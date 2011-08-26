@@ -123,6 +123,9 @@ void mvceditor::NotebookClass::MarkPageAsNotModified(int windowId) {
 }
 void mvceditor::NotebookClass::AddMvcEditorPage() {
 	CodeControlClass* page = new CodeControlClass(this, *CodeControlOptions, Project, wxID_ANY);
+
+	// if user dragged in a file on an opened file we want still want to accept dragged files
+	page->SetDropTarget(new FileDropTargetClass(this));
 	AddPage(page, wxString::Format(wxT("Untitled %d"), NewPageNumber++), true, 
 		wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_TOOLBAR, 
 		wxSize(16, 16)));
