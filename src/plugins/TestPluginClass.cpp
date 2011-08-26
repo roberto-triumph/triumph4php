@@ -1,0 +1,75 @@
+/**
+ * This software is released under the terms of the MIT License
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * @copyright  2009-2011 Roberto Perpuly
+ * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @author     $Author: robertop2004@gmail.com $
+ * @date       $Date: 2011-06-10 17:19:31 -0700 (Fri, 10 Jun 2011) $
+ * @version    $Rev: 555 $ 
+ */
+#include <plugins/TestPluginClass.h>
+#include <search/FindInFilesClass.h>
+#include <windows/StringHelperClass.h>
+#include <wx/artprov.h>
+
+int ID_GO_BUTTON = wxNewId();
+
+void mvceditor::TestPluginClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
+}
+
+void mvceditor::TestPluginClass::AddEditMenuItems(wxMenu* editMenu) {
+}
+
+void mvceditor::TestPluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
+}
+
+void mvceditor::TestPluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
+	toolBar->AddTool(ID_GO_BUTTON, wxT("GO"), wxArtProvider::GetBitmap(
+	                     wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), wxT("GO"), wxITEM_NORMAL);
+}
+
+void mvceditor::TestPluginClass::AddWindows() {
+}
+
+void mvceditor::TestPluginClass::Go(wxCommandEvent& event) {
+	//wxMessageBox(wxT("Clicked the GO! button"));
+	wxString file = wxT("/home/roberto/workspace/sample_php_project/high_ascii.php");
+	
+	mvceditor::FindInFilesClass findInFiles;
+	
+	UnicodeString str;
+	UFILE* f = u_fopen(file.ToAscii(), "r", NULL, NULL);
+	if (f) {
+		int read = u_file_read(str.getBuffer(1024), 1024, f);
+		str.releaseBuffer(read);
+		u_fclose(f);
+	}
+	GetNotebook()->LoadPage(file);
+	GetCurrentCodeControl()->SetText(StringHelperClass::IcuToWx(str));
+	
+}
+
+mvceditor::TestPluginClass::TestPluginClass() {
+}
+
+BEGIN_EVENT_TABLE(mvceditor::TestPluginClass, wxEvtHandler)
+	EVT_MENU(ID_GO_BUTTON, TestPluginClass::Go)
+END_EVENT_TABLE()

@@ -1,0 +1,3 @@
+There is a bug that prevents xulrunner from compiling correctly in 'dash' shells
+
+Patch created from https://bugzilla.mozilla.org/show_bug.cgi?id=544481
