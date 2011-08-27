@@ -31,6 +31,7 @@
 #include <php_frameworks/ProjectClass.h>
 #include <language/SymbolTableClass.h>
 #include <language/ParserClass.h>
+#include <language/LanguageDiscoveryClass.h>
 #include <PreferencesClass.h>
 #include <wx/config.h>
 #include <wx/fdrepdlg.h>
@@ -304,13 +305,27 @@ private:
 	 * The method can be given integers where to put the resulting character indices if needed.
 	 * 
 	 * @param int startPos byte offset 
-	 * @param int endPost byte offset
+	 * @param int endPos byte offset, EXCLUSIVE the character at endPos will NOT be included
 	 * @param int* charStartIndex character start position. This is the character position within the opened file.
 	 * @param int* charEndIndex character end position. This is the character position within the opened file
 	 * 
 	 */
 	UnicodeString GetSafeSubstring(int startPos, int endPos, int* charStartIndex = NULL, int* charEndIndex = NULL);
+	
+	/**
+	 * handles auto completion for PHP.
+	 * 
+	 * @param bool force if true auto completion was triggered manually.
+	 */
+	void HandleAutoCompletionPhp(bool force);	
 	 
+	 /**
+	 * handles auto completion for PHP.
+	 * 
+	 * @param bool force if true auto completion was triggered manually.
+	 */
+	void HandleAutoCompletionHtml(bool force);
+	
 	 /**
 	  * To calculate variable information
 	  * @var SymbolTableClass
@@ -359,6 +374,12 @@ private:
 	  * Used by the word highlight feature. The word being searched.
 	  */
 	 UnicodeString WordHighlightWord;
+	 
+	 /**
+	  * In order to show the proper auto complete keywords we must know what language is 
+	  * being edited at any given position.  This class will help in this regard.
+	  */
+	 mvceditor::LanguageDiscoveryClass LanguageDiscovery;
 	 
 	 /**
 	  * Used by the word highlight feature. The location from where to start searching (back)

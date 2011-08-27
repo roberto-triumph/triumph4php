@@ -184,6 +184,7 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 		, CodeControlOptions(options)
 		, WordHighlightFinder()
 		, WordHighlightWord()
+		, LanguageDiscovery()
 		, WordHighlightPreviousIndex(-1)
 		, WordHighlightNextIndex(-1)
 		, Project(project)
@@ -362,58 +363,107 @@ void mvceditor::CodeControlClass::HandleAutoCompletion(bool force) {
 	// if user is typing really fast dont bother helping them. however, if force is true, it means
 	// the user asked for auto completion, in which case always perform.
 	int currentPos = GetCurrentPos();
-	int wordLength = currentPos - WordStartPosition(currentPos, true);
-	if ((now - LastCharAddedTime) > 400 || force) { 
-		std::vector<wxString> autoCompleteList;
-		if (force || wordLength > 3) {
-			if (PositionedAtVariable(currentPos)) {
-				SymbolTable.CreateSymbols(GetSafeText());
-				int pos = WordStartPosition(currentPos, true);
-				
-				//+1 = do not take the '$' into account
-				UnicodeString symbol = GetSafeSubstring(pos + 1, pos + 1 + wordLength - 1);
-				std::vector<UnicodeString> variables = SymbolTable.GetVariablesInScope(currentPos);
-				for (size_t i = 0; i < variables.size(); ++i) {
-					if (0 == variables[i].indexOf(symbol)) {
-						autoCompleteList.push_back(wxT("$") + StringHelperClass::IcuToWx(variables[i]));
-					}
-				}
-			}
-			else {
-				wxString symbol = GetCurrentSymbol();
-				LastCharAddedTime = wxGetLocalTimeMillis();
-				ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
-				if (resourceFinder->Prepare(symbol)) {
-					resourceFinder->CollectNearMatchResources();
-					for (size_t i = 0; i < resourceFinder->GetResourceMatchCount(); ++i) {
-						wxString s = mvceditor::StringHelperClass::IcuToWx(resourceFinder->GetResourceMatch(i).Identifier);
-						autoCompleteList.push_back(s);
-					}
-				}
-				
-				// when completing method names, do NOT include keywords
-				if (resourceFinder->GetResourceType() != ResourceFinderClass::CLASS_NAME_METHOD_NAME) {
-					std::vector<wxString> keywordMatches = CollectNearMatchKeywords(symbol);
-					for (size_t i = 0; i < keywordMatches.size(); ++i) {
-						autoCompleteList.push_back(keywordMatches[i]);
-					}
-				}	
-			}
-			if (!autoCompleteList.empty()) {
-				sort(autoCompleteList.begin(), autoCompleteList.end());
-				wxString list;
-				for (size_t i = 0; i < autoCompleteList.size(); ++i) {
-					list += wxT(" ");
-					list += autoCompleteList[i];
-				}
-				AutoCompSetMaxWidth(0);
-				AutoCompShow(wordLength, list);
+	if ((now - LastCharAddedTime) > 400 || force) {
+		int charStart;
+		int charEnd;
+		UnicodeString code = GetSafeSubstring(0, currentPos, &charStart, &charEnd);
+		if (LanguageDiscovery.Open(code)) {                     
+			mvceditor::LanguageDiscoveryClass::Syntax syntax = LanguageDiscovery.at(charEnd - 1);
+			switch (syntax) {
+			case mvceditor::LanguageDiscoveryClass::PHP_SCRIPT:
+				HandleAutoCompletionPhp(force);
+				break;
+			case mvceditor::LanguageDiscoveryClass::HTML:
+				HandleAutoCompletionHtml(force);
+				break;
 			}
 		}
 	}
 	LastCharAddedTime = wxGetLocalTimeMillis();
 }
 
+void mvceditor::CodeControlClass::HandleAutoCompletionHtml(bool force) {
+      
+	// for now only complete when inside the angle brackets
+	int currentPos = GetCurrentPos();
+	int start = WordStartPosition(currentPos, true);
+	int wordLength = currentPos - start;
+	UnicodeString s = GetSafeSubstring(start - 1, start);
+	if (s.compare(UNICODE_STRING("<", 1)) == 0) {
+     
+		// scintilla needs the keywords sorted.
+		// split all of the HTML keywords into a vector so we can sort
+		// them and concatenate them
+		std::vector<wxString> autoCompleteList;
+		wxStringTokenizer tokenizer;
+		tokenizer.SetString(HTML_KEYWORDS, wxT(" "), wxTOKEN_STRTOK);
+		while (tokenizer.HasMoreTokens()) {
+			wxString it = tokenizer.NextToken();
+			autoCompleteList.push_back(it);
+		}
+		if (!autoCompleteList.empty()) {
+			sort(autoCompleteList.begin(), autoCompleteList.end());
+			wxString list;
+			for (size_t i = 0; i < autoCompleteList.size(); ++i) {
+				list += wxT(" ");
+				list += autoCompleteList[i];
+			}
+			AutoCompSetMaxWidth(0);
+			AutoCompShow(wordLength, list);
+		}
+	}
+}
+
+void mvceditor::CodeControlClass::HandleAutoCompletionPhp(bool force) {
+	int currentPos = GetCurrentPos();
+	int wordLength = currentPos - WordStartPosition(currentPos, true);
+	std::vector<wxString> autoCompleteList;
+	if (force || wordLength > 3) {
+		if (PositionedAtVariable(currentPos)) {
+			SymbolTable.CreateSymbols(GetSafeText());
+			int pos = WordStartPosition(currentPos, true);
+
+			//+1 = do not take the '$' into account
+			UnicodeString symbol = GetSafeSubstring(pos + 1, pos + 1 + wordLength - 1);
+			std::vector<UnicodeString> variables = SymbolTable.GetVariablesInScope(currentPos);
+			for (size_t i = 0; i < variables.size(); ++i) {
+				if (0 == variables[i].indexOf(symbol)) {
+					autoCompleteList.push_back(wxT("$") + StringHelperClass::IcuToWx(variables[i]));
+				}
+			}
+		}
+		else {
+			wxString symbol = GetCurrentSymbol();
+			LastCharAddedTime = wxGetLocalTimeMillis();
+			ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
+			if (resourceFinder->Prepare(symbol)) {
+				resourceFinder->CollectNearMatchResources();
+				for (size_t i = 0; i < resourceFinder->GetResourceMatchCount(); ++i) {
+					wxString s = mvceditor::StringHelperClass::IcuToWx(resourceFinder->GetResourceMatch(i).Identifier);
+					autoCompleteList.push_back(s);
+				}
+			}
+
+			 // when completing method names, do NOT include keywords
+			if (resourceFinder->GetResourceType() != ResourceFinderClass::CLASS_NAME_METHOD_NAME) {
+				std::vector<wxString> keywordMatches = CollectNearMatchKeywords(symbol);
+				for (size_t i = 0; i < keywordMatches.size(); ++i) {
+					autoCompleteList.push_back(keywordMatches[i]);
+				}
+			}
+		}
+		if (!autoCompleteList.empty()) {
+			sort(autoCompleteList.begin(), autoCompleteList.end());
+			wxString list;
+			for (size_t i = 0; i < autoCompleteList.size(); ++i) {
+				list += wxT(" ");
+				list += autoCompleteList[i];
+			}
+			AutoCompSetMaxWidth(0);
+			AutoCompShow(wordLength, list);
+		}
+	}
+}
 
 bool mvceditor::CodeControlClass::PositionedAtVariable(int pos) {
 	int start = WordStartPosition(pos, true);
@@ -811,8 +861,16 @@ UnicodeString mvceditor::CodeControlClass::GetSafeSubstring(int startPos, int en
 	
 	// pos, endPos are byte offsets into the UTF-8 string, need to convert to char numbers
 	int startIndex = mvceditor::StringHelperClass::Utf8PosToChar(buf, documentLength, startPos);
-	int endIndex = mvceditor::StringHelperClass::Utf8PosToChar(buf, documentLength, endPos);
 	UnicodeString codeText = GetSafeText();
+	int endIndex;
+	if (endPos >= documentLength) {
+		
+		// caller wants the entire document
+		endIndex = codeText.length();		
+	}
+	else {
+		endIndex =  mvceditor::StringHelperClass::Utf8PosToChar(buf, documentLength, endPos);
+	}
 	UnicodeString word(codeText, startIndex, endIndex - startIndex);
 	delete[] buf;
 	if (charStartIndex != NULL) {
