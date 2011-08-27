@@ -135,6 +135,8 @@ int mvceditor::CodeControlOptionsClass::ArrayIndexToStcConstant[] = {
 	CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING,
 	CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN,
 	CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT,
+
+	// HTML lexer
 	wxSTC_H_DEFAULT,
 	wxSTC_H_TAG,
 	wxSTC_H_TAGUNKNOWN,
@@ -148,7 +150,28 @@ int mvceditor::CodeControlOptionsClass::ArrayIndexToStcConstant[] = {
 	wxSTC_H_ENTITY,
 	wxSTC_H_VALUE,
 	wxSTC_H_QUESTION, // <?php start tag
-	wxSTC_H_TAGEND // script end tag ?>
+	wxSTC_H_TAGEND, // script end tag ?>
+
+	// SQL lexer 
+	wxSTC_SQL_DEFAULT,
+	wxSTC_SQL_COMMENT,
+	wxSTC_SQL_COMMENTLINE,
+	wxSTC_SQL_COMMENTDOC,
+	wxSTC_SQL_NUMBER,
+	wxSTC_SQL_WORD,
+	wxSTC_SQL_STRING,
+	wxSTC_SQL_CHARACTER,
+	wxSTC_SQL_OPERATOR,
+	wxSTC_SQL_IDENTIFIER,
+	wxSTC_SQL_COMMENTLINEDOC,
+	wxSTC_SQL_WORD2,
+	wxSTC_SQL_COMMENTDOCKEYWORD,
+	wxSTC_SQL_COMMENTDOCKEYWORDERROR,
+	wxSTC_SQL_USER1,
+	wxSTC_SQL_USER2,
+	wxSTC_SQL_USER3,
+	wxSTC_SQL_USER4,
+	wxSTC_SQL_QUOTEDIDENTIFIER
 };
 
 mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,  ProjectClass* project, 
@@ -197,6 +220,11 @@ bool mvceditor::CodeControlClass::LoadPhpFile(const wxString& filename) {
 		SetText(StringHelperClass::IcuToWx(fileContents));
 		EmptyUndoBuffer();
         SetSavePoint();
+		int lexer = wxSTC_LEX_HTML;
+		if (file.GetExt().CompareTo(wxT("sql")) == 0) {
+			lexer = wxSTC_LEX_SQL;
+		}
+		SetLexer(lexer);
 		Colourise(0, -1);
 		CurrentFilename = filename;
 		FileOpenedDateTime = file.GetModificationTime();

@@ -95,6 +95,27 @@ mvceditor::CodeControlOptionsClass::CodeControlOptionsClass() {
 	CodeStyles.Add(_("HTML Value"));
 	CodeStyles.Add(_("HTML Embedded Script Start"));
 	CodeStyles.Add(_("HTML Embedded Script End"));
+	CodeStyles.Add(_("HTML Embedded Script End"));
+	CodeStyles.Add(_("SQL Default"));
+	CodeStyles.Add(_("SQL Comment"));  // starts with "/*"
+	CodeStyles.Add(_("SQL Single Line Comment")); // starts with "--"
+	CodeStyles.Add(_("SQL Doc Comment")); // starts with or '/**' or '/*!' (doxygen)
+	CodeStyles.Add(_("SQL Number"));
+	CodeStyles.Add(_("SQL Keyword"));
+	CodeStyles.Add(_("SQL String"));
+	CodeStyles.Add(_("SQL Character"));
+	CodeStyles.Add(_("SQL Operator"));
+	CodeStyles.Add(_("SQL Identifier"));
+	CodeStyles.Add(_("SQL Single Line Doc Comment")); // starts with '#'
+	CodeStyles.Add(_("SQL Database Objects")); //table, column names that match the DB
+	CodeStyles.Add(_("SQL Stored Procedure Keyword")); // keyword on stored procedure
+	CodeStyles.Add(_("SQL Doxygen Comment Error")); // doxygen error
+	CodeStyles.Add(_("SQL User Keywords 1"));
+	CodeStyles.Add(_("SQL User Keywords 2"));
+	CodeStyles.Add(_("SQL User Keywords 3"));
+	CodeStyles.Add(_("SQL User Keywords 4"));
+	CodeStyles.Add(_("SQL Quoted Identifier"));
+
 	StartEditMode();
 	SetToLightTheme();
 	CommitChanges();
@@ -186,215 +207,41 @@ void mvceditor::CodeControlOptionsClass::SetToLightTheme() {
 	}
 	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 	            fontName);
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_DEFAULT)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_DEFAULT)].Color = *wxBLACK;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_DEFAULT)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_DEFAULT)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_DEFAULT)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_HSTRING)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_HSTRING)].Color = wxColour(163, 21, 21);
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_HSTRING)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_HSTRING)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_HSTRING)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_SIMPLESTRING)].Font = font;
+	for (int i = 0; i < CodeControlOptionsClass::STYLE_COUNT; ++i) {
+		EditedStylePreferences[i].Font = font;
+		EditedStylePreferences[i].Color = *wxBLACK;
+		EditedStylePreferences[i].BackgroundColor = *wxWHITE;
+		EditedStylePreferences[i].IsBold = false;
+		EditedStylePreferences[i].IsItalic = false;
+	}
+
+	EditedStylePreferences[StyleIndex(wxSTC_HPHP_HSTRING)].Color = wxColour(163, 21, 21);	
 	EditedStylePreferences[StyleIndex(wxSTC_HPHP_SIMPLESTRING)].Color = wxColour(163, 21, 21);
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_SIMPLESTRING)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_SIMPLESTRING)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_SIMPLESTRING)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_WORD)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_WORD)].Color = *wxBLUE;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_WORD)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_WORD)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_WORD)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_NUMBER)].Font = font;
+	EditedStylePreferences[StyleIndex(wxSTC_HPHP_WORD)].Color = *wxBLUE;	
 	EditedStylePreferences[StyleIndex(wxSTC_HPHP_NUMBER)].Color = wxTheColourDatabase->Find(wxT("DARK GRAY"));
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_NUMBER)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_NUMBER)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_NUMBER)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_VARIABLE)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_VARIABLE)].Color = *wxBLACK;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_VARIABLE)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_VARIABLE)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_VARIABLE)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMPLEX_VARIABLE)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMPLEX_VARIABLE)].Color = *wxBLACK;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMPLEX_VARIABLE)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMPLEX_VARIABLE)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMPLEX_VARIABLE)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMMENT)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMMENT)].Color = wxColor(0, 128, 0);
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMMENT)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMMENT)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMMENT)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMMENTLINE)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMMENTLINE)].Color = wxColor(0, 128, 0);
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMMENTLINE)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMMENTLINE)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMMENTLINE)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_HSTRING_VARIABLE)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_HSTRING_VARIABLE)].Color = *wxBLACK;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_HSTRING_VARIABLE)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_HSTRING_VARIABLE)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_HSTRING_VARIABLE)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_OPERATOR)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_OPERATOR)].Color = *wxBLACK;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_OPERATOR)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_OPERATOR)].IsBold = true;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_OPERATOR)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_BRACELIGHT)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_STYLE_BRACELIGHT)].Color = *wxGREEN;
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_BRACELIGHT)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_BRACELIGHT)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_BRACELIGHT)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_BRACEBAD)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_STYLE_BRACEBAD)].Color = *wxRED;
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_BRACEBAD)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_BRACEBAD)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_BRACEBAD)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_LINENUMBER)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_STYLE_LINENUMBER)].Color = wxColour(0, 64, 128);
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_LINENUMBER)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_LINENUMBER)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_LINENUMBER)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_INDENTGUIDE)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_STYLE_INDENTGUIDE)].Color = wxColour(wxT("#D3D3D3"));
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_INDENTGUIDE)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_INDENTGUIDE)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_INDENTGUIDE)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET)].Font = font;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET)].Color = *wxBLACK;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET)].BackgroundColor = *wxBLACK;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET)].IsBold = false;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE)].Font = font;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE)].Color = *wxBLACK;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE)].IsBold = false;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION)].Font = font;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION)].Color = *wxBLACK;
+	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET)].BackgroundColor = *wxBLACK;	
 	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION)].BackgroundColor = wxColour(192, 192, 192);
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION)].IsBold = false;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING)].Font = font;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING)].Color = *wxBLACK;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING)].IsBold = false;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN)].Font = font;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN)].Color = *wxBLACK;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN)].IsBold = false;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT)].Font = font;
 	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT)].Color = *wxBLUE;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT)].IsBold = false;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_DEFAULT)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_H_DEFAULT)].Color = *wxBLACK;
-	EditedStylePreferences[StyleIndex(wxSTC_H_DEFAULT)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_H_DEFAULT)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_H_DEFAULT)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAG)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_H_TAG)].Color = wxColour(163, 21, 21);
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAG)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAG)].IsBold = true;
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAG)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAGUNKNOWN)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAGUNKNOWN)].Color = *wxBLACK;
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAGUNKNOWN)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAGUNKNOWN)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAGUNKNOWN)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_ATTRIBUTE)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_H_ATTRIBUTE)].Color = *wxRED;
-	EditedStylePreferences[StyleIndex(wxSTC_H_ATTRIBUTE)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_H_ATTRIBUTE)].IsBold = true;
-	EditedStylePreferences[StyleIndex(wxSTC_H_ATTRIBUTE)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_ATTRIBUTEUNKNOWN)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_H_ATTRIBUTEUNKNOWN)].Color = *wxBLACK;
-	EditedStylePreferences[StyleIndex(wxSTC_H_ATTRIBUTEUNKNOWN)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_H_ATTRIBUTEUNKNOWN)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_H_ATTRIBUTEUNKNOWN)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_NUMBER)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_H_NUMBER)].Color = *wxBLACK;
-	EditedStylePreferences[StyleIndex(wxSTC_H_NUMBER)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_H_NUMBER)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_H_NUMBER)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_DOUBLESTRING)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_H_DOUBLESTRING)].Color = *wxBLUE;
-	EditedStylePreferences[StyleIndex(wxSTC_H_DOUBLESTRING)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_H_DOUBLESTRING)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_H_DOUBLESTRING)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_SINGLESTRING)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_H_SINGLESTRING)].Color = *wxBLUE;
-	EditedStylePreferences[StyleIndex(wxSTC_H_SINGLESTRING)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_H_SINGLESTRING)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_H_SINGLESTRING)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_OTHER)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_H_OTHER)].Color = *wxBLACK;
-	EditedStylePreferences[StyleIndex(wxSTC_H_OTHER)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_H_OTHER)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_H_OTHER)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_COMMENT)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_H_COMMENT)].Color = wxColour(0, 128, 0);
-	EditedStylePreferences[StyleIndex(wxSTC_H_COMMENT)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_H_COMMENT)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_H_COMMENT)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_ENTITY)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_H_ENTITY)].Color = *wxBLACK;
-	EditedStylePreferences[StyleIndex(wxSTC_H_ENTITY)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_H_ENTITY)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_H_ENTITY)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_VALUE)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_H_VALUE)].Color = *wxBLACK;
-	EditedStylePreferences[StyleIndex(wxSTC_H_VALUE)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_H_VALUE)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_H_VALUE)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_QUESTION)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_H_QUESTION)].Color = *wxBLACK;
-	EditedStylePreferences[StyleIndex(wxSTC_H_QUESTION)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_H_QUESTION)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_H_QUESTION)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAGEND)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAGEND)].Color = *wxBLACK;
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAGEND)].BackgroundColor = *wxWHITE;
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAGEND)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAGEND)].IsItalic = false;
+	EditedStylePreferences[StyleIndex(wxSTC_SQL_COMMENT)].Color = wxColor(0, 128, 0);
+	EditedStylePreferences[StyleIndex(wxSTC_SQL_COMMENTLINE)].Color = wxColor(0, 128, 0);
+	EditedStylePreferences[StyleIndex(wxSTC_SQL_COMMENTDOC)].Color = wxColor(0, 128, 0);
+	EditedStylePreferences[StyleIndex(wxSTC_SQL_WORD)].Color = *wxBLUE;
+	EditedStylePreferences[StyleIndex(wxSTC_SQL_WORD2)].Color = wxColour(163, 21, 21);
+	EditedStylePreferences[StyleIndex(wxSTC_SQL_STRING)].Color = wxColour(163, 21, 21);
+	EditedStylePreferences[StyleIndex(wxSTC_SQL_CHARACTER)].Color = wxColour(163, 21, 21);
+	EditedStylePreferences[StyleIndex(wxSTC_SQL_COMMENTLINEDOC)].Color = wxColor(0, 128, 0);	
+	EditedStylePreferences[StyleIndex(wxSTC_SQL_WORD2)].IsItalic = true;
 }
 
 void mvceditor::CodeControlOptionsClass::SetToDarkTheme() {
@@ -415,215 +262,56 @@ void mvceditor::CodeControlOptionsClass::SetToDarkTheme() {
 
 	// 100% props to the creator of the "zenburn" theme:
 	// http://slinky.imukuppi.org/2006/10/31/just-some-alien-fruit-salad-to-keep-you-in-the-zone/
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_DEFAULT)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_DEFAULT)].Color = wxColour(wxT("#DCDCCC"));
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_DEFAULT)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_DEFAULT)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_DEFAULT)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_HSTRING)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_HSTRING)].Color = wxColour(wxT("#CC9393"));
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_HSTRING)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_HSTRING)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_HSTRING)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_SIMPLESTRING)].Font = font;
+
+	for (int i = 0; i < CodeControlOptionsClass::STYLE_COUNT; ++i) {
+		EditedStylePreferences[i].Font = font;
+		EditedStylePreferences[i].Color = wxColour(wxT("#DCDCCC"));
+		EditedStylePreferences[i].BackgroundColor = wxColour(wxT("#1F1F1F"));
+		EditedStylePreferences[i].IsBold = false;
+		EditedStylePreferences[i].IsItalic = false;
+	}
+
+	EditedStylePreferences[StyleIndex(wxSTC_HPHP_HSTRING)].Color = wxColour(wxT("#CC9393"));	
 	EditedStylePreferences[StyleIndex(wxSTC_HPHP_SIMPLESTRING)].Color = wxColour(wxT("#CC9393"));
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_SIMPLESTRING)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_SIMPLESTRING)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_SIMPLESTRING)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_WORD)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_HPHP_WORD)].Color = wxColour(wxT("#DFC47D"));
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_WORD)].BackgroundColor = wxColour(wxT("#1F1F1F"));
 	EditedStylePreferences[StyleIndex(wxSTC_HPHP_WORD)].IsBold = true;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_WORD)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_NUMBER)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_HPHP_NUMBER)].Color = wxColour(wxT("#8CD0D3"));
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_NUMBER)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_NUMBER)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_NUMBER)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_VARIABLE)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_HPHP_VARIABLE)].Color = wxColour(wxT("#CEDF99"));
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_VARIABLE)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_VARIABLE)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_VARIABLE)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMPLEX_VARIABLE)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMPLEX_VARIABLE)].Color = wxColour(wxT("#CEDF99"));
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMPLEX_VARIABLE)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMPLEX_VARIABLE)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMPLEX_VARIABLE)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMMENT)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMMENT)].Color = wxColour(wxT("#7F9F7F"));
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMMENT)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMMENT)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMMENT)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMMENTLINE)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMMENTLINE)].Color = wxColour(wxT("#7F9F7F"));
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMMENTLINE)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMMENTLINE)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_COMMENTLINE)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_HSTRING_VARIABLE)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_HPHP_HSTRING_VARIABLE)].Color = wxColour(wxT("#CC9393"));
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_HSTRING_VARIABLE)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_HSTRING_VARIABLE)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_HSTRING_VARIABLE)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_OPERATOR)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_HPHP_OPERATOR)].Color = wxColour(wxT("#9F9D6D"));
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_OPERATOR)].BackgroundColor = wxColour(wxT("#1F1F1F"));
 	EditedStylePreferences[StyleIndex(wxSTC_HPHP_OPERATOR)].IsBold = true;
-	EditedStylePreferences[StyleIndex(wxSTC_HPHP_OPERATOR)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_BRACELIGHT)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_STYLE_BRACELIGHT)].Color = wxColour(wxT("#AE0000"));
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_BRACELIGHT)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_BRACELIGHT)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_BRACELIGHT)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_BRACEBAD)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_STYLE_BRACEBAD)].Color = wxColour(wxT("#FF0000"));
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_BRACEBAD)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_BRACEBAD)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_BRACEBAD)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_LINENUMBER)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_STYLE_LINENUMBER)].Color = wxColour(wxT("#8A8A8A"));
 	EditedStylePreferences[StyleIndex(wxSTC_STYLE_LINENUMBER)].BackgroundColor = wxColour(wxT("#000000"));
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_LINENUMBER)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_LINENUMBER)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_INDENTGUIDE)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_INDENTGUIDE)].Color = wxColour(wxT("#DCDCCC"));
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_INDENTGUIDE)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_INDENTGUIDE)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_STYLE_INDENTGUIDE)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET)].Font = font;
 	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET)].Color = wxColour(wxT("#D74100"));
 	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET)].BackgroundColor = wxColour(wxT("#D74100"));
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET)].IsBold = false;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE)].Font = font;
 	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE)].Color = wxColour(wxT("#000000"));
 	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE)].BackgroundColor = wxColour(wxT("#000000"));
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE)].IsBold = false;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION)].Font = font;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION)].Color = wxColour(wxT("#DCDCCC"));
 	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION)].BackgroundColor = wxColour(wxT("#646464"));
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION)].IsBold = false;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING)].Font = font;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING)].Color = wxColour(wxT("#DCDCCC"));
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING)].IsBold = false;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING)].IsItalic = false;	
-	
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN)].Font = font;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN)].Color = wxColour(wxT("#DCDCCC"));
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN)].IsBold = false;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN)].IsItalic = false;
-	
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT)].Font = font;
 	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT)].Color = wxTheColourDatabase->Find(wxT("YELLOW"));
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT)].IsBold = false;
-	EditedStylePreferences[StyleIndex(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_DEFAULT)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_H_DEFAULT)].Color = wxColour(wxT("#DCDCCC"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_DEFAULT)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_DEFAULT)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_H_DEFAULT)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAG)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_H_TAG)].Color = wxColour(wxT("#DFC47D"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAG)].BackgroundColor = wxColour(wxT("#1F1F1F"));
 	EditedStylePreferences[StyleIndex(wxSTC_H_TAG)].IsBold = true;
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAG)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAGUNKNOWN)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAGUNKNOWN)].Color = wxColour(wxT("#DCDCCC"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAGUNKNOWN)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAGUNKNOWN)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAGUNKNOWN)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_ATTRIBUTE)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_H_ATTRIBUTE)].Color = wxColour(wxT("#DFC47D"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_ATTRIBUTE)].BackgroundColor = wxColour(wxT("#1F1F1F"));
 	EditedStylePreferences[StyleIndex(wxSTC_H_ATTRIBUTE)].IsBold = true;
-	EditedStylePreferences[StyleIndex(wxSTC_H_ATTRIBUTE)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_ATTRIBUTEUNKNOWN)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_H_ATTRIBUTEUNKNOWN)].Color = wxColour(wxT("#DCDCCC"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_ATTRIBUTEUNKNOWN)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_ATTRIBUTEUNKNOWN)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_H_ATTRIBUTEUNKNOWN)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_NUMBER)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_H_NUMBER)].Color = wxColour(wxT("#DCDCCC"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_NUMBER)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_NUMBER)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_H_NUMBER)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_DOUBLESTRING)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_H_DOUBLESTRING)].Color = wxColour(wxT("#CC9393"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_DOUBLESTRING)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_DOUBLESTRING)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_H_DOUBLESTRING)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_SINGLESTRING)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_H_SINGLESTRING)].Color = wxColour(wxT("#CC9393"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_SINGLESTRING)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_SINGLESTRING)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_H_SINGLESTRING)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_OTHER)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_H_OTHER)].Color = wxColour(wxT("#DCDCCC"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_OTHER)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_OTHER)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_H_OTHER)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_COMMENT)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_H_COMMENT)].Color = wxColour(wxT("#7F9F7F"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_COMMENT)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_COMMENT)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_H_COMMENT)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_ENTITY)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_H_ENTITY)].Color = wxColour(wxT("#DCDCCC"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_ENTITY)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_ENTITY)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_H_ENTITY)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_VALUE)].Font = font;
-	EditedStylePreferences[StyleIndex(wxSTC_H_VALUE)].Color = wxColour(wxT("#DCDCCC"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_VALUE)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_VALUE)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_H_VALUE)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_QUESTION)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_H_QUESTION)].Color = wxColour(wxT("#DFC47D"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_QUESTION)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_QUESTION)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_H_QUESTION)].IsItalic = false;
-
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAGEND)].Font = font;
 	EditedStylePreferences[StyleIndex(wxSTC_H_TAGEND)].Color = wxColour(wxT("#DFC47D"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAGEND)].BackgroundColor = wxColour(wxT("#1F1F1F"));
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAGEND)].IsBold = false;
-	EditedStylePreferences[StyleIndex(wxSTC_H_TAGEND)].IsItalic = false;
+
+	EditedStylePreferences[StyleIndex(wxSTC_SQL_COMMENT)].Color = wxColour(wxT("#7F9F7F"));
+	EditedStylePreferences[StyleIndex(wxSTC_SQL_COMMENTLINE)].Color = wxColour(wxT("#7F9F7F"));
+	EditedStylePreferences[StyleIndex(wxSTC_SQL_COMMENTDOC)].Color = wxColour(wxT("#7F9F7F"));
+	EditedStylePreferences[StyleIndex(wxSTC_SQL_WORD)].Color = wxColour(wxT("#DFC47D"));
+	EditedStylePreferences[StyleIndex(wxSTC_SQL_WORD)].IsBold = true;
+	EditedStylePreferences[StyleIndex(wxSTC_SQL_STRING)].Color = wxColour(wxT("#CC9393"));;
+	EditedStylePreferences[StyleIndex(wxSTC_SQL_CHARACTER)].Color = wxColour(wxT("#CC9393"));
+	EditedStylePreferences[StyleIndex(wxSTC_SQL_COMMENTLINEDOC)].Color = wxColor(0, 128, 0);	
+	EditedStylePreferences[StyleIndex(wxSTC_SQL_WORD2)].IsItalic = true;
 }
 
 void mvceditor::CodeControlOptionsClass::Load(wxConfigBase* config) {

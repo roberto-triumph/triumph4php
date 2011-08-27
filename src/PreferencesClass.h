@@ -236,7 +236,7 @@ public:
 	 * 
 	 * @var int
 	 */
-	static const int STYLE_COUNT = 35;
+	static const int STYLE_COUNT = 54;
 	
 	/**
 	 * Mapping of array index to wxSTC_HPHP_*, wxSTC_STYLE_* constant, eliminating the need for IFs or
