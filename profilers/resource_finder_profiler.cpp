@@ -138,7 +138,7 @@ void ProfileLexer() {
 		token = lexer.NextToken();
 		lexer.GetLexeme(uniLexeme);
 		++tokenCount;
-	} while (token > 0);
+	} while (!mvceditor::TokenClass::IsTerminatingToken(token));
 	time = wxGetLocalTimeMillis() - time;
 	printf("time for lexer:%ld ms tokenCount=%d\n", time.ToLong(), tokenCount);
 
