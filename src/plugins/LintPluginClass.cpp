@@ -48,7 +48,7 @@ mvceditor::ParserDirectoryWalkerClass::ParserDirectoryWalkerClass()
 bool mvceditor::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 	bool ret = false;
 	if (!wxIsWild(PhpFileExtensions) || wxMatchWild(PhpFileExtensions, fileName)) {
-		LastResults.Error = NULL;
+		LastResults.Error = UNICODE_STRING_SIMPLE("");
 		LastResults.LineNumber = 0;
 		LastResults.CharacterPosition = 0;
 		if (Parser.LintFile(fileName, LastResults)) {

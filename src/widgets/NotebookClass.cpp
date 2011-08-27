@@ -123,9 +123,6 @@ void mvceditor::NotebookClass::MarkPageAsNotModified(int windowId) {
 }
 void mvceditor::NotebookClass::AddMvcEditorPage() {
 	CodeControlClass* page = new CodeControlClass(this, *CodeControlOptions, Project, wxID_ANY);
-
-	// if user dragged in a file on an opened file we want still want to accept dragged files
-	page->SetDropTarget(new FileDropTargetClass(this));
 	AddPage(page, wxString::Format(wxT("Untitled %d"), NewPageNumber++), true, 
 		wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_TOOLBAR, 
 		wxSize(16, 16)));
@@ -160,7 +157,7 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename) {
 			// focus goes to the notebook. Meaning that if LoadPage gets
 			// called on a file that is already at the forefront the 
 			// code control will lose focus.
-			if (GetSelection() != j) {
+			if (GetSelection() != (int)j) {
 				SetSelection(j);
 			}
 			found = true;
