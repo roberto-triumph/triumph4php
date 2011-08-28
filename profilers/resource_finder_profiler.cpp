@@ -26,6 +26,7 @@
  * @version    $Rev: 597 $ 
  */
 #include <language/LexicalAnalyzerClass.h>
+#include <language/TokenClass.h>
 #include <language/ParserClass.h>
 #include <search/DirectorySearchClass.h>
 #include <search/ResourceFinderClass.h>
