@@ -41,7 +41,7 @@
 // There is a method called GetSafeSubString() that will help you in this regard.
 
 // want to support both HTML4 and HTML5, using both sets of keywords.
-static const wxString HTML_KEYWORDS = wxString::FromAscii(
+static const wxString HTML_TAG_NAMES = wxString::FromAscii(
 
 	// HTML4 tag names, found at http://www.w3.org/TR/html4/index/elements.html
 	"a abbr acronym address applet area b base basefont bdo big blockquote body br button caption center cite code col colgroup " 
@@ -56,6 +56,9 @@ static const wxString HTML_KEYWORDS = wxString::FromAscii(
 	"header hgroup keygen mark "
 	"meter nav output progress rp rt ruby section "
 	"source summary time track video wbr"
+);
+	
+static const wxString HTML_ATTRIBUTE_NAMES = wxString::FromAscii(
 
 	// HTML4 attributes, found at http://www.w3.org/TR/html4/index/attributes.html
 	"abbr accept-charset accept accesskey action align alink alt archive axis background bgcolor border cellpadding "
@@ -367,14 +370,26 @@ void mvceditor::CodeControlClass::HandleAutoCompletion(bool force) {
 		int charStart;
 		int charEnd;
 		UnicodeString code = GetSafeSubstring(0, currentPos, &charStart, &charEnd);
-		if (LanguageDiscovery.Open(code)) {                     
+		if (LanguageDiscovery.Open(code)) {
 			mvceditor::LanguageDiscoveryClass::Syntax syntax = LanguageDiscovery.at(charEnd - 1);
 			switch (syntax) {
-			case mvceditor::LanguageDiscoveryClass::PHP_SCRIPT:
-				HandleAutoCompletionPhp(force);
+			case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_SCRIPT:
+			case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_BACKTICK:
+			case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_DOUBLE_QUOTE_STRING:
+			case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_HEREDOC:
+			case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_LINE_COMMENT:
+			case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_MULTI_LINE_COMMENT:
+			case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_NOWDOC:
+			case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_SINGLE_QUOTE_STRING:
+				HandleAutoCompletionPhp(force, syntax);
 				break;
-			case mvceditor::LanguageDiscoveryClass::HTML:
-				HandleAutoCompletionHtml(force);
+			case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML:
+			case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_TAG:
+			case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE:
+			case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE_DOUBLE_QUOTE_VALUE:
+			case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE_SINGLE_QUOTE_VALUE:
+			case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ENTITY:
+				HandleAutoCompletionHtml(force, syntax);
 				break;
 			}
 		}
@@ -382,39 +397,50 @@ void mvceditor::CodeControlClass::HandleAutoCompletion(bool force) {
 	LastCharAddedTime = wxGetLocalTimeMillis();
 }
 
-void mvceditor::CodeControlClass::HandleAutoCompletionHtml(bool force) {
-      
-	// for now only complete when inside the angle brackets
+void mvceditor::CodeControlClass::HandleAutoCompletionHtml(bool force, mvceditor::LanguageDiscoveryClass::Syntax syntax) {
 	int currentPos = GetCurrentPos();
 	int start = WordStartPosition(currentPos, true);
 	int wordLength = currentPos - start;
-	UnicodeString s = GetSafeSubstring(start - 1, start);
-	if (s.compare(UNICODE_STRING("<", 1)) == 0) {
-     
-		// scintilla needs the keywords sorted.
-		// split all of the HTML keywords into a vector so we can sort
-		// them and concatenate them
-		std::vector<wxString> autoCompleteList;
-		wxStringTokenizer tokenizer;
-		tokenizer.SetString(HTML_KEYWORDS, wxT(" "), wxTOKEN_STRTOK);
-		while (tokenizer.HasMoreTokens()) {
-			wxString it = tokenizer.NextToken();
+	if (!force && wordLength < 1) {
+		 return;
+	 }
+	 wxString symbol = GetCurrentSymbol();
+	 
+	// scintilla needs the keywords sorted.
+	// split all of the HTML keywords into a vector so we can sort
+	// them and concatenate them
+	std::vector<wxString> autoCompleteList;
+	wxStringTokenizer tokenizer(wxT(""));
+	bool isClosingTag = false;
+	if (mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE == syntax) {
+		tokenizer.SetString(HTML_ATTRIBUTE_NAMES, wxT(" "), wxTOKEN_STRTOK);
+	}
+	else if (mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_TAG == syntax) {
+		tokenizer.SetString(HTML_TAG_NAMES, wxT(" "), wxTOKEN_STRTOK);
+		UnicodeString s = GetSafeSubstring(start - 2, start);
+		if (s.compare(UNICODE_STRING("</", 1)) == 0) {
+			isClosingTag = true;
+		}
+	}
+	while (tokenizer.HasMoreTokens()) {
+		wxString it = tokenizer.NextToken();
+		if (it.StartsWith(symbol)) {
 			autoCompleteList.push_back(it);
 		}
-		if (!autoCompleteList.empty()) {
-			sort(autoCompleteList.begin(), autoCompleteList.end());
-			wxString list;
-			for (size_t i = 0; i < autoCompleteList.size(); ++i) {
-				list += wxT(" ");
-				list += autoCompleteList[i];
-			}
-			AutoCompSetMaxWidth(0);
-			AutoCompShow(wordLength, list);
+	}
+	if (!autoCompleteList.empty()) {
+		sort(autoCompleteList.begin(), autoCompleteList.end());
+		wxString list;
+		for (size_t i = 0; i < autoCompleteList.size(); ++i) {
+			list += wxT(" ");
+			list += autoCompleteList[i];
 		}
+		AutoCompSetMaxWidth(0);
+		AutoCompShow(wordLength, list);
 	}
 }
 
-void mvceditor::CodeControlClass::HandleAutoCompletionPhp(bool force) {
+void mvceditor::CodeControlClass::HandleAutoCompletionPhp(bool force, mvceditor::LanguageDiscoveryClass::Syntax syntax) {
 	int currentPos = GetCurrentPos();
 	int wordLength = currentPos - WordStartPosition(currentPos, true);
 	std::vector<wxString> autoCompleteList;
@@ -747,7 +773,7 @@ void mvceditor::CodeControlClass::SetHtmlOptions() {
 	// and JavaScript are common for HTML. For HTML, key word set 0 is for HTML,
 	// 1 is for JavaScript and 2 is for VBScript, 3 is for Python, 4 is for PHP
 	// and 5 is for SGML and DTD keywords
-	SetKeyWords(0, HTML_KEYWORDS);
+	SetKeyWords(0, HTML_TAG_NAMES + wxT(" ") + HTML_ATTRIBUTE_NAMES);
 }
 
 void mvceditor::CodeControlClass::SetJavascriptOptions() {

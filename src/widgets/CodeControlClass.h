@@ -316,15 +316,19 @@ private:
 	 * handles auto completion for PHP.
 	 * 
 	 * @param bool force if true auto completion was triggered manually.
+	 * @param syntax the token type that the cursor is currently on.  This helps
+	 * int determining context (ie if the cursor is inside of a comment or string literal)
 	 */
-	void HandleAutoCompletionPhp(bool force);	
+	void HandleAutoCompletionPhp(bool force, mvceditor::LanguageDiscoveryClass::Syntax syntax);	
 	 
 	 /**
 	 * handles auto completion for PHP.
 	 * 
 	 * @param bool force if true auto completion was triggered manually.
+	 * @param syntax the token type that the cursor is currently on.  This helps
+	 * int determining context (ie if the cursor is inside of a comment or string literal)
 	 */
-	void HandleAutoCompletionHtml(bool force);
+	void HandleAutoCompletionHtml(bool force, mvceditor::LanguageDiscoveryClass::Syntax syntax);
 	
 	 /**
 	  * To calculate variable information
