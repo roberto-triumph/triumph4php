@@ -88,6 +88,31 @@ static const wxString HTML_ATTRIBUTE_NAMES = wxString::FromAscii(
 	"onplay onplaying onpopstate onprogress onratechange onreadystatechange onredo onresize onscroll onseeked onseeking "
 	"onshow onstalled onstorage onsubmit onsuspend ontimeupdate onundo onunload onvolumechange onwaiting"
 );
+
+static const wxString MYSQL_KEYWORDS = wxString::FromAscii(
+
+	// MySQL version 5.6 keywords from
+	//http://dev.mysql.com/doc/mysqld-version-reference/en/mysqld-version-reference-reservedwords-5-6.html
+	"accessible add all alter analyze and as asc asensitive before between bigint binary blob both by call cascade "
+	"case change char character check collate column condition constraint continue convert create cross current_date "
+	"current_time current_timestamp current_user cursor database databases day_hour day_microsecond day_minute "
+	"day_second dec decimal declare default delayed delete desc describe deterministic distinct distinctrow div "
+	"double drop dual each else elseif enclosed escaped exists exit explain false fetch float float4 float8 for "
+	"force foreign from fulltext general grant group having high_priority hour_microsecond hour_minute hour_second "
+	"if ignore ignore_server_ids in index infile inner inout insensitive insert int int1 int2 int3 int4 int8 integer "
+	"interval into is iterate join key keys kill leading leave left like limit linear lines load localtime "
+	"localtimestamp lock long longblob longtext loop low_priority master_bind master_heartbeat_period "
+	"master_ssl_verify_server_cert match maxvalue mediumblob mediumint mediumtext middleint minute_microsecond "
+	"minute_second mod modifies natural not no_write_to_binlog null numeric on one_shot optimize option "
+	"optionally or order out outer outfile partition precision primary procedure purge range read reads read_write "
+	"real references regexp release rename repeat replace require resignal restrict return revoke right rlike "
+	"schema schemas second_microsecond select sensitive separator set show signal slow smallint spatial specific "
+	"sql sqlexception sqlstate sqlwarning sql_big_result sql_calc_found_rows sql_small_result ssl "
+	"starting straight_join table terminated then tinyblob tinyint tinytext to trailing trigger true undo "
+	"union unique unlock unsigned update usage use using utc_date utc_time utc_timestamp values varbinary "
+	"varchar varcharacter varying when where while with write xor year_month zerofill"
+);
+
 static const wxString JAVASCRIPT_KEYWORDS = wxT("");
 
 // margin 0 is taken up by line numbers, margin 1 is taken up by code folding. use
@@ -187,35 +212,20 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 		, CodeControlOptions(options)
 		, WordHighlightFinder()
 		, WordHighlightWord()
-		, LanguageDiscovery()
+		, Project(project)
+		, Document(NULL)
 		, WordHighlightPreviousIndex(-1)
 		, WordHighlightNextIndex(-1)
-		, Project(project)
 		, ModifiedDialogOpen(false)
 		, WordHighlightIsWordHighlighted(false) {
-	SetLexer(wxSTC_LEX_HTML);
-	UsePopUp(false);
-
-	// 7 = as per scintilla docs, HTML lexer uses 7 bits for styles
-	SetStyleBits(7);
-	AutoCompStops(wxT("!@#$%^&*()_+-=[]\\{}|;':\",./<>?"));
-	AutoCompSetSeparator(' ');
-	AutoCompSetFillUps(wxT("(["));
-	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$"));
-	wxString keywords = Project->GetPhpKeywords();
-	SetKeyWords(4, keywords);
-	SetYCaretPolicy(wxSTC_CARET_EVEN, 0);
 	
-	SetMarginType(LINT_RESULT_MARGIN, wxSTC_MARGIN_SYMBOL);
-	SetMarginWidth(LINT_RESULT_MARGIN, 16);
-	SetMarginSensitive(LINT_RESULT_MARGIN, false);
-	SetMarginMask(LINT_RESULT_MARGIN, ~wxSTC_MASK_FOLDERS);
-
-	MarkerDefine(LINT_RESULT_MARKER, wxSTC_MARK_ARROW, *wxRED, *wxRED);
+	// we will handle right-click menu ourselves
+	UsePopUp(false);
+	SetYCaretPolicy(wxSTC_CARET_EVEN, 0);
 	ApplyPreferences();
 }
 
-bool mvceditor::CodeControlClass::LoadPhpFile(const wxString& filename) {
+bool mvceditor::CodeControlClass::LoadAndTrackFile(const wxString& filename) {
 	UnicodeString fileContents;
 	wxFileName file(filename);
 	// not using LoadFile() because it does not correctly handle files with high ascii characters
@@ -224,14 +234,10 @@ bool mvceditor::CodeControlClass::LoadPhpFile(const wxString& filename) {
 		SetText(StringHelperClass::IcuToWx(fileContents));
 		EmptyUndoBuffer();
         SetSavePoint();
-		int lexer = wxSTC_LEX_HTML;
-		if (file.GetExt().CompareTo(wxT("sql")) == 0) {
-			lexer = wxSTC_LEX_SQL;
-		}
-		SetLexer(lexer);
-		Colourise(0, -1);
 		CurrentFilename = filename;
 		FileOpenedDateTime = file.GetModificationTime();
+		ApplyPreferences();
+		Colourise(0, -1);
 		return true;
 	}
 	return false;
@@ -239,7 +245,7 @@ bool mvceditor::CodeControlClass::LoadPhpFile(const wxString& filename) {
 
 void mvceditor::CodeControlClass::Revert() {
 	if (!IsNew()) {
-		LoadPhpFile(CurrentFilename);
+		LoadAndTrackFile(CurrentFilename);
 	}
 }
 
@@ -247,7 +253,7 @@ bool mvceditor::CodeControlClass::IsNew() const {
 	return CurrentFilename.empty();
 }
 
-bool mvceditor::CodeControlClass::SavePhpFile(const wxString newFilename) {
+bool mvceditor::CodeControlClass::SaveAndTrackFile(wxString newFilename) {
 	bool saved = false;
 	
 	// when saving, update the internal timestamp so that the OnIdle logic works correctly
@@ -261,10 +267,16 @@ bool mvceditor::CodeControlClass::SavePhpFile(const wxString newFilename) {
 	if (saved) {
 		wxFileName file(CurrentFilename);
 		FileOpenedDateTime = file.GetModificationTime();
+		
+		// when a file is saved update the resource cache
 		mvceditor::ResourceFinderClass* finder = Project->GetResourceFinder();
 		if (finder != NULL) {
 			finder->Walk(CurrentFilename);
 		}
+		
+		// if the file extension changed let's update the code control appropriate
+		// for example if a .txt file was saved as a .sql file
+		ApplyPreferences();
 	}
 	return saved;
 }
@@ -339,6 +351,8 @@ wxString mvceditor::CodeControlClass::GetCurrentSymbol() {
 	UnicodeString codeText = GetSafeText();
 	ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
 	wxString fileName = CurrentFilename.IsEmpty() ? wxT("Untitled") : CurrentFilename;
+	
+	// this will parse any new symbols into the cache
 	resourceFinder->BuildResourceCacheForFile(fileName, codeText);
 	SymbolTable.CreateSymbols(codeText);
 	SymbolClass::Types type;
@@ -365,130 +379,37 @@ void mvceditor::CodeControlClass::HandleAutoCompletion(bool force) {
 	
 	// if user is typing really fast dont bother helping them. however, if force is true, it means
 	// the user asked for auto completion, in which case always perform.
-	int currentPos = GetCurrentPos();
 	if ((now - LastCharAddedTime) > 400 || force) {
-		int charStart;
-		int charEnd;
-		UnicodeString code = GetSafeSubstring(0, currentPos, &charStart, &charEnd);
-		if (LanguageDiscovery.Open(code)) {
-			mvceditor::LanguageDiscoveryClass::Syntax syntax = LanguageDiscovery.at(charEnd - 1);
-			switch (syntax) {
-			case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_SCRIPT:
-			case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_BACKTICK:
-			case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_DOUBLE_QUOTE_STRING:
-			case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_HEREDOC:
-			case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_LINE_COMMENT:
-			case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_MULTI_LINE_COMMENT:
-			case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_NOWDOC:
-			case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_SINGLE_QUOTE_STRING:
-				HandleAutoCompletionPhp(force, syntax);
-				break;
-			case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML:
-			case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_TAG:
-			case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE:
-			case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE_DOUBLE_QUOTE_VALUE:
-			case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE_SINGLE_QUOTE_VALUE:
-			case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ENTITY:
-				HandleAutoCompletionHtml(force, syntax);
-				break;
+		if (Document->CanAutoComplete()) {
+			int currentPos = GetCurrentPos();
+			int startPos = WordStartPosition(currentPos, true);
+			int endPos = WordEndPosition(currentPos, true);
+			UnicodeString symbol = GetSafeSubstring(startPos, endPos);
+			UnicodeString code = GetSafeSubstring(0, currentPos);
+			
+			// this will parse any new symbols into the cache
+			// hmmm this means that code will be scanned again (here and up above by the LanguageDiscoveryClass)
+			// TODO: code gets parsed here and also inside of PhpDocumentClass::HandlAutoComplete(). fix.
+			// ideally this would only happen once inside of PhpDocumentClass::HandlAutoComplete()
+			wxString fileName = CurrentFilename.IsEmpty() ? wxT("Untitled") : CurrentFilename;
+			Project->GetResourceFinder()->BuildResourceCacheForFile(fileName, GetSafeText());
+			std::vector<wxString> autoCompleteList = Document->HandleAutoComplete(code, symbol, force);
+			if (!autoCompleteList.empty()) {
+				
+				// scintilla needs the keywords sorted.
+				sort(autoCompleteList.begin(), autoCompleteList.end());
+				wxString list;
+				for (size_t i = 0; i < autoCompleteList.size(); ++i) {
+					list += wxT(" ");
+					list += autoCompleteList[i];
+				}
+				AutoCompSetMaxWidth(0);
+				int wordLength = currentPos - startPos;
+				AutoCompShow(wordLength, list);
 			}
 		}
 	}
 	LastCharAddedTime = wxGetLocalTimeMillis();
-}
-
-void mvceditor::CodeControlClass::HandleAutoCompletionHtml(bool force, mvceditor::LanguageDiscoveryClass::Syntax syntax) {
-	int currentPos = GetCurrentPos();
-	int start = WordStartPosition(currentPos, true);
-	int wordLength = currentPos - start;
-	if (!force && wordLength < 1) {
-		 return;
-	 }
-	 wxString symbol = GetCurrentSymbol();
-	 
-	// scintilla needs the keywords sorted.
-	// split all of the HTML keywords into a vector so we can sort
-	// them and concatenate them
-	std::vector<wxString> autoCompleteList;
-	wxStringTokenizer tokenizer(wxT(""));
-	bool isClosingTag = false;
-	if (mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE == syntax) {
-		tokenizer.SetString(HTML_ATTRIBUTE_NAMES, wxT(" "), wxTOKEN_STRTOK);
-	}
-	else if (mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_TAG == syntax) {
-		tokenizer.SetString(HTML_TAG_NAMES, wxT(" "), wxTOKEN_STRTOK);
-		UnicodeString s = GetSafeSubstring(start - 2, start);
-		if (s.compare(UNICODE_STRING("</", 1)) == 0) {
-			isClosingTag = true;
-		}
-	}
-	while (tokenizer.HasMoreTokens()) {
-		wxString it = tokenizer.NextToken();
-		if (it.StartsWith(symbol)) {
-			autoCompleteList.push_back(it);
-		}
-	}
-	if (!autoCompleteList.empty()) {
-		sort(autoCompleteList.begin(), autoCompleteList.end());
-		wxString list;
-		for (size_t i = 0; i < autoCompleteList.size(); ++i) {
-			list += wxT(" ");
-			list += autoCompleteList[i];
-		}
-		AutoCompSetMaxWidth(0);
-		AutoCompShow(wordLength, list);
-	}
-}
-
-void mvceditor::CodeControlClass::HandleAutoCompletionPhp(bool force, mvceditor::LanguageDiscoveryClass::Syntax syntax) {
-	int currentPos = GetCurrentPos();
-	int wordLength = currentPos - WordStartPosition(currentPos, true);
-	std::vector<wxString> autoCompleteList;
-	if (force || wordLength > 3) {
-		if (PositionedAtVariable(currentPos)) {
-			SymbolTable.CreateSymbols(GetSafeText());
-			int pos = WordStartPosition(currentPos, true);
-
-			//+1 = do not take the '$' into account
-			UnicodeString symbol = GetSafeSubstring(pos + 1, pos + 1 + wordLength - 1);
-			std::vector<UnicodeString> variables = SymbolTable.GetVariablesInScope(currentPos);
-			for (size_t i = 0; i < variables.size(); ++i) {
-				if (0 == variables[i].indexOf(symbol)) {
-					autoCompleteList.push_back(wxT("$") + StringHelperClass::IcuToWx(variables[i]));
-				}
-			}
-		}
-		else {
-			wxString symbol = GetCurrentSymbol();
-			LastCharAddedTime = wxGetLocalTimeMillis();
-			ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
-			if (resourceFinder->Prepare(symbol)) {
-				resourceFinder->CollectNearMatchResources();
-				for (size_t i = 0; i < resourceFinder->GetResourceMatchCount(); ++i) {
-					wxString s = mvceditor::StringHelperClass::IcuToWx(resourceFinder->GetResourceMatch(i).Identifier);
-					autoCompleteList.push_back(s);
-				}
-			}
-
-			 // when completing method names, do NOT include keywords
-			if (resourceFinder->GetResourceType() != ResourceFinderClass::CLASS_NAME_METHOD_NAME) {
-				std::vector<wxString> keywordMatches = CollectNearMatchKeywords(symbol);
-				for (size_t i = 0; i < keywordMatches.size(); ++i) {
-					autoCompleteList.push_back(keywordMatches[i]);
-				}
-			}
-		}
-		if (!autoCompleteList.empty()) {
-			sort(autoCompleteList.begin(), autoCompleteList.end());
-			wxString list;
-			for (size_t i = 0; i < autoCompleteList.size(); ++i) {
-				list += wxT(" ");
-				list += autoCompleteList[i];
-			}
-			AutoCompSetMaxWidth(0);
-			AutoCompShow(wordLength, list);
-		}
-	}
 }
 
 bool mvceditor::CodeControlClass::PositionedAtVariable(int pos) {
@@ -589,20 +510,6 @@ void mvceditor::CodeControlClass::HandleCallTip(wxChar ch) {
 	}
 }
 
-std::vector<wxString> mvceditor::CodeControlClass::CollectNearMatchKeywords(wxString resource) {
-	resource = resource.Lower();
-	std::vector<wxString> matchedKeywords;
-	wxString keywords = Project->GetPhpKeywords();
-	wxStringTokenizer tokens(keywords, wxT(" "));
-	while (tokens.HasMoreTokens()) {
-		wxString keyword = tokens.GetNextToken();
-		if (0 == keyword.Find(resource)) {
-			matchedKeywords.push_back(keyword);
-		}
-	}
-	return matchedKeywords;
-}
-
 void mvceditor::CodeControlClass::OnUpdateUi(wxStyledTextEvent &event) {
 	HandleCallTip(0);
 	event.Skip();
@@ -684,6 +591,104 @@ void mvceditor::CodeControlClass::SetMargin() {
 }
 
 void mvceditor::CodeControlClass::SetPhpOptions() {
+	// Some languages, such as HTML may contain embedded languages, VBScript
+	// and JavaScript are common for HTML. For HTML, key word set 0 is for HTML,
+	// 1 is for JavaScript and 2 is for VBScript, 3 is for Python, 4 is for PHP
+	// and 5 is for SGML and DTD keywords
+	SetKeyWords(0, HTML_TAG_NAMES + wxT(" ") + HTML_ATTRIBUTE_NAMES);
+	SetKeyWords(1, JAVASCRIPT_KEYWORDS);
+	wxString keywords = Project->GetPhpKeywords();
+	SetKeyWords(4, keywords);
+	
+	SetLexer(wxSTC_LEX_HTML);
+	// 7 = as per scintilla docs, HTML lexer uses 7 bits for styles
+	SetStyleBits(7);
+	AutoCompStops(wxT("!@#$%^&*()_+-=[]\\{}|;':\",./<>?"));
+	AutoCompSetSeparator(' ');
+	AutoCompSetFillUps(wxT("(["));
+	AutoCompSetIgnoreCase(true);
+	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$"));
+	
+	SetMarginType(LINT_RESULT_MARGIN, wxSTC_MARGIN_SYMBOL);
+	SetMarginWidth(LINT_RESULT_MARGIN, 16);
+	SetMarginSensitive(LINT_RESULT_MARGIN, false);
+	SetMarginMask(LINT_RESULT_MARGIN, ~wxSTC_MASK_FOLDERS);
+	MarkerDefine(LINT_RESULT_MARKER, wxSTC_MARK_ARROW, *wxRED, *wxRED);
+	
+	
+}
+
+void mvceditor::CodeControlClass::ApplyPreferences() {
+	SetMargin();
+	SetCodeControlOptions();
+	wxString file = GetFileName();
+	wxFileName name(file);
+	wxString ext = name.GetExt();
+	if (Document) {
+		delete Document;
+		Document = NULL;
+	}
+	if (ext.CmpNoCase(wxT("sql")) == 0) {
+		SetSqlOptions();		
+		Document = new mvceditor::SqlDocumentClass();
+	}
+	else if (ext.CmpNoCase(wxT("php")) == 0 || 
+			ext.CmpNoCase(wxT("phtml")) == 0 || 
+			ext.CmpNoCase(wxT("html")) == 0) {
+		SetPhpOptions();
+		Document = new mvceditor::PhpDocumentClass(Project);
+	}
+	else {
+		Document = new mvceditor::TextDocumentClass();
+	}
+}
+
+void mvceditor::CodeControlClass::SetSqlOptions() {	
+	SetKeyWords(0, MYSQL_KEYWORDS);
+	SetKeyWords(1, wxT(""));
+	SetKeyWords(2, wxT(""));
+	SetKeyWords(3, wxT(""));
+	SetKeyWords(4, wxT(""));
+	
+	SetLexer(wxSTC_LEX_SQL);
+	
+	// 5 = default as per scintilla docs. set it because it may have been set by SetPhpOptions()
+	SetStyleBits(5);
+	AutoCompStops(wxT("!@#$%^&*()_+-=[]\\{}|;':\",./<>?`"));
+	AutoCompSetSeparator(' ');
+	AutoCompSetIgnoreCase(true);
+	AutoCompSetFillUps(wxT("(["));
+	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$"));
+	
+}
+
+void mvceditor::CodeControlClass::SetCodeControlOptions() {
+	if (CodeControlOptions.IndentUsingTabs) {
+		SetUseTabs(true);
+		SetTabWidth(CodeControlOptions.TabWidth);
+		SetIndent(0);
+		SetTabIndents(true);
+		SetBackSpaceUnIndents(true);
+	}
+	else {
+		SetUseTabs(false);
+		SetTabWidth(CodeControlOptions.SpacesPerIndent);
+		SetIndent(CodeControlOptions.SpacesPerIndent);
+		SetTabIndents(false);
+		SetBackSpaceUnIndents(false);
+	}
+	if (CodeControlOptions.RightMargin > 0) {
+		SetEdgeMode(wxSTC_EDGE_LINE);
+		SetEdgeColumn(CodeControlOptions.RightMargin);
+	}
+	else {
+		SetEdgeMode(wxSTC_EDGE_NONE);
+	}
+	SetIndentationGuides(CodeControlOptions.EnableIndentationGuides);
+	SetEOLMode(CodeControlOptions.LineEndingMode);
+	SetViewEOL(CodeControlOptions.EnableLineEndings);
+	
+	// syntax coloring
 	wxFont font;
 	wxColor color,
 		backgroundColor;
@@ -739,7 +744,7 @@ void mvceditor::CodeControlClass::SetPhpOptions() {
 							wxSTC_HJ_SINGLESTRING, wxSTC_HJ_SYMBOLS, wxSTC_HJ_STRINGEOL,
 							wxSTC_HJ_REGEX
 						};
-						for (int i = 0; i < 28; ++i) {
+						for (int i = 0; i < 14; ++i) {
 							StyleSetFont(styles[i], font);
 							StyleSetForeground(styles[i], color);
 							StyleSetBackground(styles[i], backgroundColor);
@@ -755,56 +760,7 @@ void mvceditor::CodeControlClass::SetPhpOptions() {
 					break;
 			}
 		}
-		
 	}
-}
-
-void mvceditor::CodeControlClass::ApplyPreferences() {
-	SetHtmlOptions();
-	SetMargin();
-	SetPhpOptions();
-	SetJavascriptOptions();
-	SetCodeControlOptions();
-}
-
-void mvceditor::CodeControlClass::SetHtmlOptions() {
-	
-	// Some languages, such as HTML may contain embedded languages, VBScript
-	// and JavaScript are common for HTML. For HTML, key word set 0 is for HTML,
-	// 1 is for JavaScript and 2 is for VBScript, 3 is for Python, 4 is for PHP
-	// and 5 is for SGML and DTD keywords
-	SetKeyWords(0, HTML_TAG_NAMES + wxT(" ") + HTML_ATTRIBUTE_NAMES);
-}
-
-void mvceditor::CodeControlClass::SetJavascriptOptions() {
-	SetKeyWords(1, JAVASCRIPT_KEYWORDS);
-}
-
-void mvceditor::CodeControlClass::SetCodeControlOptions() {
-	if (CodeControlOptions.IndentUsingTabs) {
-		SetUseTabs(true);
-		SetTabWidth(CodeControlOptions.TabWidth);
-		SetIndent(0);
-		SetTabIndents(true);
-		SetBackSpaceUnIndents(true);
-	}
-	else {
-		SetUseTabs(false);
-		SetTabWidth(CodeControlOptions.SpacesPerIndent);
-		SetIndent(CodeControlOptions.SpacesPerIndent);
-		SetTabIndents(false);
-		SetBackSpaceUnIndents(false);
-	}
-	if (CodeControlOptions.RightMargin > 0) {
-		SetEdgeMode(wxSTC_EDGE_LINE);
-		SetEdgeColumn(CodeControlOptions.RightMargin);
-	}
-	else {
-		SetEdgeMode(wxSTC_EDGE_NONE);
-	}
-	SetIndentationGuides(CodeControlOptions.EnableIndentationGuides);
-	SetEOLMode(CodeControlOptions.LineEndingMode);
-	SetViewEOL(CodeControlOptions.EnableLineEndings);
 }
 
 void  mvceditor::CodeControlClass::OnDoubleClick(wxStyledTextEvent& event) {
@@ -876,9 +832,10 @@ UnicodeString mvceditor::CodeControlClass::GetSafeText() {
 }
 
 UnicodeString mvceditor::CodeControlClass::GetSafeSubstring(int startPos, int endPos, int *charStartIndex, int *charEndIndex) {
-	
+	if (endPos == startPos) {
+		return UNICODE_STRING_SIMPLE("");
+	}
 	// not a very efficient function, but at least it's correct
-	
 	int documentLength = GetTextLength();
 	char* buf = new char[documentLength];
 	
@@ -921,7 +878,7 @@ void mvceditor::CodeControlClass::OnIdle(wxIdleEvent& event) {
 				int res = wxMessageBox(message, _("Warning"), 
 					wxYES_NO | wxICON_QUESTION, this);
 				if (wxYES == res) {
-					LoadPhpFile(CurrentFilename);
+					LoadAndTrackFile(CurrentFilename);
 				}
 				else {
 
@@ -1066,6 +1023,202 @@ void mvceditor::CodeControlClass::ClearLintErrors() {
 	SetStyling(GetLength(), 0);
 }
 
+void mvceditor::CodeControlClass::OnClose(wxCloseEvent& event) {
+	delete Document;
+	Document = NULL;
+	event.Skip();
+}
+
+mvceditor::TextDocumentClass::TextDocumentClass() {
+	
+}
+
+mvceditor::TextDocumentClass::~TextDocumentClass() {
+	
+}
+
+bool mvceditor::TextDocumentClass::CanAutoComplete() {
+	return false;
+}
+
+std::vector<wxString> mvceditor::TextDocumentClass::HandleAutoComplete(const UnicodeString& code, const UnicodeString& word, bool force) {	
+	std::vector<wxString> ret;
+	return ret;
+}
+
+
+
+mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::ProjectClass* project)
+	: TextDocumentClass()
+	, LanguageDiscovery()
+	, SymbolTable()
+	, Project(project) {
+}
+
+bool mvceditor::PhpDocumentClass::CanAutoComplete() {
+	return true;
+}
+
+std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoComplete(const UnicodeString& code, const UnicodeString& word, bool force) {	
+	std::vector<wxString> ret;
+	if (LanguageDiscovery.Open(code)) {
+		mvceditor::LanguageDiscoveryClass::Syntax syntax = LanguageDiscovery.at(code.length() - 1);
+		switch (syntax) {
+		case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_SCRIPT:
+		case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_BACKTICK:
+		case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_DOUBLE_QUOTE_STRING:
+		case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_HEREDOC:
+		case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_LINE_COMMENT:
+		case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_MULTI_LINE_COMMENT:
+		case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_NOWDOC:
+		case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_SINGLE_QUOTE_STRING:
+			ret = HandleAutoCompletionPhp(code, word, force, syntax);
+			break;
+		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML:
+		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_TAG:
+		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE:
+		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE_DOUBLE_QUOTE_VALUE:
+		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE_SINGLE_QUOTE_VALUE:
+		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ENTITY:
+			ret = HandleAutoCompletionHtml(code, word, force, syntax);
+			break;
+		}
+	}	
+	return ret;
+}
+
+std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionHtml(const UnicodeString& code, const UnicodeString& word, bool force, mvceditor::LanguageDiscoveryClass::Syntax syntax) {
+	std::vector<wxString> autoCompleteList;
+	if (!force && word.length() < 1) {
+		 return autoCompleteList;
+	}
+	wxStringTokenizer tokenizer(wxT(""));
+	if (mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE == syntax) {
+		tokenizer.SetString(HTML_ATTRIBUTE_NAMES, wxT(" "), wxTOKEN_STRTOK);
+	}
+	else if (mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_TAG == syntax) {
+		tokenizer.SetString(HTML_TAG_NAMES, wxT(" "), wxTOKEN_STRTOK);
+	}
+	wxString symbol = mvceditor::StringHelperClass::IcuToWx(word);
+	while (tokenizer.HasMoreTokens()) {
+		wxString it = tokenizer.NextToken();
+		if (it.StartsWith(symbol)) {
+			autoCompleteList.push_back(it);
+		}
+	}
+	return autoCompleteList;
+}
+
+std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& code, const UnicodeString& word, bool force, mvceditor::LanguageDiscoveryClass::Syntax syntax) {
+	std::vector<wxString> autoCompleteList;
+	if (force || word.length() >= 3) {
+		
+		ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
+	
+		// word will start with a '$" if its a variable
+		//the word will contain the $ in case of variables since "$" is a word characters (via SetWordCharacters() call)
+		if (word.charAt(0) == '$') {
+			
+			// hmmm this means that code will be scanned again (here and up above by the LanguageDiscoveryClass)
+			// TODO: parsing it again? that's 3 times now
+			// TODO fix the double-scanning
+			SymbolTable.CreateSymbols(code);
+
+			//+1 = do not take the '$' into account
+			UnicodeString symbol(word, 1);
+			std::vector<UnicodeString> variables = SymbolTable.GetVariablesInScope(code.length() - 1);
+			for (size_t i = 0; i < variables.size(); ++i) {
+				if (0 == variables[i].indexOf(symbol)) {
+					autoCompleteList.push_back(wxT("$") + StringHelperClass::IcuToWx(variables[i]));
+				}
+			}
+		}
+		else {
+			
+			// look up the type of the word (is the word in the context of a class, method or function ?
+			// SymbolTable resolves stuff like parent:: and self:: as well we don't need to do it here
+			SymbolTable.CreateSymbols(code);
+			SymbolClass::Types type;
+			UnicodeString objectType,
+				objectMember,
+				comment,
+				symbol(word);
+			if (SymbolTable.Lookup(code.length() - 1, *resourceFinder, type, objectType, objectMember, comment)) {
+				bool isObjectMethodOrProperty = SymbolClass::OBJECT == type ||SymbolClass::METHOD == type || SymbolClass::PROPERTY == type;
+				if (isObjectMethodOrProperty)  {
+					// even if objectType is empty, symbol will be something like '::METHOD' which the 
+					// ResourceFinder will interpret to look for methods only (which is what we want here)
+					symbol = objectType + UNICODE_STRING_SIMPLE("::") + objectMember;
+				}
+				else {
+					symbol = objectType;
+				}
+			}
+			
+			// get all other resources that start like the word
+			wxString wxSymbol = mvceditor::StringHelperClass::IcuToWx(symbol);			
+			if (resourceFinder->Prepare(wxSymbol)) {
+				resourceFinder->CollectNearMatchResources();
+				for (size_t i = 0; i < resourceFinder->GetResourceMatchCount(); ++i) {
+					wxString s = mvceditor::StringHelperClass::IcuToWx(resourceFinder->GetResourceMatch(i).Identifier);
+					autoCompleteList.push_back(s);
+				}
+			}
+
+			 // when completing method names, do NOT include keywords
+			if (resourceFinder->GetResourceType() != ResourceFinderClass::CLASS_NAME_METHOD_NAME) {
+				std::vector<wxString> keywordMatches = CollectNearMatchKeywords(wxSymbol);
+				for (size_t i = 0; i < keywordMatches.size(); ++i) {
+					autoCompleteList.push_back(keywordMatches[i]);
+				}
+			}
+		}
+	}
+	return autoCompleteList;
+}
+
+std::vector<wxString> mvceditor::PhpDocumentClass::CollectNearMatchKeywords(wxString resource) {
+	resource = resource.Lower();
+	std::vector<wxString> matchedKeywords;
+	wxString keywords = Project->GetPhpKeywords();
+	wxStringTokenizer tokens(keywords, wxT(" "));
+	while (tokens.HasMoreTokens()) {
+		wxString keyword = tokens.GetNextToken();
+		if (0 == keyword.Find(resource)) {
+			matchedKeywords.push_back(keyword);
+		}
+	}
+	return matchedKeywords;
+}
+
+mvceditor::SqlDocumentClass::SqlDocumentClass() 
+	: TextDocumentClass() {
+		
+}
+
+bool mvceditor::SqlDocumentClass::CanAutoComplete() {
+	return true;
+}
+
+std::vector<wxString> mvceditor::SqlDocumentClass::HandleAutoComplete(const UnicodeString& code, const UnicodeString& word, bool force) {
+	std::vector<wxString> autoCompleteList;
+	if (!force && word.length() < 1) {
+		return autoCompleteList;
+	 }
+	wxString symbol = mvceditor::StringHelperClass::IcuToWx(word);
+	symbol = symbol.Lower();
+	wxStringTokenizer tokenizer(wxT(""));
+	tokenizer.SetString(MYSQL_KEYWORDS, wxT(" "), wxTOKEN_STRTOK);
+	while (tokenizer.HasMoreTokens()) {
+		wxString it = tokenizer.NextToken();
+		if (it.StartsWith(symbol)) {
+			
+			// make keywords uppercase for SQL keywords
+			autoCompleteList.push_back(it.Upper());
+		}
+	}
+	return autoCompleteList;
+}
 
 BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)
 	EVT_STC_MARGINCLICK(wxID_ANY, mvceditor::CodeControlClass::OnMarginClick)
@@ -1077,5 +1230,6 @@ BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)
 	EVT_STC_CHARADDED(wxID_ANY, mvceditor::CodeControlClass::OnCharAdded)
 	EVT_STC_UPDATEUI(wxID_ANY, mvceditor::CodeControlClass::OnUpdateUi) 
 	EVT_LEFT_DOWN(mvceditor::CodeControlClass::OnLeftDown)
-	EVT_KEY_DOWN(mvceditor::CodeControlClass::OnKeyDown) 	
+	EVT_KEY_DOWN(mvceditor::CodeControlClass::OnKeyDown)
+	EVT_CLOSE(mvceditor::CodeControlClass::OnClose)
 END_EVENT_TABLE()

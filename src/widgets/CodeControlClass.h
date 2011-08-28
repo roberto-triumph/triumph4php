@@ -44,7 +44,146 @@
  * The source code editor.
  */
 namespace mvceditor {
+
+/**
+ * this is the 'extra' functionality  that a plain text document has.
+ * Plain text docouments will have auto complete, call tips, and
+ * brace matching disabled.
+ */ 	
+class TextDocumentClass {
 	
+	public:
+
+	TextDocumentClass();
+	
+	virtual ~TextDocumentClass();
+	
+	/**
+	 * Since auto-completion can be a time consuming task we want to make
+	 * it optional so that editing documents labeled as plain text can be as
+	 * smooth as possible.
+	 * 
+	 * Sub classes can return TRUE here, but if they don then they must also
+	 * implement HandleAutoComplete method.
+	 * This method will be called in response to a user keypress; speed is
+	 * crucial here.
+	 * 
+	 * For plain text documents this method returns false since we
+	 * don't know what words to complete.
+	 */
+	virtual bool CanAutoComplete();
+	
+	/**
+	 * Sub classes can implement their own logic for auto completion.
+	 * This method will be called in response to a user keypress; speed is
+	 * crucial here.
+	 * @return a vector of strings, one item for each keyword to be 
+	 * shown to the user.
+	 */
+	virtual std::vector<wxString> HandleAutoComplete(const UnicodeString& code, const UnicodeString& word, bool force);
+
+};
+
+/**
+ * this is a PHP specialization of a document.  It knows how to perform code
+ * completion on PHP documents intelligently 
+ */
+class PhpDocumentClass : public TextDocumentClass {
+public:
+
+	/**
+	 * This class will NOT own this pointer. Caller must manage (delete) it.
+	 */
+	PhpDocumentClass(ProjectClass* project);
+	
+	/**
+	 * enable auto complete
+	 */
+	virtual bool CanAutoComplete();
+	
+	/**
+	 * Use the project's resource finder to find auto complete suggestions
+	 */
+	virtual std::vector<wxString> HandleAutoComplete(const UnicodeString& code, const UnicodeString& word, bool force);
+	
+private:
+
+	/**
+	 * handles auto completion for PHP.
+	 * 
+	 * @param bool force if true auto completion was triggered manually.
+	 * @param syntax the token type that the cursor is currently on.  This helps
+	 * int determining context (ie if the cursor is inside of a comment or string literal)
+	 */
+	std::vector<wxString> HandleAutoCompletionPhp(const UnicodeString& code, const UnicodeString& word, bool force, mvceditor::LanguageDiscoveryClass::Syntax syntax);	
+	 
+	 /**
+	 * handles auto completion for PHP.
+	 * 
+	 * @param bool force if true auto completion was triggered manually.
+	 * @param syntax the token type that the cursor is currently on.  This helps
+	 * int determining context (ie if the cursor is inside of a comment or string literal)
+	 */
+	std::vector<wxString> HandleAutoCompletionHtml(const UnicodeString& code, const UnicodeString& word, bool force, mvceditor::LanguageDiscoveryClass::Syntax syntax);
+	
+	/**
+	 * Return a list of possible keyword matches for the given word. For example, if word="cl"
+	 * then this method would return "class"
+	 */
+	std::vector<wxString> CollectNearMatchKeywords(wxString word);
+
+
+	 /**
+	  * In order to show the proper auto complete keywords we must know what language is 
+	  * being edited at any given position.  This class will help in this regard.
+	  */
+	 mvceditor::LanguageDiscoveryClass LanguageDiscovery;
+	 
+	 /**
+	 * To calculate variable information
+	 * @var SymbolTableClass
+	 */
+	SymbolTableClass SymbolTable;
+
+	/**
+	 * This class will NOT own this pointer
+	 */
+	ProjectClass* Project;
+	
+};
+
+/**
+ * This is a SQL specialization of a document.  It knows how to code complete 
+ * SQL keywords
+ */
+class SqlDocumentClass : public TextDocumentClass {
+	
+public:
+
+	SqlDocumentClass();
+	
+
+	/**
+	 * Will enable auto complete for SQL keywords
+	 */
+	virtual bool CanAutoComplete();
+	
+	/**
+	 * Returns the keywords to be shown in the auto complete list.
+	 */
+	virtual std::vector<wxString> HandleAutoComplete(const UnicodeString& code, const UnicodeString& word, bool force);
+};
+
+/**
+ * source code control with the following enhancements.
+ * - Outside modification of a file: This code control will alert the user when the
+ *   loaded file has been modified outside of the editor.
+ * - PHP autocompletion of structures found in the current project.
+ * - Displaying of PHP call tips
+ * - "Word highlight" functionality; when user double clicks on a word then all
+ *   instances of that word are highlighted.
+ * - Automatic indentation
+ */
 class CodeControlClass : public wxStyledTextCtrl {
 
 public:
@@ -60,12 +199,15 @@ public:
 	
 	/**
 	 * Loads the contents of the given file, and initializes the
-	 * lexer so that the file gets syntax highlight
+	 * proper lexer so that the file gets syntax highlight according to the language
+	 * it containts.  This load method is better than the wxStyledTextCtrl load
+	 * method because it will keep track of the file modification times and
+	 * prompt the user when a file has been modified outside of the editor.
 	 * 
 	 * @param wxString filename full path of the file to load
 	 * @return bool true id the filename was found and readable.
 	 */
-	bool LoadPhpFile(const wxString& filename);
+	bool LoadAndTrackFile(const wxString& filename);
 	
 	/**
 	 * Returns true if the this control was NOT loaded with an existing
@@ -76,16 +218,19 @@ public:
 	bool IsNew() const;
 	
 	/**
-	 * If filename is not give, saves the contents of the code control under 
-	 * the name given in LoadPhpFile().  IfLoadPhpFile was not called, then
+	 * If filename is not given, saves the contents of the code control under 
+	 * the name given in LoadAndTrackFile().  IfLoadPhpFile was not called, then
 	 * caller should supply a filename and this method will create the new 
 	 * file
+	 * 
+	 * If LoadAndTrackFile method was called then this method should be called otherwise
+	 * the tracking feature will be broken.
 	 * 
 	 * @param wxString filename the full path where the contents of the code 
 	 * 	control will be saved to.  Existing file will be overwritten.
 	 * @return bool true if the file was successfully saved.
 	 */
-	bool SavePhpFile(wxString filename = wxT(""));
+	bool SaveAndTrackFile(wxString filename = wxT(""));
 
 	/**
 	 * Reload the file from this.  This method does nothing if this control was NOT loaded
@@ -194,31 +339,59 @@ public:
 	
 private:
 
+//------------------------------------------------------------------------
+// setting the various wxStyledTextCtrl options
+// wxStyledTextCtrl is super-configurable.  These methods will turn on
+// some sensible defaults for plain-text, PHP, HTML, and SQL editing.
+//------------------------------------------------------------------------
+
 	/**
 	 * set the margin look of the source control
 	 */
 	void SetMargin();
 	
 	/**
-	 * Set the PHP syntax highlight options
-	 */
-	void SetPhpOptions();
-	
-	/**
-	 * Set the HTML syntax highlight options of the source control
-	 */
-	void SetHtmlOptions();
-
-	/**
-	 * Set the JavaScript highlight options of the source control
-	 */
-	void SetJavascriptOptions();
-	
-	/**
 	 * Set the font, EOL, tab options of the source control
+	 * Set generic defaults for plain text editing.
 	 */
 	void SetCodeControlOptions();
 	
+	/**
+	 * Set the PHP syntax highlight options. Note that since PHP is embedded the PHP options will be suitable for
+	 * HTML and Javascript editing as well.
+	 */
+	void SetPhpOptions();
+
+	/**
+	 * Set the SQL highlight options of the source control
+	 */
+	void SetSqlOptions();
+	
+	
+//------------------------------------------------------------------------
+// word highlight feature
+//------------------------------------------------------------------------
+	/**
+	 * Highlight the next matched word.
+	 */
+	void WordHiglightForwardSearch(wxIdleEvent& event);
+	
+	/**
+	 * Highlight the previous matched word.
+	 */
+	void WordHiglightPreviousSearch(wxIdleEvent& event);
+		
+	/**
+	 * Remove the exact matches style [that was added by the double click event] from all text. 
+	 */
+	void UndoHighlight();
+	
+//------------------------------------------------------------------------
+	
+	
+//------------------------------------------------------------------------
+// Brace matching and automatic indentation features
+//------------------------------------------------------------------------
 	/**
 	 * If char at poistion pos ot (pos +1) is a brace, highlight the brace
 	 * Otherwise, remove all brace highlights
@@ -233,44 +406,15 @@ private:
 	 */
 	void HandleAutomaticIndentation(char ch);
 
-	/**
-	 * Return a list of possible keyword matches for the given word. For example, if word="cl"
-	 * then this method would return "class"
-	 */
-	std::vector<wxString> CollectNearMatchKeywords(wxString word);
-
+//------------------------------------------------------------------------
+// Event handlers 
+//------------------------------------------------------------------------
+	
 	/**
 	 * Handle the right-click event.
 	 * @param wxContextMenuEvent& event the event
 	 */
 	void OnContextMenu(wxContextMenuEvent& event);
-	
-	/**
-	 * Returns true if a  PHP variable is located at position pos 
-	 * 
-	 * @return bool
-	 */
-	bool PositionedAtVariable(int pos);
-	
-	/**
-	 * Returns the offset (byte) . This method is needed because Scintilla's "position" is byte-based not character
-	 * based, while all other code (find, find in files etc...) return characters based positions.  This makes all the
-	 * difference in the world for multi-byte documents, since internally Scintilla stores contents as UTF-8.
-	 * 
-	 * @param chracter position if this is more than the number of characters in the document then this method returns the last byte position.
-	 * @return int byte position
-	 */
-	int CharacterToPos(int character);
-	
-	/**
-	 * Highlight the next matched word.
-	 */
-	void WordHiglightForwardSearch(wxIdleEvent& event);
-	
-	/**
-	 * Highlight the previous matched word.
-	 */
-	void WordHiglightPreviousSearch(wxIdleEvent& event);
 
 	/**
 	 * Check to see if file has been modified outside of the editor.
@@ -292,12 +436,26 @@ private:
 	 * On a left mouse click, we will undo the highlighting caused by double clicks
 	 */
 	void OnLeftDown(wxMouseEvent& event);
-	
+
 	/**
-	 * Remove the exact matches style [that was added by the double click event] from all text. 
+	 * cleanup of internal pointers
 	 */
-	void UndoHighlight();
+	void OnClose(wxCloseEvent& event);
 	
+//------------------------------------------------------------------------
+// Auto complete feature
+//------------------------------------------------------------------------
+	/**
+	 * Returns true if a  PHP variable is located at position pos 
+	 * 
+	 * @return bool
+	 */
+	bool PositionedAtVariable(int pos);
+
+//------------------------------------------------------------------------
+// Character conversion (UTF-8 <--> ICU) needed for proper string offsets
+//------------------------------------------------------------------------	
+
 	/**
 	 * Use this method whenever you need to get a UnicodeString that is being calculated from Scintilla
 	 * positions (GetCurrentPos(), GetWordStart(), etc...)
@@ -313,30 +471,22 @@ private:
 	UnicodeString GetSafeSubstring(int startPos, int endPos, int* charStartIndex = NULL, int* charEndIndex = NULL);
 	
 	/**
-	 * handles auto completion for PHP.
+	 * Returns the offset (byte) . This method is needed because Scintilla's "position" is byte-based not character
+	 * based, while all other code (find, find in files etc...) return characters based positions.  This makes all the
+	 * difference in the world for multi-byte documents, since internally Scintilla stores contents as UTF-8.
 	 * 
-	 * @param bool force if true auto completion was triggered manually.
-	 * @param syntax the token type that the cursor is currently on.  This helps
-	 * int determining context (ie if the cursor is inside of a comment or string literal)
+	 * @param chracter position if this is more than the number of characters in the document then this method returns the last byte position.
+	 * @return int byte position
 	 */
-	void HandleAutoCompletionPhp(bool force, mvceditor::LanguageDiscoveryClass::Syntax syntax);	
-	 
-	 /**
-	 * handles auto completion for PHP.
-	 * 
-	 * @param bool force if true auto completion was triggered manually.
-	 * @param syntax the token type that the cursor is currently on.  This helps
-	 * int determining context (ie if the cursor is inside of a comment or string literal)
-	 */
-	void HandleAutoCompletionHtml(bool force, mvceditor::LanguageDiscoveryClass::Syntax syntax);
+	int CharacterToPos(int character);
 	
 	 /**
-	  * To calculate variable information
-	  * @var SymbolTableClass
-	  */
-	 SymbolTableClass SymbolTable;
+	 * To calculate variable information
+	 * @var SymbolTableClass
+	 */
+	SymbolTableClass SymbolTable;
 	 
-	 	/*
+	 /*
 	 * The file that was loaded.
 	 */
 	wxString CurrentFilename;
@@ -349,27 +499,13 @@ private:
 	wxString CurrentSignature;
 	
 	 /**
-	  * The timestamp of the last time a character was added to the document. Will help with auto completion by preventing
-	  * resource lookup when the user is typing really fast (an indication that the user does not need help)
-	  */
-	 wxLongLong LastCharAddedTime;	
-	 
-	 /**
 	  * The options to enable/disable various look & feel items
 	  * 
 	  * @var CodeControlOptionsClass
 	  */
 	 CodeControlOptionsClass& CodeControlOptions;
-
-	 /**
-	  * Store the time the file was opened / last saved. We will use this to check to see if the file was modified
-	  * externally.
-	  *
-	  * @var wxDateTime
-	  */
-	 wxDateTime FileOpenedDateTime;
 	 
-	 /**
+	/**
 	  * Used by the word highlight feature to do the actual searching.
 	  */
 	 mvceditor::FinderClass WordHighlightFinder;
@@ -378,14 +514,22 @@ private:
 	  * Used by the word highlight feature. The word being searched.
 	  */
 	 UnicodeString WordHighlightWord;
-	 
-	 /**
-	  * In order to show the proper auto complete keywords we must know what language is 
-	  * being edited at any given position.  This class will help in this regard.
+
+	/**
+	  * To help with autocompletion and keywords
+	  * 
+	  * @var ProjectClass
 	  */
-	 mvceditor::LanguageDiscoveryClass LanguageDiscovery;
+	 ProjectClass* Project;
 	 
 	 /**
+	  * This is the current specialization (document type) that is being used. This
+	  * pointer can be changed at any moment; the lifetime of the pointer may BE LESS
+	  * than the code control.
+	  */
+	 TextDocumentClass* Document;
+	 
+	  /**
 	  * Used by the word highlight feature. The location from where to start searching (back)
 	  */
 	 int32_t WordHighlightPreviousIndex;
@@ -394,13 +538,6 @@ private:
 	  * Used by the word highlight feature. The location from where to start searching (forward)
 	  */
 	 int32_t WordHighlightNextIndex;
-	 
-	 /**
-	  * To help with autocompletion and keywords
-	  * 
-	  * @var ProjectClass
-	  */
-	 ProjectClass* Project;
 	 
 	 /**
 	  * Detect when the 'Externally Modified' dialog is opened. In linux, the externally modified
@@ -415,6 +552,20 @@ private:
 	  * @var bool
 	  */
 	 bool WordHighlightIsWordHighlighted;
+	 
+	 /**
+	  * The timestamp of the last time a character was added to the document. Will help with auto completion by preventing
+	  * resource lookup when the user is typing really fast (an indication that the user does not need help)
+	  */
+	 wxLongLong LastCharAddedTime;	
+	 
+	 /**
+	  * Store the time the file was opened / last saved. We will use this to check to see if the file was modified
+	  * externally.
+	  *
+	  * @var wxDateTime
+	  */
+	 wxDateTime FileOpenedDateTime;
 	 	
 	DECLARE_EVENT_TABLE()
 };

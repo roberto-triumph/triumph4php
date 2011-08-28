@@ -73,12 +73,12 @@ bool mvceditor::NotebookClass::SavePage(int pageIndex) {
 			pageIndex);
 	bool saved = false;
 	if (phpSourceCodeCtrl->IsNew()) {
-		wxString phpFileFilter = wxT("PHP files (*.php)|*.php");
+		wxString phpFileFilter = wxT("*.*");
 		wxFileDialog fileDialog(this, wxT("Save a PHP File"), wxT(""), wxT(""), 
 				phpFileFilter, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 		if (wxID_OK == fileDialog.ShowModal()) {
 			wxString newFullPath = fileDialog.GetPath();
-			if (!phpSourceCodeCtrl->SavePhpFile(newFullPath)) {
+			if (!phpSourceCodeCtrl->SaveAndTrackFile(newFullPath)) {
 				wxMessageBox(wxT("Could Not Save File."));
 			}
 			else {
@@ -94,7 +94,7 @@ bool mvceditor::NotebookClass::SavePage(int pageIndex) {
 		}
 	}
 	else {
-		if (!phpSourceCodeCtrl->SavePhpFile()) {
+		if (!phpSourceCodeCtrl->SaveAndTrackFile()) {
 			wxMessageBox(wxT("Could Not Save File."));
 		}
 		else {
@@ -129,7 +129,7 @@ void mvceditor::NotebookClass::AddMvcEditorPage() {
 }
 
 void mvceditor::NotebookClass::LoadPage() {
-	wxString phpFileFilter = wxT("PHP files (*.php)|*.php");
+	wxString phpFileFilter = wxT("*.*");
 	wxFileDialog fileDialog(this, wxT("Open a PHP File"), wxT(""), wxT(""), 
 			phpFileFilter, wxFD_OPEN | wxFD_FILE_MUST_EXIST | 
 			wxFD_MULTIPLE);
@@ -167,7 +167,7 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename) {
 	if (!found) {
 		CodeControlClass* newCode = new CodeControlClass(
 			this, *CodeControlOptions, Project, wxID_ANY);
-		if (newCode->LoadPhpFile(filename)) {
+		if (newCode->LoadAndTrackFile(filename)) {
 			// if user dragged in a file on an opened file we want still want to accept dragged files
 			newCode->SetDropTarget(new FileDropTargetClass(this));
 			wxFileName fileName(filename);
@@ -213,7 +213,7 @@ bool mvceditor::NotebookClass::SaveCurrentPageAsNew() {
 			SaveCurrentPage();
 		}
 		else {
-	 		wxString phpFileFilter = wxT("PHP files (*.php)|*.php");
+	 		wxString phpFileFilter = wxT("*.*");
 			wxFileDialog fileDialog(this, wxT("Save to a new PHP File"), wxT(""), wxT(""), 
 					phpFileFilter, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 			if (wxID_OK == fileDialog.ShowModal()) {
