@@ -264,7 +264,8 @@ bool ParserDirectoryWalkerClass::Walk(const wxString& file) {
 		}
 		else {
 			UFILE *out = u_finit(stdout, NULL, NULL);
-			u_fprintf(out, "%S\n", error.Error.getTerminatedBuffer());
+			u_fprintf(out, "%S on file %s around line %d\n", error.Error.getTerminatedBuffer(), 
+				(const char*)file.ToAscii(), error.LineNumber);
 			u_fclose(out);
 			WithErrors++;
 		}
