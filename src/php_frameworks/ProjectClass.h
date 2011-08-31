@@ -125,6 +125,9 @@ public:
 	 */
 	wxString GetPhpExecutable() const;
 	
+	/**
+	 * This object will still own the returned pointer. Do NOT delete it.
+	 */
 	ResourceFinderClass* GetResourceFinder();
 
 protected:

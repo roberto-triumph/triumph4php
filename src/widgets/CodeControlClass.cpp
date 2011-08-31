@@ -123,8 +123,11 @@ static const int LINT_RESULT_MARGIN = 2;
 // we'll use up the first available marker & indicator for showing parse results
 static const int INDICATOR = 0;
 
-// 128 => 8th bit on since first 7 bits of style bits are for the lexer
-static const int INDICATOR_STYLE = 128;
+// 128 => 7th bit on since first 7 bits of style bits are for the HTML lexer
+static const int INDICATOR_PHP_STYLE = 128;
+
+// 32 => 5th bit on since first 5 bits of style bits are for all other lexers
+static const int INDICATOR_TEXT_STYLE = 32;
 
 // wxSTC_HPHP_DEFAULT			PHP Default
 // wxSTC_HPHP_HSTRING			PHP Double quoted String
@@ -216,6 +219,7 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 		, Document(NULL)
 		, WordHighlightPreviousIndex(-1)
 		, WordHighlightNextIndex(-1)
+		, WordHighlightStyle(0)
 		, ModifiedDialogOpen(false)
 		, WordHighlightIsWordHighlighted(false) {
 	
@@ -384,16 +388,15 @@ void mvceditor::CodeControlClass::HandleAutoCompletion(bool force) {
 			int currentPos = GetCurrentPos();
 			int startPos = WordStartPosition(currentPos, true);
 			int endPos = WordEndPosition(currentPos, true);
-			UnicodeString symbol = GetSafeSubstring(startPos, endPos);
-			UnicodeString code = GetSafeSubstring(0, currentPos);
+			UnicodeString symbol = 	GetSafeSubstring(startPos, endPos);
+			UnicodeString code = GetSafeSubstring(0, currentPos + 1);
 			
 			// this will parse any new symbols into the cache
 			// hmmm this means that code will be scanned again (here and up above by the LanguageDiscoveryClass)
 			// TODO: code gets parsed here and also inside of PhpDocumentClass::HandlAutoComplete(). fix.
 			// ideally this would only happen once inside of PhpDocumentClass::HandlAutoComplete()
 			wxString fileName = CurrentFilename.IsEmpty() ? wxT("Untitled") : CurrentFilename;
-			Project->GetResourceFinder()->BuildResourceCacheForFile(fileName, GetSafeText());
-			std::vector<wxString> autoCompleteList = Document->HandleAutoComplete(code, symbol, force);
+			std::vector<wxString> autoCompleteList = Document->HandleAutoComplete(fileName, code, symbol, force);
 			if (!autoCompleteList.empty()) {
 				
 				// scintilla needs the keywords sorted.
@@ -614,8 +617,7 @@ void mvceditor::CodeControlClass::SetPhpOptions() {
 	SetMarginSensitive(LINT_RESULT_MARGIN, false);
 	SetMarginMask(LINT_RESULT_MARGIN, ~wxSTC_MASK_FOLDERS);
 	MarkerDefine(LINT_RESULT_MARKER, wxSTC_MARK_ARROW, *wxRED, *wxRED);
-	
-	
+	WordHighlightStyle = INDICATOR_PHP_STYLE;
 }
 
 void mvceditor::CodeControlClass::ApplyPreferences() {
@@ -659,7 +661,7 @@ void mvceditor::CodeControlClass::SetSqlOptions() {
 	AutoCompSetIgnoreCase(true);
 	AutoCompSetFillUps(wxT("(["));
 	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$"));
-	
+	WordHighlightStyle = INDICATOR_TEXT_STYLE;
 }
 
 void mvceditor::CodeControlClass::SetCodeControlOptions() {
@@ -782,13 +784,22 @@ void  mvceditor::CodeControlClass::OnDoubleClick(wxStyledTextEvent& event) {
 
 	// remove any parse error indicators. if we don't do this the 
 	// parse error will get highlighted like a match.
-	StartStyling(0, INDICATOR_STYLE);
+	StartStyling(0, WordHighlightStyle);
 	SetStyling(GetTextLength(), 0);
 	
 	int charStartIndex = 0;
 	int charEndIndex = 0;
+	
 	// pos, endPos are byte offsets into the UTF-8 string, need to convert to char numbers
-	UnicodeString word = GetSafeSubstring(pos, endPos, &charStartIndex, &charEndIndex);
+	int documentLength = GetTextLength();
+	char* buf = new char[documentLength];
+		
+	// GET_TEXT  message
+	SendMsg(2182, documentLength, (long)buf);
+	charStartIndex = mvceditor::StringHelperClass::Utf8PosToChar(buf, documentLength, pos);
+	charEndIndex = mvceditor::StringHelperClass::Utf8PosToChar(buf, documentLength, endPos);
+	
+	UnicodeString word = GetSafeSubstring(pos, endPos);
 	if (!word.isEmpty()) {
 		WordHighlightFinder.Expression = word;
 		WordHighlightFinder.Mode = mvceditor::FinderClass::EXACT;
@@ -798,6 +809,7 @@ void  mvceditor::CodeControlClass::OnDoubleClick(wxStyledTextEvent& event) {
 			WordHighlightNextIndex = charStartIndex;
 		}
 	}
+	delete[] buf;
 	event.Skip();
 }
 
@@ -831,38 +843,10 @@ UnicodeString mvceditor::CodeControlClass::GetSafeText() {
 	return str;
 }
 
-UnicodeString mvceditor::CodeControlClass::GetSafeSubstring(int startPos, int endPos, int *charStartIndex, int *charEndIndex) {
-	if (endPos == startPos) {
-		return UNICODE_STRING_SIMPLE("");
-	}
-	// not a very efficient function, but at least it's correct
-	int documentLength = GetTextLength();
-	char* buf = new char[documentLength];
-	
-	// GET_TEXT  message
-	SendMsg(2182, documentLength, (long)buf);
-	
-	// pos, endPos are byte offsets into the UTF-8 string, need to convert to char numbers
-	int startIndex = mvceditor::StringHelperClass::Utf8PosToChar(buf, documentLength, startPos);
-	UnicodeString codeText = GetSafeText();
-	int endIndex;
-	if (endPos >= documentLength) {
-		
-		// caller wants the entire document
-		endIndex = codeText.length();		
-	}
-	else {
-		endIndex =  mvceditor::StringHelperClass::Utf8PosToChar(buf, documentLength, endPos);
-	}
-	UnicodeString word(codeText, startIndex, endIndex - startIndex);
-	delete[] buf;
-	if (charStartIndex != NULL) {
-		*charStartIndex = startIndex;
-	}
-	if (charEndIndex != NULL) {
-		*charEndIndex = endIndex;
-	}
-	return word;
+UnicodeString mvceditor::CodeControlClass::GetSafeSubstring(int startPos, int endPos) {
+	wxString s = GetTextRange(startPos, endPos);
+	UnicodeString ret = mvceditor::StringHelperClass::wxToIcu(s);
+	return ret;
 }
 
 void mvceditor::CodeControlClass::OnIdle(wxIdleEvent& event) {
@@ -915,7 +899,7 @@ void mvceditor::CodeControlClass::UndoHighlight() {
 		WordHighlightNextIndex = -1;
 		WordHighlightPreviousIndex = -1;
 		
-		StartStyling(0, INDICATOR_STYLE);
+		StartStyling(0, WordHighlightStyle);
 		SetStyling(GetTextLength(), 0);
 		WordHighlightIsWordHighlighted = false;
 	}
@@ -940,8 +924,8 @@ void mvceditor::CodeControlClass::WordHiglightForwardSearch(wxIdleEvent& event) 
 			int utf8Start = mvceditor::StringHelperClass::CharToUtf8Pos(buf, documentLength, matchStart);
 			int utf8End = mvceditor::StringHelperClass::CharToUtf8Pos(buf, documentLength, matchStart + matchLength);
 
-			StartStyling(utf8Start, INDICATOR_STYLE);
-			SetStyling(utf8End - utf8Start, INDICATOR_STYLE);
+			StartStyling(utf8Start, WordHighlightStyle);
+			SetStyling(utf8End - utf8Start, WordHighlightStyle);
 			WordHighlightNextIndex = matchStart + matchLength + 1; // prevent infinite find next's
 			event.RequestMore();
 		}
@@ -972,8 +956,8 @@ void mvceditor::CodeControlClass::WordHiglightPreviousSearch(wxIdleEvent& event)
 			int utf8Start = mvceditor::StringHelperClass::CharToUtf8Pos(buf, documentLength, matchStart);
 			int utf8End = mvceditor::StringHelperClass::CharToUtf8Pos(buf, documentLength, matchStart + matchLength);
 
-			StartStyling(utf8Start, INDICATOR_STYLE);
-			SetStyling(utf8End - utf8Start, INDICATOR_STYLE);
+			StartStyling(utf8Start, WordHighlightStyle);
+			SetStyling(utf8End - utf8Start, WordHighlightStyle);
 			WordHighlightPreviousIndex = matchStart - 1; // prevent infinite find previous's
 			event.RequestMore();
 		}
@@ -1007,8 +991,8 @@ void mvceditor::CodeControlClass::MarkLintError(const mvceditor::LintResultsClas
 		// GET_TEXT  message
 		SendMsg(2182, documentLength, (long)buf);	
 		int byteNumber = mvceditor::StringHelperClass::CharToUtf8Pos(buf, documentLength, charNumber);
-		StartStyling(byteNumber, INDICATOR_STYLE);
-		SetStyling(errorLength, INDICATOR_STYLE);
+		StartStyling(byteNumber, WordHighlightStyle);
+		SetStyling(errorLength, WordHighlightStyle);
 
 		GotoPos(byteNumber);
 
@@ -1019,7 +1003,7 @@ void mvceditor::CodeControlClass::MarkLintError(const mvceditor::LintResultsClas
 
 void mvceditor::CodeControlClass::ClearLintErrors() {
 	MarkerDeleteAll(LINT_RESULT_MARKER);
-	StartStyling(0, INDICATOR_STYLE);
+	StartStyling(0, WordHighlightStyle);
 	SetStyling(GetLength(), 0);
 }
 
@@ -1041,7 +1025,7 @@ bool mvceditor::TextDocumentClass::CanAutoComplete() {
 	return false;
 }
 
-std::vector<wxString> mvceditor::TextDocumentClass::HandleAutoComplete(const UnicodeString& code, const UnicodeString& word, bool force) {	
+std::vector<wxString> mvceditor::TextDocumentClass::HandleAutoComplete(const wxString& fileName, const UnicodeString& code, const UnicodeString& word, bool force) {	
 	std::vector<wxString> ret;
 	return ret;
 }
@@ -1059,7 +1043,7 @@ bool mvceditor::PhpDocumentClass::CanAutoComplete() {
 	return true;
 }
 
-std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoComplete(const UnicodeString& code, const UnicodeString& word, bool force) {	
+std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoComplete(const wxString& fileName, const UnicodeString& code, const UnicodeString& word, bool force) {	
 	std::vector<wxString> ret;
 	if (LanguageDiscovery.Open(code)) {
 		mvceditor::LanguageDiscoveryClass::Syntax syntax = LanguageDiscovery.at(code.length() - 1);
@@ -1072,7 +1056,7 @@ std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoComplete(const Unic
 		case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_MULTI_LINE_COMMENT:
 		case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_NOWDOC:
 		case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_SINGLE_QUOTE_STRING:
-			ret = HandleAutoCompletionPhp(code, word, force, syntax);
+			ret = HandleAutoCompletionPhp(fileName, code, word, force, syntax);
 			break;
 		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML:
 		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_TAG:
@@ -1109,12 +1093,14 @@ std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionHtml(cons
 	return autoCompleteList;
 }
 
-std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& code, const UnicodeString& word, bool force, mvceditor::LanguageDiscoveryClass::Syntax syntax) {
+std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const wxString& fileName, const UnicodeString& code, const UnicodeString& word, bool force, mvceditor::LanguageDiscoveryClass::Syntax syntax) {
 	std::vector<wxString> autoCompleteList;
 	if (force || word.length() >= 3) {
 		
 		ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
-	
+		//Project->GetResourceFinder()->BuildResourceCacheForFile(fileName, GetSafeText());
+		//Project->GetResourceFinder()->BuildResourceCacheForFile(fileName, code);
+		
 		// word will start with a '$" if its a variable
 		//the word will contain the $ in case of variables since "$" is a word characters (via SetWordCharacters() call)
 		if (word.charAt(0) == '$') {
@@ -1200,7 +1186,7 @@ bool mvceditor::SqlDocumentClass::CanAutoComplete() {
 	return true;
 }
 
-std::vector<wxString> mvceditor::SqlDocumentClass::HandleAutoComplete(const UnicodeString& code, const UnicodeString& word, bool force) {
+std::vector<wxString> mvceditor::SqlDocumentClass::HandleAutoComplete(const wxString& fileName, const UnicodeString& code, const UnicodeString& word, bool force) {
 	std::vector<wxString> autoCompleteList;
 	if (!force && word.length() < 1) {
 		return autoCompleteList;

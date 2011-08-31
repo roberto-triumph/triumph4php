@@ -30,11 +30,8 @@
 
 #include <php_frameworks/ProjectClass.h>
 #include <language/SymbolTableClass.h>
-#include <language/ParserClass.h>
 #include <language/LanguageDiscoveryClass.h>
-#include <PreferencesClass.h>
-#include <wx/config.h>
-#include <wx/fdrepdlg.h>
+#include <widgets/CodeControlOptionsClass.h>
 #include <wx/stc/stc.h>
 #include <unicode/unistr.h>
 
@@ -80,7 +77,7 @@ class TextDocumentClass {
 	 * @return a vector of strings, one item for each keyword to be 
 	 * shown to the user.
 	 */
-	virtual std::vector<wxString> HandleAutoComplete(const UnicodeString& code, const UnicodeString& word, bool force);
+	virtual std::vector<wxString> HandleAutoComplete(const wxString& fileName, const UnicodeString& code, const UnicodeString& word, bool force);
 
 };
 
@@ -104,7 +101,7 @@ public:
 	/**
 	 * Use the project's resource finder to find auto complete suggestions
 	 */
-	virtual std::vector<wxString> HandleAutoComplete(const UnicodeString& code, const UnicodeString& word, bool force);
+	virtual std::vector<wxString> HandleAutoComplete(const wxString& fileName, const UnicodeString& code, const UnicodeString& word, bool force);
 	
 private:
 
@@ -115,7 +112,7 @@ private:
 	 * @param syntax the token type that the cursor is currently on.  This helps
 	 * int determining context (ie if the cursor is inside of a comment or string literal)
 	 */
-	std::vector<wxString> HandleAutoCompletionPhp(const UnicodeString& code, const UnicodeString& word, bool force, mvceditor::LanguageDiscoveryClass::Syntax syntax);	
+	std::vector<wxString> HandleAutoCompletionPhp(const wxString& fileName, const UnicodeString& code, const UnicodeString& word, bool force, mvceditor::LanguageDiscoveryClass::Syntax syntax);	
 	 
 	 /**
 	 * handles auto completion for PHP.
@@ -171,7 +168,7 @@ public:
 	/**
 	 * Returns the keywords to be shown in the auto complete list.
 	 */
-	virtual std::vector<wxString> HandleAutoComplete(const UnicodeString& code, const UnicodeString& word, bool force);
+	virtual std::vector<wxString> HandleAutoComplete(const wxString& fileName, const UnicodeString& code, const UnicodeString& word, bool force);
 };
 
 /**
@@ -464,11 +461,9 @@ private:
 	 * 
 	 * @param int startPos byte offset 
 	 * @param int endPos byte offset, EXCLUSIVE the character at endPos will NOT be included
-	 * @param int* charStartIndex character start position. This is the character position within the opened file.
-	 * @param int* charEndIndex character end position. This is the character position within the opened file
 	 * 
 	 */
-	UnicodeString GetSafeSubstring(int startPos, int endPos, int* charStartIndex = NULL, int* charEndIndex = NULL);
+	UnicodeString GetSafeSubstring(int startPos, int endPos);
 	
 	/**
 	 * Returns the offset (byte) . This method is needed because Scintilla's "position" is byte-based not character
@@ -538,6 +533,16 @@ private:
 	  * Used by the word highlight feature. The location from where to start searching (forward)
 	  */
 	 int32_t WordHighlightNextIndex;
+	 
+	 /**
+	  * This is the style bit for the WordHighlight.  Since this code control handles multiple parsers
+	  * and each parser can have more style bits, the indicator offsets will be different for different
+	  * lexers.
+	  * 
+	  * For example, the HTML lexer has 7 bits, so the first indicator style will be 128 (2 ^ 7)
+	  * The SQL lexer has 5 bits, so the first indicator style will be 32 (2 ^ 5)
+	  */
+	 int WordHighlightStyle;
 	 
 	 /**
 	  * Detect when the 'Externally Modified' dialog is opened. In linux, the externally modified
