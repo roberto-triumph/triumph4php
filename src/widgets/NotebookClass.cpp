@@ -73,7 +73,7 @@ bool mvceditor::NotebookClass::SavePage(int pageIndex) {
 			pageIndex);
 	bool saved = false;
 	if (phpSourceCodeCtrl->IsNew()) {
-		wxString phpFileFilter = wxT("*.*");
+		wxString phpFileFilter = wxT("PHP Files (*.php)|*.php| SQL Files (*.sql)|*.sql| All Files (*.*)|*.*");
 		wxFileDialog fileDialog(this, wxT("Save a PHP File"), wxT(""), wxT(""), 
 				phpFileFilter, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 		if (wxID_OK == fileDialog.ShowModal()) {
@@ -129,7 +129,7 @@ void mvceditor::NotebookClass::AddMvcEditorPage() {
 }
 
 void mvceditor::NotebookClass::LoadPage() {
-	wxString phpFileFilter = wxT("*.*");
+	wxString phpFileFilter = wxT("PHP Files (*.php)|*.php| SQL Files (*.sql)|*.sql| All Files (*.*)|*.*");
 	wxFileDialog fileDialog(this, wxT("Open a PHP File"), wxT(""), wxT(""), 
 			phpFileFilter, wxFD_OPEN | wxFD_FILE_MUST_EXIST | 
 			wxFD_MULTIPLE);
@@ -213,7 +213,7 @@ bool mvceditor::NotebookClass::SaveCurrentPageAsNew() {
 			SaveCurrentPage();
 		}
 		else {
-	 		wxString phpFileFilter = wxT("*.*");
+	 		wxString phpFileFilter = wxT("PHP Files (*.php)|*.php| SQL Files (*.sql)|*.sql| All Files (*.*)|*.*");
 			wxFileDialog fileDialog(this, wxT("Save to a new PHP File"), wxT(""), wxT(""), 
 					phpFileFilter, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 			if (wxID_OK == fileDialog.ShowModal()) {
