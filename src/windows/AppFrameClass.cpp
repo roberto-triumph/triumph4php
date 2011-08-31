@@ -481,6 +481,7 @@ void mvceditor::AppFrameClass::LoadPlugins() {
 	// propagate GUI events to plugins, so that they can handle menu events themselves
 	// plugin menus
 	for (size_t i = 0; i < Plugins.size(); ++i) {
+		Plugins[i]->SetProject(Project);
 		Plugins[i]->InitWindow(GetStatusBarWithGauge(), Notebook, ToolsNotebook, &AuiManager);
 		Plugins[i]->InitState(&Environment);
 		PushEventHandler(Plugins[i]);
