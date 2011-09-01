@@ -34,7 +34,8 @@
 
 /**
  * This profiler can be used to test the speediness of the code editing control.
- * Interface: Files can be opened by dragging them from the operating system file explorer  
+ * Interface: Files can be opened by dragging them from the operating system file explorer 
+ * There will be a menu created where the user can test the code completions and call tips.
  */
 class CodeControlProfilerAppClass : public wxApp {
 public:
@@ -97,9 +98,31 @@ public:
 	CodeControlFrameClass();
 
 private:
+	
+/*
+ * Build the menu and add the event handlers
+ */
+
+	void CreateMenu();
+	
+	void OnContentAssist(wxCommandEvent& event);
+	
+	void OnCallTip(wxCommandEvent& event);
+	
+	void OnHelp(wxCommandEvent& event);
+	
+	enum {
+		ID_CONTENT_ASSIST,
+		ID_CALL_TIP,
+		ID_HELP
+	};
+	
 	mvceditor::CodeControlOptionsClass Options;
 	mvceditor::ProjectClass* Project;
+	mvceditor::CodeControlClass* Ctrl;
+	
 
+	DECLARE_EVENT_TABLE()
 };
 
 IMPLEMENT_APP(CodeControlProfilerAppClass)
@@ -120,8 +143,39 @@ CodeControlFrameClass::CodeControlFrameClass()
 	Project = mvceditor::ProjectClass::Factory(projectOptions);
 	Options.EnableAutomaticLineIndentation = true;
 	Options.EnableAutoCompletion = true;
-	mvceditor::CodeControlClass* ctrl = new mvceditor::CodeControlClass(this, Options, Project, wxID_ANY);
-	ctrl->SetDropTarget(new FileDropTargetClass(ctrl));
+	Ctrl = new mvceditor::CodeControlClass(this, Options, Project, wxID_ANY);
+	Ctrl->SetDropTarget(new FileDropTargetClass(Ctrl));
+	CreateMenu();
 }
 
- 
+void CodeControlFrameClass::OnCallTip(wxCommandEvent& event) {
+	Ctrl->HandleCallTip(0, true);	
+}
+
+void CodeControlFrameClass::OnContentAssist(wxCommandEvent& event) {
+	Ctrl->HandleAutoCompletion(true);	
+}
+
+void CodeControlFrameClass::OnHelp(wxCommandEvent& event) {
+	wxString msg = wxT("This is a program that can be used to profile the source code control. Testing of the ");
+	msg += wxT("auto completion and call tips can be done by using the menu items, just like in the App.\n\n");
+	msg += wxT("Dragging a file into the window will open its contents.");
+	wxMessageBox(msg);
+}
+
+void CodeControlFrameClass::CreateMenu() {
+	wxMenu* edit = new wxMenu(wxT("Edit"));
+	edit->Append(ID_CONTENT_ASSIST, wxT("Content Assist\tCTRL+SPACE"), wxT("Content Assist"), false);
+	edit->Append(ID_CALL_TIP, wxT("Show Call Tip\tCTRL+SHIFT+SPACE"), wxT("Show Call Tip"), false);
+	edit->Append(ID_HELP, wxT("Help"), wxT("Help"), false);
+	
+	wxMenuBar* menuBar = new wxMenuBar();
+	menuBar->Append(edit, wxT("Menu"));
+	SetMenuBar(menuBar);
+}
+
+BEGIN_EVENT_TABLE(CodeControlFrameClass, wxFrame) 
+	EVT_MENU(CodeControlFrameClass::ID_CONTENT_ASSIST, CodeControlFrameClass::OnContentAssist)
+	EVT_MENU(CodeControlFrameClass::ID_CALL_TIP, CodeControlFrameClass::OnCallTip)
+	EVT_MENU(CodeControlFrameClass::ID_HELP, CodeControlFrameClass::OnHelp)
+END_EVENT_TABLE()

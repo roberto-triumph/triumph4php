@@ -292,11 +292,12 @@ public:
 	/**
 	 * shows the user function definition
 	 * 
-	 * @param wxChar the character last inserted. if '(' call tip will be activated. else, call tip may be left
+	 * @param wxChar the character last inserted. if '(' (or force parameter is true) call tip will be activated. else, call tip may be left
 	 * activated or deactivated depending on the char
+	 * @param bool if true call tip will be activated.
 	 * 
 	 */
-	void HandleCallTip(wxChar ch = 0);
+	void HandleCallTip(wxChar ch = 0, bool force = false);
 	
 	/**
 	 * Returns the symbol that is positioned in the current cursos position.
@@ -448,6 +449,27 @@ private:
 	 * @return bool
 	 */
 	bool PositionedAtVariable(int pos);
+	
+	/**
+	 * Returns the symbol that is positioned in the given cursor position.
+	 * 
+	 * @param int posToCheck a SCINTILLA POSITION (ie. BYTES not characters)
+	 * @return wxString a class name, or class name/method name, function name, or keyword.  The string is suitable
+	 *         for passing to a ResourceFinderClass instance.
+	 */
+	wxString GetSymbolAt(int posToCheck);
+	
+	/**
+	 * Check to see if the given position is at a PHP comment or style.
+	 * This is a quick-check that doesn't do any parsing it relies on the scintiall styling only
+	 * (this method will return true if the position is colored as a string or comment.)
+	 * This implementation should probably change in the future.
+	 * 
+	 * @param int posToCheck the scintilla position (byte) to check
+	 * @return bool TRUE if the position is at a PHP comment or PHP string
+	 */
+	bool InCommentOrStringStyle(int posToCheck);
+	
 
 //------------------------------------------------------------------------
 // Character conversion (UTF-8 <--> ICU) needed for proper string offsets

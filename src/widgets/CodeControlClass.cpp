@@ -232,19 +232,43 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 bool mvceditor::CodeControlClass::LoadAndTrackFile(const wxString& filename) {
 	UnicodeString fileContents;
 	wxFileName file(filename);
+	bool ret = false;
 	// not using LoadFile() because it does not correctly handle files with high ascii characters
 	if (file.IsOk() && file.IsFileReadable()) {
 		FindInFilesClass::FileContents(filename, fileContents);
-		SetText(StringHelperClass::IcuToWx(fileContents));
-		EmptyUndoBuffer();
-        SetSavePoint();
-		CurrentFilename = filename;
-		FileOpenedDateTime = file.GetModificationTime();
-		ApplyPreferences();
-		Colourise(0, -1);
-		return true;
+		
+		// lets avoid the IcuToWx to prevent going from 
+		// UnicodeString -> UTF8 -> wxString  -> UTF8 -> Sciintilla
+		// cost of translation could be big for big sized files
+		// because of the double encoding due to all three libraries using
+		// different internal encodings for their strings
+		UErrorCode status = U_ZERO_ERROR;
+		int32_t rawLength;
+		int32_t length = fileContents.length();
+		const UChar* src = fileContents.getBuffer();
+		u_strToUTF8(NULL, 0, &rawLength, src, length, &status);
+		status = U_ZERO_ERROR;
+		char* dest = new char[rawLength + 1];
+		int32_t written;
+		u_strToUTF8(dest, rawLength + 1, &written, src, length, &status);
+		if(U_SUCCESS(status)) {
+			
+			// SetText message
+			SendMsg(2181, 0, (long)(const char*)dest);
+			
+			EmptyUndoBuffer();
+			SetSavePoint();
+			CurrentFilename = filename;
+			FileOpenedDateTime = file.GetModificationTime();
+			ApplyPreferences();
+			Colourise(0, -1);	
+		}
+		delete[] dest;
+		
+		
+		ret = true;
 	}
-	return false;
+	return ret;
 }
 
 void mvceditor::CodeControlClass::Revert() {
@@ -349,9 +373,13 @@ void mvceditor::CodeControlClass::HandleAutomaticIndentation(char chr) {
 }
 
 wxString mvceditor::CodeControlClass::GetCurrentSymbol() {
-	int pos = WordStartPosition(GetCurrentPos(), true);
-	int endPos = WordEndPosition(GetCurrentPos(), true);
-	UnicodeString symbol = GetSafeSubstring(pos, endPos);
+	return GetSymbolAt(GetCurrentPos());
+}
+
+wxString mvceditor::CodeControlClass::GetSymbolAt(int posToCheck) {
+	int startPos = WordStartPosition(posToCheck, true);
+	int endPos = WordEndPosition(posToCheck, true);
+	UnicodeString symbol = GetSafeSubstring(startPos, endPos);
 	UnicodeString codeText = GetSafeText();
 	ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
 	wxString fileName = CurrentFilename.IsEmpty() ? wxT("Untitled") : CurrentFilename;
@@ -383,7 +411,7 @@ void mvceditor::CodeControlClass::HandleAutoCompletion(bool force) {
 	
 	// if user is typing really fast dont bother helping them. however, if force is true, it means
 	// the user asked for auto completion, in which case always perform.
-	if ((now - LastCharAddedTime) > 400 || force) {
+	if (force || (now - LastCharAddedTime) > 400) {
 		if (Document->CanAutoComplete()) {
 			int currentPos = GetCurrentPos();
 			int startPos = WordStartPosition(currentPos, true);
@@ -391,11 +419,7 @@ void mvceditor::CodeControlClass::HandleAutoCompletion(bool force) {
 			UnicodeString symbol = 	GetSafeSubstring(startPos, endPos);
 			UnicodeString code = GetSafeSubstring(0, currentPos + 1);
 			
-			// this will parse any new symbols into the cache
-			// hmmm this means that code will be scanned again (here and up above by the LanguageDiscoveryClass)
-			// TODO: code gets parsed here and also inside of PhpDocumentClass::HandlAutoComplete(). fix.
-			// ideally this would only happen once inside of PhpDocumentClass::HandlAutoComplete()
-			wxString fileName = CurrentFilename.IsEmpty() ? wxT("Untitled") : CurrentFilename;
+			wxString fileName = CurrentFilename;
 			std::vector<wxString> autoCompleteList = Document->HandleAutoComplete(fileName, code, symbol, force);
 			if (!autoCompleteList.empty()) {
 				
@@ -420,30 +444,41 @@ bool mvceditor::CodeControlClass::PositionedAtVariable(int pos) {
 	return GetCharAt(start) == wxT('$');
 }
 
-void mvceditor::CodeControlClass::HandleCallTip(wxChar ch) {
+void mvceditor::CodeControlClass::HandleCallTip(wxChar ch, bool force) {
+	
+	// this function deliberately uses scintilla positions (bytes) instead of 
+	// converting over to unicode text. be careful.
 	int currentPos = GetCurrentPos();
-	if (wxT(')') == ch) {
+	if (InCommentOrStringStyle(currentPos) && wxT(')') == ch) {
 		CallTipCancel();
 	}
-	if (wxT('(') == ch) {
+	if (force || wxT('(') == ch) {
 		
-		// when getting the word, do not get the open parenthesis
-		UnicodeString uniText = GetSafeText();
-		wxString text = StringHelperClass::IcuToWx(uniText);
-		ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
-		CurrentSignature = wxT("");
-		wxString fileName = CurrentFilename.IsEmpty() ? wxT("Untitled") : CurrentFilename;
-		resourceFinder->BuildResourceCacheForFile(fileName, uniText);
-		currentPos = text.rfind(wxT("("), currentPos);
-		SymbolTable.CreateSymbols(GetSafeText());
-		SymbolClass::Types type;
-		UnicodeString objectType,
-			objectMember,
-			comment;
-		if (SymbolTable.Lookup(currentPos, *resourceFinder, type, objectType, objectMember, comment)) {
-			wxString resource = SymbolClass::OBJECT == type ||SymbolClass::METHOD == type ||SymbolClass::PROPERTY == type ? 
-				StringHelperClass::IcuToWx(objectType) + wxT("::") + StringHelperClass::IcuToWx(objectMember) : StringHelperClass::IcuToWx(objectType);
-			if (resourceFinder->Prepare(resource)) {
+		// back up to the last function call "(" then get the function name, do not get the open parenthesis
+		/// we are always going to do the call tip for the nearest function ie. when
+		// a line is  
+		// Func1('hello', Func2('bye'
+		// we are always going to show the call tip for Func2 (if the cursor is after 'bye')
+		// make sure we don't go past the last statement
+		while (currentPos >= 0) {
+			char c = GetCharAt(currentPos);
+			if (!InCommentOrStringStyle(currentPos)) {
+				if ('(' == c) {
+					break;
+				}
+				if (';' == c) {
+					currentPos = -1;
+					break;
+				}
+			}
+			currentPos--;
+		}
+		
+		if (currentPos >= 0) {
+			wxString symbol = GetSymbolAt(currentPos);
+			ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
+			CurrentSignature = wxT("");
+			if (resourceFinder->Prepare(symbol)) {
 				if (resourceFinder->CollectNearMatchResources()) {
 					
 					// highly unlikely that there is more than one match since we searched for a full name (lookup succeeded).
@@ -451,44 +486,37 @@ void mvceditor::CodeControlClass::HandleCallTip(wxChar ch) {
 					CurrentSignature = mvceditor::StringHelperClass::IcuToWx(resourceFinder->GetResourceSignature(fullQualifiedResource));
 				}
 			}
-		}
-		else {
-			
-			 // when getting the word, do not get the open parenthesis
-			int lastOpenParenthesis = text.rfind(wxT('('),currentPos);
-			int lastSemicolon = text.rfind(wxT(';'), currentPos);
-			if (lastOpenParenthesis > lastSemicolon) {
-				int pos = WordStartPosition(lastOpenParenthesis - 1, true);
-				wxString word = text.substr(pos, lastOpenParenthesis - pos);
-				CurrentSignature = mvceditor::StringHelperClass::IcuToWx(resourceFinder->GetResourceSignature(
-					mvceditor::StringHelperClass::wxToIcu(word)));
-				if (!CurrentSignature.IsEmpty()) {
-						CallTipShow(GetCurrentPos(), CurrentSignature);
-				}
+			if (!CurrentSignature.IsEmpty()) {
+				CallTipShow(GetCurrentPos(), CurrentSignature);
 			}
-		}
-		if (!CurrentSignature.IsEmpty()) {
-			CallTipShow(GetCurrentPos(), CurrentSignature);
 		}
 	}
 	if (CallTipActive()) {
 		
 		// highlight the 1st, 2nd, 3rd or 4th parameter of the call tip depending on where the cursors currently is.
 		// If the cursor is in the 2nd argument, then highlight the 2nd parameter and so on...
-		wxString text = GetText();
-		int lastOpenParenthesis = text.rfind(wxT('('), currentPos);
-		int lastSemicolon = text.rfind(wxT(';'), currentPos);
-		if (lastOpenParenthesis > lastSemicolon) {
-			int commaCount = 0;
-			wxString args = text.substr(lastOpenParenthesis, currentPos - lastOpenParenthesis);
-			for (size_t i = 0; i < args.length(); ++i) {
-				if (args[i] == wxT(',')) {
+		int startOfArguments = GetCurrentPos();
+		int commaCount = 0;
+		while (startOfArguments >= 0) {
+			char c = GetCharAt(startOfArguments);
+			if (!InCommentOrStringStyle(startOfArguments)) {
+				if ('(' == c) {
+					break;
+				}
+				if (';' == c) {
+					startOfArguments = -1;
+					break;
+				}
+				if (',' == c) {
 					commaCount++;
 				}
 			}
+			startOfArguments--;
+		}
+		if (startOfArguments >= 0) {
 			int startHighlightPos = CurrentSignature.find(wxT('('));
 			
-			// sometimes the previous call tip is active, as in for exampele this line
+			// sometimes the previous call tip is active, as in for example this line
 			//   $m->getB()->work(
 			// in this case we need to be careful
 			if(startHighlightPos >= 0) {
@@ -514,7 +542,7 @@ void mvceditor::CodeControlClass::HandleCallTip(wxChar ch) {
 }
 
 void mvceditor::CodeControlClass::OnUpdateUi(wxStyledTextEvent &event) {
-	HandleCallTip(0);
+	HandleCallTip(0, false);
 	event.Skip();
 }
 
@@ -525,16 +553,19 @@ void mvceditor::CodeControlClass::OnMarginClick(wxStyledTextEvent& event) {
 	}
 }
 
-void mvceditor::CodeControlClass::MatchBraces(int posToCheck) {
-
+bool mvceditor::CodeControlClass::InCommentOrStringStyle(int posToCheck) {
 	int style = GetStyleAt(posToCheck);
 	int prevStyle = GetStyleAt(posToCheck - 1);
 
 	// dont match braces inside strings or comments. for some reason when styling line comments (//)
 	// the last character is styled as default but the characters before are styled correctly (wxSTC_HPHP_COMMENTLINE)
 	// so lets check the previous character in that case
-	if (wxSTC_HPHP_HSTRING != style && wxSTC_HPHP_SIMPLESTRING != style && wxSTC_HPHP_COMMENT != style
-	        && wxSTC_HPHP_COMMENTLINE != style && wxSTC_HPHP_COMMENTLINE != prevStyle) {
+	return wxSTC_HPHP_HSTRING == style || wxSTC_HPHP_SIMPLESTRING == style || wxSTC_HPHP_COMMENT == style
+		|| wxSTC_HPHP_COMMENTLINE == style || wxSTC_HPHP_COMMENTLINE == prevStyle;
+}
+
+void mvceditor::CodeControlClass::MatchBraces(int posToCheck) {
+	if (!InCommentOrStringStyle(posToCheck)) {
 		wxChar c1 = GetCharAt(posToCheck),
 		            c2 = GetCharAt(posToCheck - 1);
 		if (wxT('{') == c1 || wxT('}') == c1 || wxT('(') == c1 || wxT(')') == c1 || wxT('[') == c1 || wxT(']') == c1) {
@@ -1097,10 +1128,6 @@ std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const
 	std::vector<wxString> autoCompleteList;
 	if (force || word.length() >= 3) {
 		
-		ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
-		//Project->GetResourceFinder()->BuildResourceCacheForFile(fileName, GetSafeText());
-		//Project->GetResourceFinder()->BuildResourceCacheForFile(fileName, code);
-		
 		// word will start with a '$" if its a variable
 		//the word will contain the $ in case of variables since "$" is a word characters (via SetWordCharacters() call)
 		if (word.charAt(0) == '$') {
@@ -1120,6 +1147,13 @@ std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const
 			}
 		}
 		else {
+			
+			ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
+			
+			// need to build the cache in case if has not been done so for this file.
+			// however now the file is scanned twice; here and by the SymbolTable
+			// hmmm
+			resourceFinder->BuildResourceCacheForFile(fileName, code);
 			
 			// look up the type of the word (is the word in the context of a class, method or function ?
 			// SymbolTable resolves stuff like parent:: and self:: as well we don't need to do it here

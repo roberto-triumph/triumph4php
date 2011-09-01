@@ -323,7 +323,7 @@ void mvceditor::AppFrameClass::OnEditContentAssist(wxCommandEvent& event) {
 void mvceditor::AppFrameClass::OnEditCallTip(wxCommandEvent& event) {
 	CodeControlClass* page = Notebook->GetCurrentCodeControl();
 	if (page) {
-		page->HandleCallTip(wxT('('));
+		page->HandleCallTip(0, true);
 	}
 }
 
