@@ -214,6 +214,12 @@ void mvceditor::FinderPanelClass::SetStatus(const wxString& message) {
 	// we need this for the label to be right-aligned after
 	// the text change
 	ResultText->GetContainingSizer()->Layout();
+
+	// NOTE: had to add these calls otherwise the find panel would not 
+	// totally repaint itself and it looks garbled when the status
+	// message changes
+	GetContainingSizer()->Layout();
+	Refresh();
 }
 
 void mvceditor::FinderPanelClass::OnCloseButton(wxCommandEvent& event) {
@@ -373,6 +379,12 @@ void mvceditor::ReplacePanelClass::SetStatus(const wxString& message) {
 	// we need this for the label to be right-aligned after
 	// the text change
 	ResultText->GetContainingSizer()->Layout();
+
+	// NOTE: had to add these calls otherwise the find panel would not 
+	// totally repaint itself and it looks garbled when the status
+	// message changes
+	GetContainingSizer()->Layout();
+	Refresh();
 }
 
 void mvceditor::ReplacePanelClass::OnCloseButton(wxCommandEvent& event) {
