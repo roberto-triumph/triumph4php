@@ -21,9 +21,6 @@
  *
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
- * @author     $Author: robertop2004@gmail.com $
- * @date       $Date: 2011-06-22 22:42:39 -0700 (Wed, 22 Jun 2011) $
- * @version    $Rev: 560 $ 
  */
 
 /*

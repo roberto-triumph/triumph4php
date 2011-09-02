@@ -21,9 +21,6 @@
  *
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
- * @author     $Author: robertop2004@gmail.com $
- * @date       $Date: 2011-08-11 09:10:06 -0700 (Thu, 11 Aug 2011) $
- * @version    $Rev: 595 $ 
  */
 #ifndef MVCEDITORNOTEBOOKCLASS_H_
 #define MVCEDITORNOTEBOOKCLASS_H_

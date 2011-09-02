@@ -21,9 +21,6 @@
  *
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
- * @author     $Author: robertop2004@gmail.com $
- * @date       $Date: 2011-08-07 12:41:00 -0700 (Sun, 07 Aug 2011) $
- * @version    $Rev: 589 $ 
  */
 #ifndef MVCEDITORAPPFRAMECLASS_H_
 #define MVCEDITORAPPFRAMECLASS_H_

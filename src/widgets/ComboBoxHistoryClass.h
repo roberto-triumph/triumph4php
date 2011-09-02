@@ -21,9 +21,6 @@
  *
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
- * @author     $Author$
- * @date       $Date$
- * @version    $Rev$ 
  */
 #ifndef COMBO_BOX_HISTORY_CLASS_H
 #define COMBO_BOX_HISTORY_CLASS_H

@@ -21,9 +21,6 @@
  *
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
- * @author     $Author: robertop2004@gmail.com $
- * @date       $Date: 2011-06-18 15:24:42 -0700 (Sat, 18 Jun 2011) $
- * @version    $Rev: 559 $ 
  */
 #include <windows/PreferencesDialogClass.h>
 #include <wx/bookctrl.h>
