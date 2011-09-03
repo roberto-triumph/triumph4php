@@ -38,6 +38,7 @@
 #include <plugins/RunConsolePluginClass.h>
 #include <plugins/WebBrowserPanelClass.h>
 #include <plugins/LintPluginClass.h>
+#include <plugins/SqlBrowserPluginClass.h>
 
 #include <wx/artprov.h>
 #include <wx/choicdlg.h>
@@ -472,6 +473,8 @@ void mvceditor::AppFrameClass::LoadPlugins() {
 	plugin = new OutlineViewPluginClass();
 	Plugins.push_back(plugin);
 	plugin = new LintPluginClass();
+	Plugins.push_back(plugin);
+	plugin = new SqlBrowserPluginClass();
 	Plugins.push_back(plugin);
 	
 	// test plugin need to find a quicker way to toggling it ON / OFF
