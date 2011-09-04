@@ -232,6 +232,15 @@ protected:
 	 * @return bool true if the window with the given windowId is the selected (active) tools window.
 	 */
 	bool IsToolsWindowSelected(int windowId) const;
+	
+	/**
+	 * Add a window to the 'main' content pane (the center pane). Once added, this class will take care of 
+	 * memory management for the window pointer.
+	 * 
+	 * @param wxWindow any window
+	 * @param wxString name the string that will show up in the tab
+	 */
+	bool AddContentWindow(wxWindow* window, const wxString& name);
 
 	/**
 	 * Returns the top-level window.
@@ -241,11 +250,19 @@ protected:
 	wxWindow* GetMainWindow() const;
 	
 	/**
-	 * Get the currently selected code control.
+	 * Get the currently selected code control. This may be NULL if the editor's content pane is
+	 * focused on something other than a code control.
 	 * 
 	 * @return CodeControlClass* the code control that has focus; can be NULL
 	 */
 	CodeControlClass* GetCurrentCodeControl() const;
+	
+	/**
+	 * Get the currently visible content pane. This may return NULL if the notebook is empty.
+	 * 
+	 * @return wxWindow* do not DELETE the returned pointer 
+	 */
+	wxWindow* GetCurrentContentPane() const;
 	
 	/**
 	 * Do NOT delete the pointer
@@ -287,6 +304,14 @@ protected:
 	 * @return EnvironmentClass
 	 */
 	 EnvironmentClass* GetEnvironment() const;
+	 
+	 /**
+	  * Creates a new code control without a parent but it is primed with the global editor
+	  * options.
+	  * 
+	  * @return CodeControlClass* caller will own the pointer
+	  */
+	 CodeControlClass* CreateCodeControl(wxWindow* parent) const;
 	 
 	/**
 	 * The AUI Manager is needed in cases where the different windows are repositioned programatically and the entire AUI

@@ -556,25 +556,27 @@ void mvceditor::FinderPluginClass::OnEditFind(wxCommandEvent& event) {
 }
 	
 void mvceditor::FinderPluginClass::OnEditFindNext(wxCommandEvent& event) {
-	if (GetCurrentCodeControl()) {
+	mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
+	if (codeControl) {
 		OnEditFind(event);
 		wxWindow* window = wxWindow::FindWindowById(ID_FIND_PANEL,  GetMainWindow());
 		FinderPanelClass* panel = (FinderPanelClass*) window;
 		panel->FindNext();
 		
 		// give focus back to code control this is just better user experience	
-		GetCurrentCodeControl()->SetFocus();
+		codeControl->SetFocus();
 	}
 }
 	
 void mvceditor::FinderPluginClass::OnEditFindPrevious(wxCommandEvent& event) {
-	if (GetCurrentCodeControl()) {
+	mvceditor::CodeControlClass* codeControl  = GetCurrentCodeControl();
+	if (codeControl) {
 		OnEditFind(event);
 		wxWindow* window = wxWindow::FindWindowById(ID_FIND_PANEL,  GetMainWindow());
 		FinderPanelClass* panel = (FinderPanelClass*) window;	
 		panel->FindPrevious();	
 		// give focus back to code control this is just better user experience
-		GetCurrentCodeControl()->SetFocus();
+		codeControl->SetFocus();
 	}
 }
 

@@ -286,20 +286,22 @@ void mvceditor::ResourcePluginClass::OnJump(wxCommandEvent& event) {
 void mvceditor::ResourcePluginClass::LoadPageFromResourceFinder(ResourceFinderClass* resourceFinder, int resourceMatchIndex) {
 	GetNotebook()->LoadPage(resourceFinder->GetResourceMatchFullPath(resourceMatchIndex));
 	CodeControlClass* codeControl = GetCurrentCodeControl();
-	int lineNumber = resourceFinder->GetLineNumber();
-	int32_t position, 
-		length;
-	bool found = resourceFinder->GetResourceMatchPosition(resourceMatchIndex, codeControl->GetSafeText(), position, length);
-	if (ResourceFinderClass::FILE_NAME_LINE_NUMBER == resourceFinder->GetResourceType()) {
-			
-		// scintilla line numbers start at zero. use the ensure method so that the line is shown in the 
-		// center of the screen
-		int pos = codeControl->PositionFromLine(lineNumber - 1);
-		codeControl->SetSelectionAndEnsureVisible(pos, pos);
-		codeControl->GotoLine(lineNumber - 1);
-	}
-	else if (found) {
-		codeControl->SetSelectionAndEnsureVisible(position, position + length);
+	if (codeControl) {
+		int lineNumber = resourceFinder->GetLineNumber();
+		int32_t position, 
+			length;
+		bool found = resourceFinder->GetResourceMatchPosition(resourceMatchIndex, codeControl->GetSafeText(), position, length);
+		if (ResourceFinderClass::FILE_NAME_LINE_NUMBER == resourceFinder->GetResourceType()) {
+				
+			// scintilla line numbers start at zero. use the ensure method so that the line is shown in the 
+			// center of the screen
+			int pos = codeControl->PositionFromLine(lineNumber - 1);
+			codeControl->SetSelectionAndEnsureVisible(pos, pos);
+			codeControl->GotoLine(lineNumber - 1);
+		}
+		else if (found) {
+			codeControl->SetSelectionAndEnsureVisible(position, position + length);
+		}
 	}
 }
 

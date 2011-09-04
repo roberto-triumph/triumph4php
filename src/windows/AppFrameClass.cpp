@@ -571,39 +571,66 @@ void mvceditor::AppFrameClass::OnContextMenu(wxContextMenuEvent& event) {
 }
 
 void mvceditor::AppFrameClass::OnUndo(wxCommandEvent& event) {
-	Notebook->GetCurrentCodeControl()->Undo();
+	mvceditor::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
+	if (codeControl) {
+		codeControl->Undo();
+	}
 }
 
 void mvceditor::AppFrameClass::OnRedo(wxCommandEvent& event) {
-	Notebook->GetCurrentCodeControl()->Redo();
+	mvceditor::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
+	if (codeControl) {
+		codeControl->Redo();
+	}
 }
 
 void mvceditor::AppFrameClass::OnCutLine(wxCommandEvent& event) {
-	Notebook->GetCurrentCodeControl()->CmdKeyExecute(wxSTC_CMD_LINECUT);
+	mvceditor::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
+	if (codeControl) {
+		codeControl->CmdKeyExecute(wxSTC_CMD_LINECUT);
+	}
 }
 
 void mvceditor::AppFrameClass::OnDuplicateLine(wxCommandEvent& event) {
-	Notebook->GetCurrentCodeControl()->CmdKeyExecute(wxSTC_CMD_LINEDUPLICATE);
+	mvceditor::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
+	if (codeControl) {
+		codeControl->CmdKeyExecute(wxSTC_CMD_LINEDUPLICATE);
+	}
 }
 
 void mvceditor::AppFrameClass::OnDeleteLine(wxCommandEvent& event) {
-	Notebook->GetCurrentCodeControl()->CmdKeyExecute(wxSTC_CMD_LINEDELETE);
+	mvceditor::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
+	if (codeControl) {
+		codeControl->CmdKeyExecute(wxSTC_CMD_LINEDELETE);
+	}
 }
 
 void mvceditor::AppFrameClass::OnTransposeLine(wxCommandEvent& event) {
-	Notebook->GetCurrentCodeControl()->CmdKeyExecute(wxSTC_CMD_LINETRANSPOSE);
+	mvceditor::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
+	if (codeControl) {
+		codeControl->CmdKeyExecute(wxSTC_CMD_LINETRANSPOSE);
+	}
 }
 
 void mvceditor::AppFrameClass::OnCopyLine(wxCommandEvent& event) {
-	Notebook->GetCurrentCodeControl()->CmdKeyExecute(wxSTC_CMD_LINECOPY);
+	mvceditor::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
+	if (codeControl) {
+		codeControl->CmdKeyExecute(wxSTC_CMD_LINECOPY);
+	}
 }
 
 void mvceditor::AppFrameClass::OnLowecase(wxCommandEvent& event) {
-	Notebook->GetCurrentCodeControl()->CmdKeyExecute(wxSTC_CMD_LOWERCASE);
+	mvceditor::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
+	if (codeControl) {
+		codeControl->CmdKeyExecute(wxSTC_CMD_LOWERCASE);
+	}
 }
 
 void mvceditor::AppFrameClass::OnUppercase(wxCommandEvent& event) {
-	Notebook->GetCurrentCodeControl()->CmdKeyExecute(wxSTC_CMD_UPPERCASE);
+	mvceditor::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
+	if (codeControl) {
+		codeControl->CmdKeyExecute(wxSTC_CMD_UPPERCASE);
+	}
 }
 
 void mvceditor::AppFrameClass::OnCodeControlUpdate(wxStyledTextEvent& event) {

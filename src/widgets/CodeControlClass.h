@@ -183,6 +183,32 @@ class CodeControlClass : public wxStyledTextCtrl {
 public:
 
 	/**
+	 * This mode flag controls what settings are used for syntax highlighting, margins,
+	 * and code folding.  It also controls how Auto code completion should be handled
+	 * if at all.
+	 * The CodeControlClass will auto-detect the correct mode based on file name, but it
+	 * can be changed via the SetDocumentMode() method.
+	 */
+	enum Mode {
+		
+		/**
+		 * No code completion, ever. No syntax highlight, ever.  This is the default mode
+		 * for anything that's not PHP or SQL.
+		 */
+		TEXT,
+		
+		/**
+		 * The full functionalityL code completion, call tips, syntax highlighting, the works
+		 */
+		PHP,
+		
+		/**
+		 * Code completion and SQL syntax highlighting
+		 */
+		SQL
+	};
+
+	/**
 	 * Constructor. Memory management of project is left to the caller of this method. project
 	 * CANNOT be NULL.
 	 */
@@ -225,6 +251,14 @@ public:
 	 * @return bool true if the file was successfully saved.
 	 */
 	bool SaveAndTrackFile(wxString filename = wxT(""));
+	
+	/**
+	 * Set the options for this document.  This is auto-detected when using the LoadAndTrackFile() method
+	 * and will most likely not need to be called.
+	 * 
+	 * @param Mode a document mode; changes will take place immediately (causing a repaint)
+	 */
+	void SetDocumentMode(Mode mode);
 
 	/**
 	 * Reload the file from this.  This method does nothing if this control was NOT loaded
@@ -361,6 +395,11 @@ private:
 	 * Set the SQL highlight options of the source control
 	 */
 	void SetSqlOptions();
+	
+	/**
+	 * Determine the correct document Mode and sets it (causing a repaint)
+	 */
+	void AutoDetectDocumentMode();
 	
 	
 //------------------------------------------------------------------------
@@ -590,6 +629,13 @@ private:
 	  * @var wxDateTime
 	  */
 	 wxDateTime FileOpenedDateTime;
+	 
+	 /**
+	  * The current rendering options being used.
+	  * Each language will have its own options.
+	  * @var Mode
+	  */
+	 Mode DocumentMode;
 	 	
 	DECLARE_EVENT_TABLE()
 };

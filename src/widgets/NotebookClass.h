@@ -144,7 +144,7 @@ public:
 	 * Get the source code control at the given index.
 	 * 
 	 * @param size_t pageIndex the page number to get
-	 * @return MvcEditorCodeControlClass* the source code control window, NULL
+	 * @return mvceditor::CodeControlClass* the source code control window, NULL
 	 * if pageIndex is invalid.
 	 */
 	CodeControlClass* GetCodeControl(size_t pageIndex) const;
@@ -156,6 +156,13 @@ public:
 	 * if notebook is empty.
 	 */
 	CodeControlClass* GetCurrentCodeControl() const;
+	
+	/**
+	 * Get the currently visible content pane. This may return NULL if the notebook is empty.
+	 * 
+	 * @return wxWindow* do not DELETE the returned pointer 
+	 */
+	wxWindow* GetCurrentContentPane() const;
 	
 	/**
 	 * Closes all open pages.

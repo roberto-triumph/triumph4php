@@ -30,7 +30,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 class SqlBrowserPanelGeneratedClass : public wxPanel 
 {
+	DECLARE_EVENT_TABLE()
 	private:
+		
+		// Private event handlers
+		void _wxFB_OnRunButton( wxCommandEvent& event ){ OnRunButton( event ); }
+		
 	
 	protected:
 		enum
@@ -51,7 +56,6 @@ class SqlBrowserPanelGeneratedClass : public wxPanel
 			ID_PASSWORD,
 			ID_RUNBUTTON,
 			ID_RUN,
-			ID_CODECONTROL,
 			ID_BOTTOMPANLE,
 			ID_RESULTSLABEL,
 			ID_DATAGRID,
@@ -59,6 +63,7 @@ class SqlBrowserPanelGeneratedClass : public wxPanel
 		
 		wxSplitterWindow* Splitter;
 		wxPanel* TopPanel;
+		wxFlexGridSizer* TopPanelSizer;
 		wxPanel* ButtonPanel;
 		wxStaticText* HostLabel;
 		wxTextCtrl* Host;
@@ -72,19 +77,22 @@ class SqlBrowserPanelGeneratedClass : public wxPanel
 		wxTextCtrl* Password;
 		wxButton* RunButton;
 		wxStaticText* Status;
-		wxTextCtrl* FakeCodeControl;
 		wxPanel* BottomPanel;
 		wxStaticText* ResultsLabel;
 		wxGrid* ResultsGrid;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnRunButton( wxCommandEvent& event ) { event.Skip(); }
+		
 	
 	public:
 		
-		SqlBrowserPanelGeneratedClass( wxWindow* parent, wxWindowID id = ID_PANEL, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 800,599 ), long style = wxTAB_TRAVERSAL );
+		SqlBrowserPanelGeneratedClass( wxWindow* parent, wxWindowID id = ID_PANEL, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 830,490 ), long style = wxTAB_TRAVERSAL );
 		~SqlBrowserPanelGeneratedClass();
 		
 		void SplitterOnIdle( wxIdleEvent& )
 		{
-			Splitter->SetSashPosition( 272 );
+			Splitter->SetSashPosition( 249 );
 			Splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( SqlBrowserPanelGeneratedClass::SplitterOnIdle ), NULL, this );
 		}
 	

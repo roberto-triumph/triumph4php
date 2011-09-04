@@ -40,11 +40,23 @@ mvceditor::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id,
 }
 
 mvceditor::CodeControlClass* mvceditor::NotebookClass::GetCodeControl(size_t pageNumber) const {
-	return pageNumber < GetPageCount() ? (CodeControlClass*)GetPage(pageNumber) : NULL;
+	mvceditor::CodeControlClass* codeControl = NULL;
+	if (pageNumber < GetPageCount()) {
+		wxWindow* window = GetPage(pageNumber);
+		codeControl = wxDynamicCast(window, mvceditor::CodeControlClass);
+	}
+	return codeControl;
 }
 
 mvceditor::CodeControlClass* mvceditor::NotebookClass::GetCurrentCodeControl() const {
 	return GetCodeControl(GetSelection());
+}
+
+wxWindow* mvceditor::NotebookClass::GetCurrentContentPane() const {
+	
+	// avoid assertions when there are no tabs
+	size_t selection = GetSelection();
+	return selection < GetPageCount() ? GetPage(selection) : NULL;
 }
 
 void mvceditor::NotebookClass::SavePageIfModified(wxAuiNotebookEvent& event) {
@@ -69,7 +81,7 @@ bool mvceditor::NotebookClass::SavePage(int pageIndex) {
 	CodeControlClass* phpSourceCodeCtrl = GetCodeControl(
 			pageIndex);
 	bool saved = false;
-	if (phpSourceCodeCtrl->IsNew()) {
+	if (phpSourceCodeCtrl && phpSourceCodeCtrl->IsNew()) {
 		wxString phpFileFilter = wxT("PHP Files (*.php)|*.php| SQL Files (*.sql)|*.sql| All Files (*.*)|*.*");
 		wxFileDialog fileDialog(this, wxT("Save a PHP File"), wxT(""), wxT(""), 
 				phpFileFilter, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
@@ -91,7 +103,7 @@ bool mvceditor::NotebookClass::SavePage(int pageIndex) {
 		}
 	}
 	else {
-		if (!phpSourceCodeCtrl->SaveAndTrackFile()) {
+		if (phpSourceCodeCtrl && !phpSourceCodeCtrl->SaveAndTrackFile()) {
 			wxMessageBox(wxT("Could Not Save File."));
 		}
 		else {
@@ -147,7 +159,7 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename) {
 	// if file is already opened just bring it to the forefront
 	for (size_t j = 0; j < GetPageCount(); ++j) {
 		CodeControlClass* control = GetCodeControl(j);
-		if (control->GetFileName() == filename) {
+		if (control && control->GetFileName() == filename) {
 
 			// only set the selection when it's different
 			// if it gets called for the window that's already opened
@@ -334,7 +346,9 @@ std::vector<wxString> mvceditor::NotebookClass::GetOpenedFiles() const {
 	std::vector<wxString> files;
 	for (size_t j = 0; j < GetPageCount(); ++j) {
 		CodeControlClass* control = GetCodeControl(j);
-		files.push_back(control->GetFileName());
+		if (control) {
+			files.push_back(control->GetFileName());
+		}
 	}
 	return files;
 }

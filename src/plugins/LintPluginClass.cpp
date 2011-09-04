@@ -295,7 +295,8 @@ void mvceditor::LintPluginClass::OnFileSaved(wxCommandEvent &event) {
 			SetFocusToToolsWindow(lintResultsPanel);
 		}
 		int previousPos = -1;
-		if (GetCurrentCodeControl()) {
+		mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
+		if (codeControl) {
 			previousPos = GetCurrentCodeControl()->GetCurrentPos();
 		}
 		
@@ -305,8 +306,8 @@ void mvceditor::LintPluginClass::OnFileSaved(wxCommandEvent &event) {
 
 		// diplaying the lint causes things to be redrawn; put the cursor 
 		// where the user left it
-		if (previousPos >= 0) {
-			GetCurrentCodeControl()->GotoPos(previousPos);
+		if (previousPos >= 0 && codeControl) {
+			codeControl->GotoPos(previousPos);
 		}
 	}
 }

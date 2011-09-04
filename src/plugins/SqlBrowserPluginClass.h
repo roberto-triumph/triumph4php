@@ -34,9 +34,28 @@ namespace mvceditor {
 class SqlBrowserPanelClass : public SqlBrowserPanelGeneratedClass {
 
 public:
+	
+	/**
+	 * Creates a new SQL browser panel, using the given codeControl as the 
+	 * text editor.
+	 * Need for the caller of this method to create it as this class doesn't
+	 * have access to the user options.
+	 */
+	SqlBrowserPanelClass(wxWindow* parent, int id, mvceditor::CodeControlClass* codeControl);
+	
+	/**
+	 * Gets the entire text that is currently in the code control.
+	 */
+	wxString GetText();
 
-	SqlBrowserPanelClass(wxWindow* parent, int id);
+private:
 
+	void OnRunButton(wxCommandEvent& event);
+	
+	/**
+	 * For SQL editing.
+	 */
+	CodeControlClass* CodeControl;
 };
 
 /**
@@ -54,6 +73,8 @@ public:
 private:
 
 	void OnSqlBrowserToolsMenu(wxCommandEvent& event);
+	
+	void OnRun(wxCommandEvent& event);
 	
 	DECLARE_EVENT_TABLE()
 };

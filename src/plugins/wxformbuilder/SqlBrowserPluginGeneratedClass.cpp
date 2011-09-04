@@ -9,17 +9,21 @@
 
 ///////////////////////////////////////////////////////////////////////////
 
+BEGIN_EVENT_TABLE( SqlBrowserPanelGeneratedClass, wxPanel )
+	EVT_BUTTON( ID_RUNBUTTON, SqlBrowserPanelGeneratedClass::_wxFB_OnRunButton )
+END_EVENT_TABLE()
+
 SqlBrowserPanelGeneratedClass::SqlBrowserPanelGeneratedClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	wxBoxSizer* BoxSizer;
 	BoxSizer = new wxBoxSizer( wxHORIZONTAL );
 	
-	Splitter = new wxSplitterWindow( this, ID_SPLITTER, wxDefaultPosition, wxDefaultSize, wxSP_3D );
+	Splitter = new wxSplitterWindow( this, ID_SPLITTER, wxDefaultPosition, wxDefaultSize, wxSP_3D|wxSP_3DBORDER|wxSP_3DSASH );
 	Splitter->Connect( wxEVT_IDLE, wxIdleEventHandler( SqlBrowserPanelGeneratedClass::SplitterOnIdle ), NULL, this );
 	
 	TopPanel = new wxPanel( Splitter, ID_TOPPANEL, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	wxFlexGridSizer* TopPanelSizer;
 	TopPanelSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	TopPanelSizer->AddGrowableCol( 0 );
 	TopPanelSizer->AddGrowableRow( 1 );
 	TopPanelSizer->SetFlexibleDirection( wxBOTH );
 	TopPanelSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
@@ -40,21 +44,21 @@ SqlBrowserPanelGeneratedClass::SqlBrowserPanelGeneratedClass( wxWindow* parent, 
 	
 	HostLabel = new wxStaticText( ButtonPanel, ID_HOSTLABEL, wxT("Host"), wxDefaultPosition, wxDefaultSize, 0 );
 	HostLabel->Wrap( -1 );
-	InputSizer->Add( HostLabel, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	InputSizer->Add( HostLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	Host = new wxTextCtrl( ButtonPanel, ID_HOST, wxT("localhost"), wxDefaultPosition, wxDefaultSize, 0 );
 	InputSizer->Add( Host, 1, wxALL|wxEXPAND, 5 );
 	
 	PortLabel = new wxStaticText( ButtonPanel, ID_PORTLABEL, wxT("Port"), wxDefaultPosition, wxDefaultSize, 0 );
 	PortLabel->Wrap( -1 );
-	InputSizer->Add( PortLabel, 0, wxALL, 5 );
+	InputSizer->Add( PortLabel, 0, wxALIGN_CENTER|wxALL, 5 );
 	
 	Port = new wxSpinCtrl( ButtonPanel, ID_PORT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 65535, 3306 );
 	InputSizer->Add( Port, 0, wxALL, 5 );
 	
 	DatabaseLabel = new wxStaticText( ButtonPanel, ID_DATABASELABEL, wxT("Database"), wxDefaultPosition, wxDefaultSize, 0 );
 	DatabaseLabel->Wrap( -1 );
-	InputSizer->Add( DatabaseLabel, 0, wxALL, 5 );
+	InputSizer->Add( DatabaseLabel, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 	
 	Database = new wxComboBox( ButtonPanel, ID_DATABASE, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
 	Database->Append( wxT("db1") );
@@ -64,14 +68,14 @@ SqlBrowserPanelGeneratedClass::SqlBrowserPanelGeneratedClass( wxWindow* parent, 
 	
 	UserLabel = new wxStaticText( ButtonPanel, ID_USERLABEL, wxT("User"), wxDefaultPosition, wxDefaultSize, 0 );
 	UserLabel->Wrap( -1 );
-	InputSizer->Add( UserLabel, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	InputSizer->Add( UserLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	User = new wxTextCtrl( ButtonPanel, ID_USER, wxT("root"), wxDefaultPosition, wxDefaultSize, 0 );
 	InputSizer->Add( User, 1, wxALL|wxEXPAND, 5 );
 	
 	PasswordLabel = new wxStaticText( ButtonPanel, ID_PASSWORDLABEL, wxT("Password"), wxDefaultPosition, wxDefaultSize, 0 );
 	PasswordLabel->Wrap( -1 );
-	InputSizer->Add( PasswordLabel, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	InputSizer->Add( PasswordLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	Password = new wxTextCtrl( ButtonPanel, ID_PASSWORD, wxT("fdfd"), wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD );
 	InputSizer->Add( Password, 1, wxALL|wxEXPAND, 5 );
@@ -86,19 +90,16 @@ SqlBrowserPanelGeneratedClass::SqlBrowserPanelGeneratedClass( wxWindow* parent, 
 	
 	Status = new wxStaticText( ButtonPanel, ID_RUN, wxT("Status:Connected"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
 	Status->Wrap( -1 );
-	ButtonSizer->Add( Status, 1, wxALL|wxEXPAND, 5 );
+	ButtonSizer->Add( Status, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 	
 	ButtonFlexGrid->Add( ButtonSizer, 1, wxEXPAND, 5 );
 	
-	ButtonPanelSizer->Add( ButtonFlexGrid, 1, wxEXPAND, 5 );
+	ButtonPanelSizer->Add( ButtonFlexGrid, 1, wxEXPAND, 0 );
 	
 	ButtonPanel->SetSizer( ButtonPanelSizer );
 	ButtonPanel->Layout();
 	ButtonPanelSizer->Fit( ButtonPanel );
 	TopPanelSizer->Add( ButtonPanel, 1, wxEXPAND | wxALL, 5 );
-	
-	FakeCodeControl = new wxTextCtrl( TopPanel, ID_CODECONTROL, wxT("SELECT * FROM ...\nWHERE ...\nORDER BY ..."), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE );
-	TopPanelSizer->Add( FakeCodeControl, 1, wxALL|wxEXPAND, 5 );
 	
 	TopPanel->SetSizer( TopPanelSizer );
 	TopPanel->Layout();
@@ -108,9 +109,9 @@ SqlBrowserPanelGeneratedClass::SqlBrowserPanelGeneratedClass( wxWindow* parent, 
 	BottomGridSizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* FlexGridSizer;
-	FlexGridSizer = new wxFlexGridSizer( 3, 1, 0, 0 );
+	FlexGridSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
 	FlexGridSizer->AddGrowableCol( 0 );
-	FlexGridSizer->AddGrowableRow( 2 );
+	FlexGridSizer->AddGrowableRow( 1 );
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );
 	FlexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -154,7 +155,7 @@ SqlBrowserPanelGeneratedClass::SqlBrowserPanelGeneratedClass( wxWindow* parent, 
 	BottomPanel->SetSizer( BottomGridSizer );
 	BottomPanel->Layout();
 	BottomGridSizer->Fit( BottomPanel );
-	Splitter->SplitHorizontally( TopPanel, BottomPanel, 272 );
+	Splitter->SplitHorizontally( TopPanel, BottomPanel, 249 );
 	BoxSizer->Add( Splitter, 1, wxEXPAND, 5 );
 	
 	this->SetSizer( BoxSizer );
