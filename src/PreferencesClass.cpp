@@ -58,6 +58,10 @@ void mvceditor::PreferencesClass::Load(wxFrame* frame) {
 	// for some reason, must give absolute path else loading will saving & fail
 	// COMMENT OUT THIS CODE TO SEE IF IT IS THE CAUSE OF CRASHES
 	//KeyProfiles.Load(config, wxT("/Keyboard"));
+	
+	// TODO: key profiles uses menu IDs to load/save configs, but since menu IDs can change
+	// when a new plugin is added the new menuIDs may conflict with an existing menu ID and will
+	// cause crashes in KeyBinder. Need to fix this.
 	KeyProfiles.Load(config);
 	for (int i = 0; i < KeyProfiles.GetCount(); ++i) {
 		totalCmdCount += KeyProfiles.Item(i)->GetCmdCount();
