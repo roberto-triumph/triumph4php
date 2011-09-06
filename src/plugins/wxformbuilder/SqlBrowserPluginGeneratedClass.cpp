@@ -15,10 +15,12 @@ END_EVENT_TABLE()
 
 SqlBrowserPanelGeneratedClass::SqlBrowserPanelGeneratedClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
+	this->SetExtraStyle( wxWS_EX_VALIDATE_RECURSIVELY );
+	
 	wxBoxSizer* BoxSizer;
 	BoxSizer = new wxBoxSizer( wxHORIZONTAL );
 	
-	Splitter = new wxSplitterWindow( this, ID_SPLITTER, wxDefaultPosition, wxDefaultSize, wxSP_3D|wxSP_3DBORDER|wxSP_3DSASH );
+	Splitter = new wxSplitterWindow( this, ID_SPLITTER, wxDefaultPosition, wxDefaultSize, wxSP_3D );
 	Splitter->Connect( wxEVT_IDLE, wxIdleEventHandler( SqlBrowserPanelGeneratedClass::SplitterOnIdle ), NULL, this );
 	
 	TopPanel = new wxPanel( Splitter, ID_TOPPANEL, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
@@ -88,10 +90,6 @@ SqlBrowserPanelGeneratedClass::SqlBrowserPanelGeneratedClass( wxWindow* parent, 
 	RunButton = new wxButton( ButtonPanel, ID_RUNBUTTON, wxT("Run"), wxDefaultPosition, wxDefaultSize, 0 );
 	ButtonSizer->Add( RunButton, 0, wxALL, 5 );
 	
-	Status = new wxStaticText( ButtonPanel, ID_RUN, wxT("Status:Connected"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
-	Status->Wrap( -1 );
-	ButtonSizer->Add( Status, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
-	
 	ButtonFlexGrid->Add( ButtonSizer, 1, wxEXPAND, 5 );
 	
 	ButtonPanelSizer->Add( ButtonFlexGrid, 1, wxEXPAND, 0 );
@@ -123,7 +121,7 @@ SqlBrowserPanelGeneratedClass::SqlBrowserPanelGeneratedClass( wxWindow* parent, 
 	
 	// Grid
 	ResultsGrid->CreateGrid( 5, 5 );
-	ResultsGrid->EnableEditing( true );
+	ResultsGrid->EnableEditing( false );
 	ResultsGrid->EnableGridLines( true );
 	ResultsGrid->EnableDragGridSize( true );
 	ResultsGrid->SetMargins( 0, 0 );
@@ -155,7 +153,7 @@ SqlBrowserPanelGeneratedClass::SqlBrowserPanelGeneratedClass( wxWindow* parent, 
 	BottomPanel->SetSizer( BottomGridSizer );
 	BottomPanel->Layout();
 	BottomGridSizer->Fit( BottomPanel );
-	Splitter->SplitHorizontally( TopPanel, BottomPanel, 249 );
+	Splitter->SplitHorizontally( TopPanel, BottomPanel, 251 );
 	BoxSizer->Add( Splitter, 1, wxEXPAND, 5 );
 	
 	this->SetSizer( BoxSizer );

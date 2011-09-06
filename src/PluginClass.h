@@ -309,9 +309,11 @@ protected:
 	  * Creates a new code control without a parent but it is primed with the global editor
 	  * options.
 	  * 
+	  * @param wxWindow* parent window
+	  * @param int flags window creation flags
 	  * @return CodeControlClass* caller will own the pointer
 	  */
-	 CodeControlClass* CreateCodeControl(wxWindow* parent) const;
+	 CodeControlClass* CreateCodeControl(wxWindow* parent, int flags) const;
 	 
 	/**
 	 * The AUI Manager is needed in cases where the different windows are repositioned programatically and the entire AUI

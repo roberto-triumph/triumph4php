@@ -55,7 +55,6 @@ class SqlBrowserPanelGeneratedClass : public wxPanel
 			ID_PASSWORDLABEL,
 			ID_PASSWORD,
 			ID_RUNBUTTON,
-			ID_RUN,
 			ID_BOTTOMPANLE,
 			ID_RESULTSLABEL,
 			ID_DATAGRID,
@@ -76,7 +75,6 @@ class SqlBrowserPanelGeneratedClass : public wxPanel
 		wxStaticText* PasswordLabel;
 		wxTextCtrl* Password;
 		wxButton* RunButton;
-		wxStaticText* Status;
 		wxPanel* BottomPanel;
 		wxStaticText* ResultsLabel;
 		wxGrid* ResultsGrid;
@@ -92,7 +90,7 @@ class SqlBrowserPanelGeneratedClass : public wxPanel
 		
 		void SplitterOnIdle( wxIdleEvent& )
 		{
-			Splitter->SetSashPosition( 249 );
+			Splitter->SetSashPosition( 251 );
 			Splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( SqlBrowserPanelGeneratedClass::SplitterOnIdle ), NULL, this );
 		}
 	

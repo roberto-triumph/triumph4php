@@ -28,10 +28,111 @@
 
 #include <PluginClass.h>
 #include <plugins/wxformbuilder/SqlBrowserPluginGeneratedClass.h>
+ #include <soci/soci.h>
+#include <wx/thread.h>
+
+BEGIN_DECLARE_EVENT_TYPES()
+
+	/**
+	 * This event will be propagated when the SQL query completes
+	 * execution
+	 * event.GetInt() will have a non-zero value if the query executed successfully
+	 */
+	DECLARE_EVENT_TYPE(QUERY_COMPLETE_EVENT, wxNewId())
+END_DECLARE_EVENT_TYPES()
 
 namespace mvceditor {
+	
+/**
+ * A small class that will send queries to the database
+ */
+class SqlQueryClass {
+	
+	public:
+	
+	/**
+	 * The database host to connect to
+	 */
+	wxString Host;
+	
+	/**
+	 * The database user to connect as
+	 */
+	wxString User;
+	
+	/**
+	 * The database password
+	 */
+	wxString Password;
+	
+	/**
+	 * The database (schema name) to connect to
+	 */
+	wxString Database;
+	
+	/**
+	 * The port to connect to
+	 */
+	int Port;
+	
+	
+	SqlQueryClass();
+	
+	~SqlQueryClass();
+	
+	/**
+	 * Close the connection and cleanup any results. This needs to be called
+	 * after every call to Query()
+	 */
+	void Close();
+	
+	/**
+	 * Sends ONE query to the server. 
+	 */
+	bool Query(const wxString& query, wxString& error);
+	
+	/**
+	 * Returns true if there are more results to be read.
+	 */
+	bool More();
+	
+	/**
+	 * Populates columnNames with the name of the columns in the current result.
+	 * Returns false when there are no more results.
+	 * 
+	 * @param columnNames vector of column names will be populated
+	 * @param error will be populated when an error ocurrs
+	 * @return bool true on success, false on error
+	 */
+	bool ColumnNames(std::vector<wxString>& colummNames, wxString& error);
+	
+	/**
+	 * Populates columnNames with the name of the columns in the current result.
+	 * Returns false when there are no more results.
+	 * 
+	 * @param columnValues vector of column values of the current row will be populated
+	 * @param indicators vector of indicator for each column of the current row; can be used to find out if values are NULL
+	 * @param error will be populated when an error ocurrs
+	 * @return bool true on success, false on error
+	 */
+	bool NextRow(std::vector<wxString>& columnValues, std::vector<soci::indicator>& indicators, wxString& error);
+	
+	/**
+	 * Get the number of affected records.
+	 */
+	long long GetAffectedRows();
+	
+private:
 
-class SqlBrowserPanelClass : public SqlBrowserPanelGeneratedClass {
+	soci::session Session;
+	
+	soci::statement* Statement;
+	
+	soci::row Row;
+
+};
+
+class SqlBrowserPanelClass : public SqlBrowserPanelGeneratedClass, wxThreadHelper {
 
 public:
 	
@@ -40,22 +141,80 @@ public:
 	 * text editor.
 	 * Need for the caller of this method to create it as this class doesn't
 	 * have access to the user options.
+	 * @param wxWindow* the parent of this window
+	 * @param int id the window ID
+	 * @param mvceditor::CodeControlClass* the code control; this class will own the pointer
+	 * @param mvceditor::StatusBarWithGaugeClass* the gauge control. this class will NOT own the pointer
 	 */
-	SqlBrowserPanelClass(wxWindow* parent, int id, mvceditor::CodeControlClass* codeControl);
+	SqlBrowserPanelClass(wxWindow* parent, int id, mvceditor::CodeControlClass* codeControl, mvceditor::StatusBarWithGaugeClass* gauge);
+	
+	/**
+	 * Runs the query that is in the text control (in a separate thread).
+	 */
+	void Execute();
 	
 	/**
 	 * Gets the entire text that is currently in the code control.
 	 */
 	wxString GetText();
+	
+	/**
+	 * When a query has finished running display the results in the grid
+	 */
+	void OnQueryComplete(wxCommandEvent& event);
+
+protected:
+
+	void* Entry();
 
 private:
 
 	void OnRunButton(wxCommandEvent& event);
 	
+	void OnTimer(wxTimerEvent& event);
+	
+	/**
+	 * Transfers all of the variables from the controls to the Query data structure 
+	 * and will return true if all values are valid
+	 */
+	bool Check();
+	
+	/**
+	 * To send queries to the server
+	 */
+	SqlQueryClass Query;
+	
 	/**
 	 * For SQL editing.
 	 */
 	CodeControlClass* CodeControl;
+	
+	/**
+	 * Show progress when the query is running
+	 */
+	StatusBarWithGaugeClass* Gauge;
+	
+	/**
+	 * Make the gauge update smoothly
+	 */
+	wxTimer Timer;
+	
+	/**
+	 * Filled in with the last error string from the database
+	 */
+	wxString LastError;
+	
+	/**
+	 * The contents of the code control that are currenltly being executed.
+	 */
+	wxString LastQuery;
+	
+	/**
+	 * The time that the query has begun executing
+	 */
+	wxLongLong QueryStart;
+	
+	DECLARE_EVENT_TABLE()
 };
 
 /**
@@ -64,6 +223,8 @@ private:
 class SqlBrowserPluginClass : public PluginClass {
 public:
 	SqlBrowserPluginClass();
+	
+	~SqlBrowserPluginClass();
 
 	/**
 	 * This plugin will have menu to create ad-hoc queries

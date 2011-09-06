@@ -26,21 +26,6 @@
 -- will look for MySQL files in these directories
 MYSQL_INSTALL_DIR = "/usr/"
 
--- 
--- Check to see if the given file name exists
--- @param string name the file to check
--- @return boolean TRUE if the file can be read
---
-function file_exists(name)
-	local f = io.open(name,"r")
-	if f~=nil then
-		io.close(f) 
-		return true 
-	else 
-		return false 
-	end
-end
-
 newaction {
 	trigger = "soci",
 	description = "Build the SOCI (database access) library",

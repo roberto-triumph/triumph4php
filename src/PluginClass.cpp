@@ -177,8 +177,10 @@ wxWindow* mvceditor::PluginClass::GetMainWindow() const {
 	return ToolsNotebook->GetParent();
 }
 
-mvceditor::CodeControlClass* mvceditor::PluginClass::CreateCodeControl(wxWindow* window) const {
-	mvceditor::CodeControlClass* ctrl = new mvceditor::CodeControlClass(window, *GetNotebook()->CodeControlOptions, GetProject(), wxID_ANY);
+mvceditor::CodeControlClass* mvceditor::PluginClass::CreateCodeControl(wxWindow* window, int flags) const {
+	mvceditor::CodeControlClass* ctrl = new mvceditor::CodeControlClass(window, 
+		*GetNotebook()->CodeControlOptions, GetProject(), wxID_ANY, wxDefaultPosition,
+		wxDefaultSize, flags);
 	return ctrl;
 }
 
