@@ -8,20 +8,21 @@
 #ifndef __SqlBrowserPluginGeneratedClass__
 #define __SqlBrowserPluginGeneratedClass__
 
-#include <wx/string.h>
-#include <wx/stattext.h>
+#include <wx/sizer.h>
 #include <wx/gdicmn.h>
+#include <wx/panel.h>
 #include <wx/font.h>
 #include <wx/colour.h>
 #include <wx/settings.h>
+#include <wx/string.h>
+#include <wx/stattext.h>
+#include <wx/grid.h>
+#include <wx/splitter.h>
 #include <wx/textctrl.h>
 #include <wx/spinctrl.h>
 #include <wx/combobox.h>
-#include <wx/sizer.h>
 #include <wx/button.h>
-#include <wx/panel.h>
-#include <wx/grid.h>
-#include <wx/splitter.h>
+#include <wx/dialog.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -30,61 +31,27 @@
 ///////////////////////////////////////////////////////////////////////////////
 class SqlBrowserPanelGeneratedClass : public wxPanel 
 {
-	DECLARE_EVENT_TABLE()
 	private:
-		
-		// Private event handlers
-		void _wxFB_OnRunButton( wxCommandEvent& event ){ OnRunButton( event ); }
-		
 	
 	protected:
 		enum
 		{
 			ID_PANEL = 1000,
 			ID_SPLITTER,
-			ID_TOPPANEL,
-			ID_GRIDPANEL,
-			ID_HOSTLABEL,
-			ID_HOST,
-			ID_PORTLABEL,
-			ID_PORT,
-			ID_DATABASELABEL,
-			ID_DATABASE,
-			ID_USERLABEL,
-			ID_USER,
-			ID_PASSWORDLABEL,
-			ID_PASSWORD,
-			ID_RUNBUTTON,
 			ID_CODECONTROLPANEL,
 			ID_BOTTOMPANLE,
+			ID_CONNECTIONLABEL,
 			ID_RESULTSLABEL,
 			ID_DATAGRID,
 		};
 		
 		wxSplitterWindow* Splitter;
-		wxPanel* TopPanel;
-		wxFlexGridSizer* TopPanelSizer;
-		wxPanel* ButtonPanel;
-		wxStaticText* HostLabel;
-		wxTextCtrl* Host;
-		wxStaticText* PortLabel;
-		wxSpinCtrl* Port;
-		wxStaticText* DatabaseLabel;
-		wxComboBox* Database;
-		wxStaticText* UserLabel;
-		wxTextCtrl* User;
-		wxStaticText* PasswordLabel;
-		wxTextCtrl* Password;
-		wxButton* RunButton;
 		wxPanel* CodeControlPanel;
 		wxBoxSizer* CodeControlPanelSizer;
 		wxPanel* BottomPanel;
+		wxStaticText* ConnectionLabel;
 		wxStaticText* ResultsLabel;
 		wxGrid* ResultsGrid;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void OnRunButton( wxCommandEvent& event ) { event.Skip(); }
-		
 	
 	public:
 		
@@ -96,6 +63,63 @@ class SqlBrowserPanelGeneratedClass : public wxPanel
 			Splitter->SetSashPosition( 251 );
 			Splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( SqlBrowserPanelGeneratedClass::SplitterOnIdle ), NULL, this );
 		}
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class SqlConnectionDialogGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class SqlConnectionDialogGeneratedClass : public wxDialog 
+{
+	DECLARE_EVENT_TABLE()
+	private:
+		
+		// Private event handlers
+		void _wxFB_OnTestButton( wxCommandEvent& event ){ OnTestButton( event ); }
+		void _wxFB_OnOkButton( wxCommandEvent& event ){ OnOkButton( event ); }
+		
+	
+	protected:
+		enum
+		{
+			ID_SQLCONNECTIONDIALOGCLASS = 1000,
+			ID_HOSTLABEL,
+			ID_HOST,
+			ID_PORTLABEL,
+			ID_PORT,
+			ID_DATABASELABEL,
+			ID_DATABASE,
+			ID_USERLABEL,
+			ID_USER,
+			ID_PASSWORDLABEL,
+			ID_PASSWORD,
+			ID_TEST,
+		};
+		
+		wxStaticText* HostLabel;
+		wxTextCtrl* Host;
+		wxStaticText* PortLabel;
+		wxSpinCtrl* Port;
+		wxStaticText* DatabaseLabel;
+		wxComboBox* Database;
+		wxStaticText* UserLabel;
+		wxTextCtrl* User;
+		wxStaticText* PasswordLabel;
+		wxTextCtrl* Password;
+		wxButton* m_button2;
+		wxStdDialogButtonSizer* m_sdbSizer2;
+		wxButton* m_sdbSizer2OK;
+		wxButton* m_sdbSizer2Cancel;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnTestButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		SqlConnectionDialogGeneratedClass( wxWindow* parent, wxWindowID id = ID_SQLCONNECTIONDIALOGCLASS, const wxString& title = wxT("SQL Connection"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
+		~SqlConnectionDialogGeneratedClass();
 	
 };
 

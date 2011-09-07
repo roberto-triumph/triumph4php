@@ -78,6 +78,12 @@ class SqlQueryClass {
 	
 	SqlQueryClass();
 	
+	/**
+	 * Will only copy Host, User, Database, Port, and Password
+	 * Any statement that other has will NOT be copied
+	 */
+	SqlQueryClass(const SqlQueryClass& other);
+	
 	~SqlQueryClass();
 	
 	/**
@@ -85,6 +91,13 @@ class SqlQueryClass {
 	 * after every call to Query()
 	 */
 	void Close();
+	
+	/**
+	 * Will only copy Host, User, Database, Port, and Password
+	 * Any statement that other has will NOT be copied
+	 * @param src the object to copy FROM
+	 */
+	void Copy(const SqlQueryClass& src);
 	
 	/**
 	 * Sends ONE query to the server. 
@@ -132,6 +145,44 @@ private:
 
 };
 
+class SqlConnectionDialogClass : public SqlConnectionDialogGeneratedClass, wxThreadHelper {
+
+public:
+
+	/**
+	 * @param wxWindow* the parent window
+	 * @param SqlQueryClass query will get populated with the values that the user entered.
+	 */
+	SqlConnectionDialogClass(wxWindow* parent, SqlQueryClass& query);
+	
+private:
+
+	void OnOkButton(wxCommandEvent& event);
+	
+	void OnCancelButton(wxCommandEvent& event);
+	
+	void OnTestButton(wxCommandEvent& event);
+	
+	/**
+	 * Connection test will happen in a separate thread so dialog stays responsive
+	 */
+	void* Entry();
+	
+	void ShowTestResults(wxCommandEvent& event);
+	
+	/**
+	 * These settings will be tied to the dialog, and will be transferred only when
+	 * the user clicks OK
+	 * In case the user clicks test, then clicks cancel, we don't want to touch the original
+	 * settings.
+	 */
+	SqlQueryClass ModifiedQuery;
+	
+	SqlQueryClass& OriginalQuery;
+	
+	DECLARE_EVENT_TABLE()
+};
+
 class SqlBrowserPanelClass : public SqlBrowserPanelGeneratedClass, wxThreadHelper {
 
 public:
@@ -145,8 +196,10 @@ public:
 	 * @param int id the window ID
 	 * @param mvceditor::CodeControlClass* the code control; this class will own the pointer
 	 * @param mvceditor::StatusBarWithGaugeClass* the gauge control. this class will NOT own the pointer
+	 * @param mvceditor::SqlQueryClass connection settings to prime the browser with
 	 */
-	SqlBrowserPanelClass(wxWindow* parent, int id, mvceditor::CodeControlClass* codeControl, mvceditor::StatusBarWithGaugeClass* gauge);
+	SqlBrowserPanelClass(wxWindow* parent, int id, mvceditor::CodeControlClass* codeControl, mvceditor::StatusBarWithGaugeClass* gauge,
+		const SqlQueryClass& query);
 	
 	/**
 	 * Runs the query that is in the text control (in a separate thread).
@@ -178,6 +231,8 @@ private:
 	 * and will return true if all values are valid
 	 */
 	bool Check();
+	
+	void UpdateLabels(const wxString& result);
 	
 	/**
 	 * To send queries to the server
@@ -240,7 +295,11 @@ private:
 
 	void OnSqlBrowserToolsMenu(wxCommandEvent& event);
 	
+	void OnSqlConnectionMenu(wxCommandEvent& event);
+	
 	void OnRun(wxCommandEvent& event);
+	
+	SqlQueryClass Query;
 	
 	DECLARE_EVENT_TABLE()
 };
