@@ -55,6 +55,7 @@ class SqlBrowserPanelGeneratedClass : public wxPanel
 			ID_PASSWORDLABEL,
 			ID_PASSWORD,
 			ID_RUNBUTTON,
+			ID_CODECONTROLPANEL,
 			ID_BOTTOMPANLE,
 			ID_RESULTSLABEL,
 			ID_DATAGRID,
@@ -75,6 +76,8 @@ class SqlBrowserPanelGeneratedClass : public wxPanel
 		wxStaticText* PasswordLabel;
 		wxTextCtrl* Password;
 		wxButton* RunButton;
+		wxPanel* CodeControlPanel;
+		wxBoxSizer* CodeControlPanelSizer;
 		wxPanel* BottomPanel;
 		wxStaticText* ResultsLabel;
 		wxGrid* ResultsGrid;

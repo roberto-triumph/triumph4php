@@ -214,6 +214,11 @@ private:
 	 */
 	wxLongLong QueryStart;
 	
+	/**
+	 * TRUE if a query is running. 
+	 */
+	bool IsRunning;
+	
 	DECLARE_EVENT_TABLE()
 };
 

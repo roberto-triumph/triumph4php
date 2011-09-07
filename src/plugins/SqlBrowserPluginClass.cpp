@@ -73,6 +73,7 @@ bool mvceditor::SqlQueryClass::Query(const wxString& query, wxString& error) {
 		
 	} catch (std::exception const& e) {
 		success = false;
+		printf("query error=%s cs=%s\n", e.what(), (const char *)connString.ToAscii());
 		error = wxString(e.what(), wxConvUTF8);
 	}
 	return success;
@@ -159,14 +160,16 @@ mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id, 
 	, Gauge(gauge)
 	, Timer()
 	, LastError()
-	, LastQuery() {
-	CodeControl->Reparent(this);
+	, LastQuery()
+	, IsRunning(false) {
+	CodeControl->Reparent(CodeControlPanel);
 	CodeControl->SetDocumentMode(mvceditor::CodeControlClass::SQL);
-	TopPanelSizer->Add(CodeControl, 1, wxEXPAND, 0);
 	ResultsGrid->DeleteCols(0, ResultsGrid->GetNumberCols());
 	ResultsGrid->DeleteRows(0, ResultsGrid->GetNumberRows());
 	ResultsGrid->ClearGrid();
 	ResultsLabel->SetLabel(wxT(""));
+	CodeControlPanelSizer->Add(CodeControl, 1, wxEXPAND, 0);
+	CodeControlPanelSizer->Layout();
 	Timer.SetOwner(this);
 	
 	Password->SetValue(wxT(""));
@@ -195,13 +198,31 @@ bool mvceditor::SqlBrowserPanelClass::Check() {
 }
 
 void mvceditor::SqlBrowserPanelClass::Execute() {
-	if (Check()) {
+	if (!IsRunning && Check()) {
 		LastError = wxT("");
-		Gauge->AddGauge(_("Running SQL Query"), ID_SQL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
-		Timer.Start(200, wxTIMER_CONTINUOUS);
-		QueryStart = wxGetLocalTimeMillis();
-		wxThreadHelper::Create();
-		GetThread()->Run();
+		wxThreadError error = wxThreadHelper::Create();
+		switch (error) {
+		case wxTHREAD_NO_ERROR:
+			Gauge->AddGauge(_("Running SQL Query"), ID_SQL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
+			Timer.Start(200, wxTIMER_CONTINUOUS);
+			QueryStart = wxGetLocalTimeMillis();
+			GetThread()->Run();
+			IsRunning = true;
+			RunButton->Disable();
+			break;
+		case wxTHREAD_NO_RESOURCE:
+		case wxTHREAD_MISC_ERROR:
+			wxMessageBox(_("Cannot run query. Your system is low on resources."));
+			break;
+		case wxTHREAD_RUNNING:
+		case wxTHREAD_KILLED:
+		case wxTHREAD_NOT_RUNNING:
+			// should not be possible we are controlling this with IsRunning
+			break;
+		}
+	}
+	else {
+		wxMessageBox(_("Please wait until the current query completes."));
 	}
 }
 
@@ -232,14 +253,14 @@ void mvceditor::SqlBrowserPanelClass::OnQueryComplete(wxCommandEvent& event) {
 	bool nonEmpty = false;
 	int rowNumber = 1;
 	int affected = Query.GetAffectedRows();
+	if (ResultsGrid->GetNumberCols()) {
+		ResultsGrid->DeleteCols(0, ResultsGrid->GetNumberCols());
+	}
+	if (ResultsGrid->GetNumberRows()) {
+		ResultsGrid->DeleteRows(0, ResultsGrid->GetNumberRows());
+	}
 	if (success) {
 		if (Query.ColumnNames(columnNames, error)) {
-			if (ResultsGrid->GetNumberCols()) {
-				ResultsGrid->DeleteCols(0, ResultsGrid->GetNumberCols());
-			}
-			if (ResultsGrid->GetNumberRows()) {
-				ResultsGrid->DeleteRows(0, ResultsGrid->GetNumberRows());
-			}
 			ResultsGrid->AppendCols(columnNames.size());
 			for (size_t i = 0; i < columnNames.size(); i++) {
 				ResultsGrid->SetColLabelValue(i, columnNames[i]);
@@ -292,6 +313,8 @@ void mvceditor::SqlBrowserPanelClass::OnQueryComplete(wxCommandEvent& event) {
 	ResultsGrid->EndBatch();
 	Gauge->StopGauge(ID_SQL_GAUGE);
 	Timer.Stop();
+	IsRunning = false;
+	RunButton->Enable();
 }
 
 void mvceditor::SqlBrowserPanelClass::OnTimer(wxTimerEvent& event) {
@@ -315,7 +338,7 @@ void mvceditor::SqlBrowserPluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
 }
 
 void  mvceditor::SqlBrowserPluginClass::OnSqlBrowserToolsMenu(wxCommandEvent& event) {
-	mvceditor::CodeControlClass* ctrl = CreateCodeControl(GetToolsParentWindow(), wxBORDER_NONE | wxHSCROLL | wxHSCROLL);
+	mvceditor::CodeControlClass* ctrl = CreateCodeControl(GetToolsParentWindow(), 0);
 	mvceditor::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetNotebook(), wxID_NEW, ctrl, GetStatusBarWithGauge());
 	AddContentWindow(sqlPanel, _("SQL Browser"));
 	SetFocusToToolsWindow(sqlPanel);
@@ -326,7 +349,6 @@ void mvceditor::SqlBrowserPluginClass::OnRun(wxCommandEvent& event) {
 	mvceditor::SqlBrowserPanelClass* panel = wxDynamicCast(window, mvceditor::SqlBrowserPanelClass);
 	if (panel) {
 		wxString queries = panel->GetText();
-		wxMessageBox(wxT("going to query\n\n") + queries);
 		panel->Execute();
 	}
 }

@@ -23,14 +23,14 @@ SqlBrowserPanelGeneratedClass::SqlBrowserPanelGeneratedClass( wxWindow* parent, 
 	Splitter = new wxSplitterWindow( this, ID_SPLITTER, wxDefaultPosition, wxDefaultSize, wxSP_3D );
 	Splitter->Connect( wxEVT_IDLE, wxIdleEventHandler( SqlBrowserPanelGeneratedClass::SplitterOnIdle ), NULL, this );
 	
-	TopPanel = new wxPanel( Splitter, ID_TOPPANEL, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	TopPanel = new wxPanel( Splitter, ID_TOPPANEL, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxRAISED_BORDER|wxTAB_TRAVERSAL );
 	TopPanelSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
 	TopPanelSizer->AddGrowableCol( 0 );
 	TopPanelSizer->AddGrowableRow( 1 );
 	TopPanelSizer->SetFlexibleDirection( wxBOTH );
 	TopPanelSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	ButtonPanel = new wxPanel( TopPanel, ID_GRIDPANEL, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	ButtonPanel = new wxPanel( TopPanel, ID_GRIDPANEL, wxDefaultPosition, wxDefaultSize, wxRAISED_BORDER|wxTAB_TRAVERSAL );
 	wxBoxSizer* ButtonPanelSizer;
 	ButtonPanelSizer = new wxBoxSizer( wxHORIZONTAL );
 	
@@ -99,10 +99,18 @@ SqlBrowserPanelGeneratedClass::SqlBrowserPanelGeneratedClass( wxWindow* parent, 
 	ButtonPanelSizer->Fit( ButtonPanel );
 	TopPanelSizer->Add( ButtonPanel, 1, wxEXPAND | wxALL, 5 );
 	
+	CodeControlPanel = new wxPanel( TopPanel, ID_CODECONTROLPANEL, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+	CodeControlPanelSizer = new wxBoxSizer( wxHORIZONTAL );
+	
+	CodeControlPanel->SetSizer( CodeControlPanelSizer );
+	CodeControlPanel->Layout();
+	CodeControlPanelSizer->Fit( CodeControlPanel );
+	TopPanelSizer->Add( CodeControlPanel, 1, wxEXPAND, 5 );
+	
 	TopPanel->SetSizer( TopPanelSizer );
 	TopPanel->Layout();
 	TopPanelSizer->Fit( TopPanel );
-	BottomPanel = new wxPanel( Splitter, ID_BOTTOMPANLE, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	BottomPanel = new wxPanel( Splitter, ID_BOTTOMPANLE, wxDefaultPosition, wxDefaultSize, wxRAISED_BORDER|wxTAB_TRAVERSAL );
 	wxBoxSizer* BottomGridSizer;
 	BottomGridSizer = new wxBoxSizer( wxVERTICAL );
 	
