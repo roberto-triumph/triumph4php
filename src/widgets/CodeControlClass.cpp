@@ -218,7 +218,8 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 		, WordHighlightNextIndex(-1)
 		, WordHighlightStyle(0)
 		, ModifiedDialogOpen(false)
-		, WordHighlightIsWordHighlighted(false) {
+		, WordHighlightIsWordHighlighted(false)
+		, DocumentMode(TEXT) {
 	
 	// we will handle right-click menu ourselves
 	UsePopUp(false);
@@ -293,10 +294,15 @@ bool mvceditor::CodeControlClass::SaveAndTrackFile(wxString newFilename) {
 		FileOpenedDateTime = file.GetModificationTime();
 		
 		// when a file is saved update the resource cache
-		mvceditor::ResourceFinderClass* finder = Project->GetResourceFinder();
-		if (finder != NULL) {
-			finder->Walk(CurrentFilename);
-		}
+		// TODO: this causes a crash in the UCharBufferedFile class when
+		// seems to be that the Save event (from the menu) and the key
+		// event from the keyboard are getting executed simultaneously
+		// since UCharBufferedFile is no reentrant, especially when here 
+		// a File is given and in the key event (auto complete) a string is given
+		//mvceditor::ResourceFinderClass* finder = Project->GetResourceFinder();
+		//if (finder != NULL) {
+		//	finder->Walk(CurrentFilename);
+		//}
 		
 		// if the file extension changed let's update the code control appropriate
 		// for example if a .txt file was saved as a .sql file

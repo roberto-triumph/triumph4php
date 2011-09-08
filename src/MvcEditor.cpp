@@ -25,6 +25,7 @@
 #include <wx/wx.h>
 #include <wx/cmdline.h>
 #include <windows/AppFrameClass.h>
+#include <unicode/uclean.h>
 
 class MvcEditorAppClass : public wxApp {
 
@@ -33,6 +34,8 @@ public:
 	 * Initialize the application 
 	 */
 	virtual bool OnInit();
+	
+	~MvcEditorAppClass();
 };
 
 IMPLEMENT_APP(MvcEditorAppClass)
@@ -81,4 +84,12 @@ bool MvcEditorAppClass::OnInit() {
 		return true;
 	}
 	return false;
+}
+
+MvcEditorAppClass::~MvcEditorAppClass() {
+	
+	// calling cleanup here so that we can run this binary through a memory leak detector 
+	// ICU will cache many things and that will cause the detector to output "possible leaks"
+	// TODO: only use this during debug mode
+	u_cleanup();
 }
