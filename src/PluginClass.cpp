@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <PluginClass.h>
+#include <wx/artprov.h>
 
 int mvceditor::PluginClass::CurrentMenuId = 10000;
 
@@ -115,8 +116,18 @@ bool mvceditor::PluginClass::IsToolsWindowSelected(int windowId) const {
 	return windowIndex != wxNOT_FOUND && windowIndex == ToolsNotebook->GetSelection();
 }
 
+bool mvceditor::PluginClass::AddContentWindow(wxWindow* window, const wxString& name) {
+	return Notebook->AddPage(window, name, true, 
+		wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_TOOLBAR, 
+		wxSize(16, 16)));
+}
+
 mvceditor::CodeControlClass* mvceditor::PluginClass::GetCurrentCodeControl() const {
 	return Notebook->GetCurrentCodeControl();
+}
+
+wxWindow*  mvceditor::PluginClass::GetCurrentContentPane() const {
+	return Notebook->GetCurrentContentPane();
 }
 
 wxWindow* mvceditor::PluginClass::GetToolsParentWindow() const {
@@ -164,4 +175,11 @@ void mvceditor::PluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 
 wxWindow* mvceditor::PluginClass::GetMainWindow() const {
 	return ToolsNotebook->GetParent();
+}
+
+mvceditor::CodeControlClass* mvceditor::PluginClass::CreateCodeControl(wxWindow* window, int flags) const {
+	mvceditor::CodeControlClass* ctrl = new mvceditor::CodeControlClass(window, 
+		*GetNotebook()->CodeControlOptions, GetProject(), wxID_ANY, wxDefaultPosition,
+		wxDefaultSize, flags);
+	return ctrl;
 }

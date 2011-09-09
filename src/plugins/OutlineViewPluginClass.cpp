@@ -164,13 +164,15 @@ void mvceditor::OutlineViewPluginClass::JumpToResource(const wxString& resource)
 		if (resourceFinder->CollectFullyQualifiedResource()) {
 			GetNotebook()->LoadPage(resourceFinder->GetResourceMatchFullPath(0));
 			CodeControlClass* codeControl = GetCurrentCodeControl();
-			int32_t position, 
-				length;
-			bool found = resourceFinder->GetResourceMatchPosition(0, codeControl->GetSafeText(), position, length);
-			if (found) {
-				codeControl->SetSelectionAndEnsureVisible(position, position + length);
+			if (codeControl) {
+				int32_t position, 
+					length;
+				bool found = resourceFinder->GetResourceMatchPosition(0, codeControl->GetSafeText(), position, length);
+				if (found) {
+					codeControl->SetSelectionAndEnsureVisible(position, position + length);
+				}
+				// else the index is out of date....
 			}
-			// else the index is out of date....
 		}
 	}	
 }
@@ -192,7 +194,7 @@ void mvceditor::OutlineViewPluginClass::OnContextMenuOutline(wxCommandEvent& eve
 		BuildOutlineCurrentCodeControl();
 		modified = true;
 	}
-	else if (event.GetId() == ID_CONTEXT_MENU_SHOW_OUTLINE_OTHER && !code->GetSelectedText().IsEmpty()) { 
+	else if (event.GetId() == ID_CONTEXT_MENU_SHOW_OUTLINE_OTHER && code && !code->GetSelectedText().IsEmpty()) { 
 		// adding the :: makes the resource finder match on all of the class's methods 
 		BuildOutline(code->GetSelectedText() + wxT("::")); 
 		modified = true; 

@@ -11,118 +11,49 @@
 
 SqlBrowserPanelGeneratedClass::SqlBrowserPanelGeneratedClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
+	this->SetExtraStyle( wxWS_EX_VALIDATE_RECURSIVELY );
+	
 	wxBoxSizer* BoxSizer;
 	BoxSizer = new wxBoxSizer( wxHORIZONTAL );
 	
 	Splitter = new wxSplitterWindow( this, ID_SPLITTER, wxDefaultPosition, wxDefaultSize, wxSP_3D );
 	Splitter->Connect( wxEVT_IDLE, wxIdleEventHandler( SqlBrowserPanelGeneratedClass::SplitterOnIdle ), NULL, this );
 	
-	TopPanel = new wxPanel( Splitter, ID_TOPPANEL, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	wxFlexGridSizer* TopPanelSizer;
-	TopPanelSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
-	TopPanelSizer->AddGrowableRow( 1 );
-	TopPanelSizer->SetFlexibleDirection( wxBOTH );
-	TopPanelSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	CodeControlPanel = new wxPanel( Splitter, ID_CODECONTROLPANEL, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+	CodeControlPanelSizer = new wxBoxSizer( wxHORIZONTAL );
 	
-	ButtonPanel = new wxPanel( TopPanel, ID_GRIDPANEL, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	wxBoxSizer* ButtonPanelSizer;
-	ButtonPanelSizer = new wxBoxSizer( wxHORIZONTAL );
-	
-	wxFlexGridSizer* ButtonFlexGrid;
-	ButtonFlexGrid = new wxFlexGridSizer( 2, 1, 0, 0 );
-	ButtonFlexGrid->AddGrowableCol( 0 );
-	ButtonFlexGrid->AddGrowableRow( 0 );
-	ButtonFlexGrid->SetFlexibleDirection( wxBOTH );
-	ButtonFlexGrid->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	wxBoxSizer* InputSizer;
-	InputSizer = new wxBoxSizer( wxHORIZONTAL );
-	
-	HostLabel = new wxStaticText( ButtonPanel, ID_HOSTLABEL, wxT("Host"), wxDefaultPosition, wxDefaultSize, 0 );
-	HostLabel->Wrap( -1 );
-	InputSizer->Add( HostLabel, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	Host = new wxTextCtrl( ButtonPanel, ID_HOST, wxT("localhost"), wxDefaultPosition, wxDefaultSize, 0 );
-	InputSizer->Add( Host, 1, wxALL|wxEXPAND, 5 );
-	
-	PortLabel = new wxStaticText( ButtonPanel, ID_PORTLABEL, wxT("Port"), wxDefaultPosition, wxDefaultSize, 0 );
-	PortLabel->Wrap( -1 );
-	InputSizer->Add( PortLabel, 0, wxALL, 5 );
-	
-	Port = new wxSpinCtrl( ButtonPanel, ID_PORT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 65535, 3306 );
-	InputSizer->Add( Port, 0, wxALL, 5 );
-	
-	DatabaseLabel = new wxStaticText( ButtonPanel, ID_DATABASELABEL, wxT("Database"), wxDefaultPosition, wxDefaultSize, 0 );
-	DatabaseLabel->Wrap( -1 );
-	InputSizer->Add( DatabaseLabel, 0, wxALL, 5 );
-	
-	Database = new wxComboBox( ButtonPanel, ID_DATABASE, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
-	Database->Append( wxT("db1") );
-	Database->Append( wxT("db2") );
-	Database->Append( wxT("mysql") );
-	InputSizer->Add( Database, 0, wxALL, 5 );
-	
-	UserLabel = new wxStaticText( ButtonPanel, ID_USERLABEL, wxT("User"), wxDefaultPosition, wxDefaultSize, 0 );
-	UserLabel->Wrap( -1 );
-	InputSizer->Add( UserLabel, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	User = new wxTextCtrl( ButtonPanel, ID_USER, wxT("root"), wxDefaultPosition, wxDefaultSize, 0 );
-	InputSizer->Add( User, 1, wxALL|wxEXPAND, 5 );
-	
-	PasswordLabel = new wxStaticText( ButtonPanel, ID_PASSWORDLABEL, wxT("Password"), wxDefaultPosition, wxDefaultSize, 0 );
-	PasswordLabel->Wrap( -1 );
-	InputSizer->Add( PasswordLabel, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	Password = new wxTextCtrl( ButtonPanel, ID_PASSWORD, wxT("fdfd"), wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD );
-	InputSizer->Add( Password, 1, wxALL|wxEXPAND, 5 );
-	
-	ButtonFlexGrid->Add( InputSizer, 1, wxEXPAND, 5 );
-	
-	wxBoxSizer* ButtonSizer;
-	ButtonSizer = new wxBoxSizer( wxHORIZONTAL );
-	
-	RunButton = new wxButton( ButtonPanel, ID_RUNBUTTON, wxT("Run"), wxDefaultPosition, wxDefaultSize, 0 );
-	ButtonSizer->Add( RunButton, 0, wxALL, 5 );
-	
-	Status = new wxStaticText( ButtonPanel, ID_RUN, wxT("Status:Connected"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
-	Status->Wrap( -1 );
-	ButtonSizer->Add( Status, 1, wxALL|wxEXPAND, 5 );
-	
-	ButtonFlexGrid->Add( ButtonSizer, 1, wxEXPAND, 5 );
-	
-	ButtonPanelSizer->Add( ButtonFlexGrid, 1, wxEXPAND, 5 );
-	
-	ButtonPanel->SetSizer( ButtonPanelSizer );
-	ButtonPanel->Layout();
-	ButtonPanelSizer->Fit( ButtonPanel );
-	TopPanelSizer->Add( ButtonPanel, 1, wxEXPAND | wxALL, 5 );
-	
-	FakeCodeControl = new wxTextCtrl( TopPanel, ID_CODECONTROL, wxT("SELECT * FROM ...\nWHERE ...\nORDER BY ..."), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE );
-	TopPanelSizer->Add( FakeCodeControl, 1, wxALL|wxEXPAND, 5 );
-	
-	TopPanel->SetSizer( TopPanelSizer );
-	TopPanel->Layout();
-	TopPanelSizer->Fit( TopPanel );
-	BottomPanel = new wxPanel( Splitter, ID_BOTTOMPANLE, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	CodeControlPanel->SetSizer( CodeControlPanelSizer );
+	CodeControlPanel->Layout();
+	CodeControlPanelSizer->Fit( CodeControlPanel );
+	BottomPanel = new wxPanel( Splitter, ID_BOTTOMPANLE, wxDefaultPosition, wxDefaultSize, wxRAISED_BORDER|wxTAB_TRAVERSAL );
 	wxBoxSizer* BottomGridSizer;
 	BottomGridSizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* FlexGridSizer;
-	FlexGridSizer = new wxFlexGridSizer( 3, 1, 0, 0 );
+	FlexGridSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
 	FlexGridSizer->AddGrowableCol( 0 );
-	FlexGridSizer->AddGrowableRow( 2 );
+	FlexGridSizer->AddGrowableRow( 1 );
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );
 	FlexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
+	wxBoxSizer* bSizer13;
+	bSizer13 = new wxBoxSizer( wxHORIZONTAL );
+	
+	ConnectionLabel = new wxStaticText( BottomPanel, ID_CONNECTIONLABEL, wxT("mysql: root@localhost:3306"), wxDefaultPosition, wxDefaultSize, 0 );
+	ConnectionLabel->Wrap( -1 );
+	bSizer13->Add( ConnectionLabel, 1, wxALL, 5 );
+	
 	ResultsLabel = new wxStaticText( BottomPanel, ID_RESULTSLABEL, wxT("20 rows returned"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
 	ResultsLabel->Wrap( -1 );
-	FlexGridSizer->Add( ResultsLabel, 0, wxALL|wxEXPAND, 5 );
+	bSizer13->Add( ResultsLabel, 0, wxALL|wxEXPAND, 5 );
+	
+	FlexGridSizer->Add( bSizer13, 1, wxEXPAND, 5 );
 	
 	ResultsGrid = new wxGrid( BottomPanel, ID_DATAGRID, wxDefaultPosition, wxDefaultSize, 0 );
 	
 	// Grid
 	ResultsGrid->CreateGrid( 5, 5 );
-	ResultsGrid->EnableEditing( true );
+	ResultsGrid->EnableEditing( false );
 	ResultsGrid->EnableGridLines( true );
 	ResultsGrid->EnableDragGridSize( true );
 	ResultsGrid->SetMargins( 0, 0 );
@@ -154,7 +85,7 @@ SqlBrowserPanelGeneratedClass::SqlBrowserPanelGeneratedClass( wxWindow* parent, 
 	BottomPanel->SetSizer( BottomGridSizer );
 	BottomPanel->Layout();
 	BottomGridSizer->Fit( BottomPanel );
-	Splitter->SplitHorizontally( TopPanel, BottomPanel, 272 );
+	Splitter->SplitHorizontally( CodeControlPanel, BottomPanel, 251 );
 	BoxSizer->Add( Splitter, 1, wxEXPAND, 5 );
 	
 	this->SetSizer( BoxSizer );
@@ -162,5 +93,90 @@ SqlBrowserPanelGeneratedClass::SqlBrowserPanelGeneratedClass( wxWindow* parent, 
 }
 
 SqlBrowserPanelGeneratedClass::~SqlBrowserPanelGeneratedClass()
+{
+}
+
+BEGIN_EVENT_TABLE( SqlConnectionDialogGeneratedClass, wxDialog )
+	EVT_BUTTON( ID_TEST, SqlConnectionDialogGeneratedClass::_wxFB_OnTestButton )
+	EVT_BUTTON( wxID_OK, SqlConnectionDialogGeneratedClass::_wxFB_OnOkButton )
+END_EVENT_TABLE()
+
+SqlConnectionDialogGeneratedClass::SqlConnectionDialogGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* bSizer11;
+	bSizer11 = new wxBoxSizer( wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizer8;
+	fgSizer8 = new wxFlexGridSizer( 5, 2, 0, 0 );
+	fgSizer8->AddGrowableCol( 1 );
+	fgSizer8->SetFlexibleDirection( wxBOTH );
+	fgSizer8->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	HostLabel = new wxStaticText( this, ID_HOSTLABEL, wxT("Host"), wxDefaultPosition, wxDefaultSize, 0 );
+	HostLabel->Wrap( -1 );
+	fgSizer8->Add( HostLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	Host = new wxTextCtrl( this, ID_HOST, wxT("localhost"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer8->Add( Host, 1, wxALL|wxEXPAND, 5 );
+	
+	PortLabel = new wxStaticText( this, ID_PORTLABEL, wxT("Port"), wxDefaultPosition, wxDefaultSize, 0 );
+	PortLabel->Wrap( -1 );
+	fgSizer8->Add( PortLabel, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+	
+	Port = new wxSpinCtrl( this, ID_PORT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 65535, 3306 );
+	fgSizer8->Add( Port, 0, wxALL, 5 );
+	
+	DatabaseLabel = new wxStaticText( this, ID_DATABASELABEL, wxT("Database"), wxDefaultPosition, wxDefaultSize, 0 );
+	DatabaseLabel->Wrap( -1 );
+	fgSizer8->Add( DatabaseLabel, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+	
+	Database = new wxComboBox( this, ID_DATABASE, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
+	Database->Append( wxT("db1") );
+	Database->Append( wxT("db2") );
+	Database->Append( wxT("mysql") );
+	fgSizer8->Add( Database, 1, wxALL|wxEXPAND, 5 );
+	
+	UserLabel = new wxStaticText( this, ID_USERLABEL, wxT("User"), wxDefaultPosition, wxDefaultSize, 0 );
+	UserLabel->Wrap( -1 );
+	fgSizer8->Add( UserLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	User = new wxTextCtrl( this, ID_USER, wxT("root"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer8->Add( User, 1, wxALL|wxEXPAND, 5 );
+	
+	PasswordLabel = new wxStaticText( this, ID_PASSWORDLABEL, wxT("Password"), wxDefaultPosition, wxDefaultSize, 0 );
+	PasswordLabel->Wrap( -1 );
+	fgSizer8->Add( PasswordLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	Password = new wxTextCtrl( this, ID_PASSWORD, wxT("fdfd"), wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD );
+	fgSizer8->Add( Password, 1, wxALL|wxEXPAND, 5 );
+	
+	bSizer11->Add( fgSizer8, 1, wxEXPAND, 5 );
+	
+	wxBoxSizer* bSizer12;
+	bSizer12 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_button2 = new wxButton( this, ID_TEST, wxT("Test"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer12->Add( m_button2, 0, wxALL, 5 );
+	
+	m_sdbSizer2 = new wxStdDialogButtonSizer();
+	m_sdbSizer2OK = new wxButton( this, wxID_OK );
+	m_sdbSizer2->AddButton( m_sdbSizer2OK );
+	m_sdbSizer2Cancel = new wxButton( this, wxID_CANCEL );
+	m_sdbSizer2->AddButton( m_sdbSizer2Cancel );
+	m_sdbSizer2->Realize();
+	bSizer12->Add( m_sdbSizer2, 1, wxEXPAND, 5 );
+	
+	bSizer11->Add( bSizer12, 0, 0, 5 );
+	
+	this->SetSizer( bSizer11 );
+	this->Layout();
+	bSizer11->Fit( this );
+	
+	this->Centre( wxBOTH );
+}
+
+SqlConnectionDialogGeneratedClass::~SqlConnectionDialogGeneratedClass()
 {
 }

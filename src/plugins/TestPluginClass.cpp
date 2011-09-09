@@ -60,8 +60,10 @@ void mvceditor::TestPluginClass::Go(wxCommandEvent& event) {
 		u_fclose(f);
 	}
 	GetNotebook()->LoadPage(file);
-	GetCurrentCodeControl()->SetText(StringHelperClass::IcuToWx(str));
-	
+	mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
+	if (codeControl) {
+		codeControl->SetText(StringHelperClass::IcuToWx(str));
+	}
 }
 
 mvceditor::TestPluginClass::TestPluginClass() {

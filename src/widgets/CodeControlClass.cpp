@@ -257,8 +257,7 @@ bool mvceditor::CodeControlClass::LoadAndTrackFile(const wxString& filename) {
 			SetSavePoint();
 			CurrentFilename = filename;
 			FileOpenedDateTime = file.GetModificationTime();
-			ApplyPreferences();
-			Colourise(0, -1);	
+			AutoDetectDocumentMode();
 		}
 		delete[] dest;
 		
@@ -301,7 +300,7 @@ bool mvceditor::CodeControlClass::SaveAndTrackFile(wxString newFilename) {
 		
 		// if the file extension changed let's update the code control appropriate
 		// for example if a .txt file was saved as a .sql file
-		ApplyPreferences();
+		AutoDetectDocumentMode();
 	}
 	return saved;
 }
@@ -648,29 +647,44 @@ void mvceditor::CodeControlClass::SetPhpOptions() {
 	WordHighlightStyle = INDICATOR_PHP_STYLE;
 }
 
-void mvceditor::CodeControlClass::ApplyPreferences() {
-	SetMargin();
-	SetCodeControlOptions();
+void mvceditor::CodeControlClass::AutoDetectDocumentMode() {
 	wxString file = GetFileName();
 	wxFileName name(file);
 	wxString ext = name.GetExt();
-	if (Document) {
-		delete Document;
-		Document = NULL;
-	}
 	if (ext.CmpNoCase(wxT("sql")) == 0) {
-		SetSqlOptions();		
-		Document = new mvceditor::SqlDocumentClass();
+		SetDocumentMode(mvceditor::CodeControlClass::SQL);
 	}
 	else if (ext.CmpNoCase(wxT("php")) == 0 || 
 			ext.CmpNoCase(wxT("phtml")) == 0 || 
 			ext.CmpNoCase(wxT("html")) == 0) {
+		// TODO: someway for the user to change this
+		// *.inc endings are common
+		SetDocumentMode(mvceditor::CodeControlClass::PHP);
+	}
+	else {
+		SetDocumentMode(mvceditor::CodeControlClass::TEXT);
+	}
+}
+
+void mvceditor::CodeControlClass::ApplyPreferences() {
+	SetMargin();
+	SetCodeControlOptions();
+	if (Document) {
+		delete Document;
+		Document = NULL;
+	}
+	if (mvceditor::CodeControlClass::SQL == DocumentMode) {
+		SetSqlOptions();		
+		Document = new mvceditor::SqlDocumentClass();
+	}
+	else if (mvceditor::CodeControlClass::PHP == DocumentMode) {
 		SetPhpOptions();
 		Document = new mvceditor::PhpDocumentClass(Project);
 	}
 	else {
 		Document = new mvceditor::TextDocumentClass();
 	}
+	Colourise(0, -1);
 }
 
 void mvceditor::CodeControlClass::SetSqlOptions() {	
@@ -1235,6 +1249,10 @@ std::vector<wxString> mvceditor::SqlDocumentClass::HandleAutoComplete(const wxSt
 		}
 	}
 	return autoCompleteList;
+}
+void mvceditor::CodeControlClass::SetDocumentMode(Mode mode) {
+	DocumentMode = mode;
+	ApplyPreferences();
 }
 
 BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)
