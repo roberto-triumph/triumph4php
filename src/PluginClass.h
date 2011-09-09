@@ -35,6 +35,18 @@
 
 namespace mvceditor {
 
+	
+/**
+ * These are events that will be published to all plugins.  Plugins may connect
+ * and listen for these events.
+ *
+ * This event will be dispatched when a file is saved.  
+ * event.GetString() will cotain the full path to the file.
+ * event.GetEventObject() will contain a pointer to the code control window that
+ *                        was saved.
+ */
+ const wxEventType EVENT_PLUGIN_FILE_SAVED = wxNewEventType();
+
 /**
  * Plugin examples:
  * SVN
@@ -337,19 +349,4 @@ protected:
 };
 
 }
-
-/**
- * These are events that will be published to all plugins.  Plugins may connect
- * and listen for these events.
- */
-BEGIN_DECLARE_EVENT_TYPES()
-
-	/**
-	 * This event will be dispatched when a file is saved.  
-	 * event.GetString() will cotain the full path to the file.
-	 * event.GetEventObject() will contain a pointer to the code control window that
-	 *                        was saved.
-	 */
-	DECLARE_EVENT_TYPE(EVENT_PLUGIN_FILE_SAVED, wxNewId())
-END_DECLARE_EVENT_TYPES()
 #endif

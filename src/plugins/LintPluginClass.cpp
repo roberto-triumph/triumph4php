@@ -311,7 +311,6 @@ void mvceditor::LintPluginClass::OnFileSaved(wxCommandEvent &event) {
 	}
 }
 
-DEFINE_EVENT_TYPE(EVENT_LINT_ERROR)
 BEGIN_EVENT_TABLE(mvceditor::LintPluginClass, wxEvtHandler) 
 	EVT_MENU(ID_LINT_MENU_ITEM, mvceditor::LintPluginClass::OnLintMenu)
 	EVT_MENU(ID_LINT_TOOLBAR_ITEM, mvceditor::LintPluginClass::OnLintMenu)

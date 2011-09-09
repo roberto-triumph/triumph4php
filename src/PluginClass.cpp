@@ -165,5 +165,3 @@ void mvceditor::PluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 wxWindow* mvceditor::PluginClass::GetMainWindow() const {
 	return ToolsNotebook->GetParent();
 }
-
-DEFINE_EVENT_TYPE(EVENT_PLUGIN_FILE_SAVED);

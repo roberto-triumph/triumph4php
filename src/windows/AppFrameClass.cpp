@@ -33,7 +33,6 @@
 #include <plugins/OutlineViewPluginClass.h>
 #include <plugins/ResourcePluginClass.h>
 #include <plugins/RunConsolePluginClass.h>
-#include <plugins/WebBrowserPanelClass.h>
 #include <plugins/LintPluginClass.h>
 #include <plugins/SqlBrowserPluginClass.h>
 
@@ -460,8 +459,6 @@ void mvceditor::AppFrameClass::LoadPlugins() {
 	plugin = new FindInFilesPluginClass();
 	Plugins.push_back(plugin);
 	plugin = new ResourcePluginClass();
-	Plugins.push_back(plugin);
-	plugin = new WebBrowserPluginClass();
 	Plugins.push_back(plugin);
 	plugin = new EnvironmentPluginClass();
 	Plugins.push_back(plugin);

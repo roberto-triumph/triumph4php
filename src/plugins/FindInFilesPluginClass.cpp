@@ -433,7 +433,6 @@ void mvceditor::FindInFilesPluginClass::OnEditFindInFiles(wxCommandEvent& event)
 	}
 }
 
-DEFINE_EVENT_TYPE(EVENT_FIND_IN_FILES_FILE_HIT)
 BEGIN_EVENT_TABLE(mvceditor::FindInFilesResultsPanelClass, FindInFilesResultsPanelGeneratedClass)
 	EVT_COMMAND(wxID_ANY, EVENT_FILE_READ, mvceditor::FindInFilesResultsPanelClass::OnFileSearched)
 	EVT_COMMAND(ID_FIND_IN_FILES_PROGRESS, EVENT_FIND_IN_FILES_FILE_HIT, mvceditor::FindInFilesResultsPanelClass::OnFileHit)
