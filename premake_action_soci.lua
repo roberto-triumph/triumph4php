@@ -89,7 +89,6 @@ newaction {
 							print ("Open the solution found at " .. SOCI_SRC .. "\\SOCI.sln")
 							print "Build the solution in Debug configuration"
 							print "Build the solution in Release configuration"
-							print(cmd)
 						end
 					else
 						print "Could not find the MySQL connector archive.  Does lib\\mysql-connector-c-noinstall-6.0.2-win32.zip exist?"
