@@ -267,9 +267,6 @@ mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id, 
 	CodeControlPanelSizer->Add(CodeControl, 1, wxEXPAND, 0);
 	CodeControlPanelSizer->Layout();
 	Timer.SetOwner(this);
-	
-	Query.Password = wxT("");
-	Query.Database = wxT("mysql");
 	CodeControl->SetText(wxT(""));
 	UpdateLabels(wxT(""));
 }
