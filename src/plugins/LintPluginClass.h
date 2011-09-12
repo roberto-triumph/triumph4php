@@ -32,18 +32,15 @@
 #include <plugins/BackgroundFileReaderClass.h>
 #include <plugins/wxformbuilder/LintPluginGeneratedClass.h>
 
-BEGIN_DECLARE_EVENT_TYPES()
-
-	/**
-	 * This event will get dispatched when a lint (syntax) error is encountered.  It will
-	 * be filled with the following info:
-	 * event.getClientData(): this is a pointer to a mvceditor::LintResultsClass instance.  
-	 * the event handler MUST delete the pointer!
-	 */
-	DECLARE_EVENT_TYPE(EVENT_LINT_ERROR, wxNewId())
-END_DECLARE_EVENT_TYPES()
-
 namespace mvceditor {
+
+/**
+ * This event will get dispatched when a lint (syntax) error is encountered.  It will
+ * be filled with the following info:
+ * event.getClientData(): this is a pointer to a mvceditor::LintResultsClass instance.  
+ * the event handler MUST delete the pointer!
+ */
+const wxEventType EVENT_LINT_ERROR = wxNewEventType();
 	
 /** 
  * This class will help in parsing the large project. It will enable access

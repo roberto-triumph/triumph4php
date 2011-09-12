@@ -128,6 +128,3 @@ void* mvceditor::BackgroundFileReaderClass::Entry() {
 	Handler->AddPendingEvent(endEvent);
 	return 0;
 }
-
-DEFINE_EVENT_TYPE(EVENT_FILE_READ_COMPLETE)
-DEFINE_EVENT_TYPE(EVENT_FILE_READ)

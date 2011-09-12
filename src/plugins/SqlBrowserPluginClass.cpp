@@ -25,7 +25,7 @@
 #include <wx/valgen.h>
 #include <plugins/SqlBrowserPluginClass.h>
 #include <widgets/CodeControlClass.h>
- #include <soci/mysql/soci-mysql.h>
+ #include <soci-mysql.h>
 
 const int ID_SQL_EDITOR_MENU = mvceditor::PluginClass::newMenuId();
 const int ID_SQL_RUN_MENU = mvceditor::PluginClass::newMenuId();
@@ -81,7 +81,7 @@ bool mvceditor::SqlQueryClass::Query(const wxString& query, wxString& error) {
 		Database.c_str(), Host.c_str(), Port, 
 		User.c_str(), Password.c_str());
 	try {
-		Session.open(soci::mysql, (const char*)connString.ToAscii());
+		Session.open(*soci::factory_mysql(), (const char*)connString.ToAscii());
 		Statement = new soci::statement(Session);
 		Statement->alloc();
 		Statement->prepare((const char*)query.ToAscii());
@@ -267,9 +267,6 @@ mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id, 
 	CodeControlPanelSizer->Add(CodeControl, 1, wxEXPAND, 0);
 	CodeControlPanelSizer->Layout();
 	Timer.SetOwner(this);
-	
-	Query.Password = wxT("");
-	Query.Database = wxT("mysql");
 	CodeControl->SetText(wxT(""));
 	UpdateLabels(wxT(""));
 }
@@ -334,7 +331,7 @@ void mvceditor::SqlBrowserPanelClass::OnQueryComplete(wxCommandEvent& event) {
 	std::vector<bool> autoSizeColumns;
 	wxString error = LastError;
 	ResultsGrid->BeginBatch();
-	bool success = event.GetInt();
+	bool success = event.GetInt() != 0;
 	bool nonEmpty = false;
 	int rowNumber = 1;
 	int affected = Query.GetAffectedRows();
@@ -428,7 +425,6 @@ mvceditor::SqlBrowserPluginClass::SqlBrowserPluginClass()
 }
 
 mvceditor::SqlBrowserPluginClass::~SqlBrowserPluginClass() {
-	mysql_library_end();
 }
 
 void mvceditor::SqlBrowserPluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
@@ -459,6 +455,7 @@ void mvceditor::SqlBrowserPluginClass::OnRun(wxCommandEvent& event) {
 void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event) {
 	mvceditor::SqlConnectionDialogClass dialog(GetMainWindow(), Query);
 	if (dialog.ShowModal() == wxOK) {
+
 		// nothing for now .. won't update the SqlBrowserPanel connection label
 		// since that label shows with the data and it may confuse the user
 		// TODO need to update the existing opened panels
@@ -466,7 +463,6 @@ void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event
 	}
 }
 
-DEFINE_EVENT_TYPE(QUERY_COMPLETE_EVENT)
 BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPluginClass, wxEvtHandler)
 	EVT_MENU(ID_SQL_EDITOR_MENU, mvceditor::SqlBrowserPluginClass::OnSqlBrowserToolsMenu)
 	EVT_MENU(ID_SQL_CONNECTION_MENU, mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu)

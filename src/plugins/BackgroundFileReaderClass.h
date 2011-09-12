@@ -31,6 +31,7 @@
 #include <search/DirectorySearchClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
 
+namespace mvceditor {
 
 /**
  * These event will be dispatched to the handler. Note that the 
@@ -38,26 +39,22 @@
  * to these events.
  *
  */
-BEGIN_DECLARE_EVENT_TYPES()
 
-	/**
-	 * Dispatched when all files have been read or all matched files have been processed.
-	 * The event will have the following info:
-	 * event.getInt() will have the mode that was completed: either Modes::WALK or Modes::MATCHED
-	 * depending on whether Init() or InitMatched() was called.
-	 */
-	DECLARE_EVENT_TYPE(EVENT_FILE_READ_COMPLETE, wxNewId())
+/**
+ * Dispatched when all files have been read or all matched files have been processed.
+ * The event will have the following info:
+ * event.getInt() will have the mode that was completed: either Modes::WALK or Modes::MATCHED
+ * depending on whether Init() or InitMatched() was called.
+ */
+const wxEventType EVENT_FILE_READ_COMPLETE = wxNewEventType();
 
-	/**
-	 * Dispatched each time a single file has been processed.
-	 * The event will have the following info:
-	 * event.getInt() will have the file counter; first file will be 1 then 2 and so on.
-	 * event.getClientData() will have a boolean value; true /false the value returned by FileRead() or FileMatched()
-	 */
-	DECLARE_EVENT_TYPE(EVENT_FILE_READ, wxNewId())
-END_DECLARE_EVENT_TYPES()
-
-namespace mvceditor {
+/**
+ * Dispatched each time a single file has been processed.
+ * The event will have the following info:
+ * event.getInt() will have the file counter; first file will be 1 then 2 and so on.
+ * event.getClientData() will have a boolean value; true /false the value returned by FileRead() or FileMatched()
+ */
+const wxEventType EVENT_FILE_READ = wxNewEventType();
 
 /**
  * This is a class that will glue together any background task with any "results" type panel.  Since

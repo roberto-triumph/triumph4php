@@ -22,10 +22,9 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
- #include <soci/soci.h>
- #include <soci/mysql/soci-mysql.h>
+ #include <soci.h>
+ #include <soci-mysql.h>
  #include <stdio.h>
- #include <mysql/mysql.h>
  
  /**
   * This is an example that will query a MySQL database using the SOCI library. The example
@@ -35,7 +34,7 @@
   */
  void query() {
 	 try {
-		soci::session session(soci::mysql, "db=mysql user=root password='' ");
+		soci::session session(*soci::factory_mysql(), "db=mysql user=root password='' ");
 		std::string query = "-- a query\n SHOW DATABASES;";
 		soci::statement stmt(session);
 		stmt.alloc();
@@ -62,7 +61,4 @@
 
 int main() {
 	query();
-	
-	// to cleanup any state to remove valgrind warnings
-	mysql_library_end();
 }

@@ -27,16 +27,30 @@
 #include <wx/artprov.h>
 #include <wx/platinfo.h>
 #include <wx/filename.h>
-
+#include <wx/fileconf.h>
+#include <wx/stdpaths.h>
+#include <algorithm>
 
 int ID_MENU_PROJECT_EXPLORE = mvceditor::PluginClass::newMenuId();
 int ID_MENU_PROJECT_EXPLORE_OPEN_FILE = mvceditor::PluginClass::newMenuId();
+int ID_MENU_PROJECT_RECENT = mvceditor::PluginClass::newMenuId();
+int ID_MENU_PROJECT_SUB_MENU = wxNewId();
+
+// this ID signals the start of the recent project menu IDs
+// don't want to use the wxNewId() function because we want to use a continuous 
+// set of IDs for the recent projects menu items
+// if we used wxNewId() then we could have ID collisions with the code that call 
+// wxNewId() next
+int ID_MENU_PROJECT_ITEM = 2000;
 int ID_TOOLBAR_PROJECT_EXPLORE = wxNewId();
 int ID_TOOLBAR_PROJECT_EXPLORE_OPEN_FILE = wxNewId();
 
 
 mvceditor::ProjectPluginClass::ProjectPluginClass() 
-	: PluginClass() {
+	: PluginClass()
+	, RecentProjects()
+	, RecentProjectsMenu(NULL)
+	, MAX_RECENT_PROJECTS(5) {
 	wxPlatformInfo info;
 	switch (info.GetOperatingSystemId()) {
 		case wxOS_WINDOWS_NT:
@@ -54,6 +68,9 @@ mvceditor::ProjectPluginClass::ProjectPluginClass()
 void mvceditor::ProjectPluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
 	projectMenu->Append(ID_MENU_PROJECT_EXPLORE, _("Explore"), _("Open An explorer window in the Project Root"), wxITEM_NORMAL);
 	projectMenu->Append(ID_MENU_PROJECT_EXPLORE_OPEN_FILE, _("Explore Open File"), _("Open An explorer window in the currently opened file"), wxITEM_NORMAL);
+	RecentProjectsMenu = new wxMenu(0);
+	projectMenu->Append(ID_MENU_PROJECT_SUB_MENU, _("Recent Projects"), RecentProjectsMenu, _("Open An explorer window in the Project Root"));
+	SyncMenu();
 }
 
 void mvceditor::ProjectPluginClass::AddToolBarItems(wxAuiToolBar* toolbar) {
@@ -65,10 +82,139 @@ void mvceditor::ProjectPluginClass::AddToolBarItems(wxAuiToolBar* toolbar) {
 
 void mvceditor::ProjectPluginClass::LoadPreferences(wxConfigBase* config) {
 	config->Read(wxT("Project/ExplorerExecutable"), &ExplorerExecutable);
+
+	// read the recent projects from a separate config file
+	// the decision to keep the recent projects separate from the settings config file is because
+	// the recent projects file changes more often, and there may be cases when config files can
+	// be copied between different computer / people without affecting the recent files list
+	//
+	// recent projects file will have 1 group per project; like this
+	// 
+	// [project_1]
+	// Path = /home/user/projects/project_one
+	//
+	// [project_2]
+	// Path = /home/user/projects/project_two
+	//
+	wxStandardPaths paths;
+	wxString recentFileConfigFilePath = paths.GetUserConfigDir() + wxFileName::GetPathSeparator() + wxT(".mvc_editor_projects.ini");
+	wxFileName fileName(recentFileConfigFilePath);
+	if (fileName.FileExists()) {
+		wxFileInputStream input(recentFileConfigFilePath);
+		if (input.IsOk()) {
+			wxFileConfig recentFileConfig(input);
+			wxString groupName;
+			long index;
+			bool good =  recentFileConfig.GetFirstGroup(groupName, index);
+			while (good) {
+				wxString pathKey = groupName + wxT("/Path");
+				wxString projectPath;
+				if (recentFileConfig.Read(pathKey, &projectPath)) {
+					RecentProjects.push_back(projectPath);
+				}
+				good = recentFileConfig.GetNextGroup(groupName, index);
+			}
+		}
+	}
+	SyncMenu();
 }
 
 void mvceditor::ProjectPluginClass::SavePreferences(wxConfigBase* config) {
 	config->Write(wxT("Project/ExplorerExecutable"), ExplorerExecutable);
+}
+
+void mvceditor::ProjectPluginClass::OnProjectOpened() {
+	wxString projectRoot = GetProject()->GetRootPath();
+	if (projectRoot.IsEmpty()) {
+
+		// this happens when the application starts
+		return;
+	}
+	std::vector<wxString>::iterator found = std::find(RecentProjects.begin(), RecentProjects.end(), projectRoot);
+	if (found != RecentProjects.end() && RecentProjects.size() < (size_t)MAX_RECENT_PROJECTS) {
+		RecentProjects.erase(found);
+		RecentProjects.insert(RecentProjects.begin(), projectRoot);
+	}
+	else if (RecentProjects.size() < (size_t)MAX_RECENT_PROJECTS) {
+		RecentProjects.push_back(projectRoot);
+	}
+	SyncMenu();
+
+	// recent projects file will have 1 group per project; like this
+	// 
+	// [project_1]
+	// Path = /home/user/projects/project_one
+	//
+	// [project_2]
+	// Path = /home/user/projects/project_two
+	//
+	wxStandardPaths paths;
+	wxString recentFileConfigFilePath = paths.GetUserConfigDir() + wxFileName::GetPathSeparator() + wxT(".mvc_editor_projects.ini");
+
+	// attempted to use the style wxCONFIG_USE_NO_ESCAPE_CHARACTERS  but there seems to be no way to set this
+	// flag when reading the file in
+	wxFileConfig recentFileConfig(wxT("mvc_editor"), wxEmptyString, recentFileConfigFilePath, wxEmptyString, 
+		wxCONFIG_USE_LOCAL_FILE);
+	wxString groupName;
+	for (size_t i = 0; i < RecentProjects.size(); i++) {
+		recentFileConfig.SetPath(wxString::Format(wxT("/Project_%d"), i));
+		recentFileConfig.Write(wxT("Path"), RecentProjects[i]);
+	}
+	wxFileOutputStream output(recentFileConfigFilePath);
+	recentFileConfig.Save(output);
+}
+
+void mvceditor::ProjectPluginClass::SyncMenu() {
+	if (RecentProjectsMenu) {
+		wxMenuItemList list = RecentProjectsMenu->GetMenuItems();
+		for (size_t i = 0; i < list.size(); i++) {
+			RecentProjectsMenu->Delete(list[i]);
+		}
+		for (size_t i = 0; i < RecentProjects.size(); i++) {
+			RecentProjectsMenu->Append(ID_MENU_PROJECT_ITEM + i, RecentProjects[i], _("Open the project at ") + RecentProjects[i]);
+		}
+		
+		// ATTN: possible problem. according to wxWidgets docs
+		//     Append the submenu to the parent menu after you have added your menu items, or accelerators may 
+		//     not be registered properly.
+		//
+		// wont worry about that for now since project menu items don't have accelerators automatically
+	}
+}
+
+void mvceditor::ProjectPluginClass::OnMenu(wxCommandEvent& event) {
+	int id = event.GetId();
+	if (id >= ID_MENU_PROJECT_ITEM && id < (ID_MENU_PROJECT_ITEM + MAX_RECENT_PROJECTS)) {
+		wxString project = RecentProjectsMenu->GetLabelText(id);
+		wxFileName fileName(project);
+		bool remove = false;
+		if (fileName.FileExists()) {
+			int ret = wxMessageBox(_("Path is not a directory. Remove from Recent list?\n") + project, _("Warning"), 
+				wxCENTER | wxICON_ERROR | wxYES_NO);
+			remove = wxYES == ret;
+		}
+		else if (!fileName.DirExists()) {
+			int ret = wxMessageBox(_("Path no longer exists. Remove from Recent list?\n") + project, _("Warning"), 
+				wxCENTER | wxICON_ERROR | wxYES_NO);
+			remove = wxYES == ret;
+		}
+		else {
+			wxCommandEvent cmd(EVENT_APP_OPEN_PROJECT);
+			cmd.SetString(project);
+			cmd.SetId(wxID_ANY);
+			AppEvent(cmd);
+		}
+		if (remove) {
+			std::vector<wxString>::iterator it = std::find(RecentProjects.begin(), RecentProjects.end(), project);
+			if (it != RecentProjects.end()) {
+				RecentProjects.erase(it);
+				SyncMenu();
+			}
+		}
+	}
+	else {
+		event.Skip();
+	}
 }
 
 void mvceditor::ProjectPluginClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
@@ -129,4 +275,10 @@ BEGIN_EVENT_TABLE(mvceditor::ProjectPluginClass, wxEvtHandler)
 	EVT_MENU(ID_MENU_PROJECT_EXPLORE_OPEN_FILE, mvceditor::ProjectPluginClass::OnProjectExploreOpenFile)
 	EVT_MENU(ID_TOOLBAR_PROJECT_EXPLORE, mvceditor::ProjectPluginClass::OnProjectExplore)
 	EVT_MENU(ID_TOOLBAR_PROJECT_EXPLORE_OPEN_FILE, mvceditor::ProjectPluginClass::OnProjectExploreOpenFile)
+
+	/**
+	 * Since there could be 1...N recent project menu items we cannot listen to one menu item's event
+	 * we have to listen to all menu events
+	 */
+	EVT_MENU(wxID_ANY, mvceditor::ProjectPluginClass::OnMenu)
 END_EVENT_TABLE()

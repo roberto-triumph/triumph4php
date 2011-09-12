@@ -33,7 +33,8 @@ mvceditor::PluginClass::PluginClass()
 	, Notebook(NULL)
 	, ToolsNotebook(NULL)
 	, Project(NULL)
-	, Environment(NULL) {
+	, Environment(NULL)
+	, AppHandler(NULL) {
 }
 
 mvceditor::PluginClass::~PluginClass() {
@@ -51,13 +52,16 @@ void mvceditor::PluginClass::InitWindow(StatusBarWithGaugeClass* statusBarWithGa
 	AuiManager = auiManager;		
 }
 
-void mvceditor::PluginClass::InitState(EnvironmentClass* environment) {
+void mvceditor::PluginClass::InitState(EnvironmentClass* environment, wxEvtHandler* appHandler) {
 	Environment = environment;
+	AppHandler = appHandler;
 }
 
 void mvceditor::PluginClass::SetProject(ProjectClass* project) {
 	Project = project;
-	OnProjectOpened();
+	if (Project) {
+		OnProjectOpened();
+	}
 }
 
 mvceditor::ProjectClass* mvceditor::PluginClass::GetProject() const {
@@ -184,4 +188,12 @@ mvceditor::CodeControlClass* mvceditor::PluginClass::CreateCodeControl(wxWindow*
 	return ctrl;
 }
 
-DEFINE_EVENT_TYPE(EVENT_PLUGIN_FILE_SAVED);
+void mvceditor::PluginClass::AppEvent(wxCommandEvent event) {
+	if (AppHandler) {
+		wxPostEvent(AppHandler, event);	
+	}
+}
+
+const wxEventType EVENT_PLUGIN_FILE_SAVED = wxNewEventType();
+const wxEventType EVENT_APP_OPEN_PROJECT = wxNewEventType();
+const wxEventType EVENT_APP_SAVE_PREFERENCES = wxNewEventType();

@@ -33,14 +33,14 @@ newaction {
 					print("Use the Visual Studio solution provided by wxWidgets to build the libraries \n" .. 
 							"1) Download wxPack. Install to a C:\\users\\[user]\\wxWidgets directory \n" ..
 							"2) Open Solution wx.dsw located build\msw directory\n" .. 
-							"3) Select 'Debug Unicode' from Configuration Manager\n" .. 
+							"3) Select 'DLL Debug Unicode' from Configuration Manager\n" .. 
 							"4) Build Entire Solution\n" .. 
-							"5) Select 'Release Unicode' from Configuration Manager\n" .. 
+							"5) Select 'DLL Release Unicode' from Configuration Manager\n" .. 
 							"6) Build Entire Solution\n" .. 
 							"7) Open Solution stc.dsw located in contrib\build\msw directory\n" .. 
-							"8) Select 'Debug Unicode' from Configuration Manager\n" .. 
+							"8) Select 'DLL Debug Unicode' from Configuration Manager\n" .. 
 							"9) Build Entire Solution\n" .. 
-							"10) Select 'Release Unicode' from Configuration Manager\n" .. 
+							"10) Select 'DLL Release Unicode' from Configuration Manager\n" .. 
 							"11) Build Entire Solution\n"
 					);
 				else 

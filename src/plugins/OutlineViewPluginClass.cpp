@@ -45,7 +45,8 @@ mvceditor::OutlineViewPluginClass::OutlineViewPluginClass()
 	, CurrentOutline()
 	, PhpDoc()
 	, Parser() 
-	, CurrentOutlineLines() {
+	, CurrentOutlineLines()
+	, Connected(false) {
 	Parser.SetClassObserver(this);
 	Parser.SetClassMemberObserver(this);
 	Parser.SetFunctionObserver(this);
@@ -53,7 +54,7 @@ mvceditor::OutlineViewPluginClass::OutlineViewPluginClass()
 
 mvceditor::OutlineViewPluginClass::~OutlineViewPluginClass() {
 	NotebookClass* notebook = GetNotebook();
-	if (notebook != NULL) {
+	if (notebook != NULL && Connected) {
 		notebook->Disconnect(notebook->GetId(), wxID_ANY, wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED,
 			wxAuiNotebookEventHandler(OutlineViewPluginClass::OnPageChanged), NULL, this);
 		notebook->Disconnect(notebook->GetId(), wxID_ANY, wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSED, 
@@ -214,6 +215,7 @@ void mvceditor::OutlineViewPluginClass::OnContextMenuOutline(wxCommandEvent& eve
 			if (notebook != NULL) {
 				outlineViewPanel = new OutlineViewPluginPanelClass(GetToolsParentWindow(), ID_WINDOW_OUTLINE, this, notebook);
 				if (AddToolsWindow(outlineViewPanel, wxT("Outline"))) {
+					Connected = true;
 					notebook->Connect(notebook->GetId(), wxID_ANY, wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED,
 						wxAuiNotebookEventHandler(OutlineViewPluginClass::OnPageChanged), NULL, this);
 					notebook->Connect(notebook->GetId(), wxID_ANY, wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSED, 

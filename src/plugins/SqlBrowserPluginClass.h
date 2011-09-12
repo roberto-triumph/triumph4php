@@ -28,20 +28,17 @@
 
 #include <PluginClass.h>
 #include <plugins/wxformbuilder/SqlBrowserPluginGeneratedClass.h>
- #include <soci/soci.h>
+#include <soci.h>
 #include <wx/thread.h>
 
-BEGIN_DECLARE_EVENT_TYPES()
-
-	/**
-	 * This event will be propagated when the SQL query completes
-	 * execution
-	 * event.GetInt() will have a non-zero value if the query executed successfully
-	 */
-	DECLARE_EVENT_TYPE(QUERY_COMPLETE_EVENT, wxNewId())
-END_DECLARE_EVENT_TYPES()
-
 namespace mvceditor {
+
+/**
+ * This event will be propagated when the SQL query completes
+ * execution
+ * event.GetInt() will have a non-zero value if the query executed successfully
+ */
+const wxEventType QUERY_COMPLETE_EVENT = wxNewEventType();
 	
 /**
  * A small class that will send queries to the database

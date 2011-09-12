@@ -72,6 +72,8 @@ public:
 	 */
 	void SavePreferences(wxConfigBase* config);
 
+	void OnProjectOpened();
+
 private:
 
 	/**
@@ -85,6 +87,29 @@ private:
 	 * @param wxCommandEvent& event 
 	 */
 	void OnProjectExploreOpenFile(wxCommandEvent& event);
+
+	/**
+	 * Since there could be 1...N recent project menu items we cannot listen to one menu item's event
+	 * we have to listen to all menu events
+	 */
+	void OnMenu(wxCommandEvent& event);
+
+	/**
+	 * updates the recent projects sub-menu with the projects from the internal list
+	 */
+	void SyncMenu();
+
+	/**
+	 * List of recently opened projects
+	 */
+	std::vector<wxString> RecentProjects;
+
+	/**
+	 * Sub-Menu for the recent projects 
+	 */
+	wxMenu* RecentProjectsMenu;
+
+	int MAX_RECENT_PROJECTS;
 
 	DECLARE_EVENT_TABLE()
 	
