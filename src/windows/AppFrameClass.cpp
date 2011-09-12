@@ -337,7 +337,7 @@ void mvceditor::AppFrameClass::OnProjectOpen(wxCommandEvent& event) {
 
 void mvceditor::AppFrameClass::OnProjectOpened(mvceditor::ProjectClass* project) {
 	Notebook->SetProject(project);
-	SetTitle(_("MVC Editor - Open Project - ") + project->GetRootPath());
+	SetTitle(_("MVC Editor - Open Project [") + project->GetRootPath() + wxT("]"));
 }
 
 void mvceditor::AppFrameClass::OnProjectClosed() {
