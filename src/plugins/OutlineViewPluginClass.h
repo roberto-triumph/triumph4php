@@ -168,6 +168,12 @@ private:
 	 * Updates the outlines based on the currently opened (and focused) file.
 	*/
 	void OnPageChanged(wxAuiNotebookEvent& event);
+
+	/**
+	 * flag to tell if we have connected to notebook events
+	 * when cleaning up, we can only disconnect when we have actually connected to the events
+	 */
+	bool Connected;
 	
 	DECLARE_EVENT_TABLE()
 };

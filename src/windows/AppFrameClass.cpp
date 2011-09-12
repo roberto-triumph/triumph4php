@@ -22,19 +22,11 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <AppVersion.h>
 #include <windows/AppFrameClass.h>
+#include <AppVersion.h>
+#include <PluginClass.h>
 #include <windows/PreferencesDialogClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
-#include <plugins/EnvironmentPluginClass.h>
-#include <plugins/FindInFilesPluginClass.h>
-#include <plugins/FinderPluginClass.h>
-#include <plugins/ProjectPluginClass.h>
-#include <plugins/OutlineViewPluginClass.h>
-#include <plugins/ResourcePluginClass.h>
-#include <plugins/RunConsolePluginClass.h>
-#include <plugins/LintPluginClass.h>
-#include <plugins/SqlBrowserPluginClass.h>
 
 #include <wx/artprov.h>
 #include <wx/choicdlg.h>
@@ -55,13 +47,16 @@ int ID_UPPERCASE = wxNewId();
 int ID_MENU_MORE = wxNewId();
 int ID_TOOLBAR = wxNewId();
 
-mvceditor::AppFrameClass::AppFrameClass(wxWindow* parent)
-		: AppFrameGeneratedClass(parent)
-		, Plugins()
-		, Project(NULL)
-		, Environment()
-		, Preferences() {
-	PreferencesClass::InitConfig();
+mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass*>& plugins,
+		wxEvtHandler& appHandler, mvceditor::EnvironmentClass& environment,
+		mvceditor::PreferencesClass& preferences)
+	: AppFrameGeneratedClass(NULL)
+	, Plugins(plugins)
+	, AppHandler(appHandler)
+	, Environment(environment)
+	, Preferences(preferences)
+	, ToolBar(NULL)
+	, ToolsNotebook(NULL) {
 	StatusBarWithGaugeClass* gauge = new StatusBarWithGaugeClass(this);
 	SetStatusBar(gauge);
 	
@@ -69,8 +64,7 @@ mvceditor::AppFrameClass::AppFrameClass(wxWindow* parent)
 	ToolBar = new wxAuiToolBar(this, ID_TOOLBAR, wxDefaultPosition, wxDefaultSize, wxAUI_TB_TEXT | wxAUI_TB_DEFAULT_STYLE);
 	
 	// when the notebook is empty we want to accept dragged files
-	FileDropTarget = new FileDropTargetClass(Notebook);
-	Notebook->SetDropTarget(FileDropTarget);
+	Notebook->SetDropTarget(new FileDropTargetClass(Notebook));
 	Notebook->CodeControlOptions = &Preferences.CodeControlOptions;
 	
 	// ATTN: for some reason must remove and re-insert menu item in order to change the icon
@@ -80,27 +74,7 @@ mvceditor::AppFrameClass::AppFrameClass(wxWindow* parent)
 	ProjectMenu->Insert(0, projectOpenMenuItem);
 	ToolsNotebook = new wxAuiNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 
 		wxAUI_NB_TOP | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_CLOSE_ON_ACTIVE_TAB | wxAUI_NB_TAB_MOVE);
-	
-	
-	// For instances when the user does not open a project, we still want code assist to work for native
-	// php functions.
-	// be careful when moving the project creation code around, as the order of creation of the 
-	// project vs. the various dialogs matters (especially the tools notebook)
-	ProjectOptionsClass options;
-	options.RootPath = wxT("");
-	options.Framework = GENERIC;
-	CreateProject(options);
-	
-	
-	Environment.LoadFromConfig();
-	
-	// order of loading is defined.  first load plugins, then load user options
-	LoadPlugins();
-	Preferences.Load(this);		
-	wxConfigBase* config = wxConfigBase::Get();
-	for (size_t i = 0; i < Plugins.size(); ++i) {
-		Plugins[i]->LoadPreferences(config);
-	}
+
 	CreateToolBarButtons();
 	
 	// setup the bottom "tools" pane, the main content pane, and the toolbar on top
@@ -112,21 +86,15 @@ mvceditor::AppFrameClass::AppFrameClass(wxWindow* parent)
 		).PaneBorder(false).Gripper(false).Floatable(false));
 	AuiManager.AddPane(ToolsNotebook, wxAuiPaneInfo().Bottom().Caption(
 		_("Tools")).Floatable(false).MinSize(-1, 260).Hide());
-	AuiManager.Update();	
+	AuiManager.Update();
 }
 
 mvceditor::AppFrameClass::~AppFrameClass() {
-	DeletePlugins();
-	CloseProject();
 	AuiManager.UnInit();
 }
 
 mvceditor::StatusBarWithGaugeClass* mvceditor::AppFrameClass::GetStatusBarWithGauge() {
 	return (StatusBarWithGaugeClass*)GetStatusBar();
-}
-
-mvceditor::ProjectClass* mvceditor::AppFrameClass::GetProject() {
-	return Project;
 }
 
 void mvceditor::AppFrameClass::OnClose(wxCloseEvent& event) {
@@ -148,9 +116,7 @@ void mvceditor::AppFrameClass::OnFileSave(wxCommandEvent& event) {
 	wxCommandEvent pluginEvent(EVENT_PLUGIN_FILE_SAVED);
 	pluginEvent.SetString(codeControl->GetFileName());
 	pluginEvent.SetEventObject(codeControl);
-	for (size_t i = Plugins.size() - 1; i < Plugins.size(); i++) {
-		Plugins[i]->ProcessEvent(pluginEvent);
-	}
+	wxPostEvent(&AppHandler, pluginEvent);
 }
 
 void mvceditor::AppFrameClass::OnFileNew(wxCommandEvent& event) {
@@ -188,7 +154,7 @@ void mvceditor::AppFrameClass::OnFileRevert(wxCommandEvent& event) {
 }
 
 void mvceditor::AppFrameClass::OnEditCut(wxCommandEvent& event) {
-	
+
 	// need to handle cut in all text controls
 	wxWindow* obj = wxWindow::FindFocus();
 	wxTextCtrl* t = wxDynamicCast(obj, wxTextCtrl);
@@ -213,7 +179,7 @@ void mvceditor::AppFrameClass::OnEditCut(wxCommandEvent& event) {
 }
 
 void mvceditor::AppFrameClass::OnEditCopy(wxCommandEvent& event) {
-	
+
 	// need to handle copy in all text controls
 	wxWindow* obj = wxWindow::FindFocus();
 	wxTextCtrl* t = wxDynamicCast(obj, wxTextCtrl);
@@ -238,7 +204,7 @@ void mvceditor::AppFrameClass::OnEditCopy(wxCommandEvent& event) {
 }
 
 void mvceditor::AppFrameClass::OnEditPaste(wxCommandEvent& event) {
-	
+
 	// need to handle paste in all text controls
 	wxWindow* obj = wxWindow::FindFocus();
 	wxTextCtrl* t = wxDynamicCast(obj, wxTextCtrl);
@@ -298,15 +264,9 @@ void mvceditor::AppFrameClass::OnEditPreferences(wxCommandEvent& event) {
 		exitCode = prefDialog.ShowModal();
 		if (wxOK == exitCode) {
 			Notebook->RefreshCodeControlOptions();
+			wxCommandEvent evt(EVENT_APP_SAVE_PREFERENCES);
+			wxPostEvent(&AppHandler, evt);
 		}
-	}
-	if (wxOK == exitCode) {
-		Preferences.LoadKeyboardShortcuts(this);
-		wxConfigBase* config = wxConfigBase::Get();
-		for (size_t i = 0; i < Plugins.size(); ++i) {
-			Plugins[i]->SavePreferences(config);
-		}
-		config->Flush();
 	}
 }
 
@@ -365,21 +325,28 @@ void mvceditor::AppFrameClass::OnProjectOpen(wxCommandEvent& event) {
 	wxDirDialog dialog(this, _("Choose Project Location"), wxT(""), 
 		wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST | wxDD_CHANGE_DIR);
 	if (wxID_OK == dialog.ShowModal()) {
-		ProjectOpen(dialog.GetPath());
+		bool destroy = Notebook->SaveAllModifiedPages();
+		if (destroy) {
+			Notebook->CloseAllPages();
+			wxCommandEvent evt(EVENT_APP_OPEN_PROJECT);
+			evt.SetString(dialog.GetPath());
+			wxPostEvent(&AppHandler, evt);
+		}
 	}
 }
 
-void mvceditor::AppFrameClass::ProjectOpen(const wxString& directoryPath) {
-	ProjectOptionsClass options;
-	options.RootPath = directoryPath;
-	options.Framework = GENERIC;
-	bool destroy = Notebook->SaveAllModifiedPages();
-	if (destroy) {
-		Notebook->CloseAllPages();
-		CloseProject();
-		CreateProject(options);
-		SetTitle(_("MVC Editor - Open Project - ") + Project->GetRootPath());
+void mvceditor::AppFrameClass::OnProjectOpened(mvceditor::ProjectClass* project) {
+	Notebook->SetProject(project);
+	SetTitle(_("MVC Editor - Open Project - ") + project->GetRootPath());
+}
+
+void mvceditor::AppFrameClass::OnProjectClosed() {
+	AuiManager.GetPane(ToolsNotebook).Hide();
+	while (ToolsNotebook->GetPageCount()) {
+		ToolsNotebook->DeletePage(0);
 	}
+	AuiManager.Update();
+	Notebook->SetProject(NULL);
 }
 
 void mvceditor::AppFrameClass::OnHelpAbout(wxCommandEvent& event) {
@@ -415,109 +382,49 @@ void mvceditor::AppFrameClass::OnUpdateUi(wxUpdateUIEvent& event) {
 	event.Skip();
 }
 
- void mvceditor::AppFrameClass::CreateToolBarButtons() {
+void mvceditor::AppFrameClass::CreateToolBarButtons() {
 	ToolBar->AddTool(ID_TOOLBAR_SAVE, _("Save"), wxArtProvider::GetBitmap(
 		wxART_FILE_SAVE, wxART_TOOLBAR, wxSize(16, 16)), _("Save"));
-	for (size_t i = 0; i < Plugins.size(); ++i) {
-		Plugins[i]->AddToolBarItems(ToolBar);
-		Plugins[i]->AddWindows();
-	}
 	ToolBar->EnableTool(ID_TOOLBAR_SAVE, false);
 	ToolBar->Realize();
 }
 
-void mvceditor::AppFrameClass::CreateProject(const ProjectOptionsClass& options) {
-	Project = ProjectClass::Factory(options);
-	Project->GetResourceFinder()->BuildResourceCacheForNativeFunctions();
-	Notebook->SetProject(Project);
-	for (size_t i = 0; i < Plugins.size(); ++i) {
-		Plugins[i]->SetProject(Project);
-	}
-}
-
-void mvceditor::AppFrameClass::CloseProject() {
-	AuiManager.GetPane(ToolsNotebook).Hide();
+void mvceditor::AppFrameClass::AuiManagerUpdate() {
+	ToolBar->Realize();
 	AuiManager.Update();
-	while (ToolsNotebook->GetPageCount()) {
-		ToolsNotebook->DeletePage(0);
-	}
-	Notebook->SetProject(NULL);
-	for (size_t i = 0; i < Plugins.size(); ++i) {
-		Plugins[i]->SetProject(NULL);
-	}
-	if (Project) {
-		delete Project;
-		Project = NULL;
-	}
 }
 
-void mvceditor::AppFrameClass::LoadPlugins() {
-	PluginClass* plugin = new RunConsolePluginClass();
-	Plugins.push_back(plugin);
-	plugin = new FinderPluginClass();
-	Plugins.push_back(plugin);
-	plugin = new FindInFilesPluginClass();
-	Plugins.push_back(plugin);
-	plugin = new ResourcePluginClass();
-	Plugins.push_back(plugin);
-	plugin = new EnvironmentPluginClass();
-	Plugins.push_back(plugin);
-	plugin = new ProjectPluginClass();
-	Plugins.push_back(plugin);
-	plugin = new OutlineViewPluginClass();
-	Plugins.push_back(plugin);
-	plugin = new LintPluginClass();
-	Plugins.push_back(plugin);
-	plugin = new SqlBrowserPluginClass();
-	Plugins.push_back(plugin);
-	
-	// test plugin need to find a quicker way to toggling it ON / OFF
-	//plugin = new TestPluginClass();
-	//Plugins.push_back(plugin);
+void mvceditor::AppFrameClass::LoadPlugin(mvceditor::PluginClass* plugin) {
 	
 	// propagate GUI events to plugins, so that they can handle menu events themselves
 	// plugin menus
-	for (size_t i = 0; i < Plugins.size(); ++i) {
-		Plugins[i]->SetProject(Project);
-		Plugins[i]->InitWindow(GetStatusBarWithGauge(), Notebook, ToolsNotebook, &AuiManager);
-		Plugins[i]->InitState(&Environment);
-		PushEventHandler(Plugins[i]);
-		
-		//  when adding the separators, we dont want a separator at the very end
-		// we dont need separators if the plugin did not add any menu items
-		size_t oldEditMenuCount = EditMenu->GetMenuItemCount();
-		Plugins[i]->AddEditMenuItems(EditMenu);
-		if (oldEditMenuCount != EditMenu->GetMenuItemCount() && oldEditMenuCount > 0) {
-			EditMenu->InsertSeparator(oldEditMenuCount);
-		}
-		size_t oldProjectMenuCount = ProjectMenu->GetMenuItemCount();
-		Plugins[i]->AddProjectMenuItems(ProjectMenu);
-		if (oldProjectMenuCount != ProjectMenu->GetMenuItemCount() && oldProjectMenuCount > 0) {
-			ProjectMenu->InsertSeparator(oldProjectMenuCount);
-		}		
-		size_t oldToolsMenuCount = ToolsMenu->GetMenuItemCount();
-		Plugins[i]->AddToolsMenuItems(ToolsMenu);
-		if (oldToolsMenuCount != ToolsMenu->GetMenuItemCount() && oldToolsMenuCount > 0) {
-			ToolsMenu->InsertSeparator(oldToolsMenuCount);
-		}
-		Plugins[i]->AddNewMenu(GetMenuBar());
+	plugin->InitWindow(GetStatusBarWithGauge(), Notebook, ToolsNotebook, &AuiManager);
+	
+	//  when adding the separators, we dont want a separator at the very end
+	// we dont need separators if the plugin did not add any menu items
+	size_t oldEditMenuCount = EditMenu->GetMenuItemCount();
+	plugin->AddEditMenuItems(EditMenu);
+	if (oldEditMenuCount != EditMenu->GetMenuItemCount() && oldEditMenuCount > 0) {
+		EditMenu->InsertSeparator(oldEditMenuCount);
 	}
+	size_t oldProjectMenuCount = ProjectMenu->GetMenuItemCount();
+	plugin->AddProjectMenuItems(ProjectMenu);
+	if (oldProjectMenuCount != ProjectMenu->GetMenuItemCount() && oldProjectMenuCount > 0) {
+		ProjectMenu->InsertSeparator(oldProjectMenuCount);
+	}		
+	size_t oldToolsMenuCount = ToolsMenu->GetMenuItemCount();
+	plugin->AddToolsMenuItems(ToolsMenu);
+	if (oldToolsMenuCount != ToolsMenu->GetMenuItemCount() && oldToolsMenuCount > 0) {
+		ToolsMenu->InsertSeparator(oldToolsMenuCount);
+	}
+	plugin->AddNewMenu(GetMenuBar());
 	
 	// move preferences menu to the end, similar to most other programs
 	wxMenuItem* preferencesMenu = EditMenu->Remove(ID_EDIT_PREFERENCES);
 	EditMenu->Append(preferencesMenu);
-}
 
-void mvceditor::AppFrameClass::DeletePlugins() {
-	for (size_t i = 0; i < Plugins.size(); ++i) {
-		PopEventHandler();
-	}
-	
-	// if i delete in the same loop as the PopEventHandler, wx assertions fail.
-	for (size_t i = 0; i < Plugins.size(); ++i) {
-		delete Plugins[i];
-	}
-	Plugins.clear();
+	plugin->AddToolBarItems(ToolBar);
+	plugin->AddWindows();
 }
 
 void mvceditor::AppFrameClass::OnContextMenu(wxContextMenuEvent& event) {
@@ -640,7 +547,7 @@ void mvceditor::AppFrameClass::OnCodeControlUpdate(wxStyledTextEvent& event) {
 	}
 }
 
-BEGIN_EVENT_TABLE(mvceditor::AppFrameClass, AppFrameGeneratedClass)
+BEGIN_EVENT_TABLE(mvceditor::AppFrameClass,  AppFrameGeneratedClass)
 	EVT_STC_SAVEPOINTREACHED(wxID_ANY, mvceditor::AppFrameClass::DisableSave)
 	EVT_STC_SAVEPOINTLEFT(wxID_ANY, mvceditor::AppFrameClass::EnableSave)
 	EVT_STC_UPDATEUI(wxID_ANY, mvceditor::AppFrameClass::OnCodeControlUpdate)

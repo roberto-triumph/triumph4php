@@ -33,7 +33,6 @@
 #include <wx/propdlg.h>
 #include <vector>
 
-namespace mvceditor {
 
 	
 /**
@@ -45,7 +44,29 @@ namespace mvceditor {
  * event.GetEventObject() will contain a pointer to the code control window that
  *                        was saved.
  */
- const wxEventType EVENT_PLUGIN_FILE_SAVED = wxNewEventType();
+extern const wxEventType EVENT_PLUGIN_FILE_SAVED;
+
+ /**
+  * These events can be published by plugins; the application 
+  * will listen for these events and act accordingly.
+  */
+
+/**
+ * Tell the app to open a new project.
+ * The command event should set the project root path with event.SetString()
+ * Note that the app will do NOTHING if the path is invalid; the plugin should
+ * make sure the path is valid.
+ */
+extern const wxEventType EVENT_APP_OPEN_PROJECT;
+
+/**
+ * Tell the app to save its state to the file system, and will 
+ * also repaint any windows that are affected by the changes.
+ */
+extern const wxEventType EVENT_APP_SAVE_PREFERENCES;
+
+namespace mvceditor {
+
 
 /**
  * Plugin examples:
@@ -117,8 +138,11 @@ public:
 	
 	/**
 	 * Initialize application state
+	 * 
+	 * @param EnvironmentClass* the PHP app environment options. The pointer will NOT be owned by this class.
+	 * @param appHandler event handler that may receive events from plugins. The pointer will NOT be owned by this class.
 	 */
-	void InitState(EnvironmentClass* environment);
+	void InitState(EnvironmentClass* environment, wxEvtHandler* appHandler);
 		
 	/**
 	 * Add menu items to the tools menu for this plugin.
@@ -201,6 +225,8 @@ public:
 	/**
 	 * Set the plugin's reference to the given project. The caller will take care of memory management (this class should NOT
 	 * delete the pointer).
+	 * project can be NULL, in this case the previous project has been closed and a new one is about to be opened. In this
+	 * case there will be 2 calls to SetProject() one for closing the project and one for opening the project.
 	 */
 	void SetProject(ProjectClass* project);
 	
@@ -326,6 +352,11 @@ protected:
 	  * @return CodeControlClass* caller will own the pointer
 	  */
 	 CodeControlClass* CreateCodeControl(wxWindow* parent, int flags) const;
+
+	 /**
+	  * Send an event to the application.  See above for possible events.
+	  */
+	void AppEvent(wxCommandEvent event);
 	 
 	/**
 	 * The AUI Manager is needed in cases where the different windows are repositioned programatically and the entire AUI
@@ -357,16 +388,21 @@ protected:
 	 * @var wxAuiNotebook*
 	 */
 	wxAuiNotebook* ToolsNotebook;
+
+	/**
+	 * The application event dispatcher. The pointer will NOT be owned by this class.
+	 */
+	wxEvtHandler* AppHandler;
 	
 	/**
-	 * The current opened project. Do NOT delete the pointer.
+	 * The current opened project. The pointer will NOT be owned by this class.
 	 * 
 	 * @var ProjectClass*
 	 */	
 	ProjectClass* Project;
 	
 	/**
-	 * The development stack
+	 * The development stack. The pointer will NOT be owned by this class.
 	 * 
 	 * @var EnvironmentClass
 	 */
