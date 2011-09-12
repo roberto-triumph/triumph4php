@@ -128,3 +128,6 @@ void* mvceditor::BackgroundFileReaderClass::Entry() {
 	Handler->AddPendingEvent(endEvent);
 	return 0;
 }
+
+const wxEventType mvceditor::EVENT_FILE_READ_COMPLETE = wxNewEventType();
+const wxEventType mvceditor::EVENT_FILE_READ = wxNewEventType();

@@ -46,7 +46,7 @@ namespace mvceditor {
  * event.getInt() will have the mode that was completed: either Modes::WALK or Modes::MATCHED
  * depending on whether Init() or InitMatched() was called.
  */
-const wxEventType EVENT_FILE_READ_COMPLETE = wxNewEventType();
+extern const wxEventType EVENT_FILE_READ_COMPLETE;
 
 /**
  * Dispatched each time a single file has been processed.
@@ -54,7 +54,7 @@ const wxEventType EVENT_FILE_READ_COMPLETE = wxNewEventType();
  * event.getInt() will have the file counter; first file will be 1 then 2 and so on.
  * event.getClientData() will have a boolean value; true /false the value returned by FileRead() or FileMatched()
  */
-const wxEventType EVENT_FILE_READ = wxNewEventType();
+extern const wxEventType EVENT_FILE_READ;
 
 /**
  * This is a class that will glue together any background task with any "results" type panel.  Since

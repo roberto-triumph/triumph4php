@@ -33,8 +33,8 @@
 #include <wx/propdlg.h>
 #include <vector>
 
+namespace mvceditor {
 
-	
 /**
  * These are events that will be published to all plugins.  Plugins may connect
  * and listen for these events.
@@ -64,9 +64,6 @@ extern const wxEventType EVENT_APP_OPEN_PROJECT;
  * also repaint any windows that are affected by the changes.
  */
 extern const wxEventType EVENT_APP_SAVE_PREFERENCES;
-
-namespace mvceditor {
-
 
 /**
  * Plugin examples:
