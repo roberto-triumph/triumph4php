@@ -371,30 +371,35 @@ void mvceditor::SqlBrowserPanelClass::OnQueryComplete(wxCommandEvent& event) {
 			}
 		}
 	}
-	if (!success) {
-		UpdateLabels(error);
-	}
-	else {
-		wxLongLong msec = wxGetLocalTimeMillis() - QueryStart;
-		if (affected && nonEmpty) {
-			UpdateLabels(wxString::Format(_("%d rows returned in %.3f sec"), affected, (msec.ToLong() / 1000)));
-		}
-		else {
-			UpdateLabels(wxString::Format(_("%d rows affected in %.3f sec"), affected, (msec.ToLong() / 1000)));
-		}
-	}
 	Query.Close();
+
+	// time for query only; not time to render grid
+	wxLongLong msec = wxGetLocalTimeMillis() - QueryStart;
 	for (size_t i = 0; i < autoSizeColumns.size(); i++) {
 		if (autoSizeColumns[i]) {
 			ResultsGrid->AutoSizeColumn(i);
+			ResultsGrid->SetColMinimalWidth(i, ResultsGrid->GetColumnWidth(i));
 		}
 		else {
 			ResultsGrid->SetColSize(i, 50);
+			ResultsGrid->SetColMinimalWidth(i, 50);
 		}
 	}
 	ResultsGrid->EndBatch();
 	Gauge->StopGauge(ID_SQL_GAUGE);
 	Timer.Stop();
+	if (!success) {
+		UpdateLabels(error);
+	}
+	else {
+		
+		if (affected && nonEmpty) {
+			UpdateLabels(wxString::Format(_("%d rows returned in %.3f sec"), affected, (msec.ToLong() / 1000.00)));
+		}
+		else {
+			UpdateLabels(wxString::Format(_("%d rows affected in %.3f sec"), affected, (msec.ToLong() / 1000.00)));
+		}
+	}
 	IsRunning = false;
 }
 
