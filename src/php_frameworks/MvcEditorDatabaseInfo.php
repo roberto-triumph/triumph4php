@@ -57,7 +57,7 @@ class MvcEditorDatabaseInfo {
 	 * MVC Editor will open this file when the user opens the query browser.
 	 * @var string In case of a SQLite database, the full path to the SQLite file
 	 */
-	public $file;
+	public $fileName;
 	
 	/**
 	 * MVC Editor will open a connection to this server when the user opens the query browser.
@@ -93,18 +93,18 @@ class MvcEditorDatabaseInfo {
 	 * @param $host string required
 	 * @param $port int optional, can be zero; zero will mean the default port
 	 * @param $databaseName string the schema to read (required)
-	 * @param $file string for SQLite required. This must be a full path
+	 * @param $fileName string for SQLite required. This must be a full path
 	 * @param $user string optional
 	 * @param $password string optional
 	 */
-	public function __construct($driver, $environment, $name, $host, $port, $databaseName, $file, $user, $password) {
+	public function __construct($driver, $environment, $name, $host, $port, $databaseName, $fileName, $user, $password) {
 		$this->driver = $driver;
 		$this->environment = $environment;
 		$this->name = $name;
 		$this->host = $host;
 		$this->port = $port;
 		$this->databaseName = $databaseName;
-		$this->file = $file;
+		$this->fileName = $fileName;
 		$this->user = $user;
 		$this->password = $password;
 	}

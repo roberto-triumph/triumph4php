@@ -28,8 +28,10 @@
 
 #include <PluginClass.h>
 #include <plugins/wxformbuilder/SqlBrowserPluginGeneratedClass.h>
+#include <php_frameworks/ProjectClass.h>
 #include <soci.h>
 #include <wx/thread.h>
+#include <vector>
 
 namespace mvceditor {
 
@@ -48,35 +50,14 @@ class SqlQueryClass {
 	public:
 	
 	/**
-	 * The database host to connect to
+	 * The database info to use when connecting
 	 */
-	wxString Host;
-	
-	/**
-	 * The database user to connect as
-	 */
-	wxString User;
-	
-	/**
-	 * The database password
-	 */
-	wxString Password;
-	
-	/**
-	 * The database (schema name) to connect to
-	 */
-	wxString Database;
-	
-	/**
-	 * The port to connect to
-	 */
-	int Port;
-	
+	DatabaseInfoClass Info;
 	
 	SqlQueryClass();
 	
 	/**
-	 * Will only copy Host, User, Database, Port, and Password
+	 * Will only copy DatabaseInfo not results.
 	 * Any statement that other has will NOT be copied
 	 */
 	SqlQueryClass(const SqlQueryClass& other);
@@ -148,9 +129,9 @@ public:
 
 	/**
 	 * @param wxWindow* the parent window
-	 * @param SqlQueryClass query will get populated with the values that the user entered.
+	 * @param vector<DatabaseInfoClass> will get populated with the values that the user entered.
 	 */
-	SqlConnectionDialogClass(wxWindow* parent, SqlQueryClass& query);
+	SqlConnectionDialogClass(wxWindow* parent, std::vector<mvceditor::DatabaseInfoClass>info, size_t& chosenIndex);
 	
 private:
 
@@ -160,6 +141,8 @@ private:
 	
 	void OnTestButton(wxCommandEvent& event);
 	
+	void OnListboxSelected(wxCommandEvent& event);
+
 	/**
 	 * Connection test will happen in a separate thread so dialog stays responsive
 	 */
@@ -167,15 +150,11 @@ private:
 	
 	void ShowTestResults(wxCommandEvent& event);
 	
-	/**
-	 * These settings will be tied to the dialog, and will be transferred only when
-	 * the user clicks OK
-	 * In case the user clicks test, then clicks cancel, we don't want to touch the original
-	 * settings.
-	 */
-	SqlQueryClass ModifiedQuery;
+	std::vector<DatabaseInfoClass> Infos;
 	
-	SqlQueryClass& OriginalQuery;
+	SqlQueryClass TestQuery;
+	
+	size_t& ChosenIndex;
 	
 	DECLARE_EVENT_TABLE()
 };
@@ -288,6 +267,10 @@ public:
 	 */
 	virtual void AddToolsMenuItems(wxMenu* toolsMenu);
 	
+protected:
+	
+	void OnProjectOpened();	
+	
 private:
 
 	void OnSqlBrowserToolsMenu(wxCommandEvent& event);
@@ -296,7 +279,9 @@ private:
 	
 	void OnRun(wxCommandEvent& event);
 	
-	SqlQueryClass Query;
+	std::vector<DatabaseInfoClass> Infos;
+	
+	size_t ChosenIndex;
 	
 	DECLARE_EVENT_TABLE()
 };

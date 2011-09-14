@@ -26,37 +26,30 @@
 #include <php_frameworks/ProjectClass.h>
 #include <FileTestFixtureClass.h>
 
-class SymfonyProjectTestClass : public FileTestFixtureClass {
+class ProjectTestFixtureClass : public FileTestFixtureClass {
 public:	
-	SymfonyProjectTestClass() 
-		: FileTestFixtureClass(wxT("new_project")) {
+	ProjectTestFixtureClass() 
+		: FileTestFixtureClass(wxT("project_test")) {
 		mvceditor::ProjectOptionsClass options;
 		options.RootPath = TestProjectDir;
-		options.Framework = mvceditor::SYMFONY;
-		Project = new mvceditor::SymfonyProjectClass(options);
-		if (wxDirExists(TestProjectDir)) {
-			RecursiveRmDir(TestProjectDir);
-			//wxRmDir(TestProjectDir.fn_str());
-		}
+		Project = new mvceditor::ProjectClass(options);
 	}
 	
-	virtual ~SymfonyProjectTestClass() {
+	virtual ~ProjectTestFixtureClass() {
 		delete Project;
 	}
 
-	mvceditor::SymfonyProjectClass* Project;	
+	mvceditor::ProjectClass* Project;	
 };
 
-// silence test for now
-#if 0
-TEST_FIXTURE(SymfonyProjectTestClass, CreateShouldCreateProjectFiles) {
-	if (!wxDirExists(TestProjectDir)) {
-		wxMkdir(TestProjectDir);
-	}
-	wxString errors;
-	bool created = Project->Create(wxT("a new project"), errors);
-	CHECK(created);
-	bool exists = wxDirExists(TestProjectDir + wxT("apps"));
-	CHECK(exists);
+SUITE(ProjectTestClass) {
+	
+TEST_FIXTURE(ProjectTestFixtureClass, ShouldBeDetected) {
+	CreateFixtureFile(wxT("test.php"), wxT("<?php"));
+	Project->Detect();
+	std::vector<mvceditor::DatabaseInfoClass> frameworks = Project->DatabaseInfo();
+	CHECK_EQUAL((size_t)1, frameworks.size());
+	CHECK_EQUAL(wxT("127.0.0.1"), frameworks[0].Host);
 }
-#endif
+
+}

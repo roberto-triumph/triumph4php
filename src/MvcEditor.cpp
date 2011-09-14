@@ -162,8 +162,7 @@ bool mvceditor::AppClass::OnInit() {
 	// create the project data structure
 	ProjectOptionsClass options;
 	options.RootPath = wxT("");
-	options.Framework = GENERIC;
-	Project = ProjectClass::Factory(options);
+	Project = new ProjectClass(options);
 	Project->GetResourceFinder()->BuildResourceCacheForNativeFunctions();
 
 	// due to the way keyboard shortcuts are serialized, we need to load the
@@ -320,9 +319,8 @@ void mvceditor::AppClass::DeletePlugins() {
 void mvceditor::AppClass::ProjectOpen(const wxString& directoryPath) {
 	ProjectOptionsClass options;
 	options.RootPath = directoryPath;
-	options.Framework = GENERIC;
 	CloseProject();
-	Project = ProjectClass::Factory(options);
+	Project = new ProjectClass(options);
 	Project->GetResourceFinder()->BuildResourceCacheForNativeFunctions();
 	AppFrame->OnProjectOpened(Project);
 	for (size_t i = 0; i < Plugins.size(); ++i) {
@@ -341,7 +339,7 @@ void mvceditor::AppClass::OnSavePreferences(wxCommandEvent& event) {
 
 void mvceditor::AppClass::OnFileSaved(wxCommandEvent& event) {
 	for (size_t i = 0; i < Plugins.size(); i++) {
-		Plugins[i]->ProcessEvent(event);
+		wxPostEvent(Plugins[i], event);
 	}
 }
 

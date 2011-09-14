@@ -64,7 +64,8 @@ abstract class MvcEditorFrameworkBaseClass {
 	 * The database connection detection method. Sub classes should read the database connection
 	 * info from their respective files and create the necessary MvcEditorDatabaseInfo objects.
 	 *
+	 * @param $dir the base directory of the project in question
 	 * @return array of MvcEditorDatabaseInfo object
 	 */
-	abstract public function databaseInfo();
+	abstract public function databaseInfo($dir);
 }

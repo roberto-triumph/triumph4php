@@ -32,9 +32,9 @@ mvceditor::PluginClass::PluginClass()
 	, StatusBarWithGauge(NULL)
 	, Notebook(NULL)
 	, ToolsNotebook(NULL)
+	, AppHandler(NULL)
 	, Project(NULL)
-	, Environment(NULL)
-	, AppHandler(NULL) {
+	, Environment(NULL) {
 }
 
 mvceditor::PluginClass::~PluginClass() {

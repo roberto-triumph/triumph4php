@@ -97,7 +97,9 @@ SqlBrowserPanelGeneratedClass::~SqlBrowserPanelGeneratedClass()
 }
 
 BEGIN_EVENT_TABLE( SqlConnectionDialogGeneratedClass, wxDialog )
+	EVT_LISTBOX( ID_LIST, SqlConnectionDialogGeneratedClass::_wxFB_OnListboxSelected )
 	EVT_BUTTON( ID_TEST, SqlConnectionDialogGeneratedClass::_wxFB_OnTestButton )
+	EVT_BUTTON( wxID_CANCEL, SqlConnectionDialogGeneratedClass::_wxFB_OnCancelButton )
 	EVT_BUTTON( wxID_OK, SqlConnectionDialogGeneratedClass::_wxFB_OnOkButton )
 END_EVENT_TABLE()
 
@@ -107,6 +109,17 @@ SqlConnectionDialogGeneratedClass::SqlConnectionDialogGeneratedClass( wxWindow* 
 	
 	wxBoxSizer* bSizer11;
 	bSizer11 = new wxBoxSizer( wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizer3;
+	fgSizer3 = new wxFlexGridSizer( 1, 2, 0, 0 );
+	fgSizer3->AddGrowableCol( 0 );
+	fgSizer3->AddGrowableCol( 1 );
+	fgSizer3->AddGrowableRow( 0 );
+	fgSizer3->SetFlexibleDirection( wxBOTH );
+	fgSizer3->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	List = new wxListBox( this, ID_LIST, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_SINGLE ); 
+	fgSizer3->Add( List, 1, wxALL|wxEXPAND, 5 );
 	
 	wxFlexGridSizer* fgSizer8;
 	fgSizer8 = new wxFlexGridSizer( 5, 2, 0, 0 );
@@ -152,7 +165,9 @@ SqlConnectionDialogGeneratedClass::SqlConnectionDialogGeneratedClass( wxWindow* 
 	Password = new wxTextCtrl( this, ID_PASSWORD, wxT("fdfd"), wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD );
 	fgSizer8->Add( Password, 1, wxALL|wxEXPAND, 5 );
 	
-	bSizer11->Add( fgSizer8, 1, wxEXPAND, 5 );
+	fgSizer3->Add( fgSizer8, 1, wxEXPAND, 5 );
+	
+	bSizer11->Add( fgSizer3, 1, wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer12;
 	bSizer12 = new wxBoxSizer( wxHORIZONTAL );
@@ -168,11 +183,10 @@ SqlConnectionDialogGeneratedClass::SqlConnectionDialogGeneratedClass( wxWindow* 
 	m_sdbSizer2->Realize();
 	bSizer12->Add( m_sdbSizer2, 1, wxEXPAND, 5 );
 	
-	bSizer11->Add( bSizer12, 0, 0, 5 );
+	bSizer11->Add( bSizer12, 0, wxEXPAND, 5 );
 	
 	this->SetSizer( bSizer11 );
 	this->Layout();
-	bSizer11->Fit( this );
 	
 	this->Centre( wxBOTH );
 }

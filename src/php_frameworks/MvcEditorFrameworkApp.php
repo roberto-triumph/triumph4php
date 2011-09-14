@@ -31,7 +31,7 @@
  * For example, let's say the user opened a SQL browser.  The editor needs to know the SQL credentials to
  * use. The editor will run this script asking for the credentials.  
  *
- *     php MvcEditorFrameworkApp.php --identifier="CI-1.4" --dir="/home/user/projects/my_blog/" --action=database-info
+ *     php MvcEditorFrameworkApp.php --identifier="CI-1.4" --dir="/home/user/projects/my_blog/" --action=databaseInfo
  *
  * The script will parse the arguments. In this case, this script will know to ask the 
  * framework identified by 'CI-1.4' and will ask the framework for its model credentials. The script will create the
@@ -73,31 +73,56 @@ function loadFrameworks() {
  * any prior inputs that the framework object may do.
  * action is assumed to be valid at this point
  */
-function runAction($framework, $action) {
-	print "-----START-MVC-EDITOR-----\n";
+function runAction($framework, $dir, $action) {
+	print "\n-----START-MVC-EDITOR-----\n";
 	if (strcasecmp($action, 'databaseInfo') == 0) {
-		$infoList = $framework->databaseInfo();
-		if ($infoList) {
-			$writer = new Zend_Config_Writer_Ini();
-			$config = new Zend_Config(array(), true);
-			$writer->setConfig($config);
-			foreach ($infoList as $info) {
-			
-				// write an INI entry for each connection. make sure to replace any possible
-				// characters that may conflict with INI parsing.
-				$key = str_replace(array("/", "\n"), array(" ", " "), $info->environment)
-					. '/'
-					. str_replace(array("/", "\n"), array(" ", " "), $info->name);
-					
-				$config->{$key} = array();
-				foreach ($info as $prop => $value) {
-					$config->{$key}->{$prop} = $value;
-				}				
-			}
-			$contents = $writer->render();
-			print $contents;
+		runDatabaseInfo($framework, $dir);
+	}
+	else if (strcasecmp($action, 'isUsedBy') == 0) {
+		runIsUsedBy($dir);
+	}
+}
+
+function runDatabaseInfo($framework, $dir) {
+	$infoList = $framework->databaseInfo($dir);
+	if ($infoList) {
+		$writer = new Zend_Config_Writer_Ini();
+		$config = new Zend_Config(array(), true);
+		$writer->setConfig($config);
+		foreach ($infoList as $info) {
+		
+			// write an INI entry for each connection. make sure to replace any possible
+			// characters that may conflict with INI parsing.
+			$key = str_replace(array("/", "\n", " "), array("_", "_", "_"), $info->name);
+				
+			$config->{$key} = array();
+			foreach ($info as $prop => $value) {
+				$prop = ucfirst($prop);
+				$config->{$key}->{$prop} = $value;
+			}				
+		}
+		print $writer->render();
+	}
+}
+
+function runIsUsedBy( $dir) {
+	$frameworks = loadFrameworks();
+	$identifiers = array();
+	foreach ($frameworks as $framework) {
+		if ($framework->isUsedBy($dir)) { 
+			$identifiers[] = $framework->getIdentifier();
 		}
 	}
+	$writer = new Zend_Config_Writer_Ini();
+	$config = new Zend_Config(array(), true);
+	$writer->setConfig($config);
+	$i = 0;
+	foreach ($identifiers as $identifier) {
+		$prop = "framework_{$i}";
+		$config->{$prop} = $identifier;
+		$i++;
+	}
+	print $writer->render();
 }
 
 $rules = array(
@@ -131,12 +156,12 @@ When any argument is invalid or missing, the program will exit with an error cod
 EOF;
 	exit(0);
 }
-
+print "Running action=$action on identifier=$identifier with dir=$dir\n";
 // go through all the available frameworks and pick the one with the correct identifier
 $frameworks = loadFrameworks();
 $chosenFramework = NULL;
 foreach ($frameworks as $framework) {
-	if ($framework->getIdentifier() == $identifier) {
+	if (strcasecmp($framework->getIdentifier(), $identifier) == 0) {
 		$chosenFramework = $framework;
 		break;
 	}
@@ -145,14 +170,16 @@ if ($chosenFramework) {
 
 	// pick the correct method call on the framework
 	if (method_exists($chosenFramework, $action)) {
-		runAction($chosenFramework, $action);
+		runAction($chosenFramework, $dir, $action);
 	}
 	else {
-		print "Invalid action: '{$action}.' Program will now exit.";
+		print "Invalid action: '{$action}.' Program will now exit.\n";
 		exit(-1);
 	}
 }
-else {
-	print "Invalid identifier: '{$identifier}.' Program will now exit.";
+else if (strcasecmp($action, 'isUsedBy') == 0) {
+	runAction(NULL, $dir, $action);
 }
-print "action=$action identifier=$identifier dir=$dir\n";
+else {
+	print "Invalid identifier: '{$identifier}.' Program will now exit.\n";
+}

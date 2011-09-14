@@ -26,20 +26,10 @@
 #define PROJECTCLASS_H_
 
 #include <search/ResourceFinderClass.h>
-#include <wx/wx.h>
+#include <wx/string.h>
+#include <vector>
 
 namespace mvceditor {
-
-/**
- * The frameworks MVC Editor supports
- */
-enum Frameworks {
-	GENERIC = 0,
-	SYMFONY = 1
-};
-
-const wxString FrameworksDescriptions[2] = {wxT("Generic PHP Project"), 
-	wxT("Symfony") };
 
 /*
  * Data structure that holds project attributes.
@@ -63,11 +53,6 @@ public:
 	ProjectOptionsClass(const ProjectOptionsClass& other);
 	
 	/**
-	 * The framework flag.
-	 */
-	Frameworks Framework;
-	
-	/**
 	 * The location of the root directory of the project in
 	 * the file system. 
 	 */
@@ -75,31 +60,91 @@ public:
 };
 
 /**
- * The Project class is a base class for all PHP projects
+ * This is the database connection information used by the framework.
+ * The information will actually be located via a PHP script
+ * (MvcEditorFrameworkApp.php) and not the C++ code. this way we
+ * can extend / modifify the code for different frameworks.
+ */
+class DatabaseInfoClass {
+
+public:
+
+	/**
+	 * The RDBMS systems that both the frameworks and MVC Editor supports.
+	 */
+	enum Drivers {
+		MYSQL,
+		POSTGRESQL,
+		SQLITE
+	};
+	
+	/**
+	 * The database host to connect to
+	 */
+	wxString Host;
+	
+	/**
+	 * The database user to connect as
+	 */
+	wxString User;
+	
+	/**
+	 * The database password
+	 */
+	wxString Password;
+	
+	/**
+	 * The database (schema name) to connect to
+	 */
+	wxString DatabaseName;
+	
+	/**
+	 * The full path to the database (in case of SQLite)
+	 */
+	wxString FileName;
+	
+	/**
+	 * the system that is used.
+	 */
+	Drivers Driver;
+	
+	/**
+	 * The port to connect to
+	 */
+	int Port;
+	
+	DatabaseInfoClass();
+	
+	/**
+	 * copy the attributes from src to this object.
+	 */
+	DatabaseInfoClass(const DatabaseInfoClass& other);
+	
+	/**
+	 * copy the attributes from src to this object.
+	 */
+	void Copy(const DatabaseInfoClass& src);
+};
+
+/**
+ * The Project class is the class that detects various artifacts for PHP frameworks.
  */
 class ProjectClass {
 	
 public:
 	
 	/**
-	 * Construct a ProjectClass object from the given options. Memory management (delete) is left to the 
-	 * caller of this method.
+	 * Construct a ProjectClass object from the given options
 	 * 
 	 * @param ProjectOptionsClass options the new project's options
 	 */
-	static ProjectClass* Factory(const ProjectOptionsClass& options);
+	ProjectClass(const ProjectOptionsClass& options);
 	
 	/**
-	 * Creates a project for this framework on the file system.  The 
-	 * project creation process usually involves creating a directory
-	 * structure with various config files and such.
-	 * Returns true if creation succeeded.  Any errors are populated
-	 * into the errors out parameter.
-	 * 
-	 * @param wxString errors gets filled in with any errors that occur
-	 * when creating this project.
+	 * run the detection code against the root path to figure out which frameworks
+	 * the project uses.
 	 */
-	virtual bool Create(wxString& errors);
+	void Detect();
 	
 	/**
 	 * Returns the root path of this project
@@ -126,47 +171,46 @@ public:
 	 * This object will still own the returned pointer. Do NOT delete it.
 	 */
 	ResourceFinderClass* GetResourceFinder();
+	
+	/**
+	 * Returns the detected database connection infos
+	 */
+	std::vector<DatabaseInfoClass> DatabaseInfo();
 
-protected:
+private:
 	
 	/**
 	 * sanitize a string to be suitable as an argument to a command 
 	 */
 	wxString Sanitize(const wxString& arg) const;
 	
-	/*
-	 * Protected so that construction can only be done
-	 * through the factory method.
+	/**
+	 * Send a query to the PHP detection code
+	 * returns the parsed response
 	 */
-	ProjectClass(const ProjectOptionsClass& options);
+	wxString Ask(const wxString& action, const wxString& identifier) const;
+	
+	wxString AskDatabaseInfo(const wxString& identifier) const;
 	
 	/*
 	 * Holds project attributes.
 	 */
 	ProjectOptionsClass Options;
 
-private:
-	
+	/**
+	 * to look for classes and methods
+	 */
 	ResourceFinderClass ResourceFinder;
-};
-
-
-/*
- * Class that interfaces with the various symfony commands. 
- */
-class SymfonyProjectClass : public ProjectClass {
-
-public:
 	
-	/*
-	 * constructor
+	/**
+	 * the detected frameworks
 	 */
-	SymfonyProjectClass(const ProjectOptionsClass& options);
+	std::vector<wxString> FrameworkIdentifiers;
 	
-	/*
-	 * Executes the command symfony generate:project
+	/**
+	 * The detected database connection info
 	 */
-	virtual bool Create(const wxString& name, wxString& errors);
+	std::vector<DatabaseInfoClass> Databases;
 };
 
 }
