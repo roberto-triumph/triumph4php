@@ -115,7 +115,8 @@ private:
 	};
 	
 	mvceditor::CodeControlOptionsClass Options;
-	mvceditor::ProjectClass* Project;
+	mvceditor::ProjectOptionsClass ProjectOptions;
+	mvceditor::ProjectClass Project;
 	mvceditor::CodeControlClass* Ctrl;
 	
 
@@ -135,12 +136,11 @@ CodeControlFrameClass::CodeControlFrameClass()
 	: wxFrame(NULL, wxID_ANY, wxT("CodeControlClass profiler"), wxDefaultPosition, 
 			wxSize(1024, 768))
 	, Options()
-	, Project(NULL) {
-	mvceditor::ProjectOptionsClass projectOptions;
-	Project = mvceditor::ProjectClass::Factory(projectOptions);
+	, ProjectOptions()
+	, Project(ProjectOptions) {
 	Options.EnableAutomaticLineIndentation = true;
 	Options.EnableAutoCompletion = true;
-	Ctrl = new mvceditor::CodeControlClass(this, Options, Project, wxID_ANY);
+	Ctrl = new mvceditor::CodeControlClass(this, Options, &Project, wxID_ANY);
 	Ctrl->SetDropTarget(new FileDropTargetClass(Ctrl));
 	CreateMenu();
 }
