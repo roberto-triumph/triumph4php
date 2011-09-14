@@ -125,6 +125,7 @@ void mvceditor::ProjectPluginClass::SavePreferences(wxConfigBase* config) {
 
 void mvceditor::ProjectPluginClass::OnProjectOpened() {
 	wxString projectRoot = GetProject()->GetRootPath();
+	projectRoot.Trim();
 	if (projectRoot.IsEmpty()) {
 
 		// this happens when the application starts
@@ -186,6 +187,9 @@ void mvceditor::ProjectPluginClass::OnMenu(wxCommandEvent& event) {
 	int id = event.GetId();
 	if (id >= ID_MENU_PROJECT_ITEM && id < (ID_MENU_PROJECT_ITEM + MAX_RECENT_PROJECTS)) {
 		wxString project = RecentProjectsMenu->GetLabelText(id);
+		
+		// on linux project seems to have an extra space
+		project.Trim();
 		wxFileName fileName(project);
 		bool remove = false;
 		if (fileName.FileExists()) {

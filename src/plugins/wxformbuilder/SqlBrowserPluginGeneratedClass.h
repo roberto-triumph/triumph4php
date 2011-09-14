@@ -18,6 +18,7 @@
 #include <wx/stattext.h>
 #include <wx/grid.h>
 #include <wx/splitter.h>
+#include <wx/listbox.h>
 #include <wx/textctrl.h>
 #include <wx/spinctrl.h>
 #include <wx/combobox.h>
@@ -75,7 +76,9 @@ class SqlConnectionDialogGeneratedClass : public wxDialog
 	private:
 		
 		// Private event handlers
+		void _wxFB_OnListboxSelected( wxCommandEvent& event ){ OnListboxSelected( event ); }
 		void _wxFB_OnTestButton( wxCommandEvent& event ){ OnTestButton( event ); }
+		void _wxFB_OnCancelButton( wxCommandEvent& event ){ OnCancelButton( event ); }
 		void _wxFB_OnOkButton( wxCommandEvent& event ){ OnOkButton( event ); }
 		
 	
@@ -83,6 +86,7 @@ class SqlConnectionDialogGeneratedClass : public wxDialog
 		enum
 		{
 			ID_SQLCONNECTIONDIALOGCLASS = 1000,
+			ID_LIST,
 			ID_HOSTLABEL,
 			ID_HOST,
 			ID_PORTLABEL,
@@ -96,6 +100,7 @@ class SqlConnectionDialogGeneratedClass : public wxDialog
 			ID_TEST,
 		};
 		
+		wxListBox* List;
 		wxStaticText* HostLabel;
 		wxTextCtrl* Host;
 		wxStaticText* PortLabel;
@@ -112,13 +117,15 @@ class SqlConnectionDialogGeneratedClass : public wxDialog
 		wxButton* m_sdbSizer2Cancel;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnListboxSelected( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnTestButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		SqlConnectionDialogGeneratedClass( wxWindow* parent, wxWindowID id = ID_SQLCONNECTIONDIALOGCLASS, const wxString& title = wxT("SQL Connection"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
+		SqlConnectionDialogGeneratedClass( wxWindow* parent, wxWindowID id = ID_SQLCONNECTIONDIALOGCLASS, const wxString& title = wxT("SQL Connections"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 599,287 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~SqlConnectionDialogGeneratedClass();
 	
 };

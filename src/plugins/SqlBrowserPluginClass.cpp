@@ -33,34 +33,21 @@ const int ID_SQL_CONNECTION_MENU = mvceditor::PluginClass::newMenuId();
 const int ID_SQL_GAUGE = wxNewId();
 
 mvceditor::SqlQueryClass::SqlQueryClass()
-	: Host()
-	, User()
-	, Password()
-	, Database()
-	, Port()
+	: Info()
 	, Session()
 	, Statement(NULL)
 	, Row() {
 }
 
 mvceditor::SqlQueryClass::SqlQueryClass(const mvceditor::SqlQueryClass& other) 
-	: Host()
-	, User()
-	, Password()
-	, Database()
-	, Port()
+	: Info(other.Info)
 	, Session()
 	, Statement(NULL)
 	, Row()  {
-	Copy(other);
 }
 
 void mvceditor::SqlQueryClass::Copy(const mvceditor::SqlQueryClass& src) {
-	Host = src.Host;
-	User = src.User;
-	Password = src.Password;
-	Database = src.Database;
-	Port = src.Port;
+	Info.Copy(src.Info);
 }
 
 mvceditor::SqlQueryClass::~SqlQueryClass() {
@@ -78,8 +65,8 @@ void mvceditor::SqlQueryClass::Close() {
 bool mvceditor::SqlQueryClass::Query(const wxString& query, wxString& error) {
 	bool success = false;
 	wxString connString = wxString::Format(wxT("db=%s host=%s port=%d user=%s password='%s'"), 
-		Database.c_str(), Host.c_str(), Port, 
-		User.c_str(), Password.c_str());
+		Info.DatabaseName.c_str(), Info.Host.c_str(), Info.Port, 
+		Info.User.c_str(), Info.Password.c_str());
 	try {
 		Session.open(*soci::factory_mysql(), (const char*)connString.ToAscii());
 		Statement = new soci::statement(Session);
@@ -173,25 +160,33 @@ bool mvceditor::SqlQueryClass::NextRow(std::vector<wxString>& columnValues, std:
 	return data;
 }
 
-mvceditor::SqlConnectionDialogClass::SqlConnectionDialogClass(wxWindow* parent, mvceditor::SqlQueryClass& query)
-	: SqlConnectionDialogGeneratedClass(parent, wxID_ANY)
-	, ModifiedQuery(query)
-	, OriginalQuery(query) {
-	wxGenericValidator hostValidator(&ModifiedQuery.Host);
-	Host->SetValidator(hostValidator);
-	wxGenericValidator userValidator(&ModifiedQuery.User);
-	User->SetValidator(userValidator);
-	wxGenericValidator passwordValidator(&ModifiedQuery.Password);
-	Password->SetValidator(passwordValidator);
-	wxGenericValidator databaseValidator(&ModifiedQuery.Database);
-	Database->SetValidator(databaseValidator);
-	wxGenericValidator portValidator(&ModifiedQuery.Port);
-	Port->SetValidator(portValidator);
+mvceditor::SqlConnectionDialogClass::SqlConnectionDialogClass(wxWindow* parent, std::vector<mvceditor::DatabaseInfoClass> infos, size_t& chosenIndex)
+	: SqlConnectionDialogGeneratedClass(parent, wxID_ANY) 
+	, Infos(infos)
+	, TestQuery()
+	, ChosenIndex(chosenIndex) {
+	mvceditor::DatabaseInfoClass info;
+	for (size_t i = 0; i < infos.size(); i++) {
+		List->Append(infos[i].DatabaseName);
+	}
+	if (chosenIndex < infos.size()) {
+		info = infos[chosenIndex];
+		
+		Host->SetValue(infos[chosenIndex].Host);
+		User->SetValue(infos[chosenIndex].User);
+		Password->SetValue(infos[chosenIndex].Password);
+		
+		Database->Clear();
+		Database->Append(infos[chosenIndex].DatabaseName);
+		Database->Select(0);
+		Port->SetValue(infos[chosenIndex].Port);
+		List->Select(chosenIndex);
+	}
 }
 	
 void mvceditor::SqlConnectionDialogClass::OnOkButton(wxCommandEvent& event) {
 	if (Validate() && TransferDataFromWindow()) {
-		OriginalQuery.Copy(ModifiedQuery);
+		ChosenIndex = List->GetSelection();
 		EndModal(wxOK);
 	}
 }
@@ -205,22 +200,29 @@ void mvceditor::SqlConnectionDialogClass::OnCancelButton(wxCommandEvent& event) 
 
 void mvceditor::SqlConnectionDialogClass::OnTestButton(wxCommandEvent& event) {
 	if (TransferDataFromWindow()) {
-		wxThreadError error = wxThreadHelper::Create();
-		switch (error) {
-		case wxTHREAD_NO_ERROR:
-			GetThread()->Run();
-			wxWindow::FindWindowById(wxID_OK, this)->Disable();
-			wxWindow::FindWindowById(ID_TEST, this)->Disable();
-			break;
-		case wxTHREAD_NO_RESOURCE:
-		case wxTHREAD_MISC_ERROR:
-			wxMessageBox(_("Cannot run query. Your system is low on resources."));
-			break;
-		case wxTHREAD_RUNNING:
-		case wxTHREAD_KILLED:
-		case wxTHREAD_NOT_RUNNING:
-			// should not be possible we are controlling this with IsRunning
-			break;
+		size_t index = List->GetSelection();
+		if (index < Infos.size()) {
+			TestQuery.Info.Copy(Infos[index]);
+			wxThreadError error = wxThreadHelper::Create();
+			switch (error) {
+			case wxTHREAD_NO_ERROR:
+				GetThread()->Run();
+				wxWindow::FindWindowById(wxID_OK, this)->Disable();
+				wxWindow::FindWindowById(ID_TEST, this)->Disable();
+				break;
+			case wxTHREAD_NO_RESOURCE:
+			case wxTHREAD_MISC_ERROR:
+				wxMessageBox(_("Cannot run query. Your system is low on resources."));
+				break;
+			case wxTHREAD_RUNNING:
+			case wxTHREAD_KILLED:
+			case wxTHREAD_NOT_RUNNING:
+				// should not be possible we are controlling this with IsRunning
+				break;
+			}
+		}
+		else {
+			wxMessageBox(_("TODO: allow entering of credentials"));
 		}
 	}
 }
@@ -228,7 +230,7 @@ void mvceditor::SqlConnectionDialogClass::OnTestButton(wxCommandEvent& event) {
 void* mvceditor::SqlConnectionDialogClass::Entry() {
 	wxString error;
 	wxString query(wxT("SELECT 1"));
-	bool success = ModifiedQuery.Query(query, error);
+	bool success = TestQuery.Query(query, error);
 	wxCommandEvent evt(QUERY_COMPLETE_EVENT, wxID_ANY);
 	evt.SetInt(success);
 	evt.SetString(error);
@@ -241,10 +243,14 @@ void mvceditor::SqlConnectionDialogClass::ShowTestResults(wxCommandEvent& event)
 	if (!event.GetInt()) {
 		msg = _("Connection Failed:") + event.GetString();
 	}
-	ModifiedQuery.Close();
+	TestQuery.Close();
 	wxMessageBox(msg);
 	wxWindow::FindWindowById(wxID_OK, this)->Enable();
 	wxWindow::FindWindowById(ID_TEST, this)->Enable();
+}
+
+void mvceditor::SqlConnectionDialogClass::OnListboxSelected(wxCommandEvent& event) {
+	ChosenIndex = event.GetInt();
 }
 	
 
@@ -406,9 +412,9 @@ void mvceditor::SqlBrowserPanelClass::OnQueryComplete(wxCommandEvent& event) {
 void mvceditor::SqlBrowserPanelClass::UpdateLabels(const wxString& result) {
 	ConnectionLabel->SetLabel(wxString::Format(
 		wxT("%s@%s:%d"),
-		Query.User.c_str(),
-		Query.Host.c_str(),
-		Query.Port
+		Query.Info.User.c_str(),
+		Query.Info.Host.c_str(),
+		Query.Info.Port
 	));
 	ResultsLabel->SetLabel(result);
 	ResultsLabel->GetContainingSizer()->Layout();
@@ -420,16 +426,18 @@ void mvceditor::SqlBrowserPanelClass::OnTimer(wxTimerEvent& event) {
 
 mvceditor::SqlBrowserPluginClass::SqlBrowserPluginClass() 
 	: PluginClass() 
-	, Query() {
-	Query.Host = wxT("localhost");
-	Query.Port = 3306;
-	Query.Database = wxT("mysql");
-	Query.User = wxT("root");
-	Query.Password = wxT("");
-
+	, Infos()
+	, ChosenIndex(0) {
 }
 
 mvceditor::SqlBrowserPluginClass::~SqlBrowserPluginClass() {
+}
+
+void mvceditor::SqlBrowserPluginClass::OnProjectOpened() {
+	GetProject()->Detect();
+	
+	// TODO: how and when to refresh ??
+	Infos = GetProject()->DatabaseInfo();
 }
 
 void mvceditor::SqlBrowserPluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
@@ -443,7 +451,11 @@ void mvceditor::SqlBrowserPluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
 
 void  mvceditor::SqlBrowserPluginClass::OnSqlBrowserToolsMenu(wxCommandEvent& event) {
 	mvceditor::CodeControlClass* ctrl = CreateCodeControl(GetToolsParentWindow(), 0);
-	mvceditor::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetNotebook(), wxID_NEW, ctrl, GetStatusBarWithGauge(), Query);
+	mvceditor::SqlQueryClass query;
+	if (ChosenIndex < Infos.size()) {
+		query.Info.Copy(Infos[ChosenIndex]);
+	}
+	mvceditor::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetNotebook(), wxID_NEW, ctrl, GetStatusBarWithGauge(), query);
 	AddContentWindow(sqlPanel, _("SQL Browser"));
 	SetFocusToToolsWindow(sqlPanel);
 }
@@ -458,7 +470,7 @@ void mvceditor::SqlBrowserPluginClass::OnRun(wxCommandEvent& event) {
 }
 
 void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event) {
-	mvceditor::SqlConnectionDialogClass dialog(GetMainWindow(), Query);
+	mvceditor::SqlConnectionDialogClass dialog(GetMainWindow(), Infos, ChosenIndex);
 	if (dialog.ShowModal() == wxOK) {
 
 		// nothing for now .. won't update the SqlBrowserPanel connection label

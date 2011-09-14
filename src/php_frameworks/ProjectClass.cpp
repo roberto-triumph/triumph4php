@@ -23,28 +23,59 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <php_frameworks/ProjectClass.h>
+#include <wx/stdpaths.h>
+#include <wx/filename.h>
+#include <wx/utils.h>
+#include <wx/sstream.h>
+#include <wx/fileconf.h>
+#include <vector>
 
 mvceditor::ProjectOptionsClass::ProjectOptionsClass()  
-	: Framework(GENERIC)
-	, RootPath() { 
+	: RootPath() { 
 }
 	
 mvceditor::ProjectOptionsClass::ProjectOptionsClass(const ProjectOptionsClass& other) { 
-	Framework = other.Framework; 
 	RootPath = other.RootPath; 
 }
 
-mvceditor::ProjectClass* mvceditor::ProjectClass::Factory(const ProjectOptionsClass& options) {
-	mvceditor::ProjectClass* project = NULL;
-	switch(options.Framework) {
-		case SYMFONY:
-			project = new mvceditor::SymfonyProjectClass(options);
-			break;
-		case GENERIC:
-			project = new mvceditor::ProjectClass(options);
-			break;
-	}
-	return project;
+mvceditor::DatabaseInfoClass::DatabaseInfoClass()
+	: Host()
+	, User()
+	, Password()
+	, DatabaseName()
+	, FileName()
+	, Driver(MYSQL)
+	, Port() {
+		
+}
+
+mvceditor::DatabaseInfoClass::DatabaseInfoClass(const mvceditor::DatabaseInfoClass& other) 
+	: Host()
+	, User()
+	, Password()
+	, DatabaseName()
+	, FileName()
+	, Driver(MYSQL)
+	, Port() {
+	Copy(other);
+}
+
+void mvceditor::DatabaseInfoClass::Copy(const mvceditor::DatabaseInfoClass& src) {
+	Host = src.Host;
+	User = src.User;
+	Password = src.Password;
+	DatabaseName = src.DatabaseName;
+	FileName = src.FileName;
+	Driver = src.Driver;
+	Port = src.Port;
+}
+
+mvceditor::ProjectClass::ProjectClass(const mvceditor::ProjectOptionsClass& options)
+	: Options(options)
+	, ResourceFinder()
+	, FrameworkIdentifiers()
+	, Databases() {
+	ResourceFinder.FilesFilter = GetPhpFileExtensions();
 }
 
 wxString mvceditor::ProjectClass::GetPhpKeywords() const {
@@ -58,20 +89,71 @@ wxString mvceditor::ProjectClass::GetPhpKeywords() const {
 	  wxT("integer");
 }
 
-bool mvceditor::ProjectClass::Create(wxString& errors) {
-	
-	//folder has been created by FolderDialog, so nothing to do here 
-	return true;
-}
-
-mvceditor::ProjectClass::ProjectClass(const mvceditor::ProjectOptionsClass& options)
-	: Options(options)
-	, ResourceFinder() {
-	ResourceFinder.FilesFilter = GetPhpFileExtensions();
-}
-
 wxString  mvceditor::ProjectClass::GetRootPath() const { 
 	return Options.RootPath; 
+}
+
+void mvceditor::ProjectClass::Detect() {
+	FrameworkIdentifiers.clear();
+	
+	wxString action = wxT("isUsedBy");
+	
+	// no identifier because we are detecting them here we don't know them
+	wxString resultString = Ask(action, wxT(""));
+	wxStringInputStream stream(resultString);
+	wxFileConfig result(stream);
+	size_t count = result.GetNumberOfEntries();
+	for (size_t i = 0; i < count; i++) {
+		wxString key = wxString::Format(wxT("/framework_%d"), i);
+		wxString val;
+		val = result.Read(key);
+		FrameworkIdentifiers.push_back(val);
+	}
+}
+
+std::vector<mvceditor::DatabaseInfoClass> mvceditor::ProjectClass::DatabaseInfo() {
+	if (Databases.size()) {
+		return Databases;
+	}
+	for (size_t i = 0; i < FrameworkIdentifiers.size(); i++) {
+		wxString identifier = FrameworkIdentifiers[i];
+		wxString resultString = AskDatabaseInfo(identifier);
+		wxStringInputStream stream(resultString);
+		wxFileConfig result(stream);
+		wxString groupName = wxT("");
+		long index = 0;
+		
+		bool next = result.GetFirstGroup(groupName, index);
+		while (next) {
+			mvceditor::DatabaseInfoClass info;
+			result.SetPath(wxT("/") + groupName);
+			info.Host = result.Read(wxT("Host"));
+			info.User = result.Read(wxT("User"));
+			printf("reas user %s on group %s\n", (const char*)info.User.ToAscii(), (const char*)groupName.ToAscii());
+			info.Password = result.Read(wxT("Password"));
+			info.DatabaseName = result.Read(wxT("DatabaseName"));
+			info.FileName = result.Read(wxT("FileName"));
+			wxString driverString;
+			result.Read(wxT("Driver"), driverString);
+			if (driverString.CmpNoCase(wxT("MYSQL"))) {
+				info.Driver = mvceditor::DatabaseInfoClass::MYSQL;
+			}
+			else if (driverString.CmpNoCase(wxT("POSTGRESQL"))) {
+				info.Driver = mvceditor::DatabaseInfoClass::POSTGRESQL;
+			}
+			else if (driverString.CmpNoCase(wxT("SQLITE"))) {
+				info.Driver = mvceditor::DatabaseInfoClass::SQLITE;
+			}
+			else {
+				info.Driver = mvceditor::DatabaseInfoClass::MYSQL;
+				// TODO error handling
+			}
+			result.Read(wxT("Port"), info.Port);
+			Databases.push_back(info);
+			next = result.GetNextGroup(groupName, index);
+		}
+	}
+	return Databases;
 }
 
 wxString mvceditor::ProjectClass::Sanitize(const wxString& arg) const {
@@ -92,18 +174,36 @@ mvceditor::ResourceFinderClass* mvceditor::ProjectClass::GetResourceFinder() {
 	return &ResourceFinder;
 }
 
-mvceditor::SymfonyProjectClass::SymfonyProjectClass(const mvceditor::ProjectOptionsClass& options)
-	: ProjectClass(options) {
-	
+wxString mvceditor::ProjectClass::AskDatabaseInfo(const wxString& identifier) const {
+	return Ask(wxT("databaseInfo"), identifier);
 }
 
-bool mvceditor::SymfonyProjectClass::Create(const wxString& name, wxString& errors) {
-	wxString cmd = wxT("symfony generate:project ") + Sanitize(name);
-	wxSetWorkingDirectory(Options.RootPath);
-	wxArrayString output, execErrors;
-	int returnCode = wxExecute(cmd, output, execErrors);
-	for (size_t i = 0; i < execErrors.Count(); ++i) {
-		errors += wxT("\n") + execErrors[i]; 
+wxString mvceditor::ProjectClass::Ask(const wxString& action, const wxString& identifier) const {
+	wxStandardPaths paths;
+	wxFileName pathExecutableFileName(paths.GetExecutablePath());
+	wxString scriptFileName = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
+		wxT("..") + wxFileName::GetPathSeparator() +
+		wxT("src") + wxFileName::GetPathSeparator() +
+		wxT("php_frameworks") + wxFileName::GetPathSeparator() +
+		wxT("MvcEditorFrameworkApp.php");
+	wxString args =
+		wxT(" --action=") + Sanitize(action) + 
+		wxT(" --dir=") + Sanitize(GetRootPath()) +
+		wxT(" --identifier=" + Sanitize(identifier));
+	wxString cmd = GetPhpExecutable() + wxT(" ") + Sanitize(scriptFileName) + args;
+	wxArrayString output;
+	wxExecute(cmd, output, wxEXEC_SYNC);
+	wxString cat = wxT("");
+	bool doCat = false;
+	for (size_t i = 0; i < output.Count(); i++) {
+		if (doCat) {
+			cat += output[i];
+			cat += wxT("\n");
+		}
+		if (output[i] == wxT("-----START-MVC-EDITOR-----")) {
+			doCat = true;
+		}
+		printf("%s\n", (const char*)output[i].ToAscii());
 	}
-	return 0 == returnCode;
+	return cat;
 }

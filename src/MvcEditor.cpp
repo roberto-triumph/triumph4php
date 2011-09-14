@@ -24,6 +24,7 @@
  */
 #include <wx/wx.h>
 #include <wx/cmdline.h>
+#include <unicode/uclean.h>
 
 #include <windows/AppFrameClass.h>
 #include <plugins/EnvironmentPluginClass.h>
@@ -46,7 +47,7 @@ public:
 	 * Initialize the application 
 	 */
 	virtual bool OnInit();
-
+	
 	AppClass();
 
 	~AppClass();
@@ -70,7 +71,7 @@ public:
 	/**
 	 * Opens the given directory as a project.
 	 */
-	void OnProjectOpen(const wxString& directoryPath);
+	void ProjectOpen(const wxString& directoryPath);
 
 private:
 
@@ -176,7 +177,7 @@ bool mvceditor::AppClass::OnInit() {
 	Preferences->Load(AppFrame);
 
 	// open a new project
-	OnProjectOpen(wxT(""));
+	ProjectOpen(wxT(""));
 
 	AppFrame->AuiManagerUpdate();
 	if (CommandLine()) {
@@ -194,12 +195,19 @@ mvceditor::AppClass::~AppClass() {
 		delete Project;
 		Project = NULL;
 	}
-	delete Preferences;
+	if (Preferences) {
+		delete Preferences;
+	}
+	
+	// calling cleanup here so that we can run this binary through a memory leak detector 
+	// ICU will cache many things and that will cause the detector to output "possible leaks"
+	// TODO: only use this during debug mode
+	u_cleanup();
 }
 
 
 bool mvceditor::AppClass::CommandLine() {
-	bool ret = false;
+	bool ret = true;
 	wxCmdLineEntryDesc description[3];
 	description[0].description = wxT("File name to open on startup");
 	description[0].flags =  wxCMD_LINE_PARAM_OPTIONAL;
@@ -231,12 +239,16 @@ bool mvceditor::AppClass::CommandLine() {
 			AppFrame->FileOpen(filenames);
 		}
 		if (parser.Found(wxT("project"), &projectDirectory)) {
-			OnProjectOpen(projectDirectory);
+			ProjectOpen(projectDirectory);
 		}
-		ret = true;
+	}
+	else if (-1 == result) {
+		ret = false;
 	}
 	return ret;
 }
+
+
 
 void mvceditor::AppClass::CloseProject() {
 	if (AppFrame) {
@@ -302,12 +314,11 @@ void mvceditor::AppClass::DeletePlugins() {
 	Plugins.clear();
 }
 
-void mvceditor::AppClass::OnProjectOpen(const wxString& directoryPath) {
+void mvceditor::AppClass::ProjectOpen(const wxString& directoryPath) {
 	ProjectOptionsClass options;
 	options.RootPath = directoryPath;
-	options.Framework = GENERIC;
 	CloseProject();
-	Project = ProjectClass::Factory(options);
+	Project = new ProjectClass(options);
 	Project->GetResourceFinder()->BuildResourceCacheForNativeFunctions();
 	AppFrame->OnProjectOpened(Project);
 	for (size_t i = 0; i < Plugins.size(); ++i) {
@@ -326,13 +337,13 @@ void mvceditor::AppClass::OnSavePreferences(wxCommandEvent& event) {
 
 void mvceditor::AppClass::OnFileSaved(wxCommandEvent& event) {
 	for (size_t i = 0; i < Plugins.size(); i++) {
-		Plugins[i]->ProcessEvent(event);
+		wxPostEvent(Plugins[i], event);
 	}
 }
 
 void mvceditor::AppClass::OnProjectOpen(wxCommandEvent& event) {
 	wxString directoryPath = event.GetString();
-	OnProjectOpen(directoryPath);
+	ProjectOpen(directoryPath);
 }
 
 BEGIN_EVENT_TABLE(mvceditor::AppClass, wxApp)
