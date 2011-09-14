@@ -158,13 +158,6 @@ bool mvceditor::AppClass::OnInit() {
 	// plugins will need to be create first because 
 	CreatePlugins();
 
-	// create the project data structure
-	ProjectOptionsClass options;
-	options.RootPath = wxT("");
-	options.Framework = GENERIC;
-	Project = ProjectClass::Factory(options);
-	Project->GetResourceFinder()->BuildResourceCacheForNativeFunctions();
-
 	// due to the way keyboard shortcuts are serialized, we need to load the
 	// frame and initialize the plugin windows so that all menus are created
 	// and only then can we load the keyboard shortcuts from the INI file
@@ -181,6 +174,10 @@ bool mvceditor::AppClass::OnInit() {
 	PreferencesClass::InitConfig();
 	Environment.LoadFromConfig();
 	Preferences->Load(AppFrame);
+
+	// open a new project
+	OnProjectOpen(wxT(""));
+
 	AppFrame->AuiManagerUpdate();
 	if (CommandLine()) {
 		SetTopWindow(AppFrame);
