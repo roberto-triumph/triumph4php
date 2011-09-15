@@ -54,8 +54,6 @@ public:
 	 * For all of these pointer arguments, this class will NOT own them.
 	 */
 	RunConsolePanelClass(wxWindow* parent, EnvironmentClass* environment, StatusBarWithGaugeClass* gauge, int id = wxID_ANY);
-	
-	~RunConsolePanelClass();
 
 	/**
 	 * Set to run the given PHP file
@@ -73,6 +71,12 @@ public:
 	 * set the focus on the text input for the command.
 	 */
 	void SetFocusOnCommandText();
+
+	/**
+	 * when the page is closed perform cleanup. This means
+	 * clean up the child process and any open gauges
+	 */
+	void OnPageClose(wxAuiNotebookEvent& evt);
 
 private:
 		

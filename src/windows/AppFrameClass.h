@@ -200,6 +200,11 @@ private:
 	 * Draw the current cursor line and pos
 	 */
 	void OnCodeControlUpdate(wxStyledTextEvent& event);
+
+	/**
+	 * When the tools notebook has no more pages; hide it
+	 */
+	void OnToolsNotebookPageClosed(wxAuiNotebookEvent& event);
 	
 	/**
 	 * GUI framework object, used to programatically position the different windows

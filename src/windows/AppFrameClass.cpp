@@ -46,6 +46,7 @@ int ID_LOWERCASE = wxNewId();
 int ID_UPPERCASE = wxNewId();
 int ID_MENU_MORE = wxNewId();
 int ID_TOOLBAR = wxNewId();
+int ID_TOOLS_WINDOW = wxNewId();
 
 mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass*>& plugins,
 		wxEvtHandler& appHandler, mvceditor::EnvironmentClass& environment,
@@ -72,7 +73,7 @@ mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass
 	projectOpenMenuItem = ProjectMenu->Remove(projectOpenMenuItem);
 	projectOpenMenuItem->SetBitmap(wxArtProvider::GetBitmap(wxART_FOLDER_OPEN, wxART_MENU));
 	ProjectMenu->Insert(0, projectOpenMenuItem);
-	ToolsNotebook = new wxAuiNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 
+	ToolsNotebook = new wxAuiNotebook(this, ID_TOOLS_WINDOW, wxDefaultPosition, wxDefaultSize, 
 		wxAUI_NB_TOP | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_CLOSE_ON_ACTIVE_TAB | wxAUI_NB_TAB_MOVE);
 
 	CreateToolBarButtons();
@@ -548,6 +549,17 @@ void mvceditor::AppFrameClass::OnCodeControlUpdate(wxStyledTextEvent& event) {
 	}
 }
 
+void mvceditor::AppFrameClass::OnToolsNotebookPageClosed(wxAuiNotebookEvent& event) {
+	size_t count = ToolsNotebook->GetPageCount();
+
+	// this event is received AFTER the page is removed
+	if (count <= 0) {
+		AuiManager.GetPane(ToolsNotebook).Hide();
+		AuiManager.Update();
+	}
+	event.Skip();
+}
+
 BEGIN_EVENT_TABLE(mvceditor::AppFrameClass,  AppFrameGeneratedClass)
 	EVT_STC_SAVEPOINTREACHED(wxID_ANY, mvceditor::AppFrameClass::DisableSave)
 	EVT_STC_SAVEPOINTLEFT(wxID_ANY, mvceditor::AppFrameClass::EnableSave)
@@ -566,4 +578,5 @@ BEGIN_EVENT_TABLE(mvceditor::AppFrameClass,  AppFrameGeneratedClass)
 	EVT_MENU(ID_LOWERCASE, mvceditor::AppFrameClass::OnLowecase)
 	EVT_MENU(ID_UPPERCASE, mvceditor::AppFrameClass::OnUppercase)
 	EVT_MENU(ID_TOOLBAR_SAVE, mvceditor::AppFrameClass::SaveCurrentFile)
+	EVT_AUINOTEBOOK_PAGE_CLOSED(ID_TOOLS_WINDOW, mvceditor::AppFrameClass::OnToolsNotebookPageClosed)
 END_EVENT_TABLE()

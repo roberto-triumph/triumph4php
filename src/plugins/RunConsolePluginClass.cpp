@@ -63,14 +63,29 @@ END_EVENT_TABLE()
 	wxGenericValidator commandValidator(&CommandString);
 	Command->SetValidator(commandValidator);
 	IdProcessGauge = wxNewId();
+
+	// need to attach to the notebook page close event here
+	// so that we can cleanup the child process AND also remove any open gauge
+	// can't do this in destructor because we need to guarantee
+	// that the gauge pointer is valid
+	parent->Connect(wxID_ANY, wxID_ANY, wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE, 
+		wxAuiNotebookEventHandler(mvceditor::RunConsolePanelClass::OnPageClose), NULL, this);
 }
 
- mvceditor::RunConsolePanelClass::~RunConsolePanelClass() {
+void mvceditor::RunConsolePanelClass::OnPageClose(wxAuiNotebookEvent& evt) {
+	int selected = evt.GetSelection();
+	wxAuiNotebook* ctrl = (wxAuiNotebook*)evt.GetEventObject();
+	if (ctrl->GetPage(selected) == this) {
 
-	// make sure we kill any running processes
-	if (Process) {
-		Process->Detach();
+		// make sure we kill any running processes
+		if (Process) {
+			Process->Detach();
+		}
+		Gauge->StopGauge(IdProcessGauge);
+		GetParent()->Disconnect(wxID_ANY, wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE, 
+			wxAuiNotebookEventHandler(mvceditor::RunConsolePanelClass::OnPageClose), NULL, this);
 	}
+	evt.Skip();
 }
 
 void  mvceditor::RunConsolePanelClass::SetToRunFile(const wxString& fullPath) {
@@ -287,4 +302,3 @@ void mvceditor::RunConsolePluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 	toolBar->AddTool(ID_TOOLBAR_RUN, _("Run"), wxArtProvider::GetBitmap(
 		wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), _("Run"));
 }
-
