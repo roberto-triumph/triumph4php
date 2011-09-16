@@ -44,11 +44,11 @@ class MvcEditorFrameworkSample extends MvcEditorFrameworkBaseClass {
 	public function databaseInfo($dir) {
 		$list = array();
 		require_once($dir . DIRECTORY_SEPARATOR . 'library' . DIRECTORY_SEPARATOR . 'config.db.php');
-		$info = new MvcEditorDatabaseInfo(MvcEditorDatabaseInfo::DRIVER_MYSQL, 'default', 'verifi master', MY_DB_MASTER_HOST, 3306, MY_DB_NAME, '', MY_DB_NAME, MY_DB_PASSWORD);
+		$info = new MvcEditorDatabaseInfo(MvcEditorDatabaseInfo::DRIVER_MYSQL, 'default', 'verifi master', MY_DB_MASTER_HOST, 3306, MY_DB_NAME, '', MY_DB_USER, MY_DB_PASSWORD);
 		$list[] = $info;
-		$info = new MvcEditorDatabaseInfo(MvcEditorDatabaseInfo::DRIVER_MYSQL, 'default', 'gateway master', GATEWAY_DB_MASTER_HOST, 3306, GATEWAY_DB_NAME, '', GATEWAY_DB_NAME, GATEWAY_DB_PASSWORD);
+		$info = new MvcEditorDatabaseInfo(MvcEditorDatabaseInfo::DRIVER_MYSQL, 'default', 'gateway master', GATEWAY_DB_MASTER_HOST, 3306, GATEWAY_DB_NAME, '', GATEWAY_DB_USER, GATEWAY_DB_PASSWORD);
 		$list[] = $info;
-		$info = new MvcEditorDatabaseInfo(MvcEditorDatabaseInfo::DRIVER_MYSQL, 'default', 'forex master', FOREX_DB_MASTER_HOST, 3306, FOREX_DB_NAME, '', FOREX_DB_NAME, FOREX_DB_PASSWORD);
+		$info = new MvcEditorDatabaseInfo(MvcEditorDatabaseInfo::DRIVER_MYSQL, 'default', 'forex master', FOREX_DB_MASTER_HOST, 3306, FOREX_DB_NAME, '', FOREX_DB_USER, FOREX_DB_PASSWORD);
 		$list[] = $info;
 		return $list;
 	}

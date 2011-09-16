@@ -67,6 +67,7 @@ bool mvceditor::SqlQueryClass::Query(const wxString& query, wxString& error) {
 	wxString connString = wxString::Format(wxT("db=%s host=%s port=%d user=%s password='%s'"), 
 		Info.DatabaseName.c_str(), Info.Host.c_str(), Info.Port, 
 		Info.User.c_str(), Info.Password.c_str());
+		printf("connstr=%s\n", (const char*)connString.ToAscii());
 	try {
 		Session.open(*soci::factory_mysql(), (const char*)connString.ToAscii());
 		Statement = new soci::statement(Session);
@@ -82,7 +83,6 @@ bool mvceditor::SqlQueryClass::Query(const wxString& query, wxString& error) {
 		
 	} catch (std::exception const& e) {
 		success = false;
-		printf("query error=%s cs=%s\n", e.what(), (const char *)connString.ToAscii());
 		error = wxString(e.what(), wxConvUTF8);
 	}
 	return success;
@@ -160,27 +160,44 @@ bool mvceditor::SqlQueryClass::NextRow(std::vector<wxString>& columnValues, std:
 	return data;
 }
 
-mvceditor::SqlConnectionDialogClass::SqlConnectionDialogClass(wxWindow* parent, std::vector<mvceditor::DatabaseInfoClass> infos, size_t& chosenIndex)
+mvceditor::SqlConnectionDialogClass::SqlConnectionDialogClass(wxWindow* parent, std::vector<mvceditor::DatabaseInfoClass>& infos, 
+		size_t& chosenIndex, bool allowEdit)
 	: SqlConnectionDialogGeneratedClass(parent, wxID_ANY) 
 	, Infos(infos)
 	, TestQuery()
 	, ChosenIndex(chosenIndex) {
 	mvceditor::DatabaseInfoClass info;
 	for (size_t i = 0; i < infos.size(); i++) {
-		List->Append(infos[i].DatabaseName);
+		List->Append(infos[i].Name);
 	}
 	if (chosenIndex < infos.size()) {
 		info = infos[chosenIndex];
-		
 		Host->SetValue(infos[chosenIndex].Host);
 		User->SetValue(infos[chosenIndex].User);
 		Password->SetValue(infos[chosenIndex].Password);
-		
-		Database->Clear();
-		Database->Append(infos[chosenIndex].DatabaseName);
-		Database->Select(0);
+		Database->SetValue(infos[chosenIndex].DatabaseName);
 		Port->SetValue(infos[chosenIndex].Port);
 		List->Select(chosenIndex);
+	}
+	if (!allowEdit) {
+		Host->Enable(false);
+		User->Enable(false);
+		Password->Enable(false);
+		Database->Enable(false);
+		Port->Enable(false);
+	}
+	else if (!infos.empty()) {
+		wxGenericValidator hostValidator(&Infos[0].Host);
+		Host->SetValidator(hostValidator);
+		wxGenericValidator userValidator(&Infos[0].User);
+		User->SetValidator(userValidator);
+		wxGenericValidator passwordValidator(&Infos[0].Password);
+		Password->SetValidator(passwordValidator);
+		wxGenericValidator databaseValidator(&Infos[0].DatabaseName);
+		Database->SetValidator(databaseValidator);
+		wxGenericValidator portValidator(&Infos[0].Port);
+		Port->SetValidator(portValidator);
+		TransferDataToWindow();
 	}
 }
 	
@@ -196,6 +213,7 @@ void mvceditor::SqlConnectionDialogClass::OnCancelButton(wxCommandEvent& event) 
 	if (thread) { 
 		thread->Kill();
 	}
+	event.Skip();
 }
 
 void mvceditor::SqlConnectionDialogClass::OnTestButton(wxCommandEvent& event) {
@@ -221,10 +239,19 @@ void mvceditor::SqlConnectionDialogClass::OnTestButton(wxCommandEvent& event) {
 				break;
 			}
 		}
-		else {
-			wxMessageBox(_("TODO: allow entering of credentials"));
-		}
 	}
+}
+
+void mvceditor::SqlConnectionDialogClass::OnHelpButton(wxCommandEvent& event) {
+	wxString help = wxString::FromAscii(
+		"The SQL Connections dialog shows you the list of database connections that were detected.\n"
+		"This detection works only for supported frameworks (MVC Editor can support multiple frameworks).\n"
+		"If this list is empty it means that the editor the current project is not using one of the \n"
+		"supported frameworks. If you modify the file containing the database credentials you will need \n"
+		"to reopen the project"		
+	);
+	help = wxGetTranslation(help);
+	wxMessageBox(help, _("Help"));
 }
 
 void* mvceditor::SqlConnectionDialogClass::Entry() {
@@ -232,16 +259,18 @@ void* mvceditor::SqlConnectionDialogClass::Entry() {
 	wxString query(wxT("SELECT 1"));
 	bool success = TestQuery.Query(query, error);
 	wxCommandEvent evt(QUERY_COMPLETE_EVENT, wxID_ANY);
-	evt.SetInt(success);
+	evt.SetInt(success ? 1 : 0);
 	evt.SetString(error);
 	wxPostEvent(this, evt);
 	return 0;
 }
 
 void mvceditor::SqlConnectionDialogClass::ShowTestResults(wxCommandEvent& event) {
-	wxString msg = _("Connection successul");
-	if (!event.GetInt()) {
-		msg = _("Connection Failed:") + event.GetString();
+	wxString msg = _("Connection to %s@%s was successful");
+	msg = wxString::Format(msg, TestQuery.Info.User.c_str(), TestQuery.Info.Host.c_str());
+	if (event.GetInt() == 0) {
+		msg = _("Connection to %s@%s failed: %s");
+		msg = wxString::Format(msg, TestQuery.Info.User.c_str(), TestQuery.Info.Host.c_str(), event.GetString().c_str());
 	}
 	TestQuery.Close();
 	wxMessageBox(msg);
@@ -251,6 +280,13 @@ void mvceditor::SqlConnectionDialogClass::ShowTestResults(wxCommandEvent& event)
 
 void mvceditor::SqlConnectionDialogClass::OnListboxSelected(wxCommandEvent& event) {
 	ChosenIndex = event.GetInt();
+	if (ChosenIndex <Infos.size()) {
+		Host->SetValue(Infos[ChosenIndex].Host);
+		User->SetValue(Infos[ChosenIndex].User);
+		Password->SetValue(Infos[ChosenIndex].Password);
+		Database->SetValue(Infos[ChosenIndex].DatabaseName);
+		Port->SetValue(Infos[ChosenIndex].Port);
+	}
 }
 	
 
@@ -427,7 +463,8 @@ void mvceditor::SqlBrowserPanelClass::OnTimer(wxTimerEvent& event) {
 mvceditor::SqlBrowserPluginClass::SqlBrowserPluginClass() 
 	: PluginClass() 
 	, Infos()
-	, ChosenIndex(0) {
+	, ChosenIndex(0)
+	, WasEmptyDetectedInfo(false) {
 }
 
 mvceditor::SqlBrowserPluginClass::~SqlBrowserPluginClass() {
@@ -435,9 +472,17 @@ mvceditor::SqlBrowserPluginClass::~SqlBrowserPluginClass() {
 
 void mvceditor::SqlBrowserPluginClass::OnProjectOpened() {
 	GetProject()->Detect();
+	ChosenIndex = 0;
 	
 	// TODO: how and when to refresh ??
+	// a "redetect" button??
 	Infos = GetProject()->DatabaseInfo();
+	WasEmptyDetectedInfo = Infos.empty();
+	if (WasEmptyDetectedInfo) {
+		mvceditor::DatabaseInfoClass info;
+		info.Name = _("Custom info");
+		Infos.push_back(info);
+	}
 }
 
 void mvceditor::SqlBrowserPluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
@@ -470,9 +515,9 @@ void mvceditor::SqlBrowserPluginClass::OnRun(wxCommandEvent& event) {
 }
 
 void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event) {
-	mvceditor::SqlConnectionDialogClass dialog(GetMainWindow(), Infos, ChosenIndex);
+	mvceditor::SqlConnectionDialogClass dialog(GetMainWindow(), Infos, ChosenIndex, WasEmptyDetectedInfo);
 	if (dialog.ShowModal() == wxOK) {
-
+		wxMessageBox(Infos[0].Host);
 		// nothing for now .. won't update the SqlBrowserPanel connection label
 		// since that label shows with the data and it may confuse the user
 		// TODO need to update the existing opened panels

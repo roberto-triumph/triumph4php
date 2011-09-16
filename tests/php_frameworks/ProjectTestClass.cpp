@@ -46,9 +46,9 @@ SUITE(ProjectTestClass) {
 	
 TEST_FIXTURE(ProjectTestFixtureClass, ShouldBeDetected) {
 	CreateFixtureFile(wxT("test.php"), wxT("<?php"));
-	Project->Detect();
+	Project->Detect(true);
 	std::vector<mvceditor::DatabaseInfoClass> frameworks = Project->DatabaseInfo();
-	CHECK_EQUAL((size_t)1, frameworks.size());
+	CHECK_EQUAL((size_t)2, frameworks.size());
 	CHECK_EQUAL(wxT("127.0.0.1"), frameworks[0].Host);
 }
 

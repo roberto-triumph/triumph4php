@@ -100,6 +100,7 @@ BEGIN_EVENT_TABLE( SqlConnectionDialogGeneratedClass, wxDialog )
 	EVT_LISTBOX( ID_LIST, SqlConnectionDialogGeneratedClass::_wxFB_OnListboxSelected )
 	EVT_BUTTON( ID_TEST, SqlConnectionDialogGeneratedClass::_wxFB_OnTestButton )
 	EVT_BUTTON( wxID_CANCEL, SqlConnectionDialogGeneratedClass::_wxFB_OnCancelButton )
+	EVT_BUTTON( wxID_HELP, SqlConnectionDialogGeneratedClass::_wxFB_OnHelpButton )
 	EVT_BUTTON( wxID_OK, SqlConnectionDialogGeneratedClass::_wxFB_OnOkButton )
 END_EVENT_TABLE()
 
@@ -145,11 +146,9 @@ SqlConnectionDialogGeneratedClass::SqlConnectionDialogGeneratedClass( wxWindow* 
 	DatabaseLabel->Wrap( -1 );
 	fgSizer8->Add( DatabaseLabel, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 	
-	Database = new wxComboBox( this, ID_DATABASE, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
-	Database->Append( wxT("db1") );
-	Database->Append( wxT("db2") );
-	Database->Append( wxT("mysql") );
-	fgSizer8->Add( Database, 1, wxALL|wxEXPAND, 5 );
+	Database = new wxTextCtrl( this, ID_DATABASE, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	Database->SetMaxLength( 100 ); 
+	fgSizer8->Add( Database, 0, wxALL|wxEXPAND, 5 );
 	
 	UserLabel = new wxStaticText( this, ID_USERLABEL, wxT("User"), wxDefaultPosition, wxDefaultSize, 0 );
 	UserLabel->Wrap( -1 );
@@ -180,6 +179,8 @@ SqlConnectionDialogGeneratedClass::SqlConnectionDialogGeneratedClass( wxWindow* 
 	m_sdbSizer2->AddButton( m_sdbSizer2OK );
 	m_sdbSizer2Cancel = new wxButton( this, wxID_CANCEL );
 	m_sdbSizer2->AddButton( m_sdbSizer2Cancel );
+	m_sdbSizer2Help = new wxButton( this, wxID_HELP );
+	m_sdbSizer2->AddButton( m_sdbSizer2Help );
 	m_sdbSizer2->Realize();
 	bSizer12->Add( m_sdbSizer2, 1, wxEXPAND, 5 );
 	

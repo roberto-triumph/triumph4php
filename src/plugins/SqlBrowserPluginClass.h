@@ -130,8 +130,10 @@ public:
 	/**
 	 * @param wxWindow* the parent window
 	 * @param vector<DatabaseInfoClass> will get populated with the values that the user entered.
+	 * @param size_t& chosenIndex the info item that the user selected 
+	 * @param bool allowEdit if TRUE user will be allowed to modify the info properties
 	 */
-	SqlConnectionDialogClass(wxWindow* parent, std::vector<mvceditor::DatabaseInfoClass>info, size_t& chosenIndex);
+	SqlConnectionDialogClass(wxWindow* parent, std::vector<mvceditor::DatabaseInfoClass>&info, size_t& chosenIndex, bool allowEdit);
 	
 private:
 
@@ -143,6 +145,8 @@ private:
 	
 	void OnListboxSelected(wxCommandEvent& event);
 
+	void OnHelpButton(wxCommandEvent& event);
+	
 	/**
 	 * Connection test will happen in a separate thread so dialog stays responsive
 	 */
@@ -150,7 +154,7 @@ private:
 	
 	void ShowTestResults(wxCommandEvent& event);
 	
-	std::vector<DatabaseInfoClass> Infos;
+	std::vector<DatabaseInfoClass>& Infos;
 	
 	SqlQueryClass TestQuery;
 	
@@ -282,6 +286,12 @@ private:
 	std::vector<DatabaseInfoClass> Infos;
 	
 	size_t ChosenIndex;
+	
+	/**
+	 * @var bool TRUE if there were zero database info objects for the current project
+	 * in this case we will allow the user to edit the connections info
+	 */
+	bool WasEmptyDetectedInfo;
 	
 	DECLARE_EVENT_TABLE()
 };

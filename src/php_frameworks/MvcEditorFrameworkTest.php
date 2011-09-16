@@ -43,7 +43,9 @@ class MvcEditorFrameworkTest extends MvcEditorFrameworkBaseClass {
 
 	public function databaseInfo($dir) {
 		$list = array();
-		$info = new MvcEditorDatabaseInfo(MvcEditorDatabaseInfo::DRIVER_MYSQL, 'dev', "local dev", '127.0.0.1', 3306, 'db_name', 'filename', 'root', '123');
+		$info = new MvcEditorDatabaseInfo(MvcEditorDatabaseInfo::DRIVER_MYSQL, 'dev', "local dev", '127.0.0.1', 3306, 'my_dev', '', 'my_user_dev', '123_dev');
+		$list[] = $info;
+		$info = new MvcEditorDatabaseInfo(MvcEditorDatabaseInfo::DRIVER_MYSQL, 'test', "local testing", 'localhost', 3306, 'my_test', '', 'my_user_test', '123_test');
 		$list[] = $info;
 		return $list;
 	}

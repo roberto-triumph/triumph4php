@@ -21,7 +21,6 @@
 #include <wx/listbox.h>
 #include <wx/textctrl.h>
 #include <wx/spinctrl.h>
-#include <wx/combobox.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 
@@ -79,6 +78,7 @@ class SqlConnectionDialogGeneratedClass : public wxDialog
 		void _wxFB_OnListboxSelected( wxCommandEvent& event ){ OnListboxSelected( event ); }
 		void _wxFB_OnTestButton( wxCommandEvent& event ){ OnTestButton( event ); }
 		void _wxFB_OnCancelButton( wxCommandEvent& event ){ OnCancelButton( event ); }
+		void _wxFB_OnHelpButton( wxCommandEvent& event ){ OnHelpButton( event ); }
 		void _wxFB_OnOkButton( wxCommandEvent& event ){ OnOkButton( event ); }
 		
 	
@@ -106,7 +106,7 @@ class SqlConnectionDialogGeneratedClass : public wxDialog
 		wxStaticText* PortLabel;
 		wxSpinCtrl* Port;
 		wxStaticText* DatabaseLabel;
-		wxComboBox* Database;
+		wxTextCtrl* Database;
 		wxStaticText* UserLabel;
 		wxTextCtrl* User;
 		wxStaticText* PasswordLabel;
@@ -115,17 +115,19 @@ class SqlConnectionDialogGeneratedClass : public wxDialog
 		wxStdDialogButtonSizer* m_sdbSizer2;
 		wxButton* m_sdbSizer2OK;
 		wxButton* m_sdbSizer2Cancel;
+		wxButton* m_sdbSizer2Help;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnListboxSelected( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnTestButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		SqlConnectionDialogGeneratedClass( wxWindow* parent, wxWindowID id = ID_SQLCONNECTIONDIALOGCLASS, const wxString& title = wxT("SQL Connections"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 599,287 ), long style = wxDEFAULT_DIALOG_STYLE );
+		SqlConnectionDialogGeneratedClass( wxWindow* parent, wxWindowID id = ID_SQLCONNECTIONDIALOGCLASS, const wxString& title = wxT("SQL Connections"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 599,274 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~SqlConnectionDialogGeneratedClass();
 	
 };

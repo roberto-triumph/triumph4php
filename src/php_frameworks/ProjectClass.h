@@ -104,6 +104,11 @@ public:
 	wxString FileName;
 	
 	/**
+	 * A human friendly name for this info
+	 */
+	wxString Name;
+	
+	/**
 	 * the system that is used.
 	 */
 	Drivers Driver;
@@ -143,8 +148,10 @@ public:
 	/**
 	 * run the detection code against the root path to figure out which frameworks
 	 * the project uses.
+	 * @param useTest quick hack for unit testing; use TRUE 
+	 * if false the test framework will be omitted
 	 */
-	void Detect();
+	void Detect(bool useTest = false);
 	
 	/**
 	 * Returns the root path of this project

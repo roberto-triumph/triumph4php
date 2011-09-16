@@ -44,6 +44,7 @@ mvceditor::DatabaseInfoClass::DatabaseInfoClass()
 	, Password()
 	, DatabaseName()
 	, FileName()
+	, Name()
 	, Driver(MYSQL)
 	, Port() {
 		
@@ -55,6 +56,7 @@ mvceditor::DatabaseInfoClass::DatabaseInfoClass(const mvceditor::DatabaseInfoCla
 	, Password()
 	, DatabaseName()
 	, FileName()
+	, Name()
 	, Driver(MYSQL)
 	, Port() {
 	Copy(other);
@@ -66,6 +68,7 @@ void mvceditor::DatabaseInfoClass::Copy(const mvceditor::DatabaseInfoClass& src)
 	Password = src.Password;
 	DatabaseName = src.DatabaseName;
 	FileName = src.FileName;
+	Name = src.Name;
 	Driver = src.Driver;
 	Port = src.Port;
 }
@@ -93,7 +96,7 @@ wxString  mvceditor::ProjectClass::GetRootPath() const {
 	return Options.RootPath; 
 }
 
-void mvceditor::ProjectClass::Detect() {
+void mvceditor::ProjectClass::Detect(bool useTest) {
 	FrameworkIdentifiers.clear();
 	
 	wxString action = wxT("isUsedBy");
@@ -107,7 +110,14 @@ void mvceditor::ProjectClass::Detect() {
 		wxString key = wxString::Format(wxT("/framework_%d"), i);
 		wxString val;
 		val = result.Read(key);
-		FrameworkIdentifiers.push_back(val);
+		
+		// omit the test databases; only used for unit testing the ProjectClass
+		if (!useTest  && val.CmpNoCase(wxT("Test")) != 0) {
+			FrameworkIdentifiers.push_back(val);
+		}
+		else if (useTest) {
+			FrameworkIdentifiers.push_back(val);
+		}
 	}
 }
 
@@ -121,20 +131,20 @@ std::vector<mvceditor::DatabaseInfoClass> mvceditor::ProjectClass::DatabaseInfo(
 		wxStringInputStream stream(resultString);
 		wxFileConfig result(stream);
 		wxString groupName = wxT("");
-		long index = 0;
-		
+		long index = 0;		
 		bool next = result.GetFirstGroup(groupName, index);
 		while (next) {
 			mvceditor::DatabaseInfoClass info;
-			result.SetPath(wxT("/") + groupName);
-			info.Host = result.Read(wxT("Host"));
-			info.User = result.Read(wxT("User"));
-			printf("reas user %s on group %s\n", (const char*)info.User.ToAscii(), (const char*)groupName.ToAscii());
-			info.Password = result.Read(wxT("Password"));
-			info.DatabaseName = result.Read(wxT("DatabaseName"));
-			info.FileName = result.Read(wxT("FileName"));
-			wxString driverString;
-			result.Read(wxT("Driver"), driverString);
+			groupName = wxT("/") + groupName + wxT("/");
+			
+			// dont use wxFileConfig.SetPath method. it seems to mess with the group iteration
+			info.Host = result.Read(groupName + wxT("Host"));
+			info.User = result.Read(groupName + wxT("/User"));
+			info.Password = result.Read(groupName + wxT("Password"));
+			info.DatabaseName = result.Read(groupName + wxT("DatabaseName"));
+			info.FileName = result.Read(groupName + wxT("FileName"));
+			info.Name = result.Read(groupName + wxT("Name"));
+			wxString driverString = result.Read(groupName + wxT("Driver"));
 			if (driverString.CmpNoCase(wxT("MYSQL"))) {
 				info.Driver = mvceditor::DatabaseInfoClass::MYSQL;
 			}
@@ -148,7 +158,7 @@ std::vector<mvceditor::DatabaseInfoClass> mvceditor::ProjectClass::DatabaseInfo(
 				info.Driver = mvceditor::DatabaseInfoClass::MYSQL;
 				// TODO error handling
 			}
-			result.Read(wxT("Port"), info.Port);
+			result.Read(groupName + wxT("Port"), &info.Port);
 			Databases.push_back(info);
 			next = result.GetNextGroup(groupName, index);
 		}
@@ -203,7 +213,6 @@ wxString mvceditor::ProjectClass::Ask(const wxString& action, const wxString& id
 		if (output[i] == wxT("-----START-MVC-EDITOR-----")) {
 			doCat = true;
 		}
-		printf("%s\n", (const char*)output[i].ToAscii());
 	}
 	return cat;
 }

@@ -948,13 +948,12 @@
                                         <event name="OnUpdateUI"></event>
                                     </object>
                                 </object>
-                                <object class="sizeritem" expanded="0">
+                                <object class="sizeritem" expanded="1">
                                     <property name="border">5</property>
                                     <property name="flag">wxALL|wxEXPAND</property>
-                                    <property name="proportion">1</property>
-                                    <object class="wxComboBox" expanded="0">
+                                    <property name="proportion">0</property>
+                                    <object class="wxTextCtrl" expanded="1">
                                         <property name="bg"></property>
-                                        <property name="choices">&quot;db1&quot; &quot;db2&quot; &quot;mysql&quot;</property>
                                         <property name="context_help"></property>
                                         <property name="context_menu">1</property>
                                         <property name="enabled">1</property>
@@ -963,6 +962,7 @@
                                         <property name="hidden">0</property>
                                         <property name="id">ID_DATABASE</property>
                                         <property name="maximum_size"></property>
+                                        <property name="maxlength">100</property>
                                         <property name="minimum_size"></property>
                                         <property name="name">Database</property>
                                         <property name="permission">protected</property>
@@ -980,7 +980,6 @@
                                         <property name="window_name"></property>
                                         <property name="window_style"></property>
                                         <event name="OnChar"></event>
-                                        <event name="OnCombobox"></event>
                                         <event name="OnEnterWindow"></event>
                                         <event name="OnEraseBackground"></event>
                                         <event name="OnKeyDown"></event>
@@ -1004,6 +1003,8 @@
                                         <event name="OnSize"></event>
                                         <event name="OnText"></event>
                                         <event name="OnTextEnter"></event>
+                                        <event name="OnTextMaxLen"></event>
+                                        <event name="OnTextURL"></event>
                                         <event name="OnUpdateUI"></event>
                                     </object>
                                 </object>
@@ -1317,7 +1318,7 @@
                                 <property name="Apply">0</property>
                                 <property name="Cancel">1</property>
                                 <property name="ContextHelp">0</property>
-                                <property name="Help">0</property>
+                                <property name="Help">1</property>
                                 <property name="No">0</property>
                                 <property name="OK">1</property>
                                 <property name="Save">0</property>
@@ -1328,7 +1329,7 @@
                                 <event name="OnApplyButtonClick"></event>
                                 <event name="OnCancelButtonClick">OnCancelButton</event>
                                 <event name="OnContextHelpButtonClick"></event>
-                                <event name="OnHelpButtonClick"></event>
+                                <event name="OnHelpButtonClick">OnHelpButton</event>
                                 <event name="OnNoButtonClick"></event>
                                 <event name="OnOKButtonClick">OnOkButton</event>
                                 <event name="OnSaveButtonClick"></event>
