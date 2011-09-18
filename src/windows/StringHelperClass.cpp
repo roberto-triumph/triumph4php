@@ -26,7 +26,7 @@
 #include <unicode/ustring.h>
 #include <unicode/ucnv.h>
 
-wxString mvceditor::StringHelperClass::IcuToWx(UnicodeString icu) {
+wxString mvceditor::StringHelperClass::IcuToWx(const UnicodeString& icu) {
 	wxString wx;
 	UErrorCode status = U_ZERO_ERROR;
 	int32_t rawLength;
@@ -76,6 +76,24 @@ UnicodeString mvceditor::StringHelperClass::charToIcu(const char* source) {
 		uni.releaseBuffer(0);
 	}
 	return uni;
+}
+
+std::string mvceditor::StringHelperClass::IcuToChar(const UnicodeString& source) {
+	std::string ret;
+	UErrorCode status = U_ZERO_ERROR;
+	int32_t rawLength;
+	int32_t length = source.length();
+	const UChar* src = source.getBuffer();
+	u_strToUTF8(NULL, 0, &rawLength, src, length, &status);
+	status = U_ZERO_ERROR;
+	char* dest = new char[rawLength + 1];
+	int32_t written;
+	u_strToUTF8(dest, rawLength + 1, &written, src, length, &status);
+	if(U_SUCCESS(status)) {
+		ret = std::string(dest, written);
+	}
+	delete[] dest;
+	return ret;
 }
 
 int mvceditor::StringHelperClass::Utf8PosToChar(const char* bytes, int bytesLength, int bytePos) {

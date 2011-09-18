@@ -28,16 +28,25 @@
 #include <wx/string.h>
 #include <unicode/ustdio.h>
 #include <unicode/unistr.h>
+#include <string>
 
 namespace mvceditor {
 
+/** 
+ * This is a collection of methods that are necessary due to the many C++ string
+ * objects used by various libraries.  Be careful when using any of these; using
+ * any methods of this class should be done as a last resort because these methods
+ * copy data. In a nutshell, you the bulk of the time UnicodeString should
+ * be used, and only when something is going to be displayed to the user then 
+ * at that point convert it to a wx String.
+ */
 class StringHelperClass {
 public:
 
 	/**
 	 * conversion from wxString to ICU string
 	 */
-	static wxString IcuToWx(UnicodeString icu);
+	static wxString IcuToWx(const UnicodeString& icu);
 
 	/**
 	 * conversion from ICU String to wxString
@@ -49,6 +58,11 @@ public:
 	 * C-string is A PLAIN ASCII STRING!
 	 */
 	static UnicodeString charToIcu(const char* s);
+	
+	/**
+	 * conversion from ICU to C++ string
+	 */
+	static std::string IcuToChar(const UnicodeString& source);
 	
 	/**
 	 * Calculate the number of characters in a UTF-8 string.  Since UTF-8 is a multi-byte variable

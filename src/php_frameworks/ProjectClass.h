@@ -26,6 +26,7 @@
 #define PROJECTCLASS_H_
 
 #include <search/ResourceFinderClass.h>
+#include <environment/DatabaseInfoClass.h>
 #include <wx/string.h>
 #include <vector>
 
@@ -57,78 +58,6 @@ public:
 	 * the file system. 
 	 */
 	wxString RootPath;
-};
-
-/**
- * This is the database connection information used by the framework.
- * The information will actually be located via a PHP script
- * (MvcEditorFrameworkApp.php) and not the C++ code. this way we
- * can extend / modifify the code for different frameworks.
- */
-class DatabaseInfoClass {
-
-public:
-
-	/**
-	 * The RDBMS systems that both the frameworks and MVC Editor supports.
-	 */
-	enum Drivers {
-		MYSQL,
-		POSTGRESQL,
-		SQLITE
-	};
-	
-	/**
-	 * The database host to connect to
-	 */
-	wxString Host;
-	
-	/**
-	 * The database user to connect as
-	 */
-	wxString User;
-	
-	/**
-	 * The database password
-	 */
-	wxString Password;
-	
-	/**
-	 * The database (schema name) to connect to
-	 */
-	wxString DatabaseName;
-	
-	/**
-	 * The full path to the database (in case of SQLite)
-	 */
-	wxString FileName;
-	
-	/**
-	 * A human friendly name for this info
-	 */
-	wxString Name;
-	
-	/**
-	 * the system that is used.
-	 */
-	Drivers Driver;
-	
-	/**
-	 * The port to connect to
-	 */
-	int Port;
-	
-	DatabaseInfoClass();
-	
-	/**
-	 * copy the attributes from src to this object.
-	 */
-	DatabaseInfoClass(const DatabaseInfoClass& other);
-	
-	/**
-	 * copy the attributes from src to this object.
-	 */
-	void Copy(const DatabaseInfoClass& src);
 };
 
 /**

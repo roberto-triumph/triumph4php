@@ -25,140 +25,14 @@
 #include <wx/valgen.h>
 #include <plugins/SqlBrowserPluginClass.h>
 #include <widgets/CodeControlClass.h>
- #include <soci-mysql.h>
+#include <soci-mysql.h>
+#include <windows/StringHelperClass.h>
+#include <widgets/UnicodeStringValidatorClass.h>
 
 const int ID_SQL_EDITOR_MENU = mvceditor::PluginClass::newMenuId();
 const int ID_SQL_RUN_MENU = mvceditor::PluginClass::newMenuId();
 const int ID_SQL_CONNECTION_MENU = mvceditor::PluginClass::newMenuId();
 const int ID_SQL_GAUGE = wxNewId();
-
-mvceditor::SqlQueryClass::SqlQueryClass()
-	: Info()
-	, Session()
-	, Statement(NULL)
-	, Row() {
-}
-
-mvceditor::SqlQueryClass::SqlQueryClass(const mvceditor::SqlQueryClass& other) 
-	: Info(other.Info)
-	, Session()
-	, Statement(NULL)
-	, Row()  {
-}
-
-void mvceditor::SqlQueryClass::Copy(const mvceditor::SqlQueryClass& src) {
-	Info.Copy(src.Info);
-}
-
-mvceditor::SqlQueryClass::~SqlQueryClass() {
-	Close();
-}
-
-void mvceditor::SqlQueryClass::Close() {
-	Session.close();
-	if (Statement) {
-		Statement->clean_up();
-		Statement = NULL;
-	}	
-}
-
-bool mvceditor::SqlQueryClass::Query(const wxString& query, wxString& error) {
-	bool success = false;
-	wxString connString = wxString::Format(wxT("db=%s host=%s port=%d user=%s password='%s'"), 
-		Info.DatabaseName.c_str(), Info.Host.c_str(), Info.Port, 
-		Info.User.c_str(), Info.Password.c_str());
-		printf("connstr=%s\n", (const char*)connString.ToAscii());
-	try {
-		Session.open(*soci::factory_mysql(), (const char*)connString.ToAscii());
-		Statement = new soci::statement(Session);
-		Statement->alloc();
-		Statement->prepare((const char*)query.ToAscii());
-		Statement->define_and_bind();
-		Statement->exchange_for_rowset(soci::into(Row));
-		Statement->execute(true);
-		
-		// execute will return false if statement does not return any rows
-		// but we want to return true for INSERTs and UPDATEs too
-		success = true;
-		
-	} catch (std::exception const& e) {
-		success = false;
-		error = wxString(e.what(), wxConvUTF8);
-	}
-	return success;
-}
-
-bool mvceditor::SqlQueryClass::More() {
-	return Statement && Statement->got_data();
-}
-
-long long mvceditor::SqlQueryClass::GetAffectedRows() {
-	return Statement ? Statement->get_affected_rows() : 0;
-}
-
-bool mvceditor::SqlQueryClass::ColumnNames(std::vector<wxString>& columnNames, wxString& error) {
-	bool data = Statement && Statement->got_data();
-	if (data) {
-		try {
-			for (size_t i = 0; i < Row.size(); i++) {
-				soci::column_properties props = Row.get_properties(i);
-				wxString col(props.get_name().c_str(), wxConvUTF8);
-				columnNames.push_back(col);
-			}
-		}
-		catch (std::exception const& e) {
-			data = false;
-			error = wxString(e.what(), wxConvUTF8);
-		}
-	}
-	return data;
-}
-
-bool mvceditor::SqlQueryClass::NextRow(std::vector<wxString>& columnValues, std::vector<soci::indicator>& columnIndicators, wxString& error) {
-	bool data = Statement && Statement->got_data();
-	if (data) {
-		try {
-			for (size_t i = 0; i < Row.size(); i++) {
-				soci::indicator indicator = Row.get_indicator(i);
-				columnIndicators.push_back(indicator);
-				soci::column_properties props = Row.get_properties(i);
-				wxString col;
-				if (soci::i_null != indicator) {
-					switch(props.get_data_type()) {
-					case soci::dt_string:
-						col = wxString(Row.get<std::string>(i).c_str(), wxConvUTF8);
-						break;
-					case soci::dt_double:
-						col = wxString::Format(wxT("%f"), Row.get<double>(i));
-						break;
-					case soci::dt_integer:
-						col = wxString::Format(wxT("%d"), Row.get<int>(i));
-						break;
-					case soci::dt_unsigned_long:
-					case soci::dt_unsigned_long_long:
-						col = wxString::Format(wxT("%lu"), Row.get<unsigned long>(i));
-						break;
-					case soci::dt_long_long:
-						col = wxString::Format(wxT("%ld"), Row.get<long long>(i));
-						break;
-					case soci::dt_date:
-						wxDateTime date(Row.get<std::tm>(i));
-						col = date.Format(wxT("%Y-%m-%d %H:%M:%S"));
-						break;
-					}
-					
-				}
-				columnValues.push_back(col);
-			}
-			Statement->fetch();
-		}
-		catch (std::exception const& e) {
-			data = false;
-			error = wxString(e.what(), wxConvUTF8);
-		}
-	}
-	return data;
-}
 
 mvceditor::SqlConnectionDialogClass::SqlConnectionDialogClass(wxWindow* parent, std::vector<mvceditor::DatabaseInfoClass>& infos, 
 		size_t& chosenIndex, bool allowEdit)
@@ -166,16 +40,15 @@ mvceditor::SqlConnectionDialogClass::SqlConnectionDialogClass(wxWindow* parent, 
 	, Infos(infos)
 	, TestQuery()
 	, ChosenIndex(chosenIndex) {
-	mvceditor::DatabaseInfoClass info;
 	for (size_t i = 0; i < infos.size(); i++) {
-		List->Append(infos[i].Name);
+		wxString name = mvceditor::StringHelperClass::IcuToWx(infos[i].Name);
+		List->Append(name);
 	}
 	if (chosenIndex < infos.size()) {
-		info = infos[chosenIndex];
-		Host->SetValue(infos[chosenIndex].Host);
-		User->SetValue(infos[chosenIndex].User);
-		Password->SetValue(infos[chosenIndex].Password);
-		Database->SetValue(infos[chosenIndex].DatabaseName);
+		Host->SetValue(mvceditor::StringHelperClass::IcuToWx(infos[chosenIndex].Host));
+		User->SetValue(mvceditor::StringHelperClass::IcuToWx(infos[chosenIndex].User));
+		Password->SetValue(mvceditor::StringHelperClass::IcuToWx(infos[chosenIndex].Password));
+		Database->SetValue(mvceditor::StringHelperClass::IcuToWx(infos[chosenIndex].DatabaseName));
 		Port->SetValue(infos[chosenIndex].Port);
 		List->Select(chosenIndex);
 	}
@@ -187,13 +60,13 @@ mvceditor::SqlConnectionDialogClass::SqlConnectionDialogClass(wxWindow* parent, 
 		Port->Enable(false);
 	}
 	else if (!infos.empty()) {
-		wxGenericValidator hostValidator(&Infos[0].Host);
+		UnicodeStringValidatorClass hostValidator(&Infos[0].Host);
 		Host->SetValidator(hostValidator);
-		wxGenericValidator userValidator(&Infos[0].User);
+		UnicodeStringValidatorClass userValidator(&Infos[0].User);
 		User->SetValidator(userValidator);
-		wxGenericValidator passwordValidator(&Infos[0].Password);
+		UnicodeStringValidatorClass passwordValidator(&Infos[0].Password);
 		Password->SetValidator(passwordValidator);
-		wxGenericValidator databaseValidator(&Infos[0].DatabaseName);
+		UnicodeStringValidatorClass databaseValidator(&Infos[0].DatabaseName);
 		Database->SetValidator(databaseValidator);
 		wxGenericValidator portValidator(&Infos[0].Port);
 		Port->SetValidator(portValidator);
@@ -255,24 +128,33 @@ void mvceditor::SqlConnectionDialogClass::OnHelpButton(wxCommandEvent& event) {
 }
 
 void* mvceditor::SqlConnectionDialogClass::Entry() {
-	wxString error;
-	wxString query(wxT("SELECT 1"));
-	bool success = TestQuery.Query(query, error);
+	UnicodeString error;
+	soci::session session;
+	bool success = false;
+	if (TestQuery.Connect(session, error)) {
+		soci::statement stmt = (session.prepare << "SELECT 1");
+		success = TestQuery.Execute(stmt, error);
+		TestQuery.Close(session, stmt);
+	}
 	wxCommandEvent evt(QUERY_COMPLETE_EVENT, wxID_ANY);
 	evt.SetInt(success ? 1 : 0);
-	evt.SetString(error);
+	evt.SetString(mvceditor::StringHelperClass::IcuToWx(error));
 	wxPostEvent(this, evt);
 	return 0;
 }
 
 void mvceditor::SqlConnectionDialogClass::ShowTestResults(wxCommandEvent& event) {
 	wxString msg = _("Connection to %s@%s was successful");
-	msg = wxString::Format(msg, TestQuery.Info.User.c_str(), TestQuery.Info.Host.c_str());
+	msg = wxString::Format(msg, 
+		mvceditor::StringHelperClass::IcuToWx(TestQuery.Info.User).c_str(), 
+		mvceditor::StringHelperClass::IcuToWx(TestQuery.Info.Host).c_str());
 	if (event.GetInt() == 0) {
 		msg = _("Connection to %s@%s failed: %s");
-		msg = wxString::Format(msg, TestQuery.Info.User.c_str(), TestQuery.Info.Host.c_str(), event.GetString().c_str());
+		msg = wxString::Format(msg, 
+		mvceditor::StringHelperClass::IcuToWx(TestQuery.Info.User).c_str(), 
+		mvceditor::StringHelperClass::IcuToWx(TestQuery.Info.Host).c_str(), 
+		event.GetString().c_str());
 	}
-	TestQuery.Close();
 	wxMessageBox(msg);
 	wxWindow::FindWindowById(wxID_OK, this)->Enable();
 	wxWindow::FindWindowById(ID_TEST, this)->Enable();
@@ -281,10 +163,10 @@ void mvceditor::SqlConnectionDialogClass::ShowTestResults(wxCommandEvent& event)
 void mvceditor::SqlConnectionDialogClass::OnListboxSelected(wxCommandEvent& event) {
 	ChosenIndex = event.GetInt();
 	if (ChosenIndex <Infos.size()) {
-		Host->SetValue(Infos[ChosenIndex].Host);
-		User->SetValue(Infos[ChosenIndex].User);
-		Password->SetValue(Infos[ChosenIndex].Password);
-		Database->SetValue(Infos[ChosenIndex].DatabaseName);
+		Host->SetValue(mvceditor::StringHelperClass::IcuToWx(Infos[ChosenIndex].Host));
+		User->SetValue(mvceditor::StringHelperClass::IcuToWx(Infos[ChosenIndex].User));
+		Password->SetValue(mvceditor::StringHelperClass::IcuToWx(Infos[ChosenIndex].Password));
+		Database->SetValue(mvceditor::StringHelperClass::IcuToWx(Infos[ChosenIndex].DatabaseName));
 		Port->SetValue(Infos[ChosenIndex].Port);
 	}
 }
@@ -295,6 +177,9 @@ mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id, 
 	: SqlBrowserPanelGeneratedClass(parent, id)
 	, wxThreadHelper()
 	, Query(other)
+	, Session()
+	, Stmt(NULL)
+	, Row()
 	, CodeControl(codeControl) 
 	, Gauge(gauge)
 	, Timer()
@@ -313,18 +198,29 @@ mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id, 
 	UpdateLabels(wxT(""));
 }
 
+void mvceditor::SqlBrowserPanelClass::Close() {
+	if (Stmt) {
+		Query.Close(Session, *Stmt);
+		delete Stmt;
+		Stmt = NULL;
+	}
+	else {
+		Session.close();
+	}
+}
+
 bool mvceditor::SqlBrowserPanelClass::Check() {
 	bool ret = Validate() && TransferDataFromWindow();
 	if (ret) {
-		LastQuery = GetText().Trim();
-		ret = !LastQuery.empty();
+		LastQuery = mvceditor::StringHelperClass::wxToIcu(GetText().Trim());
+		ret = !LastQuery.isEmpty();
 	}
 	return ret;
 }
 
 void mvceditor::SqlBrowserPanelClass::Execute() {
 	if (!IsRunning && Check()) {
-		LastError = wxT("");
+		LastError = UNICODE_STRING_SIMPLE("");
 		wxThreadError error = wxThreadHelper::Create();
 		switch (error) {
 		case wxTHREAD_NO_ERROR:
@@ -351,7 +247,11 @@ void mvceditor::SqlBrowserPanelClass::Execute() {
 }
 
 void* mvceditor::SqlBrowserPanelClass::Entry() {
-	bool success = Query.Query(LastQuery, LastError);
+	bool success = Query.Connect(Session, LastError);
+	if (success) {
+		Stmt = new soci::statement(Session);
+		success = Query.Execute(Session, *Stmt, Row, LastQuery, LastError);
+	}
 	wxCommandEvent evt(QUERY_COMPLETE_EVENT, wxID_ANY);
 	evt.SetInt(success);
 	wxPostEvent(this, evt);
@@ -367,16 +267,16 @@ void mvceditor::SqlBrowserPanelClass::OnRunButton(wxCommandEvent& event) {
 }
 
 void mvceditor::SqlBrowserPanelClass::OnQueryComplete(wxCommandEvent& event) {
-	std::vector<wxString> columnNames;
-	std::vector<wxString> columnValues;
+	std::vector<UnicodeString> columnNames;
+	std::vector<UnicodeString> columnValues;
 	std::vector<soci::indicator> columnIndicators;
 	std::vector<bool> autoSizeColumns;
-	wxString error = LastError;
+	UnicodeString error = LastError;
 	ResultsGrid->BeginBatch();
 	bool success = event.GetInt() != 0;
 	bool nonEmpty = false;
 	int rowNumber = 1;
-	int affected = Query.GetAffectedRows();
+	int affected = Query.GetAffectedRows(*Stmt);
 	if (ResultsGrid->GetNumberCols()) {
 		ResultsGrid->DeleteCols(0, ResultsGrid->GetNumberCols());
 	}
@@ -384,25 +284,25 @@ void mvceditor::SqlBrowserPanelClass::OnQueryComplete(wxCommandEvent& event) {
 		ResultsGrid->DeleteRows(0, ResultsGrid->GetNumberRows());
 	}
 	if (success) {
-		if (Query.ColumnNames(columnNames, error)) {
+		if (Query.ColumnNames(Row, columnNames, error)) {
 			ResultsGrid->AppendCols(columnNames.size());
 			for (size_t i = 0; i < columnNames.size(); i++) {
-				ResultsGrid->SetColLabelValue(i, columnNames[i]);
+				ResultsGrid->SetColLabelValue(i, mvceditor::StringHelperClass::IcuToWx(columnNames[i]));
 				autoSizeColumns.push_back(true);
 			}
 			bool more = true;
 			ResultsGrid->SetDefaultCellOverflow(false);
-			while (more && Query.More()) {
+				while (more && Query.More(*Stmt, success, error)) {
 				ResultsGrid->AppendRows(1);
-				more = Query.NextRow(columnValues, columnIndicators, error);
+				more = Query.NextRow(Row, columnValues, columnIndicators, error);
 				for (size_t colNumber = 0; colNumber < columnValues.size(); colNumber++) {
 					if (columnIndicators[colNumber] == soci::i_null) {
 						ResultsGrid->SetCellValue(rowNumber - 1, colNumber, wxT("<NULL>"));
 					}
 					else {
-						ResultsGrid->SetCellValue(rowNumber - 1, colNumber, columnValues[colNumber]);
+						ResultsGrid->SetCellValue(rowNumber - 1, colNumber, mvceditor::StringHelperClass::IcuToWx(columnValues[colNumber]));
 					}					
-					if (columnValues[colNumber].size() > 50) {
+					if (columnValues[colNumber].length() > 50) {
 						autoSizeColumns[colNumber] = false; 
 					}
 				}
@@ -413,7 +313,7 @@ void mvceditor::SqlBrowserPanelClass::OnQueryComplete(wxCommandEvent& event) {
 			}
 		}
 	}
-	Query.Close();
+	Close();
 
 	// time for query only; not time to render grid
 	wxLongLong msec = wxGetLocalTimeMillis() - QueryStart;
@@ -431,7 +331,7 @@ void mvceditor::SqlBrowserPanelClass::OnQueryComplete(wxCommandEvent& event) {
 	Gauge->StopGauge(ID_SQL_GAUGE);
 	Timer.Stop();
 	if (!success) {
-		UpdateLabels(error);
+		UpdateLabels(mvceditor::StringHelperClass::IcuToWx(error));
 	}
 	else {
 		
@@ -448,8 +348,8 @@ void mvceditor::SqlBrowserPanelClass::OnQueryComplete(wxCommandEvent& event) {
 void mvceditor::SqlBrowserPanelClass::UpdateLabels(const wxString& result) {
 	ConnectionLabel->SetLabel(wxString::Format(
 		wxT("%s@%s:%d"),
-		Query.Info.User.c_str(),
-		Query.Info.Host.c_str(),
+		mvceditor::StringHelperClass::IcuToWx(Query.Info.User).c_str(),
+		mvceditor::StringHelperClass::IcuToWx(Query.Info.Host).c_str(),
 		Query.Info.Port
 	));
 	ResultsLabel->SetLabel(result);
@@ -480,7 +380,7 @@ void mvceditor::SqlBrowserPluginClass::OnProjectOpened() {
 	WasEmptyDetectedInfo = Infos.empty();
 	if (WasEmptyDetectedInfo) {
 		mvceditor::DatabaseInfoClass info;
-		info.Name = _("Custom info");
+		info.Name = UNICODE_STRING_SIMPLE("Custom info");
 		Infos.push_back(info);
 	}
 }
@@ -517,7 +417,7 @@ void mvceditor::SqlBrowserPluginClass::OnRun(wxCommandEvent& event) {
 void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event) {
 	mvceditor::SqlConnectionDialogClass dialog(GetMainWindow(), Infos, ChosenIndex, WasEmptyDetectedInfo);
 	if (dialog.ShowModal() == wxOK) {
-		wxMessageBox(Infos[0].Host);
+
 		// nothing for now .. won't update the SqlBrowserPanel connection label
 		// since that label shows with the data and it may confuse the user
 		// TODO need to update the existing opened panels

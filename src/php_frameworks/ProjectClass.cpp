@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <php_frameworks/ProjectClass.h>
+#include <windows/StringHelperClass.h>
 #include <wx/stdpaths.h>
 #include <wx/filename.h>
 #include <wx/utils.h>
@@ -36,41 +37,6 @@ mvceditor::ProjectOptionsClass::ProjectOptionsClass()
 	
 mvceditor::ProjectOptionsClass::ProjectOptionsClass(const ProjectOptionsClass& other) { 
 	RootPath = other.RootPath; 
-}
-
-mvceditor::DatabaseInfoClass::DatabaseInfoClass()
-	: Host()
-	, User()
-	, Password()
-	, DatabaseName()
-	, FileName()
-	, Name()
-	, Driver(MYSQL)
-	, Port() {
-		
-}
-
-mvceditor::DatabaseInfoClass::DatabaseInfoClass(const mvceditor::DatabaseInfoClass& other) 
-	: Host()
-	, User()
-	, Password()
-	, DatabaseName()
-	, FileName()
-	, Name()
-	, Driver(MYSQL)
-	, Port() {
-	Copy(other);
-}
-
-void mvceditor::DatabaseInfoClass::Copy(const mvceditor::DatabaseInfoClass& src) {
-	Host = src.Host;
-	User = src.User;
-	Password = src.Password;
-	DatabaseName = src.DatabaseName;
-	FileName = src.FileName;
-	Name = src.Name;
-	Driver = src.Driver;
-	Port = src.Port;
 }
 
 mvceditor::ProjectClass::ProjectClass(const mvceditor::ProjectOptionsClass& options)
@@ -138,22 +104,29 @@ std::vector<mvceditor::DatabaseInfoClass> mvceditor::ProjectClass::DatabaseInfo(
 			groupName = wxT("/") + groupName + wxT("/");
 			
 			// dont use wxFileConfig.SetPath method. it seems to mess with the group iteration
-			info.Host = result.Read(groupName + wxT("Host"));
-			info.User = result.Read(groupName + wxT("/User"));
-			info.Password = result.Read(groupName + wxT("Password"));
-			info.DatabaseName = result.Read(groupName + wxT("DatabaseName"));
-			info.FileName = result.Read(groupName + wxT("FileName"));
-			info.Name = result.Read(groupName + wxT("Name"));
+			wxString s = result.Read(groupName + wxT("Host"));
+			info.Host = mvceditor::StringHelperClass::wxToIcu(s);
+			s = result.Read(groupName + wxT("/User"));
+			info.User = mvceditor::StringHelperClass::wxToIcu(s);
+			s = result.Read(groupName + wxT("Password"));
+			info.Password = mvceditor::StringHelperClass::wxToIcu(s);
+			s = result.Read(groupName + wxT("DatabaseName"));
+			info.DatabaseName = mvceditor::StringHelperClass::wxToIcu(s);
+			s = result.Read(groupName + wxT("FileName"));
+			info.FileName = mvceditor::StringHelperClass::wxToIcu(s);
+			s = result.Read(groupName + wxT("Name"));
+			info.Name = mvceditor::StringHelperClass::wxToIcu(s);
 			wxString driverString = result.Read(groupName + wxT("Driver"));
 			if (driverString.CmpNoCase(wxT("MYSQL"))) {
 				info.Driver = mvceditor::DatabaseInfoClass::MYSQL;
 			}
+			/*
 			else if (driverString.CmpNoCase(wxT("POSTGRESQL"))) {
 				info.Driver = mvceditor::DatabaseInfoClass::POSTGRESQL;
 			}
 			else if (driverString.CmpNoCase(wxT("SQLITE"))) {
 				info.Driver = mvceditor::DatabaseInfoClass::SQLITE;
-			}
+			}*/
 			else {
 				info.Driver = mvceditor::DatabaseInfoClass::MYSQL;
 				// TODO error handling

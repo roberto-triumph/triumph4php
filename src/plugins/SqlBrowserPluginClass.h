@@ -29,9 +29,10 @@
 #include <PluginClass.h>
 #include <plugins/wxformbuilder/SqlBrowserPluginGeneratedClass.h>
 #include <php_frameworks/ProjectClass.h>
-#include <soci.h>
+#include <environment/DatabaseInfoClass.h>
 #include <wx/thread.h>
 #include <vector>
+#include <unicode/unistr.h>
 
 namespace mvceditor {
 
@@ -41,87 +42,6 @@ namespace mvceditor {
  * event.GetInt() will have a non-zero value if the query executed successfully
  */
 const wxEventType QUERY_COMPLETE_EVENT = wxNewEventType();
-	
-/**
- * A small class that will send queries to the database
- */
-class SqlQueryClass {
-	
-	public:
-	
-	/**
-	 * The database info to use when connecting
-	 */
-	DatabaseInfoClass Info;
-	
-	SqlQueryClass();
-	
-	/**
-	 * Will only copy DatabaseInfo not results.
-	 * Any statement that other has will NOT be copied
-	 */
-	SqlQueryClass(const SqlQueryClass& other);
-	
-	~SqlQueryClass();
-	
-	/**
-	 * Close the connection and cleanup any results. This needs to be called
-	 * after every call to Query()
-	 */
-	void Close();
-	
-	/**
-	 * Will only copy Host, User, Database, Port, and Password
-	 * Any statement that other has will NOT be copied
-	 * @param src the object to copy FROM
-	 */
-	void Copy(const SqlQueryClass& src);
-	
-	/**
-	 * Sends ONE query to the server. 
-	 */
-	bool Query(const wxString& query, wxString& error);
-	
-	/**
-	 * Returns true if there are more results to be read.
-	 */
-	bool More();
-	
-	/**
-	 * Populates columnNames with the name of the columns in the current result.
-	 * Returns false when there are no more results.
-	 * 
-	 * @param columnNames vector of column names will be populated
-	 * @param error will be populated when an error ocurrs
-	 * @return bool true on success, false on error
-	 */
-	bool ColumnNames(std::vector<wxString>& colummNames, wxString& error);
-	
-	/**
-	 * Populates columnNames with the name of the columns in the current result.
-	 * Returns false when there are no more results.
-	 * 
-	 * @param columnValues vector of column values of the current row will be populated
-	 * @param indicators vector of indicator for each column of the current row; can be used to find out if values are NULL
-	 * @param error will be populated when an error ocurrs
-	 * @return bool true on success, false on error
-	 */
-	bool NextRow(std::vector<wxString>& columnValues, std::vector<soci::indicator>& indicators, wxString& error);
-	
-	/**
-	 * Get the number of affected records.
-	 */
-	long long GetAffectedRows();
-	
-private:
-
-	soci::session Session;
-	
-	soci::statement* Statement;
-	
-	soci::row Row;
-
-};
 
 class SqlConnectionDialogClass : public SqlConnectionDialogGeneratedClass, wxThreadHelper {
 
@@ -153,6 +73,11 @@ private:
 	void* Entry();
 	
 	void ShowTestResults(wxCommandEvent& event);
+	
+	/**
+	 * cleans up the current query and closes the connection
+	 */
+	void Close();
 	
 	std::vector<DatabaseInfoClass>& Infos;
 	
@@ -215,9 +140,30 @@ private:
 	void UpdateLabels(const wxString& result);
 	
 	/**
+	 * cleans up the current query and closes the connection
+	 */
+	void Close();
+	
+	/**
 	 * To send queries to the server
 	 */
 	SqlQueryClass Query;
+	
+	/**
+	 * Connection handle
+	 */
+	soci::session Session;
+	
+	/**
+	 * result cursor
+	 */
+	soci::statement* Stmt;
+	
+	/**
+	 * A record. Since the query is determined at run time, we must use dynamically binded rows
+	 */
+	soci::row Row;
+	
 	
 	/**
 	 * For SQL editing.
@@ -237,12 +183,12 @@ private:
 	/**
 	 * Filled in with the last error string from the database
 	 */
-	wxString LastError;
+	UnicodeString LastError;
 	
 	/**
 	 * The contents of the code control that are currenltly being executed.
 	 */
-	wxString LastQuery;
+	UnicodeString LastQuery;
 	
 	/**
 	 * The time that the query has begun executing

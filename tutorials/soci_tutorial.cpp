@@ -34,7 +34,7 @@
   */
  void query() {
 	 try {
-		soci::session session(*soci::factory_mysql(), "db=mysql user=root password='' ");
+		soci::session session(*soci::factory_mysql(), "db=mysql user=root password='' host=127.0.0.1 ");
 		std::string query = "-- a query\n SHOW DATABASES;";
 		soci::statement stmt(session);
 		stmt.alloc();
