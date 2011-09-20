@@ -30,8 +30,18 @@
  #include <vector>
  #include <map>
  
- namespace mvceditor {
-	 
+namespace mvceditor {
+
+/**
+ * Case-sensitive string comparator for use as STL Predicate
+ */
+class SqlResourceFinderUnicodeStringComparatorClass {
+public:
+	bool operator()(const UnicodeString& str1, const UnicodeString& str2) const {
+		return (str1.compare(str2) < (int8_t)0) ? true : false;
+	}
+};
+
 class SqlResourceFinderClass {
 	
 public:
@@ -95,14 +105,15 @@ public:
 	 * To keep the tables linked to a specific connection
 	 * key will be the info hash, value will be the list of table for that info
 	 */
-	std::map<UnicodeString, UnicodeStringVector> Tables;
+	std::map<UnicodeString, UnicodeStringVector, SqlResourceFinderUnicodeStringComparatorClass> Tables;
 	
 	/**
 	 * To keep the columns linked to a specific connection AND table
 	 * key will be info hash + table name, value will be the list
 	 * of columns for that table
+	 * comparator is needed for MSW compiler
 	 */
-	std::map<UnicodeString, UnicodeStringVector> Columns;
+	std::map<UnicodeString, UnicodeStringVector, SqlResourceFinderUnicodeStringComparatorClass> Columns;
 	
 };
 	 

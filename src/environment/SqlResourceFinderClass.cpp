@@ -70,7 +70,7 @@ bool mvceditor::SqlResourceFinderClass::Fetch(const mvceditor::DatabaseInfoClass
 				Query.Close(stmt);
 			}
 			std::sort(Tables[hash].begin(), Tables[hash].end());
-			for (std::map<UnicodeString, UnicodeStringVector>::iterator it = Columns.begin(); it != Columns.end(); ++it) {
+			for (std::map<UnicodeString, UnicodeStringVector, SqlResourceFinderUnicodeStringComparatorClass>::iterator it = Columns.begin(); it != Columns.end(); ++it) {
 				std::sort(it->second.begin(), it->second.end());
 			}
 			

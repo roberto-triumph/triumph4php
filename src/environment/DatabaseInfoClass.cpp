@@ -79,6 +79,7 @@ void mvceditor::SqlQueryClass::Close(soci::statement& stmt) {
 	try {
 		stmt.clean_up();
 	} catch (std::exception const& e) {
+		printf("SqlQuery close error:%s\n", e.what());
 	}
 }
 
@@ -87,6 +88,7 @@ void mvceditor::SqlQueryClass::Close(soci::session& session, soci::statement& st
 		stmt.clean_up();
 		session.close();
 	} catch (std::exception const& e) {
+		printf("SqlQuery close error:%s\n", e.what());
 	}
 }
 
@@ -182,7 +184,7 @@ long long mvceditor::SqlQueryClass::GetAffectedRows(soci::statement& stmt) {
 	try {
 		rows = stmt.get_affected_rows();
 	} catch (std::exception const& e) {
-		
+		printf("SqlQuery close error:%s\n", e.what());	
 	}
 	return rows;
 }

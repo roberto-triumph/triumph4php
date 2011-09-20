@@ -49,7 +49,7 @@ TEST_FIXTURE(ProjectTestFixtureClass, ShouldBeDetected) {
 	Project->Detect(true);
 	std::vector<mvceditor::DatabaseInfoClass> frameworks = Project->DatabaseInfo();
 	CHECK_EQUAL((size_t)2, frameworks.size());
-	CHECK_EQUAL(wxT("127.0.0.1"), frameworks[0].Host);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("127.0.0.1"), frameworks[0].Host);
 }
 
 }
