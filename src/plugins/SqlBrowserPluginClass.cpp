@@ -33,6 +33,7 @@ const int ID_SQL_EDITOR_MENU = mvceditor::PluginClass::newMenuId();
 const int ID_SQL_RUN_MENU = mvceditor::PluginClass::newMenuId();
 const int ID_SQL_CONNECTION_MENU = mvceditor::PluginClass::newMenuId();
 const int ID_SQL_GAUGE = wxNewId();
+const int ID_SQL_METADATA_GAUGE = wxNewId();
 
 mvceditor::SqlConnectionDialogClass::SqlConnectionDialogClass(wxWindow* parent, std::vector<mvceditor::DatabaseInfoClass>& infos, 
 		size_t& chosenIndex, bool allowEdit)
@@ -360,9 +361,53 @@ void mvceditor::SqlBrowserPanelClass::OnTimer(wxTimerEvent& event) {
 	Gauge->IncrementGauge(ID_SQL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
 }
 
+mvceditor::SqlMetaDataFetchClass::SqlMetaDataFetchClass(wxEvtHandler& handler)
+	: ThreadWithHeartbeatClass(handler) {
+		
+}
+
+bool mvceditor::SqlMetaDataFetchClass::Read(std::vector<mvceditor::DatabaseInfoClass>* infos, mvceditor::ProjectClass* project) {
+	bool ret = false;
+	Infos = infos;
+	wxThreadError err = Create();
+	if (wxTHREAD_NO_RESOURCE == err) {
+		wxMessageBox(_("System is way too busy. Please try again later."), _("SQL MetaData fetch"));
+	}
+	else if (wxTHREAD_RUNNING == err) {
+		wxMessageBox(_("There is already another SQL MetaData fetch that is active. Please wait for it to finish."), _("SQL MetaData fetch"));
+	}
+	else if (wxTHREAD_NO_ERROR == err) {
+		Infos = infos;
+		Project = project;
+		GetThread()->Run();
+		SignalStart();
+		ret = true;
+	}
+	return ret;
+}
+
+void* mvceditor::SqlMetaDataFetchClass::Entry() {
+	wxMutexLocker locker(Project->SqlResourceFinderMutex);
+	if (locker.IsOk()) {
+		mvceditor::SqlResourceFinderClass* finder = Project->GetSqlResourceFinder();
+		
+		std::vector<UnicodeString> errors;
+		for (std::vector<mvceditor::DatabaseInfoClass>::iterator it = Infos->begin(); it != Infos->end(); ++it) {
+			UnicodeString error;
+			if (!finder->Fetch(*it, error)) {
+				errors.push_back(error);
+			}
+		}
+		// TODO do something with the error strings
+	}
+	SignalEnd();
+	return 0;
+}
+
 mvceditor::SqlBrowserPluginClass::SqlBrowserPluginClass() 
-	: PluginClass() 
+	: PluginClass()
 	, Infos()
+	, SqlMetaDataFetch(*this)
 	, ChosenIndex(0)
 	, WasEmptyDetectedInfo(false) {
 }
@@ -382,6 +427,11 @@ void mvceditor::SqlBrowserPluginClass::OnProjectOpened() {
 		mvceditor::DatabaseInfoClass info;
 		info.Name = UNICODE_STRING_SIMPLE("Custom info");
 		Infos.push_back(info);
+	}
+	else {
+		if (SqlMetaDataFetch.Read(&Infos, GetProject())) {
+			GetStatusBarWithGauge()->AddGauge(_("Fetching SQL meta data"), ID_SQL_METADATA_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
+		}
 	}
 }
 
@@ -422,13 +472,24 @@ void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event
 		// since that label shows with the data and it may confuse the user
 		// TODO need to update the existing opened panels
 		// but need to account for thread-safetyness
+		SqlMetaDataFetch.Read(&Infos, GetProject());
 	}
+}
+
+void mvceditor::SqlBrowserPluginClass::OnWorkInProgress(wxCommandEvent& event) {
+	GetStatusBarWithGauge()->IncrementGauge(ID_SQL_METADATA_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
+}
+
+void mvceditor::SqlBrowserPluginClass::OnWorkComplete(wxCommandEvent& event) {
+	GetStatusBarWithGauge()->StopGauge(ID_SQL_METADATA_GAUGE);
 }
 
 BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPluginClass, wxEvtHandler)
 	EVT_MENU(ID_SQL_EDITOR_MENU, mvceditor::SqlBrowserPluginClass::OnSqlBrowserToolsMenu)
 	EVT_MENU(ID_SQL_CONNECTION_MENU, mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu)
 	EVT_MENU(ID_SQL_RUN_MENU, mvceditor::SqlBrowserPluginClass::OnRun)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SqlBrowserPluginClass::OnWorkInProgress)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SqlBrowserPluginClass::OnWorkComplete)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPanelClass, SqlBrowserPanelGeneratedClass)

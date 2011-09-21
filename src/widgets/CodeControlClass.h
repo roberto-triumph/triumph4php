@@ -154,8 +154,10 @@ class SqlDocumentClass : public TextDocumentClass {
 	
 public:
 
-	SqlDocumentClass();
-	
+	/**
+	 * This class will NOT own this pointer. Caller must manage (delete) it.
+	 */
+	SqlDocumentClass(ProjectClass* project);
 
 	/**
 	 * Will enable auto complete for SQL keywords
@@ -166,6 +168,13 @@ public:
 	 * Returns the keywords to be shown in the auto complete list.
 	 */
 	virtual std::vector<wxString> HandleAutoComplete(const wxString& fileName, const UnicodeString& code, const UnicodeString& word, bool force);
+	
+private:
+
+	/**
+	 * This class will NOT own this pointer
+	 */
+	ProjectClass*  Project;
 };
 
 /**

@@ -30,6 +30,7 @@
 #include <plugins/wxformbuilder/SqlBrowserPluginGeneratedClass.h>
 #include <php_frameworks/ProjectClass.h>
 #include <environment/DatabaseInfoClass.h>
+#include <widgets/ThreadWithHeartbeatClass.h>
 #include <wx/thread.h>
 #include <vector>
 #include <unicode/unistr.h>
@@ -204,6 +205,34 @@ private:
 };
 
 /**
+ * This class will performt SQL metadata indexing (grabbing table and column names)
+ * from all of the connections of the current project).
+ */
+class SqlMetaDataFetchClass : public ThreadWithHeartbeatClass {
+
+public:
+
+	SqlMetaDataFetchClass(wxEvtHandler& handler);
+	
+	/**
+	 * starts a background thread to read the metadata. Generates events while work
+	 * is in progress.
+	 * @see mvceditor::ThreadWithHearbeatClass
+	 * @return bool TRUE if thread was started
+	 */
+	bool Read(std::vector<DatabaseInfoClass>* infos, ProjectClass* project);
+	
+protected:
+
+	void* Entry();
+	
+	
+	std::vector<DatabaseInfoClass>* Infos;
+	
+	ProjectClass* Project;
+};
+
+/**
  * This is a plugin for SQL interface.
  */
 class SqlBrowserPluginClass : public PluginClass {
@@ -229,7 +258,13 @@ private:
 	
 	void OnRun(wxCommandEvent& event);
 	
+	void OnWorkInProgress(wxCommandEvent& event);
+	
+	void OnWorkComplete(wxCommandEvent& event);
+	
 	std::vector<DatabaseInfoClass> Infos;
+	
+	SqlMetaDataFetchClass SqlMetaDataFetch;
 	
 	size_t ChosenIndex;
 	

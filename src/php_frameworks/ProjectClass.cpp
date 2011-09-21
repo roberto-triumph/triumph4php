@@ -40,7 +40,8 @@ mvceditor::ProjectOptionsClass::ProjectOptionsClass(const ProjectOptionsClass& o
 }
 
 mvceditor::ProjectClass::ProjectClass(const mvceditor::ProjectOptionsClass& options)
-	: Options(options)
+	: SqlResourceFinderMutex() 
+	, Options(options)
 	, ResourceFinder()
 	, FrameworkIdentifiers()
 	, Databases() {
@@ -155,6 +156,10 @@ wxString mvceditor::ProjectClass::GetPhpExecutable() const {
 
 mvceditor::ResourceFinderClass* mvceditor::ProjectClass::GetResourceFinder() {
 	return &ResourceFinder;
+}
+
+mvceditor::SqlResourceFinderClass* mvceditor::ProjectClass::GetSqlResourceFinder() {
+	return &SqlResourceFinder;
 }
 
 wxString mvceditor::ProjectClass::AskDatabaseInfo(const wxString& identifier) const {

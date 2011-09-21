@@ -27,7 +27,9 @@
 
 #include <search/ResourceFinderClass.h>
 #include <environment/DatabaseInfoClass.h>
+#include <environment/SqlResourceFinderClass.h>
 #include <wx/string.h>
+#include <wx/thread.h>
 #include <vector>
 
 namespace mvceditor {
@@ -66,6 +68,8 @@ public:
 class ProjectClass {
 	
 public:
+
+	wxMutex SqlResourceFinderMutex;
 	
 	/**
 	 * Construct a ProjectClass object from the given options
@@ -109,6 +113,18 @@ public:
 	ResourceFinderClass* GetResourceFinder();
 	
 	/**
+	 * Get the SQL ResourceFinder. 
+	 * WARNING: NEED TO ACQUIRE THE LOCK FIRST!! You need to acquire the sql resource finder mutex of this object
+	 * 
+	 * wxMutexLocker locker(Project.SqlResourceFinderMutex)
+	 * if (locker.IsOk()) {
+	 *   //... your logic
+	 * }
+	 * 
+	 */
+	SqlResourceFinderClass* GetSqlResourceFinder();
+	
+	/**
 	 * Returns the detected database connection infos
 	 */
 	std::vector<DatabaseInfoClass> DatabaseInfo();
@@ -137,6 +153,11 @@ private:
 	 * to look for classes and methods
 	 */
 	ResourceFinderClass ResourceFinder;
+	
+	/**
+	 * To grab SQL table meta data
+	 */
+	SqlResourceFinderClass SqlResourceFinder;
 	
 	/**
 	 * the detected frameworks

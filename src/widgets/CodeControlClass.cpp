@@ -681,7 +681,7 @@ void mvceditor::CodeControlClass::ApplyPreferences() {
 	}
 	if (mvceditor::CodeControlClass::SQL == DocumentMode) {
 		SetSqlOptions();		
-		Document = new mvceditor::SqlDocumentClass();
+		Document = new mvceditor::SqlDocumentClass(Project);
 	}
 	else if (mvceditor::CodeControlClass::PHP == DocumentMode) {
 		SetPhpOptions();
@@ -1228,8 +1228,9 @@ std::vector<wxString> mvceditor::PhpDocumentClass::CollectNearMatchKeywords(wxSt
 	return matchedKeywords;
 }
 
-mvceditor::SqlDocumentClass::SqlDocumentClass() 
-	: TextDocumentClass() {
+mvceditor::SqlDocumentClass::SqlDocumentClass(mvceditor::ProjectClass* project) 
+	: TextDocumentClass() 
+	, Project(project) {
 		
 }
 
@@ -1253,6 +1254,25 @@ std::vector<wxString> mvceditor::SqlDocumentClass::HandleAutoComplete(const wxSt
 			// make keywords uppercase for SQL keywords
 			autoCompleteList.push_back(it.Upper());
 		}
+	}
+	
+	// look at the meta data, but we need to make sure to get the lock 
+	// dont want to lock the GUI thread, so dont wait for the lock
+	if (wxMUTEX_NO_ERROR == Project->SqlResourceFinderMutex.TryLock()) {
+		mvceditor::SqlResourceFinderClass* finder = Project->GetSqlResourceFinder();
+
+		// NO EXCEPTIONS MUST BE THROWN HERE...
+		// should not loop through all infos, should use the current info
+		std::vector<mvceditor::DatabaseInfoClass> infos = Project->DatabaseInfo();
+		for (std::vector<mvceditor::DatabaseInfoClass>::iterator it = infos.begin(); it != infos.end(); ++it) {
+			UnicodeString error;
+			std::vector<UnicodeString> results = finder->FindTables(*it, word);
+			for (size_t i = 0; i < results.size(); i++) {
+				wxString s = mvceditor::StringHelperClass::IcuToWx(results[i]);
+				autoCompleteList.push_back(s);
+			}
+		}
+		Project->SqlResourceFinderMutex.Unlock();
 	}
 	return autoCompleteList;
 }
