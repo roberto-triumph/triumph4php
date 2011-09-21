@@ -59,10 +59,9 @@ bool mvceditor::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 	return ret;
 }
 
-mvceditor::LintBackgroundFileReaderClass::LintBackgroundFileReaderClass(wxEvtHandler* handler)
+mvceditor::LintBackgroundFileReaderClass::LintBackgroundFileReaderClass(wxEvtHandler& handler)
 	: BackgroundFileReaderClass(handler)
 	, ParserDirectoryWalker()
-	, Handler(handler)
 	, PhpFileExtensions() {
 		
 }
@@ -94,7 +93,7 @@ bool mvceditor::LintBackgroundFileReaderClass::LintSingleFile(const wxString& fi
 		mvceditor::LintResultsClass* clonedResults = new mvceditor::LintResultsClass;
 		clonedResults->Copy(walker.LastResults);
 		evt.SetClientData((void*)clonedResults);
-		wxPostEvent(Handler, evt);
+		wxPostEvent(&Handler, evt);
 	}
 	return error;
 }
@@ -108,7 +107,7 @@ bool mvceditor::LintBackgroundFileReaderClass::FileRead(DirectorySearchClass &se
 		mvceditor::LintResultsClass* clonedResults = new mvceditor::LintResultsClass;
 		clonedResults->Copy(ParserDirectoryWalker.LastResults);
 		evt.SetClientData((void*)clonedResults);
-		wxPostEvent(Handler, evt);
+		wxPostEvent(&Handler, evt);
 	}
 	return !error;
 }
@@ -186,10 +185,8 @@ void mvceditor::LintResultsPanelClass::DisplayLintError(int index) {
 
 mvceditor::LintPluginClass::LintPluginClass() 
 	: PluginClass()
-	, LintBackgroundFileReader(this)
-	, Timer()
+	, LintBackgroundFileReader(*this)
 	, LintErrors() {
-	Timer.SetOwner(this);
 }
 
 void mvceditor::LintPluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
@@ -214,7 +211,6 @@ void mvceditor::LintPluginClass::OnLintMenu(wxCommandEvent& event) {
 		if (LintBackgroundFileReader.BeginDirectoryLint(rootPath, phpFileExtensions, error)) {
 			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 			gauge->AddGauge(_("Lint Check"), ID_LINT_RESULTS_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
-			Timer.Start(200, wxTIMER_CONTINUOUS);
 			
 			// create / open the outline window
 			wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
@@ -263,10 +259,9 @@ void mvceditor::LintPluginClass::OnLintFileComplete(wxCommandEvent& event) {
 void mvceditor::LintPluginClass::OnLintComplete(wxCommandEvent& event) {
 	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 	gauge->StopGauge(ID_LINT_RESULTS_GAUGE);
-	Timer.Stop();
 }
 
-void mvceditor::LintPluginClass::OnTimer(wxTimerEvent& event) {
+void mvceditor::LintPluginClass::OnTimer(wxCommandEvent& event) {
 	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 	gauge->IncrementGauge(ID_LINT_RESULTS_GAUGE, StatusBarWithGaugeClass::INDETERMINATE_MODE);	
 }
@@ -317,7 +312,7 @@ BEGIN_EVENT_TABLE(mvceditor::LintPluginClass, wxEvtHandler)
 	EVT_MENU(ID_LINT_TOOLBAR_ITEM, mvceditor::LintPluginClass::OnLintMenu)
 	EVT_COMMAND(wxID_ANY, EVENT_LINT_ERROR,  mvceditor::LintPluginClass::OnLintError)
 	EVT_COMMAND(wxID_ANY, EVENT_FILE_READ,  mvceditor::LintPluginClass::OnLintFileComplete)
-	EVT_COMMAND(wxID_ANY, EVENT_FILE_READ_COMPLETE,  mvceditor::LintPluginClass::OnLintComplete)
 	EVT_COMMAND(wxID_ANY, EVENT_PLUGIN_FILE_SAVED,  mvceditor::LintPluginClass::OnFileSaved)
-	EVT_TIMER(wxID_ANY, mvceditor::LintPluginClass::OnTimer)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::LintPluginClass::OnTimer)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::LintPluginClass::OnLintComplete)
 END_EVENT_TABLE()

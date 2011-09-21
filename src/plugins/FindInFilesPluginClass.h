@@ -44,7 +44,7 @@ const wxEventType EVENT_FIND_IN_FILES_FILE_HIT = wxNewEventType();
 class FindInFilesBackgroundReaderClass: public BackgroundFileReaderClass {
 public:
 
-	FindInFilesBackgroundReaderClass(wxEvtHandler* handler);
+	FindInFilesBackgroundReaderClass(wxEvtHandler& handler);
 
 	/**
 	 * Prepare to iterate through all files in the given directory.
@@ -158,13 +158,6 @@ private:
 	FindInFilesBackgroundReaderClass FindInFilesBackgroundFileReader;
 	
 	/**
-	 * To increment the gauge smoothly.
-	 * 
-	 * @var wxTimer
-	 */
-	wxTimer Timer;	
-	
-	/**
 	 * To open the files 
 	 * @var NotebookClass
 	 */
@@ -218,9 +211,10 @@ private:
 	/**
 	 * Timer handler.
 	 * 
-	 * @var wxTimerEvent& event
+	 * @param wxCommandEvent& event
 	 */
-	void OnTimer(wxTimerEvent& event);
+	 void OnTimer(wxCommandEvent& event);
+	
 	
 	DECLARE_EVENT_TABLE()
 };

@@ -94,10 +94,10 @@ public:
 
 	/**
 	 * @param handler the object that will receive LINT_ERROR events
-	 *        this pointer will NOT be managed by this object (will not
-	 *        DELETE the pointer).
+	 * 	      as well as WORK_* events
+	 * @see mvceditor::ThreadWithHeartbeat class
 	 */
-	LintBackgroundFileReaderClass(wxEvtHandler* handler);
+	LintBackgroundFileReaderClass(wxEvtHandler& handler);
 	
 	/**
 	 * Start the background thread.  Lint errors will be propagated as events.
@@ -139,9 +139,7 @@ protected:
 private:
 
 	ParserDirectoryWalkerClass ParserDirectoryWalker;
-		
-	wxEvtHandler* Handler;
-	
+			
 	wxString PhpFileExtensions;
 };
 
@@ -216,18 +214,11 @@ private:
 
 	void OnLintComplete(wxCommandEvent& event);
 	
-	void OnTimer(wxTimerEvent& event);
+	void OnTimer(wxCommandEvent& event);
 	
 	void OnFileSaved(wxCommandEvent& event);
 
 	LintBackgroundFileReaderClass LintBackgroundFileReader;
-	
-	/**
-	 * To increment the gauge smoothly.
-	 * 
-	 * @var wxTimer
-	 */
-	wxTimer Timer;
 
 	/**
 	 * This will hold all info about parse errors. This class will own 

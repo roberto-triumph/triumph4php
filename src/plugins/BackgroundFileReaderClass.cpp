@@ -22,13 +22,11 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-
 #include <plugins/BackgroundFileReaderClass.h>
 
 
-mvceditor::BackgroundFileReaderClass::BackgroundFileReaderClass(wxEvtHandler* handler)
-	: wxThreadHelper()
-	, Handler(handler)
+mvceditor::BackgroundFileReaderClass::BackgroundFileReaderClass(wxEvtHandler& handler)
+	: ThreadWithHeartbeatClass(handler)
 	, DirectorySearch()
 	, Mode(WALK) {
 }
@@ -64,6 +62,7 @@ bool mvceditor::BackgroundFileReaderClass::StartReading(StartError& error) {
 		else {
 			GetThread()->Run();
 			ret = true;
+			SignalStart();
 		}		
 	}
 	else {
@@ -102,7 +101,7 @@ void* mvceditor::BackgroundFileReaderClass::Entry() {
 			wxCommandEvent singleEvent(EVENT_FILE_READ, wxNewId());
 			singleEvent.SetInt(counter);
 			singleEvent.SetClientData((void*) res);
-			wxPostEvent(Handler, singleEvent);
+			wxPostEvent(&Handler, singleEvent);
 			isDestroy = GetThread()->TestDestroy();
 		}
 	}
@@ -116,7 +115,7 @@ void* mvceditor::BackgroundFileReaderClass::Entry() {
 			counter++;
 			wxCommandEvent singleEvent(EVENT_FILE_READ, wxNewId());
 			singleEvent.SetInt(counter);
-			wxPostEvent(Handler, singleEvent);
+			wxPostEvent(&Handler, singleEvent);
 			isDestroy = GetThread()->TestDestroy();
 		}
 	}
@@ -125,7 +124,8 @@ void* mvceditor::BackgroundFileReaderClass::Entry() {
 	// signal that the background thread has finished
 	wxCommandEvent endEvent(EVENT_FILE_READ_COMPLETE, wxNewId());
 	endEvent.SetInt(Mode);
-	Handler->AddPendingEvent(endEvent);
+	wxPostEvent(&Handler, endEvent);
+	SignalEnd();
 	return 0;
 }
 

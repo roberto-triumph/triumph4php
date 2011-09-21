@@ -18,7 +18,7 @@
 const int ID_MENU_FIND_IN_FILES = mvceditor::PluginClass::newMenuId();
 const int ID_FIND_IN_FILES_PROGRESS = wxNewId();
 
-mvceditor::FindInFilesBackgroundReaderClass::FindInFilesBackgroundReaderClass(wxEvtHandler* handler) 
+mvceditor::FindInFilesBackgroundReaderClass::FindInFilesBackgroundReaderClass(wxEvtHandler& handler) 
 : BackgroundFileReaderClass(handler) {
 
 }
@@ -79,12 +79,10 @@ bool mvceditor::FindInFilesBackgroundReaderClass::FileMatch(const wxString& file
 mvceditor::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* parent, NotebookClass* notebook, StatusBarWithGaugeClass* gauge)
 	: FindInFilesResultsPanelGeneratedClass(parent)
 	, FindInFiles()
-	, FindInFilesBackgroundFileReader(this)
-	, Timer()
+	, FindInFilesBackgroundFileReader(*this)
 	, Notebook(notebook)
 	, Gauge(gauge)
 	, MatchedFiles(0) {
-	Timer.SetOwner(this);
 	FindInFilesGaugeId = wxNewId();
 }
 
@@ -104,7 +102,6 @@ void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findI
 			EnableButtons(true, false);
 			Gauge->AddGauge(_("Find In Files"), FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE, 
 				wxGA_HORIZONTAL);
-			Timer.Start(200, wxTIMER_CONTINUOUS);
 		}
 		else if (error == mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING)  {
 			wxMessageBox(_("Find in files is already running. Please wait for it to finish."), _("Find In Files"));
@@ -198,7 +195,6 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxComman
 			Gauge->AddGauge(_("Find In Files"), FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE, 
 				wxGA_HORIZONTAL);
 			EnableButtons(true, false);
-			Timer.Start(200, wxTIMER_CONTINUOUS);
 		}
 		else if (error == mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING)  {
 			wxMessageBox(_("Find in files is already running. Please wait for it to finish."), _("Find In Files"));
@@ -244,7 +240,6 @@ void mvceditor::FindInFilesResultsPanelClass::OnFindInFilesComplete(wxCommandEve
 			SetStatus(_("Did not Replace. No Matches Were Found"));
 		}
 	}
-	Timer.Stop();
 }
 
 void mvceditor::FindInFilesResultsPanelClass::OnFileHit(wxCommandEvent& event) {
@@ -342,7 +337,7 @@ int mvceditor::FindInFilesResultsPanelClass::GetNumberOfMatchedFiles() {
 	return MatchedFiles;
 }
 
-void mvceditor::FindInFilesResultsPanelClass::OnTimer(wxTimerEvent& event) {
+void mvceditor::FindInFilesResultsPanelClass::OnTimer(wxCommandEvent& event) {
 	Gauge->IncrementGauge(FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE);	
 }
 
@@ -437,7 +432,7 @@ BEGIN_EVENT_TABLE(mvceditor::FindInFilesResultsPanelClass, FindInFilesResultsPan
 	EVT_COMMAND(wxID_ANY, EVENT_FILE_READ, mvceditor::FindInFilesResultsPanelClass::OnFileSearched)
 	EVT_COMMAND(ID_FIND_IN_FILES_PROGRESS, EVENT_FIND_IN_FILES_FILE_HIT, mvceditor::FindInFilesResultsPanelClass::OnFileHit)
 	EVT_COMMAND(wxID_ANY, EVENT_FILE_READ_COMPLETE, mvceditor::FindInFilesResultsPanelClass::OnFindInFilesComplete)
-	EVT_TIMER(wxID_ANY, mvceditor::FindInFilesResultsPanelClass::OnTimer)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::FindInFilesResultsPanelClass::OnTimer)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::FindInFilesPluginClass, wxEvtHandler)

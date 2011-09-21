@@ -22,14 +22,14 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __BACKGROUND_TASK_DRIVER_H__
-#define __BACKGROUND_TASK_DRIVER_H__
+#ifndef __BACKGROUNDFILEREADER_H__
+#define __BACKGROUNDFILEREADER_H__
 
 #include <wx/string.h>
-#include <wx/thread.h>
-#include <wx/window.h>
+#include <wx/event.h>
 #include <search/DirectorySearchClass.h>
-#include <widgets/StatusBarWithGaugeClass.h>
+#include <widgets/ThreadWithHeartbeatClass.h>
+
 
 namespace mvceditor {
 
@@ -62,8 +62,12 @@ extern const wxEventType EVENT_FILE_READ;
  * searching through a project's files) with the updating of a GUI element (such as displaying the
  * found hits).  This class is the "glue" between a background task and GUI element: It will start
  * up a wxThread. Note: Objects of this class will handle at most 1 concurrently running thread at a time.
+ * 
+ * TODO: make it so that multiple logic can be added to this class; as we ideally do not want
+ * to iterate through entire projects twice. It is better to open a file once and hand it to
+ * multiple workers than multiple workers attempting to open/close the same file multiple times.
  */
-class BackgroundFileReaderClass : public wxThreadHelper {
+class BackgroundFileReaderClass : public ThreadWithHeartbeatClass {
 
 public:
 
@@ -91,11 +95,13 @@ public:
 	};
 	
 	/**
-	 * @param wxEvtHandler* handler this event handler will receive
+	 * @param wxEvtHandler& handler this event handler will receive
 	 *        a EVENT_FILE_READ_COMPLETE event when the
-	 *        background thread has completed.
+	 *        background thread has completed. Will also receive
+	 * 		  mvceditor::WORK_* events 
+	 * @see mvceditor::ThreadWithHeartbeatClass
 	 */
-	BackgroundFileReaderClass(wxEvtHandler* handler);
+	BackgroundFileReaderClass(wxEvtHandler& handler);
 
 	/**
 	 * Prepare the background thread to iterate through all
@@ -154,12 +160,6 @@ protected:
 	void* Entry();
 
 private:
-
-	/**
-	 * Will get notified when the thread completes. This class will
-	 * NOT own the pointer (it will not DELETE the pointer).
-	 */
-	wxEvtHandler* Handler;
 
 	/**
 	 * The object that will be used to traverse the file system.
