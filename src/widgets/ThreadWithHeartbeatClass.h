@@ -48,7 +48,7 @@ extern const wxEventType EVENT_WORK_IN_PROGRESS;
  * This class is useful when displaying the status and percent completion to the
  * user. For now heartbeats will be at a constant rate.
  */
-class ThreadWithHeartbeatClass : public wxThreadHelper, public wxEvtHandler {
+class ThreadWithHeartbeatClass : public wxEvtHandler, public wxThreadHelper {
 
 public:
 	
