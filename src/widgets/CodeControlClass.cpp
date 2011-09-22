@@ -212,19 +212,20 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 		, CodeControlOptions(options)
 		, WordHighlightFinder()
 		, WordHighlightWord()
+		, CurrentInfo()
 		, Project(project)
-		, Document(NULL)
 		, WordHighlightPreviousIndex(-1)
 		, WordHighlightNextIndex(-1)
 		, WordHighlightStyle(0)
 		, ModifiedDialogOpen(false)
 		, WordHighlightIsWordHighlighted(false)
 		, DocumentMode(TEXT) {
-	
+	Document = NULL;
 	// we will handle right-click menu ourselves
 	UsePopUp(false);
 	SetYCaretPolicy(wxSTC_CARET_EVEN, 0);
 	ApplyPreferences();
+	
 }
 
 bool mvceditor::CodeControlClass::LoadAndTrackFile(const wxString& filename) {
@@ -681,7 +682,7 @@ void mvceditor::CodeControlClass::ApplyPreferences() {
 	}
 	if (mvceditor::CodeControlClass::SQL == DocumentMode) {
 		SetSqlOptions();		
-		Document = new mvceditor::SqlDocumentClass(Project);
+		Document = new mvceditor::SqlDocumentClass(Project, CurrentInfo);
 	}
 	else if (mvceditor::CodeControlClass::PHP == DocumentMode) {
 		SetPhpOptions();
@@ -1061,6 +1062,15 @@ void mvceditor::CodeControlClass::OnClose(wxCloseEvent& event) {
 	event.Skip();
 }
 
+void mvceditor::CodeControlClass::SetCurrentInfo(const mvceditor::DatabaseInfoClass& currentInfo) {
+	CurrentInfo.Copy(currentInfo);
+	
+	// if SQL document is active we need to change the currentInfo in that object
+	// but since C++ does has poor RTTI we dont know what type Document pointer currently is
+	// for now just refresh everything which will update CurrentInfo
+	ApplyPreferences();
+}
+
 mvceditor::TextDocumentClass::TextDocumentClass() {
 	
 }
@@ -1228,9 +1238,10 @@ std::vector<wxString> mvceditor::PhpDocumentClass::CollectNearMatchKeywords(wxSt
 	return matchedKeywords;
 }
 
-mvceditor::SqlDocumentClass::SqlDocumentClass(mvceditor::ProjectClass* project) 
+mvceditor::SqlDocumentClass::SqlDocumentClass(mvceditor::ProjectClass* project, const mvceditor::DatabaseInfoClass& currentInfo) 
 	: TextDocumentClass() 
-	, Project(project) {
+	, Project(project)
+	, CurrentInfo(currentInfo) {
 		
 }
 
@@ -1262,11 +1273,14 @@ std::vector<wxString> mvceditor::SqlDocumentClass::HandleAutoComplete(const wxSt
 		mvceditor::SqlResourceFinderClass* finder = Project->GetSqlResourceFinder();
 
 		// NO EXCEPTIONS MUST BE THROWN HERE...
-		// should not loop through all infos, should use the current info
-		std::vector<mvceditor::DatabaseInfoClass> infos = Project->DatabaseInfo();
-		for (std::vector<mvceditor::DatabaseInfoClass>::iterator it = infos.begin(); it != infos.end(); ++it) {
+		if (!CurrentInfo.Host.isEmpty()) {
 			UnicodeString error;
-			std::vector<UnicodeString> results = finder->FindTables(*it, word);
+			std::vector<UnicodeString> results = finder->FindTables(CurrentInfo, word);
+			for (size_t i = 0; i < results.size(); i++) {
+				wxString s = mvceditor::StringHelperClass::IcuToWx(results[i]);
+				autoCompleteList.push_back(s);
+			}
+			results = finder->FindColumns(CurrentInfo, word);
 			for (size_t i = 0; i < results.size(); i++) {
 				wxString s = mvceditor::StringHelperClass::IcuToWx(results[i]);
 				autoCompleteList.push_back(s);

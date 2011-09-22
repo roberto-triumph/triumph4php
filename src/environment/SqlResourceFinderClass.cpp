@@ -40,7 +40,10 @@ bool mvceditor::SqlResourceFinderClass::Fetch(const mvceditor::DatabaseInfoClass
 	soci::session session;
 	if (Query.Connect(session, error)) {
 		UnicodeString hash = Hash(info);
+		
+		// clear any cache for this info
 		Tables[hash].clear();
+		Columns[hash].clear();
 		try {
 			std::string schema = mvceditor::StringHelperClass::IcuToChar(info.DatabaseName);
 			std::string tableName;
@@ -49,31 +52,28 @@ bool mvceditor::SqlResourceFinderClass::Fetch(const mvceditor::DatabaseInfoClass
 			stmt.execute();
 			while (Query.More(stmt, ret, error)) {
 				UnicodeString uni = mvceditor::StringHelperClass::charToIcu(tableName.c_str());
-				Tables[hash].push_back(uni);
-				UnicodeString columnHash = Hash(info, uni);
-				
-				// clear any old columns for this table that were cached
-				Columns[columnHash].clear();
+				Tables[hash].push_back(uni);				
 			}
 			Query.Close(stmt);
 			if (ret) {
 				std::string columnName;
-				query = "SELECT table_name, column_name FROM information_schema.columns WHERE table_schema=(:schema)";
-				stmt = (session.prepare << query, soci::into(tableName), soci::into(columnName), soci::use(schema));
+				
+				// only getting unique columns names for now
+				// no need to know what tables they came from since we are not yet able to
+				// auto complete properly. proper auto complete would require a proper SQL lexer and parser
+				// and its not worth it for now
+				query = "SELECT DISTINCT column_name FROM information_schema.columns WHERE table_schema=(:schema)";
+				stmt = (session.prepare << query, soci::into(columnName), soci::use(schema));
 				stmt.execute();
 				while (Query.More(stmt, ret, error)) {
-					UnicodeString uniTable = mvceditor::StringHelperClass::charToIcu(tableName.c_str());
 					UnicodeString uniColumn = mvceditor::StringHelperClass::charToIcu(columnName.c_str());
-					UnicodeString hash = Hash(info, uniTable);
+					UnicodeString hash = Hash(info);
 					Columns[hash].push_back(uniColumn);
 				}
 				Query.Close(stmt);
 			}
 			std::sort(Tables[hash].begin(), Tables[hash].end());
-			for (std::map<UnicodeString, UnicodeStringVector, SqlResourceFinderUnicodeStringComparatorClass>::iterator it = Columns.begin(); it != Columns.end(); ++it) {
-				std::sort(it->second.begin(), it->second.end());
-			}
-			
+			std::sort(Columns[hash].begin(), Columns[hash].end());			
 		} 
 		catch (std::exception const& e) {
 			ret = false;
@@ -95,10 +95,9 @@ std::vector<UnicodeString> mvceditor::SqlResourceFinderClass::FindTables(const m
 	return ret;
 }
 
-std::vector<UnicodeString> mvceditor::SqlResourceFinderClass::FindColumns(const mvceditor::DatabaseInfoClass& info, const UnicodeString& tableName, 
-		const UnicodeString& partialColumnName) {
+std::vector<UnicodeString> mvceditor::SqlResourceFinderClass::FindColumns(const mvceditor::DatabaseInfoClass& info, const UnicodeString& partialColumnName) {
 	std::vector<UnicodeString> ret;
-	UnicodeString hash =  Hash(info, tableName);
+	UnicodeString hash =  Hash(info);
 	std::vector<UnicodeString> infoColumns = Columns[hash];
 	std::vector<UnicodeString>::iterator it = std::lower_bound(infoColumns.begin(), infoColumns.end(), partialColumnName);
 	while (it != infoColumns.end() && it->indexOf(partialColumnName) == 0) {
@@ -111,11 +110,5 @@ std::vector<UnicodeString> mvceditor::SqlResourceFinderClass::FindColumns(const 
 UnicodeString mvceditor::SqlResourceFinderClass::Hash(const mvceditor::DatabaseInfoClass& info) {
 	UnicodeString hash = info.Host + UNICODE_STRING_SIMPLE("--") + info.DatabaseName + UNICODE_STRING_SIMPLE("---") +
 		info.FileName;
-	return hash;
-}
-
-UnicodeString mvceditor::SqlResourceFinderClass::Hash(const mvceditor::DatabaseInfoClass& info, const UnicodeString& tableName) {
-	UnicodeString hash = info.Host + UNICODE_STRING_SIMPLE("--") + info.DatabaseName + UNICODE_STRING_SIMPLE("--") +
-		info.FileName + UNICODE_STRING_SIMPLE("--") + tableName;
 	return hash;
 }

@@ -347,18 +347,28 @@ void mvceditor::SqlBrowserPanelClass::OnQueryComplete(wxCommandEvent& event) {
 }
 
 void mvceditor::SqlBrowserPanelClass::UpdateLabels(const wxString& result) {
-	ConnectionLabel->SetLabel(wxString::Format(
-		wxT("%s@%s:%d"),
-		mvceditor::StringHelperClass::IcuToWx(Query.Info.User).c_str(),
-		mvceditor::StringHelperClass::IcuToWx(Query.Info.Host).c_str(),
-		Query.Info.Port
-	));
+	if (!Query.Info.Host.isEmpty()) {
+		ConnectionLabel->SetLabel(wxString::Format(
+			wxT("%s@%s:%d"),
+			mvceditor::StringHelperClass::IcuToWx(Query.Info.User).c_str(),
+			mvceditor::StringHelperClass::IcuToWx(Query.Info.Host).c_str(),
+			Query.Info.Port
+		));
+	}
+	else {
+		ConnectionLabel->SetLabel(_("No Connection is not configured."));
+	}
 	ResultsLabel->SetLabel(result);
 	ResultsLabel->GetContainingSizer()->Layout();
 }
 
 void mvceditor::SqlBrowserPanelClass::OnTimer(wxTimerEvent& event) {
 	Gauge->IncrementGauge(ID_SQL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
+}
+
+void mvceditor::SqlBrowserPanelClass::SetCurrentInfo(const mvceditor::DatabaseInfoClass& info) {
+	Query.Info.Copy(info);
+	CodeControl->SetCurrentInfo(info);
 }
 
 mvceditor::SqlMetaDataFetchClass::SqlMetaDataFetchClass(wxEvtHandler& handler)
@@ -436,11 +446,11 @@ void mvceditor::SqlBrowserPluginClass::OnProjectOpened() {
 }
 
 void mvceditor::SqlBrowserPluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
-	toolsMenu->Append(ID_SQL_EDITOR_MENU, _("SQL Browser"), _("Open a window for SQL browsing"),
+	toolsMenu->Append(ID_SQL_EDITOR_MENU, _("SQL Browser\tSHIFT+F9"), _("Open a window for SQL browsing"),
 		wxITEM_NORMAL);
-	toolsMenu->Append(ID_SQL_CONNECTION_MENU, _("SQL Connections"), _("Show & Pick The SQL Connections that this project uses"),
+	toolsMenu->Append(ID_SQL_CONNECTION_MENU, _("SQL Connections\tCTRL+F9"), _("Show & Pick The SQL Connections that this project uses"),
 		wxITEM_NORMAL);
-	toolsMenu->Append(ID_SQL_RUN_MENU, _("Run Queries in SQL Browser"), _("Execute the query that is currently in the SQL Browser"),
+	toolsMenu->Append(ID_SQL_RUN_MENU, _("Run Queries in SQL Browser\tF9"), _("Execute the query that is currently in the SQL Browser"),
 		wxITEM_NORMAL);
 }
 
@@ -449,6 +459,7 @@ void  mvceditor::SqlBrowserPluginClass::OnSqlBrowserToolsMenu(wxCommandEvent& ev
 	mvceditor::SqlQueryClass query;
 	if (ChosenIndex < Infos.size()) {
 		query.Info.Copy(Infos[ChosenIndex]);
+		ctrl->SetCurrentInfo(Infos[ChosenIndex]);
 	}
 	mvceditor::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetNotebook(), wxID_NEW, ctrl, GetStatusBarWithGauge(), query);
 	AddContentWindow(sqlPanel, _("SQL Browser"));
@@ -467,12 +478,19 @@ void mvceditor::SqlBrowserPluginClass::OnRun(wxCommandEvent& event) {
 void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event) {
 	mvceditor::SqlConnectionDialogClass dialog(GetMainWindow(), Infos, ChosenIndex, WasEmptyDetectedInfo);
 	if (dialog.ShowModal() == wxOK) {
-
-		// nothing for now .. won't update the SqlBrowserPanel connection label
-		// since that label shows with the data and it may confuse the user
-		// TODO need to update the existing opened panels
-		// but need to account for thread-safetyness
 		SqlMetaDataFetch.Read(&Infos, GetProject());
+		
+		// if connection changed need to update the code control so that it knows to use the new
+		// connection for auto completion purposes
+		// TODO update the currrent panel only ?
+		wxWindow* window = GetCurrentContentPane();
+		mvceditor::SqlBrowserPanelClass* panel = wxDynamicCast(window, mvceditor::SqlBrowserPanelClass);
+		if (panel) {
+			if (ChosenIndex < Infos.size()) {
+				panel->SetCurrentInfo(Infos[ChosenIndex]);
+			}
+			panel->UpdateLabels(wxT(""));			
+		}
 	}
 }
 

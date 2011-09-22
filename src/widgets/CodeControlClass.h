@@ -156,11 +156,13 @@ public:
 
 	/**
 	 * This class will NOT own this pointer. Caller must manage (delete) it.
+	 * @param project the current project
+	 * @param currentInfo the connection to fetch database metadata for (auto completion)
 	 */
-	SqlDocumentClass(ProjectClass* project);
+	SqlDocumentClass(ProjectClass* project, const DatabaseInfoClass& currentInfo);
 
 	/**
-	 * Will enable auto complete for SQL keywords
+	 * Will enable auto complete for SQL keywords and SQL table metadata
 	 */
 	virtual bool CanAutoComplete();
 	
@@ -175,6 +177,8 @@ private:
 	 * This class will NOT own this pointer
 	 */
 	ProjectClass*  Project;
+	
+	DatabaseInfoClass CurrentInfo;
 };
 
 /**
@@ -374,6 +378,11 @@ public:
 	 * results. Markings are moved from this window only.
 	 */
 	void ClearLintErrors();
+
+	/**
+	 * Set the connection to use to fetch the SQL table metadata
+	 */
+	void SetCurrentInfo(const DatabaseInfoClass& other);
 	
 private:
 
@@ -576,6 +585,11 @@ private:
 	  * Used by the word highlight feature. The word being searched.
 	  */
 	 UnicodeString WordHighlightWord;
+	 
+	 /**
+	  * The connection to use to fetch the SQL table metadata.
+	  */
+	 DatabaseInfoClass CurrentInfo;
 
 	/**
 	  * To help with autocompletion and keywords

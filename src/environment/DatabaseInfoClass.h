@@ -104,6 +104,12 @@ public:
 	 * copy the attributes from src to this object.
 	 */
 	void Copy(const DatabaseInfoClass& src);
+	
+	/**
+	 * @return true if this info is the "equal to" another; equality is not
+	 * based on pointers it is based on host and database name
+	 */
+	bool SameAs(const DatabaseInfoClass& other);
 };
 
 /**

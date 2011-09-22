@@ -63,6 +63,10 @@ void mvceditor::DatabaseInfoClass::Copy(const mvceditor::DatabaseInfoClass& src)
 	Port = src.Port;
 }
 
+bool mvceditor::DatabaseInfoClass::SameAs(const mvceditor::DatabaseInfoClass& other) {
+	return Host.caseCompare(other.Host, 0) == 0 && DatabaseName.caseCompare(other.DatabaseName, 0) == 0;
+}
+
 mvceditor::SqlQueryClass::SqlQueryClass()
 	: Info() {
 }

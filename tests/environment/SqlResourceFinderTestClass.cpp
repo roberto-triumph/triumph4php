@@ -119,14 +119,16 @@ TEST_FIXTURE(MySqlFixtureClass, FindColumns) {
 	UnicodeString error;
 	CHECK(Finder.Fetch(Info, error));
 	
-	std::vector<UnicodeString> columns = Finder.FindColumns(Info, UNICODE_STRING_SIMPLE("service_names"), UNICODE_STRING_SIMPLE("id"));
+	std::vector<UnicodeString> columns = Finder.FindColumns(Info, UNICODE_STRING_SIMPLE("idServiceL"));
 	CHECK_EQUAL((size_t)1, columns.size());
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("idServiceName").compare(columns.at(0)), (int8_t)0);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("idServiceLocation").compare(columns.at(0)), (int8_t)0);
 	
-	columns = Finder.FindColumns(Info, UNICODE_STRING_SIMPLE("deleted_users"), UNICODE_STRING_SIMPLE("id"));
-	CHECK_EQUAL((size_t)2, columns.size());	
+	columns = Finder.FindColumns(Info, UNICODE_STRING_SIMPLE("id"));
+	CHECK_EQUAL((size_t)4, columns.size());	
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("idDeletedBy").compare(columns.at(0)), (int8_t)0);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("idUser").compare(columns.at(1)), (int8_t)0);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("idServiceLocation").compare(columns.at(1)), (int8_t)0);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("idServiceName").compare(columns.at(2)), (int8_t)0);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("idUser").compare(columns.at(3)), (int8_t)0);
 	
 }
 	 

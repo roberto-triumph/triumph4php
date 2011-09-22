@@ -66,14 +66,14 @@ public:
 	std::vector<UnicodeString> FindTables(const DatabaseInfoClass& info, const UnicodeString& partialTableName);
 	
 	/**
+	 * Searches ALL columns of ALL tables.
 	 * @param info the connection to search in. only tables from this connection will be returned
-	 * @param tableName only columns from this table will be returned. tableName cannot be empty
 	 * @param partialColumnName column name to search for
 	 * @return vector<UnicodeString> all table names that start with the partial table name
 	 * will return empty vector when table name is empty
 	 * returned column names will be sorted in ascending order
 	 */
-	std::vector<UnicodeString> FindColumns(const DatabaseInfoClass& info, const UnicodeString& tableName, const UnicodeString& partialColumnName);
+	std::vector<UnicodeString> FindColumns(const DatabaseInfoClass& info, const UnicodeString& partialColumnName);
 	
 	private:
 
@@ -88,13 +88,6 @@ public:
 	 * have to keep a pointer to the info around.
 	 */
 	UnicodeString Hash(const DatabaseInfoClass& info);
-	
-	/**
-	 * turn the info AND table into a string that way we can link tables to a connection and we don't 
-	 * have to keep a pointer to the info around. This hash is useful to quickly lookup
-	 * columns.
-	 */
-	UnicodeString Hash(const DatabaseInfoClass& info, const UnicodeString& tableName);
 	
 	/**
 	 * To make the queries

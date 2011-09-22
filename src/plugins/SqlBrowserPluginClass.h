@@ -121,6 +121,17 @@ public:
 	 * When a query has finished running display the results in the grid
 	 */
 	void OnQueryComplete(wxCommandEvent& event);
+	
+	/**
+	 * signal to this panel that the user changed the connection.
+	 */
+	void SetCurrentInfo(const DatabaseInfoClass& info);
+	
+	/**
+	 * Sets the connection label and the result label.
+	 * This is how the user knows what connection is being used by this panel.
+	 */
+	void UpdateLabels(const wxString& result);
 
 protected:
 
@@ -137,8 +148,6 @@ private:
 	 * and will return true if all values are valid
 	 */
 	bool Check();
-	
-	void UpdateLabels(const wxString& result);
 	
 	/**
 	 * cleans up the current query and closes the connection
