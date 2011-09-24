@@ -79,7 +79,7 @@
             <event name="OnSetFocus"></event>
             <event name="OnSize"></event>
             <event name="OnUpdateUI"></event>
-            <object class="wxBoxSizer" expanded="0">
+            <object class="wxBoxSizer" expanded="1">
                 <property name="minimum_size"></property>
                 <property name="name">Sizer</property>
                 <property name="orient">wxVERTICAL</property>
@@ -120,7 +120,7 @@
                         <event name="OnAuiNotebookButton"></event>
                         <event name="OnAuiNotebookDragMotion"></event>
                         <event name="OnAuiNotebookEndDrag"></event>
-                        <event name="OnAuiNotebookPageChanged"></event>
+                        <event name="OnAuiNotebookPageChanged">OnContentNotebookPageChanged</event>
                         <event name="OnAuiNotebookPageChanging"></event>
                         <event name="OnAuiNotebookPageClose"></event>
                         <event name="OnChar"></event>

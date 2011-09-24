@@ -158,13 +158,6 @@ public:
 	CodeControlClass* GetCurrentCodeControl() const;
 	
 	/**
-	 * Get the currently visible content pane. This may return NULL if the notebook is empty.
-	 * 
-	 * @return wxWindow* do not DELETE the returned pointer 
-	 */
-	wxWindow* GetCurrentContentPane() const;
-	
-	/**
 	 * Closes all open pages.
 	 */
 	void CloseAllPages();

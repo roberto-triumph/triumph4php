@@ -13,6 +13,7 @@
 
 BEGIN_EVENT_TABLE( AppFrameGeneratedClass, wxFrame )
 	EVT_CLOSE( AppFrameGeneratedClass::_wxFB_OnClose )
+	EVT_AUINOTEBOOK_PAGE_CHANGED( ID_NOTEBOOK, AppFrameGeneratedClass::_wxFB_OnContentNotebookPageChanged )
 	EVT_MENU( wxID_NEW, AppFrameGeneratedClass::_wxFB_OnFileNew )
 	EVT_MENU( wxID_OPEN, AppFrameGeneratedClass::_wxFB_OnFileOpen )
 	EVT_MENU( wxID_SAVE, AppFrameGeneratedClass::_wxFB_OnFileSave )

@@ -16,16 +16,7 @@ SqlBrowserPanelGeneratedClass::SqlBrowserPanelGeneratedClass( wxWindow* parent, 
 	wxBoxSizer* BoxSizer;
 	BoxSizer = new wxBoxSizer( wxHORIZONTAL );
 	
-	Splitter = new wxSplitterWindow( this, ID_SPLITTER, wxDefaultPosition, wxDefaultSize, wxSP_3D );
-	Splitter->Connect( wxEVT_IDLE, wxIdleEventHandler( SqlBrowserPanelGeneratedClass::SplitterOnIdle ), NULL, this );
-	
-	CodeControlPanel = new wxPanel( Splitter, ID_CODECONTROLPANEL, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
-	CodeControlPanelSizer = new wxBoxSizer( wxHORIZONTAL );
-	
-	CodeControlPanel->SetSizer( CodeControlPanelSizer );
-	CodeControlPanel->Layout();
-	CodeControlPanelSizer->Fit( CodeControlPanel );
-	BottomPanel = new wxPanel( Splitter, ID_BOTTOMPANLE, wxDefaultPosition, wxDefaultSize, wxRAISED_BORDER|wxTAB_TRAVERSAL );
+	BottomPanel = new wxPanel( this, ID_BOTTOMPANLE, wxDefaultPosition, wxDefaultSize, 0 );
 	wxBoxSizer* BottomGridSizer;
 	BottomGridSizer = new wxBoxSizer( wxVERTICAL );
 	
@@ -85,8 +76,7 @@ SqlBrowserPanelGeneratedClass::SqlBrowserPanelGeneratedClass( wxWindow* parent, 
 	BottomPanel->SetSizer( BottomGridSizer );
 	BottomPanel->Layout();
 	BottomGridSizer->Fit( BottomPanel );
-	Splitter->SplitHorizontally( CodeControlPanel, BottomPanel, 251 );
-	BoxSizer->Add( Splitter, 1, wxEXPAND, 5 );
+	BoxSizer->Add( BottomPanel, 1, wxEXPAND | wxALL, 5 );
 	
 	this->SetSizer( BoxSizer );
 	this->Layout();

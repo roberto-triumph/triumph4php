@@ -242,7 +242,7 @@ void mvceditor::RunConsolePluginClass::OnRunFileAsCli(wxCommandEvent& event) {
 		
 		// right now dont really care which window, just want to reuse an existing one. that's why all windows
 		// are created with the same ID
-		wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_CONSOLE, GetToolsParentWindow());
+		wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_CONSOLE, GetToolsNotebook());
 		if (NULL != window) {
 			RunConsolePanelClass* runConsolePanel = (RunConsolePanelClass*)window;
 			
@@ -257,7 +257,7 @@ void mvceditor::RunConsolePluginClass::OnRunFileAsCli(wxCommandEvent& event) {
 			}
 		}
 		else {
-			RunConsolePanelClass* runConsolePanel = new RunConsolePanelClass(GetToolsParentWindow(), GetEnvironment(), 
+			RunConsolePanelClass* runConsolePanel = new RunConsolePanelClass(GetToolsNotebook(), GetEnvironment(), 
 				GetStatusBarWithGauge(), ID_WINDOW_CONSOLE);	
 			if (AddToolsWindow(runConsolePanel, _("Run"))) {
 				runConsolePanel->SetToRunFile(code->GetFileName());
@@ -275,7 +275,7 @@ void mvceditor::RunConsolePluginClass::OnRunFileAsCli(wxCommandEvent& event) {
 void mvceditor::RunConsolePluginClass::OnRunFileAsCliInNewWindow(wxCommandEvent& event) {
 	CodeControlClass* code = GetCurrentCodeControl();
 	if (code) {
-		RunConsolePanelClass* window = new RunConsolePanelClass(GetToolsParentWindow(), GetEnvironment(), 
+		RunConsolePanelClass* window = new RunConsolePanelClass(GetToolsNotebook(), GetEnvironment(), 
 			GetStatusBarWithGauge(), ID_WINDOW_CONSOLE);
 		if (AddToolsWindow(window, _("Run"))) {
 			window->SetToRunFile(code->GetFileName());

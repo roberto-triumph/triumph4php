@@ -134,7 +134,7 @@ private:
 	 * Change the state of various menus / buttons
 	 * when page is changed.
 	 */
-	void PhpSourceCodeCtrlPageChanged(wxAuiNotebookEvent& event);
+	void OnContentNotebookPageChanged(wxAuiNotebookEvent& event);
 
 	/**
 	 * Save the currently active tab.

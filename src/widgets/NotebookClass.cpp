@@ -52,13 +52,6 @@ mvceditor::CodeControlClass* mvceditor::NotebookClass::GetCurrentCodeControl() c
 	return GetCodeControl(GetSelection());
 }
 
-wxWindow* mvceditor::NotebookClass::GetCurrentContentPane() const {
-	
-	// avoid assertions when there are no tabs
-	size_t selection = GetSelection();
-	return selection < GetPageCount() ? GetPage(selection) : NULL;
-}
-
 void mvceditor::NotebookClass::SavePageIfModified(wxAuiNotebookEvent& event) {
 	int currentPage = event.GetSelection();
 	CodeControlClass* codeCtrl = GetCodeControl(currentPage);

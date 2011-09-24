@@ -132,6 +132,14 @@ public:
 	 * This is how the user knows what connection is being used by this panel.
 	 */
 	void UpdateLabels(const wxString& result);
+	
+	/**
+	 * Returns TRUE if the the given window is the same as the the code control
+	 * given in the constructor.  This way we can know if a result panel
+	 * is tied to the given window. (this panel will execute the SQL that is
+	 * in the control panel when the user runs the query).
+	 */
+	bool IsLinkedTo(CodeControlClass* window);
 
 protected:
 
@@ -270,6 +278,16 @@ private:
 	void OnWorkInProgress(wxCommandEvent& event);
 	
 	void OnWorkComplete(wxCommandEvent& event);
+	
+	SqlBrowserPanelClass* CreateResultsPanel(CodeControlClass* ctrl);
+	
+	/**
+	 * synchronize the SQL query tab in the code control notebook with
+	 * the results tool notebook.  Will switch the page of the
+	 * tools notebook to show the results panel that was created with
+	 * the currently shown code control.
+	 */
+	void OnContentNotebookPageChanged(wxAuiNotebookEvent& event);
 	
 	std::vector<DatabaseInfoClass> Infos;
 	

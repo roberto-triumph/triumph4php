@@ -45,6 +45,7 @@ mvceditor::ResourcePluginClass::ResourcePluginClass()
 	, HasCodeLookups(false)
 	, HasFileLookups(false) {
 	Timer.SetOwner(this);
+	ResourcePluginPanel = NULL;
 }
 
 void mvceditor::ResourcePluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
@@ -59,8 +60,8 @@ void mvceditor::ResourcePluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 }
 
 void mvceditor::ResourcePluginClass::AddWindows() {
-	ResourcePluginPanelClass* panel = new ResourcePluginPanelClass(GetMainWindow(), *this, GetNotebook());
-	AuiManager->AddPane(panel, wxAuiPaneInfo().Top(
+	ResourcePluginPanel = new ResourcePluginPanelClass(GetMainWindow(), *this);
+	AuiManager->AddPane(ResourcePluginPanel, wxAuiPaneInfo().Top(
 		).CaptionVisible(false).CloseButton(false).Gripper(
 		false).DockFixed(true).PaneBorder(false).Floatable(
 		false).Row(2));
@@ -76,6 +77,9 @@ void mvceditor::ResourcePluginClass::OnProjectOpened() {
 }
 
 void mvceditor::ResourcePluginClass::SearchForResources() {
+	// ATTN: resource parsing is done in the main thread.
+	// there is no mechanism for thread safe access to resource finder.
+	// at some point, use BackgroundFileReaderClass
 	if (GetProject() && !GetProject()->GetRootPath().IsEmpty()) {
 		if (FREE == State) { //prevent two finds at a time
 			ResourceFinderClass* resourceFinder = GetResourceFinder();
@@ -307,7 +311,6 @@ void mvceditor::ResourcePluginClass::LoadPageFromResourceFinder(ResourceFinderCl
 
 void mvceditor::ResourcePluginClass::OnUpdateUi(wxUpdateUIEvent& event) {
 	ProjectIndexMenu->Enable(GetProject() && FREE == State);
-
 	event.Skip();
 }
 
@@ -337,28 +340,33 @@ void mvceditor::ResourcePluginClass::OnTimer(wxTimerEvent& event) {
 	GetStatusBarWithGauge()->IncrementGauge(ID_COUNT_FILES_GAUGE, StatusBarWithGaugeClass::INDETERMINATE_MODE);
 }
 
-mvceditor::ResourcePluginPanelClass::ResourcePluginPanelClass(wxWindow* parent, ResourcePluginClass& resource, NotebookClass* notebook)
+void mvceditor::ResourcePluginClass::OnPageChanged(wxAuiNotebookEvent& event) {
+	size_t selection =  event.GetSelection();
+	CodeControlClass* code = GetNotebook()->GetCodeControl(selection);
+	if (code) {
+		wxString fileName = code->GetFileName();
+		ResourcePluginPanel->ChangeToFileName(fileName);
+	}
+	event.Skip();
+}
+
+void mvceditor::ResourcePluginClass::OnPageClosed(wxAuiNotebookEvent& event) {
+	ResourcePluginPanel->RemoveClosedFiles(GetNotebook());
+	event.Skip();
+}
+
+void mvceditor::ResourcePluginClass::OpenFile(wxString fileName) {
+	GetNotebook()->LoadPage(fileName);
+}
+
+mvceditor::ResourcePluginPanelClass::ResourcePluginPanelClass(wxWindow* parent, ResourcePluginClass& resource)
 	: ResourcePluginGeneratedPanelClass(parent, ID_RESOURCE_PLUGIN_PANEL)
-	, ResourcePlugin(resource)
-	, Notebook(notebook) {
+	, ResourcePlugin(resource) {
 	wxGenericValidator filesComboValidator(&ResourcePlugin.JumpToText);
 	FilesCombo->SetValidator(filesComboValidator);
 	
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
-		
-	// lets capture the notebook events so we can update the combo box
-	Notebook->Connect(Notebook->GetId(), wxID_ANY, wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, 
-		wxAuiNotebookEventHandler(ResourcePluginPanelClass::OnPageChanged), NULL, this);
-	Notebook->Connect(Notebook->GetId(), wxID_ANY, wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSED, 
-		wxAuiNotebookEventHandler(ResourcePluginPanelClass::OnPageClosed), NULL, this);
-}
-
-void mvceditor::ResourcePluginPanelClass::OnClose(wxCloseEvent& event) {
-	Notebook->Disconnect(Notebook->GetId(), wxID_ANY, wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED,
-		wxAuiNotebookEventHandler(ResourcePluginPanelClass::OnPageChanged), NULL, this);
-	Notebook->Disconnect(Notebook->GetId(), wxID_ANY, wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSED, 
-		wxAuiNotebookEventHandler(ResourcePluginPanelClass::OnPageClosed), NULL, this);
 }
 
 void mvceditor::ResourcePluginPanelClass::FocusOnSearchControl() {
@@ -375,7 +383,7 @@ void mvceditor::ResourcePluginPanelClass::OnFilesComboCombobox(wxCommandEvent& e
 		wxString fullPath = FilesCombo->GetValue();
 		wxFileName fileName(fullPath);
 		if (fileName.Normalize() && wxFileName::IsFileReadable(fileName.GetFullPath())) {
-			Notebook->LoadPage(fileName.GetFullPath());
+			ResourcePlugin.OpenFile(fileName.GetFullPath());
 		}
 		else {
 			ResourcePlugin.SearchForResources();
@@ -392,7 +400,7 @@ void mvceditor::ResourcePluginPanelClass::OnFilesComboTextEnter(wxCommandEvent& 
 		wxString fullPath = FilesCombo->GetValue();
 		wxFileName fileName(fullPath);
 		if (fileName.Normalize() && wxFileName::IsFileReadable(fileName.GetFullPath())) {
-			Notebook->LoadPage(fileName.GetFullPath());
+			ResourcePlugin.OpenFile(fileName.GetFullPath());
 		}
 		else {
 			ResourcePlugin.SearchForResources();
@@ -425,28 +433,25 @@ void mvceditor::ResourcePluginPanelClass::OnHelpButtonClick(wxCommandEvent& even
 	wxMessageBox(help, _("Help"), wxOK);	
 }
 
-void mvceditor::ResourcePluginPanelClass::OnPageChanged(wxAuiNotebookEvent& event) {
-	size_t selection =  event.GetSelection();
-	CodeControlClass* code = Notebook->GetCodeControl(selection);
-	if (code) {
-		wxString fileName = code->GetFileName();
-		
-		// for now let's ignore the new (untitled) files
-		if (!fileName.IsEmpty()) {
-			FilesCombo->SetValue(fileName);
-			wxArrayString values = FilesCombo->GetStrings();
-			int foundIndex = values.Index(fileName);
-			if (foundIndex == wxNOT_FOUND) {		
-				FilesCombo->Append(fileName);	
-			}
+void mvceditor::ResourcePluginPanelClass::ChangeToFileName(wxString fileName) {
+
+	// for now let's ignore the new (untitled) files
+	if (!fileName.IsEmpty()) {
+		FilesCombo->SetValue(fileName);
+		wxArrayString values = FilesCombo->GetStrings();
+		int foundIndex = values.Index(fileName);
+		if (foundIndex == wxNOT_FOUND) {		
+			FilesCombo->Append(fileName);	
 		}
 	}
-	
+	else {
+		FilesCombo->SetValue(wxEmptyString);
+	}
 }
 
-void mvceditor::ResourcePluginPanelClass::OnPageClosed(wxAuiNotebookEvent& event) {
+void mvceditor::ResourcePluginPanelClass::RemoveClosedFiles(mvceditor::NotebookClass* notebook) {
 	int MAX_ITEMS = 18;
-	int pageCount = Notebook->GetPageCount();
+	int pageCount = notebook->GetPageCount();
 	if (pageCount <= 0) {
 		FilesCombo->SetValue(wxEmptyString);
 	}
@@ -457,8 +462,8 @@ void mvceditor::ResourcePluginPanelClass::OnPageClosed(wxAuiNotebookEvent& event
 	for (size_t i = 0; i < FilesCombo->GetCount() && FilesCombo->GetCount() > (size_t)MAX_ITEMS; ++i) {
 		wxString fileName = FilesCombo->GetString(i);
 		bool found = false;
-		for(size_t j = 0; j < Notebook->GetPageCount(); ++j) {
-			CodeControlClass* code = Notebook->GetCodeControl(j);
+		for(size_t j = 0; j < notebook->GetPageCount(); ++j) {
+			CodeControlClass* code = notebook->GetCodeControl(j);
 			if (NULL != code) {
 				if (fileName == code->GetFileName()) {
 					found = true;
@@ -473,7 +478,6 @@ void mvceditor::ResourcePluginPanelClass::OnPageClosed(wxAuiNotebookEvent& event
 			--i;
 		}
 	}
-	event.Skip();
 }
 
 BEGIN_EVENT_TABLE(mvceditor::ResourcePluginClass, wxEvtHandler)
@@ -483,8 +487,6 @@ BEGIN_EVENT_TABLE(mvceditor::ResourcePluginClass, wxEvtHandler)
 	EVT_MENU(ID_MENU_INDEX, mvceditor::ResourcePluginClass::OnProjectIndex)
 	EVT_UPDATE_UI(wxID_ANY, mvceditor::ResourcePluginClass::OnUpdateUi)
 	EVT_TIMER(wxID_ANY, mvceditor::ResourcePluginClass::OnTimer)
-END_EVENT_TABLE()
-
-BEGIN_EVENT_TABLE(mvceditor::ResourcePluginPanelClass, ResourcePluginGeneratedPanelClass)
-	EVT_CLOSE(mvceditor::ResourcePluginPanelClass::OnClose)
+	EVT_AUINOTEBOOK_PAGE_CHANGED(wxID_ANY, mvceditor::ResourcePluginClass::OnPageChanged)
+	EVT_AUINOTEBOOK_PAGE_CLOSED(wxID_ANY, mvceditor::ResourcePluginClass::OnPageClosed)
 END_EVENT_TABLE()

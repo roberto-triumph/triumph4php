@@ -111,11 +111,11 @@ bool mvceditor::PluginClass::AddToolsWindow(wxWindow* window, wxString name) {
 }
 
 wxWindow* mvceditor::PluginClass::FindToolsWindow(int windowId) const {
-	return wxWindow::FindWindowById(windowId, GetToolsParentWindow());
+	return wxWindow::FindWindowById(windowId, GetToolsNotebook());
 }
 
 bool mvceditor::PluginClass::IsToolsWindowSelected(int windowId) const {
-	wxWindow* window = wxWindow::FindWindowById(windowId, GetToolsParentWindow());
+	wxWindow* window = wxWindow::FindWindowById(windowId, GetToolsNotebook());
 	int windowIndex = ToolsNotebook->GetPageIndex(window); 
 	return windowIndex != wxNOT_FOUND && windowIndex == ToolsNotebook->GetSelection();
 }
@@ -130,11 +130,7 @@ mvceditor::CodeControlClass* mvceditor::PluginClass::GetCurrentCodeControl() con
 	return Notebook->GetCurrentCodeControl();
 }
 
-wxWindow*  mvceditor::PluginClass::GetCurrentContentPane() const {
-	return Notebook->GetCurrentContentPane();
-}
-
-wxWindow* mvceditor::PluginClass::GetToolsParentWindow() const {
+wxAuiNotebook* mvceditor::PluginClass::GetToolsNotebook() const {
 	return ToolsNotebook;
 }
 

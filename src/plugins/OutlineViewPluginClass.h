@@ -63,11 +63,6 @@ public:
 	 * Creates a new OutlineViewPlugin.
 	 */
 	OutlineViewPluginClass();
-	
-	/**
-	 * Destructor. Disconnects from all events
-	 */
-	~OutlineViewPluginClass();
 
 	/**
 	 * This plugin will have a tools menu entry
@@ -167,13 +162,7 @@ private:
 	/**
 	 * Updates the outlines based on the currently opened (and focused) file.
 	*/
-	void OnPageChanged(wxAuiNotebookEvent& event);
-
-	/**
-	 * flag to tell if we have connected to notebook events
-	 * when cleaning up, we can only disconnect when we have actually connected to the events
-	 */
-	bool Connected;
+	void OnContentNotebookPageChanged(wxAuiNotebookEvent& event);
 	
 	DECLARE_EVENT_TABLE()
 };

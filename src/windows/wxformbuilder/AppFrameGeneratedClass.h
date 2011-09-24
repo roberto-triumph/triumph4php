@@ -48,6 +48,7 @@ class AppFrameGeneratedClass : public wxFrame
 		
 		// Private event handlers
 		void _wxFB_OnClose( wxCloseEvent& event ){ OnClose( event ); }
+		void _wxFB_OnContentNotebookPageChanged( wxAuiNotebookEvent& event ){ OnContentNotebookPageChanged( event ); }
 		void _wxFB_OnFileNew( wxCommandEvent& event ){ OnFileNew( event ); }
 		void _wxFB_OnFileOpen( wxCommandEvent& event ){ OnFileOpen( event ); }
 		void _wxFB_OnFileSave( wxCommandEvent& event ){ OnFileSave( event ); }
@@ -90,6 +91,7 @@ class AppFrameGeneratedClass : public wxFrame
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnContentNotebookPageChanged( wxAuiNotebookEvent& event ) { event.Skip(); }
 		virtual void OnFileNew( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFileOpen( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFileSave( wxCommandEvent& event ) { event.Skip(); }

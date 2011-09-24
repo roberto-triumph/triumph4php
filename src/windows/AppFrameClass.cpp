@@ -310,7 +310,7 @@ void mvceditor::AppFrameClass::DisableSave(wxStyledTextEvent& event) {
 	Notebook->MarkPageAsNotModified(event.GetId());
 }
 
-void mvceditor::AppFrameClass::PhpSourceCodeCtrlPageChanged(wxAuiNotebookEvent& event) {
+void mvceditor::AppFrameClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& event) {
 	int newPage = event.GetSelection();
 	bool isPageModified = Notebook->IsPageModified(newPage);
 	ToolBar->EnableTool(ID_TOOLBAR_SAVE, isPageModified);
@@ -564,8 +564,6 @@ BEGIN_EVENT_TABLE(mvceditor::AppFrameClass,  AppFrameGeneratedClass)
 	EVT_STC_SAVEPOINTREACHED(wxID_ANY, mvceditor::AppFrameClass::DisableSave)
 	EVT_STC_SAVEPOINTLEFT(wxID_ANY, mvceditor::AppFrameClass::EnableSave)
 	EVT_STC_UPDATEUI(wxID_ANY, mvceditor::AppFrameClass::OnCodeControlUpdate)
-	EVT_AUINOTEBOOK_PAGE_CHANGED(ID_NOTEBOOK, 
-			mvceditor::AppFrameClass::PhpSourceCodeCtrlPageChanged)
 	EVT_UPDATE_UI(wxID_ANY, mvceditor::AppFrameClass::OnUpdateUi)
 	EVT_CONTEXT_MENU(mvceditor::AppFrameClass::OnContextMenu)
 	EVT_MENU(wxID_UNDO, mvceditor::AppFrameClass::OnUndo)

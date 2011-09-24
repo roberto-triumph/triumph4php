@@ -420,7 +420,7 @@ void mvceditor::FindInFilesPluginClass::OnEditFindInFiles(wxCommandEvent& event)
 	}
 	FindInFilesDialogClass dialog(NULL, *this);
 	if (dialog.ShowModal() == wxID_OK) {
-		mvceditor::FindInFilesResultsPanelClass* panel = new mvceditor::FindInFilesResultsPanelClass(GetToolsParentWindow(), 
+		mvceditor::FindInFilesResultsPanelClass* panel = new mvceditor::FindInFilesResultsPanelClass(GetToolsNotebook(), 
 			GetNotebook(), GetStatusBarWithGauge());		
 		if(AddToolsWindow(panel, _("Find In Files Results"))) {
 			panel->Find(PreviousFindInFiles, PreviousFindPath);

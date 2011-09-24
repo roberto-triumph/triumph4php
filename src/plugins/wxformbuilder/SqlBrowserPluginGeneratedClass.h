@@ -8,16 +8,15 @@
 #ifndef __SqlBrowserPluginGeneratedClass__
 #define __SqlBrowserPluginGeneratedClass__
 
-#include <wx/sizer.h>
+#include <wx/string.h>
+#include <wx/stattext.h>
 #include <wx/gdicmn.h>
-#include <wx/panel.h>
 #include <wx/font.h>
 #include <wx/colour.h>
 #include <wx/settings.h>
-#include <wx/string.h>
-#include <wx/stattext.h>
+#include <wx/sizer.h>
 #include <wx/grid.h>
-#include <wx/splitter.h>
+#include <wx/panel.h>
 #include <wx/listbox.h>
 #include <wx/textctrl.h>
 #include <wx/spinctrl.h>
@@ -37,17 +36,12 @@ class SqlBrowserPanelGeneratedClass : public wxPanel
 		enum
 		{
 			ID_PANEL = 1000,
-			ID_SPLITTER,
-			ID_CODECONTROLPANEL,
 			ID_BOTTOMPANLE,
 			ID_CONNECTIONLABEL,
 			ID_RESULTSLABEL,
 			ID_DATAGRID,
 		};
 		
-		wxSplitterWindow* Splitter;
-		wxPanel* CodeControlPanel;
-		wxBoxSizer* CodeControlPanelSizer;
 		wxPanel* BottomPanel;
 		wxStaticText* ConnectionLabel;
 		wxStaticText* ResultsLabel;
@@ -57,12 +51,6 @@ class SqlBrowserPanelGeneratedClass : public wxPanel
 		
 		SqlBrowserPanelGeneratedClass( wxWindow* parent, wxWindowID id = ID_PANEL, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 830,490 ), long style = wxTAB_TRAVERSAL );
 		~SqlBrowserPanelGeneratedClass();
-		
-		void SplitterOnIdle( wxIdleEvent& )
-		{
-			Splitter->SetSashPosition( 251 );
-			Splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( SqlBrowserPanelGeneratedClass::SplitterOnIdle ), NULL, this );
-		}
 	
 };
 

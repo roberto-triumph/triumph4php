@@ -221,7 +221,7 @@ void mvceditor::LintPluginClass::OnLintMenu(wxCommandEvent& event) {
 				SetFocusToToolsWindow(lintResultsPanel);
 			}
 			else {
-				lintResultsPanel = new LintResultsPanelClass(GetToolsParentWindow(), ID_LINT_RESULTS_PANEL, GetNotebook(), LintErrors);
+				lintResultsPanel = new LintResultsPanelClass(GetToolsNotebook(), ID_LINT_RESULTS_PANEL, GetNotebook(), LintErrors);
 				AddToolsWindow(lintResultsPanel, _("Lint Check"));
 				SetFocusToToolsWindow(lintResultsPanel);
 			}
@@ -285,7 +285,7 @@ void mvceditor::LintPluginClass::OnFileSaved(wxCommandEvent &event) {
 		// handle the case where user has saved a file but has not clicked
 		// on the Lint project button.
 		if (!window) {
-			lintResultsPanel = new LintResultsPanelClass(GetToolsParentWindow(), ID_LINT_RESULTS_PANEL, GetNotebook(), LintErrors);
+			lintResultsPanel = new LintResultsPanelClass(GetToolsNotebook(), ID_LINT_RESULTS_PANEL, GetNotebook(), LintErrors);
 			AddToolsWindow(lintResultsPanel, _("Lint Check"));
 			SetFocusToToolsWindow(lintResultsPanel);
 		}

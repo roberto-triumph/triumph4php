@@ -293,20 +293,13 @@ protected:
 	CodeControlClass* GetCurrentCodeControl() const;
 	
 	/**
-	 * Get the currently visible content pane. This may return NULL if the notebook is empty.
-	 * 
-	 * @return wxWindow* do not DELETE the returned pointer 
-	 */
-	wxWindow* GetCurrentContentPane() const;
-	
-	/**
 	 * Do NOT delete the pointer
-	 * @return wxWindow* the parent of all tool windows
+	 * @return wxAuiNotebook* the parent of all tool windows. guaranteed to be not null.
 	 */
-	wxWindow* GetToolsParentWindow() const;
+	wxAuiNotebook* GetToolsNotebook() const;
 	
 	/**
-	 * The source code control notebook
+	 * The source code control notebook. Guaranteed to be not null.
 	 * 
 	 * @return NotebookClass*
 	 */

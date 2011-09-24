@@ -272,6 +272,12 @@ public:
 	 * @param Mode a document mode; changes will take place immediately (causing a repaint)
 	 */
 	void SetDocumentMode(Mode mode);
+	
+	/**
+	 * @return the current document mode that this code control is using.  it could be the one
+	 * set by SetDocumentMode() or it could have been detected.
+	 */
+	Mode GetDocumentMode();
 
 	/**
 	 * Reload the file from this.  This method does nothing if this control was NOT loaded

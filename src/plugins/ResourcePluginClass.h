@@ -33,7 +33,9 @@
 #include <wx/stc/stc.h>
 
 namespace mvceditor {
-	
+
+class ResourcePluginPanelClass;
+
 class ResourcePluginClass : public PluginClass, DirectoryWalkerClass {
 
 public:
@@ -80,6 +82,11 @@ public:
 	 * If multiple files match, then user will be prompted to pick a file to open.
 	 */
 	void SearchForResources();
+	
+	/**
+	 * @param wxString full path to the file that will be opened.
+	 */
+	void OpenFile(wxString fileName);
 	
 private:
 
@@ -140,6 +147,20 @@ private:
 	 * @return bool
 	 */
 	bool NeedToIndex() const;
+	
+	/**
+	 * When user changes a page update the FilesCombo box on the ResourcePluginPanel
+	 * 
+	 * @param wxAuiNotebookEvent& event
+	 */
+	void OnPageChanged(wxAuiNotebookEvent& event);
+	
+	/**
+	 * When user closes all page clear the FilesCombo box on the ResourcePluginPanel
+	 * 
+	 * @param wxAuiNotebookEvent& event
+	 */
+	void OnPageClosed(wxAuiNotebookEvent& event);
 
 	/**
 	 * The various states control what this plugin does during the IDLE events. This class will perform
@@ -177,6 +198,11 @@ private:
 	wxTimer Timer;
 	
 	/**
+	 * When a tab changes we must update the FilesCombo combo box
+	 */
+	ResourcePluginPanelClass* ResourcePluginPanel;
+	
+	/**
 	 * we won't use a separate thread to fo the resource finder.  we will use the idle event instead. This State flag will
 	 * signal the idle event to wake up.
 	 */
@@ -205,12 +231,24 @@ private:
 class ResourcePluginPanelClass : public ResourcePluginGeneratedPanelClass {
 public:
 
-	ResourcePluginPanelClass(wxWindow* parent, ResourcePluginClass& resource, NotebookClass* notebook);
+	ResourcePluginPanelClass(wxWindow* parent, ResourcePluginClass& resource);
 	
 	/**
 	 * Set the focus on the search control
 	 */
 	void FocusOnSearchControl();
+	
+	/**
+	 * @param fileName the file name to put in the files combo box
+	 */
+	void ChangeToFileName(wxString fileName);
+
+	/**
+	 * Files won't be removed from the combo right away; only the oldest
+	 * will be removed.
+	 * @param NotebookClass* the notebook of opened files this class will NOT own the pointer
+	 */
+	void RemoveClosedFiles(NotebookClass* notebook);	
 	
 protected:
 
@@ -231,8 +269,7 @@ protected:
 	 * @param wxCommandEvent& the event
 	 */
 	void OnHelpButtonClick(wxCommandEvent& event);
-
-
+	
 private:
 
 	/**
@@ -241,36 +278,6 @@ private:
 	 * @var ResourcePluginClass
 	 */
 	ResourcePluginClass& ResourcePlugin;
-	
-	/**
-	 * The notebook that holds all of the opened files
-	 * 
-	 * @var NotebookClass*
-	 */
-	NotebookClass* Notebook;
-	
-	/**
-	 * When user changes a page update the FilesCombo box
-	 * 
-	 * @param wxAuiNotebookEvent& event
-	 */
-	void OnPageChanged(wxAuiNotebookEvent& event);
-	
-	/**
-	 * When user closes all page clear the FilesCombo box
-	 * 
-	 * @param wxAuiNotebookEvent& event
-	 */
-	void OnPageClosed(wxAuiNotebookEvent& event);
-	
-	/**
-	 * Disconnect from the page changing events.
-	 * 
-	 * @param wxCloseEvent& event
-	 */
-	void OnClose(wxCloseEvent& event);
-	
-	DECLARE_EVENT_TABLE()
 };
 
 }

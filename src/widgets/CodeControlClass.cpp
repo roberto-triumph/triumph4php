@@ -1295,6 +1295,10 @@ void mvceditor::CodeControlClass::SetDocumentMode(Mode mode) {
 	ApplyPreferences();
 }
 
+mvceditor::CodeControlClass::Mode mvceditor::CodeControlClass::GetDocumentMode() {
+	return DocumentMode;
+}
+
 BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)
 	EVT_STC_MARGINCLICK(wxID_ANY, mvceditor::CodeControlClass::OnMarginClick)
 	EVT_STC_DOUBLECLICK(wxID_ANY, mvceditor::CodeControlClass::OnDoubleClick)

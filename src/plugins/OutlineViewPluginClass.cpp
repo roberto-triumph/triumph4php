@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2009-2011 Roberto Perpuly
+ * @copyright  2009-2011 RobertoOnContentNotebookPageChanged Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <plugins/OutlineViewPluginClass.h>
@@ -45,21 +45,10 @@ mvceditor::OutlineViewPluginClass::OutlineViewPluginClass()
 	, CurrentOutline()
 	, PhpDoc()
 	, Parser() 
-	, CurrentOutlineLines()
-	, Connected(false) {
+	, CurrentOutlineLines() {
 	Parser.SetClassObserver(this);
 	Parser.SetClassMemberObserver(this);
 	Parser.SetFunctionObserver(this);
-}
-
-mvceditor::OutlineViewPluginClass::~OutlineViewPluginClass() {
-	NotebookClass* notebook = GetNotebook();
-	if (notebook != NULL && Connected) {
-		notebook->Disconnect(notebook->GetId(), wxID_ANY, wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED,
-			wxAuiNotebookEventHandler(OutlineViewPluginClass::OnPageChanged), NULL, this);
-		notebook->Disconnect(notebook->GetId(), wxID_ANY, wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSED, 
-			wxAuiNotebookEventHandler(OutlineViewPluginClass::OnPageChanged), NULL, this);
-	}
 }
 
 void mvceditor::OutlineViewPluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
@@ -203,7 +192,7 @@ void mvceditor::OutlineViewPluginClass::OnContextMenuOutline(wxCommandEvent& eve
 	if (modified) {
 		
 		// create / open the outline window
-		wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetToolsParentWindow());
+		wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetToolsNotebook());
 		OutlineViewPluginPanelClass* outlineViewPanel = NULL;
 		if (window != NULL) {
 			outlineViewPanel = (OutlineViewPluginPanelClass*)window;
@@ -213,13 +202,8 @@ void mvceditor::OutlineViewPluginClass::OnContextMenuOutline(wxCommandEvent& eve
 		else {
 			mvceditor::NotebookClass* notebook = GetNotebook();
 			if (notebook != NULL) {
-				outlineViewPanel = new OutlineViewPluginPanelClass(GetToolsParentWindow(), ID_WINDOW_OUTLINE, this, notebook);
+				outlineViewPanel = new OutlineViewPluginPanelClass(GetToolsNotebook(), ID_WINDOW_OUTLINE, this, notebook);
 				if (AddToolsWindow(outlineViewPanel, wxT("Outline"))) {
-					Connected = true;
-					notebook->Connect(notebook->GetId(), wxID_ANY, wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED,
-						wxAuiNotebookEventHandler(OutlineViewPluginClass::OnPageChanged), NULL, this);
-					notebook->Connect(notebook->GetId(), wxID_ANY, wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSED, 
-						wxAuiNotebookEventHandler(OutlineViewPluginClass::OnPageChanged), NULL, this);
 					outlineViewPanel->RefreshOutlines();
 				}
 			}
@@ -230,8 +214,8 @@ void mvceditor::OutlineViewPluginClass::OnContextMenuOutline(wxCommandEvent& eve
 	}
 }
 
-void mvceditor::OutlineViewPluginClass::OnPageChanged(wxAuiNotebookEvent& event) {
-	wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetToolsParentWindow());
+void mvceditor::OutlineViewPluginClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& event) {
+	wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetToolsNotebook());
 
 	// only change the outline if the user is looking at the outline.  otherwise, it gets 
 	// annoying if the user is looking at run output, switches PHP files, and the outline
@@ -432,6 +416,7 @@ BEGIN_EVENT_TABLE(mvceditor::OutlineViewPluginClass, wxEvtHandler)
 	EVT_MENU(ID_MENU_OUTLINE_CURRENT, mvceditor::OutlineViewPluginClass::OnContextMenuOutline)
 	EVT_MENU(ID_CONTEXT_MENU_SHOW_OUTLINE_CURRENT, mvceditor::OutlineViewPluginClass::OnContextMenuOutline)
 	EVT_MENU(ID_CONTEXT_MENU_SHOW_OUTLINE_OTHER, mvceditor::OutlineViewPluginClass::OnContextMenuOutline)
+	EVT_AUINOTEBOOK_PAGE_CHANGED(wxID_ANY, mvceditor::OutlineViewPluginClass::OnContentNotebookPageChanged)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::OutlineViewPluginPanelClass, OutlineViewPluginGeneratedPanelClass)
