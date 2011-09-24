@@ -177,10 +177,11 @@ wxWindow* mvceditor::PluginClass::GetMainWindow() const {
 	return ToolsNotebook->GetParent();
 }
 
-mvceditor::CodeControlClass* mvceditor::PluginClass::CreateCodeControl(wxWindow* window, int flags) const {
-	mvceditor::CodeControlClass* ctrl = new mvceditor::CodeControlClass(window, 
-		*GetNotebook()->CodeControlOptions, GetProject(), wxID_ANY, wxDefaultPosition,
-		wxDefaultSize, flags);
+mvceditor::CodeControlClass* mvceditor::PluginClass::CreateCodeControl(const wxString& tabName) const {
+	mvceditor::NotebookClass* notebook = GetNotebook();
+	notebook->AddMvcEditorPage();
+	notebook->SetPageText(notebook->GetSelection(), tabName);
+	mvceditor::CodeControlClass* ctrl = notebook->GetCurrentCodeControl();
 	return ctrl;
 }
 

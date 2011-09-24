@@ -94,28 +94,23 @@ class SqlBrowserPanelClass : public SqlBrowserPanelGeneratedClass, wxThreadHelpe
 public:
 	
 	/**
-	 * Creates a new SQL browser panel, using the given codeControl as the 
-	 * text editor.
-	 * Need for the caller of this method to create it as this class doesn't
-	 * have access to the user options.
+	 * Creates a new SQL browser panel. After creation, the panel needs to be linked to a CodeControl
+	 * in order for Execute() to work properly.
+	 * Need for the caller of this method to create the code control as this class doesn't
+	 * have access to the user options (coloring, spacing, fonts, etc...).
 	 * @param wxWindow* the parent of this window
 	 * @param int id the window ID
-	 * @param mvceditor::CodeControlClass* the code control; this class will own the pointer
 	 * @param mvceditor::StatusBarWithGaugeClass* the gauge control. this class will NOT own the pointer
 	 * @param mvceditor::SqlQueryClass connection settings to prime the browser with
 	 */
-	SqlBrowserPanelClass(wxWindow* parent, int id, mvceditor::CodeControlClass* codeControl, mvceditor::StatusBarWithGaugeClass* gauge,
+	SqlBrowserPanelClass(wxWindow* parent, int id, mvceditor::StatusBarWithGaugeClass* gauge,
 		const SqlQueryClass& query);
 	
 	/**
 	 * Runs the query that is in the text control (in a separate thread).
 	 */
 	void Execute();
-	
-	/**
-	 * Gets the entire text that is currently in the code control.
-	 */
-	wxString GetText();
+
 	
 	/**
 	 * When a query has finished running display the results in the grid
@@ -134,12 +129,28 @@ public:
 	void UpdateLabels(const wxString& result);
 	
 	/**
-	 * Returns TRUE if the the given window is the same as the the code control
-	 * given in the constructor.  This way we can know if a result panel
+	 * this will make it possible to link a code control to this results panel;
+	 * when the user is focused on the codeControl and user click 'Run SQL Query' (Execute method) the
+	 * results of the SQL will be written to this code control.
+	 */
+	void LinkToCodeControl(CodeControlClass* codeControl);
+	
+	/**
+	 * This method is used to tell if these results came from the query that's in codeControl.
 	 * is tied to the given window. (this panel will execute the SQL that is
 	 * in the control panel when the user runs the query).
+	 * @param codeControl the code control to check
+	 * @param notebook this class will NOT own the pointer
+	 * @param toolsNotebook this class will NOT own the pointer
 	 */
-	bool IsLinkedTo(CodeControlClass* window);
+	bool IsLinkedToCodeControl(CodeControlClass* codeControl);
+	
+	/**
+	 * this method should be called when the user has closed the code control; need to do this
+	 * so that this results panel knows that the code control has been deleted and should not
+	 * be used. This method essentially disables the Execute() method.
+	 */
+	void UnlinkFromCodeControl();
 
 protected:
 
@@ -182,9 +193,10 @@ private:
 	 */
 	soci::row Row;
 	
-	
 	/**
-	 * For SQL editing.
+	 * To get the query that needs to be run. One results panel will be linked with exactly one code control.
+	 * When the code control is deleted then this results panel will be read-only.
+	 * This pointer can be NULL. This class will NOT own this pointer.
 	 */
 	CodeControlClass* CodeControl;
 	
@@ -243,7 +255,6 @@ protected:
 
 	void* Entry();
 	
-	
 	std::vector<DatabaseInfoClass>* Infos;
 	
 	ProjectClass* Project;
@@ -288,6 +299,12 @@ private:
 	 * the currently shown code control.
 	 */
 	void OnContentNotebookPageChanged(wxAuiNotebookEvent& event);
+	
+	/**
+	 * will unlink any results panel that is linked to the code control
+	 * that is about to be closed.
+	 */
+	void OnContentNotebookPageClose(wxAuiNotebookEvent& event);
 	
 	std::vector<DatabaseInfoClass> Infos;
 	

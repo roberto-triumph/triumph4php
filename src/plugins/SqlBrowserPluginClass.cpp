@@ -173,7 +173,7 @@ void mvceditor::SqlConnectionDialogClass::OnListboxSelected(wxCommandEvent& even
 }
 	
 
-mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id, mvceditor::CodeControlClass* codeControl, 
+mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id, 
 		mvceditor::StatusBarWithGaugeClass* gauge, const mvceditor::SqlQueryClass& other) 
 	: SqlBrowserPanelGeneratedClass(parent, id)
 	, wxThreadHelper()
@@ -181,18 +181,16 @@ mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id, 
 	, Session()
 	, Stmt(NULL)
 	, Row()
-	, CodeControl(codeControl) 
 	, Gauge(gauge)
 	, Timer()
 	, LastError()
 	, LastQuery()
 	, IsRunning(false) {
-	CodeControl->SetDocumentMode(mvceditor::CodeControlClass::SQL);
+	CodeControl = NULL;
 	ResultsGrid->DeleteCols(0, ResultsGrid->GetNumberCols());
 	ResultsGrid->DeleteRows(0, ResultsGrid->GetNumberRows());
 	ResultsGrid->ClearGrid();
 	Timer.SetOwner(this);
-	CodeControl->SetText(wxT(""));
 	UpdateLabels(wxT(""));
 }
 
@@ -208,9 +206,9 @@ void mvceditor::SqlBrowserPanelClass::Close() {
 }
 
 bool mvceditor::SqlBrowserPanelClass::Check() {
-	bool ret = Validate() && TransferDataFromWindow();
+	bool ret = 	CodeControl && Validate() && TransferDataFromWindow();
 	if (ret) {
-		LastQuery = mvceditor::StringHelperClass::wxToIcu(GetText().Trim());
+		LastQuery = CodeControl->GetSafeText();
 		ret = !LastQuery.isEmpty();
 	}
 	return ret;
@@ -254,10 +252,6 @@ void* mvceditor::SqlBrowserPanelClass::Entry() {
 	evt.SetInt(success);
 	wxPostEvent(this, evt);
 	return 0;
-}
-
-wxString mvceditor::SqlBrowserPanelClass::GetText() {
-	return CodeControl->GetText();
 }
 
 void mvceditor::SqlBrowserPanelClass::OnRunButton(wxCommandEvent& event) {
@@ -365,11 +359,21 @@ void mvceditor::SqlBrowserPanelClass::OnTimer(wxTimerEvent& event) {
 
 void mvceditor::SqlBrowserPanelClass::SetCurrentInfo(const mvceditor::DatabaseInfoClass& info) {
 	Query.Info.Copy(info);
-	CodeControl->SetCurrentInfo(info);
+	if (CodeControl) {
+		CodeControl->SetCurrentInfo(info);
+	}
 }
 
-bool mvceditor::SqlBrowserPanelClass::IsLinkedTo(mvceditor::CodeControlClass* window) {
-	return CodeControl == window;
+void mvceditor::SqlBrowserPanelClass::LinkToCodeControl(mvceditor::CodeControlClass* codeControl) {
+	CodeControl = codeControl;
+}
+
+bool mvceditor::SqlBrowserPanelClass::IsLinkedToCodeControl(mvceditor::CodeControlClass* codeControl) {
+	return CodeControl != NULL && codeControl == CodeControl;
+}
+
+void mvceditor::SqlBrowserPanelClass::UnlinkFromCodeControl() {
+	CodeControl = NULL;
 }
 
 mvceditor::SqlMetaDataFetchClass::SqlMetaDataFetchClass(wxEvtHandler& handler)
@@ -465,8 +469,8 @@ void  mvceditor::SqlBrowserPluginClass::OnSqlBrowserToolsMenu(wxCommandEvent& ev
 		}
 	}
 	
-	mvceditor::CodeControlClass* ctrl = CreateCodeControl(notebook, 0);
-	AddContentWindow(ctrl, wxString::Format(_("SQL Browser %d"), num));
+	mvceditor::CodeControlClass* ctrl = CreateCodeControl(wxString::Format(_("SQL Browser %d"), num));
+	ctrl->SetDocumentMode(mvceditor::CodeControlClass::SQL);
 	CreateResultsPanel(ctrl);
 	ctrl->SetFocus();
 }
@@ -478,11 +482,11 @@ mvceditor::SqlBrowserPanelClass* mvceditor::SqlBrowserPluginClass::CreateResults
 		codeControl->SetCurrentInfo(Infos[ChosenIndex]);
 	}
 	
-	// name the results tab the same as the code tab so that user can relate the two
-	size_t index = GetNotebook()->GetPageIndex(codeControl);
-	wxString tabText = GetNotebook()->GetPageText(index);
-	mvceditor::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxID_NEW, codeControl, GetStatusBarWithGauge(), query);
+	mvceditor::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxID_NEW, GetStatusBarWithGauge(), query);
+	mvceditor::NotebookClass* codeNotebook = GetNotebook();
+	wxString tabText = codeNotebook->GetPageText(codeNotebook->GetPageIndex(codeControl));
 	AddToolsWindow(sqlPanel, tabText);
+	sqlPanel->LinkToCodeControl(codeControl);
 	return sqlPanel;
 }
 
@@ -496,7 +500,7 @@ void mvceditor::SqlBrowserPluginClass::OnRun(wxCommandEvent& event) {
 		for (size_t i = 0; i < notebook->GetPageCount(); i++) {
 			wxWindow* window = notebook->GetPage(i);
 			mvceditor::SqlBrowserPanelClass* panel = wxDynamicCast(window, mvceditor::SqlBrowserPanelClass);
-			if (panel && panel->IsLinkedTo(ctrl)) {
+			if (panel && panel->IsLinkedToCodeControl(ctrl)) {
 				
 				// we found the panel bring it to the forefront and run the query
 				found = true;
@@ -520,30 +524,47 @@ void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event
 		// if connection changed need to update the code control so that it knows to use the new
 		// connection for auto completion purposes
 		// TODO update the currrent panel only ?
-		wxWindow* window = GetToolsNotebook()->GetPage(GetToolsNotebook()->GetSelection());
-		mvceditor::SqlBrowserPanelClass* panel = wxDynamicCast(window, mvceditor::SqlBrowserPanelClass);
-		if (panel) {
-			if (ChosenIndex < Infos.size()) {
-				panel->SetCurrentInfo(Infos[ChosenIndex]);
+		size_t selection = GetToolsNotebook()->GetSelection();
+		if (selection >= 0 && GetToolsNotebook()->GetPageCount() > 0) {
+			wxWindow* window = GetToolsNotebook()->GetPage(selection);
+			mvceditor::SqlBrowserPanelClass* panel = wxDynamicCast(window, mvceditor::SqlBrowserPanelClass);
+			if (panel) {
+				if (ChosenIndex < Infos.size()) {
+					panel->SetCurrentInfo(Infos[ChosenIndex]);
+				}
+				panel->UpdateLabels(wxT(""));			
 			}
-			panel->UpdateLabels(wxT(""));			
 		}
 	}
 }
 
 void mvceditor::SqlBrowserPluginClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& event) {
-	
 	mvceditor::CodeControlClass* contentWindow = GetNotebook()->GetCodeControl(event.GetSelection());
 	if (contentWindow) {
 		wxAuiNotebook* notebook = GetToolsNotebook();
 		for (size_t i = 0; i < notebook->GetPageCount(); i++) {
 			wxWindow* toolsWindow = notebook->GetPage(i);
 			mvceditor::SqlBrowserPanelClass* panel = wxDynamicCast(toolsWindow, mvceditor::SqlBrowserPanelClass);
-			if (panel && panel->IsLinkedTo(contentWindow)) {
+			if (panel && panel->IsLinkedToCodeControl(contentWindow)) {
 				
 				// we found the panel bring it to the forefront and run the query
 				SetFocusToToolsWindow(toolsWindow);
 				break;
+			}
+		}
+	}
+	event.Skip();
+}
+
+void mvceditor::SqlBrowserPluginClass::OnContentNotebookPageClose(wxAuiNotebookEvent& event) {
+	mvceditor::CodeControlClass* contentWindow = GetNotebook()->GetCodeControl(event.GetSelection());
+	if (contentWindow) {
+		wxAuiNotebook* notebook = GetToolsNotebook();
+		for (size_t i = 0; i < notebook->GetPageCount(); i++) {
+			wxWindow* toolsWindow = notebook->GetPage(i);
+			mvceditor::SqlBrowserPanelClass* panel = wxDynamicCast(toolsWindow, mvceditor::SqlBrowserPanelClass);
+			if (panel && panel->IsLinkedToCodeControl(contentWindow)) {
+				panel->UnlinkFromCodeControl();
 			}
 		}
 	}
@@ -565,6 +586,7 @@ BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPluginClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SqlBrowserPluginClass::OnWorkInProgress)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SqlBrowserPluginClass::OnWorkComplete)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(wxID_ANY, mvceditor::SqlBrowserPluginClass::OnContentNotebookPageChanged)
+	EVT_AUINOTEBOOK_PAGE_CLOSE(wxID_ANY, mvceditor::SqlBrowserPluginClass::OnContentNotebookPageClose)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPanelClass, SqlBrowserPanelGeneratedClass)

@@ -122,7 +122,7 @@
                         <event name="OnAuiNotebookEndDrag"></event>
                         <event name="OnAuiNotebookPageChanged">OnContentNotebookPageChanged</event>
                         <event name="OnAuiNotebookPageChanging"></event>
-                        <event name="OnAuiNotebookPageClose"></event>
+                        <event name="OnAuiNotebookPageClose">OnContentNotebookPageClose</event>
                         <event name="OnChar"></event>
                         <event name="OnEnterWindow"></event>
                         <event name="OnEraseBackground"></event>

@@ -329,7 +329,6 @@ void mvceditor::AppFrameClass::OnProjectOpen(wxCommandEvent& event) {
 	if (wxID_OK == dialog.ShowModal()) {
 		bool destroy = Notebook->SaveAllModifiedPages();
 		if (destroy) {
-			Notebook->CloseAllPages();
 			wxCommandEvent evt(EVENT_APP_OPEN_PROJECT);
 			evt.SetString(dialog.GetPath());
 			wxPostEvent(&AppHandler, evt);
@@ -343,6 +342,7 @@ void mvceditor::AppFrameClass::OnProjectOpened(mvceditor::ProjectClass* project)
 }
 
 void mvceditor::AppFrameClass::OnProjectClosed() {
+	Notebook->CloseAllPages();
 	AuiManager.GetPane(ToolsNotebook).Hide();
 	while (ToolsNotebook->GetPageCount()) {
 		ToolsNotebook->DeletePage(0);

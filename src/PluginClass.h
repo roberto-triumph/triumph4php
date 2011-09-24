@@ -334,14 +334,13 @@ protected:
 	 EnvironmentClass* GetEnvironment() const;
 	 
 	 /**
-	  * Creates a new code control without a parent but it is primed with the global editor
-	  * options.
+	  * Creates a new code control that is primed with the global editor
+	  * options. code control will be tied to the application code Notebook.
 	  * 
-	  * @param wxWindow* parent window
-	  * @param int flags window creation flags
-	  * @return CodeControlClass* caller will own the pointer
+	  * @param tabName the name that will go on the tab of the new page
+	  * @return CodeControlClass* this class will own the pointer, DONT delete it
 	  */
-	 CodeControlClass* CreateCodeControl(wxWindow* parent, int flags) const;
+	 CodeControlClass* CreateCodeControl(const wxString& tabName) const;
 
 	 /**
 	  * Send an event to the application.  See above for possible events.
