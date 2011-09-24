@@ -25,8 +25,8 @@
 #include <widgets/ThreadWithHeartbeatClass.h>
 
 mvceditor::ThreadWithHeartbeatClass::ThreadWithHeartbeatClass(wxEvtHandler& handler)
-	: wxThreadHelper()
-	, wxEvtHandler()
+	: wxEvtHandler()
+	, wxThreadHelper()
 	, Handler(handler)
 	, Timer() {
 	Timer.SetOwner(this);
