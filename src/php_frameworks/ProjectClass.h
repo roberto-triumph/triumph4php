@@ -25,11 +25,13 @@
 #ifndef PROJECTCLASS_H_
 #define PROJECTCLASS_H_
 
+
 #include <search/ResourceFinderClass.h>
 #include <environment/DatabaseInfoClass.h>
 #include <environment/SqlResourceFinderClass.h>
 #include <wx/string.h>
 #include <wx/thread.h>
+#include <wx/platinfo.h>
 #include <vector>
 
 namespace mvceditor {
@@ -79,12 +81,35 @@ public:
 	ProjectClass(const ProjectOptionsClass& options);
 	
 	/**
-	 * run the detection code against the root path to figure out which frameworks
-	 * the project uses.
-	 * @param useTest quick hack for unit testing; use TRUE 
-	 * if false the test framework will be omitted
+	 * creates the detection command that will figure out which frameworks
+	 * the project uses.  Project "detection" means figuring out what framework a
+	 * project uses (could be multiple). The caller of this method should execute the returned
+	 * command asynchronosuly and give the results to DetectFrameworkResponse() method.
+	 *
+	 * @return wxString the command (operating system command line) that will calculate the 
+	 *         framework that this project uses.
 	 */
-	void Detect(bool useTest = false);
+	wxString DetectFrameworkCommand(wxOperatingSystemId systemId);
+
+	/**
+	 * creates the detection command that will figure out which database connections
+	 * the project uses.
+
+	 * @return wxString the command (operating system command line) that will calculate the 
+	 *         database connections that this project uses (for the given framework).
+	 */
+	wxString DetectDatabaseCommand(const wxString& framework, wxOperatingSystemId systemId);
+
+	/**
+	 * Handle the results of the framework detect command.
+	 */
+	void DetectFrameworkResponse(const wxString& resultString);
+
+	/**
+	 * Handle the results of the database detection command. After a call to this method, DatabaseInfo() will return
+	 * any new database connections (that were identified).
+	 */
+	void DetectDatabaseResponse(const wxString& resultString);
 	
 	/**
 	 * Returns the root path of this project
@@ -125,9 +150,15 @@ public:
 	SqlResourceFinderClass* GetSqlResourceFinder();
 	
 	/**
-	 * Returns the detected database connection infos
+	 * Returns the detected database connection infos.
+	 * Filled by DetectDatabaseResponse();
 	 */
-	std::vector<DatabaseInfoClass> DatabaseInfo();
+	std::vector<DatabaseInfoClass> DatabaseInfo() const;
+
+	/**
+	 * @return the detected frameworks. Filled by DetectFrameworkResponse()
+	 */
+	std::vector<wxString> FrameworkIdentifiers() const;
 
 private:
 	
@@ -137,12 +168,23 @@ private:
 	wxString Sanitize(const wxString& arg) const;
 	
 	/**
-	 * Send a query to the PHP detection code
-	 * returns the parsed response
+	 * Create the command line to run the PHP detection code
+	 * returns the command line string 
+	 * @param action the 'query' to pass
+	 * @param identifier the detected framework identifier
+	 * @param int eventId the ID of the event to be generated. This will enable us to
+	 *        different handlers for each query
+	 * @return bool TRUE if external PHP process was successfully started.  If FALSE,
+	 *  then PHP binary is not found or somehow the command line is bad.
 	 */
-	wxString Ask(const wxString& action, const wxString& identifier) const;
-	
-	wxString AskDatabaseInfo(const wxString& identifier) const;
+	wxString Ask(const wxString& action, const wxString& identifier, wxOperatingSystemId systemId);
+
+	/**
+	 * 'clean' the process output; output may contain some text before the INI response; this method
+	 * will remove the offending text.
+	 * @return the  output  (valid INI format) of the last process that was run
+	 */
+	wxString GetProcessOutput(const wxString& allOutput);
 	
 	/*
 	 * Holds project attributes.
@@ -162,7 +204,7 @@ private:
 	/**
 	 * the detected frameworks
 	 */
-	std::vector<wxString> FrameworkIdentifiers;
+	std::vector<wxString> Frameworks;
 	
 	/**
 	 * The detected database connection info

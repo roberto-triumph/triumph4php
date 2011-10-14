@@ -36,8 +36,12 @@
 #include <plugins/RunConsolePluginClass.h>
 #include <plugins/LintPluginClass.h>
 #include <plugins/SqlBrowserPluginClass.h>
+#include <widgets/ProcessWithHeartbeatClass.h>
 
 namespace mvceditor {
+
+static const int ID_FRAMEWORK_DETECT_PROCESS = wxNewId();
+static const int ID_DATABASE_DETECT_PROCESS = wxNewId();
 
 class AppClass : public wxApp {
 
@@ -106,9 +110,27 @@ private:
 	void CloseProject();
 
 	/**
+	 * method that gets called when one of the external processes finishes
+	 */
+	void OnProcessComplete(wxCommandEvent& event);
+
+	/**
+	 * method that gets called when one of the external processes fails
+	 */
+	void OnProcessFailed(wxCommandEvent& event);
+
+	/**
 	 * Additional functionality
 	 */
 	std::vector<PluginClass*> Plugins;
+
+	/**
+	 * a project may be using more than one framework. This vector
+	 * will be used as a 'queue' so that we can know when all framework
+	 * info has been discovered. This queue is needed because the
+	 * detection process is asynchronous.
+	 */
+	std::vector<wxString> FrameworkIdentifiersLeftToDetect;
 	
 	/**
 	 * The environment stack.
@@ -116,6 +138,12 @@ private:
 	 * @var EnvironmentClass
 	 */
 	EnvironmentClass Environment;
+
+	/**
+	 * Any running external processes are tracked here.  These external
+	 * processes are usually calls to the PHP framework detectiong scripts.
+	 */
+	ProcessWithHeartbeatClass ProcessWithHeartbeat;
 
 	/**
 	 * The user preferences
@@ -145,7 +173,9 @@ IMPLEMENT_APP(mvceditor::AppClass)
 mvceditor::AppClass::AppClass()
 	: wxApp()
 	, Plugins()
+	, FrameworkIdentifiersLeftToDetect()
 	, Environment()
+	, ProcessWithHeartbeat(*this)
 	, Preferences(NULL)
 	, Project(NULL)
 	, AppFrame(NULL) {
@@ -319,10 +349,13 @@ void mvceditor::AppClass::ProjectOpen(const wxString& directoryPath) {
 	options.RootPath = directoryPath;
 	CloseProject();
 	Project = new ProjectClass(options);
+	FrameworkIdentifiersLeftToDetect.clear();
 	Project->GetResourceFinder()->BuildResourceCacheForNativeFunctions();
-	AppFrame->OnProjectOpened(Project);
-	for (size_t i = 0; i < Plugins.size(); ++i) {
-		Plugins[i]->SetProject(Project);
+
+	wxPlatformInfo info;
+	wxString cmd = Project->DetectFrameworkCommand(info.GetOperatingSystemId());
+	if (!ProcessWithHeartbeat.Init(cmd, ID_FRAMEWORK_DETECT_PROCESS)) {
+		wxMessageBox(_("Error in PHP framework detection. Is PHP location correct?"));
 	}
 }
 
@@ -346,8 +379,55 @@ void mvceditor::AppClass::OnProjectOpen(wxCommandEvent& event) {
 	ProjectOpen(directoryPath);
 }
 
+void mvceditor::AppClass::OnProcessComplete(wxCommandEvent& event) {
+	bool continueProjectOpen = true;
+	if (event.GetId() == ID_FRAMEWORK_DETECT_PROCESS) {
+
+		// framework detection complete.  if a known framework 
+		// was detected get the DB info, else just continue
+		// opening the project
+		std::vector<wxString> frameworks = Project->FrameworkIdentifiers();
+		if (!frameworks.empty()) {
+			wxPlatformInfo info;
+			for (size_t i = 0; i < frameworks.size(); i++) {
+				wxString cmd = Project->DetectDatabaseCommand(frameworks[i], info.GetOperatingSystemId());
+				if (ProcessWithHeartbeat.Init(cmd, ID_DATABASE_DETECT_PROCESS)) {
+					FrameworkIdentifiersLeftToDetect.push_back(frameworks[i]);
+				}
+			}
+			continueProjectOpen = false;
+		}
+	}
+	else if (event.GetId() == ID_DATABASE_DETECT_PROCESS) {
+		
+		// detection of database settings for ONE framework has completed.
+		wxString output = event.GetString();
+		Project->DetectDatabaseResponse(output);
+
+		// at this point we dont use the framework name here; just need a 'counter'
+		// to know when all frameworks have been detected
+		FrameworkIdentifiersLeftToDetect.pop_back();
+		if (!FrameworkIdentifiersLeftToDetect.empty()) {
+			continueProjectOpen = false;
+		}
+	}
+	if (continueProjectOpen) {
+		AppFrame->OnProjectOpened(Project);
+		for (size_t i = 0; i < Plugins.size(); ++i) {
+			Plugins[i]->SetProject(Project);
+		}
+	}
+}
+
+void mvceditor::AppClass::OnProcessFailed(wxCommandEvent& event) {
+	wxMessageBox(event.GetString());
+}
+
 BEGIN_EVENT_TABLE(mvceditor::AppClass, wxApp)
 	EVT_COMMAND(wxID_ANY, EVENT_APP_SAVE_PREFERENCES, mvceditor::AppClass::OnSavePreferences)
 	EVT_COMMAND(wxID_ANY, EVENT_PLUGIN_FILE_SAVED, mvceditor::AppClass::OnFileSaved)
 	EVT_COMMAND(wxID_ANY, EVENT_APP_OPEN_PROJECT, mvceditor::AppClass::OnProjectOpen)
+	EVT_COMMAND(mvceditor::ID_FRAMEWORK_DETECT_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::AppClass::OnProcessComplete)
+	EVT_COMMAND(mvceditor::ID_DATABASE_DETECT_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::AppClass::OnProcessComplete)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_FAILED, mvceditor::AppClass::OnProcessFailed)
 END_EVENT_TABLE()

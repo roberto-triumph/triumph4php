@@ -114,6 +114,8 @@ void  mvceditor::RunConsolePanelClass::RunCommand(wxCommandEvent& event) {
 		}
 		Process = new wxProcess(this, ID_PROCESS);
 		Process->Redirect();
+
+		// TODO: use new ProcessWithHeartbeat class
 		CurrentPid = wxExecute(CommandString, wxEXEC_ASYNC, Process);
 		if (!CurrentPid || !Timer.Start( mvceditor::RunConsolePanelClass::POLL_INTERVAL, wxTIMER_CONTINUOUS)) {
 			delete Process;

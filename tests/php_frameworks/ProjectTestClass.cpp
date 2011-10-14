@@ -39,14 +39,50 @@ public:
 		delete Project;
 	}
 
-	mvceditor::ProjectClass* Project;	
+	mvceditor::ProjectClass* Project;
 };
 
 SUITE(ProjectTestClass) {
+
+TEST_FIXTURE(ProjectTestFixtureClass, ShouldParseFrameworkResponse) {
+	wxString result = wxString::FromAscii(
+		"-----START-MVC-EDITOR-----\n"
+		"framework_0 = \"Test\"\n"
+		"framework_1 = \"Symfony\"\n"
+	);
+	Project->DetectFrameworkResponse(result);
+	std::vector<wxString> identifiers = Project->FrameworkIdentifiers();
+	CHECK_EQUAL(2, identifiers.size());
+	CHECK_EQUAL(wxT("Test"), identifiers[0]);
+	CHECK_EQUAL(wxT("Symfony"), identifiers[1]);
+}
 	
-TEST_FIXTURE(ProjectTestFixtureClass, ShouldBeDetected) {
-	CreateFixtureFile(wxT("test.php"), wxT("<?php"));
-	Project->Detect(true);
+TEST_FIXTURE(ProjectTestFixtureClass, ShouldParseDatabaseResponse) {
+	wxString result = wxString::FromAscii(
+		"-----START-MVC-EDITOR-----\n"
+		"[local_dev]\n"
+		"Environment = \"dev\"\n"
+		"Name = \"local dev\"\n"
+		"Driver = \"MYSQL\"\n"
+		"FileName = \"\"\n"
+		"Host = \"127.0.0.1\"\n"
+		"Port = 3306\n"
+		"DatabaseName = \"my_dev\"\n"
+		"User = \"my_user_dev\"\n"
+		"Password = \"123_dev\"\n"
+		"\n"
+		"[local_testing]\n"
+		"Environment = \"test\"\n"
+		"Name = \"local testing\"\n"
+		"Driver = \"MYSQL\"\n"
+		"FileName = \"\"\n"
+		"Host = \"localhost\"\n"
+		"Port = 3306\n"
+		"DatabaseName = \"my_test\"\n"
+		"User = \"my_user_test\"\n"
+		"Password = \"123_test\"\n"
+	);
+	Project->DetectDatabaseResponse(result);
 	std::vector<mvceditor::DatabaseInfoClass> frameworks = Project->DatabaseInfo();
 	CHECK_EQUAL((size_t)2, frameworks.size());
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("127.0.0.1"), frameworks[0].Host);

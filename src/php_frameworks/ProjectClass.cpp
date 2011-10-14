@@ -43,7 +43,7 @@ mvceditor::ProjectClass::ProjectClass(const mvceditor::ProjectOptionsClass& opti
 	: SqlResourceFinderMutex() 
 	, Options(options)
 	, ResourceFinder()
-	, FrameworkIdentifiers()
+	, Frameworks()
 	, Databases() {
 	ResourceFinder.FilesFilter = GetPhpFileExtensions();
 }
@@ -63,81 +63,25 @@ wxString  mvceditor::ProjectClass::GetRootPath() const {
 	return Options.RootPath; 
 }
 
-void mvceditor::ProjectClass::Detect(bool useTest) {
-	FrameworkIdentifiers.clear();
-	
+wxString mvceditor::ProjectClass::DetectFrameworkCommand(wxOperatingSystemId systemId) {
+	Frameworks.clear();
+
 	wxString action = wxT("isUsedBy");
 	
 	// no identifier because we are detecting them here we don't know them
-	wxString resultString = Ask(action, wxT(""));
-	wxStringInputStream stream(resultString);
-	wxFileConfig result(stream);
-	size_t count = result.GetNumberOfEntries();
-	for (size_t i = 0; i < count; i++) {
-		wxString key = wxString::Format(wxT("/framework_%d"), i);
-		wxString val;
-		val = result.Read(key);
-		
-		// omit the test databases; only used for unit testing the ProjectClass
-		if (!useTest  && val.CmpNoCase(wxT("Test")) != 0) {
-			FrameworkIdentifiers.push_back(val);
-		}
-		else if (useTest) {
-			FrameworkIdentifiers.push_back(val);
-		}
-	}
+	return Ask(action, wxT(""), systemId);
 }
 
-std::vector<mvceditor::DatabaseInfoClass> mvceditor::ProjectClass::DatabaseInfo() {
-	if (Databases.size()) {
-		return Databases;
-	}
-	for (size_t i = 0; i < FrameworkIdentifiers.size(); i++) {
-		wxString identifier = FrameworkIdentifiers[i];
-		wxString resultString = AskDatabaseInfo(identifier);
-		wxStringInputStream stream(resultString);
-		wxFileConfig result(stream);
-		wxString groupName = wxT("");
-		long index = 0;		
-		bool next = result.GetFirstGroup(groupName, index);
-		while (next) {
-			mvceditor::DatabaseInfoClass info;
-			groupName = wxT("/") + groupName + wxT("/");
-			
-			// dont use wxFileConfig.SetPath method. it seems to mess with the group iteration
-			wxString s = result.Read(groupName + wxT("Host"));
-			info.Host = mvceditor::StringHelperClass::wxToIcu(s);
-			s = result.Read(groupName + wxT("/User"));
-			info.User = mvceditor::StringHelperClass::wxToIcu(s);
-			s = result.Read(groupName + wxT("Password"));
-			info.Password = mvceditor::StringHelperClass::wxToIcu(s);
-			s = result.Read(groupName + wxT("DatabaseName"));
-			info.DatabaseName = mvceditor::StringHelperClass::wxToIcu(s);
-			s = result.Read(groupName + wxT("FileName"));
-			info.FileName = mvceditor::StringHelperClass::wxToIcu(s);
-			s = result.Read(groupName + wxT("Name"));
-			info.Name = mvceditor::StringHelperClass::wxToIcu(s);
-			wxString driverString = result.Read(groupName + wxT("Driver"));
-			if (driverString.CmpNoCase(wxT("MYSQL"))) {
-				info.Driver = mvceditor::DatabaseInfoClass::MYSQL;
-			}
-			/*
-			else if (driverString.CmpNoCase(wxT("POSTGRESQL"))) {
-				info.Driver = mvceditor::DatabaseInfoClass::POSTGRESQL;
-			}
-			else if (driverString.CmpNoCase(wxT("SQLITE"))) {
-				info.Driver = mvceditor::DatabaseInfoClass::SQLITE;
-			}*/
-			else {
-				info.Driver = mvceditor::DatabaseInfoClass::MYSQL;
-				// TODO error handling
-			}
-			result.Read(groupName + wxT("Port"), &info.Port);
-			Databases.push_back(info);
-			next = result.GetNextGroup(groupName, index);
-		}
-	}
+wxString mvceditor::ProjectClass::DetectDatabaseCommand(const wxString& frameworkIdentifier, wxOperatingSystemId systemId) {
+	return Ask(wxT("databaseInfo"), frameworkIdentifier, systemId);
+}
+
+std::vector<mvceditor::DatabaseInfoClass> mvceditor::ProjectClass::DatabaseInfo() const {
 	return Databases;
+}
+
+std::vector<wxString> mvceditor::ProjectClass::FrameworkIdentifiers() const {
+	return Frameworks;
 }
 
 wxString mvceditor::ProjectClass::Sanitize(const wxString& arg) const {
@@ -162,11 +106,7 @@ mvceditor::SqlResourceFinderClass* mvceditor::ProjectClass::GetSqlResourceFinder
 	return &SqlResourceFinder;
 }
 
-wxString mvceditor::ProjectClass::AskDatabaseInfo(const wxString& identifier) const {
-	return Ask(wxT("databaseInfo"), identifier);
-}
-
-wxString mvceditor::ProjectClass::Ask(const wxString& action, const wxString& identifier) const {
+wxString mvceditor::ProjectClass::Ask(const wxString& action, const wxString& identifier, wxOperatingSystemId systemId) {
 	wxStandardPaths paths;
 	wxFileName pathExecutableFileName(paths.GetExecutablePath());
 	wxString scriptFileName = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
@@ -175,22 +115,86 @@ wxString mvceditor::ProjectClass::Ask(const wxString& action, const wxString& id
 		wxT("php_frameworks") + wxFileName::GetPathSeparator() +
 		wxT("MvcEditorFrameworkApp.php");
 	wxString args =
-		wxT(" --action=") + Sanitize(action) + 
-		wxT(" --dir=") + Sanitize(GetRootPath()) +
-		wxT(" --identifier=" + Sanitize(identifier));
-	wxString cmd = GetPhpExecutable() + wxT(" ") + Sanitize(scriptFileName) + args;
-	wxArrayString output;
-	wxExecute(cmd, output, wxEXEC_SYNC);
-	wxString cat = wxT("");
-	bool doCat = false;
-	for (size_t i = 0; i < output.Count(); i++) {
-		if (doCat) {
-			cat += output[i];
-			cat += wxT("\n");
-		}
-		if (output[i] == wxT("-----START-MVC-EDITOR-----")) {
-			doCat = true;
-		}
+		wxT(" --action=") + action + 
+		wxT(" --dir=") + GetRootPath() +
+		wxT(" --identifier=" + identifier);
+	wxString cmd = GetPhpExecutable() + wxT(" ") + scriptFileName + args;
+
+	if (wxOS_WINDOWS_NT == systemId) {
+		
+		// in windows, we will execute commands in the shell
+		cmd = wxT("cmd.exe /Q /C ") + cmd;
 	}
-	return cat;
+	return cmd;
+}
+
+void mvceditor::ProjectClass::DetectFrameworkResponse(const wxString& resultString) {
+	wxString iniString = GetProcessOutput(resultString);
+	wxStringInputStream stream(iniString);
+	wxFileConfig result(stream);
+	size_t count = result.GetNumberOfEntries();
+	for (size_t i = 0; i < count; i++) {
+		wxString key = wxString::Format(wxT("/framework_%d"), i);
+		wxString val;
+		val = result.Read(key);
+		Frameworks.push_back(val);
+	}
+}
+
+void mvceditor::ProjectClass::DetectDatabaseResponse(const wxString& resultString) {
+	wxString iniString = GetProcessOutput(resultString);
+	wxStringInputStream stream(iniString);
+	wxFileConfig result(stream);
+	wxString groupName = wxT("");
+	long index = 0;		
+	bool next = result.GetFirstGroup(groupName, index);
+	while (next) {
+		mvceditor::DatabaseInfoClass info;
+		groupName = wxT("/") + groupName + wxT("/");
+		
+		// don't use wxFileConfig.SetPath method. it seems to mess with the group iteration
+		wxString s = result.Read(groupName + wxT("Host"));
+		info.Host = mvceditor::StringHelperClass::wxToIcu(s);
+		s = result.Read(groupName + wxT("/User"));
+		info.User = mvceditor::StringHelperClass::wxToIcu(s);
+		s = result.Read(groupName + wxT("Password"));
+		info.Password = mvceditor::StringHelperClass::wxToIcu(s);
+		s = result.Read(groupName + wxT("DatabaseName"));
+		info.DatabaseName = mvceditor::StringHelperClass::wxToIcu(s);
+		s = result.Read(groupName + wxT("FileName"));
+		info.FileName = mvceditor::StringHelperClass::wxToIcu(s);
+		s = result.Read(groupName + wxT("Name"));
+		info.Name = mvceditor::StringHelperClass::wxToIcu(s);
+		wxString driverString = result.Read(groupName + wxT("Driver"));
+		if (driverString.CmpNoCase(wxT("MYSQL"))) {
+			info.Driver = mvceditor::DatabaseInfoClass::MYSQL;
+		}
+		/*
+		else if (driverString.CmpNoCase(wxT("POSTGRESQL"))) {
+			info.Driver = mvceditor::DatabaseInfoClass::POSTGRESQL;
+		}
+		else if (driverString.CmpNoCase(wxT("SQLITE"))) {
+			info.Driver = mvceditor::DatabaseInfoClass::SQLITE;
+		}*/
+		else {
+			info.Driver = mvceditor::DatabaseInfoClass::MYSQL;
+			// TODO error handling
+		}
+		result.Read(groupName + wxT("Port"), &info.Port);
+		Databases.push_back(info);
+		next = result.GetNextGroup(groupName, index);
+	}
+}
+
+wxString mvceditor::ProjectClass::GetProcessOutput(const wxString& allOutput) {
+
+	// get only the stuff after the marker; anything before the marker will
+	// make the output invalid INI format
+	const wxString START_MARKER = wxT("-----START-MVC-EDITOR-----");
+	int index = allOutput.Find(START_MARKER);
+	wxString resultString;
+	if (index >= 0) {
+		resultString = allOutput.Mid(index + START_MARKER.Length() + 1);
+	}
+	return resultString;
 }

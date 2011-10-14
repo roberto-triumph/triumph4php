@@ -426,7 +426,6 @@ mvceditor::SqlBrowserPluginClass::~SqlBrowserPluginClass() {
 }
 
 void mvceditor::SqlBrowserPluginClass::OnProjectOpened() {
-	GetProject()->Detect();
 	ChosenIndex = 0;
 	
 	// TODO: how and when to refresh ??
