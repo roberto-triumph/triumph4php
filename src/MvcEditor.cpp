@@ -351,10 +351,9 @@ void mvceditor::AppClass::ProjectOpen(const wxString& directoryPath) {
 	Project = new ProjectClass(options);
 	FrameworkIdentifiersLeftToDetect.clear();
 	Project->GetResourceFinder()->BuildResourceCacheForNativeFunctions();
-
-	wxPlatformInfo info;
-	wxString cmd = Project->DetectFrameworkCommand(info.GetOperatingSystemId());
-	if (!ProcessWithHeartbeat.Init(cmd, ID_FRAMEWORK_DETECT_PROCESS)) {
+	wxString cmd = Project->DetectFrameworkCommand();
+	long pid = 0;
+	if (!ProcessWithHeartbeat.Init(cmd, ID_FRAMEWORK_DETECT_PROCESS, pid)) {
 		wxMessageBox(_("Error in PHP framework detection. Is PHP location correct?"));
 	}
 }
@@ -388,10 +387,10 @@ void mvceditor::AppClass::OnProcessComplete(wxCommandEvent& event) {
 		// opening the project
 		std::vector<wxString> frameworks = Project->FrameworkIdentifiers();
 		if (!frameworks.empty()) {
-			wxPlatformInfo info;
 			for (size_t i = 0; i < frameworks.size(); i++) {
-				wxString cmd = Project->DetectDatabaseCommand(frameworks[i], info.GetOperatingSystemId());
-				if (ProcessWithHeartbeat.Init(cmd, ID_DATABASE_DETECT_PROCESS)) {
+				wxString cmd = Project->DetectDatabaseCommand(frameworks[i]);
+				long pid = 0;
+				if (ProcessWithHeartbeat.Init(cmd, ID_DATABASE_DETECT_PROCESS, pid)) {
 					FrameworkIdentifiersLeftToDetect.push_back(frameworks[i]);
 				}
 			}
@@ -429,5 +428,6 @@ BEGIN_EVENT_TABLE(mvceditor::AppClass, wxApp)
 	EVT_COMMAND(wxID_ANY, EVENT_APP_OPEN_PROJECT, mvceditor::AppClass::OnProjectOpen)
 	EVT_COMMAND(mvceditor::ID_FRAMEWORK_DETECT_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::AppClass::OnProcessComplete)
 	EVT_COMMAND(mvceditor::ID_DATABASE_DETECT_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::AppClass::OnProcessComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_FAILED, mvceditor::AppClass::OnProcessFailed)
+	EVT_COMMAND(mvceditor::ID_FRAMEWORK_DETECT_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::AppClass::OnProcessFailed)
+	EVT_COMMAND(mvceditor::ID_DATABASE_DETECT_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::AppClass::OnProcessFailed)
 END_EVENT_TABLE()

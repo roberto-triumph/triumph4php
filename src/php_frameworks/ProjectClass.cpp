@@ -63,17 +63,17 @@ wxString  mvceditor::ProjectClass::GetRootPath() const {
 	return Options.RootPath; 
 }
 
-wxString mvceditor::ProjectClass::DetectFrameworkCommand(wxOperatingSystemId systemId) {
+wxString mvceditor::ProjectClass::DetectFrameworkCommand() {
 	Frameworks.clear();
 
 	wxString action = wxT("isUsedBy");
 	
 	// no identifier because we are detecting them here we don't know them
-	return Ask(action, wxT(""), systemId);
+	return Ask(action, wxT(""));
 }
 
-wxString mvceditor::ProjectClass::DetectDatabaseCommand(const wxString& frameworkIdentifier, wxOperatingSystemId systemId) {
-	return Ask(wxT("databaseInfo"), frameworkIdentifier, systemId);
+wxString mvceditor::ProjectClass::DetectDatabaseCommand(const wxString& frameworkIdentifier) {
+	return Ask(wxT("databaseInfo"), frameworkIdentifier);
 }
 
 std::vector<mvceditor::DatabaseInfoClass> mvceditor::ProjectClass::DatabaseInfo() const {
@@ -106,7 +106,7 @@ mvceditor::SqlResourceFinderClass* mvceditor::ProjectClass::GetSqlResourceFinder
 	return &SqlResourceFinder;
 }
 
-wxString mvceditor::ProjectClass::Ask(const wxString& action, const wxString& identifier, wxOperatingSystemId systemId) {
+wxString mvceditor::ProjectClass::Ask(const wxString& action, const wxString& identifier) {
 	wxStandardPaths paths;
 	wxFileName pathExecutableFileName(paths.GetExecutablePath());
 	wxString scriptFileName = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
@@ -119,12 +119,6 @@ wxString mvceditor::ProjectClass::Ask(const wxString& action, const wxString& id
 		wxT(" --dir=") + GetRootPath() +
 		wxT(" --identifier=" + identifier);
 	wxString cmd = GetPhpExecutable() + wxT(" ") + scriptFileName + args;
-
-	if (wxOS_WINDOWS_NT == systemId) {
-		
-		// in windows, we will execute commands in the shell
-		cmd = wxT("cmd.exe /Q /C ") + cmd;
-	}
 	return cmd;
 }
 

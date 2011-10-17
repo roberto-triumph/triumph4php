@@ -31,7 +31,6 @@
 #include <environment/SqlResourceFinderClass.h>
 #include <wx/string.h>
 #include <wx/thread.h>
-#include <wx/platinfo.h>
 #include <vector>
 
 namespace mvceditor {
@@ -89,16 +88,15 @@ public:
 	 * @return wxString the command (operating system command line) that will calculate the 
 	 *         framework that this project uses.
 	 */
-	wxString DetectFrameworkCommand(wxOperatingSystemId systemId);
+	wxString DetectFrameworkCommand();
 
 	/**
 	 * creates the detection command that will figure out which database connections
 	 * the project uses.
-
 	 * @return wxString the command (operating system command line) that will calculate the 
 	 *         database connections that this project uses (for the given framework).
 	 */
-	wxString DetectDatabaseCommand(const wxString& framework, wxOperatingSystemId systemId);
+	wxString DetectDatabaseCommand(const wxString& framework);
 
 	/**
 	 * Handle the results of the framework detect command.
@@ -172,12 +170,9 @@ private:
 	 * returns the command line string 
 	 * @param action the 'query' to pass
 	 * @param identifier the detected framework identifier
-	 * @param int eventId the ID of the event to be generated. This will enable us to
-	 *        different handlers for each query
-	 * @return bool TRUE if external PHP process was successfully started.  If FALSE,
-	 *  then PHP binary is not found or somehow the command line is bad.
+	 * @return wxString the command (operating system command line) that will run the PHP detection code.
 	 */
-	wxString Ask(const wxString& action, const wxString& identifier, wxOperatingSystemId systemId);
+	wxString Ask(const wxString& action, const wxString& identifier);
 
 	/**
 	 * 'clean' the process output; output may contain some text before the INI response; this method

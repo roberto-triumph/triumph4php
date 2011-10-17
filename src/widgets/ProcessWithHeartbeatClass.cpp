@@ -50,18 +50,40 @@ mvceditor::ProcessWithHeartbeatClass::~ProcessWithHeartbeatClass() {
 	Timer.Stop();
 }
 
-bool mvceditor::ProcessWithHeartbeatClass::Init(const wxString& command, int commandId) {
+bool mvceditor::ProcessWithHeartbeatClass::Init(wxString command, int commandId, long& pid) {
+	wxPlatformInfo platform;
+	if (wxOS_WINDOWS_NT == platform.GetOperatingSystemId()) {
+		
+		// in windows, we will execute commands in the shell
+		command = wxT("cmd.exe /Q /C ") + command;
+	}
 	wxProcess* newProcess = new wxProcess(this, commandId);
 	newProcess->Redirect();
-	long pid = wxExecute(command, wxEXEC_ASYNC, newProcess);
+
+	// dont use newProcess::GetPid(), it seems to always return zero.
+	// http://forums.wxwidgets.org/viewtopic.php?t=13559
+	pid = wxExecute(command, wxEXEC_ASYNC, newProcess);
 	if (pid != 0) {
 		RunningProcesses[pid] = newProcess;
-		Timer.Start(200, wxTIMER_CONTINUOUS);
+		Timer.Start(POLL_INTERVAL, wxTIMER_CONTINUOUS);
 	}
 	else {
 		delete newProcess;
 	}
 	return 0 != pid;
+}
+
+bool mvceditor::ProcessWithHeartbeatClass::Stop(long pid) {
+	bool stopped = false;	
+	std::map<long, wxProcess*>::iterator it = RunningProcesses.find(pid);
+	if (it != RunningProcesses.end()) {
+		it->second->Detach();
+		stopped = 0 == wxProcess::Kill(pid);
+		delete it->second;
+		RunningProcesses.erase(it);
+	}
+	Timer.Stop();
+	return stopped;
 }
 
 void mvceditor::ProcessWithHeartbeatClass::OnProcessEnded(wxProcessEvent& event) {
@@ -90,6 +112,15 @@ void mvceditor::ProcessWithHeartbeatClass::OnProcessEnded(wxProcessEvent& event)
 	}
 }
 
+wxString mvceditor::ProcessWithHeartbeatClass::GetProcessOutput(long pid) const {
+	std::map<long, wxProcess*>::const_iterator it = RunningProcesses.find(pid);
+	wxString output;
+	if (it != RunningProcesses.end()) {
+		output = GetProcessOutput(it->second);
+	}
+	return output;
+}
+
 wxString mvceditor::ProcessWithHeartbeatClass::GetProcessOutput(wxProcess* proc) const {
 	wxInputStream* stream = proc->GetInputStream();
 	wxString allOutput;
@@ -109,6 +140,12 @@ wxString mvceditor::ProcessWithHeartbeatClass::GetProcessOutput(wxProcess* proc)
 	return allOutput;
 }
 
+void mvceditor::ProcessWithHeartbeatClass::OnTimer(wxTimerEvent& event) {
+	wxCommandEvent intProgressEvent(mvceditor::EVENT_PROCESS_IN_PROGRESS);
+	wxPostEvent(&Handler, intProgressEvent);
+}
+
 BEGIN_EVENT_TABLE(mvceditor::ProcessWithHeartbeatClass, wxEvtHandler)
 	EVT_END_PROCESS(wxID_ANY, mvceditor::ProcessWithHeartbeatClass::OnProcessEnded)
+	EVT_TIMER(wxID_ANY, mvceditor::ProcessWithHeartbeatClass::OnTimer)
 END_EVENT_TABLE()

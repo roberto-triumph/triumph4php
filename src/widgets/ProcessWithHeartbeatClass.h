@@ -35,6 +35,8 @@ namespace mvceditor {
 	/**
 	 * This event will be generated when the external process has completed its job
 	 * **successfully** A process that has been killed will NOT generate this event.
+	 * event.GetString() will contain the entire process STDOUT and STDERR output; with
+	 * some caveats. see  mvceditor::ProcessWithHeartbeatClass::GetProcessOutput(long pid)
 	 */
 	extern const wxEventType EVENT_PROCESS_COMPLETE;
 
@@ -42,13 +44,17 @@ namespace mvceditor {
 	 * This event will be generated when the external process was submitted (started)
 	 * **successfully** but failed while executing (returned a non-zero exit code). A 
 	 * process that has been killed will NOT generate this event.
+	 * event.GetString() will contain the entire process STDOUT and STDERR output; with
+	 * some caveats. see  mvceditor::ProcessWithHeartbeatClass::GetProcessOutput(long pid)
 	 */
 	extern const wxEventType EVENT_PROCESS_FAILED;
 
 	/**
 	 * This event will be generated when the process is in action. Event listeners
 	 * can do things like update status bars here.
-	 * event.GetString() may have a message describing the action being taken
+	 * event.GetString() may have a message describing the action being taken (NOT
+	 * the process STDOUT / STDERR  output).
+	 * These events will NOT have an event ID, connect to them with wxID_ANY
 	 */
 	extern const wxEventType EVENT_PROCESS_IN_PROGRESS;
 
@@ -78,10 +84,28 @@ public:
 	 * @param command the command to start (with arguments as well)
 	 * @param int commandId command ID will be used when an EVENT_PROCESS_* is genereated
 	 *        this way the caller can correlate a command to an event.
+	 * @param pid the PID of the new process will be set here
 	 * @return bool TRUE if the command was started successfully. if FALSE then 
 	 *         command is invalid or command is not found.
 	 */
-	bool Init(const wxString& command, int commandId);
+	bool Init(wxString command, int commandId, long& pid);
+
+	/**
+	 * stop a running process.
+	 * 
+	 * @param pid the PID to stop.
+	 */
+	bool Stop(long pid);
+
+	/**
+	 * Get the output from the process' output stream. Note that if you call this while
+	 * the process is running then the PROCESS_COMPLETE event will NOT have the entire
+	 * process output.
+	 *
+	  *@param long pid the running process ID
+	 * @return wxString the process STDOUT and STDERR output , so far
+	 */
+	wxString GetProcessOutput(long pid) const;
 
 private:
 
@@ -91,19 +115,36 @@ private:
 	void OnProcessEnded(wxProcessEvent& event);
 
 	/**
-	 * Get the output from the process' output stream.
+	 * Get the output from the process' STDOUT and STDERR output.
 	 */
 	wxString GetProcessOutput(wxProcess* proc) const;
+	
+	/**
+	 * Timer callback. In this method, we will get the process output and append it to the textbox.
+	 */
+	void OnTimer(wxTimerEvent& event);
 
 	/**
 	 * the processes that are alive.
 	 * key is the PID, value is the wxProcess instance for that PID.
 	 */
 	std::map<long, wxProcess*> RunningProcesses;
-	
+
+	/**
+	 * used to give out constant feedback.
+	 */
 	wxTimer Timer;
 	
+	/**
+	 * Any EVENT_PROCESS_* events are sent to this handler.
+	 */
 	wxEvtHandler& Handler;
+
+	/**
+	 * how often we check the process for new output
+	 */
+	const static int POLL_INTERVAL = 300;
+
 
 	DECLARE_EVENT_TABLE()
 };

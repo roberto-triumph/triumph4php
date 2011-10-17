@@ -28,35 +28,18 @@
 #include <wx/sstream.h>
 #include <wx/valgen.h>
 
-int ID_MENU_RUN_CLI = mvceditor::PluginClass::newMenuId();
-int ID_MENU_RUN_CLI_IN_NEW_WINDOW = mvceditor::PluginClass::newMenuId();
-int ID_MENU_RUN_CLI_ARGS = mvceditor::PluginClass::newMenuId();
-int ID_MENU_RUN_CLI_IN_NEW_WINDOW_ARGS = mvceditor::PluginClass::newMenuId();
-int ID_CONSOLE = wxNewId();
-int ID_PROCESS = wxNewId();
-int ID_TOOLBAR_RUN = wxNewId();
-int ID_WINDOW_CONSOLE = wxNewId();
-
-BEGIN_EVENT_TABLE(mvceditor::RunConsolePanelClass, wxPanel) 
-	EVT_TIMER(ID_CONSOLE,  mvceditor::RunConsolePanelClass::OnTimer)
-	EVT_END_PROCESS(ID_PROCESS,  mvceditor::RunConsolePanelClass::OnEndProcess)
-	EVT_IDLE(mvceditor::RunConsolePanelClass::OnIdle)
-END_EVENT_TABLE()
-
-BEGIN_EVENT_TABLE(mvceditor::RunConsolePluginClass, wxEvtHandler) 
-	EVT_MENU(ID_MENU_RUN_CLI, mvceditor::RunConsolePluginClass::OnRunFileAsCli)
-	EVT_MENU(ID_MENU_RUN_CLI_ARGS, mvceditor::RunConsolePluginClass::OnRunFileAsCli)
-	EVT_MENU(ID_MENU_RUN_CLI_IN_NEW_WINDOW, mvceditor::RunConsolePluginClass::OnRunFileAsCliInNewWindow)
-	EVT_MENU(ID_MENU_RUN_CLI_IN_NEW_WINDOW_ARGS, mvceditor::RunConsolePluginClass::OnRunFileAsCliInNewWindow)
-	EVT_TOOL(ID_TOOLBAR_RUN, mvceditor::RunConsolePluginClass::OnRunFileAsCli)
-	EVT_UPDATE_UI(wxID_ANY, mvceditor::RunConsolePluginClass::OnUpdateUi)
-END_EVENT_TABLE()
+static const int ID_MENU_RUN_CLI = mvceditor::PluginClass::newMenuId();
+static const int ID_MENU_RUN_CLI_IN_NEW_WINDOW = mvceditor::PluginClass::newMenuId();
+static const int ID_MENU_RUN_CLI_ARGS = mvceditor::PluginClass::newMenuId();
+static const int ID_MENU_RUN_CLI_IN_NEW_WINDOW_ARGS = mvceditor::PluginClass::newMenuId();
+static const int ID_PROCESS = wxNewId();
+static const int ID_TOOLBAR_RUN = wxNewId();
+static const int ID_WINDOW_CONSOLE = wxNewId();
 
  mvceditor::RunConsolePanelClass::RunConsolePanelClass(wxWindow* parent, EnvironmentClass* environment, StatusBarWithGaugeClass* gauge, int id)
 	: RunConsolePanelGeneratedClass(parent, id)
 	, CommandString()
-	, Timer(this, ID_CONSOLE)
-	, Process(NULL)
+	, ProcessWithHeartbeat(*this)
 	, Environment(environment)
 	, Gauge(gauge)
 	, CurrentPid(0) {
@@ -78,8 +61,8 @@ void mvceditor::RunConsolePanelClass::OnPageClose(wxAuiNotebookEvent& evt) {
 	if (ctrl->GetPage(selected) == this) {
 
 		// make sure we kill any running processes
-		if (Process) {
-			Process->Detach();
+		if (CurrentPid > 0) {
+			ProcessWithHeartbeat.Stop(CurrentPid);
 		}
 		Gauge->StopGauge(IdProcessGauge);
 		GetParent()->Disconnect(wxID_ANY, wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE, 
@@ -91,8 +74,15 @@ void mvceditor::RunConsolePanelClass::OnPageClose(wxAuiNotebookEvent& evt) {
 void  mvceditor::RunConsolePanelClass::SetToRunFile(const wxString& fullPath) {
 	
 	// command is a file name, lets run it through PHP
-	CommandString = Environment->Php.PhpExecutablePath + wxT(" ") + fullPath;
-	TransferDataToWindow();
+	// cannot run new files that have not been saved yet
+	if (!fullPath.empty()) {
+		CommandString = Environment->Php.PhpExecutablePath + wxT(" ") + fullPath;
+		TransferDataToWindow();
+	}
+	else {
+		CommandString = wxT("");
+		wxMessageBox(_("PHP script needs to be saved in order to run it."));
+	}
 }
 
 void  mvceditor::RunConsolePanelClass::SetFocusOnCommandText() {
@@ -103,41 +93,25 @@ void  mvceditor::RunConsolePanelClass::RunCommand(wxCommandEvent& event) {
 	
 	// do not run a process if one is already running. the 'Run' button
 	// converts to a 'stop' button when a process is running.
-	if (!Process && TransferDataFromWindow() && !CommandString.IsEmpty()) {
+	if (!CurrentPid && TransferDataFromWindow() && !CommandString.IsEmpty()) {
 		Command->Enable(false);
 		RunButton->SetLabel(_("Stop"));
-		wxPlatformInfo platform;
-		if (wxOS_WINDOWS_NT == platform.GetOperatingSystemId()) {
-			
-			// in windows, we will execute commands in the shell
-			CommandString = wxT("cmd.exe /Q /C ") + CommandString;
+		if (ProcessWithHeartbeat.Init(CommandString, ID_PROCESS, CurrentPid)) {
+			Gauge->AddGauge(_("Running Process"), IdProcessGauge, StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);	
 		}
-		Process = new wxProcess(this, ID_PROCESS);
-		Process->Redirect();
-
-		// TODO: use new ProcessWithHeartbeat class
-		CurrentPid = wxExecute(CommandString, wxEXEC_ASYNC, Process);
-		if (!CurrentPid || !Timer.Start( mvceditor::RunConsolePanelClass::POLL_INTERVAL, wxTIMER_CONTINUOUS)) {
-			delete Process;
-			Process = NULL;
-			if (CurrentPid) {
-				wxMessageBox(_("Could not start timer. (Internal Error)"));
-			}
+		else {
 			Command->Enable(true);
 			RunButton->SetLabel(_("Start"));
 		}
-		else {
-			LastPulse = wxGetLocalTimeMillis();
-			Gauge->AddGauge(_("Running Process"), IdProcessGauge, StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);	
-		}
 	}
-	else if (Process) {
-		
-		// dont use Process::GetPid(), it seems to always return zero.
-		// http://forums.wxwidgets.org/viewtopic.php?t=13559
-		int err = wxProcess::Kill(CurrentPid, wxSIGTERM);
-		if (err != 0) {
-			wxMessageBox(wxString::Format(wxT("Could not kill process %ld. Error (%d)"), CurrentPid, err));
+	else if (CurrentPid > 0) {
+		bool stopped = ProcessWithHeartbeat.Stop(CurrentPid);		
+		if (!stopped) {
+			wxMessageBox(wxString::Format(wxT("Could not kill process %ld."), CurrentPid));
+
+			// stale PID??
+			Gauge->StopGauge(IdProcessGauge);
+			CurrentPid = 0;
 		}
 		Command->Enable(true);
 		RunButton->SetLabel(_("Start"));
@@ -148,70 +122,40 @@ void  mvceditor::RunConsolePanelClass::OnClear(wxCommandEvent& event) {
 	OutputWindow->ChangeValue(wxT(""));
 }
 
-void  mvceditor::RunConsolePanelClass::OnTimer(wxTimerEvent& event) {
-	wxWakeUpIdle();
-}
+void  mvceditor::RunConsolePanelClass::OnProcessFailed(wxCommandEvent& event) {
+	wxString output = event.GetString();
 
-void  mvceditor::RunConsolePanelClass::OnIdle(wxIdleEvent& event) {
-	wxLongLong now = wxGetLocalTimeMillis();
-	if ((now - LastPulse) > 250) {
-		Gauge->IncrementGauge(IdProcessGauge, StatusBarWithGaugeClass::INDETERMINATE_MODE);
-		LastPulse = now;
+	// if no output, do not append.  This will allow the user the ability to select the text when the process is silent
+	if (!output.IsEmpty()) {
+		OutputWindow->AppendText(output);
 	}
-	GetProcessOutput();
-	
-	// only request more idle events when there is more input to read.
-	// be very careful about accessing Process pointer, it may be deleted
-	// when the process ends.
-	if (Process) {
-		event.RequestMore(Process->IsInputAvailable() || Process->IsErrorAvailable());
-	}
-}
-
-void  mvceditor::RunConsolePanelClass::OnEndProcess(wxProcessEvent& event) { 
-	GetProcessOutput();
-	Timer.Stop();
 	Gauge->StopGauge(IdProcessGauge);
-	delete Process;
-	Process = NULL;
 	CurrentPid = 0;
-	//OutputWindow->AppendText(
-	//	wxT("\n-------------------------------------------------------------\nProcess terminated at ") + 
-	//	wxDateTime::Now().Format() +
-	//	wxT("\n-------------------------------------------------------------\n"));
 	Command->Enable(true);
 	RunButton->SetLabel(_("Run"));
 }
 
-void  mvceditor::RunConsolePanelClass::GetProcessOutput() {
-	if (Process && Process->GetInputStream()) {
-		wxString output;
-		while (Process && Process->IsInputAvailable()) {
-			char ch = Process->GetInputStream()->GetC();
-			if (isprint(ch) || isspace(ch)) {
-				output.Append(ch);
-			}
-		}
-		
-		// if no output, do not append.  This will allow the user the ability to select the text when the process is silent
-		if (!output.IsEmpty()) {
-			OutputWindow->AppendText(output);
-		}
+void  mvceditor::RunConsolePanelClass::OnProcessInProgress(wxCommandEvent& event) {
+	wxString output = ProcessWithHeartbeat.GetProcessOutput(CurrentPid);
+
+	// if no output, do not append.  This will allow the user the ability to select the text when the process is silent
+	if (!output.IsEmpty()) {
+		OutputWindow->AppendText(output);
 	}
-	if (Process && Process->GetErrorStream()) {
-		wxString output;
-		while (Process && Process->IsErrorAvailable()) {
-			char ch = Process->GetErrorStream()->GetC();
-			if (isprint(ch) || isspace(ch)) {
-				output.Append(ch);
-			}
-		}
-		
-		// if no output, do not append.  This will allow the user the ability to select the text when the process is silent
-		if (!output.IsEmpty()) {
-			OutputWindow->AppendText(output);
-		}
-	}	
+	Gauge->IncrementGauge(IdProcessGauge, StatusBarWithGaugeClass::INDETERMINATE_MODE);
+}
+
+void  mvceditor::RunConsolePanelClass::OnProcessComplete(wxCommandEvent& event) { 
+	wxString output = event.GetString();
+
+	// if no output, do not append.  This will allow the user the ability to select the text when the process is silent
+	if (!output.IsEmpty()) {
+		OutputWindow->AppendText(output);
+	}
+	Gauge->StopGauge(IdProcessGauge);
+	CurrentPid = 0;
+	Command->Enable(true);
+	RunButton->SetLabel(_("Run"));
 }
 
 mvceditor::RunConsolePluginClass::RunConsolePluginClass()
@@ -304,3 +248,18 @@ void mvceditor::RunConsolePluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 	toolBar->AddTool(ID_TOOLBAR_RUN, _("Run"), wxArtProvider::GetBitmap(
 		wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), _("Run"));
 }
+
+BEGIN_EVENT_TABLE(mvceditor::RunConsolePanelClass, wxPanel) 
+	EVT_COMMAND(ID_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::RunConsolePanelClass::OnProcessComplete)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::RunConsolePanelClass::OnProcessInProgress)
+	EVT_COMMAND(ID_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::RunConsolePanelClass::OnProcessFailed)
+END_EVENT_TABLE()
+
+BEGIN_EVENT_TABLE(mvceditor::RunConsolePluginClass, wxEvtHandler) 
+	EVT_MENU(ID_MENU_RUN_CLI, mvceditor::RunConsolePluginClass::OnRunFileAsCli)
+	EVT_MENU(ID_MENU_RUN_CLI_ARGS, mvceditor::RunConsolePluginClass::OnRunFileAsCli)
+	EVT_MENU(ID_MENU_RUN_CLI_IN_NEW_WINDOW, mvceditor::RunConsolePluginClass::OnRunFileAsCliInNewWindow)
+	EVT_MENU(ID_MENU_RUN_CLI_IN_NEW_WINDOW_ARGS, mvceditor::RunConsolePluginClass::OnRunFileAsCliInNewWindow)
+	EVT_TOOL(ID_TOOLBAR_RUN, mvceditor::RunConsolePluginClass::OnRunFileAsCli)
+	EVT_UPDATE_UI(wxID_ANY, mvceditor::RunConsolePluginClass::OnUpdateUi)
+END_EVENT_TABLE()
