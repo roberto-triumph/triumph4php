@@ -840,24 +840,37 @@ void mvceditor::ResourceFinderClass::Print() {
 
 void mvceditor::ResourceFinderClass::CopyResourcesFrom(const mvceditor::ResourceFinderClass& src) {
 	ResourceCache.clear();
+
+	// since resource caches can be quite large, avoid using push_back
+	ResourceCache.resize(src.ResourceCache.size());
 	std::list<ResourceClass>::const_iterator it;
-	for (it = src.ResourceCache.begin(); it != src.ResourceCache.end(); ++it) {
-		ResourceClass res = *it;
-		ResourceCache.push_back(res);
+	std::list<ResourceClass>::iterator destIt;
+	it = src.ResourceCache.begin();
+	destIt = ResourceCache.begin();
+	while(it != src.ResourceCache.end()) {
+		*destIt = *it;
+		++destIt;
+		++it;
 	}
 	MembersCache.clear();
-	for (it = src.MembersCache.begin(); it != src.MembersCache.end(); ++it) {
-		ResourceClass res = *it;
-		MembersCache.push_back(res);
+	MembersCache.resize(src.MembersCache.size());
+	it = src.MembersCache.begin();
+	destIt = MembersCache.begin();
+	while (it != src.MembersCache.end()) {
+		*destIt = *it;
+		++destIt;
+		++it;
 	}
 	FileCache.clear();
-	std::vector<FileItem>::const_iterator fit;
-	for (fit = src.FileCache.begin(); fit != src.FileCache.end(); ++fit) {
-		FileItem item;
-		item.DateTime = fit->DateTime;
-		item.FullPath = fit->FullPath;
-		item.Parsed = fit->Parsed;
-		FileCache.push_back(item);
+	FileCache.resize(src.FileCache.size());
+	std::vector<FileItem>::const_iterator fit = src.FileCache.begin();
+	std::vector<FileItem>::iterator destFit = FileCache.begin();
+	while(fit != src.FileCache.end()) {
+		destFit->DateTime = fit->DateTime;
+		destFit->FullPath = fit->FullPath;
+		destFit->Parsed = fit->Parsed;
+		++destFit;
+		++fit;
 	}
 	IsCacheSorted = src.IsCacheSorted;
 }
