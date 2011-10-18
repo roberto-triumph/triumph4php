@@ -70,6 +70,9 @@ class ProjectClass {
 	
 public:
 
+	/**
+	 * guard concurrent access to SQL Resource finder
+	 */
 	wxMutex SqlResourceFinderMutex;
 	
 	/**
@@ -116,7 +119,8 @@ public:
 	
 	/**
 	 * Returns the valid PHP file extensions for this project
-	 * @return wxString file extensions
+	 * @return wxString file extensions. This string will be suitable to
+	 * be given to the wxMatchWild() function
 	 */
 	wxString GetPhpFileExtensions() const;
 	
@@ -131,12 +135,13 @@ public:
 	wxString GetPhpExecutable() const;
 	
 	/**
+	 * @return the project's parsed resources (class, method, function names).
 	 * This object will still own the returned pointer. Do NOT delete it.
 	 */
 	ResourceFinderClass* GetResourceFinder();
 	
 	/**
-	 * Get the SQL ResourceFinder. 
+	 *  This object will still own the returned pointer. Do NOT delete it.
 	 * WARNING: NEED TO ACQUIRE THE LOCK FIRST!! You need to acquire the sql resource finder mutex of this object
 	 * 
 	 * wxMutexLocker locker(Project.SqlResourceFinderMutex)

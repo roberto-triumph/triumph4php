@@ -1200,4 +1200,29 @@ TEST_FIXTURE(ResourceFinderTestClass, GetResourceMatchPositionShouldReturnValidP
 	CHECK_EQUAL(19, length);
 }
 
+TEST_FIXTURE(ResourceFinderTestClass, CopyResourcesFromShouldCopyCopy) {
+	wxString testFile = wxT("test.php");
+	CreateFixtureFile(testFile, wxString::FromAscii(
+		"<?php\n"
+		"$s = 'hello';\n"
+		"\n"
+		"?>\n"
+	));
+	CHECK(ResourceFinder->Prepare(testFile));
+	ResourceFinder->Walk(TestProjectDir + testFile);
+	CHECK(ResourceFinder->CollectNearMatchResources());
+	CHECK_EQUAL((size_t)1, ResourceFinder->GetResourceMatchCount());
+	CHECK_EQUAL(TestProjectDir + wxT("test.php"), ResourceFinder->GetResourceMatchFullPath(0));
+
+	mvceditor::ResourceFinderClass copy;
+	copy.CopyResourcesFrom(*ResourceFinder);
+
+	CHECK(copy.Prepare(testFile));
+
+	// notice that we do not need to parse the file again
+	CHECK(copy.CollectNearMatchResources());
+	CHECK_EQUAL((size_t)1, copy.GetResourceMatchCount());
+	CHECK_EQUAL(TestProjectDir + wxT("test.php"), copy.GetResourceMatchFullPath(0));
+}
+
 }

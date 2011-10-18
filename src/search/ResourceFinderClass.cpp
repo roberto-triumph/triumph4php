@@ -179,8 +179,13 @@ bool mvceditor::ResourceFinderClass::Prepare(const wxString& resource) {
 }
 
 void mvceditor::ResourceFinderClass::BuildResourceCacheForNativeFunctions() {
+	wxFileName fileName = NativeFunctionsFilePath();	
+	if (fileName.FileExists()) {
+		BuildResourceCache(fileName.GetFullPath(), true);
+	}
+}
 
-	// add the php built in functions
+wxFileName mvceditor::ResourceFinderClass::NativeFunctionsFilePath() {
 	wxStandardPaths paths;
 	wxFileName pathExecutableFileName(paths.GetExecutablePath());
 	wxString nativeFileName = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
@@ -189,9 +194,7 @@ void mvceditor::ResourceFinderClass::BuildResourceCacheForNativeFunctions() {
 	                          wxT("native.php");
 	wxFileName fileName(nativeFileName);
 	fileName.Normalize();
-	if (fileName.FileExists()) {
-		BuildResourceCache(fileName.GetFullPath(), true);
-	}
+	return fileName;
 }
 
 bool mvceditor::ResourceFinderClass::CollectNearMatchResources() {
@@ -833,6 +836,30 @@ void mvceditor::ResourceFinderClass::Print() {
 			it->Resource.getTerminatedBuffer(), it->Identifier.getTerminatedBuffer(),  it->Type);
 	}
 	u_fclose(out);
+}
+
+void mvceditor::ResourceFinderClass::CopyResourcesFrom(const mvceditor::ResourceFinderClass& src) {
+	ResourceCache.clear();
+	std::list<ResourceClass>::const_iterator it;
+	for (it = src.ResourceCache.begin(); it != src.ResourceCache.end(); ++it) {
+		ResourceClass res = *it;
+		ResourceCache.push_back(res);
+	}
+	MembersCache.clear();
+	for (it = src.MembersCache.begin(); it != src.MembersCache.end(); ++it) {
+		ResourceClass res = *it;
+		MembersCache.push_back(res);
+	}
+	FileCache.clear();
+	std::vector<FileItem>::const_iterator fit;
+	for (fit = src.FileCache.begin(); fit != src.FileCache.end(); ++fit) {
+		FileItem item;
+		item.DateTime = fit->DateTime;
+		item.FullPath = fit->FullPath;
+		item.Parsed = fit->Parsed;
+		FileCache.push_back(item);
+	}
+	IsCacheSorted = src.IsCacheSorted;
 }
 
 void mvceditor::ResourceFinderClass::EnsureSorted() {

@@ -31,6 +31,7 @@
 #include <language/ParserClass.h>
 #include <wx/datetime.h>
 #include <wx/string.h>
+#include <wx/filename.h>
 #include <unicode/unistr.h>
 #include <list>
 #include <vector>
@@ -152,9 +153,15 @@ public:
 	
 	/**
 	 * Builds cache for PHP native functions. After a call to this method, CollectNearMatchResources, 
-	 * GetResourceSignature methods will work for PHP natve functions (array, string, file functions ...).
+	 * GetResourceSignature methods will work for PHP native functions (array, string, file functions ...).
 	 */
 	void BuildResourceCacheForNativeFunctions();
+
+	/**
+	 * Returns the file that has the PHP native functions.This file was created using the script
+	 * resources/parser_php_doc.php and exists inside of the MVC Editor app distribution.
+	 */
+	wxFileName NativeFunctionsFilePath();
 	
 	/**
 	 * Parses the given string for resources.  This method would be used, for example, when wanting
@@ -368,6 +375,16 @@ public:
 	 * Print the resource cache to stdout.  Useful for debugging only.
 	 */
 	void Print();
+
+	/**
+	 * This method copies the internal resource lists from the given object to this. This method can
+	 * be used to create a new instance of ResourceFinder without needing to re-scan the entire
+	 * file system.  After a call to this method both src and this will have the same resources
+	 * (but as DIFFERENT COPIES).
+	 *
+	 * Note that the matches are NOT copied.
+	 */
+	void CopyResourcesFrom(const ResourceFinderClass& src);
 	
 private:
 	

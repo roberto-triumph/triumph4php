@@ -35,16 +35,51 @@ int ID_MENU_JUMP = mvceditor::PluginClass::newMenuId();
 int ID_TOOLBAR_INDEX = wxNewId();
 int ID_RESOURCE_PLUGIN_PANEL = wxNewId();
 
+mvceditor::ResourceFileReaderClass::ResourceFileReaderClass(wxEvtHandler& handler) 
+	: BackgroundFileReaderClass(handler)
+	, NewResources() {
+}
+
+bool mvceditor::ResourceFileReaderClass::InitForNativeFunctionsFile(const mvceditor::ResourceFinderClass& finder) {
+	wxFileName nativeFunctionsFilePath = NewResources.NativeFunctionsFilePath();
+	if (Init(nativeFunctionsFilePath.GetPath())) {
+		NewResources.CopyResourcesFrom(finder);
+		NewResources.FilesFilter = nativeFunctionsFilePath.GetFullName();
+
+		// need to do this so that the resource finder attempts to parse the files
+		NewResources.Prepare(wxT("FakeClass"));
+		return true;
+	}
+	return false;
+}
+
+bool mvceditor::ResourceFileReaderClass::InitForProject(const mvceditor::ResourceFinderClass& finder, const wxString& projectRootPath, const wxString& phpFileExtensions) {
+	if (Init(projectRootPath)) {
+		NewResources.CopyResourcesFrom(finder);
+		NewResources.FilesFilter = phpFileExtensions;
+		return true;
+	}
+	return false;
+}
+
+void mvceditor::ResourceFileReaderClass::GetNewResources(mvceditor::ResourceFinderClass& dest) {
+	dest.CopyResourcesFrom(NewResources);
+}
+
+bool mvceditor::ResourceFileReaderClass::FileRead(mvceditor::DirectorySearchClass& search) {
+	return search.Walk(NewResources);
+}
+
+bool mvceditor::ResourceFileReaderClass::FileMatch(const wxString& file) {
+	return wxMatchWild(NewResources.FilesFilter, file);
+}
+
 mvceditor::ResourcePluginClass::ResourcePluginClass()
 	: PluginClass()
 	, JumpToText()
-	, DirectorySearch()
+	, ResourceFileReader(*this)
 	, ProjectIndexMenu(NULL)
-	, Timer()
-	, State(FREE)
-	, HasCodeLookups(false)
-	, HasFileLookups(false) {
-	Timer.SetOwner(this);
+	, State(FREE) {
 }
 
 void mvceditor::ResourcePluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
@@ -71,26 +106,57 @@ void mvceditor::ResourcePluginClass::AddCodeControlClassContextMenuItems(wxMenu*
 }
 
 void mvceditor::ResourcePluginClass::OnProjectOpened() {
-	HasCodeLookups = false;
-	HasFileLookups = false;
+	if (ResourceFileReader.InitForNativeFunctionsFile(*(GetProject()->GetResourceFinder()))) {
+		mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
+		if (ResourceFileReader.StartReading(error)) {
+			GetStatusBarWithGauge()->AddGauge(_("Preparing Resource Index"), ID_COUNT_FILES_GAUGE, 
+				StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
+		}
+		else if (mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING == error) {
+			wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
+		}
+		else if (mvceditor::BackgroundFileReaderClass::NO_RESOURCES == error) {
+			wxMessageBox(_("Your system is low on resources. Try again later."), wxT("Warning"), wxICON_EXCLAMATION);
+		}
+	}
 }
 
 void mvceditor::ResourcePluginClass::SearchForResources() {
-	if (GetProject() && !GetProject()->GetRootPath().IsEmpty()) {
-		if (FREE == State) { //prevent two finds at a time
-			ResourceFinderClass* resourceFinder = GetResourceFinder();
+	mvceditor::ProjectClass* project = GetProject();
+	if (project && !project->GetRootPath().IsEmpty()) {
+
+		//prevent two finds at a time
+		if (FREE == State) { 
+			ResourceFinderClass* resourceFinder = project->GetResourceFinder();
 
 			// don't bother searching when path or expression is not valid
-			if (DirectorySearch.Init(GetProject()->GetRootPath()) && resourceFinder->Prepare(JumpToText)) {
-				GetStatusBarWithGauge()->AddGauge(_("Counting Files"), ID_COUNT_FILES_GAUGE, StatusBarWithGaugeClass::INDETERMINATE_MODE, 
-					wxGA_HORIZONTAL);
-				FileCount = 0;
-				State = GOTO_COUNT_FILES;
-				Timer.Start(200, wxTIMER_CONTINUOUS);
+			if (resourceFinder->Prepare(JumpToText)) {
+				if (ResourceFileReader.InitForProject(*resourceFinder, project->GetRootPath(), 
+					project->GetPhpFileExtensions())) {
+						mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
+						if (ResourceFileReader.StartReading(error)) {
+							State = GOTO;
+							GetStatusBarWithGauge()->AddGauge(_("Searching For Resources"),
+								ID_COUNT_FILES_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE,
+								wxGA_HORIZONTAL);
+						}
+						else if (mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING == error) {
+							wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
+						}
+						else if (mvceditor::BackgroundFileReaderClass::NO_RESOURCES == error) {
+							wxMessageBox(_("Your system is low on resources. Try again later."), wxT("Warning"), wxICON_EXCLAMATION);
+						}
+				}
+				else {
+					wxMessageBox(_("Invalid Project Path"), wxT("Warning"), wxICON_EXCLAMATION);
+				}
 			}
 			else {
-				wxMessageBox(_("Invalid Expression or Project Path"), wxT("Warning"), wxICON_EXCLAMATION);
+				wxMessageBox(_("Invalid Expression"), wxT("Warning"), wxICON_EXCLAMATION);
 			}
+		}
+		else {
+			wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
 		}
 	}
 	else {
@@ -98,78 +164,23 @@ void mvceditor::ResourcePluginClass::SearchForResources() {
 	}
 }
 
-void mvceditor::ResourcePluginClass::OnIdleEvent(wxIdleEvent& event) {
-	if (GOTO_COUNT_FILES == State || INDEX_COUNT_FILES == State) {
-		
-		// we may or may not index depending on whether we have built the appropriate cache
-		if (!NeedToIndex()) {
-			Timer.Stop();
-			GetStatusBarWithGauge()->StopGauge(ID_COUNT_FILES_GAUGE);
-			State = State == GOTO_COUNT_FILES ? GOTO : INDEX;
-		}
-		
-		// for each idle event do at most 50 files.  this will prevent freezes on big projects.
-		int i = 0;
-		int MAX_DIR = 50;
-		while (i < MAX_DIR && DirectorySearch.More()) {
-			if (DirectorySearch.Walk(*this)) {
-				FileCount++;
-			}
-			i++;
-		}
-		if (!DirectorySearch.More()) {
-			// end of file count. build the status bar and commence searching
-			Timer.Stop();
-			GetStatusBarWithGauge()->StopGauge(ID_COUNT_FILES_GAUGE);			
-			if (DirectorySearch.Init(GetProject()->GetRootPath())) {
-				// not quite sure why we are one-off here, if I dont add the one I get an failed assertion in the gauge class
-				GetStatusBarWithGauge()->AddGauge(_("Resource Lookup "), ID_JUMP_TO_GAUGE, FileCount + 1, 
-						wxGA_HORIZONTAL);
-				State = State == GOTO_COUNT_FILES ? GOTO : INDEX;
-			}
-		}
-		else {
-			event.RequestMore();
-		}
-	}
-	else if (GOTO == State || INDEX == State) {
-		ResourceFinderClass* resourceFinder = GetResourceFinder();
+void mvceditor::ResourcePluginClass::OnWorkInProgress(wxCommandEvent& event) {
+	GetStatusBarWithGauge()->IncrementGauge(ID_COUNT_FILES_GAUGE, StatusBarWithGaugeClass::INDETERMINATE_MODE);
+}
 
-		// we may or may not index depending on whether we have built the appropriate cache
-		// only walk through at most 10 files per idle event
-		if (NeedToIndex()) {
-			for (int i = 0; i < 10 && DirectorySearch.More(); i++) {
-				GetStatusBarWithGauge()->IncrementGauge(ID_JUMP_TO_GAUGE);
-				DirectorySearch.Walk(*resourceFinder);				
-			}
-		}
-		if (!NeedToIndex() || !DirectorySearch.More()) {
-			// THE END of the resource caching
-			if (ResourceFinderClass::CLASS_NAME == resourceFinder->GetResourceType() || 
-				ResourceFinderClass::CLASS_NAME_METHOD_NAME == resourceFinder->GetResourceType()) {
-				HasCodeLookups = true;
-				HasFileLookups = true;
-			}
-			else if (ResourceFinderClass::FILE_NAME == resourceFinder->GetResourceType() || 
-				ResourceFinderClass::FILE_NAME_LINE_NUMBER == resourceFinder->GetResourceType()) {
-				HasFileLookups = true;
-			}			
-			if (GOTO == State) {
-				resourceFinder->CollectNearMatchResources();
-			}
-			GetStatusBarWithGauge()->StopGauge(ID_JUMP_TO_GAUGE);
-			
-			// switch state before showing results, so that when more idle events get triggered we skip them
-			States previousState = State;
-			State = FREE;
-			if (GOTO == previousState) {
-				ShowJumpToResults();
-			}			
-		}
-		else {
-			event.RequestMore();
-		}
-	}
+void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
+	GetStatusBarWithGauge()->StopGauge(ID_COUNT_FILES_GAUGE);
+
+	mvceditor::ResourceFinderClass* resourceFinder = GetResourceFinder();
+	ResourceFileReader.GetNewResources(*resourceFinder);
+	
+	// if we indexed because of a user query; need to show the user the results.
+	States previousState = State;
+	State = FREE;
+	if (GOTO == previousState) {
+		resourceFinder->CollectNearMatchResources();
+		ShowJumpToResults();
+	}	
 }
 
 void mvceditor::ResourcePluginClass::ShowJumpToResults() {
@@ -216,25 +227,38 @@ void mvceditor::ResourcePluginClass::ShowJumpToResults() {
 }
 
 void mvceditor::ResourcePluginClass::OnProjectIndex(wxCommandEvent& event) {
-	if (GetProject() && !GetProject()->GetRootPath().IsEmpty()) {
-		
-		// prevent indexing from being done if already being performed
-		if (FREE == State) {
-			ResourceFinderClass* resourceFinder = GetResourceFinder();
-			
-			// index for now is just searching for something that will never be found
-			if (DirectorySearch.Init(GetProject()->GetRootPath()) && resourceFinder->Prepare(wxT("FakeClass"))) {				
-				GetStatusBarWithGauge()->AddGauge(_("Counting Files"), ID_COUNT_FILES_GAUGE, StatusBarWithGaugeClass::INDETERMINATE_MODE, 
-					wxGA_HORIZONTAL);
-				FileCount = 0;
-				Timer.Start(200, wxTIMER_CONTINUOUS);
-				State = INDEX_COUNT_FILES;
-				
-				// INDEX state is user-initiated index, force a refresh of the cache
-				HasCodeLookups = false;
-				HasFileLookups = false;
-				
+	mvceditor::ProjectClass* project = GetProject();
+	if (project && !project->GetRootPath().IsEmpty()) {
+
+		//prevent two finds at a time
+		if (FREE == State) { 
+			ResourceFinderClass* resourceFinder = project->GetResourceFinder();
+
+			// don't bother searching when path or expression is not valid
+			// need to do this so that the resource finder attempts to parse the files
+			resourceFinder->Prepare(wxT("FakeClass"));			
+			if (ResourceFileReader.InitForProject(*resourceFinder, project->GetRootPath(), 
+				project->GetPhpFileExtensions())) {
+					mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
+					if (ResourceFileReader.StartReading(error)) {
+						State = INDEXING_PROJECT;
+						GetStatusBarWithGauge()->AddGauge(_("Indexing Project"),
+							ID_COUNT_FILES_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE,
+							wxGA_HORIZONTAL);
+					}
+					else if (mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING == error) {
+						wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
+					}
+					else if (mvceditor::BackgroundFileReaderClass::NO_RESOURCES == error) {
+						wxMessageBox(_("Your system is low on resources. Try again later."), wxT("Warning"), wxICON_EXCLAMATION);
+					}
 			}
+			else {
+				wxMessageBox(_("Invalid Project Path"), wxT("Warning"), wxICON_EXCLAMATION);
+			}
+		}
+		else {
+			wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
 		}
 	}
 	else {
@@ -313,28 +337,6 @@ void mvceditor::ResourcePluginClass::OnUpdateUi(wxUpdateUIEvent& event) {
 
 mvceditor::ResourceFinderClass* mvceditor::ResourcePluginClass::GetResourceFinder() const {
 	return GetProject()->GetResourceFinder();
-}
-
-bool mvceditor::ResourcePluginClass::NeedToIndex() const {
-	ResourceFinderClass* resourceFinder = GetResourceFinder();
-	if ((ResourceFinderClass::CLASS_NAME == resourceFinder->GetResourceType() || 
-		ResourceFinderClass::CLASS_NAME_METHOD_NAME == resourceFinder->GetResourceType()) && !HasCodeLookups)  {
-		return true;
-	}
-	else if ((ResourceFinderClass::FILE_NAME == resourceFinder->GetResourceType() || 
-		ResourceFinderClass::FILE_NAME_LINE_NUMBER == resourceFinder->GetResourceType()) && !HasFileLookups) {
-		return true;
-	}			
-	return false;
-}
-
-bool mvceditor::ResourcePluginClass::Walk(const wxString& file) {
-	// always count all files.
-	return true;
-}
-
-void mvceditor::ResourcePluginClass::OnTimer(wxTimerEvent& event) {
-	GetStatusBarWithGauge()->IncrementGauge(ID_COUNT_FILES_GAUGE, StatusBarWithGaugeClass::INDETERMINATE_MODE);
 }
 
 mvceditor::ResourcePluginPanelClass::ResourcePluginPanelClass(wxWindow* parent, ResourcePluginClass& resource, NotebookClass* notebook)
@@ -479,10 +481,10 @@ void mvceditor::ResourcePluginPanelClass::OnPageClosed(wxAuiNotebookEvent& event
 BEGIN_EVENT_TABLE(mvceditor::ResourcePluginClass, wxEvtHandler)
 	EVT_MENU(ID_TOOLBAR_INDEX, mvceditor::ResourcePluginClass::OnProjectIndex)
 	EVT_MENU(ID_MENU_JUMP, mvceditor::ResourcePluginClass::OnJump)
-	EVT_IDLE(mvceditor::ResourcePluginClass::OnIdleEvent)
 	EVT_MENU(ID_MENU_INDEX, mvceditor::ResourcePluginClass::OnProjectIndex)
 	EVT_UPDATE_UI(wxID_ANY, mvceditor::ResourcePluginClass::OnUpdateUi)
-	EVT_TIMER(wxID_ANY, mvceditor::ResourcePluginClass::OnTimer)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FILE_READ_COMPLETE, mvceditor::ResourcePluginClass::OnWorkComplete)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ResourcePluginClass::OnWorkInProgress)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::ResourcePluginPanelClass, ResourcePluginGeneratedPanelClass)

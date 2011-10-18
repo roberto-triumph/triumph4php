@@ -350,7 +350,6 @@ void mvceditor::AppClass::ProjectOpen(const wxString& directoryPath) {
 	CloseProject();
 	Project = new ProjectClass(options);
 	FrameworkIdentifiersLeftToDetect.clear();
-	Project->GetResourceFinder()->BuildResourceCacheForNativeFunctions();
 	wxString cmd = Project->DetectFrameworkCommand();
 	long pid = 0;
 	if (!ProcessWithHeartbeat.Init(cmd, ID_FRAMEWORK_DETECT_PROCESS, pid)) {
