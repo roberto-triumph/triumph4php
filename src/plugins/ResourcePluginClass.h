@@ -185,6 +185,18 @@ private:
 	 */
 	ResourceFinderClass* GetResourceFinder() const;
 
+	/**
+	* Returns true if files in the project have NOT already been cached by the resource finder. This does not
+	* necesaarily mean that the resource finder has parsed them; if so far all resource lookups have been for
+	* file names then the resource finder has not parsed a single file.  What it does mean is that the next call
+	* to ResourceFinderClass::LocateResourceInFileSystem will be really slow because the appropriate cache has
+	* not been built. (ie file lookups will be fast after the first file lookup, class lookups will be
+	* slow until the second file lookup)
+	*
+	* @return bool
+	*/
+	bool NeedToIndex() const;
+
 	 /**
 	  * The various states control what this plugin does.
 	  * Because indexing runs in a background thread we need to save
@@ -196,6 +208,11 @@ private:
 		 * background thread is not running
 		 */
 		FREE,
+
+		/**
+		 * background thread is running; used during initial project opening
+		 */
+		INDEXING_NATIVE_FUNCTIONS,
 
 		/**
 		 * background thread is running; used triggered an index operation only
@@ -226,6 +243,18 @@ private:
 	 * To check if parsing is happening at the moment; and what files we are parsing.
 	 */
 	States State;
+
+	/**
+	* Flag that will store when files have been parsed.
+	* @var bool
+	*/
+	bool HasCodeLookups;
+
+	/**
+	* Flag that will store when file names have been walked over and cached.
+	* @var bool
+	*/
+	bool HasFileLookups;
 
 	DECLARE_EVENT_TABLE()
 };

@@ -79,7 +79,10 @@ mvceditor::ResourcePluginClass::ResourcePluginClass()
 	, JumpToText()
 	, ResourceFileReader(*this)
 	, ProjectIndexMenu(NULL)
-	, State(FREE) {
+	, State(FREE) 
+	, HasCodeLookups(false)
+	, HasFileLookups(false) {
+
 }
 
 void mvceditor::ResourcePluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
@@ -106,9 +109,15 @@ void mvceditor::ResourcePluginClass::AddCodeControlClassContextMenuItems(wxMenu*
 }
 
 void mvceditor::ResourcePluginClass::OnProjectOpened() {
+	HasCodeLookups = false;
+	HasFileLookups = false;
+	if (ResourceFileReader.IsRunning()) {
+		ResourceFileReader.StopReading();
+	}
 	if (ResourceFileReader.InitForNativeFunctionsFile(*(GetProject()->GetResourceFinder()))) {
 		mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
 		if (ResourceFileReader.StartReading(error)) {
+			State = INDEXING_NATIVE_FUNCTIONS;
 			GetStatusBarWithGauge()->AddGauge(_("Preparing Resource Index"), ID_COUNT_FILES_GAUGE, 
 				StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 		}
@@ -123,36 +132,48 @@ void mvceditor::ResourcePluginClass::OnProjectOpened() {
 
 void mvceditor::ResourcePluginClass::SearchForResources() {
 	mvceditor::ProjectClass* project = GetProject();
+	mvceditor::ResourceFinderClass* resourceFinder = project->GetResourceFinder();
+	
+	// don't bother searching when path or expression is not valid
+	if (!resourceFinder->Prepare(JumpToText)) {
+		wxMessageBox(_("Invalid Expression"), wxT("Warning"), wxICON_EXCLAMATION);
+		return;
+	}
+	
+	// if we know the indexing has already taken place lets just do the lookup; it will be quick.
+	if (!NeedToIndex() && project) {
+		resourceFinder->CollectNearMatchResources();
+		ShowJumpToResults();
+		return;
+	}
+
+	// need to do indexing; start the background process
+	
 	if (project && !project->GetRootPath().IsEmpty()) {
 
 		//prevent two finds at a time
 		if (FREE == State) { 
 			ResourceFinderClass* resourceFinder = project->GetResourceFinder();
 
-			// don't bother searching when path or expression is not valid
-			if (resourceFinder->Prepare(JumpToText)) {
-				if (ResourceFileReader.InitForProject(*resourceFinder, project->GetRootPath(), 
-					project->GetPhpFileExtensions())) {
-						mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
-						if (ResourceFileReader.StartReading(error)) {
-							State = GOTO;
-							GetStatusBarWithGauge()->AddGauge(_("Searching For Resources"),
-								ID_COUNT_FILES_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE,
-								wxGA_HORIZONTAL);
-						}
-						else if (mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING == error) {
-							wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
-						}
-						else if (mvceditor::BackgroundFileReaderClass::NO_RESOURCES == error) {
-							wxMessageBox(_("Your system is low on resources. Try again later."), wxT("Warning"), wxICON_EXCLAMATION);
-						}
-				}
-				else {
-					wxMessageBox(_("Invalid Project Path"), wxT("Warning"), wxICON_EXCLAMATION);
-				}
+			// don't bother searching when path is not valid
+			if (ResourceFileReader.InitForProject(*resourceFinder, project->GetRootPath(), 
+				project->GetPhpFileExtensions())) {
+					mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
+					if (ResourceFileReader.StartReading(error)) {
+						State = GOTO;
+						GetStatusBarWithGauge()->AddGauge(_("Searching For Resources"),
+							ID_COUNT_FILES_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE,
+							wxGA_HORIZONTAL);
+					}
+					else if (mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING == error) {
+						wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
+					}
+					else if (mvceditor::BackgroundFileReaderClass::NO_RESOURCES == error) {
+						wxMessageBox(_("Your system is low on resources. Try again later."), wxT("Warning"), wxICON_EXCLAMATION);
+					}
 			}
 			else {
-				wxMessageBox(_("Invalid Expression"), wxT("Warning"), wxICON_EXCLAMATION);
+				wxMessageBox(_("Invalid Project Path"), wxT("Warning"), wxICON_EXCLAMATION);
 			}
 		}
 		else {
@@ -173,6 +194,20 @@ void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
 
 	mvceditor::ResourceFinderClass* resourceFinder = GetResourceFinder();
 	ResourceFileReader.GetNewResources(*resourceFinder);
+
+	// figure out what resources have been cached, so that next time we can jump
+	// to the results without creating a new background thread
+	if (INDEXING_PROJECT == State || GOTO == State) {
+		if (ResourceFinderClass::CLASS_NAME == resourceFinder->GetResourceType() ||
+			ResourceFinderClass::CLASS_NAME_METHOD_NAME == resourceFinder->GetResourceType()) {
+			HasCodeLookups = true;
+			HasFileLookups = true;
+		}
+		else if (ResourceFinderClass::FILE_NAME == resourceFinder->GetResourceType() ||
+			ResourceFinderClass::FILE_NAME_LINE_NUMBER == resourceFinder->GetResourceType()) {
+			HasFileLookups = true;
+		}
+	}
 	
 	// if we indexed because of a user query; need to show the user the results.
 	States previousState = State;
@@ -180,7 +215,7 @@ void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
 	if (GOTO == previousState) {
 		resourceFinder->CollectNearMatchResources();
 		ShowJumpToResults();
-	}	
+	}
 }
 
 void mvceditor::ResourcePluginClass::ShowJumpToResults() {
@@ -334,6 +369,20 @@ void mvceditor::ResourcePluginClass::OnUpdateUi(wxUpdateUIEvent& event) {
 
 	event.Skip();
 }
+
+bool mvceditor::ResourcePluginClass::NeedToIndex() const {
+	ResourceFinderClass* resourceFinder = GetResourceFinder();
+	if ((ResourceFinderClass::CLASS_NAME == resourceFinder->GetResourceType() ||
+		ResourceFinderClass::CLASS_NAME_METHOD_NAME == resourceFinder->GetResourceType()) && !HasCodeLookups)  {
+		return true;
+	}
+	else if ((ResourceFinderClass::FILE_NAME == resourceFinder->GetResourceType() ||
+		ResourceFinderClass::FILE_NAME_LINE_NUMBER == resourceFinder->GetResourceType()) && !HasFileLookups) {
+		return true;
+	}
+	return false;
+}
+
 
 mvceditor::ResourceFinderClass* mvceditor::ResourcePluginClass::GetResourceFinder() const {
 	return GetProject()->GetResourceFinder();
