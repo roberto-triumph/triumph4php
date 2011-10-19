@@ -1081,12 +1081,14 @@ TEST_FIXTURE(ResourceFinderTestClass, GetResourceSignatureShouldReturnSignatureF
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
+		"/**\n\tGets the user's name\n*/\n"
 		"\tfunction getName() {\n"
 		"\t\treturn $this->name;\n"
 		"\t}\n"
 		"}\n"
 		"class AdminClass extends UserClass {\n"
 		"}\n"
+		"/**\nPrint the user's name to the STDOUT\n*/\n"
 		"function userClassPrint($user) {\n"
 		"\t echo $user->getName() . \"\\n\";"
 		"}\n"
@@ -1096,8 +1098,13 @@ TEST_FIXTURE(ResourceFinderTestClass, GetResourceSignatureShouldReturnSignatureF
 	CreateFixtureFile(testFile, code);
 	CHECK(ResourceFinder->Prepare(wxT("userClas")));
 	ResourceFinder->Walk(TestProjectDir + testFile);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("getName()"), ResourceFinder->GetResourceSignature(UNICODE_STRING_SIMPLE("UserClass::getName")));
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("userClassPrint($user)"), ResourceFinder->GetResourceSignature(UNICODE_STRING_SIMPLE("userClassPrint")));
+	UnicodeString comment;
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("getName()"), 
+		ResourceFinder->GetResourceSignature(UNICODE_STRING_SIMPLE("UserClass::getName"), comment));
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/**\n\tGets the user's name\n*/"), comment);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("userClassPrint($user)"), 
+		ResourceFinder->GetResourceSignature(UNICODE_STRING_SIMPLE("userClassPrint"), comment));
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/**\nPrint the user's name to the STDOUT\n*/"), comment);
 }
 
 TEST_FIXTURE(ResourceFinderTestClass, GetResourceParentClassShouldReturnParentClass) {

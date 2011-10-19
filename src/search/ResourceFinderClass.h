@@ -249,12 +249,14 @@ public:
 	bool CollectNearMatchResources();
 
 	/**
-	 * Gets the signature for the given resource. This method will not trigger rebuilding of resource cache.
+	 * Gets the signature for the given resource. This is a strict comparison, resource must match
+	 * exactly.
 	 * 
 	 * @param const UnicodeString& resource
-	 * @param UnicodeString the resource signature
+	 * @param comment the resource's DocComment will be set in this variable.
+	 * @return UnicodeString the resource signature
 	 */
-	UnicodeString GetResourceSignature(const UnicodeString& resource) const;
+	UnicodeString GetResourceSignature(const UnicodeString& resource, UnicodeString& comment) const;
 	
 	/**
 	 * Gets the return type for the given resource. This method will not trigger rebuilding of resource cache.

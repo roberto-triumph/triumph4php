@@ -397,13 +397,14 @@ void mvceditor::ResourceFinderClass::CollectAllMembers(const std::vector<Unicode
 	}
 }
 
-UnicodeString mvceditor::ResourceFinderClass::GetResourceSignature(const UnicodeString& resource) const {
+UnicodeString mvceditor::ResourceFinderClass::GetResourceSignature(const UnicodeString& resource, UnicodeString& comment) const {
 	UnicodeString signature;
 	
 	// a function
 	for (std::list<ResourceClass>::const_iterator it = ResourceCache.begin(); it != ResourceCache.end(); ++it) {
 		if (it->Type != ResourceClass::CLASS && it->Type != ResourceClass::DEFINE && it->Resource == resource) {
 			signature = it->Signature;
+			comment = it->Comment;
 			break;
 		}
 	}
@@ -414,6 +415,7 @@ UnicodeString mvceditor::ResourceFinderClass::GetResourceSignature(const Unicode
 		for (std::list<ResourceClass>::const_iterator it = MembersCache.begin(); it != MembersCache.end(); ++it) {
 			if (it->Type == ResourceClass::METHOD && (it->Resource == resource || it->Resource == constructorSignature)) {
 				signature = it->Signature;
+				comment = it->Comment;
 				break;
 			}
 		}	

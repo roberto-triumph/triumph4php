@@ -493,6 +493,16 @@ private:
 	 * cleanup of internal pointers
 	 */
 	void OnClose(wxCloseEvent& event);
+
+	/**
+	 * show the symbol comment popup to the user
+	 */
+	void OnDwellStart(wxStyledTextEvent& event);
+
+	/**
+	 * Hide the symbool comment popup
+	 */
+	void OnDwellEnd(wxStyledTextEvent& event);
 	
 //------------------------------------------------------------------------
 // Auto complete feature
