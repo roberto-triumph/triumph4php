@@ -179,8 +179,13 @@ bool mvceditor::ResourceFinderClass::Prepare(const wxString& resource) {
 }
 
 void mvceditor::ResourceFinderClass::BuildResourceCacheForNativeFunctions() {
+	wxFileName fileName = NativeFunctionsFilePath();	
+	if (fileName.FileExists()) {
+		BuildResourceCache(fileName.GetFullPath(), true);
+	}
+}
 
-	// add the php built in functions
+wxFileName mvceditor::ResourceFinderClass::NativeFunctionsFilePath() {
 	wxStandardPaths paths;
 	wxFileName pathExecutableFileName(paths.GetExecutablePath());
 	wxString nativeFileName = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
@@ -189,9 +194,7 @@ void mvceditor::ResourceFinderClass::BuildResourceCacheForNativeFunctions() {
 	                          wxT("native.php");
 	wxFileName fileName(nativeFileName);
 	fileName.Normalize();
-	if (fileName.FileExists()) {
-		BuildResourceCache(fileName.GetFullPath(), true);
-	}
+	return fileName;
 }
 
 bool mvceditor::ResourceFinderClass::CollectNearMatchResources() {
@@ -394,13 +397,14 @@ void mvceditor::ResourceFinderClass::CollectAllMembers(const std::vector<Unicode
 	}
 }
 
-UnicodeString mvceditor::ResourceFinderClass::GetResourceSignature(const UnicodeString& resource) const {
+UnicodeString mvceditor::ResourceFinderClass::GetResourceSignature(const UnicodeString& resource, UnicodeString& comment) const {
 	UnicodeString signature;
 	
 	// a function
 	for (std::list<ResourceClass>::const_iterator it = ResourceCache.begin(); it != ResourceCache.end(); ++it) {
 		if (it->Type != ResourceClass::CLASS && it->Type != ResourceClass::DEFINE && it->Resource == resource) {
 			signature = it->Signature;
+			comment = it->Comment;
 			break;
 		}
 	}
@@ -411,6 +415,7 @@ UnicodeString mvceditor::ResourceFinderClass::GetResourceSignature(const Unicode
 		for (std::list<ResourceClass>::const_iterator it = MembersCache.begin(); it != MembersCache.end(); ++it) {
 			if (it->Type == ResourceClass::METHOD && (it->Resource == resource || it->Resource == constructorSignature)) {
 				signature = it->Signature;
+				comment = it->Comment;
 				break;
 			}
 		}	
@@ -833,6 +838,43 @@ void mvceditor::ResourceFinderClass::Print() {
 			it->Resource.getTerminatedBuffer(), it->Identifier.getTerminatedBuffer(),  it->Type);
 	}
 	u_fclose(out);
+}
+
+void mvceditor::ResourceFinderClass::CopyResourcesFrom(const mvceditor::ResourceFinderClass& src) {
+	ResourceCache.clear();
+
+	// since resource caches can be quite large, avoid using push_back
+	ResourceCache.resize(src.ResourceCache.size());
+	std::list<ResourceClass>::const_iterator it;
+	std::list<ResourceClass>::iterator destIt;
+	it = src.ResourceCache.begin();
+	destIt = ResourceCache.begin();
+	while(it != src.ResourceCache.end()) {
+		*destIt = *it;
+		++destIt;
+		++it;
+	}
+	MembersCache.clear();
+	MembersCache.resize(src.MembersCache.size());
+	it = src.MembersCache.begin();
+	destIt = MembersCache.begin();
+	while (it != src.MembersCache.end()) {
+		*destIt = *it;
+		++destIt;
+		++it;
+	}
+	FileCache.clear();
+	FileCache.resize(src.FileCache.size());
+	std::vector<FileItem>::const_iterator fit = src.FileCache.begin();
+	std::vector<FileItem>::iterator destFit = FileCache.begin();
+	while(fit != src.FileCache.end()) {
+		destFit->DateTime = fit->DateTime;
+		destFit->FullPath = fit->FullPath;
+		destFit->Parsed = fit->Parsed;
+		++destFit;
+		++fit;
+	}
+	IsCacheSorted = src.IsCacheSorted;
 }
 
 void mvceditor::ResourceFinderClass::EnsureSorted() {

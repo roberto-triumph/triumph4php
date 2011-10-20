@@ -27,16 +27,79 @@
 
 #include <PluginClass.h>
 #include <plugins/wxformbuilder/ResourcePluginGeneratedClass.h>
-#include <search/DirectorySearchClass.h>
+#include <plugins/BackgroundFileReaderClass.h>
 #include <search/ResourceFinderClass.h>
 #include <wx/string.h>
-#include <wx/stc/stc.h>
 
 namespace mvceditor {
 
 class ResourcePluginPanelClass;
 
-class ResourcePluginClass : public PluginClass, DirectoryWalkerClass {
+/**
+ * This class will take care of iterating through all files in a project
+ * and parsing the resources so that queries to ResourceFinderClass
+ * will work.
+ * We will get around concurrency problems by copying the resource finder
+ * objects; this way the background thread will have its own copy without
+ * needing to synchronize.
+ */
+class ResourceFileReaderClass : public BackgroundFileReaderClass {
+
+public:
+
+	/**
+	 * @param handler will receive EVENT_FILE_* and EVENT_WORK_* events when all 
+	 * files have been iterated through.
+	 */
+	ResourceFileReaderClass(wxEvtHandler& handler);
+
+	/**
+	 * prepare to iterate through the file that has the PHP native functions.
+	 *
+	 * @param existingFinder the existing resources
+	 * @return bool false if native functions file does not exist
+	 */
+	bool InitForNativeFunctionsFile(const ResourceFinderClass& existingFinder);
+
+	/**
+	 * prepare to iterate through all files of the given directory
+	 * that match the given wildcard.
+	 *
+	 * @param existingFinder the existing resources
+	 * @return bool false if project root path does not exist
+	 */
+	bool InitForProject(const ResourceFinderClass& existingFinder, const wxString& projectPath, const wxString& filesFilter);
+
+	/**
+	 * Copies the resources that have been parsed by the background thread into dest.
+	 * Be sure to NOT call this while the background thread is running. Once the
+	 * EVENT_WORK_COMPLETE event is seen then this method is safe to call.
+	 *
+	 * @param dest the new resources that were parsed will go into dest.
+	 */
+	void GetNewResources(ResourceFinderClass& dest);
+
+protected:
+
+	/**
+	 * Files will be parsed for resouces in a background thread.
+	 */
+	virtual bool FileRead(DirectorySearchClass& search);
+
+	/**
+	 * Resources will only look for PHP files.
+	 */
+	virtual bool FileMatch(const wxString& file);
+
+private:
+
+	/**
+	 * A copy of resources that only the background thread will write to.
+	 */
+	ResourceFinderClass NewResources;
+};
+	
+class ResourcePluginClass : public PluginClass {
 
 public:
 
@@ -65,20 +128,13 @@ public:
 	void AddCodeControlClassContextMenuItems(wxMenu* menu);
 	
 	/**
-	 * Implement the walk method of DirectoryWalkerClass. We will 
-	 * count the files here during the idle event instead of using the PRECISE
-	 * flag on the DirectorySearchClass.  This is to prevent screen freeze.
-	 */
-	virtual bool Walk(const wxString& file);
-	
-	/**
-	 * Searches for a file that  matches FileText.  if a single match is found, then the file is opened / brought to the front.
+	 * Searches for a file that matches FileText.  if a single match is found, then the file is opened / brought to the front.
 	 * If multiple files match, then user will be prompted to pick a file to open.
 	 */
 	void SearchForFiles();
 	
 	/**
-	 * Searches for a file that  matches JumpToText.  if a single match is found, then the file is opened / brought to the front.
+	 * Searches for a file that matches JumpToText.  if a single match is found, then the file is opened / brought to the front.
 	 * If multiple files match, then user will be prompted to pick a file to open.
 	 */
 	void SearchForResources();
@@ -89,11 +145,6 @@ public:
 	void OpenFile(wxString fileName);
 	
 private:
-
-	/**
-	 * Will use the idle event to do the resource lookups.
-	 */
-	void OnIdleEvent(wxIdleEvent& event);
 
 	/**
 	 * Handle the results of the resource lookups.
@@ -116,9 +167,14 @@ private:
 	void OnJump(wxCommandEvent& event);
 	
 	/**
-	 * During the timer we will pulse the gauge.
+	 * During file iteration we will pulse the gauge.
 	 */
-	void OnTimer(wxTimerEvent& event);
+	void OnWorkInProgress(wxCommandEvent& event);
+
+	/**
+	 * Once the file parsing finishes alert the user.
+	 */
+	void OnWorkComplete(wxCommandEvent& event);
 	
 	/**
 	 * Opens the page and sets the cursor on the function/method/property/file that was searched for by the
@@ -135,17 +191,17 @@ private:
 	 * @return ResourceFinderClass* 
 	 */
 	ResourceFinderClass* GetResourceFinder() const;
-	
+
 	/**
-	 * Returns true if files in the project have NOT already been cached by the resource finder. This does not
-	 * necesaarily mean that the resource finder has parsed them; if so far all resource lookups have been for
-	 * file names then the resource finder has not parsed a single file.  What it does mean is that the next call
-	 * to ResourceFinderClass::LocateResourceInFileSystem will be really slow because the appropriate cache has
-	 * not been built. (ie file lookups will be fast after the first file lookup, class lookups will be
-	 * slow until the second file lookup)
-	 *
-	 * @return bool
-	 */
+	* Returns true if files in the project have NOT already been cached by the resource finder. This does not
+	* necesaarily mean that the resource finder has parsed them; if so far all resource lookups have been for
+	* file names then the resource finder has not parsed a single file.  What it does mean is that the next call
+	* to ResourceFinderClass::LocateResourceInFileSystem will be really slow because the appropriate cache has
+	* not been built. (ie file lookups will be fast after the first file lookup, class lookups will be
+	* slow until the second file lookup)
+	*
+	* @return bool
+	*/
 	bool NeedToIndex() const;
 	
 	/**
@@ -162,21 +218,33 @@ private:
 	 */
 	void OnPageClosed(wxAuiNotebookEvent& event);
 
-	/**
-	 * The various states control what this plugin does during the IDLE events. This class will perform
-	 * the resource lookups in the main thread, so we need this flag to determine what action to take.
-	 * 
-	 * states go in this order:
-	 * FREE -> GOTO_COUNT_FILES -> GOTO -> FREE
-	 * FREE -> INDEX_COUNT_FILES -> INDEX -> FREE
-	 * 
-	 */
-	enum States {
+	 /**
+	  * The various states control what this plugin does.
+	  * Because indexing runs in a background thread we need to save
+	  * whether or not the user triggered an index or triggered a lookup
+	  */
+	 enum States {
+
+		/**
+		 * background thread is not running
+		 */
 		FREE,
-		GOTO_COUNT_FILES,
-		GOTO,		
-		INDEX_COUNT_FILES,
-		INDEX
+
+		/**
+		 * background thread is running; used during initial project opening
+		 */
+		INDEXING_NATIVE_FUNCTIONS,
+
+		/**
+		 * background thread is running; used triggered an index operation only
+		 */
+		INDEXING_PROJECT,
+
+		/**
+		 * background thread is running; used triggered a resource lookup
+		 * once thread finishes results will be shown to the user
+		 */
+		GOTO
 	};
 	
 	/**
@@ -184,45 +252,34 @@ private:
 	 * 
 	 * @var DirectorySearch
 	 */
-	DirectorySearchClass DirectorySearch;
+	ResourceFileReaderClass ResourceFileReader;
 	
 	/**
 	 * The "Index project" menu item
 	 * @var wxMenuItem* 
 	 */
 	wxMenuItem* ProjectIndexMenu;
-	
-	/**
-	 * To increment the gauge smoothly.
-	 */
-	wxTimer Timer;
-	
+
 	/**
 	 * When a tab changes we must update the FilesCombo combo box
 	 */
 	ResourcePluginPanelClass* ResourcePluginPanel;
 	
 	/**
-	 * we won't use a separate thread to fo the resource finder.  we will use the idle event instead. This State flag will
-	 * signal the idle event to wake up.
+	 * To check if parsing is happening at the moment; and what files we are parsing.
 	 */
 	States State;
-	
+
 	/**
-	 * The number of files that will be searched. 
-	 */
-	int FileCount;
-	
-	/**
-	 * Flag that will store when files have been parsed.
-	 * @var bool
-	 */
+	* Flag that will store when files have been parsed.
+	* @var bool
+	*/
 	bool HasCodeLookups;
 
 	/**
-	 * Flag that will store when file names have been walked over and cached.
-	 * @var bool
-	 */
+	* Flag that will store when file names have been walked over and cached.
+	* @var bool
+	*/
 	bool HasFileLookups;
 
 	DECLARE_EVENT_TABLE()

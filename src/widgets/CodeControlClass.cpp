@@ -28,6 +28,7 @@
 #include <wx/stc/stc.h>
 #include <wx/regex.h>
 #include <wx/tokenzr.h>
+#include <wx/tipwin.h>
 #include <unicode/ustring.h>
 #include <algorithm>
 
@@ -225,6 +226,7 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 	UsePopUp(false);
 	SetYCaretPolicy(wxSTC_CARET_EVEN, 0);
 	ApplyPreferences();
+	SetMouseDwellTime(1500);
 	
 }
 
@@ -486,7 +488,9 @@ void mvceditor::CodeControlClass::HandleCallTip(wxChar ch, bool force) {
 					
 					// highly unlikely that there is more than one match since we searched for a full name (lookup succeeded).
 					UnicodeString fullQualifiedResource =  resourceFinder->GetResourceMatch(0).Resource;
-					CurrentSignature = mvceditor::StringHelperClass::IcuToWx(resourceFinder->GetResourceSignature(fullQualifiedResource));
+					UnicodeString comment;
+					CurrentSignature = mvceditor::StringHelperClass::IcuToWx(
+						resourceFinder->GetResourceSignature(fullQualifiedResource, comment));
 				}
 			}
 			if (!CurrentSignature.IsEmpty()) {
@@ -1299,6 +1303,48 @@ mvceditor::CodeControlClass::Mode mvceditor::CodeControlClass::GetDocumentMode()
 	return DocumentMode;
 }
 
+void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
+	mvceditor::ResourceFinderClass* finder = Project->GetResourceFinder();
+	if (DocumentMode == PHP && finder) {
+		int pos = event.GetPosition();
+		wxString symbol = GetSymbolAt(pos);
+		if (!symbol.IsEmpty()) {
+			finder->Prepare(symbol);
+			bool found = finder->CollectFullyQualifiedResource();
+			if (found) {
+				mvceditor::ResourceClass resource = finder->GetResourceMatch(0);
+				wxString msg = mvceditor::StringHelperClass::IcuToWx(resource.Identifier);
+				if (resource.Type == mvceditor::ResourceClass::FUNCTION) {
+					msg += wxT("\n\n");
+					msg += mvceditor::StringHelperClass::IcuToWx(resource.ReturnType);
+					msg += wxT(" ");
+					msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
+				}
+				else if (resource.Type == mvceditor::ResourceClass::METHOD) {
+					msg += wxT("\n\n");
+					msg += mvceditor::StringHelperClass::IcuToWx(resource.ReturnType);
+					msg += wxT(" ");
+					msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
+				}
+				else {
+					msg += wxT("\n\n");
+					msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
+				}
+				if (!resource.Comment.isEmpty()) {
+					msg += wxT("\n\n");
+					msg += mvceditor::StringHelperClass::IcuToWx(resource.Comment);
+				}
+				wxTipWindow* tip = new wxTipWindow(this, msg, 
+					wxCoord(400), &tip);
+			}
+		}
+	}
+}
+
+void mvceditor::CodeControlClass::OnDwellEnd(wxStyledTextEvent& event) {
+
+}
+
 BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)
 	EVT_STC_MARGINCLICK(wxID_ANY, mvceditor::CodeControlClass::OnMarginClick)
 	EVT_STC_DOUBLECLICK(wxID_ANY, mvceditor::CodeControlClass::OnDoubleClick)
@@ -1311,4 +1357,6 @@ BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)
 	EVT_LEFT_DOWN(mvceditor::CodeControlClass::OnLeftDown)
 	EVT_KEY_DOWN(mvceditor::CodeControlClass::OnKeyDown)
 	EVT_CLOSE(mvceditor::CodeControlClass::OnClose)
+	EVT_STC_DWELLSTART(wxID_ANY, mvceditor::CodeControlClass::OnDwellStart)
+	EVT_STC_DWELLEND(wxID_ANY, mvceditor::CodeControlClass::OnDwellEnd)
 END_EVENT_TABLE()
