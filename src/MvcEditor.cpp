@@ -384,6 +384,7 @@ void mvceditor::AppClass::OnProcessComplete(wxCommandEvent& event) {
 		// framework detection complete.  if a known framework 
 		// was detected get the DB info, else just continue
 		// opening the project
+		Project->DetectFrameworkResponse(event.GetString());
 		std::vector<wxString> frameworks = Project->FrameworkIdentifiers();
 		if (!frameworks.empty()) {
 			for (size_t i = 0; i < frameworks.size(); i++) {
