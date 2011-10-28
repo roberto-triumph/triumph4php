@@ -56,6 +56,11 @@ public:
 	 * if and only if there is a parse error.  
 	 */
 	virtual bool Walk(const wxString& file);
+
+	/**
+	 * set the file counters (WithErrors, WitNoErrors) back to zero
+	 */
+	void ResetTotals();
 	
 	/**
 	 * The last parsing results.
@@ -120,6 +125,16 @@ public:
 	 * Returns TRUE if the file contains a lint error.
 	 */
 	bool LintSingleFile(const wxString& fileName);
+
+	/**
+	 * Return a summary of the number of files that were lint'ed.
+	 * Only use this method after the EVENT_WORK_COMPLETE event is dispatched.
+	 * (ie dont cll this while the background thread is running).
+	 *
+	 * @param totalFiles the number of files checked will be set here
+	 * @param erroFiles the number of files with lint errors will be set here
+	 */
+	void LintTotals(int& totalFiles, int& errorFiles);
 	
 protected:
 
@@ -178,6 +193,11 @@ public:
 	 * editor will be marked up.
 	 */
 	void DisplayLintError(int index);
+
+	/**
+	 * Add the file counts to a label.
+	 */
+	void PrintSummary(int totalFiles, int errorFiles);
 
 	virtual void OnListDoubleClick(wxCommandEvent& event);
 

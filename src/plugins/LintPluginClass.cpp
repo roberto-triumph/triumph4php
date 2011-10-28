@@ -42,6 +42,11 @@ mvceditor::ParserDirectoryWalkerClass::ParserDirectoryWalkerClass()
 		
 }
 
+void mvceditor::ParserDirectoryWalkerClass::ResetTotals() {
+	WithErrors = 0;
+	WithNoErrors = 0;
+}
+
 bool mvceditor::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 	bool ret = false;
 	if (!wxIsWild(PhpFileExtensions) || wxMatchWild(PhpFileExtensions, fileName)) {
@@ -71,6 +76,7 @@ bool mvceditor::LintBackgroundFileReaderClass::BeginDirectoryLint(const wxString
 	PhpFileExtensions = phpFileExtensions;
 	error = mvceditor::BackgroundFileReaderClass::NONE;
 	if (Init(directory)) {
+		ParserDirectoryWalker.ResetTotals();
 		ParserDirectoryWalker.PhpFileExtensions = phpFileExtensions;
 		if (StartReading(error)) {
 			good = true;
@@ -114,6 +120,11 @@ bool mvceditor::LintBackgroundFileReaderClass::FileRead(DirectorySearchClass &se
 
 bool mvceditor::LintBackgroundFileReaderClass::FileMatch(const wxString& file) {
 	return true;
+}
+
+void mvceditor::LintBackgroundFileReaderClass::LintTotals(int& totalFiles, int& errorFiles) {
+	totalFiles = ParserDirectoryWalker.WithErrors + ParserDirectoryWalker.WithNoErrors;
+	errorFiles = ParserDirectoryWalker.WithErrors;
 }
 
 mvceditor::LintResultsPanelClass::LintResultsPanelClass(wxWindow *parent, int id, mvceditor::NotebookClass* notebook,
@@ -167,6 +178,19 @@ void mvceditor::LintResultsPanelClass::RemoveErrorsFor(const wxString& fileName)
 			i++;
 			it++;
 		}
+	}
+}
+
+void mvceditor::LintResultsPanelClass::PrintSummary(int totalFiles, int errorFiles) {
+	if (0 == errorFiles) {
+		this->Label->SetLabel(
+			wxString::Format(_("No errors found; checked %d files"), totalFiles)
+		);
+	}
+	else {
+		this->Label->SetLabel(
+			wxString::Format(_("Found %d files with errors; checked %d files"), errorFiles, totalFiles)
+		);
 	}
 }
 
@@ -259,6 +283,15 @@ void mvceditor::LintPluginClass::OnLintFileComplete(wxCommandEvent& event) {
 void mvceditor::LintPluginClass::OnLintComplete(wxCommandEvent& event) {
 	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 	gauge->StopGauge(ID_LINT_RESULTS_GAUGE);
+	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
+	LintResultsPanelClass* lintResultsPanel = NULL;
+	if (window) {
+		lintResultsPanel = (LintResultsPanelClass*)window;
+		int totalFiles = 0;
+		int errorFiles = 0;
+		LintBackgroundFileReader.LintTotals(totalFiles, errorFiles);
+		lintResultsPanel->PrintSummary(totalFiles, errorFiles);
+	}
 }
 
 void mvceditor::LintPluginClass::OnTimer(wxCommandEvent& event) {
