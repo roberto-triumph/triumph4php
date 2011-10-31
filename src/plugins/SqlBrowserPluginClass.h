@@ -31,6 +31,7 @@
 #include <php_frameworks/ProjectClass.h>
 #include <environment/DatabaseInfoClass.h>
 #include <widgets/ThreadWithHeartbeatClass.h>
+#include <language/SqlLexicalAnalyzerClass.h>
 #include <wx/thread.h>
 #include <vector>
 #include <unicode/unistr.h>
@@ -40,9 +41,14 @@ namespace mvceditor {
 /**
  * This event will be propagated when the SQL query completes
  * execution
- * event.GetInt() will have a non-zero value if the query executed successfully
+ * event.GetClientData() will have a pointer to a SqlResultClass; it will contain everything necessary to
+ * iterate through a result. Event handlers will own the pointer and will need to delete it when they
+ * are done reading the result.
  */
 const wxEventType QUERY_COMPLETE_EVENT = wxNewEventType();
+
+
+class SqlBrowserPluginClass;
 
 class SqlConnectionDialogClass : public SqlConnectionDialogGeneratedClass, wxThreadHelper {
 
@@ -89,7 +95,85 @@ private:
 	DECLARE_EVENT_TABLE()
 };
 
-class SqlBrowserPanelClass : public SqlBrowserPanelGeneratedClass, wxThreadHelper {
+class MultipleSqlExecuteClass : public ThreadWithHeartbeatClass {
+	
+public:
+
+	/**
+	 * @param handler the object that will receive the EVENT_WORK_* events
+	 */
+	MultipleSqlExecuteClass(wxEvtHandler& handler);
+	
+	/**
+	 * Prepares queries to be run
+	 * @param sql the entire SQL contents to be executed. This may contain more than one query.
+	 * @param query the connection options used to connect
+	 * @return true if sql is not empty
+	 */
+	bool Init(const UnicodeString& sql, const SqlQueryClass& query);
+	
+	/**
+	 * start a new thread and execute the current query.
+	 * @return bool true if a new thread was started
+	 */
+	bool Execute();
+	
+	/**
+	 * cleans up the current connection. After a call to this session, stmt, and row are no longer
+	 * valid.
+	 */
+	void Close();
+	
+	/**
+	 * cleans up the given result set but keeps the connection alive [for another query]
+	 * after a call to this method; result is no longer a valid pointer
+	 */
+	void CleanResult(mvceditor::SqlResultClass* result);
+	
+protected:
+
+	void* Entry();
+
+private:
+
+	/**
+	 * we will handle multiple queries here by splitting the contents of the 
+	 * code control into multiple queries and send one query at a time to the server.
+	 * Doing it this way because it will work for all SQL backends uniformly
+	 * 
+	 * To handle multiple queries. When execute happens; a query object is made 
+	 * for each query.  Each query is executed one by one in a background thread (one query will
+	 * be executed; the next query will only be executed once the first query returns.).
+	 * When a query is finished, an event [wis propagated. 
+	 * This object will handle the event by rendering the result of the query and
+	 * cleaning up the result set. The results rendering
+	 * depends on whether a query returned a result set. If a query returned a result
+	 * set (a SELECT) then a new SqlBrowserPanel is created, if a result set is not
+	 * returned then set to a special grid.
+	 */
+	SqlLexicalAnalyzerClass SqlLexer;
+	
+	/**
+	 * To execute the queries
+	 */
+	SqlQueryClass Query;
+
+	/**
+	 * Connection handle
+	 */
+	soci::session Session;
+	
+	/**
+	 * To prevent more than one thread from running at the same time.
+	 */
+	bool IsRunning;
+	
+	bool Connected;
+	
+};
+
+
+class SqlBrowserPanelClass : public SqlBrowserPanelGeneratedClass {
 
 public:
 	
@@ -102,16 +186,19 @@ public:
 	 * @param int id the window ID
 	 * @param mvceditor::StatusBarWithGaugeClass* the gauge control. this class will NOT own the pointer
 	 * @param mvceditor::SqlQueryClass connection settings to prime the browser with
+	 * @param SqlBrowserPluginClass used to create a new panel (and attach it to the tools window) for 
+	 *        result sets
 	 */
 	SqlBrowserPanelClass(wxWindow* parent, int id, mvceditor::StatusBarWithGaugeClass* gauge,
-		const SqlQueryClass& query);
+		const SqlQueryClass& query, SqlBrowserPluginClass* plugin);
 	
 	/**
 	 * Runs the query that is in the text control (in a separate thread).
 	 */
 	void Execute();
-
 	
+	void ExecuteMore();
+
 	/**
 	 * When a query has finished running display the results in the grid
 	 */
@@ -152,15 +239,7 @@ public:
 	 */
 	void UnlinkFromCodeControl();
 
-protected:
-
-	void* Entry();
-
 private:
-
-	void OnRunButton(wxCommandEvent& event);
-	
-	void OnTimer(wxTimerEvent& event);
 	
 	/**
 	 * Transfers all of the variables from the controls to the Query data structure 
@@ -168,30 +247,41 @@ private:
 	 */
 	bool Check();
 	
-	/**
-	 * cleans up the current query and closes the connection
-	 */
-	void Close();
+	void OnWorkInProgress(wxCommandEvent& event);
 	
 	/**
-	 * To send queries to the server
+	 * close the connection here
+	 */
+	void OnWorkComplete(wxCommandEvent& event);
+	
+	/**
+	 * Fill the grid with the SQL results
+	 */
+	void Fill(SqlResultClass* results);
+	
+	void RenderAllResults();
+	
+	/**
+	 * The connection info
 	 */
 	SqlQueryClass Query;
 	
 	/**
-	 * Connection handle
+	 * Filled in with the last error string from the database
 	 */
-	soci::session Session;
+	UnicodeString LastError;
+
+	/**
+ 	 * The contents of the code control that are currenltly being executed.
+	 */
+	UnicodeString LastQuery;
 	
 	/**
-	 * result cursor
+	 * used to process the SQL and execute the queries one at a time
 	 */
-	soci::statement* Stmt;
+	MultipleSqlExecuteClass MultipleSqlExecute;
 	
-	/**
-	 * A record. Since the query is determined at run time, we must use dynamically binded rows
-	 */
-	soci::row Row;
+	std::vector<SqlResultClass*> Results;
 	
 	/**
 	 * To get the query that needs to be run. One results panel will be linked with exactly one code control.
@@ -206,29 +296,20 @@ private:
 	StatusBarWithGaugeClass* Gauge;
 	
 	/**
-	 * Make the gauge update smoothly
+	 * when running multiple queries; queries that have no result (INSERT, DELETE, CREATE...) 
+	 * are put in this panel
 	 */
-	wxTimer Timer;
+	SqlBrowserPanelClass* OutputPanel;
 	
 	/**
-	 * Filled in with the last error string from the database
+	 * needed to create the results panel and attach it to the tools window.
 	 */
-	UnicodeString LastError;
+	SqlBrowserPluginClass* Plugin;
 	
 	/**
-	 * The contents of the code control that are currenltly being executed.
+	 * true if this grid is filled with data.
 	 */
-	UnicodeString LastQuery;
-	
-	/**
-	 * The time that the query has begun executing
-	 */
-	wxLongLong QueryStart;
-	
-	/**
-	 * TRUE if a query is running. 
-	 */
-	bool IsRunning;
+	bool IsFilled;
 	
 	DECLARE_EVENT_TABLE()
 };
@@ -274,6 +355,10 @@ public:
 	 */
 	virtual void AddToolsMenuItems(wxMenu* toolsMenu);
 	
+	SqlBrowserPanelClass* CreateResultsPanel(CodeControlClass* ctrl);
+	
+	void AuiManagerUpdate();
+	
 protected:
 	
 	void OnProjectOpened();	
@@ -289,8 +374,6 @@ private:
 	void OnWorkInProgress(wxCommandEvent& event);
 	
 	void OnWorkComplete(wxCommandEvent& event);
-	
-	SqlBrowserPanelClass* CreateResultsPanel(CodeControlClass* ctrl);
 	
 	/**
 	 * synchronize the SQL query tab in the code control notebook with

@@ -24,6 +24,7 @@
  */
  #include <environment/DatabaseInfoClass.h>
  #include <soci-mysql.h>
+ #include <soci.h>
  #include <wx/datetime.h>
  #include <windows/StringHelperClass.h>
  #include <string>
@@ -65,6 +66,31 @@ void mvceditor::DatabaseInfoClass::Copy(const mvceditor::DatabaseInfoClass& src)
 
 bool mvceditor::DatabaseInfoClass::SameAs(const mvceditor::DatabaseInfoClass& other) {
 	return Host.caseCompare(other.Host, 0) == 0 && DatabaseName.caseCompare(other.DatabaseName, 0) == 0;
+}
+
+mvceditor::SqlResultClass::SqlResultClass(soci::session& session) 
+	: Error()
+	, Row()
+	, QueryTime()
+	, Stmt(NULL)
+	, Success(false) {
+	Stmt = new soci::statement(session);
+}
+
+mvceditor::SqlResultClass::~SqlResultClass() {
+	Close();
+}
+
+void mvceditor::SqlResultClass::Close() {
+	if (Stmt) {
+		try {
+			Stmt->clean_up();
+		} catch (std::exception const& e) {
+			printf("SqlResultClass close error:%s\n", e.what());
+		}
+		delete Stmt;
+		Stmt = NULL;
+	}
 }
 
 mvceditor::SqlQueryClass::SqlQueryClass()
@@ -133,27 +159,25 @@ bool mvceditor::SqlQueryClass::Connect(soci::session& session, UnicodeString& er
 	return success;
 }
 
-bool mvceditor::SqlQueryClass::Execute(soci::session& session, soci::statement& stmt, soci::row& row, const UnicodeString& query, UnicodeString& error) {
-	bool success = false;
+bool mvceditor::SqlQueryClass::Execute(soci::session& session, mvceditor::SqlResultClass& results, const UnicodeString& query) {
+	results.Success = false;
 	try {
 		std::string queryStd = mvceditor::StringHelperClass::IcuToChar(query);
-		stmt = (session.prepare << queryStd, soci::into(row));
-		stmt.execute(false);
-		//Statement->alloc();
-		//Statement->prepare(queryStd.c_str());
-		//Statement->define_and_bind();
-		//Statement->exchange_for_rowset(soci::into(Row));
-		//Statement->execute(true);
+		*(results.Stmt) = (session.prepare << queryStd, soci::into(results.Row));
+		
+		// dont pass TRUE to execute; it will fetch the first row and it makes it 
+		// easy to skip past the first row.
+		results.Stmt->execute(false);
 		
 		// execute will return false if statement does not return any rows
 		// but we want to return true for INSERTs and UPDATEs too
-		success = true;
+		results.Success = true;
 		
 	} catch (std::exception const& e) {
-		success = false;
-		error = mvceditor::StringHelperClass::charToIcu(e.what());
+		results.Success = false;
+		results.Error = mvceditor::StringHelperClass::charToIcu(e.what());
 	}
-	return success;
+	return results.Success;
 }
 
 bool mvceditor::SqlQueryClass::Execute(soci::statement& stmt, UnicodeString& error) {
@@ -170,6 +194,16 @@ bool mvceditor::SqlQueryClass::Execute(soci::statement& stmt, UnicodeString& err
 		error = mvceditor::StringHelperClass::charToIcu(e.what());
 	}
 	return success;
+}
+
+bool mvceditor::SqlQueryClass::GotData(soci::statement& stmt) {
+	bool ret =  false;
+	try {
+		ret = stmt.got_data();
+	}
+	catch (std::exception const& e) {
+	}
+	return ret;
 }
 
 bool mvceditor::SqlQueryClass::More(soci::statement& stmt, bool& hasError, UnicodeString& error) {
@@ -239,7 +273,7 @@ bool mvceditor::SqlQueryClass::NextRow(soci::row& row, std::vector<UnicodeString
 					break;
 				case soci::dt_date:
 					wxDateTime date(row.get<std::tm>(i));
-					out << date.Format(wxT("%Y-%m-%d %H:%M:%S")).c_str();
+					out << date.Format(wxT("%Y-%m-%d %H:%M:%S")).ToAscii();
 					break;
 				}
 				col = mvceditor::StringHelperClass::charToIcu(out.str().c_str());

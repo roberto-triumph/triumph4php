@@ -23,70 +23,33 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
  #include <UnitTest++.h>
+ #include <DatabaseTestFixtureClass.h>
  #include <environment/SqlResourceFinderClass.h>
  #include <unicode/ustdio.h>
  #include <string>
  
-class MySqlFixtureClass {
+class SqlResourceFinderFixtureClass : public DatabaseTestFixtureClass {
 
 public:
 
-	MySqlFixtureClass() 
-		: Info() 
-		, Query() 
-		, Finder()
-		, Session() {
-		Info.DatabaseName = UNICODE_STRING_SIMPLE("mysql");
-		Info.Driver = mvceditor::DatabaseInfoClass::MYSQL;
+	SqlResourceFinderFixtureClass() 
+		: DatabaseTestFixtureClass("sql_resource_finder") 
+		, Info()
+		, Finder() {
+		Info.DatabaseName = UNICODE_STRING_SIMPLE("sql_resource_finder");
 		Info.Host = UNICODE_STRING_SIMPLE("127.0.0.1");
 		Info.User = UNICODE_STRING_SIMPLE("root");
-		Query.Info.Copy(Info);
-		Clean();
-	}
-	
-	~MySqlFixtureClass() {
-		
-	}
-	
-	void Clean() {
-		Exec("DROP DATABASE IF EXISTS sql_resource_test");
-	}
-	
-	bool CreateDatabase(std::string name) {
-		return Exec("CREATE DATABASE " + name);
-	}
-	
-	bool Exec(std::string query) {
-		
-		// in case info changes
-		Query.Info.Copy(Info);
-		UnicodeString error;
-		bool ret = Query.Connect(Session, error);
-		if (ret) {			
-			soci::statement stmt = (Session.prepare << query);
-			ret = Query.Execute(stmt, error);
-			if (!ret) {
-				UFILE* out = u_finit(stdout, NULL, NULL);
-				u_fprintf(out, "%S\n", error.getTerminatedBuffer());
-				u_fclose(out);
-			}
-			Query.Close(Session, stmt);
-		}
-		return ret;
 	}
 	
 	mvceditor::DatabaseInfoClass Info;
-	mvceditor::SqlQueryClass Query;
+	
 	mvceditor::SqlResourceFinderClass Finder;
-	soci::session Session;
-	 
  };
  
-SUITE(SqlResourceFinderTestClassSuite) {
+SUITE(SqlResourceFinderTestClass) {
 	 
-TEST_FIXTURE(MySqlFixtureClass, FindTable) {
-	CHECK(CreateDatabase("sql_resource_test"));
-	Info.DatabaseName = UNICODE_STRING_SIMPLE("sql_resource_test");
+TEST_FIXTURE(SqlResourceFinderFixtureClass, FindTable) {
+	Info.DatabaseName = UNICODE_STRING_SIMPLE("sql_resource_finder");
 	
 	std::string query = "CREATE TABLE web_users(idUser int);";
 	CHECK(Exec(query));
@@ -104,9 +67,8 @@ TEST_FIXTURE(MySqlFixtureClass, FindTable) {
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("service_names").compare(tables.at(1)), (int8_t)0);
 }
 
-TEST_FIXTURE(MySqlFixtureClass, FindColumns) {	
-	CHECK(CreateDatabase("sql_resource_test"));
-	Info.DatabaseName = UNICODE_STRING_SIMPLE("sql_resource_test");
+TEST_FIXTURE(SqlResourceFinderFixtureClass, FindColumns) {	
+	Info.DatabaseName = UNICODE_STRING_SIMPLE("sql_resource_finder");
 	
 	std::string query = "CREATE TABLE web_users(idUser int);";
 	CHECK(Exec(query));

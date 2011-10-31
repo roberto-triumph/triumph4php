@@ -28,6 +28,7 @@
  #include <unicode/unistr.h>
  #include <soci.h>
  #include <vector>
+ #include <wx/longlong.h>
  
  namespace mvceditor {
  
@@ -113,6 +114,65 @@ public:
 };
 
 /**
+ * a small structure used to pass results from the background thread to the main thread.
+ * an instance of this struct will be created in the heap by the background thread,
+ * and the foreground thread will delete it once it has been read.
+ */
+class SqlResultClass {
+	
+public:
+
+	/**
+	 * results are tied to a session. when reusing result objects you will need to call Init() method
+	 * to allocate a new result.
+	 */
+	SqlResultClass(soci::session& session);
+	
+	/**
+	 * clean up resources
+	 */
+	virtual ~SqlResultClass();
+	
+	/**
+	 * clean up resources. after a call to this object the statement has been cleaned up and is no longer valid.
+	 * DO NOT ACCESS IT!
+	 */
+	void Close();
+
+	/**
+	 * Error string returned by the server.Can be empty string,
+	 */
+	UnicodeString Error;
+	
+	/**
+	 * A record. Since the query is determined at run time, we must use dynamically binded rows
+	 */
+	soci::row Row;
+	
+	/**
+	 * The time that the query took to execute.
+	 */
+	wxLongLong QueryTime;
+	
+	/**
+	 * result cursor. can be NULL (when query fails)
+	 */
+	soci::statement* Stmt;
+	
+	/**
+	 * The line number that the query was in
+	 */
+	int LineNumber;
+	
+	/**
+	 * If true then the query was sent successfully
+	 * (this will be TRUE even if a query returned zero rows)
+	 */
+	bool Success;
+	
+};
+
+/**
  * A small class that will send queries to the database. Main purpose of this class is 
  * to wrap the soci API that uses exceptions into an API that does not
  * use exceptions.
@@ -165,14 +225,11 @@ class SqlQueryClass {
 	 * Sends ONE query to the server. Results can be traversed via the More() method
 	 * 
 	 * @param session the opened connection
-	 * @param stmt the statement that WILL be prepared
-	 * @param row the row of a result. This will be bound to the statement.  After every call to
-	 * More() this row will be filled with a new row of the result.
-	 * @param query the query to execute.
-	 * @param error if connection failed error string will be set here
-	 * @return bool TRUE if connection was successfuly
+	 * @param result the results of the query
+	 * @param query to query to execute
+	 * @return bool TRUE if query was successful (no connection errors)
 	 */
-	bool Execute(soci::session& session, soci::statement& stmt, soci::row& row, const UnicodeString& query, UnicodeString& error);
+	bool Execute(soci::session& session, SqlResultClass& result, const UnicodeString& query);
 	
 	/**
 	 * Sends ONE query to the server. Results can be traversed via the More() method
@@ -183,9 +240,16 @@ class SqlQueryClass {
 	 * @return bool TRUE if connection was successfuly
 	 */
 	bool Execute(soci::statement& stmt, UnicodeString& error);
-		
+	
 	/**
-	 * Returns true if there are more results to be read.
+	 * This method can be used to check if a statement has data left.
+	 * @return true if the stamement has rows in its result.
+	 */
+	bool GotData(soci::statement& stmt);
+	
+	/**
+	 * Returns true if there are more results to be read. Also moves the result set cursor to 
+	 * the next row
 	 * @param stmt the statement that HAS ALREADY been executed
 	 * @param hasError will be set to TRUE a fatal error ocurred
 	 * @param error will be set to the error message
