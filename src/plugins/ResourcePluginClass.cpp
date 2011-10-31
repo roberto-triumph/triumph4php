@@ -358,6 +358,10 @@ void mvceditor::ResourcePluginClass::LoadPageFromResourceFinder(ResourceFinderCl
 			codeControl->SetSelectionAndEnsureVisible(pos, pos);
 			codeControl->GotoLine(lineNumber - 1);
 		}
+		if (ResourceFinderClass::FILE_NAME == resourceFinder->GetResourceType()) {
+				
+			// nothing; just open the file but don't scroll down to any place
+		}
 		else if (found) {
 			codeControl->SetSelectionAndEnsureVisible(position, position + length);
 		}

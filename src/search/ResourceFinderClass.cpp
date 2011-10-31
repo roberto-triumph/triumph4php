@@ -135,10 +135,14 @@ bool mvceditor::ResourceFinderClass::GetResourceMatchPosition(size_t index, cons
 					finder.GetLastMatch(pos, length);
 				}
 				start = pos + length;
-				finder.Expression = UNICODE_STRING_SIMPLE("\\sfunction\\s+") + methodName + UNICODE_STRING_SIMPLE("\\s*\\(");
+
+				// method may return a reference (&)
+				finder.Expression = UNICODE_STRING_SIMPLE("\\sfunction\\s*(&\\s*)?") + methodName + UNICODE_STRING_SIMPLE("\\s*\\(");
 				break;
 			case ResourceClass::FUNCTION:
-				finder.Expression = UNICODE_STRING_SIMPLE("\\sfunction\\s+") + className + UNICODE_STRING_SIMPLE("\\s*\\(");
+
+				// function may return a reference (&)
+				finder.Expression = UNICODE_STRING_SIMPLE("\\sfunction\\s*(&\\s*)?") + className + UNICODE_STRING_SIMPLE("\\s*\\(");
 				break;
 			case ResourceClass::MEMBER:
 				//advance past the class header so that if  a variable with the same name exists we will skip it				:
