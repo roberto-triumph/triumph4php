@@ -346,6 +346,9 @@ void mvceditor::SqlBrowserPanelClass::RenderAllResults() {
 			ResultsGrid->SetCellValue(wxGridCellCoords(rowNumber , 0), wxString::Format(wxT("%d"), results->LineNumber));
 			ResultsGrid->SetCellValue(wxGridCellCoords(rowNumber , 1), msg);
 		}
+		if (!outputSummary && !results->Error.isEmpty()) {
+			UpdateLabels(mvceditor::StringHelperClass::IcuToWx(results->Error));
+		}
 	}
 	if (outputSummary && ResultsGrid->GetNumberCols() > 0) {
 		ResultsGrid->AutoSizeColumn(0);
@@ -414,12 +417,29 @@ void mvceditor::SqlBrowserPanelClass::Fill(mvceditor::SqlResultClass* results) {
 
 void mvceditor::SqlBrowserPanelClass::UpdateLabels(const wxString& result) {
 	if (!Query.Info.Host.isEmpty()) {
-		ConnectionLabel->SetLabel(wxString::Format(
-			wxT("%s@%s:%d"),
-			mvceditor::StringHelperClass::IcuToWx(Query.Info.User).c_str(),
-			mvceditor::StringHelperClass::IcuToWx(Query.Info.Host).c_str(),
-			Query.Info.Port
-		));
+		wxString driver;
+		if (Query.Info.Driver == mvceditor::DatabaseInfoClass::MYSQL) {
+			driver = _("mysql");
+		}
+		if (Query.Info.Port) {
+			ConnectionLabel->SetLabel(wxString::Format(
+				wxT("%s:host=%s:%d user=%s dbname=%s"),
+				driver,
+				mvceditor::StringHelperClass::IcuToWx(Query.Info.Host).c_str(),
+				Query.Info.Port,
+				mvceditor::StringHelperClass::IcuToWx(Query.Info.User).c_str(),
+				mvceditor::StringHelperClass::IcuToWx(Query.Info.DatabaseName).c_str()
+			));
+		}
+		else {
+			ConnectionLabel->SetLabel(wxString::Format(
+				wxT("%s:host=%s user=%s dbname=%s"),
+				driver,
+				mvceditor::StringHelperClass::IcuToWx(Query.Info.Host).c_str(),
+				mvceditor::StringHelperClass::IcuToWx(Query.Info.User).c_str(),
+				mvceditor::StringHelperClass::IcuToWx(Query.Info.DatabaseName).c_str()
+			));
+		}
 	}
 	else {
 		ConnectionLabel->SetLabel(_("No Connection is not configured."));
@@ -608,7 +628,13 @@ void mvceditor::SqlBrowserPluginClass::OnRun(wxCommandEvent& event) {
 }
 
 void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event) {
-	mvceditor::SqlConnectionDialogClass dialog(GetMainWindow(), Infos, ChosenIndex, WasEmptyDetectedInfo);
+
+	// decided to always allow the user to edit the connection info in order to
+	// allow the user to create a new database from within the editor (the very 
+	// first time a new project is created; its database may not exist).
+	// before, a user would not be able to edit the connection info once it was detected
+	// in order to make it less confusing about where the connection info comes from.
+	mvceditor::SqlConnectionDialogClass dialog(GetMainWindow(), Infos, ChosenIndex, true);
 	if (dialog.ShowModal() == wxOK) {
 		SqlMetaDataFetch.Read(&Infos, GetProject());
 		
