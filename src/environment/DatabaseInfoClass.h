@@ -31,6 +31,8 @@
  #include <wx/longlong.h>
  
  namespace mvceditor {
+
+ class SqlQueryClass;
  
  /**
  * This is the database connection information used by the framework.
@@ -126,12 +128,23 @@ public:
 	 * results are tied to a session. when reusing result objects you will need to call Init() method
 	 * to allocate a new result.
 	 */
-	SqlResultClass(soci::session& session);
+	SqlResultClass();
 	
 	/**
 	 * clean up resources
 	 */
 	virtual ~SqlResultClass();
+
+	/**
+	 * Dump all rows of the given statement into this result. Note that this method assumes that
+	 * stmt.execute() already fetched the first row of the result.
+	 *
+	 * @param query the connection info
+	 * @param session the active connection
+	 * @param stmt the current statement that was executed.
+	 * @param hasRows TRUE if the statement has results.
+	 */
+	void Init(mvceditor::SqlQueryClass& query, soci::session& session, soci::statement& stmt, bool hasRows);
 	
 	/**
 	 * clean up resources. after a call to this object the statement has been cleaned up and is no longer valid.
@@ -143,11 +156,21 @@ public:
 	 * Error string returned by the server.Can be empty string,
 	 */
 	UnicodeString Error;
-	
+
 	/**
-	 * A record. Since the query is determined at run time, we must use dynamically binded rows
+	 * This variable is 'bound' to a statement; SOCI will put the results from the database into this variable.
 	 */
 	soci::row Row;
+	
+	/**
+	 * The entire list result rows.
+	 */
+	std::vector<std::vector<UnicodeString> >StringResults;
+
+	/**
+	 * The names of the columns in the result.
+	 */
+	std::vector<UnicodeString> ColumnNames;
 	
 	/**
 	 * The time that the query took to execute.
@@ -155,20 +178,27 @@ public:
 	wxLongLong QueryTime;
 	
 	/**
-	 * result cursor. can be NULL (when query fails)
-	 */
-	soci::statement* Stmt;
-	
-	/**
 	 * The line number that the query was in
 	 */
 	int LineNumber;
+
+	/**
+	 * The number of records affected.  This is RDBMS dependant; don't count on it being always correct.
+	 */
+	int AffectedRows;
 	
 	/**
 	 * If true then the query was sent successfully
 	 * (this will be TRUE even if a query returned zero rows)
 	 */
 	bool Success;
+
+	/**
+	 * If true then result has rows that can iterated through. If this is false, then the
+	 * query that was executed was a DML query (INSERT, UPDATE) or the query returned
+	 * zero results.
+	 */
+	bool HasRows;
 	
 };
 

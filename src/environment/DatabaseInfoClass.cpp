@@ -68,13 +68,17 @@ bool mvceditor::DatabaseInfoClass::SameAs(const mvceditor::DatabaseInfoClass& ot
 	return Host.caseCompare(other.Host, 0) == 0 && DatabaseName.caseCompare(other.DatabaseName, 0) == 0;
 }
 
-mvceditor::SqlResultClass::SqlResultClass(soci::session& session) 
+mvceditor::SqlResultClass::SqlResultClass() 
 	: Error()
 	, Row()
+	, StringResults()
+	, ColumnNames()
 	, QueryTime()
-	, Stmt(NULL)
-	, Success(false) {
-	Stmt = new soci::statement(session);
+	, LineNumber(0)
+	, AffectedRows(0)
+	, Success(false)
+	, HasRows(false) {
+
 }
 
 mvceditor::SqlResultClass::~SqlResultClass() {
@@ -82,14 +86,38 @@ mvceditor::SqlResultClass::~SqlResultClass() {
 }
 
 void mvceditor::SqlResultClass::Close() {
-	if (Stmt) {
-		try {
-			Stmt->clean_up();
-		} catch (std::exception const& e) {
-			printf("SqlResultClass close error:%s\n", e.what());
-		}
-		delete Stmt;
-		Stmt = NULL;
+	ColumnNames.clear();
+	StringResults.clear();
+	AffectedRows = 0;
+	HasRows = false;
+	Success = false;
+}
+
+void mvceditor::SqlResultClass::Init(mvceditor::SqlQueryClass& query, soci::session& session, soci::statement& stmt, bool hasRows) {
+	ColumnNames.clear();
+	StringResults.clear();
+	std::vector<soci::indicator> columnIndicators;
+	HasRows = hasRows;
+	AffectedRows = query.GetAffectedRows(stmt);
+	if (Success && HasRows && query.ColumnNames(Row, ColumnNames, Error)) {
+		bool more = true;
+		bool hasError = false;
+
+		// perform a DO ... WHILE loop since we called statement.execute() method [in SqlQueryClass.Execute() ]
+		// with TRUE so it will fetch the first row for us
+		do {
+			std::vector<UnicodeString> columnValues;
+			more = query.NextRow(Row, columnValues, columnIndicators, Error);
+			if (more) {
+				for (size_t colNumber = 0; colNumber < columnValues.size(); colNumber++) {
+					if (columnIndicators[colNumber] == soci::i_null) {
+						columnValues[colNumber] = UNICODE_STRING_SIMPLE("<NULL>");
+					}
+				}
+				StringResults.push_back(columnValues);
+			}
+			columnIndicators.clear();
+		} while (more && query.More(stmt, hasError, Error) && !hasError);
 	}
 }
 
@@ -163,16 +191,17 @@ bool mvceditor::SqlQueryClass::Execute(soci::session& session, mvceditor::SqlRes
 	results.Success = false;
 	try {
 		std::string queryStd = mvceditor::StringHelperClass::IcuToChar(query);
-		*(results.Stmt) = (session.prepare << queryStd, soci::into(results.Row));
+		soci::statement stmt = (session.prepare << queryStd, soci::into(results.Row));
 		
 		// dont pass TRUE to execute; it will fetch the first row and it makes it 
 		// easy to skip past the first row.
-		results.Stmt->execute(false);
-		
+		bool hasRows = stmt.execute(true);
+
 		// execute will return false if statement does not return any rows
 		// but we want to return true for INSERTs and UPDATEs too
 		results.Success = true;
-		
+		results.Init(*this, session, stmt, hasRows);
+		stmt.clean_up();
 	} catch (std::exception const& e) {
 		results.Success = false;
 		results.Error = mvceditor::StringHelperClass::charToIcu(e.what());
@@ -202,6 +231,9 @@ bool mvceditor::SqlQueryClass::GotData(soci::statement& stmt) {
 		ret = stmt.got_data();
 	}
 	catch (std::exception const& e) {
+
+		// TODO: make error accessible?
+		printf(e.what());
 	}
 	return ret;
 }
@@ -209,7 +241,7 @@ bool mvceditor::SqlQueryClass::GotData(soci::statement& stmt) {
 bool mvceditor::SqlQueryClass::More(soci::statement& stmt, bool& hasError, UnicodeString& error) {
 	bool ret = false;
 	try {
-		ret = stmt.fetch();
+		ret = stmt.fetch() && stmt.got_data();
 	} catch (std::exception const& e) {
 		hasError = true;
 		error = mvceditor::StringHelperClass::charToIcu(e.what());

@@ -41,7 +41,7 @@ public:
 };
 
 SUITE(DatabaseInfoClassTest) {
-	
+
 TEST_FIXTURE(DatabaseInfoTestFixtureClass, ConnectQueryAndResults) {
 	Exec("CREATE TABLE names (id INT, name VARCHAR(255));");
 	Exec("INSERT INTO names(id, name) VALUES(1, 'one')");
@@ -56,25 +56,21 @@ TEST_FIXTURE(DatabaseInfoTestFixtureClass, ConnectQueryAndResults) {
 	query.Info.Copy(Info);
 	CHECK(query.Connect(session, error));
 	CHECK_EQUAL(0, error.length());
-	mvceditor::SqlResultClass results(session);
+	mvceditor::SqlResultClass results;
 	CHECK(query.Execute(session, results, UNICODE_STRING_SIMPLE("SELECT * FROM names ORDER BY id;")));
 	CHECK_EQUAL(0, results.Error.length());
 	CHECK(results.Success);
-	CHECK_EQUAL(3, query.GetAffectedRows(*results.Stmt));
-	CHECK(query.More(*results.Stmt, hasError, error));
+	CHECK_EQUAL(3, results.AffectedRows);
+	CHECK_EQUAL((size_t)3, results.StringResults.size());
 	CHECK_EQUAL(0, error.length());
-	CHECK_EQUAL(1, results.Row.get<int>(0));
-	CHECK_EQUAL("one", results.Row.get<std::string>(1));
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("1"), results.StringResults[0][0]);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("one"), results.StringResults[0][1]);
 	
-	CHECK(query.More(*results.Stmt, hasError, error));
-	CHECK_EQUAL(2, results.Row.get<int>(0));
-	CHECK_EQUAL("two", results.Row.get<std::string>(1));
-	
-	CHECK(query.More(*results.Stmt, hasError, error));
-	CHECK_EQUAL(3, results.Row.get<int>(0));
-	CHECK_EQUAL("three", results.Row.get<std::string>(1));
-	
-	CHECK_EQUAL(false, query.More(*results.Stmt, hasError, error));
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("2"), results.StringResults[1][0]);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("two"), results.StringResults[1][1]);
+
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("3"), results.StringResults[2][0]);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("three"), results.StringResults[2][1]);
 }
 
 TEST_FIXTURE(DatabaseInfoTestFixtureClass, MultipleQueries) {
@@ -92,33 +88,28 @@ TEST_FIXTURE(DatabaseInfoTestFixtureClass, MultipleQueries) {
 	query.Info.Copy(Info);
 	CHECK(query.Connect(session, error));
 	CHECK_EQUAL(0, error.length());
-	mvceditor::SqlResultClass results(session);
+	mvceditor::SqlResultClass results;
 	
 	CHECK(query.Execute(session, results, UNICODE_STRING_SIMPLE("DELETE FROM places;")));
 	CHECK_EQUAL(0, results.Error.length());
 	CHECK(results.Success);
-	CHECK_EQUAL(false, query.More(*results.Stmt, hasError, error));
+	CHECK_EQUAL(false, results.HasRows);
 	results.Close();
 	
-	mvceditor::SqlResultClass results2(session);
+	mvceditor::SqlResultClass results2;
 	CHECK(query.Execute(session, results2, UNICODE_STRING_SIMPLE("SELECT * FROM names ORDER BY id;")));
 	CHECK_EQUAL(0, results2.Error.length());
 	CHECK(results2.Success);
 	int rowCount = 0;
-	while (query.More(*results2.Stmt, hasError, error)) {
-		CHECK_EQUAL(false, hasError);
-		CHECK_EQUAL(0, error.length());
-		rowCount++;
-	}
-	CHECK_EQUAL(3, rowCount);
+	CHECK_EQUAL((size_t)3, results2.StringResults.size());
+	CHECK_EQUAL(3, results2.AffectedRows);
 	results2.Close();
 	
-	mvceditor::SqlResultClass results3(session);
+	mvceditor::SqlResultClass results3;
 	CHECK(query.Execute(session, results3, UNICODE_STRING_SIMPLE("DELETE FROM names;")));
 	CHECK_EQUAL(0, results3.Error.length());
 	CHECK(results3.Success);
-	CHECK_EQUAL(false, query.More(*results3.Stmt, hasError, error));
-	CHECK_EQUAL(false, query.More(*results3.Stmt, hasError, error));
+	CHECK_EQUAL(false, results3.HasRows);
 	results3.Close();
 }
 

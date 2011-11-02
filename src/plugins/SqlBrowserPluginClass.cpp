@@ -176,17 +176,16 @@ mvceditor::MultipleSqlExecuteClass::MultipleSqlExecuteClass(wxEvtHandler& handle
 	, SqlLexer() 
 	, Query()
 	, Session()
-	, IsRunning(false)
-	, Connected(false) {
+	, QueryId(0)
+	, IsRunning(false) {
 }
 
 bool mvceditor::MultipleSqlExecuteClass::Execute() {
 	bool ret = false;
-	wxThreadError error = wxTHREAD_NO_ERROR; /*** wxThreadHelper::Create(); */
+	wxThreadError error = wxThreadHelper::Create();
 	switch (error) {
 	case wxTHREAD_NO_ERROR:
-		/*** GetThread()->Run(); */
-		Entry();
+		GetThread()->Run();
 		SignalStart();
 		IsRunning = true;
 		ret = true;
@@ -198,6 +197,7 @@ bool mvceditor::MultipleSqlExecuteClass::Execute() {
 	case wxTHREAD_RUNNING:
 	case wxTHREAD_KILLED:
 	case wxTHREAD_NOT_RUNNING:
+
 		// should not be possible we are controlling this with IsRunning
 		break;
 	}
@@ -207,73 +207,49 @@ bool mvceditor::MultipleSqlExecuteClass::Execute() {
 void* mvceditor::MultipleSqlExecuteClass::Entry() {
 	UnicodeString error;
 	UnicodeString query;
-	bool success = false;
-	if (!Connected) {
-		success = Query.Connect(Session, error);
-		if (success) {
-			Connected = true;
-		}
-	}
-	if (Connected) {
-		/*** while */ if (SqlLexer.NextQuery(query)) {		
+	bool connected = Query.Connect(Session, error);
+	if (connected) {
+		while (SqlLexer.NextQuery(query)) {		
 			wxLongLong start = wxGetLocalTimeMillis();
-			mvceditor::SqlResultClass* results = new mvceditor::SqlResultClass();
-			results->Error = UNICODE_STRING_SIMPLE("");
+
+			// create a new result on the heap; the event handler must delete it
+			mvceditor::SqlResultClass* results = new mvceditor::SqlResultClass;
 			results->QueryTime = wxGetLocalTimeMillis() - start;
 			results->LineNumber = SqlLexer.GetLineNumber();
-			results->Row = new soci::row;
-			results->Stmt = new soci::statement(Session);
-			results->Success = Query.Execute(Session, *(results->Stmt), *(results->Row), query, results->Error, results->HasData);
-			wxCommandEvent evt(QUERY_COMPLETE_EVENT, wxID_ANY);
+			Query.Execute(Session, *results, query);
+			wxCommandEvent evt(QUERY_COMPLETE_EVENT, QueryId);
 			evt.SetClientData(results);
 			wxPostEvent(&Handler, evt);
-			/*** if (!results->Success) {
+			if (!results->Success) {
 				break;
 			}
-			 */
-		}
-		else {
-			SignalEnd();
 		}
 	}
 	else {
-		mvceditor::SqlResultClass* results = new mvceditor::SqlResultClass();
-		results->Error = error;
-		results->HasData = false;
-		results->QueryTime = 0;
+
+		// signal a failed connection
+		mvceditor::SqlResultClass* results = new mvceditor::SqlResultClass;
 		results->LineNumber = SqlLexer.GetLineNumber();
-		results->Row = NULL;
-		results->Stmt = NULL;
-		wxCommandEvent evt(QUERY_COMPLETE_EVENT, wxID_ANY);
+		results->Success = false;
+		results->HasRows = false;
+		results->Error = error;
+		wxCommandEvent evt(QUERY_COMPLETE_EVENT, QueryId);
 		evt.SetClientData(results);
 		wxPostEvent(&Handler, evt);
 	}
-	//SignalEnd();
+	SignalEnd(QueryId);
 	return 0;
 }
 
-bool mvceditor::MultipleSqlExecuteClass::Init(const UnicodeString& sql, const SqlQueryClass& query) {
+bool mvceditor::MultipleSqlExecuteClass::Init(const UnicodeString& sql, const SqlQueryClass& query, int queryId) {
 	Query.Info.Copy(query.Info);
+	QueryId = queryId;
 	return !IsRunning && SqlLexer.OpenString(sql);
-}
-
-void mvceditor::MultipleSqlExecuteClass::CleanResult(mvceditor::SqlResultClass* result) {
-	if (result) {
-		if (result->Stmt) {
-			Query.Close(*(result->Stmt));
-			delete result->Stmt;
-		}
-		if (result->Row) {
-			delete result->Row;
-		}
-		delete result;
-	}
 }
 
 void mvceditor::MultipleSqlExecuteClass::Close() {
 	Session.close();
 	IsRunning = false;
-	Connected = false;
 }
 
 mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id, 
@@ -286,10 +262,9 @@ mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id,
 	, MultipleSqlExecute(*this) 
 	, Results()
 	, Gauge(gauge)
-	, Plugin(plugin) 
-	, IsFilled(false) {
+	, Plugin(plugin) {
 	CodeControl = NULL;
-	OutputPanel = NULL;
+	QueryId = wxNewId();
 	ResultsGrid->DeleteCols(0, ResultsGrid->GetNumberCols());
 	ResultsGrid->DeleteRows(0, ResultsGrid->GetNumberRows());
 	ResultsGrid->ClearGrid();
@@ -306,9 +281,7 @@ bool mvceditor::SqlBrowserPanelClass::Check() {
 }
 
 void mvceditor::SqlBrowserPanelClass::Execute() {
-	if (Check() && MultipleSqlExecute.Init(LastQuery, Query)) {
-		OutputPanel = NULL;
-		IsFilled = false;
+	if (Check() && MultipleSqlExecute.Init(LastQuery, Query, QueryId)) {
 		MultipleSqlExecute.Execute();
 	}
 	else if (LastQuery.isEmpty()) {
@@ -319,154 +292,104 @@ void mvceditor::SqlBrowserPanelClass::Execute() {
 	}
 }
 
-void mvceditor::SqlBrowserPanelClass::ExecuteMore() {
-	MultipleSqlExecute.Execute();
-}
-
 void mvceditor::SqlBrowserPanelClass::OnQueryComplete(wxCommandEvent& event) {
-	mvceditor::SqlResultClass* result = (mvceditor::SqlResultClass*)event.GetClientData();
-	Results.push_back(result);
-	RenderAllResults();
-	Results.clear();
-	puts("query complete");
-	ExecuteMore();
+	if (event.GetId() == QueryId) {
+		mvceditor::SqlResultClass* result = (mvceditor::SqlResultClass*)event.GetClientData();
+		Results.push_back(result);
+	}
 }
 
 void mvceditor::SqlBrowserPanelClass::RenderAllResults() {
-	/*if (ResultsGrid->GetNumberCols()) {
-		ResultsGrid->DeleteCols(0, ResultsGrid->GetNumberCols());
-	}
-	if (ResultsGrid->GetNumberRows()) {
-		ResultsGrid->DeleteRows(0, ResultsGrid->GetNumberRows());
-	}*/
-	for (size_t i = 0; i < Results.size(); i++) {
-		printf("result %u\n", (unsigned int)i);
-		mvceditor::SqlResultClass* results = Results[i];
-		int affected = (results->Stmt) ? Query.GetAffectedRows(*(results->Stmt)) : 0;
-		
-		// time for query only; not time to render grid
-		wxLongLong msec = results->QueryTime;
-		bool hasError = false;
-		UnicodeString error;
-		
-		// first query has results: render the results in this panel, each new result in a new panel, and any messages
-		//                           for non-resultset queries in a new panel
-		// first query has no results: render any messages for non-resultset queries in this panel, each new resultset 
-		//                             in a new panel
-		if (results->Success && results->Stmt && Query.More(*(results->Stmt), hasError, error) && !hasError) {
-			if (!IsFilled) {
-				Fill(results);
-				IsFilled = true;
-			}
-			else {
-				
-				// lets create a new grid for these results
-				mvceditor::SqlBrowserPanelClass* newPanel = Plugin->CreateResultsPanel(CodeControl);
-				newPanel->Fill(results);
-			}
-		}
-		else {
-			if (!OutputPanel) {
-				if (IsFilled) {
-					OutputPanel = Plugin->CreateResultsPanel(CodeControl);
-				}
-				else {
-					if (ResultsGrid->GetNumberCols()) {
-						ResultsGrid->DeleteCols(0, ResultsGrid->GetNumberCols());
-					}
-					if (ResultsGrid->GetNumberRows()) {
-						ResultsGrid->DeleteRows(0, ResultsGrid->GetNumberRows());
-					}
-					OutputPanel = this;
-				}
-				OutputPanel->ResultsGrid->SetDefaultCellOverflow(false);
-				OutputPanel->ResultsGrid->AppendCols(2);
-				OutputPanel->ResultsGrid->SetColLabelValue(0, _("Query"));
-				OutputPanel->ResultsGrid->SetColLabelValue(1, _("Result"));
-			}
-			wxString msg;
-			if (results->Success) {
-				msg = wxString::Format(_("%d rows affected in %.3f sec"), affected, (msec.ToLong() / 1000.00));
-			}
-			else {
-				msg = mvceditor::StringHelperClass::IcuToWx(results->Error);
-			}
-			int rowNumber = OutputPanel->ResultsGrid->GetNumberRows();
-			OutputPanel->ResultsGrid->AppendRows(1);
-			OutputPanel->ResultsGrid->SetCellValue(wxGridCellCoords(rowNumber , 0), wxString::Format(wxT("%d"), results->LineNumber));
-			OutputPanel->ResultsGrid->SetCellValue(wxGridCellCoords(rowNumber , 1), msg);
-
-			 IsFilled = true;
-		}
-		MultipleSqlExecute.CleanResult(results);
-	}
-	if (OutputPanel) {
-		OutputPanel->ResultsGrid->AutoSizeColumn(0);
-		OutputPanel->ResultsGrid->AutoSizeColumn(1);
-	}
-}
-
-void mvceditor::SqlBrowserPanelClass::Fill(mvceditor::SqlResultClass* results) {
-	std::vector<UnicodeString> columnNames;
-	std::vector<UnicodeString> columnValues;
-	std::vector<soci::indicator> columnIndicators;
-	std::vector<bool> autoSizeColumns;
-	UnicodeString error(results->Error);
-	ResultsGrid->BeginBatch();
-	bool success = results->Success;
-	int rowNumber = 1;
-	int affected = (results->Stmt) ? Query.GetAffectedRows(*(results->Stmt)) : 0;
-	
 	if (ResultsGrid->GetNumberCols()) {
 		ResultsGrid->DeleteCols(0, ResultsGrid->GetNumberCols());
 	}
 	if (ResultsGrid->GetNumberRows()) {
 		ResultsGrid->DeleteRows(0, ResultsGrid->GetNumberRows());
 	}
-	if (success && results->Stmt) {
-		if (Query.ColumnNames(*(results->Row), columnNames, error)) {
-			ResultsGrid->AppendCols(columnNames.size());
-			for (size_t i = 0; i < columnNames.size(); i++) {
-				ResultsGrid->SetColLabelValue(i, mvceditor::StringHelperClass::IcuToWx(columnNames[i]));
-				autoSizeColumns.push_back(true);
+	bool outputSummary = false;
+	if (Results.size() > 1) {
+
+		// this grid will show a summary of all query results
+		outputSummary = true;
+		ResultsGrid->SetDefaultCellOverflow(false);
+		ResultsGrid->AppendCols(2);
+		ResultsGrid->SetColLabelValue(0, _("Query Line Number"));
+		ResultsGrid->SetColLabelValue(1, _("Result"));
+	}
+	
+	for (size_t i = 0; i < Results.size(); i++) {
+		mvceditor::SqlResultClass* results = Results[i];
+		bool hasError = false;
+		UnicodeString error;
+		
+		// if only one query was executed: render the results in this panel
+		// if more than one query was executed: render any messages for 
+		//	in this panel, each new resultset in a new panel
+		if (results->Success && results->HasRows && !outputSummary) {
+			Fill(results);
+		}
+		else if (results->Success && results->HasRows && outputSummary) {
+			mvceditor::SqlBrowserPanelClass* newPanel = Plugin->CreateResultsPanel(CodeControl);
+			newPanel->Fill(results);
+		}
+		if (outputSummary) {
+			wxString msg;
+			if (results->Success) {
+				msg = wxString::Format(_("%d rows affected in %.3f sec"), results->AffectedRows, 
+					(results->QueryTime.ToLong() / 1000.00));
 			}
+			else {
+				msg = mvceditor::StringHelperClass::IcuToWx(results->Error);
+			}
+			int rowNumber = ResultsGrid->GetNumberRows();
+			ResultsGrid->AppendRows(1);
+			ResultsGrid->SetCellValue(wxGridCellCoords(rowNumber , 0), wxString::Format(wxT("%d"), results->LineNumber));
+			ResultsGrid->SetCellValue(wxGridCellCoords(rowNumber , 1), msg);
 		}
 	}
-	printf("success=%d hasData=%d\n", success, results->HasData);
-	if (success && results->Stmt) {
+	if (outputSummary && ResultsGrid->GetNumberCols() > 0) {
+		ResultsGrid->AutoSizeColumn(0);
+	}
+	if (outputSummary && ResultsGrid->GetNumberCols() > 1) {
+		ResultsGrid->AutoSizeColumn(1);
+	}
+}
+
+void mvceditor::SqlBrowserPanelClass::Fill(mvceditor::SqlResultClass* results) {
+	std::vector<bool> autoSizeColumns;
+
+	// there may be many results; freeze the drawing until we fill in the grid
+	ResultsGrid->BeginBatch();
+	int rowNumber = 1;
+	if (ResultsGrid->GetNumberCols()) {
+		ResultsGrid->DeleteCols(0, ResultsGrid->GetNumberCols());
+	}
+	if (ResultsGrid->GetNumberRows()) {
+		ResultsGrid->DeleteRows(0, ResultsGrid->GetNumberRows());
+	}
+	if (results->HasRows) {
+		ResultsGrid->AppendCols(results->ColumnNames.size());
+		for (size_t i = 0; i < results->ColumnNames.size(); i++) {
+			ResultsGrid->SetColLabelValue(i, mvceditor::StringHelperClass::IcuToWx(results->ColumnNames[i]));
+			autoSizeColumns.push_back(true);
+		}
 		bool more = true;
 		ResultsGrid->SetDefaultCellOverflow(false);
-		
-		// using a do..while loop since OnQueryComplete calls More() to check for result set
-		do {
+		for (size_t i = 0; i < results->StringResults.size(); i++) {
 			ResultsGrid->AppendRows(1);
-			more = Query.NextRow(*(results->Row), columnValues, columnIndicators, error);
+			std::vector<UnicodeString> columnValues =  results->StringResults[i];
 			for (size_t colNumber = 0; colNumber < columnValues.size(); colNumber++) {
-				if (columnIndicators[colNumber] == soci::i_null) {
-					//printf(",NULL");
-					ResultsGrid->SetCellValue(rowNumber - 1, colNumber, wxT("<NULL>"));
-				}
-				else {
-					ResultsGrid->SetCellValue(rowNumber - 1, colNumber, mvceditor::StringHelperClass::IcuToWx(columnValues[colNumber]));
-					//printf("%s,",
-					//(const char*)mvceditor::StringHelperClass::IcuToWx(columnValues[colNumber]).ToAscii());
-				}					
+				ResultsGrid->SetCellValue(rowNumber - 1, colNumber, mvceditor::StringHelperClass::IcuToWx(columnValues[colNumber]));
 				if (columnValues[colNumber].length() > 50) {
 					autoSizeColumns[colNumber] = false; 
 				}
 			}
 			ResultsGrid->SetRowLabelValue(rowNumber - 1, wxString::Format(wxT("%d"), rowNumber));
 			rowNumber++;
-			columnValues.clear();
-			columnIndicators.clear();
-			//printf("more=%d success=%d\n", more, success);
-			//printf("\n");
 		}
-		while (more && Query.More(*(results->Stmt), success, error) && success);
-	}	
+	}
 
-	// time for query only; not time to render grid
-	wxLongLong msec = results->QueryTime;
+	// resize columns to fit the content, unless the content of the columns is too big (ie blobs)
 	for (size_t i = 0; i < autoSizeColumns.size(); i++) {
 		if (autoSizeColumns[i]) {
 			ResultsGrid->AutoSizeColumn(i);
@@ -477,12 +400,15 @@ void mvceditor::SqlBrowserPanelClass::Fill(mvceditor::SqlResultClass* results) {
 			ResultsGrid->SetColMinimalWidth(i, 50);
 		}
 	}
+
+	// unfreeze the grid
 	ResultsGrid->EndBatch();
 	if (!results->Success) {
-		UpdateLabels(mvceditor::StringHelperClass::IcuToWx(error));
+		UpdateLabels(mvceditor::StringHelperClass::IcuToWx(results->Error));
 	}
 	else {
-		UpdateLabels(wxString::Format(_("%d rows returned in %.3f sec"), affected, (msec.ToLong() / 1000.00)));		
+		UpdateLabels(wxString::Format(_("%d rows returned in %.3f sec"), 
+			results->AffectedRows, (results->QueryTime.ToLong() / 1000.00)));		
 	}
 }
 
@@ -503,16 +429,24 @@ void mvceditor::SqlBrowserPanelClass::UpdateLabels(const wxString& result) {
 }
 
 void mvceditor::SqlBrowserPanelClass::OnWorkInProgress(wxCommandEvent& event) {
-	Gauge->IncrementGauge(ID_SQL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
+	if (event.GetId() == QueryId) {
+		Gauge->IncrementGauge(ID_SQL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
+	}
 }
 
 void mvceditor::SqlBrowserPanelClass::OnWorkComplete(wxCommandEvent& event) {
-	RenderAllResults();
-	Results.clear();
-	MultipleSqlExecute.Close();
-	OutputPanel = NULL;
-	Gauge->StopGauge(ID_SQL_GAUGE);
-	Plugin->AuiManagerUpdate();
+	if (event.GetId() == QueryId) {
+		RenderAllResults();
+
+		// make sure to cleanup all results
+		for (size_t i = 0; i < Results.size(); i++) {
+			delete Results[i];
+		}
+		Results.clear();
+		MultipleSqlExecute.Close();
+		Gauge->StopGauge(ID_SQL_GAUGE);
+		Plugin->AuiManagerUpdate();
+	}
 }
 
 void mvceditor::SqlBrowserPanelClass::SetCurrentInfo(const mvceditor::DatabaseInfoClass& info) {

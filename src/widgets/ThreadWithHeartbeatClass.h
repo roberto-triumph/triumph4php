@@ -64,8 +64,9 @@ public:
 	
 	/**
 	 * Will generate a EVENT_WORK_COMPLETE event.
+	 * @param id if given, the generated event will have this id as its GetId() member.
 	 */
-	void SignalEnd();
+	void SignalEnd(int id = wxID_ANY);
 	
 	/**
 	 * Will generate a EVENT_WORK_IN_PROGRESS event

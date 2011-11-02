@@ -37,9 +37,9 @@ void mvceditor::ThreadWithHeartbeatClass::SignalStart() {
 	Timer.Start(200, wxTIMER_CONTINUOUS);
 }
 	
-void mvceditor::ThreadWithHeartbeatClass::SignalEnd() {
+void mvceditor::ThreadWithHeartbeatClass::SignalEnd(int id) {
 	Timer.Stop();
-	wxCommandEvent evt(mvceditor::EVENT_WORK_COMPLETE);
+	wxCommandEvent evt(mvceditor::EVENT_WORK_COMPLETE, id);
 	wxPostEvent(&Handler, evt);
 }
 	

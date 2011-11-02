@@ -41,9 +41,10 @@ namespace mvceditor {
 /**
  * This event will be propagated when the SQL query completes
  * execution
- * event.GetClientData() will have a pointer to a SqlResultClass; it will contain everything necessary to
- * iterate through a result. Event handlers will own the pointer and will need to delete it when they
- * are done reading the result.
+ * event.GetClientData() will have a pointer to a SqlResultClass pointer. ClientData pointer will contain 
+ * everything necessary to iterate through a result. Event handlers will own the pointer and will need to delete it when they
+ * are done reading the result. This pointer may be NULL when there are no results.
+ * event.GetId() will contain the ID of query (as given to MultiplSqlExecuteClass::Init).
  */
 const wxEventType QUERY_COMPLETE_EVENT = wxNewEventType();
 
@@ -108,9 +109,11 @@ public:
 	 * Prepares queries to be run
 	 * @param sql the entire SQL contents to be executed. This may contain more than one query.
 	 * @param query the connection options used to connect
+	 * @param queryId this ID will be used by the handler; the handler should only handle its own
+	 *        query results.
 	 * @return true if sql is not empty
 	 */
-	bool Init(const UnicodeString& sql, const SqlQueryClass& query);
+	bool Init(const UnicodeString& sql, const SqlQueryClass& query, int queryId);
 	
 	/**
 	 * start a new thread and execute the current query.
@@ -123,12 +126,6 @@ public:
 	 * valid.
 	 */
 	void Close();
-	
-	/**
-	 * cleans up the given result set but keeps the connection alive [for another query]
-	 * after a call to this method; result is no longer a valid pointer
-	 */
-	void CleanResult(mvceditor::SqlResultClass* result);
 	
 protected:
 
@@ -162,14 +159,17 @@ private:
 	 * Connection handle
 	 */
 	soci::session Session;
+
+	/**
+	 * This ID will be used to differentiate between the events that the various panels will generate.
+	 * Each panel will only handles the events generated from its own MultipleSqlExecute class.
+	 */
+	int QueryId;
 	
 	/**
 	 * To prevent more than one thread from running at the same time.
 	 */
-	bool IsRunning;
-	
-	bool Connected;
-	
+	bool IsRunning;	
 };
 
 
@@ -196,8 +196,6 @@ public:
 	 * Runs the query that is in the text control (in a separate thread).
 	 */
 	void Execute();
-	
-	void ExecuteMore();
 
 	/**
 	 * When a query has finished running display the results in the grid
@@ -255,10 +253,13 @@ private:
 	void OnWorkComplete(wxCommandEvent& event);
 	
 	/**
-	 * Fill the grid with the SQL results
+	 * Fill the grid with the a single SQL result
 	 */
 	void Fill(SqlResultClass* results);
 	
+	/**
+	 * Fill the grid with ALL SQL results
+	 */
 	void RenderAllResults();
 	
 	/**
@@ -281,6 +282,9 @@ private:
 	 */
 	MultipleSqlExecuteClass MultipleSqlExecute;
 	
+	/**
+	 * the accumulated results. This class will DELETE the pointers once it has rendered them.
+	 */
 	std::vector<SqlResultClass*> Results;
 	
 	/**
@@ -296,20 +300,15 @@ private:
 	StatusBarWithGaugeClass* Gauge;
 	
 	/**
-	 * when running multiple queries; queries that have no result (INSERT, DELETE, CREATE...) 
-	 * are put in this panel
-	 */
-	SqlBrowserPanelClass* OutputPanel;
-	
-	/**
 	 * needed to create the results panel and attach it to the tools window.
 	 */
 	SqlBrowserPluginClass* Plugin;
-	
+
 	/**
-	 * true if this grid is filled with data.
+	 * This ID will be used to differentiate between the events that the various panels will generate.
+	 * Each panel will only handles the events generated from its own MultipleSqlExecute class.
 	 */
-	bool IsFilled;
+	int QueryId;
 	
 	DECLARE_EVENT_TABLE()
 };
