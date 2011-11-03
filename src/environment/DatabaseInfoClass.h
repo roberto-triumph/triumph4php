@@ -142,9 +142,11 @@ public:
 	 * @param query the connection info
 	 * @param session the active connection
 	 * @param stmt the current statement that was executed.
+	 * @param sqlString the SQL that was excuted
 	 * @param hasRows TRUE if the statement has results.
 	 */
-	void Init(mvceditor::SqlQueryClass& query, soci::session& session, soci::statement& stmt, bool hasRows);
+	void Init(mvceditor::SqlQueryClass& query, soci::session& session, soci::statement& stmt, const UnicodeString& sqlString,
+		bool hasRows);
 	
 	/**
 	 * clean up resources. after a call to this object the statement has been cleaned up and is no longer valid.
@@ -171,6 +173,11 @@ public:
 	 * The names of the columns in the result.
 	 */
 	std::vector<UnicodeString> ColumnNames;
+
+	/**
+	 * The query that was executed.
+	 */
+	UnicodeString Query;
 	
 	/**
 	 * The time that the query took to execute.

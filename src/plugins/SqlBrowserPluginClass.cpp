@@ -171,12 +171,12 @@ void mvceditor::SqlConnectionDialogClass::OnListboxSelected(wxCommandEvent& even
 	}
 }
 
-mvceditor::MultipleSqlExecuteClass::MultipleSqlExecuteClass(wxEvtHandler& handler)
-	: ThreadWithHeartbeatClass(handler)
+mvceditor::MultipleSqlExecuteClass::MultipleSqlExecuteClass(wxEvtHandler& handler, int queryId)
+	: ThreadWithHeartbeatClass(handler, queryId)
 	, SqlLexer() 
 	, Query()
 	, Session()
-	, QueryId(0)
+	, QueryId(queryId)
 	, IsRunning(false) {
 }
 
@@ -237,13 +237,12 @@ void* mvceditor::MultipleSqlExecuteClass::Entry() {
 		evt.SetClientData(results);
 		wxPostEvent(&Handler, evt);
 	}
-	SignalEnd(QueryId);
+	SignalEnd();
 	return 0;
 }
 
-bool mvceditor::MultipleSqlExecuteClass::Init(const UnicodeString& sql, const SqlQueryClass& query, int queryId) {
+bool mvceditor::MultipleSqlExecuteClass::Init(const UnicodeString& sql, const SqlQueryClass& query) {
 	Query.Info.Copy(query.Info);
-	QueryId = queryId;
 	return !IsRunning && SqlLexer.OpenString(sql);
 }
 
@@ -259,12 +258,12 @@ mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id,
 	, Query(other)
 	, LastError()
 	, LastQuery()
-	, MultipleSqlExecute(*this) 
+	, MultipleSqlExecute(*this, id) 
 	, Results()
 	, Gauge(gauge)
 	, Plugin(plugin) {
 	CodeControl = NULL;
-	QueryId = wxNewId();
+	QueryId = id;
 	ResultsGrid->DeleteCols(0, ResultsGrid->GetNumberCols());
 	ResultsGrid->DeleteRows(0, ResultsGrid->GetNumberRows());
 	ResultsGrid->ClearGrid();
@@ -281,8 +280,8 @@ bool mvceditor::SqlBrowserPanelClass::Check() {
 }
 
 void mvceditor::SqlBrowserPanelClass::Execute() {
-	if (Check() && MultipleSqlExecute.Init(LastQuery, Query, QueryId)) {
-		MultipleSqlExecute.Execute();
+	if (Check() && MultipleSqlExecute.Init(LastQuery, Query) && MultipleSqlExecute.Execute()) {
+		Gauge->AddGauge(_("Running SQL queries"), ID_SQL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 	}
 	else if (LastQuery.isEmpty()) {
 		wxMessageBox(_("Please enter a query into the code control."));
@@ -312,9 +311,10 @@ void mvceditor::SqlBrowserPanelClass::RenderAllResults() {
 		// this grid will show a summary of all query results
 		outputSummary = true;
 		ResultsGrid->SetDefaultCellOverflow(false);
-		ResultsGrid->AppendCols(2);
+		ResultsGrid->AppendCols(3);
 		ResultsGrid->SetColLabelValue(0, _("Query Line Number"));
-		ResultsGrid->SetColLabelValue(1, _("Result"));
+		ResultsGrid->SetColLabelValue(1, _("Query"));
+		ResultsGrid->SetColLabelValue(2, _("Result"));
 	}
 	
 	for (size_t i = 0; i < Results.size(); i++) {
@@ -333,6 +333,8 @@ void mvceditor::SqlBrowserPanelClass::RenderAllResults() {
 			newPanel->Fill(results);
 		}
 		if (outputSummary) {
+
+			// put summary in the summary GRID
 			wxString msg;
 			if (results->Success) {
 				msg = wxString::Format(_("%d rows affected in %.3f sec"), results->AffectedRows, 
@@ -342,19 +344,29 @@ void mvceditor::SqlBrowserPanelClass::RenderAllResults() {
 				msg = mvceditor::StringHelperClass::IcuToWx(results->Error);
 			}
 			int rowNumber = ResultsGrid->GetNumberRows();
+			wxString queryStart = mvceditor::StringHelperClass::IcuToWx(results->Query);
 			ResultsGrid->AppendRows(1);
 			ResultsGrid->SetCellValue(wxGridCellCoords(rowNumber , 0), wxString::Format(wxT("%d"), results->LineNumber));
-			ResultsGrid->SetCellValue(wxGridCellCoords(rowNumber , 1), msg);
+			ResultsGrid->SetCellValue(wxGridCellCoords(rowNumber , 1), queryStart.Mid(0, 100)); 
+			ResultsGrid->SetCellValue(wxGridCellCoords(rowNumber , 2), msg);
 		}
 		if (!outputSummary && !results->Error.isEmpty()) {
+
+			// put error in the summary LABEL
 			UpdateLabels(mvceditor::StringHelperClass::IcuToWx(results->Error));
 		}
+		else if (!outputSummary) {
+
+			// put summary in the summary LABEL
+			wxString msg = wxString::Format(_("%d rows affected in %.3f sec"), results->AffectedRows, 
+					(results->QueryTime.ToLong() / 1000.00));
+			UpdateLabels(msg);
+		}
 	}
-	if (outputSummary && ResultsGrid->GetNumberCols() > 0) {
+	if (outputSummary) {
 		ResultsGrid->AutoSizeColumn(0);
-	}
-	if (outputSummary && ResultsGrid->GetNumberCols() > 1) {
 		ResultsGrid->AutoSizeColumn(1);
+		ResultsGrid->AutoSizeColumn(2);
 	}
 }
 
@@ -593,7 +605,7 @@ mvceditor::SqlBrowserPanelClass* mvceditor::SqlBrowserPluginClass::CreateResults
 		codeControl->SetCurrentInfo(Infos[ChosenIndex]);
 	}
 	
-	mvceditor::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxID_NEW, GetStatusBarWithGauge(), query, this);
+	mvceditor::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxNewId(), GetStatusBarWithGauge(), query, this);
 	mvceditor::NotebookClass* codeNotebook = GetNotebook();
 	wxString tabText = codeNotebook->GetPageText(codeNotebook->GetPageIndex(codeControl));
 	AddToolsWindow(sqlPanel, tabText);

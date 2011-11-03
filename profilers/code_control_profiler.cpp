@@ -116,6 +116,7 @@ private:
 	
 	mvceditor::CodeControlOptionsClass Options;
 	mvceditor::ProjectOptionsClass ProjectOptions;
+	mvceditor::EnvironmentClass Environment;
 	mvceditor::ProjectClass Project;
 	mvceditor::CodeControlClass* Ctrl;
 	
@@ -137,7 +138,7 @@ CodeControlFrameClass::CodeControlFrameClass()
 			wxSize(1024, 768))
 	, Options()
 	, ProjectOptions()
-	, Project(ProjectOptions) {
+	, Project(ProjectOptions, Environment) {
 	Options.EnableAutomaticLineIndentation = true;
 	Options.EnableAutoCompletion = true;
 	Ctrl = new mvceditor::CodeControlClass(this, Options, &Project, wxID_ANY);

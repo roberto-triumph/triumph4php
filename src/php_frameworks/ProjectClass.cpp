@@ -39,9 +39,11 @@ mvceditor::ProjectOptionsClass::ProjectOptionsClass(const ProjectOptionsClass& o
 	RootPath = other.RootPath; 
 }
 
-mvceditor::ProjectClass::ProjectClass(const mvceditor::ProjectOptionsClass& options)
+mvceditor::ProjectClass::ProjectClass(const mvceditor::ProjectOptionsClass& options, 
+		const mvceditor::EnvironmentClass& environment)
 	: SqlResourceFinderMutex() 
 	, Options(options)
+	, Environment(environment)
 	, ResourceFinder()
 	, Frameworks()
 	, Databases() {
@@ -95,7 +97,7 @@ wxString mvceditor::ProjectClass::GetPhpFileExtensions() const {
 }
 
 wxString mvceditor::ProjectClass::GetPhpExecutable() const {
-	return wxT("php");
+	return Environment.Php.PhpExecutablePath;
 }
 
 mvceditor::ResourceFinderClass* mvceditor::ProjectClass::GetResourceFinder() {

@@ -32,7 +32,7 @@ public:
 		: FileTestFixtureClass(wxT("project_test")) {
 		mvceditor::ProjectOptionsClass options;
 		options.RootPath = TestProjectDir;
-		Project = new mvceditor::ProjectClass(options);
+		Project = new mvceditor::ProjectClass(options, Environment);
 	}
 	
 	virtual ~ProjectTestFixtureClass() {
@@ -40,6 +40,7 @@ public:
 	}
 
 	mvceditor::ProjectClass* Project;
+	mvceditor::EnvironmentClass Environment;
 };
 
 SUITE(ProjectTestClass) {

@@ -29,6 +29,7 @@
 #include <search/ResourceFinderClass.h>
 #include <environment/DatabaseInfoClass.h>
 #include <environment/SqlResourceFinderClass.h>
+#include <environment/EnvironmentClass.h>
 #include <wx/string.h>
 #include <wx/thread.h>
 #include <vector>
@@ -74,13 +75,19 @@ public:
 	 * guard concurrent access to SQL Resource finder
 	 */
 	wxMutex SqlResourceFinderMutex;
+
+	/**
+	 * Holds the location of the PHP binary.
+	 */
+	const EnvironmentClass& Environment;
 	
 	/**
 	 * Construct a ProjectClass object from the given options
 	 * 
 	 * @param ProjectOptionsClass options the new project's options
+	 * @param EnvironmentClass the system binary locations
 	 */
-	ProjectClass(const ProjectOptionsClass& options);
+	ProjectClass(const ProjectOptionsClass& options, const EnvironmentClass& environment);
 	
 	/**
 	 * creates the detection command that will figure out which frameworks

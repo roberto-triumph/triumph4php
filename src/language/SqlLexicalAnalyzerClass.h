@@ -71,14 +71,7 @@ public:
 	bool NextQuery(UnicodeString& query);
 	
 	/**
-	 * Get the offset into queries where the query returned by NextQuery() started. 
-	 * @return the character position where the NextQuery starts.
-	 *
-	int GetCharacterPosition();
-	*/
-	
-	/**
-	 * @return int the line number that the query (set by the NextQuery() method) was in.  
+	 * @return int the line number that the query (set by the NextQuery() method) STARTS IN.  
 	 * This is a 1-based number.
 	 */
 	int GetLineNumber() const;
@@ -136,9 +129,9 @@ public:
 	UCharBufferedFileClass Buffer;
 	
 	/**
-	 * The start of the current query
+	 * The starting line number of the current query that was returned by NextQuery()
 	 */
-	int Start;
+	int QueryStartLineNumber;
 	
 	/**
 	 * Keeps track of the current lexer state

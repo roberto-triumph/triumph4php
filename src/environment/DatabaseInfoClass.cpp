@@ -73,6 +73,7 @@ mvceditor::SqlResultClass::SqlResultClass()
 	, Row()
 	, StringResults()
 	, ColumnNames()
+	, Query()
 	, QueryTime()
 	, LineNumber(0)
 	, AffectedRows(0)
@@ -93,9 +94,11 @@ void mvceditor::SqlResultClass::Close() {
 	Success = false;
 }
 
-void mvceditor::SqlResultClass::Init(mvceditor::SqlQueryClass& query, soci::session& session, soci::statement& stmt, bool hasRows) {
+void mvceditor::SqlResultClass::Init(mvceditor::SqlQueryClass& query, soci::session& session, soci::statement& stmt, 
+									 const UnicodeString& sqlString, bool hasRows) {
 	ColumnNames.clear();
 	StringResults.clear();
+	Query = sqlString;
 	std::vector<soci::indicator> columnIndicators;
 	HasRows = hasRows;
 	AffectedRows = query.GetAffectedRows(stmt);
@@ -200,7 +203,7 @@ bool mvceditor::SqlQueryClass::Execute(soci::session& session, mvceditor::SqlRes
 		// execute will return false if statement does not return any rows
 		// but we want to return true for INSERTs and UPDATEs too
 		results.Success = true;
-		results.Init(*this, session, stmt, hasRows);
+		results.Init(*this, session, stmt, query, hasRows);
 		stmt.clean_up();
 	} catch (std::exception const& e) {
 		results.Success = false;

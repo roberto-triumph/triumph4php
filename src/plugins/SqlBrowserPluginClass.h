@@ -102,18 +102,18 @@ public:
 
 	/**
 	 * @param handler the object that will receive the EVENT_WORK_* events
+	 * @param queryId this ID will be used by the handler; the handler should only handle its own
+	 *        query results.
 	 */
-	MultipleSqlExecuteClass(wxEvtHandler& handler);
+	MultipleSqlExecuteClass(wxEvtHandler& handler, int queryId);
 	
 	/**
 	 * Prepares queries to be run
 	 * @param sql the entire SQL contents to be executed. This may contain more than one query.
 	 * @param query the connection options used to connect
-	 * @param queryId this ID will be used by the handler; the handler should only handle its own
-	 *        query results.
 	 * @return true if sql is not empty
 	 */
-	bool Init(const UnicodeString& sql, const SqlQueryClass& query, int queryId);
+	bool Init(const UnicodeString& sql, const SqlQueryClass& query);
 	
 	/**
 	 * start a new thread and execute the current query.

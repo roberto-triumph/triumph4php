@@ -24,11 +24,12 @@
  */
 #include <widgets/ThreadWithHeartbeatClass.h>
 
-mvceditor::ThreadWithHeartbeatClass::ThreadWithHeartbeatClass(wxEvtHandler& handler)
+mvceditor::ThreadWithHeartbeatClass::ThreadWithHeartbeatClass(wxEvtHandler& handler, int id)
 	: wxEvtHandler()
 	, wxThreadHelper()
 	, Handler(handler)
-	, Timer() {
+	, Timer()
+	, EventId(id) {
 	Timer.SetOwner(this);
 	
 }
@@ -37,15 +38,15 @@ void mvceditor::ThreadWithHeartbeatClass::SignalStart() {
 	Timer.Start(200, wxTIMER_CONTINUOUS);
 }
 	
-void mvceditor::ThreadWithHeartbeatClass::SignalEnd(int id) {
+void mvceditor::ThreadWithHeartbeatClass::SignalEnd() {
 	Timer.Stop();
-	wxCommandEvent evt(mvceditor::EVENT_WORK_COMPLETE, id);
+	wxCommandEvent evt(mvceditor::EVENT_WORK_COMPLETE, EventId);
 	wxPostEvent(&Handler, evt);
 }
 	
 
 void mvceditor::ThreadWithHeartbeatClass::OnTimer(wxTimerEvent& event) {
-	wxCommandEvent evt(mvceditor::EVENT_WORK_IN_PROGRESS);
+	wxCommandEvent evt(mvceditor::EVENT_WORK_IN_PROGRESS, EventId);
 	wxPostEvent(&Handler, evt);
 }
 

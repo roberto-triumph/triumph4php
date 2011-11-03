@@ -348,7 +348,7 @@ void mvceditor::AppClass::ProjectOpen(const wxString& directoryPath) {
 	ProjectOptionsClass options;
 	options.RootPath = directoryPath;
 	CloseProject();
-	Project = new ProjectClass(options);
+	Project = new ProjectClass(options, Environment);
 	FrameworkIdentifiersLeftToDetect.clear();
 	wxString cmd = Project->DetectFrameworkCommand();
 	long pid = 0;

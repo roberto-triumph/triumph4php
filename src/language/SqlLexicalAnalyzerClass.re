@@ -33,19 +33,20 @@
 
 mvceditor::SqlLexicalAnalyzerClass::SqlLexicalAnalyzerClass() 
 	: Buffer()
-	, Start(0)
+	, QueryStartLineNumber(0)
 	, CurrentCondition(SQL_ANY) {
 
 }
 
 bool mvceditor::SqlLexicalAnalyzerClass::OpenString(const UnicodeString& queries) {
-	Start = 0;
+	QueryStartLineNumber = 1;
 	return Buffer.OpenString(queries);
 }
 
 bool mvceditor::SqlLexicalAnalyzerClass::NextQuery(UnicodeString& query) {
 	Buffer.ResetBuffer();
 	query.remove();
+	QueryStartLineNumber = Buffer.GetLineNumber();
 	NextToken();
 	bool contents = false;
 	UChar *start = Buffer.TokenStart;
@@ -65,7 +66,7 @@ bool mvceditor::SqlLexicalAnalyzerClass::NextQuery(UnicodeString& query) {
 }
 
 int mvceditor::SqlLexicalAnalyzerClass::GetLineNumber() const {
-	return Buffer.GetLineNumber();
+	return QueryStartLineNumber;
 }
 
 int mvceditor::SqlLexicalAnalyzerClass::NextToken() {

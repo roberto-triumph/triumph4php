@@ -54,19 +54,21 @@ public:
 	
 	/**
 	 * @param handler will receive the EVENT_WORK_* events
+	 * @param id if given, the generated event will have this id as its GetId() member.
 	 */
-	ThreadWithHeartbeatClass(wxEvtHandler& handler);
+	ThreadWithHeartbeatClass(wxEvtHandler& handler, int id = wxID_ANY);
 	
 	/**
-	 * Will prepare to send events at regular intervals
+	 * Will prepare to send events at regular intervals. After a call to this method, a 
+	 * EVENT_WORK_IN_PROGRESS will be generated at regular intervals until SignalEnd()
+	 * is called.
 	 */
 	void SignalStart();
 	
 	/**
-	 * Will generate a EVENT_WORK_COMPLETE event.
-	 * @param id if given, the generated event will have this id as its GetId() member.
+	 * Will generate a EVENT_WORK_COMPLETE event and stop the EVENT_WORK_IN_PROGRESS events.
 	 */
-	void SignalEnd(int id = wxID_ANY);
+	void SignalEnd();
 	
 	/**
 	 * Will generate a EVENT_WORK_IN_PROGRESS event
@@ -80,6 +82,11 @@ protected:
 private:
 
 	wxTimer Timer;
+
+	/**
+	 * All generated events will have this ID as their EventId
+	 */
+	int EventId;
 	
 	DECLARE_EVENT_TABLE()
 
