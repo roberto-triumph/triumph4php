@@ -49,7 +49,6 @@ TEST_FIXTURE(DatabaseInfoTestFixtureClass, ConnectQueryAndResults) {
 	Exec("INSERT INTO names(id, name) VALUES(3, 'three')");
 	
 	soci::session session;
-	bool hasError = false;
 	mvceditor::SqlQueryClass query;
 	UnicodeString error;
 	
@@ -81,7 +80,6 @@ TEST_FIXTURE(DatabaseInfoTestFixtureClass, MultipleQueries) {
 	Exec("INSERT INTO names(id, name) VALUES(3, 'three')");
 	
 	soci::session session;
-	bool hasError = false;
 	mvceditor::SqlQueryClass query;
 	UnicodeString error;
 	
@@ -100,7 +98,6 @@ TEST_FIXTURE(DatabaseInfoTestFixtureClass, MultipleQueries) {
 	CHECK(query.Execute(session, results2, UNICODE_STRING_SIMPLE("SELECT * FROM names ORDER BY id;")));
 	CHECK_EQUAL(0, results2.Error.length());
 	CHECK(results2.Success);
-	int rowCount = 0;
 	CHECK_EQUAL((size_t)3, results2.StringResults.size());
 	CHECK_EQUAL(3, results2.AffectedRows);
 	results2.Close();

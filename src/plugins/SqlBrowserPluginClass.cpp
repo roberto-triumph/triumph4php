@@ -319,7 +319,6 @@ void mvceditor::SqlBrowserPanelClass::RenderAllResults() {
 	
 	for (size_t i = 0; i < Results.size(); i++) {
 		mvceditor::SqlResultClass* results = Results[i];
-		bool hasError = false;
 		UnicodeString error;
 		
 		// if only one query was executed: render the results in this panel
@@ -388,7 +387,6 @@ void mvceditor::SqlBrowserPanelClass::Fill(mvceditor::SqlResultClass* results) {
 			ResultsGrid->SetColLabelValue(i, mvceditor::StringHelperClass::IcuToWx(results->ColumnNames[i]));
 			autoSizeColumns.push_back(true);
 		}
-		bool more = true;
 		ResultsGrid->SetDefaultCellOverflow(false);
 		for (size_t i = 0; i < results->StringResults.size(); i++) {
 			ResultsGrid->AppendRows(1);
@@ -436,7 +434,7 @@ void mvceditor::SqlBrowserPanelClass::UpdateLabels(const wxString& result) {
 		if (Query.Info.Port) {
 			ConnectionLabel->SetLabel(wxString::Format(
 				wxT("%s:host=%s:%d user=%s dbname=%s"),
-				driver,
+				driver.c_str(),
 				mvceditor::StringHelperClass::IcuToWx(Query.Info.Host).c_str(),
 				Query.Info.Port,
 				mvceditor::StringHelperClass::IcuToWx(Query.Info.User).c_str(),
@@ -446,7 +444,7 @@ void mvceditor::SqlBrowserPanelClass::UpdateLabels(const wxString& result) {
 		else {
 			ConnectionLabel->SetLabel(wxString::Format(
 				wxT("%s:host=%s user=%s dbname=%s"),
-				driver,
+				driver.c_str(),
 				mvceditor::StringHelperClass::IcuToWx(Query.Info.Host).c_str(),
 				mvceditor::StringHelperClass::IcuToWx(Query.Info.User).c_str(),
 				mvceditor::StringHelperClass::IcuToWx(Query.Info.DatabaseName).c_str()

@@ -42,8 +42,8 @@ mvceditor::ProjectOptionsClass::ProjectOptionsClass(const ProjectOptionsClass& o
 mvceditor::ProjectClass::ProjectClass(const mvceditor::ProjectOptionsClass& options, 
 		const mvceditor::EnvironmentClass& environment)
 	: SqlResourceFinderMutex() 
-	, Options(options)
 	, Environment(environment)
+	, Options(options)
 	, ResourceFinder()
 	, Frameworks()
 	, Databases() {

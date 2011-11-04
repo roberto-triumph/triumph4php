@@ -236,7 +236,7 @@ bool mvceditor::SqlQueryClass::GotData(soci::statement& stmt) {
 	catch (std::exception const& e) {
 
 		// TODO: make error accessible?
-		printf(e.what());
+		puts(e.what());
 	}
 	return ret;
 }
