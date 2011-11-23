@@ -499,11 +499,13 @@ void mvceditor::SqlBrowserPanelClass::UnlinkFromCodeControl() {
 }
 
 mvceditor::SqlMetaDataFetchClass::SqlMetaDataFetchClass(wxEvtHandler& handler)
-	: ThreadWithHeartbeatClass(handler) {
+	: ThreadWithHeartbeatClass(handler)
+	, Infos() 
+	, NewResources() {
 		
 }
 
-bool mvceditor::SqlMetaDataFetchClass::Read(std::vector<mvceditor::DatabaseInfoClass>* infos, mvceditor::ProjectClass* project) {
+bool mvceditor::SqlMetaDataFetchClass::Read(std::vector<mvceditor::DatabaseInfoClass>* infos) {
 	bool ret = false;
 	Infos = infos;
 	wxThreadError err = Create();
@@ -515,7 +517,6 @@ bool mvceditor::SqlMetaDataFetchClass::Read(std::vector<mvceditor::DatabaseInfoC
 	}
 	else if (wxTHREAD_NO_ERROR == err) {
 		Infos = infos;
-		Project = project;
 		GetThread()->Run();
 		SignalStart();
 		ret = true;
@@ -524,21 +525,21 @@ bool mvceditor::SqlMetaDataFetchClass::Read(std::vector<mvceditor::DatabaseInfoC
 }
 
 void* mvceditor::SqlMetaDataFetchClass::Entry() {
-	wxMutexLocker locker(Project->SqlResourceFinderMutex);
-	if (locker.IsOk()) {
-		mvceditor::SqlResourceFinderClass* finder = Project->GetSqlResourceFinder();
-		
-		std::vector<UnicodeString> errors;
-		for (std::vector<mvceditor::DatabaseInfoClass>::iterator it = Infos->begin(); it != Infos->end(); ++it) {
-			UnicodeString error;
-			if (!finder->Fetch(*it, error)) {
-				errors.push_back(error);
-			}
+	std::vector<UnicodeString> errors;
+	for (std::vector<mvceditor::DatabaseInfoClass>::iterator it = Infos->begin(); it != Infos->end(); ++it) {
+		UnicodeString error;
+		if (!NewResources.Fetch(*it, error)) {
+			errors.push_back(error);
 		}
-		// TODO do something with the error strings
 	}
+
+	// TODO do something with the error strings
 	SignalEnd();
 	return 0;
+}
+
+void mvceditor::SqlMetaDataFetchClass::WriteResultsInto(mvceditor::SqlResourceFinderClass& dest) {
+	dest.Copy(NewResources);
 }
 
 mvceditor::SqlBrowserPluginClass::SqlBrowserPluginClass() 
@@ -565,7 +566,7 @@ void mvceditor::SqlBrowserPluginClass::OnProjectOpened() {
 		Infos.push_back(info);
 	}
 	else {
-		if (SqlMetaDataFetch.Read(&Infos, GetProject())) {
+		if (SqlMetaDataFetch.Read(&Infos)) {
 			GetStatusBarWithGauge()->AddGauge(_("Fetching SQL meta data"), ID_SQL_METADATA_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
 		}
 	}
@@ -646,7 +647,7 @@ void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event
 	// in order to make it less confusing about where the connection info comes from.
 	mvceditor::SqlConnectionDialogClass dialog(GetMainWindow(), Infos, ChosenIndex, true);
 	if (dialog.ShowModal() == wxOK) {
-		SqlMetaDataFetch.Read(&Infos, GetProject());
+		SqlMetaDataFetch.Read(&Infos);
 		
 		// if connection changed need to update the code control so that it knows to use the new
 		// connection for auto completion purposes
@@ -708,6 +709,7 @@ void mvceditor::SqlBrowserPluginClass::OnWorkInProgress(wxCommandEvent& event) {
 
 void mvceditor::SqlBrowserPluginClass::OnWorkComplete(wxCommandEvent& event) {
 	GetStatusBarWithGauge()->StopGauge(ID_SQL_METADATA_GAUGE);
+	SqlMetaDataFetch.WriteResultsInto(*GetProject()->GetSqlResourceFinder());
 }
 
 void mvceditor::SqlBrowserPluginClass::AuiManagerUpdate() {

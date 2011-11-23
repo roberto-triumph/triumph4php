@@ -1271,26 +1271,20 @@ std::vector<wxString> mvceditor::SqlDocumentClass::HandleAutoComplete(const wxSt
 		}
 	}
 	
-	// look at the meta data, but we need to make sure to get the lock 
-	// dont want to lock the GUI thread, so dont wait for the lock
-	if (wxMUTEX_NO_ERROR == Project->SqlResourceFinderMutex.TryLock()) {
-		mvceditor::SqlResourceFinderClass* finder = Project->GetSqlResourceFinder();
-
-		// NO EXCEPTIONS MUST BE THROWN HERE...
-		if (!CurrentInfo.Host.isEmpty()) {
-			UnicodeString error;
-			std::vector<UnicodeString> results = finder->FindTables(CurrentInfo, word);
-			for (size_t i = 0; i < results.size(); i++) {
-				wxString s = mvceditor::StringHelperClass::IcuToWx(results[i]);
-				autoCompleteList.push_back(s);
-			}
-			results = finder->FindColumns(CurrentInfo, word);
-			for (size_t i = 0; i < results.size(); i++) {
-				wxString s = mvceditor::StringHelperClass::IcuToWx(results[i]);
-				autoCompleteList.push_back(s);
-			}
+	// look at the meta data
+	mvceditor::SqlResourceFinderClass* finder = Project->GetSqlResourceFinder();
+	if (!CurrentInfo.Host.isEmpty()) {
+		UnicodeString error;
+		std::vector<UnicodeString> results = finder->FindTables(CurrentInfo, word);
+		for (size_t i = 0; i < results.size(); i++) {
+			wxString s = mvceditor::StringHelperClass::IcuToWx(results[i]);
+			autoCompleteList.push_back(s);
 		}
-		Project->SqlResourceFinderMutex.Unlock();
+		results = finder->FindColumns(CurrentInfo, word);
+		for (size_t i = 0; i < results.size(); i++) {
+			wxString s = mvceditor::StringHelperClass::IcuToWx(results[i]);
+			autoCompleteList.push_back(s);
+		}
 	}
 	return autoCompleteList;
 }

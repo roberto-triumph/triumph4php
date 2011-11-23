@@ -34,6 +34,12 @@ mvceditor::SqlResourceFinderClass::SqlResourceFinderClass()
 		
 }
 
+void mvceditor::SqlResourceFinderClass::Copy(const mvceditor::SqlResourceFinderClass& src) {
+	Query.Info.Copy(src.Query.Info);
+	Tables = src.Tables;
+	Columns = src.Columns;
+}
+
 bool mvceditor::SqlResourceFinderClass::Fetch(const mvceditor::DatabaseInfoClass& info, UnicodeString& error) {
 	bool ret = true;
 	Query.Info.Copy(info);

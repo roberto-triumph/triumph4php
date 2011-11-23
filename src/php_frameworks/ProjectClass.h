@@ -72,11 +72,6 @@ class ProjectClass {
 public:
 
 	/**
-	 * guard concurrent access to SQL Resource finder
-	 */
-	wxMutex SqlResourceFinderMutex;
-
-	/**
 	 * Holds the location of the PHP binary.
 	 */
 	const EnvironmentClass& Environment;
@@ -149,12 +144,6 @@ public:
 	
 	/**
 	 *  This object will still own the returned pointer. Do NOT delete it.
-	 * WARNING: NEED TO ACQUIRE THE LOCK FIRST!! You need to acquire the sql resource finder mutex of this object
-	 * 
-	 * wxMutexLocker locker(Project.SqlResourceFinderMutex)
-	 * if (locker.IsOk()) {
-	 *   //... your logic
-	 * }
 	 * 
 	 */
 	SqlResourceFinderClass* GetSqlResourceFinder();

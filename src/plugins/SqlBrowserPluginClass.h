@@ -329,7 +329,17 @@ public:
 	 * @see mvceditor::ThreadWithHearbeatClass
 	 * @return bool TRUE if thread was started
 	 */
-	bool Read(std::vector<DatabaseInfoClass>* infos, ProjectClass* project);
+	bool Read(std::vector<DatabaseInfoClass>* infos);
+
+	/**
+	 * Once the background thread signals that it has finished
+	 * reading the metadata, call this method to get the results
+	 * of the work.
+	 *
+	 * @param dest the results of the background thread will be copied
+	 *        to dest
+	 */
+	void WriteResultsInto(SqlResourceFinderClass& dest);
 	
 protected:
 
@@ -337,7 +347,11 @@ protected:
 	
 	std::vector<DatabaseInfoClass>* Infos;
 	
-	ProjectClass* Project;
+	/**
+	 * This is a clean resource object; will only be accessed
+	 * background thread will only ever write to this object.
+	 */
+	SqlResourceFinderClass NewResources;
 };
 
 /**

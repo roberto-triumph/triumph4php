@@ -47,6 +47,13 @@ class SqlResourceFinderClass {
 public:
 
 	SqlResourceFinderClass();
+
+	/**
+	 * copy the internal resources from src into this object.
+	 *
+	 * @param src the object to copy from.
+	 */
+	void Copy(const SqlResourceFinderClass& src);
 	
 	/**
 	 * Connects to the given database and queries the table meta data
