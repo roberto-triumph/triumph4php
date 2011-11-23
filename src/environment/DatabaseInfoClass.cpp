@@ -155,12 +155,6 @@ void mvceditor::SqlQueryClass::Close(soci::session& session, soci::statement& st
 
 bool mvceditor::SqlQueryClass::Connect(soci::session& session, UnicodeString& error) {
 	bool success = false;
-	const char* pattern = "db=%S host=%S port=%d user=%S password='%S'";
-	UnicodeString connString;
-	
-	// 6 =  max length of port (65535)
-	UChar* buffer = connString.getBuffer(strlen(pattern) + Info.DatabaseName.length() + Info.Host.length() +
-		6 + Info.User.length() + Info.Password.length());
 	UnicodeString host = Info.Host;
 	
 	// using localhost triggers socket file lookups in linux
@@ -169,11 +163,26 @@ bool mvceditor::SqlQueryClass::Connect(soci::session& session, UnicodeString& er
 	if (host.caseCompare(UNICODE_STRING_SIMPLE("localhost"), 0) == 0) {
 		host = UNICODE_STRING_SIMPLE("127.0.0.1");
 	}
+
+	// 6 =  max length of port (65535) + null character
+	UnicodeString portString;
+	UChar* buffer = portString.getBuffer(7);
+	int32_t written = u_sprintf(buffer, "%d", Info.Port);
+	portString.releaseBuffer(written);
 	
-	int32_t written = u_sprintf(buffer, pattern, 
-		Info.DatabaseName.getTerminatedBuffer(), host.getTerminatedBuffer(), 
-		Info.Port, Info.User.getTerminatedBuffer(), Info.Password.getTerminatedBuffer());
-	connString.releaseBuffer(written);
+	UnicodeString connString;
+	connString = UNICODE_STRING_SIMPLE("db=");
+	connString += Info.DatabaseName;
+	connString += UNICODE_STRING_SIMPLE(" host=");
+	connString += host;
+	connString += UNICODE_STRING_SIMPLE(" port=");
+	connString += portString;
+	connString += UNICODE_STRING_SIMPLE(" user=");
+	connString += Info.User;
+	connString += UNICODE_STRING_SIMPLE(" password='");
+	connString += Info.Password;
+	connString +=  UNICODE_STRING_SIMPLE("'");
+	
 	
 	std::string s = mvceditor::StringHelperClass::IcuToChar(connString);
 	try {
