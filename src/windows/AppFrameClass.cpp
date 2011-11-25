@@ -275,7 +275,7 @@ void mvceditor::AppFrameClass::OnEditPreferences(wxCommandEvent& event) {
 void mvceditor::AppFrameClass::OnEditContentAssist(wxCommandEvent& event) {
 	CodeControlClass* page = Notebook->GetCurrentCodeControl();
 	if (page) {
-		page->HandleAutoCompletion(true);
+		page->HandleAutoCompletion();
 	}
 }
 

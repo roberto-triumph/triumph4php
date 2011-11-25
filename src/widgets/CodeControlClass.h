@@ -74,7 +74,7 @@ class TextDocumentClass {
 	 * @return a vector of strings, one item for each keyword to be 
 	 * shown to the user.
 	 */
-	virtual std::vector<wxString> HandleAutoComplete(const wxString& fileName, const UnicodeString& code, const UnicodeString& word, bool force);
+	virtual std::vector<wxString> HandleAutoComplete(const wxString& fileName, const UnicodeString& code, const UnicodeString& word);
 
 };
 
@@ -98,27 +98,28 @@ public:
 	/**
 	 * Use the project's resource finder to find auto complete suggestions
 	 */
-	virtual std::vector<wxString> HandleAutoComplete(const wxString& fileName, const UnicodeString& code, const UnicodeString& word, bool force);
+	virtual std::vector<wxString> HandleAutoComplete(const wxString& fileName, const UnicodeString& code, const UnicodeString& word);
 	
 private:
 
 	/**
 	 * handles auto completion for PHP.
 	 * 
-	 * @param bool force if true auto completion was triggered manually.
+	 * @param fileName the current file which autocomplete is working on
+	 * @param code the entire, most current, source code
+	 * @param word the current word where the cursor lies (this determines what the current symbol)
 	 * @param syntax the token type that the cursor is currently on.  This helps
-	 * int determining context (ie if the cursor is inside of a comment or string literal)
+	 * in determining context (ie if the cursor is inside of a comment or string literal)
 	 */
-	std::vector<wxString> HandleAutoCompletionPhp(const wxString& fileName, const UnicodeString& code, const UnicodeString& word, bool force, mvceditor::LanguageDiscoveryClass::Syntax syntax);	
+	std::vector<wxString> HandleAutoCompletionPhp(const wxString& fileName, const UnicodeString& code, const UnicodeString& word, mvceditor::LanguageDiscoveryClass::Syntax syntax);	
 	 
 	 /**
 	 * handles auto completion for PHP.
 	 * 
-	 * @param bool force if true auto completion was triggered manually.
 	 * @param syntax the token type that the cursor is currently on.  This helps
 	 * int determining context (ie if the cursor is inside of a comment or string literal)
 	 */
-	std::vector<wxString> HandleAutoCompletionHtml(const UnicodeString& code, const UnicodeString& word, bool force, mvceditor::LanguageDiscoveryClass::Syntax syntax);
+	std::vector<wxString> HandleAutoCompletionHtml(const UnicodeString& code, const UnicodeString& word, mvceditor::LanguageDiscoveryClass::Syntax syntax);
 	
 	/**
 	 * Return a list of possible keyword matches for the given word. For example, if word="cl"
@@ -167,9 +168,10 @@ public:
 	virtual bool CanAutoComplete();
 	
 	/**
+	 * Searches the current project's SqlResourceFinder to find SQL keywords and metadata that completes the given word.
 	 * Returns the keywords to be shown in the auto complete list.
 	 */
-	virtual std::vector<wxString> HandleAutoComplete(const wxString& fileName, const UnicodeString& code, const UnicodeString& word, bool force);
+	virtual std::vector<wxString> HandleAutoComplete(const wxString& fileName, const UnicodeString& code, const UnicodeString& word);
 	
 private:
 
@@ -332,12 +334,9 @@ public:
 	void SetSelectionByCharacterPosition(int start, int end);
 	
 	/**
-	 * handles auto completion.
-	 * 
-	 * @param bool force if true auto completion is always triggered. By default, it is only triggered
-	 * 	when the current word is greater than a certain length.
+	 * handles auto completion. This will differ based upon which document mode is loaded.
 	 */
-	void HandleAutoCompletion(bool force);	
+	void HandleAutoCompletion();	
 	
 	/**
 	 * shows the user function definition
@@ -654,12 +653,6 @@ private:
 	  * @var bool
 	  */
 	 bool WordHighlightIsWordHighlighted;
-	 
-	 /**
-	  * The timestamp of the last time a character was added to the document. Will help with auto completion by preventing
-	  * resource lookup when the user is typing really fast (an indication that the user does not need help)
-	  */
-	 wxLongLong LastCharAddedTime;	
 	 
 	 /**
 	  * Store the time the file was opened / last saved. We will use this to check to see if the file was modified

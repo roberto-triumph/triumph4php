@@ -345,10 +345,17 @@ void mvceditor::CodeControlClass::OnCharAdded(wxStyledTextEvent &event) {
 		HandleAutomaticIndentation(ch);
 	}
 	if (CodeControlOptions.EnableAutoCompletion) {
-		HandleAutoCompletion(false);
+
+		// attempt to show code completion on method operator / scope operator
+		// since this event happens after currentPos is advanced; so
+		// current char is now at currentPos - 1, so previous char is at currentPos - 2
+		char prevChar = GetCharAt(GetCurrentPos() - 2);
+		if (('-' == prevChar && '>' == ch) || (':' == prevChar && ':' == ch)) {
+			HandleAutoCompletion();
+		}
+		HandleCallTip(ch);
 	}
-	HandleCallTip(ch);
-	
+
 	// expand the line if currently folded. adding +1 to the current line so that even if enter is pressed,
 	// the folded line is expanded
 	int currentLine = GetCurrentLine();
@@ -396,7 +403,10 @@ wxString mvceditor::CodeControlClass::GetSymbolAt(int posToCheck) {
 	UnicodeString objectType,
 		objectMember,
 		comment;
-	if (SymbolTable.Lookup(endPos, *resourceFinder, type, objectType, objectMember, comment)) {
+	bool isThisCall(false),
+		isParentCall(false),
+		isStaticCall(false);
+	if (SymbolTable.Lookup(endPos, *resourceFinder, type, objectType, objectMember, comment, isThisCall, isParentCall, isStaticCall)) {
 		bool isObjectMethodOrProperty = SymbolClass::OBJECT == type ||SymbolClass::METHOD == type || SymbolClass::PROPERTY == type;
 		if (isObjectMethodOrProperty)  {
 			// even if objectType is empty, symbol will be something like '::METHOD' which the 
@@ -411,37 +421,30 @@ wxString mvceditor::CodeControlClass::GetSymbolAt(int posToCheck) {
 	return StringHelperClass::IcuToWx(symbol);
 }
 
-void mvceditor::CodeControlClass::HandleAutoCompletion(bool force) {
-	wxLongLong now = wxGetLocalTimeMillis();
-	
-	// if user is typing really fast dont bother helping them. however, if force is true, it means
-	// the user asked for auto completion, in which case always perform.
-	if (force || (now - LastCharAddedTime) > 400) {
-		if (Document->CanAutoComplete()) {
-			int currentPos = GetCurrentPos();
-			int startPos = WordStartPosition(currentPos, true);
-			int endPos = WordEndPosition(currentPos, true);
-			UnicodeString symbol = 	GetSafeSubstring(startPos, endPos);
-			UnicodeString code = GetSafeSubstring(0, currentPos + 1);
+void mvceditor::CodeControlClass::HandleAutoCompletion() {
+	if (Document->CanAutoComplete()) {
+		int currentPos = GetCurrentPos();
+		int startPos = WordStartPosition(currentPos, true);
+		int endPos = WordEndPosition(currentPos, true);
+		UnicodeString symbol = 	GetSafeSubstring(startPos, endPos);
+		UnicodeString code = GetSafeSubstring(0, currentPos + 1);
+		
+		wxString fileName = CurrentFilename;
+		std::vector<wxString> autoCompleteList = Document->HandleAutoComplete(fileName, code, symbol);
+		if (!autoCompleteList.empty()) {
 			
-			wxString fileName = CurrentFilename;
-			std::vector<wxString> autoCompleteList = Document->HandleAutoComplete(fileName, code, symbol, force);
-			if (!autoCompleteList.empty()) {
-				
-				// scintilla needs the keywords sorted.
-				sort(autoCompleteList.begin(), autoCompleteList.end());
-				wxString list;
-				for (size_t i = 0; i < autoCompleteList.size(); ++i) {
-					list += wxT(" ");
-					list += autoCompleteList[i];
-				}
-				AutoCompSetMaxWidth(0);
-				int wordLength = currentPos - startPos;
-				AutoCompShow(wordLength, list);
+			// scintilla needs the keywords sorted.
+			sort(autoCompleteList.begin(), autoCompleteList.end());
+			wxString list;
+			for (size_t i = 0; i < autoCompleteList.size(); ++i) {
+				list += wxT(" ");
+				list += autoCompleteList[i];
 			}
+			AutoCompSetMaxWidth(0);
+			int wordLength = currentPos - startPos;
+			AutoCompShow(wordLength, list);
 		}
 	}
-	LastCharAddedTime = wxGetLocalTimeMillis();
 }
 
 bool mvceditor::CodeControlClass::PositionedAtVariable(int pos) {
@@ -644,7 +647,7 @@ void mvceditor::CodeControlClass::SetPhpOptions() {
 	SetLexer(wxSTC_LEX_HTML);
 	// 7 = as per scintilla docs, HTML lexer uses 7 bits for styles
 	SetStyleBits(7);
-	AutoCompStops(wxT("!@#$%^&*()_+-=[]\\{}|;':\",./<>?"));
+	AutoCompStops(wxT("!@#$%^&*()_+-=[]\\{}|;'\",./<?"));
 	AutoCompSetSeparator(' ');
 	AutoCompSetFillUps(wxT("(["));
 	AutoCompSetIgnoreCase(true);
@@ -709,11 +712,11 @@ void mvceditor::CodeControlClass::SetSqlOptions() {
 	
 	// 5 = default as per scintilla docs. set it because it may have been set by SetPhpOptions()
 	SetStyleBits(5);
-	AutoCompStops(wxT("!@#$%^&*()_+-=[]\\{}|;':\",./<>?`"));
+	AutoCompStops(wxT("!@#$%^&*()_+-=[]\\{}|;'\",/?`"));
 	AutoCompSetSeparator(' ');
 	AutoCompSetIgnoreCase(true);
 	AutoCompSetFillUps(wxT("(["));
-	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$"));
+	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
 	WordHighlightStyle = INDICATOR_TEXT_STYLE;
 }
 
@@ -1087,7 +1090,7 @@ bool mvceditor::TextDocumentClass::CanAutoComplete() {
 	return false;
 }
 
-std::vector<wxString> mvceditor::TextDocumentClass::HandleAutoComplete(const wxString& fileName, const UnicodeString& code, const UnicodeString& word, bool force) {	
+std::vector<wxString> mvceditor::TextDocumentClass::HandleAutoComplete(const wxString& fileName, const UnicodeString& code, const UnicodeString& word) {	
 	std::vector<wxString> ret;
 	return ret;
 }
@@ -1105,7 +1108,7 @@ bool mvceditor::PhpDocumentClass::CanAutoComplete() {
 	return true;
 }
 
-std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoComplete(const wxString& fileName, const UnicodeString& code, const UnicodeString& word, bool force) {	
+std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoComplete(const wxString& fileName, const UnicodeString& code, const UnicodeString& word) {	
 	std::vector<wxString> ret;
 	if (LanguageDiscovery.Open(code)) {
 		mvceditor::LanguageDiscoveryClass::Syntax syntax = LanguageDiscovery.at(code.length() - 1);
@@ -1118,7 +1121,7 @@ std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoComplete(const wxSt
 		case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_MULTI_LINE_COMMENT:
 		case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_NOWDOC:
 		case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_SINGLE_QUOTE_STRING:
-			ret = HandleAutoCompletionPhp(fileName, code, word, force, syntax);
+			ret = HandleAutoCompletionPhp(fileName, code, word, syntax);
 			break;
 		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML:
 		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_TAG:
@@ -1126,16 +1129,16 @@ std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoComplete(const wxSt
 		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE_DOUBLE_QUOTE_VALUE:
 		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE_SINGLE_QUOTE_VALUE:
 		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ENTITY:
-			ret = HandleAutoCompletionHtml(code, word, force, syntax);
+			ret = HandleAutoCompletionHtml(code, word, syntax);
 			break;
 		}
 	}	
 	return ret;
 }
 
-std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionHtml(const UnicodeString& code, const UnicodeString& word, bool force, mvceditor::LanguageDiscoveryClass::Syntax syntax) {
+std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionHtml(const UnicodeString& code, const UnicodeString& word, mvceditor::LanguageDiscoveryClass::Syntax syntax) {
 	std::vector<wxString> autoCompleteList;
-	if (!force && word.length() < 1) {
+	if (word.length() < 1) {
 		 return autoCompleteList;
 	}
 	wxStringTokenizer tokenizer(wxT(""));
@@ -1155,73 +1158,101 @@ std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionHtml(cons
 	return autoCompleteList;
 }
 
-std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const wxString& fileName, const UnicodeString& code, const UnicodeString& word, bool force, mvceditor::LanguageDiscoveryClass::Syntax syntax) {
+std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const wxString& fileName, const UnicodeString& code, const UnicodeString& word, mvceditor::LanguageDiscoveryClass::Syntax syntax) {
 	std::vector<wxString> autoCompleteList;
-	if (force || word.length() >= 3) {
 		
-		// word will start with a '$" if its a variable
-		//the word will contain the $ in case of variables since "$" is a word characters (via SetWordCharacters() call)
-		if (word.charAt(0) == '$') {
-			
-			// hmmm this means that code will be scanned again (here and up above by the LanguageDiscoveryClass)
-			// TODO: parsing it again? that's 3 times now
-			// TODO fix the double-scanning
-			SymbolTable.CreateSymbols(code);
+	// word will start with a '$" if its a variable
+	//the word will contain the $ in case of variables since "$" is a word characters (via SetWordCharacters() call)
+	if (word.charAt(0) == '$') {
+		
+		// hmmm this means that code will be scanned again (here and up above by the LanguageDiscoveryClass)
+		// TODO: parsing it again? that's 3 times now
+		// TODO fix the double-scanning
+		SymbolTable.CreateSymbols(code);
 
-			//+1 = do not take the '$' into account
-			UnicodeString symbol(word, 1);
-			std::vector<UnicodeString> variables = SymbolTable.GetVariablesInScope(code.length() - 1);
-			for (size_t i = 0; i < variables.size(); ++i) {
-				if (0 == variables[i].indexOf(symbol)) {
-					autoCompleteList.push_back(wxT("$") + StringHelperClass::IcuToWx(variables[i]));
-				}
+		//+1 = do not take the '$' into account
+		UnicodeString symbol(word, 1);
+		std::vector<UnicodeString> variables = SymbolTable.GetVariablesInScope(code.length() - 1);
+		for (size_t i = 0; i < variables.size(); ++i) {
+			if (0 == variables[i].indexOf(symbol)) {
+				autoCompleteList.push_back(wxT("$") + StringHelperClass::IcuToWx(variables[i]));
 			}
 		}
-		else {
-			
-			ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
-			
-			// need to build the cache in case if has not been done so for this file.
-			// however now the file is scanned twice; here and by the SymbolTable
-			// hmmm
-			resourceFinder->BuildResourceCacheForFile(fileName, code);
-			
-			// look up the type of the word (is the word in the context of a class, method or function ?
-			// SymbolTable resolves stuff like parent:: and self:: as well we don't need to do it here
-			SymbolTable.CreateSymbols(code);
-			SymbolClass::Types type;
-			UnicodeString objectType,
-				objectMember,
-				comment,
-				symbol(word);
-			if (SymbolTable.Lookup(code.length() - 1, *resourceFinder, type, objectType, objectMember, comment)) {
-				bool isObjectMethodOrProperty = SymbolClass::OBJECT == type ||SymbolClass::METHOD == type || SymbolClass::PROPERTY == type;
-				if (isObjectMethodOrProperty)  {
-					// even if objectType is empty, symbol will be something like '::METHOD' which the 
-					// ResourceFinder will interpret to look for methods only (which is what we want here)
-					symbol = objectType + UNICODE_STRING_SIMPLE("::") + objectMember;
-				}
-				else {
-					symbol = objectType;
-				}
+	}
+	else {
+		
+		ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
+		
+		// need to build the cache in case if has not been done so for this file.
+		// however now the file is scanned twice; here and by the SymbolTable
+		// hmmm
+		resourceFinder->BuildResourceCacheForFile(fileName, code);
+		
+		// look up the type of the word (is the word in the context of a class, method or function ?
+		// SymbolTable resolves stuff like parent:: and self:: as well we don't need to do it here
+		SymbolTable.CreateSymbols(code);
+		SymbolClass::Types type;
+		UnicodeString objectType,
+			objectMember,
+			comment,
+			symbol(word);
+		bool isThisCall(false),
+			isParentCall(false),
+			isStaticCall(false);
+		if (SymbolTable.Lookup(code.length() - 1, *resourceFinder, type, objectType, objectMember, comment, isThisCall, isParentCall, isStaticCall)) {
+			bool isObjectMethodOrProperty = SymbolClass::OBJECT == type ||SymbolClass::METHOD == type || SymbolClass::PROPERTY == type;
+			if (isObjectMethodOrProperty) {
+				// even if objectType is empty, symbol will be something like '::METHOD' which the 
+				// ResourceFinder will interpret to look for methods only (which is what we want here)
+				symbol = objectType + UNICODE_STRING_SIMPLE("::") + objectMember;
 			}
-			
-			// get all other resources that start like the word
-			wxString wxSymbol = mvceditor::StringHelperClass::IcuToWx(symbol);			
-			if (resourceFinder->Prepare(wxSymbol)) {
-				resourceFinder->CollectNearMatchResources();
-				for (size_t i = 0; i < resourceFinder->GetResourceMatchCount(); ++i) {
-					wxString s = mvceditor::StringHelperClass::IcuToWx(resourceFinder->GetResourceMatch(i).Identifier);
+			else {
+				symbol = objectType;
+			}
+		}
+		
+		// get all other resources that start like the word
+		wxString wxSymbol = mvceditor::StringHelperClass::IcuToWx(symbol);			
+		if (resourceFinder->Prepare(wxSymbol)) {
+			resourceFinder->CollectNearMatchResources();
+			for (size_t i = 0; i < resourceFinder->GetResourceMatchCount(); ++i) {
+				mvceditor::ResourceClass resource = resourceFinder->GetResourceMatch(i);
+				bool passesStaticCheck = isStaticCall == resource.IsStatic;
+
+				// if the resource starts with symbol it means that resource is a member of "$this"
+				bool isInherited = FALSE != resource.Resource.startsWith(symbol);
+
+				// $this => can access this resource's private, parent's protected/public, other public
+				// parent => can access parent's protected/public
+				// neither => can only access public
+				bool passesVisibilityCheck = !resource.IsPrivate && !resource.IsProtected;
+				if (!passesVisibilityCheck && isParentCall) {
+
+					// this check assumes that the resource finder has traversed the inheritance chain
+					// properly. then, by a process of elimination, if the resource class is not
+					// the symbol then we only show protected/public resources
+					passesVisibilityCheck = resource.IsProtected;
+				}
+				else if (!passesVisibilityCheck) {
+
+					//not checking isThisCalled
+					passesVisibilityCheck = isInherited;
+				}
+				if (passesStaticCheck && passesVisibilityCheck) {
+					wxString s = mvceditor::StringHelperClass::IcuToWx(resource.Identifier);
+					if (resource.IsStatic && resource.Type == mvceditor::ResourceClass::MEMBER) {
+						s = wxT("$") + s;
+					}
 					autoCompleteList.push_back(s);
 				}
 			}
+		}
 
-			 // when completing method names, do NOT include keywords
-			if (resourceFinder->GetResourceType() != ResourceFinderClass::CLASS_NAME_METHOD_NAME) {
-				std::vector<wxString> keywordMatches = CollectNearMatchKeywords(wxSymbol);
-				for (size_t i = 0; i < keywordMatches.size(); ++i) {
-					autoCompleteList.push_back(keywordMatches[i]);
-				}
+		 // when completing method names, do NOT include keywords
+		if (resourceFinder->GetResourceType() != ResourceFinderClass::CLASS_NAME_METHOD_NAME) {
+			std::vector<wxString> keywordMatches = CollectNearMatchKeywords(wxSymbol);
+			for (size_t i = 0; i < keywordMatches.size(); ++i) {
+				autoCompleteList.push_back(keywordMatches[i]);
 			}
 		}
 	}
@@ -1253,9 +1284,9 @@ bool mvceditor::SqlDocumentClass::CanAutoComplete() {
 	return true;
 }
 
-std::vector<wxString> mvceditor::SqlDocumentClass::HandleAutoComplete(const wxString& fileName, const UnicodeString& code, const UnicodeString& word, bool force) {
+std::vector<wxString> mvceditor::SqlDocumentClass::HandleAutoComplete(const wxString& fileName, const UnicodeString& code, const UnicodeString& word) {
 	std::vector<wxString> autoCompleteList;
-	if (!force && word.length() < 1) {
+	if (word.length() < 1) {
 		return autoCompleteList;
 	 }
 	wxString symbol = mvceditor::StringHelperClass::IcuToWx(word);

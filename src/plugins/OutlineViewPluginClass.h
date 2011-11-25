@@ -124,13 +124,15 @@ public:
 	 * Implementation of ClassMemberObserver.  In this method we will append to the outline buffer.
 	 */
 	void MethodFound(const UnicodeString& className, const UnicodeString& methodName, 
-		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment);
+		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
+		TokenClass::TokenIds visibility, bool isStatic);
 		
 	/**
 	 * Implementation of ClassMemberObserver.  In this method we will append to the outline buffer.
 	 */
 	void PropertyFound(const UnicodeString& className, const UnicodeString& propertyName, 
-		const UnicodeString& propertyType, const UnicodeString& comment, bool isConst);
+		const UnicodeString& propertyType, const UnicodeString& comment, 
+		TokenClass::TokenIds visibility, bool isConst, bool isStatic);
 		
 	/**
 	 * Implementation of FunctionObserver.  In this method we will append to the outline buffer.

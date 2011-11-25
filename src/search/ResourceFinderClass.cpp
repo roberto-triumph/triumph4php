@@ -621,7 +621,8 @@ void mvceditor::ResourceFinderClass::DefineDeclarationFound(const UnicodeString&
 }
 
 void mvceditor::ResourceFinderClass::MethodFound(const UnicodeString& className, const UnicodeString& methodName,
-		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment) {
+		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
+		mvceditor::TokenClass::TokenIds visibility, bool isStatic) {
 	ResourceClass item;
 	item.Resource = className + UNICODE_STRING_SIMPLE("::") + methodName;
 	item.Identifier = methodName;
@@ -633,6 +634,17 @@ void mvceditor::ResourceFinderClass::MethodFound(const UnicodeString& className,
 	item.Signature += signature;
 	item.ReturnType = returnType;
 	item.Comment = comment;
+	switch (visibility) {
+	case mvceditor::TokenClass::PROTECTED:
+		item.IsProtected = true;
+		break;
+	case mvceditor::TokenClass::PRIVATE:
+		item.IsPrivate = true;
+		break;
+	default:
+		break;
+	}
+	item.IsStatic = isStatic;
 	MembersCache.push_back(item);
 
 	if (methodName.caseCompare(UNICODE_STRING_SIMPLE("__construct"), 0) == 0) {
@@ -656,7 +668,8 @@ void mvceditor::ResourceFinderClass::MethodFound(const UnicodeString& className,
 }
 
 void mvceditor::ResourceFinderClass::PropertyFound(const UnicodeString& className, const UnicodeString& propertyName,
-                                        const UnicodeString& propertyType, const UnicodeString& comment, bool isConst) {
+                                        const UnicodeString& propertyType, const UnicodeString& comment, 
+										mvceditor::TokenClass::TokenIds visibility, bool isConst, bool isStatic) {
 	ResourceClass item;
 	item.Resource = className + UNICODE_STRING_SIMPLE("::") + propertyName;
 	item.Identifier = propertyName;
@@ -665,6 +678,17 @@ void mvceditor::ResourceFinderClass::PropertyFound(const UnicodeString& classNam
 	item.Signature = item.Resource;
 	item.ReturnType = propertyType;
 	item.Comment = comment;
+	switch (visibility) {
+	case mvceditor::TokenClass::PROTECTED:
+		item.IsProtected = true;
+		break;
+	case mvceditor::TokenClass::PRIVATE:
+		item.IsPrivate = true;
+		break;
+	default:
+		break;
+	}
+	item.IsStatic = isStatic;
 	MembersCache.push_back(item);
 }
 
@@ -898,7 +922,10 @@ mvceditor::ResourceClass::ResourceClass()
 	, ReturnType()
 	, Comment()
 	, Type(CLASS) 
-	, FileItemIndex(-1) {
+	, FileItemIndex(-1)
+	, IsProtected(false)
+	, IsPrivate(false) 
+	, IsStatic(false) {
 		
 }
 
@@ -910,6 +937,9 @@ void mvceditor::ResourceClass::operator=(const ResourceClass& src) {
 	Comment = src.Comment;
 	Type = src.Type;
 	FileItemIndex = src.FileItemIndex;
+	IsProtected = src.IsProtected;
+	IsPrivate = src.IsPrivate;
+	IsStatic = src.IsStatic;
 }
 
 bool mvceditor::ResourceClass::operator<(const mvceditor::ResourceClass& a) const {
