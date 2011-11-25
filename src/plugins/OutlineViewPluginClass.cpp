@@ -243,7 +243,8 @@ void mvceditor::OutlineViewPluginClass::DefineDeclarationFound(const UnicodeStri
 }
 	
 void mvceditor::OutlineViewPluginClass::MethodFound(const UnicodeString& className, const UnicodeString& methodName, 
-		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment) {
+		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
+		TokenClass::TokenIds visibility, bool isStatic) {
 	UnicodeString line;
 	
 	// TODO: nationalize the word "method"
@@ -252,7 +253,8 @@ void mvceditor::OutlineViewPluginClass::MethodFound(const UnicodeString& classNa
 }
 		
 void mvceditor::OutlineViewPluginClass::PropertyFound(const UnicodeString& className, const UnicodeString& propertyName, 
-		const UnicodeString& propertyType, const UnicodeString& comment, bool isConst) {
+		const UnicodeString& propertyType, const UnicodeString& comment, 
+		TokenClass::TokenIds visibility, bool isConst, bool isStatic) {
 	UnicodeString line;
 	
 	// TODO: nationalize the word "property"

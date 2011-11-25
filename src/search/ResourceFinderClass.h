@@ -359,13 +359,15 @@ public:
 	 * Implement class member observer.  When a class method has been parsed, add it to the Resource Cache.
 	 */
 	void MethodFound(const UnicodeString& className, const UnicodeString& methodName, 
-		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment);
+		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
+		TokenClass::TokenIds visibility, bool isStatic);
  
 	/**
 	 * Implement class member observer.  When a class property has been parsed, add it to the Resource Cache.
 	 */
 	void PropertyFound(const UnicodeString& className, const UnicodeString& propertyName, 
-		const UnicodeString& propertyType, const UnicodeString& comment, bool isConst);
+		const UnicodeString& propertyType, const UnicodeString& comment, 
+		TokenClass::TokenIds visibility, bool isConst, bool isStatic);
 		
 	/**
 	 * Implement function observer.  When a function has been parsed, add it to the Resource Cache.
@@ -636,6 +638,21 @@ public:
 	 * @var ReourceClass::Type
 	 */
 	ResourceClass::Type Type;
+
+	/**
+	 * TRUE if this is a protected member
+	 */
+	bool IsProtected;
+
+	/**
+	 * TRUE if this is a private member
+	 */
+	bool IsPrivate;
+
+	/**
+	 * TRUE if this is a static member
+	 */
+	bool IsStatic;
 	
 	ResourceClass();
 	

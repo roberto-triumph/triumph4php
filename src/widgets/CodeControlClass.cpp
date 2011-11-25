@@ -403,7 +403,10 @@ wxString mvceditor::CodeControlClass::GetSymbolAt(int posToCheck) {
 	UnicodeString objectType,
 		objectMember,
 		comment;
-	if (SymbolTable.Lookup(endPos, *resourceFinder, type, objectType, objectMember, comment)) {
+	bool isThisCall(false),
+		isParentCall(false),
+		isStaticCall(false);
+	if (SymbolTable.Lookup(endPos, *resourceFinder, type, objectType, objectMember, comment, isThisCall, isParentCall, isStaticCall)) {
 		bool isObjectMethodOrProperty = SymbolClass::OBJECT == type ||SymbolClass::METHOD == type || SymbolClass::PROPERTY == type;
 		if (isObjectMethodOrProperty)  {
 			// even if objectType is empty, symbol will be something like '::METHOD' which the 
@@ -1193,7 +1196,10 @@ std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const
 			objectMember,
 			comment,
 			symbol(word);
-		if (SymbolTable.Lookup(code.length() - 1, *resourceFinder, type, objectType, objectMember, comment)) {
+		bool isThisCall(false),
+			isParentCall(false),
+			isStaticCall(false);
+		if (SymbolTable.Lookup(code.length() - 1, *resourceFinder, type, objectType, objectMember, comment, isThisCall, isParentCall, isStaticCall)) {
 			bool isObjectMethodOrProperty = SymbolClass::OBJECT == type ||SymbolClass::METHOD == type || SymbolClass::PROPERTY == type;
 			if (isObjectMethodOrProperty) {
 				// even if objectType is empty, symbol will be something like '::METHOD' which the 
@@ -1210,8 +1216,35 @@ std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const
 		if (resourceFinder->Prepare(wxSymbol)) {
 			resourceFinder->CollectNearMatchResources();
 			for (size_t i = 0; i < resourceFinder->GetResourceMatchCount(); ++i) {
-				wxString s = mvceditor::StringHelperClass::IcuToWx(resourceFinder->GetResourceMatch(i).Identifier);
-				autoCompleteList.push_back(s);
+				mvceditor::ResourceClass resource = resourceFinder->GetResourceMatch(i);
+				bool passesStaticCheck = isStaticCall == resource.IsStatic;
+
+				// if the resource starts with symbol it means that resource is a member of "$this"
+				bool isInherited = FALSE != resource.Resource.startsWith(symbol);
+
+				// $this => can access this resource's private, parent's protected/public, other public
+				// parent => can access parent's protected/public
+				// neither => can only access public
+				bool passesVisibilityCheck = !resource.IsPrivate && !resource.IsProtected;
+				if (!passesVisibilityCheck && isParentCall) {
+
+					// this check assumes that the resource finder has traversed the inheritance chain
+					// properly. then, by a process of elimination, if the resource class is not
+					// the symbol then we only show protected/public resources
+					passesVisibilityCheck = resource.IsProtected;
+				}
+				else if (!passesVisibilityCheck) {
+
+					//not checking isThisCalled
+					passesVisibilityCheck = isInherited;
+				}
+				if (passesStaticCheck && passesVisibilityCheck) {
+					wxString s = mvceditor::StringHelperClass::IcuToWx(resource.Identifier);
+					if (resource.IsStatic && resource.Type == mvceditor::ResourceClass::MEMBER) {
+						s = wxT("$") + s;
+					}
+					autoCompleteList.push_back(s);
+				}
 			}
 		}
 
