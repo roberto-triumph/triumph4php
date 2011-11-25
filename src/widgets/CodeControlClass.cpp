@@ -111,6 +111,37 @@ static const wxString MYSQL_KEYWORDS = wxString::FromAscii(
 	"varchar varcharacter varying when where while with write xor year_month zerofill"
 );
 
+// these are actually CSS 1, CSS 2 and CSS 3 keywords
+// got these from http://code.google.com/p/scite-files/wiki/bettercsspropertiesfile
+static const wxString CSS_KEYWORDS = wxString::FromAscii(
+	"ascent azimuth background background-attachment background-color background-image background-position "
+	"background-repeat background-size baseline bbox border border-bottom border-bottom-color "
+	"border-bottom-left-radius border-bottom-right-radius border-bottom-style border-bottom-width border-collapse " 
+	"border-color border-color border-left border-left-color border-left-style border-left-width border-radius "
+	"border-right border-right-color border-right-style border-right-width border-spacing border-style "
+	"border-style border-top border-top-left-radius border-top-right-radius border-top-style border-top-width "
+	"border-width bottom box-shadow cap-height caption-side centerline clear clip color column-count column-gap "
+	"column-rule column-rule-color column-rule-style column-rule-width columns column-width content counter-increment "
+	"counter-reset cue cue-after cue-before cursor definition-src descent direction display elevation empty-cells "
+	"float font font-family font-size font-size-adjust font-stretch font-style font-variant font-weight height left "
+	"letter-spacing line-height list-style list-style-image list-style-position list-style-type margin margin-bottom "
+	"margin-left margin-right margin-top marker-offset marks mathline max-height max-width min-height min-width "
+	"opacity order-top-color orphans outline outline-color outline-style outline-width overflow padding padding-bottom "
+	"padding-left padding-right padding-top page page-break-after page-break-before page-break-inside panose-1 pause "
+	"pause-after pause-before pitch pitch-range play-during position quotes resize richness right size slope speak "
+	"speak-header speak-numeral speak-punctuation speech-rate src stemh stemv stress table-layout text-align "
+	"text-decoration text-indent text-shadow text-transform top topline unicode-bidi unicode-range units-per-em "
+	"vertical-align visibility voice-family volume white-space widows width widths word-spacing word-wrap x-height z-index"
+);
+
+// these are for CSS 1, 2, and 3
+// got these from http://code.google.com/p/scite-files/wiki/bettercsspropertiesfile
+static const wxString CSS_PSEUDOCLASSES = wxString::FromAscii(
+	"active checked disabled empty enabled first first-child first-of-type focus hover invalid lang last-child "
+	"last-of-type left link not nth-child nth-last-child nth-last-of-type nth-of-type only-child only-of-type "
+	"optional required right root target valid visited"
+);
+
 static const wxString JAVASCRIPT_KEYWORDS = wxT("");
 
 // margin 0 is taken up by line numbers, margin 1 is taken up by code folding. use
@@ -126,82 +157,6 @@ static const int INDICATOR_PHP_STYLE = 128;
 
 // 32 => 5th bit on since first 5 bits of style bits are for all other lexers
 static const int INDICATOR_TEXT_STYLE = 32;
-
-// wxSTC_HPHP_DEFAULT			PHP Default
-// wxSTC_HPHP_HSTRING			PHP Double quoted String
-// wxSTC_HPHP_SIMPLESTRING		PHP Single quoted string
-// wxSTC_HPHP_WORD				PHP Keyword
-// wxSTC_HPHP_NUMBER			PHP Number constant
-// wxSTC_HPHP_VARIABLE			PHP Variable
-// wxSTC_HPHP_COMMENT			PHP Comment
-// wxSTC_HPHP_COMMENTLINE		PHP One line comment
-// wxSTC_HPHP_HSTRING_VARIABLE 	PHP Variable in double quoted string
-// wxSTC_HPHP_OPERATOR			PHP Operator
-// wxSTC_STYLE_BRACELIGHT		Matching Braces
-// wxSTC_STYLE_BRACEBAD			Mismatched brace
-// wxSTC_STYLE_LINENUMBER		Line number margin
-// wxSTC_STYLE_INDENT_GUIDE		Indentation guides
-	
-int mvceditor::CodeControlOptionsClass::ArrayIndexToStcConstant[] = {
-	wxSTC_HPHP_DEFAULT,
-	wxSTC_HPHP_HSTRING,
-	wxSTC_HPHP_SIMPLESTRING,
-	wxSTC_HPHP_WORD,
-	wxSTC_HPHP_NUMBER,
-	wxSTC_HPHP_VARIABLE,
-	wxSTC_HPHP_COMMENT,
-	wxSTC_HPHP_COMMENTLINE,
-	wxSTC_HPHP_HSTRING_VARIABLE,
-	wxSTC_HPHP_COMPLEX_VARIABLE,
-	wxSTC_HPHP_OPERATOR,
-	wxSTC_STYLE_BRACELIGHT,
-	wxSTC_STYLE_BRACEBAD,
-	wxSTC_STYLE_LINENUMBER,
-	wxSTC_STYLE_INDENTGUIDE,
-	CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET,
-	CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE,
-	CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION,
-	CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING,
-	CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN,
-	CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT,
-
-	// HTML lexer
-	wxSTC_H_DEFAULT,
-	wxSTC_H_TAG,
-	wxSTC_H_TAGUNKNOWN,
-	wxSTC_H_ATTRIBUTE,
-	wxSTC_H_ATTRIBUTEUNKNOWN,
-	wxSTC_H_NUMBER,
-	wxSTC_H_DOUBLESTRING,
-	wxSTC_H_SINGLESTRING,
-	wxSTC_H_OTHER,
-	wxSTC_H_COMMENT,
-	wxSTC_H_ENTITY,
-	wxSTC_H_VALUE,
-	wxSTC_H_QUESTION, // <?php start tag
-	wxSTC_H_TAGEND, // script end tag ?>
-
-	// SQL lexer 
-	wxSTC_SQL_DEFAULT,
-	wxSTC_SQL_COMMENT,
-	wxSTC_SQL_COMMENTLINE,
-	wxSTC_SQL_COMMENTDOC,
-	wxSTC_SQL_NUMBER,
-	wxSTC_SQL_WORD,
-	wxSTC_SQL_STRING,
-	wxSTC_SQL_CHARACTER,
-	wxSTC_SQL_OPERATOR,
-	wxSTC_SQL_IDENTIFIER,
-	wxSTC_SQL_COMMENTLINEDOC,
-	wxSTC_SQL_WORD2,
-	wxSTC_SQL_COMMENTDOCKEYWORD,
-	wxSTC_SQL_COMMENTDOCKEYWORDERROR,
-	wxSTC_SQL_USER1,
-	wxSTC_SQL_USER2,
-	wxSTC_SQL_USER3,
-	wxSTC_SQL_USER4,
-	wxSTC_SQL_QUOTEDIDENTIFIER
-};
 
 mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,  ProjectClass* project, 
 			int id, const wxPoint& position, const wxSize& size, long style,
@@ -659,6 +614,38 @@ void mvceditor::CodeControlClass::SetPhpOptions() {
 	SetMarginMask(LINT_RESULT_MARGIN, ~wxSTC_MASK_FOLDERS);
 	MarkerDefine(LINT_RESULT_MARKER, wxSTC_MARK_ARROW, *wxRED, *wxRED);
 	WordHighlightStyle = INDICATOR_PHP_STYLE;
+	
+	// syntax coloring
+	for (size_t i = 0; i < CodeControlOptions.PhpStyles.size(); ++i) {
+		mvceditor::StylePreferenceClass pref = CodeControlOptions.PhpStyles[i];
+		int style = pref.StcStyle;
+		if (wxSTC_HPHP_DEFAULT == style) {
+			
+			// use the PHP default settings as the catch-all for settings not yet exposed
+			// (Javascript) so the user sees a uniform style.
+			int styles[] = {
+				wxSTC_STYLE_DEFAULT,
+				wxSTC_HJ_START, wxSTC_HJ_DEFAULT, wxSTC_HJ_COMMENT,
+				wxSTC_HJ_COMMENTLINE, wxSTC_HJ_COMMENTDOC, wxSTC_HJ_NUMBER,
+				wxSTC_HJ_WORD, wxSTC_HJ_KEYWORD, wxSTC_HJ_DOUBLESTRING,
+				wxSTC_HJ_SINGLESTRING, wxSTC_HJ_SYMBOLS, wxSTC_HJ_STRINGEOL,
+				wxSTC_HJ_REGEX
+			};
+			for (int i = 0; i < 14; ++i) {
+				StyleSetFont(styles[i], pref.Font);
+				StyleSetForeground(styles[i], pref.Color);
+				StyleSetBackground(styles[i], pref.BackgroundColor);
+				StyleSetBold(styles[i], pref.IsBold);
+				StyleSetItalic(styles[i], pref.IsItalic);
+			}
+		}
+		StyleSetFont(style, pref.Font);
+		StyleSetForeground(style, pref.Color);
+		StyleSetBackground(style, pref.BackgroundColor);
+		StyleSetBold(style, pref.IsBold);
+		StyleSetItalic(style, pref.IsItalic);
+		break;
+	}
 }
 
 void mvceditor::CodeControlClass::AutoDetectDocumentMode() {
@@ -675,6 +662,9 @@ void mvceditor::CodeControlClass::AutoDetectDocumentMode() {
 		// *.inc endings are common
 		SetDocumentMode(mvceditor::CodeControlClass::PHP);
 	}
+	else if (ext.CmpNoCase(wxT("css")) == 0) {
+		SetDocumentMode(mvceditor::CodeControlClass::CSS);
+	}
 	else {
 		SetDocumentMode(mvceditor::CodeControlClass::TEXT);
 	}
@@ -682,20 +672,28 @@ void mvceditor::CodeControlClass::AutoDetectDocumentMode() {
 
 void mvceditor::CodeControlClass::ApplyPreferences() {
 	SetMargin();
-	SetCodeControlOptions();
 	if (Document) {
 		delete Document;
 		Document = NULL;
 	}
 	if (mvceditor::CodeControlClass::SQL == DocumentMode) {
+		SetCodeControlOptions(CodeControlOptions.SqlStyles);
 		SetSqlOptions();		
 		Document = new mvceditor::SqlDocumentClass(Project, CurrentInfo);
 	}
 	else if (mvceditor::CodeControlClass::PHP == DocumentMode) {
+		SetCodeControlOptions(CodeControlOptions.PhpStyles);
 		SetPhpOptions();
 		Document = new mvceditor::PhpDocumentClass(Project);
 	}
+	else if (mvceditor::CodeControlClass::CSS == DocumentMode) {
+		SetCodeControlOptions(CodeControlOptions.CssStyles);
+		SetCssOptions();
+		Document = new mvceditor::TextDocumentClass();
+	}
 	else {
+		std::vector<mvceditor::StylePreferenceClass> noStyles;
+		SetCodeControlOptions(noStyles);
 		Document = new mvceditor::TextDocumentClass();
 	}
 	Colourise(0, -1);
@@ -718,9 +716,68 @@ void mvceditor::CodeControlClass::SetSqlOptions() {
 	AutoCompSetFillUps(wxT("(["));
 	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
 	WordHighlightStyle = INDICATOR_TEXT_STYLE;
+	
+	for (size_t i = 0; i < CodeControlOptions.SqlStyles.size(); ++i) {
+		mvceditor::StylePreferenceClass pref = CodeControlOptions.SqlStyles[i];
+		int style = pref.StcStyle;
+		if (wxSTC_CSS_DEFAULT == style) {
+			
+			// wxSTC_STYLE_DEFAULT controls the background of the portions where text does not reach
+			StyleSetFont(wxSTC_STYLE_DEFAULT, pref.Font);
+			StyleSetForeground(wxSTC_STYLE_DEFAULT, pref.Color);
+			StyleSetBackground(wxSTC_STYLE_DEFAULT, pref.BackgroundColor);
+			StyleSetBold(wxSTC_STYLE_DEFAULT, pref.IsBold);
+			StyleSetItalic(wxSTC_STYLE_DEFAULT, pref.IsItalic);
+		}
+		StyleSetFont(style, pref.Font);
+		StyleSetForeground(style, pref.Color);
+		StyleSetBackground(style, pref.BackgroundColor);
+		StyleSetBold(style, pref.IsBold);
+		StyleSetItalic(style, pref.IsItalic);	
+	}
 }
 
-void mvceditor::CodeControlClass::SetCodeControlOptions() {
+void mvceditor::CodeControlClass::SetCssOptions() {
+	SetLexer(wxSTC_LEX_CSS);
+	
+	// got this by looking at LexCSS.cxx (bottom of the file)
+	// keywords 0 => CSS 1 keywords
+	// keywords 1 => Pseudo classes
+	// keywords 2 => CSS 2 keywords but we will pass all keywords in 0
+	SetKeyWords(0, CSS_KEYWORDS);
+	SetKeyWords(1, CSS_PSEUDOCLASSES);
+	SetKeyWords(2, wxT(""));
+	
+	// 5 = default as per scintilla docs. set it because it may have been set by SetPhpOptions()
+	SetStyleBits(5);
+	AutoCompStops(wxT("!@#$%^&*()_+-=[]\\{}|;'\",/?`"));
+	AutoCompSetSeparator(' ');
+	AutoCompSetIgnoreCase(true);
+	AutoCompSetFillUps(wxT("([:"));
+	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
+	WordHighlightStyle = INDICATOR_TEXT_STYLE;
+	
+	for (size_t i = 0; i < CodeControlOptions.CssStyles.size(); ++i) {
+		mvceditor::StylePreferenceClass pref = CodeControlOptions.CssStyles[i];
+		int style = pref.StcStyle;
+		if (wxSTC_CSS_DEFAULT == style) {
+			
+			// wxSTC_STYLE_DEFAULT controls the background of the portions where text does not reach
+			StyleSetFont(wxSTC_STYLE_DEFAULT, pref.Font);
+			StyleSetForeground(wxSTC_STYLE_DEFAULT, pref.Color);
+			StyleSetBackground(wxSTC_STYLE_DEFAULT, pref.BackgroundColor);
+			StyleSetBold(wxSTC_STYLE_DEFAULT, pref.IsBold);
+			StyleSetItalic(wxSTC_STYLE_DEFAULT, pref.IsItalic);
+		}
+		StyleSetFont(style, pref.Font);
+		StyleSetForeground(style, pref.Color);
+		StyleSetBackground(style, pref.BackgroundColor);
+		StyleSetBold(style, pref.IsBold);
+		StyleSetItalic(style, pref.IsItalic);	
+	}
+}
+
+void mvceditor::CodeControlClass::SetCodeControlOptions(const std::vector<mvceditor::StylePreferenceClass>& styles) {
 	if (CodeControlOptions.IndentUsingTabs) {
 		SetUseTabs(true);
 		SetTabWidth(CodeControlOptions.TabWidth);
@@ -746,77 +803,44 @@ void mvceditor::CodeControlClass::SetCodeControlOptions() {
 	SetEOLMode(CodeControlOptions.LineEndingMode);
 	SetViewEOL(CodeControlOptions.EnableLineEndings);
 	
-	// syntax coloring
-	wxFont font;
-	wxColor color,
-		backgroundColor;
-	bool isBold,
-		isItalic;
-	for (int i = 0; i < CodeControlOptionsClass::STYLE_COUNT; ++i) {
-		int style = CodeControlOptionsClass::ArrayIndexToStcConstant[i];
-		if (CodeControlOptions.GetStyleByStcConstant(style, font, color, backgroundColor, isBold, isItalic)) {
-			switch (style) {
-				case CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET:
-					SetCaretForeground(color);
-					break;
-				case CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE:
-					SetCaretLineVisible(true);
-					SetCaretLineBackground(backgroundColor);
-					break;
-				case CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION:
-					SetSelForeground(true, color);
-					SetSelBackground(true, backgroundColor);
-					break;
-				case CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING:
-					if (CodeControlOptions.EnableCodeFolding) {
-						SetFoldMarginColour(true, backgroundColor);
-						SetFoldMarginHiColour(true, backgroundColor);
-						MarkerDefine(wxSTC_MARKNUM_FOLDEROPEN, wxSTC_MARK_BOXMINUS, backgroundColor, color);
-						MarkerDefine(wxSTC_MARKNUM_FOLDER, wxSTC_MARK_BOXPLUS, backgroundColor, color);
-						MarkerDefine(wxSTC_MARKNUM_FOLDERSUB, wxSTC_MARK_VLINE, backgroundColor, color);
-						MarkerDefine(wxSTC_MARKNUM_FOLDERTAIL, wxSTC_MARK_LCORNER, backgroundColor, color);
-						MarkerDefine(wxSTC_MARKNUM_FOLDEREND, wxSTC_MARK_BOXPLUSCONNECTED, backgroundColor, color);
-						MarkerDefine(wxSTC_MARKNUM_FOLDEROPENMID, wxSTC_MARK_BOXMINUSCONNECTED, backgroundColor, color);
-						MarkerDefine(wxSTC_MARKNUM_FOLDERMIDTAIL, wxSTC_MARK_TCORNER, backgroundColor, color);
-					}
-				case CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN:
-					if (CodeControlOptions.RightMargin > 0) {
-						SetEdgeColour(color);
-					}
-					break;
-				case mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT:
-					// since we need to share one indicator with the matching word highlight
-					// and the parse errors indicators; we will set this setting when the 
-					// user initiates the matching word feature
-					break;
-				default:
-					if (wxSTC_HPHP_DEFAULT == style) {
-						
-						// use the PHP default settings as the catch-all for settings not yet exposed
-						// (Javascript) so the user sees a uniform style.
-						int styles[] = {
-							wxSTC_STYLE_DEFAULT,
-							wxSTC_HJ_START, wxSTC_HJ_DEFAULT, wxSTC_HJ_COMMENT,
-							wxSTC_HJ_COMMENTLINE, wxSTC_HJ_COMMENTDOC, wxSTC_HJ_NUMBER,
-							wxSTC_HJ_WORD, wxSTC_HJ_KEYWORD, wxSTC_HJ_DOUBLESTRING,
-							wxSTC_HJ_SINGLESTRING, wxSTC_HJ_SYMBOLS, wxSTC_HJ_STRINGEOL,
-							wxSTC_HJ_REGEX
-						};
-						for (int i = 0; i < 14; ++i) {
-							StyleSetFont(styles[i], font);
-							StyleSetForeground(styles[i], color);
-							StyleSetBackground(styles[i], backgroundColor);
-							StyleSetBold(styles[i], isBold);
-							StyleSetItalic(styles[i], isItalic);
-						}
-					}
-					StyleSetFont(style, font);
-					StyleSetForeground(style, color);
-					StyleSetBackground(style, backgroundColor);
-					StyleSetBold(style, isBold);
-					StyleSetItalic(style, isItalic);
-					break;
-			}
+	// caret, line, selection, margin colors
+	for (size_t i = 0; i < styles.size(); ++i) {
+		mvceditor::StylePreferenceClass pref = styles[i];
+		int style = pref.StcStyle;
+		switch (style) {
+			case CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET:
+				SetCaretForeground(pref.Color);
+				break;
+			case CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE:
+				SetCaretLineVisible(true);
+				SetCaretLineBackground(pref.BackgroundColor);
+				break;
+			case CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION:
+				SetSelForeground(true, pref.Color);
+				SetSelBackground(true, pref.BackgroundColor);
+				break;
+			case CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING:
+				if (CodeControlOptions.EnableCodeFolding) {
+					SetFoldMarginColour(true, pref.BackgroundColor);
+					SetFoldMarginHiColour(true, pref.BackgroundColor);
+					MarkerDefine(wxSTC_MARKNUM_FOLDEROPEN, wxSTC_MARK_BOXMINUS, pref.BackgroundColor, pref.Color);
+					MarkerDefine(wxSTC_MARKNUM_FOLDER, wxSTC_MARK_BOXPLUS, pref.BackgroundColor, pref.Color);
+					MarkerDefine(wxSTC_MARKNUM_FOLDERSUB, wxSTC_MARK_VLINE, pref.BackgroundColor, pref.Color);
+					MarkerDefine(wxSTC_MARKNUM_FOLDERTAIL, wxSTC_MARK_LCORNER, pref.BackgroundColor, pref.Color);
+					MarkerDefine(wxSTC_MARKNUM_FOLDEREND, wxSTC_MARK_BOXPLUSCONNECTED, pref.BackgroundColor, pref.Color);
+					MarkerDefine(wxSTC_MARKNUM_FOLDEROPENMID, wxSTC_MARK_BOXMINUSCONNECTED, pref.BackgroundColor, pref.Color);
+					MarkerDefine(wxSTC_MARKNUM_FOLDERMIDTAIL, wxSTC_MARK_TCORNER, pref.BackgroundColor, pref.Color);
+				}
+			case CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN:
+				if (CodeControlOptions.RightMargin > 0) {
+					SetEdgeColour(pref.Color);
+				}
+				break;
+			case mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT:
+				// since we need to share one indicator with the matching word highlight
+				// and the parse errors indicators; we will set this setting when the 
+				// user initiates the matching word feature
+				break;
 		}
 	}
 }
@@ -828,15 +852,10 @@ void  mvceditor::CodeControlClass::OnDoubleClick(wxStyledTextEvent& event) {
 	// we must share the indicator between highlight words functionality and
 	// parse errors functionality.  This is because the HTML lexer uses 7 of the
 	// eight style bits, leaving only one bit for indicators
-	wxFont font;
-	wxColor color;
-	wxColor backgroundColor;
-	bool isBold;
-	bool isItalic;
-	CodeControlOptions.GetStyleByStcConstant(mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT, 
-		font, color, backgroundColor, isBold, isItalic);
+	mvceditor::StylePreferenceClass pref = CodeControlOptions.FindByStcStyle(CodeControlOptions.PhpStyles, 
+		mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT);
 	IndicatorSetStyle(INDICATOR,  wxSTC_INDIC_ROUNDBOX);
-	IndicatorSetForeground(INDICATOR, color);
+	IndicatorSetForeground(INDICATOR, pref.Color);
 
 	// remove any parse error indicators. if we don't do this the 
 	// parse error will get highlighted like a match.

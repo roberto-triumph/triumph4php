@@ -28,38 +28,42 @@
 mvceditor::EditColorsPanelClass::EditColorsPanelClass(wxWindow* parent, mvceditor::CodeControlOptionsClass& options)
 		: EditColorsPanelGeneratedClass(parent)
 		, CodeControlOptions(options) {
-	Styles->InsertItems(options.CodeStyles, 0);
-	Styles->SetSelection(0);
-	wxFont font;
-	wxColor color,
-		backgroundColor;
-	bool isBold,
-		isItalic;
 	CodeControlOptions.StartEditMode();
-	if (CodeControlOptions.GetEditStyle(0, font, color, backgroundColor, isBold, isItalic)) {
-		Font->SetSelectedFont(font);
-		ForegroundColor->SetColour(color);
-		BackgroundColor->SetColour(backgroundColor);
-		Bold->SetValue(isBold);
-		Italic->SetValue(isItalic);
+	for (size_t i = 0; i < options.EditedPhpStyles.size(); ++i) {
+		wxString name = wxString::FromAscii(options.EditedPhpStyles[i].Name);
+		Styles->Append(wxGetTranslation(name), &options.EditedPhpStyles[i]);
 	}
+	for (size_t i = 0; i < options.EditedSqlStyles.size(); ++i) {
+		wxString name = wxString::FromAscii(options.EditedSqlStyles[i].Name);
+		Styles->Append(wxGetTranslation(name), &options.EditedSqlStyles[i]);
+	}
+	for (size_t i = 0; i < options.EditedCssStyles.size(); ++i) {
+		wxString name = wxString::FromAscii(options.EditedCssStyles[i].Name);
+		Styles->Append(wxGetTranslation(name), &options.EditedCssStyles[i]);
+	}
+	Styles->Select(0);
+	mvceditor::StylePreferenceClass firstPref = options.EditedPhpStyles[0];
+	Font->SetSelectedFont(firstPref.Font);
+	ForegroundColor->SetColour(firstPref.Color);
+	BackgroundColor->SetColour(firstPref.BackgroundColor);
+	Bold->SetValue(firstPref.IsBold);
+	Italic->SetValue(firstPref.IsItalic);
 }
 
 
 void mvceditor::EditColorsPanelClass::OnListBox(wxCommandEvent& event) {
 	int selected = event.GetSelection();
-	wxFont font;
-	wxColor color,
-		backgroundColor;
-	bool isBold,
-		isItalic;
-	if (CodeControlOptions.GetEditStyle(selected, font, color, backgroundColor, isBold, isItalic)) {
-		Font->SetSelectedFont(font);
-		ForegroundColor->SetColour(color);
-		BackgroundColor->SetColour(backgroundColor);
-		Bold->SetValue(isBold);
-		Italic->SetValue(isItalic);
-		int style = CodeControlOptionsClass::ArrayIndexToStcConstant[selected];
+	if (selected < 0) {
+		return;
+	}
+	mvceditor::StylePreferenceClass* pref = (mvceditor::StylePreferenceClass*)Styles->GetClientData(selected);
+	if (pref) {
+		Font->SetSelectedFont(pref->Font);
+		ForegroundColor->SetColour(pref->Color);
+		BackgroundColor->SetColour(pref->BackgroundColor);
+		Bold->SetValue(pref->IsBold);
+		Italic->SetValue(pref->IsItalic);
+		int style = pref->StcStyle;
 		switch (style) {
 			case mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET:
 			case mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE:
@@ -91,61 +95,51 @@ void mvceditor::EditColorsPanelClass::OnListBox(wxCommandEvent& event) {
 
 void mvceditor::EditColorsPanelClass::OnCheck(wxCommandEvent& event) {
 	int selected = Styles->GetSelection();
-	wxFont font;
-	wxColor color,
-		backgroundColor;
-	bool isBold,
-		isItalic;
-	if (CodeControlOptions.GetEditStyle(selected, font, color, backgroundColor, isBold, isItalic)) {
+	mvceditor::StylePreferenceClass* pref = (mvceditor::StylePreferenceClass*)Styles->GetClientData(selected);
+	if (pref) {
 		switch (event.GetId()) {
 			case ID_BOLD:
-				isBold = event.IsChecked();
+				pref->IsBold = event.IsChecked();
 				break;
 			case ID_ITALIC:
-				isItalic = event.IsChecked();
+				pref->IsItalic = event.IsChecked();
 				break;
 		}
-		CodeControlOptions.ChangeStyle(selected, font, color, backgroundColor, isBold, isItalic);
 	}
 }
 
 void mvceditor::EditColorsPanelClass::OnColorChanged(wxColourPickerEvent& event) {
 	int selected = Styles->GetSelection();
-	wxFont font;
-	wxColor color,
-		backgroundColor;
-	bool isBold,
-		isItalic;
-	if (CodeControlOptions.GetEditStyle(selected, font, color, backgroundColor, isBold, isItalic)) {
+	mvceditor::StylePreferenceClass* pref = (mvceditor::StylePreferenceClass*)Styles->GetClientData(selected);
+	if (pref) {
 		switch (event.GetId()) {
 			case ID_FOREGROUND_COLOR:
-				color = event.GetColour();
+				pref->Color = event.GetColour();
 				break;
 			case ID_BACKGROUND_COLOR:
-				backgroundColor = event.GetColour();
+				pref->BackgroundColor = event.GetColour();
 				break;
 		}
-		CodeControlOptions.ChangeStyle(selected, font, color, backgroundColor, isBold, isItalic);
 	}
 }
 
 void mvceditor::EditColorsPanelClass::OnFontChanged(wxFontPickerEvent& event) {
 	int selected = Styles->GetSelection();
-	wxFont font;
-	wxColor color,
-		backgroundColor;
-	bool isBold,
-		isItalic;
-	if (CodeControlOptions.GetEditStyle(selected, font, color, backgroundColor, isBold, isItalic)) {
-		font = event.GetFont();
-		CodeControlOptions.ChangeStyle(selected, font, color, backgroundColor, isBold, isItalic);
+	mvceditor::StylePreferenceClass* pref = (mvceditor::StylePreferenceClass*)Styles->GetClientData(selected);
+	if (pref) {
+		wxFont font = event.GetFont();
+		pref->Font = font;
 	}
 }
 
 void mvceditor::EditColorsPanelClass::OnThemeChoice(wxCommandEvent& event) {
 	int choice = event.GetSelection();
 	wxCommandEvent listBoxEvent(wxEVT_COMMAND_LISTBOX_SELECTED, wxID_ANY);
-	listBoxEvent.SetInt(Styles->GetSelection());
+	int sel = Styles->GetSelection();
+	if (sel < 0) {
+		sel = 0;
+	}
+	listBoxEvent.SetInt(sel);
 	switch (choice) {
 		case 0:
 			CodeControlOptions.SetToLightTheme();

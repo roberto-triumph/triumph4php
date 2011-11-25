@@ -26,11 +26,60 @@
 #include <wx/colour.h>
 #include <wx/font.h>
 #include <wx/config.h>
+#include <vector>
 
 #ifndef __CODECONTROLLASS_H___
 #define __CODECONTROLLASS_H___
 
 namespace mvceditor {
+
+/**
+ * A class that holds the editor styles for syntax highlighting
+ */
+class StylePreferenceClass {
+	
+public:
+	
+	wxFont Font;
+	wxColor Color;
+	wxColor BackgroundColor;
+	
+	/**
+	 * A name for this style. This is not
+	 * nationalized, but it is human-friendly.
+	 * Guaranteed to be unique.
+	 */
+	const char* Name;
+	
+	/**
+	 * this is the value of the wxSTC_* constant that this
+	 * style maps to.
+	 * For example, for the PHP double quoted string, the value of this
+	 * variable will be wxSTC_HPHP_HSTRING
+	 * This could also be one of the STYLES enum of this class.
+	 */
+	int StcStyle;
+	
+	bool IsBold;
+	bool IsItalic;
+	
+	/**
+	 * Copy the properties from src to this object.
+	 * After a call to this method; src and this will have the same values
+	 * for each of the properties.
+	 */
+	void Copy(const StylePreferenceClass& src);
+	
+	/**
+	 * Give a name to this style and set the constant that it
+	 * controls.
+	 */
+	void Control(int stcStyle, const char* name);
+	
+	bool Read(wxConfigBase* config);
+	
+	bool Write(wxConfigBase* config);
+};
 	
 /**
  * This class will act as a bridge between the preferences dialog and the CodeControlClass; it will
@@ -40,6 +89,21 @@ class CodeControlOptionsClass {
 
 public:
 
+	/**
+	 * Stores the preferences for each style; for syntax highlighting 
+	 */
+	std::vector<StylePreferenceClass> PhpStyles;
+	std::vector<StylePreferenceClass> SqlStyles;
+	std::vector<StylePreferenceClass> CssStyles;
+	
+	/**
+	 * Stores the preferences being edited.  They are stored separately so that if the user
+	 * happens to cancel the operation, the original settings are left intact.
+	 */
+	std::vector<StylePreferenceClass> EditedPhpStyles;
+	std::vector<StylePreferenceClass> EditedSqlStyles;
+	std::vector<StylePreferenceClass> EditedCssStyles;
+	
 	/**
 	 *  This is the entire list of styles that can have font/color attached to.
 	 *  @var wxArrayString
@@ -123,47 +187,6 @@ public:
 	CodeControlOptionsClass();
 	
 	/**
-	 * Changes the font, color, bold, and italic settings for the given style.
-	 * 
-	 * @param int style index into the CodeStyles array
-	 * @param wxFont font the new font
-	 * @param wxColor color the new foreground color
-	 * @param wxColor backgroundColor the new background color
-	 * @param bool isBold the new setting for bold
-	 * @param bool isItalic the new setting for italic
-	 */
-	void ChangeStyle(int style, wxFont font, wxColor color, wxColor backgroundColor, bool isBold, bool isItalic);
-
-	/**
-	 * Get the font, color, bold, and italic settings for the given style. Will NOT get the preferences
-	 * that have been changed (by calling ChangeStyle()), UNTIL CommitChanges() method gest called.
-	 * 
-	 * @param int style one of the wxSTC_HPHP_* constants, or wxSTC_STYLE_*
-	 * @param wxFont the font will be written to this variable
-	 * @param wxColor color the color will be written to this variable
-	 * @param wxColor backgroundColor the background color will be written to this variable
-	 * @param bool isBold the  setting for bold will be written to this variable
-	 * @param bool isItalic the setting for italic will be written to this variable
-	 * @return bool if style exists and is a valid style
-	 */
-	bool GetStyleByStcConstant(int style, wxFont& font, wxColor& color, wxColor& backgroundColor, bool& isBold, 
-		bool& isItalic) const;
-	
-	/**
-	 * Get the font, color, bold, and italic settings for the given style THAT IS CURRENTLY BEING EDITED.
-	 * 
-	 * @param int style index into the CodeStyles array
-	 * @param wxFont the font will be written to this variable
-	 * @param wxColor color the color will be written to this variable
-	 * @param wxColor backgroundColor the color will be written to this variable
-	 * @param bool isBold the  setting for bold will be written to this variable
-	 * @param bool isItalic the setting for italic will be written to this variable
-	 * @return bool if style exists and is a valid style
-	 */
-	bool GetEditStyle(int style, wxFont& font, wxColor& color, wxColor& backgroundColor, bool& isBold, 
-		bool& isItalic) const;
-	
-	/**
 	 * Prepares the edited preferences by copying them FROM the real settings. From this point on, all calls to 
 	 * GetEditedStyle() will return the preferences that are set by the ChangeStyle() method. Note that this
 	 * only affects style preferences and not the public properties.
@@ -186,15 +209,6 @@ public:
 	 * Set the color scheme to the light on dark scheme
 	 */
 	void SetToDarkTheme();
-	
-	/**
-	 * Get the array index of the given style. Note that this function is to be used for
-	 * static data, as a failed assertion is made when the style is not valid.
-	 * 
-	 * @param int style 
-	 * @return int the index of the style in the preferences array.  
-	 */
-	int StyleIndex(int style) const;
 	
 	/**
 	 * Load state from persistent storage
@@ -230,40 +244,16 @@ public:
 		MVC_EDITOR_STYLE_RIGHT_MARGIN,
 		MVC_EDITOR_STYLE_MATCH_HIGHLIGHT,
 	};
-	
+
 	/**
-	 * number of styles that can be edited.
+	 * Get the array index of the given style. Note that this function is to be used for
+	 * static data, as a failed assertion is made when the style is not valid.
 	 * 
-	 * @var int
+	 * @param int styles the style array to look into. one of static arrays PhpStyles, CssStyles, etc..
+	 * @param int style the STC constant to look for
+	 * @return int the index of the style in the preferences array.  
 	 */
-	static const int STYLE_COUNT = 54;
-	
-	/**
-	 * Mapping of array index to wxSTC_HPHP_*, wxSTC_STYLE_* constant, eliminating the need for IFs or
-	 * CASE statements.
-	 */
-	static int ArrayIndexToStcConstant[STYLE_COUNT];	
-
-private:
-
-	struct StylePreference {
-		wxFont Font;
-		wxColor Color;
-		wxColor BackgroundColor;
-		bool IsBold;
-		bool IsItalic;
-	};
-	
-	/**
-	 * Stores the preferences to for each style 
-	 */
-	StylePreference StylePreferences[STYLE_COUNT];
-	
-	/**
-	 * Stores the preferences being edited.  They are stored separately so that if the user
-	 * happens to cancel the operation, the original settings are left intact.
-	 */
-	StylePreference EditedStylePreferences[STYLE_COUNT];
+	StylePreferenceClass& FindByStcStyle(std::vector<StylePreferenceClass>& styles, int style) const;
 	
 };
 

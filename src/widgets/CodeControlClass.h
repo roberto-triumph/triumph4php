@@ -220,7 +220,12 @@ public:
 		/**
 		 * Code completion and SQL syntax highlighting
 		 */
-		SQL
+		SQL,
+		
+		/**
+		 * CSS style sheets (pure CSS files only)
+		 */
+		 CSS
 	};
 
 	/**
@@ -406,7 +411,7 @@ private:
 	 * Set the font, EOL, tab options of the source control
 	 * Set generic defaults for plain text editing.
 	 */
-	void SetCodeControlOptions();
+	void SetCodeControlOptions(const std::vector<mvceditor::StylePreferenceClass>& styles);
 	
 	/**
 	 * Set the PHP syntax highlight options. Note that since PHP is embedded the PHP options will be suitable for
@@ -418,6 +423,11 @@ private:
 	 * Set the SQL highlight options of the source control
 	 */
 	void SetSqlOptions();
+	
+		/**
+	 * Set the CSS highlight options of the source control
+	 */
+	void SetCssOptions();
 	
 	/**
 	 * Determine the correct document Mode and sets it (causing a repaint)
