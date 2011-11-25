@@ -151,7 +151,7 @@ void CodeControlFrameClass::OnCallTip(wxCommandEvent& event) {
 }
 
 void CodeControlFrameClass::OnContentAssist(wxCommandEvent& event) {
-	Ctrl->HandleAutoCompletion(true);	
+	Ctrl->HandleAutoCompletion();	
 }
 
 void CodeControlFrameClass::OnHelp(wxCommandEvent& event) {
