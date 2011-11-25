@@ -922,10 +922,10 @@ mvceditor::ResourceClass::ResourceClass()
 	, ReturnType()
 	, Comment()
 	, Type(CLASS) 
-	, FileItemIndex(-1)
 	, IsProtected(false)
 	, IsPrivate(false) 
-	, IsStatic(false) {
+	, IsStatic(false)
+	, FileItemIndex(-1) {
 		
 }
 
