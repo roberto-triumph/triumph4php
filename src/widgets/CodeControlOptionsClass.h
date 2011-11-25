@@ -63,6 +63,8 @@ public:
 	bool IsBold;
 	bool IsItalic;
 	
+	StylePreferenceClass();
+	
 	/**
 	 * Copy the properties from src to this object.
 	 * After a call to this method; src and this will have the same values

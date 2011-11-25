@@ -589,65 +589,6 @@ void mvceditor::CodeControlClass::SetMargin() {
 	}
 }
 
-void mvceditor::CodeControlClass::SetPhpOptions() {
-	// Some languages, such as HTML may contain embedded languages, VBScript
-	// and JavaScript are common for HTML. For HTML, key word set 0 is for HTML,
-	// 1 is for JavaScript and 2 is for VBScript, 3 is for Python, 4 is for PHP
-	// and 5 is for SGML and DTD keywords
-	SetKeyWords(0, HTML_TAG_NAMES + wxT(" ") + HTML_ATTRIBUTE_NAMES);
-	SetKeyWords(1, JAVASCRIPT_KEYWORDS);
-	wxString keywords = Project->GetPhpKeywords();
-	SetKeyWords(4, keywords);
-	
-	SetLexer(wxSTC_LEX_HTML);
-	// 7 = as per scintilla docs, HTML lexer uses 7 bits for styles
-	SetStyleBits(7);
-	AutoCompStops(wxT("!@#$%^&*()_+-=[]\\{}|;'\",./<?"));
-	AutoCompSetSeparator(' ');
-	AutoCompSetFillUps(wxT("(["));
-	AutoCompSetIgnoreCase(true);
-	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$"));
-	
-	SetMarginType(LINT_RESULT_MARGIN, wxSTC_MARGIN_SYMBOL);
-	SetMarginWidth(LINT_RESULT_MARGIN, 16);
-	SetMarginSensitive(LINT_RESULT_MARGIN, false);
-	SetMarginMask(LINT_RESULT_MARGIN, ~wxSTC_MASK_FOLDERS);
-	MarkerDefine(LINT_RESULT_MARKER, wxSTC_MARK_ARROW, *wxRED, *wxRED);
-	WordHighlightStyle = INDICATOR_PHP_STYLE;
-	
-	// syntax coloring
-	for (size_t i = 0; i < CodeControlOptions.PhpStyles.size(); ++i) {
-		mvceditor::StylePreferenceClass pref = CodeControlOptions.PhpStyles[i];
-		int style = pref.StcStyle;
-		if (wxSTC_HPHP_DEFAULT == style) {
-			
-			// use the PHP default settings as the catch-all for settings not yet exposed
-			// (Javascript) so the user sees a uniform style.
-			int styles[] = {
-				wxSTC_STYLE_DEFAULT,
-				wxSTC_HJ_START, wxSTC_HJ_DEFAULT, wxSTC_HJ_COMMENT,
-				wxSTC_HJ_COMMENTLINE, wxSTC_HJ_COMMENTDOC, wxSTC_HJ_NUMBER,
-				wxSTC_HJ_WORD, wxSTC_HJ_KEYWORD, wxSTC_HJ_DOUBLESTRING,
-				wxSTC_HJ_SINGLESTRING, wxSTC_HJ_SYMBOLS, wxSTC_HJ_STRINGEOL,
-				wxSTC_HJ_REGEX
-			};
-			for (int i = 0; i < 14; ++i) {
-				StyleSetFont(styles[i], pref.Font);
-				StyleSetForeground(styles[i], pref.Color);
-				StyleSetBackground(styles[i], pref.BackgroundColor);
-				StyleSetBold(styles[i], pref.IsBold);
-				StyleSetItalic(styles[i], pref.IsItalic);
-			}
-		}
-		StyleSetFont(style, pref.Font);
-		StyleSetForeground(style, pref.Color);
-		StyleSetBackground(style, pref.BackgroundColor);
-		StyleSetBold(style, pref.IsBold);
-		StyleSetItalic(style, pref.IsItalic);
-		break;
-	}
-}
-
 void mvceditor::CodeControlClass::AutoDetectDocumentMode() {
 	wxString file = GetFileName();
 	wxFileName name(file);
@@ -699,6 +640,65 @@ void mvceditor::CodeControlClass::ApplyPreferences() {
 	Colourise(0, -1);
 }
 
+void mvceditor::CodeControlClass::SetPhpOptions() {
+	// Some languages, such as HTML may contain embedded languages, VBScript
+	// and JavaScript are common for HTML. For HTML, key word set 0 is for HTML,
+	// 1 is for JavaScript and 2 is for VBScript, 3 is for Python, 4 is for PHP
+	// and 5 is for SGML and DTD keywords
+	SetKeyWords(0, HTML_TAG_NAMES + wxT(" ") + HTML_ATTRIBUTE_NAMES);
+	SetKeyWords(1, JAVASCRIPT_KEYWORDS);
+	wxString keywords = Project->GetPhpKeywords();
+	SetKeyWords(4, keywords);
+	
+	SetLexer(wxSTC_LEX_HTML);
+	
+	// 7 = as per scintilla docs, HTML lexer uses 7 bits for styles
+	SetStyleBits(7);
+	AutoCompStops(wxT("!@#$%^&*()_+-=[]\\{}|;'\",./<?"));
+	AutoCompSetSeparator(' ');
+	AutoCompSetFillUps(wxT("(["));
+	AutoCompSetIgnoreCase(true);
+	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$"));
+	
+	SetMarginType(LINT_RESULT_MARGIN, wxSTC_MARGIN_SYMBOL);
+	SetMarginWidth(LINT_RESULT_MARGIN, 16);
+	SetMarginSensitive(LINT_RESULT_MARGIN, false);
+	SetMarginMask(LINT_RESULT_MARGIN, ~wxSTC_MASK_FOLDERS);
+	MarkerDefine(LINT_RESULT_MARKER, wxSTC_MARK_ARROW, *wxRED, *wxRED);
+	WordHighlightStyle = INDICATOR_PHP_STYLE;
+	
+	// syntax coloring
+	for (size_t i = 0; i < CodeControlOptions.PhpStyles.size(); ++i) {
+		mvceditor::StylePreferenceClass pref = CodeControlOptions.PhpStyles[i];
+		int style = pref.StcStyle;
+		if (wxSTC_HPHP_DEFAULT == style) {
+			
+			// use the PHP default settings as the catch-all for settings not yet exposed
+			// (Javascript) so the user sees a uniform style.
+			int styles[] = {
+				wxSTC_STYLE_DEFAULT,
+				wxSTC_HJ_START, wxSTC_HJ_DEFAULT, wxSTC_HJ_COMMENT,
+				wxSTC_HJ_COMMENTLINE, wxSTC_HJ_COMMENTDOC, wxSTC_HJ_NUMBER,
+				wxSTC_HJ_WORD, wxSTC_HJ_KEYWORD, wxSTC_HJ_DOUBLESTRING,
+				wxSTC_HJ_SINGLESTRING, wxSTC_HJ_SYMBOLS, wxSTC_HJ_STRINGEOL,
+				wxSTC_HJ_REGEX
+			};
+			for (int j = 0; j < 14; ++j) {
+				StyleSetFont(styles[j], pref.Font);
+				StyleSetForeground(styles[j], pref.Color);
+				StyleSetBackground(styles[j], pref.BackgroundColor);
+				StyleSetBold(styles[j], pref.IsBold);
+				StyleSetItalic(styles[j], pref.IsItalic);
+			}
+		}
+		StyleSetFont(style, pref.Font);
+		StyleSetForeground(style, pref.Color);
+		StyleSetBackground(style, pref.BackgroundColor);
+		StyleSetBold(style, pref.IsBold);
+		StyleSetItalic(style, pref.IsItalic);
+	}
+}
+
 void mvceditor::CodeControlClass::SetSqlOptions() {	
 	SetKeyWords(0, MYSQL_KEYWORDS);
 	SetKeyWords(1, wxT(""));
@@ -720,7 +720,7 @@ void mvceditor::CodeControlClass::SetSqlOptions() {
 	for (size_t i = 0; i < CodeControlOptions.SqlStyles.size(); ++i) {
 		mvceditor::StylePreferenceClass pref = CodeControlOptions.SqlStyles[i];
 		int style = pref.StcStyle;
-		if (wxSTC_CSS_DEFAULT == style) {
+		if (wxSTC_SQL_DEFAULT == style) {
 			
 			// wxSTC_STYLE_DEFAULT controls the background of the portions where text does not reach
 			StyleSetFont(wxSTC_STYLE_DEFAULT, pref.Font);

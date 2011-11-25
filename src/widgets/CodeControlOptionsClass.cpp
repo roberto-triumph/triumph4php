@@ -160,13 +160,13 @@ mvceditor::CodeControlOptionsClass::CodeControlOptionsClass() {
 
 void mvceditor::CodeControlOptionsClass::CommitChanges() {
 	for (size_t i = 0; i < PhpStyles.size(); ++i) {
-		PhpStyles[i] = EditedPhpStyles[i];
+		PhpStyles[i].Copy(EditedPhpStyles[i]);
 	}
 	for (size_t i = 0; i < SqlStyles.size(); ++i) {
-		SqlStyles[i] = EditedSqlStyles[i];
+		SqlStyles[i].Copy(EditedSqlStyles[i]);
 	}
 	for (size_t i = 0; i < CssStyles.size(); ++i) {
-		CssStyles[i] = EditedCssStyles[i];
+		CssStyles[i].Copy(EditedCssStyles[i]);
 	}
 }
 
@@ -178,13 +178,13 @@ void mvceditor::CodeControlOptionsClass::StartEditMode() {
 	EditedCssStyles.resize(CssStyles.size());
 	
 	for (size_t i = 0; i < PhpStyles.size(); ++i) {
-		EditedPhpStyles[i] = PhpStyles[i];
+		EditedPhpStyles[i].Copy(PhpStyles[i]);
 	}
 	for (size_t i = 0; i < SqlStyles.size(); ++i) {
-		EditedSqlStyles[i] = SqlStyles[i];
+		EditedSqlStyles[i].Copy(SqlStyles[i]);
 	}
 	for (size_t i = 0; i < CssStyles.size(); ++i) {
-		EditedCssStyles[i] = CssStyles[i];
+		EditedCssStyles[i].Copy(CssStyles[i]);
 	}
 }
 
@@ -467,6 +467,17 @@ void mvceditor::CodeControlOptionsClass::Save(wxConfigBase* config) {
 	}
 }
 
+mvceditor::StylePreferenceClass::StylePreferenceClass() 
+	: Font()
+	, Color()
+	, BackgroundColor()
+	, Name(0)
+	, StcStyle(0)
+	, IsBold(false)
+	, IsItalic(false) {
+		
+}
+
 void mvceditor::StylePreferenceClass::Copy(const mvceditor::StylePreferenceClass& src) {
 	Font = src.Font;
 	Color = src.Color;
@@ -474,6 +485,7 @@ void mvceditor::StylePreferenceClass::Copy(const mvceditor::StylePreferenceClass
 	IsBold = src.IsBold;
 	IsItalic = src.IsItalic;
 	StcStyle = src.StcStyle;
+	Name = src.Name;
 }
 
 bool mvceditor::StylePreferenceClass::Read(wxConfigBase* config) {

@@ -29,7 +29,7 @@
 #include <wx/menuutils.h>
 #include <wx/stdpaths.h>
 #include <wx/wfstream.h>
-#include <wx/stc/stc.h>
+#include <wx/frame.h>
 
 mvceditor::PreferencesClass::PreferencesClass()
 	: CodeControlOptions()
