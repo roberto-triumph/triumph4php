@@ -29,6 +29,7 @@
 #include <wx/regex.h>
 #include <wx/tokenzr.h>
 #include <wx/tipwin.h>
+#include <wx/utils.h>
 #include <unicode/ustring.h>
 #include <algorithm>
 
@@ -159,29 +160,42 @@ static const int INDICATOR_PHP_STYLE = 128;
 static const int INDICATOR_TEXT_STYLE = 32;
 
 mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,  ProjectClass* project, 
+			mvceditor::ResourceUpdateThreadClass* resourceUpdates,
 			int id, const wxPoint& position, const wxSize& size, long style,
 			const wxString& name)
 		: wxStyledTextCtrl(parent, id, position, size, style, name)
 		, SymbolTable()
 		, CurrentFilename()
 		, CurrentSignature()
+		, FileIdentifier()
+		, Timer()
 		, CodeControlOptions(options)
 		, WordHighlightFinder()
 		, WordHighlightWord()
 		, CurrentInfo()
+		, ResourceUpdates(resourceUpdates)
 		, Project(project)
 		, WordHighlightPreviousIndex(-1)
 		, WordHighlightNextIndex(-1)
 		, WordHighlightStyle(0)
 		, ModifiedDialogOpen(false)
 		, WordHighlightIsWordHighlighted(false)
+		, NeedToUpdateResources(false)
 		, DocumentMode(TEXT) {
 	Document = NULL;
+	
 	// we will handle right-click menu ourselves
 	UsePopUp(false);
 	SetYCaretPolicy(wxSTC_CARET_EVEN, 0);
 	ApplyPreferences();
 	SetMouseDwellTime(1500);
+	Timer.SetOwner(this);
+	Timer.Start(500, false);
+	
+	// need to give this new file unique name so because the
+	// resource updates object needs a unique name
+	wxLongLong time = wxGetLocalTimeMillis();
+	FileIdentifier = wxString::Format(wxT("File_%s"), time.ToString().c_str());
 	
 }
 
@@ -214,13 +228,12 @@ bool mvceditor::CodeControlClass::LoadAndTrackFile(const wxString& filename) {
 			
 			EmptyUndoBuffer();
 			SetSavePoint();
+			NeedToUpdateResources = false;
 			CurrentFilename = filename;
 			FileOpenedDateTime = file.GetModificationTime();
 			AutoDetectDocumentMode();
 		}
 		delete[] dest;
-		
-		
 		ret = true;
 	}
 	return ret;
@@ -228,6 +241,10 @@ bool mvceditor::CodeControlClass::LoadAndTrackFile(const wxString& filename) {
 
 void mvceditor::CodeControlClass::Revert() {
 	if (!IsNew()) {
+		if (ResourceUpdates) {
+			ResourceUpdates->Unregister(FileIdentifier);
+		}
+		NeedToUpdateResources = true;
 		LoadAndTrackFile(CurrentFilename);
 	}
 }
@@ -349,10 +366,7 @@ wxString mvceditor::CodeControlClass::GetSymbolAt(int posToCheck) {
 	UnicodeString symbol = GetSafeSubstring(startPos, endPos);
 	UnicodeString codeText = GetSafeText();
 	ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
-	wxString fileName = CurrentFilename.IsEmpty() ? wxT("Untitled") : CurrentFilename;
 	
-	// this will parse any new symbols into the cache
-	resourceFinder->BuildResourceCacheForFile(fileName, codeText);
 	SymbolTable.CreateSymbols(codeText);
 	SymbolClass::Types type;
 	UnicodeString objectType,
@@ -361,6 +375,8 @@ wxString mvceditor::CodeControlClass::GetSymbolAt(int posToCheck) {
 	bool isThisCall(false),
 		isParentCall(false),
 		isStaticCall(false);
+		
+	// TODO: what about the opened files? will need to look at the opened files resource finders (ResourceUpdates object)
 	if (SymbolTable.Lookup(endPos, *resourceFinder, type, objectType, objectMember, comment, isThisCall, isParentCall, isStaticCall)) {
 		bool isObjectMethodOrProperty = SymbolClass::OBJECT == type ||SymbolClass::METHOD == type || SymbolClass::PROPERTY == type;
 		if (isObjectMethodOrProperty)  {
@@ -408,6 +424,9 @@ bool mvceditor::CodeControlClass::PositionedAtVariable(int pos) {
 }
 
 void mvceditor::CodeControlClass::HandleCallTip(wxChar ch, bool force) {
+	if (!ResourceUpdates) {
+		return;
+	}
 	
 	// this function deliberately uses scintilla positions (bytes) instead of 
 	// converting over to unicode text. be careful.
@@ -439,16 +458,24 @@ void mvceditor::CodeControlClass::HandleCallTip(wxChar ch, bool force) {
 		
 		if (currentPos >= 0) {
 			wxString symbol = GetSymbolAt(currentPos);
-			ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
 			CurrentSignature = wxT("");
-			if (resourceFinder->Prepare(symbol)) {
-				if (resourceFinder->CollectNearMatchResources()) {
-					
-					// highly unlikely that there is more than one match since we searched for a full name (lookup succeeded).
-					UnicodeString fullQualifiedResource =  resourceFinder->GetResourceMatch(0).Resource;
-					UnicodeString comment;
-					CurrentSignature = mvceditor::StringHelperClass::IcuToWx(
-						resourceFinder->GetResourceSignature(fullQualifiedResource, comment));
+			ResourceFinderClass* globalResourceFinder = Project->GetResourceFinder();
+			if (ResourceUpdates->PrepareAll(globalResourceFinder, symbol)) {
+				
+				// highly unlikely that there is more than one match since we searched for a full name (lookup succeeded).
+				// before this did a near matches: why?? resourceFinder->CollectNearMatchResources()
+				if (ResourceUpdates->CollectFullyQualifiedResourceFromAll(globalResourceFinder)) {
+					std::vector<mvceditor::ResourceFinderClass*> finders = ResourceUpdates->Iterator(globalResourceFinder);
+					for (size_t r = 0; r < finders.size(); r++) {
+						mvceditor::ResourceFinderClass* resourceFinder = finders[r];
+						mvceditor::ResourceClass resource = resourceFinder->GetResourceMatch(0);
+						if (!resource.Identifier.isEmpty()) {
+							UnicodeString fullQualifiedResource =  resource.Resource;
+							UnicodeString comment;
+							CurrentSignature = mvceditor::StringHelperClass::IcuToWx(
+								resourceFinder->GetResourceSignature(fullQualifiedResource, comment));
+						}
+					}
 				}
 			}
 			if (!CurrentSignature.IsEmpty()) {
@@ -599,6 +626,7 @@ void mvceditor::CodeControlClass::AutoDetectDocumentMode() {
 	else if (ext.CmpNoCase(wxT("php")) == 0 || 
 			ext.CmpNoCase(wxT("phtml")) == 0 || 
 			ext.CmpNoCase(wxT("html")) == 0) {
+				
 		// TODO: someway for the user to change this
 		// *.inc endings are common
 		SetDocumentMode(mvceditor::CodeControlClass::PHP);
@@ -625,7 +653,10 @@ void mvceditor::CodeControlClass::ApplyPreferences() {
 	else if (mvceditor::CodeControlClass::PHP == DocumentMode) {
 		SetCodeControlOptions(CodeControlOptions.PhpStyles);
 		SetPhpOptions();
-		Document = new mvceditor::PhpDocumentClass(Project);
+		if (ResourceUpdates) {
+			ResourceUpdates->Register(FileIdentifier, this);
+		}
+		Document = new mvceditor::PhpDocumentClass(Project, ResourceUpdates);
 	}
 	else if (mvceditor::CodeControlClass::CSS == DocumentMode) {
 		SetCodeControlOptions(CodeControlOptions.CssStyles);
@@ -960,6 +991,35 @@ void mvceditor::CodeControlClass::OnIdle(wxIdleEvent& event) {
 
 void mvceditor::CodeControlClass::OnKeyDown(wxKeyEvent& event) {
 	UndoHighlight();
+	
+	// if already parsing then dont do anything
+	if (ResourceUpdates->GetThread() && ResourceUpdates->GetThread()->IsRunning()) {
+		event.Skip();
+		return;
+	}
+	// only update the dirty bit on a letter, number of backspace
+	// keypress.  disregard shortcut keystrokes
+	// we want to keep the re-parsings to a minimum
+	// we dont need to reparse when user is adding a 
+	// comment or a constant string
+	if (!InCommentOrStringStyle(GetCurrentPos())) {
+		int modifiers = event.GetModifiers();
+		if (modifiers == wxMOD_SHIFT || modifiers == wxMOD_NONE) {
+			int keyCode = event.GetKeyCode();
+			if ((keyCode >= 'a'  && keyCode <= 'z') ||
+					(keyCode >= 'A'  && keyCode <= 'Z') ||
+					(keyCode >= '0'  && keyCode <= '9') ||
+					'_' == keyCode || 
+					'{' == keyCode || 
+					'}' == keyCode ||
+					'(' == keyCode ||
+					')' == keyCode ||
+					WXK_DELETE == keyCode ||
+					WXK_BACK == keyCode) {
+				NeedToUpdateResources = true;
+			}
+		}
+	}
 	event.Skip();
 }
 
@@ -1116,11 +1176,12 @@ std::vector<wxString> mvceditor::TextDocumentClass::HandleAutoComplete(const wxS
 
 
 
-mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::ProjectClass* project)
+mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::ProjectClass* project, mvceditor::ResourceUpdateThreadClass* resourceUpdates)
 	: TextDocumentClass()
 	, LanguageDiscovery()
 	, SymbolTable()
-	, Project(project) {
+	, Project(project)
+	, ResourceUpdates(resourceUpdates) {
 }
 
 bool mvceditor::PhpDocumentClass::CanAutoComplete() {
@@ -1179,6 +1240,9 @@ std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionHtml(cons
 
 std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const wxString& fileName, const UnicodeString& code, const UnicodeString& word, mvceditor::LanguageDiscoveryClass::Syntax syntax) {
 	std::vector<wxString> autoCompleteList;
+	if (!ResourceUpdates) {
+		return autoCompleteList;
+	}
 		
 	// word will start with a '$" if its a variable
 	//the word will contain the $ in case of variables since "$" is a word characters (via SetWordCharacters() call)
@@ -1199,13 +1263,7 @@ std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const
 		}
 	}
 	else {
-		
-		ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
-		
-		// need to build the cache in case if has not been done so for this file.
-		// however now the file is scanned twice; here and by the SymbolTable
-		// hmmm
-		resourceFinder->BuildResourceCacheForFile(fileName, code);
+		mvceditor::ResourceFinderClass* globalResourceFinder = Project->GetResourceFinder();
 		
 		// look up the type of the word (is the word in the context of a class, method or function ?
 		// SymbolTable resolves stuff like parent:: and self:: as well we don't need to do it here
@@ -1218,7 +1276,7 @@ std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const
 		bool isThisCall(false),
 			isParentCall(false),
 			isStaticCall(false);
-		if (SymbolTable.Lookup(code.length() - 1, *resourceFinder, type, objectType, objectMember, comment, isThisCall, isParentCall, isStaticCall)) {
+		if (SymbolTable.Lookup(code.length() - 1, *globalResourceFinder, type, objectType, objectMember, comment, isThisCall, isParentCall, isStaticCall)) {
 			bool isObjectMethodOrProperty = SymbolClass::OBJECT == type ||SymbolClass::METHOD == type || SymbolClass::PROPERTY == type;
 			if (isObjectMethodOrProperty) {
 				// even if objectType is empty, symbol will be something like '::METHOD' which the 
@@ -1231,44 +1289,49 @@ std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const
 		}
 		
 		// get all other resources that start like the word
-		wxString wxSymbol = mvceditor::StringHelperClass::IcuToWx(symbol);			
-		if (resourceFinder->Prepare(wxSymbol)) {
-			resourceFinder->CollectNearMatchResources();
-			for (size_t i = 0; i < resourceFinder->GetResourceMatchCount(); ++i) {
-				mvceditor::ResourceClass resource = resourceFinder->GetResourceMatch(i);
-				bool passesStaticCheck = isStaticCall == resource.IsStatic;
+		wxString wxSymbol = mvceditor::StringHelperClass::IcuToWx(symbol);
+		if (ResourceUpdates->PrepareAll(globalResourceFinder, wxSymbol)) {
+			if (ResourceUpdates->CollectNearMatchResourcesFromAll(globalResourceFinder)) {
+				std::vector<mvceditor::ResourceFinderClass*> finders = ResourceUpdates->Iterator(globalResourceFinder);
+				for (size_t r = 0; r < finders.size(); r++) {
+					mvceditor::ResourceFinderClass* resourceFinder = finders[r];
+					for (size_t i = 0; i < resourceFinder->GetResourceMatchCount(); ++i) {
+						mvceditor::ResourceClass resource = resourceFinder->GetResourceMatch(i);
+						bool passesStaticCheck = isStaticCall == resource.IsStatic;
 
-				// if the resource starts with symbol it means that resource is a member of "$this"
-				bool isInherited = FALSE != resource.Resource.startsWith(symbol);
+						// if the resource starts with symbol it means that resource is a member of "$this"
+						bool isInherited = FALSE != resource.Resource.startsWith(symbol);
 
-				// $this => can access this resource's private, parent's protected/public, other public
-				// parent => can access parent's protected/public
-				// neither => can only access public
-				bool passesVisibilityCheck = !resource.IsPrivate && !resource.IsProtected;
-				if (!passesVisibilityCheck && isParentCall) {
+						// $this => can access this resource's private, parent's protected/public, other public
+						// parent => can access parent's protected/public
+						// neither => can only access public
+						bool passesVisibilityCheck = !resource.IsPrivate && !resource.IsProtected;
+						if (!passesVisibilityCheck && isParentCall) {
 
-					// this check assumes that the resource finder has traversed the inheritance chain
-					// properly. then, by a process of elimination, if the resource class is not
-					// the symbol then we only show protected/public resources
-					passesVisibilityCheck = resource.IsProtected;
-				}
-				else if (!passesVisibilityCheck) {
+							// this check assumes that the resource finder has traversed the inheritance chain
+							// properly. then, by a process of elimination, if the resource class is not
+							// the symbol then we only show protected/public resources
+							passesVisibilityCheck = resource.IsProtected;
+						}
+						else if (!passesVisibilityCheck) {
 
-					//not checking isThisCalled
-					passesVisibilityCheck = isInherited;
-				}
-				if (passesStaticCheck && passesVisibilityCheck) {
-					wxString s = mvceditor::StringHelperClass::IcuToWx(resource.Identifier);
-					if (resource.IsStatic && resource.Type == mvceditor::ResourceClass::MEMBER) {
-						s = wxT("$") + s;
+							//not checking isThisCalled
+							passesVisibilityCheck = isInherited;
+						}
+						if (passesStaticCheck && passesVisibilityCheck) {
+							wxString s = mvceditor::StringHelperClass::IcuToWx(resource.Identifier);
+							if (resource.IsStatic && resource.Type == mvceditor::ResourceClass::MEMBER) {
+								s = wxT("$") + s;
+							}
+							autoCompleteList.push_back(s);
+						}
 					}
-					autoCompleteList.push_back(s);
 				}
 			}
 		}
 
 		 // when completing method names, do NOT include keywords
-		if (resourceFinder->GetResourceType() != ResourceFinderClass::CLASS_NAME_METHOD_NAME) {
+		if (globalResourceFinder->GetResourceType() != ResourceFinderClass::CLASS_NAME_METHOD_NAME) {
 			std::vector<wxString> keywordMatches = CollectNearMatchKeywords(wxSymbol);
 			for (size_t i = 0; i < keywordMatches.size(); ++i) {
 				autoCompleteList.push_back(keywordMatches[i]);
@@ -1348,45 +1411,77 @@ mvceditor::CodeControlClass::Mode mvceditor::CodeControlClass::GetDocumentMode()
 }
 
 void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
-	mvceditor::ResourceFinderClass* finder = Project->GetResourceFinder();
-	if (DocumentMode == PHP && finder) {
+	if (!ResourceUpdates) {
+		event.Skip();
+		return;
+	}
+	mvceditor::ResourceFinderClass* globalResourceFinder = Project->GetResourceFinder();
+	if (DocumentMode == PHP && globalResourceFinder) {
 		int pos = event.GetPosition();
 		wxString symbol = GetSymbolAt(pos);
 		if (!symbol.IsEmpty()) {
-			finder->Prepare(symbol);
-			bool found = finder->CollectFullyQualifiedResource();
-			if (found) {
-				mvceditor::ResourceClass resource = finder->GetResourceMatch(0);
-				wxString msg = mvceditor::StringHelperClass::IcuToWx(resource.Identifier);
-				if (resource.Type == mvceditor::ResourceClass::FUNCTION) {
-					msg += wxT("\n\n");
-					msg += mvceditor::StringHelperClass::IcuToWx(resource.ReturnType);
-					msg += wxT(" ");
-					msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
+			if (ResourceUpdates->PrepareAll(globalResourceFinder, symbol)) {
+				if (ResourceUpdates->CollectFullyQualifiedResourceFromAll(globalResourceFinder)) {
+					std::vector<mvceditor::ResourceFinderClass*> finders = ResourceUpdates->Iterator(globalResourceFinder);
+					for (size_t r = 0; r < finders.size(); r++) {
+						mvceditor::ResourceFinderClass* finder = finders[r];
+						mvceditor::ResourceClass resource = finder->GetResourceMatch(0);					
+						bool found = FALSE != resource.Identifier.isEmpty();
+						if (found) {
+							wxString msg = mvceditor::StringHelperClass::IcuToWx(resource.Identifier);
+							if (resource.Type == mvceditor::ResourceClass::FUNCTION) {
+								msg += wxT("\n\n");
+								msg += mvceditor::StringHelperClass::IcuToWx(resource.ReturnType);
+								msg += wxT(" ");
+								msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
+							}
+							else if (resource.Type == mvceditor::ResourceClass::METHOD) {
+								msg += wxT("\n\n");
+								msg += mvceditor::StringHelperClass::IcuToWx(resource.ReturnType);
+								msg += wxT(" ");
+								msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
+							}
+							else {
+								msg += wxT("\n\n");
+								msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
+							}
+							if (!resource.Comment.isEmpty()) {
+								msg += wxT("\n\n");
+								msg += mvceditor::StringHelperClass::IcuToWx(resource.Comment);
+							}
+							new wxTipWindow(this, msg, 
+								wxCoord(400), NULL);
+						}
+					}
 				}
-				else if (resource.Type == mvceditor::ResourceClass::METHOD) {
-					msg += wxT("\n\n");
-					msg += mvceditor::StringHelperClass::IcuToWx(resource.ReturnType);
-					msg += wxT(" ");
-					msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
-				}
-				else {
-					msg += wxT("\n\n");
-					msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
-				}
-				if (!resource.Comment.isEmpty()) {
-					msg += wxT("\n\n");
-					msg += mvceditor::StringHelperClass::IcuToWx(resource.Comment);
-				}
-				wxTipWindow* tip = new wxTipWindow(this, msg, 
-					wxCoord(400), &tip);
 			}
 		}
 	}
+	event.Skip();
 }
 
 void mvceditor::CodeControlClass::OnDwellEnd(wxStyledTextEvent& event) {
 
+}
+
+void mvceditor::CodeControlClass::OnResourceUpdateComplete(wxCommandEvent& event) {
+	Timer.Start();
+	event.Skip();
+}
+void mvceditor::CodeControlClass::OnTimer(wxTimerEvent& event) {
+	if (NeedToUpdateResources && ResourceUpdates && (!ResourceUpdates->GetThread() || !ResourceUpdates->GetThread()->IsRunning())) {
+		UnicodeString text = GetSafeText();
+		wxThreadError error = ResourceUpdates->UpdateResources(FileIdentifier, text);
+		if (wxTHREAD_RUNNING == error) {
+			wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
+		}
+		else if (wxTHREAD_NO_RESOURCE == error) {
+			wxMessageBox(_("Your system is low on resources. Try again later."), wxT("Warning"), wxICON_EXCLAMATION);
+		}
+		NeedToUpdateResources = false;
+		Timer.Stop();
+	}
+	event.Skip();
 }
 
 BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)
@@ -1403,4 +1498,6 @@ BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)
 	EVT_CLOSE(mvceditor::CodeControlClass::OnClose)
 	EVT_STC_DWELLSTART(wxID_ANY, mvceditor::CodeControlClass::OnDwellStart)
 	EVT_STC_DWELLEND(wxID_ANY, mvceditor::CodeControlClass::OnDwellEnd)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::CodeControlClass::OnResourceUpdateComplete)
+	EVT_TIMER(wxID_ANY, mvceditor::CodeControlClass::OnTimer)
 END_EVENT_TABLE()

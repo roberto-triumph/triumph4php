@@ -27,6 +27,7 @@
 #include <wx/filename.h>
 #include <widgets/CodeControlOptionsClass.h>
 #include <widgets/CodeControlClass.h>
+#include <widgets/ResourceUpdateThreadClass.h>
 #include <php_frameworks/ProjectClass.h>
 
 /**
@@ -118,6 +119,7 @@ private:
 	mvceditor::ProjectOptionsClass ProjectOptions;
 	mvceditor::EnvironmentClass Environment;
 	mvceditor::ProjectClass Project;
+	mvceditor::ResourceUpdateThreadClass ResourceUpdates;
 	mvceditor::CodeControlClass* Ctrl;
 	
 
@@ -138,10 +140,11 @@ CodeControlFrameClass::CodeControlFrameClass()
 			wxSize(1024, 768))
 	, Options()
 	, ProjectOptions()
-	, Project(ProjectOptions, Environment) {
+	, Project(ProjectOptions, Environment) 
+	, ResourceUpdates(*this, wxID_ANY) {
 	Options.EnableAutomaticLineIndentation = true;
 	Options.EnableAutoCompletion = true;
-	Ctrl = new mvceditor::CodeControlClass(this, Options, &Project, wxID_ANY);
+	Ctrl = new mvceditor::CodeControlClass(this, Options, &Project, &ResourceUpdates, wxID_ANY);
 	Ctrl->SetDropTarget(new FileDropTargetClass(Ctrl));
 	CreateMenu();
 }
@@ -162,13 +165,12 @@ void CodeControlFrameClass::OnHelp(wxCommandEvent& event) {
 }
 
 void CodeControlFrameClass::CreateMenu() {
-	wxMenu* edit = new wxMenu(wxT("Edit"));
+	wxMenuBar* menuBar = new wxMenuBar(0);
+	wxMenu* edit = new wxMenu();
 	edit->Append(ID_CONTENT_ASSIST, wxT("Content Assist\tCTRL+SPACE"), wxT("Content Assist"), false);
 	edit->Append(ID_CALL_TIP, wxT("Show Call Tip\tCTRL+SHIFT+SPACE"), wxT("Show Call Tip"), false);
 	edit->Append(ID_HELP, wxT("Help"), wxT("Help"), false);
-	
-	wxMenuBar* menuBar = new wxMenuBar();
-	menuBar->Append(edit, wxT("Menu"));
+	menuBar->Append(edit, wxT("Edit"));
 	SetMenuBar(menuBar);
 }
 

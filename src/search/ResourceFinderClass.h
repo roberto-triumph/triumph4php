@@ -390,6 +390,13 @@ public:
 	 */
 	void CopyResourcesFrom(const ResourceFinderClass& src);
 	
+	/**
+	 * Sorts the resources if they are not already sorted.
+	 * After sorting, we can perform binary searches on the list.
+	 * Also clears out all of the previous matches.
+	 */
+	void EnsureSorted();
+	
 private:
 	
 	/**
@@ -573,13 +580,6 @@ private:
 	 * If the file was deleted, then the match is invalidated and the cache for that file removed.
 	 */
 	void EnsureMatchesExist();
-	
-	/**
-	 * Sorts the resources if they are not already sorted.
-	 * After sorting, we can perform binary searches on the list.
-	 * Also clears out all of the previous matches.
-	 */
-	void EnsureSorted();
 
 };
 

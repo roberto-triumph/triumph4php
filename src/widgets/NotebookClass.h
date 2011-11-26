@@ -51,6 +51,12 @@ public:
 	CodeControlOptionsClass* CodeControlOptions;
 	
 	/**
+	 * This object will be used to parse the resources of files that are currently open.
+	 * This class will NOT own this pointer.
+	 */
+	ResourceUpdateThreadClass* ResourceUpdates;
+	
+	/**
 	 * Constructor. Parent is needed, all others are optional.
 	 */
 	NotebookClass(wxWindow* parent, wxWindowID id = wxID_ANY, 

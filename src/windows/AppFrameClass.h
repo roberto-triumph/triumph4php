@@ -30,6 +30,7 @@
 #include <widgets/NotebookClass.h>
 #include <PluginClass.h>
 #include <PreferencesClass.h>
+#include <widgets/ResourceUpdateThreadClass.h>
 #include <wx/aui/aui.h>
 
 namespace mvceditor {
@@ -44,7 +45,7 @@ public:
 	/** Constructor */
 	AppFrameClass(const std::vector<PluginClass*>& plugins,
 		wxEvtHandler& appHandler, EnvironmentClass& environment,
-		PreferencesClass& preferences);
+		PreferencesClass& preferences, ResourceUpdateThreadClass& resourceUpdates);
 	
 	~AppFrameClass();
 	

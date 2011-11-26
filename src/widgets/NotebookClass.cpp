@@ -124,7 +124,7 @@ void mvceditor::NotebookClass::MarkPageAsNotModified(int windowId) {
 	}
 }
 void mvceditor::NotebookClass::AddMvcEditorPage() {
-	CodeControlClass* page = new CodeControlClass(this, *CodeControlOptions, Project, wxID_ANY);
+	CodeControlClass* page = new CodeControlClass(this, *CodeControlOptions, Project, ResourceUpdates, wxID_ANY);
 	AddPage(page, wxString::Format(wxT("Untitled %d"), NewPageNumber++), true, 
 		wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_TOOLBAR, 
 		wxSize(16, 16)));
@@ -168,7 +168,7 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename) {
 	}
 	if (!found) {
 		CodeControlClass* newCode = new CodeControlClass(
-			this, *CodeControlOptions, Project, wxID_ANY);
+			this, *CodeControlOptions, Project, ResourceUpdates, wxID_ANY);
 		if (newCode->LoadAndTrackFile(filename)) {
 			// if user dragged in a file on an opened file we want still want to accept dragged files
 			newCode->SetDropTarget(new FileDropTargetClass(this));

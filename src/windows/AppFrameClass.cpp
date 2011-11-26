@@ -50,7 +50,7 @@ int ID_TOOLS_WINDOW = wxNewId();
 
 mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass*>& plugins,
 		wxEvtHandler& appHandler, mvceditor::EnvironmentClass& environment,
-		mvceditor::PreferencesClass& preferences)
+		mvceditor::PreferencesClass& preferences, mvceditor::ResourceUpdateThreadClass& resourceUpdates)
 	: AppFrameGeneratedClass(NULL)
 	, Plugins(plugins)
 	, AppHandler(appHandler)
@@ -67,6 +67,7 @@ mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass
 	// when the notebook is empty we want to accept dragged files
 	Notebook->SetDropTarget(new FileDropTargetClass(Notebook));
 	Notebook->CodeControlOptions = &Preferences.CodeControlOptions;
+	Notebook->ResourceUpdates = &resourceUpdates;
 	
 	// ATTN: for some reason must remove and re-insert menu item in order to change the icon
 	wxMenuItem* projectOpenMenuItem = MenuBar->FindItem(ID_PROJECT_OPEN);

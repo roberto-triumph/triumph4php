@@ -280,11 +280,11 @@ mvceditor::OutlineViewPluginPanelClass::OutlineViewPluginPanelClass(wxWindow* pa
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
 	
-	Outline1 = new mvceditor::CodeControlClass(this, *notebook->CodeControlOptions, plugin->GetProject(), ID_WINDOW_OUTLINE_CURRENT);
+	Outline1 = new mvceditor::CodeControlClass(this, *notebook->CodeControlOptions, plugin->GetProject(), NULL, ID_WINDOW_OUTLINE_CURRENT);
 	Outline1->SetReadOnly(true);
 	OutlineSizer->Add(Outline1, 2, wxALL|wxEXPAND, 5);
 	
-	Outline3 = new mvceditor::CodeControlClass(this, *notebook->CodeControlOptions, plugin->GetProject(), ID_WINDOW_OUTLINE_COMMENT);
+	Outline3 = new mvceditor::CodeControlClass(this, *notebook->CodeControlOptions, plugin->GetProject(), NULL, ID_WINDOW_OUTLINE_COMMENT);
 	Outline3->SetWrapMode(wxSTC_WRAP_WORD);
 	Outline3->SetReadOnly(true);
 	OutlineSizer->Add(Outline3, 0, wxALL|wxEXPAND, 5);
