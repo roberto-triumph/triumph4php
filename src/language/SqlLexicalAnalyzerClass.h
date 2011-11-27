@@ -75,6 +75,8 @@ public:
 	 * This is a 1-based number.
 	 */
 	int GetLineNumber() const;
+	
+	// TODO: need to implement a Close to clean up resources
 
 	private:
 
@@ -126,7 +128,7 @@ public:
 	/**
 	 * The buffer that will hold the SQL queries.
 	 */
-	UCharBufferedFileClass Buffer;
+	UCharBufferClass Buffer;
 	
 	/**
 	 * The starting line number of the current query that was returned by NextQuery()

@@ -109,8 +109,8 @@ int main() {
 	ProfileLexer();
 	ProfileParser();
 	ProfileParserOnLargeProject();
-	ProfileNativeFunctionsParsing();
-	ProfileResourceFinderOnLargeProject();
+	//ProfileNativeFunctionsParsing();
+	//ProfileResourceFinderOnLargeProject();
 	
 	// calling cleanup here so that we can run this binary through a memory leak detector 
 	// ICU will cache many things and that will cause the detector to output "possible leaks"
@@ -179,7 +179,8 @@ void ProfileParser() {
 	}
 	else {
 		UFILE *out = u_finit(stdout, NULL, NULL);
-		u_fprintf(out, "%S\n", error.Error.getTerminatedBuffer());
+		u_fprintf(out, "%S on file %s around line %d\n", error.Error.getTerminatedBuffer(),
+			(const char*)FileName.ToAscii(), error.LineNumber);
 		u_fclose(out);
 	}
 }

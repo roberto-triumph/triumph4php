@@ -24,7 +24,6 @@
  */
 #include <language/SqlLexicalAnalyzerClass.h>
 
-
 #define SQL_LEXICAL_ANALYZER_BUFFER_FILL(n) { Buffer.AppendToLexeme(n); }
 
 #define SQL_LEXICAL_ANALYZER_GET_CONDITION() CurrentCondition
@@ -44,18 +43,18 @@ bool mvceditor::SqlLexicalAnalyzerClass::OpenString(const UnicodeString& queries
 }
 
 bool mvceditor::SqlLexicalAnalyzerClass::NextQuery(UnicodeString& query) {
-	Buffer.ResetBuffer();
+	Buffer.MarkTokenStart();
 	query.remove();
 	QueryStartLineNumber = Buffer.GetLineNumber();
 	NextToken();
 	bool contents = false;
-	UChar *start = Buffer.TokenStart;
-	UChar *end =  Buffer.Current;
+	const UChar *start = Buffer.TokenStart;
+	const UChar *end =  Buffer.Current;
 	if ((end - start) > 0 && Buffer.Current <= Buffer.Limit) {
 	
 		// if passed by the EOF need to step back otherwise we insert
 		// a null character
-		if (end == Buffer.Limit) {
+		if (Buffer.Current >= Buffer.Limit) {
 			end--;
 		}
 		query.append(Buffer.TokenStart, end - start);
@@ -70,7 +69,9 @@ int mvceditor::SqlLexicalAnalyzerClass::GetLineNumber() const {
 }
 
 int mvceditor::SqlLexicalAnalyzerClass::NextToken() {
-
+	if (Buffer.HasReachedEnd()) {
+		return mvceditor::SqlLexicalAnalyzerClass::SQL_EOF;
+	}
 
 sql_lexical_analyzer_next:
 
@@ -95,7 +96,7 @@ ANY = ALL\EOF;
 NEWLINE = [\r][\n] | [\r] | [\n];
 WHITESPACE = [ \t\v\f];
 
-<*> EOF { return mvceditor::SqlLexicalAnalyzerClass::SQL_EOF; } 
+<*> EOF { return mvceditor::SqlLexicalAnalyzerClass::SQL_EOF; }
 
 <ANY> ["]  { CurrentCondition = SQL_DOUBLE_QUOTE_STRING; goto sql_lexical_analyzer_next; }
 <ANY> ['] { CurrentCondition = SQL_SINGLE_QUOTE_STRING; goto sql_lexical_analyzer_next; }
