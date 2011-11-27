@@ -97,7 +97,7 @@ public:
 	                 int id, const wxPoint& position =
 	                     wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0,
 	                 const wxString& name = wxT("code"));
-
+	
 	/**
 	 * Loads the contents of the given file, and initializes the
 	 * proper lexer so that the file gets syntax highlight according to the language
@@ -507,7 +507,7 @@ private:
 	ResourceUpdateThreadClass* ResourceUpdates;
 
 	/**
-	  * To help with autocompletion and keywords
+	  * To help with autocompletion and keywords. This object will NOT own this pointer
 	  *
 	  * @var ProjectClass
 	  */
@@ -517,6 +517,7 @@ private:
 	 * This is the current specialization (document type) that is being used. This
 	 * pointer can be changed at any moment; the lifetime of the pointer may BE LESS
 	 * than the code control.
+	 * This object owns this pointer and will need to delete it.
 	 */
 	TextDocumentClass* Document;
 
