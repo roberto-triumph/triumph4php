@@ -1070,6 +1070,12 @@ void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
 		event.Skip();
 		return;
 	}
+	/*
+	 * do not use wxTipWindow 
+	 * there is a crash bug  with wxTipWindow
+	 * 
+	 * http://trac.wxwidgets.org/ticket/11125
+	 * 
 	mvceditor::ResourceFinderClass* globalResourceFinder = Project->GetResourceFinder();
 	if (DocumentMode == PHP && globalResourceFinder) {
 		int pos = event.GetPosition();
@@ -1114,7 +1120,7 @@ void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
 				}
 			}
 		}
-	}
+	}*/
 	event.Skip();
 }
 
