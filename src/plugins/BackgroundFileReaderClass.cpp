@@ -44,7 +44,7 @@ bool mvceditor::BackgroundFileReaderClass::InitMatched() {
 }
 
 bool mvceditor::BackgroundFileReaderClass::IsRunning() const {
-	return m_thread && m_thread->IsAlive();
+	return m_thread && m_thread->IsRunning();
 }
 
 bool mvceditor::BackgroundFileReaderClass::StartReading(StartError& error) {
@@ -119,7 +119,6 @@ void* mvceditor::BackgroundFileReaderClass::Entry() {
 			isDestroy = GetThread()->TestDestroy();
 		}
 	}
-	m_thread = NULL;
 	
 	// signal that the background thread has finished
 	wxCommandEvent endEvent(EVENT_FILE_READ_COMPLETE, wxNewId());
