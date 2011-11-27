@@ -262,11 +262,11 @@ wxString mvceditor::CodeControlClass::GetSymbolAt(int posToCheck) {
 	ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
 	
 	SymbolTable.CreateSymbols(codeText);
-	SymbolClass::Types type;
-	UnicodeString objectType,
-		objectMember,
-		comment;
-	bool isThisCall(false),
+	SymbolClass::Types type = mvceditor::SymbolClass::ARRAY;
+	UnicodeString objectType;
+	UnicodeString objectMember;
+	UnicodeString comment;
+	bool isThisCall(	false),
 		isParentCall(false),
 		isStaticCall(false);
 		
@@ -1040,6 +1040,10 @@ void mvceditor::CodeControlClass::ClearLintErrors() {
 void mvceditor::CodeControlClass::OnClose(wxCloseEvent& event) {
 	delete Document;
 	Document = NULL;
+	Timer.Stop();
+	if (ResourceUpdates) {
+		ResourceUpdates->Unregister(FileIdentifier);
+	}
 	event.Skip();
 }
 
@@ -1100,8 +1104,11 @@ void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
 								msg += wxT("\n\n");
 								msg += mvceditor::StringHelperClass::IcuToWx(resource.Comment);
 							}
-							new wxTipWindow(this, msg, 
-								wxCoord(400), NULL);
+							if (!msg.IsEmpty()) {
+								new wxTipWindow(this, msg, 
+									wxCoord(400), NULL);
+							}
+							break;
 						}
 					}
 				}
