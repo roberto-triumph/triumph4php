@@ -59,6 +59,11 @@ public:
 	ThreadWithHeartbeatClass(wxEvtHandler& handler, int id = wxID_ANY);
 	
 	/**
+	 * On object destruction, if this thread is running it will be stopped.
+	 */
+	virtual ~ThreadWithHeartbeatClass();
+	
+	/**
 	 * Will prepare to send events at regular intervals. After a call to this method, a 
 	 * EVENT_WORK_IN_PROGRESS will be generated at regular intervals until SignalEnd()
 	 * is called.

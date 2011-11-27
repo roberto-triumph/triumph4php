@@ -34,6 +34,15 @@ mvceditor::ThreadWithHeartbeatClass::ThreadWithHeartbeatClass(wxEvtHandler& hand
 	
 }
 
+mvceditor::ThreadWithHeartbeatClass::~ThreadWithHeartbeatClass() {
+	wxThread* thread = GetThread();
+	if (thread && thread->IsRunning()) {
+		thread->Delete();
+	}
+	Timer.Stop();
+	
+}
+
 void mvceditor::ThreadWithHeartbeatClass::SignalStart() {
 	Timer.Start(200, wxTIMER_CONTINUOUS);
 }
