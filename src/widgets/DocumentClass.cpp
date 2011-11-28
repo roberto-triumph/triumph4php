@@ -267,41 +267,38 @@ std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const
 		
 		// get all other resources that start like the word
 		wxString wxSymbol = mvceditor::StringHelperClass::IcuToWx(symbol);
-		if (ResourceUpdates->PrepareAll(globalResourceFinder, wxSymbol)) {
-			if (ResourceUpdates->CollectNearMatchResourcesFromAll(globalResourceFinder)) {
-				std::vector<mvceditor::ResourceFinderClass*> finders = ResourceUpdates->Iterator(globalResourceFinder);
-				for (size_t r = 0; r < finders.size(); r++) {
-					mvceditor::ResourceFinderClass* resourceFinder = finders[r];
-					for (size_t i = 0; i < resourceFinder->GetResourceMatchCount(); ++i) {
-						mvceditor::ResourceClass resource = resourceFinder->GetResourceMatch(i);
-						bool passesStaticCheck = isStaticCall == resource.IsStatic;
+		if (ResourceUpdates->Worker.PrepareAll(globalResourceFinder, wxSymbol)) {
+			if (ResourceUpdates->Worker.CollectNearMatchResourcesFromAll(globalResourceFinder)) {
+				std::vector<mvceditor::ResourceClass> matches = ResourceUpdates->Worker.Matches(globalResourceFinder);
+				for (size_t i = 0; i < matches.size(); ++i) {
+					mvceditor::ResourceClass resource = matches[i];
+					bool passesStaticCheck = isStaticCall == resource.IsStatic;
 
-						// if the resource starts with symbol it means that resource is a member of "$this"
-						bool isInherited = FALSE != resource.Resource.startsWith(symbol);
+					// if the resource starts with symbol it means that resource is a member of "$this"
+					bool isInherited = FALSE != resource.Resource.startsWith(symbol);
 
-						// $this => can access this resource's private, parent's protected/public, other public
-						// parent => can access parent's protected/public
-						// neither => can only access public
-						bool passesVisibilityCheck = !resource.IsPrivate && !resource.IsProtected;
-						if (!passesVisibilityCheck && isParentCall) {
+					// $this => can access this resource's private, parent's protected/public, other public
+					// parent => can access parent's protected/public
+					// neither => can only access public
+					bool passesVisibilityCheck = !resource.IsPrivate && !resource.IsProtected;
+					if (!passesVisibilityCheck && isParentCall) {
 
-							// this check assumes that the resource finder has traversed the inheritance chain
-							// properly. then, by a process of elimination, if the resource class is not
-							// the symbol then we only show protected/public resources
-							passesVisibilityCheck = resource.IsProtected;
+						// this check assumes that the resource finder has traversed the inheritance chain
+						// properly. then, by a process of elimination, if the resource class is not
+						// the symbol then we only show protected/public resources
+						passesVisibilityCheck = resource.IsProtected;
+					}
+					else if (!passesVisibilityCheck) {
+
+						//not checking isThisCalled
+						passesVisibilityCheck = isInherited;
+					}
+					if (passesStaticCheck && passesVisibilityCheck) {
+						wxString s = mvceditor::StringHelperClass::IcuToWx(resource.Identifier);
+						if (resource.IsStatic && resource.Type == mvceditor::ResourceClass::MEMBER) {
+							s = wxT("$") + s;
 						}
-						else if (!passesVisibilityCheck) {
-
-							//not checking isThisCalled
-							passesVisibilityCheck = isInherited;
-						}
-						if (passesStaticCheck && passesVisibilityCheck) {
-							wxString s = mvceditor::StringHelperClass::IcuToWx(resource.Identifier);
-							if (resource.IsStatic && resource.Type == mvceditor::ResourceClass::MEMBER) {
-								s = wxT("$") + s;
-							}
-							autoCompleteList.push_back(s);
-						}
+						autoCompleteList.push_back(s);
 					}
 				}
 			}

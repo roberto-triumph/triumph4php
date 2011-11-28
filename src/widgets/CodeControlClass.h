@@ -26,7 +26,6 @@
 #define MVCEDITORCODECONTROLCLASS_H_
 
 #include <php_frameworks/ProjectClass.h>
-#include <language/SymbolTableClass.h>
 #include <widgets/DocumentClass.h>
 #include <widgets/CodeControlOptionsClass.h>
 #include <widgets/ResourceUpdateThreadClass.h>
@@ -448,12 +447,6 @@ private:
 	 * @return int byte position
 	 */
 	int CharacterToPos(int character);
-
-	/**
-	* To calculate variable information
-	* @var SymbolTableClass
-	*/
-	SymbolTableClass SymbolTable;
 
 	/*
 	* The file that was loaded.

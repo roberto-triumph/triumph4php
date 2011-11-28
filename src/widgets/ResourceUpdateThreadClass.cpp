@@ -23,63 +23,73 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <widgets/ResourceUpdateThreadClass.h>
+#include <algorithm>
 
-mvceditor::ResourceUpdateThreadClass::ResourceUpdateThreadClass(wxEvtHandler& handler, int eventId)
-	: ThreadWithHeartbeatClass(handler, eventId)
-	, Finders()
-	, CurrentCode() 
-	, CurrentFileName()
-	, BusyFinder(NULL) 
-	, CurrentHandler(NULL) {
+mvceditor::ResourceUpdateClass::ResourceUpdateClass()
+	: Finders()
+	, SymbolTables() {
 }
 
-mvceditor::ResourceUpdateThreadClass::~ResourceUpdateThreadClass() {
+mvceditor::ResourceUpdateClass::~ResourceUpdateClass() {
 	for (std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it =  Finders.begin(); it != Finders.end(); ++it) {
+		delete it->second;
+	}
+	for (std::map<wxString, mvceditor::SymbolTableClass*>::iterator it =  SymbolTables.begin(); it != SymbolTables.end(); ++it) {
 		delete it->second;
 	}
 }
 
-bool mvceditor::ResourceUpdateThreadClass::CollectFullyQualifiedResourceFromAll(mvceditor::ResourceFinderClass* resourceFinder) {
-	std::vector<mvceditor::ResourceFinderClass*> finders = Iterator(resourceFinder);
-	bool found = false;
-	for (size_t i = 0; i < finders.size(); ++i) {
-		found |= finders[i]->CollectFullyQualifiedResource();
-	}
-	return found;
-}
-
-bool mvceditor::ResourceUpdateThreadClass::CollectNearMatchResourcesFromAll(mvceditor::ResourceFinderClass* resourceFinder) {
-	std::vector<mvceditor::ResourceFinderClass*> finders = Iterator(resourceFinder);
-	bool found = false;
-	for (size_t i = 0; i < finders.size(); ++i) {
-		found |= finders[i]->CollectNearMatchResources();
-	}
-	return found;
-}
-
-void* mvceditor::ResourceUpdateThreadClass::Entry() {
-	BusyFinder->BuildResourceCacheForFile(CurrentFileName, CurrentCode);
-	BusyFinder->EnsureSorted();
+bool mvceditor::ResourceUpdateClass::Register(const wxString& fileName) {
+	bool ret = false;
 	
-	wxCommandEvent evt(mvceditor::EVENT_WORK_COMPLETE, wxID_ANY);
-	wxPostEvent(CurrentHandler, evt);
-	
-	// cleanup.
-	// TODO do the string clearing methods actuall deallocate memory??
-	BusyFinder = NULL;
-	CurrentHandler = NULL;
-	CurrentFileName.Clear();
-	CurrentCode.remove();
-	return 0;
+	// careful to not overwrite the symbol table, resource finder pointers
+	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it = Finders.find(fileName);
+	std::map<wxString, mvceditor::SymbolTableClass*>::iterator itSymbols = SymbolTables.find(fileName);
+	if (it == Finders.end() && itSymbols == SymbolTables.end()) {
+		mvceditor::ResourceFinderClass* res = new mvceditor::ResourceFinderClass;
+		mvceditor::SymbolTableClass* table = new mvceditor::SymbolTableClass();
+		Finders[fileName] = res;
+		SymbolTables[fileName] = table;
+		ret = true;
+	}
+	return ret;
 }
 
-bool mvceditor::ResourceUpdateThreadClass::IsDirty(const ResourceClass& resource) {
+void mvceditor::ResourceUpdateClass::Unregister(const wxString& fileName) {
+	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it = Finders.find(fileName);
+	if (it != Finders.end()) {
+		delete it->second;
+	}
+	std::map<wxString, mvceditor::SymbolTableClass*>::iterator itSymbols = SymbolTables.find(fileName);
+	if (itSymbols != SymbolTables.end()) {
+		delete it->second;
+	}
+	Finders.erase(fileName);
+	SymbolTables.erase(fileName);
+}
+
+bool mvceditor::ResourceUpdateClass::Update(const wxString& fileName, const UnicodeString& code) {
+	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it = Finders.find(fileName);
+	std::map<wxString, mvceditor::SymbolTableClass*>::iterator itSymbols = SymbolTables.find(fileName);
+	bool ret = false;
+	if (it != Finders.end() && itSymbols != SymbolTables.end()) {
+		mvceditor::ResourceFinderClass* finder = it->second;
+		mvceditor::SymbolTableClass* symbolTable = itSymbols->second;
+		finder->BuildResourceCacheForFile(fileName, code);
+		finder->EnsureSorted();
+		symbolTable->CreateSymbols(code);
+		ret = true;
+	}
+	return ret;
+}
+
+bool mvceditor::ResourceUpdateClass::IsDirty(const ResourceClass& resource) {
 	bool ret = false;
 	
 	return ret;
 }
 
-bool mvceditor::ResourceUpdateThreadClass::PrepareAll(mvceditor::ResourceFinderClass* resourceFinder, const wxString& resource) {
+bool mvceditor::ResourceUpdateClass::PrepareAll(mvceditor::ResourceFinderClass* resourceFinder, const wxString& resource) {
 	std::vector<mvceditor::ResourceFinderClass*> finders = Iterator(resourceFinder);
 	bool prep = true;
 	for (size_t i = 0; i < finders.size(); ++i) {
@@ -88,47 +98,123 @@ bool mvceditor::ResourceUpdateThreadClass::PrepareAll(mvceditor::ResourceFinderC
 	return prep;
 }
 
-void mvceditor::ResourceUpdateThreadClass::Register(const wxString& fileName, wxEvtHandler* handler) {
-	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it = Finders.find(fileName);
-	if (it == Finders.end()) {
-		
-		// careful to not overwrite the resource finder pointer
-		mvceditor::ResourceFinderClass* res = new mvceditor::ResourceFinderClass;
-		Finders[fileName] = res;
-		Handlers[fileName] = handler;
+bool mvceditor::ResourceUpdateClass::CollectFullyQualifiedResourceFromAll(mvceditor::ResourceFinderClass* resourceFinder) {
+	std::vector<mvceditor::ResourceFinderClass*> finders = Iterator(resourceFinder);
+	bool found = false;
+	for (size_t i = 0; i < finders.size(); ++i) {
+		found |= finders[i]->CollectFullyQualifiedResource();
 	}
-	
+	return found;
 }
 
-void mvceditor::ResourceUpdateThreadClass::Unregister(const wxString& fileName) {
-	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it = Finders.find(fileName);
-	if (it != Finders.end()) {
-		delete it->second;
+bool mvceditor::ResourceUpdateClass::CollectNearMatchResourcesFromAll(mvceditor::ResourceFinderClass* resourceFinder) {
+	std::vector<mvceditor::ResourceFinderClass*> finders = Iterator(resourceFinder);
+	bool found = false;
+	for (size_t i = 0; i < finders.size(); ++i) {
+		found |= finders[i]->CollectNearMatchResources();
 	}
-	Finders.erase(fileName);
-	Handlers.erase(fileName);
+	return found;
 }
 
-wxThreadError mvceditor::ResourceUpdateThreadClass::UpdateResources(const wxString& fileName, const UnicodeString& code) {
-	wxThreadError err = Create();
-	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it = Finders.find(fileName);
-	std::map<wxString, wxEvtHandler*>::iterator itHandler = Handlers.find(fileName);
-	if (wxTHREAD_NO_ERROR == err && !GetThread()->IsRunning() && it != Finders.end() && itHandler != Handlers.end()) {
-		BusyFinder = it->second;
-		CurrentCode = code;
-		CurrentFileName = fileName;
-		CurrentHandler = itHandler->second;
-		GetThread()->Run();
-		SignalStart();
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceUpdateClass::Matches(mvceditor::ResourceFinderClass* resourceFinder) {
+	std::vector<mvceditor::ResourceClass> matches;
+	std::vector<mvceditor::ResourceFinderClass*> finders = Iterator(resourceFinder);
+	for (size_t r = 0; r < finders.size(); ++r) {
+		mvceditor::ResourceFinderClass* resourceFinder = finders[r];
+		size_t count = resourceFinder->GetResourceMatchCount();
+		for (size_t j = 0; j < count; ++j) {
+			mvceditor::ResourceClass resource = resourceFinder->GetResourceMatch(j);
+			matches.push_back(resource);
+		}
 	}
-	return err;
+	std::sort(matches.begin(), matches.end());
+	return matches;
 }
 
-std::vector<mvceditor::ResourceFinderClass*> mvceditor::ResourceUpdateThreadClass::Iterator(mvceditor::ResourceFinderClass* resourceFinder) {
+std::vector<mvceditor::ResourceFinderClass*> mvceditor::ResourceUpdateClass::Iterator(mvceditor::ResourceFinderClass* resourceFinder) {
 	std::vector<mvceditor::ResourceFinderClass*> finders;
 	finders.push_back(resourceFinder);
 	for (std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it =  Finders.begin(); it != Finders.end(); ++it) {
 		finders.push_back(it->second);
 	}
 	return finders;
+}
+
+UnicodeString mvceditor::ResourceUpdateClass::GetSymbolAt(const wxString& fileName, int pos, mvceditor::ResourceFinderClass* resourceFinder) {
+	UnicodeString symbol;
+	std::map<wxString, mvceditor::SymbolTableClass*>::iterator itSymbols = SymbolTables.find(fileName);
+	if (itSymbols != SymbolTables.end()) {
+		mvceditor::SymbolTableClass* symbolTable = itSymbols->second;
+		SymbolClass::Types type = mvceditor::SymbolClass::ARRAY;
+		UnicodeString objectType;
+		UnicodeString objectMember;
+		UnicodeString comment;
+		bool isThisCall = false;
+		bool isParentCall = false;
+		bool isStaticCall = false;
+			
+		// TODO: what about the opened files? will need to look at the opened files resource finders (ResourceUpdates object)
+		if (symbolTable->Lookup(pos, *resourceFinder, type, objectType, objectMember, comment, isThisCall, isParentCall, isStaticCall)) {
+			bool isObjectMethodOrProperty = SymbolClass::OBJECT == type ||SymbolClass::METHOD == type || SymbolClass::PROPERTY == type;
+			if (isObjectMethodOrProperty)  {
+				
+				// even if objectType is empty, symbol will be something like '::METHOD' which the 
+				// ResourceFinder will interpret to look for methods only (which is what we want here)
+				symbol = objectType + UNICODE_STRING_SIMPLE("::") + objectMember;
+			}
+			else {
+				symbol = objectType;
+			}
+		}
+	}
+	return symbol;
+}
+
+mvceditor::ResourceUpdateThreadClass::ResourceUpdateThreadClass(wxEvtHandler& handler, int eventId)
+	: ThreadWithHeartbeatClass(handler, eventId)
+	, Worker()
+	, Handlers()
+	, CurrentCode() 
+	, CurrentFileName() {
+}
+
+bool mvceditor::ResourceUpdateThreadClass::Register(const wxString& fileName, wxEvtHandler* handler) {
+	bool ret = Worker.Register(fileName);
+	if (ret) {
+		Handlers[fileName] = handler;
+		ret = true;
+	}
+	return ret;
+}
+
+void mvceditor::ResourceUpdateThreadClass::Unregister(const wxString& fileName) {
+	Worker.Unregister(fileName);
+	Handlers.erase(fileName);
+}
+
+
+wxThreadError mvceditor::ResourceUpdateThreadClass::StartBackgroundUpdate(const wxString& fileName, const UnicodeString& code) {
+	wxThreadError err = Create();
+	if (wxTHREAD_NO_ERROR == err && !GetThread()->IsRunning()) {
+		CurrentCode = code;
+		CurrentFileName = fileName;
+		GetThread()->Run();
+		SignalStart();
+	}
+	return err;
+}
+
+void* mvceditor::ResourceUpdateThreadClass::Entry() {
+	Worker.Update(CurrentFileName, CurrentCode);
+	
+	std::map<wxString, wxEvtHandler*>::iterator itHandler = Handlers.find(CurrentFileName);
+	if (itHandler != Handlers.end()) {
+		wxCommandEvent evt(mvceditor::EVENT_WORK_COMPLETE, wxID_ANY);
+		wxPostEvent(itHandler->second, evt);
+	}
+	
+	// cleanup.
+	CurrentFileName.resize(0);
+	CurrentCode.truncate(0);
+	return 0;
 }

@@ -26,33 +26,34 @@
 #define __RESOURCEUPDATETHREADCLASS_H__
 
 #include <search/ResourceFinderClass.h>
+#include <language/SymbolTableClass.h>
 #include <widgets/ThreadWithHeartbeatClass.h>
 #include <wx/event.h>
 #include <unicode/unistr.h>
 #include <map>
  
 namespace mvceditor {
-	
+
 /**
  * This class will update the ResourceFinder with the 
  * latest code that has been typed in.
  */
-class ResourceUpdateThreadClass : public ThreadWithHeartbeatClass {
+class ResourceUpdateClass {
 	
 public:
 
-	ResourceUpdateThreadClass(wxEvtHandler& handler, int eventId = wxID_ANY);
+	ResourceUpdateClass();
 	
-	virtual ~ResourceUpdateThreadClass();
+	~ResourceUpdateClass();
 	
 	/**
 	 * Creates a new resource finder for the given file.
 	 * 
 	 * @param fileName unique identifier for a file
-	 * @param handler will get notified with a EVENT_WORK_COMPLETE when resoruce parsing
-	 * is complete. This class will NOT own the pointer.
+	 * @return bool TRUE if fileName was not previously registered
+	 * only a unique fileName can be registered 
 	 */
-	void Register(const wxString& fileName, wxEvtHandler* handler);
+	bool Register(const wxString& fileName);
 	
 	/**
 	 * Cleans up the resource finder from the given file. This should be called whenever
@@ -69,7 +70,7 @@ public:
 	 * @param fileName unique identifier for a file
 	 * @param code the file's most up-to-date source code (from the user-edited buffer)
 	 */
-	wxThreadError UpdateResources(const wxString& fileName, const UnicodeString& code);
+	bool Update(const wxString& fileName, const UnicodeString& code);
 	
 	/**
 	 * Check to see if the given resource comes from one of the registered (opened
@@ -105,6 +106,19 @@ public:
 	bool CollectNearMatchResourcesFromAll(ResourceFinderClass* resourceFinder);
 	
 	/**
+	 * @return all of the matches from all finders that were found by the Collect* call.
+	 */
+	std::vector<ResourceClass> Matches(ResourceFinderClass* resourceFinder);
+	
+	/**
+	 * Get the symbol that is at the given pos on the given file.
+	 * @return the symbol; can be empty if it could not figured out or pos is invalid
+	 */
+	UnicodeString GetSymbolAt(const wxString& fileName, int pos, ResourceFinderClass* resourceFinder);
+	
+private:
+
+	/**
 	 * Returns a list that contains all of the resource finders for the registered files plus
 	 * the given resource finder.  
 	 * 
@@ -112,9 +126,66 @@ public:
 	 */
 	std::vector<ResourceFinderClass*> Iterator(ResourceFinderClass* resourceFinder);
 	
-	
-protected:
 
+	/**
+	 * These are the objects that will parse the source codes
+	 */
+	std::map<wxString, ResourceFinderClass*> Finders;
+	
+	/**
+	 * To calculate variable information
+	 */
+	std::map<wxString, SymbolTableClass*> SymbolTables;
+};
+
+/**
+ * This class will run the resource updates in a background thread
+ */
+class ResourceUpdateThreadClass : public ThreadWithHeartbeatClass {
+	
+public:
+
+	/**
+	 * @param the handler will get notified to EVENT_WORK* events with the given ID
+	 */
+	ResourceUpdateThreadClass(wxEvtHandler& handler, int eventId = wxID_ANY);
+		
+	/**
+	 * Creates a new resource finder for the given file.
+	 * 
+	 * @param fileName unique identifier for a file
+	 * @param handler will get notified with a EVENT_WORK_COMPLETE when resoruce parsing
+	 * is complete. This class will NOT own the pointer.
+	 * @return bool TRUE if fileName was not previously registered
+	 * only a unique fileName can be registered 
+	 */
+	bool Register(const wxString& fileName, wxEvtHandler* handler);
+	
+	/**
+	 * Cleans up the resource finder from the given file. This should be called whenever
+	 * the user is no longer editing the file.
+	 * 
+	 * @param fileName unique identifier for a file
+	 */
+	void Unregister(const wxString& fileName);
+	
+	/**
+	 * Will run a background thread to parse the resources of the given 
+	 * text.
+	 * 
+	 * @param fileName unique identifier for a file
+	 * @param code the file's most up-to-date source code (from the user-edited buffer)
+	 */
+	wxThreadError StartBackgroundUpdate(const wxString& fileName, const UnicodeString& code);
+	
+	/**
+	 * This is the object that will hold all of the resource cache. It should not be accessed while
+	 * the thread is running
+	 */
+	ResourceUpdateClass Worker;
+
+protected:
+	
 	/**
 	 * In the background thread we will parse the code for resources
 	 */
@@ -122,10 +193,12 @@ protected:
 	
 private:
 
-	std::map<wxString, ResourceFinderClass*> Finders;
-	
+	/**
+	 * These guys will get notified when the parsing is complete. This class will NOT own
+	 * the handler pointers.
+	 */
 	std::map<wxString, wxEvtHandler*> Handlers;
-	
+
 	/**
 	 * the code that is being worked on by the background thread.
 	 */
@@ -135,22 +208,8 @@ private:
 	 * the name of the file that is being worked on by the background thread.
 	 */
 	wxString CurrentFileName;
-	
-	/**
-	 * The finder that is being worked on by the background thread.
-	 * This is just a pointer to one of the finders that is in the map
-	 * no need to delete
-	 */
-	ResourceFinderClass* BusyFinder;
-	
-	/**
-	 * the handler to notify once the current parsing finishes
-	 * This is just a pointer to the Handlers; no need to delete
-	 */
-	wxEvtHandler* CurrentHandler;
-	
+
 };
-	
 	 
 };
 

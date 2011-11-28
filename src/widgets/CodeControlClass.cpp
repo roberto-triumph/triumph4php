@@ -58,7 +58,6 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 			int id, const wxPoint& position, const wxSize& size, long style,
 			const wxString& name)
 		: wxStyledTextCtrl(parent, id, position, size, style, name)
-		, SymbolTable()
 		, CurrentFilename()
 		, CurrentSignature()
 		, FileIdentifier()
@@ -255,34 +254,13 @@ wxString mvceditor::CodeControlClass::GetCurrentSymbol() {
 }
 
 wxString mvceditor::CodeControlClass::GetSymbolAt(int posToCheck) {
-	int startPos = WordStartPosition(posToCheck, true);
-	int endPos = WordEndPosition(posToCheck, true);
-	UnicodeString symbol = GetSafeSubstring(startPos, endPos);
-	UnicodeString codeText = GetSafeText();
 	ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
-	
-	SymbolTable.CreateSymbols(codeText);
-	SymbolClass::Types type = mvceditor::SymbolClass::ARRAY;
-	UnicodeString objectType;
-	UnicodeString objectMember;
-	UnicodeString comment;
-	bool isThisCall(	false),
-		isParentCall(false),
-		isStaticCall(false);
-		
-	// TODO: what about the opened files? will need to look at the opened files resource finders (ResourceUpdates object)
-	if (SymbolTable.Lookup(endPos, *resourceFinder, type, objectType, objectMember, comment, isThisCall, isParentCall, isStaticCall)) {
-		bool isObjectMethodOrProperty = SymbolClass::OBJECT == type ||SymbolClass::METHOD == type || SymbolClass::PROPERTY == type;
-		if (isObjectMethodOrProperty)  {
-			// even if objectType is empty, symbol will be something like '::METHOD' which the 
-			// ResourceFinder will interpret to look for methods only (which is what we want here)
-			symbol = objectType + UNICODE_STRING_SIMPLE("::") + objectMember;
-		}
-		else {
-			symbol = objectType;
-		}
+	UnicodeString symbol = ResourceUpdates->Worker.GetSymbolAt(FileIdentifier, posToCheck, resourceFinder);
+	if (symbol.isEmpty()) {
+		int startPos = WordStartPosition(posToCheck, true);
+		int endPos = WordEndPosition(posToCheck, true);
+		symbol = GetSafeSubstring(startPos, endPos);	
 	}
-	
 	return StringHelperClass::IcuToWx(symbol);
 }
 
@@ -354,21 +332,16 @@ void mvceditor::CodeControlClass::HandleCallTip(wxChar ch, bool force) {
 			wxString symbol = GetSymbolAt(currentPos);
 			CurrentSignature = wxT("");
 			ResourceFinderClass* globalResourceFinder = Project->GetResourceFinder();
-			if (ResourceUpdates->PrepareAll(globalResourceFinder, symbol)) {
+			if (ResourceUpdates->Worker.PrepareAll(globalResourceFinder, symbol)) {
 				
 				// highly unlikely that there is more than one match since we searched for a full name (lookup succeeded).
 				// before this did a near matches: why?? resourceFinder->CollectNearMatchResources()
-				if (ResourceUpdates->CollectFullyQualifiedResourceFromAll(globalResourceFinder)) {
-					std::vector<mvceditor::ResourceFinderClass*> finders = ResourceUpdates->Iterator(globalResourceFinder);
-					for (size_t r = 0; r < finders.size(); r++) {
-						mvceditor::ResourceFinderClass* resourceFinder = finders[r];
-						mvceditor::ResourceClass resource = resourceFinder->GetResourceMatch(0);
-						if (!resource.Identifier.isEmpty()) {
-							UnicodeString fullQualifiedResource =  resource.Resource;
-							UnicodeString comment;
-							CurrentSignature = mvceditor::StringHelperClass::IcuToWx(
-								resourceFinder->GetResourceSignature(fullQualifiedResource, comment));
-						}
+				if (ResourceUpdates->Worker.CollectFullyQualifiedResourceFromAll(globalResourceFinder)) {
+					std::vector<mvceditor::ResourceClass> matches = ResourceUpdates->Worker.Matches(globalResourceFinder);
+					if (!matches.empty()) {
+						mvceditor::ResourceClass resource = matches[0];
+						UnicodeString fullQualifiedResource =  resource.Resource;
+						CurrentSignature = mvceditor::StringHelperClass::IcuToWx(resource.Signature);
 					}
 				}
 			}
@@ -1135,7 +1108,7 @@ void mvceditor::CodeControlClass::OnResourceUpdateComplete(wxCommandEvent& event
 void mvceditor::CodeControlClass::OnTimer(wxTimerEvent& event) {
 	if (NeedToUpdateResources && ResourceUpdates && (!ResourceUpdates->GetThread() || !ResourceUpdates->GetThread()->IsRunning())) {
 		UnicodeString text = GetSafeText();
-		wxThreadError error = ResourceUpdates->UpdateResources(FileIdentifier, text);
+		wxThreadError error = ResourceUpdates->StartBackgroundUpdate(FileIdentifier, text);
 		if (wxTHREAD_RUNNING == error) {
 			wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
 		}
