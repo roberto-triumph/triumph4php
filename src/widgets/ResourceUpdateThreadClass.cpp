@@ -69,6 +69,7 @@ void mvceditor::ResourceUpdateClass::Unregister(const wxString& fileName) {
 }
 
 bool mvceditor::ResourceUpdateClass::Update(const wxString& fileName, const UnicodeString& code) {
+	
 	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it = Finders.find(fileName);
 	std::map<wxString, mvceditor::SymbolTableClass*>::iterator itSymbols = SymbolTables.find(fileName);
 	bool ret = false;
@@ -140,34 +141,79 @@ std::vector<mvceditor::ResourceFinderClass*> mvceditor::ResourceUpdateClass::Ite
 	return finders;
 }
 
-UnicodeString mvceditor::ResourceUpdateClass::GetSymbolAt(const wxString& fileName, int pos, mvceditor::ResourceFinderClass* resourceFinder) {
-	UnicodeString symbol;
+UnicodeString mvceditor::ResourceUpdateClass::GetSymbolAt(const wxString& fileName, int pos, mvceditor::ResourceFinderClass* resourceFinder, 
+		mvceditor::SymbolClass& symbol, const UnicodeString& code) {
+	UnicodeString symbolName;
 	std::map<wxString, mvceditor::SymbolTableClass*>::iterator itSymbols = SymbolTables.find(fileName);
 	if (itSymbols != SymbolTables.end()) {
 		mvceditor::SymbolTableClass* symbolTable = itSymbols->second;
-		SymbolClass::Types type = mvceditor::SymbolClass::ARRAY;
-		UnicodeString objectType;
-		UnicodeString objectMember;
-		UnicodeString comment;
-		bool isThisCall = false;
-		bool isParentCall = false;
-		bool isStaticCall = false;
-			
-		// TODO: what about the opened files? will need to look at the opened files resource finders (ResourceUpdates object)
-		if (symbolTable->Lookup(pos, *resourceFinder, type, objectType, objectMember, comment, isThisCall, isParentCall, isStaticCall)) {
-			bool isObjectMethodOrProperty = SymbolClass::OBJECT == type ||SymbolClass::METHOD == type || SymbolClass::PROPERTY == type;
+		
+		// TODO parsing the code again?  fix the double-scanning	
+		// hmmm calling CreateSymbols means that source code will be scanned again. that's 3 times now (in the background, language discovery, and here) 
+		// since this method is called for lookups; it should be fast; ideally the Update() method is called periodically in the background
+		// and that should create the symbols for good. However, the Lookup method is written in such a way that it needs to detect
+		// the "->" at pos; when the code control triggers auto complete the symbol table's copy of the code is not up-to-date.
+		// symbol table class needs to be better written
+		symbolTable->CreateSymbols(code);
+		if (symbolTable->Lookup(pos, symbol)) {
+			std::vector<mvceditor::ResourceFinderClass*> finders = Iterator(resourceFinder);
+			if (symbol.TypeLexeme.isEmpty() && !symbol.SourceSignature.isEmpty()) {
+				
+				// need to resolve any symbols from other files
+				UnicodeString source = symbol.SourceSignature;
+				for (size_t i = 0; i < finders.size(); ++i) {
+					UnicodeString type = finders[i]->GetResourceReturnType(source);
+					if (!type.isEmpty()) {
+						symbol.TypeLexeme = type;
+						if (type.caseCompare(UNICODE_STRING_SIMPLE("string"), 0) == 0 || type.caseCompare(UNICODE_STRING_SIMPLE("int"), 0) == 0 ||
+							type.caseCompare(UNICODE_STRING_SIMPLE("integer"), 0) == 0 || type.caseCompare(UNICODE_STRING_SIMPLE("bool"), 0) == 0 ||
+							type.caseCompare(UNICODE_STRING_SIMPLE("boolean"), 0) == 0 || type.caseCompare(UNICODE_STRING_SIMPLE("float"), 0) == 0 ||
+							type.caseCompare(UNICODE_STRING_SIMPLE("double"), 0) == 0) {
+							symbol.Type = SymbolClass::PRIMITIVE;
+						}
+						else if (type.caseCompare(UNICODE_STRING_SIMPLE("array"), 0) == 0) {
+							symbol.Type = SymbolClass::ARRAY;
+						}
+						else {
+							symbol.Type = SymbolClass::OBJECT;
+						}
+						break;
+					}
+				}
+			}
+			if (mvceditor::SymbolClass::PARENT == symbol.Type) {
+				for (size_t i =0; i < finders.size(); ++i) {
+					UnicodeString type = finders[i]->GetResourceParentClassName(symbol.TypeLexeme, symbol.Lexeme);
+					if (!type.isEmpty()) {
+						symbol.TypeLexeme = type;
+						break;
+					}
+				}
+			}
+			bool isObjectMethodOrProperty = SymbolClass::OBJECT == symbol.Type ||SymbolClass::METHOD == symbol.Type || SymbolClass::PROPERTY == symbol.Type;
 			if (isObjectMethodOrProperty)  {
 				
 				// even if objectType is empty, symbol will be something like '::METHOD' which the 
 				// ResourceFinder will interpret to look for methods only (which is what we want here)
-				symbol = objectType + UNICODE_STRING_SIMPLE("::") + objectMember;
+				symbolName = symbol.TypeLexeme + UNICODE_STRING_SIMPLE("::") + symbol.Lexeme;
 			}
 			else {
-				symbol = objectType;
+				symbolName = symbol.Lexeme;
 			}
 		}
 	}
-	return symbol;
+	return symbolName;
+}
+
+std::vector<UnicodeString> mvceditor::ResourceUpdateClass::GetVariablesInScope(const wxString& fileName, int pos, const UnicodeString& code) {
+	std::vector<UnicodeString> vars;
+	std::map<wxString, mvceditor::SymbolTableClass*>::iterator itSymbols = SymbolTables.find(fileName);
+	if (itSymbols != SymbolTables.end()) {
+		mvceditor::SymbolTableClass* symbolTable = itSymbols->second;
+		symbolTable->CreateSymbols(code);
+		vars = symbolTable->GetVariablesInScope(pos);
+	}
+	return vars;
 }
 
 mvceditor::ResourceUpdateThreadClass::ResourceUpdateThreadClass(wxEvtHandler& handler, int eventId)

@@ -90,7 +90,7 @@ public:
 	 * Searches all the registered resource finders plus the one given.
 	 * Will search only for full matches (it will call CollectFullyQualifiedResource
 	 * on each resource finder).
-	 * @param resourceFinder the resource finder to search. This class will NOT own the pointer.
+	 * @param resourceFinder the resource finder to search (in addition to all of the registered ones). This class will NOT own the pointer.
 	 * @return bool TRUE if at least one resource finder got a match
 	 */
 	bool CollectFullyQualifiedResourceFromAll(ResourceFinderClass* resourceFinder);
@@ -100,7 +100,7 @@ public:
 	 * Will search for near matches (it will call CollectNearMatchResources
 	 * on each resource finder).
 	 * 
-	 * @param resourceFinder the resource finder to search. This class will NOT own the pointer.
+	 * @param resourceFinder the resource finder to search (in addition to all of the registered ones). This class will NOT own the pointer.
 	 * @return bool TRUE if at least one resource finder got a match
 	 */
 	bool CollectNearMatchResourcesFromAll(ResourceFinderClass* resourceFinder);
@@ -112,9 +112,18 @@ public:
 	
 	/**
 	 * Get the symbol that is at the given pos on the given file.
-	 * @return the symbol; can be empty if it could not figured out or pos is invalid
+	 * 
+	 * @param fileName the symbol table of this registered file will be searched
+	 * @param resourceFinder resource finder to search (in addition to all of the registered ones). This class will NOT own the pointer.
+	 * @param symbol
+	 * @return the symbol name; can be empty if it could not figured out or pos is invalid
 	 */
-	UnicodeString GetSymbolAt(const wxString& fileName, int pos, ResourceFinderClass* resourceFinder);
+	UnicodeString GetSymbolAt(const wxString& fileName, int pos, ResourceFinderClass* resourceFinder, mvceditor::SymbolClass& symbol, const UnicodeString& code);
+	
+	/**
+	 * Basically just a calls the GetVariablesInScope() of the given file's SymbolTable
+	 */	
+	std::vector<UnicodeString> GetVariablesInScope(const wxString& fileName, int pos, const UnicodeString& code);
 	
 private:
 
@@ -126,7 +135,6 @@ private:
 	 */
 	std::vector<ResourceFinderClass*> Iterator(ResourceFinderClass* resourceFinder);
 	
-
 	/**
 	 * These are the objects that will parse the source codes
 	 */

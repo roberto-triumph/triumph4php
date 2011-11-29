@@ -222,19 +222,14 @@ std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const
 	}
 		
 	// word will start with a '$" if its a variable
-	//the word will contain the $ in case of variables since "$" is a word characters (via SetWordCharacters() call)
+	//the word will contain the $ in case of variables since "$" is a word characters (via wxStyledTextCtrl::SetWordCharacters() call)
 	if (word.charAt(0) == '$') {
 		
-		// hmmm this means that code will be scanned again (here and up above by the LanguageDiscoveryClass)
-		// TODO: parsing it again? that's 3 times now
-		// TODO fix the double-scanning
-		SymbolTable.CreateSymbols(code);
-
-		//+1 = do not take the '$' into account
-		UnicodeString symbol(word, 1);
-		std::vector<UnicodeString> variables = SymbolTable.GetVariablesInScope(code.length() - 1);
+		//+1 = do not take the '$' into account since SymbolTable drops the '$' 
+		UnicodeString symbolName(word, 1);
+		std::vector<UnicodeString> variables = ResourceUpdates->Worker.GetVariablesInScope(fileName, code.length() - 1, code);
 		for (size_t i = 0; i < variables.size(); ++i) {
-			if (0 == variables[i].indexOf(symbol)) {
+			if (0 == variables[i].indexOf(symbolName)) {
 				autoCompleteList.push_back(wxT("$") + StringHelperClass::IcuToWx(variables[i]));
 			}
 		}
@@ -244,44 +239,27 @@ std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const
 		
 		// look up the type of the word (is the word in the context of a class, method or function ?
 		// SymbolTable resolves stuff like parent:: and self:: as well we don't need to do it here
-		SymbolTable.CreateSymbols(code);
-		SymbolClass::Types type;
-		UnicodeString objectType,
-			objectMember,
-			comment,
-			symbol(word);
-		bool isThisCall(false),
-			isParentCall(false),
-			isStaticCall(false);
-		if (SymbolTable.Lookup(code.length() - 1, *globalResourceFinder, type, objectType, objectMember, comment, isThisCall, isParentCall, isStaticCall)) {
-			bool isObjectMethodOrProperty = SymbolClass::OBJECT == type ||SymbolClass::METHOD == type || SymbolClass::PROPERTY == type;
-			if (isObjectMethodOrProperty) {
-				// even if objectType is empty, symbol will be something like '::METHOD' which the 
-				// ResourceFinder will interpret to look for methods only (which is what we want here)
-				symbol = objectType + UNICODE_STRING_SIMPLE("::") + objectMember;
-			}
-			else {
-				symbol = objectType;
-			}
-		}
+		mvceditor::SymbolClass symbol;
+		UnicodeString symbolName = ResourceUpdates->Worker.GetSymbolAt(fileName, code.length() - 1, globalResourceFinder, symbol, code);
+		
 		
 		// get all other resources that start like the word
-		wxString wxSymbol = mvceditor::StringHelperClass::IcuToWx(symbol);
+		wxString wxSymbol = mvceditor::StringHelperClass::IcuToWx(symbolName);
 		if (ResourceUpdates->Worker.PrepareAll(globalResourceFinder, wxSymbol)) {
 			if (ResourceUpdates->Worker.CollectNearMatchResourcesFromAll(globalResourceFinder)) {
 				std::vector<mvceditor::ResourceClass> matches = ResourceUpdates->Worker.Matches(globalResourceFinder);
 				for (size_t i = 0; i < matches.size(); ++i) {
 					mvceditor::ResourceClass resource = matches[i];
-					bool passesStaticCheck = isStaticCall == resource.IsStatic;
+					bool passesStaticCheck = symbol.IsStatic == resource.IsStatic;
 
 					// if the resource starts with symbol it means that resource is a member of "$this"
-					bool isInherited = FALSE != resource.Resource.startsWith(symbol);
+					bool isInherited = FALSE != resource.Resource.startsWith(symbolName);
 
 					// $this => can access this resource's private, parent's protected/public, other public
 					// parent => can access parent's protected/public
 					// neither => can only access public
 					bool passesVisibilityCheck = !resource.IsPrivate && !resource.IsProtected;
-					if (!passesVisibilityCheck && isParentCall) {
+					if (!passesVisibilityCheck && mvceditor::SymbolClass::PARENT == symbol.Type) {
 
 						// this check assumes that the resource finder has traversed the inheritance chain
 						// properly. then, by a process of elimination, if the resource class is not
@@ -296,6 +274,8 @@ std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const
 					if (passesStaticCheck && passesVisibilityCheck) {
 						wxString s = mvceditor::StringHelperClass::IcuToWx(resource.Identifier);
 						if (resource.IsStatic && resource.Type == mvceditor::ResourceClass::MEMBER) {
+							
+							// SymbolTable drops the '$' but we want the auto complete to type it in for the user
 							s = wxT("$") + s;
 						}
 						autoCompleteList.push_back(s);

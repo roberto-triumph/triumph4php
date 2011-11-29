@@ -123,6 +123,12 @@ bool mvceditor::CodeControlClass::LoadAndTrackFile(const wxString& filename) {
 			SetSavePoint();
 			NeedToUpdateResources = false;
 			CurrentFilename = filename;
+			
+			// important to set the fileIdentifier to the name;
+			// the ResourceUpdates object will need to know what files are being edited so it can mark them as 'dirty'
+			ResourceUpdates->Unregister(FileIdentifier);
+			FileIdentifier = filename;
+			
 			FileOpenedDateTime = file.GetModificationTime();
 			AutoDetectDocumentMode();
 		}
@@ -171,6 +177,11 @@ bool mvceditor::CodeControlClass::SaveAndTrackFile(wxString newFilename) {
 		//if (finder != NULL) {
 		//	finder->Walk(CurrentFilename);
 		//}
+		
+		// important to set the fileIdentifier to the name;
+		// the ResourceUpdates object will need to know what files are being edited so it can mark them as 'dirty'
+		ResourceUpdates->Unregister(FileIdentifier);
+		FileIdentifier = newFilename;
 		
 		// if the file extension changed let's update the code control appropriate
 		// for example if a .txt file was saved as a .sql file
@@ -255,13 +266,15 @@ wxString mvceditor::CodeControlClass::GetCurrentSymbol() {
 
 wxString mvceditor::CodeControlClass::GetSymbolAt(int posToCheck) {
 	ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
-	UnicodeString symbol = ResourceUpdates->Worker.GetSymbolAt(FileIdentifier, posToCheck, resourceFinder);
-	if (symbol.isEmpty()) {
+	mvceditor::SymbolClass symbol;
+	UnicodeString code = GetSafeText();
+	UnicodeString symbolName = ResourceUpdates->Worker.GetSymbolAt(FileIdentifier, posToCheck, resourceFinder, symbol, code);
+	if (symbolName.isEmpty()) {
 		int startPos = WordStartPosition(posToCheck, true);
 		int endPos = WordEndPosition(posToCheck, true);
-		symbol = GetSafeSubstring(startPos, endPos);	
+		symbolName = GetSafeSubstring(startPos, endPos);	
 	}
-	return StringHelperClass::IcuToWx(symbol);
+	return StringHelperClass::IcuToWx(symbolName);
 }
 
 void mvceditor::CodeControlClass::HandleAutoCompletion() {
@@ -335,10 +348,10 @@ void mvceditor::CodeControlClass::HandleCallTip(wxChar ch, bool force) {
 			if (ResourceUpdates->Worker.PrepareAll(globalResourceFinder, symbol)) {
 				
 				// highly unlikely that there is more than one match since we searched for a full name (lookup succeeded).
-				// before this did a near matches: why?? resourceFinder->CollectNearMatchResources()
-				if (ResourceUpdates->Worker.CollectFullyQualifiedResourceFromAll(globalResourceFinder)) {
+				// use CollectNearMatchResources to handle the case when  the method is inherited
+				if (ResourceUpdates->Worker.CollectNearMatchResourcesFromAll(globalResourceFinder)) {
 					std::vector<mvceditor::ResourceClass> matches = ResourceUpdates->Worker.Matches(globalResourceFinder);
-					if (!matches.empty()) {
+					if (matches.size() == 1) {
 						mvceditor::ResourceClass resource = matches[0];
 						UnicodeString fullQualifiedResource =  resource.Resource;
 						CurrentSignature = mvceditor::StringHelperClass::IcuToWx(resource.Signature);

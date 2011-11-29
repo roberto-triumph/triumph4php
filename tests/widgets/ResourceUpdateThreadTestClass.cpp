@@ -43,6 +43,8 @@ TEST(RegisterShouldFail) {
 }
 
 TEST(CollectShouldGetFromAllFinders) {
+	
+	// going to create 3 'files'
 	mvceditor::ResourceUpdateClass resourceUpdates;
 	wxString file1 = wxT("file1.php");
 	wxString file2 = wxT("file2.php");
@@ -51,6 +53,7 @@ TEST(CollectShouldGetFromAllFinders) {
 	UnicodeString code2 = UNICODE_STRING_SIMPLE("<?php class ActionYou  { function w() {} }");
 	UnicodeString code3 = UNICODE_STRING_SIMPLE("<?php class ActionThey { function w() {} }");
 	
+	// parse the 3 files for resources
 	CHECK(resourceUpdates.Register(file1));
 	CHECK(resourceUpdates.Register(file2));
 	CHECK(resourceUpdates.Update(file1, code1));
@@ -58,10 +61,12 @@ TEST(CollectShouldGetFromAllFinders) {
 	mvceditor::ResourceFinderClass globalFinder;
 	globalFinder.BuildResourceCacheForFile(file3, code3);
 	
+	// now perform the search. will search for any resource that starts with 'Action'
+	// all 3 caches should hit
 	CHECK(resourceUpdates.PrepareAll(&globalFinder, wxT("Action")));
 	CHECK(resourceUpdates.CollectNearMatchResourcesFromAll(&globalFinder));
 	
-	globalFinder.Print();
+	
 	std::vector<mvceditor::ResourceClass> matches = resourceUpdates.Matches(&globalFinder);
 	CHECK_EQUAL((size_t)3, matches.size());
 	if (3 == matches.size()) {
@@ -73,8 +78,62 @@ TEST(CollectShouldGetFromAllFinders) {
 	}
 }
 
-TEST(GetSymbolAt) {
-
+TEST(GetSymbolAtWithGlobalFinder) {
+	
+	// in this test we will create a class in file2; file1 will use that class
+	// the ResourceUpdate object should be able to detect the variable type of 
+	// the variable in file1
+	mvceditor::ResourceUpdateClass resourceUpdates;
+	wxString file1 = wxT("file1.php");
+	wxString file2 = wxT("file2.php");
+	UnicodeString code1 = UNICODE_STRING_SIMPLE("<?php $action = new ActionYou(); $action->w(); ");
+	UnicodeString code2 = UNICODE_STRING_SIMPLE("<?php class ActionYou  { function w() {} }");
+	mvceditor::ResourceFinderClass globalFinder;
+	globalFinder.BuildResourceCacheForFile(file2, code2);
+	
+	CHECK(resourceUpdates.Register(file1));
+	CHECK(resourceUpdates.Update(file1, code1));
+	
+	int posToCheck = code1.indexOf(UNICODE_STRING_SIMPLE("->")) + 2; // position of "->w()" in code1
+	
+	mvceditor::SymbolClass symbol;
+	UnicodeString symbolName = resourceUpdates.GetSymbolAt(file1, posToCheck, &globalFinder, symbol, code1);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionYou::"), symbolName);
 }
 
+TEST(GetSymbolAtWithRegisteredFinder) {
+	
+	// in this test we will create a class in file3; file1 will use that class
+	// the ResourceUpdate object should be able to detect the variable type of 
+	// the variable in file1
+	// the difference here is that the class is now defined in one of the registered files
+	mvceditor::ResourceUpdateClass resourceUpdates;
+	wxString file1 = wxT("file1.php");
+	wxString file2 = wxT("file2.php");
+	wxString file3 = wxT("file3.php");
+	UnicodeString code1 = UNICODE_STRING_SIMPLE("<?php $action = new ActionYou(); $action->w(); ");
+	UnicodeString code2 = UNICODE_STRING_SIMPLE("<?php class ActionMe  { function yy() { $this->  } }");
+	UnicodeString code3 = UNICODE_STRING_SIMPLE("<?php class ActionYou  { function w() {} }");
+	mvceditor::ResourceFinderClass globalFinder;
+	globalFinder.BuildResourceCacheForFile(file2, code2);
+	
+	CHECK(resourceUpdates.Register(file1));
+	CHECK(resourceUpdates.Update(file1, code1));
+	CHECK(resourceUpdates.Register(file3));
+	CHECK(resourceUpdates.Update(file3, code3));
+	
+	int posToCheck = code1.indexOf(UNICODE_STRING_SIMPLE("->w")) + 3; // position of "->w()" in code1
+	
+	mvceditor::SymbolClass symbol;
+	UnicodeString symbolName = resourceUpdates.GetSymbolAt(file1, posToCheck, &globalFinder, symbol, code1);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionYou::w"), symbolName);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionYou"), symbol.TypeLexeme);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("w"), symbol.Lexeme);
+	
+	CHECK(resourceUpdates.Register(file2));
+	CHECK(resourceUpdates.Update(file2, code2));
+	posToCheck = code2.indexOf(UNICODE_STRING_SIMPLE("->")) + 2; // position of "->()" in code3
+	symbolName = resourceUpdates.GetSymbolAt(file2, posToCheck, &globalFinder, symbol, code2);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionMe::"), symbolName);
+}
 }
