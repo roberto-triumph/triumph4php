@@ -1,9 +1,26 @@
 /**
- * $Date: 2011-08-13 20:31:56 -0700 (Sat, 13 Aug 2011) $
- * $Rev: 596 $
- * $Author: robertop2004@gmail.com $
+ * This software is released under the terms of the MIT License
  * 
- * @copyright 2010 Roberto Perpuly
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * @copyright  2009-2011 Roberto Perpuly
+ * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <plugins/FindInFilesPluginClass.h>
 #include <windows/StringHelperClass.h>
@@ -28,6 +45,9 @@ bool mvceditor::FindInFilesBackgroundReaderClass::InitForFind(wxEvtHandler* hand
 
 	// find in files needs to be a copy; just to be sure
 	// its thread safe
+	// TODO: for files that are currently "dirty" (modified) we need to search the editor contents
+	// and not the file contents
+	// Kind of like the "SkipFiles" property
 	FindInFiles = findInFiles;
 	return Init(path) && FindInFiles.Prepare();
 }

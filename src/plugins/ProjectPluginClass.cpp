@@ -192,6 +192,9 @@ void mvceditor::ProjectPluginClass::OnMenu(wxCommandEvent& event) {
 		project.Trim();
 		wxFileName fileName(project);
 		bool remove = false;
+
+		// TODO: this logic does not work on Windows.  When a project directory is deleted;
+		// this prompt does not get triggered.
 		if (fileName.FileExists()) {
 			int ret = wxMessageBox(_("Path is not a directory. Remove from Recent list?\n") + project, _("Warning"), 
 				wxCENTER | wxICON_ERROR | wxYES_NO);

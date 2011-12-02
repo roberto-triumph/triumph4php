@@ -66,6 +66,9 @@ void mvceditor::ResourceUpdateClass::Unregister(const wxString& fileName) {
 	}
 	Finders.erase(fileName);
 	SymbolTables.erase(fileName);
+
+	// TODO: need to "retrigger" resource parsing on this file on the global resource finder object
+	// so that it is updated with the new contents.
 }
 
 bool mvceditor::ResourceUpdateClass::Update(const wxString& fileName, const UnicodeString& code) {
@@ -86,7 +89,9 @@ bool mvceditor::ResourceUpdateClass::Update(const wxString& fileName, const Unic
 
 bool mvceditor::ResourceUpdateClass::IsDirty(const ResourceClass& resource) {
 	bool ret = false;
-	
+	// TODO: implement this; need when collecting Resource matches we 
+	// need to ignore the matches that come from files that are being edited; as this
+	// means that the results are probably stale.
 	return ret;
 }
 
