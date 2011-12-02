@@ -350,6 +350,7 @@ std::vector<wxString> mvceditor::SqlDocumentClass::HandleAutoComplete(const wxSt
 	}
 	
 	// look at the meta data
+	// TODO: mysql information_schema stuff does not show up under code completion
 	mvceditor::SqlResourceFinderClass* finder = Project->GetSqlResourceFinder();
 	if (!CurrentInfo.Host.isEmpty()) {
 		UnicodeString error;
