@@ -25,6 +25,7 @@
 #include <plugins/FinderPluginClass.h>
 #include <windows/StringHelperClass.h>
 #include <widgets/UnicodeStringValidatorClass.h>
+#include <widgets/FinderValidatorClass.h>
 #include <wx/artprov.h>
 #include <wx/numdlg.h>
 #include <wx/valgen.h>
@@ -93,8 +94,8 @@ mvceditor::FinderPanelClass::FinderPanelClass(wxWindow* parent, mvceditor::Noteb
 		, ComboBoxHistory(FindText)
 		, Notebook(notebook)
 		, AuiManager(auiManager) {
-	UnicodeStringValidatorClass expressionValidator(&Finder.Expression);
-	FindText->SetValidator(expressionValidator);
+	mvceditor::FinderValidatorClass finderValidator(&Finder, FinderMode);
+	FindText->SetValidator(finderValidator);
 	wxGenericValidator modeValidator(&Finder.Mode);
 	FinderMode->SetValidator(modeValidator);
 	wxGenericValidator wrapValidator(&Finder.Wrap);
@@ -247,8 +248,8 @@ mvceditor::ReplacePanelClass::ReplacePanelClass(wxWindow* parent, mvceditor::Not
 		, ReplaceHistory(ReplaceWithText)
 		, Notebook(notebook)
 		, AuiManager(auiManager) {
-	UnicodeStringValidatorClass expressionValidator(&Finder.Expression);
-	FindText->SetValidator(expressionValidator);
+	mvceditor::FinderValidatorClass finderValidator(&Finder, FinderMode);
+	FindText->SetValidator(finderValidator);
 	wxGenericValidator modeValidator(&Finder.Mode);
 	FinderMode->SetValidator(modeValidator);
 	wxGenericValidator wrapValidator(&Finder.Wrap);
@@ -272,7 +273,6 @@ mvceditor::ReplacePanelClass::ReplacePanelClass(wxWindow* parent, mvceditor::Not
 		wxART_TOOLBAR, wxSize(16, 16))));
 	ReplaceWithText->MoveAfterInTabOrder(FindText);
 	RegExReplaceHelpButton->MoveAfterInTabOrder(ReplaceWithText);
-	//ReplaceWithText->MoveBeforeInTabOrder(FindText);
 
 	// since this panel handles EVT_TEXT_ENTER, we need to handle th
 	// tab traversal ourselves otherwise tab travesal wont work
