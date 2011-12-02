@@ -367,6 +367,12 @@ mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvce
 	FilesFilter->SetValidator(filesFilterValidator);
 	CaseSensitive->SetValidator(caseValidator);
 	FindText->SetFocus();
+
+	// since this panel handles EVT_TEXT_ENTER, we need to handle th
+	// tab traversal ourselves otherwise tab travesal wont work
+	ReplaceWithText->GetEventHandler()->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown));
+	FindText->GetEventHandler()->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown));
+	FilesFilter->GetEventHandler()->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown));
 }
 
 void mvceditor::FindInFilesDialogClass::OnOkButton(wxCommandEvent& event) {
@@ -398,6 +404,18 @@ void mvceditor::FindInFilesDialogClass::OnCancelButton(wxCommandEvent& event) {
 	Plugin.ReplaceHistory.Detach();
 	Plugin.FilesHistory.Detach();
 	EndModal(wxID_CANCEL);
+}
+
+void mvceditor::FindInFilesDialogClass::OnKeyDown(wxKeyEvent& event) {
+	if (event.GetKeyCode() == WXK_TAB && event.ShiftDown()) {
+		Navigate(wxNavigationKeyEvent::IsBackward);
+	}
+	else if (event.GetKeyCode() == WXK_TAB ) {
+		Navigate(wxNavigationKeyEvent::IsForward);
+	}
+	else {
+		event.Skip();
+	}
 }
 
 mvceditor::FindInFilesPluginClass::FindInFilesPluginClass()

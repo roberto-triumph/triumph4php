@@ -271,7 +271,13 @@ mvceditor::ReplacePanelClass::ReplacePanelClass(wxWindow* parent, mvceditor::Not
 	UndoButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_UNDO, 
 		wxART_TOOLBAR, wxSize(16, 16))));
 	ReplaceWithText->MoveAfterInTabOrder(FindText);
-	
+	RegExReplaceHelpButton->MoveAfterInTabOrder(ReplaceWithText);
+	//ReplaceWithText->MoveBeforeInTabOrder(FindText);
+
+	// since this panel handles EVT_TEXT_ENTER, we need to handle th
+	// tab traversal ourselves otherwise tab travesal wont work
+	ReplaceWithText->GetEventHandler()->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::ReplacePanelClass::OnKeyDown));
+	FindText->GetEventHandler()->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::ReplacePanelClass::OnKeyDown));
 }
 
 void mvceditor::ReplacePanelClass::SetFocusOnFindText() {
@@ -458,6 +464,18 @@ void mvceditor::ReplacePanelClass::OnFindEnter(wxCommandEvent& event) {
 
 void mvceditor::ReplacePanelClass::OnReplaceEnter(wxCommandEvent& event) {
 	OnReplaceButton(event);
+}
+
+void mvceditor::ReplacePanelClass::OnKeyDown(wxKeyEvent& event) {
+	if (event.GetKeyCode() == WXK_TAB && event.ShiftDown()) {
+		Navigate(wxNavigationKeyEvent::IsBackward);
+	}
+	else if (event.GetKeyCode() == WXK_TAB ) {
+		Navigate(wxNavigationKeyEvent::IsForward);
+	}
+	else {
+		event.Skip();
+	}
 }
 
 void mvceditor::ReplacePanelClass::OnRegExFindHelpButton(wxCommandEvent& event) {

@@ -292,6 +292,11 @@ private:
 
 	FindInFilesPluginClass& Plugin;
 	
+	/** 
+	 * since this panel handles EVT_TEXT_ENTER, we need to handle the
+	 * tab traversal ourselves otherwise tab travesal wont work
+	 */
+	void OnKeyDown(wxKeyEvent& event);
 };
 
 }

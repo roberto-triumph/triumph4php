@@ -241,6 +241,12 @@ private:
 	 */
 	void InsertReplaceRegExSymbol(wxCommandEvent& event);
 
+	/** 
+	 * since this panel handles EVT_TEXT_ENTER, we need to handle the
+	 * tab traversal ourselves otherwise tab travesal wont work
+	 */
+	void OnKeyDown(wxKeyEvent& event);
+
 	/**
 	 * The Finder object to be displayed.
 	 * 
