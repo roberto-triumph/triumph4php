@@ -139,9 +139,6 @@ bool mvceditor::CodeControlClass::LoadAndTrackFile(const wxString& filename) {
 }
 
 void mvceditor::CodeControlClass::Revert() {
-
-	// TODO: when a file is reverted the editor crashes
-	// seen this on Win32
 	if (!IsNew()) {
 		if (ResourceUpdates) {
 			ResourceUpdates->Unregister(FileIdentifier);

@@ -42,6 +42,14 @@ TEST(RegisterShouldFail) {
 	CHECK_EQUAL(false, resourceUpdates.Register(fileName));
 }
 
+TEST(RegisterShouldFailAfterSucceedAfterUnregistering) {	
+	wxString fileName = wxT("MyFile.php");
+	mvceditor::ResourceUpdateClass resourceUpdates;
+	CHECK(resourceUpdates.Register(fileName));
+	resourceUpdates.Unregister(fileName);
+	CHECK(resourceUpdates.Register(fileName));
+}
+
 TEST(CollectShouldGetFromAllFinders) {
 	
 	// going to create 3 'files'

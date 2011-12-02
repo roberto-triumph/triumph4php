@@ -62,7 +62,7 @@ void mvceditor::ResourceUpdateClass::Unregister(const wxString& fileName) {
 	}
 	std::map<wxString, mvceditor::SymbolTableClass*>::iterator itSymbols = SymbolTables.find(fileName);
 	if (itSymbols != SymbolTables.end()) {
-		delete it->second;
+		delete itSymbols->second;
 	}
 	Finders.erase(fileName);
 	SymbolTables.erase(fileName);
