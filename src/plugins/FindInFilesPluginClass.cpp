@@ -8,7 +8,7 @@
 #include <plugins/FindInFilesPluginClass.h>
 #include <windows/StringHelperClass.h>
 #include <widgets/UnicodeStringValidatorClass.h>
-#include <widgets/FinderValidatorClass.h>
+#include <widgets/RegularExpressionValidatorClass.h>
 #include <wx/artprov.h>
 #include <wx/clipbrd.h>
 #include <wx/ffile.h>
@@ -378,9 +378,9 @@ mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvce
 
 	// since this panel handles EVT_TEXT_ENTER, we need to handle the
 	// tab traversal ourselves otherwise tab travesal wont work
-	FindText->GetEventHandler()->Connect(wxID_ANY, wxID_ANY, wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown), NULL, this);
-	ReplaceWithText->GetEventHandler()->Connect(wxID_ANY, wxID_ANY, wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown), NULL, this);
-	FilesFilter->GetEventHandler()->Connect(wxID_ANY, wxID_ANY, wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown), NULL, this);
+	FindText->GetEventHandler()->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown));
+	ReplaceWithText->GetEventHandler()->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown));
+	FilesFilter->GetEventHandler()->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown));
 	
 	// connect to the KILL_FOCUS events so that we can capture the insertion point
 	// on Win32 GetInsertionPoint() returns 0 when the combo box is no
@@ -390,9 +390,9 @@ mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvce
 }
 
 mvceditor::FindInFilesDialogClass::~FindInFilesDialogClass() {
-	FindText->GetEventHandler()->Disconnect(wxID_ANY, wxID_ANY, wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown), NULL, this);
-	ReplaceWithText->GetEventHandler()->Disconnect(wxID_ANY, wxID_ANY, wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown), NULL, this);
-	FilesFilter->GetEventHandler()->Disconnect(wxID_ANY, wxID_ANY, wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown), NULL, this);
+	FindText->GetEventHandler()->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown));
+	ReplaceWithText->GetEventHandler()->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown));
+	FilesFilter->GetEventHandler()->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown));
 
 	FindText->GetEventHandler()->Disconnect(wxID_ANY, wxID_ANY, wxEVT_KILL_FOCUS, wxFocusEventHandler(FindInFilesDialogClass::OnKillFocusFindText), NULL, this);
 	ReplaceWithText->GetEventHandler()->Disconnect(wxID_ANY, wxID_ANY, wxEVT_KILL_FOCUS, wxFocusEventHandler(FindInFilesDialogClass::OnKillFocusReplaceText), NULL, this);
@@ -430,6 +430,8 @@ void mvceditor::FindInFilesDialogClass::OnCancelButton(wxCommandEvent& event) {
 }
 
 void mvceditor::FindInFilesDialogClass::OnKeyDown(wxKeyEvent& event) {
+
+	// warning: don't use "this"; look at the way this event has been connected 
 	if (event.GetKeyCode() == WXK_TAB && event.ShiftDown()) {
 		Navigate(wxNavigationKeyEvent::IsBackward);
 	}
