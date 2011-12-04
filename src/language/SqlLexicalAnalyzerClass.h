@@ -82,8 +82,6 @@ public:
 	 */
 	int GetLineNumber() const;
 	
-	// TODO: need to implement a Close to clean up resources
-
 	private:
 
 	/**
