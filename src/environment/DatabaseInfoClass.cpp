@@ -237,19 +237,6 @@ bool mvceditor::SqlQueryClass::Execute(soci::statement& stmt, UnicodeString& err
 	return success;
 }
 
-bool mvceditor::SqlQueryClass::GotData(soci::statement& stmt) {
-	bool ret =  false;
-	try {
-		ret = stmt.got_data();
-	}
-	catch (std::exception const& e) {
-
-		// TODO: make error accessible?
-		puts(e.what());
-	}
-	return ret;
-}
-
 bool mvceditor::SqlQueryClass::More(soci::statement& stmt, bool& hasError, UnicodeString& error) {
 	bool ret = false;
 	try {

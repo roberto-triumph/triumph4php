@@ -279,12 +279,6 @@ class SqlQueryClass {
 	bool Execute(soci::statement& stmt, UnicodeString& error);
 	
 	/**
-	 * This method can be used to check if a statement has data left.
-	 * @return true if the stamement has rows in its result.
-	 */
-	bool GotData(soci::statement& stmt);
-	
-	/**
 	 * Returns true if there are more results to be read. Also moves the result set cursor to 
 	 * the next row
 	 * @param stmt the statement that HAS ALREADY been executed
