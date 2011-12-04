@@ -31,71 +31,29 @@
 #include <wx/valgen.h>
 #include <wx/valtext.h>
 
-const int ID_MENU_FIND = mvceditor::PluginClass::newMenuId();
-const int ID_MENU_FIND_NEXT = mvceditor::PluginClass::newMenuId();
-const int ID_MENU_FIND_PREVIOUS = mvceditor::PluginClass::newMenuId();
-const int ID_MENU_GOTO_LINE = mvceditor::PluginClass::newMenuId();
-const int ID_MENU_REPLACE = mvceditor::PluginClass::newMenuId();
-const int ID_FIND_PANEL = wxNewId(); 
-const int ID_REPLACE_PANEL = wxNewId(); 
-const int ID_MENU_REG_EX_SEQUENCE_ZERO = wxNewId();
-const int ID_MENU_REG_EX_SEQUENCE_ONE = wxNewId();
-const int ID_MENU_REG_EX_ZERO_OR_ONE = wxNewId();
-const int ID_MENU_REG_EX_SEQUENCE_EXACT = wxNewId();
-const int ID_MENU_REG_EX_SEQUENCE_AT_LEAST = wxNewId();
-const int ID_MENU_REG_EX_SEQUENCE_BETWEEN = wxNewId();
-const int ID_MENU_REG_EX_BEGIN_OF_LINE = wxNewId();
-const int ID_MENU_REG_EX_END_OF_LINE = wxNewId();
-const int ID_MENU_REG_EX_DIGIT = wxNewId();
-const int ID_MENU_REG_EX_WHITE_SPACE = wxNewId();
-const int ID_MENU_REG_EX_ALPHANUMERIC = wxNewId();
-const int ID_MENU_REG_EX_NOT_DECIMAL = wxNewId();
-const int ID_MENU_REG_EX_NOT_WHITE_SPACE = wxNewId();
-const int ID_MENU_REG_EX_NOT_ALPHANUMERIC = wxNewId();
-const int ID_MENU_REG_EX_CASE_SENSITIVE = wxNewId();
-const int ID_MENU_REG_EX_COMMENT = wxNewId();
-const int ID_MENU_REG_EX_DOT_ALL = wxNewId();
-const int ID_MENU_REG_EX_MULTI_LINE = wxNewId();
-const int ID_MENU_REG_EX_UWORD = wxNewId();
+static const int ID_MENU_FIND = mvceditor::PluginClass::newMenuId();
+static const int ID_MENU_FIND_NEXT = mvceditor::PluginClass::newMenuId();
+static const int ID_MENU_FIND_PREVIOUS = mvceditor::PluginClass::newMenuId();
+static const int ID_MENU_GOTO_LINE = mvceditor::PluginClass::newMenuId();
+static const int ID_MENU_REPLACE = mvceditor::PluginClass::newMenuId();
+static const int ID_FIND_PANEL = wxNewId(); 
+static const int ID_REPLACE_PANEL = wxNewId(); 
 
-const int ID_MENU_REG_EX_REPLACE_MATCH_ONE = wxNewId();
-const int ID_MENU_REG_EX_REPLACE_MATCH_TWO = wxNewId();
-const int ID_MENU_REG_EX_REPLACE_MATCH_THREE = wxNewId();
-const int ID_MENU_REG_EX_REPLACE_MATCH_FOUR = wxNewId();
-const int ID_MENU_REG_EX_REPLACE_MATCH_FIVE = wxNewId();
-
-
-/**
- * Add all of the regular expression flags to the given menu
- */
-void PopulateRegExMenu(wxMenu& regExMenu);
-
-/**
- * Alter the given textbox (that contains a regular expression) depending on the user choice. 
- * Note that the caret will be left where the text was inserted
- * 
- * @param wxComboBox& the textbox containing the regular expression (will be modified in place)
- * @param int menuId the menu ID that the user chose.
- */
-void AddSymbolToRegularExpression(wxComboBox* text, const int menuId);
-
-/**
- * Add a flag to the given regular expression string, taking care not to clobber existing flags
- * 
- * @param wxComboBox& the textbox containing the regular expression (will be modified in place)
- * @param wxString flag the flag to add to the regular expression
- */
-void AddFlagToRegEx(wxComboBox* text, wxString flag);
-
+// these IDs are needed so that the IDs of the Regular expression help menu
+// do not collide with the menu IDs of the FinderPlugin
+static const int ID_REGEX_MENU_START = 11000;
+static const int ID_REGEX_REPLACE_FIND_MENU_START = 12000;
+static const int ID_REGEX_REPLACE_MENU_START = 13000;
 
 mvceditor::FinderPanelClass::FinderPanelClass(wxWindow* parent, mvceditor::NotebookClass* notebook, wxAuiManager* auiManager, int windowId)
 		: FinderPanelGeneratedClass(parent, windowId)
 		, Finder()
 		, ComboBoxHistory(FindText)
 		, Notebook(notebook)
-		, AuiManager(auiManager) {
-	mvceditor::FinderValidatorClass finderValidator(&Finder, FinderMode);
-	FindText->SetValidator(finderValidator);
+		, AuiManager(auiManager) 
+		, CurrentInsertionPointFind(0) {
+	mvceditor::RegularExpressionValidatorClass regExValidator(&Finder.Expression, FinderMode);
+	FindText->SetValidator(regExValidator);
 	wxGenericValidator modeValidator(&Finder.Mode);
 	FinderMode->SetValidator(modeValidator);
 	wxGenericValidator wrapValidator(&Finder.Wrap);
@@ -109,6 +67,15 @@ mvceditor::FinderPanelClass::FinderPanelClass(wxWindow* parent, mvceditor::Noteb
 		wxART_TOOLBAR, wxSize(16, 16))));
 	CloseButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_ERROR, 
 		wxART_FRAME_ICON, wxSize(16, 16))));
+
+	// connect to the KILL_FOCUS events so that we can capture the insertion point
+	// on Win32 GetInsertionPoint() returns 0 when the combo box is no
+	// in focus; we must receive the position via an outside mechanism
+	FindText->GetEventHandler()->Connect(wxID_ANY, wxID_ANY, wxEVT_KILL_FOCUS, wxFocusEventHandler(FinderPanelClass::OnKillFocusFindText), NULL, this);
+}
+
+mvceditor::FinderPanelClass::~FinderPanelClass() {
+	FindText->GetEventHandler()->Disconnect(wxID_ANY, wxID_ANY, wxEVT_KILL_FOCUS, wxFocusEventHandler(FinderPanelClass::OnKillFocusFindText), NULL, this);
 }
 
 void mvceditor::FinderPanelClass::SetFocusOnFindText() {
@@ -179,19 +146,20 @@ void mvceditor::FinderPanelClass::OnNextButton(wxCommandEvent& event) {
 }
 
 void mvceditor::FinderPanelClass::OnHelpButton(wxCommandEvent& event) {
-  //TODO: get the strings from translation "_()" macro
-  wxString help = wxT("Find modes:\n")
-	  wxT("Code:\n" )
-	  wxT("Type in PHP source code.  The editor will ignore whitespace ")
-	  wxT("where it does not matter and will also match single and double quoted literals ")
-	  wxT("if their contents match. For example, searching for\n\tstr_pos($text, 'needle')\n")
-	  wxT("will match\n\tstr_pos( $text,\"needle\" )\n\n")
-	  wxT("Exact:\n")
-	  wxT("Searching will be done using exact, case sensitive matching\n\n")
-	  wxT("Regular Expression:\n")
-	  wxT("Searching will be done using the entered regular expression. Regular ")
-	  wxT("expression syntax is that of an \"Advanced Regular Expression\" (ARE) as ")
-	  wxT("described at http://docs.wxwidgets.org/stable/wx_wxresyn.html\n");
+	wxString help = wxString::FromAscii("Find modes:\n"
+	  "Code:\n" 
+	  "Type in PHP source code.  The editor will ignore whitespace "
+	  "where it does not matter and will also match single and double quoted literals "
+	  "if their contents match. For example, searching for\n\tstr_pos($text, 'needle')\n"
+	  "will match\n\tstr_pos( $text,\"needle\" )\n\n"
+	  "Exact:\n"
+	  "Searching will be done using exact, case sensitive matching\n\n"
+	  "Regular Expression:\n"
+	  "Searching will be done using the entered regular expression. You "
+	  "can use the button on the right to see all regular expression symbols."
+	  "The full regular expression syntax is described at "
+	  "http://www.unicode.org/reports/tr18/\n");
+	help = wxGetTranslation(help);
 	wxMessageBox(help, _("Find Help"), wxOK, this);
 }
 
@@ -231,14 +199,19 @@ void mvceditor::FinderPanelClass::OnFindEnter(wxCommandEvent& event) {
 
 void mvceditor::FinderPanelClass::OnRegExFindHelpButton(wxCommandEvent& event) {
 	wxMenu regExMenu;
-	PopulateRegExMenu(regExMenu);
+	mvceditor::PopulateRegExFindMenu(regExMenu, ID_REGEX_MENU_START);
 	PopupMenu(&regExMenu);	
 }
 
 void mvceditor::FinderPanelClass::InsertRegExSymbol(wxCommandEvent& event) {
-	int id = event.GetId();
-	AddSymbolToRegularExpression(FindText, id);
+	int id = event.GetId() - ID_REGEX_MENU_START;
+	mvceditor::AddSymbolToRegularExpression(FindText, id, CurrentInsertionPointFind);
 	FinderMode->SetSelection(FinderClass::REGULAR_EXPRESSION);
+}
+
+void mvceditor::FinderPanelClass::OnKillFocusFindText(wxFocusEvent& event) {
+	CurrentInsertionPointFind = FindText->GetInsertionPoint();
+	event.Skip();
 }
 
 mvceditor::ReplacePanelClass::ReplacePanelClass(wxWindow* parent, mvceditor::NotebookClass* notebook, wxAuiManager* auiManager, int windowId)
@@ -247,9 +220,11 @@ mvceditor::ReplacePanelClass::ReplacePanelClass(wxWindow* parent, mvceditor::Not
 		, FindHistory(FindText)
 		, ReplaceHistory(ReplaceWithText)
 		, Notebook(notebook)
-		, AuiManager(auiManager) {
-	mvceditor::FinderValidatorClass finderValidator(&Finder, FinderMode);
-	FindText->SetValidator(finderValidator);
+		, AuiManager(auiManager)
+		, CurrentInsertionPointFind(0) 
+		, CurrentInsertionPointReplace(0) {
+	mvceditor::RegularExpressionValidatorClass regExValidator(&Finder.Expression, FinderMode);
+	FindText->SetValidator(regExValidator);
 	wxGenericValidator modeValidator(&Finder.Mode);
 	FinderMode->SetValidator(modeValidator);
 	wxGenericValidator wrapValidator(&Finder.Wrap);
@@ -276,8 +251,22 @@ mvceditor::ReplacePanelClass::ReplacePanelClass(wxWindow* parent, mvceditor::Not
 
 	// since this panel handles EVT_TEXT_ENTER, we need to handle th
 	// tab traversal ourselves otherwise tab travesal wont work
-	ReplaceWithText->GetEventHandler()->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::ReplacePanelClass::OnKeyDown));
-	FindText->GetEventHandler()->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::ReplacePanelClass::OnKeyDown));
+	FindText->GetEventHandler()->Connect(wxID_ANY, wxID_ANY, wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::ReplacePanelClass::OnKeyDown), NULL, this);
+	ReplaceWithText->GetEventHandler()->Connect(wxID_ANY, wxID_ANY, wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::ReplacePanelClass::OnKeyDown), NULL, this);
+	
+	// connect to the KILL_FOCUS events so that we can capture the insertion point
+	// on Win32 GetInsertionPoint() returns 0 when the combo box is no
+	// in focus; we must receive the position via an outside mechanism
+	FindText->GetEventHandler()->Connect(wxID_ANY, wxID_ANY, wxEVT_KILL_FOCUS, wxFocusEventHandler(ReplacePanelClass::OnKillFocusFindText), NULL, this);
+	ReplaceWithText->GetEventHandler()->Connect(wxID_ANY, wxID_ANY, wxEVT_KILL_FOCUS, wxFocusEventHandler(ReplacePanelClass::OnKillFocusReplaceText), NULL, this);
+}
+
+mvceditor::ReplacePanelClass::~ReplacePanelClass() {
+	FindText->GetEventHandler()->Disconnect(wxID_ANY, wxID_ANY, wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::ReplacePanelClass::OnKeyDown), NULL, this);
+	ReplaceWithText->GetEventHandler()->Disconnect(wxID_ANY, wxID_ANY, wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::ReplacePanelClass::OnKeyDown), NULL, this);
+	
+	FindText->GetEventHandler()->Disconnect(wxID_ANY, wxID_ANY, wxEVT_KILL_FOCUS, wxFocusEventHandler(ReplacePanelClass::OnKillFocusFindText), NULL, this);
+	ReplaceWithText->GetEventHandler()->Disconnect(wxID_ANY, wxID_ANY, wxEVT_KILL_FOCUS, wxFocusEventHandler(ReplacePanelClass::OnKillFocusReplaceText), NULL, this);
 }
 
 void mvceditor::ReplacePanelClass::SetFocusOnFindText() {
@@ -349,20 +338,21 @@ void mvceditor::ReplacePanelClass::OnNextButton(wxCommandEvent& event) {
 }
 
 void mvceditor::ReplacePanelClass::OnHelpButton(wxCommandEvent& event) {
-  //TODO: get the strings from translation "_()" macro
-  wxString help = wxT("Find modes:\n")
-	  wxT("Code:\n" )
-	  wxT("Type in PHP source code.  The editor will ignore whitespace ")
-	  wxT("where it does not matter and will also match single and double quoted literals ")
-	  wxT("if their contents match. For example, searching for\n\tstr_pos($text, 'needle')\n")
-	  wxT("will match\n\tstr_pos( $text,\"needle\" )\n\n")
-	  wxT("Exact:\n")
-	  wxT("Searching will be done using exact, case sensitive matching\n\n")
-	  wxT("Regular Expression:\n")
-	  wxT("Searching will be done using the entered regular expression. Regular ")
-	  wxT("expression syntax is that of an \"Advanced Regular Expression\" (ARE) as ")
-	  wxT("described at http://docs.wxwidgets.org/stable/wx_wxresyn.html\n");
-	wxMessageBox(help, _("Find Help"), wxOK, this);
+	wxString help = wxString::FromAscii("Find modes:\n"
+	  "Code:\n" 
+	  "Type in PHP source code.  The editor will ignore whitespace "
+	  "where it does not matter and will also match single and double quoted literals "
+	  "if their contents match. For example, searching for\n\tstr_pos($text, 'needle')\n"
+	  "will match\n\tstr_pos( $text,\"needle\" )\n\n"
+	  "Exact:\n"
+	  "Searching will be done using exact, case sensitive matching\n\n"
+	  "Regular Expression:\n"
+	  "Searching will be done using the entered regular expression. You "
+	  "can use the button on the right to see all regular expression symbols."
+	  "The full regular expression syntax is described at "
+	  "http://www.unicode.org/reports/tr18/\n");
+	help = wxGetTranslation(help);
+	wxMessageBox(help, _("Replace Help"), wxOK, this);
 }
 
 void mvceditor::ReplacePanelClass::OnOkButton(wxCommandEvent& event) {
@@ -480,53 +470,42 @@ void mvceditor::ReplacePanelClass::OnKeyDown(wxKeyEvent& event) {
 
 void mvceditor::ReplacePanelClass::OnRegExFindHelpButton(wxCommandEvent& event) {
 	wxMenu regExMenu;
-	PopulateRegExMenu(regExMenu);
+	mvceditor::PopulateRegExFindMenu(regExMenu, ID_REGEX_REPLACE_FIND_MENU_START);
 	PopupMenu(&regExMenu);	
 }
 
 void mvceditor::ReplacePanelClass::OnReplaceRegExFindHelpButton(wxCommandEvent& event) {
 	wxMenu regExMenu;
-	regExMenu.Append(ID_MENU_REG_EX_REPLACE_MATCH_ONE,		_("$1      Match Group 1"));
-	regExMenu.Append(ID_MENU_REG_EX_REPLACE_MATCH_TWO,		_("$2      Match Group 2"));
-	regExMenu.Append(ID_MENU_REG_EX_REPLACE_MATCH_THREE,	_("$3      Match Group 3"));
-	regExMenu.Append(ID_MENU_REG_EX_REPLACE_MATCH_FOUR,		_("$4      Match Group 4"));
-	regExMenu.Append(ID_MENU_REG_EX_REPLACE_MATCH_FIVE,		_("$5      Match Group 5"));
-	PopupMenu(&regExMenu);	
+	mvceditor::PopulateRegExReplaceMenu(regExMenu, ID_REGEX_REPLACE_MENU_START);
+	PopupMenu(&regExMenu);
 }
 
 void mvceditor::ReplacePanelClass::InsertReplaceRegExSymbol(wxCommandEvent& event) {
 	wxString symbols;
-	int id = event.GetId();
-	if (id == ID_MENU_REG_EX_REPLACE_MATCH_ONE) {
-		symbols = wxT("$1");
-	}
-	if (id == ID_MENU_REG_EX_REPLACE_MATCH_TWO) {
-		symbols = wxT("$2");
-	}
-	if (id == ID_MENU_REG_EX_REPLACE_MATCH_THREE) {
-		symbols = wxT("$3");
-	}
-	if (id == ID_MENU_REG_EX_REPLACE_MATCH_FOUR) {
-		symbols = wxT("$4");
-	}
-	if (id == ID_MENU_REG_EX_REPLACE_MATCH_FIVE) {
-		symbols = wxT("$5");
-	}
-	if (!symbols.IsEmpty()) {
-		ReplaceWithText->Replace(ReplaceWithText->GetInsertionPoint(), ReplaceWithText->GetInsertionPoint(), symbols);
-	}
+	int id = event.GetId() - ID_REGEX_REPLACE_MENU_START;
+	mvceditor::AddSymbolToReplaceRegularExpression(ReplaceWithText, id,CurrentInsertionPointReplace);
 	FinderMode->SetSelection(FinderClass::REGULAR_EXPRESSION);
 }
 
 void mvceditor::ReplacePanelClass::InsertRegExSymbol(wxCommandEvent& event) {
-	int id = event.GetId();
-	AddSymbolToRegularExpression(FindText, id);
+	int id = event.GetId() -  ID_REGEX_REPLACE_FIND_MENU_START;
+	mvceditor::AddSymbolToRegularExpression(FindText, id, CurrentInsertionPointFind);
 	FinderMode->SetSelection(FinderClass::REGULAR_EXPRESSION);
 }
 
 void mvceditor::ReplacePanelClass::EnableReplaceButtons(bool enable) {
 	ReplaceButton->Enable(enable);
 	UndoButton->Enable(enable);
+}
+
+void mvceditor::ReplacePanelClass::OnKillFocusFindText(wxFocusEvent& event) {
+	CurrentInsertionPointFind = FindText->GetInsertionPoint();
+	event.Skip();
+}
+
+void mvceditor::ReplacePanelClass::OnKillFocusReplaceText(wxFocusEvent& event) {
+	CurrentInsertionPointReplace = ReplaceWithText->GetInsertionPoint();
+	event.Skip();
 }
 
 mvceditor::FinderPluginClass::FinderPluginClass()
@@ -645,162 +624,52 @@ void mvceditor::FinderPluginClass::OnEditGoToLine(wxCommandEvent& event) {
 	}
 }
 
-void PopulateRegExMenu(wxMenu& regExMenu) {
-	regExMenu.Append(ID_MENU_REG_EX_SEQUENCE_ZERO, _("*      Sequence of 0 or more"));
-	regExMenu.Append(ID_MENU_REG_EX_SEQUENCE_ONE, _("+      Sequence of 1 or more"));
-	regExMenu.Append(ID_MENU_REG_EX_ZERO_OR_ONE, _("?      Sequence of 0 or 1"));
-	regExMenu.Append(ID_MENU_REG_EX_SEQUENCE_EXACT, _("{m}    Sequence of m"));
-	regExMenu.Append(ID_MENU_REG_EX_SEQUENCE_AT_LEAST, _("{m,}   Sequence of at least m"));
-	regExMenu.Append(ID_MENU_REG_EX_SEQUENCE_BETWEEN, _("{m,n}  Sequence of m through n matches (inclusive)"));
-	regExMenu.Append(ID_MENU_REG_EX_BEGIN_OF_LINE, _("^      Beginning of line"));
-	regExMenu.Append(ID_MENU_REG_EX_END_OF_LINE, _("$      End of line"));
-	regExMenu.AppendSeparator();
-	regExMenu.Append(ID_MENU_REG_EX_DIGIT, _("\\d    Decimal digit"));
-	regExMenu.Append(ID_MENU_REG_EX_WHITE_SPACE, _("\\s    White space character"));
-	regExMenu.Append(ID_MENU_REG_EX_ALPHANUMERIC, _("\\w    Alphanumeric (letter or digit)"));
-	regExMenu.Append(ID_MENU_REG_EX_NOT_DECIMAL, _("\\D    Not a decimal digit"));
-	regExMenu.Append(ID_MENU_REG_EX_NOT_WHITE_SPACE, _("\\S    Not a white space character"));
-	regExMenu.Append(ID_MENU_REG_EX_NOT_ALPHANUMERIC, _("\\W    Not an Alphanumeric (letter or digit)"));
-	regExMenu.AppendSeparator();
-	regExMenu.Append(ID_MENU_REG_EX_CASE_SENSITIVE, _("(?i)    Case insensitive matching"));
-	regExMenu.Append(ID_MENU_REG_EX_COMMENT, _("(?x)    allow use of white space and #comments within patterns"));
-	regExMenu.Append(ID_MENU_REG_EX_DOT_ALL, _("(?s)    A dot (.) will match line terminator. \r\n will be treated as one character."));
-	regExMenu.Append(ID_MENU_REG_EX_MULTI_LINE, _("(?m)    (^) and ($) will also match at the start and end of each line"));
-	regExMenu.Append(ID_MENU_REG_EX_UWORD, _("(?w)    word boundaries are found according to the definitions of word found in Unicode UAX 29"));
-}
-
-void AddSymbolToRegularExpression(wxComboBox* text, int id) {
-	wxString symbols;
-	if (id == ID_MENU_REG_EX_SEQUENCE_ZERO) {
-		symbols = wxT("*");
-	}
-	if (id == ID_MENU_REG_EX_SEQUENCE_ONE) {
-		symbols = wxT("+");
-	}
-	if (id == ID_MENU_REG_EX_ZERO_OR_ONE) {
-		symbols = wxT("?");
-	}
-	if (id == ID_MENU_REG_EX_SEQUENCE_EXACT) {
-		symbols = wxT("{m}");
-	}
-	if (id == ID_MENU_REG_EX_SEQUENCE_AT_LEAST) {
-		symbols = wxT("{m,}");
-	}
-	if (id == ID_MENU_REG_EX_SEQUENCE_BETWEEN) {
-		symbols = wxT("{m,n}");
-	}
-	if (id == ID_MENU_REG_EX_BEGIN_OF_LINE) {
-		symbols = wxT("^");
-	}
-	if (id == ID_MENU_REG_EX_END_OF_LINE) {
-		symbols = wxT("$");
-	}
-	if (id == ID_MENU_REG_EX_DIGIT) {
-		symbols = wxT("\\d");
-	}
-	if (id == ID_MENU_REG_EX_WHITE_SPACE) {
-		symbols = wxT("\\s");
-	}
-	if (id == ID_MENU_REG_EX_ALPHANUMERIC) {
-		symbols = wxT("\\w");
-	}
-	if (id == ID_MENU_REG_EX_NOT_DECIMAL) {
-		symbols = wxT("\\D");
-	}
-	if (id == ID_MENU_REG_EX_NOT_WHITE_SPACE) {
-		symbols = wxT("\\S");
-	}
-	if (id == ID_MENU_REG_EX_NOT_ALPHANUMERIC) {
-		symbols = wxT("\\W");
-	}
-	if (!symbols.IsEmpty()) {
-		text->Replace(text->GetInsertionPoint(), text->GetInsertionPoint(), symbols);
-	}
-	
-	// reg ex flags always go at the beginning
-	else if (id == ID_MENU_REG_EX_CASE_SENSITIVE) {
-		AddFlagToRegEx(text, wxT("i"));
-	}
-	else if (id == ID_MENU_REG_EX_COMMENT) {
-		AddFlagToRegEx(text, wxT("x"));
-	}
-	else if (id == ID_MENU_REG_EX_DOT_ALL) {
-		AddFlagToRegEx(text, wxT("s"));
-	}
-	else if (id == ID_MENU_REG_EX_MULTI_LINE) {
-		AddFlagToRegEx(text, wxT("m"));
-	}
-	else if (id == ID_MENU_REG_EX_UWORD) {
-		AddFlagToRegEx(text, wxT("w"));
-	}
-}
-
-void AddFlagToRegEx(wxComboBox* text, wxString flag) {
-	wxString value = text->GetValue();
-	
-	//meta syntax (?i) at the start of the regex. we need to put the new flag, but only if it is not already there
-	wxString startFlag(wxT("(?"));
-	if (0 == value.Find(startFlag)) {
-		int afterMetasPos = value.Find(wxT(")"));
-		if (afterMetasPos > 0) {
-			wxString flags = value.SubString(0, afterMetasPos);
-			if (wxNOT_FOUND == flags.Find(flag)) {
-				text->Replace(afterMetasPos - 1, afterMetasPos - 1, flag);
-			}
-		} 
-	}
-	else {
-		value = startFlag + flag + wxT(")") + value;
-		text->SetValue(value);
-	}
-}
-
 BEGIN_EVENT_TABLE(mvceditor::FinderPanelClass, FinderPanelGeneratedClass)
-	EVT_MENU(ID_MENU_REG_EX_SEQUENCE_ZERO, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_SEQUENCE_ONE, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_ZERO_OR_ONE, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_SEQUENCE_EXACT, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_SEQUENCE_AT_LEAST, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_SEQUENCE_BETWEEN, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_BEGIN_OF_LINE, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_END_OF_LINE, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_DIGIT, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_WHITE_SPACE, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_ALPHANUMERIC, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_NOT_DECIMAL, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_NOT_WHITE_SPACE, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_NOT_ALPHANUMERIC, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_CASE_SENSITIVE, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_COMMENT, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_DOT_ALL, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_MULTI_LINE, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_UWORD, mvceditor::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_ZERO, mvceditor::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_ONE, mvceditor::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_ZERO_OR_ONE, mvceditor::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_EXACT, mvceditor::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_AT_LEAST, mvceditor::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_BETWEEN, mvceditor::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_BEGIN_OF_LINE, mvceditor::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_END_OF_LINE, mvceditor::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_DIGIT, mvceditor::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_WHITE_SPACE, mvceditor::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_ALPHANUMERIC, mvceditor::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_NOT_DECIMAL, mvceditor::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_NOT_WHITE_SPACE, mvceditor::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_NOT_ALPHANUMERIC, mvceditor::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_CASE_SENSITIVE, mvceditor::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_COMMENT, mvceditor::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_DOT_ALL, mvceditor::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_MULTI_LINE, mvceditor::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_UWORD, mvceditor::FinderPanelClass::InsertRegExSymbol)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::ReplacePanelClass, ReplacePanelGeneratedClass)
-	EVT_MENU(ID_MENU_REG_EX_REPLACE_MATCH_ONE, mvceditor::ReplacePanelClass::InsertReplaceRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_REPLACE_MATCH_TWO, mvceditor::ReplacePanelClass::InsertReplaceRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_REPLACE_MATCH_THREE, mvceditor::ReplacePanelClass::InsertReplaceRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_REPLACE_MATCH_FOUR, mvceditor::ReplacePanelClass::InsertReplaceRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_REPLACE_MATCH_FIVE, mvceditor::ReplacePanelClass::InsertReplaceRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_SEQUENCE_ONE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_ZERO_OR_ONE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_SEQUENCE_EXACT, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_SEQUENCE_AT_LEAST, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_SEQUENCE_BETWEEN, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_BEGIN_OF_LINE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_END_OF_LINE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_DIGIT, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_WHITE_SPACE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_ALPHANUMERIC, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_NOT_DECIMAL, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_NOT_WHITE_SPACE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_NOT_ALPHANUMERIC, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_CASE_SENSITIVE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_COMMENT, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_DOT_ALL, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_MULTI_LINE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_MENU_REG_EX_UWORD, mvceditor::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_ONE, mvceditor::ReplacePanelClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_TWO, mvceditor::ReplacePanelClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_THREE, mvceditor::ReplacePanelClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_FOUR, mvceditor::ReplacePanelClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_FIVE, mvceditor::ReplacePanelClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_SEQUENCE_ONE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_ZERO_OR_ONE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_SEQUENCE_EXACT, mvceditor::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_SEQUENCE_AT_LEAST, mvceditor::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_SEQUENCE_BETWEEN, mvceditor::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_BEGIN_OF_LINE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_END_OF_LINE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_DIGIT, mvceditor::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_WHITE_SPACE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_ALPHANUMERIC, mvceditor::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_NOT_DECIMAL, mvceditor::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_NOT_WHITE_SPACE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_NOT_ALPHANUMERIC, mvceditor::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_CASE_SENSITIVE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_COMMENT, mvceditor::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_DOT_ALL, mvceditor::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_MULTI_LINE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_UWORD, mvceditor::ReplacePanelClass::InsertRegExSymbol)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::FinderPluginClass, wxEvtHandler) 

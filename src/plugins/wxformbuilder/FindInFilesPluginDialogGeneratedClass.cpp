@@ -36,15 +36,35 @@ FindInFilesDialogGeneratedClass::FindInFilesDialogGeneratedClass( wxWindow* pare
 	FindLabel->Wrap( -1 );
 	TextboxFlexGridSizer->Add( FindLabel, 0, wxALL, 5 );
 	
-	FindText = new wxComboBox( this, ID_FINDTEXT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxTE_PROCESS_ENTER ); 
-	TextboxFlexGridSizer->Add( FindText, 1, wxALL|wxEXPAND, 5 );
+	wxBoxSizer* FindWithButtonSizer;
+	FindWithButtonSizer = new wxBoxSizer( wxHORIZONTAL );
+	
+	RegexFindHelpButton = new wxButton( this, wxID_ANY, wxT(">"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT );
+	RegexFindHelpButton->SetFont( wxFont( 8, 74, 90, 92, false, wxT("Tahoma") ) );
+	
+	FindWithButtonSizer->Add( RegexFindHelpButton, 0, wxALL, 5 );
+	
+	FindText = new wxComboBox( this, ID_FINDTEXT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_DROPDOWN|wxTE_PROCESS_ENTER ); 
+	FindWithButtonSizer->Add( FindText, 1, wxALL|wxEXPAND, 5 );
+	
+	TextboxFlexGridSizer->Add( FindWithButtonSizer, 1, wxEXPAND, 5 );
 	
 	ReplaceWithLabel = new wxStaticText( this, wxID_ANY, wxT("Replace With:"), wxDefaultPosition, wxDefaultSize, 0 );
 	ReplaceWithLabel->Wrap( -1 );
 	TextboxFlexGridSizer->Add( ReplaceWithLabel, 0, wxALL, 5 );
 	
+	wxBoxSizer* ReplaceWithButtonSizer;
+	ReplaceWithButtonSizer = new wxBoxSizer( wxHORIZONTAL );
+	
+	RegexReplaceWithHelpButton = new wxButton( this, wxID_ANY, wxT(">"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT );
+	RegexReplaceWithHelpButton->SetFont( wxFont( 8, 74, 90, 92, false, wxT("Tahoma") ) );
+	
+	ReplaceWithButtonSizer->Add( RegexReplaceWithHelpButton, 0, wxALL, 5 );
+	
 	ReplaceWithText = new wxComboBox( this, ID_REPLACEWITHTEXT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxTE_PROCESS_ENTER ); 
-	TextboxFlexGridSizer->Add( ReplaceWithText, 1, wxALL|wxEXPAND, 5 );
+	ReplaceWithButtonSizer->Add( ReplaceWithText, 1, wxALL|wxEXPAND, 5 );
+	
+	TextboxFlexGridSizer->Add( ReplaceWithButtonSizer, 1, wxEXPAND, 5 );
 	
 	TopSizer->Add( TextboxFlexGridSizer, 1, wxEXPAND, 5 );
 	
@@ -115,7 +135,9 @@ FindInFilesDialogGeneratedClass::FindInFilesDialogGeneratedClass( wxWindow* pare
 	this->Layout();
 	
 	// Connect Events
+	RegexFindHelpButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnRegExFindHelpButton ), NULL, this );
 	FindText->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnOkButton ), NULL, this );
+	RegexReplaceWithHelpButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnRegExReplaceHelpButton ), NULL, this );
 	ReplaceWithText->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnOkButton ), NULL, this );
 	FilesFilter->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnOkButton ), NULL, this );
 	ButtonsSizerCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnCancelButton ), NULL, this );
@@ -125,7 +147,9 @@ FindInFilesDialogGeneratedClass::FindInFilesDialogGeneratedClass( wxWindow* pare
 FindInFilesDialogGeneratedClass::~FindInFilesDialogGeneratedClass()
 {
 	// Disconnect Events
+	RegexFindHelpButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnRegExFindHelpButton ), NULL, this );
 	FindText->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnOkButton ), NULL, this );
+	RegexReplaceWithHelpButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnRegExReplaceHelpButton ), NULL, this );
 	ReplaceWithText->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnOkButton ), NULL, this );
 	FilesFilter->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnOkButton ), NULL, this );
 	ButtonsSizerCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnCancelButton ), NULL, this );

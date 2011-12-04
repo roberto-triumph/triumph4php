@@ -24,11 +24,24 @@
  */
 #include <widgets/FinderValidatorClass.h>
 #include <windows/StringHelperClass.h>
+#include <search/FinderClass.h>
 #include <unicode/unistr.h>
 #include <unicode/regex.h>
 #include <wx/textctrl.h>
 #include <wx/combobox.h>
 #include <wx/msgdlg.h>
+#include <wx/clipbrd.h>
+
+/**
+ * Add a flag to the given regular expression string, taking care not to clobber existing flags
+ * 
+ * @param wxComboBox& the textbox containing the regular expression (will be modified in place)
+ * @param wxString flag the flag to add to the regular expression
+ * @param int currentInsertionPoint the position of the cursor
+ *        on Win32 GetInsertionPoint() returns 0 when the combo box is no
+ *	      in focus; we must receive the position via an outside mechanism
+ */
+static void AddFlagToRegEx(wxComboBox* text, wxString flag, int currentInsertionPoint);
 
 /**
  * Turns an ICU Error Code (from a regular expression compile error) into a human
@@ -97,22 +110,22 @@ static wxString errorString(UErrorCode err) {
 	return str;
 }
 
-mvceditor::FinderValidatorClass::FinderValidatorClass(mvceditor::FinderClass *finder,
+mvceditor::RegularExpressionValidatorClass::RegularExpressionValidatorClass(UnicodeString *data,
 													  wxRadioBox* modeRadio) 
 	: wxValidator() 
-	, Finder(finder)
+	, Data(data)
 	, ModeRadio(modeRadio) {
 }
 
-mvceditor::FinderValidatorClass::FinderValidatorClass() 
+mvceditor::RegularExpressionValidatorClass::RegularExpressionValidatorClass() 
 	: wxValidator()
-	, Finder(NULL)
+	, Data(NULL)
 	, ModeRadio(NULL) {
 }
 
-bool mvceditor::FinderValidatorClass::TransferFromWindow() {
+bool mvceditor::RegularExpressionValidatorClass::TransferFromWindow() {
 	bool ret = false;
-	if (!Finder) {
+	if (!Data) {
 		return false;
 	}
 	wxTextCtrl* t = wxDynamicCast(GetWindow(), wxTextCtrl);
@@ -128,35 +141,35 @@ bool mvceditor::FinderValidatorClass::TransferFromWindow() {
 	}
 	if (!regEx.isEmpty()) {
 		ret = true;
-		Finder->Expression = regEx;
+		*Data = regEx;
 	}
 	return ret;
 }
 
-bool mvceditor::FinderValidatorClass::TransferToWindow() {
+bool mvceditor::RegularExpressionValidatorClass::TransferToWindow() {
 	bool ret = false;
-	if (!Finder) {
+	if (!Data) {
 		return false;
 	}
 	wxTextCtrl* t = wxDynamicCast(GetWindow(), wxTextCtrl);
 	wxComboBox* combo = wxDynamicCast(GetWindow(), wxComboBox);
 	UnicodeString regEx;
 	if (t) {
-		wxString val = mvceditor::StringHelperClass::IcuToWx(Finder->Expression);
+		wxString val = mvceditor::StringHelperClass::IcuToWx(*Data);
 		t->SetValue(val);
 		ret = true;
 	}
 	else if (combo) {
-		wxString val = mvceditor::StringHelperClass::IcuToWx(Finder->Expression);
+		wxString val = mvceditor::StringHelperClass::IcuToWx(*Data);
 		combo->SetValue(val);
 		ret = true;
 	}
 	return ret;
 }
 
-bool mvceditor::FinderValidatorClass::Validate(wxWindow *parent) {
+bool mvceditor::RegularExpressionValidatorClass::Validate(wxWindow *parent) {
 	bool ret =  false;
-	if (!ModeRadio || !Finder) {
+	if (!ModeRadio || !Data) {
 		return false;
 	}
 	if (ModeRadio->GetSelection() != mvceditor::FinderClass::REGULAR_EXPRESSION) {
@@ -201,9 +214,177 @@ bool mvceditor::FinderValidatorClass::Validate(wxWindow *parent) {
 	return ret;
 }
 
-wxObject* mvceditor::FinderValidatorClass::Clone() const {
-	mvceditor::FinderValidatorClass* validator = new mvceditor::FinderValidatorClass();
-	validator->Finder = Finder;
+wxObject* mvceditor::RegularExpressionValidatorClass::Clone() const {
+	mvceditor::RegularExpressionValidatorClass* validator = new mvceditor::RegularExpressionValidatorClass();
+	validator->Data = Data;
 	validator->ModeRadio = ModeRadio;
 	return validator;
+}
+
+void mvceditor::PopulateRegExFindMenu(wxMenu& regExMenu, int menuStart) {
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_SEQUENCE_ZERO, _("*      Sequence of 0 or more"));
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_SEQUENCE_ONE, _("+      Sequence of 1 or more"));
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_ZERO_OR_ONE, _("?      Sequence of 0 or 1"));
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_SEQUENCE_EXACT, _("{m}    Sequence of m"));
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_SEQUENCE_AT_LEAST, _("{m,}   Sequence of at least m"));
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_SEQUENCE_BETWEEN, _("{m,n}  Sequence of m through n matches (inclusive)"));
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_BEGIN_OF_LINE, _("^      Beginning of line"));
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_END_OF_LINE, _("$      End of line"));
+	regExMenu.AppendSeparator();
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_DIGIT, _("\\d    Decimal digit"));
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_WHITE_SPACE, _("\\s    White space character"));
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_ALPHANUMERIC, _("\\w    Alphanumeric (letter or digit)"));
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_NOT_DECIMAL, _("\\D    Not a decimal digit"));
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_NOT_WHITE_SPACE, _("\\S    Not a white space character"));
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_NOT_ALPHANUMERIC, _("\\W    Not an Alphanumeric (letter or digit)"));
+	regExMenu.AppendSeparator();
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_CASE_SENSITIVE, _("(?i)    Case insensitive matching"));
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_COMMENT, _("(?x)    allow use of white space and #comments within patterns"));
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_DOT_ALL, _("(?s)    A dot (.) will match line terminator. \r\n will be treated as one character."));
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_MULTI_LINE, _("(?m)    (^) and ($) will also match at the start and end of each line"));
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_UWORD, _("(?w)    word boundaries are found according to the definitions of word found in Unicode UAX 29"));
+}
+
+void mvceditor::PopulateRegExReplaceMenu(wxMenu& regExMenu, int menuStart) {
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_REPLACE_MATCH_ONE,		_("$1      Match Group 1"));
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_REPLACE_MATCH_TWO,		_("$2      Match Group 2"));
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_REPLACE_MATCH_THREE,	_("$3      Match Group 3"));
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_REPLACE_MATCH_FOUR,		_("$4      Match Group 4"));
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_REPLACE_MATCH_FIVE,		_("$5      Match Group 5"));
+}
+
+void mvceditor::AddSymbolToRegularExpression(wxComboBox* text, int id, int currentInsertionPoint) {
+	wxString symbols;
+	if (id == ID_MENU_REG_EX_SEQUENCE_ZERO) {
+		symbols = wxT("*");
+	}
+	if (id == ID_MENU_REG_EX_SEQUENCE_ONE) {
+		symbols = wxT("+");
+	}
+	if (id == ID_MENU_REG_EX_ZERO_OR_ONE) {
+		symbols = wxT("?");
+	}
+	if (id == ID_MENU_REG_EX_SEQUENCE_EXACT) {
+		symbols = wxT("{m}");
+	}
+	if (id == ID_MENU_REG_EX_SEQUENCE_AT_LEAST) {
+		symbols = wxT("{m,}");
+	}
+	if (id == ID_MENU_REG_EX_SEQUENCE_BETWEEN) {
+		symbols = wxT("{m,n}");
+	}
+	if (id == ID_MENU_REG_EX_BEGIN_OF_LINE) {
+		symbols = wxT("^");
+	}
+	if (id == ID_MENU_REG_EX_END_OF_LINE) {
+		symbols = wxT("$");
+	}
+	if (id == ID_MENU_REG_EX_DIGIT) {
+		symbols = wxT("\\d");
+	}
+	if (id == ID_MENU_REG_EX_WHITE_SPACE) {
+		symbols = wxT("\\s");
+	}
+	if (id == ID_MENU_REG_EX_ALPHANUMERIC) {
+		symbols = wxT("\\w");
+	}
+	if (id == ID_MENU_REG_EX_NOT_DECIMAL) {
+		symbols = wxT("\\D");
+	}
+	if (id == ID_MENU_REG_EX_NOT_WHITE_SPACE) {
+		symbols = wxT("\\S");
+	}
+	if (id == ID_MENU_REG_EX_NOT_ALPHANUMERIC) {
+		symbols = wxT("\\W");
+	}
+	if (!symbols.IsEmpty()) {
+	
+		// would love to use wxComboBox::Replace() here, but on Win32 a error occurs
+		// "Failed To Set Clipboard Data". Will need to do the replacement ourselves
+		// also; on Win32 GetInsertionPoint() returns 0 when the combo box is no
+		// in focus; we must receive the position via an outside mechanism
+		wxString val = text->GetValue();
+		wxString newVal = val.Mid(0, currentInsertionPoint) + symbols + val.Mid(currentInsertionPoint);
+		text->SetValue(newVal);
+		
+		text->SetFocus();
+		text->SetInsertionPoint(currentInsertionPoint + symbols.Length());
+	}
+	
+	// reg ex flags always go at the beginning
+	else if (id == ID_MENU_REG_EX_CASE_SENSITIVE) {
+		AddFlagToRegEx(text, wxT("i"), currentInsertionPoint);
+	}
+	else if (id == ID_MENU_REG_EX_COMMENT) {
+		AddFlagToRegEx(text, wxT("x"), currentInsertionPoint);
+	}
+	else if (id == ID_MENU_REG_EX_DOT_ALL) {
+		AddFlagToRegEx(text, wxT("s"), currentInsertionPoint);
+	}
+	else if (id == ID_MENU_REG_EX_MULTI_LINE) {
+		AddFlagToRegEx(text, wxT("m"), currentInsertionPoint);
+	}
+	else if (id == ID_MENU_REG_EX_UWORD) {
+		AddFlagToRegEx(text, wxT("w"), currentInsertionPoint);
+	}
+}
+
+void mvceditor::AddSymbolToReplaceRegularExpression(wxComboBox* text, int id, int currentInsertionPoint) {
+	wxString symbols;
+	if (id == ID_MENU_REG_EX_REPLACE_MATCH_ONE) {
+		symbols = wxT("$1");
+	}
+	if (id == ID_MENU_REG_EX_REPLACE_MATCH_TWO) {
+		symbols = wxT("$2");
+	}
+	if (id == ID_MENU_REG_EX_REPLACE_MATCH_THREE) {
+		symbols = wxT("$3");
+	}
+	if (id == ID_MENU_REG_EX_REPLACE_MATCH_FOUR) {
+		symbols = wxT("$4");
+	}
+	if (id == ID_MENU_REG_EX_REPLACE_MATCH_FIVE) {
+		symbols = wxT("$5");
+	}
+	if (!symbols.IsEmpty()) {
+
+		// would love to use wxComboBox::Replace() here, but on Win32 a error occurs
+		// "Failed To Set Clipboard Data". Will need to do the replacement ourselves
+		// also; on Win32 GetInsertionPoint() returns 0 when the combo box is no
+		// in focus; we must receive the position via an outside mechanism
+		wxString val = text->GetValue();
+		wxString newVal = val.Mid(0, currentInsertionPoint) + symbols + val.Mid(currentInsertionPoint);
+		text->SetValue(newVal);
+		
+		text->SetFocus();
+		text->SetInsertionPoint(currentInsertionPoint + symbols.Length());
+	}
+}
+
+void AddFlagToRegEx(wxComboBox* text, wxString flag, int currentInsertionPoint) {
+	wxString value = text->GetValue();
+	
+	//meta syntax (?i) at the start of the regex. we need to put the new flag, but only if it is not already there
+	wxString startFlag(wxT("(?"));
+	if (0 == value.Find(startFlag)) {
+		int afterMetasPos = value.Find(wxT(")"));
+		if (afterMetasPos > 0) {
+			wxString flags = value.SubString(0, afterMetasPos);
+			if (wxNOT_FOUND == flags.Find(flag)) {
+
+				// would love to use wxComboBox::Replace() here, but on Win32 a error occurs
+				// "Failed To Set Clipboard Data". Will need to do the replacement ourselves
+				wxString val = text->GetValue();
+				wxString newVal = val.Mid(0, afterMetasPos - 1) + flag + val.Mid(afterMetasPos - 1);
+				text->SetValue(newVal);
+				
+				text->SetFocus();
+				text->SetInsertionPoint(currentInsertionPoint + flag.Length());
+			}
+		} 
+	}
+	else {
+		value = startFlag + flag + wxT(")") + value;
+		text->SetValue(value);
+	}
 }

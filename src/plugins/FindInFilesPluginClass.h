@@ -120,7 +120,7 @@ protected:
 	void OnCopySelectedButton(wxCommandEvent& event);
 	void OnCopyAllButton(wxCommandEvent& event);
 	void OnFindInFilesComplete(wxCommandEvent& event);
-	
+		
 public:
 
 	/**
@@ -281,22 +281,52 @@ class FindInFilesDialogClass: public FindInFilesDialogGeneratedClass {
 public:
 
 	FindInFilesDialogClass(wxWindow* parent, FindInFilesPluginClass& plugin);
+	
+	~FindInFilesDialogClass();
 
 protected:
 
 	virtual void OnOkButton(wxCommandEvent& event);
-
 	virtual void OnCancelButton(wxCommandEvent& event);
+	void OnRegExFindHelpButton(wxCommandEvent& event);
+	void OnRegExReplaceHelpButton(wxCommandEvent& event);
 
 private:
 
 	FindInFilesPluginClass& Plugin;
+
+	int CurrentInsertionPointFind;
+
+	int CurrentInsertionPointReplace;
 	
 	/** 
 	 * since this panel handles EVT_TEXT_ENTER, we need to handle the
 	 * tab traversal ourselves otherwise tab travesal wont work
 	 */
 	void OnKeyDown(wxKeyEvent& event);
+	
+	/**
+	 * Need to save the insertion point of the Find and replace combo boxes; in Win32
+	 * GetInsertionPoint() of combobox fails when it does not have focus.
+	 * The insertion is needed to have the cursor show up properly when
+	 * the user clicks on the regex help buttons
+	 */
+	void OnKillFocusFindText(wxFocusEvent& event);
+	void OnKillFocusReplaceText(wxFocusEvent& event);
+
+	/**
+	 * handle the regular expression popup menu. Will add the symbol
+	 * the the expression textbox value.
+	 */
+	void InsertRegExSymbol(wxCommandEvent& event);
+
+	/**
+	 * handle the regular expression replace popup menu. Will add the symbol
+	 * the the replace textbox value.
+	 */
+	void InsertReplaceRegExSymbol(wxCommandEvent& event);
+
+	DECLARE_EVENT_TABLE()
 };
 
 }

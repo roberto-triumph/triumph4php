@@ -63,6 +63,8 @@ public:
 	 */
 	FinderPanelClass(wxWindow* parent, NotebookClass* notebook, wxAuiManager* auiManager, int windowId);
 	
+	~FinderPanelClass();
+
 	/**
 	 * The focus will  be set on the find text box.
 	 */
@@ -103,15 +105,23 @@ private:
 	
 	/**
 	 * When called show the user a picked a item in the menu of reg ex symbols
-	 * @param wxCommandEvnt& event
+	 * @param wxCommandEvent& event
 	 */
 	void InsertRegExSymbol(wxCommandEvent& event);
 
 	/**
 	 * When called show the user a picked a item in the menu of replace reg ex symbols
-	 * @param wxCommandEvnt& event
+	 * @param wxCommandEvent& event
 	 */
 	void InsertReplaceRegExSymbol(wxCommandEvent& event);
+
+	/**
+	 * Need to save the insertion point of the Find and replace combo boxes; in Win32
+	 * GetInsertionPoint() of combobox fails when it does not have focus.
+	 * The insertion is needed to have the cursor show up properly when
+	 * the user clicks on the regex help buttons
+	 */
+	void OnKillFocusFindText(wxFocusEvent& event);
 	
 	/**
 	 * The Finder object to be displayed.
@@ -144,6 +154,8 @@ private:
 	 * @var wxString
 	 */
 	wxString RESULT_MESSAGE;
+
+	int CurrentInsertionPointFind;
 	
 	DECLARE_EVENT_TABLE()
 
@@ -178,6 +190,8 @@ public:
 	 */
 	ReplacePanelClass(wxWindow* parent, NotebookClass* notebook, wxAuiManager* auiManager, int windowId);
 	
+	~ReplacePanelClass();
+
 	/**
 	 * Enables/disables replace buttons
 	 * @var bool enable if true, buttons will be enabled. else, buttons
@@ -248,6 +262,15 @@ private:
 	void OnKeyDown(wxKeyEvent& event);
 
 	/**
+	 * Need to save the insertion point of the Find and replace combo boxes; in Win32
+	 * GetInsertionPoint() of combobox fails when it does not have focus.
+	 * The insertion is needed to have the cursor show up properly when
+	 * the user clicks on the regex help buttons
+	 */
+	void OnKillFocusFindText(wxFocusEvent& event);
+	void OnKillFocusReplaceText(wxFocusEvent& event);
+
+	/**
 	 * The Finder object to be displayed.
 	 * 
 	 * @var FinderClass
@@ -283,6 +306,10 @@ private:
 	 * @var wxString
 	 */
 	wxString RESULT_MESSAGE;
+
+	int CurrentInsertionPointFind;
+
+	int CurrentInsertionPointReplace;
 	
 	DECLARE_EVENT_TABLE()
 };

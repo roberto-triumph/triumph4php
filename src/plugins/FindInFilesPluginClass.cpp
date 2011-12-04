@@ -8,6 +8,7 @@
 #include <plugins/FindInFilesPluginClass.h>
 #include <windows/StringHelperClass.h>
 #include <widgets/UnicodeStringValidatorClass.h>
+#include <widgets/FinderValidatorClass.h>
 #include <wx/artprov.h>
 #include <wx/clipbrd.h>
 #include <wx/ffile.h>
@@ -15,8 +16,13 @@
 #include <wx/valgen.h>
 #include <algorithm>
 
-const int ID_MENU_FIND_IN_FILES = mvceditor::PluginClass::newMenuId();
-const int ID_FIND_IN_FILES_PROGRESS = wxNewId();
+static const int ID_MENU_FIND_IN_FILES = mvceditor::PluginClass::newMenuId();
+static const int ID_FIND_IN_FILES_PROGRESS = wxNewId();
+
+// these IDs are needed so that the IDs of the Regular expression help menu
+// do not collide with the menu IDs of the FinderPlugin
+static const int ID_REGEX_MENU_START = 9000;
+static const int ID_REGEX_REPLACE_MENU_START = 10000;
 
 mvceditor::FindInFilesBackgroundReaderClass::FindInFilesBackgroundReaderClass(wxEvtHandler& handler) 
 : BackgroundFileReaderClass(handler) {
@@ -343,7 +349,9 @@ void mvceditor::FindInFilesResultsPanelClass::OnTimer(wxCommandEvent& event) {
 
 mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvceditor::FindInFilesPluginClass& plugin)
 	: FindInFilesDialogGeneratedClass(parent, wxID_ANY)
-	, Plugin(plugin) {
+	, Plugin(plugin)
+	, CurrentInsertionPointFind(0)
+	, CurrentInsertionPointReplace(0) {
 	mvceditor::ProjectClass* project = Plugin.GetProject();
 	Plugin.FindHistory.Attach(FindText);
 	Plugin.ReplaceHistory.Attach(ReplaceWithText);
@@ -356,23 +364,38 @@ mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvce
 	if (NULL != project && !project->GetRootPath().IsEmpty()) {
 		Directory->SetPath(project->GetRootPath());
 	}
-	UnicodeStringValidatorClass expressionValidator(&Plugin.PreviousFindInFiles.Expression);
+	mvceditor::RegularExpressionValidatorClass regExValidator(&Plugin.PreviousFindInFiles.Expression, FinderMode);
+	FindText->SetValidator(regExValidator);
 	UnicodeStringValidatorClass replaceExpressionValidator(&Plugin.PreviousFindInFiles.ReplaceExpression);
 	wxGenericValidator filesFilterValidator(&Plugin.PreviousFindInFiles.FilesFilter);
 	wxGenericValidator modeValidator(&Plugin.PreviousFindInFiles.Mode);
 	wxGenericValidator caseValidator(&Plugin.PreviousFindInFiles.CaseSensitive);
-	FindText->SetValidator(expressionValidator);
 	ReplaceWithText->SetValidator(replaceExpressionValidator);
 	FinderMode->SetValidator(modeValidator);
 	FilesFilter->SetValidator(filesFilterValidator);
 	CaseSensitive->SetValidator(caseValidator);
 	FindText->SetFocus();
 
-	// since this panel handles EVT_TEXT_ENTER, we need to handle th
+	// since this panel handles EVT_TEXT_ENTER, we need to handle the
 	// tab traversal ourselves otherwise tab travesal wont work
-	ReplaceWithText->GetEventHandler()->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown));
-	FindText->GetEventHandler()->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown));
-	FilesFilter->GetEventHandler()->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown));
+	FindText->GetEventHandler()->Connect(wxID_ANY, wxID_ANY, wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown), NULL, this);
+	ReplaceWithText->GetEventHandler()->Connect(wxID_ANY, wxID_ANY, wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown), NULL, this);
+	FilesFilter->GetEventHandler()->Connect(wxID_ANY, wxID_ANY, wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown), NULL, this);
+	
+	// connect to the KILL_FOCUS events so that we can capture the insertion point
+	// on Win32 GetInsertionPoint() returns 0 when the combo box is no
+	// in focus; we must receive the position via an outside mechanism
+	FindText->GetEventHandler()->Connect(wxID_ANY, wxID_ANY, wxEVT_KILL_FOCUS, wxFocusEventHandler(FindInFilesDialogClass::OnKillFocusFindText), NULL, this);
+	ReplaceWithText->GetEventHandler()->Connect(wxID_ANY, wxID_ANY, wxEVT_KILL_FOCUS, wxFocusEventHandler(FindInFilesDialogClass::OnKillFocusReplaceText), NULL, this);
+}
+
+mvceditor::FindInFilesDialogClass::~FindInFilesDialogClass() {
+	FindText->GetEventHandler()->Disconnect(wxID_ANY, wxID_ANY, wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown), NULL, this);
+	ReplaceWithText->GetEventHandler()->Disconnect(wxID_ANY, wxID_ANY, wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown), NULL, this);
+	FilesFilter->GetEventHandler()->Disconnect(wxID_ANY, wxID_ANY, wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown), NULL, this);
+
+	FindText->GetEventHandler()->Disconnect(wxID_ANY, wxID_ANY, wxEVT_KILL_FOCUS, wxFocusEventHandler(FindInFilesDialogClass::OnKillFocusFindText), NULL, this);
+	ReplaceWithText->GetEventHandler()->Disconnect(wxID_ANY, wxID_ANY, wxEVT_KILL_FOCUS, wxFocusEventHandler(FindInFilesDialogClass::OnKillFocusReplaceText), NULL, this);
 }
 
 void mvceditor::FindInFilesDialogClass::OnOkButton(wxCommandEvent& event) {
@@ -418,6 +441,16 @@ void mvceditor::FindInFilesDialogClass::OnKeyDown(wxKeyEvent& event) {
 	}
 }
 
+void mvceditor::FindInFilesDialogClass::OnKillFocusFindText(wxFocusEvent& event) {
+	CurrentInsertionPointFind = FindText->GetInsertionPoint();
+	event.Skip();
+}
+
+void mvceditor::FindInFilesDialogClass::OnKillFocusReplaceText(wxFocusEvent& event) {
+	CurrentInsertionPointReplace = ReplaceWithText->GetInsertionPoint();
+	event.Skip();
+}
+
 mvceditor::FindInFilesPluginClass::FindInFilesPluginClass()
 	: PluginClass()
 	, PreviousFindInFiles()
@@ -446,6 +479,31 @@ void mvceditor::FindInFilesPluginClass::OnEditFindInFiles(wxCommandEvent& event)
 	}
 }
 
+void mvceditor::FindInFilesDialogClass::OnRegExFindHelpButton(wxCommandEvent& event) {
+	wxMenu regExMenu;
+	mvceditor::PopulateRegExFindMenu(regExMenu, ID_REGEX_MENU_START);
+	PopupMenu(&regExMenu);	
+}
+
+void mvceditor::FindInFilesDialogClass::OnRegExReplaceHelpButton(wxCommandEvent& event) {
+	wxMenu regExMenu;
+	mvceditor::PopulateRegExReplaceMenu(regExMenu, ID_REGEX_REPLACE_MENU_START);
+	PopupMenu(&regExMenu);	
+}
+
+void mvceditor::FindInFilesDialogClass::InsertRegExSymbol(wxCommandEvent& event) {
+	int id = event.GetId() - ID_REGEX_MENU_START;
+	mvceditor::AddSymbolToRegularExpression(FindText, id, CurrentInsertionPointFind);
+	FinderMode->SetSelection(FinderClass::REGULAR_EXPRESSION);
+	event.Skip();
+}
+
+void mvceditor::FindInFilesDialogClass::InsertReplaceRegExSymbol(wxCommandEvent& event) {
+	int id = event.GetId() - ID_REGEX_REPLACE_MENU_START;
+	mvceditor::AddSymbolToReplaceRegularExpression(ReplaceWithText, id, CurrentInsertionPointReplace);
+	FinderMode->SetSelection(FinderClass::REGULAR_EXPRESSION);
+}
+
 BEGIN_EVENT_TABLE(mvceditor::FindInFilesResultsPanelClass, FindInFilesResultsPanelGeneratedClass)
 	EVT_COMMAND(wxID_ANY, EVENT_FILE_READ, mvceditor::FindInFilesResultsPanelClass::OnFileSearched)
 	EVT_COMMAND(ID_FIND_IN_FILES_PROGRESS, EVENT_FIND_IN_FILES_FILE_HIT, mvceditor::FindInFilesResultsPanelClass::OnFileHit)
@@ -455,4 +513,30 @@ END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::FindInFilesPluginClass, wxEvtHandler)
 	EVT_MENU(ID_MENU_FIND_IN_FILES, mvceditor::FindInFilesPluginClass::OnEditFindInFiles)
+END_EVENT_TABLE()
+
+BEGIN_EVENT_TABLE(mvceditor::FindInFilesDialogClass, FindInFilesDialogGeneratedClass)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_ONE, mvceditor::FindInFilesDialogClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_TWO, mvceditor::FindInFilesDialogClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_THREE, mvceditor::FindInFilesDialogClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_FOUR, mvceditor::FindInFilesDialogClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_FIVE, mvceditor::FindInFilesDialogClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_ONE, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_ZERO_OR_ONE, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_EXACT, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_AT_LEAST, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_BETWEEN, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_BEGIN_OF_LINE, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_END_OF_LINE, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_DIGIT, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_WHITE_SPACE, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_ALPHANUMERIC, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_NOT_DECIMAL, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_NOT_WHITE_SPACE, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_NOT_ALPHANUMERIC, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_CASE_SENSITIVE, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_COMMENT, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_DOT_ALL, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_MULTI_LINE, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_UWORD, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
 END_EVENT_TABLE()

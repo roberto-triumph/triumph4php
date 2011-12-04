@@ -27,7 +27,9 @@
 
 #include <wx/validate.h>
 #include <wx/radiobox.h>
-#include <search/FinderClass.h>
+#include <wx/combobox.h>
+#include <wx/menu.h>
+#include <unicode/unistr.h>
 
 namespace mvceditor {
 
@@ -36,17 +38,17 @@ namespace mvceditor {
  * if the finder is in regex mode. Currently this validator
  * can handle either wxTextCtrl of wxComboBox only.
  */
-class FinderValidatorClass : public wxValidator {
+class RegularExpressionValidatorClass : public wxValidator {
 
 public:
 	
 	/**
-	 * @param The object to validate. This class will not own this pointer.
+	 * @param The string to validate / transfer. This class will not own this pointer.
 	 * @param the mode radio button. this needs to be 
 	 *        checked so that we skip reg ex validation
 	 *        when the expression is not a reg ex
 	 */
-	FinderValidatorClass(FinderClass* finder, wxRadioBox* modeRadio);
+	RegularExpressionValidatorClass(UnicodeString* data, wxRadioBox* modeRadio);
 
 	virtual bool TransferToWindow();
 	
@@ -58,7 +60,7 @@ public:
 
 private:
 
-	FinderValidatorClass();
+	RegularExpressionValidatorClass();
 	
 	/**
 	 * The mode radio button; this needs to be 
@@ -70,8 +72,77 @@ private:
 	/**
 	 * The object to validate. This class will not own this pointer.
 	 */
-	FinderClass* Finder;
+	UnicodeString* Data;
 };
+
+/**
+ * Add all of the regular expression flags to the given menu
+ * @param regExMenu the popup menu
+ * @param menuStart the start ID of the menu items
+ */
+void PopulateRegExFindMenu(wxMenu& regExMenu, int menuStart);
+
+/**
+ * Add all of the regular expression replacements to the given menu
+ * @param regExMenu the popup menu
+ * @param menuStart the start ID of the menu items
+ */
+void PopulateRegExReplaceMenu(wxMenu& regExMenu, int menuStart);
+
+/**
+ * Alter the given textbox (that contains a regular expression) depending on the user choice. 
+ * Note that the caret will be left at currentInsertionPoint
+ * 
+ * @param wxComboBox* the combobox containing the regular expression (will be modified in place)
+ * @param int menuId the ID that the user chose (one of the ID_MENU_REG_EX_ constants)
+ * @param int currentInsertionPoint the position of the cursor
+ *        on Win32 GetInsertionPoint() returns 0 when the combo box is no
+ *	      in focus; we must receive the position via an outside mechanism
+ */
+void AddSymbolToRegularExpression(wxComboBox* text, const int id, int currentInsertionPoint);
+
+/**
+ * Alter the given textbox (that contains a regular expression replacement) depending on 
+ * the user choice. Note that the caret will be left at currentInsertionPoint
+ *
+ * @param wxComboBox* the combobox containing the regular expression (will be modified in place)
+ * @param int menuId the ID that the user chose (one of the ID_MENU_REG_EX_ constants) 
+ * @param int currentInsertionPoint the position of the cursor
+ *        on Win32 GetInsertionPoint() returns 0 when the combo box is no
+ *	      in focus; we must receive the position via an outside mechanism
+ */
+void AddSymbolToReplaceRegularExpression(wxComboBox* text, int id, int currentInsertionPoint);
+
+/**
+ * These are the Menu IDs for the regular expression popup menu.
+ * When connecting to events, use these IDs.
+ */
+const int ID_MENU_REG_EX_SEQUENCE_ZERO = 1;
+const int ID_MENU_REG_EX_SEQUENCE_ONE = 2;
+const int ID_MENU_REG_EX_ZERO_OR_ONE = 3;
+const int ID_MENU_REG_EX_SEQUENCE_EXACT = 4;
+const int ID_MENU_REG_EX_SEQUENCE_AT_LEAST = 5;
+const int ID_MENU_REG_EX_SEQUENCE_BETWEEN = 6;
+const int ID_MENU_REG_EX_BEGIN_OF_LINE = 7;
+const int ID_MENU_REG_EX_END_OF_LINE = 8;
+const int ID_MENU_REG_EX_DIGIT = 9;
+const int ID_MENU_REG_EX_WHITE_SPACE = 10;
+const int ID_MENU_REG_EX_ALPHANUMERIC = 11;
+const int ID_MENU_REG_EX_NOT_DECIMAL = 12;
+const int ID_MENU_REG_EX_NOT_WHITE_SPACE = 13;
+const int ID_MENU_REG_EX_NOT_ALPHANUMERIC = 14;
+const int ID_MENU_REG_EX_CASE_SENSITIVE = 15;
+const int ID_MENU_REG_EX_COMMENT = 16;
+const int ID_MENU_REG_EX_DOT_ALL = 17;
+const int ID_MENU_REG_EX_MULTI_LINE = 18;
+const int ID_MENU_REG_EX_UWORD = 19;
+
+const int ID_MENU_REG_EX_REPLACE_MATCH_ONE = 20;
+const int ID_MENU_REG_EX_REPLACE_MATCH_TWO = 21;
+const int ID_MENU_REG_EX_REPLACE_MATCH_THREE = 22;
+const int ID_MENU_REG_EX_REPLACE_MATCH_FOUR = 23;
+const int ID_MENU_REG_EX_REPLACE_MATCH_FIVE = 24;
+
 }
 
 #endif

@@ -14,13 +14,13 @@
 #include <wx/font.h>
 #include <wx/colour.h>
 #include <wx/settings.h>
+#include <wx/button.h>
 #include <wx/combobox.h>
 #include <wx/sizer.h>
 #include <wx/filepicker.h>
 #include <wx/statbox.h>
 #include <wx/radiobox.h>
 #include <wx/checkbox.h>
-#include <wx/button.h>
 #include <wx/dialog.h>
 #include <wx/listbox.h>
 #include <wx/panel.h>
@@ -42,8 +42,10 @@ class FindInFilesDialogGeneratedClass : public wxDialog
 		};
 		
 		wxStaticText* FindLabel;
+		wxButton* RegexFindHelpButton;
 		wxComboBox* FindText;
 		wxStaticText* ReplaceWithLabel;
+		wxButton* RegexReplaceWithHelpButton;
 		wxComboBox* ReplaceWithText;
 		wxDirPickerCtrl* Directory;
 		wxComboBox* FilesFilter;
@@ -54,7 +56,9 @@ class FindInFilesDialogGeneratedClass : public wxDialog
 		wxButton* ButtonsSizerCancel;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnRegExFindHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRegExReplaceHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
 		
 	
