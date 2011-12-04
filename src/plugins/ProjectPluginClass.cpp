@@ -140,6 +140,10 @@ void mvceditor::ProjectPluginClass::OnProjectOpened() {
 		RecentProjects.push_back(projectRoot);
 	}
 	SyncMenu();
+	PersistProjectList();
+}
+
+void mvceditor::ProjectPluginClass::PersistProjectList() {
 
 	// recent projects file will have 1 group per project; like this
 	// 
@@ -156,6 +160,9 @@ void mvceditor::ProjectPluginClass::OnProjectOpened() {
 	// flag when reading the file in
 	wxFileConfig recentFileConfig(wxT("mvc_editor"), wxEmptyString, recentFileConfigFilePath, wxEmptyString, 
 		wxCONFIG_USE_LOCAL_FILE);
+
+	// remove all existing items; this is in case the list has shrunk from last time it was persisted
+	recentFileConfig.DeleteAll();
 	wxString groupName;
 	for (size_t i = 0; i < RecentProjects.size(); i++) {
 		recentFileConfig.SetPath(wxString::Format(wxT("/Project_%d"), i));
@@ -190,17 +197,13 @@ void mvceditor::ProjectPluginClass::OnMenu(wxCommandEvent& event) {
 		
 		// on linux project seems to have an extra space
 		project.Trim();
-		wxFileName fileName(project);
 		bool remove = false;
-
-		// TODO: this logic does not work on Windows.  When a project directory is deleted;
-		// this prompt does not get triggered.
-		if (fileName.FileExists()) {
+		if (wxFileName::FileExists(project)) {
 			int ret = wxMessageBox(_("Path is not a directory. Remove from Recent list?\n") + project, _("Warning"), 
 				wxCENTER | wxICON_ERROR | wxYES_NO);
 			remove = wxYES == ret;
 		}
-		else if (!fileName.DirExists()) {
+		else if (!wxFileName::DirExists(project)) {
 			int ret = wxMessageBox(_("Path no longer exists. Remove from Recent list?\n") + project, _("Warning"), 
 				wxCENTER | wxICON_ERROR | wxYES_NO);
 			remove = wxYES == ret;
@@ -216,6 +219,7 @@ void mvceditor::ProjectPluginClass::OnMenu(wxCommandEvent& event) {
 			if (it != RecentProjects.end()) {
 				RecentProjects.erase(it);
 				SyncMenu();
+				PersistProjectList();
 			}
 		}
 	}

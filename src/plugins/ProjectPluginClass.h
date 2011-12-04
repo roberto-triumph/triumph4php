@@ -100,6 +100,11 @@ private:
 	void SyncMenu();
 
 	/**
+	 * Will write the RecentProjects list to disk.
+	 */
+	void PersistProjectList();
+
+	/**
 	 * List of recently opened projects
 	 */
 	std::vector<wxString> RecentProjects;
