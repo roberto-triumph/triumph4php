@@ -224,6 +224,7 @@ void* mvceditor::MultipleSqlExecuteClass::Entry() {
 				break;
 			}
 		}
+		SqlLexer.Close();
 	}
 	else {
 
@@ -248,6 +249,7 @@ bool mvceditor::MultipleSqlExecuteClass::Init(const UnicodeString& sql, const Sq
 
 void mvceditor::MultipleSqlExecuteClass::Close() {
 	Session.close();
+	SqlLexer.Close();
 	IsRunning = false;
 }
 

@@ -49,6 +49,12 @@ public:
 	 * @return bool true if queries is not empty
 	 */
 	bool OpenString(const UnicodeString& queries);
+
+	/**
+	 * Clean up any resources after lexing. This should be done so that
+	 * the string given in the Open() call can be released.
+	 */
+	void Close();
 	
 	/**
 	 * Method to parse out an entire query out of the text. This method is usually in a 

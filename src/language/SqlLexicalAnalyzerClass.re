@@ -37,6 +37,10 @@ mvceditor::SqlLexicalAnalyzerClass::SqlLexicalAnalyzerClass()
 
 }
 
+void mvceditor::SqlLexicalAnalyzerClass::Close() {
+	Buffer.Close();
+}
+
 bool mvceditor::SqlLexicalAnalyzerClass::OpenString(const UnicodeString& queries) {
 	QueryStartLineNumber = 1;
 	return Buffer.OpenString(queries);

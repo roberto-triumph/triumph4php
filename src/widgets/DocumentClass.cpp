@@ -189,6 +189,7 @@ std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoComplete(const wxSt
 			ret = HandleAutoCompletionHtml(code, word, syntax);
 			break;
 		}
+		LanguageDiscovery.Close();
 	}	
 	return ret;
 }
