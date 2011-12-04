@@ -49,11 +49,6 @@ public:
 	 */
 	enum Drivers {
 		MYSQL
-		
-		// TODO: add support for these later
-		// adding support means implementing meta data for SqlResourceFinderClass
-		//POSTGRESQL,
-		//SQLITE
 	};
 	
 	/**
