@@ -249,8 +249,9 @@ void mvceditor::OutlineViewPluginClass::MethodFound(const UnicodeString& classNa
 		TokenClass::TokenIds visibility, bool isStatic) {
 	UnicodeString line;
 	
-	// TODO: nationalize the word "method"
-	line.append(className).append(UNICODE_STRING_SIMPLE("::")).append(signature).append(UNICODE_STRING_SIMPLE(" [method]"));
+	wxString method = _("[method]");
+	line.append(className).append(UNICODE_STRING_SIMPLE("::")).append(signature)
+		.append(mvceditor::StringHelperClass::wxToIcu(method));
 	CurrentOutlineLines.push_back(line);
 }
 		
@@ -258,9 +259,9 @@ void mvceditor::OutlineViewPluginClass::PropertyFound(const UnicodeString& class
 		const UnicodeString& propertyType, const UnicodeString& comment, 
 		TokenClass::TokenIds visibility, bool isConst, bool isStatic) {
 	UnicodeString line;
-	
-	// TODO: nationalize the word "property"
-	line.append(className).append(UNICODE_STRING_SIMPLE("::")).append(propertyName).append(UNICODE_STRING_SIMPLE(" [Property] "));
+	wxString property = _("[property]");
+	line.append(className).append(UNICODE_STRING_SIMPLE("::")).append(propertyName)
+		.append(mvceditor::StringHelperClass::wxToIcu(property));
 	if (!propertyType.isEmpty()) {
 		line.append(propertyType);
 	}
