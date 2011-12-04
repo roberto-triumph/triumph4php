@@ -90,13 +90,15 @@ void mvceditor::OutlineViewPluginClass::BuildOutline(const wxString& line) {
 					UnicodeString params(resource.Signature, pos);
 					CurrentOutline.append(params);
 				}
-				
-				// TODO: nationalize the words 'method' and 'property'
 				if (resource.Type == mvceditor::ResourceClass::METHOD) {
-					CurrentOutline.append(UNICODE_STRING_SIMPLE(" [Method]"));
+					wxString method = _("[Method]");
+					CurrentOutline.append(' ');
+					CurrentOutline.append(mvceditor::StringHelperClass::wxToIcu(method));
 				}
 				else if (resource.Type == mvceditor::ResourceClass::MEMBER) {
-					CurrentOutline.append(UNICODE_STRING_SIMPLE(" [Property]"));
+					wxString prop = _("[Property]");
+					CurrentOutline.append(' ');
+					CurrentOutline.append(mvceditor::StringHelperClass::wxToIcu(prop));
 				}
 				CurrentOutline.append(UNICODE_STRING_SIMPLE("\n"));
 			}
