@@ -245,14 +245,14 @@ void mvceditor::ResourceUpdateThreadClass::Unregister(const wxString& fileName) 
 
 
 wxThreadError mvceditor::ResourceUpdateThreadClass::StartBackgroundUpdate(const wxString& fileName, const UnicodeString& code) {
-	wxThreadError err = Create();
-	if (wxTHREAD_NO_ERROR == err && !GetThread()->IsRunning()) {
+	wxThreadError error = CreateSingleInstance();
+	if (wxTHREAD_NO_ERROR == error) {
 		CurrentCode = code;
 		CurrentFileName = fileName;
 		GetThread()->Run();
 		SignalStart();
 	}
-	return err;
+	return error;
 }
 
 void* mvceditor::ResourceUpdateThreadClass::Entry() {

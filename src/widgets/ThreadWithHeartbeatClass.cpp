@@ -40,7 +40,20 @@ mvceditor::ThreadWithHeartbeatClass::~ThreadWithHeartbeatClass() {
 		thread->Delete();
 	}
 	Timer.Stop();
-	
+}
+
+wxThreadError mvceditor::ThreadWithHeartbeatClass::CreateSingleInstance() {
+	wxThreadError error = wxTHREAD_NO_ERROR;
+
+	// Create() kills the currently running thread; must first check for a running
+	// instance
+	if (IsRunning()) {
+		error = wxTHREAD_RUNNING;
+	}
+	else {		
+		error = Create();
+	}
+	return error;
 }
 
 void mvceditor::ThreadWithHeartbeatClass::SignalStart() {
@@ -57,6 +70,10 @@ void mvceditor::ThreadWithHeartbeatClass::SignalEnd() {
 void mvceditor::ThreadWithHeartbeatClass::OnTimer(wxTimerEvent& event) {
 	wxCommandEvent evt(mvceditor::EVENT_WORK_IN_PROGRESS, EventId);
 	wxPostEvent(&Handler, evt);
+}
+
+bool mvceditor::ThreadWithHeartbeatClass::IsRunning() const {
+	return m_thread && m_thread->IsRunning();
 }
 
 const wxEventType mvceditor::EVENT_WORK_COMPLETE = wxNewEventType();

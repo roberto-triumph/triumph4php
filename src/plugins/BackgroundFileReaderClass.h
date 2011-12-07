@@ -131,11 +131,6 @@ public:
 	 */
 	void StopReading();
 
-	/**
-	 * returns TRUE if there is a background thread running.
-	 */
-	bool IsRunning() const;
-
 protected: 
 
 	/**

@@ -306,24 +306,25 @@ void mvceditor::ResourcePluginClass::OnJump(wxCommandEvent& event) {
 	wxWindow* mainWindow = GetMainWindow();
 	if (codeControl) {
 		ResourceFinderClass* resourceFinder = GetResourceFinder();
-		wxString text = codeControl->GetSelectedText();
-		if (!text.IsEmpty()) {
-			// the user specifically marked a string to search
-			// lets see if we can determine the class. if we can determine the class, we will have a higher
-			// chance of getting fewer matches from the resource finder
-			wxString symbol = codeControl->GetCurrentSymbol();
-			if (symbol.Contains(wxT("::"))) {
-				text = symbol;
-			}
-			bool found = resourceFinder->Prepare(text) && resourceFinder->CollectNearMatchResources();
+		//wxString text = codeControl->GetSelectedText();
+		//if (!text.IsEmpty()) {
+		// the user specifically marked a string to search
+		// lets see if we can determine the class. if we can determine the class, we will have a higher
+		// chance of getting fewer matches from the resource finder
+		wxString symbol = codeControl->GetCurrentSymbol();
+		if (!symbol.IsEmpty()) {
+			//if (symbol.Contains(wxT("::"))) {
+				//text = symbol;
+			//}
+			bool found = resourceFinder->Prepare(symbol) && resourceFinder->CollectNearMatchResources();
 			if (found) {
-				JumpToText = text;
+				JumpToText = symbol;
 				ShowJumpToResults();	
 			}
 			else {
 				
 				// maybe cache has not been created or user has not indexed the project, lets index the project and try again
-				JumpToText = text;
+				JumpToText = symbol;
 				
 				ResourcePluginPanelClass* window = (ResourcePluginPanelClass*)wxWindow::FindWindowById(ID_RESOURCE_PLUGIN_PANEL, mainWindow);
 				window->FocusOnSearchControl();
