@@ -70,8 +70,10 @@ public:
 	
 	/**
 	 * The file extensions we want to attempt to parse.
+	 * Each item in the list is a wilcard suitable for passing into the wxMatchWild()
+	 * function
 	 */
-	wxString PhpFileExtensions;
+	std::vector<wxString> PhpFileFilters;
 	
 	/**
 	 * Running count of files that had parse errors.
@@ -108,13 +110,13 @@ public:
 	 * Start the background thread.  Lint errors will be propagated as events.
 	 * @param wxString directory the location of files that need to be parsed.  Parsing will
 	 *        be recursive (sub directories will be parsed also).
-	 * @param wxString phpFileExtension wildcard filter of files to parse. See wxIsWild()
-	 *       for description of valid wildcards.
+	 * @param wxString phpFileFilters a list of wildcard filter of files to parse. See wxIsWild() and
+	 *        wxMatchWild() for description of valid wildcards (only '*' and '?' are wildcards).
 	 * @param StartError& error the reason for a failure to start will be set here.
 	 * return bool TRUE if and only if the thread was started.  If false, either thread could
 	 * not be started or directory is not valid. 
 	 */
-	bool BeginDirectoryLint(const wxString& directory, const wxString& phpFileExtensions, StartError& error);
+	bool BeginDirectoryLint(const wxString& directory, const std::vector<wxString>& phpFileFilters, StartError& error);
 
 	/**
 	 * Lint checks the given file in the current thread.  This is a thread-safe method;
@@ -155,7 +157,12 @@ private:
 
 	ParserDirectoryWalkerClass ParserDirectoryWalker;
 			
-	wxString PhpFileExtensions;
+	/**
+	 * The file extensions we want to attempt to parse.
+	 * Each item in the list is a wilcard suitable for passing into the wxMatchWild()
+	 * function
+	 */
+	std::vector<wxString> PhpFileFilters;
 };
 
 /**

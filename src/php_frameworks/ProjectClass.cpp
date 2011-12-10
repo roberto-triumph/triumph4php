@@ -28,6 +28,7 @@
 #include <wx/filename.h>
 #include <wx/utils.h>
 #include <wx/sstream.h>
+#include <wx/tokenzr.h>
 #include <wx/fileconf.h>
 #include <vector>
 
@@ -45,8 +46,10 @@ mvceditor::ProjectClass::ProjectClass(const mvceditor::ProjectOptionsClass& opti
 	, Options(options)
 	, ResourceFinder()
 	, Frameworks()
-	, Databases() {
-	ResourceFinder.FilesFilter = GetPhpFileExtensions();
+	, Databases() 
+	, PhpFileFilters()
+	, CssFileFilters()
+	, SqlFileFilters() {
 }
 
 wxString mvceditor::ProjectClass::GetPhpKeywords() const {
@@ -89,10 +92,6 @@ wxString mvceditor::ProjectClass::Sanitize(const wxString& arg) const {
 	wxString ret = arg;
 	ret.Replace(wxT("'"), wxT("\\'"), true);
 	return wxT("'") + ret + wxT("'");
-}
-
-wxString mvceditor::ProjectClass::GetPhpFileExtensions() const {
-	return wxT("*.php");
 }
 
 wxString mvceditor::ProjectClass::GetPhpExecutable() const {
@@ -192,4 +191,91 @@ wxString mvceditor::ProjectClass::GetProcessOutput(const wxString& allOutput) {
 		resultString = allOutput.Mid(index + START_MARKER.Length() + 1);
 	}
 	return resultString;
+}
+
+wxString mvceditor::ProjectClass::GetPhpFileExtensionsString() const {
+	wxString all;
+	for (size_t i = 0; i < PhpFileFilters.size(); ++i) {
+		all.Append(PhpFileFilters[i]);
+		if (i < (PhpFileFilters.size() - 1)) {
+			all.Append(wxT(';'));
+		}
+	}
+	return all;
+}
+
+std::vector<wxString> mvceditor::ProjectClass::GetPhpFileExtensions() const {
+	std::vector<wxString> cpy;
+	for (size_t i = 0; i < PhpFileFilters.size(); ++i) {
+		wxString s;
+		s.Append(PhpFileFilters[i]);
+		cpy.push_back(s);
+	}
+	return cpy;
+}
+
+void mvceditor::ProjectClass::SetPhpFileExtensionsString(wxString wildcardString) {
+	wxStringTokenizer tokenizer(wildcardString, wxT(";"));
+	while (tokenizer.HasMoreTokens()) {
+		wxString wildcard = tokenizer.NextToken();
+		PhpFileFilters.push_back(wildcard);
+	}
+	ResourceFinder.FileFilters = PhpFileFilters;
+}
+
+wxString mvceditor::ProjectClass::GetCssFileExtensionsString() const {
+	wxString all;
+	for (size_t i = 0; i < CssFileFilters.size(); ++i) {
+		all.Append(CssFileFilters[i]);
+		if (i < (CssFileFilters.size() - 1)) {
+			all.Append(wxT(';'));
+		}
+	}
+	return all;
+}
+
+std::vector<wxString> mvceditor::ProjectClass::GetCssFileExtensions() const {
+	std::vector<wxString> cpy;
+	for (size_t i = 0; i < CssFileFilters.size(); ++i) {
+		wxString s;
+		s.Append(CssFileFilters[i]);
+		cpy.push_back(s);
+	}
+	return cpy;
+}
+
+void mvceditor::ProjectClass::SetCssFileExtensionsString(wxString wildcardString) {
+	wxStringTokenizer tokenizer(wildcardString, wxT(";"));
+	while (tokenizer.HasMoreTokens()) {
+		wxString wildcard = tokenizer.NextToken();
+		CssFileFilters.push_back(wildcard);
+	}
+}
+
+wxString mvceditor::ProjectClass::GetSqlFileExtensionsString() const {
+	wxString all;
+	for (size_t i = 0; i < SqlFileFilters.size(); ++i) {
+		all.Append(SqlFileFilters[i]);
+		if (i < (SqlFileFilters.size() - 1)) {
+			all.Append(wxT(';'));
+		}
+	}
+	return all;
+}
+std::vector<wxString> mvceditor::ProjectClass::GetSqlFileExtensions() const {
+	std::vector<wxString> cpy;
+	for (size_t i = 0; i <SqlFileFilters.size(); ++i) {
+		wxString s;
+		s.Append(SqlFileFilters[i]);
+		cpy.push_back(s);
+	}
+	return cpy;
+}
+
+void mvceditor::ProjectClass::SetSqlFileExtensionsString(wxString wildcardString) {
+	wxStringTokenizer tokenizer(wildcardString, wxT(";"));
+	while (tokenizer.HasMoreTokens()) {
+		wxString wildcard = tokenizer.NextToken();
+		SqlFileFilters.push_back(wildcard);
+	}
 }

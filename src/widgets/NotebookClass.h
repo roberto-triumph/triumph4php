@@ -230,6 +230,11 @@ private:
 	 *  saved.
 	 */
 	bool GetModifiedPageNames(std::vector<wxString>& modifiedPageNames, std::vector<int>& modifiedPageIndexes) const;
+
+	/**
+	 * Creates the dialog wildcard string based on the project's settings.
+	 */
+	wxString CreateWildcardString() const;
 	
 	/**
 	 * The context menu for handling right-click options

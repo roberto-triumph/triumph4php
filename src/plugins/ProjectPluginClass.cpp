@@ -49,8 +49,14 @@ int ID_TOOLBAR_PROJECT_EXPLORE_OPEN_FILE = wxNewId();
 mvceditor::ProjectPluginClass::ProjectPluginClass() 
 	: PluginClass()
 	, RecentProjects()
+	, PhpFileFiltersString()
+	, CssFileFiltersString()
+	, SqlFileFiltersString()
 	, RecentProjectsMenu(NULL)
 	, MAX_RECENT_PROJECTS(5) {
+	PhpFileFiltersString = wxT("*.php");
+	CssFileFiltersString = wxT("*.css");
+	SqlFileFiltersString = wxT("*.sql");
 	wxPlatformInfo info;
 	switch (info.GetOperatingSystemId()) {
 		case wxOS_WINDOWS_NT:
@@ -81,7 +87,17 @@ void mvceditor::ProjectPluginClass::AddToolBarItems(wxAuiToolBar* toolbar) {
 }
 
 void mvceditor::ProjectPluginClass::LoadPreferences(wxConfigBase* config) {
-	config->Read(wxT("Project/ExplorerExecutable"), &ExplorerExecutable);
+	config->Read(wxT("/Project/ExplorerExecutable"), &ExplorerExecutable);
+	PhpFileFiltersString = config->Read(wxT("/Project/PhpFileFilters"), wxT("*.php"));
+	CssFileFiltersString = config->Read(wxT("/Project/CssFileFilters"), wxT("*.css"));
+	SqlFileFiltersString = config->Read(wxT("/Project/SqlFileFilters"), wxT("*.sql"));
+	mvceditor::ProjectClass* project = GetProject();
+	if (project) {
+		project->SetPhpFileExtensionsString(PhpFileFiltersString);
+		project->SetCssFileExtensionsString(CssFileFiltersString);
+		project->SetSqlFileExtensionsString(SqlFileFiltersString);
+	}
+
 
 	// read the recent projects from a separate config file
 	// the decision to keep the recent projects separate from the settings config file is because
@@ -120,11 +136,26 @@ void mvceditor::ProjectPluginClass::LoadPreferences(wxConfigBase* config) {
 }
 
 void mvceditor::ProjectPluginClass::SavePreferences(wxConfigBase* config) {
-	config->Write(wxT("Project/ExplorerExecutable"), ExplorerExecutable);
+	config->Write(wxT("/Project/ExplorerExecutable"), ExplorerExecutable);
+	config->Write(wxT("/Project/PhpFileFilters"), PhpFileFiltersString);
+	config->Write(wxT("/Project/CssFileFilters"), CssFileFiltersString);
+	config->Write(wxT("/Project/SqlFileFilters"), SqlFileFiltersString);
+	
+	mvceditor::ProjectClass* project = GetProject();
+	if (project) {
+		project->SetPhpFileExtensionsString(PhpFileFiltersString);
+		project->SetCssFileExtensionsString(CssFileFiltersString);
+		project->SetSqlFileExtensionsString(SqlFileFiltersString);
+	}
 }
 
 void mvceditor::ProjectPluginClass::OnProjectOpened() {
-	wxString projectRoot = GetProject()->GetRootPath();
+	mvceditor::ProjectClass* project = GetProject();
+	project->SetPhpFileExtensionsString(PhpFileFiltersString);
+	project->SetCssFileExtensionsString(CssFileFiltersString);
+	project->SetSqlFileExtensionsString(SqlFileFiltersString);
+	
+	wxString projectRoot = project->GetRootPath();
 	projectRoot.Trim();
 	if (projectRoot.IsEmpty()) {
 
@@ -268,8 +299,18 @@ void mvceditor::ProjectPluginClass::OnProjectExploreOpenFile(wxCommandEvent& eve
 
 mvceditor::ProjectPluginPanelClass::ProjectPluginPanelClass(wxWindow *parent, mvceditor::ProjectPluginClass &projectPlugin) 
 : ProjectPluginGeneratedPanelClass(parent) {
-	NonEmptyTextValidatorClass validator(&projectPlugin.ExplorerExecutable, Label);
-	ExplorerExecutable->SetValidator(validator);
+	NonEmptyTextValidatorClass explorerValidator(&projectPlugin.ExplorerExecutable, Label);
+	ExplorerExecutable->SetValidator(explorerValidator);
+
+	NonEmptyTextValidatorClass phpFileFiltersValidator(&projectPlugin.PhpFileFiltersString, PhpLabel);
+	PhpFileFilters->SetValidator(phpFileFiltersValidator);
+
+	NonEmptyTextValidatorClass cssFileFiltersValidator(&projectPlugin.CssFileFiltersString, CssLabel);
+	CssFileFilters->SetValidator(cssFileFiltersValidator);
+
+	NonEmptyTextValidatorClass sqlFileFiltersValidator(&projectPlugin.SqlFileFiltersString, SqlLabel);
+	SqlFileFilters->SetValidator(sqlFileFiltersValidator);
+	
 }
 
 void mvceditor::ProjectPluginPanelClass::OnFileChanged(wxFileDirPickerEvent& event) {

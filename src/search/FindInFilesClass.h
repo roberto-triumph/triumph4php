@@ -42,7 +42,7 @@ namespace mvceditor {
  * files will be line-based, each line of each file will be compared against the search expression.
  * 
  * File filters string is a GLOB-like string, using asterisk ('*') as wildcard. There may be multiple filters, each 
- * filter should be separated by a comma (',').
+ * filter should be separated by a semicolon (';').
  * 
  * Examples:
  * 
@@ -67,7 +67,7 @@ namespace mvceditor {
  * <code>
  * 
  *   FindInFilesClass finder(UNICODE_STRING_SIMPLE("UserClass"), FinderClass::CODE);
- *   finder.FilesFilter = wxT("*.php,*.inc");
+ *   finder.FilesFilter = wxT("*.php;*.inc");
  *   DirectorySearchClass search();
  *   if (search.Init(wxT("/path/to/phpfiles/"))) {
  *   	if (finder.Prepare()) {
@@ -84,7 +84,7 @@ namespace mvceditor {
  * 
  *  <code>
  *   FindInFilesClass finder(UNICODE_STRING_SIMPLE("UserClass"), FinderClass::CODE);
- *   finder.FilesFilter = wxT("*.php,*.inc");
+ *   finder.FilesFilter = wxT("*.php;*.inc");
  *   DirectorySearchClass search();
  *   if (search.Init(wxT("/path/to/phpfiles/"))) {
  *   	if (finder.Prepare()) {
@@ -134,6 +134,7 @@ public:
 	/**
 	 * File name mask.  Files matching the mask will be searched. If FilesFilter is modified, Prepare() method MUST be 
 	 * called in order to set the internal state machine.
+	 * the FilesFilter is a semicolon-separated series of wildcards.
 	 * @var wxString
 	 */
 	wxString FilesFilter;

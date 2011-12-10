@@ -43,6 +43,21 @@ public:
 	wxString ExplorerExecutable;
 
 	/**
+	 * Serialized PHP file filters string from the config
+	 */
+	wxString PhpFileFiltersString;
+
+	/**
+	 * Serialized CSS file filters string from the config
+	 */
+	wxString CssFileFiltersString;
+
+	/**
+	 * Serialized SQL file filters string from the config
+	 */
+	wxString SqlFileFiltersString;
+
+	/**
 	 * Create a new instance of ProjectPluginClass.
 	 */
 	ProjectPluginClass();

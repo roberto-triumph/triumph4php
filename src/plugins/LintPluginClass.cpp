@@ -35,7 +35,7 @@ const int ID_LINT_RESULTS_GAUGE = mvceditor::PluginClass::newMenuId();
 
 mvceditor::ParserDirectoryWalkerClass::ParserDirectoryWalkerClass() 
 	: LastResults()
-	, PhpFileExtensions()
+	, PhpFileFilters()
 	, WithErrors(0)
 	, WithNoErrors(0)
 	, Parser() {
@@ -49,7 +49,15 @@ void mvceditor::ParserDirectoryWalkerClass::ResetTotals() {
 
 bool mvceditor::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 	bool ret = false;
-	if (!wxIsWild(PhpFileExtensions) || wxMatchWild(PhpFileExtensions, fileName)) {
+	bool matchedFilter = false;
+	for (size_t i = 0; i < PhpFileFilters.size(); ++i) {
+		wxString filter = PhpFileFilters[i];
+		matchedFilter = !wxIsWild(filter) || wxMatchWild(filter, fileName);
+		if (matchedFilter) {
+			break;
+		}
+	}
+	if (matchedFilter) {
 		LastResults.Error = UNICODE_STRING_SIMPLE("");
 		LastResults.LineNumber = 0;
 		LastResults.CharacterPosition = 0;
@@ -67,17 +75,17 @@ bool mvceditor::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 mvceditor::LintBackgroundFileReaderClass::LintBackgroundFileReaderClass(wxEvtHandler& handler)
 	: BackgroundFileReaderClass(handler)
 	, ParserDirectoryWalker()
-	, PhpFileExtensions() {
+	, PhpFileFilters() {
 		
 }
 
-bool mvceditor::LintBackgroundFileReaderClass::BeginDirectoryLint(const wxString& directory, const wxString& phpFileExtensions, mvceditor::BackgroundFileReaderClass::StartError& error) {
+bool mvceditor::LintBackgroundFileReaderClass::BeginDirectoryLint(const wxString& directory, const std::vector<wxString>& phpFileFilters, mvceditor::BackgroundFileReaderClass::StartError& error) {
 	bool good = false;
-	PhpFileExtensions = phpFileExtensions;
+	PhpFileFilters = phpFileFilters;
 	error = mvceditor::BackgroundFileReaderClass::NONE;
 	if (Init(directory)) {
 		ParserDirectoryWalker.ResetTotals();
-		ParserDirectoryWalker.PhpFileExtensions = phpFileExtensions;
+		ParserDirectoryWalker.PhpFileFilters = PhpFileFilters;
 		if (StartReading(error)) {
 			good = true;
 		}
@@ -90,7 +98,7 @@ bool mvceditor::LintBackgroundFileReaderClass::LintSingleFile(const wxString& fi
 	// ATTN: use a local instance of ParserClass so that this method is thread safe
 	// and can be run when a background thread is already running.
 	ParserDirectoryWalkerClass walker;
-	walker.PhpFileExtensions = wxT("");
+	walker.PhpFileFilters.clear();
 	bool error = walker.Walk(fileName);
 	if (error) {
 		wxCommandEvent evt(EVENT_LINT_ERROR, ID_LINT_ERROR_COMMAND);
@@ -230,9 +238,9 @@ void mvceditor::LintPluginClass::OnLintMenu(wxCommandEvent& event) {
 	mvceditor::ProjectClass *project = GetProject();
 	if (project) {
 		wxString rootPath = project->GetRootPath();
-		wxString phpFileExtensions = project->GetPhpFileExtensions();
+		std::vector<wxString> phpFileFilters = project->GetPhpFileExtensions();
 		mvceditor::BackgroundFileReaderClass::StartError error;
-		if (LintBackgroundFileReader.BeginDirectoryLint(rootPath, phpFileExtensions, error)) {
+		if (LintBackgroundFileReader.BeginDirectoryLint(rootPath, phpFileFilters, error)) {
 			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 			gauge->AddGauge(_("Lint Check"), ID_LINT_RESULTS_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 			

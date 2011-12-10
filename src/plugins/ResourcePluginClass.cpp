@@ -44,19 +44,22 @@ bool mvceditor::ResourceFileReaderClass::InitForNativeFunctionsFile(const mvcedi
 	wxFileName nativeFunctionsFilePath = NewResources.NativeFunctionsFilePath();
 	if (Init(nativeFunctionsFilePath.GetPath())) {
 		NewResources.CopyResourcesFrom(finder);
-		NewResources.FilesFilter = nativeFunctionsFilePath.GetFullName();
-
+		
 		// need to do this so that the resource finder attempts to parse the files
+		// FileFilters and query string needs to be non-empty
+		NewResources.FileFilters = finder.FileFilters;
 		NewResources.Prepare(wxT("FakeClass"));
 		return true;
 	}
 	return false;
 }
 
-bool mvceditor::ResourceFileReaderClass::InitForProject(const mvceditor::ResourceFinderClass& finder, const wxString& projectRootPath, const wxString& phpFileExtensions) {
+bool mvceditor::ResourceFileReaderClass::InitForProject(const mvceditor::ResourceFinderClass& finder, 
+														const wxString& projectRootPath, 
+														const std::vector<wxString>& phpFileFilters) {
 	if (Init(projectRootPath)) {
 		NewResources.CopyResourcesFrom(finder);
-		NewResources.FilesFilter = phpFileExtensions;
+		NewResources.FileFilters = phpFileFilters;
 		return true;
 	}
 	return false;
@@ -71,7 +74,15 @@ bool mvceditor::ResourceFileReaderClass::FileRead(mvceditor::DirectorySearchClas
 }
 
 bool mvceditor::ResourceFileReaderClass::FileMatch(const wxString& file) {
-	return wxMatchWild(NewResources.FilesFilter, file);
+	bool matchedFilter = false;
+	for (size_t i = 0; i < NewResources.FileFilters.size(); ++i) {
+		wxString filter = NewResources.FileFilters[i];
+		matchedFilter = !wxIsWild(filter) || wxMatchWild(filter, file);
+		if (matchedFilter) {
+			break;
+		}
+	}
+	return matchedFilter;
 }
 
 mvceditor::ResourcePluginClass::ResourcePluginClass()

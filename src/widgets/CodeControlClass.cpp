@@ -498,23 +498,37 @@ void mvceditor::CodeControlClass::SetMargin() {
 
 void mvceditor::CodeControlClass::AutoDetectDocumentMode() {
 	wxString file = GetFileName();
-	wxFileName name(file);
-	wxString ext = name.GetExt();
-	if (ext.CmpNoCase(wxT("sql")) == 0) {
-		SetDocumentMode(mvceditor::CodeControlClass::SQL);
+	
+	bool found = false;
+	std::vector<wxString> wildcards = Project->GetPhpFileExtensions();
+	for (size_t i = 0; i < wildcards.size(); ++i) {
+		if (wxMatchWild(wildcards[i], file)) {
+			found = true;
+			SetDocumentMode(mvceditor::CodeControlClass::PHP);
+			break;
+		}
 	}
-	else if (ext.CmpNoCase(wxT("php")) == 0 || 
-			ext.CmpNoCase(wxT("phtml")) == 0 || 
-			ext.CmpNoCase(wxT("html")) == 0) {
-				
-		// TODO: someway for the user to change this
-		// *.inc endings are common
-		SetDocumentMode(mvceditor::CodeControlClass::PHP);
+	if (!found) {
+		wildcards = Project->GetCssFileExtensions();
+		for (size_t i = 0; i < wildcards.size(); ++i) {
+			if (wxMatchWild(wildcards[i], file)) {
+				found = true;
+				SetDocumentMode(mvceditor::CodeControlClass::CSS);
+				break;
+			}
+		}	
 	}
-	else if (ext.CmpNoCase(wxT("css")) == 0) {
-		SetDocumentMode(mvceditor::CodeControlClass::CSS);
+	if (!found) {
+		wildcards = Project->GetSqlFileExtensions();
+		for (size_t i = 0; i < wildcards.size(); ++i) {
+			if (wxMatchWild(wildcards[i], file)) {
+				found = true;
+				SetDocumentMode(mvceditor::CodeControlClass::SQL);
+				break;
+			}
+		}	
 	}
-	else {
+	if (!found) {
 		SetDocumentMode(mvceditor::CodeControlClass::TEXT);
 	}
 }
