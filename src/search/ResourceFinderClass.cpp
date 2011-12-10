@@ -32,7 +32,7 @@
 
 
 mvceditor::ResourceFinderClass::ResourceFinderClass()
-		: FilesFilter()
+		: FileFilters()
 		, ResourceCache()
 		, MembersCache()
 		, FileCache()
@@ -52,7 +52,15 @@ mvceditor::ResourceFinderClass::ResourceFinderClass()
 }
 
 bool mvceditor::ResourceFinderClass::Walk(const wxString& fileName) {
-	if (!wxIsWild(FilesFilter) || wxMatchWild(FilesFilter, fileName)) {
+	bool matchedFilter = false;
+	for (size_t i = 0; i < FileFilters.size(); ++i) {
+		wxString filter = FileFilters[i];
+		matchedFilter = !wxIsWild(filter) || wxMatchWild(filter, fileName);
+		if (matchedFilter) {
+			break;
+		}
+	}
+	if (matchedFilter) {
 		switch (ResourceType) {
 			case FILE_NAME:
 			case FILE_NAME_LINE_NUMBER:

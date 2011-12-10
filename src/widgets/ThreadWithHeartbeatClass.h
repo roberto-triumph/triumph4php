@@ -62,6 +62,14 @@ public:
 	 * On object destruction, if this thread is running it will be stopped.
 	 */
 	virtual ~ThreadWithHeartbeatClass();
+
+	/**
+	 * A wrapper around wxThreadHelper::Create() method; the added bonus is that
+	 * CreateSingleInstance() will first check for the existence of a running thread
+	 * and will not Create (nor kill) a thread that is currently running. Create()
+	 * will kill any running threads.
+	 */
+	wxThreadError CreateSingleInstance();
 	
 	/**
 	 * Will prepare to send events at regular intervals. After a call to this method, a 
@@ -79,6 +87,11 @@ public:
 	 * Will generate a EVENT_WORK_IN_PROGRESS event
 	 */
 	void OnTimer(wxTimerEvent& event);
+
+	/**
+	 * returns TRUE if there is a background thread running.
+	 */
+	bool IsRunning() const;
 	
 protected:
 

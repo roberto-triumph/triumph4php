@@ -43,20 +43,16 @@ bool mvceditor::BackgroundFileReaderClass::InitMatched() {
 	return !DirectorySearch.GetMatchedFiles().empty();
 }
 
-bool mvceditor::BackgroundFileReaderClass::IsRunning() const {
-	return m_thread && m_thread->IsRunning();
-}
-
 bool mvceditor::BackgroundFileReaderClass::StartReading(StartError& error) {
 	error = NONE;
 	bool ret = false;
 	bool isAlive = IsRunning();
 	if (!isAlive) {
-		wxThreadError t = Create();
-		if (t == wxTHREAD_NO_RESOURCE) {
+		wxThreadError threadError = CreateSingleInstance();
+		if (threadError == wxTHREAD_NO_RESOURCE) {
 			error = NO_RESOURCES;
 		}
-		else if (t == wxTHREAD_RUNNING) {
+		else if (threadError == wxTHREAD_RUNNING) {
 			error = ALREADY_RUNNING;
 		}
 		else {

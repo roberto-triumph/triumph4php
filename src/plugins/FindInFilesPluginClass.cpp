@@ -379,7 +379,7 @@ mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvce
 	
 	// the first time showing this dialog populate the filter to have only PHP file extensions
 	if (FilesFilter->GetCount() <= 0) {
-		Plugin.PreviousFindInFiles.FilesFilter = project->GetPhpFileExtensions();
+		Plugin.PreviousFindInFiles.FilesFilter = project->GetPhpFileExtensionsString();
 	}
 	if (NULL != project && !project->GetRootPath().IsEmpty()) {
 		Directory->SetPath(project->GetRootPath());

@@ -61,7 +61,7 @@ class ResourceClass;
  * ResourceFinderClass resourceFinder;
  * DirectorySearchClass search;
  * if (search.Init(wxT("/home/user/workspace/project/"))) {
- *   resourceFinder.FilesFilter = wxT("*.php");
+ *   resourceFinder.FilesFilter.push_back(wxT("*.php"));
  *   if (resourceFinder.Prepare(wxT("UserClass"))) {
  *     while (search.More()) {
  *       search.Walk(resourceFinder);
@@ -120,9 +120,12 @@ public:
 	/**
 	 * The files to look in
 	 * 
-	 * @var wxString comma separated list of files, ex. "*.php,class.*.php"
+	 * @var vector<wxString> a lst of file filters 
+	 * Each item in the array will be one wildcard expression; where each
+	 * expression can contain either a '*' or a '?' for use in the
+	 * wxMatchWild() function.
 	 */
-	wxString FilesFilter;
+	std::vector<wxString> FileFilters;
 	
 	/**
 	 * This is the entry point into the resource lookups.  Callers will call the Prepare method giving it a 'query'

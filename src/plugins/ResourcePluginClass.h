@@ -66,9 +66,11 @@ public:
 	 * that match the given wildcard.
 	 *
 	 * @param existingFinder the existing resources
+	 * @param projectPath the directory to be scanned (recursively)
+	 * @param phpFileFilters the list of PHP file extensions to look for resources in
 	 * @return bool false if project root path does not exist
 	 */
-	bool InitForProject(const ResourceFinderClass& existingFinder, const wxString& projectPath, const wxString& filesFilter);
+	bool InitForProject(const ResourceFinderClass& existingFinder, const wxString& projectPath, const std::vector<wxString>& phpFileFilters);
 
 	/**
 	 * Copies the resources that have been parsed by the background thread into dest.

@@ -498,23 +498,37 @@ void mvceditor::CodeControlClass::SetMargin() {
 
 void mvceditor::CodeControlClass::AutoDetectDocumentMode() {
 	wxString file = GetFileName();
-	wxFileName name(file);
-	wxString ext = name.GetExt();
-	if (ext.CmpNoCase(wxT("sql")) == 0) {
-		SetDocumentMode(mvceditor::CodeControlClass::SQL);
+	
+	bool found = false;
+	std::vector<wxString> wildcards = Project->GetPhpFileExtensions();
+	for (size_t i = 0; i < wildcards.size(); ++i) {
+		if (wxMatchWild(wildcards[i], file)) {
+			found = true;
+			SetDocumentMode(mvceditor::CodeControlClass::PHP);
+			break;
+		}
 	}
-	else if (ext.CmpNoCase(wxT("php")) == 0 || 
-			ext.CmpNoCase(wxT("phtml")) == 0 || 
-			ext.CmpNoCase(wxT("html")) == 0) {
-				
-		// TODO: someway for the user to change this
-		// *.inc endings are common
-		SetDocumentMode(mvceditor::CodeControlClass::PHP);
+	if (!found) {
+		wildcards = Project->GetCssFileExtensions();
+		for (size_t i = 0; i < wildcards.size(); ++i) {
+			if (wxMatchWild(wildcards[i], file)) {
+				found = true;
+				SetDocumentMode(mvceditor::CodeControlClass::CSS);
+				break;
+			}
+		}	
 	}
-	else if (ext.CmpNoCase(wxT("css")) == 0) {
-		SetDocumentMode(mvceditor::CodeControlClass::CSS);
+	if (!found) {
+		wildcards = Project->GetSqlFileExtensions();
+		for (size_t i = 0; i < wildcards.size(); ++i) {
+			if (wxMatchWild(wildcards[i], file)) {
+				found = true;
+				SetDocumentMode(mvceditor::CodeControlClass::SQL);
+				break;
+			}
+		}	
 	}
-	else {
+	if (!found) {
 		SetDocumentMode(mvceditor::CodeControlClass::TEXT);
 	}
 }
@@ -1119,15 +1133,12 @@ void mvceditor::CodeControlClass::OnResourceUpdateComplete(wxCommandEvent& event
 	event.Skip();
 }
 void mvceditor::CodeControlClass::OnTimer(wxTimerEvent& event) {
-	if (NeedToUpdateResources && ResourceUpdates && (!ResourceUpdates->GetThread() || !ResourceUpdates->GetThread()->IsRunning())) {
+	if (NeedToUpdateResources && ResourceUpdates && !ResourceUpdates->IsRunning()) {
 		UnicodeString text = GetSafeText();
 		wxThreadError error = ResourceUpdates->StartBackgroundUpdate(FileIdentifier, text);
-		if (wxTHREAD_RUNNING == error) {
-			wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
-		}
-		else if (wxTHREAD_NO_RESOURCE == error) {
-			wxMessageBox(_("Your system is low on resources. Try again later."), wxT("Warning"), wxICON_EXCLAMATION);
-		}
+
+		// even if thread could not be started just prevent re-parsing until user 
+		// modified the text
 		NeedToUpdateResources = false;
 		Timer.Stop();
 	}

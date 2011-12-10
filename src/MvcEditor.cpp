@@ -205,14 +205,15 @@ bool mvceditor::AppClass::OnInit() {
 	Preferences = new PreferencesClass();
 	AppFrame = new mvceditor::AppFrameClass(Plugins, *this, Environment, *Preferences, ResourceUpdates);
 	PluginWindows();
+
+	// load any settings from .INI files
+	PreferencesClass::InitConfig();
+	Environment.LoadFromConfig();
 	wxConfigBase* config = wxConfigBase::Get();
 	for (size_t i = 0; i < Plugins.size(); ++i) {
 		Plugins[i]->InitState(&Environment, this);
 		Plugins[i]->LoadPreferences(config);
-	}
-	// load any settings from .INI files
-	PreferencesClass::InitConfig();
-	Environment.LoadFromConfig();
+	}	
 	Preferences->Load(AppFrame);
 
 	// open a new project

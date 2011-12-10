@@ -75,9 +75,9 @@ bool mvceditor::NotebookClass::SavePage(int pageIndex) {
 			pageIndex);
 	bool saved = false;
 	if (phpSourceCodeCtrl && phpSourceCodeCtrl->IsNew()) {
-		wxString phpFileFilter = wxT("PHP Files (*.php)|*.php| SQL Files (*.sql)|*.sql| All Files (*.*)|*.*");
-		wxFileDialog fileDialog(this, wxT("Save a PHP File"), wxT(""), wxT(""), 
-				phpFileFilter, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+		wxString fileFilter = CreateWildcardString();
+		wxFileDialog fileDialog(this, wxT("Save a File"), wxT(""), wxT(""), 
+				fileFilter, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 		if (wxID_OK == fileDialog.ShowModal()) {
 			wxString newFullPath = fileDialog.GetPath();
 			if (!phpSourceCodeCtrl->SaveAndTrackFile(newFullPath)) {
@@ -131,9 +131,9 @@ void mvceditor::NotebookClass::AddMvcEditorPage() {
 }
 
 void mvceditor::NotebookClass::LoadPage() {
-	wxString phpFileFilter = wxT("PHP Files (*.php)|*.php| SQL Files (*.sql)|*.sql| All Files (*.*)|*.*");
-	wxFileDialog fileDialog(this, wxT("Open a PHP File"), wxT(""), wxT(""), 
-			phpFileFilter, wxFD_OPEN | wxFD_FILE_MUST_EXIST | 
+	wxString fileFilter = CreateWildcardString();
+	wxFileDialog fileDialog(this, wxT("Open a File"), wxT(""), wxT(""), 
+			fileFilter, wxFD_OPEN | wxFD_FILE_MUST_EXIST | 
 			wxFD_MULTIPLE);
 	if (wxID_OK == fileDialog.ShowModal()) {
 		wxArrayString filenames;
@@ -215,9 +215,9 @@ bool mvceditor::NotebookClass::SaveCurrentPageAsNew() {
 			SaveCurrentPage();
 		}
 		else {
-	 		wxString phpFileFilter = wxT("PHP Files (*.php)|*.php| SQL Files (*.sql)|*.sql| All Files (*.*)|*.*");
+	 		wxString fileFilter = CreateWildcardString();
 			wxFileDialog fileDialog(this, wxT("Save to a new PHP File"), wxT(""), wxT(""), 
-					phpFileFilter, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+					fileFilter, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 			if (wxID_OK == fileDialog.ShowModal()) {
 				
 				// SaveAs should have no effect on the state of the
@@ -344,6 +344,24 @@ std::vector<wxString> mvceditor::NotebookClass::GetOpenedFiles() const {
 		}
 	}
 	return files;
+}
+
+wxString mvceditor::NotebookClass::CreateWildcardString() const {
+	wxString phpLabel = Project->GetPhpFileExtensionsString(),
+		cssLabel = Project->GetCssFileExtensionsString(),
+		sqlLabel = Project->GetSqlFileExtensionsString();
+	phpLabel.Replace(wxT(";"), wxT(" "));
+	cssLabel.Replace(wxT(";"), wxT(" "));
+	sqlLabel.Replace(wxT(";"), wxT(" "));
+	wxString php = Project->GetPhpFileExtensionsString(),
+		css = Project->GetCssFileExtensionsString(),
+		sql = Project->GetSqlFileExtensionsString();
+	wxString fileFilter = 
+		wxString::Format(wxT("PHP Files (%s)| %s|"), phpLabel.c_str(), php.c_str()) +
+		wxString::Format(wxT("CSS Files (%s)| %s|"), cssLabel.c_str(), css.c_str()) +
+		wxString::Format(wxT("SQL Files (%s)| %s|"), sqlLabel.c_str(), sql.c_str()) +
+		wxT("All Files (*.*)| *.*");
+	return fileFilter;
 }
 
 mvceditor::FileDropTargetClass::FileDropTargetClass(mvceditor::NotebookClass* notebook) :

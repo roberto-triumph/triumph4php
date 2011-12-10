@@ -70,7 +70,7 @@ TEST_FIXTURE(FindInFilesTestFixtureClass, WalkShouldOnlySearchWhenWildcardsMatch
 	CreateFixtureFile(wxT("admin.inc"), FILE_1);
 	CreateFixtureFile(wxT("admin.php_bak"), FILE_1);
 	FindInFiles->Expression = UNICODE_STRING_SIMPLE("UserClass");
-	FindInFiles->FilesFilter = wxT("*.php,*.inc");
+	FindInFiles->FilesFilter = wxT("*.php;*.inc");
 	CHECK(FindInFiles->Prepare());
 	CHECK(FindInFiles->Walk(TestProjectDir + wxT("user.php")));
 	CHECK(FindInFiles->Walk(TestProjectDir + wxT("admin.inc")));

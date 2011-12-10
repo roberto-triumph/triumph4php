@@ -34,6 +34,7 @@ public:
 	ResourceFinderTestClass() 
 		: FileTestFixtureClass(wxT("resource_finder")) {
 		ResourceFinder = new mvceditor::ResourceFinderClass();
+		ResourceFinder->FileFilters.push_back(wxT("*.php"));
 		if (wxDirExists(TestProjectDir)) {
 			RecursiveRmDir(TestProjectDir);
 		}

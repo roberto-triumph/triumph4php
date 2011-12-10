@@ -44,19 +44,22 @@ bool mvceditor::ResourceFileReaderClass::InitForNativeFunctionsFile(const mvcedi
 	wxFileName nativeFunctionsFilePath = NewResources.NativeFunctionsFilePath();
 	if (Init(nativeFunctionsFilePath.GetPath())) {
 		NewResources.CopyResourcesFrom(finder);
-		NewResources.FilesFilter = nativeFunctionsFilePath.GetFullName();
-
+		
 		// need to do this so that the resource finder attempts to parse the files
+		// FileFilters and query string needs to be non-empty
+		NewResources.FileFilters = finder.FileFilters;
 		NewResources.Prepare(wxT("FakeClass"));
 		return true;
 	}
 	return false;
 }
 
-bool mvceditor::ResourceFileReaderClass::InitForProject(const mvceditor::ResourceFinderClass& finder, const wxString& projectRootPath, const wxString& phpFileExtensions) {
+bool mvceditor::ResourceFileReaderClass::InitForProject(const mvceditor::ResourceFinderClass& finder, 
+														const wxString& projectRootPath, 
+														const std::vector<wxString>& phpFileFilters) {
 	if (Init(projectRootPath)) {
 		NewResources.CopyResourcesFrom(finder);
-		NewResources.FilesFilter = phpFileExtensions;
+		NewResources.FileFilters = phpFileFilters;
 		return true;
 	}
 	return false;
@@ -71,7 +74,15 @@ bool mvceditor::ResourceFileReaderClass::FileRead(mvceditor::DirectorySearchClas
 }
 
 bool mvceditor::ResourceFileReaderClass::FileMatch(const wxString& file) {
-	return wxMatchWild(NewResources.FilesFilter, file);
+	bool matchedFilter = false;
+	for (size_t i = 0; i < NewResources.FileFilters.size(); ++i) {
+		wxString filter = NewResources.FileFilters[i];
+		matchedFilter = !wxIsWild(filter) || wxMatchWild(filter, file);
+		if (matchedFilter) {
+			break;
+		}
+	}
+	return matchedFilter;
 }
 
 mvceditor::ResourcePluginClass::ResourcePluginClass()
@@ -306,24 +317,25 @@ void mvceditor::ResourcePluginClass::OnJump(wxCommandEvent& event) {
 	wxWindow* mainWindow = GetMainWindow();
 	if (codeControl) {
 		ResourceFinderClass* resourceFinder = GetResourceFinder();
-		wxString text = codeControl->GetSelectedText();
-		if (!text.IsEmpty()) {
-			// the user specifically marked a string to search
-			// lets see if we can determine the class. if we can determine the class, we will have a higher
-			// chance of getting fewer matches from the resource finder
-			wxString symbol = codeControl->GetCurrentSymbol();
-			if (symbol.Contains(wxT("::"))) {
-				text = symbol;
-			}
-			bool found = resourceFinder->Prepare(text) && resourceFinder->CollectNearMatchResources();
+		//wxString text = codeControl->GetSelectedText();
+		//if (!text.IsEmpty()) {
+		// the user specifically marked a string to search
+		// lets see if we can determine the class. if we can determine the class, we will have a higher
+		// chance of getting fewer matches from the resource finder
+		wxString symbol = codeControl->GetCurrentSymbol();
+		if (!symbol.IsEmpty()) {
+			//if (symbol.Contains(wxT("::"))) {
+				//text = symbol;
+			//}
+			bool found = resourceFinder->Prepare(symbol) && resourceFinder->CollectNearMatchResources();
 			if (found) {
-				JumpToText = text;
+				JumpToText = symbol;
 				ShowJumpToResults();	
 			}
 			else {
 				
 				// maybe cache has not been created or user has not indexed the project, lets index the project and try again
-				JumpToText = text;
+				JumpToText = symbol;
 				
 				ResourcePluginPanelClass* window = (ResourcePluginPanelClass*)wxWindow::FindWindowById(ID_RESOURCE_PLUGIN_PANEL, mainWindow);
 				window->FocusOnSearchControl();

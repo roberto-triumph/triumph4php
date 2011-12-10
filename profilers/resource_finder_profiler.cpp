@@ -223,7 +223,7 @@ void ProfileResourceFinderOnLargeProject() {
 		return;
 	}
 	time = wxGetLocalTimeMillis();
-	resourceFinder.FilesFilter = wxT("*.php");
+	resourceFinder.FileFilters.push_back(wxT("*.php"));
 	resourceFinder.Prepare(wxT("ExtendedRecordSetForUnitTestAddGetLeftJoin"));
 	search.Init(DirName);
 	while (search.More()) {
@@ -235,7 +235,6 @@ void ProfileResourceFinderOnLargeProject() {
 	printf("time for resourceFinder on entire project:%ld ms found:%d\n", time.ToLong(), (int)found);
 	
 	time = wxGetLocalTimeMillis();
-	resourceFinder.FilesFilter = wxT("*.php");
 	resourceFinder.Prepare(wxT("Record::get"));
 	search.Init(DirName);
 	while (search.More()) {

@@ -208,8 +208,8 @@ void mvceditor::FindInFilesClass::FileContents(const wxString& fileName, Unicode
 wxString mvceditor::FindInFilesClass::CreateFilesFilterRegEx() const {
 	wxString escapedExpression = FilesFilter;
 	
-	// allow ? and * wildcards, turn ',' into '|'
-	wxString symbols = wxT("!@#$%^&()[]{}\\-+.\"|;");
+	// allow ? and * wildcards, turn ';' into '|'
+	wxString symbols = wxT("!@#$%^&()[]{}\\-+.\"|,");
 	int pos = escapedExpression.find_first_of(symbols, 0);
 	while (-1 != pos) {
 		wxString symbol = escapedExpression.substr(pos, 1);
@@ -217,7 +217,7 @@ wxString mvceditor::FindInFilesClass::CreateFilesFilterRegEx() const {
 		escapedExpression.replace(pos, 1, symbol, 2);
 		pos = escapedExpression.find_first_of(symbols, pos + 2);
 	}
-	escapedExpression.Replace(wxT(","), wxT("$|"));
+	escapedExpression.Replace(wxT(";"), wxT("$|"));
 	escapedExpression.Replace(wxT("*"), wxT(".*"));
 	escapedExpression.Replace(wxT("?"), wxT(".?"));
 	escapedExpression.Append(wxT("$"));

@@ -94,7 +94,13 @@ void mvceditor::SqlConnectionDialogClass::OnTestButton(wxCommandEvent& event) {
 		size_t index = List->GetSelection();
 		if (index < Infos.size()) {
 			TestQuery.Info.Copy(Infos[index]);
-			wxThreadError error = wxThreadHelper::Create();
+			wxThreadError error = wxTHREAD_NO_ERROR;
+			if (GetThread() && !GetThread()->IsRunning()) {
+				error = wxTHREAD_RUNNING;
+			}
+			else {
+				error = wxThreadHelper::Create();
+			}
 			switch (error) {
 			case wxTHREAD_NO_ERROR:
 				GetThread()->Run();
@@ -108,7 +114,9 @@ void mvceditor::SqlConnectionDialogClass::OnTestButton(wxCommandEvent& event) {
 			case wxTHREAD_RUNNING:
 			case wxTHREAD_KILLED:
 			case wxTHREAD_NOT_RUNNING:
+
 				// should not be possible we are controlling this with IsRunning
+				// by disabling the buttons
 				break;
 			}
 		}
@@ -182,7 +190,8 @@ mvceditor::MultipleSqlExecuteClass::MultipleSqlExecuteClass(wxEvtHandler& handle
 
 bool mvceditor::MultipleSqlExecuteClass::Execute() {
 	bool ret = false;
-	wxThreadError error = wxThreadHelper::Create();
+	
+	wxThreadError error = CreateSingleInstance();
 	switch (error) {
 	case wxTHREAD_NO_ERROR:
 		GetThread()->Run();
@@ -198,7 +207,7 @@ bool mvceditor::MultipleSqlExecuteClass::Execute() {
 	case wxTHREAD_KILLED:
 	case wxTHREAD_NOT_RUNNING:
 
-		// should not be possible we are controlling this with IsRunning
+		wxMessageBox(_("Please wait while current queries finish executing."));
 		break;
 	}
 	return ret;
@@ -510,7 +519,7 @@ mvceditor::SqlMetaDataFetchClass::SqlMetaDataFetchClass(wxEvtHandler& handler)
 bool mvceditor::SqlMetaDataFetchClass::Read(std::vector<mvceditor::DatabaseInfoClass>* infos) {
 	bool ret = false;
 	Infos = infos;
-	wxThreadError err = Create();
+	wxThreadError err = CreateSingleInstance();
 	if (wxTHREAD_NO_RESOURCE == err) {
 		wxMessageBox(_("System is way too busy. Please try again later."), _("SQL MetaData fetch"));
 	}
