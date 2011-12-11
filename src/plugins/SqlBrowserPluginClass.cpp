@@ -32,6 +32,7 @@
 const int ID_SQL_EDITOR_MENU = mvceditor::PluginClass::newMenuId();
 const int ID_SQL_RUN_MENU = mvceditor::PluginClass::newMenuId();
 const int ID_SQL_CONNECTION_MENU = mvceditor::PluginClass::newMenuId();
+const int ID_SQL_DETECT_MENU = mvceditor::PluginClass::newMenuId();
 const int ID_SQL_GAUGE = wxNewId();
 const int ID_SQL_METADATA_GAUGE = wxNewId();
 
@@ -569,10 +570,11 @@ mvceditor::SqlBrowserPluginClass::~SqlBrowserPluginClass() {
 }
 
 void mvceditor::SqlBrowserPluginClass::OnProjectOpened() {
+	DetectMetadata();
+}
+
+void mvceditor::SqlBrowserPluginClass::DetectMetadata() {
 	ChosenIndex = 0;
-	
-	// TODO: how and when to refresh ??
-	// a "redetect" button??
 	Infos = GetProject()->DatabaseInfo();
 	WasEmptyDetectedInfo = Infos.empty();
 	if (WasEmptyDetectedInfo) {
@@ -593,6 +595,8 @@ void mvceditor::SqlBrowserPluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
 	toolsMenu->Append(ID_SQL_CONNECTION_MENU, _("SQL Connections\tCTRL+F9"), _("Show & Pick The SQL Connections that this project uses"),
 		wxITEM_NORMAL);
 	toolsMenu->Append(ID_SQL_RUN_MENU, _("Run Queries in SQL Browser\tF9"), _("Execute the query that is currently in the SQL Browser"),
+		wxITEM_NORMAL);
+	toolsMenu->Append(ID_SQL_DETECT_MENU, _("Detect SQL Meta Data"), _("Detect SQL Meta data so that it is made available to code completion"),
 		wxITEM_NORMAL);
 }
 
@@ -666,10 +670,10 @@ void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event
 		
 		// if connection changed need to update the code control so that it knows to use the new
 		// connection for auto completion purposes
-		// TODO update the currrent panel only ?
-		size_t selection = GetToolsNotebook()->GetSelection();
-		if (selection >= 0 && GetToolsNotebook()->GetPageCount() > 0) {
-			wxWindow* window = GetToolsNotebook()->GetPage(selection);
+		// all SQL panels are updated.
+		wxAuiNotebook* notebook = GetToolsNotebook();
+		for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
+			wxWindow* window = notebook->GetPage(i);
 			mvceditor::SqlBrowserPanelClass* panel = wxDynamicCast(window, mvceditor::SqlBrowserPanelClass);
 			if (panel) {
 				if (ChosenIndex < Infos.size()) {
@@ -679,6 +683,10 @@ void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event
 			}
 		}
 	}
+}
+
+void mvceditor::SqlBrowserPluginClass::OnSqlDetectMenu(wxCommandEvent& event) {
+	DetectMetadata();
 }
 
 void mvceditor::SqlBrowserPluginClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& event) {
@@ -741,6 +749,7 @@ BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPluginClass, wxEvtHandler)
 	EVT_MENU(ID_SQL_EDITOR_MENU, mvceditor::SqlBrowserPluginClass::OnSqlBrowserToolsMenu)
 	EVT_MENU(ID_SQL_CONNECTION_MENU, mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu)
 	EVT_MENU(ID_SQL_RUN_MENU, mvceditor::SqlBrowserPluginClass::OnRun)
+	EVT_MENU(ID_SQL_DETECT_MENU, mvceditor::SqlBrowserPluginClass::OnSqlDetectMenu)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SqlBrowserPluginClass::OnWorkInProgress)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SqlBrowserPluginClass::OnWorkComplete)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(wxID_ANY, mvceditor::SqlBrowserPluginClass::OnContentNotebookPageChanged)

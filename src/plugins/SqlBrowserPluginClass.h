@@ -390,6 +390,8 @@ private:
 	void OnSqlBrowserToolsMenu(wxCommandEvent& event);
 	
 	void OnSqlConnectionMenu(wxCommandEvent& event);
+
+	void OnSqlDetectMenu(wxCommandEvent& event);
 	
 	void OnRun(wxCommandEvent& event);
 	
@@ -410,6 +412,11 @@ private:
 	 * that is about to be closed.
 	 */
 	void OnContentNotebookPageClose(wxAuiNotebookEvent& event);
+
+	/**
+	 * Will start the SQL meta data background task
+	 */
+	void DetectMetadata();
 	
 	std::vector<DatabaseInfoClass> Infos;
 	
