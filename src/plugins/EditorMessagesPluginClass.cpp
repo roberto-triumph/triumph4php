@@ -79,6 +79,9 @@ void mvceditor::EditorMessagesPanelClass::AddMessage(wxLogLevel level, const wxC
 	case wxLOG_Trace:
 		levelString = _("Trace");
 		break;
+	case wxLOG_Warning:
+		levelString = _("Warning");
+		break;
 	}
 	wxDateTime dateTime(timestamp);
 	dateString = dateTime.FormatISOTime();

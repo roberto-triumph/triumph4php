@@ -513,6 +513,7 @@ void mvceditor::SqlBrowserPanelClass::UnlinkFromCodeControl() {
 mvceditor::SqlMetaDataFetchClass::SqlMetaDataFetchClass(wxEvtHandler& handler)
 	: ThreadWithHeartbeatClass(handler)
 	, Infos() 
+	, Errors()
 	, NewResources() {
 		
 }
@@ -529,6 +530,7 @@ bool mvceditor::SqlMetaDataFetchClass::Read(std::vector<mvceditor::DatabaseInfoC
 	}
 	else if (wxTHREAD_NO_ERROR == err) {
 		Infos = infos;
+		Errors.clear();
 		GetThread()->Run();
 		SignalStart();
 		ret = true;
@@ -537,21 +539,22 @@ bool mvceditor::SqlMetaDataFetchClass::Read(std::vector<mvceditor::DatabaseInfoC
 }
 
 void* mvceditor::SqlMetaDataFetchClass::Entry() {
-	std::vector<UnicodeString> errors;
 	for (std::vector<mvceditor::DatabaseInfoClass>::iterator it = Infos->begin(); it != Infos->end(); ++it) {
 		UnicodeString error;
 		if (!NewResources.Fetch(*it, error)) {
-			errors.push_back(error);
+			Errors.push_back(error);
 		}
 	}
-
-	// TODO do something with the error strings
 	SignalEnd();
 	return 0;
 }
 
 void mvceditor::SqlMetaDataFetchClass::WriteResultsInto(mvceditor::SqlResourceFinderClass& dest) {
 	dest.Copy(NewResources);
+}
+
+std::vector<UnicodeString> mvceditor::SqlMetaDataFetchClass::GetErrors() {
+	return Errors;
 }
 
 mvceditor::SqlBrowserPluginClass::SqlBrowserPluginClass() 
@@ -722,6 +725,12 @@ void mvceditor::SqlBrowserPluginClass::OnWorkInProgress(wxCommandEvent& event) {
 void mvceditor::SqlBrowserPluginClass::OnWorkComplete(wxCommandEvent& event) {
 	GetStatusBarWithGauge()->StopGauge(ID_SQL_METADATA_GAUGE);
 	SqlMetaDataFetch.WriteResultsInto(*GetProject()->GetSqlResourceFinder());
+
+	std::vector<UnicodeString> errors = SqlMetaDataFetch.GetErrors();
+	for (size_t i = 0; i < errors.size(); ++i) {
+		wxString wxError = mvceditor::StringHelperClass::IcuToWx(errors[i]);
+		mvceditor::EditorLogError(mvceditor::BAD_SQL, wxError);
+	}
 }
 
 void mvceditor::SqlBrowserPluginClass::AuiManagerUpdate() {

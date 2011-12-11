@@ -60,6 +60,10 @@ wxString MessageFromError(mvceditor::Errors error, const wxString& extra) {
 			msg = mvceditor::MessageWithFix(_("Could not open file due to a character set detection error. ") + extra,
 				_("This seems to be a binary, encrypted, or compressed file.  MVC Editor cannot open binary, encrypted, or compressed files."));
 			break;
+		case mvceditor::BAD_SQL:
+			msg = mvceditor::MessageWithFix(_("Error executing SQL MetaData query. ") + extra,
+				_("Is the database server up and running?"));
+			break;
 		default:
 			break;
 	}

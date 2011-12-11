@@ -340,12 +340,21 @@ public:
 	 *        to dest
 	 */
 	void WriteResultsInto(SqlResourceFinderClass& dest);
+
+	/**
+	 * Get any connection errors that occurred in the background thread.
+	 * The errors are only from the last run.
+	 * Be careful to no access this while the background thread is running.
+	 */
+	std::vector<UnicodeString> GetErrors();
 	
 protected:
 
 	void* Entry();
 	
 	std::vector<DatabaseInfoClass>* Infos;
+
+	std::vector<UnicodeString> Errors;
 	
 	/**
 	 * This is a clean resource object; will only be accessed

@@ -41,7 +41,7 @@ void mvceditor::SqlResourceFinderClass::Copy(const mvceditor::SqlResourceFinderC
 }
 
 bool mvceditor::SqlResourceFinderClass::Fetch(const mvceditor::DatabaseInfoClass& info, UnicodeString& error) {
-	bool ret = true;
+	bool ret = false;
 	Query.Info.Copy(info);
 	soci::session session;
 	if (Query.Connect(session, error)) {
@@ -51,6 +51,7 @@ bool mvceditor::SqlResourceFinderClass::Fetch(const mvceditor::DatabaseInfoClass
 		Tables[hash].clear();
 		Columns[hash].clear();
 		try {
+			ret = true;
 			std::string schema = mvceditor::StringHelperClass::IcuToChar(info.DatabaseName);
 			std::string tableName;
 			std::string query = "SELECT table_name FROM information_schema.tables WHERE table_schema=(:schema)";
