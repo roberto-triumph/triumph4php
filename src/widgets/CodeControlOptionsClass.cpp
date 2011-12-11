@@ -48,7 +48,7 @@ mvceditor::CodeControlOptionsClass::CodeControlOptionsClass() {
 		
 		// there is a bad flicker that happens when Code Folding and matching braces are enabled ...
 		// turn off code folding in linux by default.
-		// TODO: fixed in new versions of Scintilla?
+		// ATTN: fixed in new versions of Scintilla?
 		EnableCodeFolding = false;
 	}
 	RightMargin = 0;
