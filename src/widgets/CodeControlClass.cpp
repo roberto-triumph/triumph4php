@@ -182,18 +182,7 @@ bool mvceditor::CodeControlClass::SaveAndTrackFile(wxString newFilename) {
 	if (saved) {
 		wxFileName file(CurrentFilename);
 		FileOpenedDateTime = file.GetModificationTime();
-		
-		// when a file is saved update the resource cache
-		// TODO: this causes a crash in the UCharBufferedFile class when
-		// seems to be that the Save event (from the menu) and the key
-		// event from the keyboard are getting executed simultaneously
-		// since UCharBufferedFile is no reentrant, especially when here 
-		// a File is given and in the key event (auto complete) a string is given
-		//mvceditor::ResourceFinderClass* finder = Project->GetResourceFinder();
-		//if (finder != NULL) {
-		//	finder->Walk(CurrentFilename);
-		//}
-		
+
 		// important to set the fileIdentifier to the name;
 		// the ResourceUpdates object will need to know what files are being edited so it can mark them as 'dirty'
 		ResourceUpdates->Unregister(FileIdentifier);
