@@ -122,62 +122,81 @@ wxString mvceditor::ProjectClass::Ask(const wxString& action, const wxString& id
 	return cmd;
 }
 
-void mvceditor::ProjectClass::DetectFrameworkResponse(const wxString& resultString) {
+bool mvceditor::ProjectClass::DetectFrameworkResponse(const wxString& resultString, mvceditor::ProjectClass::DetectError& error) {
+	bool ret = true;
 	wxString iniString = GetProcessOutput(resultString);
-	wxStringInputStream stream(iniString);
-	wxFileConfig result(stream);
-	size_t count = result.GetNumberOfEntries();
-	for (size_t i = 0; i < count; i++) {
-		wxString key = wxString::Format(wxT("/framework_%d"), i);
-		wxString val;
-		val = result.Read(key);
-		Frameworks.push_back(val);
+
+	// only return false when result is non empty but has invalid content
+	if (!iniString.IsEmpty()) {
+		wxStringInputStream stream(iniString);
+		wxFileConfig result(stream);
+		error = mvceditor::ProjectClass::NONE;
+		size_t count = result.GetNumberOfEntries();
+		ret = false;
+		for (size_t i = 0; i < count; i++) {
+			wxString key = wxString::Format(wxT("/framework_%d"), i);
+			wxString val;
+			ret = result.Read(key, &val);
+			if (!ret) {
+				error = mvceditor::ProjectClass::BAD_CONTENT;
+				break;
+			}
+			Frameworks.push_back(val);	
+		}
 	}
+	return ret;
 }
 
-void mvceditor::ProjectClass::DetectDatabaseResponse(const wxString& resultString) {
+bool mvceditor::ProjectClass::DetectDatabaseResponse(const wxString& resultString, mvceditor::ProjectClass::DetectError& error) {
+	bool ret = true;
 	wxString iniString = GetProcessOutput(resultString);
-	wxStringInputStream stream(iniString);
-	wxFileConfig result(stream);
-	wxString groupName = wxT("");
-	long index = 0;		
-	bool next = result.GetFirstGroup(groupName, index);
-	while (next) {
-		mvceditor::DatabaseInfoClass info;
-		groupName = wxT("/") + groupName + wxT("/");
-		
-		// don't use wxFileConfig.SetPath method. it seems to mess with the group iteration
-		wxString s = result.Read(groupName + wxT("Host"));
-		info.Host = mvceditor::StringHelperClass::wxToIcu(s);
-		s = result.Read(groupName + wxT("/User"));
-		info.User = mvceditor::StringHelperClass::wxToIcu(s);
-		s = result.Read(groupName + wxT("Password"));
-		info.Password = mvceditor::StringHelperClass::wxToIcu(s);
-		s = result.Read(groupName + wxT("DatabaseName"));
-		info.DatabaseName = mvceditor::StringHelperClass::wxToIcu(s);
-		s = result.Read(groupName + wxT("FileName"));
-		info.FileName = mvceditor::StringHelperClass::wxToIcu(s);
-		s = result.Read(groupName + wxT("Name"));
-		info.Name = mvceditor::StringHelperClass::wxToIcu(s);
-		wxString driverString = result.Read(groupName + wxT("Driver"));
-		if (driverString.CmpNoCase(wxT("MYSQL"))) {
-			info.Driver = mvceditor::DatabaseInfoClass::MYSQL;
+
+	// only return false when result is non empty but has invalid content
+	if (!iniString.IsEmpty()) {
+		wxStringInputStream stream(iniString);
+		wxFileConfig result(stream);
+		wxString groupName = wxT("");
+		long index = 0;		
+		bool next = result.GetFirstGroup(groupName, index);
+		error = mvceditor::ProjectClass::NONE;
+		if (iniString.IsEmpty() || !next) {
+			error = mvceditor::ProjectClass::BAD_CONTENT;
 		}
-		/*
-		else if (driverString.CmpNoCase(wxT("POSTGRESQL"))) {
-			info.Driver = mvceditor::DatabaseInfoClass::POSTGRESQL;
-		}
-		else if (driverString.CmpNoCase(wxT("SQLITE"))) {
-			info.Driver = mvceditor::DatabaseInfoClass::SQLITE;
-		}*/
 		else {
-			info.Driver = mvceditor::DatabaseInfoClass::MYSQL;
-			// TODO error handling
+			ret = true;
 		}
-		result.Read(groupName + wxT("Port"), &info.Port);
-		Databases.push_back(info);
-		next = result.GetNextGroup(groupName, index);
+		while (next) {
+			mvceditor::DatabaseInfoClass info;
+			groupName = wxT("/") + groupName + wxT("/");
+			
+			// don't use wxFileConfig.SetPath method. it seems to mess with the group iteration
+			wxString s = result.Read(groupName + wxT("Host"));
+			info.Host = mvceditor::StringHelperClass::wxToIcu(s);
+			s = result.Read(groupName + wxT("/User"));
+			info.User = mvceditor::StringHelperClass::wxToIcu(s);
+			s = result.Read(groupName + wxT("Password"));
+			info.Password = mvceditor::StringHelperClass::wxToIcu(s);
+			s = result.Read(groupName + wxT("DatabaseName"));
+			info.DatabaseName = mvceditor::StringHelperClass::wxToIcu(s);
+			s = result.Read(groupName + wxT("FileName"));
+			info.FileName = mvceditor::StringHelperClass::wxToIcu(s);
+			s = result.Read(groupName + wxT("Name"));
+			info.Name = mvceditor::StringHelperClass::wxToIcu(s);
+			wxString driverString = result.Read(groupName + wxT("Driver"));
+			if (driverString.CmpNoCase(wxT("MYSQL")) == 0) {
+				info.Driver = mvceditor::DatabaseInfoClass::MYSQL;
+			}
+			else {
+				error = mvceditor::ProjectClass::UNIMPLEMENTED;
+				ret = false;
+				break;
+			}
+			result.Read(groupName + wxT("Port"), &info.Port);
+			Databases.push_back(info);
+			next = result.GetNextGroup(groupName, index);
+		}
 	}
+	return ret;
 }
 
 wxString mvceditor::ProjectClass::GetProcessOutput(const wxString& allOutput) {

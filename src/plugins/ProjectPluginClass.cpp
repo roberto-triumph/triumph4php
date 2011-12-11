@@ -24,6 +24,7 @@
  */
 #include <plugins/ProjectPluginClass.h>
 #include <widgets/NonEmptyTextValidatorClass.h>
+#include <MvcEditorErrors.h>
 #include <wx/artprov.h>
 #include <wx/platinfo.h>
 #include <wx/filename.h>
@@ -261,7 +262,7 @@ void mvceditor::ProjectPluginClass::OnMenu(wxCommandEvent& event) {
 
 void mvceditor::ProjectPluginClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 	ProjectPluginPanelClass* panel = new ProjectPluginPanelClass(parent, *this);
-	parent->AddPage(panel, wxT("Explorer"));
+	parent->AddPage(panel, wxT("Project"));
 }
 
 void mvceditor::ProjectPluginClass::OnProjectExplore(wxCommandEvent& event) {
@@ -274,7 +275,7 @@ void mvceditor::ProjectPluginClass::OnProjectExplore(wxCommandEvent& event) {
 		cmd += wxT("\"");
 		long result = wxExecute(cmd);
 		if (!result) {
-			wxMessageBox(_("Explorer could not be invoked: ") + cmd);
+			mvceditor::EditorLogError(mvceditor::BAD_EXPLORER_EXCUTABLE, cmd);
 		}
 	}
 	else {
@@ -293,7 +294,7 @@ void mvceditor::ProjectPluginClass::OnProjectExploreOpenFile(wxCommandEvent& eve
 		cmd += wxT("\"");
 		long result = wxExecute(cmd);
 		if (!result) {
-			wxMessageBox(_("Explorer could not be invoked: ") + cmd);
+			mvceditor::EditorLogError(mvceditor::BAD_EXPLORER_EXCUTABLE, cmd);
 		}
 	}
 	else {

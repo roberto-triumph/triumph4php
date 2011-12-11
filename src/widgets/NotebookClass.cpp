@@ -24,6 +24,7 @@
  */
 #include <widgets/NotebookClass.h>
 #include <windows/StringHelperClass.h>
+#include <MvcEditorErrors.h>
 #include <wx/artprov.h>
 #include <wx/filename.h>
 #include <wx/file.h>
@@ -167,9 +168,14 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename) {
 		}
 	}
 	if (!found) {
-		CodeControlClass* newCode = new CodeControlClass(
-			this, *CodeControlOptions, Project, ResourceUpdates, wxID_ANY);
-		if (newCode->LoadAndTrackFile(filename)) {
+		UnicodeString fileContents;	
+
+		// not using wxStyledTextCtrl::LoadFile() because it does not correctly handle files with high ascii characters
+		mvceditor::FindInFilesClass::OpenErrors error = FindInFilesClass::FileContents(filename, fileContents);
+		if (error == mvceditor::FindInFilesClass::NONE) {
+			CodeControlClass* newCode = new CodeControlClass(this, *CodeControlOptions, Project, ResourceUpdates, wxID_ANY);
+			newCode->TrackFile(filename, fileContents);
+
 			// if user dragged in a file on an opened file we want still want to accept dragged files
 			newCode->SetDropTarget(new FileDropTargetClass(this));
 			wxFileName fileName(filename);
@@ -177,11 +183,11 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename) {
 				wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_TOOLBAR, 
 				wxSize(16, 16)));
 		}
-		else {
-			
-			// else probably should delete window since it's not going to 
-			// get used...
-			 newCode->Destroy();
+		else if (error = mvceditor::FindInFilesClass::FILE_NOT_FOUND) {
+			wxLogError(_("File Not Found:") + filename);
+		}
+		else if (mvceditor::FindInFilesClass::CHARSET_DETECTION == error) {
+			mvceditor::EditorLogError(mvceditor::CHARSET_DETECTION, filename);
 		}
 	}
 }

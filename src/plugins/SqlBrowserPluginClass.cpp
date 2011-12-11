@@ -27,6 +27,7 @@
 #include <widgets/CodeControlClass.h>
 #include <windows/StringHelperClass.h>
 #include <widgets/UnicodeStringValidatorClass.h>
+#include <MvcEditorErrors.h>
 
 const int ID_SQL_EDITOR_MENU = mvceditor::PluginClass::newMenuId();
 const int ID_SQL_RUN_MENU = mvceditor::PluginClass::newMenuId();
@@ -109,7 +110,7 @@ void mvceditor::SqlConnectionDialogClass::OnTestButton(wxCommandEvent& event) {
 				break;
 			case wxTHREAD_NO_RESOURCE:
 			case wxTHREAD_MISC_ERROR:
-				wxMessageBox(_("Cannot run query. Your system is low on resources."));
+				mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
 				break;
 			case wxTHREAD_RUNNING:
 			case wxTHREAD_KILLED:
@@ -201,7 +202,7 @@ bool mvceditor::MultipleSqlExecuteClass::Execute() {
 		break;
 	case wxTHREAD_NO_RESOURCE:
 	case wxTHREAD_MISC_ERROR:
-		wxMessageBox(_("Cannot run query. Your system is low on resources."));
+		mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
 		break;
 	case wxTHREAD_RUNNING:
 	case wxTHREAD_KILLED:
@@ -521,7 +522,7 @@ bool mvceditor::SqlMetaDataFetchClass::Read(std::vector<mvceditor::DatabaseInfoC
 	Infos = infos;
 	wxThreadError err = CreateSingleInstance();
 	if (wxTHREAD_NO_RESOURCE == err) {
-		wxMessageBox(_("System is way too busy. Please try again later."), _("SQL MetaData fetch"));
+		mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
 	}
 	else if (wxTHREAD_RUNNING == err) {
 		wxMessageBox(_("There is already another SQL MetaData fetch that is active. Please wait for it to finish."), _("SQL MetaData fetch"));

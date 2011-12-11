@@ -36,8 +36,10 @@
 #include <plugins/RunConsolePluginClass.h>
 #include <plugins/LintPluginClass.h>
 #include <plugins/SqlBrowserPluginClass.h>
+#include <plugins/EditorMessagesPluginClass.h>
 #include <widgets/ProcessWithHeartbeatClass.h>
 #include <widgets/ResourceUpdateThreadClass.h>
+#include <MvcEditorErrors.h>
 
 namespace mvceditor {
 
@@ -322,6 +324,8 @@ void mvceditor::AppClass::CreatePlugins() {
 	Plugins.push_back(plugin);
 	plugin = new SqlBrowserPluginClass();
 	Plugins.push_back(plugin);
+	plugin = new mvceditor::EditorMessagesPluginClass();
+	Plugins.push_back(plugin);
 
 	// test plugin need to find a quicker way to toggling it ON / OFF
 	//plugin = new TestPluginClass();
@@ -363,7 +367,7 @@ void mvceditor::AppClass::ProjectOpen(const wxString& directoryPath) {
 	wxString cmd = Project->DetectFrameworkCommand();
 	long pid = 0;
 	if (!ProcessWithHeartbeat.Init(cmd, ID_FRAMEWORK_DETECT_PROCESS, pid)) {
-		wxMessageBox(_("Error in PHP framework detection. Is PHP location correct?"));
+		mvceditor::EditorLogError(mvceditor::BAD_PHP_EXECUTABLE, Environment.Php.PhpExecutablePath); 
 	}
 }
 
@@ -394,30 +398,44 @@ void mvceditor::AppClass::OnProcessComplete(wxCommandEvent& event) {
 		// framework detection complete.  if a known framework 
 		// was detected get the DB info, else just continue
 		// opening the project
-		Project->DetectFrameworkResponse(event.GetString());
-		std::vector<wxString> frameworks = Project->FrameworkIdentifiers();
-		if (!frameworks.empty()) {
-			for (size_t i = 0; i < frameworks.size(); i++) {
-				wxString cmd = Project->DetectDatabaseCommand(frameworks[i]);
-				long pid = 0;
-				if (ProcessWithHeartbeat.Init(cmd, ID_DATABASE_DETECT_PROCESS, pid)) {
-					FrameworkIdentifiersLeftToDetect.push_back(frameworks[i]);
+		if (!event.GetString().IsEmpty()) {
+			mvceditor::ProjectClass::DetectError error = mvceditor::ProjectClass::NONE;
+			if (Project->DetectFrameworkResponse(event.GetString(), error)) {
+				std::vector<wxString> frameworks = Project->FrameworkIdentifiers();
+				if (!frameworks.empty()) {
+					for (size_t i = 0; i < frameworks.size(); i++) {
+						wxString cmd = Project->DetectDatabaseCommand(frameworks[i]);
+						long pid = 0;
+						if (ProcessWithHeartbeat.Init(cmd, ID_DATABASE_DETECT_PROCESS, pid)) {
+							FrameworkIdentifiersLeftToDetect.push_back(frameworks[i]);
+						}
+					}
+					continueProjectOpen = false;
 				}
 			}
-			continueProjectOpen = false;
+			else {
+				mvceditor::EditorLogError(mvceditor::PROJECT_DETECTION);
+			}
 		}
 	}
 	else if (event.GetId() == ID_DATABASE_DETECT_PROCESS) {
 		
 		// detection of database settings for ONE framework has completed.
 		wxString output = event.GetString();
-		Project->DetectDatabaseResponse(output);
+		if (!output.IsEmpty()) {
+			mvceditor::ProjectClass::DetectError error = mvceditor::ProjectClass::NONE;
+			if (Project->DetectDatabaseResponse(output, error)) {
 
-		// at this point we dont use the framework name here; just need a 'counter'
-		// to know when all frameworks have been detected
-		FrameworkIdentifiersLeftToDetect.pop_back();
-		if (!FrameworkIdentifiersLeftToDetect.empty()) {
-			continueProjectOpen = false;
+				// at this point we dont use the framework name here; just need a 'counter'
+				// to know when all frameworks have been detected
+				FrameworkIdentifiersLeftToDetect.pop_back();
+				if (!FrameworkIdentifiersLeftToDetect.empty()) {
+					continueProjectOpen = false;
+				}
+			}
+			else {
+				mvceditor::EditorLogError(mvceditor::DATABASE_DETECTION);
+			}
 		}
 	}
 	if (continueProjectOpen) {
@@ -429,7 +447,7 @@ void mvceditor::AppClass::OnProcessComplete(wxCommandEvent& event) {
 }
 
 void mvceditor::AppClass::OnProcessFailed(wxCommandEvent& event) {
-	wxMessageBox(event.GetString());
+	EditorLogError(mvceditor::BAD_PHP_EXECUTABLE, event.GetString());
 }
 
 BEGIN_EVENT_TABLE(mvceditor::AppClass, wxApp)

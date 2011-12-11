@@ -24,6 +24,7 @@
  */
 #include <plugins/ResourcePluginClass.h>
 #include <windows/StringHelperClass.h>
+#include <MvcEditorErrors.h>
 #include <wx/artprov.h>
 #include <wx/filename.h>
 #include <wx/valgen.h>
@@ -136,7 +137,7 @@ void mvceditor::ResourcePluginClass::OnProjectOpened() {
 			wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
 		}
 		else if (mvceditor::BackgroundFileReaderClass::NO_RESOURCES == error) {
-			wxMessageBox(_("Your system is low on resources. Try again later."), wxT("Warning"), wxICON_EXCLAMATION);
+			mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
 		}
 	}
 }
@@ -180,7 +181,7 @@ void mvceditor::ResourcePluginClass::SearchForResources() {
 						wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
 					}
 					else if (mvceditor::BackgroundFileReaderClass::NO_RESOURCES == error) {
-						wxMessageBox(_("Your system is low on resources. Try again later."), wxT("Warning"), wxICON_EXCLAMATION);
+						mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
 					}
 			}
 			else {
@@ -296,7 +297,7 @@ void mvceditor::ResourcePluginClass::OnProjectIndex(wxCommandEvent& event) {
 						wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
 					}
 					else if (mvceditor::BackgroundFileReaderClass::NO_RESOURCES == error) {
-						wxMessageBox(_("Your system is low on resources. Try again later."), wxT("Warning"), wxICON_EXCLAMATION);
+						mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
 					}
 			}
 			else {

@@ -98,16 +98,16 @@ public:
 	                 const wxString& name = wxT("code"));
 	
 	/**
-	 * Loads the contents of the given file, and initializes the
+	 * Loads the given contents of the given file, and initializes the
 	 * proper lexer so that the file gets syntax highlight according to the language
-	 * it containts.  This load method is better than the wxStyledTextCtrl load
+	 * it contains.  This load method is better than the wxStyledTextCtrl load
 	 * method because it will keep track of the file modification times and
 	 * prompt the user when a file has been modified outside of the editor.
 	 *
 	 * @param wxString filename full path of the file to load
-	 * @return bool true id the filename was found and readable.
+	 * @param contents the file contents
 	 */
-	bool LoadAndTrackFile(const wxString& filename);
+	void TrackFile(const wxString& filename, UnicodeString& contents);
 
 	/**
 	 * Returns true if the this control was NOT loaded with an existing
@@ -255,6 +255,18 @@ public:
 	void SetCurrentInfo(const DatabaseInfoClass& other);
 
 private:
+
+	/**
+	 * Opens the file, loads its contents of the given file, and initializes the
+	 * proper lexer so that the file gets syntax highlight according to the language
+	 * it contains.  This load method is better than the wxStyledTextCtrl load
+	 * method because it will keep track of the file modification times and
+	 * prompt the user when a file has been modified outside of the editor.
+	 *
+	 * @param wxString filename full path of the file to load
+	 * @param contents the file contents
+	 */
+	void LoadAndTrackFile(const wxString& filename);
 
 //------------------------------------------------------------------------
 // setting the various wxStyledTextCtrl options

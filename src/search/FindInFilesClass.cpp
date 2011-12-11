@@ -23,12 +23,14 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <language/LexicalAnalyzerClass.h>
+#include <MvcEditorErrors.h>
 #include <search/FindInFilesClass.h>
 #include <unicode/ustring.h>
 #include <unicode/ucnv.h>
 #include <unicode/ucsdet.h>
 
-#include <wx/wx.h>
+#include <wx/string.h>
+#include <wx/regex.h>
 #include <wx/filename.h>
 
 mvceditor::FindInFilesClass::FindInFilesClass(const UnicodeString& expression, int mode) 
@@ -133,12 +135,17 @@ int mvceditor::FindInFilesClass::ReplaceAllMatchesInFile(const wxString& fileNam
 		// TODO: problems here: this code will load entire file into memory not too efficient
 		// TODO: double memory hit going from ICU string to WX string
 		UnicodeString fileContents;
-		FileContents(fileName, fileContents);
-		matches += ReplaceAllMatches(fileContents);
-		UFILE* file = u_fopen(fileName.ToAscii(), "wb", NULL, NULL);
-		if (NULL != file) {
-			u_file_write(fileContents.getBuffer(), fileContents.length(), file);
-			u_fclose(file);
+		mvceditor::FindInFilesClass::OpenErrors error = FileContents(fileName, fileContents);
+			if (NONE == error) {
+			matches += ReplaceAllMatches(fileContents);
+			UFILE* file = u_fopen(fileName.ToAscii(), "wb", NULL, NULL);
+			if (NULL != file) {
+				u_file_write(fileContents.getBuffer(), fileContents.length(), file);
+				u_fclose(file);
+			}
+		}
+		else if (mvceditor::FindInFilesClass::CHARSET_DETECTION == error) {
+			mvceditor::EditorLogError(mvceditor::CHARSET_DETECTION, fileName);
 		}
 	}
 	return matches;
@@ -152,7 +159,8 @@ void mvceditor::FindInFilesClass::CopyFinder(FinderClass& dest) {
 	dest.Wrap = Finder.Wrap;
 }
 
-void mvceditor::FindInFilesClass::FileContents(const wxString& fileName, UnicodeString& fileContents) {
+mvceditor::FindInFilesClass::OpenErrors mvceditor::FindInFilesClass::FileContents(const wxString& fileName, UnicodeString& fileContents) {
+	OpenErrors error = NONE;
 
 	// TODO: inefficient; will load entire file into memory ... twice!!
 	// TODO: handle unicode file names
@@ -176,33 +184,36 @@ void mvceditor::FindInFilesClass::FileContents(const wxString& fileName, Unicode
 		if(U_SUCCESS(status)) {
 			ucm = ucsdet_detect(csd, &status);
 			if(U_SUCCESS(status) && ucm != NULL) {
-				name = ucsdet_getName(ucm, &status);
-				if(U_SUCCESS(status)) {
-					//wxString s = wxString::FromAscii(name);
-					//int32_t cc = ucsdet_getConfidence(ucm, &status);
-					//s += wxT(" confidence=");
-					//s += wxString::Format(wxT("%d"), cc);
-					//wxMessageBox(s);
-				} else wxMessageBox(wxT("could not get detected charset name"));
-			} //else wxMessageBox(wxT("could not detect charset"));
+				name = ucsdet_getName(ucm, &status);	
+			}
 			ucsdet_close(csd);
-		} //else wxMessageBox(wxT("could init detector"));
-		
+		} 	
 		delete[] tmp;
-		
-		// encode to string. file already opened, no need to check again
-		// open without newline translations; very important to find out
-		// tricky newline problems
-		UFILE* file = u_fopen(fileName.ToAscii(), "rb", NULL, NULL);
-		if (name != 0) {
+		if (name) {
+			
+			// encode to string. file already opened, no need to check again
+			// open without newline translations; very important to find out
+			// tricky newline problems
+			UFILE* file = u_fopen(fileName.ToAscii(), "rb", NULL, NULL);
 			int error = u_fsetcodepage(name, file);
 			if(0 == error) {
 				int32_t read = u_file_read(fileContents.getBuffer(size + 1), size, file);
 				fileContents.releaseBuffer(read);
+				error = NONE;
 			}
+			else {
+				error = CHARSET_DETECTION;
+			}
+			u_fclose(file);
 		}
-		u_fclose(file);
+		else {
+			error = CHARSET_DETECTION;
+		}
 	}
+	else {
+		error = FILE_NOT_FOUND;
+	}
+	return error;
 }
 	
 wxString mvceditor::FindInFilesClass::CreateFilesFilterRegEx() const {

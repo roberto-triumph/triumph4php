@@ -26,6 +26,7 @@
 #include <windows/StringHelperClass.h>
 #include <widgets/UnicodeStringValidatorClass.h>
 #include <widgets/RegularExpressionValidatorClass.h>
+#include <MvceditorErrors.h>
 #include <wx/artprov.h>
 #include <wx/clipbrd.h>
 #include <wx/ffile.h>
@@ -133,7 +134,7 @@ void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findI
 			wxMessageBox(_("Find in files is already running. Please wait for it to finish."), _("Find In Files"));
 		}
 		else if (error == mvceditor::BackgroundFileReaderClass::NO_RESOURCES)  {
-			wxMessageBox(_("System is way too busy. Please try again later."), _("Find In Files"));
+			mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
 		}
 	}
 	else {
@@ -226,7 +227,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxComman
 			wxMessageBox(_("Find in files is already running. Please wait for it to finish."), _("Find In Files"));
 		}
 		else if (error == mvceditor::BackgroundFileReaderClass::NO_RESOURCES)  {
-			wxMessageBox(_("System is way too busy. Please try again later."), _("Find In Files"));
+			mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
 		}
 	}
 	else {

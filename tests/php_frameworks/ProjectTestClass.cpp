@@ -51,7 +51,8 @@ TEST_FIXTURE(ProjectTestFixtureClass, ShouldParseFrameworkResponse) {
 		"framework_0 = \"Test\"\n"
 		"framework_1 = \"Symfony\"\n"
 	);
-	Project->DetectFrameworkResponse(result);
+	mvceditor::ProjectClass::DetectError error = mvceditor::ProjectClass::NONE;
+	CHECK(Project->DetectFrameworkResponse(result, error));
 	std::vector<wxString> identifiers = Project->FrameworkIdentifiers();
 	CHECK_EQUAL((size_t)2, identifiers.size());
 	CHECK_EQUAL(wxT("Test"), identifiers[0]);
@@ -83,7 +84,10 @@ TEST_FIXTURE(ProjectTestFixtureClass, ShouldParseDatabaseResponse) {
 		"User = \"my_user_test\"\n"
 		"Password = \"123_test\"\n"
 	);
-	Project->DetectDatabaseResponse(result);
+
+	mvceditor::ProjectClass::DetectError error = mvceditor::ProjectClass::NONE;
+	CHECK(Project->DetectDatabaseResponse(result, error));
+	
 	std::vector<mvceditor::DatabaseInfoClass> frameworks = Project->DatabaseInfo();
 	CHECK_EQUAL((size_t)2, frameworks.size());
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("127.0.0.1"), frameworks[0].Host);

@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <plugins/RunConsolePluginClass.h>
+#include <MvcEditorErrors.h>
 #include <wx/artprov.h>
 #include <wx/filename.h>
 #include <wx/sstream.h>
@@ -107,7 +108,8 @@ void  mvceditor::RunConsolePanelClass::RunCommand(wxCommandEvent& event) {
 	else if (CurrentPid > 0) {
 		bool stopped = ProcessWithHeartbeat.Stop(CurrentPid);		
 		if (!stopped) {
-			wxMessageBox(wxString::Format(wxT("Could not kill process %ld."), CurrentPid));
+			mvceditor::EditorLogError(mvceditor::ROGUE_PROCESS, 
+				wxString::Format(wxT("Process ID: %ld."), CurrentPid));
 
 			// stale PID??
 			Gauge->StopGauge(IdProcessGauge);

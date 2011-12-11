@@ -24,6 +24,7 @@
  */
 #include <widgets/CodeControlClass.h>
 #include <windows/StringHelperClass.h>
+#include <MvcEditorErrors.h>
 #include <wx/filename.h>
 #include <wx/stc/stc.h>
 #include <wx/regex.h>
@@ -92,50 +93,44 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 	
 }
 
-bool mvceditor::CodeControlClass::LoadAndTrackFile(const wxString& filename) {
-	UnicodeString fileContents;
-	wxFileName file(filename);
-	bool ret = false;
-	// not using LoadFile() because it does not correctly handle files with high ascii characters
-	if (file.IsOk() && file.IsFileReadable()) {
-		FindInFilesClass::FileContents(filename, fileContents);
+void mvceditor::CodeControlClass::TrackFile(const wxString& filename, UnicodeString& contents) {
+
+	// lets avoid the IcuToWx to prevent going from 
+	// UnicodeString -> UTF8 -> wxString  -> UTF8 -> Sciintilla
+	// cost of translation could be big for big sized files
+	// because of the double encoding due to all three libraries using
+	// different internal encodings for their strings
+	UErrorCode status = U_ZERO_ERROR;
+	int32_t rawLength;
+	int32_t length = contents.length();
+	const UChar* src = contents.getBuffer();
+	u_strToUTF8(NULL, 0, &rawLength, src, length, &status);
+	status = U_ZERO_ERROR;
+	char* dest = new char[rawLength + 1];
+	int32_t written;
+	u_strToUTF8(dest, rawLength + 1, &written, src, length, &status);
+	if(U_SUCCESS(status)) {
 		
-		// lets avoid the IcuToWx to prevent going from 
-		// UnicodeString -> UTF8 -> wxString  -> UTF8 -> Sciintilla
-		// cost of translation could be big for big sized files
-		// because of the double encoding due to all three libraries using
-		// different internal encodings for their strings
-		UErrorCode status = U_ZERO_ERROR;
-		int32_t rawLength;
-		int32_t length = fileContents.length();
-		const UChar* src = fileContents.getBuffer();
-		u_strToUTF8(NULL, 0, &rawLength, src, length, &status);
-		status = U_ZERO_ERROR;
-		char* dest = new char[rawLength + 1];
-		int32_t written;
-		u_strToUTF8(dest, rawLength + 1, &written, src, length, &status);
-		if(U_SUCCESS(status)) {
-			
-			// SetText message
-			SendMsg(2181, 0, (long)(const char*)dest);
-			
-			EmptyUndoBuffer();
-			SetSavePoint();
-			NeedToUpdateResources = false;
-			CurrentFilename = filename;
-			
-			// important to set the fileIdentifier to the name;
-			// the ResourceUpdates object will need to know what files are being edited so it can mark them as 'dirty'
-			ResourceUpdates->Unregister(FileIdentifier);
-			FileIdentifier = filename;
-			
+		// SetText message
+		SendMsg(2181, 0, (long)(const char*)dest);
+		
+		EmptyUndoBuffer();
+		SetSavePoint();
+		NeedToUpdateResources = false;
+		CurrentFilename = filename;
+		
+		// important to set the fileIdentifier to the name;
+		// the ResourceUpdates object will need to know what files are being edited so it can mark them as 'dirty'
+		ResourceUpdates->Unregister(FileIdentifier);
+		FileIdentifier = filename;
+		
+		wxFileName file(filename);
+		if (file.IsOk()) {
 			FileOpenedDateTime = file.GetModificationTime();
-			AutoDetectDocumentMode();
 		}
-		delete[] dest;
-		ret = true;
+		AutoDetectDocumentMode();
 	}
-	return ret;
+	delete[] dest;
 }
 
 void mvceditor::CodeControlClass::Revert() {
@@ -145,6 +140,22 @@ void mvceditor::CodeControlClass::Revert() {
 		}
 		NeedToUpdateResources = true;
 		LoadAndTrackFile(CurrentFilename);
+	}
+}
+
+void mvceditor::CodeControlClass::LoadAndTrackFile(const wxString& fileName) {
+	UnicodeString contents;	
+
+	// not using wxStyledTextCtrl::LoadFile() because it does not correctly handle files with high ascii characters
+	mvceditor::FindInFilesClass::OpenErrors error = FindInFilesClass::FileContents(fileName, contents);
+	if (error == mvceditor::FindInFilesClass::NONE) {
+		TrackFile(fileName, contents);
+	}
+	else if (error = mvceditor::FindInFilesClass::FILE_NOT_FOUND) {
+		wxLogError(_("File Not Found:") + fileName);
+	}
+	else if (mvceditor::FindInFilesClass::CHARSET_DETECTION == error) {
+		mvceditor::EditorLogError(mvceditor::CHARSET_DETECTION, fileName);
 	}
 }
 

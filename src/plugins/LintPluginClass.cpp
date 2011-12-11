@@ -24,6 +24,7 @@
  */
 #include <plugins/LintPluginClass.h>
 #include <windows/StringHelperClass.h>
+#include <MvcEditorErrors.h>
 #include <unicode/unistr.h>
 #include <wx/artprov.h>
 
@@ -262,7 +263,7 @@ void mvceditor::LintPluginClass::OnLintMenu(wxCommandEvent& event) {
 			wxMessageBox(_("There is already another lint check that is active. Please wait for it to finish."), _("Lint Check"));
 		}
 		else if (error == mvceditor::BackgroundFileReaderClass::NO_RESOURCES)  {
-			wxMessageBox(_("System is way too busy. Please try again later."), _("Lint Check"));
+			mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
 		}
 		else {
 			wxMessageBox(_("Could not start parsing. Does project root path have files?"), _("Lint Check"));

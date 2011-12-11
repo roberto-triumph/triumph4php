@@ -72,6 +72,23 @@ class ProjectClass {
 public:
 
 	/**
+	 * Any errors that occur when reading the Detection process response.
+	 */
+	enum DetectError {
+		NONE,
+
+		/**
+		 * detection response is empty or not in the expected format
+		 */
+		BAD_CONTENT,
+		
+		/**
+		 * detection response has a value that is not yet implemented
+		 */
+		UNIMPLEMENTED
+	};
+
+	/**
 	 * Holds the location of the PHP binary.
 	 */
 	const EnvironmentClass& Environment;
@@ -106,13 +123,13 @@ public:
 	/**
 	 * Handle the results of the framework detect command.
 	 */
-	void DetectFrameworkResponse(const wxString& resultString);
+	bool DetectFrameworkResponse(const wxString& resultString, DetectError& err);
 
 	/**
 	 * Handle the results of the database detection command. After a call to this method, DatabaseInfo() will return
 	 * any new database connections (that were identified).
 	 */
-	void DetectDatabaseResponse(const wxString& resultString);
+	bool DetectDatabaseResponse(const wxString& resultString, DetectError& err);
 	
 	/**
 	 * Returns the root path of this project

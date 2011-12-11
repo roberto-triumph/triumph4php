@@ -108,6 +108,15 @@ class FindInFilesClass : public DirectoryWalkerClass {
 
 public:
 
+	/**
+	 * Reasons why a file could not be opened.
+	 */
+	enum OpenErrors {
+		NONE,
+		FILE_NOT_FOUND,
+		CHARSET_DETECTION
+	};
+
 	FindInFilesClass(const UnicodeString& expression = UNICODE_STRING_SIMPLE(""), int mode = FinderClass::CODE);
 	
 	/**
@@ -236,8 +245,11 @@ public:
 	
 	/**
 	 * Get the file contents from the file and write them to the string
+	 * @param fileName full path of the file to open
+	 * @param content the file contents will be written to this variable
+	 * @return OpenErrors reason for content not being set
 	 */
-	static void FileContents(const wxString& fileName, UnicodeString& content);
+	static OpenErrors FileContents(const wxString& fileName, UnicodeString& content);
 
 private:
 
