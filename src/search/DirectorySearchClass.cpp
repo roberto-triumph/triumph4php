@@ -33,7 +33,7 @@ mvceditor::DirectorySearchClass::DirectorySearchClass()
 	, TotalFileCount(0) {
 }
 
-bool mvceditor::DirectorySearchClass::Init(const wxString& path, int mode) {
+bool mvceditor::DirectorySearchClass::Init(const wxString& path, Modes mode) {
 	TotalFileCount = 0;
 	while (!CurrentFiles.empty()) {
 		CurrentFiles.pop();

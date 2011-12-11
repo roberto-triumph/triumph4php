@@ -31,11 +31,9 @@ mvceditor::BackgroundFileReaderClass::BackgroundFileReaderClass(wxEvtHandler& ha
 	, Mode(WALK) {
 }
 
-bool mvceditor::BackgroundFileReaderClass::Init(const wxString& path) {
+bool mvceditor::BackgroundFileReaderClass::Init(const wxString& path, mvceditor::DirectorySearchClass::Modes mode) {
 	Mode = WALK;
-
-	// TODO: expose find mode to sub classes?
-	return DirectorySearch.Init(path, DirectorySearchClass::RECURSIVE);
+	return DirectorySearch.Init(path, mode);
 }
 
 bool mvceditor::BackgroundFileReaderClass::InitMatched() {

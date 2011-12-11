@@ -108,7 +108,7 @@ public:
 	 * files in the given directory.
 	 * @return bool true if the given path is valid and exists
 	 */
-	bool Init(const wxString& path);
+	bool Init(const wxString& path, DirectorySearchClass::Modes mode = DirectorySearchClass::RECURSIVE);
 
 	/**
 	 * prepares the thread to iterate over the last set of matched files

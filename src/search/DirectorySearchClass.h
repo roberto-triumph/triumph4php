@@ -57,6 +57,21 @@ public:
 class DirectorySearchClass {
 
 public:
+	
+	enum Modes {
+
+		/**
+		 * In RECURSIVE mode, sub-directories are recursed one at a time.  This method is more memory efficient, at the cost
+		 * of not knowing how many files still need to be walked over.
+		 */
+		RECURSIVE = 0,
+		
+		/**
+		 * In PRECISE mode, all files for all sub-directories are enumerated at once, making the total files count available.
+		 * This method of searching is more memory-intensive.
+		 */
+		PRECISE
+	};
 
 	DirectorySearchClass();
 	
@@ -70,7 +85,7 @@ public:
 	 *        memory intensive.  Note that both modes will result in walking of all files.
 	 * @return bool true of the given path exists
 	 */
-	bool Init(const wxString& path, int mode = RECURSIVE);
+	bool Init(const wxString& path, Modes mode = RECURSIVE);
 	
 	/**
 	 * Passes the current file to the given walker and advances to the next file. Note that the files are not guaranteed to
@@ -103,20 +118,6 @@ public:
 	 * @return std::vector<wxString> the files that the walker returned true for
 	 */
 	const std::vector<wxString>& GetMatchedFiles();
-	
-	enum {
-		/**
-		 * In RECURSIVE mode, sub-directories are recursed one at a time.  This method is more memory efficient, at the cost
-		 * of not knowing how many files still need to be walked over.
-		 */
-		RECURSIVE = 0,
-		
-		/**
-		 * In PRECISE mode, all files for all sub-directories are enumerated at once, making the total files count available.
-		 * This method of searching is more memory-intensive.
-		 */
-		PRECISE
-	};
 	
 private:
 
