@@ -29,6 +29,7 @@
 #include <widgets/CodeControlClass.h>
 #include <widgets/ResourceUpdateThreadClass.h>
 #include <php_frameworks/ProjectClass.h>
+#include <search/FindInFilesClass.h>
 
 /**
  * This profiler can be used to test the speediness of the code editing control.
@@ -84,7 +85,9 @@ bool FileDropTargetClass::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString&
 		wxMessageBox(_("Invalid file:") + fileNameString);
 		return false;
 	}
-	CodeControl->LoadAndTrackFile(fileNameString);
+	UnicodeString contents;
+	mvceditor::FindInFilesClass::FileContents(fileNameString, contents);
+	CodeControl->TrackFile(fileNameString, contents);
 	return true;
 }
 
