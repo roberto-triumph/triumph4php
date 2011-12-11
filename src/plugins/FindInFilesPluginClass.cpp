@@ -289,8 +289,8 @@ void mvceditor::FindInFilesResultsPanelClass::OnFileSearched(wxCommandEvent& eve
 		void* matchFound = event.GetClientData();
 		if (matchFound) {
 			++MatchedFiles;
+			SetStatus(wxString::Format(wxT("Found %d files with matches so far"), MatchedFiles));
 		}
-		SetStatus(wxString::Format(wxT("Searched %d files"), progress));
 	}
 }
 
