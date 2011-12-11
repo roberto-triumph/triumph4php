@@ -133,7 +133,6 @@ int mvceditor::FindInFilesClass::ReplaceAllMatchesInFile(const wxString& fileNam
 	if (!fileName.empty() && wxFileName::IsFileReadable(fileName)) {
 
 		// TODO: problems here: this code will load entire file into memory not too efficient
-		// TODO: double memory hit going from ICU string to WX string
 		UnicodeString fileContents;
 		mvceditor::FindInFilesClass::OpenErrors error = FileContents(fileName, fileContents);
 			if (NONE == error) {

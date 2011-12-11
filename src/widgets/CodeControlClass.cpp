@@ -94,12 +94,33 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 }
 
 void mvceditor::CodeControlClass::TrackFile(const wxString& filename, UnicodeString& contents) {
+	SetUnicodeText(contents);
+	EmptyUndoBuffer();
+	SetSavePoint();
+	NeedToUpdateResources = false;
+	CurrentFilename = filename;
+	
+	// important to set the fileIdentifier to the name;
+	// the ResourceUpdates object will need to know what files are being edited so it can mark them as 'dirty'
+	ResourceUpdates->Unregister(FileIdentifier);
+	FileIdentifier = filename;
+	
+	wxFileName file(filename);
+	if (file.IsOk()) {
+		FileOpenedDateTime = file.GetModificationTime();
+	}
+	AutoDetectDocumentMode();
+}
+
+void mvceditor::CodeControlClass::SetUnicodeText(UnicodeString& contents) {
 
 	// lets avoid the IcuToWx to prevent going from 
-	// UnicodeString -> UTF8 -> wxString  -> UTF8 -> Sciintilla
-	// cost of translation could be big for big sized files
+	// UnicodeString -> UTF8 -> wxString  -> UTF8 -> Scintilla
+	// cost of translation (computation and memoory) could be big for big sized files
 	// because of the double encoding due to all three libraries using
 	// different internal encodings for their strings
+	// code below just goes
+	// UnicodeString -> UTF8 -> Scintilla
 	UErrorCode status = U_ZERO_ERROR;
 	int32_t rawLength;
 	int32_t length = contents.length();
@@ -113,22 +134,6 @@ void mvceditor::CodeControlClass::TrackFile(const wxString& filename, UnicodeStr
 		
 		// SetText message
 		SendMsg(2181, 0, (long)(const char*)dest);
-		
-		EmptyUndoBuffer();
-		SetSavePoint();
-		NeedToUpdateResources = false;
-		CurrentFilename = filename;
-		
-		// important to set the fileIdentifier to the name;
-		// the ResourceUpdates object will need to know what files are being edited so it can mark them as 'dirty'
-		ResourceUpdates->Unregister(FileIdentifier);
-		FileIdentifier = filename;
-		
-		wxFileName file(filename);
-		if (file.IsOk()) {
-			FileOpenedDateTime = file.GetModificationTime();
-		}
-		AutoDetectDocumentMode();
 	}
 	delete[] dest;
 }
@@ -1154,6 +1159,17 @@ void mvceditor::CodeControlClass::OnTimer(wxTimerEvent& event) {
 		Timer.Stop();
 	}
 	event.Skip();
+}
+
+int mvceditor::CodeControlClass::LineFromCharacter(int charPos) {
+	int documentLength = GetTextLength();
+	char* buf = new char[documentLength];
+	
+	// GET_TEXT  message
+	SendMsg(2182, documentLength, (long)buf);
+	int pos = mvceditor::StringHelperClass::CharToUtf8Pos(buf, documentLength, charPos);
+	delete[] buf;
+	return LineFromPosition(pos);
 }
 
 BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)

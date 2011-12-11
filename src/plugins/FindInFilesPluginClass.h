@@ -70,9 +70,11 @@ public:
 	 *        (deleted) by this class. 
 	 * @param FindInFilesClass findInFiles the expression to search for
 	 * @param wxString the directory search. 
+	 * @param skipFiles full paths of files to not search. We want to NOT perform searches 
+	 *        in files that are already opened; those would result in incorrect hits.
 	 * @return True if directory is valid and the find expression is valid.
 	 */
-	bool InitForFind(wxEvtHandler* handler, FindInFilesClass findInFiles, const wxString& path);
+	bool InitForFind(wxEvtHandler* handler, FindInFilesClass findInFiles, const wxString& path, std::vector<wxString> skipFiles);
 
 	/**
 	 * When replacing, the thread will replace all matched files. In case files are opened, we don't want to
@@ -81,12 +83,20 @@ public:
 	 * @param wxEvtHandler* This object will receive the various FIND events. The pointer will NOT be managed 
 	 *        (deleted) by this class. 
 	 * @param FindInFilesClass findInFiles the expression to search and replace with
-	 * @param files full paths of files to not replace. We want to NOT perform replacements
+	 * @param skipFiles full paths of files to not replace. We want to NOT perform replacements
 	 * in files that are already opened.
 	 * @return true if there are matching files from the previous find
 	 * operation.
 	 */
-	bool InitForReplace(wxEvtHandler* handler, FindInFilesClass findInFiles, std::vector<wxString> files);
+	bool InitForReplace(wxEvtHandler* handler, FindInFilesClass findInFiles, std::vector<wxString> skipFiles);
+
+	/**
+	 * Creates a Hit event for the current FindInFiles match. (the event will NOT be posted).
+	 * @param lineNumber the line that where the hit occurred
+	 * @param the line text itself
+	 * @param fileName the name of the file that was searched.
+	 */
+	static wxCommandEvent MakeHitEvent(int lineNumber, const wxString& lineText, const wxString& fileName);
 
 protected:
 
@@ -110,7 +120,9 @@ private:
 	FindInFilesClass FindInFiles;
 	
 	/**
-	 * Matched files that will NOT be replaced
+	 * Matched files that will NOT be replaced / searched
+	 * The plugin will make the background thread skip the files that are currently opened; this way the result do not
+	 * show stale (and possibly wrong) hits
 	 */
 	std::vector<wxString> SkipFiles;
 	

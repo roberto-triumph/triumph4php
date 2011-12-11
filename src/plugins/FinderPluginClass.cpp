@@ -416,11 +416,9 @@ void mvceditor::ReplacePanelClass::OnReplaceAllButton(wxCommandEvent& event) {
 		CodeControlClass* codeControl = 
 				Notebook->GetCodeControl(Notebook->GetSelection());
 		 if (codeControl) {
-			 
-			 // TODO find a more efficient way. Is this taking 3x the memory?
 			 UnicodeString text = codeControl->GetSafeText();
 			 int matches = Finder.ReplaceAllMatches(text);
-			 codeControl->SetText(StringHelperClass::IcuToWx(text));
+			 codeControl->SetUnicodeText(text);
 			 SetStatus(wxString::Format(wxT("Status: Replaced %d matches"), matches));	
 			 ReplaceHistory.Save();
 		}

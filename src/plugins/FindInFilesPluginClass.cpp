@@ -47,46 +47,48 @@ mvceditor::FindInFilesBackgroundReaderClass::FindInFilesBackgroundReaderClass(wx
 
 }
 
-bool mvceditor::FindInFilesBackgroundReaderClass::InitForFind(wxEvtHandler* handler, mvceditor::FindInFilesClass findInFiles, const wxString& path) {
+bool mvceditor::FindInFilesBackgroundReaderClass::InitForFind(wxEvtHandler* handler, mvceditor::FindInFilesClass findInFiles, 
+															  const wxString& path, std::vector<wxString> skipFiles) {
 	Handler = handler;
 
 	// find in files needs to be a copy; just to be sure
 	// its thread safe
-	// TODO: for files that are currently "dirty" (modified) we need to search the editor contents
-	// and not the file contents
-	// Kind of like the "SkipFiles" property
 	FindInFiles = findInFiles;
+	SkipFiles = skipFiles;
 	return Init(path) && FindInFiles.Prepare();
 }
 
-bool mvceditor::FindInFilesBackgroundReaderClass::InitForReplace(wxEvtHandler* handler, mvceditor::FindInFilesClass findInFiles, std::vector<wxString> files) {
+bool mvceditor::FindInFilesBackgroundReaderClass::InitForReplace(wxEvtHandler* handler, mvceditor::FindInFilesClass findInFiles, 
+																 std::vector<wxString> skipFiles) {
 	Handler = handler;
 	FindInFiles = findInFiles;
-	SkipFiles = files;
+	SkipFiles = skipFiles;
 	return InitMatched();
 }
 
 bool mvceditor::FindInFilesBackgroundReaderClass::FileRead(DirectorySearchClass& search) {
-	bool found = search.Walk(FindInFiles);
+	bool found = false;
+	found = search.Walk(FindInFiles);
 	if (found) {
 		wxString fileName = search.GetMatchedFiles().back();
-		bool destroy = TestDestroy();
-		do {			
-			if (destroy) {
-				break;
+		
+		// if this match is for one of the skip files then we want to ignore it
+		// DirectorySearch doesn't have a GetCurrentFile() so the one way to know the
+		// file that was searched is to do the search
+		std::vector<wxString>::iterator it = find(SkipFiles.begin(), SkipFiles.end(), fileName);
+		if (it == SkipFiles.end()) {
+			bool destroy = TestDestroy();
+			do {			
+				if (destroy) {
+					break;
+				}
+				int lineNumber = FindInFiles.GetCurrentLineNumber();
+				wxString lineText = StringHelperClass::IcuToWx(FindInFiles.GetCurrentLine());
+				wxCommandEvent hitEvent = MakeHitEvent(lineNumber, lineText, fileName); 
+				wxPostEvent(Handler, hitEvent);
 			}
-			int lineNumber = FindInFiles.GetCurrentLineNumber();
-			wxString line = StringHelperClass::IcuToWx(FindInFiles.GetCurrentLine());
-			wxCommandEvent hitEvent(EVENT_FIND_IN_FILES_FILE_HIT, ID_FIND_IN_FILES_PROGRESS);
-
-			// in MSW the list control does not render the \t use another delimiter
-			wxString hit = fileName + wxT("\t:") + 
-				wxString::Format(wxT("%d"), lineNumber) + wxT("\t:") +
-				line;
-			hitEvent.SetString(hit);
-			wxPostEvent(Handler, hitEvent);
+			while (!destroy && FindInFiles.FindNext());
 		}
-		while (!destroy && FindInFiles.FindNext());
 	}
 	return found;
 }
@@ -101,6 +103,18 @@ bool mvceditor::FindInFilesBackgroundReaderClass::FileMatch(const wxString& file
 		matches += FindInFiles.ReplaceAllMatchesInFile(fileToReplace);
 	}
 	return matches > 0;
+}
+
+wxCommandEvent mvceditor::FindInFilesBackgroundReaderClass::MakeHitEvent(int lineNumber, const wxString& lineText, const wxString& fileName) {
+	
+	wxCommandEvent hitEvent(EVENT_FIND_IN_FILES_FILE_HIT, ID_FIND_IN_FILES_PROGRESS);
+
+	// in MSW the list control does not render the \t use another delimiter
+	wxString hit = fileName + wxT("\t:") + 
+		wxString::Format(wxT("%d"), lineNumber) + wxT("\t:") +
+		lineText;
+	hitEvent.SetString(hit);
+	return hitEvent;
 }
 	
 mvceditor::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* parent, NotebookClass* notebook, StatusBarWithGaugeClass* gauge)
@@ -123,12 +137,49 @@ void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findI
 		wxMessageBox(_("Find in files is already running. Please wait for it to finish."), _("Find In Files"));
 		return;
 	}
-	if (FindInFilesBackgroundFileReader.InitForFind(this, FindInFiles, findPath)) {
+	std::vector<wxString> skipFiles = Notebook->GetOpenedFiles();
+	if (FindInFilesBackgroundFileReader.InitForFind(this, FindInFiles, findPath, skipFiles)) {
 		mvceditor::BackgroundFileReaderClass::StartError error;
 		if (FindInFilesBackgroundFileReader.StartReading(error)) {
 			EnableButtons(true, false);
 			Gauge->AddGauge(_("Find In Files"), FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE, 
 				wxGA_HORIZONTAL);
+
+			// lets do the find in the opened files ourselves so that the hits are not stale
+
+			FinderClass finder;
+			FindInFiles.CopyFinder(finder);
+			if (finder.Prepare()) {
+
+				// search the opened files
+				for (size_t i = 0; i < Notebook->GetPageCount(); ++i) {
+					CodeControlClass* codeControl = Notebook->GetCodeControl(i);
+					UnicodeString text = codeControl->GetSafeText();
+					int32_t next = 0;
+					int32_t charPos = 0,
+						length = 0;
+					while (finder.FindNext(text, next)) {
+						if (finder.GetLastMatch(charPos, length)) {
+							int lineNumber = codeControl->LineFromCharacter(charPos);
+							
+							int start = codeControl->PositionFromLine(lineNumber);
+							int end = codeControl->GetLineEndPosition(lineNumber);
+							wxString lineText = codeControl->GetTextRange(start, end);
+
+							// lineNumber is zero-based but we want to display it as 1-based
+							lineNumber++;
+							wxCommandEvent evt = mvceditor::FindInFilesBackgroundReaderClass::MakeHitEvent(lineNumber, lineText, 
+								codeControl->GetFileName());
+							wxPostEvent(this, evt);
+							next = charPos + length;
+						}
+						else {
+							break;
+						}
+					}
+				}
+			}
+			
 		}
 		else if (error == mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING)  {
 			wxMessageBox(_("Find in files is already running. Please wait for it to finish."), _("Find In Files"));
@@ -180,9 +231,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceAllInFileButton(wxCommand
 		FindInFiles.CopyFinder(finder);
 		if (finder.Prepare()) {
 			int matches = finder.ReplaceAllMatches(text);
-			// TODO: must be a more efficent way than copying back and forth to/from ICU / wx string
-			wxString s = StringHelperClass::IcuToWx(text);
-			codeControl->SetText(s);
+			codeControl->SetUnicodeText(text);
 			SetStatus(wxString::Format(wxT("Status: Replaced %d matches"), matches));	
 		}
 	 }
@@ -190,10 +239,17 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceAllInFileButton(wxCommand
 
 void mvceditor::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxCommandEvent& event) {
 
+	// for now disallow another replace when one is already active
+	if (FindInFilesBackgroundFileReader.IsRunning()) {
+		wxMessageBox(_("Find in files is already running. Please wait for it to finish."), _("Find In Files"));
+		return;
+	}
+
 	if (FindInFiles.Prepare()) {
 		FinderClass finder;
 		FindInFiles.CopyFinder(finder);
 		if (finder.Prepare()) {
+
 			// replace the open files
 			for (size_t i = 0; i < Notebook->GetPageCount(); ++i) {
 				CodeControlClass* codeControl = Notebook->GetCodeControl(i);
@@ -201,20 +257,12 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxComman
 			
 				// only update code control when there are replacements made
 				if(finder.ReplaceAllMatches(text) > 0) {
-					
-					// TODO: must be a more efficent way than copying back and forth to/from ICU / wx string
-					wxString s = StringHelperClass::IcuToWx(text);
-					codeControl->SetText(s);
+					codeControl->SetUnicodeText(text);
 				}
 			}
 		}
 		
 		// we've already searched, when replacing we should iterate through matched files hence we don't call DirectorySearch,.Init().
-		// for now disallow another replace when one is already active
-		if (FindInFilesBackgroundFileReader.IsRunning()) {
-			wxMessageBox(_("Find in files is already running. Please wait for it to finish."), _("Find In Files"));
-			return;
-		}
 		FindInFilesBackgroundFileReader.InitForReplace(this, FindInFiles, Notebook->GetOpenedFiles());
 		mvceditor::BackgroundFileReaderClass::StartError error;
 		if (FindInFilesBackgroundFileReader.StartReading(error)) {

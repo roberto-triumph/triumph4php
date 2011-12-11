@@ -110,6 +110,22 @@ public:
 	void TrackFile(const wxString& filename, UnicodeString& contents);
 
 	/**
+	 * lets avoid calls like this
+	 *
+	 * UnicodeString contents //....
+	 * wxStyledTextCtrl::SetText(mvceditor::IcuToWx(contents))
+	 *
+	 * This method prevents going from 
+	 * UnicodeString -> UTF8 -> wxString  -> UTF8 -> Scintilla
+	 * cost of translation could be big for big sized files
+	 * because of the double encoding due to all three libraries using
+	 * different internal encodings for their strings
+	 * 
+	 * @param contents the UnicodeString of contents that the code control will render 
+	 */
+	void SetUnicodeText(UnicodeString& contents);
+
+	/**
 	 * Returns true if the this control was NOT loaded with an existing
 	 * file.
 	 *
@@ -232,7 +248,7 @@ public:
 	 * method accounts for high ascii characters correctly.
 	 *
 	 * ALWAYS USE THIS METHOD INSTEAD OF GetText()
-	 * @return wxString
+	 * @return UnicodeString
 	 */
 	UnicodeString GetSafeText();
 
@@ -253,6 +269,15 @@ public:
 	 * Set the connection to use to fetch the SQL table metadata
 	 */
 	void SetCurrentInfo(const DatabaseInfoClass& other);
+
+	/**
+	 * Calculate the line number from the given CHARACTER position. Scintilla's
+	 * LineFromPosition() works on bytes.
+	 * 
+	 * @param charPos character offset (no byte offset)
+	 * @return int line number, zero-based
+	 */
+	int LineFromCharacter(int charPos);
 
 private:
 
@@ -449,16 +474,6 @@ private:
 	 *
 	 */
 	UnicodeString GetSafeSubstring(int startPos, int endPos);
-
-	/**
-	 * Returns the offset (byte) . This method is needed because Scintilla's "position" is byte-based not character
-	 * based, while all other code (find, find in files etc...) return characters based positions.  This makes all the
-	 * difference in the world for multi-byte documents, since internally Scintilla stores contents as UTF-8.
-	 *
-	 * @param chracter position if this is more than the number of characters in the document then this method returns the last byte position.
-	 * @return int byte position
-	 */
-	int CharacterToPos(int character);
 
 	/*
 	* The file that was loaded.
