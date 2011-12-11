@@ -132,7 +132,8 @@ int mvceditor::FindInFilesClass::ReplaceAllMatchesInFile(const wxString& fileNam
 	int matches = 0;
 	if (!fileName.empty() && wxFileName::IsFileReadable(fileName)) {
 
-		// TODO: problems here: this code will load entire file into memory not too efficient
+		// ATTN: problems here: this code will load entire file into memory not too efficient
+		// but the regular expression classes do not work with strings
 		UnicodeString fileContents;
 		mvceditor::FindInFilesClass::OpenErrors error = FileContents(fileName, fileContents);
 			if (NONE == error) {
@@ -160,53 +161,51 @@ void mvceditor::FindInFilesClass::CopyFinder(FinderClass& dest) {
 
 mvceditor::FindInFilesClass::OpenErrors mvceditor::FindInFilesClass::FileContents(const wxString& fileName, UnicodeString& fileContents) {
 	OpenErrors error = NONE;
+	wxFFile fFile(fileName, wxT("rb"));
+	if (fFile.IsOpened()) {
 
-	// TODO: inefficient; will load entire file into memory ... twice!!
-	// TODO: handle unicode file names
-	FILE* rawFile = fopen(fileName.ToAscii(), "rb");
-	if (rawFile) {
-		
+		// need to detect the character set so we can decode it correctly
+		// at this point I could only find the character set detection code that works for
+		// byte arrays; not sure one exists to detect charset from files
+
 		// obtain file size and read the raw data
-		fseek(rawFile, 0, SEEK_END);
-		int32_t size = ftell(rawFile);
-		rewind(rawFile);		
-		char* tmp = new char[size];
-		fread(tmp, 1, size, rawFile);
-		fclose(rawFile);
+		// got this code by looking at the code of wxFFile::ReadAll
+		wxFileOffset offset = fFile.Length();
+		size_t bufferSize = wx_truncate_cast(size_t, fFile.Length());
+		if ((wxFileOffset)bufferSize == offset) { 
+			char* buffer = new char[bufferSize];
+			fFile.Read(buffer, bufferSize);
+			fFile.Close();
 
-		// what encoding is it??
-		UErrorCode status = U_ZERO_ERROR;
-		const char* name = 0;
-		UCharsetDetector* csd = ucsdet_open(&status);
-		const UCharsetMatch *ucm;		
-		ucsdet_setText(csd, tmp, size, &status);
-		if(U_SUCCESS(status)) {
-			ucm = ucsdet_detect(csd, &status);
-			if(U_SUCCESS(status) && ucm != NULL) {
-				name = ucsdet_getName(ucm, &status);	
+			// what encoding is it??
+			error = CHARSET_DETECTION;
+			UErrorCode status = U_ZERO_ERROR;
+			UCharsetDetector* csd = ucsdet_open(&status);
+			ucsdet_setText(csd, buffer, bufferSize, &status);
+			if(U_SUCCESS(status)) {
+				const UCharsetMatch *ucm = ucsdet_detect(csd, &status);
+				if(U_SUCCESS(status) && ucm) {
+					const char* name = ucsdet_getName(ucm, &status);
+
+					// encode to Unicode from the detected charset. file already opened, just translate the
+					// buffer from memory
+					UConverter* converter = ucnv_open(name, &status);
+					if (U_SUCCESS(status)) {
+						UChar* dest = fileContents.getBuffer(bufferSize + 1);
+						int32_t read = ucnv_toUChars(converter, dest, bufferSize + 1, buffer, bufferSize, &status);
+						fileContents.releaseBuffer(read);
+						if (U_SUCCESS(status)) {
+							error = NONE;
+						}
+						ucnv_close(converter);
+					}
+				}
+				ucsdet_close(csd);
 			}
-			ucsdet_close(csd);
-		} 	
-		delete[] tmp;
-		if (name) {
-			
-			// encode to string. file already opened, no need to check again
-			// open without newline translations; very important to find out
-			// tricky newline problems
-			UFILE* file = u_fopen(fileName.ToAscii(), "rb", NULL, NULL);
-			int error = u_fsetcodepage(name, file);
-			if(0 == error) {
-				int32_t read = u_file_read(fileContents.getBuffer(size + 1), size, file);
-				fileContents.releaseBuffer(read);
-				error = NONE;
-			}
-			else {
-				error = CHARSET_DETECTION;
-			}
-			u_fclose(file);
+			delete[] buffer;
 		}
 		else {
-			error = CHARSET_DETECTION;
+			error = FILE_NOT_FOUND;
 		}
 	}
 	else {
