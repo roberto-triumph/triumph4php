@@ -63,7 +63,7 @@ extern const wxEventType EVENT_FILE_READ;
  * found hits).  This class is the "glue" between a background task and GUI element: It will start
  * up a wxThread. Note: Objects of this class will handle at most 1 concurrently running thread at a time.
  * 
- * TODO: make it so that multiple logic can be added to this class; as we ideally do not want
+ * ATTN: make it so that multiple logic can be added to this class; as we ideally do not want
  * to iterate through entire projects twice. It is better to open a file once and hand it to
  * multiple workers than multiple workers attempting to open/close the same file multiple times.
  */
