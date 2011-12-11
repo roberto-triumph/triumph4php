@@ -448,6 +448,13 @@ void mvceditor::AppClass::OnProcessComplete(wxCommandEvent& event) {
 
 void mvceditor::AppClass::OnProcessFailed(wxCommandEvent& event) {
 	EditorLogError(mvceditor::BAD_PHP_EXECUTABLE, event.GetString());
+
+	// still need to set the project even if the project detection fails
+	// pretty much all code depends on having a Project pointer
+	AppFrame->OnProjectOpened(Project);
+	for (size_t i = 0; i < Plugins.size(); ++i) {
+		Plugins[i]->SetProject(Project);
+	}
 }
 
 BEGIN_EVENT_TABLE(mvceditor::AppClass, wxApp)
