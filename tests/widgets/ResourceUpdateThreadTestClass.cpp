@@ -64,10 +64,10 @@ TEST(CollectShouldGetFromAllFinders) {
 	// parse the 3 files for resources
 	CHECK(resourceUpdates.Register(file1));
 	CHECK(resourceUpdates.Register(file2));
-	CHECK(resourceUpdates.Update(file1, code1));
-	CHECK(resourceUpdates.Update(file2, code2));
+	CHECK(resourceUpdates.Update(file1, code1, true));
+	CHECK(resourceUpdates.Update(file2, code2, true));
 	mvceditor::ResourceFinderClass globalFinder;
-	globalFinder.BuildResourceCacheForFile(file3, code3);
+	globalFinder.BuildResourceCacheForFile(file3, code3, true);
 	
 	// now perform the search. will search for any resource that starts with 'Action'
 	// all 3 caches should hit
@@ -86,6 +86,33 @@ TEST(CollectShouldGetFromAllFinders) {
 	}
 }
 
+TEST(CollectShouldIgnoreStaleMatches) {
+	
+	// create a class in file1 with methodA
+	// update file1, remove methodA from class
+	// perform a search
+	// methodA should not be a hit since it has been removed
+	mvceditor::ResourceUpdateClass resourceUpdates;
+	wxString file1 = wxT("file1.php");
+	UnicodeString code1 = UNICODE_STRING_SIMPLE("<?php class ActionMy   { function methodA() {} }");
+	UnicodeString code2 = UNICODE_STRING_SIMPLE("<?php class ActionMy   { function methodB() {} }");
+
+	mvceditor::ResourceFinderClass globalFinder;
+	globalFinder.BuildResourceCacheForFile(file1, code1, true);
+	CHECK(resourceUpdates.Register(file1));
+	CHECK(resourceUpdates.Update(file1, code2, true));
+
+	CHECK(resourceUpdates.PrepareAll(&globalFinder, wxT("ActionMy::methodA")));
+	CHECK(resourceUpdates.CollectNearMatchResourcesFromAll(&globalFinder));
+	std::vector<mvceditor::ResourceClass> matches = resourceUpdates.Matches(&globalFinder);
+	CHECK_EQUAL((size_t)0, matches.size());
+
+	CHECK(resourceUpdates.PrepareAll(&globalFinder, wxT("ActionMy::methodB")));
+	CHECK(resourceUpdates.CollectNearMatchResourcesFromAll(&globalFinder));
+	matches = resourceUpdates.Matches(&globalFinder);
+	CHECK_EQUAL((size_t)1, matches.size());
+}
+
 TEST(GetSymbolAtWithGlobalFinder) {
 	
 	// in this test we will create a class in file2; file1 will use that class
@@ -97,10 +124,10 @@ TEST(GetSymbolAtWithGlobalFinder) {
 	UnicodeString code1 = UNICODE_STRING_SIMPLE("<?php $action = new ActionYou(); $action->w(); ");
 	UnicodeString code2 = UNICODE_STRING_SIMPLE("<?php class ActionYou  { function w() {} }");
 	mvceditor::ResourceFinderClass globalFinder;
-	globalFinder.BuildResourceCacheForFile(file2, code2);
+	globalFinder.BuildResourceCacheForFile(file2, code2, true);
 	
 	CHECK(resourceUpdates.Register(file1));
-	CHECK(resourceUpdates.Update(file1, code1));
+	CHECK(resourceUpdates.Update(file1, code1, true));
 	
 	int posToCheck = code1.indexOf(UNICODE_STRING_SIMPLE("->")) + 2; // position of "->w()" in code1
 	
@@ -123,12 +150,12 @@ TEST(GetSymbolAtWithRegisteredFinder) {
 	UnicodeString code2 = UNICODE_STRING_SIMPLE("<?php class ActionMe  { function yy() { $this->  } }");
 	UnicodeString code3 = UNICODE_STRING_SIMPLE("<?php class ActionYou  { function w() {} }");
 	mvceditor::ResourceFinderClass globalFinder;
-	globalFinder.BuildResourceCacheForFile(file2, code2);
+	globalFinder.BuildResourceCacheForFile(file2, code2, true);
 	
 	CHECK(resourceUpdates.Register(file1));
-	CHECK(resourceUpdates.Update(file1, code1));
+	CHECK(resourceUpdates.Update(file1, code1, true));
 	CHECK(resourceUpdates.Register(file3));
-	CHECK(resourceUpdates.Update(file3, code3));
+	CHECK(resourceUpdates.Update(file3, code3, true));
 	
 	int posToCheck = code1.indexOf(UNICODE_STRING_SIMPLE("->w")) + 3; // position of "->w()" in code1
 	
@@ -139,7 +166,7 @@ TEST(GetSymbolAtWithRegisteredFinder) {
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("w"), symbol.Lexeme);
 	
 	CHECK(resourceUpdates.Register(file2));
-	CHECK(resourceUpdates.Update(file2, code2));
+	CHECK(resourceUpdates.Update(file2, code2, true));
 	posToCheck = code2.indexOf(UNICODE_STRING_SIMPLE("->")) + 2; // position of "->()" in code3
 	symbolName = resourceUpdates.GetSymbolAt(file2, posToCheck, &globalFinder, symbol, code2);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionMe::"), symbolName);

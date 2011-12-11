@@ -77,7 +77,7 @@ bool mvceditor::ResourceFinderClass::Walk(const wxString& fileName) {
 	return false;
 }
 
-void mvceditor::ResourceFinderClass::BuildResourceCacheForFile(const wxString& fullPath, const UnicodeString& code) {
+void mvceditor::ResourceFinderClass::BuildResourceCacheForFile(const wxString& fullPath, const UnicodeString& code, bool isNew) {
 	// remove all previous cached resources
 	int fileItemIndex = -1;
 	for (size_t i = 0; i < FileCache.size(); ++i) {
@@ -87,6 +87,17 @@ void mvceditor::ResourceFinderClass::BuildResourceCacheForFile(const wxString& f
 		}
 	}
 	RemoveCachedResources(fileItemIndex);
+	if (-1 == fileItemIndex) {
+
+		// if caller just calls this method without calling Walk(); then file cache will be empty
+		// need to add an entry so that GetResourceMatchFullPathFromResource works correctly
+		mvceditor::ResourceFinderClass::FileItem fileItem;
+		fileItem.FullPath = fullPath;
+		fileItem.Parsed = false;
+		fileItem.IsNew = isNew;
+		fileItemIndex = FileCache.size();
+		FileCache.push_back(fileItem);
+	}
 	CurrentFileItemIndex = fileItemIndex;
 	Parser.ScanString(code);
 	IsCacheSorted = false;
@@ -110,6 +121,14 @@ wxString mvceditor::ResourceFinderClass::GetResourceMatchFullPath(size_t index) 
 		if (fileItemIndex >= 0 && fileItemIndex < FileCache.size()) {
 			return FileCache[fileItemIndex].FullPath;
 		}
+	}
+	return wxT("");
+}
+
+wxString  mvceditor::ResourceFinderClass::GetResourceMatchFullPathFromResource(const mvceditor::ResourceClass& resource) const {
+	size_t fileItemIndex = resource.FileItemIndex;
+	if (fileItemIndex >= 0 && fileItemIndex < FileCache.size()) {
+		return FileCache[fileItemIndex].FullPath;
 	}
 	return wxT("");
 }
@@ -572,19 +591,21 @@ void mvceditor::ResourceFinderClass::BuildResourceCache(const wxString& fullPath
 		}
 	}
 	FileItem fileItem;
-	bool isNewFile = false;
+	bool filePreviouslyCached = false;
 	if (fileItemIndex > -1) {
 		FileCache[fileItemIndex].FullPath = fullPath;
 		FileCache[fileItemIndex].DateTime = fileLastModifiedDateTime;
 		fileItem = FileCache[fileItemIndex];
+		filePreviouslyCached = true;
 	}
 	else {
 		fileItem.FullPath = fullPath;
 		fileItem.DateTime = fileLastModifiedDateTime;
 		fileItem.Parsed = false;
+		fileItem.IsNew = false;
 		fileItemIndex = FileCache.size();
 		FileCache.push_back(fileItem);
-		isNewFile = true;
+		
 	}
 	if (parseClasses) {
 		if (!cached || !fileItem.Parsed) {
@@ -592,7 +613,7 @@ void mvceditor::ResourceFinderClass::BuildResourceCache(const wxString& fullPath
 
 			// no need to look for resources if the file had not yet existed, this will save much time
 			// this optimization was found by using the profiler
-			if (!isNewFile) {
+			if (filePreviouslyCached) {
 				RemoveCachedResources(fileItemIndex);
 			}
 			CurrentFileItemIndex = fileItemIndex;
@@ -842,7 +863,9 @@ void mvceditor::ResourceFinderClass::EnsureMatchesExist() {
 	for(std::vector<int>::const_iterator it = files.begin(); it != files.end(); ++it) {
 		int fileItemIndex = *it;
 		if (fileItemIndex >= 0 && fileItemIndex < (int)FileCache.size()) {
-			if (!wxFileName::FileExists(FileCache[fileItemIndex].FullPath)) {
+
+			// is a file is new it wont be on disk; results are not stale.
+			if (!FileCache[fileItemIndex].IsNew && !wxFileName::FileExists(FileCache[fileItemIndex].FullPath)) {
 				
 				// file is gone. remove all cached resources
 				RemoveCachedResources(fileItemIndex);

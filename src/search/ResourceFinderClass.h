@@ -174,8 +174,9 @@ public:
 	 * @param const wxString&
 	 * fileName the full path of the file
 	 * @param const UnicodeString& code the PHP source code
+	 * @param bool if TRUE then tileName is a new file that is not yet written to disk
 	 */
-	void BuildResourceCacheForFile(const wxString& fileName, const UnicodeString& code);
+	void BuildResourceCacheForFile(const wxString& fileName, const UnicodeString& code, bool isNew);
 	
 	/**
 	 * Looks for the resource, using exact, case insensitive matching. Will collect the fully qualified resource name 
@@ -305,6 +306,14 @@ public:
 	 * @return wxString returns empty string on invalid index
 	 */
 	wxString GetResourceMatchFullPath(size_t index) const;
+
+	/**
+	 * Returns the full path to the given resource
+	 * 
+	 * @param resource a resource returned by one of the CollectXXX() methods OF THIS OBJECT.
+	 * @return wxString returns empty string on invalid resource
+	 */
+	wxString GetResourceMatchFullPathFromResource(const ResourceClass& resource) const;
 	
 	/**
 	 * Searches the given text for the position of the resource at index.  For example, if the resource matched 3 items
@@ -422,6 +431,11 @@ private:
 		 * whether or not file has been parsed, could be false if we only looked for files
 		 */
 		bool Parsed;
+
+		/**
+		 * If TRUE, then this file is not yet written to disk
+		 */
+		bool IsNew;
 	};
 	
 	/**

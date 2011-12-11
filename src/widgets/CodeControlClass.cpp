@@ -1140,7 +1140,7 @@ void mvceditor::CodeControlClass::OnResourceUpdateComplete(wxCommandEvent& event
 void mvceditor::CodeControlClass::OnTimer(wxTimerEvent& event) {
 	if (NeedToUpdateResources && ResourceUpdates && !ResourceUpdates->IsRunning()) {
 		UnicodeString text = GetSafeText();
-		wxThreadError error = ResourceUpdates->StartBackgroundUpdate(FileIdentifier, text);
+		wxThreadError error = ResourceUpdates->StartBackgroundUpdate(FileIdentifier, text, IsNew());
 
 		// even if thread could not be started just prevent re-parsing until user 
 		// modified the text

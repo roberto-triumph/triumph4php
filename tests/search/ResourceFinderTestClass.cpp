@@ -710,7 +710,7 @@ TEST_FIXTURE(ResourceFinderTestClass, CollectNearMatchResourcesShouldFindMatches
 	);
 	CHECK(ResourceFinder->Prepare(wxT("printUse")));
 	ResourceFinder->Walk(TestProjectDir + fileName);
-	ResourceFinder->BuildResourceCacheForFile(TestProjectDir + fileName, uniCode);
+	ResourceFinder->BuildResourceCacheForFile(TestProjectDir + fileName, uniCode, false);
 	CHECK(ResourceFinder->CollectNearMatchResources());
 	CHECK_EQUAL((size_t)2, ResourceFinder->GetResourceMatchCount());
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("printUser"), ResourceFinder->GetResourceMatch(0).Resource);
@@ -751,7 +751,7 @@ TEST_FIXTURE(ResourceFinderTestClass, CollectNearMatchResourcesShouldFindMatches
 	wxString fileName = wxT("Untitled");
 	CHECK(ResourceFinder->Prepare(wxT("printUse")));
 	ResourceFinder->Walk(TestProjectDir + testFile);
-	ResourceFinder->BuildResourceCacheForFile(fileName, uniCode);
+	ResourceFinder->BuildResourceCacheForFile(fileName, uniCode, true);
 	CHECK(ResourceFinder->CollectNearMatchResources());
 	CHECK_EQUAL((size_t)1, ResourceFinder->GetResourceMatchCount());
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("printUser"), ResourceFinder->GetResourceMatch(0).Resource);

@@ -69,14 +69,9 @@ public:
 	 * 
 	 * @param fileName unique identifier for a file
 	 * @param code the file's most up-to-date source code (from the user-edited buffer)
+	 * @param bool if TRUE then tileName is a new file that is not yet written to disk
 	 */
-	bool Update(const wxString& fileName, const UnicodeString& code);
-	
-	/**
-	 * Check to see if the given resource comes from one of the registered (opened
-	 * files).  If this returns true, it means that the resource may be stale.
-	 */
-	bool IsDirty(const ResourceClass& resource);
+	bool Update(const wxString& fileName, const UnicodeString& code, bool isNew);
 	
 	/**
 	 * prepares all the registered resource finders plus the one given.
@@ -126,6 +121,15 @@ public:
 	std::vector<UnicodeString> GetVariablesInScope(const wxString& fileName, int pos, const UnicodeString& code);
 	
 private:
+
+	/**
+	 * Check to see if the given resource comes from one of the registered (opened
+	 * files).  If this returns true, it means that the resource may be stale.
+	 *
+	 * @param resource the resource to check
+	 * @param resourceFinder the finder that collected the resource
+	 */
+	bool IsDirty(const ResourceClass& resource, ResourceFinderClass* resourceFinder) const;
 
 	/**
 	 * Returns a list that contains all of the resource finders for the registered files plus
@@ -183,8 +187,9 @@ public:
 	 * 
 	 * @param fileName unique identifier for a file
 	 * @param code the file's most up-to-date source code (from the user-edited buffer)
+	 * @param bool if TRUE then tileName is a new file that is not yet written to disk
 	 */
-	wxThreadError StartBackgroundUpdate(const wxString& fileName, const UnicodeString& code);
+	wxThreadError StartBackgroundUpdate(const wxString& fileName, const UnicodeString& code, bool isNew);
 	
 	/**
 	 * This is the object that will hold all of the resource cache. It should not be accessed while
@@ -216,6 +221,11 @@ private:
 	 * the name of the file that is being worked on by the background thread.
 	 */
 	wxString CurrentFileName;
+
+	/**
+	 * if TRUE then tileName is a new file that is not yet written to disk
+	 */
+	bool CurrentFileIsNew;
 
 };
 	 

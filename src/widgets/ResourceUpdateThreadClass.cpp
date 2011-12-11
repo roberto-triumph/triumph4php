@@ -71,7 +71,7 @@ void mvceditor::ResourceUpdateClass::Unregister(const wxString& fileName) {
 	// so that it is updated with the new contents.
 }
 
-bool mvceditor::ResourceUpdateClass::Update(const wxString& fileName, const UnicodeString& code) {
+bool mvceditor::ResourceUpdateClass::Update(const wxString& fileName, const UnicodeString& code, bool isNew) {
 	
 	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it = Finders.find(fileName);
 	std::map<wxString, mvceditor::SymbolTableClass*>::iterator itSymbols = SymbolTables.find(fileName);
@@ -79,7 +79,7 @@ bool mvceditor::ResourceUpdateClass::Update(const wxString& fileName, const Unic
 	if (it != Finders.end() && itSymbols != SymbolTables.end()) {
 		mvceditor::ResourceFinderClass* finder = it->second;
 		mvceditor::SymbolTableClass* symbolTable = itSymbols->second;
-		finder->BuildResourceCacheForFile(fileName, code);
+		finder->BuildResourceCacheForFile(fileName, code, isNew);
 		finder->EnsureSorted();
 		symbolTable->CreateSymbols(code);
 		ret = true;
@@ -87,11 +87,20 @@ bool mvceditor::ResourceUpdateClass::Update(const wxString& fileName, const Unic
 	return ret;
 }
 
-bool mvceditor::ResourceUpdateClass::IsDirty(const ResourceClass& resource) {
+bool mvceditor::ResourceUpdateClass::IsDirty(const ResourceClass& resource, mvceditor::ResourceFinderClass* resourceFinder) const {
 	bool ret = false;
-	// TODO: implement this; need when collecting Resource matches we 
-	// need to ignore the matches that come from files that are being edited; as this
-	// means that the results are probably stale.
+	wxString matchFullName = resourceFinder->GetResourceMatchFullPathFromResource(resource);
+	std::map<wxString, mvceditor::ResourceFinderClass*>::const_iterator it = Finders.begin();
+	while (it != Finders.end()) {
+
+		// a match from one of the opened resource finders can never be 'dirty' because the resource cache 
+		// has been updated by the Update() method
+		if (it->first.CompareTo(matchFullName) == 0 && it->second != resourceFinder) {
+			ret = true;
+			break;
+		}
+		++it;
+	}
 	return ret;
 }
 
@@ -122,15 +131,17 @@ bool mvceditor::ResourceUpdateClass::CollectNearMatchResourcesFromAll(mvceditor:
 	return found;
 }
 
-std::vector<mvceditor::ResourceClass> mvceditor::ResourceUpdateClass::Matches(mvceditor::ResourceFinderClass* resourceFinder) {
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceUpdateClass::Matches(mvceditor::ResourceFinderClass* globalResourceFinder) {
 	std::vector<mvceditor::ResourceClass> matches;
-	std::vector<mvceditor::ResourceFinderClass*> finders = Iterator(resourceFinder);
+	std::vector<mvceditor::ResourceFinderClass*> finders = Iterator(globalResourceFinder);
 	for (size_t r = 0; r < finders.size(); ++r) {
 		mvceditor::ResourceFinderClass* resourceFinder = finders[r];
 		size_t count = resourceFinder->GetResourceMatchCount();
 		for (size_t j = 0; j < count; ++j) {
 			mvceditor::ResourceClass resource = resourceFinder->GetResourceMatch(j);
-			matches.push_back(resource);
+			if (!IsDirty(resource, resourceFinder)) {
+				matches.push_back(resource);
+			}
 		}
 	}
 	std::sort(matches.begin(), matches.end());
@@ -244,11 +255,12 @@ void mvceditor::ResourceUpdateThreadClass::Unregister(const wxString& fileName) 
 }
 
 
-wxThreadError mvceditor::ResourceUpdateThreadClass::StartBackgroundUpdate(const wxString& fileName, const UnicodeString& code) {
+wxThreadError mvceditor::ResourceUpdateThreadClass::StartBackgroundUpdate(const wxString& fileName, const UnicodeString& code, bool isNew) {
 	wxThreadError error = CreateSingleInstance();
 	if (wxTHREAD_NO_ERROR == error) {
 		CurrentCode = code;
 		CurrentFileName = fileName;
+		CurrentFileIsNew = isNew;
 		GetThread()->Run();
 		SignalStart();
 	}
@@ -256,7 +268,7 @@ wxThreadError mvceditor::ResourceUpdateThreadClass::StartBackgroundUpdate(const 
 }
 
 void* mvceditor::ResourceUpdateThreadClass::Entry() {
-	Worker.Update(CurrentFileName, CurrentCode);
+	Worker.Update(CurrentFileName, CurrentCode, CurrentFileIsNew);
 	
 	std::map<wxString, wxEvtHandler*>::iterator itHandler = Handlers.find(CurrentFileName);
 	if (itHandler != Handlers.end()) {
