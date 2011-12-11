@@ -329,7 +329,7 @@ public:
 	 * @see mvceditor::ThreadWithHearbeatClass
 	 * @return bool TRUE if thread was started
 	 */
-	bool Read(std::vector<DatabaseInfoClass>* infos);
+	bool Read(std::vector<DatabaseInfoClass> infos);
 
 	/**
 	 * Once the background thread signals that it has finished
@@ -352,7 +352,7 @@ protected:
 
 	void* Entry();
 	
-	std::vector<DatabaseInfoClass>* Infos;
+	std::vector<DatabaseInfoClass> Infos;
 
 	std::vector<UnicodeString> Errors;
 	

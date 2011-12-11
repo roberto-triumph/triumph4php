@@ -97,7 +97,7 @@ void mvceditor::SqlConnectionDialogClass::OnTestButton(wxCommandEvent& event) {
 		if (index < Infos.size()) {
 			TestQuery.Info.Copy(Infos[index]);
 			wxThreadError error = wxTHREAD_NO_ERROR;
-			if (GetThread() && !GetThread()->IsRunning()) {
+			if (GetThread() && GetThread()->IsRunning()) {
 				error = wxTHREAD_RUNNING;
 			}
 			else {
@@ -519,9 +519,8 @@ mvceditor::SqlMetaDataFetchClass::SqlMetaDataFetchClass(wxEvtHandler& handler)
 		
 }
 
-bool mvceditor::SqlMetaDataFetchClass::Read(std::vector<mvceditor::DatabaseInfoClass>* infos) {
+bool mvceditor::SqlMetaDataFetchClass::Read(std::vector<mvceditor::DatabaseInfoClass> infos) {
 	bool ret = false;
-	Infos = infos;
 	wxThreadError err = CreateSingleInstance();
 	if (wxTHREAD_NO_RESOURCE == err) {
 		mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
@@ -540,7 +539,7 @@ bool mvceditor::SqlMetaDataFetchClass::Read(std::vector<mvceditor::DatabaseInfoC
 }
 
 void* mvceditor::SqlMetaDataFetchClass::Entry() {
-	for (std::vector<mvceditor::DatabaseInfoClass>::iterator it = Infos->begin(); it != Infos->end(); ++it) {
+	for (std::vector<mvceditor::DatabaseInfoClass>::iterator it = Infos.begin(); it != Infos.end(); ++it) {
 		UnicodeString error;
 		if (!NewResources.Fetch(*it, error)) {
 			Errors.push_back(error);
@@ -583,7 +582,7 @@ void mvceditor::SqlBrowserPluginClass::DetectMetadata() {
 		Infos.push_back(info);
 	}
 	else {
-		if (SqlMetaDataFetch.Read(&Infos)) {
+		if (SqlMetaDataFetch.Read(Infos)) {
 			GetStatusBarWithGauge()->AddGauge(_("Fetching SQL meta data"), ID_SQL_METADATA_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
 		}
 	}
@@ -666,7 +665,6 @@ void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event
 	// in order to make it less confusing about where the connection info comes from.
 	mvceditor::SqlConnectionDialogClass dialog(GetMainWindow(), Infos, ChosenIndex, true);
 	if (dialog.ShowModal() == wxOK) {
-		SqlMetaDataFetch.Read(&Infos);
 		
 		// if connection changed need to update the code control so that it knows to use the new
 		// connection for auto completion purposes
@@ -682,6 +680,9 @@ void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event
 				panel->UpdateLabels(wxT(""));			
 			}
 		}
+
+		// redetect the SQL meta data
+		SqlMetaDataFetch.Read(Infos);
 	}
 }
 
