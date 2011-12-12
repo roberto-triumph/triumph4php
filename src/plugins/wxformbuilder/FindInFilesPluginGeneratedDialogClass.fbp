@@ -495,11 +495,11 @@
                                 </object>
                             </object>
                         </object>
-                        <object class="sizeritem" expanded="0">
+                        <object class="sizeritem" expanded="1">
                             <property name="border">5</property>
                             <property name="flag">wxEXPAND</property>
                             <property name="proportion">1</property>
-                            <object class="wxBoxSizer" expanded="0">
+                            <object class="wxBoxSizer" expanded="1">
                                 <property name="minimum_size"></property>
                                 <property name="name">MidSizer</property>
                                 <property name="orient">wxVERTICAL</property>
@@ -577,20 +577,20 @@
                                 </object>
                             </object>
                         </object>
-                        <object class="sizeritem" expanded="0">
+                        <object class="sizeritem" expanded="1">
                             <property name="border">5</property>
                             <property name="flag">wxEXPAND</property>
                             <property name="proportion">0</property>
-                            <object class="wxBoxSizer" expanded="0">
+                            <object class="wxBoxSizer" expanded="1">
                                 <property name="minimum_size"></property>
                                 <property name="name">MiddleSizer</property>
                                 <property name="orient">wxHORIZONTAL</property>
                                 <property name="permission">none</property>
-                                <object class="sizeritem" expanded="0">
+                                <object class="sizeritem" expanded="1">
                                     <property name="border">5</property>
                                     <property name="flag">wxEXPAND|wxALL</property>
                                     <property name="proportion">1</property>
-                                    <object class="wxStaticBoxSizer" expanded="0">
+                                    <object class="wxStaticBoxSizer" expanded="1">
                                         <property name="id">wxID_ANY</property>
                                         <property name="label">File Extensions To Search:</property>
                                         <property name="minimum_size"></property>
@@ -661,20 +661,20 @@
                                 </object>
                             </object>
                         </object>
-                        <object class="sizeritem" expanded="0">
+                        <object class="sizeritem" expanded="1">
                             <property name="border">5</property>
                             <property name="flag">wxEXPAND</property>
                             <property name="proportion">1</property>
-                            <object class="wxBoxSizer" expanded="0">
+                            <object class="wxBoxSizer" expanded="1">
                                 <property name="minimum_size"></property>
                                 <property name="name">BottomSizer</property>
                                 <property name="orient">wxHORIZONTAL</property>
                                 <property name="permission">none</property>
-                                <object class="sizeritem" expanded="0">
+                                <object class="sizeritem" expanded="1">
                                     <property name="border">5</property>
                                     <property name="flag">wxEXPAND|wxALL</property>
                                     <property name="proportion">2</property>
-                                    <object class="wxBoxSizer" expanded="0">
+                                    <object class="wxBoxSizer" expanded="1">
                                         <property name="minimum_size"></property>
                                         <property name="name">OptionsSizer</property>
                                         <property name="orient">wxHORIZONTAL</property>
@@ -685,7 +685,7 @@
                                             <property name="proportion">1</property>
                                             <object class="wxRadioBox" expanded="0">
                                                 <property name="bg"></property>
-                                                <property name="choices">&quot;Code&quot; &quot;Exact&quot; &quot;Regular Expression&quot;</property>
+                                                <property name="choices">&quot;Exact&quot; &quot;Regular Expression&quot;</property>
                                                 <property name="context_help"></property>
                                                 <property name="context_menu">1</property>
                                                 <property name="enabled">1</property>

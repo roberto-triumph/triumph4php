@@ -102,7 +102,7 @@ FindInFilesDialogGeneratedClass::FindInFilesDialogGeneratedClass( wxWindow* pare
 	wxBoxSizer* OptionsSizer;
 	OptionsSizer = new wxBoxSizer( wxHORIZONTAL );
 	
-	wxString FinderModeChoices[] = { wxT("Code"), wxT("Exact"), wxT("Regular Expression") };
+	wxString FinderModeChoices[] = { wxT("Exact"), wxT("Regular Expression") };
 	int FinderModeNChoices = sizeof( FinderModeChoices ) / sizeof( wxString );
 	FinderMode = new wxRadioBox( this, wxID_ANY, wxT("Find Mode"), wxDefaultPosition, wxDefaultSize, FinderModeNChoices, FinderModeChoices, 3, wxRA_SPECIFY_ROWS );
 	FinderMode->SetSelection( 0 );

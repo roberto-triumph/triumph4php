@@ -243,6 +243,12 @@ void mvceditor::PopulateRegExFindMenu(wxMenu& regExMenu, int menuStart) {
 	regExMenu.Append(menuStart + ID_MENU_REG_EX_DOT_ALL, _("(?s)    A dot (.) will match line terminator. \r\n will be treated as one character."));
 	regExMenu.Append(menuStart + ID_MENU_REG_EX_MULTI_LINE, _("(?m)    (^) and ($) will also match at the start and end of each line"));
 	regExMenu.Append(menuStart + ID_MENU_REG_EX_UWORD, _("(?w)    word boundaries are found according to the definitions of word found in Unicode UAX 29"));
+	regExMenu.AppendSeparator();
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_PHP_STRING, _("...    Matches a PHP single or double quoted string"));
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_PHP_VARIABLE, _("...    Matches a PHP variable"));
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_PHP_NUMBER, _("...    Matches a PHP number"));
+	regExMenu.Append(menuStart + ID_MENU_REG_EX_PHP_WHITESPACE, _("\\s+    Matches PHP whitespace"));
+
 }
 
 void mvceditor::PopulateRegExReplaceMenu(wxMenu& regExMenu, int menuStart) {
@@ -296,6 +302,18 @@ void mvceditor::AddSymbolToRegularExpression(wxComboBox* text, int id, int curre
 	}
 	if (id == ID_MENU_REG_EX_NOT_ALPHANUMERIC) {
 		symbols = wxT("\\W");
+	}
+	if (id == ID_MENU_REG_EX_PHP_NUMBER) {
+		symbols = wxT("(-)?([0-9]+)|([0-9]*\\.[0-9]+)|([0-9]+\\.[0-9]*)");
+	}
+	if (id == ID_MENU_REG_EX_PHP_STRING) {
+		symbols = wxT("('[^']*')|(\"[^\"]*\")");
+	}
+	if (id == ID_MENU_REG_EX_PHP_VARIABLE) {
+		symbols = wxT("\\$[a-zA-Z_\\x7f-\\xff][a-zA-Z0-9_\\x7f-\\xff]*");
+	}
+	if (id == ID_MENU_REG_EX_PHP_WHITESPACE) {
+		symbols = wxT("\\s+");
 	}
 	if (!symbols.IsEmpty()) {
 	

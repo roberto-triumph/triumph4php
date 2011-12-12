@@ -28,7 +28,7 @@
 #include <windows/StringHelperClass.h>
 #include <assert.h>
 
-mvceditor::FinderClass::FinderClass(UnicodeString expression, int mode)
+mvceditor::FinderClass::FinderClass(UnicodeString expression, mvceditor::FinderClass::Modes mode)
 	: Expression(expression)
 	, ReplaceExpression()
 	, Mode(mode)
@@ -55,15 +55,10 @@ bool mvceditor::FinderClass::Prepare() {
 	Pattern = NULL;
 	PatternErrorCode = U_ZERO_ERROR;
 	
-	switch(Mode) {
-		case CODE:
-			PrepareForCodeMode();
-			break;
-		case REGULAR_EXPRESSION:
-			PrepareForRegularExpressionMode();
-			break;
+	if (mvceditor::FinderClass::REGULAR_EXPRESSION == Mode) {
+		PrepareForRegularExpressionMode();
 	}
-	IsPrepared = !Expression.isEmpty() && (EXACT == Mode || U_SUCCESS(PatternErrorCode));
+	IsPrepared = !Expression.isEmpty() && (mvceditor::FinderClass::EXACT == Mode || U_SUCCESS(PatternErrorCode));
 	return IsPrepared;
 }
 
@@ -72,21 +67,19 @@ bool mvceditor::FinderClass::FindNext(const UnicodeString& text, int32_t start) 
 	if (IsPrepared) {
 		ResetLastHit();
 		switch(Mode) {
-			case EXACT:
+			case mvceditor::FinderClass::EXACT:
 				found = FindNextExact(text, start);
 				break;
-			case CODE:
-			case REGULAR_EXPRESSION:
+			case mvceditor::FinderClass::REGULAR_EXPRESSION:
 				found = FindNextRegularExpression(text, start);
 			break;
 		}
 		if (Wrap && !found) {
 			switch(Mode) {
-				case EXACT:
+				case mvceditor::FinderClass::EXACT:
 					found = FindNextExact(text, 0);
 					break;
-				case CODE:
-				case REGULAR_EXPRESSION:
+				case mvceditor::FinderClass::REGULAR_EXPRESSION:
 					found = FindNextRegularExpression(text, 0);
 				break;
 			}
@@ -97,7 +90,7 @@ bool mvceditor::FinderClass::FindNext(const UnicodeString& text, int32_t start) 
 
 bool mvceditor::FinderClass::FindPrevious(const UnicodeString& text, int32_t start) {
 	bool found = false;
-	if(EXACT == Mode) {
+	if(mvceditor::FinderClass::EXACT == Mode) {
 		ResetLastHit();
 		found = FindPreviousExact(text, start);
 	}
@@ -155,16 +148,6 @@ bool mvceditor::FinderClass::GetLastReplacementText(const UnicodeString& text, U
 					replacementText = replaceWith;
 				}
 				break;
-			case CODE:
-				matcher = Pattern->matcher(matchedText, error);
-				if (U_SUCCESS(error) && matcher && matcher->matches(error) && U_SUCCESS(error)) {
-					
-					// dont use back references
-					//replaceWith.findAndReplace(UNICODE_STRING_SIMPLE("$"), UNICODE_STRING_SIMPLE("\\$"));
-					replacementText = matcher->replaceFirst(replaceWith, error);
-					matchFound = TRUE;
-				}
-				break;
 			case REGULAR_EXPRESSION:
 				matcher = Pattern->matcher(matchedText, error);
 				if (U_SUCCESS(error) && matcher && matcher->matches(error) && U_SUCCESS(error)) {
@@ -197,24 +180,6 @@ int mvceditor::FinderClass::ReplaceAllMatches(UnicodeString& text) const {
 					++matches;
 				}
 				break;
-			case CODE:
-				matcher = Pattern->matcher(text, error);
-				if (U_SUCCESS(error) && matcher) {
-					
-					// dont use back references
-					replacement.findAndReplace(UNICODE_STRING_SIMPLE("$"), UNICODE_STRING_SIMPLE("\\$"));
-					while (matcher->find()) {
-						if (U_SUCCESS(error)) {
-							matcher->appendReplacement(dest, replacement, error);
-							if (U_SUCCESS(error)) {
-								++matches;
-							}
-						}
-					}
-					matcher->appendTail(dest);
-					text = dest;
-				}
-				break;
 			case REGULAR_EXPRESSION:
 				matcher = Pattern->matcher(text, error);
 				if (U_SUCCESS(error) && matcher) {
@@ -236,219 +201,6 @@ int mvceditor::FinderClass::ReplaceAllMatches(UnicodeString& text) const {
 		}
 	}
 	return matches;
-}
-
-int mvceditor::FinderClass::RegExOfVariable(UnicodeString& code, int32_t start, UnicodeString& expressionRegEx) const {
-	int length = 1;
-	for (int32_t i = start + 1; i < code.length(); ++i) {
-		if (!u_isalnum(code[i]) && '_' != code[i]) {
-			break;
-		}
-		++length;
-	}
-	UnicodeString regex(code, start, length);
-	EscapeRegEx(regex);
-	expressionRegEx.append(regex);
-	return length;
-}
-
-int mvceditor::FinderClass::RegExOfSingleQuotedString(UnicodeString& code, int32_t start, UnicodeString& expressionRegEx) const {
-	int32_t length = 1;
-	int32_t codeLength = code.length();
-	UnicodeString escapedQuote = UNICODE_STRING_SIMPLE("\\'");
-	for (int32_t i = start + 1; i < codeLength; ++i) {		
-		if (code.compare(i, 2, escapedQuote, 0, 1) == 0) {			
-			length += 2; 
-			++i;
-		}
-		else {
-			++length;
-			if ('\'' == code[i]) {			
-				break;
-			}
-		}
-	}
-	
-	// escape regex symbols. for string literals, get matches
-	// with either single or double quotes. be careful to
-	// NOT add end quotes to literals that do no have ending
-	// quotes
-	UnicodeString regex;
-	UChar lastChar = '\0';
-	if (length > 1) {
-		regex.append(code, start + 1, length - 1);
-		lastChar = regex[regex.length() - 1];
-		if ('\'' == lastChar) {
-			regex.setTo(code, start + 1, length - 2);
-		}
-		EscapeRegEx(regex);
-	}
-	expressionRegEx.append(UNICODE_STRING_SIMPLE("('|\")"));
-	expressionRegEx.append(regex);
-	if ('\'' == lastChar) {
-		expressionRegEx.append(UNICODE_STRING_SIMPLE("('|\")"));
-	 }
-	return length;
-}
-
-int mvceditor::FinderClass::RegExOfDoubleQuotedString(UnicodeString& code, int32_t start, UnicodeString& expressionRegEx) const {
-	int length = 1;
-	int32_t codeLength = code.length();
-	UnicodeString escapedDoubleQuote = UNICODE_STRING_SIMPLE("\\\"");
-	for (int32_t i = start + 1; i < codeLength; ++i) {		
-		if (code.compare(i, 2, escapedDoubleQuote, 0, 1) == 0) {
-			length += 2; 
-			++i;
-		}
-		else {
-			++length;
-			if ('"' == code[i]) {			
-				break;
-			}
-		}
-	}
-	
-	// escape regex symbols. for string literals, get matches
-	// with either single or double quotes. be careful to
-	// NOT add end quotes to literals that do no have ending
-	// quotes
-	UnicodeString regex;
-	UChar lastChar = '\0';
-	if (length > 1) {
-		regex.setTo(code, start + 1, length - 1);
-		lastChar = regex[regex.length() - 1];
-		if ('"' == lastChar) {
-			regex.setTo(code, start + 1, length - 2);
-		}
-		EscapeRegEx(regex);
-	}
-	expressionRegEx.append(UNICODE_STRING_SIMPLE("('|\")"));
-	expressionRegEx.append(regex);
-	if ('"' == lastChar) {
-		expressionRegEx.append(UNICODE_STRING_SIMPLE("('|\")"));
-	}
-	return length;
-}
-
-int mvceditor::FinderClass::RegExOfComment(UnicodeString& code, int32_t start, UnicodeString& expressionRegEx) const {
-	int length = 2;
-	if (code.compare(start, 2, UNICODE_STRING_SIMPLE("//")) == 0) {
-		for (int32_t i = start + 2; i < code.length(); ++i) {
-			if ('\n' == code[i]) {
-				break;
-			}
-			++length;
-		}
-	}
-	else {
-		for (int32_t i = start + 2; i < code.length(); ++i) {		
-			if (code.compare(i, 2, UNICODE_STRING_SIMPLE("*/")) == 0) {
-				length += 2;
-				break;
-			}
-			++length;
-		}
-	}
-	
-	// TODO: fancy logic of matching multi-line comments like
-	//	  // line 1
-	//	  // line 2
-	//	  
-	//	  and 
-	//	  
-	//	  /*
-	//	   * line 1
-	//	   * line 2
-	//	   */
-	 
-	UnicodeString regex(code, start, length);
-	EscapeRegEx(regex);
-	expressionRegEx.append(regex);
-	return length;
-}
-
-int mvceditor::FinderClass::RegExOfNumber(UnicodeString& code, int32_t start, UnicodeString& expressionRegEx) const {
-	
-	// TODO: logic is kinda faulty as it does not account for negative numbers
-	int length = 0;
-	UnicodeString firstTwoChars(code, start, 2);
-	if (UNICODE_STRING_SIMPLE("0x") == firstTwoChars) {
-		length = 2;
-		for (int32_t i = start + 2; i < code.length(); ++i) {
-			if (!u_isalnum(code[i])) {
-				break;
-			}
-			++length;
-		}
-	}
-	else {
-		for (int32_t i = start; i < code.length(); ++i) {
-
-			// for floats and exponents ie. 3.14 or 3.142e-49. 
-			// not a really good check but good enough for now...
-			if (!u_isdigit(code[i]) && '.' != code[i] && 'e' != code[i] &&
-				'E' != code[i] && '-' != code[i]) {
-				break;
-			}
-			++length;
-		}
-	}
-	UnicodeString regex(code, start, length);
-	EscapeRegEx(regex);
-	expressionRegEx.append(regex);
-	return length;
-}
-
-int mvceditor::FinderClass::RegExOfOperator(UnicodeString& code, int32_t start, UnicodeString& expressionRegEx) const {
-	int length = 0;
-	
-	// check for 3-char operators
-	 if (code.compare(start, 3, UNICODE_STRING_SIMPLE("===")) == 0 || 
-		code.compare(start, 3, UNICODE_STRING_SIMPLE("!==")) == 0) {
-		length = 3;
-	} 
-	
-	// check for 2-char operators
-	 else if (code.compare(start, 2, UNICODE_STRING_SIMPLE("&&"), 0, 2) == 0 ||
-		 code.compare(start, 2, UNICODE_STRING_SIMPLE("||"), 0, 2) == 0 ||
-		 code.compare(start, 2, UNICODE_STRING_SIMPLE("=="), 0, 2) == 0 ||
-		 code.compare(start, 2, UNICODE_STRING_SIMPLE("<="), 0, 2) == 0 ||
-		 code.compare(start, 2, UNICODE_STRING_SIMPLE(">="), 0, 2) == 0 ||
-		 code.compare(start, 2, UNICODE_STRING_SIMPLE("!="), 0, 2) == 0 ||
-		 code.compare(start, 2, UNICODE_STRING_SIMPLE("&="), 0, 2) == 0 ||
-		 code.compare(start, 2, UNICODE_STRING_SIMPLE("|="), 0, 2) == 0 ||
-		 code.compare(start, 2, UNICODE_STRING_SIMPLE("+="), 0, 2) == 0 ||
-		 code.compare(start, 2, UNICODE_STRING_SIMPLE("-="), 0, 2) == 0 ||
-		 code.compare(start, 2, UNICODE_STRING_SIMPLE("*="), 0, 2) == 0 ||
-		 code.compare(start, 2, UNICODE_STRING_SIMPLE("/="), 0, 2) == 0 ||
-		 code.compare(start, 2, UNICODE_STRING_SIMPLE("->"), 0, 2) == 0 ||
-		 code.compare(start, 2, UNICODE_STRING_SIMPLE("::"), 0, 2) == 0 ||
-		 code.compare(start, 2, UNICODE_STRING_SIMPLE("=>"), 0, 2) == 0) {
-		length = 2;
-	}
-	else {
-		
-		// must be 1-char operators
-		 length = 1;
-	}
-	UnicodeString regex(code, start, length);
-	EscapeRegEx(regex);
-	expressionRegEx.append(regex);
-	return length;
-}
-
-int mvceditor::FinderClass::RegExOfOther(UnicodeString& code, int32_t start, UnicodeString& expressionRegEx) const {
-	int length = 0;
-	for (int32_t i = start; i < code.length(); ++i) {
-		if (!u_isalnum(code[i]) && '_' != code[i]) {
-			break;
-		}
-		++length;
-	}
-	UnicodeString regex(code, start, length);
-	EscapeRegEx(regex);
-	expressionRegEx.append(regex);
-	return length;
 }
 
 void mvceditor::FinderClass::EscapeRegEx(UnicodeString& regEx) const {
@@ -476,10 +228,9 @@ void mvceditor::FinderClass::EscapeRegEx(UnicodeString& regEx) const {
 	regEx.findAndReplace(UNICODE_STRING_SIMPLE("."), UNICODE_STRING_SIMPLE("\\."));
 	regEx.findAndReplace(UNICODE_STRING_SIMPLE(","), UNICODE_STRING_SIMPLE("\\,"));
 	regEx.findAndReplace(UNICODE_STRING_SIMPLE("\""), UNICODE_STRING_SIMPLE("\\\""));
-	regEx.findAndReplace(UNICODE_STRING_SIMPLE("|"), UNICODE_STRING_SIMPLE("\\|"));
-
-	
+	regEx.findAndReplace(UNICODE_STRING_SIMPLE("|"), UNICODE_STRING_SIMPLE("\\|"));	
 }
+
 bool mvceditor::FinderClass::FindNextExact(const UnicodeString& text, int32_t start) {
 	int32_t foundIndex = 0;
 	if (!CaseSensitive) {
@@ -555,66 +306,6 @@ bool mvceditor::FinderClass::FindNextRegularExpression(const UnicodeString& text
 	return IsFound;
 }
 
-void mvceditor::FinderClass::PrepareForCodeMode() {
-	UnicodeString expressionRegEx;
-	int tokenLength = 0;
-	UChar nextChar;
-	int32_t length = Expression.length();
-	for (int32_t i = 0; i < length; ++i) {
-		if (i < (length - 1)) {
-			nextChar = Expression[i + 1];
-		}
-		tokenLength = 0;
-		UChar currentChar = Expression[i];
-		if ('$' == currentChar) {
-			tokenLength = RegExOfVariable(Expression, i, expressionRegEx);
-		}
-		else if ('\'' == currentChar) {
-			tokenLength = RegExOfSingleQuotedString(Expression, i, expressionRegEx);
-		}
-		else if ('"' == currentChar) {
-			tokenLength = RegExOfDoubleQuotedString(Expression, i, expressionRegEx);
-		}
-		else if (('/' == currentChar && '/' == nextChar) ||
-			('/' == currentChar && '*' == nextChar)) {
-			tokenLength = RegExOfComment(Expression, i, expressionRegEx);
-		}
-		else if(u_isdigit(currentChar)) {
-			tokenLength = RegExOfNumber(Expression, i, expressionRegEx);
-		}
-		else if (u_isspace(currentChar)) {
-			//nothing
-		}
-		
-		// underscores are not operators
-		else if(!u_isalnum(currentChar) && !u_isspace(currentChar) && '_' != currentChar) {
-			tokenLength = RegExOfOperator(Expression, i, expressionRegEx);
-		}
-		else {
-			tokenLength = RegExOfOther(Expression, i, expressionRegEx);
-		}
-		if (tokenLength) {
-			expressionRegEx.append(UNICODE_STRING_SIMPLE("\\s*"));
-			i += tokenLength - 1;			
-		}
-	}
-	if (expressionRegEx.compare(expressionRegEx.length() - 3, 3, UNICODE_STRING_SIMPLE("\\s*")) == 0) {
-		expressionRegEx.setTo(expressionRegEx, 0, expressionRegEx.length() - 3);
-	}
-	
-	// should always be valid since we have escaped properly
-	int flags = UREGEX_MULTILINE;
-	if (!CaseSensitive) {
-		flags |= UREGEX_CASE_INSENSITIVE;
-	}
-	Pattern = RegexPattern::compile(expressionRegEx, flags, PatternErrorCode);
-	assert(U_SUCCESS(PatternErrorCode));
-	
-	//UFILE *out = u_finit(stdout, NULL, NULL);
-    //u_fprintf(out, "%S\n", expressionRegEx.getTerminatedBuffer());
-    //u_fclose(out);
-}
-	
 void mvceditor::FinderClass::PrepareForRegularExpressionMode() {
 	int flags = 0;
 	if (!CaseSensitive) {

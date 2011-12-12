@@ -38,7 +38,7 @@ namespace mvceditor {
 
 /**
  * This class can be used to search for a subset of text in multiple files of a given directory.  The find logic
- * is identical to that of FinderClass in regards to the different modes (CODE vs. EXACT vs. REGULAR_EXPRESSION). Searching
+ * is identical to that of FinderClass in regards to the different modes (EXACT vs. REGULAR_EXPRESSION). Searching
  * files will be line-based, each line of each file will be compared against the search expression.
  * 
  * File filters string is a GLOB-like string, using asterisk ('*') as wildcard. There may be multiple filters, each 
@@ -49,7 +49,7 @@ namespace mvceditor {
  * FindInFilesClass can be used to quickly find the number of matches of an expression in a directory of files.
  * 
  * <code>
- *   FindInFilesClass finder(UNICODE_STRING_SIMPLE("UserClass"), FinderClass::CODE);
+ *   FindInFilesClass finder(UNICODE_STRING_SIMPLE("UserClass"), FinderClass::EXACT);
  *   DirectorySearchClass search();
  *   if (search.Init(wxT("/path/to/phpfiles/"))) {
  *   	if (finder.Prepare()) {
@@ -66,7 +66,7 @@ namespace mvceditor {
  * with the php or inc extensions.
  * <code>
  * 
- *   FindInFilesClass finder(UNICODE_STRING_SIMPLE("UserClass"), FinderClass::CODE);
+ *   FindInFilesClass finder(UNICODE_STRING_SIMPLE("UserClass"), FinderClass::EXACT);
  *   finder.FilesFilter = wxT("*.php;*.inc");
  *   DirectorySearchClass search();
  *   if (search.Init(wxT("/path/to/phpfiles/"))) {
@@ -83,7 +83,7 @@ namespace mvceditor {
  * the matched files at some point in the future.
  * 
  *  <code>
- *   FindInFilesClass finder(UNICODE_STRING_SIMPLE("UserClass"), FinderClass::CODE);
+ *   FindInFilesClass finder(UNICODE_STRING_SIMPLE("UserClass"), FinderClass::EXACT);
  *   finder.FilesFilter = wxT("*.php;*.inc");
  *   DirectorySearchClass search();
  *   if (search.Init(wxT("/path/to/phpfiles/"))) {
@@ -117,7 +117,7 @@ public:
 		CHARSET_DETECTION
 	};
 
-	FindInFilesClass(const UnicodeString& expression = UNICODE_STRING_SIMPLE(""), int mode = FinderClass::CODE);
+	FindInFilesClass(const UnicodeString& expression = UNICODE_STRING_SIMPLE(""), FinderClass::Modes mode = FinderClass::EXACT);
 	
 	/**
 	 * Will copy source into this new instance. However, this variable is not prepared, and
@@ -151,7 +151,7 @@ public:
 	/**
 	 * The find mode. If Mode is modified, Prepare() method MUST be called in order to
 	 * set the internal state machine.
-	 * @var int one of FinderClass::MODES
+	 * @var one of FinderClass::MODES
 	 */
 	int Mode;
 	

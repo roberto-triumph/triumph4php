@@ -33,7 +33,7 @@
 #include <wx/regex.h>
 #include <wx/filename.h>
 
-mvceditor::FindInFilesClass::FindInFilesClass(const UnicodeString& expression, int mode) 
+mvceditor::FindInFilesClass::FindInFilesClass(const UnicodeString& expression, mvceditor::FinderClass::Modes mode) 
 	: Expression(expression)
 	, ReplaceExpression()
 	, FilesFilter(wxT("*.*"))

@@ -32,9 +32,8 @@ namespace mvceditor {
 	
 /**
  * This class can be used to search for a subset of text within a given 
- * text. This class searches for code snippets within given text, using 
- * PHP syntax rules to determine when case sensitivity and whitespace applies. The FindNext & FindPrevious
- * methods perform the search, while iterating through the results is done by using the GetLastMatch() method.
+ * text. The FindNext & FindPrevious methods perform the search, while iterating through the 
+ * results is done by using the GetLastMatch() method.
  * Example:
  * 
  * <code>
@@ -53,76 +52,29 @@ namespace mvceditor {
  *   // Found target at position: 17, length of match: 6
  *   // Found target at position: 41, length of match: 6
  * </code>
- * 
- * Finder Rules:  The finder makes searching PHP code easy by using PHP syntax rules to
- * determine when case sensitivity and whitespace significance applies. This relieves the burden
- * of having a precise expression to find code.
- * 
- * Example:  Let's say that we have a string variable named code with the following PHP code:
- * <code>
- *   UnicodeString code = UNICODE_STRING_SIMPLE("
- *     function computeAreaOfCircle($radius) {
- *       $PI = 3.14;
- *       $MESSAGE = 'area of circle is: %2f';
- *       return sprintf($MESSAGE, $PI * $radius * 2);
- *     }");
- * </code>
- * 
- * variable names: Variable names will always be case-sensitive, since in PHP variables are
- * case sensitive:
- * 
- * <code>
- *   FinderClass finder(UNICODE_STRING_SIMPLE("$PI"));
- *   printf("%d", finder.findNext(code)); // prints 1
- *   finder.Expression = UNICODE_STRING_SIMPLE("$pi");
- *   finder.Prepare();
- *   printf("%d", finder.FindNext(code)); // prints 0
- * </code>
- * 
- * whitespace significance: white space around operators and parentheses are insignificant
- * 
- * <code>
- *   FinderClass finder(UNICODE_STRING_SIMPLE("$PI = 3.14"));
- *   printf("%d", finder.findNext(code)); // prints 1
- *   finder.Expression = UNICODE_STRING_SIMPLE("$PI=3.14");
- *   finder.Prepare();
- *   printf("%d", finder.FindNext(code)); // prints 1
- *   finder.Expression = UNICODE_STRING_SIMPLE("$PI*$radius*2");
- *   finder.Prepare();
- *   printf("%d", finder.FindNext(code)); // prints 1
- *   finder.Expression = UNICODE_STRING_SIMPLE("computeAreaOfCircle( $radius )");
- *   finder.Prepare();
- *   printf("%d", finder.FindNext(code)); // prints 1
- *   finder.Prepare();
- *   finder.Expression = UNICODE_STRING_SIMPLE("sprintf (");
- *   finder.Prepare();
- *   printf("%d", finder.FindNext(code)); // prints 1
- * </code>
- * 
- * note that case sensitivity and whitespace rules will not apply to string literals.  However, literals
- * are searched using both single quotes and double quotes (since in PHP they are the same).
- * 
- * <code>
- *   FinderClass finder(UNICODE_STRING_SIMPLE("'area of circle is: %2f'"));
- *   printf("%d", finder.FindNext(code)); // prints 1
- *   finder.Expression = UNICODE_STRING_SIMPLE("'area of circle is:%2f'");
- *   finder.Prepare();
- *   printf("%d", finder.FindNext(code)); // prints 0
- *   finder.Expression = UNICODE_STRING_SIMPLE("\"area of circle is: %2f\"");
- *   finder.Prepare();
- *   printf("%d", finder.FindNext(code)); // prints 1
- * </code>
+ *
+ *
  */
 class FinderClass {
 	
 public:
+
+	/**
+	 * All possible search modes
+	 * 
+	 * @var enum
+	 */
+	enum Modes {
+		EXACT = 0,
+		REGULAR_EXPRESSION = 1
+	};
 	
 	/**
 	 * Default constructor.
 	 * 
 	 * @param UnicodeString expression the expression to search for
 	 */
-	FinderClass(UnicodeString expression = UNICODE_STRING_SIMPLE(""), int mode = CODE);
+	FinderClass(UnicodeString expression = UNICODE_STRING_SIMPLE(""), Modes mode = EXACT);
 	
 	/**
 	 * cleanup pattern
@@ -238,17 +190,6 @@ public:
 	 */
 	bool Wrap;
 	
-	/**
-	 * All possible search modes
-	 * 
-	 * @var enum
-	 */
-	enum {
-		CODE = 0,
-		EXACT = 1,
-		REGULAR_EXPRESSION = 2
-	};
-	
 private:
 	
 	/**
@@ -301,94 +242,6 @@ private:
 	 * Compiles the internal regular expression object from the Expression
 	 */
 	void PrepareForRegularExpressionMode();	
-	
-	/**
-	 * Appends the regular expression for variable at the given code, starting from the given
-	 * start index.  Will set the length parameter to the length of the token. This method
-	 * assumes that code[start] is the beginning of a PHP variable ('$')
-	 * 
-	 * @param UnicodeString code the string to search
-	 * @param int32_t start the index from where to begin
-	 * @param UnicodeString the regular expression to append to
-	 * @return int length the number of characters of the token
-	 */
-	int RegExOfVariable(UnicodeString& code, int32_t start, UnicodeString& expressionRegEx) const;
-	
-	/**
-	 * Appends the regular expression for a string literal at the given code, starting 
-	 * from the given start index.  Will set the length parameter to the length of the token.
-	 * This method assumes that code[start] is the beginning of a PHP string literal (').
-	 * The appended regular expression will match either single or double quoted
-	 * string since they have the same meaning.
-	 * 
-	 * @param UnicodeString code the string to search
-	 * @param int32_t start the index from where to begin
-	 * @param UnicodeString the regular expression to append to
-	 * @return int length the number of characters of the token
-	 */
-	int RegExOfSingleQuotedString(UnicodeString& code, int32_t start, UnicodeString& expressionRegEx) const;
-
-	/**
-	 * Appends the regular expression for a double quoted string literal at the given code, starting 
-	 * from the given start index.  Will set the length parameter to the length of the token. 
-	 * This method assumes that code[start] is the beginning of a PHP string literal (").
-	 * The appended regular expression will match either single or double quoted
-	 * string since they have the same meaning.
-	 * 
-	 * @param UnicodeString code the string to search
-	 * @param int32_t start the index from where to begin
-	 * @param UnicodeString the regular expression to append to
-	 * @return int length the number of characters of the token including the quotes
-	 */
-	int RegExOfDoubleQuotedString(UnicodeString& code, int32_t start, UnicodeString& expressionRegEx) const;
-	
-	/**
-	 * Appends the regular expression for a comment at the given code, starting from the given
-	 * start index.  Will set the length parameter to the length of the token. This method
-	 * assumes that code[start ... start + 1] is the beginning of a PHP comment  ("//" or "/ *")
-	 * 
-	 * @param UnicodeString code the string to search
-	 * @param int32_t start the index from where to begin
-	 * @param UnicodeString the regular expression to append to
-	 * @return int length the number of characters of the token
-	 */	
-	int RegExOfComment(UnicodeString& code, int32_t start, UnicodeString& expressionRegEx) const;
-	
-	/**
-	 * Appends the regular expression for a number literal at the given code, starting from the given
-	 * start index.  Will set the length parameter to the length of the token. This method
-	 * assumes that code[start] is the beginning of a PHP number literal
-	 * 
-	 * @param UnicodeString code the string to search
-	 * @param int32_t start the index from where to begin
-	 * @param UnicodeString the regular expression to append to
-	 * @return int length the number of characters of the token
-	 */	
-	int RegExOfNumber(UnicodeString& code, int32_t start, UnicodeString& expressionRegEx) const;
-	
-	/**
-	 * Appends the regular expression for an operator at the given code, starting from the given
-	 * start index.  Will set the length parameter to the length of the token. This method
-	 * assumes that code[start] is the beginning of a PHP operator.
-	 * 
-	 * @param UnicodeString code the string to search
-	 * @param int32_t start the index from where to begin
-	 * @param UnicodeString the regular expression to append to
-	 * @return int length the number of characters of the token
-	 */		
-	int RegExOfOperator(UnicodeString& code, int32_t start, UnicodeString& expressionRegEx) const;
-	
-	/**
-	 * Returns the regular expression for an identifier at the given code, starting from the given
-	 * start index.  Will set the length parameter to the length of the token. This method
-	 * assumes that code[start] is the beginning of a PHP identifier
-	 * 
-	 * @param UnicodeString code the string to search
-	 * @param int32_t start the index from where to begin
-     * @param UnicodeString the regular expression to append to
-	 * @return int length the number of characters of the token
-	 */			
-	int RegExOfOther(UnicodeString& code, int32_t start, UnicodeString& expressionRegEx) const;
 	
 	/**
 	 * replace all regular expression symbols so that they are treated as normal

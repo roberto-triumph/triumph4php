@@ -142,11 +142,6 @@ void mvceditor::FinderPanelClass::OnNextButton(wxCommandEvent& event) {
 
 void mvceditor::FinderPanelClass::OnHelpButton(wxCommandEvent& event) {
 	wxString help = wxString::FromAscii("Find modes:\n"
-	  "Code:\n" 
-	  "Type in PHP source code.  The editor will ignore whitespace "
-	  "where it does not matter and will also match single and double quoted literals "
-	  "if their contents match. For example, searching for\n\tstr_pos($text, 'needle')\n"
-	  "will match\n\tstr_pos( $text,\"needle\" )\n\n"
 	  "Exact:\n"
 	  "Searching will be done using exact, case sensitive matching\n\n"
 	  "Regular Expression:\n"
@@ -220,7 +215,7 @@ mvceditor::ReplacePanelClass::ReplacePanelClass(wxWindow* parent, mvceditor::Not
 		, CurrentInsertionPointReplace(0) {
 	mvceditor::RegularExpressionValidatorClass regExValidator(&Finder.Expression, FinderMode);
 	FindText->SetValidator(regExValidator);
-	wxGenericValidator modeValidator(&Finder.Mode);
+	wxGenericValidator modeValidator(&(int)Finder.Mode);
 	FinderMode->SetValidator(modeValidator);
 	wxGenericValidator wrapValidator(&Finder.Wrap);
 	Wrap->SetValidator(wrapValidator);
@@ -334,11 +329,6 @@ void mvceditor::ReplacePanelClass::OnNextButton(wxCommandEvent& event) {
 
 void mvceditor::ReplacePanelClass::OnHelpButton(wxCommandEvent& event) {
 	wxString help = wxString::FromAscii("Find modes:\n"
-	  "Code:\n" 
-	  "Type in PHP source code.  The editor will ignore whitespace "
-	  "where it does not matter and will also match single and double quoted literals "
-	  "if their contents match. For example, searching for\n\tstr_pos($text, 'needle')\n"
-	  "will match\n\tstr_pos( $text,\"needle\" )\n\n"
 	  "Exact:\n"
 	  "Searching will be done using exact, case sensitive matching\n\n"
 	  "Regular Expression:\n"
@@ -639,6 +629,10 @@ BEGIN_EVENT_TABLE(mvceditor::FinderPanelClass, FinderPanelGeneratedClass)
 	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_DOT_ALL, mvceditor::FinderPanelClass::InsertRegExSymbol)
 	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_MULTI_LINE, mvceditor::FinderPanelClass::InsertRegExSymbol)
 	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_UWORD, mvceditor::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_PHP_STRING, mvceditor::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_PHP_VARIABLE, mvceditor::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_PHP_NUMBER, mvceditor::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_PHP_WHITESPACE, mvceditor::FinderPanelClass::InsertRegExSymbol)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::ReplacePanelClass, ReplacePanelGeneratedClass)
@@ -665,6 +659,10 @@ BEGIN_EVENT_TABLE(mvceditor::ReplacePanelClass, ReplacePanelGeneratedClass)
 	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_DOT_ALL, mvceditor::ReplacePanelClass::InsertRegExSymbol)
 	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_MULTI_LINE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
 	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_UWORD, mvceditor::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_PHP_STRING, mvceditor::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_PHP_VARIABLE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_PHP_NUMBER, mvceditor::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_PHP_WHITESPACE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::FinderPluginClass, wxEvtHandler) 
