@@ -320,8 +320,8 @@ void mvceditor::AppClass::CreatePlugins() {
 	Plugins.push_back(plugin);
 	plugin = new OutlineViewPluginClass();
 	Plugins.push_back(plugin);
-	plugin = new LintPluginClass();
-	Plugins.push_back(plugin);
+	//plugin = new LintPluginClass();
+	//Plugins.push_back(plugin);
 	plugin = new SqlBrowserPluginClass();
 	Plugins.push_back(plugin);
 	plugin = new mvceditor::EditorMessagesPluginClass();

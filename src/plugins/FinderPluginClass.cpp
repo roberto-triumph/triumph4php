@@ -31,16 +31,11 @@
 #include <wx/valgen.h>
 #include <wx/valtext.h>
 
-static const int ID_MENU_FIND = mvceditor::PluginClass::newMenuId();
-static const int ID_MENU_FIND_NEXT = mvceditor::PluginClass::newMenuId();
-static const int ID_MENU_FIND_PREVIOUS = mvceditor::PluginClass::newMenuId();
-static const int ID_MENU_GOTO_LINE = mvceditor::PluginClass::newMenuId();
-static const int ID_MENU_REPLACE = mvceditor::PluginClass::newMenuId();
 static const int ID_FIND_PANEL = wxNewId(); 
 static const int ID_REPLACE_PANEL = wxNewId(); 
 
 // these IDs are needed so that the IDs of the Regular expression help menu
-// do not collide with the menu IDs of the FinderPlugin
+// do not collide with the menu IDs of the FindInFilesPlugin
 static const int ID_REGEX_MENU_START = 11000;
 static const int ID_REGEX_REPLACE_FIND_MENU_START = 12000;
 static const int ID_REGEX_REPLACE_MENU_START = 13000;
@@ -513,11 +508,11 @@ mvceditor::FinderPluginClass::FinderPluginClass()
 }
 	
 void mvceditor::FinderPluginClass::AddEditMenuItems(wxMenu* editMenu) {
-	editMenu->Append(ID_MENU_FIND, _("Find\tCTRL+F"), _("Find"));
-	editMenu->Append(ID_MENU_FIND_NEXT, _("Find Next\tF3"), _("Advance to the next match"));
-	editMenu->Append(ID_MENU_FIND_PREVIOUS, _("Find Previous\tSHIFT+F3"), _("Advance to the previous match"));
-	editMenu->Append(ID_MENU_REPLACE, _("Replace\tCTRL+H"), _("Find and Replace in current file"));
-	editMenu->Append(ID_MENU_GOTO_LINE, _("Go To Line\tCTRL+G"), _("Go To Line"));
+	editMenu->Append(mvceditor::MENU_FINDER + 0, _("Find\tCTRL+F"), _("Find"));
+	editMenu->Append(mvceditor::MENU_FINDER + 1, _("Find Next\tF3"), _("Advance to the next match"));
+	editMenu->Append(mvceditor::MENU_FINDER + 2, _("Find Previous\tSHIFT+F3"), _("Advance to the previous match"));
+	editMenu->Append(mvceditor::MENU_FINDER + 3, _("Replace\tCTRL+H"), _("Find and Replace in current file"));
+	editMenu->Append(mvceditor::MENU_FINDER + 4, _("Go To Line\tCTRL+G"), _("Go To Line"));
 }
 
 void mvceditor::FinderPluginClass::OnEditFind(wxCommandEvent& event) {
@@ -673,10 +668,10 @@ BEGIN_EVENT_TABLE(mvceditor::ReplacePanelClass, ReplacePanelGeneratedClass)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::FinderPluginClass, wxEvtHandler) 
-	EVT_MENU(ID_MENU_FIND, mvceditor::FinderPluginClass::OnEditFind)
-	EVT_MENU(ID_MENU_FIND_NEXT, mvceditor::FinderPluginClass::OnEditFindNext)
-	EVT_MENU(ID_MENU_FIND_PREVIOUS, mvceditor::FinderPluginClass::OnEditFindPrevious)
-	EVT_MENU(ID_MENU_REPLACE, mvceditor::FinderPluginClass::OnEditReplace)
-	EVT_MENU(ID_MENU_GOTO_LINE, mvceditor::FinderPluginClass::OnEditGoToLine)
+	EVT_MENU(mvceditor::MENU_FINDER + 0, mvceditor::FinderPluginClass::OnEditFind)
+	EVT_MENU(mvceditor::MENU_FINDER + 1, mvceditor::FinderPluginClass::OnEditFindNext)
+	EVT_MENU(mvceditor::MENU_FINDER + 2, mvceditor::FinderPluginClass::OnEditFindPrevious)
+	EVT_MENU(mvceditor::MENU_FINDER + 3, mvceditor::FinderPluginClass::OnEditReplace)
+	EVT_MENU(mvceditor::MENU_FINDER + 4, mvceditor::FinderPluginClass::OnEditGoToLine)
 END_EVENT_TABLE()
 

@@ -25,8 +25,6 @@
 #include <PluginClass.h>
 #include <wx/artprov.h>
 
-int mvceditor::PluginClass::CurrentMenuId = 10000;
-
 mvceditor::PluginClass::PluginClass()
 	: AuiManager(NULL)
 	, StatusBarWithGauge(NULL)
@@ -38,10 +36,6 @@ mvceditor::PluginClass::PluginClass()
 }
 
 mvceditor::PluginClass::~PluginClass() {
-}
-
-int mvceditor::PluginClass::newMenuId() {
-	return CurrentMenuId++;
 }
 
 void mvceditor::PluginClass::InitWindow(StatusBarWithGaugeClass* statusBarWithGauge, NotebookClass* notebook, wxAuiNotebook* toolsNotebook, 

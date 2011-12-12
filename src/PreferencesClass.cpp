@@ -23,13 +23,153 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <PreferencesClass.h>
-
+#include <MvcEditorErrors.h>
 #include <wx/fileconf.h>
 #include <wx/filename.h>
 #include <wx/menuutils.h>
 #include <wx/stdpaths.h>
 #include <wx/wfstream.h>
 #include <wx/frame.h>
+
+#include <wx/wx.h>
+
+// this function was ripped off from wxMenuCmd::CreateNew() but this function
+// gracefully handles non-existant menus
+static wxCmd* CreateNewMenuCmd(wxMenuBar* menuBar, int id) {
+
+	// search the menuitem which is tied to the given ID
+	wxMenuItem* item = menuBar->FindItem(id);
+	return item ? new wxMenuCmd(item) : NULL;
+}
+
+// this function was ripped off from wxKeyBinder::Load() but this function
+// gracefully handles non-existant menus
+static int LoadKeyProfileShortcuts(wxMenuBar* menuBar, wxKeyProfile& profile, wxConfigBase* config, const wxString& configKey) {
+    wxString str;
+    bool cont;
+    int total = 0;
+    long idx;
+
+    // before starting...
+    config->SetPath(configKey);
+    profile.Reset();
+
+    cont = config->GetFirstEntry(str, idx);
+    while (cont) {
+
+        // try to decode this entry
+        if (str.StartsWith(wxCMD_CONFIG_PREFIX)) {
+
+            wxString id(str.BeforeFirst(wxT('-')));
+            wxString type(str.AfterFirst(wxT('-')));
+            id = id.Right(id.Len()-wxString(wxCMD_CONFIG_PREFIX).Len());
+            type = type.Right(type.Len()-wxString(wxT("type")).Len());
+
+            // is this a valid entry ?
+            if (id.IsNumber() && type.IsNumber() &&
+                config->GetEntryType(str) == wxConfigBase::Type_String) {
+
+                // we will interpret this group as a command ID
+                int nid = wxAtoi(id);
+                int ntype = wxAtoi(type);
+
+                // create & load this command
+                wxCmd *cmd = CreateNewMenuCmd(menuBar, nid);
+				if (cmd && cmd->Load(config, str)) {
+					profile.AddCmd(cmd);      // add to the array
+					total++;
+				}
+				else if (!cmd) {
+					
+					// menu no longer exists
+					// the normal keybinder code would just error out here but we 
+					// dont want to 
+					mvceditor::EditorLogWarning(mvceditor::MISSING_KEYBOARD_SHORTCUT, str);
+				}
+				else {
+
+					// could not load from config ... continue on to next shortcut
+					// the normal keybinder code would just error out here but we 
+					// dont want to 
+					mvceditor::EditorLogWarning(mvceditor::CORRUPT_KEYBOARD_SHORTCUT, str);
+				}
+            }
+        }
+
+        // proceed with next entry (if it does exist)
+        cont &= config->GetNextEntry(str, idx);
+    }
+
+    return total;
+}
+
+// this function was ripped off from wxKeyProfile::Load() but this function
+// gracefully handles non-existant menus
+static bool LoadKeyProfile(wxMenuBar* menuBar, wxKeyProfile& profile, wxConfigBase* config, const wxString& configKey) {
+	bool ret = false;
+	config->SetPath(configKey);        // enter into this group
+    wxString name;
+    wxString desc;
+
+    // do we have valid DESC & NAME entries ?
+    if (config->HasEntry(wxT("desc")) && config->HasEntry(wxT("name"))) {
+        if (!config->Read(wxT("desc"), &desc))
+            return FALSE;
+        if (!config->Read(wxT("name"), &name))
+            return FALSE;
+
+        // check for valid name & desc
+        if (name.IsEmpty())
+            return FALSE;
+
+        profile.SetName(name);
+        profile.SetDesc(desc);
+
+        // load from current path (we cannot use '.')
+        ret = LoadKeyProfileShortcuts(menuBar, profile, config, wxT("../") + configKey) > 0;
+	}
+	return ret;
+}
+
+static bool LoadKeyProfileArray(wxMenuBar* menuBar, wxKeyProfileArray& profiles, wxConfigBase* config, const wxString& configKey) {
+    wxKeyProfile tmp;
+    wxString str;
+    bool cont;
+    long idx;
+
+    // before starting...
+    config->SetPath(configKey);
+	int selected = 0;
+    if (!config->Read(wxT("nSelProfile"), &selected))
+        return FALSE;
+	
+    cont = config->GetFirstGroup(str, idx);
+    while (cont) {
+
+        // try to decode this group name
+        if (str.StartsWith(wxKEYPROFILE_CONFIG_PREFIX)) {
+
+            // is this a valid entry ?
+			if (LoadKeyProfile(menuBar, tmp, config, str)) {
+				profiles.Add(new wxKeyProfile(tmp));     // yes, it is; add it to the array
+			}
+        }
+
+        // set the path again (it could have been changed...)
+        config->SetPath(configKey);
+
+        // proceed with next entry (if it does exist)
+        cont &= config->GetNextGroup(str, idx);
+    }
+	if (selected < profiles.GetCount()) {
+		profiles.SetSelProfile(selected);
+	}
+	else if (!profiles.IsEmpty()) {
+		profiles.SetSelProfile(0);
+	}
+    return TRUE;
+}
+
 
 mvceditor::PreferencesClass::PreferencesClass()
 	: CodeControlOptions()
@@ -54,15 +194,11 @@ void mvceditor::PreferencesClass::Load(wxFrame* frame) {
 	// of commands we want wxCmd::Load to be able to recognize...	
 	wxMenuCmd::Register(menuBar);
 	int totalCmdCount = 0;
-		
-	// for some reason, must give absolute path else loading will saving & fail
-	// COMMENT OUT THIS CODE TO SEE IF IT IS THE CAUSE OF CRASHES
-	//KeyProfiles.Load(config, wxT("/Keyboard"));
-	
-	// TODO: key profiles uses menu IDs to load/save configs, but since menu IDs can change
-	// when a new plugin is added the new menuIDs may conflict with an existing menu ID and will
-	// cause crashes in KeyBinder. Need to fix this.
-	KeyProfiles.Load(config);
+
+	// call out own key profile load function
+	// out function will gracefully handle deleted menus ; the normal keybinder code
+	// throws asserts
+	LoadKeyProfileArray(menuBar, KeyProfiles, config, wxT(""));
 	for (int i = 0; i < KeyProfiles.GetCount(); ++i) {
 		totalCmdCount += KeyProfiles.Item(i)->GetCmdCount();
 	}
@@ -82,10 +218,6 @@ void mvceditor::PreferencesClass::Load(wxFrame* frame) {
 void mvceditor::PreferencesClass::Save() {
 	wxConfigBase* config = wxConfigBase::Get();
 	CodeControlOptions.Save(config);
-	
-	// for some reason, must give absolute path else loading will saving & fail
-	// COMMENT OUT THIS CODE TO SEE IF IT IS THE CAUSE OF CRASHES
-	//KeyProfiles.Save(config, wxT("/Keyboard"), true);
 	KeyProfiles.Save(config, wxT(""), true);
 	
 	// keybinder sets the config path, must reset it back to normal

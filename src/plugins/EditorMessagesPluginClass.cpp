@@ -25,7 +25,6 @@
 #include <plugins/EditorMessagesPluginClass.h>
 #include <MvcEditorErrors.h>
 
-static const int ID_DEBUG_WINDOW_MENU = mvceditor::PluginClass::newMenuId();
 static const int ID_DEBUG_WINDOW = wxNewId();
 
 mvceditor::EditorMessagesPanelClass::EditorMessagesPanelClass(wxWindow* parent, int id)
@@ -109,7 +108,7 @@ mvceditor::EditorMessagesPluginClass::EditorMessagesPluginClass()
 }
 
 void mvceditor::EditorMessagesPluginClass::AddToolsMenuItems(wxMenu *toolsMenu) {
-	toolsMenu->Append(ID_DEBUG_WINDOW_MENU, _("Editor Messages"), 
+	toolsMenu->Append(mvceditor::MENU_EDITOR_MESSAGES, _("Editor Messages"), 
 		_("Editor Messages"));
 }
 
@@ -149,5 +148,5 @@ void mvceditor::EditorMessagesLoggerClass::DoLog(wxLogLevel level, const wxChar 
 }
 
 BEGIN_EVENT_TABLE(mvceditor::EditorMessagesPluginClass, mvceditor::PluginClass)
-	EVT_MENU(ID_DEBUG_WINDOW_MENU, mvceditor::EditorMessagesPluginClass::OnMenu)
+	EVT_MENU(mvceditor::MENU_EDITOR_MESSAGES, mvceditor::EditorMessagesPluginClass::OnMenu)
 END_EVENT_TABLE()

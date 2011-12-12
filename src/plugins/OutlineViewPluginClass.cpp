@@ -31,14 +31,13 @@
 #include <algorithm>
 
 
-int ID_MENU_OUTLINE_CURRENT = mvceditor::PluginClass::newMenuId();
-int ID_CONTEXT_MENU_SHOW_OUTLINE_OTHER = mvceditor::PluginClass::newMenuId();
+int ID_CONTEXT_MENU_SHOW_OUTLINE_OTHER = wxNewId();
 int ID_WINDOW_OUTLINE = wxNewId();
 int ID_CONTEXT_MENU_SHOW_OUTLINE_CURRENT = wxNewId();
 int ID_WINDOW_OUTLINE_CURRENT = wxNewId();
 int ID_WINDOW_OUTLINE_COMMENT = wxNewId();
-int ID_MENU_OUTLINE_CURRENT_JUMP_TO = wxNewId();
-int ID_MENU_OUTLINE_CURRENT_JUMP_TO_COMMENT = wxNewId();
+int ID_CONTEXT_MENU_CURRENT_JUMP_TO = wxNewId();
+int ID_CONTEXT_MENU_CURRENT_JUMP_TO_COMMENT = wxNewId();
 
 mvceditor::OutlineViewPluginClass::OutlineViewPluginClass()
 	: PluginClass()
@@ -52,7 +51,7 @@ mvceditor::OutlineViewPluginClass::OutlineViewPluginClass()
 }
 
 void mvceditor::OutlineViewPluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
-	toolsMenu->Append(ID_MENU_OUTLINE_CURRENT, _("Outline Current File"),  _("Opens an outline view of the currently viewed file"), wxITEM_NORMAL);
+	toolsMenu->Append(mvceditor::MENU_OUTLINE, _("Outline Current File"),  _("Opens an outline view of the currently viewed file"), wxITEM_NORMAL);
 }
 
 void mvceditor::OutlineViewPluginClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
@@ -182,7 +181,7 @@ UnicodeString mvceditor::OutlineViewPluginClass::HumanFriendlyOutline() {
 void mvceditor::OutlineViewPluginClass::OnContextMenuOutline(wxCommandEvent& event) {
 	CodeControlClass* code = GetCurrentCodeControl();
 	bool modified = false;
-	if (event.GetId() == ID_CONTEXT_MENU_SHOW_OUTLINE_CURRENT || event.GetId() == ID_MENU_OUTLINE_CURRENT) {
+	if (event.GetId() == ID_CONTEXT_MENU_SHOW_OUTLINE_CURRENT || event.GetId() == mvceditor::MENU_OUTLINE) {
 		BuildOutlineCurrentCodeControl();
 		modified = true;
 	}
@@ -361,8 +360,8 @@ void mvceditor::OutlineViewPluginPanelClass::OnContextMenu(wxContextMenuEvent& e
 	// i have no idea how we can know which code control the popup menu is in.
 	// for now I am assigning each code control window its own menu ID and differentiating that way
 	if (event.GetEventObject() == Outline1) {
-		menu.Append(ID_MENU_OUTLINE_CURRENT_JUMP_TO, _("Jump To Resource"),  _("Opens this resource in the editor"), wxITEM_NORMAL);
-		menu.Append(ID_MENU_OUTLINE_CURRENT_JUMP_TO_COMMENT, _("Show Comment"),  _("Display the resource comment"), wxITEM_NORMAL);
+		menu.Append(ID_CONTEXT_MENU_CURRENT_JUMP_TO, _("Jump To Resource"),  _("Opens this resource in the editor"), wxITEM_NORMAL);
+		menu.Append(ID_CONTEXT_MENU_CURRENT_JUMP_TO_COMMENT, _("Show Comment"),  _("Display the resource comment"), wxITEM_NORMAL);
 		PopupMenu(&menu);
 	}
 	else {
@@ -397,7 +396,7 @@ wxString mvceditor::OutlineViewPluginPanelClass::ResourceFromOutline(wxCommandEv
 	// for now I am assigning each code control window its own menu ID and differentiating that way
 	// I tried event.GetEventObject() == Outline1 and that did not work
 	int caretPos = 0;
-	if (event.GetId() == ID_MENU_OUTLINE_CURRENT_JUMP_TO || event.GetId() == ID_MENU_OUTLINE_CURRENT_JUMP_TO_COMMENT) {
+	if (event.GetId() == ID_CONTEXT_MENU_CURRENT_JUMP_TO || event.GetId() == ID_CONTEXT_MENU_CURRENT_JUMP_TO_COMMENT) {
 		line = Outline1->GetCurLine(&caretPos);
 	}
 	
@@ -418,7 +417,7 @@ wxString mvceditor::OutlineViewPluginPanelClass::ResourceFromOutline(wxCommandEv
 }
 
 BEGIN_EVENT_TABLE(mvceditor::OutlineViewPluginClass, wxEvtHandler)
-	EVT_MENU(ID_MENU_OUTLINE_CURRENT, mvceditor::OutlineViewPluginClass::OnContextMenuOutline)
+	EVT_MENU(mvceditor::MENU_OUTLINE, mvceditor::OutlineViewPluginClass::OnContextMenuOutline)
 	EVT_MENU(ID_CONTEXT_MENU_SHOW_OUTLINE_CURRENT, mvceditor::OutlineViewPluginClass::OnContextMenuOutline)
 	EVT_MENU(ID_CONTEXT_MENU_SHOW_OUTLINE_OTHER, mvceditor::OutlineViewPluginClass::OnContextMenuOutline)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(wxID_ANY, mvceditor::OutlineViewPluginClass::OnContentNotebookPageChanged)
@@ -426,6 +425,6 @@ END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::OutlineViewPluginPanelClass, OutlineViewPluginGeneratedPanelClass)
 	EVT_CLOSE(mvceditor::OutlineViewPluginPanelClass::OnClose)
-	EVT_MENU(ID_MENU_OUTLINE_CURRENT_JUMP_TO, mvceditor::OutlineViewPluginPanelClass::OnOutlineJumpTo)
-	EVT_MENU(ID_MENU_OUTLINE_CURRENT_JUMP_TO_COMMENT, mvceditor::OutlineViewPluginPanelClass::OnOutlineJumpToComment)
+	EVT_MENU(ID_CONTEXT_MENU_CURRENT_JUMP_TO, mvceditor::OutlineViewPluginPanelClass::OnOutlineJumpTo)
+	EVT_MENU(ID_CONTEXT_MENU_CURRENT_JUMP_TO_COMMENT, mvceditor::OutlineViewPluginPanelClass::OnOutlineJumpToComment)
 END_EVENT_TABLE()

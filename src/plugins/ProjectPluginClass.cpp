@@ -32,11 +32,6 @@
 #include <wx/stdpaths.h>
 #include <algorithm>
 
-int ID_MENU_PROJECT_EXPLORE = mvceditor::PluginClass::newMenuId();
-int ID_MENU_PROJECT_EXPLORE_OPEN_FILE = mvceditor::PluginClass::newMenuId();
-int ID_MENU_PROJECT_RECENT = mvceditor::PluginClass::newMenuId();
-int ID_MENU_PROJECT_SUB_MENU = wxNewId();
-
 // this ID signals the start of the recent project menu IDs
 // don't want to use the wxNewId() function because we want to use a continuous 
 // set of IDs for the recent projects menu items
@@ -73,10 +68,10 @@ mvceditor::ProjectPluginClass::ProjectPluginClass()
 }
 
 void mvceditor::ProjectPluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
-	projectMenu->Append(ID_MENU_PROJECT_EXPLORE, _("Explore"), _("Open An explorer window in the Project Root"), wxITEM_NORMAL);
-	projectMenu->Append(ID_MENU_PROJECT_EXPLORE_OPEN_FILE, _("Explore Open File"), _("Open An explorer window in the currently opened file"), wxITEM_NORMAL);
+	projectMenu->Append(mvceditor::MENU_PROJECT + 0, _("Explore"), _("Open An explorer window in the Project Root"), wxITEM_NORMAL);
+	projectMenu->Append(mvceditor::MENU_PROJECT + 1, _("Explore Open File"), _("Open An explorer window in the currently opened file"), wxITEM_NORMAL);
 	RecentProjectsMenu = new wxMenu(0);
-	projectMenu->Append(ID_MENU_PROJECT_SUB_MENU, _("Recent Projects"), RecentProjectsMenu, _("Open An explorer window in the Project Root"));
+	projectMenu->Append(mvceditor::MENU_PROJECT + 2, _("Recent Projects"), RecentProjectsMenu, _("Open An explorer window in the Project Root"));
 	SyncMenu();
 }
 
@@ -324,8 +319,8 @@ void mvceditor::ProjectPluginPanelClass::OnFileChanged(wxFileDirPickerEvent& eve
 }
 
 BEGIN_EVENT_TABLE(mvceditor::ProjectPluginClass, wxEvtHandler)
-	EVT_MENU(ID_MENU_PROJECT_EXPLORE, mvceditor::ProjectPluginClass::OnProjectExplore)
-	EVT_MENU(ID_MENU_PROJECT_EXPLORE_OPEN_FILE, mvceditor::ProjectPluginClass::OnProjectExploreOpenFile)
+	EVT_MENU(mvceditor::MENU_PROJECT + 0, mvceditor::ProjectPluginClass::OnProjectExplore)
+	EVT_MENU(mvceditor::MENU_PROJECT + 1, mvceditor::ProjectPluginClass::OnProjectExploreOpenFile)
 	EVT_MENU(ID_TOOLBAR_PROJECT_EXPLORE, mvceditor::ProjectPluginClass::OnProjectExplore)
 	EVT_MENU(ID_TOOLBAR_PROJECT_EXPLORE_OPEN_FILE, mvceditor::ProjectPluginClass::OnProjectExploreOpenFile)
 

@@ -29,10 +29,6 @@
 #include <widgets/UnicodeStringValidatorClass.h>
 #include <MvcEditorErrors.h>
 
-const int ID_SQL_EDITOR_MENU = mvceditor::PluginClass::newMenuId();
-const int ID_SQL_RUN_MENU = mvceditor::PluginClass::newMenuId();
-const int ID_SQL_CONNECTION_MENU = mvceditor::PluginClass::newMenuId();
-const int ID_SQL_DETECT_MENU = mvceditor::PluginClass::newMenuId();
 const int ID_SQL_GAUGE = wxNewId();
 const int ID_SQL_METADATA_GAUGE = wxNewId();
 
@@ -589,13 +585,13 @@ void mvceditor::SqlBrowserPluginClass::DetectMetadata() {
 }
 
 void mvceditor::SqlBrowserPluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
-	toolsMenu->Append(ID_SQL_EDITOR_MENU, _("SQL Browser\tSHIFT+F9"), _("Open a window for SQL browsing"),
+	toolsMenu->Append(mvceditor::MENU_SQL + 0, _("SQL Browser\tSHIFT+F9"), _("Open a window for SQL browsing"),
 		wxITEM_NORMAL);
-	toolsMenu->Append(ID_SQL_CONNECTION_MENU, _("SQL Connections\tCTRL+F9"), _("Show & Pick The SQL Connections that this project uses"),
+	toolsMenu->Append(mvceditor::MENU_SQL + 1, _("SQL Connections\tCTRL+F9"), _("Show & Pick The SQL Connections that this project uses"),
 		wxITEM_NORMAL);
-	toolsMenu->Append(ID_SQL_RUN_MENU, _("Run Queries in SQL Browser\tF9"), _("Execute the query that is currently in the SQL Browser"),
+	toolsMenu->Append(mvceditor::MENU_SQL + 2, _("Run Queries in SQL Browser\tF9"), _("Execute the query that is currently in the SQL Browser"),
 		wxITEM_NORMAL);
-	toolsMenu->Append(ID_SQL_DETECT_MENU, _("Detect SQL Meta Data"), _("Detect SQL Meta data so that it is made available to code completion"),
+	toolsMenu->Append(mvceditor::MENU_SQL + 3, _("Detect SQL Meta Data"), _("Detect SQL Meta data so that it is made available to code completion"),
 		wxITEM_NORMAL);
 }
 
@@ -747,10 +743,10 @@ void mvceditor::SqlBrowserPluginClass::AuiManagerUpdate() {
 }
 
 BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPluginClass, wxEvtHandler)
-	EVT_MENU(ID_SQL_EDITOR_MENU, mvceditor::SqlBrowserPluginClass::OnSqlBrowserToolsMenu)
-	EVT_MENU(ID_SQL_CONNECTION_MENU, mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu)
-	EVT_MENU(ID_SQL_RUN_MENU, mvceditor::SqlBrowserPluginClass::OnRun)
-	EVT_MENU(ID_SQL_DETECT_MENU, mvceditor::SqlBrowserPluginClass::OnSqlDetectMenu)
+	EVT_MENU(mvceditor::MENU_SQL + 0, mvceditor::SqlBrowserPluginClass::OnSqlBrowserToolsMenu)
+	EVT_MENU(mvceditor::MENU_SQL + 1, mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu)
+	EVT_MENU(mvceditor::MENU_SQL + 2, mvceditor::SqlBrowserPluginClass::OnRun)
+	EVT_MENU(mvceditor::MENU_SQL + 3, mvceditor::SqlBrowserPluginClass::OnSqlDetectMenu)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SqlBrowserPluginClass::OnWorkInProgress)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SqlBrowserPluginClass::OnWorkComplete)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(wxID_ANY, mvceditor::SqlBrowserPluginClass::OnContentNotebookPageChanged)

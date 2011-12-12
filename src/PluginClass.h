@@ -66,6 +66,32 @@ extern const wxEventType EVENT_APP_OPEN_PROJECT;
 extern const wxEventType EVENT_APP_SAVE_PREFERENCES;
 
 /**
+ * ATTN: Use this enum to build the Plugin menus
+ * Since wxKeyBinder uses menu IDs to serialize the shortcuts, the menu IDs
+ * cannot change (else KeyBinder will not bind the shortcut; or worse it may
+ * crash.  For now we will use this enum to make sure the IDs are consistent
+ * across app versions; and to prevent ID collisions. 
+ * Be sure to NOT modify the enum values; enum items may be added
+ * but make sure to not change the previous values, items may be deleted but if they are
+ * do NOT change the values of the remanining items; else menu shortcuts
+ * will not work (and the app may crash).
+ * At some point, a more 'dynamic' shortcut system will need to be written,  since
+ * wxKeyBinder does not handle dynamic menus well.
+ */
+enum MenuIds {
+	MENU_FINDER = 200,
+	MENU_FIND_IN_FILES = 210,
+	MENU_SQL = 220,
+	MENU_RUN_PHP = 230,
+	MENU_RESOURCE = 240,
+	MENU_PROJECT = 250,
+	MENU_OUTLINE = 260,
+	MENU_LINT_PHP = 270,
+	MENU_ENVIRONMENT = 280,
+	MENU_EDITOR_MESSAGES = 290
+};
+
+/**
  * Plugin examples:
  * SVN
  * Text modifiers (up case, lowercase, code beautifiers)
@@ -142,14 +168,16 @@ public:
 	void InitState(EnvironmentClass* environment, wxEvtHandler* appHandler);
 		
 	/**
-	 * Add menu items to the tools menu for this plugin.
+	 * Add menu items to the tools menu for this plugin. Remeber to use the MenuIds enum when building
+	 * menu items.
 	 * 
 	 * @param wxMenu* menu the tools menu to add items to.
 	 */
 	virtual void AddToolsMenuItems(wxMenu* toolsMenu);
 
 	/**
-	 * Add menu items to the edit menu for this plugin.
+	 * Add menu items to the edit menu for this plugin. Remeber to use the MenuIds enum when building
+	 * menu items.
 	 * 
 	 * @param wxMenu* menu the tools menu to add items to.
 	 */
@@ -157,13 +185,15 @@ public:
 	
 	/**
 	 * Plugin may create its own menu. The plugin should override this method if it desires to create an entirely new menu.
-	 * 
+	 * Remeber to use the MenuIds enum when building
+	 * menu items.
 	 * @param wxMenuBar* the menu bar to insert the new menu to
 	 */
 	virtual void AddNewMenu(wxMenuBar* menuBar);
 	
 	/**
-	 * Add menu items to the project menu for this plugin.
+	 * Add menu items to the project menu for this plugin. Remeber to use the MenuIds enum when building
+	 * menu items.
 	 * 
 	 * @param wxMenu* menu the tools menu to add items to.
 	 */
@@ -234,13 +264,6 @@ public:
 	 * @return ProjectClass*
 	 */
 	ProjectClass* GetProject() const;
-	
-	/**
-	 * Use this method instead of wxNewId() to get a unque ID for Menu items. If you use wxNewId() for menu items then
-	 * they will not be stored properly during saving of the keyboard shortcut preferences. You only need to use 
-	 * this method on menus that are placed in the Application MenuBar.
-	 */
-	static int newMenuId();
 	
 protected:
 	
@@ -397,7 +420,6 @@ protected:
 	 */
 	EnvironmentClass* Environment;
 	
-	static int CurrentMenuId;
 };
 
 }

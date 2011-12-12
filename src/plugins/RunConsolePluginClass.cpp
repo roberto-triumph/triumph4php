@@ -29,10 +29,6 @@
 #include <wx/sstream.h>
 #include <wx/valgen.h>
 
-static const int ID_MENU_RUN_CLI = mvceditor::PluginClass::newMenuId();
-static const int ID_MENU_RUN_CLI_IN_NEW_WINDOW = mvceditor::PluginClass::newMenuId();
-static const int ID_MENU_RUN_CLI_ARGS = mvceditor::PluginClass::newMenuId();
-static const int ID_MENU_RUN_CLI_IN_NEW_WINDOW_ARGS = mvceditor::PluginClass::newMenuId();
 static const int ID_PROCESS = wxNewId();
 static const int ID_TOOLBAR_RUN = wxNewId();
 static const int ID_WINDOW_CONSOLE = wxNewId();
@@ -169,16 +165,16 @@ mvceditor::RunConsolePluginClass::RunConsolePluginClass()
 }
 
 void mvceditor::RunConsolePluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
-	RunCliMenuItem = new wxMenuItem(toolsMenu, ID_MENU_RUN_CLI, _("Run As CLI\tF7"), 
+	RunCliMenuItem = new wxMenuItem(toolsMenu, mvceditor::MENU_RUN_PHP + 0, _("Run As CLI\tF7"), 
 		_("Run File As a PHP Command Line Script"), wxITEM_NORMAL);
 	toolsMenu->Append(RunCliMenuItem);
-	RunCliWithArgsMenuItem = new wxMenuItem(toolsMenu, ID_MENU_RUN_CLI_ARGS, _("Run As CLI With Arguments\tSHIFT+F7"), 
+	RunCliWithArgsMenuItem = new wxMenuItem(toolsMenu, mvceditor::MENU_RUN_PHP + 1, _("Run As CLI With Arguments\tSHIFT+F7"), 
 		_("Run File As a PHP Command Line Script With Arguments"), wxITEM_NORMAL);
 	toolsMenu->Append(RunCliWithArgsMenuItem);
-	RunCliInNewWindowMenuItem = new wxMenuItem(toolsMenu, ID_MENU_RUN_CLI_IN_NEW_WINDOW, _("Run As CLI In New Window\tCTRL+F7"), 
+	RunCliInNewWindowMenuItem = new wxMenuItem(toolsMenu, mvceditor::MENU_RUN_PHP + 2, _("Run As CLI In New Window\tCTRL+F7"), 
 		_("Run File As a PHP Command Line Script In a New Window"), wxITEM_NORMAL);
 	toolsMenu->Append(RunCliInNewWindowMenuItem);
-	RunCliWithArgsInNewWindowMenuItem = new wxMenuItem(toolsMenu, ID_MENU_RUN_CLI_IN_NEW_WINDOW_ARGS, 
+	RunCliWithArgsInNewWindowMenuItem = new wxMenuItem(toolsMenu, mvceditor::MENU_RUN_PHP + 3, 
 		_("Run As CLI In New Window With Arguments\tCTRL+SHIFT+F7"), 
 		_("Run File As a PHP Command Line Script In a New Window With Arguments"), wxITEM_NORMAL);
 	toolsMenu->Append(RunCliWithArgsInNewWindowMenuItem);
@@ -200,7 +196,7 @@ void mvceditor::RunConsolePluginClass::OnRunFileAsCli(wxCommandEvent& event) {
 			runConsolePanel->SetFocusOnCommandText();
 			
 			// if user chose the 'with arguments' then do not proceed let the user put in arguments
-			if (ID_MENU_RUN_CLI_ARGS != event.GetId()) {
+			if ((mvceditor::MENU_RUN_PHP + 1) != event.GetId()) {
 				runConsolePanel->RunCommand(event);	
 			}
 		}
@@ -212,7 +208,7 @@ void mvceditor::RunConsolePluginClass::OnRunFileAsCli(wxCommandEvent& event) {
 				runConsolePanel->SetFocusOnCommandText();
 				
 				// if user chose the 'with arguments' then do not proceed let the user put in arguments
-				if (ID_MENU_RUN_CLI_ARGS != event.GetId()) {
+				if ((mvceditor::MENU_RUN_PHP + 1) != event.GetId()) {
 					runConsolePanel->RunCommand(event);
 				}
 			}
@@ -230,7 +226,7 @@ void mvceditor::RunConsolePluginClass::OnRunFileAsCliInNewWindow(wxCommandEvent&
 			window->SetFocusOnCommandText();
 						
 			// if user chose the 'with arguments' then do not proceed let the user put in arguments
-			if (ID_MENU_RUN_CLI_IN_NEW_WINDOW_ARGS != event.GetId()) {
+			if ((mvceditor::MENU_RUN_PHP + 3) != event.GetId()) {
 				window->RunCommand(event);
 			}
 		}
@@ -258,10 +254,10 @@ BEGIN_EVENT_TABLE(mvceditor::RunConsolePanelClass, wxPanel)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::RunConsolePluginClass, wxEvtHandler) 
-	EVT_MENU(ID_MENU_RUN_CLI, mvceditor::RunConsolePluginClass::OnRunFileAsCli)
-	EVT_MENU(ID_MENU_RUN_CLI_ARGS, mvceditor::RunConsolePluginClass::OnRunFileAsCli)
-	EVT_MENU(ID_MENU_RUN_CLI_IN_NEW_WINDOW, mvceditor::RunConsolePluginClass::OnRunFileAsCliInNewWindow)
-	EVT_MENU(ID_MENU_RUN_CLI_IN_NEW_WINDOW_ARGS, mvceditor::RunConsolePluginClass::OnRunFileAsCliInNewWindow)
+	EVT_MENU(mvceditor::MENU_RUN_PHP + 0, mvceditor::RunConsolePluginClass::OnRunFileAsCli)
+	EVT_MENU(mvceditor::MENU_RUN_PHP + 1, mvceditor::RunConsolePluginClass::OnRunFileAsCli)
+	EVT_MENU(mvceditor::MENU_RUN_PHP + 2, mvceditor::RunConsolePluginClass::OnRunFileAsCliInNewWindow)
+	EVT_MENU(mvceditor::MENU_RUN_PHP + 3, mvceditor::RunConsolePluginClass::OnRunFileAsCliInNewWindow)
 	EVT_TOOL(ID_TOOLBAR_RUN, mvceditor::RunConsolePluginClass::OnRunFileAsCli)
 	EVT_UPDATE_UI(wxID_ANY, mvceditor::RunConsolePluginClass::OnUpdateUi)
 END_EVENT_TABLE()

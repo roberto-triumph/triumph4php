@@ -28,15 +28,13 @@
 #include <wx/string.h>
 
 
-const int ID_MENU_ENVIRONMENT = mvceditor::PluginClass::newMenuId();
-
 BEGIN_EVENT_TABLE(mvceditor::EnvironmentDialogClass, EnvironmentGeneratedDialogClass)
 	EVT_IDLE(mvceditor::EnvironmentDialogClass::OnIdle)
 	EVT_FILEPICKER_CHANGED(ID_PHP_FILE, mvceditor::EnvironmentDialogClass::OnPhpFileChanged)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::EnvironmentPluginClass, wxEvtHandler) 
-	EVT_MENU(ID_MENU_ENVIRONMENT, mvceditor::EnvironmentPluginClass::OnMenuEnvironment)
+	EVT_MENU(mvceditor::MENU_ENVIRONMENT, mvceditor::EnvironmentPluginClass::OnMenuEnvironment)
 END_EVENT_TABLE()
 
 mvceditor::EnvironmentDialogClass::EnvironmentDialogClass(wxWindow* parent, EnvironmentClass& environment)
@@ -152,7 +150,7 @@ mvceditor::EnvironmentPluginClass::EnvironmentPluginClass()
 }
 
 void mvceditor::EnvironmentPluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
-	projectMenu->Append(ID_MENU_ENVIRONMENT, _("Environment"));
+	projectMenu->Append(mvceditor::MENU_ENVIRONMENT, _("Environment"));
 }
 
 void mvceditor::EnvironmentPluginClass::OnMenuEnvironment(wxCommandEvent& event) {

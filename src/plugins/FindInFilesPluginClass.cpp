@@ -34,7 +34,6 @@
 #include <wx/valgen.h>
 #include <algorithm>
 
-static const int ID_MENU_FIND_IN_FILES = mvceditor::PluginClass::newMenuId();
 static const int ID_FIND_IN_FILES_PROGRESS = wxNewId();
 
 // these IDs are needed so that the IDs of the Regular expression help menu
@@ -529,7 +528,7 @@ mvceditor::FindInFilesPluginClass::FindInFilesPluginClass()
 }
 
 void mvceditor::FindInFilesPluginClass::AddEditMenuItems(wxMenu* editMenu) {
-	editMenu->Append(ID_MENU_FIND_IN_FILES, _("Find In Files\tCTRL+SHIFT+F"), 
+	editMenu->Append(mvceditor::MENU_FIND_IN_FILES, _("Find In Files\tCTRL+SHIFT+F"), 
 		_("Find an expression by searching entire directory contents"));
 }
 
@@ -583,7 +582,7 @@ BEGIN_EVENT_TABLE(mvceditor::FindInFilesResultsPanelClass, FindInFilesResultsPan
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::FindInFilesPluginClass, wxEvtHandler)
-	EVT_MENU(ID_MENU_FIND_IN_FILES, mvceditor::FindInFilesPluginClass::OnEditFindInFiles)
+	EVT_MENU(mvceditor::MENU_FIND_IN_FILES, mvceditor::FindInFilesPluginClass::OnEditFindInFiles)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::FindInFilesDialogClass, FindInFilesDialogGeneratedClass)

@@ -64,6 +64,14 @@ wxString MessageFromError(mvceditor::Errors error, const wxString& extra) {
 			msg = mvceditor::MessageWithFix(_("Error executing SQL MetaData query. ") + extra,
 				_("Is the database server up and running?"));
 			break;
+		case mvceditor::MISSING_KEYBOARD_SHORTCUT:
+			msg = mvceditor::MessageWithFix(_("Could not find menu item for shortcut. ") + extra,
+				_("All other menu shortcuts were loaded successfully and are functional. If you want to get rid of this message; Go to Edit ... Preferences, then Click OK to re-write the config file."));
+			break;
+		case mvceditor::CORRUPT_KEYBOARD_SHORTCUT:
+			msg = mvceditor::MessageWithFix(_("Could not load menu shortcuts from config file. ") + extra,
+				_("All other menu shortcuts were loaded successfully and are functional. If you want to get rid of this message; Go to Edit ... Preferences, then Click OK to re-write the config file."));
+			break;
 		default:
 			break;
 	}

@@ -29,12 +29,11 @@
 #include <wx/filename.h>
 #include <wx/valgen.h>
 
-int ID_JUMP_TO_GAUGE = wxNewId();
-int ID_COUNT_FILES_GAUGE = wxNewId();
-int ID_MENU_INDEX = mvceditor::PluginClass::newMenuId();
-int ID_MENU_JUMP = mvceditor::PluginClass::newMenuId();
-int ID_TOOLBAR_INDEX = wxNewId();
-int ID_RESOURCE_PLUGIN_PANEL = wxNewId();
+static int ID_JUMP_TO_GAUGE = wxNewId();
+static int ID_COUNT_FILES_GAUGE = wxNewId();
+static int ID_TOOLBAR_INDEX = wxNewId();
+static int ID_RESOURCE_PLUGIN_PANEL = wxNewId();
+static int ID_CONTEXT_MENU_JUMP = wxNewId();
 
 mvceditor::ResourceFileReaderClass::ResourceFileReaderClass(wxEvtHandler& handler) 
 	: BackgroundFileReaderClass(handler)
@@ -98,8 +97,8 @@ mvceditor::ResourcePluginClass::ResourcePluginClass()
 }
 
 void mvceditor::ResourcePluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
-	ProjectIndexMenu = projectMenu->Append(ID_MENU_INDEX, _("Index"), _("Index the project"));
-	projectMenu->Append(ID_MENU_JUMP, _("Jump To Resource"), _("Jump To Current Resource"));
+	ProjectIndexMenu = projectMenu->Append(mvceditor::MENU_RESOURCE + 0, _("Index"), _("Index the project"));
+	projectMenu->Append(mvceditor::MENU_RESOURCE + 1, _("Jump To Resource"), _("Jump To Current Resource"));
 	ProjectIndexMenu->Enable(GetProject() && FREE == State);
 }
 
@@ -117,7 +116,7 @@ void mvceditor::ResourcePluginClass::AddWindows() {
 }
 
 void mvceditor::ResourcePluginClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
-	menu->Append(ID_MENU_JUMP, _("Jump To Source"));
+	menu->Append(ID_CONTEXT_MENU_JUMP, _("Jump To Source"));
 }
 
 void mvceditor::ResourcePluginClass::OnProjectOpened() {
@@ -546,8 +545,8 @@ void mvceditor::ResourcePluginPanelClass::RemoveClosedFiles(mvceditor::NotebookC
 
 BEGIN_EVENT_TABLE(mvceditor::ResourcePluginClass, wxEvtHandler)
 	EVT_MENU(ID_TOOLBAR_INDEX, mvceditor::ResourcePluginClass::OnProjectIndex)
-	EVT_MENU(ID_MENU_JUMP, mvceditor::ResourcePluginClass::OnJump)
-	EVT_MENU(ID_MENU_INDEX, mvceditor::ResourcePluginClass::OnProjectIndex)
+	EVT_MENU(mvceditor::MENU_RESOURCE + 0, mvceditor::ResourcePluginClass::OnProjectIndex)
+	EVT_MENU(mvceditor::MENU_RESOURCE + 1, mvceditor::ResourcePluginClass::OnJump)
 	EVT_UPDATE_UI(wxID_ANY, mvceditor::ResourcePluginClass::OnUpdateUi)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(wxID_ANY, mvceditor::ResourcePluginClass::OnPageChanged)
 	EVT_AUINOTEBOOK_PAGE_CLOSED(wxID_ANY, mvceditor::ResourcePluginClass::OnPageClosed)

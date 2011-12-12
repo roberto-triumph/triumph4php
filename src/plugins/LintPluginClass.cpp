@@ -28,11 +28,10 @@
 #include <unicode/unistr.h>
 #include <wx/artprov.h>
 
-const int ID_LINT_MENU_ITEM = mvceditor::PluginClass::newMenuId();
-const int ID_LINT_TOOLBAR_ITEM = mvceditor::PluginClass::newMenuId();
-const int ID_LINT_ERROR_COMMAND = mvceditor::PluginClass::newMenuId();
-const int ID_LINT_RESULTS_PANEL = mvceditor::PluginClass::newMenuId();
-const int ID_LINT_RESULTS_GAUGE = mvceditor::PluginClass::newMenuId();
+const int ID_LINT_TOOLBAR_ITEM = wxNewId();
+const int ID_LINT_ERROR_COMMAND = wxNewId();
+const int ID_LINT_RESULTS_PANEL = wxNewId();
+const int ID_LINT_RESULTS_GAUGE = wxNewId();
 
 mvceditor::ParserDirectoryWalkerClass::ParserDirectoryWalkerClass() 
 	: LastResults()
@@ -223,7 +222,7 @@ mvceditor::LintPluginClass::LintPluginClass()
 }
 
 void mvceditor::LintPluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
-	projectMenu->Append(ID_LINT_MENU_ITEM, _("Lint Check"), _("Performs syntax check on the current project"), wxITEM_NORMAL);
+	projectMenu->Append(mvceditor::MENU_LINT_PHP, _("Lint Check"), _("Performs syntax check on the current project"), wxITEM_NORMAL);
 }
 
 void mvceditor::LintPluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
@@ -350,7 +349,7 @@ void mvceditor::LintPluginClass::OnFileSaved(wxCommandEvent &event) {
 }
 
 BEGIN_EVENT_TABLE(mvceditor::LintPluginClass, wxEvtHandler) 
-	EVT_MENU(ID_LINT_MENU_ITEM, mvceditor::LintPluginClass::OnLintMenu)
+	EVT_MENU(mvceditor::MENU_LINT_PHP, mvceditor::LintPluginClass::OnLintMenu)
 	EVT_MENU(ID_LINT_TOOLBAR_ITEM, mvceditor::LintPluginClass::OnLintMenu)
 	EVT_COMMAND(wxID_ANY, EVENT_LINT_ERROR,  mvceditor::LintPluginClass::OnLintError)
 	EVT_COMMAND(wxID_ANY, EVENT_FILE_READ,  mvceditor::LintPluginClass::OnLintFileComplete)
