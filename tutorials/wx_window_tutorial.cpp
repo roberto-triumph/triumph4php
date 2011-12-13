@@ -46,21 +46,6 @@ bool MyApp::OnInit() {
 	MyFrame* frame = new MyFrame();
 	SetTopWindow(frame);
 	frame->Show(true);	
-
-	wxString wds = wxT("hel?.php");
-	wxArrayString descs, wildcards;
-	int cnt = wxParseCommonDialogsFilter(wds, descs, wildcards);
-	int expectedCount = 1;
-	for (size_t i = 0; i < wds.Length(); ++i) {
-		if (wds[i] == wxT(';')) {
-			expectedCount++;
-		}
-	}
-	wxMessageBox(wxString::Format(wxT("expected:%d actual:%d"), expectedCount, cnt));
-	wxMessageBox(wildcards[0]);
-	wxMessageBox(wxString::Format(wxT("match?:%d"),
-		wxMatchWild(wildcards[0], wxT("hello.php"))
-	));
 	return true;
 }
 
