@@ -100,7 +100,7 @@ void ProfileFindInFilesCodeMode() {
 		mvceditor::FindInFilesClass findInFiles;
 		findInFiles.Expression = UNICODE_STRING_SIMPLE("class Db");
 		findInFiles.FilesFilter = wxT("*.php");
-		findInFiles.Mode = mvceditor::FinderClass::CODE;
+		findInFiles.Mode = mvceditor::FinderClass::EXACT;
 		if(findInFiles.Prepare()) {		
 			while (directorySearch.More()) {
 				directorySearch.Walk(findInFiles);
