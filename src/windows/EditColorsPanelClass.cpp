@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <windows/EditColorsPanelClass.h>
-#include <widgets/CodeControlClass.h>
+#include <wx/stc/stc.h>
 
 mvceditor::EditColorsPanelClass::EditColorsPanelClass(wxWindow* parent, mvceditor::CodeControlOptionsClass& options)
 		: EditColorsPanelGeneratedClass(parent)
