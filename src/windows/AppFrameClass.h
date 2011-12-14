@@ -57,14 +57,15 @@ public:
 
 	/**
 	 * notify all sub-windows of a new project.
-	 * This class will not own this pointer
+	 * This class will not own these pointer
 	 */
-	void OnProjectOpened(ProjectClass* project);
+	void OnProjectOpened(ProjectClass* project, wxEvtHandler* appHandler);
 
 	/**
 	 * when a project is closed, close any open windows
+	 * This class will not own this pointer
 	 */
-	void OnProjectClosed();
+	void OnProjectClosed(wxEvtHandler* appHandler);
 
 	/**
 	 * get all of the plugin's extra windows and menus and attach them to the main frame.

@@ -24,6 +24,7 @@
  */
 #include <widgets/NotebookClass.h>
 #include <windows/StringHelperClass.h>
+#include <MvcEditor.h>
 #include <MvcEditorErrors.h>
 #include <wx/artprov.h>
 #include <wx/filename.h>
@@ -37,6 +38,7 @@ mvceditor::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id,
 	, CodeControlOptions(NULL)
 	, ContextMenu(NULL)
 	, Project(NULL)
+	, AppHandler(NULL)
 	, NewPageNumber(1) {
 }
 
@@ -55,6 +57,7 @@ mvceditor::CodeControlClass* mvceditor::NotebookClass::GetCurrentCodeControl() c
 
 void mvceditor::NotebookClass::SavePageIfModified(wxAuiNotebookEvent& event) {
 	int currentPage = event.GetSelection();
+	bool vetoed = false;
 	CodeControlClass* codeCtrl = GetCodeControl(currentPage);
 	if (codeCtrl && codeCtrl->GetModify()) {
 		wxString pageName = GetPageText(currentPage);
@@ -66,8 +69,23 @@ void mvceditor::NotebookClass::SavePageIfModified(wxAuiNotebookEvent& event) {
 			wxCANCEL | wxICON_QUESTION, this);
 		if (wxCANCEL == response || (wxYES == response && 
 				!SavePage(currentPage))) {
+			vetoed = false;
 			event.Veto();
 		}
+	}
+	if (!vetoed && codeCtrl) {
+
+		// tell the app to re-index the project
+		// this is needed because when the user is editing the file, the 'global'
+		// resource finder cache is not updated
+		wxString fileName = codeCtrl->GetFileName();
+		wxCommandEvent cmdEvent(mvceditor::EVENT_APP_RE_INDEX);
+		cmdEvent.SetId(wxID_ANY);
+		cmdEvent.SetString(fileName);
+		wxPostEvent(AppHandler, cmdEvent);
+	}
+	if (!vetoed) {
+		event.Skip();
 	}
 }
 
@@ -125,7 +143,8 @@ void mvceditor::NotebookClass::MarkPageAsNotModified(int windowId) {
 	}
 }
 void mvceditor::NotebookClass::AddMvcEditorPage() {
-	CodeControlClass* page = new CodeControlClass(this, *CodeControlOptions, Project, ResourceUpdates, wxID_ANY);
+	CodeControlClass* page = new CodeControlClass(this, *CodeControlOptions, Project, ResourceUpdates, 
+		wxID_ANY);
 	AddPage(page, wxString::Format(wxT("Untitled %d"), NewPageNumber++), true, 
 		wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_TOOLBAR, 
 		wxSize(16, 16)));
@@ -173,7 +192,8 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename) {
 		// not using wxStyledTextCtrl::LoadFile() because it does not correctly handle files with high ascii characters
 		mvceditor::FindInFilesClass::OpenErrors error = FindInFilesClass::FileContents(filename, fileContents);
 		if (error == mvceditor::FindInFilesClass::NONE) {
-			CodeControlClass* newCode = new CodeControlClass(this, *CodeControlOptions, Project, ResourceUpdates, wxID_ANY);
+			CodeControlClass* newCode = new CodeControlClass(this, *CodeControlOptions, Project, ResourceUpdates, 
+				wxID_ANY);
 			newCode->TrackFile(filename, fileContents);
 
 			// if user dragged in a file on an opened file we want still want to accept dragged files
@@ -290,8 +310,9 @@ bool mvceditor::NotebookClass::GetModifiedPageNames(std::vector<wxString>& modif
 	return modified;
 }
 
-void mvceditor::NotebookClass::SetProject(ProjectClass* project) {
+void mvceditor::NotebookClass::SetProject(ProjectClass* project, wxEvtHandler* appHandler) {
 	Project = project;
+	AppHandler = appHandler;
 }
 
 void mvceditor::NotebookClass::ShowContextMenu(wxAuiNotebookEvent& event) {

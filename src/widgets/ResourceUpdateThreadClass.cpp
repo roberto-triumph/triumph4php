@@ -66,9 +66,6 @@ void mvceditor::ResourceUpdateClass::Unregister(const wxString& fileName) {
 	}
 	Finders.erase(fileName);
 	SymbolTables.erase(fileName);
-
-	// TODO: need to "retrigger" resource parsing on this file on the global resource finder object
-	// so that it is updated with the new contents.
 }
 
 bool mvceditor::ResourceUpdateClass::Update(const wxString& fileName, const UnicodeString& code, bool isNew) {

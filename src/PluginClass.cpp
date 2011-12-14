@@ -184,7 +184,3 @@ void mvceditor::PluginClass::AppEvent(wxCommandEvent event) {
 		wxPostEvent(AppHandler, event);	
 	}
 }
-
-const wxEventType mvceditor::EVENT_PLUGIN_FILE_SAVED = wxNewEventType();
-const wxEventType mvceditor::EVENT_APP_OPEN_PROJECT = wxNewEventType();
-const wxEventType mvceditor::EVENT_APP_SAVE_PREFERENCES = wxNewEventType();

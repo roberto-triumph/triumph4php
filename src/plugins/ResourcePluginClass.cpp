@@ -272,7 +272,7 @@ void mvceditor::ResourcePluginClass::ShowJumpToResults() {
 	}
 }
 
-void mvceditor::ResourcePluginClass::OnProjectIndex(wxCommandEvent& event) {
+void mvceditor::ResourcePluginClass::StartIndex() {
 	mvceditor::ProjectClass* project = GetProject();
 	if (project && !project->GetRootPath().IsEmpty()) {
 
@@ -310,6 +310,10 @@ void mvceditor::ResourcePluginClass::OnProjectIndex(wxCommandEvent& event) {
 	else {
 		wxMessageBox(_("This feature can only be used when you open project"), wxT("Warning"), wxICON_EXCLAMATION);
 	}
+}
+
+void mvceditor::ResourcePluginClass::OnProjectIndex(wxCommandEvent& event) {
+	StartIndex();
 }
 
 void mvceditor::ResourcePluginClass::OnJump(wxCommandEvent& event) {
