@@ -251,6 +251,19 @@ public:
 	 */
 	static OpenErrors FileContents(const wxString& fileName, UnicodeString& content);
 
+	/**
+	 * Create the regular expression from the a wildcard string. regular expression may or may not be valid,
+	 * use the IsValid() method of the wxRegEx object to test. 
+	 * A wildcard string has only 3 wildcard symbols:
+	 *
+	 *  * = Matches Any number of characters
+	 *  ? = Matches zero or 1 character
+	 *  ; = OR Separator; 
+	 * 
+	 * @return wxString string ready to be compiled into a wxRegEx object.
+	 */
+	static wxString CreateFilesFilterRegEx(const wxString& wildCardString);	
+
 private:
 
 	/**
@@ -285,14 +298,6 @@ private:
 	 * @var int
 	 */
 	int LineNumber;
-	
-	/**
-	 * Create the regular expression from the FilesFilter string. regular expression may or may not be valid,
-	 * use the IsValid() method of the wxRegEx object to test. 
-	 * 
-	 * @return wxString string ready to be compiled into a wxRegEx object.
-	 */
-	wxString CreateFilesFilterRegEx() const;	
 	
 	/**
 	 * Close the associated input streams.

@@ -17,6 +17,9 @@
 #include <wx/listbox.h>
 #include <wx/sizer.h>
 #include <wx/panel.h>
+#include <wx/checkbox.h>
+#include <wx/statbox.h>
+#include <wx/textctrl.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -44,6 +47,25 @@ class LintResultsGeneratedPanelClass : public wxPanel
 		
 		LintResultsGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 774,371 ), long style = wxTAB_TRAVERSAL );
 		~LintResultsGeneratedPanelClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class LintPluginPreferencesGeneratedPanelClass
+///////////////////////////////////////////////////////////////////////////////
+class LintPluginPreferencesGeneratedPanelClass : public wxPanel 
+{
+	private:
+	
+	protected:
+		wxCheckBox* CheckOnSave;
+		wxStaticText* SettingsLabel;
+		wxTextCtrl* IgnoreFiles;
+	
+	public:
+		
+		LintPluginPreferencesGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 583,340 ), long style = wxTAB_TRAVERSAL );
+		~LintPluginPreferencesGeneratedPanelClass();
 	
 };
 

@@ -74,12 +74,18 @@ public:
 	 * function
 	 */
 	std::vector<wxString> PhpFileFilters;
+
+	/**
+	 * Regular expression that, when matched; will result in the file being
+	 * skipped (won't be lint checked). IgnoreFileFiltersRegEx take precedence over the
+	 * PhpFileFilters (if a file matches both, then file will be ignored).
+	 */
+	wxRegEx IgnoreFileFiltersRegEx;
 	
 	/**
 	 * Running count of files that had parse errors.
 	 */
 	int WithErrors;
-	
 	
 	/**
 	 * Running count of files that had zero parse errors.
@@ -110,13 +116,16 @@ public:
 	 * Start the background thread.  Lint errors will be propagated as events.
 	 * @param wxString directory the location of files that need to be parsed.  Parsing will
 	 *        be recursive (sub directories will be parsed also).
-	 * @param wxString phpFileFilters a list of wildcard filter of files to parse. See wxIsWild() and
+	 * @param wxString phpFileFilters a list of wildcard filters of files to parse. See wxIsWild() and
 	 *        wxMatchWild() for description of valid wildcards (only '*' and '?' are wildcards).
+	 * @param wxString ignoreFileFiltersRegEx regular expression of files to IGNORE. This 
+	 *        overrides the phpFileFilters; if a file matches ignoreFileFilters and phpFileFilters then
+	 *        the file will be ignored. 
 	 * @param StartError& error the reason for a failure to start will be set here.
 	 * return bool TRUE if and only if the thread was started.  If false, either thread could
 	 * not be started or directory is not valid. 
 	 */
-	bool BeginDirectoryLint(const wxString& directory, const std::vector<wxString>& phpFileFilters, StartError& error);
+	bool BeginDirectoryLint(const wxString& directory, const std::vector<wxString>& phpFileFilters, const wxString& ignoreFileFiltersRegEx, StartError& error);
 
 	/**
 	 * Lint checks the given file in the current thread.  This is a thread-safe method;
@@ -124,9 +133,14 @@ public:
 	 * finished.
 	 *
 	 * Lint errors will be propagated as events.
-	 * Returns TRUE if the file contains a lint error.
+	 * @param wxString phpFileFilters a list of wildcard filters of files to parse. See wxIsWild() and
+	 *        wxMatchWild() for description of valid wildcards (only '*' and '?' are wildcards).
+	 * @param wxString ignoreFileFiltersRegEx regular expression of files to IGNORE. This 
+	 *        overrides the phpFileFilters; if a file matches ignoreFileFilters and phpFileFilters then
+	 *        the file will be ignored. 
+	 * @return TRUE if the file contains a lint error.
 	 */
-	bool LintSingleFile(const wxString& fileName);
+	bool LintSingleFile(const wxString& fileName, const std::vector<wxString>& phpFileFilters, const wxString& ignoreFileFiltersRegEx);
 
 	/**
 	 * Return a summary of the number of files that were lint'ed.
@@ -163,6 +177,12 @@ private:
 	 * function
 	 */
 	std::vector<wxString> PhpFileFilters;
+
+	/**
+	 * This is a list of wilcards that, when matched; will result in the file being
+	 * skipped (won't be lint checked).
+	 */
+	std::vector<wxString> IgnoreFileFilters;
 };
 
 /**
@@ -223,7 +243,27 @@ class LintPluginClass : public PluginClass {
 	
 public:
 
+	/**
+	 * A newline separated list of wildcards that will be used
+	 * to ignore certain files; files matching any of the wildcards
+	 * will NOT be checked.
+	 * Each wildcard can have either a '*' or '?'.
+	 */
+	wxString IgnoreFiles;
+	
+	/**
+	 * If TRUE, then when a file is saved; a lint check on that file
+	 * will be performed.
+	 */
+	bool CheckOnSave;
+
 	LintPluginClass();
+
+	void AddPreferenceWindow(wxBookCtrlBase* parent);
+
+	void LoadPreferences(wxConfigBase* config);
+
+	void SavePreferences(wxConfigBase* config);
 
 protected: 
 
@@ -257,6 +297,14 @@ private:
 	DECLARE_EVENT_TABLE()
 };
 
+class LintPluginPreferencesPanelClass : public LintPluginPreferencesGeneratedPanelClass {
+
+public:
+
+	LintPluginClass& Plugin;
+
+	LintPluginPreferencesPanelClass(wxWindow* parent, LintPluginClass& plugin);
+};
 
 }
 

@@ -67,7 +67,7 @@ bool mvceditor::FindInFilesClass::Prepare() {
 	Finder.Mode = Mode;
 	Finder.ReplaceExpression = ReplaceExpression;
 	Finder.CaseSensitive = CaseSensitive;
-	FilesFilterRegEx.Compile(CreateFilesFilterRegEx(), wxRE_ADVANCED);
+	FilesFilterRegEx.Compile(CreateFilesFilterRegEx(FilesFilter), wxRE_ADVANCED);
 	return Finder.Prepare() && FilesFilterRegEx.IsValid();
 }
 
@@ -214,8 +214,8 @@ mvceditor::FindInFilesClass::OpenErrors mvceditor::FindInFilesClass::FileContent
 	return error;
 }
 	
-wxString mvceditor::FindInFilesClass::CreateFilesFilterRegEx() const {
-	wxString escapedExpression = FilesFilter;
+wxString mvceditor::FindInFilesClass::CreateFilesFilterRegEx(const wxString& wildCardString) {
+	wxString escapedExpression = wildCardString;
 	
 	// allow ? and * wildcards, turn ';' into '|'
 	wxString symbols = wxT("!@#$%^&()[]{}\\-+.\"|,");
@@ -226,10 +226,14 @@ wxString mvceditor::FindInFilesClass::CreateFilesFilterRegEx() const {
 		escapedExpression.replace(pos, 1, symbol, 2);
 		pos = escapedExpression.find_first_of(symbols, pos + 2);
 	}
-	escapedExpression.Replace(wxT(";"), wxT("$|"));
+
+	// '$'  because we want to match the end of text
+	// we want each OR expression to be grouped together with parenthesis
+	escapedExpression = wxT("(") + escapedExpression;
+	size_t orCount = escapedExpression.Replace(wxT(";"), wxT("$)|("));
 	escapedExpression.Replace(wxT("*"), wxT(".*"));
 	escapedExpression.Replace(wxT("?"), wxT(".?"));
-	escapedExpression.Append(wxT("$"));
+	escapedExpression.Append(wxT("$)"));
 	return escapedExpression;
 }
 
