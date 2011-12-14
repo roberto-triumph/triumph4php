@@ -28,6 +28,7 @@
 #include <PluginClass.h>
 #include <plugins/wxformbuilder/ProjectPluginGeneratedPanelClass.h>
 #include <wx/filepicker.h>
+#include <wx/docview.h>
 
 namespace mvceditor {
 
@@ -122,14 +123,12 @@ private:
 	/**
 	 * List of recently opened projects
 	 */
-	std::vector<wxString> RecentProjects;
+	wxFileHistory History;
 
 	/**
 	 * Sub-Menu for the recent projects 
 	 */
 	wxMenu* RecentProjectsMenu;
-
-	int MAX_RECENT_PROJECTS;
 
 	DECLARE_EVENT_TABLE()
 	

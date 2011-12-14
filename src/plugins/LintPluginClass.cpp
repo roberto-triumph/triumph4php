@@ -271,7 +271,6 @@ void mvceditor::LintPluginClass::LoadPreferences(wxConfigBase* config) {
 void mvceditor::LintPluginClass::SavePreferences(wxConfigBase* config) {
 	config->Write(wxT("/LintCheck/IgnoreFiles"), IgnoreFiles);
 	config->Write(wxT("/LintCheck/CheckOnSave"), CheckOnSave);
-	wxMessageBox(_("settings saved"));
 }
 
 void mvceditor::LintPluginClass::OnLintMenu(wxCommandEvent& event) {

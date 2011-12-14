@@ -45,12 +45,11 @@ int ID_TOOLBAR_PROJECT_EXPLORE_OPEN_FILE = wxNewId();
 
 mvceditor::ProjectPluginClass::ProjectPluginClass() 
 	: PluginClass()
-	, RecentProjects()
 	, PhpFileFiltersString()
 	, CssFileFiltersString()
 	, SqlFileFiltersString()
-	, RecentProjectsMenu(NULL)
-	, MAX_RECENT_PROJECTS(5) {
+	, History(5, ID_MENU_PROJECT_ITEM)
+	, RecentProjectsMenu(NULL) {
 	PhpFileFiltersString = wxT("*.php");
 	CssFileFiltersString = wxT("*.css");
 	SqlFileFiltersString = wxT("*.sql");
@@ -72,8 +71,8 @@ void mvceditor::ProjectPluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
 	projectMenu->Append(mvceditor::MENU_PROJECT + 0, _("Explore"), _("Open An explorer window in the Project Root"), wxITEM_NORMAL);
 	projectMenu->Append(mvceditor::MENU_PROJECT + 1, _("Explore Open File"), _("Open An explorer window in the currently opened file"), wxITEM_NORMAL);
 	RecentProjectsMenu = new wxMenu(0);
+	History.UseMenu(RecentProjectsMenu);
 	projectMenu->Append(mvceditor::MENU_PROJECT + 2, _("Recent Projects"), RecentProjectsMenu, _("Open An explorer window in the Project Root"));
-	SyncMenu();
 }
 
 void mvceditor::ProjectPluginClass::AddToolBarItems(wxAuiToolBar* toolbar) {
@@ -100,15 +99,6 @@ void mvceditor::ProjectPluginClass::LoadPreferences(wxConfigBase* config) {
 	// the decision to keep the recent projects separate from the settings config file is because
 	// the recent projects file changes more often, and there may be cases when config files can
 	// be copied between different computer / people without affecting the recent files list
-	//
-	// recent projects file will have 1 group per project; like this
-	// 
-	// [project_1]
-	// Path = /home/user/projects/project_one
-	//
-	// [project_2]
-	// Path = /home/user/projects/project_two
-	//
 	wxStandardPaths paths;
 	wxString recentFileConfigFilePath = paths.GetUserConfigDir() + wxFileName::GetPathSeparator() + wxT(".mvc_editor_projects.ini");
 	wxFileName fileName(recentFileConfigFilePath);
@@ -116,17 +106,7 @@ void mvceditor::ProjectPluginClass::LoadPreferences(wxConfigBase* config) {
 		wxFileInputStream input(recentFileConfigFilePath);
 		if (input.IsOk()) {
 			wxFileConfig recentFileConfig(input);
-			wxString groupName;
-			long index;
-			bool good =  recentFileConfig.GetFirstGroup(groupName, index);
-			while (good) {
-				wxString pathKey = groupName + wxT("/Path");
-				wxString projectPath;
-				if (recentFileConfig.Read(pathKey, &projectPath)) {
-					RecentProjects.push_back(projectPath);
-				}
-				good = recentFileConfig.GetNextGroup(groupName, index);
-			}
+			History.Load(recentFileConfig);
 		}
 	}
 	SyncMenu();
@@ -159,15 +139,7 @@ void mvceditor::ProjectPluginClass::OnProjectOpened() {
 		// this happens when the application starts
 		return;
 	}
-	std::vector<wxString>::iterator found = std::find(RecentProjects.begin(), RecentProjects.end(), projectRoot);
-	if (found != RecentProjects.end() && RecentProjects.size() < (size_t)MAX_RECENT_PROJECTS) {
-		RecentProjects.erase(found);
-		RecentProjects.insert(RecentProjects.begin(), projectRoot);
-	}
-	else if (RecentProjects.size() < (size_t)MAX_RECENT_PROJECTS) {
-		RecentProjects.push_back(projectRoot);
-	}
-	SyncMenu();
+	History.AddFileToHistory(projectRoot);
 	PersistProjectList();
 }
 
@@ -189,26 +161,14 @@ void mvceditor::ProjectPluginClass::PersistProjectList() {
 	wxFileConfig recentFileConfig(wxT("mvc_editor"), wxEmptyString, recentFileConfigFilePath, wxEmptyString, 
 		wxCONFIG_USE_LOCAL_FILE);
 
-	// remove all existing items; this is in case the list has shrunk from last time it was persisted
-	recentFileConfig.DeleteAll();
-	wxString groupName;
-	for (size_t i = 0; i < RecentProjects.size(); i++) {
-		recentFileConfig.SetPath(wxString::Format(wxT("/Project_%d"), i));
-		recentFileConfig.Write(wxT("Path"), RecentProjects[i]);
-	}
+	History.Save(recentFileConfig);
 	wxFileOutputStream output(recentFileConfigFilePath);
 	recentFileConfig.Save(output);
 }
 
 void mvceditor::ProjectPluginClass::SyncMenu() {
 	if (RecentProjectsMenu) {
-		wxMenuItemList list = RecentProjectsMenu->GetMenuItems();
-		for (size_t i = 0; i < list.size(); i++) {
-			RecentProjectsMenu->Delete(list[i]);
-		}
-		for (size_t i = 0; i < RecentProjects.size(); i++) {
-			RecentProjectsMenu->Append(ID_MENU_PROJECT_ITEM + i, RecentProjects[i], _("Open the project at ") + RecentProjects[i]);
-		}
+		//History.AddFilesToMenu(RecentProjectsMenu);
 		
 		// ATTN: possible problem. according to wxWidgets docs
 		//     Append the submenu to the parent menu after you have added your menu items, or accelerators may 
@@ -219,12 +179,10 @@ void mvceditor::ProjectPluginClass::SyncMenu() {
 }
 
 void mvceditor::ProjectPluginClass::OnMenu(wxCommandEvent& event) {
-	int id = event.GetId();
-	if (id >= ID_MENU_PROJECT_ITEM && id < (ID_MENU_PROJECT_ITEM + MAX_RECENT_PROJECTS)) {
-		wxString project = RecentProjectsMenu->GetLabelText(id);
-		
-		// on linux project seems to have an extra space
-		project.Trim();
+	size_t id = (size_t)event.GetId();
+	if (id >= (size_t)ID_MENU_PROJECT_ITEM && id < (ID_MENU_PROJECT_ITEM + History.GetCount())) {
+		size_t index = id - ID_MENU_PROJECT_ITEM;
+		wxString project = History.GetHistoryFile(index);
 		bool remove = false;
 		if (wxFileName::FileExists(project)) {
 			int ret = wxMessageBox(_("Path is not a directory. Remove from Recent list?\n") + project, _("Warning"), 
@@ -243,10 +201,8 @@ void mvceditor::ProjectPluginClass::OnMenu(wxCommandEvent& event) {
 			AppEvent(cmd);
 		}
 		if (remove) {
-			std::vector<wxString>::iterator it = std::find(RecentProjects.begin(), RecentProjects.end(), project);
-			if (it != RecentProjects.end()) {
-				RecentProjects.erase(it);
-				SyncMenu();
+			if (index < History.GetCount()) {
+				History.RemoveFileFromHistory(index);
 				PersistProjectList();
 			}
 		}
