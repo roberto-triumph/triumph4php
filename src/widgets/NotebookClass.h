@@ -175,9 +175,12 @@ public:
 	void RefreshCodeControlOptions();
 	
 	/**
-	 * Give code controls access to a single, project. Memory management is left to the caller of this method.
+	 * Give code controls access to a single project. 
+	 * Memory management of both pointers is  left to the caller of this method.
+	 * @param project the opened project
+	 * @param appHandler propagated to each instance of CodeControlClass that is created.
 	 */
-	void SetProject(ProjectClass* project);
+	void SetProject(ProjectClass* project, wxEvtHandler* appHandler);
 	
 	/**
 	 * Closes (deletes) the current page (prompts the user to save if the file has been modified)
@@ -235,6 +238,11 @@ private:
 	 * Creates the dialog wildcard string based on the project's settings.
 	 */
 	wxString CreateWildcardString() const;
+
+	/**
+	 * will use the close source code event to re-trigger project indexing.
+	 */
+	void OnNotebookPageClose(wxAuiNotebookEvent& evt);
 	
 	/**
 	 * The context menu for handling right-click options
@@ -246,6 +254,14 @@ private:
 	 * @var ProjectClass
 	 */
 	ProjectClass* Project;
+
+	/**
+	 * This object will be used to publish app events. When an editor tab is closed;
+	 * we need to trigger project re-indexing since it has not been updated with
+	 * the changes made to the file that was opened (the parsed resources were being 
+	 * handled in a separate cache by ResourceUpdateThreadClass).
+	 */
+	wxEvtHandler* AppHandler;
 	
 	/**
 	 * To give a friendly number to new files. 

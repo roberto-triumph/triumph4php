@@ -25,6 +25,7 @@
 #include <windows/AppFrameClass.h>
 #include <AppVersion.h>
 #include <PluginClass.h>
+#include <MvcEditor.h>
 #include <windows/PreferencesDialogClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
 
@@ -337,19 +338,19 @@ void mvceditor::AppFrameClass::OnProjectOpen(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::AppFrameClass::OnProjectOpened(mvceditor::ProjectClass* project) {
-	Notebook->SetProject(project);
+void mvceditor::AppFrameClass::OnProjectOpened(mvceditor::ProjectClass* project, wxEvtHandler* appHandler) {
+	Notebook->SetProject(project, appHandler);
 	SetTitle(_("MVC Editor - Open Project [") + project->GetRootPath() + wxT("]"));
 }
 
-void mvceditor::AppFrameClass::OnProjectClosed() {
+void mvceditor::AppFrameClass::OnProjectClosed(wxEvtHandler* appHandler) {
 	Notebook->CloseAllPages();
 	AuiManager.GetPane(ToolsNotebook).Hide();
 	while (ToolsNotebook->GetPageCount()) {
 		ToolsNotebook->DeletePage(0);
 	}
 	AuiManager.Update();
-	Notebook->SetProject(NULL);
+	Notebook->SetProject(NULL, appHandler);
 }
 
 void mvceditor::AppFrameClass::OnHelpAbout(wxCommandEvent& event) {

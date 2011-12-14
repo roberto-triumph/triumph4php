@@ -54,7 +54,7 @@ static const int INDICATOR_PHP_STYLE = 128;
 // 32 => 5th bit on since first 5 bits of style bits are for all other lexers
 static const int INDICATOR_TEXT_STYLE = 32;
 
-mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,  ProjectClass* project, 
+mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options, ProjectClass* project, 
 			mvceditor::ResourceUpdateThreadClass* resourceUpdates,
 			int id, const wxPoint& position, const wxSize& size, long style,
 			const wxString& name)
@@ -93,6 +93,14 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 	
 }
 
+mvceditor::CodeControlClass::~CodeControlClass() {
+	Timer.Stop();
+	delete Document;
+	Document = NULL;	
+	if (ResourceUpdates) {
+		ResourceUpdates->Unregister(FileIdentifier);
+	}
+}
 void mvceditor::CodeControlClass::TrackFile(const wxString& filename, UnicodeString& contents) {
 	SetUnicodeText(contents);
 	EmptyUndoBuffer();
@@ -1042,16 +1050,6 @@ void mvceditor::CodeControlClass::ClearLintErrors() {
 	SetStyling(GetLength(), 0);
 }
 
-void mvceditor::CodeControlClass::OnClose(wxCloseEvent& event) {
-	delete Document;
-	Document = NULL;
-	Timer.Stop();
-	if (ResourceUpdates) {
-		ResourceUpdates->Unregister(FileIdentifier);
-	}
-	event.Skip();
-}
-
 void mvceditor::CodeControlClass::SetCurrentInfo(const mvceditor::DatabaseInfoClass& currentInfo) {
 	CurrentInfo.Copy(currentInfo);
 	
@@ -1172,7 +1170,6 @@ BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)
 	EVT_STC_UPDATEUI(wxID_ANY, mvceditor::CodeControlClass::OnUpdateUi) 
 	EVT_LEFT_DOWN(mvceditor::CodeControlClass::OnLeftDown)
 	EVT_KEY_DOWN(mvceditor::CodeControlClass::OnKeyDown)
-	EVT_CLOSE(mvceditor::CodeControlClass::OnClose)
 	EVT_STC_DWELLSTART(wxID_ANY, mvceditor::CodeControlClass::OnDwellStart)
 	EVT_STC_DWELLEND(wxID_ANY, mvceditor::CodeControlClass::OnDwellEnd)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::CodeControlClass::OnResourceUpdateComplete)

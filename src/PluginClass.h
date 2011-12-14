@@ -36,36 +36,6 @@
 namespace mvceditor {
 
 /**
- * These are events that will be published to all plugins.  Plugins may connect
- * and listen for these events.
- *
- * This event will be dispatched when a file is saved.  
- * event.GetString() will cotain the full path to the file.
- * event.GetEventObject() will contain a pointer to the code control window that
- *                        was saved.
- */
-extern const wxEventType EVENT_PLUGIN_FILE_SAVED;
-
- /**
-  * These events can be published by plugins; the application 
-  * will listen for these events and act accordingly.
-  */
-
-/**
- * Tell the app to open a new project.
- * The command event should set the project root path with event.SetString()
- * Note that the app will do NOTHING if the path is invalid; the plugin should
- * make sure the path is valid.
- */
-extern const wxEventType EVENT_APP_OPEN_PROJECT;
-
-/**
- * Tell the app to save its state to the file system, and will 
- * also repaint any windows that are affected by the changes.
- */
-extern const wxEventType EVENT_APP_SAVE_PREFERENCES;
-
-/**
  * ATTN: Use this enum to build the Plugin menus
  * Since wxKeyBinder uses menu IDs to serialize the shortcuts, the menu IDs
  * cannot change (else KeyBinder will not bind the shortcut; or worse it may

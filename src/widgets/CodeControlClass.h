@@ -86,16 +86,20 @@ public:
 	};
 
 	/**
-	 * Constructor. Memory management of project is left to the caller of this method. project
+	 * Constructor. 
+	 * @param ProjectClass* Memory management of project is left to the caller of this method. project
 	 * CANNOT be NULL.
-	 * ResourceUpdateThreadClass* resourceUpdates can be null. if null, then code completion will not be
-	 * functional.
+	 * @param ResourceUpdateThreadClass* resourceUpdates can be null. if null, then code completion will not be
+	 *        functional.
+	 * 
 	 */
 	CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options, ProjectClass* project,
 					ResourceUpdateThreadClass* resourceUpdates,
 	                 int id, const wxPoint& position =
 	                     wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0,
 	                 const wxString& name = wxT("code"));
+
+	~CodeControlClass();
 	
 	/**
 	 * Loads the given contents of the given file, and initializes the
@@ -400,11 +404,6 @@ private:
 	 * On a left mouse click, we will undo the highlighting caused by double clicks
 	 */
 	void OnLeftDown(wxMouseEvent& event);
-
-	/**
-	 * cleanup of internal pointers
-	 */
-	void OnClose(wxCloseEvent& event);
 
 	/**
 	 * show the symbol comment popup to the user

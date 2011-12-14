@@ -22,7 +22,7 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <wx/wx.h>
+#include <MvcEditor.h>
 #include <wx/cmdline.h>
 #include <unicode/uclean.h>
 
@@ -37,144 +37,10 @@
 #include <plugins/LintPluginClass.h>
 #include <plugins/SqlBrowserPluginClass.h>
 #include <plugins/EditorMessagesPluginClass.h>
-#include <widgets/ProcessWithHeartbeatClass.h>
-#include <widgets/ResourceUpdateThreadClass.h>
 #include <MvcEditorErrors.h>
-
-namespace mvceditor {
 
 static const int ID_FRAMEWORK_DETECT_PROCESS = wxNewId();
 static const int ID_DATABASE_DETECT_PROCESS = wxNewId();
-
-class AppClass : public wxApp {
-
-public:
-
-	/** 
-	 * Initialize the application 
-	 */
-	virtual bool OnInit();
-	
-	AppClass();
-
-	~AppClass();
-
-	/**
-	 * flush preferences to disk and tells all dependent windows to repaint
-	 * themselves based on the new settings.
-	 */
-	void OnSavePreferences(wxCommandEvent& event);
-
-	/**
-	 * notify all plugins that the file has been saved.
-	 */
-	void OnFileSaved(wxCommandEvent& event);
-
-	/**
-	 * Opens the given directory as a project.
-	 */
-	void OnProjectOpen(wxCommandEvent& event);
-
-	/**
-	 * Opens the given directory as a project.
-	 */
-	void ProjectOpen(const wxString& directoryPath);
-
-private:
-
-	/**
-	 * Parses any command line arguments.  Returns false if arguments are invalid.
-	 */
-	bool CommandLine();
-
-	/**
-	 * create plugins. only instantiates and nothing else
-	 */
-	void CreatePlugins();
-	
-	/**
-	 * delete plugins from memory
-	 */
-	void DeletePlugins();
-
-	/**
-	 * asks plugins for any windows they want to create
-	 */
-	void PluginWindows();
-	
-	/**
-	 * create a project and initialize all objects that depend on project
-	 */
-	void CreateProject(const ProjectOptionsClass& options);
-	
-	/**
-	 * close project and all resources that depend on it
-	 */
-	void CloseProject();
-
-	/**
-	 * method that gets called when one of the external processes finishes
-	 */
-	void OnProcessComplete(wxCommandEvent& event);
-
-	/**
-	 * method that gets called when one of the external processes fails
-	 */
-	void OnProcessFailed(wxCommandEvent& event);
-
-	/**
-	 * Additional functionality
-	 */
-	std::vector<PluginClass*> Plugins;
-
-	/**
-	 * a project may be using more than one framework. This vector
-	 * will be used as a 'queue' so that we can know when all framework
-	 * info has been discovered. This queue is needed because the
-	 * detection process is asynchronous.
-	 */
-	std::vector<wxString> FrameworkIdentifiersLeftToDetect;
-	
-	/**
-	 * The environment stack.
-	 * 
-	 * @var EnvironmentClass
-	 */
-	EnvironmentClass Environment;
-
-	/**
-	 * Any running external processes are tracked here.  These external
-	 * processes are usually calls to the PHP framework detectiong scripts.
-	 */
-	ProcessWithHeartbeatClass ProcessWithHeartbeat;
-	
-	/**
-	 * This object will be used to parse the resources of files that are currently open.
-	 */
-	ResourceUpdateThreadClass ResourceUpdates;
-
-	/**
-	 * The user preferences
-	 * 
-	 * @var PreferencesClass;
-	 */
-	PreferencesClass* Preferences;
-
-	/**
-	 * The open project
-	 * @var ProjectClass*
- 	 */
-	ProjectClass* Project;
-
-	/**
-	 * The main application frame.
-	 */
-	AppFrameClass* AppFrame;
-
-	DECLARE_EVENT_TABLE()
-};
-
-}
 
 IMPLEMENT_APP(mvceditor::AppClass)
 
@@ -188,7 +54,8 @@ mvceditor::AppClass::AppClass()
 	// give this a different ID; dont need to handle the signals for now
 	, ResourceUpdates(*this, wxNewId())
 	, Preferences(NULL)
-	, Project(NULL) {
+	, Project(NULL)
+	, ResourcePlugin(NULL) {
 	AppFrame = NULL;
 }
 
@@ -294,7 +161,7 @@ bool mvceditor::AppClass::CommandLine() {
 
 void mvceditor::AppClass::CloseProject() {
 	if (AppFrame) {
-		AppFrame->OnProjectClosed();
+		AppFrame->OnProjectClosed(this);
 	}
 	for (size_t i = 0; i < Plugins.size(); ++i) {
 		Plugins[i]->SetProject(NULL);
@@ -312,8 +179,12 @@ void mvceditor::AppClass::CreatePlugins() {
 	Plugins.push_back(plugin);
 	plugin = new FindInFilesPluginClass();
 	Plugins.push_back(plugin);
-	plugin = new ResourcePluginClass();
-	Plugins.push_back(plugin);
+
+	// we want to keep a reference to this plugin
+	// to fulfill the EVENT_APP_PROJECT_RE_INDEX
+	ResourcePlugin = new ResourcePluginClass();
+	Plugins.push_back(ResourcePlugin);
+
 	plugin = new EnvironmentPluginClass();
 	Plugins.push_back(plugin);
 	plugin = new ProjectPluginClass();
@@ -439,7 +310,7 @@ void mvceditor::AppClass::OnProcessComplete(wxCommandEvent& event) {
 		}
 	}
 	if (continueProjectOpen) {
-		AppFrame->OnProjectOpened(Project);
+		AppFrame->OnProjectOpened(Project, this);
 		for (size_t i = 0; i < Plugins.size(); ++i) {
 			Plugins[i]->SetProject(Project);
 		}
@@ -451,18 +322,29 @@ void mvceditor::AppClass::OnProcessFailed(wxCommandEvent& event) {
 
 	// still need to set the project even if the project detection fails
 	// pretty much all code depends on having a Project pointer
-	AppFrame->OnProjectOpened(Project);
+	AppFrame->OnProjectOpened(Project, this);
 	for (size_t i = 0; i < Plugins.size(); ++i) {
 		Plugins[i]->SetProject(Project);
 	}
 }
 
+void mvceditor::AppClass::OnProjectReIndex(wxCommandEvent& event) {
+	wxASSERT(ResourcePlugin);
+	ResourcePlugin->StartIndex();
+}
+
+const wxEventType mvceditor::EVENT_PLUGIN_FILE_SAVED = wxNewEventType();
+const wxEventType mvceditor::EVENT_APP_OPEN_PROJECT = wxNewEventType();
+const wxEventType mvceditor::EVENT_APP_SAVE_PREFERENCES = wxNewEventType();
+const wxEventType mvceditor::EVENT_APP_RE_INDEX = wxNewEventType();
+
 BEGIN_EVENT_TABLE(mvceditor::AppClass, wxApp)
 	EVT_COMMAND(wxID_ANY, EVENT_APP_SAVE_PREFERENCES, mvceditor::AppClass::OnSavePreferences)
 	EVT_COMMAND(wxID_ANY, EVENT_PLUGIN_FILE_SAVED, mvceditor::AppClass::OnFileSaved)
 	EVT_COMMAND(wxID_ANY, EVENT_APP_OPEN_PROJECT, mvceditor::AppClass::OnProjectOpen)
-	EVT_COMMAND(mvceditor::ID_FRAMEWORK_DETECT_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::AppClass::OnProcessComplete)
-	EVT_COMMAND(mvceditor::ID_DATABASE_DETECT_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::AppClass::OnProcessComplete)
-	EVT_COMMAND(mvceditor::ID_FRAMEWORK_DETECT_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::AppClass::OnProcessFailed)
-	EVT_COMMAND(mvceditor::ID_DATABASE_DETECT_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::AppClass::OnProcessFailed)
+	EVT_COMMAND(wxID_ANY, EVENT_APP_RE_INDEX, mvceditor::AppClass::OnProjectReIndex)
+	EVT_COMMAND(ID_FRAMEWORK_DETECT_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::AppClass::OnProcessComplete)
+	EVT_COMMAND(ID_DATABASE_DETECT_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::AppClass::OnProcessComplete)
+	EVT_COMMAND(ID_FRAMEWORK_DETECT_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::AppClass::OnProcessFailed)
+	EVT_COMMAND(ID_DATABASE_DETECT_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::AppClass::OnProcessFailed)
 END_EVENT_TABLE()

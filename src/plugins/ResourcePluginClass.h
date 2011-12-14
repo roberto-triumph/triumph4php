@@ -145,6 +145,11 @@ public:
 	 * @param wxString full path to the file that will be opened.
 	 */
 	void OpenFile(wxString fileName);
+
+	/**
+	 * Trigger the start of the indexing background thread.
+	 */
+	void StartIndex();
 	
 private:
 

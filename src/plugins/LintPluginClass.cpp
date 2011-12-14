@@ -25,6 +25,7 @@
 #include <plugins/LintPluginClass.h>
 #include <windows/StringHelperClass.h>
 #include <MvcEditorErrors.h>
+#include <MvcEditor.h>
 #include <unicode/unistr.h>
 #include <wx/artprov.h>
 
@@ -353,7 +354,7 @@ BEGIN_EVENT_TABLE(mvceditor::LintPluginClass, wxEvtHandler)
 	EVT_MENU(ID_LINT_TOOLBAR_ITEM, mvceditor::LintPluginClass::OnLintMenu)
 	EVT_COMMAND(wxID_ANY, EVENT_LINT_ERROR,  mvceditor::LintPluginClass::OnLintError)
 	EVT_COMMAND(wxID_ANY, EVENT_FILE_READ,  mvceditor::LintPluginClass::OnLintFileComplete)
-	EVT_COMMAND(wxID_ANY, EVENT_PLUGIN_FILE_SAVED,  mvceditor::LintPluginClass::OnFileSaved)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PLUGIN_FILE_SAVED,  mvceditor::LintPluginClass::OnFileSaved)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::LintPluginClass::OnTimer)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::LintPluginClass::OnLintComplete)
 END_EVENT_TABLE()

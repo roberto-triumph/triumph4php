@@ -25,6 +25,7 @@
 #include <plugins/ProjectPluginClass.h>
 #include <widgets/NonEmptyTextValidatorClass.h>
 #include <MvcEditorErrors.h>
+#include <MvcEditor.h>
 #include <wx/artprov.h>
 #include <wx/platinfo.h>
 #include <wx/filename.h>
