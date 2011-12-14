@@ -63,24 +63,18 @@ public:
 	void ResetTotals();
 	
 	/**
+	 * @param list of wildcard strings to perform lint checks on. Each item in the list 
+	 *        is a wilcard suitable for passing into the wxMatchWild() function
+	 * @param ignoreFilters regex string of files to ignore. This is a string suitable
+	 *        for the FindInFilesClass::CreateFilesFilterRegEx() method.
+	 */
+	void SetFilters(std::vector<wxString> includeFilters, wxString ignoreFilters);
+	
+	/**
 	 * The last parsing results.
 	 * 
 	 */
 	LintResultsClass LastResults;
-	
-	/**
-	 * The file extensions we want to attempt to parse.
-	 * Each item in the list is a wilcard suitable for passing into the wxMatchWild()
-	 * function
-	 */
-	std::vector<wxString> PhpFileFilters;
-
-	/**
-	 * Regular expression that, when matched; will result in the file being
-	 * skipped (won't be lint checked). IgnoreFileFiltersRegEx take precedence over the
-	 * PhpFileFilters (if a file matches both, then file will be ignored).
-	 */
-	wxRegEx IgnoreFileFiltersRegEx;
 	
 	/**
 	 * Running count of files that had parse errors.
@@ -95,6 +89,26 @@ public:
 private:
 
 	mvceditor::ParserClass Parser;
+
+	/**
+	 * The file extensions we want to attempt to parse.
+	 * Each item in the list is a wilcard suitable for passing into the wxMatchWild()
+	 * function
+	 */
+	std::vector<wxString> PhpFileFilters;
+
+	/**
+	 * Regular expression that, when matched; will result in the file being
+	 * skipped (won't be lint checked). IgnoreFileFiltersRegEx take precedence over the
+	 * PhpFileFilters (if a file matches both, then file will be ignored).
+	 */
+	wxRegEx IgnoreFileFiltersRegEx;
+
+	/**
+	 * The 'string' version of the Ignore files reg ex. We will keep the string version
+	 * around so that we can test for empty strings.
+	 */
+	wxString IgnoreFileFilters;
 };
 
 /**
