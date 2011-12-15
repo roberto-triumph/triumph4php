@@ -116,11 +116,11 @@ void mvceditor::AppFrameClass::OnClose(wxCloseEvent& event) {
 void mvceditor::AppFrameClass::OnFileSave(wxCommandEvent& event) {
 	Notebook->SaveCurrentPage();
 	mvceditor::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
-	wxCommandEvent pluginEvent(EVENT_PLUGIN_FILE_SAVED);
-	pluginEvent.SetString(codeControl->GetFileName());
-	pluginEvent.SetEventObject(codeControl);
-	// TODO fix this; it makes an infinite loop somehow
-	//wxPostEvent(&AppHandler, pluginEvent);
+	mvceditor::FileSavedEventClass pluginEvent(codeControl);
+
+	for (size_t i = 0; i < Plugins.size(); i++) {
+		wxPostEvent(Plugins[i], pluginEvent);
+	}
 }
 
 void mvceditor::AppFrameClass::OnFileNew(wxCommandEvent& event) {

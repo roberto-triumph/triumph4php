@@ -392,5 +392,48 @@ protected:
 	
 };
 
+extern const wxEventType EVENT_PLUGIN_FILE_SAVED;
+
+/**
+ * This is an event that will tell a plugin that a file has been saved.
+ * The plugin will get a pointer to the CodeControl that was saved.
+ * From the code control; the event handler can get the file name
+ * or file contents if so desired.
+ * Using a new event class as opposed to a wxCommandEvent because
+ * wxCommandEvents propagate by default; but we do not want
+ * these events to propagate.
+ */
+class FileSavedEventClass : public wxEvent {
+
+public:
+
+	/**
+	 * @param codeControl caller will still own the pointer
+	 */
+	FileSavedEventClass(CodeControlClass* codeControl);
+
+	/**
+	 * @return the code control that was saved; do NOT delete the returned
+	 * pointer.
+	 */
+	CodeControlClass* GetCodeControl() const;
+
+	/** 
+	 * required for sending with wxPostEvent()
+	 */
+    wxEvent* Clone() const;
+
+private:
+
+	CodeControlClass* CodeControl;
+};
+
+typedef void (wxEvtHandler::*FileSavedEventClassFunction)(FileSavedEventClass&);
+
+#define EVT_PLUGIN_FILE_SAVED(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_PLUGIN_FILE_SAVED, wxID_ANY, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( FileSavedEventClassFunction, & fn ), (wxObject *) NULL ),
+
 }
 #endif

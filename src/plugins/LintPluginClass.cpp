@@ -357,12 +357,14 @@ void mvceditor::LintPluginClass::OnTimer(wxCommandEvent& event) {
 	gauge->IncrementGauge(ID_LINT_RESULTS_GAUGE, StatusBarWithGaugeClass::INDETERMINATE_MODE);	
 }
 
-void mvceditor::LintPluginClass::OnFileSaved(wxCommandEvent &event) {
-	mvceditor::CodeControlClass* codeControl = (mvceditor::CodeControlClass*)event.GetEventObject();
-	wxString fileName = event.GetString();
+void mvceditor::LintPluginClass::OnFileSaved(mvceditor::FileSavedEventClass& event) {
+	mvceditor::CodeControlClass* codeControl = event.GetCodeControl();
+	wxString fileName = codeControl->GetFileName();
 	codeControl->ClearLintErrors();
 
-	// remove lint results for this file fromt the display list
+	bool hasErrors = !LintErrors.empty();
+
+	// remove lint results for this file from the display list
 	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
 	LintResultsPanelClass* lintResultsPanel = NULL;
 	if (window) {
@@ -370,37 +372,41 @@ void mvceditor::LintPluginClass::OnFileSaved(wxCommandEvent &event) {
 		lintResultsPanel->RemoveErrorsFor(fileName);
 	}
 
-	std::vector<wxString> phpFileFilters = GetProject()->GetPhpFileExtensions();
-	
-	// use the OR functionality of the filters by replacing newlines with semicolons
-	wxString ignoreFilesRegEx(IgnoreFiles);
-	ignoreFilesRegEx.Trim(false);
-	ignoreFilesRegEx.Trim(true);
-	ignoreFilesRegEx.Replace(wxT("\n"), wxT(";"));
-	bool error = LintBackgroundFileReader.LintSingleFile(fileName, phpFileFilters, ignoreFilesRegEx);
-	if (error) {
+	// if user has configure to do lint check on saving or user is cleanin up
+	// errors (after they manually lint checked the project) then re-check
+	if (hasErrors || CheckOnSave) {
+		std::vector<wxString> phpFileFilters = GetProject()->GetPhpFileExtensions();
 		
-		// handle the case where user has saved a file but has not clicked
-		// on the Lint project button.
-		if (!window) {
-			lintResultsPanel = new LintResultsPanelClass(GetToolsNotebook(), ID_LINT_RESULTS_PANEL, GetNotebook(), LintErrors);
-			AddToolsWindow(lintResultsPanel, _("Lint Check"));
-			SetFocusToToolsWindow(lintResultsPanel);
-		}
-		int previousPos = -1;
-		mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
-		if (codeControl) {
-			previousPos = GetCurrentCodeControl()->GetCurrentPos();
-		}
-		
-		// we know that there are lint error events to be consumed
-		ProcessPendingEvents();
-		lintResultsPanel->DisplayLintError(LintErrors.size() - 1);
+		// use the OR functionality of the filters by replacing newlines with semicolons
+		wxString ignoreFilesRegEx(IgnoreFiles);
+		ignoreFilesRegEx.Trim(false);
+		ignoreFilesRegEx.Trim(true);
+		ignoreFilesRegEx.Replace(wxT("\n"), wxT(";"));
+		bool error = LintBackgroundFileReader.LintSingleFile(fileName, phpFileFilters, ignoreFilesRegEx);
+		if (error) {
+			
+			// handle the case where user has saved a file but has not clicked
+			// on the Lint project button.
+			if (!window) {
+				lintResultsPanel = new LintResultsPanelClass(GetToolsNotebook(), ID_LINT_RESULTS_PANEL, GetNotebook(), LintErrors);
+				AddToolsWindow(lintResultsPanel, _("Lint Check"));
+				SetFocusToToolsWindow(lintResultsPanel);
+			}
+			int previousPos = -1;
+			mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
+			if (codeControl) {
+				previousPos = GetCurrentCodeControl()->GetCurrentPos();
+			}
+			
+			// we know that there are lint error events to be consumed
+			ProcessPendingEvents();
+			lintResultsPanel->DisplayLintError(LintErrors.size() - 1);
 
-		// diplaying the lint causes things to be redrawn; put the cursor 
-		// where the user left it
-		if (previousPos >= 0 && codeControl) {
-			codeControl->GotoPos(previousPos);
+			// diplaying the lint causes things to be redrawn; put the cursor 
+			// where the user left it
+			if (previousPos >= 0 && codeControl) {
+				codeControl->GotoPos(previousPos);
+			}
 		}
 	}
 }
@@ -420,7 +426,7 @@ BEGIN_EVENT_TABLE(mvceditor::LintPluginClass, wxEvtHandler)
 	EVT_MENU(ID_LINT_TOOLBAR_ITEM, mvceditor::LintPluginClass::OnLintMenu)
 	EVT_COMMAND(wxID_ANY, EVENT_LINT_ERROR,  mvceditor::LintPluginClass::OnLintError)
 	EVT_COMMAND(wxID_ANY, EVENT_FILE_READ,  mvceditor::LintPluginClass::OnLintFileComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PLUGIN_FILE_SAVED,  mvceditor::LintPluginClass::OnFileSaved)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::LintPluginClass::OnTimer)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::LintPluginClass::OnLintComplete)
+	EVT_PLUGIN_FILE_SAVED(mvceditor::LintPluginClass::OnFileSaved)
 END_EVENT_TABLE()

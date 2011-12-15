@@ -184,3 +184,20 @@ void mvceditor::PluginClass::AppEvent(wxCommandEvent event) {
 		wxPostEvent(AppHandler, event);	
 	}
 }
+
+mvceditor::FileSavedEventClass::FileSavedEventClass(mvceditor::CodeControlClass* codeControl)
+	: wxEvent(wxID_ANY, mvceditor::EVENT_PLUGIN_FILE_SAVED)
+	, CodeControl(codeControl) {
+
+}
+
+mvceditor::CodeControlClass* mvceditor::FileSavedEventClass::GetCodeControl() const {
+	return CodeControl;
+}
+
+wxEvent* mvceditor::FileSavedEventClass::Clone() const {
+	mvceditor::FileSavedEventClass* newEvt = new mvceditor::FileSavedEventClass(CodeControl);
+	return newEvt;
+}
+
+const wxEventType mvceditor::EVENT_PLUGIN_FILE_SAVED = wxNewEventType();

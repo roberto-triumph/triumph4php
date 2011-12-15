@@ -38,20 +38,9 @@
 namespace mvceditor {
 
 /**
- * These are events that will be published to all plugins.  Plugins may connect
- * and listen for these events.
- *
- * This event will be dispatched when a file is saved.  
- * event.GetString() will cotain the full path to the file.
- * event.GetEventObject() will contain a pointer to the code control window that
- *                        was saved.
- */
-extern const wxEventType EVENT_PLUGIN_FILE_SAVED;
-
- /**
-  * These events can be published by plugins; the application 
-  * will listen for these events and act accordingly.
-  */
+ * These events can be published by plugins; the application 
+ * will listen for these events and act accordingly.
+*/
 
 /**
  * Tell the app to open a new project.
@@ -92,11 +81,6 @@ private:
 	 * themselves based on the new settings.
 	 */
 	void OnSavePreferences(wxCommandEvent& event);
-
-	/**
-	 * notify all plugins that the file has been saved.
-	 */
-	void OnFileSaved(wxCommandEvent& event);
 
 	/**
 	 * Opens the given directory as a project.

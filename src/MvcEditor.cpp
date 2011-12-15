@@ -251,12 +251,6 @@ void mvceditor::AppClass::OnSavePreferences(wxCommandEvent& event) {
 	config->Flush();
 }
 
-void mvceditor::AppClass::OnFileSaved(wxCommandEvent& event) {
-	for (size_t i = 0; i < Plugins.size(); i++) {
-		wxPostEvent(Plugins[i], event);
-	}
-}
-
 void mvceditor::AppClass::OnProjectOpen(wxCommandEvent& event) {
 	wxString directoryPath = event.GetString();
 	ProjectOpen(directoryPath);
@@ -333,14 +327,12 @@ void mvceditor::AppClass::OnProjectReIndex(wxCommandEvent& event) {
 	ResourcePlugin->StartIndex();
 }
 
-const wxEventType mvceditor::EVENT_PLUGIN_FILE_SAVED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_OPEN_PROJECT = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_SAVE_PREFERENCES = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_RE_INDEX = wxNewEventType();
 
 BEGIN_EVENT_TABLE(mvceditor::AppClass, wxApp)
-	EVT_COMMAND(wxID_ANY, EVENT_APP_SAVE_PREFERENCES, mvceditor::AppClass::OnSavePreferences)
-	EVT_COMMAND(wxID_ANY, EVENT_PLUGIN_FILE_SAVED, mvceditor::AppClass::OnFileSaved)
+	EVT_COMMAND(wxID_ANY, EVENT_APP_SAVE_PREFERENCES, mvceditor::AppClass::OnSavePreferences)	
 	EVT_COMMAND(wxID_ANY, EVENT_APP_OPEN_PROJECT, mvceditor::AppClass::OnProjectOpen)
 	EVT_COMMAND(wxID_ANY, EVENT_APP_RE_INDEX, mvceditor::AppClass::OnProjectReIndex)
 	EVT_COMMAND(ID_FRAMEWORK_DETECT_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::AppClass::OnProcessComplete)

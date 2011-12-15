@@ -297,7 +297,7 @@ private:
 	
 	void OnTimer(wxCommandEvent& event);
 	
-	void OnFileSaved(wxCommandEvent& event);
+	void OnFileSaved(FileSavedEventClass& event);
 
 	LintBackgroundFileReaderClass LintBackgroundFileReader;
 
