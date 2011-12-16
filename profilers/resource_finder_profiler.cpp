@@ -25,6 +25,7 @@
 #include <language/LexicalAnalyzerClass.h>
 #include <language/TokenClass.h>
 #include <language/ParserClass.h>
+#include <language/SymbolTableClass.h>
 #include <search/DirectorySearchClass.h>
 #include <search/ResourceFinderClass.h>
 #include <wx/filefn.h>
@@ -98,17 +99,17 @@ int main() {
 		minor;
 	wxOperatingSystemId os = wxGetOsVersion(&major, &minor);
 	if (os == wxOS_WINDOWS_NT) {
-		FileName = wxT("C:\\Users\\Roberto\\Documents\\Visual Studio 2008\\Projects\\mvc-editor\\resources\\native.php");
-		DirName = wxT("C:\\Users\\Roberto\\sample_php_project\\");
+		FileName = wxT("C:\\Users\\roberto\\Desktop\\tmp.php");
+		DirName = wxT("C:\\Users\\roberto\\Desktop\\tmp.php");
 	}
 	else {
 		FileName = wxT("/home/roberto/workspace/mvc-editor/resources/native.php");
 		DirName = wxT("/home/roberto/workspace/sample_php_project/");
 	}
 
-	ProfileLexer();
+	//ProfileLexer();
 	ProfileParser();
-	ProfileParserOnLargeProject();
+	//ProfileParserOnLargeProject();
 	//ProfileNativeFunctionsParsing();
 	//ProfileResourceFinderOnLargeProject();
 	
@@ -174,7 +175,8 @@ void ProfileParser() {
 	printf("*******\n");
 	mvceditor::ParserClass parser;
 	mvceditor::LintResultsClass error;
-	if (parser.LintFile(FileName, error)) {
+	mvceditor::SymbolTableClass symbolTable;
+	if (parser.LintFile(FileName, error, &symbolTable)) {
 		printf("No syntax errors on %s\n", (const char *)FileName.ToAscii());
 	}
 	else {
@@ -183,6 +185,7 @@ void ProfileParser() {
 			(const char*)FileName.ToAscii(), error.LineNumber);
 		u_fclose(out);
 	}
+	symbolTable.Print();
 }
 
 
@@ -256,7 +259,8 @@ ParserDirectoryWalkerClass::ParserDirectoryWalkerClass()
 bool ParserDirectoryWalkerClass::Walk(const wxString& file) {
 	if (file.EndsWith(wxT(".php"))) {
 		mvceditor::LintResultsClass error;
-		if (Parser.LintFile(file, error)) {
+		mvceditor::SymbolTableClass symbolTable;
+		if (Parser.LintFile(file, error, &symbolTable)) {
 			WithNoErrors++;
 		}
 		else {
