@@ -176,6 +176,10 @@ void ProfileParser() {
 	mvceditor::ParserClass parser;
 	mvceditor::LintResultsClass error;
 	mvceditor::SymbolTableClass symbolTable;
+	UnicodeString contents;
+	mvceditor::FindInFilesClass::FileContents(FileName, contents);
+	symbolTable.CreateSymbols(contents);
+	/*
 	if (parser.LintFile(FileName, error, &symbolTable)) {
 		printf("No syntax errors on %s\n", (const char *)FileName.ToAscii());
 	}
@@ -184,7 +188,7 @@ void ProfileParser() {
 		u_fprintf(out, "%S on file %s around line %d\n", error.Error.getTerminatedBuffer(),
 			(const char*)FileName.ToAscii(), error.LineNumber);
 		u_fclose(out);
-	}
+	}*/
 	symbolTable.Print();
 }
 
@@ -259,8 +263,7 @@ ParserDirectoryWalkerClass::ParserDirectoryWalkerClass()
 bool ParserDirectoryWalkerClass::Walk(const wxString& file) {
 	if (file.EndsWith(wxT(".php"))) {
 		mvceditor::LintResultsClass error;
-		mvceditor::SymbolTableClass symbolTable;
-		if (Parser.LintFile(file, error, &symbolTable)) {
+		if (Parser.LintFile(file, error)) {
 			WithNoErrors++;
 		}
 		else {
