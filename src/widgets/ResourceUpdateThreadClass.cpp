@@ -167,6 +167,7 @@ UnicodeString mvceditor::ResourceUpdateClass::GetSymbolAt(const wxString& fileNa
 		// and that should create the symbols for good. However, the Lookup method is written in such a way that it needs to detect
 		// the "->" at pos; when the code control triggers auto complete the symbol table's copy of the code is not up-to-date.
 		// symbol table class needs to be better written
+		/***
 		symbolTable->CreateSymbols(code);
 		if (symbolTable->Lookup(pos, symbol)) {
 			std::vector<mvceditor::ResourceFinderClass*> finders = Iterator(resourceFinder);
@@ -214,6 +215,7 @@ UnicodeString mvceditor::ResourceUpdateClass::GetSymbolAt(const wxString& fileNa
 				symbolName = symbol.Lexeme;
 			}
 		}
+		*/
 	}
 	return symbolName;
 }
