@@ -324,7 +324,12 @@ void mvceditor::AppClass::OnProcessFailed(wxCommandEvent& event) {
 
 void mvceditor::AppClass::OnProjectReIndex(wxCommandEvent& event) {
 	wxASSERT(ResourcePlugin);
-	ResourcePlugin->StartIndex();
+
+	// only attempt to index when a valid project is opened
+	// otherwise user will get annoying messages.
+	if (Project && !Project->GetRootPath().IsEmpty()) {
+		ResourcePlugin->StartIndex();
+	}
 }
 
 const wxEventType mvceditor::EVENT_APP_OPEN_PROJECT = wxNewEventType();
