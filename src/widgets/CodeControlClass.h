@@ -326,9 +326,14 @@ private:
 	void SetSqlOptions();
 
 	/**
-		 * Set the CSS highlight options of the source control
-		 */
+	 * Set the CSS highlight options of the source control
+	 */
 	void SetCssOptions();
+
+	/**
+	 * Set the font settings for plain text documents.
+	 */
+	void SetPlainTextOptions();
 
 	/**
 	 * Determine the correct document Mode and sets it (causing a repaint)

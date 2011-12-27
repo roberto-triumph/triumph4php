@@ -576,6 +576,7 @@ void mvceditor::CodeControlClass::ApplyPreferences() {
 		std::vector<mvceditor::StylePreferenceClass> noStyles;
 		SetCodeControlOptions(noStyles);
 		Document = new mvceditor::TextDocumentClass();
+		SetPlainTextOptions();
 	}
 	Colourise(0, -1);
 }
@@ -713,6 +714,50 @@ void mvceditor::CodeControlClass::SetCssOptions() {
 		StyleSetBackground(style, pref.BackgroundColor);
 		StyleSetBold(style, pref.IsBold);
 		StyleSetItalic(style, pref.IsItalic);	
+	}
+}
+
+void mvceditor::CodeControlClass::SetPlainTextOptions() {
+	
+	SetLexer(wxSTC_LEX_NULL);
+	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
+	
+	SetMarginType(LINT_RESULT_MARGIN, wxSTC_MARGIN_SYMBOL);
+	SetMarginWidth(LINT_RESULT_MARGIN, 16);
+	SetMarginSensitive(LINT_RESULT_MARGIN, false);
+	SetMarginMask(LINT_RESULT_MARGIN, ~wxSTC_MASK_FOLDERS);
+	MarkerDefine(LINT_RESULT_MARKER, wxSTC_MARK_ARROW, *wxRED, *wxRED);
+	WordHighlightStyle = INDICATOR_PHP_STYLE;
+	
+	// syntax coloring; use the same font as PHP code for now
+	for (size_t i = 0; i < CodeControlOptions.PhpStyles.size(); ++i) {
+		mvceditor::StylePreferenceClass pref = CodeControlOptions.PhpStyles[i];
+		int style = pref.StcStyle;
+		if (wxSTC_HPHP_DEFAULT == style) {
+			
+			// use the PHP default settings as the catch-all for settings not yet exposed
+			// (Javascript) so the user sees a uniform style.
+			int styles[] = {
+				wxSTC_STYLE_DEFAULT,
+				wxSTC_HJ_START, wxSTC_HJ_DEFAULT, wxSTC_HJ_COMMENT,
+				wxSTC_HJ_COMMENTLINE, wxSTC_HJ_COMMENTDOC, wxSTC_HJ_NUMBER,
+				wxSTC_HJ_WORD, wxSTC_HJ_KEYWORD, wxSTC_HJ_DOUBLESTRING,
+				wxSTC_HJ_SINGLESTRING, wxSTC_HJ_SYMBOLS, wxSTC_HJ_STRINGEOL,
+				wxSTC_HJ_REGEX
+			};
+			for (int j = 0; j < 14; ++j) {
+				StyleSetFont(styles[j], pref.Font);
+				StyleSetForeground(styles[j], pref.Color);
+				StyleSetBackground(styles[j], pref.BackgroundColor);
+				StyleSetBold(styles[j], pref.IsBold);
+				StyleSetItalic(styles[j], pref.IsItalic);
+			}
+			StyleSetFont(style, pref.Font);
+			StyleSetForeground(style, pref.Color);
+			StyleSetBackground(style, pref.BackgroundColor);
+			StyleSetBold(style, pref.IsBold);
+			StyleSetItalic(style, pref.IsItalic);
+		}
 	}
 }
 
