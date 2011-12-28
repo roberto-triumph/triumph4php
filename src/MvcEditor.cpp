@@ -37,6 +37,7 @@
 #include <plugins/LintPluginClass.h>
 #include <plugins/SqlBrowserPluginClass.h>
 #include <plugins/EditorMessagesPluginClass.h>
+#include <plugins/CodeIgniterPluginClass.h>
 #include <MvcEditorErrors.h>
 
 static const int ID_FRAMEWORK_DETECT_PROCESS = wxNewId();
@@ -197,6 +198,8 @@ void mvceditor::AppClass::CreatePlugins() {
 	Plugins.push_back(plugin);
 	plugin = new mvceditor::EditorMessagesPluginClass();
 	Plugins.push_back(plugin);
+	plugin = new CodeIgniterPluginClass();
+	Plugins.push_back(plugin);
 
 	// test plugin need to find a quicker way to toggling it ON / OFF
 	//plugin = new TestPluginClass();
@@ -332,14 +335,22 @@ void mvceditor::AppClass::OnProjectReIndex(wxCommandEvent& event) {
 	}
 }
 
+void mvceditor::AppClass::OnOpenFile(wxCommandEvent& event) {
+	std::vector<wxString> filenames;
+	filenames.push_back(event.GetString());
+	AppFrame->FileOpen(filenames);
+}
+
 const wxEventType mvceditor::EVENT_APP_OPEN_PROJECT = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_SAVE_PREFERENCES = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_RE_INDEX = wxNewEventType();
+const wxEventType mvceditor::EVENT_APP_OPEN_FILE = wxNewEventType();
 
 BEGIN_EVENT_TABLE(mvceditor::AppClass, wxApp)
 	EVT_COMMAND(wxID_ANY, EVENT_APP_SAVE_PREFERENCES, mvceditor::AppClass::OnSavePreferences)	
 	EVT_COMMAND(wxID_ANY, EVENT_APP_OPEN_PROJECT, mvceditor::AppClass::OnProjectOpen)
 	EVT_COMMAND(wxID_ANY, EVENT_APP_RE_INDEX, mvceditor::AppClass::OnProjectReIndex)
+	EVT_COMMAND(wxID_ANY, EVENT_APP_OPEN_FILE, mvceditor::AppClass::OnOpenFile)
 	EVT_COMMAND(ID_FRAMEWORK_DETECT_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::AppClass::OnProcessComplete)
 	EVT_COMMAND(ID_DATABASE_DETECT_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::AppClass::OnProcessComplete)
 	EVT_COMMAND(ID_FRAMEWORK_DETECT_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::AppClass::OnProcessFailed)

@@ -61,6 +61,14 @@ extern const wxEventType EVENT_APP_SAVE_PREFERENCES;
  */
 extern const wxEventType EVENT_APP_RE_INDEX;
 
+/**
+ * Tell the app to open a new file.
+ * The command event should set the file to be opened with event.SetString()
+ * Note that the app will do NOTHING if the path is invalid; the plugin should
+ * make sure the path is valid.
+ */
+extern const wxEventType EVENT_APP_OPEN_FILE;
+
 class AppClass : public wxApp {
 
 public:
@@ -96,6 +104,12 @@ private:
 	 * method that will trigger the re-indexing of the current project.
 	 */
 	void OnProjectReIndex(wxCommandEvent& event);
+
+	/**
+	 * Opens the given file in a new Notebook tab. 
+	 * File's full path should be in event.GetString()
+	 */
+	void OnOpenFile(wxCommandEvent& event);
 
 	/**
 	 * Parses any command line arguments.  Returns false if arguments are invalid.

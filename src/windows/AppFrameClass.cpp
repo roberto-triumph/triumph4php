@@ -421,7 +421,15 @@ void mvceditor::AppFrameClass::LoadPlugin(mvceditor::PluginClass* plugin) {
 	if (oldToolsMenuCount != ToolsMenu->GetMenuItemCount() && oldToolsMenuCount > 0) {
 		ToolsMenu->InsertSeparator(oldToolsMenuCount);
 	}
-	plugin->AddNewMenu(GetMenuBar());
+	wxMenuBar* menuBar = GetMenuBar();
+	plugin->AddNewMenu(menuBar);
+
+	// new menus may have been added; push the Help menu all the way to the end
+	int helpIndex = menuBar->FindMenu(_("&Help"));
+	if (helpIndex != wxNOT_FOUND) {
+		menuBar->Remove(helpIndex);
+		menuBar->Insert(menuBar->GetMenuCount(), HelpMenu, _("&Help"));
+	}
 	
 	// move preferences menu to the end, similar to most other programs
 	wxMenuItem* preferencesMenu = EditMenu->Remove(ID_EDIT_PREFERENCES);

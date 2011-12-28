@@ -80,6 +80,10 @@ wxString mvceditor::ProjectClass::DetectDatabaseCommand(const wxString& framewor
 	return Ask(wxT("databaseInfo"), frameworkIdentifier);
 }
 
+wxString mvceditor::ProjectClass::DetectConfigFilesCommand(const wxString& frameworkIdentifier) {
+	return Ask(wxT("configFiles"), frameworkIdentifier);
+}
+
 std::vector<mvceditor::DatabaseInfoClass> mvceditor::ProjectClass::DatabaseInfo() const {
 	return Databases;
 }
@@ -194,6 +198,33 @@ bool mvceditor::ProjectClass::DetectDatabaseResponse(const wxString& resultStrin
 			result.Read(groupName + wxT("Port"), &info.Port);
 			Databases.push_back(info);
 			next = result.GetNextGroup(groupName, index);
+		}
+	}
+	return ret;
+}
+
+bool mvceditor::ProjectClass::DetectConfigFilesResponse(const wxString& resultString, mvceditor::ProjectClass::DetectError& error,
+														 std::map<wxString, wxString>& configFiles) {
+	bool ret = true;
+	wxString iniString = GetProcessOutput(resultString);
+
+	// only return false when result is non empty but has invalid content
+	if (!iniString.IsEmpty()) {
+		wxStringInputStream stream(iniString);
+		wxFileConfig result(stream);
+		
+		long index = 0;
+		wxString entryName;
+		bool hasNext = result.GetFirstEntry(entryName, index);
+		while (hasNext) {
+			wxString configFilePath;
+			ret = result.Read(entryName, &configFilePath);
+			if (!ret) {
+				error = mvceditor::ProjectClass::BAD_CONTENT;
+				break;
+			}
+			configFiles[entryName] = configFilePath;
+			hasNext = result.GetNextEntry(entryName, index);
 		}
 	}
 	return ret;
