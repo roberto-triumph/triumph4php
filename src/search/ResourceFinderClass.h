@@ -373,6 +373,8 @@ public:
 	void MethodFound(const UnicodeString& className, const UnicodeString& methodName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 		TokenClass::TokenIds visibility, bool isStatic);
+
+	void MethodEnd(const UnicodeString& className, const UnicodeString& methodName, int pos);
  
 	/**
 	 * Implement class member observer.  When a class property has been parsed, add it to the Resource Cache.
@@ -386,6 +388,8 @@ public:
 	 */
 	void FunctionFound(const UnicodeString& methodName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment);
+
+	void FunctionEnd(const UnicodeString& functionName, int pos);
 		
 	/**
 	 * Print the resource cache to stdout.  Useful for debugging only.

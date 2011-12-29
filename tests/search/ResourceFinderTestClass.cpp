@@ -171,7 +171,7 @@ TEST_FIXTURE(ResourceFinderTestClass, CollectNearMatchResourcesShouldFindFileWhe
 	mvceditor::ResourceClass resource = ResourceFinder->GetResourceMatch(0);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass"), resource.Resource);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), resource.ReturnType);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass"), resource.Signature);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("class UserClass"), resource.Signature);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** this is my class */"), resource.Comment);
 	CHECK_EQUAL(mvceditor::ResourceClass::CLASS, resource.Type);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass"), ResourceFinder->GetClassName());
@@ -256,7 +256,7 @@ TEST_FIXTURE(ResourceFinderTestClass, CollectNearMatchResourcesShouldFindFileWhe
 	mvceditor::ResourceClass resource = ResourceFinder->GetResourceMatch(0);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::getName"), resource.Resource);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("string"), resource.ReturnType);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("string getName()"), resource.Signature);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("string public function getName()"), resource.Signature);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** returns the name @return string */"), resource.Comment);
 	CHECK_EQUAL(mvceditor::ResourceClass::METHOD, resource.Type);
 	
@@ -476,7 +476,7 @@ TEST_FIXTURE(ResourceFinderTestClass, CollectNearMatchResourcesShouldFindFunctio
 	mvceditor::ResourceClass resource = ResourceFinder->GetResourceMatch(0);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("printUser"), resource.Resource);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("void"), resource.ReturnType);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("printUser($user)"), resource.Signature);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("function printUser($user)"), resource.Signature);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** print a user @return void */"), resource.Comment);
 	CHECK_EQUAL(mvceditor::ResourceClass::FUNCTION, resource.Type);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("printUser"), ResourceFinder->GetClassName());
@@ -516,7 +516,7 @@ TEST_FIXTURE(ResourceFinderTestClass, CollectNearMatchResourcesShouldFindMatches
 	CreateFixtureFile(testFile, wxString::FromAscii(
 		"<?php\n"
 		"class UserClass {\n"
-		"\t/** the user name @var string */n"
+		"\t/** the user name @var string */\n"
 		"\tprivate $name;"
 		"\tfunction getName() {\n"
 		"\t\treturn $this->name;\n"
@@ -524,24 +524,25 @@ TEST_FIXTURE(ResourceFinderTestClass, CollectNearMatchResourcesShouldFindMatches
 		"}\n"
 		"?>\n"
 	));	
-	CHECK(ResourceFinder->Prepare(wxT("UserClass::name")));
+	CHECK(ResourceFinder->Prepare(wxT("UserClass::$name")));
 	ResourceFinder->Walk(TestProjectDir + testFile);
 	CHECK(ResourceFinder->CollectNearMatchResources());
 	CHECK_EQUAL((size_t)1, ResourceFinder->GetResourceMatchCount());
 	mvceditor::ResourceClass resource = ResourceFinder->GetResourceMatch(0);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::name"), resource.Resource);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::$name"), resource.Resource);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("string"), resource.ReturnType);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::name"), resource.Signature);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::$name"), resource.Signature);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** the user name @var string */"), resource.Comment);
 	CHECK_EQUAL(mvceditor::ResourceClass::MEMBER, resource.Type);
 }
+
 
 TEST_FIXTURE(ResourceFinderTestClass, CollectNearMatchResourcesShouldFindMatchesForClassConstant) {
 	wxString testFile = wxT("test.php");
 	CreateFixtureFile(testFile, wxString::FromAscii(
 		"<?php\n"
 		"class UserClass {\n"
-		"\t/** the max constant @var int */n"
+		"\t/** the max constant @var int */\n"
 		"\tconst MAX = 1;\n"
 		"\tfunction getName() {\n"
 		"\t\treturn $this->name;\n"
@@ -669,7 +670,9 @@ TEST_FIXTURE(ResourceFinderTestClass, CollectNearMatchResourcesShouldFindMatches
 	CHECK(ResourceFinder->CollectNearMatchResources());
 	CHECK_EQUAL((size_t)2, ResourceFinder->GetResourceMatchCount());
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("array_key_exists"), ResourceFinder->GetResourceMatch(0).Resource);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("function array_key_exists($key, $search)"), ResourceFinder->GetResourceMatch(0).Signature);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("array_keys"), ResourceFinder->GetResourceMatch(1).Resource);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("function array_keys($input, $search_value, $strict)"), ResourceFinder->GetResourceMatch(1).Signature);
 }
 
 TEST_FIXTURE(ResourceFinderTestClass, CollectNearMatchResourcesShouldFindMatchesWhenUsingBuildResourceCacheForFile) {
@@ -785,12 +788,13 @@ TEST_FIXTURE(ResourceFinderTestClass, CollectNearMatchResourcesShouldCollectNear
 	ResourceFinder->Walk(TestProjectDir + testFile);
 	CHECK(ResourceFinder->CollectNearMatchResources());
 	CHECK_EQUAL((size_t)6, ResourceFinder->GetResourceMatchCount());
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::address"), ResourceFinder->GetResourceMatch(0).Resource);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::clearName"), ResourceFinder->GetResourceMatch(1).Resource);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("AdminClass::deleteUser"), ResourceFinder->GetResourceMatch(2).Resource);	
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("SuperUserClass::disableUser"), ResourceFinder->GetResourceMatch(3).Resource);	
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::getName"), ResourceFinder->GetResourceMatch(4).Resource);	
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::name"), ResourceFinder->GetResourceMatch(5).Resource);		
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::$address"), ResourceFinder->GetResourceMatch(0).Resource);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::$name"), ResourceFinder->GetResourceMatch(1).Resource);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::clearName"), ResourceFinder->GetResourceMatch(2).Resource);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("AdminClass::deleteUser"), ResourceFinder->GetResourceMatch(3).Resource);	
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("SuperUserClass::disableUser"), ResourceFinder->GetResourceMatch(4).Resource);	
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::getName"), ResourceFinder->GetResourceMatch(5).Resource);	
+	
 }
 
 TEST_FIXTURE(ResourceFinderTestClass, CollectNearMatchResourcesShouldCollectAllMethodsWhenClassIsNotGiven) {
@@ -1046,7 +1050,7 @@ TEST_FIXTURE(ResourceFinderTestClass, GetResourceMatchShouldReturnSignatureForCo
 	ResourceFinder->Walk(TestProjectDir + testFile);
 	CHECK(ResourceFinder->CollectFullyQualifiedResource());
 	mvceditor::ResourceClass resource = ResourceFinder->GetResourceMatch(0);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass($name)"), resource.Signature);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("public function UserClass($name)"), resource.Signature);
 }
 
 TEST_FIXTURE(ResourceFinderTestClass, GetResourceMatchShouldReturnSignatureForInheritedMethods) {
@@ -1074,7 +1078,7 @@ TEST_FIXTURE(ResourceFinderTestClass, GetResourceMatchShouldReturnSignatureForIn
 	CHECK(ResourceFinder->CollectNearMatchResources());
 	mvceditor::ResourceClass resource = ResourceFinder->GetResourceMatch(0);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::getName"), resource.Resource);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("getName()"), resource.Signature);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("public function getName()"), resource.Signature);
 }
 
 TEST_FIXTURE(ResourceFinderTestClass, GetResourceSignatureShouldReturnSignatureForClassesMethodsAndFunctions) {
@@ -1100,10 +1104,10 @@ TEST_FIXTURE(ResourceFinderTestClass, GetResourceSignatureShouldReturnSignatureF
 	CHECK(ResourceFinder->Prepare(wxT("userClas")));
 	ResourceFinder->Walk(TestProjectDir + testFile);
 	UnicodeString comment;
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("getName()"), 
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("public function getName()"), 
 		ResourceFinder->GetResourceSignature(UNICODE_STRING_SIMPLE("UserClass::getName"), comment));
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/**\n\tGets the user's name\n*/"), comment);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("userClassPrint($user)"), 
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("function userClassPrint($user)"), 
 		ResourceFinder->GetResourceSignature(UNICODE_STRING_SIMPLE("userClassPrint"), comment));
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/**\nPrint the user's name to the STDOUT\n*/"), comment);
 }
@@ -1192,9 +1196,9 @@ TEST_FIXTURE(ResourceFinderTestClass, GetResourceMatchPositionShouldReturnValidP
 	CHECK_EQUAL(17, length);
 	
 	// checking properties
-	CHECK(ResourceFinder->Prepare(wxT("UserClass::name")));
+	CHECK(ResourceFinder->Prepare(wxT("UserClass::$name")));
 	ResourceFinder->CollectNearMatchResources();
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::name"), ResourceFinder->GetResourceMatch(0).Resource);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::$name"), ResourceFinder->GetResourceMatch(0).Resource);
 	CHECK(ResourceFinder->GetResourceMatchPosition(0, icuCode, pos, length));
 	CHECK_EQUAL(code.find(wxT("private $name")), (size_t)pos);
 	CHECK_EQUAL(14, length);

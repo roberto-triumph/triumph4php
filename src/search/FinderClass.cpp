@@ -203,7 +203,7 @@ int mvceditor::FinderClass::ReplaceAllMatches(UnicodeString& text) const {
 	return matches;
 }
 
-void mvceditor::FinderClass::EscapeRegEx(UnicodeString& regEx) const {
+void mvceditor::FinderClass::EscapeRegEx(UnicodeString& regEx) {
 	UnicodeString symbols = UNICODE_STRING_SIMPLE("!@#$%^&*()[]{}\\-+?.,\"|");
 	
 	// there's got to be a batter way of escaping all regex symbols

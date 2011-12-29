@@ -253,6 +253,11 @@ void mvceditor::OutlineViewPluginClass::MethodFound(const UnicodeString& classNa
 		.append(mvceditor::StringHelperClass::wxToIcu(method));
 	CurrentOutlineLines.push_back(line);
 }
+
+void mvceditor::OutlineViewPluginClass::MethodEnd(const UnicodeString& className, const UnicodeString& methodName, int pos) {
+	
+	// do nothing for now
+}
 		
 void mvceditor::OutlineViewPluginClass::PropertyFound(const UnicodeString& className, const UnicodeString& propertyName, 
 		const UnicodeString& propertyType, const UnicodeString& comment, 
@@ -270,6 +275,10 @@ void mvceditor::OutlineViewPluginClass::PropertyFound(const UnicodeString& class
 void mvceditor::OutlineViewPluginClass::FunctionFound(const UnicodeString& functionName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment) {
 	CurrentOutlineLines.push_back(signature);
+}
+
+void mvceditor::OutlineViewPluginClass::FunctionEnd(const UnicodeString& functionName, int pos) {
+	// do nothing for now
 }
 
 mvceditor::OutlineViewPluginPanelClass::OutlineViewPluginPanelClass(wxWindow* parent, int windowId, OutlineViewPluginClass* plugin, 

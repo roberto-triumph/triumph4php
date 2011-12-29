@@ -154,7 +154,15 @@ public:
 	/**
 	 * reset the last position & length to signal not found.
 	 */
-	void ResetLastHit();	
+	void ResetLastHit();
+
+	/**
+	 * replace all regular expression symbols so that they are treated as normal
+	 * characters
+	 * 
+	 * @param UnicodeString& regEx the string to modify
+	 */
+	static void EscapeRegEx(UnicodeString& regEx);
 
 	/**
 	 * The string to search for. If Expression is modified, Prepare() method MUST be called in order to
@@ -242,14 +250,6 @@ private:
 	 * Compiles the internal regular expression object from the Expression
 	 */
 	void PrepareForRegularExpressionMode();	
-	
-	/**
-	 * replace all regular expression symbols so that they are treated as normal
-	 * characters
-	 * 
-	 * @param UnicodeString& regEx the string to modify
-	 */
-	void EscapeRegEx(UnicodeString& regEx) const;
 	
 	/**
 	 * Finds the next instance of this expression in the given text using exact matching.
