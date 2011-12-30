@@ -83,6 +83,7 @@ bool mvceditor::AppClass::OnInit() {
 	for (size_t i = 0; i < Plugins.size(); ++i) {
 		Plugins[i]->InitState(&Environment, this);
 		Plugins[i]->LoadPreferences(config);
+		Plugins[i]->AddKeyboardShortcuts(Preferences->DefaultKeyboardShortcutCmds);
 	}	
 	Preferences->Load(AppFrame);
 
@@ -246,7 +247,7 @@ void mvceditor::AppClass::ProjectOpen(const wxString& directoryPath) {
 }
 
 void mvceditor::AppClass::OnSavePreferences(wxCommandEvent& event) {
-	Preferences->LoadKeyboardShortcuts(AppFrame);
+	Preferences->EnableSelectedProfile(AppFrame);
 	wxConfigBase* config = wxConfigBase::Get();
 	for (size_t i = 0; i < Plugins.size(); ++i) {
 		Plugins[i]->SavePreferences(config);

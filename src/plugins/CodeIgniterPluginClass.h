@@ -52,6 +52,11 @@ public:
 	 * and will populate the code igniter menu with the config file names.
 	 */
 	virtual void OnProjectOpened();
+
+	/**
+	 * Add shortcuts to the config files.
+	 */
+	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 	
 private:	
 

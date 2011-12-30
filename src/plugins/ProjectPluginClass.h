@@ -88,6 +88,8 @@ public:
 	 */
 	void SavePreferences(wxConfigBase* config);
 
+	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
+
 	void OnProjectOpened();
 
 private:

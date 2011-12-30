@@ -124,6 +124,8 @@ public:
 	void AddToolBarItems(wxAuiToolBar* toolBar);
 	
 	void AddWindows();
+
+	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 	
 	void OnProjectOpened();
 	

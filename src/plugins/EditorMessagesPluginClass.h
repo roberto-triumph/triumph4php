@@ -72,6 +72,9 @@ public:
 	 */
 	void AddMessage(wxLogLevel level, const wxChar *msg, time_t timestamp);
 
+	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
+
+
 private:
 
 	/**

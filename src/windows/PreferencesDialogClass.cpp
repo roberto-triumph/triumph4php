@@ -30,7 +30,7 @@
 #include <wx/stdpaths.h>
 #include <wx/wfstream.h>
 
-mvceditor::PreferencesDialogClass::PreferencesDialogClass(wxWindow* parent, mvceditor::PreferencesClass& preferences, wxMenuBar* menuBar)
+mvceditor::PreferencesDialogClass::PreferencesDialogClass(wxWindow* parent, mvceditor::PreferencesClass& preferences)
 		: wxPropertySheetDialog(parent, wxID_ANY, _("Preferences"))
 		, Preferences(preferences) {
 	CreateButtons(wxOK | wxCANCEL);
@@ -43,8 +43,9 @@ mvceditor::PreferencesDialogClass::PreferencesDialogClass(wxWindow* parent, mvce
 	notebook->AddPage(new EditColorsPanelClass(notebook, Preferences.CodeControlOptions), _("Styles && Colors"));
 	KeyConfigPanel =  new wxKeyConfigPanel(notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, 
 		wxKEYBINDER_USE_TREECTRL | wxKEYBINDER_SHOW_ADDREMOVE_PROFILE | wxKEYBINDER_ENABLE_PROFILE_EDITING);
+
 	KeyConfigPanel->AddProfiles(Preferences.KeyProfiles);
-	KeyConfigPanel->ImportMenuBarCmd(menuBar, _("MVC Editor"));
+	KeyConfigPanel->ImportKeyProfileCmd(*Preferences.KeyProfiles.GetSelProfile(), _("MVC Editor"));
 	notebook->AddPage(KeyConfigPanel, _("Keyboard Shortcuts"));
 }
 

@@ -160,3 +160,9 @@ void mvceditor::EnvironmentPluginClass::OnMenuEnvironment(wxCommandEvent& event)
 		environment->SaveToConfig();
 	}
 }
+
+void mvceditor::EnvironmentPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+	std::map<int, wxString> menuItemIds;
+	menuItemIds[mvceditor::MENU_ENVIRONMENT] = wxT("Environment-Environment");
+	AddDynamicCmd(menuItemIds, shortcuts);
+}

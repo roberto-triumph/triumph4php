@@ -30,92 +30,97 @@
 #include <wx/stdpaths.h>
 #include <wx/wfstream.h>
 #include <wx/frame.h>
-
+#include <wx/tokenzr.h>
 #include <wx/wx.h>
 
-// this function was ripped off from wxMenuCmd::CreateNew() but this function
-// gracefully handles non-existant menus
-static wxCmd* CreateNewMenuCmd(wxMenuBar* menuBar, int id) {
+/* this function gracefully handles non-existant menus (bindings that are stored in the config but are no longer
+ * commands in the app).  This would happen, for example, when functionality is removed.
+ (
+ * @param dynamicCmds the commands to modify.  This vector should not be empty; it should contain the default bindings
+ *        after this function is called, the bindings will have been updated based on the config file. This function
+ *        will only update the bindings, it wont add new commands.
+ * @param config the stored config settings
+ * @param configKey the name of the config group to load.
+ */
 
-	// search the menuitem which is tied to the given ID
-	wxMenuItem* item = menuBar->FindItem(id);
-	return item ? new wxMenuCmd(item) : NULL;
-}
 
-// this function was ripped off from wxKeyBinder::Load() but this function
-// gracefully handles non-existant menus
-static int LoadKeyProfileShortcuts(wxMenuBar* menuBar, wxKeyProfile& profile, wxConfigBase* config, const wxString& configKey) {
-    wxString str;
-    bool cont;
-    int total = 0;
-    long idx;
+static int LoadKeyProfileBindings(std::vector<mvceditor::DynamicCmdClass>& dynamicCmds, wxConfigBase* config, const wxString& configKey) {
+	int total = 0;
+	config->SetPath(configKey);
+	wxString configName;
+	long configIterator;
 
-    // before starting...
-    config->SetPath(configKey);
-    profile.Reset();
-
-    cont = config->GetFirstEntry(str, idx);
-    while (cont) {
-
-        // try to decode this entry
-        if (str.StartsWith(wxCMD_CONFIG_PREFIX)) {
-
-            wxString id(str.BeforeFirst(wxT('-')));
-            wxString type(str.AfterFirst(wxT('-')));
-            id = id.Right(id.Len()-wxString(wxCMD_CONFIG_PREFIX).Len());
-            type = type.Right(type.Len()-wxString(wxT("type")).Len());
-
-            // is this a valid entry ?
-            if (id.IsNumber() && type.IsNumber() &&
-                config->GetEntryType(str) == wxConfigBase::Type_String) {
-
-                // we will interpret this group as a command ID
-                int nid = wxAtoi(id);
-                int ntype = wxAtoi(type);
-
-                // create & load this command
-                wxCmd *cmd = CreateNewMenuCmd(menuBar, nid);
-				if (cmd && cmd->Load(config, str)) {
-					profile.AddCmd(cmd);      // add to the array
-					total++;
+	// shortcuts will be stored with a prefix of "shortcut-XXX"
+	// where XXX is the command identifer, which should be unique.
+	// loop through all stored shortcuts, remove the prefix, 
+	// then update the binding by locating the command in the dynamicCmds
+	// [by looping through the already created commands]
+	//
+	// Example: config file will look like this
+	// 
+	//  ... other top-level confg items ...
+	//  ProfileSelected = 1
+	//  [keyprof_0]
+	//  ProfileName = "MVC Editor shortcuts"
+	//  ProfileDescription = "MVC Editor shortcuts"
+	//  Shortcut-File-Open = "CTRL+O"
+	//  Shortcut-File-New = "CTRL+N"
+	//  ... other commands ...
+	//  [keyprof_1]
+	//  ProfileName = "MVC Editor shortcuts"
+	//  ProfileDescription = "MVC Editor shortcuts"
+	//  Shortcut-File-Open = "CTRL+ALT+O"
+	//  Shortcut-File-New = "CTRL+SHIFT+N"
+	//  ... other commands ...
+	//
+	// A shortcut can have multiple bindings; separated by '|'
+	//  Shortcut-File-New = "CTRL+SHIFT+N|CTRL+ALT_N"
+	//
+	bool next = config->GetFirstEntry(configName, configIterator);
+    while (next) {
+        if (configName.StartsWith(wxT("Shortcut-"))) {
+			wxString shortcutIdentifier = configName.Mid(9); // 9 = length of prefix
+			for (size_t i = 0; i < dynamicCmds.size(); ++i) {
+				if (shortcutIdentifier == dynamicCmds[i].GetIdentifier()) {
+					wxString value = config->Read(configName);
+					if (!value.IsEmpty()) {
+						dynamicCmds[i].ClearShortcuts();
+						wxStringTokenizer tok(value, wxT("|"));
+						while (tok.HasMoreTokens()) {
+							dynamicCmds[i].AddShortcut(tok.GetNextToken());
+						}
+						total++;
+					}
+					break;
 				}
-				else if (!cmd) {
-					
-					// menu no longer exists
-					// the normal keybinder code would just error out here but we 
-					// dont want to 
-					mvceditor::EditorLogWarning(mvceditor::MISSING_KEYBOARD_SHORTCUT, str);
-				}
-				else {
+			}
 
-					// could not load from config ... continue on to next shortcut
-					// the normal keybinder code would just error out here but we 
-					// dont want to 
-					mvceditor::EditorLogWarning(mvceditor::CORRUPT_KEYBOARD_SHORTCUT, str);
-				}
-            }
         }
-
-        // proceed with next entry (if it does exist)
-        cont &= config->GetNextEntry(str, idx);
+        next = config->GetNextEntry(configName, configIterator);
     }
-
     return total;
 }
 
-// this function was ripped off from wxKeyProfile::Load() but this function
-// gracefully handles non-existant menus
-static bool LoadKeyProfile(wxMenuBar* menuBar, wxKeyProfile& profile, wxConfigBase* config, const wxString& configKey) {
+/* this function was ripped off from wxKeyProfile::Load() but this function
+ * gracefully handles non-existant menus
+ * @param dynamicCmds the commands to modify.  This vector should not be empty; it should contain the default bindings
+ *        after this function is called, the bindings will have been updated based on the config file. This function
+ *        will only update the bindings, it wont add new commands. *        
+ * @param profile will update the profile name and description only. The bindings will be handled by the vector dynamicCmds
+ * @param config the stored config settings
+ * @param configKey the name of the config group to load.
+ */
+static bool LoadKeyProfile(std::vector<mvceditor::DynamicCmdClass>& dynamicCmds, wxKeyProfile& profile, wxConfigBase* config, const wxString& configKey) {
 	bool ret = false;
 	config->SetPath(configKey);        // enter into this group
     wxString name;
     wxString desc;
 
     // do we have valid DESC & NAME entries ?
-    if (config->HasEntry(wxT("desc")) && config->HasEntry(wxT("name"))) {
-        if (!config->Read(wxT("desc"), &desc))
+    if (config->HasEntry(wxT("ProfileDescription")) && config->HasEntry(wxT("ProfileName"))) {
+        if (!config->Read(wxT("ProfileDescription"), &desc))
             return FALSE;
-        if (!config->Read(wxT("name"), &name))
+        if (!config->Read(wxT("ProfileName"), &name))
             return FALSE;
 
         // check for valid name & desc
@@ -126,50 +131,161 @@ static bool LoadKeyProfile(wxMenuBar* menuBar, wxKeyProfile& profile, wxConfigBa
         profile.SetDesc(desc);
 
         // load from current path (we cannot use '.')
-        ret = LoadKeyProfileShortcuts(menuBar, profile, config, wxT("../") + configKey) > 0;
+        ret = LoadKeyProfileBindings(dynamicCmds, config, wxT("../") + configKey) > 0;
 	}
 	return ret;
 }
 
-static bool LoadKeyProfileArray(wxMenuBar* menuBar, wxKeyProfileArray& profiles, wxConfigBase* config, const wxString& configKey) {
-    wxKeyProfile tmp;
-    wxString str;
-    bool cont;
-    long idx;
-
-    // before starting...
+static bool LoadKeyProfileArray(std::vector<mvceditor::DynamicCmdClass>& defaultShortcuts, wxKeyProfileArray& profiles, wxConfigBase* config, const wxString& configKey) {
     config->SetPath(configKey);
-	int selected = 0;
-    if (!config->Read(wxT("nSelProfile"), &selected))
-        return FALSE;
-	
-    cont = config->GetFirstGroup(str, idx);
-    while (cont) {
+	int profileSelected = 0;
 
-        // try to decode this group name
-        if (str.StartsWith(wxKEYPROFILE_CONFIG_PREFIX)) {
+	// status will hold FALSE when there is a problem reading the config
+    bool status = config->Read(wxT("ProfileSelected"), &profileSelected, 0);
+	long configIterator;
+	wxString configName;
 
-            // is this a valid entry ?
-			if (LoadKeyProfile(menuBar, tmp, config, str)) {
-				profiles.Add(new wxKeyProfile(tmp));     // yes, it is; add it to the array
+	// multiple shorcut profiles can be found in the config. Each saved profile is 
+	// stored with a prefix
+    bool next = config->GetFirstGroup(configName, configIterator);
+    while (next) {
+        if (configName.StartsWith(wxKEYPROFILE_CONFIG_PREFIX)) {
+
+			// wxKeyProfileArray will cleanup this pointer in wxKeyProfileArray::Cleanup()
+			wxKeyProfile* profile = new wxKeyProfile();
+			std::vector<mvceditor::DynamicCmdClass> cmds(defaultShortcuts);
+			status = LoadKeyProfile(cmds, *profile, config, configName);
+			if (status) {
+				for (size_t i = 0; i < cmds.size(); ++i) {
+					profile->AddCmd(cmds[i].CloneCommand());
+				}
+				profiles.Add(profile);
+			}
+			else {
+				delete profile;
+				break;
 			}
         }
 
         // set the path again (it could have been changed...)
         config->SetPath(configKey);
-
-        // proceed with next entry (if it does exist)
-        cont &= config->GetNextGroup(str, idx);
-    }
-	if (selected < profiles.GetCount()) {
-		profiles.SetSelProfile(selected);
+        next = config->GetNextGroup(configName, configIterator);
+	}
+	if (profileSelected < profiles.GetCount()) {
+		profiles.SetSelProfile(profileSelected);
 	}
 	else if (!profiles.IsEmpty()) {
 		profiles.SetSelProfile(0);
 	}
-    return TRUE;
+	else if (profiles.IsEmpty()) {
+
+		// no profiles were stored; use the defaults
+		wxKeyProfile* profile = new wxKeyProfile(wxT("MVC Editor keyboard shortcuts"), wxT("MVC Editor keyboard shortcuts"));
+		for (size_t i = 0; i < defaultShortcuts.size(); ++i) {
+			profile->AddCmd(defaultShortcuts[i].CloneCommand());
+		}
+		profiles.Add(profile);
+		profiles.SetSelProfile(0);
+	}
+    return status;
 }
 
+/*
+ * @param defaultShortcuts when saving commands, we will use the Identifier of the command and NOT the ID, since ID
+ *        can change between application runs
+ * @param profiles contains the actual bindings.  Since we use the default wxKeyConfigPanel; when the user updates shortcuts 
+ *        wxKeyProfileArray is actually the data stucture that is modified
+ * @param config the shortcuts will be stored to the given config
+ * @param configKey the shortcuts will be stored to the given config group
+ */
+static bool SaveKeyProfileArray(std::vector<mvceditor::DynamicCmdClass>& defaultShortcuts, wxKeyProfileArray& profiles, wxConfigBase* config, const wxString& configKey) {
+
+	// Example config file will look like this
+	// 
+	//  ... other top-level confg items ...
+	//  ProfileSelected = 1
+	//  [keyprof_0]
+	//  ProfileName = "MVC Editor shortcuts"
+	//  ProfileDescription = "MVC Editor shortcuts"
+	//  Shortcut-File-Open = "CTRL+O"
+	//  Shortcut-File-New = "CTRL+N"
+	//  ... other commands ...
+	//  [keyprof_1]
+	//  ProfileName = "MVC Editor shortcuts"
+	//  ProfileDescription = "MVC Editor shortcuts"
+	//  Shortcut-File-Open = "CTRL+ALT+O"
+	//  Shortcut-File-New = "CTRL+SHIFT+N"
+	//  ... other commands ...
+	//
+	// A shortcut can have multiple bindings; separated by '|'
+	//  Shortcut-File-New = "CTRL+SHIFT+N|CTRL+ALT_N"
+	//
+	config->SetPath(configKey);
+	bool success = false;
+	success = config->Write(wxT("ProfileSelected"), profiles.GetSelProfileIdx());
+	for (int i = 0; i < profiles.GetCount() && success; i++) {
+		const wxKeyProfile* profile = profiles.Item(i);
+		wxString groupName = wxKEYPROFILE_CONFIG_PREFIX + wxString::Format(wxT("%d"), i);
+		config->SetPath(groupName);
+		success = config->Write(wxT("ProfileName"), profile->GetName())
+			&& config->Write(wxT("ProfileDescription"), profile->GetDesc());
+
+		// this loop writes all of the shortcuts for a single profile to the configs
+		// use the defaultShortcuts to get the unique identifier, but the actual bindings
+		// are stored in the wxKeyProfile
+		for (size_t j = 0; j < defaultShortcuts.size() && success; j++) {
+			wxArrayString shortcutList = profile->GetShortcutsList(defaultShortcuts[j].GetId());
+			wxString shortcutConfigValue;
+			for (size_t k = 0; k < shortcutList.Count(); k++) {
+				shortcutConfigValue += shortcutList[k];
+				if (k < (shortcutList.Count() - 1)) {
+					shortcutConfigValue += wxT("|");
+				}
+			}
+			wxString shortcutConfigKey = wxT("Shortcut-") + defaultShortcuts[j].GetIdentifier();
+			success = config->Write(shortcutConfigKey, shortcutConfigValue);
+		}
+
+		// so that on the next iteration the next profile will be a sibling
+		config->SetPath(wxT("../"));
+	}
+	return success;
+}
+
+mvceditor::DynamicCmdClass::DynamicCmdClass(wxMenuItem* item, const wxString& identifier)
+	: MenuCmd(item, identifier, item->GetHelp())
+	, Identifier(identifier) {
+
+	// check for the default shortcuts
+	wxAcceleratorEntry *acc = item->GetAccel();
+	if (acc) {
+
+		// this menuitem has an associated accelerator... add an entry
+		// to the array of bindings for the relative command...
+		MenuCmd.AddShortcut(acc->GetFlags(), acc->GetKeyCode());
+		delete acc;
+	}
+}
+
+void mvceditor::DynamicCmdClass::AddShortcut(const wxString& key) {
+	MenuCmd.AddShortcut(key);
+}
+
+wxCmd* mvceditor::DynamicCmdClass::CloneCommand() const {
+	return MenuCmd.Clone();
+}
+
+void mvceditor::DynamicCmdClass::ClearShortcuts() {
+	MenuCmd.RemoveAllShortcuts();
+}
+
+int mvceditor::DynamicCmdClass::GetId() const {
+	return MenuCmd.GetId();
+}
+
+wxString mvceditor::DynamicCmdClass::GetIdentifier() const {
+	return Identifier;
+}
 
 mvceditor::PreferencesClass::PreferencesClass()
 	: CodeControlOptions()
@@ -188,44 +304,23 @@ void mvceditor::PreferencesClass::Load(wxFrame* frame) {
 	KeyProfiles.Cleanup();
 	wxConfigBase* config = wxConfigBase::Get();
 	CodeControlOptions.Load(config);
-	wxMenuBar* menuBar = frame->GetMenuBar();
-	
-	// before loading we must register in wxCmd arrays the various types
-	// of commands we want wxCmd::Load to be able to recognize...	
-	wxMenuCmd::Register(menuBar);
 	int totalCmdCount = 0;
 
 	// call out own key profile load function
 	// out function will gracefully handle deleted menus ; the normal keybinder code
 	// throws asserts
-	LoadKeyProfileArray(menuBar, KeyProfiles, config, wxT(""));
+	wxMenuCmd::Register(frame->GetMenuBar());
+	LoadKeyProfileArray(DefaultKeyboardShortcutCmds, KeyProfiles, config, wxT(""));
 	for (int i = 0; i < KeyProfiles.GetCount(); ++i) {
 		totalCmdCount += KeyProfiles.Item(i)->GetCmdCount();
 	}
 	
 	// keybinder sets the config path, must reset it back to normal
 	config->SetPath(wxT("/"));
-
-	if (0 == totalCmdCount) {
-		wxKeyProfile* profile = new wxKeyProfile(wxT("MVC Editor keyboard shortcuts"), wxT("MVC Editor keyboard shortcuts"));
-		profile->ImportMenuBarCmd(menuBar);
-		KeyProfiles.Add(profile);
-		KeyProfiles.SetSelProfile(0);
-	}
-	LoadKeyboardShortcuts(frame);
+	EnableSelectedProfile(frame);
 }
 
-void mvceditor::PreferencesClass::Save() {
-	wxConfigBase* config = wxConfigBase::Get();
-	CodeControlOptions.Save(config);
-	KeyProfiles.Save(config, wxT(""), true);
-	
-	// keybinder sets the config path, must reset it back to normal
-	config->SetPath(wxT("/"));
-	config->Flush();
-}
-
-void mvceditor::PreferencesClass::LoadKeyboardShortcuts(wxWindow* window) {
+void mvceditor::PreferencesClass::EnableSelectedProfile(wxWindow* window) {
 	KeyProfiles.DetachAll();
 	KeyProfiles.GetSelProfile()->Enable(true);
 
@@ -234,6 +329,16 @@ void mvceditor::PreferencesClass::LoadKeyboardShortcuts(wxWindow* window) {
 	// is deleted the profile would have a dangling pointer.
 	// however this means that the given window must be the frame
 	KeyProfiles.GetSelProfile()->Attach(window);
+}
+
+void mvceditor::PreferencesClass::Save() {
+	wxConfigBase* config = wxConfigBase::Get();
+	CodeControlOptions.Save(config);
+	SaveKeyProfileArray(DefaultKeyboardShortcutCmds, KeyProfiles, config, wxT(""));
+	
+	// keybinder sets the config path, must reset it back to normal
+	config->SetPath(wxT("/"));
+	config->Flush();
 }
 
 void mvceditor::PreferencesClass::InitConfig() {

@@ -68,6 +68,8 @@ public:
 	 * This plugin will have a tools menu entry
 	 */
 	void AddToolsMenuItems(wxMenu* editMenu);
+
+	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 	
 	/**
 	 * This plugin will add menui items to the context menu

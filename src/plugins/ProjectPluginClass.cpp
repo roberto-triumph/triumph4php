@@ -75,6 +75,13 @@ void mvceditor::ProjectPluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
 	projectMenu->Append(mvceditor::MENU_PROJECT + 2, _("Recent Projects"), RecentProjectsMenu, _("Open An explorer window in the Project Root"));
 }
 
+void mvceditor::ProjectPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+	std::map<int, wxString> menuItemIds;
+	menuItemIds[mvceditor::MENU_PROJECT + 0] = wxT("Project-Explore");
+	menuItemIds[mvceditor::MENU_PROJECT + 1] = wxT("Project-Explore-File");
+	AddDynamicCmd(menuItemIds, shortcuts);
+}
+
 void mvceditor::ProjectPluginClass::AddToolBarItems(wxAuiToolBar* toolbar) {
 	wxBitmap bitmap = wxArtProvider::GetBitmap(wxART_FOLDER_OPEN, wxART_TOOLBAR, wxSize(16, 16));
 	toolbar->AddTool(ID_TOOLBAR_PROJECT_EXPLORE, _("Explore"), bitmap, _("Open An explorer window in the Project Root"));

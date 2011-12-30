@@ -41,7 +41,7 @@ class PreferencesDialogClass : public wxPropertySheetDialog {
 	
 public:
 	/** Constructor */
-	PreferencesDialogClass(wxWindow* parent, PreferencesClass& preferences, wxMenuBar* menuBar);
+	PreferencesDialogClass(wxWindow* parent, PreferencesClass& preferences);
 	
 	/**
 	 * Call this after all property sheets have been added but before they are shown. This method

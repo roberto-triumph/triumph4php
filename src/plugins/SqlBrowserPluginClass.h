@@ -375,7 +375,9 @@ public:
 	/**
 	 * This plugin will have menu to create ad-hoc queries
 	 */
-	virtual void AddToolsMenuItems(wxMenu* toolsMenu);
+	void AddToolsMenuItems(wxMenu* toolsMenu);
+
+	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 	
 	SqlBrowserPanelClass* CreateResultsPanel(CodeControlClass* ctrl);
 	

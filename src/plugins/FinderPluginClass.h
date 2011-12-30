@@ -328,7 +328,9 @@ public:
 	 * 
 	 * @param wxMenu* menu the tools menu to add items to.
 	 */
-	virtual void AddEditMenuItems(wxMenu* editMenu);
+	void AddEditMenuItems(wxMenu* editMenu);
+
+	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 
 private:
 

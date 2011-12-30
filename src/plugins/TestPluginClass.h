@@ -41,27 +41,27 @@ public:
 	/**
 	 * This plugin will have no Edit menu items
 	 */
-	virtual void AddEditMenuItems(wxMenu* editMenu);
+	void AddEditMenuItems(wxMenu* editMenu);
 	
 	/**
 	 * This plugin will have no project menu items
 	 */
-	virtual void AddProjectMenuItems(wxMenu* projectMenu);
+	void AddProjectMenuItems(wxMenu* projectMenu);
 
 	/**
 	 * This plugin will have one toolbar button, when clicked the Go() method will get called
 	 */
-	virtual void AddToolBarItems(wxAuiToolBar* toolBar);
+	void AddToolBarItems(wxAuiToolBar* toolBar);
 	
 	/**
 	 * This plugin will have no extra windows.
 	 */
-	virtual void AddWindows();
+	void AddWindows();
 	
 	/**
 	 * This plugin will have no context menu items
 	 */
-	virtual void AddCodeControlClassContextMenuItems(wxMenu* menu);
+	void AddCodeControlClassContextMenuItems(wxMenu* menu);
 	
 private:	
 

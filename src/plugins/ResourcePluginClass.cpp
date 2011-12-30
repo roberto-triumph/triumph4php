@@ -102,6 +102,13 @@ void mvceditor::ResourcePluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
 	ProjectIndexMenu->Enable(GetProject() && FREE == State);
 }
 
+void mvceditor::ResourcePluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+	std::map<int, wxString> menuItemIds;
+	menuItemIds[mvceditor::MENU_RESOURCE + 0] = wxT("Resource-Index");
+	menuItemIds[mvceditor::MENU_RESOURCE + 1] = wxT("Resource-Jump-To");
+	AddDynamicCmd(menuItemIds, shortcuts);
+}
+
 void mvceditor::ResourcePluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 	toolBar->AddTool(ID_TOOLBAR_INDEX, wxT("Index"), wxArtProvider::GetBitmap(
 		wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), wxT("Index"), wxITEM_NORMAL);

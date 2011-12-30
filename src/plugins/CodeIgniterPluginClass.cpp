@@ -41,7 +41,9 @@ mvceditor::CodeIgniterPluginClass::CodeIgniterPluginClass()
 
 void mvceditor::CodeIgniterPluginClass::AddNewMenu(wxMenuBar *menuBar) {
 	CodeIgniterMenu = new wxMenu;
-	menuBar->Append(CodeIgniterMenu, _("Code Igniter"));
+
+	// don't insert it just yet ... we only want to add it to the menu bar
+	// for the projects that use Code Igniter
 }
 
 void mvceditor::CodeIgniterPluginClass::OnProjectOpened() {
@@ -75,21 +77,18 @@ void mvceditor::CodeIgniterPluginClass::OnProcessFailed(wxCommandEvent& event) {
 
 void mvceditor::CodeIgniterPluginClass::UpdateMenu() {
 	wxMenuItemList list = CodeIgniterMenu->GetMenuItems();
-	wxMenuItemList::iterator itMenu;
-	for (itMenu = list.begin(); itMenu != list.end(); ++itMenu) {
-		wxMenuItem* item = *itMenu;
-		CodeIgniterMenu->Delete(item);
+	if (CodeIgniterMenu->GetMenuItemCount() == 0) {
+		std::map<wxString, wxString>::const_iterator it = ConfigFiles.begin();
+		for (size_t i = 0; it != ConfigFiles.end(); ++it) {
+			wxString fullPath = it->second;
+			wxString label = it->first;
+			label.Replace(wxT("_"), wxT(" "));
+			CodeIgniterMenu->Append(MENU_CODE_IGNITER + i, label, 
+				_("Open ") + fullPath, wxITEM_NORMAL);
+			i++;
+		}
 	}
-	std::map<wxString, wxString>::const_iterator it = ConfigFiles.begin();
-	int i = 0;
-	for (; it != ConfigFiles.end(); ++it) {
-		wxString fullPath = it->second;
-		wxString label = it->first;
-		label.Replace(wxT("_"), wxT(" "));
-		CodeIgniterMenu->Append(MENU_CODE_IGNITER + i, label, 
-			_("Open ") + fullPath, wxITEM_NORMAL);
-		i++;
-	}
+	
 }
 
 void mvceditor::CodeIgniterPluginClass::OnMenuItem(wxCommandEvent& event) {
@@ -115,6 +114,12 @@ void mvceditor::CodeIgniterPluginClass::OnMenuItem(wxCommandEvent& event) {
 	else {
 		mvceditor::EditorLogWarning(mvceditor::INVALID_FILE, wxT("invalid event object"));
 	}
+}
+
+void mvceditor::CodeIgniterPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+	
+	// none for now since the code igniter menu is dynamic and is 
+	// shown/hidden depending on the project
 }
 
 BEGIN_EVENT_TABLE(mvceditor::CodeIgniterPluginClass, wxEvtHandler) 

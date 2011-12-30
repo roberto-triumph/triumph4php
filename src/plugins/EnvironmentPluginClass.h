@@ -102,7 +102,9 @@ public:
 	 * 
 	 * @return wxMenuBar* the menu bar to add to.
 	 */
-	virtual void AddProjectMenuItems(wxMenu* projectMenu);
+	void AddProjectMenuItems(wxMenu* projectMenu);
+
+	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 	
 	/**
 	 * Handle the menu item

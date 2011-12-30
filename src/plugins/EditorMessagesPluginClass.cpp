@@ -137,6 +137,12 @@ void mvceditor::EditorMessagesPluginClass::AddMessage(wxLogLevel level, const wx
 	panel->AddMessage(level, msg, timestamp);
 }
 
+void mvceditor::EditorMessagesPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+	std::map<int, wxString> menuItemIds;
+	menuItemIds[mvceditor::MENU_EDITOR_MESSAGES] = wxT("Editor-Messages");
+	AddDynamicCmd(menuItemIds, shortcuts);
+}
+
 mvceditor::EditorMessagesLoggerClass::EditorMessagesLoggerClass(mvceditor::EditorMessagesPluginClass& plugin)
 	: wxLog()
 	, Plugin(plugin) {
