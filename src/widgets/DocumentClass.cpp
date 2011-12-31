@@ -250,37 +250,8 @@ std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const
 			if (ResourceUpdates->Worker.CollectNearMatchResourcesFromAll(globalResourceFinder)) {
 				std::vector<mvceditor::ResourceClass> matches = ResourceUpdates->Worker.Matches(globalResourceFinder);
 				for (size_t i = 0; i < matches.size(); ++i) {
-					mvceditor::ResourceClass resource = matches[i];
-					bool passesStaticCheck = symbol.IsStatic == resource.IsStatic;
 
-					// if the resource starts with symbol it means that resource is a member of "$this"
-					bool isInherited = FALSE != resource.Resource.startsWith(symbolName);
-
-					// $this => can access this resource's private, parent's protected/public, other public
-					// parent => can access parent's protected/public
-					// neither => can only access public
-					bool passesVisibilityCheck = !resource.IsPrivate && !resource.IsProtected;
-					if (!passesVisibilityCheck && mvceditor::SymbolClass::PARENT == symbol.Type) {
-
-						// this check assumes that the resource finder has traversed the inheritance chain
-						// properly. then, by a process of elimination, if the resource class is not
-						// the symbol then we only show protected/public resources
-						passesVisibilityCheck = resource.IsProtected;
-					}
-					else if (!passesVisibilityCheck) {
-
-						//not checking isThisCalled
-						passesVisibilityCheck = isInherited;
-					}
-					if (passesStaticCheck && passesVisibilityCheck) {
-						wxString s = mvceditor::StringHelperClass::IcuToWx(resource.Identifier);
-						if (resource.IsStatic && resource.Type == mvceditor::ResourceClass::MEMBER) {
-							
-							// SymbolTable drops the '$' but we want the auto complete to type it in for the user
-							s = wxT("$") + s;
-						}
-						autoCompleteList.push_back(s);
-					}
+					
 				}
 			}
 		}

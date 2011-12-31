@@ -746,9 +746,17 @@ void mvceditor::ResourceFinderClass::PropertyFound(const UnicodeString& rawClass
 		int32_t pos = rawClassName.indexOf(UNICODE_STRING_SIMPLE("mvceditornative_"));
 		filteredClassName.setTo(rawClassName, pos + 16); // 16 = length of prefix
 	}
+	UnicodeString filteredProperty(propertyName);
+	if (!isStatic) {
+
+		// remove the siguil from the property name when the variable is not static;
+		// because when using non-static access ("->") the siguil is not used
+		// this affects the code completion functionality
+		filteredProperty.findAndReplace(UNICODE_STRING_SIMPLE("$"), UNICODE_STRING_SIMPLE(""));
+	}
 	ResourceClass item;
-	item.Resource = filteredClassName + UNICODE_STRING_SIMPLE("::") + propertyName;
-	item.Identifier = propertyName;
+	item.Resource = filteredClassName + UNICODE_STRING_SIMPLE("::") + filteredProperty;
+	item.Identifier = filteredProperty;
 	item.Type = isConst ? ResourceClass::CLASS_CONSTANT : ResourceClass::MEMBER;
 	item.FileItemIndex = CurrentFileItemIndex;
 	item.Signature = item.Resource;

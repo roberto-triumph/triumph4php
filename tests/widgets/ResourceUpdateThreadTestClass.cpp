@@ -113,7 +113,7 @@ TEST(CollectShouldIgnoreStaleMatches) {
 	CHECK_EQUAL((size_t)1, matches.size());
 }
 
-TEST(GetSymbolAtWithGlobalFinder) {
+TEST(ExpressionCompletionMatchesWithGlobalFinder) {
 	
 	// in this test we will create a class in file2; file1 will use that class
 	// the ResourceUpdate object should be able to detect the variable type of 
@@ -131,12 +131,19 @@ TEST(GetSymbolAtWithGlobalFinder) {
 	
 	int posToCheck = code1.indexOf(UNICODE_STRING_SIMPLE("->")) + 2; // position of "->w()" in code1
 	
-	mvceditor::SymbolClass symbol;
-	UnicodeString symbolName = resourceUpdates.GetSymbolAt(file1, posToCheck, &globalFinder, symbol, code1);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionYou::"), symbolName);
+	std::vector<UnicodeString> matches;
+	mvceditor::SymbolClass parsedExpression;
+	parsedExpression.Lexeme = UNICODE_STRING_SIMPLE("$action");
+	parsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
+	parsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->w"));
+	resourceUpdates.ExpressionCompletionMatches(file1, parsedExpression, posToCheck, &globalFinder, matches);
+	CHECK_EQUAL((size_t)1, matches.size());
+	if (!matches.empty()) {
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("w"), matches[0]);
+	}
 }
 
-TEST(GetSymbolAtWithRegisteredFinder) {
+TEST(ExpressionCompletionMatchesWithRegisteredFinder) {
 	
 	// in this test we will create a class in file3; file1 will use that class
 	// the ResourceUpdate object should be able to detect the variable type of 
@@ -147,7 +154,7 @@ TEST(GetSymbolAtWithRegisteredFinder) {
 	wxString file2 = wxT("file2.php");
 	wxString file3 = wxT("file3.php");
 	UnicodeString code1 = UNICODE_STRING_SIMPLE("<?php $action = new ActionYou(); $action->w(); ");
-	UnicodeString code2 = UNICODE_STRING_SIMPLE("<?php class ActionMe  { function yy() { $this->  } }");
+	UnicodeString code2 = UNICODE_STRING_SIMPLE("<?php class ActionMe  { function yy() { $this;  } }");
 	UnicodeString code3 = UNICODE_STRING_SIMPLE("<?php class ActionYou  { function w() {} }");
 	mvceditor::ResourceFinderClass globalFinder;
 	globalFinder.BuildResourceCacheForFile(file2, code2, true);
@@ -159,16 +166,17 @@ TEST(GetSymbolAtWithRegisteredFinder) {
 	
 	int posToCheck = code1.indexOf(UNICODE_STRING_SIMPLE("->w")) + 3; // position of "->w()" in code1
 	
-	mvceditor::SymbolClass symbol;
-	UnicodeString symbolName = resourceUpdates.GetSymbolAt(file1, posToCheck, &globalFinder, symbol, code1);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionYou::w"), symbolName);
-	///CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionYou"), symbol.TypeLexeme);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("w"), symbol.Lexeme);
-	
-	CHECK(resourceUpdates.Register(file2));
-	CHECK(resourceUpdates.Update(file2, code2, true));
-	posToCheck = code2.indexOf(UNICODE_STRING_SIMPLE("->")) + 2; // position of "->()" in code3
-	symbolName = resourceUpdates.GetSymbolAt(file2, posToCheck, &globalFinder, symbol, code2);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionMe::"), symbolName);
+	std::vector<UnicodeString> matches;
+	mvceditor::SymbolClass parsedExpression;
+	parsedExpression.Lexeme = UNICODE_STRING_SIMPLE("$action");
+	parsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
+	parsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->w"));
+	resourceUpdates.ExpressionCompletionMatches(file1, parsedExpression, posToCheck, &globalFinder, matches);
+
+	CHECK_EQUAL((size_t)1, matches.size());
+	if (!matches.empty()) {
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("w"), matches[0]);
+	}
 }
+
 }
