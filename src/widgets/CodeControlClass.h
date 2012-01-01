@@ -425,13 +425,12 @@ private:
 	bool PositionedAtVariable(int pos);
 
 	/**
-	 * Returns the symbol that is positioned in the given cursor position.
+	 * Returns the resolved Resource[s] that is positioned in the given cursor position.
 	 *
 	 * @param int posToCheck a SCINTILLA POSITION (ie. BYTES not characters)
-	 * @return wxString a class name, or class name/method name, function name, or keyword.  The string is suitable
-	 *         for passing to a ResourceFinderClass instance.
+	 * @return list of resources that the symbol can be
 	 */
-	wxString GetSymbolAt(int posToCheck);
+	std::vector<ResourceClass> GetSymbolAt(int posToCheck);
 
 	/**
 	 * Check to see if the given position is at a PHP comment or style.

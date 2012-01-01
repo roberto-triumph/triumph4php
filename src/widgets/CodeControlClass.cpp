@@ -118,6 +118,13 @@ void mvceditor::CodeControlClass::TrackFile(const wxString& filename, UnicodeStr
 		FileOpenedDateTime = file.GetModificationTime();
 	}
 	AutoDetectDocumentMode();
+
+	if (Project->GetRootPath().IsEmpty()) {
+
+		// the global resource finder is empty; trigger the resource cache
+		// so that code completion works when project is not opened
+		NeedToUpdateResources = true;
+	}
 }
 
 void mvceditor::CodeControlClass::SetUnicodeText(UnicodeString& contents) {
@@ -302,7 +309,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::CodeControlClass::GetCurrentSym
 	return matches;
 }
 
-wxString mvceditor::CodeControlClass::GetSymbolAt(int posToCheck) {
+std::vector<mvceditor::ResourceClass> mvceditor::CodeControlClass::GetSymbolAt(int posToCheck) {
 	ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
 	UnicodeString code = GetSafeSubstring(0, posToCheck);
 	
@@ -316,11 +323,8 @@ wxString mvceditor::CodeControlClass::GetSymbolAt(int posToCheck) {
 	if (!lastExpression.isEmpty()) {
 		parser.ParseExpression(lastExpression, parsedExpression);
 		ResourceUpdates->Worker.ResourceMatches(FileIdentifier, parsedExpression, posToCheck, resourceFinder, matches);
-		if (!matches.empty()) {
-			resourceName = matches[0].Resource;
-		}
 	}
-	return StringHelperClass::IcuToWx(resourceName);
+	return matches;
 }
 
 void mvceditor::CodeControlClass::HandleAutoCompletion() {
@@ -388,21 +392,14 @@ void mvceditor::CodeControlClass::HandleCallTip(wxChar ch, bool force) {
 		}
 		
 		if (currentPos >= 0) {
-			wxString symbol = GetSymbolAt(currentPos);
 			CurrentSignature = wxT("");
-			ResourceFinderClass* globalResourceFinder = Project->GetResourceFinder();
-			if (ResourceUpdates->Worker.PrepareAll(globalResourceFinder, symbol)) {
-				
+			std::vector<mvceditor::ResourceClass> matches = GetSymbolAt(currentPos);
+			if (matches.size() == 1) {
+
 				// highly unlikely that there is more than one match since we searched for a full name (lookup succeeded).
-				// use CollectNearMatchResources to handle the case when  the method is inherited
-				if (ResourceUpdates->Worker.CollectNearMatchResourcesFromAll(globalResourceFinder)) {
-					std::vector<mvceditor::ResourceClass> matches = ResourceUpdates->Worker.Matches(globalResourceFinder);
-					if (matches.size() == 1) {
-						mvceditor::ResourceClass resource = matches[0];
-						UnicodeString fullQualifiedResource =  resource.Resource;
-						CurrentSignature = mvceditor::StringHelperClass::IcuToWx(resource.Signature);
-					}
-				}
+				mvceditor::ResourceClass resource = matches[0];
+				UnicodeString fullQualifiedResource =  resource.Resource;
+				CurrentSignature = mvceditor::StringHelperClass::IcuToWx(resource.Signature);
 			}
 			if (!CurrentSignature.IsEmpty()) {
 				CallTipShow(GetCurrentPos(), CurrentSignature);
