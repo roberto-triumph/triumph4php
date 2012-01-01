@@ -156,7 +156,7 @@ private:
 	/**
 	 * Handle the results of the resource lookups.
 	 */
-	void ShowJumpToResults();
+	void ShowJumpToResults(const std::vector<mvceditor::ResourceClass>& matches);
 	
 	/**
 	 * Toggle various widgets on or off based on the application state. 

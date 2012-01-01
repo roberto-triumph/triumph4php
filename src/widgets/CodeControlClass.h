@@ -234,12 +234,11 @@ public:
 	void HandleCallTip(wxChar ch = 0, bool force = false);
 
 	/**
-	 * Returns the symbol that is positioned in the current cursos position.
+	 * Returns the resources that match the the current cursor position.
 	 *
-	 * @return wxString a class name, or class name/method name, function name, or keyword.  The string is suitable
-	 *         for passing to a ResourceFinderClass instance.
+	 * @return resource matches
 	 */
-	wxString GetCurrentSymbol();
+	std::vector<ResourceClass> GetCurrentSymbolResource();
 
 	/**
 	 * Applies the current prefernces to this window. This method should be called when the CodeControlOptions class

@@ -476,6 +476,10 @@ UnicodeString mvceditor::ResourceFinderClass::GetResourceReturnType(const Unicod
 				returnType = it->ReturnType;
 				break;
 			}
+			else if (it->Type == ResourceClass::MEMBER && it->Resource == icuResource) {
+				returnType = it->ReturnType;
+				break;
+			}
 		}
 	}
 	return returnType;

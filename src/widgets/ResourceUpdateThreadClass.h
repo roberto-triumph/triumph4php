@@ -106,18 +106,8 @@ public:
 	std::vector<ResourceClass> Matches(ResourceFinderClass* resourceFinder);
 	
 	/**
-	 * Get the symbol that is at the given pos on the given file.
-	 * 
-	 * @param fileName the symbol table of this registered file will be searched
-	 * @param resourceFinder resource finder to search (in addition to all of the registered ones). This class will NOT own the pointer.
-	 * @param symbol
-	 * @return the symbol name; can be empty if it could not figured out or pos is invalid
-	 */
-	///UnicodeString GetSymbolAt(const wxString& fileName, int pos, ResourceFinderClass* resourceFinder, mvceditor::SymbolClass& symbol, const UnicodeString& code);
-
-	/**
 	 * Collects all near matches that are possible candidates for completion of the parsed expression.
-	 * Basically just a calls the ExpressionCompletionMatches() of the given file's SymbolTable. See that method for more info
+	 * Basically just a calls the ExpressionCompletionResourceMatches() of the given file's SymbolTable. See that method for more info
 	 * 
 	 * @param fileName the symbol table of this registered file will be searched
 	 * @parm parsedExpression the parsed expression; from ParserClass::ParseExpression() 
@@ -126,7 +116,20 @@ public:
 	 * @param autoCompleteList all of the near matches will be put here
 	 */
 	void ExpressionCompletionMatches(const wxString& fileName, const SymbolClass& parsedExpression, int expressionPos, 
-									ResourceFinderClass* resourceFinder, std::vector<UnicodeString>& autoCompleteList);
+		ResourceFinderClass* resourceFinder, std::vector<UnicodeString>& autoCompleteList);
+
+	/**
+	 * This method will resolve the given parsed expression and will figure out the type of a resource.
+	 * Basically just a calls the ResourceMatches() of the given file's SymbolTable. See that method for more info
+	 * 
+	 * @param fileName the symbol table of this registered file will be searched
+	 * @parm parsedExpression the parsed expression; from ParserClass::ParseExpression() 
+	 * @pram expressionPos the character position that the expression is located in.  This helps determine expression scope.
+	 * @param resourceFinder resource finder to search (in addition to all of the registered ones). This class will NOT own the pointer.
+	 * @param matches all of the resource matches will be put here
+	 */
+	void ResourceMatches(const wxString& fileName, const SymbolClass& parsedExpression, int expressionPos, 
+		ResourceFinderClass* resourceFinder, std::vector<ResourceClass>& matches);
 	
 	/**
 	 * Basically just a calls the GetVariablesInScope() of the given file's SymbolTable

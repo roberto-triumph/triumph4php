@@ -156,7 +156,8 @@ std::vector<wxString> mvceditor::TextDocumentClass::HandleAutoComplete(const wxS
 mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::ProjectClass* project, mvceditor::ResourceUpdateThreadClass* resourceUpdates)
 	: TextDocumentClass()
 	, LanguageDiscovery()
-	, SymbolTable()
+	, Parser()
+	, Lexer()
 	, Project(project)
 	, ResourceUpdates(resourceUpdates) {
 }
@@ -221,47 +222,28 @@ std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const
 	if (!ResourceUpdates) {
 		return autoCompleteList;
 	}
-		
-	// word will start with a '$" if its a variable
-	//the word will contain the $ in case of variables since "$" is a word characters (via wxStyledTextCtrl::SetWordCharacters() call)
-	if (word.charAt(0) == '$') {
-		
-		//+1 = do not take the '$' into account since SymbolTable drops the '$' 
-		UnicodeString symbolName(word, 1);
-		std::vector<UnicodeString> variables = ResourceUpdates->Worker.GetVariablesInScope(fileName, code.length() - 1, code);
-		for (size_t i = 0; i < variables.size(); ++i) {
-			if (0 == variables[i].indexOf(symbolName)) {
-				autoCompleteList.push_back(wxT("$") + StringHelperClass::IcuToWx(variables[i]));
+	int expressionPos = code.length() - 1;
+	UnicodeString lastExpression = Lexer.LastExpression(code);
+	mvceditor::SymbolClass parsedExpression;
+	if (!lastExpression.isEmpty()) {		
+		UnicodeString expresionCode;
+		Parser.ParseExpression(lastExpression, parsedExpression);
+
+		mvceditor::ResourceFinderClass* globalResourceFinder = Project->GetResourceFinder();
+		std::vector<UnicodeString> matches;
+		ResourceUpdates->Worker.ExpressionCompletionMatches(fileName, parsedExpression, expressionPos, globalResourceFinder, matches);
+		if (!matches.empty()) {
+			for (size_t i = 0; i < matches.size(); ++i) {
+				autoCompleteList.push_back(mvceditor::StringHelperClass::IcuToWx(matches[i]));
 			}
 		}
 	}
-	else {
-		mvceditor::ResourceFinderClass* globalResourceFinder = Project->GetResourceFinder();
-		
-		// look up the type of the word (is the word in the context of a class, method or function ?
-		// SymbolTable resolves stuff like parent:: and self:: as well we don't need to do it here
-		mvceditor::SymbolClass symbol;
-		UnicodeString symbolName = ResourceUpdates->Worker.GetSymbolAt(fileName, code.length() - 1, globalResourceFinder, symbol, code);
-		
-		
-		// get all other resources that start like the word
-		wxString wxSymbol = mvceditor::StringHelperClass::IcuToWx(symbolName);
-		if (ResourceUpdates->Worker.PrepareAll(globalResourceFinder, wxSymbol)) {
-			if (ResourceUpdates->Worker.CollectNearMatchResourcesFromAll(globalResourceFinder)) {
-				std::vector<mvceditor::ResourceClass> matches = ResourceUpdates->Worker.Matches(globalResourceFinder);
-				for (size_t i = 0; i < matches.size(); ++i) {
 
-					
-				}
-			}
-		}
-
-		 // when completing method names, do NOT include keywords
-		if (globalResourceFinder->GetResourceType() != ResourceFinderClass::CLASS_NAME_METHOD_NAME) {
-			std::vector<wxString> keywordMatches = CollectNearMatchKeywords(wxSymbol);
-			for (size_t i = 0; i < keywordMatches.size(); ++i) {
-				autoCompleteList.push_back(keywordMatches[i]);
-			}
+	// when completing standalone function names, also include keyword matches
+	if (parsedExpression.ChainList.size() == 1 && !parsedExpression.ChainList[0].startsWith(UNICODE_STRING_SIMPLE("$"))) {
+		std::vector<wxString> keywordMatches = CollectNearMatchKeywords(mvceditor::StringHelperClass::IcuToWx(parsedExpression.ChainList[0]));
+		for (size_t i = 0; i < keywordMatches.size(); ++i) {
+			autoCompleteList.push_back(keywordMatches[i]);
 		}
 	}
 	return autoCompleteList;

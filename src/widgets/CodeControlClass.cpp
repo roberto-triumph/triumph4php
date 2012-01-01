@@ -194,7 +194,11 @@ bool mvceditor::CodeControlClass::SaveAndTrackFile(wxString newFilename) {
 		// important to set the fileIdentifier to the name;
 		// the ResourceUpdates object will need to know what files are being edited so it can mark them as 'dirty'
 		ResourceUpdates->Unregister(FileIdentifier);
-		FileIdentifier = newFilename;
+
+		// when saving the same file; newFileName will be empty; we dont want to lose the name
+		if (!newFilename.empty()) {
+			FileIdentifier = newFilename;
+		}
 		
 		// if the file extension changed let's update the code control appropriate
 		// for example if a .txt file was saved as a .sql file
@@ -273,21 +277,50 @@ void mvceditor::CodeControlClass::HandleAutomaticIndentation(char chr) {
 	}
 }
 
-wxString mvceditor::CodeControlClass::GetCurrentSymbol() {
-	return GetSymbolAt(GetCurrentPos());
+std::vector<mvceditor::ResourceClass> mvceditor::CodeControlClass::GetCurrentSymbolResource() {
+
+	// if the cursor is in the middle of an identifier, find the end of the
+	// current identifier; that way we can know the full name of the resource we want
+	// to get
+	int currentPos = GetCurrentPos();
+	int startPos = WordStartPosition(currentPos, true);
+	int endPos = WordEndPosition(currentPos, true);
+	
+	ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
+	UnicodeString code = GetSafeSubstring(0, endPos);
+	
+	std::vector<mvceditor::ResourceClass> matches;
+	mvceditor::LexicalAnalyzerClass lexer;
+	mvceditor::ParserClass parser;
+	mvceditor::SymbolClass parsedExpression;
+
+	UnicodeString lastExpression = lexer.LastExpression(code);
+	if (!lastExpression.isEmpty()) {
+		parser.ParseExpression(lastExpression, parsedExpression);
+		ResourceUpdates->Worker.ResourceMatches(FileIdentifier, parsedExpression, endPos, resourceFinder, matches);
+	}
+	return matches;
 }
 
 wxString mvceditor::CodeControlClass::GetSymbolAt(int posToCheck) {
 	ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
-	mvceditor::SymbolClass symbol;
-	UnicodeString code = GetSafeText();
-	UnicodeString symbolName = ResourceUpdates->Worker.GetSymbolAt(FileIdentifier, posToCheck, resourceFinder, symbol, code);
-	if (symbolName.isEmpty()) {
-		int startPos = WordStartPosition(posToCheck, true);
-		int endPos = WordEndPosition(posToCheck, true);
-		symbolName = GetSafeSubstring(startPos, endPos);	
+	UnicodeString code = GetSafeSubstring(0, posToCheck);
+	
+	std::vector<mvceditor::ResourceClass> matches;
+	mvceditor::LexicalAnalyzerClass lexer;
+	mvceditor::ParserClass parser;
+	mvceditor::SymbolClass parsedExpression;
+
+	UnicodeString lastExpression = lexer.LastExpression(code);
+	UnicodeString resourceName;
+	if (!lastExpression.isEmpty()) {
+		parser.ParseExpression(lastExpression, parsedExpression);
+		ResourceUpdates->Worker.ResourceMatches(FileIdentifier, parsedExpression, posToCheck, resourceFinder, matches);
+		if (!matches.empty()) {
+			resourceName = matches[0].Resource;
+		}
 	}
-	return StringHelperClass::IcuToWx(symbolName);
+	return StringHelperClass::IcuToWx(resourceName);
 }
 
 void mvceditor::CodeControlClass::HandleAutoCompletion() {
@@ -296,7 +329,7 @@ void mvceditor::CodeControlClass::HandleAutoCompletion() {
 		int startPos = WordStartPosition(currentPos, true);
 		int endPos = WordEndPosition(currentPos, true);
 		UnicodeString symbol = 	GetSafeSubstring(startPos, endPos);
-		UnicodeString code = GetSafeSubstring(0, currentPos + 1);
+		UnicodeString code = GetSafeSubstring(0, currentPos);
 		
 		wxString fileName = CurrentFilename;
 		std::vector<wxString> autoCompleteList = Document->HandleAutoComplete(fileName, code, symbol);

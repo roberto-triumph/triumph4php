@@ -991,10 +991,11 @@ TEST_FIXTURE(ResourceFinderTestClass, CollectFullyQualifiedResourcesShouldFindCl
 	CHECK_EQUAL((size_t)0, ResourceFinder->GetResourceMatchCount());
 }
 
-TEST_FIXTURE(ResourceFinderTestClass, GetResourceReturnTypeShouldReturnReturnTypeForClassesMethodsAndFunctions) {
+TEST_FIXTURE(ResourceFinderTestClass, GetResourceReturnTypeShouldReturnReturnTypeForClassesMethodsAndFunctionsAndProperties) {
 	 wxString code = wxString::FromAscii(
 		"<?php\n"
 		"class UserClass {\n"
+		" /** @var string */\n"
 		"\tprivate $name;\n"
 		"\t/**\n"
 		"\t * @return string\n"
@@ -1018,6 +1019,7 @@ TEST_FIXTURE(ResourceFinderTestClass, GetResourceReturnTypeShouldReturnReturnTyp
 	CHECK(ResourceFinder->Prepare(wxT("userClas")));
 	ResourceFinder->Walk(TestProjectDir + testFile);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("string"), ResourceFinder->GetResourceReturnType(UNICODE_STRING_SIMPLE("UserClass::getName")));
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("string"), ResourceFinder->GetResourceReturnType(UNICODE_STRING_SIMPLE("UserClass::name")));
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("void"), ResourceFinder->GetResourceReturnType(UNICODE_STRING_SIMPLE("userClassPrint")));
 }
 

@@ -26,7 +26,8 @@
 #define __MVCEDITOR_DOCUMENTCLASS_H__
 
 #include <php_frameworks/ProjectClass.h>
-#include <language/SymbolTableClass.h>
+#include <language/LexicalAnalyzerClass.h>
+#include <language/ParserClass.h>
 #include <language/LanguageDiscoveryClass.h>
 #include <widgets/ResourceUpdateThreadClass.h>
 #include <wx/string.h>
@@ -128,7 +129,6 @@ private:
 	 */
 	std::vector<wxString> CollectNearMatchKeywords(wxString word);
 
-
 	/**
 	 * In order to show the proper auto complete keywords we must know what language is
 	 * being edited at any given position.  This class will help in this regard.
@@ -136,10 +136,16 @@ private:
 	mvceditor::LanguageDiscoveryClass LanguageDiscovery;
 
 	/**
-	* To calculate variable information
-	* @var SymbolTableClass
+	* To parse a code snippet to make it suitable for code completion
+	* @var ParserClass
 	*/
-	SymbolTableClass SymbolTable;
+	ParserClass Parser;
+
+	/**
+	 * To get the last expression in the source code
+	 * @var LexicalAnalyzerClass
+	 */
+	LexicalAnalyzerClass Lexer;
 
 	/**
 	 * This class will NOT own this pointer
