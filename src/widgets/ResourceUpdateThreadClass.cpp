@@ -88,23 +88,6 @@ bool mvceditor::ResourceUpdateClass::Update(const wxString& fileName, const Unic
 	return ret;
 }
 
-bool mvceditor::ResourceUpdateClass::IsDirty(const ResourceClass& resource, mvceditor::ResourceFinderClass* resourceFinder) const {
-	bool ret = false;
-	wxString matchFullName = resourceFinder->GetResourceMatchFullPathFromResource(resource);
-	std::map<wxString, mvceditor::ResourceFinderClass*>::const_iterator it = Finders.begin();
-	while (it != Finders.end()) {
-
-		// a match from one of the opened resource finders can never be 'dirty' because the resource cache 
-		// has been updated by the Update() method
-		if (it->first.CompareTo(matchFullName) == 0 && it->second != resourceFinder) {
-			ret = true;
-			break;
-		}
-		++it;
-	}
-	return ret;
-}
-
 bool mvceditor::ResourceUpdateClass::PrepareAll(mvceditor::ResourceFinderClass* resourceFinder, const wxString& resource) {
 	std::vector<mvceditor::ResourceFinderClass*> finders = Iterator(resourceFinder);
 	bool prep = true;
@@ -140,7 +123,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceUpdateClass::Matches(mv
 		size_t count = resourceFinder->GetResourceMatchCount();
 		for (size_t j = 0; j < count; ++j) {
 			mvceditor::ResourceClass resource = resourceFinder->GetResourceMatch(j);
-			if (!IsDirty(resource, resourceFinder)) {
+			if (!mvceditor::IsResourceDirty(Finders, resource, resourceFinder)) {
 				matches.push_back(resource);
 			}
 		}
@@ -164,18 +147,18 @@ void mvceditor::ResourceUpdateClass::ExpressionCompletionMatches(const wxString&
 	if (itSymbols != SymbolTables.end()) {
 		mvceditor::SymbolTableClass* symbolTable = itSymbols->second;
 		if (symbolTable) {
-			symbolTable->ExpressionCompletionMatches(parsedExpression, expressionPos, Iterator(resourceFinder), autoCompleteList);
+			symbolTable->ExpressionCompletionMatches(parsedExpression, expressionPos, Finders, resourceFinder, autoCompleteList);
 		}
 	}
 }
 
 void mvceditor::ResourceUpdateClass::ResourceMatches(const wxString& fileName, const mvceditor::SymbolClass& parsedExpression, int expressionPos, 
-													 mvceditor::ResourceFinderClass* resourceFinder, std::vector<mvceditor::ResourceClass>& matches) {
+													 mvceditor::ResourceFinderClass* globalResourceFinder, std::vector<mvceditor::ResourceClass>& matches) {
 	std::map<wxString, mvceditor::SymbolTableClass*>::iterator itSymbols = SymbolTables.find(fileName);
 	if (itSymbols != SymbolTables.end()) {
 		mvceditor::SymbolTableClass* symbolTable = itSymbols->second;
 		if (symbolTable) {
-			symbolTable->ResourceMatches(parsedExpression, expressionPos, Iterator(resourceFinder), matches);
+			symbolTable->ResourceMatches(parsedExpression, expressionPos, Finders, globalResourceFinder, matches);
 		}
 	}
 }

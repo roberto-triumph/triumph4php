@@ -139,15 +139,6 @@ public:
 private:
 
 	/**
-	 * Check to see if the given resource comes from one of the registered (opened
-	 * files).  If this returns true, it means that the resource may be stale.
-	 *
-	 * @param resource the resource to check
-	 * @param resourceFinder the finder that collected the resource
-	 */
-	bool IsDirty(const ResourceClass& resource, ResourceFinderClass* resourceFinder) const;
-
-	/**
 	 * Returns a list that contains all of the resource finders for the registered files plus
 	 * the given resource finder.  
 	 * 

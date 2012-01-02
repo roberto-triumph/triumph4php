@@ -209,4 +209,77 @@ TEST(ResourceMatchesWithGlobalFinder) {
 	}
 }
 
+TEST(ResourceMatchesWithRegisteredFile) {
+
+	// create a class in file1 with methodA
+	// file2 will use the class from file1; file1 and file2 will be registered
+	// perform a search
+	// methodA should be a hit
+	mvceditor::ResourceUpdateClass resourceUpdates;
+	wxString file1 = wxT("file1.php");
+	wxString file2 = wxT("file2.php");
+	UnicodeString code1 = UNICODE_STRING_SIMPLE("<?php class ActionMy   { function methodA() {} }");
+	UnicodeString code2 = UNICODE_STRING_SIMPLE("<?php $action = new ActionMy(); ");
+
+	mvceditor::ResourceFinderClass globalFinder;
+	globalFinder.BuildResourceCacheForFile(file1, code1, true);
+	CHECK(resourceUpdates.Register(file1));
+	CHECK(resourceUpdates.Register(file2));
+	CHECK(resourceUpdates.Update(file1, code1, true));
+	CHECK(resourceUpdates.Update(file2, code2, true));
+
+	std::vector<mvceditor::ResourceClass> matches;
+	mvceditor::SymbolClass parsedExpression;
+	parsedExpression.Lexeme = UNICODE_STRING_SIMPLE("$action");
+	parsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
+	parsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->methodA"));
+
+	resourceUpdates.ResourceMatches(file2, parsedExpression, 10, &globalFinder, matches);
+	CHECK_EQUAL((size_t)1, matches.size());
+	if (!matches.empty()) {
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionMy::methodA"), matches[0].Resource);
+	}
+}
+
+TEST(ResourceMatchesWithStaleMatches) {
+
+	// create a class in file1 with methodA
+	// file2 will use the class from file1; file2 will be registered
+	// then file1 will be registered with code3 (invalidating methodA)
+	// perform a search
+	// methodA should not be a hit since it has been removed
+	mvceditor::ResourceUpdateClass resourceUpdates;
+	wxString file1 = wxT("file1.php");
+	wxString file2 = wxT("file2.php");
+	UnicodeString code1 = UNICODE_STRING_SIMPLE("<?php class ActionMy   { function methodA() {} }");
+	UnicodeString code2 = UNICODE_STRING_SIMPLE("<?php $action = new ActionMy(); ");
+	UnicodeString code3 = UNICODE_STRING_SIMPLE("<?php class ActionMy   { function methodB() {} }");
+
+	mvceditor::ResourceFinderClass globalFinder;
+	globalFinder.BuildResourceCacheForFile(file1, code1, true);
+	CHECK(resourceUpdates.Register(file1));
+	CHECK(resourceUpdates.Register(file2));
+	CHECK(resourceUpdates.Update(file1, code1, true));
+	CHECK(resourceUpdates.Update(file2, code2, true));
+
+	std::vector<mvceditor::ResourceClass> matches;
+	mvceditor::SymbolClass parsedExpression;
+	parsedExpression.Lexeme = UNICODE_STRING_SIMPLE("$action");
+	parsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
+	parsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->methodA"));
+
+	resourceUpdates.ResourceMatches(file2, parsedExpression, 10, &globalFinder, matches);
+	CHECK_EQUAL((size_t)1, matches.size());
+	if (!matches.empty()) {
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionMy::methodA"), matches[0].Resource);
+	}
+
+	// now update the code
+	CHECK(resourceUpdates.Update(file1, code3, true));
+
+	matches.clear();
+	resourceUpdates.ResourceMatches(file2, parsedExpression, 10, &globalFinder, matches);
+	CHECK_EQUAL((size_t)0, matches.size());
+}
+
 }

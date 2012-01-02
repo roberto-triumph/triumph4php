@@ -119,12 +119,9 @@ void mvceditor::CodeControlClass::TrackFile(const wxString& filename, UnicodeStr
 	}
 	AutoDetectDocumentMode();
 
-	if (Project->GetRootPath().IsEmpty()) {
-
-		// the global resource finder is empty; trigger the resource cache
-		// so that code completion works when project is not opened
-		NeedToUpdateResources = true;
-	}
+	// trigger the resource cache
+	// so that code completion works when the file is first opened
+	NeedToUpdateResources = true;
 }
 
 void mvceditor::CodeControlClass::SetUnicodeText(UnicodeString& contents) {
