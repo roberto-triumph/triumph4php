@@ -1007,6 +1007,7 @@ void mvceditor::ResourceFinderClass::CopyResourcesFrom(const mvceditor::Resource
 		destFit->DateTime = fit->DateTime;
 		destFit->FullPath = fit->FullPath;
 		destFit->Parsed = fit->Parsed;
+		destFit->IsNew = fit->IsNew;
 		++destFit;
 		++fit;
 	}

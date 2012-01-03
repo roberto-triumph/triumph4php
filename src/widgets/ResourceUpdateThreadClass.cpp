@@ -141,37 +141,26 @@ std::vector<mvceditor::ResourceFinderClass*> mvceditor::ResourceUpdateClass::Ite
 	return finders;
 }
 
-void mvceditor::ResourceUpdateClass::ExpressionCompletionMatches(const wxString& fileName, const mvceditor::SymbolClass& parsedExpression, int expressionPos, 
-													 mvceditor::ResourceFinderClass* resourceFinder, std::vector<UnicodeString>& autoCompleteList) {
-	std::map<wxString, mvceditor::SymbolTableClass*>::iterator itSymbols = SymbolTables.find(fileName);
+void mvceditor::ResourceUpdateClass::ExpressionCompletionMatches(const wxString& fileName, const mvceditor::SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
+													 mvceditor::ResourceFinderClass* resourceFinder, std::vector<UnicodeString>& autoCompleteList) const {
+	std::map<wxString, mvceditor::SymbolTableClass*>::const_iterator itSymbols = SymbolTables.find(fileName);
 	if (itSymbols != SymbolTables.end()) {
 		mvceditor::SymbolTableClass* symbolTable = itSymbols->second;
 		if (symbolTable) {
-			symbolTable->ExpressionCompletionMatches(parsedExpression, expressionPos, Finders, resourceFinder, autoCompleteList);
+			symbolTable->ExpressionCompletionMatches(parsedExpression, expressionScope, Finders, resourceFinder, autoCompleteList);
 		}
 	}
 }
 
-void mvceditor::ResourceUpdateClass::ResourceMatches(const wxString& fileName, const mvceditor::SymbolClass& parsedExpression, int expressionPos, 
-													 mvceditor::ResourceFinderClass* globalResourceFinder, std::vector<mvceditor::ResourceClass>& matches) {
-	std::map<wxString, mvceditor::SymbolTableClass*>::iterator itSymbols = SymbolTables.find(fileName);
+void mvceditor::ResourceUpdateClass::ResourceMatches(const wxString& fileName, const mvceditor::SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
+													 mvceditor::ResourceFinderClass* globalResourceFinder, std::vector<mvceditor::ResourceClass>& matches) const {
+	std::map<wxString, mvceditor::SymbolTableClass*>::const_iterator itSymbols = SymbolTables.find(fileName);
 	if (itSymbols != SymbolTables.end()) {
 		mvceditor::SymbolTableClass* symbolTable = itSymbols->second;
 		if (symbolTable) {
-			symbolTable->ResourceMatches(parsedExpression, expressionPos, Finders, globalResourceFinder, matches);
+			symbolTable->ResourceMatches(parsedExpression, expressionScope, Finders, globalResourceFinder, matches);
 		}
 	}
-}
-
-std::vector<UnicodeString> mvceditor::ResourceUpdateClass::GetVariablesInScope(const wxString& fileName, int pos, const UnicodeString& code) {
-	std::vector<UnicodeString> vars;
-	std::map<wxString, mvceditor::SymbolTableClass*>::iterator itSymbols = SymbolTables.find(fileName);
-	if (itSymbols != SymbolTables.end()) {
-		mvceditor::SymbolTableClass* symbolTable = itSymbols->second;
-		symbolTable->CreateSymbols(code);
-		vars = symbolTable->GetVariablesInScope(pos);
-	}
-	return vars;
 }
 
 mvceditor::ResourceUpdateThreadClass::ResourceUpdateThreadClass(wxEvtHandler& handler, int eventId)

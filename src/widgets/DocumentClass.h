@@ -29,7 +29,9 @@
 #include <language/LexicalAnalyzerClass.h>
 #include <language/ParserClass.h>
 #include <language/LanguageDiscoveryClass.h>
+#include <language/SymbolTableClass.h>
 #include <widgets/ResourceUpdateThreadClass.h>
+
 #include <wx/string.h>
 #include <unicode/unistr.h>
 
@@ -146,6 +148,12 @@ private:
 	 * @var LexicalAnalyzerClass
 	 */
 	LexicalAnalyzerClass Lexer;
+
+	/**
+	 * This will be used to find the scope of any position in a piece of PHP code
+	 * @var ScopeFinderClass
+	 */
+	ScopeFinderClass ScopeFinder;
 
 	/**
 	 * This class will NOT own this pointer

@@ -129,14 +129,12 @@ TEST(ExpressionCompletionMatchesWithGlobalFinder) {
 	CHECK(resourceUpdates.Register(file1));
 	CHECK(resourceUpdates.Update(file1, code1, true));
 	
-	int posToCheck = code1.indexOf(UNICODE_STRING_SIMPLE("->")) + 2; // position of "->w()" in code1
-	
 	std::vector<UnicodeString> matches;
 	mvceditor::SymbolClass parsedExpression;
 	parsedExpression.Lexeme = UNICODE_STRING_SIMPLE("$action");
 	parsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
 	parsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->w"));
-	resourceUpdates.ExpressionCompletionMatches(file1, parsedExpression, posToCheck, &globalFinder, matches);
+	resourceUpdates.ExpressionCompletionMatches(file1, parsedExpression, UNICODE_STRING_SIMPLE("::"), &globalFinder, matches);
 	CHECK_EQUAL((size_t)1, matches.size());
 	if (!matches.empty()) {
 		CHECK_EQUAL(UNICODE_STRING_SIMPLE("w"), matches[0]);
@@ -164,14 +162,12 @@ TEST(ExpressionCompletionMatchesWithRegisteredFinder) {
 	CHECK(resourceUpdates.Register(file3));
 	CHECK(resourceUpdates.Update(file3, code3, true));
 	
-	int posToCheck = code1.indexOf(UNICODE_STRING_SIMPLE("->w")) + 3; // position of "->w()" in code1
-	
 	std::vector<UnicodeString> matches;
 	mvceditor::SymbolClass parsedExpression;
 	parsedExpression.Lexeme = UNICODE_STRING_SIMPLE("$action");
 	parsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
 	parsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->w"));
-	resourceUpdates.ExpressionCompletionMatches(file1, parsedExpression, posToCheck, &globalFinder, matches);
+	resourceUpdates.ExpressionCompletionMatches(file1, parsedExpression, UNICODE_STRING_SIMPLE("::"), &globalFinder, matches);
 
 	CHECK_EQUAL((size_t)1, matches.size());
 	if (!matches.empty()) {
@@ -195,14 +191,12 @@ TEST(ResourceMatchesWithGlobalFinder) {
 	CHECK(resourceUpdates.Register(file1));
 	CHECK(resourceUpdates.Update(file1, code1, true));
 	
-	int posToCheck = code1.indexOf(UNICODE_STRING_SIMPLE("->")) + 2; // position of "->w()" in code1
-	
 	std::vector<mvceditor::ResourceClass> matches;
 	mvceditor::SymbolClass parsedExpression;
 	parsedExpression.Lexeme = UNICODE_STRING_SIMPLE("$action");
 	parsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
 	parsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->w"));
-	resourceUpdates.ResourceMatches(file1, parsedExpression, posToCheck, &globalFinder, matches);
+	resourceUpdates.ResourceMatches(file1, parsedExpression, UNICODE_STRING_SIMPLE("::"), &globalFinder, matches);
 	CHECK_EQUAL((size_t)1, matches.size());
 	if (!matches.empty()) {
 		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionYou::w"), matches[0].Resource);
@@ -234,7 +228,7 @@ TEST(ResourceMatchesWithRegisteredFile) {
 	parsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
 	parsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->methodA"));
 
-	resourceUpdates.ResourceMatches(file2, parsedExpression, 10, &globalFinder, matches);
+	resourceUpdates.ResourceMatches(file2, parsedExpression, UNICODE_STRING_SIMPLE("::"), &globalFinder, matches);
 	CHECK_EQUAL((size_t)1, matches.size());
 	if (!matches.empty()) {
 		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionMy::methodA"), matches[0].Resource);
@@ -268,7 +262,7 @@ TEST(ResourceMatchesWithStaleMatches) {
 	parsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
 	parsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->methodA"));
 
-	resourceUpdates.ResourceMatches(file2, parsedExpression, 10, &globalFinder, matches);
+	resourceUpdates.ResourceMatches(file2, parsedExpression, UNICODE_STRING_SIMPLE("::"), &globalFinder, matches);
 	CHECK_EQUAL((size_t)1, matches.size());
 	if (!matches.empty()) {
 		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionMy::methodA"), matches[0].Resource);

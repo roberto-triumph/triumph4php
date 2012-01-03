@@ -203,7 +203,7 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename) {
 				wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_TOOLBAR, 
 				wxSize(16, 16)));
 		}
-		else if (error = mvceditor::FindInFilesClass::FILE_NOT_FOUND) {
+		else if (error == mvceditor::FindInFilesClass::FILE_NOT_FOUND) {
 			wxLogError(_("File Not Found:") + filename);
 		}
 		else if (mvceditor::FindInFilesClass::CHARSET_DETECTION == error) {

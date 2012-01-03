@@ -331,7 +331,6 @@ void mvceditor::ResourcePluginClass::OnJump(wxCommandEvent& event) {
 	CodeControlClass* codeControl = GetCurrentCodeControl();
 	wxWindow* mainWindow = GetMainWindow();
 	if (codeControl) {
-		ResourceFinderClass* resourceFinder = GetResourceFinder();
 		std::vector<mvceditor::ResourceClass> matches = codeControl->GetCurrentSymbolResource();
 		if (!matches.empty()) {
 			ShowJumpToResults(matches);	

@@ -230,7 +230,7 @@ wxString mvceditor::FindInFilesClass::CreateFilesFilterRegEx(const wxString& wil
 	// '$'  because we want to match the end of text
 	// we want each OR expression to be grouped together with parenthesis
 	escapedExpression = wxT("(") + escapedExpression;
-	size_t orCount = escapedExpression.Replace(wxT(";"), wxT("$)|("));
+	escapedExpression.Replace(wxT(";"), wxT("$)|("));
 	escapedExpression.Replace(wxT("*"), wxT(".*"));
 	escapedExpression.Replace(wxT("?"), wxT(".?"));
 	escapedExpression.Append(wxT("$)"));

@@ -158,6 +158,7 @@ mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::ProjectClass* project, 
 	, LanguageDiscovery()
 	, Parser()
 	, Lexer()
+	, ScopeFinder()
 	, Project(project)
 	, ResourceUpdates(resourceUpdates) {
 }
@@ -188,6 +189,8 @@ std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoComplete(const wxSt
 		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE_SINGLE_QUOTE_VALUE:
 		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ENTITY:
 			ret = HandleAutoCompletionHtml(code, word, syntax);
+			break;
+		default:
 			break;
 		}
 		LanguageDiscovery.Close();
@@ -228,10 +231,11 @@ std::vector<wxString> mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const
 	if (!lastExpression.isEmpty()) {		
 		UnicodeString expresionCode;
 		Parser.ParseExpression(lastExpression, parsedExpression);
+		UnicodeString expressionScope = ScopeFinder.GetScopeString(code, expressionPos);
 
 		mvceditor::ResourceFinderClass* globalResourceFinder = Project->GetResourceFinder();
 		std::vector<UnicodeString> matches;
-		ResourceUpdates->Worker.ExpressionCompletionMatches(fileName, parsedExpression, expressionPos, globalResourceFinder, matches);
+		ResourceUpdates->Worker.ExpressionCompletionMatches(fileName, parsedExpression, expressionScope, globalResourceFinder, matches);
 		if (!matches.empty()) {
 			for (size_t i = 0; i < matches.size(); ++i) {
 				autoCompleteList.push_back(mvceditor::StringHelperClass::IcuToWx(matches[i]));

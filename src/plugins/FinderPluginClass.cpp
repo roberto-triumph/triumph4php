@@ -215,7 +215,7 @@ mvceditor::ReplacePanelClass::ReplacePanelClass(wxWindow* parent, mvceditor::Not
 		, CurrentInsertionPointReplace(0) {
 	mvceditor::RegularExpressionValidatorClass regExValidator(&Finder.Expression, FinderMode);
 	FindText->SetValidator(regExValidator);
-	wxGenericValidator modeValidator(&(int)Finder.Mode);
+	wxGenericValidator modeValidator(&Finder.Mode);
 	FinderMode->SetValidator(modeValidator);
 	wxGenericValidator wrapValidator(&Finder.Wrap);
 	Wrap->SetValidator(wrapValidator);

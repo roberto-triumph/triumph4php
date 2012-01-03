@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <widgets/CodeControlClass.h>
+#include <language/SymbolTableClass.h>
 #include <windows/StringHelperClass.h>
 #include <MvcEditorErrors.h>
 #include <wx/filename.h>
@@ -168,7 +169,7 @@ void mvceditor::CodeControlClass::LoadAndTrackFile(const wxString& fileName) {
 	if (error == mvceditor::FindInFilesClass::NONE) {
 		TrackFile(fileName, contents);
 	}
-	else if (error = mvceditor::FindInFilesClass::FILE_NOT_FOUND) {
+	else if (error == mvceditor::FindInFilesClass::FILE_NOT_FOUND) {
 		wxLogError(_("File Not Found:") + fileName);
 	}
 	else if (mvceditor::FindInFilesClass::CHARSET_DETECTION == error) {
@@ -287,7 +288,6 @@ std::vector<mvceditor::ResourceClass> mvceditor::CodeControlClass::GetCurrentSym
 	// current identifier; that way we can know the full name of the resource we want
 	// to get
 	int currentPos = GetCurrentPos();
-	int startPos = WordStartPosition(currentPos, true);
 	int endPos = WordEndPosition(currentPos, true);
 	
 	ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
@@ -314,12 +314,14 @@ std::vector<mvceditor::ResourceClass> mvceditor::CodeControlClass::GetSymbolAt(i
 	mvceditor::LexicalAnalyzerClass lexer;
 	mvceditor::ParserClass parser;
 	mvceditor::SymbolClass parsedExpression;
+	mvceditor::ScopeFinderClass scopeFinder;
 
 	UnicodeString lastExpression = lexer.LastExpression(code);
 	UnicodeString resourceName;
 	if (!lastExpression.isEmpty()) {
 		parser.ParseExpression(lastExpression, parsedExpression);
-		ResourceUpdates->Worker.ResourceMatches(FileIdentifier, parsedExpression, posToCheck, resourceFinder, matches);
+		UnicodeString expressionScope = scopeFinder.GetScopeString(code, posToCheck);
+		ResourceUpdates->Worker.ResourceMatches(FileIdentifier, parsedExpression, expressionScope, resourceFinder, matches);
 	}
 	return matches;
 }
@@ -1165,7 +1167,7 @@ void mvceditor::CodeControlClass::OnResourceUpdateComplete(wxCommandEvent& event
 void mvceditor::CodeControlClass::OnTimer(wxTimerEvent& event) {
 	if (NeedToUpdateResources && ResourceUpdates && !ResourceUpdates->IsRunning()) {
 		UnicodeString text = GetSafeText();
-		wxThreadError error = ResourceUpdates->StartBackgroundUpdate(FileIdentifier, text, IsNew());
+		ResourceUpdates->StartBackgroundUpdate(FileIdentifier, text, IsNew());
 
 		// even if thread could not be started just prevent re-parsing until user 
 		// modified the text
