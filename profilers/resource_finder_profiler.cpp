@@ -99,19 +99,19 @@ int main() {
 		minor;
 	wxOperatingSystemId os = wxGetOsVersion(&major, &minor);
 	if (os == wxOS_WINDOWS_NT) {
-		FileName = wxT("C:\\Users\\roberto\\Desktop\\tmp.php");
-		DirName = wxT("C:\\Users\\roberto\\Desktop\\tmp.php");
+		FileName = wxT("C:\\Users\\Roberto\\Documents\\mvc-editor\\resources\\native.php");
+		DirName = wxT("C:\\Users\\roberto\\sample_php_project\\");
 	}
 	else {
 		FileName = wxT("/home/roberto/workspace/mvc-editor/resources/native.php");
 		DirName = wxT("/home/roberto/workspace/sample_php_project/");
 	}
 
-	//ProfileLexer();
+	ProfileLexer();
 	ProfileParser();
-	//ProfileParserOnLargeProject();
-	//ProfileNativeFunctionsParsing();
-	//ProfileResourceFinderOnLargeProject();
+	ProfileParserOnLargeProject();
+	ProfileNativeFunctionsParsing();
+	ProfileResourceFinderOnLargeProject();
 	
 	// calling cleanup here so that we can run this binary through a memory leak detector 
 	// ICU will cache many things and that will cause the detector to output "possible leaks"
@@ -173,14 +173,11 @@ void ProfileLexer() {
 
 void ProfileParser() {
 	printf("*******\n");
+	wxLongLong time;
+	time = wxGetLocalTimeMillis();
 	mvceditor::ParserClass parser;
 	mvceditor::LintResultsClass error;
-	mvceditor::SymbolTableClass symbolTable;
-	UnicodeString contents;
-	mvceditor::FindInFilesClass::FileContents(FileName, contents);
-	symbolTable.CreateSymbols(contents);
-	/*
-	if (parser.LintFile(FileName, error, &symbolTable)) {
+	if (parser.LintFile(FileName, error)) {
 		printf("No syntax errors on %s\n", (const char *)FileName.ToAscii());
 	}
 	else {
@@ -188,8 +185,9 @@ void ProfileParser() {
 		u_fprintf(out, "%S on file %s around line %d\n", error.Error.getTerminatedBuffer(),
 			(const char*)FileName.ToAscii(), error.LineNumber);
 		u_fclose(out);
-	}*/
-	symbolTable.Print();
+	}
+	time = wxGetLocalTimeMillis() - time;
+	printf("time for parsing a native.php:%ld ms\n", time.ToLong());
 }
 
 
