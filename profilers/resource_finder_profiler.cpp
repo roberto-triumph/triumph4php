@@ -106,7 +106,6 @@ int main() {
 		FileName = wxT("/home/roberto/workspace/mvc-editor/resources/native.php");
 		DirName = wxT("/home/roberto/workspace/sample_php_project/");
 	}
-
 	ProfileLexer();
 	ProfileParser();
 	ProfileParserOnLargeProject();
@@ -238,7 +237,7 @@ void ProfileResourceFinderOnLargeProject() {
 	time = wxGetLocalTimeMillis() - time;
 	size_t found =  resourceFinder.GetResourceMatchCount();
 	printf("time for resourceFinder on entire project:%ld ms found:%d\n", time.ToLong(), (int)found);
-	
+
 	time = wxGetLocalTimeMillis();
 	resourceFinder.Prepare(wxT("Record::get"));
 	search.Init(DirName);
