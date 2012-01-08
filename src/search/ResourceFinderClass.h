@@ -159,12 +159,6 @@ public:
 	 * GetResourceSignature methods will work for PHP native functions (array, string, file functions ...).
 	 */
 	void BuildResourceCacheForNativeFunctions();
-
-	/**
-	 * Returns the file that has the PHP native functions.This file was created using the script
-	 * resources/parser_php_doc.php and exists inside of the MVC Editor app distribution.
-	 */
-	wxFileName NativeFunctionsFilePath();
 	
 	/**
 	 * Parses the given string for resources.  This method would be used, for example, when wanting

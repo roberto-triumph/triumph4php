@@ -114,10 +114,15 @@ public:
 	 * @param expressionScope the scope where parsed expression is located.  The scope let's us know which variables are
 	 *        available. See ScopeFinderClass for more info.
 	 * @param resourceFinder resource finder to search (in addition to all of the registered ones). This class will NOT own the pointer.
-	 * @param autoCompleteList all of the near matches will be put here
+	  * @param autoCompleteVariableList the results of the matches; these are the names of the variables that
+	 *        are "near matches" to the parsed expression. This will be filled only when parsedExpression is a variable. 
+	 * @param autoCompleteResourceList the results of the matches; these are the names of the items that
+	 *        are "near matches" to the parsed expression. This will be filled only when parsedExpression is a variable "chain" or
+	 *        a function / static class call. 
 	 */
 	void ExpressionCompletionMatches(const wxString& fileName, const SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
-		ResourceFinderClass* resourceFinder, std::vector<UnicodeString>& autoCompleteList) const;
+		ResourceFinderClass* resourceFinder, std::vector<UnicodeString>& autoCompleteList,
+		std::vector<ResourceClass>& autoCompleteResourceList) const;
 
 	/**
 	 * This method will resolve the given parsed expression and will figure out the type of a resource.

@@ -142,12 +142,14 @@ std::vector<mvceditor::ResourceFinderClass*> mvceditor::ResourceUpdateClass::Ite
 }
 
 void mvceditor::ResourceUpdateClass::ExpressionCompletionMatches(const wxString& fileName, const mvceditor::SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
-													 mvceditor::ResourceFinderClass* resourceFinder, std::vector<UnicodeString>& autoCompleteList) const {
+													 mvceditor::ResourceFinderClass* resourceFinder, 
+													 std::vector<UnicodeString>& autoCompleteList,
+													 std::vector<mvceditor::ResourceClass>& resourceMatches) const {
 	std::map<wxString, mvceditor::SymbolTableClass*>::const_iterator itSymbols = SymbolTables.find(fileName);
 	if (itSymbols != SymbolTables.end()) {
 		mvceditor::SymbolTableClass* symbolTable = itSymbols->second;
 		if (symbolTable) {
-			symbolTable->ExpressionCompletionMatches(parsedExpression, expressionScope, Finders, resourceFinder, autoCompleteList);
+			symbolTable->ExpressionCompletionMatches(parsedExpression, expressionScope, Finders, resourceFinder, autoCompleteList, resourceMatches);
 		}
 	}
 }

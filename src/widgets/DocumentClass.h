@@ -33,6 +33,7 @@
 #include <widgets/ResourceUpdateThreadClass.h>
 
 #include <wx/string.h>
+#include <wx/stc/stc.h>
 #include <unicode/unistr.h>
 
 namespace mvceditor {
@@ -48,6 +49,12 @@ public:
 
 	TextDocumentClass();
 
+	/**
+	 * @param ctrl The 'raw' text control, used 
+	 * This object will NOT own the pointer
+	 */
+	void SetControl(wxStyledTextCtrl* ctrl);
+
 	virtual ~TextDocumentClass();
 
 	/**
@@ -56,7 +63,7 @@ public:
 	 * smooth as possible.
 	 *
 	 * Sub classes can return TRUE here, but if they don then they must also
-	 * implement HandleAutoComplete method.
+	 * implement HandleAutoCompletion method.
 	 * This method will be called in response to a user keypress; speed is
 	 * crucial here.
 	 *
@@ -67,12 +74,72 @@ public:
 
 	/**
 	 * Sub classes can implement their own logic for auto completion.
-	 * This method will be called in response to a user keypress; speed is
-	 * crucial here.
-	 * @return a vector of strings, one item for each keyword to be
-	 * shown to the user.
+	 * This method may be called in response to a user keypress; speed is
+	 * crucial here. Subclasses will need to invoke the AutoCompleteShow() method
+	 * of the wxSTC control.
 	 */
-	virtual std::vector<wxString> HandleAutoComplete(const wxString& fileName, const UnicodeString& code, const UnicodeString& word);
+	virtual void HandleAutoCompletion();
+
+	/**
+	 * shows the user function definition
+	 *
+	 * @param wxChar the character last inserted. if '(' (or force parameter is true) call tip will be activated. else, call tip may be left
+	 * activated or deactivated depending on the char
+	 * @param bool if true call tip will be activated.
+	 *
+	 */
+	virtual void HandleCallTip(wxChar ch = 0, bool force = false);
+
+	/**
+	 * Returns the resources that match the the current cursor position.
+	 *
+	 * @return resource matches
+	 */
+	virtual std::vector<ResourceClass> GetCurrentSymbolResource();
+
+	/**
+	 * This method will get called when a new file is opened OR when a 
+	 * file is reverted OR when a file is saved with a new file name (Save As...)
+	 * @param fileName the file that was opened
+	 */
+	virtual void FileOpened(wxString fileName);
+
+	/**
+	 * If char at position (pos +1) is a brace, highlight the brace
+	 * Otherwise, remove all brace highlights
+	 * @param int posToCheck SCINTILLA position (byte offset) to look in
+	 */
+	virtual void MatchBraces(int posToCheck);
+
+	/**
+	 * Returns a string containing all of the contents of the code control.  The difference with GetText() is that this
+	 * method accounts for high ascii characters correctly.
+	 *
+	 * ALWAYS USE THIS METHOD INSTEAD OF GetText()
+	 * @return UnicodeString
+	 */
+	UnicodeString GetSafeText();
+
+	/**
+	 * Use this method whenever you need to get a UnicodeString that is being calculated from Scintilla
+	 * positions (GetCurrentPos(), GetWordStart(), etc...)
+	 * Scintilla uses UTF-8 encoding and the positions it returns are byte offsets not character offsets.
+	 * The method can be given integers where to put the resulting character indices if needed.
+	 *
+	 * @param int startPos byte offset
+	 * @param int endPos byte offset, EXCLUSIVE the character at endPos will NOT be included
+	 *
+	 */
+	UnicodeString GetSafeSubstring(int startPos, int endPos);
+
+protected:
+
+	/**
+	 * The 'raw' text control that this document is attached to; Ctrl will never be NULL
+	 * (except in the constructor)
+	 * This object will NOT own the pointer
+	 */
+	 wxStyledTextCtrl* Ctrl;
 
 };
 
@@ -80,7 +147,7 @@ public:
  * this is a PHP specialization of a document.  It knows how to perform code
  * completion on PHP documents intelligently
  */
-class PhpDocumentClass : public TextDocumentClass {
+class PhpDocumentClass : public wxEvtHandler, public TextDocumentClass {
 public:
 
 	/**
@@ -88,15 +155,25 @@ public:
 	 */
 	PhpDocumentClass(ProjectClass* project, ResourceUpdateThreadClass* resourceUpdates);
 
+	~PhpDocumentClass();
+
 	/**
 	 * enable auto complete
 	 */
-	virtual bool CanAutoComplete();
+	bool CanAutoComplete();
 
 	/**
 	 * Use the project's resource finder to find auto complete suggestions
 	 */
-	virtual std::vector<wxString> HandleAutoComplete(const wxString& fileName, const UnicodeString& code, const UnicodeString& word);
+	void HandleAutoCompletion();
+
+	void HandleCallTip(wxChar ch = 0, bool force = false);
+
+	std::vector<ResourceClass> GetCurrentSymbolResource();
+
+	void FileOpened(wxString fileName);
+
+	void MatchBraces(int posToCheck);
 	
 	wxString GetPhpKeywords() const;
 	
@@ -109,27 +186,68 @@ private:
 	/**
 	 * handles auto completion for PHP.
 	 *
-	 * @param fileName the current file which autocomplete is working on
-	 * @param code the entire, most current, source code
-	 * @param word the current word where the cursor lies (this determines what the current symbol)
-	 * @param syntax the token type that the cursor is currently on.  This helps
-	 * in determining context (ie if the cursor is inside of a comment or string literal)
+	 * @param code most current source code; but only up to the current position (this helps determine
+	 * the scope)
 	 */
-	std::vector<wxString> HandleAutoCompletionPhp(const wxString& fileName, const UnicodeString& code, const UnicodeString& word, mvceditor::LanguageDiscoveryClass::Syntax syntax);
+	void HandleAutoCompletionPhp(const UnicodeString& code);
 
 	/**
-	* handles auto completion for PHP.
+	* handles auto completion for HTML.
 	*
+	* @param word the word to complete
 	* @param syntax the token type that the cursor is currently on.  This helps
-	* int determining context (ie if the cursor is inside of a comment or string literal)
+	* int determining context (ie if the cursor is inside of a tag name or a tag valur)
 	*/
-	std::vector<wxString> HandleAutoCompletionHtml(const UnicodeString& code, const UnicodeString& word, mvceditor::LanguageDiscoveryClass::Syntax syntax);
+	void HandleAutoCompletionHtml(const UnicodeString& word, mvceditor::LanguageDiscoveryClass::Syntax syntax);
 
 	/**
 	 * Return a list of possible keyword matches for the given word. For example, if word="cl"
 	 * then this method would return "class"
 	 */
 	std::vector<wxString> CollectNearMatchKeywords(wxString word);
+
+	/**
+	 * This method will get called by the ResourceUpdates object when parsing of the
+	 * code in this control has been completed.
+	 */
+	void OnResourceUpdateComplete(wxCommandEvent& event);
+	
+	/**
+	 * This method will check to see if document is "dirty" and if so it will
+	 * start re-parsing in the background
+	 */
+	void OnTimer(wxTimerEvent& event);
+
+	/**
+	 * Returns the resolved Resource[s] that is positioned in the given cursor position.
+	 *
+	 * @param int posToCheck a SCINTILLA POSITION (ie. BYTES not characters)
+	 * @return list of resources that the symbol can be
+	 */
+	std::vector<ResourceClass> GetSymbolAt(int posToCheck);
+
+	/**
+	 * Handle the call tip up/down arrow events
+	 */
+	void OnCallTipClick(wxStyledTextEvent& evt);
+
+	/**
+	 * Check to see if the given position is at a PHP comment or style.
+	 * This is a quick-check that doesn't do any parsing it relies on the scintiall styling only
+	 * (this method will return true if the position is colored as a string or comment.)
+	 * This implementation should probably change in the future.
+	 *
+	 * @param int posToCheck the scintilla position (byte) to check
+	 * @return bool TRUE if the position is at a PHP comment or PHP string
+	 */
+	bool InCommentOrStringStyle(int posToCheck);
+
+	/**
+	 * On a key press, we will update the resource cache if need be
+	 */
+	void OnKeyDown(wxKeyEvent& event);
+
+	void RegisterAutoCompletionImages();
 
 	/**
 	 * In order to show the proper auto complete keywords we must know what language is
@@ -156,6 +274,22 @@ private:
 	ScopeFinderClass ScopeFinder;
 
 	/**
+	 * The resources used to populate the call tips
+	 */
+	std::vector<ResourceClass> CurrentCallTipResources;
+
+	/**
+	 * Used to control how often to check for resource re-parsing
+	 */
+	wxTimer Timer;
+
+	/**
+	 * A unique string used to identify this code control. This string is used in conjunction with 
+	 * the ResourceUpdates object.
+	 */
+	wxString FileIdentifier;
+
+	/**
 	 * This class will NOT own this pointer
 	 */
 	ProjectClass* Project;
@@ -166,6 +300,27 @@ private:
 	 */
 	ResourceUpdateThreadClass* ResourceUpdates;
 
+	/**
+	 * The resource signature currently being displayed in the calltip.
+	 * index into CurrentCallTipResources
+	 */
+	size_t CurrentCallTipIndex;
+
+		/**
+	 * This flag will control whether the document is "dirty" and needs to be re-parsed
+	 * This is NOT the same as GetModify() from scintilla; scintilla's Modify will be
+	 * set to false if the user undoes changes; but if a user undoes changes we still
+	 * want to trigger a re-parsing
+	 */
+	bool NeedToUpdateResources;
+
+	/**
+	 * TRUE if the auto complete images have been registered.
+	 */
+	bool AreImagesRegistered;
+
+
+	DECLARE_EVENT_TABLE()
 };
 
 /**
@@ -192,11 +347,15 @@ public:
 	 * Searches the current project's SqlResourceFinder to find SQL keywords and metadata that completes the given word.
 	 * Returns the keywords to be shown in the auto complete list.
 	 */
-	virtual std::vector<wxString> HandleAutoComplete(const wxString& fileName, const UnicodeString& code, const UnicodeString& word);
+	void HandleAutoCompletion();
 	
 	wxString GetMySqlKeywords() const;
 
+	// TODO brace matching for SQL docs
+
 private:
+
+	std::vector<wxString> HandleAutoCompletionMySql(const UnicodeString& word);
 
 	/**
 	 * This class will NOT own this pointer
@@ -212,13 +371,13 @@ public:
 
 	CssDocumentClass();
 
-	virtual bool CanAutoComplete();
-
-	virtual std::vector<wxString> HandleAutoComplete(const wxString& fileName, const UnicodeString& code, const UnicodeString& word);
+	bool CanAutoComplete();
 	
 	wxString GetCssKeywords() const;
 	
 	wxString GetCssPseudoClasses() const;
+
+	// TODO brace matching for CSS docs
 
 };
 

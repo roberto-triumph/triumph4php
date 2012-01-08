@@ -25,8 +25,8 @@
 #include <search/ResourceFinderClass.h>
 #include <search/FinderClass.h>
 #include <windows/StringHelperClass.h>
+#include <MvcEditorAssets.h>
 #include <wx/filename.h>
-#include <wx/stdpaths.h>
 #include <algorithm>
 #include <fstream>
 
@@ -214,22 +214,10 @@ bool mvceditor::ResourceFinderClass::Prepare(const wxString& resource) {
 }
 
 void mvceditor::ResourceFinderClass::BuildResourceCacheForNativeFunctions() {
-	wxFileName fileName = NativeFunctionsFilePath();	
+	wxFileName fileName = mvceditor::NativeFunctionsAsset();	
 	if (fileName.FileExists()) {
 		BuildResourceCache(fileName.GetFullPath(), true);
 	}
-}
-
-wxFileName mvceditor::ResourceFinderClass::NativeFunctionsFilePath() {
-	wxStandardPaths paths;
-	wxFileName pathExecutableFileName(paths.GetExecutablePath());
-	wxString nativeFileName = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
-	                          wxT("..") + wxFileName::GetPathSeparator() +
-	                          wxT("resources") + wxFileName::GetPathSeparator() +
-	                          wxT("native.php");
-	wxFileName fileName(nativeFileName);
-	fileName.Normalize();
-	return fileName;
 }
 
 bool mvceditor::ResourceFinderClass::CollectNearMatchResources() {

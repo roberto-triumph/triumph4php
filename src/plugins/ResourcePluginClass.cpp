@@ -25,6 +25,7 @@
 #include <plugins/ResourcePluginClass.h>
 #include <windows/StringHelperClass.h>
 #include <MvcEditorErrors.h>
+#include <MvcEditorAssets.h>
 #include <wx/artprov.h>
 #include <wx/filename.h>
 #include <wx/valgen.h>
@@ -41,7 +42,7 @@ mvceditor::ResourceFileReaderClass::ResourceFileReaderClass(wxEvtHandler& handle
 }
 
 bool mvceditor::ResourceFileReaderClass::InitForNativeFunctionsFile(const mvceditor::ResourceFinderClass& finder) {
-	wxFileName nativeFunctionsFilePath = NewResources.NativeFunctionsFilePath();
+	wxFileName nativeFunctionsFilePath = mvceditor::NativeFunctionsAsset();
 	if (Init(nativeFunctionsFilePath.GetPath())) {
 		NewResources.CopyResourcesFrom(finder);
 		
