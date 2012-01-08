@@ -26,6 +26,38 @@
 #include <widgets/ResourceUpdateThreadClass.h>
 #include "unicode/ustream.h" //get the << overloaded operator, needed by UnitTest++
 
+class ExpressionCompletionMatchesFixtureClass  {
+
+public:
+
+	mvceditor::ResourceUpdateClass ResourceUpdates;
+	wxString File1;
+	wxString File2;
+	wxString File3;
+	UnicodeString Code1;
+	UnicodeString Code2;
+	UnicodeString Code3;
+	mvceditor::ResourceFinderClass GlobalFinder;
+	mvceditor::SymbolClass ParsedExpression;
+
+	std::vector<UnicodeString> VariableMatches;
+	std::vector<mvceditor::ResourceClass> ResourceMatches;
+	
+	
+	ExpressionCompletionMatchesFixtureClass() 
+		: ResourceUpdates()
+		, File1(wxT("file1.php"))
+		, File2(wxT("file2.php"))
+		, File3(wxT("file3.php"))
+		, Code1()
+		, Code2()
+		, Code3()
+		, GlobalFinder()
+		, ParsedExpression()
+		, VariableMatches()
+		, ResourceMatches() {
+	}
+};
 
 SUITE(ResourceUpdateThreadTestClass) {
 
@@ -38,11 +70,11 @@ TEST(RegisterShouldSucceed) {
 TEST(RegisterShouldFail) {	
 	wxString fileName = wxT("MyFile.php");
 	mvceditor::ResourceUpdateClass resourceUpdates;
-	CHECK(resourceUpdates.Register(fileName));
-	CHECK_EQUAL(false, resourceUpdates.Register(fileName));
+	//CHECK(resourceUpdates.Register(fileName));
+	//CHECK_EQUAL(false, resourceUpdates.Register(fileName));
 }
 
-TEST(RegisterShouldFailAfterSucceedAfterUnregistering) {	
+TEST(RegisterShouldSucceedAfterSucceedAfterUnregistering) {	
 	wxString fileName = wxT("MyFile.php");
 	mvceditor::ResourceUpdateClass resourceUpdates;
 	CHECK(resourceUpdates.Register(fileName));
@@ -113,62 +145,136 @@ TEST(CollectShouldIgnoreStaleMatches) {
 	CHECK_EQUAL((size_t)1, matches.size());
 }
 
-TEST(GetSymbolAtWithGlobalFinder) {
+TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, GlobalFinder) {
 	
 	// in this test we will create a class in file2; file1 will use that class
 	// the ResourceUpdate object should be able to detect the variable type of 
 	// the variable in file1
-	mvceditor::ResourceUpdateClass resourceUpdates;
-	wxString file1 = wxT("file1.php");
-	wxString file2 = wxT("file2.php");
-	UnicodeString code1 = UNICODE_STRING_SIMPLE("<?php $action = new ActionYou(); $action->w(); ");
-	UnicodeString code2 = UNICODE_STRING_SIMPLE("<?php class ActionYou  { function w() {} }");
-	mvceditor::ResourceFinderClass globalFinder;
-	globalFinder.BuildResourceCacheForFile(file2, code2, true);
+	Code1 = UNICODE_STRING_SIMPLE("<?php $action = new ActionYou(); $action->w(); ");
+	Code2 = UNICODE_STRING_SIMPLE("<?php class ActionYou  { function w() {} }");
+	GlobalFinder.BuildResourceCacheForFile(File2, Code2, true);
 	
-	CHECK(resourceUpdates.Register(file1));
-	CHECK(resourceUpdates.Update(file1, code1, true));
+	CHECK(ResourceUpdates.Register(File1));
+	CHECK(ResourceUpdates.Update(File1, Code1, true));
 	
-	int posToCheck = code1.indexOf(UNICODE_STRING_SIMPLE("->")) + 2; // position of "->w()" in code1
-	
-	mvceditor::SymbolClass symbol;
-	UnicodeString symbolName = resourceUpdates.GetSymbolAt(file1, posToCheck, &globalFinder, symbol, code1);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionYou::"), symbolName);
+	ParsedExpression.Lexeme = UNICODE_STRING_SIMPLE("$action");
+	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
+	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->w"));
+	ResourceUpdates.ExpressionCompletionMatches(File1, ParsedExpression, UNICODE_STRING_SIMPLE("::"), &GlobalFinder, VariableMatches, ResourceMatches);
+	CHECK_EQUAL((size_t)1, ResourceMatches.size());
+	if (!ResourceMatches.empty()) {
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("w"), ResourceMatches[0].Identifier);
+	}
 }
 
-TEST(GetSymbolAtWithRegisteredFinder) {
+TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, RegisteredFinder) {
 	
 	// in this test we will create a class in file3; file1 will use that class
 	// the ResourceUpdate object should be able to detect the variable type of 
 	// the variable in file1
 	// the difference here is that the class is now defined in one of the registered files
-	mvceditor::ResourceUpdateClass resourceUpdates;
-	wxString file1 = wxT("file1.php");
-	wxString file2 = wxT("file2.php");
-	wxString file3 = wxT("file3.php");
-	UnicodeString code1 = UNICODE_STRING_SIMPLE("<?php $action = new ActionYou(); $action->w(); ");
-	UnicodeString code2 = UNICODE_STRING_SIMPLE("<?php class ActionMe  { function yy() { $this->  } }");
-	UnicodeString code3 = UNICODE_STRING_SIMPLE("<?php class ActionYou  { function w() {} }");
-	mvceditor::ResourceFinderClass globalFinder;
-	globalFinder.BuildResourceCacheForFile(file2, code2, true);
+	Code1 = UNICODE_STRING_SIMPLE("<?php $action = new ActionYou(); $action->w(); ");
+	Code2 = UNICODE_STRING_SIMPLE("<?php class ActionMe  { function yy() { $this;  } }");
+	Code3 = UNICODE_STRING_SIMPLE("<?php class ActionYou  { function w() {} }");
+	GlobalFinder.BuildResourceCacheForFile(File2, Code2, true);
 	
-	CHECK(resourceUpdates.Register(file1));
-	CHECK(resourceUpdates.Update(file1, code1, true));
-	CHECK(resourceUpdates.Register(file3));
-	CHECK(resourceUpdates.Update(file3, code3, true));
+	CHECK(ResourceUpdates.Register(File1));
+	CHECK(ResourceUpdates.Update(File1, Code1, true));
+	CHECK(ResourceUpdates.Register(File3));
+	CHECK(ResourceUpdates.Update(File3, Code3, true));
 	
-	int posToCheck = code1.indexOf(UNICODE_STRING_SIMPLE("->w")) + 3; // position of "->w()" in code1
-	
-	mvceditor::SymbolClass symbol;
-	UnicodeString symbolName = resourceUpdates.GetSymbolAt(file1, posToCheck, &globalFinder, symbol, code1);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionYou::w"), symbolName);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionYou"), symbol.TypeLexeme);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("w"), symbol.Lexeme);
-	
-	CHECK(resourceUpdates.Register(file2));
-	CHECK(resourceUpdates.Update(file2, code2, true));
-	posToCheck = code2.indexOf(UNICODE_STRING_SIMPLE("->")) + 2; // position of "->()" in code3
-	symbolName = resourceUpdates.GetSymbolAt(file2, posToCheck, &globalFinder, symbol, code2);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionMe::"), symbolName);
+	ParsedExpression.Lexeme = UNICODE_STRING_SIMPLE("$action");
+	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
+	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->w"));
+	ResourceUpdates.ExpressionCompletionMatches(File1, ParsedExpression, UNICODE_STRING_SIMPLE("::"), &GlobalFinder, VariableMatches, ResourceMatches);
+
+	CHECK_EQUAL((size_t)1, ResourceMatches.size());
+	if (!ResourceMatches.empty()) {
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("w"), ResourceMatches[0].Identifier);
+	}
 }
+
+TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithGlobalFinder) {
+	
+	// in this test we will create a class in file2; file1 will use that class
+	// the ResourceUpdate object should be able to detect the variable type of 
+	// the variable in file1
+	Code1 = UNICODE_STRING_SIMPLE("<?php $action = new ActionYou(); $action->w(); ");
+	Code2 = UNICODE_STRING_SIMPLE("<?php class ActionYou  { function w() {} }");
+	GlobalFinder.BuildResourceCacheForFile(File2, Code2, true);
+	
+	CHECK(ResourceUpdates.Register(File1));
+	CHECK(ResourceUpdates.Update(File1, Code1, true));
+	
+	ParsedExpression.Lexeme = UNICODE_STRING_SIMPLE("$action");
+	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
+	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->w"));
+	ResourceUpdates.ResourceMatches(File1, ParsedExpression, UNICODE_STRING_SIMPLE("::"), &GlobalFinder, ResourceMatches);
+	CHECK_EQUAL((size_t)1, ResourceMatches.size());
+	if (!ResourceMatches.empty()) {
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionYou::w"), ResourceMatches[0].Resource);
+	}
+}
+
+TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithRegisteredFile) {
+
+	// create a class in file1 with methodA
+	// file2 will use the class from file1; file1 and file2 will be registered
+	// perform a search
+	// methodA should be a hit
+	Code1 = UNICODE_STRING_SIMPLE("<?php class ActionMy   { function methodA() {} }");
+	Code2 = UNICODE_STRING_SIMPLE("<?php $action = new ActionMy(); ");
+
+	GlobalFinder.BuildResourceCacheForFile(File1, Code1, true);
+	CHECK(ResourceUpdates.Register(File1));
+	CHECK(ResourceUpdates.Register(File2));
+	CHECK(ResourceUpdates.Update(File1, Code1, true));
+	CHECK(ResourceUpdates.Update(File2, Code2, true));
+
+	ParsedExpression.Lexeme = UNICODE_STRING_SIMPLE("$action");
+	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
+	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->methodA"));
+
+	ResourceUpdates.ResourceMatches(File2, ParsedExpression, UNICODE_STRING_SIMPLE("::"), &GlobalFinder, ResourceMatches);
+	CHECK_EQUAL((size_t)1, ResourceMatches.size());
+	if (!ResourceMatches.empty()) {
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionMy::methodA"), ResourceMatches[0].Resource);
+	}
+}
+
+TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithStaleMatches) {
+
+	// create a class in file1 with methodA
+	// file2 will use the class from file1; file2 will be registered
+	// then file1 will be registered with code3 (invalidating methodA)
+	// perform a search
+	// methodA should not be a hit since it has been removed
+	Code1 = UNICODE_STRING_SIMPLE("<?php class ActionMy   { function methodA() {} }");
+	Code2 = UNICODE_STRING_SIMPLE("<?php $action = new ActionMy(); ");
+	Code3 = UNICODE_STRING_SIMPLE("<?php class ActionMy   { function methodB() {} }");
+
+	GlobalFinder.BuildResourceCacheForFile(File1, Code1, true);
+	CHECK(ResourceUpdates.Register(File1));
+	CHECK(ResourceUpdates.Register(File2));
+	CHECK(ResourceUpdates.Update(File1, Code1, true));
+	CHECK(ResourceUpdates.Update(File2, Code2, true));
+
+	ParsedExpression.Lexeme = UNICODE_STRING_SIMPLE("$action");
+	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
+	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->methodA"));
+
+	ResourceUpdates.ResourceMatches(File2, ParsedExpression, UNICODE_STRING_SIMPLE("::"), &GlobalFinder, ResourceMatches);
+	CHECK_EQUAL((size_t)1, ResourceMatches.size());
+	if (!ResourceMatches.empty()) {
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionMy::methodA"), ResourceMatches[0].Resource);
+	}
+
+	// now update the code
+	CHECK(ResourceUpdates.Update(File1, Code3, true));
+
+	ResourceMatches.clear();
+	ResourceUpdates.ResourceMatches(File2, ParsedExpression, UNICODE_STRING_SIMPLE("::"), &GlobalFinder, ResourceMatches);
+	CHECK_EQUAL((size_t)0, ResourceMatches.size());
+}
+
 }

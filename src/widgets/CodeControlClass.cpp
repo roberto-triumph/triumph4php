@@ -24,14 +24,14 @@
  */
 #include <widgets/CodeControlClass.h>
 #include <windows/StringHelperClass.h>
+#include <widgets/DocumentClass.h>
+
 #include <MvcEditorErrors.h>
 #include <wx/filename.h>
 #include <wx/stc/stc.h>
 #include <wx/regex.h>
-#include <wx/tipwin.h>
 #include <wx/utils.h>
 #include <unicode/ustring.h>
-#include <algorithm>
 
 // IMPLEMENTATION NOTE:
 // Take care when using positions given by Scintilla.  Scintilla gives positions in bytes while wxString and UnicodeString
@@ -60,9 +60,6 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 			const wxString& name)
 		: wxStyledTextCtrl(parent, id, position, size, style, name)
 		, CurrentFilename()
-		, CurrentSignature()
-		, FileIdentifier()
-		, Timer()
 		, CodeControlOptions(options)
 		, WordHighlightFinder()
 		, WordHighlightWord()
@@ -74,7 +71,6 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 		, WordHighlightStyle(0)
 		, ModifiedDialogOpen(false)
 		, WordHighlightIsWordHighlighted(false)
-		, NeedToUpdateResources(false)
 		, DocumentMode(TEXT) {
 	Document = NULL;
 	
@@ -83,41 +79,26 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 	SetYCaretPolicy(wxSTC_CARET_EVEN, 0);
 	ApplyPreferences();
 	SetMouseDwellTime(1500);
-	Timer.SetOwner(this);
-	Timer.Start(500, false);
-	
-	// need to give this new file unique name so because the
-	// resource updates object needs a unique name
-	wxLongLong time = wxGetLocalTimeMillis();
-	FileIdentifier = wxString::Format(wxT("File_%s"), time.ToString().c_str());
-	
+	AutoCompSetSeparator('/');
 }
 
 mvceditor::CodeControlClass::~CodeControlClass() {
-	Timer.Stop();
-	delete Document;
-	Document = NULL;	
-	if (ResourceUpdates) {
-		ResourceUpdates->Unregister(FileIdentifier);
-	}
+	delete Document;	
 }
 void mvceditor::CodeControlClass::TrackFile(const wxString& filename, UnicodeString& contents) {
 	SetUnicodeText(contents);
 	EmptyUndoBuffer();
 	SetSavePoint();
-	NeedToUpdateResources = false;
 	CurrentFilename = filename;
-	
-	// important to set the fileIdentifier to the name;
-	// the ResourceUpdates object will need to know what files are being edited so it can mark them as 'dirty'
-	ResourceUpdates->Unregister(FileIdentifier);
-	FileIdentifier = filename;
-	
 	wxFileName file(filename);
 	if (file.IsOk()) {
 		FileOpenedDateTime = file.GetModificationTime();
 	}
 	AutoDetectDocumentMode();
+
+	// order is important; calling FileOpened after document type is detected so that
+	// the proper callback is used
+	Document->FileOpened(filename);
 }
 
 void mvceditor::CodeControlClass::SetUnicodeText(UnicodeString& contents) {
@@ -139,7 +120,7 @@ void mvceditor::CodeControlClass::SetUnicodeText(UnicodeString& contents) {
 	int32_t written;
 	u_strToUTF8(dest, rawLength + 1, &written, src, length, &status);
 	if(U_SUCCESS(status)) {
-		
+	
 		// SetText message
 		SendMsg(2181, 0, (long)(const char*)dest);
 	}
@@ -148,10 +129,6 @@ void mvceditor::CodeControlClass::SetUnicodeText(UnicodeString& contents) {
 
 void mvceditor::CodeControlClass::Revert() {
 	if (!IsNew()) {
-		if (ResourceUpdates) {
-			ResourceUpdates->Unregister(FileIdentifier);
-		}
-		NeedToUpdateResources = true;
 		LoadAndTrackFile(CurrentFilename);
 	}
 }
@@ -164,7 +141,7 @@ void mvceditor::CodeControlClass::LoadAndTrackFile(const wxString& fileName) {
 	if (error == mvceditor::FindInFilesClass::NONE) {
 		TrackFile(fileName, contents);
 	}
-	else if (error = mvceditor::FindInFilesClass::FILE_NOT_FOUND) {
+	else if (error == mvceditor::FindInFilesClass::FILE_NOT_FOUND) {
 		wxLogError(_("File Not Found:") + fileName);
 	}
 	else if (mvceditor::FindInFilesClass::CHARSET_DETECTION == error) {
@@ -190,15 +167,15 @@ bool mvceditor::CodeControlClass::SaveAndTrackFile(wxString newFilename) {
 	if (saved) {
 		wxFileName file(CurrentFilename);
 		FileOpenedDateTime = file.GetModificationTime();
-
-		// important to set the fileIdentifier to the name;
-		// the ResourceUpdates object will need to know what files are being edited so it can mark them as 'dirty'
-		ResourceUpdates->Unregister(FileIdentifier);
-		FileIdentifier = newFilename;
-		
+	
 		// if the file extension changed let's update the code control appropriate
 		// for example if a .txt file was saved as a .sql file
 		AutoDetectDocumentMode();
+
+		// when saving the same file; newFileName will be empty; we dont want to lose the name
+		if (!newFilename.empty()) {
+			Document->FileOpened(newFilename);
+		}
 	}
 	return saved;
 }
@@ -240,8 +217,8 @@ void mvceditor::CodeControlClass::OnCharAdded(wxStyledTextEvent &event) {
 		// current char is now at currentPos - 1, so previous char is at currentPos - 2
 		char prevChar = GetCharAt(GetCurrentPos() - 2);
 		if (('-' == prevChar && '>' == ch) || (':' == prevChar && ':' == ch)) {
-			HandleAutoCompletion();
-		}
+			HandleAutoCompletion();	
+		}	
 		HandleCallTip(ch);
 	}
 
@@ -273,157 +250,16 @@ void mvceditor::CodeControlClass::HandleAutomaticIndentation(char chr) {
 	}
 }
 
-wxString mvceditor::CodeControlClass::GetCurrentSymbol() {
-	return GetSymbolAt(GetCurrentPos());
-}
-
-wxString mvceditor::CodeControlClass::GetSymbolAt(int posToCheck) {
-	ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
-	mvceditor::SymbolClass symbol;
-	UnicodeString code = GetSafeText();
-	UnicodeString symbolName = ResourceUpdates->Worker.GetSymbolAt(FileIdentifier, posToCheck, resourceFinder, symbol, code);
-	if (symbolName.isEmpty()) {
-		int startPos = WordStartPosition(posToCheck, true);
-		int endPos = WordEndPosition(posToCheck, true);
-		symbolName = GetSafeSubstring(startPos, endPos);	
-	}
-	return StringHelperClass::IcuToWx(symbolName);
+std::vector<mvceditor::ResourceClass> mvceditor::CodeControlClass::GetCurrentSymbolResource() {
+	return Document->GetCurrentSymbolResource();
 }
 
 void mvceditor::CodeControlClass::HandleAutoCompletion() {
-	if (Document->CanAutoComplete()) {
-		int currentPos = GetCurrentPos();
-		int startPos = WordStartPosition(currentPos, true);
-		int endPos = WordEndPosition(currentPos, true);
-		UnicodeString symbol = 	GetSafeSubstring(startPos, endPos);
-		UnicodeString code = GetSafeSubstring(0, currentPos + 1);
-		
-		wxString fileName = CurrentFilename;
-		std::vector<wxString> autoCompleteList = Document->HandleAutoComplete(fileName, code, symbol);
-		if (!autoCompleteList.empty()) {
-			
-			// scintilla needs the keywords sorted.
-			sort(autoCompleteList.begin(), autoCompleteList.end());
-			wxString list;
-			for (size_t i = 0; i < autoCompleteList.size(); ++i) {
-				list += wxT(" ");
-				list += autoCompleteList[i];
-			}
-			AutoCompSetMaxWidth(0);
-			int wordLength = currentPos - startPos;
-			AutoCompShow(wordLength, list);
-		}
-	}
-}
-
-bool mvceditor::CodeControlClass::PositionedAtVariable(int pos) {
-	int start = WordStartPosition(pos, true);
-	return GetCharAt(start) == wxT('$');
+	Document->HandleAutoCompletion();
 }
 
 void mvceditor::CodeControlClass::HandleCallTip(wxChar ch, bool force) {
-	if (!ResourceUpdates) {
-		return;
-	}
-	
-	// this function deliberately uses scintilla positions (bytes) instead of 
-	// converting over to unicode text. be careful.
-	int currentPos = GetCurrentPos();
-	if (InCommentOrStringStyle(currentPos) && wxT(')') == ch) {
-		CallTipCancel();
-	}
-	if (force || wxT('(') == ch) {
-		
-		// back up to the last function call "(" then get the function name, do not get the open parenthesis
-		/// we are always going to do the call tip for the nearest function ie. when
-		// a line is  
-		// Func1('hello', Func2('bye'
-		// we are always going to show the call tip for Func2 (if the cursor is after 'bye')
-		// make sure we don't go past the last statement
-		while (currentPos >= 0) {
-			char c = GetCharAt(currentPos);
-			if (!InCommentOrStringStyle(currentPos)) {
-				if ('(' == c) {
-					break;
-				}
-				if (';' == c) {
-					currentPos = -1;
-					break;
-				}
-			}
-			currentPos--;
-		}
-		
-		if (currentPos >= 0) {
-			wxString symbol = GetSymbolAt(currentPos);
-			CurrentSignature = wxT("");
-			ResourceFinderClass* globalResourceFinder = Project->GetResourceFinder();
-			if (ResourceUpdates->Worker.PrepareAll(globalResourceFinder, symbol)) {
-				
-				// highly unlikely that there is more than one match since we searched for a full name (lookup succeeded).
-				// use CollectNearMatchResources to handle the case when  the method is inherited
-				if (ResourceUpdates->Worker.CollectNearMatchResourcesFromAll(globalResourceFinder)) {
-					std::vector<mvceditor::ResourceClass> matches = ResourceUpdates->Worker.Matches(globalResourceFinder);
-					if (matches.size() == 1) {
-						mvceditor::ResourceClass resource = matches[0];
-						UnicodeString fullQualifiedResource =  resource.Resource;
-						CurrentSignature = mvceditor::StringHelperClass::IcuToWx(resource.Signature);
-					}
-				}
-			}
-			if (!CurrentSignature.IsEmpty()) {
-				CallTipShow(GetCurrentPos(), CurrentSignature);
-			}
-		}
-	}
-	if (CallTipActive()) {
-		
-		// highlight the 1st, 2nd, 3rd or 4th parameter of the call tip depending on where the cursors currently is.
-		// If the cursor is in the 2nd argument, then highlight the 2nd parameter and so on...
-		int startOfArguments = GetCurrentPos();
-		int commaCount = 0;
-		while (startOfArguments >= 0) {
-			char c = GetCharAt(startOfArguments);
-			if (!InCommentOrStringStyle(startOfArguments)) {
-				if ('(' == c) {
-					break;
-				}
-				if (';' == c) {
-					startOfArguments = -1;
-					break;
-				}
-				if (',' == c) {
-					commaCount++;
-				}
-			}
-			startOfArguments--;
-		}
-		if (startOfArguments >= 0) {
-			int startHighlightPos = CurrentSignature.find(wxT('('));
-			
-			// sometimes the previous call tip is active, as in for example this line
-			//   $m->getB()->work(
-			// in this case we need to be careful
-			if(startHighlightPos >= 0) {
-				int endHighlightPos = CurrentSignature.find(wxT(','), startHighlightPos);
-				
-				// no comma =  highlight the only param, if signature has no params, then 
-				// nothing will get highlighted since its all whitespace
-				if (endHighlightPos < 0) {
-					endHighlightPos = CurrentSignature.length() - 1;
-				}
-				while (commaCount > 0) {
-					startHighlightPos = endHighlightPos;
-					endHighlightPos = CurrentSignature.find(wxT(','), startHighlightPos + 1);
-					if (-1 == endHighlightPos) {
-						endHighlightPos = CurrentSignature.length() - 1;
-					}
-					--commaCount;
-				}
-				CallTipSetHighlight(startHighlightPos, endHighlightPos);
-			}
-		}
-	}
+	Document->HandleCallTip(ch, force);
 }
 
 void mvceditor::CodeControlClass::OnUpdateUi(wxStyledTextEvent &event) {
@@ -435,48 +271,6 @@ void mvceditor::CodeControlClass::OnMarginClick(wxStyledTextEvent& event) {
 	if (event.GetMargin() == CodeControlOptionsClass::MARGIN_CODE_FOLDING) {
 		int line = LineFromPosition(event.GetPosition());
 		ToggleFold(line);
-	}
-}
-
-bool mvceditor::CodeControlClass::InCommentOrStringStyle(int posToCheck) {
-	int style = GetStyleAt(posToCheck);
-	int prevStyle = GetStyleAt(posToCheck - 1);
-
-	// dont match braces inside strings or comments. for some reason when styling line comments (//)
-	// the last character is styled as default but the characters before are styled correctly (wxSTC_HPHP_COMMENTLINE)
-	// so lets check the previous character in that case
-	return wxSTC_HPHP_HSTRING == style || wxSTC_HPHP_SIMPLESTRING == style || wxSTC_HPHP_COMMENT == style
-		|| wxSTC_HPHP_COMMENTLINE == style || wxSTC_HPHP_COMMENTLINE == prevStyle;
-}
-
-void mvceditor::CodeControlClass::MatchBraces(int posToCheck) {
-	if (!InCommentOrStringStyle(posToCheck)) {
-		wxChar c1 = GetCharAt(posToCheck),
-		            c2 = GetCharAt(posToCheck - 1);
-		if (wxT('{') == c1 || wxT('}') == c1 || wxT('(') == c1 || wxT(')') == c1 || wxT('[') == c1 || wxT(']') == c1) {
-			posToCheck = posToCheck;
-		}
-		else if (wxT('{') == c2 || wxT('}') == c2 || wxT('(') == c2 || wxT(')') == c2 || wxT('[') == c2 || wxT(']') == c2) {
-			posToCheck = posToCheck - 1;
-		}
-		else  {
-			posToCheck = -1;
-		}
-		if (posToCheck >= 0) {
-			int pos = 	BraceMatch(posToCheck);
-			if (wxSTC_INVALID_POSITION == pos) {
-				BraceBadLight(posToCheck);
-			}
-			else {
-				BraceHighlight(posToCheck, pos);
-			}
-		}
-		else {
-			BraceHighlight(wxSTC_INVALID_POSITION, wxSTC_INVALID_POSITION);
-		}
-	}
-	else {
-		BraceHighlight(wxSTC_INVALID_POSITION, wxSTC_INVALID_POSITION);
 	}
 }
 
@@ -554,28 +348,27 @@ void mvceditor::CodeControlClass::ApplyPreferences() {
 	}
 	if (mvceditor::CodeControlClass::SQL == DocumentMode) {
 		Document = new mvceditor::SqlDocumentClass(Project, CurrentInfo);
+		Document->SetControl(this);
 		SetCodeControlOptions(CodeControlOptions.SqlStyles);
-		SetSqlOptions();		
-		
+		SetSqlOptions();
 	}
 	else if (mvceditor::CodeControlClass::PHP == DocumentMode) {
 		Document = new mvceditor::PhpDocumentClass(Project, ResourceUpdates);
+		Document->SetControl(this);
 		SetCodeControlOptions(CodeControlOptions.PhpStyles);
 		SetPhpOptions();
-		if (ResourceUpdates) {
-			ResourceUpdates->Register(FileIdentifier, this);
-		}
 	}
 	else if (mvceditor::CodeControlClass::CSS == DocumentMode) {
 		Document = new mvceditor::CssDocumentClass();
+		Document->SetControl(this);
 		SetCodeControlOptions(CodeControlOptions.CssStyles);
 		SetCssOptions();
-		
 	}
 	else {
 		std::vector<mvceditor::StylePreferenceClass> noStyles;
 		SetCodeControlOptions(noStyles);
 		Document = new mvceditor::TextDocumentClass();
+		Document->SetControl(this);
 		SetPlainTextOptions();
 	}
 	Colourise(0, -1);
@@ -595,7 +388,7 @@ void mvceditor::CodeControlClass::SetPhpOptions() {
 	// 7 = as per scintilla docs, HTML lexer uses 7 bits for styles
 	SetStyleBits(7);
 	AutoCompStops(wxT("!@#$%^&*()_+-=[]\\{}|;'\",./<?"));
-	AutoCompSetSeparator(' ');
+	AutoCompSetSeparator('\n');
 	AutoCompSetFillUps(wxT("(["));
 	AutoCompSetIgnoreCase(true);
 	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$"));
@@ -858,7 +651,7 @@ void  mvceditor::CodeControlClass::OnDoubleClick(wxStyledTextEvent& event) {
 	charStartIndex = mvceditor::StringHelperClass::Utf8PosToChar(buf, documentLength, pos);
 	charEndIndex = mvceditor::StringHelperClass::Utf8PosToChar(buf, documentLength, endPos);
 	
-	UnicodeString word = GetSafeSubstring(pos, endPos);
+	UnicodeString word = Document->GetSafeSubstring(pos, endPos);
 	if (!word.isEmpty()) {
 		WordHighlightFinder.Expression = word;
 		WordHighlightFinder.Mode = mvceditor::FinderClass::EXACT;
@@ -885,27 +678,7 @@ void mvceditor::CodeControlClass::OnContextMenu(wxContextMenuEvent& event) {
 }
 
 UnicodeString mvceditor::CodeControlClass::GetSafeText() {
-	
-	// copied from the implementation of GetText method in stc.cpp 
-    int len  = GetTextLength();
-	wxMemoryBuffer mbuf(len + 1);   // leave room for the null...
-	char* buf = (char*)mbuf.GetWriteBuf(len + 1);
-	SendMsg(2182, len + 1, (long)buf);
-	mbuf.UngetWriteBuf(len);
-	mbuf.AppendByte(0);
-	UnicodeString str(' ', len, 0);
-	int32_t written = 0;
-	UErrorCode error = U_ZERO_ERROR;
-	u_strFromUTF8(str.getBuffer(len + 1), len, &written, (const char*)mbuf, len, &error);
-	str.releaseBuffer(written);
-	assert(U_SUCCESS(error));
-	return str;
-}
-
-UnicodeString mvceditor::CodeControlClass::GetSafeSubstring(int startPos, int endPos) {
-	wxString s = GetTextRange(startPos, endPos);
-	UnicodeString ret = mvceditor::StringHelperClass::wxToIcu(s);
-	return ret;
+	return Document->GetSafeText();
 }
 
 void mvceditor::CodeControlClass::OnIdle(wxIdleEvent& event) {
@@ -938,41 +711,12 @@ void mvceditor::CodeControlClass::OnIdle(wxIdleEvent& event) {
 	// moving match braces here from UpdateUi because when I put this code in UpdateUi there
 	// is a bad flicker in GTK when the braces are highlighted.
 	// Code folding seems to make the flicker appear all the time.
-	MatchBraces(GetCurrentPos());
+	Document->MatchBraces(GetCurrentPos());
 	event.Skip();
 }
 
 void mvceditor::CodeControlClass::OnKeyDown(wxKeyEvent& event) {
 	UndoHighlight();
-	
-	// if already parsing then dont do anything
-	if (ResourceUpdates->GetThread() && ResourceUpdates->GetThread()->IsRunning()) {
-		event.Skip();
-		return;
-	}
-	// only update the dirty bit on a letter, number of backspace
-	// keypress.  disregard shortcut keystrokes
-	// we want to keep the re-parsings to a minimum
-	// we dont need to reparse when user is adding a 
-	// comment or a constant string
-	if (!InCommentOrStringStyle(GetCurrentPos())) {
-		int modifiers = event.GetModifiers();
-		if (modifiers == wxMOD_SHIFT || modifiers == wxMOD_NONE) {
-			int keyCode = event.GetKeyCode();
-			if ((keyCode >= 'a'  && keyCode <= 'z') ||
-					(keyCode >= 'A'  && keyCode <= 'Z') ||
-					(keyCode >= '0'  && keyCode <= '9') ||
-					'_' == keyCode || 
-					'{' == keyCode || 
-					'}' == keyCode ||
-					'(' == keyCode ||
-					')' == keyCode ||
-					WXK_DELETE == keyCode ||
-					WXK_BACK == keyCode) {
-				NeedToUpdateResources = true;
-			}
-		}
-	}
 	event.Skip();
 }
 
@@ -1176,23 +920,6 @@ void mvceditor::CodeControlClass::OnDwellEnd(wxStyledTextEvent& event) {
 
 }
 
-void mvceditor::CodeControlClass::OnResourceUpdateComplete(wxCommandEvent& event) {
-	Timer.Start();
-	event.Skip();
-}
-void mvceditor::CodeControlClass::OnTimer(wxTimerEvent& event) {
-	if (NeedToUpdateResources && ResourceUpdates && !ResourceUpdates->IsRunning()) {
-		UnicodeString text = GetSafeText();
-		wxThreadError error = ResourceUpdates->StartBackgroundUpdate(FileIdentifier, text, IsNew());
-
-		// even if thread could not be started just prevent re-parsing until user 
-		// modified the text
-		NeedToUpdateResources = false;
-		Timer.Stop();
-	}
-	event.Skip();
-}
-
 int mvceditor::CodeControlClass::LineFromCharacter(int charPos) {
 	int documentLength = GetTextLength();
 	char* buf = new char[documentLength];
@@ -1217,6 +944,4 @@ BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)
 	EVT_KEY_DOWN(mvceditor::CodeControlClass::OnKeyDown)
 	EVT_STC_DWELLSTART(wxID_ANY, mvceditor::CodeControlClass::OnDwellStart)
 	EVT_STC_DWELLEND(wxID_ANY, mvceditor::CodeControlClass::OnDwellEnd)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::CodeControlClass::OnResourceUpdateComplete)
-	EVT_TIMER(wxID_ANY, mvceditor::CodeControlClass::OnTimer)
 END_EVENT_TABLE()

@@ -106,30 +106,39 @@ public:
 	std::vector<ResourceClass> Matches(ResourceFinderClass* resourceFinder);
 	
 	/**
-	 * Get the symbol that is at the given pos on the given file.
+	 * Collects all near matches that are possible candidates for completion of the parsed expression.
+	 * Basically just a calls the ExpressionCompletionResourceMatches() of the given file's SymbolTable. See that method for more info
 	 * 
 	 * @param fileName the symbol table of this registered file will be searched
+	 * @parm parsedExpression the parsed expression; from ParserClass::ParseExpression() 
+	 * @param expressionScope the scope where parsed expression is located.  The scope let's us know which variables are
+	 *        available. See ScopeFinderClass for more info.
 	 * @param resourceFinder resource finder to search (in addition to all of the registered ones). This class will NOT own the pointer.
-	 * @param symbol
-	 * @return the symbol name; can be empty if it could not figured out or pos is invalid
+	  * @param autoCompleteVariableList the results of the matches; these are the names of the variables that
+	 *        are "near matches" to the parsed expression. This will be filled only when parsedExpression is a variable. 
+	 * @param autoCompleteResourceList the results of the matches; these are the names of the items that
+	 *        are "near matches" to the parsed expression. This will be filled only when parsedExpression is a variable "chain" or
+	 *        a function / static class call. 
 	 */
-	UnicodeString GetSymbolAt(const wxString& fileName, int pos, ResourceFinderClass* resourceFinder, mvceditor::SymbolClass& symbol, const UnicodeString& code);
-	
-	/**
-	 * Basically just a calls the GetVariablesInScope() of the given file's SymbolTable
-	 */	
-	std::vector<UnicodeString> GetVariablesInScope(const wxString& fileName, int pos, const UnicodeString& code);
-	
-private:
+	void ExpressionCompletionMatches(const wxString& fileName, const SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
+		ResourceFinderClass* resourceFinder, std::vector<UnicodeString>& autoCompleteList,
+		std::vector<ResourceClass>& autoCompleteResourceList) const;
 
 	/**
-	 * Check to see if the given resource comes from one of the registered (opened
-	 * files).  If this returns true, it means that the resource may be stale.
-	 *
-	 * @param resource the resource to check
-	 * @param resourceFinder the finder that collected the resource
+	 * This method will resolve the given parsed expression and will figure out the type of a resource.
+	 * Basically just a calls the ResourceMatches() of the given file's SymbolTable. See that method for more info
+	 * 
+	 * @param fileName the symbol table of this registered file will be searched
+	 * @parm parsedExpression the parsed expression; from ParserClass::ParseExpression() 
+	 * @param expressionScope the scope where parsed expression is located.  The scope let's us know which variables are
+	 *        available. See ScopeFinderClass for more info.
+	 * @param resourceFinder resource finder to search (in addition to all of the registered ones). This class will NOT own the pointer.
+	 * @param matches all of the resource matches will be put here
 	 */
-	bool IsDirty(const ResourceClass& resource, ResourceFinderClass* resourceFinder) const;
+	void ResourceMatches(const wxString& fileName, const SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
+		ResourceFinderClass* resourceFinder, std::vector<ResourceClass>& matches) const;
+	
+private:
 
 	/**
 	 * Returns a list that contains all of the resource finders for the registered files plus

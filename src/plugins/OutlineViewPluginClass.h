@@ -126,6 +126,8 @@ public:
 	void MethodFound(const UnicodeString& className, const UnicodeString& methodName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 		TokenClass::TokenIds visibility, bool isStatic);
+
+	void MethodEnd(const UnicodeString& className, const UnicodeString& methodName, int pos);
 		
 	/**
 	 * Implementation of ClassMemberObserver.  In this method we will append to the outline buffer.
@@ -139,6 +141,8 @@ public:
 	 */
 	void FunctionFound(const UnicodeString& functionName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment);
+
+	void FunctionEnd(const UnicodeString& functionName, int pos);
 	
 private:		
 	

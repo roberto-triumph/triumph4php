@@ -25,6 +25,7 @@
 #include <language/LexicalAnalyzerClass.h>
 #include <language/TokenClass.h>
 #include <language/ParserClass.h>
+#include <language/SymbolTableClass.h>
 #include <search/DirectorySearchClass.h>
 #include <search/ResourceFinderClass.h>
 #include <wx/filefn.h>
@@ -98,19 +99,18 @@ int main() {
 		minor;
 	wxOperatingSystemId os = wxGetOsVersion(&major, &minor);
 	if (os == wxOS_WINDOWS_NT) {
-		FileName = wxT("C:\\Users\\Roberto\\Documents\\Visual Studio 2008\\Projects\\mvc-editor\\resources\\native.php");
-		DirName = wxT("C:\\Users\\Roberto\\sample_php_project\\");
+		FileName = wxT("C:\\Users\\Roberto\\Documents\\mvc-editor\\resources\\native.php");
+		DirName = wxT("C:\\Users\\roberto\\sample_php_project\\");
 	}
 	else {
 		FileName = wxT("/home/roberto/workspace/mvc-editor/resources/native.php");
 		DirName = wxT("/home/roberto/workspace/sample_php_project/");
 	}
-
 	ProfileLexer();
 	ProfileParser();
 	ProfileParserOnLargeProject();
-	//ProfileNativeFunctionsParsing();
-	//ProfileResourceFinderOnLargeProject();
+	ProfileNativeFunctionsParsing();
+	ProfileResourceFinderOnLargeProject();
 	
 	// calling cleanup here so that we can run this binary through a memory leak detector 
 	// ICU will cache many things and that will cause the detector to output "possible leaks"
@@ -172,6 +172,8 @@ void ProfileLexer() {
 
 void ProfileParser() {
 	printf("*******\n");
+	wxLongLong time;
+	time = wxGetLocalTimeMillis();
 	mvceditor::ParserClass parser;
 	mvceditor::LintResultsClass error;
 	if (parser.LintFile(FileName, error)) {
@@ -183,6 +185,8 @@ void ProfileParser() {
 			(const char*)FileName.ToAscii(), error.LineNumber);
 		u_fclose(out);
 	}
+	time = wxGetLocalTimeMillis() - time;
+	printf("time for parsing a native.php:%ld ms\n", time.ToLong());
 }
 
 
@@ -201,7 +205,7 @@ void ProfileNativeFunctionsParsing() {
 	resourceFinder.CollectNearMatchResources();
 	time = wxGetLocalTimeMillis() - time;
 	size_t found = resourceFinder.GetResourceMatchCount();
-	printf("time for resourceFinder:%ld ms found:%d\n", time.ToLong(), (int)found);
+	printf("time for resourceFinder on native.php:%ld ms found:%d\n", time.ToLong(), (int)found);
 	
 	time = wxGetLocalTimeMillis();
 	resourceFinder.Prepare(wxT("mysql_query"));
@@ -209,7 +213,7 @@ void ProfileNativeFunctionsParsing() {
 	resourceFinder.CollectNearMatchResources();
 	time = wxGetLocalTimeMillis() - time;
 	found = resourceFinder.GetResourceMatchCount();
-	printf("time for resourceFinder after caching:%ld ms found:%d\n", time.ToLong(), (int)found);
+	printf("time for resourceFinder on native.php after caching:%ld ms found:%d\n", time.ToLong(), (int)found);
 }
 
 void ProfileResourceFinderOnLargeProject() {
@@ -233,7 +237,7 @@ void ProfileResourceFinderOnLargeProject() {
 	time = wxGetLocalTimeMillis() - time;
 	size_t found =  resourceFinder.GetResourceMatchCount();
 	printf("time for resourceFinder on entire project:%ld ms found:%d\n", time.ToLong(), (int)found);
-	
+
 	time = wxGetLocalTimeMillis();
 	resourceFinder.Prepare(wxT("Record::get"));
 	search.Init(DirName);
@@ -272,6 +276,7 @@ bool ParserDirectoryWalkerClass::Walk(const wxString& file) {
 }
 
 void ProfileParserOnLargeProject() {
+	printf("*******\n");
 	mvceditor::DirectorySearchClass search;
 	wxLongLong time;
 	if (DirName.IsEmpty() || !wxDirExists(DirName) || !search.Init(DirName)) {

@@ -91,7 +91,7 @@ wxString mvceditor::MessageWithFix(wxString message, wxString fix) {
 }
 
 void mvceditor::EditorErrorFix(const wxString& errorString, wxString& error, wxString& fix) {
-	size_t index = errorString.Find(FIX_SEPARATOR);
+	int index = errorString.Find(FIX_SEPARATOR);
 	if (index != wxNOT_FOUND) {
 		error = errorString.Mid(0, index);
 		fix = errorString.Mid(index + FIX_SEPARATOR.Length());

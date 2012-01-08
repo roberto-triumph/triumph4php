@@ -25,8 +25,8 @@
 #include <search/ResourceFinderClass.h>
 #include <search/FinderClass.h>
 #include <windows/StringHelperClass.h>
+#include <MvcEditorAssets.h>
 #include <wx/filename.h>
-#include <wx/stdpaths.h>
 #include <algorithm>
 #include <fstream>
 
@@ -147,9 +147,13 @@ bool mvceditor::ResourceFinderClass::GetResourceMatchPosition(size_t index, cons
 		if (scopeResolutionPos >= 0) {
 			className.setTo(resource, 0, scopeResolutionPos);
 			methodName.setTo(resource, scopeResolutionPos + 2, resource.length() - scopeResolutionPos + 2 - 1);
+
+			mvceditor::FinderClass::EscapeRegEx(className);
+			mvceditor::FinderClass::EscapeRegEx(methodName);
 		}
 		else {
 			className = resource;
+			mvceditor::FinderClass::EscapeRegEx(className);
 		}
 		switch (item.Type) {
 			case ResourceClass::CLASS:
@@ -210,22 +214,10 @@ bool mvceditor::ResourceFinderClass::Prepare(const wxString& resource) {
 }
 
 void mvceditor::ResourceFinderClass::BuildResourceCacheForNativeFunctions() {
-	wxFileName fileName = NativeFunctionsFilePath();	
+	wxFileName fileName = mvceditor::NativeFunctionsAsset();	
 	if (fileName.FileExists()) {
 		BuildResourceCache(fileName.GetFullPath(), true);
 	}
-}
-
-wxFileName mvceditor::ResourceFinderClass::NativeFunctionsFilePath() {
-	wxStandardPaths paths;
-	wxFileName pathExecutableFileName(paths.GetExecutablePath());
-	wxString nativeFileName = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
-	                          wxT("..") + wxFileName::GetPathSeparator() +
-	                          wxT("resources") + wxFileName::GetPathSeparator() +
-	                          wxT("native.php");
-	wxFileName fileName(nativeFileName);
-	fileName.Normalize();
-	return fileName;
 }
 
 bool mvceditor::ResourceFinderClass::CollectNearMatchResources() {
@@ -472,6 +464,10 @@ UnicodeString mvceditor::ResourceFinderClass::GetResourceReturnType(const Unicod
 				returnType = it->ReturnType;
 				break;
 			}
+			else if (it->Type == ResourceClass::MEMBER && it->Resource == icuResource) {
+				returnType = it->ReturnType;
+				break;
+			}
 		}
 	}
 	return returnType;
@@ -623,14 +619,26 @@ void mvceditor::ResourceFinderClass::BuildResourceCache(const wxString& fullPath
 	}
 }
 
-void mvceditor::ResourceFinderClass::ClassFound(const UnicodeString& className, const UnicodeString& signature, 
+void mvceditor::ResourceFinderClass::ClassFound(const UnicodeString& rawClassName, const UnicodeString& rawSignature, 
 		const UnicodeString& comment) {
+	UnicodeString filteredClassName(rawClassName);
+	UnicodeString filteredSignature(rawSignature);
+
+	// this prefix is put there by the script that builds the PHP file for the native functions
+	// the prefix is placed there so that we can run lint checks on the native functions file
+	if (rawClassName.startsWith(UNICODE_STRING_SIMPLE("mvceditornative_"))) {
+		int32_t pos = rawClassName.indexOf(UNICODE_STRING_SIMPLE("mvceditornative_"));
+		filteredClassName.setTo(rawClassName, pos + 16); // 16 = length of prefix
+	}
+	if (rawSignature.indexOf(UNICODE_STRING_SIMPLE("mvceditornative_")) >= 0) {
+		filteredSignature.findAndReplace(UNICODE_STRING_SIMPLE("mvceditornative_"), UNICODE_STRING_SIMPLE(""));
+	}
 	ResourceClass classItem;
-	classItem.Resource = className;
-	classItem.Identifier = className;
+	classItem.Resource = filteredClassName;
+	classItem.Identifier = filteredClassName;
 	classItem.Type = ResourceClass::CLASS;
 	classItem.FileItemIndex = CurrentFileItemIndex;
-	classItem.Signature = signature;
+	classItem.Signature = filteredSignature;
 	classItem.ReturnType = UNICODE_STRING_SIMPLE("");
 	classItem.Comment = comment;
 	ResourceCache.push_back(classItem);
@@ -649,18 +657,36 @@ void mvceditor::ResourceFinderClass::DefineDeclarationFound(const UnicodeString&
 	ResourceCache.push_back(defineItem);
 }
 
-void mvceditor::ResourceFinderClass::MethodFound(const UnicodeString& className, const UnicodeString& methodName,
-		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
+void mvceditor::ResourceFinderClass::MethodFound(const UnicodeString& rawClassName, const UnicodeString& rawMethodName,
+		const UnicodeString& rawSignature, const UnicodeString& returnType, const UnicodeString& comment,
 		mvceditor::TokenClass::TokenIds visibility, bool isStatic) {
+	UnicodeString filteredClassName(rawClassName);
+	UnicodeString filteredMethodName(rawMethodName);
+	UnicodeString filteredSignature(rawSignature);
+
+	// this prefix is put there by the script that builds the PHP file for the native functions
+	// the prefix is placed there so that we can run lint checks on the native functions file
+	if (rawClassName.startsWith(UNICODE_STRING_SIMPLE("mvceditornative_"))) {
+		int32_t pos = rawClassName.indexOf(UNICODE_STRING_SIMPLE("mvceditornative_"));
+		filteredClassName.setTo(rawClassName, pos + 16); // 16 = length of prefix
+	}
+	if (rawMethodName.startsWith(UNICODE_STRING_SIMPLE("mvceditornative_"))) {
+		int32_t pos = rawMethodName.indexOf(UNICODE_STRING_SIMPLE("mvceditornative_"));
+		filteredMethodName.setTo(rawMethodName, pos + 16); // 16 = length of prefix
+	}
+	if (rawSignature.indexOf(UNICODE_STRING_SIMPLE("mvceditornative_")) >= 0) {
+		filteredSignature.findAndReplace(UNICODE_STRING_SIMPLE("mvceditornative_"), UNICODE_STRING_SIMPLE(""));
+	}
 	ResourceClass item;
-	item.Resource = className + UNICODE_STRING_SIMPLE("::") + methodName;
-	item.Identifier = methodName;
+	item.Resource = filteredClassName + UNICODE_STRING_SIMPLE("::") + filteredMethodName;
+	item.Identifier = filteredMethodName;
 	item.Type = ResourceClass::METHOD;
 	item.FileItemIndex = CurrentFileItemIndex;
 	if (!returnType.isEmpty()) {
 		item.Signature = returnType + UNICODE_STRING_SIMPLE(" ");
 	}
-	item.Signature += signature;
+
+	item.Signature += filteredSignature;
 	item.ReturnType = returnType;
 	item.Comment = comment;
 	switch (visibility) {
@@ -676,32 +702,53 @@ void mvceditor::ResourceFinderClass::MethodFound(const UnicodeString& className,
 	item.IsStatic = isStatic;
 	MembersCache.push_back(item);
 
-	if (methodName.caseCompare(UNICODE_STRING_SIMPLE("__construct"), 0) == 0) {
+	if (filteredMethodName.caseCompare(UNICODE_STRING_SIMPLE("__construct"), 0) == 0) {
 		
 		// for constructors, rename them to have the same name as the class. IF this logic is changed, then the logic
 		// in the Collect methods must be changed as well.
 		ResourceClass itemConstruct;
-		itemConstruct.Resource = className + UNICODE_STRING_SIMPLE("::") + className;
-		itemConstruct.Identifier = className;
+		itemConstruct.Resource = filteredClassName + UNICODE_STRING_SIMPLE("::") + filteredClassName;
+		itemConstruct.Identifier = filteredClassName;
 		itemConstruct.Type = ResourceClass::METHOD;
 		itemConstruct.FileItemIndex = CurrentFileItemIndex;
 		if (!returnType.isEmpty()) {
 			itemConstruct.Signature = returnType + UNICODE_STRING_SIMPLE(" ");
 		}
-		itemConstruct.Signature += signature;
-		itemConstruct.Signature.findAndReplace(UNICODE_STRING_SIMPLE("__construct"), className);
+		itemConstruct.Signature += filteredSignature;
+		itemConstruct.Signature.findAndReplace(UNICODE_STRING_SIMPLE("__construct"), filteredClassName);
 		itemConstruct.ReturnType = returnType;
 		itemConstruct.Comment = comment;
 		MembersCache.push_back(itemConstruct);
 	}
 }
 
-void mvceditor::ResourceFinderClass::PropertyFound(const UnicodeString& className, const UnicodeString& propertyName,
+void mvceditor::ResourceFinderClass::MethodEnd(const UnicodeString& className, const UnicodeString& methodName, int pos) {
+
+	// no need to do anything special when a function has ended
+}
+
+void mvceditor::ResourceFinderClass::PropertyFound(const UnicodeString& rawClassName, const UnicodeString& propertyName,
                                         const UnicodeString& propertyType, const UnicodeString& comment, 
 										mvceditor::TokenClass::TokenIds visibility, bool isConst, bool isStatic) {
+	UnicodeString filteredClassName(rawClassName);
+
+	// this prefix is put there by the script that builds the PHP file for the native functions
+	// the prefix is placed there so that we can run lint checks on the native functions file
+	if (rawClassName.startsWith(UNICODE_STRING_SIMPLE("mvceditornative_"))) {
+		int32_t pos = rawClassName.indexOf(UNICODE_STRING_SIMPLE("mvceditornative_"));
+		filteredClassName.setTo(rawClassName, pos + 16); // 16 = length of prefix
+	}
+	UnicodeString filteredProperty(propertyName);
+	if (!isStatic) {
+
+		// remove the siguil from the property name when the variable is not static;
+		// because when using non-static access ("->") the siguil is not used
+		// this affects the code completion functionality
+		filteredProperty.findAndReplace(UNICODE_STRING_SIMPLE("$"), UNICODE_STRING_SIMPLE(""));
+	}
 	ResourceClass item;
-	item.Resource = className + UNICODE_STRING_SIMPLE("::") + propertyName;
-	item.Identifier = propertyName;
+	item.Resource = filteredClassName + UNICODE_STRING_SIMPLE("::") + filteredProperty;
+	item.Identifier = filteredProperty;
 	item.Type = isConst ? ResourceClass::CLASS_CONSTANT : ResourceClass::MEMBER;
 	item.FileItemIndex = CurrentFileItemIndex;
 	item.Signature = item.Resource;
@@ -721,17 +768,35 @@ void mvceditor::ResourceFinderClass::PropertyFound(const UnicodeString& classNam
 	MembersCache.push_back(item);
 }
 
-void mvceditor::ResourceFinderClass::FunctionFound(const UnicodeString& functionName, const UnicodeString& signature, 
+void mvceditor::ResourceFinderClass::FunctionFound(const UnicodeString& rawFunctionName, const UnicodeString& rawSignature, 
 		const UnicodeString& returnType, const UnicodeString& comment) {
+	UnicodeString filteredFunctionName(rawFunctionName);
+	UnicodeString filteredSignature(rawSignature);
+
+	// this prefix is put there by the script that builds the PHP file for the native functions
+	// the prefix is placed there so that we can run lint checks on the native functions file
+	if (rawFunctionName.startsWith(UNICODE_STRING_SIMPLE("mvceditornative_"))) {
+		int32_t pos = rawFunctionName.indexOf(UNICODE_STRING_SIMPLE("mvceditornative_"));
+		filteredFunctionName.setTo(rawFunctionName, pos + 16); // 16 = length of prefix
+	}
+	if (rawSignature.indexOf(UNICODE_STRING_SIMPLE("mvceditornative_")) >= 0) {
+		filteredSignature.findAndReplace(UNICODE_STRING_SIMPLE("mvceditornative_"), UNICODE_STRING_SIMPLE(""));
+	}
+
 	ResourceClass item;
-	item.Resource = functionName;
-	item.Identifier = functionName;
+	item.Resource = filteredFunctionName;
+	item.Identifier = filteredFunctionName;
 	item.Type = ResourceClass::FUNCTION;
 	item.FileItemIndex = CurrentFileItemIndex;
-	item.Signature = signature;
+	item.Signature = filteredSignature;
 	item.ReturnType = returnType;
 	item.Comment = comment;
 	ResourceCache.push_back(item);
+}
+
+void mvceditor::ResourceFinderClass::FunctionEnd(const UnicodeString& functionName, int pos) {
+	
+	// no need to do anything special when a function has ended
 }
 
 int mvceditor::ResourceFinderClass::GetLineCountFromFile(const wxString& fullPath) const {
@@ -930,6 +995,7 @@ void mvceditor::ResourceFinderClass::CopyResourcesFrom(const mvceditor::Resource
 		destFit->DateTime = fit->DateTime;
 		destFit->FullPath = fit->FullPath;
 		destFit->Parsed = fit->Parsed;
+		destFit->IsNew = fit->IsNew;
 		++destFit;
 		++fit;
 	}

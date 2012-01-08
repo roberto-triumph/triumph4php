@@ -26,9 +26,8 @@
 #define MVCEDITORCODECONTROLCLASS_H_
 
 #include <php_frameworks/ProjectClass.h>
-#include <widgets/DocumentClass.h>
+#include <search/ResourceFinderClass.h>
 #include <widgets/CodeControlOptionsClass.h>
-#include <widgets/ResourceUpdateThreadClass.h>
 #include <wx/stc/stc.h>
 #include <wx/timer.h>
 #include <unicode/unistr.h>
@@ -39,6 +38,14 @@
  * The source code editor.
  */
 namespace mvceditor {
+
+// some forward declarations to prevent re-compilation as much as possible
+// Since this file is included by many plugins whenever a change to any included header
+// files is maded most plugins have to be re-compiled.
+class TextDocumentClass;
+class ProjectClass;
+class ResourceUpdateThreadClass;
+
 
 /**
  * source code control with the following enhancements.
@@ -234,12 +241,11 @@ public:
 	void HandleCallTip(wxChar ch = 0, bool force = false);
 
 	/**
-	 * Returns the symbol that is positioned in the current cursos position.
+	 * Returns the resources that match the the current cursor position.
 	 *
-	 * @return wxString a class name, or class name/method name, function name, or keyword.  The string is suitable
-	 *         for passing to a ResourceFinderClass instance.
+	 * @return resource matches
 	 */
-	wxString GetCurrentSymbol();
+	std::vector<ResourceClass> GetCurrentSymbolResource();
 
 	/**
 	 * Applies the current prefernces to this window. This method should be called when the CodeControlOptions class
@@ -340,6 +346,12 @@ private:
 	 */
 	void AutoDetectDocumentMode();
 
+	/**
+	 * indents if the given char is a new line character.  Handles windows and unix line endings.
+	 *
+	 * @param char ch the character that was added to the document
+	 */
+	void HandleAutomaticIndentation(char ch);
 
 //------------------------------------------------------------------------
 // word highlight feature
@@ -359,25 +371,6 @@ private:
 	 */
 	void UndoHighlight();
 
-//------------------------------------------------------------------------
-
-
-//------------------------------------------------------------------------
-// Brace matching and automatic indentation features
-//------------------------------------------------------------------------
-	/**
-	 * If char at poistion pos ot (pos +1) is a brace, highlight the brace
-	 * Otherwise, remove all brace highlights
-	 * @param int posToCheck text position to look in
-	 */
-	void MatchBraces(int posToCheck);
-
-	/**
-	 * indents if the given char is a new line character.  Handles windows and unix line endings.
-	 *
-	 * @param char ch the character that was added to the document
-	 */
-	void HandleAutomaticIndentation(char ch);
 
 //------------------------------------------------------------------------
 // Event handlers
@@ -420,87 +413,10 @@ private:
 	 */
 	void OnDwellEnd(wxStyledTextEvent& event);
 
-//------------------------------------------------------------------------
-// Auto complete feature
-//------------------------------------------------------------------------
-	/**
-	 * Returns true if a  PHP variable is located at position pos
-	 *
-	 * @return bool
-	 */
-	bool PositionedAtVariable(int pos);
-
-	/**
-	 * Returns the symbol that is positioned in the given cursor position.
-	 *
-	 * @param int posToCheck a SCINTILLA POSITION (ie. BYTES not characters)
-	 * @return wxString a class name, or class name/method name, function name, or keyword.  The string is suitable
-	 *         for passing to a ResourceFinderClass instance.
-	 */
-	wxString GetSymbolAt(int posToCheck);
-
-	/**
-	 * Check to see if the given position is at a PHP comment or style.
-	 * This is a quick-check that doesn't do any parsing it relies on the scintiall styling only
-	 * (this method will return true if the position is colored as a string or comment.)
-	 * This implementation should probably change in the future.
-	 *
-	 * @param int posToCheck the scintilla position (byte) to check
-	 * @return bool TRUE if the position is at a PHP comment or PHP string
-	 */
-	bool InCommentOrStringStyle(int posToCheck);
-	
-	/**
-	 * This method will get called by the ResourceUpdates object when parsing of the
-	 * code in this control has been completed.
-	 */
-	void OnResourceUpdateComplete(wxCommandEvent& event);
-	
-	/**
-	 * This method will check to see if document is "dirty" and if so it will
-	 * start re-parsing in the background
-	 */
-	void OnTimer(wxTimerEvent& event);
-
-
-//------------------------------------------------------------------------
-// Character conversion (UTF-8 <--> ICU) needed for proper string offsets
-//------------------------------------------------------------------------
-
-	/**
-	 * Use this method whenever you need to get a UnicodeString that is being calculated from Scintilla
-	 * positions (GetCurrentPos(), GetWordStart(), etc...)
-	 * Scintilla uses UTF-8 encoding and the positions it returns are byte offsets not character offsets.
-	 * The method can be given integers where to put the resulting character indices if needed.
-	 *
-	 * @param int startPos byte offset
-	 * @param int endPos byte offset, EXCLUSIVE the character at endPos will NOT be included
-	 *
-	 */
-	UnicodeString GetSafeSubstring(int startPos, int endPos);
-
 	/*
 	* The file that was loaded.
 	*/
 	wxString CurrentFilename;
-
-	/**
-	 * The resource signature currently being displayed in the calltip.
-	 *
-	 * @var wxString
-	 */
-	wxString CurrentSignature;
-	
-	/**
-	 * A unique string used to identify this code control. This string is used in conjunction with 
-	 * the ResourceUpdates object.
-	 */
-	wxString FileIdentifier;
-	
-	/**
-	 * Used to control how often to check for resource re-parsing
-	 */
-	wxTimer Timer;
 
 	/**
 	 * The options to enable/disable various look & feel items
@@ -578,14 +494,6 @@ private:
 	 * @var bool
 	 */
 	bool WordHighlightIsWordHighlighted;
-	
-	/**
-	 * This flag will control whether the document is "dirty" and needs to be re-parsed
-	 * This is NOT the same as GetModify() from scintilla; scintilla's Modify will be
-	 * set to false if the user undoes changes; but if a user undoes changes we still
-	 * want to trigger a re-parsing
-	 */
-	bool NeedToUpdateResources;
 
 	/**
 	 * Store the time the file was opened / last saved. We will use this to check to see if the file was modified

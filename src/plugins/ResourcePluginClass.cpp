@@ -25,6 +25,7 @@
 #include <plugins/ResourcePluginClass.h>
 #include <windows/StringHelperClass.h>
 #include <MvcEditorErrors.h>
+#include <MvcEditorAssets.h>
 #include <wx/artprov.h>
 #include <wx/filename.h>
 #include <wx/valgen.h>
@@ -41,7 +42,7 @@ mvceditor::ResourceFileReaderClass::ResourceFileReaderClass(wxEvtHandler& handle
 }
 
 bool mvceditor::ResourceFileReaderClass::InitForNativeFunctionsFile(const mvceditor::ResourceFinderClass& finder) {
-	wxFileName nativeFunctionsFilePath = NewResources.NativeFunctionsFilePath();
+	wxFileName nativeFunctionsFilePath = mvceditor::NativeFunctionsAsset();
 	if (Init(nativeFunctionsFilePath.GetPath())) {
 		NewResources.CopyResourcesFrom(finder);
 		
@@ -154,7 +155,11 @@ void mvceditor::ResourcePluginClass::SearchForResources() {
 	// if we know the indexing has already taken place lets just do the lookup; it will be quick.
 	if (!NeedToIndex() && project) {
 		resourceFinder->CollectNearMatchResources();
-		ShowJumpToResults();
+		std::vector<mvceditor::ResourceClass> matches;
+		for (size_t i = 0; i < resourceFinder->GetResourceMatchCount(); ++i) {
+			matches.push_back(resourceFinder->GetResourceMatch(i));
+		}
+		ShowJumpToResults(matches);
 		return;
 	}
 
@@ -225,14 +230,18 @@ void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
 	State = FREE;
 	if (GOTO == previousState) {
 		resourceFinder->CollectNearMatchResources();
-		ShowJumpToResults();
+		std::vector<mvceditor::ResourceClass> matches;
+		for (size_t i = 0; i < resourceFinder->GetResourceMatchCount(); ++i) {
+			matches.push_back(resourceFinder->GetResourceMatch(i));
+		}
+		ShowJumpToResults(matches);
 	}
 }
 
-void mvceditor::ResourcePluginClass::ShowJumpToResults() {
-	ResourceFinderClass* resourceFinder = GetResourceFinder();
+void mvceditor::ResourcePluginClass::ShowJumpToResults(const std::vector<mvceditor::ResourceClass>& matches) {
 	wxArrayString files;
-	switch (resourceFinder->GetResourceMatchCount()) {
+	mvceditor::ResourceFinderClass* resourceFinder = GetResourceFinder();
+	switch (matches.size()) {
 		case 1:
 			LoadPageFromResourceFinder(resourceFinder, 0);
 			break;
@@ -248,8 +257,11 @@ void mvceditor::ResourcePluginClass::ShowJumpToResults() {
 			}
 			break;
 		default:
-			for (size_t i = 0; i < resourceFinder->GetResourceMatchCount(); ++i) {
-				files.Add(resourceFinder->GetResourceMatchFullPath(i));
+			
+			// TODO this is totally wrong because the matches come from the CodeControl; and the CodeControl is using
+			// the ResourceUpdatesThread class which more up-to-date resources
+			for (size_t i = 0; i < matches.size(); ++i) {
+				files.Add(resourceFinder->GetResourceMatchFullPathFromResource(matches[i]));
 			}
 			
 			// dont show the project path to the user
@@ -320,33 +332,13 @@ void mvceditor::ResourcePluginClass::OnJump(wxCommandEvent& event) {
 	CodeControlClass* codeControl = GetCurrentCodeControl();
 	wxWindow* mainWindow = GetMainWindow();
 	if (codeControl) {
-		ResourceFinderClass* resourceFinder = GetResourceFinder();
-		//wxString text = codeControl->GetSelectedText();
-		//if (!text.IsEmpty()) {
-		// the user specifically marked a string to search
-		// lets see if we can determine the class. if we can determine the class, we will have a higher
-		// chance of getting fewer matches from the resource finder
-		wxString symbol = codeControl->GetCurrentSymbol();
-		if (!symbol.IsEmpty()) {
-			//if (symbol.Contains(wxT("::"))) {
-				//text = symbol;
-			//}
-			bool found = resourceFinder->Prepare(symbol) && resourceFinder->CollectNearMatchResources();
-			if (found) {
-				JumpToText = symbol;
-				ShowJumpToResults();	
-			}
-			else {
-				
-				// maybe cache has not been created or user has not indexed the project, lets index the project and try again
-				JumpToText = symbol;
-				
-				ResourcePluginPanelClass* window = (ResourcePluginPanelClass*)wxWindow::FindWindowById(ID_RESOURCE_PLUGIN_PANEL, mainWindow);
-				window->FocusOnSearchControl();
-				SearchForResources();
-			}
+		std::vector<mvceditor::ResourceClass> matches = codeControl->GetCurrentSymbolResource();
+		if (!matches.empty()) {
+			ShowJumpToResults(matches);	
 		}
 		else {
+			
+			// maybe cache has not been created or user has not indexed the project, lets index the project and try again			
 			ResourcePluginPanelClass* window = (ResourcePluginPanelClass*)wxWindow::FindWindowById(ID_RESOURCE_PLUGIN_PANEL, mainWindow);
 			window->FocusOnSearchControl();
 			SearchForResources();

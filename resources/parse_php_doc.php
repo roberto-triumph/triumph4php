@@ -33,34 +33,37 @@
  * When CHECK_SYNTAX is TRUE, the output PHP file wil be run through a PHP lint check (php -l) so that we can assert that the generated file 
  * is correct.
  */
-define('CHECK_SYNTAX', FALSE);
+define('CHECK_SYNTAX', TRUE);
 
 /*
  * name of the downloaded PHP doc file, after uncompressing
  */
-define('PHP_MANUAL_FILE_NAME', 'php_manual_en.html');
+define('PHP_MANUAL_FILE_NAME', __DIR__ . DIRECTORY_SEPARATOR . 'php_manual_en.html');
 
 /*
  * name of the downloaded PHP doc file
  */
-define('PHP_MANUAL_COMPRESSED_FILE_NAME', PHP_MANUAL_FILE_NAME . '.gz');
+define('PHP_MANUAL_COMPRESSED_FILE_NAME', __DIR__ . DIRECTORY_SEPARATOR . PHP_MANUAL_FILE_NAME . '.gz');
 
 /*
  * name of the file that the PHP code will be written to
  */
-define('OUTPUT_FILE_NAME', 'native.php');
+define('OUTPUT_FILE_NAME', __DIR__ . DIRECTORY_SEPARATOR . 'native.php');
 
 define('DO_PRINT', FALSE);
 
 /*
- * in order to be able to run the generated code through a lint check, we need to generate proper PHP. oddly enough, some
- * extensions don't adhere to correct PHP and this function is meant to correct this.
+ * in order to be able to run the generated code through a lint check, we need to generate proper PHP. however,
+ * when we attempt to run the generated file through a lint check the lint check will complain of redefining functions
+ * unless we prepend them with a string (to be taken out by the editor).
+ * the goal is that the generated file should pass lint check.
  */
 function identifier($name) {
 	if (CHECK_SYNTAX) {
 		if ('clone' == $name || 'isSet' == $name) {
-			$name = 'y' . $name;
+			$name = 'mvceditornative_' . $name;
 		}
+		
 		//some documentation has dashes in some class names (for example OCI-Collection, but they are not valid identifers
 		$name = str_replace('-', '_', $name);
 		$name = str_replace('$8bit', '$eightBit', $name);
@@ -71,10 +74,18 @@ function identifier($name) {
 function getContents($file) {
 	$nextFunction = FALSE;
 	$contents = '';
-	while (!$nextFunction) {
+	$lastLine = '';
+	$line = '';
+	while (!$nextFunction && !feof($file)) {
+		$lastLine = $line;
 		$line = fgets($file);
 		$contents .= trim($line) . ' ';
 		$nextFunction = FALSE !== stripos($line, '</div><hr />');
+		if (!$nextFunction) {
+		
+			// PHP 5.3.9 docs have this in 2 lines
+			$nextFunction = '</div>' == trim($lastLine) && '<hr />' == trim($line);
+		}
 	}
 	$contents = str_replace('&nbsp;', ' ', $contents);
 	$contents = html_entity_decode($contents);
@@ -89,6 +100,10 @@ function parseName($contents) {
 		$name = str_replace('->', '::', $name);
 		$name = identifier($name);
 		
+		// a 'fake' namespace to put all functions in
+		if (CHECK_SYNTAX) {
+			$name = 'mvceditornative_' . $name;
+		}
 	}
 	return $name;
 }
@@ -110,6 +125,7 @@ function parseDescription($contents, $resourceName, $isMethod) {
 		$description =  str_replace('\t', ' ', strip_tags($matches[1]));
 	}
 	$matches = array();
+	$longDescription = FALSE;
 	if (preg_match('/<p class="para rdfs-comment">(.+)<\/p>(\s+)<\/div>/', $contents, $matches)) {
 		$longDescription = str_replace('\t', ' ', strip_tags($matches[1]));
 	}

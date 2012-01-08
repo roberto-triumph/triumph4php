@@ -159,12 +159,6 @@ public:
 	 * GetResourceSignature methods will work for PHP native functions (array, string, file functions ...).
 	 */
 	void BuildResourceCacheForNativeFunctions();
-
-	/**
-	 * Returns the file that has the PHP native functions.This file was created using the script
-	 * resources/parser_php_doc.php and exists inside of the MVC Editor app distribution.
-	 */
-	wxFileName NativeFunctionsFilePath();
 	
 	/**
 	 * Parses the given string for resources.  This method would be used, for example, when wanting
@@ -373,6 +367,8 @@ public:
 	void MethodFound(const UnicodeString& className, const UnicodeString& methodName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 		TokenClass::TokenIds visibility, bool isStatic);
+
+	void MethodEnd(const UnicodeString& className, const UnicodeString& methodName, int pos);
  
 	/**
 	 * Implement class member observer.  When a class property has been parsed, add it to the Resource Cache.
@@ -386,6 +382,8 @@ public:
 	 */
 	void FunctionFound(const UnicodeString& methodName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment);
+
+	void FunctionEnd(const UnicodeString& functionName, int pos);
 		
 	/**
 	 * Print the resource cache to stdout.  Useful for debugging only.
