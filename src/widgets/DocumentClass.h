@@ -112,6 +112,17 @@ public:
 	virtual void MatchBraces(int posToCheck);
 
 	/**
+	 * subclasses should connect to Styled Text events in this method
+	 */
+	virtual void AttachToControl(wxStyledTextCtrl* ctrl);
+
+	/**
+	 * subclasses should disconnect to Styled Text events in this method
+	 */
+	virtual void DetachFromControl(wxStyledTextCtrl* ctrl);
+
+
+	/**
 	 * Returns a string containing all of the contents of the code control.  The difference with GetText() is that this
 	 * method accounts for high ascii characters correctly.
 	 *
@@ -174,6 +185,11 @@ public:
 	void FileOpened(wxString fileName);
 
 	void MatchBraces(int posToCheck);
+
+	virtual void AttachToControl(wxStyledTextCtrl* ctrl);
+
+	virtual void DetachFromControl(wxStyledTextCtrl* ctrl);
+
 	
 	wxString GetPhpKeywords() const;
 	
@@ -250,6 +266,11 @@ private:
 	void RegisterAutoCompletionImages();
 
 	/**
+	 * Append the '(' for method calls that are completed
+	 */
+	void OnAutoCompletionSelected(wxStyledTextEvent& evt);
+
+	/**
 	 * In order to show the proper auto complete keywords we must know what language is
 	 * being edited at any given position.  This class will help in this regard.
 	 */
@@ -277,6 +298,12 @@ private:
 	 * The resources used to populate the call tips
 	 */
 	std::vector<ResourceClass> CurrentCallTipResources;
+
+	/**
+	 * The resources that are shown in the code completion list. Keeping these around
+	 * so that we can append the '(' for method calls.
+	 */
+	std::vector<mvceditor::ResourceClass> AutoCompletionResourceMatches;
 
 	/**
 	 * Used to control how often to check for resource re-parsing

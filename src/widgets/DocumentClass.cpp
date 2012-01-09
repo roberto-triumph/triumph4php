@@ -172,15 +172,21 @@ static wxString PhpCallTipSignature(size_t index, const std::vector<mvceditor::R
 
 
 mvceditor::TextDocumentClass::TextDocumentClass() {
-	
+	Ctrl = NULL;
 }
 
 mvceditor::TextDocumentClass::~TextDocumentClass() {
-	
+	if (Ctrl) {
+		DetachFromControl(Ctrl);
+	}
 }
 
 void mvceditor::TextDocumentClass::SetControl(wxStyledTextCtrl* ctrl) {
+	if (Ctrl) {
+		DetachFromControl(Ctrl);
+	}
 	Ctrl = ctrl;
+	AttachToControl(Ctrl);
 }
 
 bool mvceditor::TextDocumentClass::CanAutoComplete() {
@@ -230,6 +236,14 @@ UnicodeString mvceditor::TextDocumentClass::GetSafeSubstring(int startPos, int e
 	return ret;
 }
 
+void mvceditor::TextDocumentClass::AttachToControl(wxStyledTextCtrl* ctrl) {
+
+}
+
+void mvceditor::TextDocumentClass::DetachFromControl(wxStyledTextCtrl* ctrl) {
+
+}
+
 mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::ProjectClass* project, mvceditor::ResourceUpdateThreadClass* resourceUpdates)
 	: wxEvtHandler()
 	, TextDocumentClass()
@@ -239,6 +253,7 @@ mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::ProjectClass* project, 
 	, ScopeFinder()
 	, Timer()
 	, CurrentCallTipResources()
+	, AutoCompletionResourceMatches()
 	, FileIdentifier()
 	, Project(project)
 	, ResourceUpdates(resourceUpdates)
@@ -252,29 +267,42 @@ mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::ProjectClass* project, 
 	// resource updates object needs a unique name
 	wxLongLong time = wxGetLocalTimeMillis();
 	FileIdentifier = wxString::Format(wxT("File_%s"), time.ToString().c_str());
-
-	// using Connect instead of Event tables because call EVT_STC_CALLTIP_CLICK macro
-	// contains a syntax error
-	Connect(wxID_ANY, wxID_ANY, wxEVT_STC_CALLTIP_CLICK, 
-		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(wxStyledTextEventFunction, &mvceditor::PhpDocumentClass::OnCallTipClick),
-		NULL, this);
-	Connect(wxID_ANY, wxID_ANY, wxEVT_KEY_DOWN, 
-		wxKeyEventHandler(mvceditor::PhpDocumentClass::OnKeyDown),
-		NULL, this);
 }
 
 mvceditor::PhpDocumentClass::~PhpDocumentClass() {
 	Timer.Stop();
-	Disconnect(wxID_ANY, wxID_ANY, wxEVT_STC_CALLTIP_CLICK, 
-		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(wxStyledTextEventFunction, &mvceditor::PhpDocumentClass::OnCallTipClick),
-		NULL, this);
-	Disconnect(wxID_ANY, wxID_ANY, wxEVT_KEY_DOWN, 
-		wxKeyEventHandler(mvceditor::PhpDocumentClass::OnKeyDown),
-		NULL, this);
 	if (ResourceUpdates) {
 		ResourceUpdates->Unregister(FileIdentifier);
 	}
-	Ctrl->ClearRegisteredImages();
+	
+}
+
+void mvceditor::PhpDocumentClass::AttachToControl(wxStyledTextCtrl* ctrl) {
+		
+	// using Connect instead of Event tables because call EVT_STC_CALLTIP_CLICK macro
+	// contains a syntax error
+	ctrl->Connect(wxID_ANY, wxID_ANY, wxEVT_STC_CALLTIP_CLICK, 
+		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(wxStyledTextEventFunction, &mvceditor::PhpDocumentClass::OnCallTipClick),
+		NULL, this);
+	ctrl->Connect(wxID_ANY, wxID_ANY, wxEVT_KEY_DOWN, 
+		wxKeyEventHandler(mvceditor::PhpDocumentClass::OnKeyDown),
+		NULL, this);
+	ctrl->Connect(wxID_ANY, wxID_ANY, wxEVT_STC_AUTOCOMP_SELECTION,
+		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(wxStyledTextEventFunction, &mvceditor::PhpDocumentClass::OnAutoCompletionSelected),
+		NULL, this);
+}
+
+void mvceditor::PhpDocumentClass::DetachFromControl(wxStyledTextCtrl* ctrl) {
+	ctrl->Disconnect(wxID_ANY, wxID_ANY, wxEVT_STC_CALLTIP_CLICK, 
+		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(wxStyledTextEventFunction, &mvceditor::PhpDocumentClass::OnCallTipClick),
+		NULL, this);
+	ctrl->Disconnect(wxID_ANY, wxID_ANY, wxEVT_KEY_DOWN, 
+		wxKeyEventHandler(mvceditor::PhpDocumentClass::OnKeyDown),
+		NULL, this);
+	ctrl->Disconnect(wxID_ANY, wxID_ANY, wxEVT_STC_AUTOCOMP_SELECTION,
+		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(wxStyledTextEventFunction, &mvceditor::PhpDocumentClass::OnAutoCompletionSelected),
+		NULL, this);
+	ctrl->ClearRegisteredImages();
 }
 
 bool mvceditor::PhpDocumentClass::CanAutoComplete() {
@@ -282,6 +310,7 @@ bool mvceditor::PhpDocumentClass::CanAutoComplete() {
 }
 
 void mvceditor::PhpDocumentClass::HandleAutoCompletion() {	
+	AutoCompletionResourceMatches.clear();
 	int currentPos = Ctrl->GetCurrentPos();
 	int startPos = Ctrl->WordStartPosition(currentPos, true);
 	int endPos = Ctrl->WordEndPosition(currentPos, true);
@@ -364,7 +393,6 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 	}
 	std::vector<wxString> autoCompleteList;
 	std::vector<UnicodeString> variableMatches;
-	std::vector<mvceditor::ResourceClass> resourceMatches;
 	int expressionPos = code.length() - 1;
 	UnicodeString lastExpression = Lexer.LastExpression(code);
 	mvceditor::SymbolClass parsedExpression;
@@ -374,7 +402,8 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 		UnicodeString expressionScope = ScopeFinder.GetScopeString(code, expressionPos);
 		mvceditor::ResourceFinderClass* globalResourceFinder = Project->GetResourceFinder();
 
-		ResourceUpdates->Worker.ExpressionCompletionMatches(FileIdentifier, parsedExpression, expressionScope, globalResourceFinder, variableMatches, resourceMatches);
+		ResourceUpdates->Worker.ExpressionCompletionMatches(FileIdentifier, parsedExpression, expressionScope, globalResourceFinder, 
+			variableMatches, AutoCompletionResourceMatches);
 		if (!variableMatches.empty()) {
 			for (size_t i = 0; i < variableMatches.size(); ++i) {
 				wxString postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_VARIABLE);
@@ -384,18 +413,19 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 		else if (parsedExpression.ChainList.size() == 1) {
 			
 			// a bunch of function, define, or class names
-			for (size_t i = 0; i < resourceMatches.size(); ++i) {
+			for (size_t i = 0; i < AutoCompletionResourceMatches.size(); ++i) {
+				mvceditor::ResourceClass res = AutoCompletionResourceMatches[i];
 				wxString postFix;
-				if (mvceditor::ResourceClass::DEFINE == resourceMatches[i].Type) {
+				if (mvceditor::ResourceClass::DEFINE == res.Type) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_VARIABLE);
 				}
-				else if (mvceditor::ResourceClass::FUNCTION == resourceMatches[i].Type) {
+				else if (mvceditor::ResourceClass::FUNCTION == res.Type) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_FUNCTION);
 				}
-				else if (mvceditor::ResourceClass::CLASS == resourceMatches[i].Type) {
+				else if (mvceditor::ResourceClass::CLASS == res.Type) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_CLASS);
 				}
-				autoCompleteList.push_back(mvceditor::StringHelperClass::IcuToWx(resourceMatches[i].Identifier) + postFix);
+				autoCompleteList.push_back(mvceditor::StringHelperClass::IcuToWx(res.Identifier) + postFix);
 			}
 
 			// when completing standalone function names, also include keyword matches
@@ -405,28 +435,29 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 				autoCompleteList.push_back(keywordMatches[i] + postFix);
 			}
 		}
-		else if (!resourceMatches.empty()) {
+		else if (!AutoCompletionResourceMatches.empty()) {
 			
 			// an object / function "chain"
-			for (size_t i = 0; i < resourceMatches.size(); ++i) {
-				wxString comp = mvceditor::StringHelperClass::IcuToWx(resourceMatches[i].Identifier);
+			for (size_t i = 0; i < AutoCompletionResourceMatches.size(); ++i) {
+				mvceditor::ResourceClass res = AutoCompletionResourceMatches[i];
+				wxString comp = mvceditor::StringHelperClass::IcuToWx(res.Identifier);
 				wxString postFix;
-				if (mvceditor::ResourceClass::MEMBER == resourceMatches[i].Type && resourceMatches[i].IsPrivate) {
+				if (mvceditor::ResourceClass::MEMBER == res.Type && res.IsPrivate) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PRIVATE_MEMBER);
 				}
-				else if (mvceditor::ResourceClass::MEMBER == resourceMatches[i].Type && resourceMatches[i].IsProtected) {
+				else if (mvceditor::ResourceClass::MEMBER == res.Type && res.IsProtected) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PROTECTED_MEMBER);
 				}
-				else if (mvceditor::ResourceClass::MEMBER == resourceMatches[i].Type) {
+				else if (mvceditor::ResourceClass::MEMBER == res.Type) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PUBLIC_MEMBER);
 				}
-				else if (mvceditor::ResourceClass::METHOD == resourceMatches[i].Type && resourceMatches[i].IsPrivate) {
+				else if (mvceditor::ResourceClass::METHOD == res.Type && res.IsPrivate) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PRIVATE_METHOD);
 				}
-				else if (mvceditor::ResourceClass::METHOD == resourceMatches[i].Type && resourceMatches[i].IsProtected) {
+				else if (mvceditor::ResourceClass::METHOD == res.Type && res.IsProtected) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PROTECTED_METHOD);
 				}
-				else if (mvceditor::ResourceClass::METHOD == resourceMatches[i].Type) {
+				else if (mvceditor::ResourceClass::METHOD == res.Type) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PUBLIC_METHOD);
 				}
 				autoCompleteList.push_back(comp + postFix);
@@ -634,6 +665,7 @@ void mvceditor::PhpDocumentClass::OnKeyDown(wxKeyEvent& event) {
 		event.Skip();
 		return;
 	}
+
 	// only update the dirty bit on a letter, number of backspace
 	// keypress.  disregard shortcut keystrokes
 	// we want to keep the re-parsings to a minimum
@@ -707,7 +739,7 @@ bool mvceditor::PhpDocumentClass::InCommentOrStringStyle(int posToCheck) {
 }
 
 void mvceditor::PhpDocumentClass::OnCallTipClick(wxStyledTextEvent& evt) {
-	if (evt.GetEventObject() == this) {
+	if (evt.GetEventObject() == Ctrl) {
 		if (!CurrentCallTipResources.empty()) {
 			size_t resourcesSize = CurrentCallTipResources.size();
 			int position = evt.GetPosition();
@@ -773,6 +805,33 @@ void mvceditor::PhpDocumentClass::RegisterAutoCompletionImages() {
 		wxFileName imgFileName = mvceditor::AutoCompleteImageAsset(it->second);
 		wxBitmap bitmap(imgFileName.GetFullPath(), wxBITMAP_TYPE_XPM);
 		Ctrl->RegisterImage(it->first, bitmap);
+	}
+}
+
+void mvceditor::PhpDocumentClass::OnAutoCompletionSelected(wxStyledTextEvent& event) {
+	if (!AutoCompletionResourceMatches.empty()) {
+		UnicodeString selected = mvceditor::StringHelperClass::wxToIcu(event.GetText());
+		
+		for (size_t i = 0; i < AutoCompletionResourceMatches.size(); ++i) {
+			mvceditor::ResourceClass res = AutoCompletionResourceMatches[i];
+			if (res.Identifier == selected) {
+
+				// user had selected  a function /method name; let's add the 
+				// parenthesis and show the call tip
+				Ctrl->AutoCompCancel();
+				wxString selected = event.GetText();
+				int startPos = Ctrl->WordStartPosition(Ctrl->GetCurrentPos(), true);
+				Ctrl->SetSelection(startPos, Ctrl->GetCurrentPos());
+				if (mvceditor::ResourceClass::FUNCTION == res.Type || mvceditor::ResourceClass::METHOD == res.Type) {
+					Ctrl->ReplaceSelection(selected + wxT("("));
+					HandleCallTip(0, true);
+				}
+				else {
+					Ctrl->ReplaceSelection(selected);
+				}
+				break;
+			}
+		}
 	}
 }
 

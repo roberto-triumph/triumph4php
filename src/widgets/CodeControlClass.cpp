@@ -79,7 +79,6 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 	SetYCaretPolicy(wxSTC_CARET_EVEN, 0);
 	ApplyPreferences();
 	SetMouseDwellTime(1500);
-	AutoCompSetSeparator('/');
 }
 
 mvceditor::CodeControlClass::~CodeControlClass() {
@@ -389,6 +388,7 @@ void mvceditor::CodeControlClass::SetPhpOptions() {
 	SetStyleBits(7);
 	AutoCompStops(wxT("!@#$%^&*()_+-=[]\\{}|;'\",./<?"));
 	AutoCompSetSeparator('\n');
+	AutoCompSetChooseSingle(true);
 	AutoCompSetFillUps(wxT("(["));
 	AutoCompSetIgnoreCase(true);
 	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$"));
@@ -445,6 +445,7 @@ void mvceditor::CodeControlClass::SetSqlOptions() {
 	SetStyleBits(5);
 	AutoCompStops(wxT("!@#$%^&*()_+-=[]\\{}|;'\",/?`"));
 	AutoCompSetSeparator(' ');
+	AutoCompSetChooseSingle(true);
 	AutoCompSetIgnoreCase(true);
 	AutoCompSetFillUps(wxT("(["));
 	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
@@ -486,6 +487,7 @@ void mvceditor::CodeControlClass::SetCssOptions() {
 	AutoCompStops(wxT("!@#$%^&*()_+-=[]\\{}|;'\",/?`"));
 	AutoCompSetSeparator(' ');
 	AutoCompSetIgnoreCase(true);
+	AutoCompSetChooseSingle(true);
 	AutoCompSetFillUps(wxT("([:"));
 	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
 	WordHighlightStyle = INDICATOR_TEXT_STYLE;
