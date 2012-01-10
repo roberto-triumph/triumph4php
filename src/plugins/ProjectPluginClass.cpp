@@ -78,7 +78,7 @@ void mvceditor::ProjectPluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
 void mvceditor::ProjectPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
 	menuItemIds[mvceditor::MENU_PROJECT + 0] = wxT("Project-Explore");
-	menuItemIds[mvceditor::MENU_PROJECT + 1] = wxT("Project-Explore-File");
+	menuItemIds[mvceditor::MENU_PROJECT + 1] = wxT("Project-Explore File");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 

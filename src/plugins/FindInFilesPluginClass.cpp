@@ -534,7 +534,7 @@ void mvceditor::FindInFilesPluginClass::AddEditMenuItems(wxMenu* editMenu) {
 
 void mvceditor::FindInFilesPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
-	menuItemIds[mvceditor::MENU_FIND_IN_FILES + 0] = wxT("Find-In-Files");
+	menuItemIds[mvceditor::MENU_FIND_IN_FILES + 0] = wxT("Find-Find In Files");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 

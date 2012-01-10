@@ -260,7 +260,7 @@ void mvceditor::LintPluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 
 void mvceditor::LintPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
-	menuItemIds[mvceditor::MENU_LINT_PHP + 0] = wxT("Lint-Check");
+	menuItemIds[mvceditor::MENU_LINT_PHP + 0] = wxT("Lint Check - Lint Check Project");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 

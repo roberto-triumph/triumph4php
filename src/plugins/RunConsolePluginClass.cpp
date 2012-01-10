@@ -183,9 +183,9 @@ void mvceditor::RunConsolePluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
 void mvceditor::RunConsolePluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
 	menuItemIds[mvceditor::MENU_RUN_PHP + 0] = wxT("Console-Run");
-	menuItemIds[mvceditor::MENU_RUN_PHP + 1] = wxT("Console-Run-Arguments");
-	menuItemIds[mvceditor::MENU_RUN_PHP + 2] = wxT("Console-Run-New");
-	menuItemIds[mvceditor::MENU_RUN_PHP + 3] = wxT("Console-Run-New-Arguments");
+	menuItemIds[mvceditor::MENU_RUN_PHP + 1] = wxT("Console-Run With Arguments");
+	menuItemIds[mvceditor::MENU_RUN_PHP + 2] = wxT("Console-Run In New Window");
+	menuItemIds[mvceditor::MENU_RUN_PHP + 3] = wxT("Console-Run-In New Window With Arguments");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 

@@ -742,8 +742,8 @@ void mvceditor::SqlBrowserPluginClass::AddKeyboardShortcuts(std::vector<mvcedito
 	std::map<int, wxString> menuItemIds;
 	menuItemIds[mvceditor::MENU_SQL + 0] = wxT("SQL-Browser");
 	menuItemIds[mvceditor::MENU_SQL + 1] = wxT("SQL-Connections");
-	menuItemIds[mvceditor::MENU_SQL + 2] = wxT("SQL-Run-Queries");
-	menuItemIds[mvceditor::MENU_SQL + 3] = wxT("SQL-Detect-SQL-Meta-Data");
+	menuItemIds[mvceditor::MENU_SQL + 2] = wxT("SQL-Run Queries");
+	menuItemIds[mvceditor::MENU_SQL + 3] = wxT("SQL-Detect SQL Meta Data");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 

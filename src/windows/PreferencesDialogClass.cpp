@@ -29,6 +29,8 @@
 #include <wx/keybinder.h>
 #include <wx/stdpaths.h>
 #include <wx/wfstream.h>
+#include <map>
+#include <vector>
 
 mvceditor::PreferencesDialogClass::PreferencesDialogClass(wxWindow* parent, mvceditor::PreferencesClass& preferences)
 		: wxPropertySheetDialog(parent, wxID_ANY, _("Preferences"))
@@ -41,12 +43,12 @@ mvceditor::PreferencesDialogClass::PreferencesDialogClass(wxWindow* parent, mvce
 	EditorBehavior = new EditorBehaviorPanelClass(notebook, Preferences.CodeControlOptions);
 	notebook->AddPage(EditorBehavior, _("Editor Behavior"));
 	notebook->AddPage(new EditColorsPanelClass(notebook, Preferences.CodeControlOptions), _("Styles && Colors"));
-	KeyConfigPanel =  new wxKeyConfigPanel(notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, 
+	KeyboardShortcutsPanel =  new KeyboardShortcutsPanelClass(notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, 
 		wxKEYBINDER_USE_TREECTRL | wxKEYBINDER_SHOW_ADDREMOVE_PROFILE | wxKEYBINDER_ENABLE_PROFILE_EDITING);
 
-	KeyConfigPanel->AddProfiles(Preferences.KeyProfiles);
-	KeyConfigPanel->ImportKeyProfileCmd(*Preferences.KeyProfiles.GetSelProfile(), _("MVC Editor"));
-	notebook->AddPage(KeyConfigPanel, _("Keyboard Shortcuts"));
+	KeyboardShortcutsPanel->AddProfiles(Preferences.KeyProfiles);
+	KeyboardShortcutsPanel->AddDynamicCmds(Preferences.DefaultKeyboardShortcutCmds);
+	notebook->AddPage(KeyboardShortcutsPanel, _("Keyboard Shortcuts"));
 }
 
 void mvceditor::PreferencesDialogClass::Prepare() {
@@ -57,12 +59,61 @@ void mvceditor::PreferencesDialogClass::Prepare() {
 void mvceditor::PreferencesDialogClass::OnOkButton(wxCommandEvent& event) {
 	wxBookCtrlBase* book = GetBookCtrl();
 	if (Validate() && book->Validate() && TransferDataFromWindow() && book->TransferDataFromWindow()) {
-		KeyConfigPanel->ApplyChanges();
+		KeyboardShortcutsPanel->ApplyChanges();
 		Preferences.CodeControlOptions.CommitChanges();
-		Preferences.KeyProfiles = KeyConfigPanel->GetProfiles();
+		Preferences.KeyProfiles = KeyboardShortcutsPanel->GetProfiles();
 		Preferences.Save();
 		EndModal(wxOK);
 	}
+}
+
+mvceditor::KeyboardShortcutsPanelClass::KeyboardShortcutsPanelClass(wxWindow* parent, int id, wxPoint position,
+																	wxSize size, long style)
+	: wxKeyConfigPanel(parent, id, position, size, style) {
+}
+
+void mvceditor::KeyboardShortcutsPanelClass::AddDynamicCmds(const std::vector<mvceditor::DynamicCmdClass>& cmds) {
+
+	// add the dynamic commands in the tree control; this code assumes that the command
+	// identifier is delimited with dashes; and the identifier will always contain
+	// at least one dash;
+	// the code will use the first part of  the identifier as a tree 'level'
+	std::map<wxString, std::vector<wxString> > items;
+	for (size_t i = 0; i < cmds.size(); ++i) {
+		wxString cmdIdentifier = cmds[i].GetIdentifier();
+		wxString key;
+		wxString item;
+		size_t index = cmdIdentifier.Find(wxT('-'));
+		if (index >= 0) {
+			key = cmdIdentifier.Mid(0, index);
+			item = cmdIdentifier.Mid(index + 1);
+		}
+		if (!key.IsEmpty() && !item.IsEmpty()) {
+			items[key].push_back(item);
+		}
+	}
+	wxTreeItemId root = m_pCommandsTree->AddRoot(_("Keyboard Shortcuts"));
+
+	// now we build the 'leaf' nodes 
+	for (std::map<wxString, std::vector<wxString> >::iterator it = items.begin(); it != items.end(); ++it) {
+		wxString groupName = it->first;
+		wxTreeItemId group = m_pCommandsTree->AppendItem(root, groupName);
+		std::vector<wxString> itemList = it->second;
+		for (size_t i = 0; i < itemList.size(); ++i) {
+			wxString itemLabel = itemList[i];
+			wxString identifier = groupName + wxT("-") + itemLabel;
+
+			// find the command
+			for (size_t c = 0; c < cmds.size(); ++c) {
+				if (cmds[c].GetIdentifier() == identifier) {
+					wxExTreeItemData *treedata = new wxExTreeItemData(cmds[c].GetId());
+					m_pCommandsTree->AppendItem(group, itemLabel, -1, -1, treedata);
+					break;
+				}
+			}
+		}
+	}
+	m_pCommandsTree->Expand(root);
 }
 
 BEGIN_EVENT_TABLE(mvceditor::PreferencesDialogClass, wxDialog) 

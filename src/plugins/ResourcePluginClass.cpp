@@ -104,8 +104,8 @@ void mvceditor::ResourcePluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
 
 void mvceditor::ResourcePluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
-	menuItemIds[mvceditor::MENU_RESOURCE + 0] = wxT("Resource-Index");
-	menuItemIds[mvceditor::MENU_RESOURCE + 1] = wxT("Resource-Jump-To");
+	menuItemIds[mvceditor::MENU_RESOURCE + 0] = wxT("Resource-Index Project");
+	menuItemIds[mvceditor::MENU_RESOURCE + 1] = wxT("Resource-Jump To Resource");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 

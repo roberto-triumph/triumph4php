@@ -260,13 +260,12 @@ void mvceditor::AppFrameClass::OnEditSelectAll(wxCommandEvent& event) {
 }
 
 void mvceditor::AppFrameClass::OnEditPreferences(wxCommandEvent& event) {
-	int exitCode;
 	PreferencesDialogClass prefDialog(this, Preferences);
 	for (size_t i = 0; i < Plugins.size(); ++i) {
 		Plugins[i]->AddPreferenceWindow(prefDialog.GetBookCtrl());
 	}
 	prefDialog.Prepare();
-	exitCode = prefDialog.ShowModal();
+	int exitCode = prefDialog.ShowModal();
 	if (wxOK == exitCode) {
 		Notebook->RefreshCodeControlOptions();
 		wxCommandEvent evt(EVENT_APP_SAVE_PREFERENCES);
@@ -581,14 +580,14 @@ void mvceditor::AppFrameClass::DefaultKeyboardShortcuts() {
 	defaultMenus[wxID_SAVE] = wxT("File-Save");
 	defaultMenus[wxID_SAVEAS] = wxT("File-Save As");
 	defaultMenus[ID_FILE_REVERT] = wxT("File-Revert");
-	defaultMenus[ID_FILE_CLOSE] = wxT("File-Open");
+	defaultMenus[ID_FILE_CLOSE] = wxT("File-Close");
 	defaultMenus[wxID_EXIT] = wxT("File-Exit");
 	defaultMenus[wxID_CUT] = wxT("Edit-Cut");
 	defaultMenus[wxID_COPY] = wxT("Edit-Copy");
 	defaultMenus[wxID_PASTE] = wxT("Edit-Paste");
-	defaultMenus[wxID_SELECTALL] = wxT("Edit-Select-All");
-	defaultMenus[ID_EDIT_CONTENT_ASSIST] = wxT("Edit-Content-Assist");
-	defaultMenus[ID_EDIT_CALL_TIP] = wxT("Edit-Call-Tip");
+	defaultMenus[wxID_SELECTALL] = wxT("Edit-Select All");
+	defaultMenus[ID_EDIT_CONTENT_ASSIST] = wxT("Edit-Content Assist");
+	defaultMenus[ID_EDIT_CALL_TIP] = wxT("Edit-Call Tip");
 	defaultMenus[ID_EDIT_PREFERENCES] = wxT("Edit-Preferences");
 	defaultMenus[ID_PROJECT_OPEN] = wxT("Project-Open");
 	defaultMenus[ID_ABOUT] = wxT("Help-About");
