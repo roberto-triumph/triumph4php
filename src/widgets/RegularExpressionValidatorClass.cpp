@@ -113,14 +113,14 @@ static wxString errorString(UErrorCode err) {
 mvceditor::RegularExpressionValidatorClass::RegularExpressionValidatorClass(UnicodeString *data,
 													  wxRadioBox* modeRadio) 
 	: wxValidator() 
-	, Data(data)
-	, ModeRadio(modeRadio) {
+	, ModeRadio(modeRadio) 
+	, Data(data) {
 }
 
 mvceditor::RegularExpressionValidatorClass::RegularExpressionValidatorClass() 
 	: wxValidator()
-	, Data(NULL)
-	, ModeRadio(NULL) {
+	, ModeRadio(NULL)
+	, Data(NULL) {
 }
 
 bool mvceditor::RegularExpressionValidatorClass::TransferFromWindow() {
