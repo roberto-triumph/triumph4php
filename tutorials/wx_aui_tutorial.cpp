@@ -31,16 +31,18 @@
  */
 class MyApp : public wxApp {
 public:
-	virtual bool OnInit();
+
+	bool OnInit();
+	
 };
 
 class MyFrame: public wxFrame {
 public:
 	MyFrame();
+	~MyFrame();
 	
 private:
 	wxAuiManager AuiManager;
-	
 };
 
 IMPLEMENT_APP(MyApp)
@@ -54,9 +56,9 @@ bool MyApp::OnInit() {
 
 MyFrame::MyFrame() :
 	wxFrame(NULL, wxID_ANY, wxT("test"), wxDefaultPosition, 
-			wxSize(640, 480))
+			wxSize(640, 480)) 
 	, AuiManager() {
-
+	
 	wxAuiNotebook* book = new wxAuiNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 
 		wxAUI_NB_TOP | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_CLOSE_ON_ACTIVE_TAB);
 		
@@ -72,7 +74,10 @@ MyFrame::MyFrame() :
 		
 	AuiManager.AddPane(panel2, wxAuiPaneInfo().Bottom().Caption(
 		_("Tools")).Floatable(false));
-		
 	AuiManager.SetManagedWindow(this);
 	AuiManager.Update();
+}
+
+MyFrame::~MyFrame() {
+	AuiManager.UnInit();
 }
