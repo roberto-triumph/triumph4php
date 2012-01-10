@@ -91,6 +91,12 @@ private:
 	 * This class will not own this pointer.
 	 */
 	wxMenu* CodeIgniterMenu;
+
+	/**
+	 * Saving the menu bar so that the code igniter menu can be removed when a project is not
+	 * a code igniter project.
+	 */
+	wxMenuBar* MenuBar;
 	
 	DECLARE_EVENT_TABLE()
 };

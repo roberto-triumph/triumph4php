@@ -37,16 +37,25 @@ mvceditor::CodeIgniterPluginClass::CodeIgniterPluginClass()
 	, Process(*this)
 	, ConfigFiles() {
 	CodeIgniterMenu = NULL;
+	MenuBar = NULL;
 }
 
 void mvceditor::CodeIgniterPluginClass::AddNewMenu(wxMenuBar *menuBar) {
 	CodeIgniterMenu = new wxMenu;
+	MenuBar = menuBar;
 
 	// don't insert it just yet ... we only want to add it to the menu bar
 	// for the projects that use Code Igniter
 }
 
 void mvceditor::CodeIgniterPluginClass::OnProjectOpened() {
+	int menuIndex = MenuBar->FindMenu(_("Code Igniter"));
+	if (MenuBar && menuIndex != wxNOT_FOUND) {
+		MenuBar->Remove(menuIndex);
+		while (CodeIgniterMenu->GetMenuItemCount() > 0) {
+			CodeIgniterMenu->Delete(CodeIgniterMenu->FindItemByPosition(0)->GetId());
+		}
+	}
 	mvceditor::ProjectClass* project = GetProject();
 	if (project) {
 		wxString cmd = project->DetectConfigFilesCommand(FRAMEWORK_IDENTIFIER);
@@ -77,25 +86,31 @@ void mvceditor::CodeIgniterPluginClass::OnProcessFailed(wxCommandEvent& event) {
 
 void mvceditor::CodeIgniterPluginClass::UpdateMenu() {
 	wxMenuItemList list = CodeIgniterMenu->GetMenuItems();
-	if (CodeIgniterMenu->GetMenuItemCount() == 0) {
+	if (CodeIgniterMenu->GetMenuItemCount() == 0 && !ConfigFiles.empty()) {
 		std::map<wxString, wxString>::const_iterator it = ConfigFiles.begin();
 		for (size_t i = 0; it != ConfigFiles.end(); ++it) {
 			wxString fullPath = it->second;
 			wxString label = it->first;
+
+			// make label a bit friendlier for humans
 			label.Replace(wxT("_"), wxT(" "));
 			CodeIgniterMenu->Append(MENU_CODE_IGNITER + i, label, 
 				_("Open ") + fullPath, wxITEM_NORMAL);
 			i++;
 		}
+		MenuBar->Insert(MenuBar->GetMenuCount() - 1, CodeIgniterMenu, _("Code Igniter"));
 	}
-	
 }
 
 void mvceditor::CodeIgniterPluginClass::OnMenuItem(wxCommandEvent& event) {
 	int id = event.GetId();
 	wxMenuItem* item = CodeIgniterMenu->FindItem(id);
 	if (item) {
-		wxString filePath = ConfigFiles[item->GetItemLabelText()];
+		wxString menuLabel = item->GetItemLabelText();
+
+		// label was made friendlier for humans; undo it
+		menuLabel.Replace(wxT(" "), wxT("_"));
+		wxString filePath = ConfigFiles[menuLabel];
 		if (!filePath.IsEmpty()) {
 			wxFileName fileName(filePath);
 			if (fileName.IsOk()) {
@@ -125,5 +140,5 @@ void mvceditor::CodeIgniterPluginClass::AddKeyboardShortcuts(std::vector<Dynamic
 BEGIN_EVENT_TABLE(mvceditor::CodeIgniterPluginClass, wxEvtHandler) 
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::CodeIgniterPluginClass::OnProcessComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_FAILED, mvceditor::CodeIgniterPluginClass::OnProcessFailed)
-	EVT_MENU_RANGE(MENU_CODE_IGNITER, MENU_CODE_IGNITER + 10, mvceditor::CodeIgniterPluginClass::OnMenuItem)
+	EVT_MENU_RANGE(MENU_CODE_IGNITER, MENU_CODE_IGNITER + 11, mvceditor::CodeIgniterPluginClass::OnMenuItem)
 END_EVENT_TABLE()
