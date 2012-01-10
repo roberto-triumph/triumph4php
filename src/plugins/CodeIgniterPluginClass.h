@@ -22,10 +22,11 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef TEST_PLUGIN_CLASS_H
-#define TEST_PLUGIN_CLASS_H
+#ifndef CODEIGNITER_PLUGIN_CLASS_H
+#define CODEIGNITER_PLUGIN_CLASS_H
 
 #include <PluginClass.h>
+#include <widgets/ProcessWithHeartbeatClass.h>
 
 namespace mvceditor {
 
@@ -34,41 +35,68 @@ namespace mvceditor {
  * This is also useful for prototyping of a feature or debugging (instead of
  * repeating steps just put the code in the Go() method )
  */
-class TestPluginClass : public PluginClass {
+class CodeIgniterPluginClass : public PluginClass {
 public:
-	TestPluginClass();
+
+	CodeIgniterPluginClass();
 		
 	/**
-	 * This plugin will have no Edit menu items
+	 * This plugin will create its own menu. 
+	 *
+	 * @param wxMenuBar* the menu bar to insert the new menu to
 	 */
-	void AddEditMenuItems(wxMenu* editMenu);
-	
-	/**
-	 * This plugin will have no project menu items
-	 */
-	void AddProjectMenuItems(wxMenu* projectMenu);
+	virtual void AddNewMenu(wxMenuBar* menuBar);
 
 	/**
-	 * This plugin will have one toolbar button, when clicked the Go() method will get called
+	 * When a project is opened; we will read the list of project's config files
+	 * and will populate the code igniter menu with the config file names.
 	 */
-	void AddToolBarItems(wxAuiToolBar* toolBar);
-	
+	virtual void OnProjectOpened();
+
 	/**
-	 * This plugin will have no extra windows.
+	 * Add shortcuts to the config files.
 	 */
-	void AddWindows();
-	
-	/**
-	 * This plugin will have no context menu items
-	 */
-	void AddCodeControlClassContextMenuItems(wxMenu* menu);
+	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 	
 private:	
 
+	void OnMenuItem(wxCommandEvent& event);
+
+	void OnProcessComplete(wxCommandEvent& event);
+
+	void OnProcessFailed(wxCommandEvent& event);
+
 	/**
-	 * the actual code that will get executed when the "GO" button is clicked
+	 * adds the entries in ConfigFiles to the menu.
 	 */
-	void Go(wxCommandEvent& event);
+	void UpdateMenu();
+
+	/**
+	 * this is the object used to 'communicate' with the code igniter
+	 * plugin. This plugin will issue commands to get the list of
+	 * config files from the currently opened project.
+	 */
+	ProcessWithHeartbeatClass Process;
+
+	/**
+	 * This is the list of config files that were parsed from the result
+	 * of the detection command.
+	 * The key is user-friendly name; the value is the absolute path to the
+	 * corresponding config file.
+	 */
+	std::map<wxString, wxString> ConfigFiles;
+
+	/**
+	 * The menu to add the config file entries to.
+	 * This class will not own this pointer.
+	 */
+	wxMenu* CodeIgniterMenu;
+
+	/**
+	 * Saving the menu bar so that the code igniter menu can be removed when a project is not
+	 * a code igniter project.
+	 */
+	wxMenuBar* MenuBar;
 	
 	DECLARE_EVENT_TABLE()
 };

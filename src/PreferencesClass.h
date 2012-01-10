@@ -26,12 +26,87 @@
 #define __preferencesclass__
 
 #include <wx/keybinder.h>
+#include <wx/menuutils.h>
 #include <widgets/CodeControlOptionsClass.h>
 
 namespace mvceditor {
 
 /**
- * This class is the composite set of all preferences//options that a user can change.
+ * This is a class that will MVC Editor will use to manage keyboard shortcuts.  
+ * Default functionality of the Keybinder classes is not sufficient because
+ * (1) MVC Editor menus are dynamic; they can be updated or removed when new 
+ *     plugins
+ * (2) MVC Editor menus can even change for different projects; we would like
+ *     shortcuts to tolerant of menu items is not being attached to the menu bar.
+ * (3) We want to de-couple the Menu from the shortcuts because default keybinder
+ *     functionality uses Menu IDs; and Menu IDs in this app can change between
+ *     app instances (depending on plugins and projects).
+ */
+class DynamicCmdClass {
+
+public:
+
+	/**
+	 *
+	 * @param item the menu item. This class will NOT own the pointer 
+	 *        the menu item's ID need not be consistent across application
+	 *        runs, but it must be unique (use wxNewId() function)
+	 * @param identifier this is a string that is unique across the application.
+	 * The menu item's label string will be used to populate the default shortcut.
+	 * The menu item MUST live at least as long as this object.  For simplicity's
+	 * sake, DynamicCmdClass instances will have application-wide scope, and the
+	 * menu items should have application-wide scope also.
+	 */
+	DynamicCmdClass(wxMenuItem* item, const wxString& identifier);
+
+	/**
+	 * Add a key mapping to this command.  More than one can be added by calling this function
+	 * multiple times.
+	 * @param key the shortcut string to add (ie. CTRL+4, SHIFT+CTRL+P). See wxKeyBind for 
+	 *  details on this string.
+	 */
+	void AddShortcut(const wxString& key);
+
+	/**
+	 * Copies this command's bindings.
+	 * @return wxCmd* a NEW command pointer; memory management is left to the caller
+	 */
+	wxCmd* CloneCommand() const;
+
+	/**
+	 * clears all bindings. Usually this would be called when the bindings need to be changed due
+	 * to user updates.
+	 */
+	void ClearShortcuts();
+
+	/**
+	 * @return the menu item's ID. This number is NOT safe to use for serialization
+	 * across application runs, since the ID is not a compile-time value (IDs can
+	 * be created by using wxNewId()).
+	 */
+	int GetId() const;
+
+	/**
+	 * @return the command's unque Identifier string. This string is safe to use for serialization
+	 * across application runs.
+	 */
+	wxString GetIdentifier() const;
+
+private:
+
+	/**
+	 * This is the binding; menu item-shortcut(s) combination.
+	 */
+	wxMenuCmd MenuCmd;
+
+	/**
+	 * String that uniquely identifies this shortcut
+	 */
+	wxString Identifier;
+};
+
+/**
+ * This class is the composite set of all preferences/options that a user can change.
  */
 class PreferencesClass {
 
@@ -50,7 +125,7 @@ public:
 	/**
 	 * Load the preferences from persistent storage.
 	 * 
-	 * @param wxFrame* we need a frame so we can attach keyboard listeners to it as well as get the list of menu items.
+	 * @param wxFrame* we need a frame so we can attach keyboard listeners to it.
 	 */
 	void Load(wxFrame* frame);
 	
@@ -58,13 +133,13 @@ public:
 	 * Save the preferences to persistent storage.
 	 */
 	void Save();
-	
+
 	/**
-	 * Apply the keyboard shortcuts to the window.  This process involves undoing any previous keyboard shortcuts
-	 * and attaching keyboard listeners to the given window. This m,ethod should get called whenver the keyboard
-	 * short cuts have changed; if this method does not get called then the shortcuts wont take effect.
-	 */
-	void LoadKeyboardShortcuts(wxWindow* window);
+	* Apply the keyboard shortcuts to the window.  This process involves undoing any previous keyboard shortcuts
+	* and attaching keyboard listeners to the given window. This m,ethod should get called whenver the keyboard
+	* short cuts have changed; if this method does not get called then the shortcuts wont take effect.
+	*/
+	void EnableSelectedProfile(wxWindow* window);
 
 	/**
 	 * Set the config object where the settings are stored on wxConfigBase; after a call to InitConfig()
@@ -78,15 +153,26 @@ public:
 	 * @var CodeControlOptionsClass
 	 */
 	CodeControlOptionsClass CodeControlOptions;
+
+	/**
+	 * The default keyboard shortcuts. These will never change; they will be used
+	 * as a 'template' of sorts to create the multiple wxKeyProfile objects
+	 * in the KeyProfiles array
+	 * 
+	 * @var std::vector<DynamicCmdClass>
+	 */
+	std::vector<DynamicCmdClass> DefaultKeyboardShortcutCmds;
 	
 	/**
-	 * The key shortcuts.  This class will own all pointers in the array and will delete them during
-	 * destruction.
+	 * The keyboard shortcuts. Each 'set' consists of the default 
+	 * shortcuts; but each set will have the same commands but may have 
+	 * different key bindings for each command.  For example, "File-Open"
+	 * command may be bound to "CTRL+O" on one set but it may be bound to
+	 * "CTRL+SHIFT+O" on another set.
 	 * 
 	 * @var wxKeyProfileArray
 	 */
 	wxKeyProfileArray KeyProfiles;
-
 };
 
 }

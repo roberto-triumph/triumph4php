@@ -32,18 +32,20 @@ mvceditor::PluginClass::PluginClass()
 	, ToolsNotebook(NULL)
 	, AppHandler(NULL)
 	, Project(NULL)
-	, Environment(NULL) {
+	, Environment(NULL)
+	, MenuBar(NULL) {
 }
 
 mvceditor::PluginClass::~PluginClass() {
 }
 
 void mvceditor::PluginClass::InitWindow(StatusBarWithGaugeClass* statusBarWithGauge, NotebookClass* notebook, wxAuiNotebook* toolsNotebook, 
-	wxAuiManager* auiManager) {
+	wxAuiManager* auiManager, wxMenuBar* menuBar) {
 	StatusBarWithGauge = statusBarWithGauge;
 	Notebook = notebook;
 	ToolsNotebook = toolsNotebook;
-	AuiManager = auiManager;		
+	AuiManager = auiManager;
+	MenuBar = menuBar;
 }
 
 void mvceditor::PluginClass::InitState(EnvironmentClass* environment, wxEvtHandler* appHandler) {
@@ -87,6 +89,10 @@ void mvceditor::PluginClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
 
 void mvceditor::PluginClass::OnProjectOpened() {
 	
+}
+
+void mvceditor::PluginClass::AddKeyboardShortcuts(std::vector<mvceditor::DynamicCmdClass>& shortcuts) {
+
 }
 
 bool mvceditor::PluginClass::AddToolsWindow(wxWindow* window, wxString name) {
@@ -182,6 +188,15 @@ mvceditor::CodeControlClass* mvceditor::PluginClass::CreateCodeControl(const wxS
 void mvceditor::PluginClass::AppEvent(wxCommandEvent event) {
 	if (AppHandler) {
 		wxPostEvent(AppHandler, event);	
+	}
+}
+
+void mvceditor::PluginClass::AddDynamicCmd(std::map<int, wxString> menuItemIds, std::vector<mvceditor::DynamicCmdClass>& shortcuts) {
+	for (std::map<int, wxString>::iterator it = menuItemIds.begin(); it != menuItemIds.end(); ++it) {
+		wxMenuItem* item = MenuBar->FindItem(it->first);
+		wxASSERT_MSG(item, wxT("Menu item not found:") + it->second);
+		mvceditor::DynamicCmdClass cmd(item, it->second);
+		shortcuts.push_back(cmd);
 	}
 }
 

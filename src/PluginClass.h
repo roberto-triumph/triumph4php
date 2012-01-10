@@ -29,6 +29,7 @@
 #include <php_frameworks/ProjectClass.h>
 #include <widgets/NotebookClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
+#include <PreferencesClass.h>
 #include <wx/event.h>
 #include <wx/propdlg.h>
 #include <vector>
@@ -58,7 +59,8 @@ enum MenuIds {
 	MENU_OUTLINE = 260,
 	MENU_LINT_PHP = 270,
 	MENU_ENVIRONMENT = 280,
-	MENU_EDITOR_MESSAGES = 290
+	MENU_EDITOR_MESSAGES = 290,
+	MENU_CODE_IGNITER = 300
 };
 
 /**
@@ -119,15 +121,17 @@ public:
 	virtual ~PluginClass();
 
 	/**
-	 * Set the windows
+	 * Set the windows. All of these pointers will NOT be
+	 * owned by this class. The caller will still retain ownership.
 	 * 
 	 * @param StatusBarWithGaugeClass& statusBarWithGauge the status bar.
 	 * @param NotebookClass& notebook the opened source code files
 	 * @param wxAuiNotebook& toolsNotebook the parent window for all plugin windows
 	 * @param wxAuiManager auiManager the AUI manager used to update the frame
+	 * @param wxMenuBar* menuBar the application menu bar
 	 */
 	void InitWindow(StatusBarWithGaugeClass* statusBarWithGauge, NotebookClass* notebook, wxAuiNotebook* toolsNotebook, 
-		wxAuiManager* auiManager);
+		wxAuiManager* auiManager, wxMenuBar* menuBar);
 	
 	/**
 	 * Initialize application state
@@ -214,10 +218,18 @@ public:
 	virtual void SavePreferences(wxConfigBase* config);
 	
 	/**
-	 * This method is called whenever a project is opened. The project can be accessed via the GetProject() method. NOte
+	 * This method is called whenever a project is opened. The project can be accessed via the GetProject() method. Note
 	 * that this method may be called at a time where the winodowing system may not yet be initialized.
 	 */
 	virtual void OnProjectOpened();
+
+	/**
+	 * Subclasses can override this method to create their own shortcuts that will get serialized /deserialized
+	 * properly; also by using this method the shortcuts will get registered properly; plus it will allow the user to
+	 * edit the shortcuts via the preferences dialog.
+	 * @param shortcuts the list of shortcuts to add to
+	 */
+	virtual void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 	
 	/**
 	 * Set the plugin's reference to the given project. The caller will take care of memory management (this class should NOT
@@ -339,6 +351,25 @@ protected:
 	  * Send an event to the application.  See above for possible events.
 	  */
 	void AppEvent(wxCommandEvent event);
+
+	/**
+	 * This is a helper method that will add each of the given menu items as a 
+	 * shortcut.  The map will contain the menu Item IDs; each of these IDs will
+	 * be used to lookup the Menu Item in the Menu Bar, and a DynamicCmd will be
+	 * created based on the menu item. The map value (wxString) will be used as 
+	 * the DynamicCmd's identifier.
+	 * For example, if the map contains
+	 *
+	 *   menuItems[wxID_OPEN] = "Open-File"
+	 *   menuItems[wxID_CLOSE] = "Close-File" 
+	 *
+	 * Then this method will create 2 DynamicCmds, assuming that the menu bar has
+	 * menu items with the IDs wxID_OPEN and wxID_CLOSE.  "Open-File" will be the 
+	 * identifier for the first command and "Close-File" will be the identifier for
+	 * the second command.
+	 * If a menu item is not found, and assertion is triggered.
+	 */
+	void AddDynamicCmd(std::map<int, wxString> menuItemIds,std::vector<DynamicCmdClass>& shortcuts);
 	 
 	/**
 	 * The AUI Manager is needed in cases where the different windows are repositioned programatically and the entire AUI
@@ -389,6 +420,11 @@ protected:
 	 * @var EnvironmentClass
 	 */
 	EnvironmentClass* Environment;
+
+	/**
+	 * The Application-wide menu bar.
+	 */
+	wxMenuBar* MenuBar;
 	
 };
 

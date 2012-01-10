@@ -88,4 +88,9 @@ class MvcEditorFrameworkSymfony1_4 extends MvcEditorFrameworkBaseClass {
 		}
 		return $infos;
 	}
+	
+	public function configFiles($dir) {
+		return array( 
+		);
+	}
 }

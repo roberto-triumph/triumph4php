@@ -33,6 +33,7 @@
 #include <wx/string.h>
 #include <wx/thread.h>
 #include <vector>
+#include <map>
 
 namespace mvceditor {
 
@@ -121,15 +122,31 @@ public:
 	wxString DetectDatabaseCommand(const wxString& framework);
 
 	/**
+	 * Creates the detection command that will figure out the configuration files 
+	 * for the given framework (routes file, database file, etc ...)
+	 *
+	 * @param framework the identifier of the framework. One of the strings returned by
+	 *        the framework detection command
+	 * @return wxString the command (operating system command line) that will calculate the 
+	 *         configuration files for the framework that this project uses.
+	 */
+	wxString DetectConfigFilesCommand(const wxString& framework);
+
+	/**
 	 * Handle the results of the framework detect command.
 	 */
-	bool DetectFrameworkResponse(const wxString& resultString, DetectError& err);
+	bool DetectFrameworkResponse(const wxString& resultString, DetectError& error);
 
 	/**
 	 * Handle the results of the database detection command. After a call to this method, DatabaseInfo() will return
 	 * any new database connections (that were identified).
 	 */
-	bool DetectDatabaseResponse(const wxString& resultString, DetectError& err);
+	bool DetectDatabaseResponse(const wxString& resultString, DetectError& error);
+
+	/**
+	 *  Handle the results of the config files detection.
+	 */
+	bool DetectConfigFilesResponse(const wxString& resultString, DetectError& error, std::map<wxString, wxString>& configFiles);
 	
 	/**
 	 * Returns the root path of this project

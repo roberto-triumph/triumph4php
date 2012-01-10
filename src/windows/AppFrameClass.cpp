@@ -90,6 +90,8 @@ mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass
 	AuiManager.AddPane(ToolsNotebook, wxAuiPaneInfo().Bottom().Caption(
 		_("Tools")).Floatable(false).MinSize(-1, 260).Hide());
 	AuiManager.Update();
+
+	DefaultKeyboardShortcuts();
 }
 
 mvceditor::AppFrameClass::~AppFrameClass() {
@@ -258,19 +260,16 @@ void mvceditor::AppFrameClass::OnEditSelectAll(wxCommandEvent& event) {
 }
 
 void mvceditor::AppFrameClass::OnEditPreferences(wxCommandEvent& event) {
-	int exitCode;
-	{
-		PreferencesDialogClass prefDialog(this, Preferences, GetMenuBar());
-		for (size_t i = 0; i < Plugins.size(); ++i) {
-			Plugins[i]->AddPreferenceWindow(prefDialog.GetBookCtrl());
-		}
-		prefDialog.Prepare();
-		exitCode = prefDialog.ShowModal();
-		if (wxOK == exitCode) {
-			Notebook->RefreshCodeControlOptions();
-			wxCommandEvent evt(EVENT_APP_SAVE_PREFERENCES);
-			wxPostEvent(&AppHandler, evt);
-		}
+	PreferencesDialogClass prefDialog(this, Preferences);
+	for (size_t i = 0; i < Plugins.size(); ++i) {
+		Plugins[i]->AddPreferenceWindow(prefDialog.GetBookCtrl());
+	}
+	prefDialog.Prepare();
+	int exitCode = prefDialog.ShowModal();
+	if (wxOK == exitCode) {
+		Notebook->RefreshCodeControlOptions();
+		wxCommandEvent evt(EVENT_APP_SAVE_PREFERENCES);
+		wxPostEvent(&AppHandler, evt);
 	}
 }
 
@@ -402,7 +401,7 @@ void mvceditor::AppFrameClass::LoadPlugin(mvceditor::PluginClass* plugin) {
 	
 	// propagate GUI events to plugins, so that they can handle menu events themselves
 	// plugin menus
-	plugin->InitWindow(GetStatusBarWithGauge(), Notebook, ToolsNotebook, &AuiManager);
+	plugin->InitWindow(GetStatusBarWithGauge(), Notebook, ToolsNotebook, &AuiManager, GetMenuBar());
 	
 	//  when adding the separators, we dont want a separator at the very end
 	// we dont need separators if the plugin did not add any menu items
@@ -421,7 +420,15 @@ void mvceditor::AppFrameClass::LoadPlugin(mvceditor::PluginClass* plugin) {
 	if (oldToolsMenuCount != ToolsMenu->GetMenuItemCount() && oldToolsMenuCount > 0) {
 		ToolsMenu->InsertSeparator(oldToolsMenuCount);
 	}
-	plugin->AddNewMenu(GetMenuBar());
+	wxMenuBar* menuBar = GetMenuBar();
+	plugin->AddNewMenu(menuBar);
+
+	// new menus may have been added; push the Help menu all the way to the end
+	int helpIndex = menuBar->FindMenu(_("&Help"));
+	if (helpIndex != wxNOT_FOUND) {
+		menuBar->Remove(helpIndex);
+		menuBar->Insert(menuBar->GetMenuCount(), HelpMenu, _("&Help"));
+	}
 	
 	// move preferences menu to the end, similar to most other programs
 	wxMenuItem* preferencesMenu = EditMenu->Remove(ID_EDIT_PREFERENCES);
@@ -560,6 +567,37 @@ void mvceditor::AppFrameClass::OnToolsNotebookPageClosed(wxAuiNotebookEvent& eve
 		AuiManager.Update();
 	}
 	event.Skip();
+}
+
+void mvceditor::AppFrameClass::DefaultKeyboardShortcuts() {
+
+	// ATTN: when a new menu item is added to the form builder 
+	// we will need to add an entry here so that shortcuts
+	// work properly
+	std::map<int, wxString>defaultMenus;
+	defaultMenus[wxID_NEW] = wxT("File-New");
+	defaultMenus[wxID_OPEN] = wxT("File-Open");
+	defaultMenus[wxID_SAVE] = wxT("File-Save");
+	defaultMenus[wxID_SAVEAS] = wxT("File-Save As");
+	defaultMenus[ID_FILE_REVERT] = wxT("File-Revert");
+	defaultMenus[ID_FILE_CLOSE] = wxT("File-Close");
+	defaultMenus[wxID_EXIT] = wxT("File-Exit");
+	defaultMenus[wxID_CUT] = wxT("Edit-Cut");
+	defaultMenus[wxID_COPY] = wxT("Edit-Copy");
+	defaultMenus[wxID_PASTE] = wxT("Edit-Paste");
+	defaultMenus[wxID_SELECTALL] = wxT("Edit-Select All");
+	defaultMenus[ID_EDIT_CONTENT_ASSIST] = wxT("Edit-Content Assist");
+	defaultMenus[ID_EDIT_CALL_TIP] = wxT("Edit-Call Tip");
+	defaultMenus[ID_EDIT_PREFERENCES] = wxT("Edit-Preferences");
+	defaultMenus[ID_PROJECT_OPEN] = wxT("Project-Open");
+	defaultMenus[ID_ABOUT] = wxT("Help-About");
+	wxMenuBar* menuBar = GetMenuBar();
+	for (std::map<int, wxString>::iterator it = defaultMenus.begin(); it != defaultMenus.end(); ++it) {
+		wxMenuItem* item = menuBar->FindItem(it->first);
+		wxASSERT_MSG(item, wxT("Menu item not found:") + it->second);
+		mvceditor::DynamicCmdClass cmd(item, it->second);
+		Preferences.DefaultKeyboardShortcutCmds.push_back(cmd);
+	}
 }
 
 BEGIN_EVENT_TABLE(mvceditor::AppFrameClass,  AppFrameGeneratedClass)

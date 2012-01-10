@@ -54,6 +54,12 @@ void mvceditor::OutlineViewPluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
 	toolsMenu->Append(mvceditor::MENU_OUTLINE, _("Outline Current File"),  _("Opens an outline view of the currently viewed file"), wxITEM_NORMAL);
 }
 
+void mvceditor::OutlineViewPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+	std::map<int, wxString> menuItemIds;
+	menuItemIds[mvceditor::MENU_OUTLINE + 0] = wxT("Outline-Outline Current File");
+	AddDynamicCmd(menuItemIds, shortcuts);
+}
+
 void mvceditor::OutlineViewPluginClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
 	menu->Append(ID_CONTEXT_MENU_SHOW_OUTLINE_CURRENT, _("Outline Current File"),  _("Opens an outline view of the currently viewed file"), wxITEM_NORMAL);
 	menu->Append(ID_CONTEXT_MENU_SHOW_OUTLINE_OTHER, _("Show In Outline"),  _("Search for the selected resource and opens an outline view"), wxITEM_NORMAL);
