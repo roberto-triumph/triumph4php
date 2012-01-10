@@ -279,6 +279,8 @@ public:
 
 	void SavePreferences(wxConfigBase* config);
 
+	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
+
 protected: 
 
 	void AddProjectMenuItems(wxMenu* projectMenu);

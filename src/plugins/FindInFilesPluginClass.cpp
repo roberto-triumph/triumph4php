@@ -532,6 +532,12 @@ void mvceditor::FindInFilesPluginClass::AddEditMenuItems(wxMenu* editMenu) {
 		_("Find an expression by searching entire directory contents"));
 }
 
+void mvceditor::FindInFilesPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+	std::map<int, wxString> menuItemIds;
+	menuItemIds[mvceditor::MENU_FIND_IN_FILES + 0] = wxT("Find-Find In Files");
+	AddDynamicCmd(menuItemIds, shortcuts);
+}
+
 void mvceditor::FindInFilesPluginClass::OnEditFindInFiles(wxCommandEvent& event) {
 
 	// prime finder with selected text

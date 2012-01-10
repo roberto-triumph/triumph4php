@@ -127,6 +127,27 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 		return $list;
 	}
 	
+
+	public function configFiles($dir) {
+		if (is_file($dir . '/application/config/database.php')) {
+			return array( 
+				'AutoLoad' => realpath($dir . '/application/config/autoload.php'),
+				'Config' => realpath($dir . '/application/config/config.php'),
+				'Constants' => realpath($dir . '/application/config/constants.php'),
+				'Database' => realpath($dir . '/application/config/database.php'),
+				'DocTypes' => realpath($dir . '/application/config/doctypes.php'),
+				'Foreign Characters' => realpath($dir . '/application/config/foreign_chars.php'),
+				'Hooks' => realpath($dir . '/application/config/hooks.php'),
+				'Mime Types' => realpath($dir . '/application/config/mimes.php'),
+				'Profiler' => realpath($dir . '/application/config/profiler.php'),
+				'Routes' => realpath($dir . '/application/config/routes.php'),
+				'Smileys' => realpath($dir . '/application/config/smileys.php'),
+				'User Agents' => realpath($dir . '/application/config/user_agents.php')
+			);
+		}
+		return array();
+	}
+	
 	private function infoFromDbArray($environment, $groupName, $groupConnection) {
 		// port is not there by default
 		$port = 0;

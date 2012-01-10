@@ -147,12 +147,14 @@ public:
 	/**
 	 * Add menu items
 	 */
-	virtual void AddToolsMenuItems(wxMenu* toolsMenu);
+	void AddToolsMenuItems(wxMenu* toolsMenu);
 	
 	/**
 	 * Add items to the toolbar
 	 */
-	virtual void AddToolBarItems(wxAuiToolBar* toolBar);
+	void AddToolBarItems(wxAuiToolBar* toolBar);
+
+	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 
 	private:
 				

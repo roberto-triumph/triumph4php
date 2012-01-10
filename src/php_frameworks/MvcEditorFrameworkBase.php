@@ -55,7 +55,7 @@ abstract class MvcEditorFrameworkBaseClass {
 	 * relate the project at $dir to this framework; this triggers various 
 	 * the enabling of various dialogs and functionality.
 	 *
-	 * @param string the directory in question. 
+	 * @param string the directory in question; absolute path. 
 	 * @return bool TRUE if the directory houses a project that uses this framework.
 	 */
 	abstract public function isUsedBy($dir);
@@ -64,8 +64,17 @@ abstract class MvcEditorFrameworkBaseClass {
 	 * The database connection detection method. Sub classes should read the database connection
 	 * info from their respective files and create the necessary MvcEditorDatabaseInfo objects.
 	 *
-	 * @param $dir the base directory of the project in question
+	 * @param $dir the base directory of the project in question; absolute path.
 	 * @return array of MvcEditorDatabaseInfo object
 	 */
 	abstract public function databaseInfo($dir);
+	
+	/**
+	 * @param $dir the base directory of the project in question; absolute path.
+	 * @return array (name => full path) string full path to the project's configuration files. The MVC Editor will
+	 * use the returned files to give the user 'quick' access to the framework's configuration files.
+	 * The returned files MUST HAVE OS-dependant file separators.
+	 */
+	abstract public function configFiles($dir);
+
 }

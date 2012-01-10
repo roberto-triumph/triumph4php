@@ -207,6 +207,11 @@ private:
 	 * When the tools notebook has no more pages; hide it
 	 */
 	void OnToolsNotebookPageClosed(wxAuiNotebookEvent& event);
+
+	/**
+	 * Add the shortcuts for this frame's menu bar into the preference's shortcut list
+	 */
+	void DefaultKeyboardShortcuts();
 	
 	/**
 	 * GUI framework object, used to programatically position the different windows

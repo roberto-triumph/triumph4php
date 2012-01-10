@@ -258,6 +258,12 @@ void mvceditor::LintPluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 	toolBar->AddTool(ID_LINT_TOOLBAR_ITEM, _("Lint Check"), bitmap, _("Performs syntax check on the current project"));
 }
 
+void mvceditor::LintPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+	std::map<int, wxString> menuItemIds;
+	menuItemIds[mvceditor::MENU_LINT_PHP + 0] = wxT("Lint Check - Lint Check Project");
+	AddDynamicCmd(menuItemIds, shortcuts);
+}
+
 void mvceditor::LintPluginClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 	parent->AddPage(
 		new mvceditor::LintPluginPreferencesPanelClass(parent, *this),

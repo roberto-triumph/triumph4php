@@ -52,4 +52,9 @@ class MvcEditorFrameworkSample extends MvcEditorFrameworkBaseClass {
 		$list[] = $info;
 		return $list;
 	}
+	
+	public function configFiles($dir) {
+		return array( 
+		);
+	}
 }

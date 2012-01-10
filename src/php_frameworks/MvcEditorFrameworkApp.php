@@ -81,6 +81,9 @@ function runAction($framework, $dir, $action) {
 	else if (strcasecmp($action, 'isUsedBy') == 0) {
 		runIsUsedBy($dir);
 	}
+	else if (strcasecmp($action, 'configFiles') == 0) {
+		runConfigFiles($framework, $dir);
+	}
 }
 
 function runDatabaseInfo($framework, $dir) {
@@ -105,7 +108,7 @@ function runDatabaseInfo($framework, $dir) {
 	}
 }
 
-function runIsUsedBy( $dir) {
+function runIsUsedBy($dir) {
 	$frameworks = loadFrameworks();
 	$identifiers = array();
 	foreach ($frameworks as $framework) {
@@ -123,6 +126,26 @@ function runIsUsedBy( $dir) {
 		$i++;
 	}
 	print $writer->render();
+}
+
+function runConfigFiles($framework, $dir) {
+	$configFiles = $framework->configFiles($dir);
+	if ($configFiles) {
+		$writer = new Zend_Config_Writer_Ini();
+		$outputConfig = new Zend_Config(array(), true);
+		$writer->setConfig($outputConfig);
+		foreach ($configFiles as $configName => $configPath) {
+		
+			// write an INI entry for each config file. make sure to replace any possible
+			// characters that may conflict with INI parsing.
+			// at the moment I don't know how to make wxFileConfig not try to 
+			// unescap backslashes; will escape backslashes here
+			$key = str_replace(array("/", "\n", " "), array("_", "_", "_"), $configName);
+			$configPath = str_replace("\\", "\\\\", $configPath);
+			$outputConfig->{$key} = $configPath;
+		}
+		print $writer->render();
+	}
 }
 
 $rules = array(

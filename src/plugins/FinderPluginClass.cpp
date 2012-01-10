@@ -505,6 +505,16 @@ void mvceditor::FinderPluginClass::AddEditMenuItems(wxMenu* editMenu) {
 	editMenu->Append(mvceditor::MENU_FINDER + 4, _("Go To Line\tCTRL+G"), _("Go To Line"));
 }
 
+void mvceditor::FinderPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+	std::map<int, wxString> menuItemIds;
+	menuItemIds[mvceditor::MENU_FINDER + 0] = wxT("Find-Show Find Panel");
+	menuItemIds[mvceditor::MENU_FINDER + 1] = wxT("Find-Next");
+	menuItemIds[mvceditor::MENU_FINDER + 2] = wxT("Find-Previous");
+	menuItemIds[mvceditor::MENU_FINDER + 3] = wxT("Find-Replace");
+	menuItemIds[mvceditor::MENU_FINDER + 4] = wxT("Find-Go To Line");
+	AddDynamicCmd(menuItemIds, shortcuts);
+}
+
 void mvceditor::FinderPluginClass::OnEditFind(wxCommandEvent& event) {
 	wxWindow* parent = GetMainWindow();
 	
