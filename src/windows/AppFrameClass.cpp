@@ -125,8 +125,28 @@ void mvceditor::AppFrameClass::OnFileSave(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::AppFrameClass::OnFileNew(wxCommandEvent& event) {
+void mvceditor::AppFrameClass::OnFilePhpNew(wxCommandEvent& event) {
 	Notebook->AddMvcEditorPage();
+	mvceditor::CodeControlClass* ctrl = Notebook->GetCurrentCodeControl();
+	ctrl->SetDocumentMode(mvceditor::CodeControlClass::PHP);
+}
+
+void mvceditor::AppFrameClass::OnFileSqlNew(wxCommandEvent& event) {
+	Notebook->AddMvcEditorPage();
+	mvceditor::CodeControlClass* ctrl = Notebook->GetCurrentCodeControl();
+	ctrl->SetDocumentMode(mvceditor::CodeControlClass::SQL);
+}
+
+void mvceditor::AppFrameClass::OnFileCssNew(wxCommandEvent& event) {
+	Notebook->AddMvcEditorPage();
+	mvceditor::CodeControlClass* ctrl = Notebook->GetCurrentCodeControl();
+	ctrl->SetDocumentMode(mvceditor::CodeControlClass::CSS);
+}
+
+void mvceditor::AppFrameClass::OnFileTextNew(wxCommandEvent& event) {
+	Notebook->AddMvcEditorPage();
+	mvceditor::CodeControlClass* ctrl = Notebook->GetCurrentCodeControl();
+	ctrl->SetDocumentMode(mvceditor::CodeControlClass::TEXT);
 }
 
 void mvceditor::AppFrameClass::OnFileOpen(wxCommandEvent& event) {
@@ -575,7 +595,7 @@ void mvceditor::AppFrameClass::DefaultKeyboardShortcuts() {
 	// we will need to add an entry here so that shortcuts
 	// work properly
 	std::map<int, wxString>defaultMenus;
-	defaultMenus[wxID_NEW] = wxT("File-New");
+	defaultMenus[ID_FILE_PHP_NEW] = wxT("File-New PHP File");
 	defaultMenus[wxID_OPEN] = wxT("File-Open");
 	defaultMenus[wxID_SAVE] = wxT("File-Save");
 	defaultMenus[wxID_SAVEAS] = wxT("File-Save As");

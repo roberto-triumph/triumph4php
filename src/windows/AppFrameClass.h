@@ -87,7 +87,10 @@ protected:
 	 * Top Menu Bar handlers
 	 */
 	void OnFileSave(wxCommandEvent& event);
-	void OnFileNew(wxCommandEvent& event);
+	void OnFilePhpNew(wxCommandEvent& event);
+	void OnFileSqlNew(wxCommandEvent& event);
+	void OnFileCssNew(wxCommandEvent& event);
+	void OnFileTextNew(wxCommandEvent& event);
 	void OnFileRun(wxCommandEvent& event);
 	void OnFileOpen(wxCommandEvent& event);
 	void OnFileSaveAs(wxCommandEvent& event);

@@ -50,7 +50,10 @@ class AppFrameGeneratedClass : public wxFrame
 		void _wxFB_OnClose( wxCloseEvent& event ){ OnClose( event ); }
 		void _wxFB_OnContentNotebookPageChanged( wxAuiNotebookEvent& event ){ OnContentNotebookPageChanged( event ); }
 		void _wxFB_OnContentNotebookPageClose( wxAuiNotebookEvent& event ){ OnContentNotebookPageClose( event ); }
-		void _wxFB_OnFileNew( wxCommandEvent& event ){ OnFileNew( event ); }
+		void _wxFB_OnFilePhpNew( wxCommandEvent& event ){ OnFilePhpNew( event ); }
+		void _wxFB_OnFileSqlNew( wxCommandEvent& event ){ OnFileSqlNew( event ); }
+		void _wxFB_OnFileCssNew( wxCommandEvent& event ){ OnFileCssNew( event ); }
+		void _wxFB_OnFileTextNew( wxCommandEvent& event ){ OnFileTextNew( event ); }
 		void _wxFB_OnFileOpen( wxCommandEvent& event ){ OnFileOpen( event ); }
 		void _wxFB_OnFileSave( wxCommandEvent& event ){ OnFileSave( event ); }
 		void _wxFB_OnFileSaveAs( wxCommandEvent& event ){ OnFileSaveAs( event ); }
@@ -72,6 +75,10 @@ class AppFrameGeneratedClass : public wxFrame
 		enum
 		{
 			ID_NOTEBOOK = 1000,
+			ID_FILE_PHP_NEW,
+			ID_FILE_SQL_NEW,
+			ID_FILE_CSS_NEW,
+			ID_FILE_TEXT_NEW_FILE,
 			ID_FILE_REVERT,
 			ID_FILE_CLOSE,
 			ID_EDIT_CONTENT_ASSIST,
@@ -94,7 +101,10 @@ class AppFrameGeneratedClass : public wxFrame
 		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
 		virtual void OnContentNotebookPageChanged( wxAuiNotebookEvent& event ) { event.Skip(); }
 		virtual void OnContentNotebookPageClose( wxAuiNotebookEvent& event ) { event.Skip(); }
-		virtual void OnFileNew( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnFilePhpNew( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnFileSqlNew( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnFileCssNew( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnFileTextNew( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFileOpen( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFileSave( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFileSaveAs( wxCommandEvent& event ) { event.Skip(); }
