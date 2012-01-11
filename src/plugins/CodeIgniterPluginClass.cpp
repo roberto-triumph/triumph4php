@@ -135,7 +135,7 @@ void mvceditor::CodeIgniterPluginClass::OnMenuItem(wxCommandEvent& event) {
 				mvceditor::EditorLogWarning(mvceditor::INVALID_FILE, item->GetItemLabelText());
 			}
 		}
-		else if (id == (MENU_CODE_IGNITER + ConfigFiles.size() + 0)) {
+		else if (id == (int)(MENU_CODE_IGNITER + ConfigFiles.size() + 0)) {
 			mvceditor::CodeControlClass* codeControl = CreateCodeControl(wxT(""));
 			codeControl->SetDocumentMode(mvceditor::CodeControlClass::PHP);
 			UnicodeString contents = mvceditor::StringHelperClass::charToIcu(
@@ -154,7 +154,7 @@ void mvceditor::CodeIgniterPluginClass::OnMenuItem(wxCommandEvent& event) {
 			int32_t index = contents.indexOf(UNICODE_STRING_SIMPLE("Model_name"));
 			codeControl->SetSelectionByCharacterPosition(index, index + 10); // 10 => length of Model_name
 		}
-		else if (id == (MENU_CODE_IGNITER + ConfigFiles.size() + 1)) {
+		else if (id == (int)(MENU_CODE_IGNITER + ConfigFiles.size() + 1)) {
 			mvceditor::CodeControlClass* codeControl = CreateCodeControl(wxT(""));
 			codeControl->SetDocumentMode(mvceditor::CodeControlClass::PHP);
 			UnicodeString contents = mvceditor::StringHelperClass::charToIcu(
