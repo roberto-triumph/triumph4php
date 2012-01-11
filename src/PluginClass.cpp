@@ -180,7 +180,9 @@ wxWindow* mvceditor::PluginClass::GetMainWindow() const {
 mvceditor::CodeControlClass* mvceditor::PluginClass::CreateCodeControl(const wxString& tabName) const {
 	mvceditor::NotebookClass* notebook = GetNotebook();
 	notebook->AddMvcEditorPage();
-	notebook->SetPageText(notebook->GetSelection(), tabName);
+	if (!tabName.IsEmpty()) {
+		notebook->SetPageText(notebook->GetSelection(), tabName);
+	}
 	mvceditor::CodeControlClass* ctrl = notebook->GetCurrentCodeControl();
 	return ctrl;
 }
