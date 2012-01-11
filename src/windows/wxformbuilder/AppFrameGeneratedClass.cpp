@@ -15,7 +15,10 @@ BEGIN_EVENT_TABLE( AppFrameGeneratedClass, wxFrame )
 	EVT_CLOSE( AppFrameGeneratedClass::_wxFB_OnClose )
 	EVT_AUINOTEBOOK_PAGE_CHANGED( ID_NOTEBOOK, AppFrameGeneratedClass::_wxFB_OnContentNotebookPageChanged )
 	EVT_AUINOTEBOOK_PAGE_CLOSE( ID_NOTEBOOK, AppFrameGeneratedClass::_wxFB_OnContentNotebookPageClose )
-	EVT_MENU( wxID_NEW, AppFrameGeneratedClass::_wxFB_OnFileNew )
+	EVT_MENU( ID_FILE_PHP_NEW, AppFrameGeneratedClass::_wxFB_OnFilePhpNew )
+	EVT_MENU( ID_FILE_SQL_NEW, AppFrameGeneratedClass::_wxFB_OnFileSqlNew )
+	EVT_MENU( ID_FILE_CSS_NEW, AppFrameGeneratedClass::_wxFB_OnFileCssNew )
+	EVT_MENU( ID_FILE_TEXT_NEW_FILE, AppFrameGeneratedClass::_wxFB_OnFileTextNew )
 	EVT_MENU( wxID_OPEN, AppFrameGeneratedClass::_wxFB_OnFileOpen )
 	EVT_MENU( wxID_SAVE, AppFrameGeneratedClass::_wxFB_OnFileSave )
 	EVT_MENU( wxID_SAVEAS, AppFrameGeneratedClass::_wxFB_OnFileSaveAs )
@@ -49,9 +52,24 @@ AppFrameGeneratedClass::AppFrameGeneratedClass( wxWindow* parent, wxWindowID id,
 	StatusBar = this->CreateStatusBar( 1, wxST_SIZEGRIP, wxID_ANY );
 	MenuBar = new wxMenuBar( 0 );
 	FileMenu = new wxMenu();
-	wxMenuItem* MenuItemFileNew;
-	MenuItemFileNew = new wxMenuItem( FileMenu, wxID_NEW, wxString( _("&New") ) , _("Create a new file"), wxITEM_NORMAL );
-	FileMenu->Append( MenuItemFileNew );
+	wxMenuItem* MenuItemFilePhpNew;
+	MenuItemFilePhpNew = new wxMenuItem( FileMenu, ID_FILE_PHP_NEW, wxString( _("New &PHP File") ) , _("Create a new PHP File"), wxITEM_NORMAL );
+	FileMenu->Append( MenuItemFilePhpNew );
+	
+	wxMenuItem* MenuItemFileSqlNew;
+	MenuItemFileSqlNew = new wxMenuItem( FileMenu, ID_FILE_SQL_NEW, wxString( _("New S&QL File") ) , _("Create a new SQL File"), wxITEM_NORMAL );
+	FileMenu->Append( MenuItemFileSqlNew );
+	
+	wxMenuItem* MenuItemFileCssNew;
+	MenuItemFileCssNew = new wxMenuItem( FileMenu, ID_FILE_CSS_NEW, wxString( _("New &CSS File") ) , _("Create a new CSS File"), wxITEM_NORMAL );
+	FileMenu->Append( MenuItemFileCssNew );
+	
+	wxMenuItem* MenuItemFileTextNew;
+	MenuItemFileTextNew = new wxMenuItem( FileMenu, ID_FILE_TEXT_NEW_FILE, wxString( _("New Te&xt File") ) , _("Create a new text file"), wxITEM_NORMAL );
+	FileMenu->Append( MenuItemFileTextNew );
+	
+	wxMenuItem* m_separator4;
+	m_separator4 = FileMenu->AppendSeparator();
 	
 	wxMenuItem* MenuItemFileOpen;
 	MenuItemFileOpen = new wxMenuItem( FileMenu, wxID_OPEN, wxString( _("&Open") ) , _("Open a file"), wxITEM_NORMAL );
@@ -66,9 +84,6 @@ AppFrameGeneratedClass::AppFrameGeneratedClass( wxWindow* parent, wxWindowID id,
 	MenuItemFileSaveAs = new wxMenuItem( FileMenu, wxID_SAVEAS, wxString( _("Save &As") ) , wxEmptyString, wxITEM_NORMAL );
 	FileMenu->Append( MenuItemFileSaveAs );
 	MenuItemFileSaveAs->Enable( false );
-	
-	wxMenuItem* m_separator1;
-	m_separator1 = FileMenu->AppendSeparator();
 	
 	wxMenuItem* MenuItemRevert;
 	MenuItemRevert = new wxMenuItem( FileMenu, ID_FILE_REVERT, wxString( _("Revert") ) , _("Reload the file from Disk"), wxITEM_NORMAL );

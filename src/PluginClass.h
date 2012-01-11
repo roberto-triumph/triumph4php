@@ -343,6 +343,7 @@ protected:
 	  * options. code control will be tied to the application code Notebook.
 	  * 
 	  * @param tabName the name that will go on the tab of the new page
+	  *        This can be empty; if empty then a default message is shown
 	  * @return CodeControlClass* this class will own the pointer, DONT delete it
 	  */
 	 CodeControlClass* CreateCodeControl(const wxString& tabName) const;

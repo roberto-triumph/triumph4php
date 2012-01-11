@@ -290,6 +290,9 @@ void mvceditor::PhpDocumentClass::AttachToControl(wxStyledTextCtrl* ctrl) {
 	ctrl->Connect(wxID_ANY, wxID_ANY, wxEVT_STC_AUTOCOMP_SELECTION,
 		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(wxStyledTextEventFunction, &mvceditor::PhpDocumentClass::OnAutoCompletionSelected),
 		NULL, this);
+
+	// do this so that when a new untitled file is created that code completion still works.
+	FileOpened(FileIdentifier);
 }
 
 void mvceditor::PhpDocumentClass::DetachFromControl(wxStyledTextCtrl* ctrl) {
@@ -683,6 +686,7 @@ void mvceditor::PhpDocumentClass::OnKeyDown(wxKeyEvent& event) {
 					'}' == keyCode ||
 					'(' == keyCode ||
 					')' == keyCode ||
+					';' == keyCode ||
 					WXK_DELETE == keyCode ||
 					WXK_BACK == keyCode) {
 				NeedToUpdateResources = true;

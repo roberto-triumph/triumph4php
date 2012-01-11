@@ -25,6 +25,7 @@
 #include <plugins/CodeIgniterPluginClass.h>
 #include <MvcEditorErrors.h>
 #include <MvcEditor.h>
+#include <windows/StringHelperClass.h>
 
 /*
  * This is what the code igniter framework detection code calls itself.
@@ -98,6 +99,13 @@ void mvceditor::CodeIgniterPluginClass::UpdateMenu() {
 				_("Open ") + fullPath, wxITEM_NORMAL);
 			i++;
 		}
+		CodeIgniterMenu->AppendSeparator();
+		CodeIgniterMenu->Append(MENU_CODE_IGNITER + ConfigFiles.size() + 0, 
+			_("New Code Igniter Model"), 
+			_("Create a new PHP File That Will Contain a Code Igniter model"));
+		CodeIgniterMenu->Append(MENU_CODE_IGNITER + ConfigFiles.size() + 1, 
+			_("New Code Igniter Controller"), 
+			_("Create a new PHP File That Will Contain a Code Igniter controller"));
 		MenuBar->Insert(MenuBar->GetMenuCount() - 1, CodeIgniterMenu, _("Code Igniter"));
 	}
 }
@@ -106,24 +114,64 @@ void mvceditor::CodeIgniterPluginClass::OnMenuItem(wxCommandEvent& event) {
 	int id = event.GetId();
 	wxMenuItem* item = CodeIgniterMenu->FindItem(id);
 	if (item) {
-		wxString menuLabel = item->GetItemLabelText();
+		if (id < (int)(MENU_CODE_IGNITER + ConfigFiles.size())) {
+			wxString menuLabel = item->GetItemLabelText();
 
-		// label was made friendlier for humans; undo it
-		menuLabel.Replace(wxT(" "), wxT("_"));
-		wxString filePath = ConfigFiles[menuLabel];
-		if (!filePath.IsEmpty()) {
-			wxFileName fileName(filePath);
-			if (fileName.IsOk()) {
-				wxCommandEvent openEvent(mvceditor::EVENT_APP_OPEN_FILE);
-				openEvent.SetString(filePath);
-				AppEvent(openEvent);
+			// label was made friendlier for humans; undo it
+			menuLabel.Replace(wxT(" "), wxT("_"));
+			wxString filePath = ConfigFiles[menuLabel];
+			if (!filePath.IsEmpty()) {
+				wxFileName fileName(filePath);
+				if (fileName.IsOk()) {
+					wxCommandEvent openEvent(mvceditor::EVENT_APP_OPEN_FILE);
+					openEvent.SetString(filePath);
+					AppEvent(openEvent);
+				}
+				else {
+					mvceditor::EditorLogWarning(mvceditor::INVALID_FILE, filePath);
+				}
 			}
 			else {
-				mvceditor::EditorLogWarning(mvceditor::INVALID_FILE, filePath);
+				mvceditor::EditorLogWarning(mvceditor::INVALID_FILE, item->GetItemLabelText());
 			}
 		}
-		else {
-			mvceditor::EditorLogWarning(mvceditor::INVALID_FILE, item->GetItemLabelText());
+		else if (id == (MENU_CODE_IGNITER + ConfigFiles.size() + 0)) {
+			mvceditor::CodeControlClass* codeControl = CreateCodeControl(wxT(""));
+			codeControl->SetDocumentMode(mvceditor::CodeControlClass::PHP);
+			UnicodeString contents = mvceditor::StringHelperClass::charToIcu(
+				"<?php\n"
+				"\n"
+				"class Model_name extends CI_Model {\n"
+				"\n"
+				"\tfunction __construct() {\n"
+				"\t\tparent::__construct();\n"
+				"\t}\n"
+				"}\n"
+			);
+			codeControl->SetUnicodeText(contents);
+
+			// select the "Model_name" so that user can easily change it first
+			int32_t index = contents.indexOf(UNICODE_STRING_SIMPLE("Model_name"));
+			codeControl->SetSelectionByCharacterPosition(index, index + 10); // 10 => length of Model_name
+		}
+		else if (id == (MENU_CODE_IGNITER + ConfigFiles.size() + 1)) {
+			mvceditor::CodeControlClass* codeControl = CreateCodeControl(wxT(""));
+			codeControl->SetDocumentMode(mvceditor::CodeControlClass::PHP);
+			UnicodeString contents = mvceditor::StringHelperClass::charToIcu(
+				"<?php\n"
+				"\n"
+				"class Controller extends CI_Controller {\n"
+				"\n"
+				"\tfunction __construct() {\n"
+				"\t\tparent::__construct();\n"
+				"\t}\n"
+				"}\n"
+			);
+			codeControl->SetUnicodeText(contents);
+
+			// select the "Controller" so that user can easily change it first
+			int32_t index = contents.indexOf(UNICODE_STRING_SIMPLE("Controller"));
+			codeControl->SetSelectionByCharacterPosition(index, index + 10); // 10 => length of Controller
 		}
 	}
 	else {
@@ -140,5 +188,5 @@ void mvceditor::CodeIgniterPluginClass::AddKeyboardShortcuts(std::vector<Dynamic
 BEGIN_EVENT_TABLE(mvceditor::CodeIgniterPluginClass, wxEvtHandler) 
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::CodeIgniterPluginClass::OnProcessComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_FAILED, mvceditor::CodeIgniterPluginClass::OnProcessFailed)
-	EVT_MENU_RANGE(MENU_CODE_IGNITER, MENU_CODE_IGNITER + 11, mvceditor::CodeIgniterPluginClass::OnMenuItem)
+	EVT_MENU_RANGE(MENU_CODE_IGNITER, MENU_CODE_IGNITER + 13, mvceditor::CodeIgniterPluginClass::OnMenuItem)
 END_EVENT_TABLE()
