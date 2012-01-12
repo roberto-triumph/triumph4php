@@ -25,7 +25,7 @@
 #ifndef MVCEDITORNOTEBOOKCLASS_H_
 #define MVCEDITORNOTEBOOKCLASS_H_
 
-#include <widgets/CodeControlClass.h>
+#include <code_control/CodeControlClass.h>
 #include <php_frameworks/ProjectClass.h>
 #include <wx/wx.h>
 #include <wx/aui/aui.h>

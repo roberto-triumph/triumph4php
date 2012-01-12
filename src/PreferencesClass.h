@@ -27,7 +27,7 @@
 
 #include <wx/keybinder.h>
 #include <wx/menuutils.h>
-#include <widgets/CodeControlOptionsClass.h>
+#include <code_control/CodeControlOptionsClass.h>
 
 namespace mvceditor {
 

@@ -22,7 +22,7 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <widgets/DocumentClass.h>
+#include <code_control/DocumentClass.h>
 #include <windows/StringHelperClass.h>
 #include <windows/StringHelperClass.h>
 #include <MvcEditorAssets.h>

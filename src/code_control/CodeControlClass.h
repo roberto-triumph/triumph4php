@@ -27,7 +27,7 @@
 
 #include <php_frameworks/ProjectClass.h>
 #include <search/ResourceFinderClass.h>
-#include <widgets/CodeControlOptionsClass.h>
+#include <code_control/CodeControlOptionsClass.h>
 #include <wx/stc/stc.h>
 #include <wx/timer.h>
 #include <unicode/unistr.h>

@@ -24,7 +24,7 @@
  */
 #include <wx/valgen.h>
 #include <plugins/SqlBrowserPluginClass.h>
-#include <widgets/CodeControlClass.h>
+#include <code_control/CodeControlClass.h>
 #include <windows/StringHelperClass.h>
 #include <widgets/UnicodeStringValidatorClass.h>
 #include <MvcEditorErrors.h>
