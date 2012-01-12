@@ -434,9 +434,8 @@ UnicodeString mvceditor::ResourceFinderClass::GetResourceSignature(const Unicode
 	if (signature.isEmpty()) {
 		
 		//search methods
-		UnicodeString constructorSignature = resource + UNICODE_STRING_SIMPLE("::") + resource;
 		for (std::list<ResourceClass>::const_iterator it = MembersCache.begin(); it != MembersCache.end(); ++it) {
-			if (it->Type == ResourceClass::METHOD && (it->Resource == resource || it->Resource == constructorSignature)) {
+			if (it->Type == ResourceClass::METHOD && it->Resource == resource) {
 				signature = it->Signature;
 				comment = it->Comment;
 				break;
@@ -458,9 +457,8 @@ UnicodeString mvceditor::ResourceFinderClass::GetResourceReturnType(const Unicod
 		}
 	}
 	if (returnType.isEmpty()) {
-		UnicodeString constructorSignature = icuResource + UNICODE_STRING_SIMPLE("::") + icuResource;
 		for (std::list<ResourceClass>::const_iterator it = MembersCache.begin(); it != MembersCache.end(); ++it) {
-			if (it->Type == ResourceClass::METHOD && (it->Resource == icuResource || it->Resource == constructorSignature)) {
+			if (it->Type == ResourceClass::METHOD && it->Resource == icuResource) {
 				returnType = it->ReturnType;
 				break;
 			}
@@ -701,25 +699,6 @@ void mvceditor::ResourceFinderClass::MethodFound(const UnicodeString& rawClassNa
 	}
 	item.IsStatic = isStatic;
 	MembersCache.push_back(item);
-
-	if (filteredMethodName.caseCompare(UNICODE_STRING_SIMPLE("__construct"), 0) == 0) {
-		
-		// for constructors, rename them to have the same name as the class. IF this logic is changed, then the logic
-		// in the Collect methods must be changed as well.
-		ResourceClass itemConstruct;
-		itemConstruct.Resource = filteredClassName + UNICODE_STRING_SIMPLE("::") + filteredClassName;
-		itemConstruct.Identifier = filteredClassName;
-		itemConstruct.Type = ResourceClass::METHOD;
-		itemConstruct.FileItemIndex = CurrentFileItemIndex;
-		if (!returnType.isEmpty()) {
-			itemConstruct.Signature = returnType + UNICODE_STRING_SIMPLE(" ");
-		}
-		itemConstruct.Signature += filteredSignature;
-		itemConstruct.Signature.findAndReplace(UNICODE_STRING_SIMPLE("__construct"), filteredClassName);
-		itemConstruct.ReturnType = returnType;
-		itemConstruct.Comment = comment;
-		MembersCache.push_back(itemConstruct);
-	}
 }
 
 void mvceditor::ResourceFinderClass::MethodEnd(const UnicodeString& className, const UnicodeString& methodName, int pos) {

@@ -1047,11 +1047,11 @@ TEST_FIXTURE(ResourceFinderTestClass, GetResourceMatchShouldReturnSignatureForCo
 	);
 	wxString testFile = wxT("test.php");
 	CreateFixtureFile(testFile, code);
-	CHECK(ResourceFinder->Prepare(wxT("UserClass::UserClass")));
+	CHECK(ResourceFinder->Prepare(wxT("UserClass::__construct")));
 	ResourceFinder->Walk(TestProjectDir + testFile);
 	CHECK(ResourceFinder->CollectFullyQualifiedResource());
 	mvceditor::ResourceClass resource = ResourceFinder->GetResourceMatch(0);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("public function UserClass($name)"), resource.Signature);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("public function __construct($name)"), resource.Signature);
 }
 
 TEST_FIXTURE(ResourceFinderTestClass, GetResourceMatchShouldReturnSignatureForInheritedMethods) {

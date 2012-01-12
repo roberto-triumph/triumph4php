@@ -505,10 +505,12 @@ void mvceditor::PhpDocumentClass::HandleCallTip(wxChar ch, bool force) {
 		// Func1('hello', Func2('bye'
 		// we are always going to show the call tip for Func2 (if the cursor is after 'bye')
 		// make sure we don't go past the last statement
+		bool hasMethodCall = false;
 		while (currentPos >= 0) {
 			char c = Ctrl->GetCharAt(currentPos);
 			if (!InCommentOrStringStyle(currentPos)) {
 				if ('(' == c) {
+					hasMethodCall = true;
 					break;
 				}
 				if (';' == c) {
@@ -527,6 +529,31 @@ void mvceditor::PhpDocumentClass::HandleCallTip(wxChar ch, bool force) {
 				mvceditor::ResourceClass resource = matches[i];
 				if (mvceditor::ResourceClass::FUNCTION == resource.Type || mvceditor::ResourceClass::METHOD == resource.Type) {
 					CurrentCallTipResources.push_back(resource);
+				}
+			}
+			if (CurrentCallTipResources.empty() && hasMethodCall && !matches.empty()) {
+
+				// may be the constructor is being called.
+				// when the constructor is called; the matched symbol is the class name and not a method name
+				// here we will look for the constructor
+				// search for all methods of the class
+				UnicodeString className = matches[0].Resource;
+				wxString constructorResourceSearch = mvceditor::StringHelperClass::IcuToWx(className);
+				constructorResourceSearch += wxT("::");
+				mvceditor::ResourceFinderClass* globalResourceFinder = Project->GetResourceFinder();
+				if(ResourceUpdates->Worker.PrepareAll(globalResourceFinder, constructorResourceSearch)) {
+					if (ResourceUpdates->Worker.CollectNearMatchResourcesFromAll(globalResourceFinder)) {
+						std::vector<mvceditor::ResourceClass> matches = ResourceUpdates->Worker.Matches(globalResourceFinder);
+						for (size_t i = 0; i < matches.size(); ++i) {
+							mvceditor::ResourceClass res = matches[i];
+							if (mvceditor::ResourceClass::METHOD == res.Type && UNICODE_STRING_SIMPLE("__construct") == res.Identifier) {
+								CurrentCallTipResources.push_back(res);
+							}
+							else if (mvceditor::ResourceClass::METHOD == res.Type && className == res.Identifier) {
+								CurrentCallTipResources.push_back(res);
+							}
+						}
+					}
 				}
 			}
 			size_t matchCount = CurrentCallTipResources.size();
