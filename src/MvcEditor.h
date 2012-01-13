@@ -28,6 +28,7 @@
 #include <windows/AppFrameClass.h>
 #include <environment/EnvironmentClass.h>
 #include <plugins/ResourcePluginClass.h>
+#include <plugins/ProjectPluginClass.h>
 #include <PluginClass.h>
 #include <PreferencesClass.h>
 #include <wx/app.h>
@@ -205,6 +206,12 @@ private:
 	 * in the Plugin vector; no need to delete.
 	 */ 
 	ResourcePluginClass* ResourcePlugin;
+
+	/**
+	 * Will need to load preferences for the project before all others. This pointer just points to one of the Plugins
+	 * in the Plugin vector; no need to delete.
+	 */
+	ProjectPluginClass* ProjectPlugin;
 
 	DECLARE_EVENT_TABLE()
 };

@@ -43,6 +43,8 @@ mvceditor::ResourceFileReaderClass::ResourceFileReaderClass(wxEvtHandler& handle
 
 bool mvceditor::ResourceFileReaderClass::InitForNativeFunctionsFile(const mvceditor::ResourceFinderClass& finder) {
 	wxFileName nativeFunctionsFilePath = mvceditor::NativeFunctionsAsset();
+
+	// use GetPath(); Init() needs a directory
 	if (Init(nativeFunctionsFilePath.GetPath())) {
 		NewResources.CopyResourcesFrom(finder);
 		

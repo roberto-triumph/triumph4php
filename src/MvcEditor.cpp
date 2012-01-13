@@ -56,7 +56,8 @@ mvceditor::AppClass::AppClass()
 	, ResourceUpdates(*this, wxNewId())
 	, Preferences(NULL)
 	, Project(NULL)
-	, ResourcePlugin(NULL) {
+	, ResourcePlugin(NULL)
+	, ProjectPlugin(NULL) {
 	AppFrame = NULL;
 }
 
@@ -189,8 +190,11 @@ void mvceditor::AppClass::CreatePlugins() {
 
 	plugin = new EnvironmentPluginClass();
 	Plugins.push_back(plugin);
-	plugin = new ProjectPluginClass();
-	Plugins.push_back(plugin);
+
+	// we want to keep a reference to this plugin
+	// we need to load the project options before all others
+	ProjectPlugin = new ProjectPluginClass();
+	Plugins.push_back(ProjectPlugin);
 	plugin = new OutlineViewPluginClass();
 	Plugins.push_back(plugin);
 	plugin = new LintPluginClass();
@@ -209,7 +213,7 @@ void mvceditor::AppClass::CreatePlugins() {
 
 void mvceditor::AppClass::PluginWindows() {
 	for (size_t i = 0; i < Plugins.size(); ++i) {
-		Plugins[i]->SetProject(Project);
+		///Plugins[i]->SetProject(Project);
 		AppFrame->LoadPlugin(Plugins[i]);
 
 		// propagate GUI events to plugins, so that they can handle menu events themselves
@@ -309,8 +313,11 @@ void mvceditor::AppClass::OnProcessComplete(wxCommandEvent& event) {
 	}
 	if (continueProjectOpen) {
 		AppFrame->OnProjectOpened(Project, this);
+		ProjectPlugin->SetProject(Project);
 		for (size_t i = 0; i < Plugins.size(); ++i) {
-			Plugins[i]->SetProject(Project);
+			if (Plugins[i] != ProjectPlugin) {
+				Plugins[i]->SetProject(Project);
+			}
 		}
 	}
 }
@@ -321,8 +328,11 @@ void mvceditor::AppClass::OnProcessFailed(wxCommandEvent& event) {
 	// still need to set the project even if the project detection fails
 	// pretty much all code depends on having a Project pointer
 	AppFrame->OnProjectOpened(Project, this);
+	ProjectPlugin->SetProject(Project);
 	for (size_t i = 0; i < Plugins.size(); ++i) {
-		Plugins[i]->SetProject(Project);
+		if (Plugins[i] != ProjectPlugin) {
+			Plugins[i]->SetProject(Project);
+		}
 	}
 }
 
