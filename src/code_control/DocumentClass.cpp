@@ -689,9 +689,9 @@ void mvceditor::PhpDocumentClass::MatchBraces(int posToCheck) {
 }
 
 void mvceditor::PhpDocumentClass::OnKeyDown(wxKeyEvent& event) {
-	
+
 	// if already parsing then dont do anything
-	if (ResourceUpdates->GetThread() && ResourceUpdates->GetThread()->IsRunning()) {
+	if (!ResourceUpdates || (ResourceUpdates->GetThread() && ResourceUpdates->GetThread()->IsRunning())) {
 		event.Skip();
 		return;
 	}
@@ -703,19 +703,11 @@ void mvceditor::PhpDocumentClass::OnKeyDown(wxKeyEvent& event) {
 	// comment or a constant string
 	if (!InCommentOrStringStyle(Ctrl->GetCurrentPos())) {
 		int modifiers = event.GetModifiers();
+
+		// TODO:... what about when code is pasted?
 		if (modifiers == wxMOD_SHIFT || modifiers == wxMOD_NONE) {
 			int keyCode = event.GetKeyCode();
-			if ((keyCode >= 'a'  && keyCode <= 'z') ||
-					(keyCode >= 'A'  && keyCode <= 'Z') ||
-					(keyCode >= '0'  && keyCode <= '9') ||
-					'_' == keyCode || 
-					'{' == keyCode || 
-					'}' == keyCode ||
-					'(' == keyCode ||
-					')' == keyCode ||
-					';' == keyCode ||
-					WXK_DELETE == keyCode ||
-					WXK_BACK == keyCode) {
+			if (';' == keyCode) {
 				NeedToUpdateResources = true;
 			}
 		}
