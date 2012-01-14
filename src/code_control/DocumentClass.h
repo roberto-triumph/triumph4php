@@ -190,7 +190,15 @@ public:
 
 	virtual void DetachFromControl(wxStyledTextCtrl* ctrl);
 
-	
+	/**
+	 * Returns the resolved Resource[s] that is positioned in the given cursor position.
+	 * Note that posToCheck must point to the END of the word to be looked up.
+	 *
+	 * @param int posToCheck a SCINTILLA POSITION (ie. BYTES not characters)
+	 * @return list of resources that the symbol can be
+	 */
+	std::vector<ResourceClass> GetSymbolAt(int posToCheck);
+
 	wxString GetPhpKeywords() const;
 	
 	wxString GetHtmlKeywords() const;
@@ -233,14 +241,6 @@ private:
 	 * start re-parsing in the background
 	 */
 	void OnTimer(wxTimerEvent& event);
-
-	/**
-	 * Returns the resolved Resource[s] that is positioned in the given cursor position.
-	 *
-	 * @param int posToCheck a SCINTILLA POSITION (ie. BYTES not characters)
-	 * @return list of resources that the symbol can be
-	 */
-	std::vector<ResourceClass> GetSymbolAt(int posToCheck);
 
 	/**
 	 * Handle the call tip up/down arrow events

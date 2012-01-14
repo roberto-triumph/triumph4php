@@ -78,7 +78,7 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 	UsePopUp(false);
 	SetYCaretPolicy(wxSTC_CARET_EVEN, 0);
 	ApplyPreferences();
-	SetMouseDwellTime(1500);
+	SetMouseDwellTime(1000);
 }
 
 mvceditor::CodeControlClass::~CodeControlClass() {
@@ -870,58 +870,57 @@ void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
 	 * there is a crash bug  with wxTipWindow
 	 * 
 	 * http://trac.wxwidgets.org/ticket/11125
-	 * 
+	 *
+	 * use the wxStyledTextCtrl call tip instead 
+	 */
 	mvceditor::ResourceFinderClass* globalResourceFinder = Project->GetResourceFinder();
 	if (DocumentMode == PHP && globalResourceFinder) {
 		int pos = event.GetPosition();
-		wxString symbol = GetSymbolAt(pos);
-		if (!symbol.IsEmpty()) {
-			if (wxMUTEX_NO_ERROR == ResourceUpdates->WorketMutex.TryLock() && ResourceUpdates->PrepareAll(globalResourceFinder, symbol)) {
-				if (ResourceUpdates->CollectFullyQualifiedResourceFromAll(globalResourceFinder)) {
-					std::vector<mvceditor::ResourceFinderClass*> finders = ResourceUpdates->Iterator(globalResourceFinder);
-					for (size_t r = 0; r < finders.size(); r++) {
-						mvceditor::ResourceFinderClass* finder = finders[r];
-						mvceditor::ResourceClass resource = finder->GetResourceMatch(0);					
-						bool found = FALSE != resource.Identifier.isEmpty();
-						if (found) {
-							wxString msg = mvceditor::StringHelperClass::IcuToWx(resource.Identifier);
-							if (resource.Type == mvceditor::ResourceClass::FUNCTION) {
-								msg += wxT("\n\n");
-								msg += mvceditor::StringHelperClass::IcuToWx(resource.ReturnType);
-								msg += wxT(" ");
-								msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
-							}
-							else if (resource.Type == mvceditor::ResourceClass::METHOD) {
-								msg += wxT("\n\n");
-								msg += mvceditor::StringHelperClass::IcuToWx(resource.ReturnType);
-								msg += wxT(" ");
-								msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
-							}
-							else {
-								msg += wxT("\n\n");
-								msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
-							}
-							if (!resource.Comment.isEmpty()) {
-								msg += wxT("\n\n");
-								msg += mvceditor::StringHelperClass::IcuToWx(resource.Comment);
-							}
-							if (!msg.IsEmpty()) {
-								new wxTipWindow(this, msg, 
-									wxCoord(400), NULL);
-							}
-							break;
-						}
-					}
+
+		// if the cursor is in the middle of an identifier, find the end of the
+		// current identifier; that way we can know the full name of the resource we want
+		// to get
+		int endPos = WordEndPosition(pos, true);
+		std::vector<mvceditor::ResourceClass> matches = ((PhpDocumentClass *)Document)->GetSymbolAt(endPos);
+		if (!matches.empty()) {
+			mvceditor::ResourceClass resource = matches[0];
+			wxString msg;
+			if (resource.Type == mvceditor::ResourceClass::FUNCTION) {
+				msg = mvceditor::StringHelperClass::IcuToWx(resource.Resource);
+				msg += wxT("\n\n");
+				msg += mvceditor::StringHelperClass::IcuToWx(resource.ReturnType);
+				msg += wxT(" ");
+				msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
+			}
+			else if (resource.Type == mvceditor::ResourceClass::METHOD) {
+				msg = mvceditor::StringHelperClass::IcuToWx(resource.Resource);
+				msg += wxT("\n\n");
+				msg += mvceditor::StringHelperClass::IcuToWx(resource.ReturnType);
+				msg += wxT(" ");
+				msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
+			}
+			else {
+				msg = mvceditor::StringHelperClass::IcuToWx(resource.Resource);
+				msg += wxT("\n\n");
+				msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
+			}
+			if (!resource.Comment.isEmpty()) {
+				msg += wxT("\n\n");
+				msg += mvceditor::StringHelperClass::IcuToWx(resource.Comment);
+			}
+			if (!msg.IsEmpty()) {
+				if (CallTipActive()) {
+					CallTipCancel();
 				}
-				ResourceUpdates->WorkerMutex.Unlock();
+				CallTipShow(event.GetPosition(), msg);
 			}
 		}
-	}*/
+	}
 	event.Skip();
 }
 
 void mvceditor::CodeControlClass::OnDwellEnd(wxStyledTextEvent& event) {
-
+	CallTipCancel();
 }
 
 int mvceditor::CodeControlClass::LineFromCharacter(int charPos) {
