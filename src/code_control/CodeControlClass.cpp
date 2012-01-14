@@ -154,27 +154,28 @@ bool mvceditor::CodeControlClass::IsNew() const {
 
 bool mvceditor::CodeControlClass::SaveAndTrackFile(wxString newFilename) {
 	bool saved = false;
-	
-	// when saving, update the internal timestamp so that the OnIdle logic works correctly
-	if (!CurrentFilename.empty()) {
+	if (!CurrentFilename.empty() || CurrentFilename == newFilename) {
 		saved = SaveFile(CurrentFilename);
+
+		// if file is no changing name then its not changing extension
+		// no need to auto detect the document mode
 	}
 	else if (SaveFile(newFilename)) {
 		CurrentFilename = newFilename;
 		saved = true;
-	}
-	if (saved) {
-		wxFileName file(CurrentFilename);
-		FileOpenedDateTime = file.GetModificationTime();
-	
+
 		// if the file extension changed let's update the code control appropriate
 		// for example if a .txt file was saved as a .sql file
 		AutoDetectDocumentMode();
 
-		// when saving the same file; newFileName will be empty; we dont want to lose the name
-		if (!newFilename.empty()) {
-			Document->FileOpened(newFilename);
-		}
+		// need to notify the document of the new name
+		Document->FileOpened(newFilename);
+	}
+	if (saved) {
+
+		// when saving, update the internal timestamp so that the OnIdle logic works correctly
+		wxFileName file(CurrentFilename);
+		FileOpenedDateTime = file.GetModificationTime();
 	}
 	return saved;
 }
@@ -875,7 +876,7 @@ void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
 		int pos = event.GetPosition();
 		wxString symbol = GetSymbolAt(pos);
 		if (!symbol.IsEmpty()) {
-			if (ResourceUpdates->PrepareAll(globalResourceFinder, symbol)) {
+			if (wxMUTEX_NO_ERROR == ResourceUpdates->WorketMutex.TryLock() && ResourceUpdates->PrepareAll(globalResourceFinder, symbol)) {
 				if (ResourceUpdates->CollectFullyQualifiedResourceFromAll(globalResourceFinder)) {
 					std::vector<mvceditor::ResourceFinderClass*> finders = ResourceUpdates->Iterator(globalResourceFinder);
 					for (size_t r = 0; r < finders.size(); r++) {
@@ -912,6 +913,7 @@ void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
 						}
 					}
 				}
+				ResourceUpdates->WorkerMutex.Unlock();
 			}
 		}
 	}*/

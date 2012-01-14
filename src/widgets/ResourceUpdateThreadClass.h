@@ -180,6 +180,7 @@ public:
 		
 	/**
 	 * Creates a new resource finder for the given file.
+	 * This method is thread-safe.
 	 * 
 	 * @param fileName unique identifier for a file
 	 * @param handler will get notified with a EVENT_WORK_COMPLETE when resoruce parsing
@@ -192,6 +193,7 @@ public:
 	/**
 	 * Cleans up the resource finder from the given file. This should be called whenever
 	 * the user is no longer editing the file.
+	 * This method is thread-safe.
 	 * 
 	 * @param fileName unique identifier for a file
 	 */
@@ -200,18 +202,42 @@ public:
 	/**
 	 * Will run a background thread to parse the resources of the given 
 	 * text.
+	 * This method is thread-safe.
 	 * 
 	 * @param fileName unique identifier for a file
 	 * @param code the file's most up-to-date source code (from the user-edited buffer)
 	 * @param bool if TRUE then tileName is a new file that is not yet written to disk
 	 */
 	wxThreadError StartBackgroundUpdate(const wxString& fileName, const UnicodeString& code, bool isNew);
-	
+
 	/**
-	 * This is the object that will hold all of the resource cache. It should not be accessed while
-	 * the thread is running
+	 * Calls ResourceUpdateClass::ExpressionCompletionMatches in a thread-safe
+	 * manner; with the caveat that if a lock could not be acquired then this 
+	 * method does nothing.
+	 * @see ResourceUpdatesClas::ExpressionCompletionMatches 
 	 */
-	ResourceUpdateClass Worker;
+	void ExpressionCompletionMatches(const wxString& fileName, const SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
+		ResourceFinderClass* resourceFinder, std::vector<UnicodeString>& autoCompleteList,
+		std::vector<ResourceClass>& autoCompleteResourceList);
+
+	/**
+	 * Calls  and ResourceUpdateClass::PrepareAll and 
+	 * ResourceUpdateClass::CollectNearMatchResourcesFromAll in a thread-safe
+	 * manner; with the caveat that if a lock could not be acquired then this 
+	 * method does nothing.
+	 * @see ResourceUpdatesClass::PrepareAll
+	 * @see ResourceUpdatesClass::CollectNearMatchResourcesFromAll
+	 */
+	std::vector<ResourceClass> PrepareAndCollectNearMatchResourcesFromAll(ResourceFinderClass* globalresourceFinder, const wxString& resource);
+
+	/**
+	 * Calls  and ResourceUpdateClass::ResourceMatches in a thread-safe
+	 * manner; with the caveat that if this method will BLOCK until a lock
+	 * is acquired.
+	 * @see ResourceUpdatesClass::ResourceMatches 
+	 */
+	void ResourceMatches(const wxString& fileName, const SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
+		ResourceFinderClass* resourceFinder, std::vector<ResourceClass>& matches);
 
 protected:
 	
@@ -221,6 +247,17 @@ protected:
 	void* Entry();
 	
 private:
+
+	/**
+	 * This is the object that will hold all of the resource cache. It should not be accessed while
+	 * the thread is running
+	 */
+	ResourceUpdateClass Worker;
+
+	/**
+	 * Make sure accesses are thread-safe
+	 */
+	wxMutex WorkerMutex;
 
 	/**
 	 * These guys will get notified when the parsing is complete. This class will NOT own

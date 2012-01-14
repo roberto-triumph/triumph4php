@@ -168,25 +168,32 @@ void mvceditor::ResourceUpdateClass::ResourceMatches(const wxString& fileName, c
 mvceditor::ResourceUpdateThreadClass::ResourceUpdateThreadClass(wxEvtHandler& handler, int eventId)
 	: ThreadWithHeartbeatClass(handler, eventId)
 	, Worker()
+	, WorkerMutex()
 	, Handlers()
 	, CurrentCode() 
 	, CurrentFileName() {
 }
 
 bool mvceditor::ResourceUpdateThreadClass::Register(const wxString& fileName, wxEvtHandler* handler) {
-	bool ret = Worker.Register(fileName);
-	if (ret) {
-		Handlers[fileName] = handler;
-		ret = true;
+	bool ret = false;
+	wxMutexLocker locker(WorkerMutex);
+	if (locker.IsOk()) {
+		ret = Worker.Register(fileName);
+		if (ret) {
+			Handlers[fileName] = handler;
+			ret = true;
+		}
 	}
 	return ret;
 }
 
 void mvceditor::ResourceUpdateThreadClass::Unregister(const wxString& fileName) {
-	Worker.Unregister(fileName);
-	Handlers.erase(fileName);
+	wxMutexLocker locker(WorkerMutex);
+	if (locker.IsOk()) {
+		Worker.Unregister(fileName);
+		Handlers.erase(fileName);
+	}
 }
-
 
 wxThreadError mvceditor::ResourceUpdateThreadClass::StartBackgroundUpdate(const wxString& fileName, const UnicodeString& code, bool isNew) {
 	wxThreadError error = CreateSingleInstance();
@@ -201,16 +208,55 @@ wxThreadError mvceditor::ResourceUpdateThreadClass::StartBackgroundUpdate(const 
 }
 
 void* mvceditor::ResourceUpdateThreadClass::Entry() {
-	Worker.Update(CurrentFileName, CurrentCode, CurrentFileIsNew);
-	
-	std::map<wxString, wxEvtHandler*>::iterator itHandler = Handlers.find(CurrentFileName);
-	if (itHandler != Handlers.end()) {
-		wxCommandEvent evt(mvceditor::EVENT_WORK_COMPLETE, wxID_ANY);
-		wxPostEvent(itHandler->second, evt);
+	if (wxTHREAD_NO_ERROR == WorkerMutex.Lock()) {
+
+		Worker.Update(CurrentFileName, CurrentCode, CurrentFileIsNew);
+		std::map<wxString, wxEvtHandler*>::iterator itHandler = Handlers.find(CurrentFileName);
+		if (itHandler != Handlers.end()) {
+			wxCommandEvent evt(mvceditor::EVENT_WORK_COMPLETE, wxID_ANY);
+			wxPostEvent(itHandler->second, evt);
+		}
+		WorkerMutex.Unlock();
 	}
 	
 	// cleanup.
 	CurrentFileName.resize(0);
 	CurrentCode.truncate(0);
 	return 0;
+}
+
+void mvceditor::ResourceUpdateThreadClass::ExpressionCompletionMatches(const wxString& fileName, const mvceditor::SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
+													 mvceditor::ResourceFinderClass* globalResourceFinder, 
+													 std::vector<UnicodeString>& autoCompleteList,
+													 std::vector<mvceditor::ResourceClass>& resourceMatches) {
+	if (wxMUTEX_NO_ERROR == WorkerMutex.TryLock()) {
+		Worker.ExpressionCompletionMatches(fileName, parsedExpression, expressionScope, globalResourceFinder, 
+			autoCompleteList, resourceMatches);
+		WorkerMutex.Unlock();
+	}
+}
+
+std::vector<mvceditor::ResourceClass> 
+mvceditor::ResourceUpdateThreadClass::PrepareAndCollectNearMatchResourcesFromAll(
+		mvceditor::ResourceFinderClass* globalResourceFinder, 
+		const wxString& resource) {
+	std::vector<mvceditor::ResourceClass> matches;
+	if (wxMUTEX_NO_ERROR == WorkerMutex.TryLock()) {
+		if (Worker.PrepareAll(globalResourceFinder, resource)) {
+			if (Worker.CollectNearMatchResourcesFromAll(globalResourceFinder)) {
+				matches = Worker.Matches(globalResourceFinder);
+			}
+		}
+		WorkerMutex.Unlock();
+	}
+	return matches;
+}
+
+void mvceditor::ResourceUpdateThreadClass::ResourceMatches(const wxString& fileName, const SymbolClass& parsedExpression, const UnicodeString& expressionScope,
+														   mvceditor::ResourceFinderClass* globalResourceFinder, std::vector<mvceditor::ResourceClass>& matches) {
+
+	wxMutexLocker locker(WorkerMutex);
+	if (locker.IsOk()) {
+		Worker.ResourceMatches(fileName, parsedExpression, expressionScope, globalResourceFinder, matches);
+	}
 }

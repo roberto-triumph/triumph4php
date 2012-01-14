@@ -404,9 +404,9 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 		Parser.ParseExpression(lastExpression, parsedExpression);
 		UnicodeString expressionScope = ScopeFinder.GetScopeString(code, expressionPos);
 		mvceditor::ResourceFinderClass* globalResourceFinder = Project->GetResourceFinder();
-
-		ResourceUpdates->Worker.ExpressionCompletionMatches(FileIdentifier, parsedExpression, expressionScope, globalResourceFinder, 
-			variableMatches, AutoCompletionResourceMatches);
+		
+		ResourceUpdates->ExpressionCompletionMatches(FileIdentifier, parsedExpression, expressionScope, globalResourceFinder, 
+				variableMatches, AutoCompletionResourceMatches);
 		if (!variableMatches.empty()) {
 			for (size_t i = 0; i < variableMatches.size(); ++i) {
 				wxString postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_VARIABLE);
@@ -541,18 +541,14 @@ void mvceditor::PhpDocumentClass::HandleCallTip(wxChar ch, bool force) {
 				wxString constructorResourceSearch = mvceditor::StringHelperClass::IcuToWx(className);
 				constructorResourceSearch += wxT("::");
 				mvceditor::ResourceFinderClass* globalResourceFinder = Project->GetResourceFinder();
-				if(ResourceUpdates->Worker.PrepareAll(globalResourceFinder, constructorResourceSearch)) {
-					if (ResourceUpdates->Worker.CollectNearMatchResourcesFromAll(globalResourceFinder)) {
-						std::vector<mvceditor::ResourceClass> matches = ResourceUpdates->Worker.Matches(globalResourceFinder);
-						for (size_t i = 0; i < matches.size(); ++i) {
-							mvceditor::ResourceClass res = matches[i];
-							if (mvceditor::ResourceClass::METHOD == res.Type && UNICODE_STRING_SIMPLE("__construct") == res.Identifier) {
-								CurrentCallTipResources.push_back(res);
-							}
-							else if (mvceditor::ResourceClass::METHOD == res.Type && className == res.Identifier) {
-								CurrentCallTipResources.push_back(res);
-							}
-						}
+				std::vector<mvceditor::ResourceClass> matches = ResourceUpdates->PrepareAndCollectNearMatchResourcesFromAll(globalResourceFinder, constructorResourceSearch);
+				for (size_t i = 0; i < matches.size(); ++i) {
+					mvceditor::ResourceClass res = matches[i];
+					if (mvceditor::ResourceClass::METHOD == res.Type && UNICODE_STRING_SIMPLE("__construct") == res.Identifier) {
+						CurrentCallTipResources.push_back(res);
+					}
+					else if (mvceditor::ResourceClass::METHOD == res.Type && className == res.Identifier) {
+						CurrentCallTipResources.push_back(res);
 					}
 				}
 			}
@@ -637,7 +633,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetCurrentSym
 	if (!lastExpression.isEmpty()) {
 		parser.ParseExpression(lastExpression, parsedExpression);
 		UnicodeString scopeString = scopeFinder.GetScopeString(code, endPos);
-		ResourceUpdates->Worker.ResourceMatches(FileIdentifier, parsedExpression, scopeString, resourceFinder, matches);
+		ResourceUpdates->ResourceMatches(FileIdentifier, parsedExpression, scopeString, resourceFinder, matches);
 	}
 	return matches;
 }
@@ -650,8 +646,9 @@ void mvceditor::PhpDocumentClass::FileOpened(wxString fileName) {
 	// important to set the fileIdentifier to the name;
 	// the ResourceUpdates object will need to know what files are being edited so it can mark them as 'dirty'
 	FileIdentifier = fileName;
+
 	ResourceUpdates->Register(FileIdentifier, this);
-	
+
 	// trigger the resource cache
 	// so that code completion works when the file is first opened
 	NeedToUpdateResources = true;
@@ -691,7 +688,11 @@ void mvceditor::PhpDocumentClass::MatchBraces(int posToCheck) {
 void mvceditor::PhpDocumentClass::OnKeyDown(wxKeyEvent& event) {
 
 	// if already parsing then dont do anything
-	if (!ResourceUpdates || (ResourceUpdates->GetThread() && ResourceUpdates->GetThread()->IsRunning())) {
+	if (!ResourceUpdates || ResourceUpdates->IsRunning()) {
+		event.Skip();
+		return;
+	}
+	if (!Ctrl || Ctrl != event.GetEventObject()) {
 		event.Skip();
 		return;
 	}
@@ -745,7 +746,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetSymbolAt(i
 	if (!lastExpression.isEmpty()) {
 		parser.ParseExpression(lastExpression, parsedExpression);
 		UnicodeString expressionScope = scopeFinder.GetScopeString(code, posToCheck);
-		ResourceUpdates->Worker.ResourceMatches(FileIdentifier, parsedExpression, expressionScope, resourceFinder, matches);
+		ResourceUpdates->ResourceMatches(FileIdentifier, parsedExpression, expressionScope, resourceFinder, matches);
 	}
 	return matches;
 }
