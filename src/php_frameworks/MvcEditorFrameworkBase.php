@@ -45,6 +45,8 @@ abstract class MvcEditorFrameworkBaseClass {
 	 * @return string a string that uniquely identifies this framework (case insensitive). The identifier should
 	 * be unique so that MVC Editor can handle separate versions of a framework gracefully.
 	 * Examples: 'symfony_1_4', 'CI-0.10'
+	 * This string is the one used for the input into the PHP program; it is used to determine which 
+	 * specific instance of MvcEditorFrameworkBaseClass to use
 	 */
 	abstract public function getIdentifier();
 	
@@ -70,11 +72,24 @@ abstract class MvcEditorFrameworkBaseClass {
 	abstract public function databaseInfo($dir);
 	
 	/**
+	 * Sub-classes will implement this method to list all of their configuration files; MVC Editor will
+	 * use these to populate menus.
+	 *
 	 * @param $dir the base directory of the project in question; absolute path.
-	 * @return array (name => full path) string full path to the project's configuration files. The MVC Editor will
+	 * @return array associative (name => full path) string full path to the project's configuration files. The MVC Editor will
 	 * use the returned files to give the user 'quick' access to the framework's configuration files.
 	 * The returned files MUST HAVE OS-dependant file separators.
 	 */
 	abstract public function configFiles($dir);
+	
+	/**
+	 * Sub-classes will implement this method to aid MVC Editor in code completion. The sub classes will return 
+	 * any resources that it dynamically adds to its base classes; they could also be the result of
+	 * magic methods.
+	 *
+	 * @param $dir the base directory of the project in question; absolute path.
+	 * @return array of MvcEditorResource objects
+	 */
+	abstract public function resources($dir);
 
 }

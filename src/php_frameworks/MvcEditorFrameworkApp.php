@@ -84,6 +84,9 @@ function runAction($framework, $dir, $action) {
 	else if (strcasecmp($action, 'configFiles') == 0) {
 		runConfigFiles($framework, $dir);
 	}
+	else if (strcasecmp($action, 'resources') == 0) {
+		runResources($framework, $dir);
+	}
 }
 
 function runDatabaseInfo($framework, $dir) {
@@ -96,7 +99,7 @@ function runDatabaseInfo($framework, $dir) {
 		
 			// write an INI entry for each connection. make sure to replace any possible
 			// characters that may conflict with INI parsing.
-			$key = str_replace(array("/", "\n", " "), array("_", "_", "_"), $info->name);
+			$key = iniEscapeKey($info->name);
 				
 			$config->{$key} = array();
 			foreach ($info as $prop => $value) {
@@ -140,12 +143,54 @@ function runConfigFiles($framework, $dir) {
 			// characters that may conflict with INI parsing.
 			// at the moment I don't know how to make wxFileConfig not try to 
 			// unescap backslashes; will escape backslashes here
-			$key = str_replace(array("/", "\n", " "), array("_", "_", "_"), $configName);
-			$configPath = str_replace("\\", "\\\\", $configPath);
+			$key = iniEscapeKey($configName);
+			$configPath = iniEscapeValue($configPath);
 			$outputConfig->{$key} = $configPath;
 		}
 		print $writer->render();
 	}
+}
+
+/**
+ * @param MvcEditorFrameworkBaseClass $framework the framework specific code
+ * @param string $dir the directory where the project source code is located
+ */
+function runResources(MvcEditorFrameworkBaseClass $framework, $dir) {
+	$resources = $framework->resources($dir);
+	if ($resources) {
+		$writer = new Zend_Config_Writer_Ini();
+		$outputConfig = new Zend_Config(array(), true);
+		$writer->setConfig($outputConfig);
+		$keyIndex = 0;
+		foreach ($resources as $resource) {
+		
+			// write an INI entry for each config file. make sure to replace any possible
+			// characters that may conflict with INI parsing.
+			$key = iniEscapeKey('Resource_' . $keyIndex);
+			$outputConfig->{$key} = array(
+				'Resource' => iniEscapeValue($resource->resource),
+				'Identifier' => iniEscapeValue($resource->identifier),
+				'ReturnType' => iniEscapeValue($resource->returnType),
+				'Signature' => iniEscapeValue($resource->signature),
+				'Comment' => iniEscapeValue($resource->comment)
+			);
+			$keyIndex++;
+		}
+		print $writer->render();
+	}
+}
+
+
+// Replaces any possible characters that may conflict with INI parsing of KEYS.
+function iniEscapeKey($str) {
+	return str_replace(array("/", "\n", " "), array("_", "_", "_"), $str);
+}
+
+// Replaces any possible characters that may conflict with INI parsing of VALUES.
+// at the moment I don't know how to make wxFileConfig not try to 
+// unescape backslashes; will escape backslashes here
+function iniEscapeValue($str) {
+	return str_replace("\\", "\\\\", $str);
 }
 
 $rules = array(
@@ -165,6 +210,10 @@ $action = trim($action, " '\"");
 $identifier = trim($identifier, " '\"");
 $dir = trim($dir, " '\"");
 
+$action = 'resources';
+$dir = 'C:\Users\Roberto\Software\wamp\www\ember';
+$identifier = 'code-igniter';
+
 if ($help) {
 	echo <<<EOF
 This is the gateway that will be responsible for communicating with the editor app.
@@ -173,7 +222,7 @@ with some arguments) and this app will parse the arguments and respond according
 For example, let's say the user opened a SQL browser.  The editor needs to know the SQL credentials to
 use. The editor will run this script asking for the credentials.  
 
-   php MvcEditorFrameworkApp.php --identifier="CI-1.4" --dir="/home/user/projects/my_blog/" --action=database-info
+   php MvcEditorFrameworkApp.php --identifier="CI-1.4" --dir="/home/user/projects/my_blog/" --action=databaseInfo
 
 When any argument is invalid or missing, the program will exit with an error code (-1)
 EOF;

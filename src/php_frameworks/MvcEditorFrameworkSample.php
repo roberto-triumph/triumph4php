@@ -54,7 +54,10 @@ class MvcEditorFrameworkSample extends MvcEditorFrameworkBaseClass {
 	}
 	
 	public function configFiles($dir) {
-		return array( 
-		);
+		return array();
+	}
+	
+	public function resources($dir) {
+		return array();
 	}
 }
