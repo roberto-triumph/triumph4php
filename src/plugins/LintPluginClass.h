@@ -236,6 +236,18 @@ public:
 	void DisplayLintError(int index);
 
 	/**
+	 * Will highlight the next error (from the one that is currently selected) in the lint results list AND 
+	 * will markup the source control window appropriately.
+	 */
+	void SelectNextError();
+
+	/**
+	 * Will highlight the previous error (from the one that is currently selected) in the lint results list AND 
+	 * will markup the source control window appropriately.
+	 */
+	void SelectPreviousError();
+
+	/**
 	 * Add the file counts to a label.
 	 */
 	void PrintSummary(int totalFiles, int errorFiles);
@@ -290,6 +302,10 @@ protected:
 private:
 
 	void OnLintMenu(wxCommandEvent& event);
+
+	void OnNextLintError(wxCommandEvent& event);
+
+	void OnPreviousLintError(wxCommandEvent& event);
 	
 	void OnLintError(wxCommandEvent& event);
 

@@ -240,6 +240,29 @@ void mvceditor::LintResultsPanelClass::DisplayLintError(int index) {
 	Notebook->GetCurrentCodeControl()->MarkLintError(*results);
 }
 
+void mvceditor::LintResultsPanelClass::SelectNextError() {
+	int selected = ErrorsList->GetSelection();
+	if (selected != wxNOT_FOUND && ((unsigned int)selected  + 1) < ErrorsList->GetCount()) {
+		ErrorsList->SetSelection(selected + 1);
+		DisplayLintError(selected + 1);
+	}
+	else if (ErrorsList->GetCount() > 0) {
+		ErrorsList->SetSelection(0);
+		DisplayLintError(0);
+	}
+}
+
+void mvceditor::LintResultsPanelClass::SelectPreviousError() {
+	int selected = ErrorsList->GetSelection();
+	if (selected != wxNOT_FOUND && (selected  - 1) >= 0) {
+		ErrorsList->SetSelection(selected - 1);
+		DisplayLintError(selected - 1);
+	}
+	else if (ErrorsList->GetCount() > 0) {
+		ErrorsList->SetSelection(ErrorsList->GetCount() - 1);
+		DisplayLintError(ErrorsList->GetCount() - 1);
+	}
+}
 
 mvceditor::LintPluginClass::LintPluginClass() 
 	: PluginClass()
@@ -250,7 +273,9 @@ mvceditor::LintPluginClass::LintPluginClass()
 }
 
 void mvceditor::LintPluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
-	projectMenu->Append(mvceditor::MENU_LINT_PHP, _("Lint Check"), _("Performs syntax check on the current project"), wxITEM_NORMAL);
+	projectMenu->Append(mvceditor::MENU_LINT_PHP + 0, _("Lint Check"), _("Performs syntax check on the current project"), wxITEM_NORMAL);
+	projectMenu->Append(mvceditor::MENU_LINT_PHP + 1, _("Show Next Lint Error\tF4"), _("Selects the next lint error in the code window"), wxITEM_NORMAL);
+	projectMenu->Append(mvceditor::MENU_LINT_PHP + 2, _("Show Previous Lint Error\tSHIFT+F4"), _("Selects the previous lint error in the code window"), wxITEM_NORMAL);
 }
 
 void mvceditor::LintPluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
@@ -261,6 +286,8 @@ void mvceditor::LintPluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 void mvceditor::LintPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
 	menuItemIds[mvceditor::MENU_LINT_PHP + 0] = wxT("Lint Check - Lint Check Project");
+	menuItemIds[mvceditor::MENU_LINT_PHP + 1] = wxT("Lint Check - Show Next Lint Error");
+	menuItemIds[mvceditor::MENU_LINT_PHP + 2] = wxT("Lint Check - Show Previous Lint Error");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
@@ -326,6 +353,24 @@ void mvceditor::LintPluginClass::OnLintMenu(wxCommandEvent& event) {
 	}
 	else {
 		wxMessageBox(_("You must have an open project."), _("Lint Check"));
+	}
+}
+
+void mvceditor::LintPluginClass::OnNextLintError(wxCommandEvent& event) {
+	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
+	LintResultsPanelClass* lintResultsPanel = NULL;
+	if (window) {
+		lintResultsPanel = (LintResultsPanelClass*)window;
+		lintResultsPanel->SelectNextError();
+	}
+}
+
+void mvceditor::LintPluginClass::OnPreviousLintError(wxCommandEvent& event) {
+	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
+	LintResultsPanelClass* lintResultsPanel = NULL;
+	if (window) {
+		lintResultsPanel = (LintResultsPanelClass*)window;
+		lintResultsPanel->SelectPreviousError();
 	}
 }
 
@@ -428,7 +473,9 @@ mvceditor::LintPluginPreferencesPanelClass::LintPluginPreferencesPanelClass(wxWi
 }
 
 BEGIN_EVENT_TABLE(mvceditor::LintPluginClass, wxEvtHandler) 
-	EVT_MENU(mvceditor::MENU_LINT_PHP, mvceditor::LintPluginClass::OnLintMenu)
+	EVT_MENU(mvceditor::MENU_LINT_PHP + 0, mvceditor::LintPluginClass::OnLintMenu)
+	EVT_MENU(mvceditor::MENU_LINT_PHP + 1, mvceditor::LintPluginClass::OnNextLintError)
+	EVT_MENU(mvceditor::MENU_LINT_PHP + 2, mvceditor::LintPluginClass::OnPreviousLintError)
 	EVT_MENU(ID_LINT_TOOLBAR_ITEM, mvceditor::LintPluginClass::OnLintMenu)
 	EVT_COMMAND(wxID_ANY, EVENT_LINT_ERROR,  mvceditor::LintPluginClass::OnLintError)
 	EVT_COMMAND(wxID_ANY, EVENT_FILE_READ,  mvceditor::LintPluginClass::OnLintFileComplete)
