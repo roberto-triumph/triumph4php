@@ -1238,4 +1238,149 @@ TEST_FIXTURE(ResourceFinderTestClass, CopyResourcesFromShouldCopyCopy) {
 	CHECK_EQUAL(TestProjectDir + wxT("test.php"), copy.GetResourceMatchFullPath(0));
 }
 
+class DynamicResourceTestClass : public FileTestFixtureClass {
+
+public:
+
+	mvceditor::ResourceFinderClass ResourceFinder;
+	std::vector<mvceditor::ResourceClass> DynamicResources;
+	wxString TestFile;
+
+	DynamicResourceTestClass() 
+		: FileTestFixtureClass(wxT("resource-finder"))
+		, ResourceFinder() 
+		, DynamicResources()
+		, TestFile(wxT("test.php")) {
+		ResourceFinder.FileFilters.push_back(wxT("*.php"));
+		if (wxDirExists(TestProjectDir)) {
+			RecursiveRmDir(TestProjectDir);
+		}
+	
+		// create a small class that implements a magic method
+		// then add a dynamic resource that will be used to mimic the resource
+		// returned by the magic method.
+		CreateFixtureFile(TestFile, wxString::FromAscii(
+			"<?php\n"
+			"class MyDynamicClass {\n"
+			"\tfunction work() {} \n"
+			"\tfunction __get($name) {\n"
+			"\t\treturn $name == 'address' ? '123 main st.' : '';\n"
+			"\t}\n"
+			"}\n"
+			"function globalHandle() {\n"
+			"\treturn new MyDynamicClass;\n"
+			"}\n"
+		));
+
+		mvceditor::ResourceClass res;
+		res.Identifier = UNICODE_STRING_SIMPLE("address");
+		res.ReturnType = UNICODE_STRING_SIMPLE("string");
+		res.Type = mvceditor::ResourceClass::MEMBER;
+		res.Resource = UNICODE_STRING_SIMPLE("MyDynamicClass::address");
+		DynamicResources.push_back(res);
+	}
+};
+
+TEST_FIXTURE(DynamicResourceTestClass, AddDynamicResourcesShouldWorkWithCollect) {
+
+	CHECK(ResourceFinder.Prepare(wxT("MyDynamicClass::")));
+	ResourceFinder.Walk(TestProjectDir + TestFile);
+	CHECK(ResourceFinder.CollectNearMatchResources());
+	CHECK_EQUAL((size_t)2, ResourceFinder.GetResourceMatchCount());
+	if ((size_t)2 == ResourceFinder.GetResourceMatchCount()) {
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("__get"), ResourceFinder.GetResourceMatch(0).Identifier);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("work"), ResourceFinder.GetResourceMatch(1).Identifier);
+	}
+
+	// now add the dyamic property to the cache
+	ResourceFinder.AddDynamicResources(DynamicResources);
+
+	// now test the Collect functionality works as it does for resources that were parsed
+	CHECK(ResourceFinder.Prepare(wxT("MyDynamicClass::")));
+	CHECK(ResourceFinder.CollectNearMatchResources());
+	CHECK_EQUAL((size_t)3, ResourceFinder.GetResourceMatchCount());
+	if ((size_t)3 == ResourceFinder.GetResourceMatchCount()) {
+		mvceditor::ResourceClass match = ResourceFinder.GetResourceMatch(0);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyDynamicClass::__get"), match.Resource);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("__get"), match.Identifier);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), match.ReturnType);
+		CHECK_EQUAL(mvceditor::ResourceClass::METHOD, match.Type);
+
+		match = ResourceFinder.GetResourceMatch(1);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyDynamicClass::address"), match.Resource);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("address"), match.Identifier);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("string"), match.ReturnType);
+		CHECK_EQUAL(mvceditor::ResourceClass::MEMBER, match.Type);
+
+		match = ResourceFinder.GetResourceMatch(2);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyDynamicClass::work"), match.Resource);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("work"), match.Identifier);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), match.ReturnType);
+		CHECK_EQUAL(mvceditor::ResourceClass::METHOD, match.Type);
+	}
+}
+
+TEST_FIXTURE(DynamicResourceTestClass, AddDynamicResourcesShouldWorkWhenUsedBeforeWalk) {
+
+	// now add the dyamic property to the cache before calling Walk()
+	ResourceFinder.AddDynamicResources(DynamicResources);
+
+	// now test the Collect functionality works as it does for resources that were parsed
+	CHECK(ResourceFinder.Prepare(wxT("MyDynamicClass::")));
+	ResourceFinder.Walk(TestProjectDir + TestFile);
+	
+	CHECK(ResourceFinder.CollectNearMatchResources());
+	CHECK_EQUAL((size_t)3, ResourceFinder.GetResourceMatchCount());
+	if ((size_t)3 == ResourceFinder.GetResourceMatchCount()) {
+		mvceditor::ResourceClass match = ResourceFinder.GetResourceMatch(0);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyDynamicClass::__get"), match.Resource);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("__get"), match.Identifier);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), match.ReturnType);
+		CHECK_EQUAL(mvceditor::ResourceClass::METHOD, match.Type);
+
+		match = ResourceFinder.GetResourceMatch(1);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyDynamicClass::address"), match.Resource);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("address"), match.Identifier);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("string"), match.ReturnType);
+		CHECK_EQUAL(mvceditor::ResourceClass::MEMBER, match.Type);
+
+		match = ResourceFinder.GetResourceMatch(2);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyDynamicClass::work"), match.Resource);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("work"), match.Identifier);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), match.ReturnType);
+		CHECK_EQUAL(mvceditor::ResourceClass::METHOD, match.Type);
+	}
+}
+
+TEST_FIXTURE(DynamicResourceTestClass, AddDynamicResourcesShouldNotDuplicateExistingResources) {
+	
+	// in this test check that we can assign a return type to a function that already
+	// exists
+	mvceditor::ResourceClass res;
+	res.Identifier = UNICODE_STRING_SIMPLE("globalHandle");
+	res.Resource = UNICODE_STRING_SIMPLE("globalHandle");
+	res.ReturnType = UNICODE_STRING_SIMPLE("MyDynamicClass");
+	res.Type = mvceditor::ResourceClass::FUNCTION;
+	DynamicResources.push_back(res);
+
+	// now add the dyamic property to the cache before calling Walk()
+	ResourceFinder.AddDynamicResources(DynamicResources);
+
+	// now test the Collect functionality works as it does for resources that were parsed
+	CHECK(ResourceFinder.Prepare(wxT("globalHandle")));
+	ResourceFinder.Walk(TestProjectDir + TestFile);
+	
+	CHECK(ResourceFinder.CollectNearMatchResources());
+	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
+	if ((size_t)1 == ResourceFinder.GetResourceMatchCount()) {
+		mvceditor::ResourceClass match = ResourceFinder.GetResourceMatch(0);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("globalHandle"), match.Resource);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("globalHandle"), match.Identifier);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyDynamicClass"), match.ReturnType);
+		CHECK_EQUAL(false, match.IsDynamic);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("function globalHandle()"), match.Signature);
+		CHECK_EQUAL(mvceditor::ResourceClass::FUNCTION, match.Type);
+	}
+}
+
 }

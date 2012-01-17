@@ -901,7 +901,11 @@ bool mvceditor::ResourceFinderClass::CollectFullyQualifiedResource() {
 void mvceditor::ResourceFinderClass::EnsureMatchesExist() {
 	std::vector<int> files;
 	for(std::vector<ResourceClass>::const_iterator it = Matches.begin(); it != Matches.end(); ++it) {
-		files.push_back(it->FileItemIndex);
+
+		// FileItemIndex is meaningless for dynamic resources
+		if (!it->IsDynamic) {
+			files.push_back(it->FileItemIndex);
+		}
 	}
 	unique(files.begin(), files.end());
 	for(std::vector<int>::const_iterator it = files.begin(); it != files.end(); ++it) {
@@ -981,12 +985,119 @@ void mvceditor::ResourceFinderClass::CopyResourcesFrom(const mvceditor::Resource
 	IsCacheSorted = src.IsCacheSorted;
 }
 
+void mvceditor::ResourceFinderClass::AddDynamicResources(const std::vector<mvceditor::ResourceClass>& dynamicResources) {
+	for (std::vector<mvceditor::ResourceClass>::const_iterator it = dynamicResources.begin(); it != dynamicResources.end(); ++it) {
+		mvceditor::ResourceClass resource = *it;
+		if (mvceditor::ResourceClass::MEMBER == resource.Type || mvceditor::ResourceClass::METHOD == resource.Type) {
+			
+			// cannot assume cache is sorted
+			// need to account for duplicates; if so then only update
+			bool updated = false;
+			for (std::list<mvceditor::ResourceClass>::iterator itMember = MembersCache.begin(); itMember != MembersCache.end(); ++itMember) {
+				if (itMember->Resource == resource.Resource) {
+					if (!resource.ReturnType.isEmpty()) {
+						itMember->ReturnType = resource.ReturnType;
+					}
+					updated = true;
+					break;
+				}
+			}
+			if (!updated) {
+				resource.IsDynamic = true;
+
+				// we dont want these resource to point to a file; 
+				// GetResourceMatchFullPathFromResource() and GetResourceMatchFullPath() will return empty for dynamic 
+				// resources since there is no source code we can show the user.
+				resource.FileItemIndex = -1;
+				MembersCache.push_back(resource);
+				IsCacheSorted = false;
+			}
+		}
+		else {
+
+			// look at the class, function, cache
+			bool updated = false;
+			for (std::list<mvceditor::ResourceClass>::iterator itResource = ResourceCache.begin(); itResource != ResourceCache.end(); ++itResource) {
+				if (itResource->Resource == resource.Resource) {
+					if (!resource.ReturnType.isEmpty()) {
+						itResource->ReturnType = resource.ReturnType;
+					}
+					updated = true;
+					break;
+				}
+			}
+			if (!updated) {
+				resource.IsDynamic = true;
+
+				// we dont want these resource to point to a file; 
+				// GetResourceMatchFullPathFromResource() and GetResourceMatchFullPath() will return empty for dynamic 
+				// resources since there is no source code we can show the user.
+				resource.FileItemIndex = -1;
+				ResourceCache.push_back(resource);
+				IsCacheSorted = false;
+			}
+		}
+	}
+}
+
 void mvceditor::ResourceFinderClass::EnsureSorted() {
 	Matches.clear();
 	Matches.reserve(10);
 	if (!IsCacheSorted) {
 		ResourceCache.sort();
 		MembersCache.sort();
+
+		// if a dyamic resource has been added and is a dup; merge it with the corresponding 'real' resource
+		std::list<mvceditor::ResourceClass>::iterator itDynamic = ResourceCache.begin();
+		while (itDynamic != ResourceCache.end()) {
+			bool erased = false;
+			if (itDynamic->IsDynamic) {
+				ResourceClass needle;
+				needle.Identifier = itDynamic->Identifier;
+				std::list<mvceditor::ResourceClass>::iterator found =  std::lower_bound(ResourceCache.begin(), ResourceCache.end(), needle);
+				while (found != ResourceCache.end() &&
+						found->Resource == itDynamic->Resource && found->Identifier == itDynamic->Identifier && found->Type == itDynamic->Type) {
+					if (!found->IsDynamic) {
+
+						// merge by copying the ReturnType from the dynamic resource then 
+						// delete the dynamic resource
+						found->ReturnType = itDynamic->ReturnType;
+						itDynamic = ResourceCache.erase(itDynamic);
+						erased = true;
+						break;
+					}
+					++found;
+				}
+			}
+			if (!erased) {
+				++itDynamic;
+			}
+		}
+		itDynamic = MembersCache.begin();
+		while (itDynamic != MembersCache.end()) {
+			bool erased = false;
+			if (itDynamic->IsDynamic) {	
+				ResourceClass needle;
+				needle.Identifier = itDynamic->Identifier;
+				std::list<mvceditor::ResourceClass>::iterator found =  std::lower_bound(MembersCache.begin(), MembersCache.end(), needle);
+				while (found != MembersCache.end() &&
+						found->Resource == itDynamic->Resource && found->Identifier == itDynamic->Identifier && found->Type == itDynamic->Type) {
+					if (!found->IsDynamic) {
+
+						// merge by copying the ReturnType from the dynamic resource then 
+						// delete the dynamic resource
+						found->ReturnType = itDynamic->ReturnType;
+						itDynamic = MembersCache.erase(itDynamic);
+						erased = true;
+						break;
+					}
+					++found;
+				}
+			}
+			if (!erased) {
+				++itDynamic;
+			}
+		}
 		IsCacheSorted = true;
 	}
 }
@@ -1001,6 +1112,7 @@ mvceditor::ResourceClass::ResourceClass()
 	, IsProtected(false)
 	, IsPrivate(false) 
 	, IsStatic(false)
+	, IsDynamic(false)
 	, FileItemIndex(-1) {
 		
 }
@@ -1016,6 +1128,7 @@ void mvceditor::ResourceClass::operator=(const ResourceClass& src) {
 	IsProtected = src.IsProtected;
 	IsPrivate = src.IsPrivate;
 	IsStatic = src.IsStatic;
+	IsDynamic = src.IsDynamic;
 }
 
 bool mvceditor::ResourceClass::operator<(const mvceditor::ResourceClass& a) const {

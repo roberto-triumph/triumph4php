@@ -399,6 +399,14 @@ public:
 	 * Note that the matches are NOT copied.
 	 */
 	void CopyResourcesFrom(const ResourceFinderClass& src);
+
+	/**
+	 * Adds any arbritary resource to the cache. This is tolerate of duplicates; in case a duplicate
+	 * of an existing resource is found, then the resource's attributes will be updated.
+	 * Equivalence between two resources is determined by comparing the resource's Resource member.
+	 * @param dyamicResources the list of resources to add
+	 */
+	void AddDynamicResources(const std::vector<ResourceClass>& dynamicResources);
 	
 	/**
 	 * Sorts the resources if they are not already sorted.
@@ -668,6 +676,13 @@ public:
 	 * TRUE if this is a static member
 	 */
 	bool IsStatic;
+
+	/**
+	 * TRUE if this is a resource is a 'dynamic' resource; it means that the resource
+	 * is not actually in the source; it was either generated via a PHPDoc comment (@property, @method)
+	 * or a a Plugin object.
+	 */
+	bool IsDynamic;
 	
 	ResourceClass();
 	
