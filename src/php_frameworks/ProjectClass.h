@@ -25,17 +25,224 @@
 #ifndef PROJECTCLASS_H_
 #define PROJECTCLASS_H_
 
-
 #include <search/ResourceFinderClass.h>
 #include <environment/DatabaseInfoClass.h>
 #include <environment/SqlResourceFinderClass.h>
 #include <environment/EnvironmentClass.h>
+#include <widgets/ProcessWithHeartbeatClass.h>
 #include <wx/string.h>
 #include <wx/thread.h>
+#include <wx/event.h>
 #include <vector>
 #include <map>
 
 namespace mvceditor {
+
+class DetectorClass : public wxEvtHandler {
+
+public:
+
+	/**
+	 * Any errors that occur when reading the Detection process response.
+	 */
+	enum DetectError {
+		NONE,
+
+		/**
+		 * detection response is empty or not in the expected format
+		 */
+		BAD_CONTENT,
+		
+		/**
+		 * detection response has a value that is not yet implemented
+		 */
+		UNIMPLEMENTED,
+
+		/**
+		 * External process returned an non-zero exit code.
+		 */
+		 PROCESS_FAILED
+	};
+
+	/**
+	 * @param handler will get notified with EVENT_PROCESS_COMPLETE and EVENT_PROCESS_FAILED
+	 * just like if it was connected to a ProcessWithHeartbeat object. The events are posted
+	 * after the responses are parsed; it is safe to access the results from the event handlers.
+	 */
+	DetectorClass(wxEvtHandler& handler);
+	virtual ~DetectorClass();
+
+	/**
+	 * Starts the detection process. This method will return 
+	 * immediately; the handler given in the constructor will get notified
+	 * when the process finishes
+	 *
+	 * @param int commandId command ID will be used when an EVENT_PROCESS_* is genereated
+	 *        this way the caller can correlate a command to an event.
+	 * @param environment to get location of PHP binary "php-win.exe" / php
+	 * @param projectRootPath location of the project to run detection on ie. the project that
+	 *        the user is modifying
+	 * @param identifier the detected framework identifier
+	 * @return wxString the command (operating system command line) that will run the PHP detection code.
+	 */
+	bool Init(int id, const EnvironmentClass& environment, const wxString& projectRootPath, const wxString& identifier);
+
+	/**
+	 * initialize a detector from an existing file. For now, this is used only to test the
+	 * parsing code.
+	 */
+	void InitFromFile(wxString fileName);
+
+protected:
+
+	/**
+	 * sub classes will need to clear their data structures here.
+	 */
+	virtual void Clear() = 0;
+
+	/**
+	 * @return wxString sub classes must return the action that they are handling
+	 */
+	virtual wxString GetAction() = 0;
+
+	/**
+	 * This method will be called when the detector process ends.  The sub classes will
+	 * read in the contents of OutputFile and will deserialize the output into
+	 * data structures. Sub classes can set the Error property as well.
+	 */
+	virtual bool Response() = 0;
+
+private:
+
+	void OnProcessComplete(wxCommandEvent& event);
+
+	void OnProcessFailed(wxCommandEvent& event);
+
+public:
+
+	DetectError Error;
+
+	wxString ErrorMessage;
+
+protected:
+
+	/**
+	 * Used to start the detector process
+	 */
+	ProcessWithHeartbeatClass Process;
+
+	/**
+	 * This handler will get notified after process has ended and response
+	 * has been parsed.
+	 */
+	wxEvtHandler& Handler;
+
+	/**
+	 * The detector process will dump its results to this file.
+	 */
+	wxFileName OutputFile;
+
+private:
+
+	long CurrentPid;
+
+	DECLARE_EVENT_TABLE()
+
+};
+	
+/**
+ * creates the detection command that will figure out which frameworks
+ * the project uses.  Project "detection" means figuring out what framework a
+ * project uses (could be multiple). When the external process ends,
+ * the Frameworks vector will be populated with all of the frameworks that were
+ * detected.
+ */
+class FrameworkDetectorClass : public DetectorClass {
+
+public:
+
+	std::vector<wxString> Frameworks;
+
+	FrameworkDetectorClass(wxEvtHandler& handler);
+
+protected:
+
+	void Clear();
+
+	wxString GetAction();
+
+	bool Response();
+
+};
+
+/**
+ * creates the detection command that will figure out which database connections
+ * the project uses. When the external process ends,
+ * the Databases vector will be populated with all of the database connections that were
+ * detected.
+ */
+class DatabaseDetectorClass : public DetectorClass {
+
+public:
+
+	std::vector<DatabaseInfoClass> Databases;
+
+	DatabaseDetectorClass(wxEvtHandler& handler);
+	
+protected:
+
+	void Clear();
+
+	wxString GetAction();
+
+	bool Response();
+};
+
+/**
+ * Creates the detection command that will figure out the configuration files 
+ * for the given framework (routes file, database file, etc ...)
+ * When the external process ends, the ConfigFiles map will contain all of the configuration
+ * files for a single framework.
+ */
+class ConfigFilesDetectorClass : public DetectorClass {
+
+public: 
+	
+	std::map<wxString, wxString> ConfigFiles;
+
+	ConfigFilesDetectorClass(wxEvtHandler& handler);
+
+protected:
+
+	void Clear();
+
+	wxString GetAction();
+
+	bool Response();
+
+};
+
+/**
+ * creates the detection command that will figure out any "dynamic" resources
+ * that the a framework provides. When the external process ends, the Resources
+ * vector will contain all of the dynamic resources.
+ */
+class ResourcesDetectorClass : public DetectorClass {
+
+public: 
+	
+	std::vector<mvceditor::ResourceClass> Resources;
+
+	ResourcesDetectorClass(wxEvtHandler& handler);
+
+protected:
+
+	void Clear();
+
+	wxString GetAction();
+
+	bool Response();
+};
 
 /*
  * Data structure that holds project attributes.
@@ -71,83 +278,14 @@ public:
 class ProjectClass {
 	
 public:
-
-	/**
-	 * Any errors that occur when reading the Detection process response.
-	 */
-	enum DetectError {
-		NONE,
-
-		/**
-		 * detection response is empty or not in the expected format
-		 */
-		BAD_CONTENT,
-		
-		/**
-		 * detection response has a value that is not yet implemented
-		 */
-		UNIMPLEMENTED
-	};
-
-	/**
-	 * Holds the location of the PHP binary.
-	 */
-	const EnvironmentClass& Environment;
 	
 	/**
 	 * Construct a ProjectClass object from the given options
 	 * 
 	 * @param ProjectOptionsClass options the new project's options
-	 * @param EnvironmentClass the system binary locations
 	 */
-	ProjectClass(const ProjectOptionsClass& options, const EnvironmentClass& environment);
-	
-	/**
-	 * creates the detection command that will figure out which frameworks
-	 * the project uses.  Project "detection" means figuring out what framework a
-	 * project uses (could be multiple). The caller of this method should execute the returned
-	 * command asynchronosuly and give the results to DetectFrameworkResponse() method.
-	 *
-	 * @return wxString the command (operating system command line) that will calculate the 
-	 *         framework that this project uses.
-	 */
-	wxString DetectFrameworkCommand();
+	ProjectClass(const ProjectOptionsClass& options);
 
-	/**
-	 * creates the detection command that will figure out which database connections
-	 * the project uses.
-	 * @return wxString the command (operating system command line) that will calculate the 
-	 *         database connections that this project uses (for the given framework).
-	 */
-	wxString DetectDatabaseCommand(const wxString& framework);
-
-	/**
-	 * Creates the detection command that will figure out the configuration files 
-	 * for the given framework (routes file, database file, etc ...)
-	 *
-	 * @param framework the identifier of the framework. One of the strings returned by
-	 *        the framework detection command
-	 * @return wxString the command (operating system command line) that will calculate the 
-	 *         configuration files for the framework that this project uses.
-	 */
-	wxString DetectConfigFilesCommand(const wxString& framework);
-
-	/**
-	 * Handle the results of the framework detect command.
-	 */
-	bool DetectFrameworkResponse(const wxString& resultString, DetectError& error);
-
-	/**
-	 * Handle the results of the database detection command. After a call to this method, DatabaseInfo() will return
-	 * any new database connections (that were identified).
-	 */
-	bool DetectDatabaseResponse(const wxString& resultString, DetectError& error);
-
-	/**
-	 *  Handle the results of the config files detection.
-	 */
-	bool DetectConfigFilesResponse(const wxString& resultString, DetectError& error, std::map<wxString, wxString>& configFiles);
-	
 	/**
 	 * Returns the root path of this project
 	 */
@@ -219,58 +357,30 @@ public:
 	/**
 	 * Returns the PHP keywords, according to the PHP version of this project.
 	 */
+	// TODO remove from this class and into one of the Language classes
 	wxString GetPhpKeywords() const;
-	
-	/**
-	 * returns the location of the PHP executable
-	 */
-	wxString GetPhpExecutable() const;
 	
 	/**
 	 * @return the project's parsed resources (class, method, function names).
 	 * This object will still own the returned pointer. Do NOT delete it.
 	 */
+	// TODO move this out of here; need to create a ResourceFinderLocker
 	ResourceFinderClass* GetResourceFinder();
 	
 	/**
 	 *  This object will still own the returned pointer. Do NOT delete it.
-	 * 
 	 */
 	SqlResourceFinderClass* GetSqlResourceFinder();
-	
+
 	/**
-	 * Returns the detected database connection infos.
-	 * Filled by DetectDatabaseResponse();
-	 */
+	* Returns the detected database connection infos.
+	* Filled by the Application object
+	*/
 	std::vector<DatabaseInfoClass> DatabaseInfo() const;
 
-	/**
-	 * @return the detected frameworks. Filled by DetectFrameworkResponse()
-	 */
-	std::vector<wxString> FrameworkIdentifiers() const;
+	void PushDatabaseInfo(const DatabaseInfoClass& info);
 
 private:
-	
-	/**
-	 * sanitize a string to be suitable as an argument to a command 
-	 */
-	wxString Sanitize(const wxString& arg) const;
-	
-	/**
-	 * Create the command line to run the PHP detection code
-	 * returns the command line string 
-	 * @param action the 'query' to pass
-	 * @param identifier the detected framework identifier
-	 * @return wxString the command (operating system command line) that will run the PHP detection code.
-	 */
-	wxString Ask(const wxString& action, const wxString& identifier);
-
-	/**
-	 * 'clean' the process output; output may contain some text before the INI response; this method
-	 * will remove the offending text.
-	 * @return the  output  (valid INI format) of the last process that was run
-	 */
-	wxString GetProcessOutput(const wxString& allOutput);
 	
 	/*
 	 * Holds project attributes.
@@ -286,17 +396,12 @@ private:
 	 * To grab SQL table meta data
 	 */
 	SqlResourceFinderClass SqlResourceFinder;
-	
-	/**
-	 * the detected frameworks
-	 */
-	std::vector<wxString> Frameworks;
-	
+
 	/**
 	 * The detected database connection info
 	 */
 	std::vector<DatabaseInfoClass> Databases;
-
+	
 	/**
 	 * The wildcard patterns that will be used to find PHP files in this
 	 * project.

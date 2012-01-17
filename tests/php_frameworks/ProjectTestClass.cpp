@@ -25,43 +25,47 @@
 #include <UnitTest++.h>
 #include <php_frameworks/ProjectClass.h>
 #include <FileTestFixtureClass.h>
+#include <wx/event.h>
 
 class ProjectTestFixtureClass : public FileTestFixtureClass {
 public:	
 	ProjectTestFixtureClass() 
-		: FileTestFixtureClass(wxT("project_test")) {
-		mvceditor::ProjectOptionsClass options;
-		options.RootPath = TestProjectDir;
-		Project = new mvceditor::ProjectClass(options, Environment);
+		: FileTestFixtureClass(wxT("project_test"))
+		, Handler()
+		, FrameworkDetector(Handler) 
+		, DatabaseDetector(Handler)
+		, ResourcesDetector(Handler) {
 	}
 	
 	virtual ~ProjectTestFixtureClass() {
-		delete Project;
 	}
 
-	mvceditor::ProjectClass* Project;
-	mvceditor::EnvironmentClass Environment;
+	wxEvtHandler Handler;
+	mvceditor::FrameworkDetectorClass FrameworkDetector;
+	mvceditor::DatabaseDetectorClass DatabaseDetector;
+	mvceditor::ResourcesDetectorClass ResourcesDetector;
 };
 
 SUITE(ProjectTestClass) {
 
 TEST_FIXTURE(ProjectTestFixtureClass, ShouldParseFrameworkResponse) {
 	wxString result = wxString::FromAscii(
-		"-----START-MVC-EDITOR-----\n"
 		"framework_0 = \"Test\"\n"
 		"framework_1 = \"Symfony\"\n"
 	);
-	mvceditor::ProjectClass::DetectError error = mvceditor::ProjectClass::NONE;
-	CHECK(Project->DetectFrameworkResponse(result, error));
-	std::vector<wxString> identifiers = Project->FrameworkIdentifiers();
+	wxString fileName = wxT("test.ini"); 
+	CreateFixtureFile(fileName, result);
+	FrameworkDetector.InitFromFile(TestProjectDir + fileName);
+	std::vector<wxString> identifiers = FrameworkDetector.Frameworks;
 	CHECK_EQUAL((size_t)2, identifiers.size());
-	CHECK_EQUAL(wxT("Test"), identifiers[0]);
-	CHECK_EQUAL(wxT("Symfony"), identifiers[1]);
+	if ((size_t)2 == identifiers.size()) {
+		CHECK_EQUAL(wxT("Test"), identifiers[0]);
+		CHECK_EQUAL(wxT("Symfony"), identifiers[1]);
+	}
 }
 	
 TEST_FIXTURE(ProjectTestFixtureClass, ShouldParseDatabaseResponse) {
 	wxString result = wxString::FromAscii(
-		"-----START-MVC-EDITOR-----\n"
 		"[local_dev]\n"
 		"Environment = \"dev\"\n"
 		"Name = \"local dev\"\n"
@@ -84,13 +88,52 @@ TEST_FIXTURE(ProjectTestFixtureClass, ShouldParseDatabaseResponse) {
 		"User = \"my_user_test\"\n"
 		"Password = \"123_test\"\n"
 	);
-
-	mvceditor::ProjectClass::DetectError error = mvceditor::ProjectClass::NONE;
-	CHECK(Project->DetectDatabaseResponse(result, error));
-	
-	std::vector<mvceditor::DatabaseInfoClass> frameworks = Project->DatabaseInfo();
-	CHECK_EQUAL((size_t)2, frameworks.size());
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("127.0.0.1"), frameworks[0].Host);
+	wxString fileName = wxT("test.ini"); 
+	CreateFixtureFile(fileName, result);
+	DatabaseDetector.InitFromFile(TestProjectDir + fileName);
+	std::vector<mvceditor::DatabaseInfoClass> infos = DatabaseDetector.Databases;
+	CHECK_EQUAL((size_t)2, infos.size());
+	if ((size_t)2 == infos.size()) {
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("127.0.0.1"), infos[0].Host);
+	}
 }
 
+TEST_FIXTURE(ProjectTestFixtureClass, ShouldParseResourcesResponse) {
+	wxString result = wxString::FromAscii(
+		"[Resource_72]\n"
+		"Resource = \"CI_Controller::news_model\"\n"
+		"Identifier = \"news_model\"\n"
+		"ReturnType = \"News_model\"\n"
+		"Signature = \"CI_Controller::news_model\"\n"
+		"Comment = \"\"\n"
+		"Type = \"MEMBER\"\n"
+		"\n"
+		"[Resource_73]\n"
+		"Resource = \"CI_Controller::admin_user_model\"\n"
+		"Identifier = \"admin_user_model\"\n"
+		"ReturnType = \"Admin_user_model\"\n"
+		"Signature = \"CI_Controller::admin_user_model\"\n"
+		"Comment = \"\"\n"
+		"Type = \"MEMBER\"\n"
+	);
+	wxString fileName = wxT("test.ini"); 
+	CreateFixtureFile(fileName, result);
+	ResourcesDetector.InitFromFile(TestProjectDir + fileName);
+	CHECK_EQUAL(mvceditor::DetectorClass::NONE, ResourcesDetector.Error);
+	std::vector<mvceditor::ResourceClass> resources = ResourcesDetector.Resources;
+	CHECK_EQUAL((size_t)2, resources.size());
+	if ((size_t)2 == resources.size()) {
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("CI_Controller::news_model"), resources[0].Resource);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("news_model"), resources[0].Identifier);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("News_model"), resources[0].ReturnType);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("CI_Controller::news_model"), resources[0].Signature);
+		CHECK_EQUAL(mvceditor::ResourceClass::MEMBER, resources[0].Type);
+
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("CI_Controller::admin_user_model"), resources[1].Resource);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("admin_user_model"), resources[1].Identifier);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("Admin_user_model"), resources[1].ReturnType);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("CI_Controller::admin_user_model"), resources[1].Signature);
+		CHECK_EQUAL(mvceditor::ResourceClass::MEMBER, resources[1].Type);
+	}
+}
 }

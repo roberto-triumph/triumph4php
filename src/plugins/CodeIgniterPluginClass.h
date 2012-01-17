@@ -26,7 +26,7 @@
 #define CODEIGNITER_PLUGIN_CLASS_H
 
 #include <PluginClass.h>
-#include <widgets/ProcessWithHeartbeatClass.h>
+#include <php_frameworks/ProjectClass.h>
 
 namespace mvceditor {
 
@@ -76,7 +76,9 @@ private:
 	 * plugin. This plugin will issue commands to get the list of
 	 * config files from the currently opened project.
 	 */
-	ProcessWithHeartbeatClass Process;
+	ResourcesDetectorClass ResourcesDetector;
+
+	ConfigFilesDetectorClass ConfigFilesDetector;
 
 	/**
 	 * This is the list of config files that were parsed from the result

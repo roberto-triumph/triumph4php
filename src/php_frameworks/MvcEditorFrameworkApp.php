@@ -73,23 +73,22 @@ function loadFrameworks() {
  * any prior inputs that the framework object may do.
  * action is assumed to be valid at this point
  */
-function runAction($framework, $dir, $action) {
-	print "\n-----START-MVC-EDITOR-----\n";
+function runAction($framework, $dir, $action, $outputFile) {
 	if (strcasecmp($action, 'databaseInfo') == 0) {
-		runDatabaseInfo($framework, $dir);
+		runDatabaseInfo($framework, $dir, $outputFile);
 	}
 	else if (strcasecmp($action, 'isUsedBy') == 0) {
-		runIsUsedBy($dir);
+		runIsUsedBy($dir, $outputFile);
 	}
 	else if (strcasecmp($action, 'configFiles') == 0) {
-		runConfigFiles($framework, $dir);
+		runConfigFiles($framework, $dir, $outputFile);
 	}
 	else if (strcasecmp($action, 'resources') == 0) {
-		runResources($framework, $dir);
+		runResources($framework, $dir, $outputFile);
 	}
 }
 
-function runDatabaseInfo($framework, $dir) {
+function runDatabaseInfo($framework, $dir, $outputFile) {
 	$infoList = $framework->databaseInfo($dir);
 	if ($infoList) {
 		$writer = new Zend_Config_Writer_Ini();
@@ -107,11 +106,11 @@ function runDatabaseInfo($framework, $dir) {
 				$config->{$key}->{$prop} = $value;
 			}				
 		}
-		print $writer->render();
+		initPrint($writer, $outputFile);
 	}
 }
 
-function runIsUsedBy($dir) {
+function runIsUsedBy($dir, $outputFile) {
 	$frameworks = loadFrameworks();
 	$identifiers = array();
 	foreach ($frameworks as $framework) {
@@ -128,10 +127,10 @@ function runIsUsedBy($dir) {
 		$config->{$prop} = $identifier;
 		$i++;
 	}
-	print $writer->render();
+	initPrint($writer, $outputFile);
 }
 
-function runConfigFiles($framework, $dir) {
+function runConfigFiles($framework, $dir, $outputFile) {
 	$configFiles = $framework->configFiles($dir);
 	if ($configFiles) {
 		$writer = new Zend_Config_Writer_Ini();
@@ -147,7 +146,7 @@ function runConfigFiles($framework, $dir) {
 			$configPath = iniEscapeValue($configPath);
 			$outputConfig->{$key} = $configPath;
 		}
-		print $writer->render();
+		initPrint($writer, $outputFile);
 	}
 }
 
@@ -155,7 +154,7 @@ function runConfigFiles($framework, $dir) {
  * @param MvcEditorFrameworkBaseClass $framework the framework specific code
  * @param string $dir the directory where the project source code is located
  */
-function runResources(MvcEditorFrameworkBaseClass $framework, $dir) {
+function runResources(MvcEditorFrameworkBaseClass $framework, $dir, $outputFile) {
 	$resources = $framework->resources($dir);
 	if ($resources) {
 		$writer = new Zend_Config_Writer_Ini();
@@ -163,7 +162,7 @@ function runResources(MvcEditorFrameworkBaseClass $framework, $dir) {
 		$writer->setConfig($outputConfig);
 		$keyIndex = 0;
 		foreach ($resources as $resource) {
-		
+
 			// write an INI entry for each config file. make sure to replace any possible
 			// characters that may conflict with INI parsing.
 			$key = iniEscapeKey('Resource_' . $keyIndex);
@@ -172,11 +171,12 @@ function runResources(MvcEditorFrameworkBaseClass $framework, $dir) {
 				'Identifier' => iniEscapeValue($resource->identifier),
 				'ReturnType' => iniEscapeValue($resource->returnType),
 				'Signature' => iniEscapeValue($resource->signature),
-				'Comment' => iniEscapeValue($resource->comment)
+				'Comment' => iniEscapeValue($resource->comment),
+				'Type' => iniEscapeValue($resource->type)
 			);
 			$keyIndex++;
 		}
-		print $writer->render();
+		initPrint($writer, $outputFile);
 	}
 }
 
@@ -193,10 +193,21 @@ function iniEscapeValue($str) {
 	return str_replace("\\", "\\\\", $str);
 }
 
+function initPrint(Zend_Config_Writer_Ini $writer, $outputFile) {
+	if ($outputFile) {
+		file_put_contents($outputFile, $writer->render());
+	}
+	else {
+		print "\n-----START-MVC-EDITOR-----\n";
+		echo $writer->render();
+	}
+}
+
 $rules = array(
 	'identifier|i=s' => 'The framework to query',
 	'dir|d=s' => 'The base directory that the project resides in',
 	'action|a=s' => 'The data that is being queried',
+	'output|o=s' => 'If given, the output will be written to the given file (by default, output does to STDOUT)',
 	'help|h' => 'A help message'
 );
 $opts = new Zend_Console_Getopt($rules);
@@ -204,15 +215,13 @@ $action = $opts->getOption('action');
 $identifier = $opts->getOption('identifier');
 $dir = $opts->getOption('dir');
 $help = $opts->getOption('help');
+$outputFile = $opts->getOption('output');
 
 // trim any quotes
 $action = trim($action, " '\"");
 $identifier = trim($identifier, " '\"");
 $dir = trim($dir, " '\"");
-
-$action = 'resources';
-$dir = 'C:\Users\Roberto\Software\wamp\www\ember';
-$identifier = 'code-igniter';
+$outputFile = trim($outputFile, " '\"");
 
 if ($help) {
 	echo <<<EOF
@@ -228,7 +237,13 @@ When any argument is invalid or missing, the program will exit with an error cod
 EOF;
 	exit(0);
 }
-print "Running action=$action on identifier=$identifier with dir=$dir\n";
+if ($outputFile) {
+	print "Running action=$action on identifier=$identifier with dir=$dir output to $outputFile \n";
+}
+else {
+	print "Running action=$action on identifier=$identifier with dir=$dir output to STDOUT \n";
+}
+
 // go through all the available frameworks and pick the one with the correct identifier
 $frameworks = loadFrameworks();
 $chosenFramework = NULL;
@@ -238,20 +253,25 @@ foreach ($frameworks as $framework) {
 		break;
 	}
 }
-if ($chosenFramework) {
+if ($chosenFramework && $dir) {
 
 	// pick the correct method call on the framework
 	if (method_exists($chosenFramework, $action)) {
-		runAction($chosenFramework, $dir, $action);
+		runAction($chosenFramework, $dir, $action, $outputFile);
 	}
 	else {
 		print "Invalid action: '{$action}.' Program will now exit.\n";
 		exit(-1);
 	}
 }
-else if (strcasecmp($action, 'isUsedBy') == 0) {
-	runAction(NULL, $dir, $action);
+else if ($dir && strcasecmp($action, 'isUsedBy') == 0) {
+	runAction(NULL, $dir, $action, $outputFile);
+}
+else if ($dir) {
+	print "Invalid identifier: '{$identifier}.' Program will now exit.\n";
+	exit(-1);
 }
 else {
-	print "Invalid identifier: '{$identifier}.' Program will now exit.\n";
+	print "dir argument must be given.  Program will now exit.\n";
+	exit(-1);
 }

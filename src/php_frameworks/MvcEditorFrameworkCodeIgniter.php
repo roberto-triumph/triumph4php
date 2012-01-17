@@ -210,7 +210,6 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 			$propertyName = strtolower($key);
 			$comment = '';
 			$resources[] = MvcEditorResource::MakeProperty('CI_Controller', $propertyName, $propertyType, $comment);
-			$resources[] = MvcEditorResource::MakeProperty('CI_Model', $propertyName, $propertyType, $comment);
 		}
 		
 		// models can be located in sub-directories need to recurse down sub-dirs

@@ -173,10 +173,14 @@ private:
 	EnvironmentClass Environment;
 
 	/**
-	 * Any running external processes are tracked here.  These external
-	 * processes are usually calls to the PHP framework detectiong scripts.
+	 * To call the PHP framework detection scripts.
 	 */
-	ProcessWithHeartbeatClass ProcessWithHeartbeat;
+	FrameworkDetectorClass FrameworkDetector;
+
+	/**
+	 * To call the PHP database connection detection scripts
+	 */
+	DatabaseDetectorClass DatabaseDetector;
 	
 	/**
 	 * This object will be used to parse the resources of files that are currently open.

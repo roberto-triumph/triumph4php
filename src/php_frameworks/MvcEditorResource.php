@@ -63,12 +63,24 @@ class MvcEditorResource {
 	public $comment;
 	
 	/**
+	 * The type of this resource. One of the type constants.
+	 */
+	public $type;
+	
+	const TYPE_CLASS = 'CLASS';
+	const TYPE_CLASS_CONSTANT = 'CLASS_CONSTANT';
+	const TYPE_DEFINE = 'DEFINE';
+	const TYPE_FUNCTION = 'FUNCTION';
+	const TYPE_MEMBER = 'MEMBER';
+	const TYPE_METHOD = 'METHOD';
+	
+	/**
 	 * Create a property resource(a class member). For now this property is assumed to have public access.
 	 * @return MvcEditorResource
 	 */
 	public static function MakeProperty($className, $propertyName, $propertyType, $comment) {
 		$resource = $className . '::' . $propertyName;
-		$ret = new MvcEditorResource($resource, $propertyName, $propertyType, $resource, $comment);
+		$ret = new MvcEditorResource($resource, $propertyName, $propertyType, $resource, $comment, self::TYPE_MEMBER);
 		return $ret;
 	}
 	
@@ -79,15 +91,16 @@ class MvcEditorResource {
 	public static function MakeMethod($className, $methodName, $methodArgs, $methodReturnType, $comment) {
 		$resource = $className . '::' . $methodName;
 		$signature = 'public function ' . $methodName . '(' . $methodArgs . ')';
-		$ret = new MvcEditorResource($resource, $methodName, $methodReturnType, $signature, $comment);
+		$ret = new MvcEditorResource($resource, $methodName, $methodReturnType, $signature, $comment, self::TYPE_METHOD);
 		return $ret;
 	}
 	
-	private function __construct($resource, $identifier, $returnType, $signature, $comment) {
+	private function __construct($resource, $identifier, $returnType, $signature, $comment, $type) {
 		$this->resource = $resource;
 		$this->identifier = $identifier;
 		$this->returnType = $returnType;
 		$this->signature = $signature;
 		$this->comment = $comment;
+		$this->type = $type;
 	}
 }
