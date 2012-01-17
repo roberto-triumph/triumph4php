@@ -119,11 +119,15 @@ public:
 	 * @param autoCompleteResourceList the results of the matches; these are the names of the items that
 	 *        are "near matches" to the parsed expression. This will be filled only when parsedExpression is a variable "chain" or
 	 *        a function / static class call.
-	 * @param error any errors / explanations will be populated here
+	 * @param doDuckTyping if an expression chain could not be fully resolved; then we could still
+	 *        perform a search for the expression member in ALL classes. The lookups will not be
+	 *        slower because ResourceFinderClass still handles them
+	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
 	void ExpressionCompletionMatches(const wxString& fileName, const SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
 		ResourceFinderClass* resourceFinder, std::vector<UnicodeString>& autoCompleteList,
 		std::vector<ResourceClass>& autoCompleteResourceList,
+		bool doDuckTyping,
 		SymbolTableMatchErrorClass& error) const;
 
 	/**
@@ -136,10 +140,14 @@ public:
 	 *        available. See ScopeFinderClass for more info.
 	 * @param resourceFinder resource finder to search (in addition to all of the registered ones). This class will NOT own the pointer.
 	 * @param matches all of the resource matches will be put here
-	 * @param error any errors / explanations will be populated here
+	 * @param doDuckTyping if an expression chain could not be fully resolved; then we could still
+	 *        perform a search for the expression member in ALL classes. The lookups will not be
+	 *        slower because ResourceFinderClass still handles them
+	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
 	void ResourceMatches(const wxString& fileName, const SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
 		ResourceFinderClass* resourceFinder, std::vector<ResourceClass>& matches,
+		bool doDuckTyping,
 		SymbolTableMatchErrorClass& error) const;
 	
 private:
@@ -223,6 +231,7 @@ public:
 	void ExpressionCompletionMatches(const wxString& fileName, const SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
 		ResourceFinderClass* resourceFinder, std::vector<UnicodeString>& autoCompleteList,
 		std::vector<ResourceClass>& autoCompleteResourceList,
+		bool doDuckTyping,
 		SymbolTableMatchErrorClass& error);
 
 	/**
@@ -242,7 +251,8 @@ public:
 	 * @see ResourceUpdatesClass::ResourceMatches 
 	 */
 	void ResourceMatches(const wxString& fileName, const SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
-		ResourceFinderClass* resourceFinder, std::vector<ResourceClass>& matches, SymbolTableMatchErrorClass& error);
+		ResourceFinderClass* resourceFinder, std::vector<ResourceClass>& matches, bool doDuckTyping,
+		SymbolTableMatchErrorClass& error);
 
 protected:
 	

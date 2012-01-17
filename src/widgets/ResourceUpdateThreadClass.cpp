@@ -145,26 +145,28 @@ void mvceditor::ResourceUpdateClass::ExpressionCompletionMatches(const wxString&
 													 mvceditor::ResourceFinderClass* resourceFinder, 
 													 std::vector<UnicodeString>& autoCompleteList,
 													 std::vector<mvceditor::ResourceClass>& resourceMatches,
+													 bool doDuckTyping,
 													 mvceditor::SymbolTableMatchErrorClass& error) const {
 	std::map<wxString, mvceditor::SymbolTableClass*>::const_iterator itSymbols = SymbolTables.find(fileName);
 	if (itSymbols != SymbolTables.end()) {
 		mvceditor::SymbolTableClass* symbolTable = itSymbols->second;
 		if (symbolTable) {
 			symbolTable->ExpressionCompletionMatches(parsedExpression, expressionScope, Finders, resourceFinder, 
-				autoCompleteList, resourceMatches, error);
+				autoCompleteList, resourceMatches, doDuckTyping, error);
 		}
 	}
 }
 
 void mvceditor::ResourceUpdateClass::ResourceMatches(const wxString& fileName, const mvceditor::SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
 													 mvceditor::ResourceFinderClass* globalResourceFinder, std::vector<mvceditor::ResourceClass>& matches,
+													 bool doDuckTyping,
 													 mvceditor::SymbolTableMatchErrorClass& error) const {
 	std::map<wxString, mvceditor::SymbolTableClass*>::const_iterator itSymbols = SymbolTables.find(fileName);
 	if (itSymbols != SymbolTables.end()) {
 		mvceditor::SymbolTableClass* symbolTable = itSymbols->second;
 		if (symbolTable) {
 			symbolTable->ResourceMatches(parsedExpression, expressionScope, Finders, globalResourceFinder, 
-				matches, error);
+				matches, doDuckTyping, error);
 		}
 	}
 }
@@ -233,10 +235,11 @@ void mvceditor::ResourceUpdateThreadClass::ExpressionCompletionMatches(const wxS
 													 mvceditor::ResourceFinderClass* globalResourceFinder, 
 													 std::vector<UnicodeString>& autoCompleteList,
 													 std::vector<mvceditor::ResourceClass>& resourceMatches,
+													 bool doDuckTyping, 
 													 mvceditor::SymbolTableMatchErrorClass& error) {
 	if (wxMUTEX_NO_ERROR == WorkerMutex.TryLock()) {
 		Worker.ExpressionCompletionMatches(fileName, parsedExpression, expressionScope, globalResourceFinder, 
-			autoCompleteList, resourceMatches, error);
+			autoCompleteList, resourceMatches, doDuckTyping, error);
 		WorkerMutex.Unlock();
 	}
 }
@@ -259,10 +262,12 @@ mvceditor::ResourceUpdateThreadClass::PrepareAndCollectNearMatchResourcesFromAll
 
 void mvceditor::ResourceUpdateThreadClass::ResourceMatches(const wxString& fileName, const SymbolClass& parsedExpression, const UnicodeString& expressionScope,
 														   mvceditor::ResourceFinderClass* globalResourceFinder, std::vector<mvceditor::ResourceClass>& matches,
+														   bool doDuckTyping, 
 														   mvceditor::SymbolTableMatchErrorClass& error) {
 
 	wxMutexLocker locker(WorkerMutex);
 	if (locker.IsOk()) {
-		Worker.ResourceMatches(fileName, parsedExpression, expressionScope, globalResourceFinder, matches, error);
+		Worker.ResourceMatches(fileName, parsedExpression, expressionScope, globalResourceFinder, matches,
+			doDuckTyping, error);
 	}
 }

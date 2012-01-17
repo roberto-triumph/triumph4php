@@ -413,13 +413,14 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 	mvceditor::SymbolClass parsedExpression;
 	UnicodeString expressionScope;
 	mvceditor::SymbolTableMatchErrorClass error;
+	bool doDuckTyping = true;
 	if (!lastExpression.isEmpty()) {
 		Parser.ParseExpression(lastExpression, parsedExpression);
 		expressionScope = ScopeFinder.GetScopeString(code, expressionPos);
 		mvceditor::ResourceFinderClass* globalResourceFinder = Project->GetResourceFinder();
 		
 		ResourceUpdates->ExpressionCompletionMatches(FileIdentifier, parsedExpression, expressionScope, globalResourceFinder, 
-				variableMatches, AutoCompletionResourceMatches, error);
+				variableMatches, AutoCompletionResourceMatches, doDuckTyping, error);
 		if (!variableMatches.empty()) {
 			for (size_t i = 0; i < variableMatches.size(); ++i) {
 				wxString postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_VARIABLE);
@@ -731,13 +732,15 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetCurrentSym
 	mvceditor::ScopeFinderClass scopeFinder;
 
 	UnicodeString lastExpression = lexer.LastExpression(code);
+	bool doDuckTyping = true;
 	if (!lastExpression.isEmpty()) {
 		parser.ParseExpression(lastExpression, parsedExpression);
 		UnicodeString scopeString = scopeFinder.GetScopeString(code, endPos);
 
 		// for now do nothing with error
 		mvceditor::SymbolTableMatchErrorClass error;
-		ResourceUpdates->ResourceMatches(FileIdentifier, parsedExpression, scopeString, resourceFinder, matches, error);
+		ResourceUpdates->ResourceMatches(FileIdentifier, parsedExpression, scopeString, resourceFinder, matches, 
+			doDuckTyping, error);
 	}
 	return matches;
 }
@@ -847,13 +850,15 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetSymbolAt(i
 
 	UnicodeString lastExpression = lexer.LastExpression(code);
 	UnicodeString resourceName;
+	bool doDuckTyping = true;
 	if (!lastExpression.isEmpty()) {
 		parser.ParseExpression(lastExpression, parsedExpression);
 		UnicodeString expressionScope = scopeFinder.GetScopeString(code, posToCheck);
 
 		// for now do nothing with error
 		mvceditor::SymbolTableMatchErrorClass error;
-		ResourceUpdates->ResourceMatches(FileIdentifier, parsedExpression, expressionScope, resourceFinder, matches, error);
+		ResourceUpdates->ResourceMatches(FileIdentifier, parsedExpression, expressionScope, resourceFinder, matches, 
+			doDuckTyping, error);
 	}
 	return matches;
 }

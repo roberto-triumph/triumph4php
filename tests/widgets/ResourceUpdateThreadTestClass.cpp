@@ -38,6 +38,7 @@ public:
 	UnicodeString Code2;
 	UnicodeString Code3;
 	mvceditor::ResourceFinderClass GlobalFinder;
+	bool DoDuckTyping;
 	mvceditor::SymbolClass ParsedExpression;
 
 	std::vector<UnicodeString> VariableMatches;
@@ -57,6 +58,7 @@ public:
 		, ParsedExpression()
 		, VariableMatches()
 		, ResourceMatches()
+		, DoDuckTyping()
 		, Error() {
 	}
 };
@@ -161,7 +163,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, GlobalFinder) {
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->w"));
 	ResourceUpdates.ExpressionCompletionMatches(File1, ParsedExpression, UNICODE_STRING_SIMPLE("::"), 
-		&GlobalFinder, VariableMatches, ResourceMatches, Error);
+		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
 	if (!ResourceMatches.empty()) {
 		CHECK_EQUAL(UNICODE_STRING_SIMPLE("w"), ResourceMatches[0].Identifier);
@@ -188,7 +190,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, RegisteredFinder) {
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->w"));
 	ResourceUpdates.ExpressionCompletionMatches(File1, ParsedExpression, UNICODE_STRING_SIMPLE("::"), 
-		&GlobalFinder, VariableMatches, ResourceMatches, Error);
+		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
 
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
 	if (!ResourceMatches.empty()) {
@@ -212,7 +214,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithGlobalF
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->w"));
 	ResourceUpdates.ResourceMatches(File1, ParsedExpression, UNICODE_STRING_SIMPLE("::"), 
-		&GlobalFinder, ResourceMatches, Error);
+		&GlobalFinder, ResourceMatches, DoDuckTyping, Error);
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
 	if (!ResourceMatches.empty()) {
 		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionYou::w"), ResourceMatches[0].Resource);
@@ -239,7 +241,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithRegiste
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->methodA"));
 
 	ResourceUpdates.ResourceMatches(File2, ParsedExpression, UNICODE_STRING_SIMPLE("::"), 
-		&GlobalFinder, ResourceMatches, Error);
+		&GlobalFinder, ResourceMatches, DoDuckTyping, Error);
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
 	if (!ResourceMatches.empty()) {
 		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionMy::methodA"), ResourceMatches[0].Resource);
@@ -268,7 +270,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithStaleMa
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->methodA"));
 
 	ResourceUpdates.ResourceMatches(File2, ParsedExpression, UNICODE_STRING_SIMPLE("::"), 
-		&GlobalFinder, ResourceMatches, Error);
+		&GlobalFinder, ResourceMatches, DoDuckTyping, Error);
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
 	if (!ResourceMatches.empty()) {
 		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionMy::methodA"), ResourceMatches[0].Resource);
@@ -279,7 +281,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithStaleMa
 
 	ResourceMatches.clear();
 	ResourceUpdates.ResourceMatches(File2, ParsedExpression, UNICODE_STRING_SIMPLE("::"), 
-		&GlobalFinder, ResourceMatches, Error);
+		&GlobalFinder, ResourceMatches, DoDuckTyping, Error);
 	CHECK_EQUAL((size_t)0, ResourceMatches.size());
 }
 
