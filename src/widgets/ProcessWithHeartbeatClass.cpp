@@ -39,6 +39,7 @@ mvceditor::ProcessWithHeartbeatClass::ProcessWithHeartbeatClass(wxEvtHandler& ha
 }
 
 mvceditor::ProcessWithHeartbeatClass::~ProcessWithHeartbeatClass() {
+	Timer.Stop();
 	std::map<long, wxProcess*>::iterator it = RunningProcesses.begin();
 	while (it != RunningProcesses.end()) {
 		it->second->Detach();
@@ -47,16 +48,9 @@ mvceditor::ProcessWithHeartbeatClass::~ProcessWithHeartbeatClass() {
 		delete it->second;
 		it++;
 	}
-	Timer.Stop();
 }
 
 bool mvceditor::ProcessWithHeartbeatClass::Init(wxString command, int commandId, long& pid) {
-	wxPlatformInfo platform;
-	if (wxOS_WINDOWS_NT == platform.GetOperatingSystemId()) {
-		
-		// in windows, we will execute commands in the shell
-		command = wxT("cmd.exe /Q /C ") + command;
-	}
 	wxProcess* newProcess = new wxProcess(this, commandId);
 	newProcess->Redirect();
 
@@ -74,6 +68,7 @@ bool mvceditor::ProcessWithHeartbeatClass::Init(wxString command, int commandId,
 }
 
 bool mvceditor::ProcessWithHeartbeatClass::Stop(long pid) {
+	Timer.Stop();
 	bool stopped = false;	
 	std::map<long, wxProcess*>::iterator it = RunningProcesses.find(pid);
 	if (it != RunningProcesses.end()) {
@@ -82,7 +77,6 @@ bool mvceditor::ProcessWithHeartbeatClass::Stop(long pid) {
 		delete it->second;
 		RunningProcesses.erase(it);
 	}
-	Timer.Stop();
 	return stopped;
 }
 
@@ -97,7 +91,6 @@ void mvceditor::ProcessWithHeartbeatClass::OnProcessEnded(wxProcessEvent& event)
 		completeEvent.SetId(event.GetId());
 		completeEvent.SetString(output);
 		wxPostEvent(&Handler, completeEvent);
-		delete it->second;
 	}
 	else if (it != RunningProcesses.end() && it->second) {
 		wxProcess* proc = it->second;
@@ -108,6 +101,9 @@ void mvceditor::ProcessWithHeartbeatClass::OnProcessEnded(wxProcessEvent& event)
 		wxPostEvent(&Handler, completeEvent);
 	}
 	if (it != RunningProcesses.end()) {
+
+		// no need to delete the process pointer; since we don't call event.Skip() the process pointer
+		// will delete itself
 		RunningProcesses.erase(it);
 	}
 }
@@ -145,7 +141,9 @@ void mvceditor::ProcessWithHeartbeatClass::OnTimer(wxTimerEvent& event) {
 	wxPostEvent(&Handler, intProgressEvent);
 }
 
+
+
 BEGIN_EVENT_TABLE(mvceditor::ProcessWithHeartbeatClass, wxEvtHandler)
-	EVT_END_PROCESS(wxID_ANY, mvceditor::ProcessWithHeartbeatClass::OnProcessEnded)
+	EVT_END_PROCESS(wxID_ANY, mvceditor::ProcessWithHeartbeatClass::OnProcessEnded)	
 	EVT_TIMER(wxID_ANY, mvceditor::ProcessWithHeartbeatClass::OnTimer)
 END_EVENT_TABLE()
