@@ -120,7 +120,6 @@ private:
 	
 	mvceditor::CodeControlOptionsClass Options;
 	mvceditor::ProjectOptionsClass ProjectOptions;
-	mvceditor::EnvironmentClass Environment;
 	mvceditor::ProjectClass Project;
 	mvceditor::ResourceUpdateThreadClass ResourceUpdates;
 	mvceditor::CodeControlClass* Ctrl;
@@ -143,7 +142,7 @@ CodeControlFrameClass::CodeControlFrameClass()
 			wxSize(1024, 768))
 	, Options()
 	, ProjectOptions()
-	, Project(ProjectOptions, Environment) 
+	, Project(ProjectOptions) 
 	, ResourceUpdates(*this, wxID_ANY) {
 	Options.EnableAutomaticLineIndentation = true;
 	Options.EnableAutoCompletion = true;
