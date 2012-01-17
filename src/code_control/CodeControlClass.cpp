@@ -25,6 +25,7 @@
 #include <code_control/CodeControlClass.h>
 #include <windows/StringHelperClass.h>
 #include <code_control/DocumentClass.h>
+#include <widgets/StatusBarWithGaugeClass.h>
 
 #include <MvcEditorErrors.h>
 #include <wx/filename.h>
@@ -206,6 +207,15 @@ void mvceditor::CodeControlClass::SetSelectionByCharacterPosition(int start, int
 }
 
 void mvceditor::CodeControlClass::OnCharAdded(wxStyledTextEvent &event) {
+
+	// clear the auto complete message
+	wxWindow* window = GetGrandParent();
+	wxFrame* frame = wxDynamicCast(window, wxFrame);
+	if (frame) {
+		mvceditor::StatusBarWithGaugeClass* gauge = (mvceditor::StatusBarWithGaugeClass*)frame->GetStatusBar();
+		gauge->SetColumn0Text(wxT(""));		
+	}
+
 	char ch = (char)event.GetKey();
 	if (CodeControlOptions.EnableAutomaticLineIndentation) {
 		HandleAutomaticIndentation(ch);
@@ -255,7 +265,18 @@ std::vector<mvceditor::ResourceClass> mvceditor::CodeControlClass::GetCurrentSym
 }
 
 void mvceditor::CodeControlClass::HandleAutoCompletion() {
-	Document->HandleAutoCompletion();
+	wxString completeStatus;
+	Document->HandleAutoCompletion(completeStatus);
+	if (!completeStatus.IsEmpty()) {
+		wxWindow* window = GetGrandParent();
+
+		// show the auto complete message
+		wxFrame* frame = wxDynamicCast(window, wxFrame);
+		if (frame) {
+			mvceditor::StatusBarWithGaugeClass* gauge = (mvceditor::StatusBarWithGaugeClass*)frame->GetStatusBar();
+			gauge->SetColumn0Text(completeStatus);		
+		}
+	}
 }
 
 void mvceditor::CodeControlClass::HandleCallTip(wxChar ch, bool force) {

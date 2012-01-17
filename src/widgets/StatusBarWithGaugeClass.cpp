@@ -83,11 +83,15 @@ void mvceditor::StatusBarWithGaugeClass::OnSize(wxSizeEvent& event) {
 
 void mvceditor::StatusBarWithGaugeClass::RedrawGauges() {
 	
-	// Each gauge takes it 2 columns (one for the gauge title and one for the gauge itself), plus the leftmost status bar column
-	int numberOfColumns = (Gauges.size() * 2) + 1;
+	// Each gauge takes it 2 columns (one for the gauge title and one for the gauge itself), 
+	// plus the leftmost default status bar columns (for the menu help and other messages)
+	const int DEFAULT_COLUMNS = 2;
+	int numberOfColumns = (Gauges.size() * 2) + DEFAULT_COLUMNS;
 	int* widths = new int[numberOfColumns];
-	widths[0] = -1;
-	for (int i = 1; i < numberOfColumns; i += 2) {		
+	for (int i = 0; i < DEFAULT_COLUMNS; ++i) {
+		widths[i] = -1;
+	}
+	for (int i = DEFAULT_COLUMNS; i < numberOfColumns; i += 2) {		
 		widths[i] = 150;
 		widths[i + 1] = 300;
 	}
@@ -98,7 +102,7 @@ void mvceditor::StatusBarWithGaugeClass::RedrawGauges() {
 	if (!(wxOS_WINDOWS | platform.GetOperatingSystemId())) {
 		SetMinHeight(BITMAP_SIZE_Y);
 	}
-	int col = 1;
+	int col = DEFAULT_COLUMNS;
 	for (std::map<int, wxGauge*>::iterator it = Gauges.begin(); it != Gauges.end(); ++it) {
 		SetStatusText(GaugeTitles[it->first], col++);
 		wxRect rect;
@@ -106,6 +110,14 @@ void mvceditor::StatusBarWithGaugeClass::RedrawGauges() {
 		it->second->SetSize(rect.x + 2, rect.y + 2, rect.width - 4, rect.height - 4);
 	}
 	delete[] widths;
+}
+
+void mvceditor::StatusBarWithGaugeClass::SetColumn0Text(const wxString &text) {
+	SetStatusText(text, 0);
+}
+
+void mvceditor::StatusBarWithGaugeClass::SetColumn1Text(const wxString &text) {
+	SetStatusText(text, 1);
 }
 
 BEGIN_EVENT_TABLE(mvceditor::StatusBarWithGaugeClass, wxStatusBar)

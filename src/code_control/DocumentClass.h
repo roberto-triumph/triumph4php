@@ -77,8 +77,10 @@ public:
 	 * This method may be called in response to a user keypress; speed is
 	 * crucial here. Subclasses will need to invoke the AutoCompleteShow() method
 	 * of the wxSTC control.
+	 * @param completeStatus a bit of text that will help the user understand
+	 *        why the complete box did not populate.
 	 */
-	virtual void HandleAutoCompletion();
+	virtual void HandleAutoCompletion(wxString& completeStatus);
 
 	/**
 	 * shows the user function definition
@@ -176,7 +178,7 @@ public:
 	/**
 	 * Use the project's resource finder to find auto complete suggestions
 	 */
-	void HandleAutoCompletion();
+	void HandleAutoCompletion(wxString& completeStatus);
 
 	void HandleCallTip(wxChar ch = 0, bool force = false);
 
@@ -212,17 +214,29 @@ private:
 	 *
 	 * @param code most current source code; but only up to the current position (this helps determine
 	 * the scope)
+	 * @param completeStatus a bit of text that will help the user understand
+	 *        why the complete box did not populate.
 	 */
-	void HandleAutoCompletionPhp(const UnicodeString& code);
+	void HandleAutoCompletionPhp(const UnicodeString& code, wxString& completeStatus);
 
 	/**
 	* handles auto completion for HTML.
 	*
 	* @param word the word to complete
 	* @param syntax the token type that the cursor is currently on.  This helps
-	* int determining context (ie if the cursor is inside of a tag name or a tag valur)
+	*        in determining context (ie if the cursor is inside of a tag name or a tag value)
+	* @param completeStatus a bit of text that will help the user understand
+	*        why the complete box did not populate.
 	*/
-	void HandleAutoCompletionHtml(const UnicodeString& word, mvceditor::LanguageDiscoveryClass::Syntax syntax);
+	void HandleAutoCompletionHtml(const UnicodeString& word, mvceditor::LanguageDiscoveryClass::Syntax syntax,
+		wxString& completeStatus);
+
+	/**
+	 * Fills completeStatus with a human-friendly version of the symbol table error
+	 */
+	void HandleAutoCompletionPhpStatus(const SymbolTableMatchErrorClass& error, 
+		const UnicodeString& lastExpression, const SymbolClass& parsedExpression,
+		const UnicodeString& expressionScope, wxString& completeStatus);
 
 	/**
 	 * Return a list of possible keyword matches for the given word. For example, if word="cl"
@@ -374,7 +388,7 @@ public:
 	 * Searches the current project's SqlResourceFinder to find SQL keywords and metadata that completes the given word.
 	 * Returns the keywords to be shown in the auto complete list.
 	 */
-	void HandleAutoCompletion();
+	void HandleAutoCompletion(wxString& completeStatus);
 	
 	wxString GetMySqlKeywords() const;
 

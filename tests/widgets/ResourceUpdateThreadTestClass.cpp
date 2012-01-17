@@ -42,6 +42,7 @@ public:
 
 	std::vector<UnicodeString> VariableMatches;
 	std::vector<mvceditor::ResourceClass> ResourceMatches;
+	mvceditor::SymbolTableMatchErrorClass Error;
 	
 	
 	ExpressionCompletionMatchesFixtureClass() 
@@ -55,7 +56,8 @@ public:
 		, GlobalFinder()
 		, ParsedExpression()
 		, VariableMatches()
-		, ResourceMatches() {
+		, ResourceMatches()
+		, Error() {
 	}
 };
 
@@ -70,8 +72,6 @@ TEST(RegisterShouldSucceed) {
 TEST(RegisterShouldFail) {	
 	wxString fileName = wxT("MyFile.php");
 	mvceditor::ResourceUpdateClass resourceUpdates;
-	//CHECK(resourceUpdates.Register(fileName));
-	//CHECK_EQUAL(false, resourceUpdates.Register(fileName));
 }
 
 TEST(RegisterShouldSucceedAfterSucceedAfterUnregistering) {	
@@ -160,7 +160,8 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, GlobalFinder) {
 	ParsedExpression.Lexeme = UNICODE_STRING_SIMPLE("$action");
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->w"));
-	ResourceUpdates.ExpressionCompletionMatches(File1, ParsedExpression, UNICODE_STRING_SIMPLE("::"), &GlobalFinder, VariableMatches, ResourceMatches);
+	ResourceUpdates.ExpressionCompletionMatches(File1, ParsedExpression, UNICODE_STRING_SIMPLE("::"), 
+		&GlobalFinder, VariableMatches, ResourceMatches, Error);
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
 	if (!ResourceMatches.empty()) {
 		CHECK_EQUAL(UNICODE_STRING_SIMPLE("w"), ResourceMatches[0].Identifier);
@@ -186,7 +187,8 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, RegisteredFinder) {
 	ParsedExpression.Lexeme = UNICODE_STRING_SIMPLE("$action");
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->w"));
-	ResourceUpdates.ExpressionCompletionMatches(File1, ParsedExpression, UNICODE_STRING_SIMPLE("::"), &GlobalFinder, VariableMatches, ResourceMatches);
+	ResourceUpdates.ExpressionCompletionMatches(File1, ParsedExpression, UNICODE_STRING_SIMPLE("::"), 
+		&GlobalFinder, VariableMatches, ResourceMatches, Error);
 
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
 	if (!ResourceMatches.empty()) {
@@ -209,7 +211,8 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithGlobalF
 	ParsedExpression.Lexeme = UNICODE_STRING_SIMPLE("$action");
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->w"));
-	ResourceUpdates.ResourceMatches(File1, ParsedExpression, UNICODE_STRING_SIMPLE("::"), &GlobalFinder, ResourceMatches);
+	ResourceUpdates.ResourceMatches(File1, ParsedExpression, UNICODE_STRING_SIMPLE("::"), 
+		&GlobalFinder, ResourceMatches, Error);
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
 	if (!ResourceMatches.empty()) {
 		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionYou::w"), ResourceMatches[0].Resource);
@@ -235,7 +238,8 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithRegiste
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->methodA"));
 
-	ResourceUpdates.ResourceMatches(File2, ParsedExpression, UNICODE_STRING_SIMPLE("::"), &GlobalFinder, ResourceMatches);
+	ResourceUpdates.ResourceMatches(File2, ParsedExpression, UNICODE_STRING_SIMPLE("::"), 
+		&GlobalFinder, ResourceMatches, Error);
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
 	if (!ResourceMatches.empty()) {
 		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionMy::methodA"), ResourceMatches[0].Resource);
@@ -263,7 +267,8 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithStaleMa
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->methodA"));
 
-	ResourceUpdates.ResourceMatches(File2, ParsedExpression, UNICODE_STRING_SIMPLE("::"), &GlobalFinder, ResourceMatches);
+	ResourceUpdates.ResourceMatches(File2, ParsedExpression, UNICODE_STRING_SIMPLE("::"), 
+		&GlobalFinder, ResourceMatches, Error);
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
 	if (!ResourceMatches.empty()) {
 		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionMy::methodA"), ResourceMatches[0].Resource);
@@ -273,7 +278,8 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithStaleMa
 	CHECK(ResourceUpdates.Update(File1, Code3, true));
 
 	ResourceMatches.clear();
-	ResourceUpdates.ResourceMatches(File2, ParsedExpression, UNICODE_STRING_SIMPLE("::"), &GlobalFinder, ResourceMatches);
+	ResourceUpdates.ResourceMatches(File2, ParsedExpression, UNICODE_STRING_SIMPLE("::"), 
+		&GlobalFinder, ResourceMatches, Error);
 	CHECK_EQUAL((size_t)0, ResourceMatches.size());
 }
 

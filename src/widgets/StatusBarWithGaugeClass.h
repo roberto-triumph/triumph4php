@@ -72,6 +72,16 @@ public:
 	 * Removes the progress bar (user will no longer see it)
 	 */
 	void StopGauge(int id);
+
+	/**
+	 * Set the text of the column index 0 (the first column)
+	 */
+	void SetColumn0Text(const wxString& text);
+
+	/**
+	 * Set the text of the column index 1 (the second column)
+	 */
+	void SetColumn1Text(const wxString& text);
 	
 	enum {
 		INDETERMINATE_MODE = -1

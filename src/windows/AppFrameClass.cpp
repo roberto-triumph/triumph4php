@@ -572,9 +572,15 @@ void mvceditor::AppFrameClass::OnCodeControlUpdate(wxStyledTextEvent& event) {
 	CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
 	if (codeControl) {
 		int pos = codeControl->GetCurrentPos();
-		int line = codeControl->LineFromPosition(pos);
-		int column = codeControl->GetColumn(pos);
-		GetStatusBar()->SetStatusText(wxString::Format(wxT("Line:%d Column:%d Offset:%d"), line, column, pos));		
+
+		// scintilla lines and columns are zero-based 
+		// we want to be 1-based (human friendly)
+		// but offset we want to be 0-based
+		int line = codeControl->LineFromPosition(pos) + 1; 
+		int column = codeControl->GetColumn(pos) + 1;
+		GetStatusBarWithGauge()->SetColumn1Text(
+			wxString::Format(wxT("Line:%d Column:%d Offset:%d"), line, column, pos)
+		);
 	}
 }
 

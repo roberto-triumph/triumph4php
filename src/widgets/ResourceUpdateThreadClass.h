@@ -118,11 +118,13 @@ public:
 	 *        are "near matches" to the parsed expression. This will be filled only when parsedExpression is a variable. 
 	 * @param autoCompleteResourceList the results of the matches; these are the names of the items that
 	 *        are "near matches" to the parsed expression. This will be filled only when parsedExpression is a variable "chain" or
-	 *        a function / static class call. 
+	 *        a function / static class call.
+	 * @param error any errors / explanations will be populated here
 	 */
 	void ExpressionCompletionMatches(const wxString& fileName, const SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
 		ResourceFinderClass* resourceFinder, std::vector<UnicodeString>& autoCompleteList,
-		std::vector<ResourceClass>& autoCompleteResourceList) const;
+		std::vector<ResourceClass>& autoCompleteResourceList,
+		SymbolTableMatchErrorClass& error) const;
 
 	/**
 	 * This method will resolve the given parsed expression and will figure out the type of a resource.
@@ -134,9 +136,11 @@ public:
 	 *        available. See ScopeFinderClass for more info.
 	 * @param resourceFinder resource finder to search (in addition to all of the registered ones). This class will NOT own the pointer.
 	 * @param matches all of the resource matches will be put here
+	 * @param error any errors / explanations will be populated here
 	 */
 	void ResourceMatches(const wxString& fileName, const SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
-		ResourceFinderClass* resourceFinder, std::vector<ResourceClass>& matches) const;
+		ResourceFinderClass* resourceFinder, std::vector<ResourceClass>& matches,
+		SymbolTableMatchErrorClass& error) const;
 	
 private:
 
@@ -218,7 +222,8 @@ public:
 	 */
 	void ExpressionCompletionMatches(const wxString& fileName, const SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
 		ResourceFinderClass* resourceFinder, std::vector<UnicodeString>& autoCompleteList,
-		std::vector<ResourceClass>& autoCompleteResourceList);
+		std::vector<ResourceClass>& autoCompleteResourceList,
+		SymbolTableMatchErrorClass& error);
 
 	/**
 	 * Calls  and ResourceUpdateClass::PrepareAll and 
@@ -237,7 +242,7 @@ public:
 	 * @see ResourceUpdatesClass::ResourceMatches 
 	 */
 	void ResourceMatches(const wxString& fileName, const SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
-		ResourceFinderClass* resourceFinder, std::vector<ResourceClass>& matches);
+		ResourceFinderClass* resourceFinder, std::vector<ResourceClass>& matches, SymbolTableMatchErrorClass& error);
 
 protected:
 	

@@ -138,16 +138,18 @@ static const wxString CSS_PSEUDOCLASSES = wxString::FromAscii(
 
 static const wxString JAVASCRIPT_KEYWORDS = wxT("");
 
-#define AUTOCOMP_IMAGE_VARIABLE 1
-#define AUTOCOMP_IMAGE_KEYWORD 2
-#define AUTOCOMP_IMAGE_FUNCTION 3
-#define AUTOCOMP_IMAGE_CLASS  4
-#define AUTOCOMP_IMAGE_PRIVATE_METHOD  5
-#define AUTOCOMP_IMAGE_PROTECTED_METHOD  6
-#define AUTOCOMP_IMAGE_PUBLIC_METHOD  7
-#define AUTOCOMP_IMAGE_PRIVATE_MEMBER  8
-#define AUTOCOMP_IMAGE_PROTECTED_MEMBER  9
-#define AUTOCOMP_IMAGE_PUBLIC_MEMBER  10
+static enum AutoCompletionImages {
+	AUTOCOMP_IMAGE_VARIABLE = 1,
+	AUTOCOMP_IMAGE_KEYWORD,
+	AUTOCOMP_IMAGE_FUNCTION,
+	AUTOCOMP_IMAGE_CLASS,
+	AUTOCOMP_IMAGE_PRIVATE_METHOD,
+	AUTOCOMP_IMAGE_PROTECTED_METHOD,
+	AUTOCOMP_IMAGE_PUBLIC_METHOD,
+	AUTOCOMP_IMAGE_PRIVATE_MEMBER,
+	AUTOCOMP_IMAGE_PROTECTED_MEMBER,
+	AUTOCOMP_IMAGE_PUBLIC_MEMBER
+};
 
 
 /**
@@ -193,7 +195,7 @@ bool mvceditor::TextDocumentClass::CanAutoComplete() {
 	return false;
 }
 
-void mvceditor::TextDocumentClass::HandleAutoCompletion() {
+void mvceditor::TextDocumentClass::HandleAutoCompletion(wxString& completeStatus) {
 }
 
 void mvceditor::TextDocumentClass::HandleCallTip(wxChar ch, bool force) {
@@ -312,7 +314,7 @@ bool mvceditor::PhpDocumentClass::CanAutoComplete() {
 	return true;
 }
 
-void mvceditor::PhpDocumentClass::HandleAutoCompletion() {	
+void mvceditor::PhpDocumentClass::HandleAutoCompletion(wxString& completeStatus) {	
 	AutoCompletionResourceMatches.clear();
 	int currentPos = Ctrl->GetCurrentPos();
 	int startPos = Ctrl->WordStartPosition(currentPos, true);
@@ -331,7 +333,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletion() {
 		case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_MULTI_LINE_COMMENT:
 		case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_NOWDOC:
 		case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_SINGLE_QUOTE_STRING:
-			HandleAutoCompletionPhp(code);
+			HandleAutoCompletionPhp(code, completeStatus);
 			break;
 		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML:
 		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_TAG:
@@ -339,7 +341,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletion() {
 		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE_DOUBLE_QUOTE_VALUE:
 		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE_SINGLE_QUOTE_VALUE:
 		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ENTITY:
-			HandleAutoCompletionHtml(word, syntax);
+			HandleAutoCompletionHtml(word, syntax, completeStatus);
 			break;
 		default:
 			break;
@@ -348,7 +350,9 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletion() {
 	}
 }
 
-void mvceditor::PhpDocumentClass::HandleAutoCompletionHtml(const UnicodeString& word, mvceditor::LanguageDiscoveryClass::Syntax syntax) {
+void mvceditor::PhpDocumentClass::HandleAutoCompletionHtml(const UnicodeString& word, 
+														   mvceditor::LanguageDiscoveryClass::Syntax syntax,
+														   wxString& completeStatus) {
 	if (word.length() < 1) {
 		 return;
 	}
@@ -385,9 +389,17 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionHtml(const UnicodeString& 
 		int wordLength = currentPos - startPos;
 		Ctrl->AutoCompShow(wordLength, list);
 	}
+	else if (mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE == syntax) {
+		completeStatus = _("Unknown HTML Attribute: ");
+		completeStatus += symbol;
+	}
+	else if (mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_TAG == syntax) {
+		completeStatus = _("Unknown HTML Tag: ");
+		completeStatus += symbol;
+	}
 }
 
-void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& code) {
+void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& code, wxString& completeStatus) {
 	if (!ResourceUpdates) {
 		return;
 	}
@@ -399,14 +411,15 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 	int expressionPos = code.length() - 1;
 	UnicodeString lastExpression = Lexer.LastExpression(code);
 	mvceditor::SymbolClass parsedExpression;
-	if (!lastExpression.isEmpty()) {		
-		UnicodeString expresionCode;
+	UnicodeString expressionScope;
+	mvceditor::SymbolTableMatchErrorClass error;
+	if (!lastExpression.isEmpty()) {
 		Parser.ParseExpression(lastExpression, parsedExpression);
-		UnicodeString expressionScope = ScopeFinder.GetScopeString(code, expressionPos);
+		expressionScope = ScopeFinder.GetScopeString(code, expressionPos);
 		mvceditor::ResourceFinderClass* globalResourceFinder = Project->GetResourceFinder();
 		
 		ResourceUpdates->ExpressionCompletionMatches(FileIdentifier, parsedExpression, expressionScope, globalResourceFinder, 
-				variableMatches, AutoCompletionResourceMatches);
+				variableMatches, AutoCompletionResourceMatches, error);
 		if (!variableMatches.empty()) {
 			for (size_t i = 0; i < variableMatches.size(); ++i) {
 				wxString postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_VARIABLE);
@@ -466,6 +479,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 				autoCompleteList.push_back(comp + postFix);
 			}
 		}
+
 	}
 
 	if (!autoCompleteList.empty()) {
@@ -485,7 +499,94 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 		int wordLength = currentPos - startPos;
 		Ctrl->AutoCompShow(wordLength, list);
 	}
+	else {
+		HandleAutoCompletionPhpStatus(error, lastExpression, parsedExpression,
+			expressionScope, completeStatus);
+	}
 }
+
+void mvceditor::PhpDocumentClass::HandleAutoCompletionPhpStatus(
+		const mvceditor::SymbolTableMatchErrorClass& error, 
+		const UnicodeString& lastExpression,
+		const mvceditor::SymbolClass& parsedExpression,
+		const UnicodeString& expressionScope,
+		wxString& completeStatus) {
+	if (lastExpression.isEmpty()) {
+		completeStatus = _("Nothing to complete");
+	}
+	else if (lastExpression.startsWith(UNICODE_STRING_SIMPLE("$")) && parsedExpression.ChainList.size() <= 1) {
+		completeStatus = _("No matching variables for: ");
+		completeStatus += mvceditor::StringHelperClass::IcuToWx(lastExpression);
+		completeStatus +=  _(" in scope: ");
+		completeStatus += mvceditor::StringHelperClass::IcuToWx(expressionScope);
+	}
+	else if (parsedExpression.ChainList.size() == 1) {
+		completeStatus = _("No matching class, function, define, or keyword for: \"");
+		completeStatus += mvceditor::StringHelperClass::IcuToWx(lastExpression);
+		completeStatus += wxT("\"");
+	}
+	else if (AutoCompletionResourceMatches.empty()) {
+		if (mvceditor::SymbolTableMatchErrorClass::PARENT_ERROR == error.Type) {
+			completeStatus = _("parent not valid for scope: ");
+			completeStatus += mvceditor::StringHelperClass::IcuToWx(expressionScope);
+		}
+		else if (mvceditor::SymbolTableMatchErrorClass::STATIC_ERROR == error.Type) {
+			completeStatus = _("Cannot access protected or private static member \"");
+			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorLexeme);
+			completeStatus += _("\" in class: ");
+			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorClass);
+		}
+		else if (mvceditor::SymbolTableMatchErrorClass::TYPE_RESOLUTION_ERROR == error.Type) {
+			completeStatus = _("Could not resolve type for \"");
+			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorLexeme);
+			completeStatus += wxT("\"");
+		}
+		else if (mvceditor::SymbolTableMatchErrorClass::UNKNOWN_RESOURCE == error.Type) {
+			if (parsedExpression.Lexeme == UNICODE_STRING_SIMPLE("$this")) {
+				completeStatus = _("No public, protected, or private member matches for \"");
+			}
+			else {
+				completeStatus = _("No public member matches for \"");
+			}
+			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorLexeme);
+			completeStatus += _("\" in class: ");
+			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorClass);
+		}
+		else if (mvceditor::SymbolTableMatchErrorClass::UNKNOWN_STATIC_RESOURCE == error.Type) {
+			completeStatus = _("No static member matches for \"");
+			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorLexeme);
+			completeStatus += _("\" in class: ");
+			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorClass);
+		}
+		else if (mvceditor::SymbolTableMatchErrorClass::VISIBILITY_ERROR == error.Type) {
+			completeStatus = _("Cannot access protected or private member \"");
+			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorLexeme);
+			completeStatus += _("\" in class: ");
+			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorClass);
+		}
+		else if (mvceditor::SymbolTableMatchErrorClass::ARRAY_ERROR == error.Type && !error.ErrorClass.isEmpty()) {
+			completeStatus = _("Cannot use object operator for array returned by \"");
+			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorClass);
+			completeStatus += _("::");
+			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorLexeme);
+		}
+		else if (mvceditor::SymbolTableMatchErrorClass::ARRAY_ERROR == error.Type) {
+			completeStatus = _("Cannot use object operator for array variable ");
+			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorLexeme);
+		}
+		else if (mvceditor::SymbolTableMatchErrorClass::PRIMITIVE_ERROR == error.Type && !error.ErrorClass.isEmpty()) {
+			completeStatus = _("Cannot use object operator for primitive returned by \"");
+			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorClass);
+			completeStatus += _("::");
+			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorLexeme);
+		}
+		else if (mvceditor::SymbolTableMatchErrorClass::PRIMITIVE_ERROR == error.Type) {
+			completeStatus = _("Cannot use object operator for primitive variable \"");
+			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorLexeme);
+		}
+	}
+}
+
 void mvceditor::PhpDocumentClass::HandleCallTip(wxChar ch, bool force) {
 	if (!ResourceUpdates) {
 		return;
@@ -633,7 +734,10 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetCurrentSym
 	if (!lastExpression.isEmpty()) {
 		parser.ParseExpression(lastExpression, parsedExpression);
 		UnicodeString scopeString = scopeFinder.GetScopeString(code, endPos);
-		ResourceUpdates->ResourceMatches(FileIdentifier, parsedExpression, scopeString, resourceFinder, matches);
+
+		// for now do nothing with error
+		mvceditor::SymbolTableMatchErrorClass error;
+		ResourceUpdates->ResourceMatches(FileIdentifier, parsedExpression, scopeString, resourceFinder, matches, error);
 	}
 	return matches;
 }
@@ -746,7 +850,10 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetSymbolAt(i
 	if (!lastExpression.isEmpty()) {
 		parser.ParseExpression(lastExpression, parsedExpression);
 		UnicodeString expressionScope = scopeFinder.GetScopeString(code, posToCheck);
-		ResourceUpdates->ResourceMatches(FileIdentifier, parsedExpression, expressionScope, resourceFinder, matches);
+
+		// for now do nothing with error
+		mvceditor::SymbolTableMatchErrorClass error;
+		ResourceUpdates->ResourceMatches(FileIdentifier, parsedExpression, expressionScope, resourceFinder, matches, error);
 	}
 	return matches;
 }
@@ -881,7 +988,7 @@ bool mvceditor::SqlDocumentClass::CanAutoComplete() {
 	return true;
 }
 
-void mvceditor::SqlDocumentClass::HandleAutoCompletion() {
+void mvceditor::SqlDocumentClass::HandleAutoCompletion(wxString& completeStatus) {
 	int currentPos = Ctrl->GetCurrentPos();
 	int startPos = Ctrl->WordStartPosition(currentPos, true);
 	int endPos = Ctrl->WordEndPosition(currentPos, true);
