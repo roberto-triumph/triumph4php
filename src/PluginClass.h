@@ -28,7 +28,7 @@
 #include <environment/EnvironmentClass.h>
 #include <php_frameworks/ProjectClass.h>
 #include <widgets/NotebookClass.h>
-#include <widgets/ResourceUpdateThreadClass.h>
+#include <widgets/ResourceCacheClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
 #include <PreferencesClass.h>
 #include <wx/event.h>

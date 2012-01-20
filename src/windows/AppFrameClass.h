@@ -30,7 +30,7 @@
 #include <widgets/NotebookClass.h>
 #include <PluginClass.h>
 #include <PreferencesClass.h>
-#include <widgets/ResourceUpdateThreadClass.h>
+#include <widgets/ResourceCacheClass.h>
 #include <wx/aui/aui.h>
 
 namespace mvceditor {

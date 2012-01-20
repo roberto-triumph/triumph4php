@@ -24,7 +24,7 @@
  */
 #include <php_frameworks/ProjectClass.h>
 #include <widgets/ProcessWithHeartbeatClass.h>
-#include <widgets/ResourceUpdateThreadClass.h>
+#include <widgets/ResourceCacheClass.h>
 #include <windows/AppFrameClass.h>
 #include <environment/EnvironmentClass.h>
 #include <plugins/ResourcePluginClass.h>

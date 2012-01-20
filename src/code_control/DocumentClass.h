@@ -30,7 +30,7 @@
 #include <language/ParserClass.h>
 #include <language/LanguageDiscoveryClass.h>
 #include <language/SymbolTableClass.h>
-#include <widgets/ResourceUpdateThreadClass.h>
+#include <widgets/ResourceCacheClass.h>
 
 #include <wx/string.h>
 #include <wx/stc/stc.h>

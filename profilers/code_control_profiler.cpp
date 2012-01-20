@@ -27,7 +27,7 @@
 #include <wx/filename.h>
 #include <code_control/CodeControlOptionsClass.h>
 #include <code_control/CodeControlClass.h>
-#include <widgets/ResourceUpdateThreadClass.h>
+#include <widgets/ResourceCacheClass.h>
 #include <php_frameworks/ProjectClass.h>
 #include <search/FindInFilesClass.h>
 
