@@ -293,26 +293,7 @@ void mvceditor::ResourceFinderClass::CollectNearMatchMembers() {
 	// for members from the class or any class it inherited from
 	// whenever we insert into parentClassNames, need to make sure strings are all lowercase
 	// that way we dont have do lower case for every resource comparison
-	std::vector<UnicodeString> parentClassNames;
-	UnicodeString lastClassName(ClassName);
-	lastClassName.toLower();
-	parentClassNames.push_back(lastClassName);
-	bool done = false;
-	while (!done) {
-		done = true;
-		for (std::list<ResourceClass>::iterator it = ResourceCache.begin(); it != ResourceCache.end(); ++it) {
-			if (it->Type == ResourceClass::CLASS && 0 == it->Resource.caseCompare(lastClassName, 0) && it->Signature.length()) {
-				int32_t extendsPos = it->Signature.indexOf(UNICODE_STRING_SIMPLE("extends "));
-				if (extendsPos >= 0) {
-					lastClassName = ExtractParentClassFromSignature(it->Signature);
-					lastClassName.toLower();
-					parentClassNames.push_back(lastClassName);
-					done = false;
-					break;
-				}
-			}
-		}
-	}	
+	std::vector<UnicodeString> parentClassNames = ClassHierarchy(ClassName);	
 	if (MethodName.isEmpty()) {
 		
 		// special case; query for all methods for a class (UserClass::)
@@ -334,12 +315,12 @@ void mvceditor::ResourceFinderClass::CollectNearMatchMembers() {
 			bool exactMatches = false;
 
 			// if there are exact matches; we only want to collect exact matches
-			if(it->Identifier.caseCompare(needle.Identifier, 0) == 0) {
+			if (it->Identifier.caseCompare(needle.Identifier, 0) == 0) {
 				
 				// parentClassNames is a list of all classes ancestors of ClassName.  A match is found when the method
 				// is from one of these parents.  This prevents matches from classes that may have the sam method name
 				// but are not related.
-				for(size_t i = 0; i < parentClassNames.size(); ++i) {
+				for (size_t i = 0; i < parentClassNames.size(); ++i) {
 					UnicodeString possibleResource = parentClassNames[i] + UNICODE_STRING_SIMPLE("::") + needle.Identifier;
 					exactMatches = it->Resource.caseCompare(possibleResource, 0) == 0;
 					if (ClassName.isEmpty()) {
@@ -362,6 +343,7 @@ void mvceditor::ResourceFinderClass::CollectNearMatchMembers() {
 				// but are not related.
 				for(size_t i = 0; i < parentClassNames.size(); ++i) {
 					UnicodeString possibleResource = parentClassNames[i] + UNICODE_STRING_SIMPLE("::") + needleToLower;
+					possibleResource.toLower();
 					UnicodeString resourceToLower(it->Resource);
 					resourceToLower.toLower();
 					nearMatches = resourceToLower.indexOf(possibleResource) == 0;
@@ -412,55 +394,31 @@ void mvceditor::ResourceFinderClass::CollectAllMembers(const std::vector<Unicode
 	}
 }
 
-UnicodeString mvceditor::ResourceFinderClass::GetResourceSignature(const UnicodeString& resource, UnicodeString& comment) const {
-	UnicodeString signature;
-	
-	// a function
-	for (std::list<ResourceClass>::const_iterator it = ResourceCache.begin(); it != ResourceCache.end(); ++it) {
-		if (it->Type != ResourceClass::CLASS && it->Type != ResourceClass::DEFINE && it->Resource == resource) {
-			signature = it->Signature;
-			comment = it->Comment;
-			break;
-		}
-	}
-	if (signature.isEmpty()) {
-		
-		//search methods
-		for (std::list<ResourceClass>::const_iterator it = MembersCache.begin(); it != MembersCache.end(); ++it) {
-			if (it->Type == ResourceClass::METHOD && it->Resource == resource) {
-				signature = it->Signature;
-				comment = it->Comment;
-				break;
-			}
-		}	
-	}
-	return signature;
-}
+std::vector<UnicodeString> mvceditor::ResourceFinderClass::ClassHierarchy(const UnicodeString& className) const {
+	std::vector<UnicodeString> parentClassNames;
+	parentClassNames.push_back(className);
+	UnicodeString lastClassName(className);
+	lastClassName.toLower();
+	bool done = false;
+	while (!done) {
+		done = true;
 
-UnicodeString mvceditor::ResourceFinderClass::GetResourceReturnType(const UnicodeString& resource) const {
-	UnicodeString icuResource = resource;
-	UnicodeString returnType;
-	
-	// functions
-	for (std::list<ResourceClass>::const_iterator it = ResourceCache.begin(); it != ResourceCache.end(); ++it) {
-		if (it->Type != ResourceClass::CLASS && it->Type != ResourceClass::DEFINE && it->Resource == icuResource) {
-			returnType = it->ReturnType;
-			break;
-		}
-	}
-	if (returnType.isEmpty()) {
-		for (std::list<ResourceClass>::const_iterator it = MembersCache.begin(); it != MembersCache.end(); ++it) {
-			if (it->Type == ResourceClass::METHOD && it->Resource == icuResource) {
-				returnType = it->ReturnType;
-				break;
-			}
-			else if (it->Type == ResourceClass::MEMBER && it->Resource == icuResource) {
-				returnType = it->ReturnType;
-				break;
+		// we should probably try to use std::lower_bound here
+		for (std::list<ResourceClass>::const_iterator it = ResourceCache.begin(); it != ResourceCache.end(); ++it) {
+			if (it->Type == ResourceClass::CLASS && 0 == it->Resource.caseCompare(lastClassName, 0) && it->Signature.length()) {
+
+				// TODO include interface names in this list??
+				int32_t extendsPos = it->Signature.indexOf(UNICODE_STRING_SIMPLE("extends "));
+				if (extendsPos >= 0) {
+					lastClassName = ExtractParentClassFromSignature(it->Signature);
+					parentClassNames.push_back(lastClassName);
+					done = false;
+					break;
+				}
 			}
 		}
 	}
-	return returnType;
+	return parentClassNames;
 }
 
 UnicodeString mvceditor::ResourceFinderClass::GetResourceParentClassName(const UnicodeString& className, 
@@ -843,31 +801,36 @@ UnicodeString mvceditor::ResourceFinderClass::ExtractParentClassFromSignature(co
 bool mvceditor::ResourceFinderClass::CollectFullyQualifiedResource() {
 	EnsureSorted();
 	ResourceClass needle;
-	needle.Resource = ClassName;
-	std::list<ResourceClass>::iterator it;
 	if (ResourceType == CLASS_NAME_METHOD_NAME) {
-		needle.Resource.append(UNICODE_STRING_SIMPLE("::")).append(MethodName);
-		needle.Identifier = MethodName;
-		it = std::lower_bound(MembersCache.begin(), MembersCache.end(), needle);
-		
-		// members are sorted by identifers; need to acount for the case when the same method name
-		// is used in multiple classes
-		int classCount = 0;
-		ResourceClass exactMatchResource;
-		while (it != MembersCache.end() && it->Identifier.caseCompare(needle.Identifier, 0) == 0) {
-			if (it->Resource.caseCompare(needle.Resource, 0) == 0) {
-				classCount++;
-				exactMatchResource = *it;
+
+		// check the entire class hierachy; stop as soon as we found it
+		std::vector<UnicodeString> classHierarchy = ClassHierarchy(ClassName);
+		for (size_t i = 0; i < classHierarchy.size(); ++i) {
+			needle.Resource = classHierarchy[i] + UNICODE_STRING_SIMPLE("::") + MethodName;
+			needle.Identifier = MethodName;
+			std::list<ResourceClass>::iterator it = std::lower_bound(MembersCache.begin(), MembersCache.end(), needle);
+			
+			// members are sorted by identifers; need to acount for the case when the same method name
+			// is used in multiple classes
+			int classCount = 0;
+			ResourceClass exactMatchResource;
+			while (it != MembersCache.end() && it->Identifier.caseCompare(needle.Identifier, 0) == 0) {
+				if (it->Resource.caseCompare(needle.Resource, 0) == 0) {
+					classCount++;
+					exactMatchResource = *it;
+				}
+				++it;
 			}
-			++it;
-		}
-		if (1 == classCount) {
-			Matches.push_back(exactMatchResource);
+			if (1 == classCount) {
+				Matches.push_back(exactMatchResource);
+				break;
+			}
 		}
 	}
 	else {
+		needle.Resource = ClassName;
 		needle.Identifier = ClassName;
-		it = std::lower_bound(ResourceCache.begin(), ResourceCache.end(), needle);
+		std::list<ResourceClass>::iterator it = std::lower_bound(ResourceCache.begin(), ResourceCache.end(), needle);
 		if (it != ResourceCache.end() && it->Resource.caseCompare(needle.Resource, 0) == 0) {
 			ResourceClass exactMatchResource = *it;
 			++it;

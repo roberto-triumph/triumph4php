@@ -190,6 +190,18 @@ public:
 	 * UserClass
 	 * UserClass::name
 	 * UserClass::getName
+	 *
+	 * This method is also tolerant of class hierarchy; meaning that any inherited
+	 * if a property name does not match then the parent classes are searched. For example; the following code
+	 *
+	 *   class AdminClass extends UserClass {
+	 *   }
+	 * 
+	 * then the folowing resource queries will result in a match
+	 *
+	 * AdminClass
+	 * AdminClass::name
+	 * AdminClass::getName
 	 * 
 	 * @return bool returns true if resource was found
 	 */
@@ -245,24 +257,6 @@ public:
 	 * @return bool returns true if resource was found
 	 */
 	bool CollectNearMatchResources();
-
-	/**
-	 * Gets the signature for the given resource. This is a strict comparison, resource must match
-	 * exactly.
-	 * 
-	 * @param const UnicodeString& resource
-	 * @param comment the resource's DocComment will be set in this variable.
-	 * @return UnicodeString the resource signature
-	 */
-	UnicodeString GetResourceSignature(const UnicodeString& resource, UnicodeString& comment) const;
-	
-	/**
-	 * Gets the return type for the given resource. This method will not trigger rebuilding of resource cache.
-	 * 
-	 * @param const UnicodeString& resource
-	 * @return UnicodeString the resource's return type
-	 */
-	UnicodeString GetResourceReturnType(const UnicodeString& resource) const;
 	
 	/**
 	 * Get the parent class of a given resource. For example, let's say source code contained two classes: AdminClass and 
@@ -277,6 +271,12 @@ public:
 	 * @param return UnicodeString the class' most immediate parent that contains method
 	 */
 	UnicodeString GetResourceParentClassName(const UnicodeString& className, const UnicodeString& methodName) const;
+
+	/**
+	 * @param className the class name to check
+	 * @return all of the classes that the given class inherits from (parent, grandparent, and all the way up).
+	 */
+	std::vector<UnicodeString> ClassHierarchy(const UnicodeString& className) const;
 	
 	/**
 	 * Calculates the number of files that had matches. 

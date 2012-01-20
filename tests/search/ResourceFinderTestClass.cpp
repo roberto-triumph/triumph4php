@@ -873,10 +873,46 @@ TEST_FIXTURE(ResourceFinderTestClass, CollectFullyQualifiedResourcesShouldFindFi
 	));	
 	CHECK(ResourceFinder->Prepare(wxT("UserClass")));
 	ResourceFinder->Walk(TestProjectDir + testFile);
-	CHECK(ResourceFinder->CollectNearMatchResources());
+	CHECK(ResourceFinder->CollectFullyQualifiedResource());
 	CHECK_EQUAL((size_t)1, ResourceFinder->GetResourceMatchCount());
 	CHECK_EQUAL(TestProjectDir + wxT("test.php"), ResourceFinder->GetResourceMatchFullPath(0));
 	CHECK_EQUAL(TestProjectDir + wxT("test.php"), ResourceFinder->GetResourceMatch(0).GetFullPath());
+}
+
+TEST_FIXTURE(ResourceFinderTestClass, CollectFullyQualifiedResourcesWithClassHierarchy) {
+	wxString testFile = wxT("test.php");
+	CreateFixtureFile(testFile, wxString::FromAscii(
+		"<?php\n"
+		"class UserClass {\n"
+		"\tprivate $name;"
+		"\tfunction getName() {\n"
+		"\t\treturn $this->name;\n"
+		"\t}\n"
+		"}\n"
+		"class AdminClass {\n"
+		"\tfunction getName() {\n"
+		"\t\treturn 'Admin:' . $this->name;\n"
+		"\t}\n"
+		"}\n"
+		"class SuperUserClass extends AdminClass {}"
+	));	
+	CHECK(ResourceFinder->Prepare(wxT("UserClass::getName")));
+	ResourceFinder->Walk(TestProjectDir + testFile);
+	CHECK(ResourceFinder->CollectFullyQualifiedResource());
+	CHECK_EQUAL((size_t)1, ResourceFinder->GetResourceMatchCount());
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::getName"), ResourceFinder->GetResourceMatch(0).Resource);
+	
+	// should only use the 'highest' possible resource (only Admin and not User)
+	CHECK(ResourceFinder->Prepare(wxT("AdminClass::getName")));
+	CHECK(ResourceFinder->CollectFullyQualifiedResource());
+	CHECK_EQUAL((size_t)1, ResourceFinder->GetResourceMatchCount());
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("AdminClass::getName"), ResourceFinder->GetResourceMatch(0).Resource);
+	
+	CHECK(ResourceFinder->Prepare(wxT("SuperUserClass::getName")));
+	CHECK(ResourceFinder->CollectFullyQualifiedResource());
+	CHECK_EQUAL((size_t)1, ResourceFinder->GetResourceMatchCount());
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("AdminClass::getName"), ResourceFinder->GetResourceMatch(0).Resource);
+	
 }
 
 TEST_FIXTURE(ResourceFinderTestClass, CollectFullyQualifiedResourcesShouldFindMatchesForCorrectClassMethod) {
@@ -992,38 +1028,6 @@ TEST_FIXTURE(ResourceFinderTestClass, CollectFullyQualifiedResourcesShouldFindCl
 	CHECK_EQUAL((size_t)0, ResourceFinder->GetResourceMatchCount());
 }
 
-TEST_FIXTURE(ResourceFinderTestClass, GetResourceReturnTypeShouldReturnReturnTypeForClassesMethodsAndFunctionsAndProperties) {
-	 wxString code = wxString::FromAscii(
-		"<?php\n"
-		"class UserClass {\n"
-		" /** @var string */\n"
-		"\tprivate $name;\n"
-		"\t/**\n"
-		"\t * @return string\n"
-		"\t */\n"
-		"\tfunction getName() {\n"
-		"\t\treturn $this->name;\n"
-		"\t}\n"
-		"}\n"
-		"class AdminClass extends UserClass {\n"
-		"}\n"
-		"\t/**\n"
-		"\t * @return void\n"
-		"\t */\n"
-		"function userClassPrint($user) {\n"
-		"\t echo $user->getName() . \"\\n\";"
-		"}\n"
-		"?>\n"
-	);
-	wxString testFile = wxT("test.php");
-	CreateFixtureFile(testFile, code);
-	CHECK(ResourceFinder->Prepare(wxT("userClas")));
-	ResourceFinder->Walk(TestProjectDir + testFile);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("string"), ResourceFinder->GetResourceReturnType(UNICODE_STRING_SIMPLE("UserClass::getName")));
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("string"), ResourceFinder->GetResourceReturnType(UNICODE_STRING_SIMPLE("UserClass::name")));
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("void"), ResourceFinder->GetResourceReturnType(UNICODE_STRING_SIMPLE("userClassPrint")));
-}
-
 TEST_FIXTURE(ResourceFinderTestClass, GetResourceMatchShouldReturnSignatureForConstructors) {
 	 wxString code = wxString::FromAscii(
 		"<?php\n"
@@ -1083,37 +1087,6 @@ TEST_FIXTURE(ResourceFinderTestClass, GetResourceMatchShouldReturnSignatureForIn
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("public function getName()"), resource.Signature);
 }
 
-TEST_FIXTURE(ResourceFinderTestClass, GetResourceSignatureShouldReturnSignatureForClassesMethodsAndFunctions) {
-	 wxString code = wxString::FromAscii(
-		"<?php\n"
-		"class UserClass {\n"
-		"\tprivate $name;"
-		"/**\n\tGets the user's name\n*/\n"
-		"\tfunction getName() {\n"
-		"\t\treturn $this->name;\n"
-		"\t}\n"
-		"}\n"
-		"class AdminClass extends UserClass {\n"
-		"}\n"
-		"/**\nPrint the user's name to the STDOUT\n*/\n"
-		"function userClassPrint($user) {\n"
-		"\t echo $user->getName() . \"\\n\";"
-		"}\n"
-		"?>\n"
-	);
-	wxString testFile = wxT("test.php");
-	CreateFixtureFile(testFile, code);
-	CHECK(ResourceFinder->Prepare(wxT("userClas")));
-	ResourceFinder->Walk(TestProjectDir + testFile);
-	UnicodeString comment;
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("public function getName()"), 
-		ResourceFinder->GetResourceSignature(UNICODE_STRING_SIMPLE("UserClass::getName"), comment));
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/**\n\tGets the user's name\n*/"), comment);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("function userClassPrint($user)"), 
-		ResourceFinder->GetResourceSignature(UNICODE_STRING_SIMPLE("userClassPrint"), comment));
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/**\nPrint the user's name to the STDOUT\n*/"), comment);
-}
-
 TEST_FIXTURE(ResourceFinderTestClass, GetResourceParentClassShouldReturnParentClass) {
 	 wxString code = wxString::FromAscii(
 		"<?php\n"
@@ -1161,6 +1134,36 @@ TEST_FIXTURE(ResourceFinderTestClass, GetResourceParentClassShouldReturnParentCl
 	ResourceFinder->Walk(TestProjectDir + testFile);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass"), ResourceFinder->GetResourceParentClassName(UNICODE_STRING_SIMPLE("SuperAdminClass"), 
 		UNICODE_STRING_SIMPLE("getName")));
+}
+
+TEST_FIXTURE(ResourceFinderTestClass, ClassHierarchyShouldReturnAllAncestors) {
+	 wxString code = wxString::FromAscii(
+		"<?php\n"
+		"class UserClass {\n"
+		"\tprivate $name;"
+		"\tfunction getName() {\n"
+		"\t\treturn $this->name;\n"
+		"\t}\n"
+		"}\n"
+		"/** The admin class */\n"
+		"class AdminClass extends UserClass {\n"
+		"}\n"
+		" class SuperUserClass extends AdminClass {\n"
+		"}\n"
+		"?>\n"
+	);
+	wxString testFile = wxT("test.php");
+	CreateFixtureFile(testFile, code);
+	CHECK(ResourceFinder->Prepare(wxT("SuperUser")));
+	ResourceFinder->Walk(TestProjectDir + testFile);
+
+	std::vector<UnicodeString> classes = ResourceFinder->ClassHierarchy(UNICODE_STRING_SIMPLE("SuperUserClass"));
+	CHECK_EQUAL((size_t)3, classes.size());
+	if ((size_t)3 == classes.size()) {
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("SuperUserClass"), classes[0]);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("AdminClass"), classes[1]);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass"), classes[2]);
+	}
 }
 
 TEST_FIXTURE(ResourceFinderTestClass, GetResourceMatchPositionShouldReturnValidPositionsForClassMethodFunctionAndMember) {
