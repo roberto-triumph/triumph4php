@@ -243,6 +243,7 @@ void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
 	State = FREE;
 	if (GOTO == previousState) {
 		mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
+		resourceCache->PrepareAll(JumpToText);
 		resourceCache->CollectNearMatchResourcesFromAll();
 		std::vector<mvceditor::ResourceClass> matches = resourceCache->Matches();
 		ShowJumpToResults(JumpToText, matches);
@@ -263,13 +264,13 @@ void mvceditor::ResourcePluginClass::ShowJumpToResults(const wxString& finderQue
 			break;
 		case 0:
 			if (ResourceFinderClass::CLASS_NAME_METHOD_NAME == type) {
-				wxMessageBox(_("Method Not Found"));
+				wxMessageBox(_("Method Not Found: ") + finderQuery);
 			}
 			else if (ResourceFinderClass::CLASS_NAME == type) {
-				wxMessageBox(_("Class Not Found"));
+				wxMessageBox(_("Class Not Found: ") + finderQuery);
 			}
 			else {
-				wxMessageBox(_("File Not Found"));
+				wxMessageBox(_("File Not Found: ") + finderQuery);
 			}
 			break;
 		default:
