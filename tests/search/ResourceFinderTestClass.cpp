@@ -876,6 +876,7 @@ TEST_FIXTURE(ResourceFinderTestClass, CollectFullyQualifiedResourcesShouldFindFi
 	CHECK(ResourceFinder->CollectNearMatchResources());
 	CHECK_EQUAL((size_t)1, ResourceFinder->GetResourceMatchCount());
 	CHECK_EQUAL(TestProjectDir + wxT("test.php"), ResourceFinder->GetResourceMatchFullPath(0));
+	CHECK_EQUAL(TestProjectDir + wxT("test.php"), ResourceFinder->GetResourceMatch(0).GetFullPath());
 }
 
 TEST_FIXTURE(ResourceFinderTestClass, CollectFullyQualifiedResourcesShouldFindMatchesForCorrectClassMethod) {
@@ -1184,7 +1185,7 @@ TEST_FIXTURE(ResourceFinderTestClass, GetResourceMatchPositionShouldReturnValidP
 	ResourceFinder->Walk(TestProjectDir + testFile);
 	ResourceFinder->CollectNearMatchResources();
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass"), ResourceFinder->GetResourceMatch(0).Resource);
-	CHECK(ResourceFinder->GetResourceMatchPosition(0, icuCode, pos, length));
+	CHECK(mvceditor::ResourceFinderClass::GetResourceMatchPosition(ResourceFinder->GetResourceMatch(0), icuCode, pos, length));
 	CHECK_EQUAL(6, pos);
 	CHECK_EQUAL(16, length);
 	
@@ -1192,7 +1193,7 @@ TEST_FIXTURE(ResourceFinderTestClass, GetResourceMatchPositionShouldReturnValidP
 	CHECK(ResourceFinder->Prepare(wxT("::getName")));
 	ResourceFinder->CollectNearMatchResources();
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::getName"), ResourceFinder->GetResourceMatch(0).Resource);
-	CHECK(ResourceFinder->GetResourceMatchPosition(0, icuCode, pos, length));
+	CHECK(mvceditor::ResourceFinderClass::GetResourceMatchPosition(ResourceFinder->GetResourceMatch(0), icuCode, pos, length));
 	CHECK_EQUAL(code.find(wxT("function getName()")), (size_t)pos);
 	CHECK_EQUAL(17, length);
 	
@@ -1200,7 +1201,7 @@ TEST_FIXTURE(ResourceFinderTestClass, GetResourceMatchPositionShouldReturnValidP
 	CHECK(ResourceFinder->Prepare(wxT("UserClass::name")));
 	ResourceFinder->CollectNearMatchResources();
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::name"), ResourceFinder->GetResourceMatch(0).Resource);
-	CHECK(ResourceFinder->GetResourceMatchPosition(0, icuCode, pos, length));
+	CHECK(mvceditor::ResourceFinderClass::GetResourceMatchPosition(ResourceFinder->GetResourceMatch(0), icuCode, pos, length));
 	CHECK_EQUAL(code.find(wxT("private $name")), (size_t)pos);
 	CHECK_EQUAL(14, length);
 	
@@ -1208,7 +1209,7 @@ TEST_FIXTURE(ResourceFinderTestClass, GetResourceMatchPositionShouldReturnValidP
 	CHECK(ResourceFinder->Prepare(wxT("printUser")));
 	ResourceFinder->CollectNearMatchResources();
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("printUser"), ResourceFinder->GetResourceMatch(0).Resource);
-	CHECK(ResourceFinder->GetResourceMatchPosition(0, icuCode, pos, length));
+	CHECK(mvceditor::ResourceFinderClass::GetResourceMatchPosition(ResourceFinder->GetResourceMatch(0), icuCode, pos, length));
 	CHECK_EQUAL(code.find(wxT("function printUser")), (size_t)pos);
 	CHECK_EQUAL(19, length);
 }
@@ -1237,6 +1238,77 @@ TEST_FIXTURE(ResourceFinderTestClass, CopyResourcesFromShouldCopyCopy) {
 	CHECK_EQUAL((size_t)1, copy.GetResourceMatchCount());
 	CHECK_EQUAL(TestProjectDir + wxT("test.php"), copy.GetResourceMatchFullPath(0));
 }
+
+class ResourceCopyTestFixtureClass : public FileTestFixtureClass {
+
+public:
+
+	mvceditor::ResourceFinderClass Src;
+	mvceditor::ResourceFinderClass Dest;
+
+	ResourceCopyTestFixtureClass()
+		: FileTestFixtureClass(wxT("resource-finder"))
+		, Src()
+		, Dest() {
+	}
+
+};
+
+TEST_FIXTURE(ResourceCopyTestFixtureClass, AppendResources) {
+	Src.FileFilters.push_back(wxT("src.php"));
+	Dest.FileFilters.push_back(wxT("dest.php"));
+	CreateFixtureFile(wxT("src.php"), wxT("<?php class Src { public $time; } "));
+	CreateFixtureFile(wxT("dest.php"), wxT("<?php class Dest { public $name; } "));
+
+	// in order to Walk() we need to Prepare()
+	Src.Prepare(wxT("fake"));
+	Src.Walk(TestProjectDir + wxT("src.php"));
+	Dest.Prepare(wxT("fake"));
+	Dest.Walk(TestProjectDir + wxT("dest.php"));
+
+	// this should just 'append' since files are not the same
+	Dest.UpdateResourcesFrom(TestProjectDir + wxT("src.php"), Src);
+	CHECK(Dest.Prepare(wxT("Src")));
+	CHECK(Dest.CollectFullyQualifiedResource());
+	if (Dest.GetResourceMatchCount() > 0) {
+		CHECK_EQUAL(TestProjectDir + wxT("src.php"), Dest.GetResourceMatch(0).GetFullPath());
+	}
+
+	// the member
+	CHECK(Dest.Prepare(wxT("Src::time")));
+	CHECK(Dest.CollectFullyQualifiedResource());
+	if (Dest.GetResourceMatchCount() > 0) {
+		CHECK_EQUAL(TestProjectDir + wxT("src.php"), Dest.GetResourceMatch(0).GetFullPath());
+	}
+}
+
+TEST_FIXTURE(ResourceCopyTestFixtureClass, ReplaceResources) {
+	Src.FileFilters.push_back(wxT("src.php"));
+	Dest.FileFilters.push_back(wxT("dest.php"));
+	CreateFixtureFile(wxT("src.php"), wxT("<?php class Src { public $time; } "));
+
+	// in order to Walk() we need to Prepare()
+	Src.Prepare(wxT("fake"));
+	Src.Walk(TestProjectDir + wxT("src.php"));
+	Dest.Prepare(wxT("fake"));
+	Dest.Walk(TestProjectDir + wxT("src.php"));
+
+	// this should just 'replace' since files are the same and not cause duplicates
+	Dest.UpdateResourcesFrom(TestProjectDir + wxT("src.php"), Src);
+	CHECK(Dest.Prepare(wxT("Src")));
+	CHECK(Dest.CollectFullyQualifiedResource());
+	if (Dest.GetResourceMatchCount() > 0) {
+		CHECK_EQUAL(TestProjectDir + wxT("src.php"), Dest.GetResourceMatch(0).GetFullPath());
+	}
+
+	// the member
+	CHECK(Dest.Prepare(wxT("Src::time")));
+	CHECK(Dest.CollectFullyQualifiedResource());
+	if (Dest.GetResourceMatchCount() > 0) {
+		CHECK_EQUAL(TestProjectDir + wxT("src.php"), Dest.GetResourceMatch(0).GetFullPath());
+	}
+}
+
 
 class DynamicResourceTestClass : public FileTestFixtureClass {
 

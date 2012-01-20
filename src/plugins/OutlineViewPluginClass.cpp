@@ -76,50 +76,44 @@ void mvceditor::OutlineViewPluginClass::BuildOutlineCurrentCodeControl() {
 }
 
 void mvceditor::OutlineViewPluginClass::BuildOutline(const wxString& line) {
-	mvceditor::ResourceFinderClass* resourceFinder = NULL;
-	if (GetProject()) {
-		resourceFinder = GetProject()->GetResourceFinder();
-	}
-	if (resourceFinder != NULL && resourceFinder->Prepare(line)) {
-		if (resourceFinder->CollectNearMatchResources()) {
-			CurrentOutline.remove();
-			for(size_t i = 0; i < resourceFinder->GetResourceMatchCount(); ++i) {
-				mvceditor::ResourceClass resource = resourceFinder->GetResourceMatch(i);
-				
-				// take the resource
-				CurrentOutline.append(resource.Resource);
-				
-				// take the parameters from the signature
-				int32_t pos = resource.Signature.indexOf(UNICODE_STRING_SIMPLE("("));
-				if (pos >= 0) {
-					UnicodeString params(resource.Signature, pos);
-					CurrentOutline.append(params);
-				}
-				if (resource.Type == mvceditor::ResourceClass::METHOD) {
-					wxString method = _("[Method]");
-					CurrentOutline.append(' ');
-					CurrentOutline.append(mvceditor::StringHelperClass::wxToIcu(method));
-				}
-				else if (resource.Type == mvceditor::ResourceClass::MEMBER) {
-					wxString prop = _("[Property]");
-					CurrentOutline.append(' ');
-					CurrentOutline.append(mvceditor::StringHelperClass::wxToIcu(prop));
-				}
-				CurrentOutline.append(UNICODE_STRING_SIMPLE("\n"));
+	std::vector<mvceditor::ResourceClass> matches = GetResourceCache()->PrepareAndCollectNearMatchResourcesFromAll(line);
+	if (!matches.empty()) {
+		CurrentOutline.remove();
+		
+		for(size_t i = 0; i < matches.size(); ++i) {
+			mvceditor::ResourceClass resource = matches[i];
+			
+			// take the resource
+			CurrentOutline.append(resource.Resource);
+			
+			// take the parameters from the signature
+			int32_t pos = resource.Signature.indexOf(UNICODE_STRING_SIMPLE("("));
+			if (pos >= 0) {
+				UnicodeString params(resource.Signature, pos);
+				CurrentOutline.append(params);
 			}
+			if (resource.Type == mvceditor::ResourceClass::METHOD) {
+				wxString method = _("[Method]");
+				CurrentOutline.append(' ');
+				CurrentOutline.append(mvceditor::StringHelperClass::wxToIcu(method));
+			}
+			else if (resource.Type == mvceditor::ResourceClass::MEMBER) {
+				wxString prop = _("[Property]");
+				CurrentOutline.append(' ');
+				CurrentOutline.append(mvceditor::StringHelperClass::wxToIcu(prop));
+			}
+			CurrentOutline.append(UNICODE_STRING_SIMPLE("\n"));
 		}
 	}
 }
 	
 void mvceditor::OutlineViewPluginClass::BuildPhpDoc(const wxString& line) {
-	mvceditor::ResourceFinderClass* resourceFinder = NULL;
-	if (GetProject()) {
-		resourceFinder = GetProject()->GetResourceFinder();
-	}
-	if (resourceFinder != NULL && resourceFinder->Prepare(line)) {
-		if (resourceFinder->CollectFullyQualifiedResource()) {
+	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
+	if (resourceCache->PrepareAll(line)) {
+		if (resourceCache->CollectFullyQualifiedResourceFromAll()) {
 			PhpDoc.remove();
-			mvceditor::ResourceClass resource = resourceFinder->GetResourceMatch(0);
+			std::vector<mvceditor::ResourceClass> matches = resourceCache->Matches();
+			mvceditor::ResourceClass resource = matches[0];
 			
 			// take the parameters from the signature			
 			PhpDoc.append(resource.Resource);
@@ -153,18 +147,17 @@ void mvceditor::OutlineViewPluginClass::BuildPhpDoc(const wxString& line) {
 }
 
 void mvceditor::OutlineViewPluginClass::JumpToResource(const wxString& resource) {
-	mvceditor::ResourceFinderClass* resourceFinder = NULL;
-	if (GetProject()) {
-		resourceFinder = GetProject()->GetResourceFinder();
-	}
-	if (resourceFinder != NULL && resourceFinder->Prepare(resource)) {
-		if (resourceFinder->CollectFullyQualifiedResource()) {
-			GetNotebook()->LoadPage(resourceFinder->GetResourceMatchFullPath(0));
+	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
+	if (resourceCache->PrepareAll(resource)) {
+		if (resourceCache->CollectFullyQualifiedResourceFromAll()) {
+			std::vector<mvceditor::ResourceClass> matches = resourceCache->Matches();
+			mvceditor::ResourceClass resource = matches[0];
+			GetNotebook()->LoadPage(resource.GetFullPath());
 			CodeControlClass* codeControl = GetCurrentCodeControl();
 			if (codeControl) {
 				int32_t position, 
 					length;
-				bool found = resourceFinder->GetResourceMatchPosition(0, codeControl->GetSafeText(), position, length);
+				bool found = mvceditor::ResourceFinderClass::GetResourceMatchPosition(resource, codeControl->GetSafeText(), position, length);
 				if (found) {
 					codeControl->SetSelectionAndEnsureVisible(position, position + length);
 				}

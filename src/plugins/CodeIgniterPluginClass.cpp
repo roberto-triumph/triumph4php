@@ -106,8 +106,8 @@ void mvceditor::CodeIgniterPluginClass::OnProcessComplete(wxCommandEvent &event)
 			mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, wxT(""));
 		}
 		else {
-			mvceditor::ResourceFinderClass* finder = project->GetResourceFinder();
-			finder->AddDynamicResources(ResourcesDetector.Resources);
+			mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
+			resourceCache->GlobalAddDynamicResources(ResourcesDetector.Resources);
 		}
 	}
 }

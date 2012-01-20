@@ -28,6 +28,7 @@
 #include <environment/EnvironmentClass.h>
 #include <php_frameworks/ProjectClass.h>
 #include <widgets/NotebookClass.h>
+#include <widgets/ResourceUpdateThreadClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
 #include <PreferencesClass.h>
 #include <wx/event.h>
@@ -138,8 +139,9 @@ public:
 	 * 
 	 * @param EnvironmentClass* the PHP app environment options. The pointer will NOT be owned by this class.
 	 * @param appHandler event handler that may receive events from plugins. The pointer will NOT be owned by this class.
+	 * @param resourceCache the application-wide cache of resources.  The pointer will NOT be owned by this class.
 	 */
-	void InitState(EnvironmentClass* environment, wxEvtHandler* appHandler);
+	void InitState(EnvironmentClass* environment, wxEvtHandler* appHandler, ResourceCacheClass* resourceCache);
 		
 	/**
 	 * Add menu items to the tools menu for this plugin. Remeber to use the MenuIds enum when building
@@ -309,6 +311,13 @@ protected:
 	 * @return NotebookClass*
 	 */
 	NotebookClass* GetNotebook() const;
+
+	/**
+	 * The resource cache. Guaranteed to be not null. Do NOT delete the pointer
+	 * 
+	 * @return ResourceCacheClass*
+	 */
+	ResourceCacheClass* GetResourceCache() const;
 	
 	/**
 	 * Set the given page to be the selected page for the tools notebook
@@ -426,6 +435,11 @@ protected:
 	 * The Application-wide menu bar.
 	 */
 	wxMenuBar* MenuBar;
+
+	/**
+	 * The Application-wide resource cache.
+	 */
+	ResourceCacheClass* ResourceCache;
 	
 };
 

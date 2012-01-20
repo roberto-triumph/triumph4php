@@ -121,7 +121,7 @@ private:
 	mvceditor::CodeControlOptionsClass Options;
 	mvceditor::ProjectOptionsClass ProjectOptions;
 	mvceditor::ProjectClass Project;
-	mvceditor::ResourceUpdateThreadClass ResourceUpdates;
+	mvceditor::ResourceCacheClass ResourceCache;
 	mvceditor::CodeControlClass* Ctrl;
 	
 
@@ -143,10 +143,10 @@ CodeControlFrameClass::CodeControlFrameClass()
 	, Options()
 	, ProjectOptions()
 	, Project(ProjectOptions) 
-	, ResourceUpdates(*this, wxID_ANY) {
+	, ResourceCache() {
 	Options.EnableAutomaticLineIndentation = true;
 	Options.EnableAutoCompletion = true;
-	Ctrl = new mvceditor::CodeControlClass(this, Options, &Project, &ResourceUpdates, wxID_ANY);
+	Ctrl = new mvceditor::CodeControlClass(this, Options, &Project, &ResourceCache, wxID_ANY);
 	Ctrl->SetDropTarget(new FileDropTargetClass(Ctrl));
 	CreateMenu();
 }

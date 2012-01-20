@@ -56,7 +56,7 @@ static const int INDICATOR_PHP_STYLE = 128;
 static const int INDICATOR_TEXT_STYLE = 32;
 
 mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options, ProjectClass* project, 
-			mvceditor::ResourceUpdateThreadClass* resourceUpdates,
+			mvceditor::ResourceCacheClass* resourceCache,
 			int id, const wxPoint& position, const wxSize& size, long style,
 			const wxString& name)
 		: wxStyledTextCtrl(parent, id, position, size, style, name)
@@ -65,7 +65,7 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 		, WordHighlightFinder()
 		, WordHighlightWord()
 		, CurrentInfo()
-		, ResourceUpdates(resourceUpdates)
+		, ResourceCache(resourceCache)
 		, Project(project)
 		, WordHighlightPreviousIndex(-1)
 		, WordHighlightNextIndex(-1)
@@ -374,7 +374,7 @@ void mvceditor::CodeControlClass::ApplyPreferences() {
 		SetSqlOptions();
 	}
 	else if (mvceditor::CodeControlClass::PHP == DocumentMode) {
-		Document = new mvceditor::PhpDocumentClass(Project, ResourceUpdates);
+		Document = new mvceditor::PhpDocumentClass(Project, ResourceCache);
 		Document->SetControl(this);
 		SetCodeControlOptions(CodeControlOptions.PhpStyles);
 		SetPhpOptions();
@@ -882,10 +882,7 @@ mvceditor::CodeControlClass::Mode mvceditor::CodeControlClass::GetDocumentMode()
 }
 
 void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
-	if (!ResourceUpdates) {
-		event.Skip();
-		return;
-	}
+
 	/*
 	 * do not use wxTipWindow 
 	 * there is a crash bug  with wxTipWindow
@@ -894,8 +891,7 @@ void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
 	 *
 	 * use the wxStyledTextCtrl call tip instead 
 	 */
-	mvceditor::ResourceFinderClass* globalResourceFinder = Project->GetResourceFinder();
-	if (DocumentMode == PHP && globalResourceFinder) {
+	if (DocumentMode == PHP) {
 		int pos = event.GetPosition();
 
 		// if the cursor is in the middle of an identifier, find the end of the

@@ -45,7 +45,7 @@ public:
 	/** Constructor */
 	AppFrameClass(const std::vector<PluginClass*>& plugins,
 		wxEvtHandler& appHandler, EnvironmentClass& environment,
-		PreferencesClass& preferences, ResourceUpdateThreadClass& resourceUpdates);
+		PreferencesClass& preferences, ResourceCacheClass& resourceCache);
 	
 	~AppFrameClass();
 	

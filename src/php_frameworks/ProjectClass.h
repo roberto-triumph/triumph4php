@@ -355,19 +355,6 @@ public:
 	void SetSqlFileExtensionsString(wxString wildcardString);
 	
 	/**
-	 * Returns the PHP keywords, according to the PHP version of this project.
-	 */
-	// TODO remove from this class and into one of the Language classes
-	wxString GetPhpKeywords() const;
-	
-	/**
-	 * @return the project's parsed resources (class, method, function names).
-	 * This object will still own the returned pointer. Do NOT delete it.
-	 */
-	// TODO move this out of here; need to create a ResourceFinderLocker
-	ResourceFinderClass* GetResourceFinder();
-	
-	/**
 	 *  This object will still own the returned pointer. Do NOT delete it.
 	 */
 	SqlResourceFinderClass* GetSqlResourceFinder();

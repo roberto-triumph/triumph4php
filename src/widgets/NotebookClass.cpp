@@ -143,7 +143,7 @@ void mvceditor::NotebookClass::MarkPageAsNotModified(int windowId) {
 	}
 }
 void mvceditor::NotebookClass::AddMvcEditorPage() {
-	CodeControlClass* page = new CodeControlClass(this, *CodeControlOptions, Project, ResourceUpdates, 
+	CodeControlClass* page = new CodeControlClass(this, *CodeControlOptions, Project, ResourceCache, 
 		wxID_ANY);
 	AddPage(page, wxString::Format(wxT("Untitled %d"), NewPageNumber++), true, 
 		wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_TOOLBAR, 
@@ -192,7 +192,7 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename) {
 		// not using wxStyledTextCtrl::LoadFile() because it does not correctly handle files with high ascii characters
 		mvceditor::FindInFilesClass::OpenErrors error = FindInFilesClass::FileContents(filename, fileContents);
 		if (error == mvceditor::FindInFilesClass::NONE) {
-			CodeControlClass* newCode = new CodeControlClass(this, *CodeControlOptions, Project, ResourceUpdates, 
+			CodeControlClass* newCode = new CodeControlClass(this, *CodeControlOptions, Project, ResourceCache, 
 				wxID_ANY);
 			newCode->TrackFile(filename, fileContents);
 

@@ -315,23 +315,8 @@ mvceditor::ProjectClass::ProjectClass(const mvceditor::ProjectOptionsClass& opti
 	, SqlFileFilters() {
 }
 
-wxString mvceditor::ProjectClass::GetPhpKeywords() const {
-	return wxT("php if else elseif do while for foreach switch ")
-	  wxT("case break continue default function return public private protected ")
-	  wxT("class interface extends implements static final const true false ")
-	  wxT("NULL global array echo empty eval exit isset list print unset __LINE__ ")
-	  wxT("__FILE__ __DIR__ __FUNCTION__ __CLASS__ __METHOD__ __NAMESPACE__ ")
-	  wxT("require require_once include include_once stdClass parent self abstract ")
-	  wxT("clone namespace use as new bool boolean float double real string int ")
-	  wxT("integer");
-}
-
 wxString  mvceditor::ProjectClass::GetRootPath() const { 
 	return Options.RootPath; 
-}
-
-mvceditor::ResourceFinderClass* mvceditor::ProjectClass::GetResourceFinder() {
-	return &ResourceFinder;
 }
 
 mvceditor::SqlResourceFinderClass* mvceditor::ProjectClass::GetSqlResourceFinder() {

@@ -142,6 +142,9 @@ protected:
 	/**
 	 * This method will be executed in it's own thread. Most of the time
 	 * this method would be implemented by calling search.Walk() method.
+	 * The return value of this method will be set as the event.GetClientData()
+	 * of the correspoding FILE_READ event; subclasses can use it in the
+	 * event handler if they want / need to.
 	 */
 	virtual bool FileRead(DirectorySearchClass& search) = 0;
 

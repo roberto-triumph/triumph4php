@@ -78,25 +78,19 @@ bool mvceditor::ResourceFinderClass::Walk(const wxString& fileName) {
 }
 
 void mvceditor::ResourceFinderClass::BuildResourceCacheForFile(const wxString& fullPath, const UnicodeString& code, bool isNew) {
+	
 	// remove all previous cached resources
 	int fileItemIndex = -1;
-	for (size_t i = 0; i < FileCache.size(); ++i) {
-		if (FileCache[i].FullPath == fullPath) {
-			fileItemIndex = i;
-			break;
-		}
+	mvceditor::ResourceFinderClass::FileItem fileItem;
+	bool foundFile = FindInFileCache(fullPath, fileItemIndex, fileItem);
+	if (foundFile) {
+		RemoveCachedResources(fileItemIndex);
 	}
-	RemoveCachedResources(fileItemIndex);
-	if (-1 == fileItemIndex) {
+	if (!foundFile) {
 
 		// if caller just calls this method without calling Walk(); then file cache will be empty
 		// need to add an entry so that GetResourceMatchFullPathFromResource works correctly
-		mvceditor::ResourceFinderClass::FileItem fileItem;
-		fileItem.FullPath = fullPath;
-		fileItem.Parsed = false;
-		fileItem.IsNew = isNew;
-		fileItemIndex = FileCache.size();
-		FileCache.push_back(fileItem);
+		fileItemIndex = PushIntoFileCache(fullPath, false, isNew);
 	}
 	CurrentFileItemIndex = fileItemIndex;
 	Parser.ScanString(code);
@@ -133,71 +127,68 @@ wxString  mvceditor::ResourceFinderClass::GetResourceMatchFullPathFromResource(c
 	return wxT("");
 }
 
-bool mvceditor::ResourceFinderClass::GetResourceMatchPosition(size_t index, const UnicodeString& text, int32_t& pos, 
-		int32_t& length) const {
+bool mvceditor::ResourceFinderClass::GetResourceMatchPosition(const mvceditor::ResourceClass& resource, const UnicodeString& text, int32_t& pos, 
+		int32_t& length) {
 	size_t start = 0;
 	mvceditor::FinderClass finder;
 	finder.Mode = FinderClass::REGULAR_EXPRESSION;
-	if (index >= 0 && index < Matches.size()) {
-		ResourceClass item = Matches[index];
-		UnicodeString resource(item.Resource);
-		UnicodeString className,
-			methodName;
-		int scopeResolutionPos = resource.indexOf(UNICODE_STRING_SIMPLE("::"));
-		if (scopeResolutionPos >= 0) {
-			className.setTo(resource, 0, scopeResolutionPos);
-			methodName.setTo(resource, scopeResolutionPos + 2, resource.length() - scopeResolutionPos + 2 - 1);
 
-			mvceditor::FinderClass::EscapeRegEx(className);
-			mvceditor::FinderClass::EscapeRegEx(methodName);
-		}
-		else {
-			className = resource;
-			mvceditor::FinderClass::EscapeRegEx(className);
-		}
-		switch (item.Type) {
-			case ResourceClass::CLASS:
-				finder.Expression = UNICODE_STRING_SIMPLE("\\sclass\\s+") + className + UNICODE_STRING_SIMPLE("\\s");
-				break;
-			case ResourceClass::METHOD:
-				//advance past the class header so that if  a function with the same name exists we will skip it
-				finder.Expression = UNICODE_STRING_SIMPLE("\\sclass\\s+") + className + UNICODE_STRING_SIMPLE("\\s");
-				if (finder.Prepare() && finder.FindNext(text, start)) {			
-					finder.GetLastMatch(pos, length);
-				}
-				start = pos + length;
+	UnicodeString className,
+		methodName;
+	int scopeResolutionPos = resource.Resource.indexOf(UNICODE_STRING_SIMPLE("::"));
+	if (scopeResolutionPos >= 0) {
+		className.setTo(resource.Resource, 0, scopeResolutionPos);
+		methodName.setTo(resource.Resource, scopeResolutionPos + 2, resource.Resource.length() - scopeResolutionPos + 2 - 1);
 
-				// method may return a reference (&)
-				finder.Expression = UNICODE_STRING_SIMPLE("\\sfunction\\s*(&\\s*)?") + methodName + UNICODE_STRING_SIMPLE("\\s*\\(");
-				break;
-			case ResourceClass::FUNCTION:
+		mvceditor::FinderClass::EscapeRegEx(className);
+		mvceditor::FinderClass::EscapeRegEx(methodName);
+	}
+	else {
+		className = resource.Resource;
+		mvceditor::FinderClass::EscapeRegEx(className);
+	}
+	switch (resource.Type) {
+		case ResourceClass::CLASS:
+			finder.Expression = UNICODE_STRING_SIMPLE("\\sclass\\s+") + className + UNICODE_STRING_SIMPLE("\\s");
+			break;
+		case ResourceClass::METHOD:
+			//advance past the class header so that if  a function with the same name exists we will skip it
+			finder.Expression = UNICODE_STRING_SIMPLE("\\sclass\\s+") + className + UNICODE_STRING_SIMPLE("\\s");
+			if (finder.Prepare() && finder.FindNext(text, start)) {			
+				finder.GetLastMatch(pos, length);
+			}
+			start = pos + length;
 
-				// function may return a reference (&)
-				finder.Expression = UNICODE_STRING_SIMPLE("\\sfunction\\s*(&\\s*)?") + className + UNICODE_STRING_SIMPLE("\\s*\\(");
-				break;
-			case ResourceClass::MEMBER:
-				//advance past the class header so that if  a variable with the same name exists we will skip it				:
-				finder.Expression = UNICODE_STRING_SIMPLE("\\sclass\\s+") + className + UNICODE_STRING_SIMPLE("\\s");
-				if (finder.Prepare() && finder.FindNext(text, start)) {			
-					finder.GetLastMatch(pos, length);
-				}
-				start = pos + length;
-				finder.Expression = UNICODE_STRING_SIMPLE("\\s((var)|(public)|(protected)|(private)).+") + methodName + UNICODE_STRING_SIMPLE(".*;");
-				break;
-			case ResourceClass::DEFINE:
-				finder.Expression = UNICODE_STRING_SIMPLE("\\sdefine\\(\\s*('|\")") + className + UNICODE_STRING_SIMPLE("('|\")");
-				break;
-			case ResourceClass::CLASS_CONSTANT:
-				//advance past the class header so that if  a variable with the same name exists we will skip it				:
-				finder.Expression = UNICODE_STRING_SIMPLE("\\sclass\\s+") + className + UNICODE_STRING_SIMPLE("\\s");
-				if (finder.Prepare() && finder.FindNext(text, start)) {			
-					finder.GetLastMatch(pos, length);
-				}
-				start = pos + length;
-				finder.Expression = UNICODE_STRING_SIMPLE("\\sconst\\s+") + methodName + UNICODE_STRING_SIMPLE("\\s*=");
-			default:
-				break;
-		}
+			// method may return a reference (&)
+			finder.Expression = UNICODE_STRING_SIMPLE("\\sfunction\\s*(&\\s*)?") + methodName + UNICODE_STRING_SIMPLE("\\s*\\(");
+			break;
+		case ResourceClass::FUNCTION:
+
+			// function may return a reference (&)
+			finder.Expression = UNICODE_STRING_SIMPLE("\\sfunction\\s*(&\\s*)?") + className + UNICODE_STRING_SIMPLE("\\s*\\(");
+			break;
+		case ResourceClass::MEMBER:
+			//advance past the class header so that if  a variable with the same name exists we will skip it				:
+			finder.Expression = UNICODE_STRING_SIMPLE("\\sclass\\s+") + className + UNICODE_STRING_SIMPLE("\\s");
+			if (finder.Prepare() && finder.FindNext(text, start)) {			
+				finder.GetLastMatch(pos, length);
+			}
+			start = pos + length;
+			finder.Expression = UNICODE_STRING_SIMPLE("\\s((var)|(public)|(protected)|(private)).+") + methodName + UNICODE_STRING_SIMPLE(".*;");
+			break;
+		case ResourceClass::DEFINE:
+			finder.Expression = UNICODE_STRING_SIMPLE("\\sdefine\\(\\s*('|\")") + className + UNICODE_STRING_SIMPLE("('|\")");
+			break;
+		case ResourceClass::CLASS_CONSTANT:
+			//advance past the class header so that if  a variable with the same name exists we will skip it				:
+			finder.Expression = UNICODE_STRING_SIMPLE("\\sclass\\s+") + className + UNICODE_STRING_SIMPLE("\\s");
+			if (finder.Prepare() && finder.FindNext(text, start)) {			
+				finder.GetLastMatch(pos, length);
+			}
+			start = pos + length;
+			finder.Expression = UNICODE_STRING_SIMPLE("\\sconst\\s+") + methodName + UNICODE_STRING_SIMPLE("\\s*=");
+		default:
+			break;
 	}
 	if (finder.Prepare() && finder.FindNext(text, start) && finder.GetLastMatch(pos, length)) {
 		++pos; //eat the first space
@@ -208,7 +199,8 @@ bool mvceditor::ResourceFinderClass::GetResourceMatchPosition(size_t index, cons
 }
 
 bool mvceditor::ResourceFinderClass::Prepare(const wxString& resource) {
-	ParseGoToResource(resource);
+	ResourceType = ParseGoToResource(resource, FileName, ClassName, MethodName, LineNumber);
+
 	// maybe later do some error checking
 	return !resource.IsEmpty();
 }
@@ -527,18 +519,20 @@ mvceditor::ResourceFinderClass::ResourceTypes mvceditor::ResourceFinderClass::Ge
 	return ResourceType;
 }
 
-void mvceditor::ResourceFinderClass::ParseGoToResource(const wxString& resource) {
-	FileName = UNICODE_STRING_SIMPLE("");
-	ClassName = UNICODE_STRING_SIMPLE("");
-	MethodName = UNICODE_STRING_SIMPLE("");
-	LineNumber = 0;
+mvceditor::ResourceFinderClass::ResourceTypes mvceditor::ResourceFinderClass::ParseGoToResource(const wxString& resource, UnicodeString& fileName, 
+		UnicodeString& className, UnicodeString& methodName, int& lineNumber) {
+	fileName = UNICODE_STRING_SIMPLE("");
+	className = UNICODE_STRING_SIMPLE("");
+	methodName = UNICODE_STRING_SIMPLE("");
+	lineNumber = 0;
+	ResourceTypes resourceType = CLASS_NAME;
 
 	// :: => Class::method
 	int pos = resource.find(wxT("::"));
 	if (pos >= 0) {
-		ClassName = StringHelperClass::wxToIcu(resource.substr(0, pos));
-		MethodName = StringHelperClass::wxToIcu(resource.substr(pos + 2, -1));
-		ResourceType = CLASS_NAME_METHOD_NAME;
+		className = StringHelperClass::wxToIcu(resource.substr(0, pos));
+		methodName = StringHelperClass::wxToIcu(resource.substr(pos + 2, -1));
+		resourceType = CLASS_NAME_METHOD_NAME;
 	}
 	else {
 
@@ -548,24 +542,25 @@ void mvceditor::ResourceFinderClass::ParseGoToResource(const wxString& resource)
 			long int number;
 			wxString after = resource.substr(pos + 1, -1);
 			bool isNumber = after.ToLong(&number);
-			LineNumber = isNumber ? number : 0;
-			FileName = StringHelperClass::wxToIcu(resource.substr(0, pos));
-			ResourceType = FILE_NAME_LINE_NUMBER;
+			lineNumber = isNumber ? number : 0;
+			fileName = StringHelperClass::wxToIcu(resource.substr(0, pos));
+			resourceType = FILE_NAME_LINE_NUMBER;
 		}
 		else {
 
 			// class names can only have alphanumerics or underscores
 			int pos = resource.find_first_of(wxT("`!@#$%^&*()+={}|\\:;\"',./?"));
 			if (pos >= 0) {
-				FileName = StringHelperClass::wxToIcu(resource);
-				ResourceType = FILE_NAME;
+				fileName = StringHelperClass::wxToIcu(resource);
+				resourceType = FILE_NAME;
 			}
 			else {
-				ClassName = StringHelperClass::wxToIcu(resource);
-				ResourceType = CLASS_NAME;
+				className = StringHelperClass::wxToIcu(resource);
+				resourceType = CLASS_NAME;
 			}
 		}
 	}
+	return resourceType;
 }
 
 void mvceditor::ResourceFinderClass::BuildResourceCache(const wxString& fullPath, bool parseClasses) {
@@ -575,32 +570,21 @@ void mvceditor::ResourceFinderClass::BuildResourceCache(const wxString& fullPath
 	// have we looked at this file yet or is cache out of date? if not, then build the cache.
 	// we count the file as cached if (1) we have seen the file before (modified timestamp)
 	bool cached = false;
-	int fileItemIndex = -1;
-	for (size_t i = 0; i < FileCache.size(); ++i) {
-		if (FileCache[i].FullPath == fullPath) {
-			fileItemIndex = i;
-			bool modified = fileLastModifiedDateTime.IsLaterThan(FileCache[i].DateTime);
-			cached = !modified;
-			break;
-		}
-	}
-	FileItem fileItem;
 	bool filePreviouslyCached = false;
-	if (fileItemIndex > -1) {
-		FileCache[fileItemIndex].FullPath = fullPath;
+	int fileItemIndex = -1;
+	mvceditor::ResourceFinderClass::FileItem fileItem;
+	bool foundFile = FindInFileCache(fullPath, fileItemIndex, fileItem);
+	if (foundFile) {
+		bool modified = fileLastModifiedDateTime.IsLaterThan(fileItem.DateTime);
+		cached = !modified;
 		FileCache[fileItemIndex].DateTime = fileLastModifiedDateTime;
-		fileItem = FileCache[fileItemIndex];
 		filePreviouslyCached = true;
 	}
 	else {
-		fileItem.FullPath = fullPath;
-		fileItem.DateTime = fileLastModifiedDateTime;
-		fileItem.Parsed = false;
-		fileItem.IsNew = false;
-		fileItemIndex = FileCache.size();
-		FileCache.push_back(fileItem);
-		
+		fileItemIndex = PushIntoFileCache(fullPath, false, false);
+		FileCache[fileItemIndex].DateTime = fileLastModifiedDateTime;
 	}
+	fileItem = FileCache[fileItemIndex];
 	if (parseClasses) {
 		if (!cached || !fileItem.Parsed) {
 			FileCache[fileItemIndex].Parsed = true;
@@ -900,7 +884,11 @@ bool mvceditor::ResourceFinderClass::CollectFullyQualifiedResource() {
 
 void mvceditor::ResourceFinderClass::EnsureMatchesExist() {
 	std::vector<int> files;
-	for(std::vector<ResourceClass>::const_iterator it = Matches.begin(); it != Matches.end(); ++it) {
+	for(std::vector<ResourceClass>::iterator it = Matches.begin(); it != Matches.end(); ++it) {
+
+		// set the full path; initially the cache only holds the FileItemIndex to preserve space
+		// this is needed for ResourceClass::GetFullPath() to work as promised
+		it->FullPath = GetResourceMatchFullPathFromResource(*it);
 
 		// FileItemIndex is meaningless for dynamic resources
 		if (!it->IsDynamic) {
@@ -1040,6 +1028,72 @@ void mvceditor::ResourceFinderClass::AddDynamicResources(const std::vector<mvced
 	}
 }
 
+void mvceditor::ResourceFinderClass::UpdateResourcesFrom(const wxString& fullPath, const mvceditor::ResourceFinderClass& src) {
+	int fileItemIndex = -1;
+	mvceditor::ResourceFinderClass::FileItem fileItem;
+	
+	// check to see if we have cached the given file, if so then clear the file's resources
+	bool foundFile = FindInFileCache(fullPath, fileItemIndex, fileItem);
+	if (foundFile) {
+		RemoveCachedResources(fileItemIndex);
+	}
+
+	// now add the new resources from src
+	// we cannot copy them as is because FileCache indices may conflict
+	for (std::list<mvceditor::ResourceClass>::const_iterator it = src.ResourceCache.begin(); it != src.ResourceCache.end(); ++it) {
+		if (it->FileItemIndex >= 0 && it->FileItemIndex < (int)src.FileCache.size()) {
+			wxString resourceFullPath = src.FileCache[it->FileItemIndex].FullPath;
+			fileItemIndex = -1;
+			mvceditor::ResourceClass res = *it;
+			foundFile = FindInFileCache(resourceFullPath, fileItemIndex, fileItem);
+		
+			// resource comes from am known file; need to change the index 
+			if (foundFile) {				
+				res.FileItemIndex = fileItemIndex;
+			}
+			else {
+
+				// resource comes from a file that is not in this cache. need to add to the file cache 
+				int newFileItemIndex = PushIntoFileCache(src.FileCache[it->FileItemIndex].FullPath, src.FileCache[it->FileItemIndex].Parsed, src.FileCache[it->FileItemIndex].IsNew);
+				res.FileItemIndex = newFileItemIndex;
+			}
+
+			// put in the appropiate cache
+			ResourceCache.push_back(res);
+		}
+		else {
+			ResourceCache.push_back(*it);
+		}
+	}
+
+	// same thing for MembersCache
+	for (std::list<mvceditor::ResourceClass>::const_iterator it = src.MembersCache.begin(); it != src.MembersCache.end(); ++it) {
+		if (it->FileItemIndex >= 0 && it->FileItemIndex < (int)src.FileCache.size()) {
+			wxString resourceFullPath = src.FileCache[it->FileItemIndex].FullPath;
+			fileItemIndex = -1;
+			mvceditor::ResourceClass res = *it;
+			foundFile = FindInFileCache(resourceFullPath, fileItemIndex, fileItem);
+		
+			// resource comes from am known file; need to change the index 
+			if (foundFile) {				
+				res.FileItemIndex = fileItemIndex;
+			}
+			else {
+
+				// resource comes from a file that is not in this cache. need to add to the file cache 
+				int newFileItemIndex = PushIntoFileCache(src.FileCache[it->FileItemIndex].FullPath, src.FileCache[it->FileItemIndex].Parsed, src.FileCache[it->FileItemIndex].IsNew);
+				res.FileItemIndex = newFileItemIndex;
+			}
+
+			// put in the appropiate cache
+			MembersCache.push_back(res);
+		}
+		else {
+			MembersCache.push_back(*it);
+		}
+	}
+}
+
 void mvceditor::ResourceFinderClass::EnsureSorted() {
 	Matches.clear();
 	Matches.reserve(10);
@@ -1102,6 +1156,37 @@ void mvceditor::ResourceFinderClass::EnsureSorted() {
 	}
 }
 
+int mvceditor::ResourceFinderClass::PushIntoFileCache(const wxString& fullPath, bool isParsed, bool isNew) {
+	int newFileItemIndex = FileCache.size();
+	mvceditor::ResourceFinderClass::FileItem fileItem;
+	fileItem.FullPath = fullPath;
+	fileItem.Parsed = isParsed;
+	fileItem.IsNew = isNew;
+	FileCache.push_back(fileItem);
+	return newFileItemIndex;
+}
+
+bool mvceditor::ResourceFinderClass::FindInFileCache(const wxString& fullPath, int& fileItemIndex, mvceditor::ResourceFinderClass::FileItem& fileItem) const {
+	bool foundFile = false;
+	for (size_t i = 0; i < FileCache.size(); ++i) {
+		if (FileCache[i].FullPath == fullPath) {
+			fileItemIndex = i;
+			fileItem = FileCache[i];
+			foundFile = true;
+			break;
+		}
+	}
+	return foundFile;
+}
+
+std::vector<wxString> mvceditor::ResourceFinderClass::GetCachedFiles() const {
+	std::vector<wxString> files;
+	for (size_t i = 0; i < FileCache.size(); ++i) {
+		files.push_back(FileCache[i].FullPath);
+	}
+	return files;
+}
+
 mvceditor::ResourceClass::ResourceClass()
 	: Resource()
 	, Identifier()
@@ -1113,6 +1198,7 @@ mvceditor::ResourceClass::ResourceClass()
 	, IsPrivate(false) 
 	, IsStatic(false)
 	, IsDynamic(false)
+	, FullPath()
 	, FileItemIndex(-1) {
 		
 }
@@ -1124,6 +1210,7 @@ void mvceditor::ResourceClass::operator=(const ResourceClass& src) {
 	ReturnType = src.ReturnType;
 	Comment = src.Comment;
 	Type = src.Type;
+	FullPath = src.FullPath;
 	FileItemIndex = src.FileItemIndex;
 	IsProtected = src.IsProtected;
 	IsPrivate = src.IsPrivate;
@@ -1135,3 +1222,6 @@ bool mvceditor::ResourceClass::operator<(const mvceditor::ResourceClass& a) cons
 	return Identifier.caseCompare(a.Identifier, 0) < 0;
 }
 
+wxString mvceditor::ResourceClass::GetFullPath() const {
+	return FullPath;
+}

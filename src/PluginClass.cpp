@@ -48,9 +48,10 @@ void mvceditor::PluginClass::InitWindow(StatusBarWithGaugeClass* statusBarWithGa
 	MenuBar = menuBar;
 }
 
-void mvceditor::PluginClass::InitState(EnvironmentClass* environment, wxEvtHandler* appHandler) {
+void mvceditor::PluginClass::InitState(EnvironmentClass* environment, wxEvtHandler* appHandler, mvceditor::ResourceCacheClass* resourceCache) {
 	Environment = environment;
 	AppHandler = appHandler;
+	ResourceCache = resourceCache;
 }
 
 void mvceditor::PluginClass::SetProject(ProjectClass* project) {
@@ -70,6 +71,10 @@ mvceditor::NotebookClass* mvceditor::PluginClass::GetNotebook() const {
 
 mvceditor::EnvironmentClass* mvceditor::PluginClass::GetEnvironment() const {
 	return Environment;
+}
+
+mvceditor::ResourceCacheClass* mvceditor::PluginClass::GetResourceCache() const {
+	return ResourceCache;
 }
 
 void mvceditor::PluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {

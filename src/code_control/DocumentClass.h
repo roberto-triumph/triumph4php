@@ -164,9 +164,9 @@ class PhpDocumentClass : public wxEvtHandler, public TextDocumentClass {
 public:
 
 	/**
-	 * This class will NOT own this pointer. Caller must manage (delete) it.
+	 * This class will NOT own both of these pointer. Caller must manage (delete) it.
 	 */
-	PhpDocumentClass(ProjectClass* project, ResourceUpdateThreadClass* resourceUpdates);
+	PhpDocumentClass(ProjectClass* project, ResourceCacheClass* resourceCache);
 
 	~PhpDocumentClass();
 
@@ -245,7 +245,7 @@ private:
 	std::vector<wxString> CollectNearMatchKeywords(wxString word);
 
 	/**
-	 * This method will get called by the ResourceUpdates object when parsing of the
+	 * This method will get called by the ResourceCache object when parsing of the
 	 * code in this control has been completed.
 	 */
 	void OnResourceUpdateComplete(wxCommandEvent& event);
@@ -326,7 +326,7 @@ private:
 
 	/**
 	 * A unique string used to identify this code control. This string is used in conjunction with 
-	 * the ResourceUpdates object.
+	 * the ResourceCache object.
 	 */
 	wxString FileIdentifier;
 
@@ -339,7 +339,8 @@ private:
 	 * This object will be used to parse the resources of files that are currently open.
 	 * This class will NOT own this pointer
 	 */
-	ResourceUpdateThreadClass* ResourceUpdates;
+	ResourceCacheClass* ResourceCache;
+	ResourceCacheUpdateThreadClass ResourceCacheUpdateThread;
 
 	/**
 	 * The resource signature currently being displayed in the calltip.

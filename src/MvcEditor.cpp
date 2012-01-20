@@ -52,9 +52,7 @@ mvceditor::AppClass::AppClass()
 	, Environment()
 	, FrameworkDetector(*this)
 	, DatabaseDetector(*this)
-
-	// give this a different ID; dont need to handle the signals for now
-	, ResourceUpdates(*this, wxNewId())
+	, ResourceCache()
 	, Preferences(NULL)
 	, Project(NULL)
 	, ResourcePlugin(NULL)
@@ -75,7 +73,7 @@ bool mvceditor::AppClass::OnInit() {
 	// and only then can we load the keyboard shortcuts from the INI file
 	// all menu items must be present in the menu bar for shortcuts to take effect
 	Preferences = new PreferencesClass();
-	AppFrame = new mvceditor::AppFrameClass(Plugins, *this, Environment, *Preferences, ResourceUpdates);
+	AppFrame = new mvceditor::AppFrameClass(Plugins, *this, Environment, *Preferences, ResourceCache);
 	PluginWindows();
 
 	// load any settings from .INI files
@@ -83,7 +81,7 @@ bool mvceditor::AppClass::OnInit() {
 	Environment.LoadFromConfig();
 	wxConfigBase* config = wxConfigBase::Get();
 	for (size_t i = 0; i < Plugins.size(); ++i) {
-		Plugins[i]->InitState(&Environment, this);
+		Plugins[i]->InitState(&Environment, this, &ResourceCache);
 		Plugins[i]->LoadPreferences(config);
 		Plugins[i]->AddKeyboardShortcuts(Preferences->DefaultKeyboardShortcutCmds);
 	}	

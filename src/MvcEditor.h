@@ -185,7 +185,7 @@ private:
 	/**
 	 * This object will be used to parse the resources of files that are currently open.
 	 */
-	ResourceUpdateThreadClass ResourceUpdates;
+	ResourceCacheClass ResourceCache;
 
 	/**
 	 * The user preferences

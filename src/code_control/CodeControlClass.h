@@ -44,7 +44,7 @@ namespace mvceditor {
 // files is maded most plugins have to be re-compiled.
 class TextDocumentClass;
 class ProjectClass;
-class ResourceUpdateThreadClass;
+class ResourceCacheClass;
 
 
 /**
@@ -96,12 +96,12 @@ public:
 	 * Constructor. 
 	 * @param ProjectClass* Memory management of project is left to the caller of this method. project
 	 * CANNOT be NULL.
-	 * @param ResourceUpdateThreadClass* resourceUpdates can be null. if null, then code completion will not be
+	 * @param ResourceCacheClass* resourceUpdates can be null. if null, then code completion will not be
 	 *        functional.
 	 * 
 	 */
 	CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options, ProjectClass* project,
-					ResourceUpdateThreadClass* resourceUpdates,
+					ResourceCacheClass* resourceCache,
 	                 int id, const wxPoint& position =
 	                     wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0,
 	                 const wxString& name = wxT("code"));
@@ -444,7 +444,7 @@ private:
 	* This object will be used to parse the resources of files that are currently open.
 	* This class will NOT own this pointer.
 	*/
-	ResourceUpdateThreadClass* ResourceUpdates;
+	ResourceCacheClass* ResourceCache;
 
 	/**
 	  * To help with autocompletion and keywords. This object will NOT own this pointer

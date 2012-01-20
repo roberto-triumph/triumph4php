@@ -300,27 +300,19 @@ public:
 	 * @return wxString returns empty string on invalid index
 	 */
 	wxString GetResourceMatchFullPath(size_t index) const;
-
-	/**
-	 * Returns the full path to the given resource
-	 * 
-	 * @param resource a resource returned by one of the CollectXXX() methods OF THIS OBJECT.
-	 * @return wxString returns empty string on invalid resource
-	 */
-	wxString GetResourceMatchFullPathFromResource(const ResourceClass& resource) const;
 	
 	/**
-	 * Searches the given text for the position of the resource at index.  For example, if the resource matched 3 items
+	 * Searches the given text for the position of the given resource.  For example, if the resource matched 3 items
 	 * and this method is called with index=2, then text will be searched for resource 2 and will return the 
 	 * position of resource 2 in text
 	 * 
-	 * @param size_t index the index of the resource match to look for
+	 * @param resource the resource match to look for
 	 * @param UnicodeString text the text to look in
-	 * @param int32_t pos the position where resource starts
-	 * @param int32_t length the length of the resource
+	 * @param int32_t pos the position where resource starts [in the text]
+	 * @param int32_t length the length of the resource [in the text]
 	 * @return bool true if match was found in text
 	 */
-	bool GetResourceMatchPosition(size_t index, const UnicodeString& text, int32_t& pos, int32_t& length) const;
+	static bool GetResourceMatchPosition(const ResourceClass& resource, const UnicodeString& text, int32_t& pos, int32_t& length);
 	
 	/**
 	 * Returns the parsed class name
@@ -401,6 +393,12 @@ public:
 	void CopyResourcesFrom(const ResourceFinderClass& src);
 
 	/**
+	 * This method will remove all resources that were found in fileName, the add
+	 * all of the resources from the given finder.
+	 */
+	void UpdateResourcesFrom(const wxString& fullPath, const ResourceFinderClass& src);
+
+	/**
 	 * Adds any arbritary resource to the cache. This is tolerate of duplicates; in case a duplicate
 	 * of an existing resource is found, then the resource's attributes will be updated.
 	 * Equivalence between two resources is determined by comparing the resource's Resource member.
@@ -409,11 +407,40 @@ public:
 	void AddDynamicResources(const std::vector<ResourceClass>& dynamicResources);
 	
 	/**
-	 * Sorts the resources if they are not already sorted.
-	 * After sorting, we can perform binary searches on the list.
+	 * Sorts the resources if they are not already sorted. This is a relatively expensive operation.
+	 * After sorting, we calls to Collect* methods will be fast.
+	 * This method should be called once all files have been parsed. It is not necessary to call this;
+	 * but it may make sense to call it explicitly after parsing an entire project while the background thread
+	 * is still running (that way the caller can "control" that the sorting be done in the background thread).
+	 *
 	 * Also clears out all of the previous matches.
 	 */
 	void EnsureSorted();
+
+	/**
+	 * @return the list of file names  (full paths) of all of the files that have been parsed by this
+	 * object.
+	 */
+	std::vector<wxString> GetCachedFiles() const;
+
+	/**
+	 * Parses a resource string into its components: class name, file name, method name, line number
+	 * resource string is a string that contain a file name and line number or
+	 * class name or method name. Examples:
+	 * 
+	 * user.php //looks for the file named user.php
+	 * user.php:891 //looks for the file named user.php that has line 891
+	 * User //looks for a class named User
+	 * User::login //looks for a class named User that has a method called login
+	 * 
+	 * @param const wxString& resource the resource to look for
+	 * @param fileName if resource is a denifitely a file (name+ extension) this variable will be filled
+	 * @param className if resoruce is a class this variable will be filled
+	 * @param methodName if resource is a method name this variable will be filled
+	 * @param lineNumber if resource has a line number this variable will be filled
+	 */
+	static ResourceTypes ParseGoToResource(const wxString& resource, UnicodeString& fileName, UnicodeString& className, 
+		UnicodeString& methodName, int& lineNumber);
 	
 private:
 	
@@ -439,7 +466,13 @@ private:
 		bool Parsed;
 
 		/**
-		 * If TRUE, then this file is not yet written to disk
+		 * If TRUE, then this file is not yet written to disk (ie the resource only exists in memory
+		 * ( but not yet in the filesystem). This is needed because the finder will do
+		 * a sanity check to ensure that the file that contained a match still exists. Iif a file is deleted 
+		 * after a file was cached then we want to eliminate that match. But, this sanity checks would kill
+		 * matches that were a result of a manual call to BuildResourceCacheForFile. This flag ensures
+		 * proper operation (resources that were parsed from code that the user has typed in but no yet
+		 * saved are NOT removed).
 		 */
 		bool IsNew;
 	};
@@ -527,20 +560,6 @@ private:
 	bool IsCacheSorted;
 	
 	/**
-	 * Parses a resource string into its components: class name, file name, method name, line number
-	 * resource string is a string that contain a file name and line number or
-	 * class name or method name. Examples:
-	 * 
-	 * user.php //looks for the file named user.php
-	 * user.php:891 //looks for the file named user.php that has line 891
-	 * User //looks for a class named User
-	 * User::login //looks for a class named User that has a method called login
-	 * 
-	 * @param const wxString& resource the resource to look for
-	 */
-	void ParseGoToResource(const wxString& resource);
-	
-	/**
 	 * Goes through the given file and parses out resources.
 	 * 
 	 * @param wxString fullPath full path to the file to look at
@@ -604,6 +623,29 @@ private:
 	 */
 	void EnsureMatchesExist();
 
+	/**
+	 * Returns the full path to the given resource
+	 * 
+	 * @param resource a resource returned by one of the CollectXXX() methods OF THIS OBJECT.
+	 * @return wxString returns empty string on invalid resource
+	 */
+	wxString GetResourceMatchFullPathFromResource(const ResourceClass& resource) const;
+
+	/**
+	 * create a new entry in the file cache
+	 * @return the file item index of the new entry
+	 */
+	int PushIntoFileCache(const wxString& fullPath, bool isParsed, bool isNew);
+
+	/**
+	 * find the FileItem entry that has the given FullPath.
+	 * @param fullPath the full path to search for
+	 * @param fileItemIndex the index of the found item will be set here (if found)
+	 * @param fileItem the FileItem itself will be copied here (if found)
+	 * @return bool if TRUE it means that this ResourceFinder has encountered the given
+	 * file before.
+	 */
+	bool FindInFileCache(const wxString& fullPath, int& fileItemIndex, FileItem& fileItem) const;
 };
 
 /**
@@ -698,7 +740,18 @@ public:
 	 */
 	bool operator<(const ResourceClass& a) const;
 
+	/**
+	 * @return the full path where this resource is located.
+	 */
+	wxString GetFullPath() const;
+
 private:
+
+	/**
+	 * This will only be filled after a match occurs; in the cache we will just 
+	 * hold the file item index.
+	 */
+	wxString FullPath;
 
 	/**
 	 * The index to the file where this resource was found. 
@@ -706,7 +759,7 @@ private:
 	int FileItemIndex;
 	
 	/**
-	 * The resource finder class will populate FileItemIndex
+	 * The resource finder class will populate FileItemIndex and FullPat\h
 	 */
 	friend class ResourceFinderClass;
 };

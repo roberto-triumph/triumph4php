@@ -31,6 +31,14 @@
 #include <algorithm>
 #include <unicode/ustring.h>
 
+static const wxString PHP_KEYWORDS = wxString::FromAscii("php if else elseif do while for foreach switch "
+	  "case break continue default function return public private protected "
+	  "class interface extends implements static final const true false "
+	  "NULL global array echo empty eval exit isset list print unset __LINE__ "
+	  "__FILE__ __DIR__ __FUNCTION__ __CLASS__ __METHOD__ __NAMESPACE__ "
+	  "require require_once include include_once stdClass parent self abstract "
+	  "clone namespace use as new bool boolean float double real string int "
+	  "integer");
 
 // want to support both HTML4 and HTML5, using both sets of keywords.
 static const wxString HTML_TAG_NAMES = wxString::FromAscii(
@@ -246,7 +254,7 @@ void mvceditor::TextDocumentClass::DetachFromControl(wxStyledTextCtrl* ctrl) {
 
 }
 
-mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::ProjectClass* project, mvceditor::ResourceUpdateThreadClass* resourceUpdates)
+mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::ProjectClass* project, mvceditor::ResourceCacheClass* resourceCache)
 	: wxEvtHandler()
 	, TextDocumentClass()
 	, LanguageDiscovery()
@@ -258,7 +266,8 @@ mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::ProjectClass* project, 
 	, Timer()
 	, FileIdentifier()
 	, Project(project)
-	, ResourceUpdates(resourceUpdates)
+	, ResourceCache(resourceCache)
+	, ResourceCacheUpdateThread(resourceCache, *this)
 	, CurrentCallTipIndex(0)
 	, NeedToUpdateResources(false) 
 	, AreImagesRegistered(false) {
@@ -273,8 +282,8 @@ mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::ProjectClass* project, 
 
 mvceditor::PhpDocumentClass::~PhpDocumentClass() {
 	Timer.Stop();
-	if (ResourceUpdates) {
-		ResourceUpdates->Unregister(FileIdentifier);
+	if (ResourceCache) {
+		ResourceCache->Unregister(FileIdentifier);
 	}
 	
 }
@@ -400,7 +409,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionHtml(const UnicodeString& 
 }
 
 void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& code, wxString& completeStatus) {
-	if (!ResourceUpdates) {
+	if (!ResourceCache) {
 		return;
 	}
 	if (!AreImagesRegistered) {
@@ -417,9 +426,8 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 	if (!lastExpression.isEmpty()) {
 		Parser.ParseExpression(lastExpression, parsedExpression);
 		expressionScope = ScopeFinder.GetScopeString(code, expressionPos);
-		mvceditor::ResourceFinderClass* globalResourceFinder = Project->GetResourceFinder();
 		
-		ResourceUpdates->ExpressionCompletionMatches(FileIdentifier, parsedExpression, expressionScope, globalResourceFinder, 
+		ResourceCache->ExpressionCompletionMatches(FileIdentifier, parsedExpression, expressionScope,
 				variableMatches, AutoCompletionResourceMatches, doDuckTyping, error);
 		if (!variableMatches.empty()) {
 			for (size_t i = 0; i < variableMatches.size(); ++i) {
@@ -589,7 +597,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhpStatus(
 }
 
 void mvceditor::PhpDocumentClass::HandleCallTip(wxChar ch, bool force) {
-	if (!ResourceUpdates) {
+	if (!ResourceCache) {
 		return;
 	}
 	
@@ -642,8 +650,7 @@ void mvceditor::PhpDocumentClass::HandleCallTip(wxChar ch, bool force) {
 				UnicodeString className = matches[0].Resource;
 				wxString constructorResourceSearch = mvceditor::StringHelperClass::IcuToWx(className);
 				constructorResourceSearch += wxT("::");
-				mvceditor::ResourceFinderClass* globalResourceFinder = Project->GetResourceFinder();
-				std::vector<mvceditor::ResourceClass> matches = ResourceUpdates->PrepareAndCollectNearMatchResourcesFromAll(globalResourceFinder, constructorResourceSearch);
+				std::vector<mvceditor::ResourceClass> matches = ResourceCache->PrepareAndCollectNearMatchResourcesFromAll(constructorResourceSearch);
 				for (size_t i = 0; i < matches.size(); ++i) {
 					mvceditor::ResourceClass res = matches[i];
 					if (mvceditor::ResourceClass::METHOD == res.Type && UNICODE_STRING_SIMPLE("__construct") == res.Identifier) {
@@ -722,7 +729,6 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetCurrentSym
 	int currentPos = Ctrl->GetCurrentPos();
 	int endPos = Ctrl->WordEndPosition(currentPos, true);
 	
-	ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
 	UnicodeString code = GetSafeSubstring(0, endPos);
 	
 	std::vector<mvceditor::ResourceClass> matches;
@@ -733,13 +739,13 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetCurrentSym
 
 	UnicodeString lastExpression = lexer.LastExpression(code);
 	bool doDuckTyping = true;
-	if (!lastExpression.isEmpty()) {
+	if (ResourceCache && !lastExpression.isEmpty()) {
 		parser.ParseExpression(lastExpression, parsedExpression);
 		UnicodeString scopeString = scopeFinder.GetScopeString(code, endPos);
 
 		// for now do nothing with error
 		mvceditor::SymbolTableMatchErrorClass error;
-		ResourceUpdates->ResourceMatches(FileIdentifier, parsedExpression, scopeString, resourceFinder, matches, 
+		ResourceCache->ResourceMatches(FileIdentifier, parsedExpression, scopeString, matches, 
 			doDuckTyping, error);
 	}
 	return matches;
@@ -748,13 +754,13 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetCurrentSym
 void mvceditor::PhpDocumentClass::FileOpened(wxString fileName) {
 	
 	// in case the file name was changed and current file name is no  longer valid
-	ResourceUpdates->Unregister(FileIdentifier);
+	ResourceCache->Unregister(FileIdentifier);
 
 	// important to set the fileIdentifier to the name;
-	// the ResourceUpdates object will need to know what files are being edited so it can mark them as 'dirty'
+	// the ResourceCache object will need to know what files are being edited so it can mark them as 'dirty'
 	FileIdentifier = fileName;
 
-	ResourceUpdates->Register(FileIdentifier, this);
+	ResourceCache->Register(FileIdentifier);
 
 	// trigger the resource cache
 	// so that code completion works when the file is first opened
@@ -795,7 +801,7 @@ void mvceditor::PhpDocumentClass::MatchBraces(int posToCheck) {
 void mvceditor::PhpDocumentClass::OnKeyDown(wxKeyEvent& event) {
 
 	// if already parsing then dont do anything
-	if (!ResourceUpdates || ResourceUpdates->IsRunning()) {
+	if (!ResourceCache || ResourceCacheUpdateThread.IsRunning()) {
 		event.Skip();
 		return;
 	}
@@ -839,7 +845,6 @@ std::vector<wxString> mvceditor::PhpDocumentClass::CollectNearMatchKeywords(wxSt
 
 
 std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetSymbolAt(int posToCheck) {
-	ResourceFinderClass* resourceFinder = Project->GetResourceFinder();
 	UnicodeString code = GetSafeSubstring(0, posToCheck);
 	
 	std::vector<mvceditor::ResourceClass> matches;
@@ -857,7 +862,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetSymbolAt(i
 
 		// for now do nothing with error
 		mvceditor::SymbolTableMatchErrorClass error;
-		ResourceUpdates->ResourceMatches(FileIdentifier, parsedExpression, expressionScope, resourceFinder, matches, 
+		ResourceCache->ResourceMatches(FileIdentifier, parsedExpression, expressionScope, matches, 
 			doDuckTyping, error);
 	}
 	return matches;
@@ -909,12 +914,12 @@ void mvceditor::PhpDocumentClass::OnResourceUpdateComplete(wxCommandEvent& event
 }
 
 void mvceditor::PhpDocumentClass::OnTimer(wxTimerEvent& event) {
-	if (NeedToUpdateResources && ResourceUpdates && !ResourceUpdates->IsRunning()) {
+	if (NeedToUpdateResources && ResourceCache && !ResourceCacheUpdateThread.IsRunning()) {
 		UnicodeString text = GetSafeText();
 
 		// TODO: do we need to differentiate between new and opened files?
 		// (the 'true' arg)
-		ResourceUpdates->StartBackgroundUpdate(FileIdentifier, text, true);
+		ResourceCacheUpdateThread.StartBackgroundUpdate(FileIdentifier, text, true);
 
 		// even if thread could not be started just prevent re-parsing until user 
 		// modified the text
@@ -972,7 +977,7 @@ void mvceditor::PhpDocumentClass::OnAutoCompletionSelected(wxStyledTextEvent& ev
 }
 
 wxString mvceditor::PhpDocumentClass::GetPhpKeywords() const {
-	return Project->GetPhpKeywords();
+	return PHP_KEYWORDS;
 }
 wxString mvceditor::PhpDocumentClass::GetHtmlKeywords() const {
 	return HTML_TAG_NAMES + wxT(" ") + HTML_ATTRIBUTE_NAMES;

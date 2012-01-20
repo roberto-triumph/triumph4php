@@ -54,7 +54,7 @@ public:
 	 * This object will be used to parse the resources of files that are currently open.
 	 * This class will NOT own this pointer.
 	 */
-	ResourceUpdateThreadClass* ResourceUpdates;
+	ResourceCacheClass* ResourceCache;
 	
 	/**
 	 * Constructor. Parent is needed, all others are optional.
@@ -259,7 +259,7 @@ private:
 	 * This object will be used to publish app events. When an editor tab is closed;
 	 * we need to trigger project re-indexing since it has not been updated with
 	 * the changes made to the file that was opened (the parsed resources were being 
-	 * handled in a separate cache by ResourceUpdateThreadClass).
+	 * handled in a separate cache by ResourceCacheClass).
 	 */
 	wxEvtHandler* AppHandler;
 	

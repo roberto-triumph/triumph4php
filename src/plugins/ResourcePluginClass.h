@@ -56,30 +56,21 @@ public:
 	/**
 	 * prepare to iterate through the file that has the PHP native functions.
 	 *
-	 * @param existingFinder the existing resources
+	 * @param resourceCache the existing resources
 	 * @return bool false if native functions file does not exist
 	 */
-	bool InitForNativeFunctionsFile(const ResourceFinderClass& existingFinder);
+	bool InitForNativeFunctionsFile(ResourceCacheClass* resourceCache);
 
 	/**
 	 * prepare to iterate through all files of the given directory
 	 * that match the given wildcard.
 	 *
-	 * @param existingFinder the existing resources
+	 * @param resourceCache the existing resources
 	 * @param projectPath the directory to be scanned (recursively)
 	 * @param phpFileFilters the list of PHP file extensions to look for resources in
 	 * @return bool false if project root path does not exist
 	 */
-	bool InitForProject(const ResourceFinderClass& existingFinder, const wxString& projectPath, const std::vector<wxString>& phpFileFilters);
-
-	/**
-	 * Copies the resources that have been parsed by the background thread into dest.
-	 * Be sure to NOT call this while the background thread is running. Once the
-	 * EVENT_WORK_COMPLETE event is seen then this method is safe to call.
-	 *
-	 * @param dest the new resources that were parsed will go into dest.
-	 */
-	void GetNewResources(ResourceFinderClass& dest);
+	bool InitForProject(ResourceCacheClass* resourceCache, const wxString& projectPath, const std::vector<wxString>& phpFileFilters);
 
 protected:
 
@@ -96,9 +87,14 @@ protected:
 private:
 
 	/**
-	 * A copy of resources that only the background thread will write to.
+	 * The filters that match files to be parsed for resources.
 	 */
-	ResourceFinderClass NewResources;
+	std::vector<wxString> PhpFileFilters;
+
+	/**
+	 * the global cache; the parsed resources will be copied to this cache object
+	 */
+	ResourceCacheClass* ResourceCache;
 };
 	
 class ResourcePluginClass : public PluginClass {
@@ -158,7 +154,7 @@ private:
 	/**
 	 * Handle the results of the resource lookups.
 	 */
-	void ShowJumpToResults(const std::vector<mvceditor::ResourceClass>& matches);
+	void ShowJumpToResults(const wxString& finderQuery, const std::vector<mvceditor::ResourceClass>& matches);
 	
 	/**
 	 * Toggle various widgets on or off based on the application state. 
@@ -189,18 +185,11 @@ private:
 	 * Opens the page and sets the cursor on the function/method/property/file that was searched for by the
 	 * resource finder
 	 * 
-	 * @param ResourceFinderClass* will use this to set the cursor on the resource that was searched for
-	 * @param int resourceMatchIndex the index into the resource matches
+	 * @param finderQuery will be used to get the line number to scroll to
+	 * @param resource the resource to load
 	 */
-	void LoadPageFromResourceFinder(ResourceFinderClass* resourceFinder, int resourceMatchIndex);
+	void LoadPageFromResource(const wxString& finderQuery, const ResourceClass& resource);
 	
-	/**
-	 * Get the resource finder.  Do NOT delete the returned pointer.
-	 * 
-	 * @return ResourceFinderClass* 
-	 */
-	ResourceFinderClass* GetResourceFinder() const;
-
 	/**
 	* Returns true if files in the project have NOT already been cached by the resource finder. This does not
 	* necesaarily mean that the resource finder has parsed them; if so far all resource lookups have been for
@@ -211,7 +200,7 @@ private:
 	*
 	* @return bool
 	*/
-	bool NeedToIndex() const;
+	bool NeedToIndex(const wxString& finderQuery) const;
 	
 	/**
 	 * When user changes a page update the FilesCombo box on the ResourcePluginPanel
