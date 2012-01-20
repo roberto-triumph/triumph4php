@@ -250,6 +250,17 @@ void mvceditor::AppClass::ProjectOpen(const wxString& directoryPath) {
 			mvceditor::EditorLogError(mvceditor::BAD_PHP_EXECUTABLE, Environment.Php.PhpExecutablePath); 
 		}
 	}
+	else {
+
+		// still notify the plugins of the new project at program startup
+		AppFrame->OnProjectOpened(Project, this);
+		ProjectPlugin->SetProject(Project);
+		for (size_t i = 0; i < Plugins.size(); ++i) {
+			if (Plugins[i] != ProjectPlugin) {
+				Plugins[i]->SetProject(Project);
+			}
+		}
+	}
 }
 
 void mvceditor::AppClass::OnSavePreferences(wxCommandEvent& event) {
