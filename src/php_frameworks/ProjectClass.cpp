@@ -34,10 +34,10 @@
 
 mvceditor::DetectorClass::DetectorClass(wxEvtHandler& handler) 
 	: wxEvtHandler()
-	, Handler(handler)
 	, Error(NONE)
 	, ErrorMessage()
 	, Process(*this)
+	, Handler(handler)
 	, OutputFile()
 	, CurrentPid(0) {
 }

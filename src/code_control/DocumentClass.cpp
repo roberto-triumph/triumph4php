@@ -146,7 +146,7 @@ static const wxString CSS_PSEUDOCLASSES = wxString::FromAscii(
 
 static const wxString JAVASCRIPT_KEYWORDS = wxT("");
 
-static enum AutoCompletionImages {
+enum AutoCompletionImages {
 	AUTOCOMP_IMAGE_VARIABLE = 1,
 	AUTOCOMP_IMAGE_KEYWORD,
 	AUTOCOMP_IMAGE_FUNCTION,

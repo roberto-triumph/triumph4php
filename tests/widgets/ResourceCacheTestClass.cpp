@@ -86,10 +86,10 @@ public:
 		, GlobalCode()
 		, Code1()
 		, Code2()
+		, DoDuckTyping()
 		, ParsedExpression()
 		, VariableMatches()
 		, ResourceMatches()
-		, DoDuckTyping()
 		, Error()
 		, Search()
 		, PhpFileFilters() {
