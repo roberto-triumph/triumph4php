@@ -882,7 +882,10 @@ mvceditor::CodeControlClass::Mode mvceditor::CodeControlClass::GetDocumentMode()
 }
 
 void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
-
+	if (event.GetEventObject() != this) {
+		event.Skip();
+		return;
+	}
 	/*
 	 * do not use wxTipWindow 
 	 * there is a crash bug  with wxTipWindow

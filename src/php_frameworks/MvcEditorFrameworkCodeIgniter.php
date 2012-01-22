@@ -151,6 +151,7 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 	}
 	
 	private function coreResources($dir, $codeIgniterSystemDir, &$resources) {
+		$comment = '';
 		
 		// the core libraries are automatically added to the CI super object
 		foreach (glob($codeIgniterSystemDir . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . '*.php') as $libFile) {
@@ -159,10 +160,19 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 					&& 'Exceptions' != $baseName && 'Exceptions' != $baseName && 'Model' != $baseName) {
 				$propertyType = 'CI_' . $baseName;
 				$propertyName = strtolower($baseName);
-				$comment = '';
+				
 				$resources[] = MvcEditorResource::MakeProperty('CI_Controller', $propertyName, $propertyType, $comment);
 				$resources[] = MvcEditorResource::MakeProperty('CI_Model', $propertyName, $propertyType, $comment);
 			}
+		}
+		
+		// the DB library, this reqiures checking to see if active record is enabled
+		if (is_file($dir . '/application/config/database.php')) {
+			$db = array();
+			include ($dir . '/application/config/database.php');
+			$propertyType = isset($active_record) && $active_record ? 'CI_DB_active_record' : 'CI_DB_driver';
+			$resources[] = MvcEditorResource::MakeProperty('CI_Controller', 'db', $propertyType, $comment);
+			$resources[] = MvcEditorResource::MakeProperty('CI_Model', 'db', $propertyType, $comment);
 		}
 	}
 	
