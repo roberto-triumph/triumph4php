@@ -174,6 +174,11 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 			$resources[] = MvcEditorResource::MakeProperty('CI_Controller', 'db', $propertyType, $comment);
 			$resources[] = MvcEditorResource::MakeProperty('CI_Model', 'db', $propertyType, $comment);
 		}
+		
+		// alias the Loader library; seems that there is two properties
+		$resources[] = MvcEditorResource::MakeProperty('CI_Controller', 'load', 'CI_Loader', $comment);
+		$resources[] = MvcEditorResource::MakeProperty('CI_Model', 'load', 'CI_Loader', $comment);
+		
 	}
 	
 	private function libraryResources($dir, $codeIgniterSystemDir, &$resources) {
