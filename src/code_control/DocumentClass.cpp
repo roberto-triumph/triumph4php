@@ -31,14 +31,16 @@
 #include <algorithm>
 #include <unicode/ustring.h>
 
-static const wxString PHP_KEYWORDS = wxString::FromAscii("php if else elseif do while for foreach switch "
-	  "case break continue default function return public private protected "
-	  "class interface extends implements static final const true false "
-	  "NULL global array echo empty eval exit isset list print unset __LINE__ "
-	  "__FILE__ __DIR__ __FUNCTION__ __CLASS__ __METHOD__ __NAMESPACE__ "
-	  "require require_once include include_once stdClass parent self abstract "
-	  "clone namespace use as new bool boolean float double real string int "
-	  "integer");
+static const wxString PHP_KEYWORDS = wxString::FromAscii(
+	"php if else elseif do while for foreach switch "
+	"case break continue default function return public private protected "
+	"class interface extends implements static final const true false "
+	"NULL global array echo empty eval exit isset list print unset __LINE__ "
+	"__FILE__ __DIR__ __FUNCTION__ __CLASS__ __METHOD__ __NAMESPACE__ "
+	"require require_once include include_once stdClass parent self abstract "
+	"clone namespace use as new bool boolean float double real string int "
+	"integer var endif endwhile endfor endforeach endswitch "
+);
 
 // want to support both HTML4 and HTML5, using both sets of keywords.
 static const wxString HTML_TAG_NAMES = wxString::FromAscii(
@@ -953,6 +955,7 @@ void mvceditor::PhpDocumentClass::OnAutoCompletionSelected(wxStyledTextEvent& ev
 	if (!AutoCompletionResourceMatches.empty()) {
 		UnicodeString selected = mvceditor::StringHelperClass::wxToIcu(event.GetText());
 		
+		bool handled = false;
 		for (size_t i = 0; i < AutoCompletionResourceMatches.size(); ++i) {
 			mvceditor::ResourceClass res = AutoCompletionResourceMatches[i];
 			if (res.Identifier == selected) {
@@ -970,7 +973,26 @@ void mvceditor::PhpDocumentClass::OnAutoCompletionSelected(wxStyledTextEvent& ev
 				else {
 					Ctrl->ReplaceSelection(selected);
 				}
+				handled = true;
 				break;
+			}
+		}
+		if (!handled) {
+
+			// complete the PHP alternative syntax for control structures
+			// ie endif endwhile endfor endforeach endswitch
+			// Scintilla cannot handle semicolons in keywords; we will add the semicolon here
+			if (selected.caseCompare(UNICODE_STRING_SIMPLE("endif"), 0) == 0 ||
+				selected.caseCompare(UNICODE_STRING_SIMPLE("endwhile"), 0) == 0 ||
+				selected.caseCompare(UNICODE_STRING_SIMPLE("endfor"), 0) == 0 ||
+				selected.caseCompare(UNICODE_STRING_SIMPLE("endforeach"), 0) == 0 ||
+				selected.caseCompare(UNICODE_STRING_SIMPLE("endswitch"), 0) == 0) {
+				
+				Ctrl->AutoCompCancel();	
+				wxString selected = event.GetText();
+				int startPos = Ctrl->WordStartPosition(Ctrl->GetCurrentPos(), true);
+				Ctrl->SetSelection(startPos, Ctrl->GetCurrentPos());
+				Ctrl->ReplaceSelection(selected + wxT(";"));
 			}
 		}
 	}
