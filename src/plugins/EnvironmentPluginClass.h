@@ -31,7 +31,11 @@
 
 namespace mvceditor {
 	
-class EnvironmentDialogClass : public EnvironmentGeneratedDialogClass {
+/**
+ * Panel that shows the apache virtual host config. It will also
+ * have functionality to scan a directory for apache config files
+ */
+class ApacheEnvironmentPanelClass : public ApacheEnvironmentPanelGeneratedClass {
 
 protected:
 	// Handlers for EnvironmentGeneratedDialogClass events.
@@ -40,7 +44,7 @@ protected:
 
 public:
 	/** Constructor */
-	EnvironmentDialogClass(wxWindow* parent, EnvironmentClass& environment);
+	ApacheEnvironmentPanelClass(wxWindow* parent, EnvironmentClass& environment);
 
 private:
 	
@@ -69,10 +73,10 @@ private:
 	void OnIdle(wxIdleEvent& event);
 	
 	/**
-	 * Handle the file picker changed event.
+	 * When this panel is resized automatically re-adjust the wrapping the label 
 	 */
-	void OnPhpFileChanged(wxFileDirPickerEvent& event);
-	
+	void OnResize(wxSizeEvent& event);
+		
 	enum States {
 		FREE = 0,
 		SEARCHING,
@@ -84,6 +88,133 @@ private:
 	 * another thread. a whole new thread is not really warranted in this case.
 	 */
 	States State;
+	
+	DECLARE_EVENT_TABLE()
+};
+
+/**
+ * Panel that displays the configured web browser executable paths
+ */
+class WebBrowserEditPanelClass : public WebBrowserEditPanelGeneratedClass {
+
+public:
+
+	WebBrowserEditPanelClass(wxWindow* parent, EnvironmentClass& environment);
+	
+	/**
+	 * applies the settings that were changed to the Environment reference [given
+	 * in the constructor].
+	 */
+	void Apply();
+	
+protected:
+
+	/**
+	 * When this panel is resized automatically re-adjust the wrapping the label 
+	 */
+	void OnResize(wxSizeEvent& event);
+	
+	void OnRemoveSelectedWebBrowser(wxCommandEvent& event);
+	
+	void OnAddWebBrowser(wxCommandEvent& event);
+	
+	void OnEditSelectedWebBrowser(wxCommandEvent& event);
+	
+private:
+
+	/** 
+	 * The configuration class
+	 * 
+	 * @var EnvironmentClass
+	 */
+	EnvironmentClass& Environment;
+	
+	/**
+	 * The web browsers being modified. this is the map that is the recipient
+	 * of all of the user's operations; it will be copied only when the
+	 * user clicks OK.
+	 */
+	std::map<wxString, wxFileName> EditedWebBrowsers;
+};
+
+/**
+ * Panel that shows the PHP binary path locations
+ */
+class PhpEnvironmentPanelClass : public PhpEnvironmentPanelGeneratedClass {
+
+public:
+	
+	PhpEnvironmentPanelClass(wxWindow* parent, EnvironmentClass& environment);
+	
+protected:
+
+	/**
+	 * Handle the file picker changed event.
+	 */
+	void OnPhpFileChanged(wxFileDirPickerEvent& event);
+	
+	/**
+	 * When this panel is resized automatically re-adjust the wrapping the label 
+	 */
+	void OnResize(wxSizeEvent& event);
+	
+private:
+
+	/** 
+	 * The configuration class
+	 * 
+	 * @var EnvironmentClass
+	 */
+	EnvironmentClass& Environment;
+	
+};
+
+/**
+ * Dialog that allows the user to enter a web browser name and executable
+ * location 
+ */
+class WebBrowserCreateDialogClass : public WebBrowserCreateDialogGeneratedClass {
+	
+public:
+
+	WebBrowserCreateDialogClass(wxWindow* parent, std::map<wxString, wxFileName> existingBrowsers, 
+		wxString& name, wxFileName& webBrowserFileName);
+	
+protected:
+
+	void OnOkButton(wxCommandEvent& event);
+	
+	/** 
+	 * to prevent multiple browsers with the same name
+	 */
+	std::map<wxString, wxFileName> ExistingBrowsers;
+	
+	/**
+	 * to transfer the chosen file path
+	 */
+	wxFileName& WebBrowserFileName;
+	
+};
+
+class EnvironmentDialogClass : public wxPropertySheetDialog {
+
+public:
+
+	EnvironmentDialogClass(wxWindow* parent, EnvironmentClass& environment);
+	
+	/**
+	 * make sure the layout is refreshed; needed for the sizers to expand to their proper size
+	 */
+	void Prepare();
+	
+	/**
+	 * when user OKs the dialog transfer all data to the Environment data structure
+	 */
+	void OnOkButton(wxCommandEvent& event);
+	
+private:
+
+	WebBrowserEditPanelClass* WebBrowserPanel;
 	
 	DECLARE_EVENT_TABLE()
 };

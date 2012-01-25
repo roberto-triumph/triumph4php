@@ -23,19 +23,49 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <environment/EnvironmentClass.h>
-
+#include <wx/platinfo.h>
 #include <wx/confbase.h>
 
 mvceditor::EnvironmentClass::EnvironmentClass()
 		: Apache()
-		, Php() {
+		, Php()
+		, WebBrowsers() {
+	wxPlatformInfo info;
+	switch (info.GetOperatingSystemId()) {
+		case wxOS_UNIX_LINUX:
+			WebBrowsers[wxT("Mozilla Firefox")] = wxFileName(wxT("/usr/bin/firefox"));
+			WebBrowsers[wxT("Google Chrome")] = wxFileName(wxT("/usr/bin/google-chrome"));
+			WebBrowsers[wxT("Opera")] = wxFileName(wxT("/usr/bin/opera"));
+			break;
+		case wxOS_WINDOWS_NT:
+			WebBrowsers[wxT("Mozilla Firefox")] = wxFileName(wxT("C:\\Program Files\\Mozilla Firefox\\firefox.exe"));
+			WebBrowsers[wxT("Google Chrome")] = wxFileName(wxT("C:\\Program Files\\Google\\chrome.exe"));
+			WebBrowsers[wxT("Internet Explorer")] = wxFileName(wxT("C:\\Windows\\iexplore.exe"));
+			WebBrowsers[wxT("Opera")] = wxFileName(wxT("C:\\Program Files\\Opera\\Opera.exe"));
+			WebBrowsers[wxT("Safari")] = wxFileName(wxT("C:\\Program Files\\Safari\\Safari.exe"));
+			break;
+		default:
+			break;
+	}
 }
 
 mvceditor::EnvironmentClass::~EnvironmentClass() {
 }
 
 mvceditor::PhpEnvironmentClass::PhpEnvironmentClass() 
-	: PhpExecutablePath(wxT("php")) {
+	: PhpExecutablePath(wxT("")) {
+	wxPlatformInfo info;
+	switch (info.GetOperatingSystemId()) {
+		case wxOS_UNIX_LINUX:
+			PhpExecutablePath = wxT("php");
+			break;
+		case wxOS_WINDOWS_NT:
+			PhpExecutablePath = wxT("php-win.exe");
+			break;
+		default:
+			break;
+	}
+
 }
 
 void mvceditor::EnvironmentClass::LoadFromConfig() {
@@ -46,11 +76,41 @@ void mvceditor::EnvironmentClass::LoadFromConfig() {
 	if(!httpdPath.IsEmpty()) {
 		Apache.SetHttpdPath(httpdPath);
 	}
+	long index;
+	wxString groupName;
+	wxString oldPath = config->GetPath();
+	config->SetPath(wxT("Environment"));
+	bool found = config->GetFirstGroup(groupName, index);
+	if (found) {
+		
+		// only remove the defaults when the config file has something
+		WebBrowsers.clear();
+	}
+	while (found) {
+		if (groupName.Find(wxT("WebBrowser_")) >= 0) {
+			wxString key = groupName + wxT("/Name");
+			wxString browserName = config->Read(key);
+			key = groupName + wxT("/Path");
+			wxString browserPath = config->Read(key);
+			wxFileName browserFileName(browserPath);
+			WebBrowsers[browserName] = browserFileName;
+		}
+		found = config->GetNextGroup(groupName, index);
+	}
+	config->SetPath(oldPath);
 }
 
-void mvceditor::EnvironmentClass::SaveToConfig() {
+void mvceditor::EnvironmentClass::SaveToConfig() const {
 	wxConfigBase* config = wxConfigBase::Get();
 	config->Write(wxT("Environment/PhpExecutablePath"), Php.PhpExecutablePath);
 	config->Write(wxT("Environment/ApacheHttpdPath"), Apache.GetHttpdPath());
+	int i = 0;
+	for(std::map<wxString, wxFileName>::const_iterator it = WebBrowsers.begin(); it != WebBrowsers.end(); ++it) {
+		wxString key = wxString::Format(wxT("Environment/WebBrowser_%d/Name"), i);
+		config->Write(key, it->first);
+		key = wxString::Format(wxT("Environment/WebBrowser_%d/Path"), i);
+		config->Write(key, it->second.GetFullPath()); 
+		i++;
+	}
 	config->Flush();
 }

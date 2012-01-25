@@ -26,6 +26,7 @@
 #define __environmentclass__
 
 #include <environment/ApacheClass.h>
+#include <map>
 
 namespace mvceditor {
 
@@ -54,11 +55,18 @@ public:
 	ApacheClass Apache;
 	
 	PhpEnvironmentClass Php;
-
+	
+	/**
+	 * The list of web browsers used to launch when the user click Run On Web
+	 * The key is a human-friendly name, the value is the location to the web
+	 * browser executable.
+	 */
+	std::map<wxString, wxFileName> WebBrowsers;
+	
 	/**
 	 * Save the environment settings to the global config (wxConfigBase::Get())
 	 */
-	void SaveToConfig();
+	void SaveToConfig() const;
 
 	/**
 	 * Get the environment settings from the global config (wxConfigBase::Get())

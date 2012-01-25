@@ -26,28 +26,17 @@
 #include <widgets/NonEmptyTextValidatorClass.h>
 #include <wx/filename.h>
 #include <wx/string.h>
+#include <wx/valgen.h>
 
-
-BEGIN_EVENT_TABLE(mvceditor::EnvironmentDialogClass, EnvironmentGeneratedDialogClass)
-	EVT_IDLE(mvceditor::EnvironmentDialogClass::OnIdle)
-	EVT_FILEPICKER_CHANGED(ID_PHP_FILE, mvceditor::EnvironmentDialogClass::OnPhpFileChanged)
-END_EVENT_TABLE()
-
-BEGIN_EVENT_TABLE(mvceditor::EnvironmentPluginClass, wxEvtHandler) 
-	EVT_MENU(mvceditor::MENU_ENVIRONMENT, mvceditor::EnvironmentPluginClass::OnMenuEnvironment)
-END_EVENT_TABLE()
-
-mvceditor::EnvironmentDialogClass::EnvironmentDialogClass(wxWindow* parent, EnvironmentClass& environment)
-	: EnvironmentGeneratedDialogClass(parent)
+mvceditor::ApacheEnvironmentPanelClass::ApacheEnvironmentPanelClass(wxWindow* parent, EnvironmentClass& environment)
+	: ApacheEnvironmentPanelGeneratedClass(parent)
 	, Environment(environment)
 	, DirectorySearch()
 	, State(FREE) {
-	NonEmptyTextValidatorClass phpExecutableValidator(&environment.Php.PhpExecutablePath, PhpLabel);
-	PhpExecutable->SetValidator(phpExecutableValidator);
 	Populate();
 }
 
-void mvceditor::EnvironmentDialogClass::OnScanButton(wxCommandEvent& event) {
+void mvceditor::ApacheEnvironmentPanelClass::OnScanButton(wxCommandEvent& event) {
 	if (FREE == State) {
 		Gauge->Show();
 		wxString path = ApacheConfigurationDirectory->GetPath();
@@ -73,13 +62,7 @@ void mvceditor::EnvironmentDialogClass::OnScanButton(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::EnvironmentDialogClass::OnOkButton(wxCommandEvent& event) {
-	if (Validate() && TransferDataFromWindow()) {
-		EndModal(wxOK);
-	}
-}
-
-void mvceditor::EnvironmentDialogClass::Populate() {
+void mvceditor::ApacheEnvironmentPanelClass::Populate() {
 	wxString configFile = Environment.Apache.GetHttpdPath();
 	wxString results;
 
@@ -107,7 +90,7 @@ void mvceditor::EnvironmentDialogClass::Populate() {
 	VirtualHostResults->SetValue(results);
 }
 
-void mvceditor::EnvironmentDialogClass::OnIdle(wxIdleEvent& event) {
+void mvceditor::ApacheEnvironmentPanelClass::OnIdle(wxIdleEvent& event) {
 	switch (State) {
 		case FREE:
 			break;
@@ -141,8 +124,218 @@ void mvceditor::EnvironmentDialogClass::OnIdle(wxIdleEvent& event) {
 	}
 }
 
-void mvceditor::EnvironmentDialogClass::OnPhpFileChanged(wxFileDirPickerEvent& event) {
+void mvceditor::ApacheEnvironmentPanelClass::OnResize(wxSizeEvent& event) {
+	if (GetContainingSizer() && HelpText->GetContainingSizer()) {
+		HelpText->Wrap(event.GetSize().GetX());
+		HelpText->GetContainingSizer()->Layout();
+		GetContainingSizer()->Layout();
+		Refresh();
+	}
+	event.Skip();
+}
+
+mvceditor::PhpEnvironmentPanelClass::PhpEnvironmentPanelClass(wxWindow* parent, mvceditor::EnvironmentClass& environment)
+	: PhpEnvironmentPanelGeneratedClass(parent)
+	, Environment(environment) {
+	NonEmptyTextValidatorClass phpExecutableValidator(&environment.Php.PhpExecutablePath, PhpLabel);
+	PhpExecutable->SetValidator(phpExecutableValidator);
+}
+
+
+void mvceditor::PhpEnvironmentPanelClass::OnPhpFileChanged(wxFileDirPickerEvent& event) {
 	PhpExecutable->SetValue(event.GetPath());
+}
+
+void mvceditor::PhpEnvironmentPanelClass::OnResize(wxSizeEvent& event) {
+	if (GetContainingSizer() && HelpText->GetContainingSizer()) {
+		HelpText->Wrap(event.GetSize().GetX());
+		HelpText->GetContainingSizer()->Layout();
+		GetContainingSizer()->Layout();
+		Refresh();
+	}
+	event.Skip();
+}
+
+mvceditor::EnvironmentDialogClass::EnvironmentDialogClass(wxWindow* parent, mvceditor::EnvironmentClass& environment) 
+	: wxPropertySheetDialog(parent, wxID_ANY, _("Environment"), wxDefaultPosition, wxDefaultSize, 
+		wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER) {
+	CreateButtons(wxOK | wxCANCEL);
+	wxBookCtrlBase* notebook = GetBookCtrl();
+	
+	// make it so that no other preference dialogs have to explictly call Transfer methods
+	notebook->SetExtraStyle(wxWS_EX_VALIDATE_RECURSIVELY);	
+	wxPanel* panel = new mvceditor::PhpEnvironmentPanelClass(notebook, environment);
+	notebook->AddPage(panel, _("PHP"));
+	panel = new mvceditor::ApacheEnvironmentPanelClass(notebook, environment);
+	notebook->AddPage(panel, _("Apache"));
+	WebBrowserPanel = new mvceditor::WebBrowserEditPanelClass(notebook, environment);
+	notebook->AddPage(WebBrowserPanel, _("Web Browsers"));
+}
+
+void mvceditor::EnvironmentDialogClass::Prepare() {
+	GetBookCtrl()->InitDialog();
+	LayoutDialog();
+}
+
+void mvceditor::EnvironmentDialogClass::OnOkButton(wxCommandEvent& event) {
+	wxBookCtrlBase* book = GetBookCtrl();
+	if (Validate() && book->Validate() && TransferDataFromWindow() && book->TransferDataFromWindow()) {
+		WebBrowserPanel->Apply();
+		EndModal(wxOK);
+	}
+}
+
+mvceditor::WebBrowserEditPanelClass::WebBrowserEditPanelClass(wxWindow* parent, mvceditor::EnvironmentClass& environment)
+	: WebBrowserEditPanelGeneratedClass(parent)
+	, Environment(environment) 
+	, EditedWebBrowsers(environment.WebBrowsers) {
+	BrowserList->ClearAll();
+	BrowserList->InsertColumn(0, _("Web Browser Label"));
+	BrowserList->InsertColumn(1, _("Web Browser Path"));
+	std::map<wxString, wxFileName>::const_iterator it = EditedWebBrowsers.begin();
+	int newRowNumber = 0;
+	for (; it != EditedWebBrowsers.end(); ++it) {
+		
+		// list ctrl is tricky, for columns we must insertItem() then setItem() for the next columns
+		wxListItem nameItem;
+		nameItem.SetColumn(0);
+		nameItem.SetId(newRowNumber);
+		nameItem.SetText(it->first);
+		BrowserList->InsertItem(nameItem);
+		
+		wxListItem webBrowserItem;
+		webBrowserItem.SetId(newRowNumber);
+		webBrowserItem.SetColumn(1);
+		webBrowserItem.SetText(it->second.GetFullPath());
+		BrowserList->SetItem(webBrowserItem);
+
+		newRowNumber++;
+	}
+	BrowserList->SetColumnWidth(0, wxLIST_AUTOSIZE);
+	BrowserList->SetColumnWidth(1, wxLIST_AUTOSIZE);
+}
+
+void mvceditor::WebBrowserEditPanelClass::OnResize(wxSizeEvent& event) {
+	if (GetContainingSizer() && HelpText->GetContainingSizer()) {
+		HelpText->Wrap(event.GetSize().GetX());
+		HelpText->GetContainingSizer()->Layout();
+		GetContainingSizer()->Layout();
+		Refresh();
+	}
+	event.Skip();
+}
+
+void mvceditor::WebBrowserEditPanelClass::OnAddWebBrowser(wxCommandEvent& event) {
+	wxString name;
+	wxFileName webBrowserPath; 
+	mvceditor::WebBrowserCreateDialogClass dialog(this, EditedWebBrowsers, name, webBrowserPath);
+	if (wxOK == dialog.ShowModal()) {
+		int newRowNumber = BrowserList->GetItemCount();
+		wxListItem infoNameColumn;
+		infoNameColumn.SetColumn(0);
+		infoNameColumn.SetText(name);
+		infoNameColumn.SetId(newRowNumber);
+		BrowserList->InsertItem(infoNameColumn);
+		
+		wxListItem infoPathColumn;
+		infoPathColumn.SetColumn(1);
+		infoPathColumn.SetId(newRowNumber);
+		infoPathColumn.SetText(webBrowserPath.GetFullPath());
+		BrowserList->SetItem(infoPathColumn);
+		BrowserList->SetColumnWidth(0, wxLIST_AUTOSIZE);
+		BrowserList->SetColumnWidth(1, wxLIST_AUTOSIZE);
+		
+		EditedWebBrowsers[name] = webBrowserPath;
+	}
+}
+
+void mvceditor::WebBrowserEditPanelClass::OnRemoveSelectedWebBrowser(wxCommandEvent& event) {
+	int selected = BrowserList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (selected >= 0) {
+		wxListItem item;
+		item.SetColumn(0);
+		item.SetId(selected);
+		if (BrowserList->GetItem(item)) {
+			wxString name = item.GetText();
+			std::map<wxString, wxFileName>::iterator it = EditedWebBrowsers.find(name);
+			if  (it != EditedWebBrowsers.end()) {
+				EditedWebBrowsers.erase(it);
+			}
+			BrowserList->DeleteItem(selected);
+		}
+	}
+	else {
+		wxMessageBox(_("No browsers were selected. Please select a web browser to remove."));
+	}
+}
+
+void mvceditor::WebBrowserEditPanelClass::OnEditSelectedWebBrowser(wxCommandEvent& event) {
+	int selected = BrowserList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (selected >= 0) { 
+		wxListItem nameItem,
+			webBrowserPathItem;
+		nameItem.SetColumn(0);
+		nameItem.SetId(selected);
+		webBrowserPathItem.SetColumn(1);
+		webBrowserPathItem.SetId(selected);
+		if (BrowserList->GetItem(nameItem) && BrowserList->GetItem(webBrowserPathItem)) {
+			wxString oldName = nameItem.GetText();
+			wxFileName webBrowserPath(webBrowserPathItem.GetText());
+			wxString newName = oldName;
+			mvceditor::WebBrowserCreateDialogClass dialog(this, EditedWebBrowsers, newName, webBrowserPath);
+			if (wxOK == dialog.ShowModal()) {
+				BrowserList->SetItem(selected, 0, newName);
+				BrowserList->SetItem(selected, 1, webBrowserPath.GetFullPath());
+				
+				// remove the old name since name may have been changed
+				std::map<wxString, wxFileName>::iterator it = EditedWebBrowsers.find(oldName);
+				if  (it != EditedWebBrowsers.end()) {
+					EditedWebBrowsers.erase(it);
+				}
+				EditedWebBrowsers[newName] = webBrowserPath;
+			}
+		}
+	}
+	else {
+		wxMessageBox(_("No browsers were selected. Please select a web browser to edit."));
+	}
+}
+
+void mvceditor::WebBrowserEditPanelClass::Apply() {
+	Environment.WebBrowsers = EditedWebBrowsers;
+}
+
+mvceditor::WebBrowserCreateDialogClass::WebBrowserCreateDialogClass(wxWindow* parent, 
+		std::map<wxString, wxFileName> existingBrowsers, wxString& name, wxFileName& webBrowserFileName)
+	: WebBrowserCreateDialogGeneratedClass(parent) 
+	, ExistingBrowsers(existingBrowsers)
+	, WebBrowserFileName(webBrowserFileName) {
+	wxGenericValidator nameValidator(&name);
+	WebBrowserLabel->SetValidator(nameValidator);
+	WebBrowserPath->SetPath(webBrowserFileName.GetFullPath());
+	WebBrowserLabel->SetFocus();
+}
+
+void mvceditor::WebBrowserCreateDialogClass::OnOkButton(wxCommandEvent& event) {
+	if (Validate()) {
+		wxString newName = WebBrowserLabel->GetValue();
+		if (newName.IsEmpty()) {
+			wxMessageBox(_("Please enter a friendly name for this browser"));
+			return;
+		}
+		if (ExistingBrowsers.find(newName) != ExistingBrowsers.end()) {
+			wxMessageBox(_("Please enter a name that is unique to this browser"));
+			return;
+		}
+		wxString path = WebBrowserPath->GetPath();
+		if (!wxFileName::FileExists(path)) {
+			wxMessageBox(_("Please enter a valid file name for this browser"));
+			return;
+		}
+		TransferDataFromWindow();
+		WebBrowserFileName.Assign(path);
+		EndModal(wxOK);
+	}	
 }
 
 mvceditor::EnvironmentPluginClass::EnvironmentPluginClass()
@@ -155,7 +348,8 @@ void mvceditor::EnvironmentPluginClass::AddProjectMenuItems(wxMenu* projectMenu)
 
 void mvceditor::EnvironmentPluginClass::OnMenuEnvironment(wxCommandEvent& event) {
 	EnvironmentClass* environment = GetEnvironment();
-	EnvironmentDialogClass dialog(GetMainWindow(), *environment);
+	mvceditor::EnvironmentDialogClass dialog(GetMainWindow(), *environment);
+	dialog.Prepare();
 	if (wxOK == dialog.ShowModal()) {
 		environment->SaveToConfig();
 	}
@@ -166,3 +360,16 @@ void mvceditor::EnvironmentPluginClass::AddKeyboardShortcuts(std::vector<Dynamic
 	menuItemIds[mvceditor::MENU_ENVIRONMENT] = wxT("Environment-Configure Environment");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
+
+
+BEGIN_EVENT_TABLE(mvceditor::ApacheEnvironmentPanelClass, ApacheEnvironmentPanelGeneratedClass)
+	EVT_IDLE(mvceditor::ApacheEnvironmentPanelClass::OnIdle)
+END_EVENT_TABLE()
+
+BEGIN_EVENT_TABLE(mvceditor::EnvironmentPluginClass, wxEvtHandler) 
+	EVT_MENU(mvceditor::MENU_ENVIRONMENT, mvceditor::EnvironmentPluginClass::OnMenuEnvironment)
+END_EVENT_TABLE()
+
+BEGIN_EVENT_TABLE(mvceditor::EnvironmentDialogClass, wxDialog) 
+	EVT_BUTTON(wxID_OK, mvceditor::EnvironmentDialogClass::OnOkButton) 	
+END_EVENT_TABLE()
