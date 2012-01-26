@@ -28,36 +28,83 @@
 #include <wx/string.h>
 #include <wx/valgen.h>
 
+mvceditor::ApacheFileReaderClass::ApacheFileReaderClass(wxEvtHandler& handler)
+	: BackgroundFileReaderClass(handler)
+	, ApacheResults() {
+}
+
+bool mvceditor::ApacheFileReaderClass::Init(const wxString& startDirectory) {
+	return BackgroundFileReaderClass::Init(startDirectory);
+}
+
+mvceditor::ApacheClass mvceditor::ApacheFileReaderClass::Results() const {
+	return ApacheResults;
+}
+
+bool mvceditor::ApacheFileReaderClass::FileMatch(const wxString& file) {
+	return true;
+}
+
+bool mvceditor::ApacheFileReaderClass::FileRead(mvceditor::DirectorySearchClass& search) {
+	bool ret = false;
+	if (search.Walk(ApacheResults)) {
+		ret = true;
+	}
+	if (!search.More()) {
+		
+		// when we are done recursing, parse the matched files
+		std::vector<wxString> possibleConfigFiles = search.GetMatchedFiles();
+		
+		// there may be multiple files, at this point just print out the number of defined virtual hosts
+		for (size_t i = 0; i <  possibleConfigFiles.size(); ++i) {
+			
+			// as soon as we find one exit
+			if (ApacheResults.SetHttpdPath(possibleConfigFiles[i])) {
+				break;
+			}
+		}
+	}
+	return ret;
+}
+
 mvceditor::ApacheEnvironmentPanelClass::ApacheEnvironmentPanelClass(wxWindow* parent, EnvironmentClass& environment)
 	: ApacheEnvironmentPanelGeneratedClass(parent)
 	, Environment(environment)
-	, DirectorySearch()
-	, State(FREE) {
+	, ApacheFileReader(*this) {
 	Populate();
 }
 
 void mvceditor::ApacheEnvironmentPanelClass::OnScanButton(wxCommandEvent& event) {
-	if (FREE == State) {
-		Gauge->Show();
+	if (!ApacheFileReader.IsRunning()) {
 		wxString path = ApacheConfigurationDirectory->GetPath();
 		wxChar ch = wxFileName::GetPathSeparator();
-		if (!path.EndsWith(&ch)) {
+		if (path[path.Length() - 1] != ch) {
 			path.Append(ch);
 		}
-		if (DirectorySearch.Init(path)) {
-			State = SEARCHING;
-			wxWakeUpIdle();
+		mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
+		if (ApacheFileReader.Init(path) && ApacheFileReader.StartReading(error)) {
+			ScanButton->SetLabel(_("Stop Scan"));
+			Gauge->Show();
 		}
 		else {
-			wxMessageBox(_("Path not valid"), _("Configuration Not Found"), wxOK | wxCENTRE, this);
+			switch (error) {
+			case mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING:
+				wxMessageBox(_("Scanner is already running"), _("Configuration Not Found"), wxOK | wxCENTRE, this);
+				break;
+			case mvceditor::BackgroundFileReaderClass::NO_RESOURCES:
+				wxMessageBox(_("System is low on resources.  Try again later."), _("Configuration Not Found"), wxOK | wxCENTRE, this);
+				break;
+			default:
+				wxMessageBox(_("Path not valid"), _("Configuration Not Found"), wxOK | wxCENTRE, this);
+				break;
+			}
 		}
-		ScanButton->SetLabel(_("Stop Scan"));
 	}
 	else {
 		
 		// act like a stop button
-		State = FREE;
 		Gauge->SetValue(0);
+		ApacheFileReader.StopReading();
 		ScanButton->SetLabel(_("Scan For Configuration"));
 	}
 }
@@ -90,38 +137,16 @@ void mvceditor::ApacheEnvironmentPanelClass::Populate() {
 	VirtualHostResults->SetValue(results);
 }
 
-void mvceditor::ApacheEnvironmentPanelClass::OnIdle(wxIdleEvent& event) {
-	switch (State) {
-		case FREE:
-			break;
-		case SEARCHING:
-			for (int i = 0; i < 100; ++i) {
-				if (DirectorySearch.More()) {
-					DirectorySearch.Walk(Environment.Apache);
-				}
-				if (!DirectorySearch.More()) {
-					State = OPENING_FILE;
-					break;
-				}
-			}
-			event.RequestMore();
-			Gauge->Pulse();
-			break;
-		case OPENING_FILE:
-			std::vector<wxString> matchedFiles = DirectorySearch.GetMatchedFiles();
-			bool found = false;
-			for (size_t i = 0; i < matchedFiles.size(); ++i) {
-				if (Environment.Apache.SetHttpdPath(matchedFiles[i])) {
-					found = true;
-					break;
-				}
-			}
-			State = FREE;
-			Gauge->SetValue(0);
-			ScanButton->SetLabel(_("Scan For Configuration"));
-			Populate();
-			break;
-	}
+void mvceditor::ApacheEnvironmentPanelClass::OnWorkComplete(wxCommandEvent& event) {
+	Gauge->SetValue(0);
+	ScanButton->SetLabel(_("Scan For Configuration"));
+		
+	Environment.Apache = ApacheFileReader.Results();
+	Populate();
+}
+
+void mvceditor::ApacheEnvironmentPanelClass::OnWorkInProgress(wxCommandEvent& event) {
+	Gauge->Pulse();
 }
 
 void mvceditor::ApacheEnvironmentPanelClass::OnResize(wxSizeEvent& event) {
@@ -363,7 +388,8 @@ void mvceditor::EnvironmentPluginClass::AddKeyboardShortcuts(std::vector<Dynamic
 
 
 BEGIN_EVENT_TABLE(mvceditor::ApacheEnvironmentPanelClass, ApacheEnvironmentPanelGeneratedClass)
-	EVT_IDLE(mvceditor::ApacheEnvironmentPanelClass::OnIdle)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ApacheEnvironmentPanelClass::OnWorkComplete)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ApacheEnvironmentPanelClass::OnWorkInProgress)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::EnvironmentPluginClass, wxEvtHandler) 

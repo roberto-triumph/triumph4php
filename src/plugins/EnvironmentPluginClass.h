@@ -26,10 +26,45 @@
 #define __environmentpluginclass__
 
 #include <PluginClass.h>
+#include <plugins/BackgroundFileReaderClass.h>
 #include <environment/EnvironmentClass.h>
 #include <plugins/wxformbuilder/EnvironmentGeneratedDialogClass.h>
 
 namespace mvceditor {
+	
+/**
+ * A small class that will search for the Apache config files
+ * in a background thread.
+ */
+class ApacheFileReaderClass : public BackgroundFileReaderClass {
+
+public:
+	
+	ApacheFileReaderClass(wxEvtHandler& handler);
+	
+	/**
+	 * setup the background thread (does not start the thread)
+	 * @param startDirectory the directory to start looking in
+	 */
+	bool Init(const wxString& startDirectory); 
+	
+	/**
+	 * after EVENT_COMPLETE has been sent, the handler can use this method
+	 * to get the results of the apache config search & parsing
+	 */
+	ApacheClass Results() const;
+	
+protected:
+
+		bool FileMatch(const wxString& file);
+		
+		bool FileRead(DirectorySearchClass& search);
+		
+private:
+
+	ApacheClass ApacheResults;
+
+};
 	
 /**
  * Panel that shows the apache virtual host config. It will also
@@ -56,38 +91,29 @@ private:
 	EnvironmentClass& Environment;
 	
 	/**
-	 * Used to recurse through file system directories.
-	 * 
-	 * @var DirectorySearch
+	 * To look for apache config files in the background
 	 */
-	DirectorySearchClass DirectorySearch;
+	ApacheFileReaderClass ApacheFileReader;
 	
 	/**
 	 * populate the dialog according to the ApacheClass settings
 	 */
-	void Populate();
-	
-	/**
-	 * When idle and user clicked the search button, do the search
-	 */
-	void OnIdle(wxIdleEvent& event);
+	void OnWorkComplete(wxCommandEvent& event);
 	
 	/**
 	 * When this panel is resized automatically re-adjust the wrapping the label 
 	 */
 	void OnResize(wxSizeEvent& event);
-		
-	enum States {
-		FREE = 0,
-		SEARCHING,
-		OPENING_FILE
-	};
 	
 	/**
-	 * The current state.  We will be searching through directories in the same main application thread instead of
-	 * another thread. a whole new thread is not really warranted in this case.
+	 * tick the gauge here
 	 */
-	States State;
+	void OnWorkInProgress(wxCommandEvent& event);
+	
+	/**
+	 * Fills in the dialogs based on the Apache environment
+	 */
+	void Populate();
 	
 	DECLARE_EVENT_TABLE()
 };
