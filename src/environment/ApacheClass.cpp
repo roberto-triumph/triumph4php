@@ -60,11 +60,16 @@ Include conf/vhosts/ *.conf
 */
 
 mvceditor::ApacheClass::ApacheClass()
-	: VirtualHostMappings()
+	: ManualConfiguration(false)
+	, VirtualHostMappings()
 	, HttpdPath()
 	, ServerRoot()
 	, DocumentRoot()
 	, Port(0) { 
+}
+
+void mvceditor::ApacheClass::ClearMappings() {
+	VirtualHostMappings.clear();
 }
 
 bool mvceditor::ApacheClass::Walk(const wxString& file) {
@@ -74,11 +79,11 @@ bool mvceditor::ApacheClass::Walk(const wxString& file) {
 }
 
 bool mvceditor::ApacheClass::SetHttpdPath(const wxString& httpdPath) {
-	if (Walk(httpdPath)) {
+	HttpdPath = httpdPath;
+	if (!ManualConfiguration && Walk(httpdPath)) {
 		VirtualHostMappings.clear();
 		
 		// get the virtual hosts from the file
-		HttpdPath = httpdPath;
 		ServerRoot = wxT("");
 		DocumentRoot.Clear();
 		Port = 0;
@@ -88,15 +93,30 @@ bool mvceditor::ApacheClass::SetHttpdPath(const wxString& httpdPath) {
 	return false;
 }
 
-void mvceditor::ApacheClass::SetVirtualHostMapping(wxString fileSystemPath, wxString hostName) {
+void mvceditor::ApacheClass::SetVirtualHostMapping(const wxString& fileSystemPath, wxString hostName) {
 	if (!hostName.EndsWith(wxT("/"))) {
 		hostName += wxT("/");
+	}
+	if (!hostName.StartsWith(wxT("http://")) && !hostName.StartsWith(wxT("https://"))) {
+		hostName = wxT("http://") + hostName;
 	}
 	wxFileName filename;
 	filename.AssignDir(fileSystemPath);
 
 	// when inserting into the map, normalize the host document root
-	VirtualHostMappings[filename.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME)] = wxT("http://") + hostName;
+	VirtualHostMappings[filename.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME)] = hostName;
+}
+
+void mvceditor::ApacheClass::RemoveVirtualHostMapping(const wxString& fileSystemPath) {
+	
+	// normalize just like the SetVirtualHostMapping() method 
+	wxFileName filename;
+	filename.AssignDir(fileSystemPath);
+	
+	std::map<wxString, wxString>::iterator it = VirtualHostMappings.find(filename.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME));
+	if (it != VirtualHostMappings.end()) {
+		VirtualHostMappings.erase(it);
+	}
 }
 
 wxString mvceditor::ApacheClass::GetUrl(const wxString& fileSystemPath) const {

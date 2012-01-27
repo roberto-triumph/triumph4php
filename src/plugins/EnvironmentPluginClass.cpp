@@ -28,12 +28,81 @@
 #include <wx/string.h>
 #include <wx/valgen.h>
 
+/**
+ * A helper function to add a row into a list control. list control must have 2 columns
+ * 
+ * @param list the list to add to
+ * @param column1Value the value for column 1 
+ * @param column2Value the value for column 2
+ */
+void ListCtrlAdd(wxListCtrl* list, const wxString& column1Value, const wxString& column2Value) {
+	int newRowNumber = list->GetItemCount();
+	
+	// list ctrl is tricky, for columns we must insertItem() then setItem() for the next columns
+	wxListItem column1;
+	column1.SetColumn(0);
+	column1.SetId(newRowNumber);
+	column1.SetText(column1Value);
+	list->InsertItem(column1);
+	
+	wxListItem column2;
+	column2.SetId(newRowNumber);
+	column2.SetColumn(1);
+	column2.SetText(column2Value);
+	list->SetItem(column2);
+}
+
+/**
+ * A helper function to edit a list control row's contents
+ * 
+ * @param list the list to add to
+ * @param column1Value the new value for column 1 
+ * @param column2Value the new value for column 2
+ * @param rowIndex 0-based into of row to change
+ */
+void ListCtrlEdit(wxListCtrl* list, const wxString& column1Value, const wxString& column2Value, int rowIndex) {
+	wxListItem column1;
+	column1.SetColumn(0);
+	column1.SetId(rowIndex);
+	column1.SetText(column1Value);
+	list->SetItem(column1);
+	
+	wxListItem column2;
+	column2.SetId(rowIndex);
+	column2.SetColumn(1);
+	column2.SetText(column2Value);
+	list->SetItem(column2);
+}
+
+/**
+ * extract the column values from the given list control
+ * @param list the list to extract from
+ * @param column1Value will be filled with the contents of (rowIndex, 0)
+ * @param column2Value will be filled with the contents of (rowIndex, 1)
+ * @param rowIndex the row to get
+ */
+void ListCtrlGet(wxListCtrl* list, wxString& column1Value, wxString& column2Value, int rowIndex) {
+	wxListItem column1,
+		column2;
+	column1.SetColumn(0);
+	column1.SetId(rowIndex);
+	column2.SetColumn(1);
+	column2.SetId(rowIndex);
+	if (list->GetItem(column1) && list->GetItem(column2)) {
+		column1Value = column1.GetText();
+		column2Value = column2.GetText();
+	}
+}
+
+
 mvceditor::ApacheFileReaderClass::ApacheFileReaderClass(wxEvtHandler& handler)
 	: BackgroundFileReaderClass(handler)
 	, ApacheResults() {
 }
 
 bool mvceditor::ApacheFileReaderClass::Init(const wxString& startDirectory) {
+	ApacheResults.ManualConfiguration = false;
+	ApacheResults.ClearMappings();
 	return BackgroundFileReaderClass::Init(startDirectory);
 }
 
@@ -70,7 +139,19 @@ bool mvceditor::ApacheFileReaderClass::FileRead(mvceditor::DirectorySearchClass&
 mvceditor::ApacheEnvironmentPanelClass::ApacheEnvironmentPanelClass(wxWindow* parent, EnvironmentClass& environment)
 	: ApacheEnvironmentPanelGeneratedClass(parent)
 	, Environment(environment)
-	, ApacheFileReader(*this) {
+	, ApacheFileReader(*this)
+	, EditedApache() {
+	EditedApache = environment.Apache;
+	wxGenericValidator manualValidator(&EditedApache.ManualConfiguration);	
+	Manual->SetValidator(manualValidator);
+	
+	VirtualHostList->ClearAll();
+	VirtualHostList->InsertColumn(0, _("Root Directory"));
+	VirtualHostList->InsertColumn(1, _("Host Name"));
+	
+	// in case there are no virtual hosts still properly show the columns 
+	VirtualHostList->SetColumnWidth(0, 250);
+	VirtualHostList->SetColumnWidth(1, 250);
 	Populate();
 }
 
@@ -83,6 +164,7 @@ void mvceditor::ApacheEnvironmentPanelClass::OnScanButton(wxCommandEvent& event)
 		}
 		mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
 		if (ApacheFileReader.Init(path) && ApacheFileReader.StartReading(error)) {
+			VirtualHostList->DeleteAllItems();
 			ScanButton->SetLabel(_("Stop Scan"));
 			Gauge->Show();
 		}
@@ -110,38 +192,30 @@ void mvceditor::ApacheEnvironmentPanelClass::OnScanButton(wxCommandEvent& event)
 }
 
 void mvceditor::ApacheEnvironmentPanelClass::Populate() {
-	wxString configFile = Environment.Apache.GetHttpdPath();
+	wxString configFile = EditedApache.GetHttpdPath();
 	wxString results;
 
 	// configFile is a full file name, extract the path
 	wxFileName fileName(configFile);
 	ApacheConfigurationDirectory->SetPath(fileName.GetPath(true));
-	if (!Environment.Apache.GetDocumentRoot().IsEmpty()) {
-		results += wxT("Document Root:") + Environment.Apache.GetDocumentRoot() + wxT("\n");
+	std::map<wxString, wxString> mappings = EditedApache.GetVirtualHostMappings();
+	std::map<wxString, wxString>::const_iterator it;
+	for (it = mappings.begin(); it != mappings.end(); ++it) {
+		ListCtrlAdd(VirtualHostList, it->first, it->second);
 	}
-	if (Environment.Apache.GetListenPort() > 0) {
-		results += wxString::Format(wxT("Listen Port: %d\n"), Environment.Apache.GetListenPort());
-	}
-	std::map<wxString, wxString> virtualHosts = Environment.Apache.GetVirtualHostMappings();
-	results += wxT("-----------------------------------------------------\n");
-	if (0 >= virtualHosts.size()) {
-		results += wxT("No virtual hosts. Will use localhost.");
-	}
-	else {
-		for (std::map<wxString, wxString>::iterator it = virtualHosts.begin(); it != virtualHosts.end(); ++it) {
-			results += wxT("Server Name: ") + it->second +
-			wxT("\nDocument Root: ") + it->first +
-			wxT("\n-----------------------------------------------------\n");
-		}
-	}
-	VirtualHostResults->SetValue(results);
+	VirtualHostList->SetColumnWidth(0, wxLIST_AUTOSIZE);
+	VirtualHostList->SetColumnWidth(1, wxLIST_AUTOSIZE);
 }
 
 void mvceditor::ApacheEnvironmentPanelClass::OnWorkComplete(wxCommandEvent& event) {
 	Gauge->SetValue(0);
 	ScanButton->SetLabel(_("Scan For Configuration"));
 		
-	Environment.Apache = ApacheFileReader.Results();
+	mvceditor::ApacheClass newSettings = ApacheFileReader.Results();
+	
+	// setting the HTTPD path will reparse the file ... for now
+	// this is OK
+	EditedApache.SetHttpdPath(newSettings.GetHttpdPath());
 	Populate();
 }
 
@@ -157,6 +231,99 @@ void mvceditor::ApacheEnvironmentPanelClass::OnResize(wxSizeEvent& event) {
 		Refresh();
 	}
 	event.Skip();
+}
+
+void mvceditor::ApacheEnvironmentPanelClass::OnAddButton(wxCommandEvent& event) {
+	wxFileName rootDirectory;
+	wxString hostName; 
+	mvceditor::VirtualHostCreateDialogClass dialog(this, EditedApache.GetVirtualHostMappings(), hostName, rootDirectory);
+	if (wxOK == dialog.ShowModal()) {
+		ListCtrlAdd(VirtualHostList, rootDirectory.GetFullPath(), hostName);
+		VirtualHostList->SetColumnWidth(0, wxLIST_AUTOSIZE);
+		VirtualHostList->SetColumnWidth(1, wxLIST_AUTOSIZE);
+		
+		EditedApache.SetVirtualHostMapping(rootDirectory.GetFullPath(), hostName);
+	}
+}
+
+void mvceditor::ApacheEnvironmentPanelClass::OnUpdateUi(wxUpdateUIEvent& event) {
+	bool enableButtons = Manual->GetValue();
+	RemoveButton->Enable(enableButtons);
+	EditButton->Enable(enableButtons);
+	AddButton->Enable(enableButtons);
+	
+	// scan button is only for automatic configuration mode
+	ScanButton->Enable(!enableButtons);
+	ApacheConfigurationDirectory->Enable(!enableButtons);
+	event.Skip();
+}
+
+void mvceditor::ApacheEnvironmentPanelClass::OnEditButton(wxCommandEvent& event) {
+	int selected = VirtualHostList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (selected >= 0) {
+		wxString oldRootDirectory,
+			oldHostName;
+		ListCtrlGet(VirtualHostList, oldRootDirectory, oldHostName, selected);
+		wxString newHostName = oldHostName;
+		wxFileName newRootDirectory(oldRootDirectory);
+		mvceditor::VirtualHostCreateDialogClass dialog(this, EditedApache.GetVirtualHostMappings(), newHostName, newRootDirectory);
+		if (wxOK == dialog.ShowModal()) {
+			ListCtrlEdit(VirtualHostList, newRootDirectory.GetFullPath(), newHostName, selected);
+			VirtualHostList->SetColumnWidth(0, wxLIST_AUTOSIZE);
+			VirtualHostList->SetColumnWidth(1, wxLIST_AUTOSIZE);
+		
+			// in case the root directory changes
+			EditedApache.RemoveVirtualHostMapping(oldRootDirectory);
+			EditedApache.SetVirtualHostMapping(newRootDirectory.GetFullPath(), newHostName);
+		}
+	}
+}
+
+void mvceditor::ApacheEnvironmentPanelClass::OnRemoveButton(wxCommandEvent& event) {
+	int selected = VirtualHostList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (selected >= 0) {
+		wxString oldRootDirectory,
+			oldHostName;
+		ListCtrlGet(VirtualHostList, oldRootDirectory, oldHostName, selected);
+		VirtualHostList->DeleteItem(selected);		
+		EditedApache.RemoveVirtualHostMapping(oldRootDirectory);
+	}
+}
+
+void mvceditor::ApacheEnvironmentPanelClass::Apply() {
+	Environment.Apache = EditedApache;
+}
+
+void mvceditor::ApacheEnvironmentPanelClass::OnDirChanged(wxFileDirPickerEvent& event) {
+	if (!ApacheFileReader.IsRunning()) {
+		wxString path = ApacheConfigurationDirectory->GetPath();
+		wxChar ch = wxFileName::GetPathSeparator();
+		if (path[path.Length() - 1] != ch) {
+			path.Append(ch);
+		}
+		mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
+		if (ApacheFileReader.Init(path) && ApacheFileReader.StartReading(error)) {
+			VirtualHostList->DeleteAllItems();
+			ScanButton->SetLabel(_("Stop Scan"));
+			Gauge->Show();
+		}
+		else {
+			switch (error) {
+			case mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING:
+				wxMessageBox(_("Scanner is already running"), _("Configuration Not Found"), wxOK | wxCENTRE, this);
+				break;
+			case mvceditor::BackgroundFileReaderClass::NO_RESOURCES:
+				wxMessageBox(_("System is low on resources.  Try again later."), _("Configuration Not Found"), wxOK | wxCENTRE, this);
+				break;
+			default:
+				wxMessageBox(_("Path not valid"), _("Configuration Not Found"), wxOK | wxCENTRE, this);
+				break;
+			}
+		}
+	}
+	else {
+		wxMessageBox(_("Scan is already running. Stop and restart the scan so that the new directory can be scanned."));
+	}	
 }
 
 mvceditor::PhpEnvironmentPanelClass::PhpEnvironmentPanelClass(wxWindow* parent, mvceditor::EnvironmentClass& environment)
@@ -182,23 +349,25 @@ void mvceditor::PhpEnvironmentPanelClass::OnResize(wxSizeEvent& event) {
 }
 
 mvceditor::EnvironmentDialogClass::EnvironmentDialogClass(wxWindow* parent, mvceditor::EnvironmentClass& environment) 
-	: wxPropertySheetDialog(parent, wxID_ANY, _("Environment"), wxDefaultPosition, wxDefaultSize, 
-		wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER) {
-	CreateButtons(wxOK | wxCANCEL);
-	wxBookCtrlBase* notebook = GetBookCtrl();
+	: Environment(environment) {	
 	
 	// make it so that no other preference dialogs have to explictly call Transfer methods
-	notebook->SetExtraStyle(wxWS_EX_VALIDATE_RECURSIVELY);	
-	wxPanel* panel = new mvceditor::PhpEnvironmentPanelClass(notebook, environment);
+	SetExtraStyle(wxWS_EX_VALIDATE_RECURSIVELY);
+	
+	// the following calls must be executed in the following order
+	// we need to set the style BEFORE calling Create(); that's why parent class constructor
+	// is not in the initializer list
+	SetSheetStyle(wxPROPSHEET_DEFAULT);
+	Create(parent, wxID_ANY, _("Environment"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);
+	CreateButtons(wxOK | wxCANCEL);
+	
+	wxBookCtrlBase* notebook = GetBookCtrl();
+	wxPanel* panel = new mvceditor::PhpEnvironmentPanelClass(notebook, Environment);
 	notebook->AddPage(panel, _("PHP"));
-	panel = new mvceditor::ApacheEnvironmentPanelClass(notebook, environment);
-	notebook->AddPage(panel, _("Apache"));
-	WebBrowserPanel = new mvceditor::WebBrowserEditPanelClass(notebook, environment);
+	ApacheEnvironmentPanel = new mvceditor::ApacheEnvironmentPanelClass(notebook, Environment);
+	notebook->AddPage(ApacheEnvironmentPanel, _("Apache"));
+	WebBrowserPanel = new mvceditor::WebBrowserEditPanelClass(notebook, Environment);
 	notebook->AddPage(WebBrowserPanel, _("Web Browsers"));
-}
-
-void mvceditor::EnvironmentDialogClass::Prepare() {
-	GetBookCtrl()->InitDialog();
 	LayoutDialog();
 }
 
@@ -206,6 +375,7 @@ void mvceditor::EnvironmentDialogClass::OnOkButton(wxCommandEvent& event) {
 	wxBookCtrlBase* book = GetBookCtrl();
 	if (Validate() && book->Validate() && TransferDataFromWindow() && book->TransferDataFromWindow()) {
 		WebBrowserPanel->Apply();
+		ApacheEnvironmentPanel->Apply();
 		EndModal(wxOK);
 	}
 }
@@ -217,24 +387,13 @@ mvceditor::WebBrowserEditPanelClass::WebBrowserEditPanelClass(wxWindow* parent, 
 	BrowserList->ClearAll();
 	BrowserList->InsertColumn(0, _("Web Browser Label"));
 	BrowserList->InsertColumn(1, _("Web Browser Path"));
+	
+	// in case there are no configured browsers still properly show the columns 
+	BrowserList->SetColumnWidth(0, 250);
+	BrowserList->SetColumnWidth(1, 250);
 	std::map<wxString, wxFileName>::const_iterator it = EditedWebBrowsers.begin();
-	int newRowNumber = 0;
 	for (; it != EditedWebBrowsers.end(); ++it) {
-		
-		// list ctrl is tricky, for columns we must insertItem() then setItem() for the next columns
-		wxListItem nameItem;
-		nameItem.SetColumn(0);
-		nameItem.SetId(newRowNumber);
-		nameItem.SetText(it->first);
-		BrowserList->InsertItem(nameItem);
-		
-		wxListItem webBrowserItem;
-		webBrowserItem.SetId(newRowNumber);
-		webBrowserItem.SetColumn(1);
-		webBrowserItem.SetText(it->second.GetFullPath());
-		BrowserList->SetItem(webBrowserItem);
-
-		newRowNumber++;
+		ListCtrlAdd(BrowserList, it->first, it->second.GetFullPath());
 	}
 	BrowserList->SetColumnWidth(0, wxLIST_AUTOSIZE);
 	BrowserList->SetColumnWidth(1, wxLIST_AUTOSIZE);
@@ -255,18 +414,7 @@ void mvceditor::WebBrowserEditPanelClass::OnAddWebBrowser(wxCommandEvent& event)
 	wxFileName webBrowserPath; 
 	mvceditor::WebBrowserCreateDialogClass dialog(this, EditedWebBrowsers, name, webBrowserPath);
 	if (wxOK == dialog.ShowModal()) {
-		int newRowNumber = BrowserList->GetItemCount();
-		wxListItem infoNameColumn;
-		infoNameColumn.SetColumn(0);
-		infoNameColumn.SetText(name);
-		infoNameColumn.SetId(newRowNumber);
-		BrowserList->InsertItem(infoNameColumn);
-		
-		wxListItem infoPathColumn;
-		infoPathColumn.SetColumn(1);
-		infoPathColumn.SetId(newRowNumber);
-		infoPathColumn.SetText(webBrowserPath.GetFullPath());
-		BrowserList->SetItem(infoPathColumn);
+		ListCtrlAdd(BrowserList, name, webBrowserPath.GetFullPath());
 		BrowserList->SetColumnWidth(0, wxLIST_AUTOSIZE);
 		BrowserList->SetColumnWidth(1, wxLIST_AUTOSIZE);
 		
@@ -296,28 +444,23 @@ void mvceditor::WebBrowserEditPanelClass::OnRemoveSelectedWebBrowser(wxCommandEv
 
 void mvceditor::WebBrowserEditPanelClass::OnEditSelectedWebBrowser(wxCommandEvent& event) {
 	int selected = BrowserList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-	if (selected >= 0) { 
-		wxListItem nameItem,
-			webBrowserPathItem;
-		nameItem.SetColumn(0);
-		nameItem.SetId(selected);
-		webBrowserPathItem.SetColumn(1);
-		webBrowserPathItem.SetId(selected);
-		if (BrowserList->GetItem(nameItem) && BrowserList->GetItem(webBrowserPathItem)) {
-			wxString oldName = nameItem.GetText();
-			wxFileName webBrowserPath(webBrowserPathItem.GetText());
+	if (selected >= 0) {
+		wxString oldName,
+			oldWebBrowserPath;
+		ListCtrlGet(BrowserList, oldName, oldWebBrowserPath, selected);
+		if (!oldName.IsEmpty() && !oldWebBrowserPath.IsEmpty()) {
 			wxString newName = oldName;
-			mvceditor::WebBrowserCreateDialogClass dialog(this, EditedWebBrowsers, newName, webBrowserPath);
+			wxFileName newWebBrowserPath(oldWebBrowserPath);
+			mvceditor::WebBrowserCreateDialogClass dialog(this, EditedWebBrowsers, newName, newWebBrowserPath);
 			if (wxOK == dialog.ShowModal()) {
-				BrowserList->SetItem(selected, 0, newName);
-				BrowserList->SetItem(selected, 1, webBrowserPath.GetFullPath());
+				ListCtrlEdit(BrowserList, newName, newWebBrowserPath.GetFullPath(), selected);
 				
 				// remove the old name since name may have been changed
 				std::map<wxString, wxFileName>::iterator it = EditedWebBrowsers.find(oldName);
 				if  (it != EditedWebBrowsers.end()) {
 					EditedWebBrowsers.erase(it);
 				}
-				EditedWebBrowsers[newName] = webBrowserPath;
+				EditedWebBrowsers[newName] = newWebBrowserPath;
 			}
 		}
 	}
@@ -363,6 +506,38 @@ void mvceditor::WebBrowserCreateDialogClass::OnOkButton(wxCommandEvent& event) {
 	}	
 }
 
+mvceditor::VirtualHostCreateDialogClass::VirtualHostCreateDialogClass(wxWindow* parent, 
+		std::map<wxString, wxString> existingVirtualHosts, wxString& hostName, wxFileName& rootDirectory)
+	: VirtualHostCreateDialogGeneratedClass(parent)
+	, ExistingVirtualHosts(existingVirtualHosts)
+	, RootDirectoryFileName(rootDirectory) {
+	wxGenericValidator nameValidator(&hostName);
+	Hostname->SetValidator(nameValidator);
+	RootDirectory->SetPath(RootDirectoryFileName.GetFullPath());
+	RootDirectory->SetFocus();
+}
+
+void mvceditor::VirtualHostCreateDialogClass::OnOkButton(wxCommandEvent& event) {
+	if (Validate()) {
+		wxString newRootPath = RootDirectory->GetPath();
+		if (newRootPath.IsEmpty()) {
+			wxMessageBox(_("Please enter a root directory"));
+			return;
+		}
+		if (ExistingVirtualHosts.find(newRootPath) != ExistingVirtualHosts.end()) {
+			wxMessageBox(_("Please enter a root directory that is unique."));
+			return;
+		}
+		if  (!wxFileName::DirExists(newRootPath)) {
+			wxMessageBox(_("Root directory must be a directory and must be acccessible."));
+			return;
+		}
+		TransferDataFromWindow();
+		RootDirectoryFileName.Assign(newRootPath);
+		EndModal(wxOK);
+	}
+}
+
 mvceditor::EnvironmentPluginClass::EnvironmentPluginClass()
 	: PluginClass() {
 }
@@ -374,7 +549,6 @@ void mvceditor::EnvironmentPluginClass::AddProjectMenuItems(wxMenu* projectMenu)
 void mvceditor::EnvironmentPluginClass::OnMenuEnvironment(wxCommandEvent& event) {
 	EnvironmentClass* environment = GetEnvironment();
 	mvceditor::EnvironmentDialogClass dialog(GetMainWindow(), *environment);
-	dialog.Prepare();
 	if (wxOK == dialog.ShowModal()) {
 		environment->SaveToConfig();
 	}

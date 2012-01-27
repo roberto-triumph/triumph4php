@@ -10,7 +10,6 @@
 ///////////////////////////////////////////////////////////////////////////
 
 BEGIN_EVENT_TABLE( WebBrowserEditPanelGeneratedClass, wxPanel )
-	EVT_SIZE( WebBrowserEditPanelGeneratedClass::_wxFB_OnResize )
 	EVT_BUTTON( ID_REMOVE_BROWSER, WebBrowserEditPanelGeneratedClass::_wxFB_OnRemoveSelectedWebBrowser )
 	EVT_BUTTON( ID_EDITSELECTEDWEBBROWSER, WebBrowserEditPanelGeneratedClass::_wxFB_OnEditSelectedWebBrowser )
 	EVT_BUTTON( ID_ADD_BROWSER, WebBrowserEditPanelGeneratedClass::_wxFB_OnAddWebBrowser )
@@ -75,6 +74,8 @@ WebBrowserEditPanelGeneratedClass::WebBrowserEditPanelGeneratedClass( wxWindow* 
 	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	BrowserList = new wxListCtrl( this, ID_BROWSERLIST, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_VRULES );
+	BrowserList->SetMinSize( wxSize( -1,250 ) );
+	
 	GridSizer->Add( BrowserList, 1, wxALL|wxEXPAND, 5 );
 	
 	FlexSizer->Add( GridSizer, 3, wxEXPAND, 5 );
@@ -83,6 +84,7 @@ WebBrowserEditPanelGeneratedClass::WebBrowserEditPanelGeneratedClass( wxWindow* 
 	
 	this->SetSizer( BodyBoxSizer );
 	this->Layout();
+	BodyBoxSizer->Fit( this );
 }
 
 WebBrowserEditPanelGeneratedClass::~WebBrowserEditPanelGeneratedClass()
@@ -90,8 +92,12 @@ WebBrowserEditPanelGeneratedClass::~WebBrowserEditPanelGeneratedClass()
 }
 
 BEGIN_EVENT_TABLE( ApacheEnvironmentPanelGeneratedClass, wxPanel )
-	EVT_SIZE( ApacheEnvironmentPanelGeneratedClass::_wxFB_OnResize )
+	EVT_UPDATE_UI( wxID_ANY, ApacheEnvironmentPanelGeneratedClass::_wxFB_OnUpdateUi )
+	EVT_DIRPICKER_CHANGED( wxID_ANY, ApacheEnvironmentPanelGeneratedClass::_wxFB_OnDirChanged )
 	EVT_BUTTON( ID_SCAN, ApacheEnvironmentPanelGeneratedClass::_wxFB_OnScanButton )
+	EVT_BUTTON( ID_REMOVEBUTTON, ApacheEnvironmentPanelGeneratedClass::_wxFB_OnRemoveButton )
+	EVT_BUTTON( ID_EDITBUTTON, ApacheEnvironmentPanelGeneratedClass::_wxFB_OnEditButton )
+	EVT_BUTTON( ID_ADDBUTTON, ApacheEnvironmentPanelGeneratedClass::_wxFB_OnAddButton )
 END_EVENT_TABLE()
 
 ApacheEnvironmentPanelGeneratedClass::ApacheEnvironmentPanelGeneratedClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
@@ -102,7 +108,7 @@ ApacheEnvironmentPanelGeneratedClass::ApacheEnvironmentPanelGeneratedClass( wxWi
 	wxFlexGridSizer* FlexGridSizer;
 	FlexGridSizer = new wxFlexGridSizer( 4, 1, 0, 0 );
 	FlexGridSizer->AddGrowableCol( 0 );
-	FlexGridSizer->AddGrowableRow( 2 );
+	FlexGridSizer->AddGrowableRow( 4 );
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );
 	FlexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -118,6 +124,34 @@ ApacheEnvironmentPanelGeneratedClass::ApacheEnvironmentPanelGeneratedClass( wxWi
 	
 	FlexGridSizer->Add( ConfigDirectorySizer, 1, wxEXPAND, 5 );
 	
+	wxBoxSizer* ScanButtonSizer;
+	ScanButtonSizer = new wxBoxSizer( wxHORIZONTAL );
+	
+	ScanButton = new wxButton( this, ID_SCAN, _("Scan For Configuration"), wxDefaultPosition, wxDefaultSize, 0 );
+	ScanButtonSizer->Add( ScanButton, 0, wxALL, 5 );
+	
+	Gauge = new wxGauge( this, wxID_ANY, 1, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL );
+	ScanButtonSizer->Add( Gauge, 1, wxALL|wxEXPAND, 5 );
+	
+	FlexGridSizer->Add( ScanButtonSizer, 1, wxEXPAND, 5 );
+	
+	wxBoxSizer* ManualButtonSizer;
+	ManualButtonSizer = new wxBoxSizer( wxHORIZONTAL );
+	
+	Manual = new wxCheckBox( this, ID_MANUAL, _("Manual Configuration"), wxDefaultPosition, wxDefaultSize, 0 );
+	ManualButtonSizer->Add( Manual, 0, wxALL, 5 );
+	
+	RemoveButton = new wxButton( this, ID_REMOVEBUTTON, _("Remove Selected"), wxDefaultPosition, wxDefaultSize, 0 );
+	ManualButtonSizer->Add( RemoveButton, 0, wxALL, 5 );
+	
+	EditButton = new wxButton( this, ID_EDITBUTTON, _("Edit Selected"), wxDefaultPosition, wxDefaultSize, 0 );
+	ManualButtonSizer->Add( EditButton, 0, wxALL, 5 );
+	
+	AddButton = new wxButton( this, ID_ADDBUTTON, _("Add Virtual Host"), wxDefaultPosition, wxDefaultSize, 0 );
+	ManualButtonSizer->Add( AddButton, 0, wxALL, 5 );
+	
+	FlexGridSizer->Add( ManualButtonSizer, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	
 	wxFlexGridSizer* HostsSizer;
 	HostsSizer = new wxFlexGridSizer( 1, 1, 0, 0 );
 	HostsSizer->AddGrowableCol( 0 );
@@ -129,26 +163,18 @@ ApacheEnvironmentPanelGeneratedClass::ApacheEnvironmentPanelGeneratedClass( wxWi
 	VirtualHostsLabel->Wrap( -1 );
 	HostsSizer->Add( VirtualHostsLabel, 0, wxALL|wxEXPAND, 5 );
 	
-	VirtualHostResults = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
-	HostsSizer->Add( VirtualHostResults, 1, wxALL|wxEXPAND, 5 );
+	VirtualHostList = new wxListCtrl( this, ID_VIRTUALHOSTLIST, wxDefaultPosition, wxSize( -1,-1 ), wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_VRULES );
+	VirtualHostList->SetMinSize( wxSize( -1,250 ) );
+	
+	HostsSizer->Add( VirtualHostList, 1, wxALL|wxEXPAND, 5 );
 	
 	FlexGridSizer->Add( HostsSizer, 1, wxEXPAND, 5 );
-	
-	Gauge = new wxGauge( this, wxID_ANY, 1, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL );
-	FlexGridSizer->Add( Gauge, 1, wxALL|wxEXPAND, 5 );
-	
-	wxBoxSizer* ButtonSizer;
-	ButtonSizer = new wxBoxSizer( wxHORIZONTAL );
-	
-	ScanButton = new wxButton( this, ID_SCAN, _("Scan For Configuration"), wxDefaultPosition, wxDefaultSize, 0 );
-	ButtonSizer->Add( ScanButton, 0, wxALL, 5 );
-	
-	FlexGridSizer->Add( ButtonSizer, 1, wxEXPAND, 5 );
 	
 	MainSizer->Add( FlexGridSizer, 1, wxEXPAND, 5 );
 	
 	this->SetSizer( MainSizer );
 	this->Layout();
+	MainSizer->Fit( this );
 }
 
 ApacheEnvironmentPanelGeneratedClass::~ApacheEnvironmentPanelGeneratedClass()
@@ -156,7 +182,6 @@ ApacheEnvironmentPanelGeneratedClass::~ApacheEnvironmentPanelGeneratedClass()
 }
 
 BEGIN_EVENT_TABLE( PhpEnvironmentPanelGeneratedClass, wxPanel )
-	EVT_SIZE( PhpEnvironmentPanelGeneratedClass::_wxFB_OnResize )
 	EVT_FILEPICKER_CHANGED( ID_PHP_FILE, PhpEnvironmentPanelGeneratedClass::_wxFB_OnPhpFileChanged )
 END_EVENT_TABLE()
 
@@ -166,8 +191,9 @@ PhpEnvironmentPanelGeneratedClass::PhpEnvironmentPanelGeneratedClass( wxWindow* 
 	MainSizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* GridSizer;
-	GridSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
-	GridSizer->AddGrowableRow( 0 );
+	GridSizer = new wxFlexGridSizer( 3, 1, 0, 0 );
+	GridSizer->AddGrowableCol( 0 );
+	GridSizer->AddGrowableRow( 2 );
 	GridSizer->SetFlexibleDirection( wxBOTH );
 	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -175,10 +201,8 @@ PhpEnvironmentPanelGeneratedClass::PhpEnvironmentPanelGeneratedClass( wxWindow* 
 	HelpText->Wrap( 450 );
 	GridSizer->Add( HelpText, 1, wxALL|wxEXPAND, 5 );
 	
-	MainSizer->Add( GridSizer, 1, wxEXPAND, 5 );
-	
-	wxStaticBoxSizer* PhpSizer;
-	PhpSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxEmptyString ), wxHORIZONTAL );
+	wxBoxSizer* PhpSizer;
+	PhpSizer = new wxBoxSizer( wxHORIZONTAL );
 	
 	PhpLabel = new wxStaticText( this, wxID_ANY, _("PHP Executable:"), wxDefaultPosition, wxDefaultSize, 0 );
 	PhpLabel->Wrap( -1 );
@@ -190,7 +214,9 @@ PhpEnvironmentPanelGeneratedClass::PhpEnvironmentPanelGeneratedClass( wxWindow* 
 	PhpExecutableFile = new wxFilePickerCtrl( this, ID_PHP_FILE, wxEmptyString, _("Location of PHP Executable"), wxT("*"), wxDefaultPosition, wxDefaultSize, wxFLP_FILE_MUST_EXIST|wxFLP_OPEN );
 	PhpSizer->Add( PhpExecutableFile, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	MainSizer->Add( PhpSizer, 0, wxEXPAND, 5 );
+	GridSizer->Add( PhpSizer, 1, wxEXPAND, 5 );
+	
+	MainSizer->Add( GridSizer, 1, wxEXPAND, 5 );
 	
 	this->SetSizer( MainSizer );
 	this->Layout();
@@ -249,5 +275,59 @@ WebBrowserCreateDialogGeneratedClass::WebBrowserCreateDialogGeneratedClass( wxWi
 }
 
 WebBrowserCreateDialogGeneratedClass::~WebBrowserCreateDialogGeneratedClass()
+{
+}
+
+BEGIN_EVENT_TABLE( VirtualHostCreateDialogGeneratedClass, wxDialog )
+	EVT_BUTTON( wxID_OK, VirtualHostCreateDialogGeneratedClass::_wxFB_OnOkButton )
+END_EVENT_TABLE()
+
+VirtualHostCreateDialogGeneratedClass::VirtualHostCreateDialogGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* BodySizer;
+	BodySizer = new wxBoxSizer( wxVERTICAL );
+	
+	wxFlexGridSizer* GridSizer;
+	GridSizer = new wxFlexGridSizer( 2, 2, 0, 0 );
+	GridSizer->AddGrowableCol( 1 );
+	GridSizer->SetFlexibleDirection( wxBOTH );
+	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	DirectoryLabel = new wxStaticText( this, ID_DIRECTORYLABEL, _("Root directory"), wxDefaultPosition, wxDefaultSize, 0 );
+	DirectoryLabel->Wrap( -1 );
+	GridSizer->Add( DirectoryLabel, 0, wxALL, 5 );
+	
+	RootDirectory = new wxDirPickerCtrl( this, ID_ROOTDIRECTORY, wxEmptyString, _("Select a folder"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_DIR_MUST_EXIST|wxDIRP_USE_TEXTCTRL );
+	GridSizer->Add( RootDirectory, 1, wxALL|wxEXPAND, 5 );
+	
+	HostnameLabel = new wxStaticText( this, ID_HOSTNAMELABEL, _("Host name (my.localhost:8080)"), wxDefaultPosition, wxDefaultSize, 0 );
+	HostnameLabel->Wrap( -1 );
+	GridSizer->Add( HostnameLabel, 1, wxALL|wxEXPAND, 5 );
+	
+	Hostname = new wxTextCtrl( this, ID_HOSTNAME, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	GridSizer->Add( Hostname, 1, wxALL|wxEXPAND, 5 );
+	
+	
+	GridSizer->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	ButtonsSizer = new wxStdDialogButtonSizer();
+	ButtonsSizerOK = new wxButton( this, wxID_OK );
+	ButtonsSizer->AddButton( ButtonsSizerOK );
+	ButtonsSizerCancel = new wxButton( this, wxID_CANCEL );
+	ButtonsSizer->AddButton( ButtonsSizerCancel );
+	ButtonsSizer->Realize();
+	GridSizer->Add( ButtonsSizer, 1, wxEXPAND, 5 );
+	
+	BodySizer->Add( GridSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( BodySizer );
+	this->Layout();
+	
+	this->Centre( wxBOTH );
+}
+
+VirtualHostCreateDialogGeneratedClass::~VirtualHostCreateDialogGeneratedClass()
 {
 }

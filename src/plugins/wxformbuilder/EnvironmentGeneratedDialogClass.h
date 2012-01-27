@@ -22,8 +22,9 @@
 #include <wx/panel.h>
 #include <wx/filepicker.h>
 #include <wx/statbox.h>
-#include <wx/textctrl.h>
 #include <wx/gauge.h>
+#include <wx/checkbox.h>
+#include <wx/textctrl.h>
 #include <wx/dialog.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -37,7 +38,6 @@ class WebBrowserEditPanelGeneratedClass : public wxPanel
 	private:
 		
 		// Private event handlers
-		void _wxFB_OnResize( wxSizeEvent& event ){ OnResize( event ); }
 		void _wxFB_OnRemoveSelectedWebBrowser( wxCommandEvent& event ){ OnRemoveSelectedWebBrowser( event ); }
 		void _wxFB_OnEditSelectedWebBrowser( wxCommandEvent& event ){ OnEditSelectedWebBrowser( event ); }
 		void _wxFB_OnAddWebBrowser( wxCommandEvent& event ){ OnAddWebBrowser( event ); }
@@ -61,7 +61,6 @@ class WebBrowserEditPanelGeneratedClass : public wxPanel
 		wxListCtrl* BrowserList;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnResize( wxSizeEvent& event ) { event.Skip(); }
 		virtual void OnRemoveSelectedWebBrowser( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditSelectedWebBrowser( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddWebBrowser( wxCommandEvent& event ) { event.Skip(); }
@@ -69,7 +68,7 @@ class WebBrowserEditPanelGeneratedClass : public wxPanel
 	
 	public:
 		
-		WebBrowserEditPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 550,400 ), long style = wxTAB_TRAVERSAL );
+		WebBrowserEditPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
 		~WebBrowserEditPanelGeneratedClass();
 	
 };
@@ -83,8 +82,12 @@ class ApacheEnvironmentPanelGeneratedClass : public wxPanel
 	private:
 		
 		// Private event handlers
-		void _wxFB_OnResize( wxSizeEvent& event ){ OnResize( event ); }
+		void _wxFB_OnUpdateUi( wxUpdateUIEvent& event ){ OnUpdateUi( event ); }
+		void _wxFB_OnDirChanged( wxFileDirPickerEvent& event ){ OnDirChanged( event ); }
 		void _wxFB_OnScanButton( wxCommandEvent& event ){ OnScanButton( event ); }
+		void _wxFB_OnRemoveButton( wxCommandEvent& event ){ OnRemoveButton( event ); }
+		void _wxFB_OnEditButton( wxCommandEvent& event ){ OnEditButton( event ); }
+		void _wxFB_OnAddButton( wxCommandEvent& event ){ OnAddButton( event ); }
 		
 	
 	protected:
@@ -92,23 +95,36 @@ class ApacheEnvironmentPanelGeneratedClass : public wxPanel
 		{
 			ID_CONFIG_DIRECTORY = 1000,
 			ID_SCAN,
+			ID_MANUAL,
+			ID_REMOVEBUTTON,
+			ID_EDITBUTTON,
+			ID_ADDBUTTON,
+			ID_VIRTUALHOSTLIST,
 		};
 		
 		wxStaticText* HelpText;
 		wxDirPickerCtrl* ApacheConfigurationDirectory;
-		wxStaticText* VirtualHostsLabel;
-		wxTextCtrl* VirtualHostResults;
-		wxGauge* Gauge;
 		wxButton* ScanButton;
+		wxGauge* Gauge;
+		wxCheckBox* Manual;
+		wxButton* RemoveButton;
+		wxButton* EditButton;
+		wxButton* AddButton;
+		wxStaticText* VirtualHostsLabel;
+		wxListCtrl* VirtualHostList;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnResize( wxSizeEvent& event ) { event.Skip(); }
+		virtual void OnUpdateUi( wxUpdateUIEvent& event ) { event.Skip(); }
+		virtual void OnDirChanged( wxFileDirPickerEvent& event ) { event.Skip(); }
 		virtual void OnScanButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRemoveButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnEditButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAddButton( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		ApacheEnvironmentPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 550,400 ), long style = wxTAB_TRAVERSAL );
+		ApacheEnvironmentPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
 		~ApacheEnvironmentPanelGeneratedClass();
 	
 };
@@ -122,7 +138,6 @@ class PhpEnvironmentPanelGeneratedClass : public wxPanel
 	private:
 		
 		// Private event handlers
-		void _wxFB_OnResize( wxSizeEvent& event ){ OnResize( event ); }
 		void _wxFB_OnPhpFileChanged( wxFileDirPickerEvent& event ){ OnPhpFileChanged( event ); }
 		
 	
@@ -140,13 +155,12 @@ class PhpEnvironmentPanelGeneratedClass : public wxPanel
 		wxFilePickerCtrl* PhpExecutableFile;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnResize( wxSizeEvent& event ) { event.Skip(); }
 		virtual void OnPhpFileChanged( wxFileDirPickerEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		PhpEnvironmentPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
+		PhpEnvironmentPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 487,256 ), long style = wxTAB_TRAVERSAL );
 		~PhpEnvironmentPanelGeneratedClass();
 	
 };
@@ -191,6 +205,48 @@ class WebBrowserCreateDialogGeneratedClass : public wxDialog
 		
 		WebBrowserCreateDialogGeneratedClass( wxWindow* parent, wxWindowID id = ID_WEBBROWSERCREATEDIALOGGENERATEDCLASS, const wxString& title = _("Add a new Web Browser"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 458,168 ), long style = wxCLOSE_BOX|wxDEFAULT_DIALOG_STYLE );
 		~WebBrowserCreateDialogGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class VirtualHostCreateDialogGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class VirtualHostCreateDialogGeneratedClass : public wxDialog 
+{
+	DECLARE_EVENT_TABLE()
+	private:
+		
+		// Private event handlers
+		void _wxFB_OnOkButton( wxCommandEvent& event ){ OnOkButton( event ); }
+		
+	
+	protected:
+		enum
+		{
+			ID_VIRTRUALHOSTCREATEDIALOGGENERATEDCLASS = 1000,
+			ID_DIRECTORYLABEL,
+			ID_ROOTDIRECTORY,
+			ID_HOSTNAMELABEL,
+			ID_HOSTNAME,
+		};
+		
+		wxStaticText* DirectoryLabel;
+		wxDirPickerCtrl* RootDirectory;
+		wxStaticText* HostnameLabel;
+		wxTextCtrl* Hostname;
+		
+		wxStdDialogButtonSizer* ButtonsSizer;
+		wxButton* ButtonsSizerOK;
+		wxButton* ButtonsSizerCancel;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		VirtualHostCreateDialogGeneratedClass( wxWindow* parent, wxWindowID id = ID_VIRTRUALHOSTCREATEDIALOGGENERATEDCLASS, const wxString& title = _("Create a Virtual Host"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 600,144 ), long style = wxDEFAULT_DIALOG_STYLE );
+		~VirtualHostCreateDialogGeneratedClass();
 	
 };
 

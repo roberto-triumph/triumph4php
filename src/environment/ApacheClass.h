@@ -66,9 +66,21 @@ namespace mvceditor {
  * </code>
  */
 class ApacheClass : public DirectoryWalkerClass {
+
 public:
 
+	/**
+	 * if this is TRUE, then apache files will not be parsed; the virtual hosts
+	 * will need to be created manually using SetVirtualHostMapping()
+	 */
+	bool ManualConfiguration;
+
 	ApacheClass();
+	
+	/**
+	 * removes all of the virtual host mappings
+	 */
+	void ClearMappings();
 
 	/**
 	 * Checks the given file to see if it is a valid apache configuration file.
@@ -98,7 +110,7 @@ public:
 	int GetListenPort() const;
 
 	/**
-	 * Get the parsed documetn root where apache is serving files.
+	 * Get the parsed document root where apache is serving files.
 	 * @return wxString This is a path; it will always have the trailing separator.
 	 */
 	wxString GetDocumentRoot() const;
@@ -109,7 +121,14 @@ public:
 	 * @param wxString fileSystemPath the directory that serves files for the host
 	 * @param wxString hostName the name of the host
 	 */
-	void SetVirtualHostMapping(wxString fileSystemPath, wxString hostName);
+	void SetVirtualHostMapping(const wxString& fileSystemPath, wxString hostName);
+	
+	/**
+	 * Removes a single virtual host mapping. 
+	 * 
+	 * @param path must be the same as the one given in the SetVirtualHostMapping() method
+	 */
+	void RemoveVirtualHostMapping(const wxString& fileSystemPath);
 	
 	/**
 	 * Get the virtual host mappings that were parsed from the apache config files.

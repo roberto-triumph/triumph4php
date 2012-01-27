@@ -73,12 +73,13 @@ void mvceditor::EnvironmentClass::LoadFromConfig() {
 	wxString httpdPath;
 	config->Read(wxT("Environment/PhpExecutablePath"), &Php.PhpExecutablePath);
 	config->Read(wxT("Environment/ApacheHttpdPath"), &httpdPath);
+	config->Read(wxT("Environment/ManualConfiguration"), &Apache.ManualConfiguration);
 	if(!httpdPath.IsEmpty()) {
 		Apache.SetHttpdPath(httpdPath);
 	}
+	wxString oldPath = config->GetPath();
 	long index;
 	wxString groupName;
-	wxString oldPath = config->GetPath();
 	config->SetPath(wxT("Environment"));
 	bool found = config->GetFirstGroup(groupName, index);
 	if (found) {
@@ -87,6 +88,8 @@ void mvceditor::EnvironmentClass::LoadFromConfig() {
 		WebBrowsers.clear();
 	}
 	while (found) {
+		
+		// the web browsers; there are many groups; each group is named "WebBrowser_#"
 		if (groupName.Find(wxT("WebBrowser_")) >= 0) {
 			wxString key = groupName + wxT("/Name");
 			wxString browserName = config->Read(key);
@@ -94,6 +97,17 @@ void mvceditor::EnvironmentClass::LoadFromConfig() {
 			wxString browserPath = config->Read(key);
 			wxFileName browserFileName(browserPath);
 			WebBrowsers[browserName] = browserFileName;
+		}
+		else if (groupName.Find(wxT("VirtualHost_")) >= 0 && Apache.ManualConfiguration) {
+			
+			// the manual virtual host entries there are many groups; each group is named "VirtualHost_#"
+			// only fill in when Manual flag is off (otherwise we want to parse from the file
+			// in case settings have changed)
+			wxString key = groupName + wxT("/RootDirectory");
+			wxString rootDirectory = config->Read(key);
+			key = groupName + wxT("/HostName");
+			wxString hostName = config->Read(key);
+			Apache.SetVirtualHostMapping(rootDirectory, hostName);
 		}
 		found = config->GetNextGroup(groupName, index);
 	}
@@ -104,6 +118,7 @@ void mvceditor::EnvironmentClass::SaveToConfig() const {
 	wxConfigBase* config = wxConfigBase::Get();
 	config->Write(wxT("Environment/PhpExecutablePath"), Php.PhpExecutablePath);
 	config->Write(wxT("Environment/ApacheHttpdPath"), Apache.GetHttpdPath());
+	config->Write(wxT("Environment/ManualConfiguration"), Apache.ManualConfiguration);
 	int i = 0;
 	for(std::map<wxString, wxFileName>::const_iterator it = WebBrowsers.begin(); it != WebBrowsers.end(); ++it) {
 		wxString key = wxString::Format(wxT("Environment/WebBrowser_%d/Name"), i);
@@ -111,6 +126,17 @@ void mvceditor::EnvironmentClass::SaveToConfig() const {
 		key = wxString::Format(wxT("Environment/WebBrowser_%d/Path"), i);
 		config->Write(key, it->second.GetFullPath()); 
 		i++;
+	}
+	if (Apache.ManualConfiguration) {
+		std::map<wxString, wxString> mappings = Apache.GetVirtualHostMappings();
+		i = 0;
+		for (std::map<wxString, wxString>::const_iterator it = mappings.begin(); it != mappings.end(); ++it) {
+			wxString key = wxString::Format(wxT("Environment/VirtualHost_%d/RootDirectory"), i);
+			config->Write(key, it->first);
+			key = wxString::Format(wxT("Environment/VirtualHost_%d/HostName"), i);
+			config->Write(key, it->second); 
+			i++;
+		}
 	}
 	config->Flush();
 }

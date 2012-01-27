@@ -65,6 +65,38 @@ private:
 	ApacheClass ApacheResults;
 
 };
+
+/**
+ * A dialog that edits a virtual host mapping.
+ */
+class VirtualHostCreateDialogClass : public VirtualHostCreateDialogGeneratedClass {
+
+public:
+
+	VirtualHostCreateDialogClass(wxWindow* parent, std::map<wxString, wxString> existingVirtualHosts,
+			wxString& hostname, wxFileName& rootDirectory);
+			
+protected:
+
+	/**
+	 * here we will do duplicate checks; the same directory may not be entered twice
+	 */
+	void OnOkButton(wxCommandEvent& event);
+
+private:
+
+
+	/**
+	 * This is used to check that the same directory is not entered twice
+	 */
+	std::map<wxString, wxString> ExistingVirtualHosts;
+	
+	/**
+	 * Used because there is to validator for wxDirPickerCtrl
+	 */
+	wxFileName& RootDirectoryFileName;
+		
+};
 	
 /**
  * Panel that shows the apache virtual host config. It will also
@@ -73,13 +105,20 @@ private:
 class ApacheEnvironmentPanelClass : public ApacheEnvironmentPanelGeneratedClass {
 
 protected:
-	// Handlers for EnvironmentGeneratedDialogClass events.
+
 	void OnScanButton(wxCommandEvent& event);
-	void OnOkButton(wxCommandEvent& event);
+	void OnAddButton(wxCommandEvent& event);
+	void OnEditButton(wxCommandEvent& event);
+	void OnRemoveButton(wxCommandEvent& event);
 
 public:
 	/** Constructor */
 	ApacheEnvironmentPanelClass(wxWindow* parent, EnvironmentClass& environment);
+	
+	/**
+	 * transfers the settings from the window to the Environment data structure
+	 */
+	void Apply();
 
 private:
 	
@@ -94,6 +133,12 @@ private:
 	 * To look for apache config files in the background
 	 */
 	ApacheFileReaderClass ApacheFileReader;
+	
+	/**
+	 * A copy of the current virtual hosts; this is the data structure that the 
+	 * user modifies (while the dialog is opened)
+	 */
+	ApacheClass EditedApache;
 	
 	/**
 	 * populate the dialog according to the ApacheClass settings
@@ -114,6 +159,16 @@ private:
 	 * Fills in the dialogs based on the Apache environment
 	 */
 	void Populate();
+	
+	/**
+	 * disable the CRUD buttons according to the Manual flag
+	 */
+	void OnUpdateUi(wxUpdateUIEvent& event);
+	
+	/**
+	 * when the user picks a directory start the scan
+	 */
+	void OnDirChanged(wxFileDirPickerEvent& event);
 	
 	DECLARE_EVENT_TABLE()
 };
@@ -229,11 +284,6 @@ public:
 	EnvironmentDialogClass(wxWindow* parent, EnvironmentClass& environment);
 	
 	/**
-	 * make sure the layout is refreshed; needed for the sizers to expand to their proper size
-	 */
-	void Prepare();
-	
-	/**
 	 * when user OKs the dialog transfer all data to the Environment data structure
 	 */
 	void OnOkButton(wxCommandEvent& event);
@@ -241,6 +291,10 @@ public:
 private:
 
 	WebBrowserEditPanelClass* WebBrowserPanel;
+	
+	ApacheEnvironmentPanelClass* ApacheEnvironmentPanel;
+	
+	EnvironmentClass& Environment;
 	
 	DECLARE_EVENT_TABLE()
 };
