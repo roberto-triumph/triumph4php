@@ -31,9 +31,10 @@
 
 static const int ID_PROCESS = wxNewId();
 static const int ID_TOOLBAR_RUN = wxNewId();
+const int ID_TOOLBAR_BROWSER = wxNewId();
 static const int ID_WINDOW_CONSOLE = wxNewId();
 
- mvceditor::RunConsolePanelClass::RunConsolePanelClass(wxWindow* parent, EnvironmentClass* environment, StatusBarWithGaugeClass* gauge, int id)
+mvceditor::RunConsolePanelClass::RunConsolePanelClass(wxWindow* parent, EnvironmentClass* environment, StatusBarWithGaugeClass* gauge, int id)
 	: RunConsolePanelGeneratedClass(parent, id)
 	, CommandString()
 	, ProcessWithHeartbeat(*this)
@@ -161,7 +162,9 @@ mvceditor::RunConsolePluginClass::RunConsolePluginClass()
 	, RunCliMenuItem(NULL)
 	, RunCliWithArgsMenuItem(NULL)
 	, RunCliInNewWindowMenuItem(NULL)
-	, RunCliWithArgsInNewWindowMenuItem(NULL) {
+	, RunCliWithArgsInNewWindowMenuItem(NULL)
+	, RunInBrowser(NULL)
+	, BrowserComboBox(NULL) {
 }
 
 void mvceditor::RunConsolePluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
@@ -178,6 +181,10 @@ void mvceditor::RunConsolePluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
 		_("Run As CLI In New Window With Arguments\tCTRL+SHIFT+F7"), 
 		_("Run File As a PHP Command Line Script In a New Window With Arguments"), wxITEM_NORMAL);
 	toolsMenu->Append(RunCliWithArgsInNewWindowMenuItem);
+	RunInBrowser = new wxMenuItem(toolsMenu, mvceditor::MENU_RUN_PHP + 4, 
+		_("Run In Web Browser"),
+		_("Run the script in the chosen Web Browser"), wxITEM_NORMAL);
+	toolsMenu->Append(RunInBrowser);
 }
 
 void mvceditor::RunConsolePluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
@@ -186,7 +193,22 @@ void mvceditor::RunConsolePluginClass::AddKeyboardShortcuts(std::vector<DynamicC
 	menuItemIds[mvceditor::MENU_RUN_PHP + 1] = wxT("Console-Run With Arguments");
 	menuItemIds[mvceditor::MENU_RUN_PHP + 2] = wxT("Console-Run In New Window");
 	menuItemIds[mvceditor::MENU_RUN_PHP + 3] = wxT("Console-Run-In New Window With Arguments");
+	menuItemIds[mvceditor::MENU_RUN_PHP + 4] = wxT("Console-Run-In Web Browser");
 	AddDynamicCmd(menuItemIds, shortcuts);
+}
+
+void mvceditor::RunConsolePluginClass::LoadPreferences(wxConfigBase* config) {
+	
+	// dont use the config; use the Environment that has already been seeded with 
+	// the proper data
+	mvceditor::EnvironmentClass* environment = GetEnvironment();
+	std::map<wxString, wxFileName> webBrowsers = environment->WebBrowsers;
+	for (std::map<wxString, wxFileName>::const_iterator it = webBrowsers.begin(); it != webBrowsers.end(); ++it) {
+		BrowserComboBox->AppendString(it->first);
+	}
+	if (!webBrowsers.empty()) {
+		BrowserComboBox->Select(0);
+	}
 }
 
 void mvceditor::RunConsolePluginClass::OnRunFileAsCli(wxCommandEvent& event) {
@@ -254,6 +276,55 @@ void mvceditor::RunConsolePluginClass::OnUpdateUi(wxUpdateUIEvent& event) {
 void mvceditor::RunConsolePluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 	toolBar->AddTool(ID_TOOLBAR_RUN, _("Run"), wxArtProvider::GetBitmap(
 		wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), _("Run"));
+
+	wxBitmap bitmap = wxArtProvider::GetBitmap(wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16));
+	toolBar->AddTool(ID_TOOLBAR_BROWSER, _("Web Browser"), bitmap, _("Run On a Web Browser"));
+	
+	// to be filled in after the config is read
+	wxArrayString choices;
+	BrowserComboBox = new wxComboBox(toolBar, wxID_NEW, wxT(""), wxDefaultPosition, wxDefaultSize, choices, wxCB_READONLY);
+	toolBar->AddControl(BrowserComboBox);
+}
+
+void mvceditor::RunConsolePluginClass::OnRunInWebBrowser(wxCommandEvent& event) {
+	wxString browserName = BrowserComboBox->GetValue();
+	mvceditor::EnvironmentClass* environment = GetEnvironment();
+	wxFileName webBrowserPath  = environment->WebBrowsers[browserName];
+	if (webBrowserPath.IsOk()) {
+		mvceditor::CodeControlClass* currentCodeControl = GetCurrentCodeControl();
+		if (currentCodeControl) {
+			wxString fileName = currentCodeControl->GetFileName();
+			if (wxFileName::FileExists(fileName)) {
+				
+				// turn file name into a url
+				wxString url = environment->Apache.GetUrl(fileName);
+				if (!url.IsEmpty()) {
+					wxString cmd = wxT("\"") + webBrowserPath.GetFullPath() + wxT("\""); 
+					cmd += wxT(" \"");
+					cmd += url;
+					cmd += wxT("\"");
+					
+					wxMessageBox(cmd);
+					
+					// TODO track this PID ... ?
+					// what about when user closes the external browser ?
+					long pid = wxExecute(cmd, wxEXEC_ASYNC);
+					if (pid <= 0) {
+						mvceditor::EditorLogWarning(mvceditor::BAD_WEB_BROWSER_EXECUTABLE, cmd);
+					}
+				}
+				else {
+					mvceditor::EditorLogWarning(mvceditor::INVALID_FILE, _("File is not under web root"));	
+				}
+			}
+			else {
+				mvceditor::EditorLogWarning(mvceditor::INVALID_FILE, fileName);
+			}
+		}
+	}
+	else {
+		mvceditor::EditorLogWarning(mvceditor::BAD_WEB_BROWSER_EXECUTABLE, webBrowserPath.GetFullPath());
+	}
 }
 
 BEGIN_EVENT_TABLE(mvceditor::RunConsolePanelClass, wxPanel) 
@@ -267,6 +338,8 @@ BEGIN_EVENT_TABLE(mvceditor::RunConsolePluginClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_RUN_PHP + 1, mvceditor::RunConsolePluginClass::OnRunFileAsCli)
 	EVT_MENU(mvceditor::MENU_RUN_PHP + 2, mvceditor::RunConsolePluginClass::OnRunFileAsCliInNewWindow)
 	EVT_MENU(mvceditor::MENU_RUN_PHP + 3, mvceditor::RunConsolePluginClass::OnRunFileAsCliInNewWindow)
+	EVT_MENU(mvceditor::MENU_RUN_PHP + 4, mvceditor::RunConsolePluginClass::OnRunInWebBrowser)
 	EVT_TOOL(ID_TOOLBAR_RUN, mvceditor::RunConsolePluginClass::OnRunFileAsCli)
+	EVT_TOOL(ID_TOOLBAR_BROWSER, mvceditor::RunConsolePluginClass::OnRunInWebBrowser)
 	EVT_UPDATE_UI(wxID_ANY, mvceditor::RunConsolePluginClass::OnUpdateUi)
 END_EVENT_TABLE()

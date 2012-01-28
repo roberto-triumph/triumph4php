@@ -128,8 +128,9 @@ wxString mvceditor::ApacheClass::GetUrl(const wxString& fileSystemPath) const {
 			
 			// file is inside this virtual host. remove the root and append to host
 			wxString baseUrl = it->second;
-			if (Port > 0 && Port != 80) {
-				// host already has a slash
+			if (Port > 0 && Port != 80 && !baseUrl.Contains(wxT(":"))) {
+				
+				// host already has a slash; only append port if virtual host does not have it
 				baseUrl.RemoveLast();
 				baseUrl += wxString::Format(wxT(":%d/"), Port);
 			}
@@ -171,6 +172,11 @@ void mvceditor::ApacheClass::ParseApacheConfigFile(const wxString& includedFile)
 		wxTextFile file;
 		if (file.Open(includedFile)) {
 			bool inVirtualHost = false;
+
+			// this flag will be used to skip directives inside a conditional
+			// directive. we want to skip this to avoid getting confused when
+			// a config has an SSL binding hidden behind a conditional
+			bool skipParsing = false;
 			wxString currentServerName,
 					currentDocumentRoot,
 					currentPort;
@@ -180,30 +186,60 @@ void mvceditor::ApacheClass::ParseApacheConfigFile(const wxString& includedFile)
 				// so we need 2 variables for this ...
 				line = line.Trim(false).Trim(true);
 				wxString lineLower = line.Lower();
-				if (0 == lineLower.Find(wxT("<virtualhost"))) {
+				
+				if (0 == lineLower.Find(wxT("<ifmodule"))) {
+					skipParsing = true;
+				}
+				if (0 == lineLower.Find(wxT("</ifmodule>"))) {
+					skipParsing = false;
+				}
+				if (!skipParsing && 0 == lineLower.Find(wxT("<virtualhost"))) {
 					currentServerName = wxT("");
 					currentDocumentRoot = wxT("");
+					currentPort = wxT("");
+					
+					// handle the virtual host port
+					size_t colonPos = lineLower.find_last_of(wxT(":"));
+					if (colonPos != std::string::npos) {
+						size_t endPos = lineLower.find_first_of(wxT(">"), colonPos);
+						if (endPos != std::string::npos) {
+							wxString portString = lineLower.Mid(colonPos + 1, endPos - colonPos - 1);
+							portString.Trim();
+							long portLong = 0;
+							bool parsed = portString.ToLong(&portLong);
+							
+							// dont use port on default HTTP port; makes URLs 'prettier'
+							if (parsed && portLong <= 65535 && portLong != 80) {
+								currentPort = portString;
+							}
+						}
+					}
 					inVirtualHost = true;
 				}
-				if (0 == lineLower.Find(wxT("</virtualhost>"))) {
+				if (!skipParsing && 0 == lineLower.Find(wxT("</virtualhost>"))) {
 					currentServerName = wxT("");
 					currentDocumentRoot = wxT("");
 					inVirtualHost = false;
 				}
-				if (0 == lineLower.Find(wxT("serverroot"))) {
+				if (!skipParsing && 0 == lineLower.Find(wxT("serverroot"))) {
 					ServerRoot = line.Mid(10).Trim(false).Trim(true); //10= length of 'ServerRoot'
 				}
-				if (0 == lineLower.Find(wxT("include "))) {
+				if (!skipParsing && 0 == lineLower.Find(wxT("include "))) {
 					wxString nextFile = line.Mid(8).Trim(false).Trim(true); //8= length of 'Include'
 					nextFile = MakeAbsolute(nextFile);
 					ParseApacheConfigFile(nextFile);
 				}
-				if (0 == lineLower.Find(wxT("servername"))) {
+				if (!skipParsing && 0 == lineLower.Find(wxT("servername"))) {
 
 					// must get the line that has not been modified to lowercase
 					currentServerName = line.Mid(10).Trim(false).Trim(true); //10=length of "ServerName"
+					if (inVirtualHost && !currentPort.IsEmpty()) {
+						
+						// append the port information; sometimes virtual hosts have their own port
+						currentServerName.Append(wxT(":")).Append(currentPort);
+					}
 				}
-				if (0 == lineLower.Find(wxT("documentroot"))) {
+				if (!skipParsing && 0 == lineLower.Find(wxT("documentroot"))) {
 					currentDocumentRoot = line.Mid(12).Trim(false).Trim(true); //12=length of "DocumentRoot"
 					currentDocumentRoot.Replace(wxT("\""), wxT(""));
 					currentDocumentRoot.Replace(wxT("'"), wxT(""));
@@ -212,7 +248,7 @@ void mvceditor::ApacheClass::ParseApacheConfigFile(const wxString& includedFile)
 						DocumentRoot.Normalize();
 					}
 				}
-				if (0 == lineLower.Find(wxT("listen"))) {
+				if (!skipParsing && 0 == lineLower.Find(wxT("listen"))) {
 					currentPort = line.Mid(6).Trim(false).Trim(true); //6=length of "listen"
 
 					// handle listen 127.0.0.1:8080
@@ -231,6 +267,7 @@ void mvceditor::ApacheClass::ParseApacheConfigFile(const wxString& includedFile)
 					SetVirtualHostMapping(currentDocumentRoot, currentServerName);
 					currentServerName = wxT("");
 					currentDocumentRoot = wxT("");
+					currentPort = wxT("");
 				}
 			}
 		}

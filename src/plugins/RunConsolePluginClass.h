@@ -155,8 +155,12 @@ public:
 	void AddToolBarItems(wxAuiToolBar* toolBar);
 
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
+	
+protected:
 
-	private:
+	void LoadPreferences(wxConfigBase* config);
+
+private:
 				
 		/**
 		 * handler for the menu
@@ -174,12 +178,23 @@ public:
 		void OnUpdateUi(wxUpdateUIEvent& event);
 		
 		/**
+		 * run the script in (an external) web browser 
+		 */
+		void OnRunInWebBrowser(wxCommandEvent& event);
+		
+		/**
 		 * Our menu items
 		 */
 		wxMenuItem* RunCliMenuItem;
 		wxMenuItem* RunCliWithArgsMenuItem;
 		wxMenuItem* RunCliInNewWindowMenuItem;
 		wxMenuItem* RunCliWithArgsInNewWindowMenuItem;
+		wxMenuItem* RunInBrowser;
+		
+		/**
+		 * Will hold the current browser to run the PHP script with
+		 */
+		wxComboBox* BrowserComboBox;
 		
 		DECLARE_EVENT_TABLE()
 };

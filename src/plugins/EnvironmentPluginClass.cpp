@@ -35,7 +35,7 @@
  * @param column1Value the value for column 1 
  * @param column2Value the value for column 2
  */
-void ListCtrlAdd(wxListCtrl* list, const wxString& column1Value, const wxString& column2Value) {
+static void ListCtrlAdd(wxListCtrl* list, const wxString& column1Value, const wxString& column2Value) {
 	int newRowNumber = list->GetItemCount();
 	
 	// list ctrl is tricky, for columns we must insertItem() then setItem() for the next columns
@@ -60,7 +60,7 @@ void ListCtrlAdd(wxListCtrl* list, const wxString& column1Value, const wxString&
  * @param column2Value the new value for column 2
  * @param rowIndex 0-based into of row to change
  */
-void ListCtrlEdit(wxListCtrl* list, const wxString& column1Value, const wxString& column2Value, int rowIndex) {
+static void ListCtrlEdit(wxListCtrl* list, const wxString& column1Value, const wxString& column2Value, int rowIndex) {
 	wxListItem column1;
 	column1.SetColumn(0);
 	column1.SetId(rowIndex);
@@ -81,7 +81,7 @@ void ListCtrlEdit(wxListCtrl* list, const wxString& column1Value, const wxString
  * @param column2Value will be filled with the contents of (rowIndex, 1)
  * @param rowIndex the row to get
  */
-void ListCtrlGet(wxListCtrl* list, wxString& column1Value, wxString& column2Value, int rowIndex) {
+static void ListCtrlGet(wxListCtrl* list, wxString& column1Value, wxString& column2Value, int rowIndex) {
 	wxListItem column1,
 		column2;
 	column1.SetColumn(0);
@@ -559,7 +559,6 @@ void mvceditor::EnvironmentPluginClass::AddKeyboardShortcuts(std::vector<Dynamic
 	menuItemIds[mvceditor::MENU_ENVIRONMENT] = wxT("Environment-Configure Environment");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
-
 
 BEGIN_EVENT_TABLE(mvceditor::ApacheEnvironmentPanelClass, ApacheEnvironmentPanelGeneratedClass)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ApacheEnvironmentPanelClass::OnWorkComplete)
