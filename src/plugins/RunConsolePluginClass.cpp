@@ -304,8 +304,6 @@ void mvceditor::RunConsolePluginClass::OnRunInWebBrowser(wxCommandEvent& event) 
 					cmd += url;
 					cmd += wxT("\"");
 					
-					wxMessageBox(cmd);
-					
 					// TODO track this PID ... ?
 					// what about when user closes the external browser ?
 					long pid = wxExecute(cmd, wxEXEC_ASYNC);
