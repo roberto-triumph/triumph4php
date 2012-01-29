@@ -91,5 +91,15 @@ abstract class MvcEditorFrameworkBaseClass {
 	 * @return array of MvcEditorResource objects
 	 */
 	abstract public function resources($dir);
+	
+	/**
+	 * Sub-classes will implement this method to help MVC Editor create URLs from files;
+	 * sub-clases will use the routing rules specific to its framework.
+	 *
+	 * @param $dir the base directory of the project in question; absolute path.
+	 * @param $fileName the file to make the URL
+	 * @return array of URLs for the given file
+	 */
+	abstract public function makeUrls($dir, $fileName);
 
 }

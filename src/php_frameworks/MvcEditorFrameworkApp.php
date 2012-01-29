@@ -73,7 +73,7 @@ function loadFrameworks() {
  * any prior inputs that the framework object may do.
  * action is assumed to be valid at this point
  */
-function runAction($framework, $dir, $action, $outputFile) {
+function runAction($framework, $dir, $action, $extra, $outputFile) {
 	if (strcasecmp($action, 'databaseInfo') == 0) {
 		runDatabaseInfo($framework, $dir, $outputFile);
 	}
@@ -86,6 +86,10 @@ function runAction($framework, $dir, $action, $outputFile) {
 	else if (strcasecmp($action, 'resources') == 0) {
 		runResources($framework, $dir, $outputFile);
 	}
+	else if (strcasecmp($action, 'makeUrls') == 0) {
+		runMakeUrls($framework, $dir, $extra, $outputFile);
+	}
+
 }
 
 function runDatabaseInfo($framework, $dir, $outputFile) {
@@ -180,6 +184,26 @@ function runResources(MvcEditorFrameworkBaseClass $framework, $dir, $outputFile)
 	}
 }
 
+function runMakeUrls(MvcEditorFrameworkBaseClass $framework, $dir, $extra, $outputFile) {
+	$urls = $framework->makeUrls($dir, $extra);
+	if ($urls) {
+		$writer = new Zend_Config_Writer_Ini();
+		$outputConfig = new Zend_Config(array(), true);
+		$writer->setConfig($outputConfig);
+		$keyIndex = 0;
+		foreach ($urls as $url) {
+
+			// write an INI entry for each config file. make sure to replace any possible
+			// characters that may conflict with INI parsing.
+			$key = iniEscapeKey('Url_' . $keyIndex);
+			$outputConfig->{$key} = $url;
+			$keyIndex++;
+		}
+		initPrint($writer, $outputFile);
+	}
+}
+
+
 
 // Replaces any possible characters that may conflict with INI parsing of KEYS.
 function iniEscapeKey($str) {
@@ -207,6 +231,7 @@ $rules = array(
 	'identifier|i=s' => 'The framework to query',
 	'dir|d=s' => 'The base directory that the project resides in',
 	'action|a=s' => 'The data that is being queried',
+	'extra|e=s' => 'Any extra parameters that a specific action may need',
 	'output|o=s' => 'If given, the output will be written to the given file (by default, output does to STDOUT)',
 	'help|h' => 'A help message'
 );
@@ -216,12 +241,14 @@ $identifier = $opts->getOption('identifier');
 $dir = $opts->getOption('dir');
 $help = $opts->getOption('help');
 $outputFile = $opts->getOption('output');
+$extra = $opts->getOption('extra');
 
 // trim any quotes
 $action = trim($action, " '\"");
 $identifier = trim($identifier, " '\"");
 $dir = trim($dir, " '\"");
 $outputFile = trim($outputFile, " '\"");
+$extra = trim($extra, " '\"");
 
 if ($help) {
 	echo <<<EOF
@@ -257,7 +284,7 @@ if ($chosenFramework && $dir) {
 
 	// pick the correct method call on the framework
 	if (method_exists($chosenFramework, $action)) {
-		runAction($chosenFramework, $dir, $action, $outputFile);
+		runAction($chosenFramework, $dir, $action, $extra, $outputFile);
 	}
 	else {
 		print "Invalid action: '{$action}.' Program will now exit.\n";

@@ -134,6 +134,42 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 		return $resources;
 	}
 	
+	/**
+	 * @return the array of URLs for the given class name / file name.
+	 */
+	public function makeUrls($dir, $fileName) {
+		
+		// use realpath because fileName is OS-dependant (slashes)
+		$controllerDir = realpath($dir . '/application/controllers');
+		if (!file_exists($fileName) && stripos($fileName, $controllerDir) !== 0) {
+		
+			// file MUST be a controller; in the controller directory and it must exist
+			// URLs only make sense for conrollers
+			return array();
+		}
+		
+		$className = ucfirst(basename($fileName, '.php'));
+		
+		$config = array();
+		$route = array();
+		
+		// TODO: handle multiple apps
+		// need this define so that we can include code igniter files directly
+		define('BASEPATH', '');
+		include($dir . '/application/config/routes.php');
+		include($dir . '/application/config/config.php');
+		
+		$subDirectory = substr(dirname($fileName), strlen($controllerDir . '/'));
+		$urls = array();
+		foreach ($this->parseMethods($fileName) as $methodName) {
+		
+			// TODO: any controller arguments ... should get these from the user
+			$extra = '';
+			$urls[] = $this->makeUrl($route, $config, $subDirectory, $className, $methodName, $extra);
+		}
+		return $urls;
+	}
+	
 	private function infoFromDbArray($environment, $groupName, $groupConnection) {
 		// port is not there by default
 		$port = 0;
@@ -307,5 +343,100 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 			return realpath($systemDir);
 		}
 		return '';
+	}
+	
+	function makeUrl($route, $config, $subDirectory, $className, $methodName, $extra) {
+	
+		// this function was taken from http://codeigniter.com/forums/viewthread/102438
+		// with the following changes:
+		// 1. including routes directly instead of using CI object
+		//    as I was having problems including the bootstap file here
+		
+		$uri = '';
+		if ($subDirectory) {
+			$uri .= $subDirectory . '/';
+		}
+		$uri .= $className . '/' . $methodName;
+		if ($extra) {
+			$uri .= '/' . $extra;
+		}
+		
+		// in case subdir has leading slash; routes usually don't
+		$uri = ltrim($uri, '/');
+		$uri = strtolower($uri);
+		
+		if (in_array($uri, $route)) {
+			$uri = array_search($uri, $route);
+		}    
+		else {
+			foreach ($route as $singleRoute => $replace) {
+				$singleRoute   = preg_split('/(\(.+?\))/', $singleRoute, -1, PREG_SPLIT_DELIM_CAPTURE);
+				$replace = preg_split('/(\$\d+)/', $replace, -1, PREG_SPLIT_DELIM_CAPTURE);
+				if (count($singleRoute) != count($replace)) {
+					continue;
+				}
+				$newroute = $newreplace = '';
+				for ($i = 0; $i < count($singleRoute); $i++) {
+					if ($i % 2) {
+						$newroute .= $replace[$i];
+						$newreplace .= $singleRoute[$i];
+					}
+					else {
+						$newroute .= $singleRoute[$i];
+						$newreplace .= $replace[$i];
+					}
+					$newreplace = str_replace(':any', '.+', str_replace(':num', '[0-9]+', $newreplace));
+					if (preg_match("#^$newreplace\$#", $uri)) {
+						$uri = preg_replace("#^$newreplace\$#", $newroute, $uri);
+						break;
+					}
+				}
+			}
+		}
+		
+		// respect the url suffix and index page from the config. for urls, make sure there is only one ending '/'
+		// url already has leading slash
+		// make sure url never has leading slash
+		$indexPage = $config['index_page'];
+		$url = trim($indexPage, '/') . '/' . trim($uri . '/');
+		$url = ltrim($url, '/');
+		
+		if (isset($config['url_suffix']) && $config['url_suffix']) {
+			$url .= $config['url_suffix'];
+		}
+		return $url;
+	}
+	
+	private function parseMethods($fileName) {
+	
+		// since I cannot yet find a way to load the CodeIgniter bootstrap; I will just use the PHP
+		// tokenizer to get all of the controller methods.
+		// ATTN: this won't get any inherited controller methods; making them not show up
+		// in the URLs 
+		$methods = array();
+		if (!is_file($fileName)) {
+			return $methods;
+		}
+		$tokens = token_get_all(file_get_contents($fileName));
+		while ($token = next($tokens)) {
+			if ($token[0] == T_FUNCTION) {
+				
+				// php tokenizer gives us white space, we want to skip all whitespace after the "function" keyword
+				while ($token = next($tokens)) {
+					if ($token[0] != T_WHITESPACE) {
+						break;
+					}
+				}
+				if ($token) {
+					$methodName = $token[1];
+					
+					// codeigniter never serves up methods that begin with '_'
+					if (substr($methodName, 0, 1) != '_') {
+						$methods[] = $methodName;
+					}
+				}
+			}
+		}
+		return $methods;
 	}
 }

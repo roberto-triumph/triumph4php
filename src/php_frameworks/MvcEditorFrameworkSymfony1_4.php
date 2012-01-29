@@ -96,4 +96,11 @@ class MvcEditorFrameworkSymfony1_4 extends MvcEditorFrameworkBaseClass {
 	public function resources($dir) {
 		return array();
 	}
+	
+	/**
+	 * @return the array of URLs for the given class name / file name.
+	 */
+	public function makeUrls($dir, $fileName) {
+			return array();
+	}
 }
