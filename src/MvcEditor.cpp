@@ -159,8 +159,6 @@ bool mvceditor::AppClass::CommandLine() {
 	return ret;
 }
 
-
-
 void mvceditor::AppClass::CloseProject() {
 	if (AppFrame) {
 		AppFrame->OnProjectClosed(this);
@@ -292,7 +290,7 @@ void mvceditor::AppClass::OnProcessComplete(wxCommandEvent& event) {
 			DatabaseDetector.Init(ID_DATABASE_DETECT_PROCESS, Environment, Project->GetRootPath(), frameworks[0]);
 			continueProjectOpen = false;
 		}
-		if (FrameworkDetector.Error != mvceditor::DetectorClass::NONE) {
+		if (FrameworkDetector.Error != mvceditor::DetectorActionClass::NONE) {
 			mvceditor::EditorLogError(mvceditor::PROJECT_DETECTION);
 		}
 	}

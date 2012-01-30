@@ -84,7 +84,7 @@ void mvceditor::CodeIgniterPluginClass::OnProcessComplete(wxCommandEvent &event)
 	if (project && event.GetId() == ID_CONFIG_DETECTION) {
 		wxString response = event.GetString();
 		ConfigFiles.clear();
-		if (mvceditor::DetectorClass::NONE != ConfigFilesDetector.Error) {
+		if (mvceditor::DetectorActionClass::NONE != ConfigFilesDetector.Error) {
 			mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, response);
 		}
 		else {
@@ -102,7 +102,7 @@ void mvceditor::CodeIgniterPluginClass::OnProcessComplete(wxCommandEvent &event)
 		}
 	}
 	else if (project && event.GetId() == ID_RESOURCE_DETECTION) {
-		if (mvceditor::DetectorClass::NONE != ResourcesDetector.Error) {
+		if (mvceditor::DetectorActionClass::NONE != ResourcesDetector.Error) {
 			mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, wxT(""));
 		}
 		else {

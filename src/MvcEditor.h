@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <php_frameworks/ProjectClass.h>
+#include <php_frameworks/FrameworkDetectorClass.h>
 #include <widgets/ProcessWithHeartbeatClass.h>
 #include <widgets/ResourceCacheClass.h>
 #include <windows/AppFrameClass.h>
@@ -175,12 +176,12 @@ private:
 	/**
 	 * To call the PHP framework detection scripts.
 	 */
-	FrameworkDetectorClass FrameworkDetector;
+	FrameworkDetectorActionClass FrameworkDetector;
 
 	/**
 	 * To call the PHP database connection detection scripts
 	 */
-	DatabaseDetectorClass DatabaseDetector;
+	DatabaseDetectorActionClass DatabaseDetector;
 	
 	/**
 	 * This object will be used to parse the resources of files that are currently open.

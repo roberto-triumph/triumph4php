@@ -27,6 +27,7 @@
 
 #include <PluginClass.h>
 #include <php_frameworks/ProjectClass.h>
+#include <php_frameworks/FrameworkDetectorClass.h>
 
 namespace mvceditor {
 
@@ -76,9 +77,9 @@ private:
 	 * plugin. This plugin will issue commands to get the list of
 	 * config files from the currently opened project.
 	 */
-	ResourcesDetectorClass ResourcesDetector;
+	ResourcesDetectorActionClass ResourcesDetector;
 
-	ConfigFilesDetectorClass ConfigFilesDetector;
+	ConfigFilesDetectorActionClass ConfigFilesDetector;
 
 	/**
 	 * This is the list of config files that were parsed from the result

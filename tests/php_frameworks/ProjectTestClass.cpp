@@ -24,6 +24,7 @@
  */
 #include <UnitTest++.h>
 #include <php_frameworks/ProjectClass.h>
+#include <php_frameworks/FrameworkDetectorClass.h>
 #include <FileTestFixtureClass.h>
 #include <wx/event.h>
 
@@ -41,9 +42,9 @@ public:
 	}
 
 	wxEvtHandler Handler;
-	mvceditor::FrameworkDetectorClass FrameworkDetector;
-	mvceditor::DatabaseDetectorClass DatabaseDetector;
-	mvceditor::ResourcesDetectorClass ResourcesDetector;
+	mvceditor::FrameworkDetectorActionClass FrameworkDetector;
+	mvceditor::DatabaseDetectorActionClass DatabaseDetector;
+	mvceditor::ResourcesDetectorActionClass ResourcesDetector;
 };
 
 SUITE(ProjectTestClass) {
@@ -119,7 +120,7 @@ TEST_FIXTURE(ProjectTestFixtureClass, ShouldParseResourcesResponse) {
 	wxString fileName = wxT("test.ini"); 
 	CreateFixtureFile(fileName, result);
 	ResourcesDetector.InitFromFile(TestProjectDir + fileName);
-	CHECK_EQUAL(mvceditor::DetectorClass::NONE, ResourcesDetector.Error);
+	CHECK_EQUAL(mvceditor::DetectorActionClass::NONE, ResourcesDetector.Error);
 	std::vector<mvceditor::ResourceClass> resources = ResourcesDetector.Resources;
 	CHECK_EQUAL((size_t)2, resources.size());
 	if ((size_t)2 == resources.size()) {
