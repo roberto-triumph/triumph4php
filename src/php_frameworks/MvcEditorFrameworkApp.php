@@ -292,7 +292,7 @@ if ($chosenFramework && $dir) {
 	}
 }
 else if ($dir && strcasecmp($action, 'isUsedBy') == 0) {
-	runAction(NULL, $dir, $action, $outputFile);
+	runAction(NULL, $dir, $action, $extra, $outputFile);
 }
 else if ($dir) {
 	print "Invalid identifier: '{$identifier}.' Program will now exit.\n";
