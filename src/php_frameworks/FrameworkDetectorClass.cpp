@@ -24,9 +24,17 @@
  */
 #include <php_frameworks/FrameworkDetectorClass.h>
 #include <windows/StringHelperClass.h>
+#include <MvcEditorErrors.h>
 #include <wx/stdpaths.h>
 #include <wx/config.h>
 #include <wx/tokenzr.h>
+
+static const int ID_DETECT_FRAMEWORK = wxNewId();
+static const int ID_DETECT_DATABASE = wxNewId();
+static const int ID_DETECT_CONFIG = wxNewId();
+static const int ID_DETECT_RESOURCES = wxNewId();
+static const int ID_DETECT_URL = wxNewId();
+
 
 mvceditor::DetectorActionClass::DetectorActionClass(wxEvtHandler& handler) 
 	: wxEvtHandler()
@@ -328,7 +336,174 @@ bool mvceditor::UrlDetectorActionClass::Response() {
 	return ret;
 }
 
+mvceditor::PhpFrameworkDetectorClass::PhpFrameworkDetectorClass(wxEvtHandler& handler, const mvceditor::EnvironmentClass& environment)
+	: wxEvtHandler()
+	, Identifiers()
+	, ConfigFiles()
+	, Databases()
+	, Resources()
+	, FrameworkDetector(*this)
+	, ConfigFilesDetector(*this)
+	, DatabaseDetector(*this)
+	, ResourcesDetector(*this)
+	, UrlDetector(*this)
+	, FrameworkIdentifiersLeftToDetect()
+	, Handler(handler)
+	, Environment(environment)
+	, ProjectRootPath() {
+		
+}
+
+void mvceditor::PhpFrameworkDetectorClass::Clear() {
+	Identifiers.clear();
+	ConfigFiles.clear();
+	Databases.clear();
+	Resources.clear();
+	FrameworkIdentifiersLeftToDetect.clear();
+}
+
+bool mvceditor::PhpFrameworkDetectorClass::Init(const wxString& dir) {
+	ProjectRootPath = dir;
+	return FrameworkDetector.Init(ID_DETECT_FRAMEWORK, Environment, dir, wxT(""), wxT(""));
+}
+
+bool mvceditor::PhpFrameworkDetectorClass::InitUrlDetector(const wxString& dir, const wxString& fileName) {
+	ProjectRootPath = dir;
+	return FrameworkDetector.Init(ID_DETECT_URL, Environment, dir, wxT(""),  fileName);
+}
+
+
+void mvceditor::PhpFrameworkDetectorClass::NextDetection() {
+	
+	// check the queue, if no more detections need to be done then
+	// we are done
+	if (!FrameworkIdentifiersLeftToDetect.empty()) {
+		std::vector<wxString> next = FrameworkIdentifiersLeftToDetect.back();
+		FrameworkIdentifiersLeftToDetect.pop_back();
+		
+		wxString framework = next[0];
+		wxString action = next[1];
+		if (action == wxT("databaseInfo")) {
+			DatabaseDetector.Init(ID_DETECT_DATABASE, Environment, ProjectRootPath, framework);
+		}
+		else if (action == wxT("configFiles")) {
+			ConfigFilesDetector.Init(ID_DETECT_CONFIG, Environment, ProjectRootPath, framework);
+		}
+		else if (action == wxT("resources")) {
+			ResourcesDetector.Init(ID_DETECT_RESOURCES, Environment, ProjectRootPath, framework);
+		}
+	}
+	else {	
+		wxCommandEvent completeEvent(mvceditor::EVENT_FRAMEWORK_DETECTION_COMPLETE);
+		wxPostEvent(&Handler, completeEvent);
+	}
+}
+
+void mvceditor::PhpFrameworkDetectorClass::OnFrameworkDetectionComplete(wxCommandEvent& event) {
+
+	// put the identifiers in the queue. For each identifier we want to detect its
+	// db connections, config files, and resources
+	Identifiers = FrameworkDetector.Frameworks;
+	if (FrameworkDetector.Error != mvceditor::DetectorActionClass::NONE) {
+		wxString response = event.GetString();
+		mvceditor::EditorLogError(mvceditor::PROJECT_DETECTION, response);
+	}
+	if (!Identifiers.empty()) {
+		
+		// fill the detection queue
+		for (size_t i = 0; i < Identifiers.size(); i++) {
+			std::vector<wxString> next;
+			next.push_back(Identifiers[i]);
+			next.push_back(wxT("databaseInfo"));
+			FrameworkIdentifiersLeftToDetect.push_back(next);
+			
+			next.clear();
+			next.push_back(Identifiers[i]);
+			next.push_back(wxT("configFiles"));
+			FrameworkIdentifiersLeftToDetect.push_back(next);
+			
+			next.clear();
+			next.push_back(Identifiers[i]);
+			next.push_back(wxT("resources"));
+			FrameworkIdentifiersLeftToDetect.push_back(next);
+		}
+		NextDetection();
+	}
+}
+
+void mvceditor::PhpFrameworkDetectorClass::OnDatabaseDetectionComplete(wxCommandEvent& event) {
+	Databases.insert(Databases.end(), DatabaseDetector.Databases.begin(), DatabaseDetector.Databases.end());
+	if (mvceditor::DetectorActionClass::NONE != DatabaseDetector.Error) {
+		wxString response = event.GetString();
+		mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, response);
+	}
+	NextDetection();
+}
+
+void mvceditor::PhpFrameworkDetectorClass::OnConfigFilesDetectionComplete(wxCommandEvent& event) {
+	std::map<wxString, wxString>::iterator it = ConfigFilesDetector.ConfigFiles.begin();
+	for (; it != ConfigFilesDetector.ConfigFiles.end(); ++it) {
+		ConfigFiles[it->first] = it->second;
+	}
+	if (mvceditor::DetectorActionClass::NONE != ConfigFilesDetector.Error) {
+		wxString response = event.GetString();
+		mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, response);
+	}
+	NextDetection();
+}
+
+void mvceditor::PhpFrameworkDetectorClass::OnResourcesDetectionComplete(wxCommandEvent& event) {
+	Resources.insert(Resources.end(), ResourcesDetector.Resources.begin(), ResourcesDetector.Resources.end());
+	if (mvceditor::DetectorActionClass::NONE != ResourcesDetector.Error) {
+		wxString response = event.GetString();
+		mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, response);
+	}
+	NextDetection();
+}
+
+void mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed(wxCommandEvent& event) {
+	wxCommandEvent failedEvent(mvceditor::EVENT_FRAMEWORK_DETECTION_FAILED);
+	failedEvent.SetString(event.GetString());
+	wxPostEvent(&Handler, failedEvent);
+}
+
+void mvceditor::PhpFrameworkDetectorClass::OnUrlDetectionComplete(wxCommandEvent& event) {
+	wxCommandEvent failedEvent(mvceditor::EVENT_FRAMEWORK_URL_COMPLETE);
+	failedEvent.SetString(event.GetString());
+	wxPostEvent(&Handler, failedEvent);
+}
+
+void mvceditor::PhpFrameworkDetectorClass::OnUrlDetectionFailed(wxCommandEvent& event) {
+	wxCommandEvent failedEvent(mvceditor::EVENT_FRAMEWORK_URL_FAILED);
+	failedEvent.SetString(event.GetString());
+	wxPostEvent(&Handler, failedEvent);
+}
+
+void mvceditor::PhpFrameworkDetectorClass::OnWorkInProgress(wxCommandEvent& event) {
+	wxPostEvent(&Handler, event);
+}
+
+const wxEventType mvceditor::EVENT_FRAMEWORK_DETECTION_COMPLETE = wxNewEventType();
+const wxEventType mvceditor::EVENT_FRAMEWORK_DETECTION_FAILED = wxNewEventType();
+const wxEventType mvceditor::EVENT_FRAMEWORK_URL_COMPLETE = wxNewEventType();
+const wxEventType mvceditor::EVENT_FRAMEWORK_URL_FAILED = wxNewEventType();
+
 BEGIN_EVENT_TABLE(mvceditor::DetectorActionClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::DetectorActionClass::OnProcessComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_FAILED, mvceditor::DetectorActionClass::OnProcessFailed)
+END_EVENT_TABLE()
+
+BEGIN_EVENT_TABLE(mvceditor::PhpFrameworkDetectorClass, wxEvtHandler)
+	EVT_COMMAND(ID_DETECT_FRAMEWORK, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::PhpFrameworkDetectorClass::OnFrameworkDetectionComplete)
+	EVT_COMMAND(ID_DETECT_DATABASE, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::PhpFrameworkDetectorClass::OnDatabaseDetectionComplete)
+	EVT_COMMAND(ID_DETECT_CONFIG, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::PhpFrameworkDetectorClass::OnConfigFilesDetectionComplete)
+	EVT_COMMAND(ID_DETECT_RESOURCES, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::PhpFrameworkDetectorClass::OnResourcesDetectionComplete)
+	
+	EVT_COMMAND(ID_DETECT_FRAMEWORK, mvceditor::EVENT_PROCESS_FAILED, mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed)
+	EVT_COMMAND(ID_DETECT_DATABASE, mvceditor::EVENT_PROCESS_FAILED, mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed)
+	EVT_COMMAND(ID_DETECT_CONFIG, mvceditor::EVENT_PROCESS_FAILED, mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed)
+	EVT_COMMAND(ID_DETECT_RESOURCES, mvceditor::EVENT_PROCESS_FAILED, mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed)
+	EVT_COMMAND(ID_DETECT_URL, mvceditor::EVENT_PROCESS_FAILED, mvceditor::PhpFrameworkDetectorClass::OnUrlDetectionFailed)
+	
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::PhpFrameworkDetectorClass::OnWorkInProgress)
 END_EVENT_TABLE()

@@ -166,11 +166,8 @@ private:
 	/**
 	 * To grab SQL table meta data
 	 */
+	// TODO move these out of here and into the App class
 	SqlResourceFinderClass SqlResourceFinder;
-
-	/**
-	 * The detected database connection info
-	 */
 	std::vector<DatabaseInfoClass> Databases;
 	
 	/**

@@ -24,7 +24,6 @@
  */
 #include <php_frameworks/ProjectClass.h>
 #include <php_frameworks/FrameworkDetectorClass.h>
-#include <widgets/ProcessWithHeartbeatClass.h>
 #include <widgets/ResourceCacheClass.h>
 #include <windows/AppFrameClass.h>
 #include <environment/EnvironmentClass.h>
@@ -74,6 +73,24 @@ extern const wxEventType EVENT_APP_OPEN_FILE;
 class AppClass : public wxApp {
 
 public:
+
+	/**
+	 * The environment stack.
+	 * 
+	 * @var EnvironmentClass
+	 */
+	EnvironmentClass Environment;
+	
+	/**
+	 * This object will be used to parse the resources of files that are currently open.
+	 */
+	ResourceCacheClass ResourceCache;
+		
+	/**
+	 * This object will be used to detct the various PHP framework artifacts (resources,
+	 * database connections, route URLs).
+	 */
+	PhpFrameworkDetectorClass PhpFrameworks;
 
 	/** 
 	 * Initialize the application 
@@ -142,59 +159,31 @@ private:
 	 * close project and all resources that depend on it
 	 */
 	void CloseProject();
-
+	
 	/**
-	 * method that gets called when one of the external processes finishes
+	 * This is the callback that gets called when the PHP framework detectors have 
+	 * successfully run
 	 */
-	void OnProcessComplete(wxCommandEvent& event);
-
-	/**
-	 * method that gets called when one of the external processes fails
-	 */
-	void OnProcessFailed(wxCommandEvent& event);
+	void OnFrameworkDetectionComplete(wxCommandEvent& event);
+	void OnFrameworkDetectionInProgress(wxCommandEvent& event);
+	void OnFrameworkDetectionFailed(wxCommandEvent& event);
 
 	/**
 	 * Additional functionality
 	 */
 	std::vector<PluginClass*> Plugins;
-
-	/**
-	 * a project may be using more than one framework. This vector
-	 * will be used as a 'queue' so that we can know when all framework
-	 * info has been discovered. This queue is needed because the
-	 * detection process is asynchronous.
-	 */
-	std::vector<wxString> FrameworkIdentifiersLeftToDetect;
 	
 	/**
-	 * The environment stack.
+	 * The user preferences. For now this is a pointer because it does non-trival work
+	 * in the constructor (uses some wx widgets stuff)
 	 * 
-	 * @var EnvironmentClass
-	 */
-	EnvironmentClass Environment;
-
-	/**
-	 * To call the PHP framework detection scripts.
-	 */
-	FrameworkDetectorActionClass FrameworkDetector;
-
-	/**
-	 * To call the PHP database connection detection scripts
-	 */
-	DatabaseDetectorActionClass DatabaseDetector;
-	
-	/**
-	 * This object will be used to parse the resources of files that are currently open.
-	 */
-	ResourceCacheClass ResourceCache;
-
-	/**
-	 * The user preferences
 	 * 
 	 * @var PreferencesClass;
 	 */
+	 // TODO simply this and just make it a reference by creating a specific Init() method
+	 // on the preferences class.
 	PreferencesClass* Preferences;
-
+		
 	/**
 	 * The open project
 	 * @var ProjectClass*

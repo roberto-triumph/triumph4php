@@ -27,6 +27,7 @@
 #include <unicode/uclean.h>
 
 #include <windows/AppFrameClass.h>
+#include <widgets/StatusBarWithGaugeClass.h>
 #include <plugins/EnvironmentPluginClass.h>
 #include <plugins/FindInFilesPluginClass.h>
 #include <plugins/FinderPluginClass.h>
@@ -40,31 +41,28 @@
 #include <plugins/CodeIgniterPluginClass.h>
 #include <MvcEditorErrors.h>
 
-static const int ID_FRAMEWORK_DETECT_PROCESS = wxNewId();
-static const int ID_DATABASE_DETECT_PROCESS = wxNewId();
-
 IMPLEMENT_APP(mvceditor::AppClass)
+
+static const int ID_FRAMEWORK_DETECTION_GAUGE = wxNewId();
 
 mvceditor::AppClass::AppClass()
 	: wxApp()
-	, Plugins()
-	, FrameworkIdentifiersLeftToDetect()
 	, Environment()
-	, FrameworkDetector(*this)
-	, DatabaseDetector(*this)
 	, ResourceCache()
-	, Preferences(NULL)
+	, PhpFrameworks(*this, Environment)
+	, Plugins()
 	, Project(NULL)
 	, ResourcePlugin(NULL)
 	, ProjectPlugin(NULL) {
 	AppFrame = NULL;
+	Preferences = NULL;
 }
 
 /**
  * when app starts, create the new app frame
  */
 bool mvceditor::AppClass::OnInit() {
-
+	Preferences = new PreferencesClass();
 	// plugins will need to be create first because 
 	CreatePlugins();
 
@@ -72,7 +70,6 @@ bool mvceditor::AppClass::OnInit() {
 	// frame and initialize the plugin windows so that all menus are created
 	// and only then can we load the keyboard shortcuts from the INI file
 	// all menu items must be present in the menu bar for shortcuts to take effect
-	Preferences = new PreferencesClass();
 	AppFrame = new mvceditor::AppFrameClass(Plugins, *this, Environment, *Preferences, ResourceCache);
 	PluginWindows();
 
@@ -81,7 +78,7 @@ bool mvceditor::AppClass::OnInit() {
 	Environment.LoadFromConfig();
 	wxConfigBase* config = wxConfigBase::Get();
 	for (size_t i = 0; i < Plugins.size(); ++i) {
-		Plugins[i]->InitState(&Environment, this, &ResourceCache);
+		Plugins[i]->InitState(this);
 		Plugins[i]->LoadPreferences(config);
 		Plugins[i]->AddKeyboardShortcuts(Preferences->DefaultKeyboardShortcutCmds);
 	}	
@@ -106,9 +103,7 @@ mvceditor::AppClass::~AppClass() {
 		delete Project;
 		Project = NULL;
 	}
-	if (Preferences) {
-		delete Preferences;
-	}
+	delete Preferences;
 	
 	// calling cleanup here so that we can run this binary through a memory leak detector 
 	// ICU will cache many things and that will cause the detector to output "possible leaks"
@@ -240,12 +235,15 @@ void mvceditor::AppClass::ProjectOpen(const wxString& directoryPath) {
 	CloseProject();
 	Project = new ProjectClass(options);
 
-	FrameworkIdentifiersLeftToDetect.clear();
-
 	// on startup the editor is in "non-project" mode (no root path)
 	if (!directoryPath.IsEmpty()) {
-		if (!FrameworkDetector.Init(ID_FRAMEWORK_DETECT_PROCESS, Environment, directoryPath, wxT(""))) {
+		bool started = PhpFrameworks.Init(directoryPath);
+		if (!started) {
 			mvceditor::EditorLogError(mvceditor::BAD_PHP_EXECUTABLE, Environment.Php.PhpExecutablePath); 
+		}
+		else {
+			mvceditor::StatusBarWithGaugeClass* gauge = wxDynamicCast(AppFrame->GetStatusBar(), mvceditor::StatusBarWithGaugeClass);
+			gauge->AddGauge(_("Framework Detection"), ID_FRAMEWORK_DETECTION_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
 		}
 	}
 	else {
@@ -275,50 +273,23 @@ void mvceditor::AppClass::OnProjectOpen(wxCommandEvent& event) {
 	ProjectOpen(directoryPath);
 }
 
-void mvceditor::AppClass::OnProcessComplete(wxCommandEvent& event) {
-	bool continueProjectOpen = true;
-	if (event.GetId() == ID_FRAMEWORK_DETECT_PROCESS) {
-
-		// framework detection complete.  if a known framework 
-		// was detected get the DB info, else just continue
-		// opening the project
-		std::vector<wxString> frameworks = FrameworkDetector.Frameworks;
-		if (!frameworks.empty()) {
-			for (size_t i = 1; i < frameworks.size(); i++) {
-				FrameworkIdentifiersLeftToDetect.push_back(frameworks[i]);
-			}
-			DatabaseDetector.Init(ID_DATABASE_DETECT_PROCESS, Environment, Project->GetRootPath(), frameworks[0]);
-			continueProjectOpen = false;
-		}
-		if (FrameworkDetector.Error != mvceditor::DetectorActionClass::NONE) {
-			mvceditor::EditorLogError(mvceditor::PROJECT_DETECTION);
+void mvceditor::AppClass::OnFrameworkDetectionComplete(wxCommandEvent& event) {
+	for (size_t i = 0; i < PhpFrameworks.Databases.size(); ++i) {
+		Project->PushDatabaseInfo(PhpFrameworks.Databases[i]);
+	}
+	
+	AppFrame->OnProjectOpened(Project, this);
+	ProjectPlugin->SetProject(Project);
+	for (size_t i = 0; i < Plugins.size(); ++i) {
+		if (Plugins[i] != ProjectPlugin) {
+			Plugins[i]->SetProject(Project);
 		}
 	}
-	else if (event.GetId() == ID_DATABASE_DETECT_PROCESS) {
-		for (size_t i = 0; i < DatabaseDetector.Databases.size(); ++i) {
-			Project->PushDatabaseInfo(DatabaseDetector.Databases[i]);
-		}
-
-		// detection of database settings for ONE framework has completed.
-		if (!FrameworkIdentifiersLeftToDetect.empty()) {	
-			continueProjectOpen = false;
-			wxString nextFramework = FrameworkIdentifiersLeftToDetect.back();
-			FrameworkIdentifiersLeftToDetect.pop_back();
-			DatabaseDetector.Init(ID_DATABASE_DETECT_PROCESS, Environment, Project->GetRootPath(), nextFramework);
-		}
-	}
-	if (continueProjectOpen) {
-		AppFrame->OnProjectOpened(Project, this);
-		ProjectPlugin->SetProject(Project);
-		for (size_t i = 0; i < Plugins.size(); ++i) {
-			if (Plugins[i] != ProjectPlugin) {
-				Plugins[i]->SetProject(Project);
-			}
-		}
-	}
+	mvceditor::StatusBarWithGaugeClass* gauge = wxDynamicCast(AppFrame->GetStatusBar(), mvceditor::StatusBarWithGaugeClass);
+	gauge->StopGauge(ID_FRAMEWORK_DETECTION_GAUGE);
 }
 
-void mvceditor::AppClass::OnProcessFailed(wxCommandEvent& event) {
+void mvceditor::AppClass::OnFrameworkDetectionFailed(wxCommandEvent& event) {
 	EditorLogError(mvceditor::BAD_PHP_EXECUTABLE, event.GetString());
 
 	// still need to set the project even if the project detection fails
@@ -330,6 +301,13 @@ void mvceditor::AppClass::OnProcessFailed(wxCommandEvent& event) {
 			Plugins[i]->SetProject(Project);
 		}
 	}
+	mvceditor::StatusBarWithGaugeClass* gauge = wxDynamicCast(AppFrame->GetStatusBar(), mvceditor::StatusBarWithGaugeClass);
+	gauge->StopGauge(ID_FRAMEWORK_DETECTION_GAUGE);
+}
+
+void mvceditor::AppClass::OnFrameworkDetectionInProgress(wxCommandEvent& event) {
+	mvceditor::StatusBarWithGaugeClass* gauge = wxDynamicCast(AppFrame->GetStatusBar(), mvceditor::StatusBarWithGaugeClass);
+	gauge->IncrementGauge(mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
 }
 
 void mvceditor::AppClass::OnProjectReIndex(wxCommandEvent& event) {
@@ -357,9 +335,9 @@ BEGIN_EVENT_TABLE(mvceditor::AppClass, wxApp)
 	EVT_COMMAND(wxID_ANY, EVENT_APP_SAVE_PREFERENCES, mvceditor::AppClass::OnSavePreferences)	
 	EVT_COMMAND(wxID_ANY, EVENT_APP_OPEN_PROJECT, mvceditor::AppClass::OnProjectOpen)
 	EVT_COMMAND(wxID_ANY, EVENT_APP_RE_INDEX, mvceditor::AppClass::OnProjectReIndex)
-	EVT_COMMAND(wxID_ANY, EVENT_APP_OPEN_FILE, mvceditor::AppClass::OnOpenFile)
-	EVT_COMMAND(ID_FRAMEWORK_DETECT_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::AppClass::OnProcessComplete)
-	EVT_COMMAND(ID_DATABASE_DETECT_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::AppClass::OnProcessComplete)
-	EVT_COMMAND(ID_FRAMEWORK_DETECT_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::AppClass::OnProcessFailed)
-	EVT_COMMAND(ID_DATABASE_DETECT_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::AppClass::OnProcessFailed)
+	EVT_COMMAND(wxID_ANY, EVENT_APP_OPEN_FILE, mvceditor::AppClass::OnOpenFile)	
+	
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_DETECTION_COMPLETE, mvceditor::AppClass::OnFrameworkDetectionComplete)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_DETECTION_FAILED, mvceditor::AppClass::OnFrameworkDetectionFailed)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::AppClass::OnFrameworkDetectionInProgress)
 END_EVENT_TABLE()

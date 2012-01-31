@@ -62,24 +62,11 @@ public:
 private:	
 
 	void OnMenuItem(wxCommandEvent& event);
-
-	void OnProcessComplete(wxCommandEvent& event);
-
-	void OnProcessFailed(wxCommandEvent& event);
-
+	
 	/**
 	 * adds the entries in ConfigFiles to the menu.
 	 */
 	void UpdateMenu();
-
-	/**
-	 * this is the object used to 'communicate' with the code igniter
-	 * plugin. This plugin will issue commands to get the list of
-	 * config files from the currently opened project.
-	 */
-	ResourcesDetectorActionClass ResourcesDetector;
-
-	ConfigFilesDetectorActionClass ConfigFilesDetector;
 
 	/**
 	 * This is the list of config files that were parsed from the result

@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <PluginClass.h>
+#include <MvcEditor.h>
 #include <wx/artprov.h>
 
 mvceditor::PluginClass::PluginClass()
@@ -30,9 +31,8 @@ mvceditor::PluginClass::PluginClass()
 	, StatusBarWithGauge(NULL)
 	, Notebook(NULL)
 	, ToolsNotebook(NULL)
-	, AppHandler(NULL)
+	, App(NULL)
 	, Project(NULL)
-	, Environment(NULL)
 	, MenuBar(NULL) {
 }
 
@@ -48,10 +48,8 @@ void mvceditor::PluginClass::InitWindow(StatusBarWithGaugeClass* statusBarWithGa
 	MenuBar = menuBar;
 }
 
-void mvceditor::PluginClass::InitState(EnvironmentClass* environment, wxEvtHandler* appHandler, mvceditor::ResourceCacheClass* resourceCache) {
-	Environment = environment;
-	AppHandler = appHandler;
-	ResourceCache = resourceCache;
+void mvceditor::PluginClass::InitState(AppClass* app) {
+	App = app;
 }
 
 void mvceditor::PluginClass::SetProject(ProjectClass* project) {
@@ -69,12 +67,16 @@ mvceditor::NotebookClass* mvceditor::PluginClass::GetNotebook() const {
 	return Notebook;
 }
 
-mvceditor::EnvironmentClass* mvceditor::PluginClass::GetEnvironment() const {
-	return Environment;
+mvceditor::EnvironmentClass* mvceditor::PluginClass::GetEnvironment() {
+	return &App->Environment;
 }
 
-mvceditor::ResourceCacheClass* mvceditor::PluginClass::GetResourceCache() const {
-	return ResourceCache;
+mvceditor::ResourceCacheClass* mvceditor::PluginClass::GetResourceCache() {
+	return &App->ResourceCache;
+}
+
+mvceditor::PhpFrameworkDetectorClass& mvceditor::PluginClass::PhPFrameworks() const {
+	return App->PhpFrameworks;
 }
 
 void mvceditor::PluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
@@ -193,8 +195,8 @@ mvceditor::CodeControlClass* mvceditor::PluginClass::CreateCodeControl(const wxS
 }
 
 void mvceditor::PluginClass::AppEvent(wxCommandEvent event) {
-	if (AppHandler) {
-		wxPostEvent(AppHandler, event);	
+	if (App) {
+		wxPostEvent(App, event);	
 	}
 }
 

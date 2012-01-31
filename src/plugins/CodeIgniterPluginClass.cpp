@@ -27,19 +27,8 @@
 #include <MvcEditor.h>
 #include <windows/StringHelperClass.h>
 
-/*
- * This is what the code igniter framework detection code calls itself.
- * see the 'getIdentifier' method of the PHP framework detection code.
- */
-static const wxString FRAMEWORK_IDENTIFIER = wxT("code-igniter");
-static const int ID_CONFIG_DETECTION = wxNewId();
-static const int ID_RESOURCE_DETECTION = wxNewId();
-static const int ID_CODE_IGNITER_GAUGE = wxNewId();
-
 mvceditor::CodeIgniterPluginClass::CodeIgniterPluginClass()  
-	: PluginClass() 
-	, ResourcesDetector(*this)
-	, ConfigFilesDetector(*this)
+	: PluginClass()
 	, ConfigFiles() {
 	CodeIgniterMenu = NULL;
 	MenuBar = NULL;
@@ -61,61 +50,12 @@ void mvceditor::CodeIgniterPluginClass::OnProjectOpened() {
 			CodeIgniterMenu->Delete(CodeIgniterMenu->FindItemByPosition(0)->GetId());
 		}
 	}
-	mvceditor::ProjectClass* project = GetProject();
-	mvceditor::EnvironmentClass* environment = GetEnvironment();
-
-	// on startup the editor is in "non-project" mode (no root path)
-	if (project && !project->GetRootPath().IsEmpty()) {
-		if (!ConfigFilesDetector.Init(ID_CONFIG_DETECTION, *environment, project->GetRootPath(), FRAMEWORK_IDENTIFIER)) {
-			mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, wxT("Config File Detection process could not be started"));
-		}
-		else {
-			GetStatusBarWithGauge()->StopGauge(ID_CODE_IGNITER_GAUGE);
-			GetStatusBarWithGauge()->AddGauge(
-				_("Code Igniter Resource Detection"), ID_CODE_IGNITER_GAUGE, 
-				mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
-		}
-	}
-}
-
-void mvceditor::CodeIgniterPluginClass::OnProcessComplete(wxCommandEvent &event) {
-	GetStatusBarWithGauge()->StopGauge(ID_CODE_IGNITER_GAUGE);
-	mvceditor::ProjectClass* project = GetProject();
-	if (project && event.GetId() == ID_CONFIG_DETECTION) {
-		wxString response = event.GetString();
-		ConfigFiles.clear();
-		if (mvceditor::DetectorActionClass::NONE != ConfigFilesDetector.Error) {
-			mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, response);
-		}
-		else {
-			ConfigFiles = ConfigFilesDetector.ConfigFiles;
-			UpdateMenu();
-		}
-		mvceditor::EnvironmentClass* environment = GetEnvironment();
-		if (!ResourcesDetector.Init(ID_RESOURCE_DETECTION, *environment, project->GetRootPath(), FRAMEWORK_IDENTIFIER)) {
-			mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, wxT("Resource Detection process could not be started"));
-		}
-		else {
-			GetStatusBarWithGauge()->AddGauge(
-				_("Code Igniter Resource Detection"), ID_CODE_IGNITER_GAUGE, 
-				mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
-		}
-	}
-	else if (project && event.GetId() == ID_RESOURCE_DETECTION) {
-		if (mvceditor::DetectorActionClass::NONE != ResourcesDetector.Error) {
-			mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, wxT(""));
-		}
-		else {
-			mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
-			resourceCache->GlobalAddDynamicResources(ResourcesDetector.Resources);
-		}
-	}
-}
-
-void mvceditor::CodeIgniterPluginClass::OnProcessFailed(wxCommandEvent& event) {
-	wxString response = event.GetString();
-	mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, response);
-	event.Skip();
+	
+	ConfigFiles.clear();
+	ConfigFiles = PhPFrameworks().ConfigFiles;
+	UpdateMenu();
+	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
+	resourceCache->GlobalAddDynamicResources(PhPFrameworks().Resources);
 }
 
 void mvceditor::CodeIgniterPluginClass::UpdateMenu() {
@@ -219,9 +159,5 @@ void mvceditor::CodeIgniterPluginClass::AddKeyboardShortcuts(std::vector<Dynamic
 }
 
 BEGIN_EVENT_TABLE(mvceditor::CodeIgniterPluginClass, wxEvtHandler) 
-	EVT_COMMAND(ID_CONFIG_DETECTION, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::CodeIgniterPluginClass::OnProcessComplete)
-	EVT_COMMAND(ID_CONFIG_DETECTION, mvceditor::EVENT_PROCESS_FAILED, mvceditor::CodeIgniterPluginClass::OnProcessFailed)
-	EVT_COMMAND(ID_RESOURCE_DETECTION, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::CodeIgniterPluginClass::OnProcessComplete)
-	EVT_COMMAND(ID_RESOURCE_DETECTION , mvceditor::EVENT_PROCESS_FAILED, mvceditor::CodeIgniterPluginClass::OnProcessFailed)
 	EVT_MENU_RANGE(MENU_CODE_IGNITER, MENU_CODE_IGNITER + 13, mvceditor::CodeIgniterPluginClass::OnMenuItem)
 END_EVENT_TABLE()

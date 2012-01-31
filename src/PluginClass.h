@@ -27,6 +27,7 @@
  
 #include <environment/EnvironmentClass.h>
 #include <php_frameworks/ProjectClass.h>
+#include <php_frameworks/FrameworkDetectorClass.h>
 #include <widgets/NotebookClass.h>
 #include <widgets/ResourceCacheClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
@@ -36,6 +37,9 @@
 #include <vector>
 
 namespace mvceditor {
+	
+// forward declaration to prevent #include of the AppClass
+class AppClass;
 
 /**
  * ATTN: Use this enum to build the Plugin menus
@@ -137,11 +141,9 @@ public:
 	/**
 	 * Initialize application state
 	 * 
-	 * @param EnvironmentClass* the PHP app environment options. The pointer will NOT be owned by this class.
-	 * @param appHandler event handler that may receive events from plugins. The pointer will NOT be owned by this class.
-	 * @param resourceCache the application-wide cache of resources.  The pointer will NOT be owned by this class.
+	 * @param app the handler that may receive events from plugins. The pointer will NOT be owned by this class.
 	 */
-	void InitState(EnvironmentClass* environment, wxEvtHandler* appHandler, ResourceCacheClass* resourceCache);
+	void InitState(AppClass* app);
 		
 	/**
 	 * Add menu items to the tools menu for this plugin. Remeber to use the MenuIds enum when building
@@ -317,7 +319,12 @@ protected:
 	 * 
 	 * @return ResourceCacheClass*
 	 */
-	ResourceCacheClass* GetResourceCache() const;
+	ResourceCacheClass* GetResourceCache();
+	
+	/**
+	 * The detected framework resources
+	 */
+	PhpFrameworkDetectorClass& PhPFrameworks() const;
 	
 	/**
 	 * Set the given page to be the selected page for the tools notebook
@@ -345,7 +352,7 @@ protected:
 	 * 
 	 * @return EnvironmentClass
 	 */
-	 EnvironmentClass* GetEnvironment() const;
+	 EnvironmentClass* GetEnvironment();
 	 
 	 /**
 	  * Creates a new code control that is primed with the global editor
@@ -415,7 +422,7 @@ protected:
 	/**
 	 * The application event dispatcher. The pointer will NOT be owned by this class.
 	 */
-	wxEvtHandler* AppHandler;
+	AppClass* App;
 	
 	/**
 	 * The current opened project. The pointer will NOT be owned by this class.
@@ -423,23 +430,11 @@ protected:
 	 * @var ProjectClass*
 	 */	
 	ProjectClass* Project;
-	
-	/**
-	 * The development stack. The pointer will NOT be owned by this class.
-	 * 
-	 * @var EnvironmentClass
-	 */
-	EnvironmentClass* Environment;
 
 	/**
 	 * The Application-wide menu bar.
 	 */
 	wxMenuBar* MenuBar;
-
-	/**
-	 * The Application-wide resource cache.
-	 */
-	ResourceCacheClass* ResourceCache;
 	
 };
 
