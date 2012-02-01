@@ -34,6 +34,27 @@ static const int ID_TOOLBAR_RUN = wxNewId();
 const int ID_TOOLBAR_BROWSER = wxNewId();
 static const int ID_WINDOW_CONSOLE = wxNewId();
 
+static void ExternalBrowser(const wxString& browserName, const wxString& url, mvceditor::EnvironmentClass* environment) {
+	wxFileName webBrowserPath  = environment->WebBrowsers[browserName];
+	if (!webBrowserPath.IsOk()) {
+		mvceditor::EditorLogWarning(mvceditor::BAD_WEB_BROWSER_EXECUTABLE, webBrowserPath.GetFullPath());
+		return;
+	}
+	wxString cmd = wxT("\"") + webBrowserPath.GetFullPath() + wxT("\""); 
+	cmd += wxT(" \"");
+	cmd += url;
+	cmd += wxT("\"");
+			
+	// TODO track this PID ... ?
+	// what about when user closes the external browser ?
+	// make the browser its own process so that it stays alive if the editor program is exited
+	// if we dont do this the browser thinks it crashed and will tell the user so
+	long pid = wxExecute(cmd, wxEXEC_ASYNC | wxEXEC_MAKE_GROUP_LEADER);
+	if (pid <= 0) {
+		mvceditor::EditorLogWarning(mvceditor::BAD_WEB_BROWSER_EXECUTABLE, cmd);
+	}
+}
+
 mvceditor::RunConsolePanelClass::RunConsolePanelClass(wxWindow* parent, EnvironmentClass* environment, StatusBarWithGaugeClass* gauge, int id)
 	: RunConsolePanelGeneratedClass(parent, id)
 	, CommandString()
@@ -164,8 +185,16 @@ mvceditor::RunConsolePluginClass::RunConsolePluginClass()
 	, RunCliInNewWindowMenuItem(NULL)
 	, RunCliWithArgsInNewWindowMenuItem(NULL)
 	, RunInBrowser(NULL)
-	, BrowserComboBox(NULL) {
+	, BrowserComboBox(NULL) 
+	, PhpFrameworks(NULL) {
 }
+
+mvceditor::RunConsolePluginClass::~RunConsolePluginClass() {
+	if (PhpFrameworks) {
+		delete PhpFrameworks;
+	}
+}
+
 
 void mvceditor::RunConsolePluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
 	RunCliMenuItem = new wxMenuItem(toolsMenu, mvceditor::MENU_RUN_PHP + 0, _("Run As CLI\tF7"), 
@@ -287,42 +316,71 @@ void mvceditor::RunConsolePluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 }
 
 void mvceditor::RunConsolePluginClass::OnRunInWebBrowser(wxCommandEvent& event) {
-	wxString browserName = BrowserComboBox->GetValue();
+	mvceditor::CodeControlClass* currentCodeControl = GetCurrentCodeControl();
+	if (!currentCodeControl) {
+		return;
+	}
+	wxString fileName = currentCodeControl->GetFileName();
 	mvceditor::EnvironmentClass* environment = GetEnvironment();
-	wxFileName webBrowserPath  = environment->WebBrowsers[browserName];
-	if (webBrowserPath.IsOk()) {
-		mvceditor::CodeControlClass* currentCodeControl = GetCurrentCodeControl();
-		if (currentCodeControl) {
-			wxString fileName = currentCodeControl->GetFileName();
-			if (wxFileName::FileExists(fileName)) {
-				
-				// turn file name into a url
-				wxString url = environment->Apache.GetUrl(fileName);
-				if (!url.IsEmpty()) {
-					wxString cmd = wxT("\"") + webBrowserPath.GetFullPath() + wxT("\""); 
-					cmd += wxT(" \"");
-					cmd += url;
-					cmd += wxT("\"");
-					
-					// TODO track this PID ... ?
-					// what about when user closes the external browser ?
-					long pid = wxExecute(cmd, wxEXEC_ASYNC);
-					if (pid <= 0) {
-						mvceditor::EditorLogWarning(mvceditor::BAD_WEB_BROWSER_EXECUTABLE, cmd);
-					}
-				}
-				else {
-					mvceditor::EditorLogWarning(mvceditor::INVALID_FILE, _("File is not under web root"));	
-				}
-			}
-			else {
-				mvceditor::EditorLogWarning(mvceditor::INVALID_FILE, fileName);
-			}
+	if (PhPFrameworks().Identifiers.empty()) {
+		wxString browserName = BrowserComboBox->GetValue();
+		if (!wxFileName::FileExists(fileName)) {
+			mvceditor::EditorLogWarning(mvceditor::INVALID_FILE, fileName);
+			return;
 		}
+
+		// turn file name into a url in the default manner (by calculating from the vhost document root)
+		wxString url = environment->Apache.GetUrl(fileName);
+		if (url.IsEmpty()) {
+			mvceditor::EditorLogWarning(mvceditor::INVALID_FILE, _("File is not under web root"));	
+			return;
+		}	
+		ExternalBrowser(browserName, url, environment);
+	}
+	else if (!PhpFrameworks) {
+		PhpFrameworks = new PhpFrameworkDetectorClass(*this, *environment);
+		PhpFrameworks->Identifiers = PhPFrameworks().Identifiers;
+		PhpFrameworks->InitUrlDetector(GetProject()->GetRootPath(), fileName);
 	}
 	else {
-		mvceditor::EditorLogWarning(mvceditor::BAD_WEB_BROWSER_EXECUTABLE, webBrowserPath.GetFullPath());
+		PhpFrameworks->InitUrlDetector(GetProject()->GetRootPath(), fileName);
 	}
+}
+
+void mvceditor::RunConsolePluginClass::OnUrlDetectionComplete(mvceditor::UrlDetectedEventClass& event) {
+	mvceditor::CodeControlClass* currentCodeControl = GetCurrentCodeControl();
+	if (!currentCodeControl) {
+		return;
+	}
+	wxString fileName = currentCodeControl->GetFileName();
+	wxString browserName = BrowserComboBox->GetValue();
+	mvceditor::EnvironmentClass* environment = GetEnvironment();
+	
+	std::vector<wxString> urls = event.Urls;
+	if (!urls.empty()) {
+		wxString url = environment->Apache.GetUrl(fileName);
+		
+		// we only want the virtual host name, as the url we get from the framework's routing url scheme
+		url = url.Mid(7); // 7 = length of "http://"
+		url = url.Mid(0, url.Find(wxT("/")));
+		url = wxT("http://") + url + wxT("/") + urls[0];
+		ExternalBrowser(browserName, url, environment);
+	}
+	else {
+		
+		// no URLs means that the file can be accessed normally
+		// turn file name into a url in the default manner (by calculating from the vhost document root)
+		wxString url = environment->Apache.GetUrl(fileName);
+		if (url.IsEmpty()) {
+			mvceditor::EditorLogWarning(mvceditor::INVALID_FILE, _("File is not under web root"));	
+			return;
+		}	
+		ExternalBrowser(browserName, url, environment);
+	}
+}
+
+void mvceditor::RunConsolePluginClass::OnUrlDetectionFailed(wxCommandEvent& event) {
+	mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, event.GetString());
 }
 
 BEGIN_EVENT_TABLE(mvceditor::RunConsolePanelClass, wxPanel) 
@@ -340,4 +398,6 @@ BEGIN_EVENT_TABLE(mvceditor::RunConsolePluginClass, wxEvtHandler)
 	EVT_TOOL(ID_TOOLBAR_RUN, mvceditor::RunConsolePluginClass::OnRunFileAsCli)
 	EVT_TOOL(ID_TOOLBAR_BROWSER, mvceditor::RunConsolePluginClass::OnRunInWebBrowser)
 	EVT_UPDATE_UI(wxID_ANY, mvceditor::RunConsolePluginClass::OnUpdateUi)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_URL_FAILED, mvceditor::RunConsolePluginClass::OnUrlDetectionFailed)
+	EVT_FRAMEWORK_URL_COMPLETE(mvceditor::RunConsolePluginClass::OnUrlDetectionComplete)
 END_EVENT_TABLE()

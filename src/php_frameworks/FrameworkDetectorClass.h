@@ -29,9 +29,8 @@
 #include <widgets/ProcessWithHeartbeatClass.h>
 #include <environment/DatabaseInfoClass.h>
 #include <environment/EnvironmentClass.h>
-#include <wx/event.h>
 #include <wx/string.h>
-
+#include <wx/event.h>
 
 namespace mvceditor {
 
@@ -368,7 +367,7 @@ public:
 	 * @param dir the project's root directory
 	 * @param fileName the full path to the file that needs to be resolved to a URL.
 	 * @return bool TRUE if detection started successfully. If false, then it is likely that the PHP executable path
-	 * is not correct
+	 * is not correct or that no PHp frameworks were detected.
 	 */
 	bool InitUrlDetector(const wxString& dir, const wxString& fileName);
 	
@@ -392,6 +391,11 @@ private:
 	 * item 0 is the framework identifier and item 1 is the detector action
 	 */
 	std::vector<std::vector<wxString> > FrameworkIdentifiersLeftToDetect;
+	
+	/**
+	 * the list of result of URL detection; these could be from multiple frameworks
+	 */
+	std::vector<wxString> UrlsDetected;
 	
 	/**
 	 * event handler that will receive the EVENT_FRAMEWORK_DETECTION_COMPLETE, EVENT_FRAMEWORK_URL
@@ -424,12 +428,42 @@ private:
 	void OnDetectionFailed(wxCommandEvent& event);
 	void OnUrlDetectionFailed(wxCommandEvent& event);
 	
+	/**
+	 * these methods will take care of running the next detection in the queue
+	 */
 	void NextDetection();
+	void NextUrlDetection();
 	
 	void OnWorkInProgress(wxCommandEvent& event);
 	
 	DECLARE_EVENT_TABLE()
 };
+
+class UrlDetectedEventClass : public wxEvent {
+
+	public:
+
+	/**
+	 * the URLs that were detected; these URLs are calculated using framework specific
+	 * routing rules. Urls will not contain a hostname
+	 */
+	std::vector<wxString> Urls;
 	
+	UrlDetectedEventClass(std::vector<wxString> urls);
+	
+	/**
+	 * needed by wxPostEvent
+	 */
+	wxEvent* Clone() const;
+};
+
+typedef void (wxEvtHandler::*UrlDetectedEventClassFunction)(UrlDetectedEventClass&);
+
+#define EVT_FRAMEWORK_URL_COMPLETE(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_FRAMEWORK_URL_COMPLETE, wxID_ANY, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( UrlDetectedEventClassFunction, & fn ), (wxObject *) NULL ),
+
 }
+
 #endif

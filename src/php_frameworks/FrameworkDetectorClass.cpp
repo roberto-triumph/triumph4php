@@ -84,7 +84,9 @@ bool mvceditor::DetectorActionClass::Init(int id, const EnvironmentClass& enviro
 		wxT(" --action=\"") + action  + wxT("\"") +
 		wxT(" --dir=\"") + projectRootPath  + wxT("\"") +
 		wxT(" --identifier=\"") + identifier + wxT("\"") +
-		wxT(" --output=\"") + OutputFile.GetFullPath() + wxT("\"");
+		wxT(" --output=\"") + OutputFile.GetFullPath() + wxT("\"") +
+		wxT(" --extra=\"") + extra + wxT("\"");
+		
 	wxString cmd = wxT("\"") + environment.Php.PhpExecutablePath + wxT("\"") + wxT(" \"") + scriptFileName.GetFullPath() + wxT("\"") + args;
 	return Process.Init(cmd, id, CurrentPid);
 }
@@ -332,6 +334,7 @@ bool mvceditor::UrlDetectorActionClass::Response() {
 		if (ret) {
 			Urls.push_back(url);
 		}
+		hasNext = result.GetNextEntry(entryName, index);
 	}
 	return ret;
 }
@@ -348,6 +351,7 @@ mvceditor::PhpFrameworkDetectorClass::PhpFrameworkDetectorClass(wxEvtHandler& ha
 	, ResourcesDetector(*this)
 	, UrlDetector(*this)
 	, FrameworkIdentifiersLeftToDetect()
+	, UrlsDetected()
 	, Handler(handler)
 	, Environment(environment)
 	, ProjectRootPath() {
@@ -360,6 +364,7 @@ void mvceditor::PhpFrameworkDetectorClass::Clear() {
 	Databases.clear();
 	Resources.clear();
 	FrameworkIdentifiersLeftToDetect.clear();
+	UrlsDetected.clear();
 }
 
 bool mvceditor::PhpFrameworkDetectorClass::Init(const wxString& dir) {
@@ -368,8 +373,19 @@ bool mvceditor::PhpFrameworkDetectorClass::Init(const wxString& dir) {
 }
 
 bool mvceditor::PhpFrameworkDetectorClass::InitUrlDetector(const wxString& dir, const wxString& fileName) {
+	UrlsDetected.clear();
+	FrameworkIdentifiersLeftToDetect.clear();
 	ProjectRootPath = dir;
-	return FrameworkDetector.Init(ID_DETECT_URL, Environment, dir, wxT(""),  fileName);
+	for (size_t i = 0; i < Identifiers.size(); ++i) {
+		std::vector<wxString> next;
+		next.push_back(Identifiers[i]);
+		next.push_back(fileName);
+		FrameworkIdentifiersLeftToDetect.push_back(next);
+	}
+	if (!FrameworkIdentifiersLeftToDetect.empty()) {
+		NextUrlDetection();
+	}
+	return !Identifiers.empty();
 }
 
 
@@ -396,6 +412,21 @@ void mvceditor::PhpFrameworkDetectorClass::NextDetection() {
 	else {	
 		wxCommandEvent completeEvent(mvceditor::EVENT_FRAMEWORK_DETECTION_COMPLETE);
 		wxPostEvent(&Handler, completeEvent);
+	}
+}
+
+void mvceditor::PhpFrameworkDetectorClass::NextUrlDetection() {
+	if (!FrameworkIdentifiersLeftToDetect.empty()) {
+		std::vector<wxString> next = FrameworkIdentifiersLeftToDetect.back();
+		FrameworkIdentifiersLeftToDetect.pop_back();
+		
+		wxString framework = next[0];
+		wxString fileName = next[1];
+		UrlDetector.Init(ID_DETECT_URL, Environment, ProjectRootPath, framework, fileName);
+	}
+	else {
+		mvceditor::UrlDetectedEventClass urlEvent(UrlsDetected);
+		wxPostEvent(&Handler, urlEvent);
 	}
 }
 
@@ -468,9 +499,8 @@ void mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed(wxCommandEvent& eve
 }
 
 void mvceditor::PhpFrameworkDetectorClass::OnUrlDetectionComplete(wxCommandEvent& event) {
-	wxCommandEvent failedEvent(mvceditor::EVENT_FRAMEWORK_URL_COMPLETE);
-	failedEvent.SetString(event.GetString());
-	wxPostEvent(&Handler, failedEvent);
+	UrlsDetected.insert(UrlsDetected.end(), UrlDetector.Urls.begin(),UrlDetector.Urls.end());
+	NextUrlDetection();
 }
 
 void mvceditor::PhpFrameworkDetectorClass::OnUrlDetectionFailed(wxCommandEvent& event) {
@@ -481,6 +511,16 @@ void mvceditor::PhpFrameworkDetectorClass::OnUrlDetectionFailed(wxCommandEvent& 
 
 void mvceditor::PhpFrameworkDetectorClass::OnWorkInProgress(wxCommandEvent& event) {
 	wxPostEvent(&Handler, event);
+}
+
+mvceditor::UrlDetectedEventClass::UrlDetectedEventClass(std::vector<wxString> urls) 
+	: wxEvent(wxID_ANY, mvceditor::EVENT_FRAMEWORK_URL_COMPLETE) 
+	, Urls(urls) {
+}
+
+wxEvent* mvceditor::UrlDetectedEventClass::Clone() const {
+	wxEvent* cloned = new mvceditor::UrlDetectedEventClass(Urls);
+	return cloned;
 }
 
 const wxEventType mvceditor::EVENT_FRAMEWORK_DETECTION_COMPLETE = wxNewEventType();
@@ -498,6 +538,7 @@ BEGIN_EVENT_TABLE(mvceditor::PhpFrameworkDetectorClass, wxEvtHandler)
 	EVT_COMMAND(ID_DETECT_DATABASE, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::PhpFrameworkDetectorClass::OnDatabaseDetectionComplete)
 	EVT_COMMAND(ID_DETECT_CONFIG, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::PhpFrameworkDetectorClass::OnConfigFilesDetectionComplete)
 	EVT_COMMAND(ID_DETECT_RESOURCES, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::PhpFrameworkDetectorClass::OnResourcesDetectionComplete)
+	EVT_COMMAND(ID_DETECT_URL, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::PhpFrameworkDetectorClass::OnUrlDetectionComplete)
 	
 	EVT_COMMAND(ID_DETECT_FRAMEWORK, mvceditor::EVENT_PROCESS_FAILED, mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed)
 	EVT_COMMAND(ID_DETECT_DATABASE, mvceditor::EVENT_PROCESS_FAILED, mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed)
