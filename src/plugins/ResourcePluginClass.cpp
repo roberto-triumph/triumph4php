@@ -343,6 +343,11 @@ void mvceditor::ResourcePluginClass::OnProjectIndex(wxCommandEvent& event) {
 }
 
 void mvceditor::ResourcePluginClass::OnJump(wxCommandEvent& event) {
+	
+	// TODO: we need two separate actions here:
+	// (1) jump to selected resources
+	// (2) focus to resource text box
+	// right now the "jump" functionality attempts to both at the same time
 	CodeControlClass* codeControl = GetCurrentCodeControl();
 	wxWindow* mainWindow = GetMainWindow();
 	if (codeControl) {
@@ -493,6 +498,8 @@ void mvceditor::ResourcePluginPanelClass::OnFilesComboTextEnter(wxCommandEvent& 
  * @param wxCommandEvent& the event
  */
 void mvceditor::ResourcePluginPanelClass::OnHelpButtonClick(wxCommandEvent& event) {
+	
+	// TODO: correct the lie
   wxString help = wxString::FromAscii("Type in a file name, file name:page number, "
 		"class name,  or class name::method name. The resulting page will then ben opened.\n\nExamples:\n\n"
 		"user.php\n"

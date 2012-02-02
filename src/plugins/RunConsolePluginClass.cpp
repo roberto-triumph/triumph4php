@@ -242,6 +242,9 @@ void mvceditor::RunConsolePluginClass::LoadPreferences(wxConfigBase* config) {
 
 void mvceditor::RunConsolePluginClass::OnRunFileAsCli(wxCommandEvent& event) {
 	CodeControlClass* code = GetCurrentCodeControl();
+	
+	// TODO: need to hash out the what happens when the user runs a script when the run button is clicked
+	// the user has filled in run arguments the run button kills them
 	if (code) {
 		
 		// right now dont really care which window, just want to reuse an existing one. that's why all windows

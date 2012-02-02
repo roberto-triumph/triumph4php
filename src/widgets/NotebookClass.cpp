@@ -151,6 +151,8 @@ void mvceditor::NotebookClass::AddMvcEditorPage() {
 }
 
 void mvceditor::NotebookClass::LoadPage() {
+	
+	// TODO: the wildcard filter is not functional (in linux only?)
 	wxString fileFilter = CreateWildcardString();
 	wxFileDialog fileDialog(this, wxT("Open a File"), wxT(""), wxT(""), 
 			fileFilter, wxFD_OPEN | wxFD_FILE_MUST_EXIST | 
