@@ -158,6 +158,9 @@ void mvceditor::FinderPanelClass::OnOkButton(wxCommandEvent& event) {
 }
 
 void mvceditor::FinderPanelClass::OnPreviousButton(wxCommandEvent& event) {
+	
+	// TODO: something is wrong here; clicking the previous button does not
+	// work
 	FindPrevious();
 	ComboBoxHistory.Save();
 }
@@ -345,6 +348,9 @@ void mvceditor::ReplacePanelClass::OnOkButton(wxCommandEvent& event) {
 }
 
 void mvceditor::ReplacePanelClass::OnPreviousButton(wxCommandEvent& event) {
+	
+	// TODO: something is wrong here; clicking the previous button does not
+	// work
 	FindPrevious();
 	FindHistory.Save();
 }

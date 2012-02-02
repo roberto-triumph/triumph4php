@@ -361,6 +361,9 @@ void mvceditor::RunConsolePluginClass::OnUrlDetectionComplete(mvceditor::UrlDete
 		if (wxOK == dialog.ShowModal()) {
 			wxString chosenUrl = urlChoice.ChosenUrl();
 			ExternalBrowser(browserName, chosenUrl, environment);
+			
+			// TODO: save this choice into a toolbar dropdown so that the user can easily access it
+			// multiple times.
 		}
 	}
 	else {

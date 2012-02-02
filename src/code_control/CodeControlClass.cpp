@@ -546,6 +546,9 @@ void mvceditor::CodeControlClass::SetPlainTextOptions() {
 	MarkerDefine(LINT_RESULT_MARKER, wxSTC_MARK_ARROW, *wxRED, *wxRED);
 	WordHighlightStyle = INDICATOR_PHP_STYLE;
 	
+	// TODO: something is wrong here; when the user chooses the 'Light On Dark' theme
+	// the background (of text) is white not dark.
+	
 	// syntax coloring; use the same font as PHP code for now
 	for (size_t i = 0; i < CodeControlOptions.PhpStyles.size(); ++i) {
 		mvceditor::StylePreferenceClass pref = CodeControlOptions.PhpStyles[i];
@@ -894,6 +897,10 @@ void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
 	 *
 	 * use the wxStyledTextCtrl call tip instead 
 	 */
+	 // TODO: handle big comments nicely
+	 // TODO: unescape html entities
+	 // TODO: when switching tabs, sometimes the tool tip from the previously selected
+	 // page pops up when it should not
 	if (DocumentMode == PHP) {
 		int pos = event.GetPosition();
 
