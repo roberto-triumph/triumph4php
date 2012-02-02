@@ -214,5 +214,55 @@ private:
 		DECLARE_EVENT_TABLE()
 };
 
+/** 
+ * small class that will be used in the UrlChoice Dialog; to let the user
+ * select a URL to run, along with any parameters the user wants
+ */
+class UrlChoiceClass {
+public:
+
+	wxArrayString UrlList;
+	
+	wxString Extra;
+	
+	int ChosenIndex;
+	
+	/**
+	 * @param urlList list of URLs that the user will choose from.  The list should be the result of the URL
+	 * detector
+	 * @param fileName the file that corresponds to the given URLs (the file name helps to determine the virtual host)
+	 * @param environment to get the virtual host
+	 */
+	UrlChoiceClass(const std::vector<wxString>& urlList, const wxString& fileName, EnvironmentClass* environment);
+	
+	/**
+	 * @return wxString URL [that the user chose] plus the Extra
+	 */
+	wxString ChosenUrl() const;
+	
+};
+
+/**
+ * small dialog that allows the user to choose a URL to run
+ */
+class ChooseUrlDialogClass : public ChooseUrlDialogGeneratedClass {
+	
+public:
+	
+	UrlChoiceClass& UrlChoice;
+
+	ChooseUrlDialogClass(wxWindow* parent, UrlChoiceClass& urlChoice);
+	
+protected:
+
+	void OnOkButton(wxCommandEvent& event);
+	
+	/**
+	 * updates the URL label so that the user can see the exact URL to 
+	 * be opened in the browser
+	 */
+	void OnUpdateUi(wxUpdateUIEvent& event);
+};
+
 }
 #endif // __RunConsolePanelClass__

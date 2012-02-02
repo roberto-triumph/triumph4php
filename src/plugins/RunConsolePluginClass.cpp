@@ -355,16 +355,13 @@ void mvceditor::RunConsolePluginClass::OnUrlDetectionComplete(mvceditor::UrlDete
 	wxString fileName = currentCodeControl->GetFileName();
 	wxString browserName = BrowserComboBox->GetValue();
 	mvceditor::EnvironmentClass* environment = GetEnvironment();
-	
-	std::vector<wxString> urls = event.Urls;
-	if (!urls.empty()) {
-		wxString url = environment->Apache.GetUrl(fileName);
-		
-		// we only want the virtual host name, as the url we get from the framework's routing url scheme
-		url = url.Mid(7); // 7 = length of "http://"
-		url = url.Mid(0, url.Find(wxT("/")));
-		url = wxT("http://") + url + wxT("/") + urls[0];
-		ExternalBrowser(browserName, url, environment);
+	if (!event.Urls.empty()) {
+		mvceditor::UrlChoiceClass urlChoice(event.Urls, fileName, environment);
+		mvceditor::ChooseUrlDialogClass dialog(GetMainWindow(), urlChoice);
+		if (wxOK == dialog.ShowModal()) {
+			wxString chosenUrl = urlChoice.ChosenUrl();
+			ExternalBrowser(browserName, chosenUrl, environment);
+		}
 	}
 	else {
 		
@@ -379,6 +376,60 @@ void mvceditor::RunConsolePluginClass::OnUrlDetectionComplete(mvceditor::UrlDete
 	}
 }
 
+mvceditor::UrlChoiceClass::UrlChoiceClass(const std::vector<wxString>& urls, const wxString& fileName, mvceditor::EnvironmentClass* environment)
+	: UrlList()
+	, Extra() 
+	, ChosenIndex(0) {
+	wxString url = environment->Apache.GetUrl(fileName);
+		
+	// we only want the virtual host name, as the url we get from the framework's routing url scheme
+	wxString host = url.Mid(7); // 7 = length of "http://"
+	host = host.Mid(0, host.Find(wxT("/")));
+	host = wxT("http://") + host + wxT("/");
+	for (size_t i = 0; i < urls.size(); ++i) {
+		wxString item = host + urls[i];
+		UrlList.Add(item);
+	}
+}
+
+wxString mvceditor::UrlChoiceClass::ChosenUrl() const {
+	wxString chosenUrl;
+	if ((size_t)ChosenIndex < UrlList.size()) {
+		chosenUrl = UrlList[ChosenIndex] + Extra;
+	}
+	return chosenUrl;
+}
+
+mvceditor::ChooseUrlDialogClass::ChooseUrlDialogClass(wxWindow* parent, mvceditor::UrlChoiceClass& urlChoice)
+	: ChooseUrlDialogGeneratedClass(parent, wxID_ANY)
+	, UrlChoice(urlChoice) {
+	UrlList->Append(UrlChoice.UrlList);
+	UrlList->SetSelection(UrlChoice.ChosenIndex);
+	
+	wxGenericValidator extraValidator(&UrlChoice.Extra);
+	Extra->SetValidator(extraValidator);
+	TransferDataToWindow();
+	
+	if (!urlChoice.UrlList.IsEmpty()) {
+		wxString label= _("Complete URL: ") + urlChoice.UrlList[0];
+		CompleteLabel->SetLabel(label);
+	}
+}
+
+void mvceditor::ChooseUrlDialogClass::OnOkButton(wxCommandEvent& event) {
+	if (Validate() && TransferDataFromWindow()) {
+		UrlChoice.ChosenIndex = UrlList->GetSelection();
+		EndModal(wxOK);
+	}
+}
+
+void mvceditor::ChooseUrlDialogClass::OnUpdateUi(wxUpdateUIEvent& event) {
+	wxString url = UrlList->GetStringSelection() + Extra->GetValue();
+	wxString label= _("Complete URL: ") + url;
+	CompleteLabel->SetLabel(label);
+	event.Skip();
+}
+	
 void mvceditor::RunConsolePluginClass::OnUrlDetectionFailed(wxCommandEvent& event) {
 	mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, event.GetString());
 }
