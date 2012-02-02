@@ -251,6 +251,8 @@ void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
 }
 
 void mvceditor::ResourcePluginClass::ShowJumpToResults(const wxString& finderQuery, const std::vector<mvceditor::ResourceClass>& matches) {
+	
+	// TODO: no need to show jump to results for native functions
 	wxArrayString files;
 	UnicodeString fileName,
 		className, 
