@@ -82,12 +82,18 @@ static void ListCtrlEdit(wxListCtrl* list, const wxString& column1Value, const w
  * @param rowIndex the row to get
  */
 static void ListCtrlGet(wxListCtrl* list, wxString& column1Value, wxString& column2Value, int rowIndex) {
+	
+	// need to set the mask flag; otherwise in MSW the text will not be set
+	// this assumes the given list is set to LC_REPORT mode
 	wxListItem column1,
 		column2;
 	column1.SetColumn(0);
 	column1.SetId(rowIndex);
+	column1.m_mask = wxLIST_MASK_TEXT;
 	column2.SetColumn(1);
 	column2.SetId(rowIndex);
+	column2.m_mask = wxLIST_MASK_TEXT;
+
 	if (list->GetItem(column1) && list->GetItem(column2)) {
 		column1Value = column1.GetText();
 		column2Value = column2.GetText();
@@ -203,8 +209,11 @@ void mvceditor::ApacheEnvironmentPanelClass::Populate() {
 	for (it = mappings.begin(); it != mappings.end(); ++it) {
 		ListCtrlAdd(VirtualHostList, it->first, it->second);
 	}
-	VirtualHostList->SetColumnWidth(0, wxLIST_AUTOSIZE);
-	VirtualHostList->SetColumnWidth(1, wxLIST_AUTOSIZE);
+	if (!mappings.empty()) {
+		VirtualHostList->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_MASK_STATE | wxLIST_MASK_TEXT);
+		VirtualHostList->SetColumnWidth(0, wxLIST_AUTOSIZE);
+		VirtualHostList->SetColumnWidth(1, wxLIST_AUTOSIZE);
+	}
 }
 
 void mvceditor::ApacheEnvironmentPanelClass::OnWorkComplete(wxCommandEvent& event) {
@@ -243,6 +252,7 @@ void mvceditor::ApacheEnvironmentPanelClass::OnAddButton(wxCommandEvent& event) 
 		VirtualHostList->SetColumnWidth(1, wxLIST_AUTOSIZE);
 		
 		EditedApache.SetVirtualHostMapping(rootDirectory.GetFullPath(), hostName);
+		VirtualHostList->SetItemState(VirtualHostList->GetItemCount() - 1, wxLIST_STATE_SELECTED, wxLIST_MASK_STATE | wxLIST_MASK_TEXT);
 	}
 }
 
@@ -259,16 +269,16 @@ void mvceditor::ApacheEnvironmentPanelClass::OnUpdateUi(wxUpdateUIEvent& event) 
 }
 
 void mvceditor::ApacheEnvironmentPanelClass::OnEditButton(wxCommandEvent& event) {
-	int selected = VirtualHostList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-	if (selected >= 0) {
+	int selection = VirtualHostList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (selection >= 0 && selection < VirtualHostList->GetItemCount()) {
 		wxString oldRootDirectory,
 			oldHostName;
-		ListCtrlGet(VirtualHostList, oldRootDirectory, oldHostName, selected);
+		ListCtrlGet(VirtualHostList, oldRootDirectory, oldHostName, selection);
 		wxString newHostName = oldHostName;
 		wxFileName newRootDirectory(oldRootDirectory);
 		mvceditor::VirtualHostCreateDialogClass dialog(this, EditedApache.GetVirtualHostMappings(), newHostName, newRootDirectory);
 		if (wxOK == dialog.ShowModal()) {
-			ListCtrlEdit(VirtualHostList, newRootDirectory.GetFullPath(), newHostName, selected);
+			ListCtrlEdit(VirtualHostList, newRootDirectory.GetFullPath(), newHostName, selection);
 			VirtualHostList->SetColumnWidth(0, wxLIST_AUTOSIZE);
 			VirtualHostList->SetColumnWidth(1, wxLIST_AUTOSIZE);
 		
@@ -281,7 +291,7 @@ void mvceditor::ApacheEnvironmentPanelClass::OnEditButton(wxCommandEvent& event)
 
 void mvceditor::ApacheEnvironmentPanelClass::OnRemoveButton(wxCommandEvent& event) {
 	int selected = VirtualHostList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-	if (selected >= 0) {
+	if (selected >= 0 && selected < VirtualHostList->GetItemCount()) {
 		wxString oldRootDirectory,
 			oldHostName;
 		ListCtrlGet(VirtualHostList, oldRootDirectory, oldHostName, selected);
@@ -395,8 +405,11 @@ mvceditor::WebBrowserEditPanelClass::WebBrowserEditPanelClass(wxWindow* parent, 
 	for (; it != EditedWebBrowsers.end(); ++it) {
 		ListCtrlAdd(BrowserList, it->first, it->second.GetFullPath());
 	}
-	BrowserList->SetColumnWidth(0, wxLIST_AUTOSIZE);
-	BrowserList->SetColumnWidth(1, wxLIST_AUTOSIZE);
+	if (!EditedWebBrowsers.empty()) {
+		BrowserList->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_MASK_STATE | wxLIST_MASK_TEXT);
+		BrowserList->SetColumnWidth(0, wxLIST_AUTOSIZE);
+		BrowserList->SetColumnWidth(1, wxLIST_AUTOSIZE);
+	}
 }
 
 void mvceditor::WebBrowserEditPanelClass::OnResize(wxSizeEvent& event) {
@@ -419,22 +432,25 @@ void mvceditor::WebBrowserEditPanelClass::OnAddWebBrowser(wxCommandEvent& event)
 		BrowserList->SetColumnWidth(1, wxLIST_AUTOSIZE);
 		
 		EditedWebBrowsers[name] = webBrowserPath;
+		BrowserList->SetItemState(BrowserList->GetItemCount() - 1, wxLIST_STATE_SELECTED, wxLIST_MASK_STATE | wxLIST_MASK_TEXT);
 	}
 }
 
 void mvceditor::WebBrowserEditPanelClass::OnRemoveSelectedWebBrowser(wxCommandEvent& event) {
-	int selected = BrowserList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-	if (selected >= 0) {
-		wxListItem item;
-		item.SetColumn(0);
-		item.SetId(selected);
-		if (BrowserList->GetItem(item)) {
-			wxString name = item.GetText();
-			std::map<wxString, wxFileName>::iterator it = EditedWebBrowsers.find(name);
+
+	// could not get the list selection function to work on windows
+	// when the "edit" button is clicked
+	int selection = BrowserList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (selection >= 0 && selection < BrowserList->GetItemCount()) {
+		wxString browserName,
+			webBrowserPath;
+		ListCtrlGet(BrowserList, browserName, webBrowserPath, selection);
+		if (!browserName.IsEmpty()) {
+			std::map<wxString, wxFileName>::iterator it = EditedWebBrowsers.find(browserName);
 			if  (it != EditedWebBrowsers.end()) {
 				EditedWebBrowsers.erase(it);
 			}
-			BrowserList->DeleteItem(selected);
+			BrowserList->DeleteItem(selection);
 		}
 	}
 	else {
@@ -443,17 +459,20 @@ void mvceditor::WebBrowserEditPanelClass::OnRemoveSelectedWebBrowser(wxCommandEv
 }
 
 void mvceditor::WebBrowserEditPanelClass::OnEditSelectedWebBrowser(wxCommandEvent& event) {
-	int selected = BrowserList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-	if (selected >= 0) {
+
+	// could not get the list selection function to work on windows
+	// when the "edit" button is clicked
+	long selection = BrowserList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (selection >= 0 && selection < BrowserList->GetItemCount()) {
 		wxString oldName,
 			oldWebBrowserPath;
-		ListCtrlGet(BrowserList, oldName, oldWebBrowserPath, selected);
+		ListCtrlGet(BrowserList, oldName, oldWebBrowserPath, selection);
 		if (!oldName.IsEmpty() && !oldWebBrowserPath.IsEmpty()) {
 			wxString newName = oldName;
 			wxFileName newWebBrowserPath(oldWebBrowserPath);
 			mvceditor::WebBrowserCreateDialogClass dialog(this, EditedWebBrowsers, newName, newWebBrowserPath);
 			if (wxOK == dialog.ShowModal()) {
-				ListCtrlEdit(BrowserList, newName, newWebBrowserPath.GetFullPath(), selected);
+				ListCtrlEdit(BrowserList, newName, newWebBrowserPath.GetFullPath(), selection);
 				
 				// remove the old name since name may have been changed
 				std::map<wxString, wxFileName>::iterator it = EditedWebBrowsers.find(oldName);
@@ -461,6 +480,9 @@ void mvceditor::WebBrowserEditPanelClass::OnEditSelectedWebBrowser(wxCommandEven
 					EditedWebBrowsers.erase(it);
 				}
 				EditedWebBrowsers[newName] = newWebBrowserPath;
+				
+				BrowserList->SetColumnWidth(0, wxLIST_AUTOSIZE);
+				BrowserList->SetColumnWidth(1, wxLIST_AUTOSIZE);
 			}
 		}
 	}
@@ -477,7 +499,8 @@ mvceditor::WebBrowserCreateDialogClass::WebBrowserCreateDialogClass(wxWindow* pa
 		std::map<wxString, wxFileName> existingBrowsers, wxString& name, wxFileName& webBrowserFileName)
 	: WebBrowserCreateDialogGeneratedClass(parent) 
 	, ExistingBrowsers(existingBrowsers)
-	, WebBrowserFileName(webBrowserFileName) {
+	, WebBrowserFileName(webBrowserFileName)
+	, OriginalName(name) {
 	wxGenericValidator nameValidator(&name);
 	WebBrowserLabel->SetValidator(nameValidator);
 	WebBrowserPath->SetPath(webBrowserFileName.GetFullPath());
@@ -491,13 +514,16 @@ void mvceditor::WebBrowserCreateDialogClass::OnOkButton(wxCommandEvent& event) {
 			wxMessageBox(_("Please enter a friendly name for this browser"));
 			return;
 		}
-		if (ExistingBrowsers.find(newName) != ExistingBrowsers.end()) {
+
+		// allow the user to use the same name if they did not change
+		// otherwise every time the user wants to edit a browser they would need to change the name
+		if (OriginalName != newName && ExistingBrowsers.find(newName) != ExistingBrowsers.end()) {
 			wxMessageBox(_("Please enter a name that is unique to this browser"));
 			return;
 		}
 		wxString path = WebBrowserPath->GetPath();
 		if (!wxFileName::FileExists(path)) {
-			wxMessageBox(_("Please enter a valid file name for this browser"));
+			wxMessageBox(_("Please enter a valid file path for this browser"));
 			return;
 		}
 		TransferDataFromWindow();

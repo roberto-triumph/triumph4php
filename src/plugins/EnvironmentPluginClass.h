@@ -274,6 +274,13 @@ protected:
 	 * to transfer the chosen file path
 	 */
 	wxFileName& WebBrowserFileName;
+
+	/**
+	 * Safe the original name so that when editing we can tell that the name is not changing
+	 * and the "duplicate" name check won't be run (allow the user to edit a browser
+	 * path only).
+	 */
+	wxString OriginalName;
 	
 };
 
