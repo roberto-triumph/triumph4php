@@ -230,6 +230,7 @@ void mvceditor::RunConsolePluginClass::LoadPreferences(wxConfigBase* config) {
 	
 	// dont use the config; use the Environment that has already been seeded with 
 	// the proper data
+	// TODO: need to update the combo box if the user updates the environment
 	mvceditor::EnvironmentClass* environment = GetEnvironment();
 	std::map<wxString, wxFileName> webBrowsers = environment->WebBrowsers;
 	for (std::map<wxString, wxFileName>::const_iterator it = webBrowsers.begin(); it != webBrowsers.end(); ++it) {
