@@ -197,7 +197,7 @@ void mvceditor::ApacheEnvironmentPanelClass::Populate() {
 
 	// configFile is a full file name, extract the path
 	wxFileName fileName(configFile);
-	ApacheConfigurationDirectory->SetPath(fileName.GetPath(true));
+	ApacheConfigurationDirectory->SetPath(fileName.GetPath());
 	std::map<wxString, wxString> mappings = EditedApache.GetVirtualHostMappings();
 	std::map<wxString, wxString>::const_iterator it;
 	for (it = mappings.begin(); it != mappings.end(); ++it) {

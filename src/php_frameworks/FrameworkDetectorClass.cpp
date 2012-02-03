@@ -27,6 +27,7 @@
 #include <MvcEditorErrors.h>
 #include <wx/stdpaths.h>
 #include <wx/config.h>
+#include <wx/fileconf.h>
 #include <wx/tokenzr.h>
 
 static const int ID_DETECT_FRAMEWORK = wxNewId();
