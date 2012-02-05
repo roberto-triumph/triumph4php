@@ -102,21 +102,21 @@ SUITE(ResourceUpdateThreadTestClass) {
 
 TEST_FIXTURE(RegisterTestFixtureClass, RegisterShouldSucceed) {	
 	wxString fileName = wxT("MyFile.php");
-	CHECK(ResourceCache.Register(fileName));
+	CHECK(ResourceCache.Register(fileName, false));
 }
 
 TEST_FIXTURE(RegisterTestFixtureClass, RegisterShouldFail) {	
 	wxString fileName = wxT("MyFile.php");
-	CHECK(ResourceCache.Register(fileName));
-	CHECK_EQUAL(false, ResourceCache.Register(fileName));
+	CHECK(ResourceCache.Register(fileName, false));
+	CHECK_EQUAL(false, ResourceCache.Register(fileName, false));
 	
 }
 
 TEST_FIXTURE(RegisterTestFixtureClass, RegisterShouldSucceedAfterSucceedAfterUnregistering) {	
 	wxString fileName = wxT("MyFile.php");
-	CHECK(ResourceCache.Register(fileName));
+	CHECK(ResourceCache.Register(fileName, false));
 	ResourceCache.Unregister(fileName);
-	CHECK(ResourceCache.Register(fileName));
+	CHECK(ResourceCache.Register(fileName, false));
 }
 
 TEST_FIXTURE(RegisterTestFixtureClass, CollectShouldGetFromAllFinders) {
@@ -130,8 +130,8 @@ TEST_FIXTURE(RegisterTestFixtureClass, CollectShouldGetFromAllFinders) {
 	CreateFixtureFile(file3, wxT("<?php class ActionThey { function w() {} }"));
 	
 	// parse the 3 files for resources
-	CHECK(ResourceCache.Register(file1));
-	CHECK(ResourceCache.Register(file2));
+	CHECK(ResourceCache.Register(file1, false));
+	CHECK(ResourceCache.Register(file2, false));
 	CHECK(ResourceCache.Update(file1, code1, true));
 	CHECK(ResourceCache.Update(file2, code2, true));
 	ResourceCache.WalkGlobal(Search, PhpFileFilters);
@@ -166,7 +166,7 @@ TEST_FIXTURE(RegisterTestFixtureClass, CollectShouldIgnoreStaleMatches) {
 	CreateFixtureFile(file1, code1);
 	ResourceCache.WalkGlobal(Search, PhpFileFilters);
 
-	CHECK(ResourceCache.Register(TestProjectDir + file1));
+	CHECK(ResourceCache.Register(TestProjectDir + file1, false));
 	CHECK(ResourceCache.Update(TestProjectDir + file1, code2, true));
 
 	CHECK(ResourceCache.PrepareAll(wxT("ActionMy::methodA")));
@@ -192,7 +192,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, GlobalFinder) {
 	CreateFixtureFile(file1, code1);
 	ResourceCache.WalkGlobal(Search, PhpFileFilters);
 	
-	CHECK(ResourceCache.Register(File2));
+	CHECK(ResourceCache.Register(File2, false));
 	CHECK(ResourceCache.Update(File2, Code2, true));
 	
 	ParsedExpression.Lexeme = UNICODE_STRING_SIMPLE("$action");
@@ -217,9 +217,9 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, RegisteredFinder) {
 	Code2 = UNICODE_STRING_SIMPLE("<?php class ActionYou  { function w() {} }");
 	ResourceCache.WalkGlobal(Search, PhpFileFilters);
 	
-	CHECK(ResourceCache.Register(File1));
+	CHECK(ResourceCache.Register(File1, false));
 	CHECK(ResourceCache.Update(File1, Code1, true));
-	CHECK(ResourceCache.Register(File2));
+	CHECK(ResourceCache.Register(File2, false));
 	CHECK(ResourceCache.Update(File2, Code2, true));
 	
 	ParsedExpression.Lexeme = UNICODE_STRING_SIMPLE("$action");
@@ -244,7 +244,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithGlobalF
 	CreateFixtureFile(GlobalFile, GlobalCode);
 	ResourceCache.WalkGlobal(Search, PhpFileFilters);
 	
-	CHECK(ResourceCache.Register(File1));
+	CHECK(ResourceCache.Register(File1, false));
 	CHECK(ResourceCache.Update(File1, Code1, true));
 	
 	ParsedExpression.Lexeme = UNICODE_STRING_SIMPLE("$action");
@@ -267,8 +267,8 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithRegiste
 	Code1 = UNICODE_STRING_SIMPLE("<?php class ActionMy   { function methodA() {} }");
 	Code2 = UNICODE_STRING_SIMPLE("<?php $action = new ActionMy(); ");
 
-	CHECK(ResourceCache.Register(File1));
-	CHECK(ResourceCache.Register(File2));
+	CHECK(ResourceCache.Register(File1, false));
+	CHECK(ResourceCache.Register(File2, false));
 	CHECK(ResourceCache.Update(File1, Code1, true));
 	CHECK(ResourceCache.Update(File2, Code2, true));
 
@@ -298,7 +298,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithStaleMa
 	CreateFixtureFile(GlobalFile, GlobalCode);
 	ResourceCache.WalkGlobal(Search, PhpFileFilters);
 
-	CHECK(ResourceCache.Register(File1));
+	CHECK(ResourceCache.Register(File1, false));
 	CHECK(ResourceCache.Update(File1, Code1, true));
 
 	ParsedExpression.Lexeme = UNICODE_STRING_SIMPLE("$action");
@@ -313,7 +313,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithStaleMa
 	}
 
 	// now update the code
-	CHECK(ResourceCache.Register(TestProjectDir + GlobalFile));
+	CHECK(ResourceCache.Register(TestProjectDir + GlobalFile, false));
 	CHECK(ResourceCache.Update(TestProjectDir + GlobalFile, Code2, true));
 
 	ResourceMatches.clear();

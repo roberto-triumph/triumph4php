@@ -765,7 +765,7 @@ void mvceditor::PhpDocumentClass::FileOpened(wxString fileName) {
 	// the ResourceCache object will need to know what files are being edited so it can mark them as 'dirty'
 	FileIdentifier = fileName;
 
-	ResourceCache->Register(FileIdentifier);
+	ResourceCache->Register(FileIdentifier, false);
 
 	// trigger the resource cache
 	// so that code completion works when the file is first opened

@@ -70,7 +70,8 @@ void mvceditor::OutlineViewPluginClass::BuildOutlineCurrentCodeControl() {
 	CurrentOutlineLines.clear();
 	if (code != NULL) {
 		UnicodeString source = code->GetSafeText();
-		Parser.ScanString(source);
+		mvceditor::LintResultsClass results;
+		Parser.ScanString(source, results);
 	}
 	CurrentOutline = HumanFriendlyOutline();
 }

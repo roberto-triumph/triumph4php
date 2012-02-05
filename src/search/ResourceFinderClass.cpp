@@ -93,7 +93,10 @@ void mvceditor::ResourceFinderClass::BuildResourceCacheForFile(const wxString& f
 		fileItemIndex = PushIntoFileCache(fullPath, false, isNew);
 	}
 	CurrentFileItemIndex = fileItemIndex;
-	Parser.ScanString(code);
+	
+	// for now silently ignore parse errors
+	mvceditor::LintResultsClass results;
+	Parser.ScanString(code, results);
 	IsCacheSorted = false;
 }
 
@@ -553,7 +556,10 @@ void mvceditor::ResourceFinderClass::BuildResourceCache(const wxString& fullPath
 				RemoveCachedResources(fileItemIndex);
 			}
 			CurrentFileItemIndex = fileItemIndex;
-			Parser.ScanFile(fullPath);
+			
+			// for now silently ignore files with parser errors
+			mvceditor::LintResultsClass lintResults;
+			Parser.ScanFile(fullPath, lintResults);
 			IsCacheSorted = false;
 		}
 	}
@@ -884,18 +890,30 @@ void mvceditor::ResourceFinderClass::EnsureMatchesExist() {
 	}
 }
 
-void mvceditor::ResourceFinderClass::Print() {
+void mvceditor::ResourceFinderClass::Print() const {
 	UFILE *out = u_finit(stdout, NULL, NULL);
-	u_fprintf(out, "LookingFor=%S,%S\n", ClassName.getTerminatedBuffer(), MethodName.getTerminatedBuffer());
-	for (std::list<ResourceClass>::iterator it = ResourceCache.begin(); it != ResourceCache.end(); ++it) {
-		u_fprintf(out, "RESOURCE=%S  Identifier=%S Type=%d\n",
-			it->Resource.getTerminatedBuffer(), it->Identifier.getTerminatedBuffer(),  it->Type);
+	u_fprintf(out, "LookingFor=%.*S,%.*S\n", ClassName.length(), ClassName.getBuffer(), MethodName.length(), MethodName.getBuffer());
+	for (std::list<ResourceClass>::const_iterator it = ResourceCache.begin(); it != ResourceCache.end(); ++it) {
+		u_fprintf(out, "RESOURCE=%.*S  Identifier=%.*S Type=%d\n",
+			it->Resource.length(), it->Resource.getBuffer(), it->Identifier.length(), it->Identifier.getBuffer(),  it->Type);
 	}
-	for (std::list<ResourceClass>::iterator it = MembersCache.begin(); it != MembersCache.end(); ++it) {
-		u_fprintf(out, "MEMBER=%S  Identifier=%S Type=%d\n", 
-			it->Resource.getTerminatedBuffer(), it->Identifier.getTerminatedBuffer(),  it->Type);
+	for (std::list<ResourceClass>::const_iterator it = MembersCache.begin(); it != MembersCache.end(); ++it) {
+		u_fprintf(out, "MEMBER=%.*S  Identifier=%.*S ReturnType=%.*S Type=%d\n", 
+			it->Resource.length(), it->Resource.getBuffer(), it->Identifier.length(), it->Identifier.getBuffer(),  
+				it->ReturnType.length(), it->ReturnType.getBuffer(), it->Type);
 	}
 	u_fclose(out);
+}
+
+bool mvceditor::ResourceFinderClass::IsEmpty() const {
+	bool isEmpty = FileCache.empty();
+	if (FileCache.size() == (size_t)1) {
+		wxString cachedFile = FileCache[0].FullPath;
+		if (cachedFile == mvceditor::NativeFunctionsAsset().GetFullPath()) {
+			isEmpty = true;
+		}
+	}
+	return isEmpty;
 }
 
 void mvceditor::ResourceFinderClass::CopyResourcesFrom(const mvceditor::ResourceFinderClass& src) {

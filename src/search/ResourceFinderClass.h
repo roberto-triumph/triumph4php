@@ -37,7 +37,8 @@
 #include <vector>
 
 namespace mvceditor {
-	
+
+// defined at the bottom of the file
 class ResourceClass; 
 
 /**
@@ -145,6 +146,11 @@ public:
 	 * @param wxString resource
 	 * @return boolean false if resource string is bad or empty
 	 */ 
+	 // TODO: make the API simpler and just remove this method altogether
+	 // currently Walk() wont work if Prepare() is not called; but many times when we want to 
+	 //	index a file we don't have a query string
+	 // make the CollectXXX() methods take in a resource query string and return a vector of results
+	 // that way we wont need the GetResourceMatchXXX() methods either
 	bool Prepare(const wxString& resource);
 		
 	/**
@@ -380,7 +386,14 @@ public:
 	/**
 	 * Print the resource cache to stdout.  Useful for debugging only.
 	 */
-	void Print();
+	void Print() const;
+	
+	/**
+	 * @return bool true if this resource finder has not parsed any files (or those files did not have
+	 * any resources). Will also return true if the ONLY file that has been cached is the native functions
+	 * file.
+	 */
+	bool IsEmpty() const;
 
 	/**
 	 * This method copies the internal resource lists from the given object to this. This method can

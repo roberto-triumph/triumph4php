@@ -41,7 +41,7 @@ mvceditor::ResourceCacheClass::~ResourceCacheClass() {
 	}
 }
 
-bool mvceditor::ResourceCacheClass::Register(const wxString& fileName) {
+bool mvceditor::ResourceCacheClass::Register(const wxString& fileName, bool createSymbols) {
 	bool ret = false;
 	wxMutexLocker locker(Mutex);
 	if (!locker.IsOk()) {
@@ -56,6 +56,14 @@ bool mvceditor::ResourceCacheClass::Register(const wxString& fileName) {
 		mvceditor::SymbolTableClass* table = new mvceditor::SymbolTableClass();
 		Finders[fileName] = res;
 		SymbolTables[fileName] = table;
+		if (createSymbols) {
+			
+			// ATTN: not using the configured php file filters?
+			res->FileFilters.push_back(wxT("*.*"));
+			res->Prepare(wxT("Fakeclass"));
+			res->Walk(fileName);
+			table->CreateSymbolsFromFile(fileName);
+		}
 		ret = true;
 	}
 	return ret;
@@ -214,30 +222,40 @@ void mvceditor::ResourceCacheClass::ExpressionCompletionMatches(const wxString& 
 		return;
 	}
 	std::map<wxString, mvceditor::SymbolTableClass*>::const_iterator itSymbols = SymbolTables.find(fileName);
+	bool foundSymbolTable = false;
 	if (itSymbols != SymbolTables.end()) {
 		mvceditor::SymbolTableClass* symbolTable = itSymbols->second;
 		if (symbolTable) {
+			foundSymbolTable = true;
 			symbolTable->ExpressionCompletionMatches(parsedExpression, expressionScope, Finders, &GlobalResourceFinder, 
 				autoCompleteList, resourceMatches, doDuckTyping, error);
 		}
+	}
+	if (!foundSymbolTable) {
+		error.Type = mvceditor::SymbolTableMatchErrorClass::UNREGISTERED_FILE;
 	}
 }
 
 void mvceditor::ResourceCacheClass::ResourceMatches(const wxString& fileName, const mvceditor::SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
 													 std::vector<mvceditor::ResourceClass>& matches,
 													 bool doDuckTyping,
-													 mvceditor::SymbolTableMatchErrorClass& error) {
+													mvceditor::SymbolTableMatchErrorClass& error) {
 	wxMutexLocker locker(Mutex);
 	if (!locker.IsOk()) {
 		return;
 	}
 	std::map<wxString, mvceditor::SymbolTableClass*>::const_iterator itSymbols = SymbolTables.find(fileName);
+	bool foundSymbolTable = false;
 	if (itSymbols != SymbolTables.end()) {
 		mvceditor::SymbolTableClass* symbolTable = itSymbols->second;
 		if (symbolTable) {
+			foundSymbolTable = true;
 			symbolTable->ResourceMatches(parsedExpression, expressionScope, Finders, &GlobalResourceFinder, 
 				matches, doDuckTyping, error);
 		}
+	}
+	if (!foundSymbolTable) {
+		error.Type = mvceditor::SymbolTableMatchErrorClass::UNREGISTERED_FILE;
 	}
 }
 
@@ -247,6 +265,32 @@ void mvceditor::ResourceCacheClass::GlobalAddDynamicResources(const std::vector<
 		return;
 	}
 	GlobalResourceFinder.AddDynamicResources(resources);
+}
+
+void mvceditor::ResourceCacheClass::Print() {
+	wxMutexLocker locker(Mutex);
+	if (!locker.IsOk()) {
+		return;
+	}
+	GlobalResourceFinder.Print();
+	UFILE* ufout = u_finit(stdout, NULL, NULL);
+	u_fprintf(ufout, "Number of registered caches: %d\n", Finders.size());
+	u_fprintf(ufout, "Number of registered symbol tables: %d\n", SymbolTables.size());
+	u_fclose(ufout);
+	std::map<wxString, mvceditor::SymbolTableClass*>::const_iterator it = SymbolTables.begin();
+	for (; it != SymbolTables.end(); ++it) {
+		it->second->Print();
+	}
+	
+}
+
+bool mvceditor::ResourceCacheClass::IsEmpty() {
+	wxMutexLocker locker(Mutex);
+	if (!locker.IsOk()) {
+		return true;
+	}
+	bool isEmpty = GlobalResourceFinder.IsEmpty() && SymbolTables.empty() && Finders.empty();
+	return isEmpty;
 }
 
 mvceditor::ResourceCacheUpdateThreadClass::ResourceCacheUpdateThreadClass(mvceditor::ResourceCacheClass* resourceCache, wxEvtHandler& handler, int eventId)

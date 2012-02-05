@@ -64,10 +64,12 @@ public:
 	 * Creates a new resource finder for the given file.
 	 * 
 	 * @param fileName unique identifier for a file
+	 * @param createSymbols if TRUE then the symbol table from the file will be created immediately; otherwise
+	 * caller will need to vcall Update() method to build the symbol table.
 	 * @return bool TRUE if fileName was not previously registered
 	 * only a unique fileName can be registered 
 	 */
-	bool Register(const wxString& fileName);
+	bool Register(const wxString& fileName, bool createSymbols);
 	
 	/**
 	 * Cleans up the resource finder from the given file. This should be called whenever
@@ -190,6 +192,16 @@ public:
 		bool doDuckTyping,
 		SymbolTableMatchErrorClass& error);
 	
+	/**
+	 * print the resource cache to stdout
+	 */
+	void Print();
+	
+	/**
+	 * @return TRUE if the cache has not been initialized with either a call to Register() or a call to WalkGlobal()
+	 */
+	bool IsEmpty();
+	 
 private:
 
 	/**
