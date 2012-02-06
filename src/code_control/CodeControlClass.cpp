@@ -386,8 +386,9 @@ void mvceditor::CodeControlClass::ApplyPreferences() {
 		SetCssOptions();
 	}
 	else {
-		std::vector<mvceditor::StylePreferenceClass> noStyles;
-		SetCodeControlOptions(noStyles);
+		
+		// use the PHP styles; needed to get the caret and margin styling right
+		SetCodeControlOptions(CodeControlOptions.PhpStyles);
 		Document = new mvceditor::TextDocumentClass();
 		Document->SetControl(this);
 		SetPlainTextOptions();
@@ -537,6 +538,9 @@ void mvceditor::CodeControlClass::SetCssOptions() {
 void mvceditor::CodeControlClass::SetPlainTextOptions() {
 	
 	SetLexer(wxSTC_LEX_NULL);
+
+	// 5 = default as per scintilla docs. set it because it may have been set by SetPhpOptions()
+	SetStyleBits(5);
 	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
 	
 	SetMarginType(LINT_RESULT_MARGIN, wxSTC_MARGIN_SYMBOL);
@@ -546,38 +550,31 @@ void mvceditor::CodeControlClass::SetPlainTextOptions() {
 	MarkerDefine(LINT_RESULT_MARKER, wxSTC_MARK_ARROW, *wxRED, *wxRED);
 	WordHighlightStyle = INDICATOR_PHP_STYLE;
 	
-	// TODO: something is wrong here; when the user chooses the 'Light On Dark' theme
-	// the background (of text) is white not dark.
-	
 	// syntax coloring; use the same font as PHP code for now
-	for (size_t i = 0; i < CodeControlOptions.PhpStyles.size(); ++i) {
+	for (size_t i = 0; i < CodeControlOptions.CssStyles.size(); ++i) {
 		mvceditor::StylePreferenceClass pref = CodeControlOptions.PhpStyles[i];
 		int style = pref.StcStyle;
 		if (wxSTC_HPHP_DEFAULT == style) {
 			
-			// use the PHP default settings as the catch-all for settings not yet exposed
-			// (Javascript) so the user sees a uniform style.
-			int styles[] = {
-				wxSTC_STYLE_DEFAULT,
-				wxSTC_HJ_START, wxSTC_HJ_DEFAULT, wxSTC_HJ_COMMENT,
-				wxSTC_HJ_COMMENTLINE, wxSTC_HJ_COMMENTDOC, wxSTC_HJ_NUMBER,
-				wxSTC_HJ_WORD, wxSTC_HJ_KEYWORD, wxSTC_HJ_DOUBLESTRING,
-				wxSTC_HJ_SINGLESTRING, wxSTC_HJ_SYMBOLS, wxSTC_HJ_STRINGEOL,
-				wxSTC_HJ_REGEX
-			};
-			for (int j = 0; j < 14; ++j) {
-				StyleSetFont(styles[j], pref.Font);
-				StyleSetForeground(styles[j], pref.Color);
-				StyleSetBackground(styles[j], pref.BackgroundColor);
-				StyleSetBold(styles[j], pref.IsBold);
-				StyleSetItalic(styles[j], pref.IsItalic);
-			}
-			StyleSetFont(style, pref.Font);
-			StyleSetForeground(style, pref.Color);
-			StyleSetBackground(style, pref.BackgroundColor);
-			StyleSetBold(style, pref.IsBold);
-			StyleSetItalic(style, pref.IsItalic);
+			// wxSTC_STYLE_DEFAULT controls the background of the portions where text does not reach
+			StyleSetFont(wxSTC_STYLE_DEFAULT, pref.Font);
+			StyleSetForeground(wxSTC_STYLE_DEFAULT, pref.Color);
+			StyleSetBackground(wxSTC_STYLE_DEFAULT, pref.BackgroundColor);
+			StyleSetBold(wxSTC_STYLE_DEFAULT, pref.IsBold);
+			StyleSetItalic(wxSTC_STYLE_DEFAULT, pref.IsItalic);
+
+			// 0 = only style since plain text files dont use a scintilla lexer
+			StyleSetFont(0, pref.Font);
+			StyleSetForeground(0, pref.Color);
+			StyleSetBackground(0, pref.BackgroundColor);
+			StyleSetBold(0, pref.IsBold);
+			StyleSetItalic(0, pref.IsItalic);
 		}
+		StyleSetFont(style, pref.Font);
+		StyleSetForeground(style, pref.Color);
+		StyleSetBackground(style, pref.BackgroundColor);
+		StyleSetBold(style, pref.IsBold);
+		StyleSetItalic(style, pref.IsItalic);	
 	}
 }
 
