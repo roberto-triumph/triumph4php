@@ -215,6 +215,11 @@ protected:
 	 */
 	void OnCloseAllPages(wxCommandEvent& event);
 
+	/**
+	 * When a page is changed; enable/disable its tool tips
+	 */
+	void OnPageChanging(wxAuiNotebookEvent& event);
+
 private:
 	
 	/**

@@ -393,6 +393,20 @@ wxString mvceditor::NotebookClass::CreateWildcardString() const {
 	return fileFilter;
 }
 
+void mvceditor::NotebookClass::OnPageChanging(wxAuiNotebookEvent& event) {
+	int old = event.GetOldSelection();
+	int selected = event.GetSelection();
+	mvceditor::CodeControlClass* oldCtrl = GetCodeControl(old);
+	if (oldCtrl) {
+		oldCtrl->SetAsHidden(true);
+	}
+	mvceditor::CodeControlClass* selectedCtrl = GetCodeControl(selected);
+	if (selectedCtrl) {
+		selectedCtrl->SetAsHidden(false);
+	}
+	event.Skip();
+}
+
 mvceditor::FileDropTargetClass::FileDropTargetClass(mvceditor::NotebookClass* notebook) :
 	Notebook(notebook) {
 
@@ -413,4 +427,8 @@ BEGIN_EVENT_TABLE(mvceditor::NotebookClass, wxAuiNotebook)
 	EVT_AUINOTEBOOK_TAB_RIGHT_UP(wxID_ANY,
 		mvceditor::NotebookClass::ShowContextMenu)
 	EVT_MENU(ID_SAVE_MODIFIED, mvceditor::NotebookClass::OnCloseAllPages)
+
+	// using OnPageChanging instead of OnPageChanged because onPageChanged
+	// generates multiple events (not quite sure why yet)
+	EVT_AUINOTEBOOK_PAGE_CHANGING(wxID_ANY, mvceditor::NotebookClass::OnPageChanging)
 END_EVENT_TABLE()

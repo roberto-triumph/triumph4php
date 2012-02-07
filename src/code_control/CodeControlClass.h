@@ -289,6 +289,14 @@ public:
 	 */
 	int LineFromCharacter(int charPos);
 
+	/**
+	 * Sets this control as 'hidden'; doesn't do anything but affect call tips at the
+	 * moment.
+	 * The notebook should call this method as it effectively disables call tips from
+	 * showing on the dwell notification
+	 */
+	void SetAsHidden(bool isHidden);
+
 private:
 
 	/**
@@ -509,6 +517,12 @@ private:
 	 * @var Mode
 	 */
 	Mode DocumentMode;
+
+	/**
+	 * If TRUE, then this code control is treated as hidden and call tips 
+	 * will not show when the Mouse Dwell notification is received.
+	 */
+	bool IsHidden;
 
 	DECLARE_EVENT_TABLE()
 };

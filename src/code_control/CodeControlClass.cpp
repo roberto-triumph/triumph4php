@@ -72,7 +72,8 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 		, WordHighlightStyle(0)
 		, ModifiedDialogOpen(false)
 		, WordHighlightIsWordHighlighted(false)
-		, DocumentMode(TEXT) {
+		, DocumentMode(TEXT) 
+		, IsHidden(false) {
 	Document = NULL;
 	
 	// we will handle right-click menu ourselves
@@ -741,6 +742,9 @@ void mvceditor::CodeControlClass::OnIdle(wxIdleEvent& event) {
 
 void mvceditor::CodeControlClass::OnKeyDown(wxKeyEvent& event) {
 	UndoHighlight();
+	if (event.GetKeyCode() == WXK_ESCAPE) {
+		CallTipCancel();
+	}
 	event.Skip();
 }
 
@@ -882,7 +886,7 @@ mvceditor::CodeControlClass::Mode mvceditor::CodeControlClass::GetDocumentMode()
 }
 
 void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
-	if (event.GetEventObject() != this) {
+	if (event.GetEventObject() != this && IsHidden) {
 		event.Skip();
 		return;
 	}
@@ -896,8 +900,6 @@ void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
 	 */
 	 // TODO: handle big comments nicely
 	 // TODO: unescape html entities
-	 // TODO: when switching tabs, sometimes the tool tip from the previously selected
-	 // page pops up when it should not
 	if (DocumentMode == PHP) {
 		int pos = event.GetPosition();
 
@@ -956,6 +958,18 @@ int mvceditor::CodeControlClass::LineFromCharacter(int charPos) {
 	int pos = mvceditor::StringHelperClass::CharToUtf8Pos(buf, documentLength, charPos);
 	delete[] buf;
 	return LineFromPosition(pos);
+}
+
+void mvceditor::CodeControlClass::SetAsHidden(bool isHidden) {
+	IsHidden = isHidden;
+
+	// in case tool tip, auto complete lists that are currently active
+	if (IsHidden && CallTipActive()) {
+		CallTipCancel();
+	}
+	if (IsHidden && AutoCompActive()) {
+		AutoCompCancel();
+	}
 }
 
 BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)
