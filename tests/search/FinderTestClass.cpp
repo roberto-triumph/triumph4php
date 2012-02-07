@@ -148,6 +148,32 @@ TEST(FindNextUsingRegularExpressionModeShouldHandleBeforeAndEndOfLine) {
 	CHECK_EQUAL(0, CODE.compare(position, length, UNICODE_STRING_SIMPLE("  $PI = 3.14; //constant ")));
 }
 
+TEST(FindPreviousShouldSkipToFirstInstance) {
+	UnicodeString toFind(UNICODE_STRING_SIMPLE("$MESSAGE"));	
+	mvceditor::FinderClass finder(toFind, mvceditor::FinderClass::EXACT);
+	CHECK(finder.Prepare());
+
+	// find the 2nd instance of $MESSAGE
+	// the test here will be that if the Find starts from one position before the previous match 
+	// that the next call will find the previous match
+	// we are testing off-by-one errors
+	//
+	// example
+	/// ...... $MESSAGE ...... $MESSAGE......
+	// we are testing that if we use FindPrevious starting from the next to last character of the second instance of
+	// $MESSAGE that the method will match the first instance of $MESSAGE
+	int32_t firstIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("$MESSAGE"));
+	int32_t secondIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("$MESSAGE"), firstIndex + 1);
+
+	// -2 = start from "$MESSAG"
+	CHECK(finder.FindPrevious(CODE, secondIndex + toFind.length() - 2));
+	int32_t position, length;
+	CHECK(finder.GetLastMatch(position, length));
+	CHECK_EQUAL(firstIndex, position);
+	CHECK_EQUAL(0, CODE.compare(position, length, UNICODE_STRING_SIMPLE("$MESSAGE")));
+
+}
+
 TEST(GetLastReplacementTextShouldReturnMatchedTextInExactMode) {
 	UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI = 3.14;"));
 	mvceditor::FinderClass finder(tofind, mvceditor::FinderClass::EXACT);

@@ -115,10 +115,12 @@ void mvceditor::FinderPanelClass::Find(bool findNext) {
 		
 		// pick up from last found spot if possible. increment/decrement so that
 		// we dont find the same hit again
+		// we searching backwards, start from 2 positions before because the selection
+		// starts at 1 PAST the hit
 		int32_t position = codeControl->GetCurrentPos(),
 			length = 0;
 		bool found = findNext ? Finder.FindNext(codeControl->GetSafeText(), position + 1) :
-			Finder.FindPrevious(codeControl->GetSafeText(), position - 1);
+			Finder.FindPrevious(codeControl->GetSafeText(), position - 2);
 		if (found) {
 			if (Finder.GetLastMatch(position, length)) {
 				codeControl->SetSelectionAndEnsureVisible(position, position + length);
@@ -304,10 +306,12 @@ void mvceditor::ReplacePanelClass::Find(bool findNext) {
 		
 		// pick up from last found spot if possible. increment/decrement so that
 		// we dont find the same hit again
+		// we searching backwards, start from 2 positions before because the selection
+		// starts at 1 PAST the hit
 		int32_t position = codeControl->GetCurrentPos(),
 			length = 0;
 		bool found = findNext ? Finder.FindNext(codeControl->GetSafeText(), position + 1) :
-			Finder.FindPrevious(codeControl->GetSafeText(), position - 1);
+			Finder.FindPrevious(codeControl->GetSafeText(), position - 2);
 		if (found) {
 			if (Finder.GetLastMatch(position, length)) {
 				codeControl->SetSelectionAndEnsureVisible(position, position + length);
