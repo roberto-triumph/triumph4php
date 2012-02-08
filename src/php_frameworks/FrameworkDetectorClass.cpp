@@ -113,6 +113,10 @@ void mvceditor::DetectorActionClass::OnProcessFailed(wxCommandEvent& event) {
 	wxPostEvent(&Handler, event);
 }
 
+void mvceditor::DetectorActionClass::OnWorkInProgress(wxCommandEvent& event) {
+	wxPostEvent(&Handler, event);
+}
+
 mvceditor::FrameworkDetectorActionClass::FrameworkDetectorActionClass(wxEvtHandler& handler)
 	: DetectorActionClass(handler)
 	, Frameworks() {
@@ -440,27 +444,28 @@ void mvceditor::PhpFrameworkDetectorClass::OnFrameworkDetectionComplete(wxComman
 		wxString response = event.GetString();
 		mvceditor::EditorLogError(mvceditor::PROJECT_DETECTION, response);
 	}
-	if (!Identifiers.empty()) {
 		
-		// fill the detection queue
-		for (size_t i = 0; i < Identifiers.size(); i++) {
-			std::vector<wxString> next;
-			next.push_back(Identifiers[i]);
-			next.push_back(wxT("databaseInfo"));
-			FrameworkIdentifiersLeftToDetect.push_back(next);
-			
-			next.clear();
-			next.push_back(Identifiers[i]);
-			next.push_back(wxT("configFiles"));
-			FrameworkIdentifiersLeftToDetect.push_back(next);
-			
-			next.clear();
-			next.push_back(Identifiers[i]);
-			next.push_back(wxT("resources"));
-			FrameworkIdentifiersLeftToDetect.push_back(next);
-		}
-		NextDetection();
+	// fill the detection queue
+	for (size_t i = 0; i < Identifiers.size(); i++) {
+		std::vector<wxString> next;
+		next.push_back(Identifiers[i]);
+		next.push_back(wxT("databaseInfo"));
+		FrameworkIdentifiersLeftToDetect.push_back(next);
+		
+		next.clear();
+		next.push_back(Identifiers[i]);
+		next.push_back(wxT("configFiles"));
+		FrameworkIdentifiersLeftToDetect.push_back(next);
+		
+		next.clear();
+		next.push_back(Identifiers[i]);
+		next.push_back(wxT("resources"));
+		FrameworkIdentifiersLeftToDetect.push_back(next);
 	}
+	
+	// the NextDetection will properly notify any of our handlers (for DETECTION_* events) if the identifier queue
+	// is empty
+	NextDetection();
 }
 
 void mvceditor::PhpFrameworkDetectorClass::OnDatabaseDetectionComplete(wxCommandEvent& event) {
@@ -532,6 +537,7 @@ const wxEventType mvceditor::EVENT_FRAMEWORK_URL_FAILED = wxNewEventType();
 BEGIN_EVENT_TABLE(mvceditor::DetectorActionClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::DetectorActionClass::OnProcessComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_FAILED, mvceditor::DetectorActionClass::OnProcessFailed)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::DetectorActionClass::OnWorkInProgress)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::PhpFrameworkDetectorClass, wxEvtHandler)
