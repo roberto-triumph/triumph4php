@@ -24,6 +24,12 @@
  */
 #include <php_frameworks/CallStackClass.h>
 
+
+mvceditor::CallClass::CallClass()
+	: Resource() 
+	, Arguments() {
+}
+
 mvceditor::CallStackClass::CallStackClass(mvceditor::ResourceCacheClass& resourceCache)
 	: List()
 	, LintResults()
@@ -113,7 +119,7 @@ bool mvceditor::CallStackClass::Recurse(Errors& error) {
 				wxFileName nextFile = nextItem.FileName;
 				bool alreadyParsed = false;
 				for (size_t i = 0; i < List.size(); ++i) {
-					if (List[i].Resource == nextResource) {
+					if (List[i].Resource.Resource == nextResource) {
 						alreadyParsed = true;
 						break;
 					}
@@ -180,7 +186,11 @@ void mvceditor::CallStackClass::ExpressionFound(const mvceditor::ExpressionClass
 					newItem.FileName.Assign(it->GetFullPath());
 					newItem.Resource = it->Resource;
 					ResourcesRemaining.push(newItem);
-					List.push_back(*it);
+					
+					mvceditor::CallClass newCall;
+					newCall.Resource = *it;
+					newCall.Arguments = expression.CallArguments;
+					List.push_back(newCall);
 				}
 			}
 			if (singleMatchError.HasError() || matches.empty()) {

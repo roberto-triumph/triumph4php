@@ -139,7 +139,7 @@ TEST_FIXTURE(CallStackFixtureTestClass, ResolutionError) {
 	
 	// since load can be resolved the call stack should have it
 	CHECK_VECTOR_SIZE(1, CallStack.List);
-	CHECK_UNISTR_EQUALS("CI_Loader::view", CallStack.List[0].Resource);
+	CHECK_UNISTR_EQUALS("CI_Loader::view", CallStack.List[0].Resource.Resource);
 }	
 
 TEST_FIXTURE(CallStackFixtureTestClass, FailOnStackLimit) {
@@ -167,7 +167,12 @@ TEST_FIXTURE(CallStackFixtureTestClass, SucceedOnSimple) {
 	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
 	CHECK_VECTOR_SIZE(1, CallStack.List);
-	CHECK_UNISTR_EQUALS("CI_Loader::view", CallStack.List[0].Resource);
+	CHECK_UNISTR_EQUALS("CI_Loader::view", CallStack.List[0].Resource.Resource);
+	CHECK_VECTOR_SIZE(2, CallStack.List[0].Arguments);
+	CHECK_UNISTR_EQUALS("index", CallStack.List[0].Arguments[0].Lexeme);
+	CHECK_EQUAL(mvceditor::ExpressionClass::SCALAR, CallStack.List[0].Arguments[0].Type);
+	CHECK_UNISTR_EQUALS("$data", CallStack.List[0].Arguments[1].Lexeme);
+	CHECK_EQUAL(mvceditor::ExpressionClass::VARIABLE, CallStack.List[0].Arguments[1].Type);
 }
 
 }

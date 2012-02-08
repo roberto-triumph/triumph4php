@@ -36,6 +36,28 @@ namespace mvceditor
 {
 
 /**
+ * A small class to keep track of the function / method call along with the arguments
+ * to the function / method call. This class groups together the function name, file 
+ * location, class name (if a method) and the list of arguments.
+ */
+class CallClass {
+
+public:
+
+	/**
+	 * the function / method being called
+	 */
+	ResourceClass Resource;
+	
+	/**
+	 * the list of arguments given to the calling function / method
+	 */
+	std::vector<ExpressionClass> Arguments;
+	
+	CallClass();
+};
+
+/**
  * This class will keep track of all function / method calls of a piece of source;
  * this is helpful in building a call stack where a user can easily see what
  * functions are getting called.
@@ -85,7 +107,7 @@ public:
 	 * All of the resolved function calls that took place; this vector is overwritten each time
 	 * Build() method is called.
 	 */
-	std::vector<ResourceClass> List;
+	std::vector<CallClass> List;
 
 	/**
 	 * If given code has a parser error (PARSE_ERR0R), the error will be stored here
