@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <php_frameworks/CallStackClass.h>
+#include <windows/StringHelperClass.h>
 
 
 mvceditor::CallClass::CallClass()
@@ -155,6 +156,46 @@ bool mvceditor::CallStackClass::Recurse(Errors& error) {
 	}
 	return ret;		
 	
+}
+
+bool mvceditor::CallStackClass::Persist(wxFileName& fileName) {
+	bool write = false;
+	wxFFile file;
+	if (file.Open(fileName.GetFullPath(), wxT("wb"))) {
+		write = true;
+		for (std::vector<mvceditor::CallClass>::const_iterator it = List.begin(); it != List.end(); ++it) {
+			wxString line;
+			mvceditor::ResourceClass callResource = it->Resource;
+			line += mvceditor::StringHelperClass::IcuToWx(callResource.Identifier);
+			line += wxT(",");
+			line += mvceditor::StringHelperClass::IcuToWx(callResource.Resource);
+			if (!it->Arguments.empty()) {
+				line += wxT(",");
+			}
+			for (size_t i = 0; i < it->Arguments.size(); ++i) {
+				
+				// escape any double quotes in case of string constants
+				line += wxT("\"");
+				UnicodeString lexeme = it->Arguments[i].Lexeme;
+				lexeme = lexeme.findAndReplace(UNICODE_STRING_SIMPLE("\""), UNICODE_STRING_SIMPLE("\\\""));
+				line += mvceditor::StringHelperClass::IcuToWx(lexeme);
+				line += wxT("\"");
+				if (i < (it->Arguments.size() - 1)) {
+					line += wxT(",");
+				}
+			}
+			line += wxT("\n");
+			if (mvceditor::ResourceClass::FUNCTION == callResource.Type) {
+				write = file.Write(wxT("FUNCTION,")) && file.Write(line);
+				
+			}
+			else if (mvceditor::ResourceClass::METHOD == callResource.Type) {
+				write = file.Write(wxT("METHOD,")) && file.Write(line);
+			}
+		}
+		file.Close();
+	}
+	return write;
 }
 
 void mvceditor::CallStackClass::ExpressionFound(const mvceditor::ExpressionClass& expression) {

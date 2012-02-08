@@ -138,6 +138,25 @@ public:
 	 * @return TRUE on success, if FALSE then error will be filled.
 	 */
 	bool Build(const wxFileName& fileName, const UnicodeString& className, const UnicodeString& methodName, Errors& error);
+	
+	
+	/**
+	 * Saves the call stack to a file; in CSV format
+	 * Format is as follows:
+	 * ResourceType,Identifier,Resource, Arg1 lexeme, Arg2 lexeme, ... Arg N lexeme
+	 * 
+	 * where
+	 * ResourceType = FUNCTION | METHOD
+	 * Identifier is the name of the function / method
+	 * Resource is the fully qualified name (ie. ClassName::MethodName)
+	 * ArgN Lexeme is the lexeme (string) of the Nth argument; lexeme is either the constant (when argument is a string / number)
+	 * or it can be a variable name.
+	 *  TODO: object operator chains are not currently supported
+	 * 
+	 * @param fileName the full path to the file that will be written to
+	 * @return TRUE if file was successfully written to
+	 */
+	bool Persist(wxFileName& fileName);
 
 	void MethodFound(const UnicodeString& className, const UnicodeString& methodName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment, 
