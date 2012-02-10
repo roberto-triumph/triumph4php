@@ -137,11 +137,9 @@ wxString mvceditor::ProcessWithHeartbeatClass::GetProcessOutput(wxProcess* proc)
 }
 
 void mvceditor::ProcessWithHeartbeatClass::OnTimer(wxTimerEvent& event) {
-	wxCommandEvent intProgressEvent(mvceditor::EVENT_PROCESS_IN_PROGRESS);
+	wxCommandEvent intProgressEvent(mvceditor::EVENT_PROCESS_IN_PROGRESS, wxID_ANY);
 	wxPostEvent(&Handler, intProgressEvent);
 }
-
-
 
 BEGIN_EVENT_TABLE(mvceditor::ProcessWithHeartbeatClass, wxEvtHandler)
 	EVT_END_PROCESS(wxID_ANY, mvceditor::ProcessWithHeartbeatClass::OnProcessEnded)	

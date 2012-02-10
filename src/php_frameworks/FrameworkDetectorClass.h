@@ -130,6 +130,8 @@ private:
 	void OnProcessComplete(wxCommandEvent& event);
 
 	void OnProcessFailed(wxCommandEvent& event);
+	
+	void OnWorkInProgress(wxCommandEvent& event);
 
 public:
 
