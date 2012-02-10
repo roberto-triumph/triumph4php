@@ -291,14 +291,15 @@ mvceditor::PhpDocumentClass::~PhpDocumentClass() {
 }
 
 void mvceditor::PhpDocumentClass::AttachToControl(wxStyledTextCtrl* ctrl) {
+	ctrl->SetModEventMask(wxSTC_MOD_INSERTTEXT | wxSTC_MOD_DELETETEXT);
 		
 	// using Connect instead of Event tables because call EVT_STC_CALLTIP_CLICK macro
 	// contains a syntax error
 	ctrl->Connect(wxID_ANY, wxID_ANY, wxEVT_STC_CALLTIP_CLICK, 
 		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(wxStyledTextEventFunction, &mvceditor::PhpDocumentClass::OnCallTipClick),
 		NULL, this);
-	ctrl->Connect(wxID_ANY, wxID_ANY, wxEVT_KEY_DOWN, 
-		wxKeyEventHandler(mvceditor::PhpDocumentClass::OnKeyDown),
+	ctrl->Connect(wxID_ANY, wxID_ANY, wxEVT_STC_MODIFIED, 
+		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(wxStyledTextEventFunction, &mvceditor::PhpDocumentClass::OnModification),
 		NULL, this);
 	ctrl->Connect(wxID_ANY, wxID_ANY, wxEVT_STC_AUTOCOMP_SELECTION,
 		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(wxStyledTextEventFunction, &mvceditor::PhpDocumentClass::OnAutoCompletionSelected),
@@ -312,8 +313,8 @@ void mvceditor::PhpDocumentClass::DetachFromControl(wxStyledTextCtrl* ctrl) {
 	ctrl->Disconnect(wxID_ANY, wxID_ANY, wxEVT_STC_CALLTIP_CLICK, 
 		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(wxStyledTextEventFunction, &mvceditor::PhpDocumentClass::OnCallTipClick),
 		NULL, this);
-	ctrl->Disconnect(wxID_ANY, wxID_ANY, wxEVT_KEY_DOWN, 
-		wxKeyEventHandler(mvceditor::PhpDocumentClass::OnKeyDown),
+	ctrl->Disconnect(wxID_ANY, wxID_ANY, wxEVT_STC_MODIFIED, 
+		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(wxStyledTextEventFunction, &mvceditor::PhpDocumentClass::OnModification),
 		NULL, this);
 	ctrl->Disconnect(wxID_ANY, wxID_ANY, wxEVT_STC_AUTOCOMP_SELECTION,
 		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(wxStyledTextEventFunction, &mvceditor::PhpDocumentClass::OnAutoCompletionSelected),
@@ -426,7 +427,6 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 	mvceditor::SymbolTableMatchErrorClass error;
 	
 	// TODO: make duck typing user-configurable (ON / OFF)
-	// TODO: code completion does not work when typing in new text
 	bool doDuckTyping = true;
 	if (!lastExpression.isEmpty()) {
 		Parser.ParseExpression(lastExpression, parsedExpression);
@@ -803,7 +803,7 @@ void mvceditor::PhpDocumentClass::MatchBraces(int posToCheck) {
 	}
 }
 
-void mvceditor::PhpDocumentClass::OnKeyDown(wxKeyEvent& event) {
+void mvceditor::PhpDocumentClass::OnModification(wxStyledTextEvent& event) {
 
 	// if already parsing then dont do anything
 	if (!ResourceCache || ResourceCacheUpdateThread.IsRunning()) {
@@ -815,21 +815,65 @@ void mvceditor::PhpDocumentClass::OnKeyDown(wxKeyEvent& event) {
 		return;
 	}
 
-	// only update the dirty bit on a letter, number of backspace
-	// keypress.  disregard shortcut keystrokes
 	// we want to keep the re-parsings to a minimum
 	// we dont need to reparse when user is adding a 
 	// comment or a constant string
 	if (!InCommentOrStringStyle(Ctrl->GetCurrentPos())) {
-		int modifiers = event.GetModifiers();
 
-		// TODO:... what about when code is pasted?
-		if (modifiers == wxMOD_SHIFT || modifiers == wxMOD_NONE) {
-			int keyCode = event.GetKeyCode();
-			if (';' == keyCode) {
+		// trigger reparsing only when a variable has been added or removed.
+		// We can detect when a variable is added by looking for 
+		// 1. when a statement ends ";"
+		// 2. a scope ends (to handle "if ($row = mysql_fetch_array()) {}" 
+		// 3. user pastes a block of text
+		// 4. user tweaks a variable name (ie change "$user" to "$allUsers")
+		// 5. user tweaks a function / class name (change "function work" to "function asyncWork")
+		//
+		// We can detect when a variable is removed ...
+		// 1. user deletes a block of text
+		// 2. user deletes char by char until we hit the beginning of a statement (if the
+		//    cursor is positioned right after a semicolon (with whitespace being insignigicant)
+		// 3. user cuts a block of text
+		// 4. user tweaks a variable name (ie change "$user" to "$allUsers")
+		// 5. user tweaks a function / class name (change "function work" to "function asyncWork")
+		//
+		// Also we will need to look for cases where the user fixes unmatched parenthesis / braces
+		// because these may fix lint errors (and allow symbol table to be built).
+		//
+		// it looks like all text operations (type in text, cut / copy/ paste) are funneled
+		// through the wxSTC_MOD_INSERTTEXT and wxSTC_MOD_DELETETEXT events so we just need 
+		// to inspect what text is being added / removed here
+		int mod = event.GetModificationType();
+		if (mod & wxSTC_MOD_INSERTTEXT || mod & wxSTC_MOD_DELETETEXT) {
+			wxString text = event.GetText();
+			if (text.find_first_of(wxT(";{}()")) != std::string::npos) {
 				NeedToUpdateResources = true;
 			}
+			else {
+
+				// get the whole word that's positioned at the modified text
+				// then check to see if it's a variable
+				int wordStart = Ctrl->WordStartPosition(event.GetPosition(), true);
+				int wordEnd = Ctrl->WordEndPosition(event.GetPosition(), true);
+				wxString word = Ctrl->GetTextRange(wordStart, wordEnd);
+				word.Trim(true);
+				if (!word.IsEmpty() && word.StartsWith(wxT("$"))) {
+					NeedToUpdateResources = true;
+				}
+				if (!word.IsEmpty()) {
+					
+					// get the previous word; if the previous word is the keyword
+					// "function" or "class" then the user changed a function or class name
+					int previousWordEnd = Ctrl->WordStartPosition(wordStart, false);
+					int previousWordStart = Ctrl->WordStartPosition(previousWordEnd, true);
+					wxString previousWord = Ctrl->GetTextRange(previousWordStart, previousWordEnd);
+					previousWord.Trim(true);
+					if (previousWord.CmpNoCase(wxT("function")) == 0 || previousWord.CmpNoCase(wxT("class")) == 0) {
+						NeedToUpdateResources = true;
+					}
+				}
+			}
 		}
+		
 	}
 	event.Skip();
 }
@@ -914,7 +958,9 @@ void mvceditor::PhpDocumentClass::OnCallTipClick(wxStyledTextEvent& evt) {
 }
 
 void mvceditor::PhpDocumentClass::OnResourceUpdateComplete(wxCommandEvent& event) {
-	Timer.Start();
+	if(!Timer.Start(500, false)) {
+		wxLogDebug(_("Could not start parsing timer."));
+	}
 	event.Skip();
 }
 

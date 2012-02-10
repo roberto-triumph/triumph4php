@@ -273,9 +273,10 @@ private:
 	bool InCommentOrStringStyle(int posToCheck);
 
 	/**
-	 * On a key press, we will update the resource cache if need be
+	 * When text is changed, we will update the resource cache if need be (retrigger the 
+	 * buulding of the symbol table)
 	 */
-	void OnKeyDown(wxKeyEvent& event);
+	void OnModification(wxStyledTextEvent& event);
 
 	void RegisterAutoCompletionImages();
 

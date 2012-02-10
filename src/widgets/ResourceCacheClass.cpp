@@ -277,5 +277,6 @@ void* mvceditor::ResourceCacheUpdateThreadClass::Entry() {
 	// cleanup.
 	CurrentFileName.resize(0);
 	CurrentCode.truncate(0);
+	SignalEnd();
 	return 0;
 }
