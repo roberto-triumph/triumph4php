@@ -54,7 +54,7 @@ mvceditor::DetectorActionClass::~DetectorActionClass() {
 }
 
 bool mvceditor::DetectorActionClass::Init(int id, const EnvironmentClass& environment, const wxString& projectRootPath, const wxString& identifier, 
-		wxString extra) {
+		wxString file) {
 	Error = NONE;
 	ErrorMessage = wxT("");
 	Clear();
@@ -86,7 +86,7 @@ bool mvceditor::DetectorActionClass::Init(int id, const EnvironmentClass& enviro
 		wxT(" --dir=\"") + projectRootPath  + wxT("\"") +
 		wxT(" --identifier=\"") + identifier + wxT("\"") +
 		wxT(" --output=\"") + OutputFile.GetFullPath() + wxT("\"") +
-		wxT(" --extra=\"") + extra + wxT("\"");
+		wxT(" --file=\"") + file + wxT("\"");
 		
 	wxString cmd = wxT("\"") + environment.Php.PhpExecutablePath + wxT("\"") + wxT(" \"") + scriptFileName.GetFullPath() + wxT("\"") + args;
 	return Process.Init(cmd, id, CurrentPid);

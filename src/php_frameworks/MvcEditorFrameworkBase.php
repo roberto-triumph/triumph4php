@@ -101,5 +101,24 @@ abstract class MvcEditorFrameworkBaseClass {
 	 * @return array of URLs for the given file
 	 */
 	abstract public function makeUrls($dir, $fileName);
+	
+	/**
+	 * Sub-classes will implement this method to help MVC Editor determine which template files 
+	 * are executed by a specific URL. Frameworks usually use a specific function / method to invoke
+	 * template files; others may just have a specific convention (view files are named the same as the
+	 * invoked action. 
+	 * In the first case above, subclasses will usually read the call stack file that MVC Editor
+	 * generates, iterate through the function calls, and look for invocations of the framework's template
+	 * function / method.
+	 * For the second case, a subclass may be able to determine the view by just looking at the URL.
+	 *
+	 * @param string $dir the base directory of the project in question; absolute path.
+	 * @param string $url full URL to the action in question
+	 * @param string $callStackFile the location of the call stack file, use the CallStackClass to read 
+	 *        iterate through the action's function / method calls.
+	 * @return array of full paths, each item will be the full path to the view files that the given action
+	 *         uses.
+	 */
+	abstract public function viewFiles($dir, $url, $callStackFile);
 
 }

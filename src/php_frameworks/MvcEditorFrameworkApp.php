@@ -73,26 +73,25 @@ function loadFrameworks() {
  * any prior inputs that the framework object may do.
  * action is assumed to be valid at this point
  */
-function runAction($framework, $dir, $action, $extra, $outputFile) {
-	if (strcasecmp($action, 'databaseInfo') == 0) {
-		runDatabaseInfo($framework, $dir, $outputFile);
-	}
-	else if (strcasecmp($action, 'isUsedBy') == 0) {
-		runIsUsedBy($dir, $outputFile);
-	}
-	else if (strcasecmp($action, 'configFiles') == 0) {
-		runConfigFiles($framework, $dir, $outputFile);
-	}
-	else if (strcasecmp($action, 'resources') == 0) {
-		runResources($framework, $dir, $outputFile);
-	}
-	else if (strcasecmp($action, 'makeUrls') == 0) {
-		runMakeUrls($framework, $dir, $extra, $outputFile);
-	}
+function runAction($framework, $dir, $action, $url, $file, $outputFile) {
 
+	// a little dynamic code goes a long way here; no need for a bunch of IF statments
+	$availableActions = array('runDatabaseInfo', 'runIsUsedBy', 'runConfigFiles', 'runResources', 'runMakeUrls', 'runViewFiles');
+	$done = false;
+	foreach ($availableActions as $availAction) {
+		if (strcasecmp($availAction, 'run' . $action) == 0) {
+			call_user_func_array($availAction, array($framework, $dir, $url, $file, $outputFile));
+			$done = true;
+			break;
+		}
+	}
+	if (!$done) {
+		print "Invalid action: {$action}\n";
+		exit(-1);
+	}
 }
 
-function runDatabaseInfo($framework, $dir, $outputFile) {
+function runDatabaseInfo($framework, $dir, $url, $file, $outputFile) {
 	$infoList = $framework->databaseInfo($dir);
 	if ($infoList) {
 		$writer = new Zend_Config_Writer_Ini();
@@ -110,11 +109,11 @@ function runDatabaseInfo($framework, $dir, $outputFile) {
 				$config->{$key}->{$prop} = $value;
 			}				
 		}
-		initPrint($writer, $outputFile);
+		iniPrint($writer, $outputFile);
 	}
 }
 
-function runIsUsedBy($dir, $outputFile) {
+function runIsUsedBy($framework, $dir, $url, $file, $outputFile) {
 	$frameworks = loadFrameworks();
 	$identifiers = array();
 	foreach ($frameworks as $framework) {
@@ -131,10 +130,10 @@ function runIsUsedBy($dir, $outputFile) {
 		$config->{$prop} = $identifier;
 		$i++;
 	}
-	initPrint($writer, $outputFile);
+	iniPrint($writer, $outputFile);
 }
 
-function runConfigFiles($framework, $dir, $outputFile) {
+function runConfigFiles($framework, $dir, $url, $file, $outputFile) {
 	$configFiles = $framework->configFiles($dir);
 	if ($configFiles) {
 		$writer = new Zend_Config_Writer_Ini();
@@ -150,7 +149,7 @@ function runConfigFiles($framework, $dir, $outputFile) {
 			$configPath = iniEscapeValue($configPath);
 			$outputConfig->{$key} = $configPath;
 		}
-		initPrint($writer, $outputFile);
+		iniPrint($writer, $outputFile);
 	}
 }
 
@@ -158,7 +157,7 @@ function runConfigFiles($framework, $dir, $outputFile) {
  * @param MvcEditorFrameworkBaseClass $framework the framework specific code
  * @param string $dir the directory where the project source code is located
  */
-function runResources(MvcEditorFrameworkBaseClass $framework, $dir, $outputFile) {
+function runResources(MvcEditorFrameworkBaseClass $framework, $dir, $url, $file, $outputFile) {
 	$resources = $framework->resources($dir);
 	if ($resources) {
 		$writer = new Zend_Config_Writer_Ini();
@@ -180,12 +179,12 @@ function runResources(MvcEditorFrameworkBaseClass $framework, $dir, $outputFile)
 			);
 			$keyIndex++;
 		}
-		initPrint($writer, $outputFile);
+		iniPrint($writer, $outputFile);
 	}
 }
 
-function runMakeUrls(MvcEditorFrameworkBaseClass $framework, $dir, $extra, $outputFile) {
-	$urls = $framework->makeUrls($dir, $extra);
+function runMakeUrls(MvcEditorFrameworkBaseClass $framework, $dir, $url, $file, $outputFile) {
+	$urls = $framework->makeUrls($dir, $file);
 	if ($urls) {
 		$writer = new Zend_Config_Writer_Ini();
 		$outputConfig = new Zend_Config(array(), true);
@@ -199,10 +198,25 @@ function runMakeUrls(MvcEditorFrameworkBaseClass $framework, $dir, $extra, $outp
 			$outputConfig->{$key} = $url;
 			$keyIndex++;
 		}
-		initPrint($writer, $outputFile);
+		iniPrint($writer, $outputFile);
 	}
 }
 
+function runViewFiles(MvcEditorFrameworkBaseClass $framework, $dir, $url, $file, $outputFile) {
+	$viewFiles = $framework->viewFiles($dir, $url, $file);
+	if ($viewFiles) {
+		$writer = new Zend_Config_Writer_Ini();
+		$outputConfig = new Zend_Config(array(), true);
+		$writer->setConfig($outputConfig);
+		$keyIndex = 0;
+		foreach ($viewFiles as $viewFile) {
+			$key = iniEscapeKey('View_' . $keyIndex);
+			$outputConfig->{$key} = $viewFile;
+			$keyIndex++;
+		}
+		iniPrint($writer, $outputFile);
+	}
+}
 
 
 // Replaces any possible characters that may conflict with INI parsing of KEYS.
@@ -217,7 +231,7 @@ function iniEscapeValue($str) {
 	return str_replace("\\", "\\\\", $str);
 }
 
-function initPrint(Zend_Config_Writer_Ini $writer, $outputFile) {
+function iniPrint(Zend_Config_Writer_Ini $writer, $outputFile) {
 	if ($outputFile) {
 		file_put_contents($outputFile, $writer->render());
 	}
@@ -231,24 +245,19 @@ $rules = array(
 	'identifier|i=s' => 'The framework to query',
 	'dir|d=s' => 'The base directory that the project resides in',
 	'action|a=s' => 'The data that is being queried',
-	'extra|e=s' => 'Any extra parameters that a specific action may need',
+	'url|u=s' => 'URL to query (used only by the viewFiles action)',
+	'file|f=s' => 'File to query (used only by the viewFiles, makeUrls actions)',
 	'output|o=s' => 'If given, the output will be written to the given file (by default, output does to STDOUT)',
 	'help|h' => 'A help message'
 );
 $opts = new Zend_Console_Getopt($rules);
-$action = $opts->getOption('action');
 $identifier = $opts->getOption('identifier');
 $dir = $opts->getOption('dir');
-$help = $opts->getOption('help');
+$action = $opts->getOption('action');
+$url = $opts->getOption('url');
+$file = $opts->getOption('file');
 $outputFile = $opts->getOption('output');
-$extra = $opts->getOption('extra');
-
-// trim any quotes
-$action = trim($action, " '\"");
-$identifier = trim($identifier, " '\"");
-$dir = trim($dir, " '\"");
-$outputFile = trim($outputFile, " '\"");
-$extra = trim($extra, " '\"");
+$help = $opts->getOption('help');
 
 if ($help) {
 	echo <<<EOF
@@ -264,6 +273,15 @@ When any argument is invalid or missing, the program will exit with an error cod
 EOF;
 	exit(0);
 }
+
+// trim any quotes
+$identifier = trim($identifier, " '\"");
+$dir = trim($dir, " '\"");
+$action = trim($action, " '\"");
+$url = trim($url, " '\"");
+$file = trim($file, " '\"");
+$outputFile = trim($outputFile, " '\"");
+
 if ($outputFile) {
 	print "Running action=$action on identifier=$identifier with dir=$dir output to $outputFile \n";
 }
@@ -284,7 +302,7 @@ if ($chosenFramework && $dir) {
 
 	// pick the correct method call on the framework
 	if (method_exists($chosenFramework, $action)) {
-		runAction($chosenFramework, $dir, $action, $extra, $outputFile);
+		runAction($chosenFramework, $dir, $action, $url, $file, $outputFile);
 	}
 	else {
 		print "Invalid action: '{$action}.' Program will now exit.\n";
@@ -292,7 +310,7 @@ if ($chosenFramework && $dir) {
 	}
 }
 else if ($dir && strcasecmp($action, 'isUsedBy') == 0) {
-	runAction(NULL, $dir, $action, $extra, $outputFile);
+	runAction(NULL, $dir, $action, $url, $file, $outputFile);
 }
 else if ($dir) {
 	print "Invalid identifier: '{$identifier}.' Program will now exit.\n";

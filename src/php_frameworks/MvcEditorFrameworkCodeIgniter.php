@@ -27,6 +27,7 @@
 require_once 'MvcEditorFrameworkBase.php';
 require_once 'MvcEditorResource.php';
 require_once 'MvcEditorDatabaseInfo.php';
+require_once 'MvcEditorCallClass.php';
 
 class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 
@@ -168,6 +169,36 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 			$urls[] = $this->makeUrl($route, $config, $subDirectory, $className, $methodName, $extra);
 		}
 		return $urls;
+	}
+	
+	/**
+	 * @return array
+	 */
+	public function viewFiles($dir, $url, $callStackFile) {
+		
+		// CodeIgniter controllers will call $this->load->view('file', $data) 
+		// we will look for calls to CI_Loader::view that have at least 2 arguments
+		// we wont need to look at the URL to determine the view
+		$viewFiles = array();
+		$fp = fopen($callStackFile, 'rb');
+		if (!$fp) {
+			return $viewFiles;
+		}
+		$call = new MvcEditorCallClass();
+		while (!feof($fp)) {
+			if ($call->fromFile($fp)) {
+				if (MvcEditorCallClass::TYPE_METHOD == $call->type && strcasecmp('CI_Loader::view', $call->resource) == 0 && count($call->arguments) >= 2) {
+					$viewFile = $call->arguments[0];
+					
+					// most of the time views are given as relative relatives; starting from the application/views/ directory
+					// for now ignore variable arguments
+					if ($viewFile[0] != '$') {
+						$viewFiles[] = realpath($dir . '/application/views/' . $viewFile . ".php");
+					}
+				}
+			}
+		}
+		return $viewFiles;
 	}
 	
 	private function infoFromDbArray($environment, $groupName, $groupConnection) {

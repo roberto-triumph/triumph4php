@@ -94,11 +94,11 @@ public:
 	 * @param projectRootPath location of the project to run detection on ie. the project that
 	 *        the user is modifying
 	 * @param identifier the detected framework identifier
-	 * @param extra any extra parameters that this specific detector needs.
+	 * @param file the file that this specific detector needs.
 	 * @return wxString the command (operating system command line) that will run the PHP detection code.
 	 */
 	bool Init(int id, const EnvironmentClass& environment, const wxString& projectRootPath, const wxString& identifier,
-		wxString extra = wxEmptyString);
+		wxString file = wxEmptyString);
 
 	/**
 	 * initialize a detector from an existing file. For now, this is used only to test the
