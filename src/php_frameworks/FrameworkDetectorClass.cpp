@@ -35,7 +35,7 @@ static const int ID_DETECT_DATABASE = wxNewId();
 static const int ID_DETECT_CONFIG = wxNewId();
 static const int ID_DETECT_RESOURCES = wxNewId();
 static const int ID_DETECT_URL = wxNewId();
-
+static const int ID_DETECT_VIEW_FILES = wxNewId();
 
 mvceditor::DetectorActionClass::DetectorActionClass(wxEvtHandler& handler) 
 	: wxEvtHandler()
@@ -54,7 +54,7 @@ mvceditor::DetectorActionClass::~DetectorActionClass() {
 }
 
 bool mvceditor::DetectorActionClass::Init(int id, const EnvironmentClass& environment, const wxString& projectRootPath, const wxString& identifier, 
-		wxString file) {
+		std::map<wxString, wxString> moreParams) {
 	Error = NONE;
 	ErrorMessage = wxT("");
 	Clear();
@@ -85,8 +85,10 @@ bool mvceditor::DetectorActionClass::Init(int id, const EnvironmentClass& enviro
 		wxT(" --action=\"") + action  + wxT("\"") +
 		wxT(" --dir=\"") + projectRootPath  + wxT("\"") +
 		wxT(" --identifier=\"") + identifier + wxT("\"") +
-		wxT(" --output=\"") + OutputFile.GetFullPath() + wxT("\"") +
-		wxT(" --file=\"") + file + wxT("\"");
+		wxT(" --output=\"") + OutputFile.GetFullPath() + wxT("\"");
+	for (std::map<wxString, wxString>::iterator it = moreParams.begin(); it != moreParams.end(); ++it) {
+		args += wxT(" --") + it->first + wxT("=\"") + it->second + wxT("\"");
+	}
 		
 	wxString cmd = wxT("\"") + environment.Php.PhpExecutablePath + wxT("\"") + wxT(" \"") + scriptFileName.GetFullPath() + wxT("\"") + args;
 	return Process.Init(cmd, id, CurrentPid);
@@ -344,6 +346,37 @@ bool mvceditor::UrlDetectorActionClass::Response() {
 	return ret;
 }
 
+void mvceditor::ViewFilesDetectorActionClass::Clear() {
+	ViewFiles.clear();
+}
+
+wxString mvceditor::ViewFilesDetectorActionClass::GetAction() {
+	return wxT("viewFiles");
+}
+
+bool mvceditor::ViewFilesDetectorActionClass::Response() {
+	bool ret = true;
+	wxFileInputStream stream(OutputFile.GetFullPath());
+	wxFileConfig result(stream);
+	
+	long index = 0;
+	wxString entryName;
+	bool hasNext = result.GetFirstEntry(entryName, index);
+	while (ret && hasNext) {
+		wxString fullPath;
+		ret = result.Read(entryName, &fullPath);
+		wxFileName fileName(fullPath);
+		if (ret && fileName.IsOk()) {
+			ViewFiles.push_back(fileName);
+		}
+		else if (!fileName.IsOk()) {
+			EditorLogWarning(mvceditor::PROJECT_DETECTION, wxT("Invalid file name in response from ViewFiles action:") + fullPath);
+		}
+		hasNext = result.GetNextEntry(entryName, index);
+	}
+	return ret;
+}
+
 mvceditor::PhpFrameworkDetectorClass::PhpFrameworkDetectorClass(wxEvtHandler& handler, const mvceditor::EnvironmentClass& environment)
 	: wxEvtHandler()
 	, Identifiers()
@@ -355,8 +388,10 @@ mvceditor::PhpFrameworkDetectorClass::PhpFrameworkDetectorClass(wxEvtHandler& ha
 	, DatabaseDetector(*this)
 	, ResourcesDetector(*this)
 	, UrlDetector(*this)
+	, ViewFilesDetector(*this)
 	, FrameworkIdentifiersLeftToDetect()
 	, UrlsDetected()
+	, ViewFilesDetected()
 	, Handler(handler)
 	, Environment(environment)
 	, ProjectRootPath() {
@@ -370,11 +405,13 @@ void mvceditor::PhpFrameworkDetectorClass::Clear() {
 	Resources.clear();
 	FrameworkIdentifiersLeftToDetect.clear();
 	UrlsDetected.clear();
+	ViewFilesDetected.clear();
 }
 
 bool mvceditor::PhpFrameworkDetectorClass::Init(const wxString& dir) {
 	ProjectRootPath = dir;
-	return FrameworkDetector.Init(ID_DETECT_FRAMEWORK, Environment, dir, wxT(""), wxT(""));
+	std::map<wxString, wxString> moreParams;
+	return FrameworkDetector.Init(ID_DETECT_FRAMEWORK, Environment, dir, wxT(""), moreParams);
 }
 
 bool mvceditor::PhpFrameworkDetectorClass::InitUrlDetector(const wxString& dir, const wxString& fileName) {
@@ -393,6 +430,23 @@ bool mvceditor::PhpFrameworkDetectorClass::InitUrlDetector(const wxString& dir, 
 	return !Identifiers.empty();
 }
 
+bool mvceditor::PhpFrameworkDetectorClass::InitViewFilesDetector(const wxString& dir, const wxString& url, const wxFileName& callStackFile) {
+	ViewFilesDetected.clear();
+	FrameworkIdentifiersLeftToDetect.clear();
+	ProjectRootPath = dir;
+	for (size_t i = 0; i < Identifiers.size(); ++i) {
+		std::vector<wxString> next;
+		next.push_back(Identifiers[i]);
+		next.push_back(url);
+		next.push_back(callStackFile.GetFullPath());
+		FrameworkIdentifiersLeftToDetect.push_back(next);
+	}
+	if (!FrameworkIdentifiersLeftToDetect.empty()) {
+		NextViewFileDetection();
+	}
+	return !Identifiers.empty();
+}
+
 
 void mvceditor::PhpFrameworkDetectorClass::NextDetection() {
 	
@@ -404,14 +458,15 @@ void mvceditor::PhpFrameworkDetectorClass::NextDetection() {
 		
 		wxString framework = next[0];
 		wxString action = next[1];
+		std::map<wxString, wxString> moreParams;
 		if (action == wxT("databaseInfo")) {
-			DatabaseDetector.Init(ID_DETECT_DATABASE, Environment, ProjectRootPath, framework);
+			DatabaseDetector.Init(ID_DETECT_DATABASE, Environment, ProjectRootPath, framework, moreParams);
 		}
 		else if (action == wxT("configFiles")) {
-			ConfigFilesDetector.Init(ID_DETECT_CONFIG, Environment, ProjectRootPath, framework);
+			ConfigFilesDetector.Init(ID_DETECT_CONFIG, Environment, ProjectRootPath, framework, moreParams);
 		}
 		else if (action == wxT("resources")) {
-			ResourcesDetector.Init(ID_DETECT_RESOURCES, Environment, ProjectRootPath, framework);
+			ResourcesDetector.Init(ID_DETECT_RESOURCES, Environment, ProjectRootPath, framework, moreParams);
 		}
 	}
 	else {	
@@ -427,11 +482,32 @@ void mvceditor::PhpFrameworkDetectorClass::NextUrlDetection() {
 		
 		wxString framework = next[0];
 		wxString fileName = next[1];
-		UrlDetector.Init(ID_DETECT_URL, Environment, ProjectRootPath, framework, fileName);
+		std::map<wxString, wxString> moreParams;
+		moreParams[wxT("file")] = fileName;
+		UrlDetector.Init(ID_DETECT_URL, Environment, ProjectRootPath, framework, moreParams);
 	}
 	else {
 		mvceditor::UrlDetectedEventClass urlEvent(UrlsDetected);
 		wxPostEvent(&Handler, urlEvent);
+	}
+}
+
+void mvceditor::PhpFrameworkDetectorClass::NextViewFileDetection() {
+	if (!FrameworkIdentifiersLeftToDetect.empty()) {
+		std::vector<wxString> next = FrameworkIdentifiersLeftToDetect.back();
+		FrameworkIdentifiersLeftToDetect.pop_back();
+		
+		wxString framework = next[0];
+		wxString url = next[1];
+		wxString callStackFile = next[2];
+		std::map<wxString, wxString> moreParams;
+		moreParams[wxT("url")] = url;
+		moreParams[wxT("file")] = callStackFile;
+		ViewFilesDetector.Init(ID_DETECT_VIEW_FILES, Environment, ProjectRootPath, framework, moreParams);
+	}
+	else {
+		mvceditor::ViewFilesDetectedEventClass viewFilesEvent(ViewFilesDetected);
+		wxPostEvent(&Handler, viewFilesEvent);
 	}
 }
 
@@ -519,6 +595,17 @@ void mvceditor::PhpFrameworkDetectorClass::OnWorkInProgress(wxCommandEvent& even
 	wxPostEvent(&Handler, event);
 }
 
+void mvceditor::PhpFrameworkDetectorClass::OnViewFileDetectionComplete(wxCommandEvent& event) {
+	ViewFilesDetected.insert(ViewFilesDetected.begin(), ViewFilesDetector.ViewFiles.begin(), ViewFilesDetector.ViewFiles.end());
+	NextViewFileDetection();
+}
+
+void mvceditor::PhpFrameworkDetectorClass::OnViewFileDetectionFailed(wxCommandEvent& event) {
+	wxCommandEvent failedEvent(mvceditor::EVENT_FRAMEWORK_VIEW_FILES_FAILED);
+	failedEvent.SetString(event.GetString());
+	wxPostEvent(&Handler, failedEvent);
+}
+
 mvceditor::UrlDetectedEventClass::UrlDetectedEventClass(std::vector<wxString> urls) 
 	: wxEvent(wxID_ANY, mvceditor::EVENT_FRAMEWORK_URL_COMPLETE) 
 	, Urls(urls) {
@@ -529,10 +616,23 @@ wxEvent* mvceditor::UrlDetectedEventClass::Clone() const {
 	return cloned;
 }
 
+mvceditor::ViewFilesDetectedEventClass::ViewFilesDetectedEventClass(std::vector<wxFileName> viewFiles)
+	: wxEvent(wxID_ANY, mvceditor::EVENT_FRAMEWORK_VIEW_FILES_COMPLETE)
+	, ViewFiles(viewFiles) {
+		
+}
+
+wxEvent* mvceditor::ViewFilesDetectedEventClass::Clone() const {
+	wxEvent* cloned = new mvceditor::ViewFilesDetectedEventClass(ViewFiles);
+	return cloned;
+}
+
 const wxEventType mvceditor::EVENT_FRAMEWORK_DETECTION_COMPLETE = wxNewEventType();
 const wxEventType mvceditor::EVENT_FRAMEWORK_DETECTION_FAILED = wxNewEventType();
 const wxEventType mvceditor::EVENT_FRAMEWORK_URL_COMPLETE = wxNewEventType();
 const wxEventType mvceditor::EVENT_FRAMEWORK_URL_FAILED = wxNewEventType();
+const wxEventType mvceditor::EVENT_FRAMEWORK_VIEW_FILES_COMPLETE = wxNewEventType();
+const wxEventType mvceditor::EVENT_FRAMEWORK_VIEW_FILES_FAILED = wxNewEventType();
 
 BEGIN_EVENT_TABLE(mvceditor::DetectorActionClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::DetectorActionClass::OnProcessComplete)
@@ -546,12 +646,14 @@ BEGIN_EVENT_TABLE(mvceditor::PhpFrameworkDetectorClass, wxEvtHandler)
 	EVT_COMMAND(ID_DETECT_CONFIG, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::PhpFrameworkDetectorClass::OnConfigFilesDetectionComplete)
 	EVT_COMMAND(ID_DETECT_RESOURCES, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::PhpFrameworkDetectorClass::OnResourcesDetectionComplete)
 	EVT_COMMAND(ID_DETECT_URL, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::PhpFrameworkDetectorClass::OnUrlDetectionComplete)
+	EVT_COMMAND(ID_DETECT_VIEW_FILES, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::PhpFrameworkDetectorClass::OnViewFileDetectionComplete)
 	
 	EVT_COMMAND(ID_DETECT_FRAMEWORK, mvceditor::EVENT_PROCESS_FAILED, mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed)
 	EVT_COMMAND(ID_DETECT_DATABASE, mvceditor::EVENT_PROCESS_FAILED, mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed)
 	EVT_COMMAND(ID_DETECT_CONFIG, mvceditor::EVENT_PROCESS_FAILED, mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed)
 	EVT_COMMAND(ID_DETECT_RESOURCES, mvceditor::EVENT_PROCESS_FAILED, mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed)
 	EVT_COMMAND(ID_DETECT_URL, mvceditor::EVENT_PROCESS_FAILED, mvceditor::PhpFrameworkDetectorClass::OnUrlDetectionFailed)
+	EVT_COMMAND(ID_DETECT_VIEW_FILES, mvceditor::EVENT_PROCESS_FAILED, mvceditor::PhpFrameworkDetectorClass::OnViewFileDetectionFailed)
 	
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::PhpFrameworkDetectorClass::OnWorkInProgress)
 END_EVENT_TABLE()
