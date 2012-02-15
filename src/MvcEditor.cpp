@@ -35,6 +35,7 @@
 #include <plugins/OutlineViewPluginClass.h>
 #include <plugins/ResourcePluginClass.h>
 #include <plugins/RunConsolePluginClass.h>
+#include <plugins/RunBrowserPluginClass.h>
 #include <plugins/LintPluginClass.h>
 #include <plugins/SqlBrowserPluginClass.h>
 #include <plugins/EditorMessagesPluginClass.h>
@@ -197,7 +198,9 @@ void mvceditor::AppClass::CreatePlugins() {
 	Plugins.push_back(plugin);
 	plugin = new CodeIgniterPluginClass();
 	Plugins.push_back(plugin);
-
+	plugin = new RunBrowserPluginClass();
+	Plugins.push_back(plugin);
+	
 	// test plugin need to find a quicker way to toggling it ON / OFF
 	//plugin = new TestPluginClass();
 	//Plugins.push_back(plugin);

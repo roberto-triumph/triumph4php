@@ -144,7 +144,6 @@ public:
 	 * Constructor
  	 */
 	RunConsolePluginClass();
-	~RunConsolePluginClass();
 	
 	/**
 	 * Add menu items
@@ -158,110 +157,32 @@ public:
 
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 	
-protected:
-
-	void LoadPreferences(wxConfigBase* config);
-
 private:
 				
-		/**
-		 * handler for the menu
-		 */
-		void OnRunFileAsCli(wxCommandEvent& event);
-		
-		/**
-		 * Always run in a new console window
-		 */
-		void OnRunFileAsCliInNewWindow(wxCommandEvent& event);
-		
-		/**
-		 * disable menus when source code notebook is empty
-		 */
-		void OnUpdateUi(wxUpdateUIEvent& event);
-		
-		/**
-		 * run the script in (an external) web browser 
-		 */
-		void OnRunInWebBrowser(wxCommandEvent& event);
-		
-		void OnUrlDetectionComplete(UrlDetectedEventClass& event);
-		
-		void OnUrlDetectionFailed(wxCommandEvent& event);
-		
-		/**
-		 * Our menu items
-		 */
-		wxMenuItem* RunCliMenuItem;
-		wxMenuItem* RunCliWithArgsMenuItem;
-		wxMenuItem* RunCliInNewWindowMenuItem;
-		wxMenuItem* RunCliWithArgsInNewWindowMenuItem;
-		wxMenuItem* RunInBrowser;
-		
-		/**
-		 * Will hold the current browser to run the PHP script with
-		 */
-		wxComboBox* BrowserComboBox;
-		
-		/**
-		 * A local instance of the detector so that we can resolve
-		 * framework URLs according to each specific PHP framework routing rules
-		 * Needs to be local because this class needs to be the event handler
-		 * for the url detection (event handler is given in the PhpFrameworkDetector
-		 * class constructor)
-		 */
-		PhpFrameworkDetectorClass* PhpFrameworks;
-		
-		DECLARE_EVENT_TABLE()
-};
-
-/** 
- * small class that will be used in the UrlChoice Dialog; to let the user
- * select a URL to run, along with any parameters the user wants
- */
-class UrlChoiceClass {
-public:
-
-	wxArrayString UrlList;
-	
-	wxString Extra;
-	
-	int ChosenIndex;
-	
 	/**
-	 * @param urlList list of URLs that the user will choose from.  The list should be the result of the URL
-	 * detector
-	 * @param fileName the file that corresponds to the given URLs (the file name helps to determine the virtual host)
-	 * @param environment to get the virtual host
+	 * handler for the menu
 	 */
-	UrlChoiceClass(const std::vector<wxString>& urlList, const wxString& fileName, EnvironmentClass* environment);
+	void OnRunFileAsCli(wxCommandEvent& event);
 	
 	/**
-	 * @return wxString URL [that the user chose] plus the Extra
+	 * Always run in a new console window
 	 */
-	wxString ChosenUrl() const;
-	
-};
-
-/**
- * small dialog that allows the user to choose a URL to run
- */
-class ChooseUrlDialogClass : public ChooseUrlDialogGeneratedClass {
-	
-public:
-	
-	UrlChoiceClass& UrlChoice;
-
-	ChooseUrlDialogClass(wxWindow* parent, UrlChoiceClass& urlChoice);
-	
-protected:
-
-	void OnOkButton(wxCommandEvent& event);
+	void OnRunFileAsCliInNewWindow(wxCommandEvent& event);
 	
 	/**
-	 * updates the URL label so that the user can see the exact URL to 
-	 * be opened in the browser
+	 * disable menus when source code notebook is empty
 	 */
 	void OnUpdateUi(wxUpdateUIEvent& event);
+			
+	/**
+	 * Our menu items
+	 */
+	wxMenuItem* RunCliMenuItem;
+	wxMenuItem* RunCliWithArgsMenuItem;
+	wxMenuItem* RunCliInNewWindowMenuItem;
+	wxMenuItem* RunCliWithArgsInNewWindowMenuItem;
+	
+	DECLARE_EVENT_TABLE()
 };
 
 }

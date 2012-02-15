@@ -31,29 +31,7 @@
 
 static const int ID_PROCESS = wxNewId();
 static const int ID_TOOLBAR_RUN = wxNewId();
-const int ID_TOOLBAR_BROWSER = wxNewId();
 static const int ID_WINDOW_CONSOLE = wxNewId();
-
-static void ExternalBrowser(const wxString& browserName, const wxString& url, mvceditor::EnvironmentClass* environment) {
-	wxFileName webBrowserPath  = environment->WebBrowsers[browserName];
-	if (!webBrowserPath.IsOk()) {
-		mvceditor::EditorLogWarning(mvceditor::BAD_WEB_BROWSER_EXECUTABLE, webBrowserPath.GetFullPath());
-		return;
-	}
-	wxString cmd = wxT("\"") + webBrowserPath.GetFullPath() + wxT("\""); 
-	cmd += wxT(" \"");
-	cmd += url;
-	cmd += wxT("\"");
-			
-	// TODO track this PID ... ?
-	// what about when user closes the external browser ?
-	// make the browser its own process so that it stays alive if the editor program is exited
-	// if we dont do this the browser thinks it crashed and will tell the user so
-	long pid = wxExecute(cmd, wxEXEC_ASYNC | wxEXEC_MAKE_GROUP_LEADER);
-	if (pid <= 0) {
-		mvceditor::EditorLogWarning(mvceditor::BAD_WEB_BROWSER_EXECUTABLE, cmd);
-	}
-}
 
 mvceditor::RunConsolePanelClass::RunConsolePanelClass(wxWindow* parent, EnvironmentClass* environment, StatusBarWithGaugeClass* gauge, int id)
 	: RunConsolePanelGeneratedClass(parent, id)
@@ -183,18 +161,8 @@ mvceditor::RunConsolePluginClass::RunConsolePluginClass()
 	, RunCliMenuItem(NULL)
 	, RunCliWithArgsMenuItem(NULL)
 	, RunCliInNewWindowMenuItem(NULL)
-	, RunCliWithArgsInNewWindowMenuItem(NULL)
-	, RunInBrowser(NULL)
-	, BrowserComboBox(NULL) 
-	, PhpFrameworks(NULL) {
+	, RunCliWithArgsInNewWindowMenuItem(NULL) {
 }
-
-mvceditor::RunConsolePluginClass::~RunConsolePluginClass() {
-	if (PhpFrameworks) {
-		delete PhpFrameworks;
-	}
-}
-
 
 void mvceditor::RunConsolePluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
 	RunCliMenuItem = new wxMenuItem(toolsMenu, mvceditor::MENU_RUN_PHP + 0, _("Run As CLI\tF7"), 
@@ -210,10 +178,6 @@ void mvceditor::RunConsolePluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
 		_("Run As CLI In New Window With Arguments\tCTRL+SHIFT+F7"), 
 		_("Run File As a PHP Command Line Script In a New Window With Arguments"), wxITEM_NORMAL);
 	toolsMenu->Append(RunCliWithArgsInNewWindowMenuItem);
-	RunInBrowser = new wxMenuItem(toolsMenu, mvceditor::MENU_RUN_PHP + 4, 
-		_("Run In Web Browser"),
-		_("Run the script in the chosen Web Browser"), wxITEM_NORMAL);
-	toolsMenu->Append(RunInBrowser);
 }
 
 void mvceditor::RunConsolePluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
@@ -222,23 +186,7 @@ void mvceditor::RunConsolePluginClass::AddKeyboardShortcuts(std::vector<DynamicC
 	menuItemIds[mvceditor::MENU_RUN_PHP + 1] = wxT("Console-Run With Arguments");
 	menuItemIds[mvceditor::MENU_RUN_PHP + 2] = wxT("Console-Run In New Window");
 	menuItemIds[mvceditor::MENU_RUN_PHP + 3] = wxT("Console-Run-In New Window With Arguments");
-	menuItemIds[mvceditor::MENU_RUN_PHP + 4] = wxT("Console-Run-In Web Browser");
 	AddDynamicCmd(menuItemIds, shortcuts);
-}
-
-void mvceditor::RunConsolePluginClass::LoadPreferences(wxConfigBase* config) {
-	
-	// dont use the config; use the Environment that has already been seeded with 
-	// the proper data
-	// TODO: need to update the combo box if the user updates the environment
-	mvceditor::EnvironmentClass* environment = GetEnvironment();
-	std::map<wxString, wxFileName> webBrowsers = environment->WebBrowsers;
-	for (std::map<wxString, wxFileName>::const_iterator it = webBrowsers.begin(); it != webBrowsers.end(); ++it) {
-		BrowserComboBox->AppendString(it->first);
-	}
-	if (!webBrowsers.empty()) {
-		BrowserComboBox->Select(0);
-	}
 }
 
 void mvceditor::RunConsolePluginClass::OnRunFileAsCli(wxCommandEvent& event) {
@@ -309,136 +257,6 @@ void mvceditor::RunConsolePluginClass::OnUpdateUi(wxUpdateUIEvent& event) {
 void mvceditor::RunConsolePluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 	toolBar->AddTool(ID_TOOLBAR_RUN, _("Run"), wxArtProvider::GetBitmap(
 		wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), _("Run"));
-
-	wxBitmap bitmap = wxArtProvider::GetBitmap(wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16));
-	toolBar->AddTool(ID_TOOLBAR_BROWSER, _("Web Browser"), bitmap, _("Run On a Web Browser"));
-	
-	// to be filled in after the config is read
-	wxArrayString choices;
-	BrowserComboBox = new wxComboBox(toolBar, wxID_NEW, wxT(""), wxDefaultPosition, wxDefaultSize, choices, wxCB_READONLY);
-	toolBar->AddControl(BrowserComboBox);
-}
-
-void mvceditor::RunConsolePluginClass::OnRunInWebBrowser(wxCommandEvent& event) {
-	mvceditor::CodeControlClass* currentCodeControl = GetCurrentCodeControl();
-	if (!currentCodeControl) {
-		return;
-	}
-	wxString fileName = currentCodeControl->GetFileName();
-	mvceditor::EnvironmentClass* environment = GetEnvironment();
-	if (PhPFrameworks().Identifiers.empty()) {
-		wxString browserName = BrowserComboBox->GetValue();
-		if (!wxFileName::FileExists(fileName)) {
-			mvceditor::EditorLogWarning(mvceditor::INVALID_FILE, fileName);
-			return;
-		}
-
-		// turn file name into a url in the default manner (by calculating from the vhost document root)
-		wxString url = environment->Apache.GetUrl(fileName);
-		if (url.IsEmpty()) {
-			mvceditor::EditorLogWarning(mvceditor::INVALID_FILE, _("File is not under web root"));	
-			return;
-		}	
-		ExternalBrowser(browserName, url, environment);
-	}
-	else if (!PhpFrameworks) {
-		PhpFrameworks = new PhpFrameworkDetectorClass(*this, *environment);
-		PhpFrameworks->Identifiers = PhPFrameworks().Identifiers;
-		PhpFrameworks->InitUrlDetector(GetProject()->GetRootPath(), fileName);
-	}
-	else {
-		PhpFrameworks->InitUrlDetector(GetProject()->GetRootPath(), fileName);
-	}
-}
-
-void mvceditor::RunConsolePluginClass::OnUrlDetectionComplete(mvceditor::UrlDetectedEventClass& event) {
-	mvceditor::CodeControlClass* currentCodeControl = GetCurrentCodeControl();
-	if (!currentCodeControl) {
-		return;
-	}
-	wxString fileName = currentCodeControl->GetFileName();
-	wxString browserName = BrowserComboBox->GetValue();
-	mvceditor::EnvironmentClass* environment = GetEnvironment();
-	if (!event.Urls.empty()) {
-		mvceditor::UrlChoiceClass urlChoice(event.Urls, fileName, environment);
-		mvceditor::ChooseUrlDialogClass dialog(GetMainWindow(), urlChoice);
-		if (wxOK == dialog.ShowModal()) {
-			wxString chosenUrl = urlChoice.ChosenUrl();
-			ExternalBrowser(browserName, chosenUrl, environment);
-			
-			// TODO: save this choice into a toolbar dropdown so that the user can easily access it
-			// multiple times.
-		}
-	}
-	else {
-		
-		// no URLs means that the file can be accessed normally
-		// turn file name into a url in the default manner (by calculating from the vhost document root)
-		wxString url = environment->Apache.GetUrl(fileName);
-		if (url.IsEmpty()) {
-			mvceditor::EditorLogWarning(mvceditor::INVALID_FILE, _("File is not under web root"));	
-			return;
-		}	
-		ExternalBrowser(browserName, url, environment);
-	}
-}
-
-mvceditor::UrlChoiceClass::UrlChoiceClass(const std::vector<wxString>& urls, const wxString& fileName, mvceditor::EnvironmentClass* environment)
-	: UrlList()
-	, Extra() 
-	, ChosenIndex(0) {
-	wxString url = environment->Apache.GetUrl(fileName);
-		
-	// we only want the virtual host name, as the url we get from the framework's routing url scheme
-	wxString host = url.Mid(7); // 7 = length of "http://"
-	host = host.Mid(0, host.Find(wxT("/")));
-	host = wxT("http://") + host + wxT("/");
-	for (size_t i = 0; i < urls.size(); ++i) {
-		wxString item = host + urls[i];
-		UrlList.Add(item);
-	}
-}
-
-wxString mvceditor::UrlChoiceClass::ChosenUrl() const {
-	wxString chosenUrl;
-	if ((size_t)ChosenIndex < UrlList.size()) {
-		chosenUrl = UrlList[ChosenIndex] + Extra;
-	}
-	return chosenUrl;
-}
-
-mvceditor::ChooseUrlDialogClass::ChooseUrlDialogClass(wxWindow* parent, mvceditor::UrlChoiceClass& urlChoice)
-	: ChooseUrlDialogGeneratedClass(parent, wxID_ANY)
-	, UrlChoice(urlChoice) {
-	UrlList->Append(UrlChoice.UrlList);
-	UrlList->SetSelection(UrlChoice.ChosenIndex);
-	
-	wxGenericValidator extraValidator(&UrlChoice.Extra);
-	Extra->SetValidator(extraValidator);
-	TransferDataToWindow();
-	
-	if (!urlChoice.UrlList.IsEmpty()) {
-		wxString label= _("Complete URL: ") + urlChoice.UrlList[0];
-		CompleteLabel->SetLabel(label);
-	}
-}
-
-void mvceditor::ChooseUrlDialogClass::OnOkButton(wxCommandEvent& event) {
-	if (Validate() && TransferDataFromWindow()) {
-		UrlChoice.ChosenIndex = UrlList->GetSelection();
-		EndModal(wxOK);
-	}
-}
-
-void mvceditor::ChooseUrlDialogClass::OnUpdateUi(wxUpdateUIEvent& event) {
-	wxString url = UrlList->GetStringSelection() + Extra->GetValue();
-	wxString label= _("Complete URL: ") + url;
-	CompleteLabel->SetLabel(label);
-	event.Skip();
-}
-	
-void mvceditor::RunConsolePluginClass::OnUrlDetectionFailed(wxCommandEvent& event) {
-	mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, event.GetString());
 }
 
 BEGIN_EVENT_TABLE(mvceditor::RunConsolePanelClass, wxPanel) 
@@ -452,10 +270,6 @@ BEGIN_EVENT_TABLE(mvceditor::RunConsolePluginClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_RUN_PHP + 1, mvceditor::RunConsolePluginClass::OnRunFileAsCli)
 	EVT_MENU(mvceditor::MENU_RUN_PHP + 2, mvceditor::RunConsolePluginClass::OnRunFileAsCliInNewWindow)
 	EVT_MENU(mvceditor::MENU_RUN_PHP + 3, mvceditor::RunConsolePluginClass::OnRunFileAsCliInNewWindow)
-	EVT_MENU(mvceditor::MENU_RUN_PHP + 4, mvceditor::RunConsolePluginClass::OnRunInWebBrowser)
 	EVT_TOOL(ID_TOOLBAR_RUN, mvceditor::RunConsolePluginClass::OnRunFileAsCli)
-	EVT_TOOL(ID_TOOLBAR_BROWSER, mvceditor::RunConsolePluginClass::OnRunInWebBrowser)
 	EVT_UPDATE_UI(wxID_ANY, mvceditor::RunConsolePluginClass::OnUpdateUi)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_URL_FAILED, mvceditor::RunConsolePluginClass::OnUrlDetectionFailed)
-	EVT_FRAMEWORK_URL_COMPLETE(mvceditor::RunConsolePluginClass::OnUrlDetectionComplete)
 END_EVENT_TABLE()

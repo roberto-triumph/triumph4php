@@ -346,6 +346,11 @@ bool mvceditor::UrlDetectorActionClass::Response() {
 	return ret;
 }
 
+mvceditor::ViewFilesDetectorActionClass::ViewFilesDetectorActionClass(wxEvtHandler& handler) 
+	: DetectorActionClass(handler) {
+		
+}
+
 void mvceditor::ViewFilesDetectorActionClass::Clear() {
 	ViewFiles.clear();
 }
