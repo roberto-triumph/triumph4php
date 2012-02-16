@@ -55,20 +55,21 @@ class AppClass;
  * wxKeyBinder does not handle dynamic menus well.
  */
 enum MenuIds {
-	MENU_FINDER = 200,
-	MENU_FIND_IN_FILES = 210,
-	MENU_SQL = 220,
-	MENU_RUN_PHP = 230,
-	MENU_RESOURCE = 240,
-	MENU_PROJECT = 250,
-	MENU_OUTLINE = 260,
-	MENU_LINT_PHP = 270,
-	MENU_ENVIRONMENT = 280,
-	MENU_EDITOR_MESSAGES = 290,
-	MENU_CODE_IGNITER = 300,
-	MENU_RUN_BROWSER = 320,
-	MENU_RUN_BROWSER_URLS = 340,
-	MENU_END = 400
+	// start way out here to prevent collisions with default menus
+	MENU_FINDER = 3200,
+	MENU_FIND_IN_FILES = 3210,
+	MENU_SQL = 3220,
+	MENU_RUN_PHP = 3230,
+	MENU_RESOURCE = 3240,
+	MENU_PROJECT = 3250,
+	MENU_OUTLINE = 3260,
+	MENU_LINT_PHP = 3270,
+	MENU_ENVIRONMENT = 3280,
+	MENU_EDITOR_MESSAGES = 3290,
+	MENU_CODE_IGNITER = 3300,
+	MENU_RUN_BROWSER = 3320,
+	MENU_RUN_BROWSER_URLS = 3340,
+	MENU_END = 3400
 };
 
 /**
@@ -398,6 +399,11 @@ protected:
 	 * @var wxAuiManager*
 	 */
 	wxAuiManager* AuiManager;
+	
+	/**
+	 * The application event dispatcher. Also holds all 'global' structures and settings.
+	 */
+	AppClass* App;
 
 	private:
 	
@@ -421,11 +427,6 @@ protected:
 	 * @var wxAuiNotebook*
 	 */
 	wxAuiNotebook* ToolsNotebook;
-
-	/**
-	 * The application event dispatcher. The pointer will NOT be owned by this class.
-	 */
-	AppClass* App;
 	
 	/**
 	 * The current opened project. The pointer will NOT be owned by this class.

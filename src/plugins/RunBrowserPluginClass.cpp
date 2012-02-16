@@ -24,6 +24,7 @@
  */
 #include <plugins/RunBrowserPluginClass.h>
 #include <MvcEditorErrors.h>
+#include <MvcEditor.h>
 #include <wx/artprov.h>
 #include <wx/valgen.h>
 #include <wx/aui/aui.h>
@@ -108,22 +109,9 @@ void mvceditor::ChooseUrlDialogClass::OnUpdateUi(wxUpdateUIEvent& event) {
 	event.Skip();
 }
 
-mvceditor::BrowsersUrlsClass::BrowsersUrlsClass()
-	: Browsers()
-	, Urls() 
-	, Identifiers()
-	, ChosenBrowser() 
-	, ChosenUrl()  
-	, ProjectRootPath()
-	, CurrentFile()
-	, Environment(NULL) {
-		
-}
-
 mvceditor::RunBrowserPluginClass::RunBrowserPluginClass()
 	: PluginClass() 
 	, PhpFrameworks(NULL)
-	, BrowsersUrls()
 	, RunInBrowser(NULL)
 	, BrowserToolbar(NULL) {
 		
@@ -179,13 +167,13 @@ void mvceditor::RunBrowserPluginClass::LoadPreferences(wxConfigBase* config) {
 	mvceditor::EnvironmentClass* environment = GetEnvironment();
 	std::map<wxString, wxFileName> webBrowsers = environment->WebBrowsers;
 	for (std::map<wxString, wxFileName>::const_iterator it = webBrowsers.begin(); it != webBrowsers.end(); ++it) {
-		BrowsersUrls.Browsers.Add(it->first);
+		App->UrlResource.Browsers.Add(it->first);
 	}
-	if (!BrowsersUrls.Browsers.empty()) {
-		BrowsersUrls.ChosenBrowser = BrowsersUrls.Browsers[0];
+	if (!App->UrlResource.Browsers.empty()) {
+		App->UrlResource.ChosenBrowser = App->UrlResource.Browsers[0];
 	}
 	if (BrowserToolbar) {
-		BrowserToolbar->SetToolLabel(ID_BROWSER_AUI_TOOLBAR, BrowsersUrls.Browsers[0]);
+		BrowserToolbar->SetToolLabel(ID_BROWSER_AUI_TOOLBAR, App->UrlResource.Browsers[0]);
 		BrowserToolbar->Realize();
 	}
 }
@@ -196,9 +184,8 @@ void mvceditor::RunBrowserPluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 }
 
 void mvceditor::RunBrowserPluginClass::OnRunInWebBrowser(wxCommandEvent& event) {
-	///UrlPanel->TransferDataFromWindow();
-	wxString browserName = BrowsersUrls.ChosenBrowser;
-	wxString url = BrowsersUrls.ChosenUrl;
+	wxString browserName = App->UrlResource.ChosenBrowser;
+	wxString url = App->UrlResource.ChosenUrl;
 	if (!browserName.IsEmpty() && !url.IsEmpty()) {
 		mvceditor::EnvironmentClass* environment = GetEnvironment();
 		ExternalBrowser(browserName, url, environment);
@@ -238,7 +225,7 @@ void mvceditor::RunBrowserPluginClass::OnBrowserToolDropDown(wxAuiToolBarEvent& 
 
 void mvceditor::RunBrowserPluginClass::OnUrlToolDropDown(wxAuiToolBarEvent& event) {
 	if (event.IsDropDownClicked()) {
-		if (BrowsersUrls.Urls.IsEmpty()) {
+		if (App->UrlResource.Urls.IsEmpty()) {
 			return;
 		}
 		BrowserToolbar->SetToolSticky(event.GetId(), true);
@@ -246,7 +233,7 @@ void mvceditor::RunBrowserPluginClass::OnUrlToolDropDown(wxAuiToolBarEvent& even
 		// create the popup menu that contains all the available browser names
 		wxMenu menuPopup;
 		wxBitmap bmp = wxArtProvider::GetBitmap(wxART_QUESTION, wxART_OTHER, wxSize(16,16));
-		wxArrayString urls = BrowsersUrls.Urls;
+		wxArrayString urls = App->UrlResource.Urls;
 		for (size_t i = 0; i < urls.Count(); ++i) {
 			wxMenuItem* menuItem =  new wxMenuItem(&menuPopup, mvceditor::MENU_RUN_BROWSER_URLS + i, urls[i]);
 			menuItem->SetBitmap(bmp);
@@ -268,27 +255,28 @@ void mvceditor::RunBrowserPluginClass::OnUrlToolDropDown(wxAuiToolBarEvent& even
 }
 
 void mvceditor::RunBrowserPluginClass::OnUrlSearchTool(wxCommandEvent& event) {
+	wxString currentFile;
 	if (GetCurrentCodeControl()) {
-		BrowsersUrls.CurrentFile = GetCurrentCodeControl()->GetFileName();
+		currentFile = GetCurrentCodeControl()->GetFileName();
 	}
-	BrowsersUrls.Environment = GetEnvironment();
-	BrowsersUrls.Identifiers = PhPFrameworks().Identifiers;
-	BrowsersUrls.ProjectRootPath = GetProject()->GetRootPath();
 	if (!PhpFrameworks) {
-		PhpFrameworks = new PhpFrameworkDetectorClass(*this, *BrowsersUrls.Environment);
-		PhpFrameworks->Identifiers = BrowsersUrls.Identifiers;
-		PhpFrameworks->InitUrlDetector(BrowsersUrls.ProjectRootPath, BrowsersUrls.CurrentFile);
+		PhpFrameworks = new PhpFrameworkDetectorClass(*this, *GetEnvironment());
+		PhpFrameworks->Identifiers = PhPFrameworks().Identifiers;
+		PhpFrameworks->InitUrlDetector(GetProject()->GetRootPath(), currentFile);
 	}
 	else {
-		PhpFrameworks->InitUrlDetector(BrowsersUrls.ProjectRootPath, BrowsersUrls.CurrentFile);
+		PhpFrameworks->InitUrlDetector(GetProject()->GetRootPath(), currentFile);
 	}
 }
 
 void mvceditor::RunBrowserPluginClass::OnUrlDetectionComplete(mvceditor::UrlDetectedEventClass& event) {
-	wxString fileName = BrowsersUrls.CurrentFile;
+	wxString fileName;
+	if (GetCurrentCodeControl()) {
+		fileName = GetCurrentCodeControl()->GetFileName();
+	}
 	wxString chosenUrl;
-	mvceditor::EnvironmentClass* environment = BrowsersUrls.Environment;
-	if (BrowsersUrls.Identifiers.empty()) {
+	mvceditor::EnvironmentClass* environment = GetEnvironment();
+	if (PhPFrameworks().Identifiers.empty()) {
 		if (!wxFileName::FileExists(fileName)) {
 			mvceditor::EditorLogWarning(mvceditor::INVALID_FILE, fileName);
 			return;
@@ -322,16 +310,16 @@ void mvceditor::RunBrowserPluginClass::OnUrlDetectionComplete(mvceditor::UrlDete
 					
 		// add to URL to the internal recent list so that the user can easily access it
 		// multiple times.
-		if (BrowsersUrls.Urls.size() > 50) {
-			BrowsersUrls.Urls.pop_back();
+		if (App->UrlResource.Urls.size() > 50) {
+			App->UrlResource.Urls.pop_back();
 		}
-		int foundIndex = BrowsersUrls.Urls.Index(chosenUrl);
+		int foundIndex = App->UrlResource.Urls.Index(chosenUrl);
 		if (foundIndex == wxNOT_FOUND) {
-			BrowsersUrls.Urls.Add(chosenUrl);
-			BrowsersUrls.ChosenUrl = chosenUrl;
+			App->UrlResource.Urls.Add(chosenUrl);
+			App->UrlResource.ChosenUrl = chosenUrl;
 		}
 		else {
-			BrowsersUrls.ChosenUrl = chosenUrl;
+			App->UrlResource.ChosenUrl = chosenUrl;
 		}
 	}
 }
@@ -348,15 +336,14 @@ void mvceditor::RunBrowserPluginClass::OnBrowserToolMenuItem(wxCommandEvent& eve
 	wxMenu* menu = wxDynamicCast(event.GetEventObject(), wxMenu);
 	if (menu) {
 		wxString name = menu->GetLabelText(event.GetId());
-		if (BrowsersUrls.Browsers.Index(name) != wxNOT_FOUND) {
-			BrowsersUrls.ChosenBrowser = name;
+		if (App->UrlResource.Browsers.Index(name) != wxNOT_FOUND) {
+			App->UrlResource.ChosenBrowser = name;
 			BrowserToolbar->SetToolLabel(ID_BROWSER_AUI_TOOLBAR, name);
 			BrowserToolbar->Realize();
 			AuiManager->Update();
 		}
 	}
 }
-
 
 void mvceditor::RunBrowserPluginClass::OnUrlToolMenuItem(wxCommandEvent& event) {
 	
@@ -366,8 +353,8 @@ void mvceditor::RunBrowserPluginClass::OnUrlToolMenuItem(wxCommandEvent& event) 
 	wxMenu* menu = wxDynamicCast(event.GetEventObject(), wxMenu);
 	if (menu) {
 		wxString name = menu->GetLabelText(event.GetId());
-		if (BrowsersUrls.Urls.Index(name) != wxNOT_FOUND) {
-			BrowsersUrls.ChosenUrl = name;
+		if (App->UrlResource.Urls.Index(name) != wxNOT_FOUND) {
+			App->UrlResource.ChosenUrl = name;
 			BrowserToolbar->SetToolLabel(ID_URL_AUI_TOOLBAR, name);
 			BrowserToolbar->Realize();
 			AuiManager->Update();
@@ -379,8 +366,8 @@ BEGIN_EVENT_TABLE(mvceditor::RunBrowserPluginClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_RUN_BROWSER + 0, mvceditor::RunBrowserPluginClass::OnRunInWebBrowser)
 	
 	// if the end values of the ranges need to be modified, need to modify mvceditor::PluginClass::MenuIds as well
-	EVT_MENU_RANGE(mvceditor::MENU_RUN_BROWSER, mvceditor::MENU_RUN_BROWSER + 20, mvceditor::RunBrowserPluginClass::OnBrowserToolMenuItem)
-	EVT_MENU_RANGE(mvceditor::MENU_RUN_BROWSER_URLS, mvceditor::MENU_RUN_BROWSER + 40, mvceditor::RunBrowserPluginClass::OnUrlToolMenuItem)
+	EVT_MENU_RANGE(mvceditor::MENU_RUN_BROWSER + 0, mvceditor::MENU_RUN_BROWSER + 19, mvceditor::RunBrowserPluginClass::OnBrowserToolMenuItem)
+	EVT_MENU_RANGE(mvceditor::MENU_RUN_BROWSER_URLS + 0, mvceditor::MENU_RUN_BROWSER_URLS + 39, mvceditor::RunBrowserPluginClass::OnUrlToolMenuItem)
 	EVT_TOOL(ID_TOOLBAR_BROWSER, mvceditor::RunBrowserPluginClass::OnRunInWebBrowser)
 	EVT_AUITOOLBAR_TOOL_DROPDOWN(ID_BROWSER_AUI_TOOLBAR, mvceditor::RunBrowserPluginClass::OnBrowserToolDropDown)
 	EVT_AUITOOLBAR_TOOL_DROPDOWN(ID_URL_AUI_TOOLBAR, mvceditor::RunBrowserPluginClass::OnUrlToolDropDown)

@@ -28,10 +28,10 @@
 
 mvceditor::PluginClass::PluginClass()
 	: AuiManager(NULL)
+	, App(NULL)
 	, StatusBarWithGauge(NULL)
 	, Notebook(NULL)
 	, ToolsNotebook(NULL)
-	, App(NULL)
 	, Project(NULL)
 	, MenuBar(NULL) {
 }

@@ -27,6 +27,7 @@
 #include <widgets/ResourceCacheClass.h>
 #include <windows/AppFrameClass.h>
 #include <environment/EnvironmentClass.h>
+#include <environment/UrlResourceClass.h>
 #include <plugins/ResourcePluginClass.h>
 #include <plugins/ProjectPluginClass.h>
 #include <PluginClass.h>
@@ -91,6 +92,12 @@ public:
 	 * database connections, route URLs).
 	 */
 	PhpFrameworkDetectorClass PhpFrameworks;
+	
+	/**
+	 * The URLs (entry points to the current project) that have been detected so far. Also holds the 
+	 * "current" URL.
+	 */
+	UrlResourceClass UrlResource;
 
 	/** 
 	 * Initialize the application 
