@@ -63,7 +63,9 @@ mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass
 	SetStatusBar(gauge);
 	
 	AuiManager.SetManagedWindow(this);
-	ToolBar = new wxAuiToolBar(this, ID_TOOLBAR, wxDefaultPosition, wxDefaultSize, wxAUI_TB_TEXT | wxAUI_TB_DEFAULT_STYLE);
+	ToolBar = new wxAuiToolBar(this, ID_TOOLBAR, wxDefaultPosition, wxDefaultSize, 
+		  wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_OVERFLOW | wxAUI_TB_TEXT | wxAUI_TB_HORZ_TEXT);
+		// wxAUI_TB_TEXT | wxAUI_TB_DEFAULT_STYLE);
 	
 	// when the notebook is empty we want to accept dragged files
 	Notebook->SetDropTarget(new FileDropTargetClass(Notebook));
@@ -81,16 +83,15 @@ mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass
 	CreateToolBarButtons();
 	
 	// setup the bottom "tools" pane, the main content pane, and the toolbar on top
-	AuiManager.AddPane(ToolBar, wxAuiPaneInfo().Top(
-		).CaptionVisible(false).CloseButton(false).Gripper(
-		false).DockFixed(true).PaneBorder(false).Floatable(false).Row(0).Position(0));		
-		
 	AuiManager.AddPane(Notebook, wxAuiPaneInfo().CentrePane(
 		).PaneBorder(false).Gripper(false).Floatable(false));
 	AuiManager.AddPane(ToolsNotebook, wxAuiPaneInfo().Bottom().Caption(
 		_("Tools")).Floatable(false).MinSize(-1, 260).Hide());
+		
+	AuiManager.AddPane(ToolBar, wxAuiPaneInfo().Top(
+		).CaptionVisible(false).CloseButton(false).Gripper(
+		false).DockFixed(true).PaneBorder(false).Floatable(false).Row(0).Position(0));
 	AuiManager.Update();
-
 	DefaultKeyboardShortcuts();
 }
 

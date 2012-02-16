@@ -82,6 +82,59 @@ protected:
 	 */
 	void OnUpdateUi(wxUpdateUIEvent& event);
 };
+
+/**
+ * A small class to hold all of the URLs and Web Browsers to show to the user
+ */
+class BrowsersUrlsClass {
+
+public:
+
+
+	/**
+	 * the list of web browsers available to the editor. These are the 'friendly'
+	 * names that are used by the Environment class.
+	 */
+	wxArrayString Browsers;
+	
+	/**
+	 * the list of URLs. These are full URLs; "http://codeigniter.localhost/news/index"
+	 * These URLs are usually detected by the UrlDetectorClass
+	 */
+	wxArrayString Urls;
+	
+	/**
+	 * the detected framework identifier strings. Used by the UrlDetector
+	 */
+	std::vector<wxString> Identifiers;
+	
+	/**
+	 * The name of the browser that is selected
+	 */
+	wxString ChosenBrowser;
+	
+	/**
+	 * the URL that is selected
+	 */
+	wxString ChosenUrl;
+	
+	/**
+	 * The full path, root of the project
+	 */
+	wxString ProjectRootPath;
+	
+	/**
+	 * The [PHP source code] file to detect URLs from
+	 */
+	wxString CurrentFile;
+	
+	/**
+	 * Used by the UrlDetector. Pointer will NOT be owned by this class.
+	 */
+	EnvironmentClass* Environment;
+	
+	BrowsersUrlsClass();
+};
 	
 class RunBrowserPluginClass : public PluginClass {
 
@@ -89,11 +142,13 @@ public:
 
 	RunBrowserPluginClass();
 	
-	virtual ~RunBrowserPluginClass();
+	~RunBrowserPluginClass();
 	
 	void AddToolsMenuItems(wxMenu* toolsMenu);
 	
 	void AddToolBarItems(wxAuiToolBar* toolBar);
+	
+	void AddWindows();
 	
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 	
@@ -103,22 +158,32 @@ protected:
 
 private:
 
-
 	/**
-	 * run the script in (an external) web browser 
+	 * run the chosen URL in (an external) web browser 
 	 */
 	void OnRunInWebBrowser(wxCommandEvent& event);
 	
-	void OnUrlDetectionComplete(UrlDetectedEventClass& event);
+	void OnBrowserToolDropDown(wxAuiToolBarEvent& event);
 	
-	void OnUrlDetectionFailed(wxCommandEvent& event);
+	void OnBrowserToolMenuItem(wxCommandEvent& event);
 	
-	wxMenuItem* RunInBrowser;
+	void OnUrlToolDropDown(wxAuiToolBarEvent& event);
+	
+	void OnUrlToolMenuItem(wxCommandEvent& event);
+	
+	void OnUrlSearchTool(wxCommandEvent& event);
 	
 	/**
-	 * Will hold the current browser to run the PHP script with
+	 * When URL detection succeeds, the URLs are added
+	 * to the dialog that is shown to the user.
 	 */
-	wxComboBox* BrowserComboBox;
+	void OnUrlDetectionComplete(UrlDetectedEventClass& event);
+	
+	/**
+	 * If URL detection fails, then most likely this is an environment issue
+	 * (PHP binary not found)
+	 */
+	void OnUrlDetectionFailed(wxCommandEvent& event);
 	
 	/**
 	 * A local instance of the detector so that we can resolve
@@ -128,10 +193,14 @@ private:
 	 * class constructor)
 	 */
 	PhpFrameworkDetectorClass* PhpFrameworks;
-	
 
-	DECLARE_EVENT_TABLE()
+	BrowsersUrlsClass BrowsersUrls;
 	
+	wxMenuItem* RunInBrowser;
+	
+	wxAuiToolBar* BrowserToolbar;
+	
+	DECLARE_EVENT_TABLE()
 };
 
 }
