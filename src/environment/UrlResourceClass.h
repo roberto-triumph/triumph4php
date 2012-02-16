@@ -27,6 +27,7 @@
 
 #include <environment/EnvironmentClass.h>
 #include <wx/string.h>
+#include <vector>
 
 namespace mvceditor {
 
@@ -41,13 +42,13 @@ public:
 	 * the list of web browsers available to the editor. These are the 'friendly'
 	 * names that are used by the Environment class.
 	 */
-	wxArrayString Browsers;
+	std::vector<wxString> Browsers;
 	
 	/**
 	 * the list of URLs that have been detected thus far. These are full URLs; "http://codeigniter.localhost/news/index"
 	 * These URLs are usually detected by the UrlDetectorClass
 	 */
-	wxArrayString Urls;
+	std::vector<wxString> Urls;
 	
 	/**
 	 * The name of the browser that is selected

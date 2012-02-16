@@ -28,6 +28,7 @@
 #include <wx/artprov.h>
 #include <wx/valgen.h>
 #include <wx/aui/aui.h>
+#include <algorithm>
 
 static const int ID_TOOLBAR_BROWSER = wxNewId();
 static const int ID_BROWSER_AUI_TOOLBAR = wxNewId();
@@ -167,7 +168,7 @@ void mvceditor::RunBrowserPluginClass::LoadPreferences(wxConfigBase* config) {
 	mvceditor::EnvironmentClass* environment = GetEnvironment();
 	std::map<wxString, wxFileName> webBrowsers = environment->WebBrowsers;
 	for (std::map<wxString, wxFileName>::const_iterator it = webBrowsers.begin(); it != webBrowsers.end(); ++it) {
-		App->UrlResource.Browsers.Add(it->first);
+		App->UrlResource.Browsers.push_back(it->first);
 	}
 	if (!App->UrlResource.Browsers.empty()) {
 		App->UrlResource.ChosenBrowser = App->UrlResource.Browsers[0];
@@ -225,7 +226,7 @@ void mvceditor::RunBrowserPluginClass::OnBrowserToolDropDown(wxAuiToolBarEvent& 
 
 void mvceditor::RunBrowserPluginClass::OnUrlToolDropDown(wxAuiToolBarEvent& event) {
 	if (event.IsDropDownClicked()) {
-		if (App->UrlResource.Urls.IsEmpty()) {
+		if (App->UrlResource.Urls.empty()) {
 			return;
 		}
 		BrowserToolbar->SetToolSticky(event.GetId(), true);
@@ -233,8 +234,8 @@ void mvceditor::RunBrowserPluginClass::OnUrlToolDropDown(wxAuiToolBarEvent& even
 		// create the popup menu that contains all the available browser names
 		wxMenu menuPopup;
 		wxBitmap bmp = wxArtProvider::GetBitmap(wxART_QUESTION, wxART_OTHER, wxSize(16,16));
-		wxArrayString urls = App->UrlResource.Urls;
-		for (size_t i = 0; i < urls.Count(); ++i) {
+		std::vector<wxString> urls = App->UrlResource.Urls;
+		for (size_t i = 0; i < urls.size(); ++i) {
 			wxMenuItem* menuItem =  new wxMenuItem(&menuPopup, mvceditor::MENU_RUN_BROWSER_URLS + i, urls[i]);
 			menuItem->SetBitmap(bmp);
 			menuPopup.Append(menuItem);
@@ -313,9 +314,9 @@ void mvceditor::RunBrowserPluginClass::OnUrlDetectionComplete(mvceditor::UrlDete
 		if (App->UrlResource.Urls.size() > 50) {
 			App->UrlResource.Urls.pop_back();
 		}
-		int foundIndex = App->UrlResource.Urls.Index(chosenUrl);
-		if (foundIndex == wxNOT_FOUND) {
-			App->UrlResource.Urls.Add(chosenUrl);
+		std::vector<wxString>::iterator found = std::find(App->UrlResource.Urls.begin(), App->UrlResource.Urls.end(), chosenUrl);
+		if (found == App->UrlResource.Urls.end()) {
+			App->UrlResource.Urls.push_back(chosenUrl);
 			App->UrlResource.ChosenUrl = chosenUrl;
 		}
 		else {
@@ -336,7 +337,8 @@ void mvceditor::RunBrowserPluginClass::OnBrowserToolMenuItem(wxCommandEvent& eve
 	wxMenu* menu = wxDynamicCast(event.GetEventObject(), wxMenu);
 	if (menu) {
 		wxString name = menu->GetLabelText(event.GetId());
-		if (App->UrlResource.Browsers.Index(name) != wxNOT_FOUND) {
+		std::vector<wxString>::iterator found = std::find(App->UrlResource.Browsers.begin(), App->UrlResource.Browsers.end(), name);
+		if (found != App->UrlResource.Browsers.end()) {
 			App->UrlResource.ChosenBrowser = name;
 			BrowserToolbar->SetToolLabel(ID_BROWSER_AUI_TOOLBAR, name);
 			BrowserToolbar->Realize();
@@ -353,7 +355,8 @@ void mvceditor::RunBrowserPluginClass::OnUrlToolMenuItem(wxCommandEvent& event) 
 	wxMenu* menu = wxDynamicCast(event.GetEventObject(), wxMenu);
 	if (menu) {
 		wxString name = menu->GetLabelText(event.GetId());
-		if (App->UrlResource.Urls.Index(name) != wxNOT_FOUND) {
+		std::vector<wxString>::iterator found = std::find(App->UrlResource.Urls.begin(), App->UrlResource.Urls.end(), name);
+		if (found != App->UrlResource.Urls.end()) {
 			App->UrlResource.ChosenUrl = name;
 			BrowserToolbar->SetToolLabel(ID_URL_AUI_TOOLBAR, name);
 			BrowserToolbar->Realize();
