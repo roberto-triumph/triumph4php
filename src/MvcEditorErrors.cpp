@@ -75,6 +75,8 @@ wxString MessageFromError(mvceditor::Errors error, const wxString& extra) {
 		case mvceditor::INVALID_FILE:
 			msg = mvceditor::MessageWithFix(_("Could not load file: ") + extra,
 				_("Does file exist? Do you have access rights?"));
+		case mvceditor::WARNING_OTHER:
+			msg = extra;
 		default:
 			break;
 	}

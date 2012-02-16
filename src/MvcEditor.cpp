@@ -40,6 +40,7 @@
 #include <plugins/SqlBrowserPluginClass.h>
 #include <plugins/EditorMessagesPluginClass.h>
 #include <plugins/CodeIgniterPluginClass.h>
+#include <plugins/ViewFilePluginClass.h>
 #include <MvcEditorErrors.h>
 
 IMPLEMENT_APP(mvceditor::AppClass)
@@ -200,6 +201,8 @@ void mvceditor::AppClass::CreatePlugins() {
 	plugin = new CodeIgniterPluginClass();
 	Plugins.push_back(plugin);
 	plugin = new RunBrowserPluginClass();
+	Plugins.push_back(plugin);
+	plugin = new ViewFilePluginClass();
 	Plugins.push_back(plugin);
 	
 	// test plugin need to find a quicker way to toggling it ON / OFF
