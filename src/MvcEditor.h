@@ -97,7 +97,7 @@ public:
 	 * The URLs (entry points to the current project) that have been detected so far. Also holds the 
 	 * "current" URL.
 	 */
-	UrlResourceClass UrlResource;
+	UrlResourceFinderClass UrlResourceFinder;
 
 	/** 
 	 * Initialize the application 

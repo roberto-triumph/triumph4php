@@ -333,15 +333,24 @@ bool mvceditor::UrlDetectorActionClass::Response() {
 	wxFileConfig result(stream);
 	
 	long index = 0;
-	wxString entryName;
-	bool hasNext = result.GetFirstEntry(entryName, index);
+	wxString groupName;
+	bool hasNext = result.GetFirstGroup(groupName, index);
+	
 	while (ret && hasNext) {
-		wxString url;
-		ret = result.Read(entryName, &url);
-		if (ret) {
-			Urls.push_back(url);
+		mvceditor::UrlResourceClass newUrl;
+		newUrl.Url = result.Read(groupName + wxT("/Url"));
+		newUrl.FileName.Assign(result.Read(groupName + wxT("/FileName")));
+		newUrl.ClassName = result.Read(groupName + wxT("/ClassName"));
+		newUrl.MethodName = result.Read(groupName + wxT("/MethodName"));
+		if (newUrl.Url.IsEmpty() || !newUrl.FileName.IsOk()) {
+			Error = BAD_CONTENT;
+			ret = false;
+			break;
 		}
-		hasNext = result.GetNextEntry(entryName, index);
+		else {
+			Urls.push_back(newUrl);
+		}
+		hasNext = result.GetNextGroup(groupName, index);
 	}
 	return ret;
 }
@@ -611,7 +620,7 @@ void mvceditor::PhpFrameworkDetectorClass::OnViewFileDetectionFailed(wxCommandEv
 	wxPostEvent(&Handler, failedEvent);
 }
 
-mvceditor::UrlDetectedEventClass::UrlDetectedEventClass(std::vector<wxString> urls) 
+mvceditor::UrlDetectedEventClass::UrlDetectedEventClass(std::vector<mvceditor::UrlResourceClass> urls) 
 	: wxEvent(wxID_ANY, mvceditor::EVENT_FRAMEWORK_URL_COMPLETE) 
 	, Urls(urls) {
 }

@@ -25,9 +25,29 @@
 #include <environment/UrlResourceClass.h>
 
 mvceditor::UrlResourceClass::UrlResourceClass()
+ : Url()
+ , FileName()
+ , ClassName()
+ , MethodName() {
+
+ }
+
+mvceditor::UrlResourceFinderClass::UrlResourceFinderClass()
 	: Browsers()
 	, Urls() 
 	, ChosenBrowser() 
 	, ChosenUrl()  {
 		
+}
+
+bool mvceditor::UrlResourceFinderClass::FindByUrl(const wxString& url, mvceditor::UrlResourceClass& urlResource) {
+	bool ret = false;
+	for (size_t i = 0; i < Urls.size(); ++i) {
+		if (url.CmpNoCase(Urls[i].Url) == 0) {
+			ret = true;
+			urlResource = Urls[i];
+			break;
+		}
+	}
+	return ret;
 }

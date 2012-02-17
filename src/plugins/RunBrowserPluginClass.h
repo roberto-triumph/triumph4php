@@ -28,6 +28,7 @@
 #include <PluginClass.h>
 #include <plugins/wxformbuilder/RunBrowserPluginGeneratedClass.h>
 #include <php_frameworks/FrameworkDetectorClass.h>
+#include <environment/UrlResourceClass.h>
 #include <wx/string.h>
 #include <vector>
 
@@ -40,7 +41,7 @@ namespace mvceditor {
 class UrlChoiceClass {
 public:
 
-	wxArrayString UrlList;
+	std::vector<UrlResourceClass> UrlList;
 	
 	wxString Extra;
 	
@@ -52,12 +53,12 @@ public:
 	 * @param fileName the file that corresponds to the given URLs (the file name helps to determine the virtual host)
 	 * @param environment to get the virtual host
 	 */
-	UrlChoiceClass(const std::vector<wxString>& urlList, const wxString& fileName, EnvironmentClass* environment);
+	UrlChoiceClass(const std::vector<UrlResourceClass>& urlList, const wxString& fileName, EnvironmentClass* environment);
 	
 	/**
-	 * @return wxString URL [that the user chose] plus the Extra
+	 * @return UrlResourceClass URL [that the user chose] plus the Extra
 	 */
-	wxString ChosenUrl() const;
+	UrlResourceClass ChosenUrl() const;
 	
 };
 

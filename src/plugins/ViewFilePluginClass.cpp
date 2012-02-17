@@ -26,6 +26,7 @@
 #include <MvcEditor.h>
 #include <MvcEditorErrors.h>
 #include <environment/UrlResourceClass.h>
+#include <windows/StringHelperClass.h>
 
 static const int ID_VIEW_FILE_PANEL = wxNewId();
 
@@ -123,24 +124,22 @@ void mvceditor::ViewFilePluginClass::OnViewFilesMenu(wxCommandEvent& event) {
 	}
 
 	// start the chain reaction
-	wxString url = App->UrlResource.ChosenUrl;
+	wxString url = App->UrlResourceFinder.ChosenUrl.Url;
 	if (!url.IsEmpty()) {
 		
 		// TODO need another detector to go from URL -> class/method
 		// also need to go from URL -> file
-		if (GetCurrentCodeControl()) {
-			wxFileName fileName(GetCurrentCodeControl()->GetFileName());
-			if (fileName.IsOk()) {
-				UnicodeString className = UNICODE_STRING_SIMPLE("News");
-				UnicodeString methodName = UNICODE_STRING_SIMPLE("index");
-				CallStackThread.InitCallStack(App->ResourceCache);
-				if (!CallStackThread.InitThread(fileName, className, methodName)) {
-					mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Call stack file creation failed"));
-				}
-				else {
-					CurrentViewFiles.clear();
-				}				
+		wxFileName fileName = App->UrlResourceFinder.ChosenUrl.FileName;
+		if (fileName.IsOk()) {
+			UnicodeString className = mvceditor::StringHelperClass::wxToIcu(App->UrlResourceFinder.ChosenUrl.ClassName);
+			UnicodeString methodName =  mvceditor::StringHelperClass::wxToIcu(App->UrlResourceFinder.ChosenUrl.MethodName);
+			CallStackThread.InitCallStack(App->ResourceCache);
+			if (!CallStackThread.InitThread(fileName, className, methodName)) {
+				mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Call stack file creation failed"));
 			}
+			else {
+				CurrentViewFiles.clear();
+			}				
 		}
 	}
 }
@@ -150,7 +149,7 @@ void mvceditor::ViewFilePluginClass::OnWorkComplete(wxCommandEvent& event) {
 		FrameworkDetector = new mvceditor::PhpFrameworkDetectorClass(*this, *GetEnvironment());
 	}
 	FrameworkDetector->Identifiers = PhPFrameworks().Identifiers;
-	if (!FrameworkDetector->InitViewFilesDetector(GetProject()->GetRootPath(), App->UrlResource.ChosenUrl, CallStackThread.StackFile)) {
+	if (!FrameworkDetector->InitViewFilesDetector(GetProject()->GetRootPath(), App->UrlResourceFinder.ChosenUrl.Url, CallStackThread.StackFile)) {
 		mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Could not start viewFiles detector"));
 	}
 }

@@ -1,3 +1,4 @@
+<?php
 /**
  * This software is released under the terms of the MIT License
  * 
@@ -22,97 +23,51 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITORURLRESOURCECLASS_H__
-#define __MVCEDITORURLRESOURCECLASS_H__
-
-#include <environment/EnvironmentClass.h>
-#include <wx/string.h>
-#include <vector>
-
-namespace mvceditor {
 
 /**
- * A small class to hold an application URL. We tie together a URL and its PHP source
- * code entry point so that we can easily jump to it.
+ * This is a class that represents a URL resource. MVC Editor will use these URL
+ * objects to open files, run web pages, and inspect controllers and view files.
  */
-class UrlResourceClass {
-	
-public:
+class MvcEditorUrlClass  {
 
 	/**
 	 * These are relative URLs; they are relative to the server root and may contain a query string.
 	 * For example, if a user would type in "http://localhost.codeigniter/index.php/news/index" the
 	 * this URL should contain "index.php/news/index"
+	 *
+	 * @var string
 	 */
-	wxString Url;
+	public $url;
 	
 	/**
 	 * The file where the source code of the URL is located in.  This is the entry point
 	 * to the URL; for a framework $fileName will be the location of the controller.
-	 * fileName is full path (os-dependent).
+	 * fileName is full path (os-dependant).
+	 * @var string
 	 */
-	wxFileName FileName;
+	public $fileName;
 	
 	/**
 	 * The name of the controller class that handles this URL.  If a project does not
 	 * use a framework, this will be empty.
+	 *
+	 * @var string
 	 */
-	wxString ClassName;
+	public $className;
 	
 	/**
 	 * The name of the controller method that handles this URL.  If a project does not
 	 * use a framework, this will be empty.
 	 *
+	 * @var string
 	 */
-	wxString MethodName;
+	public $methodName;
 	
-	UrlResourceClass();
-};
- 
-/**
- * Class that holds all of the URLs that MVC Editor has encountered.
- * We remember them because they are a relatively expensive to determine (have to
- * use the UrlDetectorActionClass).
- */
-class UrlResourceFinderClass {
 
-public:
-
-	/**
-	 * the list of web browsers available to the editor. These are the 'friendly'
-	 * names that are used by the Environment class.
-	 */
-	std::vector<wxString> Browsers;
-	
-	/**
-	 * the list of URLs that have been detected thus far. These are full URLs; "http://codeigniter.localhost/news/index"
-	 * These URLs are usually detected by the UrlDetectorClass
-	 */
-	std::vector<UrlResourceClass> Urls;
-	
-	/**
-	 * The name of the browser that is selected
-	 */
-	wxString ChosenBrowser;
-	
-	/**
-	 * the URL that is selected
-	 */
-	UrlResourceClass ChosenUrl;
-	
-		
-	UrlResourceFinderClass();
-	
-	/**
-	 * check to see if the given URL exists in the Urls list; if the URL
-	 * exists then urlResource is filled with the contents of the URL.
-	 * This way, the caller can "resolve" a URL into a file name
-	 * Comparison is done in a case-insensitive manner
-	 *
-	 * @return TRUE if there is a URL resource that has the given URL member
-	 */
-	bool FindByUrl(const wxString& url, UrlResourceClass& urlResource);
-};
-	
+	public function __construct($url, $fileName, $className, $methodName) {
+		$this->url = $url;
+		$this->fileName = $fileName;
+		$this->className = $className;
+		$this->methodName = $methodName;
+	}
 }
-#endif

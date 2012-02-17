@@ -28,6 +28,7 @@ require_once 'MvcEditorFrameworkBase.php';
 require_once 'MvcEditorResource.php';
 require_once 'MvcEditorDatabaseInfo.php';
 require_once 'MvcEditorCallClass.php';
+require_once 'MvcEditorUrlClass.php';
 
 class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 
@@ -166,7 +167,7 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 		
 			// TODO: any controller arguments ... should get these from the user
 			$extra = '';
-			$urls[] = $this->makeUrl($route, $config, $subDirectory, $className, $methodName, $extra);
+			$urls[] = $this->makeUrl($route, $config, $subDirectory, $fileName, $className, $methodName, $extra);
 		}
 		return $urls;
 	}
@@ -376,7 +377,7 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 		return '';
 	}
 	
-	function makeUrl($route, $config, $subDirectory, $className, $methodName, $extra) {
+	function makeUrl($route, $config, $subDirectory, $fileName, $className, $methodName, $extra) {
 	
 		// this function was taken from http://codeigniter.com/forums/viewthread/102438
 		// with the following changes:
@@ -435,7 +436,8 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 		if (isset($config['url_suffix']) && $config['url_suffix']) {
 			$url .= $config['url_suffix'];
 		}
-		return $url;
+		$mvcUrl = new MvcEditorUrlClass($url, $fileName, $className, $methodName);
+		return $mvcUrl;
 	}
 	
 	private function parseMethods($fileName) {

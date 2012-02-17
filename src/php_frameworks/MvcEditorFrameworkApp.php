@@ -195,7 +195,12 @@ function runMakeUrls(MvcEditorFrameworkBaseClass $framework, $dir, $url, $file, 
 			// write an INI entry for each config file. make sure to replace any possible
 			// characters that may conflict with INI parsing.
 			$key = iniEscapeKey('Url_' . $keyIndex);
-			$outputConfig->{$key} = $url;
+			$outputConfig->{$key} = array(
+			'Url' => iniEscapeValue($url->url),
+			'FileName' => iniEscapeValue($url->fileName),
+			'ClassName' => iniEscapeValue($url->className),
+			'MethodName' => iniEscapeValue($url->methodName)
+		);
 			$keyIndex++;
 		}
 		iniPrint($writer, $outputFile);

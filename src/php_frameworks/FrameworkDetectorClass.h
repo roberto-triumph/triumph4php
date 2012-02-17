@@ -29,6 +29,7 @@
 #include <widgets/ProcessWithHeartbeatClass.h>
 #include <environment/DatabaseInfoClass.h>
 #include <environment/EnvironmentClass.h>
+#include <environment/UrlResourceClass.h>
 #include <wx/string.h>
 #include <wx/event.h>
 #include <map>
@@ -271,7 +272,7 @@ class UrlDetectorActionClass : public DetectorActionClass {
 
 public:
 
-	std::vector<wxString> Urls;
+	std::vector<UrlResourceClass> Urls;
 
 	UrlDetectorActionClass(wxEvtHandler& handler);
 	
@@ -445,7 +446,7 @@ private:
 	/**
 	 * the list of result of URL detection; these could be from multiple frameworks
 	 */
-	std::vector<wxString> UrlsDetected;
+	std::vector<UrlResourceClass> UrlsDetected;
 	
 	/**
 	 * the list of result of view file detection
@@ -505,9 +506,9 @@ class UrlDetectedEventClass : public wxEvent {
 	 * the URLs that were detected; these URLs are calculated using framework specific
 	 * routing rules. Urls will not contain a hostname
 	 */
-	std::vector<wxString> Urls;
+	std::vector<UrlResourceClass> Urls;
 	
-	UrlDetectedEventClass(std::vector<wxString> urls);
+	UrlDetectedEventClass(std::vector<UrlResourceClass> urls);
 	
 	/**
 	 * needed by wxPostEvent

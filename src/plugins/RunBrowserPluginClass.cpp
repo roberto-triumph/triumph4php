@@ -56,26 +56,34 @@ static void ExternalBrowser(const wxString& browserName, const wxString& url, mv
 	}
 }
 
-mvceditor::UrlChoiceClass::UrlChoiceClass(const std::vector<wxString>& urls, const wxString& fileName, mvceditor::EnvironmentClass* environment)
-	: UrlList()
-	, Extra() 
-	, ChosenIndex(0) {
-	wxString url = environment->Apache.GetUrl(fileName);
-		
-	// we only want the virtual host name, as the url we get from the framework's routing url scheme
-	wxString host = url.Mid(7); // 7 = length of "http://"
-	host = host.Mid(0, host.Find(wxT("/")));
-	host = wxT("http://") + host + wxT("/");
+/**
+ * Will modify each UrlResourceClass in the given list; it will make each URL absolute by prepending the
+ * correct host.
+ */
+static void MakeAbsoluteUrls(std::vector<mvceditor::UrlResourceClass>& urls, mvceditor::EnvironmentClass* environment) {
 	for (size_t i = 0; i < urls.size(); ++i) {
-		wxString item = host + urls[i];
-		UrlList.Add(item);
-	}
+		wxString url = environment->Apache.GetUrl(urls[i].FileName.GetFullPath());
+			
+		// we only want the virtual host name, as the url we get from the framework's routing url scheme
+		wxString host = url.Mid(7); // 7 = length of "http://"
+		host = host.Mid(0, host.Find(wxT("/")));
+		host = wxT("http://") + host + wxT("/");
+		urls[i].Url = host + urls[i].Url;
+	}	
 }
 
-wxString mvceditor::UrlChoiceClass::ChosenUrl() const {
-	wxString chosenUrl;
+
+mvceditor::UrlChoiceClass::UrlChoiceClass(const std::vector<mvceditor::UrlResourceClass>& urls, const wxString& fileName, mvceditor::EnvironmentClass* environment)
+	: UrlList(urls)
+	, Extra() 
+	, ChosenIndex(0) {
+}
+
+mvceditor::UrlResourceClass mvceditor::UrlChoiceClass::ChosenUrl() const {
+	mvceditor::UrlResourceClass chosenUrl;
 	if ((size_t)ChosenIndex < UrlList.size()) {
-		chosenUrl = UrlList[ChosenIndex] + Extra;
+		chosenUrl = UrlList[ChosenIndex];
+		chosenUrl.Url += Extra;
 	}
 	return chosenUrl;
 }
@@ -83,15 +91,17 @@ wxString mvceditor::UrlChoiceClass::ChosenUrl() const {
 mvceditor::ChooseUrlDialogClass::ChooseUrlDialogClass(wxWindow* parent, mvceditor::UrlChoiceClass& urlChoice)
 	: ChooseUrlDialogGeneratedClass(parent, wxID_ANY)
 	, UrlChoice(urlChoice) {
-	UrlList->Append(UrlChoice.UrlList);
+	for (size_t i = 0; i < UrlChoice.UrlList.size(); ++i) {
+		UrlList->Append(UrlChoice.UrlList[i].Url);
+	}
 	UrlList->SetSelection(UrlChoice.ChosenIndex);
 	
 	wxGenericValidator extraValidator(&UrlChoice.Extra);
 	Extra->SetValidator(extraValidator);
 	TransferDataToWindow();
 	
-	if (!urlChoice.UrlList.IsEmpty()) {
-		wxString label= _("Complete URL: ") + urlChoice.UrlList[0];
+	if (!urlChoice.UrlList.empty()) {
+		wxString label= _("Complete URL: ") + urlChoice.UrlList[0].Url;
 		CompleteLabel->SetLabel(label);
 	}
 }
@@ -168,13 +178,13 @@ void mvceditor::RunBrowserPluginClass::LoadPreferences(wxConfigBase* config) {
 	mvceditor::EnvironmentClass* environment = GetEnvironment();
 	std::map<wxString, wxFileName> webBrowsers = environment->WebBrowsers;
 	for (std::map<wxString, wxFileName>::const_iterator it = webBrowsers.begin(); it != webBrowsers.end(); ++it) {
-		App->UrlResource.Browsers.push_back(it->first);
+		App->UrlResourceFinder.Browsers.push_back(it->first);
 	}
-	if (!App->UrlResource.Browsers.empty()) {
-		App->UrlResource.ChosenBrowser = App->UrlResource.Browsers[0];
+	if (!App->UrlResourceFinder.Browsers.empty()) {
+		App->UrlResourceFinder.ChosenBrowser = App->UrlResourceFinder.Browsers[0];
 	}
 	if (BrowserToolbar) {
-		BrowserToolbar->SetToolLabel(ID_BROWSER_AUI_TOOLBAR, App->UrlResource.Browsers[0]);
+		BrowserToolbar->SetToolLabel(ID_BROWSER_AUI_TOOLBAR, App->UrlResourceFinder.Browsers[0]);
 		BrowserToolbar->Realize();
 	}
 }
@@ -185,8 +195,8 @@ void mvceditor::RunBrowserPluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 }
 
 void mvceditor::RunBrowserPluginClass::OnRunInWebBrowser(wxCommandEvent& event) {
-	wxString browserName = App->UrlResource.ChosenBrowser;
-	wxString url = App->UrlResource.ChosenUrl;
+	wxString browserName = App->UrlResourceFinder.ChosenBrowser;
+	wxString url = App->UrlResourceFinder.ChosenUrl.Url;
 	if (!browserName.IsEmpty() && !url.IsEmpty()) {
 		mvceditor::EnvironmentClass* environment = GetEnvironment();
 		ExternalBrowser(browserName, url, environment);
@@ -226,7 +236,7 @@ void mvceditor::RunBrowserPluginClass::OnBrowserToolDropDown(wxAuiToolBarEvent& 
 
 void mvceditor::RunBrowserPluginClass::OnUrlToolDropDown(wxAuiToolBarEvent& event) {
 	if (event.IsDropDownClicked()) {
-		if (App->UrlResource.Urls.empty()) {
+		if (App->UrlResourceFinder.Urls.empty()) {
 			return;
 		}
 		BrowserToolbar->SetToolSticky(event.GetId(), true);
@@ -234,9 +244,9 @@ void mvceditor::RunBrowserPluginClass::OnUrlToolDropDown(wxAuiToolBarEvent& even
 		// create the popup menu that contains all the available browser names
 		wxMenu menuPopup;
 		wxBitmap bmp = wxArtProvider::GetBitmap(wxART_QUESTION, wxART_OTHER, wxSize(16,16));
-		std::vector<wxString> urls = App->UrlResource.Urls;
+		std::vector<mvceditor::UrlResourceClass> urls = App->UrlResourceFinder.Urls;
 		for (size_t i = 0; i < urls.size(); ++i) {
-			wxMenuItem* menuItem =  new wxMenuItem(&menuPopup, mvceditor::MENU_RUN_BROWSER_URLS + i, urls[i]);
+			wxMenuItem* menuItem =  new wxMenuItem(&menuPopup, mvceditor::MENU_RUN_BROWSER_URLS + i, urls[i].Url);
 			menuItem->SetBitmap(bmp);
 			menuPopup.Append(menuItem);
 		}
@@ -275,7 +285,7 @@ void mvceditor::RunBrowserPluginClass::OnUrlDetectionComplete(mvceditor::UrlDete
 	if (GetCurrentCodeControl()) {
 		fileName = GetCurrentCodeControl()->GetFileName();
 	}
-	wxString chosenUrl;
+	mvceditor::UrlResourceClass chosenUrl;
 	mvceditor::EnvironmentClass* environment = GetEnvironment();
 	if (PhPFrameworks().Identifiers.empty()) {
 		if (!wxFileName::FileExists(fileName)) {
@@ -291,6 +301,7 @@ void mvceditor::RunBrowserPluginClass::OnUrlDetectionComplete(mvceditor::UrlDete
 		}
 	}
 	if (!event.Urls.empty()) {
+		MakeAbsoluteUrls(event.Urls, environment);
 		mvceditor::UrlChoiceClass urlChoice(event.Urls, fileName, environment);
 		mvceditor::ChooseUrlDialogClass dialog(GetMainWindow(), urlChoice);
 		if (wxOK == dialog.ShowModal()) {
@@ -301,26 +312,28 @@ void mvceditor::RunBrowserPluginClass::OnUrlDetectionComplete(mvceditor::UrlDete
 		
 		// no URLs means that the file can be accessed normally
 		// turn file name into a url in the default manner (by calculating from the vhost document root)
-		chosenUrl = environment->Apache.GetUrl(fileName);
-		if (chosenUrl.IsEmpty()) {
+		chosenUrl.Url = environment->Apache.GetUrl(fileName);
+		chosenUrl.FileName.Assign(fileName);
+		if (chosenUrl.Url.IsEmpty()) {
 			mvceditor::EditorLogWarning(mvceditor::INVALID_FILE, _("File is not under web root"));	
 			return;
 		}
 	}
-	if (!chosenUrl.IsEmpty()) {
+	if (!chosenUrl.Url.IsEmpty()) {
 					
 		// add to URL to the internal recent list so that the user can easily access it
 		// multiple times.
-		if (App->UrlResource.Urls.size() > 50) {
-			App->UrlResource.Urls.pop_back();
+		if (App->UrlResourceFinder.Urls.size() > 50) {
+			App->UrlResourceFinder.Urls.pop_back();
 		}
-		std::vector<wxString>::iterator found = std::find(App->UrlResource.Urls.begin(), App->UrlResource.Urls.end(), chosenUrl);
-		if (found == App->UrlResource.Urls.end()) {
-			App->UrlResource.Urls.push_back(chosenUrl);
-			App->UrlResource.ChosenUrl = chosenUrl;
+		mvceditor::UrlResourceClass urlResource;
+		bool found = App->UrlResourceFinder.FindByUrl(chosenUrl.Url, urlResource);
+		if (!found) {
+			App->UrlResourceFinder.Urls.push_back(chosenUrl);
+			App->UrlResourceFinder.ChosenUrl = chosenUrl;
 		}
 		else {
-			App->UrlResource.ChosenUrl = chosenUrl;
+			App->UrlResourceFinder.ChosenUrl = urlResource;
 		}
 	}
 }
@@ -337,9 +350,9 @@ void mvceditor::RunBrowserPluginClass::OnBrowserToolMenuItem(wxCommandEvent& eve
 	wxMenu* menu = wxDynamicCast(event.GetEventObject(), wxMenu);
 	if (menu) {
 		wxString name = menu->GetLabelText(event.GetId());
-		std::vector<wxString>::iterator found = std::find(App->UrlResource.Browsers.begin(), App->UrlResource.Browsers.end(), name);
-		if (found != App->UrlResource.Browsers.end()) {
-			App->UrlResource.ChosenBrowser = name;
+		std::vector<wxString>::iterator found = std::find(App->UrlResourceFinder.Browsers.begin(), App->UrlResourceFinder.Browsers.end(), name);
+		if (found != App->UrlResourceFinder.Browsers.end()) {
+			App->UrlResourceFinder.ChosenBrowser = name;
 			BrowserToolbar->SetToolLabel(ID_BROWSER_AUI_TOOLBAR, name);
 			BrowserToolbar->Realize();
 			AuiManager->Update();
@@ -355,9 +368,10 @@ void mvceditor::RunBrowserPluginClass::OnUrlToolMenuItem(wxCommandEvent& event) 
 	wxMenu* menu = wxDynamicCast(event.GetEventObject(), wxMenu);
 	if (menu) {
 		wxString name = menu->GetLabelText(event.GetId());
-		std::vector<wxString>::iterator found = std::find(App->UrlResource.Urls.begin(), App->UrlResource.Urls.end(), name);
-		if (found != App->UrlResource.Urls.end()) {
-			App->UrlResource.ChosenUrl = name;
+		mvceditor::UrlResourceClass urlResource;
+		bool found = App->UrlResourceFinder.FindByUrl(name, urlResource);
+		if (found) {
+			App->UrlResourceFinder.ChosenUrl = urlResource;
 			BrowserToolbar->SetToolLabel(ID_URL_AUI_TOOLBAR, name);
 			BrowserToolbar->Realize();
 			AuiManager->Update();

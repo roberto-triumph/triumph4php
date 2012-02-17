@@ -98,7 +98,7 @@ abstract class MvcEditorFrameworkBaseClass {
 	 *
 	 * @param $dir the base directory of the project in question; absolute path.
 	 * @param $fileName the file to make the URL
-	 * @return array of URLs for the given file
+	 * @return array of MvcEditorUrlClass objects for the given file
 	 */
 	abstract public function makeUrls($dir, $fileName);
 	
