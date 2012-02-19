@@ -188,13 +188,18 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 		$call = new MvcEditorCallClass();
 		while (!feof($fp)) {
 			if ($call->fromFile($fp)) {
-				if (MvcEditorCallClass::TYPE_METHOD == $call->type && strcasecmp('CI_Loader::view', $call->resource) == 0 && count($call->arguments) >= 2) {
+				if (MvcEditorCallClass::TYPE_METHOD == $call->type && strcasecmp('CI_Loader::view', $call->resource) == 0 && count($call->arguments) >= 1) {
 					$viewFile = $call->arguments[0];
 					
 					// most of the time views are given as relative relatives; starting from the application/views/ directory
 					// for now ignore variable arguments
 					if ($viewFile[0] != '$') {
-						$viewFiles[] = realpath($dir . '/application/views/' . $viewFile . ".php");
+						
+						// view file may have an extesion; if it has an extension use that; otherwise use the default (.php)
+						if (stripos($viewFile, '.') === FALSE) {
+							$viewFile .= '.php';
+						}
+						$viewFiles[] = realpath($dir . '/application/views/' . $viewFile);
 					}
 				}
 			}

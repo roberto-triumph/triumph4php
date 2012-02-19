@@ -216,7 +216,7 @@ function runViewFiles(MvcEditorFrameworkBaseClass $framework, $dir, $url, $file,
 		$keyIndex = 0;
 		foreach ($viewFiles as $viewFile) {
 			$key = iniEscapeKey('View_' . $keyIndex);
-			$outputConfig->{$key} = $viewFile;
+			$outputConfig->{$key} = iniEscapeValue($viewFile);
 			$keyIndex++;
 		}
 		iniPrint($writer, $outputFile);
