@@ -25,12 +25,14 @@
 #include <environment/EnvironmentClass.h>
 #include <wx/platinfo.h>
 #include <wx/confbase.h>
+#include <wx/utils.h>
 
 mvceditor::EnvironmentClass::EnvironmentClass()
 		: Apache()
 		, Php()
 		, WebBrowsers() {
 	wxPlatformInfo info;
+	wxString userHome = wxGetUserHome();
 	switch (info.GetOperatingSystemId()) {
 		case wxOS_UNIX_LINUX:
 			WebBrowsers[wxT("Mozilla Firefox")] = wxFileName(wxT("/usr/bin/firefox"));
@@ -38,11 +40,13 @@ mvceditor::EnvironmentClass::EnvironmentClass()
 			WebBrowsers[wxT("Opera")] = wxFileName(wxT("/usr/bin/opera"));
 			break;
 		case wxOS_WINDOWS_NT:
-			WebBrowsers[wxT("Mozilla Firefox")] = wxFileName(wxT("C:\\Program Files\\Mozilla Firefox\\firefox.exe"));
-			WebBrowsers[wxT("Google Chrome")] = wxFileName(wxT("C:\\Program Files\\Google\\chrome.exe"));
-			WebBrowsers[wxT("Internet Explorer")] = wxFileName(wxT("C:\\Windows\\iexplore.exe"));
-			WebBrowsers[wxT("Opera")] = wxFileName(wxT("C:\\Program Files\\Opera\\Opera.exe"));
-			WebBrowsers[wxT("Safari")] = wxFileName(wxT("C:\\Program Files\\Safari\\Safari.exe"));
+			WebBrowsers[wxT("Mozilla Firefox")] = wxFileName(wxT("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe"));
+
+			// by default google installs itself in the user home
+			WebBrowsers[wxT("Google Chrome")] = wxFileName(userHome + wxT("\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe"));
+			WebBrowsers[wxT("Internet Explorer")] = wxFileName(wxT("C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe"));
+			WebBrowsers[wxT("Opera")] = wxFileName(wxT("C:\\Program Files (x86)\\Opera\\opera.exe"));
+			WebBrowsers[wxT("Safari")] = wxFileName(wxT("C:\\Program Files (x86)\\Safari\\Safari.exe"));
 			break;
 		default:
 			break;
