@@ -49,7 +49,7 @@ public:
 };
 
 SUITE(UCharBufferedFileTestClass) {
-#if 0
+
 TEST_FIXTURE(UCharBufferedFileTestFixtureClass, MemoryBufferHasEnded) {
 	UnicodeString test = UNICODE_STRING_SIMPLE("function");
 	CHECK(MemBuffer->OpenString(test));
@@ -268,7 +268,7 @@ TEST_FIXTURE(UCharBufferedFileTestFixtureClass, FileBufferWhenRemovingLeadingSla
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("free function"), str);
 	CHECK_EQUAL(0, *FileBuffer->Current);
 }
-#endif
+
 
 TEST_FIXTURE(UCharBufferedFileTestFixtureClass, FileBufferShouldFillFromFileAfterRemovingSlack) {
 	wxString fileName = wxT("test_buffer.txt");

@@ -498,8 +498,10 @@ void mvceditor::SymbolTableClass::ResourceMatches(const mvceditor::SymbolClass& 
 	else if (typeToLookup.caseCompare(UNICODE_STRING_SIMPLE("array"), 0) == 0) {
 		error.ToArrayError(UNICODE_STRING_SIMPLE(""), parsedExpression.Lexeme);
 	}
-	else {
-		for (size_t i = 1; i < (parsedExpression.ChainList.size() - 1) && !typeToLookup.isEmpty() && !error.HasError(); ++i) {	
+	else if (!parsedExpression.ChainList.empty()) {
+
+		// need the empty check so that we don't overflow when doing 0 - 1 with size_t 
+		for (size_t i = 1;  i < (parsedExpression.ChainList.size() - 1) && !typeToLookup.isEmpty() && !error.HasError(); ++i) {	
 			UnicodeString nextResource = typeToLookup + parsedExpression.ChainList[i];
 			UnicodeString resolvedType = ResolveResourceType(nextResource, allResourceFinders);
 			if (resolvedType.isEmpty()) {

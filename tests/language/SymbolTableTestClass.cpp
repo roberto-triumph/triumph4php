@@ -508,6 +508,26 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithMethodCall) {
 	}
 }
 
+
+TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressionAndDuckTyping) {
+
+	// there was an overflow error in this scenario and it was causing a crash
+	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"class MyClass { function workA() {} function workB() {} } \n"
+		"$my = new MyClass;\n"
+	);
+	int32_t pos;
+	sourceCode = FindCursor(sourceCode, pos);
+	Init(sourceCode);	
+	mvceditor::SymbolClass emptyExpression;
+	emptyExpression.Lexeme = UNICODE_STRING_SIMPLE("unknown");
+	std::vector<mvceditor::ResourceClass> resources;
+	CompletionSymbolTable.ResourceMatches(emptyExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+		&GlobalFinder, resources, true, Error);
+	CHECK_EQUAL((size_t)0, resources.size());
+}
+
 TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillUnknownResourceError) {
 
 	// when a method could not be found make sure that the ErrorType

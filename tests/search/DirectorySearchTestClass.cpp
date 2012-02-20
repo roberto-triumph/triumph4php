@@ -89,7 +89,7 @@ TEST_FIXTURE(DirectorySearchTestClass, WalkShouldRecurseThroughSubDirectories) {
 	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), 
 		TestProjectDir + wxT("folder_two") + wxFileName::GetPathSeparator() + wxT("file_two.php")));
 }
-#if 0
+
 TEST_FIXTURE(DirectorySearchTestClass, WalkShouldRecurseThroughSubDirectoriesInPreciseMode) {
 	wxString files[] = { wxT("file_one.php"), wxT("file_two.php") };
 	wxString directories[] =  { wxT("folder_one"), wxT("folder_two") };
@@ -129,5 +129,5 @@ TEST_FIXTURE(DirectorySearchTestClass, WalkShouldRecurseThroughSubDirectoriesInP
 	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), 
 		TestProjectDir + wxT("folder_two") + wxFileName::GetPathSeparator() + wxT("file_two.php")));
 }
-#endif
+
 }

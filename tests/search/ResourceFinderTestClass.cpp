@@ -49,7 +49,7 @@ public:
 };
 
 SUITE(ResourceFinderTestClass) {
-#if 0
+
 TEST_FIXTURE(ResourceFinderTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameMatches) {
 	wxString testFile = wxT("test.php");
 	CreateFixtureFile(testFile, wxString::FromAscii(
@@ -1458,7 +1458,7 @@ TEST_FIXTURE(DynamicResourceTestClass, AddDynamicResourcesShouldNotDuplicateExis
 		CHECK_EQUAL(mvceditor::ResourceClass::FUNCTION, match.Type);
 	}
 }
-#endif
+
 TEST_FIXTURE(ResourceFinderTestClass, Persist) {
 	wxString testFile = wxT("test.php");
 	CreateFixtureFile(testFile, wxString::FromAscii(
