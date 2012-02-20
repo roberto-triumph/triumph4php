@@ -163,7 +163,7 @@ SUITE(ApacheTestClass) {
 TEST_FIXTURE(ApacheTestClass, WalkShouldFindApacheConfigFile) {
 	CreateHttpdFile(wxT(""));
 	Walk();
-	CHECK_EQUAL(TestProjectDir, Apache.GetDocumentRoot());
+	CHECK_EQUAL(wxT("http://localhost/"), Apache.GetVirtualHostMappings()[TestProjectDir]);
 	CHECK_EQUAL(8080, Apache.GetListenPort());
 }
 
@@ -176,7 +176,7 @@ TEST_FIXTURE(ApacheTestClass, WalkShouldNotParseConditionalPorts) {
 		"</IfModule>\n"
 	));
 	Walk();
-	CHECK_EQUAL(TestProjectDir, Apache.GetDocumentRoot());
+	CHECK_EQUAL(wxT("http://localhost/"), Apache.GetVirtualHostMappings()[TestProjectDir]);
 	CHECK_EQUAL(80, Apache.GetListenPort());
 }
 
@@ -184,8 +184,42 @@ TEST_FIXTURE(ApacheTestClass, WalkShouldNotParseConditionalPorts) {
 TEST_FIXTURE(ApacheTestClass, WalkShouldFindApacheConfigFileWithinSubDirectory) {
 	CreateHttpdFile(ConfigSubDirectory);
 	Walk();
-	CHECK_EQUAL(TestProjectDir, Apache.GetDocumentRoot());
+	CHECK_EQUAL(wxT("http://localhost/"), Apache.GetVirtualHostMappings()[TestProjectDir]);
 	CHECK_EQUAL(8080, Apache.GetListenPort());
+}
+
+TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWithoutVirtualHosts) {
+	CreateHttpdFile(ConfigSubDirectory);
+	Walk();
+	CHECK_EQUAL(wxT("http://localhost/"), Apache.GetVirtualHostMappings()[TestProjectDir]);
+	CHECK_EQUAL(8080, Apache.GetListenPort());
+	wxString url = Apache.GetUrl(TestProjectDir + PhpFile);
+	wxString expectedUrl = wxT("http://localhost:8080/test.php");
+	CHECK_EQUAL(expectedUrl, url);
+}
+
+TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenDocumentRootHasAWindowsPath) {
+	int major, 
+		minor;
+	wxOperatingSystemId systemId = wxGetOsVersion(&major, &minor);
+	if (wxOS_WINDOWS_NT == systemId) {
+
+		// paths in apache config file have forward slashes
+		// windows paths are not like regular windows path c:\\dir\\dir2
+		// they are  c:/dir1/dir2
+		// also test that apache class handles case insesitive paths
+		wxString trueDir = TestProjectDir;
+		TestProjectDir.Replace(wxT("\\"), wxT("/"));
+		TestProjectDir.Replace(wxT("a"), wxT("A"));
+		
+
+		CreateHttpdFile(ConfigSubDirectory);
+		Walk();
+		CHECK_EQUAL(8080, Apache.GetListenPort());
+		wxString url = Apache.GetUrl(TestProjectDir + PhpFile);
+		wxString expectedUrl = wxT("http://localhost:8080/test.php");
+		CHECK_EQUAL(expectedUrl, url);
+	}
 }
 
 TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsInHttpConfFile) {
@@ -359,7 +393,6 @@ TEST_FIXTURE(ApacheTestClass, SetHttpdPathShouldParseDocumentRoot) {
 	
 	wxString expectedPath = TestProjectDir;
 	expectedPath.Append(ConfigSubDirectory).Append(wxFileName::GetPathSeparator()).Append(HttpdFile);
-	CHECK_EQUAL(TestProjectDir, Apache.GetDocumentRoot());
 	wxString url = Apache.GetUrl(TestProjectDir + wxT("test.php"));
 	CHECK_EQUAL(wxT("http://localhost:8080/test.php"), url);	
 }
@@ -381,7 +414,6 @@ TEST_FIXTURE(ApacheTestClass, SetHttpdPathShouldParseDocumentRootWhenRootIsMissi
 	expectedPath.Append(ConfigSubDirectory).Append(wxFileName::GetPathSeparator()).Append(HttpdFile);
 	CHECK_EQUAL(expectedPath, actualHttpdPath);
 	CHECK(Apache.SetHttpdPath(actualHttpdPath));
-	CHECK_EQUAL(TestProjectDir, Apache.GetDocumentRoot());
 	wxString url = Apache.GetUrl(TestProjectDir + wxT("test.php"));
 	CHECK_EQUAL(wxT("http://localhost/test.php"), url);	
 }
@@ -411,10 +443,19 @@ TEST_FIXTURE(ApacheTestClass, SetHttpdPathShouldWorkForWindowsPaths) {
 		expectedPath.Append(ConfigSubDirectory).Append(wxFileName::GetPathSeparator()).Append(HttpdFile);
 		CHECK_EQUAL(expectedPath, actualHttpdPath);
 		CHECK(Apache.SetHttpdPath(actualHttpdPath));
-		CHECK_EQUAL(TestProjectDir, Apache.GetDocumentRoot());
 		wxString url = Apache.GetUrl(TestProjectDir + wxT("test.php"));
 		CHECK_EQUAL(wxT("http://localhost/test.php"), url);	
 	}
+}
+
+TEST_FIXTURE(ApacheTestClass, GetUriShouldWorkWithoutVirtualHosts) {
+	CreateHttpdFile(ConfigSubDirectory);
+	Walk();
+	CHECK_EQUAL(wxT("http://localhost/"), Apache.GetVirtualHostMappings()[TestProjectDir]);
+	CHECK_EQUAL(8080, Apache.GetListenPort());
+	wxString url = Apache.GetUri(TestProjectDir + PhpFile, wxT("/news/index"));
+	wxString expectedUrl = wxT("http://localhost:8080/news/index");
+	CHECK_EQUAL(expectedUrl, url);
 }
 
 }

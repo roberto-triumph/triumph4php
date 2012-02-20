@@ -196,7 +196,7 @@
                                 <event name="OnLeftDClick"></event>
                                 <event name="OnLeftDown"></event>
                                 <event name="OnLeftUp"></event>
-                                <event name="OnListBox"></event>
+                                <event name="OnListBox">OnListItemSelected</event>
                                 <event name="OnListBoxDClick"></event>
                                 <event name="OnMiddleDClick"></event>
                                 <event name="OnMiddleDown"></event>
@@ -210,7 +210,7 @@
                                 <event name="OnRightUp"></event>
                                 <event name="OnSetFocus"></event>
                                 <event name="OnSize"></event>
-                                <event name="OnUpdateUI">OnUpdateUi</event>
+                                <event name="OnUpdateUI"></event>
                             </object>
                         </object>
                         <object class="sizeritem" expanded="1">
@@ -278,7 +278,7 @@
                                         <event name="OnRightUp"></event>
                                         <event name="OnSetFocus"></event>
                                         <event name="OnSize"></event>
-                                        <event name="OnText"></event>
+                                        <event name="OnText">OnText</event>
                                         <event name="OnTextEnter"></event>
                                         <event name="OnTextMaxLen"></event>
                                         <event name="OnTextURL"></event>

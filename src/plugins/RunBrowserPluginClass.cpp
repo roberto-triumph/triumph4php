@@ -62,13 +62,7 @@ static void ExternalBrowser(const wxString& browserName, const wxString& url, mv
  */
 static void MakeAbsoluteUrls(std::vector<mvceditor::UrlResourceClass>& urls, mvceditor::EnvironmentClass* environment) {
 	for (size_t i = 0; i < urls.size(); ++i) {
-		wxString url = environment->Apache.GetUrl(urls[i].FileName.GetFullPath());
-			
-		// we only want the virtual host name, as the url we get from the framework's routing url scheme
-		wxString host = url.Mid(7); // 7 = length of "http://"
-		host = host.Mid(0, host.Find(wxT("/")));
-		host = wxT("http://") + host + wxT("/");
-		urls[i].Url = host + urls[i].Url;
+		urls[i].Url = environment->Apache.GetUri(urls[i].FileName.GetFullPath(), urls[i].Url);
 	}	
 }
 
@@ -113,7 +107,14 @@ void mvceditor::ChooseUrlDialogClass::OnOkButton(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::ChooseUrlDialogClass::OnUpdateUi(wxUpdateUIEvent& event) {
+void mvceditor::ChooseUrlDialogClass::OnListItemSelected(wxCommandEvent& event) {
+	wxString url = UrlList->GetStringSelection() + Extra->GetValue();
+	wxString label= _("Complete URL: ") + url;
+	CompleteLabel->SetLabel(label);
+	event.Skip();
+}
+
+void mvceditor::ChooseUrlDialogClass::OnText(wxCommandEvent& event) {
 	wxString url = UrlList->GetStringSelection() + Extra->GetValue();
 	wxString label= _("Complete URL: ") + url;
 	CompleteLabel->SetLabel(label);

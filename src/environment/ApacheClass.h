@@ -108,12 +108,6 @@ public:
 	 * @return int, may be zero if SetHttpdPath() method returned false
 	 */
 	int GetListenPort() const;
-
-	/**
-	 * Get the parsed document root where apache is serving files.
-	 * @return wxString This is a path; it will always have the trailing separator.
-	 */
-	wxString GetDocumentRoot() const;
 	
 	/**
 	 * Add a virtual host mapping.  Usually, the SetHttpdPath does this automatically.
@@ -146,9 +140,28 @@ public:
 	 * http://www.company.com/folder/index.php
 	 * 
 	 * @param wxString fileSystemPath the file that needs to be accessed via a URL
-	 * @return wxxString the URL based on the httpd.conf file that was set
+	 * @return wxString the URL based on the httpd.conf file that was set
 	 */
 	wxString GetUrl(const wxString& fileSystemPath) const;
+
+	/**
+	 * Resolves the host from the given file system path AND appends the given uriPath
+	 * to the virtual host.  This is different from GetUrl() in that GetUrl() is useful
+	 * for projects that do not use a framework (PHP script files are accessed directly via
+	 * a URL) where as GetUri() is useful for projects that use a framework (PHP script
+	 * files reside a front controller and are accessed via pretty URLs).
+	 * For example: 
+	 * fileSystemPath = /home/user/public_html/codeigniter/application/controller/news.php
+	 * uriPath = /index.php/news/index
+	 *
+	 * Virtual Host localhost.codeigniter has a document root of /home/user/public_html/codeigniter
+	 * The URL returned will be: http://localhost.codeigniter/index.php/news/index
+	 * 
+	 * @param wxString fileSystemPath the file that needs to be accessed via a URL
+	 * @param wxString the uri to append to the host that contains the file located at fileSystemPath
+	 * @return wxString the URL based on the httpd.conf file that was set
+	 */
+	wxString GetUri(const wxString& fileSystemPath, const wxString& uriPath) const;
 	
 private:
 	
@@ -189,12 +202,6 @@ private:
 	 * @var wxString
 	 */
 	 wxString ServerRoot;
-
-	 /**
-	 * The document root directive. This is where the web server files are located.
-	 * @var wxString
-	 */
-	 wxFileName DocumentRoot;
 
 	 /**
 	  * The Listen directive.  This is the port at which apache is listening.

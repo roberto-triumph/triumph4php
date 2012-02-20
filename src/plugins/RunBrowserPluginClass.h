@@ -81,7 +81,9 @@ protected:
 	 * updates the URL label so that the user can see the exact URL to 
 	 * be opened in the browser
 	 */
-	void OnUpdateUi(wxUpdateUIEvent& event);
+	void OnListItemSelected(wxCommandEvent& event);
+
+	void OnText(wxCommandEvent& event);
 };
 	
 class RunBrowserPluginClass : public PluginClass {

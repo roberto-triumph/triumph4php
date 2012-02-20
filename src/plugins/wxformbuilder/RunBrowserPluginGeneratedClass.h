@@ -35,7 +35,8 @@ class ChooseUrlDialogGeneratedClass : public wxDialog
 	private:
 		
 		// Private event handlers
-		void _wxFB_OnUpdateUi( wxUpdateUIEvent& event ){ OnUpdateUi( event ); }
+		void _wxFB_OnListItemSelected( wxCommandEvent& event ){ OnListItemSelected( event ); }
+		void _wxFB_OnText( wxCommandEvent& event ){ OnText( event ); }
 		void _wxFB_OnOkButton( wxCommandEvent& event ){ OnOkButton( event ); }
 		
 	
@@ -49,7 +50,8 @@ class ChooseUrlDialogGeneratedClass : public wxDialog
 		wxButton* ButtonsSizerCancel;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnUpdateUi( wxUpdateUIEvent& event ) { event.Skip(); }
+		virtual void OnListItemSelected( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnText( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
 		
 	

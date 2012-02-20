@@ -64,7 +64,6 @@ mvceditor::ApacheClass::ApacheClass()
 	, VirtualHostMappings()
 	, HttpdPath()
 	, ServerRoot()
-	, DocumentRoot()
 	, Port(0) { 
 }
 
@@ -85,10 +84,9 @@ bool mvceditor::ApacheClass::SetHttpdPath(const wxString& httpdPath) {
 		
 		// get the virtual hosts from the file
 		ServerRoot = wxT("");
-		DocumentRoot.Clear();
 		Port = 0;
 		ParseApacheConfigFile(httpdPath);		
-		return !VirtualHostMappings.empty() || DocumentRoot.IsOk();
+		return !VirtualHostMappings.empty();
 	}
 	return false;
 }
@@ -104,7 +102,7 @@ void mvceditor::ApacheClass::SetVirtualHostMapping(const wxString& fileSystemPat
 	filename.AssignDir(fileSystemPath);
 
 	// when inserting into the map, normalize the host document root
-	VirtualHostMappings[filename.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME)] = hostName;
+	VirtualHostMappings[filename.GetFullPath()] = hostName;
 }
 
 void mvceditor::ApacheClass::RemoveVirtualHostMapping(const wxString& fileSystemPath) {
@@ -120,15 +118,24 @@ void mvceditor::ApacheClass::RemoveVirtualHostMapping(const wxString& fileSystem
 }
 
 wxString mvceditor::ApacheClass::GetUrl(const wxString& fileSystemPath) const {
+
+	// normalize the given path; also convert to lower case so that we make case-insesitive
+	// comparisons (to handle windows paths)
 	wxFileName fileToGet(fileSystemPath);
+	wxString dir = fileToGet.GetFullPath();
+	dir.LowerCase();
 	wxString url;
 	for (std::map<wxString, wxString>::const_iterator it = VirtualHostMappings.begin(); it != VirtualHostMappings.end(); ++it) {
 		wxString hostRoot = it->first;
-		if (0 == fileToGet.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME).Find(hostRoot)) {
+		hostRoot.LowerCase();
+		if (0 == dir.Find(hostRoot)) {
 			
 			// file is inside this virtual host. remove the root and append to host
 			wxString baseUrl = it->second;
-			if (Port > 0 && Port != 80 && !baseUrl.Contains(wxT(":"))) {
+
+			// look for a port (but careful of the protocol http://
+			bool urlHasPort = baseUrl.find_last_of(wxT(":")) > 4;
+			if (Port > 0 && Port != 80 && !urlHasPort) {  
 				
 				// host already has a slash; only append port if virtual host does not have it
 				baseUrl.RemoveLast();
@@ -138,19 +145,41 @@ wxString mvceditor::ApacheClass::GetUrl(const wxString& fileSystemPath) const {
 			break;
 		}
 	}
-	
-	if(url.IsEmpty() && DocumentRoot.IsOk() && 0 == fileToGet.GetPath().Find(DocumentRoot.GetPath())) {
-		
-		// file is inside Document Root. remove the root and append to host
-		wxString baseUrl = wxT("http://localhost/");
-		if (Port > 0 && Port != 80) {
-			baseUrl = wxString::Format(wxT("http://localhost:%d/"), Port);
+	return url;
+}
+
+wxString mvceditor::ApacheClass::GetUri(const wxString& fileSystemPath, const wxString& uriPath) const {
+
+	// normalize the given path; also convert to lower case so that we make case-insesitive
+	// comparisons (to handle windows paths)
+	wxFileName fileToGet(fileSystemPath);
+	wxString dir = fileToGet.GetFullPath();
+	dir.LowerCase();
+	wxString url;
+	for (std::map<wxString, wxString>::const_iterator it = VirtualHostMappings.begin(); it != VirtualHostMappings.end(); ++it) {
+		wxString hostRoot = it->first;
+		hostRoot.LowerCase();
+		if (0 == dir.Find(hostRoot)) {
+			
+			// file is inside this virtual host. remove the root and append to host
+			wxString baseUrl = it->second;
+
+			// look for a port (but careful of the protocol http://
+			bool urlHasPort = baseUrl.find_last_of(wxT(":")) > 4;
+			if (Port > 0 && Port != 80 && !urlHasPort) {  
+				
+				// host already has a slash; only append port if virtual host does not have it
+				baseUrl.RemoveLast();
+				baseUrl += wxString::Format(wxT(":%d/"), Port);
+			}
+			if (!uriPath.IsEmpty() && uriPath[0] == wxT('/')) {
+				url = baseUrl + uriPath.Mid(1);
+			}
+			else {
+				url = baseUrl + uriPath;
+			}
+			break;
 		}
-		
-		url = baseUrl + fileSystemPath.Mid(DocumentRoot.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME).length());
-		
-		// in case fileSystemPath is a Windows path
-		url.Replace(wxT("\\"), wxT("/"));
 	}
 	return url;
 }
@@ -197,6 +226,7 @@ void mvceditor::ApacheClass::ParseApacheConfigFile(const wxString& includedFile)
 					currentServerName = wxT("");
 					currentDocumentRoot = wxT("");
 					currentPort = wxT("");
+					inVirtualHost = true;
 					
 					// handle the virtual host port
 					size_t colonPos = lineLower.find_last_of(wxT(":"));
@@ -214,7 +244,6 @@ void mvceditor::ApacheClass::ParseApacheConfigFile(const wxString& includedFile)
 							}
 						}
 					}
-					inVirtualHost = true;
 				}
 				if (!skipParsing && 0 == lineLower.Find(wxT("</virtualhost>"))) {
 					currentServerName = wxT("");
@@ -243,10 +272,6 @@ void mvceditor::ApacheClass::ParseApacheConfigFile(const wxString& includedFile)
 					currentDocumentRoot = line.Mid(12).Trim(false).Trim(true); //12=length of "DocumentRoot"
 					currentDocumentRoot.Replace(wxT("\""), wxT(""));
 					currentDocumentRoot.Replace(wxT("'"), wxT(""));
-					if (!inVirtualHost) {
-						DocumentRoot.AssignDir(currentDocumentRoot);
-						DocumentRoot.Normalize();
-					}
 				}
 				if (!skipParsing && 0 == lineLower.Find(wxT("listen"))) {
 					currentPort = line.Mid(6).Trim(false).Trim(true); //6=length of "listen"
@@ -263,7 +288,12 @@ void mvceditor::ApacheClass::ParseApacheConfigFile(const wxString& includedFile)
 						Port = portLong;
 					}
 				}
-				if (inVirtualHost && !currentServerName.IsEmpty() && !currentDocumentRoot.IsEmpty()) {
+				if (!currentDocumentRoot.IsEmpty()) {
+					if (currentServerName.IsEmpty()) {
+
+						// this is the case for the server document root (outside a virtual host tag)
+						currentServerName = wxT("localhost");
+					}
 					SetVirtualHostMapping(currentDocumentRoot, currentServerName);
 					currentServerName = wxT("");
 					currentDocumentRoot = wxT("");
@@ -315,10 +345,6 @@ wxString mvceditor::ApacheClass::MakeAbsolute(const wxString& configPath) {
 		fileName.MakeAbsolute(ServerRoot);
 	}
 	return fileName.GetFullPath();
-}
-
-wxString mvceditor::ApacheClass::GetDocumentRoot() const {
-	return DocumentRoot.GetPath(wxPATH_GET_SEPARATOR |  wxPATH_GET_VOLUME);
 }
 
 int mvceditor::ApacheClass::GetListenPort() const {

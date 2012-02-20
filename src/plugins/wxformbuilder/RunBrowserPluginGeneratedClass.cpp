@@ -10,7 +10,8 @@
 ///////////////////////////////////////////////////////////////////////////
 
 BEGIN_EVENT_TABLE( ChooseUrlDialogGeneratedClass, wxDialog )
-	EVT_UPDATE_UI( wxID_ANY, ChooseUrlDialogGeneratedClass::_wxFB_OnUpdateUi )
+	EVT_LISTBOX( wxID_ANY, ChooseUrlDialogGeneratedClass::_wxFB_OnListItemSelected )
+	EVT_TEXT( wxID_ANY, ChooseUrlDialogGeneratedClass::_wxFB_OnText )
 	EVT_BUTTON( wxID_OK, ChooseUrlDialogGeneratedClass::_wxFB_OnOkButton )
 END_EVENT_TABLE()
 
