@@ -99,6 +99,24 @@ public:
 	 */
 	bool WalkGlobal(DirectorySearchClass& directorySearch, const std::vector<wxString>& phpFileFilters);
 
+
+	/**
+	 * Writes the global cache into the given file. Format is this:
+	 *
+	 * TYPE,File name,Class name or Function name,Method / property name 
+	 *
+	 * Where TYPE is either CLASS, METHOD, MEMBER, FUNCTION. Method / property name 
+	 * may be empty for CLASS or FUNCTION types. File name is the full path
+	 *
+	 * Examples:
+	 * CLASS,/home/users/public_html/controllers/my_controller.php,MyController,
+	 * FUNCTION,/home/users/public_html/lib/calc.php,calculate,
+	 * METHOD,/home/users/public_html/controllers/my_controller.php,MyController,index
+	 *
+	 * @return bool TRUE if file was successfully written to.
+	 */
+	bool PersistGlobal(const wxFileName& outputFile);
+
 	/**
 	 * calls EnsureSorted on the GLOBAL resource; this is usually done after all files have been indexed.
 	 * @see mvceditor::ResourceFinderClass::EnsureSorted

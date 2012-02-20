@@ -124,6 +124,14 @@ bool mvceditor::ResourceCacheClass::WalkGlobal(mvceditor::DirectorySearchClass& 
 	return true;
 }
 
+bool mvceditor::ResourceCacheClass::PersistGlobal(const wxFileName& outputFile) {
+	wxMutexLocker locker(Mutex);
+	if (!locker.IsOk()) {
+		return false;
+	}
+	return GlobalResourceFinder.Persist(outputFile);
+}
+
 void mvceditor::ResourceCacheClass::EnsureSortedGlobal() {
 	wxMutexLocker locker(Mutex);
 	if (!locker.IsOk()) {

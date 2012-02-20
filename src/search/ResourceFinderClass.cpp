@@ -1168,6 +1168,54 @@ std::vector<wxString> mvceditor::ResourceFinderClass::GetCachedFiles() const {
 	return files;
 }
 
+bool mvceditor::ResourceFinderClass::Persist(const wxFileName& outputFile) const {
+	if (!outputFile.IsOk()) {
+		return false;
+	}
+
+	// TODO: fn_str() would not compile in MSW
+	// what about unicode file names?
+	UFILE* uf = u_fopen(outputFile.GetFullPath().ToAscii(), "wb", NULL, NULL);
+	if (!uf) {
+		return false;
+	}
+	int32_t written;
+	bool error = false;
+	std::list<mvceditor::ResourceClass>::const_iterator it;
+	for (it = ResourceCache.begin(); it != ResourceCache.end() && !error; ++it) {
+		if (mvceditor::ResourceClass::CLASS == it->Type) {
+			written = u_fprintf(uf, "CLASS,%s,%.*S,\n", 
+				FileCache[it->FileItemIndex].FullPath.ToAscii(), it->Resource.length(), it->Resource.getBuffer());
+			error = 0 == written;
+		}
+		else if (mvceditor::ResourceClass::FUNCTION == it->Type) {
+			written = u_fprintf(uf, "FUNCTION,%s,%.*S,\n", 
+				FileCache[it->FileItemIndex].FullPath.ToAscii(), it->Resource.length(), it->Resource.getBuffer());
+			error = 0 == written;
+		}
+	}
+	for (it = MembersCache.begin(); it != MembersCache.end() && !error; ++it) {
+		UnicodeString className(it->Resource, 0, it->Resource.indexOf(it->Identifier));
+		className.findAndReplace(UNICODE_STRING_SIMPLE("::"), UNICODE_STRING_SIMPLE(""));
+		if (mvceditor::ResourceClass::MEMBER == it->Type) {
+			written = u_fprintf(uf, "MEMBER,%s,%S,%.*S\n", 
+				FileCache[it->FileItemIndex].FullPath.ToAscii(), 
+				className.getTerminatedBuffer(),
+				it->Identifier.length(), it->Identifier.getBuffer());
+			error = 0 == written;
+		}
+		else if (mvceditor::ResourceClass::METHOD == it->Type) {
+			written = u_fprintf(uf, "METHOD,%s,%S,%.*S\n", 
+				FileCache[it->FileItemIndex].FullPath.ToAscii(), 
+				className.getTerminatedBuffer(),
+				it->Identifier.length(), it->Identifier.getBuffer());
+			error = 0 == written;
+		}
+	}
+	u_fclose(uf);
+	return !error;
+}
+
 mvceditor::ResourceClass::ResourceClass()
 	: Resource()
 	, Identifier()

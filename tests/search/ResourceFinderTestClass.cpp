@@ -28,6 +28,7 @@
 #include <FileTestFixtureClass.h>
 #include <wx/filefn.h>
 #include <wx/timer.h>
+#include <wx/tokenzr.h>
 
 class ResourceFinderTestClass : public FileTestFixtureClass {
 public:	
@@ -48,7 +49,7 @@ public:
 };
 
 SUITE(ResourceFinderTestClass) {
-
+#if 0
 TEST_FIXTURE(ResourceFinderTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameMatches) {
 	wxString testFile = wxT("test.php");
 	CreateFixtureFile(testFile, wxString::FromAscii(
@@ -1456,6 +1457,33 @@ TEST_FIXTURE(DynamicResourceTestClass, AddDynamicResourcesShouldNotDuplicateExis
 		CHECK_EQUAL(UNICODE_STRING_SIMPLE("function globalHandle()"), match.Signature);
 		CHECK_EQUAL(mvceditor::ResourceClass::FUNCTION, match.Type);
 	}
+}
+#endif
+TEST_FIXTURE(ResourceFinderTestClass, Persist) {
+	wxString testFile = wxT("test.php");
+	CreateFixtureFile(testFile, wxString::FromAscii(
+		"<?php\n"
+		"class UserClass {\n"
+		"\tprivate $name;"
+		"\tfunction getName() {\n"
+		"\t\treturn $this->name;\n"
+		"\t}\n"
+		"}\n"
+		"function printUser($user) {\n"
+		"}\n"
+		"?>\n"
+	));
+	CHECK(ResourceFinder->Prepare(wxT("UserClass")));
+	ResourceFinder->Walk(TestProjectDir + testFile);
+
+	wxFileName outputFile(TestProjectDir + wxT("index.csv"));
+	CHECK(ResourceFinder->Persist(outputFile));
+	wxString contents = GetFileContents(wxT("index.csv"));
+	wxStringTokenizer tokenizer(contents, wxT("\n"));
+	CHECK_EQUAL(wxT("CLASS,") + TestProjectDir + testFile + wxT(",UserClass,"), tokenizer.GetNextToken());
+	CHECK_EQUAL(wxT("FUNCTION,") + TestProjectDir + testFile + wxT(",printUser,"), tokenizer.GetNextToken());
+	CHECK_EQUAL(wxT("MEMBER,") + TestProjectDir + testFile + wxT(",UserClass,name"), tokenizer.GetNextToken());
+	CHECK_EQUAL(wxT("METHOD,") + TestProjectDir + testFile + wxT(",UserClass,getName"), tokenizer.GetNextToken());
 }
 
 }

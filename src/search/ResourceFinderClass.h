@@ -437,6 +437,23 @@ public:
 	std::vector<wxString> GetCachedFiles() const;
 
 	/**
+	 * Writes the parsed resources into the given file. Format is this:
+	 *
+	 * TYPE,File name,Class name or Function name,Method / property name 
+	 *
+	 * Where TYPE is either CLASS, METHOD, MEMBER, FUNCTION. Method / property name 
+	 * may be empty for CLASS or FUNCTION types. File name is the full path
+	 *
+	 * Examples:
+	 * CLASS,/home/users/public_html/controllers/my_controller.php,MyController,
+	 * FUNCTION,/home/users/public_html/lib/calc.php,calculate,
+	 * METHOD,/home/users/public_html/controllers/my_controller.php,MyController,index
+	 *
+	 * @return bool TRUE if file was successfully written to.
+	 */
+	bool Persist(const wxFileName& outputFile) const;
+
+	/**
 	 * Parses a resource string into its components: class name, file name, method name, line number
 	 * resource string is a string that contain a file name and line number or
 	 * class name or method name. Examples:
