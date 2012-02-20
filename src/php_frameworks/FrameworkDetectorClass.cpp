@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <php_frameworks/FrameworkDetectorClass.h>
+#include <MvcEditorAssets.h>
 #include <windows/StringHelperClass.h>
 #include <MvcEditorErrors.h>
 #include <wx/stdpaths.h>
@@ -60,17 +61,8 @@ bool mvceditor::DetectorActionClass::Init(int id, const EnvironmentClass& enviro
 	Clear();
 
 	wxString action = GetAction();
-
-	// the detection script
+	wxFileName scriptFileName = mvceditor::PhpDetectorsAsset();
 	wxStandardPaths paths;
-	wxFileName pathExecutableFileName(paths.GetExecutablePath());
-	wxString scriptFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
-		wxT("..") + wxFileName::GetPathSeparator() +
-		wxT("src") + wxFileName::GetPathSeparator() +
-		wxT("php_frameworks") + wxFileName::GetPathSeparator() +
-		wxT("MvcEditorFrameworkApp.php");
-	wxFileName scriptFileName(scriptFullPath);
-	scriptFileName.Normalize();
 
 	// the temporary file where the output will go
 	// make it a unique name

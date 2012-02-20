@@ -31,7 +31,7 @@ namespace mvceditor {
 
 /**
  * @return the file location of the PHP native functions file. This file was created using the script
- * resources/parser_php_doc.php and exists inside of the MVC Editor app distribution.
+ * resources/parse_php_doc.php and exists inside of the MVC Editor app distribution.
  */
 wxFileName NativeFunctionsAsset();
 
@@ -42,6 +42,12 @@ wxFileName NativeFunctionsAsset();
  */
 wxFileName AutoCompleteImageAsset(wxString imageName);
 
+
+/**
+ * @return the file location of the PHP detector script.  The editor will use this script
+ * to find out framework-specific stuff (routes, DB connections, etc...)
+ */
+wxFileName PhpDetectorsAsset();
 
 
 }

@@ -58,3 +58,16 @@ wxFileName mvceditor::AutoCompleteImageAsset(wxString imageName) {
 	wxASSERT(fileName.IsOk());
 	return fileName;
 }
+
+wxFileName mvceditor::PhpDetectorsAsset() {
+	wxStandardPaths paths;
+	wxFileName pathExecutableFileName(paths.GetExecutablePath());
+	wxString scriptFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
+		wxT("..") + wxFileName::GetPathSeparator() +
+		wxT("php_detectors") + wxFileName::GetPathSeparator() +
+		wxT("src") + wxFileName::GetPathSeparator() +
+		wxT("MvcEditorFrameworkApp.php");
+	wxFileName scriptFileName(scriptFullPath);
+	scriptFileName.Normalize();
+	return scriptFileName;
+}
