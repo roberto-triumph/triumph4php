@@ -40,7 +40,6 @@
 
 define('FRAMEWORK_CLASS_PREFIX', 'MvcEditorFramework');
 
-echo realpath(__DIR__ . '/../lib/'); echo "\n";
 set_include_path(get_include_path() . PATH_SEPARATOR .  realpath(__DIR__ . '/../lib/'));
 
 require_once 'Zend/Console/Getopt.php';
