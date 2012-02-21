@@ -75,7 +75,7 @@ class MvcEditorCallClass {
 		$this->clear();
 		$ret = false;
 		if (!feof($fileResource)) {
-			$line = fgets($fileResource);
+			$line = trim(fgets($fileResource));
 			if (!empty($line)) {
 			
 				// file format: a CSV file with variable columns. Format is as follows:
