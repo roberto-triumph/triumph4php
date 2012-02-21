@@ -29,6 +29,8 @@ require_once 'MvcEditorResource.php';
 require_once 'MvcEditorDatabaseInfo.php';
 require_once 'MvcEditorCallClass.php';
 require_once 'MvcEditorUrlClass.php';
+require_once __DIR__ . '/../lib/opportunity/array.php';
+require_once __DIR__ . '/../lib/opportunity/string.php';
 
 class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 
@@ -41,6 +43,7 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 	}
 	
 	public function isUsedBy($dir) {
+		$dir = \opstring\ensure_ends_with($dir, '/');
 		$systemDir = $this->locateSystemDir($dir);
 		return strlen($systemDir) > 0;
 	}
@@ -131,7 +134,7 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 
 		// the "super" object
 		$comment = '';
-		$resources[] = MvcEditorResource::MakeMethod('CI_Controller', 'get_instance', '', 'CI_Controller', $comment);
+		$resources[] = MvcEditorResource::CreateMethod('CI_Controller', 'get_instance', '', 'CI_Controller', $comment);
 		
 		return $resources;
 	}
@@ -139,7 +142,41 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 	/**
 	 * @return the array of URLs for the given class name / file name.
 	 */
-	public function makeUrls($dir, $fileName) {
+	public function makeUrls($dir, $resoureCacheFileName) {
+		if (!is_file($resoureCacheFileName)) {
+			return array();
+		}
+		// TODO: handle multiple apps
+		// need this define so that we can include code igniter files directly
+		define('BASEPATH', '');
+		$config = array();
+		$route = array();
+		include($dir . '/application/config/routes.php');
+		include($dir . '/application/config/config.php');
+		$allUrls = array();
+		$resource = new MvcEditorResource();
+		$handle = fopen($resoureCacheFileName, 'r');
+		if ($handle) {
+			while (!feof($handle)) {
+				if ($resource->FromFile($handle) && MvcEditorResource::TYPE_METHOD == $resource->type) {
+				
+					// use realpath because fileName is OS-dependant (slashes)
+					$controllerFile = realpath($controllerFile);
+					
+					// perform minor surgery on the file to get to a URL. Two things to worry about:
+					// 1.) the app may be in a subdirectory of the document root
+					// 2.) the controller may be in a subdirectory of controllers
+					
+					// TODO: any controller arguments ... should get these from the user
+					$extra = '';
+					$allUrls[] = $this->makeUrl($route, $config, $subDirectory, $resource->fileName, $resource->resource, $resource->identifier, $extra);
+				}
+			}
+		}
+		return $allUrls;
+	}
+	
+	private function makerUrlsFromController($dir, $fileName, $config, $route) {
 		
 		// use realpath because fileName is OS-dependant (slashes)
 		$controllerDir = realpath($dir . '/application/controllers');
@@ -150,24 +187,12 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 			return array();
 		}
 		
-		$className = ucfirst(basename($fileName, '.php'));
-		
-		$config = array();
-		$route = array();
-		
-		// TODO: handle multiple apps
-		// need this define so that we can include code igniter files directly
-		define('BASEPATH', '');
-		include($dir . '/application/config/routes.php');
-		include($dir . '/application/config/config.php');
-		
+		$className = ucfirst(basename($fileName, '.php'));		
 		$subDirectory = substr(dirname($fileName), strlen($controllerDir . '/'));
 		$urls = array();
 		foreach ($this->parseMethods($fileName) as $methodName) {
 		
-			// TODO: any controller arguments ... should get these from the user
-			$extra = '';
-			$urls[] = $this->makeUrl($route, $config, $subDirectory, $fileName, $className, $methodName, $extra);
+			
 		}
 		return $urls;
 	}
@@ -234,8 +259,8 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 				$propertyType = 'CI_' . $baseName;
 				$propertyName = strtolower($baseName);
 				
-				$resources[] = MvcEditorResource::MakeProperty('CI_Controller', $propertyName, $propertyType, $comment);
-				$resources[] = MvcEditorResource::MakeProperty('CI_Model', $propertyName, $propertyType, $comment);
+				$resources[] = MvcEditorResource::CreateMember('CI_Controller', $propertyName, $propertyType, $comment);
+				$resources[] = MvcEditorResource::CreateMember('CI_Model', $propertyName, $propertyType, $comment);
 			}
 		}
 		
@@ -244,13 +269,13 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 			$db = array();
 			include ($dir . '/application/config/database.php');
 			$propertyType = isset($active_record) && $active_record ? 'CI_DB_active_record' : 'CI_DB_driver';
-			$resources[] = MvcEditorResource::MakeProperty('CI_Controller', 'db', $propertyType, $comment);
-			$resources[] = MvcEditorResource::MakeProperty('CI_Model', 'db', $propertyType, $comment);
+			$resources[] = MvcEditorResource::CreateMember('CI_Controller', 'db', $propertyType, $comment);
+			$resources[] = MvcEditorResource::CreateMember('CI_Model', 'db', $propertyType, $comment);
 		}
 		
 		// alias the Loader library; seems that there is two properties
-		$resources[] = MvcEditorResource::MakeProperty('CI_Controller', 'load', 'CI_Loader', $comment);
-		$resources[] = MvcEditorResource::MakeProperty('CI_Model', 'load', 'CI_Loader', $comment);
+		$resources[] = MvcEditorResource::CreateMember('CI_Controller', 'load', 'CI_Loader', $comment);
+		$resources[] = MvcEditorResource::CreateMember('CI_Model', 'load', 'CI_Loader', $comment);
 		
 	}
 	
@@ -266,8 +291,8 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 			$propertyType = 'CI_' . $key;
 			$propertyName = strtolower($key);
 			$comment = '';
-			$resources[] = MvcEditorResource::MakeProperty('CI_Controller', $propertyName, $propertyType, $comment);
-			$resources[] = MvcEditorResource::MakeProperty('CI_Model', $propertyName, $propertyType, $comment);
+			$resources[] = MvcEditorResource::CreateMember('CI_Controller', $propertyName, $propertyType, $comment);
+			$resources[] = MvcEditorResource::CreateMember('CI_Model', $propertyName, $propertyType, $comment);
 		}
 		
 		// user-created libraries. need to get the configured prefix
@@ -281,8 +306,8 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 			// the property name will NOT have the prefix
 			$propertyName = strtolower(substr($key, strlen($prefix)));
 			$comment = '';
-			$resources[] = MvcEditorResource::MakeProperty('CI_Controller', $propertyName, $propertyType, $comment);
-			$resources[] = MvcEditorResource::MakeProperty('CI_Model', $propertyName, $propertyType, $comment);
+			$resources[] = MvcEditorResource::CreateMember('CI_Controller', $propertyName, $propertyType, $comment);
+			$resources[] = MvcEditorResource::CreateMember('CI_Model', $propertyName, $propertyType, $comment);
 		}
 	}
 	
@@ -297,7 +322,7 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 			// the property name will NOT have the prefix
 			$propertyName = strtolower($key);
 			$comment = '';
-			$resources[] = MvcEditorResource::MakeProperty('CI_Controller', $propertyName, $propertyType, $comment);
+			$resources[] = MvcEditorResource::CreateMember('CI_Controller', $propertyName, $propertyType, $comment);
 		}
 		
 		// models can be located in sub-directories need to recurse down sub-dirs
@@ -328,10 +353,10 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 	
 		// we will locate the system directory by readind the code igniter bootstrap file
 		// and getting the $systemDir variable
-		if (!is_file($dir . DIRECTORY_SEPARATOR . 'index.php')) {
+		if (!is_file($dir . 'index.php')) {
 			return '';
 		}
-		$tokens = token_get_all(file_get_contents($dir . DIRECTORY_SEPARATOR . 'index.php'));
+		$tokens = token_get_all(file_get_contents($dir . 'index.php'));
 		
 		// look for the system variable; it will contain the location of the system dir
 		$index = 0;
@@ -369,15 +394,21 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 			$index++;
 		}
 		
-		// remove the quotes
+		// remove the quotes and normalize
 		$systemDir = substr($systemDir, 1, -1);
+		$systemDir = \opstring\ensure_ends_with($systemDir, '/');
 		
 		// systemDir may be an absolute path
-		if (is_file($dir . '/' . $systemDir . '/core/CodeIgniter.php')) {
-			return realpath($dir . '/' . $systemDir); 
+		// dont use realpath() because we are using vfsStream for testing
+		if (is_file($dir . $systemDir . 'core/CodeIgniter.php')) {
+			$systemDir = str_replace('/', DIRECTORY_SEPARATOR, $dir . $systemDir); 
+			$systemDir = str_replace('\\', DIRECTORY_SEPARATOR, $dir . $systemDir); 
+			return $systemDir;
 		}
-		else if (is_file($systemDir . '/core/CodeIgniter.php')) {
-			return realpath($systemDir);
+		else if (is_file($systemDir . 'core/CodeIgniter.php')) {
+			$systemDir = str_replace('/', DIRECTORY_SEPARATOR, $systemDir ); 
+			$systemDir = str_replace('\\', DIRECTORY_SEPARATOR, $systemDir); 
+			return $systemDir;
 		}
 		return '';
 	}
