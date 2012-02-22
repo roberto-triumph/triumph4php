@@ -32,7 +32,8 @@ namespace opstring;
 /**
  * Makes sure that haystack always  ends with needle.  If haystack already
  * ends with needle, then haystack is returned. If haystack does not end
- * with needle, then needle is appended to haystack.
+ * with needle, then needle is appended to haystack. Comparison is case
+ * sensitive.
  *
  * @param $haystack the string to search in
  * @param $needle the character to search for
@@ -44,4 +45,51 @@ function ensure_ends_with($haystack, $needle) {
 		$haystack.= $needle;
 	}
 	return $haystack;
+}
+
+/**
+ * Convenience function that checks whether haystack starts with needle. Comparison
+ * is case-sensitive.
+ *
+ * @param $haystack the string to search in
+ * @param $needle the character to search for
+ * @return boolean TRUE if haystack begins with needle Examples:
+ *         haystack: "combo box" needle: "com"
+ *         haystack: "combo box" needle: "combo"
+ */
+function begins_with($haystack, $needle) {
+	return stripos($haystack, $needle) === 0;
+}
+
+/**
+ * Gets the contents of a string that are after an initial string. This is *almost*
+ * like the strstr function, the difference being tht this function will NOT return
+ * the needle. Example:
+ * haystack: hello@gmail.com needle: @  return: gmail.com
+ *
+ * @param $haystack the string to search in
+ * @param $needle the character to search for
+ * @return the part of haystack that is AFTER needle.  If needle is not in haystack,
+ *         then the function returns FALSE
+ */
+function after($haystack, $needle) {
+	$after = strstr($haystack, $needle);
+	if ($after !== FALSE) {
+		$after = substr($after, strlen($needle));
+	}
+	return $after;
+}
+
+/**
+ * Get the contents of a string that are before an trailing string.  This is
+ * like the strstr function.
+ *
+ * @param $haystack the string to search in
+ * @param $needle the character to search for
+ * @return the part of haystack that is BEFORE needle. If needle is not in haystack,
+ *          this function returns FALSE
+ */
+function before($haystack, $needle) {
+	$before = strstr($haystack, $needle, TRUE);
+	return $before;
 }
