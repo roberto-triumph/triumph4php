@@ -97,10 +97,13 @@ abstract class MvcEditorFrameworkBaseClass {
 	 * sub-clases will use the routing rules specific to its framework.
 	 *
 	 * @param $dir the base directory of the project in question; absolute path.
-	 * @param $fileName the file to make the URL
+	 * @param $fileName the resource cache file; used to go through all of the controllers.
+	 *        This will make it relatively inexpensive to go through all of the classes
+	 *        in a project without needing to parse all PHP source files.
+	 * @param $host the protocol & port to prepend to the url (http://localhost, or http://localhost/dir/)
 	 * @return array of MvcEditorUrlClass objects for the given file
 	 */
-	abstract public function makeUrls($dir, $fileName);
+	abstract public function makeUrls($dir, $fileName, $host);
 	
 	/**
 	 * Sub-classes will implement this method to help MVC Editor determine which template files 

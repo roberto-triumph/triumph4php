@@ -54,5 +54,36 @@ class CodeIgniterTest extends PHPUnit_Framework_TestCase {
 		file_put_contents(vfsStream::url('index.php'), "<?php \$system_path = '$absolute'; ");
 		$this->assertEquals(TRUE, $this->detector->isUsedBy(vfsStream::url('')));
 	}
+	
+	function testUrlsSimple() {
+		
+		// test a controller inside of a sub directory
+		$cacheContents = <<<'EOF'
+METHOD,vfs://application/controllers/welcome.php,Welcome,index
+METHOD,vfs://application/controllers/welcome.php,Welcome,about
+METHOD,vfs://application/controllers/admin/admin.php,Admin,index
+EOF;
+		$tmpDir = vfsStream::newDirectory('tmp');
+		vfsStreamWrapper::getRoot()->addChild($tmpDir);
+		$cacheFile = vfsStream::newFile('resources.csv');
+		$cacheFile->withContent($cacheContents);
+		$tmpDir->addChild($cacheFile);
+		$this->fs->config();
+		$this->fs->database();
+		$this->fs->routes();
+		$urls = $this->detector->makeUrls(vfsStream::url(''), vfsStream::url('tmp/resources.csv'), 'http://localhost');
+		$expected = array(
+			new MvcEditorUrlClass('http://localhost/index.php/welcome/index/', 'vfs://application/controllers/welcome.php', 'Welcome', 'index'),
+			new MvcEditorUrlClass('http://localhost/index.php/welcome/about/', 'vfs://application/controllers/welcome.php', 'Welcome', 'about'),
+			new MvcEditorUrlClass('http://localhost/index.php/admin/admin/index/', 'vfs://application/controllers/admin/admin.php', 'Admin', 'index')
+		);
+		$this->assertEquals($expected, $urls);
+		
+		$urls = $this->detector->makeUrls(vfsStream::url(''), vfsStream::url('tmp/resources.csv'), 'http://localhost/codeigniterapp/');
+		$expected = array(
+			new MvcEditorUrlClass('http://localhost/index.php/admin/admin/about/', 'vfs://application/controllers/welcome.php', 'Welcome', 'about')
+		);
+		
+	}
 }
 

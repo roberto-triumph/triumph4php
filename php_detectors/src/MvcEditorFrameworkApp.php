@@ -73,14 +73,14 @@ function loadFrameworks() {
  * any prior inputs that the framework object may do.
  * action is assumed to be valid at this point
  */
-function runAction($framework, $dir, $action, $url, $file, $outputFile) {
+function runAction($framework, $dir, $action, $url, $file, $host, $outputFile) {
 
 	// a little dynamic code goes a long way here; no need for a bunch of IF statments
 	$availableActions = array('runDatabaseInfo', 'runIsUsedBy', 'runConfigFiles', 'runResources', 'runMakeUrls', 'runViewFiles');
 	$done = false;
 	foreach ($availableActions as $availAction) {
 		if (strcasecmp($availAction, 'run' . $action) == 0) {
-			call_user_func_array($availAction, array($framework, $dir, $url, $file, $outputFile));
+			call_user_func_array($availAction, array($framework, $dir, $url, $file, $host, $outputFile));
 			$done = true;
 			break;
 		}
@@ -183,8 +183,8 @@ function runResources(MvcEditorFrameworkBaseClass $framework, $dir, $url, $file,
 	}
 }
 
-function runMakeUrls(MvcEditorFrameworkBaseClass $framework, $dir, $url, $file, $outputFile) {
-	$urls = $framework->makeUrls($dir, $file);
+function runMakeUrls(MvcEditorFrameworkBaseClass $framework, $dir, $host, $resourceCacheFile, $outputFile) {
+	$urls = $framework->makeUrls($dir, $resourceCacheFile, $host);
 	if ($urls) {
 		$writer = new Zend_Config_Writer_Ini();
 		$outputConfig = new Zend_Config(array(), true);
@@ -252,6 +252,7 @@ $rules = array(
 	'action|a=s' => 'The data that is being queried',
 	'url|u=s' => 'URL to query (used only by the viewFiles action)',
 	'file|f=s' => 'File to query (used only by the viewFiles, makeUrls actions)',
+	'host|s=s' => 'Host name (used only by the makeUrls action)',
 	'output|o=s' => 'If given, the output will be written to the given file (by default, output does to STDOUT)',
 	'help|h' => 'A help message'
 );
@@ -261,6 +262,7 @@ $dir = $opts->getOption('dir');
 $action = $opts->getOption('action');
 $url = $opts->getOption('url');
 $file = $opts->getOption('file');
+$host = $opts->getOption('host');
 $outputFile = $opts->getOption('output');
 $help = $opts->getOption('help');
 
@@ -307,7 +309,7 @@ if ($chosenFramework && $dir) {
 
 	// pick the correct method call on the framework
 	if (method_exists($chosenFramework, $action)) {
-		runAction($chosenFramework, $dir, $action, $url, $file, $outputFile);
+		runAction($chosenFramework, $dir, $action, $url, $file, $host, $outputFile);
 	}
 	else {
 		print "Invalid action: '{$action}.' Program will now exit.\n";
@@ -315,7 +317,7 @@ if ($chosenFramework && $dir) {
 	}
 }
 else if ($dir && strcasecmp($action, 'isUsedBy') == 0) {
-	runAction(NULL, $dir, $action, $url, $file, $outputFile);
+	runAction(NULL, $dir, $action, $url, $file, $host, $outputFile);
 }
 else if ($dir) {
 	print "Invalid identifier: '{$identifier}.' Program will now exit.\n";

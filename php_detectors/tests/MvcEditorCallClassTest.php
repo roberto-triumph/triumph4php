@@ -28,8 +28,7 @@ require_once __DIR__ . '/../src/MvcEditorCallClass.php';
 /**
  * Test class for MvcEditorCallClass.
  */
-class MvcEditorCallClassTest extends PHPUnit_Framework_TestCase
-{
+class MvcEditorCallClassTest extends PHPUnit_Framework_TestCase {
     /**
      * @var MvcEditorCallClass
      */

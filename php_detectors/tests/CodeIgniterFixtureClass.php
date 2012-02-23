@@ -28,6 +28,7 @@ require_once 'vfsStream/vfsStreamDirectory.php';
 require_once 'vfsStream/visitor/vfsStreamPrintVisitor.php';
 
 
+
 class CodeIgniterFixtureClass extends PHPUnit_Framework_TestCase {
 
 	/**
@@ -38,9 +39,55 @@ class CodeIgniterFixtureClass extends PHPUnit_Framework_TestCase {
 	function skeleton() {
 		$root = vfsStream::setup('root', 0, array(
 			'index.php' => '<?php $system_path = "lib/system";',
-			'application' => array('controllers' => array(), 'models' => array(), 'views' => array()),
+			'application' => array('controllers' => array(), 'models' => array(), 'views' => array(), 'config' => array()),
 			'lib' => array('system' => array('core' => array('CodeIgniter.php' => ' // .....')))
 		));
 	}
+	
+	function database() {
+		$database = <<<'EOF'
+<?php
+$active_group = 'default';
+$active_record = TRUE;
 
+$db['default']['hostname'] = 'localhost';
+$db['default']['username'] = 'root';
+$db['default']['password'] = '';
+$db['default']['database'] = 'codeigniter';
+$db['default']['dbdriver'] = 'mysql';
+$db['default']['dbprefix'] = '';
+$db['default']['pconnect'] = TRUE;
+$db['default']['db_debug'] = TRUE;
+$db['default']['cache_on'] = FALSE;
+$db['default']['cachedir'] = '';
+$db['default']['char_set'] = 'utf8';
+$db['default']['dbcollat'] = 'utf8_general_ci';
+$db['default']['swap_pre'] = '';
+$db['default']['autoinit'] = TRUE;
+$db['default']['stricton'] = FALSE;
+EOF;
+		file_put_contents(vfsStream::url('application/config/database.php'), $database);
+	}
+	
+	function routes() {
+		$routes = <<<'EOF'
+<?php
+$route['default_controller'] = "welcome";
+$route['404_override'] = '';
+EOF;
+		file_put_contents(vfsStream::url('application/config/routes.php'), $routes);
+		
+		///$tor = new vfsStreamPrintVisitor();
+		///$tor->visitDirectory(vfsStreamWrapper::getRoot());
+	}
+	
+	function config() {
+	$config = <<<'EOF'
+<?php
+$config['base_url']	= '';
+$config['index_page'] = 'index.php';
+$config['url_suffix'] = '';
+EOF;
+		file_put_contents(vfsStream::url('application/config/config.php'), $config);
+	}
 }

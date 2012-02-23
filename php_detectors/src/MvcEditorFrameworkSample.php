@@ -64,7 +64,7 @@ class MvcEditorFrameworkSample extends MvcEditorFrameworkBaseClass {
 	/**
 	 * @return the array of URLs for the given class name / file name.
 	 */
-	public function makeUrls($dir, $fileName) {
+	public function makeUrls($dir, $fileName, $host) {
 			return array();
 	}
 	

@@ -142,59 +142,54 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 	/**
 	 * @return the array of URLs for the given class name / file name.
 	 */
-	public function makeUrls($dir, $resoureCacheFileName) {
+	public function makeUrls($dir, $resoureCacheFileName, $host) {
 		if (!is_file($resoureCacheFileName)) {
 			return array();
 		}
+		$dir = \opstring\ensure_ends_with($dir, '/');
+		
 		// TODO: handle multiple apps
 		// need this define so that we can include code igniter files directly
-		define('BASEPATH', '');
+		if (!defined('BASEPATH')) {
+			define('BASEPATH', '');
+		}
 		$config = array();
 		$route = array();
-		include($dir . '/application/config/routes.php');
-		include($dir . '/application/config/config.php');
+		include($dir . 'application/config/routes.php');
+		include($dir . 'application/config/config.php');
+		
 		$allUrls = array();
 		$resource = new MvcEditorResource();
 		$handle = fopen($resoureCacheFileName, 'r');
 		if ($handle) {
 			while (!feof($handle)) {
 				if ($resource->FromFile($handle) && MvcEditorResource::TYPE_METHOD == $resource->type) {
-				
-					// use realpath because fileName is OS-dependant (slashes)
-					$controllerFile = realpath($controllerFile);
 					
-					// perform minor surgery on the file to get to a URL. Two things to worry about:
-					// 1.) the app may be in a subdirectory of the document root
-					// 2.) the controller may be in a subdirectory of controllers
-					
-					// TODO: any controller arguments ... should get these from the user
-					$extra = '';
-					$allUrls[] = $this->makeUrl($route, $config, $subDirectory, $resource->fileName, $resource->resource, $resource->identifier, $extra);
+					// is this resource from a controller file ? only controllers are accessible via URLs
+					$controllerDir = $dir . 'application/controllers';
+					if (\opstring\begins_with($resource->fileName, $controllerDir)) {
+						$controllerFile = \opstring\after($resource->fileName, $controllerDir);
+						$subDirectory = dirname($controllerFile);
+						if ('\\' == $subDirectory) {
+						
+							// hack to work around special case when there is no subdirectory
+							$subDirectory = '';
+						}
+						
+						// perform minor surgery on the file to get to a URL. Two things to worry about:
+						// 1.) the app may be in a subdirectory of the document root
+						// 2.) the controller may be in a subdirectory of controllers
+						
+						// TODO: any controller arguments ... should get these from the user
+						$extra = '';
+						$appUrl = $this->makeUrl($route, $config, $subDirectory, $resource->fileName, $resource->ClassName(), $resource->identifier, $extra);
+						$appUrl->url = $host . '/' . $appUrl->url;
+						$allUrls[] = $appUrl;
+					}
 				}
 			}
 		}
 		return $allUrls;
-	}
-	
-	private function makerUrlsFromController($dir, $fileName, $config, $route) {
-		
-		// use realpath because fileName is OS-dependant (slashes)
-		$controllerDir = realpath($dir . '/application/controllers');
-		if (!file_exists($fileName) && stripos($fileName, $controllerDir) !== 0) {
-		
-			// file MUST be a controller; in the controller directory and it must exist
-			// URLs only make sense for conrollers
-			return array();
-		}
-		
-		$className = ucfirst(basename($fileName, '.php'));		
-		$subDirectory = substr(dirname($fileName), strlen($controllerDir . '/'));
-		$urls = array();
-		foreach ($this->parseMethods($fileName) as $methodName) {
-		
-			
-		}
-		return $urls;
 	}
 	
 	/**
@@ -264,7 +259,7 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 			}
 		}
 		
-		// the DB library, this reqiures checking to see if active record is enabled
+		// the DB library, this requires checking to see if active record is enabled
 		if (is_file($dir . '/application/config/database.php')) {
 			$db = array();
 			include ($dir . '/application/config/database.php');
@@ -419,7 +414,6 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 		// with the following changes:
 		// 1. including routes directly instead of using CI object
 		//    as I was having problems including the bootstap file here
-		
 		$uri = '';
 		if ($subDirectory) {
 			$uri .= $subDirectory . '/';
@@ -466,7 +460,8 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 		// url already has leading slash
 		// make sure url never has leading slash
 		$indexPage = $config['index_page'];
-		$url = trim($indexPage, '/') . '/' . trim($uri . '/');
+		$indexPage = \opstring\ensure_ends_with($indexPage, '/');
+		$url = $indexPage . trim($uri . '/');
 		$url = ltrim($url, '/');
 		
 		if (isset($config['url_suffix']) && $config['url_suffix']) {

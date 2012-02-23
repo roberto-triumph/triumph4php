@@ -23,6 +23,7 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
+require_once __DIR__ . '/../lib/opportunity/string.php';
 
 /**
  * This is a resource artifact.  The MVC Editor will use a list of resources to aid
@@ -174,7 +175,7 @@ class MvcEditorResource {
 		$this->type = self::TYPE_FUNCTION;
 	}
 	
-	public function clear() {
+	public function Clear() {
 		$this->resource = '';
 		$this->identifier = '';
 		$this->returnType = '';
@@ -191,7 +192,7 @@ class MvcEditorResource {
 	 * file is not a resource cache file or the file did not contain proper data.
 	 */
 	public function FromFile($fileResource) {
-		$this->clear();
+		$this->Clear();
 		$ret = false;
 		if (!feof($fileResource)) {
 			$line = trim(fgets($fileResource));
@@ -233,4 +234,12 @@ class MvcEditorResource {
 		}
 		return $ret;
  	}
+	
+	public function ClassName() {
+		$clazz = '';
+		if (self::TYPE_MEMBER == $this->type || self::TYPE_METHOD == $this->type) {
+			$clazz = \opstring\before($this->resource, '::' . $this->identifier);
+		}
+		return $clazz;
+	}
 }
