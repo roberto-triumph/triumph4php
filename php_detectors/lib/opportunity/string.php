@@ -93,3 +93,12 @@ function before($haystack, $needle) {
 	$before = strstr($haystack, $needle, TRUE);
 	return $before;
 }
+
+/**
+ * Replaces all the instances of needle in haystack with
+ * replace.
+ * @return string the modified string
+ */
+function replace($haystack, $needle, $replace) {
+	return str_replace($needle, $replace, $haystack); 
+}

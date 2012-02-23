@@ -61,4 +61,8 @@ class StringTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('', \opstring\before('hello@gmail.com', 'hello'));
 		$this->assertEquals(FALSE, \opstring\before('hello@gmail.com', 'csu.edu'));
 	}
+	
+	function testReplaceShouldChangeAll() {
+		$this->assertEquals('these ese a string', \opstring\replace('this is a string', 'is', 'ese'));
+	}
 }
