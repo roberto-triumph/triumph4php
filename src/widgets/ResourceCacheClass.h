@@ -277,6 +277,13 @@ public:
 	 */
 	wxThreadError StartBackgroundUpdate(const wxString& fileName, const UnicodeString& code, bool isNew);
 
+	/**
+	 * Will run a background thread to persist the global cache to a file.
+	 * 
+	 * @param outputFile the file to write the global cache to.
+	 */
+	wxThreadError StartPersist(const wxFileName& outputFile);
+
 protected:
 	
 	/**
@@ -287,10 +294,24 @@ protected:
 private:
 
 	/**
+	 * the type of work that will happen in the background thread
+	 */
+	enum Modes {
+		UPDATE,
+		PERSIST
+	} Mode;
+
+	/**
 	 * This is the object that will hold all of the resource cache. It should not be accessed while
 	 * the thread is running. Pointer will NOT be owned by this object.
 	 */
 	ResourceCacheClass* ResourceCache;
+
+	/**
+	 * If the thread is to persist the cache, then this variable contains the file to write the
+	 * cache to.
+	 */
+	wxFileName OutputFile;
 
 	/**
 	 * the code that is being worked on by the background thread.

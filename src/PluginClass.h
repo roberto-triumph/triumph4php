@@ -239,6 +239,12 @@ public:
 	 * @param shortcuts the list of shortcuts to add to
 	 */
 	virtual void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
+
+	/**
+	 * Subclasses can override this method to perform logic whenever a project's resource cache has been udpated. note
+	 * that the cache may be updated when the user clicks the 'index' button or by some other, automatic action.
+	 */
+	virtual void OnProjectIndexed();
 	
 	/**
 	 * Set the plugin's reference to the given project. The caller will take care of memory management (this class should NOT
@@ -372,7 +378,7 @@ protected:
 	 /**
 	  * Send an event to the application.  See above for possible events.
 	  */
-	void AppEvent(wxCommandEvent event);
+	void AppEvent(wxEvent& event);
 
 	/**
 	 * This is a helper method that will add each of the given menu items as a 
@@ -452,7 +458,9 @@ extern const wxEventType EVENT_PLUGIN_FILE_SAVED;
  * or file contents if so desired.
  * Using a new event class as opposed to a wxCommandEvent because
  * wxCommandEvents propagate by default; but we do not want
- * these events to propagate.
+ * these events to propagate. This is because plugins are hooked into
+ * the main frame's event table; and if the event were to propagate
+ * then it would result in an infine loop.
  */
 class FileSavedEventClass : public wxEvent {
 
@@ -486,5 +494,35 @@ typedef void (wxEvtHandler::*FileSavedEventClassFunction)(FileSavedEventClass&);
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( FileSavedEventClassFunction, & fn ), (wxObject *) NULL ),
 
+extern const wxEventType EVENT_PLUGIN_PROJECT_INDEXED;
+
+
+/**
+ * This is an event that will tell a plugin that the current project
+ * has been indexed; the event handler can get the project name
+ * or resource cache from its [PluginClass] member properties if so desired.
+ * Using a new event class as opposed to a wxCommandEvent because
+ * wxCommandEvents propagate by default; but we do not want
+ * these events to propagate. This is because plugins are hooked into
+ * the main frame's event table; and if the event were to propagate
+ * then it would result in an infine loop.
+ */
+class ProjectIndexedEventClass : public wxEvent {
+
+public:
+
+	ProjectIndexedEventClass();
+	
+	wxEvent* Clone() const;
+};
+
+typedef void (wxEvtHandler::*ProjectIndexedEventClassFunction)(ProjectIndexedEventClass&);
+
+#define EVT_PLUGIN_PROJECT_INDEXED(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_PLUGIN_PROJECT_INDEXED, wxID_ANY, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( ProjectIndexedEventClassFunction, & fn ), (wxObject *) NULL ),
+
 }
+
 #endif

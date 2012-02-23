@@ -176,6 +176,11 @@ private:
 	void OnFrameworkDetectionFailed(wxCommandEvent& event);
 
 	/**
+	 * propagate this event to all plugins
+	 */
+	void OnProjectIndexed(ProjectIndexedEventClass& event);
+
+	/**
 	 * Additional functionality
 	 */
 	std::vector<PluginClass*> Plugins;

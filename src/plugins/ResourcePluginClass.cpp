@@ -248,6 +248,10 @@ void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
 		std::vector<mvceditor::ResourceClass> matches = resourceCache->Matches();
 		ShowJumpToResults(JumpToText, matches);
 	}
+	else if (INDEXING_PROJECT == previousState) {
+		mvceditor::ProjectIndexedEventClass indexedEvent;
+		AppEvent(indexedEvent);
+	}
 }
 
 void mvceditor::ResourcePluginClass::ShowJumpToResults(const wxString& finderQuery, const std::vector<mvceditor::ResourceClass>& matches) {

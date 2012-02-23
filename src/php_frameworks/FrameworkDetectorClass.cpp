@@ -330,10 +330,10 @@ bool mvceditor::UrlDetectorActionClass::Response() {
 	
 	while (ret && hasNext) {
 		mvceditor::UrlResourceClass newUrl;
-		newUrl.Url = result.Read(groupName + wxT("/Url"));
+		result.Read(groupName + wxT("/Url"), &newUrl.Url);
 		newUrl.FileName.Assign(result.Read(groupName + wxT("/FileName")));
-		newUrl.ClassName = result.Read(groupName + wxT("/ClassName"));
-		newUrl.MethodName = result.Read(groupName + wxT("/MethodName"));
+		result.Read(groupName + wxT("/ClassName"), &newUrl.ClassName);
+		result.Read(groupName + wxT("/MethodName"), &newUrl.MethodName);
 		if (newUrl.Url.IsEmpty() || !newUrl.FileName.IsOk()) {
 			Error = BAD_CONTENT;
 			ret = false;
@@ -420,14 +420,15 @@ bool mvceditor::PhpFrameworkDetectorClass::Init(const wxString& dir) {
 	return FrameworkDetector.Init(ID_DETECT_FRAMEWORK, Environment, dir, wxT(""), moreParams);
 }
 
-bool mvceditor::PhpFrameworkDetectorClass::InitUrlDetector(const wxString& dir, const wxString& fileName) {
+bool mvceditor::PhpFrameworkDetectorClass::InitUrlDetector(const wxString& dir, const wxString& resourceCacheFileName, const wxString& baseUrl) {
 	UrlsDetected.clear();
 	FrameworkIdentifiersLeftToDetect.clear();
 	ProjectRootPath = dir;
 	for (size_t i = 0; i < Identifiers.size(); ++i) {
 		std::vector<wxString> next;
 		next.push_back(Identifiers[i]);
-		next.push_back(fileName);
+		next.push_back(resourceCacheFileName);
+		next.push_back(baseUrl);
 		FrameworkIdentifiersLeftToDetect.push_back(next);
 	}
 	if (!FrameworkIdentifiersLeftToDetect.empty()) {
@@ -488,8 +489,10 @@ void mvceditor::PhpFrameworkDetectorClass::NextUrlDetection() {
 		
 		wxString framework = next[0];
 		wxString fileName = next[1];
+		wxString baseUrl = next[2];
 		std::map<wxString, wxString> moreParams;
 		moreParams[wxT("file")] = fileName;
+		moreParams[wxT("host")] = baseUrl;
 		UrlDetector.Init(ID_DETECT_URL, Environment, ProjectRootPath, framework, moreParams);
 	}
 	else {

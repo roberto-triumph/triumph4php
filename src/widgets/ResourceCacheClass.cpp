@@ -303,9 +303,11 @@ bool mvceditor::ResourceCacheClass::IsEmpty() {
 
 mvceditor::ResourceCacheUpdateThreadClass::ResourceCacheUpdateThreadClass(mvceditor::ResourceCacheClass* resourceCache, wxEvtHandler& handler, int eventId)
 	: ThreadWithHeartbeatClass(handler, eventId)
+	, Mode(UPDATE)
 	, ResourceCache(resourceCache)
+	, OutputFile()
 	, CurrentCode() 
-	, CurrentFileName() {
+	, CurrentFileName(){
 }
 
 wxThreadError mvceditor::ResourceCacheUpdateThreadClass::StartBackgroundUpdate(const wxString& fileName, const UnicodeString& code, bool isNew) {
@@ -317,6 +319,22 @@ wxThreadError mvceditor::ResourceCacheUpdateThreadClass::StartBackgroundUpdate(c
 		CurrentCode = code;
 		CurrentFileName = fileName;
 		CurrentFileIsNew = isNew;
+		OutputFile.Clear();
+		Mode = UPDATE;
+		GetThread()->Run();
+		SignalStart();		
+	}
+	return error;
+}
+
+wxThreadError mvceditor::ResourceCacheUpdateThreadClass::StartPersist(const wxFileName& outputFile) {
+	if (!ResourceCache) {
+		return wxTHREAD_NO_ERROR;
+	}
+	wxThreadError error = CreateSingleInstance();
+	if (wxTHREAD_NO_ERROR == error) {
+		OutputFile = outputFile;
+		Mode = PERSIST;
 		GetThread()->Run();
 		SignalStart();		
 	}
@@ -324,11 +342,17 @@ wxThreadError mvceditor::ResourceCacheUpdateThreadClass::StartBackgroundUpdate(c
 }
 
 void* mvceditor::ResourceCacheUpdateThreadClass::Entry() {
-	ResourceCache->Update(CurrentFileName, CurrentCode, CurrentFileIsNew);
+	if (UPDATE == Mode) {
+		ResourceCache->Update(CurrentFileName, CurrentCode, CurrentFileIsNew);
+	}
+	else if (PERSIST == Mode) {
+		ResourceCache->PersistGlobal(OutputFile);
+	}
 	
 	// cleanup.
 	CurrentFileName.resize(0);
 	CurrentCode.truncate(0);
+	OutputFile.Clear();
 	SignalEnd();
 	return 0;
 }

@@ -167,18 +167,19 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 					
 					// is this resource from a controller file ? only controllers are accessible via URLs
 					$controllerDir = $dir . 'application/controllers';
-					if (\opstring\begins_with($resource->fileName, $controllerDir)) {
-						$controllerFile = \opstring\after($resource->fileName, $controllerDir);
+					
+					// normalize any paths to have forward slash
+					// doing this so that this logic works on MSW, linux, AND the vfs:// stream (tests)
+					$controllerDir = \opstring\replace($controllerDir, DIRECTORY_SEPARATOR, '/');
+					$resourceFileName = \opstring\replace($resource->fileName, DIRECTORY_SEPARATOR, '/');
+					if (\opstring\begins_with($resourceFileName, $controllerDir)) {
+						$controllerFile = \opstring\after($resourceFileName, $controllerDir);
 						$subDirectory = dirname($controllerFile);
 						if ('\\' == $subDirectory) {
 						
 							// hack to work around special case when there is no subdirectory
 							$subDirectory = '';
 						}
-						
-						// perform minor surgery on the file to get to a URL. Two things to worry about:
-						// 1.) the app may be in a subdirectory of the document root
-						// 2.) the controller may be in a subdirectory of controllers
 						
 						// TODO: any controller arguments ... should get these from the user
 						$extra = '';
@@ -469,38 +470,5 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 		}
 		$mvcUrl = new MvcEditorUrlClass($url, $fileName, $className, $methodName);
 		return $mvcUrl;
-	}
-	
-	private function parseMethods($fileName) {
-	
-		// since I cannot yet find a way to load the CodeIgniter bootstrap; I will just use the PHP
-		// tokenizer to get all of the controller methods.
-		// ATTN: this won't get any inherited controller methods; making them not show up
-		// in the URLs 
-		$methods = array();
-		if (!is_file($fileName)) {
-			return $methods;
-		}
-		$tokens = token_get_all(file_get_contents($fileName));
-		while ($token = next($tokens)) {
-			if ($token[0] == T_FUNCTION) {
-				
-				// php tokenizer gives us white space, we want to skip all whitespace after the "function" keyword
-				while ($token = next($tokens)) {
-					if ($token[0] != T_WHITESPACE) {
-						break;
-					}
-				}
-				if ($token) {
-					$methodName = $token[1];
-					
-					// codeigniter never serves up methods that begin with '_'
-					if (substr($methodName, 0, 1) != '_') {
-						$methods[] = $methodName;
-					}
-				}
-			}
-		}
-		return $methods;
 	}
 }

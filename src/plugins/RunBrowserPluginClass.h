@@ -29,8 +29,10 @@
 #include <plugins/wxformbuilder/RunBrowserPluginGeneratedClass.h>
 #include <php_frameworks/FrameworkDetectorClass.h>
 #include <environment/UrlResourceClass.h>
+#include <widgets/ResourceCacheClass.h>
 #include <wx/string.h>
 #include <vector>
+#include <memory>
 
 namespace mvceditor {
 	
@@ -92,8 +94,6 @@ public:
 
 	RunBrowserPluginClass();
 	
-	~RunBrowserPluginClass();
-	
 	void AddToolsMenuItems(wxMenu* toolsMenu);
 	
 	void AddToolBarItems(wxAuiToolBar* toolBar);
@@ -134,6 +134,17 @@ private:
 	 * (PHP binary not found)
 	 */
 	void OnUrlDetectionFailed(wxCommandEvent& event);
+
+	/**
+	 * When a project is indexed, lets call the url detector and get the
+	 * urls for a project.
+	 */
+	void OnProjectIndexed();
+
+	/**
+	 * this will be called once the cache file has been persisted
+	*/
+	void OnWorkComplete(wxCommandEvent& event);
 	
 	/**
 	 * A local instance of the detector so that we can resolve
@@ -142,8 +153,19 @@ private:
 	 * for the url detection (event handler is given in the PhpFrameworkDetector
 	 * class constructor)
 	 */
-	PhpFrameworkDetectorClass* PhpFrameworks;
+	std::auto_ptr<PhpFrameworkDetectorClass> PhpFrameworks;
 	
+	/**
+	 * Will use a background thread to persist the global cache. The global cache file is
+	 * then used by the PHP URL detector.
+	 */
+	std::auto_ptr<ResourceCacheUpdateThreadClass> ResourceCacheThread;
+
+	/**
+	 * a temporary file for the resource cache to be written to
+	 */
+	wxFileName ResourceCacheFileName;
+
 	wxMenuItem* RunInBrowser;
 	
 	wxAuiToolBar* BrowserToolbar;

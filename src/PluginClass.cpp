@@ -102,6 +102,10 @@ void mvceditor::PluginClass::AddKeyboardShortcuts(std::vector<mvceditor::Dynamic
 
 }
 
+void mvceditor::PluginClass::OnProjectIndexed() {
+
+}
+
 bool mvceditor::PluginClass::AddToolsWindow(wxWindow* window, wxString name) {
 	if (ToolsNotebook->AddPage(window, name)) {
 		int index = ToolsNotebook->GetPageIndex(window);
@@ -194,9 +198,9 @@ mvceditor::CodeControlClass* mvceditor::PluginClass::CreateCodeControl(const wxS
 	return ctrl;
 }
 
-void mvceditor::PluginClass::AppEvent(wxCommandEvent event) {
+void mvceditor::PluginClass::AppEvent(wxEvent& event) {
 	if (App) {
-		wxPostEvent(App, event);	
+		wxPostEvent(App, event);
 	}
 }
 
@@ -225,3 +229,13 @@ wxEvent* mvceditor::FileSavedEventClass::Clone() const {
 }
 
 const wxEventType mvceditor::EVENT_PLUGIN_FILE_SAVED = wxNewEventType();
+
+mvceditor::ProjectIndexedEventClass::ProjectIndexedEventClass() 
+	: wxEvent(wxID_ANY, mvceditor::EVENT_PLUGIN_PROJECT_INDEXED) {
+}
+
+wxEvent* mvceditor::ProjectIndexedEventClass::Clone() const {
+	return new mvceditor::ProjectIndexedEventClass();
+}
+
+const wxEventType mvceditor::EVENT_PLUGIN_PROJECT_INDEXED = wxNewEventType();

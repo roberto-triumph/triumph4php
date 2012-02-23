@@ -398,16 +398,23 @@ public:
 	
 	/**
 	 * kicks off the URL detector; URL detector is used to ask the PHP framework to
-	 * resolve URLs from file names.  At the end of all detections, a EVENT_FRAMEWORK_URL_COMPLETE will be generated.
-	 * Usually if fileName is a controller file, then the result of this would be a list of
-	 * URLs, one for each action in a controller (this will vary by PHP framework).
+	 * resolve all project URLs.  At the end of all detections, a EVENT_FRAMEWORK_URL_COMPLETE will be generated.
+	 * The fileName is the persisted cache file (from ResourceCacheClass)controller file; the php URL detector
+	 * will read the cache file to inspect the class names (it wont need to parse the source code).
+	 
+	 * The result of this would be a list of URLs, one for each action in a controller (this will vary by PHP framework).
 	 * 
 	 * @param dir the project's root directory
-	 * @param fileName the full path to the file that needs to be resolved to a URL.
+	 * @param fileName the full path to the resource cache file. 
+	 * @param baseUrl the base URL of the project (usually calculated by the ApacheClass). This will be the 
+	 *        virtual host + the directory within the virtual host where the current project starts.  For example,
+	 *        if the virtual host document root is /home/user/public, the project root directory is 
+	 *        /home/user/public/secret_project, then the baseUrl should be 
+	          http://localhost/secret_project
 	 * @return bool TRUE if detection started successfully. If false, then it is likely that the PHP executable path
-	 * is not correct or that no PHp frameworks were detected.
+	 * is not correct or that no PHP frameworks were detected.
 	 */
-	bool InitUrlDetector(const wxString& dir, const wxString& fileName);
+	bool InitUrlDetector(const wxString& dir, const wxString& resourceCacheFileName, const wxString& baseUrl);
 	
 	/**
 	 * kicks off the View files detector, the View files detector is used to ask the PHP framework to

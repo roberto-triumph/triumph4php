@@ -1197,14 +1197,16 @@ bool mvceditor::ResourceFinderClass::Persist(const wxFileName& outputFile) const
 	for (it = MembersCache.begin(); it != MembersCache.end() && !error; ++it) {
 		UnicodeString className(it->Resource, 0, it->Resource.indexOf(it->Identifier));
 		className.findAndReplace(UNICODE_STRING_SIMPLE("::"), UNICODE_STRING_SIMPLE(""));
-		if (mvceditor::ResourceClass::MEMBER == it->Type) {
+
+		// watch out for dynamic resources
+		if (mvceditor::ResourceClass::MEMBER == it->Type && it->FileItemIndex >= 0) {
 			written = u_fprintf(uf, "MEMBER,%s,%S,%.*S\n", 
 				FileCache[it->FileItemIndex].FullPath.ToAscii(), 
 				className.getTerminatedBuffer(),
 				it->Identifier.length(), it->Identifier.getBuffer());
 			error = 0 == written;
 		}
-		else if (mvceditor::ResourceClass::METHOD == it->Type) {
+		else if (mvceditor::ResourceClass::METHOD == it->Type && it->FileItemIndex >= 0) {
 			written = u_fprintf(uf, "METHOD,%s,%S,%.*S\n", 
 				FileCache[it->FileItemIndex].FullPath.ToAscii(), 
 				className.getTerminatedBuffer(),

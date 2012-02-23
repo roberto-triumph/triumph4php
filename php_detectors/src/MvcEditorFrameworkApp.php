@@ -91,7 +91,7 @@ function runAction($framework, $dir, $action, $url, $file, $host, $outputFile) {
 	}
 }
 
-function runDatabaseInfo($framework, $dir, $url, $file, $outputFile) {
+function runDatabaseInfo($framework, $dir, $url, $file, $host, $outputFile) {
 	$infoList = $framework->databaseInfo($dir);
 	if ($infoList) {
 		$writer = new Zend_Config_Writer_Ini();
@@ -113,7 +113,7 @@ function runDatabaseInfo($framework, $dir, $url, $file, $outputFile) {
 	}
 }
 
-function runIsUsedBy($framework, $dir, $url, $file, $outputFile) {
+function runIsUsedBy($framework, $dir, $url, $file, $host, $outputFile) {
 	$frameworks = loadFrameworks();
 	$identifiers = array();
 	foreach ($frameworks as $framework) {
@@ -133,7 +133,7 @@ function runIsUsedBy($framework, $dir, $url, $file, $outputFile) {
 	iniPrint($writer, $outputFile);
 }
 
-function runConfigFiles($framework, $dir, $url, $file, $outputFile) {
+function runConfigFiles($framework, $dir, $url, $file, $host, $outputFile) {
 	$configFiles = $framework->configFiles($dir);
 	if ($configFiles) {
 		$writer = new Zend_Config_Writer_Ini();
@@ -157,7 +157,7 @@ function runConfigFiles($framework, $dir, $url, $file, $outputFile) {
  * @param MvcEditorFrameworkBaseClass $framework the framework specific code
  * @param string $dir the directory where the project source code is located
  */
-function runResources(MvcEditorFrameworkBaseClass $framework, $dir, $url, $file, $outputFile) {
+function runResources(MvcEditorFrameworkBaseClass $framework, $dir, $url, $file, $host, $outputFile) {
 	$resources = $framework->resources($dir);
 	if ($resources) {
 		$writer = new Zend_Config_Writer_Ini();
@@ -182,8 +182,8 @@ function runResources(MvcEditorFrameworkBaseClass $framework, $dir, $url, $file,
 		iniPrint($writer, $outputFile);
 	}
 }
-
-function runMakeUrls(MvcEditorFrameworkBaseClass $framework, $dir, $host, $resourceCacheFile, $outputFile) {
+                                                 
+function runMakeUrls(MvcEditorFrameworkBaseClass $framework, $dir, $url, $resourceCacheFile, $host, $outputFile) {
 	$urls = $framework->makeUrls($dir, $resourceCacheFile, $host);
 	if ($urls) {
 		$writer = new Zend_Config_Writer_Ini();
@@ -207,7 +207,7 @@ function runMakeUrls(MvcEditorFrameworkBaseClass $framework, $dir, $host, $resou
 	}
 }
 
-function runViewFiles(MvcEditorFrameworkBaseClass $framework, $dir, $url, $file, $outputFile) {
+function runViewFiles(MvcEditorFrameworkBaseClass $framework, $dir, $url, $file, $host, $outputFile) {
 	$viewFiles = $framework->viewFiles($dir, $url, $file);
 	if ($viewFiles) {
 		$writer = new Zend_Config_Writer_Ini();

@@ -56,16 +56,6 @@ static void ExternalBrowser(const wxString& browserName, const wxString& url, mv
 	}
 }
 
-/**
- * Will modify each UrlResourceClass in the given list; it will make each URL absolute by prepending the
- * correct host.
- */
-static void MakeAbsoluteUrls(std::vector<mvceditor::UrlResourceClass>& urls, mvceditor::EnvironmentClass* environment) {
-	for (size_t i = 0; i < urls.size(); ++i) {
-		urls[i].Url = environment->Apache.GetUri(urls[i].FileName.GetFullPath(), urls[i].Url);
-	}	
-}
-
 
 mvceditor::UrlChoiceClass::UrlChoiceClass(const std::vector<mvceditor::UrlResourceClass>& urls, const wxString& fileName, mvceditor::EnvironmentClass* environment)
 	: UrlList(urls)
@@ -124,15 +114,11 @@ void mvceditor::ChooseUrlDialogClass::OnText(wxCommandEvent& event) {
 mvceditor::RunBrowserPluginClass::RunBrowserPluginClass()
 	: PluginClass() 
 	, PhpFrameworks(NULL)
+	, ResourceCacheThread(NULL)
+	, ResourceCacheFileName()
 	, RunInBrowser(NULL)
 	, BrowserToolbar(NULL) {
 		
-}
-
-mvceditor::RunBrowserPluginClass::~RunBrowserPluginClass() {
-	if (PhpFrameworks) {
-		delete PhpFrameworks;
-	}
 }
 
 void mvceditor::RunBrowserPluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
@@ -246,7 +232,7 @@ void mvceditor::RunBrowserPluginClass::OnUrlToolDropDown(wxAuiToolBarEvent& even
 		wxMenu menuPopup;
 		wxBitmap bmp = wxArtProvider::GetBitmap(wxART_QUESTION, wxART_OTHER, wxSize(16,16));
 		std::vector<mvceditor::UrlResourceClass> urls = App->UrlResourceFinder.Urls;
-		for (size_t i = 0; i < urls.size(); ++i) {
+		for (size_t i = 0; i < urls.size() && i < 40; ++i) {
 			wxMenuItem* menuItem =  new wxMenuItem(&menuPopup, mvceditor::MENU_RUN_BROWSER_URLS + i, urls[i].Url);
 			menuItem->SetBitmap(bmp);
 			menuPopup.Append(menuItem);
@@ -267,22 +253,7 @@ void mvceditor::RunBrowserPluginClass::OnUrlToolDropDown(wxAuiToolBarEvent& even
 }
 
 void mvceditor::RunBrowserPluginClass::OnUrlSearchTool(wxCommandEvent& event) {
-	wxString currentFile;
-	if (GetCurrentCodeControl()) {
-		currentFile = GetCurrentCodeControl()->GetFileName();
-	}
-	if (!PhpFrameworks) {
-		PhpFrameworks = new PhpFrameworkDetectorClass(*this, *GetEnvironment());
-		PhpFrameworks->Identifiers = PhPFrameworks().Identifiers;
-		PhpFrameworks->InitUrlDetector(GetProject()->GetRootPath(), currentFile);
-	}
-	else {
-		PhpFrameworks->InitUrlDetector(GetProject()->GetRootPath(), currentFile);
-	}
-}
-
-void mvceditor::RunBrowserPluginClass::OnUrlDetectionComplete(mvceditor::UrlDetectedEventClass& event) {
-	wxString fileName;
+wxString fileName;
 	if (GetCurrentCodeControl()) {
 		fileName = GetCurrentCodeControl()->GetFileName();
 	}
@@ -301,9 +272,8 @@ void mvceditor::RunBrowserPluginClass::OnUrlDetectionComplete(mvceditor::UrlDete
 			return;
 		}
 	}
-	if (!event.Urls.empty()) {
-		MakeAbsoluteUrls(event.Urls, environment);
-		mvceditor::UrlChoiceClass urlChoice(event.Urls, fileName, environment);
+	if (!App->UrlResourceFinder.Urls.empty()) {
+		mvceditor::UrlChoiceClass urlChoice(App->UrlResourceFinder.Urls, fileName, environment);
 		mvceditor::ChooseUrlDialogClass dialog(GetMainWindow(), urlChoice);
 		if (wxOK == dialog.ShowModal()) {
 			chosenUrl = urlChoice.ChosenUrl();
@@ -339,8 +309,16 @@ void mvceditor::RunBrowserPluginClass::OnUrlDetectionComplete(mvceditor::UrlDete
 	}
 }
 
+void mvceditor::RunBrowserPluginClass::OnUrlDetectionComplete(mvceditor::UrlDetectedEventClass& event) {
+	for (size_t i = 0; i < event.Urls.size(); ++i) {
+		App->UrlResourceFinder.Urls.push_back(event.Urls[i]);
+	}
+	wxRemoveFile(ResourceCacheFileName.GetFullPath());
+}
+
 void mvceditor::RunBrowserPluginClass::OnUrlDetectionFailed(wxCommandEvent& event) {
 	mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, event.GetString());
+	wxRemoveFile(ResourceCacheFileName.GetFullPath());
 }
 
 void mvceditor::RunBrowserPluginClass::OnBrowserToolMenuItem(wxCommandEvent& event) {
@@ -380,6 +358,28 @@ void mvceditor::RunBrowserPluginClass::OnUrlToolMenuItem(wxCommandEvent& event) 
 	}
 }
 
+void mvceditor::RunBrowserPluginClass::OnProjectIndexed() {
+	if (!ResourceCacheThread.get()) {
+		ResourceCacheThread.reset(new mvceditor::ResourceCacheUpdateThreadClass(GetResourceCache(), *this));
+	}
+	ResourceCacheFileName.Assign(wxFileName::CreateTempFileName(wxT("resource_cache")));
+	ResourceCacheThread->StartPersist(ResourceCacheFileName);
+}
+
+void mvceditor::RunBrowserPluginClass::OnWorkComplete(wxCommandEvent& event) {
+	mvceditor::EnvironmentClass* environment = GetEnvironment();
+	mvceditor::ProjectClass* project = GetProject();
+	wxString projectRootUrl =  environment->Apache.GetUrl(project->GetRootPath());
+	if (!PhpFrameworks.get()) {
+		PhpFrameworks.reset(new PhpFrameworkDetectorClass(*this, *GetEnvironment()));
+		PhpFrameworks->Identifiers = PhPFrameworks().Identifiers;
+		PhpFrameworks->InitUrlDetector(GetProject()->GetRootPath(), ResourceCacheFileName.GetFullPath(), projectRootUrl);
+	}
+	else {
+		PhpFrameworks->InitUrlDetector(GetProject()->GetRootPath(), ResourceCacheFileName.GetFullPath(), projectRootUrl);
+	}
+}
+
 BEGIN_EVENT_TABLE(mvceditor::RunBrowserPluginClass, wxEvtHandler) 
 	EVT_MENU(mvceditor::MENU_RUN_BROWSER + 0, mvceditor::RunBrowserPluginClass::OnRunInWebBrowser)
 	
@@ -392,4 +392,5 @@ BEGIN_EVENT_TABLE(mvceditor::RunBrowserPluginClass, wxEvtHandler)
 	EVT_TOOL(ID_URL_SEARCH_AUI_TOOLBAR, mvceditor::RunBrowserPluginClass::OnUrlSearchTool)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_URL_FAILED, mvceditor::RunBrowserPluginClass::OnUrlDetectionFailed)
 	EVT_FRAMEWORK_URL_COMPLETE(mvceditor::RunBrowserPluginClass::OnUrlDetectionComplete)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::RunBrowserPluginClass::OnWorkComplete)
 END_EVENT_TABLE()

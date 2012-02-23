@@ -212,7 +212,6 @@ void mvceditor::AppClass::CreatePlugins() {
 
 void mvceditor::AppClass::PluginWindows() {
 	for (size_t i = 0; i < Plugins.size(); ++i) {
-		///Plugins[i]->SetProject(Project);
 		AppFrame->LoadPlugin(Plugins[i]);
 
 		// propagate GUI events to plugins, so that they can handle menu events themselves
@@ -283,8 +282,7 @@ void mvceditor::AppClass::OnProjectOpen(wxCommandEvent& event) {
 void mvceditor::AppClass::OnFrameworkDetectionComplete(wxCommandEvent& event) {
 	for (size_t i = 0; i < PhpFrameworks.Databases.size(); ++i) {
 		Project->PushDatabaseInfo(PhpFrameworks.Databases[i]);
-	}
-	
+	}	
 	AppFrame->OnProjectOpened(Project, this);
 	ProjectPlugin->SetProject(Project);
 	for (size_t i = 0; i < Plugins.size(); ++i) {
@@ -314,7 +312,7 @@ void mvceditor::AppClass::OnFrameworkDetectionFailed(wxCommandEvent& event) {
 
 void mvceditor::AppClass::OnFrameworkDetectionInProgress(wxCommandEvent& event) {
 	mvceditor::StatusBarWithGaugeClass* gauge = wxDynamicCast(AppFrame->GetStatusBar(), mvceditor::StatusBarWithGaugeClass);
-	gauge->IncrementGauge(mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
+	gauge->IncrementGauge(ID_FRAMEWORK_DETECTION_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
 }
 
 void mvceditor::AppClass::OnProjectReIndex(wxCommandEvent& event) {
@@ -333,6 +331,18 @@ void mvceditor::AppClass::OnOpenFile(wxCommandEvent& event) {
 	AppFrame->FileOpen(filenames);
 }
 
+void mvceditor::AppClass::OnProjectIndexed(mvceditor::ProjectIndexedEventClass& event) {
+	
+
+	// ATTN: tried to use wxPostEvent to avoid defining another virtual method
+	// but wxWidgets was having none of that ... infinite event loops were
+	// ocurring
+	mvceditor::ProjectIndexedEventClass newEvt;
+	for (size_t i = 0; i < Plugins.size(); i++) {
+		Plugins[i]->OnProjectIndexed();
+	}
+}
+
 const wxEventType mvceditor::EVENT_APP_OPEN_PROJECT = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_SAVE_PREFERENCES = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_RE_INDEX = wxNewEventType();
@@ -347,4 +357,5 @@ BEGIN_EVENT_TABLE(mvceditor::AppClass, wxApp)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_DETECTION_COMPLETE, mvceditor::AppClass::OnFrameworkDetectionComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_DETECTION_FAILED, mvceditor::AppClass::OnFrameworkDetectionFailed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::AppClass::OnFrameworkDetectionInProgress)
+	EVT_PLUGIN_PROJECT_INDEXED(mvceditor::AppClass::OnProjectIndexed)
 END_EVENT_TABLE()
