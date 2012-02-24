@@ -182,10 +182,14 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 						}
 						
 						// TODO: any controller arguments ... should get these from the user
-						$extra = '';
-						$appUrl = $this->makeUrl($route, $config, $subDirectory, $resource->fileName, $resource->ClassName(), $resource->identifier, $extra);
-						$appUrl->url = $host . '/' . $appUrl->url;
-						$allUrls[] = $appUrl;
+						// constructors are not web-accessible
+						// code igniter makes methods that start with underscore
+						if (\opstring\compare_case('__construct', $resource->identifier) && !\opstring\begins_with($resource->identifier, '_')) {
+							$extra = '';
+							$appUrl = $this->makeUrl($route, $config, $subDirectory, $resource->fileName, $resource->ClassName(), $resource->identifier, $extra);
+							$appUrl->url = $host . '/' . $appUrl->url;
+							$allUrls[] = $appUrl;
+						}
 					}
 				}
 			}
@@ -457,13 +461,19 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 			}
 		}
 		
+		if (0 == \opstring\compare('default_controller', $uri)) {
+			$uri = '';
+		}
+		
 		// respect the url suffix and index page from the config. for urls, make sure there is only one ending '/'
 		// url already has leading slash
 		// make sure url never has leading slash
 		$indexPage = $config['index_page'];
 		$indexPage = \opstring\ensure_ends_with($indexPage, '/');
-		$url = $indexPage . trim($uri . '/');
-		$url = ltrim($url, '/');
+		if (!empty($uri)) {
+			$url = $indexPage . trim($uri . '/');
+			$url = ltrim($url, '/');
+		}
 		
 		if (isset($config['url_suffix']) && $config['url_suffix']) {
 			$url .= $config['url_suffix'];
