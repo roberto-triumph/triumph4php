@@ -27,6 +27,7 @@
 
 #include <search/ResourceFinderClass.h>
 #include <widgets/ProcessWithHeartbeatClass.h>
+#include <widgets/ThreadWithHeartbeatClass.h>
 #include <environment/DatabaseInfoClass.h>
 #include <environment/EnvironmentClass.h>
 #include <environment/UrlResourceClass.h>
@@ -35,6 +36,33 @@
 #include <map>
 
 namespace mvceditor {
+
+// forward declaration; class is defined in this file further down below.
+class DetectorActionClass;
+
+/**
+ * A small class to parse the PHP detector responses in a background thread.
+ * This is done in case the response is big; we don't want to lock up
+ * the main thread.
+ */
+class ResponseThreadWithHeartbeatClass : public ThreadWithHeartbeatClass {
+
+public:
+
+	ResponseThreadWithHeartbeatClass(DetectorActionClass& action);
+	
+	bool Init(wxFileName outputFile);
+
+protected:
+
+	void* Entry();
+
+private:
+
+	DetectorActionClass& Action;
+
+	wxFileName OutputFile;
+};
 
 /**
  * A DetectorAction is a base class that will "communicate" with the PHP detection
@@ -125,6 +153,8 @@ protected:
 	 * This method will be called when the detector process ends.  The sub classes will
 	 * read in the contents of OutputFile and will deserialize the output into
 	 * data structures. Sub classes can set the Error property as well.
+	 * This method will get run in a background thread, make sure that any synchronization
+	 * is done accordingly. 
 	 */
 	virtual bool Response() = 0;
 
@@ -135,6 +165,8 @@ private:
 	void OnProcessFailed(wxCommandEvent& event);
 	
 	void OnWorkInProgress(wxCommandEvent& event);
+
+	void OnWorkComplete(wxCommandEvent& event);
 
 public:
 
@@ -148,6 +180,11 @@ protected:
 	 * Used to start the detector process
 	 */
 	ProcessWithHeartbeatClass Process;
+
+	/**
+	 * Used to parse the detector response in a background thread.
+	 */
+	ResponseThreadWithHeartbeatClass ResponseThread;
 
 	/**
 	 * This handler will get notified after process has ended and response
@@ -164,7 +201,11 @@ private:
 
 	long CurrentPid;
 
+	int CurrentId;
+
 	DECLARE_EVENT_TABLE()
+
+	friend class ResponseThreadWithHeartbeatClass;
 
 };
 	

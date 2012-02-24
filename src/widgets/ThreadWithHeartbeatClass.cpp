@@ -35,11 +35,7 @@ mvceditor::ThreadWithHeartbeatClass::ThreadWithHeartbeatClass(wxEvtHandler& hand
 }
 
 mvceditor::ThreadWithHeartbeatClass::~ThreadWithHeartbeatClass() {
-	wxThread* thread = GetThread();
-	if (thread && thread->IsRunning()) {
-		thread->Delete();
-	}
-	Timer.Stop();
+	KillInstance();
 }
 
 wxThreadError mvceditor::ThreadWithHeartbeatClass::CreateSingleInstance() {
@@ -54,6 +50,14 @@ wxThreadError mvceditor::ThreadWithHeartbeatClass::CreateSingleInstance() {
 		error = Create();
 	}
 	return error;
+}
+
+void mvceditor::ThreadWithHeartbeatClass::KillInstance() {
+	wxThread* thread = GetThread();
+	if (thread && thread->IsRunning()) {
+		thread->Delete();
+	}
+	Timer.Stop();
 }
 
 void mvceditor::ThreadWithHeartbeatClass::SignalStart() {

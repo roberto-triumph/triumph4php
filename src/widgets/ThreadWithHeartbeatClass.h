@@ -68,8 +68,16 @@ public:
 	 * CreateSingleInstance() will first check for the existence of a running thread
 	 * and will not Create (nor kill) a thread that is currently running. Create()
 	 * will kill any running threads.
+	 * This method DOES NOT start thread execution. Caller must call GetThread()->Run()
 	 */
 	wxThreadError CreateSingleInstance();
+
+	/**
+	 * If there is a background thread running, stop it. This is NOT graceful stoppage
+	 * it is a forceful action.  You should only use this as a last resort;  it
+	 * is better that subclasses implement a stop flag and gracefully exit the Entry() method.
+	 */
+	void KillInstance();
 	
 	/**
 	 * Will prepare to send events at regular intervals. After a call to this method, a 
@@ -80,6 +88,7 @@ public:
 	
 	/**
 	 * Will generate a EVENT_WORK_COMPLETE event and stop the EVENT_WORK_IN_PROGRESS events.
+	 * Does not actually stop the thread.
 	 */
 	void SignalEnd();
 	

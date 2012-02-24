@@ -38,20 +38,47 @@ static const int ID_DETECT_RESOURCES = wxNewId();
 static const int ID_DETECT_URL = wxNewId();
 static const int ID_DETECT_VIEW_FILES = wxNewId();
 
+mvceditor::ResponseThreadWithHeartbeatClass::ResponseThreadWithHeartbeatClass(mvceditor::DetectorActionClass& action) 
+	: ThreadWithHeartbeatClass(action) 
+	, Action(action) 
+	, OutputFile() {
+}
+
+bool mvceditor::ResponseThreadWithHeartbeatClass::Init(wxFileName outputFile) {
+	OutputFile = outputFile;
+	if (wxTHREAD_NO_ERROR == CreateSingleInstance()) {
+		GetThread()->Run();
+		SignalStart();
+		return true;
+	}
+	return false;
+}
+
+void* mvceditor::ResponseThreadWithHeartbeatClass::Entry() {
+	if (OutputFile.FileExists()) {
+		Action.Response();
+	}
+	SignalEnd();
+	return 0;
+}
+
 mvceditor::DetectorActionClass::DetectorActionClass(wxEvtHandler& handler) 
 	: wxEvtHandler()
 	, Error(NONE)
 	, ErrorMessage()
 	, Process(*this)
+	, ResponseThread(*this)
 	, Handler(handler)
 	, OutputFile()
-	, CurrentPid(0) {
+	, CurrentPid(0)
+	, CurrentId(0) {
 }
 
 mvceditor::DetectorActionClass::~DetectorActionClass() {
 	if (CurrentPid > 0) {
 		Process.Stop(CurrentPid);
 	}
+	ResponseThread.KillInstance();
 }
 
 bool mvceditor::DetectorActionClass::Init(int id, const EnvironmentClass& environment, const wxString& projectRootPath, const wxString& identifier, 
@@ -59,7 +86,9 @@ bool mvceditor::DetectorActionClass::Init(int id, const EnvironmentClass& enviro
 	Error = NONE;
 	ErrorMessage = wxT("");
 	Clear();
+	ResponseThread.KillInstance();
 
+	CurrentId = id;
 	wxString action = GetAction();
 	wxFileName scriptFileName = mvceditor::PhpDetectorsAsset();
 	wxStandardPaths paths;
@@ -92,12 +121,12 @@ void mvceditor::DetectorActionClass::InitFromFile(wxString fileName) {
 }
 
 void mvceditor::DetectorActionClass::OnProcessComplete(wxCommandEvent& event) {
-	if (OutputFile.FileExists()) {
-		Response();
-	}
 	CurrentPid = 0;
-	wxPostEvent(&Handler, event);
-	wxRemoveFile(OutputFile.GetFullPath());
+
+	// kick off response parsing in a background thread.
+	// any running thread was stopped in Init()
+	bool init = ResponseThread.Init(OutputFile);
+	wxASSERT(init);
 }
 
 void mvceditor::DetectorActionClass::OnProcessFailed(wxCommandEvent& event) {
@@ -109,6 +138,15 @@ void mvceditor::DetectorActionClass::OnProcessFailed(wxCommandEvent& event) {
 
 void mvceditor::DetectorActionClass::OnWorkInProgress(wxCommandEvent& event) {
 	wxPostEvent(&Handler, event);
+}
+
+void mvceditor::DetectorActionClass::OnWorkComplete(wxCommandEvent& event) {
+
+	// users expect an EVENT_PROCESS_COMPLETE event
+	wxCommandEvent completeEvent(mvceditor::EVENT_PROCESS_COMPLETE);
+	completeEvent.SetId(CurrentId);
+	wxPostEvent(&Handler, completeEvent);
+	wxRemoveFile(OutputFile.GetFullPath());
 }
 
 mvceditor::FrameworkDetectorActionClass::FrameworkDetectorActionClass(wxEvtHandler& handler)
@@ -327,11 +365,13 @@ bool mvceditor::UrlDetectorActionClass::Response() {
 	long index = 0;
 	wxString groupName;
 	bool hasNext = result.GetFirstGroup(groupName, index);
-	
+	wxString fileName;
 	while (ret && hasNext) {
+		result.Read(groupName + wxT("/FileName"), &fileName);
+
 		mvceditor::UrlResourceClass newUrl;
 		result.Read(groupName + wxT("/Url"), &newUrl.Url);
-		newUrl.FileName.Assign(result.Read(groupName + wxT("/FileName")));
+		newUrl.FileName.Assign(fileName);
 		result.Read(groupName + wxT("/ClassName"), &newUrl.ClassName);
 		result.Read(groupName + wxT("/MethodName"), &newUrl.MethodName);
 		if (newUrl.Url.IsEmpty() || !newUrl.FileName.IsOk()) {
@@ -647,6 +687,8 @@ BEGIN_EVENT_TABLE(mvceditor::DetectorActionClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::DetectorActionClass::OnProcessComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_FAILED, mvceditor::DetectorActionClass::OnProcessFailed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::DetectorActionClass::OnWorkInProgress)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::DetectorActionClass::OnWorkComplete)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::DetectorActionClass::OnWorkInProgress)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::PhpFrameworkDetectorClass, wxEvtHandler)
