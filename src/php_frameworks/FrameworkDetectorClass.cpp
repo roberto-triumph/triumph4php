@@ -48,7 +48,6 @@ bool mvceditor::ResponseThreadWithHeartbeatClass::Init(wxFileName outputFile) {
 	OutputFile = outputFile;
 	if (wxTHREAD_NO_ERROR == CreateSingleInstance()) {
 		GetThread()->Run();
-		Entry();
 		SignalStart();
 		return true;
 	}
@@ -138,7 +137,11 @@ void mvceditor::DetectorActionClass::OnProcessFailed(wxCommandEvent& event) {
 }
 
 void mvceditor::DetectorActionClass::OnWorkInProgress(wxCommandEvent& event) {
-	wxPostEvent(&Handler, event);
+	
+	// users expect an EVENT_PROCESS_IN_PROGRESS event but this handler
+	// handles both EVENT_PROCESS_IN_PROGRESS AND EVENT_WORK_IN_PROGRESS
+	wxCommandEvent inProgressEvent(mvceditor::EVENT_PROCESS_IN_PROGRESS);
+	wxPostEvent(&Handler, inProgressEvent);
 }
 
 void mvceditor::DetectorActionClass::OnWorkComplete(wxCommandEvent& event) {

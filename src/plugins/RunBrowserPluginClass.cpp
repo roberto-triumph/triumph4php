@@ -34,6 +34,7 @@ static const int ID_TOOLBAR_BROWSER = wxNewId();
 static const int ID_BROWSER_AUI_TOOLBAR = wxNewId();
 static const int ID_URL_AUI_TOOLBAR = wxNewId();
 static const int ID_URL_SEARCH_AUI_TOOLBAR = wxNewId();
+static const int ID_URL_GAUGE = wxNewId();
 
 static void ExternalBrowser(const wxString& browserName, const wxString& url, mvceditor::EnvironmentClass* environment) {
 	wxFileName webBrowserPath  = environment->WebBrowsers[browserName];
@@ -314,6 +315,7 @@ void mvceditor::RunBrowserPluginClass::OnUrlDetectionComplete(mvceditor::UrlDete
 		App->UrlResourceFinder.Urls.push_back(event.Urls[i]);
 	}
 	wxRemoveFile(ResourceCacheFileName.GetFullPath());
+	GetStatusBarWithGauge()->StopGauge(ID_URL_GAUGE);
 }
 
 void mvceditor::RunBrowserPluginClass::OnUrlDetectionFailed(wxCommandEvent& event) {
@@ -364,6 +366,7 @@ void mvceditor::RunBrowserPluginClass::OnProjectIndexed() {
 	}
 	ResourceCacheFileName.Assign(wxFileName::CreateTempFileName(wxT("resource_cache")));
 	ResourceCacheThread->StartPersist(ResourceCacheFileName);
+	GetStatusBarWithGauge()->AddGauge(_("URL Detection"), ID_URL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
 }
 
 void mvceditor::RunBrowserPluginClass::OnWorkComplete(wxCommandEvent& event) {
@@ -380,6 +383,10 @@ void mvceditor::RunBrowserPluginClass::OnWorkComplete(wxCommandEvent& event) {
 	}
 }
 
+void mvceditor::RunBrowserPluginClass::OnProcessInProgress(wxCommandEvent& event) {
+	GetStatusBarWithGauge()->UpdateGauge(ID_URL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
+}
+
 BEGIN_EVENT_TABLE(mvceditor::RunBrowserPluginClass, wxEvtHandler) 
 	EVT_MENU(mvceditor::MENU_RUN_BROWSER + 0, mvceditor::RunBrowserPluginClass::OnRunInWebBrowser)
 	
@@ -393,4 +400,6 @@ BEGIN_EVENT_TABLE(mvceditor::RunBrowserPluginClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_URL_FAILED, mvceditor::RunBrowserPluginClass::OnUrlDetectionFailed)
 	EVT_FRAMEWORK_URL_COMPLETE(mvceditor::RunBrowserPluginClass::OnUrlDetectionComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::RunBrowserPluginClass::OnWorkComplete)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::RunBrowserPluginClass::OnProcessInProgress)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::RunBrowserPluginClass::OnProcessInProgress)
 END_EVENT_TABLE()

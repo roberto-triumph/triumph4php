@@ -145,6 +145,11 @@ private:
 	 * this will be called once the cache file has been persisted
 	*/
 	void OnWorkComplete(wxCommandEvent& event);
+
+	/**
+	 * to show progress to the user
+	 */
+	void OnProcessInProgress(wxCommandEvent& event);
 	
 	/**
 	 * A local instance of the detector so that we can resolve
