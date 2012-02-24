@@ -65,4 +65,25 @@ class StringTest extends PHPUnit_Framework_TestCase {
 	function testReplaceShouldChangeAll() {
 		$this->assertEquals('these ese a string', \opstring\replace('this is a string', 'is', 'ese'));
 	}
+	
+	function testLength() {
+		$this->assertEquals(5, \opstring\length('this '));
+	}
+	
+	function testCompare() {
+		$this->assertEquals(-1, \opstring\compare('that', 'this'));
+		$this->assertEquals(0, \opstring\compare('this', 'this'));
+		$this->assertEquals(1, \opstring\compare('this', 'that'));
+		$this->assertEquals(1, \opstring\compare('this', 'thIS'));
+	}
+	
+	function testCompareCase() {
+		$this->assertEquals(-1, \opstring\compare_case('that', 'this'));
+		$this->assertEquals(-1, \opstring\compare_case('that', 'thIS'));
+		$this->assertEquals(0, \opstring\compare_case('this', 'this'));
+		$this->assertEquals(0, \opstring\compare_case('this', 'thIS'));
+		$this->assertEquals(1, \opstring\compare_case('this', 'that'));
+		$this->assertEquals(1, \opstring\compare_case('this', 'thAT'));
+		
+	}
 }

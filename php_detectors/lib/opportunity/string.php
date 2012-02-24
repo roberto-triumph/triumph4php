@@ -102,3 +102,50 @@ function before($haystack, $needle) {
 function replace($haystack, $needle, $replace) {
 	return str_replace($needle, $replace, $haystack); 
 }
+
+/**
+ * Returns the length of string.
+ * @return int
+ */
+function length($str) {
+	return strlen($str);
+}
+
+/**
+ * lexical comparison of two strings in a case-sensitive manner. 
+ * @param $str1 string to compare
+ * @param $str2 string to compare
+ * @return int -1 if $str1 is less than $str2
+ *              1 if $str1 is greater than $str2
+ *              0 if two strings are the same (case sensitive)
+ */
+function compare($str1, $str2) {
+	$ret = strcmp($str1, $str2);
+	if ($ret < 0) {
+		return -1;
+	}
+	else if ($ret > 0) {
+		return 1;
+	}
+	return 0;
+}
+
+
+/**
+ * lexical comparison of two strings in a case-INsensitive manner. 
+ * @param $str1 string to compare
+ * @param $str2 string to compare
+ * @return int -1 if $str1 is less than $str2
+ *              1 if $str1 is greater than $str2
+ *              0 if two strings are the same (case INsensitive)
+ */
+function compare_case($str1, $str2) {
+	$ret = strcasecmp($str1, $str2);
+	if ($ret < 0) {
+		return -1;
+	}
+	else if ($ret > 0) {
+		return 1;
+	}
+	return 0;
+}
