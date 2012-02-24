@@ -47,23 +47,19 @@ mvceditor::ResponseThreadWithHeartbeatClass::ResponseThreadWithHeartbeatClass(mv
 bool mvceditor::ResponseThreadWithHeartbeatClass::Init(wxFileName outputFile) {
 	OutputFile = outputFile;
 	if (wxTHREAD_NO_ERROR == CreateSingleInstance()) {
-		//GetThread()->Run();
+		GetThread()->Run();
 		Entry();
 		SignalStart();
 		return true;
 	}
 	return false;
 }
-#include <wx/wx.h>
 
 void* mvceditor::ResponseThreadWithHeartbeatClass::Entry() {
-	wxLongLong time = wxGetLocalTimeMillis();
 	if (OutputFile.FileExists()) {
 		Action.Response();
 	}
 	SignalEnd();
-	time = wxGetLocalTimeMillis() - time;
-	wxLogWarning(wxString::Format(wxT("time to parse=%ld ms"), time.ToLong()));
 	return 0;
 }
 
@@ -377,12 +373,12 @@ bool mvceditor::UrlDetectorActionClass::Response() {
 		if (tok.HasMoreTokens()) {
 			newUrl.Url = tok.NextToken();
 			if (tok.HasMoreTokens()) {
-				//newUrl.FileName.Assign(tok.NextToken());
+				newUrl.FileName.Assign(tok.NextToken());
 				if (tok.HasMoreTokens()) {
 					newUrl.ClassName = tok.NextToken();
 					if (tok.HasMoreTokens()) {
 						newUrl.MethodName = tok.NextToken();
-						if (newUrl.Url.IsEmpty() /*|| !newUrl.FileName.IsOk()*/) {
+						if (newUrl.Url.IsEmpty() || !newUrl.FileName.IsOk()) {
 							Error = BAD_CONTENT;
 							ret = false;
 							break;
@@ -395,33 +391,6 @@ bool mvceditor::UrlDetectorActionClass::Response() {
 			}
 		}
 	}
-	/*
-	wxFileInputStream stream(OutputFile.GetFullPath());
-	wxTextInputStream textStream(stream);
-	wxFileConfig result(textStream);
-	
-	long index = 0;
-	wxString groupName;
-	bool hasNext = result.GetFirstGroup(groupName, index);
-	wxString fileName;
-	while (ret && hasNext) {
-		result.Read(groupName + wxT("/FileName"), &fileName);
-
-		mvceditor::UrlResourceClass newUrl;
-		result.Read(groupName + wxT("/Url"), &newUrl.Url);
-		newUrl.FileName.Assign(fileName);
-		result.Read(groupName + wxT("/ClassName"), &newUrl.ClassName);
-		result.Read(groupName + wxT("/MethodName"), &newUrl.MethodName);
-		if (newUrl.Url.IsEmpty() || !newUrl.FileName.IsOk()) {
-			Error = BAD_CONTENT;
-			ret = false;
-			break;
-		}
-		else {
-			Urls.push_back(newUrl);
-		}
-		hasNext = result.GetNextGroup(groupName, index);
-	}*/
 	return ret;
 }
 
