@@ -186,24 +186,28 @@ function runResources(MvcEditorFrameworkBaseClass $framework, $dir, $url, $file,
 function runMakeUrls(MvcEditorFrameworkBaseClass $framework, $dir, $url, $resourceCacheFile, $host, $outputFile) {
 	$urls = $framework->makeUrls($dir, $resourceCacheFile, $host);
 	if ($urls) {
-		$writer = new Zend_Config_Writer_Ini();
-		$outputConfig = new Zend_Config(array(), true);
-		$writer->setConfig($outputConfig);
-		$keyIndex = 0;
-		foreach ($urls as $url) {
-
-			// write an INI entry for each config file. make sure to replace any possible
-			// characters that may conflict with INI parsing.
-			$key = iniEscapeKey('Url_' . $keyIndex);
-			$outputConfig->{$key} = array(
-			'Url' => iniEscapeValue($url->url),
-			'FileName' => iniEscapeValue($url->fileName),
-			'ClassName' => iniEscapeValue($url->className),
-			'MethodName' => iniEscapeValue($url->methodName)
-		);
-			$keyIndex++;
+		
+		// decided against using INI for this particular action; since there could be many URLS
+		// the MvcEditor INI parsing is not so great; a measly 2000+ entries takes 5 seconds to parse
+		// in INI form.
+		// decided against using INI for this particular action; since there could be many URLS
+		// the MvcEditor INI parsing is not so great; a measly 2000+ entries takes 5 seconds to parse
+		// in INI form.
+		$outputFile = strlen($outputFile) > 0 ? $outputFile : "php:://stdout";
+		$fp = fopen($outputFile, "wb");
+		if ($fp) {
+			foreach ($urls as $url) {
+				fwrite($fp, $url->url);
+				fwrite($fp, ",");
+				fwrite($fp, $url->fileName);
+				fwrite($fp, ",");
+				fwrite($fp, $url->className);
+				fwrite($fp, ",");
+				fwrite($fp, $url->methodName);
+				fwrite($fp, "\n");
+			}
+			fclose($fp);
 		}
-		iniPrint($writer, $outputFile);
 	}
 }
 

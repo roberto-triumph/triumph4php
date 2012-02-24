@@ -47,18 +47,23 @@ mvceditor::ResponseThreadWithHeartbeatClass::ResponseThreadWithHeartbeatClass(mv
 bool mvceditor::ResponseThreadWithHeartbeatClass::Init(wxFileName outputFile) {
 	OutputFile = outputFile;
 	if (wxTHREAD_NO_ERROR == CreateSingleInstance()) {
-		GetThread()->Run();
+		//GetThread()->Run();
+		Entry();
 		SignalStart();
 		return true;
 	}
 	return false;
 }
+#include <wx/wx.h>
 
 void* mvceditor::ResponseThreadWithHeartbeatClass::Entry() {
+	wxLongLong time = wxGetLocalTimeMillis();
 	if (OutputFile.FileExists()) {
 		Action.Response();
 	}
 	SignalEnd();
+	time = wxGetLocalTimeMillis() - time;
+	wxLogWarning(wxString::Format(wxT("time to parse=%ld ms"), time.ToLong()));
 	return 0;
 }
 
@@ -359,8 +364,41 @@ wxString mvceditor::UrlDetectorActionClass::GetAction() {
 
 bool mvceditor::UrlDetectorActionClass::Response() {
 	bool ret = true;
+
+	// decided against using INI for this particular action; since there could be many URLS
+	// the MvcEditor INI parsing is not so great; a measly 2000+ entries takes 5 seconds to parse
+	// in INI form.
 	wxFileInputStream stream(OutputFile.GetFullPath());
-	wxFileConfig result(stream);
+	wxTextInputStream textStream(stream);
+	wxStringTokenizer tok;
+	while (!stream.Eof()) {
+		tok.SetString(textStream.ReadLine(), wxT(",\n"));
+		mvceditor::UrlResourceClass newUrl;
+		if (tok.HasMoreTokens()) {
+			newUrl.Url = tok.NextToken();
+			if (tok.HasMoreTokens()) {
+				//newUrl.FileName.Assign(tok.NextToken());
+				if (tok.HasMoreTokens()) {
+					newUrl.ClassName = tok.NextToken();
+					if (tok.HasMoreTokens()) {
+						newUrl.MethodName = tok.NextToken();
+						if (newUrl.Url.IsEmpty() /*|| !newUrl.FileName.IsOk()*/) {
+							Error = BAD_CONTENT;
+							ret = false;
+							break;
+						}
+						else {
+							Urls.push_back(newUrl);
+						}
+					}
+				}
+			}
+		}
+	}
+	/*
+	wxFileInputStream stream(OutputFile.GetFullPath());
+	wxTextInputStream textStream(stream);
+	wxFileConfig result(textStream);
 	
 	long index = 0;
 	wxString groupName;
@@ -383,7 +421,7 @@ bool mvceditor::UrlDetectorActionClass::Response() {
 			Urls.push_back(newUrl);
 		}
 		hasNext = result.GetNextGroup(groupName, index);
-	}
+	}*/
 	return ret;
 }
 
