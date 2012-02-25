@@ -48,13 +48,13 @@ ChooseUrlDialogGeneratedClass::ChooseUrlDialogGeneratedClass( wxWindow* parent, 
 	CompleteLabel->Wrap( -1 );
 	GridSizer->Add( CompleteLabel, 1, wxALL|wxEXPAND|wxALIGN_BOTTOM, 5 );
 	
-	ButtonsSizer = new wxStdDialogButtonSizer();
-	ButtonsSizerOK = new wxButton( this, wxID_OK );
-	ButtonsSizer->AddButton( ButtonsSizerOK );
-	ButtonsSizerCancel = new wxButton( this, wxID_CANCEL );
-	ButtonsSizer->AddButton( ButtonsSizerCancel );
-	ButtonsSizer->Realize();
-	GridSizer->Add( ButtonsSizer, 1, wxEXPAND, 5 );
+	m_sdbSizer2 = new wxStdDialogButtonSizer();
+	m_sdbSizer2OK = new wxButton( this, wxID_OK );
+	m_sdbSizer2->AddButton( m_sdbSizer2OK );
+	m_sdbSizer2Cancel = new wxButton( this, wxID_CANCEL );
+	m_sdbSizer2->AddButton( m_sdbSizer2Cancel );
+	m_sdbSizer2->Realize();
+	GridSizer->Add( m_sdbSizer2, 1, wxEXPAND, 5 );
 	
 	BodySizer->Add( GridSizer, 1, wxEXPAND, 5 );
 	

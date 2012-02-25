@@ -307,6 +307,11 @@ wxString fileName;
 		else {
 			App->UrlResourceFinder.ChosenUrl = urlResource;
 		}
+
+		// 'select' the URL (make it the current in the toolbar)
+		BrowserToolbar->SetToolLabel(ID_URL_AUI_TOOLBAR, App->UrlResourceFinder.ChosenUrl.Url);
+		BrowserToolbar->Realize();
+		AuiManager->Update();
 	}
 }
 

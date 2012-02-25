@@ -45,9 +45,9 @@ class ChooseUrlDialogGeneratedClass : public wxDialog
 		wxListBox* UrlList;
 		wxTextCtrl* Extra;
 		wxStaticText* CompleteLabel;
-		wxStdDialogButtonSizer* ButtonsSizer;
-		wxButton* ButtonsSizerOK;
-		wxButton* ButtonsSizerCancel;
+		wxStdDialogButtonSizer* m_sdbSizer2;
+		wxButton* m_sdbSizer2OK;
+		wxButton* m_sdbSizer2Cancel;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnListItemSelected( wxCommandEvent& event ) { event.Skip(); }
@@ -57,7 +57,7 @@ class ChooseUrlDialogGeneratedClass : public wxDialog
 	
 	public:
 		
-		ChooseUrlDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Choose URL To Open"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 557,344 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP );
+		ChooseUrlDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Choose URL To Open"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 638,413 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP );
 		~ChooseUrlDialogGeneratedClass();
 	
 };
