@@ -388,7 +388,6 @@ void mvceditor::RunBrowserPluginClass::OnProcessInProgress(wxCommandEvent& event
 }
 
 BEGIN_EVENT_TABLE(mvceditor::RunBrowserPluginClass, wxEvtHandler) 
-	EVT_MENU(mvceditor::MENU_RUN_BROWSER + 0, mvceditor::RunBrowserPluginClass::OnRunInWebBrowser)
 	
 	// if the end values of the ranges need to be modified, need to modify mvceditor::PluginClass::MenuIds as well
 	EVT_MENU_RANGE(mvceditor::MENU_RUN_BROWSER + 0, mvceditor::MENU_RUN_BROWSER + 19, mvceditor::RunBrowserPluginClass::OnBrowserToolMenuItem)
