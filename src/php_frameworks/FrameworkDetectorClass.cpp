@@ -422,11 +422,15 @@ bool mvceditor::ViewFilesDetectorActionClass::Response() {
 		wxString fullPath;
 		ret = result.Read(entryName, &fullPath);
 		wxFileName fileName(fullPath);
-		if (ret && fileName.IsOk()) {
+		if (ret) {
+
+			// let invalid files through. we will alert the user later.
 			ViewFiles.push_back(fileName);
 		}
-		else if (!fileName.IsOk()) {
-			EditorLogWarning(mvceditor::PROJECT_DETECTION, wxT("Invalid file name in response from ViewFiles action:") + fullPath);
+		else {
+			Error = BAD_CONTENT;
+			ret = false;
+			break;
 		}
 		hasNext = result.GetNextEntry(entryName, index);
 	}

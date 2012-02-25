@@ -31,6 +31,7 @@
 #include <widgets/ThreadWithHeartbeatClass.h>
 #include <plugins/wxformbuilder/LintPluginGeneratedClass.h>
 #include <unicode/unistr.h>
+#include <memory>
 
 namespace mvceditor {
 	
@@ -51,7 +52,7 @@ public:
 	 * file is required by the ViewFiles detector
 	 * This pointer is owned by this class
 	 */
-	CallStackClass* CallStack;
+	std::auto_ptr<CallStackClass> CallStack;
 	
 	/**
 	 * error will be filled when a call stack file could not be generated
@@ -74,8 +75,6 @@ public:
 	 * @param handler will be notified of EVENT_WORK_* events
 	 */
 	CallStackThreadClass(wxEvtHandler& handler);
-	
-	virtual ~CallStackThreadClass();
 	
 	void InitCallStack(ResourceCacheClass& resourceCache);
 	
@@ -111,13 +110,11 @@ public:
 
 	ViewFilePluginClass();
 	
-	~ViewFilePluginClass();
-	
 	/**
 	 * A 'local' detector that will be used to get all of the
 	 * files for the current URL.
 	 */
-	PhpFrameworkDetectorClass* FrameworkDetector;
+	std::auto_ptr<PhpFrameworkDetectorClass> FrameworkDetector;
 	
 	/**
 	 * used to generate the call stack for the current URL
@@ -158,6 +155,8 @@ public:
 	ViewFilePanelClass(wxWindow* parent, int id, ViewFilePluginClass& plugin);
 
 	void UpdateLabels();
+
+	void UpdateTitle(const UrlResourceClass& chosenUrl);
 	
 };
 	

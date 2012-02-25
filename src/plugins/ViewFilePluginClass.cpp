@@ -38,15 +38,9 @@ mvceditor::CallStackThreadClass::CallStackThreadClass(wxEvtHandler& handler)
 		
 }
 
-mvceditor::CallStackThreadClass::~CallStackThreadClass() {
-	if (CallStack) {
-		delete CallStack;
-	}
-}
-
 void mvceditor::CallStackThreadClass::InitCallStack(mvceditor::ResourceCacheClass& resourceCache) {
-	if (!CallStack) {
-		CallStack = new mvceditor::CallStackClass(resourceCache);
+	if (!CallStack.get()) {
+		CallStack.reset(new mvceditor::CallStackClass(resourceCache));
 	}
 }
 
@@ -97,12 +91,6 @@ mvceditor::ViewFilePluginClass::ViewFilePluginClass()
 	, CurrentViewFiles() {
 }
 
-mvceditor::ViewFilePluginClass::~ViewFilePluginClass() {
-	if (FrameworkDetector) {
-		delete FrameworkDetector;
-	}
-}
-
 void mvceditor::ViewFilePluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
 	toolsMenu->Append(mvceditor::MENU_VIEW_FILES + 0, _("URL View (template) files"), 
 		_("Shows the view (template) files for the currently selected URL"), wxITEM_NORMAL);
@@ -122,6 +110,7 @@ void mvceditor::ViewFilePluginClass::OnViewFilesMenu(wxCommandEvent& event) {
 		AddToolsWindow(viewPanel, _("View (template) Files"));
 		SetFocusToToolsWindow(viewPanel);
 	}
+	viewPanel->UpdateTitle(App->UrlResourceFinder.ChosenUrl);
 
 	// start the chain reaction
 	wxString url = App->UrlResourceFinder.ChosenUrl.Url;
@@ -145,8 +134,8 @@ void mvceditor::ViewFilePluginClass::OnViewFilesMenu(wxCommandEvent& event) {
 }
 
 void mvceditor::ViewFilePluginClass::OnWorkComplete(wxCommandEvent& event) {
-	if (!FrameworkDetector) {
-		FrameworkDetector = new mvceditor::PhpFrameworkDetectorClass(*this, *GetEnvironment());
+	if (!FrameworkDetector.get()) {
+		FrameworkDetector.reset(new mvceditor::PhpFrameworkDetectorClass(*this, *GetEnvironment()));
 	}
 	FrameworkDetector->Identifiers = PhPFrameworks().Identifiers;
 	if (!FrameworkDetector->InitViewFilesDetector(GetProject()->GetRootPath(), App->UrlResourceFinder.ChosenUrl.Url, CallStackThread.StackFile)) {
@@ -172,15 +161,15 @@ void mvceditor::ViewFilePluginClass::OnViewFilesDetectionFailed(wxCommandEvent& 
 mvceditor::ViewFilePanelClass::ViewFilePanelClass(wxWindow* parent, int id, mvceditor::ViewFilePluginClass& plugin)
 	: LintResultsGeneratedPanelClass(parent, id)
 	, Plugin(plugin) {
-		
+		Label->SetLabel(_("Template Files:"));
 }
 
 void mvceditor::ViewFilePanelClass::UpdateLabels() {
-	if (Plugin.CallStackThread.LastError != mvceditor::CallStackClass::NONE) {
-		Label->SetLabel(wxString::Format(_("Call stack creation error: %d"), Plugin.CallStackThread.LastError));
+	if (Plugin.CallStackThread.LastError != mvceditor::CallStackClass::NONE && Plugin.CallStackThread.LastError != mvceditor::CallStackClass::RESOLUTION_ERROR) {
+		ErrorsList->AppendString(wxString::Format(_("Call stack creation error: %d"), Plugin.CallStackThread.LastError));
 	}
 	else if (Plugin.CallStackThread.WriteError) {
-		Label->SetLabel(_("Could not Write Call stack file to file system"));
+		ErrorsList->AppendString(_("Could not Write Call stack file to file system"));
 	}
 	else {
 		ErrorsList->Clear();
@@ -189,6 +178,12 @@ void mvceditor::ViewFilePanelClass::UpdateLabels() {
 			ErrorsList->AppendString(Plugin.CurrentViewFiles[i].GetFullPath());
 		}
 	}
+}
+
+void mvceditor::ViewFilePanelClass::UpdateTitle(const mvceditor::UrlResourceClass& chosenUrl) {
+	Label->SetLabel(_("Template Files For:") + chosenUrl.FileName.GetFullPath() + 
+		wxT(" (") + chosenUrl.ClassName + wxT("::") + chosenUrl.MethodName + wxT(")"));
+
 }
 
 BEGIN_EVENT_TABLE(mvceditor::ViewFilePluginClass, wxEvtHandler) 
