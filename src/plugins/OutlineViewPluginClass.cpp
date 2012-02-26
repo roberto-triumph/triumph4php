@@ -193,6 +193,7 @@ void mvceditor::OutlineViewPluginClass::OnContextMenuOutline(wxCommandEvent& eve
 	if (modified) {
 		
 		// create / open the outline window
+		// TODO: display in Outline window instead
 		wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetToolsNotebook());
 		OutlineViewPluginPanelClass* outlineViewPanel = NULL;
 		if (window != NULL) {
@@ -221,6 +222,7 @@ void mvceditor::OutlineViewPluginClass::OnContentNotebookPageChanged(wxAuiNotebo
 	// only change the outline if the user is looking at the outline.  otherwise, it gets 
 	// annoying if the user is looking at run output, switches PHP files, and the outline
 	// gets changed.
+	// TODO: display in Outline window instead
 	if (window != NULL && IsToolsWindowSelected(ID_WINDOW_OUTLINE)) {
 		OutlineViewPluginPanelClass* outlineViewPanel = NULL;
 		outlineViewPanel = (OutlineViewPluginPanelClass*)window;

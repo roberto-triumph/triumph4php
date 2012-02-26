@@ -229,7 +229,8 @@ void mvceditor::RunBrowserPluginClass::OnUrlToolDropDown(wxAuiToolBarEvent& even
 		}
 		BrowserToolbar->SetToolSticky(event.GetId(), true);
 		
-		// create the popup menu that contains all the available browser names
+		// create the popup menu that contains all the available URLs
+		// TODO: clear the URLs from the previously-closed projects
 		wxMenu menuPopup;
 		wxBitmap bmp = wxArtProvider::GetBitmap(wxART_QUESTION, wxART_OTHER, wxSize(16,16));
 		std::vector<mvceditor::UrlResourceClass> urls = App->UrlResourceFinder.Urls;
@@ -258,6 +259,8 @@ wxString fileName;
 	if (GetCurrentCodeControl()) {
 		fileName = GetCurrentCodeControl()->GetFileName();
 	}
+
+	// TODO: add a 'delete URL' button
 	mvceditor::UrlResourceClass chosenUrl;
 	mvceditor::EnvironmentClass* environment = GetEnvironment();
 	if (PhPFrameworks().Identifiers.empty()) {
