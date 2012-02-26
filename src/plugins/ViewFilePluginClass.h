@@ -29,7 +29,7 @@
 #include <php_frameworks/FrameworkDetectorClass.h>
 #include <php_frameworks/CallStackClass.h>
 #include <widgets/ThreadWithHeartbeatClass.h>
-#include <plugins/wxformbuilder/LintPluginGeneratedClass.h>
+#include <plugins/wxformbuilder/ViewFilePluginGeneratedClass.h>
 #include <unicode/unistr.h>
 #include <memory>
 
@@ -126,8 +126,28 @@ public:
 	 * current URL
 	 */
 	std::vector<wxFileName> CurrentViewFiles;
+
+	/**
+	 * the URL that the user chose to view files from
+	 */
+	UrlResourceClass ChosenUrl;
 	
 	void AddToolsMenuItems(wxMenu* toolsMenu);
+
+	UrlResourceFinderClass& Urls();
+
+	/**
+	 * starts the view file detection process. This is an asynchronous operation.
+	 * When view files are detected, the plugin will update the
+	 * panel appropriately.
+	 */
+	void StartDetection();
+
+	/**
+	 * @return the currently opened file. Note that this may not be
+	 * a valid file (new, untitled files).
+	 */
+	wxString CurrentFile();
 	
 private:
 	
@@ -145,8 +165,7 @@ private:
 	DECLARE_EVENT_TABLE()
 };
 
-// TODO: make a panel specific for this class
-class ViewFilePanelClass : public LintResultsGeneratedPanelClass {
+class ViewFilePanelClass : public ViewFilePanelGeneratedClass {
 	
 public:
 
@@ -154,10 +173,23 @@ public:
 	
 	ViewFilePanelClass(wxWindow* parent, int id, ViewFilePluginClass& plugin);
 
-	void UpdateLabels();
+	void UpdateResults();
+
+	void ClearResults();
+
+	void UpdateControllers();
 
 	void UpdateTitle(const UrlResourceClass& chosenUrl);
 	
+protected:
+
+	void OnHelpButton(wxCommandEvent& event);
+
+	void OnLinkButton(wxCommandEvent& event);
+
+	void OnControllerChoice(wxCommandEvent& event);
+
+	void OnActionChoice(wxCommandEvent& event);
 };
 	
 }
