@@ -40,7 +40,8 @@ class ViewFilePanelGeneratedClass : public wxPanel
 		void _wxFB_OnControllerChoice( wxCommandEvent& event ){ OnControllerChoice( event ); }
 		void _wxFB_OnActionChoice( wxCommandEvent& event ){ OnActionChoice( event ); }
 		void _wxFB_OnHelpButton( wxCommandEvent& event ){ OnHelpButton( event ); }
-		void _wxFB_OnLinkButton( wxCommandEvent& event ){ OnLinkButton( event ); }
+		void _wxFB_OnCurrentButton( wxCommandEvent& event ){ OnCurrentButton( event ); }
+		void _wxFB_OnTreeItemActivated( wxTreeEvent& event ){ OnTreeItemActivated( event ); }
 		
 	
 	protected:
@@ -51,9 +52,8 @@ class ViewFilePanelGeneratedClass : public wxPanel
 			ID_CONTROLLER,
 			ID_ACTIONLABEL,
 			ID_ACTION,
-			ID_URLLABEL,
 			ID_HELPBUTTON,
-			ID_LINKBUTTON,
+			ID_CURRENTBUTTON,
 			ID_ERRORLABEL,
 			ID_FILETREE,
 		};
@@ -62,9 +62,8 @@ class ViewFilePanelGeneratedClass : public wxPanel
 		wxChoice* Controller;
 		wxStaticText* ActionLabel;
 		wxChoice* Action;
-		wxStaticText* UrlLabel;
 		wxBitmapButton* HelpButton;
-		wxButton* LinkButton;
+		wxButton* CurrentButton;
 		wxStaticText* StatusLabel;
 		wxTreeCtrl* FileTree;
 		
@@ -72,7 +71,8 @@ class ViewFilePanelGeneratedClass : public wxPanel
 		virtual void OnControllerChoice( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnActionChoice( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnLinkButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCurrentButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnTreeItemActivated( wxTreeEvent& event ) { event.Skip(); }
 		
 	
 	public:

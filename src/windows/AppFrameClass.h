@@ -212,6 +212,11 @@ private:
 	void OnToolsNotebookPageClosed(wxAuiNotebookEvent& event);
 
 	/**
+	 * When the outline notebook has no more pages; hide it
+	 */
+	void OnOutlineNotebookPageClosed(wxAuiNotebookEvent& event);
+
+	/**
 	 * Add the shortcuts for this frame's menu bar into the preference's shortcut list
 	 */
 	void DefaultKeyboardShortcuts();
@@ -259,6 +264,13 @@ private:
 	 * @var wxAuiNotebook*
 	 */
 	wxAuiNotebook* ToolsNotebook;
+	
+	/**
+	 * To hold the various outline
+	 * panels in place.
+	 * @var wxAuiNotebook*
+	 */
+	wxAuiNotebook* OutlineNotebook;
 	
 	DECLARE_EVENT_TABLE()
 };

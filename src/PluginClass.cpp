@@ -32,6 +32,7 @@ mvceditor::PluginClass::PluginClass()
 	, StatusBarWithGauge(NULL)
 	, Notebook(NULL)
 	, ToolsNotebook(NULL)
+	, OutlineNotebook(NULL)
 	, Project(NULL)
 	, MenuBar(NULL) {
 }
@@ -40,10 +41,11 @@ mvceditor::PluginClass::~PluginClass() {
 }
 
 void mvceditor::PluginClass::InitWindow(StatusBarWithGaugeClass* statusBarWithGauge, NotebookClass* notebook, wxAuiNotebook* toolsNotebook, 
-	wxAuiManager* auiManager, wxMenuBar* menuBar) {
+	wxAuiNotebook* outlineNotebook, wxAuiManager* auiManager, wxMenuBar* menuBar) {
 	StatusBarWithGauge = statusBarWithGauge;
 	Notebook = notebook;
 	ToolsNotebook = toolsNotebook;
+	OutlineNotebook = outlineNotebook;
 	AuiManager = auiManager;
 	MenuBar = menuBar;
 }
@@ -121,14 +123,39 @@ bool mvceditor::PluginClass::AddToolsWindow(wxWindow* window, wxString name) {
 	return false;
 }
 
+bool mvceditor::PluginClass::AddOutlineWindow(wxWindow* window, wxString name) {
+	if (OutlineNotebook->AddPage(window, name)) {
+		int index = OutlineNotebook->GetPageIndex(window);
+		if (index != wxNOT_FOUND) {
+			OutlineNotebook->SetSelection(index);
+		}
+		if (NULL != AuiManager) {
+			AuiManager->GetPane(OutlineNotebook).Show();
+			AuiManager->Update();
+		}
+		return true;
+	}
+	return false;
+}
+
 wxWindow* mvceditor::PluginClass::FindToolsWindow(int windowId) const {
 	return wxWindow::FindWindowById(windowId, GetToolsNotebook());
+}
+
+wxWindow* mvceditor::PluginClass::FindOutlineWindow(int windowId) const {
+	return wxWindow::FindWindowById(windowId, GetOutlineNotebook());
 }
 
 bool mvceditor::PluginClass::IsToolsWindowSelected(int windowId) const {
 	wxWindow* window = wxWindow::FindWindowById(windowId, GetToolsNotebook());
 	int windowIndex = ToolsNotebook->GetPageIndex(window); 
 	return windowIndex != wxNOT_FOUND && windowIndex == ToolsNotebook->GetSelection();
+}
+
+bool mvceditor::PluginClass::IsOutlineWindowSelected(int windowId) const {
+	wxWindow* window = wxWindow::FindWindowById(windowId, GetOutlineNotebook());
+	int windowIndex = OutlineNotebook->GetPageIndex(window); 
+	return windowIndex != wxNOT_FOUND && windowIndex == OutlineNotebook->GetSelection();
 }
 
 bool mvceditor::PluginClass::AddContentWindow(wxWindow* window, const wxString& name) {
@@ -145,6 +172,10 @@ wxAuiNotebook* mvceditor::PluginClass::GetToolsNotebook() const {
 	return ToolsNotebook;
 }
 
+wxAuiNotebook* mvceditor::PluginClass::GetOutlineNotebook() const {
+	return OutlineNotebook;
+}
+
 mvceditor::StatusBarWithGaugeClass* mvceditor::PluginClass::GetStatusBarWithGauge() const {
 	return StatusBarWithGauge;
 }
@@ -155,6 +186,17 @@ void mvceditor::PluginClass::SetFocusToToolsWindow(wxWindow* window) {
 		ToolsNotebook->SetSelection(index);
 		if (NULL != AuiManager) {
 			AuiManager->GetPane(ToolsNotebook).Show();
+			AuiManager->Update();
+		}
+	}
+}
+
+void mvceditor::PluginClass::SetFocusToOutlineWindow(wxWindow* window) {
+	int index = OutlineNotebook->GetPageIndex(window);
+	if (index != wxNOT_FOUND) {
+		OutlineNotebook->SetSelection(index);
+		if (NULL != AuiManager) {
+			AuiManager->GetPane(OutlineNotebook).Show();
 			AuiManager->Update();
 		}
 	}

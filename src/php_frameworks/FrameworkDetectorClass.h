@@ -338,7 +338,7 @@ class ViewFilesDetectorActionClass : public DetectorActionClass {
 
 public: 
 	
-	std::vector<wxFileName> ViewFiles;
+	std::vector<wxString> ViewFiles;
 
 	ViewFilesDetectorActionClass(wxEvtHandler& handler);
 
@@ -499,7 +499,7 @@ private:
 	/**
 	 * the list of result of view file detection
 	 */
-	std::vector<wxFileName> ViewFilesDetected;
+	std::vector<wxString> ViewFilesDetected;
 	
 	/**
 	 * event handler that will receive the EVENT_FRAMEWORK_DETECTION_COMPLETE, EVENT_FRAMEWORK_URL
@@ -568,9 +568,9 @@ class ViewFilesDetectedEventClass : public wxEvent {
 
 	public:	
 	
-	std::vector<wxFileName> ViewFiles;
+	std::vector<wxString> ViewFiles;
 
-	ViewFilesDetectedEventClass(std::vector<wxFileName> viewFiles);
+	ViewFilesDetectedEventClass(std::vector<wxString> viewFiles);
 	
 	/**
 	 * needed by wxPostEvent

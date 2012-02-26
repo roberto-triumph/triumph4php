@@ -94,22 +94,20 @@ mvceditor::ViewFilePluginClass::ViewFilePluginClass()
 }
 
 void mvceditor::ViewFilePluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
-	toolsMenu->Append(mvceditor::MENU_VIEW_FILES + 0, _("URL View (template) files"), 
+	toolsMenu->Append(mvceditor::MENU_VIEW_FILES + 0, _("Views"), 
 		_("Shows the view (template) files for the currently selected URL"), wxITEM_NORMAL);
 }
 
 void mvceditor::ViewFilePluginClass::OnViewFilesMenu(wxCommandEvent& event) {
-	wxWindow* window = FindToolsWindow(ID_VIEW_FILE_PANEL);
+	wxWindow* window = FindOutlineWindow(ID_VIEW_FILE_PANEL);
 	mvceditor::ViewFilePanelClass* viewPanel = NULL;
 	if (window) {
-		viewPanel = (mvceditor::ViewFilePanelClass*)window;
-		viewPanel->UpdateResults();
-		SetFocusToToolsWindow(viewPanel);
+		viewPanel = wxDynamicCast(window, mvceditor::ViewFilePanelClass);
+		SetFocusToOutlineWindow(viewPanel);
 	}
 	else {
-		viewPanel = new mvceditor::ViewFilePanelClass(GetToolsNotebook(), ID_VIEW_FILE_PANEL, *this);
-		AddToolsWindow(viewPanel, _("View (template) Files"));
-		SetFocusToToolsWindow(viewPanel);
+		viewPanel = new mvceditor::ViewFilePanelClass(GetOutlineNotebook(), ID_VIEW_FILE_PANEL, *this);
+		AddOutlineWindow(viewPanel, _("Views"));
 	}
 	viewPanel->UpdateControllers();
 }
@@ -154,7 +152,7 @@ void mvceditor::ViewFilePluginClass::OnWorkComplete(wxCommandEvent& event) {
 }
 	
 void mvceditor::ViewFilePluginClass::OnViewFilesDetectionComplete(mvceditor::ViewFilesDetectedEventClass& event) {
-	wxWindow* window = FindToolsWindow(ID_VIEW_FILE_PANEL);
+	wxWindow* window = FindOutlineWindow(ID_VIEW_FILE_PANEL);
 	CurrentViewFiles = event.ViewFiles;
 	ViewFilePanelClass* viewPanel = NULL;
 	if (window) {
@@ -170,6 +168,13 @@ void mvceditor::ViewFilePluginClass::OnViewFilesDetectionFailed(wxCommandEvent& 
 
 mvceditor::UrlResourceFinderClass& mvceditor::ViewFilePluginClass::Urls() {
 	return App->UrlResourceFinder;
+}
+
+void mvceditor::ViewFilePluginClass::OpenFile(wxString file) {
+	wxFileName fileName(file);
+	if (fileName.IsOk()) {
+		GetNotebook()->LoadPage(fileName.GetFullPath());
+	}
 }
 
 mvceditor::ViewFilePanelClass::ViewFilePanelClass(wxWindow* parent, int id, mvceditor::ViewFilePluginClass& plugin)
@@ -201,11 +206,19 @@ void mvceditor::ViewFilePanelClass::UpdateResults() {
 		StatusLabel->SetLabel(wxString::Format(_("Found %d view files"), Plugin.CurrentViewFiles.size()));
 		FileTree->DeleteAllItems();
 
-		wxTreeItemId parent = FileTree->AddRoot(_("View Files"));
+		wxTreeItemId parent = FileTree->AddRoot(_("Views"));
+		mvceditor::ProjectClass* project = Plugin.GetProject();
+		wxString root = project->GetRootPath();
 		for (size_t i = 0; i < Plugin.CurrentViewFiles.size(); ++i) {
-			wxString text = Plugin.CurrentViewFiles[i].GetFullPath();
+			wxString viewFile = Plugin.CurrentViewFiles[i];
 
 			// remove the project root so that the dialog is not too 'wordy'
+			wxString text = viewFile.Mid(root.Len());
+			if (!wxFileName::FileExists(viewFile)) {
+
+				// show that the view file is missing
+				text = wxT("[X] ") + text;
+			}
 			FileTree->AppendItem(parent, text);
 		}
 	}
@@ -235,12 +248,7 @@ void mvceditor::ViewFilePanelClass::UpdateResults() {
 void mvceditor::ViewFilePanelClass::ClearResults() {
 	StatusLabel->SetLabel(_(""));
 	Action->Clear();
-	UrlLabel->SetLabel(_(""));
 	FileTree->DeleteAllItems();
-}
-
-void mvceditor::ViewFilePanelClass::UpdateTitle(const mvceditor::UrlResourceClass& chosenUrl) {
-	UrlLabel->SetLabel(_("URL:") + chosenUrl.FileName.GetFullPath());
 }
 
 void mvceditor::ViewFilePanelClass::OnActionChoice(wxCommandEvent& event) {
@@ -257,7 +265,6 @@ void mvceditor::ViewFilePanelClass::OnActionChoice(wxCommandEvent& event) {
 		}
 	}
 	if (!url.Url.IsEmpty()) {
-		UpdateTitle(url);
 		StatusLabel->SetLabel(_("Detecting"));
 		Plugin.ChosenUrl = url;
 		Plugin.StartDetection();
@@ -279,13 +286,17 @@ void mvceditor::ViewFilePanelClass::OnControllerChoice(wxCommandEvent &event) {
 
 void mvceditor::ViewFilePanelClass::OnHelpButton(wxCommandEvent& event) {
 	wxString help = wxString::FromAscii(
-		"this is a help string"
+		"The views outline lets you see the views (templates) for a "
+		"specific controller. Choose a controller, then an action, and "
+		"the pane will be populated with all of the templates that the "
+		"selected action uses.  If a template file has an [X] it means "
+		"that the template file was not found."
 	);
 	help = wxGetTranslation(help);
 	wxMessageBox(help);
 }
 
-void mvceditor::ViewFilePanelClass::OnLinkButton(wxCommandEvent &event) {
+void mvceditor::ViewFilePanelClass::OnCurrentButton(wxCommandEvent &event) {
 	ClearResults();
 	UpdateControllers();
 
@@ -313,6 +324,17 @@ void mvceditor::ViewFilePanelClass::OnLinkButton(wxCommandEvent &event) {
 			}
 			break;
 		}
+	}
+}
+
+void mvceditor::ViewFilePanelClass::OnTreeItemActivated(wxTreeEvent& event) {
+	wxTreeItemId item = event.GetItem();
+	wxString file = FileTree->GetItemText(item);
+	if (!file.IsEmpty() && !file.Find(wxT("[X]")) == 0) {
+		mvceditor::ProjectClass* project = Plugin.GetProject();
+		wxString root = project->GetRootPath();
+		file =  root + wxFileName::GetPathSeparator() + file;
+		Plugin.OpenFile(file);
 	}
 }
 

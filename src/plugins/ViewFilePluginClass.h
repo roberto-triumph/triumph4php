@@ -34,6 +34,9 @@
 #include <memory>
 
 namespace mvceditor {
+
+// defined  at the bottom of this file
+class ViewFilePanelClass;
 	
 /**
  * Generates the call stack file in a background thread. This class
@@ -125,7 +128,7 @@ public:
 	 * the final result; the view files that correspond to the
 	 * current URL
 	 */
-	std::vector<wxFileName> CurrentViewFiles;
+	std::vector<wxString> CurrentViewFiles;
 
 	/**
 	 * the URL that the user chose to view files from
@@ -148,6 +151,11 @@ public:
 	 * a valid file (new, untitled files).
 	 */
 	wxString CurrentFile();
+
+	/**
+	 * Opens the given file. file must be a full path.
+	 */
+	void OpenFile(wxString file);
 	
 private:
 	
@@ -178,20 +186,20 @@ public:
 	void ClearResults();
 
 	void UpdateControllers();
-
-	void UpdateTitle(const UrlResourceClass& chosenUrl);
 	
 protected:
 
 	void OnHelpButton(wxCommandEvent& event);
 
-	void OnLinkButton(wxCommandEvent& event);
+	void OnCurrentButton(wxCommandEvent& event);
 
 	void OnControllerChoice(wxCommandEvent& event);
 
 	void OnActionChoice(wxCommandEvent& event);
+
+	void OnTreeItemActivated(wxTreeEvent& event);
 };
-	
+
 }
 
 #endif

@@ -224,7 +224,12 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 						if (stripos($viewFile, '.') === FALSE) {
 							$viewFile .= '.php';
 						}
-						$viewFiles[] = realpath($dir . '/application/views/' . $viewFile);
+						
+						// not using realpath() so that MVCEditor can know that a template file has not yet been created
+						// or the programmer has a bug in the project.
+						$viewFile = \opstring\replace($viewFile, '/', DIRECTORY_SEPARATOR);
+						$viewFile = \opstring\replace($viewFile, '\\', DIRECTORY_SEPARATOR);
+						$viewFiles[] = $dir . DIRECTORY_SEPARATOR . 'application' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $viewFile;
 					}
 				}
 			}

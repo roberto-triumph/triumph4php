@@ -13,7 +13,8 @@ BEGIN_EVENT_TABLE( ViewFilePanelGeneratedClass, wxPanel )
 	EVT_CHOICE( ID_CONTROLLER, ViewFilePanelGeneratedClass::_wxFB_OnControllerChoice )
 	EVT_CHOICE( ID_ACTION, ViewFilePanelGeneratedClass::_wxFB_OnActionChoice )
 	EVT_BUTTON( ID_HELPBUTTON, ViewFilePanelGeneratedClass::_wxFB_OnHelpButton )
-	EVT_BUTTON( ID_LINKBUTTON, ViewFilePanelGeneratedClass::_wxFB_OnLinkButton )
+	EVT_BUTTON( ID_CURRENTBUTTON, ViewFilePanelGeneratedClass::_wxFB_OnCurrentButton )
+	EVT_TREE_ITEM_ACTIVATED( ID_FILETREE, ViewFilePanelGeneratedClass::_wxFB_OnTreeItemActivated )
 END_EVENT_TABLE()
 
 ViewFilePanelGeneratedClass::ViewFilePanelGeneratedClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
@@ -22,9 +23,9 @@ ViewFilePanelGeneratedClass::ViewFilePanelGeneratedClass( wxWindow* parent, wxWi
 	PanelSizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* FlexSizer;
-	FlexSizer = new wxFlexGridSizer( 4, 1, 0, 0 );
+	FlexSizer = new wxFlexGridSizer( 3, 1, 0, 0 );
 	FlexSizer->AddGrowableCol( 0 );
-	FlexSizer->AddGrowableRow( 3 );
+	FlexSizer->AddGrowableRow( 2 );
 	FlexSizer->SetFlexibleDirection( wxBOTH );
 	FlexSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -54,10 +55,6 @@ ViewFilePanelGeneratedClass::ViewFilePanelGeneratedClass( wxWindow* parent, wxWi
 	
 	FlexSizer->Add( ChoicesSizer, 1, wxEXPAND, 5 );
 	
-	UrlLabel = new wxStaticText( this, ID_URLLABEL, _("URL: http://localhost/ember/index.php/news/index/"), wxDefaultPosition, wxDefaultSize, 0 );
-	UrlLabel->Wrap( -1 );
-	FlexSizer->Add( UrlLabel, 0, wxALL, 5 );
-	
 	wxFlexGridSizer* MiddleSizer;
 	MiddleSizer = new wxFlexGridSizer( 1, 3, 0, 0 );
 	MiddleSizer->AddGrowableCol( 2 );
@@ -67,8 +64,8 @@ ViewFilePanelGeneratedClass::ViewFilePanelGeneratedClass( wxWindow* parent, wxWi
 	HelpButton = new wxBitmapButton( this, ID_HELPBUTTON, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	MiddleSizer->Add( HelpButton, 0, wxALL, 5 );
 	
-	LinkButton = new wxButton( this, ID_LINKBUTTON, _("Link"), wxDefaultPosition, wxDefaultSize, 0 );
-	MiddleSizer->Add( LinkButton, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+	CurrentButton = new wxButton( this, ID_CURRENTBUTTON, _("Current"), wxDefaultPosition, wxDefaultSize, 0 );
+	MiddleSizer->Add( CurrentButton, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 	
 	StatusLabel = new wxStaticText( this, ID_ERRORLABEL, _("Error:"), wxDefaultPosition, wxDefaultSize, 0 );
 	StatusLabel->Wrap( -1 );

@@ -48,6 +48,7 @@ int ID_UPPERCASE = wxNewId();
 int ID_MENU_MORE = wxNewId();
 int ID_TOOLBAR = wxNewId();
 int ID_TOOLS_WINDOW = wxNewId();
+int ID_OUTLINE_WINDOW = wxNewId();
 
 mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass*>& plugins,
 		wxEvtHandler& appHandler, mvceditor::EnvironmentClass& environment,
@@ -58,14 +59,14 @@ mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass
 	, Environment(environment)
 	, Preferences(preferences)
 	, ToolBar(NULL)
-	, ToolsNotebook(NULL) {
+	, ToolsNotebook(NULL)
+	, OutlineNotebook(NULL) {
 	StatusBarWithGaugeClass* gauge = new StatusBarWithGaugeClass(this);
 	SetStatusBar(gauge);
 	
 	AuiManager.SetManagedWindow(this);
 	ToolBar = new wxAuiToolBar(this, ID_TOOLBAR, wxDefaultPosition, wxDefaultSize, 
 		  wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_OVERFLOW | wxAUI_TB_TEXT | wxAUI_TB_HORZ_TEXT);
-		// wxAUI_TB_TEXT | wxAUI_TB_DEFAULT_STYLE);
 	
 	// when the notebook is empty we want to accept dragged files
 	Notebook->SetDropTarget(new FileDropTargetClass(Notebook));
@@ -79,15 +80,18 @@ mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass
 	ProjectMenu->Insert(0, projectOpenMenuItem);
 	ToolsNotebook = new wxAuiNotebook(this, ID_TOOLS_WINDOW, wxDefaultPosition, wxDefaultSize, 
 		wxAUI_NB_TOP | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_CLOSE_ON_ACTIVE_TAB | wxAUI_NB_TAB_MOVE);
-
+	OutlineNotebook = new wxAuiNotebook(this, ID_OUTLINE_WINDOW, wxDefaultPosition, wxDefaultSize, 
+		wxAUI_NB_TOP | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_CLOSE_ON_ACTIVE_TAB | wxAUI_NB_TAB_MOVE);
 	CreateToolBarButtons();
 	
 	// setup the bottom "tools" pane, the main content pane, and the toolbar on top
 	AuiManager.AddPane(Notebook, wxAuiPaneInfo().CentrePane(
-		).PaneBorder(false).Gripper(false).Floatable(false));
+		).PaneBorder(true).Gripper(false).Floatable(false).Resizable(true));
 	AuiManager.AddPane(ToolsNotebook, wxAuiPaneInfo().Bottom().Caption(
 		_("Tools")).Floatable(false).MinSize(-1, 260).Hide());
-		
+	AuiManager.AddPane(OutlineNotebook, wxAuiPaneInfo().Left().Caption(
+		_("Outlines")).Floatable(false).MinSize(260, -1).Hide());
+
 	AuiManager.AddPane(ToolBar, wxAuiPaneInfo().Top(
 		).CaptionVisible(false).CloseButton(false).Gripper(
 		false).DockFixed(true).PaneBorder(false).Floatable(false).Row(0).Position(0));
@@ -422,7 +426,7 @@ void mvceditor::AppFrameClass::LoadPlugin(mvceditor::PluginClass* plugin) {
 	
 	// propagate GUI events to plugins, so that they can handle menu events themselves
 	// plugin menus
-	plugin->InitWindow(GetStatusBarWithGauge(), Notebook, ToolsNotebook, &AuiManager, GetMenuBar());
+	plugin->InitWindow(GetStatusBarWithGauge(), Notebook, ToolsNotebook, OutlineNotebook, &AuiManager, GetMenuBar());
 	
 	//  when adding the separators, we dont want a separator at the very end
 	// we dont need separators if the plugin did not add any menu items
@@ -596,6 +600,17 @@ void mvceditor::AppFrameClass::OnToolsNotebookPageClosed(wxAuiNotebookEvent& eve
 	event.Skip();
 }
 
+void mvceditor::AppFrameClass::OnOutlineNotebookPageClosed(wxAuiNotebookEvent& event) {
+	size_t count = OutlineNotebook->GetPageCount();
+
+	// this event is received AFTER the page is removed
+	if (count <= 0) {
+		AuiManager.GetPane(OutlineNotebook).Hide();
+		AuiManager.Update();
+	}
+	event.Skip();
+}
+
 void mvceditor::AppFrameClass::DefaultKeyboardShortcuts() {
 
 	// ATTN: when a new menu item is added to the form builder 
@@ -644,4 +659,5 @@ BEGIN_EVENT_TABLE(mvceditor::AppFrameClass,  AppFrameGeneratedClass)
 	EVT_MENU(ID_UPPERCASE, mvceditor::AppFrameClass::OnUppercase)
 	EVT_MENU(ID_TOOLBAR_SAVE, mvceditor::AppFrameClass::SaveCurrentFile)
 	EVT_AUINOTEBOOK_PAGE_CLOSED(ID_TOOLS_WINDOW, mvceditor::AppFrameClass::OnToolsNotebookPageClosed)
+	EVT_AUINOTEBOOK_PAGE_CLOSED(ID_OUTLINE_WINDOW, mvceditor::AppFrameClass::OnOutlineNotebookPageClosed)
 END_EVENT_TABLE()

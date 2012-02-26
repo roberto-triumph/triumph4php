@@ -137,11 +137,12 @@ public:
 	 * @param StatusBarWithGaugeClass& statusBarWithGauge the status bar.
 	 * @param NotebookClass& notebook the opened source code files
 	 * @param wxAuiNotebook& toolsNotebook the parent window for all plugin windows
+	 * @param wxAuiNotebook& outlineNotebook the parent window for all outline type windows (left side)
 	 * @param wxAuiManager auiManager the AUI manager used to update the frame
 	 * @param wxMenuBar* menuBar the application menu bar
 	 */
 	void InitWindow(StatusBarWithGaugeClass* statusBarWithGauge, NotebookClass* notebook, wxAuiNotebook* toolsNotebook, 
-		wxAuiManager* auiManager, wxMenuBar* menuBar);
+		wxAuiNotebook* outlineNotebook, wxAuiManager* auiManager, wxMenuBar* menuBar);
 	
 	/**
 	 * Initialize application state
@@ -272,6 +273,15 @@ protected:
 	 * @return bool true if window was added.
 	 */
 	bool AddToolsWindow(wxWindow* window, wxString name);
+
+	/**
+	 * Add a window to the outline notebook. Once added, this class will take care of memory management for the window pointer.
+	 * 
+	 * @param wxWindow* window the window to add
+	 * @param wxString name the name that will show up in the window's tab
+	 * @return bool true if window was added.
+	 */
+	bool AddOutlineWindow(wxWindow* window, wxString name);
 	
 	/**
 	 * Finds the tools window with the given window ID and returns it.
@@ -280,6 +290,14 @@ protected:
 	 * @return wxWindow* the window, could be NULL if window was not found
 	 */
 	wxWindow* FindToolsWindow(int windowId) const;
+
+	/**
+	 * Finds the outline window with the given window ID and returns it.
+	 * 
+	 * @param int windowId the window ID to look for
+	 * @return wxWindow* the window, could be NULL if window was not found
+	 */
+	wxWindow* FindOutlineWindow(int windowId) const;
 	
 	/**
 	 * Check to see if the given window is the tools window that's currently active
@@ -287,6 +305,13 @@ protected:
 	 * @return bool true if the window with the given windowId is the selected (active) tools window.
 	 */
 	bool IsToolsWindowSelected(int windowId) const;
+
+	/**
+	 * Check to see if the given window is the outline window that's currently active
+	 * @param int windowId
+	 * @return bool true if the window with the given windowId is the selected (active) outline window.
+	 */
+	bool IsOutlineWindowSelected(int windowId) const;
 	
 	/**
 	 * Add a window to the 'main' content pane (the center pane). Once added, this class will take care of 
@@ -319,6 +344,12 @@ protected:
 	wxAuiNotebook* GetToolsNotebook() const;
 	
 	/**
+	 * Do NOT delete the pointer
+	 * @return wxAuiNotebook* the parent of all outline windows. guaranteed to be not null.
+	 */
+	wxAuiNotebook* GetOutlineNotebook() const;
+
+	/**
 	 * The source code control notebook. Guaranteed to be not null.
 	 * 
 	 * @return NotebookClass*
@@ -342,6 +373,12 @@ protected:
 	 * @param wxWindow the window that the tools notebook will be visible
 	 */
 	void SetFocusToToolsWindow(wxWindow* window);
+
+	/**
+	 * Set the given page to be the selected page for the outline notebook
+	 * @param wxWindow the window that the tools notebook will be visible
+	 */
+	void SetFocusToOutlineWindow(wxWindow* window);
 	
 	/**
 	 * Returns the text that's currently selected in the currently active code control.
@@ -429,11 +466,18 @@ protected:
 	NotebookClass* Notebook;
 	
 	/**
-	 * Parent container that will hold this plugin's windows.
+	 * Parent container that will hold all plugins' tools windows.
 	 * 
 	 * @var wxAuiNotebook*
 	 */
 	wxAuiNotebook* ToolsNotebook;
+
+	/**
+	 * Parent container that will hold all plugins' outline windows.
+	 * 
+	 * @var wxAuiNotebook*
+	 */
+	wxAuiNotebook* OutlineNotebook;
 	
 	/**
 	 * The current opened project. The pointer will NOT be owned by this class.

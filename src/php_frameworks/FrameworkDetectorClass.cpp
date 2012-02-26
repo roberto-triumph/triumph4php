@@ -421,11 +421,10 @@ bool mvceditor::ViewFilesDetectorActionClass::Response() {
 	while (ret && hasNext) {
 		wxString fullPath;
 		ret = result.Read(entryName, &fullPath);
-		wxFileName fileName(fullPath);
 		if (ret) {
 
 			// let invalid files through. we will alert the user later.
-			ViewFiles.push_back(fileName);
+			ViewFiles.push_back(fullPath);
 		}
 		else {
 			Error = BAD_CONTENT;
@@ -679,7 +678,7 @@ wxEvent* mvceditor::UrlDetectedEventClass::Clone() const {
 	return cloned;
 }
 
-mvceditor::ViewFilesDetectedEventClass::ViewFilesDetectedEventClass(std::vector<wxFileName> viewFiles)
+mvceditor::ViewFilesDetectedEventClass::ViewFilesDetectedEventClass(std::vector<wxString> viewFiles)
 	: wxEvent(wxID_ANY, mvceditor::EVENT_FRAMEWORK_VIEW_FILES_COMPLETE)
 	, ViewFiles(viewFiles) {
 		
