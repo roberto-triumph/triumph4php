@@ -515,21 +515,20 @@ void mvceditor::ResourcePluginPanelClass::OnFilesComboTextEnter(wxCommandEvent& 
  */
 void mvceditor::ResourcePluginPanelClass::OnHelpButtonClick(wxCommandEvent& event) {
 	
-	// TODO: correct the lie
   wxString help = wxString::FromAscii("Type in a file name, file name:page number, "
 		"class name,  or class name::method name. The resulting page will then ben opened.\n\nExamples:\n\n"
 		"user.php\n"
 		"user.php:129\n"
 		"User\n"
 		"User::login\n\n"
-		"You may even enter part of files names\n\n"
-		"ser.php (would match user.php)\n"
-		"You may even do a fuzzy string search (edit distance) for parts of class names.\n\n"
-		"ser, usr, USER (would all match a 'user' class)\n\n"
-		"Note that an exact match is done first; if an exact match is found then that file is opened; only if " 
-		"an exact match is not found will a fuzzy search be done.\n"
-		"The fuzzy string search (edit distance) threshold is configurable in under Edit ... Preferences in case " 
-		"searches are returning too many matches.\n\n"
+		"You can search with partial files names\n"
+		"ser.php (would match user.php)\n\n"
+		"You can search with partial class names\n"
+		"Use (would match Use, User, UserClass, ...)\n\n"
+		"You can search entire class names\n"
+		"User:: (would match all methods including inherited methods, from User class)\n\n"
+		"You can search all methods\n"
+		"::print (would match all methods in all classes that start with 'print' )"
 	);
 	help = wxGetTranslation(help);
 	wxMessageBox(help, _("Help"), wxOK);	
