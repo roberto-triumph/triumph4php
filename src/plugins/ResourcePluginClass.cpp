@@ -254,9 +254,7 @@ void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::ResourcePluginClass::ShowJumpToResults(const wxString& finderQuery, const std::vector<mvceditor::ResourceClass>& matches) {
-	
-	// TODO: no need to show jump to results for native functions
+void mvceditor::ResourcePluginClass::ShowJumpToResults(const wxString& finderQuery, const std::vector<mvceditor::ResourceClass>& allMatches) {
 	wxArrayString files;
 	UnicodeString fileName,
 		className, 
@@ -264,9 +262,21 @@ void mvceditor::ResourcePluginClass::ShowJumpToResults(const wxString& finderQue
 	int lineNumber = 0;
 	mvceditor::ResourceFinderClass::ResourceTypes type = mvceditor::ResourceFinderClass::ParseGoToResource(finderQuery, 
 		fileName, className, methodName, lineNumber);
-	switch (matches.size()) {
+	
+	// no need to show jump to results for native functions
+	std::vector<mvceditor::ResourceClass> nonNativeMatches = allMatches;
+	std::vector<mvceditor::ResourceClass>::iterator it = nonNativeMatches.begin();
+	while (it != nonNativeMatches.end()) {
+		if (it->IsNative) {
+			it = nonNativeMatches.erase(it);
+		}
+		else {
+			it++;
+		}
+	}
+	switch (nonNativeMatches.size()) {
 		case 1:
-			LoadPageFromResource(finderQuery, matches[0]);
+			LoadPageFromResource(finderQuery, nonNativeMatches[0]);
 			break;
 		case 0:
 			if (ResourceFinderClass::CLASS_NAME_METHOD_NAME == type) {
@@ -280,8 +290,8 @@ void mvceditor::ResourcePluginClass::ShowJumpToResults(const wxString& finderQue
 			}
 			break;
 		default:
-			for (size_t i = 0; i < matches.size(); ++i) {
-				files.Add(matches[i].GetFullPath());
+			for (size_t i = 0; i < nonNativeMatches.size(); ++i) {
+				files.Add(nonNativeMatches[i].GetFullPath());
 			}
 			
 			// dont show the project path to the user
@@ -289,16 +299,16 @@ void mvceditor::ResourcePluginClass::ShowJumpToResults(const wxString& finderQue
 				files[i].Replace(GetProject()->GetRootPath(), wxT(""));
 				if (ResourceFinderClass::FILE_NAME != type &&
 					ResourceFinderClass::FILE_NAME_LINE_NUMBER != type) {
-					files[i] += wxT("  (") + mvceditor::StringHelperClass::IcuToWx(matches[i].Resource) + wxT(")");
+					files[i] += wxT("  (") + mvceditor::StringHelperClass::IcuToWx(nonNativeMatches[i].Resource) + wxT(")");
 				}
 			}
 			wxSingleChoiceDialog dialog(NULL,
-				wxString::Format(_("Found %d files. Please choose file to open."), matches.size()),
+				wxString::Format(_("Found %d files. Please choose file to open."), nonNativeMatches.size()),
 				_("Resource Finder"), files, NULL, wxDEFAULT_DIALOG_STYLE| wxRESIZE_BORDER | wxOK | wxCANCEL);
 			dialog.SetSize(wxSize(640, 120));
 			if (wxID_OK == dialog.ShowModal()) {
 				int selection = dialog.GetSelection();
-				LoadPageFromResource(finderQuery, matches[selection]);	
+				LoadPageFromResource(finderQuery, nonNativeMatches[selection]);	
 			}
 			break;
 	}

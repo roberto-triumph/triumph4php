@@ -588,6 +588,12 @@ private:
 	 * 
 	 */
 	bool IsCacheSorted;
+
+	/**
+	 * Flag that will signal when the resource finder is parsing a native functions file (instead of user-created
+	 * code).  This  flag will allow us to differentiate between PHP standard functions and user code.
+	 */
+	bool IsCurrentFileNative;
 	
 	/**
 	 * Goes through the given file and parses out resources.
@@ -755,6 +761,13 @@ public:
 	 * or a a Plugin object.
 	 */
 	bool IsDynamic;
+
+	/**
+	 * TRUE if this is a 'native' resource; one of the standard PHP functions / classes (str_*, array_*,
+	 * DateTime).  This also includes any extensions (PDO, memcache, etc..) basically anything function
+	 * that is documented in php.net.
+	 */
+	bool IsNative;
 	
 	ResourceClass();
 	

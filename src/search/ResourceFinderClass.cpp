@@ -32,20 +32,21 @@
 
 
 mvceditor::ResourceFinderClass::ResourceFinderClass()
-		: FileFilters()
-		, ResourceCache()
-		, MembersCache()
-		, FileCache()
-		, Matches()
-		, Lexer()
-		, Parser()
-		, FileName()
-		, ClassName()
-		, MethodName()
-		, ResourceType(FILE_NAME)
-		, LineNumber(0)
-		, CurrentFileItemIndex(-1)
-		, IsCacheSorted(false) {
+	: FileFilters()
+	, ResourceCache()
+	, MembersCache()
+	, FileCache()
+	, Matches()
+	, Lexer()
+	, Parser()
+	, FileName()
+	, ClassName()
+	, MethodName()
+	, ResourceType(FILE_NAME)
+	, LineNumber(0)
+	, CurrentFileItemIndex(-1)
+	, IsCacheSorted(false)
+	, IsCurrentFileNative(false) {
 	Parser.SetClassObserver(this);
 	Parser.SetClassMemberObserver(this);
 	Parser.SetFunctionObserver(this);
@@ -60,6 +61,7 @@ bool mvceditor::ResourceFinderClass::Walk(const wxString& fileName) {
 			break;
 		}
 	}
+	IsCurrentFileNative = false;
 	if (matchedFilter) {
 		switch (ResourceType) {
 			case FILE_NAME:
@@ -78,7 +80,9 @@ bool mvceditor::ResourceFinderClass::Walk(const wxString& fileName) {
 }
 
 void mvceditor::ResourceFinderClass::BuildResourceCacheForFile(const wxString& fullPath, const UnicodeString& code, bool isNew) {
-	
+	wxFileName nativeFunctionsFile = mvceditor::NativeFunctionsAsset();
+	IsCurrentFileNative = fullPath.CmpNoCase(nativeFunctionsFile.GetFullPath()) == 0;
+
 	// remove all previous cached resources
 	int fileItemIndex = -1;
 	mvceditor::ResourceFinderClass::FileItem fileItem;
@@ -211,6 +215,7 @@ bool mvceditor::ResourceFinderClass::Prepare(const wxString& resource) {
 void mvceditor::ResourceFinderClass::BuildResourceCacheForNativeFunctions() {
 	wxFileName fileName = mvceditor::NativeFunctionsAsset();	
 	if (fileName.FileExists()) {
+		IsCurrentFileNative = true;
 		BuildResourceCache(fileName.GetFullPath(), true);
 	}
 }
@@ -525,6 +530,9 @@ mvceditor::ResourceFinderClass::ResourceTypes mvceditor::ResourceFinderClass::Pa
 }
 
 void mvceditor::ResourceFinderClass::BuildResourceCache(const wxString& fullPath, bool parseClasses) {
+	wxFileName nativeFunctionsFile = mvceditor::NativeFunctionsAsset();
+	IsCurrentFileNative = fullPath.CmpNoCase(nativeFunctionsFile.GetFullPath()) == 0;
+
 	wxFileName fileName(fullPath);
 	wxDateTime fileLastModifiedDateTime = fileName.GetModificationTime();
 	
@@ -587,6 +595,7 @@ void mvceditor::ResourceFinderClass::ClassFound(const UnicodeString& rawClassNam
 	classItem.Signature = filteredSignature;
 	classItem.ReturnType = UNICODE_STRING_SIMPLE("");
 	classItem.Comment = comment;
+	classItem.IsNative = IsCurrentFileNative;
 	ResourceCache.push_back(classItem);
 }
 
@@ -600,6 +609,7 @@ void mvceditor::ResourceFinderClass::DefineDeclarationFound(const UnicodeString&
 	defineItem.Signature = variableValue;
 	defineItem.ReturnType = UNICODE_STRING_SIMPLE("");
 	defineItem.Comment = comment;
+	defineItem.IsNative = IsCurrentFileNative;
 	ResourceCache.push_back(defineItem);
 }
 
@@ -646,6 +656,7 @@ void mvceditor::ResourceFinderClass::MethodFound(const UnicodeString& rawClassNa
 		break;
 	}
 	item.IsStatic = isStatic;
+	item.IsNative = IsCurrentFileNative;
 	MembersCache.push_back(item);
 }
 
@@ -692,6 +703,7 @@ void mvceditor::ResourceFinderClass::PropertyFound(const UnicodeString& rawClass
 		break;
 	}
 	item.IsStatic = isStatic;
+	item.IsNative = IsCurrentFileNative;
 	MembersCache.push_back(item);
 }
 
@@ -718,6 +730,7 @@ void mvceditor::ResourceFinderClass::FunctionFound(const UnicodeString& rawFunct
 	item.Signature = filteredSignature;
 	item.ReturnType = returnType;
 	item.Comment = comment;
+	item.IsNative = IsCurrentFileNative;
 	ResourceCache.push_back(item);
 }
 
@@ -1181,20 +1194,18 @@ bool mvceditor::ResourceFinderClass::Persist(const wxFileName& outputFile) const
 	}
 	int32_t written;
 	bool error = false;
-	wxString nativeFunctionsFile = mvceditor::NativeFunctionsAsset().GetFullPath();
 	std::list<mvceditor::ResourceClass>::const_iterator it;
 	for (it = ResourceCache.begin(); it != ResourceCache.end() && !error; ++it) {
 		if (it->FileItemIndex >= 0) {
 
 			// watch out for dynamic resources and 'native' functions
 			// we dont want to persist those for now 
-			bool isNative = FileCache[it->FileItemIndex].FullPath == nativeFunctionsFile;
-			if (mvceditor::ResourceClass::CLASS == it->Type && !isNative) {
+			if (mvceditor::ResourceClass::CLASS == it->Type && !it->IsNative) {
 				written = u_fprintf(uf, "CLASS,%s,%.*S,\n", 
 					FileCache[it->FileItemIndex].FullPath.ToAscii(), it->Resource.length(), it->Resource.getBuffer());
 				error = 0 == written;
 			}
-			else if (mvceditor::ResourceClass::FUNCTION == it->Type && !isNative) {
+			else if (mvceditor::ResourceClass::FUNCTION == it->Type && !it->IsNative) {
 				written = u_fprintf(uf, "FUNCTION,%s,%.*S,\n", 
 					FileCache[it->FileItemIndex].FullPath.ToAscii(), it->Resource.length(), it->Resource.getBuffer());
 				error = 0 == written;
@@ -1203,20 +1214,19 @@ bool mvceditor::ResourceFinderClass::Persist(const wxFileName& outputFile) const
 	}
 	for (it = MembersCache.begin(); it != MembersCache.end() && !error; ++it) {
 		if (it->FileItemIndex >= 0) {
-			bool isNative = FileCache[it->FileItemIndex].FullPath == nativeFunctionsFile;
 			UnicodeString className(it->Resource, 0, it->Resource.indexOf(it->Identifier));
 			className.findAndReplace(UNICODE_STRING_SIMPLE("::"), UNICODE_STRING_SIMPLE(""));
 
 			// watch out for dynamic resources and 'native' functions
 			// we dont want to persist those for now 
-			if (mvceditor::ResourceClass::MEMBER == it->Type && !isNative) {
+			if (mvceditor::ResourceClass::MEMBER == it->Type && !it->IsNative) {
 				written = u_fprintf(uf, "MEMBER,%s,%S,%.*S\n", 
 					FileCache[it->FileItemIndex].FullPath.ToAscii(), 
 					className.getTerminatedBuffer(),
 					it->Identifier.length(), it->Identifier.getBuffer());
 				error = 0 == written;
 			}
-			else if (mvceditor::ResourceClass::METHOD == it->Type && !isNative) {
+			else if (mvceditor::ResourceClass::METHOD == it->Type && !it->IsNative) {
 				written = u_fprintf(uf, "METHOD,%s,%S,%.*S\n", 
 					FileCache[it->FileItemIndex].FullPath.ToAscii(), 
 					className.getTerminatedBuffer(),
@@ -1240,6 +1250,7 @@ mvceditor::ResourceClass::ResourceClass()
 	, IsPrivate(false) 
 	, IsStatic(false)
 	, IsDynamic(false)
+	, IsNative(false)
 	, FullPath()
 	, FileItemIndex(-1) {
 		
@@ -1258,6 +1269,7 @@ void mvceditor::ResourceClass::operator=(const ResourceClass& src) {
 	IsPrivate = src.IsPrivate;
 	IsStatic = src.IsStatic;
 	IsDynamic = src.IsDynamic;
+	IsNative = src.IsNative;
 }
 
 bool mvceditor::ResourceClass::operator<(const mvceditor::ResourceClass& a) const {

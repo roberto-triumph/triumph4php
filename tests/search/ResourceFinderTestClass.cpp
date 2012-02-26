@@ -352,6 +352,7 @@ TEST_FIXTURE(ResourceFinderTestClass, CollectNearMatchResourcesShouldOnlySaveThe
 	CHECK_EQUAL((size_t)1, ResourceFinder->GetResourceMatchCount());
 	CHECK_EQUAL(TestProjectDir + wxT("test.php"), ResourceFinder->GetResourceMatchFullPath(0));
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass"), ResourceFinder->GetResourceMatch(0).Resource);
+	CHECK_EQUAL(false, ResourceFinder->GetResourceMatch(0).IsNative);
 }
 
 TEST_FIXTURE(ResourceFinderTestClass, CollectNearMatchResourcesShouldFindTwoFilesWhenClassNameMatches) {
@@ -674,6 +675,8 @@ TEST_FIXTURE(ResourceFinderTestClass, CollectNearMatchResourcesShouldFindMatches
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("function array_key_exists($key, $search)"), ResourceFinder->GetResourceMatch(0).Signature);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("array_keys"), ResourceFinder->GetResourceMatch(1).Resource);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("function array_keys($input, $search_value, $strict)"), ResourceFinder->GetResourceMatch(1).Signature);
+	CHECK(ResourceFinder->GetResourceMatch(0).IsNative);
+	CHECK(ResourceFinder->GetResourceMatch(1).IsNative);
 }
 
 TEST_FIXTURE(ResourceFinderTestClass, CollectNearMatchResourcesShouldFindMatchesWhenUsingBuildResourceCacheForFile) {
