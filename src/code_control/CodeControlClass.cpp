@@ -30,8 +30,8 @@
 #include <MvcEditorErrors.h>
 #include <wx/filename.h>
 #include <wx/stc/stc.h>
-#include <wx/regex.h>
 #include <wx/utils.h>
+#include <wx/tokenzr.h>
 #include <unicode/ustring.h>
 
 // IMPLEMENTATION NOTE:
@@ -54,6 +54,98 @@ static const int INDICATOR_PHP_STYLE = 128;
 
 // 32 => 5th bit on since first 5 bits of style bits are for all other lexers
 static const int INDICATOR_TEXT_STYLE = 32;
+
+/**
+ * Turns a resource PHPDoc comment into a nicer format that is more suitable
+ * to display. Any beginning '*'s are removed.
+ *
+ * Also, any HTML entities are handled (ignored), and any comment that
+ * is too big is truncated.
+ */
+static wxString NiceDocText(const UnicodeString& comment) {
+	wxString wxComment = mvceditor::StringHelperClass::IcuToWx(comment);
+	wxComment = wxComment.Trim();
+
+	// remove the beginning and ending '/*' and '*/'
+	wxComment = wxComment.Mid(2, wxComment.Len() - 4);
+
+	wxStringTokenizer tok(wxComment, wxT("\n\r"));
+	wxString prettyComment;
+	int lineCount = 0;
+	while (tok.HasMoreTokens() && lineCount <= 20) {
+		wxString line = tok.NextToken();
+
+		// remove the beginning whitespace and '*'s
+		size_t pos = 0;
+		for (; pos < line.Len(); ++pos) {
+			if (wxT(' ') != line[pos] && wxT('*') != line[pos] && wxT('\t') != line[pos]) {
+				break;
+			}
+		}
+		if (pos < line.Len()) {
+			line = line.Mid(pos);
+		}
+		else {
+
+			// an empty comment line
+			line = wxT("");
+		}
+
+		// tag 'conversions'
+		// taken from http://manual.phpdoc.org/HTMLSmartyConverter/HandS/phpDocumentor/tutorial_phpDocumentor.howto.pkg.html
+		// the DocBlock Description details section
+		// <b> -- emphasize/bold text
+		// <code> -- Use this to surround php code, some converters will highlight it
+		// <br> -- hard line break, may be ignored by some converters
+		// <i> -- italicize/mark as important
+		// <kbd> -- denote keyboard input/screen display
+		// <li> -- list item
+		// <ol> -- ordered list
+		// <p> -- If used to enclose all paragraphs, otherwise it will be considered text
+		// <pre> -- Preserve line breaks and spacing, and assume all tags are text (like XML's CDATA)
+		// <samp> -- denote sample or examples (non-php)
+		// <ul> -- unordered list
+		// <var> -- denote a variable name
+		//
+		// will ignore all of the tags except '<br>', '<code>', <p>', '<pre>' 
+		// since we cannot format the Scintilla call tip window.
+		// For the tags we don handle; just translate them to newlies for now.
+		wxString remove[] = { 
+			wxT("<b>"), wxT("</b>"), wxT("<i>"), wxT("</i>"), 
+			wxT("<kbd>"), wxT("</kbd>"), wxT("<samp>"), wxT("</samp>"), 
+			wxT("<var>"), wxT("</var>"), 
+			wxT("") 
+		};
+		for (int i = 0; !remove[i].IsEmpty(); ++i) {
+			line.Replace(remove[i], wxT(""));	
+		}
+
+		wxString toNewline[] =  { 
+			wxT("<code>"), wxT("</code>"),	wxT("<br>"), wxT("<br />"), 
+			wxT("<li>"), wxT("</li>"), wxT("<ol>"), wxT("</ol>"), 
+			wxT("<p>"), wxT("</p>"), wxT("<ul>"), wxT("</ul>"), 
+			wxT("") 
+		};
+		for (int i = 0; !toNewline[i].IsEmpty(); ++i) {
+			line.Replace(toNewline[i], wxT("\n"));
+		}
+
+
+		line.Replace(wxT("{@*}"), wxT("*/"));
+
+		// replace tabs with spaces
+		// do it here instead of in scintilla; we may want to change this later
+		line.Replace(wxT("\t"), wxT("    "));
+
+		prettyComment += line;
+		prettyComment += wxT("\n");
+		lineCount++;
+	}
+	if (lineCount > 20) {
+		prettyComment += wxT("\n...\n");
+	}
+	return prettyComment;
+}
 
 mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options, ProjectClass* project, 
 			mvceditor::ResourceCacheClass* resourceCache,
@@ -898,8 +990,6 @@ void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
 	 *
 	 * use the wxStyledTextCtrl call tip instead 
 	 */
-	 // TODO: handle big comments nicely
-	 // TODO: unescape html entities
 	if (DocumentMode == PHP) {
 		int pos = event.GetPosition();
 
@@ -914,16 +1004,31 @@ void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
 			if (resource.Type == mvceditor::ResourceClass::FUNCTION) {
 				msg = mvceditor::StringHelperClass::IcuToWx(resource.Resource);
 				msg += wxT("\n\n");
-				msg += mvceditor::StringHelperClass::IcuToWx(resource.ReturnType);
-				msg += wxT(" ");
 				msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
+				msg += wxT(" [ ");
+				msg += mvceditor::StringHelperClass::IcuToWx(resource.ReturnType);
+				msg += wxT(" ]");
+				
 			}
 			else if (resource.Type == mvceditor::ResourceClass::METHOD) {
 				msg = mvceditor::StringHelperClass::IcuToWx(resource.Resource);
 				msg += wxT("\n\n");
-				msg += mvceditor::StringHelperClass::IcuToWx(resource.ReturnType);
-				msg += wxT(" ");
 				msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
+				if (!resource.ReturnType.isEmpty()) {
+					msg += wxT(" [ ");
+					msg += mvceditor::StringHelperClass::IcuToWx(resource.ReturnType);
+					msg += wxT(" ]");	
+				}
+			}
+			else if (resource.Type == mvceditor::ResourceClass::MEMBER) {
+				msg = mvceditor::StringHelperClass::IcuToWx(resource.Resource);
+				msg += wxT("\n\n");
+				msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
+				if (!resource.ReturnType.isEmpty()) {
+					msg += wxT(" [ ");
+					msg += mvceditor::StringHelperClass::IcuToWx(resource.ReturnType);
+					msg += wxT(" ]");	
+				}
 			}
 			else {
 				msg = mvceditor::StringHelperClass::IcuToWx(resource.Resource);
@@ -932,7 +1037,7 @@ void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
 			}
 			if (!resource.Comment.isEmpty()) {
 				msg += wxT("\n\n");
-				msg += mvceditor::StringHelperClass::IcuToWx(resource.Comment);
+				msg += NiceDocText(resource.Comment);
 			}
 			if (!msg.IsEmpty()) {
 				if (CallTipActive()) {
