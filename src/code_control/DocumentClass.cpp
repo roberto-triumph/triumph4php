@@ -968,9 +968,8 @@ void mvceditor::PhpDocumentClass::OnTimer(wxTimerEvent& event) {
 	if (NeedToUpdateResources && ResourceCache && !ResourceCacheUpdateThread.IsRunning()) {
 		UnicodeString text = GetSafeText();
 
-		// TODO: do we need to differentiate between new and opened files?
-		// (the 'true' arg)
-		ResourceCacheUpdateThread.StartBackgroundUpdate(FileIdentifier, text, true);
+		// we need to differentiate between new and opened files (the 'true' arg)
+		ResourceCacheUpdateThread.StartBackgroundUpdate(FileIdentifier, text, !wxFileName::FileExists(Ctrl->GetFileName()));
 
 		// even if thread could not be started just prevent re-parsing until user 
 		// modified the text
