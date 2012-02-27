@@ -427,7 +427,6 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 	UnicodeString expressionScope;
 	mvceditor::SymbolTableMatchErrorClass error;
 	
-	// TODO: make duck typing user-configurable (ON / OFF)
 	bool doDuckTyping = Ctrl->CodeControlOptions.EnableDynamicAutoCompletion;
 	if (!lastExpression.isEmpty()) {
 		Parser.ParseExpression(lastExpression, parsedExpression);
