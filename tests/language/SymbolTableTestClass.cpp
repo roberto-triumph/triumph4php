@@ -25,6 +25,7 @@
 #include <language/SymbolTableClass.h>
 #include <windows/StringHelperClass.h>
 #include <FileTestFixtureClass.h>
+#include <MvcEditorChecks.h>
 #include <UnitTest++.h>
 
 UnicodeString CURSOR = UNICODE_STRING_SIMPLE("{CURSOR}");
@@ -526,6 +527,51 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressio
 	CompletionSymbolTable.ResourceMatches(emptyExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
 		&GlobalFinder, resources, true, Error);
 	CHECK_EQUAL((size_t)0, resources.size());
+}
+
+TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressionAndNoDuckTyping) {
+
+	// if we specify to not do duck typing then any variables that cannot be resolved should not 
+	// produce matches
+	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"class MyClass { function workA() {} function workB() {} } \n"
+		"/** no type here, should not work when duck typing flag is not set */\n"
+		"function make() {} \n"
+		"$my = make();"
+	);
+	int32_t pos;
+	sourceCode = FindCursor(sourceCode, pos);
+	Init(sourceCode);	
+	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false);
+	std::vector<mvceditor::ResourceClass> resources;
+	CompletionSymbolTable.ResourceMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+		&GlobalFinder, resources, false, Error);
+	CHECK_EQUAL((size_t)0, resources.size());
+}
+
+
+TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownVariableAndDuckTyping) {
+
+	// if we specify to not do duck typing then any variables that cannot be resolved should not 
+	// produce matches
+	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"class MyClass { function workA() {} function workB() {} } \n"
+		"/** no type here, should still work when duck typing flag is set */\n"
+		"function make() {} \n"
+		"$my = make();"
+	);
+	int32_t pos;
+	sourceCode = FindCursor(sourceCode, pos);
+	Init(sourceCode);	
+	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false);
+	std::vector<mvceditor::ResourceClass> resources;
+	CompletionSymbolTable.ResourceMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+		&GlobalFinder, resources, true, Error);
+	CHECK_VECTOR_SIZE(2, resources);
+	CHECK_UNISTR_EQUALS("MyClass::workA", resources[0].Resource);
+	CHECK_UNISTR_EQUALS("MyClass::workB", resources[1].Resource);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillUnknownResourceError) {

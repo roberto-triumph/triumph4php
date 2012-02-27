@@ -295,14 +295,20 @@ EditorBehaviorPanelGeneratedClass::EditorBehaviorPanelGeneratedClass( wxWindow* 
 	EnableIndentationGuides = new wxCheckBox( this, wxID_ANY, _("Show Indentation Guides"), wxDefaultPosition, wxDefaultSize, 0 );
 	FlexGridSizer->Add( EnableIndentationGuides, 0, wxALL, 5 );
 	
+	
+	FlexGridSizer->Add( 0, 0, 1, wxEXPAND, 5 );
+	
 	EnableLineEndings = new wxCheckBox( this, wxID_ANY, _("Show Line Endings"), wxDefaultPosition, wxDefaultSize, 0 );
 	FlexGridSizer->Add( EnableLineEndings, 0, wxALL, 5 );
+	
+	EnableAutoCompletion = new wxCheckBox( this, ID_AUTOCOMPLETION, _("Enable automatic code completion"), wxDefaultPosition, wxDefaultSize, 0 );
+	FlexGridSizer->Add( EnableAutoCompletion, 0, wxALL, 5 );
 	
 	IndentUsingTabs = new wxCheckBox( this, ID_SPACES_INSTEAD_OF_TABS, _("Indent Using Tabs"), wxDefaultPosition, wxDefaultSize, 0 );
 	FlexGridSizer->Add( IndentUsingTabs, 0, wxALL, 5 );
 	
-	EnableAutoCompletion = new wxCheckBox( this, ID_AUTOCOMPLETION, _("Enable automatic code completion"), wxDefaultPosition, wxDefaultSize, 0 );
-	FlexGridSizer->Add( EnableAutoCompletion, 0, wxALL, 5 );
+	EnableDynamicAutoCompletion = new wxCheckBox( this, ID_ENABLEDYNAMICAUTOCOMPLETION, _("Enable Dynamic code completion"), wxDefaultPosition, wxDefaultSize, 0 );
+	FlexGridSizer->Add( EnableDynamicAutoCompletion, 0, wxALL, 5 );
 	
 	wxBoxSizer* NumbersSizer;
 	NumbersSizer = new wxBoxSizer( wxHORIZONTAL );

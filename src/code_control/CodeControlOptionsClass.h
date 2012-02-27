@@ -186,6 +186,13 @@ public:
 	 */
 	bool EnableAutoCompletion;
 	
+	/**
+	 * If true, Auto completion will allow for 'dynamic' matching; auto complete list 
+	 * will show matching method / property names even if the variable could not be
+	 * resolved.
+	 */
+	bool EnableDynamicAutoCompletion;
+
 	CodeControlOptionsClass();
 	
 	/**

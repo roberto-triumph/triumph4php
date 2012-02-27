@@ -38,6 +38,9 @@
 
 namespace mvceditor {
 
+// forward declaration; prevent recursive dependencies
+class CodeControlClass;
+
 /**
  * this is the 'extra' functionality  that a plain text document has.
  * Plain text docouments will have auto complete, call tips, and
@@ -53,7 +56,7 @@ public:
 	 * @param ctrl The 'raw' text control, used 
 	 * This object will NOT own the pointer
 	 */
-	void SetControl(wxStyledTextCtrl* ctrl);
+	void SetControl(CodeControlClass* ctrl);
 
 	virtual ~TextDocumentClass();
 
@@ -116,12 +119,12 @@ public:
 	/**
 	 * subclasses should connect to Styled Text events in this method
 	 */
-	virtual void AttachToControl(wxStyledTextCtrl* ctrl);
+	virtual void AttachToControl(CodeControlClass* ctrl);
 
 	/**
 	 * subclasses should disconnect to Styled Text events in this method
 	 */
-	virtual void DetachFromControl(wxStyledTextCtrl* ctrl);
+	virtual void DetachFromControl(CodeControlClass* ctrl);
 
 
 	/**
@@ -152,7 +155,7 @@ protected:
 	 * (except in the constructor)
 	 * This object will NOT own the pointer
 	 */
-	 wxStyledTextCtrl* Ctrl;
+	 CodeControlClass* Ctrl;
 
 };
 
@@ -188,9 +191,9 @@ public:
 
 	void MatchBraces(int posToCheck);
 
-	virtual void AttachToControl(wxStyledTextCtrl* ctrl);
+	virtual void AttachToControl(CodeControlClass* ctrl);
 
-	virtual void DetachFromControl(wxStyledTextCtrl* ctrl);
+	virtual void DetachFromControl(CodeControlClass* ctrl);
 
 	/**
 	 * Returns the resolved Resource[s] that is positioned in the given cursor position.

@@ -36,6 +36,7 @@ mvceditor::CodeControlOptionsClass::CodeControlOptionsClass() {
 	EnableIndentationGuides = false;
 	EnableLineEndings = false;
 	EnableAutoCompletion = true;
+	EnableDynamicAutoCompletion = true;
 	wxOperatingSystemId os = wxGetOsVersion();
 	if (wxOS_WINDOWS == os) {  
 		LineEndingMode = wxSTC_EOL_CRLF;
@@ -48,7 +49,7 @@ mvceditor::CodeControlOptionsClass::CodeControlOptionsClass() {
 		
 		// there is a bad flicker that happens when Code Folding and matching braces are enabled ...
 		// turn off code folding in linux by default.
-		// ATTN: fixed in new versions of Scintilla?
+		// TODO: fixed in new versions of Scintilla?
 		EnableCodeFolding = false;
 	}
 	RightMargin = 0;
@@ -433,6 +434,7 @@ void mvceditor::CodeControlOptionsClass::Load(wxConfigBase* config) {
 	config->Read(wxT("EditorBehavior/EnableIndentationGuides"), &EnableIndentationGuides);
 	config->Read(wxT("EditorBehavior/EnableLineEndings"), &EnableLineEndings);
 	config->Read(wxT("EditorBehavior/EnableAutoCompletion"), &EnableAutoCompletion);
+	config->Read(wxT("EditorBehavior/EnableDynamicAutoCompletion"), &EnableDynamicAutoCompletion);
 	for (size_t i = 0; i < PhpStyles.size(); ++i) {
 		PhpStyles[i].Read(config);
 	}
@@ -456,6 +458,7 @@ void mvceditor::CodeControlOptionsClass::Save(wxConfigBase* config) {
 	config->Write(wxT("EditorBehavior/EnableIndentationGuides"), EnableIndentationGuides);
 	config->Write(wxT("EditorBehavior/EnableLineEndings"), EnableLineEndings);
 	config->Write(wxT("EditorBehavior/EnableAutoCompletion"), EnableAutoCompletion);
+	config->Write(wxT("EditorBehavior/EnableDynamicAutoCompletion"), EnableDynamicAutoCompletion);
 	for (size_t i = 0; i < PhpStyles.size(); ++i) {
 		PhpStyles[i].Write(config);
 	}

@@ -51,6 +51,8 @@ mvceditor::EditorBehaviorPanelClass::EditorBehaviorPanelClass(wxWindow* parent, 
 	LineEndingMode->SetValidator(lineEndingModeValidator);
 	wxGenericValidator autoCompletionValidator(&options.EnableAutoCompletion);
 	EnableAutoCompletion->SetValidator(autoCompletionValidator);
+	wxGenericValidator dynamicAutoCompletionValidator(&options.EnableDynamicAutoCompletion);
+	EnableDynamicAutoCompletion->SetValidator(dynamicAutoCompletionValidator);
 }
 
 void mvceditor::EditorBehaviorPanelClass::OnIndentUsingSpaces(wxCommandEvent& event) {

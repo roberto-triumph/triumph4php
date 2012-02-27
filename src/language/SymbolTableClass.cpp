@@ -553,7 +553,9 @@ void mvceditor::SymbolTableClass::ResourceMatches(const mvceditor::SymbolClass& 
 	bool isParentCall = parsedExpression.Lexeme.caseCompare(UNICODE_STRING_SIMPLE("parent"), 0) == 0;
 	for (size_t j = 0; j < allResourceFinders.size(); ++j) {
 		mvceditor::ResourceFinderClass* finder = allResourceFinders[j];
-		if (finder->Prepare(wxResource) && finder->CollectNearMatchResources()) {
+
+		// only do duck typing if needed. otherwise, make sure that we have a type match first.
+		if ((doDuckTyping || !typeToLookup.isEmpty()) && finder->Prepare(wxResource) && finder->CollectNearMatchResources()) {
 
 			// now we loop through the possbile matches and remove stuff that does not 
 			// make sense because of visibility rules or resources that are 

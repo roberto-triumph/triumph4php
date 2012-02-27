@@ -152,8 +152,8 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 			int id, const wxPoint& position, const wxSize& size, long style,
 			const wxString& name)
 		: wxStyledTextCtrl(parent, id, position, size, style, name)
-		, CurrentFilename()
 		, CodeControlOptions(options)
+		, CurrentFilename()		
 		, WordHighlightFinder()
 		, WordHighlightWord()
 		, CurrentInfo()

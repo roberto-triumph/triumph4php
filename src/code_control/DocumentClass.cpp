@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <code_control/DocumentClass.h>
+#include <code_control/CodeControlClass.h>
 #include <windows/StringHelperClass.h>
 #include <windows/StringHelperClass.h>
 #include <MvcEditorAssets.h>
@@ -193,7 +194,7 @@ mvceditor::TextDocumentClass::~TextDocumentClass() {
 	}
 }
 
-void mvceditor::TextDocumentClass::SetControl(wxStyledTextCtrl* ctrl) {
+void mvceditor::TextDocumentClass::SetControl(CodeControlClass* ctrl) {
 	if (Ctrl) {
 		DetachFromControl(Ctrl);
 	}
@@ -248,11 +249,11 @@ UnicodeString mvceditor::TextDocumentClass::GetSafeSubstring(int startPos, int e
 	return ret;
 }
 
-void mvceditor::TextDocumentClass::AttachToControl(wxStyledTextCtrl* ctrl) {
+void mvceditor::TextDocumentClass::AttachToControl(CodeControlClass* ctrl) {
 
 }
 
-void mvceditor::TextDocumentClass::DetachFromControl(wxStyledTextCtrl* ctrl) {
+void mvceditor::TextDocumentClass::DetachFromControl(CodeControlClass* ctrl) {
 
 }
 
@@ -290,7 +291,7 @@ mvceditor::PhpDocumentClass::~PhpDocumentClass() {
 	
 }
 
-void mvceditor::PhpDocumentClass::AttachToControl(wxStyledTextCtrl* ctrl) {
+void mvceditor::PhpDocumentClass::AttachToControl(CodeControlClass* ctrl) {
 	ctrl->SetModEventMask(wxSTC_MOD_INSERTTEXT | wxSTC_MOD_DELETETEXT);
 		
 	// using Connect instead of Event tables because call EVT_STC_CALLTIP_CLICK macro
@@ -309,7 +310,7 @@ void mvceditor::PhpDocumentClass::AttachToControl(wxStyledTextCtrl* ctrl) {
 	FileOpened(FileIdentifier);
 }
 
-void mvceditor::PhpDocumentClass::DetachFromControl(wxStyledTextCtrl* ctrl) {
+void mvceditor::PhpDocumentClass::DetachFromControl(CodeControlClass* ctrl) {
 	ctrl->Disconnect(wxID_ANY, wxID_ANY, wxEVT_STC_CALLTIP_CLICK, 
 		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(wxStyledTextEventFunction, &mvceditor::PhpDocumentClass::OnCallTipClick),
 		NULL, this);
@@ -427,7 +428,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 	mvceditor::SymbolTableMatchErrorClass error;
 	
 	// TODO: make duck typing user-configurable (ON / OFF)
-	bool doDuckTyping = true;
+	bool doDuckTyping = Ctrl->CodeControlOptions.EnableDynamicAutoCompletion;
 	if (!lastExpression.isEmpty()) {
 		Parser.ParseExpression(lastExpression, parsedExpression);
 		expressionScope = ScopeFinder.GetScopeString(code, expressionPos);

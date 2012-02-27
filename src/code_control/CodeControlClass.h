@@ -297,6 +297,14 @@ public:
 	 */
 	void SetAsHidden(bool isHidden);
 
+	/**
+	 * The options to enable/disable various look & feel items
+	 *
+	 * @var CodeControlOptionsClass
+	 */
+	CodeControlOptionsClass& CodeControlOptions;
+
+
 private:
 
 	/**
@@ -425,13 +433,6 @@ private:
 	* The file that was loaded.
 	*/
 	wxString CurrentFilename;
-
-	/**
-	 * The options to enable/disable various look & feel items
-	 *
-	 * @var CodeControlOptionsClass
-	 */
-	CodeControlOptionsClass& CodeControlOptions;
 
 	/**
 	  * Used by the word highlight feature to do the actual searching.
