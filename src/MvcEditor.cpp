@@ -54,26 +54,25 @@ mvceditor::AppClass::AppClass()
 	, PhpFrameworks(*this, Environment)
 	, UrlResourceFinder()
 	, Plugins()
+	, Preferences()
 	, Project(NULL)
 	, ResourcePlugin(NULL)
 	, ProjectPlugin(NULL) {
 	AppFrame = NULL;
-	Preferences = NULL;
 }
 
 /**
  * when app starts, create the new app frame
  */
 bool mvceditor::AppClass::OnInit() {
-	Preferences = new PreferencesClass();
-	// plugins will need to be create first because 
+	Preferences.Init();
 	CreatePlugins();
 
 	// due to the way keyboard shortcuts are serialized, we need to load the
 	// frame and initialize the plugin windows so that all menus are created
 	// and only then can we load the keyboard shortcuts from the INI file
 	// all menu items must be present in the menu bar for shortcuts to take effect
-	AppFrame = new mvceditor::AppFrameClass(Plugins, *this, Environment, *Preferences, ResourceCache);
+	AppFrame = new mvceditor::AppFrameClass(Plugins, *this, Environment, Preferences, ResourceCache);
 	PluginWindows();
 
 	// load any settings from .INI files
@@ -83,9 +82,9 @@ bool mvceditor::AppClass::OnInit() {
 	for (size_t i = 0; i < Plugins.size(); ++i) {
 		Plugins[i]->InitState(this);
 		Plugins[i]->LoadPreferences(config);
-		Plugins[i]->AddKeyboardShortcuts(Preferences->DefaultKeyboardShortcutCmds);
+		Plugins[i]->AddKeyboardShortcuts(Preferences.DefaultKeyboardShortcutCmds);
 	}	
-	Preferences->Load(AppFrame);
+	Preferences.Load(AppFrame);
 
 	// open a new project
 	ProjectOpen(wxT(""));
@@ -106,7 +105,6 @@ mvceditor::AppClass::~AppClass() {
 		delete Project;
 		Project = NULL;
 	}
-	delete Preferences;
 	
 	// calling cleanup here so that we can run this binary through a memory leak detector 
 	// ICU will cache many things and that will cause the detector to output "possible leaks"
@@ -266,7 +264,7 @@ void mvceditor::AppClass::ProjectOpen(const wxString& directoryPath) {
 }
 
 void mvceditor::AppClass::OnSavePreferences(wxCommandEvent& event) {
-	Preferences->EnableSelectedProfile(AppFrame);
+	Preferences.EnableSelectedProfile(AppFrame);
 	wxConfigBase* config = wxConfigBase::Get();
 	for (size_t i = 0; i < Plugins.size(); ++i) {
 		Plugins[i]->SavePreferences(config);

@@ -53,7 +53,9 @@ mvceditor::CodeControlOptionsClass::CodeControlOptionsClass() {
 		EnableCodeFolding = false;
 	}
 	RightMargin = 0;
-	
+}
+
+void mvceditor::CodeControlOptionsClass::Init() {	
 	int index = 0;
 	mvceditor::StylePreferenceClass pref;
 	PhpStyles.push_back(pref); PhpStyles[index++].Control(wxSTC_HPHP_DEFAULT, "PHP Default");

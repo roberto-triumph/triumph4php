@@ -293,6 +293,10 @@ mvceditor::PreferencesClass::PreferencesClass()
 	
 }
 
+void mvceditor::PreferencesClass::Init() {
+	CodeControlOptions.Init();
+}
+
 mvceditor::PreferencesClass::~PreferencesClass() {
 	//KeyProfileArray destructor deletes the pointers
 }

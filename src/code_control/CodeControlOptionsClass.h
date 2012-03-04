@@ -194,6 +194,11 @@ public:
 	bool EnableDynamicAutoCompletion;
 
 	CodeControlOptionsClass();
+
+	/**
+	 * Initializes the color schemes. 
+	 */
+	void Init();
 	
 	/**
 	 * Prepares the edited preferences by copying them FROM the real settings. From this point on, all calls to 

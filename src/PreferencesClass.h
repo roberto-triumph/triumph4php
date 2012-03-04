@@ -121,6 +121,11 @@ public:
 	 * Cleanup (delete) the keyboard profile pointers
 	 */
 	~PreferencesClass();
+
+	/**
+	 * initalizes the preferences
+	 */
+	void Init();
 	
 	/**
 	 * Load the preferences from persistent storage.

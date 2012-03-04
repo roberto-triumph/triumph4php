@@ -186,15 +186,10 @@ private:
 	std::vector<PluginClass*> Plugins;
 	
 	/**
-	 * The user preferences. For now this is a pointer because it does non-trival work
-	 * in the constructor (uses some wx widgets stuff)
-	 * 
-	 * 
+	 * The user preferences.  
 	 * @var PreferencesClass;
 	 */
-	 // TODO simply this and just make it a reference by creating a specific Init() method
-	 // on the preferences class.
-	PreferencesClass* Preferences;
+	PreferencesClass Preferences;
 		
 	/**
 	 * The open project
