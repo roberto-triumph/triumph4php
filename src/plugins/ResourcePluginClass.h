@@ -33,7 +33,9 @@
 
 namespace mvceditor {
 
+// these are defined at the bottom
 class ResourcePluginPanelClass;
+class IndexingDialogClass;
 
 /**
  * This class will take care of iterating through all files in a project
@@ -267,6 +269,12 @@ private:
 	 * When a tab changes we must update the FilesCombo combo box
 	 */
 	ResourcePluginPanelClass* ResourcePluginPanel;
+
+	/**
+	 * A more prominent status bar that indicated progress
+	 * this dialog will only be alive while project is being indexed
+	 */
+	IndexingDialogClass* IndexingDialog;
 	
 	/**
 	 * To check if parsing is happening at the moment; and what files we are parsing.
@@ -340,5 +348,30 @@ private:
 	ResourcePluginClass& ResourcePlugin;
 };
 
+/**
+ * A small dialog so that the user knows the editor is indexing.  Creating a full-fledged
+ * dialog because the lower status bar might not be enough feedback.
+ */
+class IndexingDialogClass : public IndexingDialogGeneratedClass {
+
+public:
+
+	IndexingDialogClass(wxWindow* parent);
+
+	/**
+	 * initialize this dialog's gauge (in pulse mode)
+	 */
+	void Start();
+
+	/**
+	 * increment this dialog's gauge
+	 */
+	void Increment();
+
+protected:
+
+	void OnHideButton(wxCommandEvent& event);
+
+};
 }
 #endif // __resourcepluginclass__

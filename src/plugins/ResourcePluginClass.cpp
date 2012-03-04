@@ -102,6 +102,7 @@ mvceditor::ResourcePluginClass::ResourcePluginClass()
 	, HasCodeLookups(false)
 	, HasFileLookups(false) {
 	ResourcePluginPanel = NULL;
+	IndexingDialog = NULL;
 }
 
 void mvceditor::ResourcePluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
@@ -191,6 +192,11 @@ void mvceditor::ResourcePluginClass::SearchForResources() {
 						GetStatusBarWithGauge()->AddGauge(_("Searching For Resources"),
 							ID_COUNT_FILES_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE,
 							wxGA_HORIZONTAL);
+						if (!IndexingDialog) {
+							IndexingDialog = new mvceditor::IndexingDialogClass(NULL);
+						}
+						IndexingDialog->Show();
+						IndexingDialog->Start();
 					}
 					else if (mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING == error) {
 						wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
@@ -214,10 +220,17 @@ void mvceditor::ResourcePluginClass::SearchForResources() {
 
 void mvceditor::ResourcePluginClass::OnWorkInProgress(wxCommandEvent& event) {
 	GetStatusBarWithGauge()->IncrementGauge(ID_COUNT_FILES_GAUGE, StatusBarWithGaugeClass::INDETERMINATE_MODE);
+	if (IndexingDialog && IndexingDialog->IsShown()) {
+		IndexingDialog->Increment();
+	}
 }
 
 void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
 	GetStatusBarWithGauge()->StopGauge(ID_COUNT_FILES_GAUGE);
+	if (IndexingDialog) {
+		IndexingDialog->Destroy();
+		IndexingDialog = NULL;
+	}
 
 	UnicodeString fileName,
 		className, 
@@ -582,6 +595,22 @@ void mvceditor::ResourcePluginPanelClass::RemoveClosedFiles(mvceditor::NotebookC
 			--i;
 		}
 	}
+}
+
+mvceditor::IndexingDialogClass::IndexingDialogClass(wxWindow* parent) 
+	: IndexingDialogGeneratedClass(parent) {
+}
+
+void mvceditor::IndexingDialogClass::OnHideButton(wxCommandEvent &event) {
+	Hide();
+}
+
+void mvceditor::IndexingDialogClass::Start() {
+	Gauge->Pulse();
+}
+
+void mvceditor::IndexingDialogClass::Increment() {
+	Gauge->Pulse();
 }
 
 BEGIN_EVENT_TABLE(mvceditor::ResourcePluginClass, wxEvtHandler)

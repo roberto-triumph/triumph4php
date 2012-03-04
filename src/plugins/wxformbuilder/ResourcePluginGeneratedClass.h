@@ -23,6 +23,8 @@
 #include <wx/button.h>
 #include <wx/sizer.h>
 #include <wx/panel.h>
+#include <wx/gauge.h>
+#include <wx/dialog.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -61,6 +63,40 @@ class ResourcePluginGeneratedPanelClass : public wxPanel
 		
 		ResourcePluginGeneratedPanelClass( wxWindow* parent, wxWindowID id = ID_RESOURCEPLUGINPANELCLASS, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 889,45 ), long style = wxTAB_TRAVERSAL );
 		~ResourcePluginGeneratedPanelClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class IndexingDialogGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class IndexingDialogGeneratedClass : public wxDialog 
+{
+	DECLARE_EVENT_TABLE()
+	private:
+		
+		// Private event handlers
+		void _wxFB_OnHideButton( wxCommandEvent& event ){ OnHideButton( event ); }
+		
+	
+	protected:
+		enum
+		{
+			ID_INDEXINGDIALOGGENERATEDCLASS = 1000,
+			ID_GAUGE,
+			ID_HIDEBUTTON,
+		};
+		
+		wxGauge* Gauge;
+		wxButton* HideButton;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnHideButton( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		IndexingDialogGeneratedClass( wxWindow* parent, wxWindowID id = ID_INDEXINGDIALOGGENERATEDCLASS, const wxString& title = _("Indexing ..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 392,107 ), long style = wxCAPTION|wxSTAY_ON_TOP );
+		~IndexingDialogGeneratedClass();
 	
 };
 
