@@ -106,14 +106,16 @@ mvceditor::ResourcePluginClass::ResourcePluginClass()
 
 void mvceditor::ResourcePluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
 	ProjectIndexMenu = projectMenu->Append(mvceditor::MENU_RESOURCE + 0, _("Index"), _("Index the project"));
-	projectMenu->Append(mvceditor::MENU_RESOURCE + 1, _("Jump To Resource"), _("Jump To Current Resource"));
+	projectMenu->Append(mvceditor::MENU_RESOURCE + 1, _("Jump To Resource Under Cursor"), _("Jump To Resource that is under the cursor"));
+	projectMenu->Append(mvceditor::MENU_RESOURCE + 2, _("Search for Resource..."), _("Set focus on the resource input"));
 	ProjectIndexMenu->Enable(GetProject() && FREE == State);
 }
 
 void mvceditor::ResourcePluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
 	menuItemIds[mvceditor::MENU_RESOURCE + 0] = wxT("Resource-Index Project");
-	menuItemIds[mvceditor::MENU_RESOURCE + 1] = wxT("Resource-Jump To Resource");
+	menuItemIds[mvceditor::MENU_RESOURCE + 1] = wxT("Resource-Jump To Resource Under Cursor");
+	menuItemIds[mvceditor::MENU_RESOURCE + 2] = wxT("Resource-Search For Resource ...");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
@@ -359,11 +361,8 @@ void mvceditor::ResourcePluginClass::OnProjectIndex(wxCommandEvent& event) {
 }
 
 void mvceditor::ResourcePluginClass::OnJump(wxCommandEvent& event) {
-	
-	// TODO: we need two separate actions here:
-	// (1) jump to selected resources
-	// (2) focus to resource text box
-	// right now the "jump" functionality attempts to both at the same time
+
+	// jump to selected resources
 	CodeControlClass* codeControl = GetCurrentCodeControl();
 	wxWindow* mainWindow = GetMainWindow();
 	if (codeControl) {
@@ -380,11 +379,15 @@ void mvceditor::ResourcePluginClass::OnJump(wxCommandEvent& event) {
 			SearchForResources();
 		}
 	}
-	else {
-		ResourcePluginPanelClass* window = (ResourcePluginPanelClass*)wxWindow::FindWindowById(ID_RESOURCE_PLUGIN_PANEL, mainWindow);
-		window->FocusOnSearchControl();
-	}
 }
+
+void mvceditor::ResourcePluginClass::OnSearchForResource(wxCommandEvent& event) {
+	wxWindow* mainWindow = GetMainWindow();
+	ResourcePluginPanelClass* window = (ResourcePluginPanelClass*)wxWindow::FindWindowById(ID_RESOURCE_PLUGIN_PANEL, mainWindow);
+	window->ChangeToFileName(wxT(""));
+	window->FocusOnSearchControl();
+}
+
 
 void mvceditor::ResourcePluginClass::LoadPageFromResource(const wxString& finderQuery, const mvceditor::ResourceClass& resource) {
 	UnicodeString fileName,
@@ -585,6 +588,7 @@ BEGIN_EVENT_TABLE(mvceditor::ResourcePluginClass, wxEvtHandler)
 	EVT_MENU(ID_TOOLBAR_INDEX, mvceditor::ResourcePluginClass::OnProjectIndex)
 	EVT_MENU(mvceditor::MENU_RESOURCE + 0, mvceditor::ResourcePluginClass::OnProjectIndex)
 	EVT_MENU(mvceditor::MENU_RESOURCE + 1, mvceditor::ResourcePluginClass::OnJump)
+	EVT_MENU(mvceditor::MENU_RESOURCE + 2, mvceditor::ResourcePluginClass::OnSearchForResource)
 	EVT_MENU(ID_CONTEXT_MENU_JUMP, mvceditor::ResourcePluginClass::OnJump)
 	EVT_UPDATE_UI(wxID_ANY, mvceditor::ResourcePluginClass::OnUpdateUi)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(wxID_ANY, mvceditor::ResourcePluginClass::OnPageChanged)

@@ -172,6 +172,11 @@ private:
 	void OnJump(wxCommandEvent& event);
 	
 	/**
+	 * Handle to Search For Resource menu event
+	 */
+	void OnSearchForResource(wxCommandEvent& event);
+
+	/**
 	 * During file iteration we will pulse the gauge.
 	 */
 	void OnWorkInProgress(wxCommandEvent& event);
