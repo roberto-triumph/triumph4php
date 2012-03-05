@@ -122,6 +122,12 @@ public:
 	 * @see mvceditor::ResourceFinderClass::EnsureSorted
 	 */
 	void EnsureSortedGlobal();
+
+	/**
+	 * calls AllNonNativeClasses() method on the GLOBAL resource. This is usually done after all files have been indexed.
+	 * @see mvceditor::ResourceFinderClass::AllNonNativeClasses
+	 */
+	std::vector<ResourceClass> AllNonNativeClassesGlobal();
 	
 	/**
 	 * prepares all the registered resource finders plus the global one.

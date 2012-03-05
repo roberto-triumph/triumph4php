@@ -454,6 +454,26 @@ public:
 	bool Persist(const wxFileName& outputFile) const;
 
 	/**
+	 * @return vector of ALL parsed Resources. Be careful as this method may return
+	 * many items (10000+). Try to use the CollectXXX() methods as much as possible.
+	 * An example use of this method is when wanting to find all functions in a single file.
+	 */
+	std::vector<ResourceClass> All() const;
+
+	/**
+	 * @return vector of ALL parsed class Resources. Be careful as this method may return
+	 * many items (10000+). Try to use the CollectXXX() methods as much as possible.
+	 * An example use of this method is when wanting to find all classes in a project.
+	 * This method will NOT return native PHP classes (ie. PDO, DateTime).
+	 */
+	std::vector<ResourceClass> AllNonNativeClasses() const;
+
+	/**
+	 * Removes all resources from the cache entirely.
+	 */
+	void Clear();
+
+	/**
 	 * Parses a resource string into its components: class name, file name, method name, line number
 	 * resource string is a string that contain a file name and line number or
 	 * class name or method name. Examples:

@@ -28,9 +28,53 @@
 #include <PluginClass.h>
 #include <language/ParserClass.h>
 #include <plugins/wxformbuilder/OutlineViewPluginPanelClass.h>
+#include <widgets/ThreadWithHeartbeatClass.h>
 #include <vector>
 
 namespace mvceditor {
+
+/**
+ * A small class that will parse source into resources. We want to do 
+ * this in a background thread in case the user is viewing a big file.
+ */
+class ResourceFinderBackgroundThreadClass : ThreadWithHeartbeatClass {
+
+public:
+
+	/**
+	 * don't access this until the EVENT_WORK_COMPLETE event is 
+	 * generated
+     */
+	std::vector<ResourceClass> Resources;
+
+	/**
+	 * @param handler will get notified with EVENT_WORK_COMPLETE
+	 * events when parsing is complete.
+	 */
+	ResourceFinderBackgroundThreadClass(wxEvtHandler& handler);
+
+	/**
+	 * start the background thread that parses the given file.
+	 */
+	bool Start(const wxString& fileName);
+
+protected:
+
+	void* Entry();
+
+private:
+
+	/**
+	 * to parse the resources out of a file
+	 */
+	ResourceFinderClass ResourceFinder;
+
+	/**
+	 * the current file being parsed
+	 */
+	wxString FileName;
+
+};
 
 /**
  * This is a plugin that is designed to let the user see the classes / methods of 
@@ -38,27 +82,15 @@ namespace mvceditor {
  * in the opened files.
  * 
  */
-class OutlineViewPluginClass : public PluginClass, public ClassObserverClass, public ClassMemberObserverClass, public FunctionObserverClass {
+class OutlineViewPluginClass : public PluginClass {
 public:
 
 	/**
-	 * Holds the text for the outline of the currently viewed file
-	 * @var UnicodeString
+	 * Holds the currently outlines resources , will also parse
+	 * a piece of source code.
 	 */
-	UnicodeString CurrentOutline;
+	ResourceFinderBackgroundThreadClass ResourceFinderBackground;
 	
-	/**
-	 * Holds the text for the outline of the resources the user asked for.
-	 * @var UnicodeString
-	 */
-	UnicodeString Outline2;
-	
-	/**
-	 * Holds the text for the PHP Doc of the resource the user asked for
-	 * @var UnicodeString
-	 */
-	UnicodeString PhpDoc;
-		
 	/**
 	 * Creates a new OutlineViewPlugin.
 	 */
@@ -90,18 +122,11 @@ public:
 	
 	/**
 	 * Builds an outline based on the given line of text.  Note that this does not parse a file; it searches the
-	 * ResourceFinder.
+	 * global ResourceCache
 	 * 
-	 * @param wxString line this should be a line from a previosuly built outline
+	 * @param wxString className the name of the class to build the outline for.
 	 */
-	void BuildOutline(const wxString& line);
-	
-	/**
-	 * Builds PHPDoc based on the given line of text.
-	 * 
-	 * @param wxString line this should be a line from a previosuly built outline
-	 */
-	void BuildPhpDoc(const wxString& line);
+	void BuildOutline(const wxString& className);
 	
 	/**
 	 * Opens the file where the given resource is located.
@@ -110,67 +135,17 @@ public:
 	 */
 	void JumpToResource(const wxString& resource);
 	
-	/**
-	 * Implementation of ClassObserver.  In this method we will append to the outline buffer.
-	 */
-	void ClassFound(const UnicodeString& className, const UnicodeString& signature, 
-		const UnicodeString& comment);
-	
-	/**
-	 * Implementation of ClassObserver.  In this method we will append to the outline buffer.
-	 */
-	void DefineDeclarationFound(const UnicodeString& variableName, const UnicodeString& variableValue, 
-		const UnicodeString& comment);
-		
-	/**
-	 * Implementation of ClassMemberObserver.  In this method we will append to the outline buffer.
-	 */
-	void MethodFound(const UnicodeString& className, const UnicodeString& methodName, 
-		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
-		TokenClass::TokenIds visibility, bool isStatic);
-
-	void MethodEnd(const UnicodeString& className, const UnicodeString& methodName, int pos);
-		
-	/**
-	 * Implementation of ClassMemberObserver.  In this method we will append to the outline buffer.
-	 */
-	void PropertyFound(const UnicodeString& className, const UnicodeString& propertyName, 
-		const UnicodeString& propertyType, const UnicodeString& comment, 
-		TokenClass::TokenIds visibility, bool isConst, bool isStatic);
-		
-	/**
-	 * Implementation of FunctionObserver.  In this method we will append to the outline buffer.
-	 */
-	void FunctionFound(const UnicodeString& functionName, 
-		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment);
-
-	void FunctionEnd(const UnicodeString& functionName, int pos);
-	
 private:		
-	
-	/**
-	 * To parse the class/methods from the files
-	 * @var ParserClass
-	 */
-	ParserClass Parser;
-	
-	/**
-	 * Outline to keep the results of the current outline.  We will be continually appending to this vector.
-	 * We need this vector because for the current outline we dont use ResourceFinder hence the results are not sorted
-	 */
-	std::vector<UnicodeString> CurrentOutlineLines;
-	
-	/**
-	 * Returns a human-friendly outline based on the raw text in CurrentOutlineLines
-	 * 
-	 * @return UnicodeString
-	 */
-	UnicodeString HumanFriendlyOutline();
 		
 	/**
 	 * Updates the outlines based on the currently opened (and focused) file.
 	*/
 	void OnContentNotebookPageChanged(wxAuiNotebookEvent& event);
+
+	/**
+	 * when the parsing is complete update the panel.
+	 */
+	void OnWorkComplete(wxCommandEvent& event);
 	
 	DECLARE_EVENT_TABLE()
 };
@@ -192,6 +167,16 @@ class OutlineViewPluginPanelClass : public OutlineViewPluginGeneratedPanelClass 
 	OutlineViewPluginPanelClass(wxWindow* parent, int windowId, OutlineViewPluginClass* plugin, NotebookClass* notebook);
 	
 	/**
+	 * update the status label
+	 */
+	void SetStatus(const wxString& status);
+
+	/**
+	 * update the Choice options
+	 */
+	void SetClasses(std::vector<ResourceClass>& classes);
+
+	/**
 	 * refresh the code control from the plugin source strings
 	 */
 	 void RefreshOutlines();
@@ -204,28 +189,17 @@ protected:
 	void OnHelpButton(wxCommandEvent& event);
 	
 	/**
-	 * take the entered text, perform a resource lookup, and get the outline
+	 * take the selected choice, perform a resource lookup, and get the outline
 	 */
-	void OnLookupButton(wxCommandEvent& event);
+	void OnChoice(wxCommandEvent& event);
 
 	/**
 	 * sync the outline with the currently opened file
 	 */
+	
 	void OnSyncButton(wxCommandEvent& event);
 
 private:
-
-	/**
-	 * The code control for the current file
-	 * @var CodeControlClass
-	 */
-	CodeControlClass* Outline1;
-	
-	/**
-	 * The code control for the PHPDoc comments
-	 * @var CodeControlClass
-	 */
-	CodeControlClass* Outline3;
 
 	/**
 	 * The plugin class that will execute all logic. 
@@ -239,36 +213,9 @@ private:
 	NotebookClass* Notebook;
 	
 	/**
-	 * when the panel is closed do some cleanup.
+	 * double clicking on a  resource name in the tree will make the editor open up that resource
 	 */
-	void OnClose(wxCloseEvent& event);
-
-	/**
-	 * On right-click we will allow the user to jump to a resource
-	 */
-	void OnContextMenu(wxContextMenuEvent& event);
-
-	/**
-	 * take the user to a resource
-	 */
-	void OnOutlineJumpTo(wxCommandEvent& event);
-
-	/**
-	 * show the user the resource comment
-	 */
-	void OnOutlineJumpToComment(wxCommandEvent& event);
-
-	/**
-	 * Get the resource that was clicked on by the user.  This method will figure out which of the outline windows the user clicked
-	 * on, get the selected line, and parse out the resource. The return of this method is suitable for passing to
-	 * ResourceFinderClass::Prepare and it will make ResourceFinderClass::CollectFullyQualifiedMatch return TRUE.
-	 * @param wxCommandEvent the menu event
-	 */
-	wxString ResourceFromOutline(wxCommandEvent& event);
-
-	
-	DECLARE_EVENT_TABLE()
-	
+	void OnTreeItemActivated(wxTreeEvent& event);
 };
 
 }

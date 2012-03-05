@@ -19,35 +19,62 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2009-2011 RobertoOnContentNotebookPageChanged Perpuly
+ * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <plugins/OutlineViewPluginClass.h>
 #include <language/SymbolTableClass.h>
 #include <windows/StringHelperClass.h>
+#include <MvcEditor.h>
 #include <unicode/regex.h>
 #include <wx/artprov.h>
 #include <vector>
 #include <algorithm>
 
 
-int ID_CONTEXT_MENU_SHOW_OUTLINE_OTHER = wxNewId();
-int ID_WINDOW_OUTLINE = wxNewId();
-int ID_CONTEXT_MENU_SHOW_OUTLINE_CURRENT = wxNewId();
-int ID_WINDOW_OUTLINE_CURRENT = wxNewId();
-int ID_WINDOW_OUTLINE_COMMENT = wxNewId();
-int ID_CONTEXT_MENU_CURRENT_JUMP_TO = wxNewId();
-int ID_CONTEXT_MENU_CURRENT_JUMP_TO_COMMENT = wxNewId();
+static int ID_CONTEXT_MENU_SHOW_OUTLINE_OTHER = wxNewId();
+static int ID_WINDOW_OUTLINE = wxNewId();
+static int ID_CONTEXT_MENU_SHOW_OUTLINE_CURRENT = wxNewId();
+static int ID_WINDOW_OUTLINE_CURRENT = wxNewId();
+
+mvceditor::ResourceFinderBackgroundThreadClass::ResourceFinderBackgroundThreadClass(wxEvtHandler& handler)
+	: ThreadWithHeartbeatClass(handler) 
+	, Resources()
+	, ResourceFinder() 
+	, FileName() {
+
+	// need this so that the resource finder parsers the file
+	ResourceFinder.FileFilters.push_back(wxT("*.*"));
+}
+
+bool mvceditor::ResourceFinderBackgroundThreadClass::Start(const wxString& fileName) {
+	FileName = fileName;
+	wxThreadError error = CreateSingleInstance();
+	bool created = wxTHREAD_NO_ERROR == error;
+	if (created) {
+		GetThread()->Run();
+	}
+	return created;
+}
+
+void* mvceditor::ResourceFinderBackgroundThreadClass::Entry() {
+	if (wxFileName::FileExists(FileName)) {
+		ResourceFinder.Clear();
+
+		// need this call so that resources are actually parsed
+		ResourceFinder.Prepare(wxT("fakeclass"));
+		ResourceFinder.Walk(FileName);
+		ResourceFinder.EnsureSorted();
+		Resources = ResourceFinder.All();
+		SignalEnd();
+	}
+	return 0;
+}
 
 mvceditor::OutlineViewPluginClass::OutlineViewPluginClass()
 	: PluginClass()
-	, CurrentOutline()
-	, PhpDoc()
-	, Parser() 
-	, CurrentOutlineLines() {
-	Parser.SetClassObserver(this);
-	Parser.SetClassMemberObserver(this);
-	Parser.SetFunctionObserver(this);
+	, ResourceFinderBackground(*this) {
+	
 }
 
 void mvceditor::OutlineViewPluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
@@ -67,83 +94,40 @@ void mvceditor::OutlineViewPluginClass::AddCodeControlClassContextMenuItems(wxMe
 
 void mvceditor::OutlineViewPluginClass::BuildOutlineCurrentCodeControl() {
 	CodeControlClass* code = GetCurrentCodeControl();
-	CurrentOutlineLines.clear();
 	if (code != NULL) {
-		UnicodeString source = code->GetSafeText();
-		mvceditor::LintResultsClass results;
-		Parser.ScanString(source, results);
+		if (ResourceFinderBackground.Start(code->GetFileName())) {
+			wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
+			if (window != NULL) {
+				OutlineViewPluginPanelClass* outlineViewPanel = (OutlineViewPluginPanelClass*)window;
+				SetFocusToOutlineWindow(outlineViewPanel);
+				outlineViewPanel->SetStatus(_("Parsing ..."));
+			}
+		}
 	}
-	CurrentOutline = HumanFriendlyOutline();
 }
 
-void mvceditor::OutlineViewPluginClass::BuildOutline(const wxString& line) {
-	std::vector<mvceditor::ResourceClass> matches = GetResourceCache()->PrepareAndCollectNearMatchResourcesFromAll(line);
-	if (!matches.empty()) {
-		CurrentOutline.remove();
-		
-		for(size_t i = 0; i < matches.size(); ++i) {
-			mvceditor::ResourceClass resource = matches[i];
-			
-			// take the resource
-			CurrentOutline.append(resource.Resource);
-			
-			// take the parameters from the signature
-			int32_t pos = resource.Signature.indexOf(UNICODE_STRING_SIMPLE("("));
-			if (pos >= 0) {
-				UnicodeString params(resource.Signature, pos);
-				CurrentOutline.append(params);
-			}
-			if (resource.Type == mvceditor::ResourceClass::METHOD) {
-				wxString method = _("[Method]");
-				CurrentOutline.append(' ');
-				CurrentOutline.append(mvceditor::StringHelperClass::wxToIcu(method));
-			}
-			else if (resource.Type == mvceditor::ResourceClass::MEMBER) {
-				wxString prop = _("[Property]");
-				CurrentOutline.append(' ');
-				CurrentOutline.append(mvceditor::StringHelperClass::wxToIcu(prop));
-			}
-			CurrentOutline.append(UNICODE_STRING_SIMPLE("\n"));
+void mvceditor::OutlineViewPluginClass::BuildOutline(const wxString& className) {
+	ResourceFinderBackground.Resources.clear();
+	
+	mvceditor::ResourceCacheClass* resourceCache =  GetResourceCache();
+	std::vector<mvceditor::ResourceClass>  matches; 
+
+	// get the class resource itself
+	if (resourceCache->PrepareAll(className)) {
+		resourceCache->CollectFullyQualifiedResourceFromAll();
+		matches = resourceCache->Matches();
+		for (size_t i = 0; i < matches.size(); ++i) {
+			ResourceFinderBackground.Resources.push_back(matches[i]);
 		}
 	}
-}
-	
-void mvceditor::OutlineViewPluginClass::BuildPhpDoc(const wxString& line) {
-	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
-	if (resourceCache->PrepareAll(line)) {
-		if (resourceCache->CollectFullyQualifiedResourceFromAll()) {
-			PhpDoc.remove();
-			std::vector<mvceditor::ResourceClass> matches = resourceCache->Matches();
-			mvceditor::ResourceClass resource = matches[0];
-			
-			// take the parameters from the signature			
-			PhpDoc.append(resource.Resource);
-			int32_t pos = resource.Signature.indexOf(UNICODE_STRING_SIMPLE("("));
-			if (pos >= 0) {
-				UnicodeString params(resource.Signature, pos);
-				PhpDoc.append(params);
-			}
-			PhpDoc.append(UNICODE_STRING_SIMPLE("\n\n"));
-			UnicodeString comment(resource.Comment);
-			
-			// the ending comment is not taken out by the regex below
-			comment.findAndReplace(UNICODE_STRING_SIMPLE("*/"), UNICODE_STRING_SIMPLE(""));
-			// make the comment pretty by re-formatting and taking out the comment *s
-			UErrorCode error = U_ZERO_ERROR;
-			RegexPattern* pattern = RegexPattern::compile(UNICODE_STRING_SIMPLE("(\n|^)\\s*(\\*|/\\*\\*|\\*/)\\s?"), UREGEX_MULTILINE, error);
-			if (U_SUCCESS(error)) {
-				RegexMatcher* matcher = pattern->matcher(comment, error);
-				if (U_SUCCESS(error)) {
-					UnicodeString prettyComment = matcher->replaceAll(UNICODE_STRING_SIMPLE("\n"), error);
-					if (U_SUCCESS(error)) {
-						PhpDoc.append(prettyComment);
-					}
-					delete matcher;
-				}
-				delete pattern;
-			}
-		}
-		// else the index is out of date....
+
+	// make the resource finder match on all methods / properties
+	wxString lookup;
+	lookup += className;
+	lookup += wxT("::");
+	matches = GetResourceCache()->PrepareAndCollectNearMatchResourcesFromAll(lookup);
+	for (size_t i = 0; i < matches.size(); ++i) {
+		ResourceFinderBackground.Resources.push_back(matches[i]);
 	}
 }
 
@@ -168,16 +152,6 @@ void mvceditor::OutlineViewPluginClass::JumpToResource(const wxString& resource)
 	}	
 }
 
-UnicodeString mvceditor::OutlineViewPluginClass::HumanFriendlyOutline() {
-	sort(CurrentOutlineLines.begin(), CurrentOutlineLines.end());
-	UnicodeString text;
-	for (std::vector<UnicodeString>::const_iterator it = CurrentOutlineLines.begin(); it != CurrentOutlineLines.end(); ++it) {
-		text.append(*it);
-		text.append(UNICODE_STRING_SIMPLE("\n"));
-	}
-	return text;
-}
-
 void mvceditor::OutlineViewPluginClass::OnContextMenuOutline(wxCommandEvent& event) {
 	CodeControlClass* code = GetCurrentCodeControl();
 	bool modified = false;
@@ -186,26 +160,25 @@ void mvceditor::OutlineViewPluginClass::OnContextMenuOutline(wxCommandEvent& eve
 		modified = true;
 	}
 	else if (event.GetId() == ID_CONTEXT_MENU_SHOW_OUTLINE_OTHER && code && !code->GetSelectedText().IsEmpty()) { 
-		// adding the :: makes the resource finder match on all of the class's methods 
-		BuildOutline(code->GetSelectedText() + wxT("::")); 
+		BuildOutline(code->GetSelectedText()); 
 		modified = true; 
 	} 
 	if (modified) {
 		
 		// create / open the outline window
-		// TODO: display in Outline window instead
-		wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetToolsNotebook());
+		wxWindow* window = FindOutlineWindow(ID_WINDOW_OUTLINE);
 		OutlineViewPluginPanelClass* outlineViewPanel = NULL;
 		if (window != NULL) {
 			outlineViewPanel = (OutlineViewPluginPanelClass*)window;
-			SetFocusToToolsWindow(outlineViewPanel);
+			SetFocusToOutlineWindow(outlineViewPanel);
 			outlineViewPanel->RefreshOutlines();
 		}
 		else {
 			mvceditor::NotebookClass* notebook = GetNotebook();
 			if (notebook != NULL) {
-				outlineViewPanel = new OutlineViewPluginPanelClass(GetToolsNotebook(), ID_WINDOW_OUTLINE, this, notebook);
-				if (AddToolsWindow(outlineViewPanel, wxT("Outline"))) {
+				outlineViewPanel = new OutlineViewPluginPanelClass(GetOutlineNotebook(), ID_WINDOW_OUTLINE, this, notebook);
+				if (AddOutlineWindow(outlineViewPanel, wxT("Outline"))) {
+					outlineViewPanel->SetClasses(App->ResourceCache.AllNonNativeClassesGlobal());
 					outlineViewPanel->RefreshOutlines();
 				}
 			}
@@ -217,130 +190,134 @@ void mvceditor::OutlineViewPluginClass::OnContextMenuOutline(wxCommandEvent& eve
 }
 
 void mvceditor::OutlineViewPluginClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& event) {
-	wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetToolsNotebook());
+	wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 
 	// only change the outline if the user is looking at the outline.  otherwise, it gets 
 	// annoying if the user is looking at run output, switches PHP files, and the outline
 	// gets changed.
-	// TODO: display in Outline window instead
-	if (window != NULL && IsToolsWindowSelected(ID_WINDOW_OUTLINE)) {
-		OutlineViewPluginPanelClass* outlineViewPanel = NULL;
-		outlineViewPanel = (OutlineViewPluginPanelClass*)window;
-		SetFocusToToolsWindow(outlineViewPanel);
+	if (window != NULL && IsOutlineWindowSelected(ID_WINDOW_OUTLINE)) {
+		OutlineViewPluginPanelClass* outlineViewPanel = (OutlineViewPluginPanelClass*)window;
+		SetFocusToOutlineWindow(outlineViewPanel);
 		BuildOutlineCurrentCodeControl();
 		outlineViewPanel->RefreshOutlines();
 	}
 	event.Skip();
 }
 
-void mvceditor::OutlineViewPluginClass::ClassFound(const UnicodeString& className, const UnicodeString& signature, 
-		const UnicodeString& comment) {
-	CurrentOutlineLines.push_back(signature);
-}
-	
-void mvceditor::OutlineViewPluginClass::DefineDeclarationFound(const UnicodeString& variableName, const UnicodeString& variableValue, 
-		const UnicodeString& comment) {
-	UnicodeString line;
-	line.append(variableName).append(UNICODE_STRING_SIMPLE(" = ")).append(variableValue);
-	CurrentOutlineLines.push_back(line);
-}
-	
-void mvceditor::OutlineViewPluginClass::MethodFound(const UnicodeString& className, const UnicodeString& methodName, 
-		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
-		TokenClass::TokenIds visibility, bool isStatic) {
-	UnicodeString line;
-	
-	wxString method = _("[method]");
-	line.append(className).append(UNICODE_STRING_SIMPLE("::")).append(signature)
-		.append(mvceditor::StringHelperClass::wxToIcu(method));
-	CurrentOutlineLines.push_back(line);
-}
-
-void mvceditor::OutlineViewPluginClass::MethodEnd(const UnicodeString& className, const UnicodeString& methodName, int pos) {
-	
-	// do nothing for now
-}
-		
-void mvceditor::OutlineViewPluginClass::PropertyFound(const UnicodeString& className, const UnicodeString& propertyName, 
-		const UnicodeString& propertyType, const UnicodeString& comment, 
-		TokenClass::TokenIds visibility, bool isConst, bool isStatic) {
-	UnicodeString line;
-	wxString property = _("[property]");
-	line.append(className).append(UNICODE_STRING_SIMPLE("::")).append(propertyName)
-		.append(mvceditor::StringHelperClass::wxToIcu(property));
-	if (!propertyType.isEmpty()) {
-		line.append(propertyType);
+void mvceditor::OutlineViewPluginClass::OnWorkComplete(wxCommandEvent &event) {
+	wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
+	if (window != NULL) {
+		OutlineViewPluginPanelClass* outlineViewPanel = (OutlineViewPluginPanelClass*)window;
+		SetFocusToOutlineWindow(outlineViewPanel);
+		outlineViewPanel->RefreshOutlines();
 	}
-	CurrentOutlineLines.push_back(line);
-}
-		
-void mvceditor::OutlineViewPluginClass::FunctionFound(const UnicodeString& functionName, 
-		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment) {
-	CurrentOutlineLines.push_back(signature);
-}
-
-void mvceditor::OutlineViewPluginClass::FunctionEnd(const UnicodeString& functionName, int pos) {
-	// do nothing for now
 }
 
 mvceditor::OutlineViewPluginPanelClass::OutlineViewPluginPanelClass(wxWindow* parent, int windowId, OutlineViewPluginClass* plugin, 
 		NotebookClass* notebook)
 	: OutlineViewPluginGeneratedPanelClass(parent, windowId)
-	, Outline1(NULL)
-	, Outline3(NULL)
 	, Plugin(plugin)
 	, Notebook(notebook) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
 	
-	Outline1 = new mvceditor::CodeControlClass(this, *notebook->CodeControlOptions, plugin->GetProject(), NULL, ID_WINDOW_OUTLINE_CURRENT);
-	Outline1->SetReadOnly(true);
-	OutlineSizer->Add(Outline1, 2, wxALL|wxEXPAND, 5);
-	
-	Outline3 = new mvceditor::CodeControlClass(this, *notebook->CodeControlOptions, plugin->GetProject(), NULL, ID_WINDOW_OUTLINE_COMMENT);
-	Outline3->SetWrapMode(wxSTC_WRAP_WORD);
-	Outline3->SetReadOnly(true);
-	OutlineSizer->Add(Outline3, 0, wxALL|wxEXPAND, 5);
-	
-	this->Layout();
-
-	// listen to the context menu events directly.
-	// need this for proper handling on Win32
-	// not sure how to do it in a better way
-	Outline1->Connect(Outline1->GetId(), wxID_ANY, wxEVT_CONTEXT_MENU,
-		wxContextMenuEventHandler(OutlineViewPluginPanelClass::OnContextMenu), NULL, this);
 }
 
-void mvceditor::OutlineViewPluginPanelClass::OnClose(wxCloseEvent& event) {
-	Outline1->Disconnect(Outline1->GetId(), wxID_ANY, wxEVT_CONTEXT_MENU,
-		wxContextMenuEventHandler(OutlineViewPluginPanelClass::OnContextMenu), NULL, this);
+void mvceditor::OutlineViewPluginPanelClass::SetStatus(const wxString& status) {
+	StatusLabel->SetLabel(status);
+}
+
+void mvceditor::OutlineViewPluginPanelClass::SetClasses(std::vector<mvceditor::ResourceClass>& classes) {
+	Choice->Clear();
+	for (size_t i = 0; i < classes.size(); ++i) {
+		Choice->AppendString(mvceditor::StringHelperClass::IcuToWx(classes[i].Resource));
+	}
 }
 
 void mvceditor::OutlineViewPluginPanelClass::RefreshOutlines() {
-	wxString outline = mvceditor::StringHelperClass::IcuToWx(Plugin->CurrentOutline);
-	
-	// prevent the caret from moving if the content is going to be the same
-	if (outline != Outline1->GetText()) {
-		Outline1->SetReadOnly(false);
-		Outline1->SetText(outline);
-		Outline1->SetReadOnly(true);
+	Tree->DeleteAllItems();
+	wxTreeItemId rootId = Tree->AddRoot(_("Outline"));
+	StatusLabel->SetLabel(_(""));
+	std::vector<mvceditor::ResourceClass> resources = Plugin->ResourceFinderBackground.Resources;
+	for (size_t i = 0; i < resources.size(); ++i) {
+
+		// for now never show dynamic resources since there is no way we can know where the source for them is.
+		int type = resources[i].Type;
+		if (mvceditor::ResourceClass::DEFINE == type && !resources[i].IsDynamic) {
+			UnicodeString res = resources[i].Resource;
+			wxString label = mvceditor::StringHelperClass::IcuToWx(res);
+			label = _("[D] ") + label;
+			Tree->AppendItem(rootId, label);
+		}
+		else if (mvceditor::ResourceClass::CLASS == type && !resources[i].IsDynamic) {
+			UnicodeString res = resources[i].Resource;
+			wxString label = mvceditor::StringHelperClass::IcuToWx(res);
+			label = _("[C] ") + label;
+			wxTreeItemId classId = Tree->AppendItem(rootId, label);
+
+			// for now just loop again through the resources
+			// for the class we are going to add
+			for (size_t j = 0; j < resources.size(); ++j) {
+				if (resources[j].Resource.indexOf(resources[i].Resource) == 0  && !resources[j].IsDynamic) {
+					UnicodeString res = resources[j].Identifier;
+					wxString label = mvceditor::StringHelperClass::IcuToWx(res);
+					if (mvceditor::ResourceClass::MEMBER == resources[j].Type) {
+						label = _("[P] ") + label;
+						if (!resources[j].ReturnType.isEmpty()) {
+							wxString returnType = mvceditor::StringHelperClass::IcuToWx(resources[j].ReturnType);
+							label = label + wxT(" [") + returnType + wxT("]");
+						}
+						Tree->AppendItem(classId, label);
+					}
+					else if (mvceditor::ResourceClass::METHOD == resources[j].Type) {
+						label = _("[M] ") + label;
+
+						// add the function signature to the label
+						int32_t sigIndex = resources[j].Signature.indexOf(UNICODE_STRING_SIMPLE(" function ")); 
+						if (sigIndex > 0) {
+							UnicodeString sig(resources[j].Signature, sigIndex + 10);
+							label = _("[M] ") + mvceditor::StringHelperClass::IcuToWx(sig);
+						}
+						if (!resources[j].ReturnType.isEmpty()) {
+							wxString returnType = mvceditor::StringHelperClass::IcuToWx(resources[j].ReturnType);
+							label += wxT(" [") + returnType + wxT("]");
+						}
+						Tree->AppendItem(classId, label);
+					}
+					else if (mvceditor::ResourceClass::CLASS_CONSTANT == resources[j].Type) {
+						label = _("[O] ") + label;
+						Tree->AppendItem(classId, label);
+					}
+				}
+			}
+		}
+		else if (mvceditor::ResourceClass::FUNCTION == type && !resources[i].IsDynamic) {
+			UnicodeString res = resources[i].Resource;
+			wxString label = mvceditor::StringHelperClass::IcuToWx(res);
+			label = _("[F] ") + label;
+
+			// add the function signature to the label
+			int32_t sigIndex = resources[i].Signature.indexOf(UNICODE_STRING_SIMPLE("function ")); 
+			if (sigIndex >= 0) {
+				UnicodeString sig(resources[i].Signature, sigIndex + 9);
+				label = _("[F] ") + mvceditor::StringHelperClass::IcuToWx(sig);
+			}
+			if (!resources[i].ReturnType.isEmpty()) {
+				wxString returnType = mvceditor::StringHelperClass::IcuToWx(resources[i].ReturnType);
+				label += wxT(" [") + returnType + wxT("]");
+			}
+			Tree->AppendItem(rootId, label);
+		}
 	}
-	outline = mvceditor::StringHelperClass::IcuToWx(Plugin->PhpDoc);
-	if (outline != Outline3->GetText()) {
-		Outline3->SetReadOnly(false);
-		Outline3->SetText(outline);
-		Outline3->SetReadOnly(true);
-	}
+	Tree->ExpandAll();
 }
 
 void mvceditor::OutlineViewPluginPanelClass::OnHelpButton(wxCommandEvent& event) {
 	wxString help = wxString::FromAscii(
-		"The outline tab allows you to 	quickly browse through your project's resources and see the PHPDoc "
-		"comments attached to those resources.  The outline window consists of 2 panes:\n"
+		"The outline tab allows you to 	quickly browse through your project's resources.\n"
 		"1. The leftmost pane lists all of the resources of the file being viewed.\n"
 		"   Changing the contents of the middle outline is done with the Lookup button "
 		"   or the 'Show In Outline' context menu.\n"
-		"2. The rightmost pane shows the PHPDoc comment of any resource.  This is triggered with the 'Show PHPDoc' context menu\n\n"
 		"The 'Sync Outline' button will 'reset' the outline view with the outline of the file that is currently being viewed."
 		"\n"
 		""
@@ -349,12 +326,9 @@ void mvceditor::OutlineViewPluginPanelClass::OnHelpButton(wxCommandEvent& event)
 	wxMessageBox(help, _("Help"));
 }
 
-void mvceditor::OutlineViewPluginPanelClass::OnLookupButton(wxCommandEvent& event) {
-	wxString lookup = Lookup->GetValue();
+void mvceditor::OutlineViewPluginPanelClass::OnChoice(wxCommandEvent& event) {
+	wxString lookup = event.GetString();
 	if (!lookup.IsEmpty()) {
-		
-		// make the resource finder match on all methods / properties
-		lookup += wxT("::");
 		Plugin->BuildOutline(lookup);
 		RefreshOutlines();
 	}
@@ -362,27 +336,40 @@ void mvceditor::OutlineViewPluginPanelClass::OnLookupButton(wxCommandEvent& even
 
 void mvceditor::OutlineViewPluginPanelClass::OnSyncButton(wxCommandEvent& event) {
 	Plugin->BuildOutlineCurrentCodeControl();
-	RefreshOutlines();
 }
 
-void mvceditor::OutlineViewPluginPanelClass::OnContextMenu(wxContextMenuEvent& event) {
-	wxMenu menu;
+void mvceditor::OutlineViewPluginPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
+
+	// the method name is the leaf node, the class name is the parent of the activated node
+	wxTreeItemId item = event.GetItem();
+	wxString methodSig = Tree->GetItemText(item);
+	wxTreeItemId parentItem = Tree->GetItemParent(item);
+	if (!item.IsOk() || !parentItem.IsOk()) {
+
+		// dont want to handle a double-click on the root element
+		event.Skip();
+		return;
+	}
+	wxString classNameSig = Tree->GetItemText(parentItem);
+	classNameSig = classNameSig.Mid(4); // 4 = length of '[C] '
+
+	wxString resource = classNameSig + wxT("::");
+	methodSig = methodSig.Mid(4); // 4= length of '[M] '
 	
-	// i have no idea how we can know which code control the popup menu is in.
-	// for now I am assigning each code control window its own menu ID and differentiating that way
-	if (event.GetEventObject() == Outline1) {
-		menu.Append(ID_CONTEXT_MENU_CURRENT_JUMP_TO, _("Jump To Resource"),  _("Opens this resource in the editor"), wxITEM_NORMAL);
-		menu.Append(ID_CONTEXT_MENU_CURRENT_JUMP_TO_COMMENT, _("Show Comment"),  _("Display the resource comment"), wxITEM_NORMAL);
-		PopupMenu(&menu);
+	// extract just the name from the label (function call args or property type)
+	int index = methodSig.Index(wxT('('));
+	if (wxNOT_FOUND == index) {
+		index = methodSig.Index(wxT('['));
+	}
+	if (wxNOT_FOUND != index) {
+		resource += methodSig.Mid(0, index);
 	}
 	else {
-		event.Skip();
-	}
-}
 
-void mvceditor::OutlineViewPluginPanelClass::OnOutlineJumpTo(wxCommandEvent& event) {
-	wxString resource = ResourceFromOutline(event);
-	if (!resource.IsEmpty()) {
+		// sig is not of a function, and prop does not have a type
+		resource += methodSig;
+	}
+	if ( Tree->GetItemText(parentItem) != wxT("Outline") && !resource.IsEmpty()) {
 		Plugin->JumpToResource(resource);
 	}
 	else {
@@ -390,52 +377,10 @@ void mvceditor::OutlineViewPluginPanelClass::OnOutlineJumpTo(wxCommandEvent& eve
 	}
 }
 
-void mvceditor::OutlineViewPluginPanelClass::OnOutlineJumpToComment(wxCommandEvent& event) {
-	wxString resource = ResourceFromOutline(event);
-	if (!resource.IsEmpty()) {
-		Plugin->BuildPhpDoc(resource);
-		RefreshOutlines();
-	}
-	else {
-		event.Skip();
-	}
-}
-
-wxString mvceditor::OutlineViewPluginPanelClass::ResourceFromOutline(wxCommandEvent& event) {
-	wxString line;
-	// i have no idea how we can know which code control the popup menu is in.
-	// for now I am assigning each code control window its own menu ID and differentiating that way
-	// I tried event.GetEventObject() == Outline1 and that did not work
-	int caretPos = 0;
-	if (event.GetId() == ID_CONTEXT_MENU_CURRENT_JUMP_TO || event.GetId() == ID_CONTEXT_MENU_CURRENT_JUMP_TO_COMMENT) {
-		line = Outline1->GetCurLine(&caretPos);
-	}
-	
-	if (!line.IsEmpty()) {
-		
-		// from the line, only the part of the text that will make a resource match (ie. the function name, or class::method)
-		// the ' ' and  '[' come from the way the resource is made into human friendly from (in OutlineViewPluginClass)
-		// the '(' comes from the resource signature (in the case of methods)
-		int pos = line.find_first_of(wxT(" [("));
-		if (wxNOT_FOUND != pos) {
-			line = line.Mid(0, pos);
-		}
-		
-		// remove any newlines
-		line.Trim(false).Trim(true);
-	}
-	return line;
-}
-
 BEGIN_EVENT_TABLE(mvceditor::OutlineViewPluginClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_OUTLINE, mvceditor::OutlineViewPluginClass::OnContextMenuOutline)
 	EVT_MENU(ID_CONTEXT_MENU_SHOW_OUTLINE_CURRENT, mvceditor::OutlineViewPluginClass::OnContextMenuOutline)
 	EVT_MENU(ID_CONTEXT_MENU_SHOW_OUTLINE_OTHER, mvceditor::OutlineViewPluginClass::OnContextMenuOutline)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(wxID_ANY, mvceditor::OutlineViewPluginClass::OnContentNotebookPageChanged)
-END_EVENT_TABLE()
-
-BEGIN_EVENT_TABLE(mvceditor::OutlineViewPluginPanelClass, OutlineViewPluginGeneratedPanelClass)
-	EVT_CLOSE(mvceditor::OutlineViewPluginPanelClass::OnClose)
-	EVT_MENU(ID_CONTEXT_MENU_CURRENT_JUMP_TO, mvceditor::OutlineViewPluginPanelClass::OnOutlineJumpTo)
-	EVT_MENU(ID_CONTEXT_MENU_CURRENT_JUMP_TO_COMMENT, mvceditor::OutlineViewPluginPanelClass::OnOutlineJumpToComment)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::OutlineViewPluginClass::OnWorkComplete)
 END_EVENT_TABLE()

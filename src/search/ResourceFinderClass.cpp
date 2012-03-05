@@ -1239,6 +1239,42 @@ bool mvceditor::ResourceFinderClass::Persist(const wxFileName& outputFile) const
 	return !error;
 }
 
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::All() const {
+	std::vector<mvceditor::ResourceClass> all;
+	all.resize(ResourceCache.size() + MembersCache.size());
+	std::list<mvceditor::ResourceClass>::const_iterator it;
+	size_t index = 0;
+	for (it = ResourceCache.begin(); it != ResourceCache.end(); ++it, ++index) {
+		all[index] = *it;
+	}
+	for (it = MembersCache.begin(); it != MembersCache.end(); ++it, ++index) {
+		all[index] = *it;
+	}
+	return all;
+}
+
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::AllNonNativeClasses() const {
+	std::vector<mvceditor::ResourceClass> all;
+	all.reserve(ResourceCache.size());
+	std::list<mvceditor::ResourceClass>::const_iterator it;
+	size_t index = 0;
+	for (it = ResourceCache.begin(); it != ResourceCache.end(); ++it) {
+		if (mvceditor::ResourceClass::CLASS == it->Type && !it->IsNative) {
+			all.push_back(*it);
+		}
+	}
+	return all;
+}
+
+void mvceditor::ResourceFinderClass::Clear() {
+	ResourceCache.clear();
+	MembersCache.clear();
+	FileCache.clear();
+	Matches.clear();
+	IsCacheSorted = false;
+	IsCurrentFileNative = false;
+}
+
 mvceditor::ResourceClass::ResourceClass()
 	: Resource()
 	, Identifier()

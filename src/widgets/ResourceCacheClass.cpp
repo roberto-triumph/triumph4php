@@ -140,6 +140,15 @@ void mvceditor::ResourceCacheClass::EnsureSortedGlobal() {
 	GlobalResourceFinder.EnsureSorted();
 }
 
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceCacheClass::AllNonNativeClassesGlobal() {
+	wxMutexLocker locker(Mutex);
+	std::vector<mvceditor::ResourceClass> res;
+	if (!locker.IsOk()) {
+		return res;
+	}
+	return GlobalResourceFinder.AllNonNativeClasses();
+}
+
 bool mvceditor::ResourceCacheClass::PrepareAll(const wxString& resource) {
 	wxMutexLocker locker(Mutex);
 	if (!locker.IsOk()) {
