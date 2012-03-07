@@ -396,8 +396,16 @@ public:
 	void HandleAutoCompletion(wxString& completeStatus);
 	
 	wxString GetMySqlKeywords() const;
+	
+	/**
+	 * Match any parenthesis
+	 */
+	void MatchBraces(int posToCheck);
 
-	// TODO brace matching for SQL docs
+	/**
+	 * check to see if the give pos is at a SQL comment or SQL string
+	 */
+	bool InCommentOrStringStyle(int posToCheck); 
 
 private:
 
@@ -423,7 +431,15 @@ public:
 	
 	wxString GetCssPseudoClasses() const;
 
-	// TODO brace matching for CSS docs
+	/**
+	 * Match any parenthesis or braces
+	 */
+	void MatchBraces(int posToCheck);
+
+	/**
+	 * check to see if the give pos is at a CSS comment or CSS string
+	 */
+	bool InCommentOrStringStyle(int posToCheck); 
 
 };
 

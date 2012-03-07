@@ -1133,6 +1133,49 @@ wxString mvceditor::SqlDocumentClass::GetMySqlKeywords() const {
 	return MYSQL_KEYWORDS;
 }
 
+void mvceditor::SqlDocumentClass::MatchBraces(int posToCheck) {
+	if (!InCommentOrStringStyle(posToCheck)) {
+		wxChar c1 = Ctrl->GetCharAt(posToCheck),
+		            c2 = Ctrl->GetCharAt(posToCheck - 1);
+		if (wxT('(') == c1 || wxT(')') == c1) {
+			posToCheck = posToCheck;
+		}
+		else if (wxT('(') == c2 || wxT(')') == c2) {
+			posToCheck = posToCheck - 1;
+		}
+		else  {
+			posToCheck = -1;
+		}
+		if (posToCheck >= 0) {
+			int pos = Ctrl->BraceMatch(posToCheck);
+			if (wxSTC_INVALID_POSITION == pos) {
+				Ctrl->BraceBadLight(posToCheck);
+			}
+			else {
+				Ctrl->BraceHighlight(posToCheck, pos);
+			}
+		}
+		else {
+			Ctrl->BraceHighlight(wxSTC_INVALID_POSITION, wxSTC_INVALID_POSITION);
+		}
+	}
+	else {
+		Ctrl->BraceHighlight(wxSTC_INVALID_POSITION, wxSTC_INVALID_POSITION);
+	}
+}
+
+bool mvceditor::SqlDocumentClass::InCommentOrStringStyle(int posToCheck) {
+	int style = Ctrl->GetStyleAt(posToCheck);
+	int prevStyle = Ctrl->GetStyleAt(posToCheck - 1);
+
+	// dont match braces inside strings or comments. for some reason when styling line comments (//)
+	// the last character is styled as default but the characters before are styled correctly (wxSTC_SQL_COMMENTLINE)
+	// so lets check the previous character in that case
+	return wxSTC_SQL_COMMENT == style || wxSTC_SQL_COMMENTDOC == style || wxSTC_SQL_COMMENTLINE == prevStyle
+		|| wxSTC_SQL_COMMENTLINEDOC == prevStyle || wxSTC_SQL_QUOTEDIDENTIFIER == style || wxSTC_SQL_STRING == style
+		|| wxSTC_SQL_CHARACTER == style;
+}
+
 mvceditor::CssDocumentClass::CssDocumentClass() 
 	: TextDocumentClass() {
 		
@@ -1150,6 +1193,44 @@ wxString mvceditor::CssDocumentClass::GetCssKeywords() const {
 wxString mvceditor::CssDocumentClass::GetCssPseudoClasses() const {
 	return CSS_PSEUDOCLASSES;
 }
+
+void mvceditor::CssDocumentClass::MatchBraces(int posToCheck) {
+	if (!InCommentOrStringStyle(posToCheck)) {
+		wxChar c1 = Ctrl->GetCharAt(posToCheck),
+		            c2 = Ctrl->GetCharAt(posToCheck - 1);
+		if (wxT('(') == c1 || wxT(')') == c1 || wxT('[') == c1 || wxT(']') == c1 || wxT('{') == c1 || wxT('}') == c1) {
+			posToCheck = posToCheck;
+		}
+		else if (wxT('(') == c2 || wxT(')') == c2 || wxT('[') == c2 || wxT(']') == c2 || wxT('{') == c2 || wxT('}') == c2) {
+			posToCheck = posToCheck - 1;
+		}
+		else  {
+			posToCheck = -1;
+		}
+		if (posToCheck >= 0) {
+			int pos = Ctrl->BraceMatch(posToCheck);
+			if (wxSTC_INVALID_POSITION == pos) {
+				Ctrl->BraceBadLight(posToCheck);
+			}
+			else {
+				Ctrl->BraceHighlight(posToCheck, pos);
+			}
+		}
+		else {
+			Ctrl->BraceHighlight(wxSTC_INVALID_POSITION, wxSTC_INVALID_POSITION);
+		}
+	}
+	else {
+		Ctrl->BraceHighlight(wxSTC_INVALID_POSITION, wxSTC_INVALID_POSITION);
+	}
+}
+
+bool mvceditor::CssDocumentClass::InCommentOrStringStyle(int posToCheck) {
+	int style = Ctrl->GetStyleAt(posToCheck);
+
+	// dont match braces inside strings or comments.
+	return wxSTC_CSS_COMMENT == style || wxSTC_CSS_DOUBLESTRING == style || wxSTC_CSS_SINGLESTRING == style;
+}		
 
 BEGIN_EVENT_TABLE(mvceditor::PhpDocumentClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::PhpDocumentClass::OnResourceUpdateComplete)
