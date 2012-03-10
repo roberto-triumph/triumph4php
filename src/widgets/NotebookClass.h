@@ -27,6 +27,7 @@
 
 #include <code_control/CodeControlClass.h>
 #include <php_frameworks/ProjectClass.h>
+#include <Events.h>
 #include <wx/wx.h>
 #include <wx/aui/aui.h>
 #include <wx/dnd.h>
@@ -178,9 +179,9 @@ public:
 	 * Give code controls access to a single project. 
 	 * Memory management of both pointers is  left to the caller of this method.
 	 * @param project the opened project
-	 * @param appHandler propagated to each instance of CodeControlClass that is created.
+	 * @param eventSink given to each instance of CodeControlClass that is created.
 	 */
-	void SetProject(ProjectClass* project, wxEvtHandler* appHandler);
+	void SetProject(ProjectClass* project, EventSinkClass* eventSink);
 	
 	/**
 	 * Closes (deletes) the current page (prompts the user to save if the file has been modified)
@@ -266,7 +267,7 @@ private:
 	 * the changes made to the file that was opened (the parsed resources were being 
 	 * handled in a separate cache by ResourceCacheClass).
 	 */
-	wxEvtHandler* AppHandler;
+	EventSinkClass* EventSink;
 	
 	/**
 	 * To give a friendly number to new files. 

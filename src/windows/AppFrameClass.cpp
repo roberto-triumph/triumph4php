@@ -51,11 +51,13 @@ int ID_TOOLS_WINDOW = wxNewId();
 int ID_OUTLINE_WINDOW = wxNewId();
 
 mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass*>& plugins,
-		wxEvtHandler& appHandler, mvceditor::EnvironmentClass& environment,
-		mvceditor::PreferencesClass& preferences, mvceditor::ResourceCacheClass& resourceCache)
+										mvceditor::AppClass* app,
+										mvceditor::EnvironmentClass& environment,
+										mvceditor::PreferencesClass& preferences)
 	: AppFrameGeneratedClass(NULL)
 	, Plugins(plugins)
-	, AppHandler(appHandler)
+	, Listener(this)
+	, App(app)
 	, Environment(environment)
 	, Preferences(preferences)
 	, ToolBar(NULL)
@@ -63,6 +65,8 @@ mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass
 	, OutlineNotebook(NULL) {
 	StatusBarWithGaugeClass* gauge = new StatusBarWithGaugeClass(this);
 	SetStatusBar(gauge);
+
+	app->EventSink.PushHandler(&Listener);
 	
 	AuiManager.SetManagedWindow(this);
 	ToolBar = new wxAuiToolBar(this, ID_TOOLBAR, wxDefaultPosition, wxDefaultSize, 
@@ -71,7 +75,7 @@ mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass
 	// when the notebook is empty we want to accept dragged files
 	Notebook->SetDropTarget(new FileDropTargetClass(Notebook));
 	Notebook->CodeControlOptions = &Preferences.CodeControlOptions;
-	Notebook->ResourceCache = &resourceCache;
+	Notebook->ResourceCache = &App->ResourceCache;
 	
 	// ATTN: for some reason must remove and re-insert menu item in order to change the icon
 	wxMenuItem* projectOpenMenuItem = MenuBar->FindItem(ID_PROJECT_OPEN);
@@ -292,9 +296,10 @@ void mvceditor::AppFrameClass::OnEditPreferences(wxCommandEvent& event) {
 	prefDialog.Prepare();
 	int exitCode = prefDialog.ShowModal();
 	if (wxOK == exitCode) {
+		Preferences.EnableSelectedProfile(this);
 		Notebook->RefreshCodeControlOptions();
-		wxCommandEvent evt(EVENT_APP_SAVE_PREFERENCES);
-		wxPostEvent(&AppHandler, evt);
+		wxCommandEvent evt(mvceditor::EVENT_APP_PREFERENCES_UPDATED);
+		App->EventSink.Publish(evt);
 	}
 }
 
@@ -355,26 +360,11 @@ void mvceditor::AppFrameClass::OnProjectOpen(wxCommandEvent& event) {
 	if (wxID_OK == dialog.ShowModal()) {
 		bool destroy = Notebook->SaveAllModifiedPages();
 		if (destroy) {
-			wxCommandEvent evt(EVENT_APP_OPEN_PROJECT);
+			wxCommandEvent evt(EVENT_CMD_OPEN_PROJECT);
 			evt.SetString(dialog.GetPath());
-			wxPostEvent(&AppHandler, evt);
+			App->EventSink.Publish(evt);
 		}
 	}
-}
-
-void mvceditor::AppFrameClass::OnProjectOpened(mvceditor::ProjectClass* project, wxEvtHandler* appHandler) {
-	Notebook->SetProject(project, appHandler);
-	SetTitle(_("MVC Editor - Open Project [") + project->GetRootPath() + wxT("]"));
-}
-
-void mvceditor::AppFrameClass::OnProjectClosed(wxEvtHandler* appHandler) {
-	Notebook->CloseAllPages();
-	AuiManager.GetPane(ToolsNotebook).Hide();
-	while (ToolsNotebook->GetPageCount()) {
-		ToolsNotebook->DeletePage(0);
-	}
-	AuiManager.Update();
-	Notebook->SetProject(NULL, appHandler);
 }
 
 void mvceditor::AppFrameClass::OnHelpAbout(wxCommandEvent& event) {
@@ -642,12 +632,68 @@ void mvceditor::AppFrameClass::DefaultKeyboardShortcuts() {
 	}
 }
 
+void mvceditor::AppFrameClass::OnAnyMenuCommandEvent(wxCommandEvent& event) {
+	App->EventSink.Publish(event);
+}
+
+void mvceditor::AppFrameClass::OnAnyAuiNotebookEvent(wxAuiNotebookEvent& event) {
+	if (event.GetId() != ID_TOOLS_WINDOW && event.GetId() != ID_OUTLINE_WINDOW) {
+
+		// only send the code notebook events for now
+		App->EventSink.Publish(event);
+	}
+	event.Skip();
+}
+
+void mvceditor::AppFrameClass::OnAnyAuiToolbarEvent(wxAuiToolBarEvent& event) {
+	App->EventSink.Publish(event);
+	event.Skip();
+}
+
+void mvceditor::AppFrameClass::OnProjectOpened() {
+	Notebook->SetProject(App->Project, &App->EventSink);
+	SetTitle(_("MVC Editor - Open Project [") + App->Project->GetRootPath() + wxT("]"));
+}
+
+void mvceditor::AppFrameClass::OnProjectClosed() {
+	Notebook->CloseAllPages();
+	AuiManager.GetPane(ToolsNotebook).Hide();
+	while (ToolsNotebook->GetPageCount()) {
+		ToolsNotebook->DeletePage(0);
+	}
+	AuiManager.Update();
+	Notebook->SetProject(NULL, &App->EventSink);
+}
+
+mvceditor::AppEventListenerForFrameClass::AppEventListenerForFrameClass(mvceditor::AppFrameClass* appFrame)
+	: wxEvtHandler()
+	, AppFrame(appFrame) {
+
+}
+
+void mvceditor::AppEventListenerForFrameClass::OnProjectOpened(wxCommandEvent& event) {
+	AppFrame->OnProjectOpened();
+}
+
+void mvceditor::AppEventListenerForFrameClass::OnProjectClosed(wxCommandEvent& event) {
+	AppFrame->OnProjectClosed();
+}
+
+void mvceditor::AppEventListenerForFrameClass::OnCmdOpenFile(wxCommandEvent& event) {
+	std::vector<wxString> filenames;
+	filenames.push_back(event.GetString());
+	AppFrame->FileOpen(filenames);
+}
+
 BEGIN_EVENT_TABLE(mvceditor::AppFrameClass,  AppFrameGeneratedClass)
 	EVT_STC_SAVEPOINTREACHED(wxID_ANY, mvceditor::AppFrameClass::DisableSave)
 	EVT_STC_SAVEPOINTLEFT(wxID_ANY, mvceditor::AppFrameClass::EnableSave)
 	EVT_STC_UPDATEUI(wxID_ANY, mvceditor::AppFrameClass::OnCodeControlUpdate)
 	EVT_UPDATE_UI(wxID_ANY, mvceditor::AppFrameClass::OnUpdateUi)
 	EVT_CONTEXT_MENU(mvceditor::AppFrameClass::OnContextMenu)
+
+	// these are context menu handlers; the menu handlers are already accounted for
+	// in the AppFrameGeneratedClass
 	EVT_MENU(wxID_UNDO, mvceditor::AppFrameClass::OnUndo)
 	EVT_MENU(wxID_REDO, mvceditor::AppFrameClass::OnRedo)
 	EVT_MENU(ID_CUT_LINE, mvceditor::AppFrameClass::OnCutLine)
@@ -660,4 +706,37 @@ BEGIN_EVENT_TABLE(mvceditor::AppFrameClass,  AppFrameGeneratedClass)
 	EVT_MENU(ID_TOOLBAR_SAVE, mvceditor::AppFrameClass::SaveCurrentFile)
 	EVT_AUINOTEBOOK_PAGE_CLOSED(ID_TOOLS_WINDOW, mvceditor::AppFrameClass::OnToolsNotebookPageClosed)
 	EVT_AUINOTEBOOK_PAGE_CLOSED(ID_OUTLINE_WINDOW, mvceditor::AppFrameClass::OnOutlineNotebookPageClosed)
+
+	// ATTN: STOP! DO NOT HANDLE ANY APP EVENTS HERE! SEE AppEventListenerForFrameClass
+
+	// we want to propagate these events to the plugins, we will do so here
+	// at first, wxWindow::PushEventHandler was used (each plugin was added to the event chain of
+	// the app frame), but that function could no longer be used when the event sink was 
+	// introduced; since for any plugin that did not handle the event the app frame would get the event
+	// (because the plugin had the frame in its handler chain)
+	// for now we will only restrict to the plugin menus, since AppFrameGeneratedClass already handles
+	// some events I could not just do EVT_MENU(wxID_ANY,...); putting this line would mean
+	// that OnAnyMenuCommandEvent would need to handle all of the AppFrame menus (and adding a new menu item
+	// to the app frame menus would involve modifying OnAnyMenuCommandEvent AND AppFrameGeneratedClass
+	EVT_MENU_RANGE(mvceditor::MENU_START, mvceditor::MENU_END, mvceditor::AppFrameClass::OnAnyMenuCommandEvent)
+	EVT_TOOL_RANGE(mvceditor::MENU_START, mvceditor::MENU_END, mvceditor::AppFrameClass::OnAnyMenuCommandEvent)
+
+	// make sure notebook events are propagated to the app event sink
+	EVT_AUINOTEBOOK_PAGE_CHANGED(wxID_ANY, mvceditor::AppFrameClass::OnAnyAuiNotebookEvent)
+	EVT_AUINOTEBOOK_PAGE_CHANGING(wxID_ANY, mvceditor::AppFrameClass::OnAnyAuiNotebookEvent)
+	EVT_AUINOTEBOOK_PAGE_CLOSE(wxID_ANY, mvceditor::AppFrameClass::OnAnyAuiNotebookEvent)
+	EVT_AUINOTEBOOK_PAGE_CLOSED(wxID_ANY, mvceditor::AppFrameClass::OnAnyAuiNotebookEvent)
+	
+	// make sure the tool bar events are propagated to the app event sink
+	EVT_AUITOOLBAR_BEGIN_DRAG(wxID_ANY, mvceditor::AppFrameClass::OnAnyAuiToolbarEvent)
+	EVT_AUITOOLBAR_MIDDLE_CLICK(wxID_ANY, mvceditor::AppFrameClass::OnAnyAuiToolbarEvent)
+	EVT_AUITOOLBAR_OVERFLOW_CLICK(wxID_ANY, mvceditor::AppFrameClass::OnAnyAuiToolbarEvent)
+	EVT_AUITOOLBAR_RIGHT_CLICK(wxID_ANY, mvceditor::AppFrameClass::OnAnyAuiToolbarEvent)
+	EVT_AUITOOLBAR_TOOL_DROPDOWN(wxID_ANY, mvceditor::AppFrameClass::OnAnyAuiToolbarEvent)
+END_EVENT_TABLE()
+
+BEGIN_EVENT_TABLE(mvceditor::AppEventListenerForFrameClass, wxEvtHandler)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_OPENED, mvceditor::AppEventListenerForFrameClass::OnProjectOpened)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_CLOSED, mvceditor::AppEventListenerForFrameClass::OnProjectClosed)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_OPEN_FILE, mvceditor::AppEventListenerForFrameClass::OnCmdOpenFile)
 END_EVENT_TABLE()

@@ -30,7 +30,6 @@
 #include <wx/valgen.h>
 
 static const int ID_PROCESS = wxNewId();
-static const int ID_TOOLBAR_RUN = wxNewId();
 static const int ID_WINDOW_CONSOLE = wxNewId();
 
 mvceditor::RunConsolePanelClass::RunConsolePanelClass(wxWindow* parent, EnvironmentClass* environment, StatusBarWithGaugeClass* gauge, int id)
@@ -255,7 +254,7 @@ void mvceditor::RunConsolePluginClass::OnUpdateUi(wxUpdateUIEvent& event) {
 }
 
 void mvceditor::RunConsolePluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
-	toolBar->AddTool(ID_TOOLBAR_RUN, _("Run"), wxArtProvider::GetBitmap(
+	toolBar->AddTool(mvceditor::MENU_RUN_PHP + 0, _("Run"), wxArtProvider::GetBitmap(
 		wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), _("Run"));
 }
 
@@ -270,6 +269,5 @@ BEGIN_EVENT_TABLE(mvceditor::RunConsolePluginClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_RUN_PHP + 1, mvceditor::RunConsolePluginClass::OnRunFileAsCli)
 	EVT_MENU(mvceditor::MENU_RUN_PHP + 2, mvceditor::RunConsolePluginClass::OnRunFileAsCliInNewWindow)
 	EVT_MENU(mvceditor::MENU_RUN_PHP + 3, mvceditor::RunConsolePluginClass::OnRunFileAsCliInNewWindow)
-	EVT_TOOL(ID_TOOLBAR_RUN, mvceditor::RunConsolePluginClass::OnRunFileAsCli)
 	EVT_UPDATE_UI(wxID_ANY, mvceditor::RunConsolePluginClass::OnUpdateUi)
 END_EVENT_TABLE()

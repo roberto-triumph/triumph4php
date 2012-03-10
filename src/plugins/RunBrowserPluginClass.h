@@ -101,12 +101,12 @@ public:
 	void AddWindows();
 	
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
-	
-protected:
 
 	void LoadPreferences(wxConfigBase* config);
-
+		
 private:
+
+	void OnEnvironmentUpdated(wxCommandEvent& event);
 
 	/**
 	 * run the chosen URL in (an external) web browser 
@@ -139,7 +139,7 @@ private:
 	 * When a project is indexed, lets call the url detector and get the
 	 * urls for a project.
 	 */
-	void OnProjectIndexed();
+	void OnProjectIndexed(wxCommandEvent& event);
 
 	/**
 	 * this will be called once the cache file has been persisted
@@ -167,6 +167,18 @@ private:
 	std::auto_ptr<ResourceCacheUpdateThreadClass> ResourceCacheThread;
 
 	/**
+	 * A popup menu to show the currently configured browsers. The same popup menu will be
+	 * reused multiple times. This class will own it,  that's why we use auto_ptr here
+	 */
+	std::auto_ptr<wxMenu> BrowserMenu;
+
+	/**
+	 * A popup menu to show the currently detected URLs. The same popup menu will be
+	 * reused multiple times. This class will own it,  that's why we use auto_ptr here
+	 */
+	std::auto_ptr<wxMenu> UrlMenu;
+
+	/**
 	 * a temporary file for the resource cache to be written to
 	 */
 	wxFileName ResourceCacheFileName;
@@ -174,6 +186,7 @@ private:
 	wxMenuItem* RunInBrowser;
 	
 	wxAuiToolBar* BrowserToolbar;
+
 	
 	DECLARE_EVENT_TABLE()
 };

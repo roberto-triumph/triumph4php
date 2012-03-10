@@ -26,12 +26,12 @@
 #include <windows/StringHelperClass.h>
 #include <MvcEditorErrors.h>
 #include <MvcEditor.h>
+#include <Events.h>
 #include <unicode/unistr.h>
 #include <wx/artprov.h>
 #include <wx/valgen.h>
 #include <wx/tokenzr.h>
 
-const int ID_LINT_TOOLBAR_ITEM = wxNewId();
 const int ID_LINT_ERROR_COMMAND = wxNewId();
 const int ID_LINT_RESULTS_PANEL = wxNewId();
 const int ID_LINT_RESULTS_GAUGE = wxNewId();
@@ -280,7 +280,7 @@ void mvceditor::LintPluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
 
 void mvceditor::LintPluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 	wxBitmap bitmap = wxArtProvider::GetBitmap(wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16));
-	toolBar->AddTool(ID_LINT_TOOLBAR_ITEM, _("Lint Check"), bitmap, _("Performs syntax check on the current project"));
+	toolBar->AddTool(mvceditor::MENU_LINT_PHP + 0, _("Lint Check"), bitmap, _("Performs syntax check on the current project"));
 }
 
 void mvceditor::LintPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
@@ -301,7 +301,8 @@ void mvceditor::LintPluginClass::LoadPreferences(wxConfigBase* config) {
 	IgnoreFiles = config->Read(wxT("LintCheck/IgnoreFiles"));
 	config->Read(wxT("/LintCheck/CheckOnSave"), &CheckOnSave);
 }
-void mvceditor::LintPluginClass::SavePreferences(wxConfigBase* config) {
+void mvceditor::LintPluginClass::SavePreferences(wxCommandEvent& event) {
+	wxConfigBase* config = wxConfig::Get();
 	config->Write(wxT("/LintCheck/IgnoreFiles"), IgnoreFiles);
 	config->Write(wxT("/LintCheck/CheckOnSave"), CheckOnSave);
 }
@@ -476,10 +477,10 @@ BEGIN_EVENT_TABLE(mvceditor::LintPluginClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_LINT_PHP + 0, mvceditor::LintPluginClass::OnLintMenu)
 	EVT_MENU(mvceditor::MENU_LINT_PHP + 1, mvceditor::LintPluginClass::OnNextLintError)
 	EVT_MENU(mvceditor::MENU_LINT_PHP + 2, mvceditor::LintPluginClass::OnPreviousLintError)
-	EVT_MENU(ID_LINT_TOOLBAR_ITEM, mvceditor::LintPluginClass::OnLintMenu)
 	EVT_COMMAND(wxID_ANY, EVENT_LINT_ERROR,  mvceditor::LintPluginClass::OnLintError)
 	EVT_COMMAND(wxID_ANY, EVENT_FILE_READ,  mvceditor::LintPluginClass::OnLintFileComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::LintPluginClass::OnTimer)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::LintPluginClass::OnLintComplete)
 	EVT_PLUGIN_FILE_SAVED(mvceditor::LintPluginClass::OnFileSaved)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_UPDATED, mvceditor::LintPluginClass::SavePreferences)
 END_EVENT_TABLE()

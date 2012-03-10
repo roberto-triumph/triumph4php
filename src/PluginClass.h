@@ -56,21 +56,21 @@ class AppClass;
  */
 enum MenuIds {
 	// start way out here to prevent collisions with default menus
-	MENU_FINDER = 3200,
-	MENU_FIND_IN_FILES = 3210,
-	MENU_SQL = 3220,
-	MENU_RUN_PHP = 3230,
-	MENU_RESOURCE = 3240,
-	MENU_PROJECT = 3250,
-	MENU_OUTLINE = 3260,
-	MENU_LINT_PHP = 3270,
-	MENU_ENVIRONMENT = 3280,
-	MENU_EDITOR_MESSAGES = 3290,
-	MENU_CODE_IGNITER = 3300,
-	MENU_RUN_BROWSER = 3320,
-	MENU_RUN_BROWSER_URLS = 3340,
-	MENU_VIEW_FILES = 3400,
-	MENU_END = 3410
+	MENU_START = 10000,
+	MENU_FINDER = 10000,
+	MENU_FIND_IN_FILES = 10100,
+	MENU_SQL = 10200,
+	MENU_RUN_PHP = 10300,
+	MENU_RESOURCE = 10400,
+	MENU_PROJECT = 10500,
+	MENU_OUTLINE = 10600,
+	MENU_LINT_PHP = 10700,
+	MENU_ENVIRONMENT = 10800,
+	MENU_EDITOR_MESSAGES = 10900,
+	MENU_CODE_IGNITER = 11000,
+	MENU_RUN_BROWSER = 11100,
+	MENU_VIEW_FILES = 11200,
+	MENU_END = 113000
 };
 
 /**
@@ -112,8 +112,19 @@ enum MenuIds {
  * Lifecycle:
  *  + One instance of plugin per application.  plugins are created during program startup and deleted during application exit.
  *  + During startup, AddMenuItems method is called. The plugin can override this method to create menu items.
- *    Plugins inherit from wxEvtHandler, so event tables or Connect method may be used to listen for menu or any other window) events.
- *  + When a project is opened, the plugin's setProject method gets called.
+ *    Plugins inherit from wxEvtHandler, so event tables or Connect method may be used to listen for menu or any other window) events
+ *
+ * Events:
+ * The application has an "Event Sink", any interesting events are posted to the event sink. These can be
+ * editor events (like, for example, when a file has been opened, when settings have changed, etc).  Also,
+ * ** some ** window events are put in the event sink; all menu events, toolbar events and some AUI events.
+ * All plugins are automatically added as handles for the event sink; what this all means is that a plugin
+ * can implement menu items and toolbar buttons by adding event table entries as if it were the main
+ * frame. 
+ * The event sink is a two-way communication, plugins can send commands to the event sink or they can
+ * handle commands from other plugins as well.
+ *
+ * See EventSinkClass for more info.
  * 
  */
 class PluginClass : public wxEvtHandler {
@@ -220,40 +231,12 @@ public:
 	virtual void LoadPreferences(wxConfigBase* config);
 	
 	/**
-	 * This method will be called after the user changes the settings via Edit ... Preferences. the plugin should 
-	 * save the preferences to persistent storage (confg) here
-	 * 
-	 * @param wxConfigBase* the config where settings should be stored.
-	 */
-	virtual void SavePreferences(wxConfigBase* config);
-	
-	/**
-	 * This method is called whenever a project is opened. The project can be accessed via the GetProject() method. Note
-	 * that this method may be called at a time where the winodowing system may not yet be initialized.
-	 */
-	virtual void OnProjectOpened();
-
-	/**
 	 * Subclasses can override this method to create their own shortcuts that will get serialized /deserialized
 	 * properly; also by using this method the shortcuts will get registered properly; plus it will allow the user to
 	 * edit the shortcuts via the preferences dialog.
 	 * @param shortcuts the list of shortcuts to add to
 	 */
 	virtual void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
-
-	/**
-	 * Subclasses can override this method to perform logic whenever a project's resource cache has been udpated. note
-	 * that the cache may be updated when the user clicks the 'index' button or by some other, automatic action.
-	 */
-	virtual void OnProjectIndexed();
-	
-	/**
-	 * Set the plugin's reference to the given project. The caller will take care of memory management (this class should NOT
-	 * delete the pointer).
-	 * project can be NULL, in this case the previous project has been closed and a new one is about to be opened. In this
-	 * case there will be 2 calls to SetProject() one for closing the project and one for opening the project.
-	 */
-	void SetProject(ProjectClass* project);
 	
 	/**
 	 * The current opened project. Do NOT delete the pointer. Note that the Project may be NULL when there is no 
@@ -412,11 +395,6 @@ protected:
 	  */
 	 CodeControlClass* CreateCodeControl(const wxString& tabName) const;
 
-	 /**
-	  * Send an event to the application.  See above for possible events.
-	  */
-	void AppEvent(wxEvent& event);
-
 	/**
 	 * This is a helper method that will add each of the given menu items as a 
 	 * shortcut.  The map will contain the menu Item IDs; each of these IDs will
@@ -478,13 +456,6 @@ protected:
 	 * @var wxAuiNotebook*
 	 */
 	wxAuiNotebook* OutlineNotebook;
-	
-	/**
-	 * The current opened project. The pointer will NOT be owned by this class.
-	 * 
-	 * @var ProjectClass*
-	 */	
-	ProjectClass* Project;
 
 	/**
 	 * The Application-wide menu bar.
@@ -492,80 +463,6 @@ protected:
 	wxMenuBar* MenuBar;
 	
 };
-
-extern const wxEventType EVENT_PLUGIN_FILE_SAVED;
-
-/**
- * This is an event that will tell a plugin that a file has been saved.
- * The plugin will get a pointer to the CodeControl that was saved.
- * From the code control; the event handler can get the file name
- * or file contents if so desired.
- * Using a new event class as opposed to a wxCommandEvent because
- * wxCommandEvents propagate by default; but we do not want
- * these events to propagate. This is because plugins are hooked into
- * the main frame's event table; and if the event were to propagate
- * then it would result in an infine loop.
- */
-class FileSavedEventClass : public wxEvent {
-
-public:
-
-	/**
-	 * @param codeControl caller will still own the pointer
-	 */
-	FileSavedEventClass(CodeControlClass* codeControl);
-
-	/**
-	 * @return the code control that was saved; do NOT delete the returned
-	 * pointer.
-	 */
-	CodeControlClass* GetCodeControl() const;
-
-	/** 
-	 * required for sending with wxPostEvent()
-	 */
-    wxEvent* Clone() const;
-
-private:
-
-	CodeControlClass* CodeControl;
-};
-
-typedef void (wxEvtHandler::*FileSavedEventClassFunction)(FileSavedEventClass&);
-
-#define EVT_PLUGIN_FILE_SAVED(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_PLUGIN_FILE_SAVED, wxID_ANY, -1, \
-    (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( FileSavedEventClassFunction, & fn ), (wxObject *) NULL ),
-
-extern const wxEventType EVENT_PLUGIN_PROJECT_INDEXED;
-
-
-/**
- * This is an event that will tell a plugin that the current project
- * has been indexed; the event handler can get the project name
- * or resource cache from its [PluginClass] member properties if so desired.
- * Using a new event class as opposed to a wxCommandEvent because
- * wxCommandEvents propagate by default; but we do not want
- * these events to propagate. This is because plugins are hooked into
- * the main frame's event table; and if the event were to propagate
- * then it would result in an infine loop.
- */
-class ProjectIndexedEventClass : public wxEvent {
-
-public:
-
-	ProjectIndexedEventClass();
-	
-	wxEvent* Clone() const;
-};
-
-typedef void (wxEvtHandler::*ProjectIndexedEventClassFunction)(ProjectIndexedEventClass&);
-
-#define EVT_PLUGIN_PROJECT_INDEXED(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_PLUGIN_PROJECT_INDEXED, wxID_ANY, -1, \
-    (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( ProjectIndexedEventClassFunction, & fn ), (wxObject *) NULL ),
 
 }
 

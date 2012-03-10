@@ -25,6 +25,7 @@
 #include <plugins/CodeIgniterPluginClass.h>
 #include <MvcEditorErrors.h>
 #include <MvcEditor.h>
+#include <Events.h>
 #include <windows/StringHelperClass.h>
 
 mvceditor::CodeIgniterPluginClass::CodeIgniterPluginClass()  
@@ -42,7 +43,7 @@ void mvceditor::CodeIgniterPluginClass::AddNewMenu(wxMenuBar *menuBar) {
 	// for the projects that use Code Igniter
 }
 
-void mvceditor::CodeIgniterPluginClass::OnProjectOpened() {
+void mvceditor::CodeIgniterPluginClass::OnProjectOpened(wxCommandEvent& event) {
 	int menuIndex = MenuBar->FindMenu(_("Code Igniter"));
 	if (MenuBar && menuIndex != wxNOT_FOUND) {
 		MenuBar->Remove(menuIndex);
@@ -96,9 +97,9 @@ void mvceditor::CodeIgniterPluginClass::OnMenuItem(wxCommandEvent& event) {
 			if (!filePath.IsEmpty()) {
 				wxFileName fileName(filePath);
 				if (fileName.IsOk()) {
-					wxCommandEvent openEvent(mvceditor::EVENT_APP_OPEN_FILE);
+					wxCommandEvent openEvent(mvceditor::EVENT_CMD_OPEN_FILE);
 					openEvent.SetString(filePath);
-					AppEvent(openEvent);
+					App->EventSink.Publish(openEvent);
 				}
 				else {
 					mvceditor::EditorLogWarning(mvceditor::INVALID_FILE, filePath);
@@ -160,4 +161,5 @@ void mvceditor::CodeIgniterPluginClass::AddKeyboardShortcuts(std::vector<Dynamic
 
 BEGIN_EVENT_TABLE(mvceditor::CodeIgniterPluginClass, wxEvtHandler) 
 	EVT_MENU_RANGE(MENU_CODE_IGNITER, MENU_CODE_IGNITER + 13, mvceditor::CodeIgniterPluginClass::OnMenuItem)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_OPENED, mvceditor::CodeIgniterPluginClass::OnProjectOpened)
 END_EVENT_TABLE()

@@ -383,11 +383,9 @@ public:
 	
 	void AuiManagerUpdate();
 	
-protected:
-	
-	void OnProjectOpened();	
-	
 private:
+
+	void OnProjectOpened(wxCommandEvent& event);	
 
 	void OnSqlBrowserToolsMenu(wxCommandEvent& event);
 	

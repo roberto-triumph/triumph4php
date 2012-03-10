@@ -33,7 +33,6 @@ mvceditor::PluginClass::PluginClass()
 	, Notebook(NULL)
 	, ToolsNotebook(NULL)
 	, OutlineNotebook(NULL)
-	, Project(NULL)
 	, MenuBar(NULL) {
 }
 
@@ -54,15 +53,8 @@ void mvceditor::PluginClass::InitState(AppClass* app) {
 	App = app;
 }
 
-void mvceditor::PluginClass::SetProject(ProjectClass* project) {
-	Project = project;
-	if (Project) {
-		OnProjectOpened();
-	}
-}
-
 mvceditor::ProjectClass* mvceditor::PluginClass::GetProject() const {
-	return Project;
+	return App ? App->Project : NULL;
 }
 
 mvceditor::NotebookClass* mvceditor::PluginClass::GetNotebook() const {
@@ -96,15 +88,7 @@ void mvceditor::PluginClass::AddNewMenu(wxMenuBar*) {
 void mvceditor::PluginClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
 }
 
-void mvceditor::PluginClass::OnProjectOpened() {
-	
-}
-
 void mvceditor::PluginClass::AddKeyboardShortcuts(std::vector<mvceditor::DynamicCmdClass>& shortcuts) {
-
-}
-
-void mvceditor::PluginClass::OnProjectIndexed() {
 
 }
 
@@ -220,9 +204,6 @@ void mvceditor::PluginClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 void mvceditor::PluginClass::LoadPreferences(wxConfigBase* config) {
 }
 
-void mvceditor::PluginClass::SavePreferences(wxConfigBase* config) {
-}
-
 void mvceditor::PluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 }
 
@@ -240,12 +221,6 @@ mvceditor::CodeControlClass* mvceditor::PluginClass::CreateCodeControl(const wxS
 	return ctrl;
 }
 
-void mvceditor::PluginClass::AppEvent(wxEvent& event) {
-	if (App) {
-		wxPostEvent(App, event);
-	}
-}
-
 void mvceditor::PluginClass::AddDynamicCmd(std::map<int, wxString> menuItemIds, std::vector<mvceditor::DynamicCmdClass>& shortcuts) {
 	for (std::map<int, wxString>::iterator it = menuItemIds.begin(); it != menuItemIds.end(); ++it) {
 		wxMenuItem* item = MenuBar->FindItem(it->first);
@@ -254,30 +229,3 @@ void mvceditor::PluginClass::AddDynamicCmd(std::map<int, wxString> menuItemIds, 
 		shortcuts.push_back(cmd);
 	}
 }
-
-mvceditor::FileSavedEventClass::FileSavedEventClass(mvceditor::CodeControlClass* codeControl)
-	: wxEvent(wxID_ANY, mvceditor::EVENT_PLUGIN_FILE_SAVED)
-	, CodeControl(codeControl) {
-
-}
-
-mvceditor::CodeControlClass* mvceditor::FileSavedEventClass::GetCodeControl() const {
-	return CodeControl;
-}
-
-wxEvent* mvceditor::FileSavedEventClass::Clone() const {
-	mvceditor::FileSavedEventClass* newEvt = new mvceditor::FileSavedEventClass(CodeControl);
-	return newEvt;
-}
-
-const wxEventType mvceditor::EVENT_PLUGIN_FILE_SAVED = wxNewEventType();
-
-mvceditor::ProjectIndexedEventClass::ProjectIndexedEventClass() 
-	: wxEvent(wxID_ANY, mvceditor::EVENT_PLUGIN_PROJECT_INDEXED) {
-}
-
-wxEvent* mvceditor::ProjectIndexedEventClass::Clone() const {
-	return new mvceditor::ProjectIndexedEventClass();
-}
-
-const wxEventType mvceditor::EVENT_PLUGIN_PROJECT_INDEXED = wxNewEventType();

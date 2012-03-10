@@ -125,8 +125,6 @@ public:
 
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 	
-	void OnProjectOpened();
-	
 	void AddCodeControlClassContextMenuItems(wxMenu* menu);
 	
 	/**
@@ -152,6 +150,10 @@ public:
 	void StartIndex();
 	
 private:
+
+	void OnProjectOpened(wxCommandEvent& event);
+
+	void OnCmdProjectReIndex(wxCommandEvent& event);
 
 	/**
 	 * Handle the results of the resource lookups.

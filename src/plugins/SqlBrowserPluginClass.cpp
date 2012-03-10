@@ -564,8 +564,10 @@ mvceditor::SqlBrowserPluginClass::SqlBrowserPluginClass()
 mvceditor::SqlBrowserPluginClass::~SqlBrowserPluginClass() {
 }
 
-void mvceditor::SqlBrowserPluginClass::OnProjectOpened() {
-	DetectMetadata();
+void mvceditor::SqlBrowserPluginClass::OnProjectOpened(wxCommandEvent& event) {
+	if (GetProject()) {
+		DetectMetadata();
+	}
 }
 
 void mvceditor::SqlBrowserPluginClass::DetectMetadata() {
@@ -660,6 +662,8 @@ void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event
 	// before, a user would not be able to edit the connection info once it was detected
 	// in order to make it less confusing about where the connection info comes from.
 	mvceditor::SqlConnectionDialogClass dialog(GetMainWindow(), Infos, ChosenIndex, true);
+
+	// TODO: sometimes the editor crashes when the user test a connection then closes the test dialog
 	if (dialog.ShowModal() == wxOK) {
 		
 		// if connection changed need to update the code control so that it knows to use the new
@@ -760,6 +764,7 @@ BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPluginClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SqlBrowserPluginClass::OnWorkComplete)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(wxID_ANY, mvceditor::SqlBrowserPluginClass::OnContentNotebookPageChanged)
 	EVT_AUINOTEBOOK_PAGE_CLOSE(wxID_ANY, mvceditor::SqlBrowserPluginClass::OnContentNotebookPageClose)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_OPENED, mvceditor::SqlBrowserPluginClass::OnProjectOpened)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPanelClass, SqlBrowserPanelGeneratedClass)

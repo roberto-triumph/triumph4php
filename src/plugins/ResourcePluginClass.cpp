@@ -26,15 +26,15 @@
 #include <windows/StringHelperClass.h>
 #include <MvcEditorErrors.h>
 #include <MvcEditorAssets.h>
+#include <Events.h>
+#include <MvcEditor.h>
 #include <wx/artprov.h>
 #include <wx/filename.h>
 #include <wx/valgen.h>
 
 static int ID_JUMP_TO_GAUGE = wxNewId();
 static int ID_COUNT_FILES_GAUGE = wxNewId();
-static int ID_TOOLBAR_INDEX = wxNewId();
 static int ID_RESOURCE_PLUGIN_PANEL = wxNewId();
-static int ID_CONTEXT_MENU_JUMP = wxNewId();
 
 mvceditor::ResourceFileReaderClass::ResourceFileReaderClass(wxEvtHandler& handler) 
 	: BackgroundFileReaderClass(handler)
@@ -121,7 +121,7 @@ void mvceditor::ResourcePluginClass::AddKeyboardShortcuts(std::vector<DynamicCmd
 }
 
 void mvceditor::ResourcePluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
-	toolBar->AddTool(ID_TOOLBAR_INDEX, wxT("Index"), wxArtProvider::GetBitmap(
+	toolBar->AddTool(mvceditor::MENU_RESOURCE + 0, wxT("Index"), wxArtProvider::GetBitmap(
 		wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), wxT("Index"), wxITEM_NORMAL);
 }
 
@@ -134,15 +134,17 @@ void mvceditor::ResourcePluginClass::AddWindows() {
 }
 
 void mvceditor::ResourcePluginClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
-	menu->Append(ID_CONTEXT_MENU_JUMP, _("Jump To Source"));
+	menu->Append(mvceditor::MENU_RESOURCE + 3, _("Jump To Source"));
 }
 
-void mvceditor::ResourcePluginClass::OnProjectOpened() {
+void mvceditor::ResourcePluginClass::OnProjectOpened(wxCommandEvent& event) {
 	HasCodeLookups = false;
 	HasFileLookups = false;
 	if (ResourceFileReader.IsRunning()) {
 		ResourceFileReader.StopReading();
 	}
+
+	// TODO editor crashes if the native file parsing has not completed and the user closes the app
 	if (ResourceFileReader.InitForNativeFunctionsFile(GetResourceCache())) {
 		mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
 		if (ResourceFileReader.StartReading(error)) {
@@ -264,8 +266,8 @@ void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
 		ShowJumpToResults(JumpToText, matches);
 	}
 	else if (INDEXING_PROJECT == previousState) {
-		mvceditor::ProjectIndexedEventClass indexedEvent;
-		AppEvent(indexedEvent);
+		wxCommandEvent indexedEvent(mvceditor::EVENT_APP_PROJECT_INDEXED);
+		App->EventSink.Publish(indexedEvent);
 	}
 }
 
@@ -335,7 +337,7 @@ void mvceditor::ResourcePluginClass::StartIndex() {
 
 		//prevent two finds at a time
 		if (FREE == State) { 
-			ResourceCacheClass* resourceCache =GetResourceCache();
+			ResourceCacheClass* resourceCache = GetResourceCache();
 
 			// don't bother searching when path or expression is not valid
 			// need to do this so that the resource finder attempts to parse the files
@@ -473,6 +475,10 @@ void mvceditor::ResourcePluginClass::OnPageClosed(wxAuiNotebookEvent& event) {
 
 void mvceditor::ResourcePluginClass::OpenFile(wxString fileName) {
 	GetNotebook()->LoadPage(fileName);
+}
+
+void mvceditor::ResourcePluginClass::OnCmdProjectReIndex(wxCommandEvent& event) {
+	StartIndex();
 }
 
 mvceditor::ResourcePluginPanelClass::ResourcePluginPanelClass(wxWindow* parent, ResourcePluginClass& resource)
@@ -614,14 +620,15 @@ void mvceditor::IndexingDialogClass::Increment() {
 }
 
 BEGIN_EVENT_TABLE(mvceditor::ResourcePluginClass, wxEvtHandler)
-	EVT_MENU(ID_TOOLBAR_INDEX, mvceditor::ResourcePluginClass::OnProjectIndex)
 	EVT_MENU(mvceditor::MENU_RESOURCE + 0, mvceditor::ResourcePluginClass::OnProjectIndex)
 	EVT_MENU(mvceditor::MENU_RESOURCE + 1, mvceditor::ResourcePluginClass::OnJump)
 	EVT_MENU(mvceditor::MENU_RESOURCE + 2, mvceditor::ResourcePluginClass::OnSearchForResource)
-	EVT_MENU(ID_CONTEXT_MENU_JUMP, mvceditor::ResourcePluginClass::OnJump)
+	EVT_MENU(mvceditor::MENU_RESOURCE + 3, mvceditor::ResourcePluginClass::OnJump)
 	EVT_UPDATE_UI(wxID_ANY, mvceditor::ResourcePluginClass::OnUpdateUi)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(wxID_ANY, mvceditor::ResourcePluginClass::OnPageChanged)
 	EVT_AUINOTEBOOK_PAGE_CLOSED(wxID_ANY, mvceditor::ResourcePluginClass::OnPageClosed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FILE_READ_COMPLETE, mvceditor::ResourcePluginClass::OnWorkComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ResourcePluginClass::OnWorkInProgress)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_OPENED, mvceditor::ResourcePluginClass::OnProjectOpened)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_RE_INDEX, mvceditor::ResourcePluginClass::OnCmdProjectReIndex)
 END_EVENT_TABLE()

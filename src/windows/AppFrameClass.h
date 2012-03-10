@@ -30,10 +30,51 @@
 #include <widgets/NotebookClass.h>
 #include <PluginClass.h>
 #include <PreferencesClass.h>
+#include <Events.h>
 #include <widgets/ResourceCacheClass.h>
 #include <wx/aui/aui.h>
 
 namespace mvceditor {
+
+// forward declaration to prevent recursive dependencies
+class AppClass;
+
+// defined at the bottom of this file
+class AppFrameClass;
+
+/**
+ * This class is used to listen for app events.  It is a separate class
+ * because the AppFrame should handle them; the app propagates
+ * the menu, tool, and AUI events to the event sink; if the frame
+ * were a listener to the sink then events would be
+ * trigger indefinitely (since the frame would get an event, publish it
+ * to the sink, and get notified of the new event).
+ */
+class AppEventListenerForFrameClass : public wxEvtHandler {
+
+public:
+
+	/**
+	 * @param frame this class will not own the pointer
+	*/
+	AppEventListenerForFrameClass(AppFrameClass* frame);
+
+private:
+
+
+	void OnProjectOpened(wxCommandEvent& event);
+
+	void OnProjectClosed(wxCommandEvent& event);
+
+	void OnCmdOpenFile(wxCommandEvent& event);
+
+	/**
+	 * Need the frame to manipulate it
+	 */
+	AppFrameClass* AppFrame;
+
+	DECLARE_EVENT_TABLE()
+};
 
 /**
  * The main frame; contains all menus, toolbars, and notebooks.  For now there is only one
@@ -42,10 +83,9 @@ namespace mvceditor {
 class AppFrameClass : public AppFrameGeneratedClass {
 
 public:
-	/** Constructor */
-	AppFrameClass(const std::vector<PluginClass*>& plugins,
-		wxEvtHandler& appHandler, EnvironmentClass& environment,
-		PreferencesClass& preferences, ResourceCacheClass& resourceCache);
+	/** Constructor, this class will NOT  own the App pinter */
+	AppFrameClass(const std::vector<PluginClass*>& plugins, AppClass* app, EnvironmentClass& environment, 
+		PreferencesClass& preferences);
 	
 	~AppFrameClass();
 	
@@ -54,18 +94,6 @@ public:
 	 * File names must be fully qualified.
 	 */
 	void FileOpen(const std::vector<wxString>& filenames);
-
-	/**
-	 * notify all sub-windows of a new project.
-	 * This class will not own these pointer
-	 */
-	void OnProjectOpened(ProjectClass* project, wxEvtHandler* appHandler);
-
-	/**
-	 * when a project is closed, close any open windows
-	 * This class will not own this pointer
-	 */
-	void OnProjectClosed(wxEvtHandler* appHandler);
 
 	/**
 	 * get all of the plugin's extra windows and menus and attach them to the main frame.
@@ -77,6 +105,16 @@ public:
 	 * this should be called whenever a new window is added.
 	 */
 	void AuiManagerUpdate();
+
+	/**
+	 * notify all sub-windows of a new project.
+	 */
+	void OnProjectOpened();
+
+	/**
+	 * when a project is closed, close any open windows
+	 */
+	void OnProjectClosed();
 
 protected:
 
@@ -105,11 +143,6 @@ protected:
 	void OnEditContentAssist(wxCommandEvent& event);
 	void OnEditCallTip(wxCommandEvent& event);
 	void OnHelpAbout(wxCommandEvent& event);
-
-	/**
-	 * project menu handlers
-	 */
-	void OnProjectOpen(wxCommandEvent& event);
 	
 	/**
 	 * Context menu handler
@@ -117,6 +150,12 @@ protected:
 	void OnContextMenu(wxContextMenuEvent& event);	
 	
 private:
+	
+	/**
+	 * project menu handlers
+	 */
+	void OnProjectOpen(wxCommandEvent& event);
+
 
 	/**
 	 * Status bar accessor.  This status bar allows plugins to easily add gauges to the status bar.
@@ -220,7 +259,25 @@ private:
 	 * Add the shortcuts for this frame's menu bar into the preference's shortcut list
 	 */
 	void DefaultKeyboardShortcuts();
-	
+
+	/**
+	 * propagate menu events to plugins, so that they can handle menu events themselves
+	 * their own menus
+	 */
+	void OnAnyMenuCommandEvent(wxCommandEvent& event);
+
+	/**
+	 * propagate aui notebook events to plugins, so that they can handle menu events themselves
+	 * their own menus
+	 */
+	void OnAnyAuiNotebookEvent(wxAuiNotebookEvent& event);
+
+	/**
+	 * propagate aui toolbar events to plugins, so that they can handle menu events themselves
+	 * their own menus
+	 */
+	void OnAnyAuiToolbarEvent(wxAuiToolBarEvent& event);
+
 	/**
 	 * GUI framework object, used to programatically position the different windows
 	 * 
@@ -234,10 +291,15 @@ private:
 	const std::vector<PluginClass*>& Plugins;
 
 	/**
-	 * will send events to the top-level app
+	 * Used to listen for app events.
 	 */
-	wxEvtHandler& AppHandler;
-	
+	AppEventListenerForFrameClass Listener;
+
+	/**
+	 * The application global
+	 */
+	AppClass* App;
+
 	/**
 	 * The environment stack.
 	 * 

@@ -38,7 +38,7 @@ mvceditor::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id,
 	, CodeControlOptions(NULL)
 	, ContextMenu(NULL)
 	, Project(NULL)
-	, AppHandler(NULL)
+	, EventSink(NULL)
 	, NewPageNumber(1) {
 }
 
@@ -79,10 +79,10 @@ void mvceditor::NotebookClass::SavePageIfModified(wxAuiNotebookEvent& event) {
 		// this is needed because when the user is editing the file, the 'global'
 		// resource finder cache is not updated
 		wxString fileName = codeCtrl->GetFileName();
-		wxCommandEvent cmdEvent(mvceditor::EVENT_APP_RE_INDEX);
+		wxCommandEvent cmdEvent(mvceditor::EVENT_CMD_RE_INDEX);
 		cmdEvent.SetId(wxID_ANY);
 		cmdEvent.SetString(fileName);
-		wxPostEvent(AppHandler, cmdEvent);
+		EventSink->Publish(cmdEvent);
 	}
 	if (!vetoed) {
 		event.Skip();
@@ -312,9 +312,9 @@ bool mvceditor::NotebookClass::GetModifiedPageNames(std::vector<wxString>& modif
 	return modified;
 }
 
-void mvceditor::NotebookClass::SetProject(ProjectClass* project, wxEvtHandler* appHandler) {
+void mvceditor::NotebookClass::SetProject(ProjectClass* project, mvceditor::EventSinkClass* eventSink) {
 	Project = project;
-	AppHandler = appHandler;
+	EventSink = eventSink;
 }
 
 void mvceditor::NotebookClass::ShowContextMenu(wxAuiNotebookEvent& event) {

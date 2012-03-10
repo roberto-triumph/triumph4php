@@ -28,48 +28,16 @@
 #include <windows/AppFrameClass.h>
 #include <environment/EnvironmentClass.h>
 #include <environment/UrlResourceClass.h>
-#include <plugins/ResourcePluginClass.h>
 #include <plugins/ProjectPluginClass.h>
 #include <PluginClass.h>
 #include <PreferencesClass.h>
+#include <Events.h>
 #include <wx/app.h>
 #include <wx/event.h>
 #include <wx/string.h>
 #include <vector>
 
 namespace mvceditor {
-
-/**
- * These events can be published by plugins; the application 
- * will listen for these events and act accordingly.
-*/
-
-/**
- * Tell the app to open a new project.
- * The command event should set the project root path with event.SetString()
- * Note that the app will do NOTHING if the path is invalid; the plugin should
- * make sure the path is valid.
- */
-extern const wxEventType EVENT_APP_OPEN_PROJECT;
-
-/**
- * Tell the app to save its state to the file system, and will 
- * also repaint any windows that are affected by the changes.
- */
-extern const wxEventType EVENT_APP_SAVE_PREFERENCES;
-
-/**
- * Tell the app to re-index the current project.
- */
-extern const wxEventType EVENT_APP_RE_INDEX;
-
-/**
- * Tell the app to open a new file.
- * The command event should set the file to be opened with event.SetString()
- * Note that the app will do NOTHING if the path is invalid; the plugin should
- * make sure the path is valid.
- */
-extern const wxEventType EVENT_APP_OPEN_FILE;
 
 class AppClass : public wxApp {
 
@@ -99,6 +67,21 @@ public:
 	 */
 	UrlResourceFinderClass UrlResourceFinder;
 
+	/**
+	 * Any plugins should post any useful events to this event handler
+	 * then all other plugins will get notified.  This is how
+	 * inter-plugin communication is done in a way to reduce coupling
+	 * Plugins need not push themselves onto this sink, the application will do 
+	 * so at app start.
+	 */
+	EventSinkClass EventSink;
+
+	/**
+	 * The open project
+	 * @var ProjectClass*
+ 	 */
+	ProjectClass* Project;
+
 	/** 
 	 * Initialize the application 
 	 */
@@ -109,33 +92,6 @@ public:
 	~AppClass();
 
 private:
-
-	/**
-	 * flush preferences to disk and tells all dependent windows to repaint
-	 * themselves based on the new settings.
-	 */
-	void OnSavePreferences(wxCommandEvent& event);
-
-	/**
-	 * Opens the given directory as a project.
-	 */
-	void OnProjectOpen(wxCommandEvent& event);
-
-	/**
-	 * Opens the given directory as a project.
-	 */
-	void ProjectOpen(const wxString& directoryPath);
-
-	/**
-	 * method that will trigger the re-indexing of the current project.
-	 */
-	void OnProjectReIndex(wxCommandEvent& event);
-
-	/**
-	 * Opens the given file in a new Notebook tab. 
-	 * File's full path should be in event.GetString()
-	 */
-	void OnOpenFile(wxCommandEvent& event);
 
 	/**
 	 * Parses any command line arguments.  Returns false if arguments are invalid.
@@ -156,29 +112,6 @@ private:
 	 * asks plugins for any windows they want to create
 	 */
 	void PluginWindows();
-	
-	/**
-	 * create a project and initialize all objects that depend on project
-	 */
-	void CreateProject(const ProjectOptionsClass& options);
-	
-	/**
-	 * close project and all resources that depend on it
-	 */
-	void CloseProject();
-	
-	/**
-	 * This is the callback that gets called when the PHP framework detectors have 
-	 * successfully run
-	 */
-	void OnFrameworkDetectionComplete(wxCommandEvent& event);
-	void OnFrameworkDetectionInProgress(wxCommandEvent& event);
-	void OnFrameworkDetectionFailed(wxCommandEvent& event);
-
-	/**
-	 * propagate this event to all plugins
-	 */
-	void OnProjectIndexed(ProjectIndexedEventClass& event);
 
 	/**
 	 * Additional functionality
@@ -190,12 +123,6 @@ private:
 	 * @var PreferencesClass;
 	 */
 	PreferencesClass Preferences;
-		
-	/**
-	 * The open project
-	 * @var ProjectClass*
- 	 */
-	ProjectClass* Project;
 
 	/**
 	 * The main application frame.
@@ -203,18 +130,11 @@ private:
 	AppFrameClass* AppFrame;
 
 	/**
-	 * This is used to trigger project indexing.  This pointer just points to one of the Plugins
-	 * in the Plugin vector; no need to delete.
-	 */ 
-	ResourcePluginClass* ResourcePlugin;
-
-	/**
 	 * Will need to load preferences for the project before all others. This pointer just points to one of the Plugins
 	 * in the Plugin vector; no need to delete.
 	 */
 	ProjectPluginClass* ProjectPlugin;
 
-	DECLARE_EVENT_TABLE()
 };
 
 }

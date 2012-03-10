@@ -30,11 +30,9 @@
 #include <wx/aui/aui.h>
 #include <algorithm>
 
-static const int ID_TOOLBAR_BROWSER = wxNewId();
-static const int ID_BROWSER_AUI_TOOLBAR = wxNewId();
-static const int ID_URL_AUI_TOOLBAR = wxNewId();
-static const int ID_URL_SEARCH_AUI_TOOLBAR = wxNewId();
 static const int ID_URL_GAUGE = wxNewId();
+static const int MAX_BROWSERS = 10;
+static const int MAX_URLS = 40;
 
 static void ExternalBrowser(const wxString& browserName, const wxString& url, mvceditor::EnvironmentClass* environment) {
 	wxFileName webBrowserPath  = environment->WebBrowsers[browserName];
@@ -116,6 +114,8 @@ mvceditor::RunBrowserPluginClass::RunBrowserPluginClass()
 	: PluginClass() 
 	, PhpFrameworks(NULL)
 	, ResourceCacheThread(NULL)
+	, BrowserMenu(NULL)
+	, UrlMenu(NULL)
 	, ResourceCacheFileName()
 	, RunInBrowser(NULL)
 	, BrowserToolbar(NULL) {
@@ -123,7 +123,7 @@ mvceditor::RunBrowserPluginClass::RunBrowserPluginClass()
 }
 
 void mvceditor::RunBrowserPluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
-	RunInBrowser = new wxMenuItem(toolsMenu, mvceditor::MENU_RUN_BROWSER + 0, 
+	RunInBrowser = new wxMenuItem(toolsMenu, mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 1, 
 		_("Run In Web Browser"),
 		_("Run the script in the chosen Web Browser"), wxITEM_NORMAL);
 	toolsMenu->Append(RunInBrowser);
@@ -137,12 +137,12 @@ void mvceditor::RunBrowserPluginClass::AddWindows() {
                                          wxAUI_TB_HORZ_TEXT);
     BrowserToolbar->SetToolBitmapSize(wxSize(16,16));
     wxBitmap browserBitmap = wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_OTHER, wxSize(16,16));
-	BrowserToolbar->AddTool(ID_BROWSER_AUI_TOOLBAR, wxT("No Browsers Configured"), browserBitmap);
-    BrowserToolbar->SetToolDropDown(ID_BROWSER_AUI_TOOLBAR, true);
+	BrowserToolbar->AddTool(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, wxT("No Browsers Configured"), browserBitmap);
+    BrowserToolbar->SetToolDropDown(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, true);
 	BrowserToolbar->AddSeparator();
-    BrowserToolbar->AddTool(ID_URL_AUI_TOOLBAR, wxT("No URLs"), browserBitmap);
-    BrowserToolbar->SetToolDropDown(ID_URL_AUI_TOOLBAR, true);
-	BrowserToolbar->AddTool(ID_URL_SEARCH_AUI_TOOLBAR, _("Search for URLs..."), browserBitmap);
+    BrowserToolbar->AddTool(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, wxT("No URLs"), browserBitmap);
+    BrowserToolbar->SetToolDropDown(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, true);
+	BrowserToolbar->AddTool(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 4, _("Search for URLs..."), browserBitmap);
 	BrowserToolbar->SetOverflowVisible(false);
     BrowserToolbar->Realize();
 
@@ -154,7 +154,7 @@ void mvceditor::RunBrowserPluginClass::AddWindows() {
 
 void mvceditor::RunBrowserPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
-	menuItemIds[mvceditor::MENU_RUN_BROWSER + 0] = wxT("Run-In Web Browser");
+	menuItemIds[mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 1] = wxT("Run-In Web Browser");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
@@ -162,7 +162,6 @@ void mvceditor::RunBrowserPluginClass::LoadPreferences(wxConfigBase* config) {
 	
 	// dont use the config; use the Environment that has already been seeded with 
 	// the proper data
-	// TODO: need to update the combo box if the user updates the environment
 	mvceditor::EnvironmentClass* environment = GetEnvironment();
 	std::map<wxString, wxFileName> webBrowsers = environment->WebBrowsers;
 	for (std::map<wxString, wxFileName>::const_iterator it = webBrowsers.begin(); it != webBrowsers.end(); ++it) {
@@ -172,14 +171,34 @@ void mvceditor::RunBrowserPluginClass::LoadPreferences(wxConfigBase* config) {
 		App->UrlResourceFinder.ChosenBrowser = App->UrlResourceFinder.Browsers[0];
 	}
 	if (BrowserToolbar) {
-		BrowserToolbar->SetToolLabel(ID_BROWSER_AUI_TOOLBAR, App->UrlResourceFinder.Browsers[0]);
+		BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, App->UrlResourceFinder.Browsers[0]);
+		BrowserToolbar->Realize();
+	}
+}
+
+void mvceditor::RunBrowserPluginClass::OnEnvironmentUpdated(wxCommandEvent& event) {
+
+	// need to update the browser toolbar if the user updates the environment
+	App->UrlResourceFinder.Browsers.clear();
+	mvceditor::EnvironmentClass* environment = GetEnvironment();
+	std::map<wxString, wxFileName> webBrowsers = environment->WebBrowsers;
+	for (std::map<wxString, wxFileName>::const_iterator it = webBrowsers.begin(); it != webBrowsers.end(); ++it) {
+		App->UrlResourceFinder.Browsers.push_back(it->first);
+	}
+
+	// for now just make the first item as selected
+	if (!App->UrlResourceFinder.Browsers.empty()) {
+		App->UrlResourceFinder.ChosenBrowser = App->UrlResourceFinder.Browsers[0];
+	}
+	if (BrowserToolbar) {
+		BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, App->UrlResourceFinder.Browsers[0]);
 		BrowserToolbar->Realize();
 	}
 }
 
 void mvceditor::RunBrowserPluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 	wxBitmap bitmap = wxArtProvider::GetBitmap(wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16));
-	toolBar->AddTool(ID_TOOLBAR_BROWSER, _("Web Browser"), bitmap, _("Run On a Web Browser"));
+	toolBar->AddTool(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 1, _("Web Browser"), bitmap, _("Run On a Web Browser"));
 }
 
 void mvceditor::RunBrowserPluginClass::OnRunInWebBrowser(wxCommandEvent& event) {
@@ -197,14 +216,19 @@ void mvceditor::RunBrowserPluginClass::OnBrowserToolDropDown(wxAuiToolBarEvent& 
 		mvceditor::EnvironmentClass* environment = GetEnvironment();
 		
 		// create the popup menu that contains all the available browser names
-		wxMenu menuPopup;
+		if (!BrowserMenu.get()) {
+			BrowserMenu.reset(new wxMenu);
+		}
+		while (BrowserMenu->GetMenuItemCount() > 0) {
+			BrowserMenu->Delete(BrowserMenu->FindItemByPosition(0)->GetId());
+		}
 		wxBitmap bmp = wxArtProvider::GetBitmap(wxART_QUESTION, wxART_OTHER, wxSize(16,16));
 		std::map<wxString, wxFileName> webBrowsers = environment->WebBrowsers;
 		int i = 0;
 		for (std::map<wxString, wxFileName>::const_iterator it = webBrowsers.begin(); it != webBrowsers.end(); ++it) {
-			wxMenuItem* menuItem =  new wxMenuItem(&menuPopup, mvceditor::MENU_RUN_BROWSER + i, it->first);
+			wxMenuItem* menuItem =  new wxMenuItem(BrowserMenu.get(), mvceditor::MENU_RUN_BROWSER + i, it->first);
 			menuItem->SetBitmap(bmp);
-			menuPopup.Append(menuItem);
+			BrowserMenu->Append(menuItem);
 			i++;
 		}
 		
@@ -212,7 +236,7 @@ void mvceditor::RunBrowserPluginClass::OnBrowserToolDropDown(wxAuiToolBarEvent& 
 		wxRect rect = BrowserToolbar->GetToolRect(event.GetId());
 		wxPoint pt = BrowserToolbar->ClientToScreen(rect.GetBottomLeft());
 		pt = GetMainWindow()->ScreenToClient(pt);
-		GetMainWindow()->PopupMenu(&menuPopup, pt);
+		GetMainWindow()->PopupMenu(BrowserMenu.get(), pt);
 
 		// make sure the button is "un-stuck"
 		BrowserToolbar->SetToolSticky(event.GetId(), false);
@@ -231,20 +255,26 @@ void mvceditor::RunBrowserPluginClass::OnUrlToolDropDown(wxAuiToolBarEvent& even
 		
 		// create the popup menu that contains all the available URLs
 		// TODO: clear the URLs from the previously-closed projects
-		wxMenu menuPopup;
+		if (!UrlMenu.get()) {
+			UrlMenu.reset(new wxMenu);
+		}
+		while (UrlMenu->GetMenuItemCount() > 0) {
+			UrlMenu->Delete(UrlMenu->FindItemByPosition(0)->GetId());
+		}
+
 		wxBitmap bmp = wxArtProvider::GetBitmap(wxART_QUESTION, wxART_OTHER, wxSize(16,16));
 		std::vector<mvceditor::UrlResourceClass> urls = App->UrlResourceFinder.Urls;
-		for (size_t i = 0; i < urls.size() && i < 40; ++i) {
-			wxMenuItem* menuItem =  new wxMenuItem(&menuPopup, mvceditor::MENU_RUN_BROWSER_URLS + i, urls[i].Url);
+		for (size_t i = 0; i < urls.size() && i < MAX_URLS; ++i) {
+			wxMenuItem* menuItem =  new wxMenuItem(UrlMenu.get(), mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + i, urls[i].Url);
 			menuItem->SetBitmap(bmp);
-			menuPopup.Append(menuItem);
+			UrlMenu->Append(menuItem);
 		}
 		
 		// line up our menu with the button
 		wxRect rect = BrowserToolbar->GetToolRect(event.GetId());
 		wxPoint pt = BrowserToolbar->ClientToScreen(rect.GetBottomLeft());
 		pt = GetMainWindow()->ScreenToClient(pt);
-		GetMainWindow()->PopupMenu(&menuPopup, pt);
+		GetMainWindow()->PopupMenu(UrlMenu.get(), pt);
 
 		// make sure the button is "un-stuck"
 		BrowserToolbar->SetToolSticky(event.GetId(), false);
@@ -298,7 +328,7 @@ wxString fileName;
 					
 		// add to URL to the internal recent list so that the user can easily access it
 		// multiple times.
-		if (App->UrlResourceFinder.Urls.size() > 50) {
+		if (App->UrlResourceFinder.Urls.size() > MAX_URLS) {
 			App->UrlResourceFinder.Urls.pop_back();
 		}
 		mvceditor::UrlResourceClass urlResource;
@@ -312,7 +342,7 @@ wxString fileName;
 		}
 
 		// 'select' the URL (make it the current in the toolbar)
-		BrowserToolbar->SetToolLabel(ID_URL_AUI_TOOLBAR, App->UrlResourceFinder.ChosenUrl.Url);
+		BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, App->UrlResourceFinder.ChosenUrl.Url);
 		BrowserToolbar->Realize();
 		AuiManager->Update();
 	}
@@ -332,17 +362,16 @@ void mvceditor::RunBrowserPluginClass::OnUrlDetectionFailed(wxCommandEvent& even
 }
 
 void mvceditor::RunBrowserPluginClass::OnBrowserToolMenuItem(wxCommandEvent& event) {
-	
+
 	// detect the chosen browser based on the menu item name
 	// change the current selection only if name is found
-	// change both the data structure and the toolbar 
-	wxMenu* menu = wxDynamicCast(event.GetEventObject(), wxMenu);
-	if (menu) {
-		wxString name = menu->GetLabelText(event.GetId());
+	// change both the data structure and the toolbar
+	if (BrowserMenu.get()) {
+		wxString name = BrowserMenu->GetLabelText(event.GetId());
 		std::vector<wxString>::iterator found = std::find(App->UrlResourceFinder.Browsers.begin(), App->UrlResourceFinder.Browsers.end(), name);
 		if (found != App->UrlResourceFinder.Browsers.end()) {
 			App->UrlResourceFinder.ChosenBrowser = name;
-			BrowserToolbar->SetToolLabel(ID_BROWSER_AUI_TOOLBAR, name);
+			BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, name);
 			BrowserToolbar->Realize();
 			AuiManager->Update();
 		}
@@ -354,21 +383,20 @@ void mvceditor::RunBrowserPluginClass::OnUrlToolMenuItem(wxCommandEvent& event) 
 	// detect the chosen url based on the menu item name
 	// change the current selection only if name is found
 	// change both the data structure and the toolbar 
-	wxMenu* menu = wxDynamicCast(event.GetEventObject(), wxMenu);
-	if (menu) {
-		wxString name = menu->GetLabelText(event.GetId());
+	if (UrlMenu.get()) {
+		wxString name = UrlMenu->GetLabelText(event.GetId());
 		mvceditor::UrlResourceClass urlResource;
 		bool found = App->UrlResourceFinder.FindByUrl(name, urlResource);
 		if (found) {
 			App->UrlResourceFinder.ChosenUrl = urlResource;
-			BrowserToolbar->SetToolLabel(ID_URL_AUI_TOOLBAR, name);
+			BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, name);
 			BrowserToolbar->Realize();
 			AuiManager->Update();
 		}
 	}
 }
 
-void mvceditor::RunBrowserPluginClass::OnProjectIndexed() {
+void mvceditor::RunBrowserPluginClass::OnProjectIndexed(wxCommandEvent& event) {
 	if (!ResourceCacheThread.get()) {
 		ResourceCacheThread.reset(new mvceditor::ResourceCacheUpdateThreadClass(GetResourceCache(), *this));
 	}
@@ -398,15 +426,18 @@ void mvceditor::RunBrowserPluginClass::OnProcessInProgress(wxCommandEvent& event
 BEGIN_EVENT_TABLE(mvceditor::RunBrowserPluginClass, wxEvtHandler) 
 	
 	// if the end values of the ranges need to be modified, need to modify mvceditor::PluginClass::MenuIds as well
-	EVT_MENU_RANGE(mvceditor::MENU_RUN_BROWSER + 0, mvceditor::MENU_RUN_BROWSER + 19, mvceditor::RunBrowserPluginClass::OnBrowserToolMenuItem)
-	EVT_MENU_RANGE(mvceditor::MENU_RUN_BROWSER_URLS + 0, mvceditor::MENU_RUN_BROWSER_URLS + 39, mvceditor::RunBrowserPluginClass::OnUrlToolMenuItem)
-	EVT_TOOL(ID_TOOLBAR_BROWSER, mvceditor::RunBrowserPluginClass::OnRunInWebBrowser)
-	EVT_AUITOOLBAR_TOOL_DROPDOWN(ID_BROWSER_AUI_TOOLBAR, mvceditor::RunBrowserPluginClass::OnBrowserToolDropDown)
-	EVT_AUITOOLBAR_TOOL_DROPDOWN(ID_URL_AUI_TOOLBAR, mvceditor::RunBrowserPluginClass::OnUrlToolDropDown)
-	EVT_TOOL(ID_URL_SEARCH_AUI_TOOLBAR, mvceditor::RunBrowserPluginClass::OnUrlSearchTool)
+	EVT_MENU_RANGE(mvceditor::MENU_RUN_BROWSER + 0, mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS - 1, mvceditor::RunBrowserPluginClass::OnBrowserToolMenuItem)
+	EVT_MENU_RANGE(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS, mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS - 1, mvceditor::RunBrowserPluginClass::OnUrlToolMenuItem)
+	EVT_TOOL(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 1, mvceditor::RunBrowserPluginClass::OnRunInWebBrowser)
+	EVT_AUITOOLBAR_TOOL_DROPDOWN(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, mvceditor::RunBrowserPluginClass::OnBrowserToolDropDown)
+	EVT_AUITOOLBAR_TOOL_DROPDOWN(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, mvceditor::RunBrowserPluginClass::OnUrlToolDropDown)
+	EVT_TOOL(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 4, mvceditor::RunBrowserPluginClass::OnUrlSearchTool)
+
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_URL_FAILED, mvceditor::RunBrowserPluginClass::OnUrlDetectionFailed)
 	EVT_FRAMEWORK_URL_COMPLETE(mvceditor::RunBrowserPluginClass::OnUrlDetectionComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::RunBrowserPluginClass::OnWorkComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::RunBrowserPluginClass::OnProcessInProgress)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::RunBrowserPluginClass::OnProcessInProgress)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_ENVIRONMENT_UPDATED, mvceditor::RunBrowserPluginClass::OnEnvironmentUpdated)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_INDEXED, mvceditor::RunBrowserPluginClass::OnProjectIndexed)
 END_EVENT_TABLE()

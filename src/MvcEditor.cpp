@@ -27,7 +27,6 @@
 #include <unicode/uclean.h>
 
 #include <windows/AppFrameClass.h>
-#include <widgets/StatusBarWithGaugeClass.h>
 #include <plugins/EnvironmentPluginClass.h>
 #include <plugins/FindInFilesPluginClass.h>
 #include <plugins/FinderPluginClass.h>
@@ -45,18 +44,16 @@
 
 IMPLEMENT_APP(mvceditor::AppClass)
 
-static const int ID_FRAMEWORK_DETECTION_GAUGE = wxNewId();
-
 mvceditor::AppClass::AppClass()
 	: wxApp()
 	, Environment()
 	, ResourceCache()
 	, PhpFrameworks(*this, Environment)
 	, UrlResourceFinder()
+	, EventSink()
+	, Project(NULL)
 	, Plugins()
 	, Preferences()
-	, Project(NULL)
-	, ResourcePlugin(NULL)
 	, ProjectPlugin(NULL) {
 	AppFrame = NULL;
 }
@@ -72,7 +69,7 @@ bool mvceditor::AppClass::OnInit() {
 	// frame and initialize the plugin windows so that all menus are created
 	// and only then can we load the keyboard shortcuts from the INI file
 	// all menu items must be present in the menu bar for shortcuts to take effect
-	AppFrame = new mvceditor::AppFrameClass(Plugins, *this, Environment, Preferences, ResourceCache);
+	AppFrame = new mvceditor::AppFrameClass(Plugins, this, Environment, Preferences);
 	PluginWindows();
 
 	// load any settings from .INI files
@@ -87,7 +84,7 @@ bool mvceditor::AppClass::OnInit() {
 	Preferences.Load(AppFrame);
 
 	// open a new project
-	ProjectOpen(wxT(""));
+	ProjectPlugin->ProjectOpen(wxT(""));
 
 	AppFrame->AuiManagerUpdate();
 	if (CommandLine()) {
@@ -146,26 +143,13 @@ bool mvceditor::AppClass::CommandLine() {
 			AppFrame->FileOpen(filenames);
 		}
 		if (parser.Found(wxT("project"), &projectDirectory)) {
-			ProjectOpen(projectDirectory);
+			ProjectPlugin->ProjectOpen(projectDirectory);
 		}
 	}
 	else if (-1 == result) {
 		ret = false;
 	}
 	return ret;
-}
-
-void mvceditor::AppClass::CloseProject() {
-	if (AppFrame) {
-		AppFrame->OnProjectClosed(this);
-	}
-	for (size_t i = 0; i < Plugins.size(); ++i) {
-		Plugins[i]->SetProject(NULL);
-	}
-	if (Project) {
-		delete Project;
-		Project = NULL;
-	}
 }
 
 void mvceditor::AppClass::CreatePlugins() {
@@ -175,11 +159,8 @@ void mvceditor::AppClass::CreatePlugins() {
 	Plugins.push_back(plugin);
 	plugin = new FindInFilesPluginClass();
 	Plugins.push_back(plugin);
-
-	// we want to keep a reference to this plugin
-	// to fulfill the EVENT_APP_PROJECT_RE_INDEX
-	ResourcePlugin = new ResourcePluginClass();
-	Plugins.push_back(ResourcePlugin);
+	plugin = new ResourcePluginClass();
+	Plugins.push_back(plugin);
 
 	plugin = new EnvironmentPluginClass();
 	Plugins.push_back(plugin);
@@ -206,154 +187,25 @@ void mvceditor::AppClass::CreatePlugins() {
 	// test plugin need to find a quicker way to toggling it ON / OFF
 	//plugin = new TestPluginClass();
 	//Plugins.push_back(plugin);
+
+	// connect the plugins to the event sink so that they can
+	// receive app events
+	for (size_t i = 0; i < Plugins.size(); ++i) {
+		EventSink.PushHandler(Plugins[i]);
+	}
 }
 
 void mvceditor::AppClass::PluginWindows() {
 	for (size_t i = 0; i < Plugins.size(); ++i) {
 		AppFrame->LoadPlugin(Plugins[i]);
-
-		// propagate GUI events to plugins, so that they can handle menu events themselves
-		// their own menus
-		AppFrame->PushEventHandler(Plugins[i]);
 	}
 }
 
 void mvceditor::AppClass::DeletePlugins() {
-	// Since this is called in the destructor
-	// the AppFrame pointer has been deleted, can't pop
-	// the plugins that were pushed.
-	//for (size_t i = 0; i < Plugins.size(); ++i) {
-	//	AppFrame->PopEventHandler();
-	//}
-	
+
 	// if i delete in the same loop as the PopEventHandler, wx assertions fail.
 	for (size_t i = 0; i < Plugins.size(); ++i) {
 		delete Plugins[i];
 	}
 	Plugins.clear();
 }
-
-void mvceditor::AppClass::ProjectOpen(const wxString& directoryPath) {
-	ProjectOptionsClass options;
-	options.RootPath = directoryPath;
-	CloseProject();
-	Project = new ProjectClass(options);
-
-	// on startup the editor is in "non-project" mode (no root path)
-	if (!directoryPath.IsEmpty()) {
-		bool started = PhpFrameworks.Init(directoryPath);
-		if (!started) {
-			mvceditor::EditorLogError(mvceditor::BAD_PHP_EXECUTABLE, Environment.Php.PhpExecutablePath); 
-		}
-		else {
-			mvceditor::StatusBarWithGaugeClass* gauge = wxDynamicCast(AppFrame->GetStatusBar(), mvceditor::StatusBarWithGaugeClass);
-			gauge->AddGauge(_("Framework Detection"), ID_FRAMEWORK_DETECTION_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
-		}
-	}
-	else {
-
-		// still notify the plugins of the new project at program startup
-		AppFrame->OnProjectOpened(Project, this);
-		ProjectPlugin->SetProject(Project);
-		for (size_t i = 0; i < Plugins.size(); ++i) {
-			if (Plugins[i] != ProjectPlugin) {
-				Plugins[i]->SetProject(Project);
-			}
-		}
-	}
-}
-
-void mvceditor::AppClass::OnSavePreferences(wxCommandEvent& event) {
-	Preferences.EnableSelectedProfile(AppFrame);
-	wxConfigBase* config = wxConfigBase::Get();
-	for (size_t i = 0; i < Plugins.size(); ++i) {
-		Plugins[i]->SavePreferences(config);
-	}
-	config->Flush();
-}
-
-void mvceditor::AppClass::OnProjectOpen(wxCommandEvent& event) {
-	wxString directoryPath = event.GetString();
-	ProjectOpen(directoryPath);
-}
-
-void mvceditor::AppClass::OnFrameworkDetectionComplete(wxCommandEvent& event) {
-	for (size_t i = 0; i < PhpFrameworks.Databases.size(); ++i) {
-		Project->PushDatabaseInfo(PhpFrameworks.Databases[i]);
-	}	
-	AppFrame->OnProjectOpened(Project, this);
-	ProjectPlugin->SetProject(Project);
-	for (size_t i = 0; i < Plugins.size(); ++i) {
-		if (Plugins[i] != ProjectPlugin) {
-			Plugins[i]->SetProject(Project);
-		}
-	}
-	mvceditor::StatusBarWithGaugeClass* gauge = wxDynamicCast(AppFrame->GetStatusBar(), mvceditor::StatusBarWithGaugeClass);
-	gauge->StopGauge(ID_FRAMEWORK_DETECTION_GAUGE);
-}
-
-void mvceditor::AppClass::OnFrameworkDetectionFailed(wxCommandEvent& event) {
-	EditorLogError(mvceditor::BAD_PHP_EXECUTABLE, event.GetString());
-
-	// still need to set the project even if the project detection fails
-	// pretty much all code depends on having a Project pointer
-	AppFrame->OnProjectOpened(Project, this);
-	ProjectPlugin->SetProject(Project);
-	for (size_t i = 0; i < Plugins.size(); ++i) {
-		if (Plugins[i] != ProjectPlugin) {
-			Plugins[i]->SetProject(Project);
-		}
-	}
-	mvceditor::StatusBarWithGaugeClass* gauge = wxDynamicCast(AppFrame->GetStatusBar(), mvceditor::StatusBarWithGaugeClass);
-	gauge->StopGauge(ID_FRAMEWORK_DETECTION_GAUGE);
-}
-
-void mvceditor::AppClass::OnFrameworkDetectionInProgress(wxCommandEvent& event) {
-	mvceditor::StatusBarWithGaugeClass* gauge = wxDynamicCast(AppFrame->GetStatusBar(), mvceditor::StatusBarWithGaugeClass);
-	gauge->IncrementGauge(ID_FRAMEWORK_DETECTION_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
-}
-
-void mvceditor::AppClass::OnProjectReIndex(wxCommandEvent& event) {
-	wxASSERT(ResourcePlugin);
-
-	// only attempt to index when a valid project is opened
-	// otherwise user will get annoying messages.
-	if (Project && !Project->GetRootPath().IsEmpty()) {
-		ResourcePlugin->StartIndex();
-	}
-}
-
-void mvceditor::AppClass::OnOpenFile(wxCommandEvent& event) {
-	std::vector<wxString> filenames;
-	filenames.push_back(event.GetString());
-	AppFrame->FileOpen(filenames);
-}
-
-void mvceditor::AppClass::OnProjectIndexed(mvceditor::ProjectIndexedEventClass& event) {
-	
-
-	// ATTN: tried to use wxPostEvent to avoid defining another virtual method
-	// but wxWidgets was having none of that ... infinite event loops were
-	// ocurring
-	mvceditor::ProjectIndexedEventClass newEvt;
-	for (size_t i = 0; i < Plugins.size(); i++) {
-		Plugins[i]->OnProjectIndexed();
-	}
-}
-
-const wxEventType mvceditor::EVENT_APP_OPEN_PROJECT = wxNewEventType();
-const wxEventType mvceditor::EVENT_APP_SAVE_PREFERENCES = wxNewEventType();
-const wxEventType mvceditor::EVENT_APP_RE_INDEX = wxNewEventType();
-const wxEventType mvceditor::EVENT_APP_OPEN_FILE = wxNewEventType();
-
-BEGIN_EVENT_TABLE(mvceditor::AppClass, wxApp)
-	EVT_COMMAND(wxID_ANY, EVENT_APP_SAVE_PREFERENCES, mvceditor::AppClass::OnSavePreferences)	
-	EVT_COMMAND(wxID_ANY, EVENT_APP_OPEN_PROJECT, mvceditor::AppClass::OnProjectOpen)
-	EVT_COMMAND(wxID_ANY, EVENT_APP_RE_INDEX, mvceditor::AppClass::OnProjectReIndex)
-	EVT_COMMAND(wxID_ANY, EVENT_APP_OPEN_FILE, mvceditor::AppClass::OnOpenFile)	
-	
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_DETECTION_COMPLETE, mvceditor::AppClass::OnFrameworkDetectionComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_DETECTION_FAILED, mvceditor::AppClass::OnFrameworkDetectionFailed)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::AppClass::OnFrameworkDetectionInProgress)
-	EVT_PLUGIN_PROJECT_INDEXED(mvceditor::AppClass::OnProjectIndexed)
-END_EVENT_TABLE()

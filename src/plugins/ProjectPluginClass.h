@@ -64,6 +64,11 @@ public:
 	ProjectPluginClass();
 
 	/**
+	 * Opens the given directory as a project.
+	 */
+	void ProjectOpen(const wxString& directoryPath);
+
+	/**
 	 * Add menu items to the project menu
 	 */
 	void AddProjectMenuItems(wxMenu* projectMenu);
@@ -83,16 +88,14 @@ public:
 	 */
 	void LoadPreferences(wxConfigBase* config);
 
+	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
+
+private:
+
 	/**
 	 * Save the preferences to persistent storage 
 	 */
-	void SavePreferences(wxConfigBase* config);
-
-	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
-
-	void OnProjectOpened();
-
-private:
+	void SavePreferences(wxCommandEvent& event);
 
 	/**
 	 * Handler for the Project .. Explore menu 
@@ -105,6 +108,12 @@ private:
 	 * @param wxCommandEvent& event 
 	 */
 	void OnProjectExploreOpenFile(wxCommandEvent& event);
+
+	/**
+	 * handler for the open project command that can be published by any
+	 * other plugin
+	 */
+	void OnCmdProjectOpen(wxCommandEvent& event);
 
 	/**
 	 * Since there could be 1...N recent project menu items we cannot listen to one menu item's event
@@ -123,9 +132,28 @@ private:
 	void PersistProjectList();
 
 	/**
+	 * This is the callback that gets called when the PHP framework detectors have 
+	 * successfully run
+	 */
+	void OnFrameworkDetectionComplete(wxCommandEvent& event);
+	void OnFrameworkDetectionInProgress(wxCommandEvent& event);
+	void OnFrameworkDetectionFailed(wxCommandEvent& event);
+
+	/**
+	 * close project and all resources that depend on it
+	 */
+	void CloseProject();
+
+	/**
 	 * List of recently opened projects
 	 */
 	wxFileHistory History;
+
+	/**
+	 * This object will be used to detct the various PHP framework artifacts (resources,
+	 * database connections, route URLs).
+	 */
+	std::auto_ptr<PhpFrameworkDetectorClass> PhpFrameworks;
 
 	/**
 	 * Sub-Menu for the recent projects 

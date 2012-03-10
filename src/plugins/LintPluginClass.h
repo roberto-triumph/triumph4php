@@ -28,6 +28,7 @@
 
 #include <vector>
 #include <PluginClass.h>
+#include <Events.h>
 #include <search/DirectorySearchClass.h>
 #include <plugins/BackgroundFileReaderClass.h>
 #include <plugins/wxformbuilder/LintPluginGeneratedClass.h>
@@ -289,8 +290,6 @@ public:
 
 	void LoadPreferences(wxConfigBase* config);
 
-	void SavePreferences(wxConfigBase* config);
-
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 
 protected: 
@@ -300,6 +299,8 @@ protected:
 	void AddToolBarItems(wxAuiToolBar* toolBar);
 	
 private:
+
+	void SavePreferences(wxCommandEvent& event);
 
 	void OnLintMenu(wxCommandEvent& event);
 
@@ -315,7 +316,7 @@ private:
 	
 	void OnTimer(wxCommandEvent& event);
 	
-	void OnFileSaved(FileSavedEventClass& event);
+	void OnFileSaved(mvceditor::FileSavedEventClass& event);
 
 	LintBackgroundFileReaderClass LintBackgroundFileReader;
 
