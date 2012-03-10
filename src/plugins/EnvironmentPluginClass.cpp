@@ -24,6 +24,7 @@
  */
 #include <plugins/EnvironmentPluginClass.h>
 #include <widgets/NonEmptyTextValidatorClass.h>
+#include <MvcEditor.h>
 #include <wx/filename.h>
 #include <wx/string.h>
 #include <wx/valgen.h>
@@ -577,6 +578,8 @@ void mvceditor::EnvironmentPluginClass::OnMenuEnvironment(wxCommandEvent& event)
 	mvceditor::EnvironmentDialogClass dialog(GetMainWindow(), *environment);
 	if (wxOK == dialog.ShowModal()) {
 		environment->SaveToConfig();
+		wxCommandEvent updatedEvent(mvceditor::EVENT_APP_ENVIRONMENT_UPDATED);
+		App->EventSink.Publish(updatedEvent);
 	}
 }
 
