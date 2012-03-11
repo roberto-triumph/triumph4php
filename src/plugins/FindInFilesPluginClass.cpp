@@ -220,8 +220,6 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceButton(wxCommandEvent& ev
 }
 
 void mvceditor::FindInFilesResultsPanelClass::OnReplaceAllInFileButton(wxCommandEvent& event) {
-
-	// TODO: replace all functionality is BROKEN!
 	CodeControlClass* codeControl = 
 			Notebook->GetCodeControl(Notebook->GetSelection());	
 			
