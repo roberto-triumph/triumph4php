@@ -402,9 +402,9 @@ mvceditor::WebBrowserEditPanelClass::WebBrowserEditPanelClass(wxWindow* parent, 
 	// in case there are no configured browsers still properly show the columns 
 	BrowserList->SetColumnWidth(0, 250);
 	BrowserList->SetColumnWidth(1, 250);
-	std::map<wxString, wxFileName>::const_iterator it = EditedWebBrowsers.begin();
+	std::vector<mvceditor::WebBrowserClass>::const_iterator it = EditedWebBrowsers.begin();
 	for (; it != EditedWebBrowsers.end(); ++it) {
-		ListCtrlAdd(BrowserList, it->first, it->second.GetFullPath());
+		ListCtrlAdd(BrowserList, it->Name, it->FullPath.GetFullPath());
 	}
 	if (!EditedWebBrowsers.empty()) {
 		BrowserList->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_MASK_STATE | wxLIST_MASK_TEXT);
@@ -424,15 +424,14 @@ void mvceditor::WebBrowserEditPanelClass::OnResize(wxSizeEvent& event) {
 }
 
 void mvceditor::WebBrowserEditPanelClass::OnAddWebBrowser(wxCommandEvent& event) {
-	wxString name;
-	wxFileName webBrowserPath; 
-	mvceditor::WebBrowserCreateDialogClass dialog(this, EditedWebBrowsers, name, webBrowserPath);
+	mvceditor::WebBrowserClass newBrowser;
+	mvceditor::WebBrowserCreateDialogClass dialog(this, EditedWebBrowsers, newBrowser);
 	if (wxOK == dialog.ShowModal()) {
-		ListCtrlAdd(BrowserList, name, webBrowserPath.GetFullPath());
+		ListCtrlAdd(BrowserList, newBrowser.Name, newBrowser.FullPath.GetFullPath());
 		BrowserList->SetColumnWidth(0, wxLIST_AUTOSIZE);
 		BrowserList->SetColumnWidth(1, wxLIST_AUTOSIZE);
 		
-		EditedWebBrowsers[name] = webBrowserPath;
+		EditedWebBrowsers.push_back(newBrowser);
 		BrowserList->SetItemState(BrowserList->GetItemCount() - 1, wxLIST_STATE_SELECTED, wxLIST_MASK_STATE | wxLIST_MASK_TEXT);
 	}
 }
@@ -443,16 +442,15 @@ void mvceditor::WebBrowserEditPanelClass::OnRemoveSelectedWebBrowser(wxCommandEv
 	// when the "edit" button is clicked
 	int selection = BrowserList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 	if (selection >= 0 && selection < BrowserList->GetItemCount()) {
-		wxString browserName,
-			webBrowserPath;
-		ListCtrlGet(BrowserList, browserName, webBrowserPath, selection);
-		if (!browserName.IsEmpty()) {
-			std::map<wxString, wxFileName>::iterator it = EditedWebBrowsers.find(browserName);
-			if  (it != EditedWebBrowsers.end()) {
+		int cur = 0;
+		for(std::vector<mvceditor::WebBrowserClass>::iterator it = EditedWebBrowsers.begin(); it != EditedWebBrowsers.end(); ++it) {
+			if (cur == selection) {
 				EditedWebBrowsers.erase(it);
+				break;
 			}
-			BrowserList->DeleteItem(selection);
+			cur++;
 		}
+		BrowserList->DeleteItem(selection);
 	}
 	else {
 		wxMessageBox(_("No browsers were selected. Please select a web browser to remove."));
@@ -465,30 +463,69 @@ void mvceditor::WebBrowserEditPanelClass::OnEditSelectedWebBrowser(wxCommandEven
 	// when the "edit" button is clicked
 	long selection = BrowserList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 	if (selection >= 0 && selection < BrowserList->GetItemCount()) {
-		wxString oldName,
-			oldWebBrowserPath;
-		ListCtrlGet(BrowserList, oldName, oldWebBrowserPath, selection);
-		if (!oldName.IsEmpty() && !oldWebBrowserPath.IsEmpty()) {
-			wxString newName = oldName;
-			wxFileName newWebBrowserPath(oldWebBrowserPath);
-			mvceditor::WebBrowserCreateDialogClass dialog(this, EditedWebBrowsers, newName, newWebBrowserPath);
-			if (wxOK == dialog.ShowModal()) {
-				ListCtrlEdit(BrowserList, newName, newWebBrowserPath.GetFullPath(), selection);
-				
-				// remove the old name since name may have been changed
-				std::map<wxString, wxFileName>::iterator it = EditedWebBrowsers.find(oldName);
-				if  (it != EditedWebBrowsers.end()) {
-					EditedWebBrowsers.erase(it);
-				}
-				EditedWebBrowsers[newName] = newWebBrowserPath;
-				
-				BrowserList->SetColumnWidth(0, wxLIST_AUTOSIZE);
-				BrowserList->SetColumnWidth(1, wxLIST_AUTOSIZE);
-			}
+		mvceditor::WebBrowserClass oldBrowser = EditedWebBrowsers[selection];
+		mvceditor::WebBrowserCreateDialogClass dialog(this, EditedWebBrowsers, oldBrowser);
+		if (wxOK == dialog.ShowModal()) {
+			ListCtrlEdit(BrowserList, oldBrowser.Name, oldBrowser.FullPath.GetFullPath(), selection);
+			
+			// remove the old name since name may have been changed
+			EditedWebBrowsers[selection] = oldBrowser;
+			
+			BrowserList->SetColumnWidth(0, wxLIST_AUTOSIZE);
+			BrowserList->SetColumnWidth(1, wxLIST_AUTOSIZE);
 		}
 	}
 	else {
 		wxMessageBox(_("No browsers were selected. Please select a web browser to edit."));
+	}
+}
+
+void mvceditor::WebBrowserEditPanelClass::OnMoveUp(wxCommandEvent& event) {
+	
+	// could not get the list selection function to work on windows
+	// when the button is clicked
+	int selection = BrowserList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (selection > 0 && selection < BrowserList->GetItemCount()) {
+
+		// the 'top' row will moved down one and the row at the selection will be moved up one
+		mvceditor::WebBrowserClass top =  EditedWebBrowsers[selection - 1];
+		mvceditor::WebBrowserClass selected =  EditedWebBrowsers[selection];
+		EditedWebBrowsers[selection - 1] = selected;
+		EditedWebBrowsers[selection] = top;
+		
+		ListCtrlEdit(BrowserList, selected.Name, selected.FullPath.GetFullPath(), selection - 1);
+		ListCtrlEdit(BrowserList, top.Name, top.FullPath.GetFullPath(), selection);
+
+		// toggle selection on modified rows
+		BrowserList->SetItemState(selection - 1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+		BrowserList->SetFocus();
+	}
+	else {
+		wxMessageBox(_("No browsers were selected. Please select a web browser to move."));
+	}
+}
+
+void mvceditor::WebBrowserEditPanelClass::OnMoveDown(wxCommandEvent& event) {
+
+	// could not get the list selection function to work on windows
+	// when the button is clicked
+	int selection = BrowserList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (selection >= 0 && selection < (BrowserList->GetItemCount() - 1)) {
+	
+		// the 'bottom' row will moved up one and the row at the selection will be moved down one
+		mvceditor::WebBrowserClass bottom =  EditedWebBrowsers[selection + 1];
+		mvceditor::WebBrowserClass selected =  EditedWebBrowsers[selection];
+		EditedWebBrowsers[selection + 1] = selected;
+		EditedWebBrowsers[selection] = bottom;
+
+		ListCtrlEdit(BrowserList, selected.Name, selected.FullPath.GetFullPath(), selection + 1);
+		ListCtrlEdit(BrowserList, bottom.Name, bottom.FullPath.GetFullPath(), selection);
+
+		BrowserList->SetItemState(selection + 1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+		BrowserList->SetFocus();
+	}
+	else {
+		wxMessageBox(_("No browsers were selected. Please select a web browser to move."));
 	}
 }
 
@@ -497,14 +534,15 @@ void mvceditor::WebBrowserEditPanelClass::Apply() {
 }
 
 mvceditor::WebBrowserCreateDialogClass::WebBrowserCreateDialogClass(wxWindow* parent, 
-		std::map<wxString, wxFileName> existingBrowsers, wxString& name, wxFileName& webBrowserFileName)
+																	std::vector<mvceditor::WebBrowserClass> existingBrowsers, 
+																	mvceditor::WebBrowserClass& oldBrowser)
 	: WebBrowserCreateDialogGeneratedClass(parent) 
 	, ExistingBrowsers(existingBrowsers)
-	, WebBrowserFileName(webBrowserFileName)
-	, OriginalName(name) {
-	wxGenericValidator nameValidator(&name);
+	, NewBrowser(oldBrowser)
+	, OriginalName(oldBrowser.Name) {
+	wxGenericValidator nameValidator(&NewBrowser.Name);
 	WebBrowserLabel->SetValidator(nameValidator);
-	WebBrowserPath->SetPath(webBrowserFileName.GetFullPath());
+	WebBrowserPath->SetPath(NewBrowser.FullPath.GetFullPath());
 	WebBrowserLabel->SetFocus();
 }
 
@@ -518,7 +556,14 @@ void mvceditor::WebBrowserCreateDialogClass::OnOkButton(wxCommandEvent& event) {
 
 		// allow the user to use the same name if they did not change
 		// otherwise every time the user wants to edit a browser they would need to change the name
-		if (OriginalName != newName && ExistingBrowsers.find(newName) != ExistingBrowsers.end()) {
+		bool found = false;
+		for(std::vector<mvceditor::WebBrowserClass>::const_iterator it = ExistingBrowsers.begin(); it != ExistingBrowsers.end(); ++it) {
+			if (it->Name == newName) {
+				found = true;
+				break;
+			}
+		}
+		if (OriginalName != newName && found) {
 			wxMessageBox(_("Please enter a name that is unique to this browser"));
 			return;
 		}
@@ -528,7 +573,7 @@ void mvceditor::WebBrowserCreateDialogClass::OnOkButton(wxCommandEvent& event) {
 			return;
 		}
 		TransferDataFromWindow();
-		WebBrowserFileName.Assign(path);
+		NewBrowser.FullPath.Assign(path);
 		EndModal(wxOK);
 	}	
 }

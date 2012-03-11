@@ -38,6 +38,8 @@ class WebBrowserEditPanelGeneratedClass : public wxPanel
 	private:
 		
 		// Private event handlers
+		void _wxFB_OnMoveDown( wxCommandEvent& event ){ OnMoveDown( event ); }
+		void _wxFB_OnMoveUp( wxCommandEvent& event ){ OnMoveUp( event ); }
 		void _wxFB_OnRemoveSelectedWebBrowser( wxCommandEvent& event ){ OnRemoveSelectedWebBrowser( event ); }
 		void _wxFB_OnEditSelectedWebBrowser( wxCommandEvent& event ){ OnEditSelectedWebBrowser( event ); }
 		void _wxFB_OnAddWebBrowser( wxCommandEvent& event ){ OnAddWebBrowser( event ); }
@@ -47,6 +49,8 @@ class WebBrowserEditPanelGeneratedClass : public wxPanel
 		enum
 		{
 			ID_HELPTEXT = 1000,
+			ID_MOVEDOWNBUTTON,
+			ID_MOVEUPBUTTON,
 			ID_REMOVE_BROWSER,
 			ID_EDITSELECTEDWEBBROWSER,
 			ID_ADD_BROWSER,
@@ -55,12 +59,16 @@ class WebBrowserEditPanelGeneratedClass : public wxPanel
 		
 		wxStaticText* HelpText;
 		
+		wxButton* MoveDownButton;
+		wxButton* MoveUpButton;
 		wxButton* RemoveSelectedBrowser;
 		wxButton* EditSelectedWebBrowser;
 		wxButton* AddBrowserButton;
 		wxListCtrl* BrowserList;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnMoveDown( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMoveUp( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRemoveSelectedWebBrowser( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditSelectedWebBrowser( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddWebBrowser( wxCommandEvent& event ) { event.Skip(); }

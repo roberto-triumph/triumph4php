@@ -200,6 +200,10 @@ protected:
 	void OnAddWebBrowser(wxCommandEvent& event);
 	
 	void OnEditSelectedWebBrowser(wxCommandEvent& event);
+
+	void OnMoveUp(wxCommandEvent& event);
+
+	void OnMoveDown(wxCommandEvent& event);
 	
 private:
 
@@ -211,11 +215,11 @@ private:
 	EnvironmentClass& Environment;
 	
 	/**
-	 * The web browsers being modified. this is the map that is the recipient
+	 * The web browsers being modified. this is the vector that is the recipient
 	 * of all of the user's operations; it will be copied only when the
 	 * user clicks OK.
 	 */
-	std::map<wxString, wxFileName> EditedWebBrowsers;
+	std::vector<WebBrowserClass> EditedWebBrowsers;
 };
 
 /**
@@ -258,8 +262,8 @@ class WebBrowserCreateDialogClass : public WebBrowserCreateDialogGeneratedClass 
 	
 public:
 
-	WebBrowserCreateDialogClass(wxWindow* parent, std::map<wxString, wxFileName> existingBrowsers, 
-		wxString& name, wxFileName& webBrowserFileName);
+	WebBrowserCreateDialogClass(wxWindow* parent, std::vector<WebBrowserClass> existingBrowsers, 
+		WebBrowserClass& newBrowser);
 	
 protected:
 
@@ -268,12 +272,12 @@ protected:
 	/** 
 	 * to prevent multiple browsers with the same name
 	 */
-	std::map<wxString, wxFileName> ExistingBrowsers;
+	std::vector<WebBrowserClass> ExistingBrowsers;
 	
 	/**
 	 * to transfer the chosen file path
 	 */
-	wxFileName& WebBrowserFileName;
+	WebBrowserClass& NewBrowser;
 
 	/**
 	 * Safe the original name so that when editing we can tell that the name is not changing

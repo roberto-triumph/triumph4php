@@ -26,7 +26,7 @@
 #define __environmentclass__
 
 #include <environment/ApacheClass.h>
-#include <map>
+#include <vector>
 
 namespace mvceditor {
 
@@ -39,6 +39,28 @@ public:
 	PhpEnvironmentClass();
 	
 	wxString PhpExecutablePath;
+};
+
+/**
+ * Holds the full path to the web browser binary (google chrome, IE, firefox,...)
+ * and a 'friendly' name that the user can change.
+ */
+class WebBrowserClass {
+
+public:
+
+	/**
+	 * should be unique, but that is not enforced here
+	 */
+	wxString Name;
+
+	wxFileName FullPath;
+
+	WebBrowserClass();
+
+	WebBrowserClass(const WebBrowserClass& other);
+
+	WebBrowserClass(wxString name, wxFileName fullPath);
 };
 
 /**
@@ -57,11 +79,9 @@ public:
 	PhpEnvironmentClass Php;
 	
 	/**
-	 * The list of web browsers used to launch when the user click Run On Web
-	 * The key is a human-friendly name, the value is the location to the web
-	 * browser executable.
+	 * The list of web browsers used to launch when the user click Run On Web Browser
 	 */
-	std::map<wxString, wxFileName> WebBrowsers;
+	std::vector<WebBrowserClass> WebBrowsers;
 	
 	/**
 	 * Save the environment settings to the global config (wxConfigBase::Get())
@@ -72,6 +92,13 @@ public:
 	 * Get the environment settings from the global config (wxConfigBase::Get())
 	 */
 	void LoadFromConfig();
+
+	/**
+	 * @param name the browser name to look up. lookup is case sensitive.
+	 * @param fullPath will get filled with the full path of the corresponding browser
+	 * @return TRUE if name was found.
+	 */
+	bool FindBrowserByName(const wxString& name, wxFileName& fileName) const;
 };
 
 }

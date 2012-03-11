@@ -10,6 +10,8 @@
 ///////////////////////////////////////////////////////////////////////////
 
 BEGIN_EVENT_TABLE( WebBrowserEditPanelGeneratedClass, wxPanel )
+	EVT_BUTTON( ID_MOVEDOWNBUTTON, WebBrowserEditPanelGeneratedClass::_wxFB_OnMoveDown )
+	EVT_BUTTON( ID_MOVEUPBUTTON, WebBrowserEditPanelGeneratedClass::_wxFB_OnMoveUp )
 	EVT_BUTTON( ID_REMOVE_BROWSER, WebBrowserEditPanelGeneratedClass::_wxFB_OnRemoveSelectedWebBrowser )
 	EVT_BUTTON( ID_EDITSELECTEDWEBBROWSER, WebBrowserEditPanelGeneratedClass::_wxFB_OnEditSelectedWebBrowser )
 	EVT_BUTTON( ID_ADD_BROWSER, WebBrowserEditPanelGeneratedClass::_wxFB_OnAddWebBrowser )
@@ -53,13 +55,19 @@ WebBrowserEditPanelGeneratedClass::WebBrowserEditPanelGeneratedClass( wxWindow* 
 	wxBoxSizer* ButtonSizer;
 	ButtonSizer = new wxBoxSizer( wxHORIZONTAL );
 	
-	RemoveSelectedBrowser = new wxButton( this, ID_REMOVE_BROWSER, _("Remove Selected Web Browser"), wxDefaultPosition, wxDefaultSize, 0 );
+	MoveDownButton = new wxButton( this, ID_MOVEDOWNBUTTON, _("Move Down"), wxDefaultPosition, wxDefaultSize, 0 );
+	ButtonSizer->Add( MoveDownButton, 0, wxALL, 5 );
+	
+	MoveUpButton = new wxButton( this, ID_MOVEUPBUTTON, _("Move Up"), wxDefaultPosition, wxDefaultSize, 0 );
+	ButtonSizer->Add( MoveUpButton, 0, wxALL, 5 );
+	
+	RemoveSelectedBrowser = new wxButton( this, ID_REMOVE_BROWSER, _("Remove Selected"), wxDefaultPosition, wxDefaultSize, 0 );
 	ButtonSizer->Add( RemoveSelectedBrowser, 0, wxALL, 5 );
 	
-	EditSelectedWebBrowser = new wxButton( this, ID_EDITSELECTEDWEBBROWSER, _("Edit Selected Web Browser"), wxDefaultPosition, wxDefaultSize, 0 );
+	EditSelectedWebBrowser = new wxButton( this, ID_EDITSELECTEDWEBBROWSER, _("Edit Selected"), wxDefaultPosition, wxDefaultSize, 0 );
 	ButtonSizer->Add( EditSelectedWebBrowser, 0, wxALL, 5 );
 	
-	AddBrowserButton = new wxButton( this, ID_ADD_BROWSER, _("Add Web Browser"), wxDefaultPosition, wxDefaultSize, 0 );
+	AddBrowserButton = new wxButton( this, ID_ADD_BROWSER, _("Add New"), wxDefaultPosition, wxDefaultSize, 0 );
 	ButtonSizer->Add( AddBrowserButton, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	ButtonGridSizer->Add( ButtonSizer, 1, wxEXPAND, 5 );

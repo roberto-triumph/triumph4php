@@ -35,8 +35,9 @@ static const int MAX_BROWSERS = 10;
 static const int MAX_URLS = 40;
 
 static void ExternalBrowser(const wxString& browserName, const wxString& url, mvceditor::EnvironmentClass* environment) {
-	wxFileName webBrowserPath  = environment->WebBrowsers[browserName];
-	if (!webBrowserPath.IsOk()) {
+	wxFileName webBrowserPath;
+	bool found = environment->FindBrowserByName(browserName, webBrowserPath);
+	if (!found || !webBrowserPath.IsOk()) {
 		mvceditor::EditorLogWarning(mvceditor::BAD_WEB_BROWSER_EXECUTABLE, webBrowserPath.GetFullPath());
 		return;
 	}
@@ -163,9 +164,8 @@ void mvceditor::RunBrowserPluginClass::LoadPreferences(wxConfigBase* config) {
 	// dont use the config; use the Environment that has already been seeded with 
 	// the proper data
 	mvceditor::EnvironmentClass* environment = GetEnvironment();
-	std::map<wxString, wxFileName> webBrowsers = environment->WebBrowsers;
-	for (std::map<wxString, wxFileName>::const_iterator it = webBrowsers.begin(); it != webBrowsers.end(); ++it) {
-		App->UrlResourceFinder.Browsers.push_back(it->first);
+	for (std::vector<mvceditor::WebBrowserClass>::const_iterator it = environment->WebBrowsers.begin(); it != environment->WebBrowsers.end(); ++it) {
+		App->UrlResourceFinder.Browsers.push_back(it->Name);
 	}
 	if (!App->UrlResourceFinder.Browsers.empty()) {
 		App->UrlResourceFinder.ChosenBrowser = App->UrlResourceFinder.Browsers[0];
@@ -181,9 +181,8 @@ void mvceditor::RunBrowserPluginClass::OnEnvironmentUpdated(wxCommandEvent& even
 	// need to update the browser toolbar if the user updates the environment
 	App->UrlResourceFinder.Browsers.clear();
 	mvceditor::EnvironmentClass* environment = GetEnvironment();
-	std::map<wxString, wxFileName> webBrowsers = environment->WebBrowsers;
-	for (std::map<wxString, wxFileName>::const_iterator it = webBrowsers.begin(); it != webBrowsers.end(); ++it) {
-		App->UrlResourceFinder.Browsers.push_back(it->first);
+	for (std::vector<mvceditor::WebBrowserClass>::const_iterator it = environment->WebBrowsers.begin(); it != environment->WebBrowsers.end(); ++it) {
+		App->UrlResourceFinder.Browsers.push_back(it->Name);
 	}
 
 	// for now just make the first item as selected
@@ -193,6 +192,7 @@ void mvceditor::RunBrowserPluginClass::OnEnvironmentUpdated(wxCommandEvent& even
 	if (BrowserToolbar) {
 		BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, App->UrlResourceFinder.Browsers[0]);
 		BrowserToolbar->Realize();
+		AuiManager->Update();
 	}
 }
 
@@ -223,13 +223,10 @@ void mvceditor::RunBrowserPluginClass::OnBrowserToolDropDown(wxAuiToolBarEvent& 
 			BrowserMenu->Delete(BrowserMenu->FindItemByPosition(0)->GetId());
 		}
 		wxBitmap bmp = wxArtProvider::GetBitmap(wxART_QUESTION, wxART_OTHER, wxSize(16,16));
-		std::map<wxString, wxFileName> webBrowsers = environment->WebBrowsers;
-		int i = 0;
-		for (std::map<wxString, wxFileName>::const_iterator it = webBrowsers.begin(); it != webBrowsers.end(); ++it) {
-			wxMenuItem* menuItem =  new wxMenuItem(BrowserMenu.get(), mvceditor::MENU_RUN_BROWSER + i, it->first);
+		for (size_t i = 0; i < environment->WebBrowsers.size();  ++i) {
+			wxMenuItem* menuItem =  new wxMenuItem(BrowserMenu.get(), mvceditor::MENU_RUN_BROWSER + i, environment->WebBrowsers[i].Name);
 			menuItem->SetBitmap(bmp);
 			BrowserMenu->Append(menuItem);
-			i++;
 		}
 		
 		// line up our menu with the button

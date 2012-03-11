@@ -27,26 +27,47 @@
 #include <wx/confbase.h>
 #include <wx/utils.h>
 
+mvceditor::WebBrowserClass::WebBrowserClass() 
+	: Name()
+	, FullPath() {
+
+}
+
+
+mvceditor::WebBrowserClass::WebBrowserClass(const mvceditor::WebBrowserClass& other) 
+	: Name(other.Name)
+	, FullPath(other.FullPath) {
+
+}
+
+mvceditor::WebBrowserClass::WebBrowserClass(wxString name, wxFileName fullPath) 
+	: Name(name)
+	, FullPath(fullPath) {
+
+}
+
 mvceditor::EnvironmentClass::EnvironmentClass()
 		: Apache()
 		, Php()
 		, WebBrowsers() {
 	wxPlatformInfo info;
 	wxString userHome = wxGetUserHome();
+
+	// these are the default installation locations
 	switch (info.GetOperatingSystemId()) {
 		case wxOS_UNIX_LINUX:
-			WebBrowsers[wxT("Mozilla Firefox")] = wxFileName(wxT("/usr/bin/firefox"));
-			WebBrowsers[wxT("Google Chrome")] = wxFileName(wxT("/usr/bin/google-chrome"));
-			WebBrowsers[wxT("Opera")] = wxFileName(wxT("/usr/bin/opera"));
+			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Mozilla Firefox"), wxFileName(wxT("/usr/bin/firefox"))));
+			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Google Chrome"), wxFileName(wxT("/usr/bin/google-chrome"))));
+			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Opera"), wxFileName(wxT("/usr/bin/opera"))));
 			break;
 		case wxOS_WINDOWS_NT:
-			WebBrowsers[wxT("Mozilla Firefox")] = wxFileName(wxT("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe"));
+			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Mozilla Firefox"), wxFileName(wxT("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe"))));
 
 			// by default google installs itself in the user home
-			WebBrowsers[wxT("Google Chrome")] = wxFileName(userHome + wxT("\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe"));
-			WebBrowsers[wxT("Internet Explorer")] = wxFileName(wxT("C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe"));
-			WebBrowsers[wxT("Opera")] = wxFileName(wxT("C:\\Program Files (x86)\\Opera\\opera.exe"));
-			WebBrowsers[wxT("Safari")] = wxFileName(wxT("C:\\Program Files (x86)\\Safari\\Safari.exe"));
+			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Google Chrome"), wxFileName(userHome + wxT("\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe"))));
+			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Internet Explorer"), wxFileName(wxT("C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe"))));
+			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Opera"), wxFileName(wxT("C:\\Program Files (x86)\\Opera\\opera.exe"))));
+			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Safari"), wxFileName(wxT("C:\\Program Files (x86)\\Safari\\Safari.exe"))));
 			break;
 		default:
 			break;
@@ -100,7 +121,7 @@ void mvceditor::EnvironmentClass::LoadFromConfig() {
 			key = groupName + wxT("/Path");
 			wxString browserPath = config->Read(key);
 			wxFileName browserFileName(browserPath);
-			WebBrowsers[browserName] = browserFileName;
+			WebBrowsers.push_back(mvceditor::WebBrowserClass(browserName, browserFileName));
 		}
 		else if (groupName.Find(wxT("VirtualHost_")) >= 0 && Apache.ManualConfiguration) {
 			
@@ -124,11 +145,11 @@ void mvceditor::EnvironmentClass::SaveToConfig() const {
 	config->Write(wxT("Environment/ApacheHttpdPath"), Apache.GetHttpdPath());
 	config->Write(wxT("Environment/ManualConfiguration"), Apache.ManualConfiguration);
 	int i = 0;
-	for(std::map<wxString, wxFileName>::const_iterator it = WebBrowsers.begin(); it != WebBrowsers.end(); ++it) {
+	for(std::vector<mvceditor::WebBrowserClass>::const_iterator it = WebBrowsers.begin(); it != WebBrowsers.end(); ++it) {
 		wxString key = wxString::Format(wxT("Environment/WebBrowser_%d/Name"), i);
-		config->Write(key, it->first);
+		config->Write(key, it->Name);
 		key = wxString::Format(wxT("Environment/WebBrowser_%d/Path"), i);
-		config->Write(key, it->second.GetFullPath()); 
+		config->Write(key, it->FullPath.GetFullPath()); 
 		i++;
 	}
 	if (Apache.ManualConfiguration) {
@@ -143,4 +164,16 @@ void mvceditor::EnvironmentClass::SaveToConfig() const {
 		}
 	}
 	config->Flush();
+}
+
+bool mvceditor::EnvironmentClass::FindBrowserByName(const wxString& name, wxFileName& fileName) const {
+	bool found = false;
+	for(std::vector<mvceditor::WebBrowserClass>::const_iterator it = WebBrowsers.begin(); it != WebBrowsers.end(); ++it) {
+		if (it->Name == name) {
+			found = true;
+			fileName = it->FullPath;
+			break;
+		}
+	}
+	return found;
 }
