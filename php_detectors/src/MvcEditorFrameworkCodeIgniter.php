@@ -147,6 +147,7 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 			return array();
 		}
 		$dir = \opstring\ensure_ends_with($dir, '/');
+		$host = \opstring\ensure_ends_with($host, '/');
 		
 		// TODO: handle multiple apps
 		// need this define so that we can include code igniter files directly
@@ -187,7 +188,7 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 						if (\opstring\compare_case('__construct', $resource->identifier) && !\opstring\begins_with($resource->identifier, '_')) {
 							$extra = '';
 							$appUrl = $this->makeUrl($route, $config, $subDirectory, $resource->fileName, $resource->ClassName(), $resource->identifier, $extra);
-							$appUrl->url = $host . '/' . $appUrl->url;
+							$appUrl->url = $host . $appUrl->url;
 							$allUrls[] = $appUrl;
 						}
 					}

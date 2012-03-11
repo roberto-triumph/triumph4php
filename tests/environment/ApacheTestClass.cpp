@@ -198,6 +198,22 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWithoutVirtualHosts) {
 	CHECK_EQUAL(expectedUrl, url);
 }
 
+TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkHostRoot) {
+	CreateHttpdFile(ConfigSubDirectory);
+	Walk();
+	CHECK_EQUAL(wxT("http://localhost/"), Apache.GetVirtualHostMappings()[TestProjectDir]);
+	CHECK_EQUAL(8080, Apache.GetListenPort());
+	
+	
+	//remove the trailing slash, make sure it still works
+	wxString test = TestProjectDir;
+	test = test.Mid(0, test.Len() - 1);
+	wxString url = Apache.GetUrl(test);
+	wxString expectedUrl = wxT("http://localhost:8080/");
+	CHECK_EQUAL(expectedUrl, url);
+}
+
+
 TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenDocumentRootHasAWindowsPath) {
 	int major, 
 		minor;

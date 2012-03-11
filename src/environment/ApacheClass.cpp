@@ -120,14 +120,20 @@ void mvceditor::ApacheClass::RemoveVirtualHostMapping(const wxString& fileSystem
 wxString mvceditor::ApacheClass::GetUrl(const wxString& fileSystemPath) const {
 
 	// normalize the given path; also convert to lower case so that we make case-insesitive
-	// comparisons (to handle windows paths)
+	// comparisons (to handle windows paths). also add a trailing slash
 	wxFileName fileToGet(fileSystemPath);
 	wxString dir = fileToGet.GetFullPath();
+	if (!dir.EndsWith(wxFileName::GetPathSeparators())) {
+		dir += wxFileName::GetPathSeparators();
+	}
 	dir.LowerCase();
 	wxString url;
 	for (std::map<wxString, wxString>::const_iterator it = VirtualHostMappings.begin(); it != VirtualHostMappings.end(); ++it) {
 		wxString hostRoot = it->first;
 		hostRoot.LowerCase();
+		if (!hostRoot.EndsWith(wxFileName::GetPathSeparators())) {
+			hostRoot += wxFileName::GetPathSeparators();
+		}
 		if (0 == dir.Find(hostRoot)) {
 			
 			// file is inside this virtual host. remove the root and append to host

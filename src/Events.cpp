@@ -34,7 +34,11 @@ void mvceditor::EventSinkClass::PushHandler(wxEvtHandler *handler) {
 
 void mvceditor::EventSinkClass::Publish(wxEvent& event) {
 	for (size_t i = 0; i < Handlers.size(); ++i) {
-		wxPostEvent(Handlers[i], event);
+		
+		// wont use wxPostEvent for now
+		// using wxPostEvent would cause any Popup menus triggered in the 
+		// handlers to not work correctly in linux
+		Handlers[i]->ProcessEvent(event);
 	}
 }
 

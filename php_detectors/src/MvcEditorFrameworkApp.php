@@ -291,6 +291,7 @@ $dir = trim($dir, " '\"");
 $action = trim($action, " '\"");
 $url = trim($url, " '\"");
 $file = trim($file, " '\"");
+$host = trim($host, " '\"");
 $outputFile = trim($outputFile, " '\"");
 
 if ($outputFile) {

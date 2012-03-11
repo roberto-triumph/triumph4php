@@ -214,7 +214,7 @@ void mvceditor::RunBrowserPluginClass::OnBrowserToolDropDown(wxAuiToolBarEvent& 
 	if (event.IsDropDownClicked()) {
 		BrowserToolbar->SetToolSticky(event.GetId(), true);
 		mvceditor::EnvironmentClass* environment = GetEnvironment();
-		
+
 		// create the popup menu that contains all the available browser names
 		if (!BrowserMenu.get()) {
 			BrowserMenu.reset(new wxMenu);
