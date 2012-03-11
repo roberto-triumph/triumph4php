@@ -35,7 +35,6 @@
 static int ID_CONTEXT_MENU_SHOW_OUTLINE_OTHER = wxNewId();
 static int ID_WINDOW_OUTLINE = wxNewId();
 static int ID_CONTEXT_MENU_SHOW_OUTLINE_CURRENT = wxNewId();
-static int ID_WINDOW_OUTLINE_CURRENT = wxNewId();
 
 mvceditor::ResourceFinderBackgroundThreadClass::ResourceFinderBackgroundThreadClass(wxEvtHandler& handler)
 	: ThreadWithHeartbeatClass(handler) 
@@ -227,7 +226,7 @@ void mvceditor::OutlineViewPluginPanelClass::SetStatus(const wxString& status) {
 	StatusLabel->SetLabel(status);
 }
 
-void mvceditor::OutlineViewPluginPanelClass::SetClasses(std::vector<mvceditor::ResourceClass>& classes) {
+void mvceditor::OutlineViewPluginPanelClass::SetClasses(const std::vector<mvceditor::ResourceClass>& classes) {
 	Choice->Clear();
 	for (size_t i = 0; i < classes.size(); ++i) {
 		Choice->AppendString(mvceditor::StringHelperClass::IcuToWx(classes[i].Resource));

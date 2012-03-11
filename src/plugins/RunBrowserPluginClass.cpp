@@ -31,8 +31,8 @@
 #include <algorithm>
 
 static const int ID_URL_GAUGE = wxNewId();
-static const int MAX_BROWSERS = 10;
-static const int MAX_URLS = 40;
+static const size_t MAX_BROWSERS = 10;
+static const size_t MAX_URLS = 40;
 
 static void ExternalBrowser(const wxString& browserName, const wxString& url, mvceditor::EnvironmentClass* environment) {
 	wxFileName webBrowserPath;

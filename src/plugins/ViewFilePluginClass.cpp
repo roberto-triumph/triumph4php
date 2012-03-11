@@ -241,6 +241,10 @@ void mvceditor::ViewFilePanelClass::UpdateResults() {
 			case mvceditor::CallStackClass::STACK_LIMIT:
 				StatusLabel->SetLabel(_("The editor hit a stack recursion limit."));
 				break;
+			default:
+			
+				// NONE or RESOLUTION_ERROR are not errors
+				break;
 		}
 	}
 }

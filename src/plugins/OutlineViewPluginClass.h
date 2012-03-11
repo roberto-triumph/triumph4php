@@ -174,7 +174,7 @@ class OutlineViewPluginPanelClass : public OutlineViewPluginGeneratedPanelClass 
 	/**
 	 * update the Choice options
 	 */
-	void SetClasses(std::vector<ResourceClass>& classes);
+	void SetClasses(const std::vector<ResourceClass>& classes);
 
 	/**
 	 * refresh the code control from the plugin source strings

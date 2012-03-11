@@ -1201,13 +1201,15 @@ bool mvceditor::ResourceFinderClass::Persist(const wxFileName& outputFile) const
 			// watch out for dynamic resources and 'native' functions
 			// we dont want to persist those for now 
 			if (mvceditor::ResourceClass::CLASS == it->Type && !it->IsNative) {
-				written = u_fprintf(uf, "CLASS,%s,%.*S,\n", 
-					FileCache[it->FileItemIndex].FullPath.ToAscii(), it->Resource.length(), it->Resource.getBuffer());
+				UnicodeString uniFile = mvceditor::StringHelperClass::wxToIcu(FileCache[it->FileItemIndex].FullPath);
+				written = u_fprintf(uf, "CLASS,%S,%.*S,\n", 
+					uniFile.getTerminatedBuffer(), it->Resource.length(), it->Resource.getBuffer());
 				error = 0 == written;
 			}
 			else if (mvceditor::ResourceClass::FUNCTION == it->Type && !it->IsNative) {
-				written = u_fprintf(uf, "FUNCTION,%s,%.*S,\n", 
-					FileCache[it->FileItemIndex].FullPath.ToAscii(), it->Resource.length(), it->Resource.getBuffer());
+				UnicodeString uniFile = mvceditor::StringHelperClass::wxToIcu(FileCache[it->FileItemIndex].FullPath);
+				written = u_fprintf(uf, "FUNCTION,%S,%.*S,\n", 
+					uniFile.getTerminatedBuffer(), it->Resource.length(), it->Resource.getBuffer());
 				error = 0 == written;
 			}
 		}
@@ -1220,15 +1222,17 @@ bool mvceditor::ResourceFinderClass::Persist(const wxFileName& outputFile) const
 			// watch out for dynamic resources and 'native' functions
 			// we dont want to persist those for now 
 			if (mvceditor::ResourceClass::MEMBER == it->Type && !it->IsNative) {
-				written = u_fprintf(uf, "MEMBER,%s,%S,%.*S\n", 
-					FileCache[it->FileItemIndex].FullPath.ToAscii(), 
+				UnicodeString uniFile = mvceditor::StringHelperClass::wxToIcu(FileCache[it->FileItemIndex].FullPath);
+				written = u_fprintf(uf, "MEMBER,%S,%S,%.*S\n", 
+					uniFile.getTerminatedBuffer(), 
 					className.getTerminatedBuffer(),
 					it->Identifier.length(), it->Identifier.getBuffer());
 				error = 0 == written;
 			}
 			else if (mvceditor::ResourceClass::METHOD == it->Type && !it->IsNative) {
-				written = u_fprintf(uf, "METHOD,%s,%S,%.*S\n", 
-					FileCache[it->FileItemIndex].FullPath.ToAscii(), 
+				UnicodeString uniFile = mvceditor::StringHelperClass::wxToIcu(FileCache[it->FileItemIndex].FullPath);
+				written = u_fprintf(uf, "METHOD,%S,%S,%.*S\n", 
+					uniFile.getTerminatedBuffer(), 
 					className.getTerminatedBuffer(),
 					it->Identifier.length(), it->Identifier.getBuffer());
 				error = 0 == written;
@@ -1257,7 +1261,6 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::AllNonNati
 	std::vector<mvceditor::ResourceClass> all;
 	all.reserve(ResourceCache.size());
 	std::list<mvceditor::ResourceClass>::const_iterator it;
-	size_t index = 0;
 	for (it = ResourceCache.begin(); it != ResourceCache.end(); ++it) {
 		if (mvceditor::ResourceClass::CLASS == it->Type && !it->IsNative) {
 			all.push_back(*it);
