@@ -244,6 +244,12 @@ private:
 	 * Creates the dialog wildcard string based on the project's settings.
 	 */
 	wxString CreateWildcardString() const;
+	
+	/**
+	 * @return the wildcard  index according to the given mode
+	 * the index is suitable to pass to the wxFileDialog::SetFilterIndex method
+	 */
+	int WilcardIndex(CodeControlClass::Mode mode);
 
 	/**
 	 * will use the close source code event to re-trigger project indexing.

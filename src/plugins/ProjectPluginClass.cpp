@@ -258,6 +258,10 @@ void mvceditor::ProjectPluginClass::ProjectOpen(const wxString& directoryPath) {
 	}
 	else {
 	
+		App->Project->SetPhpFileExtensionsString(PhpFileFiltersString);
+		App->Project->SetCssFileExtensionsString(CssFileFiltersString);
+		App->Project->SetSqlFileExtensionsString(SqlFileFiltersString);
+		
 		// still notify the plugins of the new project at program startup
 		// when the app starts the "empty" project is opened
 		wxCommandEvent evt(mvceditor::EVENT_APP_PROJECT_OPENED);

@@ -95,8 +95,10 @@ bool mvceditor::NotebookClass::SavePage(int pageIndex) {
 	bool saved = false;
 	if (phpSourceCodeCtrl && phpSourceCodeCtrl->IsNew()) {
 		wxString fileFilter = CreateWildcardString();
+		int filterIndex = WilcardIndex(phpSourceCodeCtrl->GetDocumentMode());
 		wxFileDialog fileDialog(this, wxT("Save a File"), wxT(""), wxT(""), 
 				fileFilter, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+		fileDialog.SetFilterIndex(filterIndex);
 		if (wxID_OK == fileDialog.ShowModal()) {
 			wxString newFullPath = fileDialog.GetPath();
 			if (!phpSourceCodeCtrl->SaveAndTrackFile(newFullPath)) {
@@ -151,8 +153,6 @@ void mvceditor::NotebookClass::AddMvcEditorPage() {
 }
 
 void mvceditor::NotebookClass::LoadPage() {
-	
-	// TODO: the wildcard filter is not functional (in linux only?)
 	wxString fileFilter = CreateWildcardString();
 	wxFileDialog fileDialog(this, wxT("Open a File"), wxT(""), wxT(""), 
 			fileFilter, wxFD_OPEN | wxFD_FILE_MUST_EXIST | 
@@ -244,8 +244,10 @@ bool mvceditor::NotebookClass::SaveCurrentPageAsNew() {
 		}
 		else {
 	 		wxString fileFilter = CreateWildcardString();
+			int filterIndex = WilcardIndex(codeCtrl->GetDocumentMode());
 			wxFileDialog fileDialog(this, wxT("Save to a new PHP File"), wxT(""), wxT(""), 
 					fileFilter, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+			fileDialog.SetFilterIndex(filterIndex);
 			if (wxID_OK == fileDialog.ShowModal()) {
 				
 				// SaveAs should have no effect on the state of the
@@ -385,12 +387,26 @@ wxString mvceditor::NotebookClass::CreateWildcardString() const {
 	wxString php = Project->GetPhpFileExtensionsString(),
 		css = Project->GetCssFileExtensionsString(),
 		sql = Project->GetSqlFileExtensionsString();
+
 	wxString fileFilter = 
-		wxString::Format(wxT("PHP Files (%s)| %s|"), phpLabel.c_str(), php.c_str()) +
-		wxString::Format(wxT("CSS Files (%s)| %s|"), cssLabel.c_str(), css.c_str()) +
-		wxString::Format(wxT("SQL Files (%s)| %s|"), sqlLabel.c_str(), sql.c_str()) +
-		wxT("All Files (*.*)| *.*");
+		wxString::Format(wxT("PHP Files (%s)|%s|"), phpLabel.c_str(), php.c_str()) +
+		wxString::Format(wxT("CSS Files (%s)|%s|"), cssLabel.c_str(), css.c_str()) +
+		wxString::Format(wxT("SQL Files (%s)|%s|"), sqlLabel.c_str(), sql.c_str()) +
+		wxT("All Files (*.*)|*.*");
 	return fileFilter;
+}
+
+int mvceditor::NotebookClass::WilcardIndex(mvceditor::CodeControlClass::Mode mode) {
+	if (mvceditor::CodeControlClass::PHP == mode) {
+		return 0;
+	}
+	else if (mvceditor::CodeControlClass::CSS == mode) {
+		return 1;
+	}
+	else if (mvceditor::CodeControlClass::SQL == mode) {
+		return 2;
+	}
+	return 3;
 }
 
 void mvceditor::NotebookClass::OnPageChanging(wxAuiNotebookEvent& event) {
