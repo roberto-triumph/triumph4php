@@ -30,13 +30,12 @@
 
 mvceditor::CodeIgniterPluginClass::CodeIgniterPluginClass()  
 	: PluginClass()
-	, ConfigFiles() {
-	CodeIgniterMenu = NULL;
+	, ConfigFiles() 
+	, CodeIgniterMenu(NULL) {
 	MenuBar = NULL;
 }
 
 void mvceditor::CodeIgniterPluginClass::AddNewMenu(wxMenuBar *menuBar) {
-	CodeIgniterMenu = new wxMenu;
 	MenuBar = menuBar;
 
 	// don't insert it just yet ... we only want to add it to the menu bar
@@ -44,44 +43,58 @@ void mvceditor::CodeIgniterPluginClass::AddNewMenu(wxMenuBar *menuBar) {
 }
 
 void mvceditor::CodeIgniterPluginClass::OnProjectOpened(wxCommandEvent& event) {
-	int menuIndex = MenuBar->FindMenu(_("Code Igniter"));
-	if (MenuBar && menuIndex != wxNOT_FOUND) {
-		MenuBar->Remove(menuIndex);
-		while (CodeIgniterMenu->GetMenuItemCount() > 0) {
-			CodeIgniterMenu->Delete(CodeIgniterMenu->FindItemByPosition(0)->GetId());
-		}
-	}
-	
 	ConfigFiles.clear();
 	ConfigFiles = PhPFrameworks().ConfigFiles;
-	UpdateMenu();
+	if (!ConfigFiles.empty()) {
+
+		// remove the files from any previously opened project
+		if (CodeIgniterMenu) {
+			while (CodeIgniterMenu->GetMenuItemCount() > 0) {
+				CodeIgniterMenu->Delete(CodeIgniterMenu->FindItemByPosition(0)->GetId());
+			}
+		}
+		else {
+
+			// on the first project, menu wont exist
+			CodeIgniterMenu = new wxMenu;
+		}
+		UpdateMenu();
+	}
+	else {
+		
+		// the new project is not a code igniter project, wont need the menu
+		int index = MenuBar->FindMenu(_("Code Igniter"));
+		if (index != wxNOT_FOUND) {
+			MenuBar->Remove(index);
+			delete CodeIgniterMenu;
+			CodeIgniterMenu = NULL;
+		}
+	}
 	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
 	resourceCache->GlobalAddDynamicResources(PhPFrameworks().Resources);
 }
 
 void mvceditor::CodeIgniterPluginClass::UpdateMenu() {
 	wxMenuItemList list = CodeIgniterMenu->GetMenuItems();
-	if (CodeIgniterMenu->GetMenuItemCount() == 0 && !ConfigFiles.empty()) {
-		std::map<wxString, wxString>::const_iterator it = ConfigFiles.begin();
-		for (size_t i = 0; it != ConfigFiles.end(); ++it) {
-			wxString fullPath = it->second;
-			wxString label = it->first;
+	std::map<wxString, wxString>::const_iterator it = ConfigFiles.begin();
+	for (size_t i = 0; it != ConfigFiles.end(); ++it) {
+		wxString fullPath = it->second;
+		wxString label = it->first;
 
-			// make label a bit friendlier for humans
-			label.Replace(wxT("_"), wxT(" "));
-			CodeIgniterMenu->Append(MENU_CODE_IGNITER + i, label, 
-				_("Open ") + fullPath, wxITEM_NORMAL);
-			i++;
-		}
-		CodeIgniterMenu->AppendSeparator();
-		CodeIgniterMenu->Append(MENU_CODE_IGNITER + ConfigFiles.size() + 0, 
-			_("New Code Igniter Model"), 
-			_("Create a new PHP File That Will Contain a Code Igniter model"));
-		CodeIgniterMenu->Append(MENU_CODE_IGNITER + ConfigFiles.size() + 1, 
-			_("New Code Igniter Controller"), 
-			_("Create a new PHP File That Will Contain a Code Igniter controller"));
-		MenuBar->Insert(MenuBar->GetMenuCount() - 1, CodeIgniterMenu, _("Code Igniter"));
+		// make label a bit friendlier for humans
+		label.Replace(wxT("_"), wxT(" "));
+		CodeIgniterMenu->Append(MENU_CODE_IGNITER + i, label, 
+			_("Open ") + fullPath, wxITEM_NORMAL);
+		i++;
 	}
+	CodeIgniterMenu->AppendSeparator();
+	CodeIgniterMenu->Append(MENU_CODE_IGNITER + ConfigFiles.size() + 0, 
+		_("New Code Igniter Model"), 
+		_("Create a new PHP File That Will Contain a Code Igniter model"));
+	CodeIgniterMenu->Append(MENU_CODE_IGNITER + ConfigFiles.size() + 1, 
+		_("New Code Igniter Controller"), 
+		_("Create a new PHP File That Will Contain a Code Igniter controller"));
+	MenuBar->Insert(MenuBar->GetMenuCount() - 1, CodeIgniterMenu, _("Code Igniter"));
 }
 
 void mvceditor::CodeIgniterPluginClass::OnMenuItem(wxCommandEvent& event) {

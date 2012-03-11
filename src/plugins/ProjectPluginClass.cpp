@@ -240,9 +240,9 @@ void mvceditor::ProjectPluginClass::ProjectOpen(const wxString& directoryPath) {
 	if (!PhpFrameworks.get()) {
 		PhpFrameworks.reset(new mvceditor::PhpFrameworkDetectorClass(*this, *GetEnvironment()));
 	}
+	CloseProject();
 	ProjectOptionsClass options;
 	options.RootPath = directoryPath;
-	CloseProject();
 	App->Project = new ProjectClass(options);
 
 	// on startup the editor is in "non-project" mode (no root path)
@@ -267,6 +267,15 @@ void mvceditor::ProjectPluginClass::ProjectOpen(const wxString& directoryPath) {
 
 void mvceditor::ProjectPluginClass::CloseProject() {
 	if (App->Project) {
+		PhpFrameworks->ConfigFiles.clear();
+		PhpFrameworks->Databases.clear();
+		PhpFrameworks->Identifiers.clear();
+		PhpFrameworks->Resources.clear();
+
+		App->PhpFrameworks.ConfigFiles.clear();
+		App->PhpFrameworks.Databases.clear();
+		App->PhpFrameworks.Identifiers.clear();
+		App->PhpFrameworks.Resources.clear();
 		delete App->Project;
 		App->Project = NULL;
 		wxCommandEvent closeEvent(mvceditor::EVENT_APP_PROJECT_CLOSED);

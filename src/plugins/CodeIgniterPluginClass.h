@@ -78,13 +78,14 @@ private:
 
 	/**
 	 * The menu to add the config file entries to.
-	 * This class will not own this pointer.
+	 * This class will own this pointer; the menu will be created if the opened project
+	 * is a code igniter project and will be deleted when a project is closed.
 	 */
 	wxMenu* CodeIgniterMenu;
 
 	/**
 	 * Saving the menu bar so that the code igniter menu can be removed when a project is not
-	 * a code igniter project.
+	 * a code igniter project. This class will NOT own this pointer (the AppFrame will).
 	 */
 	wxMenuBar* MenuBar;
 	
