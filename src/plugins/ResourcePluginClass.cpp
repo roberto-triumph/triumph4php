@@ -143,8 +143,6 @@ void mvceditor::ResourcePluginClass::OnProjectOpened(wxCommandEvent& event) {
 	if (ResourceFileReader.IsRunning()) {
 		ResourceFileReader.StopReading();
 	}
-
-	// TODO editor crashes if the native file parsing has not completed and the user closes the app
 	if (ResourceFileReader.InitForNativeFunctionsFile(GetResourceCache())) {
 		mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
 		if (ResourceFileReader.StartReading(error)) {

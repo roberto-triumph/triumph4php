@@ -81,7 +81,7 @@ bool mvceditor::BackgroundFileReaderClass::TestDestroy() {
 }
 
 void* mvceditor::BackgroundFileReaderClass::Entry() {
-	bool isDestroy = true;
+	bool isDestroy = false;
 	if (GetThread()) {
 		isDestroy = GetThread()->TestDestroy();
 	}
@@ -93,10 +93,17 @@ void* mvceditor::BackgroundFileReaderClass::Entry() {
 			// signal that the background thread has finished one file
 			counter++;
 			wxCommandEvent singleEvent(EVENT_FILE_READ, wxNewId());
-			singleEvent.SetInt(counter);
-			singleEvent.SetClientData((void*) res);
-			wxPostEvent(&Handler, singleEvent);
+			
+			// when isDestroy returns TRUE, must exit as soon as possible
+			// for example, when app exists the ThreadWithHeartbeat class kills the
+			// thread, many things are no longer valid
+			// this IF block prevents crashes on app exit
 			isDestroy = GetThread()->TestDestroy();
+			if (!isDestroy) {
+				singleEvent.SetInt(counter);
+				singleEvent.SetClientData((void*) res);
+				wxPostEvent(&Handler, singleEvent);
+			}
 		}
 	}
 	else if (Mode == MATCHED) {
@@ -107,18 +114,26 @@ void* mvceditor::BackgroundFileReaderClass::Entry() {
 
 			// signal that the background thread has finished one file
 			counter++;
-			wxCommandEvent singleEvent(EVENT_FILE_READ, wxNewId());
-			singleEvent.SetInt(counter);
-			wxPostEvent(&Handler, singleEvent);
 			isDestroy = GetThread()->TestDestroy();
+			if (!isDestroy) {
+				wxCommandEvent singleEvent(EVENT_FILE_READ, wxNewId());
+				singleEvent.SetInt(counter);
+				wxPostEvent(&Handler, singleEvent);
+			}
 		}
 	}
 	
 	// signal that the background thread has finished
-	wxCommandEvent endEvent(EVENT_FILE_READ_COMPLETE, wxNewId());
-	endEvent.SetInt(Mode);
-	wxPostEvent(&Handler, endEvent);
-	SignalEnd();
+	// when isDestroy returns TRUE, must exit as soon as possible
+	// for example, when app exists the ThreadWithHeartbeat class kills the
+	// thread, many things are no longer valid
+	// this IF block prevents crashes on app exit
+	if (!isDestroy) {
+		wxCommandEvent endEvent(EVENT_FILE_READ_COMPLETE, wxNewId());
+		endEvent.SetInt(Mode);
+		wxPostEvent(&Handler, endEvent);
+		SignalEnd();
+	}
 	return 0;
 }
 
