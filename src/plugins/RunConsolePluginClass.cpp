@@ -191,37 +191,29 @@ void mvceditor::RunConsolePluginClass::AddKeyboardShortcuts(std::vector<DynamicC
 void mvceditor::RunConsolePluginClass::OnRunFileAsCli(wxCommandEvent& event) {
 	CodeControlClass* code = GetCurrentCodeControl();
 	
-	// TODO: need to hash out the what happens when the user runs a script when the run button is clicked
-	// the user has filled in run arguments the run button kills them
-	if (code) {
+	// if theres a window already opened, just re-run the selected window.
+	int selection = GetToolsNotebook()->GetSelection();
+	if (selection >= 0) {
+		RunConsolePanelClass* runConsolePanel = (RunConsolePanelClass*)GetToolsNotebook()->GetPage(selection);
 		
-		// right now dont really care which window, just want to reuse an existing one. that's why all windows
-		// are created with the same ID
-		wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_CONSOLE, GetToolsNotebook());
-		if (NULL != window) {
-			RunConsolePanelClass* runConsolePanel = (RunConsolePanelClass*)window;
-			
-			// window already created
-			SetFocusToToolsWindow(runConsolePanel);
+		// window already created, will just re-run the command that's already there
+		runConsolePanel->SetFocusOnCommandText();
+		
+		// if user chose the 'with arguments' then do not proceed let the user put in arguments
+		if ((mvceditor::MENU_RUN_PHP + 1) != event.GetId()) {
+			runConsolePanel->RunCommand(event);	
+		}
+	}
+	else if (code) {
+		RunConsolePanelClass* runConsolePanel = new RunConsolePanelClass(GetToolsNotebook(), GetEnvironment(), 
+			GetStatusBarWithGauge(), ID_WINDOW_CONSOLE);	
+		if (AddToolsWindow(runConsolePanel, _("Run"))) {
 			runConsolePanel->SetToRunFile(code->GetFileName());
 			runConsolePanel->SetFocusOnCommandText();
 			
 			// if user chose the 'with arguments' then do not proceed let the user put in arguments
 			if ((mvceditor::MENU_RUN_PHP + 1) != event.GetId()) {
-				runConsolePanel->RunCommand(event);	
-			}
-		}
-		else {
-			RunConsolePanelClass* runConsolePanel = new RunConsolePanelClass(GetToolsNotebook(), GetEnvironment(), 
-				GetStatusBarWithGauge(), ID_WINDOW_CONSOLE);	
-			if (AddToolsWindow(runConsolePanel, _("Run"))) {
-				runConsolePanel->SetToRunFile(code->GetFileName());
-				runConsolePanel->SetFocusOnCommandText();
-				
-				// if user chose the 'with arguments' then do not proceed let the user put in arguments
-				if ((mvceditor::MENU_RUN_PHP + 1) != event.GetId()) {
-					runConsolePanel->RunCommand(event);
-				}
+				runConsolePanel->RunCommand(event);
 			}
 		}
 	}
