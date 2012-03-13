@@ -800,29 +800,46 @@ UnicodeString mvceditor::CodeControlClass::GetSafeText() {
 
 void mvceditor::CodeControlClass::OnIdle(wxIdleEvent& event) {
 	if (!IsNew() && !ModifiedDialogOpen) {
-		if (wxFileName::FileExists(CurrentFilename)) {
-			wxFileName file(CurrentFilename);
-			wxDateTime modifiedDateTime = file.GetModificationTime();
-			if (modifiedDateTime.IsLaterThan(FileOpenedDateTime)) {
-				ModifiedDialogOpen = true;
-				wxString message = CurrentFilename;
+		
+		// check to see if file has been removed or saved externally.
+		// careful, GetModificationTime requires the file to exist
+		wxFileName file(CurrentFilename);
+		wxDateTime modifiedDateTime;
+		if (file.FileExists()) {
+			modifiedDateTime = file.GetModificationTime();
+		}
+		if (!file.FileExists() || modifiedDateTime.IsLaterThan(FileOpenedDateTime)) {
+			ModifiedDialogOpen = true;
+			wxString message = CurrentFilename;
+			int opts = 0;
+			if (file.FileExists()) {
 				message += _("\n\nFile has been modified externally. Reload file and lose any changes?\n");
 				message += _("Yes will reload file, No will allow you to override the file.");
-				int res = wxMessageBox(message, _("Warning"), 
-					wxYES_NO | wxICON_QUESTION, this);
-				if (wxYES == res) {
-					LoadAndTrackFile(CurrentFilename);
-				}
-				else {
-
-					// so that next idle event user does not get asked the same question again
-					FileOpenedDateTime = modifiedDateTime;
-				}
-				ModifiedDialogOpen = false;
+				opts = wxYES_NO | wxICON_QUESTION;
 			}
+			else {
+				message += _("\n\nFile has been deleted externally.\n");
+				message += _("You wil need to save the file to store the contents.");
+				opts = wxICON_QUESTION;
+			}
+			int res = wxMessageBox(message, _("Warning"), 
+				opts, this);
+			if (wxYES == res && file.FileExists()) {
+				LoadAndTrackFile(CurrentFilename);
+			}
+			else if (!file.FileExists()) {
+
+				// so that next idle event user does not get asked the same question again
+				// since file does not exist, make it look like a new file
+				CurrentFilename = wxT("");
+			}
+			else {
+
+				// so that next idle event user does not get asked the same question again
+				FileOpenedDateTime = modifiedDateTime;
+			}
+			ModifiedDialogOpen = false;
 		}
-		// else file has been removed.  most likely the user know about it so don't bother telling them
-		// explictly checking for file existence because GetModificationTime requires the file to exist
 	}
 	
 	// moving match braces here from UpdateUi because when I put this code in UpdateUi there
