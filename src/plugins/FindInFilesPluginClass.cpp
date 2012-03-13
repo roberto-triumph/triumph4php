@@ -223,7 +223,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceAllInFileButton(wxCommand
 	CodeControlClass* codeControl = 
 			Notebook->GetCodeControl(Notebook->GetSelection());	
 			
-	// if user changed tab, GetLastReplacementText would return false and nothing will be replaced
+	// if user changed tab, the new tab would be modified; this is clear to the user
 	 if (codeControl) {
 		UnicodeString text = codeControl->GetSafeText();
 		FinderClass finder;

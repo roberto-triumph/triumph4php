@@ -224,6 +224,19 @@ TEST(ReplaceAllShouldReplaceAllMatchesUsingExactMode) {
 	CHECK_EQUAL(expectedCode, newCode);	
 }
 
+
+TEST(ReplaceAllShouldReplaceAllMatchesUsingExactModeShouldAllowEmptyReplacement) {
+	UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI"));
+	mvceditor::FinderClass finder(tofind, mvceditor::FinderClass::EXACT);
+	finder.ReplaceExpression = UNICODE_STRING_SIMPLE("");
+	CHECK(finder.Prepare());
+	UnicodeString newCode(CODE);
+	CHECK_EQUAL(3, finder.ReplaceAllMatches(newCode));
+	UnicodeString expectedCode(CODE);
+	expectedCode.findAndReplace(tofind, UNICODE_STRING_SIMPLE(""));
+	CHECK_EQUAL(expectedCode, newCode);	
+}
+
 TEST(ReplaceAllShouldReplaceAllMatchesUsingRegularExpressionMode) {
 	UnicodeString tofind(UNICODE_STRING_SIMPLE("\\$(PI)"));
 	mvceditor::FinderClass finder(tofind, mvceditor::FinderClass::REGULAR_EXPRESSION);
@@ -233,6 +246,19 @@ TEST(ReplaceAllShouldReplaceAllMatchesUsingRegularExpressionMode) {
 	CHECK_EQUAL(3, finder.ReplaceAllMatches(newCode));
 	UnicodeString expectedCode(CODE);
 	expectedCode.findAndReplace(UNICODE_STRING_SIMPLE("$PI"), UNICODE_STRING_SIMPLE("$_PI"));
+	CHECK_EQUAL(expectedCode, newCode);	
+}
+
+
+TEST(ReplaceAllShouldReplaceAllMatchesUsingRegularExpressionModeShouldAllowEmptyReplacement) {
+	UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI"));
+	mvceditor::FinderClass finder(tofind, mvceditor::FinderClass::REGULAR_EXPRESSION);
+	finder.ReplaceExpression = UNICODE_STRING_SIMPLE("");
+	CHECK(finder.Prepare());
+	UnicodeString newCode(CODE);
+	CHECK_EQUAL(3, finder.ReplaceAllMatches(newCode));
+	UnicodeString expectedCode(CODE);
+	expectedCode.findAndReplace(tofind, UNICODE_STRING_SIMPLE(""));
 	CHECK_EQUAL(expectedCode, newCode);	
 }
 

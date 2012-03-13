@@ -165,36 +165,37 @@ bool mvceditor::FinderClass::GetLastReplacementText(const UnicodeString& text, U
 
 int mvceditor::FinderClass::ReplaceAllMatches(UnicodeString& text) const {
 	int matches = 0;
-	if (IsPrepared && !ReplaceExpression.isEmpty()) {
+	
+	// no check for ReplaceExpression.isEmpty() allow for empty replacements
+	// this allows the user to 'delete' parts of a strin
+	if (IsPrepared) {
 		UnicodeString replacement = ReplaceExpression;
 		RegexMatcher* matcher = NULL;
 		UErrorCode error = U_ZERO_ERROR;
 		UnicodeString dest(text.length(), ' ', 0);
 		int32_t pos = 0;
-		switch (Mode) {
-			case EXACT:
-				pos = text.indexOf(Expression, 0);
-				while (pos >= 0) {
-					text.replaceBetween(pos, pos + Expression.length(), replacement);
-					pos = text.indexOf(Expression, pos + replacement.length());
-					++matches;
-				}
-				break;
-			case REGULAR_EXPRESSION:
-				matcher = Pattern->matcher(text, error);
-				if (U_SUCCESS(error) && matcher) {
-					while (matcher->find()) {
+		if (EXACT == Mode || (REGULAR_EXPRESSION == Mode && ReplaceExpression.isEmpty())) {
+			pos = text.indexOf(Expression, 0);
+			while (pos >= 0) {
+				text.replaceBetween(pos, pos + Expression.length(), replacement);
+				pos = text.indexOf(Expression, pos + replacement.length());
+				++matches;
+			}
+		}
+		else {
+			matcher = Pattern->matcher(text, error);
+			if (U_SUCCESS(error) && matcher) {
+				while (matcher->find()) {
+					if (U_SUCCESS(error)) {
+						matcher->appendReplacement(dest, replacement, error);
 						if (U_SUCCESS(error)) {
-							matcher->appendReplacement(dest, replacement, error);
-							if (U_SUCCESS(error)) {
-								++matches;
-							}
+							++matches;
 						}
 					}
-					matcher->appendTail(dest);
-					text = dest;
 				}
-				break;
+				matcher->appendTail(dest);
+				text = dest;
+			}
 		}
 		if (matcher) {
 			delete matcher;
