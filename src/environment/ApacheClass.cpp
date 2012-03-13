@@ -120,10 +120,11 @@ void mvceditor::ApacheClass::RemoveVirtualHostMapping(const wxString& fileSystem
 wxString mvceditor::ApacheClass::GetUrl(const wxString& fileSystemPath) const {
 
 	// normalize the given path; also convert to lower case so that we make case-insesitive
-	// comparisons (to handle windows paths). also add a trailing slash
+	// comparisons (to handle windows paths). also add a trailing slash if fileSystemPath
+	// is a directory; when comparing fileSystemPaths the ending separator is irrelevant
 	wxFileName fileToGet(fileSystemPath);
 	wxString dir = fileToGet.GetFullPath();
-	if (!dir.EndsWith(wxFileName::GetPathSeparators())) {
+	if (wxFileName::DirExists(dir) && !dir.EndsWith(wxFileName::GetPathSeparators())) {
 		dir += wxFileName::GetPathSeparators();
 	}
 	dir.LowerCase();
@@ -131,8 +132,11 @@ wxString mvceditor::ApacheClass::GetUrl(const wxString& fileSystemPath) const {
 	for (std::map<wxString, wxString>::const_iterator it = VirtualHostMappings.begin(); it != VirtualHostMappings.end(); ++it) {
 		wxString hostRoot = it->first;
 		hostRoot.LowerCase();
-		if (!hostRoot.EndsWith(wxFileName::GetPathSeparators())) {
-			hostRoot += wxFileName::GetPathSeparators();
+
+		// don't use wxFileName::GetPathSeparators() it produces bad results on Win32
+		// seems to return '\/'
+		if (hostRoot[hostRoot.Len() - 1] != wxFileName::GetPathSeparator()) {
+			hostRoot += wxFileName::GetPathSeparator();
 		}
 		if (0 == dir.Find(hostRoot)) {
 			
