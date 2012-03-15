@@ -98,7 +98,7 @@ public:
 	}
 };
 
-SUITE(ResourceUpdateThreadTestClass) {
+SUITE(ResourceCacheTestClass) {
 
 TEST_FIXTURE(RegisterTestFixtureClass, RegisterShouldSucceed) {	
 	wxString fileName = wxT("MyFile.php");
@@ -134,6 +134,9 @@ TEST_FIXTURE(RegisterTestFixtureClass, CollectShouldGetFromAllFinders) {
 	CHECK(ResourceCache.Register(file2, false));
 	CHECK(ResourceCache.Update(file1, code1, true));
 	CHECK(ResourceCache.Update(file2, code2, true));
+	
+	// must call init() here since file3 may have not existed before
+	Search.Init(TestProjectDir);
 	ResourceCache.WalkGlobal(Search, PhpFileFilters);
 	
 	// now perform the search. will search for any resource that starts with 'Action'
