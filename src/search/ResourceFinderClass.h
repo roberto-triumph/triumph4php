@@ -393,7 +393,14 @@ public:
 	 * any resources). Will also return true if the ONLY file that has been cached is the native functions
 	 * file.
 	 */
-	bool IsEmpty() const;
+	bool IsFileCacheEmpty() const;
+
+	/**
+	 * @return bool true if this resource finder has not parsed any resources. Will also return true if the 
+	 * ONLY resources that have been cached are those for the the native functions
+	 * file. Note that this could return TRUE even though the file cache is not empty.
+	 */
+	bool IsResourceCacheEmpty() const;
 
 	/**
 	 * This method copies the internal resource lists from the given object to this. This method can

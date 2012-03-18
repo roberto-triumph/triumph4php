@@ -54,14 +54,23 @@ mvceditor::ResourceFinderClass::ResourceFinderClass()
 
 bool mvceditor::ResourceFinderClass::Walk(const wxString& fileName) {
 	bool matchedFilter = false;
+	wxFileName file(fileName);
 	for (size_t i = 0; i < FileFilters.size(); ++i) {
 		wxString filter = FileFilters[i];
-		matchedFilter = !wxIsWild(filter) || wxMatchWild(filter, fileName);
+		if (!wxIsWild(filter)) {
+
+			// exact match of the name portion of fileName
+			matchedFilter = file.GetFullName().CmpNoCase(filter) == 0;
+		}
+		else {
+			matchedFilter =  wxMatchWild(filter, fileName);
+		}
 		if (matchedFilter) {
 			break;
 		}
 	}
-	IsCurrentFileNative = false;
+	
+	IsCurrentFileNative = file == mvceditor::NativeFunctionsAsset();
 	if (matchedFilter) {
 		switch (ResourceType) {
 			case FILE_NAME:
@@ -918,12 +927,36 @@ void mvceditor::ResourceFinderClass::Print() const {
 	u_fclose(out);
 }
 
-bool mvceditor::ResourceFinderClass::IsEmpty() const {
-	bool isEmpty = FileCache.empty();
-	if (FileCache.size() == (size_t)1) {
+bool mvceditor::ResourceFinderClass::IsFileCacheEmpty() const {
+	bool isEmpty = true;
+	int fileCacheSize = FileCache.size();
+	if ((size_t)1 == fileCacheSize) {
+		isEmpty = false;
 		wxString cachedFile = FileCache[0].FullPath;
 		if (cachedFile == mvceditor::NativeFunctionsAsset().GetFullPath()) {
 			isEmpty = true;
+		}
+	}
+	return isEmpty;
+}
+
+bool mvceditor::ResourceFinderClass::IsResourceCacheEmpty() const {
+	bool isEmpty = ResourceCache.empty() && MembersCache.empty();
+	if (!isEmpty) {
+		isEmpty = true;
+
+		// make sure only parsed resource came from the native functions file.
+		for (std::list<mvceditor::ResourceClass>::const_iterator it = ResourceCache.begin(); isEmpty && it != ResourceCache.end(); ++it) {
+			if (!it->IsNative) {
+				isEmpty = false;
+			}
+		}
+		if (isEmpty) {
+			for (std::list<mvceditor::ResourceClass>::const_iterator it = MembersCache.begin(); isEmpty && it != MembersCache.end(); ++it) {
+				if (!it->IsNative) {
+					isEmpty = false;
+				}
+			}
 		}
 	}
 	return isEmpty;

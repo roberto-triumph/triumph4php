@@ -224,7 +224,12 @@ public:
 	/**
 	 * @return TRUE if the cache has not been initialized with either a call to Register() or a call to WalkGlobal()
 	 */
-	bool IsEmpty();
+	bool IsFileCacheEmpty();
+
+	/**
+	 * @return TRUE if the cache has not been initialized with either a call to Register() or a call to WalkGlobal()
+	 */
+	bool IsResourceCacheEmpty();
 	 
 private:
 

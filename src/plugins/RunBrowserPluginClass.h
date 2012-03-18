@@ -106,8 +106,6 @@ public:
 	
 	void AddToolsMenuItems(wxMenu* toolsMenu);
 	
-	void AddToolBarItems(wxAuiToolBar* toolBar);
-	
 	void AddWindows();
 	
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
@@ -165,6 +163,11 @@ private:
 	 * to show progress to the user
 	 */
 	void OnProcessInProgress(wxCommandEvent& event);
+
+	/**
+	 * show the user the URL dialog and open the chosen url
+	 */
+	void ShowUrlDialog();
 	
 	/**
 	 * A local instance of the detector so that we can resolve
@@ -202,6 +205,17 @@ private:
 	
 	wxAuiToolBar* BrowserToolbar;
 
+	/**
+	 * This is used to control the URL dialog. Since a click of the Search for URLs button
+	 * may trigger a project re-index, and index notification is done through event
+	 * handlers, the logic will span multiple methods. This flag will be used
+	 * to see if the search for URLs button triggered an index, if so then the
+	 * URL dialog box will be shown after URLs have been detected.
+	 */
+	enum States {
+		FREE, // default state
+		INDEXING // cache is empty, resource indexing was triggered
+	} State;
 	
 	DECLARE_EVENT_TABLE()
 };

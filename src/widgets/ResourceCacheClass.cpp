@@ -301,14 +301,25 @@ void mvceditor::ResourceCacheClass::Print() {
 	
 }
 
-bool mvceditor::ResourceCacheClass::IsEmpty() {
+bool mvceditor::ResourceCacheClass::IsFileCacheEmpty() {
 	wxMutexLocker locker(Mutex);
 	if (!locker.IsOk()) {
 		return true;
 	}
-	bool isEmpty = GlobalResourceFinder.IsEmpty() && SymbolTables.empty() && Finders.empty();
+	bool isEmpty = GlobalResourceFinder.IsFileCacheEmpty();
 	return isEmpty;
 }
+
+bool mvceditor::ResourceCacheClass::IsResourceCacheEmpty() {
+	wxMutexLocker locker(Mutex);
+	if (!locker.IsOk()) {
+		return true;
+	}
+	bool isEmpty = GlobalResourceFinder.IsResourceCacheEmpty();
+	return isEmpty;
+}
+
+
 
 mvceditor::ResourceCacheUpdateThreadClass::ResourceCacheUpdateThreadClass(mvceditor::ResourceCacheClass* resourceCache, wxEvtHandler& handler, int eventId)
 	: ThreadWithHeartbeatClass(handler, eventId)

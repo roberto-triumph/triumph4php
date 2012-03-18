@@ -192,11 +192,16 @@ void mvceditor::ResourcePluginClass::SearchForResources() {
 						GetStatusBarWithGauge()->AddGauge(_("Searching For Resources"),
 							ID_COUNT_FILES_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE,
 							wxGA_HORIZONTAL);
-						if (!IndexingDialog) {
-							IndexingDialog = new mvceditor::IndexingDialogClass(NULL);
+						if (!HasCodeLookups) {
+
+							// empty resource cache, indexing will take a significant amount of time. make the 
+							// app more 'responsive' by showing a bigger gauge
+							if (!IndexingDialog) {
+								IndexingDialog = new mvceditor::IndexingDialogClass(NULL);
+							}
+							IndexingDialog->Show();
+							IndexingDialog->Start();
 						}
-						IndexingDialog->Show();
-						IndexingDialog->Start();
 					}
 					else if (mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING == error) {
 						wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
@@ -348,6 +353,16 @@ void mvceditor::ResourcePluginClass::StartIndex() {
 						GetStatusBarWithGauge()->AddGauge(_("Indexing Project"),
 							ID_COUNT_FILES_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE,
 							wxGA_HORIZONTAL);
+						if (!HasCodeLookups) {
+
+							// empty resouce cache, indexing will take a significant amount of time. make the 
+							// app more 'responsive' by showing a bigger gauge
+							if (!IndexingDialog) {
+								IndexingDialog = new mvceditor::IndexingDialogClass(NULL);
+							}
+							IndexingDialog->Show();
+							IndexingDialog->Start();
+						}
 					}
 					else if (mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING == error) {
 						wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
