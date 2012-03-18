@@ -35,49 +35,30 @@
 #include <memory>
 
 namespace mvceditor {
-	
-/** 
- * small class that will be used in the UrlChoice Dialog; to let the user
- * select a URL to run, along with any parameters the user wants
- */
-class UrlChoiceClass {
-public:
-
-	std::vector<UrlResourceClass> UrlList;
-	
-	wxString Extra;
-	
-	int ChosenIndex;
-	
-	/**
-	 * @param urlList list of URLs that the user will choose from.  The list should be the result of the URL
-	 * detector
-	 * @param fileName the file that corresponds to the given URLs (the file name helps to determine the virtual host)
-	 * @param environment to get the virtual host
-	 */
-	UrlChoiceClass(const std::vector<UrlResourceClass>& urlList, const wxString& fileName, EnvironmentClass* environment);
-	
-	/**
-	 * @return UrlResourceClass URL [that the user chose] plus the Extra
-	 */
-	UrlResourceClass ChosenUrl() const;
-	
-};
 
 /**
- * small dialog that allows the user to choose a URL to run
+ * small dialog that allows the user to choose a URL to run. User can also
+ * add, delete, and modify items in the global URL list (URLResourceFinderClass).
  */
 class ChooseUrlDialogClass : public ChooseUrlDialogGeneratedClass {
 	
 public:
-	
-	UrlChoiceClass& UrlChoice;
 
-	ChooseUrlDialogClass(wxWindow* parent, UrlChoiceClass& urlChoice);
+	ChooseUrlDialogClass(wxWindow* parent, UrlResourceFinderClass& urls, UrlResourceClass& chosenUrl);
 	
 protected:
 
 	void OnOkButton(wxCommandEvent& event);
+
+	void OnAddButton(wxCommandEvent& event);
+
+	void OnDeleteButton(wxCommandEvent& event);
+
+	void OnCloneButton(wxCommandEvent& event);
+
+	void OnTextEnter(wxCommandEvent& event);
+
+	void OnKeyDown(wxKeyEvent& event);
 	
 	/**
 	 * updates the URL label so that the user can see the exact URL to 
@@ -86,11 +67,40 @@ protected:
 	void OnListItemSelected(wxCommandEvent& event);
 
 	void OnText(wxCommandEvent& event);
+
+private:
+
+	/**
+	 * The list of URLs, it will contain URLs that were detected and URLs that were input
+	 * by the user.
+	 */
+	UrlResourceFinderClass& UrlResourceFinder;
+
+	/**
+	 * Any changes by the user are held here until the user clicks OK.
+	 * If the user clicks Cancel we dont want to change the 
+	 * UrlResourceFinder
+	 */
+	UrlResourceFinderClass EditedUrlResourceFinder;
+
+	/**
+	 * The URL that the user selected.
+	 */
+	UrlResourceClass& ChosenUrl;
 };
 	
 class RunBrowserPluginClass : public PluginClass {
 
 public:
+
+	/**
+	 * The most recent URLs that have been run. New URLs are added after the 
+	 * user picks one from the "Search For URLs..." button, and they are deleted
+	 * only after the list has reached a certain size limit
+	 * These urls have a Project scope; when a project is opened any previous
+	 * URLs are cleared.
+	 */
+	std::vector<UrlResourceClass> RecentUrls;
 
 	RunBrowserPluginClass();
 	
@@ -142,9 +152,14 @@ private:
 	void OnProjectIndexed(wxCommandEvent& event);
 
 	/**
+	 * when a project is opened clean the Recent list
+	 */
+	void OnProjectOpened(wxCommandEvent& event);
+
+	/**
 	 * this will be called once the cache file has been persisted
 	*/
-	void OnWorkComplete(wxCommandEvent& event);
+	void OnCacheFileWorkComplete(wxCommandEvent& event);
 
 	/**
 	 * to show progress to the user

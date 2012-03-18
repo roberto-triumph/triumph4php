@@ -26,7 +26,7 @@
 #define __MVCEDITORURLRESOURCECLASS_H__
 
 #include <environment/EnvironmentClass.h>
-#include <wx/string.h>
+#include <wx/url.h>
 #include <vector>
 
 namespace mvceditor {
@@ -40,11 +40,13 @@ class UrlResourceClass {
 public:
 
 	/**
-	 * These are relative URLs; they are relative to the server root and may contain a query string.
-	 * For example, if a user would type in "http://localhost.codeigniter/index.php/news/index" the
-	 * this URL should contain "index.php/news/index"
+	 * These are absolute URLs; may contain a query string.
+	 * For example, "http://localhost.codeigniter/index.php/news/index?val=123"
+	 * Using a wxURI instead of wxURL because wxURL needs some sort of socket initialization
+	 * and it crashes without the extra code. since we won't be iniating connections we
+	 * don't need that extra functionality.
 	 */
-	wxString Url;
+	wxURI Url;
 	
 	/**
 	 * The file where the source code of the URL is located in.  This is the entry point
@@ -67,12 +69,26 @@ public:
 	wxString MethodName;
 	
 	UrlResourceClass();
+
+	UrlResourceClass(wxString uri);
+
+	UrlResourceClass(const UrlResourceClass& src);
+
+	/**
+	 * @param src item to copy from. after a call to this method, this item will have the
+	 * same properties as src
+	 */
+	void Copy(const UrlResourceClass& src);
+
+	void Reset();
 };
  
 /**
  * Class that holds all of the URLs that MVC Editor has encountered.
  * We remember them because they are a relatively expensive to determine (have to
  * use the UrlDetectorActionClass).
+ * The URLs here are a combination of detected URLs and URLs manually entered in by the user.
+ * For a big application, there may be hundreds or thousands of these.
  */
 class UrlResourceFinderClass {
 
@@ -99,9 +115,10 @@ public:
 	 * the URL that is selected
 	 */
 	UrlResourceClass ChosenUrl;
-	
 		
 	UrlResourceFinderClass();
+
+	UrlResourceFinderClass(const UrlResourceFinderClass& src);
 	
 	/**
 	 * check to see if the given URL exists in the Urls list; if the URL
@@ -111,7 +128,34 @@ public:
 	 *
 	 * @return TRUE if there is a URL resource that has the given URL member
 	 */
-	bool FindByUrl(const wxString& url, UrlResourceClass& urlResource);
+	bool FindByUrl(const wxURI& url, UrlResourceClass& urlResource);
+
+	/**
+	 * Searches all URLs for the URLs that match the given filter; and will copy matching
+	 * URLs to matchedUrls.
+	 * @param filter string if filter is a substring of URL then its considered a match.
+	 *        No wildcards are accepted.
+	 * @param matchedUrls matching URLs will be pushed into the given vector.
+	 */
+	void FilterUrls(const wxString& filter, std::vector<UrlResourceClass>& matchedUrls);
+
+	/**
+	 * @param url the URL to delete from this list.
+	 */
+	void DeleteUrl(const wxURI& url);
+
+	/**
+	 * @param the URL to add
+	 * @return FALSE if URL is already there (a duplicate will NOT be inserted)
+	 */
+	bool AddUniqueUrl(const wxURI& url);
+
+	/**
+	 * @param src Replace all items in all public properties with the items in src.
+	 * After a call to this method, this and src will have the same (copies)
+	 * of items.
+	 */
+	void ReplaceAll(const UrlResourceFinderClass& src);
 };
 	
 }

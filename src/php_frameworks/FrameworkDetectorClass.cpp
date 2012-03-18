@@ -372,16 +372,15 @@ bool mvceditor::UrlDetectorActionClass::Response() {
 	wxStringTokenizer tok;
 	while (!stream.Eof()) {
 		tok.SetString(textStream.ReadLine(), wxT(",\n"));
-		mvceditor::UrlResourceClass newUrl;
 		if (tok.HasMoreTokens()) {
-			newUrl.Url = tok.NextToken();
+			mvceditor::UrlResourceClass newUrl(tok.NextToken());
 			if (tok.HasMoreTokens()) {
 				newUrl.FileName.Assign(tok.NextToken());
 				if (tok.HasMoreTokens()) {
 					newUrl.ClassName = tok.NextToken();
 					if (tok.HasMoreTokens()) {
 						newUrl.MethodName = tok.NextToken();
-						if (newUrl.Url.IsEmpty() || !newUrl.FileName.IsOk()) {
+						if (newUrl.Url.GetServer().IsEmpty() || !newUrl.FileName.IsOk()) {
 							Error = BAD_CONTENT;
 							ret = false;
 							break;
