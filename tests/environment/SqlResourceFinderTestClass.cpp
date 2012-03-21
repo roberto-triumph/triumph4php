@@ -22,11 +22,12 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
- #include <UnitTest++.h>
- #include <DatabaseTestFixtureClass.h>
- #include <environment/SqlResourceFinderClass.h>
- #include <unicode/ustdio.h>
- #include <string>
+#include <UnitTest++.h>
+#include <DatabaseTestFixtureClass.h>
+#include <environment/SqlResourceFinderClass.h>
+#include <MvcEditorChecks.h>
+#include <unicode/ustdio.h>
+#include <string>
  
 class SqlResourceFinderFixtureClass : public DatabaseTestFixtureClass {
 
@@ -62,36 +63,60 @@ TEST_FIXTURE(SqlResourceFinderFixtureClass, FindTable) {
 	UnicodeString error;
 	CHECK(Finder.Fetch(Info, error));
 	std::vector<UnicodeString> tables = Finder.FindTables(Info, UNICODE_STRING_SIMPLE("service"));
-	CHECK_EQUAL((size_t)2, tables.size());
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("service_locations").compare(tables.at(0)), (int8_t)0);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("service_names").compare(tables.at(1)), (int8_t)0);
+	CHECK_VECTOR_SIZE(2, tables);
+	CHECK_UNISTR_EQUALS_NO_CASE("service_locations", tables[0]);
+	CHECK_UNISTR_EQUALS_NO_CASE("service_names", tables[1]);
+}
+
+TEST_FIXTURE(SqlResourceFinderFixtureClass, FindTableShouldLocateInformationSchema) {
+	Info.DatabaseName = UNICODE_STRING_SIMPLE("sql_resource_finder");
+	UnicodeString error;
+	CHECK(Finder.Fetch(Info, error));
+	std::vector<UnicodeString> tables = Finder.FindTables(Info, UNICODE_STRING_SIMPLE("information_sche"));
+	CHECK_VECTOR_SIZE(1, tables);
+	CHECK_UNISTR_EQUALS_NO_CASE("information_schema", tables[0]);
+
+	tables = Finder.FindTables(Info, UNICODE_STRING_SIMPLE("colum"));
+	CHECK_VECTOR_SIZE(2, tables);
+	CHECK_UNISTR_EQUALS_NO_CASE("column_privileges", tables[0]);
+	CHECK_UNISTR_EQUALS_NO_CASE("columns", tables[1]);
 }
 
 TEST_FIXTURE(SqlResourceFinderFixtureClass, FindColumns) {	
 	Info.DatabaseName = UNICODE_STRING_SIMPLE("sql_resource_finder");
 	
-	std::string query = "CREATE TABLE web_users(idUser int);";
+	std::string query = "CREATE TABLE web_users(idIUser int);";
 	CHECK(Exec(query));
-	query = "CREATE TABLE service_names(idServiceName int);";
+	query = "CREATE TABLE service_names(idIServiceName int);";
 	CHECK(Exec(query));
-	query = "CREATE TABLE service_locations(idServiceLocation int);";
+	query = "CREATE TABLE service_locations(idIServiceLocation int);";
 	CHECK(Exec(query));
-	query = "CREATE TABLE deleted_users(idUser int, idDeletedBy int);";
+	query = "CREATE TABLE deleted_users(idIUser int, idIDeletedBy int);";
 	CHECK(Exec(query));
 	UnicodeString error;
 	CHECK(Finder.Fetch(Info, error));
 	
-	std::vector<UnicodeString> columns = Finder.FindColumns(Info, UNICODE_STRING_SIMPLE("idServiceL"));
-	CHECK_EQUAL((size_t)1, columns.size());
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("idServiceLocation").compare(columns.at(0)), (int8_t)0);
+	std::vector<UnicodeString> columns = Finder.FindColumns(Info, UNICODE_STRING_SIMPLE("idIServiceL"));
+	CHECK_VECTOR_SIZE(1, columns);
+	CHECK_UNISTR_EQUALS_NO_CASE("idIServiceLocation", columns[0]);
 	
-	columns = Finder.FindColumns(Info, UNICODE_STRING_SIMPLE("id"));
-	CHECK_EQUAL((size_t)4, columns.size());	
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("idDeletedBy").compare(columns.at(0)), (int8_t)0);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("idServiceLocation").compare(columns.at(1)), (int8_t)0);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("idServiceName").compare(columns.at(2)), (int8_t)0);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("idUser").compare(columns.at(3)), (int8_t)0);
+
+	columns = Finder.FindColumns(Info, UNICODE_STRING_SIMPLE("idI"));
 	
+	CHECK_VECTOR_SIZE(4, columns);
+	CHECK_UNISTR_EQUALS_NO_CASE("idIDeletedBy", columns[0]);
+	CHECK_UNISTR_EQUALS_NO_CASE("idIServiceLocation", columns[1]);
+	CHECK_UNISTR_EQUALS_NO_CASE("idIServiceName", columns[2]);
+	CHECK_UNISTR_EQUALS_NO_CASE("idIUser", columns[3]);
 }
-	 
+
+TEST_FIXTURE(SqlResourceFinderFixtureClass, FindInformationSchemaColumns) {
+	Info.DatabaseName = UNICODE_STRING_SIMPLE("sql_resource_finder");
+	UnicodeString error;
+	CHECK(Finder.Fetch(Info, error));
+	std::vector<UnicodeString> columns = Finder.FindColumns(Info, UNICODE_STRING_SIMPLE("table_nam"));
+	CHECK_VECTOR_SIZE(1, columns);
+	CHECK_UNISTR_EQUALS_NO_CASE("table_name", columns[0]);
+}
+
 }
