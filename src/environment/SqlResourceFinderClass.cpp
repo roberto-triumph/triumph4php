@@ -41,7 +41,7 @@ void mvceditor::SqlResourceFinderClass::Copy(const mvceditor::SqlResourceFinderC
 }
 
 bool mvceditor::SqlResourceFinderClass::Fetch(const mvceditor::DatabaseInfoClass& info, UnicodeString& error) {
-	bool ret = false;
+	bool hasError = false;
 	Query.Info.Copy(info);
 	soci::session session;
 	if (Query.Connect(session, error)) {
@@ -51,29 +51,53 @@ bool mvceditor::SqlResourceFinderClass::Fetch(const mvceditor::DatabaseInfoClass
 		Tables[hash].clear();
 		Columns[hash].clear();
 		try {
-			ret = true;
 			std::string schema = mvceditor::StringHelperClass::IcuToChar(info.DatabaseName);
 			std::string tableName;
-			std::string query = "SELECT table_name FROM information_schema.tables WHERE table_schema=(:schema)";
+
+			// populate information_schema tables we want SQL code completion to work for the 
+			// information_schema tables / columns
+			std::string query = "SELECT table_name FROM information_schema.tables WHERE table_schema IN((:schema), 'information_schema')";
 			soci::statement stmt = (session.prepare << query, soci::into(tableName), soci::use(schema));
 			stmt.execute();
-			while (Query.More(stmt, ret, error)) {
+			while (Query.More(stmt, hasError, error)) {
 				UnicodeString uni = mvceditor::StringHelperClass::charToIcu(tableName.c_str());
+
+				// lower case so that the lookup method dont have to worry about case sensitivity
+				uni.toLower();
 				Tables[hash].push_back(uni);				
 			}
 			Query.Close(stmt);
-			if (ret) {
+			if (!hasError) {
+
+				// getting the schema names, populate into tables for now
+				query = "SELECT schema_name FROM information_schema.schemata";
+				std::string schemaName;
+				stmt = (session.prepare << query, soci::into(schemaName));
+				stmt.execute();
+				while (Query.More(stmt, hasError, error)) {
+					UnicodeString uniSchema = mvceditor::StringHelperClass::charToIcu(schemaName.c_str());
+
+					// lower case so that the lookup method dont have to worry about case sensitivity
+					uniSchema.toLower();
+					Tables[hash].push_back(uniSchema);
+				}
+				Query.Close(stmt);
+			}
+			if (!hasError) {
 				std::string columnName;
 				
 				// only getting unique columns names for now
 				// no need to know what tables they came from since we are not yet able to
 				// auto complete properly. proper auto complete would require a proper SQL lexer and parser
 				// and its not worth it for now
-				query = "SELECT DISTINCT column_name FROM information_schema.columns WHERE table_schema=(:schema)";
+				query = "SELECT DISTINCT column_name FROM information_schema.columns WHERE table_schema IN((:schema), 'information_schema')";
 				stmt = (session.prepare << query, soci::into(columnName), soci::use(schema));
 				stmt.execute();
-				while (Query.More(stmt, ret, error)) {
+				while (Query.More(stmt, hasError, error)) {
 					UnicodeString uniColumn = mvceditor::StringHelperClass::charToIcu(columnName.c_str());
+
+					// lower case so that the lookup method dont have to worry about case sensitivity
+					uniColumn.toLower();
 					UnicodeString hash = Hash(info);
 					Columns[hash].push_back(uniColumn);
 				}
@@ -83,19 +107,23 @@ bool mvceditor::SqlResourceFinderClass::Fetch(const mvceditor::DatabaseInfoClass
 			std::sort(Columns[hash].begin(), Columns[hash].end());			
 		} 
 		catch (std::exception const& e) {
-			ret = false;
+			hasError = true;
 			error = mvceditor::StringHelperClass::charToIcu(e.what());
 		}
 	}
-	return ret;
+	return !hasError;
 }
 
 std::vector<UnicodeString> mvceditor::SqlResourceFinderClass::FindTables(const mvceditor::DatabaseInfoClass& info, const UnicodeString& partialTableName) {
 	std::vector<UnicodeString> ret;
 	UnicodeString hash = Hash(info);
 	std::vector<UnicodeString> infoTables = Tables[hash];
-	std::vector<UnicodeString>::iterator it = std::lower_bound(infoTables.begin(), infoTables.end(), partialTableName);
-	while (it != infoTables.end() && it->indexOf(partialTableName) == 0) {
+
+	// find is case insensitive
+	UnicodeString lower(partialTableName);
+	lower.toLower();
+	std::vector<UnicodeString>::iterator it = std::lower_bound(infoTables.begin(), infoTables.end(), lower);
+	while (it != infoTables.end() && it->indexOf(lower) == 0) {
 		ret.push_back(*it);
 		it++;
 	}
@@ -106,8 +134,12 @@ std::vector<UnicodeString> mvceditor::SqlResourceFinderClass::FindColumns(const 
 	std::vector<UnicodeString> ret;
 	UnicodeString hash =  Hash(info);
 	std::vector<UnicodeString> infoColumns = Columns[hash];
-	std::vector<UnicodeString>::iterator it = std::lower_bound(infoColumns.begin(), infoColumns.end(), partialColumnName);
-	while (it != infoColumns.end() && it->indexOf(partialColumnName) == 0) {
+
+	// find is case insensitive
+	UnicodeString lower(partialColumnName);
+	lower.toLower();
+	std::vector<UnicodeString>::iterator it = std::lower_bound(infoColumns.begin(), infoColumns.end(), lower);
+	while (it != infoColumns.end() && it->indexOf(lower) == 0) {
 		ret.push_back(*it);
 		it++;
 	}

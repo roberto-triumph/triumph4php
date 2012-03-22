@@ -36,10 +36,18 @@
 
 
 /**
- * A macro to reduce the code needed to check unicode strings against a known ascii-only string.
- * expected is assumed to be an ASCII string.
+ * A macro to reduce the code needed to check unicode strings against a known ascii-only string
+ * in a  case sensitive manner. expected is assumed to be an ASCII string.
  */
 #define CHECK_UNISTR_EQUALS(expected, actual) \
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE(expected), actual);
 
+
+/**
+ * A macro to reduce the code needed to check unicode strings against a known ascii-only string in
+ * a case-insensitive manner.
+ * expected is assumed to be an ASCII string.
+ */
+#define CHECK_UNISTR_EQUALS_NO_CASE(expected, actual) \
+	CHECK_EQUAL((int8_t)0, actual.caseCompare(UNICODE_STRING_SIMPLE(expected), 0));
 #endif
