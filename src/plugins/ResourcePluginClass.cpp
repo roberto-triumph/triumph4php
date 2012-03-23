@@ -476,7 +476,11 @@ void mvceditor::ResourcePluginClass::OpenFile(wxString fileName) {
 }
 
 void mvceditor::ResourcePluginClass::OnCmdProjectReIndex(wxCommandEvent& event) {
-	StartIndex();
+
+	// only index when there is a project open
+	if (!GetProject()->GetRootPath().IsEmpty()) {
+		StartIndex();
+	}
 }
 
 mvceditor::ResourcePluginPanelClass::ResourcePluginPanelClass(wxWindow* parent, ResourcePluginClass& resource)
