@@ -163,8 +163,9 @@ public:
 	/**
 	 * Builds cache for PHP native functions. After a call to this method, CollectNearMatchResources, 
 	 * GetResourceSignature methods will work for PHP native functions (array, string, file functions ...).
+	 * @return bool TRUE if native functions file exists and was able to be read
 	 */
-	void BuildResourceCacheForNativeFunctions();
+	bool BuildResourceCacheForNativeFunctions();
 	
 	/**
 	 * Parses the given string for resources.  This method would be used, for example, when wanting
@@ -615,12 +616,6 @@ private:
 	 * 
 	 */
 	bool IsCacheSorted;
-
-	/**
-	 * Flag that will signal when the resource finder is parsing a native functions file (instead of user-created
-	 * code).  This  flag will allow us to differentiate between PHP standard functions and user code.
-	 */
-	bool IsCurrentFileNative;
 	
 	/**
 	 * Goes through the given file and parses out resources.
@@ -709,6 +704,19 @@ private:
 	 * file before.
 	 */
 	bool FindInFileCache(const wxString& fullPath, int& fileItemIndex, FileItem& fileItem) const;
+
+	/**
+	 * Read all resources from the given tag file. After a call to this method,
+	 * all resources from fileName will be added the the internal resource 
+	 * cache.
+	 *
+	 * @param fileName full path to the tag file. fileName is a file that is
+	 *        in ctags format.
+	 * @param bool TRUE if the given file is the tags file for the built-in PHP functions.
+	 * @return bool TRUE if file exists and ALL of the containing tags are valid.
+	 */
+	bool LoadTagFile(const wxFileName& fileName, bool isNativeTags);
+
 };
 
 /**
@@ -814,6 +822,11 @@ public:
 	 * @return the full path where this resource is located.
 	 */
 	wxString GetFullPath() const;
+
+	/**
+	 * set all properties to empty string
+	 */
+	void Clear();
 
 private:
 

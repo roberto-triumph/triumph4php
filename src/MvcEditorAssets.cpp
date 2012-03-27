@@ -27,16 +27,12 @@
 #include <wx/image.h>
 
 wxFileName mvceditor::NativeFunctionsAsset() {
-	
-	// TODO: need to create a better native.php 
-	// instead of parsing the HTML docs parse the more-regular XML doc from SVN
-	// https://svn.php.net/repository/phpdoc/en/trunk/reference
 	wxStandardPaths paths;
 	wxFileName pathExecutableFileName(paths.GetExecutablePath());
 	wxString nativeFileName = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
 	                          wxT("..") + wxFileName::GetPathSeparator() +
 	                          wxT("resources") + wxFileName::GetPathSeparator() +
-	                          wxT("native.php");
+	                          wxT("php.tags");
 	wxFileName fileName(nativeFileName);
 	fileName.Normalize();
 	return fileName;

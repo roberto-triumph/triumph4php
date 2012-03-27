@@ -668,11 +668,22 @@ TEST_FIXTURE(ResourceFinderTestClass, CollectNearMatchResourcesShouldFindMatches
 	CHECK(ResourceFinder.CollectNearMatchResources());
 	CHECK_EQUAL((size_t)2, ResourceFinder.GetResourceMatchCount());
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("array_key_exists"), ResourceFinder.GetResourceMatch(0).Resource);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("function array_key_exists($key, $search)"), ResourceFinder.GetResourceMatch(0).Signature);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("bool function array_key_exists($key, $search)"), ResourceFinder.GetResourceMatch(0).Signature);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("bool"), ResourceFinder.GetResourceMatch(0).ReturnType);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("array_keys"), ResourceFinder.GetResourceMatch(1).Resource);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("function array_keys($input, $search_value, $strict)"), ResourceFinder.GetResourceMatch(1).Signature);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("array function array_keys($input, $search_value, $strict = false)"), ResourceFinder.GetResourceMatch(1).Signature);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("array"), ResourceFinder.GetResourceMatch(1).ReturnType);
 	CHECK(ResourceFinder.GetResourceMatch(0).IsNative);
 	CHECK(ResourceFinder.GetResourceMatch(1).IsNative);
+
+	// test a built-in object
+	CHECK(ResourceFinder.Prepare(wxT("pdo::que")));
+	CHECK(ResourceFinder.CollectNearMatchResources());
+	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("PDO::query"), ResourceFinder.GetResourceMatch(0).Resource);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("PDOStatement function query($statement, $PDO::FETCH_COLUMN, $colno, $PDO::FETCH_CLASS, $classname, $ctorargs, $PDO::FETCH_INTO, $object)"), ResourceFinder.GetResourceMatch(0).Signature);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("PDOStatement"), ResourceFinder.GetResourceMatch(0).ReturnType);
+	CHECK(ResourceFinder.GetResourceMatch(0).IsNative);
 }
 
 TEST_FIXTURE(ResourceFinderTestClass, CollectNearMatchResourcesShouldFindMatchesWhenUsingBuildResourceCacheForFile) {

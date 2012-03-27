@@ -29,7 +29,180 @@
 #include <wx/filename.h>
 #include <algorithm>
 #include <fstream>
+#include <unicode/uchar.h>
 
+/**
+ * @param resource the resource object that the parsed data will go into
+ * @param line the tag line to parse
+ */
+static bool ParseTag(mvceditor::ResourceClass& resource, UChar* line) {
+	resource.Clear();
+	bool good = false;
+
+	// summary of tag format
+	// column 1 : identifier
+	// column 2: file name  (location of tag) - currently not used because we are using tags files
+	//           for native resources, and user will never be able to jump to the native resources
+	// column 3: line number (+ VIM comment) -  currently not used because we are using tags files
+	//           for native resources, and user will never be able to jump to the native resources
+	// column 4-n: extension fields
+	UnicodeString lineString(line);
+	int32_t end = lineString.indexOf('\t');
+	if (end >= 0) {
+		resource.Identifier.setTo(lineString, 0, end);
+		end = lineString.indexOf('\t', end + 1); // file column - not used
+		end = lineString.indexOf('\t', end + 1); // vim magic column -  not used
+		UChar kind = 0;
+		UnicodeString className,
+			accessModifiers,
+			inheritance,
+			implementation,
+			signature;
+		int32_t extensionStart = end + 1;
+		int32_t extensionEnd = lineString.indexOf('\t', extensionStart);
+		UnicodeString extension;
+		if (extensionEnd > 0) {
+			extension.setTo(lineString, extensionStart, extensionEnd - extensionStart + 1);
+		}
+		else {
+			extension.setTo(lineString, extensionStart);
+		}
+		while (extensionStart > 0 && !extension.isEmpty()) {
+			int32_t colonIndex = extension.indexOf(':');
+			if (colonIndex < 0) {
+
+				// if no key, then default to 'kind' extension
+				kind = extension.charAt(0);
+			}
+			else if (extension.caseCompare(0, 5, UNICODE_STRING_SIMPLE("kind:"), 0) == 0) {
+				kind = extension.charAt(6);
+			}
+			else if (extension.caseCompare(0, 2, UNICODE_STRING_SIMPLE("k:"), 0) == 0) {
+				kind = extension.charAt(2);
+			}
+			else if (extension.caseCompare(0, 6, UNICODE_STRING_SIMPLE("class:"), 0) == 0) {
+				className.setTo(extension, colonIndex + 1);
+				className.trim();
+			}
+			else if (extension.caseCompare(0, 2, UNICODE_STRING_SIMPLE("a:"), 0) == 0) {
+				accessModifiers.setTo(extension, colonIndex + 1);
+			}
+			else if (extension.caseCompare(0, 7, UNICODE_STRING_SIMPLE("access:"), 0) == 0) {
+				accessModifiers.setTo(extension, colonIndex + 1);
+			}
+			else if (extension.caseCompare(0, 2, UNICODE_STRING_SIMPLE("i:"), 0) == 0) {
+				inheritance.setTo(extension, colonIndex + 1);
+			}
+			else if (extension.caseCompare(0, 12, UNICODE_STRING_SIMPLE("inheritance:"), 0) == 0) {
+				inheritance.setTo(extension, colonIndex + 1);
+			}
+			else if (extension.caseCompare(0, 2, UNICODE_STRING_SIMPLE("m:"), 0) == 0) {
+				implementation.setTo(extension, colonIndex + 1);
+			}
+			else if (extension.caseCompare(0, 15, UNICODE_STRING_SIMPLE("implementation:"), 0) == 0) {
+				implementation.setTo(extension, colonIndex + 1);
+			}
+			else if (extension.compare(0, 2, UNICODE_STRING_SIMPLE("S:")) == 0) {
+				signature.setTo(extension, colonIndex + 1);
+				signature.trim();
+			}
+			else if (extension.caseCompare(0, 10, UNICODE_STRING_SIMPLE("signature:"), 0) == 0) {
+				signature.setTo(extension, colonIndex + 1);
+				signature.trim();
+			}
+			if (extensionEnd > 0) {
+				extensionStart = extensionEnd + 1;
+				extensionEnd = lineString.indexOf('\t', extensionStart);
+				if (extensionEnd > 0) {
+					extension.setTo(lineString, extensionStart, extensionEnd - extensionStart + 1);
+				}
+				else {
+					extension.setTo(lineString, extensionStart);
+				}
+			}
+			else {
+				extensionStart = -1;
+			}
+		}
+		if (kind) {
+
+			// kinds
+			// c = class
+			// d = define
+			// f = function / method
+			// o = class member (constant)
+			// p = class member (variable)
+			// v = variable
+			//
+			// other extensions 
+			// a = Access (or export) of class members
+			// f = File-restricted scoping - not used
+			// i = Inheritance information
+			// k, kind = Kind of tag
+			// l Language of source file containing tag - not used
+			// m Implementation information 
+			// n Line number of tag definition - not used
+			// s Scope of tag definition - not used
+			// S Signature of routine (e.g. prototype or parameter list)
+			// t Type and name of a variable or typedef as "typeref:" field - not used
+			if ('c' == kind) {
+				resource.Resource = resource.Identifier;
+				resource.Type = mvceditor::ResourceClass::CLASS;;
+				good = true;
+			}
+			else if ('d' == kind) {
+				resource.Resource = resource.Identifier;
+				resource.Type = mvceditor::ResourceClass::DEFINE;
+				good = true;
+			}
+			else if ('f' == kind && className.isEmpty()) {
+				resource.Type = mvceditor::ResourceClass::FUNCTION;
+				resource.Resource = resource.Identifier;
+				resource.Signature.setTo(signature);
+
+				// return type is in the signature
+				int32_t index = resource.Signature.indexOf(UNICODE_STRING_SIMPLE("function"));
+				if (index > 0) {
+					resource.ReturnType.setTo(signature, 0, index);
+					resource.ReturnType.trim();
+				}
+				good = true;
+			}
+			else if ('f' == kind && !className.isEmpty()) {
+				resource.Type = mvceditor::ResourceClass::METHOD;
+				resource.Resource.setTo(className + UNICODE_STRING_SIMPLE("::") + resource.Identifier);
+				resource.Signature.setTo(signature);
+
+				// return type is in the signature
+				int32_t index = resource.Signature.indexOf(UNICODE_STRING_SIMPLE("function"));
+				if (index > 0) {
+					resource.ReturnType.setTo(signature, 0, index);
+					resource.ReturnType.trim();
+				}
+				good = true;
+			}
+			else if ('o' == kind) {
+				resource.Type = mvceditor::ResourceClass::CLASS_CONSTANT;
+				resource.Resource.setTo(className + UNICODE_STRING_SIMPLE("::") + resource.Identifier);
+				good = true;
+			}
+			else if ('p' == kind) {
+				resource.Type = mvceditor::ResourceClass::MEMBER;
+				resource.Resource.setTo(className + UNICODE_STRING_SIMPLE("::") + resource.Identifier);
+				good = true;
+			}
+			else if ('v' == kind) {
+
+				// super global variables there is no type for them...
+			}
+			resource.IsProtected = accessModifiers.indexOf(UNICODE_STRING_SIMPLE("protected")) != -1;
+
+			// class constants are always static
+			resource.IsStatic = accessModifiers.indexOf(UNICODE_STRING_SIMPLE("static")) != -1 || 'o' == kind;
+		}
+	}
+	return good;
+}
 
 mvceditor::ResourceFinderClass::ResourceFinderClass()
 	: FileFilters()
@@ -45,8 +218,7 @@ mvceditor::ResourceFinderClass::ResourceFinderClass()
 	, ResourceType(FILE_NAME)
 	, LineNumber(0)
 	, CurrentFileItemIndex(-1)
-	, IsCacheSorted(false)
-	, IsCurrentFileNative(false) {
+	, IsCacheSorted(false) {
 	Parser.SetClassObserver(this);
 	Parser.SetClassMemberObserver(this);
 	Parser.SetFunctionObserver(this);
@@ -69,8 +241,6 @@ bool mvceditor::ResourceFinderClass::Walk(const wxString& fileName) {
 			break;
 		}
 	}
-	
-	IsCurrentFileNative = file == mvceditor::NativeFunctionsAsset();
 	if (matchedFilter) {
 		switch (ResourceType) {
 			case FILE_NAME:
@@ -89,8 +259,6 @@ bool mvceditor::ResourceFinderClass::Walk(const wxString& fileName) {
 }
 
 void mvceditor::ResourceFinderClass::BuildResourceCacheForFile(const wxString& fullPath, const UnicodeString& code, bool isNew) {
-	wxFileName nativeFunctionsFile = mvceditor::NativeFunctionsAsset();
-	IsCurrentFileNative = fullPath.CmpNoCase(nativeFunctionsFile.GetFullPath()) == 0;
 
 	// remove all previous cached resources
 	int fileItemIndex = -1;
@@ -221,12 +389,13 @@ bool mvceditor::ResourceFinderClass::Prepare(const wxString& resource) {
 	return !resource.IsEmpty();
 }
 
-void mvceditor::ResourceFinderClass::BuildResourceCacheForNativeFunctions() {
+bool mvceditor::ResourceFinderClass::BuildResourceCacheForNativeFunctions() {
+	bool loaded = false;
 	wxFileName fileName = mvceditor::NativeFunctionsAsset();	
 	if (fileName.FileExists()) {
-		IsCurrentFileNative = true;
-		BuildResourceCache(fileName.GetFullPath(), true);
+		loaded = LoadTagFile(fileName, true);
 	}
+	return loaded;
 }
 
 bool mvceditor::ResourceFinderClass::CollectNearMatchResources() {
@@ -539,9 +708,6 @@ mvceditor::ResourceFinderClass::ResourceTypes mvceditor::ResourceFinderClass::Pa
 }
 
 void mvceditor::ResourceFinderClass::BuildResourceCache(const wxString& fullPath, bool parseClasses) {
-	wxFileName nativeFunctionsFile = mvceditor::NativeFunctionsAsset();
-	IsCurrentFileNative = fullPath.CmpNoCase(nativeFunctionsFile.GetFullPath()) == 0;
-
 	wxFileName fileName(fullPath);
 	wxDateTime fileLastModifiedDateTime = fileName.GetModificationTime();
 	
@@ -582,29 +748,17 @@ void mvceditor::ResourceFinderClass::BuildResourceCache(const wxString& fullPath
 	}
 }
 
-void mvceditor::ResourceFinderClass::ClassFound(const UnicodeString& rawClassName, const UnicodeString& rawSignature, 
+void mvceditor::ResourceFinderClass::ClassFound(const UnicodeString& className, const UnicodeString& signature, 
 		const UnicodeString& comment) {
-	UnicodeString filteredClassName(rawClassName);
-	UnicodeString filteredSignature(rawSignature);
-
-	// this prefix is put there by the script that builds the PHP file for the native functions
-	// the prefix is placed there so that we can run lint checks on the native functions file
-	if (rawClassName.startsWith(UNICODE_STRING_SIMPLE("mvceditornative_"))) {
-		int32_t pos = rawClassName.indexOf(UNICODE_STRING_SIMPLE("mvceditornative_"));
-		filteredClassName.setTo(rawClassName, pos + 16); // 16 = length of prefix
-	}
-	if (rawSignature.indexOf(UNICODE_STRING_SIMPLE("mvceditornative_")) >= 0) {
-		filteredSignature.findAndReplace(UNICODE_STRING_SIMPLE("mvceditornative_"), UNICODE_STRING_SIMPLE(""));
-	}
 	ResourceClass classItem;
-	classItem.Resource = filteredClassName;
-	classItem.Identifier = filteredClassName;
+	classItem.Resource = className;
+	classItem.Identifier = className;
 	classItem.Type = ResourceClass::CLASS;
 	classItem.FileItemIndex = CurrentFileItemIndex;
-	classItem.Signature = filteredSignature;
+	classItem.Signature = signature;
 	classItem.ReturnType = UNICODE_STRING_SIMPLE("");
 	classItem.Comment = comment;
-	classItem.IsNative = IsCurrentFileNative;
+	classItem.IsNative = false;
 	ResourceCache.push_back(classItem);
 }
 
@@ -618,40 +772,23 @@ void mvceditor::ResourceFinderClass::DefineDeclarationFound(const UnicodeString&
 	defineItem.Signature = variableValue;
 	defineItem.ReturnType = UNICODE_STRING_SIMPLE("");
 	defineItem.Comment = comment;
-	defineItem.IsNative = IsCurrentFileNative;
+	defineItem.IsNative = false;
 	ResourceCache.push_back(defineItem);
 }
 
-void mvceditor::ResourceFinderClass::MethodFound(const UnicodeString& rawClassName, const UnicodeString& rawMethodName,
-		const UnicodeString& rawSignature, const UnicodeString& returnType, const UnicodeString& comment,
+void mvceditor::ResourceFinderClass::MethodFound(const UnicodeString& className, const UnicodeString& methodName,
+		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 		mvceditor::TokenClass::TokenIds visibility, bool isStatic) {
-	UnicodeString filteredClassName(rawClassName);
-	UnicodeString filteredMethodName(rawMethodName);
-	UnicodeString filteredSignature(rawSignature);
-
-	// this prefix is put there by the script that builds the PHP file for the native functions
-	// the prefix is placed there so that we can run lint checks on the native functions file
-	if (rawClassName.startsWith(UNICODE_STRING_SIMPLE("mvceditornative_"))) {
-		int32_t pos = rawClassName.indexOf(UNICODE_STRING_SIMPLE("mvceditornative_"));
-		filteredClassName.setTo(rawClassName, pos + 16); // 16 = length of prefix
-	}
-	if (rawMethodName.startsWith(UNICODE_STRING_SIMPLE("mvceditornative_"))) {
-		int32_t pos = rawMethodName.indexOf(UNICODE_STRING_SIMPLE("mvceditornative_"));
-		filteredMethodName.setTo(rawMethodName, pos + 16); // 16 = length of prefix
-	}
-	if (rawSignature.indexOf(UNICODE_STRING_SIMPLE("mvceditornative_")) >= 0) {
-		filteredSignature.findAndReplace(UNICODE_STRING_SIMPLE("mvceditornative_"), UNICODE_STRING_SIMPLE(""));
-	}
 	ResourceClass item;
-	item.Resource = filteredClassName + UNICODE_STRING_SIMPLE("::") + filteredMethodName;
-	item.Identifier = filteredMethodName;
+	item.Resource = className + UNICODE_STRING_SIMPLE("::") + methodName;
+	item.Identifier = methodName;
 	item.Type = ResourceClass::METHOD;
 	item.FileItemIndex = CurrentFileItemIndex;
 	if (!returnType.isEmpty()) {
 		item.Signature = returnType + UNICODE_STRING_SIMPLE(" ");
 	}
 
-	item.Signature += filteredSignature;
+	item.Signature += signature;
 	item.ReturnType = returnType;
 	item.Comment = comment;
 	switch (visibility) {
@@ -665,7 +802,7 @@ void mvceditor::ResourceFinderClass::MethodFound(const UnicodeString& rawClassNa
 		break;
 	}
 	item.IsStatic = isStatic;
-	item.IsNative = IsCurrentFileNative;
+	item.IsNative = false;
 	MembersCache.push_back(item);
 }
 
@@ -674,17 +811,9 @@ void mvceditor::ResourceFinderClass::MethodEnd(const UnicodeString& className, c
 	// no need to do anything special when a function has ended
 }
 
-void mvceditor::ResourceFinderClass::PropertyFound(const UnicodeString& rawClassName, const UnicodeString& propertyName,
+void mvceditor::ResourceFinderClass::PropertyFound(const UnicodeString& className, const UnicodeString& propertyName,
                                         const UnicodeString& propertyType, const UnicodeString& comment, 
 										mvceditor::TokenClass::TokenIds visibility, bool isConst, bool isStatic) {
-	UnicodeString filteredClassName(rawClassName);
-
-	// this prefix is put there by the script that builds the PHP file for the native functions
-	// the prefix is placed there so that we can run lint checks on the native functions file
-	if (rawClassName.startsWith(UNICODE_STRING_SIMPLE("mvceditornative_"))) {
-		int32_t pos = rawClassName.indexOf(UNICODE_STRING_SIMPLE("mvceditornative_"));
-		filteredClassName.setTo(rawClassName, pos + 16); // 16 = length of prefix
-	}
 	UnicodeString filteredProperty(propertyName);
 	if (!isStatic) {
 
@@ -694,7 +823,7 @@ void mvceditor::ResourceFinderClass::PropertyFound(const UnicodeString& rawClass
 		filteredProperty.findAndReplace(UNICODE_STRING_SIMPLE("$"), UNICODE_STRING_SIMPLE(""));
 	}
 	ResourceClass item;
-	item.Resource = filteredClassName + UNICODE_STRING_SIMPLE("::") + filteredProperty;
+	item.Resource = className + UNICODE_STRING_SIMPLE("::") + filteredProperty;
 	item.Identifier = filteredProperty;
 	item.Type = isConst ? ResourceClass::CLASS_CONSTANT : ResourceClass::MEMBER;
 	item.FileItemIndex = CurrentFileItemIndex;
@@ -712,34 +841,21 @@ void mvceditor::ResourceFinderClass::PropertyFound(const UnicodeString& rawClass
 		break;
 	}
 	item.IsStatic = isStatic;
-	item.IsNative = IsCurrentFileNative;
+	item.IsNative = false;
 	MembersCache.push_back(item);
 }
 
-void mvceditor::ResourceFinderClass::FunctionFound(const UnicodeString& rawFunctionName, const UnicodeString& rawSignature, 
+void mvceditor::ResourceFinderClass::FunctionFound(const UnicodeString& functionName, const UnicodeString& signature, 
 		const UnicodeString& returnType, const UnicodeString& comment) {
-	UnicodeString filteredFunctionName(rawFunctionName);
-	UnicodeString filteredSignature(rawSignature);
-
-	// this prefix is put there by the script that builds the PHP file for the native functions
-	// the prefix is placed there so that we can run lint checks on the native functions file
-	if (rawFunctionName.startsWith(UNICODE_STRING_SIMPLE("mvceditornative_"))) {
-		int32_t pos = rawFunctionName.indexOf(UNICODE_STRING_SIMPLE("mvceditornative_"));
-		filteredFunctionName.setTo(rawFunctionName, pos + 16); // 16 = length of prefix
-	}
-	if (rawSignature.indexOf(UNICODE_STRING_SIMPLE("mvceditornative_")) >= 0) {
-		filteredSignature.findAndReplace(UNICODE_STRING_SIMPLE("mvceditornative_"), UNICODE_STRING_SIMPLE(""));
-	}
-
 	ResourceClass item;
-	item.Resource = filteredFunctionName;
-	item.Identifier = filteredFunctionName;
+	item.Resource = functionName;
+	item.Identifier = functionName;
 	item.Type = ResourceClass::FUNCTION;
 	item.FileItemIndex = CurrentFileItemIndex;
-	item.Signature = filteredSignature;
+	item.Signature = signature;
 	item.ReturnType = returnType;
 	item.Comment = comment;
-	item.IsNative = IsCurrentFileNative;
+	item.IsNative = false;
 	ResourceCache.push_back(item);
 }
 
@@ -928,16 +1044,7 @@ void mvceditor::ResourceFinderClass::Print() const {
 }
 
 bool mvceditor::ResourceFinderClass::IsFileCacheEmpty() const {
-	bool isEmpty = true;
-	int fileCacheSize = FileCache.size();
-	if ((size_t)1 == fileCacheSize) {
-		isEmpty = false;
-		wxString cachedFile = FileCache[0].FullPath;
-		if (cachedFile == mvceditor::NativeFunctionsAsset().GetFullPath()) {
-			isEmpty = true;
-		}
-	}
-	return isEmpty;
+	return 0 == FileCache.size();
 }
 
 bool mvceditor::ResourceFinderClass::IsResourceCacheEmpty() const {
@@ -1119,6 +1226,48 @@ void mvceditor::ResourceFinderClass::UpdateResourcesFrom(const wxString& fullPat
 			MembersCache.push_back(*it);
 		}
 	}
+}
+
+bool mvceditor::ResourceFinderClass::LoadTagFile(const wxFileName& fileName, bool isNativeTags) {
+	bool good = false;
+	UFILE* uf = u_fopen(fileName.GetFullPath().ToAscii(), "rb", NULL, NULL);
+	if (uf) {
+		UChar buffer[512];
+		mvceditor::ResourceClass res;
+		while (u_fgets(buffer, 512, uf)) {
+			if (UNICODE_STRING_SIMPLE("!_TAG_").caseCompare(buffer, 6, 0) != 0) {
+				// dont worry about whether the tags file is sorted or not,
+				// the cache will be sorted as needed.
+
+				// do an empty line check here. we want to skip empty lines
+				// but still process the rest of the file.
+				bool isEmpty = true;
+				for (int i = 0; i < u_strlen(buffer); ++i) {
+					if (!u_isWhitespace(buffer[i])) {
+						isEmpty = false;
+						break;
+					}
+				}
+				if (!isEmpty) {
+
+					// skip the comment tags and any other non-tags
+					good = ParseTag(res, buffer);
+					if (good) {
+						res.IsNative = isNativeTags;
+						if (mvceditor::ResourceClass::CLASS == res.Type || mvceditor::ResourceClass::DEFINE == res.Type ||
+							mvceditor::ResourceClass::FUNCTION == res.Type) {
+							ResourceCache.push_back(res);
+						}
+						else {
+							MembersCache.push_back(res);
+						}
+					}
+				}
+			}
+		}
+		u_fclose(uf);
+	}
+	return good;
 }
 
 void mvceditor::ResourceFinderClass::EnsureSorted() {
@@ -1308,7 +1457,6 @@ void mvceditor::ResourceFinderClass::Clear() {
 	FileCache.clear();
 	Matches.clear();
 	IsCacheSorted = false;
-	IsCurrentFileNative = false;
 }
 
 mvceditor::ResourceClass::ResourceClass()
@@ -1350,4 +1498,20 @@ bool mvceditor::ResourceClass::operator<(const mvceditor::ResourceClass& a) cons
 
 wxString mvceditor::ResourceClass::GetFullPath() const {
 	return FullPath;
+}
+
+void mvceditor::ResourceClass::Clear() {
+	Resource.remove();
+	Identifier.remove();
+	Signature.remove();
+	ReturnType.remove();
+	Comment.remove();
+	Type = CLASS;
+	FileItemIndex = -1;
+	FullPath = wxT("");
+	IsProtected = false;
+	IsPrivate = false;
+	IsStatic = false;
+	IsDynamic = false;
+	IsNative = false;
 }

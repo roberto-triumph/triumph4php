@@ -42,21 +42,6 @@ mvceditor::ResourceFileReaderClass::ResourceFileReaderClass(wxEvtHandler& handle
 	, ResourceCache(NULL) {
 }
 
-bool mvceditor::ResourceFileReaderClass::InitForNativeFunctionsFile(mvceditor::ResourceCacheClass* resourceCache) {
-	ResourceCache = resourceCache;
-	PhpFileFilters.clear();
-	wxFileName nativeFunctionsFilePath = mvceditor::NativeFunctionsAsset();
-
-	// use GetPath(); Init() needs a directory
-	if (Init(nativeFunctionsFilePath.GetPath())) {
-		
-		// need to do this so that the resource finder attempts to parse the files
-		PhpFileFilters.push_back(nativeFunctionsFilePath.GetFullName());
-		return true;
-	}
-	return false;
-}
-
 bool mvceditor::ResourceFileReaderClass::InitForProject(mvceditor::ResourceCacheClass* resourceCache, 
 														const wxString& projectRootPath, 
 														const std::vector<wxString>& phpFileFilters) {
@@ -68,6 +53,36 @@ bool mvceditor::ResourceFileReaderClass::InitForProject(mvceditor::ResourceCache
 	}
 	return false;
 }
+
+mvceditor::NativeFunctionsFileReaderClass::NativeFunctionsFileReaderClass(wxEvtHandler& handler) 
+	: ThreadWithHeartbeatClass(handler)
+	, ResourceCache(NULL)
+{
+
+}
+
+bool mvceditor::NativeFunctionsFileReaderClass::Init(mvceditor::ResourceCacheClass* resourceCache) {
+	wxFileName nativeFile = mvceditor::NativeFunctionsAsset();
+	bool good = false;
+	if (nativeFile.FileExists()) {
+		ResourceCache = resourceCache;
+		wxThreadError err = CreateSingleInstance();
+		if (err == wxTHREAD_NO_ERROR) {
+			GetThread()->Run();
+			SignalStart();
+			good = true;
+		}
+	}
+	return good;
+}
+
+void* mvceditor::NativeFunctionsFileReaderClass::Entry() {
+	ResourceCache->BuildResourceCacheForNativeFunctionsGlobal();
+	SignalEnd();
+	return 0;
+}
+
+
 
 bool mvceditor::ResourceFileReaderClass::FileRead(mvceditor::DirectorySearchClass& search) {
 	ResourceCache->WalkGlobal(search, PhpFileFilters);
@@ -97,6 +112,7 @@ mvceditor::ResourcePluginClass::ResourcePluginClass()
 	: PluginClass()
 	, JumpToText()
 	, ResourceFileReader(*this)
+	, NativeFunctionsReader(*this)
 	, ProjectIndexMenu(NULL)
 	, State(FREE) 
 	, HasCodeLookups(false)
@@ -143,7 +159,7 @@ void mvceditor::ResourcePluginClass::OnProjectOpened(wxCommandEvent& event) {
 	if (ResourceFileReader.IsRunning()) {
 		ResourceFileReader.StopReading();
 	}
-	if (ResourceFileReader.InitForNativeFunctionsFile(GetResourceCache())) {
+	if (NativeFunctionsReader.Init(GetResourceCache())) {
 		mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
 		if (ResourceFileReader.StartReading(error)) {
 			State = INDEXING_NATIVE_FUNCTIONS;
@@ -641,6 +657,7 @@ BEGIN_EVENT_TABLE(mvceditor::ResourcePluginClass, wxEvtHandler)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(wxID_ANY, mvceditor::ResourcePluginClass::OnPageChanged)
 	EVT_AUINOTEBOOK_PAGE_CLOSED(wxID_ANY, mvceditor::ResourcePluginClass::OnPageClosed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FILE_READ_COMPLETE, mvceditor::ResourcePluginClass::OnWorkComplete)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ResourcePluginClass::OnWorkComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ResourcePluginClass::OnWorkInProgress)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_OPENED, mvceditor::ResourcePluginClass::OnProjectOpened)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_RE_INDEX, mvceditor::ResourcePluginClass::OnCmdProjectReIndex)
