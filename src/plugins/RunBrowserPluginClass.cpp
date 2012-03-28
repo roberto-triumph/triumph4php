@@ -46,10 +46,9 @@ static void ExternalBrowser(const wxString& browserName, const wxURI& url, mvced
 	cmd += url.BuildURI();
 	cmd += wxT("\"");
 			
-	// TODO track this PID ... ?
-	// what about when user closes the external browser ?
-	// make the browser its own process so that it stays alive if the editor program is exited
-	// if we dont do this the browser thinks it crashed and will tell the user so
+	// dont track this PID, let the browser stay open if the editor is closed.
+	// if we dont do pass the make group leader flag the browser thinks it crashed and will tell the user 
+	// that the browser crashed. 
 	long pid = wxExecute(cmd, wxEXEC_ASYNC | wxEXEC_MAKE_GROUP_LEADER);
 	if (pid <= 0) {
 		mvceditor::EditorLogWarning(mvceditor::BAD_WEB_BROWSER_EXECUTABLE, cmd);
