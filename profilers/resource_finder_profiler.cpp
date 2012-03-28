@@ -106,11 +106,11 @@ int main() {
 		FileName = wxT("/home/roberto/workspace/mvc-editor/resources/native.php");
 		DirName = wxT("/home/roberto/workspace/sample_php_project/");
 	}
-	ProfileLexer();
-	ProfileParser();
-	ProfileParserOnLargeProject();
+	//ProfileLexer();
+	///ProfileParser();
+	///ProfileParserOnLargeProject();
 	ProfileNativeFunctionsParsing();
-	ProfileResourceFinderOnLargeProject();
+	///ProfileResourceFinderOnLargeProject();
 	
 	// calling cleanup here so that we can run this binary through a memory leak detector 
 	// ICU will cache many things and that will cause the detector to output "possible leaks"
@@ -198,14 +198,15 @@ void ProfileNativeFunctionsParsing() {
 		return;
 	}
 	wxLongLong time;
+	size_t found;
 
 	time = wxGetLocalTimeMillis();
+	resourceFinder.BuildResourceCacheForNativeFunctions();
 	resourceFinder.Prepare(wxT("stristr"));
-	resourceFinder.Walk(FileName);
 	resourceFinder.CollectNearMatchResources();
+	found = resourceFinder.GetResourceMatchCount();
 	time = wxGetLocalTimeMillis() - time;
-	size_t found = resourceFinder.GetResourceMatchCount();
-	printf("time for resourceFinder on native.php:%ld ms found:%d\n", time.ToLong(), (int)found);
+	printf("time for resourceFinder on php.tags:%ld ms found:%d\n", time.ToLong(), (int)found);
 	
 	time = wxGetLocalTimeMillis();
 	resourceFinder.Prepare(wxT("mysql_query"));
@@ -213,7 +214,7 @@ void ProfileNativeFunctionsParsing() {
 	resourceFinder.CollectNearMatchResources();
 	time = wxGetLocalTimeMillis() - time;
 	found = resourceFinder.GetResourceMatchCount();
-	printf("time for resourceFinder on native.php after caching:%ld ms found:%d\n", time.ToLong(), (int)found);
+	printf("time for resourceFinder on php.tags after caching:%ld ms found:%d\n", time.ToLong(), (int)found);
 }
 
 void ProfileResourceFinderOnLargeProject() {

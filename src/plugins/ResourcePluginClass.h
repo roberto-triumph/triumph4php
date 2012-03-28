@@ -41,9 +41,6 @@ class IndexingDialogClass;
  * This class will take care of iterating through all files in a project
  * and parsing the resources so that queries to ResourceFinderClass
  * will work.
- * We will get around concurrency problems by copying the resource finder
- * objects; this way the background thread will have its own copy without
- * needing to synchronize.
  */
 class ResourceFileReaderClass : public BackgroundFileReaderClass {
 
@@ -56,18 +53,10 @@ public:
 	ResourceFileReaderClass(wxEvtHandler& handler);
 
 	/**
-	 * prepare to iterate through the file that has the PHP native functions.
-	 *
-	 * @param resourceCache the existing resources
-	 * @return bool false if native functions file does not exist
-	 */
-	bool InitForNativeFunctionsFile(ResourceCacheClass* resourceCache);
-
-	/**
 	 * prepare to iterate through all files of the given directory
 	 * that match the given wildcard.
 	 *
-	 * @param resourceCache the existing resources
+	 * @param resourceCache the existing resources, any new resources will be added to this cache
 	 * @param projectPath the directory to be scanned (recursively)
 	 * @param phpFileFilters the list of PHP file extensions to look for resources in
 	 * @return bool false if project root path does not exist
@@ -97,6 +86,41 @@ private:
 	 * the global cache; the parsed resources will be copied to this cache object
 	 */
 	ResourceCacheClass* ResourceCache;
+};
+
+/**
+ * This class will take care of loading the php native functions assets file in 
+ * a background thread.
+ * We will get around concurrency problems by copying the resource finder
+ * objects; this way the background thread will have its own copy without
+ * needing to synchronize.
+ */
+class NativeFunctionsFileReaderClass : public ThreadWithHeartbeatClass {
+
+public:
+
+	/**
+	 * @param handler will receive EVENT_FILE_* and EVENT_WORK_* events when all 
+	 * files have been iterated through.
+	 */
+	NativeFunctionsFileReaderClass(wxEvtHandler& handler);
+
+	/**
+	 * prepare to iterate through the file that has the PHP native functions.
+	 *
+	 * @param resourceCache the existing resource cache, any new resources will be added to this cache
+	 * @return bool false if native functions file does not exist or thread could not be started
+	 */
+	bool Init(ResourceCacheClass* resourceCache);
+
+private:
+
+	/**
+	 * the global cache; the parsed resources will be copied to this cache object
+	 */
+	ResourceCacheClass* ResourceCache;
+
+	void* Entry();
 };
 	
 class ResourcePluginClass : public PluginClass {
@@ -260,6 +284,12 @@ private:
 	 * @var DirectorySearch
 	 */
 	ResourceFileReaderClass ResourceFileReader;
+
+	/**
+	 * to load the file that contains all of the PHP native functions
+	 * see mvceditor::NativeFunctionsAssets
+	 */
+	NativeFunctionsFileReaderClass NativeFunctionsReader;
 	
 	/**
 	 * The "Index project" menu item

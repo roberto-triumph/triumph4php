@@ -34,15 +34,15 @@ dofile "premake_action_soci.lua"
 -- these are the core wx widgets libraries and their Win32 dependencies (win dependencies listed first)
 WX_LIBS_DEBUG = { 
 	"winmm", "comctl32", "rpcrt4", "wsock32", "odbc32",
-	"wxmsw28ud_core", "wxbase28ud", "wxexpatd",	"wxjpegd", "wxpngd", "wxregexud", 
-	"wxtiffd","wxzlibd"
+	"wxmsw28ud_core", "wxbase28ud_net", "wxbase28ud", "wxexpatd", "wxjpegd", "wxpngd", "wxregexud", 
+	"wxtiffd", "wxzlibd"
 }
 
 -- these are the core wx widgets libraries and their Win32 dependencies (win dependencies listed first)
 WX_LIBS_RELEASE = { 
 	"winmm", "comctl32", "rpcrt4", "wsock32", "odbc32",
-	"wxmsw28u_core", "wxbase28u", "wxexpat", "wxjpeg", "wxpng", "wxregexu", 
-	"wxtiff","wxzlib"
+	"wxmsw28u_core", "wxbase28u_net", "wxbase28u", "wxexpat", "wxjpeg", "wxpng", "wxregexu", 
+	"wxtiff", "wxzlib"
 }
 
 WX_LIBS_WINDOW_DEBUG = { "wxmsw28ud_adv", "wxmsw28ud_aui", "wxmsw28ud_html" }
@@ -101,7 +101,7 @@ function wxconfiguration(config, action)
 		links { WX_LIBS_DEBUG }
 	elseif config == "Debug" and (action == "gmake" or action == "codelite") then
 		buildoptions { "`../../lib/wxWidgets-2.8.10/mvc_editor/Debug/bin/wx-config --cxxflags --debug=yes --unicode=yes`" }
-		linkoptions { "`../../lib/wxWidgets-2.8.10/mvc_editor/Debug/bin/wx-config --debug=yes --unicode=yes --libs core,base`" }
+		linkoptions { "`../../lib/wxWidgets-2.8.10/mvc_editor/Debug/bin/wx-config --debug=yes --unicode=yes --libs core,base,net`" }
 	elseif config == "Release" and action ==  "vs2008" then
 		libdirs { "$(WXWIN)/lib/vc_dll/" }
 		includedirs { "$(WXWIN)/include/", "$(WXWIN)/lib/vc_dll/mswu/" }
@@ -116,7 +116,7 @@ function wxconfiguration(config, action)
 		links { WX_LIBS_RELEASE } 
 	elseif config == "Release" and (action == "gmake" or action == "codelite") then
 		buildoptions { "`../../lib/wxWidgets-2.8.10/mvc_editor/Release/bin/wx-config --cxxflags --debug=no --unicode=yes`" }
-		linkoptions { "`../../lib/wxWidgets-2.8.10/mvc_editor/Release/bin/wx-config --debug=no --unicode=yes --libs core,base`" }
+		linkoptions { "`../../lib/wxWidgets-2.8.10/mvc_editor/Release/bin/wx-config --debug=no --unicode=yes --libs core,base,net`" }
 	end
 end
 

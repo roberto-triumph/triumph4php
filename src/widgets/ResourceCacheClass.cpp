@@ -124,6 +124,14 @@ bool mvceditor::ResourceCacheClass::WalkGlobal(mvceditor::DirectorySearchClass& 
 	return true;
 }
 
+bool mvceditor::ResourceCacheClass::BuildResourceCacheForNativeFunctionsGlobal() {
+	wxMutexLocker locker(Mutex);
+	if (!locker.IsOk()) {
+		return false;
+	}
+	return GlobalResourceFinder.BuildResourceCacheForNativeFunctions();
+}
+
 bool mvceditor::ResourceCacheClass::PersistGlobal(const wxFileName& outputFile) {
 	wxMutexLocker locker(Mutex);
 	if (!locker.IsOk()) {
@@ -301,14 +309,25 @@ void mvceditor::ResourceCacheClass::Print() {
 	
 }
 
-bool mvceditor::ResourceCacheClass::IsEmpty() {
+bool mvceditor::ResourceCacheClass::IsFileCacheEmpty() {
 	wxMutexLocker locker(Mutex);
 	if (!locker.IsOk()) {
 		return true;
 	}
-	bool isEmpty = GlobalResourceFinder.IsEmpty() && SymbolTables.empty() && Finders.empty();
+	bool isEmpty = GlobalResourceFinder.IsFileCacheEmpty();
 	return isEmpty;
 }
+
+bool mvceditor::ResourceCacheClass::IsResourceCacheEmpty() {
+	wxMutexLocker locker(Mutex);
+	if (!locker.IsOk()) {
+		return true;
+	}
+	bool isEmpty = GlobalResourceFinder.IsResourceCacheEmpty();
+	return isEmpty;
+}
+
+
 
 mvceditor::ResourceCacheUpdateThreadClass::ResourceCacheUpdateThreadClass(mvceditor::ResourceCacheClass* resourceCache, wxEvtHandler& handler, int eventId)
 	: ThreadWithHeartbeatClass(handler, eventId)

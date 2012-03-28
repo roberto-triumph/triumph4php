@@ -85,7 +85,7 @@ bool mvceditor::CallStackClass::Recurse(Errors& error) {
 		error = STACK_LIMIT;
 		return false;
 	}
-	if (ResourceCache.IsEmpty()) {
+	if (ResourceCache.IsResourceCacheEmpty()) {
 		error = EMPTY_CACHE;
 		return false;
 	}

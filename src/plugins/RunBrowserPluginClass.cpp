@@ -34,7 +34,7 @@ static const int ID_URL_GAUGE = wxNewId();
 static const size_t MAX_BROWSERS = 10;
 static const size_t MAX_URLS = 40;
 
-static void ExternalBrowser(const wxString& browserName, const wxString& url, mvceditor::EnvironmentClass* environment) {
+static void ExternalBrowser(const wxString& browserName, const wxURI& url, mvceditor::EnvironmentClass* environment) {
 	wxFileName webBrowserPath;
 	bool found = environment->FindBrowserByName(browserName, webBrowserPath);
 	if (!found || !webBrowserPath.IsOk()) {
@@ -43,7 +43,7 @@ static void ExternalBrowser(const wxString& browserName, const wxString& url, mv
 	}
 	wxString cmd = wxT("\"") + webBrowserPath.GetFullPath() + wxT("\""); 
 	cmd += wxT(" \"");
-	cmd += url;
+	cmd += url.BuildURI();
 	cmd += wxT("\"");
 			
 	// TODO track this PID ... ?
@@ -56,70 +56,164 @@ static void ExternalBrowser(const wxString& browserName, const wxString& url, mv
 	}
 }
 
-
-mvceditor::UrlChoiceClass::UrlChoiceClass(const std::vector<mvceditor::UrlResourceClass>& urls, const wxString& fileName, mvceditor::EnvironmentClass* environment)
-	: UrlList(urls)
-	, Extra() 
-	, ChosenIndex(0) {
-}
-
-mvceditor::UrlResourceClass mvceditor::UrlChoiceClass::ChosenUrl() const {
-	mvceditor::UrlResourceClass chosenUrl;
-	if ((size_t)ChosenIndex < UrlList.size()) {
-		chosenUrl = UrlList[ChosenIndex];
-		chosenUrl.Url += Extra;
-	}
-	return chosenUrl;
-}
-
-mvceditor::ChooseUrlDialogClass::ChooseUrlDialogClass(wxWindow* parent, mvceditor::UrlChoiceClass& urlChoice)
+mvceditor::ChooseUrlDialogClass::ChooseUrlDialogClass(wxWindow* parent, mvceditor::UrlResourceFinderClass& urls, mvceditor::UrlResourceClass& chosenUrl)
 	: ChooseUrlDialogGeneratedClass(parent, wxID_ANY)
-	, UrlChoice(urlChoice) {
-	for (size_t i = 0; i < UrlChoice.UrlList.size(); ++i) {
-		UrlList->Append(UrlChoice.UrlList[i].Url);
+	, UrlResourceFinder(urls)
+	, EditedUrlResourceFinder(urls) 
+	, ChosenUrl(chosenUrl) {
+	for (size_t i = 0; i < UrlResourceFinder.Urls.size(); ++i) {
+		UrlList->Append(UrlResourceFinder.Urls[i].Url.BuildURI());
 	}
-	UrlList->SetSelection(UrlChoice.ChosenIndex);
-	
-	wxGenericValidator extraValidator(&UrlChoice.Extra);
-	Extra->SetValidator(extraValidator);
+	if (UrlList->GetCount() > 0) {
+		UrlList->Select(0);
+	}
 	TransferDataToWindow();
-	
-	if (!urlChoice.UrlList.empty()) {
-		wxString label= _("Complete URL: ") + urlChoice.UrlList[0].Url;
-		CompleteLabel->SetLabel(label);
-	}
+	Filter->SetFocus();
 }
 
 void mvceditor::ChooseUrlDialogClass::OnOkButton(wxCommandEvent& event) {
 	if (Validate() && TransferDataFromWindow()) {
-		UrlChoice.ChosenIndex = UrlList->GetSelection();
+		UrlResourceFinder.ReplaceAll(EditedUrlResourceFinder);
+		int index = UrlList->GetSelection();
+		if (index >= 0) {
+			wxURI selection(UrlList->GetString(index));
+			UrlResourceFinder.FindByUrl(selection, ChosenUrl);
+		}
 		EndModal(wxOK);
 	}
 }
 
 void mvceditor::ChooseUrlDialogClass::OnListItemSelected(wxCommandEvent& event) {
-	wxString url = UrlList->GetStringSelection() + Extra->GetValue();
-	wxString label= _("Complete URL: ") + url;
-	CompleteLabel->SetLabel(label);
 	event.Skip();
 }
 
 void mvceditor::ChooseUrlDialogClass::OnText(wxCommandEvent& event) {
-	wxString url = UrlList->GetStringSelection() + Extra->GetValue();
-	wxString label= _("Complete URL: ") + url;
-	CompleteLabel->SetLabel(label);
-	event.Skip();
+	wxString filter = Filter->GetValue();
+	if (filter.IsEmpty()) {
+		
+		// empty string =  no filter show all
+		UrlList->Clear();
+		for (size_t i = 0; i < EditedUrlResourceFinder.Urls.size(); ++i) {
+			UrlList->Append(EditedUrlResourceFinder.Urls[i].Url.BuildURI());
+		}
+		if (UrlList->GetCount() > 0) {
+			UrlList->Select(0);
+		}
+	}
+	else {
+		std::vector<mvceditor::UrlResourceClass> filteredUrls;
+		EditedUrlResourceFinder.FilterUrls(filter, filteredUrls);
+
+		UrlList->Clear();
+		for (size_t i = 0; i < filteredUrls.size(); ++i) {
+			UrlList->Append(filteredUrls[i].Url.BuildURI());
+		}
+		if (UrlList->GetCount() > 0) {
+			UrlList->Select(0);
+		}
+	}
+}
+
+void mvceditor::ChooseUrlDialogClass::OnDeleteButton(wxCommandEvent& event) {
+	int selection = UrlList->GetSelection();
+	if (selection >= 0) {
+
+		// delete from the list control AND the data structure
+		wxString selectionString = UrlList->GetString(UrlList->GetSelection());
+		wxURI uri(selectionString);
+		EditedUrlResourceFinder.DeleteUrl(uri);
+		
+		UrlList->Delete(UrlList->GetSelection());
+		if (selection < (int)UrlList->GetCount()) {
+			UrlList->Select(selection);
+		}
+		else if (UrlList->GetCount() > 0) {
+			UrlList->Select(UrlList->GetCount() - 1);
+		}
+	}
+	else {
+		wxMessageBox(_("Need to select an URL to delete"));
+	}
+}
+
+void mvceditor::ChooseUrlDialogClass::OnAddButton(wxCommandEvent& event) {
+	wxString msg = _("Enter a URL. URL may have query string.\nExample: http://locahost/folder/test.php?val=1");
+	wxString url = wxGetTextFromUser(msg, _("Add URL"), wxEmptyString, this);
+	if (!url.IsEmpty()) {
+
+		// add to the list control AND the data structure
+		wxURI newUri(url);
+		bool added = EditedUrlResourceFinder.AddUniqueUrl(newUri);
+		if (!added) {
+			wxMessageBox(_("Invalid or Duplicate URL"));
+		}
+		else {
+			UrlList->AppendString(url);
+			UrlList->Select(UrlList->GetCount() - 1);
+		}
+	}
+}
+
+void mvceditor::ChooseUrlDialogClass::OnCloneButton(wxCommandEvent& event) {
+	int selection = UrlList->GetSelection();
+	if (selection >= 0) {
+		wxString selectionString = UrlList->GetString(UrlList->GetSelection());
+		wxString msg = _("Enter a URL. URL may have query string.\nExample: http://locahost/folder/test.php?val=1");
+		wxString url = wxGetTextFromUser(msg, _("Add URL"), selectionString, this);
+		if (!url.IsEmpty()) {
+
+			// add to the list control AND the data structure
+			wxURI newUri(url);
+			bool added = EditedUrlResourceFinder.AddUniqueUrl(newUri);
+			if (!added) {
+				wxMessageBox(_("Invalid or Duplicate URL"));
+			}
+			else {
+				UrlList->AppendString(url);
+				UrlList->Select(UrlList->GetCount() - 1);
+			}
+		}
+	}
+	else {
+		wxMessageBox(_("Need to select an URL to clone"));
+	}
+}
+
+void mvceditor::ChooseUrlDialogClass::OnTextEnter(wxCommandEvent& event) {
+	OnOkButton(event);	
+}
+
+void mvceditor::ChooseUrlDialogClass::OnKeyDown(wxKeyEvent& event) {
+	if (event.GetKeyCode() == WXK_DOWN && event.GetModifiers() == wxMOD_NONE) {
+		int selection = UrlList->GetSelection();
+		if (selection >= 0 && selection < (int)(UrlList->GetCount() - 1)) {
+			UrlList->SetSelection(selection  + 1);
+		}
+		Filter->SetFocus();
+	}
+	else if (event.GetKeyCode() == WXK_UP && event.GetModifiers() == wxMOD_NONE) {
+		int selection = UrlList->GetSelection();
+		if (selection > 0 && selection < (int)UrlList->GetCount()) {
+			UrlList->SetSelection(selection  - 1);
+		}
+		Filter->SetFocus();
+	}
+	else {
+		event.Skip();
+	}
 }
 
 mvceditor::RunBrowserPluginClass::RunBrowserPluginClass()
 	: PluginClass() 
+	, RecentUrls()
 	, PhpFrameworks(NULL)
 	, ResourceCacheThread(NULL)
 	, BrowserMenu(NULL)
 	, UrlMenu(NULL)
 	, ResourceCacheFileName()
 	, RunInBrowser(NULL)
-	, BrowserToolbar(NULL) {
+	, BrowserToolbar(NULL)
+	, State(FREE) {
 		
 }
 
@@ -138,11 +232,12 @@ void mvceditor::RunBrowserPluginClass::AddWindows() {
                                          wxAUI_TB_HORZ_TEXT);
     BrowserToolbar->SetToolBitmapSize(wxSize(16,16));
     wxBitmap browserBitmap = wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_OTHER, wxSize(16,16));
-	BrowserToolbar->AddTool(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, wxT("No Browsers Configured"), browserBitmap);
+	BrowserToolbar->AddTool(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, _("No Browsers Configured"), browserBitmap);
     BrowserToolbar->SetToolDropDown(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, true);
 	BrowserToolbar->AddSeparator();
-    BrowserToolbar->AddTool(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, wxT("No URLs"), browserBitmap);
+    BrowserToolbar->AddTool(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, _("No URLs"), browserBitmap);
     BrowserToolbar->SetToolDropDown(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, true);
+	BrowserToolbar->AddTool(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 1, _("Run In Web Browser"), browserBitmap);
 	BrowserToolbar->AddTool(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 4, _("Search for URLs..."), browserBitmap);
 	BrowserToolbar->SetOverflowVisible(false);
     BrowserToolbar->Realize();
@@ -196,15 +291,10 @@ void mvceditor::RunBrowserPluginClass::OnEnvironmentUpdated(wxCommandEvent& even
 	}
 }
 
-void mvceditor::RunBrowserPluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
-	wxBitmap bitmap = wxArtProvider::GetBitmap(wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16));
-	toolBar->AddTool(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 1, _("Web Browser"), bitmap, _("Run On a Web Browser"));
-}
-
 void mvceditor::RunBrowserPluginClass::OnRunInWebBrowser(wxCommandEvent& event) {
 	wxString browserName = App->UrlResourceFinder.ChosenBrowser;
-	wxString url = App->UrlResourceFinder.ChosenUrl.Url;
-	if (!browserName.IsEmpty() && !url.IsEmpty()) {
+	wxURI url = App->UrlResourceFinder.ChosenUrl.Url;
+	if (!browserName.IsEmpty() && !url.BuildURI().IsEmpty()) {
 		mvceditor::EnvironmentClass* environment = GetEnvironment();
 		ExternalBrowser(browserName, url, environment);
 	}
@@ -250,8 +340,7 @@ void mvceditor::RunBrowserPluginClass::OnUrlToolDropDown(wxAuiToolBarEvent& even
 		}
 		BrowserToolbar->SetToolSticky(event.GetId(), true);
 		
-		// create the popup menu that contains all the available URLs
-		// TODO: clear the URLs from the previously-closed projects
+		// create the popup menu that contains all the recent URLs
 		if (!UrlMenu.get()) {
 			UrlMenu.reset(new wxMenu);
 		}
@@ -260,9 +349,8 @@ void mvceditor::RunBrowserPluginClass::OnUrlToolDropDown(wxAuiToolBarEvent& even
 		}
 
 		wxBitmap bmp = wxArtProvider::GetBitmap(wxART_QUESTION, wxART_OTHER, wxSize(16,16));
-		std::vector<mvceditor::UrlResourceClass> urls = App->UrlResourceFinder.Urls;
-		for (size_t i = 0; i < urls.size() && i < MAX_URLS; ++i) {
-			wxMenuItem* menuItem =  new wxMenuItem(UrlMenu.get(), mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + i, urls[i].Url);
+		for (size_t i = 0; i < RecentUrls.size() && i < MAX_URLS; ++i) {
+			wxMenuItem* menuItem =  new wxMenuItem(UrlMenu.get(), mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + i, RecentUrls[i].Url.BuildURI());
 			menuItem->SetBitmap(bmp);
 			UrlMenu->Append(menuItem);
 		}
@@ -282,66 +370,47 @@ void mvceditor::RunBrowserPluginClass::OnUrlToolDropDown(wxAuiToolBarEvent& even
 }
 
 void mvceditor::RunBrowserPluginClass::OnUrlSearchTool(wxCommandEvent& event) {
-wxString fileName;
-	if (GetCurrentCodeControl()) {
-		fileName = GetCurrentCodeControl()->GetFileName();
-	}
-
-	// TODO: add a 'delete URL' button
-	mvceditor::UrlResourceClass chosenUrl;
-	mvceditor::EnvironmentClass* environment = GetEnvironment();
-	if (PhPFrameworks().Identifiers.empty()) {
-		if (!wxFileName::FileExists(fileName)) {
-			mvceditor::EditorLogWarning(mvceditor::INVALID_FILE, fileName);
-			return;
-		}
-
-		// turn file name into a url in the default manner (by calculating from the vhost document root)
-		wxString url = environment->Apache.GetUrl(fileName);
-		if (url.IsEmpty()) {
-			mvceditor::EditorLogWarning(mvceditor::INVALID_FILE, _("File is not under web root"));	
-			return;
-		}
-	}
 	if (!App->UrlResourceFinder.Urls.empty()) {
-		mvceditor::UrlChoiceClass urlChoice(App->UrlResourceFinder.Urls, fileName, environment);
-		mvceditor::ChooseUrlDialogClass dialog(GetMainWindow(), urlChoice);
-		if (wxOK == dialog.ShowModal()) {
-			chosenUrl = urlChoice.ChosenUrl();
-		}
+		ShowUrlDialog();
 	}
 	else {
-		
-		// no URLs means that the file can be accessed normally
-		// turn file name into a url in the default manner (by calculating from the vhost document root)
-		chosenUrl.Url = environment->Apache.GetUrl(fileName);
-		chosenUrl.FileName.Assign(fileName);
-		if (chosenUrl.Url.IsEmpty()) {
-			mvceditor::EditorLogWarning(mvceditor::INVALID_FILE, _("File is not under web root"));	
-			return;
-		}
+		// we need the resource cache; the resource cache is needed to figure out the URLs
+		// for each controller.
+		// we will trigger the project indexing, then once the project has been indexed 
+		// this plugin will kick off the URL detector, then show the URLs.
+		State = INDEXING;
+		wxCommandEvent indexEvent(mvceditor::EVENT_CMD_RE_INDEX);
+		App->EventSink.Publish(indexEvent);
 	}
-	if (!chosenUrl.Url.IsEmpty()) {
-					
-		// add to URL to the internal recent list so that the user can easily access it
-		// multiple times.
-		if (App->UrlResourceFinder.Urls.size() > MAX_URLS) {
-			App->UrlResourceFinder.Urls.pop_back();
-		}
-		mvceditor::UrlResourceClass urlResource;
-		bool found = App->UrlResourceFinder.FindByUrl(chosenUrl.Url, urlResource);
-		if (!found) {
-			App->UrlResourceFinder.Urls.push_back(chosenUrl);
-			App->UrlResourceFinder.ChosenUrl = chosenUrl;
-		}
-		else {
-			App->UrlResourceFinder.ChosenUrl = urlResource;
-		}
+}
 
+void mvceditor::RunBrowserPluginClass::ShowUrlDialog() {
+	mvceditor::ChooseUrlDialogClass dialog(GetMainWindow(), App->UrlResourceFinder, App->UrlResourceFinder.ChosenUrl);
+	if (wxOK == dialog.ShowModal() && !App->UrlResourceFinder.ChosenUrl.Url.BuildURI().IsEmpty()) {
+				
 		// 'select' the URL (make it the current in the toolbar)
-		BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, App->UrlResourceFinder.ChosenUrl.Url);
+		BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, App->UrlResourceFinder.ChosenUrl.Url.BuildURI());
 		BrowserToolbar->Realize();
 		AuiManager->Update();
+
+		// add it to the Recent list, or push up to the top of the Recent list if its already there
+		bool found = false;
+		for (std::vector<mvceditor::UrlResourceClass>::iterator it = RecentUrls.begin(); it  != RecentUrls.end(); ++it) {
+			if (it->Url == App->UrlResourceFinder.ChosenUrl.Url) {
+				found = true;
+				RecentUrls.erase(it);
+				RecentUrls.insert(RecentUrls.begin(), App->UrlResourceFinder.ChosenUrl);
+				break;
+			}
+		}
+		if (!found) {
+			RecentUrls.insert(RecentUrls.begin(), App->UrlResourceFinder.ChosenUrl);
+		}
+		mvceditor::EnvironmentClass* environment = GetEnvironment();
+		wxString browserName = App->UrlResourceFinder.ChosenBrowser;
+		if (!browserName.IsEmpty()) {
+			ExternalBrowser(browserName, App->UrlResourceFinder.ChosenUrl.Url, environment);
+		}
 	}
 }
 
@@ -351,11 +420,17 @@ void mvceditor::RunBrowserPluginClass::OnUrlDetectionComplete(mvceditor::UrlDete
 	}
 	wxRemoveFile(ResourceCacheFileName.GetFullPath());
 	GetStatusBarWithGauge()->StopGauge(ID_URL_GAUGE);
+	if (INDEXING == State) {
+		ShowUrlDialog();
+	}
+	State = FREE;
 }
 
 void mvceditor::RunBrowserPluginClass::OnUrlDetectionFailed(wxCommandEvent& event) {
 	mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, event.GetString());
 	wxRemoveFile(ResourceCacheFileName.GetFullPath());
+	GetStatusBarWithGauge()->StopGauge(ID_URL_GAUGE);
+	State = FREE;
 }
 
 void mvceditor::RunBrowserPluginClass::OnBrowserToolMenuItem(wxCommandEvent& event) {
@@ -402,7 +477,7 @@ void mvceditor::RunBrowserPluginClass::OnProjectIndexed(wxCommandEvent& event) {
 	GetStatusBarWithGauge()->AddGauge(_("URL Detection"), ID_URL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
 }
 
-void mvceditor::RunBrowserPluginClass::OnWorkComplete(wxCommandEvent& event) {
+void mvceditor::RunBrowserPluginClass::OnCacheFileWorkComplete(wxCommandEvent& event) {
 	mvceditor::EnvironmentClass* environment = GetEnvironment();
 	mvceditor::ProjectClass* project = GetProject();
 	wxString projectRootUrl =  environment->Apache.GetUrl(project->GetRootPath());
@@ -420,6 +495,22 @@ void mvceditor::RunBrowserPluginClass::OnProcessInProgress(wxCommandEvent& event
 	GetStatusBarWithGauge()->UpdateGauge(ID_URL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
 }
 
+void mvceditor::RunBrowserPluginClass::OnProjectOpened(wxCommandEvent& event) {
+	RecentUrls.clear();
+	App->UrlResourceFinder.Urls.clear();
+	App->UrlResourceFinder.ChosenUrl.Reset();
+	if (BrowserToolbar) {
+		BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, _("No URLs"));
+		BrowserToolbar->Realize();
+		AuiManager->Update();
+	}
+	if (UrlMenu.get()) {
+		while (UrlMenu->GetMenuItemCount() > 0) {
+			UrlMenu->Delete(UrlMenu->FindItemByPosition(0)->GetId());
+		}
+	}
+}
+
 BEGIN_EVENT_TABLE(mvceditor::RunBrowserPluginClass, wxEvtHandler) 
 	
 	// if the end values of the ranges need to be modified, need to modify mvceditor::PluginClass::MenuIds as well
@@ -430,11 +521,18 @@ BEGIN_EVENT_TABLE(mvceditor::RunBrowserPluginClass, wxEvtHandler)
 	EVT_AUITOOLBAR_TOOL_DROPDOWN(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, mvceditor::RunBrowserPluginClass::OnUrlToolDropDown)
 	EVT_TOOL(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 4, mvceditor::RunBrowserPluginClass::OnUrlSearchTool)
 
+	// when the cache file has been generated start the URL detection. URL detection needs the resource cache file
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::RunBrowserPluginClass::OnCacheFileWorkComplete)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::RunBrowserPluginClass::OnProcessInProgress)
+
+	// the URL detection handlers
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_URL_FAILED, mvceditor::RunBrowserPluginClass::OnUrlDetectionFailed)
 	EVT_FRAMEWORK_URL_COMPLETE(mvceditor::RunBrowserPluginClass::OnUrlDetectionComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::RunBrowserPluginClass::OnWorkComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::RunBrowserPluginClass::OnProcessInProgress)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::RunBrowserPluginClass::OnProcessInProgress)
+
+	// application events
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_ENVIRONMENT_UPDATED, mvceditor::RunBrowserPluginClass::OnEnvironmentUpdated)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_INDEXED, mvceditor::RunBrowserPluginClass::OnProjectIndexed)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_OPENED, mvceditor::RunBrowserPluginClass::OnProjectOpened)
 END_EVENT_TABLE()
