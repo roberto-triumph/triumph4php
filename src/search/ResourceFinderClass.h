@@ -282,6 +282,7 @@ public:
 	/**
 	 * @param className the class name to check
 	 * @return all of the classes that the given class inherits from (parent, grandparent, and all the way up).
+	 * Note that only "extended" classes will be returned; interfaces will NOT be returned.
 	 */
 	std::vector<UnicodeString> ClassHierarchy(const UnicodeString& className) const;
 	

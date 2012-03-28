@@ -593,7 +593,8 @@ std::vector<UnicodeString> mvceditor::ResourceFinderClass::ClassHierarchy(const 
 		for (std::list<ResourceClass>::const_iterator it = ResourceCache.begin(); it != ResourceCache.end(); ++it) {
 			if (it->Type == ResourceClass::CLASS && 0 == it->Resource.caseCompare(lastClassName, 0) && it->Signature.length()) {
 
-				// TODO include interface names in this list??
+				// wont include interface names in this list, since it is very likely that the same function
+				// is actually implemented and we want to jump to the implementation instead
 				int32_t extendsPos = it->Signature.indexOf(UNICODE_STRING_SIMPLE("extends "));
 				if (extendsPos >= 0) {
 					lastClassName = ExtractParentClassFromSignature(it->Signature);
