@@ -24,7 +24,6 @@
  */
 #include <search/FindInFilesClass.h>
 #include <search/DirectorySearchClass.h>
-#include <search/ResourceFinderClass.h>
 #include <wx/filefn.h>
 #include <wx/timer.h>
 #include <unicode/uclean.h>

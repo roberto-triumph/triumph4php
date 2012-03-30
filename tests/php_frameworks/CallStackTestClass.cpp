@@ -104,7 +104,9 @@ TEST_FIXTURE(CallStackFixtureTestClass, FailOnParseError) {
 	wxFileName file(TestProjectDir + wxT("news.php"));
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
 	CHECK_EQUAL(false, CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), error));
-	CHECK_EQUAL(file.GetFullPath(), CallStack.LintResults.File);
+
+	std::string expected = file.GetFullPath().ToAscii();
+	CHECK_EQUAL(expected, CallStack.LintResults.File);
 	CHECK_EQUAL(mvceditor::CallStackClass::PARSE_ERR0R, error);
 }	
 
@@ -170,9 +172,9 @@ TEST_FIXTURE(CallStackFixtureTestClass, SimpleMethodCall) {
 	CHECK_UNISTR_EQUALS("CI_Loader::view", CallStack.List[0].Resource.Resource);
 	CHECK_VECTOR_SIZE(2, CallStack.List[0].Arguments);
 	CHECK_UNISTR_EQUALS("index", CallStack.List[0].Arguments[0].Lexeme);
-	CHECK_EQUAL(mvceditor::ExpressionClass::SCALAR, CallStack.List[0].Arguments[0].Type);
+	CHECK_EQUAL(pelet::ExpressionClass::SCALAR, CallStack.List[0].Arguments[0].Type);
 	CHECK_UNISTR_EQUALS("$data", CallStack.List[0].Arguments[1].Lexeme);
-	CHECK_EQUAL(mvceditor::ExpressionClass::VARIABLE, CallStack.List[0].Arguments[1].Type);
+	CHECK_EQUAL(pelet::ExpressionClass::VARIABLE, CallStack.List[0].Arguments[1].Type);
 }
 
 TEST_FIXTURE(CallStackFixtureTestClass, Persist) {

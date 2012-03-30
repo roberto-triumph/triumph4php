@@ -25,8 +25,8 @@
 #ifndef __symboltable__
 #define __symboltable__
 
-#include <language/ParserClass.h>
-#include <language/ParserObserverClass.h>
+#include <pelet/ParserClass.h>
+#include <pelet/ParserObserverClass.h>
 #include <search/ResourceFinderClass.h>
 #include <unicode/unistr.h>
 #include <map>
@@ -149,7 +149,7 @@ public:
 	 * @param parsedExpression the expression that was attempted
 	 * @param className the name of the class that was searched
 	 */
-	void ToVisibility(const SymbolClass& parsedExpression, const UnicodeString& className);
+	void ToVisibility(const pelet::SymbolClass& parsedExpression, const UnicodeString& className);
 
 	/**
 	 * @param className the class name that was attempted
@@ -173,7 +173,7 @@ public:
 	 * @param parsedExpression the expression that was attempted
 	 * @param className the name of the class that was searched
 	 */
-	void ToUnknownResource(const SymbolClass& parsedExpression, const UnicodeString& className);
+	void ToUnknownResource(const pelet::SymbolClass& parsedExpression, const UnicodeString& className);
 
 };
 
@@ -185,7 +185,11 @@ public:
  *     PHP casts transparently.
  * 
  */
-class SymbolTableClass : public ClassObserverClass, ClassMemberObserverClass, FunctionObserverClass, VariableObserverClass {
+class SymbolTableClass : 
+	public pelet::ClassObserverClass, 
+	public pelet::ClassMemberObserverClass, 
+	public pelet::FunctionObserverClass, 
+	public pelet::VariableObserverClass {
 
 public:
 	SymbolTableClass();
@@ -244,7 +248,7 @@ public:
 	 *        slower because ResourceFinderClass still handles them
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear() )
 	 */
-	void ExpressionCompletionMatches(const SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
+	void ExpressionCompletionMatches(const pelet::SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
 		const std::map<wxString, ResourceFinderClass*>& openedResourceFinders,
 		mvceditor::ResourceFinderClass* globalResourceFinder,
 		std::vector<UnicodeString>& autoCompleteVariableList,
@@ -280,7 +284,7 @@ public:
 	 *        slower because ResourceFinderClass still handles them
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
-	void ResourceMatches(const SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
+	void ResourceMatches(const pelet::SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
 		const std::map<wxString, ResourceFinderClass*>& openedResourceFinders,
 		mvceditor::ResourceFinderClass* globalResourceFinder,
 		std::vector<ResourceClass>& resourceMatches,
@@ -293,60 +297,64 @@ public:
 	void Print() const;
 		
 	void ClassFound(const UnicodeString& className, const UnicodeString& signature, 
-		const UnicodeString& comment);
+		const UnicodeString& comment, const int lineNumber);
 
 	void DefineDeclarationFound(const UnicodeString& variableName, const UnicodeString& variableValue, 
-			const UnicodeString& comment);
+			const UnicodeString& comment, const int lineNumber);
+
+	void IncludeFound(const UnicodeString& include, const int lineNumber);
 	
 	void MethodFound(const UnicodeString& className, const UnicodeString& methodName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
-		TokenClass::TokenIds visibility, bool isStatic);
+		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber);
 
 	void MethodEnd(const UnicodeString& className, const UnicodeString& methodName, int pos);
 	
 	void PropertyFound(const UnicodeString& className, const UnicodeString& propertyName, 
 		const UnicodeString& propertyType, const UnicodeString& comment, 
-		TokenClass::TokenIds visibility, bool isConst, bool isStatic);
+		pelet::TokenClass::TokenIds visibility, bool isConst, bool isStatic, const int lineNumber);
 	
 	virtual void FunctionFound(const UnicodeString& functionName, 
-		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment);
+		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
+		const int lineNumber);
 
 	void FunctionEnd(const UnicodeString& functionName, int pos);
 		
 	void VariableFound(const UnicodeString& className, const UnicodeString& methodName, 
-		const SymbolClass& symbol, const UnicodeString& comment);
+		const pelet::SymbolClass& symbol, const UnicodeString& comment);
+
 private:
 
 	/**
 	 * Get the vector of variables for the given scope. If scope does not exist it will
 	 * be created.
 	 * 
-	 * @return std::vector<SymbolClass>&
+	 * @return std::vector<pelet::SymbolClass>&
 	 */
-	std::vector<SymbolClass>& GetScope(const UnicodeString& className, const UnicodeString& functionName);
+	std::vector<pelet::SymbolClass>& GetScope(const UnicodeString& className, const UnicodeString& functionName);
 
 	/**
 	 * 	Add the super global PHP predefined variables into the given scope.  For example  $_GET, $_POST, ....
 	 * 
-	 *  @param vector<SymbolClass>& scope the scope list
+	 *  @param vector<pelet::SymbolClass>& scope the scope list
 	 */
-	void CreatePredefinedVariables(std::vector<SymbolClass>& scope);
+	void CreatePredefinedVariables(std::vector<pelet::SymbolClass>& scope);
 
 	/**
 	 * The parser.
 	 * 
-	 * @var ParserClass
+	 * @var pelet::ParserClass
 	 */
-	ParserClass Parser;
+	pelet::ParserClass Parser;	
 	
 	/**
 	 * Holds all variables for the currently parsed piece of code. Each vector will represent its own scope.
 	 * The key will be the scope name.  The scope name is a combination of the class, method name. 
 	 * The scope string is that which is returned by ScopeString() method.
 	 * The value is the parsed Symbol.
-	 * @var std::map<UnicodeString, vector<SymbolClass>>
+	 * @var std::map<UnicodeString, vector<pelet::SymbolClass>>
 	 */
-	std::map<UnicodeString, std::vector<SymbolClass>, UnicodeStringComparatorClass> Variables;
+	std::map<UnicodeString, std::vector<pelet::SymbolClass>, UnicodeStringComparatorClass> Variables;
 
 };
 
@@ -366,7 +374,10 @@ bool IsResourceDirty(const std::map<wxString, ResourceFinderClass*>& finders,
 											 const ResourceClass& resource, 
 											 mvceditor::ResourceFinderClass* resourceFinder);
 
-class ScopeFinderClass : public ClassObserverClass, ClassMemberObserverClass, FunctionObserverClass {
+class ScopeFinderClass : 
+	public pelet::ClassObserverClass, 
+	public pelet::ClassMemberObserverClass, 
+	public pelet::FunctionObserverClass {
 	
 public:
 
@@ -382,23 +393,26 @@ public:
 	UnicodeString GetScopeString(const UnicodeString& code, int pos);
 		
 	void ClassFound(const UnicodeString& className, const UnicodeString& signature, 
-		const UnicodeString& comment);
+		const UnicodeString& comment, const int lineNumber);
 
 	void DefineDeclarationFound(const UnicodeString& variableName, const UnicodeString& variableValue, 
-			const UnicodeString& comment);
+			const UnicodeString& comment, const int lineNumber);
+
+	void IncludeFound(const UnicodeString& include, const int lineNumber);
 	
 	void MethodFound(const UnicodeString& className, const UnicodeString& methodName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
-		TokenClass::TokenIds visibility, bool isStatic);
+		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber);
 	
 	void MethodEnd(const UnicodeString& className, const UnicodeString& methodName, int pos);
 	
 	void PropertyFound(const UnicodeString& className, const UnicodeString& propertyName, 
 		const UnicodeString& propertyType, const UnicodeString& comment, 
-		TokenClass::TokenIds visibility, bool isConst, bool isStatic);
+		pelet::TokenClass::TokenIds visibility, bool isConst, bool isStatic, const int lineNumber);
 	
 	void FunctionFound(const UnicodeString& functionName, 
-		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment);
+		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
+		const int lineNumber);
 		
 	void FunctionEnd(const UnicodeString& functionName, int pos);
 		
@@ -424,9 +438,9 @@ private:
 	/**
 	 * The parser.
 	 * 
-	 * @var ParserClass
+	 * @var pelet::ParserClass
 	 */
-	ParserClass Parser;
+	pelet::ParserClass Parser;
 };
 
 }

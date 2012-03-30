@@ -276,7 +276,7 @@ void mvceditor::ResourceFinderClass::BuildResourceCacheForFile(const wxString& f
 	CurrentFileItemIndex = fileItemIndex;
 	
 	// for now silently ignore parse errors
-	mvceditor::LintResultsClass results;
+	pelet::LintResultsClass results;
 	Parser.ScanString(code, results);
 	IsCacheSorted = false;
 }
@@ -741,15 +741,18 @@ void mvceditor::ResourceFinderClass::BuildResourceCache(const wxString& fullPath
 			CurrentFileItemIndex = fileItemIndex;
 			
 			// for now silently ignore files with parser errors
-			mvceditor::LintResultsClass lintResults;
-			Parser.ScanFile(fullPath, lintResults);
+			pelet::LintResultsClass lintResults;
+
+			// TODO: this is not correct
+			std::string stdFile = fullPath.ToAscii();
+			Parser.ScanFile(stdFile, lintResults);
 			IsCacheSorted = false;
 		}
 	}
 }
 
 void mvceditor::ResourceFinderClass::ClassFound(const UnicodeString& className, const UnicodeString& signature, 
-		const UnicodeString& comment) {
+		const UnicodeString& comment, const int lineNumber) {
 	ResourceClass classItem;
 	classItem.Resource = className;
 	classItem.Identifier = className;
@@ -763,7 +766,7 @@ void mvceditor::ResourceFinderClass::ClassFound(const UnicodeString& className, 
 }
 
 void mvceditor::ResourceFinderClass::DefineDeclarationFound(const UnicodeString& variableName, 
-		const UnicodeString& variableValue, const UnicodeString& comment) {
+		const UnicodeString& variableValue, const UnicodeString& comment, const int lineNumber) {
 	ResourceClass defineItem;
 	defineItem.Resource = variableName;
 	defineItem.Identifier = variableName;
@@ -778,7 +781,7 @@ void mvceditor::ResourceFinderClass::DefineDeclarationFound(const UnicodeString&
 
 void mvceditor::ResourceFinderClass::MethodFound(const UnicodeString& className, const UnicodeString& methodName,
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
-		mvceditor::TokenClass::TokenIds visibility, bool isStatic) {
+		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber) {
 	ResourceClass item;
 	item.Resource = className + UNICODE_STRING_SIMPLE("::") + methodName;
 	item.Identifier = methodName;
@@ -792,10 +795,10 @@ void mvceditor::ResourceFinderClass::MethodFound(const UnicodeString& className,
 	item.ReturnType = returnType;
 	item.Comment = comment;
 	switch (visibility) {
-	case mvceditor::TokenClass::PROTECTED:
+	case pelet::TokenClass::PROTECTED:
 		item.IsProtected = true;
 		break;
-	case mvceditor::TokenClass::PRIVATE:
+	case pelet::TokenClass::PRIVATE:
 		item.IsPrivate = true;
 		break;
 	default:
@@ -813,7 +816,8 @@ void mvceditor::ResourceFinderClass::MethodEnd(const UnicodeString& className, c
 
 void mvceditor::ResourceFinderClass::PropertyFound(const UnicodeString& className, const UnicodeString& propertyName,
                                         const UnicodeString& propertyType, const UnicodeString& comment, 
-										mvceditor::TokenClass::TokenIds visibility, bool isConst, bool isStatic) {
+										pelet::TokenClass::TokenIds visibility, bool isConst, bool isStatic,
+										const int lineNumber) {
 	UnicodeString filteredProperty(propertyName);
 	if (!isStatic) {
 
@@ -831,10 +835,10 @@ void mvceditor::ResourceFinderClass::PropertyFound(const UnicodeString& classNam
 	item.ReturnType = propertyType;
 	item.Comment = comment;
 	switch (visibility) {
-	case mvceditor::TokenClass::PROTECTED:
+	case pelet::TokenClass::PROTECTED:
 		item.IsProtected = true;
 		break;
-	case mvceditor::TokenClass::PRIVATE:
+	case pelet::TokenClass::PRIVATE:
 		item.IsPrivate = true;
 		break;
 	default:
@@ -846,7 +850,7 @@ void mvceditor::ResourceFinderClass::PropertyFound(const UnicodeString& classNam
 }
 
 void mvceditor::ResourceFinderClass::FunctionFound(const UnicodeString& functionName, const UnicodeString& signature, 
-		const UnicodeString& returnType, const UnicodeString& comment) {
+		const UnicodeString& returnType, const UnicodeString& comment, const int lineNumber) {
 	ResourceClass item;
 	item.Resource = functionName;
 	item.Identifier = functionName;
@@ -862,6 +866,11 @@ void mvceditor::ResourceFinderClass::FunctionFound(const UnicodeString& function
 void mvceditor::ResourceFinderClass::FunctionEnd(const UnicodeString& functionName, int pos) {
 	
 	// no need to do anything special when a function has ended
+}
+
+void mvceditor::ResourceFinderClass::IncludeFound(const UnicodeString& file, const int lineNumber) {
+
+	// no need to do anything special when a include statement has been found
 }
 
 int mvceditor::ResourceFinderClass::GetLineCountFromFile(const wxString& fullPath) const {
