@@ -26,9 +26,9 @@
 #define __MVCEDITOR_DOCUMENTCLASS_H__
 
 #include <php_frameworks/ProjectClass.h>
-#include <language/LexicalAnalyzerClass.h>
-#include <language/ParserClass.h>
-#include <language/LanguageDiscoveryClass.h>
+#include <pelet/LexicalAnalyzerClass.h>
+#include <pelet/ParserClass.h>
+#include <pelet/LanguageDiscoveryClass.h>
 #include <language/SymbolTableClass.h>
 #include <widgets/ResourceCacheClass.h>
 
@@ -231,14 +231,14 @@ private:
 	* @param completeStatus a bit of text that will help the user understand
 	*        why the complete box did not populate.
 	*/
-	void HandleAutoCompletionHtml(const UnicodeString& word, mvceditor::LanguageDiscoveryClass::Syntax syntax,
+	void HandleAutoCompletionHtml(const UnicodeString& word, pelet::LanguageDiscoveryClass::Syntax syntax,
 		wxString& completeStatus);
 
 	/**
 	 * Fills completeStatus with a human-friendly version of the symbol table error
 	 */
 	void HandleAutoCompletionPhpStatus(const SymbolTableMatchErrorClass& error, 
-		const UnicodeString& lastExpression, const SymbolClass& parsedExpression,
+		const UnicodeString& lastExpression, const pelet::SymbolClass& parsedExpression,
 		const UnicodeString& expressionScope, wxString& completeStatus);
 
 	/**
@@ -292,19 +292,19 @@ private:
 	 * In order to show the proper auto complete keywords we must know what language is
 	 * being edited at any given position.  This class will help in this regard.
 	 */
-	mvceditor::LanguageDiscoveryClass LanguageDiscovery;
+	pelet::LanguageDiscoveryClass LanguageDiscovery;
 
 	/**
 	* To parse a code snippet to make it suitable for code completion
-	* @var ParserClass
+	* @var pelet::ParserClass
 	*/
-	ParserClass Parser;
+	pelet::ParserClass Parser;
 
 	/**
 	 * To get the last expression in the source code
-	 * @var LexicalAnalyzerClass
+	 * @var pelet::LexicalAnalyzerClass
 	 */
-	LexicalAnalyzerClass Lexer;
+	pelet::LexicalAnalyzerClass Lexer;
 
 	/**
 	 * This will be used to find the scope of any position in a piece of PHP code

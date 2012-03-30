@@ -267,7 +267,7 @@ public:
 	 * The markes will stay forever; to remove the markers
 	 * we must explicitly call MarkerDelete to remove the markers.
 	 */
-	void MarkLintError(const LintResultsClass& result);
+	void MarkLintError(const pelet::LintResultsClass& result);
 
 	/**
 	 * Remove any and all markings caused by rendering the parse

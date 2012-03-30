@@ -197,7 +197,7 @@ public:
 	 *        slower because ResourceFinderClass still handles them
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
-	void ExpressionCompletionMatches(const wxString& fileName, const SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
+	void ExpressionCompletionMatches(const wxString& fileName, const pelet::SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
 		std::vector<UnicodeString>& autoCompleteList,
 		std::vector<ResourceClass>& autoCompleteResourceList,
 		bool doDuckTyping,
@@ -217,7 +217,7 @@ public:
 	 *        slower because ResourceFinderClass still handles them
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
-	void ResourceMatches(const wxString& fileName, const SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
+	void ResourceMatches(const wxString& fileName, const pelet::SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
 		std::vector<ResourceClass>& matches,
 		bool doDuckTyping,
 		SymbolTableMatchErrorClass& error);

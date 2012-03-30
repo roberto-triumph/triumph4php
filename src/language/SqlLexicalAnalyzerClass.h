@@ -25,7 +25,7 @@
 #ifndef __SQLLEXICALANALYERCLASS_H__
 #define __SQLLEXICALANALYERCLASS_H__
 
-#include <language/UCharBufferedFileClass.h>
+#include <pelet/UCharBufferedFileClass.h>
 #include <unicode/unistr.h>
 
 namespace mvceditor {
@@ -132,7 +132,7 @@ public:
 	/**
 	 * The buffer that will hold the SQL queries.
 	 */
-	UCharBufferClass Buffer;
+	pelet::UCharBufferClass Buffer;
 	
 	/**
 	 * The starting line number of the current query that was returned by NextQuery()

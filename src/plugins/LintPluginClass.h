@@ -38,7 +38,7 @@ namespace mvceditor {
 /**
  * This event will get dispatched when a lint (syntax) error is encountered.  It will
  * be filled with the following info:
- * event.getClientData(): this is a pointer to a mvceditor::LintResultsClass instance.  
+ * event.getClientData(): this is a pointer to a pelet::LintResultsClass instance.  
  * the event handler MUST delete the pointer!
  */
 const wxEventType EVENT_LINT_ERROR = wxNewEventType();
@@ -75,7 +75,7 @@ public:
 	 * The last parsing results.
 	 * 
 	 */
-	LintResultsClass LastResults;
+	pelet::LintResultsClass LastResults;
 	
 	/**
 	 * Running count of files that had parse errors.
@@ -89,7 +89,7 @@ public:
 	
 private:
 
-	mvceditor::ParserClass Parser;
+	pelet::ParserClass Parser;
 
 	/**
 	 * The file extensions we want to attempt to parse.
@@ -207,7 +207,7 @@ class LintResultsPanelClass : public LintResultsGeneratedPanelClass {
 	
 public:
 
-	LintResultsPanelClass(wxWindow *parent, int id, NotebookClass* notebook, std::vector<LintResultsClass*>& lintErrors);
+	LintResultsPanelClass(wxWindow *parent, int id, NotebookClass* notebook, std::vector<pelet::LintResultsClass*>& lintErrors);
 
 	~LintResultsPanelClass();
 	
@@ -215,7 +215,7 @@ public:
 	 * adds to the list box widget AND the parseResults data structure
 	 * This object will own the given pointer (will delete it).
 	 */
-	void AddError(LintResultsClass* lintError);
+	void AddError(pelet::LintResultsClass* lintError);
 	
 	/**
 	 * deletes from the list box widget AND the parseResults data structure
@@ -259,7 +259,7 @@ private:
 
 	NotebookClass* Notebook;
 
-	std::vector<LintResultsClass*>& LintErrors;
+	std::vector<pelet::LintResultsClass*>& LintErrors;
 };
 
 /**
@@ -325,7 +325,7 @@ private:
 	 * the pointers themselves as well and will delete them when they
 	 * are no longer needed.
 	 */
-	std::vector<mvceditor::LintResultsClass*>LintErrors;
+	std::vector<pelet::LintResultsClass*>LintErrors;
 	
 	DECLARE_EVENT_TABLE()
 };

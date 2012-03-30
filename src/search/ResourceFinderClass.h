@@ -27,8 +27,8 @@
 
 #include <search/DirectorySearchClass.h>
 #include <search/FindInFilesClass.h>
-#include <language/LexicalAnalyzerClass.h>
-#include <language/ParserClass.h>
+#include <pelet/LexicalAnalyzerClass.h>
+#include <pelet/ParserClass.h>
 #include <wx/datetime.h>
 #include <wx/string.h>
 #include <wx/filename.h>
@@ -95,7 +95,9 @@ class ResourceClass;
  * </code>
  * 
  */
-class ResourceFinderClass : public ClassObserverClass, public ClassMemberObserverClass, public FunctionObserverClass, 
+class ResourceFinderClass : public pelet::ClassObserverClass, 
+	public pelet::ClassMemberObserverClass, 
+	public pelet::FunctionObserverClass, 
 	public DirectoryWalkerClass {
 
 public:
@@ -353,20 +355,20 @@ public:
 	 * Implement class observer.  When a class has been parsed, add it to the Resource Cache.
 	 */
 	void ClassFound(const UnicodeString& className, const UnicodeString& signature, 
-		const UnicodeString& comment);
+		const UnicodeString& comment, const int lineNumber);
 
 	/**
 	 * When a define has been found, add it to the resource cache
 	 */
 	void DefineDeclarationFound(const UnicodeString& variableName, const UnicodeString& variableValue, 
-			const UnicodeString& comment);
+			const UnicodeString& comment, const int lineNumber);
 	
 	/**
 	 * Implement class member observer.  When a class method has been parsed, add it to the Resource Cache.
 	 */
 	void MethodFound(const UnicodeString& className, const UnicodeString& methodName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
-		TokenClass::TokenIds visibility, bool isStatic);
+		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber);
 
 	void MethodEnd(const UnicodeString& className, const UnicodeString& methodName, int pos);
  
@@ -375,15 +377,17 @@ public:
 	 */
 	void PropertyFound(const UnicodeString& className, const UnicodeString& propertyName, 
 		const UnicodeString& propertyType, const UnicodeString& comment, 
-		TokenClass::TokenIds visibility, bool isConst, bool isStatic);
+		pelet::TokenClass::TokenIds visibility, bool isConst, bool isStatic, const int lineNumber);
 		
 	/**
 	 * Implement function observer.  When a function has been parsed, add it to the Resource Cache.
 	 */
 	void FunctionFound(const UnicodeString& methodName, 
-		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment);
+		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment, const int lineNumber);
 
 	void FunctionEnd(const UnicodeString& functionName, int pos);
+
+	void IncludeFound(const UnicodeString& file, const int lineNumber);
 		
 	/**
 	 * Print the resource cache to stdout.  Useful for debugging only.
@@ -559,16 +563,16 @@ private:
 	/**
 	 * Used to parse through code for classes & methods
 	 * 
-	 * @var LexicalAnalyzerClass 
+	 * @var pelet::LexicalAnalyzerClass 
 	 */
-	LexicalAnalyzerClass Lexer;
+	pelet::LexicalAnalyzerClass Lexer;
 	
 	/**
 	 * Used to parse through code for classes & methods
 	 * 
-	 * @var ParserClass
+	 * @var pelet::ParserClass
 	 */
-	ParserClass Parser;
+	pelet::ParserClass Parser;
 	
 	/**
 	 * the file name parsed from resource string 
