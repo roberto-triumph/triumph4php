@@ -725,7 +725,10 @@ mvceditor::SqlBrowserPanelClass* mvceditor::SqlBrowserPluginClass::CreateResults
 	mvceditor::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxNewId(), GetStatusBarWithGauge(), query, this);
 	mvceditor::NotebookClass* codeNotebook = GetNotebook();
 	wxString tabText = codeNotebook->GetPageText(codeNotebook->GetPageIndex(codeControl));
-	AddToolsWindow(sqlPanel, tabText);
+
+	// name the windows, since there could be multiple windows from various plugins; we want to know which opened tools windows
+	// are from this plugin
+	AddToolsWindow(sqlPanel, tabText, wxT("mvceditor::SqlBrowserPanelClass"));
 	sqlPanel->LinkToCodeControl(codeControl);
 	return sqlPanel;
 }
@@ -739,14 +742,20 @@ void mvceditor::SqlBrowserPluginClass::OnRun(wxCommandEvent& event) {
 		bool found = false;
 		for (size_t i = 0; i < notebook->GetPageCount(); i++) {
 			wxWindow* window = notebook->GetPage(i);
-			mvceditor::SqlBrowserPanelClass* panel = wxDynamicCast(window, mvceditor::SqlBrowserPanelClass);
-			if (panel && panel->IsLinkedToCodeControl(ctrl)) {
+
+			// only cast when we are sure of the type of window
+			// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
+			// methods
+			if (window->GetName() == wxT("mvceditor::SqlBrowserPanelClass")) {
+				mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)window;
+				if (panel->IsLinkedToCodeControl(ctrl)) {
 				
-				// we found the panel bring it to the forefront and run the query
-				found = true;
-				SetFocusToToolsWindow(window);
-				panel->Execute();
-				break;
+					// we found the panel bring it to the forefront and run the query
+					found = true;
+					SetFocusToToolsWindow(window);
+					panel->Execute();
+					break;
+				}
 			}
 		}
 		if (!found) {
@@ -764,8 +773,6 @@ void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event
 	// before, a user would not be able to edit the connection info once it was detected
 	// in order to make it less confusing about where the connection info comes from.
 	mvceditor::SqlConnectionDialogClass dialog(GetMainWindow(), Infos, ChosenIndex);
-
-	// TODO: sometimes the editor crashes when the user test a connection then closes the test dialog
 	if (dialog.ShowModal() == wxOK) {
 		
 		// if chosen connection changed need to update the code control so that it knows to use the new
@@ -774,8 +781,12 @@ void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event
 		wxAuiNotebook* notebook = GetToolsNotebook();
 		for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
 			wxWindow* window = notebook->GetPage(i);
-			mvceditor::SqlBrowserPanelClass* panel = wxDynamicCast(window, mvceditor::SqlBrowserPanelClass);
-			if (panel) {
+			
+			// only cast when we are sure of the type of window
+			// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
+			// methods
+			if (window->GetName() == wxT("mvceditor::SqlBrowserPanelClass")) {
+				mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)window;
 				if (ChosenIndex < Infos.size()) {
 					panel->SetCurrentInfo(Infos[ChosenIndex]);
 				}
@@ -800,12 +811,18 @@ void mvceditor::SqlBrowserPluginClass::OnContentNotebookPageChanged(wxAuiNoteboo
 			wxAuiNotebook* notebook = GetToolsNotebook();
 			for (size_t i = 0; i < notebook->GetPageCount(); i++) {
 				wxWindow* toolsWindow = notebook->GetPage(i);
-				mvceditor::SqlBrowserPanelClass* panel = wxDynamicCast(toolsWindow, mvceditor::SqlBrowserPanelClass);
-				if (panel && panel->IsLinkedToCodeControl(contentWindow)) {
-					
-					// we found the panel bring it to the forefront and run the query
-					SetFocusToToolsWindow(toolsWindow);
-					break;
+
+				// only cast when we are sure of the type of window
+				// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
+				// methods
+				if (toolsWindow->GetName() == wxT("mvceditor::SqlBrowserPanelClass")) {
+					mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)toolsWindow;
+					if (panel->IsLinkedToCodeControl(contentWindow)) {
+						
+						// we found the panel bring it to the forefront and run the query
+						SetFocusToToolsWindow(toolsWindow);
+						break;
+					}
 				}
 			}
 		}
@@ -820,9 +837,15 @@ void mvceditor::SqlBrowserPluginClass::OnContentNotebookPageClose(wxAuiNotebookE
 			wxAuiNotebook* notebook = GetToolsNotebook();
 			for (size_t i = 0; i < notebook->GetPageCount(); i++) {
 				wxWindow* toolsWindow = notebook->GetPage(i);
-				mvceditor::SqlBrowserPanelClass* panel = wxDynamicCast(toolsWindow, mvceditor::SqlBrowserPanelClass);
-				if (panel && panel->IsLinkedToCodeControl(contentWindow)) {
-					panel->UnlinkFromCodeControl();
+
+				// only cast when we are sure of the type of window
+				// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
+				// methods
+				if (toolsWindow->GetName() == wxT("mvceditor::SqlBrowserPanelClass")) {
+					mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)toolsWindow;
+					if (panel->IsLinkedToCodeControl(contentWindow)) {
+						panel->UnlinkFromCodeControl();
+					}
 				}
 			}
 		}

@@ -252,10 +252,11 @@ protected:
 	 * Add a window to the tool notebook. Once added, this class will take care of memory management for the window pointer.
 	 * 
 	 * @param wxWindow* window the window to add
-	 * @param wxString name the name that will show up in the window's tab
+	 * @param wxString tabName the name that will show up in the window's tab
+	 * @param wxString windowName the name that will be given to the window (wxWindow::SetName)
 	 * @return bool true if window was added.
 	 */
-	bool AddToolsWindow(wxWindow* window, wxString name);
+	bool AddToolsWindow(wxWindow* window, wxString tabName, wxString windowName = wxEmptyString);
 
 	/**
 	 * Add a window to the outline notebook. Once added, this class will take care of memory management for the window pointer.
@@ -288,6 +289,15 @@ protected:
 	 * @return bool true if the window with the given windowId is the selected (active) tools window.
 	 */
 	bool IsToolsWindowSelected(int windowId) const;
+
+	/**
+	 * Check to see if the given window is the tools window that's currently active
+	 * This method is useful when a plugin creates multiple tools windows
+	 *
+	 * @param wxString name the window name to check (wxWindow::GetName())
+	 * @return bool true if the selected (active) tools window's name is equal to the given name.
+	 */
+	bool IsToolsWindowSelectedByName(const wxString& name) const;
 
 	/**
 	 * Check to see if the given window is the outline window that's currently active

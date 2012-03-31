@@ -194,13 +194,11 @@ void mvceditor::RunConsolePluginClass::OnRunFileAsCli(wxCommandEvent& event) {
 	// if theres a window already opened, just re-run the selected window.
 	int selection = GetToolsNotebook()->GetSelection();
 	RunConsolePanelClass* runConsolePanel = NULL;
-	if (selection >= 0) {
-		wxWindow* window = GetToolsNotebook()->GetPage(selection);
-		if (window->GetName() == wxT("mvceditor::RunConsolePanelClass")) {
 
-			// make sure that the selected window is a run console panel
-			runConsolePanel = wxDynamicCast(window, mvceditor::RunConsolePanelClass);
-		}
+	// make sure that the selected window is a run console panel. if we don't explictly
+	// check the name, the program will crash.
+	if (IsToolsWindowSelectedByName(wxT("mvceditor::RunConsolePanelClass"))) {
+		runConsolePanel = (mvceditor::RunConsolePanelClass*)GetToolsNotebook()->GetPage(selection);
 	}
 	if (selection >= 0 && runConsolePanel) {
 		
@@ -215,8 +213,9 @@ void mvceditor::RunConsolePluginClass::OnRunFileAsCli(wxCommandEvent& event) {
 	else if (code) {
 		RunConsolePanelClass* runConsolePanel = new RunConsolePanelClass(GetToolsNotebook(), GetEnvironment(), 
 			GetStatusBarWithGauge(), ID_WINDOW_CONSOLE);
-		runConsolePanel->SetName(wxT("mvceditor::RunConsolePanelClass"));
-		if (AddToolsWindow(runConsolePanel, _("Run"))) {
+
+		// set the name so that we can know which window pointer can be safely cast this panel back to the RunConsolePanelClass
+		if (AddToolsWindow(runConsolePanel, _("Run"), wxT("mvceditor::RunConsolePanelClass"))) {
 			runConsolePanel->SetToRunFile(code->GetFileName());
 			runConsolePanel->SetFocusOnCommandText();
 			
