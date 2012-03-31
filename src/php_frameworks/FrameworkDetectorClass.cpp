@@ -222,7 +222,7 @@ bool mvceditor::DatabaseDetectorActionClass::Response() {
 		s = result.Read(groupName + wxT("FileName"));
 		info.FileName = mvceditor::StringHelperClass::wxToIcu(s);
 		s = result.Read(groupName + wxT("Name"));
-		info.Name = mvceditor::StringHelperClass::wxToIcu(s);
+		info.Label = mvceditor::StringHelperClass::wxToIcu(s);
 		wxString driverString = result.Read(groupName + wxT("Driver"));
 		if (driverString.CmpNoCase(wxT("MYSQL")) == 0) {
 			info.Driver = mvceditor::DatabaseInfoClass::MYSQL;
@@ -233,6 +233,7 @@ bool mvceditor::DatabaseDetectorActionClass::Response() {
 			break;
 		}
 		result.Read(groupName + wxT("Port"), &info.Port);
+		info.IsDetected = true;
 		Databases.push_back(info);
 		next = result.GetNextGroup(groupName, index);
 	}

@@ -148,14 +148,6 @@ public:
 	 */
 	SqlResourceFinderClass* GetSqlResourceFinder();
 
-	/**
-	* Returns the detected database connection infos.
-	* Filled by the Application object
-	*/
-	std::vector<DatabaseInfoClass> DatabaseInfo() const;
-
-	void PushDatabaseInfo(const DatabaseInfoClass& info);
-
 private:
 	
 	/*
@@ -166,9 +158,7 @@ private:
 	/**
 	 * To grab SQL table meta data
 	 */
-	// TODO move these out of here and into the App class
 	SqlResourceFinderClass SqlResourceFinder;
-	std::vector<DatabaseInfoClass> Databases;
 	
 	/**
 	 * The wildcard patterns that will be used to find PHP files in this

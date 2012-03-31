@@ -50,6 +50,11 @@ public:
 	enum Drivers {
 		MYSQL
 	};
+
+	/**
+	 * The human friendly label for this info
+	 */
+	UnicodeString Label;
 	
 	/**
 	 * The database host to connect to
@@ -77,11 +82,6 @@ public:
 	UnicodeString FileName;
 	
 	/**
-	 * A human friendly name for this info
-	 */
-	UnicodeString Name;
-	
-	/**
 	 * the system that is used.
 	 */
 	Drivers Driver;
@@ -90,6 +90,13 @@ public:
 	 * The port to connect to
 	 */
 	int Port;
+
+	/**
+	 * True if this connection was detected by a DatabaseDetector. If this flaf
+	 * is set the connection will be treated specially (it will not be persisted
+	 * to the config as it can be re-detected).
+	 */
+	bool IsDetected;
 	
 	DatabaseInfoClass();
 	
