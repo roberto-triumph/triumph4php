@@ -30,8 +30,11 @@
 namespace mvceditor {
 
 /**
- * @return the file location of the PHP native functions file. This file was created using the script
- * resources/parse_php_doc.php and exists inside of the MVC Editor app distribution.
+ * @return the file location of the PHP native functions tag file. This file contains all of the
+ *         classes, methods, functions, that are documented on the php.net site.  The file 
+ *         is formatted as a ctags file
+ * see the tags file format here: http://ctags.sourceforge.net/FORMAT
+ * see the source code for the generator program here: https://github.com/robertop/phd
  */
 wxFileName NativeFunctionsAsset();
 

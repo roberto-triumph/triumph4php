@@ -59,22 +59,16 @@ class SqlBrowserPanelGeneratedClass : public wxPanel
 ///////////////////////////////////////////////////////////////////////////////
 class SqlConnectionDialogGeneratedClass : public wxDialog 
 {
-	DECLARE_EVENT_TABLE()
 	private:
-		
-		// Private event handlers
-		void _wxFB_OnListboxSelected( wxCommandEvent& event ){ OnListboxSelected( event ); }
-		void _wxFB_OnTestButton( wxCommandEvent& event ){ OnTestButton( event ); }
-		void _wxFB_OnCancelButton( wxCommandEvent& event ){ OnCancelButton( event ); }
-		void _wxFB_OnHelpButton( wxCommandEvent& event ){ OnHelpButton( event ); }
-		void _wxFB_OnOkButton( wxCommandEvent& event ){ OnOkButton( event ); }
-		
 	
 	protected:
 		enum
 		{
 			ID_SQLCONNECTIONDIALOGCLASS = 1000,
+			ID_GLOBALCONNECTIONSLABEL,
 			ID_LIST,
+			ID_NAMELABEL,
+			ID_LABEL,
 			ID_HOSTLABEL,
 			ID_HOST,
 			ID_PORTLABEL,
@@ -85,10 +79,16 @@ class SqlConnectionDialogGeneratedClass : public wxDialog
 			ID_USER,
 			ID_PASSWORDLABEL,
 			ID_PASSWORD,
-			ID_TEST,
+			ID_WARNINGLABEL,
+			ID_TESTBUTTON,
+			ID_SQLADDBUTTON,
+			ID_SQLDELETEBUTTON,
 		};
 		
+		wxStaticText* ConnectionsLabel;
 		wxListBox* List;
+		wxStaticText* NameLabel;
+		wxTextCtrl* Label;
 		wxStaticText* HostLabel;
 		wxTextCtrl* Host;
 		wxStaticText* PortLabel;
@@ -99,23 +99,27 @@ class SqlConnectionDialogGeneratedClass : public wxDialog
 		wxTextCtrl* User;
 		wxStaticText* PasswordLabel;
 		wxTextCtrl* Password;
-		wxButton* m_button2;
+		
+		wxStaticText* WarningLabel;
+		wxButton* TestButton;
+		wxButton* AddButton;
+		wxButton* DeleteButton;
 		wxStdDialogButtonSizer* m_sdbSizer2;
 		wxButton* m_sdbSizer2OK;
 		wxButton* m_sdbSizer2Cancel;
-		wxButton* m_sdbSizer2Help;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnListboxSelected( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnLabelText( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnTestButton( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAddButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDeleteButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		SqlConnectionDialogGeneratedClass( wxWindow* parent, wxWindowID id = ID_SQLCONNECTIONDIALOGCLASS, const wxString& title = wxT("SQL Connections"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 599,274 ), long style = wxDEFAULT_DIALOG_STYLE );
+		SqlConnectionDialogGeneratedClass( wxWindow* parent, wxWindowID id = ID_SQLCONNECTIONDIALOGCLASS, const wxString& title = wxT("SQL Connections"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 592,325 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~SqlConnectionDialogGeneratedClass();
 	
 };

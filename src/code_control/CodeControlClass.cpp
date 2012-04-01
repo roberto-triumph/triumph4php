@@ -938,7 +938,7 @@ void mvceditor::CodeControlClass::WordHiglightPreviousSearch(wxIdleEvent& event)
 	event.Skip();
 }
 
-void mvceditor::CodeControlClass::MarkLintError(const mvceditor::LintResultsClass& result) {
+void mvceditor::CodeControlClass::MarkLintError(const pelet::LintResultsClass& result) {
 	
 	// positions in scintilla are byte offsets. convert chars to bytes so we can mark
 	// the squigglies properly

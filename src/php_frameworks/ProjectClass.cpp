@@ -36,7 +36,6 @@ mvceditor::ProjectOptionsClass::ProjectOptionsClass(const ProjectOptionsClass& o
 
 mvceditor::ProjectClass::ProjectClass(const mvceditor::ProjectOptionsClass& options)
 	: Options(options)
-	, Databases()
 	, PhpFileFilters()
 	, CssFileFilters()
 	, SqlFileFilters() {
@@ -48,14 +47,6 @@ wxString  mvceditor::ProjectClass::GetRootPath() const {
 
 mvceditor::SqlResourceFinderClass* mvceditor::ProjectClass::GetSqlResourceFinder() {
 	return &SqlResourceFinder;
-}
-
-std::vector<mvceditor::DatabaseInfoClass> mvceditor::ProjectClass::DatabaseInfo() const {
-	return Databases;
-}
-
-void mvceditor::ProjectClass::PushDatabaseInfo(const mvceditor::DatabaseInfoClass& info) {
-	Databases.push_back(info);
 }
 
 wxString mvceditor::ProjectClass::GetPhpFileExtensionsString() const {

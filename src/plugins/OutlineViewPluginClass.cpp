@@ -234,6 +234,7 @@ void mvceditor::OutlineViewPluginPanelClass::SetClasses(const std::vector<mvcedi
 }
 
 void mvceditor::OutlineViewPluginPanelClass::RefreshOutlines() {
+	Tree->Freeze();
 	Tree->DeleteAllItems();
 	wxTreeItemId rootId = Tree->AddRoot(_("Outline"));
 	StatusLabel->SetLabel(_(""));
@@ -308,7 +309,8 @@ void mvceditor::OutlineViewPluginPanelClass::RefreshOutlines() {
 			Tree->AppendItem(rootId, label);
 		}
 	}
-	Tree->ExpandAll();
+	Tree->Expand(Tree->GetRootItem());
+	Tree->Thaw();
 }
 
 void mvceditor::OutlineViewPluginPanelClass::OnHelpButton(wxCommandEvent& event) {
@@ -343,32 +345,50 @@ void mvceditor::OutlineViewPluginPanelClass::OnTreeItemActivated(wxTreeEvent& ev
 	wxTreeItemId item = event.GetItem();
 	wxString methodSig = Tree->GetItemText(item);
 	wxTreeItemId parentItem = Tree->GetItemParent(item);
-	if (!item.IsOk() || !parentItem.IsOk()) {
+	if (!item.IsOk() || Tree->GetChildrenCount(item) > 0) {
 
-		// dont want to handle a double-click on the root element
+		// dont want to handle a non-leaf (a class)
 		event.Skip();
 		return;
 	}
-	wxString classNameSig = Tree->GetItemText(parentItem);
-	classNameSig = classNameSig.Mid(4); // 4 = length of '[C] '
+	wxString resource;
+	if (methodSig.StartsWith(wxT("[P]")) || methodSig.StartsWith(wxT("[M]"))) {
+		wxString classNameSig = Tree->GetItemText(parentItem);
+		classNameSig = classNameSig.Mid(4); // 4 = length of '[C] '
 
-	wxString resource = classNameSig + wxT("::");
-	methodSig = methodSig.Mid(4); // 4= length of '[M] '
-	
-	// extract just the name from the label (function call args or property type)
-	int index = methodSig.Index(wxT('('));
-	if (wxNOT_FOUND == index) {
-		index = methodSig.Index(wxT('['));
-	}
-	if (wxNOT_FOUND != index) {
-		resource += methodSig.Mid(0, index);
-	}
-	else {
+		resource = classNameSig + wxT("::");
+		methodSig = methodSig.Mid(4); // 4= length of '[M] '
+		
+		// extract just the name from the label (function call args or property type)
+		int index = methodSig.Index(wxT('('));
+		if (wxNOT_FOUND == index) {
+			index = methodSig.Index(wxT('['));
+		}
+		if (wxNOT_FOUND != index) {
+			resource += methodSig.Mid(0, index);
+		}
+		else {
 
-		// sig is not of a function, and prop does not have a type
-		resource += methodSig;
+			// sig is not of a function, and prop does not have a type
+			resource += methodSig;
+		}
 	}
-	if ( Tree->GetItemText(parentItem) != wxT("Outline") && !resource.IsEmpty()) {
+	else if (methodSig.StartsWith(wxT("[D]")) || methodSig.StartsWith(wxT("[F]"))) {
+		methodSig = methodSig.Mid(4); // 4= length of '[D] '
+		
+		// extract just the name from the label (omit the return type)
+		int index = methodSig.Index(wxT('('));
+		if (wxNOT_FOUND == index) {
+			index = methodSig.Index(wxT('['));
+		}
+		if (wxNOT_FOUND != index) {
+			resource += methodSig.Mid(0, index);
+		}
+		else {
+			resource += methodSig;
+		}
+	}
+	if (!resource.IsEmpty()) {
 		Plugin->JumpToResource(resource);
 	}
 	else {

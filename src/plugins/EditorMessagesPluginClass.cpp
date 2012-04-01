@@ -114,20 +114,20 @@ void mvceditor::EditorMessagesPluginClass::AddToolsMenuItems(wxMenu *toolsMenu) 
 
 void mvceditor::EditorMessagesPluginClass::OnMenu(wxCommandEvent& event) {
 	wxWindow* window = FindToolsWindow(ID_DEBUG_WINDOW);
-	mvceditor::EditorMessagesPanelClass* panel = wxDynamicCast(window, mvceditor::EditorMessagesPanelClass);
-	if (panel) {
+	if (window) {
 		SetFocusToToolsWindow(window);
 	}
 	else {
-		panel = new mvceditor::EditorMessagesPanelClass(GetToolsNotebook(), ID_DEBUG_WINDOW);
+		wxWindow* panel = new mvceditor::EditorMessagesPanelClass(GetToolsNotebook(), ID_DEBUG_WINDOW);
 		AddToolsWindow(panel, _("Editor Messages"));
 	}
 }
 
 void mvceditor::EditorMessagesPluginClass::AddMessage(wxLogLevel level, const wxChar* msg, time_t timestamp) {
 	wxWindow* window = FindToolsWindow(ID_DEBUG_WINDOW);
-	mvceditor::EditorMessagesPanelClass* panel = wxDynamicCast(window, mvceditor::EditorMessagesPanelClass);
-	if (panel) {
+	mvceditor::EditorMessagesPanelClass* panel = NULL;
+	if (window) {
+		panel = (mvceditor::EditorMessagesPanelClass*)window;
 		SetFocusToToolsWindow(window);
 	}
 	else {

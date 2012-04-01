@@ -336,24 +336,24 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletion(wxString& completeStatus)
 	UnicodeString code = GetSafeSubstring(0, currentPos);
 	std::vector<wxString> ret;
 	if (LanguageDiscovery.Open(code)) {
-		mvceditor::LanguageDiscoveryClass::Syntax syntax = LanguageDiscovery.at(code.length() - 1);
+		pelet::LanguageDiscoveryClass::Syntax syntax = LanguageDiscovery.at(code.length() - 1);
 		switch (syntax) {
-		case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_SCRIPT:
-		case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_BACKTICK:
-		case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_DOUBLE_QUOTE_STRING:
-		case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_HEREDOC:
-		case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_LINE_COMMENT:
-		case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_MULTI_LINE_COMMENT:
-		case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_NOWDOC:
-		case mvceditor::LanguageDiscoveryClass::SYNTAX_PHP_SINGLE_QUOTE_STRING:
+		case pelet::LanguageDiscoveryClass::SYNTAX_PHP_SCRIPT:
+		case pelet::LanguageDiscoveryClass::SYNTAX_PHP_BACKTICK:
+		case pelet::LanguageDiscoveryClass::SYNTAX_PHP_DOUBLE_QUOTE_STRING:
+		case pelet::LanguageDiscoveryClass::SYNTAX_PHP_HEREDOC:
+		case pelet::LanguageDiscoveryClass::SYNTAX_PHP_LINE_COMMENT:
+		case pelet::LanguageDiscoveryClass::SYNTAX_PHP_MULTI_LINE_COMMENT:
+		case pelet::LanguageDiscoveryClass::SYNTAX_PHP_NOWDOC:
+		case pelet::LanguageDiscoveryClass::SYNTAX_PHP_SINGLE_QUOTE_STRING:
 			HandleAutoCompletionPhp(code, completeStatus);
 			break;
-		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML:
-		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_TAG:
-		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE:
-		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE_DOUBLE_QUOTE_VALUE:
-		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE_SINGLE_QUOTE_VALUE:
-		case mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ENTITY:
+		case pelet::LanguageDiscoveryClass::SYNTAX_HTML:
+		case pelet::LanguageDiscoveryClass::SYNTAX_HTML_TAG:
+		case pelet::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE:
+		case pelet::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE_DOUBLE_QUOTE_VALUE:
+		case pelet::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE_SINGLE_QUOTE_VALUE:
+		case pelet::LanguageDiscoveryClass::SYNTAX_HTML_ENTITY:
 			HandleAutoCompletionHtml(word, syntax, completeStatus);
 			break;
 		default:
@@ -364,17 +364,17 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletion(wxString& completeStatus)
 }
 
 void mvceditor::PhpDocumentClass::HandleAutoCompletionHtml(const UnicodeString& word, 
-														   mvceditor::LanguageDiscoveryClass::Syntax syntax,
+														   pelet::LanguageDiscoveryClass::Syntax syntax,
 														   wxString& completeStatus) {
 	if (word.length() < 1) {
 		 return;
 	}
 	std::vector<wxString> autoCompleteList;
 	wxStringTokenizer tokenizer(wxT(""));
-	if (mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE == syntax) {
+	if (pelet::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE == syntax) {
 		tokenizer.SetString(HTML_ATTRIBUTE_NAMES, wxT(" "), wxTOKEN_STRTOK);
 	}
-	else if (mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_TAG == syntax) {
+	else if (pelet::LanguageDiscoveryClass::SYNTAX_HTML_TAG == syntax) {
 		tokenizer.SetString(HTML_TAG_NAMES, wxT(" "), wxTOKEN_STRTOK);
 	}
 	wxString symbol = mvceditor::StringHelperClass::IcuToWx(word);
@@ -402,11 +402,11 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionHtml(const UnicodeString& 
 		int wordLength = currentPos - startPos;
 		Ctrl->AutoCompShow(wordLength, list);
 	}
-	else if (mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE == syntax) {
+	else if (pelet::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE == syntax) {
 		completeStatus = _("Unknown HTML Attribute: ");
 		completeStatus += symbol;
 	}
-	else if (mvceditor::LanguageDiscoveryClass::SYNTAX_HTML_TAG == syntax) {
+	else if (pelet::LanguageDiscoveryClass::SYNTAX_HTML_TAG == syntax) {
 		completeStatus = _("Unknown HTML Tag: ");
 		completeStatus += symbol;
 	}
@@ -423,7 +423,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 	std::vector<UnicodeString> variableMatches;
 	int expressionPos = code.length() - 1;
 	UnicodeString lastExpression = Lexer.LastExpression(code);
-	mvceditor::SymbolClass parsedExpression;
+	pelet::SymbolClass parsedExpression;
 	UnicodeString expressionScope;
 	mvceditor::SymbolTableMatchErrorClass error;
 	
@@ -522,7 +522,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 void mvceditor::PhpDocumentClass::HandleAutoCompletionPhpStatus(
 		const mvceditor::SymbolTableMatchErrorClass& error, 
 		const UnicodeString& lastExpression,
-		const mvceditor::SymbolClass& parsedExpression,
+		const pelet::SymbolClass& parsedExpression,
 		const UnicodeString& expressionScope,
 		wxString& completeStatus) {
 	if (lastExpression.isEmpty()) {
@@ -737,9 +737,9 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetCurrentSym
 	UnicodeString code = GetSafeSubstring(0, endPos);
 	
 	std::vector<mvceditor::ResourceClass> matches;
-	mvceditor::LexicalAnalyzerClass lexer;
-	mvceditor::ParserClass parser;
-	mvceditor::SymbolClass parsedExpression;
+	pelet::LexicalAnalyzerClass lexer;
+	pelet::ParserClass parser;
+	pelet::SymbolClass parsedExpression;
 	mvceditor::ScopeFinderClass scopeFinder;
 
 	UnicodeString lastExpression = lexer.LastExpression(code);
@@ -897,9 +897,9 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetSymbolAt(i
 	UnicodeString code = GetSafeSubstring(0, posToCheck);
 	
 	std::vector<mvceditor::ResourceClass> matches;
-	mvceditor::LexicalAnalyzerClass lexer;
-	mvceditor::ParserClass parser;
-	mvceditor::SymbolClass parsedExpression;
+	pelet::LexicalAnalyzerClass lexer;
+	pelet::ParserClass parser;
+	pelet::SymbolClass parsedExpression;
 	mvceditor::ScopeFinderClass scopeFinder;
 
 	UnicodeString lastExpression = lexer.LastExpression(code);
@@ -1111,7 +1111,6 @@ std::vector<wxString> mvceditor::SqlDocumentClass::HandleAutoCompletionMySql(con
 	}
 	
 	// look at the meta data
-	// TODO: mysql information_schema stuff does not show up under code completion
 	mvceditor::SqlResourceFinderClass* finder = Project->GetSqlResourceFinder();
 	if (!CurrentInfo.Host.isEmpty()) {
 		UnicodeString error;

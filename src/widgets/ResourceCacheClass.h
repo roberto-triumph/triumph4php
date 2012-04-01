@@ -99,6 +99,12 @@ public:
 	 */
 	bool WalkGlobal(DirectorySearchClass& directorySearch, const std::vector<wxString>& phpFileFilters);
 
+	/**
+	 * Will load the php native functions file that contains all built-in php functions and classes
+	 * into the GLOBAL cache.
+	 * @return false if lock could not be acquired
+	 */
+	bool BuildResourceCacheForNativeFunctionsGlobal();
 
 	/**
 	 * Writes the global cache into the given file. Format is this:
@@ -191,7 +197,7 @@ public:
 	 *        slower because ResourceFinderClass still handles them
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
-	void ExpressionCompletionMatches(const wxString& fileName, const SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
+	void ExpressionCompletionMatches(const wxString& fileName, const pelet::SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
 		std::vector<UnicodeString>& autoCompleteList,
 		std::vector<ResourceClass>& autoCompleteResourceList,
 		bool doDuckTyping,
@@ -211,7 +217,7 @@ public:
 	 *        slower because ResourceFinderClass still handles them
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
-	void ResourceMatches(const wxString& fileName, const SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
+	void ResourceMatches(const wxString& fileName, const pelet::SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
 		std::vector<ResourceClass>& matches,
 		bool doDuckTyping,
 		SymbolTableMatchErrorClass& error);
@@ -224,7 +230,12 @@ public:
 	/**
 	 * @return TRUE if the cache has not been initialized with either a call to Register() or a call to WalkGlobal()
 	 */
-	bool IsEmpty();
+	bool IsFileCacheEmpty();
+
+	/**
+	 * @return TRUE if the cache has not been initialized with either a call to Register() or a call to WalkGlobal()
+	 */
+	bool IsResourceCacheEmpty();
 	 
 private:
 

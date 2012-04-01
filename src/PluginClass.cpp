@@ -92,8 +92,11 @@ void mvceditor::PluginClass::AddKeyboardShortcuts(std::vector<mvceditor::Dynamic
 
 }
 
-bool mvceditor::PluginClass::AddToolsWindow(wxWindow* window, wxString name) {
-	if (ToolsNotebook->AddPage(window, name)) {
+bool mvceditor::PluginClass::AddToolsWindow(wxWindow* window, wxString tabName, wxString windowName) {
+	if (!windowName.IsEmpty()) {
+		window->SetName(windowName);
+	}
+	if (ToolsNotebook->AddPage(window, tabName)) {
 		int index = ToolsNotebook->GetPageIndex(window);
 		if (index != wxNOT_FOUND) {
 			ToolsNotebook->SetSelection(index);
@@ -134,6 +137,14 @@ bool mvceditor::PluginClass::IsToolsWindowSelected(int windowId) const {
 	wxWindow* window = wxWindow::FindWindowById(windowId, GetToolsNotebook());
 	int windowIndex = ToolsNotebook->GetPageIndex(window); 
 	return windowIndex != wxNOT_FOUND && windowIndex == ToolsNotebook->GetSelection();
+}
+
+bool mvceditor::PluginClass::IsToolsWindowSelectedByName(const wxString& name) const {
+	size_t selection = ToolsNotebook->GetSelection();
+	if (selection >= 0 && selection < ToolsNotebook->GetPageCount()) {
+		return ToolsNotebook->GetPage(selection)->GetName() == name;
+	}
+	return false;
 }
 
 bool mvceditor::PluginClass::IsOutlineWindowSelected(int windowId) const {

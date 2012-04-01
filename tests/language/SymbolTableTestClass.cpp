@@ -67,7 +67,7 @@ public:
 	}
 
 	mvceditor::SymbolTableClass SymbolTable;
-	mvceditor::SymbolClass ParsedExpression;
+	pelet::SymbolClass ParsedExpression;
 };
 
 class SymbolTableCompletionTestClass {
@@ -75,7 +75,7 @@ class SymbolTableCompletionTestClass {
 public:
 
 	mvceditor::SymbolTableClass CompletionSymbolTable;
-	mvceditor::SymbolClass ParsedExpression;
+	pelet::SymbolClass ParsedExpression;
 	std::map<wxString, mvceditor::ResourceFinderClass*> OpenedFinders;
 	mvceditor::ResourceFinderClass Finder1;
 	mvceditor::ResourceFinderClass GlobalFinder;
@@ -521,7 +521,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressio
 	int32_t pos;
 	sourceCode = FindCursor(sourceCode, pos);
 	Init(sourceCode);	
-	mvceditor::SymbolClass emptyExpression;
+	pelet::SymbolClass emptyExpression;
 	emptyExpression.Lexeme = UNICODE_STRING_SIMPLE("unknown");
 	std::vector<mvceditor::ResourceClass> resources;
 	CompletionSymbolTable.ResourceMatches(emptyExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 

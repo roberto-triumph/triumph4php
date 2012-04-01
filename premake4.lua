@@ -34,15 +34,15 @@ dofile "premake_action_soci.lua"
 -- these are the core wx widgets libraries and their Win32 dependencies (win dependencies listed first)
 WX_LIBS_DEBUG = { 
 	"winmm", "comctl32", "rpcrt4", "wsock32", "odbc32",
-	"wxmsw28ud_core", "wxbase28ud", "wxexpatd",	"wxjpegd", "wxpngd", "wxregexud", 
-	"wxtiffd","wxzlibd"
+	"wxmsw28ud_core", "wxbase28ud_net", "wxbase28ud", "wxexpatd", "wxjpegd", "wxpngd", "wxregexud", 
+	"wxtiffd", "wxzlibd"
 }
 
 -- these are the core wx widgets libraries and their Win32 dependencies (win dependencies listed first)
 WX_LIBS_RELEASE = { 
 	"winmm", "comctl32", "rpcrt4", "wsock32", "odbc32",
-	"wxmsw28u_core", "wxbase28u", "wxexpat", "wxjpeg", "wxpng", "wxregexu", 
-	"wxtiff","wxzlib"
+	"wxmsw28u_core", "wxbase28u_net", "wxbase28u", "wxexpat", "wxjpeg", "wxpng", "wxregexu", 
+	"wxtiff", "wxzlib"
 }
 
 WX_LIBS_WINDOW_DEBUG = { "wxmsw28ud_adv", "wxmsw28ud_aui", "wxmsw28ud_html" }
@@ -101,7 +101,7 @@ function wxconfiguration(config, action)
 		links { WX_LIBS_DEBUG }
 	elseif config == "Debug" and (action == "gmake" or action == "codelite") then
 		buildoptions { "`../../lib/wxWidgets-2.8.10/mvc_editor/Debug/bin/wx-config --cxxflags --debug=yes --unicode=yes`" }
-		linkoptions { "`../../lib/wxWidgets-2.8.10/mvc_editor/Debug/bin/wx-config --debug=yes --unicode=yes --libs core,base`" }
+		linkoptions { "`../../lib/wxWidgets-2.8.10/mvc_editor/Debug/bin/wx-config --debug=yes --unicode=yes --libs core,base,net`" }
 	elseif config == "Release" and action ==  "vs2008" then
 		libdirs { "$(WXWIN)/lib/vc_dll/" }
 		includedirs { "$(WXWIN)/include/", "$(WXWIN)/lib/vc_dll/mswu/" }
@@ -116,7 +116,7 @@ function wxconfiguration(config, action)
 		links { WX_LIBS_RELEASE } 
 	elseif config == "Release" and (action == "gmake" or action == "codelite") then
 		buildoptions { "`../../lib/wxWidgets-2.8.10/mvc_editor/Release/bin/wx-config --cxxflags --debug=no --unicode=yes`" }
-		linkoptions { "`../../lib/wxWidgets-2.8.10/mvc_editor/Release/bin/wx-config --debug=no --unicode=yes --libs core,base`" }
+		linkoptions { "`../../lib/wxWidgets-2.8.10/mvc_editor/Release/bin/wx-config --debug=no --unicode=yes --libs core,base,net`" }
 	end
 end
 
@@ -219,8 +219,8 @@ solution "mvc_editor"
 		language "C++"
 		kind "WindowedApp"
 		files { "src/**.cpp", "src/**.h", "*.lua", "src/**.re, src/**.y, src/**.hpp" }
-		includedirs { "src/", "lib/keybinder/include/" }
-		links { "tests", "keybinder" }
+		includedirs { "src/", "lib/keybinder/include/", "lib/pelet/include" }
+		links { "tests", "keybinder", "pelet" }
 		
 		sociconfiguration()
 		configuration "Debug"
@@ -260,15 +260,8 @@ solution "mvc_editor"
 			"src/environment/DatabaseInfoClass.cpp",
 			"src/environment/SqlResourceFinderClass.cpp",
 			"src/environment/UrlResourceClass.cpp",
-			"src/language/ParserClass.cpp",
-			"src/language/LexicalAnalyzerClass.cpp",
 			"src/language/SqlLexicalAnalyzerClass.cpp",
 			"src/language/SymbolTableClass.cpp",
-			"src/language/UCharBufferedFileClass.cpp",
-			"src/language/Php53LexicalAnalyzerImpl.cpp",
-			"src/language/Php53ParserImpl.cpp",
-			"src/language/LanguageDiscoveryClass.cpp",
-			"src/language/ParserObserverClass.cpp",
 			"src/php_frameworks/ProjectClass.cpp",
 			"src/php_frameworks/FrameworkDetectorClass.cpp",
 			"src/php_frameworks/CallStackClass.cpp",
@@ -283,8 +276,8 @@ solution "mvc_editor"
 			"src/MvcEditorErrors.cpp",
 			"src/MvcEditorAssets.cpp"
 		}
-		includedirs { "src/", "lib/UnitTest++/src/", "tests/" }
-		links { "unit_test++" }
+		includedirs { "src/", "lib/UnitTest++/src/", "tests/", "lib/pelet/include" }
+		links { "unit_test++", "pelet" }
 		
 		sociconfiguration()
 		configuration "Debug"
@@ -306,12 +299,12 @@ solution "mvc_editor"
 			"src/language/*.cpp",
 			"src/search/ResourceFinderClass.cpp",
 			"src/search/DirectorySearchClass.cpp",
-			"src/language/ParserClass.cpp",
 			"src/search/FinderClass.cpp",
 			"src/search/FindInFilesClass.cpp",
 			"src/windows/StringHelperClass.cpp"
 		}
-		includedirs { "src/" }
+		includedirs { "src/", "lib/pelet/include" }
+		links { "pelet" }
 		
 		configuration "Debug"
 			pickywarnings(_ACTION)
@@ -367,7 +360,8 @@ solution "mvc_editor"
 			"src/MvcEditorErrors.cpp",
 			"src/MvcEditorAssets.cpp"
 		}
-		includedirs { "src/" }
+		includedirs { "src/", "lib/pelet/include" }
+		links { "pelet" }
 		sociconfiguration()
 		configuration "Debug"
 			pickywarnings(_ACTION)
@@ -456,7 +450,46 @@ solution "mvc_editor"
 		configuration "Release"
 			wxconfiguration("Release", _ACTION)
 			wxappconfiguration("Release", _ACTION)
-			
+
+	project "pelet"
+		language "C++"
+		kind "SharedLib"
+		files { 
+			"lib/pelet/src/*", 
+			"lib/pelet/include/**", 
+			"lib/pelet/*.lua", 
+			"lib/pelet/src/**.re", 
+			"lib/pelet/src/**.y", 
+			"lib/pelet/README.md" 
+		}
+		includedirs { "lib/pelet/include" }
+		defines { "PELET_MAKING_DLL" }
+		pickywarnings(_ACTION)
+		configuration "Release"			
+			icuconfiguration("Release", _ACTION)
+		configuration { "Debug" }
+			icuconfiguration("Debug", _ACTION)
+	
+	project "pelet_tests"
+		language "C++"
+		kind "ConsoleApp"
+		files { 
+			"lib/pelet/tests/**.cpp",
+			"lib/pelet/tests/**.h"
+		}
+		includedirs { "lib/pelet/include/", "lib/UnitTest++/src/", "lib/pelet/tests/" }
+		links { "pelet", "unit_test++" }
+		
+		-- dont bother with warnings  with using 'unsafe' fopen
+		defines { "_CRT_SECURE_NO_WARNINGS" }
+		
+		configuration "Debug"
+			pickywarnings(_ACTION)
+			icuconfiguration("Debug", _ACTION)
+		configuration "Release"
+			pickywarnings(_ACTION)
+			icuconfiguration("Release", _ACTION)
+				
 	project "icu_file_tutorial"
 		language "C++"
 		kind "ConsoleApp"

@@ -25,7 +25,7 @@
 #ifndef __CALLSTACKCLASS_H__
 #define __CALLSTACKCLASS_H__
 
-#include <language/ParserClass.h>
+#include <pelet/ParserClass.h>
 #include <widgets/ResourceCacheClass.h>
 #include <unicode/unistr.h>
 #include <wx/filename.h>
@@ -52,7 +52,7 @@ public:
 	/**
 	 * the list of arguments given to the calling function / method
 	 */
-	std::vector<ExpressionClass> Arguments;
+	std::vector<pelet::ExpressionClass> Arguments;
 	
 	CallClass();
 };
@@ -63,8 +63,12 @@ public:
  * functions are getting called.
  *
  */
-class CallStackClass : public ClassMemberObserverClass, public FunctionObserverClass, public ExpressionObserverClass,
-	public ClassObserverClass, public VariableObserverClass {
+class CallStackClass : 
+	public pelet::ClassMemberObserverClass, 
+	public pelet::FunctionObserverClass, 
+	public pelet::ExpressionObserverClass,
+	public pelet::ClassObserverClass, 
+	public pelet::VariableObserverClass {
 
 public:
 
@@ -112,7 +116,7 @@ public:
 	/**
 	 * If given code has a parser error (PARSE_ERR0R), the error will be stored here
 	 */
-	LintResultsClass LintResults;
+	pelet::LintResultsClass LintResults;
 	
 	/**
 	 * If the call stack could not be completed because a variable method could not be resolved (RESOLUTION_ERROR)
@@ -160,33 +164,36 @@ public:
 
 	void MethodFound(const UnicodeString& className, const UnicodeString& methodName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment, 
-		TokenClass::TokenIds visibility, bool isStatic);
+		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber);
 
 	void MethodEnd(const UnicodeString& className, const UnicodeString& methodName, int pos);
 	
 	void PropertyFound(const UnicodeString& className, const UnicodeString& propertyName, const UnicodeString& propertyType,
-		const UnicodeString& comment, TokenClass::TokenIds visibility, bool isConst, bool isStatic);
+		const UnicodeString& comment, pelet::TokenClass::TokenIds visibility, bool isConst, bool isStatic, const int lineNumber);
 		
 	void FunctionFound(const UnicodeString& functionName, const UnicodeString& signature, const UnicodeString& returnType, 
-		const UnicodeString& comment);
+		const UnicodeString& comment, const int lineNumber);
 		
 	void FunctionEnd(const UnicodeString& functionName, int pos);
 	
-	void ExpressionFound(const ExpressionClass& expression);
+	void ExpressionFound(const pelet::ExpressionClass& expression);
 	
-	void ClassFound(const UnicodeString& className, const UnicodeString& signature, const UnicodeString& comment);
+	void ClassFound(const UnicodeString& className, const UnicodeString& signature, const UnicodeString& comment, 
+		const int lineNumber);
 	
 	 void DefineDeclarationFound(const UnicodeString& variableName, const UnicodeString& variableValue, 
-		const UnicodeString& comment);
+		const UnicodeString& comment, const int lineNumber);
+
+	void IncludeFound(const UnicodeString& includeFile, const int lineNumber);
 	
-	void VariableFound(const UnicodeString& className, const UnicodeString& methodName, const SymbolClass& symbol, const UnicodeString& comment);
+	void VariableFound(const UnicodeString& className, const UnicodeString& methodName, const pelet::SymbolClass& symbol, const UnicodeString& comment);
 
 private:
 
 	/**
 	 * this is the class that will parse the source code
 	 */
-	ParserClass Parser;
+	pelet::ParserClass Parser;
 
 	/**
 	 * the current scope; the class that the parser is currently working on. Will

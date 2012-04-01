@@ -296,9 +296,7 @@ void mvceditor::ProjectPluginClass::OnFrameworkDetectionComplete(wxCommandEvent&
 	App->PhpFrameworks.Databases = PhpFrameworks->Databases;
 	App->PhpFrameworks.Identifiers = PhpFrameworks->Identifiers;
 	App->PhpFrameworks.Resources = PhpFrameworks->Resources;
-	for (size_t i = 0; i < PhpFrameworks->Databases.size(); ++i) {
-		App->Project->PushDatabaseInfo(PhpFrameworks->Databases[i]);
-	}
+	
 	App->Project->SetPhpFileExtensionsString(PhpFileFiltersString);
 	App->Project->SetCssFileExtensionsString(CssFileFiltersString);
 	App->Project->SetSqlFileExtensionsString(SqlFileFiltersString);
@@ -321,9 +319,7 @@ void mvceditor::ProjectPluginClass::OnFrameworkDetectionFailed(wxCommandEvent& e
 	App->PhpFrameworks.Databases = PhpFrameworks->Databases;
 	App->PhpFrameworks.Identifiers = PhpFrameworks->Identifiers;
 	App->PhpFrameworks.Resources = PhpFrameworks->Resources;
-	for (size_t i = 0; i < PhpFrameworks->Databases.size(); ++i) {
-		App->Project->PushDatabaseInfo(PhpFrameworks->Databases[i]);
-	}
+	
 	App->Project->SetPhpFileExtensionsString(PhpFileFiltersString);
 	App->Project->SetCssFileExtensionsString(CssFileFiltersString);
 	App->Project->SetSqlFileExtensionsString(SqlFileFiltersString);

@@ -48,7 +48,7 @@ namespace mvceditor {
  */
 const wxEventType QUERY_COMPLETE_EVENT = wxNewEventType();
 
-
+// forward declaration; definiton is at the bottom of this file
 class SqlBrowserPluginClass;
 
 class SqlConnectionDialogClass : public SqlConnectionDialogGeneratedClass, wxThreadHelper {
@@ -57,11 +57,12 @@ public:
 
 	/**
 	 * @param wxWindow* the parent window
-	 * @param vector<DatabaseInfoClass> will get populated with the values that the user entered.
+	 * @param vector<DatabaseInfoClass> will get populated with the values that the user entered. The list can
+	 *        also contain the connections that were detected by the DatabaseDetector 
+	 *        user will NOT be able to edit the detected connections.
 	 * @param size_t& chosenIndex the info item that the user selected 
-	 * @param bool allowEdit if TRUE user will be allowed to modify the info properties
 	 */
-	SqlConnectionDialogClass(wxWindow* parent, std::vector<mvceditor::DatabaseInfoClass>&info, size_t& chosenIndex, bool allowEdit);
+	SqlConnectionDialogClass(wxWindow* parent, std::vector<mvceditor::DatabaseInfoClass>& infos, size_t& chosenIndex);
 	
 private:
 
@@ -70,6 +71,12 @@ private:
 	void OnCancelButton(wxCommandEvent& event);
 	
 	void OnTestButton(wxCommandEvent& event);
+
+	void OnAddButton(wxCommandEvent& event);
+
+	void OnDeleteButton(wxCommandEvent& event);
+
+	void OnLabelText(wxCommandEvent& event);
 	
 	void OnListboxSelected(wxCommandEvent& event);
 
@@ -86,8 +93,19 @@ private:
 	 * cleans up the current query and closes the connection
 	 */
 	void Close();
+
+	void UpdateTextInputs();
 	
+	/**
+	 * The info list to modify AFTER the user clicks OK
+	 */
 	std::vector<DatabaseInfoClass>& Infos;
+
+	/**
+	 * The info list to user modifies. This will contain both the user-created
+	 * connections and the detected ones
+	 */
+	std::vector<DatabaseInfoClass> EditedInfos;
 	
 	SqlQueryClass TestQuery;
 	
@@ -96,12 +114,16 @@ private:
 	DECLARE_EVENT_TABLE()
 };
 
+/**
+ * Class that will take a string of SQL statements and will execute them.
+ */
 class MultipleSqlExecuteClass : public ThreadWithHeartbeatClass {
 	
 public:
 
 	/**
-	 * @param handler the object that will receive the EVENT_WORK_* events
+	 * @param handler the object that will receive the EVENT_WORK_* events when queries are
+	 *        finished being executed
 	 * @param queryId this ID will be used by the handler; the handler should only handle its own
 	 *        query results.
 	 */
@@ -172,7 +194,9 @@ private:
 	bool IsRunning;	
 };
 
-
+/**
+ * Panel which shows results from a SQL query.
+ */
 class SqlBrowserPanelClass : public SqlBrowserPanelGeneratedClass {
 
 public:
@@ -321,12 +345,16 @@ class SqlMetaDataFetchClass : public ThreadWithHeartbeatClass {
 
 public:
 
+	/**
+	 * @param handler will get notified with EVENT_WORK_* events
+	 */
 	SqlMetaDataFetchClass(wxEvtHandler& handler);
 	
 	/**
 	 * starts a background thread to read the metadata. Generates events while work
 	 * is in progress.
 	 * @see mvceditor::ThreadWithHearbeatClass
+	 * @param infos the connections to fetch info for.
 	 * @return bool TRUE if thread was started
 	 */
 	bool Read(std::vector<DatabaseInfoClass> infos);
@@ -364,7 +392,7 @@ protected:
 };
 
 /**
- * This is a plugin for SQL interface.
+ * This is a plugin to manage SQL connections and make queries to the database.
  */
 class SqlBrowserPluginClass : public PluginClass {
 public:
@@ -377,6 +405,10 @@ public:
 	 */
 	void AddToolsMenuItems(wxMenu* toolsMenu);
 
+	void AddToolBarItems(wxAuiToolBar* toolBar);
+
+	void LoadPreferences(wxConfigBase* config);
+
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 	
 	SqlBrowserPanelClass* CreateResultsPanel(CodeControlClass* ctrl);
@@ -385,7 +417,7 @@ public:
 	
 private:
 
-	void OnProjectOpened(wxCommandEvent& event);	
+	void OnProjectOpened(wxCommandEvent& event);
 
 	void OnSqlBrowserToolsMenu(wxCommandEvent& event);
 	
@@ -417,18 +449,30 @@ private:
 	 * Will start the SQL meta data background task
 	 */
 	void DetectMetadata();
-	
-	std::vector<DatabaseInfoClass> Infos;
-	
-	SqlMetaDataFetchClass SqlMetaDataFetch;
-	
-	size_t ChosenIndex;
+
+	/**
+	 * Saves the user-created infos using the global config.
+	 */
+	void SavePreferences();
 	
 	/**
-	 * @var bool TRUE if there were zero database info objects for the current project
-	 * in this case we will allow the user to edit the connections info
+	 * The datatabase connections. These are all of the connections, there may be a 
+	 * mix of connections created by the user and connections that were detected
+	 * by the DatabaseDetector.
+	 */ 
+	std::vector<DatabaseInfoClass> Infos;
+	
+	/**
+	 * To detect the SQL connections
 	 */
-	bool WasEmptyDetectedInfo;
+	SqlMetaDataFetchClass SqlMetaDataFetch;
+	
+	/**
+	 * index into Infos vector; the connection that is currently active.
+	 * Any new results panels that are created will use this connection. Any
+	 * existing results panels will keep their original connection.
+	 */
+	size_t ChosenIndex;
 	
 	DECLARE_EVENT_TABLE()
 };

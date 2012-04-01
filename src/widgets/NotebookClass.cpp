@@ -46,7 +46,7 @@ mvceditor::CodeControlClass* mvceditor::NotebookClass::GetCodeControl(size_t pag
 	mvceditor::CodeControlClass* codeControl = NULL;
 	if (pageNumber < GetPageCount()) {
 		wxWindow* window = GetPage(pageNumber);
-		codeControl = wxDynamicCast(window, mvceditor::CodeControlClass);
+		codeControl = (mvceditor::CodeControlClass*)window;
 	}
 	return codeControl;
 }

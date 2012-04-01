@@ -26,7 +26,7 @@
 #define OUTLINE_VIEW_PLUGIN_CLASS_H
 
 #include <PluginClass.h>
-#include <language/ParserClass.h>
+#include <pelet/ParserClass.h>
 #include <plugins/wxformbuilder/OutlineViewPluginPanelClass.h>
 #include <widgets/ThreadWithHeartbeatClass.h>
 #include <vector>

@@ -85,9 +85,10 @@
 
 // run all tests
 int main(int argc, char **argv) {
+
 	// change if you want to run only one test
 	bool runAll = true;
-	const char* suiteToRun = "ResourceFinderTestClass";
+	const char* suiteToRun = "UrlResourceTestClass";
 	int ret = 0;
 	if (runAll) {
 		ret = UnitTest::RunAllTests();

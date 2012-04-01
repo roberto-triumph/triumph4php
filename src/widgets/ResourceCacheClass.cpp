@@ -96,8 +96,8 @@ bool mvceditor::ResourceCacheClass::Update(const wxString& fileName, const Unico
 	std::map<wxString, mvceditor::SymbolTableClass*>::iterator itSymbols = SymbolTables.find(fileName);
 	bool ret = false;
 	if (it != Finders.end() && itSymbols != SymbolTables.end()) {
-		mvceditor::ParserClass parser;
-		mvceditor::LintResultsClass results;
+		pelet::ParserClass parser;
+		pelet::LintResultsClass results;
 		if (parser.LintString(code, results)) {
 			mvceditor::ResourceFinderClass* finder = it->second;
 			mvceditor::SymbolTableClass* symbolTable = itSymbols->second;
@@ -122,6 +122,14 @@ bool mvceditor::ResourceCacheClass::WalkGlobal(mvceditor::DirectorySearchClass& 
 	GlobalResourceFinder.Prepare(wxT("FakeFakeClass"));
 	search.Walk(GlobalResourceFinder);
 	return true;
+}
+
+bool mvceditor::ResourceCacheClass::BuildResourceCacheForNativeFunctionsGlobal() {
+	wxMutexLocker locker(Mutex);
+	if (!locker.IsOk()) {
+		return false;
+	}
+	return GlobalResourceFinder.BuildResourceCacheForNativeFunctions();
 }
 
 bool mvceditor::ResourceCacheClass::PersistGlobal(const wxFileName& outputFile) {
@@ -229,7 +237,7 @@ std::vector<mvceditor::ResourceFinderClass*> mvceditor::ResourceCacheClass::Iter
 	return finders;
 }
 
-void mvceditor::ResourceCacheClass::ExpressionCompletionMatches(const wxString& fileName, const mvceditor::SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
+void mvceditor::ResourceCacheClass::ExpressionCompletionMatches(const wxString& fileName, const pelet::SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
 													 std::vector<UnicodeString>& autoCompleteList,
 													 std::vector<mvceditor::ResourceClass>& resourceMatches,
 													 bool doDuckTyping,
@@ -253,7 +261,7 @@ void mvceditor::ResourceCacheClass::ExpressionCompletionMatches(const wxString& 
 	}
 }
 
-void mvceditor::ResourceCacheClass::ResourceMatches(const wxString& fileName, const mvceditor::SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
+void mvceditor::ResourceCacheClass::ResourceMatches(const wxString& fileName, const pelet::SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
 													 std::vector<mvceditor::ResourceClass>& matches,
 													 bool doDuckTyping,
 													mvceditor::SymbolTableMatchErrorClass& error) {
@@ -301,14 +309,25 @@ void mvceditor::ResourceCacheClass::Print() {
 	
 }
 
-bool mvceditor::ResourceCacheClass::IsEmpty() {
+bool mvceditor::ResourceCacheClass::IsFileCacheEmpty() {
 	wxMutexLocker locker(Mutex);
 	if (!locker.IsOk()) {
 		return true;
 	}
-	bool isEmpty = GlobalResourceFinder.IsEmpty() && SymbolTables.empty() && Finders.empty();
+	bool isEmpty = GlobalResourceFinder.IsFileCacheEmpty();
 	return isEmpty;
 }
+
+bool mvceditor::ResourceCacheClass::IsResourceCacheEmpty() {
+	wxMutexLocker locker(Mutex);
+	if (!locker.IsOk()) {
+		return true;
+	}
+	bool isEmpty = GlobalResourceFinder.IsResourceCacheEmpty();
+	return isEmpty;
+}
+
+
 
 mvceditor::ResourceCacheUpdateThreadClass::ResourceCacheUpdateThreadClass(mvceditor::ResourceCacheClass* resourceCache, wxEvtHandler& handler, int eventId)
 	: ThreadWithHeartbeatClass(handler, eventId)

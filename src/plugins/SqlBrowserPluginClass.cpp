@@ -28,53 +28,77 @@
 #include <windows/StringHelperClass.h>
 #include <widgets/UnicodeStringValidatorClass.h>
 #include <MvcEditorErrors.h>
+#include <MvcEditor.h>
+#include <wx/artprov.h>
 
-const int ID_SQL_GAUGE = wxNewId();
-const int ID_SQL_METADATA_GAUGE = wxNewId();
+static const int ID_SQL_GAUGE = wxNewId();
+static const int ID_SQL_METADATA_GAUGE = wxNewId();
 
 mvceditor::SqlConnectionDialogClass::SqlConnectionDialogClass(wxWindow* parent, std::vector<mvceditor::DatabaseInfoClass>& infos, 
-		size_t& chosenIndex, bool allowEdit)
+															  size_t& chosenIndex)
 	: SqlConnectionDialogGeneratedClass(parent, wxID_ANY) 
 	, Infos(infos)
+	, EditedInfos(infos)
 	, TestQuery()
 	, ChosenIndex(chosenIndex) {
-	for (size_t i = 0; i < infos.size(); i++) {
-		wxString name = mvceditor::StringHelperClass::IcuToWx(infos[i].Name);
-		List->Append(name);
+	Label->SetValue(wxT(""));
+	Host->SetValue(wxT(""));
+	User->SetValue(wxT(""));
+	Password->SetValue(wxT(""));
+	Database->SetValue(wxT(""));
+	Port->SetValue(0);
+	for (size_t i = 0; i < EditedInfos.size(); i++) {
+		wxString label = mvceditor::StringHelperClass::IcuToWx(EditedInfos[i].Label);
+		if (EditedInfos[i].IsDetected) {
+			label += _(" <Detected>");
+		}
+		List->Append(label);
 	}
-	if (chosenIndex < infos.size()) {
-		Host->SetValue(mvceditor::StringHelperClass::IcuToWx(infos[chosenIndex].Host));
-		User->SetValue(mvceditor::StringHelperClass::IcuToWx(infos[chosenIndex].User));
-		Password->SetValue(mvceditor::StringHelperClass::IcuToWx(infos[chosenIndex].Password));
-		Database->SetValue(mvceditor::StringHelperClass::IcuToWx(infos[chosenIndex].DatabaseName));
-		Port->SetValue(infos[chosenIndex].Port);
-		List->Select(chosenIndex);
+	UpdateTextInputs();
+	TransferDataToWindow();
+}
+
+void mvceditor::SqlConnectionDialogClass::UpdateTextInputs() {
+	bool allowEdit = true;
+	if (ChosenIndex < EditedInfos.size()) {
+		wxString label = mvceditor::StringHelperClass::IcuToWx(EditedInfos[ChosenIndex].Label);
+		if (EditedInfos[ChosenIndex].IsDetected) {
+			label += _(" <Detected>");
+		}
+		Label->SetValue(label);
+		Host->SetValue(mvceditor::StringHelperClass::IcuToWx(EditedInfos[ChosenIndex].Host));
+		User->SetValue(mvceditor::StringHelperClass::IcuToWx(EditedInfos[ChosenIndex].User));
+		Password->SetValue(mvceditor::StringHelperClass::IcuToWx(EditedInfos[ChosenIndex].Password));
+		Database->SetValue(mvceditor::StringHelperClass::IcuToWx(EditedInfos[ChosenIndex].DatabaseName));
+		Port->SetValue(EditedInfos[ChosenIndex].Port);
+		List->Select(ChosenIndex);
+		allowEdit = !EditedInfos[ChosenIndex].IsDetected;
 	}
-	if (!allowEdit) {
-		Host->Enable(false);
-		User->Enable(false);
-		Password->Enable(false);
-		Database->Enable(false);
-		Port->Enable(false);
-	}
-	else if (!infos.empty()) {
-		UnicodeStringValidatorClass hostValidator(&Infos[0].Host);
-		Host->SetValidator(hostValidator);
-		UnicodeStringValidatorClass userValidator(&Infos[0].User);
-		User->SetValidator(userValidator);
-		UnicodeStringValidatorClass passwordValidator(&Infos[0].Password);
-		Password->SetValidator(passwordValidator);
-		UnicodeStringValidatorClass databaseValidator(&Infos[0].DatabaseName);
-		Database->SetValidator(databaseValidator);
-		wxGenericValidator portValidator(&Infos[0].Port);
-		Port->SetValidator(portValidator);
-		TransferDataToWindow();
-	}
+	Label->Enable(allowEdit);
+	Host->Enable(allowEdit);
+	User->Enable(allowEdit);
+	Password->Enable(allowEdit);
+	Database->Enable(allowEdit);
+	Port->Enable(allowEdit);
+	DeleteButton->Enable(allowEdit);
 }
 	
 void mvceditor::SqlConnectionDialogClass::OnOkButton(wxCommandEvent& event) {
 	if (Validate() && TransferDataFromWindow()) {
+
+		// save the old values
+		if (ChosenIndex < EditedInfos.size()) {
+			EditedInfos[ChosenIndex].Label = mvceditor::StringHelperClass::wxToIcu(Label->GetValue());
+			EditedInfos[ChosenIndex].Host = mvceditor::StringHelperClass::wxToIcu(Host->GetValue());
+			EditedInfos[ChosenIndex].User = mvceditor::StringHelperClass::wxToIcu(User->GetValue());
+			EditedInfos[ChosenIndex].Password = mvceditor::StringHelperClass::wxToIcu(Password->GetValue());
+			EditedInfos[ChosenIndex].DatabaseName = mvceditor::StringHelperClass::wxToIcu(Database->GetValue());
+			EditedInfos[ChosenIndex].Port = Port->GetValue();
+		}
+
 		ChosenIndex = List->GetSelection();
+		Infos.resize(EditedInfos.size());
+		std::copy(EditedInfos.begin(), EditedInfos.end(), Infos.begin());
 		EndModal(wxOK);
 	}
 }
@@ -90,8 +114,16 @@ void mvceditor::SqlConnectionDialogClass::OnCancelButton(wxCommandEvent& event) 
 void mvceditor::SqlConnectionDialogClass::OnTestButton(wxCommandEvent& event) {
 	if (TransferDataFromWindow()) {
 		size_t index = List->GetSelection();
-		if (index < Infos.size()) {
-			TestQuery.Info.Copy(Infos[index]);
+		if (index < EditedInfos.size()) {
+
+			// get the most up-to-date values that the user has input
+			EditedInfos[index].DatabaseName = mvceditor::StringHelperClass::wxToIcu(Database->GetValue());
+			EditedInfos[index].Host = mvceditor::StringHelperClass::wxToIcu(Host->GetValue());
+			EditedInfos[index].Port = Port->GetValue();
+			EditedInfos[index].User = mvceditor::StringHelperClass::wxToIcu(User->GetValue());
+			EditedInfos[index].Password = mvceditor::StringHelperClass::wxToIcu(Password->GetValue());
+			
+			TestQuery.Info.Copy(EditedInfos[index]);
 			wxThreadError error = wxTHREAD_NO_ERROR;
 			if (GetThread() && GetThread()->IsRunning()) {
 				error = wxTHREAD_RUNNING;
@@ -103,7 +135,7 @@ void mvceditor::SqlConnectionDialogClass::OnTestButton(wxCommandEvent& event) {
 			case wxTHREAD_NO_ERROR:
 				GetThread()->Run();
 				wxWindow::FindWindowById(wxID_OK, this)->Disable();
-				wxWindow::FindWindowById(ID_TEST, this)->Disable();
+				wxWindow::FindWindowById(ID_TESTBUTTON, this)->Disable();
 				break;
 			case wxTHREAD_NO_RESOURCE:
 			case wxTHREAD_MISC_ERROR:
@@ -118,6 +150,62 @@ void mvceditor::SqlConnectionDialogClass::OnTestButton(wxCommandEvent& event) {
 				break;
 			}
 		}
+	}
+}
+
+void mvceditor::SqlConnectionDialogClass::OnAddButton(wxCommandEvent& event) {
+
+	// save the old values
+	if (ChosenIndex < EditedInfos.size()) {
+		EditedInfos[ChosenIndex].Label = mvceditor::StringHelperClass::wxToIcu(Label->GetValue());
+		EditedInfos[ChosenIndex].Host = mvceditor::StringHelperClass::wxToIcu(Host->GetValue());
+		EditedInfos[ChosenIndex].User = mvceditor::StringHelperClass::wxToIcu(User->GetValue());
+		EditedInfos[ChosenIndex].Password = mvceditor::StringHelperClass::wxToIcu(Password->GetValue());
+		EditedInfos[ChosenIndex].DatabaseName = mvceditor::StringHelperClass::wxToIcu(Database->GetValue());
+		EditedInfos[ChosenIndex].Port = Port->GetValue();
+	}
+
+	// add the new item to the info list and the list control
+	mvceditor::DatabaseInfoClass newInfo;
+	newInfo.Label = UNICODE_STRING_SIMPLE("Untitled");
+	newInfo.IsDetected = false;
+	EditedInfos.push_back(newInfo);
+	List->Append(wxT("Untitled"));
+	ChosenIndex = List->GetCount() - 1;
+	List->SetSelection(List->GetCount() - 1);
+
+	// put the newly "blank" values in the textboxes
+	UpdateTextInputs();
+	Label->SetFocus();
+}
+
+void mvceditor::SqlConnectionDialogClass::OnDeleteButton(wxCommandEvent& event) {
+	int selection = List->GetSelection();
+
+	// dont allow the user to delete a detected connection
+	if (selection >= 0 && (size_t)selection < EditedInfos.size() && !EditedInfos[selection].IsDetected) {
+		List->Delete(selection);
+		if ((size_t)selection < EditedInfos.size()) {
+			EditedInfos.erase(EditedInfos.begin() + selection);
+		}
+		if ((size_t)selection < List->GetCount()) {
+			List->SetSelection(selection);
+			ChosenIndex = selection;
+		}
+		else {
+			List->SetSelection(List->GetCount() - 1);
+			ChosenIndex = List->GetCount() - 1;
+		}
+		UpdateTextInputs();
+	}
+}
+
+void mvceditor::SqlConnectionDialogClass::OnLabelText(wxCommandEvent& event) {
+	
+	// update list box with the label that is being typed in
+	int selection = List->GetSelection();
+	if (selection >= 0 && (size_t)selection < List->GetCount()) {
+		List->SetString(selection, Label->GetValue());
 	}
 }
 
@@ -163,18 +251,24 @@ void mvceditor::SqlConnectionDialogClass::ShowTestResults(wxCommandEvent& event)
 	}
 	wxMessageBox(msg);
 	wxWindow::FindWindowById(wxID_OK, this)->Enable();
-	wxWindow::FindWindowById(ID_TEST, this)->Enable();
+	wxWindow::FindWindowById(ID_TESTBUTTON, this)->Enable();
 }
 
 void mvceditor::SqlConnectionDialogClass::OnListboxSelected(wxCommandEvent& event) {
-	ChosenIndex = event.GetInt();
-	if (ChosenIndex <Infos.size()) {
-		Host->SetValue(mvceditor::StringHelperClass::IcuToWx(Infos[ChosenIndex].Host));
-		User->SetValue(mvceditor::StringHelperClass::IcuToWx(Infos[ChosenIndex].User));
-		Password->SetValue(mvceditor::StringHelperClass::IcuToWx(Infos[ChosenIndex].Password));
-		Database->SetValue(mvceditor::StringHelperClass::IcuToWx(Infos[ChosenIndex].DatabaseName));
-		Port->SetValue(Infos[ChosenIndex].Port);
+	
+	// save the old values
+	if (ChosenIndex < EditedInfos.size() && !EditedInfos[ChosenIndex].IsDetected) {
+		EditedInfos[ChosenIndex].Label = mvceditor::StringHelperClass::wxToIcu(Label->GetValue());
+		EditedInfos[ChosenIndex].Host = mvceditor::StringHelperClass::wxToIcu(Host->GetValue());
+		EditedInfos[ChosenIndex].User = mvceditor::StringHelperClass::wxToIcu(User->GetValue());
+		EditedInfos[ChosenIndex].Password = mvceditor::StringHelperClass::wxToIcu(Password->GetValue());
+		EditedInfos[ChosenIndex].DatabaseName = mvceditor::StringHelperClass::wxToIcu(Database->GetValue());
+		EditedInfos[ChosenIndex].Port = Port->GetValue();
 	}
+
+	// put the newly chosen values in the textboxes
+	ChosenIndex = event.GetInt();
+	UpdateTextInputs();
 }
 
 mvceditor::MultipleSqlExecuteClass::MultipleSqlExecuteClass(wxEvtHandler& handler, int queryId)
@@ -557,8 +651,7 @@ mvceditor::SqlBrowserPluginClass::SqlBrowserPluginClass()
 	: PluginClass()
 	, Infos()
 	, SqlMetaDataFetch(*this)
-	, ChosenIndex(0)
-	, WasEmptyDetectedInfo(false) {
+	, ChosenIndex(0) {
 }
 
 mvceditor::SqlBrowserPluginClass::~SqlBrowserPluginClass() {
@@ -566,20 +659,30 @@ mvceditor::SqlBrowserPluginClass::~SqlBrowserPluginClass() {
 
 void mvceditor::SqlBrowserPluginClass::OnProjectOpened(wxCommandEvent& event) {
 	if (GetProject()) {
+
+		// remove any connections previously detected
+		std::vector<mvceditor::DatabaseInfoClass>::iterator it = Infos.begin();
+		while (it != Infos.end()) {
+			if (it->IsDetected) {
+				it = Infos.erase(it);
+			}
+			else {
+				++it;
+			}
+		}
+		
+		// add the detected connections to the infos list
+		// this makes it easier; that way we always work with one list only
+		for (size_t i = 0; i < App->PhpFrameworks.Databases.size(); ++i) {
+			Infos.push_back(App->PhpFrameworks.Databases[i]);
+		}
 		DetectMetadata();
 	}
 }
 
 void mvceditor::SqlBrowserPluginClass::DetectMetadata() {
 	ChosenIndex = 0;
-	Infos = GetProject()->DatabaseInfo();
-	WasEmptyDetectedInfo = Infos.empty();
-	if (WasEmptyDetectedInfo) {
-		mvceditor::DatabaseInfoClass info;
-		info.Name = UNICODE_STRING_SIMPLE("Custom info");
-		Infos.push_back(info);
-	}
-	else {
+	if (!Infos.empty()) {
 		if (SqlMetaDataFetch.Read(Infos)) {
 			GetStatusBarWithGauge()->AddGauge(_("Fetching SQL meta data"), ID_SQL_METADATA_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
 		}
@@ -595,6 +698,11 @@ void mvceditor::SqlBrowserPluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
 		wxITEM_NORMAL);
 	toolsMenu->Append(mvceditor::MENU_SQL + 3, _("Detect SQL Meta Data"), _("Detect SQL Meta data so that it is made available to code completion"),
 		wxITEM_NORMAL);
+}
+
+void mvceditor::SqlBrowserPluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
+	toolBar->AddTool(mvceditor::MENU_SQL + 0, _("SQL Browser"), wxArtProvider::GetBitmap(
+		wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), wxT("Open the SQL Browser"), wxITEM_NORMAL);
 }
 
 void  mvceditor::SqlBrowserPluginClass::OnSqlBrowserToolsMenu(wxCommandEvent& event) {
@@ -623,7 +731,10 @@ mvceditor::SqlBrowserPanelClass* mvceditor::SqlBrowserPluginClass::CreateResults
 	mvceditor::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxNewId(), GetStatusBarWithGauge(), query, this);
 	mvceditor::NotebookClass* codeNotebook = GetNotebook();
 	wxString tabText = codeNotebook->GetPageText(codeNotebook->GetPageIndex(codeControl));
-	AddToolsWindow(sqlPanel, tabText);
+
+	// name the windows, since there could be multiple windows from various plugins; we want to know which opened tools windows
+	// are from this plugin
+	AddToolsWindow(sqlPanel, tabText, wxT("mvceditor::SqlBrowserPanelClass"));
 	sqlPanel->LinkToCodeControl(codeControl);
 	return sqlPanel;
 }
@@ -637,14 +748,20 @@ void mvceditor::SqlBrowserPluginClass::OnRun(wxCommandEvent& event) {
 		bool found = false;
 		for (size_t i = 0; i < notebook->GetPageCount(); i++) {
 			wxWindow* window = notebook->GetPage(i);
-			mvceditor::SqlBrowserPanelClass* panel = wxDynamicCast(window, mvceditor::SqlBrowserPanelClass);
-			if (panel && panel->IsLinkedToCodeControl(ctrl)) {
+
+			// only cast when we are sure of the type of window
+			// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
+			// methods
+			if (window->GetName() == wxT("mvceditor::SqlBrowserPanelClass")) {
+				mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)window;
+				if (panel->IsLinkedToCodeControl(ctrl)) {
 				
-				// we found the panel bring it to the forefront and run the query
-				found = true;
-				SetFocusToToolsWindow(window);
-				panel->Execute();
-				break;
+					// we found the panel bring it to the forefront and run the query
+					found = true;
+					SetFocusToToolsWindow(window);
+					panel->Execute();
+					break;
+				}
 			}
 		}
 		if (!found) {
@@ -661,25 +778,28 @@ void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event
 	// first time a new project is created; its database may not exist).
 	// before, a user would not be able to edit the connection info once it was detected
 	// in order to make it less confusing about where the connection info comes from.
-	mvceditor::SqlConnectionDialogClass dialog(GetMainWindow(), Infos, ChosenIndex, true);
-
-	// TODO: sometimes the editor crashes when the user test a connection then closes the test dialog
+	mvceditor::SqlConnectionDialogClass dialog(GetMainWindow(), Infos, ChosenIndex);
 	if (dialog.ShowModal() == wxOK) {
 		
-		// if connection changed need to update the code control so that it knows to use the new
+		// if chosen connection changed need to update the code control so that it knows to use the new
 		// connection for auto completion purposes
 		// all SQL panels are updated.
 		wxAuiNotebook* notebook = GetToolsNotebook();
 		for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
 			wxWindow* window = notebook->GetPage(i);
-			mvceditor::SqlBrowserPanelClass* panel = wxDynamicCast(window, mvceditor::SqlBrowserPanelClass);
-			if (panel) {
+			
+			// only cast when we are sure of the type of window
+			// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
+			// methods
+			if (window->GetName() == wxT("mvceditor::SqlBrowserPanelClass")) {
+				mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)window;
 				if (ChosenIndex < Infos.size()) {
 					panel->SetCurrentInfo(Infos[ChosenIndex]);
 				}
-				panel->UpdateLabels(wxT(""));			
+				panel->UpdateLabels(wxT(""));
 			}
 		}
+		SavePreferences();
 
 		// redetect the SQL meta data
 		SqlMetaDataFetch.Read(Infos);
@@ -697,12 +817,18 @@ void mvceditor::SqlBrowserPluginClass::OnContentNotebookPageChanged(wxAuiNoteboo
 			wxAuiNotebook* notebook = GetToolsNotebook();
 			for (size_t i = 0; i < notebook->GetPageCount(); i++) {
 				wxWindow* toolsWindow = notebook->GetPage(i);
-				mvceditor::SqlBrowserPanelClass* panel = wxDynamicCast(toolsWindow, mvceditor::SqlBrowserPanelClass);
-				if (panel && panel->IsLinkedToCodeControl(contentWindow)) {
-					
-					// we found the panel bring it to the forefront and run the query
-					SetFocusToToolsWindow(toolsWindow);
-					break;
+
+				// only cast when we are sure of the type of window
+				// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
+				// methods
+				if (toolsWindow->GetName() == wxT("mvceditor::SqlBrowserPanelClass")) {
+					mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)toolsWindow;
+					if (panel->IsLinkedToCodeControl(contentWindow)) {
+						
+						// we found the panel bring it to the forefront and run the query
+						SetFocusToToolsWindow(toolsWindow);
+						break;
+					}
 				}
 			}
 		}
@@ -717,9 +843,15 @@ void mvceditor::SqlBrowserPluginClass::OnContentNotebookPageClose(wxAuiNotebookE
 			wxAuiNotebook* notebook = GetToolsNotebook();
 			for (size_t i = 0; i < notebook->GetPageCount(); i++) {
 				wxWindow* toolsWindow = notebook->GetPage(i);
-				mvceditor::SqlBrowserPanelClass* panel = wxDynamicCast(toolsWindow, mvceditor::SqlBrowserPanelClass);
-				if (panel && panel->IsLinkedToCodeControl(contentWindow)) {
-					panel->UnlinkFromCodeControl();
+
+				// only cast when we are sure of the type of window
+				// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
+				// methods
+				if (toolsWindow->GetName() == wxT("mvceditor::SqlBrowserPanelClass")) {
+					mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)toolsWindow;
+					if (panel->IsLinkedToCodeControl(contentWindow)) {
+						panel->UnlinkFromCodeControl();
+					}
 				}
 			}
 		}
@@ -755,8 +887,72 @@ void mvceditor::SqlBrowserPluginClass::AuiManagerUpdate() {
 	AuiManager->Update();
 }
 
+void mvceditor::SqlBrowserPluginClass::LoadPreferences(wxConfigBase* config) {
+	wxString groupName;
+	long index = 0;
+	if (config->GetFirstGroup(groupName, index)) {
+		do {
+			if (groupName.Find(wxT("DatabaseInfo_")) == 0) {
+				mvceditor::DatabaseInfoClass info;
+				info.DatabaseName = mvceditor::StringHelperClass::wxToIcu(config->Read(groupName + wxT("/DatabaseName")));
+				wxString driverString = config->Read(groupName + wxT("/Driver"));
+				info.FileName = mvceditor::StringHelperClass::wxToIcu(config->Read(groupName + wxT("/FileName")));
+				info.Host = mvceditor::StringHelperClass::wxToIcu(config->Read(groupName + wxT("/Host")));
+				info.IsDetected = false;
+				info.Label = mvceditor::StringHelperClass::wxToIcu(config->Read(groupName + wxT("/Label")));
+				info.Password = mvceditor::StringHelperClass::wxToIcu(config->Read(groupName + wxT("/Password")));
+				config->Read(groupName + wxT("/Port"), &info.Port);
+				info.User = mvceditor::StringHelperClass::wxToIcu(config->Read(groupName + wxT("/User")));
+				
+				if (driverString.CmpNoCase(wxT("MYSQL")) == 0) {
+					info.Driver = mvceditor::DatabaseInfoClass::MYSQL;
+					Infos.push_back(info);
+				}
+			}
+		} while (config->GetNextGroup(groupName, index));
+	}
+}
+
+void mvceditor::SqlBrowserPluginClass::SavePreferences() {
+	wxConfigBase* config = wxConfig::Get();
+	wxString groupName;
+	long index = 0;
+
+	// delete any previous connections that are in the config
+	if (config->GetFirstGroup(groupName, index)) {
+		do {
+			if (groupName.Find(wxT("DatabaseInfo_")) == 0) {
+				config->DeleteGroup(groupName);
+			}
+		} while (config->GetNextGroup(groupName, index));
+	}
+
+	// now save all of the new ones
+	int saveIndex = 0;
+	for (size_t i = 0; i < Infos.size(); ++i) {
+		if (!Infos[i].IsDetected) {
+			config->SetPath(wxString::Format(wxT("/DatabaseInfo_%d"), saveIndex));
+			config->Write(wxT("DatabaseName"), mvceditor::StringHelperClass::IcuToWx(Infos[i].DatabaseName));
+			wxString driverString;
+			if (mvceditor::DatabaseInfoClass::MYSQL == Infos[i].Driver) {
+				driverString = wxT("MYSQL");
+			}
+			config->Write(wxT("Driver"), driverString);
+			config->Write(wxT("FileName"), mvceditor::StringHelperClass::IcuToWx(Infos[i].FileName));
+			config->Write(wxT("Host"), mvceditor::StringHelperClass::IcuToWx(Infos[i].Host));
+			config->Write(wxT("Label"), mvceditor::StringHelperClass::IcuToWx(Infos[i].Label));
+			config->Write(wxT("Password"), mvceditor::StringHelperClass::IcuToWx(Infos[i].Password));
+			config->Write(wxT("Port"), Infos[i].Port);
+			config->Write(wxT("User"), mvceditor::StringHelperClass::IcuToWx(Infos[i].User));
+			saveIndex++;
+		}
+	}
+	config->SetPath(wxT("/"));
+	config->Flush();
+}
+
 BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPluginClass, wxEvtHandler)
-	EVT_MENU(mvceditor::MENU_SQL + 0, mvceditor::SqlBrowserPluginClass::OnSqlBrowserToolsMenu)
+	EVT_MENU(mvceditor::MENU_SQL + 0, mvceditor::SqlBrowserPluginClass::OnSqlBrowserToolsMenu)	
 	EVT_MENU(mvceditor::MENU_SQL + 1, mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu)
 	EVT_MENU(mvceditor::MENU_SQL + 2, mvceditor::SqlBrowserPluginClass::OnRun)
 	EVT_MENU(mvceditor::MENU_SQL + 3, mvceditor::SqlBrowserPluginClass::OnSqlDetectMenu)

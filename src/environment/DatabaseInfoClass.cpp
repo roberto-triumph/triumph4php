@@ -30,38 +30,41 @@
  #include <string>
  
 mvceditor::DatabaseInfoClass::DatabaseInfoClass()
-	: Host()
+	: Label()
+	, Host()
 	, User()
 	, Password()
 	, DatabaseName()
 	, FileName()
-	, Name()
 	, Driver(MYSQL)
-	, Port() {
+	, Port() 
+	, IsDetected(false) {
 		
 }
 
 mvceditor::DatabaseInfoClass::DatabaseInfoClass(const mvceditor::DatabaseInfoClass& other) 
-	: Host()
+	: Label()
+	, Host()
 	, User()
 	, Password()
 	, DatabaseName()
 	, FileName()
-	, Name()
 	, Driver(MYSQL)
-	, Port() {
+	, Port() 
+	, IsDetected(false) {
 	Copy(other);
 }
 
 void mvceditor::DatabaseInfoClass::Copy(const mvceditor::DatabaseInfoClass& src) {
+	Label = src.Label;
 	Host = src.Host;
 	User = src.User;
 	Password = src.Password;
 	DatabaseName = src.DatabaseName;
 	FileName = src.FileName;
-	Name = src.Name;
 	Driver = src.Driver;
 	Port = src.Port;
+	IsDetected = src.IsDetected;
 }
 
 bool mvceditor::DatabaseInfoClass::SameAs(const mvceditor::DatabaseInfoClass& other) {

@@ -222,7 +222,7 @@ bool mvceditor::DatabaseDetectorActionClass::Response() {
 		s = result.Read(groupName + wxT("FileName"));
 		info.FileName = mvceditor::StringHelperClass::wxToIcu(s);
 		s = result.Read(groupName + wxT("Name"));
-		info.Name = mvceditor::StringHelperClass::wxToIcu(s);
+		info.Label = mvceditor::StringHelperClass::wxToIcu(s);
 		wxString driverString = result.Read(groupName + wxT("Driver"));
 		if (driverString.CmpNoCase(wxT("MYSQL")) == 0) {
 			info.Driver = mvceditor::DatabaseInfoClass::MYSQL;
@@ -233,6 +233,7 @@ bool mvceditor::DatabaseDetectorActionClass::Response() {
 			break;
 		}
 		result.Read(groupName + wxT("Port"), &info.Port);
+		info.IsDetected = true;
 		Databases.push_back(info);
 		next = result.GetNextGroup(groupName, index);
 	}
@@ -372,16 +373,15 @@ bool mvceditor::UrlDetectorActionClass::Response() {
 	wxStringTokenizer tok;
 	while (!stream.Eof()) {
 		tok.SetString(textStream.ReadLine(), wxT(",\n"));
-		mvceditor::UrlResourceClass newUrl;
 		if (tok.HasMoreTokens()) {
-			newUrl.Url = tok.NextToken();
+			mvceditor::UrlResourceClass newUrl(tok.NextToken());
 			if (tok.HasMoreTokens()) {
 				newUrl.FileName.Assign(tok.NextToken());
 				if (tok.HasMoreTokens()) {
 					newUrl.ClassName = tok.NextToken();
 					if (tok.HasMoreTokens()) {
 						newUrl.MethodName = tok.NextToken();
-						if (newUrl.Url.IsEmpty() || !newUrl.FileName.IsOk()) {
+						if (newUrl.Url.GetServer().IsEmpty() || !newUrl.FileName.IsOk()) {
 							Error = BAD_CONTENT;
 							ret = false;
 							break;

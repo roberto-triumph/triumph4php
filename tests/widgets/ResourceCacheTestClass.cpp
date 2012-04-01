@@ -68,7 +68,7 @@ public:
 	UnicodeString Code1;
 	UnicodeString Code2;
 	bool DoDuckTyping;
-	mvceditor::SymbolClass ParsedExpression;
+	pelet::SymbolClass ParsedExpression;
 
 	std::vector<UnicodeString> VariableMatches;
 	std::vector<mvceditor::ResourceClass> ResourceMatches;

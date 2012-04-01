@@ -124,7 +124,7 @@ wxString mvceditor::ViewFilePluginClass::CurrentFile() {
 void mvceditor::ViewFilePluginClass::StartDetection() {	
 	
 	// start the chain reaction
-	wxString url = ChosenUrl.Url;
+	wxString url = ChosenUrl.Url.BuildURI();
 	if (!url.IsEmpty()) {
 		wxFileName fileName = ChosenUrl.FileName;
 		if (fileName.IsOk()) {
@@ -146,7 +146,7 @@ void mvceditor::ViewFilePluginClass::OnWorkComplete(wxCommandEvent& event) {
 		FrameworkDetector.reset(new mvceditor::PhpFrameworkDetectorClass(*this, *GetEnvironment()));
 	}
 	FrameworkDetector->Identifiers = PhPFrameworks().Identifiers;
-	if (!FrameworkDetector->InitViewFilesDetector(GetProject()->GetRootPath(), App->UrlResourceFinder.ChosenUrl.Url, CallStackThread.StackFile)) {
+	if (!FrameworkDetector->InitViewFilesDetector(GetProject()->GetRootPath(), App->UrlResourceFinder.ChosenUrl.Url.BuildURI(), CallStackThread.StackFile)) {
 		mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Could not start viewFiles detector"));
 	}
 }
@@ -268,7 +268,7 @@ void mvceditor::ViewFilePanelClass::OnActionChoice(wxCommandEvent& event) {
 			break;
 		}
 	}
-	if (!url.Url.IsEmpty()) {
+	if (!url.Url.BuildURI().IsEmpty()) {
 		StatusLabel->SetLabel(_("Detecting"));
 		Plugin.ChosenUrl = url;
 		Plugin.StartDetection();

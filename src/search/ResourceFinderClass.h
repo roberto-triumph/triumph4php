@@ -27,8 +27,8 @@
 
 #include <search/DirectorySearchClass.h>
 #include <search/FindInFilesClass.h>
-#include <language/LexicalAnalyzerClass.h>
-#include <language/ParserClass.h>
+#include <pelet/LexicalAnalyzerClass.h>
+#include <pelet/ParserClass.h>
 #include <wx/datetime.h>
 #include <wx/string.h>
 #include <wx/filename.h>
@@ -95,7 +95,9 @@ class ResourceClass;
  * </code>
  * 
  */
-class ResourceFinderClass : public ClassObserverClass, public ClassMemberObserverClass, public FunctionObserverClass, 
+class ResourceFinderClass : public pelet::ClassObserverClass, 
+	public pelet::ClassMemberObserverClass, 
+	public pelet::FunctionObserverClass, 
 	public DirectoryWalkerClass {
 
 public:
@@ -163,8 +165,9 @@ public:
 	/**
 	 * Builds cache for PHP native functions. After a call to this method, CollectNearMatchResources, 
 	 * GetResourceSignature methods will work for PHP native functions (array, string, file functions ...).
+	 * @return bool TRUE if native functions file exists and was able to be read
 	 */
-	void BuildResourceCacheForNativeFunctions();
+	bool BuildResourceCacheForNativeFunctions();
 	
 	/**
 	 * Parses the given string for resources.  This method would be used, for example, when wanting
@@ -281,6 +284,7 @@ public:
 	/**
 	 * @param className the class name to check
 	 * @return all of the classes that the given class inherits from (parent, grandparent, and all the way up).
+	 * Note that only "extended" classes will be returned; interfaces will NOT be returned.
 	 */
 	std::vector<UnicodeString> ClassHierarchy(const UnicodeString& className) const;
 	
@@ -351,20 +355,20 @@ public:
 	 * Implement class observer.  When a class has been parsed, add it to the Resource Cache.
 	 */
 	void ClassFound(const UnicodeString& className, const UnicodeString& signature, 
-		const UnicodeString& comment);
+		const UnicodeString& comment, const int lineNumber);
 
 	/**
 	 * When a define has been found, add it to the resource cache
 	 */
 	void DefineDeclarationFound(const UnicodeString& variableName, const UnicodeString& variableValue, 
-			const UnicodeString& comment);
+			const UnicodeString& comment, const int lineNumber);
 	
 	/**
 	 * Implement class member observer.  When a class method has been parsed, add it to the Resource Cache.
 	 */
 	void MethodFound(const UnicodeString& className, const UnicodeString& methodName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
-		TokenClass::TokenIds visibility, bool isStatic);
+		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber);
 
 	void MethodEnd(const UnicodeString& className, const UnicodeString& methodName, int pos);
  
@@ -373,15 +377,17 @@ public:
 	 */
 	void PropertyFound(const UnicodeString& className, const UnicodeString& propertyName, 
 		const UnicodeString& propertyType, const UnicodeString& comment, 
-		TokenClass::TokenIds visibility, bool isConst, bool isStatic);
+		pelet::TokenClass::TokenIds visibility, bool isConst, bool isStatic, const int lineNumber);
 		
 	/**
 	 * Implement function observer.  When a function has been parsed, add it to the Resource Cache.
 	 */
 	void FunctionFound(const UnicodeString& methodName, 
-		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment);
+		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment, const int lineNumber);
 
 	void FunctionEnd(const UnicodeString& functionName, int pos);
+
+	void IncludeFound(const UnicodeString& file, const int lineNumber);
 		
 	/**
 	 * Print the resource cache to stdout.  Useful for debugging only.
@@ -393,7 +399,14 @@ public:
 	 * any resources). Will also return true if the ONLY file that has been cached is the native functions
 	 * file.
 	 */
-	bool IsEmpty() const;
+	bool IsFileCacheEmpty() const;
+
+	/**
+	 * @return bool true if this resource finder has not parsed any resources. Will also return true if the 
+	 * ONLY resources that have been cached are those for the the native functions
+	 * file. Note that this could return TRUE even though the file cache is not empty.
+	 */
+	bool IsResourceCacheEmpty() const;
 
 	/**
 	 * This method copies the internal resource lists from the given object to this. This method can
@@ -550,16 +563,16 @@ private:
 	/**
 	 * Used to parse through code for classes & methods
 	 * 
-	 * @var LexicalAnalyzerClass 
+	 * @var pelet::LexicalAnalyzerClass 
 	 */
-	LexicalAnalyzerClass Lexer;
+	pelet::LexicalAnalyzerClass Lexer;
 	
 	/**
 	 * Used to parse through code for classes & methods
 	 * 
-	 * @var ParserClass
+	 * @var pelet::ParserClass
 	 */
-	ParserClass Parser;
+	pelet::ParserClass Parser;
 	
 	/**
 	 * the file name parsed from resource string 
@@ -608,12 +621,6 @@ private:
 	 * 
 	 */
 	bool IsCacheSorted;
-
-	/**
-	 * Flag that will signal when the resource finder is parsing a native functions file (instead of user-created
-	 * code).  This  flag will allow us to differentiate between PHP standard functions and user code.
-	 */
-	bool IsCurrentFileNative;
 	
 	/**
 	 * Goes through the given file and parses out resources.
@@ -702,6 +709,19 @@ private:
 	 * file before.
 	 */
 	bool FindInFileCache(const wxString& fullPath, int& fileItemIndex, FileItem& fileItem) const;
+
+	/**
+	 * Read all resources from the given tag file. After a call to this method,
+	 * all resources from fileName will be added the the internal resource 
+	 * cache.
+	 *
+	 * @param fileName full path to the tag file. fileName is a file that is
+	 *        in ctags format.
+	 * @param bool TRUE if the given file is the tags file for the built-in PHP functions.
+	 * @return bool TRUE if file exists and ALL of the containing tags are valid.
+	 */
+	bool LoadTagFile(const wxFileName& fileName, bool isNativeTags);
+
 };
 
 /**
@@ -807,6 +827,11 @@ public:
 	 * @return the full path where this resource is located.
 	 */
 	wxString GetFullPath() const;
+
+	/**
+	 * set all properties to empty string
+	 */
+	void Clear();
 
 private:
 

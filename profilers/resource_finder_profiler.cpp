@@ -22,9 +22,9 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <language/LexicalAnalyzerClass.h>
-#include <language/TokenClass.h>
-#include <language/ParserClass.h>
+#include <pelet/LexicalAnalyzerClass.h>
+#include <pelet/TokenClass.h>
+#include <pelet/ParserClass.h>
 #include <language/SymbolTableClass.h>
 #include <search/DirectorySearchClass.h>
 #include <search/ResourceFinderClass.h>
@@ -75,7 +75,7 @@ public:
 	
 private:
 
-	mvceditor::ParserClass Parser;
+	pelet::ParserClass Parser;
 };
 
 /**
@@ -99,11 +99,11 @@ int main() {
 		minor;
 	wxOperatingSystemId os = wxGetOsVersion(&major, &minor);
 	if (os == wxOS_WINDOWS_NT) {
-		FileName = wxT("C:\\Users\\Roberto\\Documents\\mvc-editor\\resources\\native.php");
+		FileName = wxT("C:\\Users\\roberto\\Documents\\mvc-editor\\php_detectors\\lib\\Zend\\Config.php");
 		DirName = wxT("C:\\Users\\roberto\\sample_php_project\\");
 	}
 	else {
-		FileName = wxT("/home/roberto/workspace/mvc-editor/resources/native.php");
+		FileName = wxT("/home/roberto/workspace/mvc-editor/php_detectors/lib/Zend/Config.php");
 		DirName = wxT("/home/roberto/workspace/sample_php_project/");
 	}
 	ProfileLexer();
@@ -120,7 +120,7 @@ int main() {
 
 void ProfileLexer() {
 	printf("*******\n");
-	mvceditor::LexicalAnalyzerClass lexer;
+	pelet::LexicalAnalyzerClass lexer;
 	if (FileName.IsEmpty() || !wxFileExists(FileName)) {
 		printf("Nor running Profile Lexer because file was not found: %s", (const char*)FileName.ToAscii());
 		return;
@@ -128,7 +128,8 @@ void ProfileLexer() {
 	wxLongLong time;
 
 	time = wxGetLocalTimeMillis();
-	lexer.OpenFile(FileName);
+	std::string stdFile(FileName.ToAscii());
+	lexer.OpenFile(stdFile);
 	int token = 0, 
 		tokenCount = 0;
 	UnicodeString uniLexeme;
@@ -136,7 +137,7 @@ void ProfileLexer() {
 		token = lexer.NextToken();
 		lexer.GetLexeme(uniLexeme);
 		++tokenCount;
-	} while (!mvceditor::TokenClass::IsTerminatingToken(token));
+	} while (!pelet::TokenClass::IsTerminatingToken(token));
 	time = wxGetLocalTimeMillis() - time;
 	printf("time for lexer:%ld ms tokenCount=%d\n", time.ToLong(), tokenCount);
 
@@ -174,9 +175,11 @@ void ProfileParser() {
 	printf("*******\n");
 	wxLongLong time;
 	time = wxGetLocalTimeMillis();
-	mvceditor::ParserClass parser;
-	mvceditor::LintResultsClass error;
-	if (parser.LintFile(FileName, error)) {
+	pelet::ParserClass parser;
+	pelet::LintResultsClass error;
+
+	std::string stdFile(FileName.ToAscii());
+	if (parser.LintFile(stdFile, error)) {
 		printf("No syntax errors on %s\n", (const char *)FileName.ToAscii());
 	}
 	else {
@@ -198,14 +201,15 @@ void ProfileNativeFunctionsParsing() {
 		return;
 	}
 	wxLongLong time;
+	size_t found;
 
 	time = wxGetLocalTimeMillis();
+	resourceFinder.BuildResourceCacheForNativeFunctions();
 	resourceFinder.Prepare(wxT("stristr"));
-	resourceFinder.Walk(FileName);
 	resourceFinder.CollectNearMatchResources();
+	found = resourceFinder.GetResourceMatchCount();
 	time = wxGetLocalTimeMillis() - time;
-	size_t found = resourceFinder.GetResourceMatchCount();
-	printf("time for resourceFinder on native.php:%ld ms found:%d\n", time.ToLong(), (int)found);
+	printf("time for resourceFinder on php.tags:%ld ms found:%d\n", time.ToLong(), (int)found);
 	
 	time = wxGetLocalTimeMillis();
 	resourceFinder.Prepare(wxT("mysql_query"));
@@ -213,7 +217,7 @@ void ProfileNativeFunctionsParsing() {
 	resourceFinder.CollectNearMatchResources();
 	time = wxGetLocalTimeMillis() - time;
 	found = resourceFinder.GetResourceMatchCount();
-	printf("time for resourceFinder on native.php after caching:%ld ms found:%d\n", time.ToLong(), (int)found);
+	printf("time for resourceFinder on php.tags after caching:%ld ms found:%d\n", time.ToLong(), (int)found);
 }
 
 void ProfileResourceFinderOnLargeProject() {
@@ -259,8 +263,9 @@ ParserDirectoryWalkerClass::ParserDirectoryWalkerClass()
 
 bool ParserDirectoryWalkerClass::Walk(const wxString& file) {
 	if (file.EndsWith(wxT(".php"))) {
-		mvceditor::LintResultsClass error;
-		if (Parser.LintFile(file, error)) {
+		pelet::LintResultsClass error;
+		std::string stdFile(file.ToAscii());
+		if (Parser.LintFile(stdFile, error)) {
 			WithNoErrors++;
 		}
 		else {
