@@ -24,6 +24,7 @@
  */
 #include <UnitTest++.h>
 #include <windows/StringHelperClass.h>
+#include <unicode/ustream.h> //get the << overloaded operator, needed by UnitTest++
 
 SUITE(StringHelperTestClass) {
 	
@@ -67,5 +68,19 @@ TEST(FindPreviousShouldReturnNotFoundWhenMatchIsNotBeforeStart) {
 	UnicodeString expression = UNICODE_STRING_SIMPLE("backwards");
 	CHECK_EQUAL(-1, mvceditor::StringHelperClass::FindPrevious(text, expression, 29)); // 29 = index of 'd' of "backward" 
 }
+
+TEST(WxToIcuConversions) {
+	UnicodeString uniStr = UNICODE_STRING_SIMPLE("this is a test of the conversions");
+	wxString wxStr = wxT("this is a test of the conversions");
+
+	CHECK_EQUAL(wxStr, mvceditor::StringHelperClass::IcuToWx(uniStr));
+	CHECK_EQUAL(uniStr, mvceditor::StringHelperClass::wxToIcu(wxStr));
+
+	// convert twice
+	UnicodeString test = mvceditor::StringHelperClass::wxToIcu(
+			mvceditor::StringHelperClass::IcuToWx(uniStr));
+	CHECK_EQUAL(uniStr, test);
+}
+
 
 }

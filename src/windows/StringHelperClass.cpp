@@ -49,8 +49,13 @@ UnicodeString mvceditor::StringHelperClass::wxToIcu(wxString wx) {
 	UErrorCode status = U_ZERO_ERROR;
 	UnicodeString uni;
 	int actualCount = 0;
-	// not sure if 5th param is meant to be in bytes or in chars... only time will tell	
-	u_strFromUTF8(uni.getBuffer(charCount), charCount, &actualCount, (const char*)wx.ToUTF8(), charCount, &status);
+
+	size_t rawLength;
+	wxCharBuffer buf = wxConvUTF8.cWC2MB(wx.c_str(), wx.length() + 1, &rawLength);
+
+	// 5th param is meant to be in bytes not chars
+	// +1 = make room for the NULL terminator
+	u_strFromUTF8(uni.getBuffer(charCount + 1), charCount + 1, &actualCount, buf.data(), rawLength, &status);
 	if (U_SUCCESS(status)) {
 		uni.releaseBuffer(actualCount);	
 	}
