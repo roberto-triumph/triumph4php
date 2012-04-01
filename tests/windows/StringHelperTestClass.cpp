@@ -82,5 +82,18 @@ TEST(WxToIcuConversions) {
 	CHECK_EQUAL(uniStr, test);
 }
 
+TEST(IcuToCharConversions) {
+	UnicodeString uniStr = UNICODE_STRING_SIMPLE("this is a test of the conversions");
+	std::string str = "this is a test of the conversions";
+
+	CHECK_EQUAL(str, mvceditor::StringHelperClass::IcuToChar(uniStr));
+	CHECK_EQUAL(uniStr, mvceditor::StringHelperClass::charToIcu(str.c_str()));
+
+	// convert twice
+	UnicodeString test = mvceditor::StringHelperClass::charToIcu(
+		mvceditor::StringHelperClass::IcuToChar(uniStr).c_str());
+	CHECK_EQUAL(uniStr, test);
+}
+
 
 }

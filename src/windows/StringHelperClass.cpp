@@ -71,11 +71,11 @@ UnicodeString mvceditor::StringHelperClass::charToIcu(const char* source) {
 	UnicodeString uni;
 	int actualCount = 0;
 	
-	// not sure if 5th param is meant to be in bytes or in chars... only time will tell	
+	// 5th param is meant to be in bytes
 	// need to account for the null character, hence the +1
-	u_strFromUTF8(uni.getBuffer(charCount + 0), charCount + 0, &actualCount, source, charCount, &status);
+	u_strFromUTF8(uni.getBuffer(charCount + 1), charCount + 1, &actualCount, source, charCount, &status);
 	if (U_SUCCESS(status)) {
-		uni.releaseBuffer(actualCount + 0);	
+		uni.releaseBuffer(actualCount);
 	}
 	else {
 		uni.releaseBuffer(0);
