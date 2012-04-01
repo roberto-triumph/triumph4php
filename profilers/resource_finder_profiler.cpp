@@ -99,11 +99,11 @@ int main() {
 		minor;
 	wxOperatingSystemId os = wxGetOsVersion(&major, &minor);
 	if (os == wxOS_WINDOWS_NT) {
-		FileName = wxT("C:\\Users\\roberto\\Documents\\mvc-editor\\resources\\native.php");
+		FileName = wxT("C:\\Users\\roberto\\Documents\\mvc-editor\\php_detectors\\lib\\Zend\\Config.php");
 		DirName = wxT("C:\\Users\\roberto\\sample_php_project\\");
 	}
 	else {
-		FileName = wxT("/home/roberto/workspace/mvc-editor/resources/native.php");
+		FileName = wxT("/home/roberto/workspace/mvc-editor/php_detectors/lib/Zend/Config.php");
 		DirName = wxT("/home/roberto/workspace/sample_php_project/");
 	}
 	ProfileLexer();
@@ -128,8 +128,6 @@ void ProfileLexer() {
 	wxLongLong time;
 
 	time = wxGetLocalTimeMillis();
-
-	// TODO fix
 	std::string stdFile(FileName.ToAscii());
 	lexer.OpenFile(stdFile);
 	int token = 0, 
@@ -179,6 +177,7 @@ void ProfileParser() {
 	time = wxGetLocalTimeMillis();
 	pelet::ParserClass parser;
 	pelet::LintResultsClass error;
+
 	std::string stdFile(FileName.ToAscii());
 	if (parser.LintFile(stdFile, error)) {
 		printf("No syntax errors on %s\n", (const char *)FileName.ToAscii());
@@ -265,8 +264,6 @@ ParserDirectoryWalkerClass::ParserDirectoryWalkerClass()
 bool ParserDirectoryWalkerClass::Walk(const wxString& file) {
 	if (file.EndsWith(wxT(".php"))) {
 		pelet::LintResultsClass error;
-
-		// TODO: fix
 		std::string stdFile(file.ToAscii());
 		if (Parser.LintFile(stdFile, error)) {
 			WithNoErrors++;

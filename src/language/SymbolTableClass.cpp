@@ -444,10 +444,8 @@ void mvceditor::SymbolTableClass::CreateSymbolsFromFile(const wxString& fileName
 	
 	// for now ignore parse errors
 	pelet::LintResultsClass results;
-
-	// TODO: not correct
-	std::string stdFile(fileName.ToAscii());
-	Parser.ScanFile(stdFile, results);
+	wxFFile file(fileName, wxT("rb"));
+	Parser.ScanFile(file.fp(), mvceditor::StringHelperClass::wxToIcu(fileName), results);
 }
 
 void mvceditor::SymbolTableClass::ExpressionCompletionMatches(const pelet::SymbolClass& parsedExpression, const UnicodeString& expressionScope,

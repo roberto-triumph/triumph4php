@@ -105,8 +105,8 @@ TEST_FIXTURE(CallStackFixtureTestClass, FailOnParseError) {
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
 	CHECK_EQUAL(false, CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), error));
 
-	std::string expected = file.GetFullPath().ToAscii();
-	CHECK_EQUAL(expected, CallStack.LintResults.File);
+	UnicodeString expected = mvceditor::StringHelperClass::wxToIcu(file.GetFullPath());
+	CHECK_EQUAL(expected, CallStack.LintResults.UnicodeFilename);
 	CHECK_EQUAL(mvceditor::CallStackClass::PARSE_ERR0R, error);
 }	
 

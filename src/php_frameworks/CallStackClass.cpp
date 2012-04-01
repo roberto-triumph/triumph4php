@@ -103,9 +103,8 @@ bool mvceditor::CallStackClass::Recurse(Errors& error) {
 	// types
 	bool newlyRegistered = ResourceCache.Register(fileName.GetFullPath(), true);
 	
-	// TODO: fix
-	std::string stdFile = fileName.GetFullPath().ToAscii();
-	bool ret = Parser.ScanFile(stdFile, LintResults);
+	wxFFile file(fileName.GetFullPath(), wxT("rb"));
+	bool ret = Parser.ScanFile(file.fp(), mvceditor::StringHelperClass::wxToIcu(fileName.GetFullPath()), LintResults);
 	if (ret && !MatchError.HasError() && FoundScope) {
 		
 		// check to see if we have any new functions to parse

@@ -1033,7 +1033,7 @@ TEST_FIXTURE(ResourceFinderTestClass, CollectFullyQualifiedResourcesShouldFindCl
 	CHECK(ResourceFinder.CollectNearMatchResources());
 	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
 	CHECK_EQUAL(TestProjectDir + wxT("test.php"), ResourceFinder.GetResourceMatchFullPath(0));
-	wxRemoveFile(TestProjectDir + testFile);
+	CHECK(wxRemoveFile(TestProjectDir + testFile));
 	CHECK(ResourceFinder.Prepare(wxT("UserClass")));
 	CHECK_EQUAL(false, ResourceFinder.CollectFullyQualifiedResource());
 	CHECK_EQUAL((size_t)0, ResourceFinder.GetResourceMatchCount());

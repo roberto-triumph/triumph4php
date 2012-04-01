@@ -743,10 +743,8 @@ void mvceditor::ResourceFinderClass::BuildResourceCache(const wxString& fullPath
 			
 			// for now silently ignore files with parser errors
 			pelet::LintResultsClass lintResults;
-
-			// TODO: this is not correct
-			std::string stdFile = fullPath.ToAscii();
-			Parser.ScanFile(stdFile, lintResults);
+			wxFFile file(fullPath, wxT("rb"));
+			Parser.ScanFile(file.fp(), mvceditor::StringHelperClass::wxToIcu(fullPath), lintResults);
 			IsCacheSorted = false;
 		}
 	}
@@ -1378,9 +1376,11 @@ bool mvceditor::ResourceFinderClass::Persist(const wxFileName& outputFile) const
 		return false;
 	}
 
-	// TODO: fn_str() would not compile in MSW
-	// what about unicode file names?
-	UFILE* uf = u_fopen(outputFile.GetFullPath().ToAscii(), "wb", NULL, NULL);
+	wxFFile file(outputFile.GetFullPath(), wxT("wb"));
+	if (!file.IsOpened()) {
+		return false;
+	}
+	UFILE* uf = u_finit(file.fp(), NULL, NULL);
 	if (!uf) {
 		return false;
 	}

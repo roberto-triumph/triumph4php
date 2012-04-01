@@ -480,6 +480,9 @@ solution "mvc_editor"
 		includedirs { "lib/pelet/include/", "lib/UnitTest++/src/", "lib/pelet/tests/" }
 		links { "pelet", "unit_test++" }
 		
+		-- dont bother with warnings  with using 'unsafe' fopen
+		defines { "_CRT_SECURE_NO_WARNINGS" }
+		
 		configuration "Debug"
 			pickywarnings(_ACTION)
 			icuconfiguration("Debug", _ACTION)

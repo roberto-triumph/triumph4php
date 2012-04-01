@@ -87,9 +87,8 @@ bool mvceditor::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 		LastResults.LineNumber = 0;
 		LastResults.CharacterPosition = 0;
 
-		// TODO: fix 
-		std::string stdFile = fileName.ToAscii();
-		if (Parser.LintFile(stdFile, LastResults)) {
+		wxFFile file(fileName, wxT("rb"));
+		if (Parser.LintFile(file.fp(), mvceditor::StringHelperClass::wxToIcu(fileName), LastResults)) {
 			WithNoErrors++;
 		}
 		else {
@@ -179,13 +178,19 @@ mvceditor::LintResultsPanelClass::~LintResultsPanelClass() {
 void mvceditor::LintResultsPanelClass::AddError(pelet::LintResultsClass* lintError) {
 	wxString err = StringHelperClass::IcuToWx(lintError->Error);
 	wxString line;
-	line.Printf(_("%s on %s line %d near Position %d\n"), 
-		err.c_str(), 
-		lintError->File.c_str(), 
+	int capacity = lintError->Error.length() + lintError->UnicodeFilename.length() + 50;
+	UnicodeString msg;
+	int written = u_sprintf(msg.getBuffer(capacity), 
+		"%S on %S line %d near Position %d\n", 
+		lintError->Error.getTerminatedBuffer(),
+		lintError->UnicodeFilename.getTerminatedBuffer(),
 		lintError->LineNumber,
-		lintError->CharacterPosition);
+		lintError->CharacterPosition
+	);
+	msg.releaseBuffer(written);
+	wxString wxMsg = mvceditor::StringHelperClass::IcuToWx(msg);
 	LintErrors.push_back(lintError);
-	ErrorsList->AppendString(line);
+	ErrorsList->AppendString(wxMsg);
 }
 
 void mvceditor::LintResultsPanelClass::ClearErrors() {
@@ -205,10 +210,9 @@ void mvceditor::LintResultsPanelClass::RemoveErrorsFor(const wxString& fileName)
 	std::vector<pelet::LintResultsClass*>::iterator it = LintErrors.begin();
 	int i = 0;
 
-	// TODO: fix 
-	wxCharBuffer buf = fileName.ToUTF8();
+	UnicodeString uniFileName = mvceditor::StringHelperClass::wxToIcu(fileName);
 	while (it != LintErrors.end()) {
-		if ((*it)->File == buf.data()) {
+		if ((*it)->UnicodeFilename == uniFileName) {
 			delete *it;
 			it = LintErrors.erase(it);
 			ErrorsList->Delete(i);
@@ -242,8 +246,7 @@ void mvceditor::LintResultsPanelClass::OnListDoubleClick(wxCommandEvent& event) 
 void mvceditor::LintResultsPanelClass::DisplayLintError(int index) {
 	pelet::LintResultsClass* results = LintErrors[index];
 
-	// TODO: fix
-	wxString file(results->File.c_str(), wxConvUTF8);
+	wxString file = mvceditor::StringHelperClass::IcuToWx(results->UnicodeFilename);
 	Notebook->LoadPage(file);
 	Notebook->GetCurrentCodeControl()->MarkLintError(*results);
 }
@@ -442,6 +445,7 @@ void mvceditor::LintPluginClass::OnFileSaved(mvceditor::FileSavedEventClass& eve
 		ignoreFilesRegEx.Trim(false);
 		ignoreFilesRegEx.Trim(true);
 		ignoreFilesRegEx.Replace(wxT("\n"), wxT(";"));
+
 		bool error = LintBackgroundFileReader.LintSingleFile(fileName, phpFileFilters, ignoreFilesRegEx);
 		if (error) {
 			
