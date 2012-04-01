@@ -29,9 +29,10 @@
 #include <widgets/UnicodeStringValidatorClass.h>
 #include <MvcEditorErrors.h>
 #include <MvcEditor.h>
+#include <wx/artprov.h>
 
-const int ID_SQL_GAUGE = wxNewId();
-const int ID_SQL_METADATA_GAUGE = wxNewId();
+static const int ID_SQL_GAUGE = wxNewId();
+static const int ID_SQL_METADATA_GAUGE = wxNewId();
 
 mvceditor::SqlConnectionDialogClass::SqlConnectionDialogClass(wxWindow* parent, std::vector<mvceditor::DatabaseInfoClass>& infos, 
 															  size_t& chosenIndex)
@@ -699,6 +700,11 @@ void mvceditor::SqlBrowserPluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
 		wxITEM_NORMAL);
 }
 
+void mvceditor::SqlBrowserPluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
+	toolBar->AddTool(mvceditor::MENU_SQL + 0, _("SQL Browser"), wxArtProvider::GetBitmap(
+		wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), wxT("Open the SQL Browser"), wxITEM_NORMAL);
+}
+
 void  mvceditor::SqlBrowserPluginClass::OnSqlBrowserToolsMenu(wxCommandEvent& event) {
 	int num = 1;
 	mvceditor::NotebookClass* notebook = GetNotebook();
@@ -946,7 +952,7 @@ void mvceditor::SqlBrowserPluginClass::SavePreferences() {
 }
 
 BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPluginClass, wxEvtHandler)
-	EVT_MENU(mvceditor::MENU_SQL + 0, mvceditor::SqlBrowserPluginClass::OnSqlBrowserToolsMenu)
+	EVT_MENU(mvceditor::MENU_SQL + 0, mvceditor::SqlBrowserPluginClass::OnSqlBrowserToolsMenu)	
 	EVT_MENU(mvceditor::MENU_SQL + 1, mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu)
 	EVT_MENU(mvceditor::MENU_SQL + 2, mvceditor::SqlBrowserPluginClass::OnRun)
 	EVT_MENU(mvceditor::MENU_SQL + 3, mvceditor::SqlBrowserPluginClass::OnSqlDetectMenu)

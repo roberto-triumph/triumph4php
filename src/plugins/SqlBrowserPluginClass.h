@@ -405,6 +405,8 @@ public:
 	 */
 	void AddToolsMenuItems(wxMenu* toolsMenu);
 
+	void AddToolBarItems(wxAuiToolBar* toolBar);
+
 	void LoadPreferences(wxConfigBase* config);
 
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
