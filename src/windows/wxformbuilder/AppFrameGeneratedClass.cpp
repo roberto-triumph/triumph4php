@@ -295,8 +295,8 @@ EditorBehaviorPanelGeneratedClass::EditorBehaviorPanelGeneratedClass( wxWindow* 
 	EnableIndentationGuides = new wxCheckBox( this, wxID_ANY, _("Show Indentation Guides"), wxDefaultPosition, wxDefaultSize, 0 );
 	FlexGridSizer->Add( EnableIndentationGuides, 0, wxALL, 5 );
 	
-	
-	FlexGridSizer->Add( 0, 0, 1, wxEXPAND, 5 );
+	EnableWordWrap = new wxCheckBox( this, ID_ENABLEWORDWRAP, _("Enable Word Wrap"), wxDefaultPosition, wxDefaultSize, 0 );
+	FlexGridSizer->Add( EnableWordWrap, 0, wxALL, 5 );
 	
 	EnableLineEndings = new wxCheckBox( this, wxID_ANY, _("Show Line Endings"), wxDefaultPosition, wxDefaultSize, 0 );
 	FlexGridSizer->Add( EnableLineEndings, 0, wxALL, 5 );

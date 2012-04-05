@@ -642,6 +642,13 @@ void mvceditor::CodeControlClass::SetPlainTextOptions() {
 	SetMarginMask(LINT_RESULT_MARGIN, ~wxSTC_MASK_FOLDERS);
 	MarkerDefine(LINT_RESULT_MARKER, wxSTC_MARK_ARROW, *wxRED, *wxRED);
 	WordHighlightStyle = INDICATOR_PHP_STYLE;
+	if (CodeControlOptions.EnableWordWrap) {
+		SetWrapMode(wxSTC_WRAP_WORD);
+		SetWrapVisualFlags(wxSTC_WRAPVISUALFLAG_START);
+	}
+	else {
+		SetWrapMode(wxSTC_WRAP_NONE);
+	}
 	
 	// syntax coloring; use the same font as PHP code for now
 	for (size_t i = 0; i < CodeControlOptions.CssStyles.size(); ++i) {

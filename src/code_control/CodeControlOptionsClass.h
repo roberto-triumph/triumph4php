@@ -193,6 +193,11 @@ public:
 	 */
 	bool EnableDynamicAutoCompletion;
 
+	/**
+	 * If TRUE, lines  wider than the window width will be continued on the following lines
+	 */
+	bool EnableWordWrap;
+
 	CodeControlOptionsClass();
 
 	/**

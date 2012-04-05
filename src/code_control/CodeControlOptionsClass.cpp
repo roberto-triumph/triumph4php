@@ -37,6 +37,7 @@ mvceditor::CodeControlOptionsClass::CodeControlOptionsClass() {
 	EnableLineEndings = false;
 	EnableAutoCompletion = true;
 	EnableDynamicAutoCompletion = true;
+	EnableWordWrap = false;
 	wxOperatingSystemId os = wxGetOsVersion();
 	if (wxOS_WINDOWS == os) {  
 		LineEndingMode = wxSTC_EOL_CRLF;
@@ -437,6 +438,7 @@ void mvceditor::CodeControlOptionsClass::Load(wxConfigBase* config) {
 	config->Read(wxT("EditorBehavior/EnableLineEndings"), &EnableLineEndings);
 	config->Read(wxT("EditorBehavior/EnableAutoCompletion"), &EnableAutoCompletion);
 	config->Read(wxT("EditorBehavior/EnableDynamicAutoCompletion"), &EnableDynamicAutoCompletion);
+	config->Read(wxT("EditorBehavior/EnableWordWrap"), &EnableWordWrap);
 	for (size_t i = 0; i < PhpStyles.size(); ++i) {
 		PhpStyles[i].Read(config);
 	}
@@ -461,6 +463,7 @@ void mvceditor::CodeControlOptionsClass::Save(wxConfigBase* config) {
 	config->Write(wxT("EditorBehavior/EnableLineEndings"), EnableLineEndings);
 	config->Write(wxT("EditorBehavior/EnableAutoCompletion"), EnableAutoCompletion);
 	config->Write(wxT("EditorBehavior/EnableDynamicAutoCompletion"), EnableDynamicAutoCompletion);
+	config->Write(wxT("EditorBehavior/EnableWordWrap"), EnableWordWrap);
 	for (size_t i = 0; i < PhpStyles.size(); ++i) {
 		PhpStyles[i].Write(config);
 	}

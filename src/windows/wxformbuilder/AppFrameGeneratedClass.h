@@ -197,6 +197,7 @@ class EditorBehaviorPanelGeneratedClass : public wxPanel
 		enum
 		{
 			ID_RIGHT_MARGIN_CHECK = 1000,
+			ID_ENABLEWORDWRAP,
 			ID_AUTOCOMPLETION,
 			ID_SPACES_INSTEAD_OF_TABS,
 			ID_ENABLEDYNAMICAUTOCOMPLETION,
@@ -208,7 +209,7 @@ class EditorBehaviorPanelGeneratedClass : public wxPanel
 		wxCheckBox* EnableRightMargin;
 		wxSpinCtrl* RightMargin;
 		wxCheckBox* EnableIndentationGuides;
-		
+		wxCheckBox* EnableWordWrap;
 		wxCheckBox* EnableLineEndings;
 		wxCheckBox* EnableAutoCompletion;
 		wxCheckBox* IndentUsingTabs;
