@@ -248,6 +248,12 @@ bool mvceditor::CodeControlClass::IsNew() const {
 
 bool mvceditor::CodeControlClass::SaveAndTrackFile(wxString newFilename) {
 	bool saved = false;
+	if (CodeControlOptions.TrimTrailingSpaceBeforeSave) {
+		TrimTrailingSpaces();
+	}
+	if (CodeControlOptions.RemoveTrailingBlankLinesBeforeSave) {
+		RemoveTrailingBlankLines();
+	}
 	if (!CurrentFilename.empty() || CurrentFilename == newFilename) {
 		saved = SaveFile(CurrentFilename);
 
@@ -1098,6 +1104,80 @@ void mvceditor::CodeControlClass::SetAsHidden(bool isHidden) {
 	}
 	if (IsHidden && AutoCompActive()) {
 		AutoCompCancel();
+	}
+}
+
+void mvceditor::CodeControlClass::TrimTrailingSpaces() {
+	int maxLines = GetLineCount();
+	for (int line = 0; line < maxLines; line++) {
+		int lineStart = PositionFromLine(line);
+		int lineEnd = GetLineEndPosition(line);
+		int i = lineEnd - 1;
+		char ch = (char)GetCharAt(i);
+		while ((i >= lineStart) && ((ch == ' ') || (ch == '\t'))) {
+			i--;
+			ch = GetCharAt(i);
+		}
+		if (i < (lineEnd - 1)) {
+			SetTargetStart(i + 1);
+			SetTargetEnd(lineEnd);
+			ReplaceTarget(wxT(""));
+		}
+	}
+}
+
+void mvceditor::CodeControlClass::RemoveTrailingBlankLines() {
+	if (DocumentMode != PHP) {
+		return;
+	}
+
+	// search backwards from the end of the file
+	// if the first non-whitespace characters are "?>" then
+	// we remove all space characters
+	int maxPos = GetTextLength();
+	char c = 0, prev = 0;
+	bool done = false;
+	bool seenAngleBracket = false;
+	bool seenQuestion = false;
+	for (int i = maxPos - 1; i >= 0 && !done; i--) {
+		if ('>' == prev && '?' == c) {
+
+			// if we get here then the first non-space characters that were found were
+			// the PHP end tags
+			// 3 = don't remove the ending PHP tag
+			SetTargetStart(i + 3);
+			SetTargetEnd(maxPos);
+			ReplaceTarget(wxT(""));
+			done = true;
+		}
+		prev = c;
+		c = GetCharAt(i);
+
+		// once we see an angle bracket, we come to our decision
+		// if we dont do this, then a single angle bracket will get removed
+		// for example when the file ends like this:
+		// "?>
+		// \n
+		// \n>"
+		
+		if ('>' == c && seenAngleBracket) {
+			done = true;
+		}
+		else if ('>' == c && !seenAngleBracket) {
+			seenAngleBracket = true;
+		}
+		if ('?' == c && seenQuestion) {
+			done = true;
+		}
+		else if ('?' == c && !seenQuestion) {
+			seenQuestion = true;
+		}
+
+		// if we hit anything other than a space character or the PHP end
+		// tag, then don't modify anything
+		if (!isspace(c) && c != '?' && c != '>') {
+			done = true;
+		}
 	}
 }
 

@@ -310,6 +310,12 @@ EditorBehaviorPanelGeneratedClass::EditorBehaviorPanelGeneratedClass( wxWindow* 
 	EnableDynamicAutoCompletion = new wxCheckBox( this, ID_ENABLEDYNAMICAUTOCOMPLETION, _("Enable Dynamic code completion"), wxDefaultPosition, wxDefaultSize, 0 );
 	FlexGridSizer->Add( EnableDynamicAutoCompletion, 0, wxALL, 5 );
 	
+	TrimTrailingSpaceBeforeSave = new wxCheckBox( this, ID_TRIMTRAILINGSPACEBEFORESAVE, _("Trim Trailing Space Before Save"), wxDefaultPosition, wxDefaultSize, 0 );
+	FlexGridSizer->Add( TrimTrailingSpaceBeforeSave, 0, wxALL, 5 );
+	
+	RemoveTrailingBlankLines = new wxCheckBox( this, ID_REMOVETRAILINGBLANKLINES, _("Remove Trailing Blank Lines (PHP)"), wxDefaultPosition, wxDefaultSize, 0 );
+	FlexGridSizer->Add( RemoveTrailingBlankLines, 0, wxALL, 5 );
+	
 	wxBoxSizer* NumbersSizer;
 	NumbersSizer = new wxBoxSizer( wxHORIZONTAL );
 	

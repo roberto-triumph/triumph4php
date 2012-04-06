@@ -429,6 +429,17 @@ private:
 	 */
 	void OnDwellEnd(wxStyledTextEvent& event);
 
+	/**
+	 * Removes trailing space from ALL lines in this document.
+	 */
+	void TrimTrailingSpaces();
+	
+	/**
+	 * Removes any trailing empty lines.
+	 * This method will only modify PHP files.
+	 */
+	void RemoveTrailingBlankLines();
+
 	/*
 	* The file that was loaded.
 	*/

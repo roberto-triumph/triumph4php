@@ -201,6 +201,8 @@ class EditorBehaviorPanelGeneratedClass : public wxPanel
 			ID_AUTOCOMPLETION,
 			ID_SPACES_INSTEAD_OF_TABS,
 			ID_ENABLEDYNAMICAUTOCOMPLETION,
+			ID_TRIMTRAILINGSPACEBEFORESAVE,
+			ID_REMOVETRAILINGBLANKLINES,
 		};
 		
 		wxCheckBox* EnableCodeFolding;
@@ -214,6 +216,8 @@ class EditorBehaviorPanelGeneratedClass : public wxPanel
 		wxCheckBox* EnableAutoCompletion;
 		wxCheckBox* IndentUsingTabs;
 		wxCheckBox* EnableDynamicAutoCompletion;
+		wxCheckBox* TrimTrailingSpaceBeforeSave;
+		wxCheckBox* RemoveTrailingBlankLines;
 		wxStaticText* TabWidthLabel;
 		wxSpinCtrl* TabWidth;
 		wxStaticText* SpacesPerIndentLabel;
