@@ -193,6 +193,24 @@ public:
 	 */
 	bool EnableDynamicAutoCompletion;
 
+	/**
+	 * If TRUE, lines wider than the window width will be continued on the following lines
+	 */
+	bool EnableWordWrap;
+
+	/**
+	 * If TRUE, the editor will remove any space characters from the last line before
+	 * the document is saved.
+	 */
+	bool TrimTrailingSpaceBeforeSave;
+
+	/**
+	 * If TRUE, the editor will remove any trailing lines that are empty. This functionality
+	 * will prevent the "headers already sent" problem when there are empty lines after
+	 * a PHP closing tag.
+	 */
+	bool RemoveTrailingBlankLinesBeforeSave;
+
 	CodeControlOptionsClass();
 
 	/**
