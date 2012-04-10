@@ -69,15 +69,15 @@ function icuconfiguration(config, action)
 		libdirs { "lib/icu/lib/" }
 		links { ICU_LIBS_DEBUG }
 	elseif config == "Debug" and (action == "gmake" or action == "codelite") then
-		buildoptions { "`../../lib/icu/mvc_editor/Debug/bin/icu-config --cppflags`" }
-		linkoptions { "`../../lib/icu/mvc_editor/Debug/bin/icu-config --ldflags --ldflags-icuio`" }
+		buildoptions { "`../../lib/icu/mvc-editor/Debug/bin/icu-config --cppflags`" }
+		linkoptions { "`../../lib/icu/mvc-editor/Debug/bin/icu-config --ldflags --ldflags-icuio`" }
 	elseif config == "Release" and action ==  "vs2008" then
 		includedirs { "lib/icu/include/" }
 		libdirs { "lib/icu/lib/" }
 		links { ICU_LIBS_RELEASE }
 	elseif config == "Release" and (action == "gmake" or action == "codelite") then
-		buildoptions { "`../../lib/icu/mvc_editor/Release/bin/icu-config --cppflags`" }
-		linkoptions { "`../../lib/icu/mvc_editor/Release/bin/icu-config --ldflags --ldflags-icuio`" }
+		buildoptions { "`../../lib/icu/mvc-editor/Release/bin/icu-config --cppflags`" }
+		linkoptions { "`../../lib/icu/mvc-editor/Release/bin/icu-config --ldflags --ldflags-icuio`" }
 	end
 end
 
@@ -100,8 +100,8 @@ function wxconfiguration(config, action)
 		flags { "Unicode" }
 		links { WX_LIBS_DEBUG }
 	elseif config == "Debug" and (action == "gmake" or action == "codelite") then
-		buildoptions { "`../../lib/wxWidgets-2.8.10/mvc_editor/Debug/bin/wx-config --cxxflags --debug=yes --unicode=yes`" }
-		linkoptions { "`../../lib/wxWidgets-2.8.10/mvc_editor/Debug/bin/wx-config --debug=yes --unicode=yes --libs core,base,net`" }
+		buildoptions { "`../../lib/wxWidgets-2.8.10/mvc-editor/Debug/bin/wx-config --cxxflags --debug=yes --unicode=yes`" }
+		linkoptions { "`../../lib/wxWidgets-2.8.10/mvc-editor/Debug/bin/wx-config --debug=yes --unicode=yes --libs core,base,net`" }
 	elseif config == "Release" and action ==  "vs2008" then
 		libdirs { "$(WXWIN)/lib/vc_dll/" }
 		includedirs { "$(WXWIN)/include/", "$(WXWIN)/lib/vc_dll/mswu/" }
@@ -115,8 +115,8 @@ function wxconfiguration(config, action)
 		flags { "Unicode", "Optimize" }
 		links { WX_LIBS_RELEASE } 
 	elseif config == "Release" and (action == "gmake" or action == "codelite") then
-		buildoptions { "`../../lib/wxWidgets-2.8.10/mvc_editor/Release/bin/wx-config --cxxflags --debug=no --unicode=yes`" }
-		linkoptions { "`../../lib/wxWidgets-2.8.10/mvc_editor/Release/bin/wx-config --debug=no --unicode=yes --libs core,base,net`" }
+		buildoptions { "`../../lib/wxWidgets-2.8.10/mvc-editor/Release/bin/wx-config --cxxflags --debug=no --unicode=yes`" }
+		linkoptions { "`../../lib/wxWidgets-2.8.10/mvc-editor/Release/bin/wx-config --debug=no --unicode=yes --libs core,base,net`" }
 	end
 end
 
@@ -129,11 +129,11 @@ function wxappconfiguration(config, action)
 	end
 	
 	if config == "Debug" and (action == "gmake" or action == "codelite") then
-		linkoptions { "`../../lib/wxWidgets-2.8.10/mvc_editor/Debug/bin/wx-config --debug=yes --unicode=yes --libs aui,adv`" }
+		linkoptions { "`../../lib/wxWidgets-2.8.10/mvc-editor/Debug/bin/wx-config --debug=yes --unicode=yes --libs aui,adv`" }
 	elseif config == "Debug" and action ==  "vs2008" then
 		links { WX_LIBS_WINDOW_DEBUG } 
 	elseif config == "Release" and (action == "gmake" or action == "codelite") then
-		linkoptions { "`../../lib/wxWidgets-2.8.10/mvc_editor/Release/bin/wx-config --debug=no --unicode=yes --libs aui,adv`" }
+		linkoptions { "`../../lib/wxWidgets-2.8.10/mvc-editor/Release/bin/wx-config --debug=no --unicode=yes --libs aui,adv`" }
 	elseif config == "Release" and action ==  "vs2008" then
 		links { WX_LIBS_WINDOW_RELEASE } 
 	end
@@ -159,17 +159,17 @@ function sociconfiguration()
 		links { "soci_core_3_1", "soci_mysql_3_1", "libmysql" }
 	else 
 		includedirs { 
-			"lib/soci/mvc_editor/include",
-			"lib/soci/mvc_editor/include/soci",
-			"lib/soci/mvc_editor/include/soci/mysql",
+			"lib/soci/mvc-editor/include",
+			"lib/soci/mvc-editor/include/soci",
+			"lib/soci/mvc-editor/include/soci/mysql",
 			MYSQL_BUILD_DIR .. "include/"
 		}
 		
 		-- soci creates lib directory with the architecture name
-		if os.isdir "lib/soci/mvc_editor/lib64" then
-			libdirs { "lib/soci/mvc_editor/lib64" }
+		if os.isdir "lib/soci/mvc-editor/lib64" then
+			libdirs { "lib/soci/mvc-editor/lib64" }
 		else 
-			libdirs { "lib/soci/mvc_editor/lib" }
+			libdirs { "lib/soci/mvc-editor/lib" }
 		end
 		libdirs {
 			MYSQL_BUILD_DIR .. "lib/"
@@ -194,7 +194,7 @@ end
 -- each toolset will have its own directory
 -- the executable files will be placed in the configuration directory (Debug/ or Release/)
 -- compile flags will be set to be stricter than normal
-solution "mvc_editor"
+solution "mvc-editor"
 	if _ACTION then
 		location ("build/" .. _ACTION)
 	end
@@ -215,10 +215,10 @@ solution "mvc_editor"
 		-- prevent "warning LNK4098: defaultlib 'MSVCRTD' conflicts with use of other libs; use /NODEFAULTLIB:library"
 		buildoptions { "/MDd" }
 	
-	project "mvc_editor"
+	project "mvc-editor"
 		language "C++"
 		kind "WindowedApp"
-		files { "src/**.cpp", "src/**.h", "*.lua", "src/**.re, src/**.y, src/**.hpp" }
+		files { "src/**.cpp", "src/**.h", "*.lua", "src/**.re, src/**.y, src/**.hpp", "README.md" }
 		includedirs { "src/", "lib/keybinder/include/", "lib/pelet/include" }
 		links { "tests", "keybinder", "pelet" }
 		
