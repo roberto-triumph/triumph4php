@@ -32,7 +32,7 @@ if os.is "windows" then
 else
 
 	-- on linux we will compile
-	MYSQL_BUILD_DIR = 'lib/mysql-connector-c-6.0.2/mvc_editor/Release/'
+	MYSQL_BUILD_DIR = 'lib/mysql-connector-c-6.0.2/mvc-editor/Release/'
 end
 
 
@@ -44,14 +44,14 @@ newaction {
 		if os.is "windows" then
 		
 			-- on windows, use MSYS Git which may not be in the path
-			SOCI_BUILD_DIR =  normalizepath("lib/soci/mvc_editor/")
+			SOCI_BUILD_DIR =  normalizepath("lib/soci/mvc-editor/")
 			SOCI_ROOT = "lib\\soci"
 			SOCI_SRC = "lib\\soci\\src"
 			GIT_ROOT = os.getenv("USERPROFILE") .. "\\software\\Git\\bin"
 			GIT = GIT_ROOT .. "\\git.exe"
 			TAR = GIT_ROOT .. "\\tar.exe"
 		else 
-			SOCI_BUILD_DIR =  normalizepath("lib/soci/mvc_editor/")
+			SOCI_BUILD_DIR =  normalizepath("lib/soci/mvc-editor/")
 			SOCI_ROOT = "lib/soci"
 			SOCI_SRC = "lib/soci/src/"
 			GIT = "git"

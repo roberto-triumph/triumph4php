@@ -52,7 +52,7 @@ newaction {
 				-- Patch is needed in order to compile wxWidgets-2.8.10 under Unbunt 9.10.  For more info, and to see the patch, go to
 				-- http://trac.wxwidgets.org/ticket/10883
 				-- build the wxStyledTextCtrl (it is not in the default build)
-				WX_BUILD =  os.getcwd() .. "/lib/wxWidgets-2.8.10/mvc_editor/Debug"
+				WX_BUILD =  os.getcwd() .. "/lib/wxWidgets-2.8.10/mvc-editor/Debug"
 				os.execute(
 					"cd lib/ && " ..
 					"tar xzf wxWidgets-2.8.10.tar.gz && " ..
@@ -70,7 +70,7 @@ newaction {
 				
 				-- build the release version
 				-- don't need to patch again
-				WX_BUILD =  os.getcwd() .. "/lib/wxWidgets-2.8.10/mvc_editor/Release"					
+				WX_BUILD =  os.getcwd() .. "/lib/wxWidgets-2.8.10/mvc-editor/Release"					
 				os.execute(
 					"cd lib/wxWidgets-2.8.10 && " ..
 					"mkdir -p build_mvc_editor_release && " .. 

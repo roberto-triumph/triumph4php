@@ -117,18 +117,18 @@ newaction {
 				print "MySQL libraries not found. Please download the MySQL Connector/C from http://dev.mysql.com/downloads/connector/c/"
 			end
 		else 
-			os.execute("cp -r " .. os.getcwd() .. "/lib/icu/mvc_editor/Debug/lib/*.so* Debug/");
-			os.execute("cp -r " .. os.getcwd() .. "/lib/icu/mvc_editor/Release/lib/*.so* Release/");
-			os.execute("cp -r " .. os.getcwd() .. "/lib/wxWidgets-2.8.10/mvc_editor/Debug/lib/*.so* Debug/");
-			os.execute("cp -r " .. os.getcwd() .. "/lib/wxWidgets-2.8.10/mvc_editor/Release/lib/*.so* Release/");
-			os.execute("cp -r " .. os.getcwd() .. "/lib/mysql-connector-c-6.0.2/mvc_editor/Release/lib/*.so* Debug/");
-			os.execute("cp -r " .. os.getcwd() .. "/lib/mysql-connector-c-6.0.2/mvc_editor/Release/lib/*.so* Release/");
-			if os.isdir "lib/soci/mvc_editor/lib64" then
-				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc_editor/lib64/*.so* Debug/");
-				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc_editor/lib64/*.so* Release/");
+			os.execute("cp -r " .. os.getcwd() .. "/lib/icu/mvc-editor/Debug/lib/*.so* Debug/");
+			os.execute("cp -r " .. os.getcwd() .. "/lib/icu/mvc-editor/Release/lib/*.so* Release/");
+			os.execute("cp -r " .. os.getcwd() .. "/lib/wxWidgets-2.8.10/mvc-editor/Debug/lib/*.so* Debug/");
+			os.execute("cp -r " .. os.getcwd() .. "/lib/wxWidgets-2.8.10/mvc-editor/Release/lib/*.so* Release/");
+			os.execute("cp -r " .. os.getcwd() .. "/lib/mysql-connector-c-6.0.2/mvc-editor/Release/lib/*.so* Debug/");
+			os.execute("cp -r " .. os.getcwd() .. "/lib/mysql-connector-c-6.0.2/mvc-editor/Release/lib/*.so* Release/");
+			if os.isdir "lib/soci/mvc-editor/lib64" then
+				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/lib64/*.so* Debug/");
+				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/lib64/*.so* Release/");
 			else
-				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc_editor/lib/*.so* Debug/");
-				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc_editor/lib/*.so* Release/");
+				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/lib/*.so* Debug/");
+				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/lib/*.so* Release/");
 			end
 		end
 	end
