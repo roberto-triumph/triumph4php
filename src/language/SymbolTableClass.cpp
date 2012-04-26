@@ -359,9 +359,25 @@ mvceditor::SymbolTableClass::SymbolTableClass()
 	Parser.SetVariableObserver(this);
 }
 
-void mvceditor::SymbolTableClass::ClassFound(const UnicodeString& className, const UnicodeString& signature, 
+void mvceditor::SymbolTableClass::ClassFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& signature, 
 		const UnicodeString& comment, const int lineNumber) {
-	
+}
+
+void mvceditor::SymbolTableClass::NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias) {
+
+}
+
+void mvceditor::SymbolTableClass::TraitAliasFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
+												  const UnicodeString& traitMethodName, const UnicodeString& alias, pelet::TokenClass::TokenIds visibility) {
+}
+
+void mvceditor::SymbolTableClass::TraitPrecedenceFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
+													   const UnicodeString& traitMethodName) {
+}
+
+void mvceditor::SymbolTableClass::TraitUseFound(const UnicodeString& namespaceName, const UnicodeString& className, 
+												const UnicodeString& fullyQualifiedTraitName) {
+
 }
 
 void mvceditor::SymbolTableClass::DefineDeclarationFound(const UnicodeString& variableName, 
@@ -372,18 +388,18 @@ void mvceditor::SymbolTableClass::DefineDeclarationFound(const UnicodeString& va
 	GetScope(UNICODE_STRING_SIMPLE(""), UNICODE_STRING_SIMPLE("")).push_back(symbol);
 }
 
-void mvceditor::SymbolTableClass::FunctionFound(const UnicodeString& functionName, const UnicodeString& signature, 
+void mvceditor::SymbolTableClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, 
 		const UnicodeString& returnType, const UnicodeString& comment, const int lineNumber) {
 	
 	// this call will automatically create the predefined variables
 	GetScope(UNICODE_STRING_SIMPLE(""), functionName);
 }
 
-void mvceditor::SymbolTableClass::FunctionEnd(const UnicodeString& functionName, int pos) {
+void mvceditor::SymbolTableClass::FunctionEnd(const UnicodeString& namespaceName, const UnicodeString& functionName, int pos) {
 	// nothing for now
 }
 
-void mvceditor::SymbolTableClass::MethodFound(const UnicodeString& className, const UnicodeString& methodName, 
+void mvceditor::SymbolTableClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
 	const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 	pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber) {
 	std::vector<pelet::SymbolClass>& methodScope = GetScope(className, methodName);
@@ -396,11 +412,11 @@ void mvceditor::SymbolTableClass::MethodFound(const UnicodeString& className, co
 	methodScope.push_back(variableSymbol);
 }
 
-void mvceditor::SymbolTableClass::MethodEnd(const UnicodeString& className, const UnicodeString& methodName, int pos) {
+void mvceditor::SymbolTableClass::MethodEnd(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, int pos) {
 	// nothing for now
 }
 
-void mvceditor::SymbolTableClass::PropertyFound(const UnicodeString& className, const UnicodeString& propertyName, 
+void mvceditor::SymbolTableClass::PropertyFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& propertyName, 
 	const UnicodeString& propertyType, const UnicodeString& comment, 
 	pelet::TokenClass::TokenIds visibility, bool isConst, bool isStatic,
 	const int lineNumber) {
@@ -408,7 +424,7 @@ void mvceditor::SymbolTableClass::PropertyFound(const UnicodeString& className, 
 	// do nothing; properties will be looked up using the ResourceFinder class
 }
 
-void mvceditor::SymbolTableClass::VariableFound(const UnicodeString& className, const UnicodeString& methodName, 
+void mvceditor::SymbolTableClass::VariableFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
 	const pelet::SymbolClass& symbol, const UnicodeString& comment) {
 
 	// ATTN: a single variable may have many assignments
@@ -663,7 +679,7 @@ mvceditor::ScopeFinderClass::ScopeFinderClass()
 	Parser.SetFunctionObserver(this);
 }
 
-void mvceditor::ScopeFinderClass::ClassFound(const UnicodeString& className, const UnicodeString& signature, 
+void mvceditor::ScopeFinderClass::ClassFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& signature, 
 											 const UnicodeString& comment, const int lineNumber) {
 	// nothing for now
 }
@@ -673,32 +689,51 @@ void mvceditor::ScopeFinderClass::DefineDeclarationFound(const UnicodeString& va
 	// nothing for now
 }
 
-void mvceditor::ScopeFinderClass::MethodFound(const UnicodeString& className, const UnicodeString& methodName, 
+void mvceditor::ScopeFinderClass::NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias) {
+	
+}
+
+void mvceditor::ScopeFinderClass::TraitAliasFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
+	const UnicodeString& traitMethodName, const UnicodeString& alias, pelet::TokenClass::TokenIds visibility) {
+		
+}
+
+void mvceditor::ScopeFinderClass::TraitPrecedenceFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
+	const UnicodeString& traitMethodName) {
+		
+}
+
+void mvceditor::ScopeFinderClass::TraitUseFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& fullyQualifiedTraitName) {
+	
+}
+
+
+void mvceditor::ScopeFinderClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber) {
 	int currentPos = Parser.GetCharacterPosition();
 	PushStartPos(className, methodName, currentPos);
 }
 
-void mvceditor::ScopeFinderClass::MethodEnd(const UnicodeString& className, const UnicodeString& methodName, int pos) {
+void mvceditor::ScopeFinderClass::MethodEnd(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, int pos) {
 	UnicodeString scopeString = ScopeString(className, methodName);
 	ScopePositions[scopeString].second = pos;
 }
 
-void mvceditor::ScopeFinderClass::PropertyFound(const UnicodeString& className, const UnicodeString& propertyName, 
+void mvceditor::ScopeFinderClass::PropertyFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& propertyName, 
 		const UnicodeString& propertyType, const UnicodeString& comment, 
 		pelet::TokenClass::TokenIds visibility, bool isConst, bool isStatic, const int lineNumber) {
 	// nothing for now
 }
 
-void mvceditor::ScopeFinderClass::FunctionFound(const UnicodeString& functionName, 
+void mvceditor::ScopeFinderClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, 
 												const UnicodeString& signature, const UnicodeString& returnType, 
 												const UnicodeString& comment, const int lineNumber) {
 	int currentPos = Parser.GetCharacterPosition();
 	PushStartPos(UNICODE_STRING_SIMPLE(""), functionName, currentPos);
 }
 
-void mvceditor::ScopeFinderClass::FunctionEnd(const UnicodeString& functionName, int pos) {
+void mvceditor::ScopeFinderClass::FunctionEnd(const UnicodeString& namespaceName, const UnicodeString& functionName, int pos) {
 	UnicodeString scopeString = ScopeString(UNICODE_STRING_SIMPLE(""), functionName);
 	ScopePositions[scopeString].second = pos;
 }

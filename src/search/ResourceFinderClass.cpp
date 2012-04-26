@@ -208,6 +208,7 @@ mvceditor::ResourceFinderClass::ResourceFinderClass()
 	: FileFilters()
 	, ResourceCache()
 	, MembersCache()
+	, NamespaceCache()
 	, FileCache()
 	, Matches()
 	, Lexer()
@@ -750,7 +751,7 @@ void mvceditor::ResourceFinderClass::BuildResourceCache(const wxString& fullPath
 	}
 }
 
-void mvceditor::ResourceFinderClass::ClassFound(const UnicodeString& className, const UnicodeString& signature, 
+void mvceditor::ResourceFinderClass::ClassFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& signature, 
 		const UnicodeString& comment, const int lineNumber) {
 	ResourceClass classItem;
 	classItem.Resource = className;
@@ -762,6 +763,33 @@ void mvceditor::ResourceFinderClass::ClassFound(const UnicodeString& className, 
 	classItem.Comment = comment;
 	classItem.IsNative = false;
 	ResourceCache.push_back(classItem);
+	
+	ResourceClass namespaceItem;
+	namespaceItem.Resource = namespaceName;
+	namespaceItem.Identifier = namespaceName;
+	if (std::find(NamespaceCache.begin(), NamespaceCache.end(), namespaceItem) != NamespaceCache.end()) {
+		NamespaceCache.push_back(namespaceItem);
+	}
+}
+
+void mvceditor::ResourceFinderClass::NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias) {
+	
+	// nothing here; the ParserClass already resolves namespace aliases
+}
+
+void mvceditor::ResourceFinderClass::TraitAliasFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
+												  const UnicodeString& traitMethodName, const UnicodeString& alias, pelet::TokenClass::TokenIds visibility) {
+	// TODO not sure if we have to do anything here
+}
+
+void mvceditor::ResourceFinderClass::TraitPrecedenceFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
+													   const UnicodeString& traitMethodName) {
+	// TODO not sure if we have to do anything here
+}
+
+void mvceditor::ResourceFinderClass::TraitUseFound(const UnicodeString& namespaceName, const UnicodeString& className, 
+												const UnicodeString& fullyQualifiedTraitName) {
+	// TODO not sure if we have to do anything here
 }
 
 void mvceditor::ResourceFinderClass::DefineDeclarationFound(const UnicodeString& variableName, 
@@ -778,7 +806,7 @@ void mvceditor::ResourceFinderClass::DefineDeclarationFound(const UnicodeString&
 	ResourceCache.push_back(defineItem);
 }
 
-void mvceditor::ResourceFinderClass::MethodFound(const UnicodeString& className, const UnicodeString& methodName,
+void mvceditor::ResourceFinderClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber) {
 	ResourceClass item;
@@ -808,12 +836,12 @@ void mvceditor::ResourceFinderClass::MethodFound(const UnicodeString& className,
 	MembersCache.push_back(item);
 }
 
-void mvceditor::ResourceFinderClass::MethodEnd(const UnicodeString& className, const UnicodeString& methodName, int pos) {
+void mvceditor::ResourceFinderClass::MethodEnd(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, int pos) {
 
 	// no need to do anything special when a function has ended
 }
 
-void mvceditor::ResourceFinderClass::PropertyFound(const UnicodeString& className, const UnicodeString& propertyName,
+void mvceditor::ResourceFinderClass::PropertyFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& propertyName,
                                         const UnicodeString& propertyType, const UnicodeString& comment, 
 										pelet::TokenClass::TokenIds visibility, bool isConst, bool isStatic,
 										const int lineNumber) {
@@ -848,7 +876,7 @@ void mvceditor::ResourceFinderClass::PropertyFound(const UnicodeString& classNam
 	MembersCache.push_back(item);
 }
 
-void mvceditor::ResourceFinderClass::FunctionFound(const UnicodeString& functionName, const UnicodeString& signature, 
+void mvceditor::ResourceFinderClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, 
 		const UnicodeString& returnType, const UnicodeString& comment, const int lineNumber) {
 	ResourceClass item;
 	item.Resource = functionName;
@@ -860,9 +888,16 @@ void mvceditor::ResourceFinderClass::FunctionFound(const UnicodeString& function
 	item.Comment = comment;
 	item.IsNative = false;
 	ResourceCache.push_back(item);
+	
+	ResourceClass namespaceItem;
+	namespaceItem.Resource = namespaceName;
+	namespaceItem.Identifier = namespaceName;
+	if (std::find(NamespaceCache.begin(), NamespaceCache.end(), namespaceItem) != NamespaceCache.end()) {
+		NamespaceCache.push_back(namespaceItem);
+	}
 }
 
-void mvceditor::ResourceFinderClass::FunctionEnd(const UnicodeString& functionName, int pos) {
+void mvceditor::ResourceFinderClass::FunctionEnd(const UnicodeString& namespaceName, const UnicodeString& functionName, int pos) {
 	
 	// no need to do anything special when a function has ended
 }
@@ -1505,6 +1540,10 @@ void mvceditor::ResourceClass::operator=(const ResourceClass& src) {
 bool mvceditor::ResourceClass::operator<(const mvceditor::ResourceClass& a) const {
 	return Identifier.caseCompare(a.Identifier, 0) < 0;
 }
+
+bool mvceditor::ResourceClass::operator==(const mvceditor::ResourceClass& a) const {
+	return Resource == a.Resource;
+} 
 
 wxString mvceditor::ResourceClass::GetFullPath() const {
 	return FullPath;

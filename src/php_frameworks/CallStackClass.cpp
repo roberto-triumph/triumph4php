@@ -241,13 +241,30 @@ void mvceditor::CallStackClass::ExpressionFound(const pelet::ExpressionClass& ex
 				MatchError = singleMatchError;
 			}
 		}
-	}	
+	}
 }
 
-void mvceditor::CallStackClass::MethodEnd(const UnicodeString& className, const UnicodeString& methodName, int pos) {
+void mvceditor::CallStackClass::NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias) {
+
 }
 
-void mvceditor::CallStackClass::MethodFound(const UnicodeString& className, const UnicodeString& methodName, const UnicodeString& signature, 
+void mvceditor::CallStackClass::TraitAliasFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
+												  const UnicodeString& traitMethodName, const UnicodeString& alias, pelet::TokenClass::TokenIds visibility) {
+}
+
+void mvceditor::CallStackClass::TraitPrecedenceFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
+													   const UnicodeString& traitMethodName) {
+}
+
+void mvceditor::CallStackClass::TraitUseFound(const UnicodeString& namespaceName, const UnicodeString& className, 
+												const UnicodeString& fullyQualifiedTraitName) {
+
+}
+
+void mvceditor::CallStackClass::MethodEnd(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, int pos) {
+}
+
+void mvceditor::CallStackClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, const UnicodeString& signature, 
 											const UnicodeString& returnType, const UnicodeString& comment, pelet::TokenClass::TokenIds visibility, 
 											bool isStatic, const int lineNumber) {
 	CurrentClass = className;
@@ -255,25 +272,25 @@ void mvceditor::CallStackClass::MethodFound(const UnicodeString& className, cons
 	CurrentFunction.remove();
 }
 
-void mvceditor::CallStackClass::PropertyFound(const UnicodeString& className, const UnicodeString& propertyName, const UnicodeString& propertyType,
+void mvceditor::CallStackClass::PropertyFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& propertyName, const UnicodeString& propertyType,
 	const UnicodeString& comment, pelet::TokenClass::TokenIds visibility, bool isConst, bool isStatic, const int lineNumber) {
 	
 	// no need to do anything here as we only want to look at expressions
 }
 
-void mvceditor::CallStackClass::FunctionFound(const UnicodeString& functionName, const UnicodeString& signature, const UnicodeString& returnType, 
+void mvceditor::CallStackClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, const UnicodeString& returnType, 
 		const UnicodeString& comment, const int lineNumber) {
 	CurrentClass.remove();
 	CurrentMethod.remove();
 	CurrentFunction = functionName;
 }
 
-void mvceditor::CallStackClass::FunctionEnd(const UnicodeString& functionName, int pos) {
+void mvceditor::CallStackClass::FunctionEnd(const UnicodeString& namespaceName, const UnicodeString& functionName, int pos) {
 
 	// no need to do anything here as we only want to look at expressions	
 }
 
-void mvceditor::CallStackClass::ClassFound(const UnicodeString& className, const UnicodeString& signature, 
+void mvceditor::CallStackClass::ClassFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& signature, 
 										   const UnicodeString& comment, const int lineNumber) {
 
 	// no need to do anything here as we only want to look at expressions		
@@ -290,7 +307,7 @@ void mvceditor::CallStackClass::DefineDeclarationFound(const UnicodeString& vari
 	// no need to do anything here as we only want to look at expressions			
 }
 
-void mvceditor::CallStackClass::VariableFound(const UnicodeString& className, const UnicodeString& methodName, const pelet::SymbolClass& symbol, 
+void mvceditor::CallStackClass::VariableFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, const pelet::SymbolClass& symbol, 
 	const UnicodeString& comment) {
 	
 	// no need to do anything here as we only want to look at expressions		

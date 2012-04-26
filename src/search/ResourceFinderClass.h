@@ -354,7 +354,7 @@ public:
 	/**
 	 * Implement class observer.  When a class has been parsed, add it to the Resource Cache.
 	 */
-	void ClassFound(const UnicodeString& className, const UnicodeString& signature, 
+	void ClassFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& signature, 
 		const UnicodeString& comment, const int lineNumber);
 
 	/**
@@ -362,30 +362,40 @@ public:
 	 */
 	void DefineDeclarationFound(const UnicodeString& variableName, const UnicodeString& variableValue, 
 			const UnicodeString& comment, const int lineNumber);
+			
+	void NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias);
+
+	void TraitAliasFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
+		const UnicodeString& traitMethodName, const UnicodeString& alias, pelet::TokenClass::TokenIds visibility);
+
+	void TraitPrecedenceFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
+		const UnicodeString& traitMethodName);
+
+	void TraitUseFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& fullyQualifiedTraitName);
 	
 	/**
 	 * Implement class member observer.  When a class method has been parsed, add it to the Resource Cache.
 	 */
-	void MethodFound(const UnicodeString& className, const UnicodeString& methodName, 
+	void MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber);
 
-	void MethodEnd(const UnicodeString& className, const UnicodeString& methodName, int pos);
+	void MethodEnd(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, int pos);
  
 	/**
 	 * Implement class member observer.  When a class property has been parsed, add it to the Resource Cache.
 	 */
-	void PropertyFound(const UnicodeString& className, const UnicodeString& propertyName, 
+	void PropertyFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& propertyName, 
 		const UnicodeString& propertyType, const UnicodeString& comment, 
 		pelet::TokenClass::TokenIds visibility, bool isConst, bool isStatic, const int lineNumber);
 		
 	/**
 	 * Implement function observer.  When a function has been parsed, add it to the Resource Cache.
 	 */
-	void FunctionFound(const UnicodeString& methodName, 
+	void FunctionFound(const UnicodeString& namespaceName, const UnicodeString& methodName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment, const int lineNumber);
 
-	void FunctionEnd(const UnicodeString& functionName, int pos);
+	void FunctionEnd(const UnicodeString& namespaceName, const UnicodeString& functionName, int pos);
 
 	void IncludeFound(const UnicodeString& file, const int lineNumber);
 		
@@ -549,6 +559,11 @@ private:
 	 * All of the methods / properties / constants found.
 	 */
 	std::list<ResourceClass> MembersCache;
+	
+	/**
+	 * All of the namespaces found
+	 */
+	std::vector<ResourceClass> NamespaceCache;
 	
 	/**
 	 * All the files that have been looked at.
@@ -740,7 +755,8 @@ public:
 		FUNCTION,
 		MEMBER,
 		DEFINE,
-		CLASS_CONSTANT
+		CLASS_CONSTANT,
+		NAMESPACE
 	};
 	
 	/**
@@ -822,6 +838,13 @@ public:
 	 * Resource).
 	 */
 	bool operator<(const ResourceClass& a) const;
+
+	/**
+	 * Defined a comparison function so for find function. This will compare resource names in an 
+	 * exact, case sensitive manner.
+	 */	
+	bool operator==(const ResourceClass& a) const;
+	
 
 	/**
 	 * @return the full path where this resource is located.
