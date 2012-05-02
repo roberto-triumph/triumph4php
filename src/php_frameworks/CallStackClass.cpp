@@ -252,8 +252,8 @@ void mvceditor::CallStackClass::TraitAliasFound(const UnicodeString& namespaceNa
 												  const UnicodeString& traitMethodName, const UnicodeString& alias, pelet::TokenClass::TokenIds visibility) {
 }
 
-void mvceditor::CallStackClass::TraitPrecedenceFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
-													   const UnicodeString& traitMethodName) {
+void mvceditor::CallStackClass::TraitInsteadOfFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
+													   const UnicodeString& traitMethodName, const std::vector<UnicodeString>& insteadOfList) {
 }
 
 void mvceditor::CallStackClass::TraitUseFound(const UnicodeString& namespaceName, const UnicodeString& className, 

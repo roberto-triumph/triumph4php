@@ -28,21 +28,12 @@
 #include <pelet/ParserClass.h>
 #include <pelet/ParserObserverClass.h>
 #include <search/ResourceFinderClass.h>
+#include <MvcEditorString.h>
 #include <unicode/unistr.h>
 #include <map>
 #include <vector>
 
 namespace mvceditor {
-
-/**
- * Case-sensitive string comparator for use as STL Predicate
- */
-class UnicodeStringComparatorClass {
-public:
-	bool operator()(const UnicodeString& str1, const UnicodeString& str2) const {
-		return (str1.compare(str2) < (int8_t)0) ? true : false;
-	}
-};
 
 /**
  * A small class that will tell the outside world why the symbol table failed
@@ -248,7 +239,7 @@ public:
 	 *        slower because ResourceFinderClass still handles them
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear() )
 	 */
-	void ExpressionCompletionMatches(const pelet::SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
+	void ExpressionCompletionMatches(pelet::SymbolClass parsedExpression, const UnicodeString& expressionScope, 
 		const std::map<wxString, ResourceFinderClass*>& openedResourceFinders,
 		mvceditor::ResourceFinderClass* globalResourceFinder,
 		std::vector<UnicodeString>& autoCompleteVariableList,
@@ -284,7 +275,7 @@ public:
 	 *        slower because ResourceFinderClass still handles them
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
-	void ResourceMatches(const pelet::SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
+	void ResourceMatches(pelet::SymbolClass parsedExpression, const UnicodeString& expressionScope, 
 		const std::map<wxString, ResourceFinderClass*>& openedResourceFinders,
 		mvceditor::ResourceFinderClass* globalResourceFinder,
 		std::vector<ResourceClass>& resourceMatches,
@@ -309,8 +300,8 @@ public:
 	void TraitAliasFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
 		const UnicodeString& traitMethodName, const UnicodeString& alias, pelet::TokenClass::TokenIds visibility);
 
-	void TraitPrecedenceFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
-		const UnicodeString& traitMethodName);
+	void TraitInsteadOfFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
+		const UnicodeString& traitMethodName, const std::vector<UnicodeString>& insteadOfList);
 
 	void TraitUseFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& fullyQualifiedTraitName);
 	
@@ -349,6 +340,23 @@ private:
 	 *  @param vector<pelet::SymbolClass>& scope the scope list
 	 */
 	void CreatePredefinedVariables(std::vector<pelet::SymbolClass>& scope);
+	
+	/**
+	 * Modifies the expression; resolving namespaces alias to their fully qualified equivalents
+	 * 
+	 * @param the expression to resolve
+	 */
+	void ResolveNamespaceAlias(pelet::SymbolClass& parsedExpression) const;
+	
+	/**
+	 * Modifies the RESOURCE; unresolving namespaces alias to their aliased equivalents. We need to 
+	 * do this because the ResourceFinder class only deals with fully qualified namespaces, it knows nothing
+	 * about the aliases
+	 * 
+	 * @param the original expression to resolve
+	 * @param resource a matched resource; will get modified an any namespace will be 'unresolved'
+	 */
+	void UnresolveNamespaceAlias(const pelet::SymbolClass& originalExpression, mvceditor::ResourceClass& resource) const;
 
 	/**
 	 * The parser.
@@ -365,6 +373,11 @@ private:
 	 * @var std::map<UnicodeString, vector<pelet::SymbolClass>>
 	 */
 	std::map<UnicodeString, std::vector<pelet::SymbolClass>, UnicodeStringComparatorClass> Variables;
+	
+	/**
+	 * The imported namespaces "use Name\Name as Alias;"
+	 */
+	std::map<UnicodeString, UnicodeString, UnicodeStringComparatorClass> NamespaceAliases;
 
 };
 
@@ -415,8 +428,8 @@ public:
 	void TraitAliasFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
 		const UnicodeString& traitMethodName, const UnicodeString& alias, pelet::TokenClass::TokenIds visibility);
 
-	void TraitPrecedenceFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
-		const UnicodeString& traitMethodName);
+	void TraitInsteadOfFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
+		const UnicodeString& traitMethodName, const std::vector<UnicodeString>& insteadOfList);
 
 	void TraitUseFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& fullyQualifiedTraitName);
 	

@@ -29,17 +29,19 @@
 #include <search/FindInFilesClass.h>
 #include <pelet/LexicalAnalyzerClass.h>
 #include <pelet/ParserClass.h>
+#include <MvcEditorString.h>
 #include <wx/datetime.h>
 #include <wx/string.h>
 #include <wx/filename.h>
 #include <unicode/unistr.h>
-#include <list>
 #include <vector>
+#include <map>
 
 namespace mvceditor {
 
 // defined at the bottom of the file
 class ResourceClass; 
+class TraitResourceClass;
 
 /**
  * The ResourceFinderClass is used to locate source code artifacts (classes, functions, methods, and files). The 
@@ -110,12 +112,14 @@ public:
 	 *                          all classes are searched
 	 * FILE_NAME:  caller asks to search file names
 	 * FILE_NAME_LINE_NUMBER:  caller asks to search file names that have at least a certain amount of lines
+	 * NAMESPACE_NAME: caller asks to search for fully qualified namespaces
 	 */
 	enum ResourceTypes {
 		CLASS_NAME,
 		CLASS_NAME_METHOD_NAME,
 		FILE_NAME,
-		FILE_NAME_LINE_NUMBER
+		FILE_NAME_LINE_NUMBER,
+		NAMESPACE_NAME
 	};
 	
 	ResourceFinderClass();
@@ -368,8 +372,8 @@ public:
 	void TraitAliasFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
 		const UnicodeString& traitMethodName, const UnicodeString& alias, pelet::TokenClass::TokenIds visibility);
 
-	void TraitPrecedenceFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
-		const UnicodeString& traitMethodName);
+	void TraitInsteadOfFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
+		const UnicodeString& traitMethodName, const std::vector<UnicodeString>& insteadOfList);
 
 	void TraitUseFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& fullyQualifiedTraitName);
 	
@@ -495,6 +499,11 @@ public:
 	 * Removes all resources from the cache entirely.
 	 */
 	void Clear();
+	
+	/**
+	 * set the PHP version to handle
+	 */
+	void SetVersion(pelet::Versions version);
 
 	/**
 	 * Parses a resource string into its components: class name, file name, method name, line number
@@ -553,17 +562,24 @@ private:
 	/**
 	 * All of the classes / functions resources found.
 	 */
-	std::list<ResourceClass> ResourceCache;
+	std::vector<ResourceClass> ResourceCache;
 	
 	/**
 	 * All of the methods / properties / constants found.
 	 */
-	std::list<ResourceClass> MembersCache;
+	std::vector<ResourceClass> MembersCache;
 	
 	/**
 	 * All of the namespaces found
 	 */
 	std::vector<ResourceClass> NamespaceCache;
+	
+	/**
+	 * trait info for each class that uses a trait. The trait cache will contain the
+	 * aliases and naming resolutions (insteadof). Since a single class can use multiple traits
+	 * the value is a vector, each item in the result vector represents one trait being used.
+	 */
+	std::map<UnicodeString, std::vector<TraitResourceClass>, UnicodeStringComparatorClass> TraitCache;
 	
 	/**
 	 * All the files that have been looked at.
@@ -682,9 +698,20 @@ private:
 	void CollectNearMatchMembers();
 	
 	/**
+	 * Collects all resources that are namespaces and match the parsed Resource [given to Prepare()]
+	 * Any hits will be accumulated in Matches vector.
+	 */
+	void CollectNearMatchNamespaces();
+	
+	/**
 	 * Collect all of the resources that are methods / properties of the given classes.
 	 */
 	void CollectAllMembers(const std::vector<UnicodeString>& classNames);
+	
+	/**
+	 * collect all of the resources from all of the traits used by the given class
+	 */
+	void CollectAllTraitMembers(const UnicodeString& className);
 	
 	/**
 	 * Extracts the parent class from a class signature.  The class signature, as parsed by the parser contains a string
@@ -736,7 +763,18 @@ private:
 	 * @return bool TRUE if file exists and ALL of the containing tags are valid.
 	 */
 	bool LoadTagFile(const wxFileName& fileName, bool isNativeTags);
-
+	
+	/**
+	 * Checks to see if the given method resource is inherited by the given class. Checking is 
+	 * done by looking at the trait use, trait alias, and trait insteadof statements.
+	 * 
+	 * @param memberResource the member resource to check
+	 * @param fullyQualifiedClassName fully qualified class name of class to check in.  This class 
+	 *        and any trait classes that this class uses, will be checked.
+	 * @return bool TRUE if memberResource belongs to className or any traits that 
+	 *         className uses.
+	 */
+	bool IsTraitInherited(const ResourceClass& memberResource, const UnicodeString& fullyQualifiedClassName);
 };
 
 /**
@@ -870,9 +908,32 @@ private:
 	int FileItemIndex;
 	
 	/**
-	 * The resource finder class will populate FileItemIndex and FullPat\h
+	 * The resource finder class will populate FileItemIndex and FullPath
 	 */
 	friend class ResourceFinderClass;
+};
+
+class TraitResourceClass {
+	
+public:
+
+	/** 
+	 * the fully qualified name of the trait being used
+	 */
+	UnicodeString TraitClassName;
+	
+	/**
+	 * The names of any aliases
+	 */
+	std::vector<UnicodeString> Aliased;
+	
+	/**
+	 * the names of any class names excluded from being used by the
+	 * 'insteadof' operator
+	 */
+	std::vector<UnicodeString> Excluded;
+	
+	TraitResourceClass();
 };
 
 }

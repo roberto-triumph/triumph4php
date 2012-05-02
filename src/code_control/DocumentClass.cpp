@@ -432,6 +432,15 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 		Parser.ParseExpression(lastExpression, parsedExpression);
 		expressionScope = ScopeFinder.GetScopeString(code, expressionPos);
 		
+		UFILE* ufout = u_finit(stdout, NULL, NULL);
+		u_fprintf(ufout, "expr=%S\n", lastExpression.getTerminatedBuffer());
+		u_fprintf(ufout, "symbol lexeme=%S\n", parsedExpression.Lexeme.getTerminatedBuffer());
+		u_fprintf(ufout, "symbol chain list size=%d \n", parsedExpression.ChainList.size());
+		if (!parsedExpression.ChainList.empty()) {
+			u_fprintf(ufout, "symbol chain list item0=%S", parsedExpression.ChainList[0].getTerminatedBuffer());
+		}
+		u_fclose(ufout);
+		
 		ResourceCache->ExpressionCompletionMatches(FileIdentifier, parsedExpression, expressionScope,
 				variableMatches, AutoCompletionResourceMatches, doDuckTyping, error);
 		if (!variableMatches.empty()) {
@@ -885,7 +894,8 @@ std::vector<wxString> mvceditor::PhpDocumentClass::CollectNearMatchKeywords(wxSt
 	wxStringTokenizer tokens(keywords, wxT(" "));
 	while (tokens.HasMoreTokens()) {
 		wxString keyword = tokens.GetNextToken();
-		if (0 == keyword.Find(resource)) {
+		wxString keywordLower = keyword.Lower();
+		if (0 == keywordLower.Find(resource)) {
 			matchedKeywords.push_back(keyword);
 		}
 	}

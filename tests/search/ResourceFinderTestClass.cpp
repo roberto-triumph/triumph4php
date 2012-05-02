@@ -1193,6 +1193,126 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceMatchPositionShouldReturn
 	CHECK_EQUAL(19, length);
 }
 
+TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectQualifiedResourceNamespaces) {
+	 Prep(mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"namespace First\\Child; \n"
+		"class MyClass {\n"
+		"	function work() {} \n"
+		"}\n"
+		"\n"
+		"function singleWork() { } \n"
+		"?>\n"
+	));
+	CHECK(ResourceFinder.Prepare(wxT("\\First\\Child\\MyClass")));
+	CHECK(ResourceFinder.CollectFullyQualifiedResource());
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), ResourceFinder.GetResourceMatch(0).Resource);
+}
+
+TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchNamespaces) {
+	 Prep(mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"namespace First\\Child; \n"
+		"class MyClass {\n"
+		"	function work() {} \n"
+		"}\n"
+		"\n"
+		"function singleWork() { } \n"
+		"?>\n"
+	));
+	CHECK(ResourceFinder.Prepare(wxT("\\First")));
+	CHECK(ResourceFinder.CollectNearMatchResources());
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child"), ResourceFinder.GetResourceMatch(0).Resource);
+	
+	CHECK(ResourceFinder.Prepare(wxT("\\First\\Ch")));
+	CHECK(ResourceFinder.CollectNearMatchResources());
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child"), ResourceFinder.GetResourceMatch(0).Resource);
+}
+
+TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchNamespaceQualifiedClassesAndFunctions) {
+	 Prep(mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"namespace First\\Child; \n"
+		"class MyClass {\n"
+		"	function work() {} \n"
+		"}\n"
+		"\n"
+		"function singleWork() { } \n"
+		"?>\n"
+	));
+	CHECK(ResourceFinder.Prepare(wxT("\\First\\Child\\si")));
+	CHECK(ResourceFinder.CollectNearMatchResources());
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\singleWork"), ResourceFinder.GetResourceMatch(0).Resource);
+	
+	CHECK(ResourceFinder.Prepare(wxT("\\First\\Child\\M")));
+	CHECK(ResourceFinder.CollectNearMatchResources());
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), ResourceFinder.GetResourceMatch(0).Resource);
+	
+	CHECK(ResourceFinder.Prepare(wxT("\\First\\Child\\")));
+	CHECK(ResourceFinder.CollectNearMatchResources());
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), ResourceFinder.GetResourceMatch(0).Resource);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\singleWork"), ResourceFinder.GetResourceMatch(1).Resource);
+}
+
+TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchNamespaceQualifiedClassesShouldIgnoreOtherNamespaces) {
+	 Prep(mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"namespace First\\Child { \n"
+		"class MyClass { }\n"
+		"}\n"
+		"namespace Second\\Child { \n"
+		"class MyClass { }\n"
+		"}\n"
+		"?>\n"
+	));
+	CHECK(ResourceFinder.Prepare(wxT("\\Second\\Child\\My")));
+	CHECK(ResourceFinder.CollectNearMatchResources());
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\Second\\Child\\MyClass"), ResourceFinder.GetResourceMatch(0).Resource);
+}
+
+TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraits) {
+	ResourceFinder.SetVersion(pelet::PHP_54);
+	Prep(mvceditor::StringHelperClass::charToIcu(
+		"trait ezcReflectionReturnInfo { "
+		"    function getReturnType() { } "
+		"} "
+		" "
+		"class ezcReflectionMethod { "
+		"    use ezcReflectionReturnInfo;"
+		"    /* ... */ "
+		"}"
+	));
+	CHECK(ResourceFinder.Prepare(wxT("ezcReflectionMethod::getReturn")));
+	CHECK(ResourceFinder.CollectNearMatchResources());
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("ezcReflectionReturnInfo::getReturnType"), ResourceFinder.GetResourceMatch(0).Resource);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("getReturnType"), ResourceFinder.GetResourceMatch(0).Identifier);
+}
+
+TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraitsWhenLookingForAllMethods) {
+	ResourceFinder.SetVersion(pelet::PHP_54); 
+	Prep(mvceditor::StringHelperClass::charToIcu(
+		"trait ezcReflectionReturnInfo { "
+		"    function getReturnType() { } "
+		"} "
+		"trait ezcReflectionFunctionInfo { "
+		"    function getReturnType() {  } "
+		"} "
+		" "
+		"class ezcReflectionMethod { "
+		"    use ezcReflectionReturnInfo, ezcReflectionFunctionInfo { "
+		"		ezcReflectionReturnInfo::getReturnType as getFunctionReturnType; "
+		"	 }"
+		"}"
+	));
+	CHECK(ResourceFinder.Prepare(wxT("ezcReflectionMethod::")));
+	CHECK(ResourceFinder.CollectNearMatchResources());
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("ezcReflectionMethod::getFunctionReturnType"), ResourceFinder.GetResourceMatch(0).Resource);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("getFunctionReturnType"), ResourceFinder.GetResourceMatch(0).Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("ezcReflectionReturnInfo::getReturnType"), ResourceFinder.GetResourceMatch(1).Resource);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("getReturnType"), ResourceFinder.GetResourceMatch(1).Identifier);
+	
+}
+
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CopyResourcesFromShouldCopyCopy) {
 	Prep(mvceditor::StringHelperClass::charToIcu(
 		"<?php\n"

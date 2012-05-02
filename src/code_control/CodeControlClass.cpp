@@ -508,12 +508,15 @@ void mvceditor::CodeControlClass::SetPhpOptions() {
 	
 	// 7 = as per scintilla docs, HTML lexer uses 7 bits for styles
 	SetStyleBits(7);
-	AutoCompStops(wxT("!@#$%^&*()_+-=[]\\{}|;'\",./<?"));
+	AutoCompStops(wxT("!@#$%^&*()_+-=[]{}|;'\",./<?"));
 	AutoCompSetSeparator('\n');
 	AutoCompSetChooseSingle(true);
 	AutoCompSetFillUps(wxT("(["));
 	AutoCompSetIgnoreCase(true);
-	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$"));
+	
+	// need to add the namespace operator here, it was the only way i could get the
+	// autocompletion to workwith namespaces.
+	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$\\"));
 	
 	SetMarginType(LINT_RESULT_MARGIN, wxSTC_MARGIN_SYMBOL);
 	SetMarginWidth(LINT_RESULT_MARGIN, 16);
