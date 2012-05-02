@@ -32,7 +32,7 @@ if os.is "windows" then
 else
 
 	-- on linux we will compile
-	MYSQL_BUILD_DIR = 'lib/mysql-connector-c-6.0.2/mvc_editor/Release/'
+	MYSQL_BUILD_DIR = 'lib/mysql-connector-c-6.0.2/mvc-editor/Release/'
 end
 
 
