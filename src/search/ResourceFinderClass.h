@@ -367,8 +367,6 @@ public:
 	void DefineDeclarationFound(const UnicodeString& variableName, const UnicodeString& variableValue, 
 			const UnicodeString& comment, const int lineNumber);
 			
-	void NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias);
-
 	void TraitAliasFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
 		const UnicodeString& traitMethodName, const UnicodeString& alias, pelet::TokenClass::TokenIds visibility);
 
@@ -383,8 +381,6 @@ public:
 	void MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber);
-
-	void MethodEnd(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, int pos);
  
 	/**
 	 * Implement class member observer.  When a class property has been parsed, add it to the Resource Cache.
@@ -399,10 +395,6 @@ public:
 	void FunctionFound(const UnicodeString& namespaceName, const UnicodeString& methodName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment, const int lineNumber);
 
-	void FunctionEnd(const UnicodeString& namespaceName, const UnicodeString& functionName, int pos);
-
-	void IncludeFound(const UnicodeString& file, const int lineNumber);
-		
 	/**
 	 * Print the resource cache to stdout.  Useful for debugging only.
 	 */

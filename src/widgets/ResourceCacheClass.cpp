@@ -237,7 +237,7 @@ std::vector<mvceditor::ResourceFinderClass*> mvceditor::ResourceCacheClass::Iter
 	return finders;
 }
 
-void mvceditor::ResourceCacheClass::ExpressionCompletionMatches(const wxString& fileName, const pelet::SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
+void mvceditor::ResourceCacheClass::ExpressionCompletionMatches(const wxString& fileName, const pelet::SymbolClass& parsedExpression, const mvceditor::ScopeResultClass& expressionScope, 
 													 std::vector<UnicodeString>& autoCompleteList,
 													 std::vector<mvceditor::ResourceClass>& resourceMatches,
 													 bool doDuckTyping,
@@ -261,7 +261,7 @@ void mvceditor::ResourceCacheClass::ExpressionCompletionMatches(const wxString& 
 	}
 }
 
-void mvceditor::ResourceCacheClass::ResourceMatches(const wxString& fileName, const pelet::SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
+void mvceditor::ResourceCacheClass::ResourceMatches(const wxString& fileName, const pelet::SymbolClass& parsedExpression, const mvceditor::ScopeResultClass& expressionScope, 
 													 std::vector<mvceditor::ResourceClass>& matches,
 													 bool doDuckTyping,
 													mvceditor::SymbolTableMatchErrorClass& error) {

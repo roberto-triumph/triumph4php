@@ -220,8 +220,10 @@ void mvceditor::CallStackClass::ExpressionFound(const pelet::ExpressionClass& ex
 			
 			std::vector<mvceditor::ResourceClass> matches;
 			mvceditor::SymbolTableMatchErrorClass singleMatchError;
+			mvceditor::ScopeResultClass scopeResult;
+			scopeResult.MethodName = item.Resource;
 			
-			ResourceCache.ResourceMatches(item.FileName.GetFullPath(), symbol, item.Resource, matches, false, singleMatchError);
+			ResourceCache.ResourceMatches(item.FileName.GetFullPath(), symbol, scopeResult, matches, false, singleMatchError);
 			for (std::vector<mvceditor::ResourceClass>::iterator it = matches.begin(); it != matches.end(); ++it) {
 				if (mvceditor::ResourceClass::FUNCTION == it->Type || mvceditor::ResourceClass::METHOD == it->Type) {
 					ResourceWithFile newItem;
@@ -244,26 +246,6 @@ void mvceditor::CallStackClass::ExpressionFound(const pelet::ExpressionClass& ex
 	}
 }
 
-void mvceditor::CallStackClass::NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias) {
-
-}
-
-void mvceditor::CallStackClass::TraitAliasFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
-												  const UnicodeString& traitMethodName, const UnicodeString& alias, pelet::TokenClass::TokenIds visibility) {
-}
-
-void mvceditor::CallStackClass::TraitInsteadOfFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
-													   const UnicodeString& traitMethodName, const std::vector<UnicodeString>& insteadOfList) {
-}
-
-void mvceditor::CallStackClass::TraitUseFound(const UnicodeString& namespaceName, const UnicodeString& className, 
-												const UnicodeString& fullyQualifiedTraitName) {
-
-}
-
-void mvceditor::CallStackClass::MethodEnd(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, int pos) {
-}
-
 void mvceditor::CallStackClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, const UnicodeString& signature, 
 											const UnicodeString& returnType, const UnicodeString& comment, pelet::TokenClass::TokenIds visibility, 
 											bool isStatic, const int lineNumber) {
@@ -272,43 +254,9 @@ void mvceditor::CallStackClass::MethodFound(const UnicodeString& namespaceName, 
 	CurrentFunction.remove();
 }
 
-void mvceditor::CallStackClass::PropertyFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& propertyName, const UnicodeString& propertyType,
-	const UnicodeString& comment, pelet::TokenClass::TokenIds visibility, bool isConst, bool isStatic, const int lineNumber) {
-	
-	// no need to do anything here as we only want to look at expressions
-}
-
 void mvceditor::CallStackClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, const UnicodeString& returnType, 
 		const UnicodeString& comment, const int lineNumber) {
 	CurrentClass.remove();
 	CurrentMethod.remove();
 	CurrentFunction = functionName;
-}
-
-void mvceditor::CallStackClass::FunctionEnd(const UnicodeString& namespaceName, const UnicodeString& functionName, int pos) {
-
-	// no need to do anything here as we only want to look at expressions	
-}
-
-void mvceditor::CallStackClass::ClassFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& signature, 
-										   const UnicodeString& comment, const int lineNumber) {
-
-	// no need to do anything here as we only want to look at expressions		
-}
-
-void mvceditor::CallStackClass::IncludeFound(const UnicodeString& includeFile, const int lineNumber) {
-
-	// no need to do anything here as we only want to look at expressions		
-}
-
-void mvceditor::CallStackClass::DefineDeclarationFound(const UnicodeString& variableName, const UnicodeString& variableValue, 
-		const UnicodeString& comment, const int lineNumber) {
-
-	// no need to do anything here as we only want to look at expressions			
-}
-
-void mvceditor::CallStackClass::VariableFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, const pelet::SymbolClass& symbol, 
-	const UnicodeString& comment) {
-	
-	// no need to do anything here as we only want to look at expressions		
 }

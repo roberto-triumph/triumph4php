@@ -169,12 +169,50 @@ public:
 };
 
 /**
+ * The scope at a certain, specific point in PHP source code. An instance of this is 
+ * given to the SymbolTable class so that it can choose the correct variables and 
+ * namespaces to resolve an expression against.
+ */
+class ScopeResultClass {
+
+	public:
+	
+	/**
+	 * A string that denotes the scope.  This is the classname::methodname, or
+	 * ::functionName.
+	 */
+	UnicodeString MethodName;
+	
+	UnicodeString NamespaceName;
+	
+	/**
+	 * The imported namespaces "use Name\Name as Alias;"
+	 */
+	std::map<UnicodeString, UnicodeString, UnicodeStringComparatorClass> NamespaceAliases;
+	
+	ScopeResultClass();
+	
+	void Clear();
+	
+	void Copy(const ScopeResultClass& src);
+	
+	bool IsGlobalScope() const;
+	
+	bool IsGlobalNamespace() const;
+};
+
+/**
  * A Symbol table is the data structure that will hold all of the variables in the code along with their type information.
+ * The symbol table is responsible for figuring out a variable's type as well as resolve any functions, methods,
+ * and namespace names.
+ * 
  * Symbols will be generated per each file according to PHP lanuguage semantics: 
  *  1. There are proper scopes (local variables)
  *  2. no distinction is made between numbers, bools, and strings.  They are all labeled as primitives because
  *     PHP casts transparently.
- * 
+ * Symbol table will do its work one file at a time; since most of the time the symbol table responds to user
+ * actions (ie. the user wants to jump to a specific variable declaration, or the user wants to complete
+ * a variable method call).
  */
 class SymbolTableClass : 
 	public pelet::ClassObserverClass, 
@@ -239,7 +277,7 @@ public:
 	 *        slower because ResourceFinderClass still handles them
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear() )
 	 */
-	void ExpressionCompletionMatches(pelet::SymbolClass parsedExpression, const UnicodeString& expressionScope, 
+	void ExpressionCompletionMatches(pelet::SymbolClass parsedExpression, const ScopeResultClass& expressionScope, 
 		const std::map<wxString, ResourceFinderClass*>& openedResourceFinders,
 		mvceditor::ResourceFinderClass* globalResourceFinder,
 		std::vector<UnicodeString>& autoCompleteVariableList,
@@ -275,7 +313,7 @@ public:
 	 *        slower because ResourceFinderClass still handles them
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
-	void ResourceMatches(pelet::SymbolClass parsedExpression, const UnicodeString& expressionScope, 
+	void ResourceMatches(pelet::SymbolClass parsedExpression, const ScopeResultClass& expressionScope, 
 		const std::map<wxString, ResourceFinderClass*>& openedResourceFinders,
 		mvceditor::ResourceFinderClass* globalResourceFinder,
 		std::vector<ResourceClass>& resourceMatches,
@@ -286,40 +324,17 @@ public:
 	 * outout to stdout
 	 */
 	void Print() const;
-		
-	void ClassFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& signature, 
-		const UnicodeString& comment, const int lineNumber);
-
+			
 	void DefineDeclarationFound(const UnicodeString& variableName, const UnicodeString& variableValue, 
 			const UnicodeString& comment, const int lineNumber);
 
-	void IncludeFound(const UnicodeString& include, const int lineNumber);
-
-	void NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias);
-
-	void TraitAliasFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
-		const UnicodeString& traitMethodName, const UnicodeString& alias, pelet::TokenClass::TokenIds visibility);
-
-	void TraitInsteadOfFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
-		const UnicodeString& traitMethodName, const std::vector<UnicodeString>& insteadOfList);
-
-	void TraitUseFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& fullyQualifiedTraitName);
-	
 	void MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber);
-
-	void MethodEnd(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, int pos);
-	
-	void PropertyFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& propertyName, 
-		const UnicodeString& propertyType, const UnicodeString& comment, 
-		pelet::TokenClass::TokenIds visibility, bool isConst, bool isStatic, const int lineNumber);
 	
 	virtual void FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 		const int lineNumber);
-
-	void FunctionEnd(const UnicodeString& namespaceName, const UnicodeString& functionName, int pos);
 		
 	void VariableFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
 		const pelet::SymbolClass& symbol, const UnicodeString& comment);
@@ -345,8 +360,9 @@ private:
 	 * Modifies the expression; resolving namespaces alias to their fully qualified equivalents
 	 * 
 	 * @param the expression to resolve
+	 * @param scope the scope that containts the aliases to resolve against
 	 */
-	void ResolveNamespaceAlias(pelet::SymbolClass& parsedExpression) const;
+	void ResolveNamespaceAlias(pelet::SymbolClass& parsedExpression, const ScopeResultClass& scopeResult) const;
 	
 	/**
 	 * Modifies the RESOURCE; unresolving namespaces alias to their aliased equivalents. We need to 
@@ -354,9 +370,10 @@ private:
 	 * about the aliases
 	 * 
 	 * @param the original expression to resolve
+	 * @param scope the scope that containts the aliases to resolve against
 	 * @param resource a matched resource; will get modified an any namespace will be 'unresolved'
 	 */
-	void UnresolveNamespaceAlias(const pelet::SymbolClass& originalExpression, mvceditor::ResourceClass& resource) const;
+	void UnresolveNamespaceAlias(const pelet::SymbolClass& originalExpression, const ScopeResultClass& scopeResult, mvceditor::ResourceClass& resource) const;
 
 	/**
 	 * The parser.
@@ -373,11 +390,6 @@ private:
 	 * @var std::map<UnicodeString, vector<pelet::SymbolClass>>
 	 */
 	std::map<UnicodeString, std::vector<pelet::SymbolClass>, UnicodeStringComparatorClass> Variables;
-	
-	/**
-	 * The imported namespaces "use Name\Name as Alias;"
-	 */
-	std::map<UnicodeString, UnicodeString, UnicodeStringComparatorClass> NamespaceAliases;
 
 };
 
@@ -397,6 +409,10 @@ bool IsResourceDirty(const std::map<wxString, ResourceFinderClass*>& finders,
 											 const ResourceClass& resource, 
 											 mvceditor::ResourceFinderClass* resourceFinder);
 
+/**
+ * This class can be used to determine what function or namespace that a
+ * particular line of code is in
+ */ 
 class ScopeFinderClass : 
 	public pelet::ClassObserverClass, 
 	public pelet::ClassMemberObserverClass, 
@@ -410,38 +426,20 @@ public:
 	/**
 	 * Returns the scope that is located at the given position i.e. what class/function is at position.
 	 * 
+	 * @param code the source code to process
 	 * @param int position is index into code string given to the CreateSymbols() method.
-	 * @return std::vector<UnicodeString> the variables in scope. The variables will contain the siguil ('$')
+	 * @param scope ScopeResultClass instance to put the function, declared namespace, and aliases
+	 *        that the position lies in.
 	 */
-	UnicodeString GetScopeString(const UnicodeString& code, int pos);
+	void GetScopeString(const UnicodeString& code, int pos, ScopeResultClass& scope);
 		
-	void ClassFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& signature, 
-		const UnicodeString& comment, const int lineNumber);
-
-	void DefineDeclarationFound(const UnicodeString& variableName, const UnicodeString& variableValue, 
-			const UnicodeString& comment, const int lineNumber);
-
-	void IncludeFound(const UnicodeString& include, const int lineNumber);
+	void NamespaceDeclarationFound(const UnicodeString& namespaceName);
 
 	void NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias);
 
-	void TraitAliasFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
-		const UnicodeString& traitMethodName, const UnicodeString& alias, pelet::TokenClass::TokenIds visibility);
-
-	void TraitInsteadOfFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
-		const UnicodeString& traitMethodName, const std::vector<UnicodeString>& insteadOfList);
-
-	void TraitUseFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& fullyQualifiedTraitName);
-	
 	void MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber);
-	
-	void MethodEnd(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, int pos);
-	
-	void PropertyFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& propertyName, 
-		const UnicodeString& propertyType, const UnicodeString& comment, 
-		pelet::TokenClass::TokenIds visibility, bool isConst, bool isStatic, const int lineNumber);
 	
 	void FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
@@ -452,28 +450,35 @@ public:
 private:
 
 	/**
-	 * Stores the given scope and relates it to the given position. 
+	 * if the given namespace is different than the current one, it indicates that the file has 
+	 * switched to a new declared namespace.
+	 * 
+	 * @param namespaceName the current namespace
 	 */
-	void PushStartPos(const UnicodeString& className, const UnicodeString& functionName, int startPos);
+	void CheckLastNamespace(const UnicodeString& namespaceName);
 	
-
 	/**
-	 * This will store the character positions where the scope started and ended.
-	 * The scope string is that which is returned by ScopeString() method.
-	 * The global scope will always start at 0
-	 * For purposes of this class; it is enough to know that the ranges will never overlap.
-	 * For exact meanings of where the the class, method, and function start positions, see the
-	 * ParserClass::GetCharacterPosition
-	 * @see ParserClass::GetCharacterPosition
+	 * to keep track of the current namespace and method
 	 */
-	std::map<UnicodeString, std::pair<int, int>, UnicodeStringComparatorClass> ScopePositions;
+	ScopeResultClass ScopeResult;
 	
+	/**
+	 * To keep know if a namespace has switched. If a namespace has switched we need to 
+	 * remove all the aliases; a single PHP file can declare multiple namespaces
+	 */
+	UnicodeString LastNamespace;
+
 	/**
 	 * The parser.
 	 * 
 	 * @var pelet::ParserClass
 	 */
 	pelet::ParserClass Parser;
+	
+	/**
+	 * this will tell us when to stop annotating
+	 */
+	int PosToCheck;
 };
 
 }

@@ -251,6 +251,10 @@ static void BoundedCacheSearch(const std::vector<mvceditor::ResourceClass>& cach
 	}
 }
 
+static bool IsRootNamespace(const UnicodeString& namespaceName) {
+	return UNICODE_STRING_SIMPLE("\\") == namespaceName;
+}
+
 /**
  * @return TRUE if the given resource belongs to a class
  */
@@ -302,7 +306,7 @@ static UnicodeString QualifyName(const UnicodeString& namespaceName, const Unico
 	UnicodeString qualifiedName;
 	
 	// if namespace is the root namespace, ignore for now
-	if (namespaceName.length() > 1) {
+	if (!IsRootNamespace(namespaceName)) {
 		qualifiedName.append(namespaceName);
 	}
 	if (!qualifiedName.isEmpty() && !qualifiedName.endsWith(UNICODE_STRING_SIMPLE("\\"))) {
@@ -872,15 +876,10 @@ void mvceditor::ResourceFinderClass::ClassFound(const UnicodeString& namespaceNa
 	if (!namespaceName.isEmpty() && std::find(NamespaceCache.begin(), NamespaceCache.end(), namespaceItem) == NamespaceCache.end()) {
 		NamespaceCache.push_back(namespaceItem);
 	}
-	if (!namespaceName.isEmpty()) {	
+	if (!IsRootNamespace(namespaceName)) {	
 		classItem.Identifier = QualifyName(namespaceName, className);
 		NamespaceCache.push_back(classItem);
 	}
-}
-
-void mvceditor::ResourceFinderClass::NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias) {
-	
-	// nothing here; the SymbolTableClass will be responsible for resolving namespace aliases
 }
 
 void mvceditor::ResourceFinderClass::TraitAliasFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
@@ -1008,11 +1007,6 @@ void mvceditor::ResourceFinderClass::MethodFound(const UnicodeString& namespaceN
 	MembersCache.push_back(item);
 }
 
-void mvceditor::ResourceFinderClass::MethodEnd(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, int pos) {
-
-	// no need to do anything special when a function has ended
-}
-
 void mvceditor::ResourceFinderClass::PropertyFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& propertyName,
                                         const UnicodeString& propertyType, const UnicodeString& comment, 
 										pelet::TokenClass::TokenIds visibility, bool isConst, bool isStatic,
@@ -1067,22 +1061,12 @@ void mvceditor::ResourceFinderClass::FunctionFound(const UnicodeString& namespac
 	if (!namespaceName.isEmpty() && std::find(NamespaceCache.begin(), NamespaceCache.end(), namespaceItem) == NamespaceCache.end()) {
 		NamespaceCache.push_back(namespaceItem);
 	}
-	if (!namespaceName.isEmpty()) {
+	if (!IsRootNamespace(namespaceName)) {	
 		
 		// put in the namespace cache so that qualified name lookups work too
 		item.Identifier = QualifyName(namespaceName, functionName);
 		NamespaceCache.push_back(item);
 	}
-}
-
-void mvceditor::ResourceFinderClass::FunctionEnd(const UnicodeString& namespaceName, const UnicodeString& functionName, int pos) {
-	
-	// no need to do anything special when a function has ended
-}
-
-void mvceditor::ResourceFinderClass::IncludeFound(const UnicodeString& file, const int lineNumber) {
-
-	// no need to do anything special when a include statement has been found
 }
 
 int mvceditor::ResourceFinderClass::GetLineCountFromFile(const wxString& fullPath) const {

@@ -162,43 +162,15 @@ public:
 	 */
 	bool Persist(wxFileName& fileName);
 	
-	void NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias);
-
-	void TraitAliasFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
-		const UnicodeString& traitMethodName, const UnicodeString& alias, pelet::TokenClass::TokenIds visibility);
-
-	void TraitInsteadOfFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
-		const UnicodeString& traitMethodName, const std::vector<UnicodeString>& insteadOfList);
-
-	void TraitUseFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& fullyQualifiedTraitName);
-
-
 	void MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment, 
 		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber);
 
-	void MethodEnd(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, int pos);
-	
-	void PropertyFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& propertyName, const UnicodeString& propertyType,
-		const UnicodeString& comment, pelet::TokenClass::TokenIds visibility, bool isConst, bool isStatic, const int lineNumber);
-		
 	void FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, const UnicodeString& returnType, 
 		const UnicodeString& comment, const int lineNumber);
 		
-	void FunctionEnd(const UnicodeString& namespaceName, const UnicodeString& functionName, int pos);
-	
 	void ExpressionFound(const pelet::ExpressionClass& expression);
 	
-	void ClassFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& signature, const UnicodeString& comment, 
-		const int lineNumber);
-	
-	 void DefineDeclarationFound(const UnicodeString& variableName, const UnicodeString& variableValue, 
-		const UnicodeString& comment, const int lineNumber);
-
-	void IncludeFound(const UnicodeString& includeFile, const int lineNumber);
-	
-	void VariableFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, const pelet::SymbolClass& symbol, const UnicodeString& comment);
-
 private:
 
 	/**

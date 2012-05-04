@@ -28,14 +28,22 @@
 #include <algorithm>
 
 /*
- * Checks that a resource matches visiblity rules.  
+ * Checks that a resource matches visiblity rules.  Visibility rules include
+ * 1) public/private/protected
+ * 2) static/instance
+ * 3) namespace aliases
+ * 
  * @param resource the resource to check
+ * @param originalParsedExpression the original query being asked for
+ * @param scopeResult the scope of the query being parsed
  * @param isStaticCall if TRUE, then resource is visible if the resource is also static
  * @param isThisCall if TRUE, then resource is visible if the resource is private, protected, or public
  * @param isParentCall if TRUE, then resource is visible if the resource is protected, or public
  * @return bool true if resource is visible
  */
-static bool IsResourceVisible(const mvceditor::ResourceClass& resource, bool isStaticCall, bool isThisCall, bool isParentCall) {
+static bool IsResourceVisible(const mvceditor::ResourceClass& resource, const pelet::SymbolClass& originalParsedExpression,
+		const mvceditor::ScopeResultClass& scopeResult,
+		bool isStaticCall, bool isThisCall, bool isParentCall) {
 	bool passesStaticCheck = isStaticCall == resource.IsStatic;
 
 	// $this => can access this resource's private, parent's protected/public, other public
@@ -54,7 +62,44 @@ static bool IsResourceVisible(const mvceditor::ResourceClass& resource, bool isS
 		//not checking isThisCalled
 		passesVisibilityCheck = isThisCall;
 	}
-	return passesStaticCheck && passesVisibilityCheck;
+	
+	// if the scope has a declared namespace, then global classes are not visible by default
+	// since ResourceFinder does not work on a file level it had no knowledge of namespace aliases
+	// we must perform this logic here
+	bool passesNamespaceCheck = true;			
+	UnicodeString name = originalParsedExpression.Lexeme;
+	if (!name.startsWith(UNICODE_STRING_SIMPLE("$")) && !name.startsWith(UNICODE_STRING_SIMPLE("\\")) && mvceditor::ResourceClass::CLASS == resource.Type) {
+		
+		// if the resource if a global class and the current namespace is NOT the global namespace, 
+		// then the class cannot be accessed
+		// this assumes that resource finder was successful
+		if (!scopeResult.IsGlobalNamespace()) {
+			passesNamespaceCheck = false;
+			
+			
+				
+			// but if the resource is aliased then the class can be accessed
+			std::map<UnicodeString, UnicodeString, mvceditor::UnicodeStringComparatorClass>::const_iterator it;
+			for (it = scopeResult.NamespaceAliases.begin(); it != scopeResult.NamespaceAliases.end(); ++it) {
+				
+				// map key is the alias
+				// check to see if the expression begins with the alias
+				// need to watch out for the namespace operator
+				// the expression may or may not have it
+				UnicodeString alias(it->second);
+				if (alias.caseCompare(UNICODE_STRING_SIMPLE("\\") + resource.Resource, 0) == 0) {
+					passesNamespaceCheck = true;
+					break;
+				}
+			}
+			if (!passesNamespaceCheck) {
+				
+				// check to see if resource is from the declared namespace
+				passesNamespaceCheck = resource.Resource.indexOf(scopeResult.NamespaceName + UNICODE_STRING_SIMPLE("\\")) == 0;
+			}
+		}
+	}
+	return passesStaticCheck && passesVisibilityCheck && passesNamespaceCheck;
 }
 
 /**
@@ -79,16 +124,21 @@ static bool IsStaticExpression(const pelet::SymbolClass& parsedExpression) {
  * Yes, this will cause a recursive call (symbol table may call this function); but it will never be very deep.
 
  * @see VariableObserverClass
- * @param variable the variable's name.  This is a single token, ie "$this", "$aglob" no object
- *        operations.
- * @param scopeSymbols the scope to look for the variable in
- * @param symbolTable the symbol table is used to resolve the variable assigments.
  * @param expressionScope needed to use the symbol table
  * @param openedResourceFinders needed to use the symbol table
- * @param globalResourceFinder needed to use the symbol table
+ * @param globalResourceFinder needed to use the symbol table  
+ * @param doDuckTyping
+ * @param error any symbol table errors will be written here
+ * @param variable the variable's name.  This is a single token, ie "$this", "$aglob" no object
+ *        operations.
+ * @param scopeSymbols the scope to look for the variable in 
+ * @param symbolTable the symbol table is used to resolve the variable assigments.
+ 
+ 
+ 
  * @return the variable's type; could be empty string if type could not be determined 
  */
-static UnicodeString ResolveVariableType(const UnicodeString& expressionScope, 
+static UnicodeString ResolveVariableType(const mvceditor::ScopeResultClass& expressionScope, 
 										 const std::map<wxString, mvceditor::ResourceFinderClass*>& openedResourceFinders, 
 										 mvceditor::ResourceFinderClass* globalResourceFinder,
 										 bool doDuckTyping,
@@ -188,7 +238,7 @@ static UnicodeString ResolveResourceType(UnicodeString resourceToLookup,
  * @return the resource's type; (for methods, it's the return type of the method) could be empty string if type could not be determined 
  */
 static UnicodeString ResolveInitialLexemeType(const pelet::SymbolClass& parsedExpression, 
-											  const UnicodeString& expressionScope, 
+											  const mvceditor::ScopeResultClass& expressionScope, 
 											  const std::map<wxString, mvceditor::ResourceFinderClass*>& openedResourceFinders,
 											  mvceditor::ResourceFinderClass* globalResourceFinder,
 											  bool doDuckTyping,
@@ -228,9 +278,9 @@ static UnicodeString ResolveInitialLexemeType(const pelet::SymbolClass& parsedEx
 		// also, determine the type of "parent" by looking at the scope
 		UnicodeString scopeClass;
 		UnicodeString scopeMethod;
-		int32_t index = expressionScope.indexOf(UNICODE_STRING_SIMPLE("::"));
+		int32_t index = expressionScope.MethodName.indexOf(UNICODE_STRING_SIMPLE("::"));
 		if (index >= 0) {
-			scopeClass.setTo(expressionScope, 0, index);
+			scopeClass.setTo(expressionScope.MethodName, 0, index);
 			scopeMethod.setTo(UNICODE_STRING_SIMPLE(""));
 		}
 		for (size_t i = 0; i < allResourceFinders.size(); ++i) {	
@@ -352,36 +402,11 @@ void mvceditor::SymbolTableMatchErrorClass::ToUnknownResource(const pelet::Symbo
 
 mvceditor::SymbolTableClass::SymbolTableClass() 
 	: Parser()
-	, Variables()
-	, NamespaceAliases() {
+	, Variables() {
 	Parser.SetClassObserver(this);
 	Parser.SetClassMemberObserver(this);
 	Parser.SetFunctionObserver(this);
 	Parser.SetVariableObserver(this);
-}
-
-void mvceditor::SymbolTableClass::ClassFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& signature, 
-		const UnicodeString& comment, const int lineNumber) {
-	
-	// add support for the namespace static operator		
-	NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = namespaceName;
-}
-
-void mvceditor::SymbolTableClass::NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias) {
-	NamespaceAliases[alias] = namespaceName;
-}
-
-void mvceditor::SymbolTableClass::TraitAliasFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
-												  const UnicodeString& traitMethodName, const UnicodeString& alias, pelet::TokenClass::TokenIds visibility) {
-}
-
-void mvceditor::SymbolTableClass::TraitInsteadOfFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
-													   const UnicodeString& traitMethodName, const std::vector<UnicodeString>& insteadOfList) {
-}
-
-void mvceditor::SymbolTableClass::TraitUseFound(const UnicodeString& namespaceName, const UnicodeString& className, 
-												const UnicodeString& fullyQualifiedTraitName) {
-
 }
 
 void mvceditor::SymbolTableClass::DefineDeclarationFound(const UnicodeString& variableName, 
@@ -397,13 +422,6 @@ void mvceditor::SymbolTableClass::FunctionFound(const UnicodeString& namespaceNa
 	
 	// this call will automatically create the predefined variables
 	GetScope(UNICODE_STRING_SIMPLE(""), functionName);
-	
-	// add support for the namespace static operator		
-	NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = namespaceName;
-}
-
-void mvceditor::SymbolTableClass::FunctionEnd(const UnicodeString& namespaceName, const UnicodeString& functionName, int pos) {
-	// nothing for now
 }
 
 void mvceditor::SymbolTableClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
@@ -417,18 +435,6 @@ void mvceditor::SymbolTableClass::MethodFound(const UnicodeString& namespaceName
 	variableSymbol.Type = pelet::SymbolClass::OBJECT;
 	variableSymbol.ChainList.push_back(className);
 	methodScope.push_back(variableSymbol);
-}
-
-void mvceditor::SymbolTableClass::MethodEnd(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, int pos) {
-	// nothing for now
-}
-
-void mvceditor::SymbolTableClass::PropertyFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& propertyName, 
-	const UnicodeString& propertyType, const UnicodeString& comment, 
-	pelet::TokenClass::TokenIds visibility, bool isConst, bool isStatic,
-	const int lineNumber) {
-
-	// do nothing; properties will be looked up using the ResourceFinder class
 }
 
 void mvceditor::SymbolTableClass::VariableFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
@@ -449,14 +455,8 @@ void mvceditor::SymbolTableClass::VariableFound(const UnicodeString& namespaceNa
 	}
 }
 
-void mvceditor::SymbolTableClass::IncludeFound(const UnicodeString& file, const int lineNumber) {
-
-	// no need to do anything special when a include statement has been found
-}
-
 void mvceditor::SymbolTableClass::CreateSymbols(const UnicodeString& code) {
 	Variables.clear();
-	NamespaceAliases.clear();
 	
 	// for now ignore parse errors
 	pelet::LintResultsClass results;
@@ -465,7 +465,6 @@ void mvceditor::SymbolTableClass::CreateSymbols(const UnicodeString& code) {
 
 void mvceditor::SymbolTableClass::CreateSymbolsFromFile(const wxString& fileName) {
 	Variables.clear();
-	NamespaceAliases.clear();
 	
 	// for now ignore parse errors
 	pelet::LintResultsClass results;
@@ -473,7 +472,7 @@ void mvceditor::SymbolTableClass::CreateSymbolsFromFile(const wxString& fileName
 	Parser.ScanFile(file.fp(), mvceditor::StringHelperClass::wxToIcu(fileName), results);
 }
 
-void mvceditor::SymbolTableClass::ExpressionCompletionMatches(pelet::SymbolClass parsedExpression, const UnicodeString& expressionScope,
+void mvceditor::SymbolTableClass::ExpressionCompletionMatches(pelet::SymbolClass parsedExpression, const mvceditor::ScopeResultClass& expressionScope,
 															  const std::map<wxString, mvceditor::ResourceFinderClass*>& openedResourceFinders,
 															  mvceditor::ResourceFinderClass* globalResourceFinder,
 															  std::vector<UnicodeString>& autoCompleteVariableList,
@@ -485,7 +484,8 @@ void mvceditor::SymbolTableClass::ExpressionCompletionMatches(pelet::SymbolClass
 		// if expression does not have more than one chained called AND it starts with a '$' then we want to match (local)
 		// variables. This is just a SymbolTable search.
 		std::vector<pelet::SymbolClass> scopeSymbols;
-		std::map<UnicodeString, std::vector<pelet::SymbolClass>, mvceditor::UnicodeStringComparatorClass>::const_iterator it = Variables.find(expressionScope);
+		std::map<UnicodeString, std::vector<pelet::SymbolClass>, mvceditor::UnicodeStringComparatorClass>::const_iterator it;
+		it = Variables.find(expressionScope.MethodName);
 		if (it != Variables.end()) {
 			scopeSymbols = it->second;
 		}
@@ -503,14 +503,14 @@ void mvceditor::SymbolTableClass::ExpressionCompletionMatches(pelet::SymbolClass
 	}	
 }
 
-void mvceditor::SymbolTableClass::ResourceMatches(pelet::SymbolClass parsedExpression, const UnicodeString& expressionScope, 
+void mvceditor::SymbolTableClass::ResourceMatches(pelet::SymbolClass parsedExpression, const mvceditor::ScopeResultClass& expressionScope, 
 												  const std::map<wxString, mvceditor::ResourceFinderClass*>& openedResourceFinders,
 												  mvceditor::ResourceFinderClass* globalResourceFinder,
 												  std::vector<mvceditor::ResourceClass>& resourceMatches,
 												  bool doDuckTyping,
 												  mvceditor::SymbolTableMatchErrorClass& error) const {
 	std::vector<pelet::SymbolClass> scopeSymbols;
-	std::map<UnicodeString, std::vector<pelet::SymbolClass>, UnicodeStringComparatorClass>::const_iterator it = Variables.find(expressionScope);
+	std::map<UnicodeString, std::vector<pelet::SymbolClass>, UnicodeStringComparatorClass>::const_iterator it = Variables.find(expressionScope.MethodName);
 	if (it != Variables.end()) {
 		scopeSymbols = it->second;
 	}	
@@ -522,11 +522,11 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::SymbolClass parsedExpre
 	
 	// take care of the 'use' namespace importing
 	pelet::SymbolClass originalExpression = parsedExpression;
-	ResolveNamespaceAlias(parsedExpression);
+	ResolveNamespaceAlias(parsedExpression, expressionScope);
 	
 	UnicodeString typeToLookup = ResolveInitialLexemeType(parsedExpression, expressionScope, openedResourceFinders, 
-		globalResourceFinder, doDuckTyping, error, scopeSymbols, *this);	
-
+		globalResourceFinder, doDuckTyping, error, scopeSymbols, *this);
+		
 	// continue to the next item in the chain up until the second to last one
 	// if we can't resolve a type then just exit
 	if (typeToLookup.caseCompare(UNICODE_STRING_SIMPLE("primitive"), 0) == 0) {
@@ -599,9 +599,9 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::SymbolClass parsedExpre
 			// duplicated in two separate caches
 			for (size_t k = 0; k < finder->GetResourceMatchCount(); ++k) {
 				mvceditor::ResourceClass resource = finder->GetResourceMatch(k);
-				bool isVisible = IsResourceVisible(resource, isStaticCall, isThisCall, isParentCall);
+				bool isVisible = IsResourceVisible(resource, originalExpression, expressionScope, isStaticCall, isThisCall, isParentCall);
 				if (!mvceditor::IsResourceDirty(openedResourceFinders, resource, finder) && isVisible) {
-					UnresolveNamespaceAlias(originalExpression, resource);
+					UnresolveNamespaceAlias(originalExpression, expressionScope, resource);
 					resourceMatches.push_back(resource);
 				}
 				else if (!isVisible) {
@@ -668,7 +668,7 @@ void mvceditor::SymbolTableClass::CreatePredefinedVariables(std::vector<pelet::S
 	}
 }
 
-void mvceditor::SymbolTableClass::ResolveNamespaceAlias(pelet::SymbolClass& parsedExpression) const {
+void mvceditor::SymbolTableClass::ResolveNamespaceAlias(pelet::SymbolClass& parsedExpression, const mvceditor::ScopeResultClass& scopeResult) const {
 	
 	// aliases are only in the beginning of the expression
 	// for example, for the expression 
@@ -679,7 +679,7 @@ void mvceditor::SymbolTableClass::ResolveNamespaceAlias(pelet::SymbolClass& pars
 	UnicodeString name = parsedExpression.Lexeme;
 	if (!name.startsWith(UNICODE_STRING_SIMPLE("$")) && !name.startsWith(UNICODE_STRING_SIMPLE("\\"))) {
 		std::map<UnicodeString, UnicodeString, UnicodeStringComparatorClass>::const_iterator it;
-		for (it = NamespaceAliases.begin(); it != NamespaceAliases.end(); ++it) {
+		for (it = scopeResult.NamespaceAliases.begin(); it != scopeResult.NamespaceAliases.end(); ++it) {
 			
 			// map key is the alias
 			// check to see if the expression begins with the alias
@@ -693,20 +693,21 @@ void mvceditor::SymbolTableClass::ResolveNamespaceAlias(pelet::SymbolClass& pars
 				UnicodeString afterAlias(name, it->first.length());
 				name = it->second + afterAlias;
 				parsedExpression.Lexeme = name;
-				parsedExpression.ChainList[0] = name;
+				parsedExpression.ChainList[0] = name;				
 				break;
 			}
 		}
 	}
 }
 
-void mvceditor::SymbolTableClass::UnresolveNamespaceAlias(const pelet::SymbolClass& originalExpression, mvceditor::ResourceClass& resource) const {
+void mvceditor::SymbolTableClass::UnresolveNamespaceAlias(const pelet::SymbolClass& originalExpression, const mvceditor::ScopeResultClass& scopeResult, mvceditor::ResourceClass& resource) const {
 	UnicodeString name = resource.Identifier;
 	
 	// leave variables and fully qualified names alone
 	if (!originalExpression.Lexeme.startsWith(UNICODE_STRING_SIMPLE("$")) && !originalExpression.Lexeme.startsWith(UNICODE_STRING_SIMPLE("\\"))) {
+		
 		std::map<UnicodeString, UnicodeString, UnicodeStringComparatorClass>::const_iterator it;
-		for (it = NamespaceAliases.begin(); it != NamespaceAliases.end(); ++it) {
+		for (it = scopeResult.NamespaceAliases.begin(); it != scopeResult.NamespaceAliases.end(); ++it) {
 			
 			// map value is the fully qualified name
 			// check to see if the resource begins with the fully qualified aliased name
@@ -744,108 +745,115 @@ bool mvceditor::IsResourceDirty(const std::map<wxString, mvceditor::ResourceFind
 	return ret;
 }
 
+mvceditor::ScopeResultClass::ScopeResultClass() 
+	: MethodName()
+	, NamespaceName()
+	, NamespaceAliases() {
+		
+	//  by default use the global scope
+	MethodName = UNICODE_STRING_SIMPLE("::");
+}
+
+void mvceditor::ScopeResultClass::Clear() {
+	
+	//  by default use the global scope
+	MethodName = UNICODE_STRING_SIMPLE("::");
+	NamespaceName.remove();
+	NamespaceAliases.clear();
+}
+
+void mvceditor::ScopeResultClass::Copy(const mvceditor::ScopeResultClass& src) {
+	MethodName = src.MethodName;
+	NamespaceName = src.NamespaceName;
+	NamespaceAliases = src.NamespaceAliases;
+}
+
+bool mvceditor::ScopeResultClass::IsGlobalScope() const {
+	return UNICODE_STRING_SIMPLE("::") == MethodName;
+}
+
+bool mvceditor::ScopeResultClass::IsGlobalNamespace() const {
+	return UNICODE_STRING_SIMPLE("\\") == NamespaceName || NamespaceName.isEmpty();
+}
+
+
 mvceditor::ScopeFinderClass::ScopeFinderClass() 
-	: ScopePositions()
+	: ScopeResult()
+	, LastNamespace()
 	, Parser() {
 	Parser.SetClassObserver(this);
 	Parser.SetClassMemberObserver(this);
 	Parser.SetFunctionObserver(this);
 }
 
-void mvceditor::ScopeFinderClass::ClassFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& signature, 
-											 const UnicodeString& comment, const int lineNumber) {
-	// nothing for now
-}
-
-void mvceditor::ScopeFinderClass::DefineDeclarationFound(const UnicodeString& variableName, const UnicodeString& variableValue, 
-														 const UnicodeString& comment, const int lineNumber) {
-	// nothing for now
+void mvceditor::ScopeFinderClass::NamespaceDeclarationFound(const UnicodeString& namespaceName) {
+	if (Parser.GetCharacterPosition() > PosToCheck) {
+		return;
+	}
+	CheckLastNamespace(namespaceName);
+	
+	// add support for the namespace static operator
+	if (namespaceName != UNICODE_STRING_SIMPLE("\\")) {
+		ScopeResult.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = namespaceName;
+	}
 }
 
 void mvceditor::ScopeFinderClass::NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias) {
-	
+	if (Parser.GetCharacterPosition() > PosToCheck) {
+		return;
+	}
+	ScopeResult.NamespaceAliases[alias] = namespaceName;
 }
-
-void mvceditor::ScopeFinderClass::TraitAliasFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
-	const UnicodeString& traitMethodName, const UnicodeString& alias, pelet::TokenClass::TokenIds visibility) {
-		
-}
-
-void mvceditor::ScopeFinderClass::TraitInsteadOfFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
-	const UnicodeString& traitMethodName, const std::vector<UnicodeString>& insteadOfList) {
-		
-}
-
-void mvceditor::ScopeFinderClass::TraitUseFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& fullyQualifiedTraitName) {
-	
-}
-
 
 void mvceditor::ScopeFinderClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber) {
-	int currentPos = Parser.GetCharacterPosition();
-	PushStartPos(className, methodName, currentPos);
-}
-
-void mvceditor::ScopeFinderClass::MethodEnd(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, int pos) {
+	if (Parser.GetCharacterPosition() > PosToCheck) {
+		return;
+	}
 	UnicodeString scopeString = ScopeString(className, methodName);
-	ScopePositions[scopeString].second = pos;
-}
-
-void mvceditor::ScopeFinderClass::PropertyFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& propertyName, 
-		const UnicodeString& propertyType, const UnicodeString& comment, 
-		pelet::TokenClass::TokenIds visibility, bool isConst, bool isStatic, const int lineNumber) {
-	// nothing for now
+	ScopeResult.MethodName = scopeString;
 }
 
 void mvceditor::ScopeFinderClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, 
 												const UnicodeString& signature, const UnicodeString& returnType, 
 												const UnicodeString& comment, const int lineNumber) {
-	int currentPos = Parser.GetCharacterPosition();
-	PushStartPos(UNICODE_STRING_SIMPLE(""), functionName, currentPos);
+	if (Parser.GetCharacterPosition() > PosToCheck) {
+		return;
+	}
+	CheckLastNamespace(namespaceName);
+	UnicodeString scopeString = ScopeString(UNICODE_STRING_SIMPLE(""), functionName);
+	ScopeResult.MethodName = scopeString;
 }
 
 void mvceditor::ScopeFinderClass::FunctionEnd(const UnicodeString& namespaceName, const UnicodeString& functionName, int pos) {
-	UnicodeString scopeString = ScopeString(UNICODE_STRING_SIMPLE(""), functionName);
-	ScopePositions[scopeString].second = pos;
+	
+	// not sure why this needs ">=" for it to work ... the test passes and the test is correct
+	if (pos >= PosToCheck) {
+		return;
+	}
+	ScopeResult.MethodName = UNICODE_STRING_SIMPLE("::");
 }
 
-void mvceditor::ScopeFinderClass::IncludeFound(const UnicodeString& fileName, const int lineNumber) {
-	// nothing for now
-}
-
-UnicodeString mvceditor::ScopeFinderClass::GetScopeString(const UnicodeString& code, int pos) {
-	ScopePositions.clear();
+void mvceditor::ScopeFinderClass::GetScopeString(const UnicodeString& code, int pos, mvceditor::ScopeResultClass& scopeResult) {
+	ScopeResult.Clear();
+	LastNamespace.remove();
+	PosToCheck = pos;
 	
 	// for now ignore parse errors
-	pelet::LintResultsClass results;
-	Parser.ScanString(code, results);
-
-	// ScopePositions are ranges; we just need to check which range pos falls in
-	UnicodeString scopeString = ScopeString(UNICODE_STRING_SIMPLE(""), UNICODE_STRING_SIMPLE(""));
-	for (std::map<UnicodeString, std::pair<int, int>, UnicodeStringComparatorClass>::const_iterator it = ScopePositions.begin(); it != ScopePositions.end(); ++it) {
-
-		// this is the scope IF pos is after this position but before the next one
-		// map values are pairs themselves, hence the second.first and second.second
-		if (pos >= it->second.first && pos <= it->second.second) {
-			scopeString = it->first;
-		}
-		else if (pos >= it->second.first && it->second.first == it->second.second) {
-			
-			// special case to handles "bad" code where the scope does not end (functions that have been
-			// declared but have no ending brace). PushStartPos() prepares the scope positions in
-			// this manner
-			scopeString = it->first;
-		}
-	}
-	return scopeString;
+	pelet::LintResultsClass lintResults;
+	Parser.ScanString(code, lintResults);
+	
+	// ScanString starts the parsing and will call of the observer methods. At this point the scope has been figured out
+	scopeResult.Copy(ScopeResult);
 }
 
-void mvceditor::ScopeFinderClass::PushStartPos(const UnicodeString& className, const UnicodeString& functionName, int startPos) {
-	UnicodeString scopeString = ScopeString(className, functionName);
-	std::pair<int, int> pair;
-	pair.first = startPos;
-	pair.second = startPos;
-	ScopePositions[scopeString] = pair;
+void mvceditor::ScopeFinderClass::CheckLastNamespace(const UnicodeString& namespaceName) {
+	if (LastNamespace.caseCompare(namespaceName, 0) != 0) {
+		
+		// cannot Clear() the scope result because it would delete the aliases, and the aliases
+		// are created outside of any method/function scope
+		ScopeResult.NamespaceName = namespaceName;
+		LastNamespace = namespaceName;
+	}
 }
