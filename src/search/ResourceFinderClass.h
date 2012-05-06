@@ -552,17 +552,18 @@ private:
 	};
 	
 	/**
-	 * All of the classes / functions resources found.
+	 * All of the resources, will be indexed by identifier name
 	 */
-	std::vector<ResourceClass> ResourceCache;
+	std::vector<ResourceClass> IdentifierCache;
 	
 	/**
-	 * All of the methods / properties / constants found.
+	 * All of the resources, will be indexed by ClassName::Member name. Note that this does not contain
+	 * functions or define resources since they do not belong to a class
 	 */
 	std::vector<ResourceClass> MembersCache;
 	
 	/**
-	 * All of the namespaces found
+	 * All of the resources, will be indexed by fully qualified namespace \\First\\ClassName
 	 */
 	std::vector<ResourceClass> NamespaceCache;
 	
@@ -767,6 +768,21 @@ private:
 	 *         className uses.
 	 */
 	bool IsTraitInherited(const ResourceClass& memberResource, const UnicodeString& fullyQualifiedClassName);
+	
+	/**
+	 * Searches the given cache for the given resource; quitting after maxMatches have been found.
+	 * This search is a little more complicated than a straight loookup; a search is done using exact
+	 * matching, and if exact matches are not found then a "near" match lookup is done.
+	 * 
+	 * cache is assumed to be sorted; if cache is not sorted then this function will not work.
+	 * 
+	 * @param cache the sorted cache of resources to search
+	 * @param needle the resource to search for
+	 * @param matches the vector to hold the matched resources
+	 * @param maxMatches after this many matches, the search will end.
+	 */
+	void BoundedCacheSearch(const std::vector<mvceditor::ResourceClass>& cache, const UnicodeString& key,
+			std::vector<mvceditor::ResourceClass>& matches, int maxMatches) const;	
 };
 
 /**
@@ -790,16 +806,22 @@ public:
 	};
 	
 	/**
-	 * The resource fully qualified name; members will have a class name with it: ie. User::Name
-	 * @var UnicodeString
-	 */
-	UnicodeString Resource;
-	
-	/**
 	 * The identifer name of this resource. Members will not have a class name with it; ie. a Name method's Identifier will be Name
 	 * @var UnicodeString
 	 */
 	UnicodeString Identifier;
+	
+	/**
+	 * The name of the class that this resource belongs to; only members will have a class name with it: ie. User::Name
+	 * The class name will NOT have the namespace
+	 * @var UnicodeString
+	 */
+	UnicodeString ClassName;
+	
+	/**
+	 * The namespace that this function / class is in.
+	 */
+	UnicodeString NamespaceName;
 	
 	/**
 	 * The resource signature. For methods / functions; it is the entire argument list
@@ -885,6 +907,11 @@ public:
 	 * set all properties to empty string
 	 */
 	void Clear();
+	
+	/**
+	 * @return TRUE if given key is the same as this resource's key (case insensitive)
+	 */
+	bool IsKeyEqualTo(const UnicodeString& key) const;
 
 private:
 
@@ -893,6 +920,16 @@ private:
 	 * hold the file item index.
 	 */
 	wxString FullPath;
+	
+	/**
+	 * This is the "key" that we will use for lookups. This is the string that will be used to index resources
+	 * by so that we can use binary search.
+	 * The key can be one of:
+	 * - A single identifier (class name, function name, property / method name)
+	 * - A full member name (Class::Method)
+	 * - A fully namespaced name (\First\Sec\Class)
+	 */
+	UnicodeString Key;
 
 	/**
 	 * The index to the file where this resource was found. 

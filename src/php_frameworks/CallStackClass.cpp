@@ -121,7 +121,7 @@ bool mvceditor::CallStackClass::Recurse(Errors& error) {
 				wxFileName nextFile = nextItem.FileName;
 				bool alreadyParsed = false;
 				for (size_t i = 0; i < List.size(); ++i) {
-					if (List[i].Resource.Resource == nextResource) {
+					if ((List[i].Resource.ClassName + UNICODE_STRING_SIMPLE("::") + List[i].Resource.Identifier) == nextResource) {
 						alreadyParsed = true;
 						break;
 					}
@@ -169,7 +169,11 @@ bool mvceditor::CallStackClass::Persist(wxFileName& fileName) {
 			mvceditor::ResourceClass callResource = it->Resource;
 			line += mvceditor::StringHelperClass::IcuToWx(callResource.Identifier);
 			line += wxT(",");
-			line += mvceditor::StringHelperClass::IcuToWx(callResource.Resource);
+			if (!callResource.ClassName.isEmpty()) {
+				line += mvceditor::StringHelperClass::IcuToWx(callResource.ClassName);
+				line += wxT("::");
+			}
+			line += mvceditor::StringHelperClass::IcuToWx(callResource.Identifier);
 			if (!it->Arguments.empty()) {
 				line += wxT(",");
 			}
@@ -228,7 +232,12 @@ void mvceditor::CallStackClass::ExpressionFound(const pelet::ExpressionClass& ex
 				if (mvceditor::ResourceClass::FUNCTION == it->Type || mvceditor::ResourceClass::METHOD == it->Type) {
 					ResourceWithFile newItem;
 					newItem.FileName.Assign(it->GetFullPath());
-					newItem.Resource = it->Resource;
+					if (mvceditor::ResourceClass::FUNCTION == it->Type) {
+						newItem.Resource = it->Identifier;
+					}
+					else {
+						newItem.Resource = it->ClassName + UNICODE_STRING_SIMPLE("::") + it->Identifier;
+					}
 					ResourcesRemaining.push(newItem);
 					
 					mvceditor::CallClass newCall;

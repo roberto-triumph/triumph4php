@@ -141,7 +141,8 @@ TEST_FIXTURE(CallStackFixtureTestClass, ResolutionError) {
 	
 	// since load can be resolved the call stack should have it
 	CHECK_VECTOR_SIZE(1, CallStack.List);
-	CHECK_UNISTR_EQUALS("CI_Loader::view", CallStack.List[0].Resource.Resource);
+	CHECK_UNISTR_EQUALS("view", CallStack.List[0].Resource.Identifier);
+	CHECK_UNISTR_EQUALS("CI_Loader", CallStack.List[0].Resource.ClassName);
 }	
 
 TEST_FIXTURE(CallStackFixtureTestClass, FailOnStackLimit) {
@@ -169,7 +170,8 @@ TEST_FIXTURE(CallStackFixtureTestClass, SimpleMethodCall) {
 	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
 	CHECK_VECTOR_SIZE(1, CallStack.List);
-	CHECK_UNISTR_EQUALS("CI_Loader::view", CallStack.List[0].Resource.Resource);
+	CHECK_UNISTR_EQUALS("view", CallStack.List[0].Resource.Identifier);
+	CHECK_UNISTR_EQUALS("CI_Loader", CallStack.List[0].Resource.ClassName);
 	CHECK_VECTOR_SIZE(2, CallStack.List[0].Arguments);
 	CHECK_UNISTR_EQUALS("index", CallStack.List[0].Arguments[0].Lexeme);
 	CHECK_EQUAL(pelet::ExpressionClass::SCALAR, CallStack.List[0].Arguments[0].Type);

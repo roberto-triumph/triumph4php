@@ -223,7 +223,7 @@ public:
 		SymbolTableMatchErrorClass& error);
 	
 	/**
-	 * print the resource cache to stdout
+	 * print the resource cache to stdout. Really only useful for debugging and not much else
 	 */
 	void Print();
 	
@@ -236,6 +236,11 @@ public:
 	 * @return TRUE if the cache has not been initialized with either a call to Register() or a call to WalkGlobal()
 	 */
 	bool IsResourceCacheEmpty();
+	
+	/**
+	 * Remove all items from all caches and also unregisters any and all files.
+	 */
+	void Clear();
 	 
 private:
 

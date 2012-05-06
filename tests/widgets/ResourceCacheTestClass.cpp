@@ -153,9 +153,9 @@ TEST_FIXTURE(RegisterTestFixtureClass, CollectShouldGetFromAllFinders) {
 	if (3 == matches.size()) {
 		
 		// results should be sorted
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionMy"), matches[0].Resource);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionThey"), matches[1].Resource);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionYou"), matches[2].Resource);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionMy"), matches[0].Identifier);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionThey"), matches[1].Identifier);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionYou"), matches[2].Identifier);
 	}
 }
 
@@ -260,7 +260,8 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithGlobalF
 		ResourceMatches, DoDuckTyping, Error);
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
 	if (!ResourceMatches.empty()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionYou::w"), ResourceMatches[0].Resource);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("w"), ResourceMatches[0].Identifier);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionYou"), ResourceMatches[0].ClassName);
 	}
 }
 
@@ -286,7 +287,8 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithRegiste
 		ResourceMatches, DoDuckTyping, Error);
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
 	if (!ResourceMatches.empty()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionMy::methodA"), ResourceMatches[0].Resource);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("methodA"), ResourceMatches[0].Identifier);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionMy"), ResourceMatches[0].ClassName);
 	}
 }
 
@@ -315,7 +317,8 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithStaleMa
 		ResourceMatches, DoDuckTyping, Error);
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
 	if (!ResourceMatches.empty()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionMy::methodA"), ResourceMatches[0].Resource);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("methodA"), ResourceMatches[0].Identifier);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionMy"), ResourceMatches[0].ClassName);
 	}
 
 	// now update the code

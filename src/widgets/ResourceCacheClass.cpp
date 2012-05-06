@@ -33,12 +33,7 @@ mvceditor::ResourceCacheClass::ResourceCacheClass()
 }
 
 mvceditor::ResourceCacheClass::~ResourceCacheClass() {
-	for (std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it =  Finders.begin(); it != Finders.end(); ++it) {
-		delete it->second;
-	}
-	for (std::map<wxString, mvceditor::SymbolTableClass*>::iterator it =  SymbolTables.begin(); it != SymbolTables.end(); ++it) {
-		delete it->second;
-	}
+	Clear();
 }
 
 bool mvceditor::ResourceCacheClass::Register(const wxString& fileName, bool createSymbols) {
@@ -327,7 +322,22 @@ bool mvceditor::ResourceCacheClass::IsResourceCacheEmpty() {
 	return isEmpty;
 }
 
-
+void mvceditor::ResourceCacheClass::Clear() {
+	wxMutexLocker locker(Mutex);
+	if (!locker.IsOk()) {
+		return;
+	}
+	GlobalResourceFinder.Clear();
+	for (std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it =  Finders.begin(); it != Finders.end(); ++it) {
+		delete it->second;
+	}
+	for (std::map<wxString, mvceditor::SymbolTableClass*>::iterator it =  SymbolTables.begin(); it != SymbolTables.end(); ++it) {
+		delete it->second;
+	}
+	Finders.clear();
+	SymbolTables.clear();
+	
+}
 
 mvceditor::ResourceCacheUpdateThreadClass::ResourceCacheUpdateThreadClass(mvceditor::ResourceCacheClass* resourceCache, wxEvtHandler& handler, int eventId)
 	: ThreadWithHeartbeatClass(handler, eventId)

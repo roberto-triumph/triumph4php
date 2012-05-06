@@ -307,8 +307,14 @@ bool mvceditor::ResourcesDetectorActionClass::Response() {
 		wxString resComment = result.Read(groupName + wxT("/Comment"));
 		
 		mvceditor::ResourceClass resource;
-		resource.Resource = mvceditor::StringHelperClass::wxToIcu(resResource);
-		resource.Identifier = mvceditor::StringHelperClass::wxToIcu(resIdentifier);
+		UnicodeString res = mvceditor::StringHelperClass::wxToIcu(resResource);
+		int32_t scopePos = res.indexOf(UNICODE_STRING_SIMPLE("::"));
+		UnicodeString className;
+		if (scopePos > 0) {
+			className.setTo(res, 0, scopePos);			
+			resource.ClassName = className;
+		}
+		resource.Identifier = mvceditor::StringHelperClass::wxToIcu(resIdentifier);	
 		resource.ReturnType = mvceditor::StringHelperClass::wxToIcu(resReturnType);
 		resource.Signature = mvceditor::StringHelperClass::wxToIcu(resSignature);
 		resource.Comment = mvceditor::StringHelperClass::wxToIcu(resComment);

@@ -1035,7 +1035,7 @@ void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
 			mvceditor::ResourceClass resource = matches[0];
 			wxString msg;
 			if (resource.Type == mvceditor::ResourceClass::FUNCTION) {
-				msg = mvceditor::StringHelperClass::IcuToWx(resource.Resource);
+				msg = mvceditor::StringHelperClass::IcuToWx(resource.Identifier);
 				msg += wxT("\n\n");
 				msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
 				msg += wxT(" [ ");
@@ -1044,7 +1044,9 @@ void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
 				
 			}
 			else if (resource.Type == mvceditor::ResourceClass::METHOD) {
-				msg = mvceditor::StringHelperClass::IcuToWx(resource.Resource);
+				msg = mvceditor::StringHelperClass::IcuToWx(resource.ClassName);
+				msg += wxT("::");
+				msg += mvceditor::StringHelperClass::IcuToWx(resource.Identifier);
 				msg += wxT("\n\n");
 				msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
 				if (!resource.ReturnType.isEmpty()) {
@@ -1053,8 +1055,10 @@ void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
 					msg += wxT(" ]");	
 				}
 			}
-			else if (resource.Type == mvceditor::ResourceClass::MEMBER) {
-				msg = mvceditor::StringHelperClass::IcuToWx(resource.Resource);
+			else if (resource.Type == mvceditor::ResourceClass::MEMBER || resource.Type == mvceditor::ResourceClass::CLASS_CONSTANT) {
+				msg = mvceditor::StringHelperClass::IcuToWx(resource.ClassName);
+				msg += wxT("::");
+				msg += mvceditor::StringHelperClass::IcuToWx(resource.Identifier);
 				msg += wxT("\n\n");
 				msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
 				if (!resource.ReturnType.isEmpty()) {
@@ -1064,7 +1068,7 @@ void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
 				}
 			}
 			else {
-				msg = mvceditor::StringHelperClass::IcuToWx(resource.Resource);
+				msg = mvceditor::StringHelperClass::IcuToWx(resource.Identifier);
 				msg += wxT("\n\n");
 				msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
 			}

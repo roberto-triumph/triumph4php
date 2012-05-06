@@ -651,7 +651,7 @@ void mvceditor::PhpDocumentClass::HandleCallTip(wxChar ch, bool force) {
 				// when the constructor is called; the matched symbol is the class name and not a method name
 				// here we will look for the constructor
 				// search for all methods of the class
-				UnicodeString className = matches[0].Resource;
+				UnicodeString className = matches[0].ClassName;
 				wxString constructorResourceSearch = mvceditor::StringHelperClass::IcuToWx(className);
 				constructorResourceSearch += wxT("::");
 				std::vector<mvceditor::ResourceClass> matches = ResourceCache->PrepareAndCollectNearMatchResourcesFromAll(constructorResourceSearch);

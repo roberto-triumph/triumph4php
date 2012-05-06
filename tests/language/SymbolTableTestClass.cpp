@@ -471,7 +471,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithClassname) {
 	CompletionSymbolTable.ResourceMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, resources, DoDuckTyping, Error);
 	CHECK_VECTOR_SIZE(1, resources);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass"), resources[0].Resource);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass"), resources[0].Identifier);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceNameCompletion) {
@@ -600,8 +600,6 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClas
 	ResourceMatches.clear();
 	Error.Clear();
 	ScopeResult.Clear();
-	/**
-	 TODO: fix this
 	  
 	// fully qualified class names should be visible
 	ToClass(UNICODE_STRING_SIMPLE("\\Othe"));
@@ -610,10 +608,8 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClas
 	ScopeResult.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = UNICODE_STRING_SIMPLE("\\Second");
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
-	Finder1.Print();
 	CHECK_VECTOR_SIZE(1, ResourceMatches);
 	CHECK_UNISTR_EQUALS("\\OtherClass", ResourceMatches[0].Identifier);
-	 */
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClassInDifferentNamespace) {
@@ -684,7 +680,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClas
 	ScopeResult.NamespaceName = UNICODE_STRING_SIMPLE("\\First\\Child");
 	ScopeResult.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = UNICODE_STRING_SIMPLE("\\First\\Child");
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
-		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
+		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);	
 	CHECK_VECTOR_SIZE(1, ResourceMatches);
 	CHECK_UNISTR_EQUALS("MyClass", ResourceMatches[0].Identifier);		
 }
@@ -729,7 +725,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndGlob
 	// since code is declaring a namespace, then classes in the global namespace are not automatically
 	// imported
 	CHECK_VECTOR_SIZE(1, ResourceMatches);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("OtherClass"), ResourceMatches[0].Resource);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("OtherClass"), ResourceMatches[0].ClassName);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("OtherClass"), ResourceMatches[0].Identifier);
 }
 
@@ -749,8 +745,10 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithMethodCall) {
 		&GlobalFinder, resources, DoDuckTyping, Error);
 	CHECK_EQUAL((size_t)2, resources.size());
 	if ((size_t)2 == resources.size()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass::workA"), resources[0].Resource);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass::workB"), resources[1].Resource);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("workA"), resources[0].Identifier);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass"), resources[0].ClassName);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), resources[1].Identifier);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass"), resources[1].ClassName);
 	}
 }
 
@@ -809,8 +807,10 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownVariableA
 	CompletionSymbolTable.ResourceMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, resources, true, Error);
 	CHECK_VECTOR_SIZE(2, resources);
-	CHECK_UNISTR_EQUALS("MyClass::workA", resources[0].Resource);
-	CHECK_UNISTR_EQUALS("MyClass::workB", resources[1].Resource);
+	CHECK_UNISTR_EQUALS("workA", resources[0].Identifier);
+	CHECK_UNISTR_EQUALS("MyClass", resources[0].ClassName);
+	CHECK_UNISTR_EQUALS("workB", resources[1].Identifier);
+	CHECK_UNISTR_EQUALS("MyClass", resources[1].ClassName);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillUnknownResourceError) {

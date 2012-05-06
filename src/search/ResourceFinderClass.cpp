@@ -37,6 +37,7 @@
  */
 static bool ParseTag(mvceditor::ResourceClass& resource, UChar* line) {
 	resource.Clear();
+	resource.NamespaceName = UNICODE_STRING_SIMPLE("\\");
 	bool good = false;
 
 	// summary of tag format
@@ -146,18 +147,16 @@ static bool ParseTag(mvceditor::ResourceClass& resource, UChar* line) {
 			// S Signature of routine (e.g. prototype or parameter list)
 			// t Type and name of a variable or typedef as "typeref:" field - not used
 			if ('c' == kind) {
-				resource.Resource = resource.Identifier;
-				resource.Type = mvceditor::ResourceClass::CLASS;;
+				resource.ClassName = resource.Identifier;
+				resource.Type = mvceditor::ResourceClass::CLASS;
 				good = true;
 			}
 			else if ('d' == kind) {
-				resource.Resource = resource.Identifier;
 				resource.Type = mvceditor::ResourceClass::DEFINE;
 				good = true;
 			}
 			else if ('f' == kind && className.isEmpty()) {
 				resource.Type = mvceditor::ResourceClass::FUNCTION;
-				resource.Resource = resource.Identifier;
 				resource.Signature.setTo(signature);
 
 				// return type is in the signature
@@ -170,7 +169,7 @@ static bool ParseTag(mvceditor::ResourceClass& resource, UChar* line) {
 			}
 			else if ('f' == kind && !className.isEmpty()) {
 				resource.Type = mvceditor::ResourceClass::METHOD;
-				resource.Resource.setTo(className + UNICODE_STRING_SIMPLE("::") + resource.Identifier);
+				resource.ClassName = className;
 				resource.Signature.setTo(signature);
 
 				// return type is in the signature
@@ -183,18 +182,16 @@ static bool ParseTag(mvceditor::ResourceClass& resource, UChar* line) {
 			}
 			else if ('o' == kind) {
 				resource.Type = mvceditor::ResourceClass::CLASS_CONSTANT;
-				resource.Resource.setTo(className + UNICODE_STRING_SIMPLE("::") + resource.Identifier);
+				resource.ClassName = className;
 				good = true;
 			}
 			else if ('p' == kind) {
 				resource.Type = mvceditor::ResourceClass::MEMBER;
-				resource.Resource.setTo(className + UNICODE_STRING_SIMPLE("::") + resource.Identifier);
+				resource.ClassName = className;
 				good = true;
 			}
-			else if ('v' == kind) {
-
-				// super global variables there is no type for them...
-			}
+			// 'v' kind super global variables there is no type for them...
+			
 			resource.IsProtected = accessModifiers.indexOf(UNICODE_STRING_SIMPLE("protected")) != -1;
 
 			// class constants are always static
@@ -212,47 +209,12 @@ static bool ParseTag(mvceditor::ResourceClass& resource, UChar* line) {
 static bool MatchesAnyClass(const mvceditor::ResourceClass& resource, const std::vector<UnicodeString>& classNames) {
 	bool match = false;
 	for (size_t i = 0; i < classNames.size(); ++i) {
-		if (mvceditor::CaseStartsWith(resource.Resource, classNames[i] + UNICODE_STRING_SIMPLE("::"))) {
+		if (resource.ClassName.caseCompare(classNames[i], 0) == 0) {
 			match = true;
 			break;
 		}
 	}
 	return match;
-}
-
-/**
- * Searches the given cache for the given resource; quitting after maxMatches have been found.
- * This search is a little more complicated than a straight loookup; a search is done using exact
- * matching, and if exact matches are not found then a "near" match lookup is done.
- * 
- * cache is assumed to be sorted; if cache is not sorted then this function will not work.
- * 
- * @param cache the sorted cache of resources to search
- * @param needle the resource to search for
- * @param matches the vector to hold the matched resources
- * @param maxMatches after this many matches, the search will end.
- */
-static void BoundedCacheSearch(const std::vector<mvceditor::ResourceClass>& cache,
-		const mvceditor::ResourceClass& needle,
-		std::vector<mvceditor::ResourceClass>& matches, int maxMatches) {
-	int matchCount = 0;
-	std::vector<mvceditor::ResourceClass>::const_iterator it =  std::lower_bound(cache.begin(), cache.end(), needle);
-	if (it != cache.end()) {
-		
-		// collect near matches
-		while (it != cache.end() && mvceditor::CaseStartsWith(it->Identifier, needle.Identifier)) {
-			matches.push_back(*it);
-			matchCount++;
-			if (matchCount > maxMatches) {
-				break;
-			}
-			++it;
-		}
-	}
-}
-
-static bool IsRootNamespace(const UnicodeString& namespaceName) {
-	return UNICODE_STRING_SIMPLE("\\") == namespaceName;
 }
 
 /**
@@ -266,36 +228,35 @@ static bool IsClassMember(const mvceditor::ResourceClass& resource) {
 
 /**
  * A predicate class useful for STL algorithms.  This class will match TRUE
- * if a resource has the exact same identifier as the identifier given in
+ * if a resource has the exact same key as the identifier given in
  * the constructor (case insensitive). For example, if this predicate is 
  * give to std::count_if function, then the function will count all resources
- * that have the same identifer.
- * 
+ * that have the same key.
  * 
  * IsNegative flag will invert the comparison, and the predicate will instead
- * return false when a resource has the exact same identifier as the identifier
+ * return false when a resource has the exact same key as the key
  * given in the constructor. This makes it possible to use this predicate in
  * std::remove_if to remove items that do NOT match an identifier.
  */
-class IdentifierPredicateClass {
+class KeyPredicateClass {
 	
 public:
 
-	UnicodeString Identifier;
+	UnicodeString Key;
 	
 	bool IsNegative;
 
-	IdentifierPredicateClass(const UnicodeString& identifier, bool isNegative) 
-		: Identifier(identifier) 
+	KeyPredicateClass(const UnicodeString& key, bool isNegative) 
+		: Key(key) 
 		, IsNegative(isNegative) {
 		
 	}
 
 	bool operator()(const mvceditor::ResourceClass& resource) const {
 		if (!IsNegative) {
-			return Identifier.caseCompare(resource.Identifier, 0) == 0;
+			return resource.IsKeyEqualTo(Key) == 0;
 		}
-		return Identifier.caseCompare(resource.Identifier, 0) != 0;
+		return !resource.IsKeyEqualTo(Key);
 	}
 };
 
@@ -304,12 +265,8 @@ public:
  */
 static UnicodeString QualifyName(const UnicodeString& namespaceName, const UnicodeString& name) {
 	UnicodeString qualifiedName;
-	
-	// if namespace is the root namespace, ignore for now
-	if (!IsRootNamespace(namespaceName)) {
-		qualifiedName.append(namespaceName);
-	}
-	if (!qualifiedName.isEmpty() && !qualifiedName.endsWith(UNICODE_STRING_SIMPLE("\\"))) {
+	qualifiedName.append(namespaceName);
+	if (!qualifiedName.endsWith(UNICODE_STRING_SIMPLE("\\"))) {
 		qualifiedName.append(UNICODE_STRING_SIMPLE("\\"));
 	}
 	qualifiedName.append(name);
@@ -318,7 +275,7 @@ static UnicodeString QualifyName(const UnicodeString& namespaceName, const Unico
 
 mvceditor::ResourceFinderClass::ResourceFinderClass()
 	: FileFilters()
-	, ResourceCache()
+	, IdentifierCache()
 	, MembersCache()
 	, NamespaceCache()
 	, TraitCache()
@@ -438,16 +395,15 @@ bool mvceditor::ResourceFinderClass::GetResourceMatchPosition(const mvceditor::R
 
 	UnicodeString className,
 		methodName;
-	int scopeResolutionPos = resource.Resource.indexOf(UNICODE_STRING_SIMPLE("::"));
-	if (scopeResolutionPos >= 0) {
-		className.setTo(resource.Resource, 0, scopeResolutionPos);
-		methodName.setTo(resource.Resource, scopeResolutionPos + 2, resource.Resource.length() - scopeResolutionPos + 2 - 1);
+	if (!resource.ClassName.isEmpty()) {
+		className = resource.ClassName;
+		methodName = resource.Identifier;
 
 		mvceditor::FinderClass::EscapeRegEx(className);
 		mvceditor::FinderClass::EscapeRegEx(methodName);
 	}
 	else {
-		className = resource.Resource;
+		className = resource.Identifier;
 		mvceditor::FinderClass::EscapeRegEx(className);
 	}
 	switch (resource.Type) {
@@ -558,17 +514,16 @@ void mvceditor::ResourceFinderClass::CollectNearMatchFiles() {
 }
 
 void mvceditor::ResourceFinderClass::CollectNearMatchNonMembers() {
-	ResourceClass needle;
-	needle.Identifier = ClassName;
-	BoundedCacheSearch(ResourceCache, needle, Matches, 50);
+	UnicodeString key = ClassName;
+	BoundedCacheSearch(IdentifierCache, key, Matches, 50);
 	
 	// bounded search uses near matches, here if the identifier is an exact match then 
 	// just use the exact match
 	std::vector<mvceditor::ResourceClass>::iterator end = Matches.end();
 	end = std::remove_if(Matches.begin(), end, IsClassMember);
 	
-	if (!Matches.empty() && Matches[0].Identifier.caseCompare(needle.Identifier, 0) == 0) {
-		IdentifierPredicateClass pred(needle.Identifier, true);
+	if (!Matches.empty() && Matches[0].Identifier.caseCompare(key, 0) == 0) {
+		KeyPredicateClass pred(key, true);
 		end = std::remove_if(Matches.begin(), end, pred);
 	}
 	
@@ -589,10 +544,32 @@ void mvceditor::ResourceFinderClass::CollectNearMatchMembers() {
 		CollectAllMembers(parentClassNames);
 		CollectAllTraitMembers(ClassName);
 	}
+	else if (ClassName.isEmpty()) {
+		
+		// special case, query accross all classes for a method (::getName)
+		// if ClassName is empty, then just check method names (which BoundedCacheSearch does). This ensures 
+		// queries like '::getName' will work as well.
+		UnicodeString key = MethodName;
+		BoundedCacheSearch(IdentifierCache, key, Matches, 50);
+		
+		// BoundedCacheSearch got all resources that match on the identifier. we need extra logic
+		// to remove matches that come from resources that are not methods or properties
+		std::vector<ResourceClass>::iterator it = Matches.begin();
+		while (it != Matches.end()) {
+			bool keep = mvceditor::ResourceClass::MEMBER == it->Type ||
+				mvceditor::ResourceClass::METHOD == it->Type ||
+				mvceditor::ResourceClass::CLASS_CONSTANT == it->Type;
+			if (keep) {
+				++it;
+			}
+			else {
+				it = Matches.erase(it);
+			}
+		}
+	}
 	else {
-		ResourceClass needle;
-		needle.Identifier = MethodName;		
-		BoundedCacheSearch(MembersCache, needle, Matches, 50);
+		UnicodeString key = MethodName;
+		BoundedCacheSearch(IdentifierCache, key, Matches, 50);
 		std::vector<ResourceClass>::iterator it = Matches.begin();
 		
 		// BoundedCacheSearch got all resources that match on the identifier. we need extra logic
@@ -601,10 +578,7 @@ void mvceditor::ResourceFinderClass::CollectNearMatchMembers() {
 		// for the query class, or a trait that is used by the query class.
 		while (it != Matches.end()) {
 			bool keep = MatchesAnyClass(*it, parentClassNames) || IsTraitInherited(*it, ClassName);
-			
-			// if ClassName is empty, then just check method names (which BoundedCacheSearch already did). This ensures 
-			// queries like '::getName' will work as well.
-			if (keep || ClassName.isEmpty()) {
+			if (keep) {
 				++it;
 			}
 			else {
@@ -615,66 +589,45 @@ void mvceditor::ResourceFinderClass::CollectNearMatchMembers() {
 }
 
 void mvceditor::ResourceFinderClass::CollectAllMembers(const std::vector<UnicodeString>& classNames) {
-	std::vector<UnicodeString> normalizedClassNames;
-	for (size_t i = 0; i < classNames.size(); ++i) {
-		UnicodeString s(classNames[i]);
-		s.toLower();
-		
-		// need to append this so that we only match methods and not classes that begin with the name
-		// ie. match only full class names
-		s.append(UNICODE_STRING_SIMPLE("::"));
-		normalizedClassNames.push_back(s);
-	}
 	
-	// TODO; not very efficient for large projects
-	for (std::vector<ResourceClass>::const_iterator it = MembersCache.begin(); it != MembersCache.end(); ++it) {
-		UnicodeString possibleResource(it->Resource);
-		possibleResource.toLower();
-		bool match = false;
-		for(size_t i = 0; i < normalizedClassNames.size(); ++i) {
-			if (possibleResource.indexOf(normalizedClassNames[i]) == 0) {
-				match = true;
-				break;
-			}
-		}
-		if (match) {
-			ResourceClass match = *it;
-			Matches.push_back(match);
-		}
+	for (size_t i = 0; i < classNames.size(); ++i) {
+		UnicodeString key = classNames[i] + UNICODE_STRING_SIMPLE("::");
+		BoundedCacheSearch(MembersCache, key, Matches, 50);
 	}
 }
 
 void mvceditor::ResourceFinderClass::CollectAllTraitMembers(const UnicodeString& className) {
 	
-	// TODO; not very efficient for large projects
-	for (std::vector<ResourceClass>::const_iterator it = MembersCache.begin(); it != MembersCache.end(); ++it) {
-		bool match = false;
-		std::vector<mvceditor::TraitResourceClass> traits = TraitCache[ClassName];
-		for (size_t j = 0; j < traits.size(); ++j) {
-			if (mvceditor::CaseStartsWith(it->Resource, traits[j].TraitClassName + UNICODE_STRING_SIMPLE("::"))) {
-				match = true;
-				break;
-			}
-		}
-		if (match) {
-			Matches.push_back(*it);
+	std::vector<mvceditor::TraitResourceClass> traits = TraitCache[className];
+	for (size_t j = 0; j < traits.size(); ++j) {
+		UnicodeString key = traits[j].TraitClassName + UNICODE_STRING_SIMPLE("::");
+		BoundedCacheSearch(MembersCache, key, Matches, 50);
+	}
+	
+	// now go through the result and change the method names of any aliased 
+	for (size_t i = 0; i < traits.size(); i++) {
+		std::vector<UnicodeString> aliases = traits[i].Aliased;
+		for (size_t a = 0; a < aliases.size(); a++) {
+			mvceditor::ResourceClass res;
+			res.ClassName = traits[i].TraitClassName;
+			res.Identifier = aliases[a];
+			Matches.push_back(res);
 		}
 	}
 }
 
 void mvceditor::ResourceFinderClass::CollectNearMatchNamespaces() {
-	mvceditor::ResourceClass needle;
 	
 	// needle identifier contains a namespace operator; but it may be
 	// a namespace or a fully qualified name
-	needle.Identifier = ClassName;
-	BoundedCacheSearch(NamespaceCache, needle, Matches, 50);
+	UnicodeString key = ClassName;
+	BoundedCacheSearch(NamespaceCache, key, Matches, 50);
 	
 	std::vector<mvceditor::ResourceClass>::iterator end = Matches.end();
 	
 	// if there are exact matches; we only want to collect exact matches
-	if (!Matches.empty() && Matches[0].Identifier.caseCompare(needle.Identifier, 0) == 0) {
-		IdentifierPredicateClass pred(needle.Identifier, true);
+	if (!Matches.empty() && Matches[0].IsKeyEqualTo(key)) {
+		KeyPredicateClass pred(key, true);
 		end = std::remove_if(Matches.begin(), end, pred);
 	}
 	
@@ -691,9 +644,9 @@ std::vector<UnicodeString> mvceditor::ResourceFinderClass::ClassHierarchy(const 
 	while (!done) {
 		done = true;
 
-		// we should probably try to use std::lower_bound here
-		for (std::vector<ResourceClass>::const_iterator it = ResourceCache.begin(); it != ResourceCache.end(); ++it) {
-			if (it->Type == ResourceClass::CLASS && 0 == it->Resource.caseCompare(lastClassName, 0) && it->Signature.length()) {
+		// TODO we should probably try to use std::lower_bound here
+		for (std::vector<ResourceClass>::const_iterator it = IdentifierCache.begin(); it != IdentifierCache.end(); ++it) {
+			if (it->Type == ResourceClass::CLASS && 0 == it->ClassName.caseCompare(lastClassName, 0) && it->Signature.length()) {
 
 				// wont include interface names in this list, since it is very likely that the same function
 				// is actually implemented and we want to jump to the implementation instead
@@ -713,8 +666,10 @@ std::vector<UnicodeString> mvceditor::ResourceFinderClass::ClassHierarchy(const 
 UnicodeString mvceditor::ResourceFinderClass::GetResourceParentClassName(const UnicodeString& className, 
 		const UnicodeString& methodName) const {
 	UnicodeString parentClassName;
-	for (std::vector<ResourceClass>::const_iterator it = ResourceCache.begin(); it != ResourceCache.end(); ++it) {
-		if (it->Type == ResourceClass::CLASS &&  it->Resource == className) {
+	
+	// TODO not very efficient
+	for (std::vector<ResourceClass>::const_iterator it = IdentifierCache.begin(); it != IdentifierCache.end(); ++it) {
+		if (it->Type == ResourceClass::CLASS &&  it->Identifier == className) {
 			parentClassName = ExtractParentClassFromSignature(it->Signature);
 			break;
 		}
@@ -722,16 +677,16 @@ UnicodeString mvceditor::ResourceFinderClass::GetResourceParentClassName(const U
 	if (!parentClassName.isEmpty() && !methodName.isEmpty()) {
 
 		// check that the parent has the given method
-		UnicodeString resource = parentClassName + UNICODE_STRING_SIMPLE("::") + methodName;
 		UnicodeString parentClassSignature;
 		bool found = false;
-		for (std::vector<ResourceClass>::const_iterator it = ResourceCache.begin(); it != ResourceCache.end(); ++it) {
-			if (it->Type == ResourceClass::CLASS &&  it->Resource == parentClassName) {
-				parentClassSignature = it->Resource;
+		for (std::vector<ResourceClass>::const_iterator it = IdentifierCache.begin(); it != IdentifierCache.end(); ++it) {
+			if (it->Type == ResourceClass::CLASS &&  it->ClassName == parentClassName) {
+				parentClassSignature = it->ClassName;
 			}
 		}
 		for (std::vector<ResourceClass>::const_iterator it = MembersCache.begin(); it != MembersCache.end(); ++it) {
-			if (it->Type == ResourceClass::METHOD && 0 == it->Resource.indexOf(resource)) {
+			if (it->Type == ResourceClass::METHOD && 0 == it->ClassName.caseCompare(parentClassName, 0) && 
+				mvceditor::CaseStartsWith(it->Identifier, methodName)) {
 
 				// this ancestor has the method
 				found = true;
@@ -860,26 +815,31 @@ void mvceditor::ResourceFinderClass::BuildResourceCache(const wxString& fullPath
 void mvceditor::ResourceFinderClass::ClassFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& signature, 
 		const UnicodeString& comment, const int lineNumber) {
 	ResourceClass classItem;
-	classItem.Resource = QualifyName(namespaceName, className);
 	classItem.Identifier = className;
+	classItem.ClassName = className;
+	classItem.NamespaceName = namespaceName;
+	classItem.Key = className;
 	classItem.Type = ResourceClass::CLASS;
 	classItem.FileItemIndex = CurrentFileItemIndex;
 	classItem.Signature = signature;
 	classItem.ReturnType = UNICODE_STRING_SIMPLE("");
 	classItem.Comment = comment;
 	classItem.IsNative = false;
-	ResourceCache.push_back(classItem);
-	
+	IdentifierCache.push_back(classItem);
+		
+	// a resource for the namespace itself
 	ResourceClass namespaceItem;
-	namespaceItem.Resource = namespaceName;
+	namespaceItem.NamespaceName = namespaceName;
 	namespaceItem.Identifier = namespaceName;
+	namespaceItem.Key = namespaceName;
 	if (!namespaceName.isEmpty() && std::find(NamespaceCache.begin(), NamespaceCache.end(), namespaceItem) == NamespaceCache.end()) {
 		NamespaceCache.push_back(namespaceItem);
 	}
-	if (!IsRootNamespace(namespaceName)) {	
-		classItem.Identifier = QualifyName(namespaceName, className);
-		NamespaceCache.push_back(classItem);
-	}
+
+	classItem.Identifier = QualifyName(namespaceName, className);
+	classItem.Key = QualifyName(namespaceName, className);
+	NamespaceCache.push_back(classItem);
+
 }
 
 void mvceditor::ResourceFinderClass::TraitAliasFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
@@ -894,14 +854,19 @@ void mvceditor::ResourceFinderClass::TraitAliasFound(const UnicodeString& namesp
 	// since traitResources was copied not a reference
 	TraitCache[QualifyName(namespaceName, className)] = traitResources;
 	
+	// put a non-qualified version too, sometimes the query will not contain a fully qualified name
+	TraitCache[className] = traitResources;
+	
 	if (!alias.isEmpty()) {
 	
 		// write the alias as a resource on the class in scope since alias will not show up in the trait methods
 		// put the alias in the current class as opposed to the trait class, since the same method may be aliased
 		// by 2 different classes that use the trait
 		ResourceClass item;
-		item.Resource = className + UNICODE_STRING_SIMPLE("::") + alias;
+		item.ClassName = className;
 		item.Identifier = alias;
+		item.NamespaceName = namespaceName;
+		item.Key = alias;
 		item.Type = ResourceClass::METHOD;
 		item.FileItemIndex = CurrentFileItemIndex;
 
@@ -924,7 +889,10 @@ void mvceditor::ResourceFinderClass::TraitAliasFound(const UnicodeString& namesp
 		}
 		item.IsStatic = false;
 		item.IsNative = false;
-		MembersCache.push_back(item);
+		///MembersCache.push_back(item);
+		
+		///item.Key = className + UNICODE_STRING_SIMPLE("::") + alias;
+		//MembersCache.push_back(item);
 	}
 }
 
@@ -942,6 +910,9 @@ void mvceditor::ResourceFinderClass::TraitInsteadOfFound(const UnicodeString& na
 	
 	// since traitResources was copied not a reference
 	TraitCache[QualifyName(namespaceName, className)] = traitResources;
+	
+	// put a non-qualified version too, sometimes the query will not contain a fully qualified name
+	TraitCache[className] = traitResources;
 }
 
 void mvceditor::ResourceFinderClass::TraitUseFound(const UnicodeString& namespaceName, const UnicodeString& className, 
@@ -960,29 +931,34 @@ void mvceditor::ResourceFinderClass::TraitUseFound(const UnicodeString& namespac
 	}
 	if (!found) {
 		TraitCache[QualifyName(namespaceName, className)].push_back(newTraitResource);
+		
+		// put a non-qualified version too, sometimes the query will not contain a fully qualified name
+		TraitCache[className].push_back(newTraitResource);
 	}
 }
 
 void mvceditor::ResourceFinderClass::DefineDeclarationFound(const UnicodeString& variableName, 
 		const UnicodeString& variableValue, const UnicodeString& comment, const int lineNumber) {
 	ResourceClass defineItem;
-	defineItem.Resource = variableName;
 	defineItem.Identifier = variableName;
+	defineItem.Key = variableName;
 	defineItem.Type = ResourceClass::DEFINE;
 	defineItem.FileItemIndex = CurrentFileItemIndex;
 	defineItem.Signature = variableValue;
 	defineItem.ReturnType = UNICODE_STRING_SIMPLE("");
 	defineItem.Comment = comment;
 	defineItem.IsNative = false;
-	ResourceCache.push_back(defineItem);
+	IdentifierCache.push_back(defineItem);
 }
 
 void mvceditor::ResourceFinderClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber) {
 	ResourceClass item;
-	item.Resource = className + UNICODE_STRING_SIMPLE("::") + methodName;
 	item.Identifier = methodName;
+	item.ClassName = className;
+	item.NamespaceName = namespaceName;
+	item.Key = methodName;
 	item.Type = ResourceClass::METHOD;
 	item.FileItemIndex = CurrentFileItemIndex;
 	if (!returnType.isEmpty()) {
@@ -1004,6 +980,10 @@ void mvceditor::ResourceFinderClass::MethodFound(const UnicodeString& namespaceN
 	}
 	item.IsStatic = isStatic;
 	item.IsNative = false;
+	IdentifierCache.push_back(item);
+	
+	// insert a complete name so that we can quickly lookup all methods for a single class
+	item.Key = className + UNICODE_STRING_SIMPLE("::") + methodName;
 	MembersCache.push_back(item);
 }
 
@@ -1020,11 +1000,13 @@ void mvceditor::ResourceFinderClass::PropertyFound(const UnicodeString& namespac
 		filteredProperty.findAndReplace(UNICODE_STRING_SIMPLE("$"), UNICODE_STRING_SIMPLE(""));
 	}
 	ResourceClass item;
-	item.Resource = className + UNICODE_STRING_SIMPLE("::") + filteredProperty;
 	item.Identifier = filteredProperty;
+	item.ClassName = className;
+	item.NamespaceName = namespaceName;
+	item.Key = filteredProperty;
 	item.Type = isConst ? ResourceClass::CLASS_CONSTANT : ResourceClass::MEMBER;
 	item.FileItemIndex = CurrentFileItemIndex;
-	item.Signature = item.Resource;
+	item.Signature =  className + UNICODE_STRING_SIMPLE("::") + filteredProperty;
 	item.ReturnType = propertyType;
 	item.Comment = comment;
 	switch (visibility) {
@@ -1039,34 +1021,39 @@ void mvceditor::ResourceFinderClass::PropertyFound(const UnicodeString& namespac
 	}
 	item.IsStatic = isStatic;
 	item.IsNative = false;
+	IdentifierCache.push_back(item);
+	
+	// insert a complete name so that we can quickly lookup all methods for a single class
+	item.Key = className + UNICODE_STRING_SIMPLE("::") + filteredProperty;
 	MembersCache.push_back(item);
 }
 
 void mvceditor::ResourceFinderClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, 
 		const UnicodeString& returnType, const UnicodeString& comment, const int lineNumber) {
 	ResourceClass item;
-	item.Resource = QualifyName(namespaceName, functionName);
 	item.Identifier = functionName;
+	item.NamespaceName = namespaceName;
+	item.Key = functionName;
 	item.Type = ResourceClass::FUNCTION;
 	item.FileItemIndex = CurrentFileItemIndex;
 	item.Signature = signature;
 	item.ReturnType = returnType;
 	item.Comment = comment;
 	item.IsNative = false;
-	ResourceCache.push_back(item);
-	
+	IdentifierCache.push_back(item);
+		
 	ResourceClass namespaceItem;
-	namespaceItem.Resource = namespaceName;
+	namespaceItem.NamespaceName = namespaceName;
 	namespaceItem.Identifier = namespaceName;
+	namespaceItem.Key = namespaceName;
 	if (!namespaceName.isEmpty() && std::find(NamespaceCache.begin(), NamespaceCache.end(), namespaceItem) == NamespaceCache.end()) {
 		NamespaceCache.push_back(namespaceItem);
 	}
-	if (!IsRootNamespace(namespaceName)) {	
 		
-		// put in the namespace cache so that qualified name lookups work too
-		item.Identifier = QualifyName(namespaceName, functionName);
-		NamespaceCache.push_back(item);
-	}
+	// put in the namespace cache so that qualified name lookups work too
+	item.Identifier = QualifyName(namespaceName, functionName);
+	item.Key = QualifyName(namespaceName, functionName);
+	NamespaceCache.push_back(item);
 }
 
 int mvceditor::ResourceFinderClass::GetLineCountFromFile(const wxString& fullPath) const {
@@ -1109,10 +1096,10 @@ int mvceditor::ResourceFinderClass::GetLineCountFromFile(const wxString& fullPat
 }
 
 void mvceditor::ResourceFinderClass::RemoveCachedResources(int fileItemIndex) {
-	std::vector<ResourceClass>::iterator it = ResourceCache.begin();
-	while (it != ResourceCache.end()) {
+	std::vector<ResourceClass>::iterator it = IdentifierCache.begin();
+	while (it != IdentifierCache.end()) {
 		if (it->FileItemIndex == fileItemIndex) {
-			it = ResourceCache.erase(it);
+			it = IdentifierCache.erase(it);
 		}
 		else {
 			++it;
@@ -1122,6 +1109,15 @@ void mvceditor::ResourceFinderClass::RemoveCachedResources(int fileItemIndex) {
 	while (it != MembersCache.end()) {
 		if (it->FileItemIndex == fileItemIndex) {
 			it = MembersCache.erase(it);
+		}
+		else {
+			++it;
+		}
+	}
+	it = NamespaceCache.begin();
+	while (it != NamespaceCache.end()) {
+		if (it->FileItemIndex == fileItemIndex) {
+			it = NamespaceCache.erase(it);
 		}
 		else {
 			++it;
@@ -1155,16 +1151,16 @@ bool mvceditor::ResourceFinderClass::CollectFullyQualifiedResource() {
 		// check the entire class hierachy; stop as soon as we found it
 		std::vector<UnicodeString> classHierarchy = ClassHierarchy(ClassName);
 		for (size_t i = 0; i < classHierarchy.size(); ++i) {
-			needle.Resource = classHierarchy[i] + UNICODE_STRING_SIMPLE("::") + MethodName;
-			needle.Identifier = MethodName;
+			
+			needle.Key = classHierarchy[i] + UNICODE_STRING_SIMPLE("::") + MethodName;
 			std::vector<ResourceClass>::iterator it = std::lower_bound(MembersCache.begin(), MembersCache.end(), needle);
 			
 			// members are sorted by identifers; need to acount for the case when the same method name
 			// is used in multiple classes
 			int classCount = 0;
 			ResourceClass exactMatchResource;
-			while (it != MembersCache.end() && it->Identifier.caseCompare(needle.Identifier, 0) == 0) {
-				if (it->Resource.caseCompare(needle.Resource, 0) == 0) {
+			while (it != MembersCache.end() && it->Identifier.caseCompare(MethodName, 0) == 0) {
+				if (it->ClassName.caseCompare(classHierarchy[i], 0) == 0) {
 					classCount++;
 					exactMatchResource = *it;
 				}
@@ -1176,16 +1172,28 @@ bool mvceditor::ResourceFinderClass::CollectFullyQualifiedResource() {
 			}
 		}
 	}
-	else {
-		needle.Resource = ClassName;
-		needle.Identifier = ClassName;
-		std::vector<ResourceClass>::iterator it = std::lower_bound(ResourceCache.begin(), ResourceCache.end(), needle);
-		if (it != ResourceCache.end() && it->Resource.caseCompare(needle.Resource, 0) == 0) {
+	else if (NAMESPACE_NAME == ResourceType) {
+		needle.Key = ClassName;
+		std::vector<ResourceClass>::iterator it = std::lower_bound(NamespaceCache.begin(), NamespaceCache.end(), needle);
+		if (it != NamespaceCache.end() && it->Key.caseCompare(needle.Key, 0) == 0) {
 			ResourceClass exactMatchResource = *it;
 			++it;
 			
 			// make sure there is one and only one item that matches the search.
-			if (it == ResourceCache.end() || it->Resource.caseCompare(needle.Resource, 0) > 0) {
+			if (it == NamespaceCache.end() || it->Key.caseCompare(needle.Key, 0) > 0) {
+				Matches.push_back(exactMatchResource);
+			}
+		}
+	}
+	else {
+		needle.Key = ClassName;
+		std::vector<ResourceClass>::iterator it = std::lower_bound(IdentifierCache.begin(), IdentifierCache.end(), needle);
+		if (it != IdentifierCache.end() && it->Identifier.caseCompare(ClassName, 0) == 0) {
+			ResourceClass exactMatchResource = *it;
+			++it;
+			
+			// make sure there is one and only one item that matches the search.
+			if (it == IdentifierCache.end() || it->Identifier.caseCompare(ClassName, 0) > 0) {
 				Matches.push_back(exactMatchResource);
 			}
 		}
@@ -1199,7 +1207,7 @@ bool mvceditor::ResourceFinderClass::IsTraitInherited(const mvceditor::ResourceC
 	std::vector<mvceditor::TraitResourceClass> traits = TraitCache[fullyQualifiedClassName];
 	for (size_t i = 0; i < traits.size(); ++i) {
 		UnicodeString traitClassName = traits[i].TraitClassName;
-		if (mvceditor::CaseStartsWith(memberResource.Resource, traitClassName + UNICODE_STRING_SIMPLE("::"))) {
+		if (memberResource.ClassName.caseCompare(traitClassName, 0) == 0) {
 			
 			// trait is used unless there is an explicit insteadof 
 			match = true;
@@ -1255,22 +1263,53 @@ void mvceditor::ResourceFinderClass::EnsureMatchesExist() {
 	}
 }
 
+void mvceditor::ResourceFinderClass::BoundedCacheSearch(const std::vector<mvceditor::ResourceClass>& cache,
+		const UnicodeString& key,
+		std::vector<mvceditor::ResourceClass>& matches, int maxMatches)  const {
+	int matchCount = 0;
+	mvceditor::ResourceClass needle;
+	needle.Key = key;
+	std::vector<mvceditor::ResourceClass>::const_iterator it =  std::lower_bound(cache.begin(), cache.end(), needle);
+	if (it != cache.end()) {
+		
+		// collect near matches
+		while (it != cache.end() && mvceditor::CaseStartsWith(it->Key, key)) {
+			matches.push_back(*it);
+			matchCount++;
+			if (matchCount > maxMatches) {
+				break;
+			}
+			++it;
+		}
+	}
+}
+
 void mvceditor::ResourceFinderClass::Print() const {
 	UFILE *out = u_finit(stdout, NULL, NULL);
 	u_fprintf(out, "LookingFor=%.*S,%.*S\n", ClassName.length(), ClassName.getBuffer(), MethodName.length(), MethodName.getBuffer());
-	for (std::vector<ResourceClass>::const_iterator it = ResourceCache.begin(); it != ResourceCache.end(); ++it) {
-		u_fprintf(out, "RESOURCE=%.*S  Identifier=%.*S Type=%d\n",
-			it->Resource.length(), it->Resource.getBuffer(), it->Identifier.length(), it->Identifier.getBuffer(),  it->Type);
+	for (std::vector<ResourceClass>::const_iterator it = IdentifierCache.begin(); it != IdentifierCache.end(); ++it) {
+		u_fprintf(out, "RESOURCE: Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S Type=%d\n",
+			it->Key.length(), it->Key.getBuffer(),
+			it->Identifier.length(), it->Identifier.getBuffer(),  
+			it->ClassName.length(), it->ClassName.getBuffer(),
+			it->NamespaceName.length(), it->NamespaceName.getBuffer(),
+			it->Type);
 	}
 	for (std::vector<ResourceClass>::const_iterator it = MembersCache.begin(); it != MembersCache.end(); ++it) {
-		u_fprintf(out, "MEMBER=%.*S  Identifier=%.*S ReturnType=%.*S Type=%d\n", 
-			it->Resource.length(), it->Resource.getBuffer(), it->Identifier.length(), it->Identifier.getBuffer(),  
-				it->ReturnType.length(), it->ReturnType.getBuffer(), it->Type);
+		u_fprintf(out, "MEMBER: Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S ReturnType=%.*S Type=%d\n", 
+			it->Key.length(), it->Key.getBuffer(),
+			it->Identifier.length(), it->Identifier.getBuffer(),  
+			it->ClassName.length(), it->ClassName.getBuffer(),
+			it->NamespaceName.length(), it->NamespaceName.getBuffer(),
+			it->ReturnType.length(), it->ReturnType.getBuffer(), it->Type);
 	}
 	for (std::vector<ResourceClass>::const_iterator it = NamespaceCache.begin(); it != NamespaceCache.end(); ++it) {
-		u_fprintf(out, "NAMESPACE=%.*S  Identifier=%.*S Type=%d\n", 
-			it->Resource.length(), it->Resource.getBuffer(), it->Identifier.length(), it->Identifier.getBuffer(),  
-				it->Type);
+		u_fprintf(out, "NAMESPACE:Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S  Type=%d\n", 
+			it->Key.length(), it->Key.getBuffer(),
+			it->Identifier.length(), it->Identifier.getBuffer(),  
+			it->ClassName.length(), it->ClassName.getBuffer(),
+			it->NamespaceName.length(), it->NamespaceName.getBuffer(),
+			it->Type);
 	}
 	for (std::map<UnicodeString, std::vector<mvceditor::TraitResourceClass>, UnicodeStringComparatorClass>::const_iterator it = TraitCache.begin(); it != TraitCache.end(); ++it) {
 		u_fprintf(out, "TRAITS USED BY = %.*S\n",
@@ -1297,12 +1336,12 @@ bool mvceditor::ResourceFinderClass::IsFileCacheEmpty() const {
 }
 
 bool mvceditor::ResourceFinderClass::IsResourceCacheEmpty() const {
-	bool isEmpty = ResourceCache.empty() && MembersCache.empty();
+	bool isEmpty = IdentifierCache.empty() && MembersCache.empty();
 	if (!isEmpty) {
 		isEmpty = true;
 
 		// make sure only parsed resource came from the native functions file.
-		for (std::vector<mvceditor::ResourceClass>::const_iterator it = ResourceCache.begin(); isEmpty && it != ResourceCache.end(); ++it) {
+		for (std::vector<mvceditor::ResourceClass>::const_iterator it = IdentifierCache.begin(); isEmpty && it != IdentifierCache.end(); ++it) {
 			if (!it->IsNative) {
 				isEmpty = false;
 			}
@@ -1319,40 +1358,19 @@ bool mvceditor::ResourceFinderClass::IsResourceCacheEmpty() const {
 }
 
 void mvceditor::ResourceFinderClass::CopyResourcesFrom(const mvceditor::ResourceFinderClass& src) {
-	ResourceCache.clear();
 
 	// since resource caches can be quite large, avoid using push_back
-	ResourceCache.resize(src.ResourceCache.size());
-	std::vector<ResourceClass>::const_iterator it;
-	std::vector<ResourceClass>::iterator destIt;
-	it = src.ResourceCache.begin();
-	destIt = ResourceCache.begin();
-	while(it != src.ResourceCache.end()) {
-		*destIt = *it;
-		++destIt;
-		++it;
-	}
-	MembersCache.clear();
+	IdentifierCache.resize(src.IdentifierCache.size());
+	std::copy(src.IdentifierCache.begin(), src.IdentifierCache.end(), IdentifierCache.begin());
+	
 	MembersCache.resize(src.MembersCache.size());
-	it = src.MembersCache.begin();
-	destIt = MembersCache.begin();
-	while (it != src.MembersCache.end()) {
-		*destIt = *it;
-		++destIt;
-		++it;
-	}
-	FileCache.clear();
+	std::copy(src.MembersCache.begin(), src.MembersCache.end(), MembersCache.begin());
+	
+	NamespaceCache.resize(src.NamespaceCache.size());
+	std::copy(src.NamespaceCache.begin(), src.NamespaceCache.end(), NamespaceCache.begin());
+	
 	FileCache.resize(src.FileCache.size());
-	std::vector<FileItem>::const_iterator fit = src.FileCache.begin();
-	std::vector<FileItem>::iterator destFit = FileCache.begin();
-	while(fit != src.FileCache.end()) {
-		destFit->DateTime = fit->DateTime;
-		destFit->FullPath = fit->FullPath;
-		destFit->Parsed = fit->Parsed;
-		destFit->IsNew = fit->IsNew;
-		++destFit;
-		++fit;
-	}
+	std::copy(src.FileCache.begin(), src.FileCache.end(), FileCache.begin());
 	IsCacheSorted = src.IsCacheSorted;
 }
 
@@ -1365,7 +1383,7 @@ void mvceditor::ResourceFinderClass::AddDynamicResources(const std::vector<mvced
 			// need to account for duplicates; if so then only update
 			bool updated = false;
 			for (std::vector<mvceditor::ResourceClass>::iterator itMember = MembersCache.begin(); itMember != MembersCache.end(); ++itMember) {
-				if (itMember->Resource == resource.Resource) {
+				if (itMember->ClassName == resource.ClassName && itMember->Identifier == resource.Identifier) {
 					if (!resource.ReturnType.isEmpty()) {
 						itMember->ReturnType = resource.ReturnType;
 					}
@@ -1380,7 +1398,13 @@ void mvceditor::ResourceFinderClass::AddDynamicResources(const std::vector<mvced
 				// GetResourceMatchFullPathFromResource() and GetResourceMatchFullPath() will return empty for dynamic 
 				// resources since there is no source code we can show the user.
 				resource.FileItemIndex = -1;
+				resource.Key = resource.Identifier;
 				MembersCache.push_back(resource);
+				
+				// the fully qualified version
+				resource.Key = resource.ClassName + UNICODE_STRING_SIMPLE("::") + resource.Identifier;
+				MembersCache.push_back(resource);
+				
 				IsCacheSorted = false;
 			}
 		}
@@ -1388,8 +1412,8 @@ void mvceditor::ResourceFinderClass::AddDynamicResources(const std::vector<mvced
 
 			// look at the class, function, cache
 			bool updated = false;
-			for (std::vector<mvceditor::ResourceClass>::iterator itResource = ResourceCache.begin(); itResource != ResourceCache.end(); ++itResource) {
-				if (itResource->Resource == resource.Resource) {
+			for (std::vector<mvceditor::ResourceClass>::iterator itResource = IdentifierCache.begin(); itResource != IdentifierCache.end(); ++itResource) {
+				if (itResource->ClassName == resource.ClassName && itResource->Identifier == resource.Identifier) {
 					if (!resource.ReturnType.isEmpty()) {
 						itResource->ReturnType = resource.ReturnType;
 					}
@@ -1404,7 +1428,13 @@ void mvceditor::ResourceFinderClass::AddDynamicResources(const std::vector<mvced
 				// GetResourceMatchFullPathFromResource() and GetResourceMatchFullPath() will return empty for dynamic 
 				// resources since there is no source code we can show the user.
 				resource.FileItemIndex = -1;
-				ResourceCache.push_back(resource);
+				resource.Key = resource.Identifier;
+				IdentifierCache.push_back(resource);
+				
+				// the fully qualified version
+				resource.Key = QualifyName(resource.NamespaceName, resource.ClassName);
+				IdentifierCache.push_back(resource);
+				
 				IsCacheSorted = false;
 			}
 		}
@@ -1423,7 +1453,7 @@ void mvceditor::ResourceFinderClass::UpdateResourcesFrom(const wxString& fullPat
 
 	// now add the new resources from src
 	// we cannot copy them as is because FileCache indices may conflict
-	for (std::vector<mvceditor::ResourceClass>::const_iterator it = src.ResourceCache.begin(); it != src.ResourceCache.end(); ++it) {
+	for (std::vector<mvceditor::ResourceClass>::const_iterator it = src.IdentifierCache.begin(); it != src.IdentifierCache.end(); ++it) {
 		if (it->FileItemIndex >= 0 && it->FileItemIndex < (int)src.FileCache.size()) {
 			wxString resourceFullPath = src.FileCache[it->FileItemIndex].FullPath;
 			fileItemIndex = -1;
@@ -1442,10 +1472,10 @@ void mvceditor::ResourceFinderClass::UpdateResourcesFrom(const wxString& fullPat
 			}
 
 			// put in the appropiate cache
-			ResourceCache.push_back(res);
+			IdentifierCache.push_back(res);
 		}
 		else {
-			ResourceCache.push_back(*it);
+			IdentifierCache.push_back(*it);
 		}
 	}
 
@@ -1473,6 +1503,33 @@ void mvceditor::ResourceFinderClass::UpdateResourcesFrom(const wxString& fullPat
 		}
 		else {
 			MembersCache.push_back(*it);
+		}
+	}
+	
+	// same thing for NamespaceCache
+	for (std::vector<mvceditor::ResourceClass>::const_iterator it = src.NamespaceCache.begin(); it != src.NamespaceCache.end(); ++it) {
+		if (it->FileItemIndex >= 0 && it->FileItemIndex < (int)src.FileCache.size()) {
+			wxString resourceFullPath = src.FileCache[it->FileItemIndex].FullPath;
+			fileItemIndex = -1;
+			mvceditor::ResourceClass res = *it;
+			foundFile = FindInFileCache(resourceFullPath, fileItemIndex, fileItem);
+		
+			// resource comes from am known file; need to change the index 
+			if (foundFile) {				
+				res.FileItemIndex = fileItemIndex;
+			}
+			else {
+
+				// resource comes from a file that is not in this cache. need to add to the file cache 
+				int newFileItemIndex = PushIntoFileCache(src.FileCache[it->FileItemIndex].FullPath, src.FileCache[it->FileItemIndex].Parsed, src.FileCache[it->FileItemIndex].IsNew);
+				res.FileItemIndex = newFileItemIndex;
+			}
+
+			// put in the appropiate cache
+			NamespaceCache.push_back(res);
+		}
+		else {
+			NamespaceCache.push_back(*it);
 		}
 	}
 }
@@ -1503,12 +1560,29 @@ bool mvceditor::ResourceFinderClass::LoadTagFile(const wxFileName& fileName, boo
 					good = ParseTag(res, buffer);
 					if (good) {
 						res.IsNative = isNativeTags;
-						if (mvceditor::ResourceClass::CLASS == res.Type || mvceditor::ResourceClass::DEFINE == res.Type ||
-							mvceditor::ResourceClass::FUNCTION == res.Type) {
-							ResourceCache.push_back(res);
-						}
-						else {
+						res.Key = res.Identifier;
+						IdentifierCache.push_back(res);
+						switch (res.Type) {
+						case mvceditor::ResourceClass::CLASS:
+						case mvceditor::ResourceClass::FUNCTION:
+						case mvceditor::ResourceClass::NAMESPACE:
+							
+							// the fully qualified version
+							res.Identifier =  QualifyName(res.NamespaceName, res.Identifier);
+							res.Key = res.Identifier;
+							NamespaceCache.push_back(res);
+							break;
+						case mvceditor::ResourceClass::MEMBER:
+						case mvceditor::ResourceClass::METHOD:
+						case mvceditor::ResourceClass::CLASS_CONSTANT:
+
+							// the fully scoped version
+							res.Key = res.ClassName + UNICODE_STRING_SIMPLE("::") + res.Identifier;;
 							MembersCache.push_back(res);
+							break;
+						case mvceditor::ResourceClass::DEFINE:
+							// PHP does not define any namespaced constants?
+							break;
 						}
 					}
 				}
@@ -1523,26 +1597,28 @@ void mvceditor::ResourceFinderClass::EnsureSorted() {
 	Matches.clear();
 	Matches.reserve(10);
 	if (!IsCacheSorted) {
-		std::sort(ResourceCache.begin(), ResourceCache.end());
+		std::sort(IdentifierCache.begin(), IdentifierCache.end());
 		std::sort(MembersCache.begin(), MembersCache.end());
 		std::sort(NamespaceCache.begin(), NamespaceCache.end());
 
 		// if a dyamic resource has been added and is a dup; merge it with the corresponding 'real' resource
-		std::vector<mvceditor::ResourceClass>::iterator itDynamic = ResourceCache.begin();
-		while (itDynamic != ResourceCache.end()) {
+		std::vector<mvceditor::ResourceClass>::iterator itDynamic = IdentifierCache.begin();
+		while (itDynamic != IdentifierCache.end()) {
 			bool erased = false;
 			if (itDynamic->IsDynamic) {
 				ResourceClass needle;
 				needle.Identifier = itDynamic->Identifier;
-				std::vector<mvceditor::ResourceClass>::iterator found =  std::lower_bound(ResourceCache.begin(), ResourceCache.end(), needle);
-				while (found != ResourceCache.end() &&
-						found->Resource == itDynamic->Resource && found->Identifier == itDynamic->Identifier && found->Type == itDynamic->Type) {
+				std::vector<mvceditor::ResourceClass>::iterator found =  std::lower_bound(IdentifierCache.begin(), IdentifierCache.end(), needle);
+				while (found != IdentifierCache.end() &&
+						found->ClassName == itDynamic->ClassName && found->Identifier == itDynamic->Identifier &&
+						found->NamespaceName == itDynamic->NamespaceName &&
+						found->Type == itDynamic->Type) {
 					if (!found->IsDynamic) {
 
 						// merge by copying the ReturnType from the dynamic resource then 
 						// delete the dynamic resource
 						found->ReturnType = itDynamic->ReturnType;
-						itDynamic = ResourceCache.erase(itDynamic);
+						itDynamic = IdentifierCache.erase(itDynamic);
 						erased = true;
 						break;
 					}
@@ -1561,7 +1637,9 @@ void mvceditor::ResourceFinderClass::EnsureSorted() {
 				needle.Identifier = itDynamic->Identifier;
 				std::vector<mvceditor::ResourceClass>::iterator found =  std::lower_bound(MembersCache.begin(), MembersCache.end(), needle);
 				while (found != MembersCache.end() &&
-						found->Resource == itDynamic->Resource && found->Identifier == itDynamic->Identifier && found->Type == itDynamic->Type) {
+						found->ClassName == itDynamic->ClassName && found->Identifier == itDynamic->Identifier &&
+						found->NamespaceName == itDynamic->NamespaceName &&
+						found->Type == itDynamic->Type) {
 					if (!found->IsDynamic) {
 
 						// merge by copying the ReturnType from the dynamic resource then 
@@ -1629,7 +1707,7 @@ bool mvceditor::ResourceFinderClass::Persist(const wxFileName& outputFile) const
 	int32_t written;
 	bool error = false;
 	std::vector<mvceditor::ResourceClass>::const_iterator it;
-	for (it = ResourceCache.begin(); it != ResourceCache.end() && !error; ++it) {
+	for (it = IdentifierCache.begin(); it != IdentifierCache.end() && !error; ++it) {
 		if (it->FileItemIndex >= 0) {
 
 			// watch out for dynamic resources and 'native' functions
@@ -1637,21 +1715,20 @@ bool mvceditor::ResourceFinderClass::Persist(const wxFileName& outputFile) const
 			if (mvceditor::ResourceClass::CLASS == it->Type && !it->IsNative) {
 				UnicodeString uniFile = mvceditor::StringHelperClass::wxToIcu(FileCache[it->FileItemIndex].FullPath);
 				written = u_fprintf(uf, "CLASS,%S,%.*S,\n", 
-					uniFile.getTerminatedBuffer(), it->Resource.length(), it->Resource.getBuffer());
+					uniFile.getTerminatedBuffer(), it->ClassName.length(), it->ClassName.getBuffer());
 				error = 0 == written;
 			}
 			else if (mvceditor::ResourceClass::FUNCTION == it->Type && !it->IsNative) {
 				UnicodeString uniFile = mvceditor::StringHelperClass::wxToIcu(FileCache[it->FileItemIndex].FullPath);
 				written = u_fprintf(uf, "FUNCTION,%S,%.*S,\n", 
-					uniFile.getTerminatedBuffer(), it->Resource.length(), it->Resource.getBuffer());
+					uniFile.getTerminatedBuffer(), it->Identifier.length(), it->Identifier.getBuffer());
 				error = 0 == written;
 			}
 		}
 	}
 	for (it = MembersCache.begin(); it != MembersCache.end() && !error; ++it) {
 		if (it->FileItemIndex >= 0) {
-			UnicodeString className(it->Resource, 0, it->Resource.indexOf(it->Identifier));
-			className.findAndReplace(UNICODE_STRING_SIMPLE("::"), UNICODE_STRING_SIMPLE(""));
+			UnicodeString className(it->ClassName);
 
 			// watch out for dynamic resources and 'native' functions
 			// we dont want to persist those for now 
@@ -1679,10 +1756,10 @@ bool mvceditor::ResourceFinderClass::Persist(const wxFileName& outputFile) const
 
 std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::All() const {
 	std::vector<mvceditor::ResourceClass> all;
-	all.resize(ResourceCache.size() + MembersCache.size());
+	all.resize(IdentifierCache.size() + MembersCache.size());
 	std::vector<mvceditor::ResourceClass>::const_iterator it;
 	size_t index = 0;
-	for (it = ResourceCache.begin(); it != ResourceCache.end(); ++it, ++index) {
+	for (it = IdentifierCache.begin(); it != IdentifierCache.end(); ++it, ++index) {
 		all[index] = *it;
 	}
 	for (it = MembersCache.begin(); it != MembersCache.end(); ++it, ++index) {
@@ -1693,9 +1770,9 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::All() cons
 
 std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::AllNonNativeClasses() const {
 	std::vector<mvceditor::ResourceClass> all;
-	all.reserve(ResourceCache.size());
+	all.reserve(IdentifierCache.size());
 	std::vector<mvceditor::ResourceClass>::const_iterator it;
-	for (it = ResourceCache.begin(); it != ResourceCache.end(); ++it) {
+	for (it = IdentifierCache.begin(); it != IdentifierCache.end(); ++it) {
 		if (mvceditor::ResourceClass::CLASS == it->Type && !it->IsNative) {
 			all.push_back(*it);
 		}
@@ -1704,16 +1781,18 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::AllNonNati
 }
 
 void mvceditor::ResourceFinderClass::Clear() {
-	ResourceCache.clear();
+	IdentifierCache.clear();
 	MembersCache.clear();
+	NamespaceCache.clear();
 	FileCache.clear();
 	Matches.clear();
 	IsCacheSorted = false;
 }
 
 mvceditor::ResourceClass::ResourceClass()
-	: Resource()
-	, Identifier()
+	: Identifier()
+	, ClassName()
+	, NamespaceName()
 	, Signature()
 	, ReturnType()
 	, Comment()
@@ -1724,18 +1803,21 @@ mvceditor::ResourceClass::ResourceClass()
 	, IsDynamic(false)
 	, IsNative(false)
 	, FullPath()
+	, Key()
 	, FileItemIndex(-1) {
 		
 }
 
 void mvceditor::ResourceClass::operator=(const ResourceClass& src) {
-	Resource = src.Resource;
 	Identifier = src.Identifier;
+	ClassName = src.ClassName;
+	NamespaceName = src.NamespaceName;
 	Signature = src.Signature;
 	ReturnType = src.ReturnType;
 	Comment = src.Comment;
 	Type = src.Type;
 	FullPath = src.FullPath;
+	Key = src.Key;
 	FileItemIndex = src.FileItemIndex;
 	IsProtected = src.IsProtected;
 	IsPrivate = src.IsPrivate;
@@ -1745,26 +1827,32 @@ void mvceditor::ResourceClass::operator=(const ResourceClass& src) {
 }
 
 bool mvceditor::ResourceClass::operator<(const mvceditor::ResourceClass& a) const {
-	return Identifier.caseCompare(a.Identifier, 0) < 0;
+	return Key.caseCompare(a.Key, 0) < 0;
 }
 
 bool mvceditor::ResourceClass::operator==(const mvceditor::ResourceClass& a) const {
-	return Resource == a.Resource;
+	return Identifier == a.Identifier && ClassName == a.ClassName && NamespaceName == a.NamespaceName;
 } 
 
 wxString mvceditor::ResourceClass::GetFullPath() const {
 	return FullPath;
 }
 
+bool mvceditor::ResourceClass::IsKeyEqualTo(const UnicodeString& key) const {
+	return Key.caseCompare(key, 0) == 0;
+}
+
 void mvceditor::ResourceClass::Clear() {
-	Resource.remove();
 	Identifier.remove();
+	ClassName.remove();
+	NamespaceName.remove();
 	Signature.remove();
 	ReturnType.remove();
 	Comment.remove();
 	Type = CLASS;
 	FileItemIndex = -1;
 	FullPath = wxT("");
+	Key.remove();
 	IsProtected = false;
 	IsPrivate = false;
 	IsStatic = false;

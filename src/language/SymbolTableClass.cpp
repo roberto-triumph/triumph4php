@@ -76,7 +76,11 @@ static bool IsResourceVisible(const mvceditor::ResourceClass& resource, const pe
 		if (!scopeResult.IsGlobalNamespace()) {
 			passesNamespaceCheck = false;
 			
-			
+			UnicodeString resQualified(resource.NamespaceName);
+			if (!resQualified.endsWith(UNICODE_STRING_SIMPLE("\\"))) {
+				resQualified.append(UNICODE_STRING_SIMPLE("\\"));
+			}
+			resQualified.append(resource.Identifier);
 				
 			// but if the resource is aliased then the class can be accessed
 			std::map<UnicodeString, UnicodeString, mvceditor::UnicodeStringComparatorClass>::const_iterator it;
@@ -86,8 +90,8 @@ static bool IsResourceVisible(const mvceditor::ResourceClass& resource, const pe
 				// check to see if the expression begins with the alias
 				// need to watch out for the namespace operator
 				// the expression may or may not have it
-				UnicodeString alias(it->second);
-				if (alias.caseCompare(UNICODE_STRING_SIMPLE("\\") + resource.Resource, 0) == 0) {
+				UnicodeString alias(it->second);				
+				if (alias.caseCompare(resQualified, 0) == 0) {
 					passesNamespaceCheck = true;
 					break;
 				}
@@ -95,7 +99,13 @@ static bool IsResourceVisible(const mvceditor::ResourceClass& resource, const pe
 			if (!passesNamespaceCheck) {
 				
 				// check to see if resource is from the declared namespace
-				passesNamespaceCheck = resource.Resource.indexOf(scopeResult.NamespaceName + UNICODE_STRING_SIMPLE("\\")) == 0;
+				// when comparing namespaces make sure both end with slash so that we compare
+				// full namespace names
+				UnicodeString scopeNs = scopeResult.NamespaceName;
+				if (!scopeNs.endsWith(UNICODE_STRING_SIMPLE("\\"))) {
+					scopeNs.append(UNICODE_STRING_SIMPLE("\\"));
+				}
+				passesNamespaceCheck = resQualified.indexOf(scopeNs) == 0;
 			}
 		}
 	}
@@ -181,7 +191,7 @@ static UnicodeString ResolveVariableType(const mvceditor::ScopeResultClass& expr
 					openedResourceFinders, globalResourceFinder,resourceMatches, doDuckTyping, error);
 				if (!resourceMatches.empty()) {
 					if (mvceditor::ResourceClass::CLASS == resourceMatches[0].Type) {
-						type = resourceMatches[0].Resource;
+						type = resourceMatches[0].ClassName;
 					}
 					else {
 						type =  resourceMatches[0].ReturnType;
