@@ -63,6 +63,10 @@ void mvceditor::ParserDirectoryWalkerClass::SetFilters(std::vector<wxString> php
 	}
 }
 
+void mvceditor::ParserDirectoryWalkerClass::SetVersion(pelet::Versions version) {
+	Parser.SetVersion(version);
+}
+
 bool mvceditor::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 	bool ret = false;
 	bool matchedFilter = false;
@@ -107,10 +111,13 @@ mvceditor::LintBackgroundFileReaderClass::LintBackgroundFileReaderClass(wxEvtHan
 }
 
 bool mvceditor::LintBackgroundFileReaderClass::BeginDirectoryLint(const wxString& directory, const std::vector<wxString>& phpFileFilters, 
-																  const wxString& ignoreFileFilters, mvceditor::BackgroundFileReaderClass::StartError& error) {
+																  const wxString& ignoreFileFilters, 
+																  const mvceditor::EnvironmentClass& environment,
+																  mvceditor::BackgroundFileReaderClass::StartError& error) {
 	bool good = false;
 	error = mvceditor::BackgroundFileReaderClass::NONE;
 	if (Init(directory)) {
+		ParserDirectoryWalker.SetVersion(environment.Php.Version);
 		ParserDirectoryWalker.SetFilters(phpFileFilters, ignoreFileFilters);
 		ParserDirectoryWalker.ResetTotals();
 		if (StartReading(error)) {
@@ -121,12 +128,14 @@ bool mvceditor::LintBackgroundFileReaderClass::BeginDirectoryLint(const wxString
 }
 
 bool mvceditor::LintBackgroundFileReaderClass::LintSingleFile(const wxString& fileName, 
-	  const std::vector<wxString>& phpFileFilters, const wxString& ignoreFileFilters) {
+	  const std::vector<wxString>& phpFileFilters, const wxString& ignoreFileFilters,
+	  const mvceditor::EnvironmentClass& environment) {
 
 	// ATTN: use a local instance of ParserClass so that this method is thread safe
 	// and can be run when a background thread is already running.
 	ParserDirectoryWalkerClass walker;
 	walker.SetFilters(phpFileFilters, ignoreFileFilters);
+	walker.SetVersion(environment.Php.Version);
 	bool error = walker.Walk(fileName);
 	if (error) {
 		wxCommandEvent evt(EVENT_LINT_ERROR, ID_LINT_ERROR_COMMAND);
@@ -335,7 +344,7 @@ void mvceditor::LintPluginClass::OnLintMenu(wxCommandEvent& event) {
 		ignoreFilesRegEx.Trim(false);
 		ignoreFilesRegEx.Trim(true);
 		ignoreFilesRegEx.Replace(wxT("\n"), wxT(";"));		
-		if (LintBackgroundFileReader.BeginDirectoryLint(rootPath, phpFileFilters, ignoreFilesRegEx, error)) {
+		if (LintBackgroundFileReader.BeginDirectoryLint(rootPath, phpFileFilters, ignoreFilesRegEx, *GetEnvironment(), error)) {
 			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 			gauge->AddGauge(_("Lint Check"), ID_LINT_RESULTS_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 			
@@ -446,7 +455,7 @@ void mvceditor::LintPluginClass::OnFileSaved(mvceditor::FileSavedEventClass& eve
 		ignoreFilesRegEx.Trim(true);
 		ignoreFilesRegEx.Replace(wxT("\n"), wxT(";"));
 
-		bool error = LintBackgroundFileReader.LintSingleFile(fileName, phpFileFilters, ignoreFilesRegEx);
+		bool error = LintBackgroundFileReader.LintSingleFile(fileName, phpFileFilters, ignoreFilesRegEx, *GetEnvironment());
 		if (error) {
 			
 			// handle the case where user has saved a file but has not clicked

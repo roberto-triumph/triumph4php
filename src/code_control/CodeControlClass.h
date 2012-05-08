@@ -28,6 +28,7 @@
 #include <php_frameworks/ProjectClass.h>
 #include <search/ResourceFinderClass.h>
 #include <code_control/CodeControlOptionsClass.h>
+#include <environment/EnvironmentClass.h>
 #include <wx/stc/stc.h>
 #include <wx/timer.h>
 #include <unicode/unistr.h>
@@ -98,10 +99,12 @@ public:
 	 * CANNOT be NULL.
 	 * @param ResourceCacheClass* resourceUpdates can be null. if null, then code completion will not be
 	 *        functional.
+	 * @param environment pointer to environment info, used to get the PHP version info. This object
+	 *        will NOT own the pointer
 	 * 
 	 */
 	CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options, ProjectClass* project,
-					ResourceCacheClass* resourceCache,
+					ResourceCacheClass* resourceCache, EnvironmentClass* environment,
 	                 int id, const wxPoint& position =
 	                     wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0,
 	                 const wxString& name = wxT("code"));
@@ -472,6 +475,11 @@ private:
 	  * @var ProjectClass
 	  */
 	ProjectClass* Project;
+	
+	/**
+	 * to use the proper version of PHP for auto completion
+	 */
+	EnvironmentClass* Environment;
 
 	/**
 	 * This is the current specialization (document type) that is being used. This

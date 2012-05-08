@@ -72,6 +72,11 @@ public:
 	void SetFilters(std::vector<wxString> includeFilters, wxString ignoreFilters);
 	
 	/**
+	 * Set the version of PHP to lint against
+	 */
+	void SetVersion(pelet::Versions version);
+	
+	/**
 	 * The last parsing results.
 	 * 
 	 */
@@ -136,11 +141,12 @@ public:
 	 * @param wxString ignoreFileFiltersRegEx regular expression of files to IGNORE. This 
 	 *        overrides the phpFileFilters; if a file matches ignoreFileFilters and phpFileFilters then
 	 *        the file will be ignored. 
+	 * @param environment to know which PHP version to check against
 	 * @param StartError& error the reason for a failure to start will be set here.
 	 * return bool TRUE if and only if the thread was started.  If false, either thread could
 	 * not be started or directory is not valid. 
 	 */
-	bool BeginDirectoryLint(const wxString& directory, const std::vector<wxString>& phpFileFilters, const wxString& ignoreFileFiltersRegEx, StartError& error);
+	bool BeginDirectoryLint(const wxString& directory, const std::vector<wxString>& phpFileFilters, const wxString& ignoreFileFiltersRegEx, const EnvironmentClass& environment, StartError& error);
 
 	/**
 	 * Lint checks the given file in the current thread.  This is a thread-safe method;
@@ -153,9 +159,11 @@ public:
 	 * @param wxString ignoreFileFiltersRegEx regular expression of files to IGNORE. This 
 	 *        overrides the phpFileFilters; if a file matches ignoreFileFilters and phpFileFilters then
 	 *        the file will be ignored. 
+	 * @param environment to know which PHP version to check against
 	 * @return TRUE if the file contains a lint error.
 	 */
-	bool LintSingleFile(const wxString& fileName, const std::vector<wxString>& phpFileFilters, const wxString& ignoreFileFiltersRegEx);
+	bool LintSingleFile(const wxString& fileName, const std::vector<wxString>& phpFileFilters, const wxString& ignoreFileFiltersRegEx,
+		const EnvironmentClass& environment);
 
 	/**
 	 * Return a summary of the number of files that were lint'ed.

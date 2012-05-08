@@ -241,6 +241,11 @@ public:
 	 * Remove all items from all caches and also unregisters any and all files.
 	 */
 	void Clear();
+	
+	/**
+	 * Set the version that the PHP parser should use.
+	 */
+	void SetVersion(pelet::Versions version);
 	 
 private:
 
@@ -266,6 +271,11 @@ private:
 	 * These are the resources from the ENTIRE project; it may include stale resources
 	 */
 	mvceditor::ResourceFinderClass GlobalResourceFinder;
+	
+	/**
+	 * the version of PHP to use when parsing source code
+	 */
+	pelet::Versions Version;
 };
 
 /**

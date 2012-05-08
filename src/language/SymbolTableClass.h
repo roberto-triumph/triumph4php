@@ -338,6 +338,11 @@ public:
 		
 	void VariableFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
 		const pelet::SymbolClass& symbol, const UnicodeString& comment);
+		
+	/**
+	 * Set the version that the PHP parser should use.
+	 */
+	void SetVersion(pelet::Versions version);
 
 private:
 
@@ -432,6 +437,8 @@ public:
 	 *        that the position lies in.
 	 */
 	void GetScopeString(const UnicodeString& code, int pos, ScopeResultClass& scope);
+	
+	void ClassEnd(const UnicodeString& namespaceName, const UnicodeString& className, int pos);
 		
 	void NamespaceDeclarationFound(const UnicodeString& namespaceName);
 
@@ -446,6 +453,11 @@ public:
 		const int lineNumber);
 		
 	void FunctionEnd(const UnicodeString& namespaceName, const UnicodeString& functionName, int pos);
+	
+	/**
+	 * Set the version that the PHP parser should use.
+	 */
+	void SetVersion(pelet::Versions version);
 		
 private:
 

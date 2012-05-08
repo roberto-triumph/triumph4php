@@ -78,7 +78,9 @@ mvceditor::EnvironmentClass::~EnvironmentClass() {
 }
 
 mvceditor::PhpEnvironmentClass::PhpEnvironmentClass() 
-	: PhpExecutablePath(wxT("")) {
+	: PhpExecutablePath(wxT(""))
+	, Version(pelet::PHP_53) 
+	, IsAuto(true) {
 	wxPlatformInfo info;
 	switch (info.GetOperatingSystemId()) {
 		case wxOS_UNIX_LINUX:
@@ -90,13 +92,59 @@ mvceditor::PhpEnvironmentClass::PhpEnvironmentClass()
 		default:
 			break;
 	}
+}
 
+void mvceditor::PhpEnvironmentClass::AutoDetermine() {
+	if (PhpExecutablePath.IsEmpty()) {
+		Version = pelet::PHP_53;
+		return;
+	}
+	if (!IsAuto) {
+		return;
+	}
+	wxString cmd = PhpExecutablePath + wxT(" -v");
+	wxArrayString output;
+	wxExecute(cmd, output);
+	bool is53 = false;
+	bool is54 = false;
+	for (size_t i = 0; i < output.GetCount(); ++i) {
+		if (output[i].Find(wxT("PHP 5.3")) >= 0) {
+			is53 = true;
+			break;
+		}
+		if (output[i].Find(wxT("PHP 5.4")) >= 0) {
+			is54 = true;
+			break;
+		}
+	}
+	if (is54) {
+		Version = pelet::PHP_54;
+	}
+	else {
+		Version = pelet::PHP_53;
+	}
 }
 
 void mvceditor::EnvironmentClass::LoadFromConfig() {
 	wxConfigBase* config = wxConfigBase::Get();
-	wxString httpdPath;
+	
+	int version = 0;
 	config->Read(wxT("Environment/PhpExecutablePath"), &Php.PhpExecutablePath);
+	config->Read(wxT("Environment/PhpVersionIsAuto"), &Php.IsAuto);
+	config->Read(wxT("Environment/PhpVersion"), &version);
+	
+	if (1 == version) {
+		Php.Version = pelet::PHP_53;
+	}
+	else if (2 == version) {
+		Php.Version = pelet::PHP_54;
+	}
+	
+	if (Php.IsAuto) {
+		Php.AutoDetermine();
+	}
+	
+	wxString httpdPath;
 	config->Read(wxT("Environment/ApacheHttpdPath"), &httpdPath);
 	config->Read(wxT("Environment/ManualConfiguration"), &Apache.ManualConfiguration);
 	if(!httpdPath.IsEmpty()) {
@@ -141,7 +189,18 @@ void mvceditor::EnvironmentClass::LoadFromConfig() {
 
 void mvceditor::EnvironmentClass::SaveToConfig() const {
 	wxConfigBase* config = wxConfigBase::Get();
+	int version = 0;
+	if (pelet::PHP_53 == Php.Version) {
+		version = 1;
+	}
+	else if (pelet::PHP_54) {
+		version = 2;
+	}
 	config->Write(wxT("Environment/PhpExecutablePath"), Php.PhpExecutablePath);
+	config->Write(wxT("Environment/PhpVersionIsAuto"), Php.IsAuto);
+	config->Write(wxT("Environment/PhpVersion"), version);
+	
+	
 	config->Write(wxT("Environment/ApacheHttpdPath"), Apache.GetHttpdPath());
 	config->Write(wxT("Environment/ManualConfiguration"), Apache.ManualConfiguration);
 	int i = 0;

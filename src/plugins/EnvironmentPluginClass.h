@@ -231,6 +231,8 @@ public:
 	
 	PhpEnvironmentPanelClass(wxWindow* parent, EnvironmentClass& environment);
 	
+	void Apply();
+	
 protected:
 
 	/**
@@ -304,6 +306,8 @@ private:
 	WebBrowserEditPanelClass* WebBrowserPanel;
 	
 	ApacheEnvironmentPanelClass* ApacheEnvironmentPanel;
+	
+	PhpEnvironmentPanelClass* PhpEnvironmentPanel;
 	
 	EnvironmentClass& Environment;
 	

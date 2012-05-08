@@ -69,7 +69,7 @@ bool mvceditor::AppClass::OnInit() {
 	// frame and initialize the plugin windows so that all menus are created
 	// and only then can we load the keyboard shortcuts from the INI file
 	// all menu items must be present in the menu bar for shortcuts to take effect
-	AppFrame = new mvceditor::AppFrameClass(Plugins, this, Environment, Preferences);
+	AppFrame = new mvceditor::AppFrameClass(Plugins, this, Preferences);
 	PluginWindows();
 
 	// load any settings from .INI files

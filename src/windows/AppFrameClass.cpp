@@ -52,13 +52,11 @@ int ID_OUTLINE_WINDOW = wxNewId();
 
 mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass*>& plugins,
 										mvceditor::AppClass* app,
-										mvceditor::EnvironmentClass& environment,
 										mvceditor::PreferencesClass& preferences)
 	: AppFrameGeneratedClass(NULL)
 	, Plugins(plugins)
 	, Listener(this)
 	, App(app)
-	, Environment(environment)
 	, Preferences(preferences)
 	, ToolBar(NULL)
 	, ToolsNotebook(NULL)
@@ -76,6 +74,7 @@ mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass
 	Notebook->SetDropTarget(new FileDropTargetClass(Notebook));
 	Notebook->CodeControlOptions = &Preferences.CodeControlOptions;
 	Notebook->ResourceCache = &App->ResourceCache;
+	Notebook->Environment = &App->Environment;
 	
 	// ATTN: for some reason must remove and re-insert menu item in order to change the icon
 	wxMenuItem* projectOpenMenuItem = MenuBar->FindItem(ID_PROJECT_OPEN);

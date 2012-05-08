@@ -84,7 +84,7 @@ class AppFrameClass : public AppFrameGeneratedClass {
 
 public:
 	/** Constructor, this class will NOT  own the App pinter */
-	AppFrameClass(const std::vector<PluginClass*>& plugins, AppClass* app, EnvironmentClass& environment, 
+	AppFrameClass(const std::vector<PluginClass*>& plugins, AppClass* app,
 		PreferencesClass& preferences);
 	
 	~AppFrameClass();
@@ -299,13 +299,6 @@ private:
 	 * The application global
 	 */
 	AppClass* App;
-
-	/**
-	 * The environment stack.
-	 * 
-	 * @var EnvironmentClass
-	 */
-	EnvironmentClass& Environment;
 
 	/**
 	 * The user preferences

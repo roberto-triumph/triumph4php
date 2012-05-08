@@ -31,7 +31,7 @@
 #include <pelet/LanguageDiscoveryClass.h>
 #include <language/SymbolTableClass.h>
 #include <widgets/ResourceCacheClass.h>
-
+#include <environment/EnvironmentClass.h>
 #include <wx/string.h>
 #include <wx/stc/stc.h>
 #include <unicode/unistr.h>
@@ -167,9 +167,9 @@ class PhpDocumentClass : public wxEvtHandler, public TextDocumentClass {
 public:
 
 	/**
-	 * This class will NOT own both of these pointer. Caller must manage (delete) it.
+	 * This class will NOT own any of these pointer. Caller must manage (delete) it.
 	 */
-	PhpDocumentClass(ProjectClass* project, ResourceCacheClass* resourceCache);
+	PhpDocumentClass(ProjectClass* project, ResourceCacheClass* resourceCache, EnvironmentClass* environment);
 
 	~PhpDocumentClass();
 
@@ -345,6 +345,12 @@ private:
 	 */
 	ResourceCacheClass* ResourceCache;
 	ResourceCacheUpdateThreadClass ResourceCacheUpdateThread;
+	
+
+	/**
+	 * This class will NOT own this pointer
+	 */
+	EnvironmentClass* Environment;
 
 	/**
 	 * The resource signature currently being displayed in the calltip.

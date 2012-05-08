@@ -40,8 +40,13 @@ static const wxString PHP_KEYWORDS = wxString::FromAscii(
 	"__FILE__ __DIR__ __FUNCTION__ __CLASS__ __METHOD__ __NAMESPACE__ "
 	"require require_once include include_once stdClass parent self abstract "
 	"clone namespace use as new bool boolean float double real string int "
-	"integer var endif endwhile endfor endforeach endswitch "
+	"integer var endif endwhile endfor endforeach endswitch"
 );
+
+static const wxString PHP_54_KEYWORDS = wxString::FromAscii(
+	"trait callable"
+);
+
 
 // want to support both HTML4 and HTML5, using both sets of keywords.
 static const wxString HTML_TAG_NAMES = wxString::FromAscii(
@@ -257,7 +262,7 @@ void mvceditor::TextDocumentClass::DetachFromControl(CodeControlClass* ctrl) {
 
 }
 
-mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::ProjectClass* project, mvceditor::ResourceCacheClass* resourceCache)
+mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::ProjectClass* project, mvceditor::ResourceCacheClass* resourceCache, mvceditor::EnvironmentClass* environment)
 	: wxEvtHandler()
 	, TextDocumentClass()
 	, LanguageDiscovery()
@@ -271,6 +276,7 @@ mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::ProjectClass* project, 
 	, Project(project)
 	, ResourceCache(resourceCache)
 	, ResourceCacheUpdateThread(resourceCache, *this)
+	, Environment(environment)
 	, CurrentCallTipIndex(0)
 	, NeedToUpdateResources(false) 
 	, AreImagesRegistered(false) {
@@ -419,6 +425,10 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 	if (!AreImagesRegistered) {
 		RegisterAutoCompletionImages();
 	}
+	Lexer.SetVersion(Environment->Php.Version);
+	Parser.SetVersion(Environment->Php.Version);
+	ScopeFinder.SetVersion(Environment->Php.Version);
+	
 	std::vector<wxString> autoCompleteList;
 	std::vector<UnicodeString> variableMatches;
 	int expressionPos = code.length() - 1;
@@ -1048,6 +1058,9 @@ void mvceditor::PhpDocumentClass::OnAutoCompletionSelected(wxStyledTextEvent& ev
 }
 
 wxString mvceditor::PhpDocumentClass::GetPhpKeywords() const {
+	if (pelet::PHP_54 == Environment->Php.Version) {
+		return PHP_KEYWORDS + wxT(" ") + PHP_54_KEYWORDS;
+	}
 	return PHP_KEYWORDS;
 }
 wxString mvceditor::PhpDocumentClass::GetHtmlKeywords() const {

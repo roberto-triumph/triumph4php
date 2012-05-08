@@ -813,6 +813,46 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownVariableA
 	CHECK_UNISTR_EQUALS("MyClass", resources[1].ClassName);
 }
 
+TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithTraitInDifferentNamespace) {
+	CompletionSymbolTable.SetVersion(pelet::PHP_54);
+	GlobalFinder.SetVersion(pelet::PHP_54);
+	Finder1.SetVersion(pelet::PHP_54);
+	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"class TraitClass { \n"
+		" function work() {}\n"
+		"}\n"
+	);
+	GlobalFinder.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
+	
+	// TODO need to add the trait code to both caches for now because
+	// the resource finder will look for trait methods from its own resource finder
+	// meaning that if the class that uses the trait is only in Finder1 
+	// and the trait class is only in GlobalFinder, this test will fail.
+	// This means that if the user creates a trait, then creates a new file
+	// then the user will not get code completion for trait methods until the
+	// project get re-indexed. will need to fix this.
+	Finder1.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
+	sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"namespace Second { \n"
+		"class MyClass {\n"
+		"	use \\TraitClass; \n"
+		"}  \n"
+		"$my = new MyClass();"
+		"} \n"
+		
+	);
+	Init(sourceCode);
+	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE(""), false);
+	ScopeResult.NamespaceName = UNICODE_STRING_SIMPLE("\\Second");
+	ScopeResult.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = UNICODE_STRING_SIMPLE("\\Second");
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
+		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
+		
+	CHECK_VECTOR_SIZE(1, ResourceMatches);
+	CHECK_UNISTR_EQUALS("work", ResourceMatches[0].Identifier);
+}
+
 TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillUnknownResourceError) {
 
 	// when a method could not be found make sure that the ErrorType
@@ -908,8 +948,8 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldFindMethodScope) {
 		"\t}\n"
 		"\t/** @return void */\n"
 		"\tprivate function setName($anotherName) {\n"
+		"\t\t{CURSOR} "
 		"\t\t$someName = '';\n"
-		"\t\t{CURSOR}"
 		"\t}\n"
 		"}\n"
 		"?>\n"
@@ -919,6 +959,21 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldFindMethodScope) {
 	ScopeFinder.GetScopeString(sourceCode, pos, ScopeResult);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::setName"), ScopeResult.MethodName);
 }
+
+TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldFindGlobalScopePastClass) {
+	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"class MyClass { function work() { } }\n"
+		"$globalVar = new MyClass(); \n"
+		"\t{CURSOR}"
+		"?>\n"
+	);
+	int32_t pos;
+	sourceCode = FindCursor(sourceCode, pos);
+	ScopeFinder.GetScopeString(sourceCode, pos, ScopeResult);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("::"), ScopeResult.MethodName);
+}
+
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldFindFunctionScope) {
 	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(

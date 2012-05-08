@@ -158,7 +158,8 @@ void mvceditor::ResourcePluginClass::OnProjectOpened(wxCommandEvent& event) {
 	if (ResourceFileReader.IsRunning()) {
 		ResourceFileReader.StopReading();
 	}
-	GetResourceCache()->Clear();	
+	GetResourceCache()->Clear();
+	GetResourceCache()->SetVersion(GetEnvironment()->Php.Version);
 	if (NativeFunctionsReader.Init(GetResourceCache())) {
 		mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
 		if (ResourceFileReader.StartReading(error)) {
@@ -173,6 +174,10 @@ void mvceditor::ResourcePluginClass::OnProjectOpened(wxCommandEvent& event) {
 			mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
 		}
 	}
+}
+
+void mvceditor::ResourcePluginClass::OnEnvironmentUpdated(wxCommandEvent& event) {
+	GetResourceCache()->SetVersion(GetEnvironment()->Php.Version);
 }
 
 void mvceditor::ResourcePluginClass::SearchForResources() {

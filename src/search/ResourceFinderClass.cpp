@@ -600,8 +600,14 @@ void mvceditor::ResourceFinderClass::CollectAllTraitMembers(const UnicodeString&
 	
 	std::vector<mvceditor::TraitResourceClass> traits = TraitCache[className];
 	for (size_t j = 0; j < traits.size(); ++j) {
-		UnicodeString key = traits[j].TraitClassName + UNICODE_STRING_SIMPLE("::");
+		
+		// lets unqualify, the members cache key does not have the namespace name
+		int32_t index = traits[j].TraitClassName.lastIndexOf(UNICODE_STRING_SIMPLE("\\"));
+		UnicodeString traitClassNameOnly(traits[j].TraitClassName, index + 1);
+		UnicodeString key =  traitClassNameOnly + UNICODE_STRING_SIMPLE("::");
 		BoundedCacheSearch(MembersCache, key, Matches, 50);
+		
+		// TODO weed out Matches from methods from the wrong namespace
 	}
 	
 	// now go through the result and change the method names of any aliased 
@@ -1312,7 +1318,7 @@ void mvceditor::ResourceFinderClass::Print() const {
 			it->Type);
 	}
 	for (std::map<UnicodeString, std::vector<mvceditor::TraitResourceClass>, UnicodeStringComparatorClass>::const_iterator it = TraitCache.begin(); it != TraitCache.end(); ++it) {
-		u_fprintf(out, "TRAITS USED BY = %.*S\n",
+		u_fprintf(out, "TRAITS USED BY: %.*S\n",
 			it->first.length(), it->first.getBuffer());
 		std::vector<mvceditor::TraitResourceClass> traits =  it->second;
 		for (size_t j = 0; j < traits.size(); ++j) {

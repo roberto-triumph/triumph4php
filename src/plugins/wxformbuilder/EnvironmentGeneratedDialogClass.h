@@ -25,6 +25,7 @@
 #include <wx/gauge.h>
 #include <wx/checkbox.h>
 #include <wx/textctrl.h>
+#include <wx/combobox.h>
 #include <wx/dialog.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -155,12 +156,16 @@ class PhpEnvironmentPanelGeneratedClass : public wxPanel
 			ID_HELPTEXT = 1000,
 			ID_PHP_EXECUTABLE,
 			ID_PHP_FILE,
+			ID_VERSIONLABEL,
+			ID_VERSION,
 		};
 		
 		wxStaticText* HelpText;
 		wxStaticText* PhpLabel;
 		wxTextCtrl* PhpExecutable;
 		wxFilePickerCtrl* PhpExecutableFile;
+		wxStaticText* VersionLabel;
+		wxComboBox* Version;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnPhpFileChanged( wxFileDirPickerEvent& event ) { event.Skip(); }

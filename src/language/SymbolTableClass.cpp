@@ -647,7 +647,13 @@ void mvceditor::SymbolTableClass::Print() const {
 		u_fprintf(out, "Symbol Table For %S\n", s.getTerminatedBuffer());
 		for (size_t j = 0; j < scopedSymbols.size(); ++j) {
 			pelet::SymbolClass symbol = scopedSymbols[j];
-			u_fprintf(out, "%d\t%S\t%d\n", (int)j, symbol.Lexeme.getTerminatedBuffer(), symbol.Type); 
+			u_fprintf(out, "%d\t%S\t", (int)j, 
+				symbol.Lexeme.getTerminatedBuffer()); 
+			for (size_t k = 0; k < symbol.ChainList.size(); ++k) {
+				u_fprintf(out, "%S->\n", 
+					symbol.ChainList[k].getTerminatedBuffer()); 
+			}
+			u_fprintf(out, "\n");
 		}
 	}
 	u_fclose(out);
@@ -737,6 +743,10 @@ void mvceditor::SymbolTableClass::UnresolveNamespaceAlias(const pelet::SymbolCla
 	}
 }
 
+void mvceditor::SymbolTableClass::SetVersion(pelet::Versions version) {
+	Parser.SetVersion(version);
+}
+
 bool mvceditor::IsResourceDirty(const std::map<wxString, mvceditor::ResourceFinderClass*>& finders, 
 								const ResourceClass& resource, mvceditor::ResourceFinderClass* resourceFinder) {
 	bool ret = false;
@@ -795,6 +805,18 @@ mvceditor::ScopeFinderClass::ScopeFinderClass()
 	Parser.SetClassMemberObserver(this);
 	Parser.SetFunctionObserver(this);
 }
+
+void mvceditor::ScopeFinderClass::SetVersion(pelet::Versions version) {
+	Parser.SetVersion(version);
+}
+
+void mvceditor::ScopeFinderClass::ClassEnd(const UnicodeString& namespaceName, const UnicodeString& className, int pos) {
+	if (pos >= PosToCheck) {
+		return;
+	}
+	ScopeResult.MethodName = UNICODE_STRING_SIMPLE("::");
+}
+
 
 void mvceditor::ScopeFinderClass::NamespaceDeclarationFound(const UnicodeString& namespaceName) {
 	if (Parser.GetCharacterPosition() > PosToCheck) {

@@ -178,6 +178,8 @@ private:
 	void OnProjectOpened(wxCommandEvent& event);
 
 	void OnCmdProjectReIndex(wxCommandEvent& event);
+	
+	void OnEnvironmentUpdated(wxCommandEvent& event);
 
 	/**
 	 * Handle the results of the resource lookups.

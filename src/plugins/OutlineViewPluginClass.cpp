@@ -46,8 +46,9 @@ mvceditor::ResourceFinderBackgroundThreadClass::ResourceFinderBackgroundThreadCl
 	ResourceFinder.FileFilters.push_back(wxT("*.*"));
 }
 
-bool mvceditor::ResourceFinderBackgroundThreadClass::Start(const wxString& fileName) {
+bool mvceditor::ResourceFinderBackgroundThreadClass::Start(const wxString& fileName, const mvceditor::EnvironmentClass& environment) {
 	FileName = fileName;
+	ResourceFinder.SetVersion(environment.Php.Version);
 	wxThreadError error = CreateSingleInstance();
 	bool created = wxTHREAD_NO_ERROR == error;
 	if (created) {
@@ -94,7 +95,7 @@ void mvceditor::OutlineViewPluginClass::AddCodeControlClassContextMenuItems(wxMe
 void mvceditor::OutlineViewPluginClass::BuildOutlineCurrentCodeControl() {
 	CodeControlClass* code = GetCurrentCodeControl();
 	if (code != NULL) {
-		if (ResourceFinderBackground.Start(code->GetFileName())) {
+		if (ResourceFinderBackground.Start(code->GetFileName(), *GetEnvironment())) {
 			wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 			if (window != NULL) {
 				OutlineViewPluginPanelClass* outlineViewPanel = (OutlineViewPluginPanelClass*)window;
