@@ -1762,15 +1762,10 @@ bool mvceditor::ResourceFinderClass::Persist(const wxFileName& outputFile) const
 
 std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::All() const {
 	std::vector<mvceditor::ResourceClass> all;
-	all.resize(IdentifierCache.size() + MembersCache.size());
-	std::vector<mvceditor::ResourceClass>::const_iterator it;
-	size_t index = 0;
-	for (it = IdentifierCache.begin(); it != IdentifierCache.end(); ++it, ++index) {
-		all[index] = *it;
-	}
-	for (it = MembersCache.begin(); it != MembersCache.end(); ++it, ++index) {
-		all[index] = *it;
-	}
+	all.resize(IdentifierCache.size());
+	
+	// only the IdentifierCache, NamespaceCache and MembersCache are duplicates
+	std::copy(IdentifierCache.begin(), IdentifierCache.end(), all.begin());
 	return all;
 }
 

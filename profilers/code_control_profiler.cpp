@@ -122,6 +122,7 @@ private:
 	mvceditor::ProjectOptionsClass ProjectOptions;
 	mvceditor::ProjectClass Project;
 	mvceditor::ResourceCacheClass ResourceCache;
+	mvceditor::EnvironmentClass Environment;
 	mvceditor::CodeControlClass* Ctrl;
 	
 
@@ -143,12 +144,15 @@ CodeControlFrameClass::CodeControlFrameClass()
 	, Options()
 	, ProjectOptions()
 	, Project(ProjectOptions) 
-	, ResourceCache() {
+	, ResourceCache() 
+	, Environment() {
 	Options.EnableAutomaticLineIndentation = true;
 	Options.EnableAutoCompletion = true;
-	Ctrl = new mvceditor::CodeControlClass(this, Options, &Project, &ResourceCache, wxID_ANY);
+	Ctrl = new mvceditor::CodeControlClass(this, Options, &Project, &ResourceCache, &Environment, wxID_ANY);
 	Ctrl->SetDropTarget(new FileDropTargetClass(Ctrl));
 	CreateMenu();
+	ResourceCache.BuildResourceCacheForNativeFunctionsGlobal();
+	Ctrl->SetDocumentMode(mvceditor::CodeControlClass::PHP);
 }
 
 void CodeControlFrameClass::OnCallTip(wxCommandEvent& event) {

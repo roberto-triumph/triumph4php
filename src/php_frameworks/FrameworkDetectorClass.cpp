@@ -125,8 +125,7 @@ void mvceditor::DetectorActionClass::OnProcessComplete(wxCommandEvent& event) {
 
 	// kick off response parsing in a background thread.
 	// any running thread was stopped in Init()
-	bool init = ResponseThread.Init(OutputFile);
-	wxASSERT(init);
+	ResponseThread.Init(OutputFile);
 }
 
 void mvceditor::DetectorActionClass::OnProcessFailed(wxCommandEvent& event) {
