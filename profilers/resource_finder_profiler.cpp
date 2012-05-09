@@ -137,7 +137,7 @@ void ProfileLexer() {
 		token = lexer.NextToken();
 		lexer.GetLexeme(uniLexeme);
 		++tokenCount;
-	} while (!pelet::TokenClass::IsTerminatingToken(token));
+	} while (!pelet::IsTerminatingToken(token));
 	time = wxGetLocalTimeMillis() - time;
 	printf("time for lexer:%ld ms tokenCount=%d\n", time.ToLong(), tokenCount);
 

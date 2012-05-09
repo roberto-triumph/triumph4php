@@ -185,7 +185,7 @@ function pickywarnings(action)
 		
 		-- when compiling strict warning checks; also check against variable length arrays
 		-- since Visual Studio is not C99 compliant
-		buildoptions { "-Wall", "-Wvla", "-Wno-comment"  }
+		buildoptions { "-Wall", "-Werror", "-Wvla", "-Wno-comment"  }
 	end
 end
 
@@ -274,7 +274,8 @@ solution "mvc-editor"
 			"src/widgets/ProcessWithHeartbeatClass.cpp",
 			"src/windows/StringHelperClass.cpp",
 			"src/MvcEditorErrors.cpp",
-			"src/MvcEditorAssets.cpp"
+			"src/MvcEditorAssets.cpp",
+			"src/MvcEditorString.cpp"
 		}
 		includedirs { "src/", "lib/UnitTest++/src/", "tests/", "lib/pelet/include" }
 		links { "unit_test++", "pelet" }
@@ -301,9 +302,10 @@ solution "mvc-editor"
 			"src/search/DirectorySearchClass.cpp",
 			"src/search/FinderClass.cpp",
 			"src/search/FindInFilesClass.cpp",
-			"src/windows/StringHelperClass.cpp"
+			"src/windows/StringHelperClass.cpp",
+			"src/MvcEditorString.cpp"
 		}
-		includedirs { "src/", "lib/pelet/include" }
+		includedirs { "src", "lib/pelet/include" }
 		links { "pelet" }
 		
 		configuration "Debug"
@@ -358,7 +360,8 @@ solution "mvc-editor"
 			"src/search/ResourceFinderClass.cpp",
 			"src/search/DirectorySearchClass.cpp",
 			"src/MvcEditorErrors.cpp",
-			"src/MvcEditorAssets.cpp"
+			"src/MvcEditorAssets.cpp",
+			"src/MvcEditorString.cpp"
 		}
 		includedirs { "src/", "lib/pelet/include" }
 		links { "pelet" }

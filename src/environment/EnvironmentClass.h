@@ -26,6 +26,7 @@
 #define __environmentclass__
 
 #include <environment/ApacheClass.h>
+#include <pelet/TokenClass.h>
 #include <vector>
 
 namespace mvceditor {
@@ -36,9 +37,31 @@ namespace mvceditor {
 class PhpEnvironmentClass {
 
 public:
+	
+	/**
+	 * Full path to the PHP executable
+	 */
+	wxString PhpExecutablePath;
+	
+	/**
+	 * The version to use in Source code parsing.
+	 */
+	pelet::Versions Version;
+	
+	/**
+	 * If TRUE, we will get the version of use from the PHP executable
+	 * itself by reading the output of "php -v"
+	 */
+	bool IsAuto;
+	
 	PhpEnvironmentClass();
 	
-	wxString PhpExecutablePath;
+	/**
+	 * Use the PHP executable to determine the PHP verion and
+	 * then fills in the  Version property
+	 */
+	void AutoDetermine();
+	
 };
 
 /**

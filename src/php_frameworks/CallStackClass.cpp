@@ -121,7 +121,7 @@ bool mvceditor::CallStackClass::Recurse(Errors& error) {
 				wxFileName nextFile = nextItem.FileName;
 				bool alreadyParsed = false;
 				for (size_t i = 0; i < List.size(); ++i) {
-					if (List[i].Resource.Resource == nextResource) {
+					if ((List[i].Resource.ClassName + UNICODE_STRING_SIMPLE("::") + List[i].Resource.Identifier) == nextResource) {
 						alreadyParsed = true;
 						break;
 					}
@@ -169,7 +169,11 @@ bool mvceditor::CallStackClass::Persist(wxFileName& fileName) {
 			mvceditor::ResourceClass callResource = it->Resource;
 			line += mvceditor::StringHelperClass::IcuToWx(callResource.Identifier);
 			line += wxT(",");
-			line += mvceditor::StringHelperClass::IcuToWx(callResource.Resource);
+			if (!callResource.ClassName.isEmpty()) {
+				line += mvceditor::StringHelperClass::IcuToWx(callResource.ClassName);
+				line += wxT("::");
+			}
+			line += mvceditor::StringHelperClass::IcuToWx(callResource.Identifier);
 			if (!it->Arguments.empty()) {
 				line += wxT(",");
 			}
@@ -220,13 +224,20 @@ void mvceditor::CallStackClass::ExpressionFound(const pelet::ExpressionClass& ex
 			
 			std::vector<mvceditor::ResourceClass> matches;
 			mvceditor::SymbolTableMatchErrorClass singleMatchError;
+			mvceditor::ScopeResultClass scopeResult;
+			scopeResult.MethodName = item.Resource;
 			
-			ResourceCache.ResourceMatches(item.FileName.GetFullPath(), symbol, item.Resource, matches, false, singleMatchError);
+			ResourceCache.ResourceMatches(item.FileName.GetFullPath(), symbol, scopeResult, matches, false, singleMatchError);
 			for (std::vector<mvceditor::ResourceClass>::iterator it = matches.begin(); it != matches.end(); ++it) {
 				if (mvceditor::ResourceClass::FUNCTION == it->Type || mvceditor::ResourceClass::METHOD == it->Type) {
 					ResourceWithFile newItem;
 					newItem.FileName.Assign(it->GetFullPath());
-					newItem.Resource = it->Resource;
+					if (mvceditor::ResourceClass::FUNCTION == it->Type) {
+						newItem.Resource = it->Identifier;
+					}
+					else {
+						newItem.Resource = it->ClassName + UNICODE_STRING_SIMPLE("::") + it->Identifier;
+					}
 					ResourcesRemaining.push(newItem);
 					
 					mvceditor::CallClass newCall;
@@ -241,13 +252,10 @@ void mvceditor::CallStackClass::ExpressionFound(const pelet::ExpressionClass& ex
 				MatchError = singleMatchError;
 			}
 		}
-	}	
+	}
 }
 
-void mvceditor::CallStackClass::MethodEnd(const UnicodeString& className, const UnicodeString& methodName, int pos) {
-}
-
-void mvceditor::CallStackClass::MethodFound(const UnicodeString& className, const UnicodeString& methodName, const UnicodeString& signature, 
+void mvceditor::CallStackClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, const UnicodeString& signature, 
 											const UnicodeString& returnType, const UnicodeString& comment, pelet::TokenClass::TokenIds visibility, 
 											bool isStatic, const int lineNumber) {
 	CurrentClass = className;
@@ -255,43 +263,9 @@ void mvceditor::CallStackClass::MethodFound(const UnicodeString& className, cons
 	CurrentFunction.remove();
 }
 
-void mvceditor::CallStackClass::PropertyFound(const UnicodeString& className, const UnicodeString& propertyName, const UnicodeString& propertyType,
-	const UnicodeString& comment, pelet::TokenClass::TokenIds visibility, bool isConst, bool isStatic, const int lineNumber) {
-	
-	// no need to do anything here as we only want to look at expressions
-}
-
-void mvceditor::CallStackClass::FunctionFound(const UnicodeString& functionName, const UnicodeString& signature, const UnicodeString& returnType, 
+void mvceditor::CallStackClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, const UnicodeString& returnType, 
 		const UnicodeString& comment, const int lineNumber) {
 	CurrentClass.remove();
 	CurrentMethod.remove();
 	CurrentFunction = functionName;
-}
-
-void mvceditor::CallStackClass::FunctionEnd(const UnicodeString& functionName, int pos) {
-
-	// no need to do anything here as we only want to look at expressions	
-}
-
-void mvceditor::CallStackClass::ClassFound(const UnicodeString& className, const UnicodeString& signature, 
-										   const UnicodeString& comment, const int lineNumber) {
-
-	// no need to do anything here as we only want to look at expressions		
-}
-
-void mvceditor::CallStackClass::IncludeFound(const UnicodeString& includeFile, const int lineNumber) {
-
-	// no need to do anything here as we only want to look at expressions		
-}
-
-void mvceditor::CallStackClass::DefineDeclarationFound(const UnicodeString& variableName, const UnicodeString& variableValue, 
-		const UnicodeString& comment, const int lineNumber) {
-
-	// no need to do anything here as we only want to look at expressions			
-}
-
-void mvceditor::CallStackClass::VariableFound(const UnicodeString& className, const UnicodeString& methodName, const pelet::SymbolClass& symbol, 
-	const UnicodeString& comment) {
-	
-	// no need to do anything here as we only want to look at expressions		
 }

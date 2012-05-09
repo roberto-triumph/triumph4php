@@ -83,6 +83,7 @@ public:
 	std::vector<mvceditor::ResourceClass> ResourceMatches;
 	bool DoDuckTyping;
 	mvceditor::SymbolTableMatchErrorClass Error;
+	mvceditor::ScopeResultClass ScopeResult;
 
 	SymbolTableCompletionTestClass()
 		: CompletionSymbolTable()
@@ -93,7 +94,8 @@ public:
 		, VariableMatches()
 		, ResourceMatches()
 		, DoDuckTyping(false)
-		, Error() {
+		, Error()
+		, ScopeResult() {
 
 	}
 
@@ -101,9 +103,14 @@ public:
 		Finder1.BuildResourceCacheForFile(wxT("untitled"), sourceCode, true);
 		OpenedFinders[wxT("untitled")] = &Finder1;
 		CompletionSymbolTable.CreateSymbols(sourceCode);
+		ScopeResult.Clear();
+		
+		// the global scope
+		ScopeResult.MethodName = UNICODE_STRING_SIMPLE("::");
 	}
 
 	void ToFunction(const UnicodeString& functionName) {
+		ParsedExpression.ChainList.clear();
 		ParsedExpression.Lexeme = functionName;
 		ParsedExpression.ChainList.push_back(functionName);
 	}
@@ -111,13 +118,21 @@ public:
 	void ToVariable(const UnicodeString& variableName) {
 
 		// same as function make, but it makes tests easier to read
+		ParsedExpression.ChainList.clear();
 		ParsedExpression.Lexeme = variableName;
 		ParsedExpression.ChainList.push_back(variableName);
 	}
-
-	void ToMethod(const UnicodeString& variableName, const UnicodeString& methodName, bool isStatic) {
+	
+	void ToClass(const UnicodeString& className) {
 
 		// same as function make, but it makes tests easier to read
+		ParsedExpression.ChainList.clear();
+		ParsedExpression.Lexeme = className;
+		ParsedExpression.ChainList.push_back(className);
+	}
+
+	void ToMethod(const UnicodeString& variableName, const UnicodeString& methodName, bool isStatic) {
+		ParsedExpression.ChainList.clear();
 		ParsedExpression.Lexeme = variableName;
 		ParsedExpression.ChainList.push_back(variableName);
 		UnicodeString operatorString = isStatic ? UNICODE_STRING_SIMPLE("::") : UNICODE_STRING_SIMPLE("->");
@@ -130,9 +145,11 @@ class ScopeFinderTestClass {
 public:
 
 	mvceditor::ScopeFinderClass ScopeFinder;
+	mvceditor::ScopeResultClass ScopeResult;
 
 	ScopeFinderTestClass() 
-		: ScopeFinder() {
+		: ScopeFinder()
+		, ScopeResult() {
 	}
 };
 
@@ -145,7 +162,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithFunctionName) {
 	);
 	Init(sourceCode);	
 	ToFunction(UNICODE_STRING_SIMPLE("wo"));
-	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK(!ResourceMatches.empty());
 	if (!ResourceMatches.empty()) {
@@ -161,13 +178,11 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, VariableMatchesWithVariableName) {
 	);
 	Init(sourceCode);	
 	ToVariable(UNICODE_STRING_SIMPLE("$global"));
-	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders,
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders,
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
-	CHECK_EQUAL((size_t)2, VariableMatches.size());
-	if ((size_t)2 == VariableMatches.size()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("$globalOne"), VariableMatches[0]);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("$globalTwo"), VariableMatches[1]);
-	}
+	CHECK_VECTOR_SIZE(2, VariableMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("$globalOne"), VariableMatches[0]);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("$globalTwo"), VariableMatches[1]);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, VariableMatchesWithLocalVariableOnly) {
@@ -178,12 +193,10 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, VariableMatchesWithLocalVariableOnl
 	);
 	Init(sourceCode);	
 	ToVariable(UNICODE_STRING_SIMPLE("$global"));
-	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
-	CHECK_EQUAL((size_t)1, VariableMatches.size());
-	if ((size_t)1 == VariableMatches.size()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("$globalOne"), VariableMatches[0]);
-	}
+	CHECK_VECTOR_SIZE(1, VariableMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("$globalOne"), VariableMatches[0]);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ManyVariableAssignments) {
@@ -197,12 +210,10 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ManyVariableAssignments) {
 	);
 	Init(sourceCode);	
 	ToVariable(UNICODE_STRING_SIMPLE("$global"));
-	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
-	CHECK_EQUAL((size_t)1, VariableMatches.size());
-	if ((size_t)1 == VariableMatches.size()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("$globalOne"), VariableMatches[0]);
-	}
+	CHECK_VECTOR_SIZE(1, VariableMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("$globalOne"), VariableMatches[0]);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, VariableMatchesWithPredefinedVariable) {
@@ -213,12 +224,11 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, VariableMatchesWithPredefinedVariab
 	);
 	Init(sourceCode);	
 	ToVariable(UNICODE_STRING_SIMPLE("$_POS"));
-	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::work"), OpenedFinders, 
+	ScopeResult.MethodName = UNICODE_STRING_SIMPLE("::work");
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
-	CHECK_EQUAL((size_t)1, VariableMatches.size());
-	if ((size_t)1 == VariableMatches.size()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("$_POST"), VariableMatches[0]);
-	}
+	CHECK_VECTOR_SIZE(1, VariableMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("$_POST"), VariableMatches[0]);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodCall) {
@@ -229,13 +239,11 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodCall) {
 	);
 	Init(sourceCode);	
 	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false);
-	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
-	CHECK_EQUAL((size_t)2, ResourceMatches.size());
-	if ((size_t)2 == ResourceMatches.size()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("workA"), ResourceMatches[0].Identifier);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), ResourceMatches[1].Identifier);
-	}
+	CHECK_VECTOR_SIZE(2, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workA"), ResourceMatches[0].Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), ResourceMatches[1].Identifier);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodCallFromGlobalFinder) {
@@ -249,13 +257,11 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodCallFromGlobalFind
 	Init(sourceCode);
 	GlobalFinder.BuildResourceCacheForFile(wxT("MyClass.php"), sourceCodeGlobal, true);
 	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false);
-	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
-	CHECK_EQUAL((size_t)2, ResourceMatches.size());
-	if ((size_t)2 == ResourceMatches.size()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("workA"), ResourceMatches[0].Identifier);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), ResourceMatches[1].Identifier);
-	}
+	CHECK_VECTOR_SIZE(2, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workA"), ResourceMatches[0].Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), ResourceMatches[1].Identifier);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithLocalFinderOverridesGlobalFinder) {
@@ -280,12 +286,10 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithLocalFinderOverridesGlob
 
 	GlobalFinder.BuildResourceCacheForFile(wxT("MyClass.php"), sourceCodeGlobal, true);
 	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false);
-	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
-	CHECK_EQUAL((size_t)1, ResourceMatches.size());
-	if ((size_t)1 == ResourceMatches.size()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), ResourceMatches[0].Identifier);
-	}
+	CHECK_VECTOR_SIZE(1, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), ResourceMatches[0].Identifier);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithObjectWithoutMethodCall) {
@@ -296,13 +300,11 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithObjectWithoutMethodCall)
 	);
 	Init(sourceCode);	
 	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE(""), false);
-	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
-	CHECK_EQUAL((size_t)2, ResourceMatches.size());
-	if ((size_t)2 == ResourceMatches.size()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("workA"), ResourceMatches[0].Identifier);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), ResourceMatches[1].Identifier);
-	}
+	CHECK_VECTOR_SIZE(2, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workA"), ResourceMatches[0].Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), ResourceMatches[1].Identifier);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithStaticMethodCall) {
@@ -310,16 +312,12 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithStaticMethodCall) {
 		"<?php\n"
 		"class MyClass { function workA() {} static function workB() {} } \n"
 	);
-	int32_t pos;
-	sourceCode = FindCursor(sourceCode, pos);
 	Init(sourceCode);	
 	ToMethod(UNICODE_STRING_SIMPLE("MyClass"), UNICODE_STRING_SIMPLE("work"), true);
-	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
-	CHECK_EQUAL((size_t)1, ResourceMatches.size());
-	if ((size_t)1 == ResourceMatches.size()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), ResourceMatches[0].Identifier);
-	}
+	CHECK_VECTOR_SIZE(1, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), ResourceMatches[0].Identifier);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithPrivateMethodCall) {
@@ -330,12 +328,10 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithPrivateMethodCall) {
 	);
 	Init(sourceCode);	
 	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false);
-	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
-	CHECK_EQUAL((size_t)1, ResourceMatches.size());
-	if ((size_t)1 == ResourceMatches.size()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("workA"), ResourceMatches[0].Identifier);
-	}
+	CHECK_VECTOR_SIZE(1, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workA"), ResourceMatches[0].Identifier);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodChain) {
@@ -348,12 +344,10 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodChain) {
 	Init(sourceCode);	
 	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("workA()"), false);
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->ti"));
-	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
-	CHECK_EQUAL((size_t)1, ResourceMatches.size());
-	if ((size_t)1 == ResourceMatches.size()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("time"), ResourceMatches[0].Identifier);
-	}
+	CHECK_VECTOR_SIZE(1, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("time"), ResourceMatches[0].Identifier);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithLongPropertyChain) {
@@ -363,18 +357,14 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithLongPropertyChain) {
 		"class OtherClass { /** @var OtherClass */ var $parent; function toString() {} }\n"
 		"$my = new MyClass;\n"
 	);
-	int32_t pos;
-	sourceCode = FindCursor(sourceCode, pos);
 	Init(sourceCode);	
 	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("workA()"), false);
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->parent"));
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->pare"));
-	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
-	CHECK_EQUAL((size_t)1, ResourceMatches.size());
-	if ((size_t)1 == ResourceMatches.size()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("parent"), ResourceMatches[0].Identifier);
-	}
+	CHECK_VECTOR_SIZE(1, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("parent"), ResourceMatches[0].Identifier);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithLongMethodChain) {
@@ -389,12 +379,10 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithLongMethodChain) {
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->parent()"));
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->parent()"));
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->p"));
-	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
-	CHECK_EQUAL((size_t)1, ResourceMatches.size());
-	if ((size_t)1 == ResourceMatches.size()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("parent"), ResourceMatches[0].Identifier);
-	}
+	CHECK_VECTOR_SIZE(1, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("parent"), ResourceMatches[0].Identifier);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithFunctionChain) {
@@ -405,18 +393,14 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithFunctionChain) {
 		"class OtherClass { var $time;  /** @return FirstClass */ function toString() {} }\n"
 		"$my = new MyClass;\n"
 	);
-	int32_t pos;
-	sourceCode = FindCursor(sourceCode, pos);
 	Init(sourceCode);	
 	ToFunction(UNICODE_STRING_SIMPLE("workA()"));
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->toString()"));
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->stat"));
-	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
-	CHECK_EQUAL((size_t)1, ResourceMatches.size());
-	if ((size_t)1 == ResourceMatches.size()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("status"), ResourceMatches[0].Identifier);
-	}
+	CHECK_VECTOR_SIZE(1, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("status"), ResourceMatches[0].Identifier);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithParentChain) {
@@ -426,18 +410,15 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithParentChain) {
 		"class OtherClass extends FirstClass { var $time; function status() { } }\n"
 		"$my = new MyClass;\n"
 	);
-	int32_t pos;
-	sourceCode = FindCursor(sourceCode, pos);
 	Init(sourceCode);	
 	ParsedExpression.Lexeme = UNICODE_STRING_SIMPLE("parent");
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("parent"));
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("::"));
-	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, UNICODE_STRING_SIMPLE("OtherClass::status"), OpenedFinders, 
+	ScopeResult.MethodName = UNICODE_STRING_SIMPLE("OtherClass::status");
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
-	CHECK_EQUAL((size_t)1, ResourceMatches.size());
-	if ((size_t)1 == ResourceMatches.size()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("status"), ResourceMatches[0].Identifier);
-	}
+	CHECK_VECTOR_SIZE(1, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("status"), ResourceMatches[0].Identifier);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableCreatedFunctionChain) {
@@ -449,18 +430,14 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableCreatedFunctionC
 		"class OtherClass { var $time;  /** @return FirstClass */ function toString() {} }\n"
 		"$my = workA();\n"
 	);
-	int32_t pos;
-	sourceCode = FindCursor(sourceCode, pos);
 	Init(sourceCode);	
 	ToVariable(UNICODE_STRING_SIMPLE("$my"));
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->"));
-	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
-	CHECK_EQUAL((size_t)2, ResourceMatches.size());
-	if ((size_t)2 == ResourceMatches.size()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("time"), ResourceMatches[0].Identifier);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("toString"), ResourceMatches[1].Identifier);
-	}
+	CHECK_VECTOR_SIZE(2, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("time"), ResourceMatches[0].Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("toString"), ResourceMatches[1].Identifier);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableCreatedMethodChain) {
@@ -472,22 +449,288 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableCreatedMethodCha
 		"$my = new OtherClass();\n"
 		"$parent = $my->parent();\n"
 	);
-	int32_t pos;
-	sourceCode = FindCursor(sourceCode, pos);
 	Init(sourceCode);	
 	ToVariable(UNICODE_STRING_SIMPLE("$parent"));
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->"));
-	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
-	CHECK_EQUAL((size_t)2, ResourceMatches.size());
-	if ((size_t)2 == ResourceMatches.size()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("parent"), ResourceMatches[0].Identifier);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("time"), ResourceMatches[1].Identifier);
-	}
+	CHECK_VECTOR_SIZE(2, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("parent"), ResourceMatches[0].Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("time"), ResourceMatches[1].Identifier);
+}
+
+
+TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithClassname) {
+	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"class MyClass { function workA() {} function workB() {} } \n"
+	);
+	Init(sourceCode);	
+	ToClass(UNICODE_STRING_SIMPLE("MyCl"));
+	std::vector<mvceditor::ResourceClass> resources;
+	CompletionSymbolTable.ResourceMatches(ParsedExpression, ScopeResult, OpenedFinders, 
+		&GlobalFinder, resources, DoDuckTyping, Error);
+	CHECK_VECTOR_SIZE(1, resources);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass"), resources[0].Identifier);
+}
+
+TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceNameCompletion) {
+	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"namespace Second {\n"
+		"class SecClass {}\n"
+		"}"
+		"namespace First\\Child { \n"
+		"class OtherClass { }\n"
+		"}"
+	);
+	Init(sourceCode);	
+	ToClass(UNICODE_STRING_SIMPLE("\\Sec"));
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
+		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
+	CHECK_VECTOR_SIZE(2, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\Second"), ResourceMatches[0].Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\Second\\SecClass"), ResourceMatches[1].Identifier);
+
+	ToClass(UNICODE_STRING_SIMPLE("\\First\\C"));
+	ResourceMatches.clear();
+	
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
+		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
+	CHECK_VECTOR_SIZE(2, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child"), ResourceMatches[0].Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\OtherClass"), ResourceMatches[1].Identifier);
+}
+
+TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAlias) {
+	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"namespace Second {\n"
+		"function work() {} \n"
+		"}"
+		"namespace First\\Child { \n"
+		"use Second as S; \n"
+		"class OtherClass {} \n"
+		"}"
+	);
+	Init(sourceCode);	
+	ToClass(UNICODE_STRING_SIMPLE("S\\"));
+	ScopeResult.NamespaceAliases[UNICODE_STRING_SIMPLE("S")] = UNICODE_STRING_SIMPLE("\\Second");
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
+		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
+	CHECK_VECTOR_SIZE(1, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("S\\work"), ResourceMatches[0].Identifier);
+}
+
+TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceStatic) {
+	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"namespace First\\Child { \n"
+		"class OtherClass {} \n"
+		"}"
+	);
+	Init(sourceCode);	
+	ToClass(UNICODE_STRING_SIMPLE("namespace\\"));
+	ScopeResult.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = UNICODE_STRING_SIMPLE("\\First\\Child");
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
+		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
+	CHECK_VECTOR_SIZE(1, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("namespace\\OtherClass"), ResourceMatches[0].Identifier);
+}
+
+TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceImporting) {
+	
+	// define namespaces and classes in a separate file
+	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"namespace Second {\n"
+		"class MyClass { }\n"
+		"}"
+		"namespace First { \n"
+		"class OtherClass { }\n"
+		"}\n"
+	);
+	GlobalFinder.BuildResourceCacheForFile(wxT("defines.php"), sourceCode, true);
+	
+	// the code under test will import the namespaces
+	sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"use First as F; \n"
+		"}"
+	);
+	Init(sourceCode);	
+	ToClass(UNICODE_STRING_SIMPLE("F\\"));
+	ScopeResult.NamespaceAliases[UNICODE_STRING_SIMPLE("F")] = UNICODE_STRING_SIMPLE("\\First");
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
+		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
+	CHECK_VECTOR_SIZE(1, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("F\\OtherClass"), ResourceMatches[0].Identifier);
+	
+	ResourceMatches.clear();
+	ToClass(UNICODE_STRING_SIMPLE("\\Sec"));
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
+		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
+	CHECK_VECTOR_SIZE(2, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\Second"), ResourceMatches[0].Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\Second\\MyClass"), ResourceMatches[1].Identifier);
+}
+
+TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClassInGlobalNamespace) {
+	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"class OtherClass {} \n"
+	);
+	Init(sourceCode);
+	
+	sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"namespace Second; \n"
+		"class MyClass {}"
+	);
+	GlobalFinder.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
+	ToClass(UNICODE_STRING_SIMPLE("Othe"));
+	ScopeResult.NamespaceName = UNICODE_STRING_SIMPLE("\\Second");
+	ScopeResult.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = UNICODE_STRING_SIMPLE("\\Second");
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
+		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
+		
+	// since code is declaring a namespace, then classes in the global namespace are not automatically
+	// imported
+	CHECK_VECTOR_SIZE(0, ResourceMatches);
+	
+	ResourceMatches.clear();
+	Error.Clear();
+	ScopeResult.Clear();
+	  
+	// fully qualified class names should be visible
+	ToClass(UNICODE_STRING_SIMPLE("\\Othe"));
+	
+	ScopeResult.NamespaceName = UNICODE_STRING_SIMPLE("\\Second");
+	ScopeResult.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = UNICODE_STRING_SIMPLE("\\Second");
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
+		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
+	CHECK_VECTOR_SIZE(1, ResourceMatches);
+	CHECK_UNISTR_EQUALS("\\OtherClass", ResourceMatches[0].Identifier);
+}
+
+TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClassInDifferentNamespace) {
+	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"namespace First\\Child {\n"
+		"class OtherClass {} \n"
+		"}\n"
+	);
+	Init(sourceCode);
+	
+	sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"namespace Second { \n"
+		"class MyClass {}  \n"
+		"} \n"
+	);
+	GlobalFinder.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
+	ToClass(UNICODE_STRING_SIMPLE("Othe"));
+	ScopeResult.NamespaceName = UNICODE_STRING_SIMPLE("\\Second");
+	ScopeResult.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = UNICODE_STRING_SIMPLE("\\Second");
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
+		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
+		
+	// since code is declaring a namespace, then classes in the global namespace are not automatically
+	// imported
+	CHECK_VECTOR_SIZE(0, ResourceMatches);
+}
+
+
+TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndFunctionInGlobalNamespace) {
+	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"function work() {}"
+	);
+	Init(sourceCode);
+	
+	sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"namespace First\\Child; \n"
+		"class MyClass {}"
+	);
+	GlobalFinder.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
+	
+	// global functions ARE automatically imported
+	ToFunction(UNICODE_STRING_SIMPLE("wor"));
+	ScopeResult.NamespaceName = UNICODE_STRING_SIMPLE("\\First\\Child");
+	ScopeResult.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = UNICODE_STRING_SIMPLE("\\First\\Child");
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
+		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
+	CHECK_VECTOR_SIZE(1, ResourceMatches);
+	CHECK_UNISTR_EQUALS("work", ResourceMatches[0].Identifier);
+}
+
+TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClassInSameNamespace) {
+	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"Class OtherClass {}"
+	);
+	Init(sourceCode);
+	
+	sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"namespace First\\Child; \n"
+		"class MyClass {}"
+	);
+	GlobalFinder.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
+	
+	// classes in the same namespace ARE automatically imported
+	ToClass(UNICODE_STRING_SIMPLE("MyC"));
+	ScopeResult.NamespaceName = UNICODE_STRING_SIMPLE("\\First\\Child");
+	ScopeResult.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = UNICODE_STRING_SIMPLE("\\First\\Child");
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
+		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);	
+	CHECK_VECTOR_SIZE(1, ResourceMatches);
+	CHECK_UNISTR_EQUALS("MyClass", ResourceMatches[0].Identifier);		
+}
+
+TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceGlobalClassIsNotImported) {
+	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"class OtherClass {}"
+	);
+	Init(sourceCode);
+	
+	sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"namespace First\\Child; \n"
+		"class MyClass {}"
+	);
+	GlobalFinder.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
+	
+	ToClass(UNICODE_STRING_SIMPLE("Other"));
+	ScopeResult.NamespaceName = UNICODE_STRING_SIMPLE("\\First\\Child");
+	ScopeResult.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = UNICODE_STRING_SIMPLE("\\First\\Child");
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
+		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
+	CHECK_VECTOR_SIZE(0, ResourceMatches);
+}
+
+TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndGlobalClassImported) {
+	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"class OtherClass {} \n"
+		"function work() {}"
+	);
+	Init(sourceCode);
+	ToClass(UNICODE_STRING_SIMPLE("Other"));
+	
+	// declare a namespace and import the global class as well
+	ScopeResult.NamespaceName = UNICODE_STRING_SIMPLE("\\First\\Child");
+	ScopeResult.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = UNICODE_STRING_SIMPLE("\\First\\Child");
+	ScopeResult.NamespaceAliases[UNICODE_STRING_SIMPLE("OtherClass")] = UNICODE_STRING_SIMPLE("\\OtherClass");
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
+		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
+		
+	// since code is declaring a namespace, then classes in the global namespace are not automatically
+	// imported
+	CHECK_VECTOR_SIZE(1, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("OtherClass"), ResourceMatches[0].ClassName);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("OtherClass"), ResourceMatches[0].Identifier);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithMethodCall) {
-
+	
 	// only doing light testing on ResourceMatches because the Matches* tests
 	// cover it already
 	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
@@ -495,17 +738,17 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithMethodCall) {
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"$my = new MyClass;\n"
 	);
-	int32_t pos;
-	sourceCode = FindCursor(sourceCode, pos);
 	Init(sourceCode);	
 	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false);
 	std::vector<mvceditor::ResourceClass> resources;
-	CompletionSymbolTable.ResourceMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+	CompletionSymbolTable.ResourceMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, resources, DoDuckTyping, Error);
 	CHECK_EQUAL((size_t)2, resources.size());
 	if ((size_t)2 == resources.size()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass::workA"), resources[0].Resource);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass::workB"), resources[1].Resource);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("workA"), resources[0].Identifier);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass"), resources[0].ClassName);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), resources[1].Identifier);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass"), resources[1].ClassName);
 	}
 }
 
@@ -518,13 +761,11 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressio
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"$my = new MyClass;\n"
 	);
-	int32_t pos;
-	sourceCode = FindCursor(sourceCode, pos);
 	Init(sourceCode);	
 	pelet::SymbolClass emptyExpression;
 	emptyExpression.Lexeme = UNICODE_STRING_SIMPLE("unknown");
 	std::vector<mvceditor::ResourceClass> resources;
-	CompletionSymbolTable.ResourceMatches(emptyExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+	CompletionSymbolTable.ResourceMatches(emptyExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, resources, true, Error);
 	CHECK_EQUAL((size_t)0, resources.size());
 }
@@ -540,12 +781,10 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressio
 		"function make() {} \n"
 		"$my = make();"
 	);
-	int32_t pos;
-	sourceCode = FindCursor(sourceCode, pos);
 	Init(sourceCode);	
 	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false);
 	std::vector<mvceditor::ResourceClass> resources;
-	CompletionSymbolTable.ResourceMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+	CompletionSymbolTable.ResourceMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, resources, false, Error);
 	CHECK_EQUAL((size_t)0, resources.size());
 }
@@ -562,16 +801,56 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownVariableA
 		"function make() {} \n"
 		"$my = make();"
 	);
-	int32_t pos;
-	sourceCode = FindCursor(sourceCode, pos);
 	Init(sourceCode);	
 	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false);
 	std::vector<mvceditor::ResourceClass> resources;
-	CompletionSymbolTable.ResourceMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+	CompletionSymbolTable.ResourceMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, resources, true, Error);
 	CHECK_VECTOR_SIZE(2, resources);
-	CHECK_UNISTR_EQUALS("MyClass::workA", resources[0].Resource);
-	CHECK_UNISTR_EQUALS("MyClass::workB", resources[1].Resource);
+	CHECK_UNISTR_EQUALS("workA", resources[0].Identifier);
+	CHECK_UNISTR_EQUALS("MyClass", resources[0].ClassName);
+	CHECK_UNISTR_EQUALS("workB", resources[1].Identifier);
+	CHECK_UNISTR_EQUALS("MyClass", resources[1].ClassName);
+}
+
+TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithTraitInDifferentNamespace) {
+	CompletionSymbolTable.SetVersion(pelet::PHP_54);
+	GlobalFinder.SetVersion(pelet::PHP_54);
+	Finder1.SetVersion(pelet::PHP_54);
+	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"class TraitClass { \n"
+		" function work() {}\n"
+		"}\n"
+	);
+	GlobalFinder.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
+	
+	// TODO need to add the trait code to both caches for now because
+	// the resource finder will look for trait methods from its own resource finder
+	// meaning that if the class that uses the trait is only in Finder1 
+	// and the trait class is only in GlobalFinder, this test will fail.
+	// This means that if the user creates a trait, then creates a new file
+	// then the user will not get code completion for trait methods until the
+	// project get re-indexed. will need to fix this.
+	Finder1.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
+	sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"namespace Second { \n"
+		"class MyClass {\n"
+		"	use \\TraitClass; \n"
+		"}  \n"
+		"$my = new MyClass();"
+		"} \n"
+		
+	);
+	Init(sourceCode);
+	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE(""), false);
+	ScopeResult.NamespaceName = UNICODE_STRING_SIMPLE("\\Second");
+	ScopeResult.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = UNICODE_STRING_SIMPLE("\\Second");
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
+		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
+		
+	CHECK_VECTOR_SIZE(1, ResourceMatches);
+	CHECK_UNISTR_EQUALS("work", ResourceMatches[0].Identifier);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillUnknownResourceError) {
@@ -583,12 +862,10 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillUnknownResourceError) {
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"$my = new MyClass;\n"
 	);
-	int32_t pos;
-	sourceCode = FindCursor(sourceCode, pos);
 	Init(sourceCode);	
 	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("unknownFunc"), false);
 	std::vector<mvceditor::ResourceClass> resources;
-	CompletionSymbolTable.ResourceMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+	CompletionSymbolTable.ResourceMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, resources, DoDuckTyping, Error);
 	CHECK_EQUAL((size_t)0, resources.size());
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::UNKNOWN_RESOURCE, Error.Type);
@@ -604,13 +881,11 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillResolutionError) {
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"$my = new MyClass;\n"
 	);
-	int32_t pos;
-	sourceCode = FindCursor(sourceCode, pos);
 	Init(sourceCode);	
 	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("workB()"), false);
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->prop"));
 	std::vector<mvceditor::ResourceClass> resources;
-	CompletionSymbolTable.ResourceMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+	CompletionSymbolTable.ResourceMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, resources, DoDuckTyping, Error);
 	CHECK_EQUAL((size_t)0, resources.size());
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::TYPE_RESOLUTION_ERROR, Error.Type);
@@ -626,12 +901,10 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillPrimitveError) {
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"$my = '124';\n"
 	);
-	int32_t pos;
-	sourceCode = FindCursor(sourceCode, pos);
 	Init(sourceCode);	
 	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("wor"), false);
 	std::vector<mvceditor::ResourceClass> resources;
-	CompletionSymbolTable.ResourceMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+	CompletionSymbolTable.ResourceMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, resources, DoDuckTyping, Error);
 	CHECK_EQUAL((size_t)0, resources.size());
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::PRIMITIVE_ERROR, Error.Type);
@@ -647,20 +920,15 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, WithDuckTyping) {
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"function factory() {}\n"
 	);
-	int32_t pos;
-	sourceCode = FindCursor(sourceCode, pos);
 	Init(sourceCode);	
 	ToFunction(UNICODE_STRING_SIMPLE("factory"));
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->work"));
 	DoDuckTyping = true;
-	CompletionSymbolTable.ResourceMatches(ParsedExpression, UNICODE_STRING_SIMPLE("::"), OpenedFinders, 
+	CompletionSymbolTable.ResourceMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, ResourceMatches, DoDuckTyping, Error);
-	CHECK_EQUAL((size_t)2, ResourceMatches.size());
-	if ((size_t)2 == ResourceMatches.size()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("workA"), ResourceMatches[0].Identifier);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), ResourceMatches[1].Identifier);
-	}
-	
+	CHECK_VECTOR_SIZE(2, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workA"), ResourceMatches[0].Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), ResourceMatches[1].Identifier);
 }
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldFindMethodScope) {
@@ -680,17 +948,32 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldFindMethodScope) {
 		"\t}\n"
 		"\t/** @return void */\n"
 		"\tprivate function setName($anotherName) {\n"
+		"\t\t{CURSOR} "
 		"\t\t$someName = '';\n"
-		"\t\t{CURSOR}"
 		"\t}\n"
 		"}\n"
 		"?>\n"
 	);
 	int32_t pos;
 	sourceCode = FindCursor(sourceCode, pos);
-	UnicodeString scope = ScopeFinder.GetScopeString(sourceCode, pos);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::setName"), scope);
+	ScopeFinder.GetScopeString(sourceCode, pos, ScopeResult);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::setName"), ScopeResult.MethodName);
 }
+
+TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldFindGlobalScopePastClass) {
+	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"class MyClass { function work() { } }\n"
+		"$globalVar = new MyClass(); \n"
+		"\t{CURSOR}"
+		"?>\n"
+	);
+	int32_t pos;
+	sourceCode = FindCursor(sourceCode, pos);
+	ScopeFinder.GetScopeString(sourceCode, pos, ScopeResult);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("::"), ScopeResult.MethodName);
+}
+
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldFindFunctionScope) {
 	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
@@ -704,8 +987,8 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldFindFunctionScope) {
 	);
 	int32_t pos;
 	sourceCode = FindCursor(sourceCode, pos);
-	UnicodeString scope = ScopeFinder.GetScopeString(sourceCode, pos);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("::setName"), scope);
+	ScopeFinder.GetScopeString(sourceCode, pos, ScopeResult);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("::setName"), ScopeResult.MethodName);
 }
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleTypeHinting) {
@@ -719,8 +1002,8 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleTypeHinting) {
 	);
 	int32_t pos;
 	sourceCode = FindCursor(sourceCode, pos);
-	UnicodeString scope = ScopeFinder.GetScopeString(sourceCode, pos);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("::printUser"), scope);
+	ScopeFinder.GetScopeString(sourceCode, pos, ScopeResult);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("::printUser"), ScopeResult.MethodName);
 }
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleMultipleBlocks) {
@@ -738,8 +1021,8 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleMultipleBlocks) {
 	);
 	int32_t pos;
 	sourceCode = FindCursor(sourceCode, pos);
-	UnicodeString scope = ScopeFinder.GetScopeString(sourceCode, pos);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("::"), scope);
+	ScopeFinder.GetScopeString(sourceCode, pos, ScopeResult);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("::"), ScopeResult.MethodName);
 }
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleUnfinishedBlock) {
@@ -752,8 +1035,8 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleUnfinishedBlock) {
 	);
 	int32_t pos;
 	sourceCode = FindCursor(sourceCode, pos);
-	UnicodeString scope = ScopeFinder.GetScopeString(sourceCode, pos);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("::printUser"), scope);
+	ScopeFinder.GetScopeString(sourceCode, pos, ScopeResult);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("::printUser"), ScopeResult.MethodName);
 }
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleUnfinishedClassMethod) {
@@ -767,8 +1050,41 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleUnfinishedClassMeth
 	);
 	int32_t pos;
 	sourceCode = FindCursor(sourceCode, pos);
-	UnicodeString scope = ScopeFinder.GetScopeString(sourceCode, pos);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass::printUser"), scope);
+	ScopeFinder.GetScopeString(sourceCode, pos, ScopeResult);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass::printUser"), ScopeResult.MethodName);
+}
+
+TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringWithMultipleNamespaces) {
+	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"namespace First\\Child {"
+		"	use ArrayObject, Exception; \n"
+		"}"
+		"namespace Second\\Child {"
+		"	use PDOException as PE; \n"
+		" 	function  work() {"
+		"{CURSOR}"
+	);
+	int32_t pos;
+	sourceCode = FindCursor(sourceCode, pos);
+	ScopeFinder.GetScopeString(sourceCode, pos, ScopeResult);
+	CHECK_UNISTR_EQUALS("::work", ScopeResult.MethodName);
+	CHECK_UNISTR_EQUALS("\\PDOException", ScopeResult.NamespaceAliases[UNICODE_STRING_SIMPLE("PE")]);
+	CHECK_UNISTR_EQUALS("\\Second\\Child", ScopeResult.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")]);
+}
+
+TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringWithNamespaceOnly) {
+	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"namespace First\\Child;"
+		"{CURSOR}"
+	);
+	int32_t pos;
+	sourceCode = FindCursor(sourceCode, pos);
+	ScopeFinder.GetScopeString(sourceCode, pos, ScopeResult);
+	CHECK_UNISTR_EQUALS("::", ScopeResult.MethodName);
+	CHECK_UNISTR_EQUALS("\\First\\Child", ScopeResult.NamespaceName);
+	CHECK_UNISTR_EQUALS("\\First\\Child", ScopeResult.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")]);
 }
 
 }

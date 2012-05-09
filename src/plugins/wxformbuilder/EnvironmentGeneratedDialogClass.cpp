@@ -205,16 +205,23 @@ PhpEnvironmentPanelGeneratedClass::PhpEnvironmentPanelGeneratedClass( wxWindow* 
 	GridSizer->SetFlexibleDirection( wxBOTH );
 	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	HelpText = new wxStaticText( this, ID_HELPTEXT, _("This dialog shows the PHP configuration that is currently being used by MVC Editor.  This page lists the executable that  MVC Editor will use when running scripts or detecting the PHP framework that a project is using.\n\nChoose the location of the PHP binary.  If you are running on a Windows PC, choose php-win.exe."), wxDefaultPosition, wxDefaultSize, 0 );
+	HelpText = new wxStaticText( this, ID_HELPTEXT, _("This dialog shows the PHP configuration that is currently being used by MVC Editor.  This page lists the executable that  MVC Editor will use when running scripts or detecting the PHP framework that a project is using.\n\nChoose the location of the PHP binary.  If you are running on a Windows PC, choose php-win.exe.\n\nThe version dropdown will determine which version of PHP MVC Editor will use for source code parsing. Choose \"Auto\" to have MVC Editor use the same version as the PHP executable; or one of the other versions to use have MVC Editor use a different version."), wxDefaultPosition, wxDefaultSize, 0 );
 	HelpText->Wrap( 450 );
 	GridSizer->Add( HelpText, 1, wxALL|wxEXPAND, 5 );
 	
-	wxBoxSizer* PhpSizer;
-	PhpSizer = new wxBoxSizer( wxHORIZONTAL );
+	wxFlexGridSizer* fgSizer10;
+	fgSizer10 = new wxFlexGridSizer( 2, 2, 0, 0 );
+	fgSizer10->AddGrowableCol( 0 );
+	fgSizer10->AddGrowableCol( 1 );
+	fgSizer10->SetFlexibleDirection( wxBOTH );
+	fgSizer10->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	PhpLabel = new wxStaticText( this, wxID_ANY, _("PHP Executable:"), wxDefaultPosition, wxDefaultSize, 0 );
 	PhpLabel->Wrap( -1 );
-	PhpSizer->Add( PhpLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	fgSizer10->Add( PhpLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	wxBoxSizer* PhpSizer;
+	PhpSizer = new wxBoxSizer( wxHORIZONTAL );
 	
 	PhpExecutable = new wxTextCtrl( this, ID_PHP_EXECUTABLE, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	PhpSizer->Add( PhpExecutable, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
@@ -222,7 +229,24 @@ PhpEnvironmentPanelGeneratedClass::PhpEnvironmentPanelGeneratedClass( wxWindow* 
 	PhpExecutableFile = new wxFilePickerCtrl( this, ID_PHP_FILE, wxEmptyString, _("Location of PHP Executable"), wxT("*"), wxDefaultPosition, wxDefaultSize, wxFLP_FILE_MUST_EXIST|wxFLP_OPEN );
 	PhpSizer->Add( PhpExecutableFile, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	GridSizer->Add( PhpSizer, 1, wxEXPAND, 5 );
+	fgSizer10->Add( PhpSizer, 1, wxEXPAND, 5 );
+	
+	VersionLabel = new wxStaticText( this, ID_VERSIONLABEL, _("Version:"), wxDefaultPosition, wxDefaultSize, 0 );
+	VersionLabel->Wrap( -1 );
+	fgSizer10->Add( VersionLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	wxBoxSizer* bSizer10;
+	bSizer10 = new wxBoxSizer( wxHORIZONTAL );
+	
+	Version = new wxComboBox( this, ID_VERSION, _("Auto"), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_DROPDOWN|wxCB_READONLY );
+	Version->Append( _("Auto") );
+	Version->Append( _("PHP 5.3") );
+	Version->Append( _("PHP 5.4") );
+	bSizer10->Add( Version, 1, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+	
+	fgSizer10->Add( bSizer10, 1, 0, 5 );
+	
+	GridSizer->Add( fgSizer10, 1, wxEXPAND, 5 );
 	
 	MainSizer->Add( GridSizer, 1, wxEXPAND, 5 );
 	

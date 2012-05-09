@@ -40,8 +40,13 @@ static const wxString PHP_KEYWORDS = wxString::FromAscii(
 	"__FILE__ __DIR__ __FUNCTION__ __CLASS__ __METHOD__ __NAMESPACE__ "
 	"require require_once include include_once stdClass parent self abstract "
 	"clone namespace use as new bool boolean float double real string int "
-	"integer var endif endwhile endfor endforeach endswitch "
+	"integer var endif endwhile endfor endforeach endswitch"
 );
+
+static const wxString PHP_54_KEYWORDS = wxString::FromAscii(
+	"trait callable"
+);
+
 
 // want to support both HTML4 and HTML5, using both sets of keywords.
 static const wxString HTML_TAG_NAMES = wxString::FromAscii(
@@ -257,7 +262,7 @@ void mvceditor::TextDocumentClass::DetachFromControl(CodeControlClass* ctrl) {
 
 }
 
-mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::ProjectClass* project, mvceditor::ResourceCacheClass* resourceCache)
+mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::ProjectClass* project, mvceditor::ResourceCacheClass* resourceCache, mvceditor::EnvironmentClass* environment)
 	: wxEvtHandler()
 	, TextDocumentClass()
 	, LanguageDiscovery()
@@ -271,6 +276,7 @@ mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::ProjectClass* project, 
 	, Project(project)
 	, ResourceCache(resourceCache)
 	, ResourceCacheUpdateThread(resourceCache, *this)
+	, Environment(environment)
 	, CurrentCallTipIndex(0)
 	, NeedToUpdateResources(false) 
 	, AreImagesRegistered(false) {
@@ -419,19 +425,22 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 	if (!AreImagesRegistered) {
 		RegisterAutoCompletionImages();
 	}
+	Lexer.SetVersion(Environment->Php.Version);
+	Parser.SetVersion(Environment->Php.Version);
+	ScopeFinder.SetVersion(Environment->Php.Version);
+	
 	std::vector<wxString> autoCompleteList;
 	std::vector<UnicodeString> variableMatches;
 	int expressionPos = code.length() - 1;
 	UnicodeString lastExpression = Lexer.LastExpression(code);
 	pelet::SymbolClass parsedExpression;
-	UnicodeString expressionScope;
+	mvceditor::ScopeResultClass expressionScope;
 	mvceditor::SymbolTableMatchErrorClass error;
 	
 	bool doDuckTyping = Ctrl->CodeControlOptions.EnableDynamicAutoCompletion;
 	if (!lastExpression.isEmpty()) {
 		Parser.ParseExpression(lastExpression, parsedExpression);
-		expressionScope = ScopeFinder.GetScopeString(code, expressionPos);
-		
+		ScopeFinder.GetScopeString(code, expressionPos, expressionScope);
 		ResourceCache->ExpressionCompletionMatches(FileIdentifier, parsedExpression, expressionScope,
 				variableMatches, AutoCompletionResourceMatches, doDuckTyping, error);
 		if (!variableMatches.empty()) {
@@ -523,7 +532,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhpStatus(
 		const mvceditor::SymbolTableMatchErrorClass& error, 
 		const UnicodeString& lastExpression,
 		const pelet::SymbolClass& parsedExpression,
-		const UnicodeString& expressionScope,
+		const mvceditor::ScopeResultClass& expressionScope,
 		wxString& completeStatus) {
 	if (lastExpression.isEmpty()) {
 		completeStatus = _("Nothing to complete");
@@ -532,7 +541,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhpStatus(
 		completeStatus = _("No matching variables for: ");
 		completeStatus += mvceditor::StringHelperClass::IcuToWx(lastExpression);
 		completeStatus +=  _(" in scope: ");
-		completeStatus += mvceditor::StringHelperClass::IcuToWx(expressionScope);
+		completeStatus += mvceditor::StringHelperClass::IcuToWx(expressionScope.MethodName);
 	}
 	else if (parsedExpression.ChainList.size() == 1) {
 		completeStatus = _("No matching class, function, define, or keyword for: \"");
@@ -542,7 +551,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhpStatus(
 	else if (AutoCompletionResourceMatches.empty()) {
 		if (mvceditor::SymbolTableMatchErrorClass::PARENT_ERROR == error.Type) {
 			completeStatus = _("parent not valid for scope: ");
-			completeStatus += mvceditor::StringHelperClass::IcuToWx(expressionScope);
+			completeStatus += mvceditor::StringHelperClass::IcuToWx(expressionScope.MethodName);
 		}
 		else if (mvceditor::SymbolTableMatchErrorClass::STATIC_ERROR == error.Type) {
 			completeStatus = _("Cannot access protected or private static member \"");
@@ -652,7 +661,7 @@ void mvceditor::PhpDocumentClass::HandleCallTip(wxChar ch, bool force) {
 				// when the constructor is called; the matched symbol is the class name and not a method name
 				// here we will look for the constructor
 				// search for all methods of the class
-				UnicodeString className = matches[0].Resource;
+				UnicodeString className = matches[0].ClassName;
 				wxString constructorResourceSearch = mvceditor::StringHelperClass::IcuToWx(className);
 				constructorResourceSearch += wxT("::");
 				std::vector<mvceditor::ResourceClass> matches = ResourceCache->PrepareAndCollectNearMatchResourcesFromAll(constructorResourceSearch);
@@ -741,16 +750,17 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetCurrentSym
 	pelet::ParserClass parser;
 	pelet::SymbolClass parsedExpression;
 	mvceditor::ScopeFinderClass scopeFinder;
-
+	mvceditor::ScopeResultClass scopeResult;
+	
 	UnicodeString lastExpression = lexer.LastExpression(code);
 	bool doDuckTyping = true;
 	if (ResourceCache && !lastExpression.isEmpty()) {
 		parser.ParseExpression(lastExpression, parsedExpression);
-		UnicodeString scopeString = scopeFinder.GetScopeString(code, endPos);
+		scopeFinder.GetScopeString(code, endPos, scopeResult);
 
 		// for now do nothing with error
 		mvceditor::SymbolTableMatchErrorClass error;
-		ResourceCache->ResourceMatches(FileIdentifier, parsedExpression, scopeString, matches, 
+		ResourceCache->ResourceMatches(FileIdentifier, parsedExpression, scopeResult, matches, 
 			doDuckTyping, error);
 	}
 	return matches;
@@ -885,13 +895,13 @@ std::vector<wxString> mvceditor::PhpDocumentClass::CollectNearMatchKeywords(wxSt
 	wxStringTokenizer tokens(keywords, wxT(" "));
 	while (tokens.HasMoreTokens()) {
 		wxString keyword = tokens.GetNextToken();
-		if (0 == keyword.Find(resource)) {
+		wxString keywordLower = keyword.Lower();
+		if (0 == keywordLower.Find(resource)) {
 			matchedKeywords.push_back(keyword);
 		}
 	}
 	return matchedKeywords;
 }
-
 
 std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetSymbolAt(int posToCheck) {
 	UnicodeString code = GetSafeSubstring(0, posToCheck);
@@ -901,13 +911,14 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetSymbolAt(i
 	pelet::ParserClass parser;
 	pelet::SymbolClass parsedExpression;
 	mvceditor::ScopeFinderClass scopeFinder;
-
+	mvceditor::ScopeResultClass expressionScope;
+	
 	UnicodeString lastExpression = lexer.LastExpression(code);
 	UnicodeString resourceName;
 	bool doDuckTyping = true;
 	if (!lastExpression.isEmpty()) {
 		parser.ParseExpression(lastExpression, parsedExpression);
-		UnicodeString expressionScope = scopeFinder.GetScopeString(code, posToCheck);
+		scopeFinder.GetScopeString(code, posToCheck, expressionScope);
 
 		// for now do nothing with error
 		mvceditor::SymbolTableMatchErrorClass error;
@@ -1047,6 +1058,9 @@ void mvceditor::PhpDocumentClass::OnAutoCompletionSelected(wxStyledTextEvent& ev
 }
 
 wxString mvceditor::PhpDocumentClass::GetPhpKeywords() const {
+	if (pelet::PHP_54 == Environment->Php.Version) {
+		return PHP_KEYWORDS + wxT(" ") + PHP_54_KEYWORDS;
+	}
 	return PHP_KEYWORDS;
 }
 wxString mvceditor::PhpDocumentClass::GetHtmlKeywords() const {

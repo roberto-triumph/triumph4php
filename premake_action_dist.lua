@@ -32,23 +32,23 @@ newaction {
 			end
 			os.execute(
 				"mkdir dist && " .. 
-				"mkdir dist\\mvc_editor\\bin && " .. 
-				"mkdir dist\\mvc_editor\\lib &&" .. 
-				"mkdir dist\\mvc_editor\\resources && "  .. 
-				"xcopy /S /Y Release\\*.dll dist\\mvc_editor\\bin && " ..
-				"copy Release\\mvc_editor.exe dist\\mvc_editor\\bin &&" ..
-				"copy resources\\native.php dist\\mvc_editor\\resources "
+				"mkdir dist\\mvc-editor\\bin && " .. 
+				"mkdir dist\\mvc-editor\\lib &&" .. 
+				"mkdir dist\\mvc-editor\\resources && "  .. 
+				"xcopy /S /Y Release\\*.dll dist\\mvc-editor\\bin && " ..
+				"copy Release\\mvc-editor.exe dist\\mvc-editor\\bin &&" ..
+				"copy resources\\native.php dist\\mvc-editor\\resources "
 			)
 		else
 			os.execute(
 				"rm -rf dist && " .. 
-				"mkdir -p dist/mvc_editor/bin && " .. 
-				"mkdir -p dist/mvc_editor/resources && " .. 
-				"cp -R Release/*so* dist/mvc_editor/bin && " .. 
-				"cp Release/mvc_editor dist/mvc_editor/bin/mvc_editor && " .. 
-				"cp resources/native.php dist/mvc_editor/resources/ && " .. 
+				"mkdir -p dist/mvc-editor/bin && " .. 
+				"mkdir -p dist/mvc-editor/resources && " .. 
+				"cp -R Release/*so* dist/mvc-editor/bin && " .. 
+				"cp Release/mvc-editor dist/mvc-editor/bin/mvc-editor && " .. 
+				"cp resources/native.php dist/mvc-editor/resources/ && " .. 
 				"cd dist && " .. 
-				"tar cjf mvc_editor.tar.bz2 mvc_editor"
+				"tar cjf mvc-editor.tar.bz2 mvc-editor"
 			);
 		end
 	end

@@ -148,7 +148,7 @@ static wxString NiceDocText(const UnicodeString& comment) {
 }
 
 mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options, ProjectClass* project, 
-			mvceditor::ResourceCacheClass* resourceCache,
+			mvceditor::ResourceCacheClass* resourceCache, mvceditor::EnvironmentClass* environment,
 			int id, const wxPoint& position, const wxSize& size, long style,
 			const wxString& name)
 		: wxStyledTextCtrl(parent, id, position, size, style, name)
@@ -159,6 +159,7 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 		, CurrentInfo()
 		, ResourceCache(resourceCache)
 		, Project(project)
+		, Environment(environment)
 		, WordHighlightPreviousIndex(-1)
 		, WordHighlightNextIndex(-1)
 		, WordHighlightStyle(0)
@@ -473,7 +474,7 @@ void mvceditor::CodeControlClass::ApplyPreferences() {
 		SetSqlOptions();
 	}
 	else if (mvceditor::CodeControlClass::PHP == DocumentMode) {
-		Document = new mvceditor::PhpDocumentClass(Project, ResourceCache);
+		Document = new mvceditor::PhpDocumentClass(Project, ResourceCache, Environment);
 		Document->SetControl(this);
 		SetCodeControlOptions(CodeControlOptions.PhpStyles);
 		SetPhpOptions();
@@ -508,12 +509,15 @@ void mvceditor::CodeControlClass::SetPhpOptions() {
 	
 	// 7 = as per scintilla docs, HTML lexer uses 7 bits for styles
 	SetStyleBits(7);
-	AutoCompStops(wxT("!@#$%^&*()_+-=[]\\{}|;'\",./<?"));
+	AutoCompStops(wxT("!@#$%^&*()_+-=[]{}|;'\",./<?"));
 	AutoCompSetSeparator('\n');
 	AutoCompSetChooseSingle(true);
 	AutoCompSetFillUps(wxT("(["));
 	AutoCompSetIgnoreCase(true);
-	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$"));
+	
+	// need to add the namespace operator here, it was the only way i could get the
+	// autocompletion to workwith namespaces.
+	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$\\"));
 	
 	SetMarginType(LINT_RESULT_MARGIN, wxSTC_MARGIN_SYMBOL);
 	SetMarginWidth(LINT_RESULT_MARGIN, 16);
@@ -1032,7 +1036,7 @@ void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
 			mvceditor::ResourceClass resource = matches[0];
 			wxString msg;
 			if (resource.Type == mvceditor::ResourceClass::FUNCTION) {
-				msg = mvceditor::StringHelperClass::IcuToWx(resource.Resource);
+				msg = mvceditor::StringHelperClass::IcuToWx(resource.Identifier);
 				msg += wxT("\n\n");
 				msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
 				msg += wxT(" [ ");
@@ -1041,7 +1045,9 @@ void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
 				
 			}
 			else if (resource.Type == mvceditor::ResourceClass::METHOD) {
-				msg = mvceditor::StringHelperClass::IcuToWx(resource.Resource);
+				msg = mvceditor::StringHelperClass::IcuToWx(resource.ClassName);
+				msg += wxT("::");
+				msg += mvceditor::StringHelperClass::IcuToWx(resource.Identifier);
 				msg += wxT("\n\n");
 				msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
 				if (!resource.ReturnType.isEmpty()) {
@@ -1050,8 +1056,10 @@ void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
 					msg += wxT(" ]");	
 				}
 			}
-			else if (resource.Type == mvceditor::ResourceClass::MEMBER) {
-				msg = mvceditor::StringHelperClass::IcuToWx(resource.Resource);
+			else if (resource.Type == mvceditor::ResourceClass::MEMBER || resource.Type == mvceditor::ResourceClass::CLASS_CONSTANT) {
+				msg = mvceditor::StringHelperClass::IcuToWx(resource.ClassName);
+				msg += wxT("::");
+				msg += mvceditor::StringHelperClass::IcuToWx(resource.Identifier);
 				msg += wxT("\n\n");
 				msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
 				if (!resource.ReturnType.isEmpty()) {
@@ -1061,7 +1069,7 @@ void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
 				}
 			}
 			else {
-				msg = mvceditor::StringHelperClass::IcuToWx(resource.Resource);
+				msg = mvceditor::StringHelperClass::IcuToWx(resource.Identifier);
 				msg += wxT("\n\n");
 				msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
 			}

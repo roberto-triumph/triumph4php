@@ -342,6 +342,29 @@ mvceditor::PhpEnvironmentPanelClass::PhpEnvironmentPanelClass(wxWindow* parent, 
 	, Environment(environment) {
 	NonEmptyTextValidatorClass phpExecutableValidator(&environment.Php.PhpExecutablePath, PhpLabel);
 	PhpExecutable->SetValidator(phpExecutableValidator);
+	if (environment.Php.IsAuto) {
+		Version->SetSelection(0);
+	}
+	else if (pelet::PHP_53 == environment.Php.Version) {
+		Version->SetSelection(1);
+	}
+	else if (pelet::PHP_54 == environment.Php.Version) {
+		Version->SetSelection(2);
+	}
+}
+
+void mvceditor::PhpEnvironmentPanelClass::Apply() {
+	int sel = Version->GetCurrentSelection();
+	Environment.Php.IsAuto = false;
+	if (2 == sel) {
+		Environment.Php.Version = pelet::PHP_54;
+	}
+	else if (1 == sel) {
+		Environment.Php.Version = pelet::PHP_53;
+	}
+	else {
+		Environment.Php.IsAuto = true;
+	}
 }
 
 
@@ -373,8 +396,8 @@ mvceditor::EnvironmentDialogClass::EnvironmentDialogClass(wxWindow* parent, mvce
 	CreateButtons(wxOK | wxCANCEL);
 	
 	wxBookCtrlBase* notebook = GetBookCtrl();
-	wxPanel* panel = new mvceditor::PhpEnvironmentPanelClass(notebook, Environment);
-	notebook->AddPage(panel, _("PHP"));
+	PhpEnvironmentPanel = new mvceditor::PhpEnvironmentPanelClass(notebook, Environment);
+	notebook->AddPage(PhpEnvironmentPanel, _("PHP"));
 	ApacheEnvironmentPanel = new mvceditor::ApacheEnvironmentPanelClass(notebook, Environment);
 	notebook->AddPage(ApacheEnvironmentPanel, _("Apache"));
 	WebBrowserPanel = new mvceditor::WebBrowserEditPanelClass(notebook, Environment);
@@ -387,6 +410,10 @@ void mvceditor::EnvironmentDialogClass::OnOkButton(wxCommandEvent& event) {
 	if (Validate() && book->Validate() && TransferDataFromWindow() && book->TransferDataFromWindow()) {
 		WebBrowserPanel->Apply();
 		ApacheEnvironmentPanel->Apply();
+		PhpEnvironmentPanel->Apply();
+		if (Environment.Php.IsAuto) {
+			Environment.Php.AutoDetermine();
+		}
 		EndModal(wxOK);
 	}
 }

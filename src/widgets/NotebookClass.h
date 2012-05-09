@@ -27,6 +27,7 @@
 
 #include <code_control/CodeControlClass.h>
 #include <php_frameworks/ProjectClass.h>
+#include <environment/EnvironmentClass.h>
 #include <Events.h>
 #include <wx/wx.h>
 #include <wx/aui/aui.h>
@@ -56,6 +57,14 @@ public:
 	 * This class will NOT own this pointer.
 	 */
 	ResourceCacheClass* ResourceCache;
+	
+	/**
+	 * Source code editors need to know environment settings, like what version
+	 * of PHP to use.
+	 * 
+	 * This class will NOT own this pointer
+	 */
+	EnvironmentClass* Environment;
 	
 	/**
 	 * Constructor. Parent is needed, all others are optional.

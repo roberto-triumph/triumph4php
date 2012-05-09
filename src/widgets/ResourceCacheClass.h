@@ -197,7 +197,7 @@ public:
 	 *        slower because ResourceFinderClass still handles them
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
-	void ExpressionCompletionMatches(const wxString& fileName, const pelet::SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
+	void ExpressionCompletionMatches(const wxString& fileName, const pelet::SymbolClass& parsedExpression, const ScopeResultClass& expressionScope, 
 		std::vector<UnicodeString>& autoCompleteList,
 		std::vector<ResourceClass>& autoCompleteResourceList,
 		bool doDuckTyping,
@@ -217,13 +217,13 @@ public:
 	 *        slower because ResourceFinderClass still handles them
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
-	void ResourceMatches(const wxString& fileName, const pelet::SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
+	void ResourceMatches(const wxString& fileName, const pelet::SymbolClass& parsedExpression, const ScopeResultClass& expressionScope, 
 		std::vector<ResourceClass>& matches,
 		bool doDuckTyping,
 		SymbolTableMatchErrorClass& error);
 	
 	/**
-	 * print the resource cache to stdout
+	 * print the resource cache to stdout. Really only useful for debugging and not much else
 	 */
 	void Print();
 	
@@ -236,6 +236,16 @@ public:
 	 * @return TRUE if the cache has not been initialized with either a call to Register() or a call to WalkGlobal()
 	 */
 	bool IsResourceCacheEmpty();
+	
+	/**
+	 * Remove all items from all caches and also unregisters any and all files.
+	 */
+	void Clear();
+	
+	/**
+	 * Set the version that the PHP parser should use.
+	 */
+	void SetVersion(pelet::Versions version);
 	 
 private:
 
@@ -261,6 +271,11 @@ private:
 	 * These are the resources from the ENTIRE project; it may include stale resources
 	 */
 	mvceditor::ResourceFinderClass GlobalResourceFinder;
+	
+	/**
+	 * the version of PHP to use when parsing source code
+	 */
+	pelet::Versions Version;
 };
 
 /**

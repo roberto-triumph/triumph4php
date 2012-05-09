@@ -29,16 +29,12 @@ mvceditor::ResourceCacheClass::ResourceCacheClass()
 	: Mutex()
 	, Finders()
 	, SymbolTables()
-	, GlobalResourceFinder() {
+	, GlobalResourceFinder() 
+	, Version(pelet::PHP_53) {
 }
 
 mvceditor::ResourceCacheClass::~ResourceCacheClass() {
-	for (std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it =  Finders.begin(); it != Finders.end(); ++it) {
-		delete it->second;
-	}
-	for (std::map<wxString, mvceditor::SymbolTableClass*>::iterator it =  SymbolTables.begin(); it != SymbolTables.end(); ++it) {
-		delete it->second;
-	}
+	Clear();
 }
 
 bool mvceditor::ResourceCacheClass::Register(const wxString& fileName, bool createSymbols) {
@@ -54,6 +50,8 @@ bool mvceditor::ResourceCacheClass::Register(const wxString& fileName, bool crea
 	if (it == Finders.end() && itSymbols == SymbolTables.end()) {
 		mvceditor::ResourceFinderClass* res = new mvceditor::ResourceFinderClass;
 		mvceditor::SymbolTableClass* table = new mvceditor::SymbolTableClass();
+		res->SetVersion(Version);
+		table->SetVersion(Version);
 		Finders[fileName] = res;
 		SymbolTables[fileName] = table;
 		if (createSymbols) {
@@ -97,6 +95,7 @@ bool mvceditor::ResourceCacheClass::Update(const wxString& fileName, const Unico
 	bool ret = false;
 	if (it != Finders.end() && itSymbols != SymbolTables.end()) {
 		pelet::ParserClass parser;
+		parser.SetVersion(Version);
 		pelet::LintResultsClass results;
 		if (parser.LintString(code, results)) {
 			mvceditor::ResourceFinderClass* finder = it->second;
@@ -237,7 +236,7 @@ std::vector<mvceditor::ResourceFinderClass*> mvceditor::ResourceCacheClass::Iter
 	return finders;
 }
 
-void mvceditor::ResourceCacheClass::ExpressionCompletionMatches(const wxString& fileName, const pelet::SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
+void mvceditor::ResourceCacheClass::ExpressionCompletionMatches(const wxString& fileName, const pelet::SymbolClass& parsedExpression, const mvceditor::ScopeResultClass& expressionScope, 
 													 std::vector<UnicodeString>& autoCompleteList,
 													 std::vector<mvceditor::ResourceClass>& resourceMatches,
 													 bool doDuckTyping,
@@ -261,7 +260,7 @@ void mvceditor::ResourceCacheClass::ExpressionCompletionMatches(const wxString& 
 	}
 }
 
-void mvceditor::ResourceCacheClass::ResourceMatches(const wxString& fileName, const pelet::SymbolClass& parsedExpression, const UnicodeString& expressionScope, 
+void mvceditor::ResourceCacheClass::ResourceMatches(const wxString& fileName, const pelet::SymbolClass& parsedExpression, const mvceditor::ScopeResultClass& expressionScope, 
 													 std::vector<mvceditor::ResourceClass>& matches,
 													 bool doDuckTyping,
 													mvceditor::SymbolTableMatchErrorClass& error) {
@@ -327,7 +326,37 @@ bool mvceditor::ResourceCacheClass::IsResourceCacheEmpty() {
 	return isEmpty;
 }
 
+void mvceditor::ResourceCacheClass::Clear() {
+	wxMutexLocker locker(Mutex);
+	if (!locker.IsOk()) {
+		return;
+	}
+	GlobalResourceFinder.Clear();
+	for (std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it =  Finders.begin(); it != Finders.end(); ++it) {
+		delete it->second;
+	}
+	for (std::map<wxString, mvceditor::SymbolTableClass*>::iterator it =  SymbolTables.begin(); it != SymbolTables.end(); ++it) {
+		delete it->second;
+	}
+	Finders.clear();
+	SymbolTables.clear();	
+}
 
+void mvceditor::ResourceCacheClass::SetVersion(pelet::Versions version) {
+	wxMutexLocker locker(Mutex);
+	if (!locker.IsOk()) {
+		return;
+	}
+	Version = version;
+	GlobalResourceFinder.SetVersion(version);
+	for (std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it =  Finders.begin(); it != Finders.end(); ++it) {
+		it->second->SetVersion(version);
+	}
+	for (std::map<wxString, mvceditor::SymbolTableClass*>::iterator it =  SymbolTables.begin(); it != SymbolTables.end(); ++it) {
+		it->second->SetVersion(version);
+	}
+	
+}
 
 mvceditor::ResourceCacheUpdateThreadClass::ResourceCacheUpdateThreadClass(mvceditor::ResourceCacheClass* resourceCache, wxEvtHandler& handler, int eventId)
 	: ThreadWithHeartbeatClass(handler, eventId)

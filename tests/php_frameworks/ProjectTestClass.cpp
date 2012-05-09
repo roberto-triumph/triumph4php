@@ -124,13 +124,13 @@ TEST_FIXTURE(ProjectTestFixtureClass, ShouldParseResourcesResponse) {
 	std::vector<mvceditor::ResourceClass> resources = ResourcesDetector.Resources;
 	CHECK_EQUAL((size_t)2, resources.size());
 	if ((size_t)2 == resources.size()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("CI_Controller::news_model"), resources[0].Resource);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("CI_Controller"), resources[0].ClassName);
 		CHECK_EQUAL(UNICODE_STRING_SIMPLE("news_model"), resources[0].Identifier);
 		CHECK_EQUAL(UNICODE_STRING_SIMPLE("News_model"), resources[0].ReturnType);
 		CHECK_EQUAL(UNICODE_STRING_SIMPLE("CI_Controller::news_model"), resources[0].Signature);
 		CHECK_EQUAL(mvceditor::ResourceClass::MEMBER, resources[0].Type);
 
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("CI_Controller::admin_user_model"), resources[1].Resource);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("CI_Controller"), resources[1].ClassName);
 		CHECK_EQUAL(UNICODE_STRING_SIMPLE("admin_user_model"), resources[1].Identifier);
 		CHECK_EQUAL(UNICODE_STRING_SIMPLE("Admin_user_model"), resources[1].ReturnType);
 		CHECK_EQUAL(UNICODE_STRING_SIMPLE("CI_Controller::admin_user_model"), resources[1].Signature);

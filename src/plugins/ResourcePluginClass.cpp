@@ -32,7 +32,6 @@
 #include <wx/filename.h>
 #include <wx/valgen.h>
 
-static int ID_JUMP_TO_GAUGE = wxNewId();
 static int ID_COUNT_FILES_GAUGE = wxNewId();
 static int ID_RESOURCE_PLUGIN_PANEL = wxNewId();
 
@@ -159,6 +158,8 @@ void mvceditor::ResourcePluginClass::OnProjectOpened(wxCommandEvent& event) {
 	if (ResourceFileReader.IsRunning()) {
 		ResourceFileReader.StopReading();
 	}
+	GetResourceCache()->Clear();
+	GetResourceCache()->SetVersion(GetEnvironment()->Php.Version);
 	if (NativeFunctionsReader.Init(GetResourceCache())) {
 		mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
 		if (ResourceFileReader.StartReading(error)) {
@@ -173,6 +174,10 @@ void mvceditor::ResourcePluginClass::OnProjectOpened(wxCommandEvent& event) {
 			mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
 		}
 	}
+}
+
+void mvceditor::ResourcePluginClass::OnEnvironmentUpdated(wxCommandEvent& event) {
+	GetResourceCache()->SetVersion(GetEnvironment()->Php.Version);
 }
 
 void mvceditor::ResourcePluginClass::SearchForResources() {
@@ -335,7 +340,8 @@ void mvceditor::ResourcePluginClass::ShowJumpToResults(const wxString& finderQue
 				files[i].Replace(GetProject()->GetRootPath(), wxT(""));
 				if (ResourceFinderClass::FILE_NAME != type &&
 					ResourceFinderClass::FILE_NAME_LINE_NUMBER != type) {
-					files[i] += wxT("  (") + mvceditor::StringHelperClass::IcuToWx(nonNativeMatches[i].Resource) + wxT(")");
+					UnicodeString res = nonNativeMatches[i].ClassName + UNICODE_STRING_SIMPLE("::") + nonNativeMatches[i].Identifier;
+					files[i] += wxT("  (") + mvceditor::StringHelperClass::IcuToWx(res) + wxT(")");
 				}
 			}
 			wxSingleChoiceDialog dialog(NULL,
@@ -412,7 +418,8 @@ void mvceditor::ResourcePluginClass::OnJump(wxCommandEvent& event) {
 	if (codeControl) {
 		std::vector<mvceditor::ResourceClass> matches = codeControl->GetCurrentSymbolResource();
 		if (!matches.empty()) {
-			wxString wxResource = mvceditor::StringHelperClass::IcuToWx(matches[0].Resource);
+			UnicodeString res = matches[0].ClassName + UNICODE_STRING_SIMPLE("::") + matches[0].Identifier;
+			wxString wxResource = mvceditor::StringHelperClass::IcuToWx(res);
 			ShowJumpToResults(wxResource, matches);	
 		}
 		else {

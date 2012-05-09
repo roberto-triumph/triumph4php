@@ -46,8 +46,9 @@ mvceditor::ResourceFinderBackgroundThreadClass::ResourceFinderBackgroundThreadCl
 	ResourceFinder.FileFilters.push_back(wxT("*.*"));
 }
 
-bool mvceditor::ResourceFinderBackgroundThreadClass::Start(const wxString& fileName) {
+bool mvceditor::ResourceFinderBackgroundThreadClass::Start(const wxString& fileName, const mvceditor::EnvironmentClass& environment) {
 	FileName = fileName;
+	ResourceFinder.SetVersion(environment.Php.Version);
 	wxThreadError error = CreateSingleInstance();
 	bool created = wxTHREAD_NO_ERROR == error;
 	if (created) {
@@ -94,7 +95,7 @@ void mvceditor::OutlineViewPluginClass::AddCodeControlClassContextMenuItems(wxMe
 void mvceditor::OutlineViewPluginClass::BuildOutlineCurrentCodeControl() {
 	CodeControlClass* code = GetCurrentCodeControl();
 	if (code != NULL) {
-		if (ResourceFinderBackground.Start(code->GetFileName())) {
+		if (ResourceFinderBackground.Start(code->GetFileName(), *GetEnvironment())) {
 			wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 			if (window != NULL) {
 				OutlineViewPluginPanelClass* outlineViewPanel = (OutlineViewPluginPanelClass*)window;
@@ -229,7 +230,7 @@ void mvceditor::OutlineViewPluginPanelClass::SetStatus(const wxString& status) {
 void mvceditor::OutlineViewPluginPanelClass::SetClasses(const std::vector<mvceditor::ResourceClass>& classes) {
 	Choice->Clear();
 	for (size_t i = 0; i < classes.size(); ++i) {
-		Choice->AppendString(mvceditor::StringHelperClass::IcuToWx(classes[i].Resource));
+		Choice->AppendString(mvceditor::StringHelperClass::IcuToWx(classes[i].Identifier));
 	}
 }
 
@@ -244,13 +245,13 @@ void mvceditor::OutlineViewPluginPanelClass::RefreshOutlines() {
 		// for now never show dynamic resources since there is no way we can know where the source for them is.
 		int type = resources[i].Type;
 		if (mvceditor::ResourceClass::DEFINE == type && !resources[i].IsDynamic) {
-			UnicodeString res = resources[i].Resource;
+			UnicodeString res = resources[i].Identifier;
 			wxString label = mvceditor::StringHelperClass::IcuToWx(res);
 			label = _("[D] ") + label;
 			Tree->AppendItem(rootId, label);
 		}
 		else if (mvceditor::ResourceClass::CLASS == type && !resources[i].IsDynamic) {
-			UnicodeString res = resources[i].Resource;
+			UnicodeString res = resources[i].Identifier;
 			wxString label = mvceditor::StringHelperClass::IcuToWx(res);
 			label = _("[C] ") + label;
 			wxTreeItemId classId = Tree->AppendItem(rootId, label);
@@ -258,7 +259,7 @@ void mvceditor::OutlineViewPluginPanelClass::RefreshOutlines() {
 			// for now just loop again through the resources
 			// for the class we are going to add
 			for (size_t j = 0; j < resources.size(); ++j) {
-				if (resources[j].Resource.indexOf(resources[i].Resource) == 0  && !resources[j].IsDynamic) {
+				if (resources[j].ClassName.caseCompare(resources[i].Identifier, 0) == 0  && !resources[j].IsDynamic) {
 					UnicodeString res = resources[j].Identifier;
 					wxString label = mvceditor::StringHelperClass::IcuToWx(res);
 					if (mvceditor::ResourceClass::MEMBER == resources[j].Type) {
@@ -292,7 +293,7 @@ void mvceditor::OutlineViewPluginPanelClass::RefreshOutlines() {
 			}
 		}
 		else if (mvceditor::ResourceClass::FUNCTION == type && !resources[i].IsDynamic) {
-			UnicodeString res = resources[i].Resource;
+			UnicodeString res = resources[i].Identifier;
 			wxString label = mvceditor::StringHelperClass::IcuToWx(res);
 			label = _("[F] ") + label;
 
