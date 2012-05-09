@@ -789,11 +789,11 @@ void mvceditor::ScopeResultClass::Copy(const mvceditor::ScopeResultClass& src) {
 }
 
 bool mvceditor::ScopeResultClass::IsGlobalScope() const {
-	return UNICODE_STRING_SIMPLE("::") == MethodName;
+	return UNICODE_STRING_SIMPLE("::").compare(MethodName) == 0;
 }
 
 bool mvceditor::ScopeResultClass::IsGlobalNamespace() const {
-	return UNICODE_STRING_SIMPLE("\\") == NamespaceName || NamespaceName.isEmpty();
+	return UNICODE_STRING_SIMPLE("\\").compare(NamespaceName) == 0 || NamespaceName.isEmpty();
 }
 
 

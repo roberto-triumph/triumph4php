@@ -31,5 +31,5 @@ bool mvceditor::UnicodeStringComparatorClass::operator()(const UnicodeString& st
 bool mvceditor::CaseStartsWith(UnicodeString haystack, UnicodeString needle) {
 	haystack.toLower();
 	needle.toLower();
-	return haystack.startsWith(needle);
+	return haystack.startsWith(needle) ? true : false;
 }
