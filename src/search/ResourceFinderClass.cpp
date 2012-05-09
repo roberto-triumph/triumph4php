@@ -943,7 +943,7 @@ void mvceditor::ResourceFinderClass::TraitUseFound(const UnicodeString& namespac
 	}
 }
 
-void mvceditor::ResourceFinderClass::DefineDeclarationFound(const UnicodeString& variableName, 
+void mvceditor::ResourceFinderClass::DefineDeclarationFound(const UnicodeString& namespaceName, const UnicodeString& variableName, 
 		const UnicodeString& variableValue, const UnicodeString& comment, const int lineNumber) {
 	ResourceClass defineItem;
 	defineItem.Identifier = variableName;
@@ -955,6 +955,10 @@ void mvceditor::ResourceFinderClass::DefineDeclarationFound(const UnicodeString&
 	defineItem.Comment = comment;
 	defineItem.IsNative = false;
 	IdentifierCache.push_back(defineItem);
+
+	defineItem.Identifier = QualifyName(namespaceName, variableName);
+	defineItem.Key = QualifyName(namespaceName, variableName);
+	NamespaceCache.push_back(defineItem);
 }
 
 void mvceditor::ResourceFinderClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,

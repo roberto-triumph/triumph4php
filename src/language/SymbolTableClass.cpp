@@ -419,7 +419,7 @@ mvceditor::SymbolTableClass::SymbolTableClass()
 	Parser.SetVariableObserver(this);
 }
 
-void mvceditor::SymbolTableClass::DefineDeclarationFound(const UnicodeString& variableName, 
+void mvceditor::SymbolTableClass::DefineDeclarationFound(const UnicodeString& namespaceName, const UnicodeString& variableName, 
 	const UnicodeString& variableValue, const UnicodeString& comment, const int lineNumber) {
 	pelet::SymbolClass symbol;
 	symbol.SetToPrimitive();

@@ -325,7 +325,7 @@ public:
 	 */
 	void Print() const;
 			
-	void DefineDeclarationFound(const UnicodeString& variableName, const UnicodeString& variableValue, 
+	void DefineDeclarationFound(const UnicodeString& namespaceName, const UnicodeString& variableName, const UnicodeString& variableValue, 
 			const UnicodeString& comment, const int lineNumber);
 
 	void MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 

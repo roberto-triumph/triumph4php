@@ -364,7 +364,7 @@ public:
 	/**
 	 * When a define has been found, add it to the resource cache
 	 */
-	void DefineDeclarationFound(const UnicodeString& variableName, const UnicodeString& variableValue, 
+	void DefineDeclarationFound(const UnicodeString& namespaceName, const UnicodeString& variableName, const UnicodeString& variableValue, 
 			const UnicodeString& comment, const int lineNumber);
 			
 	void TraitAliasFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
