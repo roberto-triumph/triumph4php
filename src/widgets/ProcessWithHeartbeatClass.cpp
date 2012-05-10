@@ -73,7 +73,10 @@ bool mvceditor::ProcessWithHeartbeatClass::Stop(long pid) {
 	std::map<long, wxProcess*>::iterator it = RunningProcesses.find(pid);
 	if (it != RunningProcesses.end()) {
 		it->second->Detach();
-		stopped = 0 == wxProcess::Kill(pid);
+
+		// in Windows, wxSIGTERM is too nice and the process does not die
+		wxKillError killError = wxProcess::Kill(pid, wxSIGKILL); 
+		stopped = wxKILL_OK == killError;
 		delete it->second;
 		RunningProcesses.erase(it);
 	}

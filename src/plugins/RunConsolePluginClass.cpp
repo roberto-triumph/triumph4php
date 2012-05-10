@@ -103,13 +103,14 @@ void  mvceditor::RunConsolePanelClass::RunCommand(wxCommandEvent& event) {
 	else if (CurrentPid > 0) {
 		bool stopped = ProcessWithHeartbeat.Stop(CurrentPid);		
 		if (!stopped) {
-			mvceditor::EditorLogError(mvceditor::ROGUE_PROCESS, 
-				wxString::Format(wxT("Process ID: %ld."), CurrentPid));
 
 			// stale PID??
-			Gauge->StopGauge(IdProcessGauge);
-			CurrentPid = 0;
+			mvceditor::EditorLogError(mvceditor::ROGUE_PROCESS, 
+				wxString::Format(wxT("Process ID: %ld."), CurrentPid));
 		}
+		
+		Gauge->StopGauge(IdProcessGauge);
+		CurrentPid = 0;
 		Command->Enable(true);
 		RunButton->SetLabel(_("Start"));
 	}
