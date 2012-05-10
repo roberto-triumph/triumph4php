@@ -263,6 +263,12 @@ public:
 	 * the user's inputs are saved.
 	 */
 	ComboBoxHistoryClass ReplaceHistory;
+
+	/**
+	 * Holds previously entered directories to search in. We need these to persist longer than the dialog so that
+	 * the user's inputs are saved.
+	 */
+	ComboBoxHistoryClass DirectoriesHistory;
 	
 	/**
 	 * Holds previously entered file filters. We need these to persist longer than the dialog so that
@@ -321,6 +327,7 @@ protected:
 	virtual void OnCancelButton(wxCommandEvent& event);
 	void OnRegExFindHelpButton(wxCommandEvent& event);
 	void OnRegExReplaceHelpButton(wxCommandEvent& event);
+	void OnDirChanged(wxFileDirPickerEvent& event);
 
 private:
 

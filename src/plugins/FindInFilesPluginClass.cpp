@@ -423,14 +423,16 @@ mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvce
 	mvceditor::ProjectClass* project = Plugin.GetProject();
 	Plugin.FindHistory.Attach(FindText);
 	Plugin.ReplaceHistory.Attach(ReplaceWithText);
+	Plugin.DirectoriesHistory.Attach(Directory);
 	Plugin.FilesHistory.Attach(FilesFilter);
 	
 	// the first time showing this dialog populate the filter to have only PHP file extensions
 	if (FilesFilter->GetCount() <= 0) {
 		Plugin.PreviousFindInFiles.FilesFilter = project->GetPhpFileExtensionsString();
 	}
-	if (NULL != project && !project->GetRootPath().IsEmpty()) {
-		Directory->SetPath(project->GetRootPath());
+	if (NULL != project && !project->GetRootPath().IsEmpty() && Directory->GetCount() <= 0) {
+		Directory->Append(project->GetRootPath());
+		Directory->SetSelection(0);
 	}
 	mvceditor::RegularExpressionValidatorClass regExValidator(&Plugin.PreviousFindInFiles.Expression, FinderMode);
 	FindText->SetValidator(regExValidator);
@@ -472,16 +474,19 @@ void mvceditor::FindInFilesDialogClass::OnOkButton(wxCommandEvent& event) {
 		if (!Plugin.PreviousFindInFiles.Prepare()) {
 			wxMessageBox(_("Expression is not valid."), _("Find In Files"), wxOK | wxCENTER, this);
 		}
-		else if (Directory->GetPath().IsEmpty()) {
+		else if (Directory->GetStringSelection().IsEmpty()) {
 			wxMessageBox(_("Find path must not be empty."), _("Find In Files"), wxOK | wxCENTER, this);
 		}
 		else {
-			Plugin.PreviousFindPath = Directory->GetPath();
+			Plugin.PreviousFindPath = Directory->GetStringSelection();
 			Plugin.FindHistory.Save();
 			Plugin.ReplaceHistory.Save();
+			Plugin.DirectoriesHistory.Save();
 			Plugin.FilesHistory.Save();
+
 			Plugin.FindHistory.Detach();
 			Plugin.ReplaceHistory.Detach();
+			Plugin.DirectoriesHistory.Detach();
 			Plugin.FilesHistory.Detach();
 			EndModal(wxID_OK);
 		}
@@ -493,8 +498,23 @@ void mvceditor::FindInFilesDialogClass::OnCancelButton(wxCommandEvent& event) {
 	// need to do this to prevent crash on app exit
 	Plugin.FindHistory.Detach();
 	Plugin.ReplaceHistory.Detach();
+	Plugin.DirectoriesHistory.Detach();
 	Plugin.FilesHistory.Detach();
 	EndModal(wxID_CANCEL);
+}
+
+void mvceditor::FindInFilesDialogClass::OnDirChanged(wxFileDirPickerEvent& event) {
+	wxString path = event.GetPath();
+
+	// add the selected directory, but only if its not already in the list
+	int index = Directory->FindString(path);
+	if (wxNOT_FOUND != index && !path.IsEmpty()) {
+		Directory->SetSelection(index);
+	}
+	else {
+		int newIndex = Directory->Append(path);
+		Directory->SetSelection(newIndex);
+	}
 }
 
 void mvceditor::FindInFilesDialogClass::OnKeyDown(wxKeyEvent& event) {

@@ -47,7 +47,8 @@ class FindInFilesDialogGeneratedClass : public wxDialog
 		wxStaticText* ReplaceWithLabel;
 		wxButton* RegexReplaceWithHelpButton;
 		wxComboBox* ReplaceWithText;
-		wxDirPickerCtrl* Directory;
+		wxComboBox* Directory;
+		wxDirPickerCtrl* DirectoryDirPicker;
 		wxComboBox* FilesFilter;
 		wxRadioBox* FinderMode;
 		wxCheckBox* CaseSensitive;
@@ -59,6 +60,7 @@ class FindInFilesDialogGeneratedClass : public wxDialog
 		virtual void OnRegExFindHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRegExReplaceHelpButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDirChanged( wxFileDirPickerEvent& event ) { event.Skip(); }
 		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
 		
 	

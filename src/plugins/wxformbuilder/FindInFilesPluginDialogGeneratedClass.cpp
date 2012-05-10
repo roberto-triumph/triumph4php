@@ -74,10 +74,13 @@ FindInFilesDialogGeneratedClass::FindInFilesDialogGeneratedClass( wxWindow* pare
 	MidSizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxStaticBoxSizer* DirectorySizer;
-	DirectorySizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Directory To Search:") ), wxVERTICAL );
+	DirectorySizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Directory To Search:") ), wxHORIZONTAL );
 	
-	Directory = new wxDirPickerCtrl( this, wxID_ANY, wxEmptyString, wxT("Select a directory to search in"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_DIR_MUST_EXIST|wxDIRP_USE_TEXTCTRL );
-	DirectorySizer->Add( Directory, 0, wxALL|wxEXPAND, 5 );
+	Directory = new wxComboBox( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxTE_PROCESS_ENTER ); 
+	DirectorySizer->Add( Directory, 1, wxALL|wxEXPAND, 5 );
+	
+	DirectoryDirPicker = new wxDirPickerCtrl( this, wxID_ANY, wxEmptyString, wxT("Select a directory to search in"), wxDefaultPosition, wxDefaultSize, wxDIRP_DIR_MUST_EXIST );
+	DirectorySizer->Add( DirectoryDirPicker, 0, wxALL|wxEXPAND, 5 );
 	
 	MidSizer->Add( DirectorySizer, 1, wxALL|wxEXPAND, 5 );
 	
@@ -139,6 +142,8 @@ FindInFilesDialogGeneratedClass::FindInFilesDialogGeneratedClass( wxWindow* pare
 	FindText->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnOkButton ), NULL, this );
 	RegexReplaceWithHelpButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnRegExReplaceHelpButton ), NULL, this );
 	ReplaceWithText->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnOkButton ), NULL, this );
+	Directory->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnOkButton ), NULL, this );
+	DirectoryDirPicker->Connect( wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler( FindInFilesDialogGeneratedClass::OnDirChanged ), NULL, this );
 	FilesFilter->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnOkButton ), NULL, this );
 	ButtonsSizerCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnCancelButton ), NULL, this );
 	ButtonsSizerOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnOkButton ), NULL, this );
@@ -151,6 +156,8 @@ FindInFilesDialogGeneratedClass::~FindInFilesDialogGeneratedClass()
 	FindText->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnOkButton ), NULL, this );
 	RegexReplaceWithHelpButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnRegExReplaceHelpButton ), NULL, this );
 	ReplaceWithText->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnOkButton ), NULL, this );
+	Directory->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnOkButton ), NULL, this );
+	DirectoryDirPicker->Disconnect( wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler( FindInFilesDialogGeneratedClass::OnDirChanged ), NULL, this );
 	FilesFilter->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnOkButton ), NULL, this );
 	ButtonsSizerCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnCancelButton ), NULL, this );
 	ButtonsSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnOkButton ), NULL, this );
