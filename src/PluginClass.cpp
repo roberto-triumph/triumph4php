@@ -135,11 +135,25 @@ wxWindow* mvceditor::PluginClass::FindOutlineWindow(int windowId) const {
 
 bool mvceditor::PluginClass::IsToolsWindowSelected(int windowId) const {
 	wxWindow* window = wxWindow::FindWindowById(windowId, GetToolsNotebook());
+	wxAuiPaneInfo info = AuiManager->GetPane(ToolsNotebook);
+	if (!info.IsShown()) {
+		
+		// if the notebook itself is not shown, it means that the window
+		// is hidden because its parent is hidden
+		return false;
+	}
 	int windowIndex = ToolsNotebook->GetPageIndex(window); 
 	return windowIndex != wxNOT_FOUND && windowIndex == ToolsNotebook->GetSelection();
 }
 
 bool mvceditor::PluginClass::IsToolsWindowSelectedByName(const wxString& name) const {
+	wxAuiPaneInfo info = AuiManager->GetPane(ToolsNotebook);
+	if (!info.IsShown()) {
+		
+		// if the notebook itself is not shown, it means that the outline window
+		// is hidden because its parent is hidden
+		return false;
+	}
 	size_t selection = ToolsNotebook->GetSelection();
 	if (selection >= 0 && selection < ToolsNotebook->GetPageCount()) {
 		return ToolsNotebook->GetPage(selection)->GetName() == name;
@@ -148,7 +162,15 @@ bool mvceditor::PluginClass::IsToolsWindowSelectedByName(const wxString& name) c
 }
 
 bool mvceditor::PluginClass::IsOutlineWindowSelected(int windowId) const {
+	
 	wxWindow* window = wxWindow::FindWindowById(windowId, GetOutlineNotebook());
+	wxAuiPaneInfo info = AuiManager->GetPane(OutlineNotebook);
+	if (!info.IsShown()) {
+		
+		// if the notebook itself is not shown, it means that the window
+		// is hidden because its parent is hidden
+		return false;
+	}
 	int windowIndex = OutlineNotebook->GetPageIndex(window); 
 	return windowIndex != wxNOT_FOUND && windowIndex == OutlineNotebook->GetSelection();
 }
