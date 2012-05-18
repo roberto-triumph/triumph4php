@@ -33,6 +33,14 @@ mvceditor::DirectorySearchClass::DirectorySearchClass()
 	, TotalFileCount(0) {
 }
 
+mvceditor::DirectorySearchClass::~DirectorySearchClass() {
+	while (!Directories.empty()) {
+		wxString* dir = Directories.top();
+		Directories.pop();
+		delete dir;
+	}
+}
+
 bool mvceditor::DirectorySearchClass::Init(const wxString& path, Modes mode) {
 	TotalFileCount = 0;
 	while (!CurrentFiles.empty()) {

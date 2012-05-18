@@ -75,6 +75,8 @@ public:
 
 	DirectorySearchClass();
 	
+	~DirectorySearchClass();
+	
 	/**
 	 * Initialize a search.
 	 * 
