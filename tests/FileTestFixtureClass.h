@@ -50,8 +50,10 @@ public:
 	 * "Hides" the given file by executing the appropriate OS command to set the file
 	 * to be a hidden file.
 	 * @param fileName full path of file to hide. Note: does NOT handle non-ascii file names
+	 * @return wxString the name of the hidden file (ie. in case of linux the file is renamed to start
+	 *        with a '.' )
 	 */
-	void HideFile(const wxString& fileName);
+	wxString HideFile(const wxString& fileName);
 	
 	/**
 	 * Create a sub-directory within tempDirectory

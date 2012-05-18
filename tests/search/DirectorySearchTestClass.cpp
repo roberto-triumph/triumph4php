@@ -153,9 +153,9 @@ TEST_FIXTURE(DirectorySearchTestClass, WalkShouldMatchHiddenFilesInRecursive) {
 	CreateTestFiles();
 
 	// hide all of the file_two.php
-	HideFile(TestProjectDir + wxFileName::GetPathSeparator() + wxT("file_two.php"));
-	HideFile(TestProjectDir + wxT("folder_one") + wxFileName::GetPathSeparator() + wxT("file_two.php"));
-	HideFile(TestProjectDir + wxT("folder_two") + wxFileName::GetPathSeparator() + wxT("file_two.php"));
+	wxString hiddenFile1 = HideFile(TestProjectDir + wxFileName::GetPathSeparator() + wxT("file_two.php"));
+	wxString hiddenFile2 = HideFile(TestProjectDir + wxT("folder_one") + wxFileName::GetPathSeparator() + wxT("file_two.php"));
+	wxString hiddenFile3 = HideFile(TestProjectDir + wxT("folder_two") + wxFileName::GetPathSeparator() + wxT("file_two.php"));
 
 	FileTestDirectoryWalker walker;
 	CHECK(DirectorySearch.Init(TestProjectDir, mvceditor::DirectorySearchClass::RECURSIVE, true));
@@ -168,15 +168,15 @@ TEST_FIXTURE(DirectorySearchTestClass, WalkShouldMatchHiddenFilesInRecursive) {
 	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + + wxT("folder_one") + wxFileName::GetPathSeparator() + wxT("file_one.php")));
 	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + + wxT("folder_two") + wxFileName::GetPathSeparator() + wxT("file_one.php")));
 	
-	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + wxT("file_two.php")));
-	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + + wxT("folder_one") + wxFileName::GetPathSeparator() + wxT("file_two.php")));
-	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + + wxT("folder_two") + wxFileName::GetPathSeparator() + wxT("file_two.php")));
+	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), hiddenFile1));
+	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), hiddenFile2));
+	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), hiddenFile3));
 
 }
 
 TEST_FIXTURE(DirectorySearchTestClass, WalkShouldMatchHiddenFilesInPreciseMode) {
 	CreateTestFiles();
-	HideFile(TestProjectDir + wxT("file_two.php"));
+	wxString hiddenFile1 = HideFile(TestProjectDir + wxT("file_two.php"));
 	
 	FileTestDirectoryWalker walker;
 	CHECK(DirectorySearch.Init(TestProjectDir, mvceditor::DirectorySearchClass::PRECISE, true));
@@ -189,7 +189,7 @@ TEST_FIXTURE(DirectorySearchTestClass, WalkShouldMatchHiddenFilesInPreciseMode) 
 	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + + wxT("folder_one") + wxFileName::GetPathSeparator() + wxT("file_one.php")));
 	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + + wxT("folder_two") + wxFileName::GetPathSeparator() + wxT("file_one.php")));
 	
-	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + wxT("file_two.php")));
+	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), hiddenFile1));
 	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + + wxT("folder_one") + wxFileName::GetPathSeparator() + wxT("file_two.php")));
 	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + + wxT("folder_two") + wxFileName::GetPathSeparator() + wxT("file_two.php")));
 }

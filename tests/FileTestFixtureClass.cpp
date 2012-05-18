@@ -83,10 +83,12 @@ void FileTestFixtureClass::CreateFixtureFile(const wxString& fileName, const wxS
 	file.close();
 }
 
-void FileTestFixtureClass::HideFile(const wxString& fileName) {	
+wxString FileTestFixtureClass::HideFile(const wxString& fileName) {	
 
 	// since tests are not wxApps we cannot use wxPlatformInfo or wxExecute
 	// must do it the hard way
+	
+	// start with the windows way
 	wxString wxHideCmd = wxT("attrib +H ");
 	wxHideCmd += fileName;
 	size_t rawLength = 0;
@@ -95,8 +97,15 @@ void FileTestFixtureClass::HideFile(const wxString& fileName) {
 	const char *cmd = buf.data();
 	int ret = system(cmd);
 	if (ret != 0) {
-		//TODO hide the file when running tests on a linux box?
+		
+		//hide the file when running tests on a linux box by renaming to a dot file
+		wxString hiddenName;
+		wxFileName wxf(fileName);
+		hiddenName = wxf.GetPath(true) + wxT(".") + wxf.GetFullName();
+		wxRenameFile(fileName, hiddenName, true);
+		return hiddenName;
 	}
+	return fileName;
 }
 
 wxString FileTestFixtureClass::GetFileContents(const wxString& fileName) {
