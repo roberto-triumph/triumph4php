@@ -83,9 +83,10 @@ public:
 	 *        total files count available.  In RECURSIVE mode, sub-directories are recursed one at a time.  PRECISE mode
 	 *        is useful when the caller needs to know how many total files will be walked over, but it is also more
 	 *        memory intensive.  Note that both modes will result in walking of all files.
+	 * @return bool doHidden if TRUE then hidden files will be walked as well.
 	 * @return bool true of the given path exists
 	 */
-	bool Init(const wxString& path, Modes mode = RECURSIVE);
+	bool Init(const wxString& path, Modes mode = RECURSIVE, bool doHidden = false);
 	
 	/**
 	 * Passes the current file to the given walker and advances to the next file. Note that the files are not guaranteed to
@@ -157,6 +158,11 @@ private:
 	 */
 	int TotalFileCount;
 	
+	/**
+	 * Flag to search hidden files.
+	 * @var bool if true then hidden files are searched.
+	 */
+	bool DoHiddenFiles;
 };
 
 }

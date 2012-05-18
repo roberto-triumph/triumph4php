@@ -45,6 +45,13 @@ public:
 	 * @param wxString contents the file contents.
 	 */
 	void CreateFixtureFile(const wxString& fileName, const wxString& contents);
+
+	/**
+	 * "Hides" the given file by executing the appropriate OS command to set the file
+	 * to be a hidden file.
+	 * @param fileName full path of file to hide. Note: does NOT handle non-ascii file names
+	 */
+	void HideFile(const wxString& fileName);
 	
 	/**
 	 * Create a sub-directory within tempDirectory

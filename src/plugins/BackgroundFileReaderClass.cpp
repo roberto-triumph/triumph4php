@@ -31,9 +31,10 @@ mvceditor::BackgroundFileReaderClass::BackgroundFileReaderClass(wxEvtHandler& ha
 	, Mode(WALK) {
 }
 
-bool mvceditor::BackgroundFileReaderClass::Init(const wxString& path, mvceditor::DirectorySearchClass::Modes mode) {
+bool mvceditor::BackgroundFileReaderClass::Init(const wxString& path, mvceditor::DirectorySearchClass::Modes mode,
+												bool doHiddenFiles) {
 	Mode = WALK;
-	return DirectorySearch.Init(path, mode);
+	return DirectorySearch.Init(path, mode, doHiddenFiles);
 }
 
 bool mvceditor::BackgroundFileReaderClass::InitMatched() {

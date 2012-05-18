@@ -52,15 +52,11 @@ wxString FILE_2 = wxString::FromAscii(
 class FindInFilesTestFixtureClass : public FileTestFixtureClass {
 public:
 	FindInFilesTestFixtureClass()
-			: FileTestFixtureClass(wxT("find_in_files"))  {
-		FindInFiles = new mvceditor::FindInFilesClass();
+		: FileTestFixtureClass(wxT("find_in_files")) 
+		, FindInFiles() {
 	}
 
-	virtual ~FindInFilesTestFixtureClass() {
-		delete FindInFiles;
-	}
-
-	mvceditor::FindInFilesClass* FindInFiles;
+	mvceditor::FindInFilesClass FindInFiles;
 };
 
 SUITE(FindInFilesTestClass) {
@@ -69,79 +65,79 @@ TEST_FIXTURE(FindInFilesTestFixtureClass, WalkShouldOnlySearchWhenWildcardsMatch
 	CreateFixtureFile(wxT("user.php"), FILE_1);
 	CreateFixtureFile(wxT("admin.inc"), FILE_1);
 	CreateFixtureFile(wxT("admin.php_bak"), FILE_1);
-	FindInFiles->Expression = UNICODE_STRING_SIMPLE("UserClass");
-	FindInFiles->FilesFilter = wxT("*.php;*.inc");
-	CHECK(FindInFiles->Prepare());
-	CHECK(FindInFiles->Walk(TestProjectDir + wxT("user.php")));
-	CHECK(FindInFiles->Walk(TestProjectDir + wxT("admin.inc")));
-	CHECK_EQUAL(false, FindInFiles->Walk(TestProjectDir + wxT("admin.php_bak")));
+	FindInFiles.Expression = UNICODE_STRING_SIMPLE("UserClass");
+	FindInFiles.FilesFilter = wxT("*.php;*.inc");
+	CHECK(FindInFiles.Prepare());
+	CHECK(FindInFiles.Walk(TestProjectDir + wxT("user.php")));
+	CHECK(FindInFiles.Walk(TestProjectDir + wxT("admin.inc")));
+	CHECK_EQUAL(false, FindInFiles.Walk(TestProjectDir + wxT("admin.php_bak")));
 }
 
 TEST_FIXTURE(FindInFilesTestFixtureClass, WalkShouldLocateNextMatchWhenItReturnsTrue) {
 	CreateFixtureFile(wxT("user.php"), FILE_1);
-	FindInFiles->Expression = UNICODE_STRING_SIMPLE("UserClass");
-	CHECK(FindInFiles->Prepare());
-	CHECK(FindInFiles->Walk(TestProjectDir + wxT("user.php")));
-	CHECK_EQUAL(2, FindInFiles->GetCurrentLineNumber());
+	FindInFiles.Expression = UNICODE_STRING_SIMPLE("UserClass");
+	CHECK(FindInFiles.Prepare());
+	CHECK(FindInFiles.Walk(TestProjectDir + wxT("user.php")));
+	CHECK_EQUAL(2, FindInFiles.GetCurrentLineNumber());
 }
 
 TEST_FIXTURE(FindInFilesTestFixtureClass, FindNextShouldLocateNextMatchWhenSearchingFromTheMiddle) {
 	CreateFixtureFile(wxT("user.php"), FILE_1);
-	FindInFiles->Expression = UNICODE_STRING_SIMPLE("name");
-	FindInFiles->CaseSensitive = false;
-	CHECK(FindInFiles->Prepare());
-	CHECK(FindInFiles->Walk(TestProjectDir + wxT("user.php")));
-	CHECK_EQUAL(3, FindInFiles->GetCurrentLineNumber());
-	CHECK(FindInFiles->FindNext());
-	CHECK_EQUAL(4, FindInFiles->GetCurrentLineNumber());
-	CHECK(FindInFiles->FindNext());
-	CHECK_EQUAL(5, FindInFiles->GetCurrentLineNumber());
-	CHECK_EQUAL(false, FindInFiles->FindNext());
+	FindInFiles.Expression = UNICODE_STRING_SIMPLE("name");
+	FindInFiles.CaseSensitive = false;
+	CHECK(FindInFiles.Prepare());
+	CHECK(FindInFiles.Walk(TestProjectDir + wxT("user.php")));
+	CHECK_EQUAL(3, FindInFiles.GetCurrentLineNumber());
+	CHECK(FindInFiles.FindNext());
+	CHECK_EQUAL(4, FindInFiles.GetCurrentLineNumber());
+	CHECK(FindInFiles.FindNext());
+	CHECK_EQUAL(5, FindInFiles.GetCurrentLineNumber());
+	CHECK_EQUAL(false, FindInFiles.FindNext());
 	
 }
 
 TEST_FIXTURE(FindInFilesTestFixtureClass, FindNextShouldLocateNextMatchWhenSearchingCaseInsesitive) {
 	CreateFixtureFile(wxT("user.php"), FILE_1);
-	FindInFiles->Expression = UNICODE_STRING_SIMPLE("userclass");
-	FindInFiles->CaseSensitive = false;
-	CHECK(FindInFiles->Prepare());
-	CHECK(FindInFiles->Walk(TestProjectDir + wxT("user.php")));
-	CHECK_EQUAL(2, FindInFiles->GetCurrentLineNumber());
+	FindInFiles.Expression = UNICODE_STRING_SIMPLE("userclass");
+	FindInFiles.CaseSensitive = false;
+	CHECK(FindInFiles.Prepare());
+	CHECK(FindInFiles.Walk(TestProjectDir + wxT("user.php")));
+	CHECK_EQUAL(2, FindInFiles.GetCurrentLineNumber());
 }
 
 TEST_FIXTURE(FindInFilesTestFixtureClass, FindNextShouldNotLocateNextMatchWhenNoMatchIsFound) {
 	CreateFixtureFile(wxT("user.php"), FILE_1);
-	FindInFiles->Expression = UNICODE_STRING_SIMPLE("AnotherUserClass");
-	CHECK(FindInFiles->Prepare());
-	CHECK_EQUAL(false, FindInFiles->Walk(TestProjectDir + wxT("user.php")));
-	CHECK_EQUAL(false, FindInFiles->FindNext());
+	FindInFiles.Expression = UNICODE_STRING_SIMPLE("AnotherUserClass");
+	CHECK(FindInFiles.Prepare());
+	CHECK_EQUAL(false, FindInFiles.Walk(TestProjectDir + wxT("user.php")));
+	CHECK_EQUAL(false, FindInFiles.FindNext());
 }
 
 TEST_FIXTURE(FindInFilesTestFixtureClass, PrepareShouldReturnTrueWhenExpressionsAreValid) {
 	CreateFixtureFile(wxT("user.php"), FILE_1);
-	FindInFiles->Expression = UNICODE_STRING_SIMPLE("\\s*UserClass\\s*");
-	FindInFiles->ReplaceExpression = UNICODE_STRING_SIMPLE("\\s*GuestUserClass\\s*");
-	FindInFiles->Mode = mvceditor::FinderClass::REGULAR_EXPRESSION;
-	CHECK(FindInFiles->Prepare());
+	FindInFiles.Expression = UNICODE_STRING_SIMPLE("\\s*UserClass\\s*");
+	FindInFiles.ReplaceExpression = UNICODE_STRING_SIMPLE("\\s*GuestUserClass\\s*");
+	FindInFiles.Mode = mvceditor::FinderClass::REGULAR_EXPRESSION;
+	CHECK(FindInFiles.Prepare());
 }
 
 TEST_FIXTURE(FindInFilesTestFixtureClass, PrepareShouldReturnFalseWhenExpressionIsInvalid) {
 	CreateFixtureFile(wxT("user.php"), FILE_1);
-	FindInFiles->Expression = UNICODE_STRING_SIMPLE("\\s*(UserClass\\s*");
-	FindInFiles->ReplaceExpression = UNICODE_STRING_SIMPLE("\\s*GuestUserClass\\s*");
-	FindInFiles->Mode = mvceditor::FinderClass::REGULAR_EXPRESSION;
-	CHECK_EQUAL(false, FindInFiles->Prepare());
+	FindInFiles.Expression = UNICODE_STRING_SIMPLE("\\s*(UserClass\\s*");
+	FindInFiles.ReplaceExpression = UNICODE_STRING_SIMPLE("\\s*GuestUserClass\\s*");
+	FindInFiles.Mode = mvceditor::FinderClass::REGULAR_EXPRESSION;
+	CHECK_EQUAL(false, FindInFiles.Prepare());
 }
 
 
 TEST_FIXTURE(FindInFilesTestFixtureClass, ReplaceAllMatchesShouldReplaceAllMatches) {
 	CreateFixtureFile(wxT("admin.inc"), FILE_2);
-	FindInFiles->Expression = UNICODE_STRING_SIMPLE("WORK_FILE");
-	FindInFiles->ReplaceExpression = UNICODE_STRING_SIMPLE("FILENAME_WORK");
-	FindInFiles->Mode = mvceditor::FinderClass::REGULAR_EXPRESSION;
-	CHECK(FindInFiles->Prepare());
+	FindInFiles.Expression = UNICODE_STRING_SIMPLE("WORK_FILE");
+	FindInFiles.ReplaceExpression = UNICODE_STRING_SIMPLE("FILENAME_WORK");
+	FindInFiles.Mode = mvceditor::FinderClass::REGULAR_EXPRESSION;
+	CHECK(FindInFiles.Prepare());
 	UnicodeString newText = mvceditor::StringHelperClass::wxToIcu(FILE_2);
-	CHECK_EQUAL(2, FindInFiles->ReplaceAllMatches(newText));
+	CHECK_EQUAL(2, FindInFiles.ReplaceAllMatches(newText));
 	UnicodeString expectedText = mvceditor::StringHelperClass::wxToIcu(FILE_2);
 	expectedText.findAndReplace(UNICODE_STRING_SIMPLE("WORK_FILE"), UNICODE_STRING_SIMPLE("FILENAME_WORK"));
 	CHECK_EQUAL(expectedText, newText);
@@ -151,14 +147,14 @@ TEST_FIXTURE(FindInFilesTestFixtureClass, ReplaceAllMatchesInFileShouldReplaceAl
 	CreateFixtureFile(wxT("user.php"), FILE_1);
 	CreateFixtureFile(wxT("admin.inc"), FILE_2);
 	CreateFixtureFile(wxT("admin.php_bak"), FILE_2);
-	FindInFiles->Expression = UNICODE_STRING_SIMPLE("\\s*(UserClass)\\s*");
-	FindInFiles->ReplaceExpression = UNICODE_STRING_SIMPLE(" Guest$1 ");
-	FindInFiles->Mode = mvceditor::FinderClass::REGULAR_EXPRESSION;
-	CHECK(FindInFiles->Prepare());
+	FindInFiles.Expression = UNICODE_STRING_SIMPLE("\\s*(UserClass)\\s*");
+	FindInFiles.ReplaceExpression = UNICODE_STRING_SIMPLE(" Guest$1 ");
+	FindInFiles.Mode = mvceditor::FinderClass::REGULAR_EXPRESSION;
+	CHECK(FindInFiles.Prepare());
 	int matches = 0;
-	matches += FindInFiles->ReplaceAllMatchesInFile(TestProjectDir + wxT("user.php"));
-	matches += FindInFiles->ReplaceAllMatchesInFile(TestProjectDir + wxT("admin.inc"));
-	matches += FindInFiles->ReplaceAllMatchesInFile(TestProjectDir + wxT("admin.php_bak"));
+	matches += FindInFiles.ReplaceAllMatchesInFile(TestProjectDir + wxT("user.php"));
+	matches += FindInFiles.ReplaceAllMatchesInFile(TestProjectDir + wxT("admin.inc"));
+	matches += FindInFiles.ReplaceAllMatchesInFile(TestProjectDir + wxT("admin.php_bak"));
 	CHECK_EQUAL(3, matches);
 	
 	// check that files were actually modified
@@ -180,14 +176,15 @@ TEST_FIXTURE(FindInFilesTestFixtureClass, ReplaceAllMatchesInFileShouldReplaceAl
 	 CHECK_EQUAL(expectedContents, fileContents);
 }
 
+
 //TEST_FIXTURE(FindInFilesTestFixtureClass, FindInCurrentFileShouldFindExpressionWhenFileHasHighAsciiCharacters) {
-//	FindInFiles->Expression = UNICODE_STRING_SIMPLE("ExtendedRecordSetForUnitTestAddGetLeftJoin");
+//	FindInFiles.Expression = UNICODE_STRING_SIMPLE("ExtendedRecordSetForUnitTestAddGetLeftJoin");
 //	DirectorySearchClass search;
-//	FindInFiles->FilesFilter = UNICODE_STRING_SIMPLE("*RecordSet.php");
+//	FindInFiles.FilesFilter = UNICODE_STRING_SIMPLE("*RecordSet.php");
 //	search.Init(wxT("/home/roberto/workspace/sample_php_project/developer_tests/library/db/"));
-//	CHECK(FindInFiles->Prepare());
+//	CHECK(FindInFiles.Prepare());
 //	while (search.More()) {
-//		search.Walk(*FindInFiles);
+//		search.Walk(FindInFiles);
 //	}
 //	printf("matches found:%d\n", search.GetMatchedFiles().size());
 //}

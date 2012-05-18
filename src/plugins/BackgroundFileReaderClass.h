@@ -106,9 +106,16 @@ public:
 	/**
 	 * Prepare the background thread to iterate through all
 	 * files in the given directory.
-	 * @return bool true if the given path is valid and exists
+	 *
+	 * @param const wxString& path the path to recurse
+	 * @param one of RECURSIVE or PRECISE.  in PRECISE mode, all files for all sub-directories are enumerated at once, making the 
+	 *        total files count available.  In RECURSIVE mode, sub-directories are recursed one at a time.  PRECISE mode
+	 *        is useful when the caller needs to know how many total files will be walked over, but it is also more
+	 *        memory intensive.  Note that both modes will result in walking of all files.
+	 * @return bool doHidden if TRUE then hidden files will be walked as well.
+	 * @return bool true of the given path exists
 	 */
-	bool Init(const wxString& path, DirectorySearchClass::Modes mode = DirectorySearchClass::RECURSIVE);
+	bool Init(const wxString& path, DirectorySearchClass::Modes mode = DirectorySearchClass::RECURSIVE, bool doHiddenFiles = false);
 
 	/**
 	 * prepares the thread to iterate over the last set of matched files
