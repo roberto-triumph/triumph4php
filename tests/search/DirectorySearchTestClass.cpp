@@ -153,7 +153,7 @@ TEST_FIXTURE(DirectorySearchTestClass, WalkShouldMatchHiddenFilesInRecursive) {
 	CreateTestFiles();
 
 	// hide all of the file_two.php
-	wxString hiddenFile1 = HideFile(TestProjectDir + wxFileName::GetPathSeparator() + wxT("file_two.php"));
+	wxString hiddenFile1 = HideFile(TestProjectDir + wxT("file_two.php"));
 	wxString hiddenFile2 = HideFile(TestProjectDir + wxT("folder_one") + wxFileName::GetPathSeparator() + wxT("file_two.php"));
 	wxString hiddenFile3 = HideFile(TestProjectDir + wxT("folder_two") + wxFileName::GetPathSeparator() + wxT("file_two.php"));
 
@@ -165,8 +165,8 @@ TEST_FIXTURE(DirectorySearchTestClass, WalkShouldMatchHiddenFilesInRecursive) {
 	CHECK_EQUAL((unsigned int)6, DirectorySearch.GetMatchedFiles().size());
 	std::vector<wxString> matchedFiles = DirectorySearch.GetMatchedFiles();
 	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + wxT("file_one.php")));
-	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + + wxT("folder_one") + wxFileName::GetPathSeparator() + wxT("file_one.php")));
-	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + + wxT("folder_two") + wxFileName::GetPathSeparator() + wxT("file_one.php")));
+	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + wxT("folder_one") + wxFileName::GetPathSeparator() + wxT("file_one.php")));
+	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + wxT("folder_two") + wxFileName::GetPathSeparator() + wxT("file_one.php")));
 	
 	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), hiddenFile1));
 	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), hiddenFile2));
