@@ -30,7 +30,8 @@ mvceditor::DirectorySearchClass::DirectorySearchClass()
 	: MatchedFiles() 
 	, CurrentFiles()
 	, Directories()
-	, TotalFileCount(0) {
+	, TotalFileCount(0)
+	, DoHiddenFiles(false) {
 }
 
 mvceditor::DirectorySearchClass::~DirectorySearchClass() {
@@ -41,8 +42,9 @@ mvceditor::DirectorySearchClass::~DirectorySearchClass() {
 	}
 }
 
-bool mvceditor::DirectorySearchClass::Init(const wxString& path, Modes mode) {
+bool mvceditor::DirectorySearchClass::Init(const wxString& path, Modes mode, bool doHiddenFiles) {
 	TotalFileCount = 0;
+	DoHiddenFiles = doHiddenFiles;
 	while (!CurrentFiles.empty()) {
 		CurrentFiles.pop();
 	}
@@ -83,7 +85,11 @@ bool mvceditor::DirectorySearchClass::Walk(mvceditor::DirectoryWalkerClass& walk
 		if (wxFileName::IsDirReadable(*path)) {
 			wxDir dir(*path);
 			wxString filename;
-			bool next = dir.GetFirst(&filename, wxEmptyString, wxDIR_FILES | wxDIR_DIRS | wxDIR_HIDDEN);
+			int flags =  wxDIR_FILES | wxDIR_DIRS;
+			if (DoHiddenFiles) {
+				flags |=  wxDIR_HIDDEN;
+			}
+			bool next = dir.GetFirst(&filename, wxEmptyString, flags);
 			while (next) {
 				if (!filename.IsEmpty()) {
 					wxString* fullPath = new wxString(*path);
@@ -122,7 +128,11 @@ void mvceditor::DirectorySearchClass::EnumerateAllFiles(const wxString& path) {
 	wxDir dir;
 	if (wxFileName::IsDirReadable(path) && dir.Open(path)) {
 		wxString filename;
-		bool next = dir.GetFirst(&filename, wxEmptyString, wxDIR_FILES | wxDIR_DIRS | wxDIR_HIDDEN);
+		int flags =  wxDIR_FILES | wxDIR_DIRS;
+		if (DoHiddenFiles) {
+			flags |=  wxDIR_HIDDEN;
+		}
+		bool next = dir.GetFirst(&filename, wxEmptyString, flags);
 		while (next) {
 			if (!filename.IsEmpty()) {
 				wxString fullPath = path + filename;

@@ -61,12 +61,11 @@ public:
 
 private:
 
-
 	void OnProjectOpened(wxCommandEvent& event);
 
 	void OnProjectClosed(wxCommandEvent& event);
 
-	void OnCmdOpenFile(wxCommandEvent& event);
+	void OnCmdFileOpen(wxCommandEvent& event);
 
 	/**
 	 * Need the frame to manipulate it

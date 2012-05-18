@@ -77,11 +77,9 @@ void mvceditor::NotebookClass::SavePageIfModified(wxAuiNotebookEvent& event) {
 	}
 	if (!vetoed && codeCtrl) {
 
-		// tell the app to re-index the project
-		// this is needed because when the user is editing the file, the 'global'
-		// resource finder cache is not updated
+		// tell the app that a file has been closed
 		wxString fileName = codeCtrl->GetFileName();
-		wxCommandEvent cmdEvent(mvceditor::EVENT_CMD_RE_INDEX);
+		wxCommandEvent cmdEvent(mvceditor::EVENT_APP_FILE_CLOSED);
 		cmdEvent.SetId(wxID_ANY);
 		cmdEvent.SetString(fileName);
 		EventSink->Publish(cmdEvent);

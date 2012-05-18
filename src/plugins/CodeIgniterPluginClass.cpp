@@ -110,7 +110,7 @@ void mvceditor::CodeIgniterPluginClass::OnMenuItem(wxCommandEvent& event) {
 			if (!filePath.IsEmpty()) {
 				wxFileName fileName(filePath);
 				if (fileName.IsOk()) {
-					wxCommandEvent openEvent(mvceditor::EVENT_CMD_OPEN_FILE);
+					wxCommandEvent openEvent(mvceditor::EVENT_CMD_FILE_OPEN);
 					openEvent.SetString(filePath);
 					App->EventSink.Publish(openEvent);
 				}

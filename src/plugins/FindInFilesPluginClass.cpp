@@ -46,18 +46,22 @@ mvceditor::FindInFilesBackgroundReaderClass::FindInFilesBackgroundReaderClass(wx
 
 }
 
-bool mvceditor::FindInFilesBackgroundReaderClass::InitForFind(wxEvtHandler* handler, mvceditor::FindInFilesClass findInFiles, 
-															  const wxString& path, std::vector<wxString> skipFiles) {
+bool mvceditor::FindInFilesBackgroundReaderClass::InitForFind(wxEvtHandler* handler, 
+															  mvceditor::FindInFilesClass findInFiles, 
+															  const wxString& path, 
+															  bool doHiddenFiles,
+															  std::vector<wxString> skipFiles) {
 	Handler = handler;
 
 	// find in files needs to be a copy; just to be sure
 	// its thread safe
 	FindInFiles = findInFiles;
 	SkipFiles = skipFiles;
-	return Init(path) && FindInFiles.Prepare();
+	return Init(path, mvceditor::DirectorySearchClass::RECURSIVE, doHiddenFiles) && FindInFiles.Prepare();
 }
 
-bool mvceditor::FindInFilesBackgroundReaderClass::InitForReplace(wxEvtHandler* handler, mvceditor::FindInFilesClass findInFiles, 
+bool mvceditor::FindInFilesBackgroundReaderClass::InitForReplace(wxEvtHandler* handler, 
+																 mvceditor::FindInFilesClass findInFiles, 
 																 std::vector<wxString> skipFiles) {
 	Handler = handler;
 	FindInFiles = findInFiles;
@@ -126,18 +130,19 @@ mvceditor::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* 
 	FindInFilesGaugeId = wxNewId();
 }
 
-void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findInFiles, wxString findPath) {
+void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findInFiles, wxString findPath,
+												   bool doHiddenFiles) {
 	FindInFiles = findInFiles;
 	FindPath = findPath;
 	MatchedFiles = 0;
 
-	// for now disallow another replace when one is already active
+	// for now disallow another find when one is already active
 	if (FindInFilesBackgroundFileReader.IsRunning()) {
 		wxMessageBox(_("Find in files is already running. Please wait for it to finish."), _("Find In Files"));
 		return;
 	}
 	std::vector<wxString> skipFiles = Notebook->GetOpenedFiles();
-	if (FindInFilesBackgroundFileReader.InitForFind(this, FindInFiles, findPath, skipFiles)) {
+	if (FindInFilesBackgroundFileReader.InitForFind(this, FindInFiles, findPath, doHiddenFiles, skipFiles)) {
 		mvceditor::BackgroundFileReaderClass::StartError error;
 		if (FindInFilesBackgroundFileReader.StartReading(error)) {
 			EnableButtons(true, false);
@@ -444,6 +449,9 @@ mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvce
 	FinderMode->SetValidator(modeValidator);
 	FilesFilter->SetValidator(filesFilterValidator);
 	CaseSensitive->SetValidator(caseValidator);
+	wxGenericValidator doHiddenFilesValidator(&Plugin.DoHiddenFiles);
+	DoHiddenFiles->SetValidator(doHiddenFilesValidator);
+
 	FindText->SetFocus();
 
 	// since this panel handles EVT_TEXT_ENTER, we need to handle the
@@ -544,7 +552,8 @@ void mvceditor::FindInFilesDialogClass::OnKillFocusReplaceText(wxFocusEvent& eve
 mvceditor::FindInFilesPluginClass::FindInFilesPluginClass()
 	: PluginClass()
 	, PreviousFindInFiles()
-	, PreviousFindPath() {
+	, PreviousFindPath()
+	, DoHiddenFiles(false) {
 }
 
 void mvceditor::FindInFilesPluginClass::AddEditMenuItems(wxMenu* editMenu) {
@@ -570,7 +579,7 @@ void mvceditor::FindInFilesPluginClass::OnEditFindInFiles(wxCommandEvent& event)
 		mvceditor::FindInFilesResultsPanelClass* panel = new mvceditor::FindInFilesResultsPanelClass(GetToolsNotebook(), 
 			GetNotebook(), GetStatusBarWithGauge());		
 		if(AddToolsWindow(panel, _("Find In Files Results"))) {
-			panel->Find(PreviousFindInFiles, PreviousFindPath);
+			panel->Find(PreviousFindInFiles, PreviousFindPath, DoHiddenFiles);
 		}
 	}
 }

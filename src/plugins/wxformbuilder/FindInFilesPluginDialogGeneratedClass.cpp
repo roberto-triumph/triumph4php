@@ -112,11 +112,14 @@ FindInFilesDialogGeneratedClass::FindInFilesDialogGeneratedClass( wxWindow* pare
 	OptionsSizer->Add( FinderMode, 1, wxEXPAND|wxRIGHT, 5 );
 	
 	wxStaticBoxSizer* CheckboxSizer;
-	CheckboxSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Options") ), wxHORIZONTAL );
+	CheckboxSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Options") ), wxVERTICAL );
 	
 	CaseSensitive = new wxCheckBox( this, wxID_ANY, wxT("Case Sensitive"), wxDefaultPosition, wxDefaultSize, 0 );
 	CaseSensitive->SetValue(true); 
 	CheckboxSizer->Add( CaseSensitive, 0, wxLEFT, 5 );
+	
+	DoHiddenFiles = new wxCheckBox( this, wxID_ANY, wxT("Search Hidden Files"), wxDefaultPosition, wxDefaultSize, 0 );
+	CheckboxSizer->Add( DoHiddenFiles, 0, wxALL, 5 );
 	
 	OptionsSizer->Add( CheckboxSizer, 1, wxEXPAND, 5 );
 	

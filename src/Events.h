@@ -153,6 +153,12 @@ extern const wxEventType EVENT_APP_PROJECT_CLOSED;
  */
 extern const wxEventType EVENT_APP_PROJECT_INDEXED;
 
+/**
+ * Notification that a file has been closed.  The event will contain
+ * the full path of the file that was closed; the path may be the 
+ * empty string when a new file is closed.
+ */
+extern const wxEventType EVENT_APP_FILE_CLOSED;
 
 /**
  * Notification that the user preferences have been updated. Listeners of this event
@@ -190,8 +196,7 @@ extern const wxEventType EVENT_CMD_OPEN_PROJECT;
  * Note that the app will do NOTHING if the path is invalid; the plugin should
  * make sure the path is valid.
  */
-extern const wxEventType EVENT_CMD_OPEN_FILE;
-
+extern const wxEventType EVENT_CMD_FILE_OPEN;
 }
 
 #endif

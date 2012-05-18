@@ -31,15 +31,46 @@
 class DirectorySearchTestClass : public FileTestFixtureClass {
 public:
 	DirectorySearchTestClass()
-		: FileTestFixtureClass(wxT("directory_search")) {
-		DirectorySearch = new mvceditor::DirectorySearchClass();
+		: FileTestFixtureClass(wxT("directory_search")) 
+		, DirectorySearch() {
 	}
 	
-	~DirectorySearchTestClass() {
-		delete DirectorySearch;
+	/**
+	 * Creates a set of files to test recursion into sub directories.
+	 * The following files are created (relative to TestProjectDir):
+	 *
+	 * file_one.php
+	 * file_two.php
+	 * folder_one/file_one.php
+	 * folder_one/file_two.php
+	 * folder_two/file_one.php
+	 * folder_two/file_two.php
+	 *
+	 */
+	void CreateTestFiles() {
+		wxString files[] = { wxT("file_one.php"), wxT("file_two.php") };
+		wxString directories[] =  { wxT("folder_one"), wxT("folder_two") };
+		
+		// create files in the dir, then the subdirs
+		for (int j = 0; j < 2; ++j) {
+			CreateFixtureFile(files[j], wxString::FromAscii(
+				"<?php"
+			));	
+		}
+		for (int i = 0; i < 2; ++i) {
+			wxString subDirectory = directories[i];
+			CreateSubDirectory(subDirectory);
+			subDirectory += wxFileName::GetPathSeparator();
+			for (int j = 0; j < 2; ++j) {
+				CreateFixtureFile(subDirectory + files[j], wxString::FromAscii(
+					"<?php"
+				));	
+			}
+		}
 	}
+
 	
-	mvceditor::DirectorySearchClass* DirectorySearch;
+	mvceditor::DirectorySearchClass DirectorySearch;
 };
 
 class FileTestDirectoryWalker : public mvceditor::DirectoryWalkerClass {
@@ -52,32 +83,14 @@ class FileTestDirectoryWalker : public mvceditor::DirectoryWalkerClass {
 SUITE(DirectorySearchTestClass) {
 	
 TEST_FIXTURE(DirectorySearchTestClass, WalkShouldRecurseThroughSubDirectories) {
-	wxString files[] = { wxT("file_one.php"), wxT("file_two.php") };
-	wxString directories[] =  { wxT("folder_one"), wxT("folder_two") };
-	
-	// create files in the dir, then the subdirs
-	for (int j = 0; j < 2; ++j) {
-		CreateFixtureFile(files[j], wxString::FromAscii(
-			"<?php"
-		));	
-	}
-	for (int i = 0; i < 2; ++i) {
-		wxString subDirectory = directories[i];
-		CreateSubDirectory(subDirectory);
-		subDirectory += wxFileName::GetPathSeparator();
-		for (int j = 0; j < 2; ++j) {
-			CreateFixtureFile(subDirectory + files[j], wxString::FromAscii(
-				"<?php"
-			));	
-		}
-	}
+	CreateTestFiles();
 	FileTestDirectoryWalker walker;
-	CHECK(DirectorySearch->Init(TestProjectDir));
-	while (DirectorySearch->More()) {
-		DirectorySearch->Walk(walker);
+	CHECK(DirectorySearch.Init(TestProjectDir));
+	while (DirectorySearch.More()) {
+		DirectorySearch.Walk(walker);
 	}
-	CHECK_EQUAL((unsigned int)6, DirectorySearch->GetMatchedFiles().size());
-	std::vector<wxString> matchedFiles = DirectorySearch->GetMatchedFiles();
+	CHECK_EQUAL((unsigned int)6, DirectorySearch.GetMatchedFiles().size());
+	std::vector<wxString> matchedFiles = DirectorySearch.GetMatchedFiles();
 	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + wxT("file_one.php")));
 	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + wxT("file_two.php")));
 	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), 
@@ -91,33 +104,15 @@ TEST_FIXTURE(DirectorySearchTestClass, WalkShouldRecurseThroughSubDirectories) {
 }
 
 TEST_FIXTURE(DirectorySearchTestClass, WalkShouldRecurseThroughSubDirectoriesInPreciseMode) {
-	wxString files[] = { wxT("file_one.php"), wxT("file_two.php") };
-	wxString directories[] =  { wxT("folder_one"), wxT("folder_two") };
-	
-	// create files in the dir, then the subdirs
-	for (int j = 0; j < 2; ++j) {
-		CreateFixtureFile(files[j], wxString::FromAscii(
-			"<?php"
-		));	
-	}
-	for (int i = 0; i < 2; ++i) {
-		wxString subDirectory = directories[i];
-		CreateSubDirectory(subDirectory);
-		subDirectory += wxFileName::GetPathSeparator();
-		for (int j = 0; j < 2; ++j) {
-			CreateFixtureFile(subDirectory + files[j], wxString::FromAscii(
-				"<?php"
-			));	
-		}
-	}
+	CreateTestFiles();
 	FileTestDirectoryWalker walker;
-	CHECK(DirectorySearch->Init(TestProjectDir, mvceditor::DirectorySearchClass::PRECISE));
-	CHECK_EQUAL(6, DirectorySearch->GetTotalFileCount());
-	while (DirectorySearch->More()) {
-		DirectorySearch->Walk(walker);
+	CHECK(DirectorySearch.Init(TestProjectDir, mvceditor::DirectorySearchClass::PRECISE));
+	CHECK_EQUAL(6, DirectorySearch.GetTotalFileCount());
+	while (DirectorySearch.More()) {
+		DirectorySearch.Walk(walker);
 	}
-	CHECK_EQUAL((unsigned int)6, DirectorySearch->GetMatchedFiles().size());
-	std::vector<wxString> matchedFiles = DirectorySearch->GetMatchedFiles();
+	CHECK_EQUAL((unsigned int)6, DirectorySearch.GetMatchedFiles().size());
+	std::vector<wxString> matchedFiles = DirectorySearch.GetMatchedFiles();
 	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + wxT("file_one.php")));
 	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + wxT("file_two.php")));
 	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), 
@@ -128,6 +123,75 @@ TEST_FIXTURE(DirectorySearchTestClass, WalkShouldRecurseThroughSubDirectoriesInP
 		TestProjectDir + wxT("folder_two") + wxFileName::GetPathSeparator() + wxT("file_one.php")));
 	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), 
 		TestProjectDir + wxT("folder_two") + wxFileName::GetPathSeparator() + wxT("file_two.php")));
+}
+	
+TEST_FIXTURE(DirectorySearchTestClass, WalkShouldSkipHiddenFiles) {
+	CreateTestFiles();
+
+	// hide all of the file_two.php
+	HideFile(TestProjectDir + wxFileName::GetPathSeparator() + wxT("file_two.php"));
+	HideFile(TestProjectDir + wxT("folder_one") + wxFileName::GetPathSeparator() + wxT("file_two.php"));
+	HideFile(TestProjectDir + wxT("folder_two") + wxFileName::GetPathSeparator() + wxT("file_two.php"));
+	
+	FileTestDirectoryWalker walker;
+	CHECK(DirectorySearch.Init(TestProjectDir));
+	while (DirectorySearch.More()) {
+		DirectorySearch.Walk(walker);
+	}
+	CHECK_EQUAL((unsigned int)3, DirectorySearch.GetMatchedFiles().size());
+	std::vector<wxString> matchedFiles = DirectorySearch.GetMatchedFiles();
+	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + wxT("file_one.php")));
+	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + + wxT("folder_one") + wxFileName::GetPathSeparator() + wxT("file_one.php")));
+	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + + wxT("folder_two") + wxFileName::GetPathSeparator() + wxT("file_one.php")));
+	
+	CHECK_EQUAL(0, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + wxT("file_two.php")));
+	CHECK_EQUAL(0, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + + wxT("folder_one") + wxFileName::GetPathSeparator() + wxT("file_two.php")));
+	CHECK_EQUAL(0, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + + wxT("folder_two") + wxFileName::GetPathSeparator() + wxT("file_two.php")));
+}
+
+TEST_FIXTURE(DirectorySearchTestClass, WalkShouldMatchHiddenFilesInRecursive) {
+	CreateTestFiles();
+
+	// hide all of the file_two.php
+	HideFile(TestProjectDir + wxFileName::GetPathSeparator() + wxT("file_two.php"));
+	HideFile(TestProjectDir + wxT("folder_one") + wxFileName::GetPathSeparator() + wxT("file_two.php"));
+	HideFile(TestProjectDir + wxT("folder_two") + wxFileName::GetPathSeparator() + wxT("file_two.php"));
+
+	FileTestDirectoryWalker walker;
+	CHECK(DirectorySearch.Init(TestProjectDir, mvceditor::DirectorySearchClass::RECURSIVE, true));
+	while (DirectorySearch.More()) {
+		DirectorySearch.Walk(walker);
+	}
+	CHECK_EQUAL((unsigned int)6, DirectorySearch.GetMatchedFiles().size());
+	std::vector<wxString> matchedFiles = DirectorySearch.GetMatchedFiles();
+	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + wxT("file_one.php")));
+	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + + wxT("folder_one") + wxFileName::GetPathSeparator() + wxT("file_one.php")));
+	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + + wxT("folder_two") + wxFileName::GetPathSeparator() + wxT("file_one.php")));
+	
+	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + wxT("file_two.php")));
+	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + + wxT("folder_one") + wxFileName::GetPathSeparator() + wxT("file_two.php")));
+	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + + wxT("folder_two") + wxFileName::GetPathSeparator() + wxT("file_two.php")));
+
+}
+
+TEST_FIXTURE(DirectorySearchTestClass, WalkShouldMatchHiddenFilesInPreciseMode) {
+	CreateTestFiles();
+	HideFile(TestProjectDir + wxT("file_two.php"));
+	
+	FileTestDirectoryWalker walker;
+	CHECK(DirectorySearch.Init(TestProjectDir, mvceditor::DirectorySearchClass::PRECISE, true));
+	while (DirectorySearch.More()) {
+		DirectorySearch.Walk(walker);
+	}
+	CHECK_EQUAL((unsigned int)6, DirectorySearch.GetMatchedFiles().size());
+	std::vector<wxString> matchedFiles = DirectorySearch.GetMatchedFiles();
+	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + wxT("file_one.php")));
+	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + + wxT("folder_one") + wxFileName::GetPathSeparator() + wxT("file_one.php")));
+	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + + wxT("folder_two") + wxFileName::GetPathSeparator() + wxT("file_one.php")));
+	
+	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + wxT("file_two.php")));
+	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + + wxT("folder_one") + wxFileName::GetPathSeparator() + wxT("file_two.php")));
+	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), TestProjectDir + + wxT("folder_two") + wxFileName::GetPathSeparator() + wxT("file_two.php")));
 }
 
 }

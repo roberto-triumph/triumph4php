@@ -83,6 +83,22 @@ void FileTestFixtureClass::CreateFixtureFile(const wxString& fileName, const wxS
 	file.close();
 }
 
+void FileTestFixtureClass::HideFile(const wxString& fileName) {	
+
+	// since tests are not wxApps we cannot use wxPlatformInfo or wxExecute
+	// must do it the hard way
+	wxString wxHideCmd = wxT("attrib +H ");
+	wxHideCmd += fileName;
+	size_t rawLength = 0;
+
+	wxCharBuffer buf = wxConvUTF8.cWC2MB(wxHideCmd.c_str(), wxHideCmd.length() + 1, &rawLength);
+	const char *cmd = buf.data();
+	int ret = system(cmd);
+	if (ret != 0) {
+		//TODO hide the file when running tests on a linux box?
+	}
+}
+
 wxString FileTestFixtureClass::GetFileContents(const wxString& fileName) {
 	wxString fileToRead = TestProjectDir + fileName;
 	std::ifstream file;
