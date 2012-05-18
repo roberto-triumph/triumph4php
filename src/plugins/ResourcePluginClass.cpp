@@ -546,6 +546,10 @@ void mvceditor::ResourcePluginClass::OnAppFileClosed(wxCommandEvent& event) {
 	wxString fileName = event.GetString();
 	if (!GetProject()->GetRootPath().IsEmpty() && fileName.Find(GetProject()->GetRootPath()) == 0) {
 		ResourceFileReader.InitForFile(GetResourceCache(), fileName);
+		mvceditor::BackgroundFileReaderClass::StartError error;
+
+		// show user the error? not for now as they cannot do anything about it
+		ResourceFileReader.StartReading(error);
 	}
 }
 
