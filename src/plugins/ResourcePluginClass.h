@@ -63,6 +63,16 @@ public:
 	 */
 	bool InitForProject(ResourceCacheClass* resourceCache, const wxString& projectPath, const std::vector<wxString>& phpFileFilters);
 
+	/**
+	 * prepare to iterate through the given file. The name part of the given file must match the wildcard.
+	 * This method can be used to update the resources once a file has been modified on disk.
+	 *
+	 * @param resourceCache the existing resources, any new resources will be added to this cache
+	 * @param fullPath file to be scanned (full path, including name).
+	 * @return bool false file does not exist
+	 */
+	bool InitForFile(ResourceCacheClass* resourceCache, const wxString& fullPath);
+
 protected:
 
 	/**
@@ -91,9 +101,6 @@ private:
 /**
  * This class will take care of loading the php native functions assets file in 
  * a background thread.
- * We will get around concurrency problems by copying the resource finder
- * objects; this way the background thread will have its own copy without
- * needing to synchronize.
  */
 class NativeFunctionsFileReaderClass : public ThreadWithHeartbeatClass {
 
@@ -177,7 +184,9 @@ private:
 
 	void OnProjectOpened(wxCommandEvent& event);
 
-	void OnCmdProjectReIndex(wxCommandEvent& event);
+	void OnAppFileClosed(wxCommandEvent& event);
+
+	void OnCmdReIndex(wxCommandEvent& event);
 	
 	void OnEnvironmentUpdated(wxCommandEvent& event);
 

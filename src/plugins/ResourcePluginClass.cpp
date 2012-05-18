@@ -53,6 +53,47 @@ bool mvceditor::ResourceFileReaderClass::InitForProject(mvceditor::ResourceCache
 	return false;
 }
 
+bool mvceditor::ResourceFileReaderClass::InitForFile(mvceditor::ResourceCacheClass* resourceCache, 
+														const wxString& fullPath) {
+	wxFileName fileName(fullPath);
+	if (!fileName.FileExists()) {
+		return false;
+	}
+	PhpFileFilters.clear();
+
+	// break up name into dir + name, add name to file filters
+	if (Init(fileName.GetPath())) {
+		ResourceCache = resourceCache;
+		PhpFileFilters.push_back(fileName.GetFullName());
+		return true;
+	}
+	return false;
+}
+
+bool mvceditor::ResourceFileReaderClass::FileRead(mvceditor::DirectorySearchClass& search) {
+	ResourceCache->WalkGlobal(search, PhpFileFilters);
+	if (!search.More()) {
+
+		// very important to do this here on the background thread
+		// that way when a search is done the cache won't have to do it
+		// and lookups will be quicker
+		ResourceCache->EnsureSortedGlobal();
+	}
+	return false;
+}
+
+bool mvceditor::ResourceFileReaderClass::FileMatch(const wxString& file) {
+	bool matchedFilter = false;
+	for (size_t i = 0; i < PhpFileFilters.size(); ++i) {
+		wxString filter = PhpFileFilters[i];
+		matchedFilter = !wxIsWild(filter) || wxMatchWild(filter, file);
+		if (matchedFilter) {
+			break;
+		}
+	}
+	return matchedFilter;
+}
+
 mvceditor::NativeFunctionsFileReaderClass::NativeFunctionsFileReaderClass(wxEvtHandler& handler) 
 	: ThreadWithHeartbeatClass(handler)
 	, ResourceCache(NULL)
@@ -79,32 +120,6 @@ void* mvceditor::NativeFunctionsFileReaderClass::Entry() {
 	ResourceCache->BuildResourceCacheForNativeFunctionsGlobal();
 	SignalEnd();
 	return 0;
-}
-
-
-
-bool mvceditor::ResourceFileReaderClass::FileRead(mvceditor::DirectorySearchClass& search) {
-	ResourceCache->WalkGlobal(search, PhpFileFilters);
-	if (!search.More()) {
-
-		// very important to do this here on the background thread
-		// that way when a search is done the cache won't have to do it
-		// and lookups will be quicker
-		ResourceCache->EnsureSortedGlobal();
-	}
-	return false;
-}
-
-bool mvceditor::ResourceFileReaderClass::FileMatch(const wxString& file) {
-	bool matchedFilter = false;
-	for (size_t i = 0; i < PhpFileFilters.size(); ++i) {
-		wxString filter = PhpFileFilters[i];
-		matchedFilter = !wxIsWild(filter) || wxMatchWild(filter, file);
-		if (matchedFilter) {
-			break;
-		}
-	}
-	return matchedFilter;
 }
 
 mvceditor::ResourcePluginClass::ResourcePluginClass()
@@ -513,11 +528,24 @@ void mvceditor::ResourcePluginClass::OpenFile(wxString fileName) {
 	GetNotebook()->LoadPage(fileName);
 }
 
-void mvceditor::ResourcePluginClass::OnCmdProjectReIndex(wxCommandEvent& event) {
+void mvceditor::ResourcePluginClass::OnCmdReIndex(wxCommandEvent& event) {
 
 	// only index when there is a project open
 	if (!GetProject()->GetRootPath().IsEmpty()) {
 		StartIndex();
+	}
+}
+
+
+void mvceditor::ResourcePluginClass::OnAppFileClosed(wxCommandEvent& event) {
+
+	// only index when there is a project open
+	// need to make sure that the file that was closed is in the opened project
+	// as well. don't want single-leaf files to be parsed for resources .. or
+	// do we?
+	wxString fileName = event.GetString();
+	if (!GetProject()->GetRootPath().IsEmpty() && fileName.Find(GetProject()->GetRootPath()) == 0) {
+		ResourceFileReader.InitForFile(GetResourceCache(), fileName);
 	}
 }
 
@@ -671,5 +699,6 @@ BEGIN_EVENT_TABLE(mvceditor::ResourcePluginClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ResourcePluginClass::OnWorkComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ResourcePluginClass::OnWorkInProgress)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_OPENED, mvceditor::ResourcePluginClass::OnProjectOpened)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_RE_INDEX, mvceditor::ResourcePluginClass::OnCmdProjectReIndex)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_RE_INDEX, mvceditor::ResourcePluginClass::OnCmdReIndex)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_CLOSED, mvceditor::ResourcePluginClass::OnAppFileClosed)
 END_EVENT_TABLE()

@@ -678,7 +678,7 @@ void mvceditor::AppEventListenerForFrameClass::OnProjectClosed(wxCommandEvent& e
 	AppFrame->OnProjectClosed();
 }
 
-void mvceditor::AppEventListenerForFrameClass::OnCmdOpenFile(wxCommandEvent& event) {
+void mvceditor::AppEventListenerForFrameClass::OnCmdFileOpen(wxCommandEvent& event) {
 	std::vector<wxString> filenames;
 	filenames.push_back(event.GetString());
 	AppFrame->FileOpen(filenames);
@@ -737,5 +737,5 @@ END_EVENT_TABLE()
 BEGIN_EVENT_TABLE(mvceditor::AppEventListenerForFrameClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_OPENED, mvceditor::AppEventListenerForFrameClass::OnProjectOpened)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_CLOSED, mvceditor::AppEventListenerForFrameClass::OnProjectClosed)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_OPEN_FILE, mvceditor::AppEventListenerForFrameClass::OnCmdOpenFile)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_FILE_OPEN, mvceditor::AppEventListenerForFrameClass::OnCmdFileOpen)
 END_EVENT_TABLE()
