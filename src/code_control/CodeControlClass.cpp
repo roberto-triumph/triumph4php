@@ -454,7 +454,7 @@ void mvceditor::CodeControlClass::AutoDetectDocumentMode() {
 				SetDocumentMode(mvceditor::CodeControlClass::SQL);
 				break;
 			}
-		}	
+		}
 	}
 	if (!found) {
 		SetDocumentMode(mvceditor::CodeControlClass::TEXT);
@@ -464,6 +464,10 @@ void mvceditor::CodeControlClass::AutoDetectDocumentMode() {
 void mvceditor::CodeControlClass::ApplyPreferences() {
 	SetMargin();
 	if (Document) {
+		
+		// need this here so that any events are not propagated while the object is
+		// being destructed (valgrind found this error)
+		Document->DetachFromControl(this);
 		delete Document;
 		Document = NULL;
 	}

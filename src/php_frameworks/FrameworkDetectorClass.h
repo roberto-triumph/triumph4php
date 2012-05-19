@@ -55,7 +55,7 @@ public:
 
 protected:
 
-	void* Entry();
+	void Entry();
 
 private:
 

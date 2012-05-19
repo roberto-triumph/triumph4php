@@ -47,19 +47,17 @@ mvceditor::ResponseThreadWithHeartbeatClass::ResponseThreadWithHeartbeatClass(mv
 bool mvceditor::ResponseThreadWithHeartbeatClass::Init(wxFileName outputFile) {
 	OutputFile = outputFile;
 	if (wxTHREAD_NO_ERROR == CreateSingleInstance()) {
-		GetThread()->Run();
 		SignalStart();
 		return true;
 	}
 	return false;
 }
 
-void* mvceditor::ResponseThreadWithHeartbeatClass::Entry() {
+void mvceditor::ResponseThreadWithHeartbeatClass::Entry() {
 	if (OutputFile.FileExists()) {
 		Action.Response();
 	}
 	SignalEnd();
-	return 0;
 }
 
 mvceditor::DetectorActionClass::DetectorActionClass(wxEvtHandler& handler) 

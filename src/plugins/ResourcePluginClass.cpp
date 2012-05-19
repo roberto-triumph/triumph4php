@@ -108,7 +108,6 @@ bool mvceditor::NativeFunctionsFileReaderClass::Init(mvceditor::ResourceCacheCla
 		ResourceCache = resourceCache;
 		wxThreadError err = CreateSingleInstance();
 		if (err == wxTHREAD_NO_ERROR) {
-			GetThread()->Run();
 			SignalStart();
 			good = true;
 		}
@@ -116,10 +115,9 @@ bool mvceditor::NativeFunctionsFileReaderClass::Init(mvceditor::ResourceCacheCla
 	return good;
 }
 
-void* mvceditor::NativeFunctionsFileReaderClass::Entry() {
+void mvceditor::NativeFunctionsFileReaderClass::Entry() {
 	ResourceCache->BuildResourceCacheForNativeFunctionsGlobal();
 	SignalEnd();
-	return 0;
 }
 
 mvceditor::ResourcePluginClass::ResourcePluginClass()

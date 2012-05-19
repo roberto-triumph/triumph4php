@@ -286,7 +286,6 @@ bool mvceditor::MultipleSqlExecuteClass::Execute() {
 	wxThreadError error = CreateSingleInstance();
 	switch (error) {
 	case wxTHREAD_NO_ERROR:
-		GetThread()->Run();
 		SignalStart();
 		IsRunning = true;
 		ret = true;
@@ -305,7 +304,7 @@ bool mvceditor::MultipleSqlExecuteClass::Execute() {
 	return ret;
 }
 
-void* mvceditor::MultipleSqlExecuteClass::Entry() {
+void mvceditor::MultipleSqlExecuteClass::Entry() {
 	UnicodeString error;
 	UnicodeString query;
 	bool connected = Query.Connect(Session, error);
@@ -340,7 +339,6 @@ void* mvceditor::MultipleSqlExecuteClass::Entry() {
 		wxPostEvent(&Handler, evt);
 	}
 	SignalEnd();
-	return 0;
 }
 
 bool mvceditor::MultipleSqlExecuteClass::Init(const UnicodeString& sql, const SqlQueryClass& query) {
@@ -621,14 +619,13 @@ bool mvceditor::SqlMetaDataFetchClass::Read(std::vector<mvceditor::DatabaseInfoC
 	else if (wxTHREAD_NO_ERROR == err) {
 		Infos = infos;
 		Errors.clear();
-		GetThread()->Run();
 		SignalStart();
 		ret = true;
 	}
 	return ret;
 }
 
-void* mvceditor::SqlMetaDataFetchClass::Entry() {
+void mvceditor::SqlMetaDataFetchClass::Entry() {
 	for (std::vector<mvceditor::DatabaseInfoClass>::iterator it = Infos.begin(); it != Infos.end(); ++it) {
 		UnicodeString error;
 		if (!NewResources.Fetch(*it, error)) {
@@ -636,7 +633,6 @@ void* mvceditor::SqlMetaDataFetchClass::Entry() {
 		}
 	}
 	SignalEnd();
-	return 0;
 }
 
 void mvceditor::SqlMetaDataFetchClass::WriteResultsInto(mvceditor::SqlResourceFinderClass& dest) {

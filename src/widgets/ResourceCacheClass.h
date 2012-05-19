@@ -321,7 +321,7 @@ protected:
 	/**
 	 * In the background thread we will parse the code for resources
 	 */
-	void* Entry();
+	void Entry();
 	
 private:
 

@@ -61,14 +61,13 @@ bool mvceditor::CallStackThreadClass::InitThread(const wxFileName& startFileName
 		StartFileName = startFileName;
 		ClassName = className;
 		MethodName = methodName;
-		GetThread()->Run();
 		ret = true;
 		SignalStart();
 	}
 	return ret;
 }
 
-void* mvceditor::CallStackThreadClass::Entry() {
+void mvceditor::CallStackThreadClass::Entry() {
 	
 	// build the call stack then save it to a temp file
 	if (CallStack->Build(StartFileName, ClassName, MethodName, LastError)) {
@@ -83,7 +82,6 @@ void* mvceditor::CallStackThreadClass::Entry() {
 		}
 	}
 	SignalEnd();
-	return 0;
 }
 
 mvceditor::ViewFilePluginClass::ViewFilePluginClass() 

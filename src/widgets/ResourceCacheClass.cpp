@@ -378,7 +378,6 @@ wxThreadError mvceditor::ResourceCacheUpdateThreadClass::StartBackgroundUpdate(c
 		CurrentFileIsNew = isNew;
 		OutputFile.Clear();
 		Mode = UPDATE;
-		GetThread()->Run();
 		SignalStart();		
 	}
 	return error;
@@ -392,13 +391,12 @@ wxThreadError mvceditor::ResourceCacheUpdateThreadClass::StartPersist(const wxFi
 	if (wxTHREAD_NO_ERROR == error) {
 		OutputFile = outputFile;
 		Mode = PERSIST;
-		GetThread()->Run();
 		SignalStart();		
 	}
 	return error;
 }
 
-void* mvceditor::ResourceCacheUpdateThreadClass::Entry() {
+void mvceditor::ResourceCacheUpdateThreadClass::Entry() {
 	if (UPDATE == Mode) {
 		ResourceCache->Update(CurrentFileName, CurrentCode, CurrentFileIsNew);
 	}
@@ -411,5 +409,4 @@ void* mvceditor::ResourceCacheUpdateThreadClass::Entry() {
 	CurrentCode.truncate(0);
 	OutputFile.Clear();
 	SignalEnd();
-	return 0;
 }

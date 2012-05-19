@@ -24,14 +24,27 @@
  */
 #include <widgets/ThreadWithHeartbeatClass.h>
 
+mvceditor::WorkerThreadClass::WorkerThreadClass(mvceditor::ThreadWithHeartbeatClass& owner)
+	: wxThread()
+	, Owner(owner) {
+			
+}
+void* mvceditor::WorkerThreadClass::Entry() {
+	Owner.Entry();
+	
+	// by doing this the owner can know when the work has been done
+	// since we are using detached threads, the thread delete themselves
+	Owner.Worker = NULL;
+	return 0;
+}
+
 mvceditor::ThreadWithHeartbeatClass::ThreadWithHeartbeatClass(wxEvtHandler& handler, int id)
 	: wxEvtHandler()
-	, wxThreadHelper()
 	, Handler(handler)
 	, Timer()
+	, Worker(NULL)
 	, EventId(id) {
 	Timer.SetOwner(this);
-	
 }
 
 mvceditor::ThreadWithHeartbeatClass::~ThreadWithHeartbeatClass() {
@@ -40,22 +53,23 @@ mvceditor::ThreadWithHeartbeatClass::~ThreadWithHeartbeatClass() {
 
 wxThreadError mvceditor::ThreadWithHeartbeatClass::CreateSingleInstance() {
 	wxThreadError error = wxTHREAD_NO_ERROR;
-
-	// Create() kills the currently running thread; must first check for a running
-	// instance
 	if (IsRunning()) {
 		error = wxTHREAD_RUNNING;
 	}
-	else {		
-		error = Create();
+	else {
+		Worker = new mvceditor::WorkerThreadClass(*this);
+		error = Worker->Create();
+		if (error == wxTHREAD_NO_ERROR) {
+			Worker->Run();
+		}
 	}
 	return error;
 }
 
 void mvceditor::ThreadWithHeartbeatClass::KillInstance() {
-	wxThread* thread = GetThread();
-	if (thread && thread->IsRunning()) {
-		thread->Delete();
+	if (IsRunning()) {
+		Worker->Delete();
+		Worker = NULL;
 	}
 	Timer.Stop();
 }
@@ -70,6 +84,13 @@ void mvceditor::ThreadWithHeartbeatClass::SignalEnd() {
 	wxPostEvent(&Handler, evt);
 }
 	
+bool mvceditor::ThreadWithHeartbeatClass::TestDestroy() {
+	bool ret = true;
+	if (Worker) {
+		ret = Worker->TestDestroy();
+	}
+	return ret;
+}
 
 void mvceditor::ThreadWithHeartbeatClass::OnTimer(wxTimerEvent& event) {
 	wxCommandEvent evt(mvceditor::EVENT_WORK_IN_PROGRESS, EventId);
@@ -77,7 +98,7 @@ void mvceditor::ThreadWithHeartbeatClass::OnTimer(wxTimerEvent& event) {
 }
 
 bool mvceditor::ThreadWithHeartbeatClass::IsRunning() const {
-	return m_thread && m_thread->IsRunning();
+	return Worker != NULL;
 }
 
 const wxEventType mvceditor::EVENT_WORK_COMPLETE = wxNewEventType();

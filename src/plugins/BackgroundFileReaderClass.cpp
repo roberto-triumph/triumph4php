@@ -55,7 +55,6 @@ bool mvceditor::BackgroundFileReaderClass::StartReading(StartError& error) {
 			error = ALREADY_RUNNING;
 		}
 		else {
-			GetThread()->Run();
 			ret = true;
 			SignalStart();
 		}		
@@ -67,25 +66,11 @@ bool mvceditor::BackgroundFileReaderClass::StartReading(StartError& error) {
 }
 
 void mvceditor::BackgroundFileReaderClass::StopReading() {
-	if (GetThread()) {
-		GetThread()->Delete();
-		m_thread = NULL;
-	}
+	KillInstance();
 }
 
-bool mvceditor::BackgroundFileReaderClass::TestDestroy() {
-	bool ret = true;
-	if (GetThread()) {
-		ret = GetThread()->TestDestroy();
-	}
-	return ret;
-}
-
-void* mvceditor::BackgroundFileReaderClass::Entry() {
-	bool isDestroy = false;
-	if (GetThread()) {
-		isDestroy = GetThread()->TestDestroy();
-	}
+void mvceditor::BackgroundFileReaderClass::Entry() {
+	bool isDestroy = TestDestroy();
 	int counter = 0;
 	if (Mode == WALK) {
 		while(DirectorySearch.More() && !isDestroy) {
@@ -99,7 +84,7 @@ void* mvceditor::BackgroundFileReaderClass::Entry() {
 			// for example, when app exists the ThreadWithHeartbeat class kills the
 			// thread, many things are no longer valid
 			// this IF block prevents crashes on app exit
-			isDestroy = GetThread()->TestDestroy();
+			isDestroy = TestDestroy();
 			if (!isDestroy) {
 				singleEvent.SetInt(counter);
 				singleEvent.SetClientData((void*) res);
@@ -115,7 +100,7 @@ void* mvceditor::BackgroundFileReaderClass::Entry() {
 
 			// signal that the background thread has finished one file
 			counter++;
-			isDestroy = GetThread()->TestDestroy();
+			isDestroy = TestDestroy();
 			if (!isDestroy) {
 				wxCommandEvent singleEvent(EVENT_FILE_READ, wxNewId());
 				singleEvent.SetInt(counter);
@@ -135,7 +120,6 @@ void* mvceditor::BackgroundFileReaderClass::Entry() {
 		wxPostEvent(&Handler, endEvent);
 		SignalEnd();
 	}
-	return 0;
 }
 
 const wxEventType mvceditor::EVENT_FILE_READ_COMPLETE = wxNewEventType();

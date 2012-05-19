@@ -127,7 +127,7 @@ private:
 	 */
 	ResourceCacheClass* ResourceCache;
 
-	void* Entry();
+	void Entry();
 };
 	
 class ResourcePluginClass : public PluginClass {

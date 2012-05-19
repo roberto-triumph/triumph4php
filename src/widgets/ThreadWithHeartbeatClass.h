@@ -43,12 +43,15 @@ extern const wxEventType EVENT_WORK_COMPLETE;
  */
 extern const wxEventType EVENT_WORK_IN_PROGRESS;
 
+// defined below
+class WorkerThreadClass;
+
 /**
  * This is a thread that announces itself that is still running and when it ends.
  * This class is useful when displaying the status and percent completion to the
  * user. For now heartbeats will be at a constant rate.
  */
-class ThreadWithHeartbeatClass : public wxEvtHandler, public wxThreadHelper {
+class ThreadWithHeartbeatClass : public wxEvtHandler {
 
 public:
 	
@@ -62,13 +65,18 @@ public:
 	 * On object destruction, if this thread is running it will be stopped.
 	 */
 	virtual ~ThreadWithHeartbeatClass();
+	
+	/**
+	 * This is the method to override; this method is executed in the background thread.
+	 */
+	virtual void Entry() = 0;
 
 	/**
-	 * A wrapper around wxThreadHelper::Create() method; the added bonus is that
+	 * A wrapper around wxThread::Create() method AND wxThread::Run() methods; the added bonus is that
 	 * CreateSingleInstance() will first check for the existence of a running thread
 	 * and will not Create (nor kill) a thread that is currently running. Create()
 	 * will kill any running threads.
-	 * This method DOES NOT start thread execution. Caller must call GetThread()->Run()
+	 * This method ALSO starts thread execution, unlike wxThread::Create
 	 */
 	wxThreadError CreateSingleInstance();
 
@@ -102,14 +110,20 @@ public:
 	 */
 	bool IsRunning() const;
 	
+	/**
+	 * @return true if thread should finish executing (exit gracefully from Entry() method)
+	 */
+	bool TestDestroy();
+	
 protected:
 
 	wxEvtHandler& Handler;
 	
 private:
-
 	wxTimer Timer;
 
+	WorkerThreadClass* Worker;
+	
 	/**
 	 * All generated events will have this ID as their EventId
 	 */
@@ -117,6 +131,30 @@ private:
 	
 	DECLARE_EVENT_TABLE()
 
+	friend class WorkerThreadClass;
+};
+
+/**
+ * Using this class instead of wxThreadHelper because we want ThreadWithHeartbeat class
+ * to be able to be re-started and we also want to guard against only 1 instance of it
+ * being running WITHOUT killing the running instance. wxThreadHelper will kill
+ * any previously running thread if Create() is called while a thread is still running.
+ * As per the docs on wxThread: IsRunning() cannot be safely called when using
+ * detached threads
+ */
+class WorkerThreadClass : public wxThread {
+
+public:
+
+	WorkerThreadClass(mvceditor::ThreadWithHeartbeatClass& owner);
+	
+protected:
+
+	void* Entry();
+	
+private:
+
+	mvceditor::ThreadWithHeartbeatClass& Owner;
 };
 
 }

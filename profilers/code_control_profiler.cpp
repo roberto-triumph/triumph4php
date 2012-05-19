@@ -25,6 +25,7 @@
 #include <wx/wx.h>
 #include <wx/dnd.h>
 #include <wx/filename.h>
+#include <unicode/uclean.h>
 #include <code_control/CodeControlOptionsClass.h>
 #include <code_control/CodeControlClass.h>
 #include <widgets/ResourceCacheClass.h>
@@ -38,7 +39,18 @@
  */
 class CodeControlProfilerAppClass : public wxApp {
 public:
+
+	CodeControlProfilerAppClass();
+	
 	virtual bool OnInit();
+	
+	virtual int OnExit();
+	
+	mvceditor::CodeControlOptionsClass Options;
+	mvceditor::ProjectOptionsClass ProjectOptions;
+	mvceditor::ProjectClass Project;
+	mvceditor::ResourceCacheClass ResourceCache;
+	mvceditor::EnvironmentClass Environment;
 };
 
 /**
@@ -96,7 +108,7 @@ bool FileDropTargetClass::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString&
  */
 class CodeControlFrameClass: public wxFrame {
 public:
-	CodeControlFrameClass();
+	CodeControlFrameClass(CodeControlProfilerAppClass& app);
 
 private:
 	
@@ -118,11 +130,6 @@ private:
 		ID_HELP
 	};
 	
-	mvceditor::CodeControlOptionsClass Options;
-	mvceditor::ProjectOptionsClass ProjectOptions;
-	mvceditor::ProjectClass Project;
-	mvceditor::ResourceCacheClass ResourceCache;
-	mvceditor::EnvironmentClass Environment;
 	mvceditor::CodeControlClass* Ctrl;
 	
 
@@ -131,28 +138,39 @@ private:
 
 IMPLEMENT_APP(CodeControlProfilerAppClass)
 
+CodeControlProfilerAppClass::CodeControlProfilerAppClass() 
+	: wxApp()
+	, Options()
+	, ProjectOptions()
+	, Project(ProjectOptions) 
+	, ResourceCache()
+	, Environment() {
+		
+}
+
 bool CodeControlProfilerAppClass::OnInit() {
-	CodeControlFrameClass* frame = new CodeControlFrameClass();
+	Options.EnableAutomaticLineIndentation = true;
+	Options.EnableAutoCompletion = true;
+	ResourceCache.BuildResourceCacheForNativeFunctionsGlobal();
+	
+	CodeControlFrameClass* frame = new CodeControlFrameClass(*this);
 	SetTopWindow(frame);
 	frame->Show(true);	
 	return true;
 }
 
-CodeControlFrameClass::CodeControlFrameClass() 
+int CodeControlProfilerAppClass::OnExit() {
+	u_cleanup();
+	return 0;
+}
+
+CodeControlFrameClass::CodeControlFrameClass(CodeControlProfilerAppClass& app) 
 	: wxFrame(NULL, wxID_ANY, wxT("CodeControlClass profiler"), wxDefaultPosition, 
-			wxSize(1024, 768))
-	, Options()
-	, ProjectOptions()
-	, Project(ProjectOptions) 
-	, ResourceCache() 
-	, Environment() {
-	Options.EnableAutomaticLineIndentation = true;
-	Options.EnableAutoCompletion = true;
-	Ctrl = new mvceditor::CodeControlClass(this, Options, &Project, &ResourceCache, &Environment, wxID_ANY);
+			wxSize(1024, 768)) {
+	Ctrl = new mvceditor::CodeControlClass(this, app.Options, &app.Project, &app.ResourceCache, &app.Environment, wxID_ANY);
 	Ctrl->SetDropTarget(new FileDropTargetClass(Ctrl));
-	CreateMenu();
-	ResourceCache.BuildResourceCacheForNativeFunctionsGlobal();
 	Ctrl->SetDocumentMode(mvceditor::CodeControlClass::PHP);
+	CreateMenu();
 }
 
 void CodeControlFrameClass::OnCallTip(wxCommandEvent& event) {

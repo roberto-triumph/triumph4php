@@ -51,13 +51,10 @@ bool mvceditor::ResourceFinderBackgroundThreadClass::Start(const wxString& fileN
 	ResourceFinder.SetVersion(environment.Php.Version);
 	wxThreadError error = CreateSingleInstance();
 	bool created = wxTHREAD_NO_ERROR == error;
-	if (created) {
-		GetThread()->Run();
-	}
 	return created;
 }
 
-void* mvceditor::ResourceFinderBackgroundThreadClass::Entry() {
+void mvceditor::ResourceFinderBackgroundThreadClass::Entry() {
 	if (wxFileName::FileExists(FileName)) {
 		ResourceFinder.Clear();
 
@@ -68,7 +65,6 @@ void* mvceditor::ResourceFinderBackgroundThreadClass::Entry() {
 		Resources = ResourceFinder.All();
 		SignalEnd();
 	}
-	return 0;
 }
 
 mvceditor::OutlineViewPluginClass::OutlineViewPluginClass()

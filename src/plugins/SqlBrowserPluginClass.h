@@ -151,7 +151,7 @@ public:
 	
 protected:
 
-	void* Entry();
+	void Entry();
 
 private:
 
@@ -378,7 +378,7 @@ public:
 	
 protected:
 
-	void* Entry();
+	void Entry();
 	
 	std::vector<DatabaseInfoClass> Infos;
 

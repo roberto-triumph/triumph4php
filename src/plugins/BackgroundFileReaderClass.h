@@ -141,12 +141,6 @@ public:
 protected: 
 
 	/**
-	 * Returns true if the background thread has been deleted
-	 * and is no longer running.
-	 */
-	bool TestDestroy();
-
-	/**
 	 * This method will be executed in it's own thread. Most of the time
 	 * this method would be implemented by calling search.Walk() method.
 	 * The return value of this method will be set as the event.GetClientData()
@@ -162,7 +156,7 @@ protected:
 	 */
 	virtual bool FileMatch(const wxString& file) = 0;
 
-	void* Entry();
+	void Entry();
 
 private:
 
