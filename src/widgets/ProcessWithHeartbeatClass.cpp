@@ -58,6 +58,13 @@ bool mvceditor::ProcessWithHeartbeatClass::Init(wxString command, int commandId,
 	// http://forums.wxwidgets.org/viewtopic.php?t=13559
 	pid = wxExecute(command, wxEXEC_ASYNC, newProcess);
 	if (pid != 0) {
+		std::map<long, wxProcess*>::iterator it = RunningProcesses.find(pid);
+		if (it != RunningProcesses.end()) {
+			
+			// not sure the new process will get the same PID if another one is running
+			// let's cleanup just to be sure
+			Stop(pid);
+		}
 		RunningProcesses[pid] = newProcess;
 		Timer.Start(POLL_INTERVAL, wxTIMER_CONTINUOUS);
 	}
@@ -105,8 +112,9 @@ void mvceditor::ProcessWithHeartbeatClass::OnProcessEnded(wxProcessEvent& event)
 	}
 	if (it != RunningProcesses.end()) {
 
-		// no need to delete the process pointer; since we don't call event.Skip() the process pointer
-		// will delete itself
+		// since we don't call event.Skip() we are the "parent" and we must delete the process pointer
+		// ourselves. See the wxProcess documentation
+		delete it->second;
 		RunningProcesses.erase(it);
 	}
 }
