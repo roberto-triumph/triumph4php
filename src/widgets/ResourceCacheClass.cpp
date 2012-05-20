@@ -262,7 +262,7 @@ void mvceditor::ResourceCacheClass::ExpressionCompletionMatches(const wxString& 
 
 void mvceditor::ResourceCacheClass::ResourceMatches(const wxString& fileName, const pelet::SymbolClass& parsedExpression, const mvceditor::ScopeResultClass& expressionScope, 
 													 std::vector<mvceditor::ResourceClass>& matches,
-													 bool doDuckTyping,
+													 bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 													mvceditor::SymbolTableMatchErrorClass& error) {
 	wxMutexLocker locker(Mutex);
 	if (!locker.IsOk()) {
@@ -275,7 +275,7 @@ void mvceditor::ResourceCacheClass::ResourceMatches(const wxString& fileName, co
 		if (symbolTable) {
 			foundSymbolTable = true;
 			symbolTable->ResourceMatches(parsedExpression, expressionScope, Finders, &GlobalResourceFinder, 
-				matches, doDuckTyping, error);
+				matches, doDuckTyping, doFullyQualifiedMatchOnly, error);
 		}
 	}
 	if (!foundSymbolTable) {

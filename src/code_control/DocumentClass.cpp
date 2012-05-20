@@ -761,7 +761,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetCurrentSym
 		// for now do nothing with error
 		mvceditor::SymbolTableMatchErrorClass error;
 		ResourceCache->ResourceMatches(FileIdentifier, parsedExpression, scopeResult, matches, 
-			doDuckTyping, error);
+			doDuckTyping, true, error);
 	}
 	return matches;
 }
@@ -923,7 +923,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetSymbolAt(i
 		// for now do nothing with error
 		mvceditor::SymbolTableMatchErrorClass error;
 		ResourceCache->ResourceMatches(FileIdentifier, parsedExpression, expressionScope, matches, 
-			doDuckTyping, error);
+			doDuckTyping, true, error);
 	}
 	return matches;
 }

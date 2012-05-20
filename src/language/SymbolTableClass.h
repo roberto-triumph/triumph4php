@@ -311,13 +311,15 @@ public:
 	 * @param doDuckTyping if an expression chain could not be fully resolved; then we could still
 	 *        perform a search for the expression member in ALL classes. The lookups will not be
 	 *        slower because ResourceFinderClass still handles them
+	 * @param doFullyQualifiedMatchOnly if TRUE the only resources that match fully qualified resources will be
+	 *        returned
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
 	void ResourceMatches(pelet::SymbolClass parsedExpression, const ScopeResultClass& expressionScope, 
 		const std::map<wxString, ResourceFinderClass*>& openedResourceFinders,
 		mvceditor::ResourceFinderClass* globalResourceFinder,
 		std::vector<ResourceClass>& resourceMatches,
-		bool doDuckTyping, 
+		bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 		SymbolTableMatchErrorClass& error) const;
 	
 	/**

@@ -227,7 +227,7 @@ void mvceditor::CallStackClass::ExpressionFound(const pelet::ExpressionClass& ex
 			mvceditor::ScopeResultClass scopeResult;
 			scopeResult.MethodName = item.Resource;
 			
-			ResourceCache.ResourceMatches(item.FileName.GetFullPath(), symbol, scopeResult, matches, false, singleMatchError);
+			ResourceCache.ResourceMatches(item.FileName.GetFullPath(), symbol, scopeResult, matches, false, true, singleMatchError);
 			for (std::vector<mvceditor::ResourceClass>::iterator it = matches.begin(); it != matches.end(); ++it) {
 				if (mvceditor::ResourceClass::FUNCTION == it->Type || mvceditor::ResourceClass::METHOD == it->Type) {
 					ResourceWithFile newItem;

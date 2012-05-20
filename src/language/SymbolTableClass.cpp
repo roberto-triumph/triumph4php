@@ -127,6 +127,45 @@ static bool IsStaticExpression(const pelet::SymbolClass& parsedExpression) {
 		|| (parsedExpression.ChainList.size() > 1 && parsedExpression.ChainList[1].startsWith(UNICODE_STRING_SIMPLE("::")));
 }
 
+/**
+ * Figure out a resource's type by looking at all of the given finders.
+ * @param resourceToLookup MUST BE fully qualified (class name  + method name,  or function name).  string can have the
+ *        object operator "->" that separates the class and method name.
+ * @param finders all of the finders to look in
+ * @return the resource's type; (for methods, it's the return type of the method) could be empty string if type could 
+ *         not be determined 
+ */
+static UnicodeString ResolveResourceType(UnicodeString resourceToLookup, 
+										 const std::vector<mvceditor::ResourceFinderClass*>& resourceFinders) {
+	UnicodeString type;
+
+	// need to get the type from the resource finders
+	// the resource finder query string needs to have '::' also remove the function markers "()" that
+	// are put there by the expression parser
+	resourceToLookup.findAndReplace(UNICODE_STRING_SIMPLE("->"), UNICODE_STRING_SIMPLE("::"));
+	resourceToLookup.findAndReplace(UNICODE_STRING_SIMPLE("()"), UNICODE_STRING_SIMPLE(""));
+	for (size_t j = 0; j < resourceFinders.size(); ++j) {
+		mvceditor::ResourceFinderClass* finder = resourceFinders[j];
+		if (finder->Prepare(mvceditor::StringHelperClass::IcuToWx(resourceToLookup)) && finder->CollectFullyQualifiedResource()) {
+			if (finder->GetResourceMatchCount() == 1) {
+				mvceditor::ResourceClass match = finder->GetResourceMatch(0);
+				if (mvceditor::ResourceClass::CLASS == match.Type) {
+					type = match.ClassName;
+				}
+				else {
+					type =  match.ReturnType;
+				}
+			}
+		}
+		if (!type.isEmpty()) {
+
+			// since we are doing exact lookups, only one should be found
+			break;
+		}
+	}
+	return type;
+}
+
 /*
  * figure out a [local] variable's type by looking at the other variables at the symbol table.
  * Since the symbol table just stores the parsed assignment expression tree; the symbols in the symbol table
@@ -175,7 +214,23 @@ static UnicodeString ResolveVariableType(const mvceditor::ScopeResultClass& expr
 				// user declares a type (in a PHPDoc comment  @var $dog Dog
 				type = symbol.PhpDocType;
 			}
+			else if (symbol.ChainList.size() == 1) {		
+				
+				// variable was created with a 'new' or single function call
+				// the  ResolveResourceType will get the function return type
+				// if the variable was created from a function.
+				UnicodeString resourceToLookup = symbol.ChainList[0];
+				std::vector<mvceditor::ResourceFinderClass*> allResourceFinders;
+				allResourceFinders.push_back(globalResourceFinder);
+				for (std::map<wxString, mvceditor::ResourceFinderClass*>::const_iterator it =  openedResourceFinders.begin(); it != openedResourceFinders.end(); ++it) {
+					allResourceFinders.push_back(it->second);
+				}
+				
+				type = ResolveResourceType(resourceToLookup, allResourceFinders);
+
+			}
 			else if (!symbol.ChainList.empty()) {
+				
 				
 				// go through the chain list; the first item in the list may be a variable
 				pelet::SymbolClass parsedExpression;
@@ -188,7 +243,7 @@ static UnicodeString ResolveVariableType(const mvceditor::ScopeResultClass& expr
 				parsedExpression.ChainList = symbol.ChainList;
 				std::vector<mvceditor::ResourceClass> resourceMatches;
 				symbolTable.ResourceMatches(parsedExpression, expressionScope, 
-					openedResourceFinders, globalResourceFinder,resourceMatches, doDuckTyping, error);
+					openedResourceFinders, globalResourceFinder, resourceMatches, doDuckTyping, false, error);
 				if (!resourceMatches.empty()) {
 					if (mvceditor::ResourceClass::CLASS == resourceMatches[0].Type) {
 						type = resourceMatches[0].ClassName;
@@ -198,40 +253,6 @@ static UnicodeString ResolveVariableType(const mvceditor::ScopeResultClass& expr
 					}
 				}
 			}
-			break;
-		}
-	}
-	return type;
-}
-
-/**
- * Figure out a resource's type by looking at all of the given finders.
- * @param resourceToLookup MUST BE fully qualified (class name  + method name,  or function name).  string can have the
- *        object operator "->" that separates the class and method name.
- * @param finders all of the finders to look in
- * @return the resource's type; (for methods, it's the return type of the method) could be empty string if type could 
- *         not be determined 
- */
-static UnicodeString ResolveResourceType(UnicodeString resourceToLookup, 
-										 const std::vector<mvceditor::ResourceFinderClass*>& resourceFinders) {
-	UnicodeString type;
-
-	// need to get the type from the resource finders
-	// the resource finder query string needs to have '::' also remove the function markers "()" that
-	// are put there by the expression parser
-	resourceToLookup.findAndReplace(UNICODE_STRING_SIMPLE("->"), UNICODE_STRING_SIMPLE("::"));
-	resourceToLookup.findAndReplace(UNICODE_STRING_SIMPLE("()"), UNICODE_STRING_SIMPLE(""));
-	for (size_t j = 0; j < resourceFinders.size(); ++j) {
-		mvceditor::ResourceFinderClass* finder = resourceFinders[j];
-		if (finder->Prepare(mvceditor::StringHelperClass::IcuToWx(resourceToLookup)) && finder->CollectFullyQualifiedResource()) {
-			if (finder->GetResourceMatchCount() == 1) {
-				mvceditor::ResourceClass match = finder->GetResourceMatch(0);
-				type = match.ReturnType;
-			}
-		}
-		if (!type.isEmpty()) {
-
-			// since we are doing exact lookups, only one should be found
 			break;
 		}
 	}
@@ -279,7 +300,7 @@ static UnicodeString ResolveInitialLexemeType(const pelet::SymbolClass& parsedEx
 			}
 		}
 	}
-	else if (start.caseCompare(UNICODE_STRING_SIMPLE("parent"), 0) == 0){
+	else if (start.caseCompare(UNICODE_STRING_SIMPLE("parent"), 0) == 0) {
 		
 		// look at the class signature of the current class that is in scope; that will tell us
 		// what class is the parent
@@ -509,7 +530,7 @@ void mvceditor::SymbolTableClass::ExpressionCompletionMatches(pelet::SymbolClass
 
 		// some kind of function call / method chain call
 		ResourceMatches(parsedExpression, expressionScope, openedResourceFinders, globalResourceFinder, 
-			autoCompleteResourceList, doDuckTyping, error);
+			autoCompleteResourceList, doDuckTyping, false, error);
 	}	
 }
 
@@ -517,7 +538,7 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::SymbolClass parsedExpre
 												  const std::map<wxString, mvceditor::ResourceFinderClass*>& openedResourceFinders,
 												  mvceditor::ResourceFinderClass* globalResourceFinder,
 												  std::vector<mvceditor::ResourceClass>& resourceMatches,
-												  bool doDuckTyping,
+												  bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 												  mvceditor::SymbolTableMatchErrorClass& error) const {
 	std::vector<pelet::SymbolClass> scopeSymbols;
 	std::map<UnicodeString, std::vector<pelet::SymbolClass>, UnicodeStringComparatorClass>::const_iterator it = Variables.find(expressionScope.MethodName);
@@ -602,7 +623,13 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::SymbolClass parsedExpre
 		mvceditor::ResourceFinderClass* finder = allResourceFinders[j];
 
 		// only do duck typing if needed. otherwise, make sure that we have a type match first.
-		if ((doDuckTyping || !typeToLookup.isEmpty()) && finder->Prepare(wxResource) && finder->CollectNearMatchResources()) {
+		if ((doDuckTyping || !typeToLookup.isEmpty()) && finder->Prepare(wxResource)) {
+			if (doFullyQualifiedMatchOnly) {
+				finder->CollectFullyQualifiedResource();
+			}
+			else {
+				finder->CollectNearMatchResources();
+			}
 
 			// now we loop through the possbile matches and remove stuff that does not 
 			// make sense because of visibility rules or resources that are 

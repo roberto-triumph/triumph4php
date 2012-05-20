@@ -68,6 +68,7 @@ public:
 	UnicodeString Code1;
 	UnicodeString Code2;
 	bool DoDuckTyping;
+	bool DoFullyQualifiedMatchOnly;
 	pelet::SymbolClass ParsedExpression;
 	mvceditor::ScopeResultClass ScopeResult;
 
@@ -87,7 +88,8 @@ public:
 		, GlobalCode()
 		, Code1()
 		, Code2()
-		, DoDuckTyping()
+		, DoDuckTyping(false)
+		, DoFullyQualifiedMatchOnly(false)
 		, ParsedExpression()
 		, ScopeResult()
 		, VariableMatches()
@@ -257,7 +259,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithGlobalF
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->w"));
 	ResourceCache.ResourceMatches(File1, ParsedExpression, ScopeResult, 
-		ResourceMatches, DoDuckTyping, Error);
+		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
 	if (!ResourceMatches.empty()) {
 		CHECK_EQUAL(UNICODE_STRING_SIMPLE("w"), ResourceMatches[0].Identifier);
@@ -284,7 +286,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithRegiste
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->methodA"));
 
 	ResourceCache.ResourceMatches(File2, ParsedExpression, ScopeResult, 
-		ResourceMatches, DoDuckTyping, Error);
+		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
 	if (!ResourceMatches.empty()) {
 		CHECK_EQUAL(UNICODE_STRING_SIMPLE("methodA"), ResourceMatches[0].Identifier);
@@ -314,7 +316,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithStaleMa
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->methodA"));
 
 	ResourceCache.ResourceMatches(File1, ParsedExpression, ScopeResult, 
-		ResourceMatches, DoDuckTyping, Error);
+		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
 	if (!ResourceMatches.empty()) {
 		CHECK_EQUAL(UNICODE_STRING_SIMPLE("methodA"), ResourceMatches[0].Identifier);
@@ -327,7 +329,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithStaleMa
 
 	ResourceMatches.clear();
 	ResourceCache.ResourceMatches(GlobalFile, ParsedExpression, ScopeResult, 
-		ResourceMatches, DoDuckTyping, Error);
+		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_EQUAL((size_t)0, ResourceMatches.size());
 }
 
