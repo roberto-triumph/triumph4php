@@ -181,7 +181,7 @@ bool mvceditor::CallStackClass::Persist(wxFileName& fileName) {
 				
 				// escape any double quotes in case of string constants
 				line += wxT("\"");
-				UnicodeString lexeme = it->Arguments[i].Lexeme;
+				UnicodeString lexeme = it->Arguments[i].FirstValue();
 				lexeme = lexeme.findAndReplace(UNICODE_STRING_SIMPLE("\""), UNICODE_STRING_SIMPLE("\\\""));
 				line += mvceditor::StringHelperClass::IcuToWx(lexeme);
 				line += wxT("\"");
@@ -211,6 +211,7 @@ void mvceditor::CallStackClass::ExpressionFound(const pelet::ExpressionClass& ex
 	}
 	
 	ResourceWithFile item = ResourcesRemaining.front();
+		
 	if (item.Resource == CurrentFunction || (item.Resource == (CurrentClass + UNICODE_STRING_SIMPLE("::") + CurrentMethod))) {
 		FoundScope = true;
 		
@@ -218,16 +219,14 @@ void mvceditor::CallStackClass::ExpressionFound(const pelet::ExpressionClass& ex
 		// lets add it to the queue AND the final list
 		// by adding it to the queue, the method will get parsed
 		// also an expression can be a method call (variable + method)
-		if (pelet::ExpressionClass::FUNCTION_CALL == expression.Type ||  expression.ChainList.size() >= (size_t)2) {			
-			pelet::SymbolClass symbol;
-			symbol.FromExpression(expression);
+		if (pelet::ExpressionClass::FUNCTION_CALL == expression.ExpressionType ||  expression.ChainList.size() >= (size_t)2) {			
 			
 			std::vector<mvceditor::ResourceClass> matches;
 			mvceditor::SymbolTableMatchErrorClass singleMatchError;
 			mvceditor::ScopeResultClass scopeResult;
 			scopeResult.MethodName = item.Resource;
 			
-			ResourceCache.ResourceMatches(item.FileName.GetFullPath(), symbol, scopeResult, matches, false, true, singleMatchError);
+			ResourceCache.ResourceMatches(item.FileName.GetFullPath(), expression, scopeResult, matches, false, true, singleMatchError);
 			for (std::vector<mvceditor::ResourceClass>::iterator it = matches.begin(); it != matches.end(); ++it) {
 				if (mvceditor::ResourceClass::FUNCTION == it->Type || mvceditor::ResourceClass::METHOD == it->Type) {
 					ResourceWithFile newItem;
@@ -240,6 +239,10 @@ void mvceditor::CallStackClass::ExpressionFound(const pelet::ExpressionClass& ex
 					}
 					ResourcesRemaining.push(newItem);
 					
+					printf("** PUSHING INTO LIST size=%d\n\n", (int)expression.CallArguments.size());
+					UFILE* ufout = u_finit(stdout, NULL, NULL);
+					u_fprintf(ufout, "expr=%S\n", expression.FirstValue().getTerminatedBuffer());
+					u_fclose(ufout);
 					mvceditor::CallClass newCall;
 					newCall.Resource = *it;
 					newCall.Arguments = expression.CallArguments;
@@ -250,7 +253,7 @@ void mvceditor::CallStackClass::ExpressionFound(const pelet::ExpressionClass& ex
 
 				// using 2 variables so that previous errors do not affect the ResourceMatches() call
 				MatchError = singleMatchError;
-			}
+			}			
 		}
 	}
 }

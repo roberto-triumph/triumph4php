@@ -433,7 +433,8 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 	std::vector<UnicodeString> variableMatches;
 	int expressionPos = code.length() - 1;
 	UnicodeString lastExpression = Lexer.LastExpression(code);
-	pelet::SymbolClass parsedExpression;
+	pelet::ScopeClass scope;
+	pelet::ExpressionClass parsedExpression(scope);
 	mvceditor::ScopeResultClass expressionScope;
 	mvceditor::SymbolTableMatchErrorClass error;
 	
@@ -531,7 +532,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 void mvceditor::PhpDocumentClass::HandleAutoCompletionPhpStatus(
 		const mvceditor::SymbolTableMatchErrorClass& error, 
 		const UnicodeString& lastExpression,
-		const pelet::SymbolClass& parsedExpression,
+		const pelet::ExpressionClass& parsedExpression,
 		const mvceditor::ScopeResultClass& expressionScope,
 		wxString& completeStatus) {
 	if (lastExpression.isEmpty()) {
@@ -565,7 +566,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhpStatus(
 			completeStatus += wxT("\"");
 		}
 		else if (mvceditor::SymbolTableMatchErrorClass::UNKNOWN_RESOURCE == error.Type) {
-			if (parsedExpression.Lexeme == UNICODE_STRING_SIMPLE("$this")) {
+			if (parsedExpression.FirstValue() == UNICODE_STRING_SIMPLE("$this")) {
 				completeStatus = _("No public, protected, or private member matches for \"");
 			}
 			else {
@@ -748,7 +749,8 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetCurrentSym
 	std::vector<mvceditor::ResourceClass> matches;
 	pelet::LexicalAnalyzerClass lexer;
 	pelet::ParserClass parser;
-	pelet::SymbolClass parsedExpression;
+	pelet::ScopeClass scope;
+	pelet::ExpressionClass parsedExpression(scope);
 	mvceditor::ScopeFinderClass scopeFinder;
 	mvceditor::ScopeResultClass scopeResult;
 	
@@ -909,7 +911,8 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetSymbolAt(i
 	std::vector<mvceditor::ResourceClass> matches;
 	pelet::LexicalAnalyzerClass lexer;
 	pelet::ParserClass parser;
-	pelet::SymbolClass parsedExpression;
+	pelet::ScopeClass scope;
+	pelet::ExpressionClass parsedExpression(scope);
 	mvceditor::ScopeFinderClass scopeFinder;
 	mvceditor::ScopeResultClass expressionScope;
 	

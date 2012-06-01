@@ -140,7 +140,7 @@ public:
 	 * @param parsedExpression the expression that was attempted
 	 * @param className the name of the class that was searched
 	 */
-	void ToVisibility(const pelet::SymbolClass& parsedExpression, const UnicodeString& className);
+	void ToVisibility(const pelet::ExpressionClass& parsedExpression, const UnicodeString& className);
 
 	/**
 	 * @param className the class name that was attempted
@@ -164,7 +164,7 @@ public:
 	 * @param parsedExpression the expression that was attempted
 	 * @param className the name of the class that was searched
 	 */
-	void ToUnknownResource(const pelet::SymbolClass& parsedExpression, const UnicodeString& className);
+	void ToUnknownResource(const pelet::ExpressionClass& parsedExpression, const UnicodeString& className);
 
 };
 
@@ -199,6 +199,95 @@ class ScopeResultClass {
 	bool IsGlobalScope() const;
 	
 	bool IsGlobalNamespace() const;
+};
+
+/**
+ * This class represents one variable found in the source code, along with
+ * the function call used to create the variable. A symbol is created ONLY
+ * when a variable is guaranteed to have been created [according to PHP rules].
+ * This includes:
+ * 
+ * 1. Assignments     $name = $person->name
+ * 2. For-each loop   for ($list as $k => $v)
+ * 3. lists asssignments  list ($a, $b, $c) = $listOfItems;
+ * 4. catch blocks    catch (Exception $e)
+ * 
+ * For example, the source code
+ * 
+ * $person = new Person('John');
+ * 
+ * will create one symbol with the ChainList = [ 'Person' ]
+ * See pelet::ExpressionClass for more info on ChainList.
+ * 
+ * In the case that a variable changes type from an array to another type in 
+ * the same scope,  then only the first type will be used. For example, the 
+ * source code
+ * 
+ *   $person = new Person('John');
+ *   $person = $person->name;
+ * 
+ * Will create one symbol "person" with the type string.
+ */
+class SymbolClass {
+	
+public:
+
+	/**
+	 * The variable type
+	 * UNKNOWN: could not determine / or a variable variable $us{$userName}
+	 * SCALAR: definitely a string, or number
+	 * ARRAY: definitely a PHP array
+	 * OBJECT: definitely a PHP object
+	 */
+	enum Types {
+		UNKNOWN,  
+		SCALAR,
+		ARRAY,
+		OBJECT
+	};
+	
+	/**
+	 * The name of the PHP variable. Will always start with the
+	 * siguil '$'
+	 */
+	UnicodeString Variable;
+	
+	/**
+	 * The type that the PHPDoc attached to the variable (ie. \@var $dog DogClass)
+	 * This is exactly what is in the DOC, it may or may not be valid.
+	 */
+	UnicodeString PhpDocType;
+	
+	/** 
+	 * The chain of function / property calls used to create this variable
+	 * 
+	 * @see pelet::ExpressionClass
+	 */
+	std::vector<UnicodeString> ChainList;
+	
+	/**
+	 * The list of array keys that this array is know to have.
+	 * These are only the constant keys; also these keys are found from both
+	 * the initial array creation ANS subsequent assignments. For the following
+	 * source code:
+	 * 
+	 *   $typesList = array( 'one' => 1, 'two' => 2);
+	 *   $typesList['thre'] = 3;
+	 * 
+	 * There will be only 1 symbol, and ArrayKeys will contain 3 items: 'one', 'two'
+	 * and 'three'
+	 * 
+	 * This array is only useful when a variable is an array.
+	 */
+	std::vector<UnicodeString> ArrayKeys;
+	
+	/**
+	 * The symbol type; what kind of variable this variable is 
+	 */
+	Types Type;
+	
+	SymbolClass(const UnicodeString& variable, Types type = UNKNOWN);
+	
 };
 
 /**
@@ -277,7 +366,7 @@ public:
 	 *        slower because ResourceFinderClass still handles them
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear() )
 	 */
-	void ExpressionCompletionMatches(pelet::SymbolClass parsedExpression, const ScopeResultClass& expressionScope, 
+	void ExpressionCompletionMatches(pelet::ExpressionClass parsedExpression, const ScopeResultClass& expressionScope, 
 		const std::map<wxString, ResourceFinderClass*>& openedResourceFinders,
 		mvceditor::ResourceFinderClass* globalResourceFinder,
 		std::vector<UnicodeString>& autoCompleteVariableList,
@@ -315,7 +404,7 @@ public:
 	 *        returned
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
-	void ResourceMatches(pelet::SymbolClass parsedExpression, const ScopeResultClass& expressionScope, 
+	void ResourceMatches(pelet::ExpressionClass parsedExpression, const ScopeResultClass& expressionScope, 
 		const std::map<wxString, ResourceFinderClass*>& openedResourceFinders,
 		mvceditor::ResourceFinderClass* globalResourceFinder,
 		std::vector<ResourceClass>& resourceMatches,
@@ -334,12 +423,12 @@ public:
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber);
 	
-	virtual void FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, 
+	void FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 		const int lineNumber);
 		
-	void VariableFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
-		const pelet::SymbolClass& symbol, const UnicodeString& comment);
+	void VariableFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
+		const pelet::VariableClass& variable, const pelet::ExpressionClass& expression, const UnicodeString& comment);
 		
 	/**
 	 * Set the version that the PHP parser should use.
@@ -352,16 +441,16 @@ private:
 	 * Get the vector of variables for the given scope. If scope does not exist it will
 	 * be created.
 	 * 
-	 * @return std::vector<pelet::SymbolClass>&
+	 * @return std::vector<mvceditor::SymbolClass>&
 	 */
-	std::vector<pelet::SymbolClass>& GetScope(const UnicodeString& className, const UnicodeString& functionName);
+	std::vector<mvceditor::SymbolClass>& GetScope(const UnicodeString& className, const UnicodeString& functionName);
 
 	/**
 	 * 	Add the super global PHP predefined variables into the given scope.  For example  $_GET, $_POST, ....
 	 * 
-	 *  @param vector<pelet::SymbolClass>& scope the scope list
+	 *  @param vector<mvceditor::SymbolClass>& scope the scope list
 	 */
-	void CreatePredefinedVariables(std::vector<pelet::SymbolClass>& scope);
+	void CreatePredefinedVariables(std::vector<mvceditor::SymbolClass>& scope);
 	
 	/**
 	 * Modifies the expression; resolving namespaces alias to their fully qualified equivalents
@@ -369,7 +458,7 @@ private:
 	 * @param the expression to resolve
 	 * @param scope the scope that containts the aliases to resolve against
 	 */
-	void ResolveNamespaceAlias(pelet::SymbolClass& parsedExpression, const ScopeResultClass& scopeResult) const;
+	void ResolveNamespaceAlias(pelet::ExpressionClass& parsedExpression, const ScopeResultClass& scopeResult) const;
 	
 	/**
 	 * Modifies the RESOURCE; unresolving namespaces alias to their aliased equivalents. We need to 
@@ -380,7 +469,7 @@ private:
 	 * @param scope the scope that containts the aliases to resolve against
 	 * @param resource a matched resource; will get modified an any namespace will be 'unresolved'
 	 */
-	void UnresolveNamespaceAlias(const pelet::SymbolClass& originalExpression, const ScopeResultClass& scopeResult, mvceditor::ResourceClass& resource) const;
+	void UnresolveNamespaceAlias(const pelet::ExpressionClass& originalExpression, const ScopeResultClass& scopeResult, mvceditor::ResourceClass& resource) const;
 
 	/**
 	 * The parser.
@@ -394,9 +483,9 @@ private:
 	 * The key will be the scope name.  The scope name is a combination of the class, method name. 
 	 * The scope string is that which is returned by ScopeString() method.
 	 * The value is the parsed Symbol.
-	 * @var std::map<UnicodeString, vector<pelet::SymbolClass>>
+	 * @var std::map<UnicodeString, vector<mvceditor::SymbolClass>>
 	 */
-	std::map<UnicodeString, std::vector<pelet::SymbolClass>, UnicodeStringComparatorClass> Variables;
+	std::map<UnicodeString, std::vector<mvceditor::SymbolClass>, UnicodeStringComparatorClass> Variables;
 
 };
 
@@ -442,19 +531,14 @@ public:
 	
 	void ClassEnd(const UnicodeString& namespaceName, const UnicodeString& className, int pos);
 		
-	void NamespaceDeclarationFound(const UnicodeString& namespaceName);
+	void NamespaceDeclarationFound(const UnicodeString& namespaceName, int startingPos);
 
-	void NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias);
-
-	void MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
-		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
-		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber);
-	
-	void FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, 
-		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
-		const int lineNumber);
+	void NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias, int startingPos);
 		
-	void FunctionEnd(const UnicodeString& namespaceName, const UnicodeString& functionName, int pos);
+	void MethodScope(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
+		int startingPos, int endingPos);
+			
+	void FunctionScope(const UnicodeString& namespaceName, const UnicodeString& functionName, int startingPos, int endingPos);
 	
 	/**
 	 * Set the version that the PHP parser should use.

@@ -746,7 +746,6 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindMat
 		"\t array_map($userList, create_function('$user', 'echo $user->getName()')); \n"
 		"\t echo \"\\n\";\n"
 		"}\n"
-		"printUser{CURSOR}"
 		"?>\n"
 	);
 	CHECK(ResourceFinder.Prepare(wxT("printUse")));
@@ -786,7 +785,6 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 		"\t echo $user->getName() . \"\\n\";"
 		"}\n"
 		"$user = new UserClass();\n"
-		"printUse{CURSOR}"
 	);
 	wxString fileName = wxT("Untitled");
 	CHECK(ResourceFinder.Prepare(wxT("printUse")));
@@ -1084,8 +1082,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceMatchShouldReturnSignatur
 		"\t}\n"
 		"}\n"
 		"class AdminClass extends UserClass {\n"
-		"\tfunction deleteUser() {\n"
-		"\t\t$this->getNam{CURSOR}\n"
+		"\tfunction deleteUser() { } \n"
 		"}\n"
 		"function userClassPrint($user) {\n"
 		"\t echo $user->getName() . \"\\n\";"

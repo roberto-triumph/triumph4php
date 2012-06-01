@@ -60,14 +60,16 @@ public:
 	SymbolTableTestClass()
 	 : FileTestFixtureClass(wxT("symbol_table")) 
 	 , SymbolTable()
-	 , ParsedExpression()  {
+	 , Scope()
+	 , ParsedExpression(Scope)  {
 		if (wxDirExists(TestProjectDir)) {
 			RecursiveRmDir(TestProjectDir);
 		}
 	}
 
 	mvceditor::SymbolTableClass SymbolTable;
-	pelet::SymbolClass ParsedExpression;
+	pelet::ScopeClass Scope;
+	pelet::ExpressionClass ParsedExpression;
 };
 
 class SymbolTableCompletionTestClass {
@@ -75,7 +77,8 @@ class SymbolTableCompletionTestClass {
 public:
 
 	mvceditor::SymbolTableClass CompletionSymbolTable;
-	pelet::SymbolClass ParsedExpression;
+	pelet::ScopeClass Scope;
+	pelet::ExpressionClass ParsedExpression;
 	std::map<wxString, mvceditor::ResourceFinderClass*> OpenedFinders;
 	mvceditor::ResourceFinderClass Finder1;
 	mvceditor::ResourceFinderClass GlobalFinder;
@@ -88,7 +91,8 @@ public:
 
 	SymbolTableCompletionTestClass()
 		: CompletionSymbolTable()
-		, ParsedExpression()
+		, Scope()
+		, ParsedExpression(Scope)
 		, OpenedFinders()
 		, Finder1()
 		, GlobalFinder()
@@ -113,7 +117,6 @@ public:
 
 	void ToFunction(const UnicodeString& functionName) {
 		ParsedExpression.ChainList.clear();
-		ParsedExpression.Lexeme = functionName;
 		ParsedExpression.ChainList.push_back(functionName);
 	}
 
@@ -121,7 +124,6 @@ public:
 
 		// same as function make, but it makes tests easier to read
 		ParsedExpression.ChainList.clear();
-		ParsedExpression.Lexeme = variableName;
 		ParsedExpression.ChainList.push_back(variableName);
 	}
 	
@@ -129,13 +131,11 @@ public:
 
 		// same as function make, but it makes tests easier to read
 		ParsedExpression.ChainList.clear();
-		ParsedExpression.Lexeme = className;
 		ParsedExpression.ChainList.push_back(className);
 	}
 
 	void ToMethod(const UnicodeString& variableName, const UnicodeString& methodName, bool isStatic) {
 		ParsedExpression.ChainList.clear();
-		ParsedExpression.Lexeme = variableName;
 		ParsedExpression.ChainList.push_back(variableName);
 		UnicodeString operatorString = isStatic ? UNICODE_STRING_SIMPLE("::") : UNICODE_STRING_SIMPLE("->");
 		ParsedExpression.ChainList.push_back(operatorString + methodName);
@@ -412,8 +412,8 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithParentChain) {
 		"class OtherClass extends FirstClass { var $time; function status() { } }\n"
 		"$my = new MyClass;\n"
 	);
-	Init(sourceCode);	
-	ParsedExpression.Lexeme = UNICODE_STRING_SIMPLE("parent");
+	Init(sourceCode);
+	ParsedExpression.ChainList.clear();
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("parent"));
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("::"));
 	ScopeResult.MethodName = UNICODE_STRING_SIMPLE("OtherClass::status");
@@ -805,8 +805,8 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressio
 		"$my = new MyClass;\n"
 	);
 	Init(sourceCode);	
-	pelet::SymbolClass emptyExpression;
-	emptyExpression.Lexeme = UNICODE_STRING_SIMPLE("unknown");
+	pelet::ExpressionClass emptyExpression(Scope);
+	emptyExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("unknown"));
 	std::vector<mvceditor::ResourceClass> resources;
 	CompletionSymbolTable.ResourceMatches(emptyExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, resources, true, false, Error);
@@ -1068,35 +1068,6 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleMultipleBlocks) {
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("::"), ScopeResult.MethodName);
 }
 
-TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleUnfinishedBlock) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
-		"<?php\n"
-		"$globalOne = 1;\n"
-		"function printUser(User $user) {\n"
-		"\t$someName = '';\n"
-		"{CURSOR}"
-	);
-	int32_t pos;
-	sourceCode = FindCursor(sourceCode, pos);
-	ScopeFinder.GetScopeString(sourceCode, pos, ScopeResult);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("::printUser"), ScopeResult.MethodName);
-}
-
-TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleUnfinishedClassMethod) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
-		"<?php\n"
-		"$globalOne = 1;\n"
-		"class MyClass {\n"
-		"function printUser(User $user) {\n"
-		"\t$someName = '';\n"
-		"{CURSOR}"
-	);
-	int32_t pos;
-	sourceCode = FindCursor(sourceCode, pos);
-	ScopeFinder.GetScopeString(sourceCode, pos, ScopeResult);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass::printUser"), ScopeResult.MethodName);
-}
-
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringWithMultipleNamespaces) {
 	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
 		"<?php\n"
@@ -1106,7 +1077,9 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringWithMultipleNamespaces) {
 		"namespace Second\\Child {"
 		"	use PDOException as PE; \n"
 		" 	function  work() {"
-		"{CURSOR}"
+		"{CURSOR}\n"
+		"   }\n"
+		"}\n"
 	);
 	int32_t pos;
 	sourceCode = FindCursor(sourceCode, pos);

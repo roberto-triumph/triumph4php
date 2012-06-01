@@ -69,7 +69,8 @@ public:
 	UnicodeString Code2;
 	bool DoDuckTyping;
 	bool DoFullyQualifiedMatchOnly;
-	pelet::SymbolClass ParsedExpression;
+	pelet::ScopeClass Scope;
+	pelet::ExpressionClass ParsedExpression;
 	mvceditor::ScopeResultClass ScopeResult;
 
 	std::vector<UnicodeString> VariableMatches;
@@ -90,7 +91,8 @@ public:
 		, Code2()
 		, DoDuckTyping(false)
 		, DoFullyQualifiedMatchOnly(false)
-		, ParsedExpression()
+		, Scope()
+		, ParsedExpression(Scope)
 		, ScopeResult()
 		, VariableMatches()
 		, ResourceMatches()
@@ -203,7 +205,6 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, GlobalFinder) {
 	CHECK(ResourceCache.Register(File2, false));
 	CHECK(ResourceCache.Update(File2, Code2, true));
 	
-	ParsedExpression.Lexeme = UNICODE_STRING_SIMPLE("$action");
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->w"));
 	ResourceCache.ExpressionCompletionMatches(File2, ParsedExpression, ScopeResult, 
@@ -230,7 +231,6 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, RegisteredFinder) {
 	CHECK(ResourceCache.Register(File2, false));
 	CHECK(ResourceCache.Update(File2, Code2, true));
 	
-	ParsedExpression.Lexeme = UNICODE_STRING_SIMPLE("$action");
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->w"));
 	ResourceCache.ExpressionCompletionMatches(File1, ParsedExpression, ScopeResult, 
@@ -255,7 +255,6 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithGlobalF
 	CHECK(ResourceCache.Register(File1, false));
 	CHECK(ResourceCache.Update(File1, Code1, true));
 	
-	ParsedExpression.Lexeme = UNICODE_STRING_SIMPLE("$action");
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->w"));
 	ResourceCache.ResourceMatches(File1, ParsedExpression, ScopeResult, 
@@ -281,7 +280,6 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithRegiste
 	CHECK(ResourceCache.Update(File1, Code1, true));
 	CHECK(ResourceCache.Update(File2, Code2, true));
 
-	ParsedExpression.Lexeme = UNICODE_STRING_SIMPLE("$action");
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->methodA"));
 
@@ -311,7 +309,6 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithStaleMa
 	CHECK(ResourceCache.Register(File1, false));
 	CHECK(ResourceCache.Update(File1, Code1, true));
 
-	ParsedExpression.Lexeme = UNICODE_STRING_SIMPLE("$action");
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
 	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->methodA"));
 

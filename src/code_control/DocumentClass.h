@@ -238,7 +238,7 @@ private:
 	 * Fills completeStatus with a human-friendly version of the symbol table error
 	 */
 	void HandleAutoCompletionPhpStatus(const SymbolTableMatchErrorClass& error, 
-		const UnicodeString& lastExpression, const pelet::SymbolClass& parsedExpression,
+		const UnicodeString& lastExpression, const pelet::ExpressionClass& parsedExpression,
 		const ScopeResultClass& expressionScope, wxString& completeStatus);
 
 	/**

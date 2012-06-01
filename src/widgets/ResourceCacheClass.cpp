@@ -236,7 +236,7 @@ std::vector<mvceditor::ResourceFinderClass*> mvceditor::ResourceCacheClass::Iter
 	return finders;
 }
 
-void mvceditor::ResourceCacheClass::ExpressionCompletionMatches(const wxString& fileName, const pelet::SymbolClass& parsedExpression, const mvceditor::ScopeResultClass& expressionScope, 
+void mvceditor::ResourceCacheClass::ExpressionCompletionMatches(const wxString& fileName, const pelet::ExpressionClass& parsedExpression, const mvceditor::ScopeResultClass& expressionScope, 
 													 std::vector<UnicodeString>& autoCompleteList,
 													 std::vector<mvceditor::ResourceClass>& resourceMatches,
 													 bool doDuckTyping,
@@ -260,7 +260,7 @@ void mvceditor::ResourceCacheClass::ExpressionCompletionMatches(const wxString& 
 	}
 }
 
-void mvceditor::ResourceCacheClass::ResourceMatches(const wxString& fileName, const pelet::SymbolClass& parsedExpression, const mvceditor::ScopeResultClass& expressionScope, 
+void mvceditor::ResourceCacheClass::ResourceMatches(const wxString& fileName, const pelet::ExpressionClass& parsedExpression, const mvceditor::ScopeResultClass& expressionScope, 
 													 std::vector<mvceditor::ResourceClass>& matches,
 													 bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 													mvceditor::SymbolTableMatchErrorClass& error) {
@@ -274,6 +274,8 @@ void mvceditor::ResourceCacheClass::ResourceMatches(const wxString& fileName, co
 		mvceditor::SymbolTableClass* symbolTable = itSymbols->second;
 		if (symbolTable) {
 			foundSymbolTable = true;
+			symbolTable->Print();
+			GlobalResourceFinder.Print();
 			symbolTable->ResourceMatches(parsedExpression, expressionScope, Finders, &GlobalResourceFinder, 
 				matches, doDuckTyping, doFullyQualifiedMatchOnly, error);
 		}
