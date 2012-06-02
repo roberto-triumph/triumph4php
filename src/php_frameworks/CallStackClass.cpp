@@ -239,13 +239,16 @@ void mvceditor::CallStackClass::ExpressionFound(const pelet::ExpressionClass& ex
 					}
 					ResourcesRemaining.push(newItem);
 					
-					printf("** PUSHING INTO LIST size=%d\n\n", (int)expression.CallArguments.size());
-					UFILE* ufout = u_finit(stdout, NULL, NULL);
-					u_fprintf(ufout, "expr=%S\n", expression.FirstValue().getTerminatedBuffer());
-					u_fclose(ufout);
 					mvceditor::CallClass newCall;
 					newCall.Resource = *it;
-					newCall.Arguments = expression.CallArguments;
+					
+					// TODO better mapping of call arguments to the correct function call
+					for (size_t i = 0; i < expression.ChainList.size(); ++i) {
+						if (!expression.ChainList[i].CallArguments.empty()) {
+							newCall.Arguments = expression.ChainList[i].CallArguments;
+							break;
+						}
+					}
 					List.push_back(newCall);
 				}
 			}

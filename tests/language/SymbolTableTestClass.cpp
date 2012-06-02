@@ -116,29 +116,50 @@ public:
 	}
 
 	void ToFunction(const UnicodeString& functionName) {
-		ParsedExpression.ChainList.clear();
-		ParsedExpression.ChainList.push_back(functionName);
+		
+		// same as ToVariable, but it makes tests easier to read
+		ParsedExpression.Clear();
+		pelet::VariablePropertyClass prop;
+		prop.Name = functionName;
+		
+		// dont set prop.IsFunction since functionName may be a partial function name
+		ParsedExpression.ChainList.push_back(prop);
 	}
 
 	void ToVariable(const UnicodeString& variableName) {
-
-		// same as function make, but it makes tests easier to read
-		ParsedExpression.ChainList.clear();
-		ParsedExpression.ChainList.push_back(variableName);
+		ParsedExpression.Clear();
+		pelet::VariablePropertyClass prop;
+		prop.Name = variableName;
+		ParsedExpression.ChainList.push_back(prop);
 	}
 	
 	void ToClass(const UnicodeString& className) {
 
-		// same as function make, but it makes tests easier to read
-		ParsedExpression.ChainList.clear();
-		ParsedExpression.ChainList.push_back(className);
+		// same as ToVariable, but it makes tests easier to read
+		ParsedExpression.Clear();
+		pelet::VariablePropertyClass prop;
+		prop.Name = className;
+		ParsedExpression.ChainList.push_back(prop);
 	}
 
-	void ToMethod(const UnicodeString& variableName, const UnicodeString& methodName, bool isStatic) {
-		ParsedExpression.ChainList.clear();
-		ParsedExpression.ChainList.push_back(variableName);
-		UnicodeString operatorString = isStatic ? UNICODE_STRING_SIMPLE("::") : UNICODE_STRING_SIMPLE("->");
-		ParsedExpression.ChainList.push_back(operatorString + methodName);
+	void ToProperty(const UnicodeString& variableName, const UnicodeString& methodName, bool isMethod, bool isStatic) {
+		ParsedExpression.Clear();
+		pelet::VariablePropertyClass classProp;
+		classProp.Name = variableName;
+		ParsedExpression.ChainList.push_back(classProp);
+		
+		pelet::VariablePropertyClass methodProp;
+		methodProp.Name = methodName;
+		methodProp.IsFunction = isMethod;
+		methodProp.IsStatic = isStatic;
+		ParsedExpression.ChainList.push_back(methodProp);
+	}
+	
+	void ExpressionAppendChain(const UnicodeString& propertyName, bool isMethod) {
+		pelet::VariablePropertyClass prop;
+		prop.Name = propertyName;
+		prop.IsFunction = isMethod;
+		ParsedExpression.ChainList.push_back(prop);
 	}
 };
 
@@ -240,7 +261,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodCall) {
 		"$my = new MyClass;\n"
 	);
 	Init(sourceCode);	
-	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false);
+	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false, false);
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_VECTOR_SIZE(2, ResourceMatches);
@@ -258,7 +279,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodCallFromGlobalFind
 	);
 	Init(sourceCode);
 	GlobalFinder.BuildResourceCacheForFile(wxT("MyClass.php"), sourceCodeGlobal, true);
-	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false);
+	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false, false);
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_VECTOR_SIZE(2, ResourceMatches);
@@ -287,7 +308,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithLocalFinderOverridesGlob
 	OpenedFinders[wxT("MyClass.php")] = &localFinder;
 
 	GlobalFinder.BuildResourceCacheForFile(wxT("MyClass.php"), sourceCodeGlobal, true);
-	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false);
+	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false, false);
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_VECTOR_SIZE(1, ResourceMatches);
@@ -301,7 +322,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithObjectWithoutMethodCall)
 		"$my = new MyClass;\n"
 	);
 	Init(sourceCode);	
-	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE(""), false);
+	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE(""), false, false);
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_VECTOR_SIZE(2, ResourceMatches);
@@ -315,7 +336,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithStaticMethodCall) {
 		"class MyClass { function workA() {} static function workB() {} } \n"
 	);
 	Init(sourceCode);	
-	ToMethod(UNICODE_STRING_SIMPLE("MyClass"), UNICODE_STRING_SIMPLE("work"), true);
+	ToProperty(UNICODE_STRING_SIMPLE("MyClass"), UNICODE_STRING_SIMPLE("work"), false, true);
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_VECTOR_SIZE(1, ResourceMatches);
@@ -329,7 +350,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithPrivateMethodCall) {
 		"$my = new MyClass;\n"
 	);
 	Init(sourceCode);	
-	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false);
+	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false, false);
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_VECTOR_SIZE(1, ResourceMatches);
@@ -344,8 +365,8 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodChain) {
 		"$my = new MyClass;\n"
 	);
 	Init(sourceCode);	
-	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("workA()"), false);
-	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->ti"));
+	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("workA"), true, false);
+	ExpressionAppendChain(UNICODE_STRING_SIMPLE("ti"), false);
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_VECTOR_SIZE(1, ResourceMatches);
@@ -360,9 +381,9 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithLongPropertyChain) {
 		"$my = new MyClass;\n"
 	);
 	Init(sourceCode);	
-	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("workA()"), false);
-	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->parent"));
-	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->pare"));
+	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("workA"), true, false);
+	ExpressionAppendChain(UNICODE_STRING_SIMPLE("parent"), false);
+	ExpressionAppendChain(UNICODE_STRING_SIMPLE("pare"), false);
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_VECTOR_SIZE(1, ResourceMatches);
@@ -377,10 +398,10 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithLongMethodChain) {
 		"$my = new MyClass;\n"
 	);
 	Init(sourceCode);	
-	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("workA()"), false);
-	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->parent()"));
-	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->parent()"));
-	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->p"));
+	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("workA"), true, false);
+	ExpressionAppendChain(UNICODE_STRING_SIMPLE("parent"), true);
+	ExpressionAppendChain(UNICODE_STRING_SIMPLE("parent"), true);
+	ExpressionAppendChain(UNICODE_STRING_SIMPLE("p"), false);
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_VECTOR_SIZE(1, ResourceMatches);
@@ -396,9 +417,9 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithFunctionChain) {
 		"$my = new MyClass;\n"
 	);
 	Init(sourceCode);	
-	ToFunction(UNICODE_STRING_SIMPLE("workA()"));
-	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->toString()"));
-	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->stat"));
+	ToFunction(UNICODE_STRING_SIMPLE("workA"));
+	ExpressionAppendChain(UNICODE_STRING_SIMPLE("toString"), true);
+	ExpressionAppendChain(UNICODE_STRING_SIMPLE("stat"), false);
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_VECTOR_SIZE(1, ResourceMatches);
@@ -413,9 +434,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithParentChain) {
 		"$my = new MyClass;\n"
 	);
 	Init(sourceCode);
-	ParsedExpression.ChainList.clear();
-	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("parent"));
-	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("::"));
+	ToProperty(UNICODE_STRING_SIMPLE("parent"), UNICODE_STRING_SIMPLE(""), false, true);
 	ScopeResult.MethodName = UNICODE_STRING_SIMPLE("OtherClass::status");
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
@@ -433,8 +452,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableCreatedFunctionC
 		"$my = workA();\n"
 	);
 	Init(sourceCode);	
-	ToVariable(UNICODE_STRING_SIMPLE("$my"));
-	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->"));
+	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE(""), false, false);
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_VECTOR_SIZE(2, ResourceMatches);
@@ -452,8 +470,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableCreatedMethodCha
 		"$parent = $my->parent();\n"
 	);
 	Init(sourceCode);	
-	ToVariable(UNICODE_STRING_SIMPLE("$parent"));
-	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->"));
+	ToProperty(UNICODE_STRING_SIMPLE("$parent"), UNICODE_STRING_SIMPLE(""), false, false);
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_VECTOR_SIZE(2, ResourceMatches);
@@ -507,7 +524,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithSimilarClassAndF
 		"$my =  new My(); \n"
 	);
 	Init(sourceCode);	
-	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE(""), false);
+	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE(""), false, false);
 	std::vector<mvceditor::ResourceClass> resources;
 	CompletionSymbolTable.ResourceMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, resources, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
@@ -782,7 +799,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithMethodCall) {
 		"$my = new MyClass;\n"
 	);
 	Init(sourceCode);	
-	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false);
+	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false, false);
 	std::vector<mvceditor::ResourceClass> resources;
 	CompletionSymbolTable.ResourceMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, resources, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
@@ -804,11 +821,10 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressio
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"$my = new MyClass;\n"
 	);
-	Init(sourceCode);	
-	pelet::ExpressionClass emptyExpression(Scope);
-	emptyExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("unknown"));
+	Init(sourceCode);
+	ToFunction(UNICODE_STRING_SIMPLE("unknown"));
 	std::vector<mvceditor::ResourceClass> resources;
-	CompletionSymbolTable.ResourceMatches(emptyExpression, ScopeResult, OpenedFinders, 
+	CompletionSymbolTable.ResourceMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, resources, true, false, Error);
 	CHECK_EQUAL((size_t)0, resources.size());
 }
@@ -825,7 +841,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressio
 		"$my = make();"
 	);
 	Init(sourceCode);	
-	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false);
+	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false, false);
 	std::vector<mvceditor::ResourceClass> resources;
 	CompletionSymbolTable.ResourceMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, resources, false, false, Error);
@@ -845,7 +861,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownVariableA
 		"$my = make();"
 	);
 	Init(sourceCode);	
-	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false);
+	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false, false);
 	std::vector<mvceditor::ResourceClass> resources;
 	CompletionSymbolTable.ResourceMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, resources, true, false, Error);
@@ -886,7 +902,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithTraitInDifferent
 		
 	);
 	Init(sourceCode);
-	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE(""), false);
+	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE(""), false, false);
 	ScopeResult.NamespaceName = UNICODE_STRING_SIMPLE("\\Second");
 	ScopeResult.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = UNICODE_STRING_SIMPLE("\\Second");
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, ScopeResult, OpenedFinders, 
@@ -906,7 +922,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillUnknownResourceError) {
 		"$my = new MyClass;\n"
 	);
 	Init(sourceCode);	
-	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("unknownFunc"), false);
+	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("unknownFunc"), false, false);
 	std::vector<mvceditor::ResourceClass> resources;
 	CompletionSymbolTable.ResourceMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, resources, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
@@ -925,8 +941,8 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillResolutionError) {
 		"$my = new MyClass;\n"
 	);
 	Init(sourceCode);	
-	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("workB()"), false);
-	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->prop"));
+	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("workB"), true, false);
+	ExpressionAppendChain(UNICODE_STRING_SIMPLE("prop"), false);
 	std::vector<mvceditor::ResourceClass> resources;
 	CompletionSymbolTable.ResourceMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, resources, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
@@ -945,7 +961,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillPrimitveError) {
 		"$my = '124';\n"
 	);
 	Init(sourceCode);	
-	ToMethod(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("wor"), false);
+	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("wor"), false, false);
 	std::vector<mvceditor::ResourceClass> resources;
 	CompletionSymbolTable.ResourceMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, resources, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
@@ -965,7 +981,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, WithDuckTyping) {
 	);
 	Init(sourceCode);	
 	ToFunction(UNICODE_STRING_SIMPLE("factory"));
-	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->work"));
+	ExpressionAppendChain(UNICODE_STRING_SIMPLE("work"), false);
 	DoDuckTyping = true;
 	CompletionSymbolTable.ResourceMatches(ParsedExpression, ScopeResult, OpenedFinders, 
 		&GlobalFinder, ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);

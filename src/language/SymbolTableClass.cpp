@@ -113,7 +113,7 @@ static bool IsResourceVisible(const mvceditor::ResourceClass& resource, const pe
 }
 
 /**
- * @return bool TRUE if the given parsed expression uses static acces ("::")
+ * @return bool TRUE if the given parsed expression uses static access ("::")
  */
 static bool IsStaticExpression(const pelet::ExpressionClass& parsedExpression) {
 
@@ -124,7 +124,7 @@ static bool IsStaticExpression(const pelet::ExpressionClass& parsedExpression) {
 	}
 	return
 		parsedExpression.FirstValue().caseCompare(UNICODE_STRING_SIMPLE("self"), 0) == 0
-		|| (parsedExpression.ChainList.size() > 1 && parsedExpression.ChainList[1].startsWith(UNICODE_STRING_SIMPLE("::")));
+		|| (parsedExpression.ChainList.size() > 1 && parsedExpression.ChainList[1].IsStatic);
 }
 
 /**
@@ -142,8 +142,6 @@ static UnicodeString ResolveResourceType(UnicodeString resourceToLookup,
 	// need to get the type from the resource finders
 	// the resource finder query string needs to have '::' also remove the function markers "()" that
 	// are put there by the expression parser
-	resourceToLookup.findAndReplace(UNICODE_STRING_SIMPLE("->"), UNICODE_STRING_SIMPLE("::"));
-	resourceToLookup.findAndReplace(UNICODE_STRING_SIMPLE("()"), UNICODE_STRING_SIMPLE(""));
 	for (size_t j = 0; j < resourceFinders.size(); ++j) {
 		mvceditor::ResourceFinderClass* finder = resourceFinders[j];
 		if (finder->Prepare(mvceditor::StringHelperClass::IcuToWx(resourceToLookup)) && finder->CollectFullyQualifiedResource()) {
@@ -219,7 +217,7 @@ static UnicodeString ResolveVariableType(const mvceditor::ScopeResultClass& expr
 				// variable was created with a 'new' or single function call
 				// the  ResolveResourceType will get the function return type
 				// if the variable was created from a function.
-				UnicodeString resourceToLookup = symbol.ChainList[0];
+				UnicodeString resourceToLookup = symbol.ChainList[0].Name;
 				std::vector<mvceditor::ResourceFinderClass*> allResourceFinders;
 				allResourceFinders.push_back(globalResourceFinder);
 				for (std::map<wxString, mvceditor::ResourceFinderClass*>::const_iterator it =  openedResourceFinders.begin(); it != openedResourceFinders.end(); ++it) {
@@ -292,7 +290,7 @@ static UnicodeString ResolveInitialLexemeType(const pelet::ExpressionClass& pars
 		// and get the type from there
 		for (size_t i = 0; i < scopeSymbols.size(); ++i) {
 			if (UNICODE_STRING_SIMPLE("$this") == scopeSymbols[i].Variable && !scopeSymbols[i].ChainList.empty()) {
-				typeToLookup = scopeSymbols[i].ChainList[0];
+				typeToLookup = scopeSymbols[i].ChainList[0].Name;
 			}
 		}
 	}
@@ -374,10 +372,7 @@ void mvceditor::SymbolTableMatchErrorClass::ToVisibility(const pelet::Expression
 		Type = mvceditor::SymbolTableMatchErrorClass::VISIBILITY_ERROR;
 	}
 	if (!parsedExpression.ChainList.empty()) {
-		ErrorLexeme = parsedExpression.ChainList.back();
-		ErrorLexeme.findAndReplace(UNICODE_STRING_SIMPLE("->"), UNICODE_STRING_SIMPLE(""));
-		ErrorLexeme.findAndReplace(UNICODE_STRING_SIMPLE("::"), UNICODE_STRING_SIMPLE(""));
-		ErrorLexeme.findAndReplace(UNICODE_STRING_SIMPLE("()"), UNICODE_STRING_SIMPLE(""));
+		ErrorLexeme = parsedExpression.ChainList.back().Name;
 	}
 	ErrorClass = className;	
 }
@@ -388,27 +383,18 @@ void mvceditor::SymbolTableMatchErrorClass::ToTypeResolution(const UnicodeString
 	Type = mvceditor::SymbolTableMatchErrorClass::TYPE_RESOLUTION_ERROR;
 	ErrorLexeme = methodName;
 	ErrorClass = className;
-	ErrorLexeme.findAndReplace(UNICODE_STRING_SIMPLE("->"), UNICODE_STRING_SIMPLE(""));
-	ErrorLexeme.findAndReplace(UNICODE_STRING_SIMPLE("::"), UNICODE_STRING_SIMPLE(""));
-	ErrorLexeme.findAndReplace(UNICODE_STRING_SIMPLE("()"), UNICODE_STRING_SIMPLE(""));
 }
 
 void mvceditor::SymbolTableMatchErrorClass::ToArrayError(const UnicodeString& className, const UnicodeString& methodName) {
 	Type = mvceditor::SymbolTableMatchErrorClass::ARRAY_ERROR;
 	ErrorLexeme = methodName;
 	ErrorClass = className;
-	ErrorLexeme.findAndReplace(UNICODE_STRING_SIMPLE("->"), UNICODE_STRING_SIMPLE(""));
-	ErrorLexeme.findAndReplace(UNICODE_STRING_SIMPLE("::"), UNICODE_STRING_SIMPLE(""));
-	ErrorLexeme.findAndReplace(UNICODE_STRING_SIMPLE("()"), UNICODE_STRING_SIMPLE(""));
 }
 
 void mvceditor::SymbolTableMatchErrorClass::ToPrimitiveError(const UnicodeString& className, const UnicodeString& methodName) {
 	Type = mvceditor::SymbolTableMatchErrorClass::PRIMITIVE_ERROR;
 	ErrorLexeme = methodName;
 	ErrorClass = className;
-	ErrorLexeme.findAndReplace(UNICODE_STRING_SIMPLE("->"), UNICODE_STRING_SIMPLE(""));
-	ErrorLexeme.findAndReplace(UNICODE_STRING_SIMPLE("::"), UNICODE_STRING_SIMPLE(""));
-	ErrorLexeme.findAndReplace(UNICODE_STRING_SIMPLE("()"), UNICODE_STRING_SIMPLE(""));
 }
 
 void mvceditor::SymbolTableMatchErrorClass::ToUnknownResource(const pelet::ExpressionClass& parsedExpression, const UnicodeString& className) {
@@ -420,10 +406,7 @@ void mvceditor::SymbolTableMatchErrorClass::ToUnknownResource(const pelet::Expre
 			Type = mvceditor::SymbolTableMatchErrorClass::UNKNOWN_RESOURCE;
 		}
 		ErrorClass = className;
-		ErrorLexeme = parsedExpression.ChainList.back();		
-		ErrorLexeme.findAndReplace(UNICODE_STRING_SIMPLE("->"), UNICODE_STRING_SIMPLE(""));
-		ErrorLexeme.findAndReplace(UNICODE_STRING_SIMPLE("::"), UNICODE_STRING_SIMPLE(""));
-		ErrorLexeme.findAndReplace(UNICODE_STRING_SIMPLE("()"), UNICODE_STRING_SIMPLE(""));
+		ErrorLexeme = parsedExpression.ChainList.back().Name;
 	}
 }
 
@@ -456,7 +439,9 @@ void mvceditor::SymbolTableClass::MethodFound(const UnicodeString& namespaceName
 
 	// create the $this variable
 	mvceditor::SymbolClass variableSymbol(UNICODE_STRING_SIMPLE("$this"), mvceditor::SymbolClass::OBJECT);
-	variableSymbol.ChainList.push_back(className);
+	pelet::VariablePropertyClass prop;
+	prop.Name = className;
+	variableSymbol.ChainList.push_back(prop);
 	methodScope.push_back(variableSymbol);
 }
 
@@ -468,7 +453,7 @@ void mvceditor::SymbolTableClass::VariableFound(const UnicodeString& namespaceNa
 	std::vector<mvceditor::SymbolClass>& symbols = GetScope(className, methodName);
 	bool found = false;
 	for (size_t i = 0; i < symbols.size(); ++i) {
-		if (!variable.ChainList.empty() && symbols[i].Variable == variable.ChainList[0]) {
+		if (!variable.ChainList.empty() && symbols[i].Variable == variable.ChainList[0].Name) {
 			found = true;
 			
 			if (!variable.ArrayKey.isEmpty()) {
@@ -486,7 +471,7 @@ void mvceditor::SymbolTableClass::VariableFound(const UnicodeString& namespaceNa
 		}
 	}
 	if (!found && !variable.ChainList.empty()) {
-		UnicodeString name = variable.ChainList[0];
+		UnicodeString name = variable.ChainList[0].Name;
 		mvceditor::SymbolClass::Types type;
 		std::vector<UnicodeString> arrayKeys;
 		switch (expression.ExpressionType) {
@@ -604,16 +589,16 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 
 		// need the empty check so that we don't overflow when doing 0 - 1 with size_t 
 		for (size_t i = 1;  i < (parsedExpression.ChainList.size() - 1) && !typeToLookup.isEmpty() && !error.HasError(); ++i) {	
-			UnicodeString nextResource = typeToLookup + parsedExpression.ChainList[i];
+			UnicodeString nextResource = typeToLookup + UNICODE_STRING_SIMPLE("::") + parsedExpression.ChainList[i].Name;
 			UnicodeString resolvedType = ResolveResourceType(nextResource, allResourceFinders);
 			if (resolvedType.isEmpty()) {
-				error.ToTypeResolution(typeToLookup, parsedExpression.ChainList[i]);
+				error.ToTypeResolution(typeToLookup, parsedExpression.ChainList[i].Name);
 			}
 			else if (typeToLookup.caseCompare(UNICODE_STRING_SIMPLE("primitive"), 0) == 0) {
-				error.ToPrimitiveError(typeToLookup, parsedExpression.ChainList[i]);
+				error.ToPrimitiveError(typeToLookup, parsedExpression.ChainList[i].Name);
 			}
 			else if (typeToLookup.caseCompare(UNICODE_STRING_SIMPLE("array"), 0) == 0) {
-				error.ToArrayError(typeToLookup, parsedExpression.ChainList[i]);
+				error.ToArrayError(typeToLookup, parsedExpression.ChainList[i].Name);
 			}
 			typeToLookup = resolvedType;
 		}
@@ -621,12 +606,7 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 
 	UnicodeString resourceToLookup;
 	if (!typeToLookup.isEmpty() && parsedExpression.ChainList.size() > 1 && !error.HasError()) {
-		resourceToLookup = typeToLookup + parsedExpression.ChainList.back();
-		resourceToLookup.findAndReplace(UNICODE_STRING_SIMPLE("->"), UNICODE_STRING_SIMPLE("::")); 
-
-		// remove the stuff leftover from the expression parser; the resource finder cannot handle them
-		// and would result in lookup failures
-		resourceToLookup.findAndReplace(UNICODE_STRING_SIMPLE("()"), UNICODE_STRING_SIMPLE("")); 
+		resourceToLookup = typeToLookup + UNICODE_STRING_SIMPLE("::") + parsedExpression.ChainList.back().Name;
 	}
 	else if (!typeToLookup.isEmpty() && !error.HasError()) {
 
@@ -638,12 +618,7 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 		// here, even if the type of previous items in the chain could not be resolved
 		// but were also known NOT to be errors
 		// perform "duck typing" lookups; just look for methods in any class
-		resourceToLookup = parsedExpression.ChainList.back();
-		resourceToLookup.findAndReplace(UNICODE_STRING_SIMPLE("->"), UNICODE_STRING_SIMPLE("::")); 
-
-		// remove the stuff leftover from the expression parser; the resource finder cannot handle them
-		// and would result in lookup failures
-		resourceToLookup.findAndReplace(UNICODE_STRING_SIMPLE("()"), UNICODE_STRING_SIMPLE("")); 
+		resourceToLookup = UNICODE_STRING_SIMPLE("::") + parsedExpression.ChainList.back().Name;
 	}
 
 	// now do the "final" lookup; here we will also perform access checks
@@ -712,7 +687,7 @@ void mvceditor::SymbolTableClass::Print() const {
 				symbol.Variable.getTerminatedBuffer()); 
 			for (size_t k = 0; k < symbol.ChainList.size(); ++k) {
 				u_fprintf(out, "%S->", 
-					symbol.ChainList[k].getTerminatedBuffer()); 
+					symbol.ChainList[k].Name.getTerminatedBuffer()); 
 			}
 			u_fprintf(out, "\n");
 		}
@@ -767,7 +742,7 @@ void mvceditor::SymbolTableClass::ResolveNamespaceAlias(pelet::ExpressionClass& 
 			if (name.startsWith(alias)) {
 				UnicodeString afterAlias(name, it->first.length());
 				name = it->second + afterAlias;
-				parsedExpression.ChainList[0] = name;				
+				parsedExpression.ChainList[0].Name = name;
 				break;
 			}
 		}

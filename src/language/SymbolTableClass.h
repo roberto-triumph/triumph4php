@@ -263,7 +263,7 @@ public:
 	 * 
 	 * @see pelet::ExpressionClass
 	 */
-	std::vector<UnicodeString> ChainList;
+	std::vector<pelet::VariablePropertyClass> ChainList;
 	
 	/**
 	 * The list of array keys that this array is know to have.

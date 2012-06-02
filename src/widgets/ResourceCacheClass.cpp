@@ -274,8 +274,8 @@ void mvceditor::ResourceCacheClass::ResourceMatches(const wxString& fileName, co
 		mvceditor::SymbolTableClass* symbolTable = itSymbols->second;
 		if (symbolTable) {
 			foundSymbolTable = true;
-			symbolTable->Print();
-			GlobalResourceFinder.Print();
+			///symbolTable->Print();
+			///GlobalResourceFinder.Print();
 			symbolTable->ResourceMatches(parsedExpression, expressionScope, Finders, &GlobalResourceFinder, 
 				matches, doDuckTyping, doFullyQualifiedMatchOnly, error);
 		}

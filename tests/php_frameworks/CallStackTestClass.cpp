@@ -74,7 +74,7 @@ public:
 };
 
 SUITE(CallStackTestClass) {
-#if 0
+
 TEST_FIXTURE(CallStackFixtureTestClass, FailOnUnknownResource) {
 	SetupFile(wxT("news.php"), Simple());
 	wxFileName file(TestProjectDir + wxT("news.php"));
@@ -169,7 +169,7 @@ TEST_FIXTURE(CallStackFixtureTestClass, FailOnEmptyCache) {
 	CHECK_EQUAL(false, localCallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), error));
 	CHECK_EQUAL(mvceditor::CallStackClass::EMPTY_CACHE, error);
 }
-#endif
+
 TEST_FIXTURE(CallStackFixtureTestClass, SimpleMethodCall) {
 	SetupFile(wxT("news.php"), Simple());
 	wxFileName file(TestProjectDir + wxT("news.php"));
@@ -187,7 +187,7 @@ TEST_FIXTURE(CallStackFixtureTestClass, SimpleMethodCall) {
 	CHECK_UNISTR_EQUALS("$data", CallStack.List[0].Arguments[1].FirstValue());
 	CHECK_EQUAL(pelet::ExpressionClass::VARIABLE, CallStack.List[0].Arguments[1].ExpressionType);
 }
-#if 0
+
 TEST_FIXTURE(CallStackFixtureTestClass, Persist) {
 	SetupFile(wxT("news.php"), Simple());
 	wxFileName file(TestProjectDir + wxT("news.php"));
@@ -210,5 +210,5 @@ TEST_FIXTURE(CallStackFixtureTestClass, Persist) {
 	CHECK_EQUAL(expected, contents);
 	
 }
-#endif
+
 }

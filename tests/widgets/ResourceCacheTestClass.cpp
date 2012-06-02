@@ -103,6 +103,17 @@ public:
 		PhpFileFilters.push_back(wxT("*.php"));
 		ScopeResult.MethodName = UNICODE_STRING_SIMPLE("::");
 	}
+	
+	void ToProperty(const UnicodeString& variableName, const UnicodeString& methodName) {
+		ParsedExpression.Clear();
+		pelet::VariablePropertyClass classProp;
+		classProp.Name = variableName;
+		ParsedExpression.ChainList.push_back(classProp);
+		
+		pelet::VariablePropertyClass methodProp;
+		methodProp.Name = methodName;
+		ParsedExpression.ChainList.push_back(methodProp);
+	}
 };
 
 SUITE(ResourceCacheTestClass) {
@@ -205,8 +216,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, GlobalFinder) {
 	CHECK(ResourceCache.Register(File2, false));
 	CHECK(ResourceCache.Update(File2, Code2, true));
 	
-	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
-	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->w"));
+	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("w"));
 	ResourceCache.ExpressionCompletionMatches(File2, ParsedExpression, ScopeResult, 
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
@@ -231,8 +241,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, RegisteredFinder) {
 	CHECK(ResourceCache.Register(File2, false));
 	CHECK(ResourceCache.Update(File2, Code2, true));
 	
-	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
-	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->w"));
+	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("w"));
 	ResourceCache.ExpressionCompletionMatches(File1, ParsedExpression, ScopeResult, 
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);
 
@@ -255,8 +264,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithGlobalF
 	CHECK(ResourceCache.Register(File1, false));
 	CHECK(ResourceCache.Update(File1, Code1, true));
 	
-	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
-	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->w"));
+	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("w"));
 	ResourceCache.ResourceMatches(File1, ParsedExpression, ScopeResult, 
 		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
@@ -280,8 +288,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithRegiste
 	CHECK(ResourceCache.Update(File1, Code1, true));
 	CHECK(ResourceCache.Update(File2, Code2, true));
 
-	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
-	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->methodA"));
+	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("methodA"));
 
 	ResourceCache.ResourceMatches(File2, ParsedExpression, ScopeResult, 
 		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
@@ -309,8 +316,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithStaleMa
 	CHECK(ResourceCache.Register(File1, false));
 	CHECK(ResourceCache.Update(File1, Code1, true));
 
-	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("$action"));
-	ParsedExpression.ChainList.push_back(UNICODE_STRING_SIMPLE("->methodA"));
+	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("methodA"));
 
 	ResourceCache.ResourceMatches(File1, ParsedExpression, ScopeResult, 
 		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
