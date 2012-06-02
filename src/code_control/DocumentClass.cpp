@@ -469,7 +469,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 			}
 
 			// when completing standalone function names, also include keyword matches
-			std::vector<wxString> keywordMatches = CollectNearMatchKeywords(mvceditor::StringHelperClass::IcuToWx(parsedExpression.ChainList[0]));
+			std::vector<wxString> keywordMatches = CollectNearMatchKeywords(mvceditor::StringHelperClass::IcuToWx(parsedExpression.ChainList[0].Name));
 			for (size_t i = 0; i < keywordMatches.size(); ++i) {
 				wxString postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_KEYWORD);
 				autoCompleteList.push_back(keywordMatches[i] + postFix);
