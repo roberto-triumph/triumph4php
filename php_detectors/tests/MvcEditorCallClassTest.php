@@ -43,43 +43,64 @@ class MvcEditorCallClassTest extends PHPUnit_Framework_TestCase {
         $this->object = new MvcEditorCallClass;
 		$this->file = tmpfile();
 		fwrite($this->file, <<<'EOF'
-METHOD,view,CI_Loader::view,"index","$data"
-FUNCTION,stripos,stripos,"$data","find me"
+BEGIN_METHOD,CI_Loader,view
+PARAM,"index"
+PARAM,$data
+RETURN
+BEGIN_FUNCTION,stripos
+PARAM,$data
+PARAM,"find me"
+RETURN
 EOF
 		);
 		fseek($this->file, 0);
     }
 
     public function testClear() {
-		$this->object->arguments = array(
-			'news/index',
-			'$data'
-		);
+		$this->object->argument = 'news/index';
 		$this->object->resource = 'CI_Loader::view';
-		$this->object->type = MvcEditorCallClass::TYPE_METHOD;
+		$this->object->type = MvcEditorCallClass::BEGIN_METHOD;
 		$this->object->clear();
 		$this->assertEquals('', $this->object->resource);
 		$this->assertEquals('', $this->object->type);
-		$this->assertEquals(TRUE, empty($this->object->arguments));
+		$this->assertEquals('', $this->object->argument);
 	}
 
     public function testFromFile() {
 		
 		// first line
 		$this->assertEquals(TRUE, $this->object->fromFile($this->file));
-		$this->assertEquals(MvcEditorCallClass::TYPE_METHOD, $this->object->type);
+		$this->assertEquals(MvcEditorCallClass::BEGIN_METHOD, $this->object->type);
 		$this->assertEquals('CI_Loader::view', $this->object->resource);
-		$this->assertEquals(2, count($this->object->arguments));
-		$this->assertEquals('index', $this->object->arguments[0]);
-		$this->assertEquals('$data', $this->object->arguments[1]);
 		
-		// second line
+		// parameter 1
 		$this->assertEquals(TRUE, $this->object->fromFile($this->file));
-		$this->assertEquals(MvcEditorCallClass::TYPE_FUNCTION, $this->object->type);
+		$this->assertEquals(MvcEditorCallClass::PARAM, $this->object->type);
+		$this->assertEquals('index', $this->object->argument);
+		
+		// parameter 2
+		$this->assertEquals(TRUE, $this->object->fromFile($this->file));
+		$this->assertEquals(MvcEditorCallClass::PARAM, $this->object->type);
+		$this->assertEquals('$data', $this->object->argument);
+		
+		$this->assertEquals(FALSE, $this->object->fromFile($this->file));
+		
+		// second function
+		$this->assertEquals(TRUE, $this->object->fromFile($this->file));
+		$this->assertEquals(MvcEditorCallClass::BEGIN_FUNCTION, $this->object->type);
 		$this->assertEquals('stripos', $this->object->resource);
-		$this->assertEquals(2, count($this->object->arguments));
-		$this->assertEquals('$data', $this->object->arguments[0]);
-		$this->assertEquals('find me', $this->object->arguments[1]);
+		
+		// parameter 1
+		$this->assertEquals(TRUE, $this->object->fromFile($this->file));
+		$this->assertEquals(MvcEditorCallClass::PARAM, $this->object->type);
+		$this->assertEquals('$data', $this->object->argument);
+		
+		// parameter 1
+		$this->assertEquals(TRUE, $this->object->fromFile($this->file));
+		$this->assertEquals(MvcEditorCallClass::PARAM, $this->object->type);
+		$this->assertEquals('find me', $this->object->argument);
+		
+		$this->assertEquals(FALSE, $this->object->fromFile($this->file));
 		
 		// no more lines, check that file pointer was advanced past the end because it shows 
 		// that the file was read.

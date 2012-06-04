@@ -212,26 +212,39 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 			return $viewFiles;
 		}
 		$call = new MvcEditorCallClass();
+		$inViewMethod = FALSE;
+		$paramIndex = 0;
 		while (!feof($fp)) {
 			if ($call->fromFile($fp)) {
-				if (MvcEditorCallClass::TYPE_METHOD == $call->type && strcasecmp('CI_Loader::view', $call->resource) == 0 && count($call->arguments) >= 1) {
-					$viewFile = $call->arguments[0];
-					
-					// most of the time views are given as relative relatives; starting from the application/views/ directory
-					// for now ignore variable arguments
-					if ($viewFile[0] != '$') {
+				if (MvcEditorCallClass::BEGIN_METHOD == $call->type && strcasecmp('CI_Loader::view', $call->resource) == 0) {
+					$inViewMethod = TRUE;
+					$paramIndex = 0;
+				}
+				else if (MvcEditorCallClass::PARAM == $call->type && $inViewMethod) {
+					if (0 == $paramIndex) {
+						$viewFile = $call->argument;
 						
-						// view file may have an extesion; if it has an extension use that; otherwise use the default (.php)
-						if (stripos($viewFile, '.') === FALSE) {
-							$viewFile .= '.php';
+						// most of the time views are given as relative relatives; starting from the application/views/ directory
+						// for now ignore variable arguments
+						if ($viewFile[0] != '$') {
+							
+							// view file may have an extesion; if it has an extension use that; otherwise use the default (.php)
+							if (stripos($viewFile, '.') === FALSE) {
+								$viewFile .= '.php';
+							}
+							
+							// not using realpath() so that MVCEditor can know that a template file has not yet been created
+							// or the programmer has a bug in the project.
+							$viewFile = \opstring\replace($viewFile, '/', DIRECTORY_SEPARATOR);
+							$viewFile = \opstring\replace($viewFile, '\\', DIRECTORY_SEPARATOR);
+							$viewFiles[] = $dir . DIRECTORY_SEPARATOR . 'application' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $viewFile;
 						}
-						
-						// not using realpath() so that MVCEditor can know that a template file has not yet been created
-						// or the programmer has a bug in the project.
-						$viewFile = \opstring\replace($viewFile, '/', DIRECTORY_SEPARATOR);
-						$viewFile = \opstring\replace($viewFile, '\\', DIRECTORY_SEPARATOR);
-						$viewFiles[] = $dir . DIRECTORY_SEPARATOR . 'application' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $viewFile;
 					}
+					$paramIndex++;
+				}
+				else {
+					$inViewMethod = FALSE;
+					$paramIndex = 0;
 				}
 			}
 		}

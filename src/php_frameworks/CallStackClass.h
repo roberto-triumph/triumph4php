@@ -27,6 +27,7 @@
 
 #include <pelet/ParserClass.h>
 #include <widgets/ResourceCacheClass.h>
+#include <language/SymbolTableClass.h>
 #include <unicode/unistr.h>
 #include <wx/filename.h>
 #include <vector>
@@ -42,7 +43,29 @@ namespace mvceditor
  */
 class CallClass {
 
-public:
+	public:
+
+	/**
+	 * All of the different types of 
+	 * NONE a sentinel value
+	 * BEGIN_METHOD a method (cass + function) was called
+	 * BEGIN_FUNCTION a function was called
+	 * ARRAY an array variable was created using the array() or [] syntax
+	 * SCALAR a scalar variable was created
+	 * OBJECT an object variable was created
+	 * PARAM this is a variable that is a function argument
+	 * RETURN the function ended
+	 */
+	enum Types {
+		NONE,
+		BEGIN_METHOD,
+		BEGIN_FUNCTION,
+		ARRAY,
+		SCALAR,
+		OBJECT,
+		PARAM,
+		RETURN
+	};
 
 	/**
 	 * the function / method being called
@@ -50,11 +73,39 @@ public:
 	ResourceClass Resource;
 	
 	/**
-	 * the list of arguments given to the calling function / method
+	 * If a variable, then this is the variable name
 	 */
-	std::vector<pelet::ExpressionClass> Arguments;
+	mvceditor::SymbolClass Symbol;
+	
+private:
+
+	pelet::ScopeClass Scope;	
+	
+public:
+
+	/**
+	 * If this is a parameter, then the expression is here
+	 */
+	pelet::ExpressionClass Expression;
+	
+	Types Type;
 	
 	CallClass();
+	
+	// various methods to set the appropriate properties
+	void ToArray(const mvceditor::SymbolClass& symbol);
+	void ToScalar(const mvceditor::SymbolClass& symbol);
+	void ToObject(const mvceditor::SymbolClass& symbol);
+	void ToParam(const pelet::ExpressionClass& expr);
+	void ToBeginFunction(const mvceditor::ResourceClass& resource);
+	void ToBeginMethod(const mvceditor::ResourceClass& resource);
+	void ToReturn();
+	
+	/**
+	 * output a line that serializes this call instance into a file
+	 */
+	UnicodeString Serialize() const;
+
 };
 
 /**
@@ -169,6 +220,9 @@ public:
 	void FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, const UnicodeString& returnType, 
 		const UnicodeString& comment, const int lineNumber);
 		
+	void VariableFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
+		const pelet::VariableClass& variable, const pelet::ExpressionClass& expression, const UnicodeString& comment);
+		
 	void ExpressionFound(const pelet::ExpressionClass& expression);
 	
 private:
@@ -204,9 +258,11 @@ private:
 		
 		wxFileName FileName;
 		
-		UnicodeString Resource;
+		mvceditor::ResourceClass Resource;
+		
+		std::vector<pelet::ExpressionClass> CallArguments;
 	};
-
+	
 	/**
 	 * These are the scopes that we want to collect function calls from.
 	 * this is a queue because we want to "follow" calls (open the functions and look inside
@@ -220,6 +276,20 @@ private:
 	ResourceCacheClass& ResourceCache;
 	
 	/**
+	 * Holds all variables for the current scope
+	 * The value of each item in the vector is the parsed Symbol.
+	 * @var std::vector<mvceditor::SymbolClass>>
+	 */
+	std::vector<mvceditor::SymbolClass> ScopeVariables;
+	
+	/**
+	 * Holds all of the function calls that were performed in the current scope
+	 */
+	std::vector<pelet::ExpressionClass> ScopeFunctionCalls;
+	
+	std::map<UnicodeString, bool, UnicodeStringComparatorClass> ParsedMethods;
+	
+	/**
 	 * this flag will be set when the parser hits the scope (resource) we are looking for.  If we dont
 	 * find the scope we are looking for, then either the input scope was wrong, or some other
 	 * unknown error has occurred
@@ -229,6 +299,8 @@ private:
 	void Clear();
 	
 	bool Recurse(Errors& error);
+	
+	void CreateCalls();
 	
 };
 

@@ -24,11 +24,30 @@
  */
 #include <php_frameworks/CallStackClass.h>
 #include <windows/StringHelperClass.h>
+#include <algorithm>
 
+
+static UnicodeString EscapeScalar(const UnicodeString& expr) {
+	UnicodeString content = expr;
+	content = content.findAndReplace(UNICODE_STRING_SIMPLE("\""), UNICODE_STRING_SIMPLE("\\\""));
+	content = content.findAndReplace(UNICODE_STRING_SIMPLE("\r\n"), UNICODE_STRING_SIMPLE(" "));
+	content = content.findAndReplace(UNICODE_STRING_SIMPLE("\n"), UNICODE_STRING_SIMPLE(" "));
+	content = content.findAndReplace(UNICODE_STRING_SIMPLE("\r"), UNICODE_STRING_SIMPLE(" "));
+	content = content.findAndReplace(UNICODE_STRING_SIMPLE("\t"), UNICODE_STRING_SIMPLE(" "));
+	
+	UnicodeString line;
+	line += UNICODE_STRING_SIMPLE("\"");
+	line += content;
+	line += UNICODE_STRING_SIMPLE("\"");
+	return line;
+}
 
 mvceditor::CallClass::CallClass()
-	: Resource() 
-	, Arguments() {
+	: Resource()
+	, Symbol(UNICODE_STRING_SIMPLE(""), mvceditor::SymbolClass::UNKNOWN)
+	, Scope()
+	, Expression(Scope)
+	, Type(NONE) {
 }
 
 mvceditor::CallStackClass::CallStackClass(mvceditor::ResourceCacheClass& resourceCache)
@@ -40,7 +59,10 @@ mvceditor::CallStackClass::CallStackClass(mvceditor::ResourceCacheClass& resourc
 	, CurrentMethod()
 	, CurrentFunction()
 	, ResourcesRemaining()
-	, ResourceCache(resourceCache) 
+	, ResourceCache(resourceCache)
+	, ScopeVariables()
+	, ScopeFunctionCalls()
+	, ParsedMethods()
 	, FoundScope(false) {
 	Parser.SetClassObserver(this);
 	Parser.SetClassMemberObserver(this);
@@ -56,16 +78,23 @@ void mvceditor::CallStackClass::Clear() {
 	CurrentClass.remove();
 	CurrentMethod.remove();
 	CurrentFunction.remove();
+	ScopeVariables.clear();
+	ScopeFunctionCalls.clear();
+	ParsedMethods.clear();
 	while (!ResourcesRemaining.empty()) {
 		ResourcesRemaining.pop();
 	}
 	FoundScope = false;
 }
 
-bool mvceditor::CallStackClass::Build(const wxFileName& fileName, const UnicodeString& className, const UnicodeString& methodName, Errors& error) {
+bool mvceditor::CallStackClass::Build(const wxFileName& fileName, const UnicodeString& className, const UnicodeString& methodName, 
+		mvceditor::CallStackClass::Errors& error) {
 	Clear();
-	UnicodeString nextResource = className + UNICODE_STRING_SIMPLE("::") + methodName;
-	
+	mvceditor::ResourceClass nextResource;
+	nextResource.Type = mvceditor::ResourceClass::METHOD;
+	nextResource.ClassName = className;
+	nextResource.Identifier = methodName;
+
 	ResourceWithFile item;
 	item.FileName = fileName;
 	item.Resource = nextResource;
@@ -73,13 +102,13 @@ bool mvceditor::CallStackClass::Build(const wxFileName& fileName, const UnicodeS
 	return Recurse(error);
 }
 
-bool mvceditor::CallStackClass::Recurse(Errors& error) {
-	
+bool mvceditor::CallStackClass::Recurse(mvceditor::CallStackClass::Errors& error) {
+
 	// base case: no more functions to parse
 	if (ResourcesRemaining.empty()) {
 		return true;
 	}
-	
+
 	// at a certain point, just stop the recursion.
 	if (List.size() >= (size_t)100) {
 		error = STACK_LIMIT;
@@ -89,51 +118,63 @@ bool mvceditor::CallStackClass::Recurse(Errors& error) {
 		error = EMPTY_CACHE;
 		return false;
 	}
-	
+
 	ResourceWithFile item = ResourcesRemaining.front();
-	
+
 	// don't pop() yet; the parser callbacks need to know the resource that we want to examine
-	// this is because we only want to look at expressions in one function 
+	// this is because we only want to look at expressions in one function
 	wxFileName fileName = item.FileName;
-	
+
 	// ScanFile will call the callbacks MethodFound, ExpressionFound; any function calls for this file will be collected
 	FoundScope = false;
-	
+
 	// need to create the symbols for the file if the cache does not have them yet; symbols allow us to know the variable
 	// types
 	bool newlyRegistered = ResourceCache.Register(fileName.GetFullPath(), true);
-	
+
 	wxFFile file(fileName.GetFullPath(), wxT("rb"));
 	bool ret = Parser.ScanFile(file.fp(), mvceditor::StringHelperClass::wxToIcu(fileName.GetFullPath()), LintResults);
-	if (ret && !MatchError.HasError() && FoundScope) {
+	file.Close();
+	UnicodeString key = item.Resource.ClassName + UNICODE_STRING_SIMPLE("::")  + item.Resource.Identifier;
+	ParsedMethods[key] = true;
+	if (ret && FoundScope) {
+		CreateCalls();
 		
+		// CreateCalls() method can fill in another error too
+		if (MatchError.HasError()) {
+			
+			// leave ret as true; we want may want an incomplete call stack
+			error = RESOLUTION_ERROR;
+		}
+
 		// check to see if we have any new functions to parse
 		ResourcesRemaining.pop();
 		if (!ResourcesRemaining.empty()) {
-			
+
 			// need to get the file that the next function is in
 			// make sure we don't go over the same function again in case there is a
 			// recursive function call along the way
 			bool hasNext = false;
 			while (!hasNext && !ResourcesRemaining.empty()) {
 				ResourceWithFile nextItem = ResourcesRemaining.front();
-				UnicodeString nextResource = nextItem.Resource;
 				wxFileName nextFile = nextItem.FileName;
 				bool alreadyParsed = false;
-				for (size_t i = 0; i < List.size(); ++i) {
-					if ((List[i].Resource.ClassName + UNICODE_STRING_SIMPLE("::") + List[i].Resource.Identifier) == nextResource) {
-						alreadyParsed = true;
-						break;
-					}
-				}
-				if (!alreadyParsed) {
-					hasNext = true;
-				}
-				else {
+				UnicodeString key = nextItem.Resource.ClassName + UNICODE_STRING_SIMPLE("::")  + nextItem.Resource.Identifier;
+				alreadyParsed =  ParsedMethods.find(key) == ParsedMethods.end();				
+				if (alreadyParsed) {
+					
+					// already been parsed; write the function arguments for this call and nothing else
+					// this is because we want to write a function call if the same function is called
+					// twice but we don't want to parse it twice
+					ScopeFunctionCalls.clear();
+					ScopeVariables.clear();
+					CreateCalls();					
 					ResourcesRemaining.pop();
 				}
 			}
 			if (hasNext) {
+				ScopeFunctionCalls.clear();
+				ScopeVariables.clear();
 				return Recurse(error);
 			}
 		}
@@ -145,18 +186,13 @@ bool mvceditor::CallStackClass::Recurse(Errors& error) {
 		ret = false;
 		error = RESOURCE_NOT_FOUND;
 	}
-	else {
-		
-		// leave ret as true; we want may want an incomplete call stack
-		error = RESOLUTION_ERROR;
-	}
 	if (newlyRegistered) {
-		
+
 		// clean up, but only if this method created the symbols
 		ResourceCache.Unregister(fileName.GetFullPath());
 	}
-	return ret;		
-	
+	return ret;
+
 }
 
 bool mvceditor::CallStackClass::Persist(wxFileName& fileName) {
@@ -164,38 +200,13 @@ bool mvceditor::CallStackClass::Persist(wxFileName& fileName) {
 	wxFFile file;
 	if (file.Open(fileName.GetFullPath(), wxT("wb"))) {
 		write = true;
-		for (std::vector<mvceditor::CallClass>::const_iterator it = List.begin(); it != List.end(); ++it) {
-			wxString line;
-			mvceditor::ResourceClass callResource = it->Resource;
-			line += mvceditor::StringHelperClass::IcuToWx(callResource.Identifier);
-			line += wxT(",");
-			if (!callResource.ClassName.isEmpty()) {
-				line += mvceditor::StringHelperClass::IcuToWx(callResource.ClassName);
-				line += wxT("::");
-			}
-			line += mvceditor::StringHelperClass::IcuToWx(callResource.Identifier);
-			if (!it->Arguments.empty()) {
-				line += wxT(",");
-			}
-			for (size_t i = 0; i < it->Arguments.size(); ++i) {
-				
-				// escape any double quotes in case of string constants
-				line += wxT("\"");
-				UnicodeString lexeme = it->Arguments[i].FirstValue();
-				lexeme = lexeme.findAndReplace(UNICODE_STRING_SIMPLE("\""), UNICODE_STRING_SIMPLE("\\\""));
-				line += mvceditor::StringHelperClass::IcuToWx(lexeme);
-				line += wxT("\"");
-				if (i < (it->Arguments.size() - 1)) {
-					line += wxT(",");
-				}
-			}
-			line += wxT("\n");
-			if (mvceditor::ResourceClass::FUNCTION == callResource.Type) {
-				write = file.Write(wxT("FUNCTION,")) && file.Write(line);
-				
-			}
-			else if (mvceditor::ResourceClass::METHOD == callResource.Type) {
-				write = file.Write(wxT("METHOD,")) && file.Write(line);
+		wxString line;
+		for (std::vector<mvceditor::CallClass>::const_iterator it = List.begin(); it != List.end() && write; ++it) {
+			line.Clear();
+			line += mvceditor::StringHelperClass::IcuToWx(it->Serialize());
+			if (!line.IsEmpty()) {
+				line += wxT("\n");
+				write = file.Write(line);
 			}
 		}
 		file.Close();
@@ -204,74 +215,342 @@ bool mvceditor::CallStackClass::Persist(wxFileName& fileName) {
 }
 
 void mvceditor::CallStackClass::ExpressionFound(const pelet::ExpressionClass& expression) {
-		
+
 	// only collect expressions that are in the scope we want
+	if (ResourcesRemaining.empty()) {
+		return;
+	}
+
+	ResourceWithFile item = ResourcesRemaining.front();
+
+	if (item.Resource.Identifier == CurrentFunction || (item.Resource.ClassName == CurrentClass && item.Resource.Identifier == CurrentMethod)) {
+		FoundScope = true;
+
+		// this is the scope we are interested in. if the expression is a function call
+		// note that variable may contain function calls too
+		if (pelet::ExpressionClass::FUNCTION_CALL == expression.ExpressionType ||  pelet::ExpressionClass::VARIABLE == expression.ExpressionType) {
+			ScopeFunctionCalls.push_back(expression);
+		}
+	}
+}
+
+void mvceditor::CallStackClass::VariableFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
+        const pelet::VariableClass& variable, const pelet::ExpressionClass& expression, const UnicodeString& comment) {
+
+	// only collect expressions that are in the scope we want
+	if (ResourcesRemaining.empty()) {
+		return;
+	}
+
+	ResourceWithFile item = ResourcesRemaining.front();
+	if (item.Resource.Identifier == CurrentFunction || (item.Resource.ClassName == CurrentClass && item.Resource.Identifier == CurrentMethod)) {
+		FoundScope = true;
+
+		// ATTN: a single variable may have many assignments
+		// for now just take the first one
+		bool found = false;
+		for (size_t i = 0; i < ScopeVariables.size(); ++i) {
+			if (!variable.ChainList.empty() && ScopeVariables[i].Variable == variable.ChainList[0].Name) {
+				found = true;
+
+				if (!variable.ArrayKey.isEmpty()) {
+
+					// update any new Array keys used in the variable assignment
+					// make sure not to have duplicates in case the same key is assigned
+					// multiple times
+					std::vector<UnicodeString>::iterator it = std::find(
+					            ScopeVariables[i].ArrayKeys.begin(), ScopeVariables[i].ArrayKeys.end(), variable.ArrayKey);
+					if (it != ScopeVariables[i].ArrayKeys.end()) {
+						ScopeVariables[i].ArrayKeys.push_back(variable.ArrayKey);
+					}
+				}
+				break;
+			}
+		}
+		if (!found && !variable.ChainList.empty()) {
+			UnicodeString name = variable.ChainList[0].Name;
+			mvceditor::SymbolClass::Types type;
+			std::vector<UnicodeString> arrayKeys;
+			switch (expression.ExpressionType) {
+				case pelet::ExpressionClass::SCALAR:
+					type = mvceditor::SymbolClass::SCALAR;
+					break;
+				case pelet::ExpressionClass::ARRAY:
+					type = mvceditor::SymbolClass::ARRAY;
+					arrayKeys = expression.ArrayKeys;
+					break;
+				case pelet::ExpressionClass::VARIABLE:
+				case pelet::ExpressionClass::FUNCTION_CALL:
+				case pelet::ExpressionClass::NEW_CALL:
+					type = mvceditor::SymbolClass::OBJECT;
+					break;
+				case pelet::ExpressionClass::UNKNOWN:
+					type = mvceditor::SymbolClass::UNKNOWN;
+					break;
+			}
+
+			mvceditor::SymbolClass newSymbol(name, type);
+			newSymbol.ChainList = expression.ChainList;
+			newSymbol.PhpDocType = variable.PhpDocType;
+			newSymbol.ArrayKeys = arrayKeys;
+			if (!variable.ArrayKey.isEmpty() && type != mvceditor::SymbolClass::ARRAY) {
+
+				// in  PHP an array may be created by assiging
+				// an array key-value to a non-existant variable
+				newSymbol.ArrayKeys.push_back(variable.ArrayKey);
+			}
+			ScopeVariables.push_back(newSymbol);
+		}
+	}
+}
+
+void mvceditor::CallStackClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, const UnicodeString& signature,
+        const UnicodeString& returnType, const UnicodeString& comment, pelet::TokenClass::TokenIds visibility,
+        bool isStatic, const int lineNumber) {
+	CurrentClass = className;
+	CurrentMethod = methodName;
+	CurrentFunction.remove();
+	
+	if (ResourcesRemaining.empty()) {
+		return;
+	}
+
+	ResourceWithFile item = ResourcesRemaining.front();
+	
+	// if a method was found set the flag
+	// we need to do this because the method iself may be empty or not contain variable
+	// and we dont want to flag this as an error
+	if (item.Resource.ClassName == CurrentClass && item.Resource.Identifier == CurrentMethod) {
+		FoundScope = true;
+	}
+}
+
+void mvceditor::CallStackClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, const UnicodeString& returnType,
+        const UnicodeString& comment, const int lineNumber) {
+	CurrentClass.remove();
+	CurrentMethod.remove();
+	CurrentFunction = functionName;
+	
+	if (ResourcesRemaining.empty()) {
+		return;
+	}
+
+	ResourceWithFile item = ResourcesRemaining.front();
+	
+	// if a method was found set the flag
+	// we need to do this because the method iself may be empty or not contain variable
+	// and we dont want to flag this as an error
+	if (item.Resource.Identifier == CurrentFunction) {
+		FoundScope = true;
+	}
+}
+
+void mvceditor::CallStackClass::CreateCalls() {
 	if (ResourcesRemaining.empty()) {
 		return;
 	}
 	
 	ResourceWithFile item = ResourcesRemaining.front();
-		
-	if (item.Resource == CurrentFunction || (item.Resource == (CurrentClass + UNICODE_STRING_SIMPLE("::") + CurrentMethod))) {
-		FoundScope = true;
-		
-		// this is the scope we are interested in. if the expression is a function call,
-		// lets add it to the queue AND the final list
-		// by adding it to the queue, the method will get parsed
-		// also an expression can be a method call (variable + method)
-		if (pelet::ExpressionClass::FUNCTION_CALL == expression.ExpressionType ||  expression.ChainList.size() >= (size_t)2) {			
-			
-			std::vector<mvceditor::ResourceClass> matches;
-			mvceditor::SymbolTableMatchErrorClass singleMatchError;
-			mvceditor::ScopeResultClass scopeResult;
-			scopeResult.MethodName = item.Resource;
-			
-			ResourceCache.ResourceMatches(item.FileName.GetFullPath(), expression, scopeResult, matches, false, true, singleMatchError);
-			for (std::vector<mvceditor::ResourceClass>::iterator it = matches.begin(); it != matches.end(); ++it) {
-				if (mvceditor::ResourceClass::FUNCTION == it->Type || mvceditor::ResourceClass::METHOD == it->Type) {
-					ResourceWithFile newItem;
-					newItem.FileName.Assign(it->GetFullPath());
-					if (mvceditor::ResourceClass::FUNCTION == it->Type) {
-						newItem.Resource = it->Identifier;
-					}
-					else {
-						newItem.Resource = it->ClassName + UNICODE_STRING_SIMPLE("::") + it->Identifier;
-					}
-					ResourcesRemaining.push(newItem);
-					
-					mvceditor::CallClass newCall;
-					newCall.Resource = *it;
-					
-					// TODO better mapping of call arguments to the correct function call
-					for (size_t i = 0; i < expression.ChainList.size(); ++i) {
-						if (!expression.ChainList[i].CallArguments.empty()) {
-							newCall.Arguments = expression.ChainList[i].CallArguments;
-							break;
-						}
-					}
-					List.push_back(newCall);
-				}
-			}
-			if (singleMatchError.HasError() || matches.empty()) {
 
-				// using 2 variables so that previous errors do not affect the ResourceMatches() call
-				MatchError = singleMatchError;
-			}			
+	// add it to the code to signal the start of a function call
+	mvceditor::CallClass cBegin;
+	if (mvceditor::ResourceClass::FUNCTION == item.Resource.Type) {
+		cBegin.ToBeginFunction(item.Resource);
+	}
+	else if (mvceditor::ResourceClass::METHOD == item.Resource.Type) {
+		cBegin.ToBeginMethod(item.Resource);
+	}
+	if (mvceditor::CallClass::NONE != cBegin.Type) {
+		List.push_back(cBegin);
+	}
+	
+	// add it to the code to signal function call parameters
+	for (size_t k = 0; k < item.CallArguments.size(); ++k) {
+		mvceditor::CallClass c;
+		c.ToParam(item.CallArguments[k]);
+		List.push_back(c);
+	}
+
+	// go through the symbols and create the CallClass instances
+	for (size_t i = 0; i < ScopeVariables.size(); ++i) {
+		mvceditor::CallClass c;
+		switch (ScopeVariables[i].Type) {
+			case mvceditor::SymbolClass::ARRAY:
+				c.ToArray(ScopeVariables[i]);
+				break;
+			case mvceditor::SymbolClass::OBJECT:
+				c.ToObject(ScopeVariables[i]);
+				break;
+			case mvceditor::SymbolClass::SCALAR:
+				c.ToScalar(ScopeVariables[i]);
+				break;
+			case mvceditor::SymbolClass::UNKNOWN:
+				break;
+		}
+		if (mvceditor::CallClass::NONE != c.Type) {
+			List.push_back(c);
 		}
 	}
+
+	// go through the function calls and add them to the recursion list
+	for (size_t i = 0; i < ScopeFunctionCalls.size(); ++i) {
+
+		// here expr is a FULL line like this
+		// $this->load->view('welcome/index', $data);
+		// $this->template()->set('user', $this->getUser());
+		pelet::ExpressionClass expr = ScopeFunctionCalls[i];
+		pelet::ExpressionClass subExpr(expr.Scope);
+		for (size_t j = 0; j < expr.ChainList.size(); ++j) {
+
+			// go through each expression property and look for function calls
+			// we keep adding the property to the subExpr so that we can properly resolve
+			// the class of the method being called
+			// for example; subExpr will first be "$this", then "$this->template()", then
+			// "$this->template()->set()"
+			// Since expr was parsed properly by pelet::ParserClass, we will handle function
+			// call arguments properly
+			subExpr.ChainList.push_back(expr.ChainList[j]);
+			if (expr.ChainList[j].IsFunction) {
+				std::vector<mvceditor::ResourceClass> matches;
+				mvceditor::SymbolTableMatchErrorClass singleMatchError;
+				mvceditor::ScopeResultClass scopeResult;
+				scopeResult.MethodName = expr.Scope.ClassName + UNICODE_STRING_SIMPLE("::") + expr.Scope.MethodName;
+
+				ResourceCache.ResourceMatches(item.FileName.GetFullPath(), subExpr, scopeResult, matches, false, true, singleMatchError);
+				for (std::vector<mvceditor::ResourceClass>::iterator it = matches.begin(); it != matches.end(); ++it) {
+
+					// if we get here; we are able to know which class and method are being called
+					// lets add it to the queue so that this class/method will get recursed into next
+					if (mvceditor::ResourceClass::FUNCTION == it->Type || mvceditor::ResourceClass::METHOD == it->Type) {
+						if (!it->GetFullPath().IsEmpty()) {
+							
+							// dynamic resources may not have a file path to go to
+							ResourceWithFile newItem;
+							newItem.FileName.Assign(it->GetFullPath());
+							newItem.Resource = *it;
+							newItem.CallArguments = expr.ChainList[j].CallArguments;
+							ResourcesRemaining.push(newItem);
+						}
+					}
+				}
+				if (!MatchError.HasError() && (singleMatchError.HasError() || matches.empty())) {
+
+					// using 2 variables so that previous errors do not affect the ResourceMatches() call
+					MatchError = singleMatchError;
+				}
+			}
+		}
+	}
+	
+	// signal the end of this function
+	mvceditor::CallClass cReturn;
+	cReturn.ToReturn();
+	List.push_back(cReturn);
 }
 
-void mvceditor::CallStackClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, const UnicodeString& signature, 
-											const UnicodeString& returnType, const UnicodeString& comment, pelet::TokenClass::TokenIds visibility, 
-											bool isStatic, const int lineNumber) {
-	CurrentClass = className;
-	CurrentMethod = methodName;
-	CurrentFunction.remove();
+void mvceditor::CallClass::ToArray(const mvceditor::SymbolClass& symbol) {
+	Type = mvceditor::CallClass::ARRAY;
+	Symbol = symbol;
 }
 
-void mvceditor::CallStackClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, const UnicodeString& returnType, 
-		const UnicodeString& comment, const int lineNumber) {
-	CurrentClass.remove();
-	CurrentMethod.remove();
-	CurrentFunction = functionName;
+void mvceditor::CallClass::ToBeginFunction(const mvceditor::ResourceClass& resource) {
+	Type = mvceditor::CallClass::BEGIN_FUNCTION;
+	Resource = resource;
+}
+
+void mvceditor::CallClass::ToBeginMethod(const mvceditor::ResourceClass& resource) {
+	Type = mvceditor::CallClass::BEGIN_METHOD;
+	Resource = resource;
+}
+
+void mvceditor::CallClass::ToObject(const mvceditor::SymbolClass& symbol) {
+	Type = mvceditor::CallClass::OBJECT;
+	Symbol = symbol;
+}
+
+void mvceditor::CallClass::ToParam(const pelet::ExpressionClass& expr) {
+	Type = mvceditor::CallClass::PARAM;
+	Expression = expr;
+}
+
+void mvceditor::CallClass::ToReturn() {
+	Type = mvceditor::CallClass::RETURN;
+}
+
+void mvceditor::CallClass::ToScalar(const mvceditor::SymbolClass& symbol) {
+	Type = mvceditor::CallClass::SCALAR;
+	Symbol = symbol;
+}
+
+UnicodeString mvceditor::CallClass::Serialize() const {
+	UnicodeString line;
+	switch (Type) {
+		case mvceditor::CallClass::ARRAY:
+			line += UNICODE_STRING_SIMPLE("ARRAY,");
+			line += Symbol.Variable;
+			for (size_t j = 0; j < Symbol.ArrayKeys.size(); ++j) {
+				line += UNICODE_STRING_SIMPLE(",");
+				line += Symbol.ArrayKeys[j];
+			}
+			break;
+
+		case mvceditor::CallClass::BEGIN_FUNCTION:
+			line += UNICODE_STRING_SIMPLE("BEGIN_FUNCTION,");
+			line += Resource.Identifier;
+			break;
+
+		case mvceditor::CallClass::BEGIN_METHOD:
+			line += UNICODE_STRING_SIMPLE("BEGIN_METHOD,");
+			line += Resource.ClassName;
+			line += UNICODE_STRING_SIMPLE(",");
+			line += Resource.Identifier;
+			break;
+
+		case mvceditor::CallClass::OBJECT:
+			line += UNICODE_STRING_SIMPLE("OBJECT,");
+			line += Symbol.Variable;
+			break;
+
+		case mvceditor::CallClass::NONE:
+
+			// none will be skipped always
+			break;
+		case mvceditor::CallClass::PARAM:
+			line += UNICODE_STRING_SIMPLE("PARAM,");
+			if (pelet::ExpressionClass::SCALAR == Expression.ExpressionType) {
+				
+				// escape any double quotes in case of string constants
+				line += EscapeScalar(Expression.ChainList[0].Name);
+			}
+			else {
+				for (size_t j = 0; j < Expression.ChainList.size(); ++j) {
+					if (j > 0 && Expression.ChainList[j].IsStatic) {
+						line += UNICODE_STRING_SIMPLE("::");
+					}
+					else if (j > 0) {
+						line += UNICODE_STRING_SIMPLE("->");
+					}
+					line += Expression.ChainList[j].Name;
+					if (Expression.ChainList[j].IsFunction) {
+						line += UNICODE_STRING_SIMPLE("()");
+					}
+				}
+			}
+			break;
+
+		case mvceditor::CallClass::RETURN:
+			line += UNICODE_STRING_SIMPLE("RETURN");
+			break;
+
+		case mvceditor::CallClass::SCALAR:
+			line += Symbol.Variable;
+			line += UNICODE_STRING_SIMPLE(",");
+			if (!Symbol.ChainList.empty()) {
+
+				// escape any double quotes in case of string constants
+				line += EscapeScalar(Symbol.ChainList[0].Name);
+			}
+			break;
+	}
+	return line;
 }

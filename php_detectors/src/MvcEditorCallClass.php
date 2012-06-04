@@ -33,12 +33,15 @@
  */
 class MvcEditorCallClass {
 
-	const TYPE_METHOD = 'METHOD';
+	const BEGIN_METHOD = 'BEGIN_METHOD';
 	
-	const TYPE_FUNCTION = 'FUNCTION';
+	const BEGIN_FUNCTION = 'BEGIN_FUNCTION';
 	
+	const PARAM = 'PARAM';
+	
+
 	/** 
-	 * @var string the type of call, either TYPE_METHOD or TYPE_FUNCTION
+	 * @var string the type of call, either BEGIN_METHOD or BEGIN_FUNCTION
 	 */
 	public $type;
 
@@ -49,11 +52,13 @@ class MvcEditorCallClass {
 	public $resource;
 	
 	/**
-	 * @var array of strings, each item in the array is the argument to the function / method call, as it was in the source 
-	 * code.  This means that each item may be a string (ie. "news/view" without the quotes), a variable (ie. $data, or $this->data). In the
-	 * case that one of the arguments is the result of another function / method call; then for now this is not supported.
+	 * @var string, this is the argument to the function / method call that has begun in the
+	 * previous line. The argument may be a string (ie. "news/view" without the quotes), a variable (ie. $data, or $this->data). In the
+	 * case that one of the arguments is the result of another function / method call; then the argument will
+	 * be the function name with a parenthesis pair; like this "myFunct()". The parentheses wil always be
+	 * empty, even if that call had arguments.
 	 */
-	public $arguments;
+	public $argument;
 	
 	/**
 	 * sets all public members to the empty string / array.
@@ -61,7 +66,7 @@ class MvcEditorCallClass {
 	public function clear() {
 		$this->type = '';
 		$this->resource = '';
-		$this->arguments = array();
+		$this->argument = '';
 	}
 
 	/**
@@ -78,24 +83,35 @@ class MvcEditorCallClass {
 			$line = trim(fgets($fileResource));
 			if (!empty($line)) {
 			
-				// file format: a CSV file with variable columns. Format is as follows:
-				// ResourceType,Identifier,Resource, Arg1 lexeme, Arg2 lexeme, ... Arg N lexeme
+				// file format: a CSV file with variable columns. Each row may have a different
+				// column count depending on the type. Format is as follows:
+				//
+				//
+				// BEGIN_FUNCTION, function name,
+				// BEGIN_METHOD, class name, method name
+				// PARAM, expression
 				//  
 				// where
-				// ResourceType = FUNCTION | METHOD
-				// Identifier is the name of the function / method
-				// Resource is the fully qualified name (ie. ClassName::MethodName)
-				// ArgN Lexeme is the lexeme (string) of the Nth argument; lexeme is either the constant (when argument is a string / number)
+				// expression is the lexeme (string) of a constant (when argument is a string / number)
 				// or it can be a variable name.
 				$columns  = explode(',', $line);
-				if (count($columns) >= 3 && ($columns[0] == self::TYPE_METHOD || $columns[0] == self::TYPE_FUNCTION)) {
+				if (count($columns) >= 2 && $columns[0] == self::BEGIN_FUNCTION) {
 					$this->type = $columns[0];
-					$this->resource = $columns[2];
-					for ($i = 3; $i < count($columns); $i++) {
-						
-						// trim the ending newline that ends the line too
-						$this->arguments[] = trim($columns[$i], "\"\n");
-					}
+					$this->resource = $columns[1];
+					$ret = true;
+				}
+				else if (count($columns) >= 3 && ($columns[0] == self::BEGIN_METHOD)) {
+					$this->type = $columns[0];
+					$this->resource = $columns[1] . '::' . $columns[2];
+					$ret = true;
+				}
+				else if (count($columns) >= 2 && $columns[0] == self::PARAM) {
+					$this->type = $columns[0];
+					$this->argument = $columns[1];
+					
+					// trim the ending newline that ends the line too
+					// item may be sorrounded by quotes when it is a constant (ALWAYS DOUBLE QUOTES only)
+					$this->argument = trim($this->argument, "\"\n");
 					$ret = true;
 				}
 			}

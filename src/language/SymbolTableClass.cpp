@@ -495,6 +495,7 @@ void mvceditor::SymbolTableClass::VariableFound(const UnicodeString& namespaceNa
 		mvceditor::SymbolClass newSymbol(name, type);
 		newSymbol.ChainList = expression.ChainList;
 		newSymbol.PhpDocType = variable.PhpDocType;
+		newSymbol.ArrayKeys = arrayKeys;
 		if (!variable.ArrayKey.isEmpty() && type != mvceditor::SymbolClass::ARRAY) {
 				
 			// in  PHP an array may be created by assiging

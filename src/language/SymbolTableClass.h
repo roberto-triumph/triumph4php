@@ -434,7 +434,7 @@ public:
 	 * Set the version that the PHP parser should use.
 	 */
 	void SetVersion(pelet::Versions version);
-
+	
 private:
 
 	/**
