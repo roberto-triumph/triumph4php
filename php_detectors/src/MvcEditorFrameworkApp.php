@@ -76,7 +76,9 @@ function loadFrameworks() {
 function runAction($framework, $dir, $action, $url, $file, $host, $outputFile) {
 
 	// a little dynamic code goes a long way here; no need for a bunch of IF statments
-	$availableActions = array('runDatabaseInfo', 'runIsUsedBy', 'runConfigFiles', 'runResources', 'runMakeUrls', 'runViewFiles');
+	$availableActions = array('runDatabaseInfo', 'runIsUsedBy', 'runConfigFiles', 
+		'runResources', 'runMakeUrls', 'runViewFiles',
+		'runTemplateVariables');
 	$done = false;
 	foreach ($availableActions as $availAction) {
 		if (strcasecmp($availAction, 'run' . $action) == 0) {
@@ -227,6 +229,21 @@ function runViewFiles(MvcEditorFrameworkBaseClass $framework, $dir, $url, $file,
 	}
 }
 
+function runTemplateVariables(MvcEditorFrameworkBaseClass $framework, $dir, $url, $file, $host, $outputFile) {
+	$templateVariables = $framework->templateVariables($file);
+	if ($templateVariables) {
+		$writer = new Zend_Config_Writer_Ini();
+		$outputConfig = new Zend_Config(array(), true);
+		$writer->setConfig($outputConfig);
+		$keyIndex = 0;
+		foreach ($templateVariables as $var) {
+			$key = iniEscapeKey('Var_' . $keyIndex);
+			$outputConfig->{$key} = iniEscapeValue($var);
+			$keyIndex++;
+		}
+		iniPrint($writer, $outputFile);
+	}
+}
 
 // Replaces any possible characters that may conflict with INI parsing of KEYS.
 function iniEscapeKey($str) {

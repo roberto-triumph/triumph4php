@@ -251,6 +251,58 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 		return $viewFiles;
 	}
 	
+	/**
+	 * @return array
+	 */
+	public function templateVariables($callStackFile) {
+		
+		// CodeIgniter controllers will call $this->load->view('file', $data) 
+		// we will look for calls to CI_Loader::view that have at least 2 arguments
+		// then we look at the array keys of the second argument
+		$templateVariables = array();
+		$fp = fopen($callStackFile, 'rb');
+		if (!$fp) {
+			return $templateVariables;
+		}
+		$call = new MvcEditorCallClass();
+		$inViewMethod = FALSE;
+		$paramIndex = 0;
+		
+		// will save the array keys here 
+		// key is the variable name, value is the array of the declared array keys
+		$scopeVariables = array();
+		while (!feof($fp)) {
+			if ($call->fromFile($fp)) {
+				if (MvcEditorCallClass::BEGIN_METHOD == $call->type && strcasecmp('CI_Loader::view', $call->resource) == 0) {
+					$inViewMethod = TRUE;
+					$paramIndex = 0;
+				}
+				else if (MvcEditorCallClass::PARAM == $call->type && $inViewMethod) {
+					if (1 == $paramIndex) {
+						$templateDataVariable = $call->argument;
+						if (array_key_exists($templateDataVariable, $scopeVariables)) {
+							foreach ($scopeVariables[$templateDataVariable] as $key) {
+								$templateVariables[] = $key;
+							}
+						}
+					}
+					$paramIndex++;
+				}
+				else  if (MvcEditorCallClass::BEGIN_FUNCTION == $call->type || MvcEditorCallClass::BEGIN_METHOD == $call->type) {
+					$scopeVariables = array();
+				}
+				else if (MvcEditorCallClass::T_ARRAY == $call->type) {
+					$scopeVariables[$call->variableName] = $call->arrayKeys;
+				}
+				else if (MvcEditorCallClass::T_RETURN == $call->type) {
+					$inViewMethod = FALSE;
+					$paramIndex = 0;
+				}
+			}
+		}
+		return $templateVariables;
+	}
+	
 	private function infoFromDbArray($environment, $groupName, $groupConnection) {
 		// port is not there by default
 		$port = 0;

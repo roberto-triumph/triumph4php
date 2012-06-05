@@ -39,9 +39,16 @@ class MvcEditorCallClass {
 	
 	const PARAM = 'PARAM';
 	
+	const T_ARRAY = 'ARRAY';
+	
+	const SCALAR = 'SCALAR';
+	
+	const OBJECT = 'OBJECT';
+	
+	const T_RETURN = 'RETURN';
 
 	/** 
-	 * @var string the type of call, either BEGIN_METHOD or BEGIN_FUNCTION
+	 * @var string the type of call, one of the class constants
 	 */
 	public $type;
 
@@ -60,6 +67,12 @@ class MvcEditorCallClass {
 	 */
 	public $argument;
 	
+	public $variableName;
+	
+	public $arrayKeys;
+	
+	public $scalar;
+	
 	/**
 	 * sets all public members to the empty string / array.
 	 */
@@ -67,6 +80,9 @@ class MvcEditorCallClass {
 		$this->type = '';
 		$this->resource = '';
 		$this->argument = '';
+		$this->variableName = '';
+		$this->arrayKeys = '';
+		$this->scalar = '';
 	}
 
 	/**
@@ -90,6 +106,10 @@ class MvcEditorCallClass {
 				// BEGIN_FUNCTION, function name,
 				// BEGIN_METHOD, class name, method name
 				// PARAM, expression
+				// ARRAY, variable name, list of array keys
+				// SCALAR, variable name,lexeme
+				// OBJECT, variable name
+				// RETURN
 				//  
 				// where
 				// expression is the lexeme (string) of a constant (when argument is a string / number)
@@ -112,6 +132,31 @@ class MvcEditorCallClass {
 					// trim the ending newline that ends the line too
 					// item may be sorrounded by quotes when it is a constant (ALWAYS DOUBLE QUOTES only)
 					$this->argument = trim($this->argument, "\"\n");
+					$ret = true;
+				}
+				else if (count($columns) >= 2 && ($columns[0] == self::T_ARRAY)) {
+					$this->type = $columns[0];
+					$this->variableName = $columns[1];
+					for ($i = 2; $i < count($columns); $i++) {
+						$this->arrayKeys[] = $columns[$i];
+					}
+					$ret = true;
+				}
+				else if (count($columns) >= 2 && ($columns[0] == self::OBJECT)) {
+					$this->type = $columns[0];
+					$this->variableName = $columns[1];
+					$ret = true;
+				}
+				else if (count($columns) >= 2 && ($columns[0] == self::SCALAR)) {
+					$this->type = $columns[0];
+					$this->scalar = $columns[1];
+					// trim the ending newline that ends the line too
+					// item may be sorrounded by quotes when it is a constant (ALWAYS DOUBLE QUOTES only)
+					$this->scalar = trim($this->scalar , "\"\n");
+					$ret = true;
+				}
+				else if (count($columns) >= 1 && ($columns[0] == self::T_RETURN)) {
+					$this->type = $columns[0];
 					$ret = true;
 				}
 			}

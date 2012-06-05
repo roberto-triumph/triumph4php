@@ -123,5 +123,13 @@ abstract class MvcEditorFrameworkBaseClass {
 	 *         uses.
 	 */
 	abstract public function viewFiles($dir, $url, $callStackFile);
+	
+	/**
+	 * Sub-classes will implement this method to help MVC Editor determin which variables 
+	 * are assigned to a template.   
+	 * @param string $callStackFile the location of the call stack file, use the CallStackClass to read 
+	 *        iterate through the action's function / method calls.
+	 */
+	abstract public function templateVariables($callStackFile);
 
 }

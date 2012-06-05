@@ -134,6 +134,7 @@ void mvceditor::ViewFilePluginClass::StartDetection() {
 			}
 			else {
 				CurrentViewFiles.clear();
+				CurrentTemplateVariables.clear();
 			}				
 		}
 	}
@@ -158,9 +159,37 @@ void mvceditor::ViewFilePluginClass::OnViewFilesDetectionComplete(mvceditor::Vie
 		viewPanel->UpdateResults();
 		SetFocusToToolsWindow(viewPanel);
 	}
+	
+	if (!FrameworkDetector->InitTemplateVariablesDetector(GetProject()->GetRootPath(), CallStackThread.StackFile)) {
+		mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Could not start templateVariables detector"));
+	}
 }
 
 void mvceditor::ViewFilePluginClass::OnViewFilesDetectionFailed(wxCommandEvent& event) {
+	mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, event.GetString());
+	
+	FrameworkDetector->Identifiers = PhPFrameworks().Identifiers;
+	if (!FrameworkDetector->InitTemplateVariablesDetector(GetProject()->GetRootPath(), CallStackThread.StackFile)) {
+		mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Could not start templateVariables detector"));
+	}
+}
+
+void mvceditor::ViewFilePluginClass::OnTemplateVariablesDetectionComplete(mvceditor::TemplateVariablesDetectedEventClass& event) {
+	wxWindow* window = FindOutlineWindow(ID_VIEW_FILE_PANEL);
+	CurrentTemplateVariables = event.TemplateVariables;
+	ViewFilePanelClass* viewPanel = NULL;
+	if (window) {
+		viewPanel = (ViewFilePanelClass*)window;
+		viewPanel->UpdateResults();
+		SetFocusToToolsWindow(viewPanel);
+	}
+	printf("variable count=%ld\n", CurrentTemplateVariables.size());
+	for (size_t i = 0; i < CurrentTemplateVariables.size(); ++i) {
+		printf("var=%s\n", (const char*)CurrentTemplateVariables[i].ToAscii());
+	}
+}
+
+void mvceditor::ViewFilePluginClass::OnTemplateVariablesDetectionFailed(wxCommandEvent& event) {
 	mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, event.GetString());
 }
 
@@ -218,6 +247,14 @@ void mvceditor::ViewFilePanelClass::UpdateResults() {
 				text = wxT("[X] ") + text;
 			}
 			FileTree->AppendItem(parent, text);
+		}
+		
+		TemplateVariablesLabel->SetLabel(wxString::Format(_("Found %d template variables"), Plugin.CurrentTemplateVariables.size()));
+		TemplateVariablesTree->DeleteAllItems();
+		parent = TemplateVariablesTree->AddRoot(_("Template Variables"));
+		for (size_t i = 0; i < Plugin.CurrentTemplateVariables.size(); ++i) {
+			wxString text = Plugin.CurrentTemplateVariables[i];
+			TemplateVariablesTree->AppendItem(parent, text);
 		}
 	}
 	else if (Plugin.CallStackThread.WriteError) {
@@ -345,4 +382,6 @@ BEGIN_EVENT_TABLE(mvceditor::ViewFilePluginClass, wxEvtHandler)
 	EVT_FRAMEWORK_VIEW_FILES_COMPLETE(mvceditor::ViewFilePluginClass::OnViewFilesDetectionComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_VIEW_FILES_FAILED, mvceditor::ViewFilePluginClass::OnViewFilesDetectionFailed)
 	EVT_MENU(mvceditor::MENU_VIEW_FILES + 0, mvceditor::ViewFilePluginClass::OnViewFilesMenu)
+	EVT_FRAMEWORK_TEMPLATE_VARIABLES_COMPLETE(mvceditor::ViewFilePluginClass::OnTemplateVariablesDetectionComplete)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_TEMPLATE_VARIABLES_FAILED, mvceditor::ViewFilePluginClass::OnTemplateVariablesDetectionFailed)
 END_EVENT_TABLE()

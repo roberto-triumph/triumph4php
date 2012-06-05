@@ -74,4 +74,10 @@ class MvcEditorFrameworkSample extends MvcEditorFrameworkBaseClass {
 	public function viewFiles($dir, $url, $callStackFile) {
 		return array();
 	}
+	
+	/**
+	 * @return array
+	 */
+	public function templateVariables($callStackFile) {
+	}
 }

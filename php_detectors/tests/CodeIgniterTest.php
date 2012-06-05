@@ -83,7 +83,35 @@ EOF;
 		$expected = array(
 			new MvcEditorUrlClass('http://localhost/index.php/admin/admin/about/', 'vfs://application/controllers/welcome.php', 'Welcome', 'about')
 		);
+	}
+	
+	function testTemplateVariablesSimple() {
 		
+		$cacheContents = <<<'EOF'
+BEGIN_METHOD,MyController,index
+ARRAY,$data,name,address
+OBJECT,$user
+SCALAR,"null user"
+RETURN
+BEGIN_METHOD,CI_Loader,view
+PARAM,"index"
+PARAM,$data
+RETURN
+BEGIN_FUNCTION,stripos
+PARAM,$data
+PARAM,"find me"
+RETURN
+EOF;
+		$tmpDir = vfsStream::newDirectory('tmp');
+		vfsStreamWrapper::getRoot()->addChild($tmpDir);
+		$cacheFile = vfsStream::newFile('call_stack.csv');
+		$cacheFile->withContent($cacheContents);
+		$tmpDir->addChild($cacheFile);
+		$this->fs->config();
+		$this->fs->database();
+		$this->fs->routes();
+		$templateVariables = $this->detector->templateVariables(vfsStream::url('tmp/call_stack.csv'));
+		$this->assertEquals(array('name', 'address'), $templateVariables);		
 	}
 }
 

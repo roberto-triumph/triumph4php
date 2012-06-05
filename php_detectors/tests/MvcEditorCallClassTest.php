@@ -43,6 +43,11 @@ class MvcEditorCallClassTest extends PHPUnit_Framework_TestCase {
         $this->object = new MvcEditorCallClass;
 		$this->file = tmpfile();
 		fwrite($this->file, <<<'EOF'
+BEGIN_METHOD,MyController,index
+ARRAY,$data,name,address
+OBJECT,$user
+SCALAR,"null user"
+RETURN
 BEGIN_METHOD,CI_Loader,view
 PARAM,"index"
 PARAM,$data
@@ -60,15 +65,39 @@ EOF
 		$this->object->argument = 'news/index';
 		$this->object->resource = 'CI_Loader::view';
 		$this->object->type = MvcEditorCallClass::BEGIN_METHOD;
+		$this->object->arrayKeys = array('one', 'two');
+		$this->object->variableName = '$data';
+		$this->object->scalar = 'a long string';
 		$this->object->clear();
 		$this->assertEquals('', $this->object->resource);
 		$this->assertEquals('', $this->object->type);
 		$this->assertEquals('', $this->object->argument);
+		$this->assertEquals('', $this->object->arrayKeys);
+		$this->assertEquals('', $this->object->variableName);
+		$this->assertEquals('', $this->object->scalar);
 	}
 
     public function testFromFile() {
+		$this->assertEquals(TRUE, $this->object->fromFile($this->file));
+		$this->assertEquals(MvcEditorCallClass::BEGIN_METHOD, $this->object->type);
+		$this->assertEquals('MyController::index', $this->object->resource);
 		
-		// first line
+		$this->assertEquals(TRUE, $this->object->fromFile($this->file));
+		$this->assertEquals(MvcEditorCallClass::T_ARRAY, $this->object->type);
+		$this->assertEquals('$data', $this->object->variableName);
+		$this->assertEquals(array('name', 'address'), $this->object->arrayKeys);
+		
+		$this->assertEquals(TRUE, $this->object->fromFile($this->file));
+		$this->assertEquals(MvcEditorCallClass::OBJECT, $this->object->type);
+		$this->assertEquals('$user', $this->object->variableName);
+		
+		$this->assertEquals(TRUE, $this->object->fromFile($this->file));
+		$this->assertEquals(MvcEditorCallClass::SCALAR, $this->object->type);
+		$this->assertEquals('null user', $this->object->scalar);
+		
+		$this->assertEquals(TRUE, $this->object->fromFile($this->file));
+		$this->assertEquals(MvcEditorCallClass::T_RETURN, $this->object->type);
+		
 		$this->assertEquals(TRUE, $this->object->fromFile($this->file));
 		$this->assertEquals(MvcEditorCallClass::BEGIN_METHOD, $this->object->type);
 		$this->assertEquals('CI_Loader::view', $this->object->resource);
@@ -83,7 +112,8 @@ EOF
 		$this->assertEquals(MvcEditorCallClass::PARAM, $this->object->type);
 		$this->assertEquals('$data', $this->object->argument);
 		
-		$this->assertEquals(FALSE, $this->object->fromFile($this->file));
+		$this->assertEquals(TRUE, $this->object->fromFile($this->file));
+		$this->assertEquals(MvcEditorCallClass::T_RETURN, $this->object->type);
 		
 		// second function
 		$this->assertEquals(TRUE, $this->object->fromFile($this->file));
@@ -100,7 +130,8 @@ EOF
 		$this->assertEquals(MvcEditorCallClass::PARAM, $this->object->type);
 		$this->assertEquals('find me', $this->object->argument);
 		
-		$this->assertEquals(FALSE, $this->object->fromFile($this->file));
+		$this->assertEquals(TRUE, $this->object->fromFile($this->file));
+		$this->assertEquals(MvcEditorCallClass::T_RETURN, $this->object->type);
 		
 		// no more lines, check that file pointer was advanced past the end because it shows 
 		// that the file was read.

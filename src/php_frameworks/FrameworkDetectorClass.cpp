@@ -37,6 +37,7 @@ static const int ID_DETECT_CONFIG = wxNewId();
 static const int ID_DETECT_RESOURCES = wxNewId();
 static const int ID_DETECT_URL = wxNewId();
 static const int ID_DETECT_VIEW_FILES = wxNewId();
+static const int ID_DETECT_TEMPLATE_VARIABLES = wxNewId();
 
 mvceditor::ResponseThreadWithHeartbeatClass::ResponseThreadWithHeartbeatClass(mvceditor::DetectorActionClass& action) 
 	: ThreadWithHeartbeatClass(action) 
@@ -439,6 +440,46 @@ bool mvceditor::ViewFilesDetectorActionClass::Response() {
 	return ret;
 }
 
+mvceditor::TemplateVariablesDetectorActionClass::TemplateVariablesDetectorActionClass(wxEvtHandler& handler) 
+	: DetectorActionClass(handler) {
+		
+}
+
+void mvceditor::TemplateVariablesDetectorActionClass::Clear() {
+	TemplateVariables.clear();
+}
+
+wxString mvceditor::TemplateVariablesDetectorActionClass::GetAction() {
+	return wxT("templateVariables");
+}
+
+bool mvceditor::TemplateVariablesDetectorActionClass::Response() {
+	bool ret = true;
+	wxFileInputStream stream(OutputFile.GetFullPath());
+	wxFileConfig result(stream);
+	
+	printf("output file=%s\n", (const char*) OutputFile.GetFullPath().ToAscii());
+	
+	long index = 0;
+	wxString entryName;
+	bool hasNext = result.GetFirstEntry(entryName, index);
+	while (ret && hasNext) {
+		wxString varName;
+		ret = result.Read(entryName, &varName);
+		if (ret) {
+			printf("in action entry=%s\n", (const char*)varName.ToAscii());
+			TemplateVariables.push_back(varName);
+		}
+		else {
+			Error = BAD_CONTENT;
+			ret = false;
+			break;
+		}
+		hasNext = result.GetNextEntry(entryName, index);
+	}
+	return ret;
+}
+
 mvceditor::PhpFrameworkDetectorClass::PhpFrameworkDetectorClass(wxEvtHandler& handler, const mvceditor::EnvironmentClass& environment)
 	: wxEvtHandler()
 	, Identifiers()
@@ -451,9 +492,11 @@ mvceditor::PhpFrameworkDetectorClass::PhpFrameworkDetectorClass(wxEvtHandler& ha
 	, ResourcesDetector(*this)
 	, UrlDetector(*this)
 	, ViewFilesDetector(*this)
+	, TemplateVariablesDetector(*this)
 	, FrameworkIdentifiersLeftToDetect()
 	, UrlsDetected()
 	, ViewFilesDetected()
+	, TemplateVariablesDetected()
 	, Handler(handler)
 	, Environment(environment)
 	, ProjectRootPath() {
@@ -468,6 +511,7 @@ void mvceditor::PhpFrameworkDetectorClass::Clear() {
 	FrameworkIdentifiersLeftToDetect.clear();
 	UrlsDetected.clear();
 	ViewFilesDetected.clear();
+	TemplateVariablesDetected.clear();
 }
 
 bool mvceditor::PhpFrameworkDetectorClass::Init(const wxString& dir) {
@@ -506,6 +550,22 @@ bool mvceditor::PhpFrameworkDetectorClass::InitViewFilesDetector(const wxString&
 	}
 	if (!FrameworkIdentifiersLeftToDetect.empty()) {
 		NextViewFileDetection();
+	}
+	return !Identifiers.empty();
+}
+
+bool mvceditor::PhpFrameworkDetectorClass::InitTemplateVariablesDetector(const wxString& dir, const wxFileName& callStackFile) {
+	TemplateVariablesDetected.clear();
+	FrameworkIdentifiersLeftToDetect.clear();
+	ProjectRootPath = dir;
+	for (size_t i = 0; i < Identifiers.size(); ++i) {
+		std::vector<wxString> next;
+		next.push_back(Identifiers[i]);
+		next.push_back(callStackFile.GetFullPath());
+		FrameworkIdentifiersLeftToDetect.push_back(next);
+	}
+	if (!FrameworkIdentifiersLeftToDetect.empty()) {
+		NextTemplateVariableDetection();
 	}
 	return !Identifiers.empty();
 }
@@ -573,6 +633,23 @@ void mvceditor::PhpFrameworkDetectorClass::NextViewFileDetection() {
 	else {
 		mvceditor::ViewFilesDetectedEventClass viewFilesEvent(ViewFilesDetected);
 		wxPostEvent(&Handler, viewFilesEvent);
+	}
+}
+
+void mvceditor::PhpFrameworkDetectorClass::NextTemplateVariableDetection() {
+	if (!FrameworkIdentifiersLeftToDetect.empty()) {
+		std::vector<wxString> next = FrameworkIdentifiersLeftToDetect.back();
+		FrameworkIdentifiersLeftToDetect.pop_back();
+		
+		wxString framework = next[0];
+		wxString callStackFile = next[1];
+		std::map<wxString, wxString> moreParams;
+		moreParams[wxT("file")] = callStackFile;
+		ViewFilesDetector.Init(ID_DETECT_TEMPLATE_VARIABLES, Environment, ProjectRootPath, framework, moreParams);
+	}
+	else {
+		mvceditor::TemplateVariablesDetectedEventClass templateVariablesEvent(TemplateVariablesDetected);
+		wxPostEvent(&Handler, templateVariablesEvent);
 	}
 }
 
@@ -671,6 +748,18 @@ void mvceditor::PhpFrameworkDetectorClass::OnViewFileDetectionFailed(wxCommandEv
 	wxPostEvent(&Handler, failedEvent);
 }
 
+void mvceditor::PhpFrameworkDetectorClass::OnTemplateVariablesDetectionComplete(wxCommandEvent& event) {
+	TemplateVariablesDetected.insert(TemplateVariablesDetected.begin(), TemplateVariablesDetector.TemplateVariables.begin(), 
+		TemplateVariablesDetector.TemplateVariables.end());
+	NextTemplateVariableDetection();
+}
+
+void mvceditor::PhpFrameworkDetectorClass::OnTemplateVariablesDetectionFailed(wxCommandEvent& event) {
+	wxCommandEvent failedEvent(mvceditor::EVENT_FRAMEWORK_VIEW_FILES_FAILED);
+	failedEvent.SetString(event.GetString());
+	wxPostEvent(&Handler, failedEvent);
+}
+
 mvceditor::UrlDetectedEventClass::UrlDetectedEventClass(std::vector<mvceditor::UrlResourceClass> urls) 
 	: wxEvent(wxID_ANY, mvceditor::EVENT_FRAMEWORK_URL_COMPLETE) 
 	, Urls(urls) {
@@ -692,12 +781,25 @@ wxEvent* mvceditor::ViewFilesDetectedEventClass::Clone() const {
 	return cloned;
 }
 
+mvceditor::TemplateVariablesDetectedEventClass::TemplateVariablesDetectedEventClass(std::vector<wxString> templateVariables)
+	: wxEvent(wxID_ANY, mvceditor::EVENT_FRAMEWORK_TEMPLATE_VARIABLES_COMPLETE)
+	, TemplateVariables(templateVariables) {
+		
+}
+
+wxEvent* mvceditor::TemplateVariablesDetectedEventClass::Clone() const {
+	wxEvent* cloned = new mvceditor::TemplateVariablesDetectedEventClass(TemplateVariables);
+	return cloned;
+}
+
 const wxEventType mvceditor::EVENT_FRAMEWORK_DETECTION_COMPLETE = wxNewEventType();
 const wxEventType mvceditor::EVENT_FRAMEWORK_DETECTION_FAILED = wxNewEventType();
 const wxEventType mvceditor::EVENT_FRAMEWORK_URL_COMPLETE = wxNewEventType();
 const wxEventType mvceditor::EVENT_FRAMEWORK_URL_FAILED = wxNewEventType();
 const wxEventType mvceditor::EVENT_FRAMEWORK_VIEW_FILES_COMPLETE = wxNewEventType();
 const wxEventType mvceditor::EVENT_FRAMEWORK_VIEW_FILES_FAILED = wxNewEventType();
+const wxEventType mvceditor::EVENT_FRAMEWORK_TEMPLATE_VARIABLES_COMPLETE = wxNewEventType();
+const wxEventType mvceditor::EVENT_FRAMEWORK_TEMPLATE_VARIABLES_FAILED = wxNewEventType();
 
 BEGIN_EVENT_TABLE(mvceditor::DetectorActionClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::DetectorActionClass::OnProcessComplete)
@@ -714,6 +816,7 @@ BEGIN_EVENT_TABLE(mvceditor::PhpFrameworkDetectorClass, wxEvtHandler)
 	EVT_COMMAND(ID_DETECT_RESOURCES, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::PhpFrameworkDetectorClass::OnResourcesDetectionComplete)
 	EVT_COMMAND(ID_DETECT_URL, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::PhpFrameworkDetectorClass::OnUrlDetectionComplete)
 	EVT_COMMAND(ID_DETECT_VIEW_FILES, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::PhpFrameworkDetectorClass::OnViewFileDetectionComplete)
+	EVT_COMMAND(ID_DETECT_TEMPLATE_VARIABLES, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::PhpFrameworkDetectorClass::OnTemplateVariablesDetectionComplete)
 	
 	EVT_COMMAND(ID_DETECT_FRAMEWORK, mvceditor::EVENT_PROCESS_FAILED, mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed)
 	EVT_COMMAND(ID_DETECT_DATABASE, mvceditor::EVENT_PROCESS_FAILED, mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed)
@@ -721,6 +824,7 @@ BEGIN_EVENT_TABLE(mvceditor::PhpFrameworkDetectorClass, wxEvtHandler)
 	EVT_COMMAND(ID_DETECT_RESOURCES, mvceditor::EVENT_PROCESS_FAILED, mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed)
 	EVT_COMMAND(ID_DETECT_URL, mvceditor::EVENT_PROCESS_FAILED, mvceditor::PhpFrameworkDetectorClass::OnUrlDetectionFailed)
 	EVT_COMMAND(ID_DETECT_VIEW_FILES, mvceditor::EVENT_PROCESS_FAILED, mvceditor::PhpFrameworkDetectorClass::OnViewFileDetectionFailed)
+	EVT_COMMAND(ID_DETECT_TEMPLATE_VARIABLES, mvceditor::EVENT_PROCESS_FAILED, mvceditor::PhpFrameworkDetectorClass::OnTemplateVariablesDetectionFailed)
 	
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::PhpFrameworkDetectorClass::OnWorkInProgress)
 END_EVENT_TABLE()

@@ -131,6 +131,12 @@ public:
 	std::vector<wxString> CurrentViewFiles;
 
 	/**
+	 * the final result; the template variables that correspond to the
+	 * current URL
+	 */
+	std::vector<wxString> CurrentTemplateVariables;
+	
+	/**
 	 * the URL that the user chose to view files from
 	 */
 	UrlResourceClass ChosenUrl;
@@ -169,6 +175,10 @@ private:
 	void OnViewFilesDetectionComplete(ViewFilesDetectedEventClass& event);
 	
 	void OnViewFilesDetectionFailed(wxCommandEvent& event);
+	
+	void OnTemplateVariablesDetectionComplete(TemplateVariablesDetectedEventClass& event);
+	
+	void OnTemplateVariablesDetectionFailed(wxCommandEvent& event);
 	
 	DECLARE_EVENT_TABLE()
 };
