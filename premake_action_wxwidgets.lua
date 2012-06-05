@@ -47,42 +47,7 @@ newaction {
 					print "WXWIN environment variable not found. Generated Solution file WILL NOT WORK. Please install wxPack."
 				end
 			else
-				-- build the debug version 
-				-- wxWidgets already has a build directory ... need to use another convention
-				-- Patch is needed in order to compile wxWidgets-2.8.10 under Unbunt 9.10.  For more info, and to see the patch, go to
-				-- http://trac.wxwidgets.org/ticket/10883
-				-- build the wxStyledTextCtrl (it is not in the default build)
-				WX_BUILD =  os.getcwd() .. "/lib/wxWidgets-2.8.10/mvc-editor/Debug"
-				os.execute(
-					"cd lib/ && " ..
-					"tar xzf wxWidgets-2.8.10.tar.gz && " ..
-					"cd wxWidgets-2.8.10 && " ..
-					"patch -Np0 -i ../wxWidgets-2.8.10.patch && "  ..
-					"mkdir -p build_mvc_editor_debug && " .. 
-					"cd build_mvc_editor_debug && " .. 
-					".././configure --prefix=\"" .. WX_BUILD .. "\" --with-gtk=2 --enable-unicode --enable-debug && " .. 
-					"make && " .. 
-					"make install && " .. 
-					"cd contrib/src/stc/ && " .. 
-					"make && " .. 
-					"make install"
-				);
-				
-				-- build the release version
-				-- don't need to patch again
-				WX_BUILD =  os.getcwd() .. "/lib/wxWidgets-2.8.10/mvc-editor/Release"					
-				os.execute(
-					"cd lib/wxWidgets-2.8.10 && " ..
-					"mkdir -p build_mvc_editor_release && " .. 
-					"cd build_mvc_editor_release && " .. 
-					".././configure --prefix=\"" .. WX_BUILD .. "\" --disable-debug --disable-debug_gdb " ..
-					"               --with-gtk=2 --enable-unicode --enable-optimize  && " .. 
-					"make && " .. 
-					"make install && " .. 
-					"cd contrib/src/stc/ && " .. 
-					"make && " .. 
-					"make install"
-				 );
+				-- assume wxWidgets is already installed
 			end
 	end
 }

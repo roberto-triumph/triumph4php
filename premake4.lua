@@ -23,6 +23,7 @@
 -- @license    http://www.opensource.org/licenses/mit-license.php The MIT License
 -------------------------------------------------------------------
 
+dofile "premake_opts.lua"
 dofile "premake_functions.lua"
 dofile "premake_action_prep.lua"
 dofile "premake_action_icu.lua"
@@ -69,15 +70,15 @@ function icuconfiguration(config, action)
 		libdirs { "lib/icu/lib/" }
 		links { ICU_LIBS_DEBUG }
 	elseif config == "Debug" and (action == "gmake" or action == "codelite") then
-		buildoptions { "`../../lib/icu/mvc-editor/Debug/bin/icu-config --cppflags`" }
-		linkoptions { "`../../lib/icu/mvc-editor/Debug/bin/icu-config --ldflags --ldflags-icuio`" }
+		buildoptions { string.format("`%s --cppflags`", ICU_CONFIG) }
+		linkoptions { string.format("`%s --ldflags --ldflags-icuio`", ICU_CONFIG) }
 	elseif config == "Release" and action ==  "vs2008" then
 		includedirs { "lib/icu/include/" }
 		libdirs { "lib/icu/lib/" }
 		links { ICU_LIBS_RELEASE }
 	elseif config == "Release" and (action == "gmake" or action == "codelite") then
-		buildoptions { "`../../lib/icu/mvc-editor/Release/bin/icu-config --cppflags`" }
-		linkoptions { "`../../lib/icu/mvc-editor/Release/bin/icu-config --ldflags --ldflags-icuio`" }
+		buildoptions { string.format("`%s --cppflags`", ICU_CONFIG) }
+		linkoptions { string.format("`%s --ldflags --ldflags-icuio`", ICU_CONFIG) }
 	end
 end
 
@@ -100,8 +101,8 @@ function wxconfiguration(config, action)
 		flags { "Unicode" }
 		links { WX_LIBS_DEBUG }
 	elseif config == "Debug" and (action == "gmake" or action == "codelite") then
-		buildoptions { "`../../lib/wxWidgets-2.8.10/mvc-editor/Debug/bin/wx-config --cxxflags --debug=yes --unicode=yes`" }
-		linkoptions { "`../../lib/wxWidgets-2.8.10/mvc-editor/Debug/bin/wx-config --debug=yes --unicode=yes --libs core,base,net`" }
+		buildoptions { string.format("`%s --cxxflags --debug=yes --unicode=yes`", WX_CONFIG) }
+		linkoptions { string.format("`%s --debug=yes --unicode=yes --libs core,base,net`", WX_CONFIG) }
 	elseif config == "Release" and action ==  "vs2008" then
 		libdirs { "$(WXWIN)/lib/vc_dll/" }
 		includedirs { "$(WXWIN)/include/", "$(WXWIN)/lib/vc_dll/mswu/" }
@@ -115,8 +116,8 @@ function wxconfiguration(config, action)
 		flags { "Unicode", "Optimize" }
 		links { WX_LIBS_RELEASE } 
 	elseif config == "Release" and (action == "gmake" or action == "codelite") then
-		buildoptions { "`../../lib/wxWidgets-2.8.10/mvc-editor/Release/bin/wx-config --cxxflags --debug=no --unicode=yes`" }
-		linkoptions { "`../../lib/wxWidgets-2.8.10/mvc-editor/Release/bin/wx-config --debug=no --unicode=yes --libs core,base,net`" }
+		buildoptions { string.format("`%s --cxxflags --debug=no --unicode=yes`", WX_CONFIG) }
+		linkoptions { string.format("`%s --debug=no --unicode=yes --libs core,base,net`", WX_CONFIG) }
 	end
 end
 
@@ -129,11 +130,11 @@ function wxappconfiguration(config, action)
 	end
 	
 	if config == "Debug" and (action == "gmake" or action == "codelite") then
-		linkoptions { "`../../lib/wxWidgets-2.8.10/mvc-editor/Debug/bin/wx-config --debug=yes --unicode=yes --libs aui,adv`" }
+		linkoptions { string.format("`%s --debug=yes --unicode=yes --libs aui,adv`", WX_CONFIG) }
 	elseif config == "Debug" and action ==  "vs2008" then
 		links { WX_LIBS_WINDOW_DEBUG } 
 	elseif config == "Release" and (action == "gmake" or action == "codelite") then
-		linkoptions { "`../../lib/wxWidgets-2.8.10/mvc-editor/Release/bin/wx-config --debug=no --unicode=yes --libs aui,adv`" }
+		linkoptions { string.format("`%s --debug=no --unicode=yes --libs aui,adv`", WX_CONFIG) }
 	elseif config == "Release" and action ==  "vs2008" then
 		links { WX_LIBS_WINDOW_RELEASE } 
 	end
@@ -148,10 +149,10 @@ function sociconfiguration()
 		includedirs { 
 			"lib/soci/src/core",
 			"lib/soci/src/backends/mysql",
-			MYSQL_BUILD_DIR .. "include/"
+			MYSQL_INCLUDE_DIR
 		}	
 		libdirs {
-			MYSQL_BUILD_DIR .. "lib/"
+			MYSQL_LIB_DIR .. "lib/"
 		}
 		
 		-- TODO Debug version?
@@ -162,7 +163,7 @@ function sociconfiguration()
 			"lib/soci/mvc-editor/include",
 			"lib/soci/mvc-editor/include/soci",
 			"lib/soci/mvc-editor/include/soci/mysql",
-			MYSQL_BUILD_DIR .. "include/"
+			MYSQL_INCLUDE_DIR 
 		}
 		
 		-- soci creates lib directory with the architecture name
@@ -172,9 +173,9 @@ function sociconfiguration()
 			libdirs { "lib/soci/mvc-editor/lib" }
 		end
 		libdirs {
-			MYSQL_BUILD_DIR .. "lib/"
+			MYSQL_LIB_DIR
 		}
-		links { "soci_core", "soci_mysql", "mysql" }
+		links { "soci_core", "soci_mysql", string.match(MYSQL_LIB_NAME, "^lib([%w_]+)%.so$") }
 	end
 end
 
@@ -276,6 +277,12 @@ solution "mvc-editor"
 			"src/MvcEditorErrors.cpp",
 			"src/MvcEditorAssets.cpp",
 			"src/MvcEditorString.cpp"
+		}
+
+		-- these will be used by the SqlResourceFinder tests
+		defines {
+			string.format("MVCEDITOR_DB_USER=\"%s\"", MVCEDITOR_DB_USER),
+			string.format("MVCEDITOR_DB_PASSWORD=\"%s\"", MVCEDITOR_DB_PASSWORD)
 		}
 		includedirs { "src/", "lib/UnitTest++/src/", "tests/", "lib/pelet/include" }
 		links { "unit_test++", "pelet" }

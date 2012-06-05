@@ -25,6 +25,7 @@
 #include <UnitTest++.h>
 #include <DatabaseTestFixtureClass.h>
 #include <environment/DatabaseInfoClass.h>
+#include <windows/StringHelperClass.h>
 #include <soci.h>
 
 class DatabaseInfoTestFixtureClass : public DatabaseTestFixtureClass {
@@ -34,7 +35,8 @@ public:
 		, Info() {
 		Info.DatabaseName = UNICODE_STRING_SIMPLE("database_info");
 		Info.Host = UNICODE_STRING_SIMPLE("127.0.0.1");
-		Info.User = UNICODE_STRING_SIMPLE("root");
+		Info.User = mvceditor::StringHelperClass::charToIcu(UserName().c_str());
+		Info.Password = mvceditor::StringHelperClass::charToIcu(Password().c_str());
 	}
 	
 	mvceditor::DatabaseInfoClass Info;

@@ -23,24 +23,11 @@
 -- @license    http://www.opensource.org/licenses/mit-license.php The MIT License
 -------------------------------------------------------------------
 
--- will look for MySQL files in these directories
-if os.is "windows" then
-   
-	-- not easy to get MySQL Connector C libs in windows
-	-- doing a manual, binary install
-	MYSQL_BUILD_DIR =  "lib/mysql-connector-c-noinstall-6.0.2-win32/"
-else
-
-	-- on linux we will compile
-	MYSQL_BUILD_DIR = 'lib/mysql-connector-c-6.0.2/mvc-editor/Release/'
-end
-
-
 newaction {
 	trigger = "soci",
 	description = "Build the SOCI (database access) library",
 	execute = function()
-		batchexecute(os.getcwd(), { "cmake --version" }, "cmake not found. Compiling SOCI requires CMake. SOCI cannot be built.")
+		batchexecute(os.getcwd(), { string.format("%s --version", CMAKE) }, "cmake not found. Compiling SOCI requires CMake. SOCI cannot be built.")
 		if os.is "windows" then
 		
 			-- on windows, use MSYS Git which may not be in the path
@@ -64,16 +51,8 @@ newaction {
 			batchexecute(os.getcwd(), {
 				"winrar x lib\\mysql-connector-c-noinstall-6.0.2-win32.zip lib\\"
 			})
-		else 
-			existence "lib/mysql-connector-c-6.0.2.tar.gz"
-			decompress("lib", "mysql-connector-c-6.0.2.tar.gz")
-			batchexecute("lib/mysql-connector-c-6.0.2", {
-				"cmake " ..
-					"-G \"Unix Makefiles\" " ..
-					"-DCMAKE_INSTALL_PREFIX=" .. normalizepath(MYSQL_BUILD_DIR),
-				"make",
-				"make install"
-			});
+		else
+			-- get from the system 
 		end
 		
 		-- always get  a specific version so that we are not developing against a moving target
@@ -89,10 +68,10 @@ newaction {
 			-- exclude SOCI from linking against Boost. we don't use it
 			-- generate a solution file
 			batchexecute(SOCI_SRC, {
-				"cmake " ..
+				CMAKE ..
 					" -G \"Visual Studio 9 2008\"" ..
-					" -DMYSQL_INCLUDE_DIR=" .. normalizepath(MYSQL_BUILD_DIR .. 'include') ..
-					" -DMYSQL_LIBRARY=" .. normalizepath(MYSQL_BUILD_DIR .. 'lib/libmysql.lib') ..
+					" -DMYSQL_INCLUDE_DIR=" .. normalizepath(MYSQL_INCLUDE_DIR) ..
+					" -DMYSQL_LIBRARY=" .. normalizepath(MYSQL_LIB_DIR .. '/libmysql.lib') ..
 					" -DCMAKE_INSTALL_PREFIX=" .. SOCI_BUILD_DIR .. 
 					" -DWITH_MYSQL=YES " ..
 					" -DWITH_ODBC=NO " ..
@@ -111,10 +90,10 @@ newaction {
 			-- now build SOCI
 			-- exclude SOCI from linking against Boost. we don't use it
 			batchexecute(SOCI_SRC, {
-				"cmake " ..
+				CMAKE ..
 					" -G \"Unix Makefiles\"" ..
-					" -DMYSQL_INCLUDE_DIR=" .. normalizepath(MYSQL_BUILD_DIR .. 'include') ..
-					" -DMYSQL_LIBRARY=" .. normalizepath(MYSQL_BUILD_DIR .. 'lib/libmysql.so') ..
+					" -DMYSQL_INCLUDE_DIR=" .. MYSQL_INCLUDE_DIR ..
+					" -DMYSQL_LIBRARY=" .. MYSQL_LIB_DIR .. "/" .. MYSQL_LIB_NAME ..
 					" -DCMAKE_INSTALL_PREFIX=" .. SOCI_BUILD_DIR .. 
 					" -DWITH_MYSQL=YES " ..
 					" -DWITH_MYSQL=ODBC " ..

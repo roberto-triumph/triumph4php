@@ -39,26 +39,8 @@ newaction {
 					print("(Note: Batch Build \"Select All\" won't work on Visual Studio 2008 Express Edition because it does not support 64 bit compilation)")
 				end
 			else
-				-- build the debug version 
-				ICU_BUILD =  os.getcwd() .. "/lib/icu/mvc-editor/Debug/"
-				os.execute(
-					"cd lib/ && " ..
-					"tar xzf icu4c-4_2_1-src.tgz && " ..
-					"cd icu/source && " .. 
-					"./runConfigureICU --enable-debug --disable-release Linux --prefix=" .. ICU_BUILD .. " && " ..
-					"make && " ..
-					"make install"
-				);
 				
-				-- build the release version
-				ICU_BUILD =  os.getcwd() .. "/lib/icu/mvc-editor/Release/"
-				os.execute(
-					"cd lib/icu/source && " ..
-					"make clean && " ..
-					"./runConfigureICU Linux --prefix=" .. ICU_BUILD .. " && " ..
-					"make && " .. 
-					"make install"
-				);
+			-- in linux we assume this is installed already
 			end
 	end
 }

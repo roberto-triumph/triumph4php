@@ -117,12 +117,8 @@ newaction {
 				print "MySQL libraries not found. Please download the MySQL Connector/C from http://dev.mysql.com/downloads/connector/c/"
 			end
 		else 
-			os.execute("cp -r " .. os.getcwd() .. "/lib/icu/mvc-editor/Debug/lib/*.so* Debug/");
-			os.execute("cp -r " .. os.getcwd() .. "/lib/icu/mvc-editor/Release/lib/*.so* Release/");
-			os.execute("cp -r " .. os.getcwd() .. "/lib/wxWidgets-2.8.10/mvc-editor/Debug/lib/*.so* Debug/");
-			os.execute("cp -r " .. os.getcwd() .. "/lib/wxWidgets-2.8.10/mvc-editor/Release/lib/*.so* Release/");
-			os.execute("cp -r " .. os.getcwd() .. "/lib/mysql-connector-c-6.0.2/mvc-editor/Release/lib/*.so* Debug/");
-			os.execute("cp -r " .. os.getcwd() .. "/lib/mysql-connector-c-6.0.2/mvc-editor/Release/lib/*.so* Release/");
+			os.execute("mkdir -p Debug");
+			os.execute("mkdir -p Release");
 			if os.isdir "lib/soci/mvc-editor/lib64" then
 				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/lib64/*.so* Debug/");
 				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/lib64/*.so* Release/");

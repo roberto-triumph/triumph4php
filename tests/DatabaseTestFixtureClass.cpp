@@ -26,11 +26,23 @@
 #include <soci-mysql.h>
 #include <stdio.h>
  
+// these macros will expand a macro into its 
+// these are needed to expand the DB user/pwd which
+// are given as macros by the premake script
+#define MVC_STR_EXPAND(s) #s
+#define MVC_STR(s) MVC_STR_EXPAND(s)
+ 
  
 DatabaseTestFixtureClass::DatabaseTestFixtureClass(const std::string& testDatabaseName)
 	: Session()
-	, ConnectionString("host=127.0.0.1 port=3306 user=root ") {
-	Session.open(*soci::factory_mysql(), (ConnectionString + "db=mysql").c_str());
+	, ConnectionString("host=127.0.0.1 port=3306 user=") {
+	ConnectionString += UserName();
+	std::string pwd = Password();
+	if (!pwd.empty()) {
+		ConnectionString += " password=";
+		ConnectionString += pwd;
+	}
+	Session.open(*soci::factory_mysql(), (ConnectionString + " db=mysql").c_str());
 	DropDatabase(testDatabaseName);
 	CreateDatabase(testDatabaseName);
 	Exec("USE " + testDatabaseName);
@@ -39,6 +51,17 @@ DatabaseTestFixtureClass::DatabaseTestFixtureClass(const std::string& testDataba
 DatabaseTestFixtureClass::~DatabaseTestFixtureClass() {
 	Session.close();
 }
+
+std::string DatabaseTestFixtureClass::UserName() const {
+	std::string user = MVC_STR(MVCEDITOR_DB_USER);
+	return user;
+}
+
+std::string DatabaseTestFixtureClass::Password() const {
+	std::string pwd = MVC_STR(MVCEDITOR_DB_PASSWORD);
+	return pwd;
+}
+
 
 void DatabaseTestFixtureClass::DropDatabase(const std::string& databaseName) {
 	std::string query("DROP DATABASE IF EXISTS ");

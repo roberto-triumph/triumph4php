@@ -25,10 +25,12 @@
 #include <UnitTest++.h>
 #include <DatabaseTestFixtureClass.h>
 #include <environment/SqlResourceFinderClass.h>
+#include <windows/StringHelperClass.h>
 #include <MvcEditorChecks.h>
 #include <unicode/ustdio.h>
 #include <string>
- 
+
+
 class SqlResourceFinderFixtureClass : public DatabaseTestFixtureClass {
 
 public:
@@ -38,8 +40,11 @@ public:
 		, Info()
 		, Finder() {
 		Info.DatabaseName = UNICODE_STRING_SIMPLE("sql_resource_finder");
+
+		// user name, pwd are #defines come from the premake script premake_opts.lua
 		Info.Host = UNICODE_STRING_SIMPLE("127.0.0.1");
-		Info.User = UNICODE_STRING_SIMPLE("root");
+		Info.User = mvceditor::StringHelperClass::charToIcu(UserName().c_str());
+		Info.Password = mvceditor::StringHelperClass::charToIcu(Password().c_str());
 	}
 	
 	mvceditor::DatabaseInfoClass Info;
