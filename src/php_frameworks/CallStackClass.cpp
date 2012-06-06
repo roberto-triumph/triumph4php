@@ -260,7 +260,7 @@ void mvceditor::CallStackClass::VariableFound(const UnicodeString& namespaceName
 					// multiple times
 					std::vector<UnicodeString>::iterator it = std::find(
 					            ScopeVariables[i].ArrayKeys.begin(), ScopeVariables[i].ArrayKeys.end(), variable.ArrayKey);
-					if (it != ScopeVariables[i].ArrayKeys.end()) {
+					if (it == ScopeVariables[i].ArrayKeys.end()) {
 						ScopeVariables[i].ArrayKeys.push_back(variable.ArrayKey);
 					}
 				}
@@ -271,34 +271,37 @@ void mvceditor::CallStackClass::VariableFound(const UnicodeString& namespaceName
 			UnicodeString name = variable.ChainList[0].Name;
 			mvceditor::SymbolClass::Types type;
 			std::vector<UnicodeString> arrayKeys;
-			switch (expression.ExpressionType) {
-				case pelet::ExpressionClass::SCALAR:
-					type = mvceditor::SymbolClass::SCALAR;
-					break;
-				case pelet::ExpressionClass::ARRAY:
-					type = mvceditor::SymbolClass::ARRAY;
-					arrayKeys = expression.ArrayKeys;
-					break;
-				case pelet::ExpressionClass::VARIABLE:
-				case pelet::ExpressionClass::FUNCTION_CALL:
-				case pelet::ExpressionClass::NEW_CALL:
-					type = mvceditor::SymbolClass::OBJECT;
-					break;
-				case pelet::ExpressionClass::UNKNOWN:
-					type = mvceditor::SymbolClass::UNKNOWN;
-					break;
+			if (variable.ArrayKey.isEmpty()) {
+				switch (expression.ExpressionType) {
+					case pelet::ExpressionClass::SCALAR:
+						type = mvceditor::SymbolClass::SCALAR;
+						break;
+					case pelet::ExpressionClass::ARRAY:
+						type = mvceditor::SymbolClass::ARRAY;
+						arrayKeys = expression.ArrayKeys;
+						break;
+					case pelet::ExpressionClass::VARIABLE:
+					case pelet::ExpressionClass::FUNCTION_CALL:
+					case pelet::ExpressionClass::NEW_CALL:
+						type = mvceditor::SymbolClass::OBJECT;
+						break;
+					case pelet::ExpressionClass::UNKNOWN:
+						type = mvceditor::SymbolClass::UNKNOWN;
+						break;
+				}
+			}
+			else {
+				type = mvceditor::SymbolClass::ARRAY;
+				
+				// in  PHP an array may be created by assiging
+				// an array key-value to a non-existant variable
+				arrayKeys.push_back(variable.ArrayKey);
 			}
 
 			mvceditor::SymbolClass newSymbol(name, type);
 			newSymbol.ChainList = expression.ChainList;
 			newSymbol.PhpDocType = variable.PhpDocType;
 			newSymbol.ArrayKeys = arrayKeys;
-			if (!variable.ArrayKey.isEmpty() && type != mvceditor::SymbolClass::ARRAY) {
-
-				// in  PHP an array may be created by assiging
-				// an array key-value to a non-existant variable
-				newSymbol.ArrayKeys.push_back(variable.ArrayKey);
-			}
 			ScopeVariables.push_back(newSymbol);
 		}
 	}

@@ -168,6 +168,7 @@ void mvceditor::ViewFilePluginClass::OnViewFilesDetectionComplete(mvceditor::Vie
 void mvceditor::ViewFilePluginClass::OnViewFilesDetectionFailed(wxCommandEvent& event) {
 	mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, event.GetString());
 	
+	// still want to show the template variables 
 	FrameworkDetector->Identifiers = PhPFrameworks().Identifiers;
 	if (!FrameworkDetector->InitTemplateVariablesDetector(GetProject()->GetRootPath(), CallStackThread.StackFile)) {
 		mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Could not start templateVariables detector"));
@@ -183,14 +184,12 @@ void mvceditor::ViewFilePluginClass::OnTemplateVariablesDetectionComplete(mvcedi
 		viewPanel->UpdateResults();
 		SetFocusToToolsWindow(viewPanel);
 	}
-	printf("variable count=%ld\n", CurrentTemplateVariables.size());
-	for (size_t i = 0; i < CurrentTemplateVariables.size(); ++i) {
-		printf("var=%s\n", (const char*)CurrentTemplateVariables[i].ToAscii());
-	}
+	wxRemoveFile(CallStackThread.StackFile.GetFullPath());
 }
 
 void mvceditor::ViewFilePluginClass::OnTemplateVariablesDetectionFailed(wxCommandEvent& event) {
 	mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, event.GetString());
+	wxRemoveFile(CallStackThread.StackFile.GetFullPath());
 }
 
 mvceditor::UrlResourceFinderClass& mvceditor::ViewFilePluginClass::Urls() {
@@ -248,6 +247,7 @@ void mvceditor::ViewFilePanelClass::UpdateResults() {
 			}
 			FileTree->AppendItem(parent, text);
 		}
+		FileTree->ExpandAll();
 		
 		TemplateVariablesLabel->SetLabel(wxString::Format(_("Found %d template variables"), Plugin.CurrentTemplateVariables.size()));
 		TemplateVariablesTree->DeleteAllItems();
@@ -256,6 +256,7 @@ void mvceditor::ViewFilePanelClass::UpdateResults() {
 			wxString text = Plugin.CurrentTemplateVariables[i];
 			TemplateVariablesTree->AppendItem(parent, text);
 		}
+		TemplateVariablesTree->ExpandAll();
 	}
 	else if (Plugin.CallStackThread.WriteError) {
 		StatusLabel->SetLabel(_("Error"));

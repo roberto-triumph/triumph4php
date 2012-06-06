@@ -458,8 +458,6 @@ bool mvceditor::TemplateVariablesDetectorActionClass::Response() {
 	wxFileInputStream stream(OutputFile.GetFullPath());
 	wxFileConfig result(stream);
 	
-	printf("output file=%s\n", (const char*) OutputFile.GetFullPath().ToAscii());
-	
 	long index = 0;
 	wxString entryName;
 	bool hasNext = result.GetFirstEntry(entryName, index);
@@ -467,7 +465,6 @@ bool mvceditor::TemplateVariablesDetectorActionClass::Response() {
 		wxString varName;
 		ret = result.Read(entryName, &varName);
 		if (ret) {
-			printf("in action entry=%s\n", (const char*)varName.ToAscii());
 			TemplateVariables.push_back(varName);
 		}
 		else {
@@ -645,7 +642,7 @@ void mvceditor::PhpFrameworkDetectorClass::NextTemplateVariableDetection() {
 		wxString callStackFile = next[1];
 		std::map<wxString, wxString> moreParams;
 		moreParams[wxT("file")] = callStackFile;
-		ViewFilesDetector.Init(ID_DETECT_TEMPLATE_VARIABLES, Environment, ProjectRootPath, framework, moreParams);
+		TemplateVariablesDetector.Init(ID_DETECT_TEMPLATE_VARIABLES, Environment, ProjectRootPath, framework, moreParams);
 	}
 	else {
 		mvceditor::TemplateVariablesDetectedEventClass templateVariablesEvent(TemplateVariablesDetected);
