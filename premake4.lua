@@ -185,7 +185,7 @@ function pickywarnings(action)
 		
 		-- when compiling strict warning checks; also check against variable length arrays
 		-- since Visual Studio is not C99 compliant
-		buildoptions { "-Wall", "-Werror", "-Wvla", "-Wno-comment"  }
+		buildoptions { "-Wall", "-Werror", "-Wvla" }
 	end
 end
 

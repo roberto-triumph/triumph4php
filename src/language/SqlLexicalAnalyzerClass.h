@@ -109,7 +109,7 @@ public:
 		SQL_LINE_COMMENT,
 		
 		/**
-		 * multi-line comments (/*)
+		 * multi-line comments (/ *)
 		 */
 		SQL_BLOCK_COMMENT
 	};
