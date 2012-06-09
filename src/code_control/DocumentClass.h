@@ -31,7 +31,7 @@
 #include <pelet/LanguageDiscoveryClass.h>
 #include <language/SymbolTableClass.h>
 #include <widgets/ResourceCacheClass.h>
-#include <environment/EnvironmentClass.h>
+#include <environment/AmpInfoClass.h>
 #include <wx/string.h>
 #include <wx/stc/stc.h>
 #include <unicode/unistr.h>
@@ -169,7 +169,7 @@ public:
 	/**
 	 * This class will NOT own any of these pointer. Caller must manage (delete) it.
 	 */
-	PhpDocumentClass(ProjectClass* project, ResourceCacheClass* resourceCache, EnvironmentClass* environment);
+	PhpDocumentClass(ProjectClass* project, ResourceCacheClass* resourceCache, AmpInfoClass* ampInfo);
 
 	~PhpDocumentClass();
 
@@ -350,7 +350,7 @@ private:
 	/**
 	 * This class will NOT own this pointer
 	 */
-	EnvironmentClass* Environment;
+	AmpInfoClass* AmpInfo;
 
 	/**
 	 * The resource signature currently being displayed in the calltip.

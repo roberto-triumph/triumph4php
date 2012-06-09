@@ -53,7 +53,7 @@ public:
 	 * Constructor 
 	 * For all of these pointer arguments, this class will NOT own them.
 	 */
-	RunConsolePanelClass(wxWindow* parent, EnvironmentClass* environment, StatusBarWithGaugeClass* gauge, int id = wxID_ANY);
+	RunConsolePanelClass(wxWindow* parent, AmpInfoClass* ampInfo, StatusBarWithGaugeClass* gauge, int id = wxID_ANY);
 
 	/**
 	 * Set to run the given PHP file
@@ -93,9 +93,9 @@ private:
 	/**
 	 * project holds the File System location of PHP executable
 	 * 
-	 * @var EnvironmentClass*
+	 * @var AmpInfoClass*
 	 */
-	EnvironmentClass* Environment;
+	AmpInfoClass* AmpInfo;
 	
 	/**
 	 * To show progess to the user

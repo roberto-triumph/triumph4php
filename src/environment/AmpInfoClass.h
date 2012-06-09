@@ -87,15 +87,15 @@ public:
 };
 
 /**
- * The Environment class is a simple container to the configured options of the currently running development stack
+ * The AmpInfo class is a simple container to the configured options of the currently running development stack
  * (LAMP / WAMP / MAMP enviroment). Each composite class will perform all of the underlying logic.
  * 
  */
-class EnvironmentClass {
+class AmpInfoClass {
 
 public:
-	EnvironmentClass();
-	~EnvironmentClass();
+	AmpInfoClass();
+	~AmpInfoClass();
 	
 	ApacheClass Apache;
 	
@@ -107,12 +107,12 @@ public:
 	std::vector<WebBrowserClass> WebBrowsers;
 	
 	/**
-	 * Save the environment settings to the global config (wxConfigBase::Get())
+	 * Save the ampInfo settings to the global config (wxConfigBase::Get())
 	 */
 	void SaveToConfig() const;
 
 	/**
-	 * Get the environment settings from the global config (wxConfigBase::Get())
+	 * Get the ampInfo settings from the global config (wxConfigBase::Get())
 	 */
 	void LoadFromConfig();
 

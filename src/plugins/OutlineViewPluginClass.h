@@ -56,9 +56,9 @@ public:
 	/**
 	 * start the background thread that parses the given file.
 	 * @filename the file to parse
-	 * @param environment to get the php version
+	 * @param ampInfo to get the php version
 	 */
-	bool Start(const wxString& fileName, const EnvironmentClass& environment);
+	bool Start(const wxString& fileName, const AmpInfoClass& ampInfo);
 
 protected:
 

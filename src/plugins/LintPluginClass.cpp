@@ -112,7 +112,7 @@ mvceditor::LintBackgroundFileReaderClass::LintBackgroundFileReaderClass(wxEvtHan
 
 bool mvceditor::LintBackgroundFileReaderClass::BeginDirectoryLint(const wxString& directory, const std::vector<wxString>& phpFileFilters, 
 																  const wxString& ignoreFileFilters, 
-																  const mvceditor::EnvironmentClass& environment,
+																  const mvceditor::AmpInfoClass& environment,
 																  mvceditor::BackgroundFileReaderClass::StartError& error) {
 	bool good = false;
 	error = mvceditor::BackgroundFileReaderClass::NONE;
@@ -129,7 +129,7 @@ bool mvceditor::LintBackgroundFileReaderClass::BeginDirectoryLint(const wxString
 
 bool mvceditor::LintBackgroundFileReaderClass::LintSingleFile(const wxString& fileName, 
 	  const std::vector<wxString>& phpFileFilters, const wxString& ignoreFileFilters,
-	  const mvceditor::EnvironmentClass& environment) {
+	  const mvceditor::AmpInfoClass& environment) {
 
 	// ATTN: use a local instance of ParserClass so that this method is thread safe
 	// and can be run when a background thread is already running.

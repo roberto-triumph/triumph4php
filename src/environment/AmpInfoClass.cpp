@@ -22,7 +22,7 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <environment/EnvironmentClass.h>
+#include <environment/AmpInfoClass.h>
 #include <wx/platinfo.h>
 #include <wx/confbase.h>
 #include <wx/utils.h>
@@ -46,7 +46,7 @@ mvceditor::WebBrowserClass::WebBrowserClass(wxString name, wxFileName fullPath)
 
 }
 
-mvceditor::EnvironmentClass::EnvironmentClass()
+mvceditor::AmpInfoClass::AmpInfoClass()
 		: Apache()
 		, Php()
 		, WebBrowsers() {
@@ -74,7 +74,7 @@ mvceditor::EnvironmentClass::EnvironmentClass()
 	}
 }
 
-mvceditor::EnvironmentClass::~EnvironmentClass() {
+mvceditor::AmpInfoClass::~AmpInfoClass() {
 }
 
 mvceditor::PhpEnvironmentClass::PhpEnvironmentClass() 
@@ -125,13 +125,13 @@ void mvceditor::PhpEnvironmentClass::AutoDetermine() {
 	}
 }
 
-void mvceditor::EnvironmentClass::LoadFromConfig() {
+void mvceditor::AmpInfoClass::LoadFromConfig() {
 	wxConfigBase* config = wxConfigBase::Get();
 	
 	int version = 0;
-	config->Read(wxT("Environment/PhpExecutablePath"), &Php.PhpExecutablePath);
-	config->Read(wxT("Environment/PhpVersionIsAuto"), &Php.IsAuto);
-	config->Read(wxT("Environment/PhpVersion"), &version);
+	config->Read(wxT("AmpInfo/PhpExecutablePath"), &Php.PhpExecutablePath);
+	config->Read(wxT("AmpInfo/PhpVersionIsAuto"), &Php.IsAuto);
+	config->Read(wxT("AmpInfo/PhpVersion"), &version);
 	
 	if (1 == version) {
 		Php.Version = pelet::PHP_53;
@@ -145,15 +145,15 @@ void mvceditor::EnvironmentClass::LoadFromConfig() {
 	}
 	
 	wxString httpdPath;
-	config->Read(wxT("Environment/ApacheHttpdPath"), &httpdPath);
-	config->Read(wxT("Environment/ManualConfiguration"), &Apache.ManualConfiguration);
+	config->Read(wxT("AmpInfo/ApacheHttpdPath"), &httpdPath);
+	config->Read(wxT("AmpInfo/ManualConfiguration"), &Apache.ManualConfiguration);
 	if(!httpdPath.IsEmpty()) {
 		Apache.SetHttpdPath(httpdPath);
 	}
 	wxString oldPath = config->GetPath();
 	long index;
 	wxString groupName;
-	config->SetPath(wxT("Environment"));
+	config->SetPath(wxT("AmpInfo"));
 	bool found = config->GetFirstGroup(groupName, index);
 	if (found) {
 		
@@ -187,7 +187,7 @@ void mvceditor::EnvironmentClass::LoadFromConfig() {
 	config->SetPath(oldPath);
 }
 
-void mvceditor::EnvironmentClass::SaveToConfig() const {
+void mvceditor::AmpInfoClass::SaveToConfig() const {
 	wxConfigBase* config = wxConfigBase::Get();
 	int version = 0;
 	if (pelet::PHP_53 == Php.Version) {
@@ -196,18 +196,18 @@ void mvceditor::EnvironmentClass::SaveToConfig() const {
 	else if (pelet::PHP_54) {
 		version = 2;
 	}
-	config->Write(wxT("Environment/PhpExecutablePath"), Php.PhpExecutablePath);
-	config->Write(wxT("Environment/PhpVersionIsAuto"), Php.IsAuto);
-	config->Write(wxT("Environment/PhpVersion"), version);
+	config->Write(wxT("AmpInfo/PhpExecutablePath"), Php.PhpExecutablePath);
+	config->Write(wxT("AmpInfo/PhpVersionIsAuto"), Php.IsAuto);
+	config->Write(wxT("AmpInfo/PhpVersion"), version);
 	
 	
-	config->Write(wxT("Environment/ApacheHttpdPath"), Apache.GetHttpdPath());
-	config->Write(wxT("Environment/ManualConfiguration"), Apache.ManualConfiguration);
+	config->Write(wxT("AmpInfo/ApacheHttpdPath"), Apache.GetHttpdPath());
+	config->Write(wxT("AmpInfo/ManualConfiguration"), Apache.ManualConfiguration);
 	int i = 0;
 	for(std::vector<mvceditor::WebBrowserClass>::const_iterator it = WebBrowsers.begin(); it != WebBrowsers.end(); ++it) {
-		wxString key = wxString::Format(wxT("Environment/WebBrowser_%d/Name"), i);
+		wxString key = wxString::Format(wxT("AmpInfo/WebBrowser_%d/Name"), i);
 		config->Write(key, it->Name);
-		key = wxString::Format(wxT("Environment/WebBrowser_%d/Path"), i);
+		key = wxString::Format(wxT("AmpInfo/WebBrowser_%d/Path"), i);
 		config->Write(key, it->FullPath.GetFullPath()); 
 		i++;
 	}
@@ -215,9 +215,9 @@ void mvceditor::EnvironmentClass::SaveToConfig() const {
 		std::map<wxString, wxString> mappings = Apache.GetVirtualHostMappings();
 		i = 0;
 		for (std::map<wxString, wxString>::const_iterator it = mappings.begin(); it != mappings.end(); ++it) {
-			wxString key = wxString::Format(wxT("Environment/VirtualHost_%d/RootDirectory"), i);
+			wxString key = wxString::Format(wxT("AmpInfo/VirtualHost_%d/RootDirectory"), i);
 			config->Write(key, it->first);
-			key = wxString::Format(wxT("Environment/VirtualHost_%d/HostName"), i);
+			key = wxString::Format(wxT("AmpInfo/VirtualHost_%d/HostName"), i);
 			config->Write(key, it->second); 
 			i++;
 		}
@@ -225,7 +225,7 @@ void mvceditor::EnvironmentClass::SaveToConfig() const {
 	config->Flush();
 }
 
-bool mvceditor::EnvironmentClass::FindBrowserByName(const wxString& name, wxFileName& fileName) const {
+bool mvceditor::AmpInfoClass::FindBrowserByName(const wxString& name, wxFileName& fileName) const {
 	bool found = false;
 	for(std::vector<mvceditor::WebBrowserClass>::const_iterator it = WebBrowsers.begin(); it != WebBrowsers.end(); ++it) {
 		if (it->Name == name) {

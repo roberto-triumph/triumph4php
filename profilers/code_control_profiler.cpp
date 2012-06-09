@@ -50,7 +50,7 @@ public:
 	mvceditor::ProjectOptionsClass ProjectOptions;
 	mvceditor::ProjectClass Project;
 	mvceditor::ResourceCacheClass ResourceCache;
-	mvceditor::EnvironmentClass Environment;
+	mvceditor::AmpInfoClass AmpInfo;
 };
 
 /**
@@ -144,7 +144,7 @@ CodeControlProfilerAppClass::CodeControlProfilerAppClass()
 	, ProjectOptions()
 	, Project(ProjectOptions) 
 	, ResourceCache()
-	, Environment() {
+	, AmpInfo() {
 		
 }
 
@@ -167,7 +167,7 @@ int CodeControlProfilerAppClass::OnExit() {
 CodeControlFrameClass::CodeControlFrameClass(CodeControlProfilerAppClass& app) 
 	: wxFrame(NULL, wxID_ANY, wxT("CodeControlClass profiler"), wxDefaultPosition, 
 			wxSize(1024, 768)) {
-	Ctrl = new mvceditor::CodeControlClass(this, app.Options, &app.Project, &app.ResourceCache, &app.Environment, wxID_ANY);
+	Ctrl = new mvceditor::CodeControlClass(this, app.Options, &app.Project, &app.ResourceCache, &app.AmpInfo, wxID_ANY);
 	Ctrl->SetDropTarget(new FileDropTargetClass(Ctrl));
 	Ctrl->SetDocumentMode(mvceditor::CodeControlClass::PHP);
 	CreateMenu();

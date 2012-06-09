@@ -25,7 +25,7 @@
 #ifndef __MVCEDITORURLRESOURCECLASS_H__
 #define __MVCEDITORURLRESOURCECLASS_H__
 
-#include <environment/EnvironmentClass.h>
+#include <environment/AmpInfoClass.h>
 #include <wx/url.h>
 #include <vector>
 
@@ -96,7 +96,7 @@ public:
 
 	/**
 	 * the list of web browsers available to the editor. These are the 'friendly'
-	 * names that are used by the Environment class.
+	 * names that are used by the AmpInfo class.
 	 */
 	std::vector<wxString> Browsers;
 	

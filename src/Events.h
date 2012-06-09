@@ -171,9 +171,9 @@ extern const wxEventType EVENT_APP_FILE_CLOSED;
 extern const wxEventType EVENT_APP_PREFERENCES_UPDATED;
 
 /**
- * Notification that the environment setting have been updated. Listeners of this event
+ * Notification that the ampInfo setting have been updated. Listeners of this event
  * will  need to repaint any windows that are affected by the changes. Listeners
- * can access the new preferences via the App Environment global.
+ * can access the new preferences via the App AmpInfo global.
  */
 extern const wxEventType EVENT_APP_ENVIRONMENT_UPDATED;
 

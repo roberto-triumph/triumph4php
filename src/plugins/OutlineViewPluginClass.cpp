@@ -46,7 +46,7 @@ mvceditor::ResourceFinderBackgroundThreadClass::ResourceFinderBackgroundThreadCl
 	ResourceFinder.FileFilters.push_back(wxT("*.*"));
 }
 
-bool mvceditor::ResourceFinderBackgroundThreadClass::Start(const wxString& fileName, const mvceditor::EnvironmentClass& environment) {
+bool mvceditor::ResourceFinderBackgroundThreadClass::Start(const wxString& fileName, const mvceditor::AmpInfoClass& environment) {
 	FileName = fileName;
 	ResourceFinder.SetVersion(environment.Php.Version);
 	wxThreadError error = CreateSingleInstance();

@@ -79,7 +79,7 @@ mvceditor::DetectorActionClass::~DetectorActionClass() {
 	ResponseThread.KillInstance();
 }
 
-bool mvceditor::DetectorActionClass::Init(int id, const EnvironmentClass& environment, const wxString& projectRootPath, const wxString& identifier, 
+bool mvceditor::DetectorActionClass::Init(int id, const AmpInfoClass& environment, const wxString& projectRootPath, const wxString& identifier, 
 		std::map<wxString, wxString> moreParams) {
 	Error = NONE;
 	ErrorMessage = wxT("");
@@ -452,7 +452,7 @@ bool mvceditor::ViewInfosDetectorActionClass::Response() {
 	return ret;
 }
 
-mvceditor::PhpFrameworkDetectorClass::PhpFrameworkDetectorClass(wxEvtHandler& handler, const mvceditor::EnvironmentClass& environment)
+mvceditor::PhpFrameworkDetectorClass::PhpFrameworkDetectorClass(wxEvtHandler& handler, const mvceditor::AmpInfoClass& environment)
 	: wxEvtHandler()
 	, Identifiers()
 	, ConfigFiles()
@@ -468,7 +468,7 @@ mvceditor::PhpFrameworkDetectorClass::PhpFrameworkDetectorClass(wxEvtHandler& ha
 	, UrlsDetected()
 	, ViewInfosDetected()
 	, Handler(handler)
-	, Environment(environment)
+	, AmpInfo(environment)
 	, ProjectRootPath() {
 		
 }
@@ -486,7 +486,7 @@ void mvceditor::PhpFrameworkDetectorClass::Clear() {
 bool mvceditor::PhpFrameworkDetectorClass::Init(const wxString& dir) {
 	ProjectRootPath = dir;
 	std::map<wxString, wxString> moreParams;
-	return FrameworkDetector.Init(ID_DETECT_FRAMEWORK, Environment, dir, wxT(""), moreParams);
+	return FrameworkDetector.Init(ID_DETECT_FRAMEWORK, AmpInfo, dir, wxT(""), moreParams);
 }
 
 bool mvceditor::PhpFrameworkDetectorClass::InitUrlDetector(const wxString& dir, const wxString& resourceCacheFileName, const wxString& baseUrl) {
@@ -535,13 +535,13 @@ void mvceditor::PhpFrameworkDetectorClass::NextDetection() {
 		wxString action = next[1];
 		std::map<wxString, wxString> moreParams;
 		if (action == wxT("databaseInfo")) {
-			DatabaseDetector.Init(ID_DETECT_DATABASE, Environment, ProjectRootPath, framework, moreParams);
+			DatabaseDetector.Init(ID_DETECT_DATABASE, AmpInfo, ProjectRootPath, framework, moreParams);
 		}
 		else if (action == wxT("configFiles")) {
-			ConfigFilesDetector.Init(ID_DETECT_CONFIG, Environment, ProjectRootPath, framework, moreParams);
+			ConfigFilesDetector.Init(ID_DETECT_CONFIG, AmpInfo, ProjectRootPath, framework, moreParams);
 		}
 		else if (action == wxT("resources")) {
-			ResourcesDetector.Init(ID_DETECT_RESOURCES, Environment, ProjectRootPath, framework, moreParams);
+			ResourcesDetector.Init(ID_DETECT_RESOURCES, AmpInfo, ProjectRootPath, framework, moreParams);
 		}
 	}
 	else {	
@@ -561,7 +561,7 @@ void mvceditor::PhpFrameworkDetectorClass::NextUrlDetection() {
 		std::map<wxString, wxString> moreParams;
 		moreParams[wxT("file")] = fileName;
 		moreParams[wxT("host")] = baseUrl;
-		UrlDetector.Init(ID_DETECT_URL, Environment, ProjectRootPath, framework, moreParams);
+		UrlDetector.Init(ID_DETECT_URL, AmpInfo, ProjectRootPath, framework, moreParams);
 	}
 	else {
 		mvceditor::UrlDetectedEventClass urlEvent(UrlsDetected);
@@ -580,7 +580,7 @@ void mvceditor::PhpFrameworkDetectorClass::NextViewInfosDetection() {
 		std::map<wxString, wxString> moreParams;
 		moreParams[wxT("url")] = url;
 		moreParams[wxT("file")] = callStackFile;
-		ViewInfosDetector.Init(ID_DETECT_VIEW_FILES, Environment, ProjectRootPath, framework, moreParams);
+		ViewInfosDetector.Init(ID_DETECT_VIEW_FILES, AmpInfo, ProjectRootPath, framework, moreParams);
 	}
 	else {
 		mvceditor::ViewInfosDetectedEventClass viewInfosEvent(ViewInfosDetected);

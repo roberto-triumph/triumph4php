@@ -143,9 +143,9 @@ bool mvceditor::ApacheFileReaderClass::FileRead(mvceditor::DirectorySearchClass&
 	return ret;
 }
 
-mvceditor::ApacheEnvironmentPanelClass::ApacheEnvironmentPanelClass(wxWindow* parent, EnvironmentClass& environment)
+mvceditor::ApacheEnvironmentPanelClass::ApacheEnvironmentPanelClass(wxWindow* parent, AmpInfoClass& environment)
 	: ApacheEnvironmentPanelGeneratedClass(parent)
-	, Environment(environment)
+	, AmpInfo(environment)
 	, ApacheFileReader(*this)
 	, EditedApache() {
 	EditedApache = environment.Apache;
@@ -302,7 +302,7 @@ void mvceditor::ApacheEnvironmentPanelClass::OnRemoveButton(wxCommandEvent& even
 }
 
 void mvceditor::ApacheEnvironmentPanelClass::Apply() {
-	Environment.Apache = EditedApache;
+	AmpInfo.Apache = EditedApache;
 }
 
 void mvceditor::ApacheEnvironmentPanelClass::OnDirChanged(wxFileDirPickerEvent& event) {
@@ -337,9 +337,9 @@ void mvceditor::ApacheEnvironmentPanelClass::OnDirChanged(wxFileDirPickerEvent& 
 	}	
 }
 
-mvceditor::PhpEnvironmentPanelClass::PhpEnvironmentPanelClass(wxWindow* parent, mvceditor::EnvironmentClass& environment)
+mvceditor::PhpEnvironmentPanelClass::PhpEnvironmentPanelClass(wxWindow* parent, mvceditor::AmpInfoClass& environment)
 	: PhpEnvironmentPanelGeneratedClass(parent)
-	, Environment(environment) {
+	, AmpInfo(environment) {
 	NonEmptyTextValidatorClass phpExecutableValidator(&environment.Php.PhpExecutablePath, PhpLabel);
 	PhpExecutable->SetValidator(phpExecutableValidator);
 	if (environment.Php.IsAuto) {
@@ -355,15 +355,15 @@ mvceditor::PhpEnvironmentPanelClass::PhpEnvironmentPanelClass(wxWindow* parent, 
 
 void mvceditor::PhpEnvironmentPanelClass::Apply() {
 	int sel = Version->GetCurrentSelection();
-	Environment.Php.IsAuto = false;
+	AmpInfo.Php.IsAuto = false;
 	if (2 == sel) {
-		Environment.Php.Version = pelet::PHP_54;
+		AmpInfo.Php.Version = pelet::PHP_54;
 	}
 	else if (1 == sel) {
-		Environment.Php.Version = pelet::PHP_53;
+		AmpInfo.Php.Version = pelet::PHP_53;
 	}
 	else {
-		Environment.Php.IsAuto = true;
+		AmpInfo.Php.IsAuto = true;
 	}
 }
 
@@ -382,8 +382,8 @@ void mvceditor::PhpEnvironmentPanelClass::OnResize(wxSizeEvent& event) {
 	event.Skip();
 }
 
-mvceditor::EnvironmentDialogClass::EnvironmentDialogClass(wxWindow* parent, mvceditor::EnvironmentClass& environment) 
-	: Environment(environment) {	
+mvceditor::EnvironmentDialogClass::EnvironmentDialogClass(wxWindow* parent, mvceditor::AmpInfoClass& environment) 
+	: AmpInfo(environment) {	
 	
 	// make it so that no other preference dialogs have to explictly call Transfer methods
 	SetExtraStyle(wxWS_EX_VALIDATE_RECURSIVELY);
@@ -392,15 +392,15 @@ mvceditor::EnvironmentDialogClass::EnvironmentDialogClass(wxWindow* parent, mvce
 	// we need to set the style BEFORE calling Create(); that's why parent class constructor
 	// is not in the initializer list
 	SetSheetStyle(wxPROPSHEET_DEFAULT);
-	Create(parent, wxID_ANY, _("Environment"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);
+	Create(parent, wxID_ANY, _("AmpInfo"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);
 	CreateButtons(wxOK | wxCANCEL);
 	
 	wxBookCtrlBase* notebook = GetBookCtrl();
-	PhpEnvironmentPanel = new mvceditor::PhpEnvironmentPanelClass(notebook, Environment);
+	PhpEnvironmentPanel = new mvceditor::PhpEnvironmentPanelClass(notebook, AmpInfo);
 	notebook->AddPage(PhpEnvironmentPanel, _("PHP"));
-	ApacheEnvironmentPanel = new mvceditor::ApacheEnvironmentPanelClass(notebook, Environment);
+	ApacheEnvironmentPanel = new mvceditor::ApacheEnvironmentPanelClass(notebook, AmpInfo);
 	notebook->AddPage(ApacheEnvironmentPanel, _("Apache"));
-	WebBrowserPanel = new mvceditor::WebBrowserEditPanelClass(notebook, Environment);
+	WebBrowserPanel = new mvceditor::WebBrowserEditPanelClass(notebook, AmpInfo);
 	notebook->AddPage(WebBrowserPanel, _("Web Browsers"));
 	LayoutDialog();
 }
@@ -411,16 +411,16 @@ void mvceditor::EnvironmentDialogClass::OnOkButton(wxCommandEvent& event) {
 		WebBrowserPanel->Apply();
 		ApacheEnvironmentPanel->Apply();
 		PhpEnvironmentPanel->Apply();
-		if (Environment.Php.IsAuto) {
-			Environment.Php.AutoDetermine();
+		if (AmpInfo.Php.IsAuto) {
+			AmpInfo.Php.AutoDetermine();
 		}
 		EndModal(wxOK);
 	}
 }
 
-mvceditor::WebBrowserEditPanelClass::WebBrowserEditPanelClass(wxWindow* parent, mvceditor::EnvironmentClass& environment)
+mvceditor::WebBrowserEditPanelClass::WebBrowserEditPanelClass(wxWindow* parent, mvceditor::AmpInfoClass& environment)
 	: WebBrowserEditPanelGeneratedClass(parent)
-	, Environment(environment) 
+	, AmpInfo(environment) 
 	, EditedWebBrowsers(environment.WebBrowsers) {
 	BrowserList->ClearAll();
 	BrowserList->InsertColumn(0, _("Web Browser Label"));
@@ -557,7 +557,7 @@ void mvceditor::WebBrowserEditPanelClass::OnMoveDown(wxCommandEvent& event) {
 }
 
 void mvceditor::WebBrowserEditPanelClass::Apply() {
-	Environment.WebBrowsers = EditedWebBrowsers;
+	AmpInfo.WebBrowsers = EditedWebBrowsers;
 }
 
 mvceditor::WebBrowserCreateDialogClass::WebBrowserCreateDialogClass(wxWindow* parent, 
@@ -642,11 +642,11 @@ mvceditor::EnvironmentPluginClass::EnvironmentPluginClass()
 }
 
 void mvceditor::EnvironmentPluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
-	projectMenu->Append(mvceditor::MENU_ENVIRONMENT, _("Environment"));
+	projectMenu->Append(mvceditor::MENU_ENVIRONMENT, _("AmpInfo"));
 }
 
 void mvceditor::EnvironmentPluginClass::OnMenuEnvironment(wxCommandEvent& event) {
-	EnvironmentClass* environment = GetEnvironment();
+	AmpInfoClass* environment = GetEnvironment();
 	mvceditor::EnvironmentDialogClass dialog(GetMainWindow(), *environment);
 	if (wxOK == dialog.ShowModal()) {
 		environment->SaveToConfig();

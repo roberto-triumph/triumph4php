@@ -148,7 +148,7 @@ static wxString NiceDocText(const UnicodeString& comment) {
 }
 
 mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options, ProjectClass* project, 
-			mvceditor::ResourceCacheClass* resourceCache, mvceditor::EnvironmentClass* environment,
+			mvceditor::ResourceCacheClass* resourceCache, mvceditor::AmpInfoClass* environment,
 			int id, const wxPoint& position, const wxSize& size, long style,
 			const wxString& name)
 		: wxStyledTextCtrl(parent, id, position, size, style, name)
@@ -159,7 +159,7 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 		, CurrentInfo()
 		, ResourceCache(resourceCache)
 		, Project(project)
-		, Environment(environment)
+		, AmpInfo(environment)
 		, WordHighlightPreviousIndex(-1)
 		, WordHighlightNextIndex(-1)
 		, WordHighlightStyle(0)
@@ -478,7 +478,7 @@ void mvceditor::CodeControlClass::ApplyPreferences() {
 		SetSqlOptions();
 	}
 	else if (mvceditor::CodeControlClass::PHP == DocumentMode) {
-		Document = new mvceditor::PhpDocumentClass(Project, ResourceCache, Environment);
+		Document = new mvceditor::PhpDocumentClass(Project, ResourceCache, AmpInfo);
 		Document->SetControl(this);
 		SetCodeControlOptions(CodeControlOptions.PhpStyles);
 		SetPhpOptions();
