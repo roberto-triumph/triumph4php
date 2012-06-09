@@ -251,7 +251,7 @@ private:
 	UnicodeString CurrentFunction;
 	
 	/**
-	 * a small struct to keep file and resoruces together while
+	 * a small struct to keep file and resources together while
 	 * jumping through the code
 	 */
 	struct ResourceWithFile {
@@ -261,6 +261,8 @@ private:
 		mvceditor::ResourceClass Resource;
 		
 		std::vector<pelet::ExpressionClass> CallArguments;
+		
+		std::vector<mvceditor::SymbolClass> ScopeVariables;
 	};
 	
 	/**

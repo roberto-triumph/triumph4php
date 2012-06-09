@@ -29,6 +29,7 @@ require_once 'MvcEditorResource.php';
 require_once 'MvcEditorDatabaseInfo.php';
 require_once 'MvcEditorCallClass.php';
 require_once 'MvcEditorUrlClass.php';
+require_once 'MvcEditorViewInfo.php';
 require_once __DIR__ . '/../lib/opportunity/array.php';
 require_once __DIR__ . '/../lib/opportunity/string.php';
 
@@ -201,19 +202,20 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 	/**
 	 * @return array
 	 */
-	public function viewFiles($dir, $url, $callStackFile) {
+	public function viewInfos($dir, $url, $callStackFile) {
 		
 		// CodeIgniter controllers will call $this->load->view('file', $data) 
 		// we will look for calls to CI_Loader::view that have at least 2 arguments
 		// we wont need to look at the URL to determine the view
-		$viewFiles = array();
+		$viewInfos = array();
 		$fp = fopen($callStackFile, 'rb');
 		if (!$fp) {
-			return $viewFiles;
+			return $viewInfos;
 		}
 		$call = new MvcEditorCallClass();
 		$inViewMethod = FALSE;
 		$paramIndex = 0;
+		$currentView = null;
 		while (!feof($fp)) {
 			if ($call->fromFile($fp)) {
 				if (MvcEditorCallClass::BEGIN_METHOD == $call->type && strcasecmp('CI_Loader::view', $call->resource) == 0) {
@@ -222,85 +224,47 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 				}
 				else if (MvcEditorCallClass::PARAM == $call->type && $inViewMethod) {
 					if (0 == $paramIndex) {
-						$viewFile = $call->argument;
+						$currentView = new MvcEditorViewInfoClass();
+						$currentView->fileName = $call->scalar;
 						
 						// most of the time views are given as relative relatives; starting from the application/views/ directory
 						// for now ignore variable arguments
-						if ($viewFile[0] != '$') {
+						if ($currentView->fileName[0] != '$' && !empty($currentView->fileName)) {
 							
 							// view file may have an extesion; if it has an extension use that; otherwise use the default (.php)
-							if (stripos($viewFile, '.') === FALSE) {
-								$viewFile .= '.php';
+							if (stripos($currentView->fileName, '.') === FALSE) {
+								$currentView->fileName .= '.php';
 							}
 							
 							// not using realpath() so that MVCEditor can know that a template file has not yet been created
 							// or the programmer has a bug in the project.
-							$viewFile = \opstring\replace($viewFile, '/', DIRECTORY_SEPARATOR);
-							$viewFile = \opstring\replace($viewFile, '\\', DIRECTORY_SEPARATOR);
-							$viewFiles[] = $dir . DIRECTORY_SEPARATOR . 'application' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $viewFile;
+							$currentView->fileName = \opstring\replace($currentView->fileName, '/', DIRECTORY_SEPARATOR);
+							$currentView->fileName = \opstring\replace($currentView->fileName, '\\', DIRECTORY_SEPARATOR);
+							$currentView->fileName = $dir . DIRECTORY_SEPARATOR . 'application' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $currentView->fileName;
+							
+							// push it now just in case the template does not get any variables
+							$viewInfos[] = $currentView;
 						}
+					}
+					else if (1 == $paramIndex) {
+						$currentView->variables = array();
+						if (MvcEditorCallClass::T_ARRAY == $call->paramType) {
+							foreach ($call->arrayKeys as $key) {
+								$currentView->variables[] = $key;
+							}
+						}
+						$viewInfos[count($viewInfos) - 1] = $currentView;
 					}
 					$paramIndex++;
 				}
 				else {
 					$inViewMethod = FALSE;
 					$paramIndex = 0;
+					$currentView = NULL;
 				}
 			}
 		}
-		return $viewFiles;
-	}
-	
-	/**
-	 * @return array
-	 */
-	public function templateVariables($callStackFile) {
-		
-		// CodeIgniter controllers will call $this->load->view('file', $data) 
-		// we will look for calls to CI_Loader::view that have at least 2 arguments
-		// then we look at the array keys of the second argument
-		$templateVariables = array();
-		$fp = fopen($callStackFile, 'rb');
-		if (!$fp) {
-			return $templateVariables;
-		}
-		$call = new MvcEditorCallClass();
-		$inViewMethod = FALSE;
-		$paramIndex = 0;
-		
-		// will save the array keys here 
-		// key is the variable name, value is the array of the declared array keys
-		$scopeVariables = array();
-		while (!feof($fp)) {
-			if ($call->fromFile($fp)) {
-				if (MvcEditorCallClass::BEGIN_METHOD == $call->type && strcasecmp('CI_Loader::view', $call->resource) == 0) {
-					$inViewMethod = TRUE;
-					$paramIndex = 0;
-				}
-				else if (MvcEditorCallClass::PARAM == $call->type && $inViewMethod) {
-					if (1 == $paramIndex) {
-						$templateDataVariable = $call->argument;
-						if (array_key_exists($templateDataVariable, $scopeVariables)) {
-							foreach ($scopeVariables[$templateDataVariable] as $key) {
-								$templateVariables[] = $key;
-							}
-						}
-					}
-					$paramIndex++;
-				}
-				else  if (MvcEditorCallClass::BEGIN_FUNCTION == $call->type || MvcEditorCallClass::BEGIN_METHOD == $call->type) {
-					$scopeVariables = array();
-				}
-				else if (MvcEditorCallClass::T_ARRAY == $call->type) {
-					$scopeVariables[$call->variableName] = $call->arrayKeys;
-				}
-				else if (MvcEditorCallClass::T_RETURN == $call->type) {
-					$inViewMethod = FALSE;
-					$paramIndex = 0;
-				}
-			}
-		}
-		return $templateVariables;
+		return $viewInfos;
 	}
 	
 	private function infoFromDbArray($environment, $groupName, $groupConnection) {

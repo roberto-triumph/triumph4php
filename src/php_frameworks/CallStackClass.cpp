@@ -369,8 +369,16 @@ void mvceditor::CallStackClass::CreateCalls() {
 	
 	// add it to the code to signal function call parameters
 	for (size_t k = 0; k < item.CallArguments.size(); ++k) {
+		
+		// look for the parameter in the scopeVariables list
 		mvceditor::CallClass c;
 		c.ToParam(item.CallArguments[k]);
+		for (size_t m = 0; m < item.ScopeVariables.size(); ++m) {
+			if (item.ScopeVariables[m].Variable == item.CallArguments[k].FirstValue()) {
+				c.Symbol = item.ScopeVariables[m];
+				break;
+			}
+		}
 		List.push_back(c);
 	}
 
@@ -432,6 +440,7 @@ void mvceditor::CallStackClass::CreateCalls() {
 							newItem.FileName.Assign(it->GetFullPath());
 							newItem.Resource = *it;
 							newItem.CallArguments = expr.ChainList[j].CallArguments;
+							newItem.ScopeVariables = ScopeVariables;
 							ResourcesRemaining.push(newItem);
 						}
 					}
@@ -520,12 +529,43 @@ UnicodeString mvceditor::CallClass::Serialize() const {
 			break;
 		case mvceditor::CallClass::PARAM:
 			line += UNICODE_STRING_SIMPLE("PARAM,");
-			if (pelet::ExpressionClass::SCALAR == Expression.ExpressionType) {
+			if (mvceditor::SymbolClass::ARRAY == Symbol.Type) {
+				line += UNICODE_STRING_SIMPLE("ARRAY,");
+				line += Symbol.Variable;
+				for (size_t j = 0; j < Symbol.ArrayKeys.size(); ++j) {
+					line += UNICODE_STRING_SIMPLE(",");
+					line += Symbol.ArrayKeys[j];
+				}
+			}
+			else if (mvceditor::SymbolClass::OBJECT == Symbol.Type) {
+				line += UNICODE_STRING_SIMPLE("OBJECT,");
+				for (size_t j = 0; j < Symbol.ChainList.size(); ++j) {
+					if (j > 0 && Symbol.ChainList[j].IsStatic) {
+						line += UNICODE_STRING_SIMPLE("::");
+					}
+					else if (j > 0) {
+						line += UNICODE_STRING_SIMPLE("->");
+					}
+					line += Symbol.ChainList[j].Name;
+					if (Symbol.ChainList[j].IsFunction) {
+						line += UNICODE_STRING_SIMPLE("()");
+					}
+				}
+			}
+			else if (mvceditor::SymbolClass::SCALAR == Symbol.Type) {
+				line += UNICODE_STRING_SIMPLE("SCALAR,");
+				
+				// escape any double quotes in case of string constants
+				line += EscapeScalar(Symbol.ChainList[0].Name);
+			}
+			else if (pelet::ExpressionClass::SCALAR == Expression.ExpressionType) {
+				line += UNICODE_STRING_SIMPLE("SCALAR,");
 				
 				// escape any double quotes in case of string constants
 				line += EscapeScalar(Expression.ChainList[0].Name);
 			}
 			else {
+				line += UNICODE_STRING_SIMPLE("VARIABLE,");
 				for (size_t j = 0; j < Expression.ChainList.size(); ++j) {
 					if (j > 0 && Expression.ChainList[j].IsStatic) {
 						line += UNICODE_STRING_SIMPLE("::");

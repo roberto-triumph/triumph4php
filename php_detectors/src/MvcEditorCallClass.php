@@ -65,7 +65,7 @@ class MvcEditorCallClass {
 	 * be the function name with a parenthesis pair; like this "myFunct()". The parentheses wil always be
 	 * empty, even if that call had arguments.
 	 */
-	public $argument;
+	public $paramType;
 	
 	public $variableName;
 	
@@ -79,10 +79,10 @@ class MvcEditorCallClass {
 	public function clear() {
 		$this->type = '';
 		$this->resource = '';
-		$this->argument = '';
 		$this->variableName = '';
 		$this->arrayKeys = '';
 		$this->scalar = '';
+		$this->paramType = '';
 	}
 
 	/**
@@ -105,7 +105,9 @@ class MvcEditorCallClass {
 				//
 				// BEGIN_FUNCTION, function name,
 				// BEGIN_METHOD, class name, method name
-				// PARAM, expression
+				// PARAM, SCALAR, expression
+				// PARAM, OBJECT, variable name
+				// PARAM, ARRAY, variable name, list of array keys
 				// ARRAY, variable name, list of array keys
 				// SCALAR, variable name,lexeme
 				// OBJECT, variable name
@@ -125,13 +127,24 @@ class MvcEditorCallClass {
 					$this->resource = $columns[1] . '::' . $columns[2];
 					$ret = true;
 				}
-				else if (count($columns) >= 2 && $columns[0] == self::PARAM) {
+				else if (count($columns) >= 3 && $columns[0] == self::PARAM) {
 					$this->type = $columns[0];
-					$this->argument = $columns[1];
+					$this->paramType = $columns[1];
+					if (self::T_ARRAY == $this->paramType) {
+						$this->variableName = $columns[2];
+						for ($i = 3; $i < count($columns); $i++) {
+							$this->arrayKeys[] = $columns[$i];
+						}
+					}
+					else if (self::SCALAR == $this->paramType) {
 					
-					// trim the ending newline that ends the line too
-					// item may be sorrounded by quotes when it is a constant (ALWAYS DOUBLE QUOTES only)
-					$this->argument = trim($this->argument, "\"\n");
+						// trim the ending newline that ends the line too
+						// item may be sorrounded by quotes when it is a constant (ALWAYS DOUBLE QUOTES only)
+						$this->scalar = trim($columns[2], "\"\n");
+					}
+					else if (self::OBJECT == $this->paramType) {
+						$this->variableName = $columns[2];
+					}
 					$ret = true;
 				}
 				else if (count($columns) >= 2 && ($columns[0] == self::T_ARRAY)) {

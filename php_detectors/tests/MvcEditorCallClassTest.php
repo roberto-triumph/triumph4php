@@ -49,12 +49,12 @@ OBJECT,$user
 SCALAR,"null user"
 RETURN
 BEGIN_METHOD,CI_Loader,view
-PARAM,"index"
-PARAM,$data
+PARAM,SCALAR,"index"
+PARAM,ARRAY,$data,name,address
 RETURN
 BEGIN_FUNCTION,stripos
-PARAM,$data
-PARAM,"find me"
+PARAM,OBJECT,$data
+PARAM,SCALAR,"find me"
 RETURN
 EOF
 		);
@@ -62,7 +62,6 @@ EOF
     }
 
     public function testClear() {
-		$this->object->argument = 'news/index';
 		$this->object->resource = 'CI_Loader::view';
 		$this->object->type = MvcEditorCallClass::BEGIN_METHOD;
 		$this->object->arrayKeys = array('one', 'two');
@@ -71,7 +70,6 @@ EOF
 		$this->object->clear();
 		$this->assertEquals('', $this->object->resource);
 		$this->assertEquals('', $this->object->type);
-		$this->assertEquals('', $this->object->argument);
 		$this->assertEquals('', $this->object->arrayKeys);
 		$this->assertEquals('', $this->object->variableName);
 		$this->assertEquals('', $this->object->scalar);
@@ -105,12 +103,15 @@ EOF
 		// parameter 1
 		$this->assertEquals(TRUE, $this->object->fromFile($this->file));
 		$this->assertEquals(MvcEditorCallClass::PARAM, $this->object->type);
-		$this->assertEquals('index', $this->object->argument);
+		$this->assertEquals(MvcEditorCallClass::SCALAR, $this->object->paramType);
+		$this->assertEquals('index', $this->object->scalar);
 		
 		// parameter 2
 		$this->assertEquals(TRUE, $this->object->fromFile($this->file));
 		$this->assertEquals(MvcEditorCallClass::PARAM, $this->object->type);
-		$this->assertEquals('$data', $this->object->argument);
+		$this->assertEquals(MvcEditorCallClass::T_ARRAY, $this->object->paramType);
+		$this->assertEquals('$data', $this->object->variableName);
+		$this->assertEquals(array('name', 'address'), $this->object->arrayKeys);
 		
 		$this->assertEquals(TRUE, $this->object->fromFile($this->file));
 		$this->assertEquals(MvcEditorCallClass::T_RETURN, $this->object->type);
@@ -123,12 +124,14 @@ EOF
 		// parameter 1
 		$this->assertEquals(TRUE, $this->object->fromFile($this->file));
 		$this->assertEquals(MvcEditorCallClass::PARAM, $this->object->type);
-		$this->assertEquals('$data', $this->object->argument);
+		$this->assertEquals(MvcEditorCallClass::OBJECT, $this->object->paramType);
+		$this->assertEquals('$data', $this->object->variableName);
 		
 		// parameter 1
 		$this->assertEquals(TRUE, $this->object->fromFile($this->file));
 		$this->assertEquals(MvcEditorCallClass::PARAM, $this->object->type);
-		$this->assertEquals('find me', $this->object->argument);
+		$this->assertEquals(MvcEditorCallClass::SCALAR, $this->object->paramType);
+		$this->assertEquals('find me', $this->object->scalar);
 		
 		$this->assertEquals(TRUE, $this->object->fromFile($this->file));
 		$this->assertEquals(MvcEditorCallClass::T_RETURN, $this->object->type);

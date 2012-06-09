@@ -52,7 +52,7 @@ public:
 
 	/**
 	 * Used to generate the call stack file (file of all function calls of a URL); call stack 
-	 * file is required by the ViewFiles detector
+	 * file is required by the ViewInfos detector
 	 * This pointer is owned by this class
 	 */
 	std::auto_ptr<CallStackClass> CallStack;
@@ -128,14 +128,8 @@ public:
 	 * the final result; the view files that correspond to the
 	 * current URL
 	 */
-	std::vector<wxString> CurrentViewFiles;
+	std::vector<mvceditor::ViewInfoClass> CurrentViewInfos;
 
-	/**
-	 * the final result; the template variables that correspond to the
-	 * current URL
-	 */
-	std::vector<wxString> CurrentTemplateVariables;
-	
 	/**
 	 * the URL that the user chose to view files from
 	 */
@@ -168,17 +162,13 @@ private:
 	/**
 	 * show (or create) the view files window and start the calculations if needed
 	 */
-	void OnViewFilesMenu(wxCommandEvent& event);
+	void OnViewInfosMenu(wxCommandEvent& event);
 	
 	void OnWorkComplete(wxCommandEvent& event);
 	
-	void OnViewFilesDetectionComplete(ViewFilesDetectedEventClass& event);
+	void OnViewInfosDetectionComplete(ViewInfosDetectedEventClass& event);
 	
-	void OnViewFilesDetectionFailed(wxCommandEvent& event);
-	
-	void OnTemplateVariablesDetectionComplete(TemplateVariablesDetectedEventClass& event);
-	
-	void OnTemplateVariablesDetectionFailed(wxCommandEvent& event);
+	void OnViewInfosDetectionFailed(wxCommandEvent& event);
 	
 	DECLARE_EVENT_TABLE()
 };

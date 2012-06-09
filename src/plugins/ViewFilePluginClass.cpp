@@ -88,7 +88,7 @@ mvceditor::ViewFilePluginClass::ViewFilePluginClass()
 	: PluginClass() 
 	, FrameworkDetector(NULL) 
 	, CallStackThread(*this) 
-	, CurrentViewFiles() {
+	, CurrentViewInfos() {
 }
 
 void mvceditor::ViewFilePluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
@@ -96,7 +96,7 @@ void mvceditor::ViewFilePluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
 		_("Shows the view (template) files for the currently selected URL"), wxITEM_NORMAL);
 }
 
-void mvceditor::ViewFilePluginClass::OnViewFilesMenu(wxCommandEvent& event) {
+void mvceditor::ViewFilePluginClass::OnViewInfosMenu(wxCommandEvent& event) {
 	wxWindow* window = FindOutlineWindow(ID_VIEW_FILE_PANEL);
 	mvceditor::ViewFilePanelClass* viewPanel = NULL;
 	if (window) {
@@ -133,8 +133,7 @@ void mvceditor::ViewFilePluginClass::StartDetection() {
 				mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Call stack file creation failed"));
 			}
 			else {
-				CurrentViewFiles.clear();
-				CurrentTemplateVariables.clear();
+				CurrentViewInfos.clear();
 			}				
 		}
 	}
@@ -145,39 +144,14 @@ void mvceditor::ViewFilePluginClass::OnWorkComplete(wxCommandEvent& event) {
 		FrameworkDetector.reset(new mvceditor::PhpFrameworkDetectorClass(*this, *GetEnvironment()));
 	}
 	FrameworkDetector->Identifiers = PhPFrameworks().Identifiers;
-	if (!FrameworkDetector->InitViewFilesDetector(GetProject()->GetRootPath(), App->UrlResourceFinder.ChosenUrl.Url.BuildURI(), CallStackThread.StackFile)) {
-		mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Could not start viewFiles detector"));
+	if (!FrameworkDetector->InitViewInfosDetector(GetProject()->GetRootPath(), App->UrlResourceFinder.ChosenUrl.Url.BuildURI(), CallStackThread.StackFile)) {
+		mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Could not start ViewInfos detector"));
 	}
 }
 	
-void mvceditor::ViewFilePluginClass::OnViewFilesDetectionComplete(mvceditor::ViewFilesDetectedEventClass& event) {
+void mvceditor::ViewFilePluginClass::OnViewInfosDetectionComplete(mvceditor::ViewInfosDetectedEventClass& event) {
 	wxWindow* window = FindOutlineWindow(ID_VIEW_FILE_PANEL);
-	CurrentViewFiles = event.ViewFiles;
-	ViewFilePanelClass* viewPanel = NULL;
-	if (window) {
-		viewPanel = (ViewFilePanelClass*)window;
-		viewPanel->UpdateResults();
-		SetFocusToToolsWindow(viewPanel);
-	}
-	
-	if (!FrameworkDetector->InitTemplateVariablesDetector(GetProject()->GetRootPath(), CallStackThread.StackFile)) {
-		mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Could not start templateVariables detector"));
-	}
-}
-
-void mvceditor::ViewFilePluginClass::OnViewFilesDetectionFailed(wxCommandEvent& event) {
-	mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, event.GetString());
-	
-	// still want to show the template variables 
-	FrameworkDetector->Identifiers = PhPFrameworks().Identifiers;
-	if (!FrameworkDetector->InitTemplateVariablesDetector(GetProject()->GetRootPath(), CallStackThread.StackFile)) {
-		mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Could not start templateVariables detector"));
-	}
-}
-
-void mvceditor::ViewFilePluginClass::OnTemplateVariablesDetectionComplete(mvceditor::TemplateVariablesDetectedEventClass& event) {
-	wxWindow* window = FindOutlineWindow(ID_VIEW_FILE_PANEL);
-	CurrentTemplateVariables = event.TemplateVariables;
+	CurrentViewInfos = event.ViewInfos;
 	ViewFilePanelClass* viewPanel = NULL;
 	if (window) {
 		viewPanel = (ViewFilePanelClass*)window;
@@ -187,7 +161,7 @@ void mvceditor::ViewFilePluginClass::OnTemplateVariablesDetectionComplete(mvcedi
 	wxRemoveFile(CallStackThread.StackFile.GetFullPath());
 }
 
-void mvceditor::ViewFilePluginClass::OnTemplateVariablesDetectionFailed(wxCommandEvent& event) {
+void mvceditor::ViewFilePluginClass::OnViewInfosDetectionFailed(wxCommandEvent& event) {
 	mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, event.GetString());
 	wxRemoveFile(CallStackThread.StackFile.GetFullPath());
 }
@@ -229,14 +203,14 @@ void mvceditor::ViewFilePanelClass::UpdateControllers() {
 void mvceditor::ViewFilePanelClass::UpdateResults() {
 	if (Plugin.CallStackThread.LastError == mvceditor::CallStackClass::NONE || Plugin.CallStackThread.LastError == mvceditor::CallStackClass::RESOLUTION_ERROR) {
 		
-		StatusLabel->SetLabel(wxString::Format(_("Found %d view files"), Plugin.CurrentViewFiles.size()));
+		StatusLabel->SetLabel(wxString::Format(_("Found %d view files"), Plugin.CurrentViewInfos.size()));
 		FileTree->DeleteAllItems();
 
 		wxTreeItemId parent = FileTree->AddRoot(_("Views"));
 		mvceditor::ProjectClass* project = Plugin.GetProject();
 		wxString root = project->GetRootPath();
-		for (size_t i = 0; i < Plugin.CurrentViewFiles.size(); ++i) {
-			wxString viewFile = Plugin.CurrentViewFiles[i];
+		for (size_t i = 0; i < Plugin.CurrentViewInfos.size(); ++i) {
+			wxString viewFile = Plugin.CurrentViewInfos[i].FileName;
 
 			// remove the project root so that the dialog is not too 'wordy'
 			wxString text = viewFile.Mid(root.Len());
@@ -249,12 +223,23 @@ void mvceditor::ViewFilePanelClass::UpdateResults() {
 		}
 		FileTree->ExpandAll();
 		
-		TemplateVariablesLabel->SetLabel(wxString::Format(_("Found %d template variables"), Plugin.CurrentTemplateVariables.size()));
+		int variableCount = 0;
+		for (size_t i = 0; i < Plugin.CurrentViewInfos.size(); ++i) {
+			variableCount += Plugin.CurrentViewInfos[i].TemplateVariables.size();
+		}
+		TemplateVariablesLabel->SetLabel(wxString::Format(_("Found %d template variables"),variableCount));
 		TemplateVariablesTree->DeleteAllItems();
 		parent = TemplateVariablesTree->AddRoot(_("Template Variables"));
-		for (size_t i = 0; i < Plugin.CurrentTemplateVariables.size(); ++i) {
-			wxString text = Plugin.CurrentTemplateVariables[i];
-			TemplateVariablesTree->AppendItem(parent, text);
+		for (size_t i = 0; i < Plugin.CurrentViewInfos.size(); ++i) {
+			mvceditor::ViewInfoClass viewInfo = Plugin.CurrentViewInfos[i];
+			wxString text = viewInfo.FileName;
+			
+			// remove the project root so that the dialog is not too 'wordy'
+			text = text.Mid(root.Len());
+			wxTreeItemId sub = TemplateVariablesTree->AppendItem(parent, text);
+			for (size_t j = 0; j < viewInfo.TemplateVariables.size(); ++j) {
+				TemplateVariablesTree->AppendItem(sub, viewInfo.TemplateVariables[j]);
+			}
 		}
 		TemplateVariablesTree->ExpandAll();
 	}
@@ -380,9 +365,7 @@ void mvceditor::ViewFilePanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 
 BEGIN_EVENT_TABLE(mvceditor::ViewFilePluginClass, wxEvtHandler) 
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ViewFilePluginClass::OnWorkComplete)
-	EVT_FRAMEWORK_VIEW_FILES_COMPLETE(mvceditor::ViewFilePluginClass::OnViewFilesDetectionComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_VIEW_FILES_FAILED, mvceditor::ViewFilePluginClass::OnViewFilesDetectionFailed)
-	EVT_MENU(mvceditor::MENU_VIEW_FILES + 0, mvceditor::ViewFilePluginClass::OnViewFilesMenu)
-	EVT_FRAMEWORK_TEMPLATE_VARIABLES_COMPLETE(mvceditor::ViewFilePluginClass::OnTemplateVariablesDetectionComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_TEMPLATE_VARIABLES_FAILED, mvceditor::ViewFilePluginClass::OnTemplateVariablesDetectionFailed)
+	EVT_FRAMEWORK_VIEW_INFOS_COMPLETE(mvceditor::ViewFilePluginClass::OnViewInfosDetectionComplete)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_VIEW_FILES_FAILED, mvceditor::ViewFilePluginClass::OnViewInfosDetectionFailed)
+	EVT_MENU(mvceditor::MENU_VIEW_FILES + 0, mvceditor::ViewFilePluginClass::OnViewInfosMenu)
 END_EVENT_TABLE()

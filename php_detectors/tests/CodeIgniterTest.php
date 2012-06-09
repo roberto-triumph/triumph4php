@@ -85,7 +85,7 @@ EOF;
 		);
 	}
 	
-	function testTemplateVariablesSimple() {
+	function testViewFilesSimple() {
 		
 		$cacheContents = <<<'EOF'
 BEGIN_METHOD,MyController,index
@@ -94,8 +94,8 @@ OBJECT,$user
 SCALAR,"null user"
 RETURN
 BEGIN_METHOD,CI_Loader,view
-PARAM,"index"
-PARAM,$data
+PARAM,SCALAR,"index"
+PARAM,ARRAY,$data,name,address
 RETURN
 BEGIN_FUNCTION,stripos
 PARAM,$data
@@ -110,8 +110,11 @@ EOF;
 		$this->fs->config();
 		$this->fs->database();
 		$this->fs->routes();
-		$templateVariables = $this->detector->templateVariables(vfsStream::url('tmp/call_stack.csv'));
-		$this->assertEquals(array('name', 'address'), $templateVariables);		
+		$viewInfos = $this->detector->viewInfos(vfsStream::url(''), 'http://localhost/mycontroller/index', vfsStream::url('tmp/call_stack.csv'));
+		$expected = array(
+			new MvcEditorViewInfoClass(vfsStream::url('/application/views/index.php'), array('name', 'address'))
+		);
+		$this->assertEquals($expected, $viewInfos);
 	}
 }
 
