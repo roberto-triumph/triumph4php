@@ -107,7 +107,7 @@ class MvcEditorFrameworkSymfony1_4 extends MvcEditorFrameworkBaseClass {
 	/**
 	 * @return array
 	 */
-	public function viewFiles($dir, $url, $callStackFile) {
+	public function viewInfos($dir, $url, $callStackFile) {
 		return array();
-	}
+	}	
 }

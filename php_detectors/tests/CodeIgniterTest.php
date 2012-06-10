@@ -83,7 +83,38 @@ EOF;
 		$expected = array(
 			new MvcEditorUrlClass('http://localhost/index.php/admin/admin/about/', 'vfs://application/controllers/welcome.php', 'Welcome', 'about')
 		);
+	}
+	
+	function testViewFilesSimple() {
 		
+		$cacheContents = <<<'EOF'
+BEGIN_METHOD,MyController,index
+ARRAY,$data,name,address
+OBJECT,$user
+SCALAR,"null user"
+RETURN
+BEGIN_METHOD,CI_Loader,view
+PARAM,SCALAR,"index"
+PARAM,ARRAY,$data,name,address
+RETURN
+BEGIN_FUNCTION,stripos
+PARAM,$data
+PARAM,"find me"
+RETURN
+EOF;
+		$tmpDir = vfsStream::newDirectory('tmp');
+		vfsStreamWrapper::getRoot()->addChild($tmpDir);
+		$cacheFile = vfsStream::newFile('call_stack.csv');
+		$cacheFile->withContent($cacheContents);
+		$tmpDir->addChild($cacheFile);
+		$this->fs->config();
+		$this->fs->database();
+		$this->fs->routes();
+		$viewInfos = $this->detector->viewInfos(vfsStream::url(''), 'http://localhost/mycontroller/index', vfsStream::url('tmp/call_stack.csv'));
+		$expected = array(
+			new MvcEditorViewInfoClass(vfsStream::url('/application/views/index.php'), array('name', 'address'))
+		);
+		$this->assertEquals($expected, $viewInfos);
 	}
 }
 

@@ -119,9 +119,8 @@ abstract class MvcEditorFrameworkBaseClass {
 	 * @param string $url full URL to the action in question
 	 * @param string $callStackFile the location of the call stack file, use the CallStackClass to read 
 	 *        iterate through the action's function / method calls.
-	 * @return array of full paths, each item will be the full path to the view files that the given action
-	 *         uses.
+	 * @return array of MvcEditorViewInfoClas instances, each item will be the full path to the view files that the given action
+	 *         uses and the variables assigned to that template.
 	 */
-	abstract public function viewFiles($dir, $url, $callStackFile);
-
+	abstract public function viewInfos($dir, $url, $callStackFile);
 }

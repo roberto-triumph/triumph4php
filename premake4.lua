@@ -186,7 +186,7 @@ function pickywarnings(action)
 		
 		-- when compiling strict warning checks; also check against variable length arrays
 		-- since Visual Studio is not C99 compliant
-		buildoptions { "-Wall", "-Werror", "-Wvla", "-Wno-comment"  }
+		buildoptions { "-Wall", "-Werror", "-Wvla" }
 	end
 end
 
@@ -323,6 +323,41 @@ solution "mvc-editor"
 			pickywarnings(_ACTION)
 			icuconfiguration("Release", _ACTION)
 			wxconfiguration("Release", _ACTION)
+
+			
+	project "call_stack_profiler"
+		language "C++"
+		kind "ConsoleApp"
+		files { 
+			"profilers/call_stack_profiler.cpp",
+			"src/MvcEditorErrors.cpp",
+			"src/MvcEditorAssets.cpp",
+			"src/language/*.cpp",
+			"src/php_frameworks/*.cpp",
+			"src/environment/*.cpp",
+			"src/search/ResourceFinderClass.cpp",
+			"src/search/DirectorySearchClass.cpp",
+			"src/search/FinderClass.cpp",
+			"src/search/FindInFilesClass.cpp",
+			"src/widgets/ResourceCacheClass.cpp",
+			"src/widgets/ThreadWithHeartbeatClass.cpp",
+			"src/widgets/ProcessWithHeartbeatClass.cpp",
+			"src/windows/StringHelperClass.cpp",
+			"src/MvcEditorString.cpp"
+		}
+		includedirs { "src", "lib/pelet/include" }
+		links { "pelet" }
+
+		sociconfiguration()	
+		configuration "Debug"
+			pickywarnings(_ACTION)
+			icuconfiguration("Debug", _ACTION)
+			wxconfiguration("Debug", _ACTION)
+		configuration { "Release"}
+			pickywarnings(_ACTION)
+			icuconfiguration("Release", _ACTION)
+			wxconfiguration("Release", _ACTION)
+	
 
 	project "find_in_files_profiler"
 		language "C++"

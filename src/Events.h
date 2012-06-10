@@ -178,6 +178,12 @@ extern const wxEventType EVENT_APP_PREFERENCES_UPDATED;
 extern const wxEventType EVENT_APP_ENVIRONMENT_UPDATED;
 
 /**
+ * Notification the that project's urls have been determined (AppClass::UrlResourceFinder 
+ * has been filled with the project's urls)
+ */
+extern const wxEventType EVENT_APP_PROJECT_URLS;
+
+/**
  * Tell the app to re-index the current project.
  */
 extern const wxEventType EVENT_CMD_RE_INDEX;
@@ -197,6 +203,12 @@ extern const wxEventType EVENT_CMD_OPEN_PROJECT;
  * make sure the path is valid.
  */
 extern const wxEventType EVENT_CMD_FILE_OPEN;
+
+/**
+ * Tell the app to build a list of the project's URLs
+ */
+extern const wxEventType EVENT_CMD_PROJECT_URLS;
+
 }
 
 #endif

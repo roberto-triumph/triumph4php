@@ -56,6 +56,8 @@ class ViewFilePanelGeneratedClass : public wxPanel
 			ID_CURRENTBUTTON,
 			ID_ERRORLABEL,
 			ID_FILETREE,
+			ID_TEMPLATEVARIABLESLABEL,
+			ID_VARIABLETREE,
 		};
 		
 		wxStaticText* ControllerLabel;
@@ -66,6 +68,8 @@ class ViewFilePanelGeneratedClass : public wxPanel
 		wxButton* CurrentButton;
 		wxStaticText* StatusLabel;
 		wxTreeCtrl* FileTree;
+		wxStaticText* TemplateVariablesLabel;
+		wxTreeCtrl* TemplateVariablesTree;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnControllerChoice( wxCommandEvent& event ) { event.Skip(); }

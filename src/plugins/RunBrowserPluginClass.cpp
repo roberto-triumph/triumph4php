@@ -373,6 +373,7 @@ void mvceditor::RunBrowserPluginClass::OnUrlSearchTool(wxCommandEvent& event) {
 		ShowUrlDialog();
 	}
 	else {
+		
 		// we need the resource cache; the resource cache is needed to figure out the URLs
 		// for each controller.
 		// we will trigger the project indexing, then once the project has been indexed 
@@ -381,6 +382,18 @@ void mvceditor::RunBrowserPluginClass::OnUrlSearchTool(wxCommandEvent& event) {
 		wxCommandEvent indexEvent(mvceditor::EVENT_CMD_RE_INDEX);
 		App->EventSink.Publish(indexEvent);
 	}
+}
+
+void mvceditor::RunBrowserPluginClass::OnCmdUrls(wxCommandEvent& event) {
+	
+	// we need the resource cache; the resource cache is needed to figure out the URLs
+	// for each controller.
+	// we will trigger the project indexing, then once the project has been indexed 
+	// this plugin will kick off the URL detector, then show the URLs.
+	
+	// dont set the state flag so that the dialog does not show
+	wxCommandEvent indexEvent(mvceditor::EVENT_CMD_RE_INDEX);
+	App->EventSink.Publish(indexEvent);
 }
 
 void mvceditor::RunBrowserPluginClass::ShowUrlDialog() {
@@ -419,6 +432,9 @@ void mvceditor::RunBrowserPluginClass::OnUrlDetectionComplete(mvceditor::UrlDete
 	}
 	wxRemoveFile(ResourceCacheFileName.GetFullPath());
 	GetStatusBarWithGauge()->StopGauge(ID_URL_GAUGE);
+	
+	wxCommandEvent urlEvent(mvceditor::EVENT_APP_PROJECT_URLS);
+	App->EventSink.Publish(urlEvent);
 	if (INDEXING == State) {
 		ShowUrlDialog();
 	}
@@ -534,4 +550,7 @@ BEGIN_EVENT_TABLE(mvceditor::RunBrowserPluginClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_ENVIRONMENT_UPDATED, mvceditor::RunBrowserPluginClass::OnEnvironmentUpdated)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_INDEXED, mvceditor::RunBrowserPluginClass::OnProjectIndexed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_OPENED, mvceditor::RunBrowserPluginClass::OnProjectOpened)
+	
+	// command handlers to enable communication with other plugins
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_PROJECT_URLS, mvceditor::RunBrowserPluginClass::OnCmdUrls)
 END_EVENT_TABLE()

@@ -23,10 +23,11 @@ ViewFilePanelGeneratedClass::ViewFilePanelGeneratedClass( wxWindow* parent, wxWi
 	PanelSizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* FlexSizer;
-	FlexSizer = new wxFlexGridSizer( 3, 1, 0, 0 );
+	FlexSizer = new wxFlexGridSizer( 4, 1, 0, 0 );
 	FlexSizer->AddGrowableCol( 0 );
 	FlexSizer->AddGrowableRow( 2 );
-	FlexSizer->SetFlexibleDirection( wxBOTH );
+	FlexSizer->AddGrowableRow( 3 );
+	FlexSizer->SetFlexibleDirection( wxVERTICAL );
 	FlexSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	wxFlexGridSizer* ChoicesSizer;
@@ -73,8 +74,33 @@ ViewFilePanelGeneratedClass::ViewFilePanelGeneratedClass( wxWindow* parent, wxWi
 	
 	FlexSizer->Add( MiddleSizer, 1, wxEXPAND, 5 );
 	
-	FileTree = new wxTreeCtrl( this, ID_FILETREE, wxDefaultPosition, wxDefaultSize, wxTR_DEFAULT_STYLE|wxTR_HIDE_ROOT|wxTR_SINGLE );
-	FlexSizer->Add( FileTree, 1, wxALL|wxEXPAND, 5 );
+	wxFlexGridSizer* TemplatesSizer;
+	TemplatesSizer = new wxFlexGridSizer( 1, 1, 0, 0 );
+	TemplatesSizer->AddGrowableCol( 0 );
+	TemplatesSizer->AddGrowableRow( 0 );
+	TemplatesSizer->SetFlexibleDirection( wxBOTH );
+	TemplatesSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	FileTree = new wxTreeCtrl( this, ID_FILETREE, wxDefaultPosition, wxDefaultSize, wxTR_DEFAULT_STYLE|wxTR_SINGLE );
+	TemplatesSizer->Add( FileTree, 1, wxALL|wxEXPAND, 5 );
+	
+	FlexSizer->Add( TemplatesSizer, 1, wxEXPAND, 5 );
+	
+	wxFlexGridSizer* TemplateVariableSizer;
+	TemplateVariableSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	TemplateVariableSizer->AddGrowableCol( 0 );
+	TemplateVariableSizer->AddGrowableRow( 1 );
+	TemplateVariableSizer->SetFlexibleDirection( wxBOTH );
+	TemplateVariableSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	TemplateVariablesLabel = new wxStaticText( this, ID_TEMPLATEVARIABLESLABEL, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	TemplateVariablesLabel->Wrap( -1 );
+	TemplateVariableSizer->Add( TemplateVariablesLabel, 0, wxALL, 5 );
+	
+	TemplateVariablesTree = new wxTreeCtrl( this, ID_VARIABLETREE, wxDefaultPosition, wxDefaultSize, wxTR_DEFAULT_STYLE );
+	TemplateVariableSizer->Add( TemplateVariablesTree, 1, wxALL|wxALIGN_BOTTOM|wxEXPAND, 5 );
+	
+	FlexSizer->Add( TemplateVariableSizer, 1, wxEXPAND, 5 );
 	
 	PanelSizer->Add( FlexSizer, 1, wxEXPAND, 5 );
 	

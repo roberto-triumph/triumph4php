@@ -327,20 +327,34 @@ protected:
 };
 
 /**
+ * Class that groups a template file and the variables assigned to it
+ * by a controller.
+ */
+class ViewInfoClass {
+	
+	public:
+	
+	wxString FileName;
+	
+	std::vector<wxString> TemplateVariables;
+};
+
+
+/**
  * Creates the detection command that will figure out the view files 
  * for the given framework (ie. to be able to go from a controller file to its view files)
- * When the external process ends, the ViewFiles list will contain all of the view files
+ * When the external process ends, the ViewInfos list will contain all of the view files
  * for a given controller action for a single framework.
  * Note: currently only one controller action can be requested at a time.
  * Note: the caller must create the Call stack file (using the CallStack class).
  */
-class ViewFilesDetectorActionClass : public DetectorActionClass {
+class ViewInfosDetectorActionClass : public DetectorActionClass {
 
 public: 
 	
-	std::vector<wxString> ViewFiles;
+	std::vector<mvceditor::ViewInfoClass> ViewInfos;
 
-	ViewFilesDetectorActionClass(wxEvtHandler& handler);
+	ViewInfosDetectorActionClass(wxEvtHandler& handler);
 
 protected:
 
@@ -460,14 +474,14 @@ public:
 	/**
 	 * kicks off the View files detector, the View files detector is used to ask the PHP framework to
 	 * get all of the view files for a particular controller action. When the detection is complete, a
-	 * ViewFilesDetectedEventClass event will be generated.
+	 * ViewInfosDetectedEventClass event will be generated.
 	 * 
 	 * @param dir the project's root directory
 	 * @param url the URL of the action to query
 	 * @param callStackFile the location of the call stack file that contains all of the function calls
 	 *        for the given URL.
 	 */
-	bool InitViewFilesDetector(const wxString& dir, const wxString& url, const wxFileName& callStackFile);
+	bool InitViewInfosDetector(const wxString& dir, const wxString& url, const wxFileName& callStackFile);
 	
 private:
 
@@ -479,7 +493,7 @@ private:
 	DatabaseDetectorActionClass DatabaseDetector;
 	ResourcesDetectorActionClass ResourcesDetector;
 	UrlDetectorActionClass UrlDetector;
-	ViewFilesDetectorActionClass ViewFilesDetector;
+	ViewInfosDetectorActionClass ViewInfosDetector;
 	
 	/**
 	 * a project may be using more than one framework. This vector
@@ -499,7 +513,7 @@ private:
 	/**
 	 * the list of result of view file detection
 	 */
-	std::vector<wxString> ViewFilesDetected;
+	std::vector<mvceditor::ViewInfoClass> ViewInfosDetected;
 	
 	/**
 	 * event handler that will receive the EVENT_FRAMEWORK_DETECTION_COMPLETE, EVENT_FRAMEWORK_URL
@@ -525,21 +539,21 @@ private:
 	void OnConfigFilesDetectionComplete(wxCommandEvent& event);
 	void OnResourcesDetectionComplete(wxCommandEvent& event);
 	void OnUrlDetectionComplete(wxCommandEvent& event);
-	void OnViewFileDetectionComplete(wxCommandEvent& event);
+	void OnViewInfosDetectionComplete(wxCommandEvent& event);
 	
 	/**
 	 * method that get called when one of the external processes fails
 	 */
 	void OnDetectionFailed(wxCommandEvent& event);
 	void OnUrlDetectionFailed(wxCommandEvent& event);
-	void OnViewFileDetectionFailed(wxCommandEvent& event);
+	void OnViewInfosDetectionFailed(wxCommandEvent& event);
 	
 	/**
 	 * these methods will take care of running the next detection in the queue
 	 */
 	void NextDetection();
 	void NextUrlDetection();
-	void NextViewFileDetection();
+	void NextViewInfosDetection();
 	
 	void OnWorkInProgress(wxCommandEvent& event);
 	
@@ -564,13 +578,13 @@ class UrlDetectedEventClass : public wxEvent {
 	wxEvent* Clone() const;
 };
 
-class ViewFilesDetectedEventClass : public wxEvent {
+class ViewInfosDetectedEventClass : public wxEvent {
 
 	public:	
 	
-	std::vector<wxString> ViewFiles;
+	std::vector<mvceditor::ViewInfoClass> ViewInfos;
 
-	ViewFilesDetectedEventClass(std::vector<wxString> viewFiles);
+	ViewInfosDetectedEventClass(std::vector<mvceditor::ViewInfoClass> viewInfos);
 	
 	/**
 	 * needed by wxPostEvent
@@ -578,18 +592,19 @@ class ViewFilesDetectedEventClass : public wxEvent {
 	wxEvent* Clone() const;
 };
 
+
 typedef void (wxEvtHandler::*UrlDetectedEventClassFunction)(UrlDetectedEventClass&);
-typedef void (wxEvtHandler::*ViewFilesDetectedEventClassFunction)(ViewFilesDetectedEventClass&);
+typedef void (wxEvtHandler::*ViewInfosDetectedEventClassFunction)(ViewInfosDetectedEventClass&);
 
 #define EVT_FRAMEWORK_URL_COMPLETE(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_FRAMEWORK_URL_COMPLETE, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( UrlDetectedEventClassFunction, & fn ), (wxObject *) NULL ),
 
-#define EVT_FRAMEWORK_VIEW_FILES_COMPLETE(fn) \
+#define EVT_FRAMEWORK_VIEW_INFOS_COMPLETE(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_FRAMEWORK_VIEW_FILES_COMPLETE, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( ViewFilesDetectedEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent( ViewInfosDetectedEventClassFunction, & fn ), (wxObject *) NULL ),
 
 }
 

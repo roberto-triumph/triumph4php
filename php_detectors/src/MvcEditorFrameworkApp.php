@@ -76,7 +76,8 @@ function loadFrameworks() {
 function runAction($framework, $dir, $action, $url, $file, $host, $outputFile) {
 
 	// a little dynamic code goes a long way here; no need for a bunch of IF statments
-	$availableActions = array('runDatabaseInfo', 'runIsUsedBy', 'runConfigFiles', 'runResources', 'runMakeUrls', 'runViewFiles');
+	$availableActions = array('runDatabaseInfo', 'runIsUsedBy', 'runConfigFiles', 
+		'runResources', 'runMakeUrls', 'runViewInfos');
 	$done = false;
 	foreach ($availableActions as $availAction) {
 		if (strcasecmp($availAction, 'run' . $action) == 0) {
@@ -211,22 +212,32 @@ function runMakeUrls(MvcEditorFrameworkBaseClass $framework, $dir, $url, $resour
 	}
 }
 
-function runViewFiles(MvcEditorFrameworkBaseClass $framework, $dir, $url, $file, $host, $outputFile) {
-	$viewFiles = $framework->viewFiles($dir, $url, $file);
-	if ($viewFiles) {
+function runViewInfos(MvcEditorFrameworkBaseClass $framework, $dir, $url, $file, $host, $outputFile) {
+	$viewInfos = $framework->viewInfos($dir, $url, $file);
+	if ($viewInfos) {
 		$writer = new Zend_Config_Writer_Ini();
 		$outputConfig = new Zend_Config(array(), true);
 		$writer->setConfig($outputConfig);
 		$keyIndex = 0;
-		foreach ($viewFiles as $viewFile) {
+		foreach ($viewInfos as $viewInfo) {
+			$templateVariables = $viewInfo->variables;
+			$viewFile = $viewInfo->fileName;
 			$key = iniEscapeKey('View_' . $keyIndex);
-			$outputConfig->{$key} = iniEscapeValue($viewFile);
+			$outputConfig->{$key} = array(
+				'FileName' => iniEscapeValue($viewFile),
+				'VariableCount' => count($templateVariables)
+			);
+			$varKeyIndex = 0;
+			foreach ($templateVariables as $var) {
+				$varKey = iniEscapeKey('Var_' . $varKeyIndex);
+				$outputConfig->{$key}->{$varKey} = iniEscapeValue($var);
+				$varKeyIndex++;
+			}
 			$keyIndex++;
 		}
 		iniPrint($writer, $outputFile);
 	}
 }
-
 
 // Replaces any possible characters that may conflict with INI parsing of KEYS.
 function iniEscapeKey($str) {
@@ -254,8 +265,8 @@ $rules = array(
 	'identifier|i=s' => 'The framework to query',
 	'dir|d=s' => 'The base directory that the project resides in',
 	'action|a=s' => 'The data that is being queried',
-	'url|u=s' => 'URL to query (used only by the viewFiles action)',
-	'file|f=s' => 'File to query (used only by the viewFiles, makeUrls actions)',
+	'url|u=s' => 'URL to query (used only by the viewInfos action)',
+	'file|f=s' => 'File to query (used only by the viewInfos, makeUrls actions)',
 	'host|s=s' => 'Host name (used only by the makeUrls action)',
 	'output|o=s' => 'If given, the output will be written to the given file (by default, output does to STDOUT)',
 	'help|h' => 'A help message'
