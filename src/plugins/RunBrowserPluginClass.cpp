@@ -34,7 +34,7 @@ static const int ID_URL_GAUGE = wxNewId();
 static const size_t MAX_BROWSERS = 10;
 static const size_t MAX_URLS = 40;
 
-static void ExternalBrowser(const wxString& browserName, const wxURI& url, mvceditor::AmpInfoClass* environment) {
+static void ExternalBrowser(const wxString& browserName, const wxURI& url, mvceditor::EnvironmentClass* environment) {
 	wxFileName webBrowserPath;
 	bool found = environment->FindBrowserByName(browserName, webBrowserPath);
 	if (!found || !webBrowserPath.IsOk()) {
@@ -255,9 +255,9 @@ void mvceditor::RunBrowserPluginClass::AddKeyboardShortcuts(std::vector<DynamicC
 
 void mvceditor::RunBrowserPluginClass::LoadPreferences(wxConfigBase* config) {
 	
-	// dont use the config; use the AmpInfo that has already been seeded with 
+	// dont use the config; use the Environment that has already been seeded with 
 	// the proper data
-	mvceditor::AmpInfoClass* environment = GetEnvironment();
+	mvceditor::EnvironmentClass* environment = GetEnvironment();
 	for (std::vector<mvceditor::WebBrowserClass>::const_iterator it = environment->WebBrowsers.begin(); it != environment->WebBrowsers.end(); ++it) {
 		App->UrlResourceFinder.Browsers.push_back(it->Name);
 	}
@@ -274,7 +274,7 @@ void mvceditor::RunBrowserPluginClass::OnEnvironmentUpdated(wxCommandEvent& even
 
 	// need to update the browser toolbar if the user updates the environment
 	App->UrlResourceFinder.Browsers.clear();
-	mvceditor::AmpInfoClass* environment = GetEnvironment();
+	mvceditor::EnvironmentClass* environment = GetEnvironment();
 	for (std::vector<mvceditor::WebBrowserClass>::const_iterator it = environment->WebBrowsers.begin(); it != environment->WebBrowsers.end(); ++it) {
 		App->UrlResourceFinder.Browsers.push_back(it->Name);
 	}
@@ -294,7 +294,7 @@ void mvceditor::RunBrowserPluginClass::OnRunInWebBrowser(wxCommandEvent& event) 
 	wxString browserName = App->UrlResourceFinder.ChosenBrowser;
 	wxURI url = App->UrlResourceFinder.ChosenUrl.Url;
 	if (!browserName.IsEmpty() && !url.BuildURI().IsEmpty()) {
-		mvceditor::AmpInfoClass* environment = GetEnvironment();
+		mvceditor::EnvironmentClass* environment = GetEnvironment();
 		ExternalBrowser(browserName, url, environment);
 	}
 }
@@ -302,7 +302,7 @@ void mvceditor::RunBrowserPluginClass::OnRunInWebBrowser(wxCommandEvent& event) 
 void mvceditor::RunBrowserPluginClass::OnBrowserToolDropDown(wxAuiToolBarEvent& event) {
 	if (event.IsDropDownClicked()) {
 		BrowserToolbar->SetToolSticky(event.GetId(), true);
-		mvceditor::AmpInfoClass* environment = GetEnvironment();
+		mvceditor::EnvironmentClass* environment = GetEnvironment();
 
 		// create the popup menu that contains all the available browser names
 		if (!BrowserMenu.get()) {
@@ -405,7 +405,7 @@ void mvceditor::RunBrowserPluginClass::ShowUrlDialog() {
 		if (!found) {
 			RecentUrls.insert(RecentUrls.begin(), App->UrlResourceFinder.ChosenUrl);
 		}
-		mvceditor::AmpInfoClass* environment = GetEnvironment();
+		mvceditor::EnvironmentClass* environment = GetEnvironment();
 		wxString browserName = App->UrlResourceFinder.ChosenBrowser;
 		if (!browserName.IsEmpty()) {
 			ExternalBrowser(browserName, App->UrlResourceFinder.ChosenUrl.Url, environment);
@@ -477,7 +477,7 @@ void mvceditor::RunBrowserPluginClass::OnProjectIndexed(wxCommandEvent& event) {
 }
 
 void mvceditor::RunBrowserPluginClass::OnCacheFileWorkComplete(wxCommandEvent& event) {
-	mvceditor::AmpInfoClass* environment = GetEnvironment();
+	mvceditor::EnvironmentClass* environment = GetEnvironment();
 	mvceditor::ProjectClass* project = GetProject();
 	wxString projectRootUrl =  environment->Apache.GetUrl(project->GetRootPath());
 	if (!PhpFrameworks.get()) {

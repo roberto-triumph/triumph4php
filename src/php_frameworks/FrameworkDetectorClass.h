@@ -29,7 +29,7 @@
 #include <widgets/ProcessWithHeartbeatClass.h>
 #include <widgets/ThreadWithHeartbeatClass.h>
 #include <environment/DatabaseInfoClass.h>
-#include <environment/AmpInfoClass.h>
+#include <environment/EnvironmentClass.h>
 #include <environment/UrlResourceClass.h>
 #include <wx/string.h>
 #include <wx/event.h>
@@ -120,7 +120,7 @@ public:
 	 *
 	 * @param int commandId command ID will be used when an EVENT_PROCESS_* is genereated
 	 *        this way the caller can correlate a command to an event.
-	 * @param ampInfo to get location of PHP binary "php-win.exe" / php
+	 * @param environment to get location of PHP binary "php-win.exe" / php
 	 * @param projectRootPath location of the project to run detection on ie. the project that
 	 *        the user is modifying
 	 * @param identifier the detected framework identifier
@@ -128,7 +128,7 @@ public:
 	 *       need the starting dashes (ie. the key should be "file" instead of "--file").
 	 * @return wxString the command (operating system command line) that will run the PHP detection code.
 	 */
-	bool Init(int id, const AmpInfoClass& ampInfo, const wxString& projectRootPath, const wxString& identifier,
+	bool Init(int id, const EnvironmentClass& environment, const wxString& projectRootPath, const wxString& identifier,
 		std::map<wxString, wxString> moreParams);
 
 	/**
@@ -429,9 +429,9 @@ public:
 	/**
 	 * @param event handler that will receive the EVENT_FRAMEWORK_DETECTION_COMPLETE, EVENT_FRAMEWORK_URL
 	 * events. Also, the handler will get an EVENT_PROCESS_IN_PROGRESS while the detectors are running
-	 * @param the ampInfo; which contains the location of the PHP binary
+	 * @param the environment; which contains the location of the PHP binary
 	 */
-	PhpFrameworkDetectorClass(wxEvtHandler& handler, const AmpInfoClass& ampInfo);
+	PhpFrameworkDetectorClass(wxEvtHandler& handler, const EnvironmentClass& environment);
 	
 	/**
 	 * deletes any detected data
@@ -522,9 +522,9 @@ private:
 	wxEvtHandler& Handler;
 	
 	/**
-	 * The ampInfo; used to get the location of the PHP executable
+	 * The environment; used to get the location of the PHP executable
 	 */
-	const AmpInfoClass& AmpInfo;
+	const EnvironmentClass& Environment;
 	
 	/**
 	 * The location of the project to be scanned

@@ -25,7 +25,7 @@
 #ifndef __mvceditorpluginclass__
 #define __mvceditorpluginclass__
  
-#include <environment/AmpInfoClass.h>
+#include <environment/EnvironmentClass.h>
 #include <php_frameworks/ProjectClass.h>
 #include <php_frameworks/FrameworkDetectorClass.h>
 #include <widgets/NotebookClass.h>
@@ -103,7 +103,7 @@ enum MenuIds {
  * 2) StatusBarWithGaugeClass to show progress to the user
  * 3) The tools window notebook.  plugins can add their windowx
  * 4) The code notebook.  Plugins can query which is the currently opened file, any selected text, etc...
- * 5) An instance of AmpInfo class; contains the apache configuration that is installed in the system. Note that the 
+ * 5) An instance of Environment class; contains the apache configuration that is installed in the system. Note that the 
  *    Apache class may not be initialized to point at a proper config file.
  * 6) Note that unless specified, all pointers that a plugin is given (Notebook, statubar, etc.. )will be taken care of by the 
  *    application and the plugin SHOULD NOT delete them.  However, any pointers created by the plugin will need to be deleted
@@ -389,11 +389,11 @@ protected:
 	StatusBarWithGaugeClass* GetStatusBarWithGauge() const;
 	
 	/**
-	 * The application. Has the ampInfo of the computer (apache, ...)
+	 * The application. Has the environment of the computer (apache, ...)
 	 * 
-	 * @return AmpInfoClass
+	 * @return EnvironmentClass
 	 */
-	 AmpInfoClass* GetEnvironment();
+	 EnvironmentClass* GetEnvironment();
 	 
 	 /**
 	  * Creates a new code control that is primed with the global editor

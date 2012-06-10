@@ -26,7 +26,7 @@
 #include <php_frameworks/FrameworkDetectorClass.h>
 #include <widgets/ResourceCacheClass.h>
 #include <windows/AppFrameClass.h>
-#include <environment/AmpInfoClass.h>
+#include <environment/EnvironmentClass.h>
 #include <environment/UrlResourceClass.h>
 #include <plugins/ProjectPluginClass.h>
 #include <PluginClass.h>
@@ -44,11 +44,11 @@ class AppClass : public wxApp {
 public:
 
 	/**
-	 * The ampInfo stack.
+	 * The environment stack.
 	 * 
-	 * @var AmpInfoClass
+	 * @var EnvironmentClass
 	 */
-	AmpInfoClass AmpInfo;
+	EnvironmentClass Environment;
 	
 	/**
 	 * This object will be used to parse the resources of files that are currently open.

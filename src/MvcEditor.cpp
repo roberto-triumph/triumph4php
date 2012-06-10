@@ -46,9 +46,9 @@ IMPLEMENT_APP(mvceditor::AppClass)
 
 mvceditor::AppClass::AppClass()
 	: wxApp()
-	, AmpInfo()
+	, Environment()
 	, ResourceCache()
-	, PhpFrameworks(*this, AmpInfo)
+	, PhpFrameworks(*this, Environment)
 	, UrlResourceFinder()
 	, EventSink()
 	, Project(NULL)
@@ -74,7 +74,7 @@ bool mvceditor::AppClass::OnInit() {
 
 	// load any settings from .INI files
 	PreferencesClass::InitConfig();
-	AmpInfo.LoadFromConfig();
+	Environment.LoadFromConfig();
 	wxConfigBase* config = wxConfigBase::Get();
 	for (size_t i = 0; i < Plugins.size(); ++i) {
 		Plugins[i]->InitState(this);

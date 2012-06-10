@@ -74,7 +74,7 @@ mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass
 	Notebook->SetDropTarget(new FileDropTargetClass(Notebook));
 	Notebook->CodeControlOptions = &Preferences.CodeControlOptions;
 	Notebook->ResourceCache = &App->ResourceCache;
-	Notebook->AmpInfo = &App->AmpInfo;
+	Notebook->Environment = &App->Environment;
 	
 	// ATTN: for some reason must remove and re-insert menu item in order to change the icon
 	wxMenuItem* projectOpenMenuItem = MenuBar->FindItem(ID_PROJECT_OPEN);

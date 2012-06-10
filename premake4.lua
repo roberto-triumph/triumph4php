@@ -256,7 +256,7 @@ solution "mvc-editor"
 			"tests/**.cpp",
 			"tests/**.h",
 			"src/environment/ApacheClass.cpp",
-			"src/environment/AmpInfoClass.cpp",
+			"src/environment/EnvironmentClass.cpp",
 			"src/environment/DatabaseInfoClass.cpp",
 			"src/environment/SqlResourceFinderClass.cpp",
 			"src/environment/UrlResourceClass.cpp",

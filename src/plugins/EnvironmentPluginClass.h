@@ -27,7 +27,7 @@
 
 #include <PluginClass.h>
 #include <plugins/BackgroundFileReaderClass.h>
-#include <environment/AmpInfoClass.h>
+#include <environment/EnvironmentClass.h>
 #include <plugins/wxformbuilder/EnvironmentGeneratedDialogClass.h>
 
 namespace mvceditor {
@@ -113,10 +113,10 @@ protected:
 
 public:
 	/** Constructor */
-	ApacheEnvironmentPanelClass(wxWindow* parent, AmpInfoClass& ampInfo);
+	ApacheEnvironmentPanelClass(wxWindow* parent, EnvironmentClass& environment);
 	
 	/**
-	 * transfers the settings from the window to the AmpInfo data structure
+	 * transfers the settings from the window to the Environment data structure
 	 */
 	void Apply();
 
@@ -125,9 +125,9 @@ private:
 	/** 
 	 * The configuration class
 	 * 
-	 * @var AmpInfoClass
+	 * @var EnvironmentClass
 	 */
-	AmpInfoClass& AmpInfo;
+	EnvironmentClass& Environment;
 	
 	/**
 	 * To look for apache config files in the background
@@ -156,7 +156,7 @@ private:
 	void OnWorkInProgress(wxCommandEvent& event);
 	
 	/**
-	 * Fills in the dialogs based on the Apache ampInfo
+	 * Fills in the dialogs based on the Apache environment
 	 */
 	void Populate();
 	
@@ -180,10 +180,10 @@ class WebBrowserEditPanelClass : public WebBrowserEditPanelGeneratedClass {
 
 public:
 
-	WebBrowserEditPanelClass(wxWindow* parent, AmpInfoClass& ampInfo);
+	WebBrowserEditPanelClass(wxWindow* parent, EnvironmentClass& environment);
 	
 	/**
-	 * applies the settings that were changed to the AmpInfo reference [given
+	 * applies the settings that were changed to the Environment reference [given
 	 * in the constructor].
 	 */
 	void Apply();
@@ -210,9 +210,9 @@ private:
 	/** 
 	 * The configuration class
 	 * 
-	 * @var AmpInfoClass
+	 * @var EnvironmentClass
 	 */
-	AmpInfoClass& AmpInfo;
+	EnvironmentClass& Environment;
 	
 	/**
 	 * The web browsers being modified. this is the vector that is the recipient
@@ -229,7 +229,7 @@ class PhpEnvironmentPanelClass : public PhpEnvironmentPanelGeneratedClass {
 
 public:
 	
-	PhpEnvironmentPanelClass(wxWindow* parent, AmpInfoClass& ampInfo);
+	PhpEnvironmentPanelClass(wxWindow* parent, EnvironmentClass& environment);
 	
 	void Apply();
 	
@@ -250,9 +250,9 @@ private:
 	/** 
 	 * The configuration class
 	 * 
-	 * @var AmpInfoClass
+	 * @var EnvironmentClass
 	 */
-	AmpInfoClass& AmpInfo;
+	EnvironmentClass& Environment;
 	
 };
 
@@ -294,10 +294,10 @@ class EnvironmentDialogClass : public wxPropertySheetDialog {
 
 public:
 
-	EnvironmentDialogClass(wxWindow* parent, AmpInfoClass& ampInfo);
+	EnvironmentDialogClass(wxWindow* parent, EnvironmentClass& environment);
 	
 	/**
-	 * when user OKs the dialog transfer all data to the AmpInfo data structure
+	 * when user OKs the dialog transfer all data to the Environment data structure
 	 */
 	void OnOkButton(wxCommandEvent& event);
 	
@@ -309,7 +309,7 @@ private:
 	
 	PhpEnvironmentPanelClass* PhpEnvironmentPanel;
 	
-	AmpInfoClass& AmpInfo;
+	EnvironmentClass& Environment;
 	
 	DECLARE_EVENT_TABLE()
 };
@@ -324,7 +324,7 @@ public:
 	EnvironmentPluginClass();
 	
 	/**
-	 * Add the ampInfo sub-menu.
+	 * Add the environment sub-menu.
 	 * 
 	 * @return wxMenuBar* the menu bar to add to.
 	 */

@@ -32,11 +32,11 @@
 static const int ID_PROCESS = wxNewId();
 static const int ID_WINDOW_CONSOLE = wxNewId();
 
-mvceditor::RunConsolePanelClass::RunConsolePanelClass(wxWindow* parent, AmpInfoClass* environment, StatusBarWithGaugeClass* gauge, int id)
+mvceditor::RunConsolePanelClass::RunConsolePanelClass(wxWindow* parent, EnvironmentClass* environment, StatusBarWithGaugeClass* gauge, int id)
 	: RunConsolePanelGeneratedClass(parent, id)
 	, CommandString()
 	, ProcessWithHeartbeat(*this)
-	, AmpInfo(environment)
+	, Environment(environment)
 	, Gauge(gauge)
 	, CurrentPid(0) {
 	wxGenericValidator commandValidator(&CommandString);
@@ -72,7 +72,7 @@ void  mvceditor::RunConsolePanelClass::SetToRunFile(const wxString& fullPath) {
 	// command is a file name, lets run it through PHP
 	// cannot run new files that have not been saved yet
 	if (!fullPath.empty()) {
-		CommandString = AmpInfo->Php.PhpExecutablePath + wxT(" ") + fullPath;
+		CommandString = Environment->Php.PhpExecutablePath + wxT(" ") + fullPath;
 		TransferDataToWindow();
 	}
 	else {

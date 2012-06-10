@@ -262,7 +262,7 @@ void mvceditor::TextDocumentClass::DetachFromControl(CodeControlClass* ctrl) {
 
 }
 
-mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::ProjectClass* project, mvceditor::ResourceCacheClass* resourceCache, mvceditor::AmpInfoClass* environment)
+mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::ProjectClass* project, mvceditor::ResourceCacheClass* resourceCache, mvceditor::EnvironmentClass* environment)
 	: wxEvtHandler()
 	, TextDocumentClass()
 	, LanguageDiscovery()
@@ -276,7 +276,7 @@ mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::ProjectClass* project, 
 	, Project(project)
 	, ResourceCache(resourceCache)
 	, ResourceCacheUpdateThread(resourceCache, *this)
-	, AmpInfo(environment)
+	, Environment(environment)
 	, CurrentCallTipIndex(0)
 	, NeedToUpdateResources(false) 
 	, AreImagesRegistered(false) {
@@ -425,9 +425,9 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 	if (!AreImagesRegistered) {
 		RegisterAutoCompletionImages();
 	}
-	Lexer.SetVersion(AmpInfo->Php.Version);
-	Parser.SetVersion(AmpInfo->Php.Version);
-	ScopeFinder.SetVersion(AmpInfo->Php.Version);
+	Lexer.SetVersion(Environment->Php.Version);
+	Parser.SetVersion(Environment->Php.Version);
+	ScopeFinder.SetVersion(Environment->Php.Version);
 	
 	std::vector<wxString> autoCompleteList;
 	std::vector<UnicodeString> variableMatches;
@@ -1061,7 +1061,7 @@ void mvceditor::PhpDocumentClass::OnAutoCompletionSelected(wxStyledTextEvent& ev
 }
 
 wxString mvceditor::PhpDocumentClass::GetPhpKeywords() const {
-	if (pelet::PHP_54 == AmpInfo->Php.Version) {
+	if (pelet::PHP_54 == Environment->Php.Version) {
 		return PHP_KEYWORDS + wxT(" ") + PHP_54_KEYWORDS;
 	}
 	return PHP_KEYWORDS;

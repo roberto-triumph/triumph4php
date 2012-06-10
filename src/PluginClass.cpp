@@ -61,8 +61,8 @@ mvceditor::NotebookClass* mvceditor::PluginClass::GetNotebook() const {
 	return Notebook;
 }
 
-mvceditor::AmpInfoClass* mvceditor::PluginClass::GetEnvironment() {
-	return &App->AmpInfo;
+mvceditor::EnvironmentClass* mvceditor::PluginClass::GetEnvironment() {
+	return &App->Environment;
 }
 
 mvceditor::ResourceCacheClass* mvceditor::PluginClass::GetResourceCache() {
