@@ -80,6 +80,7 @@ public:
 	 * The open project
 	 * @var ProjectClass*
  	 */
+	 // TODO make this an object on the stack
 	ProjectClass* Project;
 
 	/** 
