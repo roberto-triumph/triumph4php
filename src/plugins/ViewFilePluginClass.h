@@ -170,6 +170,17 @@ private:
 	
 	void OnViewInfosDetectionFailed(wxCommandEvent& event);
 	
+	void OnProjectUrls(wxCommandEvent& event);
+	
+	void ShowPanel();
+	
+	enum States {
+		FREE,
+		INDEXING
+	};
+	
+	States State;
+	
 	DECLARE_EVENT_TABLE()
 };
 

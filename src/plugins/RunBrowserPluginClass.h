@@ -170,6 +170,11 @@ private:
 	void ShowUrlDialog();
 	
 	/**
+	 * Listen for events that trigger URL building
+	 */
+	void OnCmdUrls(wxCommandEvent& event);
+	
+	/**
 	 * A local instance of the detector so that we can resolve
 	 * framework URLs according to each specific PHP framework routing rules
 	 * Needs to be local because this class needs to be the event handler

@@ -97,6 +97,31 @@ void mvceditor::ViewFilePluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
 }
 
 void mvceditor::ViewFilePluginClass::OnViewInfosMenu(wxCommandEvent& event) {
+	if (!App->UrlResourceFinder.Urls.empty()) {
+		ShowPanel();
+	}
+	else {
+		
+		// we need the resource cache; the resource cache is needed to figure out the URLs
+		// and templates for each controller.
+		// we will trigger the project indexing, then once the project has been indexed 
+		// we will show the panel.
+		State = INDEXING;
+		wxCommandEvent indexEvent(mvceditor::EVENT_CMD_PROJECT_URLS);
+		App->EventSink.Publish(indexEvent);
+	}
+}
+
+void mvceditor::ViewFilePluginClass::OnProjectUrls(wxCommandEvent& event) {
+	
+	// if we triggered the indexing
+	if (INDEXING == State) {
+		ShowPanel();	
+	}
+	State = FREE;
+}
+
+void mvceditor::ViewFilePluginClass::ShowPanel() {
 	wxWindow* window = FindOutlineWindow(ID_VIEW_FILE_PANEL);
 	mvceditor::ViewFilePanelClass* viewPanel = NULL;
 	if (window) {
@@ -368,4 +393,5 @@ BEGIN_EVENT_TABLE(mvceditor::ViewFilePluginClass, wxEvtHandler)
 	EVT_FRAMEWORK_VIEW_INFOS_COMPLETE(mvceditor::ViewFilePluginClass::OnViewInfosDetectionComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_VIEW_FILES_FAILED, mvceditor::ViewFilePluginClass::OnViewInfosDetectionFailed)
 	EVT_MENU(mvceditor::MENU_VIEW_FILES + 0, mvceditor::ViewFilePluginClass::OnViewInfosMenu)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_URLS, mvceditor::ViewFilePluginClass::OnProjectUrls)
 END_EVENT_TABLE()
