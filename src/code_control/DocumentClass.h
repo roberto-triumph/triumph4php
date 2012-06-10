@@ -239,7 +239,7 @@ private:
 	 */
 	void HandleAutoCompletionPhpStatus(const SymbolTableMatchErrorClass& error, 
 		const UnicodeString& lastExpression, const pelet::ExpressionClass& parsedExpression,
-		const ScopeResultClass& expressionScope, wxString& completeStatus);
+		const pelet::ScopeClass& expressionScope, wxString& completeStatus);
 
 	/**
 	 * Return a list of possible keyword matches for the given word. For example, if word="cl"

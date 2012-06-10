@@ -424,8 +424,9 @@ void mvceditor::CallStackClass::CreateCalls() {
 			if (expr.ChainList[j].IsFunction) {
 				std::vector<mvceditor::ResourceClass> matches;
 				mvceditor::SymbolTableMatchErrorClass singleMatchError;
-				mvceditor::ScopeResultClass scopeResult;
-				scopeResult.MethodName = expr.Scope.ClassName + UNICODE_STRING_SIMPLE("::") + expr.Scope.MethodName;
+				pelet::ScopeClass scopeResult;
+				scopeResult.ClassName = expr.Scope.ClassName;
+				scopeResult.MethodName = expr.Scope.MethodName;
 
 				ResourceCache.ResourceMatches(item.FileName.GetFullPath(), subExpr, scopeResult, matches, false, true, singleMatchError);
 				for (std::vector<mvceditor::ResourceClass>::iterator it = matches.begin(); it != matches.end(); ++it) {

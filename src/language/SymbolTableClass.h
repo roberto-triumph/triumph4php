@@ -169,39 +169,6 @@ public:
 };
 
 /**
- * The scope at a certain, specific point in PHP source code. An instance of this is 
- * given to the SymbolTable class so that it can choose the correct variables and 
- * namespaces to resolve an expression against.
- */
-class ScopeResultClass {
-
-	public:
-	
-	/**
-	 * A string that denotes the scope.  This is the classname::methodname, or
-	 * ::functionName.
-	 */
-	UnicodeString MethodName;
-	
-	UnicodeString NamespaceName;
-	
-	/**
-	 * The imported namespaces "use Name\Name as Alias;"
-	 */
-	std::map<UnicodeString, UnicodeString, UnicodeStringComparatorClass> NamespaceAliases;
-	
-	ScopeResultClass();
-	
-	void Clear();
-	
-	void Copy(const ScopeResultClass& src);
-	
-	bool IsGlobalScope() const;
-	
-	bool IsGlobalNamespace() const;
-};
-
-/**
  * This class represents one variable found in the source code, along with
  * the function call used to create the variable. A symbol is created ONLY
  * when a variable is guaranteed to have been created [according to PHP rules].
@@ -366,7 +333,7 @@ public:
 	 *        slower because ResourceFinderClass still handles them
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear() )
 	 */
-	void ExpressionCompletionMatches(pelet::ExpressionClass parsedExpression, const ScopeResultClass& expressionScope, 
+	void ExpressionCompletionMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope, 
 		const std::map<wxString, ResourceFinderClass*>& openedResourceFinders,
 		mvceditor::ResourceFinderClass* globalResourceFinder,
 		std::vector<UnicodeString>& autoCompleteVariableList,
@@ -404,7 +371,7 @@ public:
 	 *        returned
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
-	void ResourceMatches(pelet::ExpressionClass parsedExpression, const ScopeResultClass& expressionScope, 
+	void ResourceMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope, 
 		const std::map<wxString, ResourceFinderClass*>& openedResourceFinders,
 		mvceditor::ResourceFinderClass* globalResourceFinder,
 		std::vector<ResourceClass>& resourceMatches,
@@ -458,7 +425,7 @@ private:
 	 * @param the expression to resolve
 	 * @param scope the scope that containts the aliases to resolve against
 	 */
-	void ResolveNamespaceAlias(pelet::ExpressionClass& parsedExpression, const ScopeResultClass& scopeResult) const;
+	void ResolveNamespaceAlias(pelet::ExpressionClass& parsedExpression, const pelet::ScopeClass& scope) const;
 	
 	/**
 	 * Modifies the RESOURCE; unresolving namespaces alias to their aliased equivalents. We need to 
@@ -469,7 +436,7 @@ private:
 	 * @param scope the scope that containts the aliases to resolve against
 	 * @param resource a matched resource; will get modified an any namespace will be 'unresolved'
 	 */
-	void UnresolveNamespaceAlias(const pelet::ExpressionClass& originalExpression, const ScopeResultClass& scopeResult, mvceditor::ResourceClass& resource) const;
+	void UnresolveNamespaceAlias(const pelet::ExpressionClass& originalExpression, const pelet::ScopeClass& scope, mvceditor::ResourceClass& resource) const;
 
 	/**
 	 * The parser.
@@ -523,11 +490,11 @@ public:
 	 * Returns the scope that is located at the given position i.e. what class/function is at position.
 	 * 
 	 * @param code the source code to process
-	 * @param int position is index into code string given to the CreateSymbols() method.
-	 * @param scope ScopeResultClass instance to put the function, declared namespace, and aliases
+	 * @param int position is index into code string for which to get the scope for
+	 * @param scope instance to put the function, declared namespace, and aliases
 	 *        that the position lies in.
 	 */
-	void GetScopeString(const UnicodeString& code, int pos, ScopeResultClass& scope);
+	void GetScopeString(const UnicodeString& code, int pos, pelet::ScopeClass& scope);
 	
 	void ClassEnd(const UnicodeString& namespaceName, const UnicodeString& className, int pos);
 		
@@ -558,7 +525,7 @@ private:
 	/**
 	 * to keep track of the current namespace and method
 	 */
-	ScopeResultClass ScopeResult;
+	pelet::ScopeClass Scope;
 	
 	/**
 	 * To keep know if a namespace has switched. If a namespace has switched we need to 

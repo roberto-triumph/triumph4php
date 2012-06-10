@@ -435,7 +435,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 	UnicodeString lastExpression = Lexer.LastExpression(code);
 	pelet::ScopeClass scope;
 	pelet::ExpressionClass parsedExpression(scope);
-	mvceditor::ScopeResultClass expressionScope;
+	pelet::ScopeClass expressionScope;
 	mvceditor::SymbolTableMatchErrorClass error;
 	
 	bool doDuckTyping = Ctrl->CodeControlOptions.EnableDynamicAutoCompletion;
@@ -533,7 +533,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhpStatus(
 		const mvceditor::SymbolTableMatchErrorClass& error, 
 		const UnicodeString& lastExpression,
 		const pelet::ExpressionClass& parsedExpression,
-		const mvceditor::ScopeResultClass& expressionScope,
+		const pelet::ScopeClass& expressionScope,
 		wxString& completeStatus) {
 	if (lastExpression.isEmpty()) {
 		completeStatus = _("Nothing to complete");
@@ -542,6 +542,8 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhpStatus(
 		completeStatus = _("No matching variables for: ");
 		completeStatus += mvceditor::StringHelperClass::IcuToWx(lastExpression);
 		completeStatus +=  _(" in scope: ");
+		completeStatus += mvceditor::StringHelperClass::IcuToWx(expressionScope.ClassName);
+		completeStatus += _("::");
 		completeStatus += mvceditor::StringHelperClass::IcuToWx(expressionScope.MethodName);
 	}
 	else if (parsedExpression.ChainList.size() == 1) {
@@ -552,6 +554,8 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhpStatus(
 	else if (AutoCompletionResourceMatches.empty()) {
 		if (mvceditor::SymbolTableMatchErrorClass::PARENT_ERROR == error.Type) {
 			completeStatus = _("parent not valid for scope: ");
+			completeStatus += mvceditor::StringHelperClass::IcuToWx(expressionScope.ClassName);
+			completeStatus += _("::");
 			completeStatus += mvceditor::StringHelperClass::IcuToWx(expressionScope.MethodName);
 		}
 		else if (mvceditor::SymbolTableMatchErrorClass::STATIC_ERROR == error.Type) {
@@ -752,7 +756,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetCurrentSym
 	pelet::ScopeClass scope;
 	pelet::ExpressionClass parsedExpression(scope);
 	mvceditor::ScopeFinderClass scopeFinder;
-	mvceditor::ScopeResultClass scopeResult;
+	pelet::ScopeClass scopeResult;
 	
 	UnicodeString lastExpression = lexer.LastExpression(code);
 	bool doDuckTyping = true;
@@ -914,7 +918,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetSymbolAt(i
 	pelet::ScopeClass scope;
 	pelet::ExpressionClass parsedExpression(scope);
 	mvceditor::ScopeFinderClass scopeFinder;
-	mvceditor::ScopeResultClass expressionScope;
+	pelet::ScopeClass expressionScope;
 	
 	UnicodeString lastExpression = lexer.LastExpression(code);
 	UnicodeString resourceName;

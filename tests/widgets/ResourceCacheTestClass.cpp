@@ -71,7 +71,6 @@ public:
 	bool DoFullyQualifiedMatchOnly;
 	pelet::ScopeClass Scope;
 	pelet::ExpressionClass ParsedExpression;
-	mvceditor::ScopeResultClass ScopeResult;
 
 	std::vector<UnicodeString> VariableMatches;
 	std::vector<mvceditor::ResourceClass> ResourceMatches;
@@ -93,7 +92,6 @@ public:
 		, DoFullyQualifiedMatchOnly(false)
 		, Scope()
 		, ParsedExpression(Scope)
-		, ScopeResult()
 		, VariableMatches()
 		, ResourceMatches()
 		, Error()
@@ -101,7 +99,8 @@ public:
 		, PhpFileFilters() {
 		Search.Init(TestProjectDir);
 		PhpFileFilters.push_back(wxT("*.php"));
-		ScopeResult.MethodName = UNICODE_STRING_SIMPLE("::");
+		Scope.ClassName = UNICODE_STRING_SIMPLE("");
+		Scope.MethodName = UNICODE_STRING_SIMPLE("");
 	}
 	
 	void ToProperty(const UnicodeString& variableName, const UnicodeString& methodName) {
@@ -217,7 +216,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, GlobalFinder) {
 	CHECK(ResourceCache.Update(File2, Code2, true));
 	
 	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("w"));
-	ResourceCache.ExpressionCompletionMatches(File2, ParsedExpression, ScopeResult, 
+	ResourceCache.ExpressionCompletionMatches(File2, ParsedExpression, Scope, 
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
 	if (!ResourceMatches.empty()) {
@@ -242,7 +241,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, RegisteredFinder) {
 	CHECK(ResourceCache.Update(File2, Code2, true));
 	
 	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("w"));
-	ResourceCache.ExpressionCompletionMatches(File1, ParsedExpression, ScopeResult, 
+	ResourceCache.ExpressionCompletionMatches(File1, ParsedExpression, Scope, 
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);
 
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
@@ -265,7 +264,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithGlobalF
 	CHECK(ResourceCache.Update(File1, Code1, true));
 	
 	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("w"));
-	ResourceCache.ResourceMatches(File1, ParsedExpression, ScopeResult, 
+	ResourceCache.ResourceMatches(File1, ParsedExpression, Scope, 
 		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
 	if (!ResourceMatches.empty()) {
@@ -290,7 +289,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithRegiste
 
 	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("methodA"));
 
-	ResourceCache.ResourceMatches(File2, ParsedExpression, ScopeResult, 
+	ResourceCache.ResourceMatches(File2, ParsedExpression, Scope, 
 		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
 	if (!ResourceMatches.empty()) {
@@ -318,7 +317,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithStaleMa
 
 	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("methodA"));
 
-	ResourceCache.ResourceMatches(File1, ParsedExpression, ScopeResult, 
+	ResourceCache.ResourceMatches(File1, ParsedExpression, Scope, 
 		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
 	if (!ResourceMatches.empty()) {
@@ -331,7 +330,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithStaleMa
 	CHECK(ResourceCache.Update(TestProjectDir + GlobalFile, Code2, true));
 
 	ResourceMatches.clear();
-	ResourceCache.ResourceMatches(GlobalFile, ParsedExpression, ScopeResult, 
+	ResourceCache.ResourceMatches(GlobalFile, ParsedExpression, Scope, 
 		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_EQUAL((size_t)0, ResourceMatches.size());
 }
