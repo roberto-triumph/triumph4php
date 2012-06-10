@@ -24,7 +24,7 @@
  */
 #include <php_frameworks/ProjectClass.h>
 #include <php_frameworks/FrameworkDetectorClass.h>
-#include <environment/ResourceCacheClass.h>
+#include <widgets/ResourceCacheClass.h>
 #include <windows/AppFrameClass.h>
 #include <environment/AmpInfoClass.h>
 #include <environment/UrlResourceClass.h>

@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#include <environment/ResourceCacheClass.h>
+#include <widgets/ResourceCacheClass.h>
 #include <php_frameworks/CallStackClass.h>
 #include <php_frameworks/FrameworkDetectorClass.h>
 #include <MvcEditorAssets.h>

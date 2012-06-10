@@ -29,7 +29,7 @@
 #include <php_frameworks/ProjectClass.h>
 #include <php_frameworks/FrameworkDetectorClass.h>
 #include <widgets/NotebookClass.h>
-#include <environment/ResourceCacheClass.h>
+#include <widgets/ResourceCacheClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
 #include <PreferencesClass.h>
 #include <wx/event.h>

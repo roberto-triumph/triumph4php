@@ -30,7 +30,7 @@
 #include <pelet/ParserClass.h>
 #include <pelet/LanguageDiscoveryClass.h>
 #include <language/SymbolTableClass.h>
-#include <environment/ResourceCacheClass.h>
+#include <widgets/ResourceCacheClass.h>
 #include <environment/AmpInfoClass.h>
 #include <wx/string.h>
 #include <wx/stc/stc.h>

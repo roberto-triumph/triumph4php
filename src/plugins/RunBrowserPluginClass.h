@@ -29,7 +29,7 @@
 #include <plugins/wxformbuilder/RunBrowserPluginGeneratedClass.h>
 #include <php_frameworks/FrameworkDetectorClass.h>
 #include <environment/UrlResourceClass.h>
-#include <environment/ResourceCacheClass.h>
+#include <widgets/ResourceCacheClass.h>
 #include <wx/string.h>
 #include <vector>
 #include <memory>
