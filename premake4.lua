@@ -152,7 +152,7 @@ function sociconfiguration()
 			MYSQL_INCLUDE_DIR
 		}	
 		libdirs {
-			MYSQL_LIB_DIR .. "lib/"
+			MYSQL_LIB_DIR
 		}
 		
 		-- TODO Debug version?
@@ -280,10 +280,21 @@ solution "mvc-editor"
 		}
 
 		-- these will be used by the SqlResourceFinder tests
+		-- note the use of single quotes, MSW builds will fail if we
+		-- use double quotes because visual studio already escapes
+		-- defines with double quotes
 		defines {
-			string.format("MVCEDITOR_DB_USER=\"%s\"", MVCEDITOR_DB_USER),
-			string.format("MVCEDITOR_DB_PASSWORD=\"%s\"", MVCEDITOR_DB_PASSWORD)
+			string.format("MVCEDITOR_DB_USER=%s", MVCEDITOR_DB_USER)
 		}
+		
+		-- handle empty password correctly; just don't define the macro
+		-- this is so that the next word of the generated command line does
+		-- not become the password
+		if string.len(MVCEDITOR_DB_PASSWORD) > 0 then
+			defines {
+				string.format("MVCEDITOR_DB_PASSWORD=%s", MVCEDITOR_DB_PASSWORD)
+			}
+		end;
 		includedirs { "src/", "lib/UnitTest++/src/", "tests/", "lib/pelet/include" }
 		links { "unit_test++", "pelet" }
 		

@@ -58,7 +58,10 @@ std::string DatabaseTestFixtureClass::UserName() const {
 }
 
 std::string DatabaseTestFixtureClass::Password() const {
-	std::string pwd = MVC_STR(MVCEDITOR_DB_PASSWORD);
+	std::string pwd;
+	#ifdef MVCEDITOR_DB_PASSWORD
+		pwd	= MVC_STR(MVCEDITOR_DB_PASSWORD);
+	#endif
 	return pwd;
 }
 

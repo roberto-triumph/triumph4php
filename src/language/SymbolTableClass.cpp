@@ -83,7 +83,7 @@ static bool IsResourceVisible(const mvceditor::ResourceClass& resource, const pe
 			resQualified.append(resource.Identifier);
 				
 			// but if the resource is aliased then the class can be accessed
-			std::map<UnicodeString, UnicodeString, mvceditor::UnicodeStringComparatorClass>::const_iterator it;
+			std::map<UnicodeString, UnicodeString, pelet::UnicodeStringComparatorClass>::const_iterator it;
 			for (it = scope.NamespaceAliases.begin(); it != scope.NamespaceAliases.end(); ++it) {
 				
 				// map key is the alias
@@ -728,7 +728,7 @@ void mvceditor::SymbolTableClass::ResolveNamespaceAlias(pelet::ExpressionClass& 
 	// leave fully qualified names alon
 	UnicodeString name = parsedExpression.FirstValue();
 	if (!name.startsWith(UNICODE_STRING_SIMPLE("$")) && !name.startsWith(UNICODE_STRING_SIMPLE("\\"))) {
-		std::map<UnicodeString, UnicodeString, UnicodeStringComparatorClass>::const_iterator it;
+		std::map<UnicodeString, UnicodeString, pelet::UnicodeStringComparatorClass>::const_iterator it;
 		for (it = scope.NamespaceAliases.begin(); it != scope.NamespaceAliases.end(); ++it) {
 			
 			// map key is the alias
@@ -755,7 +755,7 @@ void mvceditor::SymbolTableClass::UnresolveNamespaceAlias(const pelet::Expressio
 	// leave variables and fully qualified names alone
 	if (!originalExpression.FirstValue().startsWith(UNICODE_STRING_SIMPLE("$")) && !originalExpression.FirstValue().startsWith(UNICODE_STRING_SIMPLE("\\"))) {
 		
-		std::map<UnicodeString, UnicodeString, UnicodeStringComparatorClass>::const_iterator it;
+		std::map<UnicodeString, UnicodeString, pelet::UnicodeStringComparatorClass>::const_iterator it;
 		for (it = scope.NamespaceAliases.begin(); it != scope.NamespaceAliases.end(); ++it) {
 			
 			// map value is the fully qualified name

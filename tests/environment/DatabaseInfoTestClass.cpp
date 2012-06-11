@@ -26,6 +26,7 @@
 #include <DatabaseTestFixtureClass.h>
 #include <environment/DatabaseInfoClass.h>
 #include <windows/StringHelperClass.h>
+#include <MvcEditorChecks.h>
 #include <soci.h>
 
 class DatabaseInfoTestFixtureClass : public DatabaseTestFixtureClass {
@@ -62,16 +63,16 @@ TEST_FIXTURE(DatabaseInfoTestFixtureClass, ConnectQueryAndResults) {
 	CHECK_EQUAL(0, results.Error.length());
 	CHECK(results.Success);
 	CHECK_EQUAL(3, results.AffectedRows);
-	CHECK_EQUAL((size_t)3, results.StringResults.size());
+	CHECK_VECTOR_SIZE(3, results.StringResults);
 	CHECK_EQUAL(0, error.length());
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("1"), results.StringResults[0][0]);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("one"), results.StringResults[0][1]);
+	CHECK_UNISTR_EQUALS("1", results.StringResults[0][0]);
+	CHECK_UNISTR_EQUALS("one", results.StringResults[0][1]);
 	
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("2"), results.StringResults[1][0]);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("two"), results.StringResults[1][1]);
+	CHECK_UNISTR_EQUALS("2", results.StringResults[1][0]);
+	CHECK_UNISTR_EQUALS("two", results.StringResults[1][1]);
 
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("3"), results.StringResults[2][0]);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("three"), results.StringResults[2][1]);
+	CHECK_UNISTR_EQUALS("3", results.StringResults[2][0]);
+	CHECK_UNISTR_EQUALS("three", results.StringResults[2][1]);
 }
 
 TEST_FIXTURE(DatabaseInfoTestFixtureClass, MultipleQueries) {
@@ -100,7 +101,7 @@ TEST_FIXTURE(DatabaseInfoTestFixtureClass, MultipleQueries) {
 	CHECK(query.Execute(session, results2, UNICODE_STRING_SIMPLE("SELECT * FROM names ORDER BY id;")));
 	CHECK_EQUAL(0, results2.Error.length());
 	CHECK(results2.Success);
-	CHECK_EQUAL((size_t)3, results2.StringResults.size());
+	CHECK_VECTOR_SIZE(3, results2.StringResults);
 	CHECK_EQUAL(3, results2.AffectedRows);
 	results2.Close();
 	
