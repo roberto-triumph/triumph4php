@@ -85,8 +85,9 @@ function checkWxWidgets()
 			print "WXWIN environment variable not found. Generated Solution file WILL NOT WORK. Please install wxPack."
 		end
 	elseif os.is "linux" then
-		if not os.execute(WX_CONFIG .. " --version") then
-			error "Could not execute wx-confing. Change the location of WX_CONFIG in premake_opts_linux.lua.\n"
+		print(WX_CONFIG .. " --version")
+		if 0 ~= os.execute(WX_CONFIG .. " --version") then
+			error "Could not execute wx-config. Change the location of WX_CONFIG in premake_opts_linux.lua.\n"
 		end
 	else
 		error "You are running on a non-supported operating system. MVC Editor cannot be built.\n"
@@ -118,8 +119,9 @@ function checkIcu()
 					"(Note: Batch Build \"Select All\" won't work on Visual Studio 2008 Express Edition because it does not support 64 bit compilation)")
 		end
 	elseif os.is "linux" then
-		if not os.execute(ICU_CONFIG .. " --exists") then
-			error "Could not execute icu-confing. Change the location of ICU_CONFIG in premake_opts_linux.lua.\n"
+		print(ICU_CONFIG .. " --exists")
+		if 0 ~= os.execute(ICU_CONFIG .. " --exists") then
+			error "Could not execute icu-config. Change the location of ICU_CONFIG in premake_opts_linux.lua.\n"
 		end
 	else 
 		error "You are running on a non-supported operating system. MVC Editor cannot be built.\n"
@@ -165,7 +167,7 @@ function checkSoci()
 		
 		-- soci lib dirs are named according to architecture
 		if os.isdir "lib/soci/mvc-editor/lib64" then
-			libs = os.matchfiles("/lib/soci/mvc-editor/lib64/*.so*");
+			libs = os.matchfiles("lib/soci/mvc-editor/lib64/*.so*");
 			if #libs > 0 then
 				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/lib64/*.so* Debug/");
 				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/lib64/*.so* Release/");
@@ -173,7 +175,7 @@ function checkSoci()
 				error "SOCI library has not been built.  Execute the premake soci action: ./premake4 soci"
 			end
 		else
-			libs = os.matchfiles("/lib/soci/mvc-editor/lib/*.so*");
+			libs = os.matchfiles("lib/soci/mvc-editor/lib/*.so*");
 			if #libs > 0 then
 				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/lib/*.so* Debug/");
 				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/lib/*.so* Release/");
@@ -206,9 +208,14 @@ function checkMysql()
 				"and extract to " .. MYSQL_LIB_DIR)
 		end
 	elseif os.is "linux" then
-		libs = os.matchfiles(MYSQL_LIB_DIR .. "/" .. MYSQL_LIB_NAME);
-		if #libs <= 0 then
-			error "MySQL libraries not found. Please install the MySQL C client library, or change the location of MYSQL_LIB_DIR int premake_opts_linux.lua"
+		mysqlLib = MYSQL_LIB_DIR .. MYSQL_LIB_NAME
+		cmd = "ls " .. mysqlLib
+		print(cmd)
+		found = os.execute(cmd)
+		if 0 ~= found  then
+			error ("MySQL libraries not found (" .. mysqlLib .. 
+				"). Please install the MySQL C client library, or change the location of " ..
+				" MYSQL_LIB_DIR int premake_opts_linux.lua")
 		end
 	else 
 		error "You are running on a non-supported operating system. MVC Editor cannot be built.\n"

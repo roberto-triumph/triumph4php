@@ -75,21 +75,10 @@ WX_CONFIG = 'wx-config'
 CMAKE = 'cmake';
 
 -- will look for MySQL files in these directories
-if os.is "windows" then
-   
-	-- not easy to get MySQL Connector C libs in windows
-	-- doing a manual, binary install
-	MYSQL_INCLUDE_DIR = 'lib/mysql-connector-c-noinstall-6.0.2-win32/include'
-	MYSQL_LIB = 'lib/mysql-connector-c-noinstall-6.0.2-win32/lib/libmysql.lib'
-	MYSQL_LIB_DIR = 'lib/mysql-connector-c-noinstall-6.0.2-win32/lib/'
-else
-
-	-- on linux we will assume it is installed system-wide
-	MYSQL_INCLUDE_DIR = '/usr/include/mysql/'
-	MYSQL_LIB_NAME = 'libmysqlclient_r.so'
-	MYSQL_LIB_DIR = '/usr/lib/'
-	
-end
+-- on linux we will assume it is installed system-wide
+MYSQL_INCLUDE_DIR = '/usr/include/mysql/'
+MYSQL_LIB_NAME = 'libmysqlclient.so'
+MYSQL_LIB_DIR = '/usr/lib/'
 
 -- On some unit tests, MVC Editor attempt to connect to a database
 -- Set the username and password to use here.
