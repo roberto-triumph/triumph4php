@@ -124,10 +124,7 @@ public:
 	 */
 	CallStackThreadClass CallStackThread;
 
-	/**
-	 * the URL that the user chose to view files from
-	 */
-	UrlResourceClass ChosenUrl;
+	void SetCurrentUrl(mvceditor::UrlResourceClass url);
 	
 	void AddToolsMenuItems(wxMenu* toolsMenu);
 

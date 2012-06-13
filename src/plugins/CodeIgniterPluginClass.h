@@ -68,6 +68,10 @@ private:
 	 */
 	void UpdateMenu();
 
+	void GoToController();
+
+	void GoToView();
+
 	/**
 	 * This is the list of config files that were parsed from the result
 	 * of the detection command.

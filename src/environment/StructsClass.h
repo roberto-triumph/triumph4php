@@ -66,6 +66,11 @@ public:
 	 */
 	std::vector<mvceditor::ViewInfoClass> CurrentViewInfos;
 
+	/**
+	 * the URL that the user chose to view files from
+	 */
+	UrlResourceClass CurrentUrl;
+
 	StructsClass();
 
 };

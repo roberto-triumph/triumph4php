@@ -146,12 +146,12 @@ wxString mvceditor::ViewFilePluginClass::CurrentFile() {
 void mvceditor::ViewFilePluginClass::StartDetection() {	
 	
 	// start the chain reaction
-	wxString url = ChosenUrl.Url.BuildURI();
+	wxString url = App->Structs.CurrentUrl.Url.BuildURI();
 	if (!url.IsEmpty()) {
-		wxFileName fileName = ChosenUrl.FileName;
+		wxFileName fileName = App->Structs.CurrentUrl.FileName;
 		if (fileName.IsOk()) {
-			UnicodeString className = mvceditor::StringHelperClass::wxToIcu(ChosenUrl.ClassName);
-			UnicodeString methodName =  mvceditor::StringHelperClass::wxToIcu(ChosenUrl.MethodName);
+			UnicodeString className = mvceditor::StringHelperClass::wxToIcu(App->Structs.CurrentUrl.ClassName);
+			UnicodeString methodName =  mvceditor::StringHelperClass::wxToIcu(App->Structs.CurrentUrl.MethodName);
 			CallStackThread.InitCallStack(*GetResourceCache());
 			if (!CallStackThread.InitThread(fileName, className, methodName)) {
 				mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Call stack file creation failed"));
@@ -199,6 +199,10 @@ void mvceditor::ViewFilePluginClass::OpenFile(wxString file) {
 	if (fileName.IsOk()) {
 		GetNotebook()->LoadPage(fileName.GetFullPath());
 	}
+}
+
+void mvceditor::ViewFilePluginClass::SetCurrentUrl(mvceditor::UrlResourceClass url) {
+	App->Structs.CurrentUrl = url;
 }
 
 std::vector<mvceditor::ViewInfoClass> mvceditor::ViewFilePluginClass::CurrentViewInfos() {
@@ -320,7 +324,7 @@ void mvceditor::ViewFilePanelClass::OnActionChoice(wxCommandEvent& event) {
 	}
 	if (!url.Url.BuildURI().IsEmpty()) {
 		StatusLabel->SetLabel(_("Detecting"));
-		Plugin.ChosenUrl = url;
+		Plugin.SetCurrentUrl(url);
 		Plugin.StartDetection();
 	}
 }

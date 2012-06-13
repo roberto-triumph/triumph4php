@@ -27,6 +27,7 @@
 #include <MvcEditor.h>
 #include <Events.h>
 #include <windows/StringHelperClass.h>
+#include <wx/choicdlg.h>
 
 mvceditor::CodeIgniterPluginClass::CodeIgniterPluginClass()  
 	: PluginClass()
@@ -94,7 +95,15 @@ void mvceditor::CodeIgniterPluginClass::UpdateMenu() {
 	CodeIgniterMenu->Append(MENU_CODE_IGNITER + ConfigFiles.size() + 1, 
 		_("New Code Igniter Controller"), 
 		_("Create a new PHP File That Will Contain a Code Igniter controller"));
-	MenuBar->Insert(MenuBar->GetMenuCount() - 1, CodeIgniterMenu, _("Code Igniter"));
+	CodeIgniterMenu->Append(MENU_CODE_IGNITER + ConfigFiles.size() + 2, 
+		_("Navigate To View"), 
+		_("Go to the current controller's view."));
+	CodeIgniterMenu->Append(MENU_CODE_IGNITER + ConfigFiles.size() + 3, 
+		_("Navigate To Controller"), 
+		_("Go to the current view's controller."));
+	if (MenuBar->FindMenu(_("Code Igniter")) == wxNOT_FOUND) {
+		MenuBar->Insert(MenuBar->GetMenuCount() - 1, CodeIgniterMenu, _("Code Igniter"));
+	}
 }
 
 void mvceditor::CodeIgniterPluginClass::OnMenuItem(wxCommandEvent& event) {
@@ -160,6 +169,12 @@ void mvceditor::CodeIgniterPluginClass::OnMenuItem(wxCommandEvent& event) {
 			int32_t index = contents.indexOf(UNICODE_STRING_SIMPLE("Controller"));
 			codeControl->SetSelectionByCharacterPosition(index, index + 10); // 10 => length of Controller
 		}
+		else if (id == (int)(MENU_CODE_IGNITER + ConfigFiles.size() + 2)) {
+			GoToView();
+		}
+		else if (id == (int)(MENU_CODE_IGNITER + ConfigFiles.size() + 3)) {
+			GoToController();
+		}
 	}
 	else {
 		mvceditor::EditorLogWarning(mvceditor::INVALID_FILE, wxT("invalid event object"));
@@ -172,7 +187,53 @@ void mvceditor::CodeIgniterPluginClass::AddKeyboardShortcuts(std::vector<Dynamic
 	// shown/hidden depending on the project
 }
 
+void mvceditor::CodeIgniterPluginClass::GoToView() {
+	mvceditor::CodeControlClass* codeCtrl = GetCurrentCodeControl();
+	if (codeCtrl) {
+		std::vector<mvceditor::ViewInfoClass> viewInfos = App->Structs.CurrentViewInfos;
+
+		// go through the chosen url, and get the templates for that controller
+		wxArrayString controllerViews;
+		for (size_t i = 0; i < viewInfos.size(); ++i) {
+			mvceditor::ViewInfoClass viewInfo = viewInfos[i];
+			wxFileName viewFileName(viewInfo.FileName);
+			if (viewFileName.IsOk()) {
+				controllerViews.Add(viewInfo.FileName);
+			}			
+		}
+		if (controllerViews.size() == 1) {
+			GetNotebook()->LoadPage(controllerViews[0]);
+		}
+		else {
+			wxMultiChoiceDialog dialog(GetMainWindow(), _("Select View(s) to open"),
+				_("Go to a view"), controllerViews);
+			dialog.SetSize(600, 200);
+			if (dialog.ShowModal() == wxID_OK) {
+				wxArrayInt selections = dialog.GetSelections();
+				std::vector<wxString> chosen;
+				for (size_t i = 0; i < selections.size(); ++i) {
+					chosen.push_back(controllerViews[selections[i]]);
+				}
+				if (!chosen.empty()) {
+					GetNotebook()->LoadPages(chosen);
+				}
+			}
+		}
+	}
+}
+
+void mvceditor::CodeIgniterPluginClass::GoToController() {
+	mvceditor::CodeControlClass* codeCtrl = GetCurrentCodeControl();
+	if (codeCtrl) {
+		wxFileName currentFileName(codeCtrl->GetFileName());
+		mvceditor::UrlResourceClass urlResource = App->Structs.CurrentUrl;
+		if (urlResource.FileName.IsOk()) {
+			GetNotebook()->LoadPage(urlResource.FileName.GetFullPath());
+		}
+	}
+}
+
 BEGIN_EVENT_TABLE(mvceditor::CodeIgniterPluginClass, wxEvtHandler) 
-	EVT_MENU_RANGE(MENU_CODE_IGNITER, MENU_CODE_IGNITER + 13, mvceditor::CodeIgniterPluginClass::OnMenuItem)
+	EVT_MENU_RANGE(MENU_CODE_IGNITER, MENU_CODE_IGNITER + 15, mvceditor::CodeIgniterPluginClass::OnMenuItem)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_OPENED, mvceditor::CodeIgniterPluginClass::OnProjectOpened)
 END_EVENT_TABLE()
