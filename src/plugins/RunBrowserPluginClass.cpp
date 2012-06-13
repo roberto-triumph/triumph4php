@@ -259,13 +259,13 @@ void mvceditor::RunBrowserPluginClass::LoadPreferences(wxConfigBase* config) {
 	// the proper data
 	mvceditor::EnvironmentClass* environment = GetEnvironment();
 	for (std::vector<mvceditor::WebBrowserClass>::const_iterator it = environment->WebBrowsers.begin(); it != environment->WebBrowsers.end(); ++it) {
-		App->UrlResourceFinder.Browsers.push_back(it->Name);
+		App->Structs.UrlResourceFinder.Browsers.push_back(it->Name);
 	}
-	if (!App->UrlResourceFinder.Browsers.empty()) {
-		App->UrlResourceFinder.ChosenBrowser = App->UrlResourceFinder.Browsers[0];
+	if (!App->Structs.UrlResourceFinder.Browsers.empty()) {
+		App->Structs.UrlResourceFinder.ChosenBrowser = App->Structs.UrlResourceFinder.Browsers[0];
 	}
 	if (BrowserToolbar) {
-		BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, App->UrlResourceFinder.Browsers[0]);
+		BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, App->Structs.UrlResourceFinder.Browsers[0]);
 		BrowserToolbar->Realize();
 	}
 }
@@ -273,26 +273,26 @@ void mvceditor::RunBrowserPluginClass::LoadPreferences(wxConfigBase* config) {
 void mvceditor::RunBrowserPluginClass::OnEnvironmentUpdated(wxCommandEvent& event) {
 
 	// need to update the browser toolbar if the user updates the environment
-	App->UrlResourceFinder.Browsers.clear();
+	App->Structs.UrlResourceFinder.Browsers.clear();
 	mvceditor::EnvironmentClass* environment = GetEnvironment();
 	for (std::vector<mvceditor::WebBrowserClass>::const_iterator it = environment->WebBrowsers.begin(); it != environment->WebBrowsers.end(); ++it) {
-		App->UrlResourceFinder.Browsers.push_back(it->Name);
+		App->Structs.UrlResourceFinder.Browsers.push_back(it->Name);
 	}
 
 	// for now just make the first item as selected
-	if (!App->UrlResourceFinder.Browsers.empty()) {
-		App->UrlResourceFinder.ChosenBrowser = App->UrlResourceFinder.Browsers[0];
+	if (!App->Structs.UrlResourceFinder.Browsers.empty()) {
+		App->Structs.UrlResourceFinder.ChosenBrowser = App->Structs.UrlResourceFinder.Browsers[0];
 	}
 	if (BrowserToolbar) {
-		BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, App->UrlResourceFinder.Browsers[0]);
+		BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, App->Structs.UrlResourceFinder.Browsers[0]);
 		BrowserToolbar->Realize();
 		AuiManager->Update();
 	}
 }
 
 void mvceditor::RunBrowserPluginClass::OnRunInWebBrowser(wxCommandEvent& event) {
-	wxString browserName = App->UrlResourceFinder.ChosenBrowser;
-	wxURI url = App->UrlResourceFinder.ChosenUrl.Url;
+	wxString browserName = App->Structs.UrlResourceFinder.ChosenBrowser;
+	wxURI url = App->Structs.UrlResourceFinder.ChosenUrl.Url;
 	if (!browserName.IsEmpty() && !url.BuildURI().IsEmpty()) {
 		mvceditor::EnvironmentClass* environment = GetEnvironment();
 		ExternalBrowser(browserName, url, environment);
@@ -334,7 +334,7 @@ void mvceditor::RunBrowserPluginClass::OnBrowserToolDropDown(wxAuiToolBarEvent& 
 
 void mvceditor::RunBrowserPluginClass::OnUrlToolDropDown(wxAuiToolBarEvent& event) {
 	if (event.IsDropDownClicked()) {
-		if (App->UrlResourceFinder.Urls.empty()) {
+		if (App->Structs.UrlResourceFinder.Urls.empty()) {
 			return;
 		}
 		BrowserToolbar->SetToolSticky(event.GetId(), true);
@@ -369,7 +369,7 @@ void mvceditor::RunBrowserPluginClass::OnUrlToolDropDown(wxAuiToolBarEvent& even
 }
 
 void mvceditor::RunBrowserPluginClass::OnUrlSearchTool(wxCommandEvent& event) {
-	if (!App->UrlResourceFinder.Urls.empty()) {
+	if (!App->Structs.UrlResourceFinder.Urls.empty()) {
 		ShowUrlDialog();
 	}
 	else {
@@ -397,38 +397,38 @@ void mvceditor::RunBrowserPluginClass::OnCmdUrls(wxCommandEvent& event) {
 }
 
 void mvceditor::RunBrowserPluginClass::ShowUrlDialog() {
-	mvceditor::ChooseUrlDialogClass dialog(GetMainWindow(), App->UrlResourceFinder, App->UrlResourceFinder.ChosenUrl);
-	if (wxOK == dialog.ShowModal() && !App->UrlResourceFinder.ChosenUrl.Url.BuildURI().IsEmpty()) {
+	mvceditor::ChooseUrlDialogClass dialog(GetMainWindow(), App->Structs.UrlResourceFinder, App->Structs.UrlResourceFinder.ChosenUrl);
+	if (wxOK == dialog.ShowModal() && !App->Structs.UrlResourceFinder.ChosenUrl.Url.BuildURI().IsEmpty()) {
 				
 		// 'select' the URL (make it the current in the toolbar)
-		BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, App->UrlResourceFinder.ChosenUrl.Url.BuildURI());
+		BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, App->Structs.UrlResourceFinder.ChosenUrl.Url.BuildURI());
 		BrowserToolbar->Realize();
 		AuiManager->Update();
 
 		// add it to the Recent list, or push up to the top of the Recent list if its already there
 		bool found = false;
 		for (std::vector<mvceditor::UrlResourceClass>::iterator it = RecentUrls.begin(); it  != RecentUrls.end(); ++it) {
-			if (it->Url == App->UrlResourceFinder.ChosenUrl.Url) {
+			if (it->Url == App->Structs.UrlResourceFinder.ChosenUrl.Url) {
 				found = true;
 				RecentUrls.erase(it);
-				RecentUrls.insert(RecentUrls.begin(), App->UrlResourceFinder.ChosenUrl);
+				RecentUrls.insert(RecentUrls.begin(), App->Structs.UrlResourceFinder.ChosenUrl);
 				break;
 			}
 		}
 		if (!found) {
-			RecentUrls.insert(RecentUrls.begin(), App->UrlResourceFinder.ChosenUrl);
+			RecentUrls.insert(RecentUrls.begin(), App->Structs.UrlResourceFinder.ChosenUrl);
 		}
 		mvceditor::EnvironmentClass* environment = GetEnvironment();
-		wxString browserName = App->UrlResourceFinder.ChosenBrowser;
+		wxString browserName = App->Structs.UrlResourceFinder.ChosenBrowser;
 		if (!browserName.IsEmpty()) {
-			ExternalBrowser(browserName, App->UrlResourceFinder.ChosenUrl.Url, environment);
+			ExternalBrowser(browserName, App->Structs.UrlResourceFinder.ChosenUrl.Url, environment);
 		}
 	}
 }
 
 void mvceditor::RunBrowserPluginClass::OnUrlDetectionComplete(mvceditor::UrlDetectedEventClass& event) {
 	for (size_t i = 0; i < event.Urls.size(); ++i) {
-		App->UrlResourceFinder.Urls.push_back(event.Urls[i]);
+		App->Structs.UrlResourceFinder.Urls.push_back(event.Urls[i]);
 	}
 	wxRemoveFile(ResourceCacheFileName.GetFullPath());
 	GetStatusBarWithGauge()->StopGauge(ID_URL_GAUGE);
@@ -455,9 +455,9 @@ void mvceditor::RunBrowserPluginClass::OnBrowserToolMenuItem(wxCommandEvent& eve
 	// change both the data structure and the toolbar
 	if (BrowserMenu.get()) {
 		wxString name = BrowserMenu->GetLabelText(event.GetId());
-		std::vector<wxString>::iterator found = std::find(App->UrlResourceFinder.Browsers.begin(), App->UrlResourceFinder.Browsers.end(), name);
-		if (found != App->UrlResourceFinder.Browsers.end()) {
-			App->UrlResourceFinder.ChosenBrowser = name;
+		std::vector<wxString>::iterator found = std::find(App->Structs.UrlResourceFinder.Browsers.begin(), App->Structs.UrlResourceFinder.Browsers.end(), name);
+		if (found != App->Structs.UrlResourceFinder.Browsers.end()) {
+			App->Structs.UrlResourceFinder.ChosenBrowser = name;
 			BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, name);
 			BrowserToolbar->Realize();
 			AuiManager->Update();
@@ -473,9 +473,9 @@ void mvceditor::RunBrowserPluginClass::OnUrlToolMenuItem(wxCommandEvent& event) 
 	if (UrlMenu.get()) {
 		wxString name = UrlMenu->GetLabelText(event.GetId());
 		mvceditor::UrlResourceClass urlResource;
-		bool found = App->UrlResourceFinder.FindByUrl(name, urlResource);
+		bool found = App->Structs.UrlResourceFinder.FindByUrl(name, urlResource);
 		if (found) {
-			App->UrlResourceFinder.ChosenUrl = urlResource;
+			App->Structs.UrlResourceFinder.ChosenUrl = urlResource;
 			BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, name);
 			BrowserToolbar->Realize();
 			AuiManager->Update();
@@ -512,8 +512,8 @@ void mvceditor::RunBrowserPluginClass::OnProcessInProgress(wxCommandEvent& event
 
 void mvceditor::RunBrowserPluginClass::OnProjectOpened(wxCommandEvent& event) {
 	RecentUrls.clear();
-	App->UrlResourceFinder.Urls.clear();
-	App->UrlResourceFinder.ChosenUrl.Reset();
+	App->Structs.UrlResourceFinder.Urls.clear();
+	App->Structs.UrlResourceFinder.ChosenUrl.Reset();
 	if (BrowserToolbar) {
 		BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, _("No URLs"));
 		BrowserToolbar->Realize();

@@ -26,8 +26,7 @@
 #include <php_frameworks/FrameworkDetectorClass.h>
 #include <widgets/ResourceCacheClass.h>
 #include <windows/AppFrameClass.h>
-#include <environment/EnvironmentClass.h>
-#include <environment/UrlResourceClass.h>
+#include <environment/StructsClass.h>
 #include <plugins/ProjectPluginClass.h>
 #include <PluginClass.h>
 #include <PreferencesClass.h>
@@ -44,28 +43,16 @@ class AppClass : public wxApp {
 public:
 
 	/**
-	 * The environment stack.
-	 * 
-	 * @var EnvironmentClass
+	 * Important source code program structures, like resources (tags)
+	 * URLs, templates.
 	 */
-	EnvironmentClass Environment;
-	
-	/**
-	 * This object will be used to parse the resources of files that are currently open.
-	 */
-	ResourceCacheClass ResourceCache;
+	mvceditor::StructsClass Structs;
 		
 	/**
 	 * This object will be used to detct the various PHP framework artifacts (resources,
 	 * database connections, route URLs).
 	 */
 	PhpFrameworkDetectorClass PhpFrameworks;
-	
-	/**
-	 * The URLs (entry points to the current project) that have been detected so far. Also holds the 
-	 * "current" URL.
-	 */
-	UrlResourceFinderClass UrlResourceFinder;
 
 	/**
 	 * Any plugins should post any useful events to this event handler

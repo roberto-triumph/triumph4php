@@ -87,8 +87,7 @@ void mvceditor::CallStackThreadClass::Entry() {
 mvceditor::ViewFilePluginClass::ViewFilePluginClass() 
 	: PluginClass() 
 	, FrameworkDetector(NULL) 
-	, CallStackThread(*this) 
-	, CurrentViewInfos() {
+	, CallStackThread(*this) {
 }
 
 void mvceditor::ViewFilePluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
@@ -97,7 +96,7 @@ void mvceditor::ViewFilePluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
 }
 
 void mvceditor::ViewFilePluginClass::OnViewInfosMenu(wxCommandEvent& event) {
-	if (!App->UrlResourceFinder.Urls.empty()) {
+	if (!App->Structs.UrlResourceFinder.Urls.empty()) {
 		ShowPanel();
 	}
 	else {
@@ -153,12 +152,12 @@ void mvceditor::ViewFilePluginClass::StartDetection() {
 		if (fileName.IsOk()) {
 			UnicodeString className = mvceditor::StringHelperClass::wxToIcu(ChosenUrl.ClassName);
 			UnicodeString methodName =  mvceditor::StringHelperClass::wxToIcu(ChosenUrl.MethodName);
-			CallStackThread.InitCallStack(App->ResourceCache);
+			CallStackThread.InitCallStack(*GetResourceCache());
 			if (!CallStackThread.InitThread(fileName, className, methodName)) {
 				mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Call stack file creation failed"));
 			}
 			else {
-				CurrentViewInfos.clear();
+				App->Structs.CurrentViewInfos.clear();
 			}				
 		}
 	}
@@ -169,14 +168,14 @@ void mvceditor::ViewFilePluginClass::OnWorkComplete(wxCommandEvent& event) {
 		FrameworkDetector.reset(new mvceditor::PhpFrameworkDetectorClass(*this, *GetEnvironment()));
 	}
 	FrameworkDetector->Identifiers = PhPFrameworks().Identifiers;
-	if (!FrameworkDetector->InitViewInfosDetector(GetProject()->GetRootPath(), App->UrlResourceFinder.ChosenUrl.Url.BuildURI(), CallStackThread.StackFile)) {
+	if (!FrameworkDetector->InitViewInfosDetector(GetProject()->GetRootPath(), App->Structs.UrlResourceFinder.ChosenUrl.Url.BuildURI(), CallStackThread.StackFile)) {
 		mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Could not start ViewInfos detector"));
 	}
 }
 	
 void mvceditor::ViewFilePluginClass::OnViewInfosDetectionComplete(mvceditor::ViewInfosDetectedEventClass& event) {
 	wxWindow* window = FindOutlineWindow(ID_VIEW_FILE_PANEL);
-	CurrentViewInfos = event.ViewInfos;
+	App->Structs.CurrentViewInfos = event.ViewInfos;
 	ViewFilePanelClass* viewPanel = NULL;
 	if (window) {
 		viewPanel = (ViewFilePanelClass*)window;
@@ -192,7 +191,7 @@ void mvceditor::ViewFilePluginClass::OnViewInfosDetectionFailed(wxCommandEvent& 
 }
 
 mvceditor::UrlResourceFinderClass& mvceditor::ViewFilePluginClass::Urls() {
-	return App->UrlResourceFinder;
+	return App->Structs.UrlResourceFinder;
 }
 
 void mvceditor::ViewFilePluginClass::OpenFile(wxString file) {
@@ -200,6 +199,10 @@ void mvceditor::ViewFilePluginClass::OpenFile(wxString file) {
 	if (fileName.IsOk()) {
 		GetNotebook()->LoadPage(fileName.GetFullPath());
 	}
+}
+
+std::vector<mvceditor::ViewInfoClass> mvceditor::ViewFilePluginClass::CurrentViewInfos() {
+	return App->Structs.CurrentViewInfos;
 }
 
 mvceditor::ViewFilePanelClass::ViewFilePanelClass(wxWindow* parent, int id, mvceditor::ViewFilePluginClass& plugin)
@@ -228,14 +231,15 @@ void mvceditor::ViewFilePanelClass::UpdateControllers() {
 void mvceditor::ViewFilePanelClass::UpdateResults() {
 	if (Plugin.CallStackThread.LastError == mvceditor::CallStackClass::NONE || Plugin.CallStackThread.LastError == mvceditor::CallStackClass::RESOLUTION_ERROR) {
 		
-		StatusLabel->SetLabel(wxString::Format(_("Found %d view files"), Plugin.CurrentViewInfos.size()));
+		std::vector<mvceditor::ViewInfoClass> currentViewInfos = Plugin.CurrentViewInfos();
+		StatusLabel->SetLabel(wxString::Format(_("Found %d view files"), currentViewInfos.size()));
 		FileTree->DeleteAllItems();
 
 		wxTreeItemId parent = FileTree->AddRoot(_("Views"));
 		mvceditor::ProjectClass* project = Plugin.GetProject();
 		wxString root = project->GetRootPath();
-		for (size_t i = 0; i < Plugin.CurrentViewInfos.size(); ++i) {
-			wxString viewFile = Plugin.CurrentViewInfos[i].FileName;
+		for (size_t i = 0; i < currentViewInfos.size(); ++i) {
+			wxString viewFile = currentViewInfos[i].FileName;
 
 			// remove the project root so that the dialog is not too 'wordy'
 			wxString text = viewFile.Mid(root.Len());
@@ -249,14 +253,14 @@ void mvceditor::ViewFilePanelClass::UpdateResults() {
 		FileTree->ExpandAll();
 		
 		int variableCount = 0;
-		for (size_t i = 0; i < Plugin.CurrentViewInfos.size(); ++i) {
-			variableCount += Plugin.CurrentViewInfos[i].TemplateVariables.size();
+		for (size_t i = 0; i < currentViewInfos.size(); ++i) {
+			variableCount += currentViewInfos[i].TemplateVariables.size();
 		}
 		TemplateVariablesLabel->SetLabel(wxString::Format(_("Found %d template variables"),variableCount));
 		TemplateVariablesTree->DeleteAllItems();
 		parent = TemplateVariablesTree->AddRoot(_("Template Variables"));
-		for (size_t i = 0; i < Plugin.CurrentViewInfos.size(); ++i) {
-			mvceditor::ViewInfoClass viewInfo = Plugin.CurrentViewInfos[i];
+		for (size_t i = 0; i < currentViewInfos.size(); ++i) {
+			mvceditor::ViewInfoClass viewInfo = currentViewInfos[i];
 			wxString text = viewInfo.FileName;
 			
 			// remove the project root so that the dialog is not too 'wordy'

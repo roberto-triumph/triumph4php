@@ -27,7 +27,7 @@
 
 #include <code_control/CodeControlClass.h>
 #include <php_frameworks/ProjectClass.h>
-#include <environment/EnvironmentClass.h>
+#include <environment/StructsClass.h>
 #include <Events.h>
 #include <wx/wx.h>
 #include <wx/aui/aui.h>
@@ -53,18 +53,10 @@ public:
 	CodeControlOptionsClass* CodeControlOptions;
 	
 	/**
-	 * This object will be used to parse the resources of files that are currently open.
+	 * This object is required by the source code controls
 	 * This class will NOT own this pointer.
 	 */
-	ResourceCacheClass* ResourceCache;
-	
-	/**
-	 * Source code editors need to know environment settings, like what version
-	 * of PHP to use.
-	 * 
-	 * This class will NOT own this pointer
-	 */
-	EnvironmentClass* Environment;
+	StructsClass* Structs;
 	
 	/**
 	 * Constructor. Parent is needed, all others are optional.

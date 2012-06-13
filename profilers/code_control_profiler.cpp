@@ -28,7 +28,7 @@
 #include <unicode/uclean.h>
 #include <code_control/CodeControlOptionsClass.h>
 #include <code_control/CodeControlClass.h>
-#include <widgets/ResourceCacheClass.h>
+#include <environment/StructsClass.h>
 #include <php_frameworks/ProjectClass.h>
 #include <search/FindInFilesClass.h>
 
@@ -49,8 +49,7 @@ public:
 	mvceditor::CodeControlOptionsClass Options;
 	mvceditor::ProjectOptionsClass ProjectOptions;
 	mvceditor::ProjectClass Project;
-	mvceditor::ResourceCacheClass ResourceCache;
-	mvceditor::EnvironmentClass Environment;
+	mvceditor::StructsClass Structs;
 };
 
 /**
@@ -143,15 +142,14 @@ CodeControlProfilerAppClass::CodeControlProfilerAppClass()
 	, Options()
 	, ProjectOptions()
 	, Project(ProjectOptions) 
-	, ResourceCache()
-	, Environment() {
+	, Structs() {
 		
 }
 
 bool CodeControlProfilerAppClass::OnInit() {
 	Options.EnableAutomaticLineIndentation = true;
 	Options.EnableAutoCompletion = true;
-	ResourceCache.BuildResourceCacheForNativeFunctionsGlobal();
+	Structs.ResourceCache.BuildResourceCacheForNativeFunctionsGlobal();
 	
 	CodeControlFrameClass* frame = new CodeControlFrameClass(*this);
 	SetTopWindow(frame);
@@ -167,7 +165,7 @@ int CodeControlProfilerAppClass::OnExit() {
 CodeControlFrameClass::CodeControlFrameClass(CodeControlProfilerAppClass& app) 
 	: wxFrame(NULL, wxID_ANY, wxT("CodeControlClass profiler"), wxDefaultPosition, 
 			wxSize(1024, 768)) {
-	Ctrl = new mvceditor::CodeControlClass(this, app.Options, &app.Project, &app.ResourceCache, &app.Environment, wxID_ANY);
+	Ctrl = new mvceditor::CodeControlClass(this, app.Options, &app.Project, &app.Structs, wxID_ANY);
 	Ctrl->SetDropTarget(new FileDropTargetClass(Ctrl));
 	Ctrl->SetDocumentMode(mvceditor::CodeControlClass::PHP);
 	CreateMenu();

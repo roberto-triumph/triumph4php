@@ -250,7 +250,9 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 						$currentView->variables = array();
 						if (MvcEditorCallClass::T_ARRAY == $call->paramType) {
 							foreach ($call->arrayKeys as $key) {
-								$currentView->variables[] = $key;
+							
+								// add the siguil here; editor expects us to return variables
+								$currentView->variables[] = '$' . $key;
 							}
 						}
 						$viewInfos[count($viewInfos) - 1] = $currentView;

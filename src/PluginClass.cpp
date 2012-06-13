@@ -62,11 +62,11 @@ mvceditor::NotebookClass* mvceditor::PluginClass::GetNotebook() const {
 }
 
 mvceditor::EnvironmentClass* mvceditor::PluginClass::GetEnvironment() {
-	return &App->Environment;
+	return &App->Structs.Environment;
 }
 
 mvceditor::ResourceCacheClass* mvceditor::PluginClass::GetResourceCache() {
-	return &App->ResourceCache;
+	return &App->Structs.ResourceCache;
 }
 
 mvceditor::PhpFrameworkDetectorClass& mvceditor::PluginClass::PhPFrameworks() const {

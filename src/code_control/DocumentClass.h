@@ -30,8 +30,7 @@
 #include <pelet/ParserClass.h>
 #include <pelet/LanguageDiscoveryClass.h>
 #include <language/SymbolTableClass.h>
-#include <widgets/ResourceCacheClass.h>
-#include <environment/EnvironmentClass.h>
+#include <environment/StructsClass.h>
 #include <wx/string.h>
 #include <wx/stc/stc.h>
 #include <unicode/unistr.h>
@@ -167,9 +166,10 @@ class PhpDocumentClass : public wxEvtHandler, public TextDocumentClass {
 public:
 
 	/**
-	 * This class will NOT own any of these pointer. Caller must manage (delete) it.
+	 * @param structs This class will NOT own this pointer. Caller must manage (delete) it.
+	 *   structs helps with autocompletion
 	 */
-	PhpDocumentClass(ProjectClass* project, ResourceCacheClass* resourceCache, EnvironmentClass* environment);
+	PhpDocumentClass(mvceditor::StructsClass* structs);
 
 	~PhpDocumentClass();
 
@@ -335,30 +335,23 @@ private:
 	wxString FileIdentifier;
 
 	/**
+	 * To access any global structures: the resource cache, template variables
 	 * This class will NOT own this pointer
 	 */
-	ProjectClass* Project;
-	
+	StructsClass* Structs;
+
 	/**
-	 * This object will be used to parse the resources of files that are currently open.
-	 * This class will NOT own this pointer
+	 * To parse the current source code in the background
 	 */
-	ResourceCacheClass* ResourceCache;
 	ResourceCacheUpdateThreadClass ResourceCacheUpdateThread;
 	
-
-	/**
-	 * This class will NOT own this pointer
-	 */
-	EnvironmentClass* Environment;
-
 	/**
 	 * The resource signature currently being displayed in the calltip.
 	 * index into CurrentCallTipResources
 	 */
 	size_t CurrentCallTipIndex;
 
-		/**
+	/**
 	 * This flag will control whether the document is "dirty" and needs to be re-parsed
 	 * This is NOT the same as GetModify() from scintilla; scintilla's Modify will be
 	 * set to false if the user undoes changes; but if a user undoes changes we still

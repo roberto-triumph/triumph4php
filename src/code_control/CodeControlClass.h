@@ -26,9 +26,8 @@
 #define MVCEDITORCODECONTROLCLASS_H_
 
 #include <php_frameworks/ProjectClass.h>
-#include <search/ResourceFinderClass.h>
 #include <code_control/CodeControlOptionsClass.h>
-#include <environment/EnvironmentClass.h>
+#include <environment/StructsClass.h>
 #include <wx/stc/stc.h>
 #include <wx/timer.h>
 #include <unicode/unistr.h>
@@ -97,14 +96,12 @@ public:
 	 * Constructor. 
 	 * @param ProjectClass* Memory management of project is left to the caller of this method. project
 	 * CANNOT be NULL.
-	 * @param ResourceCacheClass* resourceUpdates can be null. if null, then code completion will not be
-	 *        functional.
-	 * @param environment pointer to environment info, used to get the PHP version info. This object
+	 * @param StructsClass* To get items needed for autocompletion. This object
 	 *        will NOT own the pointer
 	 * 
 	 */
 	CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options, ProjectClass* project,
-					ResourceCacheClass* resourceCache, EnvironmentClass* environment,
+					StructsClass* structs,
 	                 int id, const wxPoint& position =
 	                     wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0,
 	                 const wxString& name = wxT("code"));
@@ -464,10 +461,11 @@ private:
 	DatabaseInfoClass CurrentInfo;
 
 	/**
-	* This object will be used to parse the resources of files that are currently open.
+	* This object will be used to parse the resources of files that are currently open
+	* and to use the proper version of PHP for auto completion.
 	* This class will NOT own this pointer.
 	*/
-	ResourceCacheClass* ResourceCache;
+	StructsClass* Structs;
 
 	/**
 	  * To help with autocompletion and keywords. This object will NOT own this pointer
@@ -475,11 +473,6 @@ private:
 	  * @var ProjectClass
 	  */
 	ProjectClass* Project;
-	
-	/**
-	 * to use the proper version of PHP for auto completion
-	 */
-	EnvironmentClass* Environment;
 
 	/**
 	 * This is the current specialization (document type) that is being used. This

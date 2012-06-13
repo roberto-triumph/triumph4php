@@ -174,7 +174,7 @@ void mvceditor::OutlineViewPluginClass::OnContextMenuOutline(wxCommandEvent& eve
 			if (notebook != NULL) {
 				outlineViewPanel = new OutlineViewPluginPanelClass(GetOutlineNotebook(), ID_WINDOW_OUTLINE, this, notebook);
 				if (AddOutlineWindow(outlineViewPanel, wxT("Outline"))) {
-					outlineViewPanel->SetClasses(App->ResourceCache.AllNonNativeClassesGlobal());
+					outlineViewPanel->SetClasses(GetResourceCache()->AllNonNativeClassesGlobal());
 					outlineViewPanel->RefreshOutlines();
 				}
 			}

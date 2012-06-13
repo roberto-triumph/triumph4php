@@ -112,7 +112,7 @@ EOF;
 		$this->fs->routes();
 		$viewInfos = $this->detector->viewInfos(vfsStream::url(''), 'http://localhost/mycontroller/index', vfsStream::url('tmp/call_stack.csv'));
 		$expected = array(
-			new MvcEditorViewInfoClass(vfsStream::url('/application/views/index.php'), array('name', 'address'))
+			new MvcEditorViewInfoClass(vfsStream::url('/application/views/index.php'), array('$name', '$address'))
 		);
 		$this->assertEquals($expected, $viewInfos);
 	}

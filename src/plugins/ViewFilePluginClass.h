@@ -123,12 +123,6 @@ public:
 	 * used to generate the call stack for the current URL
 	 */
 	CallStackThreadClass CallStackThread;
-	
-	/**
-	 * the final result; the view files that correspond to the
-	 * current URL
-	 */
-	std::vector<mvceditor::ViewInfoClass> CurrentViewInfos;
 
 	/**
 	 * the URL that the user chose to view files from
@@ -138,6 +132,12 @@ public:
 	void AddToolsMenuItems(wxMenu* toolsMenu);
 
 	UrlResourceFinderClass& Urls();
+
+	/**
+	 * the final result; the view files that correspond to the
+	 * current URL
+	 */
+	std::vector<mvceditor::ViewInfoClass> CurrentViewInfos();
 
 	/**
 	 * starts the view file detection process. This is an asynchronous operation.
