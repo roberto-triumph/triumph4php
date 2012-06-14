@@ -70,8 +70,8 @@ mvceditor::CliCommandEditDialogClass::CliCommandEditDialogClass(wxWindow* parent
 	}
 	TransferDataToWindow();
 	Executable->SetFocus();
-
 }
+
 void mvceditor::CliCommandEditDialogClass::OnOkButton(wxCommandEvent& event) {
 	if (TransferDataFromWindow()) {
 		EndModal(wxID_OK);
@@ -192,12 +192,16 @@ void mvceditor::CliCommandListDialogClass::OnOkButton(wxCommandEvent& event) {
 	EndModal(wxID_OK);
 }
 
-mvceditor::RunConsolePanelClass::RunConsolePanelClass(wxWindow* parent, EnvironmentClass* environment, StatusBarWithGaugeClass* gauge, int id)
+mvceditor::RunConsolePanelClass::RunConsolePanelClass(wxWindow* parent, int id, 
+													   mvceditor::EnvironmentClass* environment,
+													   mvceditor::StatusBarWithGaugeClass* gauge, 
+													   mvceditor::RunConsolePluginClass& plugin)
 	: RunConsolePanelGeneratedClass(parent, id)
 	, CommandString()
 	, ProcessWithHeartbeat(*this)
 	, Environment(environment)
 	, Gauge(gauge)
+	, Plugin(plugin)
 	, CurrentPid(0) {
 	wxGenericValidator commandValidator(&CommandString);
 	Command->SetValidator(commandValidator);
@@ -316,6 +320,44 @@ void  mvceditor::RunConsolePanelClass::OnProcessComplete(wxCommandEvent& event) 
 	RunButton->SetLabel(_("Run"));
 }
 
+void mvceditor::RunConsolePanelClass::OnStoreButton(wxCommandEvent& event) {
+	mvceditor::CliCommandClass newCommand;
+	wxString fullLine = Command->GetValue();
+	fullLine.Trim();
+	if (!fullLine.IsEmpty()) {
+		int spacePos = fullLine.Find(wxT(" "));
+		if (spacePos != wxNOT_FOUND) {
+			newCommand.Executable = fullLine.Mid(0, spacePos);
+			newCommand.Arguments = fullLine.Mid(spacePos + 1);
+			newCommand.ShowInToolbar = false;
+			newCommand.WaitForArguments = false;
+			
+			// prime the description with the base name in case
+			// executable is a full path
+			size_t pos = newCommand.Executable.Length();
+			for (; pos > 0; pos--) {
+				if (newCommand.Executable[pos] == wxT('/') || newCommand.Executable[pos] == wxT('\\')) {
+
+					// don't include the slash
+					pos++;
+					break;
+				}
+			}
+			newCommand.Description = newCommand.Executable.Mid(pos);
+		}
+		else {
+			newCommand.Executable = fullLine;
+		}
+
+		// using NULL so that the dialog is centered on the screen
+		mvceditor::CliCommandEditDialogClass dialog(NULL, wxID_ANY, newCommand);
+		if (dialog.ShowModal() == wxID_OK) {
+			Plugin.AddCommand(newCommand);
+			Plugin.PersistCommands();
+		}
+	}
+}
+
 mvceditor::RunConsolePluginClass::RunConsolePluginClass()
 	: PluginClass()
 	, RunCliMenuItem(NULL)
@@ -338,9 +380,10 @@ void mvceditor::RunConsolePluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
 		_("Run As CLI In New Window With Arguments\tCTRL+SHIFT+F7"), 
 		_("Run File As a PHP Command Line Script In a New Window With Arguments"), wxITEM_NORMAL);
 	toolsMenu->Append(RunCliWithArgsInNewWindowMenuItem);
+	toolsMenu->AppendSeparator();
 	toolsMenu->Append(mvceditor::MENU_RUN_PHP + 4, 
-		_("Saved Commands"),
-		_("Open a dialog that shows the saved commands"),
+		_("Saved CLI Commands"),
+		_("Open a dialog that shows the saved CLI commands"),
 		wxITEM_NORMAL);
 }
 
@@ -376,8 +419,8 @@ void mvceditor::RunConsolePluginClass::OnRunFileAsCli(wxCommandEvent& event) {
 		}
 	}
 	else if (code) {
-		RunConsolePanelClass* runConsolePanel = new RunConsolePanelClass(GetToolsNotebook(), GetEnvironment(), 
-			GetStatusBarWithGauge(), ID_WINDOW_CONSOLE);
+		RunConsolePanelClass* runConsolePanel = new RunConsolePanelClass(GetToolsNotebook(), ID_WINDOW_CONSOLE, 
+			GetEnvironment(), GetStatusBarWithGauge(), *this);
 
 		// set the name so that we can know which window pointer can be safely cast this panel back to the RunConsolePanelClass
 		if (AddToolsWindow(runConsolePanel, _("Run"), wxT("mvceditor::RunConsolePanelClass"))) {
@@ -395,8 +438,8 @@ void mvceditor::RunConsolePluginClass::OnRunFileAsCli(wxCommandEvent& event) {
 void mvceditor::RunConsolePluginClass::OnRunFileAsCliInNewWindow(wxCommandEvent& event) {
 	CodeControlClass* code = GetCurrentCodeControl();
 	if (code) {
-		RunConsolePanelClass* window = new RunConsolePanelClass(GetToolsNotebook(), GetEnvironment(), 
-			GetStatusBarWithGauge(), ID_WINDOW_CONSOLE);
+		RunConsolePanelClass* window = new RunConsolePanelClass(GetToolsNotebook(), ID_WINDOW_CONSOLE, 
+			GetEnvironment(), GetStatusBarWithGauge(), *this);
 		if (AddToolsWindow(window, _("Run"))) {
 			window->SetToRunFile(code->GetFileName());
 			window->SetFocusOnCommandText();
@@ -480,6 +523,10 @@ void mvceditor::RunConsolePluginClass::PersistCommands() {
 		config->Write(key, CliCommands[i].WaitForArguments);
 	}
 	config->Flush();
+}
+
+void mvceditor::RunConsolePluginClass::AddCommand(const mvceditor::CliCommandClass& command) {
+	CliCommands.push_back(command);
 }
 
 BEGIN_EVENT_TABLE(mvceditor::RunConsolePanelClass, wxPanel) 
