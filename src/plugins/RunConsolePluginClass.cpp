@@ -24,6 +24,7 @@
  */
 #include <plugins/RunConsolePluginClass.h>
 #include <MvcEditorErrors.h>
+#include <MvcEditor.h>
 #include <wx/artprov.h>
 #include <wx/filename.h>
 #include <wx/sstream.h>
@@ -31,6 +32,165 @@
 
 static const int ID_PROCESS = wxNewId();
 static const int ID_WINDOW_CONSOLE = wxNewId();
+
+mvceditor::CliCommandClass::CliCommandClass()
+	: Executable()
+	, Arguments()
+	, Description()
+	, WaitForArguments(false)
+	, ShowInToolbar(false) {
+}
+
+void mvceditor::CliCommandClass::Copy(const mvceditor::CliCommandClass& src) {
+	Executable = src.Executable;
+	Arguments = src.Arguments;
+	Description = src.Description;
+	WaitForArguments = src.WaitForArguments;
+	ShowInToolbar = src.ShowInToolbar;
+}
+
+mvceditor::CliCommandEditDialogClass::CliCommandEditDialogClass(wxWindow* parent, int id, mvceditor::CliCommandClass& command)
+	: CliCommandEditDialogGeneratedClass(parent, id) {
+	wxGenericValidator executableValidator(&command.Executable);
+	Executable->SetValidator(executableValidator);
+	wxGenericValidator argumentsValidator(&command.Arguments);
+	Arguments->SetValidator(argumentsValidator);
+	wxGenericValidator descriptionValidator(&command.Description);
+	Description->SetValidator(descriptionValidator);
+	wxGenericValidator waitValidator(&command.WaitForArguments);
+	WaitForArguments->SetValidator(waitValidator);
+	wxGenericValidator showValidator(&command.ShowInToolbar);
+	ShowInToolbar->SetValidator(showValidator);
+
+	// in case executable contains a full path
+	// we will allow Executable to contain relative binaries if they
+	// already exist in the user's or system path
+	if (wxFileName::FileExists(command.Executable)) {
+		ExecutableFilePicker->SetPath(command.Executable);
+	}
+	TransferDataToWindow();
+	Executable->SetFocus();
+
+}
+void mvceditor::CliCommandEditDialogClass::OnOkButton(wxCommandEvent& event) {
+	if (TransferDataFromWindow()) {
+		EndModal(wxID_OK);
+	}
+}
+
+void mvceditor::CliCommandEditDialogClass::OnHelpButton(wxCommandEvent& event) {
+	wxString help = wxString::FromAscii(
+		"Store a command for future use.\n"
+		"The command is the entire command line that will be executed.\n"
+		"The description is a bit of text that will be displayed in the \n"
+		"toolbars for this command. \n"
+		"If 'Wait For Arguments' is checked, then when this command is \n"
+		"run a new console will be opened but the command will not be \n"
+		"automatically run, you can enter in run time arguments in the command. "
+	);
+	help = wxGetTranslation(help);
+	wxMessageBox(help, _("Help"));
+}
+
+void mvceditor::CliCommandEditDialogClass::OnFileChanged(wxFileDirPickerEvent& event) {
+	Executable->SetValue(event.GetPath());
+}
+
+mvceditor::CliCommandListDialogClass::CliCommandListDialogClass(wxWindow* parent, int id, std::vector<mvceditor::CliCommandClass>& commands)
+	: CliCommandListDialogGeneratedClass(parent, id)	
+	, Commands(commands)
+	, EditedCommands(commands) {
+	FillList();
+}
+
+void mvceditor::CliCommandListDialogClass::FillList() {
+	for (size_t i = 0; i < EditedCommands.size(); ++i) {
+		CommandsList->Append(EditedCommands[i].Description);
+	}
+	if (!EditedCommands.empty()) {
+		CommandsList->SetSelection(0);
+	}
+}
+
+void mvceditor::CliCommandListDialogClass::OnUpButton(wxCommandEvent& event) {
+	size_t selection = (size_t) CommandsList->GetSelection();
+	if (selection > 0 && selection < EditedCommands.size()) {
+		mvceditor::CliCommandClass tmp = EditedCommands[selection];
+		EditedCommands[selection] = EditedCommands[selection - 1];
+		EditedCommands[selection - 1] = tmp;
+
+		CommandsList->SetSelection(selection - 1);
+		CommandsList->SetString(selection - 1, EditedCommands[selection - 1].Description);
+		CommandsList->SetString(selection, EditedCommands[selection].Description);
+	}
+}
+
+void mvceditor::CliCommandListDialogClass::OnDownButton(wxCommandEvent& event) {
+	size_t selection = (size_t) CommandsList->GetSelection();
+	if (selection >= 0 && selection < (EditedCommands.size() - 1)) {
+		mvceditor::CliCommandClass tmp = EditedCommands[selection];
+		EditedCommands[selection] = EditedCommands[selection + 1];
+		EditedCommands[selection + 1] = tmp;
+
+		CommandsList->SetSelection(selection + 1);
+		CommandsList->SetString(selection + 1, EditedCommands[selection + 1].Description);
+		CommandsList->SetString(selection, EditedCommands[selection].Description);
+	}
+}
+
+void mvceditor::CliCommandListDialogClass::OnAddButton(wxCommandEvent& event) {
+	mvceditor::CliCommandClass newCommand;
+	mvceditor::CliCommandEditDialogClass dialog(this, wxID_ANY, newCommand);
+	if (dialog.ShowModal() == wxID_OK) {
+		EditedCommands.push_back(newCommand);
+		CommandsList->Append(newCommand.Description);
+		CommandsList->SetSelection(EditedCommands.size() - 1);
+	}
+}
+
+void mvceditor::CliCommandListDialogClass::OnDeleteButton(wxCommandEvent& event) {
+	size_t selection = (size_t) CommandsList->GetSelection();
+	if (selection >= 0 && selection < EditedCommands.size()) {
+		CommandsList->Delete(selection);
+		EditedCommands.erase(EditedCommands.begin() + selection);
+		
+		if (selection >= EditedCommands.size() && !EditedCommands.empty()) {
+			CommandsList->SetSelection(EditedCommands.size() - 1);
+		}
+		else if (selection >= 0 && !EditedCommands.empty()) {
+			CommandsList->SetSelection(selection);
+		}
+	}
+}
+
+void mvceditor::CliCommandListDialogClass::OnListDoubleClick(wxCommandEvent& event) {
+	size_t selection = (size_t) event.GetSelection();
+	if (selection >= 0 && selection < EditedCommands.size()) {
+		mvceditor::CliCommandClass cliCommand = EditedCommands[selection];
+		mvceditor::CliCommandEditDialogClass dialog(this, wxID_ANY, cliCommand);
+		if (dialog.ShowModal() == wxID_OK) {
+			EditedCommands[selection] = cliCommand;
+			CommandsList->SetString(selection, cliCommand.Description);
+		}
+	}
+}
+
+void mvceditor::CliCommandListDialogClass::OnEditButton(wxCommandEvent& event) {
+	size_t selection = (size_t) CommandsList->GetSelection();
+	if (selection >= 0 && selection < EditedCommands.size()) {
+		mvceditor::CliCommandClass cliCommand = EditedCommands[selection];
+		mvceditor::CliCommandEditDialogClass dialog(this, wxID_ANY, cliCommand);
+		if (dialog.ShowModal() == wxID_OK) {
+			EditedCommands[selection] = cliCommand;
+			CommandsList->SetString(selection, cliCommand.Description);
+		}
+	}
+}
+
+void mvceditor::CliCommandListDialogClass::OnOkButton(wxCommandEvent& event) {
+	Commands = EditedCommands;
+	EndModal(wxID_OK);
+}
 
 mvceditor::RunConsolePanelClass::RunConsolePanelClass(wxWindow* parent, EnvironmentClass* environment, StatusBarWithGaugeClass* gauge, int id)
 	: RunConsolePanelGeneratedClass(parent, id)
@@ -178,6 +338,10 @@ void mvceditor::RunConsolePluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
 		_("Run As CLI In New Window With Arguments\tCTRL+SHIFT+F7"), 
 		_("Run File As a PHP Command Line Script In a New Window With Arguments"), wxITEM_NORMAL);
 	toolsMenu->Append(RunCliWithArgsInNewWindowMenuItem);
+	toolsMenu->Append(mvceditor::MENU_RUN_PHP + 4, 
+		_("Saved Commands"),
+		_("Open a dialog that shows the saved commands"),
+		wxITEM_NORMAL);
 }
 
 void mvceditor::RunConsolePluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
@@ -259,6 +423,65 @@ void mvceditor::RunConsolePluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 		wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), _("Run"));
 }
 
+void mvceditor::RunConsolePluginClass::OnRunSavedCommands(wxCommandEvent& event) {
+	mvceditor::CliCommandListDialogClass dialog(GetMainWindow(), wxID_ANY, CliCommands);
+	if (dialog.ShowModal() == wxID_OK) {
+		PersistCommands();
+	}
+}
+
+void mvceditor::RunConsolePluginClass::LoadPreferences(wxConfigBase* config) {
+	long index;
+	wxString groupName;
+	bool found = config->GetFirstGroup(groupName, index);
+	while (found) {
+		if (groupName.Find(wxT("CliCommand_")) >= 0) {
+			mvceditor::CliCommandClass newCommand;
+			wxString key = groupName + wxT("/Executable");
+			newCommand.Executable = config->Read(key);
+			key = groupName + wxT("/Arguments");
+			newCommand.Arguments = config->Read(key);
+			key = groupName + wxT("/Description");
+			newCommand.Description = config->Read(key);
+			key = groupName + wxT("/ShowInToolbar");
+			config->Read(key, &newCommand.ShowInToolbar);
+			key = groupName + wxT("/WaitForArguments");
+			config->Read(key, &newCommand.WaitForArguments);
+
+			CliCommands.push_back(newCommand);
+		}
+		found = config->GetNextGroup(groupName, index);
+	}
+}
+
+void mvceditor::RunConsolePluginClass::PersistCommands() {
+	wxConfigBase* config = wxConfig::Get();
+
+	// delete any previous commands that are in the config
+	wxString groupName;
+	long index = 0;
+	if (config->GetFirstGroup(groupName, index)) {
+		do {
+			if (groupName.Find(wxT("CliCommand_")) == 0) {
+				config->DeleteGroup(groupName);
+			}
+		} while (config->GetNextGroup(groupName, index));
+	}
+	for (size_t i = 0; i < CliCommands.size(); ++i) {
+		wxString key = wxString::Format(wxT("CliCommand_%d/Executable"), i);
+		config->Write(key, CliCommands[i].Executable);
+		key = wxString::Format(wxT("CliCommand_%d/Arguments"), i);
+		config->Write(key, CliCommands[i].Arguments);
+		key = wxString::Format(wxT("CliCommand_%d/Description"), i);
+		config->Write(key, CliCommands[i].Description);
+		key = wxString::Format(wxT("CliCommand_%d/ShowInToolbar"), i);
+		config->Write(key, CliCommands[i].ShowInToolbar);
+		key = wxString::Format(wxT("CliCommand_%d/WaitForArguments"), i);
+		config->Write(key, CliCommands[i].WaitForArguments);
+	}
+	config->Flush();
+}
+
 BEGIN_EVENT_TABLE(mvceditor::RunConsolePanelClass, wxPanel) 
 	EVT_COMMAND(ID_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::RunConsolePanelClass::OnProcessComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::RunConsolePanelClass::OnProcessInProgress)
@@ -270,5 +493,6 @@ BEGIN_EVENT_TABLE(mvceditor::RunConsolePluginClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_RUN_PHP + 1, mvceditor::RunConsolePluginClass::OnRunFileAsCli)
 	EVT_MENU(mvceditor::MENU_RUN_PHP + 2, mvceditor::RunConsolePluginClass::OnRunFileAsCliInNewWindow)
 	EVT_MENU(mvceditor::MENU_RUN_PHP + 3, mvceditor::RunConsolePluginClass::OnRunFileAsCliInNewWindow)
+	EVT_MENU(mvceditor::MENU_RUN_PHP + 4, mvceditor::RunConsolePluginClass::OnRunSavedCommands)
 	EVT_UPDATE_UI(wxID_ANY, mvceditor::RunConsolePluginClass::OnUpdateUi)
 END_EVENT_TABLE()
