@@ -110,6 +110,7 @@ class CliCommandListDialogGeneratedClass : public wxDialog
 		wxStdDialogButtonSizer* ButtonsSizer;
 		wxButton* ButtonsSizerOK;
 		wxButton* ButtonsSizerCancel;
+		wxButton* ButtonsSizerHelp;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnListDoubleClick( wxCommandEvent& event ) { event.Skip(); }
@@ -118,6 +119,7 @@ class CliCommandListDialogGeneratedClass : public wxDialog
 		virtual void OnAddButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDeleteButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
 		
 	

@@ -92,12 +92,15 @@ void mvceditor::CliCommandEditDialogClass::OnOkButton(wxCommandEvent& event) {
 void mvceditor::CliCommandEditDialogClass::OnHelpButton(wxCommandEvent& event) {
 	wxString help = wxString::FromAscii(
 		"Store a command for future use.\n"
-		"The command is the entire command line that will be executed.\n"
+		"The executable is the program that will be run.\n"
+		"The arguments are the entire string of arguments that will be given to the executable.\n"
 		"The description is a bit of text that will be displayed in the \n"
 		"toolbars for this command. \n"
 		"If 'Wait For Arguments' is checked, then when this command is \n"
 		"run a new console will be opened but the command will not be \n"
-		"automatically run, you can enter in run time arguments in the command. "
+		"automatically run, you can then enter in run time arguments in the command. "
+		"If 'Show In Toolbar' is checked, then this saved command will appear in the\n"
+		"bottom toolbar, enabling you to run it with one mouse click."
 	);
 	help = wxGetTranslation(help);
 	wxMessageBox(help, _("Help"));
@@ -201,6 +204,18 @@ void mvceditor::CliCommandListDialogClass::OnEditButton(wxCommandEvent& event) {
 void mvceditor::CliCommandListDialogClass::OnOkButton(wxCommandEvent& event) {
 	Commands = EditedCommands;
 	EndModal(wxID_OK);
+}
+
+void mvceditor::CliCommandListDialogClass::OnHelpButton(wxCommandEvent& event) {
+	wxString help = wxString::FromAscii(
+		"This dialog shows the list of all saved commands.\n"
+		"You can edit a command by double-cliking on it or by clicking the \n"
+		"Edit button. Note that the commands appear in the toolbar in the order \n"
+		"shown. Re-ordering the commands by clicking the 'up' or 'down' buttons \n"
+		"will affect the order of the command buttons in the toolbar."
+	);
+	help = wxGetTranslation(help);
+	wxMessageBox(help, _("Help"));
 }
 
 mvceditor::RunConsolePanelClass::RunConsolePanelClass(wxWindow* parent, int id, 

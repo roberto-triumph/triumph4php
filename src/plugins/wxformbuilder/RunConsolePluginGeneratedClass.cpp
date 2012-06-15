@@ -242,6 +242,8 @@ CliCommandListDialogGeneratedClass::CliCommandListDialogGeneratedClass( wxWindow
 	ButtonsSizer->AddButton( ButtonsSizerOK );
 	ButtonsSizerCancel = new wxButton( this, wxID_CANCEL );
 	ButtonsSizer->AddButton( ButtonsSizerCancel );
+	ButtonsSizerHelp = new wxButton( this, wxID_HELP );
+	ButtonsSizer->AddButton( ButtonsSizerHelp );
 	ButtonsSizer->Realize();
 	ColumnSizer->Add( ButtonsSizer, 1, wxEXPAND, 5 );
 	
@@ -259,6 +261,7 @@ CliCommandListDialogGeneratedClass::CliCommandListDialogGeneratedClass( wxWindow
 	AddButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CliCommandListDialogGeneratedClass::OnAddButton ), NULL, this );
 	DeleteButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CliCommandListDialogGeneratedClass::OnDeleteButton ), NULL, this );
 	EditButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CliCommandListDialogGeneratedClass::OnEditButton ), NULL, this );
+	ButtonsSizerHelp->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CliCommandListDialogGeneratedClass::OnHelpButton ), NULL, this );
 	ButtonsSizerOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CliCommandListDialogGeneratedClass::OnOkButton ), NULL, this );
 }
 
@@ -271,6 +274,7 @@ CliCommandListDialogGeneratedClass::~CliCommandListDialogGeneratedClass()
 	AddButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CliCommandListDialogGeneratedClass::OnAddButton ), NULL, this );
 	DeleteButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CliCommandListDialogGeneratedClass::OnDeleteButton ), NULL, this );
 	EditButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CliCommandListDialogGeneratedClass::OnEditButton ), NULL, this );
+	ButtonsSizerHelp->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CliCommandListDialogGeneratedClass::OnHelpButton ), NULL, this );
 	ButtonsSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CliCommandListDialogGeneratedClass::OnOkButton ), NULL, this );
 	
 }

@@ -133,6 +133,7 @@ protected:
 	void OnOkButton(wxCommandEvent& event);
 	void OnEditButton(wxCommandEvent& event);
 	void OnListDoubleClick(wxCommandEvent& event);
+	void OnHelpButton(wxCommandEvent& event);
 
 private:
 
