@@ -84,6 +84,11 @@ public:
 	CliCommandClass();
 
 	void Copy(const CliCommandClass& src);
+	
+	/**
+	 * @return the command to be executed
+	 */
+	wxString CmdLine() const;
 
 };
 
@@ -164,30 +169,24 @@ public:
 	/*
 	 * @param parent the parent of this pane
 	 * @param id window ID
-	 * @param 
 	 * @param gauge to show progress to the user. This class will NOT own the pointer.
 	 * @param plugin the plugin, used to add commands
 	 */
-	RunConsolePanelClass(wxWindow* parent, int id, mvceditor::EnvironmentClass* environment,
+	RunConsolePanelClass(wxWindow* parent, int id,
 		mvceditor::StatusBarWithGaugeClass* gauge, mvceditor::RunConsolePluginClass& plugin);
 
 	/**
-	 * Set to run the given PHP file
+	 * Set to run the given command
 	 * 
-	 * @param const wxString& fullPath full path to the PHP file to run
+	 * @param command to run
 	 */
-	void SetToRunFile(const wxString& fullPath);
+	void SetToRunCommand(const mvceditor::CliCommandClass& command);
 	
 	/**
 	 * Handle the 'Run' button
 	 */
 	void RunCommand(wxCommandEvent& event);
 	
-	/**
-	 * set the focus on the text input for the command.
-	 */
-	void SetFocusOnCommandText();
-
 	/**
 	 * when the page is closed perform cleanup. This means
 	 * clean up the child process and any open gauges
@@ -198,6 +197,12 @@ public:
 	 * When the user clicks on the store button save the current command.
 	 */
 	void OnStoreButton(wxCommandEvent& event);
+
+	/**
+	 * @return the command that is being run or that the user
+	 *  is typing in
+	 */
+	wxString GetCommand() const;
 
 private:
 		
@@ -210,13 +215,6 @@ private:
 	 * Used to run the process asynchronously
 	 */
 	ProcessWithHeartbeatClass ProcessWithHeartbeat;
-
-	/**
-	 * To get the File System location of PHP executable
-	 * 
-	 * @var EnvironmentClass*
-	 */
-	EnvironmentClass* Environment;
 
 	/**
 	 * To save the current command to be persisted.
@@ -305,6 +303,15 @@ private:
 	 * Always run in a new console window
 	 */
 	void OnRunFileAsCliInNewWindow(wxCommandEvent& event);
+
+	/**
+	 * @param command runs the given command and shows the output
+	 * panel. Note that the command may not actually start running
+	 * if command.WaitForArguments is set.
+	 * @param inNewWindow, if TRUE then a new console output window will
+	 * be created. Otherwise, the current output window may be used.
+	 */
+	void RunCommand(const mvceditor::CliCommandClass& command, bool inNewWindow);
 	
 	/**
 	 * disable menus when source code notebook is empty
@@ -315,6 +322,18 @@ private:
 	 * show the dialog CRUD for commands
 	 */
 	void OnRunSavedCommands(wxCommandEvent& event);
+
+	/**
+	 * synchronized the command panel buttons with those
+	 * from the Commands list. Any buttons for the removed 
+	 * commands are removed and buttons for new commands are added.
+	 */
+	void FillCommandPanel();
+
+	/**
+	 * Handles the click of the saved command buttons
+	 */
+	void OnCommandButtonClick(wxCommandEvent& evt);
 
 	/**
 	 * The list of commands to be persisted.
@@ -328,6 +347,15 @@ private:
 	wxMenuItem* RunCliWithArgsMenuItem;
 	wxMenuItem* RunCliInNewWindowMenuItem;
 	wxMenuItem* RunCliWithArgsInNewWindowMenuItem;
+
+	/*
+	 * Panel that stores the buttons to quickly execute
+	 * the stored commands. This class will not own
+	 * any of these pointers.
+	 */
+	//wxPanel* CommandPanel;
+
+	wxAuiToolBar* CommandToolbar;
 
 	DECLARE_EVENT_TABLE()
 };

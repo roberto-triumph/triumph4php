@@ -49,6 +49,17 @@ void mvceditor::CliCommandClass::Copy(const mvceditor::CliCommandClass& src) {
 	ShowInToolbar = src.ShowInToolbar;
 }
 
+wxString mvceditor::CliCommandClass::CmdLine() const {
+	wxString line;
+	if (!Executable.IsEmpty()) {
+		line += Executable;
+	}
+	if (!Arguments.IsEmpty()) {
+		line += wxT(" ") + Arguments;
+	}
+	return line;
+}
+
 mvceditor::CliCommandEditDialogClass::CliCommandEditDialogClass(wxWindow* parent, int id, mvceditor::CliCommandClass& command)
 	: CliCommandEditDialogGeneratedClass(parent, id) {
 	wxGenericValidator executableValidator(&command.Executable);
@@ -193,13 +204,11 @@ void mvceditor::CliCommandListDialogClass::OnOkButton(wxCommandEvent& event) {
 }
 
 mvceditor::RunConsolePanelClass::RunConsolePanelClass(wxWindow* parent, int id, 
-													   mvceditor::EnvironmentClass* environment,
 													   mvceditor::StatusBarWithGaugeClass* gauge, 
 													   mvceditor::RunConsolePluginClass& plugin)
 	: RunConsolePanelGeneratedClass(parent, id)
 	, CommandString()
 	, ProcessWithHeartbeat(*this)
-	, Environment(environment)
 	, Gauge(gauge)
 	, Plugin(plugin)
 	, CurrentPid(0) {
@@ -231,22 +240,29 @@ void mvceditor::RunConsolePanelClass::OnPageClose(wxAuiNotebookEvent& evt) {
 	evt.Skip();
 }
 
-void  mvceditor::RunConsolePanelClass::SetToRunFile(const wxString& fullPath) {
+void  mvceditor::RunConsolePanelClass::SetToRunCommand(const mvceditor::CliCommandClass& command) {
 	
 	// command is a file name, lets run it through PHP
 	// cannot run new files that have not been saved yet
-	if (!fullPath.empty()) {
-		CommandString = Environment->Php.PhpExecutablePath + wxT(" ") + fullPath;
+	wxString cmdLine = command.CmdLine();
+	if (!cmdLine.empty()) {
+		CommandString = cmdLine;
 		TransferDataToWindow();
+
+		// if user chose the 'with arguments' then do not proceed let the user put in arguments
+		if (command.WaitForArguments) {
+			Command->SetInsertionPointEnd();
+			Command->SetFocus();
+		}
+		else {
+			wxCommandEvent evt;
+			RunCommand(evt);
+		}
 	}
 	else {
 		CommandString = wxT("");
 		wxMessageBox(_("PHP script needs to be saved in order to run it."));
 	}
-}
-
-void  mvceditor::RunConsolePanelClass::SetFocusOnCommandText() {
-	Command->SetFocus();
 }
 
 void  mvceditor::RunConsolePanelClass::RunCommand(wxCommandEvent& event) {
@@ -358,12 +374,17 @@ void mvceditor::RunConsolePanelClass::OnStoreButton(wxCommandEvent& event) {
 	}
 }
 
+wxString mvceditor::RunConsolePanelClass::GetCommand() const {
+	return Command->GetValue();
+}
+
 mvceditor::RunConsolePluginClass::RunConsolePluginClass()
 	: PluginClass()
 	, RunCliMenuItem(NULL)
 	, RunCliWithArgsMenuItem(NULL)
 	, RunCliInNewWindowMenuItem(NULL)
-	, RunCliWithArgsInNewWindowMenuItem(NULL) {
+	, RunCliWithArgsInNewWindowMenuItem(NULL) 
+	, CommandToolbar(NULL) {
 }
 
 void mvceditor::RunConsolePluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
@@ -398,56 +419,83 @@ void mvceditor::RunConsolePluginClass::AddKeyboardShortcuts(std::vector<DynamicC
 
 void mvceditor::RunConsolePluginClass::OnRunFileAsCli(wxCommandEvent& event) {
 	CodeControlClass* code = GetCurrentCodeControl();
-	
-	// if theres a window already opened, just re-run the selected window.
-	int selection = GetToolsNotebook()->GetSelection();
-	RunConsolePanelClass* runConsolePanel = NULL;
+	if (code) {
 
-	// make sure that the selected window is a run console panel. if we don't explictly
-	// check the name, the program will crash.
-	if (IsToolsWindowSelectedByName(wxT("mvceditor::RunConsolePanelClass"))) {
-		runConsolePanel = (mvceditor::RunConsolePanelClass*)GetToolsNotebook()->GetPage(selection);
-	}
-	if (selection >= 0 && runConsolePanel) {
-		
-		// window already created, will just re-run the command that's already there
-		runConsolePanel->SetFocusOnCommandText();
-		
-		// if user chose the 'with arguments' then do not proceed let the user put in arguments
-		if ((mvceditor::MENU_RUN_PHP + 1) != event.GetId()) {
-			runConsolePanel->RunCommand(event);	
-		}
-	}
-	else if (code) {
-		RunConsolePanelClass* runConsolePanel = new RunConsolePanelClass(GetToolsNotebook(), ID_WINDOW_CONSOLE, 
-			GetEnvironment(), GetStatusBarWithGauge(), *this);
+		// cannot run new files that have not been saved yet
+		if (!code->IsNew()) {
+			mvceditor::CliCommandClass cmd;
+			cmd.Executable = GetEnvironment()->Php.PhpExecutablePath;
+			cmd.Arguments = code->GetFileName();
+			cmd.WaitForArguments = (mvceditor::MENU_RUN_PHP + 1) == event.GetId();
+			bool inNewWindow = false;
 
-		// set the name so that we can know which window pointer can be safely cast this panel back to the RunConsolePanelClass
-		if (AddToolsWindow(runConsolePanel, _("Run"), wxT("mvceditor::RunConsolePanelClass"))) {
-			runConsolePanel->SetToRunFile(code->GetFileName());
-			runConsolePanel->SetFocusOnCommandText();
-			
-			// if user chose the 'with arguments' then do not proceed let the user put in arguments
-			if ((mvceditor::MENU_RUN_PHP + 1) != event.GetId()) {
-				runConsolePanel->RunCommand(event);
+			// if theres a window already opened, just re-run the selected window.
+			// make sure that the selected window is a run console panel. if we don't explictly
+			// check the name, the program will crash. Because we are typecasting we 
+			// need to be careful
+			if (IsToolsWindowSelectedByName(wxT("mvceditor::RunConsolePanelClass"))) {
+				int selection = GetToolsNotebook()->GetSelection();
+				RunConsolePanelClass* runConsolePanel = (mvceditor::RunConsolePanelClass*)GetToolsNotebook()->GetPage(selection);
+				inNewWindow = cmd.CmdLine() != runConsolePanel->GetCommand();
 			}
+			RunCommand(cmd, inNewWindow);
 		}
-	}
+		else {
+			wxMessageBox(_("PHP script needs to be saved in order to run it."));
+		}
+	}	
 }
 
 void mvceditor::RunConsolePluginClass::OnRunFileAsCliInNewWindow(wxCommandEvent& event) {
 	CodeControlClass* code = GetCurrentCodeControl();
 	if (code) {
+
+		// cannot run new files that have not been saved yet
+		if (!code->IsNew()) {
+			mvceditor::CliCommandClass cmd;
+			cmd.Executable = GetEnvironment()->Php.PhpExecutablePath;
+			cmd.Arguments = code->GetFileName();
+			cmd.WaitForArguments = (mvceditor::MENU_RUN_PHP + 3) == event.GetId();
+			RunCommand(cmd, true);
+		}
+		else {
+			wxMessageBox(_("PHP script needs to be saved in order to run it."));
+		}
+	}
+}
+
+void mvceditor::RunConsolePluginClass::RunCommand(const mvceditor::CliCommandClass& command, bool inNewWindow) {
+	if (inNewWindow) {
 		RunConsolePanelClass* window = new RunConsolePanelClass(GetToolsNotebook(), ID_WINDOW_CONSOLE, 
-			GetEnvironment(), GetStatusBarWithGauge(), *this);
-		if (AddToolsWindow(window, _("Run"))) {
-			window->SetToRunFile(code->GetFileName());
-			window->SetFocusOnCommandText();
-						
-			// if user chose the 'with arguments' then do not proceed let the user put in arguments
-			if ((mvceditor::MENU_RUN_PHP + 3) != event.GetId()) {
-				window->RunCommand(event);
-			}
+			GetStatusBarWithGauge(), *this);
+
+		// set the name so that we can know which window pointer can be safely cast this panel back to the RunConsolePanelClass
+		if (AddToolsWindow(window, _("Run"), wxT("mvceditor::RunConsolePanelClass"))) {
+			window->SetToRunCommand(command);
+		}
+	}
+	else {
+
+		// if theres a window already opened, just re-run the selected window.
+		int selection = GetToolsNotebook()->GetSelection();
+		RunConsolePanelClass* runConsolePanel = NULL;
+
+		// make sure that the selected window is a run console panel. if we don't explictly
+		// check the name, the program will crash.
+		if (IsToolsWindowSelectedByName(wxT("mvceditor::RunConsolePanelClass"))) {
+			runConsolePanel = (mvceditor::RunConsolePanelClass*)GetToolsNotebook()->GetPage(selection);
+		}
+		else {
+			runConsolePanel = new RunConsolePanelClass(GetToolsNotebook(), ID_WINDOW_CONSOLE, 
+				GetStatusBarWithGauge(), *this);
+			
+			// set the name so that we can know which window pointer can be safely cast this panel back to the RunConsolePanelClass
+			AddToolsWindow(runConsolePanel, _("Run"), wxT("mvceditor::RunConsolePanelClass"));
+		}
+		if (selection >= 0 && runConsolePanel) {
+			
+			// window already created, will just re-run the command that's already there
+			runConsolePanel->SetToRunCommand(command);
 		}
 	}
 }
@@ -495,6 +543,7 @@ void mvceditor::RunConsolePluginClass::LoadPreferences(wxConfigBase* config) {
 		}
 		found = config->GetNextGroup(groupName, index);
 	}
+	FillCommandPanel();
 }
 
 void mvceditor::RunConsolePluginClass::PersistCommands() {
@@ -523,10 +572,56 @@ void mvceditor::RunConsolePluginClass::PersistCommands() {
 		config->Write(key, CliCommands[i].WaitForArguments);
 	}
 	config->Flush();
+	FillCommandPanel();
 }
 
 void mvceditor::RunConsolePluginClass::AddCommand(const mvceditor::CliCommandClass& command) {
 	CliCommands.push_back(command);
+}
+
+void mvceditor::RunConsolePluginClass::FillCommandPanel() {
+	bool added = false;
+	if (CommandToolbar == NULL) {
+		CommandToolbar = new wxAuiToolBar(GetMainWindow(), wxID_ANY, wxDefaultPosition, wxDefaultSize, 
+			  wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_OVERFLOW | wxAUI_TB_TEXT | wxAUI_TB_HORZ_TEXT);
+		added = true;
+		CommandToolbar->SetToolBitmapSize(wxSize(16,16));
+		CommandToolbar->SetOverflowVisible(false);
+	}
+	else {
+		AuiManager->DetachPane(CommandToolbar);
+	}
+	CommandToolbar->Clear();	
+	for (size_t i = 0; i < CliCommands.size(); ++i) {
+		mvceditor::CliCommandClass cmd = CliCommands[i];
+		if (cmd.ShowInToolbar) {
+			wxString desc = cmd.Description;
+
+			// the ID is the index; we will use the index so that the
+			// handler know which command to execute
+			CommandToolbar->AddTool(mvceditor::MENU_RUN_PHP + 5 + i, desc, wxArtProvider::GetBitmap(
+				wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), _("Run in CLI Mode"), wxITEM_NORMAL);
+		}
+	}
+	CommandToolbar->Realize();
+	if (CommandToolbar->GetToolCount() > 0) {	
+		wxAuiPaneInfo paneInfo;
+		paneInfo.Bottom().Layer(2)
+			.CaptionVisible(false).CloseButton(false)
+			.Gripper(false).DockFixed(true).PaneBorder(false)
+			.Floatable(false).Row(0).Position(0);
+		AuiManager->AddPane(CommandToolbar, paneInfo);
+	}
+	AuiManager->Update();
+}
+
+void mvceditor::RunConsolePluginClass::OnCommandButtonClick(wxCommandEvent& event) {
+	size_t index = (size_t)event.GetId();
+	index = index - (mvceditor::MENU_RUN_PHP + 5);
+	if (index >= 0 && index < CliCommands.size()) {
+		mvceditor::CliCommandClass cmd = CliCommands[index];
+		RunCommand(cmd, true);
+	}
 }
 
 BEGIN_EVENT_TABLE(mvceditor::RunConsolePanelClass, wxPanel) 
@@ -542,4 +637,8 @@ BEGIN_EVENT_TABLE(mvceditor::RunConsolePluginClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_RUN_PHP + 3, mvceditor::RunConsolePluginClass::OnRunFileAsCliInNewWindow)
 	EVT_MENU(mvceditor::MENU_RUN_PHP + 4, mvceditor::RunConsolePluginClass::OnRunSavedCommands)
 	EVT_UPDATE_UI(wxID_ANY, mvceditor::RunConsolePluginClass::OnUpdateUi)
+
+	// take up all the rest of the IDs for the command buttons
+	EVT_MENU_RANGE(mvceditor::MENU_RUN_PHP + 5, mvceditor::MENU_RUN_PHP + 55, 
+	mvceditor::RunConsolePluginClass::OnCommandButtonClick)
 END_EVENT_TABLE()
