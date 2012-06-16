@@ -439,6 +439,9 @@ mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvce
 		Directory->Append(project->GetRootPath());
 		Directory->SetSelection(0);
 	}
+	else if (Directory->GetCount() > 0) {
+		Directory->SetSelection(0);
+	}
 	mvceditor::RegularExpressionValidatorClass regExValidator(&Plugin.PreviousFindInFiles.Expression, FinderMode);
 	FindText->SetValidator(regExValidator);
 	UnicodeStringValidatorClass replaceExpressionValidator(&Plugin.PreviousFindInFiles.ReplaceExpression);
