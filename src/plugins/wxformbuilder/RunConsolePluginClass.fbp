@@ -423,7 +423,7 @@
             <property name="minimum_size"></property>
             <property name="name">CliCommandEditDialogGeneratedClass</property>
             <property name="pos"></property>
-            <property name="size">401,323</property>
+            <property name="size">422,396</property>
             <property name="style">wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</property>
             <property name="subclass"></property>
             <property name="title">Add/Edit Commands</property>
@@ -1203,7 +1203,7 @@
             <property name="minimum_size"></property>
             <property name="name">CliCommandListDialogGeneratedClass</property>
             <property name="pos"></property>
-            <property name="size">463,459</property>
+            <property name="size">511,484</property>
             <property name="style">wxDEFAULT_DIALOG_STYLE</property>
             <property name="subclass"></property>
             <property name="title">Console Commands</property>

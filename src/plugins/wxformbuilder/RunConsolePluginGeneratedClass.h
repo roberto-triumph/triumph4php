@@ -87,7 +87,7 @@ class CliCommandEditDialogGeneratedClass : public wxDialog
 	
 	public:
 		
-		CliCommandEditDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Add/Edit Commands"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 401,323 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		CliCommandEditDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Add/Edit Commands"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 422,396 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~CliCommandEditDialogGeneratedClass();
 	
 };
@@ -125,7 +125,7 @@ class CliCommandListDialogGeneratedClass : public wxDialog
 	
 	public:
 		
-		CliCommandListDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Console Commands"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 463,459 ), long style = wxDEFAULT_DIALOG_STYLE );
+		CliCommandListDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Console Commands"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 511,484 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~CliCommandListDialogGeneratedClass();
 	
 };

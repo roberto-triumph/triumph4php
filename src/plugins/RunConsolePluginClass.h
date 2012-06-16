@@ -218,14 +218,14 @@ private:
 	ProcessWithHeartbeatClass ProcessWithHeartbeat;
 
 	/**
-	 * To save the current command to be persisted.
-	 */
-	RunConsolePluginClass& Plugin;
-
-	/**
 	 * To show progress to the user.
 	 */
 	StatusBarWithGaugeClass* Gauge;
+	
+	/**
+	 * To save the current command to be persisted.
+	 */
+	RunConsolePluginClass& Plugin;
 	
 	/**
 	 * the current PID of the async process.
