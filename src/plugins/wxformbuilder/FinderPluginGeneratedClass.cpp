@@ -9,15 +9,6 @@
 
 ///////////////////////////////////////////////////////////////////////////
 
-BEGIN_EVENT_TABLE( FinderPanelGeneratedClass, wxPanel )
-	EVT_BUTTON( ID_FIND_CLOSE, FinderPanelGeneratedClass::_wxFB_OnCloseButton )
-	EVT_BUTTON( wxID_BACKWARD, FinderPanelGeneratedClass::_wxFB_OnPreviousButton )
-	EVT_BUTTON( wxID_FORWARD, FinderPanelGeneratedClass::_wxFB_OnNextButton )
-	EVT_BUTTON( wxID_HELP, FinderPanelGeneratedClass::_wxFB_OnHelpButton )
-	EVT_BUTTON( ID_FIND_REG_EX_HELP, FinderPanelGeneratedClass::_wxFB_OnRegExFindHelpButton )
-	EVT_TEXT_ENTER( ID_FINDTEXT, FinderPanelGeneratedClass::_wxFB_OnFindEnter )
-END_EVENT_TABLE()
-
 FinderPanelGeneratedClass::FinderPanelGeneratedClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	wxBoxSizer* BoxSizer;
@@ -83,25 +74,31 @@ FinderPanelGeneratedClass::FinderPanelGeneratedClass( wxWindow* parent, wxWindow
 	
 	this->SetSizer( BoxSizer );
 	this->Layout();
+	
+	// Connect Events
+	CloseButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FinderPanelGeneratedClass::OnCloseButton ), NULL, this );
+	PreviousButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FinderPanelGeneratedClass::OnPreviousButton ), NULL, this );
+	NextButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FinderPanelGeneratedClass::OnNextButton ), NULL, this );
+	HelpButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FinderPanelGeneratedClass::OnHelpButton ), NULL, this );
+	RegExFindHelpButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FinderPanelGeneratedClass::OnRegExFindHelpButton ), NULL, this );
+	FindText->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( FinderPanelGeneratedClass::OnFindKeyDown ), NULL, this );
+	FindText->Connect( wxEVT_KILL_FOCUS, wxFocusEventHandler( FinderPanelGeneratedClass::OnFindKillFocus ), NULL, this );
+	FindText->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( FinderPanelGeneratedClass::OnFindEnter ), NULL, this );
 }
 
 FinderPanelGeneratedClass::~FinderPanelGeneratedClass()
 {
+	// Disconnect Events
+	CloseButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FinderPanelGeneratedClass::OnCloseButton ), NULL, this );
+	PreviousButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FinderPanelGeneratedClass::OnPreviousButton ), NULL, this );
+	NextButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FinderPanelGeneratedClass::OnNextButton ), NULL, this );
+	HelpButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FinderPanelGeneratedClass::OnHelpButton ), NULL, this );
+	RegExFindHelpButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FinderPanelGeneratedClass::OnRegExFindHelpButton ), NULL, this );
+	FindText->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( FinderPanelGeneratedClass::OnFindKeyDown ), NULL, this );
+	FindText->Disconnect( wxEVT_KILL_FOCUS, wxFocusEventHandler( FinderPanelGeneratedClass::OnFindKillFocus ), NULL, this );
+	FindText->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( FinderPanelGeneratedClass::OnFindEnter ), NULL, this );
+	
 }
-
-BEGIN_EVENT_TABLE( ReplacePanelGeneratedClass, wxPanel )
-	EVT_BUTTON( ID_FIND_REG_EX_HELP, ReplacePanelGeneratedClass::_wxFB_OnRegExFindHelpButton )
-	EVT_TEXT_ENTER( ID_FINDTEXT, ReplacePanelGeneratedClass::_wxFB_OnFindEnter )
-	EVT_BUTTON( ID_REPLACE_REG_EX_HELP, ReplacePanelGeneratedClass::_wxFB_OnReplaceRegExFindHelpButton )
-	EVT_TEXT_ENTER( ID_REPLACEWITHTEXT, ReplacePanelGeneratedClass::_wxFB_OnReplaceEnter )
-	EVT_BUTTON( ID_REPLACE_CLOSE, ReplacePanelGeneratedClass::_wxFB_OnCloseButton )
-	EVT_BUTTON( wxID_BACKWARD, ReplacePanelGeneratedClass::_wxFB_OnPreviousButton )
-	EVT_BUTTON( wxID_FORWARD, ReplacePanelGeneratedClass::_wxFB_OnNextButton )
-	EVT_BUTTON( wxID_HELP, ReplacePanelGeneratedClass::_wxFB_OnHelpButton )
-	EVT_BUTTON( wxID_REPLACE, ReplacePanelGeneratedClass::_wxFB_OnReplaceButton )
-	EVT_BUTTON( wxID_REPLACE_ALL, ReplacePanelGeneratedClass::_wxFB_OnReplaceAllButton )
-	EVT_BUTTON( wxID_UNDO, ReplacePanelGeneratedClass::_wxFB_OnUndoButton )
-END_EVENT_TABLE()
 
 ReplacePanelGeneratedClass::ReplacePanelGeneratedClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
@@ -224,8 +221,42 @@ ReplacePanelGeneratedClass::ReplacePanelGeneratedClass( wxWindow* parent, wxWind
 	
 	this->SetSizer( BoxSizer );
 	this->Layout();
+	
+	// Connect Events
+	RegExFindHelpButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReplacePanelGeneratedClass::OnRegExFindHelpButton ), NULL, this );
+	FindText->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( ReplacePanelGeneratedClass::OnFindKeyDown ), NULL, this );
+	FindText->Connect( wxEVT_KILL_FOCUS, wxFocusEventHandler( ReplacePanelGeneratedClass::OnFindKillFocus ), NULL, this );
+	FindText->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ReplacePanelGeneratedClass::OnFindEnter ), NULL, this );
+	RegExReplaceHelpButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReplacePanelGeneratedClass::OnReplaceRegExFindHelpButton ), NULL, this );
+	ReplaceWithText->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( ReplacePanelGeneratedClass::OnReplaceKeyDown ), NULL, this );
+	ReplaceWithText->Connect( wxEVT_KILL_FOCUS, wxFocusEventHandler( ReplacePanelGeneratedClass::OnReplaceKillFocus ), NULL, this );
+	ReplaceWithText->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ReplacePanelGeneratedClass::OnReplaceEnter ), NULL, this );
+	CloseButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReplacePanelGeneratedClass::OnCloseButton ), NULL, this );
+	PreviousButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReplacePanelGeneratedClass::OnPreviousButton ), NULL, this );
+	NextButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReplacePanelGeneratedClass::OnNextButton ), NULL, this );
+	HelpButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReplacePanelGeneratedClass::OnHelpButton ), NULL, this );
+	ReplaceButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReplacePanelGeneratedClass::OnReplaceButton ), NULL, this );
+	ReplaceAllButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReplacePanelGeneratedClass::OnReplaceAllButton ), NULL, this );
+	UndoButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReplacePanelGeneratedClass::OnUndoButton ), NULL, this );
 }
 
 ReplacePanelGeneratedClass::~ReplacePanelGeneratedClass()
 {
+	// Disconnect Events
+	RegExFindHelpButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReplacePanelGeneratedClass::OnRegExFindHelpButton ), NULL, this );
+	FindText->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( ReplacePanelGeneratedClass::OnFindKeyDown ), NULL, this );
+	FindText->Disconnect( wxEVT_KILL_FOCUS, wxFocusEventHandler( ReplacePanelGeneratedClass::OnFindKillFocus ), NULL, this );
+	FindText->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ReplacePanelGeneratedClass::OnFindEnter ), NULL, this );
+	RegExReplaceHelpButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReplacePanelGeneratedClass::OnReplaceRegExFindHelpButton ), NULL, this );
+	ReplaceWithText->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( ReplacePanelGeneratedClass::OnReplaceKeyDown ), NULL, this );
+	ReplaceWithText->Disconnect( wxEVT_KILL_FOCUS, wxFocusEventHandler( ReplacePanelGeneratedClass::OnReplaceKillFocus ), NULL, this );
+	ReplaceWithText->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ReplacePanelGeneratedClass::OnReplaceEnter ), NULL, this );
+	CloseButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReplacePanelGeneratedClass::OnCloseButton ), NULL, this );
+	PreviousButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReplacePanelGeneratedClass::OnPreviousButton ), NULL, this );
+	NextButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReplacePanelGeneratedClass::OnNextButton ), NULL, this );
+	HelpButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReplacePanelGeneratedClass::OnHelpButton ), NULL, this );
+	ReplaceButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReplacePanelGeneratedClass::OnReplaceButton ), NULL, this );
+	ReplaceAllButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReplacePanelGeneratedClass::OnReplaceAllButton ), NULL, this );
+	UndoButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReplacePanelGeneratedClass::OnUndoButton ), NULL, this );
+	
 }

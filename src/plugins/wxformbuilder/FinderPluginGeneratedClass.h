@@ -34,17 +34,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 class FinderPanelGeneratedClass : public wxPanel 
 {
-	DECLARE_EVENT_TABLE()
 	private:
-		
-		// Private event handlers
-		void _wxFB_OnCloseButton( wxCommandEvent& event ){ OnCloseButton( event ); }
-		void _wxFB_OnPreviousButton( wxCommandEvent& event ){ OnPreviousButton( event ); }
-		void _wxFB_OnNextButton( wxCommandEvent& event ){ OnNextButton( event ); }
-		void _wxFB_OnHelpButton( wxCommandEvent& event ){ OnHelpButton( event ); }
-		void _wxFB_OnRegExFindHelpButton( wxCommandEvent& event ){ OnRegExFindHelpButton( event ); }
-		void _wxFB_OnFindEnter( wxCommandEvent& event ){ OnFindEnter( event ); }
-		
 	
 	protected:
 		enum
@@ -72,6 +62,8 @@ class FinderPanelGeneratedClass : public wxPanel
 		virtual void OnNextButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRegExFindHelpButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnFindKeyDown( wxKeyEvent& event ) { event.Skip(); }
+		virtual void OnFindKillFocus( wxFocusEvent& event ) { event.Skip(); }
 		virtual void OnFindEnter( wxCommandEvent& event ) { event.Skip(); }
 		
 	
@@ -87,22 +79,7 @@ class FinderPanelGeneratedClass : public wxPanel
 ///////////////////////////////////////////////////////////////////////////////
 class ReplacePanelGeneratedClass : public wxPanel 
 {
-	DECLARE_EVENT_TABLE()
 	private:
-		
-		// Private event handlers
-		void _wxFB_OnRegExFindHelpButton( wxCommandEvent& event ){ OnRegExFindHelpButton( event ); }
-		void _wxFB_OnFindEnter( wxCommandEvent& event ){ OnFindEnter( event ); }
-		void _wxFB_OnReplaceRegExFindHelpButton( wxCommandEvent& event ){ OnReplaceRegExFindHelpButton( event ); }
-		void _wxFB_OnReplaceEnter( wxCommandEvent& event ){ OnReplaceEnter( event ); }
-		void _wxFB_OnCloseButton( wxCommandEvent& event ){ OnCloseButton( event ); }
-		void _wxFB_OnPreviousButton( wxCommandEvent& event ){ OnPreviousButton( event ); }
-		void _wxFB_OnNextButton( wxCommandEvent& event ){ OnNextButton( event ); }
-		void _wxFB_OnHelpButton( wxCommandEvent& event ){ OnHelpButton( event ); }
-		void _wxFB_OnReplaceButton( wxCommandEvent& event ){ OnReplaceButton( event ); }
-		void _wxFB_OnReplaceAllButton( wxCommandEvent& event ){ OnReplaceAllButton( event ); }
-		void _wxFB_OnUndoButton( wxCommandEvent& event ){ OnUndoButton( event ); }
-		
 	
 	protected:
 		enum
@@ -134,8 +111,12 @@ class ReplacePanelGeneratedClass : public wxPanel
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnRegExFindHelpButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnFindKeyDown( wxKeyEvent& event ) { event.Skip(); }
+		virtual void OnFindKillFocus( wxFocusEvent& event ) { event.Skip(); }
 		virtual void OnFindEnter( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnReplaceRegExFindHelpButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnReplaceKeyDown( wxKeyEvent& event ) { event.Skip(); }
+		virtual void OnReplaceKillFocus( wxFocusEvent& event ) { event.Skip(); }
 		virtual void OnReplaceEnter( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCloseButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnPreviousButton( wxCommandEvent& event ) { event.Skip(); }

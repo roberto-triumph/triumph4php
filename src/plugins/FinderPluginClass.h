@@ -49,6 +49,15 @@ protected:
 	void OnCloseButton(wxCommandEvent& event);
 	void OnRegExFindHelpButton(wxCommandEvent& event);
 	void OnFindEnter(wxCommandEvent& event);
+	void OnFindKeyDown(wxKeyEvent& event);
+
+	/**
+	 * Need to save the insertion point of the Find and replace combo boxes; in Win32
+	 * GetInsertionPoint() of combobox fails when it does not have focus.
+	 * The insertion is needed to have the cursor show up properly when
+	 * the user clicks on the regex help buttons
+	 */
+	void OnFindKillFocus(wxFocusEvent& event);
 		
 public:
 	
@@ -62,8 +71,6 @@ public:
 	 * @param int windowId the window ID
 	 */
 	FinderPanelClass(wxWindow* parent, NotebookClass* notebook, wxAuiManager* auiManager, int windowId);
-	
-	~FinderPanelClass();
 
 	/**
 	 * The focus will  be set on the find text box.
@@ -114,14 +121,6 @@ private:
 	 * @param wxCommandEvent& event
 	 */
 	void InsertReplaceRegExSymbol(wxCommandEvent& event);
-
-	/**
-	 * Need to save the insertion point of the Find and replace combo boxes; in Win32
-	 * GetInsertionPoint() of combobox fails when it does not have focus.
-	 * The insertion is needed to have the cursor show up properly when
-	 * the user clicks on the regex help buttons
-	 */
-	void OnKillFocusFindText(wxFocusEvent& event);
 	
 	/**
 	 * The Finder object to be displayed.
@@ -176,6 +175,22 @@ protected:
 	void OnReplaceRegExFindHelpButton(wxCommandEvent& event);
 	void OnFindEnter(wxCommandEvent& event);
 	void OnReplaceEnter(wxCommandEvent& event);
+
+	/** 
+	 * since this panel handles EVT_TEXT_ENTER, we need to handle the
+	 * tab traversal ourselves otherwise tab travesal wont work
+	 */
+	void OnFindKeyDown(wxKeyEvent& event);
+	void OnReplaceKeyDown(wxKeyEvent& event);
+
+	/**
+	 * Need to save the insertion point of the Find and replace combo boxes; in Win32
+	 * GetInsertionPoint() of combobox fails when it does not have focus.
+	 * The insertion is needed to have the cursor show up properly when
+	 * the user clicks on the regex help buttons
+	 */
+	void OnFindKillFocus(wxFocusEvent& event);
+	void OnReplaceKillFocus(wxFocusEvent& event);
 	
 public:
 
@@ -189,8 +204,6 @@ public:
 	 * @param int windowId the window ID
 	 */
 	ReplacePanelClass(wxWindow* parent, NotebookClass* notebook, wxAuiManager* auiManager, int windowId);
-	
-	~ReplacePanelClass();
 
 	/**
 	 * Enables/disables replace buttons
@@ -254,21 +267,6 @@ private:
 	 * @param wxCommandEvnt& event
 	 */
 	void InsertReplaceRegExSymbol(wxCommandEvent& event);
-
-	/** 
-	 * since this panel handles EVT_TEXT_ENTER, we need to handle the
-	 * tab traversal ourselves otherwise tab travesal wont work
-	 */
-	void OnKeyDown(wxKeyEvent& event);
-
-	/**
-	 * Need to save the insertion point of the Find and replace combo boxes; in Win32
-	 * GetInsertionPoint() of combobox fails when it does not have focus.
-	 * The insertion is needed to have the cursor show up properly when
-	 * the user clicks on the regex help buttons
-	 */
-	void OnKillFocusFindText(wxFocusEvent& event);
-	void OnKillFocusReplaceText(wxFocusEvent& event);
 
 	/**
 	 * The Finder object to be displayed.

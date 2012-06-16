@@ -62,15 +62,6 @@ mvceditor::FinderPanelClass::FinderPanelClass(wxWindow* parent, mvceditor::Noteb
 		wxART_TOOLBAR, wxSize(16, 16))));
 	CloseButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_ERROR, 
 		wxART_FRAME_ICON, wxSize(16, 16))));
-
-	// connect to the KILL_FOCUS events so that we can capture the insertion point
-	// on Win32 GetInsertionPoint() returns 0 when the combo box is no
-	// in focus; we must receive the position via an outside mechanism
-	FindText->GetEventHandler()->Connect(wxID_ANY, wxID_ANY, wxEVT_KILL_FOCUS, wxFocusEventHandler(FinderPanelClass::OnKillFocusFindText), NULL, this);
-}
-
-mvceditor::FinderPanelClass::~FinderPanelClass() {
-	FindText->GetEventHandler()->Disconnect(wxID_ANY, wxID_ANY, wxEVT_KILL_FOCUS, wxFocusEventHandler(FinderPanelClass::OnKillFocusFindText), NULL, this);
 }
 
 void mvceditor::FinderPanelClass::SetFocusOnFindText() {
@@ -201,9 +192,23 @@ void mvceditor::FinderPanelClass::InsertRegExSymbol(wxCommandEvent& event) {
 	FinderMode->SetSelection(FinderClass::REGULAR_EXPRESSION);
 }
 
-void mvceditor::FinderPanelClass::OnKillFocusFindText(wxFocusEvent& event) {
+void mvceditor::FinderPanelClass::OnFindKillFocus(wxFocusEvent& event) {
+
+	// connect to the KILL_FOCUS events so that we can capture the insertion point
+	// on Win32 GetInsertionPoint() returns 0 when the combo box is no
+	// in focus; we must receive the position via an outside mechanism
 	CurrentInsertionPointFind = FindText->GetInsertionPoint();
 	event.Skip();
+}
+
+void mvceditor::FinderPanelClass::OnFindKeyDown(wxKeyEvent& event) {
+	if (event.GetKeyCode() == WXK_ESCAPE) {
+		AuiManager->GetPane(this).Hide();
+		AuiManager->Update();
+	}
+	else {
+		event.Skip();
+	}	
 }
 
 mvceditor::ReplacePanelClass::ReplacePanelClass(wxWindow* parent, mvceditor::NotebookClass* notebook, wxAuiManager* auiManager, int windowId)
@@ -240,25 +245,6 @@ mvceditor::ReplacePanelClass::ReplacePanelClass(wxWindow* parent, mvceditor::Not
 		wxART_TOOLBAR, wxSize(16, 16))));
 	ReplaceWithText->MoveAfterInTabOrder(FindText);
 	RegExReplaceHelpButton->MoveAfterInTabOrder(ReplaceWithText);
-
-	// since this panel handles EVT_TEXT_ENTER, we need to handle th
-	// tab traversal ourselves otherwise tab travesal wont work
-	FindText->GetEventHandler()->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::ReplacePanelClass::OnKeyDown));
-	ReplaceWithText->GetEventHandler()->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::ReplacePanelClass::OnKeyDown));
-	
-	// connect to the KILL_FOCUS events so that we can capture the insertion point
-	// on Win32 GetInsertionPoint() returns 0 when the combo box is no
-	// in focus; we must receive the position via an outside mechanism
-	FindText->GetEventHandler()->Connect(wxID_ANY, wxID_ANY, wxEVT_KILL_FOCUS, wxFocusEventHandler(ReplacePanelClass::OnKillFocusFindText), NULL, this);
-	ReplaceWithText->GetEventHandler()->Connect(wxID_ANY, wxID_ANY, wxEVT_KILL_FOCUS, wxFocusEventHandler(ReplacePanelClass::OnKillFocusReplaceText), NULL, this);
-}
-
-mvceditor::ReplacePanelClass::~ReplacePanelClass() {
-	FindText->GetEventHandler()->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::ReplacePanelClass::OnKeyDown));
-	ReplaceWithText->GetEventHandler()->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::ReplacePanelClass::OnKeyDown));
-	
-	FindText->GetEventHandler()->Disconnect(wxID_ANY, wxID_ANY, wxEVT_KILL_FOCUS, wxFocusEventHandler(ReplacePanelClass::OnKillFocusFindText), NULL, this);
-	ReplaceWithText->GetEventHandler()->Disconnect(wxID_ANY, wxID_ANY, wxEVT_KILL_FOCUS, wxFocusEventHandler(ReplacePanelClass::OnKillFocusReplaceText), NULL, this);
 }
 
 void mvceditor::ReplacePanelClass::SetFocusOnFindText() {
@@ -443,14 +429,40 @@ void mvceditor::ReplacePanelClass::OnReplaceEnter(wxCommandEvent& event) {
 	OnReplaceButton(event);
 }
 
-void mvceditor::ReplacePanelClass::OnKeyDown(wxKeyEvent& event) {
+void mvceditor::ReplacePanelClass::OnFindKeyDown(wxKeyEvent& event) {
 
-	// warning: don't use "this"; look at the way this event has been connected 
+	// since this panel handles EVT_TEXT_ENTER, we need to handle the
+	// tab traversal ourselves otherwise tab travesal wont work
 	if (event.GetKeyCode() == WXK_TAB && event.ShiftDown()) {
-		Navigate(wxNavigationKeyEvent::IsBackward);
+		FindText->Navigate(wxNavigationKeyEvent::IsBackward);
+	}
+	else if (event.GetKeyCode() == WXK_TAB) {
+		FindText->Navigate(wxNavigationKeyEvent::IsForward);
+	}
+	else  if (event.GetKeyCode() == WXK_ESCAPE) {
+		AuiManager->GetPane(this).Hide();
+		AuiManager->Update();
+	}
+	else {
+		event.Skip();
+	}
+}
+
+void mvceditor::ReplacePanelClass::OnReplaceKeyDown(wxKeyEvent& event) {
+
+	// since this panel handles EVT_TEXT_ENTER, we need to handle the
+	// tab traversal ourselves otherwise tab travesal wont work
+	if (event.GetKeyCode() == WXK_TAB && event.ShiftDown()) {
+		ReplaceWithText->Navigate(wxNavigationKeyEvent::IsBackward);
+		event.Skip();
 	}
 	else if (event.GetKeyCode() == WXK_TAB ) {
-		Navigate(wxNavigationKeyEvent::IsForward);
+		ReplaceWithText->Navigate(wxNavigationKeyEvent::IsForward);
+		event.Skip();
+	}
+	else  if (event.GetKeyCode() == WXK_ESCAPE) {
+		AuiManager->GetPane(this).Hide();
+		AuiManager->Update();
 	}
 	else {
 		event.Skip();
@@ -487,12 +499,20 @@ void mvceditor::ReplacePanelClass::EnableReplaceButtons(bool enable) {
 	UndoButton->Enable(enable);
 }
 
-void mvceditor::ReplacePanelClass::OnKillFocusFindText(wxFocusEvent& event) {
+void mvceditor::ReplacePanelClass::OnFindKillFocus(wxFocusEvent& event) {
+
+	// connect to the KILL_FOCUS events so that we can capture the insertion point
+	// on Win32 GetInsertionPoint() returns 0 when the combo box is no
+	// in focus; we must receive the position via an outside mechanism
 	CurrentInsertionPointFind = FindText->GetInsertionPoint();
 	event.Skip();
 }
 
-void mvceditor::ReplacePanelClass::OnKillFocusReplaceText(wxFocusEvent& event) {
+void mvceditor::ReplacePanelClass::OnReplaceKillFocus(wxFocusEvent& event) {
+
+	// connect to the KILL_FOCUS events so that we can capture the insertion point
+	// on Win32 GetInsertionPoint() returns 0 when the combo box is no
+	// in focus; we must receive the position via an outside mechanism
 	CurrentInsertionPointReplace = ReplaceWithText->GetInsertionPoint();
 	event.Skip();
 }
