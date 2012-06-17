@@ -1,0 +1,18 @@
+Index: reference/mongo/mongogridfs.xml
+===================================================================
+--- reference/mongo/mongogridfs.xml	(revision 326197)
++++ reference/mongo/mongogridfs.xml	(working copy)
+@@ -221,8 +221,13 @@
+     <ooclass><classname>MongoGridFS</classname></ooclass>
+ 
+ <!-- {{{ Class synopsis -->
++
+     <classsynopsisinfo>
+      <ooclass>
++      <classname>MongoGridFS</classname>
++     </ooclass>
++
++     <ooclass>
+       <modifier>extends</modifier>
+       <classname>MongoCollection</classname>
+      </ooclass>

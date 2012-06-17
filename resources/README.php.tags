@@ -1,0 +1,17 @@
+How php.tags was built
+======================
+
+The PHD project was forked; a new output type was added by me. The forked projet can be found here: https://github.com/robertop/phd
+and can be cloned from here: https://github.com/robertop/phd.git
+
+The PHD project takes the PHP documentation that is in SVN (in XML form) and generates various version of the documentation;
+an HTML version, a STUB version. PHD calls these 'formats'.  I added a CTAGS  format so that a normal CTAGS file was 
+created by running PHD.
+
+Running PHD involves:
+1. Cloning PHD
+2. Checking out the documentation from SVN
+3. Building the big XML file .manual.xml 
+4. Running PHD 
+
+The doc_patches sub-directory contains all patches to the PHP documentation so that the CTags that is built is correct.
