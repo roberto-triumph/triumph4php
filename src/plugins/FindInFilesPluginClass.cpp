@@ -485,11 +485,11 @@ void mvceditor::FindInFilesDialogClass::OnOkButton(wxCommandEvent& event) {
 		if (!Plugin.PreviousFindInFiles.Prepare()) {
 			wxMessageBox(_("Expression is not valid."), _("Find In Files"), wxOK | wxCENTER, this);
 		}
-		else if (Directory->GetStringSelection().IsEmpty()) {
+		else if (Directory->GetValue().IsEmpty()) {
 			wxMessageBox(_("Find path must not be empty."), _("Find In Files"), wxOK | wxCENTER, this);
 		}
 		else {
-			Plugin.PreviousFindPath = Directory->GetStringSelection();
+			Plugin.PreviousFindPath = Directory->GetValue();
 			Plugin.FindHistory.Save();
 			Plugin.ReplaceHistory.Save();
 			Plugin.DirectoriesHistory.Save();
