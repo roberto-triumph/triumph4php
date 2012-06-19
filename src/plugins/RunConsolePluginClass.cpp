@@ -507,7 +507,7 @@ void mvceditor::RunConsolePluginClass::RunCommand(const mvceditor::CliCommandCla
 			// set the name so that we can know which window pointer can be safely cast this panel back to the RunConsolePanelClass
 			AddToolsWindow(runConsolePanel, _("Run"), wxT("mvceditor::RunConsolePanelClass"));
 		}
-		if (selection >= 0 && runConsolePanel) {
+		if (runConsolePanel) {
 			
 			// window already created, will just re-run the command that's already there
 			runConsolePanel->SetToRunCommand(command);
