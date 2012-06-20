@@ -41,7 +41,7 @@ RunConsolePanelGeneratedClass::RunConsolePanelGeneratedClass( wxWindow* parent, 
 	wxBoxSizer* BottomSizer;
 	BottomSizer = new wxBoxSizer( wxVERTICAL );
 	
-	OutputWindow = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
+	OutputWindow = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH );
 	BottomSizer->Add( OutputWindow, 1, wxEXPAND|wxRIGHT|wxLEFT, 5 );
 	
 	FlexGridSizer->Add( BottomSizer, 0, wxEXPAND, 5 );

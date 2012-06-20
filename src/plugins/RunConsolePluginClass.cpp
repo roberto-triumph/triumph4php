@@ -23,12 +23,14 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <plugins/RunConsolePluginClass.h>
+#include <windows/StringHelperClass.h>
 #include <MvcEditorErrors.h>
 #include <MvcEditor.h>
 #include <wx/artprov.h>
 #include <wx/filename.h>
 #include <wx/sstream.h>
 #include <wx/valgen.h>
+
 
 static const int ID_PROCESS = wxNewId();
 static const int ID_WINDOW_CONSOLE = wxNewId();
@@ -320,7 +322,7 @@ void  mvceditor::RunConsolePanelClass::OnProcessFailed(wxCommandEvent& event) {
 
 	// if no output, do not append.  This will allow the user the ability to select the text when the process is silent
 	if (!output.IsEmpty()) {
-		OutputWindow->AppendText(output);
+		AppendText(output);
 	}
 	Gauge->StopGauge(IdProcessGauge);
 	CurrentPid = 0;
@@ -333,7 +335,7 @@ void  mvceditor::RunConsolePanelClass::OnProcessInProgress(wxCommandEvent& event
 
 	// if no output, do not append.  This will allow the user the ability to select the text when the process is silent
 	if (!output.IsEmpty()) {
-		OutputWindow->AppendText(output);
+		AppendText(output);
 	}
 	Gauge->IncrementGauge(IdProcessGauge, StatusBarWithGaugeClass::INDETERMINATE_MODE);
 }
@@ -343,7 +345,7 @@ void  mvceditor::RunConsolePanelClass::OnProcessComplete(wxCommandEvent& event) 
 
 	// if no output, do not append.  This will allow the user the ability to select the text when the process is silent
 	if (!output.IsEmpty()) {
-		OutputWindow->AppendText(output);
+		AppendText(output);
 	}
 	Gauge->StopGauge(IdProcessGauge);
 	CurrentPid = 0;
@@ -391,6 +393,60 @@ void mvceditor::RunConsolePanelClass::OnStoreButton(wxCommandEvent& event) {
 
 wxString mvceditor::RunConsolePanelClass::GetCommand() const {
 	return Command->GetValue();
+}
+
+void mvceditor::RunConsolePanelClass::AppendText(const wxString& text) {
+	mvceditor::FinderClass finder;
+	finder.Mode = mvceditor::FinderClass::REGULAR_EXPRESSION;
+	finder.CaseSensitive = false;
+
+	// pattern C:\\folder1\\folder2
+	// we need to escape backslashes so 1 escaped literal backslash=4 backslashes
+	// TODO: linux filenames
+	finder.Expression = UNICODE_STRING_SIMPLE("\\b([A-Za-z]:[\\\\\\w_.]+)\\b");
+	wxASSERT(finder.Prepare());
+	
+	UnicodeString uniText = mvceditor::StringHelperClass::wxToIcu(text);
+	int32_t totalLength = uniText.length();
+
+	wxTextAttr normalAttr(*wxBLACK);
+	wxTextAttr fileAttr(*wxBLUE);
+
+	int32_t index = 0;
+	while (index >= 0 && index < totalLength) {
+		int32_t hitStart, hitLength;
+
+		if (finder.FindNext(uniText, index) && finder.GetLastMatch(hitStart, hitLength)) {
+			
+			if (hitStart > index) {
+			
+				// render the text prior to the hit as normal
+				OutputWindow->SetDefaultStyle(normalAttr);
+				UnicodeString beforeHit(uniText, index, hitStart - index);
+				OutputWindow->AppendText(mvceditor::StringHelperClass::IcuToWx(beforeHit));
+			}
+
+			// render the hit
+			OutputWindow->SetDefaultStyle(fileAttr);
+			UnicodeString hit(uniText, hitStart, hitLength);
+			OutputWindow->AppendText(mvceditor::StringHelperClass::IcuToWx(hit));
+			index = hitStart + hitLength + 1;
+
+			if ((hitStart + hitLength) < totalLength) {
+				
+				// render the ending boundary that was taken by the regular expression
+				UnicodeString afterHit(uniText, hitStart + hitLength, 1);
+				OutputWindow->AppendText(mvceditor::StringHelperClass::IcuToWx(afterHit));
+
+			}
+		}
+		else {
+			OutputWindow->SetDefaultStyle(normalAttr);
+			UnicodeString noHit(uniText, index);
+			OutputWindow->AppendText(mvceditor::StringHelperClass::IcuToWx(noHit));
+			index = -1;
+		}
+	}
 }
 
 mvceditor::RunConsolePluginClass::RunConsolePluginClass()

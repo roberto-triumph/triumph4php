@@ -255,6 +255,12 @@ private:
 	 * @param wwCommandEvent& event
 	 */
 	void OnProcessInProgress(wxCommandEvent& event);
+
+	/**
+	 * @param text to append to the output. This method will format filenames
+	 * so that they are distinguishable from other text.
+	 */
+	void AppendText(const wxString& text);
 	
 	DECLARE_EVENT_TABLE()
 };
@@ -348,13 +354,6 @@ private:
 	wxMenuItem* RunCliWithArgsMenuItem;
 	wxMenuItem* RunCliInNewWindowMenuItem;
 	wxMenuItem* RunCliWithArgsInNewWindowMenuItem;
-
-	/*
-	 * Panel that stores the buttons to quickly execute
-	 * the stored commands. This class will not own
-	 * any of these pointers.
-	 */
-	//wxPanel* CommandPanel;
 
 	wxAuiToolBar* CommandToolbar;
 
