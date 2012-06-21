@@ -262,6 +262,13 @@ private:
 	 */
 	void AppendText(const wxString& text);
 	
+	/**
+	 * @return the regular expression that will match a file name. The 
+	 * matche files will have PHP, CSS, or SQL extensions as allowed
+	 * by the current project's file name wildcards.
+	 */
+	UnicodeString FileNameRegularExpression();
+	
 	DECLARE_EVENT_TABLE()
 };
 

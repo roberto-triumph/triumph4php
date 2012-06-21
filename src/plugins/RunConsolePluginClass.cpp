@@ -399,23 +399,24 @@ void mvceditor::RunConsolePanelClass::AppendText(const wxString& text) {
 	mvceditor::FinderClass finder;
 	finder.Mode = mvceditor::FinderClass::REGULAR_EXPRESSION;
 	finder.CaseSensitive = false;
-
-	// pattern C:\\folder1\\folder2
-	// we need to escape backslashes so 1 escaped literal backslash=4 backslashes
-	// TODO: linux filenames
-	finder.Expression = UNICODE_STRING_SIMPLE("\\b([A-Za-z]:[\\\\\\w_.]+)\\b");
+	finder.Expression = FileNameRegularExpression();
+	
 	wxASSERT(finder.Prepare());
 	
 	UnicodeString uniText = mvceditor::StringHelperClass::wxToIcu(text);
 	int32_t totalLength = uniText.length();
 
-	wxTextAttr normalAttr(*wxBLACK);
-	wxTextAttr fileAttr(*wxBLUE);
+	wxFont regularFont = OutputWindow->GetFont();
+	regularFont.SetUnderlined(false);
+	wxTextAttr normalAttr(*wxBLACK, wxNullColour, regularFont);
+
+	wxFont underlinedFont = OutputWindow->GetFont();
+	underlinedFont.SetUnderlined(true);
+	wxTextAttr fileAttr(*wxBLUE, wxNullColour, underlinedFont);
 
 	int32_t index = 0;
 	while (index >= 0 && index < totalLength) {
 		int32_t hitStart, hitLength;
-
 		if (finder.FindNext(uniText, index) && finder.GetLastMatch(hitStart, hitLength)) {
 			
 			if (hitStart > index) {
@@ -435,6 +436,7 @@ void mvceditor::RunConsolePanelClass::AppendText(const wxString& text) {
 			if ((hitStart + hitLength) < totalLength) {
 				
 				// render the ending boundary that was taken by the regular expression
+				OutputWindow->SetDefaultStyle(normalAttr);
 				UnicodeString afterHit(uniText, hitStart + hitLength, 1);
 				OutputWindow->AppendText(mvceditor::StringHelperClass::IcuToWx(afterHit));
 
@@ -447,6 +449,57 @@ void mvceditor::RunConsolePanelClass::AppendText(const wxString& text) {
 			index = -1;
 		}
 	}
+}
+
+UnicodeString mvceditor::RunConsolePanelClass::FileNameRegularExpression() {
+	wxPlatformInfo info;
+	mvceditor::ProjectClass* project = Plugin.GetProject();
+	std::vector<wxString> allExtensions;
+	std::vector<wxString> phpExtensions = project->GetPhpFileExtensions();
+	std::vector<wxString> cssExtensions = project->GetCssFileExtensions();
+	std::vector<wxString> sqlExtensions = project->GetSqlFileExtensions();
+	for (size_t i = 0; i < phpExtensions.size(); ++i) {
+		allExtensions.push_back(phpExtensions[i]);
+	}
+	for (size_t i = 0; i < cssExtensions.size(); ++i) {
+		allExtensions.push_back(cssExtensions[i]);
+	}
+	for (size_t i = 0; i < sqlExtensions.size(); ++i) {
+		allExtensions.push_back(sqlExtensions[i]);
+	}
+	wxString extensionsRegEx;
+	for (size_t i = 0; i < allExtensions.size(); ++i) {
+		
+		// turn wilcards into proper regular expression syntax
+		wxString ext = allExtensions[i];
+		ext.Replace(wxT("."), wxT("\\."));
+		ext.Replace(wxT("*"), wxT(".*"));
+		ext.Replace(wxT("?"), wxT(".?"));
+		extensionsRegEx += ext;
+		if (i < (allExtensions.size() - 1)) {
+			extensionsRegEx += wxT("|");
+		}
+	}
+	extensionsRegEx = wxT("(") + extensionsRegEx  + wxT(")"); 
+	
+	UnicodeString uniRegEx;
+	if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
+		
+		// pattern C:\\folder1\\folder2
+		// we need to escape backslashes so 1 escaped literal backslash=4 backslashes
+		uniRegEx += UNICODE_STRING_SIMPLE("(^|\\s)");
+		uniRegEx += UNICODE_STRING_SIMPLE("([A-Za-z]:[\\\\\\w_. ]+)");
+		uniRegEx += mvceditor::StringHelperClass::wxToIcu(extensionsRegEx);
+		uniRegEx += UNICODE_STRING_SIMPLE("($|\\s)"); 
+		
+	}
+	else {
+		uniRegEx += UNICODE_STRING_SIMPLE("(^|\\s)/");
+		uniRegEx += UNICODE_STRING_SIMPLE("([\\w_. /]+)");
+		uniRegEx += mvceditor::StringHelperClass::wxToIcu(extensionsRegEx);
+		uniRegEx += UNICODE_STRING_SIMPLE("($|\\s)"); 
+	}
+	return uniRegEx;
 }
 
 mvceditor::RunConsolePluginClass::RunConsolePluginClass()
