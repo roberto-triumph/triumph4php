@@ -46,6 +46,8 @@ class RunConsolePanelGeneratedClass : public wxPanel
 		virtual void RunCommand( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnClear( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnStoreButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnLeftDown( wxMouseEvent& event ) { event.Skip(); }
+		virtual void OnMouseMotion( wxMouseEvent& event ) { event.Skip(); }
 		
 	
 	public:

@@ -380,12 +380,12 @@
                                         <event name="OnKillFocus"></event>
                                         <event name="OnLeaveWindow"></event>
                                         <event name="OnLeftDClick"></event>
-                                        <event name="OnLeftDown"></event>
+                                        <event name="OnLeftDown">OnLeftDown</event>
                                         <event name="OnLeftUp"></event>
                                         <event name="OnMiddleDClick"></event>
                                         <event name="OnMiddleDown"></event>
                                         <event name="OnMiddleUp"></event>
-                                        <event name="OnMotion"></event>
+                                        <event name="OnMotion">OnMouseMotion</event>
                                         <event name="OnMouseEvents"></event>
                                         <event name="OnMouseWheel"></event>
                                         <event name="OnPaint"></event>

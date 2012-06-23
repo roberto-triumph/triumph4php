@@ -228,6 +228,7 @@ mvceditor::RunConsolePanelClass::RunConsolePanelClass(wxWindow* parent, int id,
 	, ProcessWithHeartbeat(*this)
 	, Gauge(gauge)
 	, Plugin(plugin)
+	, FileNameHits()
 	, CurrentPid(0) {
 	wxGenericValidator commandValidator(&CommandString);
 	Command->SetValidator(commandValidator);
@@ -315,6 +316,7 @@ void  mvceditor::RunConsolePanelClass::RunCommand(wxCommandEvent& event) {
 
 void  mvceditor::RunConsolePanelClass::OnClear(wxCommandEvent& event) {
 	OutputWindow->ChangeValue(wxT(""));
+	FileNameHits.clear();
 }
 
 void  mvceditor::RunConsolePanelClass::OnProcessFailed(wxCommandEvent& event) {
@@ -400,7 +402,6 @@ void mvceditor::RunConsolePanelClass::AppendText(const wxString& text) {
 	finder.Mode = mvceditor::FinderClass::REGULAR_EXPRESSION;
 	finder.CaseSensitive = false;
 	finder.Expression = FileNameRegularExpression();
-	
 	wxASSERT(finder.Prepare());
 	
 	UnicodeString uniText = mvceditor::StringHelperClass::wxToIcu(text);
@@ -416,30 +417,39 @@ void mvceditor::RunConsolePanelClass::AppendText(const wxString& text) {
 
 	int32_t index = 0;
 	while (index >= 0 && index < totalLength) {
-		int32_t hitStart, hitLength;
-		if (finder.FindNext(uniText, index) && finder.GetLastMatch(hitStart, hitLength)) {
-			
-			if (hitStart > index) {
+		mvceditor::FileNameHitClass hit;
+		if (finder.FindNext(uniText, index) && finder.GetLastMatch(hit.StartIndex, hit.Length)) {
+			if (hit.StartIndex > index) {
 			
 				// render the text prior to the hit as normal
 				OutputWindow->SetDefaultStyle(normalAttr);
-				UnicodeString beforeHit(uniText, index, hitStart - index);
+				UnicodeString beforeHit(uniText, index, hit.StartIndex - index);
 				OutputWindow->AppendText(mvceditor::StringHelperClass::IcuToWx(beforeHit));
 			}
+			wxString hitTrimmed = text.Mid(hit.StartIndex, hit.Length);
+			wxString hitContents = text.Mid(hit.StartIndex, hit.Length);
 
-			// render the hit
-			OutputWindow->SetDefaultStyle(fileAttr);
-			UnicodeString hit(uniText, hitStart, hitLength);
-			OutputWindow->AppendText(mvceditor::StringHelperClass::IcuToWx(hit));
-			index = hitStart + hitLength + 1;
+			// render the hit. a final check to make sure the hit is an actual file
+			// trim because the regular expression may contain a space at the beginning or the end
+			hitTrimmed.Trim(false).Trim(true);
+			if (wxFileName::FileExists(hitTrimmed)) {
+				OutputWindow->SetDefaultStyle(fileAttr);
+				
+				// store it so that we can use it during mouse hover
+				FileNameHits.push_back(hit);
+			}
+			else {
+				OutputWindow->SetDefaultStyle(normalAttr);
+			}
+			OutputWindow->AppendText(hitContents);
+			index = hit.StartIndex + hit.Length + 1;
 
-			if ((hitStart + hitLength) < totalLength) {
+			if ((hit.StartIndex + hit.Length) < totalLength) {
 				
 				// render the ending boundary that was taken by the regular expression
 				OutputWindow->SetDefaultStyle(normalAttr);
-				UnicodeString afterHit(uniText, hitStart + hitLength, 1);
+				UnicodeString afterHit(uniText, hit.StartIndex + hit.Length, 1);
 				OutputWindow->AppendText(mvceditor::StringHelperClass::IcuToWx(afterHit));
-
 			}
 		}
 		else {
@@ -488,7 +498,7 @@ UnicodeString mvceditor::RunConsolePanelClass::FileNameRegularExpression() {
 		// pattern C:\\folder1\\folder2
 		// we need to escape backslashes so 1 escaped literal backslash=4 backslashes
 		uniRegEx += UNICODE_STRING_SIMPLE("(^|\\s)");
-		uniRegEx += UNICODE_STRING_SIMPLE("([A-Za-z]:[\\\\\\w_. ]+)");
+		uniRegEx += UNICODE_STRING_SIMPLE("([A-Za-z]\\:[\\\\\\w_. ]+)\\\\");
 		uniRegEx += mvceditor::StringHelperClass::wxToIcu(extensionsRegEx);
 		uniRegEx += UNICODE_STRING_SIMPLE("($|\\s)"); 
 		
@@ -500,6 +510,48 @@ UnicodeString mvceditor::RunConsolePanelClass::FileNameRegularExpression() {
 		uniRegEx += UNICODE_STRING_SIMPLE("($|\\s)"); 
 	}
 	return uniRegEx;
+}
+
+void mvceditor::RunConsolePanelClass::OnMouseMotion(wxMouseEvent& event) {
+	mvceditor::FileNameHitClass mouseHit = HitAt(event);
+	bool isCursorHand = mouseHit.Length > 0;
+	if (isCursorHand) {
+		SetCursor(wxCURSOR_HAND);
+	}
+	else {
+		SetCursor(wxCURSOR_ARROW);
+	}
+}
+
+void mvceditor::RunConsolePanelClass::OnLeftDown(wxMouseEvent& event) {
+	mvceditor::FileNameHitClass mouseHit = HitAt(event);
+	if (mouseHit.Length > 0) {
+		wxString output = OutputWindow->GetValue();
+		wxString fileName = output.Mid(mouseHit.StartIndex, mouseHit.Length);
+
+		// trim because the regular expression may contain a space at the beginning or the end
+		fileName.Trim(false).Trim(true);
+		if (wxFileName::FileExists(fileName)) {
+			Plugin.LoadPage(fileName);
+		}
+	}
+}
+
+mvceditor::FileNameHitClass mvceditor::RunConsolePanelClass::HitAt(wxMouseEvent& event) {
+	mvceditor::FileNameHitClass mouseHit;
+	wxTextCoord x, y;
+	wxTextCtrlHitTestResult result = OutputWindow->HitTest(event.GetPosition(), &x, &y);
+	if (wxTE_HT_ON_TEXT == result) {
+		int32_t pos = (int32_t)OutputWindow->XYToPosition(x, y);
+		for (size_t i = 0; i < FileNameHits.size(); ++i) {
+			mvceditor::FileNameHitClass hit = FileNameHits[i];
+			if (pos > hit.StartIndex && pos < (hit.StartIndex + hit.Length)) {
+				mouseHit = hit;
+				break;
+			}
+		}
+	}
+	return mouseHit;
 }
 
 mvceditor::RunConsolePluginClass::RunConsolePluginClass()
@@ -746,6 +798,16 @@ void mvceditor::RunConsolePluginClass::OnCommandButtonClick(wxCommandEvent& even
 		mvceditor::CliCommandClass cmd = CliCommands[index];
 		RunCommand(cmd, true);
 	}
+}
+
+void mvceditor::RunConsolePluginClass::LoadPage(const wxString& fileName) {
+	GetNotebook()->LoadPage(fileName);
+}
+
+mvceditor::FileNameHitClass::FileNameHitClass()
+	: StartIndex(0)
+	, Length(0) {
+
 }
 
 BEGIN_EVENT_TABLE(mvceditor::RunConsolePanelClass, wxPanel) 

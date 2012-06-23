@@ -147,7 +147,6 @@ private:
 	 * List of commands that the user modifies.
 	 */
 	std::vector<mvceditor::CliCommandClass> EditedCommands;
-
 	
 	/**
 	 * populates the Commands listbox using the data 
@@ -155,6 +154,27 @@ private:
 	 */
 	void FillList();
 	
+};
+
+/**
+ * Keeps track of the position of a file name in the output.
+ */
+class FileNameHitClass {
+
+public:
+
+	/**
+	 * The 0-based index into output string. This is the start of the file name
+	 */
+	int32_t StartIndex;
+
+	/**
+	 * The number of characters in the file name
+	 */
+	int32_t Length;
+
+	FileNameHitClass();
+
 };
 	
 class RunConsolePanelClass : public RunConsolePanelGeneratedClass {
@@ -226,6 +246,11 @@ private:
 	 * To save the current command to be persisted.
 	 */
 	RunConsolePluginClass& Plugin;
+
+	/**
+	 * Save the hits so that we can traverse through them
+	 */
+	std::vector<mvceditor::FileNameHitClass> FileNameHits;
 	
 	/**
 	 * the current PID of the async process.
@@ -268,6 +293,25 @@ private:
 	 * by the current project's file name wildcards.
 	 */
 	UnicodeString FileNameRegularExpression();
+
+	/**
+	 * on mouse events, check to see if the mouse is hovered over a file name
+	 * if so, then change the cursor
+	 */
+	void OnMouseMotion(wxMouseEvent& event);
+	
+	/**
+	 * Opens the file that was clicked on
+	 */
+	void OnLeftDown(wxMouseEvent& event);
+
+	/**
+	 * Get the filename hit from the mouse event
+	 *
+	 * @param evt the mouse position
+	 * @return the filename hit that is located at the mouse position
+	 */
+	mvceditor::FileNameHitClass HitAt(wxMouseEvent& evt);
 	
 	DECLARE_EVENT_TABLE()
 };
@@ -305,6 +349,11 @@ public:
 	 * Saves the CLI commands to the [global] config
 	 */
 	void PersistCommands();
+
+	/**
+	 * Open a file.
+	 */
+	void LoadPage(const wxString& fileName);
 	
 private:
 				

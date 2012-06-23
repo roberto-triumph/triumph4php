@@ -56,6 +56,8 @@ RunConsolePanelGeneratedClass::RunConsolePanelGeneratedClass( wxWindow* parent, 
 	RunButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( RunConsolePanelGeneratedClass::RunCommand ), NULL, this );
 	ClearButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( RunConsolePanelGeneratedClass::OnClear ), NULL, this );
 	StoreButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( RunConsolePanelGeneratedClass::OnStoreButton ), NULL, this );
+	OutputWindow->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( RunConsolePanelGeneratedClass::OnLeftDown ), NULL, this );
+	OutputWindow->Connect( wxEVT_MOTION, wxMouseEventHandler( RunConsolePanelGeneratedClass::OnMouseMotion ), NULL, this );
 }
 
 RunConsolePanelGeneratedClass::~RunConsolePanelGeneratedClass()
@@ -65,6 +67,8 @@ RunConsolePanelGeneratedClass::~RunConsolePanelGeneratedClass()
 	RunButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( RunConsolePanelGeneratedClass::RunCommand ), NULL, this );
 	ClearButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( RunConsolePanelGeneratedClass::OnClear ), NULL, this );
 	StoreButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( RunConsolePanelGeneratedClass::OnStoreButton ), NULL, this );
+	OutputWindow->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( RunConsolePanelGeneratedClass::OnLeftDown ), NULL, this );
+	OutputWindow->Disconnect( wxEVT_MOTION, wxMouseEventHandler( RunConsolePanelGeneratedClass::OnMouseMotion ), NULL, this );
 	
 }
 
