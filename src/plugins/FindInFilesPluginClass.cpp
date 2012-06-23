@@ -163,7 +163,7 @@ void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findI
 	if (FindInFilesBackgroundFileReader.InitForFind(this, FindInFiles, findPath, doHiddenFiles, skipFiles)) {
 		mvceditor::BackgroundFileReaderClass::StartError error;
 		if (FindInFilesBackgroundFileReader.StartReading(error)) {
-			EnableButtons(true, false);
+			EnableButtons(true, false, false);
 			Gauge->AddGauge(_("Find In Files"), FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE, 
 				wxGA_HORIZONTAL);
 
@@ -302,7 +302,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxComman
 			SetStatus(_("Find In Files In Progress"));
 			Gauge->AddGauge(_("Find In Files"), FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE, 
 				wxGA_HORIZONTAL);
-			EnableButtons(true, false);
+			EnableButtons(true, false, false);
 		}
 		else if (error == mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING)  {
 			wxMessageBox(_("Find in files is already running. Please wait for it to finish."), _("Find In Files"));
@@ -319,7 +319,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxComman
 void mvceditor::FindInFilesResultsPanelClass::OnFindInFilesComplete(wxCommandEvent& event) {
 	int matchedFilesSize = GetNumberOfMatchedFiles();
 	bool enableIterators = matchedFilesSize > 0 && !FindInFiles.ReplaceExpression.isEmpty();
-	EnableButtons(false, enableIterators);
+	EnableButtons(false, enableIterators, enableIterators);
 	Gauge->StopGauge(FindInFilesGaugeId);
 	if (event.GetInt() == BackgroundFileReaderClass::WALK) {
 		if (matchedFilesSize > 0) {
@@ -362,6 +362,9 @@ void mvceditor::FindInFilesResultsPanelClass::OnFileHit(mvceditor::FindInFilesHi
 
 void mvceditor::FindInFilesResultsPanelClass::OnStopButton(wxCommandEvent& event) {
 	FindInFilesBackgroundFileReader.StopReading();
+	SetStatus(_("Search stopped"));
+	bool enableIterators = MatchedFiles > 0;
+	EnableButtons(false, enableIterators, enableIterators);
 }
 
 void mvceditor::FindInFilesResultsPanelClass::OnDoubleClick(wxCommandEvent& event) {
@@ -426,13 +429,13 @@ void mvceditor::FindInFilesResultsPanelClass::OnCopyAllButton(wxCommandEvent& ev
 	}
 }
 
-void mvceditor::FindInFilesResultsPanelClass::EnableButtons(bool enableStopButton, bool enableReplaceButtons) {
+void mvceditor::FindInFilesResultsPanelClass::EnableButtons(bool enableStopButton, bool enableReplaceButtons, bool enableCopyButtons) {
 	StopButton->Enable(enableStopButton);
 	ReplaceButton->Enable(enableReplaceButtons);
 	ReplaceAllInFileButton->Enable(enableReplaceButtons);
 	ReplaceInAllFilesButton->Enable(enableReplaceButtons);
-	CopySelectedButton->Enable(!enableStopButton);
-	CopyAllButton->Enable(!enableStopButton);
+	CopySelectedButton->Enable(enableCopyButtons);
+	CopyAllButton->Enable(enableCopyButtons);
 }
 
 void mvceditor::FindInFilesResultsPanelClass::SetStatus(const wxString& text) {

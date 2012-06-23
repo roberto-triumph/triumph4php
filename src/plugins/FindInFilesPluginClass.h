@@ -265,8 +265,9 @@ private:
 	 * 
 	 * @param bool enableStopButton if true, the stop button is enabled, else it is disabled
 	 * @param bool enableReplaceButtons if true, the replace buttons are enabled, else they are disabled
+	 * @param bool enableCopyButtons if true the copy to clipboard buttos are enabled, else they are disabled
 	 */
-	void EnableButtons(bool enableStopButton, bool enableReplaceButtons);
+	void EnableButtons(bool enableStopButton, bool enableReplaceButtons, bool enableCopyButtons);
 
 	/**
 	 * Place the given string in the results status label
