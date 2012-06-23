@@ -41,6 +41,30 @@ static const int ID_FIND_IN_FILES_PROGRESS = wxNewId();
 static const int ID_REGEX_MENU_START = 9000;
 static const int ID_REGEX_REPLACE_MENU_START = 10000;
 
+mvceditor::FindInFilesHitClass::FindInFilesHitClass()
+	: FileName()
+	, Preview()
+	, LineNumber() {
+
+}
+
+mvceditor::FindInFilesHitClass::FindInFilesHitClass(const wxString& fileName, const wxString& preview, int lineNumber)
+	: FileName(fileName)
+	, Preview(preview)
+	, LineNumber(lineNumber) {
+
+}
+
+mvceditor::FindInFilesHitEventClass::FindInFilesHitEventClass(const std::vector<mvceditor::FindInFilesHitClass> &hits)
+	: wxEvent(wxID_ANY, mvceditor::EVENT_FIND_IN_FILES_FILE_HIT)
+	, Hits(hits) {
+}
+
+wxEvent* mvceditor::FindInFilesHitEventClass::Clone() const {
+	wxEvent* newEvt = new mvceditor::FindInFilesHitEventClass(Hits);
+	return newEvt;
+}
+
 mvceditor::FindInFilesBackgroundReaderClass::FindInFilesBackgroundReaderClass(wxEvtHandler& handler) 
 : BackgroundFileReaderClass(handler) {
 
@@ -79,18 +103,24 @@ bool mvceditor::FindInFilesBackgroundReaderClass::FileRead(DirectorySearchClass&
 		// DirectorySearch doesn't have a GetCurrentFile() so the one way to know the
 		// file that was searched is to do the search
 		std::vector<wxString>::iterator it = find(SkipFiles.begin(), SkipFiles.end(), fileName);
+		std::vector<mvceditor::FindInFilesHitClass> hits;
 		if (it == SkipFiles.end()) {
 			bool destroy = TestDestroy();
 			do {			
 				if (destroy) {
 					break;
 				}
-				int lineNumber = FindInFiles.GetCurrentLineNumber();
-				wxString lineText = StringHelperClass::IcuToWx(FindInFiles.GetCurrentLine());
-				wxCommandEvent hitEvent = MakeHitEvent(lineNumber, lineText, fileName); 
-				wxPostEvent(Handler, hitEvent);
+				mvceditor::FindInFilesHitClass hit(fileName, 
+					StringHelperClass::IcuToWx(FindInFiles.GetCurrentLine()), 
+					FindInFiles.GetCurrentLineNumber());
+				hits.push_back(hit);
+
 			}
 			while (!destroy && FindInFiles.FindNext());
+			if (!destroy && !hits.empty()) {
+				mvceditor::FindInFilesHitEventClass hitEvent(hits);
+				wxPostEvent(Handler, hitEvent);
+			}
 		}
 	}
 	return found;
@@ -106,18 +136,6 @@ bool mvceditor::FindInFilesBackgroundReaderClass::FileMatch(const wxString& file
 		matches += FindInFiles.ReplaceAllMatchesInFile(fileToReplace);
 	}
 	return matches > 0;
-}
-
-wxCommandEvent mvceditor::FindInFilesBackgroundReaderClass::MakeHitEvent(int lineNumber, const wxString& lineText, const wxString& fileName) {
-	
-	wxCommandEvent hitEvent(EVENT_FIND_IN_FILES_FILE_HIT, ID_FIND_IN_FILES_PROGRESS);
-
-	// in MSW the list control does not render the \t use another delimiter
-	wxString hit = fileName + wxT("\t:") + 
-		wxString::Format(wxT("%d"), lineNumber) + wxT("\t:") +
-		lineText;
-	hitEvent.SetString(hit);
-	return hitEvent;
 }
 	
 mvceditor::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* parent, NotebookClass* notebook, StatusBarWithGaugeClass* gauge)
@@ -150,40 +168,7 @@ void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findI
 				wxGA_HORIZONTAL);
 
 			// lets do the find in the opened files ourselves so that the hits are not stale
-
-			FinderClass finder;
-			FindInFiles.CopyFinder(finder);
-			if (finder.Prepare()) {
-
-				// search the opened files
-				for (size_t i = 0; i < Notebook->GetPageCount(); ++i) {
-					CodeControlClass* codeControl = Notebook->GetCodeControl(i);
-					UnicodeString text = codeControl->GetSafeText();
-					int32_t next = 0;
-					int32_t charPos = 0,
-						length = 0;
-					while (finder.FindNext(text, next)) {
-						if (finder.GetLastMatch(charPos, length)) {
-							int lineNumber = codeControl->LineFromCharacter(charPos);
-							
-							int start = codeControl->PositionFromLine(lineNumber);
-							int end = codeControl->GetLineEndPosition(lineNumber);
-							wxString lineText = codeControl->GetTextRange(start, end);
-
-							// lineNumber is zero-based but we want to display it as 1-based
-							lineNumber++;
-							wxCommandEvent evt = mvceditor::FindInFilesBackgroundReaderClass::MakeHitEvent(lineNumber, lineText, 
-								codeControl->GetFileName());
-							wxPostEvent(this, evt);
-							next = charPos + length;
-						}
-						else {
-							break;
-						}
-					}
-				}
-			}
-			
+			FindInOpenedFiles();			
 		}
 		else if (error == mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING)  {
 			wxMessageBox(_("Find in files is already running. Please wait for it to finish."), _("Find In Files"));
@@ -194,6 +179,50 @@ void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findI
 	}
 	else {
 		wxMessageBox(_("Please enter a valid expression and path."));
+	}
+}
+
+void mvceditor::FindInFilesResultsPanelClass::FindInOpenedFiles() {
+	FinderClass finder;
+	FindInFiles.CopyFinder(finder);
+	if (FindInFiles.Prepare() && finder.Prepare()) {
+
+		// search the opened files
+		for (size_t i = 0; i < Notebook->GetPageCount(); ++i) {
+			CodeControlClass* codeControl = Notebook->GetCodeControl(i);
+			wxString fileName = codeControl->GetFileName();
+
+			// make sure to respect the wildcard filter and the find path here too
+			if (FindInFiles.ShouldSearch(fileName) && fileName.Find(FindPath) == 0) {
+				UnicodeString text = codeControl->GetSafeText();
+				int32_t next = 0;
+				int32_t charPos = 0,
+					length = 0;
+				std::vector<mvceditor::FindInFilesHitClass> hits;
+				while (finder.FindNext(text, next)) {
+					if (finder.GetLastMatch(charPos, length)) {
+						int lineNumber = codeControl->LineFromCharacter(charPos);
+						
+						int start = codeControl->PositionFromLine(lineNumber);
+						int end = codeControl->GetLineEndPosition(lineNumber);
+						wxString lineText = codeControl->GetTextRange(start, end);
+
+						// lineNumber is zero-based but we want to display it as 1-based
+						lineNumber++;
+						mvceditor::FindInFilesHitClass hit(fileName, lineText, lineNumber);
+						hits.push_back(hit);
+						next = charPos + length;
+					}
+					else {
+						break;
+					}
+				}
+				if (!hits.empty()) {
+					mvceditor::FindInFilesHitEventClass hitEvent(hits);
+					wxPostEvent(this, hitEvent);
+				}
+			}
+		}
 	}
 }
 
@@ -287,17 +316,6 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxComman
 	}
 }
 
-void mvceditor::FindInFilesResultsPanelClass::OnFileSearched(wxCommandEvent& event) {
-	int progress = event.GetInt();
-	if (progress >= 0) {
-		void* matchFound = event.GetClientData();
-		if (matchFound) {
-			++MatchedFiles;
-			SetStatus(wxString::Format(wxT("Found %d files with matches so far"), MatchedFiles));
-		}
-	}
-}
-
 void mvceditor::FindInFilesResultsPanelClass::OnFindInFilesComplete(wxCommandEvent& event) {
 	int matchedFilesSize = GetNumberOfMatchedFiles();
 	bool enableIterators = matchedFilesSize > 0 && !FindInFiles.ReplaceExpression.isEmpty();
@@ -321,10 +339,25 @@ void mvceditor::FindInFilesResultsPanelClass::OnFindInFilesComplete(wxCommandEve
 	}
 }
 
-void mvceditor::FindInFilesResultsPanelClass::OnFileHit(wxCommandEvent& event) {
-	wxString hit = event.GetString();
-	hit.Trim();
-	ResultsList->Append(hit.SubString(0, 200));
+void mvceditor::FindInFilesResultsPanelClass::OnFileHit(mvceditor::FindInFilesHitEventClass& event) {
+	if (event.Hits.empty()) {
+		return;
+	}
+	MatchedFiles++;
+
+	// in case there are any hits
+	ResultsList->Freeze();
+	for (size_t i = 0; i < event.Hits.size(); ++i) {
+		mvceditor::FindInFilesHitClass hit = event.Hits[i];
+
+		// in MSW the list control does not render the \t use another delimiter
+		wxString msg = hit.FileName + wxT("\t:") + 
+			wxString::Format(wxT("%d"), hit.LineNumber) + wxT("\t:") +
+			hit.Preview;
+		msg.Trim();
+		ResultsList->Append(msg.SubString(0, 200));
+	}
+	ResultsList->Thaw();
 }
 
 void mvceditor::FindInFilesResultsPanelClass::OnStopButton(wxCommandEvent& event) {
@@ -613,8 +646,11 @@ void mvceditor::FindInFilesDialogClass::InsertReplaceRegExSymbol(wxCommandEvent&
 }
 
 BEGIN_EVENT_TABLE(mvceditor::FindInFilesResultsPanelClass, FindInFilesResultsPanelGeneratedClass)
-	EVT_COMMAND(wxID_ANY, EVENT_FILE_READ, mvceditor::FindInFilesResultsPanelClass::OnFileSearched)
-	EVT_COMMAND(ID_FIND_IN_FILES_PROGRESS, EVENT_FIND_IN_FILES_FILE_HIT, mvceditor::FindInFilesResultsPanelClass::OnFileHit)
+	
+	// remove this handler; when searching many files the GUI is redrawn constantly and doesn't
+	// look smooth
+	//EVT_COMMAND(wxID_ANY, EVENT_FILE_READ, mvceditor::FindInFilesResultsPanelClass::OnFileSearched)
+	EVT_FIND_IN_FILES_HITS(mvceditor::FindInFilesResultsPanelClass::OnFileHit)
 	EVT_COMMAND(wxID_ANY, EVENT_FILE_READ_COMPLETE, mvceditor::FindInFilesResultsPanelClass::OnFindInFilesComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::FindInFilesResultsPanelClass::OnTimer)
 END_EVENT_TABLE()

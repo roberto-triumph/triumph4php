@@ -88,6 +88,16 @@ bool mvceditor::FindInFilesClass::Walk(const wxString& fileName) {
 	return found;
 }
 
+bool mvceditor::FindInFilesClass::ShouldSearch(const wxString& fileName) {
+	bool isMatch = false;
+	if (FilesFilterRegEx.IsValid() && FilesFilterRegEx.Matches(fileName)) {
+		if (!fileName.empty()) {
+			isMatch = true;
+		}
+	}
+	return isMatch;
+}
+
 bool mvceditor::FindInFilesClass::FindNext() {
 	int32_t pos = 0,
 		length;

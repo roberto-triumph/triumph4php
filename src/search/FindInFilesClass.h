@@ -178,6 +178,14 @@ public:
 	 * 		 iterate through the rest of the hits of the file.
 	 */
 	virtual bool Walk(const wxString& fileName);
+
+	/**
+	 * Check to see if the given file passes the files filter. You MUST call Prepare() method you call this method,
+	 * if Prepare method has not been called this method will always return false.
+	 * 
+	 * @return bool true if the given file matches the FilesFilter.
+	 */
+	bool ShouldSearch(const wxString& fileName);
 	
 	/**
 	 * Finds the next match in the given text. The matched line number is then made available with the GetCurrentLineNumber() method.
