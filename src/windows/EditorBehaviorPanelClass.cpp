@@ -56,9 +56,7 @@ mvceditor::EditorBehaviorPanelClass::EditorBehaviorPanelClass(wxWindow* parent, 
 	wxGenericValidator wordWrapValidator(&options.EnableWordWrap);
 	EnableWordWrap->SetValidator(wordWrapValidator);
 	wxGenericValidator trimTrailingSpaceValidator(&options.TrimTrailingSpaceBeforeSave);
-	EnableWordWrap->SetValidator(trimTrailingSpaceValidator);
-	wxGenericValidator trimTrailingSpacesValidator(&options.TrimTrailingSpaceBeforeSave);
-	TrimTrailingSpaceBeforeSave->SetValidator(trimTrailingSpacesValidator);
+	TrimTrailingSpaceBeforeSave->SetValidator(trimTrailingSpaceValidator);
 	wxGenericValidator removeTrailingBlankLinesValidator(&options.RemoveTrailingBlankLinesBeforeSave);
 	RemoveTrailingBlankLines->SetValidator(removeTrailingBlankLinesValidator);
 }

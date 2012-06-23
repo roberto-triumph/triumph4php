@@ -67,6 +67,8 @@ private:
 
 	void OnCmdFileOpen(wxCommandEvent& event);
 
+	void OnPreferencesUpdated(wxCommandEvent& event);
+
 	/**
 	 * Need the frame to manipulate it
 	 */
@@ -114,6 +116,11 @@ public:
 	 * when a project is closed, close any open windows
 	 */
 	void OnProjectClosed();
+
+	/**
+	 * For a re-draw of all dialogs and windows based on new updated preferences
+	 */
+	void UpdatePreferences();
 
 protected:
 

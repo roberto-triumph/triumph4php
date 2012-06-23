@@ -663,6 +663,10 @@ void mvceditor::AppFrameClass::OnProjectClosed() {
 	Notebook->SetProject(NULL, &App->EventSink);
 }
 
+void mvceditor::AppFrameClass::UpdatePreferences() {
+	Notebook->RefreshCodeControlOptions();
+}
+
 mvceditor::AppEventListenerForFrameClass::AppEventListenerForFrameClass(mvceditor::AppFrameClass* appFrame)
 	: wxEvtHandler()
 	, AppFrame(appFrame) {
@@ -681,6 +685,10 @@ void mvceditor::AppEventListenerForFrameClass::OnCmdFileOpen(wxCommandEvent& eve
 	std::vector<wxString> filenames;
 	filenames.push_back(event.GetString());
 	AppFrame->FileOpen(filenames);
+}
+
+void mvceditor::AppEventListenerForFrameClass::OnPreferencesUpdated(wxCommandEvent& event) {
+	AppFrame->UpdatePreferences();
 }
 
 BEGIN_EVENT_TABLE(mvceditor::AppFrameClass,  AppFrameGeneratedClass)
@@ -737,4 +745,5 @@ BEGIN_EVENT_TABLE(mvceditor::AppEventListenerForFrameClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_OPENED, mvceditor::AppEventListenerForFrameClass::OnProjectOpened)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_CLOSED, mvceditor::AppEventListenerForFrameClass::OnProjectClosed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_FILE_OPEN, mvceditor::AppEventListenerForFrameClass::OnCmdFileOpen)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_UPDATED, mvceditor::AppEventListenerForFrameClass::OnPreferencesUpdated)
 END_EVENT_TABLE()
