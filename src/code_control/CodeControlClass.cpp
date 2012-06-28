@@ -1016,7 +1016,7 @@ mvceditor::CodeControlClass::Mode mvceditor::CodeControlClass::GetDocumentMode()
 }
 
 void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
-	if (event.GetEventObject() != this && IsHidden) {
+	if (event.GetEventObject() != this || IsHidden) {
 		event.Skip();
 		return;
 	}

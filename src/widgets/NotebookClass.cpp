@@ -408,15 +408,11 @@ int mvceditor::NotebookClass::WilcardIndex(mvceditor::CodeControlClass::Mode mod
 }
 
 void mvceditor::NotebookClass::OnPageChanging(wxAuiNotebookEvent& event) {
-	int old = event.GetOldSelection();
 	int selected = event.GetSelection();
-	mvceditor::CodeControlClass* oldCtrl = GetCodeControl(old);
-	if (oldCtrl) {
-		oldCtrl->SetAsHidden(true);
-	}
-	mvceditor::CodeControlClass* selectedCtrl = GetCodeControl(selected);
-	if (selectedCtrl) {
-		selectedCtrl->SetAsHidden(false);
+	int num = GetPageCount();
+	for (int i = 0; i < num; ++i) {
+		mvceditor::CodeControlClass* ctrl = GetCodeControl(i);
+		ctrl->SetAsHidden(i != selected);
 	}
 	event.Skip();
 }
