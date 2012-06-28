@@ -454,14 +454,7 @@ private:
 	 * Saves the user-created infos using the global config.
 	 */
 	void SavePreferences();
-	
-	/**
-	 * The datatabase connections. These are all of the connections, there may be a 
-	 * mix of connections created by the user and connections that were detected
-	 * by the DatabaseDetector.
-	 */ 
-	std::vector<DatabaseInfoClass> Infos;
-	
+		
 	/**
 	 * To detect the SQL connections
 	 */

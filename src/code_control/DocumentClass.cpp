@@ -346,11 +346,13 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletion(wxString& completeStatus)
 		case pelet::LanguageDiscoveryClass::SYNTAX_PHP_BACKTICK:
 		case pelet::LanguageDiscoveryClass::SYNTAX_PHP_DOUBLE_QUOTE_STRING:
 		case pelet::LanguageDiscoveryClass::SYNTAX_PHP_HEREDOC:
+			HandleAutoCompletionPhp(code, word, syntax, completeStatus);
+			break;
 		case pelet::LanguageDiscoveryClass::SYNTAX_PHP_LINE_COMMENT:
 		case pelet::LanguageDiscoveryClass::SYNTAX_PHP_MULTI_LINE_COMMENT:
 		case pelet::LanguageDiscoveryClass::SYNTAX_PHP_NOWDOC:
 		case pelet::LanguageDiscoveryClass::SYNTAX_PHP_SINGLE_QUOTE_STRING:
-			HandleAutoCompletionPhp(code, completeStatus);
+			HandleAutoCompletionString(word, completeStatus);
 			break;
 		case pelet::LanguageDiscoveryClass::SYNTAX_HTML:
 		case pelet::LanguageDiscoveryClass::SYNTAX_HTML_TAG:
@@ -364,6 +366,51 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletion(wxString& completeStatus)
 			break;
 		}
 		LanguageDiscovery.Close();
+	}
+}
+
+void mvceditor::PhpDocumentClass::HandleAutoCompletionString(const UnicodeString& word, wxString& completeStats) {
+
+	// look at the database meta data. look accross all connections since different tables
+	// may be in different schemas used by the PHP app
+	std::vector<wxString> autoCompleteList;
+	AppendSqlTableNames(word, autoCompleteList);
+	if (!autoCompleteList.empty()) {
+		
+		// scintilla needs the keywords sorted.
+		std::sort(autoCompleteList.begin(), autoCompleteList.end());
+		wxString list;
+		for (size_t i = 0; i < autoCompleteList.size(); ++i) {
+			list += autoCompleteList[i];
+			if (i < (autoCompleteList.size() - 1)) {
+				list += (wxChar)Ctrl->AutoCompGetSeparator();
+
+			}
+		}
+		Ctrl->AutoCompSetMaxWidth(0);
+		int currentPos = Ctrl->GetCurrentPos();
+		int startPos = Ctrl->WordStartPosition(currentPos, true);
+		int wordLength = currentPos - startPos;
+		Ctrl->AutoCompShow(wordLength, list);
+	}
+}
+
+void mvceditor::PhpDocumentClass::AppendSqlTableNames(const UnicodeString& word, std::vector<wxString>& autoCompleteList) {
+	for (size_t i = 0; i < Structs->Infos.size(); ++i) {
+		mvceditor::DatabaseInfoClass info = Structs->Infos[i];
+		if (!info.Host.isEmpty()) {
+			UnicodeString error;
+			std::vector<UnicodeString> results = Structs->SqlResourceFinder.FindTables(info, word);
+			for (size_t i = 0; i < results.size(); i++) {
+				wxString s = mvceditor::StringHelperClass::IcuToWx(results[i]);
+				autoCompleteList.push_back(s);
+			}
+			results = Structs->SqlResourceFinder.FindColumns(info, word);
+			for (size_t i = 0; i < results.size(); i++) {
+				wxString s = mvceditor::StringHelperClass::IcuToWx(results[i]);
+				autoCompleteList.push_back(s);
+			}
+		}
 	}
 }
 
@@ -416,7 +463,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionHtml(const UnicodeString& 
 	}
 }
 
-void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& code, wxString& completeStatus) {
+void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& code, const UnicodeString& word, pelet::LanguageDiscoveryClass::Syntax syntax, wxString& completeStatus) {
 	if (!Structs) {
 		return;
 	}
@@ -515,6 +562,12 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 					}
 				}
 			}
+		}
+		
+		// in case of a double quoted string, complete SQL table names too
+		// this is in addition to auto completing any variable names inside the string too
+		if (pelet::LanguageDiscoveryClass::SYNTAX_PHP_DOUBLE_QUOTE_STRING == syntax) {
+			AppendSqlTableNames(word, autoCompleteList);
 		}
 	}
 
@@ -1093,9 +1146,9 @@ wxString mvceditor::PhpDocumentClass::GetJavascriptKeywords() const {
 	return JAVASCRIPT_KEYWORDS;
 }
 
-mvceditor::SqlDocumentClass::SqlDocumentClass(mvceditor::ProjectClass* project, const mvceditor::DatabaseInfoClass& currentInfo) 
+mvceditor::SqlDocumentClass::SqlDocumentClass(mvceditor::StructsClass* structs, const mvceditor::DatabaseInfoClass& currentInfo) 
 	: TextDocumentClass() 
-	, Project(project)
+	, Structs(structs)
 	, CurrentInfo(currentInfo) {
 		
 }
@@ -1147,15 +1200,14 @@ std::vector<wxString> mvceditor::SqlDocumentClass::HandleAutoCompletionMySql(con
 	}
 	
 	// look at the meta data
-	mvceditor::SqlResourceFinderClass* finder = Project->GetSqlResourceFinder();
 	if (!CurrentInfo.Host.isEmpty()) {
 		UnicodeString error;
-		std::vector<UnicodeString> results = finder->FindTables(CurrentInfo, word);
+		std::vector<UnicodeString> results = Structs->SqlResourceFinder.FindTables(CurrentInfo, word);
 		for (size_t i = 0; i < results.size(); i++) {
 			wxString s = mvceditor::StringHelperClass::IcuToWx(results[i]);
 			autoCompleteList.push_back(s);
 		}
-		results = finder->FindColumns(CurrentInfo, word);
+		results = Structs->SqlResourceFinder.FindColumns(CurrentInfo, word);
 		for (size_t i = 0; i < results.size(); i++) {
 			wxString s = mvceditor::StringHelperClass::IcuToWx(results[i]);
 			autoCompleteList.push_back(s);

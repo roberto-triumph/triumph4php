@@ -45,10 +45,6 @@ wxString  mvceditor::ProjectClass::GetRootPath() const {
 	return Options.RootPath; 
 }
 
-mvceditor::SqlResourceFinderClass* mvceditor::ProjectClass::GetSqlResourceFinder() {
-	return &SqlResourceFinder;
-}
-
 wxString mvceditor::ProjectClass::GetPhpFileExtensionsString() const {
 	wxString all;
 	for (size_t i = 0; i < PhpFileFilters.size(); ++i) {

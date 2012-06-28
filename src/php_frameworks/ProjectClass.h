@@ -142,11 +142,6 @@ public:
 	 * Existing filters are left intact
 	 */
 	void SetSqlFileExtensionsString(wxString wildcardString);
-	
-	/**
-	 *  This object will still own the returned pointer. Do NOT delete it.
-	 */
-	SqlResourceFinderClass* GetSqlResourceFinder();
 
 private:
 	
@@ -154,11 +149,6 @@ private:
 	 * Holds project attributes.
 	 */
 	ProjectOptionsClass Options;
-	
-	/**
-	 * To grab SQL table meta data
-	 */
-	SqlResourceFinderClass SqlResourceFinder;
 	
 	/**
 	 * The wildcard patterns that will be used to find PHP files in this

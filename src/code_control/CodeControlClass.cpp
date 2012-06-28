@@ -479,7 +479,7 @@ void mvceditor::CodeControlClass::ApplyPreferences() {
 		Document = NULL;
 	}
 	if (mvceditor::CodeControlClass::SQL == DocumentMode) {
-		Document = new mvceditor::SqlDocumentClass(Project, CurrentInfo);
+		Document = new mvceditor::SqlDocumentClass(Structs, CurrentInfo);
 		Document->SetControl(this);
 		SetCodeControlOptions(CodeControlOptions.SqlStyles);
 		SetSqlOptions();

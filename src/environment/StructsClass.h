@@ -28,6 +28,7 @@
 
 #include <environment/EnvironmentClass.h>
 #include <environment/UrlResourceClass.h>
+#include <environment/SqlResourceFinderClass.h>
 #include <widgets/ResourceCacheClass.h>
 #include <php_frameworks/FrameworkDetectorClass.h>
 #include <vector>
@@ -59,6 +60,18 @@ public:
 	 * "current" URL.
 	 */
 	UrlResourceFinderClass UrlResourceFinder;
+	
+	/**
+	 * To grab SQL table meta data
+	 */
+	SqlResourceFinderClass SqlResourceFinder;
+	
+	/**
+	 * The datatabase connections. These are all of the connections, there may be a 
+	 * mix of connections created by the user and connections that were detected
+	 * by the DatabaseDetector.
+	 */ 
+	std::vector<DatabaseInfoClass> Infos;
 
 	/**
 	 * All of the views of the currently selected controller/action

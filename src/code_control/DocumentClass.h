@@ -218,14 +218,17 @@ private:
 	 *
 	 * @param code most current source code; but only up to the current position (this helps determine
 	 * the scope)
+	 * @param word the word to complete
+	 * @param syntax the token type that the cursor is currently on.  This helps
+	 *        in determining context (ie if the cursor is inside of a string)
 	 * @param completeStatus a bit of text that will help the user understand
 	 *        why the complete box did not populate.
 	 */
-	void HandleAutoCompletionPhp(const UnicodeString& code, wxString& completeStatus);
+	void HandleAutoCompletionPhp(const UnicodeString& code, const UnicodeString& word, pelet::LanguageDiscoveryClass::Syntax syntax, wxString& completeStatus);
 
 	/**
 	* handles auto completion for HTML.
-	*
+	* 
 	* @param word the word to complete
 	* @param syntax the token type that the cursor is currently on.  This helps
 	*        in determining context (ie if the cursor is inside of a tag name or a tag value)
@@ -234,6 +237,14 @@ private:
 	*/
 	void HandleAutoCompletionHtml(const UnicodeString& word, pelet::LanguageDiscoveryClass::Syntax syntax,
 		wxString& completeStatus);
+		
+	/**
+	 * handles auto completion of stufff inside a PHP (single quote) string 
+	 * @param word the word to complete
+	 * @param completeStatus a bit of text that will help the user understand
+	 *        why the complete box did not populate.
+	 */
+	void HandleAutoCompletionString(const UnicodeString& word, wxString& completeStats);
 
 	/**
 	 * Fills completeStatus with a human-friendly version of the symbol table error
@@ -288,6 +299,14 @@ private:
 	 * Append the '(' for method calls that are completed
 	 */
 	void OnAutoCompletionSelected(wxStyledTextEvent& evt);
+	
+	/**
+	 * share code between HandleAutoCompletionString and HandleAutoCompletionPhp since
+	 * we want to autocomplete sql table and column names on both single and double quoted
+	 * string, but we want to keep autocompletion of PHP variables in 
+	 * double-quoted strings only
+	 */
+	void AppendSqlTableNames(const UnicodeString& word, std::vector<wxString>& matches);
 
 	/**
 	 * In order to show the proper auto complete keywords we must know what language is
@@ -378,11 +397,11 @@ class SqlDocumentClass : public TextDocumentClass {
 public:
 
 	/**
-	 * This class will NOT own this pointer. Caller must manage (delete) it.
-	 * @param project the current project
+	 * @param structs This class will NOT own this pointer. Caller must manage (delete) it.
+	 *   structs helps with autocompletion
 	 * @param currentInfo the connection to fetch database metadata for (auto completion)
 	 */
-	SqlDocumentClass(ProjectClass* project, const DatabaseInfoClass& currentInfo);
+	SqlDocumentClass(StructsClass* structs, const DatabaseInfoClass& currentInfo);
 
 	/**
 	 * Will enable auto complete for SQL keywords and SQL table metadata
@@ -414,8 +433,11 @@ private:
 	/**
 	 * This class will NOT own this pointer
 	 */
-	ProjectClass*  Project;
+	StructsClass*  Structs;
 
+	/**
+	 * the connection to fetch database metadata for (auto completion)
+	 */
 	DatabaseInfoClass CurrentInfo;
 };
 

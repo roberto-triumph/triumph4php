@@ -28,6 +28,8 @@ mvceditor::StructsClass::StructsClass()
 	: Environment()
 	, ResourceCache()
 	, UrlResourceFinder()
+	, SqlResourceFinder()
+	, Infos()
 	, CurrentViewInfos() 
 	, CurrentUrl() {
 }
