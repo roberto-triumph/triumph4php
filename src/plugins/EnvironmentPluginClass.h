@@ -40,7 +40,7 @@ class ApacheFileReaderClass : public BackgroundFileReaderClass {
 
 public:
 	
-	ApacheFileReaderClass(wxEvtHandler& handler);
+	ApacheFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
 	
 	/**
 	 * setup the background thread (does not start the thread)
@@ -113,7 +113,7 @@ protected:
 
 public:
 	/** Constructor */
-	ApacheEnvironmentPanelClass(wxWindow* parent, EnvironmentClass& environment);
+	ApacheEnvironmentPanelClass(wxWindow* parent, mvceditor::RunningThreadsClass& runningThreads, EnvironmentClass& environment);
 	
 	/**
 	 * transfers the settings from the window to the Environment data structure
@@ -294,7 +294,7 @@ class EnvironmentDialogClass : public wxPropertySheetDialog {
 
 public:
 
-	EnvironmentDialogClass(wxWindow* parent, EnvironmentClass& environment);
+	EnvironmentDialogClass(wxWindow* parent, mvceditor::RunningThreadsClass& runningThreads, EnvironmentClass& environment);
 	
 	/**
 	 * when user OKs the dialog transfer all data to the Environment data structure

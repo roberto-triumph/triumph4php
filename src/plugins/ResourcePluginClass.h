@@ -50,7 +50,7 @@ public:
 	 * @param handler will receive EVENT_FILE_* and EVENT_WORK_* events when all 
 	 * files have been iterated through.
 	 */
-	ResourceFileReaderClass(wxEvtHandler& handler);
+	ResourceFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
 
 	/**
 	 * prepare to iterate through all files of the given directory
@@ -110,7 +110,7 @@ public:
 	 * @param handler will receive EVENT_FILE_* and EVENT_WORK_* events when all 
 	 * files have been iterated through.
 	 */
-	NativeFunctionsFileReaderClass(wxEvtHandler& handler);
+	NativeFunctionsFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
 
 	/**
 	 * prepare to iterate through the file that has the PHP native functions.

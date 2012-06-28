@@ -31,8 +31,8 @@
 
 static const int ID_VIEW_FILE_PANEL = wxNewId();
 
-mvceditor::CallStackThreadClass::CallStackThreadClass(wxEvtHandler& handler)
-	: ThreadWithHeartbeatClass(handler) 
+mvceditor::CallStackThreadClass::CallStackThreadClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads)
+	: ThreadWithHeartbeatClass(handler, runningThreads) 
 	, CallStack(NULL)
 	, LastError(mvceditor::CallStackClass::NONE)
 	, StackFile() {
@@ -87,7 +87,7 @@ void mvceditor::CallStackThreadClass::Entry() {
 mvceditor::ViewFilePluginClass::ViewFilePluginClass() 
 	: PluginClass() 
 	, FrameworkDetector(NULL) 
-	, CallStackThread(*this) {
+	, CallStackThread(*this, RunningThreads) {
 }
 
 void mvceditor::ViewFilePluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
@@ -165,7 +165,7 @@ void mvceditor::ViewFilePluginClass::StartDetection() {
 
 void mvceditor::ViewFilePluginClass::OnWorkComplete(wxCommandEvent& event) {
 	if (!FrameworkDetector.get()) {
-		FrameworkDetector.reset(new mvceditor::PhpFrameworkDetectorClass(*this, *GetEnvironment()));
+		FrameworkDetector.reset(new mvceditor::PhpFrameworkDetectorClass(*this, RunningThreads, *GetEnvironment()));
 	}
 	FrameworkDetector->Identifiers = PhPFrameworks().Identifiers;
 	if (!FrameworkDetector->InitViewInfosDetector(GetProject()->GetRootPath(), App->Structs.UrlResourceFinder.ChosenUrl.Url.BuildURI(), CallStackThread.StackFile)) {

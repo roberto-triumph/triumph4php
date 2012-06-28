@@ -103,8 +103,8 @@ bool mvceditor::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 	return ret;
 }
 
-mvceditor::LintBackgroundFileReaderClass::LintBackgroundFileReaderClass(wxEvtHandler& handler)
-	: BackgroundFileReaderClass(handler)
+mvceditor::LintBackgroundFileReaderClass::LintBackgroundFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads)
+	: BackgroundFileReaderClass(handler, runningThreads)
 	, ParserDirectoryWalker()
 	, PhpFileFilters() {
 		
@@ -288,7 +288,7 @@ mvceditor::LintPluginClass::LintPluginClass()
 	: PluginClass()
 	, IgnoreFiles() 
 	, CheckOnSave(true)
-	, LintBackgroundFileReader(*this)
+	, LintBackgroundFileReader(*this, RunningThreads)
 	, LintErrors() {
 }
 

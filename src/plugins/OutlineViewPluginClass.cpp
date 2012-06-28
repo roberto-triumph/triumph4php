@@ -36,8 +36,9 @@ static int ID_CONTEXT_MENU_SHOW_OUTLINE_OTHER = wxNewId();
 static int ID_WINDOW_OUTLINE = wxNewId();
 static int ID_CONTEXT_MENU_SHOW_OUTLINE_CURRENT = wxNewId();
 
-mvceditor::ResourceFinderBackgroundThreadClass::ResourceFinderBackgroundThreadClass(wxEvtHandler& handler)
-	: ThreadWithHeartbeatClass(handler) 
+mvceditor::ResourceFinderBackgroundThreadClass::ResourceFinderBackgroundThreadClass(wxEvtHandler& handler,
+		mvceditor::RunningThreadsClass& runningThreads)
+	: ThreadWithHeartbeatClass(handler, runningThreads) 
 	, Resources()
 	, ResourceFinder() 
 	, FileName() {
@@ -69,7 +70,7 @@ void mvceditor::ResourceFinderBackgroundThreadClass::Entry() {
 
 mvceditor::OutlineViewPluginClass::OutlineViewPluginClass()
 	: PluginClass()
-	, ResourceFinderBackground(*this) {
+	, ResourceFinderBackground(*this, RunningThreads) {
 	
 }
 

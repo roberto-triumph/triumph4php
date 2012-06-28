@@ -50,6 +50,7 @@ public:
 	mvceditor::ProjectOptionsClass ProjectOptions;
 	mvceditor::ProjectClass Project;
 	mvceditor::StructsClass Structs;
+	mvceditor::RunningThreadsClass RunningThreads;
 };
 
 /**
@@ -165,7 +166,7 @@ int CodeControlProfilerAppClass::OnExit() {
 CodeControlFrameClass::CodeControlFrameClass(CodeControlProfilerAppClass& app) 
 	: wxFrame(NULL, wxID_ANY, wxT("CodeControlClass profiler"), wxDefaultPosition, 
 			wxSize(1024, 768)) {
-	Ctrl = new mvceditor::CodeControlClass(this, app.Options, &app.Project, &app.Structs, wxID_ANY);
+	Ctrl = new mvceditor::CodeControlClass(this, app.Options, &app.Project, &app.Structs, app.RunningThreads, wxID_ANY);
 	Ctrl->SetDropTarget(new FileDropTargetClass(Ctrl));
 	Ctrl->SetDocumentMode(mvceditor::CodeControlClass::PHP);
 	CreateMenu();

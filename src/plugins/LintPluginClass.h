@@ -130,7 +130,7 @@ public:
 	 * 	      as well as WORK_* events
 	 * @see mvceditor::ThreadWithHeartbeat class
 	 */
-	LintBackgroundFileReaderClass(wxEvtHandler& handler);
+	LintBackgroundFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
 	
 	/**
 	 * Start the background thread.  Lint errors will be propagated as events.

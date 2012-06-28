@@ -33,15 +33,17 @@ public:
 	ProjectTestFixtureClass() 
 		: FileTestFixtureClass(wxT("project_test"))
 		, Handler()
-		, FrameworkDetector(Handler) 
-		, DatabaseDetector(Handler)
-		, ResourcesDetector(Handler) {
+		, RunningThreads()
+		, FrameworkDetector(Handler, RunningThreads) 
+		, DatabaseDetector(Handler, RunningThreads)
+		, ResourcesDetector(Handler, RunningThreads) {
 	}
 	
 	virtual ~ProjectTestFixtureClass() {
 	}
 
 	wxEvtHandler Handler;
+	mvceditor::RunningThreadsClass RunningThreads;
 	mvceditor::FrameworkDetectorActionClass FrameworkDetector;
 	mvceditor::DatabaseDetectorActionClass DatabaseDetector;
 	mvceditor::ResourcesDetectorActionClass ResourcesDetector;

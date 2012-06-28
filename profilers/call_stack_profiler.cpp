@@ -50,8 +50,9 @@ public:
 
 HandlerClass Handler;
 mvceditor::ResourceCacheClass ResourceCache;
+mvceditor::RunningThreadsClass RunningThreads;
 mvceditor::CallStackClass CallStack(ResourceCache);
-mvceditor::ResourcesDetectorActionClass ResourceDetector(Handler);
+mvceditor::ResourcesDetectorActionClass ResourceDetector(Handler, RunningThreads);
 wxString DirName;
 wxString StartingFile;
 

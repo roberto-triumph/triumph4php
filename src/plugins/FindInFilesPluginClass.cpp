@@ -65,8 +65,8 @@ wxEvent* mvceditor::FindInFilesHitEventClass::Clone() const {
 	return newEvt;
 }
 
-mvceditor::FindInFilesBackgroundReaderClass::FindInFilesBackgroundReaderClass(wxEvtHandler& handler) 
-: BackgroundFileReaderClass(handler) {
+mvceditor::FindInFilesBackgroundReaderClass::FindInFilesBackgroundReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads) 
+: BackgroundFileReaderClass(handler, runningThreads) {
 
 }
 
@@ -138,14 +138,24 @@ bool mvceditor::FindInFilesBackgroundReaderClass::FileMatch(const wxString& file
 	return matches > 0;
 }
 	
-mvceditor::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* parent, NotebookClass* notebook, StatusBarWithGaugeClass* gauge)
+mvceditor::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* parent, NotebookClass* notebook, 
+		StatusBarWithGaugeClass* gauge, mvceditor::RunningThreadsClass& runningThreads)
 	: FindInFilesResultsPanelGeneratedClass(parent)
 	, FindInFiles()
-	, FindInFilesBackgroundFileReader(*this)
+	, FindInFilesBackgroundFileReader(*this, runningThreads)
 	, Notebook(notebook)
 	, Gauge(gauge)
 	, MatchedFiles(0) {
 	FindInFilesGaugeId = wxNewId();
+}
+
+mvceditor::FindInFilesResultsPanelClass::~FindInFilesResultsPanelClass() {
+
+	// make sure we kill any running searches
+	if (FindInFilesBackgroundFileReader.IsRunning()) {
+		FindInFilesBackgroundFileReader.StopReading();
+		Gauge->StopGauge(FindInFilesGaugeId);
+	}
 }
 
 void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findInFiles, wxString findPath,
@@ -362,6 +372,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnFileHit(mvceditor::FindInFilesHi
 
 void mvceditor::FindInFilesResultsPanelClass::OnStopButton(wxCommandEvent& event) {
 	FindInFilesBackgroundFileReader.StopReading();
+	Gauge->StopGauge(FindInFilesGaugeId);
 	SetStatus(_("Search stopped"));
 	bool enableIterators = MatchedFiles > 0;
 	EnableButtons(false, enableIterators, enableIterators);
@@ -616,7 +627,7 @@ void mvceditor::FindInFilesPluginClass::OnEditFindInFiles(wxCommandEvent& event)
 	FindInFilesDialogClass dialog(NULL, *this);
 	if (dialog.ShowModal() == wxID_OK) {
 		mvceditor::FindInFilesResultsPanelClass* panel = new mvceditor::FindInFilesResultsPanelClass(GetToolsNotebook(), 
-			GetNotebook(), GetStatusBarWithGauge());		
+			GetNotebook(), GetStatusBarWithGauge(), RunningThreads);		
 		if(AddToolsWindow(panel, _("Find In Files Results"))) {
 			panel->Find(PreviousFindInFiles, PreviousFindPath, DoHiddenFiles);
 		}

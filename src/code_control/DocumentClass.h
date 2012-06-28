@@ -168,8 +168,9 @@ public:
 	/**
 	 * @param structs This class will NOT own this pointer. Caller must manage (delete) it.
 	 *   structs helps with autocompletion
+	 * @param runningThreads To keep track of background threads
 	 */
-	PhpDocumentClass(mvceditor::StructsClass* structs);
+	PhpDocumentClass(mvceditor::StructsClass* structs, mvceditor::RunningThreadsClass& runningThreads);
 
 	~PhpDocumentClass();
 

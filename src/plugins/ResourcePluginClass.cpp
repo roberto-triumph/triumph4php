@@ -35,8 +35,8 @@
 static int ID_COUNT_FILES_GAUGE = wxNewId();
 static int ID_RESOURCE_PLUGIN_PANEL = wxNewId();
 
-mvceditor::ResourceFileReaderClass::ResourceFileReaderClass(wxEvtHandler& handler) 
-	: BackgroundFileReaderClass(handler)
+mvceditor::ResourceFileReaderClass::ResourceFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads) 
+	: BackgroundFileReaderClass(handler, runningThreads)
 	, PhpFileFilters()
 	, ResourceCache(NULL) {
 }
@@ -94,8 +94,8 @@ bool mvceditor::ResourceFileReaderClass::FileMatch(const wxString& file) {
 	return matchedFilter;
 }
 
-mvceditor::NativeFunctionsFileReaderClass::NativeFunctionsFileReaderClass(wxEvtHandler& handler) 
-	: ThreadWithHeartbeatClass(handler)
+mvceditor::NativeFunctionsFileReaderClass::NativeFunctionsFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads) 
+	: ThreadWithHeartbeatClass(handler, runningThreads)
 	, ResourceCache(NULL)
 {
 
@@ -123,8 +123,8 @@ void mvceditor::NativeFunctionsFileReaderClass::Entry() {
 mvceditor::ResourcePluginClass::ResourcePluginClass()
 	: PluginClass()
 	, JumpToText()
-	, ResourceFileReader(*this)
-	, NativeFunctionsReader(*this)
+	, ResourceFileReader(*this, RunningThreads)
+	, NativeFunctionsReader(*this, RunningThreads)
 	, ProjectIndexMenu(NULL)
 	, State(FREE) 
 	, HasCodeLookups(false)

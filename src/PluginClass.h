@@ -31,6 +31,7 @@
 #include <widgets/NotebookClass.h>
 #include <widgets/ResourceCacheClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
+#include <widgets/ThreadWithHeartbeatClass.h>
 #include <PreferencesClass.h>
 #include <wx/event.h>
 #include <wx/propdlg.h>
@@ -423,6 +424,11 @@ protected:
 	 * If a menu item is not found, and assertion is triggered.
 	 */
 	void AddDynamicCmd(std::map<int, wxString> menuItemIds,std::vector<DynamicCmdClass>& shortcuts);
+	
+	/**
+	 * Used to keep track of running background threads
+	 */
+	mvceditor::RunningThreadsClass RunningThreads;
 	 
 	/**
 	 * The AUI Manager is needed in cases where the different windows are repositioned programatically and the entire AUI

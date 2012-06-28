@@ -485,7 +485,7 @@ void mvceditor::RunBrowserPluginClass::OnUrlToolMenuItem(wxCommandEvent& event) 
 
 void mvceditor::RunBrowserPluginClass::OnProjectIndexed(wxCommandEvent& event) {
 	if (!ResourceCacheThread.get()) {
-		ResourceCacheThread.reset(new mvceditor::ResourceCacheUpdateThreadClass(GetResourceCache(), *this));
+		ResourceCacheThread.reset(new mvceditor::ResourceCacheUpdateThreadClass(GetResourceCache(), *this, RunningThreads));
 	}
 	ResourceCacheFileName.Assign(wxFileName::CreateTempFileName(wxT("resource_cache")));
 	ResourceCacheThread->StartPersist(ResourceCacheFileName);
@@ -497,7 +497,7 @@ void mvceditor::RunBrowserPluginClass::OnCacheFileWorkComplete(wxCommandEvent& e
 	mvceditor::ProjectClass* project = GetProject();
 	wxString projectRootUrl =  environment->Apache.GetUrl(project->GetRootPath());
 	if (!PhpFrameworks.get()) {
-		PhpFrameworks.reset(new PhpFrameworkDetectorClass(*this, *GetEnvironment()));
+		PhpFrameworks.reset(new PhpFrameworkDetectorClass(*this, RunningThreads, *GetEnvironment()));
 		PhpFrameworks->Identifiers = PhPFrameworks().Identifiers;
 		PhpFrameworks->InitUrlDetector(GetProject()->GetRootPath(), ResourceCacheFileName.GetFullPath(), projectRootUrl);
 	}

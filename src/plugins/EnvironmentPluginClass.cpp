@@ -102,8 +102,8 @@ static void ListCtrlGet(wxListCtrl* list, wxString& column1Value, wxString& colu
 }
 
 
-mvceditor::ApacheFileReaderClass::ApacheFileReaderClass(wxEvtHandler& handler)
-	: BackgroundFileReaderClass(handler)
+mvceditor::ApacheFileReaderClass::ApacheFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads)
+	: BackgroundFileReaderClass(handler, runningThreads)
 	, ApacheResults() {
 }
 
@@ -143,10 +143,10 @@ bool mvceditor::ApacheFileReaderClass::FileRead(mvceditor::DirectorySearchClass&
 	return ret;
 }
 
-mvceditor::ApacheEnvironmentPanelClass::ApacheEnvironmentPanelClass(wxWindow* parent, EnvironmentClass& environment)
+mvceditor::ApacheEnvironmentPanelClass::ApacheEnvironmentPanelClass(wxWindow* parent, mvceditor::RunningThreadsClass& runningThreads, EnvironmentClass& environment)
 	: ApacheEnvironmentPanelGeneratedClass(parent)
 	, Environment(environment)
-	, ApacheFileReader(*this)
+	, ApacheFileReader(*this, runningThreads)
 	, EditedApache() {
 	EditedApache = environment.Apache;
 	wxGenericValidator manualValidator(&EditedApache.ManualConfiguration);	
@@ -382,7 +382,7 @@ void mvceditor::PhpEnvironmentPanelClass::OnResize(wxSizeEvent& event) {
 	event.Skip();
 }
 
-mvceditor::EnvironmentDialogClass::EnvironmentDialogClass(wxWindow* parent, mvceditor::EnvironmentClass& environment) 
+mvceditor::EnvironmentDialogClass::EnvironmentDialogClass(wxWindow* parent, mvceditor::RunningThreadsClass& runningThreads, mvceditor::EnvironmentClass& environment) 
 	: Environment(environment) {	
 	
 	// make it so that no other preference dialogs have to explictly call Transfer methods
@@ -398,7 +398,7 @@ mvceditor::EnvironmentDialogClass::EnvironmentDialogClass(wxWindow* parent, mvce
 	wxBookCtrlBase* notebook = GetBookCtrl();
 	PhpEnvironmentPanel = new mvceditor::PhpEnvironmentPanelClass(notebook, Environment);
 	notebook->AddPage(PhpEnvironmentPanel, _("PHP"));
-	ApacheEnvironmentPanel = new mvceditor::ApacheEnvironmentPanelClass(notebook, Environment);
+	ApacheEnvironmentPanel = new mvceditor::ApacheEnvironmentPanelClass(notebook, runningThreads, Environment);
 	notebook->AddPage(ApacheEnvironmentPanel, _("Apache"));
 	WebBrowserPanel = new mvceditor::WebBrowserEditPanelClass(notebook, Environment);
 	notebook->AddPage(WebBrowserPanel, _("Web Browsers"));
@@ -647,7 +647,7 @@ void mvceditor::EnvironmentPluginClass::AddProjectMenuItems(wxMenu* projectMenu)
 
 void mvceditor::EnvironmentPluginClass::OnMenuEnvironment(wxCommandEvent& event) {
 	EnvironmentClass* environment = GetEnvironment();
-	mvceditor::EnvironmentDialogClass dialog(GetMainWindow(), *environment);
+	mvceditor::EnvironmentDialogClass dialog(GetMainWindow(), RunningThreads, *environment);
 	if (wxOK == dialog.ShowModal()) {
 		environment->SaveToConfig();
 		wxCommandEvent updatedEvent(mvceditor::EVENT_APP_ENVIRONMENT_UPDATED);

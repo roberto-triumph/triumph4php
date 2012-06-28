@@ -105,7 +105,7 @@ typedef void (wxEvtHandler::*FindInFilesHitEventClassFunction)(FindInFilesHitEve
 class FindInFilesBackgroundReaderClass: public BackgroundFileReaderClass {
 public:
 
-	FindInFilesBackgroundReaderClass(wxEvtHandler& handler);
+	FindInFilesBackgroundReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
 
 	/**
 	 * Prepare to iterate through all files in the given directory.
@@ -205,7 +205,10 @@ public:
 	 *        (deleted) by this class. 
 	 * to search in
 	 */
-	FindInFilesResultsPanelClass(wxWindow* parent, NotebookClass* notebook, StatusBarWithGaugeClass* gauge);
+	FindInFilesResultsPanelClass(wxWindow* parent, NotebookClass* notebook, StatusBarWithGaugeClass* gauge,
+		mvceditor::RunningThreadsClass& runningThreads);
+	
+	~FindInFilesResultsPanelClass();
 	
 	/**
 	 * Start a file search.
@@ -295,7 +298,6 @@ private:
 	  * hits
 	  */
 	 void FindInOpenedFiles();
-	
 	
 	DECLARE_EVENT_TABLE()
 };

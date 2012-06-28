@@ -262,7 +262,7 @@ void mvceditor::TextDocumentClass::DetachFromControl(CodeControlClass* ctrl) {
 
 }
 
-mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::StructsClass* structs)
+mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::StructsClass* structs, mvceditor::RunningThreadsClass& runningThreads)
 	: wxEvtHandler()
 	, TextDocumentClass()
 	, LanguageDiscovery()
@@ -274,7 +274,7 @@ mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::StructsClass* structs)
 	, Timer()
 	, FileIdentifier()
 	, Structs(structs)
-	, ResourceCacheUpdateThread(&structs->ResourceCache, *this)
+	, ResourceCacheUpdateThread(&structs->ResourceCache, *this, runningThreads)
 	, CurrentCallTipIndex(0)
 	, NeedToUpdateResources(false) 
 	, AreImagesRegistered(false) {

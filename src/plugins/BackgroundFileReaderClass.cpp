@@ -25,8 +25,9 @@
 #include <plugins/BackgroundFileReaderClass.h>
 
 
-mvceditor::BackgroundFileReaderClass::BackgroundFileReaderClass(wxEvtHandler& handler)
-	: ThreadWithHeartbeatClass(handler)
+mvceditor::BackgroundFileReaderClass::BackgroundFileReaderClass(wxEvtHandler& handler,
+		mvceditor::RunningThreadsClass& runningThreads)
+	: ThreadWithHeartbeatClass(handler, runningThreads)
 	, DirectorySearch()
 	, Mode(WALK) {
 }
@@ -73,7 +74,9 @@ void mvceditor::BackgroundFileReaderClass::Entry() {
 	bool isDestroy = TestDestroy();
 	int counter = 0;
 	if (Mode == WALK) {
-		while(DirectorySearch.More() && !isDestroy) {
+		
+		// careful to test for destroy first
+		while(!isDestroy && DirectorySearch.More() ) {
 			bool res = FileRead(DirectorySearch);
 
 			// signal that the background thread has finished one file

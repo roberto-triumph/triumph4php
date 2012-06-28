@@ -238,7 +238,7 @@ void mvceditor::ProjectPluginClass::OnProjectExploreOpenFile(wxCommandEvent& eve
 
 void mvceditor::ProjectPluginClass::ProjectOpen(const wxString& directoryPath) {
 	if (!PhpFrameworks.get()) {
-		PhpFrameworks.reset(new mvceditor::PhpFrameworkDetectorClass(*this, *GetEnvironment()));
+		PhpFrameworks.reset(new mvceditor::PhpFrameworkDetectorClass(*this, RunningThreads, *GetEnvironment()));
 	}
 	CloseProject();
 	ProjectOptionsClass options;

@@ -271,8 +271,8 @@ void mvceditor::SqlConnectionDialogClass::OnListboxSelected(wxCommandEvent& even
 	UpdateTextInputs();
 }
 
-mvceditor::MultipleSqlExecuteClass::MultipleSqlExecuteClass(wxEvtHandler& handler, int queryId)
-	: ThreadWithHeartbeatClass(handler, queryId)
+mvceditor::MultipleSqlExecuteClass::MultipleSqlExecuteClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, int queryId)
+	: ThreadWithHeartbeatClass(handler, runningThreads, queryId)
 	, SqlLexer() 
 	, Query()
 	, Session()
@@ -354,12 +354,12 @@ void mvceditor::MultipleSqlExecuteClass::Close() {
 
 mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id, 
 		mvceditor::StatusBarWithGaugeClass* gauge, const mvceditor::SqlQueryClass& other,
-		mvceditor::SqlBrowserPluginClass* plugin) 
+		mvceditor::SqlBrowserPluginClass* plugin, mvceditor::RunningThreadsClass& runningThreads) 
 	: SqlBrowserPanelGeneratedClass(parent, id)
 	, Query(other)
 	, LastError()
 	, LastQuery()
-	, MultipleSqlExecute(*this, id) 
+	, MultipleSqlExecute(*this, runningThreads, id) 
 	, Results()
 	, Gauge(gauge)
 	, Plugin(plugin) {
@@ -599,8 +599,8 @@ void mvceditor::SqlBrowserPanelClass::UnlinkFromCodeControl() {
 	CodeControl = NULL;
 }
 
-mvceditor::SqlMetaDataFetchClass::SqlMetaDataFetchClass(wxEvtHandler& handler)
-	: ThreadWithHeartbeatClass(handler)
+mvceditor::SqlMetaDataFetchClass::SqlMetaDataFetchClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads)
+	: ThreadWithHeartbeatClass(handler, runningThreads)
 	, Infos() 
 	, Errors()
 	, NewResources() {
@@ -646,7 +646,7 @@ std::vector<UnicodeString> mvceditor::SqlMetaDataFetchClass::GetErrors() {
 mvceditor::SqlBrowserPluginClass::SqlBrowserPluginClass() 
 	: PluginClass()
 	, Infos()
-	, SqlMetaDataFetch(*this)
+	, SqlMetaDataFetch(*this, RunningThreads)
 	, ChosenIndex(0) {
 }
 
@@ -724,7 +724,8 @@ mvceditor::SqlBrowserPanelClass* mvceditor::SqlBrowserPluginClass::CreateResults
 		codeControl->SetCurrentInfo(Infos[ChosenIndex]);
 	}
 	
-	mvceditor::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxNewId(), GetStatusBarWithGauge(), query, this);
+	mvceditor::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxNewId(), GetStatusBarWithGauge(), 
+		query, this, RunningThreads);
 	mvceditor::NotebookClass* codeNotebook = GetNotebook();
 	wxString tabText = codeNotebook->GetPageText(codeNotebook->GetPageIndex(codeControl));
 

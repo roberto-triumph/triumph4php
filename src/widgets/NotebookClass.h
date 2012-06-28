@@ -258,6 +258,11 @@ private:
 	void OnNotebookPageClose(wxAuiNotebookEvent& evt);
 	
 	/**
+	 * To keep track of any threads used for PHP parsing
+	 */
+	mvceditor::RunningThreadsClass RunningThreads;
+	
+	/**
 	 * The context menu for handling right-click options
 	 */
 	wxMenu* ContextMenu;

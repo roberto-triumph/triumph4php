@@ -362,8 +362,9 @@ void mvceditor::ResourceCacheClass::SetVersion(pelet::Versions version) {
 	
 }
 
-mvceditor::ResourceCacheUpdateThreadClass::ResourceCacheUpdateThreadClass(mvceditor::ResourceCacheClass* resourceCache, wxEvtHandler& handler, int eventId)
-	: ThreadWithHeartbeatClass(handler, eventId)
+mvceditor::ResourceCacheUpdateThreadClass::ResourceCacheUpdateThreadClass(mvceditor::ResourceCacheClass* resourceCache, 
+		wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, int eventId)
+	: ThreadWithHeartbeatClass(handler, runningThreads, eventId)
 	, Mode(UPDATE)
 	, ResourceCache(resourceCache)
 	, OutputFile()

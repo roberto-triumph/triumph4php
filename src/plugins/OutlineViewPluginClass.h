@@ -51,7 +51,7 @@ public:
 	 * @param handler will get notified with EVENT_WORK_COMPLETE
 	 * events when parsing is complete.
 	 */
-	ResourceFinderBackgroundThreadClass(wxEvtHandler& handler);
+	ResourceFinderBackgroundThreadClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
 
 	/**
 	 * start the background thread that parses the given file.

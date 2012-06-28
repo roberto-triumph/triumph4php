@@ -47,6 +47,11 @@ public:
 	 * URLs, templates.
 	 */
 	mvceditor::StructsClass Structs;
+	
+	/**
+	 * To keep track of background threads
+	 */
+	mvceditor::RunningThreadsClass RunningThreads;
 		
 	/**
 	 * This object will be used to detct the various PHP framework artifacts (resources,

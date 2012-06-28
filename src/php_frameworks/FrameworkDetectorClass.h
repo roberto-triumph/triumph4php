@@ -49,7 +49,7 @@ class ResponseThreadWithHeartbeatClass : public ThreadWithHeartbeatClass {
 
 public:
 
-	ResponseThreadWithHeartbeatClass(DetectorActionClass& action);
+	ResponseThreadWithHeartbeatClass(DetectorActionClass& action, mvceditor::RunningThreadsClass& runningThreads);
 	
 	bool Init(wxFileName outputFile);
 
@@ -109,8 +109,9 @@ public:
 	 * @param handler will get notified with EVENT_PROCESS_COMPLETE and EVENT_PROCESS_FAILED
 	 * just like if it was connected to a ProcessWithHeartbeat object. The events are posted
 	 * after the responses are parsed; it is safe to access the results from the event handlers.
+	 * @param runningThreads To keep track of background threads
 	 */
-	DetectorActionClass(wxEvtHandler& handler);
+	DetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
 	virtual ~DetectorActionClass();
 
 	/**
@@ -222,7 +223,7 @@ public:
 
 	std::vector<wxString> Frameworks;
 
-	FrameworkDetectorActionClass(wxEvtHandler& handler);
+	FrameworkDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
 
 protected:
 
@@ -246,7 +247,7 @@ public:
 
 	std::vector<DatabaseInfoClass> Databases;
 
-	DatabaseDetectorActionClass(wxEvtHandler& handler);
+	DatabaseDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
 	
 protected:
 
@@ -269,7 +270,7 @@ public:
 	
 	std::map<wxString, wxString> ConfigFiles;
 
-	ConfigFilesDetectorActionClass(wxEvtHandler& handler);
+	ConfigFilesDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
 
 protected:
 
@@ -292,7 +293,7 @@ public:
 	
 	std::vector<mvceditor::ResourceClass> Resources;
 
-	ResourcesDetectorActionClass(wxEvtHandler& handler);
+	ResourcesDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
 
 protected:
 
@@ -315,7 +316,7 @@ public:
 
 	std::vector<UrlResourceClass> Urls;
 
-	UrlDetectorActionClass(wxEvtHandler& handler);
+	UrlDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
 	
 protected:
 
@@ -354,7 +355,7 @@ public:
 	
 	std::vector<mvceditor::ViewInfoClass> ViewInfos;
 
-	ViewInfosDetectorActionClass(wxEvtHandler& handler);
+	ViewInfosDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
 
 protected:
 
@@ -431,7 +432,7 @@ public:
 	 * events. Also, the handler will get an EVENT_PROCESS_IN_PROGRESS while the detectors are running
 	 * @param the environment; which contains the location of the PHP binary
 	 */
-	PhpFrameworkDetectorClass(wxEvtHandler& handler, const EnvironmentClass& environment);
+	PhpFrameworkDetectorClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, const EnvironmentClass& environment);
 	
 	/**
 	 * deletes any detected data

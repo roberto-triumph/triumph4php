@@ -98,10 +98,11 @@ public:
 	 * CANNOT be NULL.
 	 * @param StructsClass* To get items needed for autocompletion. This object
 	 *        will NOT own the pointer
+	 * @param runningThreads To keep track of background threads
 	 * 
 	 */
 	CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options, ProjectClass* project,
-					StructsClass* structs,
+					StructsClass* structs, mvceditor::RunningThreadsClass& runningThreads,
 	                 int id, const wxPoint& position =
 	                     wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0,
 	                 const wxString& name = wxT("code"));
@@ -481,6 +482,11 @@ private:
 	 * This object owns this pointer and will need to delete it.
 	 */
 	TextDocumentClass* Document;
+	
+	/**
+	 * To manage the background threads used in PHP parsing
+	 */
+	mvceditor::RunningThreadsClass& RunningThreads;
 
 	/**
 	* Used by the word highlight feature. The location from where to start searching (back)

@@ -77,7 +77,7 @@ public:
 	/**
 	 * @param handler will be notified of EVENT_WORK_* events
 	 */
-	CallStackThreadClass(wxEvtHandler& handler);
+	CallStackThreadClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
 	
 	void InitCallStack(ResourceCacheClass& resourceCache);
 	

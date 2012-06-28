@@ -27,7 +27,7 @@
 
 #include <wx/thread.h>
 #include <wx/timer.h>
-
+#include <vector>
 
 namespace mvceditor {
 	
@@ -45,11 +45,24 @@ extern const wxEventType EVENT_WORK_IN_PROGRESS;
 
 // defined below
 class WorkerThreadClass;
+class RunningThreadsClass;
 
 /**
  * This is a thread that announces itself that is still running and when it ends.
  * This class is useful when displaying the status and percent completion to the
  * user. For now heartbeats will be at a constant rate.
+ * 
+ * This class is also useful for correctly implementing background threads.
+ * Threads in wxWidgets by default are detached; this means that IsAlive() and
+ * IsRunning() methods cannot be called on them.  We implement those methods
+ * here in this class in a safe manner.
+ * Threads created with this class are ALWAYS gracefully terminated.  This means
+ * that the implementing classes must check TestDestroy() and exit promptly.
+ * 
+ * Note that if a thread is running at the time this object goes out of scope
+ * the thread is stopped gracefully; which means that the destructor will block until
+ * the thread has terminated.
+ * 
  */
 class ThreadWithHeartbeatClass : public wxEvtHandler {
 
@@ -57,9 +70,10 @@ public:
 	
 	/**
 	 * @param handler will receive the EVENT_WORK_* events
+	 * @param runningThreads to stop the thread gracefully if need be
 	 * @param id if given, the generated event will have this id as its GetId() member.
 	 */
-	ThreadWithHeartbeatClass(wxEvtHandler& handler, int id = wxID_ANY);
+	ThreadWithHeartbeatClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, int id = wxID_ANY);
 	
 	/**
 	 * On object destruction, if this thread is running it will be stopped.
@@ -81,9 +95,9 @@ public:
 	wxThreadError CreateSingleInstance();
 
 	/**
-	 * If there is a background thread running, stop it. This is NOT graceful stoppage
-	 * it is a forceful action.  You should only use this as a last resort;  it
-	 * is better that subclasses implement a stop flag and gracefully exit the Entry() method.
+	 * If there is a background thread running, stop it. This IS a graceful stoppage
+	 * but it depends on the thread calling TestDestroy() as often  as possible during its
+	 * Entry() method.
 	 */
 	void KillInstance();
 	
@@ -120,9 +134,15 @@ protected:
 	wxEvtHandler& Handler;
 	
 private:
-	wxTimer Timer;
 
-	WorkerThreadClass* Worker;
+	wxTimer Timer;
+	
+	mvceditor::RunningThreadsClass& RunningThreads;
+	
+	/**
+	 * This thread will be managed by RunningThreads
+	 */
+	mvceditor::WorkerThreadClass* Worker;
 	
 	/**
 	 * All generated events will have this ID as their EventId
@@ -130,7 +150,7 @@ private:
 	int EventId;
 	
 	DECLARE_EVENT_TABLE()
-
+	
 	friend class WorkerThreadClass;
 };
 
@@ -146,7 +166,7 @@ class WorkerThreadClass : public wxThread {
 
 public:
 
-	WorkerThreadClass(mvceditor::ThreadWithHeartbeatClass& owner);
+	WorkerThreadClass(mvceditor::RunningThreadsClass& runningThreads, mvceditor::ThreadWithHeartbeatClass& owner);
 	
 protected:
 
@@ -154,7 +174,65 @@ protected:
 	
 private:
 
+	mvceditor::RunningThreadsClass& RunningThreads;
+	
 	mvceditor::ThreadWithHeartbeatClass& Owner;
+};
+
+/**
+ * Class to hold all of the threads that are currently running.  wxWidgets
+ * threads are detached by default, we cannot call the IsRunning or IsAlive
+ * methods on them; this makes it necessary for us to track the threads
+ * in order to stop them on demand (like say, when the user clicks a stop
+ * button or closes a panel).
+ * 
+ * This class will own the given threads, and will delete them if need be.
+ */
+class RunningThreadsClass {
+
+	public:
+	
+	RunningThreadsClass();
+	
+	/**
+	 * Keeps track of the given worker.  Most of the times we will
+	 * do nothing with this pointer; wxWidgets detached threads delete themselves.
+	 * The only time we will need this pointer is when we want to stop
+	 * the thread while it is running. Remember that it is not safe to
+	 * call IsAlive, IsRunning methods on detached threads.
+	 * 
+	 * @param worker must be a DETACHED thread
+	 */
+	void Add(mvceditor::WorkerThreadClass* worker);
+	
+	/**
+	 * Method to "forget" the given worker.
+	 * This method should be called by the worker itself right before it
+	 * exits the Entry() method (in the background thread).
+	 * @param worker worker thread to be untracked
+	 */
+	void Remove(mvceditor::WorkerThreadClass* worker);
+	
+	/**
+	 * This method will stop the given worker and forget.  This method
+	 * should be called by the main thread
+	 * The worker is gracefully stopped. But note that 
+	 * this method will block until the thread exits; which may not be
+	 * immediately.
+	 * 
+	 * @param worker thread to stop.
+	 */
+	void RemoveAndStop(mvceditor::WorkerThreadClass* worker);
+
+	
+	private:
+
+	std::vector<mvceditor::WorkerThreadClass*> Workers;
+	
+	wxMutex Mutex;
+	
+	wxCondition Condition;
+	
 };
 
 }

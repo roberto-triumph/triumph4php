@@ -298,7 +298,8 @@ public:
 	 * @param the handler will get notified to EVENT_WORK* events with the given ID
 	 * pointer will NOT be owned by this object
 	 */
-	ResourceCacheUpdateThreadClass(ResourceCacheClass* resourceCache, wxEvtHandler& handler, int eventId = wxID_ANY);
+	ResourceCacheUpdateThreadClass(ResourceCacheClass* resourceCache, wxEvtHandler& handler,
+		mvceditor::RunningThreadsClass& runningThreads, int eventId = wxID_ANY);
 		
 	/**
 	 * Will run a background thread to parse the resources of the given 

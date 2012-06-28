@@ -38,8 +38,9 @@ static const int ID_DETECT_RESOURCES = wxNewId();
 static const int ID_DETECT_URL = wxNewId();
 static const int ID_DETECT_VIEW_FILES = wxNewId();
 
-mvceditor::ResponseThreadWithHeartbeatClass::ResponseThreadWithHeartbeatClass(mvceditor::DetectorActionClass& action) 
-	: ThreadWithHeartbeatClass(action) 
+mvceditor::ResponseThreadWithHeartbeatClass::ResponseThreadWithHeartbeatClass(mvceditor::DetectorActionClass& action, 
+		mvceditor::RunningThreadsClass& runningThreads) 
+	: ThreadWithHeartbeatClass(action, runningThreads) 
 	, Action(action) 
 	, OutputFile() {
 }
@@ -60,12 +61,12 @@ void mvceditor::ResponseThreadWithHeartbeatClass::Entry() {
 	SignalEnd();
 }
 
-mvceditor::DetectorActionClass::DetectorActionClass(wxEvtHandler& handler) 
+mvceditor::DetectorActionClass::DetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads) 
 	: wxEvtHandler()
 	, Error(NONE)
 	, ErrorMessage()
 	, Process(*this)
-	, ResponseThread(*this)
+	, ResponseThread(*this, runningThreads)
 	, Handler(handler)
 	, OutputFile()
 	, CurrentPid(0)
@@ -150,8 +151,8 @@ void mvceditor::DetectorActionClass::OnWorkComplete(wxCommandEvent& event) {
 	wxRemoveFile(OutputFile.GetFullPath());
 }
 
-mvceditor::FrameworkDetectorActionClass::FrameworkDetectorActionClass(wxEvtHandler& handler)
-	: DetectorActionClass(handler)
+mvceditor::FrameworkDetectorActionClass::FrameworkDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads)
+	: DetectorActionClass(handler, runningThreads)
 	, Frameworks() {
 
 }
@@ -182,8 +183,8 @@ bool mvceditor::FrameworkDetectorActionClass::Response() {
 	return ret;
 }
 
-mvceditor::DatabaseDetectorActionClass::DatabaseDetectorActionClass(wxEvtHandler& handler)
-	: DetectorActionClass(handler)
+mvceditor::DatabaseDetectorActionClass::DatabaseDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads)
+	: DetectorActionClass(handler, runningThreads)
 	, Databases() {
 
 }
@@ -237,8 +238,8 @@ bool mvceditor::DatabaseDetectorActionClass::Response() {
 	return ret;
 }
 
-mvceditor::ConfigFilesDetectorActionClass::ConfigFilesDetectorActionClass(wxEvtHandler& handler) 
-	: DetectorActionClass(handler)
+mvceditor::ConfigFilesDetectorActionClass::ConfigFilesDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads) 
+	: DetectorActionClass(handler, runningThreads)
 	, ConfigFiles() {
 
 }
@@ -272,8 +273,8 @@ bool mvceditor::ConfigFilesDetectorActionClass::Response() {
 	return ret;
 }
 
-mvceditor::ResourcesDetectorActionClass::ResourcesDetectorActionClass(wxEvtHandler& handler)
-	: DetectorActionClass(handler)
+mvceditor::ResourcesDetectorActionClass::ResourcesDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads)
+	: DetectorActionClass(handler, runningThreads)
 	, Resources() {
 
 }
@@ -351,8 +352,8 @@ bool mvceditor::ResourcesDetectorActionClass::Response() {
 	return ret;
 }
 
-mvceditor::UrlDetectorActionClass::UrlDetectorActionClass(wxEvtHandler& handler) 
-	: DetectorActionClass(handler)
+mvceditor::UrlDetectorActionClass::UrlDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads) 
+	: DetectorActionClass(handler, runningThreads)
 	, Urls() {
 		
 }
@@ -400,8 +401,8 @@ bool mvceditor::UrlDetectorActionClass::Response() {
 	return ret;
 }
 
-mvceditor::ViewInfosDetectorActionClass::ViewInfosDetectorActionClass(wxEvtHandler& handler) 
-	: DetectorActionClass(handler) {
+mvceditor::ViewInfosDetectorActionClass::ViewInfosDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads) 
+	: DetectorActionClass(handler, runningThreads) {
 		
 }
 
@@ -452,18 +453,18 @@ bool mvceditor::ViewInfosDetectorActionClass::Response() {
 	return ret;
 }
 
-mvceditor::PhpFrameworkDetectorClass::PhpFrameworkDetectorClass(wxEvtHandler& handler, const mvceditor::EnvironmentClass& environment)
+mvceditor::PhpFrameworkDetectorClass::PhpFrameworkDetectorClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, const mvceditor::EnvironmentClass& environment)
 	: wxEvtHandler()
 	, Identifiers()
 	, ConfigFiles()
 	, Databases()
 	, Resources()
-	, FrameworkDetector(*this)
-	, ConfigFilesDetector(*this)
-	, DatabaseDetector(*this)
-	, ResourcesDetector(*this)
-	, UrlDetector(*this)
-	, ViewInfosDetector(*this)
+	, FrameworkDetector(*this, runningThreads)
+	, ConfigFilesDetector(*this, runningThreads)
+	, DatabaseDetector(*this, runningThreads)
+	, ResourcesDetector(*this, runningThreads)
+	, UrlDetector(*this, runningThreads)
+	, ViewInfosDetector(*this, runningThreads)
 	, FrameworkIdentifiersLeftToDetect()
 	, UrlsDetected()
 	, ViewInfosDetected()

@@ -127,7 +127,7 @@ public:
 	 * @param queryId this ID will be used by the handler; the handler should only handle its own
 	 *        query results.
 	 */
-	MultipleSqlExecuteClass(wxEvtHandler& handler, int queryId);
+	MultipleSqlExecuteClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, int queryId);
 	
 	/**
 	 * Prepares queries to be run
@@ -214,7 +214,7 @@ public:
 	 *        result sets
 	 */
 	SqlBrowserPanelClass(wxWindow* parent, int id, mvceditor::StatusBarWithGaugeClass* gauge,
-		const SqlQueryClass& query, SqlBrowserPluginClass* plugin);
+		const SqlQueryClass& query, SqlBrowserPluginClass* plugin, mvceditor::RunningThreadsClass& runningThreads);
 	
 	/**
 	 * Runs the query that is in the text control (in a separate thread).
@@ -348,7 +348,7 @@ public:
 	/**
 	 * @param handler will get notified with EVENT_WORK_* events
 	 */
-	SqlMetaDataFetchClass(wxEvtHandler& handler);
+	SqlMetaDataFetchClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
 	
 	/**
 	 * starts a background thread to read the metadata. Generates events while work
