@@ -42,6 +42,29 @@ public:
 	}
 };
 
+class SqlResourceClass {
+
+	public:
+	
+	/**
+	 * a lowercased version useful for sorting and searching. Searches
+	 * will be made against this value.
+	 */
+	UnicodeString Key;
+	
+	/**
+	 * The name of the resource. This is the name that will be returned
+	 * to the callers.
+	 */
+	UnicodeString Name;
+	
+	SqlResourceClass(const UnicodeString& name);
+	
+	
+	bool operator<(const SqlResourceClass& other) const;
+	
+};
+
 class SqlResourceFinderClass {
 	
 public:
@@ -85,12 +108,6 @@ public:
 	private:
 
 	/**
-	 * to prevent nested templates
-	 * gives warning about '>>>' being an operator in C++ 0x
-	 */
-	typedef std::vector<UnicodeString> UnicodeStringVector;
-
-	/**
 	 * turn the info into a string that way we can link tables to a connection and we don't 
 	 * have to keep a pointer to the info around.
 	 */
@@ -105,7 +122,7 @@ public:
 	 * To keep the tables linked to a specific connection
 	 * key will be the info hash, value will be the list of table for that info
 	 */
-	std::map<UnicodeString, UnicodeStringVector, SqlResourceFinderUnicodeStringComparatorClass> Tables;
+	std::map<UnicodeString, std::vector<SqlResourceClass>, SqlResourceFinderUnicodeStringComparatorClass> Tables;
 	
 	/**
 	 * To keep the columns linked to a specific connection AND table
@@ -113,7 +130,7 @@ public:
 	 * of columns for that table
 	 * comparator is needed for MSW compiler
 	 */
-	std::map<UnicodeString, UnicodeStringVector, SqlResourceFinderUnicodeStringComparatorClass> Columns;
+	std::map<UnicodeString, std::vector<SqlResourceClass>, SqlResourceFinderUnicodeStringComparatorClass> Columns;
 	
 };
 	 

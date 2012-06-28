@@ -27,6 +27,16 @@
 #include <soci.h>
 #include <algorithm>
 
+mvceditor::SqlResourceClass::SqlResourceClass(const UnicodeString& name)
+	: Key(name)
+	, Name(name) {
+	Key.toLower();
+}
+
+bool mvceditor::SqlResourceClass::operator <(const mvceditor::SqlResourceClass& other) const {
+	return (Key.caseCompare(other.Key, 0) < (int8_t)0) ? true : false;
+}
+
 mvceditor::SqlResourceFinderClass::SqlResourceFinderClass() 
 	: Query()
 	, Tables()
@@ -61,10 +71,8 @@ bool mvceditor::SqlResourceFinderClass::Fetch(const mvceditor::DatabaseInfoClass
 			stmt.execute();
 			while (Query.More(stmt, hasError, error)) {
 				UnicodeString uni = mvceditor::StringHelperClass::charToIcu(tableName.c_str());
-
-				// lower case so that the lookup method dont have to worry about case sensitivity
-				uni.toLower();
-				Tables[hash].push_back(uni);				
+				mvceditor::SqlResourceClass res(uni);
+				Tables[hash].push_back(res);
 			}
 			Query.Close(stmt);
 			if (!hasError) {
@@ -76,10 +84,8 @@ bool mvceditor::SqlResourceFinderClass::Fetch(const mvceditor::DatabaseInfoClass
 				stmt.execute();
 				while (Query.More(stmt, hasError, error)) {
 					UnicodeString uniSchema = mvceditor::StringHelperClass::charToIcu(schemaName.c_str());
-
-					// lower case so that the lookup method dont have to worry about case sensitivity
-					uniSchema.toLower();
-					Tables[hash].push_back(uniSchema);
+					mvceditor::SqlResourceClass resSchema(uniSchema);
+					Tables[hash].push_back(resSchema);
 				}
 				Query.Close(stmt);
 			}
@@ -95,11 +101,9 @@ bool mvceditor::SqlResourceFinderClass::Fetch(const mvceditor::DatabaseInfoClass
 				stmt.execute();
 				while (Query.More(stmt, hasError, error)) {
 					UnicodeString uniColumn = mvceditor::StringHelperClass::charToIcu(columnName.c_str());
-
-					// lower case so that the lookup method dont have to worry about case sensitivity
-					uniColumn.toLower();
 					UnicodeString hash = Hash(info);
-					Columns[hash].push_back(uniColumn);
+					mvceditor::SqlResourceClass resColumn(uniColumn);
+					Columns[hash].push_back(resColumn);
 				}
 				Query.Close(stmt);
 			}
@@ -117,14 +121,13 @@ bool mvceditor::SqlResourceFinderClass::Fetch(const mvceditor::DatabaseInfoClass
 std::vector<UnicodeString> mvceditor::SqlResourceFinderClass::FindTables(const mvceditor::DatabaseInfoClass& info, const UnicodeString& partialTableName) {
 	std::vector<UnicodeString> ret;
 	UnicodeString hash = Hash(info);
-	std::vector<UnicodeString> infoTables = Tables[hash];
+	std::vector<mvceditor::SqlResourceClass> infoTables = Tables[hash];
 
-	// find is case insensitive
-	UnicodeString lower(partialTableName);
-	lower.toLower();
-	std::vector<UnicodeString>::iterator it = std::lower_bound(infoTables.begin(), infoTables.end(), lower);
-	while (it != infoTables.end() && it->indexOf(lower) == 0) {
-		ret.push_back(*it);
+	// case insensitive is taken care of by SqlResourceClass
+	mvceditor::SqlResourceClass needle(partialTableName);
+	std::vector<mvceditor::SqlResourceClass>::iterator it = std::lower_bound(infoTables.begin(), infoTables.end(), needle);
+	while (it != infoTables.end() && it->Key.indexOf(needle.Key) == 0) {
+		ret.push_back(it->Name);
 		it++;
 	}
 	return ret;
@@ -133,14 +136,13 @@ std::vector<UnicodeString> mvceditor::SqlResourceFinderClass::FindTables(const m
 std::vector<UnicodeString> mvceditor::SqlResourceFinderClass::FindColumns(const mvceditor::DatabaseInfoClass& info, const UnicodeString& partialColumnName) {
 	std::vector<UnicodeString> ret;
 	UnicodeString hash =  Hash(info);
-	std::vector<UnicodeString> infoColumns = Columns[hash];
+	std::vector<mvceditor::SqlResourceClass> infoColumns = Columns[hash];
 
-	// find is case insensitive
-	UnicodeString lower(partialColumnName);
-	lower.toLower();
-	std::vector<UnicodeString>::iterator it = std::lower_bound(infoColumns.begin(), infoColumns.end(), lower);
-	while (it != infoColumns.end() && it->indexOf(lower) == 0) {
-		ret.push_back(*it);
+	// case insensitive is taken care of by SqlResourceClass
+	mvceditor::SqlResourceClass needle(partialColumnName);
+	std::vector<mvceditor::SqlResourceClass>::iterator it = std::lower_bound(infoColumns.begin(), infoColumns.end(), needle);
+	while (it != infoColumns.end() && it->Key.indexOf(needle.Key) == 0) {
+		ret.push_back(it->Name);
 		it++;
 	}
 	return ret;

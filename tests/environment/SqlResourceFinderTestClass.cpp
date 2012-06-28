@@ -73,6 +73,25 @@ TEST_FIXTURE(SqlResourceFinderFixtureClass, FindTable) {
 	CHECK_UNISTR_EQUALS_NO_CASE("service_names", tables[1]);
 }
 
+TEST_FIXTURE(SqlResourceFinderFixtureClass, FindTableCaseInsensitive) {
+	Info.DatabaseName = UNICODE_STRING_SIMPLE("sql_resource_finder");
+	
+	std::string query = "CREATE TABLE WebUsers(idUser int);";
+	CHECK(Exec(query));
+	query = "CREATE TABLE ServiceNames(idServiceName int);";
+	CHECK(Exec(query));
+	query = "CREATE TABLE ServiceLocations(idServiceLocation int);";
+	CHECK(Exec(query));
+	query = "CREATE TABLE Deleted_Users(idUser int, deletedDate datetime);";
+	CHECK(Exec(query));
+	UnicodeString error;
+	CHECK(Finder.Fetch(Info, error));
+	std::vector<UnicodeString> tables = Finder.FindTables(Info, UNICODE_STRING_SIMPLE("service"));
+	CHECK_VECTOR_SIZE(2, tables);
+	CHECK_UNISTR_EQUALS("ServiceLocations", tables[0]);
+	CHECK_UNISTR_EQUALS("ServiceNames", tables[1]);
+}
+
 TEST_FIXTURE(SqlResourceFinderFixtureClass, FindTableShouldLocateInformationSchema) {
 	Info.DatabaseName = UNICODE_STRING_SIMPLE("sql_resource_finder");
 	UnicodeString error;
@@ -113,6 +132,27 @@ TEST_FIXTURE(SqlResourceFinderFixtureClass, FindColumns) {
 	CHECK_UNISTR_EQUALS_NO_CASE("idIServiceLocation", columns[1]);
 	CHECK_UNISTR_EQUALS_NO_CASE("idIServiceName", columns[2]);
 	CHECK_UNISTR_EQUALS_NO_CASE("idIUser", columns[3]);
+}
+
+TEST_FIXTURE(SqlResourceFinderFixtureClass, FindColumnsCaseInsensitive) {	
+	Info.DatabaseName = UNICODE_STRING_SIMPLE("sql_resource_finder");
+	
+	std::string query = "CREATE TABLE web_users(idIUser int);";
+	CHECK(Exec(query));
+	query = "CREATE TABLE service_names(idIServiceName int);";
+	CHECK(Exec(query));
+	query = "CREATE TABLE service_locations(idIServiceLocation int);";
+	CHECK(Exec(query));
+	query = "CREATE TABLE deleted_users(idIUser int, idIDeletedBy int);";
+	CHECK(Exec(query));
+	UnicodeString error;
+	CHECK(Finder.Fetch(Info, error));
+	
+	std::vector<UnicodeString> columns = Finder.FindColumns(Info, UNICODE_STRING_SIMPLE("idiservice"));
+	CHECK_VECTOR_SIZE(2, columns);
+	CHECK_UNISTR_EQUALS("idIServiceLocation", columns[0]);
+	CHECK_UNISTR_EQUALS("idIServiceName", columns[1]);
+
 }
 
 TEST_FIXTURE(SqlResourceFinderFixtureClass, FindInformationSchemaColumns) {
