@@ -95,26 +95,6 @@ public:
 private:
 
 	pelet::ParserClass Parser;
-
-	/**
-	 * The file extensions we want to attempt to parse.
-	 * Each item in the list is a wilcard suitable for passing into the wxMatchWild()
-	 * function
-	 */
-	std::vector<wxString> PhpFileFilters;
-
-	/**
-	 * Regular expression that, when matched; will result in the file being
-	 * skipped (won't be lint checked). IgnoreFileFiltersRegEx take precedence over the
-	 * PhpFileFilters (if a file matches both, then file will be ignored).
-	 */
-	wxRegEx IgnoreFileFiltersRegEx;
-
-	/**
-	 * The 'string' version of the Ignore files reg ex. We will keep the string version
-	 * around so that we can test for empty strings.
-	 */
-	wxString IgnoreFileFilters;
 };
 
 /**
@@ -134,19 +114,15 @@ public:
 	
 	/**
 	 * Start the background thread.  Lint errors will be propagated as events.
-	 * @param wxString directory the location of files that need to be parsed.  Parsing will
+
+	 * @param sources the locations and include/exclude wildcards of files that need to be parsed.  Parsing will
 	 *        be recursive (sub directories will be parsed also).
-	 * @param wxString phpFileFilters a list of wildcard filters of files to parse. See wxIsWild() and
-	 *        wxMatchWild() for description of valid wildcards (only '*' and '?' are wildcards).
-	 * @param wxString ignoreFileFiltersRegEx regular expression of files to IGNORE. This 
-	 *        overrides the phpFileFilters; if a file matches ignoreFileFilters and phpFileFilters then
-	 *        the file will be ignored. 
 	 * @param environment to know which PHP version to check against
 	 * @param StartError& error the reason for a failure to start will be set here.
 	 * return bool TRUE if and only if the thread was started.  If false, either thread could
 	 * not be started or directory is not valid. 
 	 */
-	bool BeginDirectoryLint(const wxString& directory, const std::vector<wxString>& phpFileFilters, const wxString& ignoreFileFiltersRegEx, const EnvironmentClass& environment, StartError& error);
+	bool BeginDirectoryLint(std::vector<mvceditor::SourceClass> sources, const EnvironmentClass& environment, StartError& error);
 
 	/**
 	 * Lint checks the given file in the current thread.  This is a thread-safe method;
@@ -154,16 +130,12 @@ public:
 	 * finished.
 	 *
 	 * Lint errors will be propagated as events.
-	 * @param wxString phpFileFilters a list of wildcard filters of files to parse. See wxIsWild() and
-	 *        wxMatchWild() for description of valid wildcards (only '*' and '?' are wildcards).
-	 * @param wxString ignoreFileFiltersRegEx regular expression of files to IGNORE. This 
-	 *        overrides the phpFileFilters; if a file matches ignoreFileFilters and phpFileFilters then
-	 *        the file will be ignored. 
+	 * @param wxString fileName the full path of the file to lint
+	 * @param project needed to perform exclude wildcard checks
 	 * @param environment to know which PHP version to check against
 	 * @return TRUE if the file contains a lint error.
 	 */
-	bool LintSingleFile(const wxString& fileName, const std::vector<wxString>& phpFileFilters, const wxString& ignoreFileFiltersRegEx,
-		const EnvironmentClass& environment);
+	bool LintSingleFile(const wxString& fileName, mvceditor::ProjectClass* project, const EnvironmentClass& environment);
 
 	/**
 	 * Return a summary of the number of files that were lint'ed.
@@ -193,19 +165,6 @@ protected:
 private:
 
 	ParserDirectoryWalkerClass ParserDirectoryWalker;
-			
-	/**
-	 * The file extensions we want to attempt to parse.
-	 * Each item in the list is a wilcard suitable for passing into the wxMatchWild()
-	 * function
-	 */
-	std::vector<wxString> PhpFileFilters;
-
-	/**
-	 * This is a list of wilcards that, when matched; will result in the file being
-	 * skipped (won't be lint checked).
-	 */
-	std::vector<wxString> IgnoreFileFilters;
 };
 
 /**
@@ -277,14 +236,6 @@ private:
 class LintPluginClass : public PluginClass {
 	
 public:
-
-	/**
-	 * A newline separated list of wildcards that will be used
-	 * to ignore certain files; files matching any of the wildcards
-	 * will NOT be checked.
-	 * Each wildcard can have either a '*' or '?'.
-	 */
-	wxString IgnoreFiles;
 	
 	/**
 	 * If TRUE, then when a file is saved; a lint check on that file

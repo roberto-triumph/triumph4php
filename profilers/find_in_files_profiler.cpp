@@ -69,7 +69,6 @@ void ProfileFindInFilesExactMode() {
 	if (directorySearch.Init(DirName)) {
 		mvceditor::FindInFilesClass findInFiles;
 		findInFiles.Expression = UNICODE_STRING_SIMPLE("class Db");
-		findInFiles.FilesFilter = wxT("*.php");
 		findInFiles.Mode = mvceditor::FinderClass::EXACT;
 		if(findInFiles.Prepare()) {		
 			while (directorySearch.More()) {
@@ -95,10 +94,13 @@ void ProfileFindInFilesCodeMode() {
 	printf("*******\n");
 	wxLongLong time = wxGetLocalTimeMillis();
 	mvceditor::DirectorySearchClass directorySearch;
-	if (directorySearch.Init(DirName)) {
+	mvceditor::SourceClass src;
+	src.RootDirectory.Assign(DirName);
+	src.SetIncludeWildcards(wxT("*.php"));
+	std::vector<mvceditor::SourceClass> sources;
+	if (directorySearch.Init(sources)) {
 		mvceditor::FindInFilesClass findInFiles;
 		findInFiles.Expression = UNICODE_STRING_SIMPLE("class Db");
-		findInFiles.FilesFilter = wxT("*.php");
 		findInFiles.Mode = mvceditor::FinderClass::EXACT;
 		if(findInFiles.Prepare()) {		
 			while (directorySearch.More()) {

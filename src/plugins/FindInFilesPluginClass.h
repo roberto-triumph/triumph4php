@@ -113,13 +113,12 @@ public:
 	 * @param wxEvtHandler* This object will receive the EVENT_FIND_IN_FILES_FILE_HIT events. The pointer will NOT be managed 
 	 *        (deleted) by this class. 
 	 * @param FindInFilesClass findInFiles the expression to search for
-	 * @param wxString the directory search. 
 	 * @param doHiddenFiles if TRUE then hidden files are searched
 	 * @param skipFiles full paths of files to not search. We want to NOT perform searches 
 	 *        in files that are already opened; those would result in incorrect hits.
 	 * @return True if directory is valid and the find expression is valid.
 	 */
-	bool InitForFind(wxEvtHandler* handler, FindInFilesClass findInFiles, const wxString& path, bool doHiddenFiles, std::vector<wxString> skipFiles);
+	bool InitForFind(wxEvtHandler* handler, FindInFilesClass findInFiles, bool doHiddenFiles, std::vector<wxString> skipFiles);
 
 	/**
 	 * When replacing, the thread will replace all matched files. In case files are opened, we don't want to
@@ -217,7 +216,7 @@ public:
 	 * @param wxString path the directory to search in
 	 * @param bool if TRUE then hidden files will be searched
 	 */
-	void Find(const FindInFilesClass& findInFiles, wxString findPath, bool doHiddenFiles);
+	void Find(const FindInFilesClass& findInFiles, bool doHiddenFiles);
 	
 private:
 
@@ -245,11 +244,6 @@ private:
 	 * @var StatusBarWithGaugeClass
 	 */
 	StatusBarWithGaugeClass* Gauge;
-	
-	/**
-	 * The path to search. 
-	 */
-	wxString FindPath;
 	
 	/**
 	 * The number of files that contained at least one match.
@@ -336,12 +330,6 @@ public:
 	 *
 	 */
 	FindInFilesClass PreviousFindInFiles;
-
-	/**
-	 * Previous find path
-	 * @var wxString
-	 */
-	wxString PreviousFindPath;
 
 	/**
 	 * If TRUE, hidden files are searched

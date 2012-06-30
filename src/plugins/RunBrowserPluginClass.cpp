@@ -495,14 +495,25 @@ void mvceditor::RunBrowserPluginClass::OnProjectIndexed(wxCommandEvent& event) {
 void mvceditor::RunBrowserPluginClass::OnCacheFileWorkComplete(wxCommandEvent& event) {
 	mvceditor::EnvironmentClass* environment = GetEnvironment();
 	mvceditor::ProjectClass* project = GetProject();
-	wxString projectRootUrl =  environment->Apache.GetUrl(project->GetRootPath());
-	if (!PhpFrameworks.get()) {
-		PhpFrameworks.reset(new PhpFrameworkDetectorClass(*this, RunningThreads, *GetEnvironment()));
-		PhpFrameworks->Identifiers = PhPFrameworks().Identifiers;
-		PhpFrameworks->InitUrlDetector(GetProject()->GetRootPath(), ResourceCacheFileName.GetFullPath(), projectRootUrl);
-	}
-	else {
-		PhpFrameworks->InitUrlDetector(GetProject()->GetRootPath(), ResourceCacheFileName.GetFullPath(), projectRootUrl);
+
+	// look to see if any source directory is a virtual host doc root
+	std::vector<mvceditor::SourceClass> sources = project->AllPhpSources();
+	for (size_t i = 0; i < sources.size(); ++i) {
+
+		// ATTN: allow at most one doc root per project for now
+		wxString rootDirFullPath = sources[i].RootDirectory.GetFullPath();
+		wxString projectRootUrl =  environment->Apache.GetUrl(rootDirFullPath);
+		if (!projectRootUrl.IsEmpty()) {
+			if (!PhpFrameworks.get()) {
+				PhpFrameworks.reset(new PhpFrameworkDetectorClass(*this, RunningThreads, *GetEnvironment()));
+				PhpFrameworks->Identifiers = PhPFrameworks().Identifiers;
+				PhpFrameworks->InitUrlDetector(rootDirFullPath, ResourceCacheFileName.GetFullPath(), projectRootUrl);
+			}
+			else {
+				PhpFrameworks->InitUrlDetector(rootDirFullPath, ResourceCacheFileName.GetFullPath(), projectRootUrl);
+			}
+			break;
+		}
 	}
 }
 

@@ -61,18 +61,6 @@ public:
 
 SUITE(FindInFilesTestClass) {
 	
-TEST_FIXTURE(FindInFilesTestFixtureClass, WalkShouldOnlySearchWhenWildcardsMatch) {
-	CreateFixtureFile(wxT("user.php"), FILE_1);
-	CreateFixtureFile(wxT("admin.inc"), FILE_1);
-	CreateFixtureFile(wxT("admin.php_bak"), FILE_1);
-	FindInFiles.Expression = UNICODE_STRING_SIMPLE("UserClass");
-	FindInFiles.FilesFilter = wxT("*.php;*.inc");
-	CHECK(FindInFiles.Prepare());
-	CHECK(FindInFiles.Walk(TestProjectDir + wxT("user.php")));
-	CHECK(FindInFiles.Walk(TestProjectDir + wxT("admin.inc")));
-	CHECK_EQUAL(false, FindInFiles.Walk(TestProjectDir + wxT("admin.php_bak")));
-}
-
 TEST_FIXTURE(FindInFilesTestFixtureClass, WalkShouldLocateNextMatchWhenItReturnsTrue) {
 	CreateFixtureFile(wxT("user.php"), FILE_1);
 	FindInFiles.Expression = UNICODE_STRING_SIMPLE("UserClass");

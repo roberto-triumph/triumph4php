@@ -57,11 +57,11 @@ public:
 	 * that match the given wildcard.
 	 *
 	 * @param resourceCache the existing resources, any new resources will be added to this cache
-	 * @param projectPath the directory to be scanned (recursively)
+	 * @param sources the directories to be scanned (recursively)
 	 * @param phpFileFilters the list of PHP file extensions to look for resources in
 	 * @return bool false if project root path does not exist
 	 */
-	bool InitForProject(ResourceCacheClass* resourceCache, const wxString& projectPath, const std::vector<wxString>& phpFileFilters);
+	bool InitForProject(ResourceCacheClass* resourceCache, std::vector<mvceditor::SourceClass> sources, const std::vector<wxString>& phpFileFilters);
 
 	/**
 	 * prepare to iterate through the given file. The name part of the given file must match the wildcard.

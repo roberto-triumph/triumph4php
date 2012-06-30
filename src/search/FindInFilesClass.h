@@ -139,14 +139,11 @@ public:
 	 * @var wxString
 	 */
 	UnicodeString ReplaceExpression;
-	
+
 	/**
-	 * File name mask.  Files matching the mask will be searched. If FilesFilter is modified, Prepare() method MUST be 
-	 * called in order to set the internal state machine.
-	 * the FilesFilter is a semicolon-separated series of wildcards.
-	 * @var wxString
+	 * The folder and wildcards to search.
 	 */
-	wxString FilesFilter;
+	SourceClass Source;
 	
 	/**
 	 * The find mode. If Mode is modified, Prepare() method MUST be called in order to
@@ -164,7 +161,7 @@ public:
 
 	/**
 	 * Prepare  Expression, ReplaceExpression. 
-	 * @return bool if Expression,  ReplaceExpression are valid
+	 * @return bool if Expression, ReplaceExpression are valid
 	 */
 	bool Prepare();
 	
@@ -178,14 +175,6 @@ public:
 	 * 		 iterate through the rest of the hits of the file.
 	 */
 	virtual bool Walk(const wxString& fileName);
-
-	/**
-	 * Check to see if the given file passes the files filter. You MUST call Prepare() method you call this method,
-	 * if Prepare method has not been called this method will always return false.
-	 * 
-	 * @return bool true if the given file matches the FilesFilter.
-	 */
-	bool ShouldSearch(const wxString& fileName);
 	
 	/**
 	 * Finds the next match in the given text. The matched line number is then made available with the GetCurrentLineNumber() method.
@@ -259,19 +248,6 @@ public:
 	 */
 	static OpenErrors FileContents(const wxString& fileName, UnicodeString& content);
 
-	/**
-	 * Create the regular expression from the a wildcard string. regular expression may or may not be valid,
-	 * use the IsValid() method of the wxRegEx object to test. 
-	 * A wildcard string has only 3 wildcard symbols:
-	 *
-	 *  * = Matches Any number of characters
-	 *  ? = Matches zero or 1 character
-	 *  ; = OR Separator; 
-	 * 
-	 * @return wxString string ready to be compiled into a wxRegEx object.
-	 */
-	static wxString CreateFilesFilterRegEx(const wxString& wildCardString);	
-
 private:
 
 	/**
@@ -279,12 +255,6 @@ private:
 	 * @var FinderClass
 	 */
 	FinderClass Finder;
-	
-	/**
-	 * To check files againts the FilesFilter
-	 * @var wxRegEx
-	 */
-	wxRegEx FilesFilterRegEx;
 	
 	/**
 	 * The input stream; used to open the file

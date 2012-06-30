@@ -168,8 +168,13 @@ void mvceditor::ViewFilePluginClass::OnWorkComplete(wxCommandEvent& event) {
 		FrameworkDetector.reset(new mvceditor::PhpFrameworkDetectorClass(*this, RunningThreads, *GetEnvironment()));
 	}
 	FrameworkDetector->Identifiers = PhPFrameworks().Identifiers;
-	if (!FrameworkDetector->InitViewInfosDetector(GetProject()->GetRootPath(), App->Structs.UrlResourceFinder.ChosenUrl.Url.BuildURI(), CallStackThread.StackFile)) {
-		mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Could not start ViewInfos detector"));
+
+	// TODO: better project recall
+	if (App->Project->HasSources()) {
+		wxString projectRoot = App->Project->AllSources()[0].RootDirectory.GetFullPath();
+		if (!FrameworkDetector->InitViewInfosDetector(projectRoot, App->Structs.UrlResourceFinder.ChosenUrl.Url.BuildURI(), CallStackThread.StackFile)) {
+			mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Could not start ViewInfos detector"));
+		}
 	}
 }
 	
@@ -241,12 +246,11 @@ void mvceditor::ViewFilePanelClass::UpdateResults() {
 
 		wxTreeItemId parent = FileTree->AddRoot(_("Views"));
 		mvceditor::ProjectClass* project = Plugin.GetProject();
-		wxString root = project->GetRootPath();
 		for (size_t i = 0; i < currentViewInfos.size(); ++i) {
 			wxString viewFile = currentViewInfos[i].FileName;
 
 			// remove the project root so that the dialog is not too 'wordy'
-			wxString text = viewFile.Mid(root.Len());
+			wxString text = project->RelativeFileName(viewFile);
 			if (!wxFileName::FileExists(viewFile)) {
 
 				// show that the view file is missing
@@ -268,7 +272,7 @@ void mvceditor::ViewFilePanelClass::UpdateResults() {
 			wxString text = viewInfo.FileName;
 			
 			// remove the project root so that the dialog is not too 'wordy'
-			text = text.Mid(root.Len());
+			text = project->RelativeFileName(text);
 			wxTreeItemId sub = TemplateVariablesTree->AppendItem(parent, text);
 			for (size_t j = 0; j < viewInfo.TemplateVariables.size(); ++j) {
 				TemplateVariablesTree->AppendItem(sub, viewInfo.TemplateVariables[j]);
@@ -390,7 +394,9 @@ void mvceditor::ViewFilePanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 	wxString file = FileTree->GetItemText(item);
 	if (!file.IsEmpty() && !file.Find(wxT("[X]")) == 0) {
 		mvceditor::ProjectClass* project = Plugin.GetProject();
-		wxString root = project->GetRootPath();
+
+		// TODO: better project recall
+		wxString root = project->AllSources()[0].RootDirectory.GetFullPath();
 		file =  root + wxFileName::GetPathSeparator() + file;
 		Plugin.OpenFile(file);
 	}

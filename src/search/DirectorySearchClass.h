@@ -26,6 +26,8 @@
 #define __directorysearchclass__
 
 #include <wx/string.h>
+#include <wx/regex.h>
+#include <wx/filename.h>
 #include <stack>
 #include <vector>
 
@@ -46,6 +48,145 @@ public:
 	 * @return bool true if the dir walker wants the file to be saved as a match
 	 */
 	virtual bool Walk(const wxString& file) = 0;
+};
+
+/**
+ * A source class represents a group of files that MVC editor will 
+ * look at when indexing a project. A user will define the locations 
+ * and wildcards. Source directories contain any files that the 
+ * user wants to open in MVC Editor. Additionally, it defines wildcards
+ * to ignore certain files in a source directory, for example for
+ * ignoring cached files, or log files. Source directories are always
+ * recursive; once a directory is labeled as a source all sub-directories
+ * automatically become a source.
+ *
+ * An include/exclude wilcard can multiple wildcard expression; where each
+ * expression has only 3 wildcard symbols:
+ *
+ *  * = Matches Any number of characters
+ *  ? = Matches zero or 1 character
+ *  ; = OR Separator;  
+ *
+ * Examaple valid include wildcards:
+ * "*.phtml;class.*.php;*.php3?"
+ *
+ */
+class SourceClass {
+	
+public:
+
+	/**
+	 * The location where to start looking files from.
+	 */
+	wxFileName RootDirectory;
+
+	SourceClass();
+	~SourceClass();
+
+	/**
+	 * Needed overloads to make SourceClass usable in STL data structures
+	 */
+	SourceClass(const mvceditor::SourceClass& src);
+	void operator=(const mvceditor::SourceClass& src);
+
+	/**
+	 * @param src object to copy from. after a call, this
+	 * object will have the same root directory, include and
+	 * exclude wildcards as src.
+	 */
+	void Copy(const mvceditor::SourceClass& src);
+
+	/**
+	 * Remove all include wildcards. Removing all include wildcards
+	 * will make the Contains() method always return false, so you would
+	 * want to make sure that you append at least one wildcard.
+	 */
+	void ClearIncludeWildcards();
+
+	/**
+	 * Remove all exclude wildcards.
+	 */
+	void ClearExcludeWildcards();
+
+	/**
+	 * @param includeWildcards wildcards in the given string and adds them to the
+	 *        include wildcards
+	 * Each wildcard is assumed to be separated by a semicolon ';'
+	 * Existing wildcards are ovewritten
+     */
+	void SetIncludeWildcards(const wxString& includeWildcards);
+
+	/**
+	 * @param excludeWildcards wildcards in the given string and adds them to the
+	 *        exclude wildcards
+	 * Each wildcard is assumed to be separated by a semicolon ';'
+	 * Existing wildcards are overwritten
+     */
+	void SetExcludeWildcards(const wxString& excludeWildcards);
+
+	/**
+	 * Returns the include wildcards for this source
+	 * @return wxString file extensions. This string will be suitable to
+	 * serialize the wildcard list.
+	 */
+	wxString IncludeWildcardsString() const;
+
+	/**
+	 * Returns the include wildcards for this source
+	 * @return wxString file extensions. This string will be suitable to
+	 * serialize the wildcard list.
+	 */
+	wxString ExcludeWildcardsString() const;
+
+	/**
+	 * @return bool TRUE if the given full path is contained in this source.
+	 * This means that fullPath is in the RootDirectory (or one of RootDirectory)
+	 * sub-directories) and fullPath's file extension matches the
+	 * include files AND it does NOT match the exclude files.
+	 */
+	bool Contains(const wxString& fullPath) const;
+
+	private:
+
+	/**
+	 * Create the regular expression from the a wildcard string. returned regular expression may or may not be valid,
+	 * use the IsValid() method of the wxRegEx object to test. 
+	 * A wildcard string has only 3 wildcard symbols:
+	 *
+	 *  * = Matches Any number of characters
+	 *  ? = Matches zero or 1 character
+	 *  ; = OR Separator; 
+	 * 
+	 * @return wxString string ready to be compiled into a wxRegEx object.
+	 */
+	wxString WildcardRegEx(const wxString& expr);
+
+	/**
+	 * The regular expression made from IncludeWildcards
+	 * This is a pointer so that instances of SourceClass can be pushed
+	 * into vectors.
+	 * This object will own the pointer
+	 */
+	wxRegEx* IncludeRegEx;
+
+	/**
+	 * The given include wildcards
+	 */
+	wxString IncludeWildcards;
+
+	/**
+	 * The regular expression made from ExcludeWildcards
+	 * This is a pointer so that instances of SourceClass can be pushed
+	 * into vectors.
+	 * This object will own the pointer
+	 */
+	wxRegEx* ExcludeRegEx;
+
+	/**
+	 * The given eclude wildcards
+	 */
+	wxString ExcludeWildcards;
+
 };
 
 /**
@@ -89,6 +230,19 @@ public:
 	 * @return bool true of the given path exists
 	 */
 	bool Init(const wxString& path, Modes mode = RECURSIVE, bool doHidden = false);
+
+	/**
+	 * Initialize a search that looks in multiple directories.
+	 * 
+	 * @param sources the list of directories to recurse
+	 * @param one of RECURSIVE or PRECISE.  in PRECISE mode, all files for all sub-directories are enumerated at once, making the 
+	 *        total files count available.  In RECURSIVE mode, sub-directories are recursed one at a time.  PRECISE mode
+	 *        is useful when the caller needs to know how many total files will be walked over, but it is also more
+	 *        memory intensive.  Note that both modes will result in walking of all files.
+	 * @return bool doHidden if TRUE then hidden files will be walked as well.
+	 * @return bool true if ALL of the given path exists
+	 */
+	bool Init(const std::vector<mvceditor::SourceClass>& sources, Modes mode = RECURSIVE, bool doHidden = false);
 	
 	/**
 	 * Passes the current file to the given walker and advances to the next file. Note that the files are not guaranteed to
@@ -130,6 +284,12 @@ private:
 	 * @param wxString path the directory to be enumerated.
 	 */
 	void EnumerateAllFiles(const wxString& path);
+
+	/**
+	 * @param fullPath full path to the file to be checked.
+	 * @return bool TRUE if given full path matches the include/exclude wildcards
+	 */
+	bool MatchesWildcards(const wxString& fullPath) const;
 	
 	/**
 	 * The files that the DirectoryWalker matched on
@@ -151,6 +311,11 @@ private:
 	 * @var std::vector<wxString>
 	 */
 	std::stack<wxString*> Directories;
+
+	/**
+	 * Stores the wildcards so that we ignore files 
+	 */
+	std::vector<mvceditor::SourceClass> Sources;
 	
 	/**
 	 * the total number of files that will be walked over.  This number will only be available if Init() method was

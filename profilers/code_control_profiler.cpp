@@ -47,7 +47,6 @@ public:
 	virtual int OnExit();
 	
 	mvceditor::CodeControlOptionsClass Options;
-	mvceditor::ProjectOptionsClass ProjectOptions;
 	mvceditor::ProjectClass Project;
 	mvceditor::StructsClass Structs;
 	mvceditor::RunningThreadsClass RunningThreads;
@@ -141,8 +140,7 @@ IMPLEMENT_APP(CodeControlProfilerAppClass)
 CodeControlProfilerAppClass::CodeControlProfilerAppClass() 
 	: wxApp()
 	, Options()
-	, ProjectOptions()
-	, Project(ProjectOptions) 
+	, Project() 
 	, Structs() {
 		
 }

@@ -118,6 +118,19 @@ public:
 	bool Init(const wxString& path, DirectorySearchClass::Modes mode = DirectorySearchClass::RECURSIVE, bool doHiddenFiles = false);
 
 	/**
+	 * Prepare the background thread to iterate through the given sources.
+	 *
+	 * @param sources the list of directories to recurse
+	 * @param one of RECURSIVE or PRECISE.  in PRECISE mode, all files for all sub-directories are enumerated at once, making the 
+	 *        total files count available.  In RECURSIVE mode, sub-directories are recursed one at a time.  PRECISE mode
+	 *        is useful when the caller needs to know how many total files will be walked over, but it is also more
+	 *        memory intensive.  Note that both modes will result in walking of all files.
+	 * @return bool doHidden if TRUE then hidden files will be walked as well.
+	 * @return bool true of the given path exists
+	 */
+	bool Init(std::vector<mvceditor::SourceClass> sources, DirectorySearchClass::Modes mode = DirectorySearchClass::RECURSIVE, bool doHiddenFiles = false);
+
+	/**
 	 * prepares the thread to iterate over the last set of matched files
 	 * In this case the FileMatch() method will be called.
 	 * @return bool true if there are matching files from the previous find

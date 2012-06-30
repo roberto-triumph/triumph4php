@@ -40,10 +40,7 @@ mvceditor::ParserDirectoryWalkerClass::ParserDirectoryWalkerClass()
 	: LastResults()	
 	, WithErrors(0)
 	, WithNoErrors(0)
-	, Parser()
-	, PhpFileFilters()
-	, IgnoreFileFiltersRegEx()
-	, IgnoreFileFilters() {
+	, Parser() {
 		
 }
 
@@ -52,73 +49,40 @@ void mvceditor::ParserDirectoryWalkerClass::ResetTotals() {
 	WithNoErrors = 0;
 }
 
-void mvceditor::ParserDirectoryWalkerClass::SetFilters(std::vector<wxString> phpFileFilters, wxString ignoreFileFilters) {
-	PhpFileFilters = phpFileFilters;
-	IgnoreFileFilters = ignoreFileFilters;
-	IgnoreFileFilters.Trim(false);
-	IgnoreFileFilters.Trim(true);
-	if (!IgnoreFileFilters.IsEmpty()) {
-		wxString ignoreFilesRegEx = mvceditor::FindInFilesClass::CreateFilesFilterRegEx(IgnoreFileFilters);
-		IgnoreFileFiltersRegEx.Compile(ignoreFilesRegEx, wxRE_EXTENDED | wxRE_ICASE);
-	}
-}
-
 void mvceditor::ParserDirectoryWalkerClass::SetVersion(pelet::Versions version) {
 	Parser.SetVersion(version);
 }
 
 bool mvceditor::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 	bool ret = false;
-	bool matchedFilter = false;
-	bool matchedIgnoreFilter = false;
+	LastResults.Error = UNICODE_STRING_SIMPLE("");
+	LastResults.LineNumber = 0;
+	LastResults.CharacterPosition = 0;
 
-	// check both filters
-	// ignore file filters may be empty; when filter string is empty the regEex is irrelevant
-	if (!IgnoreFileFilters.IsEmpty() && IgnoreFileFiltersRegEx.IsValid()) {
-		matchedIgnoreFilter = IgnoreFileFiltersRegEx.Matches(fileName);
+	wxFFile file(fileName, wxT("rb"));
+	if (Parser.LintFile(file.fp(), mvceditor::StringHelperClass::wxToIcu(fileName), LastResults)) {
+		WithNoErrors++;
 	}
-	for (size_t i = 0; i < PhpFileFilters.size(); ++i) {
-		wxString filter = PhpFileFilters[i];
-		matchedFilter = !wxIsWild(filter) || wxMatchWild(filter, fileName);
-		if (matchedFilter) {
-			break;
-		}
-	}
-
-	// ignore filter overrides the include filter
-	if (matchedFilter && !matchedIgnoreFilter) {
-		LastResults.Error = UNICODE_STRING_SIMPLE("");
-		LastResults.LineNumber = 0;
-		LastResults.CharacterPosition = 0;
-
-		wxFFile file(fileName, wxT("rb"));
-		if (Parser.LintFile(file.fp(), mvceditor::StringHelperClass::wxToIcu(fileName), LastResults)) {
-			WithNoErrors++;
-		}
-		else {
-			WithErrors++;
-			ret = true;
-		}
+	else {
+		WithErrors++;
+		ret = true;
 	}
 	return ret;
 }
 
 mvceditor::LintBackgroundFileReaderClass::LintBackgroundFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads)
 	: BackgroundFileReaderClass(handler, runningThreads)
-	, ParserDirectoryWalker()
-	, PhpFileFilters() {
+	, ParserDirectoryWalker() {
 		
 }
 
-bool mvceditor::LintBackgroundFileReaderClass::BeginDirectoryLint(const wxString& directory, const std::vector<wxString>& phpFileFilters, 
-																  const wxString& ignoreFileFilters, 
+bool mvceditor::LintBackgroundFileReaderClass::BeginDirectoryLint(std::vector<mvceditor::SourceClass> sources,
 																  const mvceditor::EnvironmentClass& environment,
 																  mvceditor::BackgroundFileReaderClass::StartError& error) {
 	bool good = false;
 	error = mvceditor::BackgroundFileReaderClass::NONE;
-	if (Init(directory)) {
+	if (Init(sources)) {
 		ParserDirectoryWalker.SetVersion(environment.Php.Version);
-		ParserDirectoryWalker.SetFilters(phpFileFilters, ignoreFileFilters);
 		ParserDirectoryWalker.ResetTotals();
 		if (StartReading(error)) {
 			good = true;
@@ -127,24 +91,25 @@ bool mvceditor::LintBackgroundFileReaderClass::BeginDirectoryLint(const wxString
 	return good;
 }
 
-bool mvceditor::LintBackgroundFileReaderClass::LintSingleFile(const wxString& fileName, 
-	  const std::vector<wxString>& phpFileFilters, const wxString& ignoreFileFilters,
+bool mvceditor::LintBackgroundFileReaderClass::LintSingleFile(const wxString& fileName, mvceditor::ProjectClass* project,
 	  const mvceditor::EnvironmentClass& environment) {
 
 	// ATTN: use a local instance of ParserClass so that this method is thread safe
 	// and can be run when a background thread is already running.
-	ParserDirectoryWalkerClass walker;
-	walker.SetFilters(phpFileFilters, ignoreFileFilters);
-	walker.SetVersion(environment.Php.Version);
-	bool error = walker.Walk(fileName);
-	if (error) {
-		wxCommandEvent evt(EVENT_LINT_ERROR, ID_LINT_ERROR_COMMAND);
+	bool error = false;
+	if (project->IsAPhpSourceFile(fileName)) {
+		ParserDirectoryWalkerClass walker;
+		walker.SetVersion(environment.Php.Version);
+		bool error = walker.Walk(fileName);
+		if (error) {
+			wxCommandEvent evt(EVENT_LINT_ERROR, ID_LINT_ERROR_COMMAND);
 
-		// ATTN: will need to be DELETED!!
-		pelet::LintResultsClass* clonedResults = new pelet::LintResultsClass;
-		clonedResults->Copy(walker.LastResults);
-		evt.SetClientData((void*)clonedResults);
-		wxPostEvent(&Handler, evt);
+			// ATTN: will need to be DELETED!!
+			pelet::LintResultsClass* clonedResults = new pelet::LintResultsClass;
+			clonedResults->Copy(walker.LastResults);
+			evt.SetClientData((void*)clonedResults);
+			wxPostEvent(&Handler, evt);
+		}
 	}
 	return error;
 }
@@ -286,7 +251,6 @@ void mvceditor::LintResultsPanelClass::SelectPreviousError() {
 
 mvceditor::LintPluginClass::LintPluginClass() 
 	: PluginClass()
-	, IgnoreFiles() 
 	, CheckOnSave(true)
 	, LintBackgroundFileReader(*this, RunningThreads)
 	, LintErrors() {
@@ -318,12 +282,10 @@ void mvceditor::LintPluginClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 }
 
 void mvceditor::LintPluginClass::LoadPreferences(wxConfigBase* config) {
-	IgnoreFiles = config->Read(wxT("LintCheck/IgnoreFiles"));
 	config->Read(wxT("/LintCheck/CheckOnSave"), &CheckOnSave);
 }
 void mvceditor::LintPluginClass::SavePreferences(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfig::Get();
-	config->Write(wxT("/LintCheck/IgnoreFiles"), IgnoreFiles);
 	config->Write(wxT("/LintCheck/CheckOnSave"), CheckOnSave);
 }
 
@@ -334,17 +296,9 @@ void mvceditor::LintPluginClass::OnLintMenu(wxCommandEvent& event) {
 	}
 	mvceditor::ProjectClass *project = GetProject();
 	if (project) {
-		wxString rootPath = project->GetRootPath();
-		std::vector<wxString> phpFileFilters = project->GetPhpFileExtensions();
 		mvceditor::BackgroundFileReaderClass::StartError error;
 
-		// use the OR functionality of the filters by replacing newlines with semicolons
-		// need to remove any whitespace
-		wxString ignoreFilesRegEx(IgnoreFiles);
-		ignoreFilesRegEx.Trim(false);
-		ignoreFilesRegEx.Trim(true);
-		ignoreFilesRegEx.Replace(wxT("\n"), wxT(";"));		
-		if (LintBackgroundFileReader.BeginDirectoryLint(rootPath, phpFileFilters, ignoreFilesRegEx, *GetEnvironment(), error)) {
+		if (LintBackgroundFileReader.BeginDirectoryLint(project->AllPhpSources(), *GetEnvironment(), error)) {
 			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 			gauge->AddGauge(_("Lint Check"), ID_LINT_RESULTS_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 			
@@ -447,15 +401,7 @@ void mvceditor::LintPluginClass::OnFileSaved(mvceditor::FileSavedEventClass& eve
 	// if user has configure to do lint check on saving or user is cleanin up
 	// errors (after they manually lint checked the project) then re-check
 	if (hasErrors || CheckOnSave) {
-		std::vector<wxString> phpFileFilters = GetProject()->GetPhpFileExtensions();
-		
-		// use the OR functionality of the filters by replacing newlines with semicolons
-		wxString ignoreFilesRegEx(IgnoreFiles);
-		ignoreFilesRegEx.Trim(false);
-		ignoreFilesRegEx.Trim(true);
-		ignoreFilesRegEx.Replace(wxT("\n"), wxT(";"));
-
-		bool error = LintBackgroundFileReader.LintSingleFile(fileName, phpFileFilters, ignoreFilesRegEx, *GetEnvironment());
+		bool error = LintBackgroundFileReader.LintSingleFile(fileName, GetProject(), *GetEnvironment());
 		if (error) {
 			
 			// handle the case where user has saved a file but has not clicked
@@ -489,9 +435,7 @@ mvceditor::LintPluginPreferencesPanelClass::LintPluginPreferencesPanelClass(wxWi
 	: LintPluginPreferencesGeneratedPanelClass(parent, wxID_ANY)
 	, Plugin(plugin) {
 	wxGenericValidator checkValidator(&Plugin.CheckOnSave);
-	wxGenericValidator ignoreValidator(&Plugin.IgnoreFiles);
 	CheckOnSave->SetValidator(checkValidator);
-	IgnoreFiles->SetValidator(ignoreValidator);
 }
 
 BEGIN_EVENT_TABLE(mvceditor::LintPluginClass, wxEvtHandler) 

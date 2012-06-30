@@ -38,6 +38,13 @@ bool mvceditor::BackgroundFileReaderClass::Init(const wxString& path, mvceditor:
 	return DirectorySearch.Init(path, mode, doHiddenFiles);
 }
 
+bool mvceditor::BackgroundFileReaderClass::Init(std::vector<mvceditor::SourceClass> sources, mvceditor::DirectorySearchClass::Modes mode,
+												bool doHiddenFiles) {
+	Mode = WALK;
+	return DirectorySearch.Init(sources, mode, doHiddenFiles);
+}
+
+
 bool mvceditor::BackgroundFileReaderClass::InitMatched() {
 	Mode = MATCHED;
 	return !DirectorySearch.GetMatchedFiles().empty();

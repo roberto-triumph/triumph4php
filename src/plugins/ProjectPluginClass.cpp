@@ -201,11 +201,11 @@ void mvceditor::ProjectPluginClass::AddPreferenceWindow(wxBookCtrlBase* parent) 
 
 void mvceditor::ProjectPluginClass::OnProjectExplore(wxCommandEvent& event) {
 	ProjectClass* project = GetProject();
-	if (project != NULL && !GetProject()->GetRootPath().IsEmpty()) {
+	if (project != NULL && GetProject()->HasSources()) {
 		wxString cmd;
 		cmd += ExplorerExecutable;
 		cmd += wxT(" \"");
-		cmd += GetProject()->GetRootPath();
+		cmd += GetProject()->AllSources()[0].RootDirectory.GetFullPath();
 		cmd += wxT("\"");
 		long result = wxExecute(cmd);
 		if (!result) {
@@ -241,9 +241,11 @@ void mvceditor::ProjectPluginClass::ProjectOpen(const wxString& directoryPath) {
 		PhpFrameworks.reset(new mvceditor::PhpFrameworkDetectorClass(*this, RunningThreads, *GetEnvironment()));
 	}
 	CloseProject();
-	ProjectOptionsClass options;
-	options.RootPath = directoryPath;
-	App->Project = new ProjectClass(options);
+	App->Project = new ProjectClass();
+	mvceditor::SourceClass src;
+	src.RootDirectory.Assign(directoryPath);
+	App->Project->AddSource(src);
+	App->Project->Description = directoryPath;
 
 	// on startup the editor is in "non-project" mode (no root path)
 	if (!directoryPath.IsEmpty()) {
@@ -301,11 +303,14 @@ void mvceditor::ProjectPluginClass::OnFrameworkDetectionComplete(wxCommandEvent&
 	App->Project->SetCssFileExtensionsString(CssFileFiltersString);
 	App->Project->SetSqlFileExtensionsString(SqlFileFiltersString);
 	
-	wxString projectRoot = App->Project->GetRootPath();
-	projectRoot.Trim();
-	History.AddFileToHistory(projectRoot);
-	PersistProjectList();
-	
+	if (App->Project->HasSources()) {
+		
+		// TODO: better project recall
+		wxString projectRoot = App->Project->AllSources()[0].RootDirectory.GetFullPath();
+		projectRoot.Trim();
+		History.AddFileToHistory(projectRoot);
+		PersistProjectList();
+	}
 	wxCommandEvent projectOpenedEvent(mvceditor::EVENT_APP_PROJECT_OPENED);
 	App->EventSink.Publish(projectOpenedEvent);
 	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
@@ -324,10 +329,14 @@ void mvceditor::ProjectPluginClass::OnFrameworkDetectionFailed(wxCommandEvent& e
 	App->Project->SetCssFileExtensionsString(CssFileFiltersString);
 	App->Project->SetSqlFileExtensionsString(SqlFileFiltersString);
 	
-	wxString projectRoot = App->Project->GetRootPath();
-	projectRoot.Trim();
-	History.AddFileToHistory(projectRoot);
-	PersistProjectList();
+	if (App->Project->HasSources()) {
+		
+		// TODO: better project recall
+		wxString projectRoot = App->Project->AllSources()[0].RootDirectory.GetFullPath();
+		projectRoot.Trim();
+		History.AddFileToHistory(projectRoot);
+		PersistProjectList();
+	}
 
 	// still need to set the project even if the project detection fails
 	// pretty much all code depends on having a Project pointer

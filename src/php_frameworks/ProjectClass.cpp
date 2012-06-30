@@ -26,23 +26,62 @@
 #include <wx/tokenzr.h>
 #include <vector>
 
-mvceditor::ProjectOptionsClass::ProjectOptionsClass()  
-	: RootPath() {
-}
-	
-mvceditor::ProjectOptionsClass::ProjectOptionsClass(const ProjectOptionsClass& other) { 
-	RootPath = other.RootPath; 
-}
-
-mvceditor::ProjectClass::ProjectClass(const mvceditor::ProjectOptionsClass& options)
-	: Options(options)
+mvceditor::ProjectClass::ProjectClass()
+	: Description()
+	, Sources()
 	, PhpFileFilters()
 	, CssFileFilters()
 	, SqlFileFilters() {
 }
 
-wxString  mvceditor::ProjectClass::GetRootPath() const { 
-	return Options.RootPath; 
+void mvceditor::ProjectClass::AddSource(const mvceditor::SourceClass& src) { 
+	Sources.push_back(src);
+}
+
+void mvceditor::ProjectClass::ClearSources() {
+	Sources.clear();
+}
+
+std::vector<mvceditor::SourceClass> mvceditor::ProjectClass::AllSources() const {
+	return Sources;
+}
+
+std::vector<mvceditor::SourceClass> mvceditor::ProjectClass::AllPhpSources() const {
+	std::vector<mvceditor::SourceClass> phpSources;
+	for (size_t i = 0; i < Sources.size(); ++i) {
+		mvceditor::SourceClass phpSrc;
+		phpSrc.RootDirectory = Sources[i].RootDirectory;
+		phpSrc.SetIncludeWildcards(GetPhpFileExtensionsString());
+		phpSources.push_back(phpSrc);
+	}
+	return phpSources;
+}
+
+bool mvceditor::ProjectClass::IsAPhpSourceFile(const wxString& fullPath) const {
+	bool matches = false;
+	
+	// a file is considered a PHP file if its in a source directory and it matches
+	// the PHP file extensions
+	for (size_t i = 0; i < Sources.size() && !matches; ++i) {
+		matches = Sources[i].Contains(fullPath);
+	}
+	return matches;
+}
+
+bool mvceditor::ProjectClass::HasSources() const {
+	return !Sources.empty();
+}
+
+wxString mvceditor::ProjectClass::RelativeFileName(const wxString& fullPath) const {
+	wxString relativeName;
+	for (size_t i = 0; i < Sources.size(); ++i) {
+		wxString root = Sources[i].RootDirectory.GetFullPath();
+		if (fullPath.Find(root) == 0) {
+			relativeName = fullPath.Mid(root.Length());
+			break;
+		}
+	}
+	return relativeName;
 }
 
 wxString mvceditor::ProjectClass::GetPhpFileExtensionsString() const {

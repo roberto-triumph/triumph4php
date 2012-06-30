@@ -25,61 +25,81 @@
 #ifndef PROJECTCLASS_H_
 #define PROJECTCLASS_H_
 
-#include <environment/DatabaseInfoClass.h>
-#include <environment/SqlResourceFinderClass.h>
+#include <search/DirectorySearchClass.h>
 #include <wx/string.h>
 #include <vector>
-#include <map>
 
 namespace mvceditor {
 
-/*
- * Data structure that holds project attributes.
- */
-class ProjectOptionsClass {
-	
-public:
-	
-	/**
-	 * Default constructor. Sets name & root path to empty string, and a 
-	 * generic project.
-	 */
-	ProjectOptionsClass();
-	
-	/**
-	 * Create a new project options object from another one. The new
-	 * project options will have the same values as other.
-	 * 
-	 * @param ProjectOptionsClass other the options to copy FROM
-	 */
-	ProjectOptionsClass(const ProjectOptionsClass& other);
-	
-	/**
-	 * The location of the root directory of the project in
-	 * the file system. 
-	 */
-	wxString RootPath;
-};
-
 /**
- * The Project class is the class that detects various artifacts for PHP frameworks.
+ * The Project class represents a single project.
+ *
+ * This project can hold files from multiple, separate directories.
  */
 class ProjectClass {
 	
 public:
+
+	/**
+	 * A friendly label for this project. This is usually set by a user.
+	 */
+	wxString Description;
 	
 	/**
 	 * Construct a ProjectClass object from the given options
 	 * 
 	 * @param ProjectOptionsClass options the new project's options
 	 */
-	ProjectClass(const ProjectOptionsClass& options);
+	ProjectClass();
 
 	/**
-	 * Returns the root path of this project
+	 * Add a source directory to this project.
 	 */
-	wxString GetRootPath() const;
+	void AddSource(const mvceditor::SourceClass& src);
+
+	/**
+	 * Removes all of the sources from this project.
+	 */
+	void ClearSources();
+
+	/**
+	 * @return all of this project's source directories
+	 */
+	std::vector<mvceditor::SourceClass> AllSources() const;
 	
+	/**
+	 * @return all of this project's source directories
+	 * but with the added restriction of including only the
+	 * PHP file extension
+	 */
+	std::vector<mvceditor::SourceClass> AllPhpSources() const;
+
+	/**
+	 * @return TRUE if given full path is a PHP file, as determined by
+	 * the sources directories and the php file 
+	 * extensions wilcard.
+	 */
+	bool IsAPhpSourceFile(const wxString& fullPath) const;
+
+	/**
+	 * @return bool TRUE if this project has AT LEAST 1 source
+	 */
+	bool HasSources() const;
+
+	/**
+	 * removes the source directory from the given full path.
+	 * Examples
+	 * source directory = /home/roberto/
+	 * fullPath = /home/roberto/workspace/now.php
+	 * Then this method returns "workspace/now.php"
+	 * 
+	 * @param full path to a file
+	 * @return the part of the file without the source prefix
+	 * In the case that fullPath is not contained in any of this
+	 * project's sources, then this method returns nothing.
+	 */
+	wxString RelativeFileName(const wxString& fullPath) const;
+
 	/**
 	 * Returns the valid PHP file extensions for this project
 	 * @return wxString file extensions. This string will be suitable to
@@ -145,10 +165,10 @@ public:
 
 private:
 	
-	/*
-	 * Holds project attributes.
+	/**
+	 * The directories where source files are located in. 
 	 */
-	ProjectOptionsClass Options;
+	std::vector<mvceditor::SourceClass> Sources;
 	
 	/**
 	 * The wildcard patterns that will be used to find PHP files in this

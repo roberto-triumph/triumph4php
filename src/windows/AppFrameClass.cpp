@@ -650,7 +650,7 @@ void mvceditor::AppFrameClass::OnAnyAuiToolbarEvent(wxAuiToolBarEvent& event) {
 
 void mvceditor::AppFrameClass::OnProjectOpened() {
 	Notebook->SetProject(App->Project, &App->EventSink);
-	SetTitle(_("MVC Editor - Open Project [") + App->Project->GetRootPath() + wxT("]"));
+	SetTitle(_("MVC Editor - Open Project [") + App->Project->Description + wxT("]"));
 }
 
 void mvceditor::AppFrameClass::OnProjectClosed() {

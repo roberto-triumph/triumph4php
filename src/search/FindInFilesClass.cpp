@@ -35,11 +35,10 @@
 mvceditor::FindInFilesClass::FindInFilesClass(const UnicodeString& expression, mvceditor::FinderClass::Modes mode) 
 	: Expression(expression)
 	, ReplaceExpression()
-	, FilesFilter(wxT("*.*"))
+	, Source()
 	, Mode(mode)
 	, CaseSensitive(true)
 	, Finder(expression, mode) 
-	, FilesFilterRegEx()
 	, File(NULL)
 	, CurrentLine()
 	, LineNumber(0) {
@@ -48,7 +47,7 @@ mvceditor::FindInFilesClass::FindInFilesClass(const UnicodeString& expression, m
 mvceditor::FindInFilesClass::FindInFilesClass(const FindInFilesClass& findInFiles) {
 	Expression = findInFiles.Expression;
 	ReplaceExpression = findInFiles.ReplaceExpression;
-	FilesFilter = findInFiles.FilesFilter;
+	Source = findInFiles.Source;
 	Mode = findInFiles.Mode;
 	CaseSensitive = findInFiles.CaseSensitive;
 	Finder.Expression = findInFiles.Finder.Expression;
@@ -66,8 +65,7 @@ bool mvceditor::FindInFilesClass::Prepare() {
 	Finder.Mode = Mode;
 	Finder.ReplaceExpression = ReplaceExpression;
 	Finder.CaseSensitive = CaseSensitive;
-	FilesFilterRegEx.Compile(CreateFilesFilterRegEx(FilesFilter), wxRE_ADVANCED);
-	return Finder.Prepare() && FilesFilterRegEx.IsValid();
+	return Finder.Prepare();
 }
 
 bool mvceditor::FindInFilesClass::Walk(const wxString& fileName) {
@@ -75,27 +73,15 @@ bool mvceditor::FindInFilesClass::Walk(const wxString& fileName) {
 	LineNumber = 0;
 	CurrentLine.remove();
 	CleanupStreams();
-	if (FilesFilterRegEx.IsValid() && FilesFilterRegEx.Matches(fileName)) {
-		if (!fileName.empty()) {
-			
-			// ATTN: unicode file names?
-			File = u_fopen(fileName.ToAscii(), "r", NULL, NULL);
-			if (File) {
-				return FindNext();
-			}
+	if (!fileName.empty()) {
+		
+		// TODO: unicode file names?
+		File = u_fopen(fileName.ToAscii(), "r", NULL, NULL);
+		if (File) {
+			return FindNext();
 		}
 	}
 	return found;
-}
-
-bool mvceditor::FindInFilesClass::ShouldSearch(const wxString& fileName) {
-	bool isMatch = false;
-	if (FilesFilterRegEx.IsValid() && FilesFilterRegEx.Matches(fileName)) {
-		if (!fileName.empty()) {
-			isMatch = true;
-		}
-	}
-	return isMatch;
 }
 
 bool mvceditor::FindInFilesClass::FindNext() {
@@ -222,8 +208,10 @@ mvceditor::FindInFilesClass::OpenErrors mvceditor::FindInFilesClass::FileContent
 	}
 	return error;
 }
-	
+/*
 wxString mvceditor::FindInFilesClass::CreateFilesFilterRegEx(const wxString& wildCardString) {
+
+	// TODO: remove and use SourceClass
 	wxString escapedExpression = wildCardString;
 	
 	// allow ? and * wildcards, turn ';' into '|'
@@ -245,11 +233,12 @@ wxString mvceditor::FindInFilesClass::CreateFilesFilterRegEx(const wxString& wil
 	escapedExpression.Append(wxT("$)"));
 	return escapedExpression;
 }
+*/
 
 mvceditor::FindInFilesClass& mvceditor::FindInFilesClass::operator=(const FindInFilesClass& findInFiles) {
 	Expression = findInFiles.Expression;
 	ReplaceExpression = findInFiles.ReplaceExpression;
-	FilesFilter = findInFiles.FilesFilter;
+	Source = findInFiles.Source;
 	Mode = findInFiles.Mode;
 	CaseSensitive = findInFiles.CaseSensitive;
 	Finder.Expression = findInFiles.Finder.Expression;

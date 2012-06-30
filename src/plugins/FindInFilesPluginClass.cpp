@@ -72,7 +72,6 @@ mvceditor::FindInFilesBackgroundReaderClass::FindInFilesBackgroundReaderClass(wx
 
 bool mvceditor::FindInFilesBackgroundReaderClass::InitForFind(wxEvtHandler* handler, 
 															  mvceditor::FindInFilesClass findInFiles, 
-															  const wxString& path, 
 															  bool doHiddenFiles,
 															  std::vector<wxString> skipFiles) {
 	Handler = handler;
@@ -81,7 +80,10 @@ bool mvceditor::FindInFilesBackgroundReaderClass::InitForFind(wxEvtHandler* hand
 	// its thread safe
 	FindInFiles = findInFiles;
 	SkipFiles = skipFiles;
-	return Init(path, mvceditor::DirectorySearchClass::RECURSIVE, doHiddenFiles) && FindInFiles.Prepare();
+
+	std::vector<mvceditor::SourceClass> sources;
+	sources.push_back(FindInFiles.Source);
+	return Init(sources, mvceditor::DirectorySearchClass::RECURSIVE, doHiddenFiles) && FindInFiles.Prepare();
 }
 
 bool mvceditor::FindInFilesBackgroundReaderClass::InitForReplace(wxEvtHandler* handler, 
@@ -158,10 +160,8 @@ mvceditor::FindInFilesResultsPanelClass::~FindInFilesResultsPanelClass() {
 	}
 }
 
-void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findInFiles, wxString findPath,
-												   bool doHiddenFiles) {
+void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findInFiles, bool doHiddenFiles) {
 	FindInFiles = findInFiles;
-	FindPath = findPath;
 	MatchedFiles = 0;
 
 	// for now disallow another find when one is already active
@@ -170,7 +170,7 @@ void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findI
 		return;
 	}
 	std::vector<wxString> skipFiles = Notebook->GetOpenedFiles();
-	if (FindInFilesBackgroundFileReader.InitForFind(this, FindInFiles, findPath, doHiddenFiles, skipFiles)) {
+	if (FindInFilesBackgroundFileReader.InitForFind(this, FindInFiles, doHiddenFiles, skipFiles)) {
 		mvceditor::BackgroundFileReaderClass::StartError error;
 		if (FindInFilesBackgroundFileReader.StartReading(error)) {
 			EnableButtons(true, false, false);
@@ -203,7 +203,7 @@ void mvceditor::FindInFilesResultsPanelClass::FindInOpenedFiles() {
 			wxString fileName = codeControl->GetFileName();
 
 			// make sure to respect the wildcard filter and the find path here too
-			if (FindInFiles.ShouldSearch(fileName) && fileName.Find(FindPath) == 0) {
+			if (FindInFiles.Source.Contains(fileName)) {
 				UnicodeString text = codeControl->GetSafeText();
 				int32_t next = 0;
 				int32_t charPos = 0,
@@ -480,10 +480,10 @@ mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvce
 	
 	// the first time showing this dialog populate the filter to have only PHP file extensions
 	if (FilesFilter->GetCount() <= 0) {
-		Plugin.PreviousFindInFiles.FilesFilter = project->GetPhpFileExtensionsString();
+		Plugin.PreviousFindInFiles.Source.SetIncludeWildcards(project->GetPhpFileExtensionsString());
 	}
-	if (NULL != project && !project->GetRootPath().IsEmpty() && Directory->GetCount() <= 0) {
-		Directory->Append(project->GetRootPath());
+	if (NULL != project && project->HasSources() && Directory->GetCount() <= 0) {
+		Directory->Append(project->AllSources()[0].RootDirectory.GetFullPath());
 		Directory->SetSelection(0);
 	}
 	else if (Directory->GetCount() > 0) {
@@ -492,15 +492,15 @@ mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvce
 	mvceditor::RegularExpressionValidatorClass regExValidator(&Plugin.PreviousFindInFiles.Expression, FinderMode);
 	FindText->SetValidator(regExValidator);
 	UnicodeStringValidatorClass replaceExpressionValidator(&Plugin.PreviousFindInFiles.ReplaceExpression);
-	wxGenericValidator filesFilterValidator(&Plugin.PreviousFindInFiles.FilesFilter);
 	wxGenericValidator modeValidator(&Plugin.PreviousFindInFiles.Mode);
 	wxGenericValidator caseValidator(&Plugin.PreviousFindInFiles.CaseSensitive);
 	ReplaceWithText->SetValidator(replaceExpressionValidator);
 	FinderMode->SetValidator(modeValidator);
-	FilesFilter->SetValidator(filesFilterValidator);
 	CaseSensitive->SetValidator(caseValidator);
 	wxGenericValidator doHiddenFilesValidator(&Plugin.DoHiddenFiles);
 	DoHiddenFiles->SetValidator(doHiddenFilesValidator);
+
+	FilesFilter->SetValue(Plugin.PreviousFindInFiles.Source.IncludeWildcardsString());
 
 	FindText->SetFocus();
 
@@ -528,7 +528,7 @@ mvceditor::FindInFilesDialogClass::~FindInFilesDialogClass() {
 
 void mvceditor::FindInFilesDialogClass::OnOkButton(wxCommandEvent& event) {
 	if (TransferDataFromWindow()) {
-		
+		Plugin.PreviousFindInFiles.Source.SetIncludeWildcards(FilesFilter->GetValue());
 		if (!Plugin.PreviousFindInFiles.Prepare()) {
 			wxMessageBox(_("Expression is not valid."), _("Find In Files"), wxOK | wxCENTER, this);
 		}
@@ -536,7 +536,7 @@ void mvceditor::FindInFilesDialogClass::OnOkButton(wxCommandEvent& event) {
 			wxMessageBox(_("Find path must not be empty."), _("Find In Files"), wxOK | wxCENTER, this);
 		}
 		else {
-			Plugin.PreviousFindPath = Directory->GetValue();
+			Plugin.PreviousFindInFiles.Source.RootDirectory.Assign(Directory->GetValue());
 			Plugin.FindHistory.Save();
 			Plugin.ReplaceHistory.Save();
 			Plugin.DirectoriesHistory.Save();
@@ -602,7 +602,6 @@ void mvceditor::FindInFilesDialogClass::OnKillFocusReplaceText(wxFocusEvent& eve
 mvceditor::FindInFilesPluginClass::FindInFilesPluginClass()
 	: PluginClass()
 	, PreviousFindInFiles()
-	, PreviousFindPath()
 	, DoHiddenFiles(false) {
 }
 
@@ -629,7 +628,7 @@ void mvceditor::FindInFilesPluginClass::OnEditFindInFiles(wxCommandEvent& event)
 		mvceditor::FindInFilesResultsPanelClass* panel = new mvceditor::FindInFilesResultsPanelClass(GetToolsNotebook(), 
 			GetNotebook(), GetStatusBarWithGauge(), RunningThreads);		
 		if(AddToolsWindow(panel, _("Find In Files Results"))) {
-			panel->Find(PreviousFindInFiles, PreviousFindPath, DoHiddenFiles);
+			panel->Find(PreviousFindInFiles, DoHiddenFiles);
 		}
 	}
 }
