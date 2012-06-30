@@ -34,16 +34,29 @@ mvceditor::ProjectClass::ProjectClass()
 	, SqlFileFilters() {
 }
 
+mvceditor::ProjectClass::ProjectClass(const mvceditor::ProjectClass& project)
+	: Description(project.Description)
+	, Sources(project.Sources)
+	, PhpFileFilters(project.PhpFileFilters)
+	, CssFileFilters(project.CssFileFilters)
+	, SqlFileFilters(project.SqlFileFilters) {
+
+}
+
+void mvceditor::ProjectClass::operator=(const mvceditor::ProjectClass& project) {
+	Description =project.Description;
+	Sources = project.Sources;
+	PhpFileFilters = project.PhpFileFilters;
+	CssFileFilters = project.CssFileFilters;
+	SqlFileFilters = project.SqlFileFilters;
+}
+
 void mvceditor::ProjectClass::AddSource(const mvceditor::SourceClass& src) { 
 	Sources.push_back(src);
 }
 
 void mvceditor::ProjectClass::ClearSources() {
 	Sources.clear();
-}
-
-std::vector<mvceditor::SourceClass> mvceditor::ProjectClass::AllSources() const {
-	return Sources;
 }
 
 std::vector<mvceditor::SourceClass> mvceditor::ProjectClass::AllPhpSources() const {

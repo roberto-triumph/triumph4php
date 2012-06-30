@@ -77,6 +77,9 @@ mvceditor::PhpFrameworkDetectorClass& mvceditor::PluginClass::PhPFrameworks() co
 void mvceditor::PluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
 }
 
+void mvceditor::PluginClass::AddFileMenuItems(wxMenu* fileMenu) {
+}
+
 void mvceditor::PluginClass::AddEditMenuItems(wxMenu* editMenu) {
 }
 

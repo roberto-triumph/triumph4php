@@ -172,6 +172,14 @@ public:
 	virtual void AddToolsMenuItems(wxMenu* toolsMenu);
 
 	/**
+	 * Add menu items to the file menu for this plugin. Remeber to use the MenuIds enum when building
+	 * menu items.
+	 * 
+	 * @param wxMenu* menu the tools menu to add items to.
+	 */
+	virtual void AddFileMenuItems(wxMenu* fileMenu);
+
+	/**
 	 * Add menu items to the edit menu for this plugin. Remeber to use the MenuIds enum when building
 	 * menu items.
 	 * 

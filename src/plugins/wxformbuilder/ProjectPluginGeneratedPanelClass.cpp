@@ -111,3 +111,137 @@ ProjectPluginGeneratedPanelClass::~ProjectPluginGeneratedPanelClass()
 	FilePicker->Disconnect( wxEVT_COMMAND_FILEPICKER_CHANGED, wxFileDirPickerEventHandler( ProjectPluginGeneratedPanelClass::OnFileChanged ), NULL, this );
 	
 }
+
+ProjectDefinitionDialogGeneratedClass::ProjectDefinitionDialogGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* BoxSizer;
+	BoxSizer = new wxBoxSizer( wxVERTICAL );
+	
+	wxFlexGridSizer* FlexGridSizer;
+	FlexGridSizer = new wxFlexGridSizer( 4, 1, 0, 0 );
+	FlexGridSizer->AddGrowableCol( 0 );
+	FlexGridSizer->AddGrowableRow( 1 );
+	FlexGridSizer->SetFlexibleDirection( wxBOTH );
+	FlexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	Label = new wxStaticText( this, wxID_ANY, _("Project Sources"), wxDefaultPosition, wxDefaultSize, 0 );
+	Label->Wrap( -1 );
+	FlexGridSizer->Add( Label, 1, wxALL|wxEXPAND, 5 );
+	
+	SourcesList = new wxListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_SINGLE ); 
+	FlexGridSizer->Add( SourcesList, 1, wxALL|wxEXPAND, 5 );
+	
+	wxBoxSizer* CrudButtonsSizer;
+	CrudButtonsSizer = new wxBoxSizer( wxHORIZONTAL );
+	
+	AddButton = new wxButton( this, wxID_ANY, _("Add Source"), wxDefaultPosition, wxDefaultSize, 0 );
+	CrudButtonsSizer->Add( AddButton, 0, wxALL, 5 );
+	
+	RemoveButton = new wxButton( this, wxID_ANY, _("Remove Source"), wxDefaultPosition, wxDefaultSize, 0 );
+	CrudButtonsSizer->Add( RemoveButton, 0, wxALL, 5 );
+	
+	EditButton = new wxButton( this, wxID_ANY, _("Edit Source"), wxDefaultPosition, wxDefaultSize, 0 );
+	CrudButtonsSizer->Add( EditButton, 0, wxALL, 5 );
+	
+	FlexGridSizer->Add( CrudButtonsSizer, 1, wxEXPAND, 5 );
+	
+	ButtonsSizer = new wxStdDialogButtonSizer();
+	ButtonsSizerOK = new wxButton( this, wxID_OK );
+	ButtonsSizer->AddButton( ButtonsSizerOK );
+	ButtonsSizerCancel = new wxButton( this, wxID_CANCEL );
+	ButtonsSizer->AddButton( ButtonsSizerCancel );
+	ButtonsSizer->Realize();
+	FlexGridSizer->Add( ButtonsSizer, 1, wxEXPAND, 5 );
+	
+	BoxSizer->Add( FlexGridSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( BoxSizer );
+	this->Layout();
+	
+	this->Centre( wxBOTH );
+	
+	// Connect Events
+	SourcesList->Connect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( ProjectDefinitionDialogGeneratedClass::OnSourcesListDoubleClick ), NULL, this );
+	AddButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectDefinitionDialogGeneratedClass::OnAddSource ), NULL, this );
+	RemoveButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectDefinitionDialogGeneratedClass::OnRemoveSource ), NULL, this );
+	EditButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectDefinitionDialogGeneratedClass::OnEditSource ), NULL, this );
+	ButtonsSizerOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectDefinitionDialogGeneratedClass::OnOkButton ), NULL, this );
+}
+
+ProjectDefinitionDialogGeneratedClass::~ProjectDefinitionDialogGeneratedClass()
+{
+	// Disconnect Events
+	SourcesList->Disconnect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( ProjectDefinitionDialogGeneratedClass::OnSourcesListDoubleClick ), NULL, this );
+	AddButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectDefinitionDialogGeneratedClass::OnAddSource ), NULL, this );
+	RemoveButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectDefinitionDialogGeneratedClass::OnRemoveSource ), NULL, this );
+	EditButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectDefinitionDialogGeneratedClass::OnEditSource ), NULL, this );
+	ButtonsSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectDefinitionDialogGeneratedClass::OnOkButton ), NULL, this );
+	
+}
+
+ProjectSourceDialogGeneratedClass::ProjectSourceDialogGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* BoxSizer;
+	BoxSizer = new wxBoxSizer( wxVERTICAL );
+	
+	wxFlexGridSizer* FlexGridSizer;
+	FlexGridSizer = new wxFlexGridSizer( 6, 1, 0, 0 );
+	FlexGridSizer->AddGrowableCol( 0 );
+	FlexGridSizer->AddGrowableRow( 0 );
+	FlexGridSizer->SetFlexibleDirection( wxBOTH );
+	FlexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	HelpLabel = new wxStaticText( this, wxID_ANY, _("Enter a list of files that you want MVC Editor to track and ignore. \n\nInclude and exclude wildcards can contain one or more wildcards;  any files that match do NOT match the exclude wildcards and DO match the include wildcards will be added to the project. Exclude wildcards take precedence over include wildcards.\n\nExlcude wildcards are useful to ignore cache files, or for example Symfony skeleton files.\n\nA wildcard can have either a '*' or a '?'.\n\n* = any number of characters\n? = 0 or 1 character\n\nMultiple wildcards are separated by the semicolon (';')\n\nA wildcard can have directory separators; but they must match the operation system's path separator."), wxDefaultPosition, wxDefaultSize, 0 );
+	HelpLabel->Wrap( 500 );
+	FlexGridSizer->Add( HelpLabel, 0, wxALL, 5 );
+	
+	RootDirectoryLabel = new wxStaticText( this, wxID_ANY, _("Root Directory"), wxDefaultPosition, wxDefaultSize, 0 );
+	RootDirectoryLabel->Wrap( -1 );
+	FlexGridSizer->Add( RootDirectoryLabel, 0, wxALL|wxEXPAND, 5 );
+	
+	RootDirectory = new wxDirPickerCtrl( this, wxID_ANY, wxEmptyString, _("Select a folder"), wxDefaultPosition, wxDefaultSize, wxDIRP_DIR_MUST_EXIST|wxDIRP_USE_TEXTCTRL );
+	FlexGridSizer->Add( RootDirectory, 0, wxALL|wxEXPAND, 5 );
+	
+	IncludeWildcardsLabel = new wxStaticText( this, wxID_ANY, _("Include Wildcards"), wxDefaultPosition, wxDefaultSize, 0 );
+	IncludeWildcardsLabel->Wrap( -1 );
+	FlexGridSizer->Add( IncludeWildcardsLabel, 0, wxALL|wxEXPAND, 5 );
+	
+	IncludeWildcards = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	FlexGridSizer->Add( IncludeWildcards, 0, wxALL|wxEXPAND, 5 );
+	
+	ExcludeWildcardsLabel = new wxStaticText( this, wxID_ANY, _("Exclude Wildcards"), wxDefaultPosition, wxDefaultSize, 0 );
+	ExcludeWildcardsLabel->Wrap( -1 );
+	FlexGridSizer->Add( ExcludeWildcardsLabel, 0, wxALL|wxEXPAND, 5 );
+	
+	ExcludeWildcards = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	FlexGridSizer->Add( ExcludeWildcards, 0, wxALL|wxEXPAND, 5 );
+	
+	ButtonsSizer = new wxStdDialogButtonSizer();
+	ButtonsSizerOK = new wxButton( this, wxID_OK );
+	ButtonsSizer->AddButton( ButtonsSizerOK );
+	ButtonsSizerCancel = new wxButton( this, wxID_CANCEL );
+	ButtonsSizer->AddButton( ButtonsSizerCancel );
+	ButtonsSizer->Realize();
+	FlexGridSizer->Add( ButtonsSizer, 1, wxEXPAND, 5 );
+	
+	BoxSizer->Add( FlexGridSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( BoxSizer );
+	this->Layout();
+	
+	this->Centre( wxBOTH );
+	
+	// Connect Events
+	ButtonsSizerOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectSourceDialogGeneratedClass::OnOkButton ), NULL, this );
+}
+
+ProjectSourceDialogGeneratedClass::~ProjectSourceDialogGeneratedClass()
+{
+	// Disconnect Events
+	ButtonsSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectSourceDialogGeneratedClass::OnOkButton ), NULL, this );
+	
+}

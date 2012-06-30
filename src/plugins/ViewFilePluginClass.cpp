@@ -171,7 +171,7 @@ void mvceditor::ViewFilePluginClass::OnWorkComplete(wxCommandEvent& event) {
 
 	// TODO: better project recall
 	if (App->Project->HasSources()) {
-		wxString projectRoot = App->Project->AllSources()[0].RootDirectory.GetFullPath();
+		wxString projectRoot = App->Project->Sources[0].RootDirectory.GetFullPath();
 		if (!FrameworkDetector->InitViewInfosDetector(projectRoot, App->Structs.UrlResourceFinder.ChosenUrl.Url.BuildURI(), CallStackThread.StackFile)) {
 			mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Could not start ViewInfos detector"));
 		}
@@ -396,7 +396,7 @@ void mvceditor::ViewFilePanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 		mvceditor::ProjectClass* project = Plugin.GetProject();
 
 		// TODO: better project recall
-		wxString root = project->AllSources()[0].RootDirectory.GetFullPath();
+		wxString root = project->Sources[0].RootDirectory.GetFullPath();
 		file =  root + wxFileName::GetPathSeparator() + file;
 		Plugin.OpenFile(file);
 	}

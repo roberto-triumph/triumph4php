@@ -44,6 +44,11 @@ public:
 	 * A friendly label for this project. This is usually set by a user.
 	 */
 	wxString Description;
+
+	/**
+	 * The directories where source files are located in. 
+	 */
+	std::vector<mvceditor::SourceClass> Sources;
 	
 	/**
 	 * Construct a ProjectClass object from the given options
@@ -51,6 +56,10 @@ public:
 	 * @param ProjectOptionsClass options the new project's options
 	 */
 	ProjectClass();
+
+	ProjectClass(const mvceditor::ProjectClass& src);
+
+	void operator=(const mvceditor::ProjectClass& src);
 
 	/**
 	 * Add a source directory to this project.
@@ -61,11 +70,6 @@ public:
 	 * Removes all of the sources from this project.
 	 */
 	void ClearSources();
-
-	/**
-	 * @return all of this project's source directories
-	 */
-	std::vector<mvceditor::SourceClass> AllSources() const;
 	
 	/**
 	 * @return all of this project's source directories
@@ -164,11 +168,6 @@ public:
 	void SetSqlFileExtensionsString(wxString wildcardString);
 
 private:
-	
-	/**
-	 * The directories where source files are located in. 
-	 */
-	std::vector<mvceditor::SourceClass> Sources;
 	
 	/**
 	 * The wildcard patterns that will be used to find PHP files in this

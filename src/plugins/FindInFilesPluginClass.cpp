@@ -483,7 +483,7 @@ mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvce
 		Plugin.PreviousFindInFiles.Source.SetIncludeWildcards(project->GetPhpFileExtensionsString());
 	}
 	if (NULL != project && project->HasSources() && Directory->GetCount() <= 0) {
-		Directory->Append(project->AllSources()[0].RootDirectory.GetFullPath());
+		Directory->Append(project->Sources[0].RootDirectory.GetFullPath());
 		Directory->SetSelection(0);
 	}
 	else if (Directory->GetCount() > 0) {

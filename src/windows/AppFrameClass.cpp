@@ -418,6 +418,10 @@ void mvceditor::AppFrameClass::LoadPlugin(mvceditor::PluginClass* plugin) {
 	
 	//  when adding the separators, we dont want a separator at the very end
 	// we dont need separators if the plugin did not add any menu items
+	size_t oldFileMenuCount = FileMenu->GetMenuItemCount();
+	plugin->AddFileMenuItems(FileMenu);
+	
+
 	size_t oldEditMenuCount = EditMenu->GetMenuItemCount();
 	plugin->AddEditMenuItems(EditMenu);
 	if (oldEditMenuCount != EditMenu->GetMenuItemCount() && oldEditMenuCount > 0) {
@@ -446,6 +450,10 @@ void mvceditor::AppFrameClass::LoadPlugin(mvceditor::PluginClass* plugin) {
 	// move preferences menu to the end, similar to most other programs
 	wxMenuItem* preferencesMenu = EditMenu->Remove(ID_EDIT_PREFERENCES);
 	EditMenu->Append(preferencesMenu);
+
+	// move exit menu to the end, similar to most other programs
+	wxMenuItem* exitMenu = FileMenu->Remove(wxID_EXIT);
+	FileMenu->Append(exitMenu);
 
 	plugin->AddToolBarItems(ToolBar);
 	plugin->AddWindows();

@@ -72,6 +72,7 @@ public:
 	 * Add menu items to the project menu
 	 */
 	void AddProjectMenuItems(wxMenu* projectMenu);
+	void AddFileMenuItems(wxMenu* fileMenu);
 
 	/**
 	 * Add items to the toolbar
@@ -145,6 +146,11 @@ private:
 	void CloseProject();
 
 	/**
+	 * Open up a dialog so that the user can add more source directories
+	 */
+	void OnProjectDefine(wxCommandEvent& event);
+
+	/**
 	 * List of recently opened projects
 	 */
 	wxFileHistory History;
@@ -179,6 +185,62 @@ protected:
 	 * When a new file is chosen, update the textbox.
 	 */
 	void OnFileChanged(wxFileDirPickerEvent& event);
+};
+
+class ProjectDefinitionDialogClass : public ProjectDefinitionDialogGeneratedClass {
+
+protected:
+
+	void OnAddSource(wxCommandEvent& event);
+	void OnEditSource(wxCommandEvent& event);
+	void OnRemoveSource(wxCommandEvent& event);
+	void OnOkButton(wxCommandEvent& event);
+	void OnCancelButton(wxCommandEvent& event);
+	void OnSourcesListDoubleClick(wxCommandEvent& event);
+public:
+
+	ProjectDefinitionDialogClass(wxWindow* parent, mvceditor::ProjectClass& project);
+
+private:
+
+	/**
+	 * Reference that gets updated only when the user clicks OK
+	 */
+	mvceditor::ProjectClass& Project;
+
+	/**
+	 * The project that the user edits
+	 */
+	mvceditor::ProjectClass EditedProject;
+
+	/**
+	 * add the project sources to the list box.
+	 */
+	void Populate();
+};
+
+class ProjectSourceDialogClass : public ProjectSourceDialogGeneratedClass {
+
+protected:
+
+	void OnOkButton(wxCommandEvent& event);
+	void OnCancelButton(wxCommandEvent& event);
+
+public:
+
+	ProjectSourceDialogClass(wxWindow* parent, mvceditor::SourceClass& source);
+
+private:
+
+	/**
+	 * The source that will get updated when the user clicks OK
+	 */
+	mvceditor::SourceClass& Source;
+
+	/**
+	 * The source being edited by the user
+	 */
+	mvceditor::SourceClass EditedSource;
 };
 
 }

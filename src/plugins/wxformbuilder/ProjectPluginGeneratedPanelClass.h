@@ -22,6 +22,9 @@
 #include <wx/sizer.h>
 #include <wx/statbox.h>
 #include <wx/panel.h>
+#include <wx/listbox.h>
+#include <wx/button.h>
+#include <wx/dialog.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -54,6 +57,68 @@ class ProjectPluginGeneratedPanelClass : public wxPanel
 		
 		ProjectPluginGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,387 ), long style = wxTAB_TRAVERSAL );
 		~ProjectPluginGeneratedPanelClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class ProjectDefinitionDialogGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class ProjectDefinitionDialogGeneratedClass : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* Label;
+		wxListBox* SourcesList;
+		wxButton* AddButton;
+		wxButton* RemoveButton;
+		wxButton* EditButton;
+		wxStdDialogButtonSizer* ButtonsSizer;
+		wxButton* ButtonsSizerOK;
+		wxButton* ButtonsSizerCancel;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnSourcesListDoubleClick( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAddSource( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRemoveSource( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnEditSource( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		ProjectDefinitionDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Project Definition"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 592,475 ), long style = wxDEFAULT_DIALOG_STYLE );
+		~ProjectDefinitionDialogGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class ProjectSourceDialogGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class ProjectSourceDialogGeneratedClass : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* HelpLabel;
+		wxStaticText* RootDirectoryLabel;
+		wxDirPickerCtrl* RootDirectory;
+		wxStaticText* IncludeWildcardsLabel;
+		wxTextCtrl* IncludeWildcards;
+		wxStaticText* ExcludeWildcardsLabel;
+		wxTextCtrl* ExcludeWildcards;
+		wxStdDialogButtonSizer* ButtonsSizer;
+		wxButton* ButtonsSizerOK;
+		wxButton* ButtonsSizerCancel;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		ProjectSourceDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Project Source"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 513,438 ), long style = wxDEFAULT_DIALOG_STYLE );
+		~ProjectSourceDialogGeneratedClass();
 	
 };
 

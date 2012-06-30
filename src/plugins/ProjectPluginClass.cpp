@@ -69,6 +69,11 @@ void mvceditor::ProjectPluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
 	projectMenu->Append(mvceditor::MENU_PROJECT + MAX_PROJECT_HISTORY + 3, _("Recent Projects"), RecentProjectsMenu, _("Open An explorer window in the Project Root"));
 }
 
+void mvceditor::ProjectPluginClass::AddFileMenuItems(wxMenu* fileMenu) {
+	fileMenu->Append(mvceditor::MENU_PROJECT + MAX_PROJECT_HISTORY + 4, _("Define Project"), _("Add additional source directories to the current project"), wxITEM_NORMAL);
+}
+
+
 void mvceditor::ProjectPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
 	menuItemIds[mvceditor::MENU_PROJECT + MAX_PROJECT_HISTORY + 1] = wxT("Project-Explore");
@@ -205,7 +210,7 @@ void mvceditor::ProjectPluginClass::OnProjectExplore(wxCommandEvent& event) {
 		wxString cmd;
 		cmd += ExplorerExecutable;
 		cmd += wxT(" \"");
-		cmd += GetProject()->AllSources()[0].RootDirectory.GetFullPath();
+		cmd += GetProject()->Sources[0].RootDirectory.GetFullPath();
 		cmd += wxT("\"");
 		long result = wxExecute(cmd);
 		if (!result) {
@@ -306,7 +311,7 @@ void mvceditor::ProjectPluginClass::OnFrameworkDetectionComplete(wxCommandEvent&
 	if (App->Project->HasSources()) {
 		
 		// TODO: better project recall
-		wxString projectRoot = App->Project->AllSources()[0].RootDirectory.GetFullPath();
+		wxString projectRoot = App->Project->Sources[0].RootDirectory.GetFullPath();
 		projectRoot.Trim();
 		History.AddFileToHistory(projectRoot);
 		PersistProjectList();
@@ -332,7 +337,7 @@ void mvceditor::ProjectPluginClass::OnFrameworkDetectionFailed(wxCommandEvent& e
 	if (App->Project->HasSources()) {
 		
 		// TODO: better project recall
-		wxString projectRoot = App->Project->AllSources()[0].RootDirectory.GetFullPath();
+		wxString projectRoot = App->Project->Sources[0].RootDirectory.GetFullPath();
 		projectRoot.Trim();
 		History.AddFileToHistory(projectRoot);
 		PersistProjectList();
@@ -351,6 +356,12 @@ void mvceditor::ProjectPluginClass::OnFrameworkDetectionInProgress(wxCommandEven
 	gauge->IncrementGauge(ID_FRAMEWORK_DETECTION_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
 }
 
+void mvceditor::ProjectPluginClass::OnProjectDefine(wxCommandEvent& event) {
+	mvceditor::ProjectDefinitionDialogClass dialog(GetMainWindow(), *GetProject());
+	if (wxOK == dialog.ShowModal()) {
+		// TODO: re-trigger indexing ?
+	}
+}
 
 mvceditor::ProjectPluginPanelClass::ProjectPluginPanelClass(wxWindow *parent, mvceditor::ProjectPluginClass &projectPlugin) 
 : ProjectPluginGeneratedPanelClass(parent) {
@@ -373,9 +384,119 @@ void mvceditor::ProjectPluginPanelClass::OnFileChanged(wxFileDirPickerEvent& eve
 	event.Skip();
 }
 
+mvceditor::ProjectDefinitionDialogClass::ProjectDefinitionDialogClass(wxWindow* parent, mvceditor::ProjectClass& project)
+	: ProjectDefinitionDialogGeneratedClass(parent)
+	, Project(project)
+	, EditedProject(project) {
+	Populate();
+}
+void mvceditor::ProjectDefinitionDialogClass::OnAddSource(wxCommandEvent& event) {
+	mvceditor::SourceClass newSrc;
+	mvceditor::ProjectSourceDialogClass dialog(this, newSrc);
+	if (wxOK == dialog.ShowModal()) {
+		EditedProject.AddSource(newSrc);
+		SourcesList->Append(newSrc.RootDirectory.GetFullPath());
+	}
+}
+
+void mvceditor::ProjectDefinitionDialogClass::OnEditSource(wxCommandEvent& event) {
+	size_t selected = SourcesList->GetSelection();
+	if (selected >= 0 && selected < EditedProject.Sources.size()) {
+		mvceditor::SourceClass src = EditedProject.Sources[selected];
+		mvceditor::ProjectSourceDialogClass dialog(this, src);
+		if (wxOK == dialog.ShowModal()) {
+			SourcesList->SetString(selected, src.RootDirectory.GetFullPath());
+			EditedProject.Sources[selected] = src;
+		}
+	}
+}
+
+void mvceditor::ProjectDefinitionDialogClass::OnRemoveSource(wxCommandEvent& event) {
+	size_t selected = SourcesList->GetSelection();
+	if (selected >= 0 && selected < EditedProject.Sources.size()) {
+		mvceditor::SourceClass src = EditedProject.Sources[selected];
+		wxString msg = _("Are you sure you wish to remove the source? ");
+		msg += src.RootDirectory.GetFullPath();
+		msg += wxT("\n");
+		msg += 
+			_("MVC Editor will no longer open or index files in the directory. Note that the directory is not actually deleted from the file system");
+		wxString caption = _("Remove Project Source");
+		int response = wxMessageBox(msg, caption, wxYES_NO, this);
+		if (wxYES == response) {
+			SourcesList->Delete(selected);
+			EditedProject.Sources.erase(EditedProject.Sources.begin() + selected);
+		}
+	}
+}
+
+void mvceditor::ProjectDefinitionDialogClass::OnOkButton(wxCommandEvent& event) {
+	if (!EditedProject.HasSources()) {
+		wxMessageBox(_("Project must have at least one source directory"));
+		return;
+	}
+	Project = EditedProject;
+	EndModal(wxOK);
+}
+
+void mvceditor::ProjectDefinitionDialogClass::OnCancelButton(wxCommandEvent& event) {
+	EndModal(wxCANCEL);
+}
+
+void mvceditor::ProjectDefinitionDialogClass::OnSourcesListDoubleClick(wxCommandEvent& event) {
+	size_t selected = event.GetSelection();
+	if (selected >= 0 && selected < EditedProject.Sources.size()) {
+		mvceditor::SourceClass src = EditedProject.Sources[selected];
+		mvceditor::ProjectSourceDialogClass dialog(this, src);
+		if (wxOK == dialog.ShowModal()) {
+			SourcesList->SetString(selected, src.RootDirectory.GetFullPath());
+			EditedProject.Sources[selected] = src;
+		}
+	}
+}
+
+void mvceditor::ProjectDefinitionDialogClass::Populate() {
+	for (size_t i = 0; i < EditedProject.Sources.size(); ++i) {
+		SourcesList->Append(EditedProject.Sources[i].RootDirectory.GetFullPath());
+	}
+}
+
+mvceditor::ProjectSourceDialogClass::ProjectSourceDialogClass(wxWindow* parent, mvceditor::SourceClass& source)
+	: ProjectSourceDialogGeneratedClass(parent)
+	, Source(source)
+	, EditedSource(source) {
+	RootDirectory->SetPath(source.RootDirectory.GetFullPath());
+	IncludeWildcards->SetValue(EditedSource.IncludeWildcardsString());
+	ExcludeWildcards->SetValue(EditedSource.ExcludeWildcardsString());
+
+	if (EditedSource.IncludeWildcardsString().IsEmpty()) {
+		IncludeWildcards->SetValue(wxT("*.*"));
+	}
+}
+
+void mvceditor::ProjectSourceDialogClass::OnOkButton(wxCommandEvent& event) {
+	if (IncludeWildcards->IsEmpty()) {
+		wxMessageBox(_("Include wildcards must not be empty."));
+		return;
+	}
+	wxString path = RootDirectory->GetPath();
+	if (!wxFileName::DirExists(path)) {
+		wxMessageBox(_("Root directory must exist."));
+		return;
+	}
+	Source.RootDirectory.Assign(path);
+	Source.SetIncludeWildcards(IncludeWildcards->GetValue());
+	Source.SetExcludeWildcards(ExcludeWildcards->GetValue());
+	EndModal(wxOK);
+}
+
+void mvceditor::ProjectSourceDialogClass::OnCancelButton(wxCommandEvent& event) {
+	EndModal(wxCANCEL);
+}
+
 BEGIN_EVENT_TABLE(mvceditor::ProjectPluginClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_PROJECT + MAX_PROJECT_HISTORY + 1, mvceditor::ProjectPluginClass::OnProjectExplore)
 	EVT_MENU(mvceditor::MENU_PROJECT + MAX_PROJECT_HISTORY + 2, mvceditor::ProjectPluginClass::OnProjectExploreOpenFile)
+	EVT_MENU(mvceditor::MENU_PROJECT + MAX_PROJECT_HISTORY + 4, mvceditor::ProjectPluginClass::OnProjectDefine)
 
 	/**
 	 * Since there could be 1...N recent project menu items we cannot listen to one menu item's event
