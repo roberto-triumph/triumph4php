@@ -147,7 +147,7 @@ static wxString NiceDocText(const UnicodeString& comment) {
 	return prettyComment;
 }
 
-mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options, ProjectClass* project, 
+mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,
 			mvceditor::StructsClass* structs, mvceditor::RunningThreadsClass& runningThreads,
 			int id, const wxPoint& position, const wxSize& size, long style,
 			const wxString& name)
@@ -158,7 +158,6 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 		, WordHighlightWord()
 		, CurrentInfo()
 		, Structs(structs)
-		, Project(project)
 		, RunningThreads(runningThreads)
 		, WordHighlightPreviousIndex(-1)
 		, WordHighlightNextIndex(-1)
@@ -428,7 +427,7 @@ void mvceditor::CodeControlClass::AutoDetectDocumentMode() {
 	wxString file = GetFileName();
 	
 	bool found = false;
-	std::vector<wxString> wildcards = Project->GetPhpFileExtensions();
+	std::vector<wxString> wildcards = Structs->GetPhpFileExtensions();
 	for (size_t i = 0; i < wildcards.size(); ++i) {
 		if (wxMatchWild(wildcards[i], file)) {
 			found = true;
@@ -437,7 +436,7 @@ void mvceditor::CodeControlClass::AutoDetectDocumentMode() {
 		}
 	}
 	if (!found) {
-		wildcards = Project->GetCssFileExtensions();
+		wildcards = Structs->GetCssFileExtensions();
 		for (size_t i = 0; i < wildcards.size(); ++i) {
 			if (wxMatchWild(wildcards[i], file)) {
 				found = true;
@@ -447,7 +446,7 @@ void mvceditor::CodeControlClass::AutoDetectDocumentMode() {
 		}	
 	}
 	if (!found) {
-		wildcards = Project->GetSqlFileExtensions();
+		wildcards = Structs->GetSqlFileExtensions();
 		for (size_t i = 0; i < wildcards.size(); ++i) {
 			if (wxMatchWild(wildcards[i], file)) {
 				found = true;

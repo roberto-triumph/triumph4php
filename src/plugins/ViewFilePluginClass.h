@@ -111,7 +111,7 @@ class ViewFilePluginClass : public PluginClass {
 	
 public:
 
-	ViewFilePluginClass();
+	ViewFilePluginClass(mvceditor::AppClass& app);
 	
 	/**
 	 * A 'local' detector that will be used to get all of the

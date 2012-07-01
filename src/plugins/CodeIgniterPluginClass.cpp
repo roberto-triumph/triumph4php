@@ -29,8 +29,8 @@
 #include <windows/StringHelperClass.h>
 #include <wx/choicdlg.h>
 
-mvceditor::CodeIgniterPluginClass::CodeIgniterPluginClass()  
-	: PluginClass()
+mvceditor::CodeIgniterPluginClass::CodeIgniterPluginClass(mvceditor::AppClass& app)  
+	: PluginClass(app)
 	, ConfigFiles() 
 	, CodeIgniterMenu(NULL) {
 	MenuBar = NULL;
@@ -121,7 +121,7 @@ void mvceditor::CodeIgniterPluginClass::OnMenuItem(wxCommandEvent& event) {
 				if (fileName.IsOk()) {
 					wxCommandEvent openEvent(mvceditor::EVENT_CMD_FILE_OPEN);
 					openEvent.SetString(filePath);
-					App->EventSink.Publish(openEvent);
+					App.EventSink.Publish(openEvent);
 				}
 				else {
 					mvceditor::EditorLogWarning(mvceditor::INVALID_FILE, filePath);
@@ -190,7 +190,7 @@ void mvceditor::CodeIgniterPluginClass::AddKeyboardShortcuts(std::vector<Dynamic
 void mvceditor::CodeIgniterPluginClass::GoToView() {
 	mvceditor::CodeControlClass* codeCtrl = GetCurrentCodeControl();
 	if (codeCtrl) {
-		std::vector<mvceditor::ViewInfoClass> viewInfos = App->Structs.CurrentViewInfos;
+		std::vector<mvceditor::ViewInfoClass> viewInfos = App.Structs.CurrentViewInfos;
 
 		// go through the chosen url, and get the templates for that controller
 		wxArrayString controllerViews;
@@ -226,7 +226,7 @@ void mvceditor::CodeIgniterPluginClass::GoToController() {
 	mvceditor::CodeControlClass* codeCtrl = GetCurrentCodeControl();
 	if (codeCtrl) {
 		wxFileName currentFileName(codeCtrl->GetFileName());
-		mvceditor::UrlResourceClass urlResource = App->Structs.CurrentUrl;
+		mvceditor::UrlResourceClass urlResource = App.Structs.CurrentUrl;
 		if (urlResource.FileName.IsOk()) {
 			GetNotebook()->LoadPage(urlResource.FileName.GetFullPath());
 		}

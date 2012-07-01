@@ -62,7 +62,7 @@ class EditorMessagesPluginClass : public PluginClass, wxLog {
 
 public:
 
-	EditorMessagesPluginClass();
+	EditorMessagesPluginClass(mvceditor::AppClass& app);
 
 	void AddToolsMenuItems(wxMenu* toolsMenu);
 

@@ -25,7 +25,6 @@
 #ifndef MVCEDITORCODECONTROLCLASS_H_
 #define MVCEDITORCODECONTROLCLASS_H_
 
-#include <environment/ProjectClass.h>
 #include <code_control/CodeControlOptionsClass.h>
 #include <environment/StructsClass.h>
 #include <wx/stc/stc.h>
@@ -43,7 +42,6 @@ namespace mvceditor {
 // Since this file is included by many plugins whenever a change to any included header
 // files is maded most plugins have to be re-compiled.
 class TextDocumentClass;
-class ProjectClass;
 class ResourceCacheClass;
 
 
@@ -94,14 +92,12 @@ public:
 
 	/**
 	 * Constructor. 
-	 * @param ProjectClass* Memory management of project is left to the caller of this method. project
-	 * CANNOT be NULL.
 	 * @param StructsClass* To get items needed for autocompletion. This object
 	 *        will NOT own the pointer
 	 * @param runningThreads To keep track of background threads
 	 * 
 	 */
-	CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options, ProjectClass* project,
+	CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,
 					StructsClass* structs, mvceditor::RunningThreadsClass& runningThreads,
 	                 int id, const wxPoint& position =
 	                     wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0,
@@ -467,13 +463,6 @@ private:
 	* This class will NOT own this pointer.
 	*/
 	StructsClass* Structs;
-
-	/**
-	  * To help with autocompletion and keywords. This object will NOT own this pointer
-	  *
-	  * @var ProjectClass
-	  */
-	ProjectClass* Project;
 
 	/**
 	 * This is the current specialization (document type) that is being used. This

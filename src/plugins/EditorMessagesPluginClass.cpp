@@ -99,8 +99,8 @@ void mvceditor::EditorMessagesPanelClass::AddMessage(wxLogLevel level, const wxC
 }
 
 
-mvceditor::EditorMessagesPluginClass::EditorMessagesPluginClass()
-	: PluginClass() {
+mvceditor::EditorMessagesPluginClass::EditorMessagesPluginClass(mvceditor::AppClass& app)
+	: PluginClass(app) {
 	
 	// this line is needed so that we get all the wxLogXXX messages
 	// pointer will be managed by wxWidgets

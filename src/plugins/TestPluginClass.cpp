@@ -66,7 +66,8 @@ void mvceditor::TestPluginClass::Go(wxCommandEvent& event) {
 	}
 }
 
-mvceditor::TestPluginClass::TestPluginClass() {
+mvceditor::TestPluginClass::TestPluginClass(mvceditor::AppClass& app)
+	: PluginClass(app) {
 }
 
 BEGIN_EVENT_TABLE(mvceditor::TestPluginClass, wxEvtHandler)

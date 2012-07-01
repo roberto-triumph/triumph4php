@@ -321,7 +321,7 @@ class EnvironmentPluginClass : public PluginClass {
 
 public:
 
-	EnvironmentPluginClass();
+	EnvironmentPluginClass(mvceditor::AppClass& app);
 	
 	/**
 	 * Add the environment sub-menu.

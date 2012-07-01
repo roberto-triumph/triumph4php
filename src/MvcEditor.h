@@ -22,7 +22,6 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <environment/ProjectClass.h>
 #include <php_frameworks/FrameworkDetectorClass.h>
 #include <widgets/ResourceCacheClass.h>
 #include <windows/AppFrameClass.h>
@@ -67,13 +66,6 @@ public:
 	 * so at app start.
 	 */
 	EventSinkClass EventSink;
-
-	/**
-	 * The open project
-	 * @var ProjectClass*
- 	 */
-	 // TODO make this an object on the stack
-	ProjectClass* Project;
 
 	/** 
 	 * Initialize the application 

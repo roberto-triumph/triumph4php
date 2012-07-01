@@ -323,7 +323,7 @@ public:
 	/**
 	 * Constructor
  	 */
-	RunConsolePluginClass();
+	RunConsolePluginClass(mvceditor::AppClass& app);
 	
 	/**
 	 * Add menu items

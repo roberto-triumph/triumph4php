@@ -32,6 +32,8 @@
 
 namespace mvceditor {
 
+// defined below
+class ProjectPluginPanelClass;
 
 class ProjectPluginClass : public PluginClass {
 
@@ -44,24 +46,9 @@ public:
 	wxString ExplorerExecutable;
 
 	/**
-	 * Serialized PHP file filters string from the config
-	 */
-	wxString PhpFileFiltersString;
-
-	/**
-	 * Serialized CSS file filters string from the config
-	 */
-	wxString CssFileFiltersString;
-
-	/**
-	 * Serialized SQL file filters string from the config
-	 */
-	wxString SqlFileFiltersString;
-
-	/**
 	 * Create a new instance of ProjectPluginClass.
 	 */
-	ProjectPluginClass();
+	ProjectPluginClass(mvceditor::AppClass& app);
 
 	/**
 	 * Opens the given directory as a project.
@@ -160,16 +147,6 @@ private:
 	 * List of recently opened projects
 	 */
 	wxFileHistory History;
-
-	/**
-	 * settings for the project that is opened at the start of the program
-	 */
-	mvceditor::ProjectClass DefaultProject;
-
-	/**
-	 * All of the projects defined by the user.
-	 */
-	std::vector<mvceditor::ProjectClass> DefinedProjects;
 
 	/**
 	 * This object will be used to detct the various PHP framework artifacts (resources,

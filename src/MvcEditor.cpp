@@ -50,7 +50,6 @@ mvceditor::AppClass::AppClass()
 	, RunningThreads()
 	, PhpFrameworks(*this, RunningThreads, Structs.Environment)
 	, EventSink()
-	, Project(NULL)
 	, Plugins()
 	, Preferences()
 	, ProjectPlugin(NULL) {
@@ -68,7 +67,7 @@ bool mvceditor::AppClass::OnInit() {
 	// frame and initialize the plugin windows so that all menus are created
 	// and only then can we load the keyboard shortcuts from the INI file
 	// all menu items must be present in the menu bar for shortcuts to take effect
-	AppFrame = new mvceditor::AppFrameClass(Plugins, this, Preferences);
+	AppFrame = new mvceditor::AppFrameClass(Plugins, *this, Preferences);
 	PluginWindows();
 
 	// load any settings from .INI files
@@ -76,7 +75,6 @@ bool mvceditor::AppClass::OnInit() {
 	Structs.Environment.LoadFromConfig();
 	wxConfigBase* config = wxConfigBase::Get();
 	for (size_t i = 0; i < Plugins.size(); ++i) {
-		Plugins[i]->InitState(this);
 		Plugins[i]->LoadPreferences(config);
 		Plugins[i]->AddKeyboardShortcuts(Preferences.DefaultKeyboardShortcutCmds);
 	}	
@@ -97,10 +95,6 @@ bool mvceditor::AppClass::OnInit() {
 
 mvceditor::AppClass::~AppClass() {
 	DeletePlugins();
-	if (Project) {
-		delete Project;
-		Project = NULL;
-	}
 	
 	// calling cleanup here so that we can run this binary through a memory leak detector 
 	// ICU will cache many things and that will cause the detector to output "possible leaks"
@@ -152,39 +146,39 @@ bool mvceditor::AppClass::CommandLine() {
 }
 
 void mvceditor::AppClass::CreatePlugins() {
-	PluginClass* plugin = new RunConsolePluginClass();
+	PluginClass* plugin = new RunConsolePluginClass(*this);
 	Plugins.push_back(plugin);
-	plugin = new FinderPluginClass();
+	plugin = new FinderPluginClass(*this);
 	Plugins.push_back(plugin);
-	plugin = new FindInFilesPluginClass();
+	plugin = new FindInFilesPluginClass(*this);
 	Plugins.push_back(plugin);
-	plugin = new ResourcePluginClass();
+	plugin = new ResourcePluginClass(*this);
 	Plugins.push_back(plugin);
 
-	plugin = new EnvironmentPluginClass();
+	plugin = new EnvironmentPluginClass(*this);
 	Plugins.push_back(plugin);
 
 	// we want to keep a reference to this plugin
 	// we need to load the project options before all others
-	ProjectPlugin = new ProjectPluginClass();
+	ProjectPlugin = new ProjectPluginClass(*this);
 	Plugins.push_back(ProjectPlugin);
-	plugin = new OutlineViewPluginClass();
+	plugin = new OutlineViewPluginClass(*this);
 	Plugins.push_back(plugin);
-	plugin = new LintPluginClass();
+	plugin = new LintPluginClass(*this);
 	Plugins.push_back(plugin);
-	plugin = new SqlBrowserPluginClass();
+	plugin = new SqlBrowserPluginClass(*this);
 	Plugins.push_back(plugin);
-	plugin = new mvceditor::EditorMessagesPluginClass();
+	plugin = new mvceditor::EditorMessagesPluginClass(*this);
 	Plugins.push_back(plugin);
-	plugin = new CodeIgniterPluginClass();
+	plugin = new CodeIgniterPluginClass(*this);
 	Plugins.push_back(plugin);
-	plugin = new RunBrowserPluginClass();
+	plugin = new RunBrowserPluginClass(*this);
 	Plugins.push_back(plugin);
-	plugin = new ViewFilePluginClass();
+	plugin = new ViewFilePluginClass(*this);
 	Plugins.push_back(plugin);
 	
 	// test plugin need to find a quicker way to toggling it ON / OFF
-	//plugin = new TestPluginClass();
+	//plugin = new TestPluginClass(*this);
 	//Plugins.push_back(plugin);
 
 	// connect the plugins to the event sink so that they can

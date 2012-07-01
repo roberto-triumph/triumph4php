@@ -37,19 +37,11 @@
 static const int ID_FRAMEWORK_DETECTION_GAUGE = wxNewId();
 static const int MAX_PROJECT_HISTORY = 5;
 
-mvceditor::ProjectPluginClass::ProjectPluginClass() 
-	: PluginClass()
-	, PhpFileFiltersString()
-	, CssFileFiltersString()
-	, SqlFileFiltersString()
+mvceditor::ProjectPluginClass::ProjectPluginClass(mvceditor::AppClass& app) 
+	: PluginClass(app)
 	, History(MAX_PROJECT_HISTORY, mvceditor::MENU_PROJECT)
-	, DefaultProject()
-	, DefinedProjects()
 	, PhpFrameworks(NULL)
 	, RecentProjectsMenu(NULL) {
-	PhpFileFiltersString = wxT("*.php");
-	CssFileFiltersString = wxT("*.css");
-	SqlFileFiltersString = wxT("*.sql");
 	wxPlatformInfo info;
 	switch (info.GetOperatingSystemId()) {
 		case wxOS_WINDOWS_NT:
@@ -93,16 +85,11 @@ void mvceditor::ProjectPluginClass::AddToolBarItems(wxAuiToolBar* toolbar) {
 
 void mvceditor::ProjectPluginClass::LoadPreferences(wxConfigBase* config) {
 	config->Read(wxT("/Project/ExplorerExecutable"), &ExplorerExecutable);
-	PhpFileFiltersString = config->Read(wxT("/Project/PhpFileFilters"), wxT("*.php"));
-	CssFileFiltersString = config->Read(wxT("/Project/CssFileFilters"), wxT("*.css"));
-	SqlFileFiltersString = config->Read(wxT("/Project/SqlFileFilters"), wxT("*.sql"));
-	mvceditor::ProjectClass* project = GetProject();
-	if (project) {
-		project->SetPhpFileExtensionsString(PhpFileFiltersString);
-		project->SetCssFileExtensionsString(CssFileFiltersString);
-		project->SetSqlFileExtensionsString(SqlFileFiltersString);
-	}
-	DefinedProjects.clear();
+	App.Structs.PhpFileFiltersString = config->Read(wxT("/Project/PhpFileFilters"), wxT("*.php"));
+	App.Structs.CssFileFiltersString = config->Read(wxT("/Project/CssFileFilters"), wxT("*.css"));
+	App.Structs.SqlFileFiltersString = config->Read(wxT("/Project/SqlFileFilters"), wxT("*.sql"));
+	
+	App.Structs.Projects.clear();
 	wxString key;
 	long index;
 	int projectIndex = 0;
@@ -136,7 +123,11 @@ void mvceditor::ProjectPluginClass::LoadPreferences(wxConfigBase* config) {
 				}
 			}
 			if (newProject.HasSources()) {
-				DefinedProjects.push_back(newProject);
+				newProject.SetPhpFileExtensionsString(App.Structs.PhpFileFiltersString);
+				newProject.SetCssFileExtensionsString(App.Structs.CssFileFiltersString);
+				newProject.SetSqlFileExtensionsString(App.Structs.SqlFileFiltersString);
+
+				App.Structs.Projects.push_back(newProject);
 				projectIndex++;
 			}
 		}
@@ -164,9 +155,9 @@ void mvceditor::ProjectPluginClass::LoadPreferences(wxConfigBase* config) {
 void mvceditor::ProjectPluginClass::SavePreferences(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfig::Get();
 	config->Write(wxT("/Project/ExplorerExecutable"), ExplorerExecutable);
-	config->Write(wxT("/Project/PhpFileFilters"), PhpFileFiltersString);
-	config->Write(wxT("/Project/CssFileFilters"), CssFileFiltersString);
-	config->Write(wxT("/Project/SqlFileFilters"), SqlFileFiltersString);
+	config->Write(wxT("/Project/PhpFileFilters"), App.Structs.PhpFileFiltersString);
+	config->Write(wxT("/Project/CssFileFilters"), App.Structs.CssFileFiltersString);
+	config->Write(wxT("/Project/SqlFileFilters"), App.Structs.SqlFileFiltersString);
 
 	// remove all project from the config
 	wxString key;
@@ -183,8 +174,8 @@ void mvceditor::ProjectPluginClass::SavePreferences(wxCommandEvent& event) {
 		config->DeleteGroup(keysToDelete[i]);
 	}
 	
-	for (size_t i = 0; i < DefinedProjects.size(); ++i) {
-		mvceditor::ProjectClass project = DefinedProjects[i];
+	for (size_t i = 0; i < App.Structs.Projects.size(); ++i) {
+		mvceditor::ProjectClass project = App.Structs.Projects[i];
 		wxString keyLabel = wxString::Format(wxT("/Project_%d/Label"), i);
 		wxString keyEnabled = wxString::Format(wxT("/Project_%d/IsEnabled"), i);
 		wxString keySourceCount = wxString::Format(wxT("/Project_%d/SourceCount"), i);
@@ -275,12 +266,11 @@ void mvceditor::ProjectPluginClass::AddPreferenceWindow(wxBookCtrlBase* parent) 
 }
 
 void mvceditor::ProjectPluginClass::OnProjectExplore(wxCommandEvent& event) {
-	ProjectClass* project = GetProject();
-	if (project != NULL && GetProject()->HasSources()) {
+	if (App.Structs.HasSources()) {
 		wxString cmd;
 		cmd += ExplorerExecutable;
 		cmd += wxT(" \"");
-		cmd += GetProject()->Sources[0].RootDirectory.GetFullPath();
+		cmd += App.Structs.FirstDirectory();
 		cmd += wxT("\"");
 		long result = wxExecute(cmd);
 		if (!result) {
@@ -315,15 +305,16 @@ void mvceditor::ProjectPluginClass::ProjectOpen(const wxString& directoryPath) {
 	if (!PhpFrameworks.get()) {
 		PhpFrameworks.reset(new mvceditor::PhpFrameworkDetectorClass(*this, RunningThreads, *GetEnvironment()));
 	}
+	/*
+	TODO is this fuctionality even needed?
 	CloseProject();
-	App->Project = new ProjectClass();
 	
 	if (!directoryPath.IsEmpty()) {
 		mvceditor::SourceClass src;
 		src.RootDirectory.Assign(directoryPath);
 		src.SetIncludeWildcards(wxT("*.*"));
-		App->Project->AddSource(src);
-		App->Project->Label = directoryPath;
+		App.Project->AddSource(src);
+		App.Project->Label = directoryPath;
 
 		bool started = PhpFrameworks->Init(directoryPath);
 		if (!started) {
@@ -333,7 +324,7 @@ void mvceditor::ProjectPluginClass::ProjectOpen(const wxString& directoryPath) {
 			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 			gauge->AddGauge(_("Framework Detection"), ID_FRAMEWORK_DETECTION_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
 		}
-	}
+	}*/
 }
 
 void mvceditor::ProjectPluginClass::ProjectOpenDefault() {
@@ -341,18 +332,10 @@ void mvceditor::ProjectPluginClass::ProjectOpenDefault() {
 		PhpFrameworks.reset(new mvceditor::PhpFrameworkDetectorClass(*this, RunningThreads, *GetEnvironment()));
 	}
 
-	App->Project = new ProjectClass();
-	App->Project->Sources = DefaultProject.Sources;
-	App->Project->Label = DefaultProject.Label;
-
-	App->Project->SetPhpFileExtensionsString(PhpFileFiltersString);
-	App->Project->SetCssFileExtensionsString(CssFileFiltersString);
-	App->Project->SetSqlFileExtensionsString(SqlFileFiltersString);
-
-	if (App->Project->HasSources()) {
+	if (!App.Structs.AllEnabledSources().empty()) {
 
 		// TODO multiple sources & projects
-		bool started = PhpFrameworks->Init(App->Project->Sources[0].RootDirectory.GetPath());
+		bool started = PhpFrameworks->Init(App.Structs.FirstDirectory());
 		if (!started) {
 			mvceditor::EditorLogError(mvceditor::BAD_PHP_EXECUTABLE, GetEnvironment()->Php.PhpExecutablePath); 
 		}
@@ -365,26 +348,29 @@ void mvceditor::ProjectPluginClass::ProjectOpenDefault() {
 		// still notify the plugins of the new project at program startup
 		// when the app starts the default project is opened
 		wxCommandEvent evt(mvceditor::EVENT_APP_PROJECT_OPENED);
-		App->EventSink.Publish(evt);
+		App.EventSink.Publish(evt);
 	}
 }
 
 void mvceditor::ProjectPluginClass::CloseProject() {
-	if (App->Project) {
+	/**
+		TODO is this functionality even needed
+	if (App.Project) {
 		PhpFrameworks->ConfigFiles.clear();
 		PhpFrameworks->Databases.clear();
 		PhpFrameworks->Identifiers.clear();
 		PhpFrameworks->Resources.clear();
 
-		App->PhpFrameworks.ConfigFiles.clear();
-		App->PhpFrameworks.Databases.clear();
-		App->PhpFrameworks.Identifiers.clear();
-		App->PhpFrameworks.Resources.clear();
-		delete App->Project;
-		App->Project = NULL;
+		App.PhpFrameworks.ConfigFiles.clear();
+		App.PhpFrameworks.Databases.clear();
+		App.PhpFrameworks.Identifiers.clear();
+		App.PhpFrameworks.Resources.clear();
+		delete App.Project;
+		App.Project = NULL;
 		wxCommandEvent closeEvent(mvceditor::EVENT_APP_PROJECT_CLOSED);
-		App->EventSink.Publish(closeEvent);
+		App.EventSink.Publish(closeEvent);
 	}
+	*/
 }
 
 void mvceditor::ProjectPluginClass::OnCmdProjectOpen(wxCommandEvent& event) {
@@ -392,25 +378,21 @@ void mvceditor::ProjectPluginClass::OnCmdProjectOpen(wxCommandEvent& event) {
 }
 
 void mvceditor::ProjectPluginClass::OnFrameworkDetectionComplete(wxCommandEvent& event) {
-	App->PhpFrameworks.ConfigFiles = PhpFrameworks->ConfigFiles;
-	App->PhpFrameworks.Databases = PhpFrameworks->Databases;
-	App->PhpFrameworks.Identifiers = PhpFrameworks->Identifiers;
-	App->PhpFrameworks.Resources = PhpFrameworks->Resources;
+	App.PhpFrameworks.ConfigFiles = PhpFrameworks->ConfigFiles;
+	App.PhpFrameworks.Databases = PhpFrameworks->Databases;
+	App.PhpFrameworks.Identifiers = PhpFrameworks->Identifiers;
+	App.PhpFrameworks.Resources = PhpFrameworks->Resources;
 	
-	App->Project->SetPhpFileExtensionsString(PhpFileFiltersString);
-	App->Project->SetCssFileExtensionsString(CssFileFiltersString);
-	App->Project->SetSqlFileExtensionsString(SqlFileFiltersString);
-	
-	if (App->Project->HasSources()) {
+	if (!App.Structs.AllEnabledSources().empty()) {
 		
 		// TODO: better project recall
-		wxString projectRoot = App->Project->Sources[0].RootDirectory.GetFullPath();
+		wxString projectRoot = App.Structs.FirstDirectory();
 		projectRoot.Trim();
 		History.AddFileToHistory(projectRoot);
 		PersistProjectList();
 	}
 	wxCommandEvent projectOpenedEvent(mvceditor::EVENT_APP_PROJECT_OPENED);
-	App->EventSink.Publish(projectOpenedEvent);
+	App.EventSink.Publish(projectOpenedEvent);
 	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 	gauge->StopGauge(ID_FRAMEWORK_DETECTION_GAUGE);
 }
@@ -418,19 +400,15 @@ void mvceditor::ProjectPluginClass::OnFrameworkDetectionComplete(wxCommandEvent&
 void mvceditor::ProjectPluginClass::OnFrameworkDetectionFailed(wxCommandEvent& event) {
 	mvceditor::EditorLogError(mvceditor::BAD_PHP_EXECUTABLE, event.GetString());
 
-	App->PhpFrameworks.ConfigFiles = PhpFrameworks->ConfigFiles;
-	App->PhpFrameworks.Databases = PhpFrameworks->Databases;
-	App->PhpFrameworks.Identifiers = PhpFrameworks->Identifiers;
-	App->PhpFrameworks.Resources = PhpFrameworks->Resources;
-	
-	App->Project->SetPhpFileExtensionsString(PhpFileFiltersString);
-	App->Project->SetCssFileExtensionsString(CssFileFiltersString);
-	App->Project->SetSqlFileExtensionsString(SqlFileFiltersString);
-	
-	if (App->Project->HasSources()) {
+	App.PhpFrameworks.ConfigFiles = PhpFrameworks->ConfigFiles;
+	App.PhpFrameworks.Databases = PhpFrameworks->Databases;
+	App.PhpFrameworks.Identifiers = PhpFrameworks->Identifiers;
+	App.PhpFrameworks.Resources = PhpFrameworks->Resources;
+
+	if (App.Structs.HasSources()) {
 		
 		// TODO: better project recall
-		wxString projectRoot = App->Project->Sources[0].RootDirectory.GetFullPath();
+		wxString projectRoot = App.Structs.FirstDirectory();
 		projectRoot.Trim();
 		History.AddFileToHistory(projectRoot);
 		PersistProjectList();
@@ -439,7 +417,7 @@ void mvceditor::ProjectPluginClass::OnFrameworkDetectionFailed(wxCommandEvent& e
 	// still need to set the project even if the project detection fails
 	// pretty much all code depends on having a Project pointer
 	wxCommandEvent projectOpenedEvent(mvceditor::EVENT_APP_PROJECT_OPENED);
-	App->EventSink.Publish(projectOpenedEvent);
+	App.EventSink.Publish(projectOpenedEvent);
 	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 	gauge->StopGauge(ID_FRAMEWORK_DETECTION_GAUGE);
 }
@@ -450,7 +428,7 @@ void mvceditor::ProjectPluginClass::OnFrameworkDetectionInProgress(wxCommandEven
 }
 
 void mvceditor::ProjectPluginClass::OnProjectDefine(wxCommandEvent& event) {
-	mvceditor::ProjectListDialogClass dialog(GetMainWindow(), DefinedProjects);
+	mvceditor::ProjectListDialogClass dialog(GetMainWindow(), App.Structs.Projects);
 	if (wxOK == dialog.ShowModal()) {
 		// TODO: re-trigger indexing ?
 
@@ -466,13 +444,13 @@ mvceditor::ProjectPluginPanelClass::ProjectPluginPanelClass(wxWindow *parent, mv
 	NonEmptyTextValidatorClass explorerValidator(&projectPlugin.ExplorerExecutable, Label);
 	ExplorerExecutable->SetValidator(explorerValidator);
 
-	NonEmptyTextValidatorClass phpFileFiltersValidator(&projectPlugin.PhpFileFiltersString, PhpLabel);
+	NonEmptyTextValidatorClass phpFileFiltersValidator(&projectPlugin.App.Structs.PhpFileFiltersString, PhpLabel);
 	PhpFileFilters->SetValidator(phpFileFiltersValidator);
 
-	NonEmptyTextValidatorClass cssFileFiltersValidator(&projectPlugin.CssFileFiltersString, CssLabel);
+	NonEmptyTextValidatorClass cssFileFiltersValidator(&projectPlugin.App.Structs.CssFileFiltersString, CssLabel);
 	CssFileFilters->SetValidator(cssFileFiltersValidator);
 
-	NonEmptyTextValidatorClass sqlFileFiltersValidator(&projectPlugin.SqlFileFiltersString, SqlLabel);
+	NonEmptyTextValidatorClass sqlFileFiltersValidator(&projectPlugin.App.Structs.SqlFileFiltersString, SqlLabel);
 	SqlFileFilters->SetValidator(sqlFileFiltersValidator);
 	
 }

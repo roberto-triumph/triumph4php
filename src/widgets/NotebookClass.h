@@ -26,7 +26,6 @@
 #define MVCEDITORNOTEBOOKCLASS_H_
 
 #include <code_control/CodeControlClass.h>
-#include <environment/ProjectClass.h>
 #include <environment/StructsClass.h>
 #include <Events.h>
 #include <wx/wx.h>
@@ -57,6 +56,15 @@ public:
 	 * This class will NOT own this pointer.
 	 */
 	StructsClass* Structs;
+
+	/**
+	 * This object will be used to publish app events. When an editor tab is closed;
+	 * we need to trigger project re-indexing since it has not been updated with
+	 * the changes made to the file that was opened (the parsed resources were being 
+	 * handled in a separate cache by ResourceCacheClass).
+	 */
+	EventSinkClass* EventSink;
+
 	
 	/**
 	 * Constructor. Parent is needed, all others are optional.
@@ -175,15 +183,7 @@ public:
 	 * 
 	 */
 	void RefreshCodeControlOptions();
-	
-	/**
-	 * Give code controls access to a single project. 
-	 * Memory management of both pointers is  left to the caller of this method.
-	 * @param project the opened project
-	 * @param eventSink given to each instance of CodeControlClass that is created.
-	 */
-	void SetProject(ProjectClass* project, EventSinkClass* eventSink);
-	
+
 	/**
 	 * Closes (deletes) the current page (prompts the user to save if the file has been modified)
 	 */
@@ -266,21 +266,7 @@ private:
 	 * The context menu for handling right-click options
 	 */
 	wxMenu* ContextMenu;
-	
-	/**
-	 * To find classes & files
-	 * @var ProjectClass
-	 */
-	ProjectClass* Project;
-
-	/**
-	 * This object will be used to publish app events. When an editor tab is closed;
-	 * we need to trigger project re-indexing since it has not been updated with
-	 * the changes made to the file that was opened (the parsed resources were being 
-	 * handled in a separate cache by ResourceCacheClass).
-	 */
-	EventSinkClass* EventSink;
-	
+		
 	/**
 	 * To give a friendly number to new files. 
 	 */

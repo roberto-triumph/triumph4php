@@ -96,7 +96,7 @@ public:
 	/**
 	 * Creates a new OutlineViewPlugin.
 	 */
-	OutlineViewPluginClass();
+	OutlineViewPluginClass(mvceditor::AppClass& app);
 
 	/**
 	 * This plugin will have a tools menu entry

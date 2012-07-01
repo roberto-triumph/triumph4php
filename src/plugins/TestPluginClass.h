@@ -36,7 +36,8 @@ namespace mvceditor {
  */
 class TestPluginClass : public PluginClass {
 public:
-	TestPluginClass();
+
+	TestPluginClass(mvceditor::AppClass& app);
 		
 	/**
 	 * This plugin will have no Edit menu items

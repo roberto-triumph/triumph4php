@@ -28,6 +28,7 @@
 
 #include <environment/EnvironmentClass.h>
 #include <environment/UrlResourceClass.h>
+#include <environment/ProjectClass.h>
 #include <environment/SqlResourceFinderClass.h>
 #include <widgets/ResourceCacheClass.h>
 #include <php_frameworks/FrameworkDetectorClass.h>
@@ -80,11 +81,87 @@ public:
 	std::vector<mvceditor::ViewInfoClass> CurrentViewInfos;
 
 	/**
+	 * All of the projects defined by the user.
+	 */
+	std::vector<mvceditor::ProjectClass> Projects;
+
+	/**
 	 * the URL that the user chose to view files from
 	 */
 	UrlResourceClass CurrentUrl;
 
+	/**
+	 * Serialized PHP file filters string from the config
+	 */
+	wxString PhpFileFiltersString;
+
+	/**
+	 * Serialized CSS file filters string from the config
+	 */
+	wxString CssFileFiltersString;
+
+	/**
+	 * Serialized SQL file filters string from the config
+	 */
+	wxString SqlFileFiltersString;
+
 	StructsClass();
+
+	/**
+	 * @return vector of all directories of all source files in all enabled
+	 * projects. For example, if there are 3 enabled projects, each with 2 sources
+	 * directories, then this method returns 4 source instances.
+	 */
+	std::vector<mvceditor::SourceClass> AllEnabledSources() const;
+
+	/**
+	 * @return bool TRUE if there is at least 1 enabled project that has AT LEAST 1 source
+	 */
+	bool HasSources() const;
+
+	/**
+	 * Returns the valid PHP file extensions for this project
+	 * @return std::vector<wxSring> a copy of the file extensions
+	 */
+	std::vector<wxString> GetPhpFileExtensions() const;
+
+	/**
+	 * Returns the valid CSS file extensions for this project
+	 * @return std::vector<wxSring> a copy of the file extensions
+	 */
+	std::vector<wxString> GetCssFileExtensions() const;
+
+	/**
+	 * Returns the valid SQL file extensions for this project
+	 * @return std::vector<wxSring> a copy of the file extensions
+	 */
+	std::vector<wxString> GetSqlFileExtensions() const;
+
+	/**
+	 * @return TRUE if given full path is a PHP file, as determined by
+	 * the sources directories and the php file 
+	 * extensions wilcard.
+	 */
+	bool IsAPhpSourceFile(const wxString& fullPath) const;
+
+	/**
+	 * removes the source directory from the given full path.
+	 * Examples
+	 * source RootDirectory = /home/roberto/
+	 * fullPath = /home/roberto/workspace/now.php
+	 * Then this method returns "workspace/now.php"
+	 * 
+	 * @param full path to a file
+	 * @return the part of the file without the source prefix
+	 * In the case that fullPath is not contained in any 
+	 * project's sources, then this method returns nothing.
+	 */
+	wxString RelativeFileName(const wxString& fullPath) const;
+
+	/**
+	 * TODO remove this method
+	 */
+	wxString FirstDirectory() const;
 
 };
 

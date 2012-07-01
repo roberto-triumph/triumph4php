@@ -463,11 +463,10 @@ void mvceditor::RunConsolePanelClass::AppendText(const wxString& text) {
 
 UnicodeString mvceditor::RunConsolePanelClass::FileNameRegularExpression() {
 	wxPlatformInfo info;
-	mvceditor::ProjectClass* project = Plugin.GetProject();
 	std::vector<wxString> allExtensions;
-	std::vector<wxString> phpExtensions = project->GetPhpFileExtensions();
-	std::vector<wxString> cssExtensions = project->GetCssFileExtensions();
-	std::vector<wxString> sqlExtensions = project->GetSqlFileExtensions();
+	std::vector<wxString> phpExtensions = Plugin.App.Structs.GetPhpFileExtensions();
+	std::vector<wxString> cssExtensions = Plugin.App.Structs.GetCssFileExtensions();
+	std::vector<wxString> sqlExtensions = Plugin.App.Structs.GetSqlFileExtensions();
 	for (size_t i = 0; i < phpExtensions.size(); ++i) {
 		allExtensions.push_back(phpExtensions[i]);
 	}
@@ -554,8 +553,8 @@ mvceditor::FileNameHitClass mvceditor::RunConsolePanelClass::HitAt(wxMouseEvent&
 	return mouseHit;
 }
 
-mvceditor::RunConsolePluginClass::RunConsolePluginClass()
-	: PluginClass()
+mvceditor::RunConsolePluginClass::RunConsolePluginClass(mvceditor::AppClass& app)
+	: PluginClass(app)
 	, RunCliMenuItem(NULL)
 	, RunCliWithArgsMenuItem(NULL)
 	, RunCliInNewWindowMenuItem(NULL)

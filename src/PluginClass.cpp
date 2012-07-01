@@ -26,10 +26,10 @@
 #include <MvcEditor.h>
 #include <wx/artprov.h>
 
-mvceditor::PluginClass::PluginClass()
-	: RunningThreads()
-	, AuiManager(NULL)
-	, App(NULL)
+mvceditor::PluginClass::PluginClass(mvceditor::AppClass& app)
+	: App(app)	
+	, RunningThreads()
+	, AuiManager(NULL)	
 	, StatusBarWithGauge(NULL)
 	, Notebook(NULL)
 	, ToolsNotebook(NULL)
@@ -50,28 +50,20 @@ void mvceditor::PluginClass::InitWindow(StatusBarWithGaugeClass* statusBarWithGa
 	MenuBar = menuBar;
 }
 
-void mvceditor::PluginClass::InitState(AppClass* app) {
-	App = app;
-}
-
-mvceditor::ProjectClass* mvceditor::PluginClass::GetProject() const {
-	return App ? App->Project : NULL;
-}
-
 mvceditor::NotebookClass* mvceditor::PluginClass::GetNotebook() const {
 	return Notebook;
 }
 
 mvceditor::EnvironmentClass* mvceditor::PluginClass::GetEnvironment() {
-	return &App->Structs.Environment;
+	return &App.Structs.Environment;
 }
 
 mvceditor::ResourceCacheClass* mvceditor::PluginClass::GetResourceCache() {
-	return &App->Structs.ResourceCache;
+	return &App.Structs.ResourceCache;
 }
 
 mvceditor::PhpFrameworkDetectorClass& mvceditor::PluginClass::PhPFrameworks() const {
-	return App->PhpFrameworks;
+	return App.PhpFrameworks;
 }
 
 void mvceditor::PluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {

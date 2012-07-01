@@ -84,8 +84,8 @@ private:
 class AppFrameClass : public AppFrameGeneratedClass {
 
 public:
-	/** Constructor, this class will NOT  own the App pinter */
-	AppFrameClass(const std::vector<PluginClass*>& plugins, AppClass* app,
+	
+	AppFrameClass(const std::vector<PluginClass*>& plugins, AppClass&  app,
 		PreferencesClass& preferences);
 	
 	~AppFrameClass();
@@ -304,7 +304,7 @@ private:
 	/**
 	 * The application global
 	 */
-	AppClass* App;
+	AppClass& App;
 
 	/**
 	 * The user preferences

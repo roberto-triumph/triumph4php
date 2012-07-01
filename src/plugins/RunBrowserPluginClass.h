@@ -102,7 +102,7 @@ public:
 	 */
 	std::vector<UrlResourceClass> RecentUrls;
 
-	RunBrowserPluginClass();
+	RunBrowserPluginClass(mvceditor::AppClass& app);
 	
 	void AddToolsMenuItems(wxMenu* toolsMenu);
 	

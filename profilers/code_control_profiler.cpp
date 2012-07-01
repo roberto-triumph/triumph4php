@@ -29,7 +29,6 @@
 #include <code_control/CodeControlOptionsClass.h>
 #include <code_control/CodeControlClass.h>
 #include <environment/StructsClass.h>
-#include <environment/ProjectClass.h>
 #include <search/FindInFilesClass.h>
 
 /**
@@ -47,7 +46,6 @@ public:
 	virtual int OnExit();
 	
 	mvceditor::CodeControlOptionsClass Options;
-	mvceditor::ProjectClass Project;
 	mvceditor::StructsClass Structs;
 	mvceditor::RunningThreadsClass RunningThreads;
 };
@@ -140,7 +138,6 @@ IMPLEMENT_APP(CodeControlProfilerAppClass)
 CodeControlProfilerAppClass::CodeControlProfilerAppClass() 
 	: wxApp()
 	, Options()
-	, Project() 
 	, Structs() {
 		
 }
@@ -164,7 +161,7 @@ int CodeControlProfilerAppClass::OnExit() {
 CodeControlFrameClass::CodeControlFrameClass(CodeControlProfilerAppClass& app) 
 	: wxFrame(NULL, wxID_ANY, wxT("CodeControlClass profiler"), wxDefaultPosition, 
 			wxSize(1024, 768)) {
-	Ctrl = new mvceditor::CodeControlClass(this, app.Options, &app.Project, &app.Structs, app.RunningThreads, wxID_ANY);
+	Ctrl = new mvceditor::CodeControlClass(this, app.Options, &app.Structs, app.RunningThreads, wxID_ANY);
 	Ctrl->SetDropTarget(new FileDropTargetClass(Ctrl));
 	Ctrl->SetDocumentMode(mvceditor::CodeControlClass::PHP);
 	CreateMenu();

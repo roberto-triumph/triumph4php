@@ -637,8 +637,8 @@ void mvceditor::VirtualHostCreateDialogClass::OnOkButton(wxCommandEvent& event) 
 	}
 }
 
-mvceditor::EnvironmentPluginClass::EnvironmentPluginClass()
-	: PluginClass() {
+mvceditor::EnvironmentPluginClass::EnvironmentPluginClass(mvceditor::AppClass& app)
+	: PluginClass(app) {
 }
 
 void mvceditor::EnvironmentPluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
@@ -651,7 +651,7 @@ void mvceditor::EnvironmentPluginClass::OnMenuEnvironment(wxCommandEvent& event)
 	if (wxOK == dialog.ShowModal()) {
 		environment->SaveToConfig();
 		wxCommandEvent updatedEvent(mvceditor::EVENT_APP_ENVIRONMENT_UPDATED);
-		App->EventSink.Publish(updatedEvent);
+		App.EventSink.Publish(updatedEvent);
 	}
 }
 

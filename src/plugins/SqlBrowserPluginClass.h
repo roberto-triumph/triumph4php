@@ -396,7 +396,7 @@ protected:
  */
 class SqlBrowserPluginClass : public PluginClass {
 public:
-	SqlBrowserPluginClass();
+	SqlBrowserPluginClass(mvceditor::AppClass& app);
 	
 	~SqlBrowserPluginClass();
 

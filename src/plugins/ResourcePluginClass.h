@@ -146,7 +146,7 @@ public:
 	/**
 	 * create a resource plugin.
 	 */
-	ResourcePluginClass();
+	ResourcePluginClass(mvceditor::AppClass& app);
 
 	void AddProjectMenuItems(wxMenu* projectMenu);
 

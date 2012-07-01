@@ -132,10 +132,18 @@ class PluginClass : public wxEvtHandler {
 
 public:
 
+	
+	/**
+	 * The application event dispatcher. Also holds all 'global' structures and settings.
+	 */
+	AppClass& App;
+
 	/**
 	 * Constructor
+	 * @param app the handler that may receive events from plugins.
+	 * Note that at the start, any window pointers are not yet initialized
  	 */
-	PluginClass();
+	PluginClass(AppClass& app);
 	
 	/**
 	 * Destructor.  May be overidden by sub classes.
@@ -155,13 +163,6 @@ public:
 	 */
 	void InitWindow(StatusBarWithGaugeClass* statusBarWithGauge, NotebookClass* notebook, wxAuiNotebook* toolsNotebook, 
 		wxAuiNotebook* outlineNotebook, wxAuiManager* auiManager, wxMenuBar* menuBar);
-	
-	/**
-	 * Initialize application state
-	 * 
-	 * @param app the handler that may receive events from plugins. The pointer will NOT be owned by this class.
-	 */
-	void InitState(AppClass* app);
 		
 	/**
 	 * Add menu items to the tools menu for this plugin. Remeber to use the MenuIds enum when building
@@ -246,14 +247,6 @@ public:
 	 * @param shortcuts the list of shortcuts to add to
 	 */
 	virtual void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
-	
-	/**
-	 * The current opened project. Do NOT delete the pointer. Note that the Project may be NULL when there is no 
-	 * open project.
-	 * 
-	 * @return ProjectClass*
-	 */
-	ProjectClass* GetProject() const;
 	
 protected:
 	
@@ -445,11 +438,6 @@ protected:
 	 * @var wxAuiManager*
 	 */
 	wxAuiManager* AuiManager;
-	
-	/**
-	 * The application event dispatcher. Also holds all 'global' structures and settings.
-	 */
-	AppClass* App;
 
 	private:
 	

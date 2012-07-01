@@ -131,11 +131,11 @@ public:
 	 *
 	 * Lint errors will be propagated as events.
 	 * @param wxString fileName the full path of the file to lint
-	 * @param project needed to perform exclude wildcard checks
+	 * @param structs needed to perform exclude wildcard checks
 	 * @param environment to know which PHP version to check against
 	 * @return TRUE if the file contains a lint error.
 	 */
-	bool LintSingleFile(const wxString& fileName, mvceditor::ProjectClass* project, const EnvironmentClass& environment);
+	bool LintSingleFile(const wxString& fileName, const mvceditor::StructsClass& structs, const EnvironmentClass& environment);
 
 	/**
 	 * Return a summary of the number of files that were lint'ed.
@@ -243,7 +243,7 @@ public:
 	 */
 	bool CheckOnSave;
 
-	LintPluginClass();
+	LintPluginClass(mvceditor::AppClass& app);
 
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
 

@@ -37,10 +37,9 @@ mvceditor::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id,
 	: wxAuiNotebook(parent, id, pos, size, style)
 	, CodeControlOptions(NULL)
 	, Structs(NULL)
+	, EventSink(NULL)
 	, RunningThreads()
 	, ContextMenu(NULL)
-	, Project(NULL)
-	, EventSink(NULL)
 	, NewPageNumber(1) {
 }
 
@@ -145,7 +144,7 @@ void mvceditor::NotebookClass::MarkPageAsNotModified(int windowId) {
 	}
 }
 void mvceditor::NotebookClass::AddMvcEditorPage() {
-	CodeControlClass* page = new CodeControlClass(this, *CodeControlOptions, Project, Structs, RunningThreads, wxID_ANY);
+	CodeControlClass* page = new CodeControlClass(this, *CodeControlOptions, Structs, RunningThreads, wxID_ANY);
 	AddPage(page, wxString::Format(wxT("Untitled %d"), NewPageNumber++), true, 
 		wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_TOOLBAR, 
 		wxSize(16, 16)));
@@ -193,7 +192,7 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename) {
 		// not using wxStyledTextCtrl::LoadFile() because it does not correctly handle files with high ascii characters
 		mvceditor::FindInFilesClass::OpenErrors error = FindInFilesClass::FileContents(filename, fileContents);
 		if (error == mvceditor::FindInFilesClass::NONE) {
-			CodeControlClass* newCode = new CodeControlClass(this, *CodeControlOptions, Project, Structs, RunningThreads, wxID_ANY);
+			CodeControlClass* newCode = new CodeControlClass(this, *CodeControlOptions, Structs, RunningThreads, wxID_ANY);
 			newCode->TrackFile(filename, fileContents);
 
 			// if user dragged in a file on an opened file we want still want to accept dragged files
@@ -312,11 +311,6 @@ bool mvceditor::NotebookClass::GetModifiedPageNames(std::vector<wxString>& modif
 	return modified;
 }
 
-void mvceditor::NotebookClass::SetProject(ProjectClass* project, mvceditor::EventSinkClass* eventSink) {
-	Project = project;
-	EventSink = eventSink;
-}
-
 void mvceditor::NotebookClass::ShowContextMenu(wxAuiNotebookEvent& event) {
 	if (NULL == ContextMenu) {
 		CreateContextMenu();
@@ -376,15 +370,15 @@ std::vector<wxString> mvceditor::NotebookClass::GetOpenedFiles() const {
 }
 
 wxString mvceditor::NotebookClass::CreateWildcardString() const {
-	wxString phpLabel = Project->GetPhpFileExtensionsString(),
-		cssLabel = Project->GetCssFileExtensionsString(),
-		sqlLabel = Project->GetSqlFileExtensionsString();
+	wxString phpLabel = Structs->PhpFileFiltersString,
+		cssLabel = Structs->CssFileFiltersString,
+		sqlLabel = Structs->SqlFileFiltersString;
 	phpLabel.Replace(wxT(";"), wxT(" "));
 	cssLabel.Replace(wxT(";"), wxT(" "));
 	sqlLabel.Replace(wxT(";"), wxT(" "));
-	wxString php = Project->GetPhpFileExtensionsString(),
-		css = Project->GetCssFileExtensionsString(),
-		sql = Project->GetSqlFileExtensionsString();
+	wxString php = Structs->PhpFileFiltersString,
+		css = Structs->CssFileFiltersString,
+		sql = Structs->SqlFileFiltersString;
 
 	wxString fileFilter = 
 		wxString::Format(wxT("PHP Files (%s)|%s|"), phpLabel.c_str(), php.c_str()) +

@@ -91,13 +91,12 @@ bool mvceditor::LintBackgroundFileReaderClass::BeginDirectoryLint(std::vector<mv
 	return good;
 }
 
-bool mvceditor::LintBackgroundFileReaderClass::LintSingleFile(const wxString& fileName, mvceditor::ProjectClass* project,
-	  const mvceditor::EnvironmentClass& environment) {
+bool mvceditor::LintBackgroundFileReaderClass::LintSingleFile(const wxString& fileName, const mvceditor::StructsClass& structs, const mvceditor::EnvironmentClass& environment) {
 
 	// ATTN: use a local instance of ParserClass so that this method is thread safe
 	// and can be run when a background thread is already running.
 	bool error = false;
-	if (project->IsAPhpSourceFile(fileName)) {
+	if (structs.IsAPhpSourceFile(fileName)) {
 		ParserDirectoryWalkerClass walker;
 		walker.SetVersion(environment.Php.Version);
 		bool error = walker.Walk(fileName);
@@ -249,8 +248,8 @@ void mvceditor::LintResultsPanelClass::SelectPreviousError() {
 	}
 }
 
-mvceditor::LintPluginClass::LintPluginClass() 
-	: PluginClass()
+mvceditor::LintPluginClass::LintPluginClass(mvceditor::AppClass& app) 
+	: PluginClass(app)
 	, CheckOnSave(true)
 	, LintBackgroundFileReader(*this, RunningThreads)
 	, LintErrors() {
@@ -294,11 +293,10 @@ void mvceditor::LintPluginClass::OnLintMenu(wxCommandEvent& event) {
 		wxMessageBox(_("There is already another lint check that is active. Please wait for it to finish."), _("Lint Check"));
 		return;
 	}
-	mvceditor::ProjectClass *project = GetProject();
-	if (project) {
+	if (App.Structs.HasSources()) {
 		mvceditor::BackgroundFileReaderClass::StartError error;
 
-		if (LintBackgroundFileReader.BeginDirectoryLint(project->AllPhpSources(), *GetEnvironment(), error)) {
+		if (LintBackgroundFileReader.BeginDirectoryLint(App.Structs.AllEnabledSources(), *GetEnvironment(), error)) {
 			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 			gauge->AddGauge(_("Lint Check"), ID_LINT_RESULTS_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 			
@@ -401,7 +399,7 @@ void mvceditor::LintPluginClass::OnFileSaved(mvceditor::FileSavedEventClass& eve
 	// if user has configure to do lint check on saving or user is cleanin up
 	// errors (after they manually lint checked the project) then re-check
 	if (hasErrors || CheckOnSave) {
-		bool error = LintBackgroundFileReader.LintSingleFile(fileName, GetProject(), *GetEnvironment());
+		bool error = LintBackgroundFileReader.LintSingleFile(fileName, App.Structs, *GetEnvironment());
 		if (error) {
 			
 			// handle the case where user has saved a file but has not clicked

@@ -27,6 +27,7 @@
 #include <widgets/UnicodeStringValidatorClass.h>
 #include <widgets/RegularExpressionValidatorClass.h>
 #include <MvcEditorErrors.h>
+#include <MvcEditor.h>
 #include <wx/artprov.h>
 #include <wx/clipbrd.h>
 #include <wx/ffile.h>
@@ -472,20 +473,17 @@ mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvce
 	, Plugin(plugin)
 	, CurrentInsertionPointFind(0)
 	, CurrentInsertionPointReplace(0) {
-	mvceditor::ProjectClass* project = Plugin.GetProject();
 	Plugin.FindHistory.Attach(FindText);
 	Plugin.ReplaceHistory.Attach(ReplaceWithText);
 	Plugin.DirectoriesHistory.Attach(Directory);
 	Plugin.FilesHistory.Attach(FilesFilter);
 	
 	// the first time showing this dialog populate the filter to have only PHP file extensions
+	// TODO put all sources, php, sql, css file filters
 	if (FilesFilter->GetCount() <= 0) {
-		Plugin.PreviousFindInFiles.Source.SetIncludeWildcards(project->GetPhpFileExtensionsString());
+		Plugin.PreviousFindInFiles.Source.SetIncludeWildcards(plugin.App.Structs.PhpFileFiltersString);
 	}
-	if (NULL != project && project->HasSources() && Directory->GetCount() <= 0) {
-		Directory->Append(project->Sources[0].RootDirectory.GetFullPath());
-		Directory->SetSelection(0);
-	}
+	
 	else if (Directory->GetCount() > 0) {
 		Directory->SetSelection(0);
 	}
@@ -599,8 +597,8 @@ void mvceditor::FindInFilesDialogClass::OnKillFocusReplaceText(wxFocusEvent& eve
 	event.Skip();
 }
 
-mvceditor::FindInFilesPluginClass::FindInFilesPluginClass()
-	: PluginClass()
+mvceditor::FindInFilesPluginClass::FindInFilesPluginClass(mvceditor::AppClass& app)
+	: PluginClass(app)
 	, PreviousFindInFiles()
 	, DoHiddenFiles(false) {
 }

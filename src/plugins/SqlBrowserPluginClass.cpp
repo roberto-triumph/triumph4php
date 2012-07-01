@@ -643,8 +643,8 @@ std::vector<UnicodeString> mvceditor::SqlMetaDataFetchClass::GetErrors() {
 	return Errors;
 }
 
-mvceditor::SqlBrowserPluginClass::SqlBrowserPluginClass() 
-	: PluginClass()
+mvceditor::SqlBrowserPluginClass::SqlBrowserPluginClass(mvceditor::AppClass& app) 
+	: PluginClass(app)
 	, SqlMetaDataFetch(*this, RunningThreads)
 	, ChosenIndex(0) {
 }
@@ -653,32 +653,31 @@ mvceditor::SqlBrowserPluginClass::~SqlBrowserPluginClass() {
 }
 
 void mvceditor::SqlBrowserPluginClass::OnProjectOpened(wxCommandEvent& event) {
-	if (GetProject()) {
 
-		// remove any connections previously detected
-		std::vector<mvceditor::DatabaseInfoClass>::iterator it = App->Structs.Infos.begin();
-		while (it != App->Structs.Infos.end()) {
-			if (it->IsDetected) {
-				it = App->Structs.Infos.erase(it);
-			}
-			else {
-				++it;
-			}
+
+	// remove any connections previously detected
+	std::vector<mvceditor::DatabaseInfoClass>::iterator it = App.Structs.Infos.begin();
+	while (it != App.Structs.Infos.end()) {
+		if (it->IsDetected) {
+			it = App.Structs.Infos.erase(it);
 		}
-		
-		// add the detected connections to the infos list
-		// this makes it easier; that way we always work with one list only
-		for (size_t i = 0; i < App->PhpFrameworks.Databases.size(); ++i) {
-			App->Structs.Infos.push_back(App->PhpFrameworks.Databases[i]);
+		else {
+			++it;
 		}
-		DetectMetadata();
 	}
+	
+	// add the detected connections to the infos list
+	// this makes it easier; that way we always work with one list only
+	for (size_t i = 0; i < App.PhpFrameworks.Databases.size(); ++i) {
+		App.Structs.Infos.push_back(App.PhpFrameworks.Databases[i]);
+	}
+	DetectMetadata();
 }
 
 void mvceditor::SqlBrowserPluginClass::DetectMetadata() {
 	ChosenIndex = 0;
-	if (!App->Structs.Infos.empty()) {
-		if (SqlMetaDataFetch.Read(App->Structs.Infos)) {
+	if (!App.Structs.Infos.empty()) {
+		if (SqlMetaDataFetch.Read(App.Structs.Infos)) {
 			GetStatusBarWithGauge()->AddGauge(_("Fetching SQL meta data"), ID_SQL_METADATA_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
 		}
 	}
@@ -718,9 +717,9 @@ void  mvceditor::SqlBrowserPluginClass::OnSqlBrowserToolsMenu(wxCommandEvent& ev
 
 mvceditor::SqlBrowserPanelClass* mvceditor::SqlBrowserPluginClass::CreateResultsPanel(mvceditor::CodeControlClass* codeControl) {
 	mvceditor::SqlQueryClass query;
-	if (ChosenIndex < App->Structs.Infos.size()) {
-		query.Info.Copy(App->Structs.Infos[ChosenIndex]);
-		codeControl->SetCurrentInfo(App->Structs.Infos[ChosenIndex]);
+	if (ChosenIndex < App.Structs.Infos.size()) {
+		query.Info.Copy(App.Structs.Infos[ChosenIndex]);
+		codeControl->SetCurrentInfo(App.Structs.Infos[ChosenIndex]);
 	}
 	
 	mvceditor::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxNewId(), GetStatusBarWithGauge(), 
@@ -774,7 +773,7 @@ void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event
 	// first time a new project is created; its database may not exist).
 	// before, a user would not be able to edit the connection info once it was detected
 	// in order to make it less confusing about where the connection info comes from.
-	mvceditor::SqlConnectionDialogClass dialog(GetMainWindow(), App->Structs.Infos, ChosenIndex);
+	mvceditor::SqlConnectionDialogClass dialog(GetMainWindow(), App.Structs.Infos, ChosenIndex);
 	if (dialog.ShowModal() == wxOK) {
 		
 		// if chosen connection changed need to update the code control so that it knows to use the new
@@ -789,8 +788,8 @@ void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event
 			// methods
 			if (window->GetName() == wxT("mvceditor::SqlBrowserPanelClass")) {
 				mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)window;
-				if (ChosenIndex < App->Structs.Infos.size()) {
-					panel->SetCurrentInfo(App->Structs.Infos[ChosenIndex]);
+				if (ChosenIndex < App.Structs.Infos.size()) {
+					panel->SetCurrentInfo(App.Structs.Infos[ChosenIndex]);
 				}
 				panel->UpdateLabels(wxT(""));
 			}
@@ -798,7 +797,7 @@ void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event
 		SavePreferences();
 
 		// redetect the SQL meta data
-		SqlMetaDataFetch.Read(App->Structs.Infos);
+		SqlMetaDataFetch.Read(App.Structs.Infos);
 	}
 }
 
@@ -861,7 +860,7 @@ void mvceditor::SqlBrowserPluginClass::OnWorkInProgress(wxCommandEvent& event) {
 
 void mvceditor::SqlBrowserPluginClass::OnWorkComplete(wxCommandEvent& event) {
 	GetStatusBarWithGauge()->StopGauge(ID_SQL_METADATA_GAUGE);
-	SqlMetaDataFetch.WriteResultsInto(App->Structs.SqlResourceFinder);
+	SqlMetaDataFetch.WriteResultsInto(App.Structs.SqlResourceFinder);
 
 	std::vector<UnicodeString> errors = SqlMetaDataFetch.GetErrors();
 	for (size_t i = 0; i < errors.size(); ++i) {
@@ -902,7 +901,7 @@ void mvceditor::SqlBrowserPluginClass::LoadPreferences(wxConfigBase* config) {
 				
 				if (driverString.CmpNoCase(wxT("MYSQL")) == 0) {
 					info.Driver = mvceditor::DatabaseInfoClass::MYSQL;
-					App->Structs.Infos.push_back(info);
+					App.Structs.Infos.push_back(info);
 				}
 			}
 		} while (config->GetNextGroup(groupName, index));
@@ -925,21 +924,21 @@ void mvceditor::SqlBrowserPluginClass::SavePreferences() {
 
 	// now save all of the new ones
 	int saveIndex = 0;
-	for (size_t i = 0; i < App->Structs.Infos.size(); ++i) {
-		if (!App->Structs.Infos[i].IsDetected) {
+	for (size_t i = 0; i < App.Structs.Infos.size(); ++i) {
+		if (!App.Structs.Infos[i].IsDetected) {
 			config->SetPath(wxString::Format(wxT("/DatabaseInfo_%d"), saveIndex));
-			config->Write(wxT("DatabaseName"), mvceditor::StringHelperClass::IcuToWx(App->Structs.Infos[i].DatabaseName));
+			config->Write(wxT("DatabaseName"), mvceditor::StringHelperClass::IcuToWx(App.Structs.Infos[i].DatabaseName));
 			wxString driverString;
-			if (mvceditor::DatabaseInfoClass::MYSQL == App->Structs.Infos[i].Driver) {
+			if (mvceditor::DatabaseInfoClass::MYSQL == App.Structs.Infos[i].Driver) {
 				driverString = wxT("MYSQL");
 			}
 			config->Write(wxT("Driver"), driverString);
-			config->Write(wxT("FileName"), mvceditor::StringHelperClass::IcuToWx(App->Structs.Infos[i].FileName));
-			config->Write(wxT("Host"), mvceditor::StringHelperClass::IcuToWx(App->Structs.Infos[i].Host));
-			config->Write(wxT("Label"), mvceditor::StringHelperClass::IcuToWx(App->Structs.Infos[i].Label));
-			config->Write(wxT("Password"), mvceditor::StringHelperClass::IcuToWx(App->Structs.Infos[i].Password));
-			config->Write(wxT("Port"), App->Structs.Infos[i].Port);
-			config->Write(wxT("User"), mvceditor::StringHelperClass::IcuToWx(App->Structs.Infos[i].User));
+			config->Write(wxT("FileName"), mvceditor::StringHelperClass::IcuToWx(App.Structs.Infos[i].FileName));
+			config->Write(wxT("Host"), mvceditor::StringHelperClass::IcuToWx(App.Structs.Infos[i].Host));
+			config->Write(wxT("Label"), mvceditor::StringHelperClass::IcuToWx(App.Structs.Infos[i].Label));
+			config->Write(wxT("Password"), mvceditor::StringHelperClass::IcuToWx(App.Structs.Infos[i].Password));
+			config->Write(wxT("Port"), App.Structs.Infos[i].Port);
+			config->Write(wxT("User"), mvceditor::StringHelperClass::IcuToWx(App.Structs.Infos[i].User));
 			saveIndex++;
 		}
 	}

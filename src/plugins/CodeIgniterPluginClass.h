@@ -39,7 +39,7 @@ namespace mvceditor {
 class CodeIgniterPluginClass : public PluginClass {
 public:
 
-	CodeIgniterPluginClass();
+	CodeIgniterPluginClass(mvceditor::AppClass& app);
 		
 	/**
 	 * This plugin will create its own menu. 

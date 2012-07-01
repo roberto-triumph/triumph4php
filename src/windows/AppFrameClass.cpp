@@ -51,7 +51,7 @@ int ID_TOOLS_WINDOW = wxNewId();
 int ID_OUTLINE_WINDOW = wxNewId();
 
 mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass*>& plugins,
-										mvceditor::AppClass* app,
+										mvceditor::AppClass& app,
 										mvceditor::PreferencesClass& preferences)
 	: AppFrameGeneratedClass(NULL)
 	, Plugins(plugins)
@@ -64,7 +64,7 @@ mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass
 	StatusBarWithGaugeClass* gauge = new StatusBarWithGaugeClass(this);
 	SetStatusBar(gauge);
 
-	app->EventSink.PushHandler(&Listener);
+	App.EventSink.PushHandler(&Listener);
 	
 	AuiManager.SetManagedWindow(this);
 	ToolBar = new wxAuiToolBar(this, ID_TOOLBAR, wxDefaultPosition, wxDefaultSize, 
@@ -73,7 +73,8 @@ mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass
 	// when the notebook is empty we want to accept dragged files
 	Notebook->SetDropTarget(new FileDropTargetClass(Notebook));
 	Notebook->CodeControlOptions = &Preferences.CodeControlOptions;
-	Notebook->Structs = &App->Structs;
+	Notebook->Structs = &App.Structs;
+	Notebook->EventSink = &App.EventSink;
 	
 	// ATTN: for some reason must remove and re-insert menu item in order to change the icon
 	wxMenuItem* projectOpenMenuItem = MenuBar->FindItem(ID_PROJECT_OPEN);
@@ -297,7 +298,7 @@ void mvceditor::AppFrameClass::OnEditPreferences(wxCommandEvent& event) {
 		Preferences.EnableSelectedProfile(this);
 		Notebook->RefreshCodeControlOptions();
 		wxCommandEvent evt(mvceditor::EVENT_APP_PREFERENCES_UPDATED);
-		App->EventSink.Publish(evt);
+		App.EventSink.Publish(evt);
 	}
 }
 
@@ -360,7 +361,7 @@ void mvceditor::AppFrameClass::OnProjectOpen(wxCommandEvent& event) {
 		if (destroy) {
 			wxCommandEvent evt(EVENT_CMD_OPEN_PROJECT);
 			evt.SetString(dialog.GetPath());
-			App->EventSink.Publish(evt);
+			App.EventSink.Publish(evt);
 		}
 	}
 }
@@ -639,26 +640,25 @@ void mvceditor::AppFrameClass::DefaultKeyboardShortcuts() {
 }
 
 void mvceditor::AppFrameClass::OnAnyMenuCommandEvent(wxCommandEvent& event) {
-	App->EventSink.Publish(event);
+	App.EventSink.Publish(event);
 }
 
 void mvceditor::AppFrameClass::OnAnyAuiNotebookEvent(wxAuiNotebookEvent& event) {
 	if (event.GetId() != ID_TOOLS_WINDOW && event.GetId() != ID_OUTLINE_WINDOW) {
 
 		// only send the code notebook events for now
-		App->EventSink.Publish(event);
+		App.EventSink.Publish(event);
 	}
 	event.Skip();
 }
 
 void mvceditor::AppFrameClass::OnAnyAuiToolbarEvent(wxAuiToolBarEvent& event) {
-	App->EventSink.Publish(event);
+	App.EventSink.Publish(event);
 	event.Skip();
 }
 
 void mvceditor::AppFrameClass::OnProjectOpened() {
-	Notebook->SetProject(App->Project, &App->EventSink);
-	SetTitle(_("MVC Editor - Open Project [") + App->Project->Label + wxT("]"));
+	SetTitle(_("MVC Editor - Open Project ["));
 }
 
 void mvceditor::AppFrameClass::OnProjectClosed() {
@@ -668,7 +668,6 @@ void mvceditor::AppFrameClass::OnProjectClosed() {
 		ToolsNotebook->DeletePage(0);
 	}
 	AuiManager.Update();
-	Notebook->SetProject(NULL, &App->EventSink);
 }
 
 void mvceditor::AppFrameClass::UpdatePreferences() {

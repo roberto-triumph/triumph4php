@@ -517,8 +517,8 @@ void mvceditor::ReplacePanelClass::OnReplaceKillFocus(wxFocusEvent& event) {
 	event.Skip();
 }
 
-mvceditor::FinderPluginClass::FinderPluginClass()
-	: PluginClass() {
+mvceditor::FinderPluginClass::FinderPluginClass(mvceditor::AppClass& app)
+	: PluginClass(app) {
 }
 	
 void mvceditor::FinderPluginClass::AddEditMenuItems(wxMenu* editMenu) {

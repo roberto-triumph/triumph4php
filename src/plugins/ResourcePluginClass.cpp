@@ -62,7 +62,7 @@ bool mvceditor::ResourceFileReaderClass::InitForFile(mvceditor::ResourceCacheCla
 
 	// break up name into dir + name, add name to file filters
 	mvceditor::SourceClass src;
-	src.RootDirectory.Assign(fullPath);
+	src.RootDirectory.AssignDir(fullPath);
 	src.SetIncludeWildcards(fileName.GetFullName());
 	PhpFileFilters.push_back(fileName.GetFullName());
 
@@ -125,8 +125,8 @@ void mvceditor::NativeFunctionsFileReaderClass::Entry() {
 	SignalEnd();
 }
 
-mvceditor::ResourcePluginClass::ResourcePluginClass()
-	: PluginClass()
+mvceditor::ResourcePluginClass::ResourcePluginClass(mvceditor::AppClass& app)
+	: PluginClass(app)
 	, JumpToText()
 	, ResourceFileReader(*this, RunningThreads)
 	, NativeFunctionsReader(*this, RunningThreads)
@@ -142,7 +142,7 @@ void mvceditor::ResourcePluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
 	ProjectIndexMenu = projectMenu->Append(mvceditor::MENU_RESOURCE + 0, _("Index"), _("Index the project"));
 	projectMenu->Append(mvceditor::MENU_RESOURCE + 1, _("Jump To Resource Under Cursor"), _("Jump To Resource that is under the cursor"));
 	projectMenu->Append(mvceditor::MENU_RESOURCE + 2, _("Search for Resource..."), _("Set focus on the resource input"));
-	ProjectIndexMenu->Enable(GetProject() && FREE == State);
+	ProjectIndexMenu->Enable(App.Structs.HasSources() && FREE == State);
 }
 
 void mvceditor::ResourcePluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
@@ -216,14 +216,13 @@ void mvceditor::ResourcePluginClass::SearchForResources() {
 	}
 
 	// need to do indexing; start the background process
-	mvceditor::ProjectClass* project = GetProject();
-	if (project->HasSources()) {
+	if (App.Structs.HasSources()) {
 
 		//prevent two finds at a time
 		if (FREE == State) { 
 
 			// don't bother searching when path is not valid
-			if (ResourceFileReader.InitForProject(resourceCache, project->AllPhpSources(), project->GetPhpFileExtensions())) {
+			if (ResourceFileReader.InitForProject(resourceCache, App.Structs.AllEnabledSources(), App.Structs.GetPhpFileExtensions())) {
 					mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
 					if (ResourceFileReader.StartReading(error)) {
 						State = GOTO;
@@ -308,7 +307,7 @@ void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
 	}
 	else if (INDEXING_PROJECT == previousState) {
 		wxCommandEvent indexedEvent(mvceditor::EVENT_APP_PROJECT_INDEXED);
-		App->EventSink.Publish(indexedEvent);
+		App.EventSink.Publish(indexedEvent);
 	}
 }
 
@@ -354,7 +353,7 @@ void mvceditor::ResourcePluginClass::ShowJumpToResults(const wxString& finderQue
 			
 			// dont show the project path to the user
 			for (size_t i = 0; i < files.GetCount(); ++i) {
-				files[i] = GetProject()->RelativeFileName(files[i]);
+				files[i] = App.Structs.RelativeFileName(files[i]);
 				if (ResourceFinderClass::FILE_NAME != type &&
 					ResourceFinderClass::FILE_NAME_LINE_NUMBER != type) {
 					UnicodeString res = nonNativeMatches[i].ClassName + UNICODE_STRING_SIMPLE("::") + nonNativeMatches[i].Identifier;
@@ -374,8 +373,7 @@ void mvceditor::ResourcePluginClass::ShowJumpToResults(const wxString& finderQue
 }
 
 void mvceditor::ResourcePluginClass::StartIndex() {
-	mvceditor::ProjectClass* project = GetProject();
-	if (project && project->HasSources()) {
+	if (App.Structs.HasSources()) {
 
 		//prevent two finds at a time
 		if (FREE == State) { 
@@ -384,7 +382,7 @@ void mvceditor::ResourcePluginClass::StartIndex() {
 			// don't bother searching when path or expression is not valid
 			// need to do this so that the resource finder attempts to parse the files
 			resourceCache->PrepareAll(wxT("FakeClass"));			
-			if (ResourceFileReader.InitForProject(resourceCache, project->AllPhpSources(), project->GetPhpFileExtensions())) {
+			if (ResourceFileReader.InitForProject(resourceCache, App.Structs.AllEnabledSources(), App.Structs.GetPhpFileExtensions())) {
 					mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
 					if (ResourceFileReader.StartReading(error)) {
 						State = INDEXING_PROJECT;
@@ -488,7 +486,7 @@ void mvceditor::ResourcePluginClass::LoadPageFromResource(const wxString& finder
 }
 
 void mvceditor::ResourcePluginClass::OnUpdateUi(wxUpdateUIEvent& event) {
-	ProjectIndexMenu->Enable(GetProject() && FREE == State);
+	ProjectIndexMenu->Enable(App.Structs.HasSources() && FREE == State);
 	event.Skip();
 }
 
@@ -532,7 +530,7 @@ void mvceditor::ResourcePluginClass::OpenFile(wxString fileName) {
 void mvceditor::ResourcePluginClass::OnCmdReIndex(wxCommandEvent& event) {
 
 	// only index when there is a project open
-	if (GetProject()->HasSources()) {
+	if (App.Structs.HasSources()) {
 		StartIndex();
 	}
 }
@@ -545,7 +543,7 @@ void mvceditor::ResourcePluginClass::OnAppFileClosed(wxCommandEvent& event) {
 	// as well. don't want single-leaf files to be parsed for resources .. or
 	// do we?
 	wxString fileName = event.GetString();
-	if (!GetProject()->IsAPhpSourceFile(fileName)) {
+	if (!App.Structs.IsAPhpSourceFile(fileName)) {
 		ResourceFileReader.InitForFile(GetResourceCache(), fileName);
 		mvceditor::BackgroundFileReaderClass::StartError error;
 

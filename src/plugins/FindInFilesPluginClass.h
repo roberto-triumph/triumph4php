@@ -339,7 +339,7 @@ public:
 	/**
 	 * Constructor
 	 */
-	FindInFilesPluginClass();
+	FindInFilesPluginClass(mvceditor::AppClass& app);
 	
 	/**
 	 * Add menu items to the edit menu for this plugin.
