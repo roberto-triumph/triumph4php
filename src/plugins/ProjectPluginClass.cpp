@@ -167,6 +167,21 @@ void mvceditor::ProjectPluginClass::SavePreferences(wxCommandEvent& event) {
 	config->Write(wxT("/Project/PhpFileFilters"), PhpFileFiltersString);
 	config->Write(wxT("/Project/CssFileFilters"), CssFileFiltersString);
 	config->Write(wxT("/Project/SqlFileFilters"), SqlFileFiltersString);
+
+	// remove all project from the config
+	wxString key;
+	long index = 0;
+	bool next = config->GetFirstGroup(key, index);
+	std::vector<wxString> keysToDelete;
+	while (next) {
+		if (key.Find(wxT("Project_")) == 0) {
+			keysToDelete.push_back(key);
+		}
+		next = config->GetNextGroup(key, index);
+	}
+	for (size_t i = 0; i < keysToDelete.size(); ++i) {
+		config->DeleteGroup(keysToDelete[i]);
+	}
 	
 	for (size_t i = 0; i < DefinedProjects.size(); ++i) {
 		mvceditor::ProjectClass project = DefinedProjects[i];
@@ -603,7 +618,7 @@ void mvceditor::ProjectListDialogClass::OnProjectsListCheckbox(wxCommandEvent& e
 	size_t selection = event.GetSelection();
 	if (selection >= 0 && selection < EditedProjects.size()) {
 		mvceditor::ProjectClass project = EditedProjects[selection];
-		project.IsEnabled = event.IsChecked();
+		project.IsEnabled = ProjectsList->IsChecked(selection);
 		EditedProjects[selection] = project;
 	}
 }
