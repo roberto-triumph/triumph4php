@@ -25,7 +25,7 @@
 #ifndef __MVCEDITOR_DOCUMENTCLASS_H__
 #define __MVCEDITOR_DOCUMENTCLASS_H__
 
-#include <php_frameworks/ProjectClass.h>
+#include <environment/ProjectClass.h>
 #include <pelet/LexicalAnalyzerClass.h>
 #include <pelet/ParserClass.h>
 #include <pelet/LanguageDiscoveryClass.h>

@@ -25,6 +25,7 @@
 #include <wx/listbox.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
+#include <wx/checklst.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -68,7 +69,9 @@ class ProjectDefinitionDialogGeneratedClass : public wxDialog
 	private:
 	
 	protected:
-		wxStaticText* Label;
+		wxStaticText* LabelStatic;
+		wxTextCtrl* Label;
+		wxStaticText* SourcesLabel;
 		wxListBox* SourcesList;
 		wxButton* AddButton;
 		wxButton* RemoveButton;
@@ -119,6 +122,40 @@ class ProjectSourceDialogGeneratedClass : public wxDialog
 		
 		ProjectSourceDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Project Source"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 513,438 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~ProjectSourceDialogGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class ProjectListDialogGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class ProjectListDialogGeneratedClass : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* ProjectsLabel;
+		wxCheckListBox* ProjectsList;
+		wxButton* AddButton;
+		wxButton* RemoveButton;
+		wxButton* EditButton;
+		wxStdDialogButtonSizer* ButtonsSizer;
+		wxButton* ButtonsSizerOK;
+		wxButton* ButtonsSizerCancel;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnProjectsListDoubleClick( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnProjectsListCheckbox( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAddButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRemoveButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnEditButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		ProjectListDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Defined Projects"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 371,349 ), long style = wxDEFAULT_DIALOG_STYLE );
+		~ProjectListDialogGeneratedClass();
 	
 };
 

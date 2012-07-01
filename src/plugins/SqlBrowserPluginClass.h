@@ -28,7 +28,7 @@
 
 #include <PluginClass.h>
 #include <plugins/wxformbuilder/SqlBrowserPluginGeneratedClass.h>
-#include <php_frameworks/ProjectClass.h>
+#include <environment/ProjectClass.h>
 #include <environment/DatabaseInfoClass.h>
 #include <widgets/ThreadWithHeartbeatClass.h>
 #include <language/SqlLexicalAnalyzerClass.h>

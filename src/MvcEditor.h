@@ -22,7 +22,7 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <php_frameworks/ProjectClass.h>
+#include <environment/ProjectClass.h>
 #include <php_frameworks/FrameworkDetectorClass.h>
 #include <widgets/ResourceCacheClass.h>
 #include <windows/AppFrameClass.h>

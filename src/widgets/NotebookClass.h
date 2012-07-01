@@ -26,7 +26,7 @@
 #define MVCEDITORNOTEBOOKCLASS_H_
 
 #include <code_control/CodeControlClass.h>
-#include <php_frameworks/ProjectClass.h>
+#include <environment/ProjectClass.h>
 #include <environment/StructsClass.h>
 #include <Events.h>
 #include <wx/wx.h>

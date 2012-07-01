@@ -43,12 +43,17 @@ public:
 	/**
 	 * A friendly label for this project. This is usually set by a user.
 	 */
-	wxString Description;
+	wxString Label;
 
 	/**
 	 * The directories where source files are located in. 
 	 */
 	std::vector<mvceditor::SourceClass> Sources;
+
+	/**
+	 * If TRUE, this project is enabled and is used by MVC Editor.
+	 */
+	bool IsEnabled;
 	
 	/**
 	 * Construct a ProjectClass object from the given options

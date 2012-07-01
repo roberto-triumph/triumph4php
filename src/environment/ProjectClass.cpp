@@ -22,30 +22,32 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <php_frameworks/ProjectClass.h>
+#include <environment/ProjectClass.h>
 #include <wx/tokenzr.h>
 #include <vector>
 
 mvceditor::ProjectClass::ProjectClass()
-	: Description()
+	: Label()
 	, Sources()
+	, IsEnabled(true)
 	, PhpFileFilters()
 	, CssFileFilters()
 	, SqlFileFilters() {
 }
 
 mvceditor::ProjectClass::ProjectClass(const mvceditor::ProjectClass& project)
-	: Description(project.Description)
+	: Label(project.Label)
 	, Sources(project.Sources)
+	, IsEnabled(project.IsEnabled)
 	, PhpFileFilters(project.PhpFileFilters)
 	, CssFileFilters(project.CssFileFilters)
 	, SqlFileFilters(project.SqlFileFilters) {
-
 }
 
 void mvceditor::ProjectClass::operator=(const mvceditor::ProjectClass& project) {
-	Description =project.Description;
+	Label = project.Label;
 	Sources = project.Sources;
+	IsEnabled = project.IsEnabled;
 	PhpFileFilters = project.PhpFileFilters;
 	CssFileFilters = project.CssFileFilters;
 	SqlFileFilters = project.SqlFileFilters;

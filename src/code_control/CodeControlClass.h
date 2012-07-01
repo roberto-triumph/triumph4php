@@ -25,7 +25,7 @@
 #ifndef MVCEDITORCODECONTROLCLASS_H_
 #define MVCEDITORCODECONTROLCLASS_H_
 
-#include <php_frameworks/ProjectClass.h>
+#include <environment/ProjectClass.h>
 #include <code_control/CodeControlOptionsClass.h>
 #include <environment/StructsClass.h>
 #include <wx/stc/stc.h>

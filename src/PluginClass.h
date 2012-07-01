@@ -26,7 +26,7 @@
 #define __mvceditorpluginclass__
  
 #include <environment/EnvironmentClass.h>
-#include <php_frameworks/ProjectClass.h>
+#include <environment/ProjectClass.h>
 #include <php_frameworks/FrameworkDetectorClass.h>
 #include <widgets/NotebookClass.h>
 #include <widgets/ResourceCacheClass.h>

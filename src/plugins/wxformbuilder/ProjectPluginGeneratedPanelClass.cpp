@@ -120,15 +120,22 @@ ProjectDefinitionDialogGeneratedClass::ProjectDefinitionDialogGeneratedClass( wx
 	BoxSizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* FlexGridSizer;
-	FlexGridSizer = new wxFlexGridSizer( 4, 1, 0, 0 );
+	FlexGridSizer = new wxFlexGridSizer( 6, 1, 0, 0 );
 	FlexGridSizer->AddGrowableCol( 0 );
-	FlexGridSizer->AddGrowableRow( 1 );
+	FlexGridSizer->AddGrowableRow( 3 );
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );
 	FlexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	Label = new wxStaticText( this, wxID_ANY, _("Project Sources"), wxDefaultPosition, wxDefaultSize, 0 );
-	Label->Wrap( -1 );
-	FlexGridSizer->Add( Label, 1, wxALL|wxEXPAND, 5 );
+	LabelStatic = new wxStaticText( this, wxID_ANY, _("Project Label"), wxDefaultPosition, wxDefaultSize, 0 );
+	LabelStatic->Wrap( -1 );
+	FlexGridSizer->Add( LabelStatic, 0, wxALL|wxEXPAND, 5 );
+	
+	Label = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	FlexGridSizer->Add( Label, 0, wxALL|wxEXPAND, 5 );
+	
+	SourcesLabel = new wxStaticText( this, wxID_ANY, _("Project Sources"), wxDefaultPosition, wxDefaultSize, 0 );
+	SourcesLabel->Wrap( -1 );
+	FlexGridSizer->Add( SourcesLabel, 1, wxALL|wxEXPAND, 5 );
 	
 	SourcesList = new wxListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_SINGLE ); 
 	FlexGridSizer->Add( SourcesList, 1, wxALL|wxEXPAND, 5 );
@@ -243,5 +250,79 @@ ProjectSourceDialogGeneratedClass::~ProjectSourceDialogGeneratedClass()
 {
 	// Disconnect Events
 	ButtonsSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectSourceDialogGeneratedClass::OnOkButton ), NULL, this );
+	
+}
+
+ProjectListDialogGeneratedClass::ProjectListDialogGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* BoxSizer;
+	BoxSizer = new wxBoxSizer( wxVERTICAL );
+	
+	wxFlexGridSizer* FlexGridSizer;
+	FlexGridSizer = new wxFlexGridSizer( 4, 1, 0, 0 );
+	FlexGridSizer->AddGrowableCol( 0 );
+	FlexGridSizer->AddGrowableRow( 1 );
+	FlexGridSizer->SetFlexibleDirection( wxBOTH );
+	FlexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	ProjectsLabel = new wxStaticText( this, wxID_ANY, _("Defined Projects"), wxDefaultPosition, wxDefaultSize, 0 );
+	ProjectsLabel->Wrap( -1 );
+	FlexGridSizer->Add( ProjectsLabel, 0, wxALL|wxEXPAND, 5 );
+	
+	wxArrayString ProjectsListChoices;
+	ProjectsList = new wxCheckListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, ProjectsListChoices, 0 );
+	FlexGridSizer->Add( ProjectsList, 1, wxALL|wxEXPAND, 5 );
+	
+	wxBoxSizer* CrudButtonsSizer;
+	CrudButtonsSizer = new wxBoxSizer( wxHORIZONTAL );
+	
+	AddButton = new wxButton( this, wxID_ANY, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
+	CrudButtonsSizer->Add( AddButton, 0, wxALL, 5 );
+	
+	RemoveButton = new wxButton( this, wxID_ANY, _("Remove"), wxDefaultPosition, wxDefaultSize, 0 );
+	CrudButtonsSizer->Add( RemoveButton, 0, wxALL, 5 );
+	
+	EditButton = new wxButton( this, wxID_ANY, _("Edit"), wxDefaultPosition, wxDefaultSize, 0 );
+	CrudButtonsSizer->Add( EditButton, 0, wxALL, 5 );
+	
+	FlexGridSizer->Add( CrudButtonsSizer, 1, wxEXPAND, 5 );
+	
+	ButtonsSizer = new wxStdDialogButtonSizer();
+	ButtonsSizerOK = new wxButton( this, wxID_OK );
+	ButtonsSizer->AddButton( ButtonsSizerOK );
+	ButtonsSizerCancel = new wxButton( this, wxID_CANCEL );
+	ButtonsSizer->AddButton( ButtonsSizerCancel );
+	ButtonsSizer->Realize();
+	FlexGridSizer->Add( ButtonsSizer, 1, wxEXPAND, 5 );
+	
+	BoxSizer->Add( FlexGridSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( BoxSizer );
+	this->Layout();
+	
+	this->Centre( wxBOTH );
+	
+	// Connect Events
+	ProjectsList->Connect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnProjectsListDoubleClick ), NULL, this );
+	ProjectsList->Connect( wxEVT_COMMAND_CHECKLISTBOX_TOGGLED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnProjectsListCheckbox ), NULL, this );
+	AddButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnAddButton ), NULL, this );
+	RemoveButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnRemoveButton ), NULL, this );
+	EditButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnEditButton ), NULL, this );
+	ButtonsSizerCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnCancelButton ), NULL, this );
+	ButtonsSizerOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnOkButton ), NULL, this );
+}
+
+ProjectListDialogGeneratedClass::~ProjectListDialogGeneratedClass()
+{
+	// Disconnect Events
+	ProjectsList->Disconnect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnProjectsListDoubleClick ), NULL, this );
+	ProjectsList->Disconnect( wxEVT_COMMAND_CHECKLISTBOX_TOGGLED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnProjectsListCheckbox ), NULL, this );
+	AddButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnAddButton ), NULL, this );
+	RemoveButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnRemoveButton ), NULL, this );
+	EditButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnEditButton ), NULL, this );
+	ButtonsSizerCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnCancelButton ), NULL, this );
+	ButtonsSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnOkButton ), NULL, this );
 	
 }

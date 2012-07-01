@@ -82,8 +82,8 @@ bool mvceditor::AppClass::OnInit() {
 	}	
 	Preferences.Load(AppFrame);
 
-	// open a new project
-	ProjectPlugin->ProjectOpen(wxT(""));
+	// open the default project
+	ProjectPlugin->ProjectOpenDefault();
 
 	AppFrame->AuiManagerUpdate();
 	if (CommandLine()) {

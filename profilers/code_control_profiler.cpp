@@ -29,7 +29,7 @@
 #include <code_control/CodeControlOptionsClass.h>
 #include <code_control/CodeControlClass.h>
 #include <environment/StructsClass.h>
-#include <php_frameworks/ProjectClass.h>
+#include <environment/ProjectClass.h>
 #include <search/FindInFilesClass.h>
 
 /**

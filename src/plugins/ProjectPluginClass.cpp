@@ -31,6 +31,7 @@
 #include <wx/filename.h>
 #include <wx/fileconf.h>
 #include <wx/stdpaths.h>
+#include <wx/valgen.h>
 #include <algorithm>
 
 static const int ID_FRAMEWORK_DETECTION_GAUGE = wxNewId();
@@ -42,6 +43,8 @@ mvceditor::ProjectPluginClass::ProjectPluginClass()
 	, CssFileFiltersString()
 	, SqlFileFiltersString()
 	, History(MAX_PROJECT_HISTORY, mvceditor::MENU_PROJECT)
+	, DefaultProject()
+	, DefinedProjects()
 	, PhpFrameworks(NULL)
 	, RecentProjectsMenu(NULL) {
 	PhpFileFiltersString = wxT("*.php");
@@ -70,7 +73,7 @@ void mvceditor::ProjectPluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
 }
 
 void mvceditor::ProjectPluginClass::AddFileMenuItems(wxMenu* fileMenu) {
-	fileMenu->Append(mvceditor::MENU_PROJECT + MAX_PROJECT_HISTORY + 4, _("Define Project"), _("Add additional source directories to the current project"), wxITEM_NORMAL);
+	fileMenu->Append(mvceditor::MENU_PROJECT + MAX_PROJECT_HISTORY + 4, _("Defined Projects"), _("Add additional source directories to the current project"), wxITEM_NORMAL);
 }
 
 
@@ -99,6 +102,46 @@ void mvceditor::ProjectPluginClass::LoadPreferences(wxConfigBase* config) {
 		project->SetCssFileExtensionsString(CssFileFiltersString);
 		project->SetSqlFileExtensionsString(SqlFileFiltersString);
 	}
+	DefinedProjects.clear();
+	wxString key;
+	long index;
+	int projectIndex = 0;
+	bool next = config->GetFirstGroup(key, index);
+	while (next) {
+		if (key.Find(wxT("Project_")) == 0) {
+			mvceditor::ProjectClass newProject;
+			int sourcesCount = 0;
+
+			wxString keyLabel = wxString::Format(wxT("/Project_%d/Label"), projectIndex);
+			wxString keyEnabled = wxString::Format(wxT("/Project_%d/IsEnabled"), projectIndex);
+			wxString keySourceCount = wxString::Format(wxT("/Project_%d/SourceCount"), projectIndex);
+			config->Read(keyLabel, &newProject.Label);
+			config->Read(keyEnabled, &newProject.IsEnabled);
+			config->Read(keySourceCount, &sourcesCount);
+			for (int j = 0; j < sourcesCount; ++j) {
+				wxString keyRootPath = wxString::Format(wxT("/Project_%d/Source_%d_RootDirectory"), projectIndex, j);
+				wxString keyInclude = wxString::Format(wxT("/Project_%d/Source_%d_IncludeWildcards"), projectIndex, j);
+				wxString keyExclude = wxString::Format(wxT("/Project_%d/Source_%d_ExcludeWildcards"), projectIndex, j);
+
+				mvceditor::SourceClass src;
+				wxString rootDir = config->Read(keyRootPath);
+				wxString includeWildcards = config->Read(keyInclude);
+				wxString excludeWildcards = config->Read(keyExclude);
+				
+				src.RootDirectory.AssignDir(rootDir);
+				src.SetIncludeWildcards(includeWildcards);
+				src.SetExcludeWildcards(excludeWildcards);
+				if (src.RootDirectory.IsOk()) {
+					newProject.AddSource(src);
+				}
+			}
+			if (newProject.HasSources()) {
+				DefinedProjects.push_back(newProject);
+				projectIndex++;
+			}
+		}
+		next = config->GetNextGroup(key, index);
+	}
 
 
 	// read the recent projects from a separate config file
@@ -125,11 +168,23 @@ void mvceditor::ProjectPluginClass::SavePreferences(wxCommandEvent& event) {
 	config->Write(wxT("/Project/CssFileFilters"), CssFileFiltersString);
 	config->Write(wxT("/Project/SqlFileFilters"), SqlFileFiltersString);
 	
-	mvceditor::ProjectClass* project = GetProject();
-	if (project) {
-		project->SetPhpFileExtensionsString(PhpFileFiltersString);
-		project->SetCssFileExtensionsString(CssFileFiltersString);
-		project->SetSqlFileExtensionsString(SqlFileFiltersString);
+	for (size_t i = 0; i < DefinedProjects.size(); ++i) {
+		mvceditor::ProjectClass project = DefinedProjects[i];
+		wxString keyLabel = wxString::Format(wxT("/Project_%d/Label"), i);
+		wxString keyEnabled = wxString::Format(wxT("/Project_%d/IsEnabled"), i);
+		wxString keySourceCount = wxString::Format(wxT("/Project_%d/SourceCount"), i);
+		config->Write(keyLabel, project.Label);
+		config->Write(keyEnabled, project.IsEnabled);
+		config->Write(keySourceCount, (int)project.Sources.size());
+		for (size_t j = 0; j < project.Sources.size(); ++j) {
+			mvceditor::SourceClass source = project.Sources[j];			
+			wxString keyRootPath = wxString::Format(wxT("/Project_%d/Source_%d_RootDirectory"), i, j);
+			wxString keyInclude = wxString::Format(wxT("/Project_%d/Source_%d_IncludeWildcards"), i, j);
+			wxString keyExclude = wxString::Format(wxT("/Project_%d/Source_%d_ExcludeWildcards"), i, j);			
+			config->Write(keyRootPath, source.RootDirectory.GetFullPath());
+			config->Write(keyInclude, source.IncludeWildcardsString());
+			config->Write(keyExclude, source.ExcludeWildcardsString());
+		}
 	}
 }
 
@@ -247,13 +302,14 @@ void mvceditor::ProjectPluginClass::ProjectOpen(const wxString& directoryPath) {
 	}
 	CloseProject();
 	App->Project = new ProjectClass();
-	mvceditor::SourceClass src;
-	src.RootDirectory.Assign(directoryPath);
-	App->Project->AddSource(src);
-	App->Project->Description = directoryPath;
-
-	// on startup the editor is in "non-project" mode (no root path)
+	
 	if (!directoryPath.IsEmpty()) {
+		mvceditor::SourceClass src;
+		src.RootDirectory.Assign(directoryPath);
+		src.SetIncludeWildcards(wxT("*.*"));
+		App->Project->AddSource(src);
+		App->Project->Label = directoryPath;
+
 		bool started = PhpFrameworks->Init(directoryPath);
 		if (!started) {
 			mvceditor::EditorLogError(mvceditor::BAD_PHP_EXECUTABLE, GetEnvironment()->Php.PhpExecutablePath); 
@@ -263,14 +319,36 @@ void mvceditor::ProjectPluginClass::ProjectOpen(const wxString& directoryPath) {
 			gauge->AddGauge(_("Framework Detection"), ID_FRAMEWORK_DETECTION_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
 		}
 	}
+}
+
+void mvceditor::ProjectPluginClass::ProjectOpenDefault() {
+	if (!PhpFrameworks.get()) {
+		PhpFrameworks.reset(new mvceditor::PhpFrameworkDetectorClass(*this, RunningThreads, *GetEnvironment()));
+	}
+
+	App->Project = new ProjectClass();
+	App->Project->Sources = DefaultProject.Sources;
+	App->Project->Label = DefaultProject.Label;
+
+	App->Project->SetPhpFileExtensionsString(PhpFileFiltersString);
+	App->Project->SetCssFileExtensionsString(CssFileFiltersString);
+	App->Project->SetSqlFileExtensionsString(SqlFileFiltersString);
+
+	if (App->Project->HasSources()) {
+
+		// TODO multiple sources & projects
+		bool started = PhpFrameworks->Init(App->Project->Sources[0].RootDirectory.GetPath());
+		if (!started) {
+			mvceditor::EditorLogError(mvceditor::BAD_PHP_EXECUTABLE, GetEnvironment()->Php.PhpExecutablePath); 
+		}
+		else {
+			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
+			gauge->AddGauge(_("Framework Detection"), ID_FRAMEWORK_DETECTION_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
+		}
+	}
 	else {
-	
-		App->Project->SetPhpFileExtensionsString(PhpFileFiltersString);
-		App->Project->SetCssFileExtensionsString(CssFileFiltersString);
-		App->Project->SetSqlFileExtensionsString(SqlFileFiltersString);
-		
 		// still notify the plugins of the new project at program startup
-		// when the app starts the "empty" project is opened
+		// when the app starts the default project is opened
 		wxCommandEvent evt(mvceditor::EVENT_APP_PROJECT_OPENED);
 		App->EventSink.Publish(evt);
 	}
@@ -357,9 +435,14 @@ void mvceditor::ProjectPluginClass::OnFrameworkDetectionInProgress(wxCommandEven
 }
 
 void mvceditor::ProjectPluginClass::OnProjectDefine(wxCommandEvent& event) {
-	mvceditor::ProjectDefinitionDialogClass dialog(GetMainWindow(), *GetProject());
+	mvceditor::ProjectListDialogClass dialog(GetMainWindow(), DefinedProjects);
 	if (wxOK == dialog.ShowModal()) {
 		// TODO: re-trigger indexing ?
+
+		wxCommandEvent evt;
+		SavePreferences(evt);
+		wxConfigBase* config = wxConfig::Get();
+		config->Flush();
 	}
 }
 
@@ -388,7 +471,10 @@ mvceditor::ProjectDefinitionDialogClass::ProjectDefinitionDialogClass(wxWindow* 
 	: ProjectDefinitionDialogGeneratedClass(parent)
 	, Project(project)
 	, EditedProject(project) {
+	wxGenericValidator labelValidator(&EditedProject.Label);
+	Label->SetValidator(labelValidator);
 	Populate();
+	TransferDataToWindow();
 }
 void mvceditor::ProjectDefinitionDialogClass::OnAddSource(wxCommandEvent& event) {
 	mvceditor::SourceClass newSrc;
@@ -430,6 +516,7 @@ void mvceditor::ProjectDefinitionDialogClass::OnRemoveSource(wxCommandEvent& eve
 }
 
 void mvceditor::ProjectDefinitionDialogClass::OnOkButton(wxCommandEvent& event) {
+	TransferDataFromWindow();
 	if (!EditedProject.HasSources()) {
 		wxMessageBox(_("Project must have at least one source directory"));
 		return;
@@ -483,7 +570,7 @@ void mvceditor::ProjectSourceDialogClass::OnOkButton(wxCommandEvent& event) {
 		wxMessageBox(_("Root directory must exist."));
 		return;
 	}
-	Source.RootDirectory.Assign(path);
+	Source.RootDirectory.AssignDir(path);
 	Source.SetIncludeWildcards(IncludeWildcards->GetValue());
 	Source.SetExcludeWildcards(ExcludeWildcards->GetValue());
 	EndModal(wxOK);
@@ -491,6 +578,91 @@ void mvceditor::ProjectSourceDialogClass::OnOkButton(wxCommandEvent& event) {
 
 void mvceditor::ProjectSourceDialogClass::OnCancelButton(wxCommandEvent& event) {
 	EndModal(wxCANCEL);
+}
+
+mvceditor::ProjectListDialogClass::ProjectListDialogClass(wxWindow* parent, std::vector<mvceditor::ProjectClass>& projects)
+	: ProjectListDialogGeneratedClass(parent)
+	, Projects(projects)
+	, EditedProjects(projects) {
+	Populate();
+}
+
+void mvceditor::ProjectListDialogClass::OnProjectsListDoubleClick(wxCommandEvent& event) {
+	size_t selection = event.GetSelection();
+	if (selection >= 0 && selection < EditedProjects.size()) {
+		mvceditor::ProjectClass project = EditedProjects[selection];
+		mvceditor::ProjectDefinitionDialogClass dialog(this, project);
+		if (wxOK == dialog.ShowModal()) {
+			EditedProjects[selection] = project;
+			ProjectsList->SetString(selection, project.Label);
+		}
+	}
+}
+
+void mvceditor::ProjectListDialogClass::OnProjectsListCheckbox(wxCommandEvent& event) {
+	size_t selection = event.GetSelection();
+	if (selection >= 0 && selection < EditedProjects.size()) {
+		mvceditor::ProjectClass project = EditedProjects[selection];
+		project.IsEnabled = event.IsChecked();
+		EditedProjects[selection] = project;
+	}
+}
+
+void mvceditor::ProjectListDialogClass::OnAddButton(wxCommandEvent& event) {
+	mvceditor::ProjectClass project;
+	mvceditor::ProjectDefinitionDialogClass dialog(this, project);
+	if (wxOK == dialog.ShowModal()) {
+		EditedProjects.push_back(project);
+		ProjectsList->Append(project.Label);
+		ProjectsList->Check(ProjectsList->GetCount() - 1, true);
+	}
+}
+
+void mvceditor::ProjectListDialogClass::OnRemoveButton(wxCommandEvent& event) {
+	size_t selection = ProjectsList->GetSelection();
+	if (selection >= 0 && selection < EditedProjects.size()) {
+		mvceditor::ProjectClass project = EditedProjects[selection];
+		wxString msg = _("Are you sure you wish to remove the project? ");
+		msg += project.Label;
+		msg += wxT("\n");
+		msg += _("MVC Editor will no longer open or index files in any sources of this project. Note that no directories are actually deleted from the file system");
+		wxString caption = _("Remove Project");
+		int response = wxMessageBox(msg, caption, wxYES_NO);
+		if (wxYES == response) {
+			EditedProjects.erase(EditedProjects.begin() + selection);
+			ProjectsList->Delete(selection);
+		}
+	}
+}
+
+void mvceditor::ProjectListDialogClass::OnEditButton(wxCommandEvent& event) {
+	size_t selection = ProjectsList->GetSelection();
+	if (selection >= 0 && selection < EditedProjects.size()) {
+		mvceditor::ProjectClass project = EditedProjects[selection];
+		mvceditor::ProjectDefinitionDialogClass dialog(this, project);
+		if (wxOK == dialog.ShowModal()) {
+			EditedProjects[selection] = project;
+			ProjectsList->SetString(selection, project.Label);
+		}
+	}
+}
+
+void mvceditor::ProjectListDialogClass::OnOkButton(wxCommandEvent& event) {
+	Projects = EditedProjects;
+	EndModal(wxOK);
+}
+
+void mvceditor::ProjectListDialogClass::OnCancelButton(wxCommandEvent& event) {
+	EndModal(wxCANCEL);
+}
+
+void mvceditor::ProjectListDialogClass::Populate() {
+	ProjectsList->Clear();
+	for (size_t i = 0; i < EditedProjects.size(); ++i) {
+		mvceditor::ProjectClass project = EditedProjects[i];
+		ProjectsList->Append(project.Label);
+		ProjectsList->Check(ProjectsList->GetCount() - 1, project.IsEnabled);
+	}
 }
 
 BEGIN_EVENT_TABLE(mvceditor::ProjectPluginClass, wxEvtHandler)

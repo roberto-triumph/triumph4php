@@ -69,6 +69,12 @@ public:
 	void ProjectOpen(const wxString& directoryPath);
 
 	/**
+	 * Opens the 'default' project. It will be the one that was opened on the last
+	 * run of the program.
+	 */
+	void ProjectOpenDefault();
+
+	/**
 	 * Add menu items to the project menu
 	 */
 	void AddProjectMenuItems(wxMenu* projectMenu);
@@ -156,6 +162,16 @@ private:
 	wxFileHistory History;
 
 	/**
+	 * settings for the project that is opened at the start of the program
+	 */
+	mvceditor::ProjectClass DefaultProject;
+
+	/**
+	 * All of the projects defined by the user.
+	 */
+	std::vector<mvceditor::ProjectClass> DefinedProjects;
+
+	/**
 	 * This object will be used to detct the various PHP framework artifacts (resources,
 	 * database connections, route URLs).
 	 */
@@ -187,6 +203,9 @@ protected:
 	void OnFileChanged(wxFileDirPickerEvent& event);
 };
 
+/**
+ * Dialog to edit a single project (add multiple sources to a project)
+ */
 class ProjectDefinitionDialogClass : public ProjectDefinitionDialogGeneratedClass {
 
 protected:
@@ -219,6 +238,9 @@ private:
 	void Populate();
 };
 
+/**
+ * Dialog to add a source directory to a project
+ */
 class ProjectSourceDialogClass : public ProjectSourceDialogGeneratedClass {
 
 protected:
@@ -241,6 +263,44 @@ private:
 	 * The source being edited by the user
 	 */
 	mvceditor::SourceClass EditedSource;
+};
+
+/**
+ * Dialog to add, remove, edit, or enable/disable projects.
+ */
+class ProjectListDialogClass : public ProjectListDialogGeneratedClass {
+
+protected:
+
+	void OnProjectsListDoubleClick(wxCommandEvent& event);
+	void OnProjectsListCheckbox(wxCommandEvent& event);
+	void OnAddButton(wxCommandEvent& event);
+	void OnRemoveButton(wxCommandEvent& event);
+	void OnEditButton(wxCommandEvent& event);
+	void OnOkButton(wxCommandEvent& event);
+	void OnCancelButton(wxCommandEvent& event);
+
+public:
+
+	ProjectListDialogClass(wxWindow* parent, std::vector<mvceditor::ProjectClass>& projects);
+
+private:
+
+	/**
+	 * The list that will get updated once the user clicks OK
+	 */
+	std::vector<mvceditor::ProjectClass>& Projects;
+
+	/**
+	 * The projects being edited by the user.
+	 */
+	std::vector<mvceditor::ProjectClass> EditedProjects;
+
+	/**
+	 * add the project labels to the check list box
+	 */
+	void Populate();
+
 };
 
 }

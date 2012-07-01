@@ -56,7 +56,10 @@ mvceditor::SourceClass::~SourceClass() {
 void mvceditor::SourceClass::Copy(const mvceditor::SourceClass& src) {
 	SetIncludeWildcards(src.IncludeWildcardsString());
 	SetExcludeWildcards(src.ExcludeWildcardsString());
-	RootDirectory = src.RootDirectory;
+
+	wxString path;
+	path.Append(src.RootDirectory.GetPath());
+	RootDirectory.AssignDir(path);
 }
 
 void mvceditor::SourceClass::operator=(const mvceditor::SourceClass& src) {

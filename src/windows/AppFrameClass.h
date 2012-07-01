@@ -25,7 +25,7 @@
 #ifndef MVCEDITORAPPFRAMECLASS_H_
 #define MVCEDITORAPPFRAMECLASS_H_
 
-#include <php_frameworks/ProjectClass.h>
+#include <environment/ProjectClass.h>
 #include <windows/wxformbuilder/AppFrameGeneratedClass.h>
 #include <widgets/NotebookClass.h>
 #include <PluginClass.h>
