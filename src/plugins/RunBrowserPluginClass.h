@@ -181,7 +181,7 @@ private:
 	 * for the url detection (event handler is given in the PhpFrameworkDetector
 	 * class constructor)
 	 */
-	std::auto_ptr<PhpFrameworkDetectorClass> PhpFrameworks;
+	mvceditor::PhpFrameworkDetectorClass PhpFrameworks;
 	
 	/**
 	 * Will use a background thread to persist the global cache. The global cache file is

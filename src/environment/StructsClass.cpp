@@ -36,7 +36,8 @@ mvceditor::StructsClass::StructsClass()
 	, CurrentUrl() 
 	, PhpFileFiltersString(wxT("*.php"))	
 	, CssFileFiltersString(wxT("*.css"))
-	, SqlFileFiltersString(wxT("*.sql")) {
+	, SqlFileFiltersString(wxT("*.sql"))
+	, Frameworks() {
 }
 
 

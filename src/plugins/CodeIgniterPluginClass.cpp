@@ -45,7 +45,9 @@ void mvceditor::CodeIgniterPluginClass::AddNewMenu(wxMenuBar *menuBar) {
 
 void mvceditor::CodeIgniterPluginClass::OnProjectOpened(wxCommandEvent& event) {
 	ConfigFiles.clear();
-	ConfigFiles = PhPFrameworks().ConfigFiles;
+	for (size_t i = 0; i < App.Structs.Frameworks.size(); ++i) {
+		ConfigFiles.insert(App.Structs.Frameworks[i].ConfigFiles.begin(), App.Structs.Frameworks[i].ConfigFiles.end());
+	}
 	if (!ConfigFiles.empty()) {
 
 		// remove the files from any previously opened project
@@ -72,7 +74,9 @@ void mvceditor::CodeIgniterPluginClass::OnProjectOpened(wxCommandEvent& event) {
 		}
 	}
 	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
-	resourceCache->GlobalAddDynamicResources(PhPFrameworks().Resources);
+	for (size_t i = 0; i < App.Structs.Frameworks.size(); ++i) {
+		resourceCache->GlobalAddDynamicResources(App.Structs.Frameworks[i].Resources);
+	}
 }
 
 void mvceditor::CodeIgniterPluginClass::UpdateMenu() {

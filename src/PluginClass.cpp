@@ -62,10 +62,6 @@ mvceditor::ResourceCacheClass* mvceditor::PluginClass::GetResourceCache() {
 	return &App.Structs.ResourceCache;
 }
 
-mvceditor::PhpFrameworkDetectorClass& mvceditor::PluginClass::PhPFrameworks() const {
-	return App.PhpFrameworks;
-}
-
 void mvceditor::PluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
 }
 

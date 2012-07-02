@@ -51,12 +51,6 @@ public:
 	 * To keep track of background threads
 	 */
 	mvceditor::RunningThreadsClass RunningThreads;
-		
-	/**
-	 * This object will be used to detct the various PHP framework artifacts (resources,
-	 * database connections, route URLs).
-	 */
-	PhpFrameworkDetectorClass PhpFrameworks;
 
 	/**
 	 * Any plugins should post any useful events to this event handler

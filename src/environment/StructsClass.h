@@ -105,6 +105,11 @@ public:
 	 */
 	wxString SqlFileFiltersString;
 
+	/**
+	 * framework info that was detected
+	 */
+	std::vector<mvceditor::FrameworkClass> Frameworks;
+
 	StructsClass();
 
 	/**

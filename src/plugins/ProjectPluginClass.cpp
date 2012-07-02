@@ -35,13 +35,11 @@
 #include <algorithm>
 
 static const int ID_FRAMEWORK_DETECTION_GAUGE = wxNewId();
-static const int MAX_PROJECT_HISTORY = 5;
 
 mvceditor::ProjectPluginClass::ProjectPluginClass(mvceditor::AppClass& app) 
 	: PluginClass(app)
-	, History(MAX_PROJECT_HISTORY, mvceditor::MENU_PROJECT)
-	, PhpFrameworks(NULL)
-	, RecentProjectsMenu(NULL) {
+	, PhpFrameworks(*this, RunningThreads, app.Structs.Environment) 
+	, DirectoriesToDetect() {
 	wxPlatformInfo info;
 	switch (info.GetOperatingSystemId()) {
 		case wxOS_WINDOWS_NT:
@@ -57,30 +55,27 @@ mvceditor::ProjectPluginClass::ProjectPluginClass(mvceditor::AppClass& app)
 }
 
 void mvceditor::ProjectPluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
-	projectMenu->Append(mvceditor::MENU_PROJECT + MAX_PROJECT_HISTORY + 1, _("Explore"), _("Open An explorer window in the Project Root"), wxITEM_NORMAL);
-	projectMenu->Append(mvceditor::MENU_PROJECT + MAX_PROJECT_HISTORY + 2, _("Explore Open File"), _("Open An explorer window in the currently opened file"), wxITEM_NORMAL);
-	RecentProjectsMenu = new wxMenu(0);
-	History.UseMenu(RecentProjectsMenu);
-	projectMenu->Append(mvceditor::MENU_PROJECT + MAX_PROJECT_HISTORY + 3, _("Recent Projects"), RecentProjectsMenu, _("Open An explorer window in the Project Root"));
+	projectMenu->Append(mvceditor::MENU_PROJECT + 1, _("Explore"), _("Open An explorer window in the Project Root"), wxITEM_NORMAL);
+	projectMenu->Append(mvceditor::MENU_PROJECT + 2, _("Explore Open File"), _("Open An explorer window in the currently opened file"), wxITEM_NORMAL);
 }
 
 void mvceditor::ProjectPluginClass::AddFileMenuItems(wxMenu* fileMenu) {
-	fileMenu->Append(mvceditor::MENU_PROJECT + MAX_PROJECT_HISTORY + 4, _("Defined Projects"), _("Add additional source directories to the current project"), wxITEM_NORMAL);
+	fileMenu->Append(mvceditor::MENU_PROJECT + 3, _("Defined Projects"), _("Add additional source directories to the current project"), wxITEM_NORMAL);
 }
 
 
 void mvceditor::ProjectPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
-	menuItemIds[mvceditor::MENU_PROJECT + MAX_PROJECT_HISTORY + 1] = wxT("Project-Explore");
-	menuItemIds[mvceditor::MENU_PROJECT + MAX_PROJECT_HISTORY + 2] = wxT("Project-Explore File");
+	menuItemIds[mvceditor::MENU_PROJECT + 1] = wxT("Project-Explore");
+	menuItemIds[mvceditor::MENU_PROJECT + 2] = wxT("Project-Explore File");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
 void mvceditor::ProjectPluginClass::AddToolBarItems(wxAuiToolBar* toolbar) {
 	wxBitmap bitmap = wxArtProvider::GetBitmap(wxART_FOLDER_OPEN, wxART_TOOLBAR, wxSize(16, 16));
-	toolbar->AddTool(mvceditor::MENU_PROJECT + MAX_PROJECT_HISTORY + 1, _("Explore"), bitmap, _("Open An explorer window in the Project Root"));
+	toolbar->AddTool(mvceditor::MENU_PROJECT + 1, _("Explore"), bitmap, _("Open An explorer window in the Project Root"));
 	bitmap = wxArtProvider::GetBitmap(wxART_FOLDER_OPEN, wxART_TOOLBAR, wxSize(16, 16));
-	toolbar->AddTool(mvceditor::MENU_PROJECT + MAX_PROJECT_HISTORY + 2, _("Explore Open File"), bitmap, _("Open An explorer window in the currently opened file"));
+	toolbar->AddTool(mvceditor::MENU_PROJECT + 2, _("Explore Open File"), bitmap, _("Open An explorer window in the currently opened file"));
 }
 
 void mvceditor::ProjectPluginClass::LoadPreferences(wxConfigBase* config) {
@@ -133,23 +128,6 @@ void mvceditor::ProjectPluginClass::LoadPreferences(wxConfigBase* config) {
 		}
 		next = config->GetNextGroup(key, index);
 	}
-
-
-	// read the recent projects from a separate config file
-	// the decision to keep the recent projects separate from the settings config file is because
-	// the recent projects file changes more often, and there may be cases when config files can
-	// be copied between different computer / people without affecting the recent files list
-	wxStandardPaths paths;
-	wxString recentFileConfigFilePath = paths.GetUserConfigDir() + wxFileName::GetPathSeparator() + wxT(".mvc_editor_projects.ini");
-	wxFileName fileName(recentFileConfigFilePath);
-	if (fileName.FileExists()) {
-		wxFileInputStream input(recentFileConfigFilePath);
-		if (input.IsOk()) {
-			wxFileConfig recentFileConfig(input);
-			History.Load(recentFileConfig);
-		}
-	}
-	SyncMenu();
 }
 
 void mvceditor::ProjectPluginClass::SavePreferences(wxCommandEvent& event) {
@@ -194,72 +172,6 @@ void mvceditor::ProjectPluginClass::SavePreferences(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::ProjectPluginClass::PersistProjectList() {
-
-	// recent projects file will have 1 group per project; like this
-	// 
-	// [project_1]
-	// Path = /home/user/projects/project_one
-	//
-	// [project_2]
-	// Path = /home/user/projects/project_two
-	//
-	wxStandardPaths paths;
-	wxString recentFileConfigFilePath = paths.GetUserConfigDir() + wxFileName::GetPathSeparator() + wxT(".mvc_editor_projects.ini");
-
-	// attempted to use the style wxCONFIG_USE_NO_ESCAPE_CHARACTERS  but there seems to be no way to set this
-	// flag when reading the file in
-	wxFileConfig recentFileConfig(wxT("mvc_editor"), wxEmptyString, recentFileConfigFilePath, wxEmptyString, 
-		wxCONFIG_USE_LOCAL_FILE);
-
-	History.Save(recentFileConfig);
-	wxFileOutputStream output(recentFileConfigFilePath);
-	recentFileConfig.Save(output);
-}
-
-void mvceditor::ProjectPluginClass::SyncMenu() {
-	if (RecentProjectsMenu) {
-		//History.AddFilesToMenu(RecentProjectsMenu);
-		
-		// ATTN: possible problem. according to wxWidgets docs
-		//     Append the submenu to the parent menu after you have added your menu items, or accelerators may 
-		//     not be registered properly.
-		//
-		// wont worry about that for now since project menu items don't have accelerators automatically
-	}
-}
-
-void mvceditor::ProjectPluginClass::OnMenu(wxCommandEvent& event) {
-	size_t id = (size_t)event.GetId();
-	if (id >= (size_t)mvceditor::MENU_PROJECT && id < (mvceditor::MENU_PROJECT + History.GetCount())) {
-		size_t index = id - mvceditor::MENU_PROJECT;
-		wxString project = History.GetHistoryFile(index);
-		bool remove = false;
-		if (wxFileName::FileExists(project)) {
-			int ret = wxMessageBox(_("Path is not a directory. Remove from Recent list?\n") + project, _("Warning"), 
-				wxCENTER | wxICON_ERROR | wxYES_NO);
-			remove = wxYES == ret;
-		}
-		else if (!wxFileName::DirExists(project)) {
-			int ret = wxMessageBox(_("Path no longer exists. Remove from Recent list?\n") + project, _("Warning"), 
-				wxCENTER | wxICON_ERROR | wxYES_NO);
-			remove = wxYES == ret;
-		}
-		else {
-			ProjectOpen(project);
-		}
-		if (remove) {
-			if (index < History.GetCount()) {
-				History.RemoveFileFromHistory(index);
-				PersistProjectList();
-			}
-		}
-	}
-	else {
-		event.Skip();
-	}
-}
-
 void mvceditor::ProjectPluginClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 	ProjectPluginPanelClass* panel = new ProjectPluginPanelClass(parent, *this);
 	parent->AddPage(panel, wxT("Project"));
@@ -278,7 +190,7 @@ void mvceditor::ProjectPluginClass::OnProjectExplore(wxCommandEvent& event) {
 		}
 	}
 	else {
-		wxMessageBox(_("Need to open a project first in order for Explore to work."), _("Project Explore"));
+		wxMessageBox(_("Need to define a project first in order for Explore to work."), _("Project Explore"));
 	}
 }
 
@@ -302,9 +214,7 @@ void mvceditor::ProjectPluginClass::OnProjectExploreOpenFile(wxCommandEvent& eve
 }
 
 void mvceditor::ProjectPluginClass::ProjectOpen(const wxString& directoryPath) {
-	if (!PhpFrameworks.get()) {
-		PhpFrameworks.reset(new mvceditor::PhpFrameworkDetectorClass(*this, RunningThreads, *GetEnvironment()));
-	}
+	
 	/*
 	TODO is this fuctionality even needed?
 	CloseProject();
@@ -328,16 +238,16 @@ void mvceditor::ProjectPluginClass::ProjectOpen(const wxString& directoryPath) {
 }
 
 void mvceditor::ProjectPluginClass::ProjectOpenDefault() {
-	if (!PhpFrameworks.get()) {
-		PhpFrameworks.reset(new mvceditor::PhpFrameworkDetectorClass(*this, RunningThreads, *GetEnvironment()));
-	}
+	std::vector<mvceditor::SourceClass> allSources = App.Structs.AllEnabledSources();
+	if (!allSources.empty()) {
 
-	if (!App.Structs.AllEnabledSources().empty()) {
-
-		// TODO multiple sources & projects
-		bool started = PhpFrameworks->Init(App.Structs.FirstDirectory());
+		for (size_t i = 1; i < allSources.size(); ++i) {
+			DirectoriesToDetect.push_back(allSources[i].RootDirectory.GetPath());
+		}
+		bool started = PhpFrameworks.Init(allSources[0].RootDirectory.GetPath());
 		if (!started) {
-			mvceditor::EditorLogError(mvceditor::BAD_PHP_EXECUTABLE, GetEnvironment()->Php.PhpExecutablePath); 
+			mvceditor::EditorLogError(mvceditor::BAD_PHP_EXECUTABLE, App.Structs.Environment.Php.PhpExecutablePath); 
+			DirectoriesToDetect.clear();
 		}
 		else {
 			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
@@ -353,24 +263,9 @@ void mvceditor::ProjectPluginClass::ProjectOpenDefault() {
 }
 
 void mvceditor::ProjectPluginClass::CloseProject() {
-	/**
-		TODO is this functionality even needed
-	if (App.Project) {
-		PhpFrameworks->ConfigFiles.clear();
-		PhpFrameworks->Databases.clear();
-		PhpFrameworks->Identifiers.clear();
-		PhpFrameworks->Resources.clear();
-
-		App.PhpFrameworks.ConfigFiles.clear();
-		App.PhpFrameworks.Databases.clear();
-		App.PhpFrameworks.Identifiers.clear();
-		App.PhpFrameworks.Resources.clear();
-		delete App.Project;
-		App.Project = NULL;
-		wxCommandEvent closeEvent(mvceditor::EVENT_APP_PROJECT_CLOSED);
-		App.EventSink.Publish(closeEvent);
-	}
-	*/
+	PhpFrameworks.Clear();		
+	wxCommandEvent closeEvent(mvceditor::EVENT_APP_PROJECT_CLOSED);
+	App.EventSink.Publish(closeEvent);
 }
 
 void mvceditor::ProjectPluginClass::OnCmdProjectOpen(wxCommandEvent& event) {
@@ -378,53 +273,51 @@ void mvceditor::ProjectPluginClass::OnCmdProjectOpen(wxCommandEvent& event) {
 }
 
 void mvceditor::ProjectPluginClass::OnFrameworkDetectionComplete(wxCommandEvent& event) {
-	App.PhpFrameworks.ConfigFiles = PhpFrameworks->ConfigFiles;
-	App.PhpFrameworks.Databases = PhpFrameworks->Databases;
-	App.PhpFrameworks.Identifiers = PhpFrameworks->Identifiers;
-	App.PhpFrameworks.Resources = PhpFrameworks->Resources;
-	
-	if (!App.Structs.AllEnabledSources().empty()) {
-		
-		// TODO: better project recall
-		wxString projectRoot = App.Structs.FirstDirectory();
-		projectRoot.Trim();
-		History.AddFileToHistory(projectRoot);
-		PersistProjectList();
+	bool finished = true;
+
+	// detection on the next directory; skipping any errors
+	while (!DirectoriesToDetect.empty() && finished) {
+		wxString nextDirectory = DirectoriesToDetect.back();
+		DirectoriesToDetect.pop_back();
+		if (PhpFrameworks.Init(nextDirectory)) {
+			finished = false;
+		}
 	}
-	wxCommandEvent projectOpenedEvent(mvceditor::EVENT_APP_PROJECT_OPENED);
-	App.EventSink.Publish(projectOpenedEvent);
-	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
-	gauge->StopGauge(ID_FRAMEWORK_DETECTION_GAUGE);
+	if (finished) {	
+		wxCommandEvent projectOpenedEvent(mvceditor::EVENT_APP_PROJECT_OPENED);
+		App.EventSink.Publish(projectOpenedEvent);
+		mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
+		gauge->StopGauge(ID_FRAMEWORK_DETECTION_GAUGE);
+	}
 }
 
 void mvceditor::ProjectPluginClass::OnFrameworkDetectionFailed(wxCommandEvent& event) {
 	mvceditor::EditorLogError(mvceditor::BAD_PHP_EXECUTABLE, event.GetString());
+	bool finished = true;
 
-	App.PhpFrameworks.ConfigFiles = PhpFrameworks->ConfigFiles;
-	App.PhpFrameworks.Databases = PhpFrameworks->Databases;
-	App.PhpFrameworks.Identifiers = PhpFrameworks->Identifiers;
-	App.PhpFrameworks.Resources = PhpFrameworks->Resources;
-
-	if (App.Structs.HasSources()) {
-		
-		// TODO: better project recall
-		wxString projectRoot = App.Structs.FirstDirectory();
-		projectRoot.Trim();
-		History.AddFileToHistory(projectRoot);
-		PersistProjectList();
+	// detection on the next directory; skipping any errors
+	while (!DirectoriesToDetect.empty() && finished) {
+		wxString nextDirectory = DirectoriesToDetect.back();
+		DirectoriesToDetect.pop_back();
+		if (PhpFrameworks.Init(nextDirectory)) {
+			finished = false;
+		}
 	}
-
-	// still need to set the project even if the project detection fails
-	// pretty much all code depends on having a Project pointer
-	wxCommandEvent projectOpenedEvent(mvceditor::EVENT_APP_PROJECT_OPENED);
-	App.EventSink.Publish(projectOpenedEvent);
-	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
-	gauge->StopGauge(ID_FRAMEWORK_DETECTION_GAUGE);
+	if (finished) {	
+		wxCommandEvent projectOpenedEvent(mvceditor::EVENT_APP_PROJECT_OPENED);
+		App.EventSink.Publish(projectOpenedEvent);
+		mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
+		gauge->StopGauge(ID_FRAMEWORK_DETECTION_GAUGE);
+	}
 }
 
 void mvceditor::ProjectPluginClass::OnFrameworkDetectionInProgress(wxCommandEvent& event) {
 	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 	gauge->IncrementGauge(ID_FRAMEWORK_DETECTION_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
+}
+
+void mvceditor::ProjectPluginClass::OnFrameworkFound(mvceditor::FrameworkFoundEventClass& event) {
+	App.Structs.Frameworks.push_back(event.Framework);
 }
 
 void mvceditor::ProjectPluginClass::OnProjectDefine(wxCommandEvent& event) {
@@ -659,16 +552,11 @@ void mvceditor::ProjectListDialogClass::Populate() {
 }
 
 BEGIN_EVENT_TABLE(mvceditor::ProjectPluginClass, wxEvtHandler)
-	EVT_MENU(mvceditor::MENU_PROJECT + MAX_PROJECT_HISTORY + 1, mvceditor::ProjectPluginClass::OnProjectExplore)
-	EVT_MENU(mvceditor::MENU_PROJECT + MAX_PROJECT_HISTORY + 2, mvceditor::ProjectPluginClass::OnProjectExploreOpenFile)
-	EVT_MENU(mvceditor::MENU_PROJECT + MAX_PROJECT_HISTORY + 4, mvceditor::ProjectPluginClass::OnProjectDefine)
+	EVT_MENU(mvceditor::MENU_PROJECT + 1, mvceditor::ProjectPluginClass::OnProjectExplore)
+	EVT_MENU(mvceditor::MENU_PROJECT + 2, mvceditor::ProjectPluginClass::OnProjectExploreOpenFile)
+	EVT_MENU(mvceditor::MENU_PROJECT + 3, mvceditor::ProjectPluginClass::OnProjectDefine)
 
-	/**
-	 * Since there could be 1...N recent project menu items we cannot listen to one menu item's event
-	 * we have to listen to all menu events
-	 */
-	EVT_MENU_RANGE(mvceditor::MENU_PROJECT, mvceditor::MENU_PROJECT + MAX_PROJECT_HISTORY, mvceditor::ProjectPluginClass::OnMenu)
-
+	EVT_FRAMEWORK_FOUND(mvceditor::ProjectPluginClass::OnFrameworkFound)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_DETECTION_COMPLETE, mvceditor::ProjectPluginClass::OnFrameworkDetectionComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_DETECTION_FAILED, mvceditor::ProjectPluginClass::OnFrameworkDetectionFailed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::ProjectPluginClass::OnFrameworkDetectionInProgress)

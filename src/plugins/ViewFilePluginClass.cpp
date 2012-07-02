@@ -86,7 +86,7 @@ void mvceditor::CallStackThreadClass::Entry() {
 
 mvceditor::ViewFilePluginClass::ViewFilePluginClass(mvceditor::AppClass& app) 
 	: PluginClass(app) 
-	, FrameworkDetector(NULL) 
+	, FrameworkDetector(*this, RunningThreads, app.Structs.Environment) 
 	, CallStackThread(*this, RunningThreads) {
 }
 
@@ -164,15 +164,8 @@ void mvceditor::ViewFilePluginClass::StartDetection() {
 }
 
 void mvceditor::ViewFilePluginClass::OnWorkComplete(wxCommandEvent& event) {
-	if (!FrameworkDetector.get()) {
-		FrameworkDetector.reset(new mvceditor::PhpFrameworkDetectorClass(*this, RunningThreads, *GetEnvironment()));
-	}
-	FrameworkDetector->Identifiers = PhPFrameworks().Identifiers;
-
-	// TODO: better project recall
-	if (App.Structs.HasSources()) {
-		wxString projectRoot = App.Structs.FirstDirectory();
-		if (!FrameworkDetector->InitViewInfosDetector(projectRoot, App.Structs.UrlResourceFinder.ChosenUrl.Url.BuildURI(), CallStackThread.StackFile)) {
+	if (!App.Structs.Frameworks.empty()) {
+		if (!FrameworkDetector.InitViewInfosDetector(App.Structs.Frameworks, App.Structs.UrlResourceFinder.ChosenUrl.Url.BuildURI(), CallStackThread.StackFile)) {
 			mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Could not start ViewInfos detector"));
 		}
 	}
@@ -255,7 +248,8 @@ void mvceditor::ViewFilePanelClass::UpdateResults() {
 				// show that the view file is missing
 				text = wxT("[X] ") + text;
 			}
-			FileTree->AppendItem(parent, text);
+			mvceditor::StringTreeItemDataClass* data = new mvceditor::StringTreeItemDataClass(currentViewInfos[i].FileName);
+			FileTree->AppendItem(parent, text, -1, -1, data);
 		}
 		FileTree->ExpandAll();
 		
@@ -391,13 +385,19 @@ void mvceditor::ViewFilePanelClass::OnCurrentButton(wxCommandEvent &event) {
 void mvceditor::ViewFilePanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 	wxTreeItemId item = event.GetItem();
 	wxString file = FileTree->GetItemText(item);
-	if (!file.IsEmpty() && !file.Find(wxT("[X]")) == 0) {
-
-		// TODO: better project recall
-		wxString root = Plugin.App.Structs.FirstDirectory();
-		file =  root + wxFileName::GetPathSeparator() + file;
-		Plugin.OpenFile(file);
+	if (!file.IsEmpty() && !file.Find(wxT("[X]")) == 0 && item != FileTree->GetRootItem()) {
+		mvceditor::StringTreeItemDataClass* data = (mvceditor::StringTreeItemDataClass*)FileTree->GetItemData(item);
+		if (data) {
+			file =  data->Str;
+			Plugin.OpenFile(file);
+		}
 	}
+}
+
+mvceditor::StringTreeItemDataClass::StringTreeItemDataClass(const wxString& str)
+	: wxTreeItemData()
+	, Str(str) {
+
 }
 
 BEGIN_EVENT_TABLE(mvceditor::ViewFilePluginClass, wxEvtHandler) 

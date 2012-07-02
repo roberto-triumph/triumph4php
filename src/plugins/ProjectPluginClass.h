@@ -28,7 +28,6 @@
 #include <PluginClass.h>
 #include <plugins/wxformbuilder/ProjectPluginGeneratedPanelClass.h>
 #include <wx/filepicker.h>
-#include <wx/docview.h>
 
 namespace mvceditor {
 
@@ -110,25 +109,10 @@ private:
 	void OnCmdProjectOpen(wxCommandEvent& event);
 
 	/**
-	 * Since there could be 1...N recent project menu items we cannot listen to one menu item's event
-	 * we have to listen to all menu events
-	 */
-	void OnMenu(wxCommandEvent& event);
-
-	/**
-	 * updates the recent projects sub-menu with the projects from the internal list
-	 */
-	void SyncMenu();
-
-	/**
-	 * Will write the RecentProjects list to disk.
-	 */
-	void PersistProjectList();
-
-	/**
 	 * This is the callback that gets called when the PHP framework detectors have 
 	 * successfully run
 	 */
+	void OnFrameworkFound(mvceditor::FrameworkFoundEventClass& event);
 	void OnFrameworkDetectionComplete(wxCommandEvent& event);
 	void OnFrameworkDetectionInProgress(wxCommandEvent& event);
 	void OnFrameworkDetectionFailed(wxCommandEvent& event);
@@ -144,20 +128,16 @@ private:
 	void OnProjectDefine(wxCommandEvent& event);
 
 	/**
-	 * List of recently opened projects
-	 */
-	wxFileHistory History;
-
-	/**
 	 * This object will be used to detct the various PHP framework artifacts (resources,
 	 * database connections, route URLs).
 	 */
-	std::auto_ptr<PhpFrameworkDetectorClass> PhpFrameworks;
+	mvceditor::PhpFrameworkDetectorClass PhpFrameworks;
 
 	/**
-	 * Sub-Menu for the recent projects 
+	 * a 'queue' of folders to perform framework detection on
 	 */
-	wxMenu* RecentProjectsMenu;
+	std::vector<wxString> DirectoriesToDetect;
+
 
 	DECLARE_EVENT_TABLE()
 	

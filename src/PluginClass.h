@@ -359,11 +359,6 @@ protected:
 	ResourceCacheClass* GetResourceCache();
 	
 	/**
-	 * The detected framework resources
-	 */
-	PhpFrameworkDetectorClass& PhPFrameworks() const;
-	
-	/**
 	 * Set the given page to be the selected page for the tools notebook
 	 * @param wxWindow the window that the tools notebook will be visible
 	 */

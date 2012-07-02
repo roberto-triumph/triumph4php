@@ -668,8 +668,11 @@ void mvceditor::SqlBrowserPluginClass::OnProjectOpened(wxCommandEvent& event) {
 	
 	// add the detected connections to the infos list
 	// this makes it easier; that way we always work with one list only
-	for (size_t i = 0; i < App.PhpFrameworks.Databases.size(); ++i) {
-		App.Structs.Infos.push_back(App.PhpFrameworks.Databases[i]);
+
+	// TODO: make a AllEnabledDatabaseConnections method in StructsClass. that will clean
+	// some stuff up
+	for (size_t i = 0; i < App.Structs.Frameworks.size(); ++i) {
+		App.Structs.Infos.insert(App.Structs.Infos.end(), App.Structs.Frameworks[i].Databases.begin(), App.Structs.Frameworks[i].Databases.end());
 	}
 	DetectMetadata();
 }

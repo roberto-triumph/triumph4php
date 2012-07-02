@@ -117,7 +117,7 @@ public:
 	 * A 'local' detector that will be used to get all of the
 	 * files for the current URL.
 	 */
-	std::auto_ptr<PhpFrameworkDetectorClass> FrameworkDetector;
+	mvceditor::PhpFrameworkDetectorClass FrameworkDetector;
 	
 	/**
 	 * used to generate the call stack for the current URL
@@ -206,6 +206,20 @@ protected:
 	void OnActionChoice(wxCommandEvent& event);
 
 	void OnTreeItemActivated(wxTreeEvent& event);
+};
+
+/**
+ * Class used to put the full path of a view file inside of the tree control
+ * so that we can get the full path at a later time. This is because
+ * the tree label will be the relative file.
+ */
+class StringTreeItemDataClass : public wxTreeItemData {
+
+public:
+
+	wxString Str;
+
+	StringTreeItemDataClass(const wxString& str);
 };
 
 }

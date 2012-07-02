@@ -205,7 +205,7 @@ void mvceditor::ChooseUrlDialogClass::OnKeyDown(wxKeyEvent& event) {
 mvceditor::RunBrowserPluginClass::RunBrowserPluginClass(mvceditor::AppClass& app)
 	: PluginClass(app) 
 	, RecentUrls()
-	, PhpFrameworks(NULL)
+	, PhpFrameworks(*this, RunningThreads, app.Structs.Environment)
 	, ResourceCacheThread(NULL)
 	, BrowserMenu(NULL)
 	, UrlMenu(NULL)
@@ -503,14 +503,7 @@ void mvceditor::RunBrowserPluginClass::OnCacheFileWorkComplete(wxCommandEvent& e
 		wxString rootDirFullPath = sources[i].RootDirectory.GetFullPath();
 		wxString projectRootUrl =  environment->Apache.GetUrl(rootDirFullPath);
 		if (!projectRootUrl.IsEmpty()) {
-			if (!PhpFrameworks.get()) {
-				PhpFrameworks.reset(new PhpFrameworkDetectorClass(*this, RunningThreads, *GetEnvironment()));
-				PhpFrameworks->Identifiers = PhPFrameworks().Identifiers;
-				PhpFrameworks->InitUrlDetector(rootDirFullPath, ResourceCacheFileName.GetFullPath(), projectRootUrl);
-			}
-			else {
-				PhpFrameworks->InitUrlDetector(rootDirFullPath, ResourceCacheFileName.GetFullPath(), projectRootUrl);
-			}
+			PhpFrameworks.InitUrlDetector(App.Structs.Frameworks, ResourceCacheFileName.GetFullPath(), projectRootUrl);
 			break;
 		}
 	}
