@@ -154,6 +154,12 @@ extern const wxEventType EVENT_APP_PROJECT_CLOSED;
 extern const wxEventType EVENT_APP_PROJECT_INDEXED;
 
 /**
+ * Notification that an existing file has been opened.  The event will contain
+ * the full path of the file that was opened in the GetString() method; 
+ */
+extern const wxEventType EVENT_APP_FILE_OPENED;
+
+/**
  * Notification that a file has been closed.  The event will contain
  * the full path of the file that was closed; the path may be the 
  * empty string when a new file is closed.

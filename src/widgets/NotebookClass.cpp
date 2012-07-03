@@ -201,6 +201,11 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename) {
 			this->AddPage(newCode, fileName.GetFullName(), true, 
 				wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_TOOLBAR, 
 				wxSize(16, 16)));
+
+			// tell the app that a file has been opened
+			wxCommandEvent openEvent(mvceditor::EVENT_APP_FILE_OPENED);
+			openEvent.SetString(fileName.GetFullPath());
+			EventSink->Publish(openEvent);
 		}
 		else if (error == mvceditor::FindInFilesClass::FILE_NOT_FOUND) {
 			wxLogError(_("File Not Found:") + filename);

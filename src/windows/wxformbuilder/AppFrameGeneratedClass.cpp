@@ -95,9 +95,6 @@ AppFrameGeneratedClass::AppFrameGeneratedClass( wxWindow* parent, wxWindowID id,
 	FileMenu->Append( MenuItemFileClose );
 	MenuItemFileClose->Enable( false );
 	
-	wxMenuItem* m_separator2;
-	m_separator2 = FileMenu->AppendSeparator();
-	
 	wxMenuItem* MenuItemFileExit;
 	MenuItemFileExit = new wxMenuItem( FileMenu, wxID_EXIT, wxString( _("Exit") ) + wxT('\t') + wxT("ALT+F4"), _("Exit this program"), wxITEM_NORMAL );
 	FileMenu->Append( MenuItemFileExit );

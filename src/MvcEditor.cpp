@@ -40,6 +40,7 @@
 #include <plugins/EditorMessagesPluginClass.h>
 #include <plugins/CodeIgniterPluginClass.h>
 #include <plugins/ViewFilePluginClass.h>
+#include <plugins/RecentFilesPluginClass.h>
 #include <MvcEditorErrors.h>
 
 IMPLEMENT_APP(mvceditor::AppClass)
@@ -175,8 +176,10 @@ void mvceditor::AppClass::CreatePlugins() {
 	Plugins.push_back(plugin);
 	plugin = new ViewFilePluginClass(*this);
 	Plugins.push_back(plugin);
+	plugin = new RecentFilesPluginClass(*this);
+	Plugins.push_back(plugin);
 	
-	// test plugin need to find a quicker way to toggling it ON / OFF
+	// TODO test plugin need to find a quicker way to toggling it ON / OFF
 	//plugin = new TestPluginClass(*this);
 	//Plugins.push_back(plugin);
 
