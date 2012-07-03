@@ -28,8 +28,8 @@
 #include <windows/StringHelperClass.h>
 #include <MvcEditorChecks.h>
 #include <unicode/ustdio.h>
+#include <wx/platinfo.h>
 #include <string>
-
 
 class SqlResourceFinderFixtureClass : public DatabaseTestFixtureClass {
 
@@ -74,9 +74,15 @@ TEST_FIXTURE(SqlResourceFinderFixtureClass, FindTable) {
 }
 
 TEST_FIXTURE(SqlResourceFinderFixtureClass, FindTableCaseInsensitive) {
+	std::string query = "SHOW VARIABLES WHERE Variable_name='version_compile_os' AND Value IN('Win64', 'Win32');";
+	if (Exec(query)) {
+		//skip this test on windows, MySQL always creates tables with lowercase names
+		return;
+	}
+
 	Info.DatabaseName = UNICODE_STRING_SIMPLE("sql_resource_finder");
 	
-	std::string query = "CREATE TABLE WebUsers(idUser int);";
+	query = "CREATE TABLE WebUsers(idUser int);";
 	CHECK(Exec(query));
 	query = "CREATE TABLE ServiceNames(idServiceName int);";
 	CHECK(Exec(query));
@@ -88,6 +94,7 @@ TEST_FIXTURE(SqlResourceFinderFixtureClass, FindTableCaseInsensitive) {
 	CHECK(Finder.Fetch(Info, error));
 	std::vector<UnicodeString> tables = Finder.FindTables(Info, UNICODE_STRING_SIMPLE("service"));
 	CHECK_VECTOR_SIZE(2, tables);
+
 	CHECK_UNISTR_EQUALS("ServiceLocations", tables[0]);
 	CHECK_UNISTR_EQUALS("ServiceNames", tables[1]);
 }
