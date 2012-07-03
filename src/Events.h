@@ -47,10 +47,10 @@ namespace mvceditor {
  *
  * EVT_MENU (most of them)
  * EVT_TOOL (most of them)
- * EVT_AUINOTEBOOK_PAGE_CHANGED (for the source code notebook)
- * EVT_AUINOTEBOOK_PAGE_CHANGING (for the source code notebook)
- * EVT_AUINOTEBOOK_PAGE_CLOSE (for the source code notebook)
- * EVT_AUINOTEBOOK_PAGE_CLOSED (for the source code notebook)
+ * EVT_AUINOTEBOOK_PAGE_CHANGED (for the source code, tools, and outline notebooks)
+ * EVT_AUINOTEBOOK_PAGE_CHANGING (for the source code, tools, and outline notebook)
+ * EVT_AUINOTEBOOK_PAGE_CLOSE (for the source code, tools, and outline notebook)
+ * EVT_AUINOTEBOOK_PAGE_CLOSED (for the source code, tools, and outline notebook)
  * EVT_AUITOOLBAR_BEGIN_DRAG (all of them)
  * EVT_AUITOOLBAR_MIDDLE_CLICK (all of them)
  * EVT_AUITOOLBAR_OVERFLOW_CLICK (all of them)
@@ -209,6 +209,23 @@ extern const wxEventType EVENT_CMD_FILE_OPEN;
  */
 extern const wxEventType EVENT_CMD_PROJECT_URLS;
 
+/**
+ * The window ID of the Tools Notebook. Use this to connect to the notebook
+ * events for the tools notebook
+ */
+extern const int ID_TOOLS_NOTEBOOK;
+
+/**
+ * The window ID of the outline notebook. Use this to connect to the notebook
+ * events for the outline notebook
+ */
+extern const int ID_OUTLINE_NOTEBOOK;
+
+/**
+ * The window ID of the source code notebook. Use this to connect to the notebook
+ * events for the code notebook
+ */
+extern const int ID_CODE_NOTEBOOK;
 }
 
 #endif

@@ -426,13 +426,13 @@ bool mvceditor::FileDropTargetClass::OnDropFiles(wxCoord x, wxCoord y, const wxA
 }
 
 BEGIN_EVENT_TABLE(mvceditor::NotebookClass, wxAuiNotebook)
-	EVT_AUINOTEBOOK_PAGE_CLOSE(wxID_ANY, 
+	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_CODE_NOTEBOOK, 
 		mvceditor::NotebookClass::SavePageIfModified)
-	EVT_AUINOTEBOOK_TAB_RIGHT_UP(wxID_ANY,
+	EVT_AUINOTEBOOK_TAB_RIGHT_UP(mvceditor::ID_CODE_NOTEBOOK,
 		mvceditor::NotebookClass::ShowContextMenu)
 	EVT_MENU(ID_SAVE_MODIFIED, mvceditor::NotebookClass::OnCloseAllPages)
 
 	// using OnPageChanging instead of OnPageChanged because onPageChanged
 	// generates multiple events (not quite sure why yet)
-	EVT_AUINOTEBOOK_PAGE_CHANGING(wxID_ANY, mvceditor::NotebookClass::OnPageChanging)
+	EVT_AUINOTEBOOK_PAGE_CHANGING(mvceditor::ID_CODE_NOTEBOOK, mvceditor::NotebookClass::OnPageChanging)
 END_EVENT_TABLE()

@@ -244,6 +244,8 @@ public:
 	bool CheckOnSave;
 
 	LintPluginClass(mvceditor::AppClass& app);
+	
+	~LintPluginClass();
 
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
 
@@ -276,6 +278,8 @@ private:
 	void OnTimer(wxCommandEvent& event);
 	
 	void OnFileSaved(mvceditor::FileSavedEventClass& event);
+	
+	void OnNotebookPageClosed(wxAuiNotebookEvent& event);	
 
 	LintBackgroundFileReaderClass LintBackgroundFileReader;
 
@@ -285,6 +289,13 @@ private:
 	 * are no longer needed.
 	 */
 	std::vector<pelet::LintResultsClass*>LintErrors;
+	
+	/**
+	 * The panel that shows the lint errors. Note that this window
+	 * may be deleted by the user at any time, be careful that
+	 * you check that it is not null before accessing it
+	 */
+	mvceditor::LintResultsPanelClass* ResultsPanel;
 	
 	DECLARE_EVENT_TABLE()
 };

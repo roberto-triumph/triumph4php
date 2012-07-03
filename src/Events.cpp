@@ -70,3 +70,9 @@ const wxEventType mvceditor::EVENT_APP_ENVIRONMENT_UPDATED = wxNewEventType();
 const wxEventType mvceditor::EVENT_CMD_RE_INDEX = wxNewEventType();
 const wxEventType mvceditor::EVENT_CMD_FILE_OPEN = wxNewEventType();
 const wxEventType mvceditor::EVENT_CMD_PROJECT_URLS = wxNewEventType();
+const int mvceditor::ID_TOOLS_NOTEBOOK = wxNewId();
+const int mvceditor::ID_OUTLINE_NOTEBOOK = wxNewId();
+
+// ATTN: this is hardcoded because of the way that the notebook is created
+// within the AppFrameGeneratedClass (created by wxFormBuilder)
+const int mvceditor::ID_CODE_NOTEBOOK = 1000;

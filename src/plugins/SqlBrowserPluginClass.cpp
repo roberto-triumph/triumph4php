@@ -809,52 +809,46 @@ void mvceditor::SqlBrowserPluginClass::OnSqlDetectMenu(wxCommandEvent& event) {
 }
 
 void mvceditor::SqlBrowserPluginClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& event) {
-	if (event.GetEventObject() == GetNotebook()) {
-		mvceditor::CodeControlClass* contentWindow = GetNotebook()->GetCodeControl(event.GetSelection());
-		if (contentWindow) {
-			wxAuiNotebook* notebook = GetToolsNotebook();
-			for (size_t i = 0; i < notebook->GetPageCount(); i++) {
-				wxWindow* toolsWindow = notebook->GetPage(i);
+	mvceditor::CodeControlClass* contentWindow = GetNotebook()->GetCodeControl(event.GetSelection());
+	if (contentWindow) {
+		wxAuiNotebook* notebook = GetToolsNotebook();
+		for (size_t i = 0; i < notebook->GetPageCount(); i++) {
+			wxWindow* toolsWindow = notebook->GetPage(i);
 
-				// only cast when we are sure of the type of window
-				// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
-				// methods
-				if (toolsWindow->GetName() == wxT("mvceditor::SqlBrowserPanelClass")) {
-					mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)toolsWindow;
-					if (panel->IsLinkedToCodeControl(contentWindow)) {
-						
-						// we found the panel bring it to the forefront and run the query
-						SetFocusToToolsWindow(toolsWindow);
-						break;
-					}
+			// only cast when we are sure of the type of window
+			// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
+			// methods
+			if (toolsWindow->GetName() == wxT("mvceditor::SqlBrowserPanelClass")) {
+				mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)toolsWindow;
+				if (panel->IsLinkedToCodeControl(contentWindow)) {
+					
+					// we found the panel bring it to the forefront and run the query
+					SetFocusToToolsWindow(toolsWindow);
+					break;
 				}
 			}
 		}
 	}
-	event.Skip();
 }
 
 void mvceditor::SqlBrowserPluginClass::OnContentNotebookPageClose(wxAuiNotebookEvent& event) {
-	if (event.GetEventObject() == GetNotebook()) {	
-		mvceditor::CodeControlClass* contentWindow = GetNotebook()->GetCodeControl(event.GetSelection());
-		if (contentWindow) {
-			wxAuiNotebook* notebook = GetToolsNotebook();
-			for (size_t i = 0; i < notebook->GetPageCount(); i++) {
-				wxWindow* toolsWindow = notebook->GetPage(i);
+	mvceditor::CodeControlClass* contentWindow = GetNotebook()->GetCodeControl(event.GetSelection());
+	if (contentWindow) {
+		wxAuiNotebook* notebook = GetToolsNotebook();
+		for (size_t i = 0; i < notebook->GetPageCount(); i++) {
+			wxWindow* toolsWindow = notebook->GetPage(i);
 
-				// only cast when we are sure of the type of window
-				// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
-				// methods
-				if (toolsWindow->GetName() == wxT("mvceditor::SqlBrowserPanelClass")) {
-					mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)toolsWindow;
-					if (panel->IsLinkedToCodeControl(contentWindow)) {
-						panel->UnlinkFromCodeControl();
-					}
+			// only cast when we are sure of the type of window
+			// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
+			// methods
+			if (toolsWindow->GetName() == wxT("mvceditor::SqlBrowserPanelClass")) {
+				mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)toolsWindow;
+				if (panel->IsLinkedToCodeControl(contentWindow)) {
+					panel->UnlinkFromCodeControl();
 				}
 			}
 		}
 	}
-	event.Skip();
 }
 
 void mvceditor::SqlBrowserPluginClass::OnWorkInProgress(wxCommandEvent& event) {
@@ -956,8 +950,8 @@ BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPluginClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_SQL + 3, mvceditor::SqlBrowserPluginClass::OnSqlDetectMenu)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SqlBrowserPluginClass::OnWorkInProgress)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SqlBrowserPluginClass::OnWorkComplete)
-	EVT_AUINOTEBOOK_PAGE_CHANGED(wxID_ANY, mvceditor::SqlBrowserPluginClass::OnContentNotebookPageChanged)
-	EVT_AUINOTEBOOK_PAGE_CLOSE(wxID_ANY, mvceditor::SqlBrowserPluginClass::OnContentNotebookPageClose)
+	EVT_AUINOTEBOOK_PAGE_CHANGED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::SqlBrowserPluginClass::OnContentNotebookPageChanged)
+	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::SqlBrowserPluginClass::OnContentNotebookPageClose)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_OPENED, mvceditor::SqlBrowserPluginClass::OnProjectOpened)
 END_EVENT_TABLE()
 

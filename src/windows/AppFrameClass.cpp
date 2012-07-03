@@ -47,8 +47,6 @@ int ID_LOWERCASE = wxNewId();
 int ID_UPPERCASE = wxNewId();
 int ID_MENU_MORE = wxNewId();
 int ID_TOOLBAR = wxNewId();
-int ID_TOOLS_WINDOW = wxNewId();
-int ID_OUTLINE_WINDOW = wxNewId();
 
 mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass*>& plugins,
 										mvceditor::AppClass& app,
@@ -81,9 +79,9 @@ mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass
 	projectOpenMenuItem = ProjectMenu->Remove(projectOpenMenuItem);
 	projectOpenMenuItem->SetBitmap(wxArtProvider::GetBitmap(wxART_FOLDER_OPEN, wxART_MENU));
 	ProjectMenu->Insert(0, projectOpenMenuItem);
-	ToolsNotebook = new wxAuiNotebook(this, ID_TOOLS_WINDOW, wxDefaultPosition, wxDefaultSize, 
+	ToolsNotebook = new wxAuiNotebook(this, mvceditor::ID_TOOLS_NOTEBOOK, wxDefaultPosition, wxDefaultSize, 
 		wxAUI_NB_TOP | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_CLOSE_ON_ACTIVE_TAB | wxAUI_NB_TAB_MOVE);
-	OutlineNotebook = new wxAuiNotebook(this, ID_OUTLINE_WINDOW, wxDefaultPosition, wxDefaultSize, 
+	OutlineNotebook = new wxAuiNotebook(this, mvceditor::ID_OUTLINE_NOTEBOOK, wxDefaultPosition, wxDefaultSize, 
 		wxAUI_NB_TOP | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_CLOSE_ON_ACTIVE_TAB | wxAUI_NB_TAB_MOVE);
 	CreateToolBarButtons();
 	
@@ -651,12 +649,7 @@ void mvceditor::AppFrameClass::OnAnyMenuCommandEvent(wxCommandEvent& event) {
 }
 
 void mvceditor::AppFrameClass::OnAnyAuiNotebookEvent(wxAuiNotebookEvent& event) {
-	if (event.GetId() != ID_TOOLS_WINDOW && event.GetId() != ID_OUTLINE_WINDOW) {
-
-		// only send the code notebook events for now
-		App.EventSink.Publish(event);
-	}
-	event.Skip();
+	App.EventSink.Publish(event);
 }
 
 void mvceditor::AppFrameClass::OnAnyAuiToolbarEvent(wxAuiToolBarEvent& event) {
@@ -737,8 +730,8 @@ BEGIN_EVENT_TABLE(mvceditor::AppFrameClass,  AppFrameGeneratedClass)
 	EVT_MENU(ID_LOWERCASE, mvceditor::AppFrameClass::OnLowecase)
 	EVT_MENU(ID_UPPERCASE, mvceditor::AppFrameClass::OnUppercase)
 	EVT_MENU(ID_TOOLBAR_SAVE, mvceditor::AppFrameClass::SaveCurrentFile)
-	EVT_AUINOTEBOOK_PAGE_CLOSED(ID_TOOLS_WINDOW, mvceditor::AppFrameClass::OnToolsNotebookPageClosed)
-	EVT_AUINOTEBOOK_PAGE_CLOSED(ID_OUTLINE_WINDOW, mvceditor::AppFrameClass::OnOutlineNotebookPageClosed)
+	EVT_AUINOTEBOOK_PAGE_CLOSED(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::AppFrameClass::OnToolsNotebookPageClosed)
+	EVT_AUINOTEBOOK_PAGE_CLOSED(mvceditor::ID_OUTLINE_NOTEBOOK, mvceditor::AppFrameClass::OnOutlineNotebookPageClosed)
 
 	// ATTN: STOP! DO NOT HANDLE ANY APP EVENTS HERE! SEE AppEventListenerForFrameClass
 

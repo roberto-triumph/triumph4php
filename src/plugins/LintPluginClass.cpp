@@ -253,6 +253,13 @@ mvceditor::LintPluginClass::LintPluginClass(mvceditor::AppClass& app)
 	, CheckOnSave(true)
 	, LintBackgroundFileReader(*this, RunningThreads)
 	, LintErrors() {
+	ResultsPanel = NULL;
+}
+
+mvceditor::LintPluginClass::~LintPluginClass() {
+	if (LintBackgroundFileReader.IsRunning()) {
+		LintBackgroundFileReader.StopReading();
+	}
 }
 
 void mvceditor::LintPluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
@@ -301,17 +308,14 @@ void mvceditor::LintPluginClass::OnLintMenu(wxCommandEvent& event) {
 			gauge->AddGauge(_("Lint Check"), ID_LINT_RESULTS_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 			
 			// create / open the outline window
-			wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
-			LintResultsPanelClass* lintResultsPanel = NULL;
-			if (window) {
-				lintResultsPanel = (LintResultsPanelClass*)window;
-				lintResultsPanel->ClearErrors();
-				SetFocusToToolsWindow(lintResultsPanel);
+			if (ResultsPanel) {
+				ResultsPanel->ClearErrors();
+				SetFocusToToolsWindow(ResultsPanel);
 			}
 			else {
-				lintResultsPanel = new LintResultsPanelClass(GetToolsNotebook(), ID_LINT_RESULTS_PANEL, GetNotebook(), LintErrors);
-				AddToolsWindow(lintResultsPanel, _("Lint Check"));
-				SetFocusToToolsWindow(lintResultsPanel);
+				ResultsPanel = new LintResultsPanelClass(GetToolsNotebook(), ID_LINT_RESULTS_PANEL, GetNotebook(), LintErrors);
+				AddToolsWindow(ResultsPanel, _("Lint Check"));
+				SetFocusToToolsWindow(ResultsPanel);
 			}
 		}
 		else if (error == mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING)  {
@@ -330,31 +334,24 @@ void mvceditor::LintPluginClass::OnLintMenu(wxCommandEvent& event) {
 }
 
 void mvceditor::LintPluginClass::OnNextLintError(wxCommandEvent& event) {
-	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
-	LintResultsPanelClass* lintResultsPanel = NULL;
-	if (window) {
-		lintResultsPanel = (LintResultsPanelClass*)window;
-		lintResultsPanel->SelectNextError();
+	if (ResultsPanel) {
+		ResultsPanel->SelectNextError();
 	}
 }
 
 void mvceditor::LintPluginClass::OnPreviousLintError(wxCommandEvent& event) {
-	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
-	LintResultsPanelClass* lintResultsPanel = NULL;
-	if (window) {
-		lintResultsPanel = (LintResultsPanelClass*)window;
-		lintResultsPanel->SelectPreviousError();
+	if (ResultsPanel) {
+		ResultsPanel->SelectPreviousError();
 	}
 }
 
 void mvceditor::LintPluginClass::OnLintError(wxCommandEvent& event) {
 	pelet::LintResultsClass* results = (pelet::LintResultsClass*)event.GetClientData();
-	
-	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
-	LintResultsPanelClass* lintResultsPanel = NULL;
-	if (window) {
-		lintResultsPanel = (LintResultsPanelClass*)window;
-		lintResultsPanel->AddError(results);
+	if (ResultsPanel) {
+		ResultsPanel->AddError(results);
+	}
+	else {
+		delete results;
 	}
 }
 
@@ -365,14 +362,11 @@ void mvceditor::LintPluginClass::OnLintFileComplete(wxCommandEvent& event) {
 void mvceditor::LintPluginClass::OnLintComplete(wxCommandEvent& event) {
 	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 	gauge->StopGauge(ID_LINT_RESULTS_GAUGE);
-	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
-	LintResultsPanelClass* lintResultsPanel = NULL;
-	if (window) {
-		lintResultsPanel = (LintResultsPanelClass*)window;
+	if (ResultsPanel) {
 		int totalFiles = 0;
 		int errorFiles = 0;
 		LintBackgroundFileReader.LintTotals(totalFiles, errorFiles);
-		lintResultsPanel->PrintSummary(totalFiles, errorFiles);
+		ResultsPanel->PrintSummary(totalFiles, errorFiles);
 	}
 }
 
@@ -389,11 +383,8 @@ void mvceditor::LintPluginClass::OnFileSaved(mvceditor::FileSavedEventClass& eve
 	bool hasErrors = !LintErrors.empty();
 
 	// remove lint results for this file from the display list
-	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
-	LintResultsPanelClass* lintResultsPanel = NULL;
-	if (window) {
-		lintResultsPanel = (LintResultsPanelClass*)window;
-		lintResultsPanel->RemoveErrorsFor(fileName);
+	if (ResultsPanel) {
+		ResultsPanel->RemoveErrorsFor(fileName);
 	}
 
 	// if user has configure to do lint check on saving or user is cleanin up
@@ -404,10 +395,10 @@ void mvceditor::LintPluginClass::OnFileSaved(mvceditor::FileSavedEventClass& eve
 			
 			// handle the case where user has saved a file but has not clicked
 			// on the Lint project button.
-			if (!window) {
-				lintResultsPanel = new LintResultsPanelClass(GetToolsNotebook(), ID_LINT_RESULTS_PANEL, GetNotebook(), LintErrors);
-				AddToolsWindow(lintResultsPanel, _("Lint Check"));
-				SetFocusToToolsWindow(lintResultsPanel);
+			if (!ResultsPanel) {
+				ResultsPanel = new LintResultsPanelClass(GetToolsNotebook(), ID_LINT_RESULTS_PANEL, GetNotebook(), LintErrors);
+				AddToolsWindow(ResultsPanel, _("Lint Check"));
+				SetFocusToToolsWindow(ResultsPanel);
 			}
 			int previousPos = -1;
 			mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
@@ -417,13 +408,28 @@ void mvceditor::LintPluginClass::OnFileSaved(mvceditor::FileSavedEventClass& eve
 			
 			// we know that there are lint error events to be consumed
 			ProcessPendingEvents();
-			lintResultsPanel->DisplayLintError(LintErrors.size() - 1);
+			ResultsPanel->DisplayLintError(LintErrors.size() - 1);
 
 			// diplaying the lint causes things to be redrawn; put the cursor 
 			// where the user left it
 			if (previousPos >= 0 && codeControl) {
 				codeControl->GotoPos(previousPos);
 			}
+		}
+	}
+}
+
+void mvceditor::LintPluginClass::OnNotebookPageClosed(wxAuiNotebookEvent& event) {
+	wxAuiNotebook* notebook = GetToolsNotebook();
+	int selection = event.GetSelection();
+	if (notebook->GetPage(selection) == ResultsPanel) {
+	
+		// since this is a window, wxWidgets will do the memory cleanup
+		ResultsPanel = NULL;
+		if (LintBackgroundFileReader.IsRunning()) {
+			LintBackgroundFileReader.StopReading();
+			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
+			gauge->StopGauge(ID_LINT_RESULTS_GAUGE);
 		}
 	}
 }
@@ -446,4 +452,5 @@ BEGIN_EVENT_TABLE(mvceditor::LintPluginClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::LintPluginClass::OnLintComplete)
 	EVT_PLUGIN_FILE_SAVED(mvceditor::LintPluginClass::OnFileSaved)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_UPDATED, mvceditor::LintPluginClass::SavePreferences)
+	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::LintPluginClass::OnNotebookPageClosed)
 END_EVENT_TABLE()
