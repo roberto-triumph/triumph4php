@@ -421,7 +421,9 @@ void mvceditor::AppFrameClass::LoadPlugin(mvceditor::PluginClass* plugin) {
 	// we dont need separators if the plugin did not add any menu items
 	size_t oldFileMenuCount = FileMenu->GetMenuItemCount();
 	plugin->AddFileMenuItems(FileMenu);
-	
+	if (oldFileMenuCount != FileMenu->GetMenuItemCount() && oldFileMenuCount > 0) {
+		FileMenu->InsertSeparator(oldFileMenuCount);
+	}
 
 	size_t oldEditMenuCount = EditMenu->GetMenuItemCount();
 	plugin->AddEditMenuItems(EditMenu);

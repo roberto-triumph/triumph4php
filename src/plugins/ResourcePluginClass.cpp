@@ -36,8 +36,8 @@ static int ID_COUNT_FILES_GAUGE = wxNewId();
 
 mvceditor::ResourceFileReaderClass::ResourceFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads) 
 	: BackgroundFileReaderClass(handler, runningThreads)
-	, ResourceCache(NULL) 
-	, PhpFileFilters() {
+	, PhpFileFilters() 
+	, ResourceCache(NULL) {
 }
 
 bool mvceditor::ResourceFileReaderClass::InitForProject(mvceditor::ResourceCacheClass* resourceCache, 
