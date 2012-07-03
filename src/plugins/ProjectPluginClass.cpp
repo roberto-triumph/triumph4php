@@ -54,6 +54,10 @@ mvceditor::ProjectPluginClass::ProjectPluginClass(mvceditor::AppClass& app)
 	}
 }
 
+mvceditor::ProjectPluginClass::~ProjectPluginClass() {
+	PhpFrameworks.Stop();
+}
+
 void mvceditor::ProjectPluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
 	projectMenu->Append(mvceditor::MENU_PROJECT + 1, _("Explore"), _("Open An explorer window in the Project Root"), wxITEM_NORMAL);
 	projectMenu->Append(mvceditor::MENU_PROJECT + 2, _("Explore Open File"), _("Open An explorer window in the currently opened file"), wxITEM_NORMAL);

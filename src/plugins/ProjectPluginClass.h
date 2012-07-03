@@ -48,6 +48,8 @@ public:
 	 * Create a new instance of ProjectPluginClass.
 	 */
 	ProjectPluginClass(mvceditor::AppClass& app);
+	
+	~ProjectPluginClass();
 
 	/**
 	 * Opens the given directory as a project.

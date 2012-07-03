@@ -137,6 +137,11 @@ public:
 	 * parsing code.
 	 */
 	void InitFromFile(wxString fileName);
+	
+	/**
+	 * Stop any running processes.
+	 */
+	void Stop();
 
 protected:
 
@@ -505,6 +510,11 @@ public:
 	 *        for the given URL.
 	 */
 	bool InitViewInfosDetector(const std::vector<mvceditor::FrameworkClass>& frameworks, const wxString& url, const wxFileName& callStackFile);
+	
+	/**
+	 * Stop any active detections and delete any data.
+	 */
+	void Stop();
 	
 private:
 

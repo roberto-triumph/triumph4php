@@ -151,6 +151,15 @@ void mvceditor::DetectorActionClass::OnWorkComplete(wxCommandEvent& event) {
 	wxRemoveFile(OutputFile.GetFullPath());
 }
 
+void mvceditor::DetectorActionClass::Stop() {
+	if (ResponseThread.IsRunning()) {
+		ResponseThread.KillInstance();
+	}
+	if (CurrentPid > 0) {
+		Process.Stop(CurrentPid);
+	}
+}
+
 mvceditor::FrameworkDetectorActionClass::FrameworkDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads)
 	: DetectorActionClass(handler, runningThreads)
 	, Frameworks() {
@@ -509,6 +518,13 @@ void mvceditor::PhpFrameworkDetectorClass::Clear() {
 	FrameworkIdentifiersLeftToDetect.clear();
 	UrlsDetected.clear();
 	ViewInfosDetected.clear();
+}
+
+void mvceditor::PhpFrameworkDetectorClass::Stop() {
+	FrameworkDetector.Stop();
+	UrlDetector.Stop();
+	ViewInfosDetector.Stop();
+	Clear();
 }
 
 bool mvceditor::PhpFrameworkDetectorClass::Init(const wxString& dir) {
