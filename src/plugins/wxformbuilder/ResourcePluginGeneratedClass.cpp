@@ -9,38 +9,6 @@
 
 ///////////////////////////////////////////////////////////////////////////
 
-BEGIN_EVENT_TABLE( ResourcePluginGeneratedPanelClass, wxPanel )
-	EVT_COMBOBOX( ID_FILES_COMBO, ResourcePluginGeneratedPanelClass::_wxFB_OnFilesComboCombobox )
-	EVT_TEXT_ENTER( ID_FILES_COMBO, ResourcePluginGeneratedPanelClass::_wxFB_OnFilesComboTextEnter )
-	EVT_BUTTON( ID_HELP_BUTTON, ResourcePluginGeneratedPanelClass::_wxFB_OnHelpButtonClick )
-END_EVENT_TABLE()
-
-ResourcePluginGeneratedPanelClass::ResourcePluginGeneratedPanelClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
-{
-	wxFlexGridSizer* GridSizer;
-	GridSizer = new wxFlexGridSizer( 1, 3, 0, 0 );
-	GridSizer->AddGrowableCol( 0 );
-	GridSizer->SetFlexibleDirection( wxBOTH );
-	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	FilesCombo = new wxComboBox( this, ID_FILES_COMBO, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxTE_PROCESS_ENTER ); 
-	GridSizer->Add( FilesCombo, 0, wxALIGN_TOP|wxALL|wxEXPAND, 5 );
-	
-	HelpButton = new wxBitmapButton( this, ID_HELP_BUTTON, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
-	GridSizer->Add( HelpButton, 0, wxALL|wxEXPAND, 5 );
-	
-	this->SetSizer( GridSizer );
-	this->Layout();
-}
-
-ResourcePluginGeneratedPanelClass::~ResourcePluginGeneratedPanelClass()
-{
-}
-
-BEGIN_EVENT_TABLE( IndexingDialogGeneratedClass, wxDialog )
-	EVT_BUTTON( ID_HIDEBUTTON, IndexingDialogGeneratedClass::_wxFB_OnHideButton )
-END_EVENT_TABLE()
-
 IndexingDialogGeneratedClass::IndexingDialogGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
@@ -67,8 +35,88 @@ IndexingDialogGeneratedClass::IndexingDialogGeneratedClass( wxWindow* parent, wx
 	this->Layout();
 	
 	this->Centre( wxBOTH );
+	
+	// Connect Events
+	HideButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( IndexingDialogGeneratedClass::OnHideButton ), NULL, this );
 }
 
 IndexingDialogGeneratedClass::~IndexingDialogGeneratedClass()
 {
+	// Disconnect Events
+	HideButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( IndexingDialogGeneratedClass::OnHideButton ), NULL, this );
+	
+}
+
+ResourceSearchDialogGeneratedClass::ResourceSearchDialogGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* BoxSizer;
+	BoxSizer = new wxBoxSizer( wxVERTICAL );
+	
+	wxFlexGridSizer* FlexGridSizer;
+	FlexGridSizer = new wxFlexGridSizer( 5, 1, 0, 0 );
+	FlexGridSizer->AddGrowableCol( 0 );
+	FlexGridSizer->AddGrowableRow( 3 );
+	FlexGridSizer->SetFlexibleDirection( wxBOTH );
+	FlexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	SearchLabel = new wxStaticText( this, ID_SEARCHLABEL, _("Search String"), wxDefaultPosition, wxDefaultSize, 0 );
+	SearchLabel->Wrap( -1 );
+	FlexGridSizer->Add( SearchLabel, 0, wxALL|wxEXPAND, 5 );
+	
+	SearchText = new wxTextCtrl( this, ID_SEARCHTEXT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	FlexGridSizer->Add( SearchText, 1, wxALL|wxEXPAND, 5 );
+	
+	ResultsLabel = new wxStaticText( this, ID_RESULTSLABEL, _("Status: OK"), wxDefaultPosition, wxDefaultSize, 0 );
+	ResultsLabel->Wrap( -1 );
+	FlexGridSizer->Add( ResultsLabel, 0, wxALL|wxEXPAND, 5 );
+	
+	wxBoxSizer* ChecklistSizer;
+	ChecklistSizer = new wxBoxSizer( wxHORIZONTAL );
+	
+	wxArrayString ResultsChoices;
+	Results = new wxCheckListBox( this, ID_RESULTS, wxDefaultPosition, wxDefaultSize, ResultsChoices, 0 );
+	ChecklistSizer->Add( Results, 1, wxALL|wxEXPAND, 5 );
+	
+	FlexGridSizer->Add( ChecklistSizer, 1, wxEXPAND, 5 );
+	
+	ButtonsSizer = new wxStdDialogButtonSizer();
+	ButtonsSizerOK = new wxButton( this, wxID_OK );
+	ButtonsSizer->AddButton( ButtonsSizerOK );
+	ButtonsSizerCancel = new wxButton( this, wxID_CANCEL );
+	ButtonsSizer->AddButton( ButtonsSizerCancel );
+	ButtonsSizerHelp = new wxButton( this, wxID_HELP );
+	ButtonsSizer->AddButton( ButtonsSizerHelp );
+	ButtonsSizer->Realize();
+	FlexGridSizer->Add( ButtonsSizer, 1, wxEXPAND, 5 );
+	
+	BoxSizer->Add( FlexGridSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( BoxSizer );
+	this->Layout();
+	
+	this->Centre( wxBOTH );
+	
+	// Connect Events
+	SearchText->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( ResourceSearchDialogGeneratedClass::OnSearchKeyDown ), NULL, this );
+	SearchText->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnSearchText ), NULL, this );
+	SearchText->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnSearchEnter ), NULL, this );
+	Results->Connect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnResultsDoubleClick ), NULL, this );
+	ButtonsSizerCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnCancelButton ), NULL, this );
+	ButtonsSizerHelp->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnHelpButton ), NULL, this );
+	ButtonsSizerOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnOkButton ), NULL, this );
+}
+
+ResourceSearchDialogGeneratedClass::~ResourceSearchDialogGeneratedClass()
+{
+	// Disconnect Events
+	SearchText->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( ResourceSearchDialogGeneratedClass::OnSearchKeyDown ), NULL, this );
+	SearchText->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnSearchText ), NULL, this );
+	SearchText->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnSearchEnter ), NULL, this );
+	Results->Disconnect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnResultsDoubleClick ), NULL, this );
+	ButtonsSizerCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnCancelButton ), NULL, this );
+	ButtonsSizerHelp->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnHelpButton ), NULL, this );
+	ButtonsSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnOkButton ), NULL, this );
+	
 }

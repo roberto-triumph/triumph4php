@@ -466,6 +466,9 @@ void mvceditor::AppFrameClass::OnContextMenu(wxContextMenuEvent& event) {
 	// only show the user if and only if
 	// user clicked inside of the code control
 	if (codeWindow != NULL && event.GetEventObject() == codeWindow) {
+
+		// make sure to turn off any call tips; they hide the popup menu
+		codeWindow->SetAsHidden(true);
 		wxMenu contextMenu;
 		contextMenu.Append(wxID_CUT, _("Cut"));
 		contextMenu.Append(wxID_COPY, _("Copy"));
@@ -499,6 +502,8 @@ void mvceditor::AppFrameClass::OnContextMenu(wxContextMenuEvent& event) {
 		moreMenu->Enable(ID_LOWERCASE, isTextSelected);
 		moreMenu->Enable(ID_UPPERCASE, isTextSelected);
 		PopupMenu(&contextMenu);
+
+		codeWindow->SetAsHidden(false);
 	}
 	else {
 		
@@ -658,7 +663,20 @@ void mvceditor::AppFrameClass::OnAnyAuiToolbarEvent(wxAuiToolBarEvent& event) {
 }
 
 void mvceditor::AppFrameClass::OnProjectOpened() {
-	SetTitle(_("MVC Editor - Open Project ["));
+	wxString msg;
+	if (App.Structs.HasSources()) {
+		msg = _("MVC Editor - Open Projects");
+		for (size_t i = 0; i < App.Structs.Projects.size(); ++i) {
+			if (App.Structs.Projects[i].IsEnabled) {
+				msg += wxT(": ");
+				msg += App.Structs.Projects[i].Label;
+			}
+		}
+	}
+	else {
+		msg = _("MVC Editor");
+	}
+	SetTitle(msg);
 }
 
 void mvceditor::AppFrameClass::OnProjectClosed() {

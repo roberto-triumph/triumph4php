@@ -33,7 +33,6 @@
 #include <wx/valgen.h>
 
 static int ID_COUNT_FILES_GAUGE = wxNewId();
-static int ID_RESOURCE_PLUGIN_PANEL = wxNewId();
 
 mvceditor::ResourceFileReaderClass::ResourceFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads) 
 	: BackgroundFileReaderClass(handler, runningThreads)
@@ -127,21 +126,20 @@ void mvceditor::NativeFunctionsFileReaderClass::Entry() {
 
 mvceditor::ResourcePluginClass::ResourcePluginClass(mvceditor::AppClass& app)
 	: PluginClass(app)
-	, JumpToText()
 	, ResourceFileReader(*this, RunningThreads)
 	, NativeFunctionsReader(*this, RunningThreads)
+	, JumpToText()
 	, ProjectIndexMenu(NULL)
 	, State(FREE) 
 	, HasCodeLookups(false)
 	, HasFileLookups(false) {
-	ResourcePluginPanel = NULL;
 	IndexingDialog = NULL;
 }
 
 void mvceditor::ResourcePluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
 	ProjectIndexMenu = projectMenu->Append(mvceditor::MENU_RESOURCE + 0, _("Index"), _("Index the project"));
 	projectMenu->Append(mvceditor::MENU_RESOURCE + 1, _("Jump To Resource Under Cursor"), _("Jump To Resource that is under the cursor"));
-	projectMenu->Append(mvceditor::MENU_RESOURCE + 2, _("Search for Resource..."), _("Set focus on the resource input"));
+	projectMenu->Append(mvceditor::MENU_RESOURCE + 2, _("Search for Resource..."), _("Search for a class, method, or function"));
 	ProjectIndexMenu->Enable(App.Structs.HasSources() && FREE == State);
 }
 
@@ -158,14 +156,6 @@ void mvceditor::ResourcePluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 		wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), wxT("Index"), wxITEM_NORMAL);
 }
 
-void mvceditor::ResourcePluginClass::AddWindows() {
-	ResourcePluginPanel = new ResourcePluginPanelClass(GetMainWindow(), *this);
-	AuiManager->AddPane(ResourcePluginPanel, wxAuiPaneInfo().Top(
-		).CaptionVisible(false).CloseButton(false).Gripper(
-		false).DockFixed(true).PaneBorder(false).Floatable(
-		false).Row(2));
-}
-
 void mvceditor::ResourcePluginClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
 	menu->Append(mvceditor::MENU_RESOURCE + 3, _("Jump To Source"));
 }
@@ -178,6 +168,7 @@ void mvceditor::ResourcePluginClass::OnProjectOpened(wxCommandEvent& event) {
 	}
 	GetResourceCache()->Clear();
 	GetResourceCache()->SetVersion(GetEnvironment()->Php.Version);
+	ProjectIndexMenu->Enable(App.Structs.HasSources() && FREE == State);
 	if (NativeFunctionsReader.Init(GetResourceCache())) {
 		mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
 		if (ResourceFileReader.StartReading(error)) {
@@ -198,66 +189,25 @@ void mvceditor::ResourcePluginClass::OnEnvironmentUpdated(wxCommandEvent& event)
 	GetResourceCache()->SetVersion(GetEnvironment()->Php.Version);
 }
 
-void mvceditor::ResourcePluginClass::SearchForResources() {
+std::vector<mvceditor::ResourceClass> mvceditor::ResourcePluginClass::SearchForResources(const wxString& text) {
 	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
-	
+	std::vector<mvceditor::ResourceClass> matches;
+
 	// don't bother searching when path or expression is not valid
-	if (!resourceCache->PrepareAll(JumpToText)) {
+	if (!resourceCache->PrepareAll(text)) {
 		wxMessageBox(_("Invalid Expression"), wxT("Warning"), wxICON_EXCLAMATION);
-		return;
+		
 	}
-	
-	// if we know the indexing has already taken place lets just do the lookup; it will be quick.
-	if (!NeedToIndex(JumpToText)) {
+	else if (!NeedToIndex(text)) {	
+
+		// if we know the indexing has already taken place lets just do the lookup; it will be quick.
 		resourceCache->CollectNearMatchResourcesFromAll();
-		std::vector<mvceditor::ResourceClass> matches = resourceCache->Matches();
-		ShowJumpToResults(JumpToText, matches);
-		return;
+		matches = resourceCache->Matches();
+
+		// no need to show jump to results for native functions
+		RemoveNativeMatches(matches);
 	}
-
-	// need to do indexing; start the background process
-	if (App.Structs.HasSources()) {
-
-		//prevent two finds at a time
-		if (FREE == State) { 
-
-			// don't bother searching when path is not valid
-			if (ResourceFileReader.InitForProject(resourceCache, App.Structs.AllEnabledSources(), App.Structs.GetPhpFileExtensions())) {
-					mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
-					if (ResourceFileReader.StartReading(error)) {
-						State = GOTO;
-						GetStatusBarWithGauge()->AddGauge(_("Searching For Resources"),
-							ID_COUNT_FILES_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE,
-							wxGA_HORIZONTAL);
-						if (!HasCodeLookups) {
-
-							// empty resource cache, indexing will take a significant amount of time. make the 
-							// app more 'responsive' by showing a bigger gauge
-							if (!IndexingDialog) {
-								IndexingDialog = new mvceditor::IndexingDialogClass(NULL);
-							}
-							IndexingDialog->Show();
-							IndexingDialog->Start();
-						}
-					}
-					else if (mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING == error) {
-						wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
-					}
-					else if (mvceditor::BackgroundFileReaderClass::NO_RESOURCES == error) {
-						mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
-					}
-			}
-			else {
-				wxMessageBox(_("Invalid Project Path"), wxT("Warning"), wxICON_EXCLAMATION);
-			}
-		}
-		else {
-			wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
-		}
-	}
-	else {
-		wxMessageBox(_("This feature can only be used when you open project"), wxT("Warning"), wxICON_EXCLAMATION);
-	}
+	return matches;
 }
 
 void mvceditor::ResourcePluginClass::OnWorkInProgress(wxCommandEvent& event) {
@@ -298,77 +248,34 @@ void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
 	// if we indexed because of a user query; need to show the user the results.
 	States previousState = State;
 	State = FREE;
-	if (GOTO == previousState) {
-		mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
-		resourceCache->PrepareAll(JumpToText);
-		resourceCache->CollectNearMatchResourcesFromAll();
-		std::vector<mvceditor::ResourceClass> matches = resourceCache->Matches();
-		ShowJumpToResults(JumpToText, matches);
+	std::vector<mvceditor::ResourceClass> chosenResources;
+	if (GOTO == previousState && !JumpToText.IsEmpty()) {
+		std::vector<mvceditor::ResourceClass> matches = SearchForResources(JumpToText);
+		if (matches.size() == 1) {
+			LoadPageFromResource(JumpToText, matches[0]);
+		}
+		else if (!matches.empty()) {
+			mvceditor::ResourceSearchDialogClass dialog(GetMainWindow(), *this, JumpToText, chosenResources);
+			dialog.Prepopulate(JumpToText, matches);
+			if (dialog.ShowModal() == wxOK) {
+				for (size_t i = 0; i < chosenResources.size(); ++i) {
+					LoadPageFromResource(JumpToText, chosenResources[i]);
+				}
+			}
+		}
+	}
+	else if (GOTO == previousState && JumpToText.IsEmpty()) {
+		wxString term;
+		mvceditor::ResourceSearchDialogClass dialog(GetMainWindow(), *this, term, chosenResources);
+		if (dialog.ShowModal() == wxOK) {
+			for (size_t i = 0; i < chosenResources.size(); ++i) {
+				LoadPageFromResource(JumpToText, chosenResources[i]);
+			}
+		}
 	}
 	else if (INDEXING_PROJECT == previousState) {
 		wxCommandEvent indexedEvent(mvceditor::EVENT_APP_PROJECT_INDEXED);
 		App.EventSink.Publish(indexedEvent);
-	}
-}
-
-void mvceditor::ResourcePluginClass::ShowJumpToResults(const wxString& finderQuery, const std::vector<mvceditor::ResourceClass>& allMatches) {
-	wxArrayString files;
-	UnicodeString fileName,
-		className, 
-		methodName;
-	int lineNumber = 0;
-	mvceditor::ResourceFinderClass::ResourceTypes type = mvceditor::ResourceFinderClass::ParseGoToResource(finderQuery, 
-		fileName, className, methodName, lineNumber);
-	
-	// no need to show jump to results for native functions
-	std::vector<mvceditor::ResourceClass> nonNativeMatches = allMatches;
-	std::vector<mvceditor::ResourceClass>::iterator it = nonNativeMatches.begin();
-	while (it != nonNativeMatches.end()) {
-		if (it->IsNative) {
-			it = nonNativeMatches.erase(it);
-		}
-		else {
-			it++;
-		}
-	}
-	switch (nonNativeMatches.size()) {
-		case 1:
-			LoadPageFromResource(finderQuery, nonNativeMatches[0]);
-			break;
-		case 0:
-			if (ResourceFinderClass::CLASS_NAME_METHOD_NAME == type) {
-				wxMessageBox(_("Method Not Found: ") + finderQuery);
-			}
-			else if (ResourceFinderClass::CLASS_NAME == type) {
-				wxMessageBox(_("Class Not Found: ") + finderQuery);
-			}
-			else {
-				wxMessageBox(_("File Not Found: ") + finderQuery);
-			}
-			break;
-		default:
-			for (size_t i = 0; i < nonNativeMatches.size(); ++i) {
-				files.Add(nonNativeMatches[i].GetFullPath());
-			}
-			
-			// dont show the project path to the user
-			for (size_t i = 0; i < files.GetCount(); ++i) {
-				files[i] = App.Structs.RelativeFileName(files[i]);
-				if (ResourceFinderClass::FILE_NAME != type &&
-					ResourceFinderClass::FILE_NAME_LINE_NUMBER != type) {
-					UnicodeString res = nonNativeMatches[i].ClassName + UNICODE_STRING_SIMPLE("::") + nonNativeMatches[i].Identifier;
-					files[i] += wxT("  (") + mvceditor::StringHelperClass::IcuToWx(res) + wxT(")");
-				}
-			}
-			wxSingleChoiceDialog dialog(NULL,
-				wxString::Format(_("Found %d files. Please choose file to open."), nonNativeMatches.size()),
-				_("Resource Finder"), files, NULL, wxDEFAULT_DIALOG_STYLE| wxRESIZE_BORDER | wxOK | wxCANCEL);
-			dialog.SetSize(wxSize(640, 120));
-			if (wxID_OK == dialog.ShowModal()) {
-				int selection = dialog.GetSelection();
-				LoadPageFromResource(finderQuery, nonNativeMatches[selection]);	
-			}
-			break;
 	}
 }
 
@@ -428,29 +335,63 @@ void mvceditor::ResourcePluginClass::OnJump(wxCommandEvent& event) {
 
 	// jump to selected resources
 	CodeControlClass* codeControl = GetCurrentCodeControl();
-	wxWindow* mainWindow = GetMainWindow();
 	if (codeControl) {
+
+		// if the cursor is in the middle of an identifier, find the end of the
+		// current identifier; that way we can know the full name of the resource we want
+		// to get
+		int currentPos = codeControl->GetCurrentPos();
+		int startPos = codeControl->WordStartPosition(currentPos, true);
+		int endPos = codeControl->WordEndPosition(currentPos, true);
+		wxString term = codeControl->GetTextRange(startPos, endPos);
+	
 		std::vector<mvceditor::ResourceClass> matches = codeControl->GetCurrentSymbolResource();
 		if (!matches.empty()) {
 			UnicodeString res = matches[0].ClassName + UNICODE_STRING_SIMPLE("::") + matches[0].Identifier;
-			wxString wxResource = mvceditor::StringHelperClass::IcuToWx(res);
-			ShowJumpToResults(wxResource, matches);	
+			if (matches.size() == 1) {
+				LoadPageFromResource(term, matches[0]);
+			}
+			else {
+				std::vector<mvceditor::ResourceClass> chosenResources;
+				mvceditor::ResourceSearchDialogClass dialog(GetMainWindow(), *this, term, chosenResources);
+				if (dialog.ShowModal() == wxOK) {
+					for (size_t i = 0; i < chosenResources.size(); ++i) {
+						LoadPageFromResource(JumpToText, chosenResources[i]);
+					}
+				}
+			}
 		}
-		else {
+		else if (NeedToIndex(term)) {
 			
 			// maybe cache has not been created or user has not indexed the project, lets index the project and try again			
-			ResourcePluginPanelClass* window = (ResourcePluginPanelClass*)wxWindow::FindWindowById(ID_RESOURCE_PLUGIN_PANEL, mainWindow);
-			window->FocusOnSearchControl();
-			SearchForResources();
+			JumpToText = term;
+			StartIndex();
+
+			// set the state here so that when indexing is done we know to
+			// open the matches.
+			State = GOTO;
 		}
 	}
 }
 
 void mvceditor::ResourcePluginClass::OnSearchForResource(wxCommandEvent& event) {
-	wxWindow* mainWindow = GetMainWindow();
-	ResourcePluginPanelClass* window = (ResourcePluginPanelClass*)wxWindow::FindWindowById(ID_RESOURCE_PLUGIN_PANEL, mainWindow);
-	window->ChangeToFileName(wxT(""));
-	window->FocusOnSearchControl();
+	if (NeedToIndex(wxT("FakeClass"))) {
+		JumpToText = wxT("");
+		StartIndex();
+
+		// set the state here so that when indexing is done we know to
+		// open the search dialog.
+		State = GOTO;
+		return;
+	}
+	std::vector<mvceditor::ResourceClass> chosenResources;
+	wxString term;
+	mvceditor::ResourceSearchDialogClass dialog(GetMainWindow(), *this, term, chosenResources);
+	if (dialog.ShowModal() == wxOK) {
+		for (size_t i = 0; i < chosenResources.size(); ++i) {
+			LoadPageFromResource(term, chosenResources[i]);
+		}
+	}
 }
 
 
@@ -508,21 +449,6 @@ bool mvceditor::ResourcePluginClass::NeedToIndex(const wxString& finderQuery) co
 	return false;
 }
 
-void mvceditor::ResourcePluginClass::OnPageChanged(wxAuiNotebookEvent& event) {
-	size_t selection =  event.GetSelection();
-	CodeControlClass* code = GetNotebook()->GetCodeControl(selection);
-	if (code) {
-		wxString fileName = code->GetFileName();
-		ResourcePluginPanel->ChangeToFileName(fileName);
-	}
-	event.Skip();
-}
-
-void mvceditor::ResourcePluginClass::OnPageClosed(wxAuiNotebookEvent& event) {
-	ResourcePluginPanel->RemoveClosedFiles(GetNotebook());
-	event.Skip();
-}
-
 void mvceditor::ResourcePluginClass::OpenFile(wxString fileName) {
 	GetNotebook()->LoadPage(fileName);
 }
@@ -552,64 +478,108 @@ void mvceditor::ResourcePluginClass::OnAppFileClosed(wxCommandEvent& event) {
 	}
 }
 
-mvceditor::ResourcePluginPanelClass::ResourcePluginPanelClass(wxWindow* parent, ResourcePluginClass& resource)
-	: ResourcePluginGeneratedPanelClass(parent, ID_RESOURCE_PLUGIN_PANEL)
-	, ResourcePlugin(resource) {
-	wxGenericValidator filesComboValidator(&ResourcePlugin.JumpToText);
-	FilesCombo->SetValidator(filesComboValidator);
-	
-	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
-		wxART_TOOLBAR, wxSize(16, 16))));
+void mvceditor::ResourcePluginClass::RemoveNativeMatches(std::vector<mvceditor::ResourceClass>& matches) const {
+	std::vector<mvceditor::ResourceClass>::iterator it = matches.begin();
+	while (it != matches.end()) {
+		if (it->IsNative) {
+			it = matches.erase(it);
+		}
+		else {
+			it++;
+		}
+	}
 }
 
-void mvceditor::ResourcePluginPanelClass::FocusOnSearchControl() {
+mvceditor::ResourceSearchDialogClass::ResourceSearchDialogClass(wxWindow* parent, ResourcePluginClass& resource,
+																wxString& term, 
+																std::vector<mvceditor::ResourceClass>& chosenResources)
+	: ResourceSearchDialogGeneratedClass(parent)
+	, ResourcePlugin(resource)
+	, ChosenResources(chosenResources) 
+	, MatchedResources() {
+	wxGenericValidator termValidator(&term);
 	TransferDataToWindow();
-	FilesCombo->SetFocus();
+}
+
+void mvceditor::ResourceSearchDialogClass::OnSearchText(wxCommandEvent& event) {
+	wxString text = SearchText->GetValue();
+	if (text.Length() > 3) {
+		if (!ResourcePlugin.NeedToIndex(text)) {
+			MatchedResources = ResourcePlugin.SearchForResources(text);
+			if (!MatchedResources.empty()) {
+				ShowJumpToResults(text, MatchedResources);
+			}
+			else {
+				Results->Clear();
+				ResultsLabel->SetLabel(_("No matches found"));
+			}
+		}
+	}	
+}
+
+void mvceditor::ResourceSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
+	if (MatchedResources.size() == 1) {
+		TransferDataFromWindow();
+		ChosenResources.clear();
+		ChosenResources.push_back(MatchedResources[0]);
+		EndModal(wxOK);
+	}
+}
+
+void mvceditor::ResourceSearchDialogClass::ShowJumpToResults(const wxString& finderQuery, const std::vector<mvceditor::ResourceClass>& allMatches) {
+	wxArrayString files;
+	UnicodeString fileName,
+		className, 
+		methodName;
+	int lineNumber = 0;
+	mvceditor::ResourceFinderClass::ResourceTypes type = mvceditor::ResourceFinderClass::ParseGoToResource(finderQuery, 
+		fileName, className, methodName, lineNumber);	
+	for (size_t i = 0; i < allMatches.size(); ++i) {
+		files.Add(allMatches[i].GetFullPath());
+	}
+	Results->Clear();
+	
+	// dont show the project path to the user
+	for (size_t i = 0; i < files.GetCount(); ++i) {
+		wxString shortName = ResourcePlugin.App.Structs.RelativeFileName(files[i]);
+		if (ResourceFinderClass::FILE_NAME != type &&
+			ResourceFinderClass::FILE_NAME_LINE_NUMBER != type) {
+			UnicodeString res = allMatches[i].ClassName + UNICODE_STRING_SIMPLE("::") + allMatches[i].Identifier;
+			shortName += wxT("  (") + mvceditor::StringHelperClass::IcuToWx(res) + wxT(")");
+		}
+		Results->Append(shortName);
+	}
+	ResultsLabel->SetLabel(wxString::Format(_("Found %d files. Please choose file(s) to open."), allMatches.size()));
+}
+
+void mvceditor::ResourceSearchDialogClass::OnOkButton(wxCommandEvent& event) {
+	TransferDataFromWindow();
+	ChosenResources.clear();
+	for (size_t i = 0; i < Results->GetCount(); ++i) {
+		if (Results->IsChecked(i)) {
+			ChosenResources.push_back(MatchedResources[i]);
+		}
+	}
+	if (ChosenResources.empty()) {
+		return;
+	}
+	EndModal(wxOK);
+}
+
+void mvceditor::ResourceSearchDialogClass::OnCancelButton(wxCommandEvent& event) {
+	EndModal(wxCANCEL);
+}
+
+void mvceditor::ResourceSearchDialogClass::Prepopulate(const wxString& term, const std::vector<mvceditor::ResourceClass> &matches) {
+	MatchedResources = matches;
+	SearchText->SetValue(term);
+	ShowJumpToResults(term, MatchedResources);
 }
 	
-/**
- * When a file is chosen make the notebook show the file
- * @param wxCommandEvent& the event
- */
-void mvceditor::ResourcePluginPanelClass::OnFilesComboCombobox(wxCommandEvent& event) {
-	if (Validate() && TransferDataFromWindow()) {
-		wxString fullPath = FilesCombo->GetValue();
-		wxFileName fileName(fullPath);
-		if (fileName.Normalize() && wxFileName::IsFileReadable(fileName.GetFullPath())) {
-			ResourcePlugin.OpenFile(fileName.GetFullPath());
-		}
-		else {
-			ResourcePlugin.SearchForResources();
-		}
-	}
-}
-
-/**
- * When the user presses enter iniate a file search for the entered text.
- * @param wxCommandEvent& the event
- */
-void mvceditor::ResourcePluginPanelClass::OnFilesComboTextEnter(wxCommandEvent& event) {
-	if (Validate() && TransferDataFromWindow()) {
-		wxString fullPath = FilesCombo->GetValue();
-		wxFileName fileName(fullPath);
-		if (fileName.Normalize() && wxFileName::IsFileReadable(fileName.GetFullPath())) {
-			ResourcePlugin.OpenFile(fileName.GetFullPath());
-		}
-		else {
-			ResourcePlugin.SearchForResources();
-		}
-	}
-}
-
-
-/**
- * When the user clicks the help button help text will be shown
- * @param wxCommandEvent& the event
- */
-void mvceditor::ResourcePluginPanelClass::OnHelpButtonClick(wxCommandEvent& event) {
+void mvceditor::ResourceSearchDialogClass::OnHelpButton(wxCommandEvent& event) {
 	
   wxString help = wxString::FromAscii("Type in a file name, file name:page number, "
-		"class name,  or class name::method name. The resulting page will then ben opened.\n\nExamples:\n\n"
+		"class name,  or class name::method name. The resulting page will then be opened.\n\nExamples:\n\n"
 		"user.php\n"
 		"user.php:129\n"
 		"User\n"
@@ -627,51 +597,47 @@ void mvceditor::ResourcePluginPanelClass::OnHelpButtonClick(wxCommandEvent& even
 	wxMessageBox(help, _("Help"), wxOK);	
 }
 
-void mvceditor::ResourcePluginPanelClass::ChangeToFileName(wxString fileName) {
-
-	// for now let's ignore the new (untitled) files
-	if (!fileName.IsEmpty()) {
-		FilesCombo->SetValue(fileName);
-		wxArrayString values = FilesCombo->GetStrings();
-		int foundIndex = values.Index(fileName);
-		if (foundIndex == wxNOT_FOUND) {		
-			FilesCombo->Append(fileName);	
+void mvceditor::ResourceSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
+	int keyCode = event.GetKeyCode();
+	size_t selection = Results->GetSelection();
+	if (keyCode == WXK_DOWN) {		
+		if (!Results->IsEmpty() && selection >= 0 && selection < (Results->GetCount() - 1)) {
+			Results->SetSelection(selection + 1);
 		}
+		else if (!Results->IsEmpty() && selection >= 0) {
+
+			// cycle back to the beginning
+			Results->SetSelection(0);
+		}
+		SearchText->SetFocus();
+	}
+	else if (keyCode == WXK_UP) {
+		if (!Results->IsEmpty() && selection > 0 && selection < Results->GetCount()) {
+			Results->SetSelection(selection - 1);
+		}
+		else if (!Results->IsEmpty() && selection == 0) {
+
+			// cycle back to the end
+			Results->SetSelection(Results->GetCount() - 1);
+		}
+		SearchText->SetFocus();
 	}
 	else {
-		FilesCombo->SetValue(wxEmptyString);
+		event.Skip();
 	}
 }
 
-void mvceditor::ResourcePluginPanelClass::RemoveClosedFiles(mvceditor::NotebookClass* notebook) {
-	int MAX_ITEMS = 18;
-	int pageCount = notebook->GetPageCount();
-	if (pageCount <= 0) {
-		FilesCombo->SetValue(wxEmptyString);
+void mvceditor::ResourceSearchDialogClass::OnResultsDoubleClick(wxCommandEvent& event) {
+	TransferDataFromWindow();
+	ChosenResources.clear();
+	size_t selection = event.GetSelection();
+	if (selection >= 0 && selection < Results->GetCount()) {
+		ChosenResources.push_back(MatchedResources[selection]);
 	}
-
-	// over a certain size, remove file names that are no longer open
-	// we want to remove as little as possible so that it is easier for the 
-	// user to get back to a file.
-	for (size_t i = 0; i < FilesCombo->GetCount() && FilesCombo->GetCount() > (size_t)MAX_ITEMS; ++i) {
-		wxString fileName = FilesCombo->GetString(i);
-		bool found = false;
-		for(size_t j = 0; j < notebook->GetPageCount(); ++j) {
-			CodeControlClass* code = notebook->GetCodeControl(j);
-			if (NULL != code) {
-				if (fileName == code->GetFileName()) {
-					found = true;
-					
-					// we are guaranteed to only have one instance of filename (file can be in at most 1 tab only).
-					break;
-				}
-			}
-		}
-		if (!found) {
-			FilesCombo->Delete(i);
-			--i;
-		}
+	if (ChosenResources.empty()) {
+		return;
 	}
+	EndModal(wxOK);
 }
 
 mvceditor::IndexingDialogClass::IndexingDialogClass(wxWindow* parent) 
@@ -696,8 +662,6 @@ BEGIN_EVENT_TABLE(mvceditor::ResourcePluginClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_RESOURCE + 2, mvceditor::ResourcePluginClass::OnSearchForResource)
 	EVT_MENU(mvceditor::MENU_RESOURCE + 3, mvceditor::ResourcePluginClass::OnJump)
 	EVT_UPDATE_UI(wxID_ANY, mvceditor::ResourcePluginClass::OnUpdateUi)
-	EVT_AUINOTEBOOK_PAGE_CHANGED(wxID_ANY, mvceditor::ResourcePluginClass::OnPageChanged)
-	EVT_AUINOTEBOOK_PAGE_CLOSED(wxID_ANY, mvceditor::ResourcePluginClass::OnPageClosed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FILE_READ_COMPLETE, mvceditor::ResourcePluginClass::OnWorkComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ResourcePluginClass::OnWorkComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ResourcePluginClass::OnWorkInProgress)
