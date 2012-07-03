@@ -35,8 +35,6 @@
 #include <wx/valgen.h>
 #include <algorithm>
 
-static const int ID_FIND_IN_FILES_PROGRESS = wxNewId();
-
 // these IDs are needed so that the IDs of the Regular expression help menu
 // do not collide with the menu IDs of the FinderPlugin
 static const int ID_REGEX_MENU_START = 9000;
@@ -157,7 +155,9 @@ mvceditor::FindInFilesResultsPanelClass::~FindInFilesResultsPanelClass() {
 	// make sure we kill any running searches
 	if (FindInFilesBackgroundFileReader.IsRunning()) {
 		FindInFilesBackgroundFileReader.StopReading();
-		Gauge->StopGauge(FindInFilesGaugeId);
+		
+		// dont try to kill the gauge as the gauge window is not valid anymore
+		// since this object has a program-wide scope.
 	}
 }
 
@@ -372,6 +372,10 @@ void mvceditor::FindInFilesResultsPanelClass::OnFileHit(mvceditor::FindInFilesHi
 }
 
 void mvceditor::FindInFilesResultsPanelClass::OnStopButton(wxCommandEvent& event) {
+	Stop();
+}
+
+void mvceditor::FindInFilesResultsPanelClass::Stop() {
 	FindInFilesBackgroundFileReader.StopReading();
 	Gauge->StopGauge(FindInFilesGaugeId);
 	SetStatus(_("Search stopped"));
@@ -600,7 +604,8 @@ void mvceditor::FindInFilesDialogClass::OnKillFocusReplaceText(wxFocusEvent& eve
 mvceditor::FindInFilesPluginClass::FindInFilesPluginClass(mvceditor::AppClass& app)
 	: PluginClass(app)
 	, PreviousFindInFiles()
-	, DoHiddenFiles(false) {
+	, DoHiddenFiles(false)
+	, ResultsPanels() {
 }
 
 void mvceditor::FindInFilesPluginClass::AddEditMenuItems(wxMenu* editMenu) {
@@ -627,6 +632,23 @@ void mvceditor::FindInFilesPluginClass::OnEditFindInFiles(wxCommandEvent& event)
 			GetNotebook(), GetStatusBarWithGauge(), RunningThreads);		
 		if(AddToolsWindow(panel, _("Find In Files Results"))) {
 			panel->Find(PreviousFindInFiles, DoHiddenFiles);
+			ResultsPanels.push_back(panel);
+		}
+	}
+}
+
+void mvceditor::FindInFilesPluginClass::OnToolsNotebookPageClosed(wxAuiNotebookEvent& event) {
+	int selection = event.GetSelection();
+	wxAuiNotebook* notebook = GetToolsNotebook();
+	wxWindow* window = notebook->GetPage(selection);
+	std::vector<mvceditor::FindInFilesResultsPanelClass*>::iterator it = ResultsPanels.begin();
+	while (it != ResultsPanels.end()) {
+		if (*it == window) {
+			(*it)->Stop();
+			it = ResultsPanels.erase(it);
+		}
+		else {
+			++it;
 		}
 	}
 }
@@ -668,6 +690,7 @@ END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::FindInFilesPluginClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_FIND_IN_FILES, mvceditor::FindInFilesPluginClass::OnEditFindInFiles)
+	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::FindInFilesPluginClass::OnToolsNotebookPageClosed)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::FindInFilesDialogClass, FindInFilesDialogGeneratedClass)

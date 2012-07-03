@@ -218,6 +218,13 @@ public:
 	 */
 	void Find(const FindInFilesClass& findInFiles, bool doHiddenFiles);
 	
+	/**
+	 * Stops a currently running search. It will clean up 
+	 * the gauge also, this means that it must be called while the gauge is valid (ie NOT
+	 * at program end)
+	 */
+	void Stop();
+	
 private:
 
 	/**
@@ -356,6 +363,22 @@ private:
 	 * show the find dialog 
 	 */
 	void OnEditFindInFiles(wxCommandEvent& event);
+	
+	/**
+	 * When a tools notebook tab is closed, if its a find in files results tab
+	 * the the search will be stopped AND the gauge must be cleaned up.
+	 */
+	void OnToolsNotebookPageClosed(wxAuiNotebookEvent& event);
+	
+	/**
+	 * Safer to keep a pointer to these, rather than attempt to type cast.
+	 * Because the tools notebook can contain many types of panels.
+	 * When a tools notebook tab is closed, if its a find in files results tab
+	 * the the search will be stopped AND the gauge must be cleaned up.
+	 * Note that because these are window pointers, we wont own the pointers
+	 * wxWidgets will clean them up.
+	 */
+	std::vector<mvceditor::FindInFilesResultsPanelClass*> ResultsPanels;
 	
 	DECLARE_EVENT_TABLE()
 };
