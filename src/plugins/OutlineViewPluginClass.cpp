@@ -307,7 +307,7 @@ void mvceditor::OutlineViewPluginPanelClass::RefreshOutlines() {
 			Tree->AppendItem(rootId, label);
 		}
 	}
-	Tree->Expand(Tree->GetRootItem());
+	Tree->ExpandAll();
 	Tree->Thaw();
 }
 
