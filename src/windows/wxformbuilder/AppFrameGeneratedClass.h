@@ -67,7 +67,6 @@ class AppFrameGeneratedClass : public wxFrame
 		void _wxFB_OnEditContentAssist( wxCommandEvent& event ){ OnEditContentAssist( event ); }
 		void _wxFB_OnEditCallTip( wxCommandEvent& event ){ OnEditCallTip( event ); }
 		void _wxFB_OnEditPreferences( wxCommandEvent& event ){ OnEditPreferences( event ); }
-		void _wxFB_OnProjectOpen( wxCommandEvent& event ){ OnProjectOpen( event ); }
 		void _wxFB_OnHelpAbout( wxCommandEvent& event ){ OnHelpAbout( event ); }
 		
 	
@@ -84,7 +83,6 @@ class AppFrameGeneratedClass : public wxFrame
 			ID_EDIT_CONTENT_ASSIST,
 			ID_EDIT_CALL_TIP,
 			ID_EDIT_PREFERENCES,
-			ID_PROJECT_OPEN,
 			ID_ABOUT,
 		};
 		
@@ -93,8 +91,8 @@ class AppFrameGeneratedClass : public wxFrame
 		wxMenuBar* MenuBar;
 		wxMenu* FileMenu;
 		wxMenu* EditMenu;
-		wxMenu* ProjectMenu;
-		wxMenu* ToolsMenu;
+		wxMenu* ViewMenu;
+		wxMenu* SearchMenu;
 		wxMenu* HelpMenu;
 		
 		// Virtual event handlers, overide them in your derived class
@@ -118,7 +116,6 @@ class AppFrameGeneratedClass : public wxFrame
 		virtual void OnEditContentAssist( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditCallTip( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditPreferences( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnProjectOpen( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpAbout( wxCommandEvent& event ) { event.Skip(); }
 		
 	

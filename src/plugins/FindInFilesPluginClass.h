@@ -224,7 +224,21 @@ public:
 	 * at program end)
 	 */
 	void Stop();
+
+	/**
+	 * Move the cursor to the next find in files match.
+	 * Will set the cursor to the position of the match, opening the file
+	 * it if it's not already open.
+	 */
+	void ShowNextMatch();
 	
+	/**
+	 * Move the cursor to the previous find in files match.
+	 * Will set the cursor to the position of the match, opening the file
+	 * it if it's not already open.
+	 */
+	void ShowPreviousMatch();
+
 private:
 
 	/**
@@ -299,6 +313,14 @@ private:
 	  * hits
 	  */
 	 void FindInOpenedFiles();
+
+	 /**
+	  * Shows the i'th match. Will set the cursor to the position of the match, opening the file
+	  * it if it's not already open.
+	  *
+	  * @param i index of hit to show. i is 0-based
+	  */
+	 void ShowMatch(int i);
 	
 	DECLARE_EVENT_TABLE()
 };
@@ -349,11 +371,11 @@ public:
 	FindInFilesPluginClass(mvceditor::AppClass& app);
 	
 	/**
-	 * Add menu items to the edit menu for this plugin.
+	 * Add menu items to the search menu for this plugin.
 	 * 
 	 * @param wxMenu* menu the tools menu to add items to.
 	 */
-	void AddEditMenuItems(wxMenu* editMenu);
+	void AddSearchMenuItems(wxMenu* searchMenu);
 
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 
@@ -363,6 +385,10 @@ private:
 	 * show the find dialog 
 	 */
 	void OnEditFindInFiles(wxCommandEvent& event);
+
+	void OnEditFindInFilesNext(wxCommandEvent& event);
+
+	void OnEditFindInFilesPrevious(wxCommandEvent& event);
 	
 	/**
 	 * When a tools notebook tab is closed, if its a find in files results tab

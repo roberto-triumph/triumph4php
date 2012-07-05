@@ -64,7 +64,7 @@ public:
 
 	EditorMessagesPluginClass(mvceditor::AppClass& app);
 
-	void AddToolsMenuItems(wxMenu* toolsMenu);
+	void AddViewMenuItems(wxMenu* toolsMenu);
 
 	/**
 	 * create the messages panel (or use the existing one) and

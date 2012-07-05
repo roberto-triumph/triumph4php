@@ -62,16 +62,16 @@ mvceditor::ResourceCacheClass* mvceditor::PluginClass::GetResourceCache() {
 	return &App.Structs.ResourceCache;
 }
 
-void mvceditor::PluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
+void mvceditor::PluginClass::AddViewMenuItems(wxMenu* viewMenu) {
+}
+
+void mvceditor::PluginClass::AddSearchMenuItems(wxMenu* searchMenu) {
 }
 
 void mvceditor::PluginClass::AddFileMenuItems(wxMenu* fileMenu) {
 }
 
 void mvceditor::PluginClass::AddEditMenuItems(wxMenu* editMenu) {
-}
-
-void mvceditor::PluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
 }
 
 void mvceditor::PluginClass::AddNewMenu(wxMenuBar*) {

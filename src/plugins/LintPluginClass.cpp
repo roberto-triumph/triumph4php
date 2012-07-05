@@ -262,10 +262,10 @@ mvceditor::LintPluginClass::~LintPluginClass() {
 	}
 }
 
-void mvceditor::LintPluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
-	projectMenu->Append(mvceditor::MENU_LINT_PHP + 0, _("Lint Check"), _("Performs syntax check on the current project"), wxITEM_NORMAL);
-	projectMenu->Append(mvceditor::MENU_LINT_PHP + 1, _("Show Next Lint Error\tF4"), _("Selects the next lint error in the code window"), wxITEM_NORMAL);
-	projectMenu->Append(mvceditor::MENU_LINT_PHP + 2, _("Show Previous Lint Error\tSHIFT+F4"), _("Selects the previous lint error in the code window"), wxITEM_NORMAL);
+void mvceditor::LintPluginClass::AddViewMenuItems(wxMenu* viewMenu) {
+	viewMenu->Append(mvceditor::MENU_LINT_PHP + 0, _("Lint Check"), _("Performs syntax check on the current project"), wxITEM_NORMAL);
+	viewMenu->Append(mvceditor::MENU_LINT_PHP + 1, _("Show Next Lint Error\tF4"), _("Selects the next lint error in the code window"), wxITEM_NORMAL);
+	viewMenu->Append(mvceditor::MENU_LINT_PHP + 2, _("Show Previous Lint Error\tSHIFT+F4"), _("Selects the previous lint error in the code window"), wxITEM_NORMAL);
 }
 
 void mvceditor::LintPluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {

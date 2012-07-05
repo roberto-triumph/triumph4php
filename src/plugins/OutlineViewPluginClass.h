@@ -99,9 +99,9 @@ public:
 	OutlineViewPluginClass(mvceditor::AppClass& app);
 
 	/**
-	 * This plugin will have a tools menu entry
+	 * This plugin will have a view menu entry
 	 */
-	void AddToolsMenuItems(wxMenu* editMenu);
+	void AddViewMenuItems(wxMenu* viewMenu);
 
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 	

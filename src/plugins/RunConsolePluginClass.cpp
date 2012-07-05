@@ -562,25 +562,27 @@ mvceditor::RunConsolePluginClass::RunConsolePluginClass(mvceditor::AppClass& app
 	, CommandToolbar(NULL) {
 }
 
-void mvceditor::RunConsolePluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
-	RunCliMenuItem = new wxMenuItem(toolsMenu, mvceditor::MENU_RUN_PHP + 0, _("Run As CLI\tF7"), 
+void mvceditor::RunConsolePluginClass::AddNewMenu(wxMenuBar* menuBar) {
+	wxMenu* cliMenu = new wxMenu(0);
+	RunCliMenuItem = new wxMenuItem(cliMenu, mvceditor::MENU_RUN_PHP + 0, _("Run As CLI\tF7"), 
 		_("Run File As a PHP Command Line Script"), wxITEM_NORMAL);
-	toolsMenu->Append(RunCliMenuItem);
-	RunCliWithArgsMenuItem = new wxMenuItem(toolsMenu, mvceditor::MENU_RUN_PHP + 1, _("Run As CLI With Arguments\tSHIFT+F7"), 
+	cliMenu->Append(RunCliMenuItem);
+	RunCliWithArgsMenuItem = new wxMenuItem(cliMenu, mvceditor::MENU_RUN_PHP + 1, _("Run As CLI With Arguments\tSHIFT+F7"), 
 		_("Run File As a PHP Command Line Script With Arguments"), wxITEM_NORMAL);
-	toolsMenu->Append(RunCliWithArgsMenuItem);
-	RunCliInNewWindowMenuItem = new wxMenuItem(toolsMenu, mvceditor::MENU_RUN_PHP + 2, _("Run As CLI In New Window\tCTRL+F7"), 
+	cliMenu->Append(RunCliWithArgsMenuItem);
+	RunCliInNewWindowMenuItem = new wxMenuItem(cliMenu, mvceditor::MENU_RUN_PHP + 2, _("Run As CLI In New Window\tCTRL+F7"), 
 		_("Run File As a PHP Command Line Script In a New Window"), wxITEM_NORMAL);
-	toolsMenu->Append(RunCliInNewWindowMenuItem);
-	RunCliWithArgsInNewWindowMenuItem = new wxMenuItem(toolsMenu, mvceditor::MENU_RUN_PHP + 3, 
+	cliMenu->Append(RunCliInNewWindowMenuItem);
+	RunCliWithArgsInNewWindowMenuItem = new wxMenuItem(cliMenu, mvceditor::MENU_RUN_PHP + 3, 
 		_("Run As CLI In New Window With Arguments\tCTRL+SHIFT+F7"), 
 		_("Run File As a PHP Command Line Script In a New Window With Arguments"), wxITEM_NORMAL);
-	toolsMenu->Append(RunCliWithArgsInNewWindowMenuItem);
-	toolsMenu->AppendSeparator();
-	toolsMenu->Append(mvceditor::MENU_RUN_PHP + 4, 
+	cliMenu->Append(RunCliWithArgsInNewWindowMenuItem);
+	cliMenu->AppendSeparator();
+	cliMenu->Append(mvceditor::MENU_RUN_PHP + 4, 
 		_("Saved CLI Commands"),
 		_("Open a dialog that shows the saved CLI commands"),
 		wxITEM_NORMAL);
+	menuBar->Append(cliMenu, _("CLI"));
 }
 
 void mvceditor::RunConsolePluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {

@@ -403,7 +403,7 @@ public:
 	/**
 	 * This plugin will have menu to create ad-hoc queries
 	 */
-	void AddToolsMenuItems(wxMenu* toolsMenu);
+	void AddNewMenu(wxMenuBar* menuBar);
 
 	void AddToolBarItems(wxAuiToolBar* toolBar);
 

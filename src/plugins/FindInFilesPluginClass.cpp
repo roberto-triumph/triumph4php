@@ -177,6 +177,7 @@ void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findI
 			EnableButtons(true, false, false);
 			Gauge->AddGauge(_("Find In Files"), FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE, 
 				wxGA_HORIZONTAL);
+			SetStatus(_("Searching"));
 
 			// lets do the find in the opened files ourselves so that the hits are not stale
 			FindInOpenedFiles();			
@@ -235,6 +236,38 @@ void mvceditor::FindInFilesResultsPanelClass::FindInOpenedFiles() {
 			}
 		}
 	}
+}
+
+void mvceditor::FindInFilesResultsPanelClass::ShowNextMatch() {
+	wxArrayInt selections;
+	size_t selCount = ResultsList->GetSelections(selections);
+	ResultsList->DeselectAll();
+	int sel;
+	if (selections.GetCount() > 0 && selections[0] < ((int)ResultsList->GetCount() - 1)) {
+		sel = selections[0] + 1;
+	}
+	else {
+		// loop back to the beginning
+		sel = 0;
+	}
+	ShowMatch(sel);
+	ResultsList->SetSelection(sel);
+}
+
+void mvceditor::FindInFilesResultsPanelClass::ShowPreviousMatch() {
+	wxArrayInt selections;
+	size_t selCount = ResultsList->GetSelections(selections);
+	ResultsList->DeselectAll();
+	int sel;
+	if (selections.GetCount() > 0 && selections[0] > 0) {
+		sel = selections[0] - 1;
+	}
+	else {
+		// loop back to the end
+		sel = ResultsList->GetCount() - 1;
+	}
+	ShowMatch(sel);
+	ResultsList->SetSelection(sel);
 }
 
 void mvceditor::FindInFilesResultsPanelClass::OnReplaceButton(wxCommandEvent& event) {
@@ -314,6 +347,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxComman
 			Gauge->AddGauge(_("Find In Files"), FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE, 
 				wxGA_HORIZONTAL);
 			EnableButtons(true, false, false);
+			SetStatus(_("Replacing"));
 		}
 		else if (error == mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING)  {
 			wxMessageBox(_("Find in files is already running. Please wait for it to finish."), _("Find In Files"));
@@ -384,7 +418,12 @@ void mvceditor::FindInFilesResultsPanelClass::Stop() {
 }
 
 void mvceditor::FindInFilesResultsPanelClass::OnDoubleClick(wxCommandEvent& event) {
-	wxString result = event.GetString();
+	int sel = event.GetSelection();
+	ShowMatch(sel);
+}
+
+void mvceditor::FindInFilesResultsPanelClass::ShowMatch(int i) {
+	wxString result = ResultsList->GetString(i);
 	int index = result.Find(wxT("\t:"));
 	if (index > -1) {
 		wxString fileName = result.substr(0, index);
@@ -608,14 +647,20 @@ mvceditor::FindInFilesPluginClass::FindInFilesPluginClass(mvceditor::AppClass& a
 	, ResultsPanels() {
 }
 
-void mvceditor::FindInFilesPluginClass::AddEditMenuItems(wxMenu* editMenu) {
-	editMenu->Append(mvceditor::MENU_FIND_IN_FILES, _("Find In Files\tCTRL+SHIFT+F"), 
+void mvceditor::FindInFilesPluginClass::AddSearchMenuItems(wxMenu* searchMenu) {
+	searchMenu->Append(mvceditor::MENU_FIND_IN_FILES + 0, _("Find In Files\tCTRL+SHIFT+F"), 
 		_("Find an expression by searching entire directory contents"));
+	searchMenu->Append(mvceditor::MENU_FIND_IN_FILES + 1, _("Next Find In Files Match\tALT+F3"), 
+		_("Move the cursor to the next Find In Files Match"));
+	searchMenu->Append(mvceditor::MENU_FIND_IN_FILES + 2, _("Previous Find In Files Match\tALT+SHIFT+F3"),
+		_("Move the cursor to the previous Find In Files Match"));
 }
 
 void mvceditor::FindInFilesPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
 	menuItemIds[mvceditor::MENU_FIND_IN_FILES + 0] = wxT("Find-Find In Files");
+	menuItemIds[mvceditor::MENU_FIND_IN_FILES + 1] = wxT("Find-Find In Files Next Match");
+	menuItemIds[mvceditor::MENU_FIND_IN_FILES + 2] = wxT("Find-Find In Files Previous Match");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
@@ -633,6 +678,38 @@ void mvceditor::FindInFilesPluginClass::OnEditFindInFiles(wxCommandEvent& event)
 		if(AddToolsWindow(panel, _("Find In Files Results"))) {
 			panel->Find(PreviousFindInFiles, DoHiddenFiles);
 			ResultsPanels.push_back(panel);
+		}
+	}
+}
+
+void mvceditor::FindInFilesPluginClass::OnEditFindInFilesNext(wxCommandEvent& event) {
+	wxAuiNotebook* notebook = GetToolsNotebook();
+	int selection = notebook->GetSelection();
+	wxWindow* window = notebook->GetPage(selection);
+	std::vector<mvceditor::FindInFilesResultsPanelClass*>::iterator it = ResultsPanels.begin();
+	while (it != ResultsPanels.end()) {
+		if (*it == window) {
+			(*it)->ShowNextMatch();
+			break;
+		}
+		else {
+			++it;
+		}
+	}
+}
+
+void mvceditor::FindInFilesPluginClass::OnEditFindInFilesPrevious(wxCommandEvent& event) {
+	wxAuiNotebook* notebook = GetToolsNotebook();
+	int selection = notebook->GetSelection();
+	wxWindow* window = notebook->GetPage(selection);
+	std::vector<mvceditor::FindInFilesResultsPanelClass*>::iterator it = ResultsPanels.begin();
+	while (it != ResultsPanels.end()) {
+		if (*it == window) {
+			(*it)->ShowPreviousMatch();
+			break;
+		}
+		else {
+			++it;
 		}
 	}
 }
@@ -689,7 +766,9 @@ BEGIN_EVENT_TABLE(mvceditor::FindInFilesResultsPanelClass, FindInFilesResultsPan
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::FindInFilesPluginClass, wxEvtHandler)
-	EVT_MENU(mvceditor::MENU_FIND_IN_FILES, mvceditor::FindInFilesPluginClass::OnEditFindInFiles)
+	EVT_MENU(mvceditor::MENU_FIND_IN_FILES + 0, mvceditor::FindInFilesPluginClass::OnEditFindInFiles)
+	EVT_MENU(mvceditor::MENU_FIND_IN_FILES + 1, mvceditor::FindInFilesPluginClass::OnEditFindInFilesNext)
+	EVT_MENU(mvceditor::MENU_FIND_IN_FILES + 2, mvceditor::FindInFilesPluginClass::OnEditFindInFilesPrevious)
 	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::FindInFilesPluginClass::OnToolsNotebookPageClosed)
 END_EVENT_TABLE()
 

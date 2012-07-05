@@ -43,11 +43,6 @@ public:
 	 * This plugin will have no Edit menu items
 	 */
 	void AddEditMenuItems(wxMenu* editMenu);
-	
-	/**
-	 * This plugin will have no project menu items
-	 */
-	void AddProjectMenuItems(wxMenu* projectMenu);
 
 	/**
 	 * This plugin will have one toolbar button, when clicked the Go() method will get called

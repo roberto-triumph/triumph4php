@@ -135,7 +135,7 @@ public:
 	
 	ResourcePluginClass(mvceditor::AppClass& app);
 
-	void AddProjectMenuItems(wxMenu* projectMenu);
+	void AddSearchMenuItems(wxMenu* searchMenu);
 
 	void AddToolBarItems(wxAuiToolBar* toolBar);
 

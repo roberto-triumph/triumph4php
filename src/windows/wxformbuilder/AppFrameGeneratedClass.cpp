@@ -32,7 +32,6 @@ BEGIN_EVENT_TABLE( AppFrameGeneratedClass, wxFrame )
 	EVT_MENU( ID_EDIT_CONTENT_ASSIST, AppFrameGeneratedClass::_wxFB_OnEditContentAssist )
 	EVT_MENU( ID_EDIT_CALL_TIP, AppFrameGeneratedClass::_wxFB_OnEditCallTip )
 	EVT_MENU( ID_EDIT_PREFERENCES, AppFrameGeneratedClass::_wxFB_OnEditPreferences )
-	EVT_MENU( ID_PROJECT_OPEN, AppFrameGeneratedClass::_wxFB_OnProjectOpen )
 	EVT_MENU( ID_ABOUT, AppFrameGeneratedClass::_wxFB_OnHelpAbout )
 END_EVENT_TABLE()
 
@@ -137,15 +136,11 @@ AppFrameGeneratedClass::AppFrameGeneratedClass( wxWindow* parent, wxWindowID id,
 	
 	MenuBar->Append( EditMenu, _("&Edit") ); 
 	
-	ProjectMenu = new wxMenu();
-	wxMenuItem* MenuItemProjectOpen;
-	MenuItemProjectOpen = new wxMenuItem( ProjectMenu, ID_PROJECT_OPEN, wxString( _("&Open") ) , _("Set the default directory for all operations"), wxITEM_NORMAL );
-	ProjectMenu->Append( MenuItemProjectOpen );
+	ViewMenu = new wxMenu();
+	MenuBar->Append( ViewMenu, _("&View") ); 
 	
-	MenuBar->Append( ProjectMenu, _("&Project") ); 
-	
-	ToolsMenu = new wxMenu();
-	MenuBar->Append( ToolsMenu, _("Tools") ); 
+	SearchMenu = new wxMenu();
+	MenuBar->Append( SearchMenu, _("&Search") ); 
 	
 	HelpMenu = new wxMenu();
 	wxMenuItem* MenuItemAbout;

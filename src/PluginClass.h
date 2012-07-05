@@ -166,12 +166,20 @@ public:
 		wxAuiNotebook* outlineNotebook, wxAuiManager* auiManager, wxMenuBar* menuBar);
 		
 	/**
-	 * Add menu items to the tools menu for this plugin. Remeber to use the MenuIds enum when building
+	 * Add menu items to the view menu for this plugin. Remeber to use the MenuIds enum when building
 	 * menu items.
 	 * 
-	 * @param wxMenu* menu the tools menu to add items to.
+	 * @param wxMenu* menu the view menu to add items to.
 	 */
-	virtual void AddToolsMenuItems(wxMenu* toolsMenu);
+	virtual void AddViewMenuItems(wxMenu* viewMenu);
+
+	/**
+	 * Add menu items to the search menu for this plugin. Remeber to use the MenuIds enum when building
+	 * menu items.
+	 * 
+	 * @param wxMenu* menu the view menu to add items to.
+	 */
+	virtual void AddSearchMenuItems(wxMenu* searchMenu);
 
 	/**
 	 * Add menu items to the file menu for this plugin. Remeber to use the MenuIds enum when building
@@ -196,14 +204,6 @@ public:
 	 * @param wxMenuBar* the menu bar to insert the new menu to
 	 */
 	virtual void AddNewMenu(wxMenuBar* menuBar);
-	
-	/**
-	 * Add menu items to the project menu for this plugin. Remeber to use the MenuIds enum when building
-	 * menu items.
-	 * 
-	 * @param wxMenu* menu the tools menu to add items to.
-	 */
-	virtual void AddProjectMenuItems(wxMenu* projectMenu);
 
 	/**
 	 * Adds items to the toolbar.  These items will be left aligned.

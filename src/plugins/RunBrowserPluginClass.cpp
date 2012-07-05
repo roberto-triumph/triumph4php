@@ -216,13 +216,6 @@ mvceditor::RunBrowserPluginClass::RunBrowserPluginClass(mvceditor::AppClass& app
 		
 }
 
-void mvceditor::RunBrowserPluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
-	RunInBrowser = new wxMenuItem(toolsMenu, mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 1, 
-		_("Run In Web Browser"),
-		_("Run the script in the chosen Web Browser"), wxITEM_NORMAL);
-	toolsMenu->Append(RunInBrowser);
-}
-
 void mvceditor::RunBrowserPluginClass::AddWindows() {
 	BrowserToolbar = new wxAuiToolBar(GetMainWindow(), wxID_ANY, wxDefaultPosition, wxDefaultSize,
                                          wxAUI_TB_DEFAULT_STYLE |
@@ -248,9 +241,9 @@ void mvceditor::RunBrowserPluginClass::AddWindows() {
 }	
 
 void mvceditor::RunBrowserPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
-	std::map<int, wxString> menuItemIds;
-	menuItemIds[mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 1] = wxT("Run-In Web Browser");
-	AddDynamicCmd(menuItemIds, shortcuts);
+	//std::map<int, wxString> menuItemIds;
+	//menuItemIds[mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 1] = wxT("Run-In Web Browser");
+	//AddDynamicCmd(menuItemIds, shortcuts);
 }
 
 void mvceditor::RunBrowserPluginClass::LoadPreferences(wxConfigBase* config) {

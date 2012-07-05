@@ -90,8 +90,8 @@ mvceditor::ViewFilePluginClass::ViewFilePluginClass(mvceditor::AppClass& app)
 	, CallStackThread(*this, RunningThreads) {
 }
 
-void mvceditor::ViewFilePluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
-	toolsMenu->Append(mvceditor::MENU_VIEW_FILES + 0, _("Views"), 
+void mvceditor::ViewFilePluginClass::AddViewMenuItems(wxMenu* viewMenu) {
+	viewMenu->Append(mvceditor::MENU_VIEW_FILES + 0, _("Views"), 
 		_("Shows the view (template) files for the currently selected URL"), wxITEM_NORMAL);
 }
 

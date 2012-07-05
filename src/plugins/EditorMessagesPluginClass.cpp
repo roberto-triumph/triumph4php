@@ -107,8 +107,8 @@ mvceditor::EditorMessagesPluginClass::EditorMessagesPluginClass(mvceditor::AppCl
 	wxLog::SetActiveTarget(new mvceditor::EditorMessagesLoggerClass(*this));
 }
 
-void mvceditor::EditorMessagesPluginClass::AddToolsMenuItems(wxMenu *toolsMenu) {
-	toolsMenu->Append(mvceditor::MENU_EDITOR_MESSAGES, _("Editor Messages"), 
+void mvceditor::EditorMessagesPluginClass::AddViewMenuItems(wxMenu *viewMenu) {
+	viewMenu->Append(mvceditor::MENU_EDITOR_MESSAGES, _("Editor Messages"), 
 		_("Editor Messages"));
 }
 

@@ -74,11 +74,6 @@ mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass
 	Notebook->Structs = &App.Structs;
 	Notebook->EventSink = &App.EventSink;
 	
-	// ATTN: for some reason must remove and re-insert menu item in order to change the icon
-	wxMenuItem* projectOpenMenuItem = MenuBar->FindItem(ID_PROJECT_OPEN);
-	projectOpenMenuItem = ProjectMenu->Remove(projectOpenMenuItem);
-	projectOpenMenuItem->SetBitmap(wxArtProvider::GetBitmap(wxART_FOLDER_OPEN, wxART_MENU));
-	ProjectMenu->Insert(0, projectOpenMenuItem);
 	ToolsNotebook = new wxAuiNotebook(this, mvceditor::ID_TOOLS_NOTEBOOK, wxDefaultPosition, wxDefaultSize, 
 		wxAUI_NB_TOP | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_CLOSE_ON_ACTIVE_TAB | wxAUI_NB_TAB_MOVE);
 	OutlineNotebook = new wxAuiNotebook(this, mvceditor::ID_OUTLINE_NOTEBOOK, wxDefaultPosition, wxDefaultSize, 
@@ -428,16 +423,19 @@ void mvceditor::AppFrameClass::LoadPlugin(mvceditor::PluginClass* plugin) {
 	if (oldEditMenuCount != EditMenu->GetMenuItemCount() && oldEditMenuCount > 0) {
 		EditMenu->InsertSeparator(oldEditMenuCount);
 	}
-	size_t oldProjectMenuCount = ProjectMenu->GetMenuItemCount();
-	plugin->AddProjectMenuItems(ProjectMenu);
-	if (oldProjectMenuCount != ProjectMenu->GetMenuItemCount() && oldProjectMenuCount > 0) {
-		ProjectMenu->InsertSeparator(oldProjectMenuCount);
-	}		
-	size_t oldToolsMenuCount = ToolsMenu->GetMenuItemCount();
-	plugin->AddToolsMenuItems(ToolsMenu);
-	if (oldToolsMenuCount != ToolsMenu->GetMenuItemCount() && oldToolsMenuCount > 0) {
-		ToolsMenu->InsertSeparator(oldToolsMenuCount);
+
+	size_t oldViewMenuCount = ViewMenu->GetMenuItemCount();
+	plugin->AddViewMenuItems(ViewMenu);
+	if (oldViewMenuCount != ViewMenu->GetMenuItemCount() && oldViewMenuCount > 0) {
+		ViewMenu->InsertSeparator(oldViewMenuCount);
 	}
+
+	size_t oldSearchMenuCount = SearchMenu->GetMenuItemCount();
+	plugin->AddSearchMenuItems(SearchMenu);
+	if (oldSearchMenuCount != SearchMenu->GetMenuItemCount() && oldSearchMenuCount > 0) {
+		SearchMenu->InsertSeparator(oldSearchMenuCount);
+	}
+
 	wxMenuBar* menuBar = GetMenuBar();
 	plugin->AddNewMenu(menuBar);
 
@@ -633,7 +631,6 @@ void mvceditor::AppFrameClass::DefaultKeyboardShortcuts() {
 	defaultMenus[ID_EDIT_CONTENT_ASSIST] = wxT("Edit-Content Assist");
 	defaultMenus[ID_EDIT_CALL_TIP] = wxT("Edit-Call Tip");
 	defaultMenus[ID_EDIT_PREFERENCES] = wxT("Edit-Preferences");
-	defaultMenus[ID_PROJECT_OPEN] = wxT("Project-Open");
 	defaultMenus[ID_ABOUT] = wxT("Help-About");
 	wxMenuBar* menuBar = GetMenuBar();
 	for (std::map<int, wxString>::iterator it = defaultMenus.begin(); it != defaultMenus.end(); ++it) {

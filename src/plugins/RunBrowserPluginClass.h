@@ -104,8 +104,6 @@ public:
 
 	RunBrowserPluginClass(mvceditor::AppClass& app);
 	
-	void AddToolsMenuItems(wxMenu* toolsMenu);
-	
 	void AddWindows();
 	
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);

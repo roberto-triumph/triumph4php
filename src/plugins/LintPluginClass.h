@@ -255,7 +255,7 @@ public:
 
 protected: 
 
-	void AddProjectMenuItems(wxMenu* projectMenu);
+	void AddViewMenuItems(wxMenu* viewMenu);
 	
 	void AddToolBarItems(wxAuiToolBar* toolBar);
 	

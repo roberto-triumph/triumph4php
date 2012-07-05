@@ -686,15 +686,17 @@ void mvceditor::SqlBrowserPluginClass::DetectMetadata() {
 	}
 }
 
-void mvceditor::SqlBrowserPluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
-	toolsMenu->Append(mvceditor::MENU_SQL + 0, _("SQL Browser\tSHIFT+F9"), _("Open a window for SQL browsing"),
+void mvceditor::SqlBrowserPluginClass::AddNewMenu(wxMenuBar* menuBar) {
+	wxMenu* sqlMenu = new wxMenu(0);
+	sqlMenu->Append(mvceditor::MENU_SQL + 0, _("SQL Browser\tSHIFT+F9"), _("Open a window for SQL browsing"),
 		wxITEM_NORMAL);
-	toolsMenu->Append(mvceditor::MENU_SQL + 1, _("SQL Connections\tCTRL+F9"), _("Show & Pick The SQL Connections that this project uses"),
+	sqlMenu->Append(mvceditor::MENU_SQL + 1, _("SQL Connections\tCTRL+F9"), _("Show & Pick The SQL Connections that this project uses"),
 		wxITEM_NORMAL);
-	toolsMenu->Append(mvceditor::MENU_SQL + 2, _("Run Queries in SQL Browser\tF9"), _("Execute the query that is currently in the SQL Browser"),
+	sqlMenu->Append(mvceditor::MENU_SQL + 2, _("Run Queries in SQL Browser\tF9"), _("Execute the query that is currently in the SQL Browser"),
 		wxITEM_NORMAL);
-	toolsMenu->Append(mvceditor::MENU_SQL + 3, _("Detect SQL Meta Data"), _("Detect SQL Meta data so that it is made available to code completion"),
+	sqlMenu->Append(mvceditor::MENU_SQL + 3, _("Detect SQL Meta Data"), _("Detect SQL Meta data so that it is made available to code completion"),
 		wxITEM_NORMAL);
+	menuBar->Append(sqlMenu, _("SQL"));
 }
 
 void mvceditor::SqlBrowserPluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {

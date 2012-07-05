@@ -63,9 +63,8 @@ public:
 	void ProjectOpenDefault();
 
 	/**
-	 * Add menu items to the project menu
+	 * Add menu items to the file menu
 	 */
-	void AddProjectMenuItems(wxMenu* projectMenu);
 	void AddFileMenuItems(wxMenu* fileMenu);
 
 	/**

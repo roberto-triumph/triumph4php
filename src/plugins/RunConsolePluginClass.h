@@ -328,7 +328,7 @@ public:
 	/**
 	 * Add menu items
 	 */
-	void AddToolsMenuItems(wxMenu* toolsMenu);
+	void AddNewMenu(wxMenuBar* menuBar);
 	
 	/**
 	 * Add items to the toolbar

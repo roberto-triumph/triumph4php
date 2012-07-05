@@ -74,8 +74,8 @@ mvceditor::OutlineViewPluginClass::OutlineViewPluginClass(mvceditor::AppClass& a
 	
 }
 
-void mvceditor::OutlineViewPluginClass::AddToolsMenuItems(wxMenu* toolsMenu) {
-	toolsMenu->Append(mvceditor::MENU_OUTLINE, _("Outline Current File"),  _("Opens an outline view of the currently viewed file"), wxITEM_NORMAL);
+void mvceditor::OutlineViewPluginClass::AddViewMenuItems(wxMenu* viewMenu) {
+	viewMenu->Append(mvceditor::MENU_OUTLINE, _("Outline Current File"),  _("Opens an outline view of the currently viewed file"), wxITEM_NORMAL);
 }
 
 void mvceditor::OutlineViewPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {

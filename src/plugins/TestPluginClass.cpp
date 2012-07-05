@@ -35,9 +35,6 @@ void mvceditor::TestPluginClass::AddCodeControlClassContextMenuItems(wxMenu* men
 void mvceditor::TestPluginClass::AddEditMenuItems(wxMenu* editMenu) {
 }
 
-void mvceditor::TestPluginClass::AddProjectMenuItems(wxMenu* projectMenu) {
-}
-
 void mvceditor::TestPluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 	toolBar->AddTool(ID_GO_BUTTON, wxT("GO"), wxArtProvider::GetBitmap(
 	                     wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), wxT("GO"), wxITEM_NORMAL);

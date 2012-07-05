@@ -118,7 +118,7 @@ public:
 	/**
 	 * transfers the settings from the window to the Environment data structure
 	 */
-	void Apply();
+	bool TransferDataFromWindow();
 
 private:
 	
@@ -186,7 +186,7 @@ public:
 	 * applies the settings that were changed to the Environment reference [given
 	 * in the constructor].
 	 */
-	void Apply();
+	bool TransferDataFromWindow();
 	
 protected:
 
@@ -231,7 +231,7 @@ public:
 	
 	PhpEnvironmentPanelClass(wxWindow* parent, EnvironmentClass& environment);
 	
-	void Apply();
+	bool TransferDataFromWindow();
 	
 protected:
 
@@ -290,30 +290,6 @@ protected:
 	
 };
 
-class EnvironmentDialogClass : public wxPropertySheetDialog {
-
-public:
-
-	EnvironmentDialogClass(wxWindow* parent, mvceditor::RunningThreadsClass& runningThreads, EnvironmentClass& environment);
-	
-	/**
-	 * when user OKs the dialog transfer all data to the Environment data structure
-	 */
-	void OnOkButton(wxCommandEvent& event);
-	
-private:
-
-	WebBrowserEditPanelClass* WebBrowserPanel;
-	
-	ApacheEnvironmentPanelClass* ApacheEnvironmentPanel;
-	
-	PhpEnvironmentPanelClass* PhpEnvironmentPanel;
-	
-	EnvironmentClass& Environment;
-	
-	DECLARE_EVENT_TABLE()
-};
-
 /**
  * This plugin will handle the application stack configuration options.
  */
@@ -322,15 +298,11 @@ class EnvironmentPluginClass : public PluginClass {
 public:
 
 	EnvironmentPluginClass(mvceditor::AppClass& app);
-	
-	/**
-	 * Add the environment sub-menu.
-	 * 
-	 * @return wxMenuBar* the menu bar to add to.
-	 */
-	void AddProjectMenuItems(wxMenu* projectMenu);
 
-	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
+	/**
+	 * Add the environment dialogs to the preferences notebook
+	 */
+	void AddPreferenceWindow(wxBookCtrlBase* parent);
 	
 	/**
 	 * Handle the menu item
@@ -338,6 +310,8 @@ public:
 	void OnMenuEnvironment(wxCommandEvent& event);
 	
 private:
+
+	void OnPreferencesUpdated(wxCommandEvent& event);
 	
 	DECLARE_EVENT_TABLE()
 };

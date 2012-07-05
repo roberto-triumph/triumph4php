@@ -248,7 +248,7 @@
                 <event name="OnSetFocus"></event>
                 <event name="OnSize"></event>
                 <event name="OnUpdateUI"></event>
-                <object class="wxMenu" expanded="1">
+                <object class="wxMenu" expanded="0">
                     <property name="label">&amp;File</property>
                     <property name="name">FileMenu</property>
                     <property name="permission">protected</property>
@@ -521,29 +521,14 @@
                         <event name="OnUpdateUI"></event>
                     </object>
                 </object>
-                <object class="wxMenu" expanded="0">
-                    <property name="label">&amp;Project</property>
-                    <property name="name">ProjectMenu</property>
+                <object class="wxMenu" expanded="1">
+                    <property name="label">&amp;View</property>
+                    <property name="name">ViewMenu</property>
                     <property name="permission">protected</property>
-                    <object class="wxMenuItem" expanded="0">
-                        <property name="bitmap"></property>
-                        <property name="checked">0</property>
-                        <property name="enabled">1</property>
-                        <property name="help">Set the default directory for all operations</property>
-                        <property name="id">ID_PROJECT_OPEN</property>
-                        <property name="kind">wxITEM_NORMAL</property>
-                        <property name="label">&amp;Open</property>
-                        <property name="name">MenuItemProjectOpen</property>
-                        <property name="permission">none</property>
-                        <property name="shortcut"></property>
-                        <property name="unchecked_bitmap"></property>
-                        <event name="OnMenuSelection">OnProjectOpen</event>
-                        <event name="OnUpdateUI"></event>
-                    </object>
                 </object>
-                <object class="wxMenu" expanded="0">
-                    <property name="label">Tools</property>
-                    <property name="name">ToolsMenu</property>
+                <object class="wxMenu" expanded="1">
+                    <property name="label">&amp;Search</property>
+                    <property name="name">SearchMenu</property>
                     <property name="permission">protected</property>
                 </object>
                 <object class="wxMenu" expanded="0">

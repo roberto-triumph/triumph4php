@@ -126,7 +126,7 @@ public:
 
 	void SetCurrentUrl(mvceditor::UrlResourceClass url);
 	
-	void AddToolsMenuItems(wxMenu* toolsMenu);
+	void AddViewMenuItems(wxMenu* viewMenu);
 
 	UrlResourceFinderClass& Urls();
 
