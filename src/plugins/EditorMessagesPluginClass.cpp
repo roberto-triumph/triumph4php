@@ -101,10 +101,6 @@ void mvceditor::EditorMessagesPanelClass::AddMessage(wxLogLevel level, const wxC
 
 mvceditor::EditorMessagesPluginClass::EditorMessagesPluginClass(mvceditor::AppClass& app)
 	: PluginClass(app) {
-	
-	// this line is needed so that we get all the wxLogXXX messages
-	// pointer will be managed by wxWidgets
-	wxLog::SetActiveTarget(new mvceditor::EditorMessagesLoggerClass(*this));
 }
 
 void mvceditor::EditorMessagesPluginClass::AddViewMenuItems(wxMenu *viewMenu) {

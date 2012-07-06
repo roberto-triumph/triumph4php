@@ -52,7 +52,8 @@ mvceditor::AppClass::AppClass()
 	, EventSink()
 	, Plugins()
 	, Preferences()
-	, ProjectPlugin(NULL) {
+	, ProjectPlugin(NULL) 
+	, EditorMessagesPlugin(NULL) {
 	AppFrame = NULL;
 }
 
@@ -88,6 +89,11 @@ bool mvceditor::AppClass::OnInit() {
 		SetTopWindow(AppFrame);
 		AppFrame->Maximize(true);
 		AppFrame->Show(true);
+
+		// this line is needed so that we get all the wxLogXXX messages
+		// pointer will be managed by wxWidgets
+		// need to put this here because the logger needs an initialized window state
+		wxLog::SetActiveTarget(new mvceditor::EditorMessagesLoggerClass(*EditorMessagesPlugin));
 		return true;
 	}
 	return false;
@@ -168,8 +174,8 @@ void mvceditor::AppClass::CreatePlugins() {
 	Plugins.push_back(plugin);
 	plugin = new SqlBrowserPluginClass(*this);
 	Plugins.push_back(plugin);
-	plugin = new mvceditor::EditorMessagesPluginClass(*this);
-	Plugins.push_back(plugin);
+	EditorMessagesPlugin = new mvceditor::EditorMessagesPluginClass(*this);
+	Plugins.push_back(EditorMessagesPlugin);
 	plugin = new CodeIgniterPluginClass(*this);
 	Plugins.push_back(plugin);
 	plugin = new RunBrowserPluginClass(*this);
@@ -203,4 +209,6 @@ void mvceditor::AppClass::DeletePlugins() {
 		delete Plugins[i];
 	}
 	Plugins.clear();
+	EditorMessagesPlugin = NULL;
+	ProjectPlugin = NULL;
 }

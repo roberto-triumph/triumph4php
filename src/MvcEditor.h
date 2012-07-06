@@ -27,6 +27,7 @@
 #include <windows/AppFrameClass.h>
 #include <environment/StructsClass.h>
 #include <plugins/ProjectPluginClass.h>
+#include <plugins/EditorMessagesPluginClass.h>
 #include <PluginClass.h>
 #include <PreferencesClass.h>
 #include <Events.h>
@@ -113,6 +114,11 @@ private:
 	 * in the Plugin vector; no need to delete.
 	 */
 	ProjectPluginClass* ProjectPlugin;
+
+	/**
+	 * Shows the user various editor messages (not related to their code)
+	 */
+	EditorMessagesPluginClass* EditorMessagesPlugin;
 
 };
 
