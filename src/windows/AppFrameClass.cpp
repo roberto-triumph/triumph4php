@@ -589,28 +589,6 @@ void mvceditor::AppFrameClass::OnCodeControlUpdate(wxStyledTextEvent& event) {
 	}
 }
 
-void mvceditor::AppFrameClass::OnToolsNotebookPageClosed(wxAuiNotebookEvent& event) {
-	size_t count = ToolsNotebook->GetPageCount();
-
-	// this event is received AFTER the page is removed
-	if (count <= 0) {
-		AuiManager.GetPane(ToolsNotebook).Hide();
-		AuiManager.Update();
-	}
-	event.Skip();
-}
-
-void mvceditor::AppFrameClass::OnOutlineNotebookPageClosed(wxAuiNotebookEvent& event) {
-	size_t count = OutlineNotebook->GetPageCount();
-
-	// this event is received AFTER the page is removed
-	if (count <= 0) {
-		AuiManager.GetPane(OutlineNotebook).Hide();
-		AuiManager.Update();
-	}
-	event.Skip();
-}
-
 void mvceditor::AppFrameClass::DefaultKeyboardShortcuts() {
 
 	// ATTN: when a new menu item is added to the form builder 
@@ -646,7 +624,31 @@ void mvceditor::AppFrameClass::OnAnyMenuCommandEvent(wxCommandEvent& event) {
 }
 
 void mvceditor::AppFrameClass::OnAnyAuiNotebookEvent(wxAuiNotebookEvent& event) {
+	if (event.GetEventType() == wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSED) {
+		if (mvceditor::ID_CODE_NOTEBOOK == event.GetId()) {
+			
+		}
+		else if (mvceditor::ID_TOOLS_NOTEBOOK == event.GetId()) {
+			size_t count = ToolsNotebook->GetPageCount();
+
+			// this event is received AFTER the page is removed
+			if (count <= 0) {
+				AuiManager.GetPane(ToolsNotebook).Hide();
+				AuiManager.Update();
+			}
+		}
+		else if (mvceditor::ID_OUTLINE_NOTEBOOK == event.GetId()) {
+			size_t count = OutlineNotebook->GetPageCount();
+
+			// this event is received AFTER the page is removed
+			if (count <= 0) {
+				AuiManager.GetPane(OutlineNotebook).Hide();
+				AuiManager.Update();
+			}
+		}
+	}
 	App.EventSink.Publish(event);
+	event.Skip();
 }
 
 void mvceditor::AppFrameClass::OnAnyAuiToolbarEvent(wxAuiToolBarEvent& event) {
@@ -727,8 +729,6 @@ BEGIN_EVENT_TABLE(mvceditor::AppFrameClass,  AppFrameGeneratedClass)
 	EVT_MENU(ID_LOWERCASE, mvceditor::AppFrameClass::OnLowecase)
 	EVT_MENU(ID_UPPERCASE, mvceditor::AppFrameClass::OnUppercase)
 	EVT_MENU(ID_TOOLBAR_SAVE, mvceditor::AppFrameClass::SaveCurrentFile)
-	EVT_AUINOTEBOOK_PAGE_CLOSED(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::AppFrameClass::OnToolsNotebookPageClosed)
-	EVT_AUINOTEBOOK_PAGE_CLOSED(mvceditor::ID_OUTLINE_NOTEBOOK, mvceditor::AppFrameClass::OnOutlineNotebookPageClosed)
 
 	// ATTN: STOP! DO NOT HANDLE ANY APP EVENTS HERE! SEE AppEventListenerForFrameClass
 
@@ -748,7 +748,7 @@ BEGIN_EVENT_TABLE(mvceditor::AppFrameClass,  AppFrameGeneratedClass)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(wxID_ANY, mvceditor::AppFrameClass::OnAnyAuiNotebookEvent)
 	EVT_AUINOTEBOOK_PAGE_CHANGING(wxID_ANY, mvceditor::AppFrameClass::OnAnyAuiNotebookEvent)
 	EVT_AUINOTEBOOK_PAGE_CLOSE(wxID_ANY, mvceditor::AppFrameClass::OnAnyAuiNotebookEvent)
-	EVT_AUINOTEBOOK_PAGE_CLOSED(wxID_ANY, mvceditor::AppFrameClass::OnAnyAuiNotebookEvent)
+	EVT_AUINOTEBOOK_PAGE_CLOSED(wxID_ANY, mvceditor::AppFrameClass::OnAnyAuiNotebookEvent) 
 	
 	// make sure the tool bar events are propagated to the app event sink
 	EVT_AUITOOLBAR_BEGIN_DRAG(wxID_ANY, mvceditor::AppFrameClass::OnAnyAuiToolbarEvent)

@@ -252,16 +252,6 @@ private:
 	void OnCodeControlUpdate(wxStyledTextEvent& event);
 
 	/**
-	 * When the tools notebook has no more pages; hide it
-	 */
-	void OnToolsNotebookPageClosed(wxAuiNotebookEvent& event);
-
-	/**
-	 * When the outline notebook has no more pages; hide it
-	 */
-	void OnOutlineNotebookPageClosed(wxAuiNotebookEvent& event);
-
-	/**
 	 * Add the shortcuts for this frame's menu bar into the preference's shortcut list
 	 */
 	void DefaultKeyboardShortcuts();
