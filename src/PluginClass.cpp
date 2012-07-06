@@ -74,7 +74,7 @@ void mvceditor::PluginClass::AddFileMenuItems(wxMenu* fileMenu) {
 void mvceditor::PluginClass::AddEditMenuItems(wxMenu* editMenu) {
 }
 
-void mvceditor::PluginClass::AddNewMenu(wxMenuBar*) {
+void mvceditor::PluginClass::AddNewMenu(wxMenuBar* menuBar) {
 }
 
 void mvceditor::PluginClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {

@@ -45,7 +45,7 @@ wxObject* SearchControlValidatorClass::Clone() const {
 
 bool SearchControlValidatorClass::TransferFromWindow() {
 	bool ret = false;
-	wxSearchCtrl* window = (wxSearchCtrl*)GetWindow();
+	wxSearchCtrl* window = wxDynamicCast(GetWindow(), wxSearchCtrl);
 	if (window) {
 		wxString val = window->GetValue();
 		*Data = val;
@@ -56,7 +56,7 @@ bool SearchControlValidatorClass::TransferFromWindow() {
 
 bool SearchControlValidatorClass::TransferToWindow() {
 	bool ret = false;
-	wxSearchCtrl* window = (wxSearchCtrl*)GetWindow();
+	wxSearchCtrl* window = wxDynamicCast(GetWindow(), wxSearchCtrl);
 	if (window) {
 		wxString val = *Data;
 		window->SetValue(val);

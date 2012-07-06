@@ -48,7 +48,7 @@ wxObject* NonEmptyTextValidatorClass::Clone() const {
 
 bool NonEmptyTextValidatorClass::TransferFromWindow() {
 	bool ret = false;
-	wxTextCtrl* window = (wxTextCtrl*)GetWindow();
+	wxTextCtrl* window = wxDynamicCast(GetWindow(), wxTextCtrl);
 	if (window) {
 		wxString val = window->GetValue();
 		*Data = val;
@@ -59,7 +59,7 @@ bool NonEmptyTextValidatorClass::TransferFromWindow() {
 
 bool NonEmptyTextValidatorClass::TransferToWindow() {
 	bool ret = false;
-	wxTextCtrl* window = (wxTextCtrl*)GetWindow();
+	wxTextCtrl* window = wxDynamicCast(GetWindow(), wxTextCtrl);
 	if (window) {
 		wxString val = *Data;
 		window->SetValue(val);
@@ -70,7 +70,7 @@ bool NonEmptyTextValidatorClass::TransferToWindow() {
 
 bool NonEmptyTextValidatorClass::Validate(wxWindow* parent) {
 	bool isEmpty = true;
-	wxTextCtrl* window = (wxTextCtrl*)GetWindow();
+	wxTextCtrl* window = wxDynamicCast(GetWindow(), wxTextCtrl);
 	if (window) {
 		wxString value = window->GetValue();
 		isEmpty = value.Trim(true).Trim(false).IsEmpty();
