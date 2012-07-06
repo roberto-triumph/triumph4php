@@ -77,8 +77,9 @@ bool mvceditor::ProjectClass::IsAPhpSourceFile(const wxString& fullPath) const {
 	
 	// a file is considered a PHP file if its in a source directory and it matches
 	// the PHP file extensions
-	for (size_t i = 0; i < Sources.size() && !matches; ++i) {
-		matches = Sources[i].Contains(fullPath);
+	std::vector<mvceditor::SourceClass> phpSources = AllPhpSources();
+	for (size_t i = 0; i < phpSources.size() && !matches; ++i) {
+		matches = phpSources[i].Contains(fullPath);
 	}
 	return matches;
 }

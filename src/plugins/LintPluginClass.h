@@ -35,13 +35,32 @@
 
 namespace mvceditor {
 
-/**
- * This event will get dispatched when a lint (syntax) error is encountered.  It will
- * be filled with the following info:
- * event.getClientData(): this is a pointer to a pelet::LintResultsClass instance.  
- * the event handler MUST delete the pointer!
- */
 const wxEventType EVENT_LINT_ERROR = wxNewEventType();
+/**
+ * One EVENT_LINT_ERROR event will be generated once a PHP lint error has been encountered.
+ * See pelet::ParserClass about LintResultClass instances.
+ * An event will be generated only on errors; a clean file will not generate any errors.
+ */
+class LintResultsEventClass : public wxEvent {
+
+public:
+
+	/**
+	 * The results for a single file.
+	 */
+	pelet::LintResultsClass LintResults;
+
+	LintResultsEventClass(const pelet::LintResultsClass& lintResults);
+
+	wxEvent* Clone() const;
+};
+
+typedef void (wxEvtHandler::*LintResultsEventClassFunction)(LintResultsEventClass&);
+
+#define EVT_LINT_ERROR(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_LINT_ERROR, wxID_ANY, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( LintResultsEventClassFunction, & fn ), (wxObject *) NULL ),
 	
 /** 
  * This class will help in parsing the large project. It will enable access
@@ -133,9 +152,11 @@ public:
 	 * @param wxString fileName the full path of the file to lint
 	 * @param structs needed to perform exclude wildcard checks
 	 * @param environment to know which PHP version to check against
+	 * @param results the lint error, will only be filled when there is a lint error
 	 * @return TRUE if the file contains a lint error.
 	 */
-	bool LintSingleFile(const wxString& fileName, const mvceditor::StructsClass& structs, const EnvironmentClass& environment);
+	bool LintSingleFile(const wxString& fileName, const mvceditor::StructsClass& structs, const EnvironmentClass& environment,
+		pelet::LintResultsClass& results);
 
 	/**
 	 * Return a summary of the number of files that were lint'ed.
@@ -174,15 +195,14 @@ class LintResultsPanelClass : public LintResultsGeneratedPanelClass {
 	
 public:
 
-	LintResultsPanelClass(wxWindow *parent, int id, NotebookClass* notebook, std::vector<pelet::LintResultsClass*>& lintErrors);
+	LintResultsPanelClass(wxWindow *parent, int id, NotebookClass* notebook, std::vector<pelet::LintResultsClass>& lintErrors);
 
 	~LintResultsPanelClass();
 	
 	/**
 	 * adds to the list box widget AND the parseResults data structure
-	 * This object will own the given pointer (will delete it).
 	 */
-	void AddError(pelet::LintResultsClass* lintError);
+	void AddError(const pelet::LintResultsClass& lintError);
 	
 	/**
 	 * deletes from the list box widget AND the parseResults data structure
@@ -226,7 +246,7 @@ private:
 
 	NotebookClass* Notebook;
 
-	std::vector<pelet::LintResultsClass*>& LintErrors;
+	std::vector<pelet::LintResultsClass>& LintErrors;
 };
 
 /**
@@ -269,7 +289,7 @@ private:
 
 	void OnPreviousLintError(wxCommandEvent& event);
 	
-	void OnLintError(wxCommandEvent& event);
+	void OnLintError(mvceditor::LintResultsEventClass& event);
 
 	void OnLintFileComplete(wxCommandEvent& event);
 
@@ -284,11 +304,9 @@ private:
 	LintBackgroundFileReaderClass LintBackgroundFileReader;
 
 	/**
-	 * This will hold all info about parse errors. This class will own 
-	 * the pointers themselves as well and will delete them when they
-	 * are no longer needed.
+	 * This will hold all info about parse errors.
 	 */
-	std::vector<pelet::LintResultsClass*>LintErrors;
+	std::vector<pelet::LintResultsClass> LintErrors;
 	
 	/**
 	 * The panel that shows the lint errors. Note that this window

@@ -36,6 +36,16 @@ const int ID_LINT_ERROR_COMMAND = wxNewId();
 const int ID_LINT_RESULTS_PANEL = wxNewId();
 const int ID_LINT_RESULTS_GAUGE = wxNewId();
 
+mvceditor::LintResultsEventClass::LintResultsEventClass(const pelet::LintResultsClass& lintResults)
+	: wxEvent(mvceditor::EVENT_LINT_ERROR) 
+	, LintResults(lintResults) {
+}
+
+wxEvent* mvceditor::LintResultsEventClass::Clone() const {
+	return new mvceditor::LintResultsEventClass(LintResults);
+}
+
+
 mvceditor::ParserDirectoryWalkerClass::ParserDirectoryWalkerClass() 
 	: LastResults()	
 	, WithErrors(0)
@@ -91,7 +101,8 @@ bool mvceditor::LintBackgroundFileReaderClass::BeginDirectoryLint(std::vector<mv
 	return good;
 }
 
-bool mvceditor::LintBackgroundFileReaderClass::LintSingleFile(const wxString& fileName, const mvceditor::StructsClass& structs, const mvceditor::EnvironmentClass& environment) {
+bool mvceditor::LintBackgroundFileReaderClass::LintSingleFile(const wxString& fileName, const mvceditor::StructsClass& structs, 
+															  const mvceditor::EnvironmentClass& environment, pelet::LintResultsClass& results) {
 
 	// ATTN: use a local instance of ParserClass so that this method is thread safe
 	// and can be run when a background thread is already running.
@@ -99,15 +110,9 @@ bool mvceditor::LintBackgroundFileReaderClass::LintSingleFile(const wxString& fi
 	if (structs.IsAPhpSourceFile(fileName)) {
 		ParserDirectoryWalkerClass walker;
 		walker.SetVersion(environment.Php.Version);
-		bool error = walker.Walk(fileName);
+		error = walker.Walk(fileName);
 		if (error) {
-			wxCommandEvent evt(EVENT_LINT_ERROR, ID_LINT_ERROR_COMMAND);
-
-			// ATTN: will need to be DELETED!!
-			pelet::LintResultsClass* clonedResults = new pelet::LintResultsClass;
-			clonedResults->Copy(walker.LastResults);
-			evt.SetClientData((void*)clonedResults);
-			wxPostEvent(&Handler, evt);
+			results.Copy(walker.LastResults);
 		}
 	}
 	return error;
@@ -116,13 +121,8 @@ bool mvceditor::LintBackgroundFileReaderClass::LintSingleFile(const wxString& fi
 bool mvceditor::LintBackgroundFileReaderClass::FileRead(DirectorySearchClass &search) {
 	bool error = search.Walk(ParserDirectoryWalker);
 	if (error) {
-		wxCommandEvent evt(EVENT_LINT_ERROR, ID_LINT_ERROR_COMMAND);
-
-		// ATTN: will need to be DELETED!!
-		pelet::LintResultsClass* clonedResults = new pelet::LintResultsClass;
-		clonedResults->Copy(ParserDirectoryWalker.LastResults);
-		evt.SetClientData((void*)clonedResults);
-		wxPostEvent(&Handler, evt);
+		mvceditor::LintResultsEventClass lintResultsEvent(ParserDirectoryWalker.LastResults);
+		wxPostEvent(&Handler, lintResultsEvent);
 	}
 	return !error;
 }
@@ -137,7 +137,7 @@ void mvceditor::LintBackgroundFileReaderClass::LintTotals(int& totalFiles, int& 
 }
 
 mvceditor::LintResultsPanelClass::LintResultsPanelClass(wxWindow *parent, int id, mvceditor::NotebookClass* notebook,
-														std::vector<pelet::LintResultsClass*>& lintErrors)
+														std::vector<pelet::LintResultsClass>& lintErrors)
 	: LintResultsGeneratedPanelClass(parent, id) 
 	, Notebook(notebook) 
 	, LintErrors(lintErrors) {
@@ -148,17 +148,19 @@ mvceditor::LintResultsPanelClass::~LintResultsPanelClass() {
 	ClearErrors();
 }
 
-void mvceditor::LintResultsPanelClass::AddError(pelet::LintResultsClass* lintError) {
-	wxString err = StringHelperClass::IcuToWx(lintError->Error);
+void mvceditor::LintResultsPanelClass::AddError(const pelet::LintResultsClass& lintError) {
+	wxString err = StringHelperClass::IcuToWx(lintError.Error);
 	wxString line;
-	int capacity = lintError->Error.length() + lintError->UnicodeFilename.length() + 50;
+	int capacity = lintError.Error.length() + lintError.UnicodeFilename.length() + 50;
 	UnicodeString msg;
 	int written = u_sprintf(msg.getBuffer(capacity), 
-		"%S on %S line %d near Position %d\n", 
-		lintError->Error.getTerminatedBuffer(),
-		lintError->UnicodeFilename.getTerminatedBuffer(),
-		lintError->LineNumber,
-		lintError->CharacterPosition
+		"%.*S on %.*S line %d near Position %d\n", 
+		lintError.Error.length(),
+		lintError.Error.getBuffer(),
+		lintError.UnicodeFilename.length(),
+		lintError.UnicodeFilename.getBuffer(),
+		lintError.LineNumber,
+		lintError.CharacterPosition
 	);
 	msg.releaseBuffer(written);
 	wxString wxMsg = mvceditor::StringHelperClass::IcuToWx(msg);
@@ -168,11 +170,6 @@ void mvceditor::LintResultsPanelClass::AddError(pelet::LintResultsClass* lintErr
 
 void mvceditor::LintResultsPanelClass::ClearErrors() {
 	ErrorsList->Clear();
-
-	// ATTN: VERY IMPORTANT to delete the pointers before we clear the vector
-	for(size_t i = 0; i < LintErrors.size(); i++) {
-		delete LintErrors[i];
-	}
 	LintErrors.clear();
 }
 
@@ -180,13 +177,12 @@ void mvceditor::LintResultsPanelClass::RemoveErrorsFor(const wxString& fileName)
 	
 	// remove the lint result data structures as well as the 
 	// display list
-	std::vector<pelet::LintResultsClass*>::iterator it = LintErrors.begin();
+	std::vector<pelet::LintResultsClass>::iterator it = LintErrors.begin();
 	int i = 0;
 
 	UnicodeString uniFileName = mvceditor::StringHelperClass::wxToIcu(fileName);
 	while (it != LintErrors.end()) {
-		if ((*it)->UnicodeFilename == uniFileName) {
-			delete *it;
+		if (it->UnicodeFilename == uniFileName) {
 			it = LintErrors.erase(it);
 			ErrorsList->Delete(i);
 			i--;
@@ -217,11 +213,11 @@ void mvceditor::LintResultsPanelClass::OnListDoubleClick(wxCommandEvent& event) 
 }
 
 void mvceditor::LintResultsPanelClass::DisplayLintError(int index) {
-	pelet::LintResultsClass* results = LintErrors[index];
+	pelet::LintResultsClass results = LintErrors[index];
 
-	wxString file = mvceditor::StringHelperClass::IcuToWx(results->UnicodeFilename);
+	wxString file = mvceditor::StringHelperClass::IcuToWx(results.UnicodeFilename);
 	Notebook->LoadPage(file);
-	Notebook->GetCurrentCodeControl()->MarkLintError(*results);
+	Notebook->GetCurrentCodeControl()->MarkLintError(results);
 }
 
 void mvceditor::LintResultsPanelClass::SelectNextError() {
@@ -346,13 +342,10 @@ void mvceditor::LintPluginClass::OnPreviousLintError(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::LintPluginClass::OnLintError(wxCommandEvent& event) {
-	pelet::LintResultsClass* results = (pelet::LintResultsClass*)event.GetClientData();
+void mvceditor::LintPluginClass::OnLintError(mvceditor::LintResultsEventClass& event) {
+	pelet::LintResultsClass results = event.LintResults;
 	if (ResultsPanel) {
 		ResultsPanel->AddError(results);
-	}
-	else {
-		delete results;
 	}
 }
 
@@ -391,7 +384,8 @@ void mvceditor::LintPluginClass::OnFileSaved(mvceditor::FileSavedEventClass& eve
 	// if user has configure to do lint check on saving or user is cleanin up
 	// errors (after they manually lint checked the project) then re-check
 	if (hasErrors || CheckOnSave) {
-		bool error = LintBackgroundFileReader.LintSingleFile(fileName, App.Structs, *GetEnvironment());
+		pelet::LintResultsClass lintResults;
+		bool error = LintBackgroundFileReader.LintSingleFile(fileName, App.Structs, *GetEnvironment(), lintResults);
 		if (error) {
 			
 			// handle the case where user has saved a file but has not clicked
@@ -406,10 +400,7 @@ void mvceditor::LintPluginClass::OnFileSaved(mvceditor::FileSavedEventClass& eve
 			if (codeControl) {
 				previousPos = GetCurrentCodeControl()->GetCurrentPos();
 			}
-			
-			// we know that there are lint error events to be consumed
-			ProcessPendingEvents();
-			ResultsPanel->DisplayLintError(LintErrors.size() - 1);
+			ResultsPanel->AddError(lintResults);
 
 			// diplaying the lint causes things to be redrawn; put the cursor 
 			// where the user left it
@@ -447,11 +438,11 @@ BEGIN_EVENT_TABLE(mvceditor::LintPluginClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_LINT_PHP + 0, mvceditor::LintPluginClass::OnLintMenu)
 	EVT_MENU(mvceditor::MENU_LINT_PHP + 1, mvceditor::LintPluginClass::OnNextLintError)
 	EVT_MENU(mvceditor::MENU_LINT_PHP + 2, mvceditor::LintPluginClass::OnPreviousLintError)
-	EVT_COMMAND(wxID_ANY, EVENT_LINT_ERROR,  mvceditor::LintPluginClass::OnLintError)
 	EVT_COMMAND(wxID_ANY, EVENT_FILE_READ,  mvceditor::LintPluginClass::OnLintFileComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::LintPluginClass::OnTimer)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::LintPluginClass::OnLintComplete)
 	EVT_PLUGIN_FILE_SAVED(mvceditor::LintPluginClass::OnFileSaved)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_UPDATED, mvceditor::LintPluginClass::SavePreferences)
 	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::LintPluginClass::OnNotebookPageClosed)
+	EVT_LINT_ERROR(mvceditor::LintPluginClass::OnLintError)
 END_EVENT_TABLE()
