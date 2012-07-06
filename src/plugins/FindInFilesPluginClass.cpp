@@ -522,11 +522,31 @@ mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvce
 	Plugin.FilesHistory.Attach(FilesFilter);
 	
 	// the first time showing this dialog populate the filter to have only PHP file extensions
-	// TODO put all sources, php, sql, css file filters
 	if (FilesFilter->GetCount() <= 0) {
 		Plugin.PreviousFindInFiles.Source.SetIncludeWildcards(plugin.App.Structs.PhpFileFiltersString);
 	}
-	
+	std::vector<mvceditor::SourceClass> sources = plugin.App.Structs.AllEnabledSources();
+	for (size_t i = 0; i < sources.size(); ++i) {
+		mvceditor::SourceClass src = sources[i];
+		wxString fullPath = src.RootDirectory.GetFullPath();
+		if (Directory->FindString(fullPath, false) < 0) {
+			Directory->AppendString(fullPath);
+		}
+	}
+
+	// select the last used path by default
+	bool isUsed = false;
+	int foundIndex = -1;
+	wxString lastUsedPath = plugin.PreviousFindInFiles.Source.RootDirectory.GetFullPath();
+	if (!lastUsedPath.IsEmpty()) {
+		int foundIndex = Directory->FindString(lastUsedPath, false);
+		if (foundIndex >= 0) {
+			isUsed = true;
+		}
+	}
+	if (isUsed && foundIndex >= 0) {
+		Directory->SetSelection(foundIndex);
+	}
 	else if (Directory->GetCount() > 0) {
 		Directory->SetSelection(0);
 	}
