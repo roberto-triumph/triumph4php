@@ -577,7 +577,7 @@ void mvceditor::FindInFilesDialogClass::OnOkButton(wxCommandEvent& event) {
 			wxMessageBox(_("Find path must not be empty."), _("Find In Files"), wxOK | wxCENTER, this);
 		}
 		else {
-			Plugin.PreviousFindInFiles.Source.RootDirectory.Assign(Directory->GetValue());
+			Plugin.PreviousFindInFiles.Source.RootDirectory.AssignDir(Directory->GetValue());
 			Plugin.FindHistory.Save();
 			Plugin.ReplaceHistory.Save();
 			Plugin.DirectoriesHistory.Save();

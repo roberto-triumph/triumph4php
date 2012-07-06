@@ -164,7 +164,7 @@ mvceditor::DirectorySearchClass::~DirectorySearchClass() {
 
 bool mvceditor::DirectorySearchClass::Init(const wxString& path, Modes mode, bool doHiddenFiles) {
 	mvceditor::SourceClass src;
-	src.RootDirectory.Assign(path);
+	src.RootDirectory.AssignDir(path);
 	src.SetIncludeWildcards(wxT("*"));
 	std::vector<mvceditor::SourceClass> sources;
 	sources.push_back(src);
