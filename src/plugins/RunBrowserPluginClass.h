@@ -112,7 +112,7 @@ public:
 		
 private:
 
-	void OnEnvironmentUpdated(wxCommandEvent& event);
+	void OnPreferencesUpdated(wxCommandEvent& event);
 
 	/**
 	 * run the chosen URL in (an external) web browser 

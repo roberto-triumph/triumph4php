@@ -67,7 +67,6 @@ const wxEventType mvceditor::EVENT_APP_PROJECT_INDEXED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_PROJECT_URLS = wxNewEventType();
 const wxEventType mvceditor::EVENT_CMD_OPEN_PROJECT = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_PREFERENCES_UPDATED = wxNewEventType();
-const wxEventType mvceditor::EVENT_APP_ENVIRONMENT_UPDATED = wxNewEventType();
 const wxEventType mvceditor::EVENT_CMD_RE_INDEX = wxNewEventType();
 const wxEventType mvceditor::EVENT_CMD_FILE_OPEN = wxNewEventType();
 const wxEventType mvceditor::EVENT_CMD_PROJECT_URLS = wxNewEventType();

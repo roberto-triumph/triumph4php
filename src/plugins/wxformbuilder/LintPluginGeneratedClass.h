@@ -19,7 +19,6 @@
 #include <wx/panel.h>
 #include <wx/checkbox.h>
 #include <wx/statbox.h>
-#include <wx/textctrl.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -59,8 +58,6 @@ class LintPluginPreferencesGeneratedPanelClass : public wxPanel
 	
 	protected:
 		wxCheckBox* CheckOnSave;
-		wxStaticText* SettingsLabel;
-		wxTextCtrl* IgnoreFiles;
 	
 	public:
 		

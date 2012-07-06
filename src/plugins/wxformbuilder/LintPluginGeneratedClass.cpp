@@ -64,18 +64,6 @@ LintPluginPreferencesGeneratedPanelClass::LintPluginPreferencesGeneratedPanelCla
 	
 	FlexGidSizer->Add( TopSizer, 1, wxEXPAND, 5 );
 	
-	wxStaticBoxSizer* BottomSizer;
-	BottomSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Settings") ), wxVERTICAL );
-	
-	SettingsLabel = new wxStaticText( this, wxID_ANY, wxT("Enter a list of files that you want the PHP Lint checker to ignore.\nOne or more wildcards; any files that match at least one of the wildcards will be skipped by the PHP Lint checker.\nThis setting is useful to ignore cache files, or for example Symfony skeleton files.\nOne line per wildcard; a wildcard can have either a '*' or a '?'.\n\n* = any number of characters\n? = 0 or 1 character\n\nA wildcard can have directory separators; but they must match the operation system's path separator."), wxDefaultPosition, wxDefaultSize, 0 );
-	SettingsLabel->Wrap( -1 );
-	BottomSizer->Add( SettingsLabel, 0, wxALL|wxEXPAND, 5 );
-	
-	IgnoreFiles = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE );
-	BottomSizer->Add( IgnoreFiles, 1, wxALL|wxEXPAND, 5 );
-	
-	FlexGidSizer->Add( BottomSizer, 1, wxEXPAND, 5 );
-	
 	BozSizer->Add( FlexGidSizer, 1, wxEXPAND, 5 );
 	
 	this->SetSizer( BozSizer );

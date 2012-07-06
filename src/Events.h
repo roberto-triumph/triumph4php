@@ -172,16 +172,10 @@ extern const wxEventType EVENT_APP_FILE_CLOSED;
  * can access the new preferences via the App Preferences global.
  * This method will be called after the user changes the settings via Edit ... Preferences. 
  * The plugin should save the preferences to persistent storage (config) here
- *  The global config (wxConfig::Get()) should be used
+ *  The global config (wxConfig::Get()) should be used.
+ * Listeners can access the new preferences via the App Environment global.
  */
 extern const wxEventType EVENT_APP_PREFERENCES_UPDATED;
-
-/**
- * Notification that the environment setting have been updated. Listeners of this event
- * will  need to repaint any windows that are affected by the changes. Listeners
- * can access the new preferences via the App Environment global.
- */
-extern const wxEventType EVENT_APP_ENVIRONMENT_UPDATED;
 
 /**
  * Notification the that project's urls have been determined (AppClass::UrlResourceFinder 
