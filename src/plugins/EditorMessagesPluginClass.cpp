@@ -120,6 +120,27 @@ void mvceditor::EditorMessagesPluginClass::OnMenu(wxCommandEvent& event) {
 }
 
 void mvceditor::EditorMessagesPluginClass::AddMessage(wxLogLevel level, const wxChar* msg, time_t timestamp) {
+
+	// in MSW ignore log messages dealting with SetFocus() 
+	// If we don't ignore this, the app will stack overflow when the app is minized 
+	// and later restored.
+	// Best guess at explaining why this is happening:
+	// When the app is restored after being minized, the app is given focus but this
+	// results in a debug message ("SetFocus failed"....) When the debug message
+	// is triggered, this method (AddMessage) is called. Now, we try
+	// to add the warning to the panel and set the focus to the messages panel. This
+	// new call to focus on the panel in turn triggers another ("SetFocus failed"....) 
+	// debug message; which in turn calls this method again. And the cycle never
+	// stops.
+	//
+	// The setFocus warning seems to be an issue inside windows API and the sash, but it
+	// seems to not be harmful; we can ignore it.
+	// see http://forums.wxwidgets.org/viewtopic.php?f=1&t=30907
+	wxString ignoringMsg = wxT("window.cpp(643): 'SetFocus' failed with error 0x00000057 (the parameter is incorrect.).");
+	wxString logMsg(msg);
+	if (logMsg.Find(ignoringMsg) != wxNOT_FOUND) {
+		return;
+	}
 	wxWindow* window = FindToolsWindow(ID_DEBUG_WINDOW);
 	mvceditor::EditorMessagesPanelClass* panel = NULL;
 	if (window) {
