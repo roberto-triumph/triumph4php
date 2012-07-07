@@ -187,11 +187,6 @@ private:
 	 * Each panel will only handles the events generated from its own MultipleSqlExecute class.
 	 */
 	int QueryId;
-	
-	/**
-	 * To prevent more than one thread from running at the same time.
-	 */
-	bool IsRunning;	
 };
 
 /**

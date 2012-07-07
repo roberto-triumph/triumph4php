@@ -49,6 +49,12 @@ bool mvceditor::CallStackThreadClass::InitThread(const wxFileName& startFileName
 	StackFile.Clear();
 	WriteError = false;
 	bool ret = false;
+
+	// make sure to set these BEFORE calling CreateSingleInstance
+	// in order to prevent Entry from reading them while we write to them
+	StartFileName = startFileName;
+	ClassName = className;
+	MethodName = methodName;
 	LastError = mvceditor::CallStackClass::NONE;
 	wxThreadError threadError = CreateSingleInstance();
 	if (threadError == wxTHREAD_NO_RESOURCE) {
@@ -57,10 +63,7 @@ bool mvceditor::CallStackThreadClass::InitThread(const wxFileName& startFileName
 	else if (threadError == wxTHREAD_RUNNING) {
 		mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, _("Call stack generator is already running. Please wait for it to finish."));
 	}
-	else {
-		StartFileName = startFileName;
-		ClassName = className;
-		MethodName = methodName;
+	else {	
 		ret = true;
 		SignalStart();
 	}

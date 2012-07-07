@@ -125,6 +125,8 @@ void mvceditor::SqlConnectionDialogClass::OnTestButton(wxCommandEvent& event) {
 			
 			TestQuery.Info.Copy(EditedInfos[index]);
 			wxThreadError error = wxTHREAD_NO_ERROR;
+
+			// TODO: WRONG! IsRunning() cannot be safely called with detached threads!!
 			if (GetThread() && GetThread()->IsRunning()) {
 				error = wxTHREAD_RUNNING;
 			}
@@ -276,8 +278,7 @@ mvceditor::MultipleSqlExecuteClass::MultipleSqlExecuteClass(wxEvtHandler& handle
 	, SqlLexer() 
 	, Query()
 	, Session()
-	, QueryId(queryId)
-	, IsRunning(false) {
+	, QueryId(queryId) {
 }
 
 bool mvceditor::MultipleSqlExecuteClass::Execute() {
@@ -287,7 +288,6 @@ bool mvceditor::MultipleSqlExecuteClass::Execute() {
 	switch (error) {
 	case wxTHREAD_NO_ERROR:
 		SignalStart();
-		IsRunning = true;
 		ret = true;
 		break;
 	case wxTHREAD_NO_RESOURCE:
@@ -343,13 +343,12 @@ void mvceditor::MultipleSqlExecuteClass::Entry() {
 
 bool mvceditor::MultipleSqlExecuteClass::Init(const UnicodeString& sql, const SqlQueryClass& query) {
 	Query.Info.Copy(query.Info);
-	return !IsRunning && SqlLexer.OpenString(sql);
+	return !IsRunning() && SqlLexer.OpenString(sql);
 }
 
 void mvceditor::MultipleSqlExecuteClass::Close() {
 	Session.close();
 	SqlLexer.Close();
-	IsRunning = false;
 }
 
 mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id, 
@@ -609,6 +608,11 @@ mvceditor::SqlMetaDataFetchClass::SqlMetaDataFetchClass(wxEvtHandler& handler, m
 
 bool mvceditor::SqlMetaDataFetchClass::Read(std::vector<mvceditor::DatabaseInfoClass> infos) {
 	bool ret = false;
+
+	// make sure to set these BEFORE calling CreateSingleInstance
+	// in order to prevent Entry from reading them while we write to them
+	Infos = infos;
+	Errors.clear();
 	wxThreadError err = CreateSingleInstance();
 	if (wxTHREAD_NO_RESOURCE == err) {
 		mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
@@ -616,9 +620,7 @@ bool mvceditor::SqlMetaDataFetchClass::Read(std::vector<mvceditor::DatabaseInfoC
 	else if (wxTHREAD_RUNNING == err) {
 		wxMessageBox(_("There is already another SQL MetaData fetch that is active. Please wait for it to finish."), _("SQL MetaData fetch"));
 	}
-	else if (wxTHREAD_NO_ERROR == err) {
-		Infos = infos;
-		Errors.clear();
+	else if (wxTHREAD_NO_ERROR == err) {	
 		SignalStart();
 		ret = true;
 	}

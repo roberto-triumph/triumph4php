@@ -91,6 +91,25 @@ public:
 	 * and will not Create (nor kill) a thread that is currently running. Create()
 	 * will kill any running threads.
 	 * This method ALSO starts thread execution, unlike wxThread::Create
+	 * Because of this, you need to take care and make sure any member variables
+	 * are accessed safely as soon as this method exits. Example of what NOT to do:
+	 *
+	 *  class MyThread : public ThreadWithHeartbeatClass {
+	 *
+	 *    wxString Name;
+	 *
+	 *    bool Init(wxString& name) {
+	 *      CreateSingleInstance();
+	 *      // WRONG! at this point Entry could already be working, the variable Name 
+	 *      // may be written to and read from at the same time.
+	 *      Name = name;
+	 *    }
+	 *
+	 *    void Entry() {
+	 *      Name.ToLower();
+	 *    }
+	 *  }
+	 *
 	 */
 	wxThreadError CreateSingleInstance();
 

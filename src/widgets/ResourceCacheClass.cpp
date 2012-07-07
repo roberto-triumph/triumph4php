@@ -376,13 +376,17 @@ wxThreadError mvceditor::ResourceCacheUpdateThreadClass::StartBackgroundUpdate(c
 	if (!ResourceCache) {
 		return wxTHREAD_NO_ERROR;
 	}
+
+	// make sure to set these BEFORE calling CreateSingleInstance
+	// in order to prevent Entry from reading them while we write to them
+	CurrentCode = code;
+	CurrentFileName = fileName;
+	CurrentFileIsNew = isNew;
+	OutputFile.Clear();
+	Mode = UPDATE;
+
 	wxThreadError error = CreateSingleInstance();
-	if (wxTHREAD_NO_ERROR == error) {
-		CurrentCode = code;
-		CurrentFileName = fileName;
-		CurrentFileIsNew = isNew;
-		OutputFile.Clear();
-		Mode = UPDATE;
+	if (wxTHREAD_NO_ERROR == error) {	
 		SignalStart();		
 	}
 	return error;
@@ -392,10 +396,13 @@ wxThreadError mvceditor::ResourceCacheUpdateThreadClass::StartPersist(const wxFi
 	if (!ResourceCache) {
 		return wxTHREAD_NO_ERROR;
 	}
+	
+	// make sure to set these BEFORE calling CreateSingleInstance
+	// in order to prevent Entry from reading them while we write to them
+	OutputFile = outputFile;
+	Mode = PERSIST;
 	wxThreadError error = CreateSingleInstance();
 	if (wxTHREAD_NO_ERROR == error) {
-		OutputFile = outputFile;
-		Mode = PERSIST;
 		SignalStart();		
 	}
 	return error;
