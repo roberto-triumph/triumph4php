@@ -112,6 +112,15 @@ void mvceditor::AppFrameClass::OnClose(wxCloseEvent& event) {
 		
 		// need to detach the window from the keyboard BEFORE the window is invalidated
 		Preferences.KeyProfiles.GetSelProfile()->DetachAll();	
+
+		// need to remove the logging to the messages tab. We need to do this
+		// so that because a log message will try to be written to the 
+		// messages grid but the frame is about to be destroyed
+		wxLog* logger = wxLog::SetActiveTarget(NULL);
+		if (logger) {
+			delete logger;
+		}
+		wxLog::DontCreateOnDemand();
 		Destroy();
 	}
 }
