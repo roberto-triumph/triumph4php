@@ -106,7 +106,7 @@ CMAKE = 'cmake';
 MYSQL_INCLUDE_DIR = 'lib/mysql-connector-c-noinstall-6.0.2-win32/include'
 MYSQL_LIB = 'lib/mysql-connector-c-noinstall-6.0.2-win32/lib/libmysql.lib'
 MYSQL_LIB_DIR = 'lib/mysql-connector-c-noinstall-6.0.2-win32/lib/'
-
+MYSQL_LIB_NAME = 'libmysql.lib'
 
 -- On some unit tests, MVC Editor attempt to connect to a database
 -- Set the username and password to use here.
@@ -118,3 +118,4 @@ MVCEDITOR_DB_PASSWORD = '';
 SQLITE_INCLUDE_DIR = 'lib/sqlite/include'
 SQLITE_LIB = 'lib/sqlite/lib/sqlite3.lib'
 SQLITE_LIB_DIR = 'lib/sqlite/lib'
+SQLITE_LIB_NAME = 'sqlite3.lib'

@@ -115,54 +115,37 @@ function wxappconfiguration(config, action)
 end
 
 function sociconfiguration()
-
-	-- ATTN the SOCI action tries to build SOCI to the same directory on Win32 and linux
-	-- but the generated solution file does not seem to honor the CMAKE_INSTALL_PREFIX
-	-- for now windows output directory is different than the linux one
-	if os.is "windows" then
-		includedirs {
-			"lib/soci/src/core",
-			"lib/soci/src/backends/mysql",
-			MYSQL_INCLUDE_DIR,
-			SQLITE_INCLUDE_DIR
-		}
-		libdirs {
-			MYSQL_LIB_DIR,
-			SQLITE_LIB_DIR
-		}
-
-		-- TODO Debug version?
-		libdirs { "lib/soci/src/lib/Release" }
+	includedirs {
+		"lib/soci/mvc-editor/include",
+		"lib/soci/mvc-editor/include/soci",
+		MYSQL_INCLUDE_DIR,
+		SQLITE_INCLUDE_DIR
+	}
+	
+	-- soci creates lib directory with the architecture name
+	if os.isdir "lib/soci/mvc-editor/lib64" then
+		libdirs { "lib/soci/mvc-editor/lib64" }
+	else
+		libdirs { "lib/soci/mvc-editor/lib" }
+	end
+	libdirs {
+		MYSQL_LIB_DIR,
+		SQLITE_LIB_DIR
+	}
+	links { 
+		"soci_core_3_1", 
+		"soci_mysql_3_1", 
+		"soci_sqlite3_3_1" 
+	}
+	
+	-- premake adds the lib prefix, we must take it away
+	if os.is "windows" then	
 		links { 
-			"libmysql", 
-			"sqlite3",
-			"soci_core_3_1", 
-			"soci_mysql_3_1", 
-			"soci_sqlite3_3_1" 
+			string.match(MYSQL_LIB_NAME, "^([%w_]+)%.lib$"),
+			string.match(SQLITE_LIB_NAME , "^([%w_]+)%.lib$") 
 		}
 	else
-		includedirs {
-			"lib/soci/mvc-editor/include",
-			"lib/soci/mvc-editor/include/soci",
-			"lib/soci/mvc-editor/include/soci/mysql",
-			MYSQL_INCLUDE_DIR,
-			SQLITE_LIB_DIR
-		}
-
-		-- soci creates lib directory with the architecture name
-		if os.isdir "lib/soci/mvc-editor/lib64" then
-			libdirs { "lib/soci/mvc-editor/lib64" }
-		else
-			libdirs { "lib/soci/mvc-editor/lib" }
-		end
-		libdirs {
-			MYSQL_LIB_DIR,
-			SQLITE_LIB_DIR
-		}
 		links { 
-			"soci_core", 
-			"soci_mysql", 
-			"soci_sqlite3",
 			string.match(MYSQL_LIB_NAME, "^lib([%w_]+)%.so$"),
 			string.match(SQLITE_LIB_NAME , "^lib([%w_]+)%.so$") 
 		}
