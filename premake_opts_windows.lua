@@ -113,3 +113,8 @@ MYSQL_LIB_DIR = 'lib/mysql-connector-c-noinstall-6.0.2-win32/lib/'
 -- MVC Editor will create (and drop) the schema that it uses
 MVCEDITOR_DB_USER = 'root';
 MVCEDITOR_DB_PASSWORD = '';
+
+-- will look for SQLite in these directories
+SQLITE_INCLUDE_DIR = 'lib/sqlite/include'
+SQLITE_LIB = 'lib/sqlite/lib/sqlite3.lib'
+SQLITE_LIB_DIR = 'lib/sqlite/lib'

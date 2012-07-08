@@ -85,3 +85,8 @@ MYSQL_LIB_DIR = '/usr/lib/'
 -- MVC Editor will create (and drop) the schema that it uses
 MVCEDITOR_DB_USER = 'root';
 MVCEDITOR_DB_PASSWORD = '';
+
+-- will look for SQLite in these directories
+SQLITE_INCLUDE_DIR = '/usr/include/sqlite3/'
+SQLITE_LIB_NAME = 'libsqlite3.so'
+SQLITE_LIB_DIR = '/usr/lib'

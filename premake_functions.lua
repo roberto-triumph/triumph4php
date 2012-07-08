@@ -78,6 +78,7 @@ function batchexecute(basedir, cmds, errorMessage)
 			end
 		end
 		if #cmdString then
+			print(cmdString)
 			if 0 ~= os.execute(cmdString) then
 				if errorMessage then 
 					print(errorMessage)

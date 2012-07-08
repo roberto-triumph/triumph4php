@@ -28,41 +28,9 @@ newaction {
 	description = "Build the SOCI (database access) library",
 	execute = function()
 		batchexecute(os.getcwd(), { string.format("%s --version", CMAKE) }, "cmake not found. Compiling SOCI requires CMake. SOCI cannot be built.")
-		if os.is "windows" then
-		
-			-- on windows, use MSYS Git which may not be in the path
-			SOCI_BUILD_DIR =  normalizepath("lib/soci/mvc-editor/")
-			SOCI_ROOT = "lib\\soci"
-			SOCI_SRC = "lib\\soci\\src"
-			GIT_ROOT = os.getenv("USERPROFILE") .. "\\software\\Git\\bin"
-			GIT = GIT_ROOT .. "\\git.exe"
-			TAR = GIT_ROOT .. "\\tar.exe"
-		else 
-			SOCI_BUILD_DIR =  normalizepath("lib/soci/mvc-editor/")
-			SOCI_ROOT = "lib/soci"
-			SOCI_SRC = "lib/soci/src/"
-			GIT = "git"
-			TAR = "tar"
-		end
-		if os.is "windows" then
-			
-			-- extract the C (binary) library
-			existence "lib/mysql-connector-c-noinstall-6.0.2-win32.zip"
-			batchexecute(os.getcwd(), {
-				"winrar x lib\\mysql-connector-c-noinstall-6.0.2-win32.zip lib\\"
-			})
-		else
-			-- get from the system 
-		end
-		
-		-- always get  a specific version so that we are not developing against a moving target
-		batchexecute(os.getcwd(), { "mkdir " .. SOCI_ROOT })
-		batchexecute(SOCI_ROOT, {
-			GIT .. " archive" ..
-			" --format=tar" ..
-			" --remote git://soci.git.sourceforge.net/gitroot/soci/soci acba467dce5c6f4df618f3a816b9f9fc56bd6543" .. 
-			"| " .. TAR .. " -xf - "
-		}, "Failed to fetch SOCI source code from the remote Git repo. Do you have network connectivity?")
+		 SOCI_BUILD_DIR =  normalizepath("lib/soci/mvc-editor")
+		 SOCI_ROOT = normalizepath("lib/soci")
+		 SOCI_SRC = normalizepath("lib/soci/src")
 		if os.is "windows" then
 			
 			-- exclude SOCI from linking against Boost. we don't use it
@@ -71,18 +39,21 @@ newaction {
 				CMAKE ..
 					" -G \"Visual Studio 9 2008\"" ..
 					" -DMYSQL_INCLUDE_DIR=" .. normalizepath(MYSQL_INCLUDE_DIR) ..
-					" -DMYSQL_LIBRARY=" .. normalizepath(MYSQL_LIB_DIR .. '/libmysql.lib') ..
+					" -DMYSQL_LIBRARY=" .. normalizepath(MYSQL_LIB) ..
 					" -DCMAKE_INSTALL_PREFIX=" .. SOCI_BUILD_DIR .. 
+					" -DSQLITE3_INCLUDE_DIR=" .. normalizepath(SQLITE_INCLUDE_DIR) ..
+					" -DSQLITE3_LIBRARY=" .. normalizepath(SQLITE_LIB) ..
 					" -DWITH_MYSQL=YES " ..
 					" -DWITH_ODBC=NO " ..
 					" -DWITH_ORACLE=NO " ..
 					" -DWITH_POSTGRESQL=NO " ..
-					" -DWITH_SQLITE3=NO " ..
-					" -DWITH_BOOST=NO"
+					" -DWITH_SQLITE3=YES " ..
+					" -DWITH_BOOST=NO " ..
+					" -DSOCI_TESTS=NO "
 			})
-			print "Check the output above.  If it reads \"SOCI_MYSQL = OFF\" then you will need to do some investigation."
+			print "Check the output above.  If it reads \"SOCI_MYSQL = OFF\" or \"SOCI_SQLITE3 = OFF\" then you will need to do some investigation."
 			print "Otherwise, you will now need to open the generated solution file and build it from there."
-			print ("Open the solution found at " .. SOCI_SRC .. "\\SOCI.sln")
+			print ("Open the solution found at " .. normalizepath("lib/soci/src/SOCI.sln"))
 			print "Build the solution in Debug configuration"
 			print "Build the solution in Release configuration"
 		else 
@@ -94,12 +65,14 @@ newaction {
 					" -G \"Unix Makefiles\"" ..
 					" -DMYSQL_INCLUDE_DIR=" .. MYSQL_INCLUDE_DIR ..
 					" -DMYSQL_LIBRARY=" .. MYSQL_LIB_DIR .. "/" .. MYSQL_LIB_NAME ..
-					" -DCMAKE_INSTALL_PREFIX=" .. SOCI_BUILD_DIR .. 
+					" -DCMAKE_INSTALL_PREFIX=" .. SOCI_BUILD_DIR ..
+					" -DSQLITE3_INCLUDE_DIR=" .. SQLITE_INCLUDE_DIR ..
+					" -DSQLITE3_LIBRARIES=" .. normalizepath(SQLITE_LIB_DIR) ..
 					" -DWITH_MYSQL=YES " ..
 					" -DWITH_MYSQL=ODBC " ..
 					" -DWITH_ORACLE=NO " ..
 					" -DWITH_POSTGRESQL=NO " ..
-					" -DWITH_SQLITE3=NO " ..
+					" -DWITH_SQLITE3=YES " ..
 					" -DWITH_BOOST=NO",
 				"make",
 				"make install"
