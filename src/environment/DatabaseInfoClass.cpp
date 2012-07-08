@@ -23,8 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
  #include <environment/DatabaseInfoClass.h>
- #include <soci-mysql.h>
- #include <soci.h>
+ #include <soci/mysql/soci-mysql.h>
+ #include <soci/soci.h>
  #include <wx/datetime.h>
  #include <windows/StringHelperClass.h>
  #include <string>
