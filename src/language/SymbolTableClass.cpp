@@ -144,9 +144,10 @@ static UnicodeString ResolveResourceType(UnicodeString resourceToLookup,
 	// are put there by the expression parser
 	for (size_t j = 0; j < resourceFinders.size(); ++j) {
 		mvceditor::ResourceFinderClass* finder = resourceFinders[j];
-		if (finder->Prepare(mvceditor::StringHelperClass::IcuToWx(resourceToLookup)) && finder->CollectFullyQualifiedResource()) {
-			if (finder->GetResourceMatchCount() == 1) {
-				mvceditor::ResourceClass match = finder->GetResourceMatch(0);
+		if (finder->Prepare(mvceditor::StringHelperClass::IcuToWx(resourceToLookup))) {
+			std::vector<mvceditor::ResourceClass> matches = finder->CollectFullyQualifiedResource();
+			if (matches.size() == 1) {
+				mvceditor::ResourceClass match = matches[0];
 				if (mvceditor::ResourceClass::CLASS == match.Type) {
 					type = match.ClassName;
 				}
@@ -633,18 +634,19 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 
 		// only do duck typing if needed. otherwise, make sure that we have a type match first.
 		if ((doDuckTyping || !typeToLookup.isEmpty()) && finder->Prepare(wxResource)) {
+			std::vector<mvceditor::ResourceClass> matches;
 			if (doFullyQualifiedMatchOnly) {
-				finder->CollectFullyQualifiedResource();
+				matches = finder->CollectFullyQualifiedResource();
 			}
 			else {
-				finder->CollectNearMatchResources();
+				matches = finder->CollectNearMatchResources();
 			}
 
 			// now we loop through the possbile matches and remove stuff that does not 
 			// make sense because of visibility rules or resources that are 
 			// duplicated in two separate caches
-			for (size_t k = 0; k < finder->GetResourceMatchCount(); ++k) {
-				mvceditor::ResourceClass resource = finder->GetResourceMatch(k);
+			for (size_t k = 0; k < matches.size(); ++k) {
+				mvceditor::ResourceClass resource = matches[k];
 				bool isVisible = IsResourceVisible(resource, originalExpression, expressionScope, isStaticCall, isThisCall, isParentCall);
 				if (!mvceditor::IsResourceDirty(openedResourceFinders, resource, finder) && isVisible) {
 					UnresolveNamespaceAlias(originalExpression, expressionScope, resource);

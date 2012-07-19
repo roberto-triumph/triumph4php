@@ -30,6 +30,9 @@
 #include <algorithm>
 #include <fstream>
 #include <unicode/uchar.h>
+#include <soci/soci.h>
+#include <soci/sqlite3/soci-sqlite3.h>
+#include <sqlite3.h>
 
 /**
  * @param resource the resource object that the parsed data will go into
@@ -275,21 +278,15 @@ static UnicodeString QualifyName(const UnicodeString& namespaceName, const Unico
 
 mvceditor::ResourceFinderClass::ResourceFinderClass()
 	: FileFilters()
-	, IdentifierCache()
-	, MembersCache()
-	, NamespaceCache()
+	, FileParsingCache()
 	, TraitCache()
-	, FileCache()
-	, Matches()
-	, Lexer()
 	, Parser()
+	, Session()
 	, FileName()
 	, ClassName()
 	, MethodName()
 	, ResourceType(FILE_NAME)
-	, LineNumber(0)
-	, CurrentFileItemIndex(-1)
-	, IsCacheSorted(false) {
+	, LineNumber(0) {
 	Parser.SetClassObserver(this);
 	Parser.SetClassMemberObserver(this);
 	Parser.SetFunctionObserver(this);
@@ -297,6 +294,30 @@ mvceditor::ResourceFinderClass::ResourceFinderClass()
 
 void mvceditor::ResourceFinderClass::SetVersion(pelet::Versions version) {
 	Parser.SetVersion(version);
+}
+
+void mvceditor::ResourceFinderClass::Init() {
+	try {
+		Session.open(*soci::factory_sqlite3(), ":memory:");
+		std::string sql;
+		sql += "CREATE TABLES file_items (",
+		sql += "  file_item_id INTEGER PRIMARY KEY, full_path TEXT, last_modified DATETIME, is_parsed INTEGER, is_new INTEGER ";
+		sql += ");";
+		Session.once << sql;
+		sql = "";
+		sql += "CREATE TABLES resources (";
+		sql += "  file_item_id INTEGER, key TEXT, identifier TEXT, class_name TEXT, ";
+		sql += "  type INTEGER, namespace_name TEXT, signature TEXT, ";
+		sql += "  return_type TEXT, is_protected INTEGER, is_private INTEGER, ";
+		sql += "  is_static INTEGER, is_dynamic INTEGER, is_native INTEGER";
+		sql += ");";
+		Session.once << sql;
+		IsCacheInitialized = true;
+	} catch(std::exception const& e) {
+		Session.close();
+		IsCacheInitialized = false;
+		wxASSERT_MSG(IsCacheInitialized, mvceditor::StringHelperClass::charToWx(e.what()));
+	}
 }
 
 bool mvceditor::ResourceFinderClass::Walk(const wxString& fileName) {
@@ -317,6 +338,11 @@ bool mvceditor::ResourceFinderClass::Walk(const wxString& fileName) {
 		}
 	}
 	if (matchedFilter) {
+
+		// initialize the database only when there is a file we want to parse
+		if (!IsCacheInitialized) {
+			Init();
+		}
 		switch (ResourceType) {
 			case FILE_NAME:
 			case FILE_NAME_LINE_NUMBER:
@@ -337,54 +363,40 @@ bool mvceditor::ResourceFinderClass::Walk(const wxString& fileName) {
 void mvceditor::ResourceFinderClass::BuildResourceCacheForFile(const wxString& fullPath, const UnicodeString& code, bool isNew) {
 
 	// remove all previous cached resources
-	int fileItemIndex = -1;
-	mvceditor::ResourceFinderClass::FileItem fileItem;
-	bool foundFile = FindInFileCache(fullPath, fileItemIndex, fileItem);
+	mvceditor::FileItemClass fileItem;
+	bool foundFile = FindInFileCache(fullPath, fileItem);
 	if (foundFile) {
-		RemoveCachedResources(fileItemIndex);
+		RemoveCachedResources(fileItem);
 	}
 	if (!foundFile) {
 
 		// if caller just calls this method without calling Walk(); then file cache will be empty
 		// need to add an entry so that GetResourceMatchFullPathFromResource works correctly
-		fileItemIndex = PushIntoFileCache(fullPath, false, isNew);
+		fileItem.FullPath = fullPath;
+		fileItem.IsNew = isNew;
+		fileItem.IsParsed = false;
+		PushIntoFileCache(fileItem);
 	}
-	CurrentFileItemIndex = fileItemIndex;
 	
+	FileParsingCache.clear();
+
 	// for now silently ignore parse errors
 	pelet::LintResultsClass results;
 	Parser.ScanString(code, results);
-	IsCacheSorted = false;
+
+	PushIntoResourceCache(FileParsingCache, fileItem.FileId);
 }
 
-size_t mvceditor::ResourceFinderClass::GetResourceMatchCount() const {
-	return Matches.size();
-}
-
-mvceditor::ResourceClass mvceditor::ResourceFinderClass::GetResourceMatch(size_t index) const {
-	ResourceClass match;
-	if (index >= 0 && index < Matches.size()) {
-		match = Matches[index];
+wxString  mvceditor::ResourceFinderClass::GetResourceMatchFullPathFromResource(const mvceditor::ResourceClass& resource) {
+	if (!IsCacheInitialized) {
+		return wxEmptyString;
 	}
-	return match;
-}
-
-wxString mvceditor::ResourceFinderClass::GetResourceMatchFullPath(size_t index) const {
-	if (index >= 0 && index < Matches.size()) {
-		size_t fileItemIndex = Matches[index].FileItemIndex;
-		if (fileItemIndex >= 0 && fileItemIndex < FileCache.size()) {
-			return FileCache[fileItemIndex].FullPath;
-		}
-	}
-	return wxT("");
-}
-
-wxString  mvceditor::ResourceFinderClass::GetResourceMatchFullPathFromResource(const mvceditor::ResourceClass& resource) const {
-	size_t fileItemIndex = resource.FileItemIndex;
-	if (fileItemIndex >= 0 && fileItemIndex < FileCache.size()) {
-		return FileCache[fileItemIndex].FullPath;
-	}
-	return wxT("");
+	std::string fullPath;
+	size_t fileItemIndex = resource.FileItemId;
+	Session << "SELECT full_path FROM file_items WHERE file_item_id = (?)", 
+		soci::use(fileItemIndex), 
+		soci::into(fullPath);
+	return mvceditor::StringHelperClass::charToWx(fullPath.c_str());
 }
 
 bool mvceditor::ResourceFinderClass::GetResourceMatchPosition(const mvceditor::ResourceClass& resource, const UnicodeString& text, int32_t& pos, 
@@ -473,65 +485,94 @@ bool mvceditor::ResourceFinderClass::BuildResourceCacheForNativeFunctions() {
 	return loaded;
 }
 
-bool mvceditor::ResourceFinderClass::CollectNearMatchResources() {
-	EnsureSorted();	
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNearMatchResources() {
+	std::vector<mvceditor::ResourceClass> matches;
 	switch (ResourceType) {
 		case FILE_NAME:
 		case FILE_NAME_LINE_NUMBER:
-			CollectNearMatchFiles();
+			matches = CollectNearMatchFiles();
 			break;
 		case CLASS_NAME:
-			CollectNearMatchNonMembers();
+			matches = CollectNearMatchNonMembers();
 			break;
 		case CLASS_NAME_METHOD_NAME:
-			CollectNearMatchMembers();
+			matches = CollectNearMatchMembers();
 			break;
 		case NAMESPACE_NAME:
-			CollectNearMatchNamespaces();
+			matches = CollectNearMatchNamespaces();
 			break;
 	}
-	EnsureMatchesExist();
-	sort(Matches.begin(), Matches.end());
-	return !Matches.empty();
+	EnsureMatchesExist(matches);
+	sort(matches.begin(), matches.end());
+	return matches;
 }
 
-void mvceditor::ResourceFinderClass::CollectNearMatchFiles() {
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNearMatchFiles() {
 	wxString path,
 		currentFileName,
 		extension;
+	std::vector<mvceditor::ResourceClass> matches;
 	wxString fileName =  StringHelperClass::IcuToWx(FileName).Lower();
-	for (size_t i = 0; i < FileCache.size(); ++i) {
-		wxFileName::SplitPath(FileCache[i].FullPath, &path, &currentFileName, &extension);
-		currentFileName += wxT(".") + extension;
-		if (wxNOT_FOUND != currentFileName.Lower().Find(fileName)) {
-			if (0 == LineNumber || GetLineCountFromFile(FileCache[i].FullPath) >= LineNumber) {
-				ResourceClass newItem;
-				newItem.FileItemIndex = i;
-				Matches.push_back(newItem);
+	std::string query = mvceditor::StringHelperClass::wxToChar(fileName);
+
+	// add the SQL wildcards
+	query = "%" + query + "%";
+	std::string match;
+	int fileItemId;
+	soci::statement stmt = (Session.prepare << "SELECT full_path, file_item_id FROM file_items WHERE full_path LIKE (:query)",
+		soci::use(query),
+		soci::into(match), soci::into(fileItemId));
+	stmt.execute();
+	if (stmt.got_data()) {
+		while (stmt.fetch()) {
+			wxString fullPath = mvceditor::StringHelperClass::charToWx(match.c_str());
+			wxFileName::SplitPath(fullPath, &path, &currentFileName, &extension);
+			currentFileName += wxT(".") + extension;
+			if (wxNOT_FOUND != currentFileName.Lower().Find(fileName)) {
+				if (0 == LineNumber || GetLineCountFromFile(fullPath) >= LineNumber) {
+					ResourceClass newItem;
+					newItem.FileItemId = fileItemId;
+					matches.push_back(newItem);
+				}
 			}
 		}
 	}
+	return matches;
 }
 
-void mvceditor::ResourceFinderClass::CollectNearMatchNonMembers() {
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNearMatchNonMembers() {
 	UnicodeString key = ClassName;
-	BoundedCacheSearch(IdentifierCache, key, Matches, 50);
+
+	std::string query = mvceditor::StringHelperClass::IcuToChar(key);
+	query += "%";
+	std::string sql;
+	sql += "SELECT ";
+	sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
+	sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
+	sql += "FROM resources WHERE key LIKE (?) LIMIT 50";
+
+	std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(sql, query);
 	
-	// bounded search uses near matches, here if the identifier is an exact match then 
+	// TODO: not really sure this is the best way, just make 2 queries 1 using equals and
+	// if that returns nothing then execure the LIKE query
+	//
+	// the query used near matches, here if the identifier is an exact match then 
 	// just use the exact match
-	std::vector<mvceditor::ResourceClass>::iterator end = Matches.end();
-	end = std::remove_if(Matches.begin(), end, IsClassMember);
+	std::vector<mvceditor::ResourceClass>::iterator end = matches.end();
+	end = std::remove_if(matches.begin(), end, IsClassMember);
 	
-	if (!Matches.empty() && Matches[0].Identifier.caseCompare(key, 0) == 0) {
+	if (!matches.empty() && matches[0].Identifier.caseCompare(key, 0) == 0) {
 		KeyPredicateClass pred(key, true);
-		end = std::remove_if(Matches.begin(), end, pred);
+		end = std::remove_if(matches.begin(), end, pred);
 	}
 	
 	// need to actually delete the items from the results; remove_if does not actually erase them
-	Matches.erase(end, Matches.end());
+	matches.erase(end, matches.end());
+	return matches;
 }
 
-void mvceditor::ResourceFinderClass::CollectNearMatchMembers() {
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNearMatchMembers() {
+	std::vector<mvceditor::ResourceClass> matches;
 	
 	// look for the parent classes. when we are searching for members, we want to look
 	// for members from the class or any class it inherited from
@@ -550,12 +591,21 @@ void mvceditor::ResourceFinderClass::CollectNearMatchMembers() {
 		// if ClassName is empty, then just check method names (which BoundedCacheSearch does). This ensures 
 		// queries like '::getName' will work as well.
 		UnicodeString key = MethodName;
-		BoundedCacheSearch(IdentifierCache, key, Matches, 50);
+
+		std::string query = mvceditor::StringHelperClass::IcuToChar(key);
+		query += "%";
+		std::string sql;
+		sql += "SELECT ";
+		sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
+		sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
+		sql += "FROM resources WHERE key LIKE (?) LIMIT 50";
+
+		matches = ResourceStatementMatches(sql, query);
 		
 		// BoundedCacheSearch got all resources that match on the identifier. we need extra logic
 		// to remove matches that come from resources that are not methods or properties
-		std::vector<ResourceClass>::iterator it = Matches.begin();
-		while (it != Matches.end()) {
+		std::vector<mvceditor::ResourceClass>::iterator it = matches.begin();
+		while (it != matches.end()) {
 			bool keep = mvceditor::ResourceClass::MEMBER == it->Type ||
 				mvceditor::ResourceClass::METHOD == it->Type ||
 				mvceditor::ResourceClass::CLASS_CONSTANT == it->Type;
@@ -563,41 +613,64 @@ void mvceditor::ResourceFinderClass::CollectNearMatchMembers() {
 				++it;
 			}
 			else {
-				it = Matches.erase(it);
+				it = matches.erase(it);
 			}
 		}
 	}
 	else {
 		UnicodeString key = MethodName;
-		BoundedCacheSearch(IdentifierCache, key, Matches, 50);
-		std::vector<ResourceClass>::iterator it = Matches.begin();
+		std::string query = mvceditor::StringHelperClass::IcuToChar(key);
+		query += "%";
+		std::string sql;
+		sql += "SELECT ";
+		sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
+		sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
+		sql += "FROM resources WHERE key LIKE (?) LIMIT 50";
+
+		// TODO: we should just use an IN() query and query for classes and traits
+		matches = ResourceStatementMatches(sql, query);
+		std::vector<mvceditor::ResourceClass>::iterator it = matches.begin();
 		
 		// BoundedCacheSearch got all resources that match on the identifier. we need extra logic
 		// to remove matches that come from resources that have the same identifier but are from
 		// a different, unrelated classes. A related class is a class that is in the inheritance chain
 		// for the query class, or a trait that is used by the query class.
-		while (it != Matches.end()) {
+		while (it != matches.end()) {
 			bool keep = MatchesAnyClass(*it, parentClassNames) || IsTraitInherited(*it, ClassName);
 			if (keep) {
 				++it;
 			}
 			else {
-				it = Matches.erase(it);
+				it = matches.erase(it);
 			}
 		}
 	}
+	return matches;
 }
 
-void mvceditor::ResourceFinderClass::CollectAllMembers(const std::vector<UnicodeString>& classNames) {
-	
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectAllMembers(const std::vector<UnicodeString>& classNames) {
+	std::vector<mvceditor::ResourceClass> matches;
+	std::string query; 
 	for (size_t i = 0; i < classNames.size(); ++i) {
-		UnicodeString key = classNames[i] + UNICODE_STRING_SIMPLE("::");
-		BoundedCacheSearch(MembersCache, key, Matches, 50);
+		query += "'";
+		query += mvceditor::StringHelperClass::IcuToChar(classNames[i]);
+		query += "'";
+		if (i < (classNames.size() - 1)) {
+			query += ",";
+		}
 	}
+	
+	std::string sql;
+	sql += "SELECT ";
+	sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
+	sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
+	sql += "FROM resources WHERE class_name IN(?) LIMIT 50";
+	matches = ResourceStatementMatches(sql, query);
+	return matches;
 }
 
-void mvceditor::ResourceFinderClass::CollectAllTraitMembers(const UnicodeString& className) {
-	
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectAllTraitMembers(const UnicodeString& className) {
+	std::vector<mvceditor::ResourceClass> matches;
 	std::vector<mvceditor::TraitResourceClass> traits = TraitCache[className];
 	for (size_t j = 0; j < traits.size(); ++j) {
 		
@@ -605,7 +678,15 @@ void mvceditor::ResourceFinderClass::CollectAllTraitMembers(const UnicodeString&
 		int32_t index = traits[j].TraitClassName.lastIndexOf(UNICODE_STRING_SIMPLE("\\"));
 		UnicodeString traitClassNameOnly(traits[j].TraitClassName, index + 1);
 		UnicodeString key =  traitClassNameOnly + UNICODE_STRING_SIMPLE("::");
-		BoundedCacheSearch(MembersCache, key, Matches, 50);
+		
+		std::string query = mvceditor::StringHelperClass::IcuToChar(key);
+		std::string sql;
+		sql += "SELECT ";
+		sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
+		sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
+		sql += "FROM resources WHERE key = ? LIMIT 50";
+		std::vector<mvceditor::ResourceClass> traitMatches = ResourceStatementMatches(sql, query);
+		matches.insert(matches.end(), traitMatches.begin(), traitMatches.end());
 		
 		// TODO weed out Matches from methods from the wrong namespace
 	}
@@ -617,31 +698,39 @@ void mvceditor::ResourceFinderClass::CollectAllTraitMembers(const UnicodeString&
 			mvceditor::ResourceClass res;
 			res.ClassName = traits[i].TraitClassName;
 			res.Identifier = aliases[a];
-			Matches.push_back(res);
+			matches.push_back(res);
 		}
 	}
+	return matches;
 }
 
-void mvceditor::ResourceFinderClass::CollectNearMatchNamespaces() {
-	
+std::vector<mvceditor::ResourceClass>  mvceditor::ResourceFinderClass::CollectNearMatchNamespaces() {
+	std::vector<mvceditor::ResourceClass> matches;
+
 	// needle identifier contains a namespace operator; but it may be
 	// a namespace or a fully qualified name
 	UnicodeString key = ClassName;
-	BoundedCacheSearch(NamespaceCache, key, Matches, 50);
-	
-	std::vector<mvceditor::ResourceClass>::iterator end = Matches.end();
+	std::string query = mvceditor::StringHelperClass::IcuToChar(key);
+	std::string sql;
+	sql += "SELECT ";
+	sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
+	sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
+	sql += "FROM resources WHERE key = ? LIMIT 50";
+	matches = ResourceStatementMatches(sql, query);
+	std::vector<mvceditor::ResourceClass>::iterator end = matches.end();
 	
 	// if there are exact matches; we only want to collect exact matches
-	if (!Matches.empty() && Matches[0].IsKeyEqualTo(key)) {
+	if (!matches.empty() && matches[0].IsKeyEqualTo(key)) {
 		KeyPredicateClass pred(key, true);
-		end = std::remove_if(Matches.begin(), end, pred);
+		end = std::remove_if(matches.begin(), end, pred);
 	}
 	
 	// need to actually erase them,, std::remove_if does not
-	Matches.erase(end, Matches.end());
+	matches.erase(end, matches.end());
+	return matches;
 }
 
-std::vector<UnicodeString> mvceditor::ResourceFinderClass::ClassHierarchy(const UnicodeString& className) const {
+std::vector<UnicodeString> mvceditor::ResourceFinderClass::ClassHierarchy(const UnicodeString& className) {
 	std::vector<UnicodeString> parentClassNames;
 	parentClassNames.push_back(className);
 	UnicodeString lastClassName(className);
@@ -650,8 +739,16 @@ std::vector<UnicodeString> mvceditor::ResourceFinderClass::ClassHierarchy(const 
 	while (!done) {
 		done = true;
 
-		// TODO we should probably try to use std::lower_bound here
-		for (std::vector<ResourceClass>::const_iterator it = IdentifierCache.begin(); it != IdentifierCache.end(); ++it) {
+		std::string query = mvceditor::StringHelperClass::IcuToChar(lastClassName);
+		std::string sql;
+		sql += "SELECT ";
+		sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
+		sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
+		sql += "FROM resources WHERE key = ? AND type=";
+		sql += mvceditor::ResourceClass::CLASS;
+		sql += " LIMIT 50";
+		std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(sql, query);		
+		for (std::vector<mvceditor::ResourceClass>::const_iterator it = matches.begin(); it != matches.end(); ++it) {
 			if (it->Type == ResourceClass::CLASS && 0 == it->ClassName.caseCompare(lastClassName, 0) && it->Signature.length()) {
 
 				// wont include interface names in this list, since it is very likely that the same function
@@ -670,42 +767,50 @@ std::vector<UnicodeString> mvceditor::ResourceFinderClass::ClassHierarchy(const 
 }
 
 UnicodeString mvceditor::ResourceFinderClass::GetResourceParentClassName(const UnicodeString& className, 
-		const UnicodeString& methodName) const {
+		const UnicodeString& methodName) {
 	UnicodeString parentClassName;
-	
-	// TODO not very efficient
-	for (std::vector<ResourceClass>::const_iterator it = IdentifierCache.begin(); it != IdentifierCache.end(); ++it) {
-		if (it->Type == ResourceClass::CLASS &&  it->Identifier == className) {
-			parentClassName = ExtractParentClassFromSignature(it->Signature);
-			break;
-		}
+
+	// first query to get the parent class name
+	std::string query = mvceditor::StringHelperClass::IcuToChar(className);
+	std::string sql;
+	sql += "SELECT ";
+	sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
+	sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
+	sql += "FROM resources WHERE key = ? AND type=";
+	sql += mvceditor::ResourceClass::CLASS;
+	sql += " LIMIT 50";
+	std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(sql, query);	
+	if (!matches.empty()) {
+		mvceditor::ResourceClass resource = matches[0];
+		parentClassName = ExtractParentClassFromSignature(resource.Signature);
 	}
 	if (!parentClassName.isEmpty() && !methodName.isEmpty()) {
 
-		// check that the parent has the given method
+		// now to check that the parent has the given method
+		std::string query = mvceditor::StringHelperClass::IcuToChar(parentClassName);
+		query += "::";
+		query += mvceditor::StringHelperClass::IcuToChar(methodName);
+		query += "%";
+		std::string sql;
+		sql += "SELECT ";
+		sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
+		sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
+		sql += "FROM resources WHERE key LIKE ? AND type = ";
+		sql += mvceditor::ResourceClass::METHOD;
+		sql += " LIMIT 50";
+		
+		matches = ResourceStatementMatches(sql, query);		
 		UnicodeString parentClassSignature;
 		bool found = false;
-		for (std::vector<ResourceClass>::const_iterator it = IdentifierCache.begin(); it != IdentifierCache.end(); ++it) {
-			if (it->Type == ResourceClass::CLASS &&  it->ClassName == parentClassName) {
-				parentClassSignature = it->ClassName;
-			}
-		}
-		for (std::vector<ResourceClass>::const_iterator it = MembersCache.begin(); it != MembersCache.end(); ++it) {
-			if (it->Type == ResourceClass::METHOD && 0 == it->ClassName.caseCompare(parentClassName, 0) && 
-				mvceditor::CaseStartsWith(it->Identifier, methodName)) {
+		if (!matches.empty()) {
 
-				// this ancestor has the method
-				found = true;
-				break;
-			}
+			// this ancestor has the method
+			found = true;
 		}
-		if (!found && !parentClassSignature.isEmpty()) {
+		if (!found) {
 
 			//  keep searching up the inheritance chain
 			return GetResourceParentClassName(parentClassName, methodName);
-		}
-		else if (!found) {
-			parentClassName = UNICODE_STRING_SIMPLE("");
 		}
 	}
 	return parentClassName;
@@ -781,39 +886,33 @@ void mvceditor::ResourceFinderClass::BuildResourceCache(const wxString& fullPath
 	wxDateTime fileLastModifiedDateTime = fileName.GetModificationTime();
 	
 	// have we looked at this file yet or is cache out of date? if not, then build the cache.
-	// we count the file as cached if (1) we have seen the file before (modified timestamp)
 	bool cached = false;
-	bool filePreviouslyCached = false;
-	int fileItemIndex = -1;
-	mvceditor::ResourceFinderClass::FileItem fileItem;
-	bool foundFile = FindInFileCache(fullPath, fileItemIndex, fileItem);
+	mvceditor::FileItemClass fileItem;
+	bool foundFile = FindInFileCache(fullPath, fileItem);
 	if (foundFile) {
-		bool modified = fileLastModifiedDateTime.IsLaterThan(fileItem.DateTime);
-		cached = !modified;
-		FileCache[fileItemIndex].DateTime = fileLastModifiedDateTime;
-		filePreviouslyCached = true;
+		bool needsToBeParsed = fileItem.NeedsToBeParsed(fileLastModifiedDateTime);
+		cached = !needsToBeParsed;
 	}
 	else {
-		fileItemIndex = PushIntoFileCache(fullPath, false, false);
-		FileCache[fileItemIndex].DateTime = fileLastModifiedDateTime;
+		fileItem.MakeNew(fileName, parseClasses);
+		PushIntoFileCache(fileItem);
 	}
-	fileItem = FileCache[fileItemIndex];
 	if (parseClasses) {
-		if (!cached || !fileItem.Parsed) {
-			FileCache[fileItemIndex].Parsed = true;
+		if (!cached || !fileItem.IsParsed) {
 
 			// no need to look for resources if the file had not yet existed, this will save much time
 			// this optimization was found by using the profiler
-			if (filePreviouslyCached) {
-				RemoveCachedResources(fileItemIndex);
-			}
-			CurrentFileItemIndex = fileItemIndex;
+			if (foundFile) {
+				RemoveCachedResources(fileItem);
+			}			
+			FileParsingCache.clear();
 			
 			// for now silently ignore files with parser errors
 			pelet::LintResultsClass lintResults;
 			wxFFile file(fullPath, wxT("rb"));
 			Parser.ScanFile(file.fp(), mvceditor::StringHelperClass::wxToIcu(fullPath), lintResults);
-			IsCacheSorted = false;
+			PushIntoResourceCache(FileParsingCache, fileItem.FileId);
+			FileParsingCache.clear();
 		}
 	}
 }
@@ -826,25 +925,25 @@ void mvceditor::ResourceFinderClass::ClassFound(const UnicodeString& namespaceNa
 	classItem.NamespaceName = namespaceName;
 	classItem.Key = className;
 	classItem.Type = ResourceClass::CLASS;
-	classItem.FileItemIndex = CurrentFileItemIndex;
 	classItem.Signature = signature;
 	classItem.ReturnType = UNICODE_STRING_SIMPLE("");
 	classItem.Comment = comment;
 	classItem.IsNative = false;
-	IdentifierCache.push_back(classItem);
-		
-	// a resource for the namespace itself
-	ResourceClass namespaceItem;
-	namespaceItem.NamespaceName = namespaceName;
-	namespaceItem.Identifier = namespaceName;
-	namespaceItem.Key = namespaceName;
-	if (!namespaceName.isEmpty() && std::find(NamespaceCache.begin(), NamespaceCache.end(), namespaceItem) == NamespaceCache.end()) {
-		NamespaceCache.push_back(namespaceItem);
+	FileParsingCache.push_back(classItem);
+
+	if (IsNewNamespace(namespaceName)) {
+
+		// a resource for the namespace itself
+		ResourceClass namespaceItem;
+		namespaceItem.NamespaceName = namespaceName;
+		namespaceItem.Identifier = namespaceName;
+		namespaceItem.Key = namespaceName;
+		FileParsingCache.push_back(namespaceItem);
 	}
 
 	classItem.Identifier = QualifyName(namespaceName, className);
 	classItem.Key = QualifyName(namespaceName, className);
-	NamespaceCache.push_back(classItem);
+	FileParsingCache.push_back(classItem);
 
 }
 
@@ -862,44 +961,6 @@ void mvceditor::ResourceFinderClass::TraitAliasFound(const UnicodeString& namesp
 	
 	// put a non-qualified version too, sometimes the query will not contain a fully qualified name
 	TraitCache[className] = traitResources;
-	
-	if (!alias.isEmpty()) {
-	
-		// write the alias as a resource on the class in scope since alias will not show up in the trait methods
-		// put the alias in the current class as opposed to the trait class, since the same method may be aliased
-		// by 2 different classes that use the trait
-		ResourceClass item;
-		item.ClassName = className;
-		item.Identifier = alias;
-		item.NamespaceName = namespaceName;
-		item.Key = alias;
-		item.Type = ResourceClass::METHOD;
-		item.FileItemIndex = CurrentFileItemIndex;
-
-		// probably should get these from the original (trait)
-		//if (!returnType.isEmpty()) {
-		//	item.Signature = returnType + UNICODE_STRING_SIMPLE(" ");
-		//}
-		//item.Signature
-		//item.ReturnType 
-		//item.Comment;
-		switch (visibility) {
-		case pelet::TokenClass::PROTECTED:
-			item.IsProtected = true;
-			break;
-		case pelet::TokenClass::PRIVATE:
-			item.IsPrivate = true;
-			break;
-		default:
-			break;
-		}
-		item.IsStatic = false;
-		item.IsNative = false;
-		///MembersCache.push_back(item);
-		
-		///item.Key = className + UNICODE_STRING_SIMPLE("::") + alias;
-		//MembersCache.push_back(item);
-	}
 }
 
 void mvceditor::ResourceFinderClass::TraitInsteadOfFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
@@ -949,16 +1010,15 @@ void mvceditor::ResourceFinderClass::DefineDeclarationFound(const UnicodeString&
 	defineItem.Identifier = variableName;
 	defineItem.Key = variableName;
 	defineItem.Type = ResourceClass::DEFINE;
-	defineItem.FileItemIndex = CurrentFileItemIndex;
 	defineItem.Signature = variableValue;
 	defineItem.ReturnType = UNICODE_STRING_SIMPLE("");
 	defineItem.Comment = comment;
 	defineItem.IsNative = false;
-	IdentifierCache.push_back(defineItem);
+	FileParsingCache.push_back(defineItem);
 
 	defineItem.Identifier = QualifyName(namespaceName, variableName);
 	defineItem.Key = QualifyName(namespaceName, variableName);
-	NamespaceCache.push_back(defineItem);
+	FileParsingCache.push_back(defineItem);
 }
 
 void mvceditor::ResourceFinderClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
@@ -970,7 +1030,6 @@ void mvceditor::ResourceFinderClass::MethodFound(const UnicodeString& namespaceN
 	item.NamespaceName = namespaceName;
 	item.Key = methodName;
 	item.Type = ResourceClass::METHOD;
-	item.FileItemIndex = CurrentFileItemIndex;
 	if (!returnType.isEmpty()) {
 		item.Signature = returnType + UNICODE_STRING_SIMPLE(" ");
 	}
@@ -990,11 +1049,11 @@ void mvceditor::ResourceFinderClass::MethodFound(const UnicodeString& namespaceN
 	}
 	item.IsStatic = isStatic;
 	item.IsNative = false;
-	IdentifierCache.push_back(item);
+	FileParsingCache.push_back(item);
 	
 	// insert a complete name so that we can quickly lookup all methods for a single class
 	item.Key = className + UNICODE_STRING_SIMPLE("::") + methodName;
-	MembersCache.push_back(item);
+	FileParsingCache.push_back(item);
 }
 
 void mvceditor::ResourceFinderClass::PropertyFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& propertyName,
@@ -1015,7 +1074,6 @@ void mvceditor::ResourceFinderClass::PropertyFound(const UnicodeString& namespac
 	item.NamespaceName = namespaceName;
 	item.Key = filteredProperty;
 	item.Type = isConst ? ResourceClass::CLASS_CONSTANT : ResourceClass::MEMBER;
-	item.FileItemIndex = CurrentFileItemIndex;
 	item.Signature =  className + UNICODE_STRING_SIMPLE("::") + filteredProperty;
 	item.ReturnType = propertyType;
 	item.Comment = comment;
@@ -1031,11 +1089,11 @@ void mvceditor::ResourceFinderClass::PropertyFound(const UnicodeString& namespac
 	}
 	item.IsStatic = isStatic;
 	item.IsNative = false;
-	IdentifierCache.push_back(item);
+	FileParsingCache.push_back(item);
 	
 	// insert a complete name so that we can quickly lookup all methods for a single class
 	item.Key = className + UNICODE_STRING_SIMPLE("::") + filteredProperty;
-	MembersCache.push_back(item);
+	FileParsingCache.push_back(item);
 }
 
 void mvceditor::ResourceFinderClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, 
@@ -1045,25 +1103,45 @@ void mvceditor::ResourceFinderClass::FunctionFound(const UnicodeString& namespac
 	item.NamespaceName = namespaceName;
 	item.Key = functionName;
 	item.Type = ResourceClass::FUNCTION;
-	item.FileItemIndex = CurrentFileItemIndex;
 	item.Signature = signature;
 	item.ReturnType = returnType;
 	item.Comment = comment;
 	item.IsNative = false;
-	IdentifierCache.push_back(item);
+	FileParsingCache.push_back(item);
 		
-	ResourceClass namespaceItem;
-	namespaceItem.NamespaceName = namespaceName;
-	namespaceItem.Identifier = namespaceName;
-	namespaceItem.Key = namespaceName;
-	if (!namespaceName.isEmpty() && std::find(NamespaceCache.begin(), NamespaceCache.end(), namespaceItem) == NamespaceCache.end()) {
-		NamespaceCache.push_back(namespaceItem);
+	if (IsNewNamespace(namespaceName)) {
+		ResourceClass namespaceItem;
+		namespaceItem.NamespaceName = namespaceName;
+		namespaceItem.Identifier = namespaceName;
+		namespaceItem.Key = namespaceName;
+		FileParsingCache.push_back(namespaceItem);
 	}
 		
 	// put in the namespace cache so that qualified name lookups work too
 	item.Identifier = QualifyName(namespaceName, functionName);
 	item.Key = QualifyName(namespaceName, functionName);
-	NamespaceCache.push_back(item);
+	FileParsingCache.push_back(item);
+}
+
+bool mvceditor::ResourceFinderClass::IsNewNamespace(const UnicodeString& namespaceName) {
+	std::string sql = "SELECT COUNT(*) FROM resources WHERE key = ? AND type = ?";
+	std::string nm = mvceditor::StringHelperClass::IcuToChar(namespaceName);
+	int type = mvceditor::ResourceClass::NAMESPACE;
+	int count = 0;
+	soci::statement stmt = (Session.prepare << sql, soci::use(nm), soci::use(type), soci::into(count));
+	bool isNew = false;
+	if (count < 0) {
+		ResourceClass namespaceItem;
+		namespaceItem.NamespaceName = namespaceName;
+		namespaceItem.Identifier = namespaceName;
+		namespaceItem.Key = namespaceName;
+	 
+		// look in the current file cache, stuff that has not yet been added to the database
+		if (std::find(FileParsingCache.begin(), FileParsingCache.end(), namespaceItem) == FileParsingCache.end()) {
+			isNew = true;
+		}	
+	}
+	return isNew;
 }
 
 int mvceditor::ResourceFinderClass::GetLineCountFromFile(const wxString& fullPath) const {
@@ -1105,34 +1183,12 @@ int mvceditor::ResourceFinderClass::GetLineCountFromFile(const wxString& fullPat
 	return lineCount;
 }
 
-void mvceditor::ResourceFinderClass::RemoveCachedResources(int fileItemIndex) {
-	std::vector<ResourceClass>::iterator it = IdentifierCache.begin();
-	while (it != IdentifierCache.end()) {
-		if (it->FileItemIndex == fileItemIndex) {
-			it = IdentifierCache.erase(it);
-		}
-		else {
-			++it;
-		}
+void mvceditor::ResourceFinderClass::RemoveCachedResources(const mvceditor::FileItemClass& fileItem) {
+	if (!IsCacheInitialized) {
+		return;
 	}
-	it = MembersCache.begin();
-	while (it != MembersCache.end()) {
-		if (it->FileItemIndex == fileItemIndex) {
-			it = MembersCache.erase(it);
-		}
-		else {
-			++it;
-		}
-	}
-	it = NamespaceCache.begin();
-	while (it != NamespaceCache.end()) {
-		if (it->FileItemIndex == fileItemIndex) {
-			it = NamespaceCache.erase(it);
-		}
-		else {
-			++it;
-		}
-	}
+	std::string sql = "DELETE FROM resources WHERE file_item_id = ?";
+	Session.once << sql, soci::use(fileItem.FileId);
 }
 
 UnicodeString mvceditor::ResourceFinderClass::ExtractParentClassFromSignature(const UnicodeString& signature) const {
@@ -1153,63 +1209,72 @@ UnicodeString mvceditor::ResourceFinderClass::ExtractParentClassFromSignature(co
 	return parentClassName;
 }
 
-bool mvceditor::ResourceFinderClass::CollectFullyQualifiedResource() {
-	EnsureSorted();
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectFullyQualifiedResource() {
 	ResourceClass needle;
+	std::vector<mvceditor::ResourceClass> allMatches;
 	if (ResourceType == CLASS_NAME_METHOD_NAME) {
 
 		// check the entire class hierachy; stop as soon as we found it
 		std::vector<UnicodeString> classHierarchy = ClassHierarchy(ClassName);
 		for (size_t i = 0; i < classHierarchy.size(); ++i) {
-			
-			needle.Key = classHierarchy[i] + UNICODE_STRING_SIMPLE("::") + MethodName;
-			std::vector<ResourceClass>::iterator it = std::lower_bound(MembersCache.begin(), MembersCache.end(), needle);
-			
-			// members are sorted by identifers; need to acount for the case when the same method name
-			// is used in multiple classes
-			int classCount = 0;
-			ResourceClass exactMatchResource;
-			while (it != MembersCache.end() && it->Identifier.caseCompare(MethodName, 0) == 0) {
-				if (it->ClassName.caseCompare(classHierarchy[i], 0) == 0) {
-					classCount++;
-					exactMatchResource = *it;
-				}
-				++it;
-			}
-			if (1 == classCount) {
-				Matches.push_back(exactMatchResource);
-				break;
+			UnicodeString key = classHierarchy[i] + UNICODE_STRING_SIMPLE("::") + MethodName;
+			std::string query = mvceditor::StringHelperClass::IcuToChar(key);
+			std::string sql;
+			sql += "SELECT ";
+			sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
+			sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
+			sql += "FROM resources WHERE key = (?) AND type IN(";
+			sql += mvceditor::ResourceClass::CLASS_CONSTANT;
+			sql += ",";
+			sql += mvceditor::ResourceClass::MEMBER;
+			sql += ",";
+			sql += mvceditor::ResourceClass::METHOD;
+			sql += ") LIMIT 50";
+
+			std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(sql, query);
+			if (!matches.empty()) {
+				allMatches.push_back(matches[0]);
 			}
 		}
 	}
 	else if (NAMESPACE_NAME == ResourceType) {
-		needle.Key = ClassName;
-		std::vector<ResourceClass>::iterator it = std::lower_bound(NamespaceCache.begin(), NamespaceCache.end(), needle);
-		if (it != NamespaceCache.end() && it->Key.caseCompare(needle.Key, 0) == 0) {
-			ResourceClass exactMatchResource = *it;
-			++it;
-			
-			// make sure there is one and only one item that matches the search.
-			if (it == NamespaceCache.end() || it->Key.caseCompare(needle.Key, 0) > 0) {
-				Matches.push_back(exactMatchResource);
-			}
+		UnicodeString key = ClassName;
+		std::string query = mvceditor::StringHelperClass::IcuToChar(key);
+		std::string sql;
+		sql += "SELECT ";
+		sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
+		sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
+		sql += "FROM resources WHERE key = (?) AND type IN(";
+		sql += mvceditor::ResourceClass::NAMESPACE;
+		sql += ",";
+		sql += mvceditor::ResourceClass::MEMBER;
+		sql += ",";
+		sql += mvceditor::ResourceClass::METHOD;
+		sql += ") LIMIT 50";
+		
+		// make sure there is one and only one item that matches the search.
+		std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(sql, query);
+		if (matches.size() == 1) {
+			allMatches.push_back(matches[0]);
 		}
 	}
 	else {
-		needle.Key = ClassName;
-		std::vector<ResourceClass>::iterator it = std::lower_bound(IdentifierCache.begin(), IdentifierCache.end(), needle);
-		if (it != IdentifierCache.end() && it->Identifier.caseCompare(ClassName, 0) == 0) {
-			ResourceClass exactMatchResource = *it;
-			++it;
-			
-			// make sure there is one and only one item that matches the search.
-			if (it == IdentifierCache.end() || it->Identifier.caseCompare(ClassName, 0) > 0) {
-				Matches.push_back(exactMatchResource);
-			}
+		UnicodeString key = ClassName;
+		std::string query = mvceditor::StringHelperClass::IcuToChar(key);
+		std::string sql;
+		sql += "SELECT ";
+		sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
+		sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
+		sql += "FROM resources WHERE key = (?) LIMIT 50";
+
+		// make sure there is one and only one item that matches the search.
+		std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(sql, query);
+		if (matches.size() == 1) {
+			allMatches.push_back(matches[0]);
 		}
 	}
-	EnsureMatchesExist();
-	return !Matches.empty();
+	EnsureMatchesExist(allMatches);
+	return allMatches;
 }
 
 bool mvceditor::ResourceFinderClass::IsTraitInherited(const mvceditor::ResourceClass& memberResource, const UnicodeString& fullyQualifiedClassName) {
@@ -1234,92 +1299,86 @@ bool mvceditor::ResourceFinderClass::IsTraitInherited(const mvceditor::ResourceC
 	return match;
 }
 
-void mvceditor::ResourceFinderClass::EnsureMatchesExist() {
-	std::vector<int> files;
-	for(std::vector<ResourceClass>::iterator it = Matches.begin(); it != Matches.end(); ++it) {
+void mvceditor::ResourceFinderClass::EnsureMatchesExist(std::vector<ResourceClass>& matches) {
+	std::vector<int> fileItemIds;
+	for(std::vector<mvceditor::ResourceClass>::iterator it = matches.begin(); it != matches.end(); ++it) {
 
-		// set the full path; initially the cache only holds the FileItemIndex to preserve space
+		// set the full path; initially the cache only holds the FileItemId to preserve space
 		// this is needed for ResourceClass::GetFullPath() to work as promised
 		it->FullPath = GetResourceMatchFullPathFromResource(*it);
 
-		// FileItemIndex is meaningless for dynamic resources
+		// FileItemId is meaningless for dynamic resources
 		if (!it->IsDynamic) {
-			files.push_back(it->FileItemIndex);
+			fileItemIds.push_back(it->FileItemId);
 		}
 	}
-	unique(files.begin(), files.end());
-	for(std::vector<int>::const_iterator it = files.begin(); it != files.end(); ++it) {
-		int fileItemIndex = *it;
-		if (fileItemIndex >= 0 && fileItemIndex < (int)FileCache.size()) {
+	unique(fileItemIds.begin(), fileItemIds.end());
+	std::vector<mvceditor::FileItemClass> fileItems = FileItems(fileItemIds);
+	for (size_t i = 0; i < fileItems.size(); ++i) {
 
-			// is a file is new it wont be on disk; results are not stale.
-			if (!FileCache[fileItemIndex].IsNew && !wxFileName::FileExists(FileCache[fileItemIndex].FullPath)) {
-				
-				// file is gone. remove all cached resources
-				RemoveCachedResources(fileItemIndex);
-				
-				// remove from matches
-				std::vector<ResourceClass>::iterator it = Matches.begin();
-				while (it != Matches.end()) {
-					if (it->FileItemIndex == fileItemIndex) {
-						it = Matches.erase(it);
-					}
-					else {
-						++it;
-					}
+		// is a file is new it wont be on disk; results are not stale.
+		if (!fileItems[i].IsNew && !wxFileName::FileExists(fileItems[i].FullPath)) {
+			
+			// file is gone. remove all cached resources
+			RemoveCachedResources(fileItems[i]);
+			
+			// remove from matches
+			std::vector<mvceditor::ResourceClass>::iterator it = matches.begin();
+			while (it != matches.end()) {
+				if (it->FileItemId == fileItems[i].FileId) {
+					it = matches.erase(it);
+				}
+				else {
+					++it;
 				}
 			}
 		}
 	}
 }
 
-void mvceditor::ResourceFinderClass::BoundedCacheSearch(const std::vector<mvceditor::ResourceClass>& cache,
-		const UnicodeString& key,
-		std::vector<mvceditor::ResourceClass>& matches, int maxMatches)  const {
-	int matchCount = 0;
-	mvceditor::ResourceClass needle;
-	needle.Key = key;
-	std::vector<mvceditor::ResourceClass>::const_iterator it =  std::lower_bound(cache.begin(), cache.end(), needle);
-	if (it != cache.end()) {
-		
-		// collect near matches
-		while (it != cache.end() && mvceditor::CaseStartsWith(it->Key, key)) {
-			matches.push_back(*it);
-			matchCount++;
-			if (matchCount > maxMatches) {
-				break;
-			}
-			++it;
-		}
-	}
-}
-
-void mvceditor::ResourceFinderClass::Print() const {
+void mvceditor::ResourceFinderClass::Print() {
 	UFILE *out = u_finit(stdout, NULL, NULL);
 	u_fprintf(out, "LookingFor=%.*S,%.*S\n", ClassName.length(), ClassName.getBuffer(), MethodName.length(), MethodName.getBuffer());
-	for (std::vector<ResourceClass>::const_iterator it = IdentifierCache.begin(); it != IdentifierCache.end(); ++it) {
-		u_fprintf(out, "RESOURCE: Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S Type=%d\n",
-			it->Key.length(), it->Key.getBuffer(),
-			it->Identifier.length(), it->Identifier.getBuffer(),  
-			it->ClassName.length(), it->ClassName.getBuffer(),
-			it->NamespaceName.length(), it->NamespaceName.getBuffer(),
-			it->Type);
-	}
-	for (std::vector<ResourceClass>::const_iterator it = MembersCache.begin(); it != MembersCache.end(); ++it) {
-		u_fprintf(out, "MEMBER: Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S ReturnType=%.*S Type=%d\n", 
-			it->Key.length(), it->Key.getBuffer(),
-			it->Identifier.length(), it->Identifier.getBuffer(),  
-			it->ClassName.length(), it->ClassName.getBuffer(),
-			it->NamespaceName.length(), it->NamespaceName.getBuffer(),
-			it->ReturnType.length(), it->ReturnType.getBuffer(), it->Type);
-	}
-	for (std::vector<ResourceClass>::const_iterator it = NamespaceCache.begin(); it != NamespaceCache.end(); ++it) {
-		u_fprintf(out, "NAMESPACE:Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S  Type=%d\n", 
-			it->Key.length(), it->Key.getBuffer(),
-			it->Identifier.length(), it->Identifier.getBuffer(),  
-			it->ClassName.length(), it->ClassName.getBuffer(),
-			it->NamespaceName.length(), it->NamespaceName.getBuffer(),
-			it->Type);
+	
+	std::string sql;
+	std::string query = "1";
+	sql += "SELECT ";
+	sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
+	sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
+	sql += "FROM resources WHERE 1 = ?";
+	std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(sql, query);
+	for (std::vector<mvceditor::ResourceClass>::const_iterator it = matches.begin(); it != matches.end(); ++it) {
+		switch (it->Type) {
+			case mvceditor::ResourceClass::CLASS :
+			case mvceditor::ResourceClass::DEFINE :
+			case mvceditor::ResourceClass::FUNCTION :
+
+				u_fprintf(out, "RESOURCE: Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S Type=%d\n",
+					it->Key.length(), it->Key.getBuffer(),
+					it->Identifier.length(), it->Identifier.getBuffer(),  
+					it->ClassName.length(), it->ClassName.getBuffer(),
+					it->NamespaceName.length(), it->NamespaceName.getBuffer(),
+					it->Type);
+				break;
+			case mvceditor::ResourceClass::CLASS_CONSTANT :
+			case mvceditor::ResourceClass::MEMBER :
+			case mvceditor::ResourceClass::METHOD :
+				u_fprintf(out, "MEMBER: Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S ReturnType=%.*S Type=%d\n", 
+					it->Key.length(), it->Key.getBuffer(),
+					it->Identifier.length(), it->Identifier.getBuffer(),  
+					it->ClassName.length(), it->ClassName.getBuffer(),
+					it->NamespaceName.length(), it->NamespaceName.getBuffer(),
+					it->ReturnType.length(), it->ReturnType.getBuffer(), it->Type);
+				break;
+			case mvceditor::ResourceClass::NAMESPACE :
+				u_fprintf(out, "NAMESPACE:Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S  Type=%d\n", 
+					it->Key.length(), it->Key.getBuffer(),
+					it->Identifier.length(), it->Identifier.getBuffer(),  
+					it->ClassName.length(), it->ClassName.getBuffer(),
+					it->NamespaceName.length(), it->NamespaceName.getBuffer(),
+					it->Type);
+				break;
+		}
 	}
 	for (std::map<UnicodeString, std::vector<mvceditor::TraitResourceClass>, UnicodeStringComparatorClass>::const_iterator it = TraitCache.begin(); it != TraitCache.end(); ++it) {
 		u_fprintf(out, "TRAITS USED BY: %.*S\n",
@@ -1341,207 +1400,103 @@ void mvceditor::ResourceFinderClass::Print() const {
 	u_fclose(out);
 }
 
-bool mvceditor::ResourceFinderClass::IsFileCacheEmpty() const {
-	return 0 == FileCache.size();
-}
-
-bool mvceditor::ResourceFinderClass::IsResourceCacheEmpty() const {
-	bool isEmpty = IdentifierCache.empty() && MembersCache.empty();
-	if (!isEmpty) {
-		isEmpty = true;
-
-		// make sure only parsed resource came from the native functions file.
-		for (std::vector<mvceditor::ResourceClass>::const_iterator it = IdentifierCache.begin(); isEmpty && it != IdentifierCache.end(); ++it) {
-			if (!it->IsNative) {
-				isEmpty = false;
-			}
-		}
-		if (isEmpty) {
-			for (std::vector<mvceditor::ResourceClass>::const_iterator it = MembersCache.begin(); isEmpty && it != MembersCache.end(); ++it) {
-				if (!it->IsNative) {
-					isEmpty = false;
-				}
-			}
-		}
+bool mvceditor::ResourceFinderClass::IsFileCacheEmpty() {
+	if (!IsCacheInitialized) {
+		return true;
 	}
-	return isEmpty;
+	int count = 0;
+	Session.once << "SELECT COUNT(*) FROM file_items;", soci::into(count);
+	return 0 <= count;
 }
 
-void mvceditor::ResourceFinderClass::CopyResourcesFrom(const mvceditor::ResourceFinderClass& src) {
+bool mvceditor::ResourceFinderClass::IsResourceCacheEmpty() {
+	if (!IsCacheInitialized) {
+		return true;
+	}
 
-	// since resource caches can be quite large, avoid using push_back
-	IdentifierCache.resize(src.IdentifierCache.size());
-	std::copy(src.IdentifierCache.begin(), src.IdentifierCache.end(), IdentifierCache.begin());
-	
-	MembersCache.resize(src.MembersCache.size());
-	std::copy(src.MembersCache.begin(), src.MembersCache.end(), MembersCache.begin());
-	
-	NamespaceCache.resize(src.NamespaceCache.size());
-	std::copy(src.NamespaceCache.begin(), src.NamespaceCache.end(), NamespaceCache.begin());
-	
-	FileCache.resize(src.FileCache.size());
-	std::copy(src.FileCache.begin(), src.FileCache.end(), FileCache.begin());
-	IsCacheSorted = src.IsCacheSorted;
+	// make sure only parsed resource came from the native functions file.
+	int count = 0;
+	Session.once << "SELECT COUNT(*) FROM resources WHERE is_native = 0;", soci::into(count);
+	return 0 <= count;
 }
 
 void mvceditor::ResourceFinderClass::AddDynamicResources(const std::vector<mvceditor::ResourceClass>& dynamicResources) {
+
+	std::vector<mvceditor::ResourceClass> newResources;
 	for (std::vector<mvceditor::ResourceClass>::const_iterator it = dynamicResources.begin(); it != dynamicResources.end(); ++it) {
 		mvceditor::ResourceClass resource = *it;
 		if (mvceditor::ResourceClass::MEMBER == resource.Type || mvceditor::ResourceClass::METHOD == resource.Type) {
-			
-			// cannot assume cache is sorted
+
 			// need to account for duplicates; if so then only update
 			bool updated = false;
-			for (std::vector<mvceditor::ResourceClass>::iterator itMember = MembersCache.begin(); itMember != MembersCache.end(); ++itMember) {
-				if (itMember->ClassName == resource.ClassName && itMember->Identifier == resource.Identifier) {
-					if (!resource.ReturnType.isEmpty()) {
-						itMember->ReturnType = resource.ReturnType;
-					}
-					updated = true;
-					break;
-				}
+			std::string sql;
+			sql += "SELECT return_type FROM resources WHERE class_name = ? AND identifier = ? AND type IN(";
+			sql += mvceditor::ResourceClass::MEMBER;
+			sql += ",";
+			sql += mvceditor::ResourceClass::METHOD;
+			sql += ")";
+
+			std::string returnType;
+			std::string className = mvceditor::StringHelperClass::IcuToChar(resource.ClassName);
+			std::string identifier = mvceditor::StringHelperClass::IcuToChar(resource.Identifier);
+			Session.once << sql, soci::use(className), soci::use(identifier), soci::into(returnType);
+			if (returnType.empty()) {
+				returnType = mvceditor::StringHelperClass::IcuToChar(resource.ReturnType);
+				sql = "UPDATE resources SET return_type = ? WHERE class_name = ? AND identifier = ? AND type IN(";
+				sql += mvceditor::ResourceClass::MEMBER;
+				sql += ",";
+				sql += mvceditor::ResourceClass::METHOD;
+				sql += ")";				
+				Session.once << sql, soci::use(returnType), soci::use(className), soci::use(identifier);
+				updated = true;
 			}
 			if (!updated) {
 				resource.IsDynamic = true;
-
-				// we dont want these resource to point to a file; 
-				// GetResourceMatchFullPathFromResource() and GetResourceMatchFullPath() will return empty for dynamic 
-				// resources since there is no source code we can show the user.
-				resource.FileItemIndex = -1;
 				resource.Key = resource.Identifier;
-				MembersCache.push_back(resource);
+				newResources.push_back(resource);
 				
 				// the fully qualified version
 				resource.Key = resource.ClassName + UNICODE_STRING_SIMPLE("::") + resource.Identifier;
-				MembersCache.push_back(resource);
-				
-				IsCacheSorted = false;
+				newResources.push_back(resource);
 			}
 		}
 		else {
 
 			// look at the class, function, cache
 			bool updated = false;
-			for (std::vector<mvceditor::ResourceClass>::iterator itResource = IdentifierCache.begin(); itResource != IdentifierCache.end(); ++itResource) {
-				if (itResource->ClassName == resource.ClassName && itResource->Identifier == resource.Identifier) {
-					if (!resource.ReturnType.isEmpty()) {
-						itResource->ReturnType = resource.ReturnType;
-					}
-					updated = true;
-					break;
-				}
+			std::string sql;
+			sql += "SELECT return_type FROM resources WHERE class_name = '' AND identifier = ? AND type IN(";
+			sql += mvceditor::ResourceClass::FUNCTION;
+			sql += ")";
+			std::string className = mvceditor::StringHelperClass::IcuToChar(resource.ClassName);
+			std::string identifier = mvceditor::StringHelperClass::IcuToChar(resource.Identifier);
+			std::string returnType;
+			Session.once << sql, soci::use(identifier), soci::into(returnType);
+			if (returnType.empty()) {
+				returnType = mvceditor::StringHelperClass::IcuToChar(resource.ReturnType);
+				sql = "UPDATE resources SET return_type = ? WHERE class_name = ? AND identifier = ? AND type IN(";
+				sql += mvceditor::ResourceClass::FUNCTION;
+				sql += ")";				
+				Session.once << sql, soci::use(returnType), soci::use(className), soci::use(identifier);
+				updated = true;
 			}
 			if (!updated) {
 				resource.IsDynamic = true;
-
-				// we dont want these resource to point to a file; 
-				// GetResourceMatchFullPathFromResource() and GetResourceMatchFullPath() will return empty for dynamic 
-				// resources since there is no source code we can show the user.
-				resource.FileItemIndex = -1;
 				resource.Key = resource.Identifier;
-				IdentifierCache.push_back(resource);
+				newResources.push_back(resource);
 				
 				// the fully qualified version
 				resource.Key = QualifyName(resource.NamespaceName, resource.ClassName);
-				IdentifierCache.push_back(resource);
-				
-				IsCacheSorted = false;
+				newResources.push_back(resource);
 			}
 		}
 	}
-}
 
-void mvceditor::ResourceFinderClass::UpdateResourcesFrom(const wxString& fullPath, const mvceditor::ResourceFinderClass& src) {
+	// we dont want these resource to point to a file; 
+	// GetResourceMatchFullPathFromResource() and GetResourceMatchFullPath() will return empty for dynamic 
+	// resources since there is no source code we can show the user.
 	int fileItemIndex = -1;
-	mvceditor::ResourceFinderClass::FileItem fileItem;
-	
-	// check to see if we have cached the given file, if so then clear the file's resources
-	bool foundFile = FindInFileCache(fullPath, fileItemIndex, fileItem);
-	if (foundFile) {
-		RemoveCachedResources(fileItemIndex);
-	}
-
-	// now add the new resources from src
-	// we cannot copy them as is because FileCache indices may conflict
-	for (std::vector<mvceditor::ResourceClass>::const_iterator it = src.IdentifierCache.begin(); it != src.IdentifierCache.end(); ++it) {
-		if (it->FileItemIndex >= 0 && it->FileItemIndex < (int)src.FileCache.size()) {
-			wxString resourceFullPath = src.FileCache[it->FileItemIndex].FullPath;
-			fileItemIndex = -1;
-			mvceditor::ResourceClass res = *it;
-			foundFile = FindInFileCache(resourceFullPath, fileItemIndex, fileItem);
-		
-			// resource comes from am known file; need to change the index 
-			if (foundFile) {				
-				res.FileItemIndex = fileItemIndex;
-			}
-			else {
-
-				// resource comes from a file that is not in this cache. need to add to the file cache 
-				int newFileItemIndex = PushIntoFileCache(src.FileCache[it->FileItemIndex].FullPath, src.FileCache[it->FileItemIndex].Parsed, src.FileCache[it->FileItemIndex].IsNew);
-				res.FileItemIndex = newFileItemIndex;
-			}
-
-			// put in the appropiate cache
-			IdentifierCache.push_back(res);
-		}
-		else {
-			IdentifierCache.push_back(*it);
-		}
-	}
-
-	// same thing for MembersCache
-	for (std::vector<mvceditor::ResourceClass>::const_iterator it = src.MembersCache.begin(); it != src.MembersCache.end(); ++it) {
-		if (it->FileItemIndex >= 0 && it->FileItemIndex < (int)src.FileCache.size()) {
-			wxString resourceFullPath = src.FileCache[it->FileItemIndex].FullPath;
-			fileItemIndex = -1;
-			mvceditor::ResourceClass res = *it;
-			foundFile = FindInFileCache(resourceFullPath, fileItemIndex, fileItem);
-		
-			// resource comes from am known file; need to change the index 
-			if (foundFile) {				
-				res.FileItemIndex = fileItemIndex;
-			}
-			else {
-
-				// resource comes from a file that is not in this cache. need to add to the file cache 
-				int newFileItemIndex = PushIntoFileCache(src.FileCache[it->FileItemIndex].FullPath, src.FileCache[it->FileItemIndex].Parsed, src.FileCache[it->FileItemIndex].IsNew);
-				res.FileItemIndex = newFileItemIndex;
-			}
-
-			// put in the appropiate cache
-			MembersCache.push_back(res);
-		}
-		else {
-			MembersCache.push_back(*it);
-		}
-	}
-	
-	// same thing for NamespaceCache
-	for (std::vector<mvceditor::ResourceClass>::const_iterator it = src.NamespaceCache.begin(); it != src.NamespaceCache.end(); ++it) {
-		if (it->FileItemIndex >= 0 && it->FileItemIndex < (int)src.FileCache.size()) {
-			wxString resourceFullPath = src.FileCache[it->FileItemIndex].FullPath;
-			fileItemIndex = -1;
-			mvceditor::ResourceClass res = *it;
-			foundFile = FindInFileCache(resourceFullPath, fileItemIndex, fileItem);
-		
-			// resource comes from am known file; need to change the index 
-			if (foundFile) {				
-				res.FileItemIndex = fileItemIndex;
-			}
-			else {
-
-				// resource comes from a file that is not in this cache. need to add to the file cache 
-				int newFileItemIndex = PushIntoFileCache(src.FileCache[it->FileItemIndex].FullPath, src.FileCache[it->FileItemIndex].Parsed, src.FileCache[it->FileItemIndex].IsNew);
-				res.FileItemIndex = newFileItemIndex;
-			}
-
-			// put in the appropiate cache
-			NamespaceCache.push_back(res);
-		}
-		else {
-			NamespaceCache.push_back(*it);
-		}
-	}
+	PushIntoResourceCache(newResources, fileItemIndex);
 }
 
 bool mvceditor::ResourceFinderClass::LoadTagFile(const wxFileName& fileName, bool isNativeTags) {
@@ -1549,6 +1504,8 @@ bool mvceditor::ResourceFinderClass::LoadTagFile(const wxFileName& fileName, boo
 	UFILE* uf = u_fopen(fileName.GetFullPath().ToAscii(), "rb", NULL, NULL);
 	if (uf) {
 		UChar buffer[512];
+
+		std::vector<mvceditor::ResourceClass> newResources;
 		mvceditor::ResourceClass res;
 		while (u_fgets(buffer, 512, uf)) {
 			if (UNICODE_STRING_SIMPLE("!_TAG_").caseCompare(buffer, 6, 0) != 0) {
@@ -1571,7 +1528,7 @@ bool mvceditor::ResourceFinderClass::LoadTagFile(const wxFileName& fileName, boo
 					if (good) {
 						res.IsNative = isNativeTags;
 						res.Key = res.Identifier;
-						IdentifierCache.push_back(res);
+						newResources.push_back(res);
 						switch (res.Type) {
 						case mvceditor::ResourceClass::CLASS:
 						case mvceditor::ResourceClass::FUNCTION:
@@ -1580,7 +1537,7 @@ bool mvceditor::ResourceFinderClass::LoadTagFile(const wxFileName& fileName, boo
 							// the fully qualified version
 							res.Identifier =  QualifyName(res.NamespaceName, res.Identifier);
 							res.Key = res.Identifier;
-							NamespaceCache.push_back(res);
+							newResources.push_back(res);
 							break;
 						case mvceditor::ResourceClass::MEMBER:
 						case mvceditor::ResourceClass::METHOD:
@@ -1588,7 +1545,7 @@ bool mvceditor::ResourceFinderClass::LoadTagFile(const wxFileName& fileName, boo
 
 							// the fully scoped version
 							res.Key = res.ClassName + UNICODE_STRING_SIMPLE("::") + res.Identifier;;
-							MembersCache.push_back(res);
+							newResources.push_back(res);
 							break;
 						case mvceditor::ResourceClass::DEFINE:
 							// PHP does not define any namespaced constants?
@@ -1599,113 +1556,155 @@ bool mvceditor::ResourceFinderClass::LoadTagFile(const wxFileName& fileName, boo
 			}
 		}
 		u_fclose(uf);
+		PushIntoResourceCache(newResources, -1);
 	}
 	return good;
 }
 
-void mvceditor::ResourceFinderClass::EnsureSorted() {
-	Matches.clear();
-	Matches.reserve(10);
-	if (!IsCacheSorted) {
-		std::sort(IdentifierCache.begin(), IdentifierCache.end());
-		std::sort(MembersCache.begin(), MembersCache.end());
-		std::sort(NamespaceCache.begin(), NamespaceCache.end());
-
-		// if a dyamic resource has been added and is a dup; merge it with the corresponding 'real' resource
-		std::vector<mvceditor::ResourceClass>::iterator itDynamic = IdentifierCache.begin();
-		while (itDynamic != IdentifierCache.end()) {
-			bool erased = false;
-			if (itDynamic->IsDynamic) {
-				ResourceClass needle;
-				needle.Identifier = itDynamic->Identifier;
-				std::vector<mvceditor::ResourceClass>::iterator found =  std::lower_bound(IdentifierCache.begin(), IdentifierCache.end(), needle);
-				while (found != IdentifierCache.end() &&
-						found->ClassName == itDynamic->ClassName && found->Identifier == itDynamic->Identifier &&
-						found->NamespaceName == itDynamic->NamespaceName &&
-						found->Type == itDynamic->Type) {
-					if (!found->IsDynamic) {
-
-						// merge by copying the ReturnType from the dynamic resource then 
-						// delete the dynamic resource
-						found->ReturnType = itDynamic->ReturnType;
-						itDynamic = IdentifierCache.erase(itDynamic);
-						erased = true;
-						break;
-					}
-					++found;
-				}
-			}
-			if (!erased) {
-				++itDynamic;
-			}
-		}
-		itDynamic = MembersCache.begin();
-		while (itDynamic != MembersCache.end()) {
-			bool erased = false;
-			if (itDynamic->IsDynamic) {	
-				ResourceClass needle;
-				needle.Identifier = itDynamic->Identifier;
-				std::vector<mvceditor::ResourceClass>::iterator found =  std::lower_bound(MembersCache.begin(), MembersCache.end(), needle);
-				while (found != MembersCache.end() &&
-						found->ClassName == itDynamic->ClassName && found->Identifier == itDynamic->Identifier &&
-						found->NamespaceName == itDynamic->NamespaceName &&
-						found->Type == itDynamic->Type) {
-					if (!found->IsDynamic) {
-
-						// merge by copying the ReturnType from the dynamic resource then 
-						// delete the dynamic resource
-						found->ReturnType = itDynamic->ReturnType;
-						itDynamic = MembersCache.erase(itDynamic);
-						erased = true;
-						break;
-					}
-					++found;
-				}
-			}
-			if (!erased) {
-				++itDynamic;
-			}
-		}
-		IsCacheSorted = true;
+void mvceditor::ResourceFinderClass::PushIntoFileCache(mvceditor::FileItemClass& fileItem) {
+	if (!IsCacheInitialized) {
+		return;
+	}
+	std::string fullPath = mvceditor::StringHelperClass::wxToChar(fileItem.FullPath);
+	std::tm tm;
+	int isParsed;
+	int isNew;
+	if (fileItem.DateTime.IsValid()) {
+		wxDateTime::Tm wxTm = fileItem.DateTime.GetTm();
+		tm.tm_hour = wxTm.hour;
+		tm.tm_isdst = fileItem.DateTime.IsDST();
+		tm.tm_mday = wxTm.mday;
+		tm.tm_min = wxTm.min;
+		tm.tm_mon = wxTm.mon;
+		tm.tm_sec = wxTm.sec;
+		tm.tm_wday = fileItem.DateTime.GetWeekDay();
+		tm.tm_yday = fileItem.DateTime.GetDayOfYear();
+		tm.tm_year = wxTm.year;
+	}
+	soci::statement stmt = (Session.prepare <<
+		"INSERT INTO file_items (file_item_id, full_path, last_modified, is_parsed, is_new) VALUES(NULL, ?, ?, ?, ?)",
+		soci::use(fullPath), soci::use(tm), soci::use(isParsed), soci::use(isNew)
+	);
+	if (stmt.execute(true)) {
+		soci::sqlite3_statement_backend* backend = static_cast<soci::sqlite3_statement_backend*>(stmt.get_backend());
+		fileItem.FileId = sqlite3_last_insert_rowid(backend->session_.conn_);
 	}
 }
 
-int mvceditor::ResourceFinderClass::PushIntoFileCache(const wxString& fullPath, bool isParsed, bool isNew) {
-	int newFileItemIndex = FileCache.size();
-	mvceditor::ResourceFinderClass::FileItem fileItem;
-	fileItem.FullPath = fullPath;
-	fileItem.Parsed = isParsed;
-	fileItem.IsNew = isNew;
-	FileCache.push_back(fileItem);
-	return newFileItemIndex;
-}
-
-bool mvceditor::ResourceFinderClass::FindInFileCache(const wxString& fullPath, int& fileItemIndex, mvceditor::ResourceFinderClass::FileItem& fileItem) const {
-	bool foundFile = false;
-	for (size_t i = 0; i < FileCache.size(); ++i) {
-		if (FileCache[i].FullPath == fullPath) {
-			fileItemIndex = i;
-			fileItem = FileCache[i];
-			foundFile = true;
-			break;
-		}
+bool mvceditor::ResourceFinderClass::FindInFileCache(const wxString& fullPath, mvceditor::FileItemClass& fileItem) {
+	if (!IsCacheInitialized) {
+		return false;
 	}
+	int fileItemId;
+	std::tm lastModified;
+	int isParsed;
+	int isNew;
+
+	std::string query = mvceditor::StringHelperClass::wxToChar(fullPath);
+	std::string sql = "SELECT file_item_id, last_modified, is_parsed, is_new FROM file_items WHERE fullpath = ?";
+	soci::statement stmt = (Session.prepare << sql, soci::use(query), 
+		soci::into(fileItemId), soci::into(lastModified), soci::into(isParsed), soci::into(isNew)
+	);
+	bool foundFile = stmt.execute(true);
+	if (foundFile) {
+		fileItem.DateTime.Set(lastModified);
+		fileItem.FileId = fileItemId;
+		fileItem.FullPath = fullPath;
+		fileItem.IsNew = isNew != 0;
+		fileItem.IsParsed = isParsed != 0;
+	}	
 	return foundFile;
 }
 
-std::vector<wxString> mvceditor::ResourceFinderClass::GetCachedFiles() const {
-	std::vector<wxString> files;
-	for (size_t i = 0; i < FileCache.size(); ++i) {
-		files.push_back(FileCache[i].FullPath);
+std::vector<mvceditor::FileItemClass> mvceditor::ResourceFinderClass::FileItems(const std::vector<int>& fileItemIds) {
+	std::vector<mvceditor::FileItemClass> fileItems;
+	if (!IsCacheInitialized || fileItemIds.empty()) {
+		return fileItems;
 	}
-	return files;
+	std::ostringstream stream;
+	for (size_t i = 0; i < fileItemIds.size(); ++i) {
+		stream << fileItemIds[i];
+		if (i < (fileItemIds.size() - 1)) {
+			stream << ",";
+		}
+	}
+	std::string ids = stream.str();
+	int fileItemId;
+	std::string fullPath;
+	std::tm tm;
+	int isParsed;
+	int isNew;
+	std::string sql = "SELECT file_item_id, full_path, last_modified, is_parsed, is_new FROM file_items WHERE file_item_id IN(?)";
+	soci::statement stmt = (Session.prepare << sql, soci::use(ids),
+		soci::into(fileItemId), soci::into(fullPath), soci::into(tm), soci::into(isParsed), soci::into(isNew)
+	);
+	stmt.execute();
+	while (stmt.fetch()) {
+		mvceditor::FileItemClass fileItem;
+		fileItem.DateTime.Set(tm);
+		fileItem.FileId = fileItemId;
+		fileItem.FullPath = mvceditor::StringHelperClass::charToWx(fullPath.c_str());
+		fileItem.IsNew = isNew != 0;
+		fileItem.IsParsed = isParsed != 0;
+	}
+	return fileItems;
+}
+
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::ResourceStatementMatches(std::string sql, std::string param) {
+	std::vector<mvceditor::ResourceClass> matches;
+	if (!IsCacheInitialized) {
+		return matches;
+	}
+	int fileItemId;
+	std::string key;
+	std::string identifier;
+	std::string className;
+	int type;
+	std::string namespaceName;
+	std::string signature;
+	std::string returnType;
+	int isProtected;
+	int isPrivate;
+	int isStatic;
+	int isDynamic;
+	int isNative;
+	soci::statement stmt = (Session.prepare << sql,
+		soci::use(param),
+		soci::into(fileItemId), soci::into(key), soci::into(identifier), soci::into(className), 
+		soci::into(type), soci::into(namespaceName), soci::into(signature), 
+		soci::into(returnType), soci::into(isProtected), soci::into(isPrivate), 
+		soci::into(isStatic), soci::into(isDynamic), soci::into(isNative)
+	);
+	stmt.execute(true);
+	while (stmt.fetch()) {
+		mvceditor::ResourceClass resource;
+		resource.FileItemId = fileItemId;
+		resource.Key = mvceditor::StringHelperClass::charToIcu(key.c_str());
+		resource.Identifier = mvceditor::StringHelperClass::charToIcu(identifier.c_str());
+		resource.ClassName = mvceditor::StringHelperClass::charToIcu(className.c_str());
+		resource.Type = (mvceditor::ResourceClass::Types)type;
+		resource.NamespaceName = mvceditor::StringHelperClass::charToIcu(namespaceName.c_str());
+		resource.Signature = mvceditor::StringHelperClass::charToIcu(signature.c_str());
+		resource.ReturnType = mvceditor::StringHelperClass::charToIcu(returnType.c_str());
+		resource.IsProtected = isProtected != 0;
+		resource.IsPrivate = isPrivate != 0;
+		resource.IsStatic = isStatic != 0;
+		resource.IsDynamic = isDynamic != 0;
+		resource.IsNative = isNative != 0;
+
+		matches.push_back(resource);
+	}
+
+	return matches;
 }
 
 bool mvceditor::ResourceFinderClass::Persist(const wxFileName& outputFile) const {
 	if (!outputFile.IsOk()) {
 		return false;
 	}
-
+	bool error = false;
+	// TODO can we juse use the SQLite database file
+	/*
 	wxFFile file(outputFile.GetFullPath(), wxT("wb"));
 	if (!file.IsOpened()) {
 		return false;
@@ -1715,21 +1714,21 @@ bool mvceditor::ResourceFinderClass::Persist(const wxFileName& outputFile) const
 		return false;
 	}
 	int32_t written;
-	bool error = false;
+	
 	std::vector<mvceditor::ResourceClass>::const_iterator it;
 	for (it = IdentifierCache.begin(); it != IdentifierCache.end() && !error; ++it) {
-		if (it->FileItemIndex >= 0) {
+		if (it->FileItemId >= 0) {
 
 			// watch out for dynamic resources and 'native' functions
 			// we dont want to persist those for now 
 			if (mvceditor::ResourceClass::CLASS == it->Type && !it->IsNative) {
-				UnicodeString uniFile = mvceditor::StringHelperClass::wxToIcu(FileCache[it->FileItemIndex].FullPath);
+				UnicodeString uniFile = mvceditor::StringHelperClass::wxToIcu(FileCache[it->FileItemId].FullPath);
 				written = u_fprintf(uf, "CLASS,%S,%.*S,\n", 
 					uniFile.getTerminatedBuffer(), it->ClassName.length(), it->ClassName.getBuffer());
 				error = 0 == written;
 			}
 			else if (mvceditor::ResourceClass::FUNCTION == it->Type && !it->IsNative) {
-				UnicodeString uniFile = mvceditor::StringHelperClass::wxToIcu(FileCache[it->FileItemIndex].FullPath);
+				UnicodeString uniFile = mvceditor::StringHelperClass::wxToIcu(FileCache[it->FileItemId].FullPath);
 				written = u_fprintf(uf, "FUNCTION,%S,%.*S,\n", 
 					uniFile.getTerminatedBuffer(), it->Identifier.length(), it->Identifier.getBuffer());
 				error = 0 == written;
@@ -1737,13 +1736,13 @@ bool mvceditor::ResourceFinderClass::Persist(const wxFileName& outputFile) const
 		}
 	}
 	for (it = MembersCache.begin(); it != MembersCache.end() && !error; ++it) {
-		if (it->FileItemIndex >= 0) {
+		if (it->FileItemId >= 0) {
 			UnicodeString className(it->ClassName);
 
 			// watch out for dynamic resources and 'native' functions
 			// we dont want to persist those for now 
 			if (mvceditor::ResourceClass::MEMBER == it->Type && !it->IsNative) {
-				UnicodeString uniFile = mvceditor::StringHelperClass::wxToIcu(FileCache[it->FileItemIndex].FullPath);
+				UnicodeString uniFile = mvceditor::StringHelperClass::wxToIcu(FileCache[it->FileItemId].FullPath);
 				written = u_fprintf(uf, "MEMBER,%S,%S,%.*S\n", 
 					uniFile.getTerminatedBuffer(), 
 					className.getTerminatedBuffer(),
@@ -1751,7 +1750,7 @@ bool mvceditor::ResourceFinderClass::Persist(const wxFileName& outputFile) const
 				error = 0 == written;
 			}
 			else if (mvceditor::ResourceClass::METHOD == it->Type && !it->IsNative) {
-				UnicodeString uniFile = mvceditor::StringHelperClass::wxToIcu(FileCache[it->FileItemIndex].FullPath);
+				UnicodeString uniFile = mvceditor::StringHelperClass::wxToIcu(FileCache[it->FileItemId].FullPath);
 				written = u_fprintf(uf, "METHOD,%S,%S,%.*S\n", 
 					uniFile.getTerminatedBuffer(), 
 					className.getTerminatedBuffer(),
@@ -1761,37 +1760,109 @@ bool mvceditor::ResourceFinderClass::Persist(const wxFileName& outputFile) const
 		}
 	}
 	u_fclose(uf);
+	*/
 	return !error;
 }
 
-std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::All() const {
-	std::vector<mvceditor::ResourceClass> all;
-	all.resize(IdentifierCache.size());
-	
-	// only the IdentifierCache, NamespaceCache and MembersCache are duplicates
-	std::copy(IdentifierCache.begin(), IdentifierCache.end(), all.begin());
-	return all;
-}
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::All() {
+	std::string sql;
+	sql += "SELECT ";
+	sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
+	sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
+	sql += "FROM resources WHERE 1 = ?";
 
-std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::AllNonNativeClasses() const {
-	std::vector<mvceditor::ResourceClass> all;
-	all.reserve(IdentifierCache.size());
-	std::vector<mvceditor::ResourceClass>::const_iterator it;
-	for (it = IdentifierCache.begin(); it != IdentifierCache.end(); ++it) {
-		if (mvceditor::ResourceClass::CLASS == it->Type && !it->IsNative) {
-			all.push_back(*it);
+	std::vector<mvceditor::ResourceClass> all = ResourceStatementMatches(sql, "0");
+	
+	// remove the 'duplicates' ie. extra fully qualified entries to make lookups faster
+	std::vector<mvceditor::ResourceClass>::iterator it = all.begin();
+	while (it != all.end()) {
+		if (it->Key.indexOf(UNICODE_STRING_SIMPLE("::")) > 0 ||
+			it->Key.indexOf(UNICODE_STRING_SIMPLE("\\")) > 0) {
+			it = all.erase(it);
+		}
+		else {
+			++it;
 		}
 	}
 	return all;
 }
 
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::AllNonNativeClasses() {
+	std::string sql;
+	sql += "SELECT ";
+	sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
+	sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
+	sql += "FROM resources WHERE is_native = ? AND type =";
+	sql += mvceditor::ResourceClass::CLASS;
+
+	std::vector<mvceditor::ResourceClass> all = ResourceStatementMatches(sql, "0");
+	return all;
+}
+
 void mvceditor::ResourceFinderClass::Clear() {
-	IdentifierCache.clear();
-	MembersCache.clear();
-	NamespaceCache.clear();
-	FileCache.clear();
-	Matches.clear();
-	IsCacheSorted = false;
+	if (!IsCacheInitialized) {
+		return;
+	}
+	FileParsingCache.clear();
+	Session.once << "TRUNCATE file_items;";
+	Session.once << "TRUNCATE resources;";
+}
+
+void mvceditor::ResourceFinderClass::PushIntoResourceCache(const std::vector<mvceditor::ResourceClass>& resources, int fileItemId) {
+	if (!IsCacheInitialized) {
+		return;
+	}
+	std::string sql;
+	sql += "INSERT INTO resources (";
+	sql += "file_item_id, key, identifier, class_name, ";
+	sql += "type, namespace_name, signature, ";
+	sql += "return_type, is_protected, is_private, ";
+	sql += "is_static, is_dynamic, is_native";
+	sql += ") VALUES(";
+	sql += "?, ?, ?, ?, ";
+	sql += "?, ?, ?, ";
+	sql += "?, ?, ?, ";
+	sql += "?, ?, ?";
+	sql += ");";
+
+	std::string key;
+	std::string identifier;
+	std::string className;
+	int type;
+	std::string namespaceName;
+	std::string signature;
+	std::string returnType;
+	int isProtected;
+	int isPrivate;
+	int isStatic;
+	int isDynamic;
+	int isNative;
+
+	// use transaction to lock once instead of before and after every insert
+	soci::transaction tr(Session);
+	soci::statement stmt = (Session.prepare << sql,
+		soci::use(fileItemId), soci::use(key), soci::use(identifier), soci::use(className), 
+		soci::use(type), soci::use(namespaceName), soci::use(signature), 
+		soci::use(returnType), soci::use(isProtected), soci::use(isPrivate), 
+		soci::use(isStatic), soci::use(isDynamic), soci::use(isNative)
+	);
+	for (size_t i = 0; i < resources.size(); ++i) {
+		mvceditor::ResourceClass res = resources[i];
+		key = mvceditor::StringHelperClass::IcuToChar(res.Key);
+		identifier = mvceditor::StringHelperClass::IcuToChar(res.Identifier);
+		className = mvceditor::StringHelperClass::IcuToChar(res.ClassName);
+		type = res.Type;
+		namespaceName = mvceditor::StringHelperClass::IcuToChar(res.NamespaceName);
+		signature = mvceditor::StringHelperClass::IcuToChar(res.Signature);
+		returnType = mvceditor::StringHelperClass::IcuToChar(res.ReturnType);
+		isProtected = res.IsProtected;
+		isPrivate = res.IsPrivate;
+		isStatic = res.IsStatic;
+		isDynamic = res.IsDynamic;
+		isNative = res.IsNative;
+		stmt.execute(true);
+	}
+	tr.commit();
 }
 
 mvceditor::ResourceClass::ResourceClass()
@@ -1809,7 +1880,7 @@ mvceditor::ResourceClass::ResourceClass()
 	, IsNative(false)
 	, FullPath()
 	, Key()
-	, FileItemIndex(-1) {
+	, FileItemId(-1) {
 		
 }
 
@@ -1823,7 +1894,7 @@ void mvceditor::ResourceClass::operator=(const ResourceClass& src) {
 	Type = src.Type;
 	FullPath = src.FullPath;
 	Key = src.Key;
-	FileItemIndex = src.FileItemIndex;
+	FileItemId = src.FileItemId;
 	IsProtected = src.IsProtected;
 	IsPrivate = src.IsPrivate;
 	IsStatic = src.IsStatic;
@@ -1855,7 +1926,7 @@ void mvceditor::ResourceClass::Clear() {
 	ReturnType.remove();
 	Comment.remove();
 	Type = CLASS;
-	FileItemIndex = -1;
+	FileItemId = -1;
 	FullPath = wxT("");
 	Key.remove();
 	IsProtected = false;
@@ -1870,4 +1941,31 @@ mvceditor::TraitResourceClass::TraitResourceClass()
 	, Aliased()
 	, Excluded() {
 		
+}
+
+mvceditor::FileItemClass::FileItemClass() 
+	: FullPath()
+	, DateTime()
+	, FileId(0)
+	, IsParsed(false)
+	, IsNew(true) {
+
+}
+
+bool mvceditor::FileItemClass::NeedsToBeParsed(const wxDateTime& fileLastModifiedDateTime) const {
+	if (IsNew || !IsParsed) {
+		return true;
+	}
+	bool modified = fileLastModifiedDateTime.IsLaterThan(DateTime);
+	return modified;
+}
+
+void mvceditor::FileItemClass::MakeNew(const wxFileName& fileName, bool isParsed) {
+	wxDateTime fileLastModifiedDateTime = fileName.GetModificationTime();
+
+	FullPath = fileName.GetFullPath();
+	DateTime = fileLastModifiedDateTime;
+	FileId = 0;
+	IsParsed = isParsed;
+	IsNew = false;
 }

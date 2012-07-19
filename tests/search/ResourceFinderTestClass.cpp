@@ -60,8 +60,13 @@ public:
 		CreateFixtureFile(TestFile, source);
 	}
 
+	void CollectNearMatchResources() {
+		Matches = ResourceFinder.CollectNearMatchResources();
+	}
+
 	mvceditor::ResourceFinderClass ResourceFinder;
 	wxString TestFile;
+	std::vector<mvceditor::ResourceClass> Matches;
 };
 
 /**
@@ -74,7 +79,8 @@ class ResourceFinderMemoryTestClass {
 public:	
 	ResourceFinderMemoryTestClass() 
 		: ResourceFinder()
-		, TestFile(wxT("test.php")) {
+		, TestFile(wxT("test.php"))
+		, Matches() {
 		ResourceFinder.FileFilters.push_back(wxT("*.php"));
 	}
 	
@@ -87,8 +93,13 @@ public:
 		ResourceFinder.BuildResourceCacheForFile(TestFile, source, true);
 	}
 
+	void CollectNearMatchResources() {
+		Matches = ResourceFinder.CollectNearMatchResources();
+	}
+
 	mvceditor::ResourceFinderClass ResourceFinder;
 	wxString TestFile;
+	std::vector<mvceditor::ResourceClass> Matches;
 };
 
 #define CHECK_MEMBER_RESOURCE(className, identifier, resource) \
@@ -114,9 +125,9 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 	));
 	CHECK(ResourceFinder.Prepare(TestFile));
 	ResourceFinder.Walk(TestProjectDir + TestFile);
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_EQUAL(TestProjectDir + TestFile, ResourceFinder.GetResourceMatchFullPath(0));
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 }
 
 TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameIsASubset) {
@@ -128,9 +139,9 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 	));
 	CHECK(ResourceFinder.Prepare(wxT("est.php")));
 	ResourceFinder.Walk(TestProjectDir + TestFile);
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_EQUAL(TestProjectDir + TestFile, ResourceFinder.GetResourceMatchFullPath(0));
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 }
 
 /*
@@ -148,9 +159,9 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 	));
 	CHECK(ResourceFinder.Prepare(wxT("test")));
 	ResourceFinder.Walk(TestProjectDir + TestFile);
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_EQUAL(TestProjectDir + wxT("config.test.php"), ResourceFinder.GetResourceMatchFullPath(0));
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(TestProjectDir + wxT("config.test.php"), Matches[0].GetFullPath(););
 }
  */
 
@@ -163,8 +174,8 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldNotFind
 	));
 	CHECK(ResourceFinder.Prepare(wxT("test.php:100")));
 	ResourceFinder.Walk(TestProjectDir + TestFile);
-	CHECK_EQUAL(false, ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)0, ResourceFinder.GetResourceMatchCount());
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(0, Matches);
 	CHECK_EQUAL(100, ResourceFinder.GetLineNumber());
 }
 
@@ -181,9 +192,9 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 	));
 	CHECK(ResourceFinder.Prepare(wxT("test.php:6")));
 	ResourceFinder.Walk(TestProjectDir + TestFile);
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_EQUAL(TestProjectDir + TestFile, ResourceFinder.GetResourceMatchFullPath(0));
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 	CHECK_EQUAL(6, ResourceFinder.GetLineNumber());
 }
 
@@ -199,9 +210,9 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 	));
 	CHECK(ResourceFinder.Prepare(wxT("test.php:6")));
 	ResourceFinder.Walk(TestProjectDir + TestFile);
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_EQUAL(TestProjectDir + TestFile, ResourceFinder.GetResourceMatchFullPath(0));
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 	CHECK_EQUAL(6, ResourceFinder.GetLineNumber());
 }
 
@@ -218,10 +229,10 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 		"?>\n"
 	));	
 	CHECK(ResourceFinder.Prepare(wxT("UserClass")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_EQUAL(TestFile, ResourceFinder.GetResourceMatchFullPath(0));
-	mvceditor::ResourceClass resource = ResourceFinder.GetResourceMatch(0);
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
+	mvceditor::ResourceClass resource = Matches[0];
 	CHECK_NAMESPACE_RESOURCE("\\", "UserClass", resource);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), resource.ReturnType);
 	CHECK_UNISTR_EQUALS("class UserClass", resource.Signature);
@@ -243,8 +254,8 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldNotFi
 		"?>\n"
 	));
 	CHECK(ResourceFinder.Prepare(wxT("BlogPostClass")));
-	CHECK_EQUAL(false, ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)0, ResourceFinder.GetResourceMatchCount());
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(0, Matches);
 	CHECK_UNISTR_EQUALS("BlogPostClass", ResourceFinder.GetClassName());
 }
 
@@ -260,9 +271,9 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 		"?>\n"
 	));
 	CHECK(ResourceFinder.Prepare(wxT("User")));
-	CHECK_EQUAL(true, ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_EQUAL(TestFile, ResourceFinder.GetResourceMatchFullPath(0));
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 	CHECK_UNISTR_EQUALS("User", ResourceFinder.GetClassName());
 }
 
@@ -278,8 +289,8 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 		"?>\n"
 	));
 	CHECK(ResourceFinder.Prepare(wxT("User")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("User", ResourceFinder.GetClassName());
 }
 
@@ -296,10 +307,10 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 		"?>\n"
 	));	
 	CHECK(ResourceFinder.Prepare(wxT("UserClass::getName")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_EQUAL(TestFile, ResourceFinder.GetResourceMatchFullPath(0));	
-	mvceditor::ResourceClass resource = ResourceFinder.GetResourceMatch(0);
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
+	mvceditor::ResourceClass resource = Matches[0];
 	CHECK_MEMBER_RESOURCE("UserClass", "getName", resource);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\"), resource.NamespaceName);
 	CHECK_UNISTR_EQUALS("string", resource.ReturnType);
@@ -326,9 +337,9 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 		"?>\n"
 	));	
 	CHECK(ResourceFinder.Prepare(wxT("UserClass::getName")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_EQUAL(TestFile, ResourceFinder.GetResourceMatchFullPath(0));	
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 	CHECK_UNISTR_EQUALS("UserClass", ResourceFinder.GetClassName());
 	CHECK_UNISTR_EQUALS("getName", ResourceFinder.GetMethodName());
 }
@@ -345,8 +356,8 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldNotFi
 		"?>\n"
 	));	
 	CHECK(ResourceFinder.Prepare(wxT("UserClass::getAddress")));
-	CHECK_EQUAL(false, ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)0, ResourceFinder.GetResourceMatchCount());
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(0, Matches);
 	CHECK_UNISTR_EQUALS("UserClass", ResourceFinder.GetClassName());
 	CHECK_UNISTR_EQUALS("getAddress", ResourceFinder.GetMethodName());
 }
@@ -363,10 +374,10 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 		"?>\n"
 	));
 	CHECK(ResourceFinder.Prepare(wxT("::getName")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_EQUAL(TestFile, ResourceFinder.GetResourceMatchFullPath(0));
-	CHECK_MEMBER_RESOURCE("UserClass", "getName", ResourceFinder.GetResourceMatch(0));
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
+	CHECK_MEMBER_RESOURCE("UserClass", "getName", Matches[0]);
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldOnlySaveTheExactMatchWhenAnExactMatchIsFound) {
@@ -386,11 +397,11 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldOnlyS
 		"}?>\n"
 	));	
 	CHECK(ResourceFinder.Prepare(wxT("UserClass")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_EQUAL(TestFile, ResourceFinder.GetResourceMatchFullPath(0));
-	CHECK_UNISTR_EQUALS("UserClass", ResourceFinder.GetResourceMatch(0).Identifier);
-	CHECK_EQUAL(false, ResourceFinder.GetResourceMatch(0).IsNative);
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
+	CHECK_UNISTR_EQUALS("UserClass", Matches[0].Identifier);
+	CHECK_EQUAL(false, Matches[0].IsNative);
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindTwoFilesWhenClassNameMatches) {
@@ -419,11 +430,11 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindT
 		"?>\n"
 	));	
 	CHECK(ResourceFinder.Prepare(wxT("UserClass")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)2, ResourceFinder.GetResourceMatchCount());
-	CHECK_EQUAL(testFile, ResourceFinder.GetResourceMatchFullPath(0));
-	CHECK_EQUAL(testFile2, ResourceFinder.GetResourceMatchFullPath(1));
-	CHECK_EQUAL(wxT(""), ResourceFinder.GetResourceMatchFullPath(2));
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(2, Matches);
+	CHECK_EQUAL(testFile, Matches[0].GetFullPath());
+	CHECK_EQUAL(testFile2, Matches[1].GetFullPath());
+	CHECK_EQUAL(wxT(""), Matches[2].GetFullPath());
 	CHECK_UNISTR_EQUALS("UserClass", ResourceFinder.GetClassName());
 }
 
@@ -440,9 +451,9 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldNotFind
 	));	
 	CHECK(ResourceFinder.Prepare(wxT("UserClass")));
 	ResourceFinder.Walk(TestProjectDir + TestFile);
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_EQUAL(TestProjectDir + TestFile, ResourceFinder.GetResourceMatchFullPath(0));
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 	wxSleep(1);
 	Prep(wxString::FromAscii(
 		"<?php\n"
@@ -456,7 +467,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldNotFind
 	));
 	CHECK(ResourceFinder.Prepare(wxT("UserClass")));
 	ResourceFinder.Walk(TestProjectDir + TestFile);
-	CHECK_EQUAL(false, ResourceFinder.CollectNearMatchResources());
+	CollectNearMatchResources();
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindClassAfterFindingFile) {
@@ -470,21 +481,21 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindC
 		"}\n"
 	));	
 	CHECK(ResourceFinder.Prepare(wxT("test.php")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_EQUAL(TestFile, ResourceFinder.GetResourceMatchFullPath(0));
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 	CHECK(ResourceFinder.Prepare(wxT("UserClass")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_EQUAL(TestFile, ResourceFinder.GetResourceMatchFullPath(0));
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 	CHECK(ResourceFinder.Prepare(wxT("test.php")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_EQUAL(TestFile, ResourceFinder.GetResourceMatchFullPath(0));
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 	CHECK(ResourceFinder.Prepare(wxT("UserClass")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_EQUAL(TestFile, ResourceFinder.GetResourceMatchFullPath(0));
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFunctionWhenFunctionNameMatches) {
@@ -503,9 +514,9 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 		"?>\n"
 	));	
 	CHECK(ResourceFinder.Prepare(wxT("printUser")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	mvceditor::ResourceClass resource = ResourceFinder.GetResourceMatch(0);
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	mvceditor::ResourceClass resource = Matches[0];
 	CHECK_UNISTR_EQUALS("printUser", resource.Identifier);
 	CHECK_UNISTR_EQUALS("void", resource.ReturnType);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("function printUser($user)"), resource.Signature);
@@ -535,10 +546,10 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 		"?>\n"
 	));	
 	CHECK(ResourceFinder.Prepare(wxT("userClas")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)2, ResourceFinder.GetResourceMatchCount());
-	CHECK_UNISTR_EQUALS("UserClass", ResourceFinder.GetResourceMatch(0).Identifier);
-	CHECK_UNISTR_EQUALS("userClassPrint", ResourceFinder.GetResourceMatch(1).Identifier);
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(2, Matches);
+	CHECK_UNISTR_EQUALS("UserClass", Matches[0].Identifier);
+	CHECK_UNISTR_EQUALS("userClassPrint", Matches[1].Identifier);
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForClassMembers) {
@@ -554,9 +565,9 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 		"?>\n"
 	));	
 	CHECK(ResourceFinder.Prepare(wxT("UserClass::name")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	mvceditor::ResourceClass resource = ResourceFinder.GetResourceMatch(0);
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	mvceditor::ResourceClass resource = Matches[0];
 	CHECK_MEMBER_RESOURCE("UserClass", "name", resource);
 	CHECK_UNISTR_EQUALS("string", resource.ReturnType);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::name"), resource.Signature);
@@ -578,9 +589,9 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 		"?>\n"
 	));	
 	CHECK(ResourceFinder.Prepare(wxT("UserClass::MAX")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	mvceditor::ResourceClass resource = ResourceFinder.GetResourceMatch(0);
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	mvceditor::ResourceClass resource = Matches[0];
 	CHECK_MEMBER_RESOURCE("UserClass", "MAX", resource);
 	CHECK_UNISTR_EQUALS("int", resource.ReturnType);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::MAX"), resource.Signature);
@@ -596,9 +607,9 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 		"?>\n"
 	));	
 	CHECK(ResourceFinder.Prepare(wxT("MAX_ITEMS")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	mvceditor::ResourceClass resource = ResourceFinder.GetResourceMatch(0);
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	mvceditor::ResourceClass resource = Matches[0];
 	CHECK_UNISTR_EQUALS("MAX_ITEMS", resource.Identifier);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), resource.ReturnType);
 	CHECK_UNISTR_EQUALS("1", resource.Signature);
@@ -627,9 +638,9 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 		"?>\n"
 	));	
 	CHECK(ResourceFinder.Prepare(wxT("UserClass::get")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_MEMBER_RESOURCE("UserClass", "get", ResourceFinder.GetResourceMatch(0));
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_MEMBER_RESOURCE("UserClass", "get", Matches[0]);
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindPartialMatchesForCorrectClassMethod) {
@@ -653,9 +664,9 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindP
 		"?>\n"
 	));	
 	CHECK(ResourceFinder.Prepare(wxT("UserClass::get")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_MEMBER_RESOURCE("UserClass", "getName", ResourceFinder.GetResourceMatch(0));
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_MEMBER_RESOURCE("UserClass", "getName", Matches[0]);
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindPartialMatchesForClassMethodsWithNoClassName) {
@@ -676,41 +687,41 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindP
 		"?>\n"
 	));	
 	CHECK(ResourceFinder.Prepare(wxT("::getNa")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_MEMBER_RESOURCE("UserClass", "getName", ResourceFinder.GetResourceMatch(0));
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_MEMBER_RESOURCE("UserClass", "getName", Matches[0]);
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForNativeFunctions) {
 	CHECK(ResourceFinder.Prepare(wxT("array_key")));
 	ResourceFinder.BuildResourceCacheForNativeFunctions();
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)2, ResourceFinder.GetResourceMatchCount());
-	CHECK_UNISTR_EQUALS("array_key_exists", ResourceFinder.GetResourceMatch(0).Identifier);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("bool function array_key_exists($key, $search)"), ResourceFinder.GetResourceMatch(0).Signature);
-	CHECK_UNISTR_EQUALS("bool", ResourceFinder.GetResourceMatch(0).ReturnType);
-	CHECK_UNISTR_EQUALS("array_keys", ResourceFinder.GetResourceMatch(1).Identifier);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("array function array_keys($input, $search_value, $strict = false)"), ResourceFinder.GetResourceMatch(1).Signature);
-	CHECK_UNISTR_EQUALS("array", ResourceFinder.GetResourceMatch(1).ReturnType);
-	CHECK(ResourceFinder.GetResourceMatch(0).IsNative);
-	CHECK(ResourceFinder.GetResourceMatch(1).IsNative);
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(2, Matches);
+	CHECK_UNISTR_EQUALS("array_key_exists", Matches[0].Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("bool function array_key_exists($key, $search)"), Matches[0].Signature);
+	CHECK_UNISTR_EQUALS("bool", Matches[0].ReturnType);
+	CHECK_UNISTR_EQUALS("array_keys", Matches[1].Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("array function array_keys($input, $search_value, $strict = false)"), Matches[1].Signature);
+	CHECK_UNISTR_EQUALS("array", Matches[1].ReturnType);
+	CHECK(Matches[0].IsNative);
+	CHECK(Matches[1].IsNative);
 
 	// test a built-in object
 	CHECK(ResourceFinder.Prepare(wxT("pdo::que")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_UNISTR_EQUALS("query", ResourceFinder.GetResourceMatch(0).Identifier);
-	CHECK_UNISTR_EQUALS("PDO", ResourceFinder.GetResourceMatch(0).ClassName);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("PDOStatement function query($statement, $PDO::FETCH_COLUMN, $colno, $PDO::FETCH_CLASS, $classname, $ctorargs, $PDO::FETCH_INTO, $object)"), ResourceFinder.GetResourceMatch(0).Signature);
-	CHECK_UNISTR_EQUALS("PDOStatement", ResourceFinder.GetResourceMatch(0).ReturnType);
-	CHECK(ResourceFinder.GetResourceMatch(0).IsNative);
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_UNISTR_EQUALS("query", Matches[0].Identifier);
+	CHECK_UNISTR_EQUALS("PDO", Matches[0].ClassName);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("PDOStatement function query($statement, $PDO::FETCH_COLUMN, $colno, $PDO::FETCH_CLASS, $classname, $ctorargs, $PDO::FETCH_INTO, $object)"), Matches[0].Signature);
+	CHECK_UNISTR_EQUALS("PDOStatement", Matches[0].ReturnType);
+	CHECK(Matches[0].IsNative);
 	
 	// a fully qualified search
 	CHECK(ResourceFinder.Prepare(wxT("\\Exception")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_UNISTR_EQUALS("\\Exception", ResourceFinder.GetResourceMatch(0).Identifier);
-	CHECK_UNISTR_EQUALS("Exception", ResourceFinder.GetResourceMatch(0).ClassName);
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_UNISTR_EQUALS("\\Exception", Matches[0].Identifier);
+	CHECK_UNISTR_EQUALS("Exception", Matches[0].ClassName);
 	
 }
 
@@ -751,10 +762,10 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindMat
 	CHECK(ResourceFinder.Prepare(wxT("printUse")));
 	ResourceFinder.Walk(TestProjectDir + TestFile);
 	ResourceFinder.BuildResourceCacheForFile(TestProjectDir + TestFile, uniCode, false);
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)2, ResourceFinder.GetResourceMatchCount());
-	CHECK_UNISTR_EQUALS("printUser", ResourceFinder.GetResourceMatch(0).Identifier);
-	CHECK_UNISTR_EQUALS("printUserList", ResourceFinder.GetResourceMatch(1).Identifier);
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(2, Matches);
+	CHECK_UNISTR_EQUALS("printUser", Matches[0].Identifier);
+	CHECK_UNISTR_EQUALS("printUserList", Matches[1].Identifier);
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesWhenUsingBuildResourceCacheForFileAndUsingNewFile) {
@@ -789,9 +800,9 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 	wxString fileName = wxT("Untitled");
 	CHECK(ResourceFinder.Prepare(wxT("printUse")));
 	ResourceFinder.BuildResourceCacheForFile(fileName, uniCode, true);
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_UNISTR_EQUALS("printUser", ResourceFinder.GetResourceMatch(0).Identifier);
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_UNISTR_EQUALS("printUser", Matches[0].Identifier);
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldCollectNearMatchResourcesForParentClass) {
@@ -817,14 +828,14 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldColle
 		"?>\n"
 	));
 	CHECK(ResourceFinder.Prepare(wxT("AdminClass::")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)6, ResourceFinder.GetResourceMatchCount());
-	CHECK_MEMBER_RESOURCE("AdminClass", "deleteUser", ResourceFinder.GetResourceMatch(0));
-	CHECK_MEMBER_RESOURCE("SuperUserClass", "disableUser", ResourceFinder.GetResourceMatch(1));
-	CHECK_MEMBER_RESOURCE("UserClass", "address", ResourceFinder.GetResourceMatch(2));
-	CHECK_MEMBER_RESOURCE("UserClass", "clearName", ResourceFinder.GetResourceMatch(3));
-	CHECK_MEMBER_RESOURCE("UserClass", "getName", ResourceFinder.GetResourceMatch(4));	
-	CHECK_MEMBER_RESOURCE("UserClass", "name", ResourceFinder.GetResourceMatch(5));
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(6, Matches);
+	CHECK_MEMBER_RESOURCE("AdminClass", "deleteUser", Matches[0]);
+	CHECK_MEMBER_RESOURCE("SuperUserClass", "disableUser", Matches[1]);
+	CHECK_MEMBER_RESOURCE("UserClass", "address", Matches[2]);
+	CHECK_MEMBER_RESOURCE("UserClass", "clearName", Matches[3]);
+	CHECK_MEMBER_RESOURCE("UserClass", "getName", Matches[4]);	
+	CHECK_MEMBER_RESOURCE("UserClass", "name", Matches[5]);
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldCollectAllMethodsWhenClassIsNotGiven) {
@@ -850,11 +861,11 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldColle
 		"?>\n"
 	));
 	CHECK(ResourceFinder.Prepare(wxT("::user")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)3, ResourceFinder.GetResourceMatchCount());
-	CHECK_MEMBER_RESOURCE("AdminClass", "userDelete", ResourceFinder.GetResourceMatch(0));
-	CHECK_MEMBER_RESOURCE("SuperUserClass", "userDisable", ResourceFinder.GetResourceMatch(1));
-	CHECK_MEMBER_RESOURCE("UserClass", "userName", ResourceFinder.GetResourceMatch(2));
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(3, Matches);
+	CHECK_MEMBER_RESOURCE("AdminClass", "userDelete", Matches[0]);
+	CHECK_MEMBER_RESOURCE("SuperUserClass", "userDisable", Matches[1]);
+	CHECK_MEMBER_RESOURCE("UserClass", "userName", Matches[2]);
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldNotCollectParentClassesWhenInheritedClassNameIsGiven) {
@@ -880,9 +891,9 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldNotCo
 		"?>\n"
 	));
 	CHECK(ResourceFinder.Prepare(wxT("AdminClass")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_UNISTR_EQUALS("AdminClass", ResourceFinder.GetResourceMatch(0).Identifier);
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_UNISTR_EQUALS("AdminClass", Matches[0].Identifier);
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesShouldFindFileWhenClassNameMatches) {
@@ -896,10 +907,10 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesShould
 		"}\n"
 	));	
 	CHECK(ResourceFinder.Prepare(wxT("UserClass")));
-	CHECK(ResourceFinder.CollectFullyQualifiedResource());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_EQUAL(TestFile, ResourceFinder.GetResourceMatchFullPath(0));
-	CHECK_EQUAL(TestFile, ResourceFinder.GetResourceMatch(0).GetFullPath());
+	Matches = ResourceFinder.CollectFullyQualifiedResource();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
+	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesWithClassHierarchy) {
@@ -919,20 +930,20 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesWithCl
 		"class SuperUserClass extends AdminClass {}"
 	));	
 	CHECK(ResourceFinder.Prepare(wxT("UserClass::getName")));
-	CHECK(ResourceFinder.CollectFullyQualifiedResource());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_MEMBER_RESOURCE("UserClass", "getName", ResourceFinder.GetResourceMatch(0));
+	Matches = ResourceFinder.CollectFullyQualifiedResource();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_MEMBER_RESOURCE("UserClass", "getName", Matches[0]);
 	
 	// should only use the 'highest' possible resource (only Admin and not User)
 	CHECK(ResourceFinder.Prepare(wxT("AdminClass::getName")));
-	CHECK(ResourceFinder.CollectFullyQualifiedResource());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_MEMBER_RESOURCE("AdminClass", "getName", ResourceFinder.GetResourceMatch(0));
+	Matches = ResourceFinder.CollectFullyQualifiedResource();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_MEMBER_RESOURCE("AdminClass", "getName", Matches[0]);
 	
 	CHECK(ResourceFinder.Prepare(wxT("SuperUserClass::getName")));
-	CHECK(ResourceFinder.CollectFullyQualifiedResource());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_MEMBER_RESOURCE("AdminClass", "getName", ResourceFinder.GetResourceMatch(0));
+	Matches = ResourceFinder.CollectFullyQualifiedResource();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_MEMBER_RESOURCE("AdminClass", "getName", Matches[0]);
 	
 }
 
@@ -957,9 +968,9 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesShould
 		"?>\n"
 	));	
 	CHECK(ResourceFinder.Prepare(wxT("UserClass::get")));
-	CHECK(ResourceFinder.CollectFullyQualifiedResource());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_MEMBER_RESOURCE("UserClass", "get", ResourceFinder.GetResourceMatch(0));
+	Matches = ResourceFinder.CollectFullyQualifiedResource();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_MEMBER_RESOURCE("UserClass", "get", Matches[0]);
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesShouldNotFindFileWhenClassNameDoesNotMatch) {
@@ -973,8 +984,8 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesShould
 		"}\n"
 	));	
 	CHECK(ResourceFinder.Prepare(wxT("User")));
-	CHECK_EQUAL(false, ResourceFinder.CollectFullyQualifiedResource());
-	CHECK_EQUAL((size_t)0, ResourceFinder.GetResourceMatchCount());
+	Matches = ResourceFinder.CollectFullyQualifiedResource();
+	CHECK_VECTOR_SIZE(0, Matches);
 }
 
 TEST_FIXTURE(ResourceFinderFileTestClass, CollectFullyQualifiedResourcesShouldFindClassWhenFileHasBeenModified) {
@@ -993,9 +1004,9 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectFullyQualifiedResourcesShouldFi
 	));	
 	CHECK(ResourceFinder.Prepare(wxT("UserClass")));
 	ResourceFinder.Walk(TestProjectDir + TestFile);
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_EQUAL(TestProjectDir + TestFile, ResourceFinder.GetResourceMatchFullPath(0));
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 	wxSleep(1);
 	Prep(wxString::FromAscii(
 		"<?php\n"
@@ -1015,8 +1026,8 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectFullyQualifiedResourcesShouldFi
 	));
 	CHECK(ResourceFinder.Prepare(wxT("AdminClass")));
 	ResourceFinder.Walk(TestProjectDir + TestFile);
-	CHECK_EQUAL(true, ResourceFinder.CollectFullyQualifiedResource());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
+	Matches = ResourceFinder.CollectFullyQualifiedResource();
+	CHECK_VECTOR_SIZE(1, Matches);
 }
 
 TEST_FIXTURE(ResourceFinderFileTestClass, CollectFullyQualifiedResourcesShouldFindClassWhenFileHasBeenDeleted) {
@@ -1035,13 +1046,13 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectFullyQualifiedResourcesShouldFi
 	));	
 	CHECK(ResourceFinder.Prepare(wxT("UserClass")));
 	ResourceFinder.Walk(TestProjectDir + testFile);
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_EQUAL(TestProjectDir + TestFile, ResourceFinder.GetResourceMatchFullPath(0));
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 	CHECK(wxRemoveFile(TestProjectDir + testFile));
 	CHECK(ResourceFinder.Prepare(wxT("UserClass")));
-	CHECK_EQUAL(false, ResourceFinder.CollectFullyQualifiedResource());
-	CHECK_EQUAL((size_t)0, ResourceFinder.GetResourceMatchCount());
+	Matches = ResourceFinder.CollectFullyQualifiedResource();
+	CHECK_VECTOR_SIZE(0, Matches);
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceMatchShouldReturnSignatureForConstructors) {
@@ -1067,8 +1078,8 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceMatchShouldReturnSignatur
 		"?>\n"
 	));
 	CHECK(ResourceFinder.Prepare(wxT("UserClass::__construct")));
-	CHECK(ResourceFinder.CollectFullyQualifiedResource());
-	mvceditor::ResourceClass resource = ResourceFinder.GetResourceMatch(0);
+	Matches = ResourceFinder.CollectFullyQualifiedResource();
+	mvceditor::ResourceClass resource = Matches[0];
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("public function __construct($name)"), resource.Signature);
 }
 
@@ -1090,8 +1101,8 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceMatchShouldReturnSignatur
 		"?>\n"
 	));
 	CHECK(ResourceFinder.Prepare(wxT("AdminClass::getName")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	mvceditor::ResourceClass resource = ResourceFinder.GetResourceMatch(0);
+	CollectNearMatchResources();
+	mvceditor::ResourceClass resource = Matches[0];
 	CHECK_MEMBER_RESOURCE("UserClass", "getName", resource);
 	CHECK_UNISTR_EQUALS("public function getName()", resource.Signature);
 }
@@ -1184,32 +1195,32 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceMatchPositionShouldReturn
 		length;
 	CHECK(ResourceFinder.Prepare(wxT("UserClass")));
 	ResourceFinder.CollectNearMatchResources();
-	CHECK_UNISTR_EQUALS("UserClass", ResourceFinder.GetResourceMatch(0).Identifier);
-	CHECK(mvceditor::ResourceFinderClass::GetResourceMatchPosition(ResourceFinder.GetResourceMatch(0), icuCode, pos, length));
+	CHECK_UNISTR_EQUALS("UserClass", Matches[0].Identifier);
+	CHECK(mvceditor::ResourceFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
 	CHECK_EQUAL(6, pos);
 	CHECK_EQUAL(16, length);
 	
 	// checking methods
 	CHECK(ResourceFinder.Prepare(wxT("::getName")));
 	ResourceFinder.CollectNearMatchResources();
-	CHECK_MEMBER_RESOURCE("UserClass", "getName", ResourceFinder.GetResourceMatch(0));
-	CHECK(mvceditor::ResourceFinderClass::GetResourceMatchPosition(ResourceFinder.GetResourceMatch(0), icuCode, pos, length));
+	CHECK_MEMBER_RESOURCE("UserClass", "getName", Matches[0]);
+	CHECK(mvceditor::ResourceFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
 	CHECK_EQUAL(icuCode.indexOf(UNICODE_STRING_SIMPLE("function getName()")), (int32_t)pos);
 	CHECK_EQUAL(17, length);
 	
 	// checking properties
 	CHECK(ResourceFinder.Prepare(wxT("UserClass::name")));
 	ResourceFinder.CollectNearMatchResources();
-	CHECK_MEMBER_RESOURCE("UserClass", "name", ResourceFinder.GetResourceMatch(0));
-	CHECK(mvceditor::ResourceFinderClass::GetResourceMatchPosition(ResourceFinder.GetResourceMatch(0), icuCode, pos, length));
+	CHECK_MEMBER_RESOURCE("UserClass", "name", Matches[0]);
+	CHECK(mvceditor::ResourceFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
 	CHECK_EQUAL(icuCode.indexOf(UNICODE_STRING_SIMPLE("private $name")), (int32_t)pos);
 	CHECK_EQUAL(14, length);
 	
 	// checking functions
 	CHECK(ResourceFinder.Prepare(wxT("printUser")));
 	ResourceFinder.CollectNearMatchResources();
-	CHECK_UNISTR_EQUALS("printUser", ResourceFinder.GetResourceMatch(0).Identifier);
-	CHECK(mvceditor::ResourceFinderClass::GetResourceMatchPosition(ResourceFinder.GetResourceMatch(0), icuCode, pos, length));
+	CHECK_UNISTR_EQUALS("printUser", Matches[0].Identifier);
+	CHECK(mvceditor::ResourceFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
 	CHECK_EQUAL(icuCode.indexOf(UNICODE_STRING_SIMPLE("function printUser")), (int32_t)pos);
 	CHECK_EQUAL(19, length);
 }
@@ -1226,8 +1237,8 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectQualifiedResourceNamespaces) 
 		"?>\n"
 	));
 	CHECK(ResourceFinder.Prepare(wxT("\\First\\Child\\MyClass")));
-	CHECK(ResourceFinder.CollectFullyQualifiedResource());
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), ResourceFinder.GetResourceMatch(0).Identifier);
+	Matches = ResourceFinder.CollectFullyQualifiedResource();
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), Matches[0].Identifier);
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectResourceInGlobalNamespaces) {
@@ -1241,12 +1252,12 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectResourceInGlobalNamespaces) {
 		"?>\n"
 	));
 	CHECK(ResourceFinder.Prepare(wxT("\\MyClass")));
-	CHECK(ResourceFinder.CollectFullyQualifiedResource());
-	CHECK_UNISTR_EQUALS("\\MyClass", ResourceFinder.GetResourceMatch(0).Identifier);
+	Matches = ResourceFinder.CollectFullyQualifiedResource();
+	CHECK_UNISTR_EQUALS("\\MyClass", Matches[0].Identifier);
 	
 	CHECK(ResourceFinder.Prepare(wxT("\\singleWork")));
-	CHECK(ResourceFinder.CollectFullyQualifiedResource());
-	CHECK_UNISTR_EQUALS("\\singleWork", ResourceFinder.GetResourceMatch(0).Identifier);
+	Matches = ResourceFinder.CollectFullyQualifiedResource();
+	CHECK_UNISTR_EQUALS("\\singleWork", Matches[0].Identifier);
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchNamespaces) {
@@ -1261,12 +1272,12 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchNamespaces) {
 		"?>\n"
 	));
 	CHECK(ResourceFinder.Prepare(wxT("\\First")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child"), ResourceFinder.GetResourceMatch(0).Identifier);
+	CollectNearMatchResources();
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child"), Matches[0].Identifier);
 	
 	CHECK(ResourceFinder.Prepare(wxT("\\First\\Ch")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child"), ResourceFinder.GetResourceMatch(0).Identifier);
+	CollectNearMatchResources();
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child"), Matches[0].Identifier);
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchNamespaceQualifiedClassesAndFunctions) {
@@ -1281,17 +1292,17 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchNamespaceQualifiedCl
 		"?>\n"
 	));
 	CHECK(ResourceFinder.Prepare(wxT("\\First\\Child\\si")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\singleWork"), ResourceFinder.GetResourceMatch(0).Identifier);
+	CollectNearMatchResources();
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\singleWork"), Matches[0].Identifier);
 	
 	CHECK(ResourceFinder.Prepare(wxT("\\First\\Child\\M")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), ResourceFinder.GetResourceMatch(0).Identifier);
+	CollectNearMatchResources();
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), Matches[0].Identifier);
 	
 	CHECK(ResourceFinder.Prepare(wxT("\\First\\Child\\")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), ResourceFinder.GetResourceMatch(0).Identifier);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\singleWork"), ResourceFinder.GetResourceMatch(1).Identifier);
+	CollectNearMatchResources();
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), Matches[0].Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\singleWork"), Matches[1].Identifier);
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchNamespaceQualifiedClassesShouldIgnoreOtherNamespaces) {
@@ -1306,8 +1317,8 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchNamespaceQualifiedCl
 		"?>\n"
 	));
 	CHECK(ResourceFinder.Prepare(wxT("\\Second\\Child\\My")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\Second\\Child\\MyClass"), ResourceFinder.GetResourceMatch(0).Identifier);
+	CollectNearMatchResources();
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\Second\\Child\\MyClass"), Matches[0].Identifier);
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraits) {
@@ -1323,9 +1334,9 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraits) 
 		"}"
 	));
 	CHECK(ResourceFinder.Prepare(wxT("ezcReflectionMethod::getReturn")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_MEMBER_RESOURCE("ezcReflectionReturnInfo", "getReturnType", ResourceFinder.GetResourceMatch(0));
-	CHECK_UNISTR_EQUALS("getReturnType", ResourceFinder.GetResourceMatch(0).Identifier);
+	CollectNearMatchResources();
+	CHECK_MEMBER_RESOURCE("ezcReflectionReturnInfo", "getReturnType", Matches[0]);
+	CHECK_UNISTR_EQUALS("getReturnType", Matches[0].Identifier);
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraitsWhenLookingForAllMethods) {
@@ -1345,112 +1356,16 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraitsWh
 		"}"
 	));
 	CHECK(ResourceFinder.Prepare(wxT("ezcReflectionMethod::")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
+	CollectNearMatchResources();
 	
 	// for now just show both the aliased and original methods
-	CHECK_MEMBER_RESOURCE("ezcReflectionReturnInfo", "getFunctionReturnType", ResourceFinder.GetResourceMatch(0));
-	CHECK_UNISTR_EQUALS("getFunctionReturnType", ResourceFinder.GetResourceMatch(0).Identifier);
-	CHECK_MEMBER_RESOURCE("ezcReflectionFunctionInfo", "getReturnType", ResourceFinder.GetResourceMatch(1));
-	CHECK_UNISTR_EQUALS("getReturnType", ResourceFinder.GetResourceMatch(1).Identifier);
-	CHECK_MEMBER_RESOURCE("ezcReflectionReturnInfo", "getReturnType", ResourceFinder.GetResourceMatch(2));
-	CHECK_UNISTR_EQUALS("getReturnType", ResourceFinder.GetResourceMatch(2).Identifier);
+	CHECK_MEMBER_RESOURCE("ezcReflectionReturnInfo", "getFunctionReturnType", Matches[0]);
+	CHECK_UNISTR_EQUALS("getFunctionReturnType", Matches[0].Identifier);
+	CHECK_MEMBER_RESOURCE("ezcReflectionFunctionInfo", "getReturnType", Matches[1]);
+	CHECK_UNISTR_EQUALS("getReturnType", Matches[1].Identifier);
+	CHECK_MEMBER_RESOURCE("ezcReflectionReturnInfo", "getReturnType", Matches[2]);
+	CHECK_UNISTR_EQUALS("getReturnType", Matches[2].Identifier);
 }
-
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CopyResourcesFromShouldCopyCopy) {
-	Prep(mvceditor::StringHelperClass::charToIcu(
-		"<?php\n"
-		"function work() {} "
-		"\n"
-		"?>\n"
-	));
-	
-	wxString query(wxT("work"));
-	CHECK(ResourceFinder.Prepare(query));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	CHECK_EQUAL(TestFile, ResourceFinder.GetResourceMatchFullPath(0));
-
-	mvceditor::ResourceFinderClass copy;
-	copy.CopyResourcesFrom(ResourceFinder);
-
-	CHECK(copy.Prepare(query));
-
-	// notice that we do not need to parse the file again
-	CHECK(copy.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, copy.GetResourceMatchCount());
-	CHECK_EQUAL(TestFile, copy.GetResourceMatchFullPath(0));
-}
-
-class ResourceCopyTestFixtureClass : public FileTestFixtureClass {
-
-public:
-
-	mvceditor::ResourceFinderClass Src;
-	mvceditor::ResourceFinderClass Dest;
-
-	ResourceCopyTestFixtureClass()
-		: FileTestFixtureClass(wxT("resource-finder"))
-		, Src()
-		, Dest() {
-	}
-
-};
-
-TEST_FIXTURE(ResourceCopyTestFixtureClass, AppendResources) {
-	Src.FileFilters.push_back(wxT("src.php"));
-	Dest.FileFilters.push_back(wxT("dest.php"));
-	CreateFixtureFile(wxT("src.php"), wxT("<?php class Src { public $time; } "));
-	CreateFixtureFile(wxT("dest.php"), wxT("<?php class Dest { public $name; } "));
-
-	// in order to Walk() we need to Prepare()
-	Src.Prepare(wxT("fake"));
-	Src.Walk(TestProjectDir + wxT("src.php"));
-	Dest.Prepare(wxT("fake"));
-	Dest.Walk(TestProjectDir + wxT("dest.php"));
-
-	// this should just 'append' since files are not the same
-	Dest.UpdateResourcesFrom(TestProjectDir + wxT("src.php"), Src);
-	CHECK(Dest.Prepare(wxT("Src")));
-	CHECK(Dest.CollectFullyQualifiedResource());
-	if (Dest.GetResourceMatchCount() > 0) {
-		CHECK_EQUAL(TestProjectDir + wxT("src.php"), Dest.GetResourceMatch(0).GetFullPath());
-	}
-
-	// the member
-	CHECK(Dest.Prepare(wxT("Src::time")));
-	CHECK(Dest.CollectFullyQualifiedResource());
-	if (Dest.GetResourceMatchCount() > 0) {
-		CHECK_EQUAL(TestProjectDir + wxT("src.php"), Dest.GetResourceMatch(0).GetFullPath());
-	}
-}
-
-TEST_FIXTURE(ResourceCopyTestFixtureClass, ReplaceResources) {
-	Src.FileFilters.push_back(wxT("src.php"));
-	Dest.FileFilters.push_back(wxT("dest.php"));
-	CreateFixtureFile(wxT("src.php"), wxT("<?php class Src { public $time; } "));
-
-	// in order to Walk() we need to Prepare()
-	Src.Prepare(wxT("fake"));
-	Src.Walk(TestProjectDir + wxT("src.php"));
-	Dest.Prepare(wxT("fake"));
-	Dest.Walk(TestProjectDir + wxT("src.php"));
-
-	// this should just 'replace' since files are the same and not cause duplicates
-	Dest.UpdateResourcesFrom(TestProjectDir + wxT("src.php"), Src);
-	CHECK(Dest.Prepare(wxT("Src")));
-	CHECK(Dest.CollectFullyQualifiedResource());
-	if (Dest.GetResourceMatchCount() > 0) {
-		CHECK_EQUAL(TestProjectDir + wxT("src.php"), Dest.GetResourceMatch(0).GetFullPath());
-	}
-
-	// the member
-	CHECK(Dest.Prepare(wxT("Src::time")));
-	CHECK(Dest.CollectFullyQualifiedResource());
-	if (Dest.GetResourceMatchCount() > 0) {
-		CHECK_EQUAL(TestProjectDir + wxT("src.php"), Dest.GetResourceMatch(0).GetFullPath());
-	}
-}
-
 
 class DynamicResourceTestClass {
 
@@ -1458,11 +1373,13 @@ public:
 
 	mvceditor::ResourceFinderClass ResourceFinder;
 	std::vector<mvceditor::ResourceClass> DynamicResources;
+	std::vector<mvceditor::ResourceClass> Matches;
 	wxString TestFile;
 
 	DynamicResourceTestClass() 
 		: ResourceFinder() 
 		, DynamicResources()
+		, Matches()
 		, TestFile(wxT("test.php")) {
 		ResourceFinder.FileFilters.push_back(wxT("*.php"));
 		
@@ -1489,44 +1406,44 @@ public:
 		res.ClassName = UNICODE_STRING_SIMPLE("MyDynamicClass");
 		DynamicResources.push_back(res);
 	}
+
+	void CollectNearMatchResources() {
+		Matches = ResourceFinder.CollectNearMatchResources();
+	}
 };
 
 TEST_FIXTURE(DynamicResourceTestClass, AddDynamicResourcesShouldWorkWithCollect) {
 
 	CHECK(ResourceFinder.Prepare(wxT("MyDynamicClass::")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)2, ResourceFinder.GetResourceMatchCount());
-	if ((size_t)2 == ResourceFinder.GetResourceMatchCount()) {
-		CHECK_UNISTR_EQUALS("__get", ResourceFinder.GetResourceMatch(0).Identifier);
-		CHECK_UNISTR_EQUALS("work", ResourceFinder.GetResourceMatch(1).Identifier);
-	}
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(2, Matches);
+	CHECK_UNISTR_EQUALS("__get", Matches[0].Identifier);
+	CHECK_UNISTR_EQUALS("work", Matches[1].Identifier);
 
 	// now add the dyamic property to the cache
 	ResourceFinder.AddDynamicResources(DynamicResources);
 
 	// now test the Collect functionality works as it does for resources that were parsed
 	CHECK(ResourceFinder.Prepare(wxT("MyDynamicClass::")));
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)3, ResourceFinder.GetResourceMatchCount());
-	if ((size_t)3 == ResourceFinder.GetResourceMatchCount()) {
-		mvceditor::ResourceClass match = ResourceFinder.GetResourceMatch(0);
-		CHECK_MEMBER_RESOURCE("MyDynamicClass", "__get", match);
-		CHECK_UNISTR_EQUALS("__get", match.Identifier);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), match.ReturnType);
-		CHECK_EQUAL(mvceditor::ResourceClass::METHOD, match.Type);
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(3, Matches);
+	mvceditor::ResourceClass match = Matches[0];
+	CHECK_MEMBER_RESOURCE("MyDynamicClass", "__get", match);
+	CHECK_UNISTR_EQUALS("__get", match.Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), match.ReturnType);
+	CHECK_EQUAL(mvceditor::ResourceClass::METHOD, match.Type);
 
-		match = ResourceFinder.GetResourceMatch(1);
-		CHECK_MEMBER_RESOURCE("MyDynamicClass", "address", match);
-		CHECK_UNISTR_EQUALS("address", match.Identifier);
-		CHECK_UNISTR_EQUALS("string", match.ReturnType);
-		CHECK_EQUAL(mvceditor::ResourceClass::MEMBER, match.Type);
+	match = Matches[1];
+	CHECK_MEMBER_RESOURCE("MyDynamicClass", "address", match);
+	CHECK_UNISTR_EQUALS("address", match.Identifier);
+	CHECK_UNISTR_EQUALS("string", match.ReturnType);
+	CHECK_EQUAL(mvceditor::ResourceClass::MEMBER, match.Type);
 
-		match = ResourceFinder.GetResourceMatch(2);
-		CHECK_MEMBER_RESOURCE("MyDynamicClass", "work", match);
-		CHECK_UNISTR_EQUALS("work", match.Identifier);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), match.ReturnType);
-		CHECK_EQUAL(mvceditor::ResourceClass::METHOD, match.Type);
-	}
+	match = Matches[2];
+	CHECK_MEMBER_RESOURCE("MyDynamicClass", "work", match);
+	CHECK_UNISTR_EQUALS("work", match.Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), match.ReturnType);
+	CHECK_EQUAL(mvceditor::ResourceClass::METHOD, match.Type);
 }
 
 TEST_FIXTURE(DynamicResourceTestClass, AddDynamicResourcesShouldWorkWhenUsedBeforeWalk) {
@@ -1537,27 +1454,25 @@ TEST_FIXTURE(DynamicResourceTestClass, AddDynamicResourcesShouldWorkWhenUsedBefo
 	// now test the Collect functionality works as it does for resources that were parsed
 	CHECK(ResourceFinder.Prepare(wxT("MyDynamicClass::")));
 	
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)3, ResourceFinder.GetResourceMatchCount());
-	if ((size_t)3 == ResourceFinder.GetResourceMatchCount()) {
-		mvceditor::ResourceClass match = ResourceFinder.GetResourceMatch(0);
-		CHECK_MEMBER_RESOURCE("MyDynamicClass", "__get", match);
-		CHECK_UNISTR_EQUALS("__get", match.Identifier);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), match.ReturnType);
-		CHECK_EQUAL(mvceditor::ResourceClass::METHOD, match.Type);
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(3, Matches);
+	mvceditor::ResourceClass match = Matches[0];
+	CHECK_MEMBER_RESOURCE("MyDynamicClass", "__get", match);
+	CHECK_UNISTR_EQUALS("__get", match.Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), match.ReturnType);
+	CHECK_EQUAL(mvceditor::ResourceClass::METHOD, match.Type);
 
-		match = ResourceFinder.GetResourceMatch(1);
-		CHECK_MEMBER_RESOURCE("MyDynamicClass", "address", match);
-		CHECK_UNISTR_EQUALS("address", match.Identifier);
-		CHECK_UNISTR_EQUALS("string", match.ReturnType);
-		CHECK_EQUAL(mvceditor::ResourceClass::MEMBER, match.Type);
+	match = Matches[1];
+	CHECK_MEMBER_RESOURCE("MyDynamicClass", "address", match);
+	CHECK_UNISTR_EQUALS("address", match.Identifier);
+	CHECK_UNISTR_EQUALS("string", match.ReturnType);
+	CHECK_EQUAL(mvceditor::ResourceClass::MEMBER, match.Type);
 
-		match = ResourceFinder.GetResourceMatch(2);
-		CHECK_MEMBER_RESOURCE("MyDynamicClass", "work", match);
-		CHECK_UNISTR_EQUALS("work", match.Identifier);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), match.ReturnType);
-		CHECK_EQUAL(mvceditor::ResourceClass::METHOD, match.Type);
-	}
+	match = Matches[2];
+	CHECK_MEMBER_RESOURCE("MyDynamicClass", "work", match);
+	CHECK_UNISTR_EQUALS("work", match.Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), match.ReturnType);
+	CHECK_EQUAL(mvceditor::ResourceClass::METHOD, match.Type);
 }
 
 TEST_FIXTURE(DynamicResourceTestClass, AddDynamicResourcesShouldNotDuplicateExistingResources) {
@@ -1577,17 +1492,15 @@ TEST_FIXTURE(DynamicResourceTestClass, AddDynamicResourcesShouldNotDuplicateExis
 	// now test the Collect functionality works as it does for resources that were parsed
 	CHECK(ResourceFinder.Prepare(wxT("globalHandle")));
 	
-	CHECK(ResourceFinder.CollectNearMatchResources());
-	CHECK_EQUAL((size_t)1, ResourceFinder.GetResourceMatchCount());
-	if ((size_t)1 == ResourceFinder.GetResourceMatchCount()) {
-		mvceditor::ResourceClass match = ResourceFinder.GetResourceMatch(0);
-		CHECK_UNISTR_EQUALS("", match.ClassName);
-		CHECK_UNISTR_EQUALS("globalHandle", match.Identifier);
-		CHECK_UNISTR_EQUALS("MyDynamicClass", match.ReturnType);
-		CHECK_EQUAL(false, match.IsDynamic);
-		CHECK_UNISTR_EQUALS("function globalHandle()", match.Signature);
-		CHECK_EQUAL(mvceditor::ResourceClass::FUNCTION, match.Type);
-	}
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	mvceditor::ResourceClass match = Matches[0];
+	CHECK_UNISTR_EQUALS("", match.ClassName);
+	CHECK_UNISTR_EQUALS("globalHandle", match.Identifier);
+	CHECK_UNISTR_EQUALS("MyDynamicClass", match.ReturnType);
+	CHECK_EQUAL(false, match.IsDynamic);
+	CHECK_UNISTR_EQUALS("function globalHandle()", match.Signature);
+	CHECK_EQUAL(mvceditor::ResourceClass::FUNCTION, match.Type);
 }
 
 TEST_FIXTURE(ResourceFinderFileTestClass, Persist) {
@@ -1682,9 +1595,9 @@ TEST_FIXTURE(ResourceFinderFileTestClass, FileFiltersShouldWorkWithNoWildcards) 
 	ResourceFinder.Walk(TestProjectDir + badFile);
 
 	ResourceFinder.Prepare(wxT("good.php"));
-	CHECK(ResourceFinder.CollectNearMatchResources());
+	CollectNearMatchResources();
 	ResourceFinder.Prepare(wxT("bad.php"));
-	CHECK_EQUAL(false, ResourceFinder.CollectNearMatchResources());
+	CollectNearMatchResources();
 }
 
 }

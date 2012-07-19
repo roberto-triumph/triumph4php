@@ -26,7 +26,7 @@
 #include <widgets/ResourceCacheClass.h>
 #include <FileTestFixtureClass.h>
 #include "unicode/ustream.h" //get the << overloaded operator, needed by UnitTest++
-
+#include <MvcEditorChecks.h>
 
 /**
  * fixture that holds the object under test for 
@@ -40,15 +40,21 @@ public:
 	mvceditor::ResourceFinderClass Finder;
 	mvceditor::DirectorySearchClass Search;
 	std::vector<wxString> PhpFileFilters;
+	std::vector<mvceditor::ResourceClass> Matches;
 
 	RegisterTestFixtureClass()
 		: FileTestFixtureClass(wxT("resource-cache"))
 		, ResourceCache()
 		, Finder()
 		, Search() 
-		, PhpFileFilters() {
+		, PhpFileFilters()
+		, Matches() {
 		Search.Init(TestProjectDir);
 		PhpFileFilters.push_back(wxT("*.php"));
+	}
+
+	void CollectNearMatchResourcesFromAll() {
+		Matches = ResourceCache.CollectNearMatchResourcesFromAll();
 	}
 };
 
@@ -159,18 +165,14 @@ TEST_FIXTURE(RegisterTestFixtureClass, CollectShouldGetFromAllFinders) {
 	// now perform the search. will search for any resource that starts with 'Action'
 	// all 3 caches should hit
 	CHECK(ResourceCache.PrepareAll(wxT("Action")));
-	CHECK(ResourceCache.CollectNearMatchResourcesFromAll());
-	
-	
-	std::vector<mvceditor::ResourceClass> matches = ResourceCache.Matches();
-	CHECK_EQUAL((size_t)3, matches.size());
-	if (3 == matches.size()) {
+	CollectNearMatchResourcesFromAll();
+
+	CHECK_VECTOR_SIZE(3, Matches);
 		
-		// results should be sorted
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionMy"), matches[0].Identifier);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionThey"), matches[1].Identifier);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionYou"), matches[2].Identifier);
-	}
+	// results should be sorted
+	CHECK_UNISTR_EQUALS("ActionMy", Matches[0].Identifier);
+	CHECK_UNISTR_EQUALS("ActionThey", Matches[1].Identifier);
+	CHECK_UNISTR_EQUALS("ActionYou", Matches[2].Identifier);
 }
 
 TEST_FIXTURE(RegisterTestFixtureClass, CollectShouldIgnoreStaleMatches) {
@@ -190,14 +192,12 @@ TEST_FIXTURE(RegisterTestFixtureClass, CollectShouldIgnoreStaleMatches) {
 	CHECK(ResourceCache.Update(TestProjectDir + file1, code2, true));
 
 	CHECK(ResourceCache.PrepareAll(wxT("ActionMy::methodA")));
-	CHECK(ResourceCache.CollectNearMatchResourcesFromAll());
-	std::vector<mvceditor::ResourceClass> matches = ResourceCache.Matches();
-	CHECK_EQUAL((size_t)0, matches.size());
+	CollectNearMatchResourcesFromAll();
+	CHECK_VECTOR_SIZE(0, Matches);
 
 	CHECK(ResourceCache.PrepareAll(wxT("ActionMy::methodB")));
-	CHECK(ResourceCache.CollectNearMatchResourcesFromAll());
-	matches = ResourceCache.Matches();
-	CHECK_EQUAL((size_t)1, matches.size());
+	CollectNearMatchResourcesFromAll();
+	CHECK_VECTOR_SIZE(1, Matches);
 }
 
 TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, GlobalFinder) {
@@ -220,7 +220,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, GlobalFinder) {
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
 	if (!ResourceMatches.empty()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("w"), ResourceMatches[0].Identifier);
+		CHECK_UNISTR_EQUALS("w", ResourceMatches[0].Identifier);
 	}
 }
 
@@ -246,7 +246,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, RegisteredFinder) {
 
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
 	if (!ResourceMatches.empty()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("w"), ResourceMatches[0].Identifier);
+		CHECK_UNISTR_EQUALS("w", ResourceMatches[0].Identifier);
 	}
 }
 
@@ -268,8 +268,8 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithGlobalF
 		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
 	if (!ResourceMatches.empty()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("w"), ResourceMatches[0].Identifier);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionYou"), ResourceMatches[0].ClassName);
+		CHECK_UNISTR_EQUALS("w", ResourceMatches[0].Identifier);
+		CHECK_UNISTR_EQUALS("ActionYou", ResourceMatches[0].ClassName);
 	}
 }
 
@@ -293,8 +293,8 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithRegiste
 		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
 	if (!ResourceMatches.empty()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("methodA"), ResourceMatches[0].Identifier);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionMy"), ResourceMatches[0].ClassName);
+		CHECK_UNISTR_EQUALS("methodA", ResourceMatches[0].Identifier);
+		CHECK_UNISTR_EQUALS("ActionMy", ResourceMatches[0].ClassName);
 	}
 }
 
@@ -321,8 +321,8 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithStaleMa
 		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_EQUAL((size_t)1, ResourceMatches.size());
 	if (!ResourceMatches.empty()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("methodA"), ResourceMatches[0].Identifier);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("ActionMy"), ResourceMatches[0].ClassName);
+		CHECK_UNISTR_EQUALS("methodA", ResourceMatches[0].Identifier);
+		CHECK_UNISTR_EQUALS("ActionMy", ResourceMatches[0].ClassName);
 	}
 
 	// now update the code

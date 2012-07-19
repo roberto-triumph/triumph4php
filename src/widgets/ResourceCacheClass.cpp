@@ -101,7 +101,6 @@ bool mvceditor::ResourceCacheClass::Update(const wxString& fileName, const Unico
 			mvceditor::ResourceFinderClass* finder = it->second;
 			mvceditor::SymbolTableClass* symbolTable = itSymbols->second;
 			finder->BuildResourceCacheForFile(fileName, code, isNew);
-			finder->EnsureSorted();
 			symbolTable->CreateSymbols(code);
 			ret = true;
 		}
@@ -139,14 +138,6 @@ bool mvceditor::ResourceCacheClass::PersistGlobal(const wxFileName& outputFile) 
 	return GlobalResourceFinder.Persist(outputFile);
 }
 
-void mvceditor::ResourceCacheClass::EnsureSortedGlobal() {
-	wxMutexLocker locker(Mutex);
-	if (!locker.IsOk()) {
-		return;
-	}
-	GlobalResourceFinder.EnsureSorted();
-}
-
 std::vector<mvceditor::ResourceClass> mvceditor::ResourceCacheClass::AllNonNativeClassesGlobal() {
 	wxMutexLocker locker(Mutex);
 	std::vector<mvceditor::ResourceClass> res;
@@ -169,61 +160,64 @@ bool mvceditor::ResourceCacheClass::PrepareAll(const wxString& resource) {
 	return prep;
 }
 
-bool mvceditor::ResourceCacheClass::CollectFullyQualifiedResourceFromAll() {
-	wxMutexLocker locker(Mutex);
-	if (!locker.IsOk()) {
-		return false;
-	}
-	std::vector<mvceditor::ResourceFinderClass*> finders = Iterator(&GlobalResourceFinder);
-	bool found = false;
-	for (size_t i = 0; i < finders.size(); ++i) {
-		found |= finders[i]->CollectFullyQualifiedResource();
-	}
-	return found;
-}
-
-bool mvceditor::ResourceCacheClass::CollectNearMatchResourcesFromAll() {
-	wxMutexLocker locker(Mutex);
-	if (!locker.IsOk()) {
-		return false;
-	}
-	std::vector<mvceditor::ResourceFinderClass*> finders = Iterator(&GlobalResourceFinder);
-	bool found = false;
-	for (size_t i = 0; i < finders.size(); ++i) {
-		found |= finders[i]->CollectNearMatchResources();
-	}
-	return found;
-}
-
-std::vector<mvceditor::ResourceClass>
-mvceditor::ResourceCacheClass::PrepareAndCollectNearMatchResourcesFromAll(const wxString& resource) {
-	std::vector<mvceditor::ResourceClass> matches;
-	if (PrepareAll(resource)) {
-		if (CollectNearMatchResourcesFromAll()) {
-			matches = Matches();
-		}
-	}
-	return matches;
-}
-
-std::vector<mvceditor::ResourceClass> mvceditor::ResourceCacheClass::Matches() {
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceCacheClass::CollectFullyQualifiedResourceFromAll() {
 	std::vector<mvceditor::ResourceClass> matches;
 	wxMutexLocker locker(Mutex);
 	if (!locker.IsOk()) {
 		return matches;
 	}
+
+	// return all of the matches from all finders that were found by the Collect* call.
+	// This is a bit tricky because we want to prioritize matches in opened files 
+	// instead of the global finder, since the global finder will be outdated.
 	std::vector<mvceditor::ResourceFinderClass*> finders = Iterator(&GlobalResourceFinder);
-	for (size_t r = 0; r < finders.size(); ++r) {
-		mvceditor::ResourceFinderClass* resourceFinder = finders[r];
-		size_t count = resourceFinder->GetResourceMatchCount();
+	for (size_t i = 0; i < finders.size(); ++i) {
+		mvceditor::ResourceFinderClass* resourceFinder = finders[i];
+		std::vector<mvceditor::ResourceClass> finderMatches = resourceFinder->CollectFullyQualifiedResource();
+		size_t count = finderMatches.size();
 		for (size_t j = 0; j < count; ++j) {
-			mvceditor::ResourceClass resource = resourceFinder->GetResourceMatch(j);
+			mvceditor::ResourceClass resource = finderMatches[j];
 			if (!mvceditor::IsResourceDirty(Finders, resource, resourceFinder)) {
 				matches.push_back(resource);
 			}
 		}
 	}
 	std::sort(matches.begin(), matches.end());
+	return matches;
+}
+
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceCacheClass::CollectNearMatchResourcesFromAll() {
+	std::vector<mvceditor::ResourceClass> matches;
+	wxMutexLocker locker(Mutex);
+	if (!locker.IsOk()) {
+		return matches;
+	}
+
+	// return all of the matches from all finders that were found by the Collect* call.
+	// This is a bit tricky because we want to prioritize matches in opened files 
+	// instead of the global finder, since the global finder will be outdated.
+	std::vector<mvceditor::ResourceFinderClass*> finders = Iterator(&GlobalResourceFinder);
+	for (size_t i = 0; i < finders.size(); ++i) {
+		mvceditor::ResourceFinderClass* resourceFinder = finders[i];
+		std::vector<mvceditor::ResourceClass> finderMatches = resourceFinder->CollectNearMatchResources();
+		size_t count = finderMatches.size();
+		for (size_t j = 0; j < count; ++j) {
+			mvceditor::ResourceClass resource = finderMatches[j];
+			if (!mvceditor::IsResourceDirty(Finders, resource, resourceFinder)) {
+				matches.push_back(resource);
+			}
+		}
+	}
+	std::sort(matches.begin(), matches.end());
+	return matches;
+}
+
+std::vector<mvceditor::ResourceClass>
+mvceditor::ResourceCacheClass::PrepareAndCollectNearMatchResourcesFromAll(const wxString& resource) {
+	std::vector<mvceditor::ResourceClass> matches;
+	if (PrepareAll(resource)) {
+		matches = CollectNearMatchResourcesFromAll();
+	}
 	return matches;
 }
 

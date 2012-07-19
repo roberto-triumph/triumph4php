@@ -206,17 +206,17 @@ void ProfileNativeFunctionsParsing() {
 	time = wxGetLocalTimeMillis();
 	resourceFinder.BuildResourceCacheForNativeFunctions();
 	resourceFinder.Prepare(wxT("stristr"));
-	resourceFinder.CollectNearMatchResources();
-	found = resourceFinder.GetResourceMatchCount();
+	std::vector<mvceditor::ResourceClass> matches = resourceFinder.CollectNearMatchResources();
+	found = !matches.empty();
 	time = wxGetLocalTimeMillis() - time;
 	printf("time for resourceFinder on php.tags:%ld ms found:%d\n", time.ToLong(), (int)found);
 	
 	time = wxGetLocalTimeMillis();
 	resourceFinder.Prepare(wxT("mysql_query"));
 	resourceFinder.Walk(FileName);
-	resourceFinder.CollectNearMatchResources();
+	matches = resourceFinder.CollectNearMatchResources();
 	time = wxGetLocalTimeMillis() - time;
-	found = resourceFinder.GetResourceMatchCount();
+	found = !matches.empty();
 	printf("time for resourceFinder on php.tags after caching:%ld ms found:%d\n", time.ToLong(), (int)found);
 }
 
@@ -237,9 +237,9 @@ void ProfileResourceFinderOnLargeProject() {
 	while (search.More()) {
 		search.Walk(resourceFinder);
 	}
-	resourceFinder.CollectNearMatchResources();
+	std::vector<mvceditor::ResourceClass> matches = resourceFinder.CollectNearMatchResources();
 	time = wxGetLocalTimeMillis() - time;
-	size_t found =  resourceFinder.GetResourceMatchCount();
+	size_t found =  matches.size();
 	printf("time for resourceFinder on entire project:%ld ms found:%d\n", time.ToLong(), (int)found);
 
 	time = wxGetLocalTimeMillis();
@@ -248,9 +248,9 @@ void ProfileResourceFinderOnLargeProject() {
 	while (search.More()) {
 		search.Walk(resourceFinder);
 	}
-	resourceFinder.CollectNearMatchResources();
+	matches = resourceFinder.CollectNearMatchResources();
 	time = wxGetLocalTimeMillis() - time;
-	found = resourceFinder.GetResourceMatchCount();
+	found = matches.size();
 	printf("time for resourceFinder on entire project after caching:%ld ms found:%d\n", time.ToLong(), (int)found);
 }
 

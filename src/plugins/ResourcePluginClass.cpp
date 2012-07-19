@@ -76,13 +76,6 @@ bool mvceditor::ResourceFileReaderClass::InitForFile(mvceditor::ResourceCacheCla
 
 bool mvceditor::ResourceFileReaderClass::FileRead(mvceditor::DirectorySearchClass& search) {
 	ResourceCache->WalkGlobal(search, PhpFileFilters);
-	if (!search.More()) {
-
-		// very important to do this here on the background thread
-		// that way when a search is done the cache won't have to do it
-		// and lookups will be quicker
-		ResourceCache->EnsureSortedGlobal();
-	}
 	return false;
 }
 
@@ -201,8 +194,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourcePluginClass::SearchForR
 	else if (!NeedToIndex(text)) {	
 
 		// if we know the indexing has already taken place lets just do the lookup; it will be quick.
-		resourceCache->CollectNearMatchResourcesFromAll();
-		matches = resourceCache->Matches();
+		matches = resourceCache->CollectNearMatchResourcesFromAll();
 
 		// no need to show jump to results for native functions
 		RemoveNativeMatches(matches);

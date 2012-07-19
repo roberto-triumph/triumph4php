@@ -27,21 +27,22 @@
 
 #include <search/DirectorySearchClass.h>
 #include <search/FindInFilesClass.h>
-#include <pelet/LexicalAnalyzerClass.h>
 #include <pelet/ParserClass.h>
 #include <MvcEditorString.h>
 #include <wx/datetime.h>
 #include <wx/string.h>
 #include <wx/filename.h>
+#include <soci/soci.h>
 #include <unicode/unistr.h>
 #include <vector>
 #include <map>
 
 namespace mvceditor {
 
-// defined at the bottom of the file
+// these are defined at the bottom of the file
 class ResourceClass; 
 class TraitResourceClass;
+class FileItemClass;
 
 /**
  * The ResourceFinderClass is used to locate source code artifacts (classes, functions, methods, and files). The 
@@ -218,7 +219,7 @@ public:
 	 * 
 	 * @return bool returns true if resource was found
 	 */
-	bool CollectFullyQualifiedResource();
+	std::vector<ResourceClass> CollectFullyQualifiedResource();
 	
 	/**
 	 * Looks for the resource, using a near-match logic. Logic is as follows:
@@ -267,9 +268,9 @@ public:
 	 * 
 	 * Note that if any exact matches are found, then no near-matches will be collected.
 	 * 
-	 * @return bool returns true if resource was found
+	 * @return matches the list of matched resources (max of 50)
 	 */
-	bool CollectNearMatchResources();
+	std::vector<ResourceClass> CollectNearMatchResources();
 	
 	/**
 	 * Get the parent class of a given resource. For example, let's say source code contained two classes: AdminClass and 
@@ -283,37 +284,14 @@ public:
 	 * @param UnicodeString methodName the method to search.  IF and only IF given, then returned parent class will contain the given method.
 	 * @param return UnicodeString the class' most immediate parent that contains method
 	 */
-	UnicodeString GetResourceParentClassName(const UnicodeString& className, const UnicodeString& methodName) const;
+	UnicodeString GetResourceParentClassName(const UnicodeString& className, const UnicodeString& methodName);
 
 	/**
 	 * @param className the class name to check
 	 * @return all of the classes that the given class inherits from (parent, grandparent, and all the way up).
 	 * Note that only "extended" classes will be returned; interfaces will NOT be returned.
 	 */
-	std::vector<UnicodeString> ClassHierarchy(const UnicodeString& className) const;
-	
-	/**
-	 * Calculates the number of files that had matches. 
-	 * 
-	 * @return int the number of files under FindPath that had at least one match for this resource
-	 */
-	size_t GetResourceMatchCount() const;
-
-	/**
-	 * Returns the full resource name that matched this expression.
-	 * 
-	 * @param int the resource match index  0 < i < GetResourceMatchCount().  
-	 * @return ResourceClass returns empty reource on invalid index
-	 */
-	ResourceClass GetResourceMatch(size_t index) const;
-
-	/**
-	 * Returns the full path to  the resource that matched this expression.
-	 * 
-	 * @param size_t the resource match index  0 < i < GetResourceMatchCount().  
-	 * @return wxString returns empty string on invalid index
-	 */
-	wxString GetResourceMatchFullPath(size_t index) const;
+	std::vector<UnicodeString> ClassHierarchy(const UnicodeString& className);
 	
 	/**
 	 * Searches the given text for the position of the given resource.  For example, if the resource matched 3 items
@@ -398,37 +376,21 @@ public:
 	/**
 	 * Print the resource cache to stdout.  Useful for debugging only.
 	 */
-	void Print() const;
+	void Print();
 	
 	/**
 	 * @return bool true if this resource finder has not parsed any files (or those files did not have
 	 * any resources). Will also return true if the ONLY file that has been cached is the native functions
 	 * file.
 	 */
-	bool IsFileCacheEmpty() const;
+	bool IsFileCacheEmpty();
 
 	/**
 	 * @return bool true if this resource finder has not parsed any resources. Will also return true if the 
 	 * ONLY resources that have been cached are those for the the native functions
 	 * file. Note that this could return TRUE even though the file cache is not empty.
 	 */
-	bool IsResourceCacheEmpty() const;
-
-	/**
-	 * This method copies the internal resource lists from the given object to this. This method can
-	 * be used to create a new instance of ResourceFinder without needing to re-scan the entire
-	 * file system.  After a call to this method both src and this will have the same resources
-	 * (but as DIFFERENT COPIES).
-	 *
-	 * Note that the matches are NOT copied.
-	 */
-	void CopyResourcesFrom(const ResourceFinderClass& src);
-
-	/**
-	 * This method will remove all resources that were found in fileName, the add
-	 * all of the resources from the given finder.
-	 */
-	void UpdateResourcesFrom(const wxString& fullPath, const ResourceFinderClass& src);
+	bool IsResourceCacheEmpty();
 
 	/**
 	 * Adds any arbritary resource to the cache. This is tolerate of duplicates; in case a duplicate
@@ -437,23 +399,6 @@ public:
 	 * @param dyamicResources the list of resources to add
 	 */
 	void AddDynamicResources(const std::vector<ResourceClass>& dynamicResources);
-	
-	/**
-	 * Sorts the resources if they are not already sorted. This is a relatively expensive operation.
-	 * After sorting, we calls to Collect* methods will be fast.
-	 * This method should be called once all files have been parsed. It is not necessary to call this;
-	 * but it may make sense to call it explicitly after parsing an entire project while the background thread
-	 * is still running (that way the caller can "control" that the sorting be done in the background thread).
-	 *
-	 * Also clears out all of the previous matches.
-	 */
-	void EnsureSorted();
-
-	/**
-	 * @return the list of file names  (full paths) of all of the files that have been parsed by this
-	 * object.
-	 */
-	std::vector<wxString> GetCachedFiles() const;
 
 	/**
 	 * Writes the parsed resources into the given file. Format is this:
@@ -477,7 +422,7 @@ public:
 	 * many items (10000+). Try to use the CollectXXX() methods as much as possible.
 	 * An example use of this method is when wanting to find all functions in a single file.
 	 */
-	std::vector<ResourceClass> All() const;
+	std::vector<ResourceClass> All();
 
 	/**
 	 * @return vector of ALL parsed class Resources. Be careful as this method may return
@@ -485,7 +430,7 @@ public:
 	 * An example use of this method is when wanting to find all classes in a project.
 	 * This method will NOT return native PHP classes (ie. PDO, DateTime).
 	 */
-	std::vector<ResourceClass> AllNonNativeClasses() const;
+	std::vector<ResourceClass> AllNonNativeClasses() ;
 
 	/**
 	 * Removes all resources from the cache entirely.
@@ -519,54 +464,12 @@ public:
 private:
 	
 	/**
-	 * This struct will be used to keep track of which files we have already cached.  The last modified timestamp
-	 * will be used so that we dont look at files that have not been modified since we last parsed them
+	 * All of the resources. This is only a temporary cache that is pushed into while the 
+	 * file is being parsed. After file parsing is complete, these resources will be
+	 * added to the database.
 	 */
-	struct FileItem {
+	std::vector<ResourceClass> FileParsingCache;
 		
-		/**
-		 * The full path to the file where this resource was found
-		 */
-		wxString FullPath;
-		
-		/**
-		 * The time that this resource was looked at.
-		 */
-		wxDateTime DateTime;
-		
-		/**
-		 * whether or not file has been parsed, could be false if we only looked for files
-		 */
-		bool Parsed;
-
-		/**
-		 * If TRUE, then this file is not yet written to disk (ie the resource only exists in memory
-		 * ( but not yet in the filesystem). This is needed because the finder will do
-		 * a sanity check to ensure that the file that contained a match still exists. Iif a file is deleted 
-		 * after a file was cached then we want to eliminate that match. But, this sanity checks would kill
-		 * matches that were a result of a manual call to BuildResourceCacheForFile. This flag ensures
-		 * proper operation (resources that were parsed from code that the user has typed in but no yet
-		 * saved are NOT removed).
-		 */
-		bool IsNew;
-	};
-	
-	/**
-	 * All of the resources, will be indexed by identifier name
-	 */
-	std::vector<ResourceClass> IdentifierCache;
-	
-	/**
-	 * All of the resources, will be indexed by ClassName::Member name. Note that this does not contain
-	 * functions or define resources since they do not belong to a class
-	 */
-	std::vector<ResourceClass> MembersCache;
-	
-	/**
-	 * All of the resources, will be indexed by fully qualified namespace \\First\\ClassName
-	 */
-	std::vector<ResourceClass> NamespaceCache;
-	
 	/**
 	 * trait info for each class that uses a trait. The trait cache will contain the
 	 * aliases and naming resolutions (insteadof). Since a single class can use multiple traits
@@ -575,28 +478,18 @@ private:
 	std::map<UnicodeString, std::vector<TraitResourceClass>, UnicodeStringComparatorClass> TraitCache;
 	
 	/**
-	 * All the files that have been looked at.
-	 */
-	std::vector<FileItem> FileCache;
-	
-	/**
-	 * Full paths to all the resource matches (the actual structs)
-	 */
-	std::vector<ResourceClass>  Matches;
-	
-	/**
-	 * Used to parse through code for classes & methods
-	 * 
-	 * @var pelet::LexicalAnalyzerClass 
-	 */
-	pelet::LexicalAnalyzerClass Lexer;
-	
-	/**
 	 * Used to parse through code for classes & methods
 	 * 
 	 * @var pelet::ParserClass
 	 */
 	pelet::ParserClass Parser;
+
+	/**
+	 * The connection to the database that backs the resource cache
+	 * The database will hold all of the files that have been looked at, as well
+	 * as all of the resources that were parsed.
+	 */
+	soci::session Session;
 	
 	/**
 	 * the file name parsed from resource string 
@@ -636,15 +529,17 @@ private:
 	 * 
 	 * @var int fileItemIndex the index of the FileCache entry that corresponds to the file located at fullPath
 	 */
-	int CurrentFileItemIndex;
-	
+	int CurrentFileItemId;
+
 	/**
-	 * Flag that will signal when the cache has been sorted.  The cache will be sorted only until
-	 * a CollectNearMatches or CollectFullyQualifiedResource methods are called, and it will
-	 * be unsorted when a call to BuildResourceCache is called
-	 * 
+	 * Flag to make sure we initialize the resource database.
 	 */
-	bool IsCacheSorted;
+	bool IsCacheInitialized;
+
+	/**
+	 * Create the resource database.
+	 */
+	void Init();
 	
 	/**
 	 * Goes through the given file and parses out resources.
@@ -666,45 +561,45 @@ private:
 	/**
 	 * remove all resources for the file.
 	 * 
-	 * @param int fileItemIndex the index of the FileCache entry that corresponds to the file located at fullPath
+	 * @param fileItem resources from this fileItem will be deleted.
 	 */
-	void RemoveCachedResources(int fileItemIndex);
+	void RemoveCachedResources(const mvceditor::FileItemClass& fileItem);
 	
 	/**
 	 * Collects all resources that are files and match the parsed Resource [given to Prepare()]. 
-	 * Any hits will be accumulated in Matches vector.
+	 * Any hits will be returned
 	 */
-	void CollectNearMatchFiles();
+	std::vector<ResourceClass> CollectNearMatchFiles();
 
 	/**
 	 * Collects all resources that are classes / functions / defines and match the parsed Resource [given to Prepare()]. 
-	 * Any hits will be accumulated in Matches vector.
+	 * Any hits will be returned
 	 * 
 	 */
-	void CollectNearMatchNonMembers();
+	std::vector<ResourceClass> CollectNearMatchNonMembers();
 	
 	/**
 	 * Collects all resources that are class methods / properties and match the parsed Resource [given to Prepare()]. 
-	 * Any hits will be accumulated in Matches vector.
+	 * Any hits will be returned
 	 * 
 	 */
-	void CollectNearMatchMembers();
+	std::vector<ResourceClass> CollectNearMatchMembers();
 	
 	/**
 	 * Collects all resources that are namespaces and match the parsed Resource [given to Prepare()]
-	 * Any hits will be accumulated in Matches vector.
+	 * Any hits will be returned
 	 */
-	void CollectNearMatchNamespaces();
+	std::vector<ResourceClass> CollectNearMatchNamespaces();
 	
 	/**
 	 * Collect all of the resources that are methods / properties of the given classes.
 	 */
-	void CollectAllMembers(const std::vector<UnicodeString>& classNames);
+	std::vector<ResourceClass> CollectAllMembers(const std::vector<UnicodeString>& classNames);
 	
 	/**
 	 * collect all of the resources from all of the traits used by the given class
 	 */
-	void CollectAllTraitMembers(const UnicodeString& className);
+	std::vector<ResourceClass> CollectAllTraitMembers(const UnicodeString& className);
 	
 	/**
 	 * Extracts the parent class from a class signature.  The class signature, as parsed by the parser contains a string
@@ -719,7 +614,7 @@ private:
 	 * Look through all of the matches and verifies that the file still actually exists (file has not been deleted).
 	 * If the file was deleted, then the match is invalidated and the cache for that file removed.
 	 */
-	void EnsureMatchesExist();
+	void EnsureMatchesExist(std::vector<ResourceClass>& matchesw);
 
 	/**
 	 * Returns the full path to the given resource
@@ -727,23 +622,21 @@ private:
 	 * @param resource a resource returned by one of the CollectXXX() methods OF THIS OBJECT.
 	 * @return wxString returns empty string on invalid resource
 	 */
-	wxString GetResourceMatchFullPathFromResource(const ResourceClass& resource) const;
+	wxString GetResourceMatchFullPathFromResource(const ResourceClass& resource);
 
 	/**
-	 * create a new entry in the file cache
-	 * @return the file item index of the new entry
+	 * create a new entry in the file cache. The item's FileId member will be set as well.
 	 */
-	int PushIntoFileCache(const wxString& fullPath, bool isParsed, bool isNew);
+	void PushIntoFileCache(mvceditor::FileItemClass& fileItem);
 
 	/**
 	 * find the FileItem entry that has the given FullPath.
 	 * @param fullPath the full path to search for
-	 * @param fileItemIndex the index of the found item will be set here (if found)
 	 * @param fileItem the FileItem itself will be copied here (if found)
 	 * @return bool if TRUE it means that this ResourceFinder has encountered the given
 	 * file before.
 	 */
-	bool FindInFileCache(const wxString& fullPath, int& fileItemIndex, FileItem& fileItem) const;
+	bool FindInFileCache(const wxString& fullPath, mvceditor::FileItemClass& fileItem);
 
 	/**
 	 * Read all resources from the given tag file. After a call to this method,
@@ -770,19 +663,33 @@ private:
 	bool IsTraitInherited(const ResourceClass& memberResource, const UnicodeString& fullyQualifiedClassName);
 	
 	/**
-	 * Searches the given cache for the given resource; quitting after maxMatches have been found.
-	 * This search is a little more complicated than a straight loookup; a search is done using exact
-	 * matching, and if exact matches are not found then a "near" match lookup is done.
-	 * 
-	 * cache is assumed to be sorted; if cache is not sorted then this function will not work.
-	 * 
-	 * @param cache the sorted cache of resources to search
-	 * @param needle the resource to search for
-	 * @param matches the vector to hold the matched resources
-	 * @param maxMatches after this many matches, the search will end.
+	 * bulk get operation for the given file item Ids.
+	 * @param fileItemIds the file items to get from the database
+	 * @return vector of file items that correspond to the given Ids
 	 */
-	void BoundedCacheSearch(const std::vector<mvceditor::ResourceClass>& cache, const UnicodeString& key,
-			std::vector<mvceditor::ResourceClass>& matches, int maxMatches) const;	
+	std::vector<mvceditor::FileItemClass> FileItems(const std::vector<int>& fileItemIds);
+
+	/**
+	 * @param the query to execute (query must be into the resources table)
+	 * @param param the binding param. query must contain one and only one bound parameter.
+	 * @return the vector of resources pulled from the statement's results
+	 */
+	std::vector<mvceditor::ResourceClass> ResourceStatementMatches(std::string sql, std::string param);
+
+	/**
+	 * add all of the given resources into the database.
+	 * @param resources the list of resources that were parsed out
+	 * @param int the file that the resources are located in
+	 */
+	void PushIntoResourceCache(const std::vector<mvceditor::ResourceClass>& resources, int fileitemId);
+
+	/**
+	 * check the database AND the current file's parsed cache to see if the namespace has been seen
+	 * before.
+	 * @return bool TRUE if the namespace is NOT in the database and its NOT in the current file
+	 *  parsed cache
+	 */
+	bool IsNewNamespace(const UnicodeString& namespaceName);
 };
 
 /**
@@ -795,7 +702,7 @@ public:
 	/**
 	 * All the resources we collect
 	 */
-	enum Type {
+	enum Types {
 		CLASS,
 		METHOD,
 		FUNCTION,
@@ -846,7 +753,7 @@ public:
 	 * The resource item type
 	 * @var ReourceClass::Type
 	 */
-	ResourceClass::Type Type;
+	ResourceClass::Types Type;
 
 	/**
 	 * TRUE if this is a protected member
@@ -934,10 +841,10 @@ private:
 	/**
 	 * The index to the file where this resource was found. 
 	 */
-	int FileItemIndex;
+	int FileItemId;
 	
 	/**
-	 * The resource finder class will populate FileItemIndex and FullPath
+	 * The resource finder class will populate FileItemId and FullPath
 	 */
 	friend class ResourceFinderClass;
 };
@@ -963,6 +870,62 @@ public:
 	std::vector<UnicodeString> Excluded;
 	
 	TraitResourceClass();
+};
+
+/**
+ * This struct will be used to keep track of which files we have already cached.  The last modified timestamp
+ * will be used so that we dont look at files that have not been modified since we last parsed them
+ */
+class FileItemClass {
+
+public:
+	
+	/**
+	 * The full path to the file where this resource was found
+	 */
+	wxString FullPath;
+	
+	/**
+	 * The time that this resource was looked at.
+	 */
+	wxDateTime DateTime;
+
+	/**
+	 * unique identifier for this file. Guaranteed to be unique once this itemsd
+	 * has been saved to the database.
+	 */
+	int FileId;
+	
+	/**
+	 * whether or not file has been parsed, could be false if we only looked for files
+	 */
+	bool IsParsed;
+
+	/**
+	 * If TRUE, then this file is not yet written to disk (ie the resource only exists in memory
+	 * ( but not yet in the filesystem). This is needed because the finder will do
+	 * a sanity check to ensure that the file that contained a match still exists. Iif a file is deleted 
+	 * after a file was cached then we want to eliminate that match. But, this sanity checks would kill
+	 * matches that were a result of a manual call to BuildResourceCacheForFile. This flag ensures
+	 * proper operation (resources that were parsed from code that the user has typed in but no yet
+	 * saved are NOT removed).
+	 */
+	bool IsNew;
+
+	FileItemClass();
+
+	/**
+	 * Check to see if this file needs to be parsed. A file needs to be parsed when
+	 * 1. it is seen for the first time
+	 * 2. has not been parsed yet (IsParsed is FALSE)
+	 * 3. it has been modified since the last time we parsed it
+	 */
+	bool NeedsToBeParsed(const wxDateTime& fileLastModifiedTime) const;
+
+	/**
+	 * initialize the members of this file item for insertion into the database.
+	 */
+	void MakeNew(const wxFileName& fileName, bool isParsed);
 };
 
 }

@@ -63,7 +63,17 @@ public:
 	 * conversion from ICU to C++ string
 	 */
 	static std::string IcuToChar(const UnicodeString& source);
-	
+
+	/**
+	 * conversion from wxString to C++ string
+	 */
+	static std::string wxToChar(const wxString& source);
+
+	/**
+	 * conversion from wxString to C++ string
+	 */
+	static wxString charToWx(const char* source);
+
 	/**
 	 * Calculate the number of characters in a UTF-8 string.  Since UTF-8 is a multi-byte variable
 	 * encoding, we cannot easily tell how many characters (1 character may be 1, 2 ,3, or 4 bytes). 

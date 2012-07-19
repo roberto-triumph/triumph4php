@@ -124,12 +124,6 @@ public:
 	bool PersistGlobal(const wxFileName& outputFile);
 
 	/**
-	 * calls EnsureSorted on the GLOBAL resource; this is usually done after all files have been indexed.
-	 * @see mvceditor::ResourceFinderClass::EnsureSorted
-	 */
-	void EnsureSortedGlobal();
-
-	/**
 	 * calls AllNonNativeClasses() method on the GLOBAL resource. This is usually done after all files have been indexed.
 	 * @see mvceditor::ResourceFinderClass::AllNonNativeClasses
 	 */
@@ -146,18 +140,18 @@ public:
 	 * Searches all the registered resource finders plus the global given.
 	 * Will search only for full matches (it will call CollectFullyQualifiedResource
 	 * on each resource finder).
-	 * @return bool TRUE if at least one resource finder got a match
+	 * @return std::vector<mvceditor::ResourceClass> matched resources 
 	 */
-	bool CollectFullyQualifiedResourceFromAll();
+	std::vector<mvceditor::ResourceClass> CollectFullyQualifiedResourceFromAll();
 	
 	/**
 	 * Searches all the registered resource finders plus the global given
 	 * Will search for near matches (it will call CollectNearMatchResources
 	 * on each resource finder).
 	 *
-	 * @return bool TRUE if at least one resource finder got a match
+	 * @return std::vector<mvceditor::ResourceClass> matched resources
 	 */
-	bool CollectNearMatchResourcesFromAll();
+	std::vector<mvceditor::ResourceClass> CollectNearMatchResourcesFromAll();
 
 	/**
 	 * Calls  and ResourceUpdateClass::PrepareAll and
@@ -167,11 +161,6 @@ public:
 	 * @see ResourceCacheClass::CollectNearMatchResourcesFromAll
 	 */
 	std::vector<ResourceClass> PrepareAndCollectNearMatchResourcesFromAll(const wxString& resource);
-	
-	/**
-	 * @return all of the matches from all finders that were found by the Collect* call.
-	 */
-	std::vector<ResourceClass> Matches();
 
 	/**
 	 * thread-safe wrapper for ResourceFinderClass::AddDynamicResouces on the GLOBAL cache
@@ -250,7 +239,7 @@ public:
 	void SetVersion(pelet::Versions version);
 	 
 private:
-
+		
 	/**
 	 * Returns a list that contains all of the resource finders for the registered files plus
 	 * the given resource finder.  

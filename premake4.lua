@@ -294,6 +294,7 @@ solution "mvc-editor"
 		includedirs { "src", "lib/pelet/include" }
 		links { "pelet" }
 
+		sociconfiguration()
 		configuration "Debug"
 			pickywarnings(_ACTION)
 			icuconfiguration("Debug", _ACTION)

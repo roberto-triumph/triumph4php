@@ -62,7 +62,6 @@ void mvceditor::ResourceFinderBackgroundThreadClass::Entry() {
 		// need this call so that resources are actually parsed
 		ResourceFinder.Prepare(wxT("fakeclass"));
 		ResourceFinder.Walk(FileName);
-		ResourceFinder.EnsureSorted();
 		Resources = ResourceFinder.All();
 		SignalEnd();
 	}
@@ -111,8 +110,7 @@ void mvceditor::OutlineViewPluginClass::BuildOutline(const wxString& className) 
 
 	// get the class resource itself
 	if (resourceCache->PrepareAll(className)) {
-		resourceCache->CollectFullyQualifiedResourceFromAll();
-		matches = resourceCache->Matches();
+		matches = resourceCache->CollectFullyQualifiedResourceFromAll();
 		for (size_t i = 0; i < matches.size(); ++i) {
 			ResourceFinderBackground.Resources.push_back(matches[i]);
 		}
@@ -131,8 +129,8 @@ void mvceditor::OutlineViewPluginClass::BuildOutline(const wxString& className) 
 void mvceditor::OutlineViewPluginClass::JumpToResource(const wxString& resource) {
 	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
 	if (resourceCache->PrepareAll(resource)) {
-		if (resourceCache->CollectFullyQualifiedResourceFromAll()) {
-			std::vector<mvceditor::ResourceClass> matches = resourceCache->Matches();
+		std::vector<mvceditor::ResourceClass> matches = resourceCache->CollectFullyQualifiedResourceFromAll();
+		if (!matches.empty()) {
 			mvceditor::ResourceClass resource = matches[0];
 			GetNotebook()->LoadPage(resource.GetFullPath());
 			CodeControlClass* codeControl = GetCurrentCodeControl();
