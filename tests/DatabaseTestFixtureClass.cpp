@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <DatabaseTestFixtureClass.h>
-#include <soci-mysql.h>
+#include <soci/mysql/soci-mysql.h>
 #include <stdio.h>
  
 // these macros will expand a macro into its 

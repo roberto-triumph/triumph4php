@@ -138,45 +138,48 @@ end
 function checkSoci() 
 	if os.is "windows" then
 		SOCI_SRC = normalizepath("lib/soci/src")
-		dlls = os.matchfiles("lib/soci/mvc-editor/bin/*.dll")
+		
+		-- grab the libraries from the build directory.  the ones from
+		-- from the install directory (lib/soci/mvc-editor) do not work (programs 
+		-- that use them crash)
+		dlls = os.matchfiles("lib/soci/src/bin/Debug/*.dll")
 		if #dlls > 0 then
-			sociLibPath = normalizepath("lib/soci/mvc-editor/bin/*.dll")
+			sociLibPath = normalizepath("lib/soci/src/bin/Debug/*.dll")
 			cmd = "xcopy /S /Y " .. sociLibPath  .. " \"Debug\\\""
 			print(cmd)
 			os.execute(cmd)
 		else 
 			print "SOCI Debug libraries have not been built. You need to build the SOCI library in Debug configuration. "
 			print ("Open the solution found at " .. SOCI_SRC .. "\\SOCI.sln")
-			print "Build the solution in Debug configuration"
+			print "Build the solution using the Debug configuration."
 			error ""
 		end
 		
-		dlls = os.matchfiles("lib/soci/mvc-editor/bin/*.dll")
+		dlls = os.matchfiles("lib/soci/src/bin/Release/*.dll")
 		if #dlls > 0 then
-			sociLibPath = normalizepath("lib/soci/mvc-editor/bin/*.dll")
+			sociLibPath = normalizepath("lib/soci/src/bin/Release/*.dll")
 			cmd = "xcopy /S /Y " .. sociLibPath  .. " \"Release\\\""
 			print(cmd)
 			os.execute(cmd)
 		else 
 			print "SOCI Release libraries have not been built. You need to build the SOCI library in Release configuration. "
 			print ("Open the solution found at " .. SOCI_SRC .. "\\SOCI.sln")
-			print "Build the solution in Debug configuration"
-			print "Build the solution in Release configuration"
+			print "Build the solution using the Release configuration"
 			error ""
 		end	
 	elseif os.is "linux" then
 		
 		-- soci lib dirs are named according to architecture
 		if os.isdir "lib/soci/mvc-editor/lib64" then
-			libs = os.matchfiles("lib/soci/mvc-editor/lib64/*.so*");
+			libs = os.matchfiles("lib/soci/src/mvc-editor/lib64/*.so*");
 			if #libs > 0 then
-				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/lib64/*.so* Debug/");
-				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/lib64/*.so* Release/");
+				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/src/mvc-editor/lib64/*.so* Debug/");
+				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/src/mvc-editor/lib64/*.so* Release/");
 			else 
 				error "SOCI library has not been built.  Execute the premake soci action: ./premake4 soci"
 			end
 		else
-			libs = os.matchfiles("lib/soci/mvc-editor/lib/*.so*");
+			libs = os.matchfiles("lib/soci/src/mvc-editor/lib/*.so*");
 			if #libs > 0 then
 				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/lib/*.so* Debug/");
 				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/lib/*.so* Release/");

@@ -121,13 +121,6 @@ function sociconfiguration()
 		MYSQL_INCLUDE_DIR,
 		SQLITE_INCLUDE_DIR
 	}
-	
-	-- soci creates lib directory with the architecture name
-	if os.isdir "lib/soci/mvc-editor/lib64" then
-		libdirs { "lib/soci/mvc-editor/lib64" }
-	else
-		libdirs { "lib/soci/mvc-editor/lib" }
-	end
 	libdirs {
 		MYSQL_LIB_DIR,
 		SQLITE_LIB_DIR
@@ -137,14 +130,24 @@ function sociconfiguration()
 		"soci_mysql_3_1", 
 		"soci_sqlite3_3_1" 
 	}
-	
-	-- premake adds the lib prefix, we must take it away
-	if os.is "windows" then	
+	if os.is "windows" then 
+		-- premake adds the lib prefix, we must take it away
 		links { 
 			string.match(MYSQL_LIB_NAME, "^([%w_]+)%.lib$"),
 			string.match(SQLITE_LIB_NAME , "^([%w_]+)%.lib$") 
 		}
-	else
+		
+		-- grab the libraries from the build directory.  the ones from
+		-- from the install directory (lib/soci/mvc-editor) do not work (programs 
+		-- that use them crash)
+		libdirs { "lib/soci/src/lib/Release" }
+	else 
+		-- soci creates lib directory with the architecture name
+		if os.isdir "lib/soci/mvc-editor/lib64" then
+			libdirs { "lib/soci/mvc-editor/lib64" }
+		else
+			libdirs { "lib/soci/mvc-editor/lib" }
+		end
 		links { 
 			string.match(MYSQL_LIB_NAME, "^lib([%w_]+)%.so$"),
 			string.match(SQLITE_LIB_NAME , "^lib([%w_]+)%.so$") 

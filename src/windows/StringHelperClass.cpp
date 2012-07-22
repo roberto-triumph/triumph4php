@@ -151,9 +151,11 @@ int32_t mvceditor::StringHelperClass::FindPrevious(const UnicodeString& text, co
  * conversion from wxString to C++ string
  */
 std::string mvceditor::StringHelperClass::wxToChar(const wxString& source) {
-	size_t rawLength;
-	wxCharBuffer buf = wxConvUTF8.cWC2MB(source.c_str(), source.length() + 1, &rawLength);
-	std::string s((const char*)source.data(), rawLength);
+	
+	//size_t rawLength;
+	//wxCharBuffer buf = source.ToAscii(); //wxConvUTF8.cWC2MB(source.c_str(), source.length() + 1, &rawLength);
+	//std::string s((const char*)source.data()); //, rawLength);
+	std::string s = std::string(source.mb_str());
 	return s;
 }
 

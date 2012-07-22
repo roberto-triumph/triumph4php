@@ -28,9 +28,9 @@ newaction {
 	description = "Build the SOCI (database access) library",
 	execute = function()
 		batchexecute(os.getcwd(), { string.format("%s --version", CMAKE) }, "cmake not found. Compiling SOCI requires CMake. SOCI cannot be built.")
-		 SOCI_BUILD_DIR =  normalizepath("lib/soci/mvc-editor")
-		 SOCI_ROOT = normalizepath("lib/soci")
-		 SOCI_SRC = normalizepath("lib/soci/src")
+		SOCI_BUILD_DIR =  normalizepath("lib/soci/mvc-editor");
+		SOCI_ROOT = normalizepath("lib/soci")
+		SOCI_SRC = normalizepath("lib/soci/src")
 		if os.is "windows" then
 			
 			-- exclude SOCI from linking against Boost. we don't use it
@@ -49,7 +49,7 @@ newaction {
 					" -DWITH_POSTGRESQL=NO " ..
 					" -DWITH_SQLITE3=YES " ..
 					" -DWITH_BOOST=NO " ..
-					" -DSOCI_TESTS=NO "
+					" -DSOCI_TESTS=YES "
 			})
 			print "Check the output above.  If it reads \"SOCI_MYSQL = OFF\" or \"SOCI_SQLITE3 = OFF\" then you will need to do some investigation."
 			print "Otherwise, you will now need to open the generated solution file and build it from there."
@@ -73,7 +73,8 @@ newaction {
 					" -DWITH_ORACLE=NO " ..
 					" -DWITH_POSTGRESQL=NO " ..
 					" -DWITH_SQLITE3=YES " ..
-					" -DWITH_BOOST=NO",
+					" -DWITH_BOOST=NO" ..
+					" -DSOCI_TESTS=YES ",
 				"make",
 				"make install"
 			})

@@ -286,7 +286,8 @@ mvceditor::ResourceFinderClass::ResourceFinderClass()
 	, ClassName()
 	, MethodName()
 	, ResourceType(FILE_NAME)
-	, LineNumber(0) {
+	, LineNumber(0) 
+	, IsCacheInitialized(false) {
 	Parser.SetClassObserver(this);
 	Parser.SetClassMemberObserver(this);
 	Parser.SetFunctionObserver(this);
@@ -298,16 +299,26 @@ void mvceditor::ResourceFinderClass::SetVersion(pelet::Versions version) {
 
 void mvceditor::ResourceFinderClass::Init() {
 	try {
-		Session.open(*soci::factory_sqlite3(), ":memory:");
+		std::ostringstream stream;
+		stream << ":memory:";
+		/*stream << "C:\\users\\roberto\\Documents\\test_"
+			<< cnt
+			<< ".db";
+		*/
+		Session.open(*soci::factory_sqlite3(), stream.str());
+		
+		Session.once << "DROP TABLE IF EXISTS file_items;";
+		Session.once << "DROP TABLE IF EXISTS resources;";
+
 		std::string sql;
-		sql += "CREATE TABLES file_items (",
+		sql += "CREATE TABLE file_items (",
 		sql += "  file_item_id INTEGER PRIMARY KEY, full_path TEXT, last_modified DATETIME, is_parsed INTEGER, is_new INTEGER ";
 		sql += ");";
 		Session.once << sql;
 		sql = "";
-		sql += "CREATE TABLES resources (";
+		sql += "CREATE TABLE resources (";
 		sql += "  file_item_id INTEGER, key TEXT, identifier TEXT, class_name TEXT, ";
-		sql += "  type INTEGER, namespace_name TEXT, signature TEXT, ";
+		sql += "  type INTEGER, namespace_name TEXT, signature TEXT, comment TEXT, ";
 		sql += "  return_type TEXT, is_protected INTEGER, is_private INTEGER, ";
 		sql += "  is_static INTEGER, is_dynamic INTEGER, is_native INTEGER";
 		sql += ");";
@@ -316,7 +327,8 @@ void mvceditor::ResourceFinderClass::Init() {
 	} catch(std::exception const& e) {
 		Session.close();
 		IsCacheInitialized = false;
-		wxASSERT_MSG(IsCacheInitialized, mvceditor::StringHelperClass::charToWx(e.what()));
+		wxString msg = mvceditor::StringHelperClass::charToWx(e.what());
+		wxASSERT_MSG(IsCacheInitialized, msg);
 	}
 }
 
@@ -361,6 +373,10 @@ bool mvceditor::ResourceFinderClass::Walk(const wxString& fileName) {
 }
 
 void mvceditor::ResourceFinderClass::BuildResourceCacheForFile(const wxString& fullPath, const UnicodeString& code, bool isNew) {
+	// initialize the database only when there is a file we want to parse
+	if (!IsCacheInitialized) {
+		Init();
+	}
 
 	// remove all previous cached resources
 	mvceditor::FileItemClass fileItem;
@@ -374,6 +390,7 @@ void mvceditor::ResourceFinderClass::BuildResourceCacheForFile(const wxString& f
 		// need to add an entry so that GetResourceMatchFullPathFromResource works correctly
 		fileItem.FullPath = fullPath;
 		fileItem.IsNew = isNew;
+		fileItem.DateTime = wxDateTime::Now();
 		fileItem.IsParsed = false;
 		PushIntoFileCache(fileItem);
 	}
@@ -516,24 +533,21 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 	std::string query = mvceditor::StringHelperClass::wxToChar(fileName);
 
 	// add the SQL wildcards
-	query = "%" + query + "%";
+	query = "'%" + query + "%'";
 	std::string match;
 	int fileItemId;
-	soci::statement stmt = (Session.prepare << "SELECT full_path, file_item_id FROM file_items WHERE full_path LIKE (:query)",
-		soci::use(query),
+	soci::statement stmt = (Session.prepare << "SELECT full_path, file_item_id FROM file_items WHERE full_path LIKE " + query,
 		soci::into(match), soci::into(fileItemId));
 	stmt.execute();
-	if (stmt.got_data()) {
-		while (stmt.fetch()) {
-			wxString fullPath = mvceditor::StringHelperClass::charToWx(match.c_str());
-			wxFileName::SplitPath(fullPath, &path, &currentFileName, &extension);
-			currentFileName += wxT(".") + extension;
-			if (wxNOT_FOUND != currentFileName.Lower().Find(fileName)) {
-				if (0 == LineNumber || GetLineCountFromFile(fullPath) >= LineNumber) {
-					ResourceClass newItem;
-					newItem.FileItemId = fileItemId;
-					matches.push_back(newItem);
-				}
+	while (stmt.fetch()) {
+		wxString fullPath = mvceditor::StringHelperClass::charToWx(match.c_str());
+		wxFileName::SplitPath(fullPath, &path, &currentFileName, &extension);
+		currentFileName += wxT(".") + extension;
+		if (wxNOT_FOUND != currentFileName.Lower().Find(fileName)) {
+			if (0 == LineNumber || GetLineCountFromFile(fullPath) >= LineNumber) {
+				ResourceClass newItem;
+				newItem.FileItemId = fileItemId;
+				matches.push_back(newItem);
 			}
 		}
 	}
@@ -542,16 +556,10 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 
 std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNearMatchNonMembers() {
 	UnicodeString key = ClassName;
-
 	std::string query = mvceditor::StringHelperClass::IcuToChar(key);
-	query += "%";
-	std::string sql;
-	sql += "SELECT ";
-	sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
-	sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
-	sql += "FROM resources WHERE key LIKE (?) LIMIT 50";
-
-	std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(sql, query);
+	std::ostringstream stream;
+	stream << " key LIKE '" << query << "%'";
+	std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(stream.str(), true);
 	
 	// TODO: not really sure this is the best way, just make 2 queries 1 using equals and
 	// if that returns nothing then execure the LIKE query
@@ -582,25 +590,23 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 	if (MethodName.isEmpty()) {
 		
 		// special case; query for all methods for a class (UserClass::)
-		CollectAllMembers(parentClassNames);
-		CollectAllTraitMembers(ClassName);
+		std::vector<mvceditor::ResourceClass> memberMatches = CollectAllMembers(parentClassNames);
+		std::vector<mvceditor::ResourceClass> traitMatches = CollectAllTraitMembers(ClassName);
+
+		matches.insert(matches.end(), memberMatches.begin(), memberMatches.end());
+		matches.insert(matches.end(), traitMatches.begin(), traitMatches.end());
 	}
 	else if (ClassName.isEmpty()) {
 		
 		// special case, query accross all classes for a method (::getName)
-		// if ClassName is empty, then just check method names (which BoundedCacheSearch does). This ensures 
+		// if ClassName is empty, then just check method names This ensures 
 		// queries like '::getName' will work as well.
+		// make sure to NOT get fully qualified  matches (key=identifier)
 		UnicodeString key = MethodName;
-
 		std::string query = mvceditor::StringHelperClass::IcuToChar(key);
-		query += "%";
-		std::string sql;
-		sql += "SELECT ";
-		sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
-		sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
-		sql += "FROM resources WHERE key LIKE (?) LIMIT 50";
-
-		matches = ResourceStatementMatches(sql, query);
+		std::ostringstream stream;
+		stream << " identifier LIKE '" << query << "%' AND key = identifier";
+		matches = ResourceStatementMatches(stream.str(), true);
 		
 		// BoundedCacheSearch got all resources that match on the identifier. we need extra logic
 		// to remove matches that come from resources that are not methods or properties
@@ -620,15 +626,11 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 	else {
 		UnicodeString key = MethodName;
 		std::string query = mvceditor::StringHelperClass::IcuToChar(key);
-		query += "%";
-		std::string sql;
-		sql += "SELECT ";
-		sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
-		sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
-		sql += "FROM resources WHERE key LIKE (?) LIMIT 50";
+		std::ostringstream stream;
+		stream << " key LIKE '" << query << "%'";
+		matches = ResourceStatementMatches(stream.str(), true);
 
 		// TODO: we should just use an IN() query and query for classes and traits
-		matches = ResourceStatementMatches(sql, query);
 		std::vector<mvceditor::ResourceClass>::iterator it = matches.begin();
 		
 		// BoundedCacheSearch got all resources that match on the identifier. we need extra logic
@@ -659,13 +661,12 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectAll
 			query += ",";
 		}
 	}
-	
-	std::string sql;
-	sql += "SELECT ";
-	sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
-	sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
-	sql += "FROM resources WHERE class_name IN(?) LIMIT 50";
-	matches = ResourceStatementMatches(sql, query);
+
+	// make sure to NOT get fully qualified matches since they are dups.  
+	std::ostringstream stream;
+	stream << " class_name IN (" << query << ") AND type IN(" << mvceditor::ResourceClass::CLASS_CONSTANT << ","
+		<< mvceditor::ResourceClass::MEMBER << "," << mvceditor::ResourceClass::METHOD << ") AND key = Identifier";
+	matches = ResourceStatementMatches(stream.str(), true);
 	return matches;
 }
 
@@ -680,12 +681,9 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectAll
 		UnicodeString key =  traitClassNameOnly + UNICODE_STRING_SIMPLE("::");
 		
 		std::string query = mvceditor::StringHelperClass::IcuToChar(key);
-		std::string sql;
-		sql += "SELECT ";
-		sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
-		sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
-		sql += "FROM resources WHERE key = ? LIMIT 50";
-		std::vector<mvceditor::ResourceClass> traitMatches = ResourceStatementMatches(sql, query);
+		std::ostringstream stream;
+		stream << " key LIKE '" << query << "%'";
+		std::vector<mvceditor::ResourceClass> traitMatches = ResourceStatementMatches(stream.str(), true);
 		matches.insert(matches.end(), traitMatches.begin(), traitMatches.end());
 		
 		// TODO weed out Matches from methods from the wrong namespace
@@ -711,12 +709,10 @@ std::vector<mvceditor::ResourceClass>  mvceditor::ResourceFinderClass::CollectNe
 	// a namespace or a fully qualified name
 	UnicodeString key = ClassName;
 	std::string query = mvceditor::StringHelperClass::IcuToChar(key);
-	std::string sql;
-	sql += "SELECT ";
-	sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
-	sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
-	sql += "FROM resources WHERE key = ? LIMIT 50";
-	matches = ResourceStatementMatches(sql, query);
+	std::ostringstream stream;
+	stream << " key LIKE '" << query << "%'";
+	matches = ResourceStatementMatches(stream.str(), true);
+
 	std::vector<mvceditor::ResourceClass>::iterator end = matches.end();
 	
 	// if there are exact matches; we only want to collect exact matches
@@ -734,20 +730,14 @@ std::vector<UnicodeString> mvceditor::ResourceFinderClass::ClassHierarchy(const 
 	std::vector<UnicodeString> parentClassNames;
 	parentClassNames.push_back(className);
 	UnicodeString lastClassName(className);
-	lastClassName.toLower();
 	bool done = false;
 	while (!done) {
 		done = true;
 
 		std::string query = mvceditor::StringHelperClass::IcuToChar(lastClassName);
-		std::string sql;
-		sql += "SELECT ";
-		sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
-		sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
-		sql += "FROM resources WHERE key = ? AND type=";
-		sql += mvceditor::ResourceClass::CLASS;
-		sql += " LIMIT 50";
-		std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(sql, query);		
+		std::ostringstream stream;
+		stream << " key = '" << query << "' AND TYPE = " << mvceditor::ResourceClass::CLASS;
+		std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(stream.str(), true);
 		for (std::vector<mvceditor::ResourceClass>::const_iterator it = matches.begin(); it != matches.end(); ++it) {
 			if (it->Type == ResourceClass::CLASS && 0 == it->ClassName.caseCompare(lastClassName, 0) && it->Signature.length()) {
 
@@ -772,14 +762,9 @@ UnicodeString mvceditor::ResourceFinderClass::GetResourceParentClassName(const U
 
 	// first query to get the parent class name
 	std::string query = mvceditor::StringHelperClass::IcuToChar(className);
-	std::string sql;
-	sql += "SELECT ";
-	sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
-	sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
-	sql += "FROM resources WHERE key = ? AND type=";
-	sql += mvceditor::ResourceClass::CLASS;
-	sql += " LIMIT 50";
-	std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(sql, query);	
+	std::ostringstream stream;
+	stream << " key = '" << query << "' AND type = " << mvceditor::ResourceClass::CLASS;
+	std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(stream.str(), false);
 	if (!matches.empty()) {
 		mvceditor::ResourceClass resource = matches[0];
 		parentClassName = ExtractParentClassFromSignature(resource.Signature);
@@ -790,16 +775,9 @@ UnicodeString mvceditor::ResourceFinderClass::GetResourceParentClassName(const U
 		std::string query = mvceditor::StringHelperClass::IcuToChar(parentClassName);
 		query += "::";
 		query += mvceditor::StringHelperClass::IcuToChar(methodName);
-		query += "%";
-		std::string sql;
-		sql += "SELECT ";
-		sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
-		sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
-		sql += "FROM resources WHERE key LIKE ? AND type = ";
-		sql += mvceditor::ResourceClass::METHOD;
-		sql += " LIMIT 50";
-		
-		matches = ResourceStatementMatches(sql, query);		
+		std::ostringstream stream;
+		stream << " key LIKE '" << query << "%' AND type = " << mvceditor::ResourceClass::METHOD;
+		matches = ResourceStatementMatches(stream.str(), true);
 		UnicodeString parentClassSignature;
 		bool found = false;
 		if (!matches.empty()) {
@@ -1130,7 +1108,7 @@ bool mvceditor::ResourceFinderClass::IsNewNamespace(const UnicodeString& namespa
 	int count = 0;
 	soci::statement stmt = (Session.prepare << sql, soci::use(nm), soci::use(type), soci::into(count));
 	bool isNew = false;
-	if (count < 0) {
+	if (count <= 0) {
 		ResourceClass namespaceItem;
 		namespaceItem.NamespaceName = namespaceName;
 		namespaceItem.Identifier = namespaceName;
@@ -1219,19 +1197,9 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectFul
 		for (size_t i = 0; i < classHierarchy.size(); ++i) {
 			UnicodeString key = classHierarchy[i] + UNICODE_STRING_SIMPLE("::") + MethodName;
 			std::string query = mvceditor::StringHelperClass::IcuToChar(key);
-			std::string sql;
-			sql += "SELECT ";
-			sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
-			sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
-			sql += "FROM resources WHERE key = (?) AND type IN(";
-			sql += mvceditor::ResourceClass::CLASS_CONSTANT;
-			sql += ",";
-			sql += mvceditor::ResourceClass::MEMBER;
-			sql += ",";
-			sql += mvceditor::ResourceClass::METHOD;
-			sql += ") LIMIT 50";
-
-			std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(sql, query);
+			std::ostringstream stream;
+			stream << " key = '" << query << "' AND type IN(" << mvceditor::ResourceClass::MEMBER << "," << mvceditor::ResourceClass::METHOD << ")";
+			std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(stream.str(), true);
 			if (!matches.empty()) {
 				allMatches.push_back(matches[0]);
 			}
@@ -1240,20 +1208,11 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectFul
 	else if (NAMESPACE_NAME == ResourceType) {
 		UnicodeString key = ClassName;
 		std::string query = mvceditor::StringHelperClass::IcuToChar(key);
-		std::string sql;
-		sql += "SELECT ";
-		sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
-		sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
-		sql += "FROM resources WHERE key = (?) AND type IN(";
-		sql += mvceditor::ResourceClass::NAMESPACE;
-		sql += ",";
-		sql += mvceditor::ResourceClass::MEMBER;
-		sql += ",";
-		sql += mvceditor::ResourceClass::METHOD;
-		sql += ") LIMIT 50";
-		
+		std::ostringstream stream;
+		stream << " key = '" << query << "'";
+
 		// make sure there is one and only one item that matches the search.
-		std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(sql, query);
+		std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(stream.str(), true);
 		if (matches.size() == 1) {
 			allMatches.push_back(matches[0]);
 		}
@@ -1261,14 +1220,11 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectFul
 	else {
 		UnicodeString key = ClassName;
 		std::string query = mvceditor::StringHelperClass::IcuToChar(key);
-		std::string sql;
-		sql += "SELECT ";
-		sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
-		sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
-		sql += "FROM resources WHERE key = (?) LIMIT 50";
+		std::ostringstream stream;
+		stream << " key = '" << query << "'";
 
 		// make sure there is one and only one item that matches the search.
-		std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(sql, query);
+		std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(stream.str(), true);
 		if (matches.size() == 1) {
 			allMatches.push_back(matches[0]);
 		}
@@ -1339,14 +1295,7 @@ void mvceditor::ResourceFinderClass::EnsureMatchesExist(std::vector<ResourceClas
 void mvceditor::ResourceFinderClass::Print() {
 	UFILE *out = u_finit(stdout, NULL, NULL);
 	u_fprintf(out, "LookingFor=%.*S,%.*S\n", ClassName.length(), ClassName.getBuffer(), MethodName.length(), MethodName.getBuffer());
-	
-	std::string sql;
-	std::string query = "1";
-	sql += "SELECT ";
-	sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
-	sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
-	sql += "FROM resources WHERE 1 = ?";
-	std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(sql, query);
+	std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches("1=1", false);
 	for (std::vector<mvceditor::ResourceClass>::const_iterator it = matches.begin(); it != matches.end(); ++it) {
 		switch (it->Type) {
 			case mvceditor::ResourceClass::CLASS :
@@ -1406,7 +1355,7 @@ bool mvceditor::ResourceFinderClass::IsFileCacheEmpty() {
 	}
 	int count = 0;
 	Session.once << "SELECT COUNT(*) FROM file_items;", soci::into(count);
-	return 0 <= count;
+	return count <= 0;
 }
 
 bool mvceditor::ResourceFinderClass::IsResourceCacheEmpty() {
@@ -1417,37 +1366,43 @@ bool mvceditor::ResourceFinderClass::IsResourceCacheEmpty() {
 	// make sure only parsed resource came from the native functions file.
 	int count = 0;
 	Session.once << "SELECT COUNT(*) FROM resources WHERE is_native = 0;", soci::into(count);
-	return 0 <= count;
+	return count <= 0;
 }
 
 void mvceditor::ResourceFinderClass::AddDynamicResources(const std::vector<mvceditor::ResourceClass>& dynamicResources) {
-
 	std::vector<mvceditor::ResourceClass> newResources;
+	
 	for (std::vector<mvceditor::ResourceClass>::const_iterator it = dynamicResources.begin(); it != dynamicResources.end(); ++it) {
 		mvceditor::ResourceClass resource = *it;
 		if (mvceditor::ResourceClass::MEMBER == resource.Type || mvceditor::ResourceClass::METHOD == resource.Type) {
 
 			// need to account for duplicates; if so then only update
 			bool updated = false;
-			std::string sql;
-			sql += "SELECT return_type FROM resources WHERE class_name = ? AND identifier = ? AND type IN(";
-			sql += mvceditor::ResourceClass::MEMBER;
-			sql += ",";
-			sql += mvceditor::ResourceClass::METHOD;
-			sql += ")";
+			std::ostringstream stream;
+			stream << "SELECT return_type, class_name, identifier FROM resources WHERE class_name = ? AND identifier = ? AND type IN("
+				<< mvceditor::ResourceClass::MEMBER
+				<< ","
+				<< mvceditor::ResourceClass::METHOD
+				<< ")";
 
-			std::string returnType;
+			std::string returnType, 
+				classNameOut, 
+				identifierOut;
 			std::string className = mvceditor::StringHelperClass::IcuToChar(resource.ClassName);
 			std::string identifier = mvceditor::StringHelperClass::IcuToChar(resource.Identifier);
-			Session.once << sql, soci::use(className), soci::use(identifier), soci::into(returnType);
-			if (returnType.empty()) {
+			Session.once << stream.str(), soci::use(className), soci::use(identifier), soci::into(returnType), soci::into(classNameOut)
+				, soci::into(identifierOut);
+			if (returnType.empty() && !classNameOut.empty() && !identifierOut.empty()) {
+
+				// resource already exists, only update the return type
 				returnType = mvceditor::StringHelperClass::IcuToChar(resource.ReturnType);
-				sql = "UPDATE resources SET return_type = ? WHERE class_name = ? AND identifier = ? AND type IN(";
-				sql += mvceditor::ResourceClass::MEMBER;
-				sql += ",";
-				sql += mvceditor::ResourceClass::METHOD;
-				sql += ")";				
-				Session.once << sql, soci::use(returnType), soci::use(className), soci::use(identifier);
+				std::ostringstream updateStream;
+				updateStream << "UPDATE resources SET return_type = ? WHERE class_name = ? AND identifier = ? AND type IN("
+					<< mvceditor::ResourceClass::MEMBER
+					<< ","
+					<< mvceditor::ResourceClass::METHOD
+					<< ")";
+				Session.once << updateStream.str(), soci::use(returnType), soci::use(className), soci::use(identifier);
 				updated = true;
 			}
 			if (!updated) {
@@ -1464,20 +1419,24 @@ void mvceditor::ResourceFinderClass::AddDynamicResources(const std::vector<mvced
 
 			// look at the class, function, cache
 			bool updated = false;
-			std::string sql;
-			sql += "SELECT return_type FROM resources WHERE class_name = '' AND identifier = ? AND type IN(";
-			sql += mvceditor::ResourceClass::FUNCTION;
-			sql += ")";
+			std::ostringstream stream;
+			stream << "SELECT return_type, identifier FROM resources WHERE class_name = ? AND identifier = ? AND type IN("
+				<< mvceditor::ResourceClass::FUNCTION
+				<< ")";
 			std::string className = mvceditor::StringHelperClass::IcuToChar(resource.ClassName);
 			std::string identifier = mvceditor::StringHelperClass::IcuToChar(resource.Identifier);
 			std::string returnType;
-			Session.once << sql, soci::use(identifier), soci::into(returnType);
-			if (returnType.empty()) {
+			std::string identifierOut;
+			Session.once << stream.str(), soci::use(identifier), soci::into(returnType), soci::into(identifierOut);
+			if (returnType.empty() && !identifier.empty()) {
+
+				// function already exists, just update the return type
 				returnType = mvceditor::StringHelperClass::IcuToChar(resource.ReturnType);
-				sql = "UPDATE resources SET return_type = ? WHERE class_name = ? AND identifier = ? AND type IN(";
-				sql += mvceditor::ResourceClass::FUNCTION;
-				sql += ")";				
-				Session.once << sql, soci::use(returnType), soci::use(className), soci::use(identifier);
+				std::ostringstream updateStream;
+				updateStream << "UPDATE resources SET return_type = ? WHERE class_name = ? AND identifier = ? AND type IN("
+					<< mvceditor::ResourceClass::FUNCTION
+					<< ")";				
+				Session.once << updateStream.str(), soci::use(returnType), soci::use(className), soci::use(identifier);
 				updated = true;
 			}
 			if (!updated) {
@@ -1556,6 +1515,9 @@ bool mvceditor::ResourceFinderClass::LoadTagFile(const wxFileName& fileName, boo
 			}
 		}
 		u_fclose(uf);
+		if (!IsCacheInitialized) {
+			Init();
+		}
 		PushIntoResourceCache(newResources, -1);
 	}
 	return good;
@@ -1567,8 +1529,8 @@ void mvceditor::ResourceFinderClass::PushIntoFileCache(mvceditor::FileItemClass&
 	}
 	std::string fullPath = mvceditor::StringHelperClass::wxToChar(fileItem.FullPath);
 	std::tm tm;
-	int isParsed;
-	int isNew;
+	int isParsed = fileItem.IsParsed ? 1 : 0;
+	int isNew = fileItem.IsNew ? 1 : 0;
 	if (fileItem.DateTime.IsValid()) {
 		wxDateTime::Tm wxTm = fileItem.DateTime.GetTm();
 		tm.tm_hour = wxTm.hour;
@@ -1579,16 +1541,17 @@ void mvceditor::ResourceFinderClass::PushIntoFileCache(mvceditor::FileItemClass&
 		tm.tm_sec = wxTm.sec;
 		tm.tm_wday = fileItem.DateTime.GetWeekDay();
 		tm.tm_yday = fileItem.DateTime.GetDayOfYear();
-		tm.tm_year = wxTm.year;
+
+		// tm holds number of years since 1900 (2012 = 112)
+		tm.tm_year = wxTm.year - 1900;
 	}
 	soci::statement stmt = (Session.prepare <<
 		"INSERT INTO file_items (file_item_id, full_path, last_modified, is_parsed, is_new) VALUES(NULL, ?, ?, ?, ?)",
 		soci::use(fullPath), soci::use(tm), soci::use(isParsed), soci::use(isNew)
 	);
-	if (stmt.execute(true)) {
-		soci::sqlite3_statement_backend* backend = static_cast<soci::sqlite3_statement_backend*>(stmt.get_backend());
-		fileItem.FileId = sqlite3_last_insert_rowid(backend->session_.conn_);
-	}
+	stmt.execute(true);
+	soci::sqlite3_statement_backend* backend = static_cast<soci::sqlite3_statement_backend*>(stmt.get_backend());
+	fileItem.FileId = sqlite3_last_insert_rowid(backend->session_.conn_);
 }
 
 bool mvceditor::ResourceFinderClass::FindInFileCache(const wxString& fullPath, mvceditor::FileItemClass& fileItem) {
@@ -1601,7 +1564,7 @@ bool mvceditor::ResourceFinderClass::FindInFileCache(const wxString& fullPath, m
 	int isNew;
 
 	std::string query = mvceditor::StringHelperClass::wxToChar(fullPath);
-	std::string sql = "SELECT file_item_id, last_modified, is_parsed, is_new FROM file_items WHERE fullpath = ?";
+	std::string sql = "SELECT file_item_id, last_modified, is_parsed, is_new FROM file_items WHERE full_path = ?";
 	soci::statement stmt = (Session.prepare << sql, soci::use(query), 
 		soci::into(fileItemId), soci::into(lastModified), soci::into(isParsed), soci::into(isNew)
 	);
@@ -1634,8 +1597,8 @@ std::vector<mvceditor::FileItemClass> mvceditor::ResourceFinderClass::FileItems(
 	std::tm tm;
 	int isParsed;
 	int isNew;
-	std::string sql = "SELECT file_item_id, full_path, last_modified, is_parsed, is_new FROM file_items WHERE file_item_id IN(?)";
-	soci::statement stmt = (Session.prepare << sql, soci::use(ids),
+	std::string sql = "SELECT file_item_id, full_path, last_modified, is_parsed, is_new FROM file_items WHERE file_item_id IN(" + ids + ")";
+	soci::statement stmt = (Session.prepare << sql,
 		soci::into(fileItemId), soci::into(fullPath), soci::into(tm), soci::into(isParsed), soci::into(isNew)
 	);
 	stmt.execute();
@@ -1646,11 +1609,22 @@ std::vector<mvceditor::FileItemClass> mvceditor::ResourceFinderClass::FileItems(
 		fileItem.FullPath = mvceditor::StringHelperClass::charToWx(fullPath.c_str());
 		fileItem.IsNew = isNew != 0;
 		fileItem.IsParsed = isParsed != 0;
+		fileItems.push_back(fileItem);
 	}
 	return fileItems;
 }
 
-std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::ResourceStatementMatches(std::string sql, std::string param) {
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::ResourceStatementMatches(std::string whereCond, bool doLimit) {
+	std::string sql;
+	sql += "SELECT file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment,";
+	sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
+	sql += "FROM resources WHERE ";
+	sql += whereCond;
+	sql += " ORDER BY key";
+	if (doLimit) {
+		sql += " LIMIT 50";
+	}
+
 	std::vector<mvceditor::ResourceClass> matches;
 	if (!IsCacheInitialized) {
 		return matches;
@@ -1663,48 +1637,49 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::ResourceSt
 	std::string namespaceName;
 	std::string signature;
 	std::string returnType;
+	std::string comment;
 	int isProtected;
 	int isPrivate;
 	int isStatic;
 	int isDynamic;
 	int isNative;
 	soci::statement stmt = (Session.prepare << sql,
-		soci::use(param),
 		soci::into(fileItemId), soci::into(key), soci::into(identifier), soci::into(className), 
 		soci::into(type), soci::into(namespaceName), soci::into(signature), 
-		soci::into(returnType), soci::into(isProtected), soci::into(isPrivate), 
+		soci::into(returnType), soci::into(comment), soci::into(isProtected), soci::into(isPrivate), 
 		soci::into(isStatic), soci::into(isDynamic), soci::into(isNative)
 	);
-	stmt.execute(true);
-	while (stmt.fetch()) {
-		mvceditor::ResourceClass resource;
-		resource.FileItemId = fileItemId;
-		resource.Key = mvceditor::StringHelperClass::charToIcu(key.c_str());
-		resource.Identifier = mvceditor::StringHelperClass::charToIcu(identifier.c_str());
-		resource.ClassName = mvceditor::StringHelperClass::charToIcu(className.c_str());
-		resource.Type = (mvceditor::ResourceClass::Types)type;
-		resource.NamespaceName = mvceditor::StringHelperClass::charToIcu(namespaceName.c_str());
-		resource.Signature = mvceditor::StringHelperClass::charToIcu(signature.c_str());
-		resource.ReturnType = mvceditor::StringHelperClass::charToIcu(returnType.c_str());
-		resource.IsProtected = isProtected != 0;
-		resource.IsPrivate = isPrivate != 0;
-		resource.IsStatic = isStatic != 0;
-		resource.IsDynamic = isDynamic != 0;
-		resource.IsNative = isNative != 0;
+	if (stmt.execute(true)) {
+		do {
+			mvceditor::ResourceClass resource;
+			resource.FileItemId = fileItemId;
+			resource.Key = mvceditor::StringHelperClass::charToIcu(key.c_str());
+			resource.Identifier = mvceditor::StringHelperClass::charToIcu(identifier.c_str());
+			resource.ClassName = mvceditor::StringHelperClass::charToIcu(className.c_str());
+			resource.Type = (mvceditor::ResourceClass::Types)type;
+			resource.NamespaceName = mvceditor::StringHelperClass::charToIcu(namespaceName.c_str());
+			resource.Signature = mvceditor::StringHelperClass::charToIcu(signature.c_str());
+			resource.ReturnType = mvceditor::StringHelperClass::charToIcu(returnType.c_str());
+			resource.Comment = mvceditor::StringHelperClass::charToIcu(comment.c_str());
+			resource.IsProtected = isProtected != 0;
+			resource.IsPrivate = isPrivate != 0;
+			resource.IsStatic = isStatic != 0;
+			resource.IsDynamic = isDynamic != 0;
+			resource.IsNative = isNative != 0;
 
-		matches.push_back(resource);
+			matches.push_back(resource);
+		} while (stmt.fetch());
 	}
-
 	return matches;
 }
 
-bool mvceditor::ResourceFinderClass::Persist(const wxFileName& outputFile) const {
+bool mvceditor::ResourceFinderClass::Persist(const wxFileName& outputFile) {
 	if (!outputFile.IsOk()) {
 		return false;
 	}
 	bool error = false;
+	
 	// TODO can we juse use the SQLite database file
-	/*
 	wxFFile file(outputFile.GetFullPath(), wxT("wb"));
 	if (!file.IsOpened()) {
 		return false;
@@ -1715,63 +1690,63 @@ bool mvceditor::ResourceFinderClass::Persist(const wxFileName& outputFile) const
 	}
 	int32_t written;
 	
-	std::vector<mvceditor::ResourceClass>::const_iterator it;
-	for (it = IdentifierCache.begin(); it != IdentifierCache.end() && !error; ++it) {
-		if (it->FileItemId >= 0) {
+	// watch out for dynamic resources and 'native' functions
+	// we dont want to persist those for now 
+	std::string whereCond = "is_native = 0 AND is_dynamic = 0 AND file_item_id > 0";
+	std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(whereCond, false);
+	std::vector<mvceditor::ResourceClass>::iterator it;
+	for (it = matches.begin(); it != matches.end() && !error; ++it) {
+		if (it->Key.indexOf(UNICODE_STRING_SIMPLE("::")) >= 0 ||
+			it->Key.indexOf(UNICODE_STRING_SIMPLE("\\")) >= 0) {
 
-			// watch out for dynamic resources and 'native' functions
-			// we dont want to persist those for now 
-			if (mvceditor::ResourceClass::CLASS == it->Type && !it->IsNative) {
-				UnicodeString uniFile = mvceditor::StringHelperClass::wxToIcu(FileCache[it->FileItemId].FullPath);
-				written = u_fprintf(uf, "CLASS,%S,%.*S,\n", 
-					uniFile.getTerminatedBuffer(), it->ClassName.length(), it->ClassName.getBuffer());
-				error = 0 == written;
-			}
-			else if (mvceditor::ResourceClass::FUNCTION == it->Type && !it->IsNative) {
-				UnicodeString uniFile = mvceditor::StringHelperClass::wxToIcu(FileCache[it->FileItemId].FullPath);
-				written = u_fprintf(uf, "FUNCTION,%S,%.*S,\n", 
-					uniFile.getTerminatedBuffer(), it->Identifier.length(), it->Identifier.getBuffer());
-				error = 0 == written;
-			}
+			// this is a duplicate, fully qualified match.  skip it
+			continue;
 		}
-	}
-	for (it = MembersCache.begin(); it != MembersCache.end() && !error; ++it) {
-		if (it->FileItemId >= 0) {
-			UnicodeString className(it->ClassName);
-
-			// watch out for dynamic resources and 'native' functions
-			// we dont want to persist those for now 
-			if (mvceditor::ResourceClass::MEMBER == it->Type && !it->IsNative) {
-				UnicodeString uniFile = mvceditor::StringHelperClass::wxToIcu(FileCache[it->FileItemId].FullPath);
-				written = u_fprintf(uf, "MEMBER,%S,%S,%.*S\n", 
-					uniFile.getTerminatedBuffer(), 
-					className.getTerminatedBuffer(),
-					it->Identifier.length(), it->Identifier.getBuffer());
-				error = 0 == written;
-			}
-			else if (mvceditor::ResourceClass::METHOD == it->Type && !it->IsNative) {
-				UnicodeString uniFile = mvceditor::StringHelperClass::wxToIcu(FileCache[it->FileItemId].FullPath);
-				written = u_fprintf(uf, "METHOD,%S,%S,%.*S\n", 
-					uniFile.getTerminatedBuffer(), 
-					className.getTerminatedBuffer(),
-					it->Identifier.length(), it->Identifier.getBuffer());
-				error = 0 == written;
-			}
+		// TODO: doing N queries to get the full path, this is not good
+		// once we get rid of this custom file format and just use sqlite everywhere 
+		// then this will be solved.
+		std::vector<int> fileItemIds;
+		fileItemIds.push_back(it->FileItemId);
+		std::vector<mvceditor::FileItemClass> fileItems = FileItems(fileItemIds);
+		wxString fullPath;
+		if (!fileItems.empty()) {
+			fullPath = fileItems[0].FullPath;
+		}
+		if (mvceditor::ResourceClass::CLASS == it->Type) {
+			UnicodeString uniFile = mvceditor::StringHelperClass::wxToIcu(fullPath);
+			written = u_fprintf(uf, "CLASS,%S,%.*S,\n", 
+				uniFile.getTerminatedBuffer(), it->ClassName.length(), it->ClassName.getBuffer());
+			error = 0 == written;
+		}
+		else if (mvceditor::ResourceClass::FUNCTION == it->Type) {
+			UnicodeString uniFile = mvceditor::StringHelperClass::wxToIcu(fullPath);
+			written = u_fprintf(uf, "FUNCTION,%S,%.*S,\n", 
+				uniFile.getTerminatedBuffer(), it->Identifier.length(), it->Identifier.getBuffer());
+			error = 0 == written;
+		}
+		else if (mvceditor::ResourceClass::MEMBER == it->Type) {
+			UnicodeString uniFile = mvceditor::StringHelperClass::wxToIcu(fullPath);
+			written = u_fprintf(uf, "MEMBER,%S,%S,%.*S\n", 
+				uniFile.getTerminatedBuffer(), 
+				it->ClassName.getTerminatedBuffer(),
+				it->Identifier.length(), it->Identifier.getBuffer());
+			error = 0 == written;
+		}
+		else if (mvceditor::ResourceClass::METHOD == it->Type && !it->IsNative) {
+			UnicodeString uniFile = mvceditor::StringHelperClass::wxToIcu(fullPath);
+			written = u_fprintf(uf, "METHOD,%S,%S,%.*S\n", 
+				uniFile.getTerminatedBuffer(), 
+				it->ClassName.getTerminatedBuffer(),
+				it->Identifier.length(), it->Identifier.getBuffer());
+			error = 0 == written;
 		}
 	}
 	u_fclose(uf);
-	*/
 	return !error;
 }
 
 std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::All() {
-	std::string sql;
-	sql += "SELECT ";
-	sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
-	sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
-	sql += "FROM resources WHERE 1 = ?";
-
-	std::vector<mvceditor::ResourceClass> all = ResourceStatementMatches(sql, "0");
+	std::vector<mvceditor::ResourceClass> all = ResourceStatementMatches("1=1", false);
 	
 	// remove the 'duplicates' ie. extra fully qualified entries to make lookups faster
 	std::vector<mvceditor::ResourceClass>::iterator it = all.begin();
@@ -1788,14 +1763,9 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::All() {
 }
 
 std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::AllNonNativeClasses() {
-	std::string sql;
-	sql += "SELECT ";
-	sql += "file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type,";
-	sql += "is_protected, is_private, is_static, is_dynamic, is_native ";
-	sql += "FROM resources WHERE is_native = ? AND type =";
-	sql += mvceditor::ResourceClass::CLASS;
-
-	std::vector<mvceditor::ResourceClass> all = ResourceStatementMatches(sql, "0");
+	std::ostringstream stream;
+	stream << " is_native = 0 AND type =" << mvceditor::ResourceClass::CLASS;
+	std::vector<mvceditor::ResourceClass> all = ResourceStatementMatches(stream.str(), false);
 	return all;
 }
 
@@ -1804,8 +1774,8 @@ void mvceditor::ResourceFinderClass::Clear() {
 		return;
 	}
 	FileParsingCache.clear();
-	Session.once << "TRUNCATE file_items;";
-	Session.once << "TRUNCATE resources;";
+	Session.once << "DELETE FROM file_items;";
+	Session.once << "DELETE FROM resources;";
 }
 
 void mvceditor::ResourceFinderClass::PushIntoResourceCache(const std::vector<mvceditor::ResourceClass>& resources, int fileItemId) {
@@ -1816,12 +1786,12 @@ void mvceditor::ResourceFinderClass::PushIntoResourceCache(const std::vector<mvc
 	sql += "INSERT INTO resources (";
 	sql += "file_item_id, key, identifier, class_name, ";
 	sql += "type, namespace_name, signature, ";
-	sql += "return_type, is_protected, is_private, ";
+	sql += "return_type, comment, is_protected, is_private, ";
 	sql += "is_static, is_dynamic, is_native";
 	sql += ") VALUES(";
 	sql += "?, ?, ?, ?, ";
 	sql += "?, ?, ?, ";
-	sql += "?, ?, ?, ";
+	sql += "?, ?, ?, ?, ";
 	sql += "?, ?, ?";
 	sql += ");";
 
@@ -1832,6 +1802,7 @@ void mvceditor::ResourceFinderClass::PushIntoResourceCache(const std::vector<mvc
 	std::string namespaceName;
 	std::string signature;
 	std::string returnType;
+	std::string comment;
 	int isProtected;
 	int isPrivate;
 	int isStatic;
@@ -1843,7 +1814,7 @@ void mvceditor::ResourceFinderClass::PushIntoResourceCache(const std::vector<mvc
 	soci::statement stmt = (Session.prepare << sql,
 		soci::use(fileItemId), soci::use(key), soci::use(identifier), soci::use(className), 
 		soci::use(type), soci::use(namespaceName), soci::use(signature), 
-		soci::use(returnType), soci::use(isProtected), soci::use(isPrivate), 
+		soci::use(returnType), soci::use(comment), soci::use(isProtected), soci::use(isPrivate), 
 		soci::use(isStatic), soci::use(isDynamic), soci::use(isNative)
 	);
 	for (size_t i = 0; i < resources.size(); ++i) {
@@ -1855,6 +1826,7 @@ void mvceditor::ResourceFinderClass::PushIntoResourceCache(const std::vector<mvc
 		namespaceName = mvceditor::StringHelperClass::IcuToChar(res.NamespaceName);
 		signature = mvceditor::StringHelperClass::IcuToChar(res.Signature);
 		returnType = mvceditor::StringHelperClass::IcuToChar(res.ReturnType);
+		comment = mvceditor::StringHelperClass::IcuToChar(res.Comment);
 		isProtected = res.IsProtected;
 		isPrivate = res.IsPrivate;
 		isStatic = res.IsStatic;

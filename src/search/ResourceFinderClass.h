@@ -415,7 +415,7 @@ public:
 	 *
 	 * @return bool TRUE if file was successfully written to.
 	 */
-	bool Persist(const wxFileName& outputFile) const;
+	bool Persist(const wxFileName& outputFile);
 
 	/**
 	 * @return vector of ALL parsed Resources. Be careful as this method may return
@@ -670,11 +670,15 @@ private:
 	std::vector<mvceditor::FileItemClass> FileItems(const std::vector<int>& fileItemIds);
 
 	/**
-	 * @param the query to execute (query must be into the resources table)
-	 * @param param the binding param. query must contain one and only one bound parameter.
+	 * @param whereCond the WHERE clause of the query to execute (query will be into the resources table)
+	 *        this does NOT have the "where" keyword.  examples:  
+	 *        "Key = 'ClassName'"
+	 *        "Key = 'ClassName::Method' AND Type IN(3)"
+	 * @param doLimit if TRUE a max amount of results will be returned, if FALSE then ALL results will be returned
+	 *        most of the time you want to set this to TRUE
 	 * @return the vector of resources pulled from the statement's results
 	 */
-	std::vector<mvceditor::ResourceClass> ResourceStatementMatches(std::string sql, std::string param);
+	std::vector<mvceditor::ResourceClass> ResourceStatementMatches(std::string whereCond, bool doLimit);
 
 	/**
 	 * add all of the given resources into the database.
