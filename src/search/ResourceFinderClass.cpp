@@ -297,26 +297,31 @@ void mvceditor::ResourceFinderClass::SetVersion(pelet::Versions version) {
 	Parser.SetVersion(version);
 }
 
-void mvceditor::ResourceFinderClass::Init() {
-	try {
-		std::ostringstream stream;
-		stream << ":memory:";
-		/*stream << "C:\\users\\roberto\\Documents\\test_"
-			<< cnt
-			<< ".db";
-		*/
-		Session.open(*soci::factory_sqlite3(), stream.str());
-		
-		Session.once << "DROP TABLE IF EXISTS file_items;";
-		Session.once << "DROP TABLE IF EXISTS resources;";
+void mvceditor::ResourceFinderClass::InitMemory() {
+	OpenAndCreateTables(":memory:");
+}
 
+void mvceditor::ResourceFinderClass::InitFile(const wxFileName& fileName) {
+	std::string str = mvceditor::StringHelperClass::wxToChar(fileName.GetFullPath());
+	OpenAndCreateTables(str);
+}
+
+void mvceditor::ResourceFinderClass::OpenAndCreateTables(std::string db) {
+	try {
+
+		// close any existing connection
+		if (IsCacheInitialized) {
+			Session.close();
+			IsCacheInitialized = false;
+		}
+		Session.open(*soci::factory_sqlite3(), db);
 		std::string sql;
-		sql += "CREATE TABLE file_items (",
+		sql += "CREATE TABLE IF NOT EXISTS file_items (",
 		sql += "  file_item_id INTEGER PRIMARY KEY, full_path TEXT, last_modified DATETIME, is_parsed INTEGER, is_new INTEGER ";
 		sql += ");";
 		Session.once << sql;
 		sql = "";
-		sql += "CREATE TABLE resources (";
+		sql += "CREATE TABLE IF NOT EXISTS resources (";
 		sql += "  file_item_id INTEGER, key TEXT, identifier TEXT, class_name TEXT, ";
 		sql += "  type INTEGER, namespace_name TEXT, signature TEXT, comment TEXT, ";
 		sql += "  return_type TEXT, is_protected INTEGER, is_private INTEGER, ";
@@ -350,11 +355,6 @@ bool mvceditor::ResourceFinderClass::Walk(const wxString& fileName) {
 		}
 	}
 	if (matchedFilter) {
-
-		// initialize the database only when there is a file we want to parse
-		if (!IsCacheInitialized) {
-			Init();
-		}
 		switch (ResourceType) {
 			case FILE_NAME:
 			case FILE_NAME_LINE_NUMBER:
@@ -373,10 +373,6 @@ bool mvceditor::ResourceFinderClass::Walk(const wxString& fileName) {
 }
 
 void mvceditor::ResourceFinderClass::BuildResourceCacheForFile(const wxString& fullPath, const UnicodeString& code, bool isNew) {
-	// initialize the database only when there is a file we want to parse
-	if (!IsCacheInitialized) {
-		Init();
-	}
 
 	// remove all previous cached resources
 	mvceditor::FileItemClass fileItem;
@@ -1515,9 +1511,6 @@ bool mvceditor::ResourceFinderClass::LoadTagFile(const wxFileName& fileName, boo
 			}
 		}
 		u_fclose(uf);
-		if (!IsCacheInitialized) {
-			Init();
-		}
 		PushIntoResourceCache(newResources, -1);
 	}
 	return good;

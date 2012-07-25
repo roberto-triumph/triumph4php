@@ -50,6 +50,7 @@ public:
 		if (wxDirExists(TestProjectDir)) {
 			RecursiveRmDir(TestProjectDir);
 		}
+		ResourceFinder.InitMemory();
 	}
 	
 	/**
@@ -82,6 +83,7 @@ public:
 		, TestFile(wxT("test.php"))
 		, Matches() {
 		ResourceFinder.FileFilters.push_back(wxT("*.php"));
+		ResourceFinder.InitMemory();
 	}
 	
 	/**
@@ -100,6 +102,52 @@ public:
 	mvceditor::ResourceFinderClass ResourceFinder;
 	wxString TestFile;
 	std::vector<mvceditor::ResourceClass> Matches;
+};
+
+class DynamicResourceTestClass {
+
+public:
+
+	mvceditor::ResourceFinderClass ResourceFinder;
+	std::vector<mvceditor::ResourceClass> DynamicResources;
+	std::vector<mvceditor::ResourceClass> Matches;
+	wxString TestFile;
+
+	DynamicResourceTestClass() 
+		: ResourceFinder() 
+		, DynamicResources()
+		, Matches()
+		, TestFile(wxT("test.php")) {
+		ResourceFinder.FileFilters.push_back(wxT("*.php"));
+		ResourceFinder.InitMemory();
+		
+		// create a small class that implements a magic method
+		// then add a dynamic resource that will be used to mimic the resource
+		// returned by the magic method.
+		ResourceFinder.BuildResourceCacheForFile(TestFile, mvceditor::StringHelperClass::charToIcu(
+			"<?php\n"
+			"class MyDynamicClass {\n"
+			"\tfunction work() {} \n"
+			"\tfunction __get($name) {\n"
+			"\t\treturn $name == 'address' ? '123 main st.' : '';\n"
+			"\t}\n"
+			"}\n"
+			"function globalHandle() {\n"
+			"\treturn new MyDynamicClass;\n"
+			"}\n"
+		), true);
+
+		mvceditor::ResourceClass res;
+		res.Identifier = UNICODE_STRING_SIMPLE("address");
+		res.ReturnType = UNICODE_STRING_SIMPLE("string");
+		res.Type = mvceditor::ResourceClass::MEMBER;
+		res.ClassName = UNICODE_STRING_SIMPLE("MyDynamicClass");
+		DynamicResources.push_back(res);
+	}
+
+	void CollectNearMatchResources() {
+		Matches = ResourceFinder.CollectNearMatchResources();
+	}
 };
 
 #define CHECK_MEMBER_RESOURCE(className, identifier, resource) \
@@ -766,6 +814,32 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindMat
 	CHECK_UNISTR_EQUALS("printUserList", Matches[1].Identifier);
 }
 
+TEST_FIXTURE(ResourceFinderFileTestClass, InitFileShouldLoadDbFromFile) {
+	wxFileName newDbFileName(TestProjectDir, wxT("test.db"));
+	ResourceFinder.InitFile(newDbFileName);
+	Prep(wxString::FromAscii(
+		"<?php\n"
+		"$s = 'hello';\n"
+		"\n"
+		"?>\n"
+	));
+	CHECK(ResourceFinder.Prepare(TestFile));
+	ResourceFinder.Walk(TestProjectDir + TestFile);
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
+
+	// do a lookup in the new resource finder that only looks at the DB file
+	// and does not parse the file system
+	mvceditor::ResourceFinderClass newResourceFinder;
+	newResourceFinder.InitFile(newDbFileName);
+	newResourceFinder.Prepare(TestFile);
+	Matches = newResourceFinder.CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
+}
+
+
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesWhenUsingBuildResourceCacheForFileAndUsingNewFile) {
 	Prep(mvceditor::StringHelperClass::charToIcu(
 		
@@ -1385,51 +1459,6 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraitsWh
 	CHECK_MEMBER_RESOURCE("ezcReflectionReturnInfo", "getReturnType", Matches[2]);
 	CHECK_UNISTR_EQUALS("getReturnType", Matches[2].Identifier);
 }
-
-class DynamicResourceTestClass {
-
-public:
-
-	mvceditor::ResourceFinderClass ResourceFinder;
-	std::vector<mvceditor::ResourceClass> DynamicResources;
-	std::vector<mvceditor::ResourceClass> Matches;
-	wxString TestFile;
-
-	DynamicResourceTestClass() 
-		: ResourceFinder() 
-		, DynamicResources()
-		, Matches()
-		, TestFile(wxT("test.php")) {
-		ResourceFinder.FileFilters.push_back(wxT("*.php"));
-		
-		// create a small class that implements a magic method
-		// then add a dynamic resource that will be used to mimic the resource
-		// returned by the magic method.
-		ResourceFinder.BuildResourceCacheForFile(TestFile, mvceditor::StringHelperClass::charToIcu(
-			"<?php\n"
-			"class MyDynamicClass {\n"
-			"\tfunction work() {} \n"
-			"\tfunction __get($name) {\n"
-			"\t\treturn $name == 'address' ? '123 main st.' : '';\n"
-			"\t}\n"
-			"}\n"
-			"function globalHandle() {\n"
-			"\treturn new MyDynamicClass;\n"
-			"}\n"
-		), true);
-
-		mvceditor::ResourceClass res;
-		res.Identifier = UNICODE_STRING_SIMPLE("address");
-		res.ReturnType = UNICODE_STRING_SIMPLE("string");
-		res.Type = mvceditor::ResourceClass::MEMBER;
-		res.ClassName = UNICODE_STRING_SIMPLE("MyDynamicClass");
-		DynamicResources.push_back(res);
-	}
-
-	void CollectNearMatchResources() {
-		Matches = ResourceFinder.CollectNearMatchResources();
-	}
-};
 
 TEST_FIXTURE(DynamicResourceTestClass, AddDynamicResourcesShouldWorkWithCollect) {
 

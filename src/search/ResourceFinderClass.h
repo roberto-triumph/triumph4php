@@ -63,6 +63,7 @@ class FileItemClass;
  * 
  * <code>
  * ResourceFinderClass resourceFinder;
+ * resourceFinder.InitMemory();
  * DirectorySearchClass search;
  * if (search.Init(wxT("/home/user/workspace/project/"))) {
  *   resourceFinder.FilesFilter.push_back(wxT("*.php"));
@@ -71,9 +72,10 @@ class FileItemClass;
  *       search.Walk(resourceFinder);
  *     }
  *     //now that the resources have been cached, we can query the cache
- *     if (resourceFinder.CollectNearMatchResources()) {
- *       for (int i = 0; i < resourceFinder.GetResourceMatchCount(); i++)  {
- *         mvceditor::ResourceClass resource = resourceFinder.GetResourceMatch(i);
+ *     std::vector<mvceditor::ResourceClass> matches = resourceFinder.CollectNearMatchResources();
+ *     if (!matches.empty()) {
+ *       for (size_t i = 0; i < matches.size(); i++)  {
+ *         mvceditor::ResourceClass resource = matches[i];
  *         // do something with the resource 
  *         // print the comment resource.Comment
  *         //  print the signature   resource.Signature
@@ -122,9 +124,7 @@ public:
 		FILE_NAME_LINE_NUMBER,
 		NAMESPACE_NAME
 	};
-	
-	ResourceFinderClass();
-	
+
 	/**
 	 * The files to look in
 	 * 
@@ -134,6 +134,29 @@ public:
 	 * wxMatchWild() function.
 	 */
 	std::vector<wxString> FileFilters;
+	
+	ResourceFinderClass();
+
+	/**
+	 * Create the resource database that is backed by a SQLite database file.  By 
+	 * using a file, we can hold many resources while keeping memory usage in check.
+	 * This will also allow us to save parsed resources across program restarts.
+	 *
+	 * Unless you will be using the resource finder for a single file, then 
+	 * use this method. Also note that if a DB file / memory DB was previously open, this method
+	 * will close the existing db before the new db is opened.
+	 * @param fileName the location where the database file is, or where it 
+	 *        will be created if it does not exist.
+	 */
+	void InitFile(const wxFileName& fileName);
+
+	/**
+	 * Create the resource database that is backed by a SQLite in-memory database.
+	 * By using an in-memory database, lookups are faster. This method would be used
+	 * when parsing resources for a single file only. Also note that if a DB 
+	 * file / memory DB was previously open, this method will close the existing db before the new db is opened.
+	 */
+	void InitMemory();
 	
 	/**
 	 * This is the entry point into the resource lookups.  Callers will call the Prepare method giving it a 'query'
@@ -161,7 +184,8 @@ public:
 	bool Prepare(const wxString& resource);
 		
 	/**
-	 * Parses the given file for resources
+	 * Parses the given file for resources. Note that one of the InitXXX() methods
+	 * must have been called before a call to this method is made.
 	 *
 	 *  @param wxString  fileName the full path to the file to be parsed
 	 */
@@ -170,7 +194,9 @@ public:
 	/**
 	 * Builds cache for PHP native functions. After a call to this method, CollectNearMatchResources, 
 	 * GetResourceSignature methods will work for PHP native functions (array, string, file functions ...).
-	 * @return bool TRUE if native functions file exists and was able to be read
+	 * Note that one of the InitXXX() methods
+	 * must have been called before a call to this method is made.
+	 * @return bool TRUE if native functions file exists and was able to be read.
 	 */
 	bool BuildResourceCacheForNativeFunctions();
 	
@@ -178,6 +204,8 @@ public:
 	 * Parses the given string for resources.  This method would be used, for example, when wanting
 	 * to be able to find resources from a file currently being edited by a user but the user
 	 * has not yet saved the file so the new contents are not yet on disk.
+	 * Note that one of the InitXXX() methods
+	 * must have been called before a call to this method is made.
 	 * 
 	 * @param const wxString&
 	 * fileName the full path of the file
@@ -537,9 +565,14 @@ private:
 	bool IsCacheInitialized;
 
 	/**
-	 * Create the resource database.
+	 * create the database connection to the given db, and create tables to store the parsed resources
+	 * Also note that if a DB file / memory DB was previously open, this method
+	 * will close the existing db before the new db is opened.
+	 * @param db dbName, given to SQLite.  db can be a full path to a file or
+	 *        the special ":memory:" to create an in-memory db.  The
+	 *        file does not need to exist; if it does not exist it will be created.
 	 */
-	void Init();
+	void OpenAndCreateTables(std::string db);
 	
 	/**
 	 * Goes through the given file and parses out resources.

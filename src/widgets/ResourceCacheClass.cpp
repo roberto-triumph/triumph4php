@@ -31,6 +31,8 @@ mvceditor::ResourceCacheClass::ResourceCacheClass()
 	, SymbolTables()
 	, GlobalResourceFinder() 
 	, Version(pelet::PHP_53) {
+
+	GlobalResourceFinder.InitMemory();
 }
 
 mvceditor::ResourceCacheClass::~ResourceCacheClass() {
@@ -51,6 +53,7 @@ bool mvceditor::ResourceCacheClass::Register(const wxString& fileName, bool crea
 		mvceditor::ResourceFinderClass* res = new mvceditor::ResourceFinderClass;
 		mvceditor::SymbolTableClass* table = new mvceditor::SymbolTableClass();
 		res->SetVersion(Version);
+		res->InitMemory();
 		table->SetVersion(Version);
 		Finders[fileName] = res;
 		SymbolTables[fileName] = table;

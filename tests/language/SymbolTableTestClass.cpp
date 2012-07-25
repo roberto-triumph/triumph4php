@@ -100,7 +100,8 @@ public:
 		, DoDuckTyping(false)
 		, DoFullyQualifiedMatchOnly(false)
 		, Error() {
-
+		Finder1.InitMemory();
+		GlobalFinder.InitMemory();
 	}
 
 	void Init(const UnicodeString& sourceCode) {
@@ -299,6 +300,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithLocalFinderOverridesGlob
 	Init(sourceCode);
 	GlobalFinder.BuildResourceCacheForFile(wxT("MyClass.php"), sourceCodeGlobal, true);
 	mvceditor::ResourceFinderClass localFinder;
+	localFinder.InitMemory();
 	localFinder.BuildResourceCacheForFile(wxT("MyClass.php"), sourceCodeOpened, true);
 	OpenedFinders[wxT("MyClass.php")] = &localFinder;
 
