@@ -100,7 +100,7 @@ int main() {
 	wxOperatingSystemId os = wxGetOsVersion(&major, &minor);
 	if (os == wxOS_WINDOWS_NT) {
 		FileName = wxT("C:\\Users\\roberto\\Documents\\mvc-editor\\php_detectors\\lib\\Zend\\Config.php");
-		DirName = wxT("C:\\Users\\roberto\\sample_php_project\\");
+		DirName = wxT("C:\\Users\\roberto\\sample_php_project");
 	}
 	else {
 		FileName = wxT("/home/roberto/workspace/mvc-editor/php_detectors/lib/Zend/Config.php");
@@ -196,6 +196,7 @@ void ProfileParser() {
 void ProfileNativeFunctionsParsing() {
 	printf("*******\n");
 	mvceditor::ResourceFinderClass resourceFinder;
+	resourceFinder.InitMemory();
 	if (FileName.IsEmpty() || !wxFileExists(FileName)) {
 		printf("Nor running ProfileNativeFunctionsParsing because file was not found: %s", (const char*)FileName.ToAscii());
 		return;
@@ -223,6 +224,7 @@ void ProfileNativeFunctionsParsing() {
 void ProfileResourceFinderOnLargeProject() {
 	printf("*******\n");
 	mvceditor::ResourceFinderClass resourceFinder;
+	resourceFinder.InitMemory();
 	mvceditor::DirectorySearchClass search;
 	wxLongLong time;
 	if (DirName.IsEmpty() || !wxDirExists(DirName)) {

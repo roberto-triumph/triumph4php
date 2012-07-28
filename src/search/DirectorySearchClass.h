@@ -42,12 +42,26 @@ class DirectoryWalkerClass {
 public:
 
 	/**
+	 * This method will be called right before the first file is iterated through. Walkers will
+	 * perform any initialization here.
+	 * Note that BeginSearch() will NOT be called if the DirectorySearch was given a non-existent or empty directory.
+	 */
+	virtual void BeginSearch() { };
+
+	/**
 	 * The walker should determine whether it thinks the given file is special and wants to mark it as so.
 	 * 
 	 * @param wxString file the full file path
 	 * @return bool true if the dir walker wants the file to be saved as a match
 	 */
 	virtual bool Walk(const wxString& file) = 0;
+
+	/**
+	 * This method will be called after all files have be iterated. Walkers will
+	 * perform any cleanup here.
+	 * Note that EndSearch() will NOT be called if the DirectorySearch was given a non-existent or empty directory.
+	 */
+	virtual void EndSearch() { };
 };
 
 /**
@@ -330,6 +344,16 @@ private:
 	 * @var bool if true then hidden files are searched.
 	 */
 	bool DoHiddenFiles;
+
+	/**
+	 * Keeps track of whether the walker's Begin() method has been called.
+	 */
+	bool HasCalledBegin;
+
+	/**
+	 * Keeps track of whether the walker's End() method has been called.
+	 */
+	bool HasCalledEnd;
 };
 
 }

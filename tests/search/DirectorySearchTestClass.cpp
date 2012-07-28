@@ -98,8 +98,30 @@ public:
 
 class FileTestDirectoryWalker : public mvceditor::DirectoryWalkerClass {
 
-	virtual bool Walk(const wxString& file) {
+public:
+
+
+	bool IsBeginCalled;
+
+	bool IsEndCalled;
+
+	FileTestDirectoryWalker()
+		: DirectoryWalkerClass()
+		, IsBeginCalled(false)
+		, IsEndCalled(false) {
+
+	}
+
+	void BeginSearch() {
+		IsBeginCalled = true;
+	}
+
+	bool Walk(const wxString& file) {
 		return true;
+	}
+
+	void EndSearch() {
+		IsEndCalled = true;
 	}
 };
 
@@ -124,6 +146,8 @@ TEST_FIXTURE(DirectorySearchTestClass, WalkShouldRecurseThroughSubDirectories) {
 		TestProjectDir + wxT("folder_two") + wxFileName::GetPathSeparator() + wxT("file_one.php")));
 	CHECK_EQUAL(1, count(matchedFiles.begin(), matchedFiles.end(), 
 		TestProjectDir + wxT("folder_two") + wxFileName::GetPathSeparator() + wxT("file_two.php")));
+	CHECK(walker.IsBeginCalled);
+	CHECK(walker.IsEndCalled);
 }
 
 TEST_FIXTURE(DirectorySearchTestClass, WalkShouldRecurseThroughSubDirectoriesInPreciseMode) {

@@ -136,6 +136,7 @@ public:
 	std::vector<wxString> FileFilters;
 	
 	ResourceFinderClass();
+	~ResourceFinderClass();
 
 	/**
 	 * Create the resource database that is backed by a SQLite database file.  By 
@@ -182,6 +183,11 @@ public:
 	 // make the CollectXXX() methods take in a resource query string and return a vector of results
 	 // that way we wont need the GetResourceMatchXXX() methods either
 	bool Prepare(const wxString& resource);
+
+	/**
+	 * Implement the DirectoryWalkerClass method; will start a transaction
+	 */
+	void BeginSearch();
 		
 	/**
 	 * Parses the given file for resources. Note that one of the InitXXX() methods
@@ -190,6 +196,11 @@ public:
 	 *  @param wxString  fileName the full path to the file to be parsed
 	 */
 	virtual bool Walk(const wxString& fileName);
+
+	/**
+	 * Implement the DirectoryWalkerClass method; will commit a transaction
+	 */
+	void EndSearch();
 	
 	/**
 	 * Builds cache for PHP native functions. After a call to this method, CollectNearMatchResources, 
@@ -492,11 +503,19 @@ public:
 private:
 	
 	/**
-	 * All of the resources. This is only a temporary cache that is pushed into while the 
-	 * file is being parsed. After file parsing is complete, these resources will be
+	 * All of the resources that have been parsed during the current walk. This is only a temporary cache that is pushed into while the 
+	 * files are being parsed. After all files have been parsed, these resources will be
 	 * added to the database.
 	 */
 	std::vector<ResourceClass> FileParsingCache;
+
+	/**
+	 * cache of namespaces, used because the same namespace may be declared in multiple 
+	 * files and we don't want to insert multiple rows of the same namespace name. Since
+	 * our transaction is commited once ALL files have been parsed, the DB will
+	 * not able to help us in determining duplicates.
+	 */
+	std::map<UnicodeString, int, UnicodeStringComparatorClass> NamespaceCache;
 		
 	/**
 	 * trait info for each class that uses a trait. The trait cache will contain the
@@ -518,6 +537,11 @@ private:
 	 * as all of the resources that were parsed.
 	 */
 	soci::session Session;
+
+	/*
+	 * Will use transaction to lock once instead of before and after every insert
+	 */
+	soci::transaction* Transaction;
 	
 	/**
 	 * the file name parsed from resource string 
@@ -822,6 +846,8 @@ public:
 	bool IsNative;
 	
 	ResourceClass();
+
+	static mvceditor::ResourceClass MakeNamespace(const UnicodeString& namespaceName);
 	
 	/**
 	 * Clones a ResourceClass

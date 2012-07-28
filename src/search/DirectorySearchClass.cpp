@@ -151,7 +151,9 @@ mvceditor::DirectorySearchClass::DirectorySearchClass()
 	, Directories()
 	, Sources()
 	, TotalFileCount(0)
-	, DoHiddenFiles(false) {
+	, DoHiddenFiles(false)
+	, HasCalledBegin(false)
+	, HasCalledEnd(false) {
 }
 
 mvceditor::DirectorySearchClass::~DirectorySearchClass() {
@@ -223,6 +225,8 @@ bool mvceditor::DirectorySearchClass::Init(const std::vector<mvceditor::SourceCl
 		srcCopy.Copy(sources[i]);
 		Sources.push_back(srcCopy);
 	}
+	HasCalledBegin = false;
+	HasCalledEnd = false;
 	return true;
 }
 
@@ -268,10 +272,18 @@ bool mvceditor::DirectorySearchClass::Walk(mvceditor::DirectoryWalkerClass& walk
 	if (!CurrentFiles.empty()) {
 		wxString filename = CurrentFiles.top();
 		CurrentFiles.pop();
+		if (!HasCalledBegin) {
+			walker.BeginSearch();
+			HasCalledBegin = true;
+		}
 		hit = walker.Walk(filename); 
 		if (hit) {
 			MatchedFiles.push_back(filename);
 		}
+	}
+	if (HasCalledBegin && !HasCalledEnd && !More()) {
+		walker.EndSearch();
+		HasCalledEnd = true;
 	}
 	return hit;
 }

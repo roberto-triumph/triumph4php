@@ -1302,7 +1302,6 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceMatchPositionShouldReturn
 	CHECK_EQUAL(19, length);
 }
 
-
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectQualifiedResourceNamespaces) {
 	 Prep(mvceditor::StringHelperClass::charToIcu(
 		"<?php\n"
@@ -1318,6 +1317,44 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectQualifiedResourceNamespaces) 
 	Matches = ResourceFinder.CollectFullyQualifiedResource();
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), Matches[0].Identifier);
+}
+
+TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectQualifiedResourceNamespacesShouldNotFindDuplicates) {
+	 Prep(mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"namespace First\\Child; \n"
+		"class MyClass {\n"
+		"	function work() {} \n"
+		"}\n"
+		"\n"
+		"function singleWork() { } \n"
+		"?>\n"
+	));
+	TestFile = wxT("test_2.php");
+	Prep(mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"namespace First\\Child; \n"
+		"class TwoClass {\n"
+		"	function twoWork() {} \n"
+		"}\n"
+		"\n"
+		"?>\n"
+	));	
+	CHECK(ResourceFinder.Prepare(wxT("\\First\\Child\\MyClass")));
+	Matches = ResourceFinder.CollectFullyQualifiedResource();
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), Matches[0].Identifier);
+
+	std::vector<mvceditor::ResourceClass> all = ResourceFinder.All();
+
+	//  6 resources total
+	// namespace First\\Child 
+	// class MyClass
+	// function MyClass::work
+	// function singleWork
+	// class TwoClass
+	// function TwoClass::twoWork
+	CHECK_VECTOR_SIZE(6, all);
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectResourceInGlobalNamespaces) {

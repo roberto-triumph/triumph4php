@@ -279,9 +279,11 @@ static UnicodeString QualifyName(const UnicodeString& namespaceName, const Unico
 mvceditor::ResourceFinderClass::ResourceFinderClass()
 	: FileFilters()
 	, FileParsingCache()
+	, NamespaceCache()
 	, TraitCache()
 	, Parser()
 	, Session()
+	, Transaction(NULL)
 	, FileName()
 	, ClassName()
 	, MethodName()
@@ -291,6 +293,12 @@ mvceditor::ResourceFinderClass::ResourceFinderClass()
 	Parser.SetClassObserver(this);
 	Parser.SetClassMemberObserver(this);
 	Parser.SetFunctionObserver(this);
+}
+
+mvceditor::ResourceFinderClass::~ResourceFinderClass() {
+	if (Transaction) {
+		delete Transaction;
+	}
 }
 
 void mvceditor::ResourceFinderClass::SetVersion(pelet::Versions version) {
@@ -337,6 +345,33 @@ void mvceditor::ResourceFinderClass::OpenAndCreateTables(std::string db) {
 	}
 }
 
+void mvceditor::ResourceFinderClass::BeginSearch() {
+	if (IsCacheInitialized) {
+
+		// rollback any previous transaction, as commits should be explicit
+		if (Transaction) {
+			delete Transaction;
+		}
+		Transaction = new soci::transaction(Session);
+	}
+	FileParsingCache.clear();
+	NamespaceCache.clear();
+}
+
+void mvceditor::ResourceFinderClass::EndSearch() {
+	if (Transaction) {
+
+		// commit until the very end; profiling showed that sqlite3 was
+		// being flushed to disk after every file and that was 
+		// resulting in very slow walks.
+		Transaction->commit();
+		delete Transaction;
+		Transaction = NULL;
+	}
+	FileParsingCache.clear();
+	NamespaceCache.clear();
+}
+
 bool mvceditor::ResourceFinderClass::Walk(const wxString& fileName) {
 	bool matchedFilter = false;
 	wxFileName file(fileName);
@@ -373,6 +408,7 @@ bool mvceditor::ResourceFinderClass::Walk(const wxString& fileName) {
 }
 
 void mvceditor::ResourceFinderClass::BuildResourceCacheForFile(const wxString& fullPath, const UnicodeString& code, bool isNew) {
+	BeginSearch();
 
 	// remove all previous cached resources
 	mvceditor::FileItemClass fileItem;
@@ -398,6 +434,7 @@ void mvceditor::ResourceFinderClass::BuildResourceCacheForFile(const wxString& f
 	Parser.ScanString(code, results);
 
 	PushIntoResourceCache(FileParsingCache, fileItem.FileId);
+	EndSearch();
 }
 
 wxString  mvceditor::ResourceFinderClass::GetResourceMatchFullPathFromResource(const mvceditor::ResourceClass& resource) {
@@ -491,10 +528,12 @@ bool mvceditor::ResourceFinderClass::Prepare(const wxString& resource) {
 
 bool mvceditor::ResourceFinderClass::BuildResourceCacheForNativeFunctions() {
 	bool loaded = false;
+	BeginSearch();
 	wxFileName fileName = mvceditor::NativeFunctionsAsset();	
 	if (fileName.FileExists()) {
 		loaded = LoadTagFile(fileName, true);
 	}
+	EndSearch();
 	return loaded;
 }
 
@@ -908,10 +947,7 @@ void mvceditor::ResourceFinderClass::ClassFound(const UnicodeString& namespaceNa
 	if (IsNewNamespace(namespaceName)) {
 
 		// a resource for the namespace itself
-		ResourceClass namespaceItem;
-		namespaceItem.NamespaceName = namespaceName;
-		namespaceItem.Identifier = namespaceName;
-		namespaceItem.Key = namespaceName;
+		mvceditor::ResourceClass namespaceItem = mvceditor::ResourceClass::MakeNamespace(namespaceName);
 		FileParsingCache.push_back(namespaceItem);
 	}
 
@@ -1084,10 +1120,7 @@ void mvceditor::ResourceFinderClass::FunctionFound(const UnicodeString& namespac
 	FileParsingCache.push_back(item);
 		
 	if (IsNewNamespace(namespaceName)) {
-		ResourceClass namespaceItem;
-		namespaceItem.NamespaceName = namespaceName;
-		namespaceItem.Identifier = namespaceName;
-		namespaceItem.Key = namespaceName;
+		mvceditor::ResourceClass namespaceItem = mvceditor::ResourceClass::MakeNamespace(namespaceName);
 		FileParsingCache.push_back(namespaceItem);
 	}
 		
@@ -1103,16 +1136,14 @@ bool mvceditor::ResourceFinderClass::IsNewNamespace(const UnicodeString& namespa
 	int type = mvceditor::ResourceClass::NAMESPACE;
 	int count = 0;
 	soci::statement stmt = (Session.prepare << sql, soci::use(nm), soci::use(type), soci::into(count));
+	stmt.execute(true);
 	bool isNew = false;
 	if (count <= 0) {
-		ResourceClass namespaceItem;
-		namespaceItem.NamespaceName = namespaceName;
-		namespaceItem.Identifier = namespaceName;
-		namespaceItem.Key = namespaceName;
 	 
-		// look in the current file cache, stuff that has not yet been added to the database
-		if (std::find(FileParsingCache.begin(), FileParsingCache.end(), namespaceItem) == FileParsingCache.end()) {
+		// look in the current namespace cache, stuff that has not yet been added to the database
+		if (NamespaceCache.count(namespaceName) <= 0) {
 			isNew = true;
+			NamespaceCache[namespaceName] = 1;
 		}	
 	}
 	return isNew;
@@ -1366,6 +1397,7 @@ bool mvceditor::ResourceFinderClass::IsResourceCacheEmpty() {
 }
 
 void mvceditor::ResourceFinderClass::AddDynamicResources(const std::vector<mvceditor::ResourceClass>& dynamicResources) {
+	BeginSearch();
 	std::vector<mvceditor::ResourceClass> newResources;
 	
 	for (std::vector<mvceditor::ResourceClass>::const_iterator it = dynamicResources.begin(); it != dynamicResources.end(); ++it) {
@@ -1452,6 +1484,7 @@ void mvceditor::ResourceFinderClass::AddDynamicResources(const std::vector<mvced
 	// resources since there is no source code we can show the user.
 	int fileItemIndex = -1;
 	PushIntoResourceCache(newResources, fileItemIndex);
+	EndSearch();
 }
 
 bool mvceditor::ResourceFinderClass::LoadTagFile(const wxFileName& fileName, bool isNativeTags) {
@@ -1744,8 +1777,14 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::All() {
 	// remove the 'duplicates' ie. extra fully qualified entries to make lookups faster
 	std::vector<mvceditor::ResourceClass>::iterator it = all.begin();
 	while (it != all.end()) {
-		if (it->Key.indexOf(UNICODE_STRING_SIMPLE("::")) > 0 ||
-			it->Key.indexOf(UNICODE_STRING_SIMPLE("\\")) > 0) {
+		if (it->Key.indexOf(UNICODE_STRING_SIMPLE("::")) > 0) {
+
+			// fully qualified methods
+			it = all.erase(it);
+		}
+		else if (it->Type != mvceditor::ResourceClass::NAMESPACE && it->Key.indexOf(UNICODE_STRING_SIMPLE("\\")) >= 0) {
+			
+			// fully qualified classes / functions (with namespace)
 			it = all.erase(it);
 		}
 		else {
@@ -1776,7 +1815,7 @@ void mvceditor::ResourceFinderClass::PushIntoResourceCache(const std::vector<mvc
 		return;
 	}
 	std::string sql;
-	sql += "INSERT INTO resources (";
+	sql += "INSERT OR IGNORE INTO resources (";
 	sql += "file_item_id, key, identifier, class_name, ";
 	sql += "type, namespace_name, signature, ";
 	sql += "return_type, comment, is_protected, is_private, ";
@@ -1802,8 +1841,7 @@ void mvceditor::ResourceFinderClass::PushIntoResourceCache(const std::vector<mvc
 	int isDynamic;
 	int isNative;
 
-	// use transaction to lock once instead of before and after every insert
-	soci::transaction tr(Session);
+	
 	soci::statement stmt = (Session.prepare << sql,
 		soci::use(fileItemId), soci::use(key), soci::use(identifier), soci::use(className), 
 		soci::use(type), soci::use(namespaceName), soci::use(signature), 
@@ -1827,7 +1865,6 @@ void mvceditor::ResourceFinderClass::PushIntoResourceCache(const std::vector<mvc
 		isNative = res.IsNative;
 		stmt.execute(true);
 	}
-	tr.commit();
 }
 
 mvceditor::ResourceClass::ResourceClass()
@@ -1899,6 +1936,15 @@ void mvceditor::ResourceClass::Clear() {
 	IsStatic = false;
 	IsDynamic = false;
 	IsNative = false;
+}
+
+mvceditor::ResourceClass mvceditor::ResourceClass::MakeNamespace(const UnicodeString& namespaceName) {
+	mvceditor::ResourceClass namespaceItem;
+	namespaceItem.Type = mvceditor::ResourceClass::NAMESPACE;
+	namespaceItem.NamespaceName = namespaceName;
+	namespaceItem.Identifier = namespaceName;
+	namespaceItem.Key = namespaceName;
+	return namespaceItem;
 }
 
 mvceditor::TraitResourceClass::TraitResourceClass() 
