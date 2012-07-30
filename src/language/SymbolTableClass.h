@@ -319,10 +319,10 @@ public:
 	 * @param parsedExpression the expression to resolve. This is usually the result of the ParserClass::ParserExpression
 	 * @param expressionScope the scope where parsed expression is located.  The scope let's us know which variables are
 	 *        available. See ScopeFinderClass for more info.
+	 * @param allResourceFindesr all of the resource finders to look in
 	 * @param openedResourceFinders the resource cache will be used to look up class methods and function return
 	 *        values. This map should contain only cache for files that are currently being edited.  The key
 	 *        of the map is the file's full path, the value is the cache itself.
-	 * @param globalResourceFinder the 'global' cache of resources for files that are NOT being edited
 	 * @param autoCompleteVariableList the results of the matches; these are the names of the variables that
 	 *        are "near matches" to the parsed expression. This will be filled only when parsedExpression is a variable. 
 	 * @param autoCompleteResourceList the results of the matches; these are the names of the items that
@@ -334,8 +334,8 @@ public:
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear() )
 	 */
 	void ExpressionCompletionMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope, 
+		const std::vector<mvceditor::ResourceFinderClass*>& allResourceFinders,
 		const std::map<wxString, ResourceFinderClass*>& openedResourceFinders,
-		mvceditor::ResourceFinderClass* globalResourceFinder,
 		std::vector<UnicodeString>& autoCompleteVariableList,
 		std::vector<ResourceClass>& autoCompleteResourceList,
 		bool doDuckTyping,
@@ -358,10 +358,10 @@ public:
 	 * @param parsedExpression the expression to resolve. This is usually the result of the ParserClass::ParserExpression
 	 * @param expressionScope the scope where parsed expression is located.  The scope let's us know which variables are
 	 *        available. See ScopeFinderClass for more info.
+	 * @param allResourceFinders the resource finders to look in
 	 * @param openedResourceFinders the resource cache will be used to look up class methods and function return
 	 *        values. This map should contain only cache for files that are currently being edited.  The key
 	 *        of the map is the file's full path, the value is the cache itself
-	 * @param globalResourceFinder the 'global' cache of resources for files that are NOT being edited
 	 * @param resourceMatches the resource matches; these are the names of the items that
 	 *        are "near matches" to the parsed expression.
 	 * @param doDuckTyping if an expression chain could not be fully resolved; then we could still
@@ -372,8 +372,8 @@ public:
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
 	void ResourceMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope, 
+		const std::vector<mvceditor::ResourceFinderClass*>& allResourceFinders,
 		const std::map<wxString, ResourceFinderClass*>& openedResourceFinders,
-		mvceditor::ResourceFinderClass* globalResourceFinder,
 		std::vector<ResourceClass>& resourceMatches,
 		bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 		SymbolTableMatchErrorClass& error) const;

@@ -37,12 +37,43 @@ namespace mvceditor {
 
 /**
  * This class represents all the most up-to-date resources of the currently opened project
- * in MVC Editor.  It consists of a "global" cache together with a series of 
+ * in MVC Editor.  It consists of a series of "global" caches together with a series of 
  * separate caches for each file that is being edited.  The reason for putting opened files
  * in their own cache is for speed and accuracy; while a file is being edited (but the new
  * contents have not yet been flushed to disk) we can parse the code control content for resources without 
  * disturbing the global-wide cache; lookups are faster because the cache won't need to re-sort
  * the entire global list of resources since the resources from files that are not openeed are not affected.
+ * Lookups are also accurate because we can parse contents that have not yet been parsed, allowing code 
+ * completion to be helpful on code not yet saved.
+ *
+ * Usage:
+ * The resource cache can handle multiple global caches; this can be used to separate the
+ * resource cache into multiple files; one file per project. Something like this:
+ *
+ * @code
+ 
+ * mvceditor::ResourceCacheClass cache;
+ *
+ * // setup the parsed resources to be saved into the user's home directory
+ * // note that file need not exist
+ * wxFileName cache1("/home/user/.mvceditorcache");
+ * cache.InitGlobal(cache1);
+ *
+ * // now parse a project
+ * mvceditor::DirectorySearchClass search;
+ * search.Init(wxT("/home/user/project1/src"));
+ * std::vector<wxString> fileFilters;
+ * fileFilters.push_back(wxT("*.php"));
+ * while (search.More()) {
+ *   cache.WalkGlobal(search, fileFilters);
+ * }
+ *
+ * @endcode
+ *
+ * Since ResourceCacheClass is backed by ResourceFinderClass, the global resource finders 
+ * are stored on disk and are preserved across application restarts. This means that 
+ * if the cache file already exists, then WalkGlobal() may return immediately if the file
+ * to be parsed has not been modified since the last time we parsed it.
  *
  * Note that all of the methods of this class can be safely accessed by multiple
  * threads.
@@ -65,7 +96,7 @@ public:
 	 * 
 	 * @param fileName unique identifier for a file
 	 * @param createSymbols if TRUE then the symbol table from the file will be created immediately; otherwise
-	 * caller will need to vcall Update() method to build the symbol table.
+	 * caller will need to call Update() method to build the symbol table.
 	 * @return bool TRUE if fileName was not previously registered
 	 * only a unique fileName can be registered 
 	 */
@@ -85,19 +116,41 @@ public:
 	 * 
 	 * @param fileName unique identifier for a file that was given to Register()
 	 * @param code the file's most up-to-date source code (from the user-edited buffer)
-	 * @param bool if TRUE then tileName is a new file that is not yet written to disk
+	 * @param bool if TRUE then fileName is a new file that is not yet written to disk
 	 * @return false if lock could not be acquired or code contains a parse error
 	 */
 	bool Update(const wxString& fileName, const UnicodeString& code, bool isNew);
 
 	/**
+	 * Create a new global resource finder that is backed by the given 
+	 * file.  File may or may not exist; if file does not exist then it will
+	 * be created.
+	 * A resource DB file can only be initialized once.
+	 *
+	 * @param resourceDbFileName the location of the SQLite cache for the resource finder
+	 * @return bool FALSE if the resource file is already initialized
+	 */
+	bool InitGlobal(const wxFileName& resourceDbFileName);
+
+	/**
+	 * check to see if a resource DB file is already loaded
+	 *
+	 * @return bool TRUE if db file is already loaded.
+	 */
+	bool IsInitGlobal(const wxFileName& resourceDbFileName);
+
+	/**
 	 * Will update the GLOBAL cache by calling Walk() on the global resource cache (in a thread safe manner)
+	 * The last finder created by InitGlobal() will be modified.
+	 *
 	 * @see mvceditor::ResourceFinderClass::Walk
+	 * @param resourceDbFileName the location of the SQLite cache for the resource finder. this 
+	 *        is the file where the resources will be persisted to
 	 * @param directorySearch keeps track of the file to parse
 	 * @param phpFileFilters the wildcards that hold which files to parse
 	 * @return false if lock could not be acquired
 	 */
-	bool WalkGlobal(DirectorySearchClass& directorySearch, const std::vector<wxString>& phpFileFilters);
+	bool WalkGlobal(const wxFileName& resourceDbFileName, DirectorySearchClass& directorySearch, const std::vector<wxString>& phpFileFilters);
 
 	/**
 	 * Will load the php native functions file that contains all built-in php functions and classes
@@ -242,11 +295,11 @@ private:
 		
 	/**
 	 * Returns a list that contains all of the resource finders for the registered files plus
-	 * the given resource finder.  
+	 * the global resource finders.
 	 * 
 	 * This clas owns the resource finder pointers, do NOT delete them
 	 */
-	std::vector<ResourceFinderClass*> Iterator(ResourceFinderClass* resourceFinder);
+	std::vector<ResourceFinderClass*> AllFinders();
 	
 	/**
 	 * These are the objects that will parse the source codes
@@ -259,9 +312,11 @@ private:
 	std::map<wxString, SymbolTableClass*> SymbolTables;
 
 	/**
-	 * These are the resources from the ENTIRE project; it may include stale resources
+	 * These are the resource finders from the ENTIRE project; it may include stale resources
+	 * The key is the full path to the resource finder DB file, the value is the
+	 * resource finder itself.
 	 */
-	mvceditor::ResourceFinderClass GlobalResourceFinder;
+	std::map<wxString, mvceditor::ResourceFinderClass*> GlobalResourceFinders;
 	
 	/**
 	 * the version of PHP to use when parsing source code

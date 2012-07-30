@@ -41,6 +41,7 @@ public:
 	mvceditor::DirectorySearchClass Search;
 	std::vector<wxString> PhpFileFilters;
 	std::vector<mvceditor::ResourceClass> Matches;
+	wxFileName ResourceDbFileName;
 
 	RegisterTestFixtureClass()
 		: FileTestFixtureClass(wxT("resource-cache"))
@@ -48,9 +49,12 @@ public:
 		, Finder()
 		, Search() 
 		, PhpFileFilters()
-		, Matches() {
+		, Matches() 
+		, ResourceDbFileName() {
 		Search.Init(TestProjectDir);
 		PhpFileFilters.push_back(wxT("*.php"));
+		ResourceDbFileName.Assign(TestProjectDir + wxT("resource_cache.db"));
+		ResourceCache.InitGlobal(ResourceDbFileName);
 	}
 
 	void CollectNearMatchResourcesFromAll() {
@@ -83,14 +87,15 @@ public:
 	mvceditor::SymbolTableMatchErrorClass Error;
 	mvceditor::DirectorySearchClass Search;
 	std::vector<wxString> PhpFileFilters;
+	wxFileName ResourceDbFileName;
 	
 	
 	ExpressionCompletionMatchesFixtureClass() 
 		: FileTestFixtureClass(wxT("resource-cache"))
 		, ResourceCache()
-		, GlobalFile(wxT("global.php"))
-		, File1(wxT("file1.php"))
-		, File2(wxT("file2.php"))
+		, GlobalFile(wxT("src") + wxFileName::GetPathSeparators() + wxT("global.php"))
+		, File1(wxT("src") + wxFileName::GetPathSeparators() + wxT("file1.php"))
+		, File2(wxT("src") + wxFileName::GetPathSeparators() + wxT("file2.php"))
 		, GlobalCode()
 		, Code1()
 		, Code2()
@@ -102,11 +107,15 @@ public:
 		, ResourceMatches()
 		, Error()
 		, Search()
-		, PhpFileFilters() {
-		Search.Init(TestProjectDir);
+		, PhpFileFilters()
+		, ResourceDbFileName() {
+		CreateSubDirectory(wxT("src"));
+		Search.Init(TestProjectDir + wxT("src"));
 		PhpFileFilters.push_back(wxT("*.php"));
 		Scope.ClassName = UNICODE_STRING_SIMPLE("");
 		Scope.MethodName = UNICODE_STRING_SIMPLE("");
+		ResourceDbFileName.Assign(TestProjectDir + wxT("resource_cache.db"));
+		ResourceCache.InitGlobal(ResourceDbFileName);
 	}
 	
 	void ToProperty(const UnicodeString& variableName, const UnicodeString& methodName) {
@@ -145,11 +154,12 @@ TEST_FIXTURE(RegisterTestFixtureClass, RegisterShouldSucceedAfterSucceedAfterUnr
 TEST_FIXTURE(RegisterTestFixtureClass, CollectShouldGetFromAllFinders) {
 	
 	// going to create 3 'files'
-	wxString file1 = wxT("file1.php");
-	wxString file2 = wxT("file2.php");
-	wxString file3 = wxT("file3.php");
+	wxString file1 = wxT("src") + wxFileName::GetPathSeparators() + wxT("file1.php");
+	wxString file2 = wxT("src") + wxFileName::GetPathSeparators() + wxT("file2.php");
+	wxString file3 = wxT("src") + wxFileName::GetPathSeparators() +wxT("file3.php");
 	UnicodeString code1 = UNICODE_STRING_SIMPLE("<?php class ActionMy   { function w() {} }");
 	UnicodeString code2 = UNICODE_STRING_SIMPLE("<?php class ActionYou  { function w() {} }");
+	CreateSubDirectory(wxT("src"));
 	CreateFixtureFile(file3, wxT("<?php class ActionThey { function w() {} }"));
 	
 	// parse the 3 files for resources
@@ -158,9 +168,9 @@ TEST_FIXTURE(RegisterTestFixtureClass, CollectShouldGetFromAllFinders) {
 	CHECK(ResourceCache.Update(file1, code1, true));
 	CHECK(ResourceCache.Update(file2, code2, true));
 	
-	// must call init() here since file3 may have not existed before
-	Search.Init(TestProjectDir);
-	ResourceCache.WalkGlobal(Search, PhpFileFilters);
+	// must call init() here since file3 exists in the hard disk and we want to parse it from disk
+	Search.Init(TestProjectDir + wxT("src"));
+	ResourceCache.WalkGlobal(ResourceDbFileName, Search, PhpFileFilters);
 	
 	// now perform the search. will search for any resource that starts with 'Action'
 	// all 3 caches should hit
@@ -186,7 +196,7 @@ TEST_FIXTURE(RegisterTestFixtureClass, CollectShouldIgnoreStaleMatches) {
 	UnicodeString code2 = UNICODE_STRING_SIMPLE("<?php class ActionMy   { function methodB() {} }");
 
 	CreateFixtureFile(file1, code1);
-	ResourceCache.WalkGlobal(Search, PhpFileFilters);
+	ResourceCache.WalkGlobal(ResourceDbFileName, Search, PhpFileFilters);
 
 	CHECK(ResourceCache.Register(TestProjectDir + file1, false));
 	CHECK(ResourceCache.Update(TestProjectDir + file1, code2, true));
@@ -205,12 +215,11 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, GlobalFinder) {
 	// in this test we will create a class in file1; file2 will use that class
 	// the ResourceCache object should be able to detect the variable type of 
 	// the variable in file2
-	wxString file1 = wxT("file1.php");
 	wxString code1 = wxT("<?php class ActionYou  { function w() {} }");
 	Code2 = UNICODE_STRING_SIMPLE("<?php $action = new ActionYou(); $action->w(); ");
 
-	CreateFixtureFile(file1, code1);
-	ResourceCache.WalkGlobal(Search, PhpFileFilters);
+	CreateFixtureFile(File1, code1);
+	ResourceCache.WalkGlobal(ResourceDbFileName, Search, PhpFileFilters);
 	
 	CHECK(ResourceCache.Register(File2, false));
 	CHECK(ResourceCache.Update(File2, Code2, true));
@@ -233,7 +242,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, RegisteredFinder) {
 	Code1 = UNICODE_STRING_SIMPLE("<?php $action = new ActionYou(); $action->w(); ");
 	GlobalCode = wxT("<?php class ActionMe  { function yy() { $this;  } }");
 	Code2 = UNICODE_STRING_SIMPLE("<?php class ActionYou  { function w() {} }");
-	ResourceCache.WalkGlobal(Search, PhpFileFilters);
+	ResourceCache.WalkGlobal(ResourceDbFileName, Search, PhpFileFilters);
 	
 	CHECK(ResourceCache.Register(File1, false));
 	CHECK(ResourceCache.Update(File1, Code1, true));
@@ -258,7 +267,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithGlobalF
 	Code1 = UNICODE_STRING_SIMPLE("<?php $action = new ActionYou(); $action->w(); ");
 	GlobalCode = wxT("<?php class ActionYou  { function w() {} }");
 	CreateFixtureFile(GlobalFile, GlobalCode);
-	ResourceCache.WalkGlobal(Search, PhpFileFilters);
+	ResourceCache.WalkGlobal(ResourceDbFileName, Search, PhpFileFilters);
 	
 	CHECK(ResourceCache.Register(File1, false));
 	CHECK(ResourceCache.Update(File1, Code1, true));
@@ -310,7 +319,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithStaleMa
 	Code2 = UNICODE_STRING_SIMPLE("<?php class ActionMy   { function methodB() {} }");
 
 	CreateFixtureFile(GlobalFile, GlobalCode);
-	ResourceCache.WalkGlobal(Search, PhpFileFilters);
+	ResourceCache.WalkGlobal(ResourceDbFileName, Search, PhpFileFilters);
 
 	CHECK(ResourceCache.Register(File1, false));
 	CHECK(ResourceCache.Update(File1, Code1, true));
@@ -333,6 +342,92 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithStaleMa
 	ResourceCache.ResourceMatches(GlobalFile, ParsedExpression, Scope, 
 		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_EQUAL((size_t)0, ResourceMatches.size());
+}
+
+TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, MultipleGlobalFinders) {
+
+	// this test will exercise multiple global finders. going to create
+	// 2 global finders, each will parse a different file with different PHP classes. 
+	// then we will make sure that completion works for both classes
+	wxString globalCode1 = wxT("<?php class ActionMy   { function methodA() {} }");
+	wxString globalCode2 = wxT("<?php class ActionYours   { function methodB() {} }");
+	wxString globalRoot1 = wxT("my_src") + wxFileName::GetPathSeparators();
+	wxString globalRoot2 = wxT("yours_src") + wxFileName::GetPathSeparators();
+	CreateSubDirectory(globalRoot1);
+	CreateSubDirectory(globalRoot2);
+	CreateFixtureFile(globalRoot1 + wxT("ActionMy.php"), globalCode1);
+	CreateFixtureFile(globalRoot2 + wxT("ActionYours.php"), globalCode2);
+
+	// initialize 2 global finders and prime them, backed by files
+	wxFileName globalDb1(TestProjectDir + wxT("/resource_my.db"));
+	ResourceCache.InitGlobal(globalDb1);
+	mvceditor::DirectorySearchClass search1;
+	search1.Init(TestProjectDir + globalRoot1);
+	std::vector<wxString> fileFilters;
+	fileFilters.push_back(wxT("*.php"));
+	while (search1.More()) {
+		ResourceCache.WalkGlobal(globalDb1, search1, PhpFileFilters);
+	}
+	wxFileName globalDb2(TestProjectDir + wxT("/resource_yours.db"));
+	ResourceCache.InitGlobal(globalDb2);
+	mvceditor::DirectorySearchClass search2;
+	search2.Init(TestProjectDir + globalRoot2);
+	while (search2.More()) {
+		ResourceCache.WalkGlobal(globalDb2, search2, fileFilters);
+	}
+
+	// initialize a symbol table
+	Code1 = UNICODE_STRING_SIMPLE("<?php $action = new ActionMy(); ");
+	CHECK(ResourceCache.Register(File1, false));
+	CHECK(ResourceCache.Update(File1, Code1, true));
+
+	// try a completion
+	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("methodA"));
+	ResourceCache.ResourceMatches(File1, ParsedExpression, Scope, 
+		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
+	CHECK_EQUAL((size_t)1, ResourceMatches.size());
+	if (!ResourceMatches.empty()) {
+		CHECK_UNISTR_EQUALS("methodA", ResourceMatches[0].Identifier);
+		CHECK_UNISTR_EQUALS("ActionMy", ResourceMatches[0].ClassName);
+	}
+
+	// create another resource cache, but we will initialize them with the
+	// parsed cache; we won't need to walk over the files (re-parse them) and
+	// completion should still work
+	mvceditor::ResourceCacheClass newCache;
+	newCache.InitGlobal(globalDb1);
+	newCache.InitGlobal(globalDb2);
+
+	// initialize a symbol table
+	Code1 = UNICODE_STRING_SIMPLE("<?php $action = new ActionMy(); ");
+	CHECK(newCache.Register(File1, false));
+	CHECK(newCache.Update(File1, Code1, true));
+
+	// try a completion
+	ResourceMatches.clear();
+	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("methodA"));
+	newCache.ResourceMatches(File1, ParsedExpression, Scope, 
+		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
+	CHECK_EQUAL((size_t)1, ResourceMatches.size());
+	if (!ResourceMatches.empty()) {
+		CHECK_UNISTR_EQUALS("methodA", ResourceMatches[0].Identifier);
+		CHECK_UNISTR_EQUALS("ActionMy", ResourceMatches[0].ClassName);
+	}
+
+	// try the second resource finder
+	Code2 = UNICODE_STRING_SIMPLE("<?php $action = new ActionYours(); ");
+	CHECK(newCache.Register(File2, false));
+	CHECK(newCache.Update(File2, Code2, true));
+	ResourceMatches.clear();
+	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("methodB"));
+	newCache.ResourceMatches(File2, ParsedExpression, Scope, 
+		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
+	CHECK_EQUAL((size_t)1, ResourceMatches.size());
+	if (!ResourceMatches.empty()) {
+		CHECK_UNISTR_EQUALS("methodB", ResourceMatches[0].Identifier);
+		CHECK_UNISTR_EQUALS("ActionYours", ResourceMatches[0].ClassName);
+	}
+
 }
 
 }

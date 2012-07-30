@@ -37,22 +37,30 @@ static int ID_COUNT_FILES_GAUGE = wxNewId();
 mvceditor::ResourceFileReaderClass::ResourceFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads) 
 	: BackgroundFileReaderClass(handler, runningThreads)
 	, PhpFileFilters() 
-	, ResourceCache(NULL) {
+	, ResourceCache(NULL) 
+	, ProjectQueue()
+	, CurrentResourceDbFileName() {
 }
 
-bool mvceditor::ResourceFileReaderClass::InitForProject(mvceditor::ResourceCacheClass* resourceCache, 
-														std::vector<mvceditor::SourceClass> sources,
-														const std::vector<wxString>& phpFileFilters) {
-	if (Init(sources)) {
-		ResourceCache = resourceCache;
-		PhpFileFilters = phpFileFilters;
-		return true;
+bool mvceditor::ResourceFileReaderClass::InitProjectQueue(mvceditor::ResourceCacheClass* resourceCache, 
+														const std::vector<mvceditor::ProjectClass>& projects) {
+	while (!ProjectQueue.empty()) {
+		ProjectQueue.pop();
 	}
-	return false;
+	ResourceCache = resourceCache;
+	for (size_t i = 0; i < projects.size(); ++i) {
+		if (projects[i].IsEnabled && !projects[i].AllPhpSources().empty()) {
+			ProjectQueue.push(projects[i]);
+		}
+	}
+	return !ProjectQueue.empty();
 }
 
 bool mvceditor::ResourceFileReaderClass::InitForFile(mvceditor::ResourceCacheClass* resourceCache, 
 														const wxString& fullPath) {
+	while (!ProjectQueue.empty()) {
+		ProjectQueue.pop();
+	}
 	wxFileName fileName(fullPath);
 	if (!fileName.FileExists()) {
 		return false;
@@ -75,7 +83,7 @@ bool mvceditor::ResourceFileReaderClass::InitForFile(mvceditor::ResourceCacheCla
 }
 
 bool mvceditor::ResourceFileReaderClass::FileRead(mvceditor::DirectorySearchClass& search) {
-	ResourceCache->WalkGlobal(search, PhpFileFilters);
+	ResourceCache->WalkGlobal(CurrentResourceDbFileName.GetFullPath(), search, PhpFileFilters);
 	return false;
 }
 
@@ -89,6 +97,29 @@ bool mvceditor::ResourceFileReaderClass::FileMatch(const wxString& file) {
 		}
 	}
 	return matchedFilter;
+}
+
+bool mvceditor::ResourceFileReaderClass::MoreProjects() const {
+	return !ProjectQueue.empty();
+}
+
+bool mvceditor::ResourceFileReaderClass::ReadNextProject() {
+	bool next = false;
+	if (!ProjectQueue.empty()) {
+		mvceditor::ProjectClass project = ProjectQueue.front();
+		ProjectQueue.pop();
+		std::vector<mvceditor::SourceClass> sources = project.AllPhpSources();
+		if (Init(sources)) {			
+			PhpFileFilters = project.GetPhpFileExtensions();
+			project.MakeResourceDbFileName();
+			CurrentResourceDbFileName = project.ResourceDbFileName;
+			if (!ResourceCache->IsInitGlobal(CurrentResourceDbFileName)) {
+				ResourceCache->InitGlobal(CurrentResourceDbFileName);
+			}
+			next = true;
+		}
+	}
+	return next;
 }
 
 mvceditor::NativeFunctionsFileReaderClass::NativeFunctionsFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads) 
@@ -210,6 +241,20 @@ void mvceditor::ResourcePluginClass::OnWorkInProgress(wxCommandEvent& event) {
 }
 
 void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
+	if (ResourceFileReader.MoreProjects()) {
+
+		// if the project queue is not empty then start reading the next project.
+		bool hasNext = false;
+		while (ResourceFileReader.MoreProjects() && !hasNext) {
+			hasNext = ResourceFileReader.ReadNextProject();
+		}
+		if (hasNext) {
+			mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
+			ResourceFileReader.StartReading(error);
+			wxASSERT(mvceditor::BackgroundFileReaderClass::NONE == error);
+			return;
+		}
+	}
 	GetStatusBarWithGauge()->StopGauge(ID_COUNT_FILES_GAUGE);
 	if (IndexingDialog) {
 		IndexingDialog->Destroy();
@@ -281,7 +326,7 @@ void mvceditor::ResourcePluginClass::StartIndex() {
 			// don't bother searching when path or expression is not valid
 			// need to do this so that the resource finder attempts to parse the files
 			resourceCache->PrepareAll(wxT("FakeClass"));			
-			if (ResourceFileReader.InitForProject(resourceCache, App.Structs.AllEnabledSources(), App.Structs.GetPhpFileExtensions())) {
+			if (ResourceFileReader.InitProjectQueue(resourceCache, App.Structs.Projects) && ResourceFileReader.ReadNextProject()) {
 					mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
 					if (ResourceFileReader.StartReading(error)) {
 						State = INDEXING_PROJECT;

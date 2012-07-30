@@ -24,6 +24,7 @@
  */
 #include <environment/ProjectClass.h>
 #include <wx/tokenzr.h>
+#include <wx/stdpaths.h>
 #include <vector>
 
 mvceditor::ProjectClass::ProjectClass()
@@ -32,7 +33,8 @@ mvceditor::ProjectClass::ProjectClass()
 	, IsEnabled(true)
 	, PhpFileFilters()
 	, CssFileFilters()
-	, SqlFileFilters() {
+	, SqlFileFilters()
+	, ResourceDbFileName() {
 }
 
 mvceditor::ProjectClass::ProjectClass(const mvceditor::ProjectClass& project)
@@ -41,7 +43,8 @@ mvceditor::ProjectClass::ProjectClass(const mvceditor::ProjectClass& project)
 	, IsEnabled(project.IsEnabled)
 	, PhpFileFilters(project.PhpFileFilters)
 	, CssFileFilters(project.CssFileFilters)
-	, SqlFileFilters(project.SqlFileFilters) {
+	, SqlFileFilters(project.SqlFileFilters) 
+	, ResourceDbFileName(project.ResourceDbFileName) {
 }
 
 void mvceditor::ProjectClass::operator=(const mvceditor::ProjectClass& project) {
@@ -51,6 +54,7 @@ void mvceditor::ProjectClass::operator=(const mvceditor::ProjectClass& project) 
 	PhpFileFilters = project.PhpFileFilters;
 	CssFileFilters = project.CssFileFilters;
 	SqlFileFilters = project.SqlFileFilters;
+	ResourceDbFileName = project.ResourceDbFileName;
 }
 
 void mvceditor::ProjectClass::AddSource(const mvceditor::SourceClass& src) { 
@@ -184,4 +188,15 @@ void mvceditor::ProjectClass::SetSqlFileExtensionsString(wxString wildcardString
 		wxString wildcard = tokenizer.NextToken();
 		SqlFileFilters.push_back(wildcard);
 	}
+}
+
+bool mvceditor::ProjectClass::MakeResourceDbFileName() {
+	if (ResourceDbFileName.IsOk()) {
+		return true;
+	}
+	wxStandardPaths paths;
+	wxString userConfigFullPath = paths.GetUserConfigDir();
+	wxString tempFullPath = wxFileName::CreateTempFileName(userConfigFullPath + wxFileName::GetPathSeparators() + wxT("resource_finder_"));
+	ResourceDbFileName.Assign(tempFullPath);
+	return !tempFullPath.IsEmpty();
 }

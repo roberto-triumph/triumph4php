@@ -30,6 +30,7 @@
 #include <plugins/BackgroundFileReaderClass.h>
 #include <search/ResourceFinderClass.h>
 #include <wx/string.h>
+#include <queue>
 
 namespace mvceditor {
 
@@ -52,15 +53,14 @@ public:
 	ResourceFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
 
 	/**
-	 * prepare to iterate through all files of the given directory
+	 * prepare to iterate through all files of the given projects
 	 * that match the given wildcard.
 	 *
 	 * @param resourceCache the existing resources, any new resources will be added to this cache
-	 * @param sources the directories to be scanned (recursively)
-	 * @param phpFileFilters the list of PHP file extensions to look for resources in
-	 * @return bool false if project root path does not exist
+	 * @param projects the directories to be scanned (recursively)
+	 * @return bool false if none of the projects are enabled or none of the projects have a PHP source directory
 	 */
-	bool InitForProject(ResourceCacheClass* resourceCache, std::vector<mvceditor::SourceClass> sources, const std::vector<wxString>& phpFileFilters);
+	bool InitProjectQueue(ResourceCacheClass* resourceCache, const std::vector<mvceditor::ProjectClass>& projects);
 
 	/**
 	 * prepare to iterate through the given file. The name part of the given file must match the wildcard.
@@ -71,6 +71,18 @@ public:
 	 * @return bool false file does not exist
 	 */
 	bool InitForFile(ResourceCacheClass* resourceCache, const wxString& fullPath);
+
+	/**
+	 * @return TRUE if there are more projects in the queue
+	 */
+	bool MoreProjects() const;
+
+	/**
+	 * initialize the next project in the queue to be read. After a call to this method, the background
+	 * thread can be started.
+	 * @return TRUE if the project has at least one source directory that exists
+	 */
+	bool ReadNextProject();
 
 protected:
 
@@ -95,6 +107,17 @@ private:
 	 * the global cache; the parsed resources will be copied to this cache object
 	 */
 	ResourceCacheClass* ResourceCache;
+
+	/**
+	 * Queue of projects to be indexed.
+	 */
+	std::queue<mvceditor::ProjectClass> ProjectQueue;
+
+	/**
+	 * full path to the location where the current parsed resources are being
+	 * written to.
+	 */
+	wxFileName CurrentResourceDbFileName;
 };
 
 /**

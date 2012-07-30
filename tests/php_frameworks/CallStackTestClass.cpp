@@ -35,6 +35,7 @@ public:
 	mvceditor::ResourceCacheClass ResourceCache;
 	mvceditor::CallStackClass CallStack;
 	std::vector<wxString> PhpFileFilters;
+	wxFileName ResourceDbFileName;
 	
 	CallStackFixtureTestClass()
 		: FileTestFixtureClass(wxT("call_stack")) 
@@ -42,8 +43,9 @@ public:
 		, CallStack(ResourceCache)
 		, PhpFileFilters() {
 		PhpFileFilters.push_back(wxT("*.php"));
+		CreateSubDirectory(wxT("src"));
 	}
-	
+
 	wxString Simple() {
 		return wxString::FromAscii(
 			"<?php\n"
@@ -63,13 +65,21 @@ public:
 	}
 	
 	void SetupFile(const wxString& fileName, const wxString& contents) {
-		CreateFixtureFile(fileName, contents);
-		
+
 		// make the cache consume the file; to prime it with the resources because the
 		// call stack wont work without the cache
+		CreateFixtureFile(wxT("src") + wxFileName::GetPathSeparators() + fileName, contents);
+	}
+
+	void BuildCache() {
+		ResourceDbFileName.Assign(TestProjectDir + wxT("resource_cache.db"));
+		ResourceCache.InitGlobal(ResourceDbFileName);
+
 		mvceditor::DirectorySearchClass search;
-		search.Init(TestProjectDir);
-		ResourceCache.WalkGlobal(search, PhpFileFilters);
+		search.Init(TestProjectDir + wxT("src"));
+		while (search.More()) {
+			ResourceCache.WalkGlobal(ResourceDbFileName, search, PhpFileFilters);
+		}
 	}
 };
 
@@ -77,7 +87,8 @@ SUITE(CallStackTestClass) {
 
 TEST_FIXTURE(CallStackFixtureTestClass, FailOnUnknownResource) {
 	SetupFile(wxT("news.php"), Simple());
-	wxFileName file(TestProjectDir + wxT("news.php"));
+	BuildCache();
+	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
 	CHECK_EQUAL(false, CallStack.Build(file, UNICODE_STRING_SIMPLE("UnknownClass"), UNICODE_STRING_SIMPLE("index"), error));
 	CHECK_EQUAL(mvceditor::CallStackClass::RESOURCE_NOT_FOUND, error);
@@ -109,8 +120,9 @@ TEST_FIXTURE(CallStackFixtureTestClass, FailOnParseError) {
 		"}"
 	);
 	SetupFile(wxT("news.php"), badCode);
+	BuildCache();
 	
-	wxFileName file(TestProjectDir + wxT("news.php"));
+	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
 	CHECK_EQUAL(false, CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), error));
 
@@ -139,8 +151,9 @@ TEST_FIXTURE(CallStackFixtureTestClass, ResolutionError) {
 		"}"
 	);
 	SetupFile(wxT("news.php"), badCode);
+	BuildCache();
 	
-	wxFileName file(TestProjectDir + wxT("news.php"));
+	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
 	
 	// we still want to return true because an incomplete call stack may be helpful in some cases
@@ -174,11 +187,12 @@ TEST_FIXTURE(CallStackFixtureTestClass, FailOnStackLimit) {
 
 TEST_FIXTURE(CallStackFixtureTestClass, FailOnEmptyCache) {
 	SetupFile(wxT("news.php"), Simple());
-	
+	BuildCache();
+
 	mvceditor::ResourceCacheClass localCache;
 	mvceditor::CallStackClass localCallStack(localCache);
 	
-	wxFileName file(TestProjectDir + wxT("news.php"));
+	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
 	CHECK_EQUAL(false, localCallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), error));
 	CHECK_EQUAL(mvceditor::CallStackClass::EMPTY_CACHE, error);
@@ -186,7 +200,9 @@ TEST_FIXTURE(CallStackFixtureTestClass, FailOnEmptyCache) {
 
 TEST_FIXTURE(CallStackFixtureTestClass, SimpleMethodCall) {
 	SetupFile(wxT("news.php"), Simple());
-	wxFileName file(TestProjectDir + wxT("news.php"));
+	BuildCache();
+
+	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
 	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), error));
 	
@@ -243,7 +259,9 @@ TEST_FIXTURE(CallStackFixtureTestClass, MultipleMethodCalls) {
 			"}\n"
 		);
 	SetupFile(wxT("news.php"), code);
-	wxFileName file(TestProjectDir + wxT("news.php"));
+	BuildCache();
+
+	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
 	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), error));
 	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
@@ -292,7 +310,9 @@ TEST_FIXTURE(CallStackFixtureTestClass, WithArrayKeyAssignment) {
 		"}\n"
 	);
 	SetupFile(wxT("news.php"), code);
-	wxFileName file(TestProjectDir + wxT("news.php"));
+	BuildCache();
+
+	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
 	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), error));
 	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
@@ -338,7 +358,9 @@ TEST_FIXTURE(CallStackFixtureTestClass, WithMethodCall) {
 		"}\n"
 	);
 	SetupFile(wxT("news.php"), code);
-	wxFileName file(TestProjectDir + wxT("news.php"));
+	BuildCache();
+	
+	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
 	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), error));
 	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
@@ -367,7 +389,9 @@ TEST_FIXTURE(CallStackFixtureTestClass, WithMethodCall) {
 
 TEST_FIXTURE(CallStackFixtureTestClass, Persist) {
 	SetupFile(wxT("news.php"), Simple());
-	wxFileName file(TestProjectDir + wxT("news.php"));
+	BuildCache();
+
+	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
 	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), error));
 	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);

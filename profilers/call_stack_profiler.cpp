@@ -124,8 +124,13 @@ void CacheLargeProject(mvceditor::ResourceCacheClass& resourceCache, wxString di
 		printf("Directory does not exist: %s\n", (const char*)dirName.ToAscii());
 	}
 	bool walked = true;
+	wxFileName fileName(wxFileName::GetTempDir() + wxT("resource_cache.db"));
+	if (fileName.FileExists()) {
+		wxRemoveFile(fileName.GetFullPath());
+	}
+	resourceCache.InitGlobal(fileName);
 	while (walked && directorySearch.More()) {
-		walked = resourceCache.WalkGlobal(directorySearch, fileFilters);
+		walked = resourceCache.WalkGlobal(fileName, directorySearch, fileFilters);
 	}
 	if (!walked) {
 		printf("Resource Cache could not be initialized!\n");

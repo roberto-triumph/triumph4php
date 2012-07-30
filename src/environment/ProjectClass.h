@@ -51,6 +51,15 @@ public:
 	std::vector<mvceditor::SourceClass> Sources;
 
 	/**
+	 * The location of the resource cache for this project. The resource DB file contains all of
+	 * the parsed resources for all of this project's resources.
+	 * This file will be invalid for new projects, until the MakeDbFileName() method gets called.
+	 *
+	 * @see mvceditor::ResourceFinderClass
+	 */
+	wxFileName ResourceDbFileName;
+
+	/**
 	 * If TRUE, this project is enabled and is used by MVC Editor.
 	 */
 	bool IsEnabled;
@@ -171,6 +180,11 @@ public:
 	 * Existing filters are left intact
 	 */
 	void SetSqlFileExtensionsString(wxString wildcardString);
+
+	/**
+	 * creates a unique filename for the resources of this project. 
+	 */
+	bool MakeResourceDbFileName();
 
 private:
 	

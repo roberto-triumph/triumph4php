@@ -97,9 +97,11 @@ void mvceditor::ProjectPluginClass::LoadPreferences(wxConfigBase* config) {
 
 			wxString keyLabel = wxString::Format(wxT("/Project_%d/Label"), projectIndex);
 			wxString keyEnabled = wxString::Format(wxT("/Project_%d/IsEnabled"), projectIndex);
+			wxString keyResourceDbFileName = wxString::Format(wxT("/Project_%d/ResourceDbFileName"), projectIndex);
 			wxString keySourceCount = wxString::Format(wxT("/Project_%d/SourceCount"), projectIndex);
 			config->Read(keyLabel, &newProject.Label);
 			config->Read(keyEnabled, &newProject.IsEnabled);
+			newProject.ResourceDbFileName.Assign(config->Read(keyResourceDbFileName));
 			config->Read(keySourceCount, &sourcesCount);
 			for (int j = 0; j < sourcesCount; ++j) {
 				wxString keyRootPath = wxString::Format(wxT("/Project_%d/Source_%d_RootDirectory"), projectIndex, j);
@@ -157,9 +159,11 @@ void mvceditor::ProjectPluginClass::SavePreferences(wxCommandEvent& event) {
 		mvceditor::ProjectClass project = App.Structs.Projects[i];
 		wxString keyLabel = wxString::Format(wxT("/Project_%d/Label"), i);
 		wxString keyEnabled = wxString::Format(wxT("/Project_%d/IsEnabled"), i);
+		wxString keyResourceDbFileName = wxString::Format(wxT("/Project_%d/ResourceDbFileName"), i);	
 		wxString keySourceCount = wxString::Format(wxT("/Project_%d/SourceCount"), i);
 		config->Write(keyLabel, project.Label);
 		config->Write(keyEnabled, project.IsEnabled);
+		config->Write(keyResourceDbFileName, project.ResourceDbFileName.GetFullPath());
 		config->Write(keySourceCount, (int)project.Sources.size());
 		for (size_t j = 0; j < project.Sources.size(); ++j) {
 			mvceditor::SourceClass source = project.Sources[j];			

@@ -29,10 +29,8 @@ mvceditor::ResourceCacheClass::ResourceCacheClass()
 	: Mutex()
 	, Finders()
 	, SymbolTables()
-	, GlobalResourceFinder() 
+	, GlobalResourceFinders() 
 	, Version(pelet::PHP_53) {
-
-	GlobalResourceFinder.InitMemory();
 }
 
 mvceditor::ResourceCacheClass::~ResourceCacheClass() {
@@ -111,7 +109,33 @@ bool mvceditor::ResourceCacheClass::Update(const wxString& fileName, const Unico
 	return ret;
 }
 
-bool mvceditor::ResourceCacheClass::WalkGlobal(mvceditor::DirectorySearchClass& search, const std::vector<wxString>& phpFileFilters) {
+bool mvceditor::ResourceCacheClass::InitGlobal(const wxFileName& resourceDbFileName) {
+	wxMutexLocker locker(Mutex);
+	if (!locker.IsOk()) {
+		return false;
+	}
+	
+	bool ret = false;
+	int cnt = GlobalResourceFinders.count(resourceDbFileName.GetFullPath());
+	if (cnt <= 0) {
+		mvceditor::ResourceFinderClass* resourceFinder = new mvceditor::ResourceFinderClass();
+		resourceFinder->InitFile(resourceDbFileName);
+		GlobalResourceFinders[resourceDbFileName.GetFullPath()] = resourceFinder;
+		ret = true;
+	}
+	return ret;
+}
+
+bool mvceditor::ResourceCacheClass::IsInitGlobal(const wxFileName& resourceDbFileName) {
+	wxMutexLocker locker(Mutex);
+	if (!locker.IsOk()) {
+		return false;
+	}
+	int cnt = GlobalResourceFinders.count(resourceDbFileName.GetFullPath());
+	return cnt > 0;
+}
+
+bool mvceditor::ResourceCacheClass::WalkGlobal(const wxFileName& resourceDbFileName, mvceditor::DirectorySearchClass& search, const std::vector<wxString>& phpFileFilters) {
 	wxMutexLocker locker(Mutex);
 	if (!locker.IsOk()) {
 		return false;
@@ -119,9 +143,13 @@ bool mvceditor::ResourceCacheClass::WalkGlobal(mvceditor::DirectorySearchClass& 
 
 	// need to do this so that the resource finder attempts to parse the files
 	// FileFilters and query string needs to be non-empty
-	GlobalResourceFinder.FileFilters = phpFileFilters;
-	GlobalResourceFinder.Prepare(wxT("FakeFakeClass"));
-	search.Walk(GlobalResourceFinder);
+	for (std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it = GlobalResourceFinders.begin(); it != GlobalResourceFinders.end(); ++it) {
+		if (it->first == resourceDbFileName.GetFullPath()) {
+			it->second->FileFilters = phpFileFilters;
+			it->second->Prepare(wxT("FakeFakeClass"));
+			search.Walk(*it->second);
+		}
+	}
 	return true;
 }
 
@@ -130,7 +158,14 @@ bool mvceditor::ResourceCacheClass::BuildResourceCacheForNativeFunctionsGlobal()
 	if (!locker.IsOk()) {
 		return false;
 	}
-	return GlobalResourceFinder.BuildResourceCacheForNativeFunctions();
+	if (GlobalResourceFinders.count(wxT(":memory:")) == 0) {
+
+		// this is the case when Clear() is called right before this method
+		mvceditor::ResourceFinderClass* finder = new mvceditor::ResourceFinderClass;
+		finder->InitMemory();
+		GlobalResourceFinders[wxT(":memory:")] = finder;
+	}
+	return GlobalResourceFinders[wxT(":memory:")]->BuildResourceCacheForNativeFunctions();
 }
 
 bool mvceditor::ResourceCacheClass::PersistGlobal(const wxFileName& outputFile) {
@@ -138,7 +173,12 @@ bool mvceditor::ResourceCacheClass::PersistGlobal(const wxFileName& outputFile) 
 	if (!locker.IsOk()) {
 		return false;
 	}
-	return GlobalResourceFinder.Persist(outputFile);
+	bool good = false;
+	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it;
+	for (it = GlobalResourceFinders.begin(); good && it != GlobalResourceFinders.end(); ++it) {
+		good &= it->second->Persist(outputFile);
+	}
+	return good;
 }
 
 std::vector<mvceditor::ResourceClass> mvceditor::ResourceCacheClass::AllNonNativeClassesGlobal() {
@@ -147,7 +187,12 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceCacheClass::AllNonNativ
 	if (!locker.IsOk()) {
 		return res;
 	}
-	return GlobalResourceFinder.AllNonNativeClasses();
+	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it;
+	for (it = GlobalResourceFinders.begin(); it != GlobalResourceFinders.end(); ++it) {
+		std::vector<mvceditor::ResourceClass> finderResources = it->second->AllNonNativeClasses();
+		res.insert(res.end(), finderResources.begin(), finderResources.end());
+	}
+	return res;
 }
 
 bool mvceditor::ResourceCacheClass::PrepareAll(const wxString& resource) {
@@ -155,7 +200,7 @@ bool mvceditor::ResourceCacheClass::PrepareAll(const wxString& resource) {
 	if (!locker.IsOk()) {
 		return false;
 	}
-	std::vector<mvceditor::ResourceFinderClass*> finders = Iterator(&GlobalResourceFinder);
+	std::vector<mvceditor::ResourceFinderClass*> finders = AllFinders();
 	bool prep = true;
 	for (size_t i = 0; i < finders.size(); ++i) {
 		prep &= finders[i]->Prepare(resource);
@@ -173,7 +218,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceCacheClass::CollectFull
 	// return all of the matches from all finders that were found by the Collect* call.
 	// This is a bit tricky because we want to prioritize matches in opened files 
 	// instead of the global finder, since the global finder will be outdated.
-	std::vector<mvceditor::ResourceFinderClass*> finders = Iterator(&GlobalResourceFinder);
+	std::vector<mvceditor::ResourceFinderClass*> finders = AllFinders();
 	for (size_t i = 0; i < finders.size(); ++i) {
 		mvceditor::ResourceFinderClass* resourceFinder = finders[i];
 		std::vector<mvceditor::ResourceClass> finderMatches = resourceFinder->CollectFullyQualifiedResource();
@@ -199,7 +244,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceCacheClass::CollectNear
 	// return all of the matches from all finders that were found by the Collect* call.
 	// This is a bit tricky because we want to prioritize matches in opened files 
 	// instead of the global finder, since the global finder will be outdated.
-	std::vector<mvceditor::ResourceFinderClass*> finders = Iterator(&GlobalResourceFinder);
+	std::vector<mvceditor::ResourceFinderClass*> finders = AllFinders();
 	for (size_t i = 0; i < finders.size(); ++i) {
 		mvceditor::ResourceFinderClass* resourceFinder = finders[i];
 		std::vector<mvceditor::ResourceClass> finderMatches = resourceFinder->CollectNearMatchResources();
@@ -224,13 +269,16 @@ mvceditor::ResourceCacheClass::PrepareAndCollectNearMatchResourcesFromAll(const 
 	return matches;
 }
 
-std::vector<mvceditor::ResourceFinderClass*> mvceditor::ResourceCacheClass::Iterator(mvceditor::ResourceFinderClass* resourceFinder) {
-	std::vector<mvceditor::ResourceFinderClass*> finders;
-	finders.push_back(resourceFinder);
+std::vector<mvceditor::ResourceFinderClass*> mvceditor::ResourceCacheClass::AllFinders() {
+	std::vector<mvceditor::ResourceFinderClass*> allResourceFinders;
 	for (std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it =  Finders.begin(); it != Finders.end(); ++it) {
-		finders.push_back(it->second);
+		allResourceFinders.push_back(it->second);
 	}
-	return finders;
+	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it;
+	for (it = GlobalResourceFinders.begin(); it != GlobalResourceFinders.end(); ++it) {
+		allResourceFinders.push_back(it->second);
+	}
+	return allResourceFinders;
 }
 
 void mvceditor::ResourceCacheClass::ExpressionCompletionMatches(const wxString& fileName, const pelet::ExpressionClass& parsedExpression, 
@@ -249,7 +297,8 @@ void mvceditor::ResourceCacheClass::ExpressionCompletionMatches(const wxString& 
 		mvceditor::SymbolTableClass* symbolTable = itSymbols->second;
 		if (symbolTable) {
 			foundSymbolTable = true;
-			symbolTable->ExpressionCompletionMatches(parsedExpression, expressionScope, Finders, &GlobalResourceFinder, 
+			std::vector<mvceditor::ResourceFinderClass*> allFinders = AllFinders();
+			symbolTable->ExpressionCompletionMatches(parsedExpression, expressionScope, allFinders, Finders, 
 				autoCompleteList, resourceMatches, doDuckTyping, error);
 		}
 	}
@@ -275,7 +324,8 @@ void mvceditor::ResourceCacheClass::ResourceMatches(const wxString& fileName, co
 			foundSymbolTable = true;
 			///symbolTable->Print();
 			///GlobalResourceFinder.Print();
-			symbolTable->ResourceMatches(parsedExpression, expressionScope, Finders, &GlobalResourceFinder, 
+			std::vector<mvceditor::ResourceFinderClass*> allFinders = AllFinders();
+			symbolTable->ResourceMatches(parsedExpression, expressionScope, allFinders, Finders, 
 				matches, doDuckTyping, doFullyQualifiedMatchOnly, error);
 		}
 	}
@@ -289,7 +339,14 @@ void mvceditor::ResourceCacheClass::GlobalAddDynamicResources(const std::vector<
 	if (!locker.IsOk()) {
 		return;
 	}
-	GlobalResourceFinder.AddDynamicResources(resources);
+	if (GlobalResourceFinders.count(wxT(":memory:")) == 0) {
+
+		// this is the case when Clear() is called right before this method
+		mvceditor::ResourceFinderClass* finder = new mvceditor::ResourceFinderClass;
+		finder->InitMemory();
+		GlobalResourceFinders[wxT(":memory:")] = finder;
+	}
+	GlobalResourceFinders[wxT(":memory:")]->AddDynamicResources(resources);
 }
 
 void mvceditor::ResourceCacheClass::Print() {
@@ -297,8 +354,8 @@ void mvceditor::ResourceCacheClass::Print() {
 	if (!locker.IsOk()) {
 		return;
 	}
-	GlobalResourceFinder.Print();
 	UFILE* ufout = u_finit(stdout, NULL, NULL);
+	u_fprintf(ufout, "Number of global caches: %d\n", GlobalResourceFinders.size());
 	u_fprintf(ufout, "Number of registered caches: %d\n", Finders.size());
 	u_fprintf(ufout, "Number of registered symbol tables: %d\n", SymbolTables.size());
 	u_fclose(ufout);
@@ -306,7 +363,6 @@ void mvceditor::ResourceCacheClass::Print() {
 	for (; it != SymbolTables.end(); ++it) {
 		it->second->Print();
 	}
-	
 }
 
 bool mvceditor::ResourceCacheClass::IsFileCacheEmpty() {
@@ -314,7 +370,11 @@ bool mvceditor::ResourceCacheClass::IsFileCacheEmpty() {
 	if (!locker.IsOk()) {
 		return true;
 	}
-	bool isEmpty = GlobalResourceFinder.IsFileCacheEmpty();
+	bool isEmpty = true;
+	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it;
+	for (it = GlobalResourceFinders.begin(); it != GlobalResourceFinders.end(); ++it) {
+		isEmpty = it->second->IsFileCacheEmpty();
+	}
 	return isEmpty;
 }
 
@@ -323,7 +383,11 @@ bool mvceditor::ResourceCacheClass::IsResourceCacheEmpty() {
 	if (!locker.IsOk()) {
 		return true;
 	}
-	bool isEmpty = GlobalResourceFinder.IsResourceCacheEmpty();
+	bool isEmpty = true;
+	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it;
+	for (it = GlobalResourceFinders.begin(); it != GlobalResourceFinders.end(); ++it) {
+		isEmpty = it->second->IsResourceCacheEmpty();
+	}
 	return isEmpty;
 }
 
@@ -332,13 +396,17 @@ void mvceditor::ResourceCacheClass::Clear() {
 	if (!locker.IsOk()) {
 		return;
 	}
-	GlobalResourceFinder.Clear();
+	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it;
+	for (it = GlobalResourceFinders.begin(); it != GlobalResourceFinders.end(); ++it) {
+		delete it->second;
+	}
 	for (std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it =  Finders.begin(); it != Finders.end(); ++it) {
 		delete it->second;
 	}
 	for (std::map<wxString, mvceditor::SymbolTableClass*>::iterator it =  SymbolTables.begin(); it != SymbolTables.end(); ++it) {
 		delete it->second;
 	}
+	GlobalResourceFinders.clear();
 	Finders.clear();
 	SymbolTables.clear();	
 }
@@ -349,7 +417,10 @@ void mvceditor::ResourceCacheClass::SetVersion(pelet::Versions version) {
 		return;
 	}
 	Version = version;
-	GlobalResourceFinder.SetVersion(version);
+	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it;
+	for (it = GlobalResourceFinders.begin(); it != GlobalResourceFinders.end(); ++it) {
+		it->second->SetVersion(version);
+	}
 	for (std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it =  Finders.begin(); it != Finders.end(); ++it) {
 		it->second->SetVersion(version);
 	}

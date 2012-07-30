@@ -173,8 +173,8 @@ static UnicodeString ResolveResourceType(UnicodeString resourceToLookup,
 
  * @see VariableObserverClass
  * @param expressionScope needed to use the symbol table
- * @param openedResourceFinders needed to use the symbol table
- * @param globalResourceFinder needed to use the symbol table  
+ * @param allResourceFinders needed to use the symbol table
+ * @param openedResourceFinders needed to use the symbol table  
  * @param doDuckTyping
  * @param error any symbol table errors will be written here
  * @param variable the variable's name.  This is a single token, ie "$this", "$aglob" no object
@@ -187,8 +187,8 @@ static UnicodeString ResolveResourceType(UnicodeString resourceToLookup,
  * @return the variable's type; could be empty string if type could not be determined 
  */
 static UnicodeString ResolveVariableType(const pelet::ScopeClass& expressionScope, 
+										 const std::vector<mvceditor::ResourceFinderClass*>& allResourceFinders,
 										 const std::map<wxString, mvceditor::ResourceFinderClass*>& openedResourceFinders, 
-										 mvceditor::ResourceFinderClass* globalResourceFinder,
 										 bool doDuckTyping,
 										 mvceditor::SymbolTableMatchErrorClass& error,
 										 const UnicodeString& variable, 
@@ -219,12 +219,6 @@ static UnicodeString ResolveVariableType(const pelet::ScopeClass& expressionScop
 				// the  ResolveResourceType will get the function return type
 				// if the variable was created from a function.
 				UnicodeString resourceToLookup = symbol.ChainList[0].Name;
-				std::vector<mvceditor::ResourceFinderClass*> allResourceFinders;
-				allResourceFinders.push_back(globalResourceFinder);
-				for (std::map<wxString, mvceditor::ResourceFinderClass*>::const_iterator it =  openedResourceFinders.begin(); it != openedResourceFinders.end(); ++it) {
-					allResourceFinders.push_back(it->second);
-				}
-				
 				type = ResolveResourceType(resourceToLookup, allResourceFinders);
 
 			}
@@ -238,7 +232,7 @@ static UnicodeString ResolveVariableType(const pelet::ScopeClass& expressionScop
 				parsedExpression.ChainList = symbol.ChainList;
 				std::vector<mvceditor::ResourceClass> resourceMatches;
 				symbolTable.ResourceMatches(parsedExpression, expressionScope, 
-					openedResourceFinders, globalResourceFinder, resourceMatches, doDuckTyping, false, error);
+					allResourceFinders, openedResourceFinders, resourceMatches, doDuckTyping, false, error);
 				if (!resourceMatches.empty()) {
 					if (mvceditor::ResourceClass::CLASS == resourceMatches[0].Type) {
 						type = resourceMatches[0].ClassName;
@@ -258,31 +252,27 @@ static UnicodeString ResolveVariableType(const pelet::ScopeClass& expressionScop
  * Figure out the type of the initial lexeme in an expression chain. The initial 
  * element may be a variable, a function call, or a static class access. This logic
  * is not trivial; that's why it was separated.
-
+ *
  * @param parsedExpression the expression to resolved.
  * @param scope the scope (to resolve variables)
- * @param finders all of the finders to look in
+ * @param allResourceFinders all of the finders to look in
+ * @param openedResourceFindesr the resource finders from the opened files
  * @return the resource's type; (for methods, it's the return type of the method) could be empty string if type could not be determined 
  */
 static UnicodeString ResolveInitialLexemeType(const pelet::ExpressionClass& parsedExpression, 
 											  const pelet::ScopeClass& expressionScope, 
+											  const std::vector<mvceditor::ResourceFinderClass*>& allResourceFinders,
 											  const std::map<wxString, mvceditor::ResourceFinderClass*>& openedResourceFinders,
-											  mvceditor::ResourceFinderClass* globalResourceFinder,
 											  bool doDuckTyping,
 											  mvceditor::SymbolTableMatchErrorClass& error,
 											  const std::vector<mvceditor::SymbolClass>& scopeSymbols,
 											  const mvceditor::SymbolTableClass& symbolTable) {
 	UnicodeString start = parsedExpression.FirstValue();
 	UnicodeString typeToLookup;
-	std::vector<mvceditor::ResourceFinderClass*> allResourceFinders;
-	allResourceFinders.push_back(globalResourceFinder);
-	for (std::map<wxString, mvceditor::ResourceFinderClass*>::const_iterator it =  openedResourceFinders.begin(); it != openedResourceFinders.end(); ++it) {
-		allResourceFinders.push_back(it->second);
-	}
 	if (start.startsWith(UNICODE_STRING_SIMPLE("$"))) {
 		
 		// a variable. look at the type from the symbol table
-		typeToLookup = ResolveVariableType(expressionScope, openedResourceFinders, globalResourceFinder, doDuckTyping, error, 
+		typeToLookup = ResolveVariableType(expressionScope, allResourceFinders, openedResourceFinders, doDuckTyping, error, 
 				start, scopeSymbols, symbolTable);
 	}
 	else if (start.caseCompare(UNICODE_STRING_SIMPLE("self"), 0) == 0){
@@ -523,8 +513,8 @@ void mvceditor::SymbolTableClass::CreateSymbolsFromFile(const wxString& fileName
 }
 
 void mvceditor::SymbolTableClass::ExpressionCompletionMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope,
+															  const std::vector<mvceditor::ResourceFinderClass*>& allResourceFinders,
 															  const std::map<wxString, mvceditor::ResourceFinderClass*>& openedResourceFinders,
-															  mvceditor::ResourceFinderClass* globalResourceFinder,
 															  std::vector<UnicodeString>& autoCompleteVariableList,
 															  std::vector<mvceditor::ResourceClass>& autoCompleteResourceList,
 															  bool doDuckTyping,
@@ -548,14 +538,14 @@ void mvceditor::SymbolTableClass::ExpressionCompletionMatches(pelet::ExpressionC
 	else {
 
 		// some kind of function call / method chain call
-		ResourceMatches(parsedExpression, expressionScope, openedResourceFinders, globalResourceFinder, 
+		ResourceMatches(parsedExpression, expressionScope, allResourceFinders, openedResourceFinders,
 			autoCompleteResourceList, doDuckTyping, false, error);
 	}	
 }
 
 void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope, 
+												  const std::vector<mvceditor::ResourceFinderClass*>& allResourceFinders,
 												  const std::map<wxString, mvceditor::ResourceFinderClass*>& openedResourceFinders,
-												  mvceditor::ResourceFinderClass* globalResourceFinder,
 												  std::vector<mvceditor::ResourceClass>& resourceMatches,
 												  bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 												  mvceditor::SymbolTableMatchErrorClass& error) const {
@@ -564,19 +554,14 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 		Variables.find(ScopeString(expressionScope.ClassName, expressionScope.MethodName));
 	if (it != Variables.end()) {
 		scopeSymbols = it->second;
-	}	
-	std::vector<mvceditor::ResourceFinderClass*> allResourceFinders;
-	allResourceFinders.push_back(globalResourceFinder);
-	for (std::map<wxString, mvceditor::ResourceFinderClass*>::const_iterator it =  openedResourceFinders.begin(); it != openedResourceFinders.end(); ++it) {
-		allResourceFinders.push_back(it->second);
 	}
 	
 	// take care of the 'use' namespace importing
 	pelet::ExpressionClass originalExpression = parsedExpression;
 	ResolveNamespaceAlias(parsedExpression, expressionScope);
 	
-	UnicodeString typeToLookup = ResolveInitialLexemeType(parsedExpression, expressionScope, openedResourceFinders, 
-		globalResourceFinder, doDuckTyping, error, scopeSymbols, *this);
+	UnicodeString typeToLookup = ResolveInitialLexemeType(parsedExpression, expressionScope, allResourceFinders, openedResourceFinders, 
+		doDuckTyping, error, scopeSymbols, *this);
 		
 	// continue to the next item in the chain up until the second to last one
 	// if we can't resolve a type then just exit
