@@ -43,11 +43,11 @@ mvceditor::StructsClass::StructsClass()
 
 std::vector<mvceditor::SourceClass> mvceditor::StructsClass::AllEnabledSources() const {
 	std::vector<mvceditor::SourceClass> allSources;
-	for (size_t i = 0; i < Projects.size(); ++i) {
-		mvceditor::ProjectClass project = Projects[i];
-		if (project.IsEnabled) {
-			for (size_t j = 0; j < project.Sources.size(); ++j) {
-				allSources.push_back(project.Sources[j]);
+	std::vector<mvceditor::ProjectClass>::const_iterator it;
+	for (it = Projects.begin(); it != Projects.end(); ++it) {
+		if (it->IsEnabled) {
+			for (size_t j = 0; j < it->Sources.size(); ++j) {
+				allSources.push_back(it->Sources[j]);
 			}
 		}
 	}
@@ -96,18 +96,18 @@ std::vector<wxString> mvceditor::StructsClass::GetSqlFileExtensions() const {
 
 bool mvceditor::StructsClass::IsAPhpSourceFile(const wxString& fullPath) const {
 	bool isPhp = false;
-	for (size_t i = 0; i < Projects.size() && !isPhp; ++i) {
-		mvceditor::ProjectClass project = Projects[i];
-		isPhp = project.IsAPhpSourceFile(fullPath);
+	std::vector<mvceditor::ProjectClass>::const_iterator it;
+	for (it = Projects.begin(); it != Projects.end() && !isPhp; ++it) {
+		isPhp = it->IsAPhpSourceFile(fullPath);
 	}
 	return isPhp;
 }
 
 wxString mvceditor::StructsClass::RelativeFileName(const wxString &fullPath) const {
 	wxString relativeName;
-	for (size_t i = 0; i < Projects.size() && relativeName.IsEmpty(); ++i) {
-		mvceditor::ProjectClass project = Projects[i];
-		relativeName = project.RelativeFileName(fullPath);
+	std::vector<mvceditor::ProjectClass>::const_iterator it;
+	for (it = Projects.begin(); it != Projects.end() && relativeName.IsEmpty(); ++it) {
+		relativeName = it->RelativeFileName(fullPath);
 	}
 	return relativeName;
 }
@@ -115,10 +115,10 @@ wxString mvceditor::StructsClass::RelativeFileName(const wxString &fullPath) con
 
 wxString mvceditor::StructsClass::FirstDirectory() const {
 	wxString fullPath;
-	for (size_t i = 0; i < Projects.size(); ++i) {
-		mvceditor::ProjectClass project = Projects[i];
-		if (project.IsEnabled && project.HasSources()) {
-			fullPath = project.Sources[0].RootDirectory.GetPath();
+	std::vector<mvceditor::ProjectClass>::const_iterator it;
+	for (it = Projects.begin(); it != Projects.end(); ++it) {
+		if (it->IsEnabled && it->HasSources()) {
+			fullPath = it->Sources[0].RootDirectory.GetPath();
 			break;
 		}
 	}
