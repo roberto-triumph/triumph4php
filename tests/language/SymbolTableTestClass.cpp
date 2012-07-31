@@ -308,7 +308,6 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithLocalFinderOverridesGlob
 	OpenedFinders[wxT("MyClass.php")] = &localFinder;
 	AllFinders.push_back(&localFinder);
 
-	GlobalFinder.BuildResourceCacheForFile(wxT("MyClass.php"), sourceCodeGlobal, true);
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false, false);
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);

@@ -616,11 +616,11 @@ private:
 	int GetLineCountFromFile(const wxString& fullPath) const;
 	
 	/**
-	 * remove all resources for the file.
+	 * remove all resources for the given file_item_ids.
 	 * 
-	 * @param fileItem resources from this fileItem will be deleted.
+	 * @param fileItemids the list of file_item_id that will be deleted from the SQLite database.
 	 */
-	void RemoveCachedResources(const mvceditor::FileItemClass& fileItem);
+	void RemoveCachedResources(const std::vector<int>& fileItemIds);
 	
 	/**
 	 * Collects all resources that are files and match the parsed Resource [given to Prepare()]. 
@@ -674,14 +674,6 @@ private:
 	void EnsureMatchesExist(std::vector<ResourceClass>& matchesw);
 
 	/**
-	 * Returns the full path to the given resource
-	 * 
-	 * @param resource a resource returned by one of the CollectXXX() methods OF THIS OBJECT.
-	 * @return wxString returns empty string on invalid resource
-	 */
-	wxString GetResourceMatchFullPathFromResource(const ResourceClass& resource);
-
-	/**
 	 * create a new entry in the file cache. The item's FileId member will be set as well.
 	 */
 	void PushIntoFileCache(mvceditor::FileItemClass& fileItem);
@@ -708,16 +700,13 @@ private:
 	bool LoadTagFile(const wxFileName& fileName, bool isNativeTags);
 	
 	/**
-	 * Checks to see if the given method resource is inherited by the given class. Checking is 
+	 * Get all of the traits that a given class uses. Checking is 
 	 * done by looking at the trait use, trait alias, and trait insteadof statements.
 	 * 
-	 * @param memberResource the member resource to check
-	 * @param fullyQualifiedClassName fully qualified class name of class to check in.  This class 
-	 *        and any trait classes that this class uses, will be checked.
-	 * @return bool TRUE if memberResource belongs to className or any traits that 
-	 *         className uses.
+	 * @param fullyQualifiedClassName fully qualified class name of class to query
+	 * @param inheritedTraits the list of traits will be appended to this vector
 	 */
-	bool IsTraitInherited(const ResourceClass& memberResource, const UnicodeString& fullyQualifiedClassName);
+	void InheritedTraits(const UnicodeString& fullyQualifiedClassName, std::vector<UnicodeString>& inheritedTraits);
 	
 	/**
 	 * bulk get operation for the given file item Ids.
@@ -809,6 +798,12 @@ public:
 	 * @var UnicodeString
 	 */
 	UnicodeString Comment;
+
+	/**
+	 * Full path to the file where this resource was found. Note that this may not be a valid file
+	 * if a resources is a native or dynamic resource.
+	 */
+	wxFileName FullPath;
 	
 	/**
 	 * The resource item type
@@ -866,12 +861,6 @@ public:
 	 * exact, case sensitive manner.
 	 */	
 	bool operator==(const ResourceClass& a) const;
-	
-
-	/**
-	 * @return the full path where this resource is located.
-	 */
-	wxString GetFullPath() const;
 
 	/**
 	 * set all properties to empty string
@@ -884,12 +873,6 @@ public:
 	bool IsKeyEqualTo(const UnicodeString& key) const;
 
 private:
-
-	/**
-	 * This will only be filled after a match occurs; in the cache we will just 
-	 * hold the file item index.
-	 */
-	wxString FullPath;
 	
 	/**
 	 * This is the "key" that we will use for lookups. This is the string that will be used to index resources
@@ -905,6 +888,13 @@ private:
 	 * The index to the file where this resource was found. 
 	 */
 	int FileItemId;
+
+	/**
+	 * Same as FileItemClass::IsNew ie TRUE if this resource was parsed from contents
+	 * not yet written to disk
+	 * @see FileItemClass::IsNew
+	 */
+	bool FileIsNew;
 	
 	/**
 	 * The resource finder class will populate FileItemId and FullPath

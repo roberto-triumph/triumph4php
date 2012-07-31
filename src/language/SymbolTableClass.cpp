@@ -770,7 +770,7 @@ void mvceditor::SymbolTableClass::SetVersion(pelet::Versions version) {
 bool mvceditor::IsResourceDirty(const std::map<wxString, mvceditor::ResourceFinderClass*>& finders, 
 								const ResourceClass& resource, mvceditor::ResourceFinderClass* resourceFinder) {
 	bool ret = false;
-	wxString matchFullName = resource.GetFullPath();
+	wxString matchFullName = resource.FullPath.GetFullPath();
 	std::map<wxString, mvceditor::ResourceFinderClass*>::const_iterator it = finders.begin();
 	while (it != finders.end()) {
 

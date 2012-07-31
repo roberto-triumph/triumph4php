@@ -540,6 +540,9 @@ void mvceditor::ProjectListDialogClass::OnEditButton(wxCommandEvent& event) {
 
 void mvceditor::ProjectListDialogClass::OnOkButton(wxCommandEvent& event) {
 	Projects = EditedProjects;
+	for (size_t i = 0; i < Projects.size(); ++i) {
+		Projects[i].MakeResourceDbFileName();
+	}
 	EndModal(wxOK);
 }
 

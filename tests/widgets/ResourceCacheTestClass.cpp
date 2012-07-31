@@ -350,6 +350,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, MultipleGlobalFinders) {
 	// 2 global finders, each will parse a different file with different PHP classes. 
 	// then we will make sure that completion works for both classes
 	wxString globalCode1 = wxT("<?php class ActionMy   { function methodA() {} }");
+
 	wxString globalCode2 = wxT("<?php class ActionYours   { function methodB() {} }");
 	wxString globalRoot1 = wxT("my_src") + wxFileName::GetPathSeparators();
 	wxString globalRoot2 = wxT("yours_src") + wxFileName::GetPathSeparators();

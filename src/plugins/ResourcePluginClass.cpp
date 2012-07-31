@@ -111,7 +111,6 @@ bool mvceditor::ResourceFileReaderClass::ReadNextProject() {
 		std::vector<mvceditor::SourceClass> sources = project.AllPhpSources();
 		if (Init(sources)) {			
 			PhpFileFilters = project.GetPhpFileExtensions();
-			project.MakeResourceDbFileName();
 			CurrentResourceDbFileName = project.ResourceDbFileName;
 			if (!ResourceCache->IsInitGlobal(CurrentResourceDbFileName)) {
 				ResourceCache->InitGlobal(CurrentResourceDbFileName);
@@ -439,7 +438,7 @@ void mvceditor::ResourcePluginClass::LoadPageFromResource(const wxString& finder
 	int lineNumber = 0;
 	mvceditor::ResourceFinderClass::ResourceTypes type = mvceditor::ResourceFinderClass::ParseGoToResource(finderQuery, 
 		fileName, className, methodName, lineNumber);
-	GetNotebook()->LoadPage(resource.GetFullPath());
+	GetNotebook()->LoadPage(resource.FullPath.GetFullPath());
 	CodeControlClass* codeControl = GetCurrentCodeControl();
 	if (codeControl) {
 		int32_t position, 
@@ -572,7 +571,7 @@ void mvceditor::ResourceSearchDialogClass::ShowJumpToResults(const wxString& fin
 	mvceditor::ResourceFinderClass::ResourceTypes type = mvceditor::ResourceFinderClass::ParseGoToResource(finderQuery, 
 		fileName, className, methodName, lineNumber);	
 	for (size_t i = 0; i < allMatches.size(); ++i) {
-		files.Add(allMatches[i].GetFullPath());
+		files.Add(allMatches[i].FullPath.GetFullPath());
 	}
 	Results->Clear();
 	
