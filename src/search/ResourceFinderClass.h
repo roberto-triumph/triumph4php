@@ -727,6 +727,41 @@ private:
 	std::vector<mvceditor::ResourceClass> ResourceStatementMatches(std::string whereCond, bool doLimit);
 
 	/**
+	 * @return all resources that match the key exact (case insensitive)
+	 */
+	std::vector<mvceditor::ResourceClass> FindByKeyExact(const std::string& key);
+	
+	/**
+	 * @return all resources that match the key exact (case insensitive) AND are of the given types
+	 */
+	std::vector<mvceditor::ResourceClass> FindByKeyExactAndTypes(const std::string& key, const std::vector<int>& types, bool doLimit);
+
+	/**
+	 * @return all resources whose key begins with the given keyStart (case insensitive)
+	 */
+	std::vector<mvceditor::ResourceClass> FindByKeyStart(const std::string& keyStart, bool doLimit);
+	
+	/**
+	 * @return all resources whose key begins with the given keyStart (case insensitive) AND are of the given types 
+	 */
+	std::vector<mvceditor::ResourceClass> FindByKeyStartAndTypes(const std::string& keyStart, const std::vector<int>& types, bool doLimit);
+	
+	/**
+	 * @return all resources whose key begins with the given at least one of the given keyStart (case insensitive)
+	 */
+	std::vector<mvceditor::ResourceClass> FindByKeyStartMany(const std::vector<std::string>& keyStarts, bool doLimit);
+
+	/**
+	 * @return all resources whose identifier begins with the given identifier(case insensitive)
+	 */
+	std::vector<mvceditor::ResourceClass> FindByIdentifierExactAndTypes(const std::string& identifier, const std::vector<int>& types, bool doLimit);
+	
+	/**
+	 * @return all resources whose identifier begins with the given identifierStart (case insensitive) AND are of the given type 
+	 */
+	std::vector<mvceditor::ResourceClass> FindByIdentifierStartAndTypes(const std::string& identifierStart, const std::vector<int>& types, bool doLimit);
+
+	/**
 	 * add all of the given resources into the database.
 	 * @param resources the list of resources that were parsed out
 	 * @param int the file that the resources are located in

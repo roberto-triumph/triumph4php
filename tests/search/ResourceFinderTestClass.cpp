@@ -739,7 +739,6 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindP
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForNativeFunctions) {
-	ResourceFinder.InitFile(wxFileName(wxT("c:\\users\\roberto\\desktop\\native.db")));
 	
 	CHECK(ResourceFinder.Prepare(wxT("array_key")));
 	ResourceFinder.BuildResourceCacheForNativeFunctions();
@@ -905,11 +904,11 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldColle
 	CollectNearMatchResources();
 	CHECK_VECTOR_SIZE(6, Matches);
 
-	// sorted by identifier (member name)
-	CHECK_MEMBER_RESOURCE("UserClass", "address", Matches[0]);
-	CHECK_MEMBER_RESOURCE("UserClass", "clearName", Matches[1]);
-	CHECK_MEMBER_RESOURCE("AdminClass", "deleteUser", Matches[2]);
-	CHECK_MEMBER_RESOURCE("SuperUserClass", "disableUser", Matches[3]);
+	// sorted by resource key (class name :: member name)
+	CHECK_MEMBER_RESOURCE("AdminClass", "deleteUser", Matches[0]);
+	CHECK_MEMBER_RESOURCE("SuperUserClass", "disableUser", Matches[1]);
+	CHECK_MEMBER_RESOURCE("UserClass", "address", Matches[2]);
+	CHECK_MEMBER_RESOURCE("UserClass", "clearName", Matches[3]);
 	CHECK_MEMBER_RESOURCE("UserClass", "getName", Matches[4]);	
 	CHECK_MEMBER_RESOURCE("UserClass", "name", Matches[5]);
 }

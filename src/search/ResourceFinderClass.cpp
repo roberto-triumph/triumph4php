@@ -230,40 +230,6 @@ static bool IsClassMember(const mvceditor::ResourceClass& resource) {
 }
 
 /**
- * A predicate class useful for STL algorithms.  This class will match TRUE
- * if a resource has the exact same key as the identifier given in
- * the constructor (case insensitive). For example, if this predicate is 
- * give to std::count_if function, then the function will count all resources
- * that have the same key.
- * 
- * IsNegative flag will invert the comparison, and the predicate will instead
- * return false when a resource has the exact same key as the key
- * given in the constructor. This makes it possible to use this predicate in
- * std::remove_if to remove items that do NOT match an identifier.
- */
-class KeyPredicateClass {
-	
-public:
-
-	UnicodeString Key;
-	
-	bool IsNegative;
-
-	KeyPredicateClass(const UnicodeString& key, bool isNegative) 
-		: Key(key) 
-		, IsNegative(isNegative) {
-		
-	}
-
-	bool operator()(const mvceditor::ResourceClass& resource) const {
-		if (!IsNegative) {
-			return resource.IsKeyEqualTo(Key) == 0;
-		}
-		return !resource.IsKeyEqualTo(Key);
-	}
-};
-
-/**
  * appends name to namespace
  */
 static UnicodeString QualifyName(const UnicodeString& namespaceName, const UnicodeString& name) {
@@ -336,6 +302,13 @@ void mvceditor::ResourceFinderClass::OpenAndCreateTables(std::string db) {
 		sql += "  is_static INTEGER, is_dynamic INTEGER, is_native INTEGER";
 		sql += ");";
 		Session.once << sql;
+
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idxFullPath ON file_items(full_path)";
+		Session.once << sql;
+
+		sql = "CREATE INDEX IF NOT EXISTS idxResourceKey ON resources(key, type)";
+		Session.once << sql;
+
 		IsCacheInitialized = true;
 	} catch(std::exception const& e) {
 		Session.close();
@@ -584,24 +557,16 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 }
 
 std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNearMatchNonMembers() {
-	UnicodeString key = ClassName;
-	key.findAndReplace(UNICODE_STRING_SIMPLE("'"),UNICODE_STRING_SIMPLE(""));
-	std::string query = mvceditor::StringHelperClass::IcuToChar(key);
-	std::ostringstream stream;
-	stream << " key = '" << query << "' AND type IN(" 
-		<< mvceditor::ResourceClass::CLASS << ","
-		<< mvceditor::ResourceClass::DEFINE << ","
-		<< mvceditor::ResourceClass::FUNCTION << ")";
-	std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(stream.str(), true);
+	std::string key = mvceditor::StringHelperClass::IcuToChar(ClassName);
+	std::vector<int> types;
+	types.push_back(mvceditor::ResourceClass::CLASS);
+	types.push_back(mvceditor::ResourceClass::DEFINE);
+	types.push_back(mvceditor::ResourceClass::FUNCTION);
+	std::vector<mvceditor::ResourceClass> matches = FindByKeyExactAndTypes(key, types, true);
 	if (matches.empty()) {
 	
 		// if nothing matches exactly then execure the LIKE query
-		std::ostringstream streamLike;
-		streamLike << " key LIKE '" << query << "%' AND type IN(" 
-		<< mvceditor::ResourceClass::CLASS << ","
-		<< mvceditor::ResourceClass::DEFINE << ","
-		<< mvceditor::ResourceClass::FUNCTION << ")";
-		matches = ResourceStatementMatches(streamLike.str(), true);
+		matches = FindByKeyStartAndTypes(key, types, true);
 	}
 	return matches;
 }
@@ -629,68 +594,45 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 		// if ClassName is empty, then just check method names This ensures 
 		// queries like '::getName' will work as well.
 		// make sure to NOT get fully qualified  matches (key=identifier)
-		UnicodeString key = MethodName;
-		std::string query = mvceditor::StringHelperClass::IcuToChar(key);
-		std::ostringstream stream;
-		stream << " identifier LIKE '" << query << "' AND key = identifier AND type IN ("
-				<< mvceditor::ResourceClass::MEMBER << ","
-				<< mvceditor::ResourceClass::METHOD << ","
-				<< mvceditor::ResourceClass::CLASS_CONSTANT << ")";
-		matches = ResourceStatementMatches(stream.str(), true);
+		std::string identifier = mvceditor::StringHelperClass::IcuToChar(MethodName);
+		std::vector<int> types;
+		types.push_back(mvceditor::ResourceClass::MEMBER);
+		types.push_back(mvceditor::ResourceClass::METHOD);
+		types.push_back(mvceditor::ResourceClass::CLASS_CONSTANT);
+		matches = FindByIdentifierExactAndTypes(identifier, types, true);
 		if (matches.empty()) {
 		
 			// use LIKE to get near matches
-			std::ostringstream streamLike;
-			streamLike << "identifier LIKE '" << query << "%' AND key = identifier AND type IN ("
-				<< mvceditor::ResourceClass::MEMBER << ","
-				<< mvceditor::ResourceClass::METHOD << ","
-				<< mvceditor::ResourceClass::CLASS_CONSTANT << ")";
-			matches = ResourceStatementMatches(streamLike.str(), true);
+			matches = FindByIdentifierStartAndTypes(identifier, types, true);
 		}
 	}
 	else {
 		InheritedTraits(ClassName, parentClassNames);
+		std::vector<std::string> keyStarts;
 
-		UnicodeString key = MethodName;
-		std::string query = mvceditor::StringHelperClass::IcuToChar(key);
-		std::ostringstream streamLike;
-
-		// make sure to NOT get the fully qualified resources
-		streamLike << " key = identifier AND identifier LIKE '" << query << "%' AND class_name IN(";
-		
-		// we use an IN() query and query for classes and traits at the same time
+		// now that we found the parent classes, combine the parent class name and the queried method
+		// to make all of the keys we need to look for. remember that a resource class key is of the form
+		// ClassName::MethodName
 		for (std::vector<UnicodeString>::iterator it = parentClassNames.begin(); it != parentClassNames.end(); ++it) {
-			streamLike << "'" << mvceditor::StringHelperClass::IcuToChar(*it) << "'";
-			if (it != (parentClassNames.end() - 1)) {
-				streamLike << ",";
-			}
+			std::string keyStart = mvceditor::StringHelperClass::IcuToChar(*it);
+			keyStart += "::";
+			keyStart += mvceditor::StringHelperClass::IcuToChar(MethodName);
+			keyStarts.push_back(keyStart);
 		}
-		streamLike << ") AND type IN ("
-				<< mvceditor::ResourceClass::MEMBER << ","
-				<< mvceditor::ResourceClass::METHOD << ","
-				<< mvceditor::ResourceClass::CLASS_CONSTANT << ")";
-		matches = ResourceStatementMatches(streamLike.str(), true);
+		matches = FindByKeyStartMany(keyStarts, true);
 	}
 	return matches;
 }
 
 std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectAllMembers(const std::vector<UnicodeString>& classNames) {
 	std::vector<mvceditor::ResourceClass> matches;
-	std::string query; 
+	std::vector<std::string> keyStarts;
 	for (size_t i = 0; i < classNames.size(); ++i) {
-		query += "'";
-		query += mvceditor::StringHelperClass::IcuToChar(classNames[i]);
-		query += "'";
-		if (i < (classNames.size() - 1)) {
-			query += ",";
-		}
+		std::string keyStart = mvceditor::StringHelperClass::IcuToChar(classNames[i]);
+		keyStart += "::";
+		keyStarts.push_back(keyStart);
 	}
-
-	// make sure to NOT get fully qualified matches since they are dups.  
-	std::ostringstream stream;
-	stream << " class_name IN (" << query << ") AND type IN(" << mvceditor::ResourceClass::CLASS_CONSTANT << ","
-		<< mvceditor::ResourceClass::MEMBER << "," << mvceditor::ResourceClass::METHOD << ") AND key = Identifier";
-	matches = ResourceStatementMatches(stream.str(), true);
+	matches = FindByKeyStartMany(keyStarts, true);
 	return matches;
 }
 
@@ -704,10 +646,8 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectAll
 		UnicodeString traitClassNameOnly(traits[j].TraitClassName, index + 1);
 		UnicodeString key =  traitClassNameOnly + UNICODE_STRING_SIMPLE("::");
 		
-		std::string query = mvceditor::StringHelperClass::IcuToChar(key);
-		std::ostringstream stream;
-		stream << " key LIKE '" << query << "%'";
-		std::vector<mvceditor::ResourceClass> traitMatches = ResourceStatementMatches(stream.str(), true);
+		std::string stdKey = mvceditor::StringHelperClass::IcuToChar(key);
+		std::vector<mvceditor::ResourceClass> traitMatches = FindByKeyStart(stdKey, true);
 		matches.insert(matches.end(), traitMatches.begin(), traitMatches.end());
 		
 		// TODO weed out Matches from methods from the wrong namespace
@@ -732,21 +672,11 @@ std::vector<mvceditor::ResourceClass>  mvceditor::ResourceFinderClass::CollectNe
 	// needle identifier contains a namespace operator; but it may be
 	// a namespace or a fully qualified name
 	UnicodeString key = ClassName;
-	std::string query = mvceditor::StringHelperClass::IcuToChar(key);
-	std::ostringstream stream;
-	stream << " key LIKE '" << query << "%'";
-	matches = ResourceStatementMatches(stream.str(), true);
-
-	std::vector<mvceditor::ResourceClass>::iterator end = matches.end();
-	
-	// if there are exact matches; we only want to collect exact matches
-	if (!matches.empty() && matches[0].IsKeyEqualTo(key)) {
-		KeyPredicateClass pred(key, true);
-		end = std::remove_if(matches.begin(), end, pred);
+	std::string stdKey = mvceditor::StringHelperClass::IcuToChar(key);
+	matches = FindByKeyExact(stdKey);
+	if (matches.empty()) {
+		matches = FindByKeyStart(stdKey, true);
 	}
-	
-	// need to actually erase them,, std::remove_if does not
-	matches.erase(end, matches.end());
 	return matches;
 }
 
@@ -755,13 +685,14 @@ std::vector<UnicodeString> mvceditor::ResourceFinderClass::ClassHierarchy(const 
 	parentClassNames.push_back(className);
 	UnicodeString lastClassName(className);
 	bool done = false;
+
+	std::vector<int> types;
+	types.push_back(mvceditor::ResourceClass::CLASS);
 	while (!done) {
 		done = true;
 
-		std::string query = mvceditor::StringHelperClass::IcuToChar(lastClassName);
-		std::ostringstream stream;
-		stream << " key = '" << query << "' AND TYPE = " << mvceditor::ResourceClass::CLASS;
-		std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(stream.str(), true);
+		std::string key = mvceditor::StringHelperClass::IcuToChar(lastClassName);
+		std::vector<mvceditor::ResourceClass> matches = FindByKeyExactAndTypes(key, types, true);
 		for (std::vector<mvceditor::ResourceClass>::const_iterator it = matches.begin(); it != matches.end(); ++it) {
 			if (it->Type == ResourceClass::CLASS && 0 == it->ClassName.caseCompare(lastClassName, 0) && it->Signature.length()) {
 
@@ -785,10 +716,10 @@ UnicodeString mvceditor::ResourceFinderClass::GetResourceParentClassName(const U
 	UnicodeString parentClassName;
 
 	// first query to get the parent class name
-	std::string query = mvceditor::StringHelperClass::IcuToChar(className);
-	std::ostringstream stream;
-	stream << " key = '" << query << "' AND type = " << mvceditor::ResourceClass::CLASS;
-	std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(stream.str(), false);
+	std::vector<int> types;
+	types.push_back(mvceditor::ResourceClass::CLASS);
+	std::string key = mvceditor::StringHelperClass::IcuToChar(className);
+	std::vector<mvceditor::ResourceClass> matches = FindByKeyExactAndTypes(key, types, true);
 	if (!matches.empty()) {
 		mvceditor::ResourceClass resource = matches[0];
 		parentClassName = ExtractParentClassFromSignature(resource.Signature);
@@ -799,9 +730,9 @@ UnicodeString mvceditor::ResourceFinderClass::GetResourceParentClassName(const U
 		std::string query = mvceditor::StringHelperClass::IcuToChar(parentClassName);
 		query += "::";
 		query += mvceditor::StringHelperClass::IcuToChar(methodName);
-		std::ostringstream stream;
-		stream << " key LIKE '" << query << "%' AND type = " << mvceditor::ResourceClass::METHOD;
-		matches = ResourceStatementMatches(stream.str(), true);
+		std::vector<int> methodTypes;
+		methodTypes.push_back(mvceditor::ResourceClass::METHOD);
+		matches = FindByKeyStartAndTypes(query, methodTypes, true);
 		UnicodeString parentClassSignature;
 		bool found = false;
 		if (!matches.empty()) {
@@ -1221,12 +1152,14 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectFul
 
 		// check the entire class hierachy; stop as soon as we found it
 		std::vector<UnicodeString> classHierarchy = ClassHierarchy(ClassName);
+		std::vector<int> types;
+		types.push_back(mvceditor::ResourceClass::MEMBER);
+		types.push_back(mvceditor::ResourceClass::METHOD);
+		types.push_back(mvceditor::ResourceClass::CLASS_CONSTANT);
 		for (size_t i = 0; i < classHierarchy.size(); ++i) {
 			UnicodeString key = classHierarchy[i] + UNICODE_STRING_SIMPLE("::") + MethodName;
-			std::string query = mvceditor::StringHelperClass::IcuToChar(key);
-			std::ostringstream stream;
-			stream << " key = '" << query << "' AND type IN(" << mvceditor::ResourceClass::MEMBER << "," << mvceditor::ResourceClass::METHOD << ")";
-			std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(stream.str(), true);
+			std::string stdKey = mvceditor::StringHelperClass::IcuToChar(key);
+			std::vector<mvceditor::ResourceClass> matches = FindByKeyExactAndTypes(stdKey, types, true);
 			if (!matches.empty()) {
 				allMatches.push_back(matches[0]);
 			}
@@ -1234,24 +1167,20 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectFul
 	}
 	else if (NAMESPACE_NAME == ResourceType) {
 		UnicodeString key = ClassName;
-		std::string query = mvceditor::StringHelperClass::IcuToChar(key);
-		std::ostringstream stream;
-		stream << " key = '" << query << "'";
+		std::string stdKey = mvceditor::StringHelperClass::IcuToChar(key);
 
 		// make sure there is one and only one item that matches the search.
-		std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(stream.str(), true);
+		std::vector<mvceditor::ResourceClass> matches = FindByKeyExact(stdKey);
 		if (matches.size() == 1) {
 			allMatches.push_back(matches[0]);
 		}
 	}
 	else {
 		UnicodeString key = ClassName;
-		std::string query = mvceditor::StringHelperClass::IcuToChar(key);
-		std::ostringstream stream;
-		stream << " key = '" << query << "'";
+		std::string stdKey = mvceditor::StringHelperClass::IcuToChar(key);
 
 		// make sure there is one and only one item that matches the search.
-		std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches(stream.str(), true);
+		std::vector<mvceditor::ResourceClass> matches = FindByKeyExact(stdKey);
 		if (matches.size() == 1) {
 			allMatches.push_back(matches[0]);
 		}
@@ -1702,6 +1631,95 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::ResourceSt
 	}
 	return matches;
 }
+
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::FindByKeyExact(const std::string& key) {
+	
+	// using LIKE here so that comparisons are NOT case sensitive (so that pdo = PDO)
+	std::string whereCond = "key LIKE '" + key + "'";
+	return ResourceStatementMatches(whereCond, false);
+}
+
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::FindByKeyExactAndTypes(const std::string& key, const std::vector<int>& types, bool doLimit) {
+	std::ostringstream stream;
+
+	// using LIKE here so that comparisons are NOT case sensitive (so that pdo = PDO)
+	stream << "key LIKE '" << key << "' AND type IN(";
+	for (size_t i = 0; i < types.size(); ++i) {
+		stream << types[i];
+		if (i < (types.size() - 1)) {
+			stream << ",";
+		}
+	}
+	stream << ")";
+	return ResourceStatementMatches(stream.str(), doLimit);
+}
+
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::FindByKeyStart(const std::string& keyStart, bool doLimit) {
+	std::string whereCond = "key LIKE '" + keyStart + "%'";
+	return ResourceStatementMatches(whereCond, doLimit);
+}
+
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::FindByKeyStartAndTypes(const std::string& keyStart, const std::vector<int>& types, bool doLimit) {
+	std::ostringstream stream;
+	stream << "key LIKE '" << keyStart << "%' AND type IN(";
+	for (size_t i = 0; i < types.size(); ++i) {
+		stream << types[i];
+		if (i < (types.size() - 1)) {
+			stream << ",";
+		}
+	}
+	stream << ")";
+	return ResourceStatementMatches(stream.str(), doLimit);
+}
+
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::FindByKeyStartMany(const std::vector<std::string>& keyStarts, bool doLimit) {
+	if (keyStarts.empty()) {
+		std::vector<mvceditor::ResourceClass> matches;
+		return matches;
+	}
+	std::ostringstream stream;
+	stream << "key LIKE '" << keyStarts[0] << "%'";
+	for (size_t i = 1; i < keyStarts.size(); ++i) {
+		stream << " OR key LIKE '" << keyStarts[i] << "%'";
+	}
+	return ResourceStatementMatches(stream.str(), true);
+}
+
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::FindByIdentifierExactAndTypes(const std::string& identifier, const std::vector<int>& types, bool doLimit) {
+	std::ostringstream stream;
+
+	// using LIKE here so that comparisons are NOT case sensitive (so that pdo = PDO)
+	// do not get fully qualified resources
+	// make sure to use the key because it is indexed
+	stream << "key LIKE '" << identifier << "' AND identifier = key AND type IN(";
+	for (size_t i = 0; i < types.size(); ++i) {
+		stream << types[i];
+		if (i < (types.size() - 1)) {
+			stream << ",";
+		}
+	}
+	stream << ")";
+	return ResourceStatementMatches(stream.str(), doLimit);
+
+}
+
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::FindByIdentifierStartAndTypes(const std::string& identifierStart, const std::vector<int>& types, bool doLimit) {
+	std::ostringstream stream;
+
+	// using LIKE here so that comparisons are NOT case sensitive (so that pdo = PDO)
+	// do not get fully qualified resources
+	// make sure to use the key because it is indexed
+	stream << "key LIKE '" << identifierStart << "%' AND identifier = key AND type IN(";
+	for (size_t i = 0; i < types.size(); ++i) {
+		stream << types[i];
+		if (i < (types.size() - 1)) {
+			stream << ",";
+		}
+	}
+	stream << ")";
+	return ResourceStatementMatches(stream.str(), doLimit);
+}
+
 
 bool mvceditor::ResourceFinderClass::Persist(const wxFileName& outputFile) {
 	if (!outputFile.IsOk()) {

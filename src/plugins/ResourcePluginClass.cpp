@@ -543,7 +543,9 @@ void mvceditor::ResourceSearchDialogClass::OnSearchText(wxCommandEvent& event) {
 		if (!ResourcePlugin.NeedToIndex(text)) {
 			MatchedResources = ResourcePlugin.SearchForResources(text);
 			if (!MatchedResources.empty()) {
+				Results->Freeze();
 				ShowJumpToResults(text, MatchedResources);
+				Results->Thaw();
 			}
 			else {
 				Results->Clear();
