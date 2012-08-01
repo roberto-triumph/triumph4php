@@ -17,6 +17,6 @@ that can be downloaded from http://sqlite.org/download.html
 
 sqlite3.lib and sqlite3.exp can be created by using the LIB.exe
 
-lib.exe /def:sqlite3.dll
+lib.exe /DEF:sqlite3.dll /MACHINE:x86
 
 

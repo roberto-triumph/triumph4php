@@ -115,6 +115,7 @@ MVCEDITOR_DB_USER = 'root';
 MVCEDITOR_DB_PASSWORD = '';
 
 -- will look for SQLite in these directories
+-- read lib/sqlite/README  for more info
 SQLITE_INCLUDE_DIR = 'lib/sqlite/include'
 SQLITE_LIB = 'lib/sqlite/lib/sqlite3.lib'
 SQLITE_LIB_DIR = 'lib/sqlite/lib'

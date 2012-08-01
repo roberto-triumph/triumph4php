@@ -742,6 +742,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 	
 	CHECK(ResourceFinder.Prepare(wxT("array_key")));
 	ResourceFinder.BuildResourceCacheForNativeFunctions();
+
 	CollectNearMatchResources();
 	CHECK_VECTOR_SIZE(2, Matches);
 	CHECK_UNISTR_EQUALS("array_key_exists", Matches[0].Identifier);
@@ -762,6 +763,11 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("PDOStatement function query($statement, $PDO::FETCH_COLUMN, $colno, $PDO::FETCH_CLASS, $classname, $ctorargs, $PDO::FETCH_INTO, $object)"), Matches[0].Signature);
 	CHECK_UNISTR_EQUALS("PDOStatement", Matches[0].ReturnType);
 	CHECK(Matches[0].IsNative);
+
+	// test a built-in object query for all methods
+	CHECK(ResourceFinder.Prepare(wxT("PDO::")));
+	CollectNearMatchResources();
+	CHECK_VECTOR_SIZE(50, Matches);
 	
 	// a fully qualified search
 	CHECK(ResourceFinder.Prepare(wxT("\\Exception")));
@@ -769,7 +775,6 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("\\Exception", Matches[0].Identifier);
 	CHECK_UNISTR_EQUALS("Exception", Matches[0].ClassName);
-	
 }
 
 TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindMatchesWhenUsingBuildResourceCacheForFile) {
