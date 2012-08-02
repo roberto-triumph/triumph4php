@@ -734,7 +734,9 @@ void mvceditor::PhpDocumentClass::HandleCallTip(wxChar ch, bool force) {
 				UnicodeString className = matches[0].ClassName;
 				wxString constructorResourceSearch = mvceditor::StringHelperClass::IcuToWx(className);
 				constructorResourceSearch += wxT("::");
-				std::vector<mvceditor::ResourceClass> matches = Structs->ResourceCache.PrepareAndCollectNearMatchResourcesFromAll(constructorResourceSearch);
+
+				// TODO: get class hierarchy
+				std::vector<mvceditor::ResourceClass> matches = Structs->ResourceCache.CollectNearMatchResourcesFromAll(mvceditor::StringHelperClass::wxToIcu(constructorResourceSearch));
 				for (size_t i = 0; i < matches.size(); ++i) {
 					mvceditor::ResourceClass res = matches[i];
 					if (mvceditor::ResourceClass::METHOD == res.Type && UNICODE_STRING_SIMPLE("__construct") == res.Identifier) {

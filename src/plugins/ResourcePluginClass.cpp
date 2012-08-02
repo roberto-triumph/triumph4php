@@ -210,15 +210,10 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourcePluginClass::SearchForR
 	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
 	std::vector<mvceditor::ResourceClass> matches;
 
-	// don't bother searching when path or expression is not valid
-	if (!resourceCache->PrepareAll(text)) {
-		wxMessageBox(_("Invalid Expression"), wxT("Warning"), wxICON_EXCLAMATION);
-		
-	}
-	else if (!NeedToIndex(text)) {	
+	if (!NeedToIndex(text)) {	
 
 		// if we know the indexing has already taken place lets just do the lookup; it will be quick.
-		matches = resourceCache->CollectNearMatchResourcesFromAll();
+		matches = resourceCache->CollectNearMatchResourcesFromAll(mvceditor::StringHelperClass::wxToIcu(text));
 
 		// no need to show jump to results for native functions
 		RemoveNativeMatches(matches);
@@ -253,13 +248,7 @@ void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
 		IndexingDialog->Destroy();
 		IndexingDialog = NULL;
 	}
-
-	UnicodeString fileName,
-		className, 
-		methodName;
-	int lineNumber;
-	mvceditor::ResourceFinderClass::ResourceTypes type = mvceditor::ResourceFinderClass::ParseGoToResource(JumpToText,
-		fileName, className, methodName, lineNumber);
+	mvceditor::ResourceSearchClass resourceSearch(mvceditor::StringHelperClass::wxToIcu(JumpToText));
 
 	if (INDEXING_NATIVE_FUNCTIONS == State) {
 		mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
@@ -281,13 +270,13 @@ void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
 
 		// figure out what resources have been cached, so that next time we can jump
 		// to the results without creating a new background thread
-		if (ResourceFinderClass::CLASS_NAME == type ||
-			ResourceFinderClass::CLASS_NAME_METHOD_NAME == type) {
+		if (mvceditor::ResourceSearchClass::CLASS_NAME == resourceSearch.GetResourceType() ||
+			mvceditor::ResourceSearchClass::CLASS_NAME_METHOD_NAME == resourceSearch.GetResourceType()) {
 			HasCodeLookups = true;
 			HasFileLookups = true;
 		}
-		else if (ResourceFinderClass::FILE_NAME == type ||
-			ResourceFinderClass::FILE_NAME_LINE_NUMBER == type) {
+		else if (mvceditor::ResourceSearchClass::FILE_NAME == resourceSearch.GetResourceType() ||
+			mvceditor::ResourceSearchClass::FILE_NAME_LINE_NUMBER == resourceSearch.GetResourceType()) {
 			HasFileLookups = true;
 		}
 
@@ -332,10 +321,6 @@ void mvceditor::ResourcePluginClass::StartIndex() {
 		//prevent two finds at a time
 		if (FREE == State) { 
 			ResourceCacheClass* resourceCache = GetResourceCache();
-
-			// don't bother searching when path or expression is not valid
-			// need to do this so that the resource finder attempts to parse the files
-			resourceCache->PrepareAll(wxT("FakeClass"));			
 			if (ResourceFileReader.InitProjectQueue(resourceCache, App.Structs.Projects) && ResourceFileReader.ReadNextProject()) {
 					mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
 					if (ResourceFileReader.StartReading(error)) {
@@ -443,27 +428,22 @@ void mvceditor::ResourcePluginClass::OnSearchForResource(wxCommandEvent& event) 
 
 
 void mvceditor::ResourcePluginClass::LoadPageFromResource(const wxString& finderQuery, const mvceditor::ResourceClass& resource) {
-	UnicodeString fileName,
-		className, 
-		methodName;
-	int lineNumber = 0;
-	mvceditor::ResourceFinderClass::ResourceTypes type = mvceditor::ResourceFinderClass::ParseGoToResource(finderQuery, 
-		fileName, className, methodName, lineNumber);
+	mvceditor::ResourceSearchClass resourceSearch(mvceditor::StringHelperClass::wxToIcu(finderQuery));
 	GetNotebook()->LoadPage(resource.FullPath.GetFullPath());
 	CodeControlClass* codeControl = GetCurrentCodeControl();
 	if (codeControl) {
 		int32_t position, 
 			length;
 		bool found = mvceditor::ResourceFinderClass::GetResourceMatchPosition(resource, codeControl->GetSafeText(), position, length);
-		if (ResourceFinderClass::FILE_NAME_LINE_NUMBER == type) {
+		if (mvceditor::ResourceSearchClass::FILE_NAME_LINE_NUMBER == resourceSearch.GetResourceType()) {
 				
 			// scintilla line numbers start at zero. use the ensure method so that the line is shown in the 
 			// center of the screen
-			int pos = codeControl->PositionFromLine(lineNumber - 1);
+			int pos = codeControl->PositionFromLine(resourceSearch.GetLineNumber() - 1);
 			codeControl->SetSelectionAndEnsureVisible(pos, pos);
-			codeControl->GotoLine(lineNumber - 1);
+			codeControl->GotoLine(resourceSearch.GetLineNumber() - 1);
 		}
-		if (ResourceFinderClass::FILE_NAME == type) {
+		if (mvceditor::ResourceSearchClass::FILE_NAME == resourceSearch.GetResourceType()) {
 				
 			// nothing; just open the file but don't scroll down to any place
 		}
@@ -479,18 +459,13 @@ void mvceditor::ResourcePluginClass::OnUpdateUi(wxUpdateUIEvent& event) {
 }
 
 bool mvceditor::ResourcePluginClass::NeedToIndex(const wxString& finderQuery) const {
-	UnicodeString fileName,
-		className, 
-		methodName;
-	int lineNumber = 0;
-	mvceditor::ResourceFinderClass::ResourceTypes type = mvceditor::ResourceFinderClass::ParseGoToResource(finderQuery, 
-		fileName, className, methodName, lineNumber);
-	if ((ResourceFinderClass::CLASS_NAME == type ||
-		ResourceFinderClass::CLASS_NAME_METHOD_NAME == type) && !HasCodeLookups)  {
+	mvceditor::ResourceSearchClass resourceSearch(mvceditor::StringHelperClass::wxToIcu(finderQuery));
+	if ((mvceditor::ResourceSearchClass::CLASS_NAME == resourceSearch.GetResourceType() ||
+		mvceditor::ResourceSearchClass::CLASS_NAME_METHOD_NAME == resourceSearch.GetResourceType()) && !HasCodeLookups)  {
 		return true;
 	}
-	else if ((ResourceFinderClass::FILE_NAME == type ||
-		ResourceFinderClass::FILE_NAME_LINE_NUMBER == type) && !HasFileLookups) {
+	else if ((mvceditor::ResourceSearchClass::FILE_NAME == resourceSearch.GetResourceType() ||
+		mvceditor::ResourceSearchClass::FILE_NAME_LINE_NUMBER == resourceSearch.GetResourceType()) && !HasFileLookups) {
 		return true;
 	}
 	return false;
@@ -577,12 +552,7 @@ void mvceditor::ResourceSearchDialogClass::OnSearchEnter(wxCommandEvent& event) 
 
 void mvceditor::ResourceSearchDialogClass::ShowJumpToResults(const wxString& finderQuery, const std::vector<mvceditor::ResourceClass>& allMatches) {
 	wxArrayString files;
-	UnicodeString fileName,
-		className, 
-		methodName;
-	int lineNumber = 0;
-	mvceditor::ResourceFinderClass::ResourceTypes type = mvceditor::ResourceFinderClass::ParseGoToResource(finderQuery, 
-		fileName, className, methodName, lineNumber);	
+	mvceditor::ResourceSearchClass resourceSearch(mvceditor::StringHelperClass::wxToIcu(finderQuery));
 	for (size_t i = 0; i < allMatches.size(); ++i) {
 		files.Add(allMatches[i].FullPath.GetFullPath());
 	}
@@ -591,8 +561,8 @@ void mvceditor::ResourceSearchDialogClass::ShowJumpToResults(const wxString& fin
 	// dont show the project path to the user
 	for (size_t i = 0; i < files.GetCount(); ++i) {
 		wxString shortName = ResourcePlugin.App.Structs.RelativeFileName(files[i]);
-		if (ResourceFinderClass::FILE_NAME != type &&
-			ResourceFinderClass::FILE_NAME_LINE_NUMBER != type) {
+		if (mvceditor::ResourceSearchClass::FILE_NAME != resourceSearch.GetResourceType() &&
+			mvceditor::ResourceSearchClass::FILE_NAME_LINE_NUMBER != resourceSearch.GetResourceType()) {
 			UnicodeString res = allMatches[i].ClassName + UNICODE_STRING_SIMPLE("::") + allMatches[i].Identifier;
 			shortName += wxT("  (") + mvceditor::StringHelperClass::IcuToWx(res) + wxT(")");
 		}

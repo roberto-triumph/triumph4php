@@ -60,7 +60,6 @@ void mvceditor::ResourceFinderBackgroundThreadClass::Entry() {
 		ResourceFinder.Clear();
 
 		// need this call so that resources are actually parsed
-		ResourceFinder.Prepare(wxT("fakeclass"));
 		ResourceFinder.Walk(FileName);
 		Resources = ResourceFinder.All();
 		SignalEnd();
@@ -109,18 +108,16 @@ void mvceditor::OutlineViewPluginClass::BuildOutline(const wxString& className) 
 	std::vector<mvceditor::ResourceClass>  matches; 
 
 	// get the class resource itself
-	if (resourceCache->PrepareAll(className)) {
-		matches = resourceCache->CollectFullyQualifiedResourceFromAll();
-		for (size_t i = 0; i < matches.size(); ++i) {
-			ResourceFinderBackground.Resources.push_back(matches[i]);
-		}
+	matches = resourceCache->CollectFullyQualifiedResourceFromAll(mvceditor::StringHelperClass::wxToIcu(className));
+	for (size_t i = 0; i < matches.size(); ++i) {
+		ResourceFinderBackground.Resources.push_back(matches[i]);
 	}
 
 	// make the resource finder match on all methods / properties
-	wxString lookup;
-	lookup += className;
-	lookup += wxT("::");
-	matches = GetResourceCache()->PrepareAndCollectNearMatchResourcesFromAll(lookup);
+	UnicodeString lookup;
+	lookup += mvceditor::StringHelperClass::wxToIcu(className);
+	lookup += UNICODE_STRING_SIMPLE("::");
+	matches = GetResourceCache()->CollectNearMatchResourcesFromAll(lookup);
 	for (size_t i = 0; i < matches.size(); ++i) {
 		ResourceFinderBackground.Resources.push_back(matches[i]);
 	}
@@ -128,21 +125,19 @@ void mvceditor::OutlineViewPluginClass::BuildOutline(const wxString& className) 
 
 void mvceditor::OutlineViewPluginClass::JumpToResource(const wxString& resource) {
 	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
-	if (resourceCache->PrepareAll(resource)) {
-		std::vector<mvceditor::ResourceClass> matches = resourceCache->CollectFullyQualifiedResourceFromAll();
-		if (!matches.empty()) {
-			mvceditor::ResourceClass resource = matches[0];
-			GetNotebook()->LoadPage(resource.FullPath.GetFullPath());
-			CodeControlClass* codeControl = GetCurrentCodeControl();
-			if (codeControl) {
-				int32_t position, 
-					length;
-				bool found = mvceditor::ResourceFinderClass::GetResourceMatchPosition(resource, codeControl->GetSafeText(), position, length);
-				if (found) {
-					codeControl->SetSelectionAndEnsureVisible(position, position + length);
-				}
-				// else the index is out of date....
+	std::vector<mvceditor::ResourceClass> matches = resourceCache->CollectFullyQualifiedResourceFromAll(mvceditor::StringHelperClass::wxToIcu(resource));
+	if (!matches.empty()) {
+		mvceditor::ResourceClass resource = matches[0];
+		GetNotebook()->LoadPage(resource.FullPath.GetFullPath());
+		CodeControlClass* codeControl = GetCurrentCodeControl();
+		if (codeControl) {
+			int32_t position, 
+				length;
+			bool found = mvceditor::ResourceFinderClass::GetResourceMatchPosition(resource, codeControl->GetSafeText(), position, length);
+			if (found) {
+				codeControl->SetSelectionAndEnsureVisible(position, position + length);
 			}
+			// else the index is out of date....
 		}
 	}	
 }

@@ -57,8 +57,8 @@ public:
 		ResourceCache.InitGlobal(ResourceDbFileName);
 	}
 
-	void CollectNearMatchResourcesFromAll() {
-		Matches = ResourceCache.CollectNearMatchResourcesFromAll();
+	void CollectNearMatchResourcesFromAll(const UnicodeString& search) {
+		Matches = ResourceCache.CollectNearMatchResourcesFromAll(search);
 	}
 };
 
@@ -174,8 +174,7 @@ TEST_FIXTURE(RegisterTestFixtureClass, CollectShouldGetFromAllFinders) {
 	
 	// now perform the search. will search for any resource that starts with 'Action'
 	// all 3 caches should hit
-	CHECK(ResourceCache.PrepareAll(wxT("Action")));
-	CollectNearMatchResourcesFromAll();
+	CollectNearMatchResourcesFromAll(UNICODE_STRING_SIMPLE("Action"));
 
 	CHECK_VECTOR_SIZE(3, Matches);
 		
@@ -201,12 +200,10 @@ TEST_FIXTURE(RegisterTestFixtureClass, CollectShouldIgnoreStaleMatches) {
 	CHECK(ResourceCache.Register(TestProjectDir + file1, false));
 	CHECK(ResourceCache.Update(TestProjectDir + file1, code2, true));
 
-	CHECK(ResourceCache.PrepareAll(wxT("ActionMy::methodA")));
-	CollectNearMatchResourcesFromAll();
+	CollectNearMatchResourcesFromAll(UNICODE_STRING_SIMPLE("ActionMy::methodA"));
 	CHECK_VECTOR_SIZE(0, Matches);
 
-	CHECK(ResourceCache.PrepareAll(wxT("ActionMy::methodB")));
-	CollectNearMatchResourcesFromAll();
+	CollectNearMatchResourcesFromAll(UNICODE_STRING_SIMPLE("ActionMy::methodB"));
 	CHECK_VECTOR_SIZE(1, Matches);
 }
 

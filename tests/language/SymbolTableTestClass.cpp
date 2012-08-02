@@ -991,6 +991,36 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, WithDuckTyping) {
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), ResourceMatches[1].Identifier);
 }
 
+
+TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithClassHierarchyInMultipleResourceFinders) {
+
+	/*
+	 * test scenario:
+	 * user opens a file, writes code for a base class
+	 * user opens another file, writes code for a class that uses the base class
+	 * code completion should recognize the inheritance chain, even though
+	 * the classes are stored in multiple resources finders
+	 */
+	UnicodeString sourceCodeParent = mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"class MyBaseClass { function workBase() {}  } \n"
+	);
+	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"class MyClass { function workA() {} function workB() {} } \n"
+		"$my = new MyClass;\n"
+	);
+	GlobalFinder.BuildResourceCacheForFile(wxT("untitled 2"), sourceCodeParent, true);
+	Init(sourceCode);
+	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE(""), false, false);
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
+		VariableMatches, ResourceMatches, DoDuckTyping, Error);
+	CHECK_VECTOR_SIZE(3, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workA"), ResourceMatches[0].Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), ResourceMatches[1].Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workBase"), ResourceMatches[2].Identifier);
+}
+
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldFindMethodScope) {
 	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
 		"<?php\n"

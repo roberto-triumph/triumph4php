@@ -45,6 +45,136 @@ class TraitResourceClass;
 class FileItemClass;
 
 /**
+ * This represents a single 'query' for a resource; ie. this is how the tell the resource finder
+ * what to look for.
+ * A resource string can be one of: class name, file name, method name, file name with line number
+ * Examples:
+ * 
+ * user.php //looks for the file named user.php
+ * user.php:891 //looks for the file named user.php that has line 891
+ * User //looks for a class named User
+ * User::login //looks for a class named User that has a method called login
+ * User:: //looks for all methods and properties for the user class
+ * 
+ */
+class ResourceSearchClass {
+
+public:
+
+	/**
+	 * These are the different near match scenarios that can occur. 
+	 * 
+	 * CLASS_NAME:  caller asks to search class names or function names.
+	 * CLASS_NAME_METHOD_NAME:  caller asks to search method names (class functions). Class name is optional, in which
+	 *                          all classes are searched
+	 * FILE_NAME:  caller asks to search file names
+	 * FILE_NAME_LINE_NUMBER:  caller asks to search file names that have at least a certain amount of lines
+	 * NAMESPACE_NAME: caller asks to search for fully qualified namespaces
+	 */
+	enum ResourceTypes {
+		CLASS_NAME,
+		CLASS_NAME_METHOD_NAME,
+		FILE_NAME,
+		FILE_NAME_LINE_NUMBER,
+		NAMESPACE_NAME
+	};
+
+	ResourceSearchClass(const UnicodeString& query);
+
+	std::vector<UnicodeString> GetParentClasses() const;
+	void SetParentClasses(const std::vector<UnicodeString>& parents);
+
+	std::vector<UnicodeString> GetTraits() const;
+	void SetTraits(const std::vector<UnicodeString>& traits);
+
+	/**
+	 * Returns the parsed class name
+	 * 
+	 * @var UnicodeString
+	 */
+	UnicodeString GetClassName() const;
+
+	/**
+	 * Returns the parsed file name
+	 * 
+	 * @var UnicodeString
+	 */
+	UnicodeString GetFileName() const;
+	
+	/**
+	 * Returns the parsed method name
+	 * 
+	 * @var UnicodeString
+	 */
+	UnicodeString GetMethodName() const;
+	
+	/**
+	 * Returns the parsed line number
+	 * 
+	 * @var int
+	 */
+	int GetLineNumber() const;
+	
+	/**
+	 * Returns the resource type that was given in the Prepare() methods. 
+	 * @return ResourceTypes
+	 */
+	ResourceSearchClass::ResourceTypes GetResourceType() const;
+
+private:
+
+	/**
+	 * the file name parsed from resource string 
+	 * 
+	 * @var UnicodeString
+	 */
+	UnicodeString FileName;
+
+	/**
+	 * the class name parsed from resource string 
+	 * 
+	 * @var UnicodeString
+	 */
+	UnicodeString ClassName;
+	
+	/**
+	 * the method name parsed from resource string
+	 * 
+	 * @var UnicodeString
+	 */
+	UnicodeString MethodName;
+
+	/**
+	 * The list of classes to look in. When this is given, the method name will be searched
+	 * across all of these classes
+	 *
+	 * @var std::vector<UnicodeString>
+	 */
+	std::vector<UnicodeString> ParentClasses;
+
+	/**
+	 * The list of classes to look in. When this is given, the method name will be searched
+	 * across all of these traits
+	 *
+	 * @var std::vector<UnicodeString>
+	 */
+	std::vector<UnicodeString> Traits;
+	
+	/**
+	 * The resource type that was parsed
+	 */
+	ResourceTypes ResourceType;
+	
+	/**
+	 * the line number parsed from resource string 
+	 * 
+	 * @var int
+	 */
+	int LineNumber;
+
+};
+
+/**
  * The ResourceFinderClass is used to locate source code artifacts (classes, functions, methods, and files). The 
  * general flow of a search is as follows:
  * 
@@ -106,24 +236,6 @@ class ResourceFinderClass : public pelet::ClassObserverClass,
 	public DirectoryWalkerClass {
 
 public:
-	
-	/**
-	 * These are the different near match scenarios that can occur. 
-	 * 
-	 * CLASS_NAME:  caller asks to search class names or function names.
-	 * CLASS_NAME_METHOD_NAME:  caller asks to search method names (class functions). Class name is optional, in which
-	 *                          all classes are searched
-	 * FILE_NAME:  caller asks to search file names
-	 * FILE_NAME_LINE_NUMBER:  caller asks to search file names that have at least a certain amount of lines
-	 * NAMESPACE_NAME: caller asks to search for fully qualified namespaces
-	 */
-	enum ResourceTypes {
-		CLASS_NAME,
-		CLASS_NAME_METHOD_NAME,
-		FILE_NAME,
-		FILE_NAME_LINE_NUMBER,
-		NAMESPACE_NAME
-	};
 
 	/**
 	 * The files to look in
@@ -160,38 +272,15 @@ public:
 	void InitMemory();
 	
 	/**
-	 * This is the entry point into the resource lookups.  Callers will call the Prepare method giving it a 'query'
-	 * ie. the item to search for. After calling this method, the caller can perform the actual lookup by calling the 
-	 * CollectNearMatchResources or CollectFullyQualifiedResource methods. See method descriptions for more info on the
-	 * search logic.
-	 * 
-	 * A resource string can be one of: class name, file name, method name, file name with line number
-	 * Examples:
- 	 * 
- 	 * user.php //looks for the file named user.php
-	 * user.php:891 //looks for the file named user.php that has line 891
-	 * User //looks for a class named User
-	 * User::login //looks for a class named User that has a method called login
-	 * User:: //looks for all methods and properties for the user class
-	 * 
-	 * @param wxString resource
-	 * @return boolean false if resource string is bad or empty
-	 */ 
-	 // TODO: make the API simpler and just remove this method altogether
-	 // currently Walk() wont work if Prepare() is not called; but many times when we want to 
-	 //	index a file we don't have a query string
-	 // make the CollectXXX() methods take in a resource query string and return a vector of results
-	 // that way we wont need the GetResourceMatchXXX() methods either
-	bool Prepare(const wxString& resource);
-
-	/**
 	 * Implement the DirectoryWalkerClass method; will start a transaction
 	 */
 	void BeginSearch();
 		
 	/**
 	 * Parses the given file for resources. Note that one of the InitXXX() methods
-	 * must have been called before a call to this method is made.
+	 * must have been called before a call to this method is made. Also, BeginSearch() must 
+	 * have been called already (if using a DirectorySearchClass, the DirectorySearchClass
+	 * will take care of calling that method before this method gets called).
 	 *
 	 *  @param wxString  fileName the full path to the file to be parsed
 	 */
@@ -227,7 +316,7 @@ public:
 	
 	/**
 	 * Looks for the resource, using exact, case insensitive matching. Will collect the fully qualified resource name 
-	 * itself. Collected resource names can be accessed through GetResourceMatch() method
+	 * itself.
 	 * For example for the following class:
 	 * 
 	 *  class UserClass {
@@ -244,21 +333,24 @@ public:
 	 * UserClass::name
 	 * UserClass::getName
 	 *
-	 * This method is also tolerant of class hierarchy; meaning that any inherited
-	 * if a property name does not match then the parent classes are searched. For example; the following code
+	 * This method is NOT tolerant of class hierarchy; meaning that any inherited
+	 * if a property name will NOT match then the parent classes are searched. For example; the following code
 	 *
 	 *   class AdminClass extends UserClass {
 	 *   }
 	 * 
-	 * then the folowing resource queries will result in a match
+	 * then the folowing resource queries will NOT result in a match
 	 *
 	 * AdminClass
 	 * AdminClass::name
 	 * AdminClass::getName
+	 *
+	 * To search the hierarchy, the GetResourceParentClassName() and GetResourceTraits() methods can be useful
 	 * 
-	 * @return bool returns true if resource was found
+	 * @param resourceSearch the resources to look for
+	 * @return std::vector<ResourceClass> the matched resources
 	 */
-	std::vector<ResourceClass> CollectFullyQualifiedResource();
+	std::vector<ResourceClass> CollectFullyQualifiedResource(const mvceditor::ResourceSearchClass& resourceSearch);
 	
 	/**
 	 * Looks for the resource, using a near-match logic. Logic is as follows:
@@ -287,7 +379,6 @@ public:
 	 *    query.  For example, if the query is 'user.php:900' then all files that would match 'user.php' AND are 
 	 *    at least 900 lines long will match.
 	 * 
-	 * Collected resources can be accessed through GetResourceMatch() method.
 	 * For example the following class:
 	 * 
 	 * class UserClass {
@@ -307,15 +398,16 @@ public:
 	 * 
 	 * Note that if any exact matches are found, then no near-matches will be collected.
 	 * 
+	 * @param resourceSearch the partial name of resources to look for
 	 * @return matches the list of matched resources (max of 50)
 	 */
-	std::vector<ResourceClass> CollectNearMatchResources();
+	std::vector<ResourceClass> CollectNearMatchResources(const mvceditor::ResourceSearchClass& resourceSearch);
 	
 	/**
 	 * Get the parent class of a given resource. For example, let's say source code contained two classes: AdminClass and 
 	 * UserClass, AdminClass inherited from UserClass.  When this method is called in this manner
 	 * 
-	 * resourceFinder.GetResourceParentClass(UNICODE_STRING_SIMPLE("AdminClass"))
+	 * resourceFinder.GetResourceParentClassName(UNICODE_STRING_SIMPLE("AdminClass"), UNICODE_STRING_SIMPLE(""))
 	 * 
 	 * then this method will return "UserClass"
 	 * 
@@ -326,11 +418,20 @@ public:
 	UnicodeString GetResourceParentClassName(const UnicodeString& className, const UnicodeString& methodName);
 
 	/**
-	 * @param className the class name to check
-	 * @return all of the classes that the given class inherits from (parent, grandparent, and all the way up).
-	 * Note that only "extended" classes will be returned; interfaces will NOT be returned.
+	 * Get the traits used by a given resource. For example, let's say source code contained a class and two traits: UserClass,
+	 * a Save trait and a Load trait; AdminClass uses the Save and Load traits.  When this method is called in this manner
+	 * 
+	 * resourceFinder.GetResourceTraits(UNICODE_STRING_SIMPLE("AdminClass"))
+	 * 
+	 * then this method will return ["Save", "Load"]
+	 * 
+	 * @param UnicodeString className the class to search for
+	 * @param UnicodeString methodName the method to search.  IF and only IF given, then returned traits will be further constraint by 
+	 *        looking at the trait conflict resolution (insteadof). In this case, returned traits will have been checked and
+	 *        passed the insteadof operator.
+	 * @param return vector UnicodeString the class' most immediate used traits (ie won't return the traits' traits). 
 	 */
-	std::vector<UnicodeString> ClassHierarchy(const UnicodeString& className);
+	std::vector<UnicodeString> GetResourceTraits(const UnicodeString& className, const UnicodeString& methodName);
 	
 	/**
 	 * Searches the given text for the position of the given resource.  For example, if the resource matched 3 items
@@ -344,34 +445,7 @@ public:
 	 * @return bool true if match was found in text
 	 */
 	static bool GetResourceMatchPosition(const ResourceClass& resource, const UnicodeString& text, int32_t& pos, int32_t& length);
-	
-	/**
-	 * Returns the parsed class name
-	 * 
-	 * @var UnicodeString
-	 */
-	UnicodeString GetClassName() const;
-	
-	/**
-	 * Returns the parsed method name
-	 * 
-	 * @var UnicodeString
-	 */
-	UnicodeString GetMethodName() const;
-	
-	/**
-	 * Returns the parsed line number
-	 * 
-	 * @var int
-	 */
-	int GetLineNumber() const;
-	
-	/**
-	 * Returns the resource type that was given in the Prepare() methods. 
-	 * @return ResourceTypes
-	 */
-	ResourceFinderClass::ResourceTypes GetResourceType() const;
-	
+		
 	/**
 	 * Implement class observer.  When a class has been parsed, add it to the Resource Cache.
 	 */
@@ -482,25 +556,6 @@ public:
 	 * set the PHP version to handle
 	 */
 	void SetVersion(pelet::Versions version);
-
-	/**
-	 * Parses a resource string into its components: class name, file name, method name, line number
-	 * resource string is a string that contain a file name and line number or
-	 * class name or method name. Examples:
-	 * 
-	 * user.php //looks for the file named user.php
-	 * user.php:891 //looks for the file named user.php that has line 891
-	 * User //looks for a class named User
-	 * User::login //looks for a class named User that has a method called login
-	 * 
-	 * @param const wxString& resource the resource to look for
-	 * @param fileName if resource is a denifitely a file (name+ extension) this variable will be filled
-	 * @param className if resoruce is a class this variable will be filled
-	 * @param methodName if resource is a method name this variable will be filled
-	 * @param lineNumber if resource has a line number this variable will be filled
-	 */
-	static ResourceTypes ParseGoToResource(const wxString& resource, UnicodeString& fileName, UnicodeString& className, 
-		UnicodeString& methodName, int& lineNumber);
 	
 private:
 	
@@ -544,40 +599,7 @@ private:
 	 * Will use transaction to lock once instead of before and after every insert
 	 */
 	soci::transaction* Transaction;
-	
-	/**
-	 * the file name parsed from resource string 
-	 * 
-	 * @var UnicodeString
-	 */
-	UnicodeString FileName;
-
-	/**
-	 * the class name parsed from resource string 
-	 * 
-	 * @var UnicodeString
-	 */
-	UnicodeString ClassName;
-	
-	/**
-	 * the method name parsed from resource string
-	 * 
-	 * @var UnicodeString
-	 */
-	UnicodeString MethodName;
-	
-	/**
-	 * The resource type that was parsed
-	 */
-	ResourceTypes ResourceType;
-	
-	/**
-	 * the line number parsed from resource string 
-	 * 
-	 * @var int
-	 */
-	int LineNumber;
-	
+		
 	/**
 	 * The current file item being indexed.  We keep a class-wide member when parsing through many files.
 	 * 
@@ -627,28 +649,32 @@ private:
 	/**
 	 * Collects all resources that are files and match the parsed Resource [given to Prepare()]. 
 	 * Any hits will be returned
+	 *
+	 * @param resourceSearch the name of resources to look for
 	 */
-	std::vector<ResourceClass> CollectNearMatchFiles();
+	std::vector<ResourceClass> CollectNearMatchFiles(const mvceditor::ResourceSearchClass& resourceSearch);
 
 	/**
-	 * Collects all resources that are classes / functions / defines and match the parsed Resource [given to Prepare()]. 
+	 * Collects all resources that are classes / functions / defines and match the the given Resource search.
 	 * Any hits will be returned
-	 * 
+	 *
+	 * @param resourceSearch the name of resources to look for
 	 */
-	std::vector<ResourceClass> CollectNearMatchNonMembers();
+	std::vector<ResourceClass> CollectNearMatchNonMembers(const mvceditor::ResourceSearchClass& resourceSearch);
 	
 	/**
-	 * Collects all resources that are class methods / properties and match the parsed Resource [given to Prepare()]. 
+	 * Collects all resources that are class methods / properties and match the given Resource search.
 	 * Any hits will be returned
 	 * 
+	 * @param resourceSearch the name of resources to look for
 	 */
-	std::vector<ResourceClass> CollectNearMatchMembers();
+	std::vector<ResourceClass> CollectNearMatchMembers(const mvceditor::ResourceSearchClass& resourceSearch);
 	
 	/**
-	 * Collects all resources that are namespaces and match the parsed Resource [given to Prepare()]
+	 * Collects all resources that are namespaces and match the given Resource search.
 	 * Any hits will be returned
 	 */
-	std::vector<ResourceClass> CollectNearMatchNamespaces();
+	std::vector<ResourceClass> CollectNearMatchNamespaces(const mvceditor::ResourceSearchClass& resourceSearch);
 	
 	/**
 	 * Collect all of the resources that are methods / properties of the given classes.
@@ -673,7 +699,7 @@ private:
 	 * Look through all of the matches and verifies that the file still actually exists (file has not been deleted).
 	 * If the file was deleted, then the match is invalidated and the cache for that file removed.
 	 */
-	void EnsureMatchesExist(std::vector<ResourceClass>& matchesw);
+	void EnsureMatchesExist(std::vector<ResourceClass>& matches);
 
 	/**
 	 * create a new entry in the file cache. The item's FileId member will be set as well.

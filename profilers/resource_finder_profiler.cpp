@@ -206,16 +206,15 @@ void ProfileNativeFunctionsParsing() {
 
 	time = wxGetLocalTimeMillis();
 	resourceFinder.BuildResourceCacheForNativeFunctions();
-	resourceFinder.Prepare(wxT("stristr"));
-	std::vector<mvceditor::ResourceClass> matches = resourceFinder.CollectNearMatchResources();
+	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("stristr"));
+	std::vector<mvceditor::ResourceClass> matches = resourceFinder.CollectNearMatchResources(resourceSearch);
 	found = !matches.empty();
 	time = wxGetLocalTimeMillis() - time;
 	printf("time for resourceFinder on php.tags:%ld ms found:%d\n", time.ToLong(), (int)found);
 	
 	time = wxGetLocalTimeMillis();
-	resourceFinder.Prepare(wxT("mysql_query"));
 	resourceFinder.Walk(FileName);
-	matches = resourceFinder.CollectNearMatchResources();
+	matches = resourceFinder.CollectNearMatchResources(UNICODE_STRING_SIMPLE("mysql_query"));
 	time = wxGetLocalTimeMillis() - time;
 	found = !matches.empty();
 	printf("time for resourceFinder on php.tags after caching:%ld ms found:%d\n", time.ToLong(), (int)found);
@@ -234,23 +233,22 @@ void ProfileResourceFinderOnLargeProject() {
 	}
 	time = wxGetLocalTimeMillis();
 	resourceFinder.FileFilters.push_back(wxT("*.php"));
-	resourceFinder.Prepare(wxT("ExtendedRecordSetForUnitTestAddGetLeftJoin"));
 	search.Init(DirName);
 	while (search.More()) {
 		search.Walk(resourceFinder);
 	}
-	std::vector<mvceditor::ResourceClass> matches = resourceFinder.CollectNearMatchResources();
+	std::vector<mvceditor::ResourceClass> matches = resourceFinder.CollectNearMatchResources(UNICODE_STRING_SIMPLE("ExtendedRecordSetForUnitTestAddGetLeftJoin"));
 	time = wxGetLocalTimeMillis() - time;
 	size_t found =  matches.size();
 	printf("time for resourceFinder on entire project:%ld ms found:%d\n", time.ToLong(), (int)found);
 
 	time = wxGetLocalTimeMillis();
-	resourceFinder.Prepare(wxT("Record::get"));
 	search.Init(DirName);
 	while (search.More()) {
 		search.Walk(resourceFinder);
 	}
-	matches = resourceFinder.CollectNearMatchResources();
+	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("Record::get"));
+	matches = resourceFinder.CollectNearMatchResources(resourceSearch);
 	time = wxGetLocalTimeMillis() - time;
 	found = matches.size();
 	printf("time for resourceFinder on entire project after caching:%ld ms found:%d\n", time.ToLong(), (int)found);

@@ -128,9 +128,65 @@ static bool IsStaticExpression(const pelet::ExpressionClass& parsedExpression) {
 }
 
 /**
+ * @return vector of all of the classes that are parent classes or used traits of the given
+ *         class. this method will search across all resource finders
+ */
+static std::vector<UnicodeString> ClassHierarchy(UnicodeString className, UnicodeString methodName, 
+												 const std::vector<mvceditor::ResourceFinderClass*>& allResourceFinders) {
+	std::vector<UnicodeString> parents;
+	parents.push_back(className);
+	bool found = false;
+	UnicodeString classToLookup = className;
+	do {
+
+		// each parent class may be located in any of the finders. in practice this code is not as slow
+		// as it looks; class hierarchies are usually not very deep (1-4 parents)
+		found = false;
+		for (size_t i = 0; i < allResourceFinders.size(); ++i) {
+			UnicodeString parentClass = allResourceFinders[i]->GetResourceParentClassName(classToLookup, methodName);
+			if (!parentClass.isEmpty()) {
+				found = true;
+				parents.push_back(parentClass);
+				classToLookup = parentClass;
+
+				// a class can have at most 1 parent, no need to look at other finders
+				break;
+			}
+		}
+	} while (found);
+	return parents;
+}
+
+static std::vector<UnicodeString> ClassUsedTraits(std::vector<UnicodeString> classNames, UnicodeString methodName, 
+												 const std::vector<mvceditor::ResourceFinderClass*>& allResourceFinders) {
+
+	// trait support; a class can use multiple traits; hence the different logic 
+	std::vector<UnicodeString> classesToLookup = classNames;
+	std::vector<UnicodeString> usedTraits;
+	bool found = false;
+	do {
+		found = false;
+		std::vector<UnicodeString> nextTraitsToLookup;
+		for (std::vector<UnicodeString>::iterator it = classesToLookup.begin(); it != classesToLookup.end(); ++it) {
+			for (size_t i = 0; i < allResourceFinders.size(); ++i) {
+				std::vector<UnicodeString> traits = allResourceFinders[i]->GetResourceTraits(*it, methodName);
+				if (!traits.empty()) {
+					found = true;
+					nextTraitsToLookup.insert(nextTraitsToLookup.end(), traits.begin(), traits.end());
+					usedTraits.insert(usedTraits.end(), traits.begin(), traits.end());
+				}
+			}
+		}
+		classesToLookup = nextTraitsToLookup;
+	} while (found);
+
+	return usedTraits;
+}
+
+/**
  * Figure out a resource's type by looking at all of the given finders.
  * @param resourceToLookup MUST BE fully qualified (class name  + method name,  or function name).  string can have the
- *        object operator "->" that separates the class and method name.
+ *        object operator "::" that separates the class and method name.
  * @param finders all of the finders to look in
  * @return the resource's type; (for methods, it's the return type of the method) could be empty string if type could 
  *         not be determined 
@@ -138,22 +194,27 @@ static bool IsStaticExpression(const pelet::ExpressionClass& parsedExpression) {
 static UnicodeString ResolveResourceType(UnicodeString resourceToLookup, 
 										 const std::vector<mvceditor::ResourceFinderClass*>& resourceFinders) {
 	UnicodeString type;
+	mvceditor::ResourceSearchClass resourceSearch(resourceToLookup);
+	resourceSearch.SetParentClasses(ClassHierarchy(resourceSearch.GetClassName(), resourceSearch.GetMethodName(), resourceFinders));
+
+	std::vector<UnicodeString> classesToSearchForTraits = resourceSearch.GetParentClasses();
+	classesToSearchForTraits.push_back(resourceSearch.GetClassName());
+	resourceSearch.SetTraits(ClassUsedTraits(classesToSearchForTraits, resourceSearch.GetMethodName(), resourceFinders));
 
 	// need to get the type from the resource finders
-	// the resource finder query string needs to have '::' also remove the function markers "()" that
-	// are put there by the expression parser
 	for (size_t j = 0; j < resourceFinders.size(); ++j) {
 		mvceditor::ResourceFinderClass* finder = resourceFinders[j];
-		if (finder->Prepare(mvceditor::StringHelperClass::IcuToWx(resourceToLookup))) {
-			std::vector<mvceditor::ResourceClass> matches = finder->CollectFullyQualifiedResource();
-			if (matches.size() == 1) {
-				mvceditor::ResourceClass match = matches[0];
-				if (mvceditor::ResourceClass::CLASS == match.Type) {
-					type = match.ClassName;
-				}
-				else {
-					type =  match.ReturnType;
-				}
+		std::vector<mvceditor::ResourceClass> matches = finder->CollectFullyQualifiedResource(resourceSearch);
+		if (!matches.empty()) {
+
+			// since we are doing fully qualified matches, all matches are from the inheritance chain; ie. all methods
+			// will have the same signature (return type)
+			mvceditor::ResourceClass match = matches[0];
+			if (mvceditor::ResourceClass::CLASS == match.Type) {
+				type = match.ClassName;
+			}
+			else {
+				type =  match.ReturnType;
 			}
 		}
 		if (!type.isEmpty()) {
@@ -609,36 +670,44 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 
 	// now do the "final" lookup; here we will also perform access checks
 	// and static access checks
-	wxString wxResource = mvceditor::StringHelperClass::IcuToWx(resourceToLookup);
 	bool visibilityError = false;
 	bool isStaticCall = IsStaticExpression(parsedExpression);
 	bool isThisCall = parsedExpression.FirstValue().caseCompare(UNICODE_STRING_SIMPLE("$this"), 0) == 0;
 	bool isParentCall = parsedExpression.FirstValue().caseCompare(UNICODE_STRING_SIMPLE("parent"), 0) == 0;
-	for (size_t j = 0; j < allResourceFinders.size(); ++j) {
-		mvceditor::ResourceFinderClass* finder = allResourceFinders[j];
 
-		// only do duck typing if needed. otherwise, make sure that we have a type match first.
-		if ((doDuckTyping || !typeToLookup.isEmpty()) && finder->Prepare(wxResource)) {
-			std::vector<mvceditor::ResourceClass> matches;
-			if (doFullyQualifiedMatchOnly) {
-				matches = finder->CollectFullyQualifiedResource();
-			}
-			else {
-				matches = finder->CollectNearMatchResources();
-			}
+	if (!error.HasError()) {
+		mvceditor::ResourceSearchClass resourceSearch(resourceToLookup);
+		resourceSearch.SetParentClasses(ClassHierarchy(resourceSearch.GetClassName(), resourceSearch.GetMethodName(), allResourceFinders));
 
-			// now we loop through the possbile matches and remove stuff that does not 
-			// make sense because of visibility rules or resources that are 
-			// duplicated in two separate caches
-			for (size_t k = 0; k < matches.size(); ++k) {
-				mvceditor::ResourceClass resource = matches[k];
-				bool isVisible = IsResourceVisible(resource, originalExpression, expressionScope, isStaticCall, isThisCall, isParentCall);
-				if (!mvceditor::IsResourceDirty(openedResourceFinders, resource, finder) && isVisible) {
-					UnresolveNamespaceAlias(originalExpression, expressionScope, resource);
-					resourceMatches.push_back(resource);
+		std::vector<UnicodeString> classesToSearchForTraits = resourceSearch.GetParentClasses();
+		classesToSearchForTraits.push_back(resourceSearch.GetClassName());
+		resourceSearch.SetTraits(ClassUsedTraits(classesToSearchForTraits, resourceSearch.GetMethodName(), allResourceFinders));
+		for (size_t j = 0; j < allResourceFinders.size(); ++j) {
+			mvceditor::ResourceFinderClass* finder = allResourceFinders[j];
+
+			// only do duck typing if needed. otherwise, make sure that we have a type match first.
+			if ((doDuckTyping || !typeToLookup.isEmpty())) {
+				std::vector<mvceditor::ResourceClass> matches;
+				if (doFullyQualifiedMatchOnly) {
+					matches = finder->CollectFullyQualifiedResource(resourceSearch);
 				}
-				else if (!isVisible) {
-					visibilityError = true;
+				else {
+					matches = finder->CollectNearMatchResources(resourceSearch);
+				}
+
+				// now we loop through the possbile matches and remove stuff that does not 
+				// make sense because of visibility rules or resources that are 
+				// duplicated in two separate caches
+				for (size_t k = 0; k < matches.size(); ++k) {
+					mvceditor::ResourceClass resource = matches[k];
+					bool isVisible = IsResourceVisible(resource, originalExpression, expressionScope, isStaticCall, isThisCall, isParentCall);
+					if (!mvceditor::IsResourceDirty(openedResourceFinders, resource, finder) && isVisible) {
+						UnresolveNamespaceAlias(originalExpression, expressionScope, resource);
+						resourceMatches.push_back(resource);
+					}
+					else if (!isVisible) {
+						visibilityError = true;
+					}
 				}
 			}
 		}

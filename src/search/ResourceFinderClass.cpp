@@ -30,6 +30,9 @@
 #include <algorithm>
 #include <fstream>
 #include <unicode/uchar.h>
+#include <unicode/ustring.h>
+#include <unicode/fmtable.h>
+#include <unicode/numfmt.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <sqlite3.h>
@@ -205,31 +208,6 @@ static bool ParseTag(mvceditor::ResourceClass& resource, UChar* line) {
 }
 
 /**
- * @param resource the resource to check, for example MyClass::Method
- * @param classNames list of fully qualified class names, for example  [ MyClass, MySecondClass, \First\Class ]
- * @return bool TRUE if the given [member] resource is from any of the given classses
- */
-static bool MatchesAnyClass(const mvceditor::ResourceClass& resource, const std::vector<UnicodeString>& classNames) {
-	bool match = false;
-	for (size_t i = 0; i < classNames.size(); ++i) {
-		if (resource.ClassName.caseCompare(classNames[i], 0) == 0) {
-			match = true;
-			break;
-		}
-	}
-	return match;
-}
-
-/**
- * @return TRUE if the given resource belongs to a class
- */
-static bool IsClassMember(const mvceditor::ResourceClass& resource) {
-	return mvceditor::ResourceClass::CLASS_CONSTANT == resource.Type
-		|| mvceditor::ResourceClass::MEMBER == resource.Type
-		|| mvceditor::ResourceClass::METHOD == resource.Type;
-}
-
-/**
  * appends name to namespace
  */
 static UnicodeString QualifyName(const UnicodeString& namespaceName, const UnicodeString& name) {
@@ -242,6 +220,97 @@ static UnicodeString QualifyName(const UnicodeString& namespaceName, const Unico
 	return qualifiedName;
 }
 
+mvceditor::ResourceSearchClass::ResourceSearchClass(const UnicodeString& resourceQuery)
+	: FileName()
+	, ClassName()
+	, MethodName()
+	, ResourceType(FILE_NAME)
+	, LineNumber(0) {
+	ResourceTypes resourceType = CLASS_NAME;
+
+	// :: => Class::method
+	// \ => \namespace\namespace
+	// : => filename : line number
+	int scopePos = resourceQuery.indexOf(UNICODE_STRING_SIMPLE("::"));
+	int namespacePos = resourceQuery.indexOf(UNICODE_STRING_SIMPLE("\\"));
+	int colonPos = resourceQuery.indexOf(UNICODE_STRING_SIMPLE(":"));
+	if (scopePos >= 0) {
+		ClassName.setTo(resourceQuery, 0, scopePos);
+		MethodName.setTo(resourceQuery, scopePos + 2);
+		ResourceType = CLASS_NAME_METHOD_NAME;
+	}
+	else if (namespacePos >= 0) {
+		ClassName = resourceQuery;
+		ResourceType = NAMESPACE_NAME;
+	}
+	else if (colonPos >= 0) {
+		
+		// : => filename : line number
+		UnicodeString after(resourceQuery, colonPos + 1);
+		Formattable fmtable((int32_t)0);
+		UErrorCode error = U_ZERO_ERROR;
+		NumberFormat* format = NumberFormat::createInstance(error);
+		if (U_SUCCESS(error)) {
+			format->parse(after, fmtable, error);
+			if (U_SUCCESS(error)) {
+				LineNumber = fmtable.getLong();
+			}
+		}
+		FileName.setTo(resourceQuery, 0, colonPos);
+		ResourceType = FILE_NAME_LINE_NUMBER;
+	}
+	else {
+
+		// class names can only have alphanumerics or underscores
+		bool hasSymbols = NULL != u_strpbrk(resourceQuery.getBuffer(), UNICODE_STRING_SIMPLE("`!@#$%^&*()+={}|\\:;\"',./?").getBuffer());
+		if (hasSymbols) {
+			FileName = resourceQuery;
+			ResourceType = FILE_NAME;
+		}
+		else {
+			ClassName = resourceQuery;
+			ResourceType = CLASS_NAME;
+		}
+	}
+}
+
+void mvceditor::ResourceSearchClass::SetParentClasses(const std::vector<UnicodeString>& parents) {
+	ParentClasses = parents;
+}
+
+std::vector<UnicodeString> mvceditor::ResourceSearchClass::GetParentClasses() const {
+	return ParentClasses;
+}
+
+void mvceditor::ResourceSearchClass::SetTraits(const std::vector<UnicodeString>& traits) {
+	Traits = traits;
+}
+
+std::vector<UnicodeString> mvceditor::ResourceSearchClass::GetTraits() const {
+	return Traits;
+}
+
+UnicodeString mvceditor::ResourceSearchClass::GetClassName() const {
+	return ClassName;
+}
+
+UnicodeString mvceditor::ResourceSearchClass::GetFileName() const {
+	return FileName;
+}
+
+UnicodeString mvceditor::ResourceSearchClass::GetMethodName() const {
+	return MethodName;
+}
+
+int mvceditor::ResourceSearchClass::GetLineNumber() const {
+	return LineNumber;
+}
+
+mvceditor::ResourceSearchClass::ResourceTypes mvceditor::ResourceSearchClass::GetResourceType() const {
+	return ResourceType;
+}
+
+
 mvceditor::ResourceFinderClass::ResourceFinderClass()
 	: FileFilters()
 	, FileParsingCache()
@@ -250,11 +319,6 @@ mvceditor::ResourceFinderClass::ResourceFinderClass()
 	, Parser()
 	, Session()
 	, Transaction(NULL)
-	, FileName()
-	, ClassName()
-	, MethodName()
-	, ResourceType(FILE_NAME)
-	, LineNumber(0) 
 	, IsCacheInitialized(false) {
 	Parser.SetClassObserver(this);
 	Parser.SetClassMemberObserver(this);
@@ -363,17 +427,7 @@ bool mvceditor::ResourceFinderClass::Walk(const wxString& fileName) {
 		}
 	}
 	if (matchedFilter) {
-		switch (ResourceType) {
-			case FILE_NAME:
-			case FILE_NAME_LINE_NUMBER:
-				BuildResourceCache(fileName, false);
-				break;
-			case CLASS_NAME:
-			case CLASS_NAME_METHOD_NAME:
-			case NAMESPACE_NAME:
-				BuildResourceCache(fileName, true);
-				break;
-		}
+		BuildResourceCache(fileName, true);
 	}
 
 	// no need to keep know which files have resources, most likely all files should have a resource
@@ -482,13 +536,6 @@ bool mvceditor::ResourceFinderClass::GetResourceMatchPosition(const mvceditor::R
 	return false;
 }
 
-bool mvceditor::ResourceFinderClass::Prepare(const wxString& resource) {
-	ResourceType = ParseGoToResource(resource, FileName, ClassName, MethodName, LineNumber);
-
-	// maybe later do some error checking
-	return !resource.IsEmpty();
-}
-
 bool mvceditor::ResourceFinderClass::BuildResourceCacheForNativeFunctions() {
 	bool loaded = false;
 	BeginSearch();
@@ -500,21 +547,21 @@ bool mvceditor::ResourceFinderClass::BuildResourceCacheForNativeFunctions() {
 	return loaded;
 }
 
-std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNearMatchResources() {
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNearMatchResources(const mvceditor::ResourceSearchClass& resourceSearch) {
 	std::vector<mvceditor::ResourceClass> matches;
-	switch (ResourceType) {
-		case FILE_NAME:
-		case FILE_NAME_LINE_NUMBER:
-			matches = CollectNearMatchFiles();
+	switch (resourceSearch.GetResourceType()) {
+		case mvceditor::ResourceSearchClass::FILE_NAME:
+		case mvceditor::ResourceSearchClass::FILE_NAME_LINE_NUMBER:
+			matches = CollectNearMatchFiles(resourceSearch);
 			break;
-		case CLASS_NAME:
-			matches = CollectNearMatchNonMembers();
+		case mvceditor::ResourceSearchClass::CLASS_NAME:
+			matches = CollectNearMatchNonMembers(resourceSearch);
 			break;
-		case CLASS_NAME_METHOD_NAME:
-			matches = CollectNearMatchMembers();
+		case mvceditor::ResourceSearchClass::CLASS_NAME_METHOD_NAME:
+			matches = CollectNearMatchMembers(resourceSearch);
 			break;
-		case NAMESPACE_NAME:
-			matches = CollectNearMatchNamespaces();
+		case mvceditor::ResourceSearchClass::NAMESPACE_NAME:
+			matches = CollectNearMatchNamespaces(resourceSearch);
 			break;
 	}
 	EnsureMatchesExist(matches);
@@ -522,13 +569,12 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 	return matches;
 }
 
-std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNearMatchFiles() {
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNearMatchFiles(const mvceditor::ResourceSearchClass& resourceSearch) {
 	wxString path,
 		currentFileName,
 		extension;
 	std::vector<mvceditor::ResourceClass> matches;
-	wxString fileName =  StringHelperClass::IcuToWx(FileName).Lower();
-	std::string query = mvceditor::StringHelperClass::wxToChar(fileName);
+	std::string query = mvceditor::StringHelperClass::IcuToChar(resourceSearch.GetFileName());
 
 	// add the SQL wildcards
 	query = "'%" + query + "%'";
@@ -542,8 +588,9 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 			wxString fullPath = mvceditor::StringHelperClass::charToWx(match.c_str());
 			wxFileName::SplitPath(fullPath, &path, &currentFileName, &extension);
 			currentFileName += wxT(".") + extension;
+			wxString fileName = mvceditor::StringHelperClass::IcuToWx(resourceSearch.GetFileName());
 			if (wxNOT_FOUND != currentFileName.Lower().Find(fileName)) {
-				if (0 == LineNumber || GetLineCountFromFile(fullPath) >= LineNumber) {
+				if (0 == resourceSearch.GetLineNumber() || GetLineCountFromFile(fullPath) >= resourceSearch.GetLineNumber()) {
 					ResourceClass newItem;
 					newItem.FileItemId = fileItemId;
 					newItem.FullPath.Assign(fullPath);
@@ -556,8 +603,8 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 	return matches;
 }
 
-std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNearMatchNonMembers() {
-	std::string key = mvceditor::StringHelperClass::IcuToChar(ClassName);
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNearMatchNonMembers(const mvceditor::ResourceSearchClass& resourceSearch) {
+	std::string key = mvceditor::StringHelperClass::IcuToChar(resourceSearch.GetClassName());
 	std::vector<int> types;
 	types.push_back(mvceditor::ResourceClass::CLASS);
 	types.push_back(mvceditor::ResourceClass::DEFINE);
@@ -571,30 +618,29 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 	return matches;
 }
 
-std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNearMatchMembers() {
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNearMatchMembers(const mvceditor::ResourceSearchClass& resourceSearch) {
 	std::vector<mvceditor::ResourceClass> matches;
 	
 	// look for the parent classes. when we are searching for members, we want to look
 	// for members from the class or any class it inherited from
-	// whenever we insert into parentClassNames, need to make sure strings are all lowercase
-	// that way we dont have do lower case for every resource comparison
-	std::vector<UnicodeString> parentClassNames = ClassHierarchy(ClassName);	
-	if (MethodName.isEmpty()) {
+	std::vector<UnicodeString> parentClassNames = resourceSearch.GetParentClasses();
+	parentClassNames.push_back(resourceSearch.GetClassName());
+	if (resourceSearch.GetMethodName().isEmpty()) {
 		
 		// special case; query for all methods for a class (UserClass::)
 		std::vector<mvceditor::ResourceClass> memberMatches = CollectAllMembers(parentClassNames);
-		std::vector<mvceditor::ResourceClass> traitMatches = CollectAllTraitMembers(ClassName);
+		std::vector<mvceditor::ResourceClass> traitMatches = CollectAllTraitMembers(resourceSearch.GetClassName());
 
 		matches.insert(matches.end(), memberMatches.begin(), memberMatches.end());
 		matches.insert(matches.end(), traitMatches.begin(), traitMatches.end());
 	}
-	else if (ClassName.isEmpty()) {
+	else if (resourceSearch.GetClassName().isEmpty()) {
 		
-		// special case, query accross all classes for a method (::getName)
+		// special case, query across all classes for a method (::getName)
 		// if ClassName is empty, then just check method names This ensures 
 		// queries like '::getName' will work as well.
 		// make sure to NOT get fully qualified  matches (key=identifier)
-		std::string identifier = mvceditor::StringHelperClass::IcuToChar(MethodName);
+		std::string identifier = mvceditor::StringHelperClass::IcuToChar(resourceSearch.GetMethodName());
 		std::vector<int> types;
 		types.push_back(mvceditor::ResourceClass::MEMBER);
 		types.push_back(mvceditor::ResourceClass::METHOD);
@@ -607,7 +653,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 		}
 	}
 	else {
-		InheritedTraits(ClassName, parentClassNames);
+		InheritedTraits(resourceSearch.GetClassName(), parentClassNames);
 		std::vector<std::string> keyStarts;
 
 		// now that we found the parent classes, combine the parent class name and the queried method
@@ -616,7 +662,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 		for (std::vector<UnicodeString>::iterator it = parentClassNames.begin(); it != parentClassNames.end(); ++it) {
 			std::string keyStart = mvceditor::StringHelperClass::IcuToChar(*it);
 			keyStart += "::";
-			keyStart += mvceditor::StringHelperClass::IcuToChar(MethodName);
+			keyStart += mvceditor::StringHelperClass::IcuToChar(resourceSearch.GetMethodName());
 			keyStarts.push_back(keyStart);
 		}
 		matches = FindByKeyStartMany(keyStarts, true);
@@ -666,12 +712,12 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectAll
 	return matches;
 }
 
-std::vector<mvceditor::ResourceClass>  mvceditor::ResourceFinderClass::CollectNearMatchNamespaces() {
+std::vector<mvceditor::ResourceClass>  mvceditor::ResourceFinderClass::CollectNearMatchNamespaces(const mvceditor::ResourceSearchClass& resourceSearch) {
 	std::vector<mvceditor::ResourceClass> matches;
 
 	// needle identifier contains a namespace operator; but it may be
 	// a namespace or a fully qualified name
-	UnicodeString key = ClassName;
+	UnicodeString key = resourceSearch.GetClassName();
 	std::string stdKey = mvceditor::StringHelperClass::IcuToChar(key);
 	matches = FindByKeyExact(stdKey);
 	if (matches.empty()) {
@@ -680,6 +726,7 @@ std::vector<mvceditor::ResourceClass>  mvceditor::ResourceFinderClass::CollectNe
 	return matches;
 }
 
+/***
 std::vector<UnicodeString> mvceditor::ResourceFinderClass::ClassHierarchy(const UnicodeString& className) {
 	std::vector<UnicodeString> parentClassNames;
 	parentClassNames.push_back(className);
@@ -710,6 +757,7 @@ std::vector<UnicodeString> mvceditor::ResourceFinderClass::ClassHierarchy(const 
 	}
 	return parentClassNames;
 }
+*/
 
 UnicodeString mvceditor::ResourceFinderClass::GetResourceParentClassName(const UnicodeString& className, 
 		const UnicodeString& methodName) {
@@ -749,70 +797,13 @@ UnicodeString mvceditor::ResourceFinderClass::GetResourceParentClassName(const U
 	return parentClassName;
 }
 
-UnicodeString mvceditor::ResourceFinderClass::GetClassName() const {
-	return ClassName;
+std::vector<UnicodeString> mvceditor::ResourceFinderClass::GetResourceTraits(const UnicodeString& className, 
+		const UnicodeString& methodName) {
+	//TODO
+	std::vector<UnicodeString> traits;
+	return traits;
 }
 
-UnicodeString mvceditor::ResourceFinderClass::GetMethodName() const {
-	return MethodName;
-}
-
-int mvceditor::ResourceFinderClass::GetLineNumber() const {
-	return LineNumber;
-}
-
-mvceditor::ResourceFinderClass::ResourceTypes mvceditor::ResourceFinderClass::GetResourceType() const {
-	return ResourceType;
-}
-
-mvceditor::ResourceFinderClass::ResourceTypes mvceditor::ResourceFinderClass::ParseGoToResource(const wxString& resource, UnicodeString& fileName, 
-		UnicodeString& className, UnicodeString& methodName, int& lineNumber) {
-	fileName = UNICODE_STRING_SIMPLE("");
-	className = UNICODE_STRING_SIMPLE("");
-	methodName = UNICODE_STRING_SIMPLE("");
-	lineNumber = 0;
-	ResourceTypes resourceType = CLASS_NAME;
-
-	// :: => Class::method
-	// \ => \namespace\namespace
-	// : => filename : line number
-	int scopePos = resource.find(wxT("::"));
-	int namespacePos = resource.find(wxT("\\"));
-	int colonPos = resource.find(wxT(":"));
-	if (scopePos >= 0) {
-		className = StringHelperClass::wxToIcu(resource.substr(0, scopePos));
-		methodName = StringHelperClass::wxToIcu(resource.substr(scopePos + 2, -1));
-		resourceType = CLASS_NAME_METHOD_NAME;
-	}
-	else if (namespacePos >= 0) {
-		className = StringHelperClass::wxToIcu(resource);
-		resourceType = NAMESPACE_NAME;
-	}
-	else if (colonPos >= 0) {
-		
-		// : => filename : line number
-		long int number;
-		wxString after = resource.substr(colonPos + 1, -1);
-		bool isNumber = after.ToLong(&number);
-		lineNumber = isNumber ? number : 0;
-		fileName = StringHelperClass::wxToIcu(resource.substr(0, colonPos));
-		resourceType = FILE_NAME_LINE_NUMBER;
-	}
-	else {
-
-		// class names can only have alphanumerics or underscores
-		int pos = resource.find_first_of(wxT("`!@#$%^&*()+={}|\\:;\"',./?"));
-		if (pos >= 0) {
-			fileName = StringHelperClass::wxToIcu(resource);
-			resourceType = FILE_NAME;
-		}
-		else {
-			className = StringHelperClass::wxToIcu(resource);
-			resourceType = CLASS_NAME;
-		}
-	}
-	return resourceType;
-}
 
 void mvceditor::ResourceFinderClass::BuildResourceCache(const wxString& fullPath, bool parseClasses) {
 	wxFileName fileName(fullPath);
@@ -1145,19 +1136,20 @@ UnicodeString mvceditor::ResourceFinderClass::ExtractParentClassFromSignature(co
 	return parentClassName;
 }
 
-std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectFullyQualifiedResource() {
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectFullyQualifiedResource(const mvceditor::ResourceSearchClass& resourceSearch) {
 	ResourceClass needle;
 	std::vector<mvceditor::ResourceClass> allMatches;
-	if (ResourceType == CLASS_NAME_METHOD_NAME) {
+	if (resourceSearch.GetResourceType() == mvceditor::ResourceSearchClass::CLASS_NAME_METHOD_NAME) {
 
 		// check the entire class hierachy; stop as soon as we found it
-		std::vector<UnicodeString> classHierarchy = ClassHierarchy(ClassName);
+		std::vector<UnicodeString> classHierarchy = resourceSearch.GetParentClasses();
+		classHierarchy.push_back(resourceSearch.GetClassName());
 		std::vector<int> types;
 		types.push_back(mvceditor::ResourceClass::MEMBER);
 		types.push_back(mvceditor::ResourceClass::METHOD);
 		types.push_back(mvceditor::ResourceClass::CLASS_CONSTANT);
 		for (size_t i = 0; i < classHierarchy.size(); ++i) {
-			UnicodeString key = classHierarchy[i] + UNICODE_STRING_SIMPLE("::") + MethodName;
+			UnicodeString key = classHierarchy[i] + UNICODE_STRING_SIMPLE("::") + resourceSearch.GetMethodName();
 			std::string stdKey = mvceditor::StringHelperClass::IcuToChar(key);
 			std::vector<mvceditor::ResourceClass> matches = FindByKeyExactAndTypes(stdKey, types, true);
 			if (!matches.empty()) {
@@ -1165,8 +1157,8 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectFul
 			}
 		}
 	}
-	else if (NAMESPACE_NAME == ResourceType) {
-		UnicodeString key = ClassName;
+	else if (mvceditor::ResourceSearchClass::NAMESPACE_NAME == resourceSearch.GetResourceType()) {
+		UnicodeString key = resourceSearch.GetClassName();
 		std::string stdKey = mvceditor::StringHelperClass::IcuToChar(key);
 
 		// make sure there is one and only one item that matches the search.
@@ -1176,7 +1168,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectFul
 		}
 	}
 	else {
-		UnicodeString key = ClassName;
+		UnicodeString key = resourceSearch.GetClassName();
 		std::string stdKey = mvceditor::StringHelperClass::IcuToChar(key);
 
 		// make sure there is one and only one item that matches the search.
@@ -1238,7 +1230,6 @@ void mvceditor::ResourceFinderClass::EnsureMatchesExist(std::vector<ResourceClas
 
 void mvceditor::ResourceFinderClass::Print() {
 	UFILE *out = u_finit(stdout, NULL, NULL);
-	u_fprintf(out, "LookingFor=%.*S,%.*S\n", ClassName.length(), ClassName.getBuffer(), MethodName.length(), MethodName.getBuffer());
 	std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches("1=1", false);
 	for (std::vector<mvceditor::ResourceClass>::const_iterator it = matches.begin(); it != matches.end(); ++it) {
 		switch (it->Type) {

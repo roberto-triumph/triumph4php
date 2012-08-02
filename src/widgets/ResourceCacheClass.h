@@ -183,37 +183,23 @@ public:
 	std::vector<ResourceClass> AllNonNativeClassesGlobal();
 	
 	/**
-	 * prepares all the registered resource finders plus the global one.
-	 * @param resource the resource to look for
-	 * @return bool TRUE if all resource finders could be preparead
-	 */
-	bool PrepareAll(const wxString& resource);
-	
-	/**
 	 * Searches all the registered resource finders plus the global given.
 	 * Will search only for full matches (it will call CollectFullyQualifiedResource
 	 * on each resource finder).
+	 * @param search string to search for
 	 * @return std::vector<mvceditor::ResourceClass> matched resources 
 	 */
-	std::vector<mvceditor::ResourceClass> CollectFullyQualifiedResourceFromAll();
+	std::vector<mvceditor::ResourceClass> CollectFullyQualifiedResourceFromAll(const UnicodeString& search);
 	
 	/**
 	 * Searches all the registered resource finders plus the global given
 	 * Will search for near matches (it will call CollectNearMatchResources
 	 * on each resource finder).
 	 *
+	 * @param string to search for
 	 * @return std::vector<mvceditor::ResourceClass> matched resources
 	 */
-	std::vector<mvceditor::ResourceClass> CollectNearMatchResourcesFromAll();
-
-	/**
-	 * Calls  and ResourceUpdateClass::PrepareAll and
-	 * ResourceUpdateClass::CollectNearMatchResourcesFromAll
-
-	 * @see ResourceCacheClass::PrepareAll
-	 * @see ResourceCacheClass::CollectNearMatchResourcesFromAll
-	 */
-	std::vector<ResourceClass> PrepareAndCollectNearMatchResourcesFromAll(const wxString& resource);
+	std::vector<mvceditor::ResourceClass> CollectNearMatchResourcesFromAll(const UnicodeString& search);
 
 	/**
 	 * thread-safe wrapper for ResourceFinderClass::AddDynamicResouces on the GLOBAL cache
