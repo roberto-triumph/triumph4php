@@ -124,7 +124,7 @@ void CacheLargeProject(mvceditor::ResourceCacheClass& resourceCache, wxString di
 		printf("Directory does not exist: %s\n", (const char*)dirName.ToAscii());
 	}
 	bool walked = true;
-	wxFileName fileName(wxFileName::GetTempDir() + wxT("call_stack_profiler_resource_cache.db"));
+	wxFileName fileName(wxFileName::GetTempDir() + wxFileName::GetPathSeparators() + wxT("call_stack_profiler_resource_cache.db"));
 	if (fileName.FileExists()) {
 		wxRemoveFile(fileName.GetFullPath());
 	}
