@@ -355,19 +355,6 @@ void mvceditor::AppFrameClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& 
 	event.Skip();
 }
 
-void mvceditor::AppFrameClass::OnProjectOpen(wxCommandEvent& event) {
-	wxDirDialog dialog(this, _("Choose Project Location"), wxT(""), 
-		wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST | wxDD_CHANGE_DIR);
-	if (wxID_OK == dialog.ShowModal()) {
-		bool destroy = Notebook->SaveAllModifiedPages();
-		if (destroy) {
-			wxCommandEvent evt(EVENT_CMD_OPEN_PROJECT);
-			evt.SetString(dialog.GetPath());
-			App.EventSink.Publish(evt);
-		}
-	}
-}
-
 void mvceditor::AppFrameClass::OnHelpAbout(wxCommandEvent& event) {
 	wxAboutDialogInfo info;
 	info.AddDeveloper(wxT("Roberto Perpuly"));
@@ -665,7 +652,7 @@ void mvceditor::AppFrameClass::OnAnyAuiToolbarEvent(wxAuiToolBarEvent& event) {
 	event.Skip();
 }
 
-void mvceditor::AppFrameClass::OnProjectOpened() {
+void mvceditor::AppFrameClass::OnProjectsUpdated() {
 	wxString msg;
 	if (App.Structs.HasSources()) {
 		msg = _("MVC Editor - Open Projects");
@@ -682,15 +669,6 @@ void mvceditor::AppFrameClass::OnProjectOpened() {
 	SetTitle(msg);
 }
 
-void mvceditor::AppFrameClass::OnProjectClosed() {
-	Notebook->CloseAllPages();
-	AuiManager.GetPane(ToolsNotebook).Hide();
-	while (ToolsNotebook->GetPageCount()) {
-		ToolsNotebook->DeletePage(0);
-	}
-	AuiManager.Update();
-}
-
 void mvceditor::AppFrameClass::UpdatePreferences() {
 	Notebook->RefreshCodeControlOptions();
 }
@@ -701,12 +679,8 @@ mvceditor::AppEventListenerForFrameClass::AppEventListenerForFrameClass(mvcedito
 
 }
 
-void mvceditor::AppEventListenerForFrameClass::OnProjectOpened(wxCommandEvent& event) {
-	AppFrame->OnProjectOpened();
-}
-
-void mvceditor::AppEventListenerForFrameClass::OnProjectClosed(wxCommandEvent& event) {
-	AppFrame->OnProjectClosed();
+void mvceditor::AppEventListenerForFrameClass::OnProjectsUpdated(wxCommandEvent& event) {
+	AppFrame->OnProjectsUpdated();
 }
 
 void mvceditor::AppEventListenerForFrameClass::OnCmdFileOpen(wxCommandEvent& event) {
@@ -768,8 +742,7 @@ BEGIN_EVENT_TABLE(mvceditor::AppFrameClass,  AppFrameGeneratedClass)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::AppEventListenerForFrameClass, wxEvtHandler)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_OPENED, mvceditor::AppEventListenerForFrameClass::OnProjectOpened)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_CLOSED, mvceditor::AppEventListenerForFrameClass::OnProjectClosed)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::AppEventListenerForFrameClass::OnProjectsUpdated)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_FILE_OPEN, mvceditor::AppEventListenerForFrameClass::OnCmdFileOpen)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_UPDATED, mvceditor::AppEventListenerForFrameClass::OnPreferencesUpdated)
 END_EVENT_TABLE()

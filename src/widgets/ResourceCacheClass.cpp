@@ -175,8 +175,8 @@ bool mvceditor::ResourceCacheClass::PersistGlobal(const wxFileName& outputFile) 
 	}
 	bool good = false;
 	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it;
-	for (it = GlobalResourceFinders.begin(); good && it != GlobalResourceFinders.end(); ++it) {
-		good &= it->second->Persist(outputFile);
+	for (it = GlobalResourceFinders.begin(); it != GlobalResourceFinders.end(); ++it) {
+		good |= it->second->Persist(outputFile, true);
 	}
 	return good;
 }
@@ -271,10 +271,10 @@ mvceditor::ResourceCacheClass::PrepareAndCollectNearMatchResourcesFromAll(const 
 
 std::vector<mvceditor::ResourceFinderClass*> mvceditor::ResourceCacheClass::AllFinders() {
 	std::vector<mvceditor::ResourceFinderClass*> allResourceFinders;
-	for (std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it =  Finders.begin(); it != Finders.end(); ++it) {
-		allResourceFinders.push_back(it->second);
-	}
 	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it;
+	for (it =  Finders.begin(); it != Finders.end(); ++it) {
+		allResourceFinders.push_back(it->second);
+	}	
 	for (it = GlobalResourceFinders.begin(); it != GlobalResourceFinders.end(); ++it) {
 		allResourceFinders.push_back(it->second);
 	}

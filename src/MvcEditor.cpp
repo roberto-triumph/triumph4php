@@ -141,9 +141,6 @@ bool mvceditor::AppClass::CommandLine() {
 			filenames.push_back(filename);
 			AppFrame->FileOpen(filenames);
 		}
-		if (parser.Found(wxT("project"), &projectDirectory)) {
-			ProjectPlugin->ProjectOpen(projectDirectory);
-		}
 	}
 	else if (-1 == result) {
 		ret = false;

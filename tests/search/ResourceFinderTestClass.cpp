@@ -1611,7 +1611,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, Persist) {
 	ResourceFinder.Walk(TestProjectDir + TestFile);
 	
 	wxFileName outputFile(TestProjectDir + wxT("index.csv"));
-	CHECK(ResourceFinder.Persist(outputFile));
+	CHECK(ResourceFinder.Persist(outputFile, false));
 	wxString contents = GetFileContents(wxT("index.csv"));
 	wxStringTokenizer tokenizer(contents, wxT("\n"));
 	CHECK_EQUAL(wxT("CLASS,") + TestProjectDir + TestFile + wxT(",UserClass,"), tokenizer.GetNextToken());

@@ -654,7 +654,7 @@ mvceditor::SqlBrowserPluginClass::SqlBrowserPluginClass(mvceditor::AppClass& app
 mvceditor::SqlBrowserPluginClass::~SqlBrowserPluginClass() {
 }
 
-void mvceditor::SqlBrowserPluginClass::OnProjectOpened(wxCommandEvent& event) {
+void mvceditor::SqlBrowserPluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 
 
 	// remove any connections previously detected
@@ -956,7 +956,7 @@ BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPluginClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SqlBrowserPluginClass::OnWorkComplete)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::SqlBrowserPluginClass::OnContentNotebookPageChanged)
 	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::SqlBrowserPluginClass::OnContentNotebookPageClose)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_OPENED, mvceditor::SqlBrowserPluginClass::OnProjectOpened)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::SqlBrowserPluginClass::OnProjectsUpdated)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPanelClass, SqlBrowserPanelGeneratedClass)

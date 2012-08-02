@@ -61,11 +61,9 @@ wxEvent* mvceditor::FileSavedEventClass::Clone() const {
 const wxEventType mvceditor::EVENT_PLUGIN_FILE_SAVED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_FILE_OPENED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_FILE_CLOSED = wxNewEventType();
-const wxEventType mvceditor::EVENT_APP_PROJECT_OPENED = wxNewEventType();
-const wxEventType mvceditor::EVENT_APP_PROJECT_CLOSED = wxNewEventType();
+const wxEventType mvceditor::EVENT_APP_PROJECTS_UPDATED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_PROJECT_INDEXED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_PROJECT_URLS = wxNewEventType();
-const wxEventType mvceditor::EVENT_CMD_OPEN_PROJECT = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_PREFERENCES_UPDATED = wxNewEventType();
 const wxEventType mvceditor::EVENT_CMD_RE_INDEX = wxNewEventType();
 const wxEventType mvceditor::EVENT_CMD_FILE_OPEN = wxNewEventType();

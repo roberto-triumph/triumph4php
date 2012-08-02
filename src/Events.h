@@ -129,19 +129,12 @@ typedef void (wxEvtHandler::*FileSavedEventClassFunction)(FileSavedEventClass&);
     wxStaticCastEvent( FileSavedEventClassFunction, & fn ), (wxObject *) NULL ),
 
 /**
- * Notification that a project has been opened. This event is fired AFTER the framework
+ * Notification that the projects list has been opened / closed or any project's source definitions have 
+ * updated. This event is fired AFTER the framework
  * detection is complete; it is safe to access a project's database connections, dynamic
  * resources, etc... via the application globals.
  */
-extern const wxEventType EVENT_APP_PROJECT_OPENED;
-
-/**
- * Notification that a project *WAS* closed. This event is fired AFTER the project
- * is cleaned up; it is still NOT safe to access a project's database connections, dynamic
- * resources, etc... via the application globals.
- * There is currently no way to veto a project closing via an event.
- */
-extern const wxEventType EVENT_APP_PROJECT_CLOSED;
+extern const wxEventType EVENT_APP_PROJECTS_UPDATED;
 
 /**
  * Notification that the that the current project
@@ -187,14 +180,6 @@ extern const wxEventType EVENT_APP_PROJECT_URLS;
  * Tell the app to re-index the current project.
  */
 extern const wxEventType EVENT_CMD_RE_INDEX;
-
-/**
- * Tell the app to open a new project.
- * The command event should set the project root path with event.SetString()
- * Note that the app will do NOTHING if the path is invalid; the plugin should
- * make sure the path is valid.
- */
-extern const wxEventType EVENT_CMD_OPEN_PROJECT;
 
 /**
  * Tell the app to open a new file.

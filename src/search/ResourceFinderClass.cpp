@@ -1721,14 +1721,18 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::FindByIden
 }
 
 
-bool mvceditor::ResourceFinderClass::Persist(const wxFileName& outputFile) {
+bool mvceditor::ResourceFinderClass::Persist(const wxFileName& outputFile, bool append) {
 	if (!outputFile.IsOk()) {
 		return false;
 	}
 	bool error = false;
 	
-	// TODO can we juse use the SQLite database file
-	wxFFile file(outputFile.GetFullPath(), wxT("wb"));
+	// TODO can we just use the SQLite database file
+	wxString opts = wxT("wb");
+	if (append) {
+		opts = wxT("ab");
+	}
+	wxFFile file(outputFile.GetFullPath(), opts);
 	if (!file.IsOpened()) {
 		return false;
 	}

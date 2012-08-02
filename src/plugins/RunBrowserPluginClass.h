@@ -150,7 +150,7 @@ private:
 	/**
 	 * when a project is opened clean the Recent list
 	 */
-	void OnProjectOpened(wxCommandEvent& event);
+	void OnProjectsUpdated(wxCommandEvent& event);
 
 	/**
 	 * this will be called once the cache file has been persisted

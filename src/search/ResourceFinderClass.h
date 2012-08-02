@@ -452,9 +452,11 @@ public:
 	 * FUNCTION,/home/users/public_html/lib/calc.php,calculate,
 	 * METHOD,/home/users/public_html/controllers/my_controller.php,MyController,index
 	 *
+	 * @param outputFile the file to write the resources to
+	 * @param append TRUE to append to the outputFile. When FALSE, the file is overwritten
 	 * @return bool TRUE if file was successfully written to.
 	 */
-	bool Persist(const wxFileName& outputFile);
+	bool Persist(const wxFileName& outputFile, bool append);
 
 	/**
 	 * @return vector of ALL parsed Resources. Be careful as this method may return

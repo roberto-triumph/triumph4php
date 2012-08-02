@@ -61,9 +61,7 @@ public:
 
 private:
 
-	void OnProjectOpened(wxCommandEvent& event);
-
-	void OnProjectClosed(wxCommandEvent& event);
+	void OnProjectsUpdated(wxCommandEvent& event);
 
 	void OnCmdFileOpen(wxCommandEvent& event);
 
@@ -110,12 +108,7 @@ public:
 	/**
 	 * notify all sub-windows of a new project.
 	 */
-	void OnProjectOpened();
-
-	/**
-	 * when a project is closed, close any open windows
-	 */
-	void OnProjectClosed();
+	void OnProjectsUpdated();
 
 	/**
 	 * For a re-draw of all dialogs and windows based on new updated preferences
@@ -157,12 +150,6 @@ protected:
 	
 private:
 	
-	/**
-	 * project menu handlers
-	 */
-	void OnProjectOpen(wxCommandEvent& event);
-
-
 	/**
 	 * Status bar accessor.  This status bar allows plugins to easily add gauges to the status bar.
 	 * 

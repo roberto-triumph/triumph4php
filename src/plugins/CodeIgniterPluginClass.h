@@ -59,7 +59,7 @@ private:
 	 * When a project is opened; we will read the list of project's config files
 	 * and will populate the code igniter menu with the config file names.
 	 */
-	void OnProjectOpened(wxCommandEvent& event);
+	void OnProjectsUpdated(wxCommandEvent& event);
 
 	void OnMenuItem(wxCommandEvent& event);
 	

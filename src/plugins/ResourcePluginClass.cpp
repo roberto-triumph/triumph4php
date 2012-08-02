@@ -183,7 +183,7 @@ void mvceditor::ResourcePluginClass::AddCodeControlClassContextMenuItems(wxMenu*
 	menu->Append(mvceditor::MENU_RESOURCE + 3, _("Jump To Source"));
 }
 
-void mvceditor::ResourcePluginClass::OnProjectOpened(wxCommandEvent& event) {
+void mvceditor::ResourcePluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 	HasCodeLookups = false;
 	HasFileLookups = false;
 	if (ResourceFileReader.IsRunning()) {
@@ -192,19 +192,13 @@ void mvceditor::ResourcePluginClass::OnProjectOpened(wxCommandEvent& event) {
 	GetResourceCache()->Clear();
 	GetResourceCache()->SetVersion(GetEnvironment()->Php.Version);
 	ProjectIndexMenu->Enable(App.Structs.HasSources() && FREE == State);
+	GetStatusBarWithGauge()->AddGauge(_("Preparing Resource Index"), ID_COUNT_FILES_GAUGE, 
+			StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 	if (NativeFunctionsReader.Init(GetResourceCache())) {
-		mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
-		if (ResourceFileReader.StartReading(error)) {
-			State = INDEXING_NATIVE_FUNCTIONS;
-			GetStatusBarWithGauge()->AddGauge(_("Preparing Resource Index"), ID_COUNT_FILES_GAUGE, 
-				StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
-		}
-		else if (mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING == error) {
-			wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
-		}
-		else if (mvceditor::BackgroundFileReaderClass::NO_RESOURCES == error) {
-			mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
-		}
+		State = INDEXING_NATIVE_FUNCTIONS;		
+	}
+	else {
+		GetStatusBarWithGauge()->StopGauge(ID_COUNT_FILES_GAUGE);
 	}
 }
 
@@ -267,9 +261,26 @@ void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
 	mvceditor::ResourceFinderClass::ResourceTypes type = mvceditor::ResourceFinderClass::ParseGoToResource(JumpToText,
 		fileName, className, methodName, lineNumber);
 
-	// figure out what resources have been cached, so that next time we can jump
-	// to the results without creating a new background thread
-	if (INDEXING_PROJECT == State || GOTO == State) {
+	if (INDEXING_NATIVE_FUNCTIONS == State) {
+		mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
+		if (ResourceFileReader.StartReading(error)) {
+			State = INDEXING_PROJECT;
+			GetStatusBarWithGauge()->AddGauge(_("Indexing Projects"), ID_COUNT_FILES_GAUGE, 
+				StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
+		}
+		else if (mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING == error) {
+			wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
+			State = FREE;
+		}
+		else if (mvceditor::BackgroundFileReaderClass::NO_RESOURCES == error) {
+			mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
+			State = FREE;
+		}
+	}
+	else if (INDEXING_PROJECT == State || GOTO == State) {
+
+		// figure out what resources have been cached, so that next time we can jump
+		// to the results without creating a new background thread
 		if (ResourceFinderClass::CLASS_NAME == type ||
 			ResourceFinderClass::CLASS_NAME_METHOD_NAME == type) {
 			HasCodeLookups = true;
@@ -279,39 +290,39 @@ void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
 			ResourceFinderClass::FILE_NAME_LINE_NUMBER == type) {
 			HasFileLookups = true;
 		}
-	}
-	
-	// if we indexed because of a user query; need to show the user the results.
-	States previousState = State;
-	State = FREE;
-	std::vector<mvceditor::ResourceClass> chosenResources;
-	if (GOTO == previousState && !JumpToText.IsEmpty()) {
-		std::vector<mvceditor::ResourceClass> matches = SearchForResources(JumpToText);
-		if (matches.size() == 1) {
-			LoadPageFromResource(JumpToText, matches[0]);
+
+		// if we indexed because of a user query; need to show the user the results.
+		States previousState = State;
+		State = FREE;
+		std::vector<mvceditor::ResourceClass> chosenResources;
+		if (GOTO == previousState && !JumpToText.IsEmpty()) {
+			std::vector<mvceditor::ResourceClass> matches = SearchForResources(JumpToText);
+			if (matches.size() == 1) {
+				LoadPageFromResource(JumpToText, matches[0]);
+			}
+			else if (!matches.empty()) {
+				mvceditor::ResourceSearchDialogClass dialog(GetMainWindow(), *this, JumpToText, chosenResources);
+				dialog.Prepopulate(JumpToText, matches);
+				if (dialog.ShowModal() == wxOK) {
+					for (size_t i = 0; i < chosenResources.size(); ++i) {
+						LoadPageFromResource(JumpToText, chosenResources[i]);
+					}
+				}
+			}
 		}
-		else if (!matches.empty()) {
-			mvceditor::ResourceSearchDialogClass dialog(GetMainWindow(), *this, JumpToText, chosenResources);
-			dialog.Prepopulate(JumpToText, matches);
+		else if (GOTO == previousState && JumpToText.IsEmpty()) {
+			wxString term;
+			mvceditor::ResourceSearchDialogClass dialog(GetMainWindow(), *this, term, chosenResources);
 			if (dialog.ShowModal() == wxOK) {
 				for (size_t i = 0; i < chosenResources.size(); ++i) {
 					LoadPageFromResource(JumpToText, chosenResources[i]);
 				}
 			}
 		}
-	}
-	else if (GOTO == previousState && JumpToText.IsEmpty()) {
-		wxString term;
-		mvceditor::ResourceSearchDialogClass dialog(GetMainWindow(), *this, term, chosenResources);
-		if (dialog.ShowModal() == wxOK) {
-			for (size_t i = 0; i < chosenResources.size(); ++i) {
-				LoadPageFromResource(JumpToText, chosenResources[i]);
-			}
+		else if (INDEXING_PROJECT == previousState) {
+			wxCommandEvent indexedEvent(mvceditor::EVENT_APP_PROJECT_INDEXED);
+			App.EventSink.Publish(indexedEvent);
 		}
-	}
-	else if (INDEXING_PROJECT == previousState) {
-		wxCommandEvent indexedEvent(mvceditor::EVENT_APP_PROJECT_INDEXED);
-		App.EventSink.Publish(indexedEvent);
 	}
 }
 
@@ -329,7 +340,7 @@ void mvceditor::ResourcePluginClass::StartIndex() {
 					mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
 					if (ResourceFileReader.StartReading(error)) {
 						State = INDEXING_PROJECT;
-						GetStatusBarWithGauge()->AddGauge(_("Indexing Project"),
+						GetStatusBarWithGauge()->AddGauge(_("Indexing Projects"),
 							ID_COUNT_FILES_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE,
 							wxGA_HORIZONTAL);
 						if (!HasCodeLookups) {
@@ -703,7 +714,7 @@ BEGIN_EVENT_TABLE(mvceditor::ResourcePluginClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FILE_READ_COMPLETE, mvceditor::ResourcePluginClass::OnWorkComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ResourcePluginClass::OnWorkComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ResourcePluginClass::OnWorkInProgress)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_OPENED, mvceditor::ResourcePluginClass::OnProjectOpened)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::ResourcePluginClass::OnProjectsUpdated)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_RE_INDEX, mvceditor::ResourcePluginClass::OnCmdReIndex)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_CLOSED, mvceditor::ResourcePluginClass::OnAppFileClosed)
 END_EVENT_TABLE()

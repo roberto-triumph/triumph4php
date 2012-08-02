@@ -490,6 +490,7 @@ void mvceditor::RunBrowserPluginClass::OnCacheFileWorkComplete(wxCommandEvent& e
 
 	// look to see if any source directory is a virtual host doc root
 	std::vector<mvceditor::SourceClass> sources = App.Structs.AllEnabledSources();
+	bool started = false;
 	for (size_t i = 0; i < sources.size(); ++i) {
 
 		// ATTN: allow at most one doc root per source directory for now
@@ -497,8 +498,14 @@ void mvceditor::RunBrowserPluginClass::OnCacheFileWorkComplete(wxCommandEvent& e
 		wxString projectRootUrl =  environment->Apache.GetUrl(rootDirFullPath);
 		if (!projectRootUrl.IsEmpty()) {
 			PhpFrameworks.InitUrlDetector(App.Structs.Frameworks, ResourceCacheFileName.GetFullPath(), projectRootUrl);
+			started = true;
 			break;
 		}
+	}
+	if (!started) {
+
+		// cleanup the file
+		wxRemoveFile(ResourceCacheFileName.GetFullPath());
 	}
 }
 
@@ -506,7 +513,7 @@ void mvceditor::RunBrowserPluginClass::OnProcessInProgress(wxCommandEvent& event
 	GetStatusBarWithGauge()->UpdateGauge(ID_URL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
 }
 
-void mvceditor::RunBrowserPluginClass::OnProjectOpened(wxCommandEvent& event) {
+void mvceditor::RunBrowserPluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 	RecentUrls.clear();
 	App.Structs.UrlResourceFinder.Urls.clear();
 	App.Structs.UrlResourceFinder.ChosenUrl.Reset();
@@ -545,7 +552,7 @@ BEGIN_EVENT_TABLE(mvceditor::RunBrowserPluginClass, wxEvtHandler)
 	// application events
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_UPDATED, mvceditor::RunBrowserPluginClass::OnPreferencesUpdated)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_INDEXED, mvceditor::RunBrowserPluginClass::OnProjectIndexed)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_OPENED, mvceditor::RunBrowserPluginClass::OnProjectOpened)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::RunBrowserPluginClass::OnProjectsUpdated)
 	
 	// command handlers to enable communication with other plugins
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_PROJECT_URLS, mvceditor::RunBrowserPluginClass::OnCmdUrls)

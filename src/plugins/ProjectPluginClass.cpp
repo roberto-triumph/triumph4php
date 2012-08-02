@@ -218,31 +218,8 @@ void mvceditor::ProjectPluginClass::OnProjectExploreOpenFile(wxCommandEvent& eve
 	}
 }
 
-void mvceditor::ProjectPluginClass::ProjectOpen(const wxString& directoryPath) {
-	
-	/*
-	TODO is this fuctionality even needed?
-	CloseProject();
-	
-	if (!directoryPath.IsEmpty()) {
-		mvceditor::SourceClass src;
-		src.RootDirectory.Assign(directoryPath);
-		src.SetIncludeWildcards(wxT("*.*"));
-		App.Project->AddSource(src);
-		App.Project->Label = directoryPath;
-
-		bool started = PhpFrameworks->Init(directoryPath);
-		if (!started) {
-			mvceditor::EditorLogError(mvceditor::BAD_PHP_EXECUTABLE, GetEnvironment()->Php.PhpExecutablePath); 
-		}
-		else {
-			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
-			gauge->AddGauge(_("Framework Detection"), ID_FRAMEWORK_DETECTION_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
-		}
-	}*/
-}
-
 void mvceditor::ProjectPluginClass::ProjectOpenDefault() {
+	DirectoriesToDetect.clear();
 	std::vector<mvceditor::SourceClass> allSources = App.Structs.AllEnabledSources();
 	if (!allSources.empty()) {
 
@@ -262,19 +239,9 @@ void mvceditor::ProjectPluginClass::ProjectOpenDefault() {
 	else {
 		// still notify the plugins of the new project at program startup
 		// when the app starts the default project is opened
-		wxCommandEvent evt(mvceditor::EVENT_APP_PROJECT_OPENED);
+		wxCommandEvent evt(mvceditor::EVENT_APP_PROJECTS_UPDATED);
 		App.EventSink.Publish(evt);
 	}
-}
-
-void mvceditor::ProjectPluginClass::CloseProject() {
-	PhpFrameworks.Clear();		
-	wxCommandEvent closeEvent(mvceditor::EVENT_APP_PROJECT_CLOSED);
-	App.EventSink.Publish(closeEvent);
-}
-
-void mvceditor::ProjectPluginClass::OnCmdProjectOpen(wxCommandEvent& event) {
-	ProjectOpen(event.GetString());
 }
 
 void mvceditor::ProjectPluginClass::OnFrameworkDetectionComplete(wxCommandEvent& event) {
@@ -289,7 +256,7 @@ void mvceditor::ProjectPluginClass::OnFrameworkDetectionComplete(wxCommandEvent&
 		}
 	}
 	if (finished) {	
-		wxCommandEvent projectOpenedEvent(mvceditor::EVENT_APP_PROJECT_OPENED);
+		wxCommandEvent projectOpenedEvent(mvceditor::EVENT_APP_PROJECTS_UPDATED);
 		App.EventSink.Publish(projectOpenedEvent);
 		mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 		gauge->StopGauge(ID_FRAMEWORK_DETECTION_GAUGE);
@@ -309,7 +276,7 @@ void mvceditor::ProjectPluginClass::OnFrameworkDetectionFailed(wxCommandEvent& e
 		}
 	}
 	if (finished) {	
-		wxCommandEvent projectOpenedEvent(mvceditor::EVENT_APP_PROJECT_OPENED);
+		wxCommandEvent projectOpenedEvent(mvceditor::EVENT_APP_PROJECTS_UPDATED);
 		App.EventSink.Publish(projectOpenedEvent);
 		mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 		gauge->StopGauge(ID_FRAMEWORK_DETECTION_GAUGE);
@@ -328,12 +295,16 @@ void mvceditor::ProjectPluginClass::OnFrameworkFound(mvceditor::FrameworkFoundEv
 void mvceditor::ProjectPluginClass::OnProjectDefine(wxCommandEvent& event) {
 	mvceditor::ProjectListDialogClass dialog(GetMainWindow(), App.Structs.Projects);
 	if (wxOK == dialog.ShowModal()) {
-		// TODO: re-trigger indexing ?
-
 		wxCommandEvent evt;
 		SavePreferences(evt);
 		wxConfigBase* config = wxConfig::Get();
 		config->Flush();
+
+		// re-start the project opening cycle
+		// clear the detected framework info
+		App.Structs.Frameworks.clear();
+		App.Structs.Infos.clear();
+		ProjectOpenDefault();
 	}
 }
 
@@ -568,6 +539,5 @@ BEGIN_EVENT_TABLE(mvceditor::ProjectPluginClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_DETECTION_COMPLETE, mvceditor::ProjectPluginClass::OnFrameworkDetectionComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_DETECTION_FAILED, mvceditor::ProjectPluginClass::OnFrameworkDetectionFailed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::ProjectPluginClass::OnFrameworkDetectionInProgress)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_OPEN_PROJECT, mvceditor::ProjectPluginClass::OnCmdProjectOpen)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_UPDATED, mvceditor::ProjectPluginClass::SavePreferences)
 END_EVENT_TABLE()

@@ -43,7 +43,7 @@ void mvceditor::CodeIgniterPluginClass::AddNewMenu(wxMenuBar *menuBar) {
 	// for the projects that use Code Igniter
 }
 
-void mvceditor::CodeIgniterPluginClass::OnProjectOpened(wxCommandEvent& event) {
+void mvceditor::CodeIgniterPluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 	ConfigFiles.clear();
 	for (size_t i = 0; i < App.Structs.Frameworks.size(); ++i) {
 		ConfigFiles.insert(App.Structs.Frameworks[i].ConfigFiles.begin(), App.Structs.Frameworks[i].ConfigFiles.end());
@@ -239,5 +239,5 @@ void mvceditor::CodeIgniterPluginClass::GoToController() {
 
 BEGIN_EVENT_TABLE(mvceditor::CodeIgniterPluginClass, wxEvtHandler) 
 	EVT_MENU_RANGE(MENU_CODE_IGNITER, MENU_CODE_IGNITER + 15, mvceditor::CodeIgniterPluginClass::OnMenuItem)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_OPENED, mvceditor::CodeIgniterPluginClass::OnProjectOpened)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::CodeIgniterPluginClass::OnProjectsUpdated)
 END_EVENT_TABLE()

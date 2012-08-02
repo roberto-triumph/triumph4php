@@ -52,13 +52,8 @@ public:
 	~ProjectPluginClass();
 
 	/**
-	 * Opens the given directory as a project.
-	 */
-	void ProjectOpen(const wxString& directoryPath);
-
-	/**
-	 * Opens the 'default' project. It will be the one that was opened on the last
-	 * run of the program.
+	 * Opens the projects that are setup in App.Structs. It will be the ones that were opened on the last
+	 * run of the program, or ones that were updated by the user..
 	 */
 	void ProjectOpenDefault();
 
@@ -104,12 +99,6 @@ private:
 	void OnProjectExploreOpenFile(wxCommandEvent& event);
 
 	/**
-	 * handler for the open project command that can be published by any
-	 * other plugin
-	 */
-	void OnCmdProjectOpen(wxCommandEvent& event);
-
-	/**
 	 * This is the callback that gets called when the PHP framework detectors have 
 	 * successfully run
 	 */
@@ -119,9 +108,9 @@ private:
 	void OnFrameworkDetectionFailed(wxCommandEvent& event);
 
 	/**
-	 * close project and all resources that depend on it
+	 * close all projects and all resources that depend on it
 	 */
-	void CloseProject();
+	void CleanupProjects();
 
 	/**
 	 * Open up a dialog so that the user can add more source directories

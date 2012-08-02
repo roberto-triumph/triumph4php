@@ -202,7 +202,7 @@ public:
 	
 private:
 
-	void OnProjectOpened(wxCommandEvent& event);
+	void OnProjectsUpdated(wxCommandEvent& event);
 
 	void OnAppFileClosed(wxCommandEvent& event);
 
