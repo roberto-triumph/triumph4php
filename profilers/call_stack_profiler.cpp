@@ -71,7 +71,7 @@ int main() {
 	int major, minor;
 	wxOperatingSystemId os = wxGetOsVersion(&major, &minor);
 	if (os == wxOS_WINDOWS_NT) {
-		DirName = wxT("C:\\Users\\roberto\\Software\\wamp\\www\\ember\\");
+		DirName = wxT("C:\\Users\\roberto\\Software\\wamp\\www\\ember");
 		StartingFile = wxT("C:\\Users\\roberto\\Software\\wamp\\www\\ember\\application\\controllers\\news.php");
 	}
 	else {
@@ -115,7 +115,7 @@ int main() {
 	
 void CacheLargeProject(mvceditor::ResourceCacheClass& resourceCache, wxString dirName) {
 	printf("...");
-	///resourceCache.BuildResourceCacheForNativeFunctionsGlobal();
+	resourceCache.BuildResourceCacheForNativeFunctionsGlobal();
 	mvceditor::DirectorySearchClass directorySearch;
 	std::vector<wxString> fileFilters;
 	fileFilters.push_back(wxT("*.php"));
@@ -124,11 +124,13 @@ void CacheLargeProject(mvceditor::ResourceCacheClass& resourceCache, wxString di
 		printf("Directory does not exist: %s\n", (const char*)dirName.ToAscii());
 	}
 	bool walked = true;
-	wxFileName fileName(wxFileName::GetTempDir() + wxT("resource_cache.db"));
+	wxFileName fileName(wxFileName::GetTempDir() + wxT("call_stack_profiler_resource_cache.db"));
 	if (fileName.FileExists()) {
 		wxRemoveFile(fileName.GetFullPath());
 	}
-	resourceCache.InitGlobal(fileName);
+	if (!resourceCache.InitGlobal(fileName)) {
+		printf("Could not initialize a global cache.\n");
+	}
 	while (walked && directorySearch.More()) {
 		walked = resourceCache.WalkGlobal(fileName, directorySearch, fileFilters);
 	}
