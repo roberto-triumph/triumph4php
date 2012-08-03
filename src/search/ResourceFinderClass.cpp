@@ -396,9 +396,7 @@ void mvceditor::ResourceFinderClass::BeginSearch() {
 
 	
 	// 1,000 = good amount of resources for a med-to-large size project
-	// 50 = good amount of namespaces
 	FileParsingCache.reserve(1000);
-	NamespaceCache.get_allocator().allocate(50);
 }
 
 void mvceditor::ResourceFinderClass::EndSearch() {
