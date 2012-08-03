@@ -1007,7 +1007,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithClassHierarchyInMultiple
 	);
 	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
 		"<?php\n"
-		"class MyClass { function workA() {} function workB() {} } \n"
+		"class MyClass extends MyBaseClass { function workA() {} function workB() {} } \n"
 		"$my = new MyClass;\n"
 	);
 	GlobalFinder.BuildResourceCacheForFile(wxT("untitled 2"), sourceCodeParent, true);
