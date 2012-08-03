@@ -835,40 +835,6 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 	CHECK_UNISTR_EQUALS("printUser", Matches[0].Identifier);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldCollectNearMatchResourcesForParentClass) {
-	Prep(mvceditor::StringHelperClass::charToIcu(
-		"<?php\n"
-		"class UserClass {\n"
-		"\tprivate $name;\n"
-		"\tprivate $address;\n"
-		"\tfunction getName() {\n"
-		"\t\treturn $this->name;\n"
-		"\t}\n"
-		"\tprivate function clearName() {\n"
-		"\t}\n"
-		"}\n"
-		"class SuperUserClass extends UserClass {\n"
-		"\tfunction disableUser(User $user) {\n"
-		"\t}\n"
-		"}\n"
-		"class AdminClass extends SuperUserClass {\n"
-		"\tfunction deleteUser(User $user) {\n"
-		"\t}\n"
-		"}\n"
-		"?>\n"
-	));
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("AdminClass::"));
-	CHECK_VECTOR_SIZE(6, Matches);
-
-	// sorted by resource key (class name :: member name)
-	CHECK_MEMBER_RESOURCE("AdminClass", "deleteUser", Matches[0]);
-	CHECK_MEMBER_RESOURCE("SuperUserClass", "disableUser", Matches[1]);
-	CHECK_MEMBER_RESOURCE("UserClass", "address", Matches[2]);
-	CHECK_MEMBER_RESOURCE("UserClass", "clearName", Matches[3]);
-	CHECK_MEMBER_RESOURCE("UserClass", "getName", Matches[4]);	
-	CHECK_MEMBER_RESOURCE("UserClass", "name", Matches[5]);
-}
-
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldCollectAllMethodsWhenClassIsNotGiven) {
 	Prep(mvceditor::StringHelperClass::charToIcu(
 		"<?php\n"
@@ -940,37 +906,6 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesShould
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestFile, Matches[0].FullPath.GetFullPath());
 	CHECK_EQUAL(TestFile, Matches[0].FullPath.GetFullPath());
-}
-
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesWithClassHierarchy) {
-	Prep(mvceditor::StringHelperClass::charToIcu(
-		"<?php\n"
-		"class UserClass {\n"
-		"\tprivate $name;"
-		"\tfunction getName() {\n"
-		"\t\treturn $this->name;\n"
-		"\t}\n"
-		"}\n"
-		"class AdminClass {\n"
-		"\tfunction getName() {\n"
-		"\t\treturn 'Admin:' . $this->name;\n"
-		"\t}\n"
-		"}\n"
-		"class SuperUserClass extends AdminClass {}"
-	));	
-	Matches = ResourceFinder.CollectFullyQualifiedResource(UNICODE_STRING_SIMPLE("UserClass::getName"));
-	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_MEMBER_RESOURCE("UserClass", "getName", Matches[0]);
-	
-	// should only use the 'highest' possible resource (only Admin and not User)
-	Matches = ResourceFinder.CollectFullyQualifiedResource(UNICODE_STRING_SIMPLE("AdminClass::getName"));
-	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_MEMBER_RESOURCE("AdminClass", "getName", Matches[0]);
-	
-	Matches = ResourceFinder.CollectFullyQualifiedResource(UNICODE_STRING_SIMPLE("SuperUserClass::getName"));
-	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_MEMBER_RESOURCE("AdminClass", "getName", Matches[0]);
-	
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesShouldFindMatchesForCorrectClassMethod) {
@@ -1104,29 +1039,6 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceMatchShouldReturnSignatur
 	Matches = ResourceFinder.CollectFullyQualifiedResource(resourceSearch);
 	mvceditor::ResourceClass resource = Matches[0];
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("public function __construct($name)"), resource.Signature);
-}
-
-TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceMatchShouldReturnSignatureForInheritedMethods) {
-	 Prep(mvceditor::StringHelperClass::charToIcu(
-		"<?php\n"
-		"class UserClass {\n"
-		"\tprivate $name;"
-		"\tfunction getName() {\n"
-		"\t\treturn $this->name;\n"
-		"\t}\n"
-		"}\n"
-		"class AdminClass extends UserClass {\n"
-		"\tfunction deleteUser() { } \n"
-		"}\n"
-		"function userClassPrint($user) {\n"
-		"\t echo $user->getName() . \"\\n\";"
-		"}\n"
-		"?>\n"
-	));
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("AdminClass::getName"));
-	mvceditor::ResourceClass resource = Matches[0];
-	CHECK_MEMBER_RESOURCE("UserClass", "getName", resource);
-	CHECK_UNISTR_EQUALS("public function getName()", resource.Signature);
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceParentClassShouldReturnParentClass) {
@@ -1415,7 +1327,7 @@ TEST_FIXTURE(DynamicResourceTestClass, AddDynamicResourcesShouldWorkWithCollect)
 	ResourceFinder.AddDynamicResources(DynamicResources);
 
 	// now test the Collect functionality works as it does for resources that were parsed
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("MyDynamicClass"));
+	CollectNearMatchResources(UNICODE_STRING_SIMPLE("MyDynamicClass::"));
 	CHECK_VECTOR_SIZE(3, Matches);
 	mvceditor::ResourceClass match = Matches[0];
 	CHECK_MEMBER_RESOURCE("MyDynamicClass", "__get", match);
