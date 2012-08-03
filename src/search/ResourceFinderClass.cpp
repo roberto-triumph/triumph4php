@@ -393,6 +393,12 @@ void mvceditor::ResourceFinderClass::BeginSearch() {
 	}
 	FileParsingCache.clear();
 	NamespaceCache.clear();
+
+	
+	// 1,000 = good amount of resources for a med-to-large size project
+	// 50 = good amount of namespaces
+	FileParsingCache.reserve(1000);
+	NamespaceCache.get_allocator().allocate(50);
 }
 
 void mvceditor::ResourceFinderClass::EndSearch() {
@@ -407,6 +413,11 @@ void mvceditor::ResourceFinderClass::EndSearch() {
 	}
 	FileParsingCache.clear();
 	NamespaceCache.clear();
+
+	
+	// reclaim mem since we no longer need it
+	FileParsingCache.reserve(10);
+
 }
 
 bool mvceditor::ResourceFinderClass::Walk(const wxString& fileName) {
@@ -1402,6 +1413,9 @@ bool mvceditor::ResourceFinderClass::LoadTagFile(const wxFileName& fileName, boo
 		UChar buffer[512];
 
 		std::vector<mvceditor::ResourceClass> newResources;
+
+		// 20,000 = lines in php.tags + some slack
+		newResources.reserve(20000);
 		mvceditor::ResourceClass res;
 		while (u_fgets(buffer, 512, uf)) {
 			if (UNICODE_STRING_SIMPLE("!_TAG_").caseCompare(buffer, 6, 0) != 0) {
