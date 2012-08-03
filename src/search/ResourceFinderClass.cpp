@@ -1974,7 +1974,15 @@ bool mvceditor::FileItemClass::NeedsToBeParsed(const wxDateTime& fileLastModifie
 	if (IsNew || !IsParsed) {
 		return true;
 	}
-	bool modified = fileLastModifiedDateTime.IsLaterThan(DateTime);
+
+	// precision that is stored in SQLite is up to the second;
+	// lets truncate the given date to the nearest second before comparing
+	wxDateTime truncated;
+	truncated.Set(
+		fileLastModifiedDateTime.GetDay(), fileLastModifiedDateTime.GetMonth(), fileLastModifiedDateTime.GetYear(),
+		fileLastModifiedDateTime.GetHour(), fileLastModifiedDateTime.GetMinute(), fileLastModifiedDateTime.GetSecond(), 0
+	);
+	bool modified = truncated.IsLaterThan(DateTime);
 	return modified;
 }
 
