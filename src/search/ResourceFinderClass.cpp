@@ -256,6 +256,7 @@ mvceditor::ResourceSearchClass::ResourceSearchClass(const UnicodeString& resourc
 				LineNumber = fmtable.getLong();
 			}
 		}
+		delete format;
 		FileName.setTo(resourceQuery, 0, colonPos);
 		ResourceType = FILE_NAME_LINE_NUMBER;
 	}
@@ -768,8 +769,7 @@ std::vector<UnicodeString> mvceditor::ResourceFinderClass::ClassHierarchy(const 
 }
 */
 
-UnicodeString mvceditor::ResourceFinderClass::GetResourceParentClassName(const UnicodeString& className, 
-		const UnicodeString& methodName) {
+UnicodeString mvceditor::ResourceFinderClass::GetResourceParentClassName(const UnicodeString& className) {
 	UnicodeString parentClassName;
 
 	// first query to get the parent class name
@@ -780,28 +780,6 @@ UnicodeString mvceditor::ResourceFinderClass::GetResourceParentClassName(const U
 	if (!matches.empty()) {
 		mvceditor::ResourceClass resource = matches[0];
 		parentClassName = ExtractParentClassFromSignature(resource.Signature);
-	}
-	if (!parentClassName.isEmpty() && !methodName.isEmpty()) {
-
-		// now to check that the parent has the given method
-		std::string query = mvceditor::StringHelperClass::IcuToChar(parentClassName);
-		query += "::";
-		query += mvceditor::StringHelperClass::IcuToChar(methodName);
-		std::vector<int> methodTypes;
-		methodTypes.push_back(mvceditor::ResourceClass::METHOD);
-		matches = FindByKeyStartAndTypes(query, methodTypes, true);
-		UnicodeString parentClassSignature;
-		bool found = false;
-		if (!matches.empty()) {
-
-			// this ancestor has the method
-			found = true;
-		}
-		if (!found) {
-
-			//  keep searching up the inheritance chain
-			return GetResourceParentClassName(parentClassName, methodName);
-		}
 	}
 	return parentClassName;
 }
@@ -1151,6 +1129,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectFul
 	if (resourceSearch.GetResourceType() == mvceditor::ResourceSearchClass::CLASS_NAME_METHOD_NAME) {
 
 		// check the entire class hierachy; stop as soon as we found it
+		// combine the parent classes with the class being searched
 		std::vector<UnicodeString> classHierarchy = resourceSearch.GetParentClasses();
 		classHierarchy.push_back(resourceSearch.GetClassName());
 		std::vector<int> types;
@@ -1339,7 +1318,7 @@ void mvceditor::ResourceFinderClass::AddDynamicResources(const std::vector<mvced
 				, soci::into(identifierOut);
 			if (returnType.empty() && !classNameOut.empty() && !identifierOut.empty()) {
 
-				// resource already exists, only update the return type
+				// resource already exists, but it does not have a return type. only update the return type
 				returnType = mvceditor::StringHelperClass::IcuToChar(resource.ReturnType);
 				std::ostringstream updateStream;
 				updateStream << "UPDATE resources SET return_type = ? WHERE class_name = ? AND identifier = ? AND type IN("
@@ -1350,7 +1329,9 @@ void mvceditor::ResourceFinderClass::AddDynamicResources(const std::vector<mvced
 				Session.once << updateStream.str(), soci::use(returnType), soci::use(className), soci::use(identifier);
 				updated = true;
 			}
-			if (!updated) {
+			else if (returnType.empty() && classNameOut.empty() && identifierOut.empty()) {
+				
+				// make sure to not insert duplicate items (if we found them)
 				resource.IsDynamic = true;
 				resource.Key = resource.Identifier;
 				newResources.push_back(resource);
@@ -1362,13 +1343,12 @@ void mvceditor::ResourceFinderClass::AddDynamicResources(const std::vector<mvced
 		}
 		else {
 
-			// look at the class, function, cache
+			// look at the function, cache
 			bool updated = false;
 			std::ostringstream stream;
-			stream << "SELECT return_type, identifier FROM resources WHERE class_name = ? AND identifier = ? AND type IN("
+			stream << "SELECT return_type, identifier FROM resources WHERE key = ? AND type IN("
 				<< mvceditor::ResourceClass::FUNCTION
 				<< ")";
-			std::string className = mvceditor::StringHelperClass::IcuToChar(resource.ClassName);
 			std::string identifier = mvceditor::StringHelperClass::IcuToChar(resource.Identifier);
 			std::string returnType;
 			std::string identifierOut;
@@ -1378,13 +1358,15 @@ void mvceditor::ResourceFinderClass::AddDynamicResources(const std::vector<mvced
 				// function already exists, just update the return type
 				returnType = mvceditor::StringHelperClass::IcuToChar(resource.ReturnType);
 				std::ostringstream updateStream;
-				updateStream << "UPDATE resources SET return_type = ? WHERE class_name = ? AND identifier = ? AND type IN("
+				updateStream << "UPDATE resources SET return_type = ? WHERE key = ? AND type IN("
 					<< mvceditor::ResourceClass::FUNCTION
 					<< ")";				
-				Session.once << updateStream.str(), soci::use(returnType), soci::use(className), soci::use(identifier);
+				Session.once << updateStream.str(), soci::use(returnType), soci::use(identifier);
 				updated = true;
 			}
-			if (!updated) {
+			else if (returnType.empty() && identifierOut.empty()) {
+
+				// make sure to not insert duplicate items (if we found them)
 				resource.IsDynamic = true;
 				resource.Key = resource.Identifier;
 				newResources.push_back(resource);
@@ -1638,6 +1620,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::ResourceSt
 std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::FindByKeyExact(const std::string& key) {
 	
 	// using LIKE here so that comparisons are NOT case sensitive (so that pdo = PDO)
+	// TODO: better to just use SQLite collation capabilities
 	std::string whereCond = "key LIKE '" + key + "'";
 	return ResourceStatementMatches(whereCond, false);
 }

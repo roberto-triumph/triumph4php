@@ -131,10 +131,9 @@ static bool IsStaticExpression(const pelet::ExpressionClass& parsedExpression) {
  * @return vector of all of the classes that are parent classes or used traits of the given
  *         class. this method will search across all resource finders
  */
-static std::vector<UnicodeString> ClassHierarchy(UnicodeString className, UnicodeString methodName, 
+static std::vector<UnicodeString> ClassParents(UnicodeString className, UnicodeString methodName, 
 												 const std::vector<mvceditor::ResourceFinderClass*>& allResourceFinders) {
 	std::vector<UnicodeString> parents;
-	parents.push_back(className);
 	bool found = false;
 	UnicodeString classToLookup = className;
 	do {
@@ -143,7 +142,7 @@ static std::vector<UnicodeString> ClassHierarchy(UnicodeString className, Unicod
 		// as it looks; class hierarchies are usually not very deep (1-4 parents)
 		found = false;
 		for (size_t i = 0; i < allResourceFinders.size(); ++i) {
-			UnicodeString parentClass = allResourceFinders[i]->GetResourceParentClassName(classToLookup, methodName);
+			UnicodeString parentClass = allResourceFinders[i]->GetResourceParentClassName(classToLookup);
 			if (!parentClass.isEmpty()) {
 				found = true;
 				parents.push_back(parentClass);
@@ -157,11 +156,15 @@ static std::vector<UnicodeString> ClassHierarchy(UnicodeString className, Unicod
 	return parents;
 }
 
-static std::vector<UnicodeString> ClassUsedTraits(std::vector<UnicodeString> classNames, UnicodeString methodName, 
-												 const std::vector<mvceditor::ResourceFinderClass*>& allResourceFinders) {
+static std::vector<UnicodeString> ClassUsedTraits(const UnicodeString& className, 
+												  const std::vector<UnicodeString>& parentClassNames, 
+												  const UnicodeString& methodName, 
+												  const std::vector<mvceditor::ResourceFinderClass*>& allResourceFinders) {
 
 	// trait support; a class can use multiple traits; hence the different logic 
-	std::vector<UnicodeString> classesToLookup = classNames;
+	std::vector<UnicodeString> classesToLookup;
+	classesToLookup.push_back(className);
+	classesToLookup.insert(classesToLookup.end(), parentClassNames.begin(), parentClassNames.end());
 	std::vector<UnicodeString> usedTraits;
 	bool found = false;
 	do {
@@ -187,23 +190,20 @@ static std::vector<UnicodeString> ClassUsedTraits(std::vector<UnicodeString> cla
  * Figure out a resource's type by looking at all of the given finders.
  * @param resourceToLookup MUST BE fully qualified (class name  + method name,  or function name).  string can have the
  *        object operator "::" that separates the class and method name.
- * @param finders all of the finders to look in
+ * @param allResourceFinders all of the finders to look in
  * @return the resource's type; (for methods, it's the return type of the method) could be empty string if type could 
  *         not be determined 
  */
 static UnicodeString ResolveResourceType(UnicodeString resourceToLookup, 
-										 const std::vector<mvceditor::ResourceFinderClass*>& resourceFinders) {
+										 const std::vector<mvceditor::ResourceFinderClass*>& allResourceFinders) {
 	UnicodeString type;
 	mvceditor::ResourceSearchClass resourceSearch(resourceToLookup);
-	resourceSearch.SetParentClasses(ClassHierarchy(resourceSearch.GetClassName(), resourceSearch.GetMethodName(), resourceFinders));
-
-	std::vector<UnicodeString> classesToSearchForTraits = resourceSearch.GetParentClasses();
-	classesToSearchForTraits.push_back(resourceSearch.GetClassName());
-	resourceSearch.SetTraits(ClassUsedTraits(classesToSearchForTraits, resourceSearch.GetMethodName(), resourceFinders));
+	resourceSearch.SetParentClasses(ClassParents(resourceSearch.GetClassName(), resourceSearch.GetMethodName(), allResourceFinders));
+	resourceSearch.SetTraits(ClassUsedTraits(resourceSearch.GetClassName(), resourceSearch.GetParentClasses(), resourceSearch.GetMethodName(), allResourceFinders));
 
 	// need to get the type from the resource finders
-	for (size_t j = 0; j < resourceFinders.size(); ++j) {
-		mvceditor::ResourceFinderClass* finder = resourceFinders[j];
+	for (size_t j = 0; j < allResourceFinders.size(); ++j) {
+		mvceditor::ResourceFinderClass* finder = allResourceFinders[j];
 		std::vector<mvceditor::ResourceClass> matches = finder->CollectFullyQualifiedResource(resourceSearch);
 		if (!matches.empty()) {
 
@@ -357,7 +357,7 @@ static UnicodeString ResolveInitialLexemeType(const pelet::ExpressionClass& pars
 		UnicodeString scopeClass = expressionScope.ClassName;
 		UnicodeString scopeMethod = expressionScope.MethodName;
 		for (size_t i = 0; i < allResourceFinders.size(); ++i) {	
-			typeToLookup = allResourceFinders[i]->GetResourceParentClassName(scopeClass, scopeMethod);
+			typeToLookup = allResourceFinders[i]->GetResourceParentClassName(scopeClass);
 			if (!typeToLookup.isEmpty()) {
 				break;
 			}
@@ -638,6 +638,7 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 		for (size_t i = 1;  i < (parsedExpression.ChainList.size() - 1) && !typeToLookup.isEmpty() && !error.HasError(); ++i) {	
 			UnicodeString nextResource = typeToLookup + UNICODE_STRING_SIMPLE("::") + parsedExpression.ChainList[i].Name;
 			UnicodeString resolvedType = ResolveResourceType(nextResource, allResourceFinders);
+
 			if (resolvedType.isEmpty()) {
 				error.ToTypeResolution(typeToLookup, parsedExpression.ChainList[i].Name);
 			}
@@ -677,11 +678,8 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 
 	if (!error.HasError()) {
 		mvceditor::ResourceSearchClass resourceSearch(resourceToLookup);
-		resourceSearch.SetParentClasses(ClassHierarchy(resourceSearch.GetClassName(), resourceSearch.GetMethodName(), allResourceFinders));
-
-		std::vector<UnicodeString> classesToSearchForTraits = resourceSearch.GetParentClasses();
-		classesToSearchForTraits.push_back(resourceSearch.GetClassName());
-		resourceSearch.SetTraits(ClassUsedTraits(classesToSearchForTraits, resourceSearch.GetMethodName(), allResourceFinders));
+		resourceSearch.SetParentClasses(ClassParents(resourceSearch.GetClassName(), resourceSearch.GetMethodName(), allResourceFinders));
+		resourceSearch.SetTraits(ClassUsedTraits(resourceSearch.GetClassName(), resourceSearch.GetParentClasses(), resourceSearch.GetMethodName(), allResourceFinders));
 		for (size_t j = 0; j < allResourceFinders.size(); ++j) {
 			mvceditor::ResourceFinderClass* finder = allResourceFinders[j];
 
@@ -694,7 +692,7 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 				else {
 					matches = finder->CollectNearMatchResources(resourceSearch);
 				}
-
+				
 				// now we loop through the possbile matches and remove stuff that does not 
 				// make sense because of visibility rules or resources that are 
 				// duplicated in two separate caches
@@ -742,8 +740,11 @@ void mvceditor::SymbolTableClass::Print() const {
 			u_fprintf(out, "%d\t%S\t", (int)j, 
 				symbol.Variable.getTerminatedBuffer()); 
 			for (size_t k = 0; k < symbol.ChainList.size(); ++k) {
-				u_fprintf(out, "%S->", 
+				u_fprintf(out, "%S", 
 					symbol.ChainList[k].Name.getTerminatedBuffer()); 
+				if (k < (symbol.ChainList.size() - 1)) {
+					u_fprintf(out, "->"); 
+				}
 			}
 			u_fprintf(out, "\n");
 		}

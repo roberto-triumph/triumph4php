@@ -407,15 +407,14 @@ public:
 	 * Get the parent class of a given resource. For example, let's say source code contained two classes: AdminClass and 
 	 * UserClass, AdminClass inherited from UserClass.  When this method is called in this manner
 	 * 
-	 * resourceFinder.GetResourceParentClassName(UNICODE_STRING_SIMPLE("AdminClass"), UNICODE_STRING_SIMPLE(""))
+	 * resourceFinder.GetResourceParentClassName(UNICODE_STRING_SIMPLE("AdminClass"))
 	 * 
 	 * then this method will return "UserClass"
 	 * 
 	 * @param UnicodeString className the class to search
-	 * @param UnicodeString methodName the method to search.  IF and only IF given, then returned parent class will contain the given method.
-	 * @param return UnicodeString the class' most immediate parent that contains method
+	 * @param return UnicodeString the class' most immediate parent
 	 */
-	UnicodeString GetResourceParentClassName(const UnicodeString& className, const UnicodeString& methodName);
+	UnicodeString GetResourceParentClassName(const UnicodeString& className);
 
 	/**
 	 * Get the traits used by a given resource. For example, let's say source code contained a class and two traits: UserClass,

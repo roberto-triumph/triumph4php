@@ -153,6 +153,29 @@ public:
 	}
 };
 
+class ResourceSearchTestClass {
+
+public:
+
+	mvceditor::ResourceSearchClass* ResourceSearch;
+
+	ResourceSearchTestClass()
+		: ResourceSearch(NULL) {
+	
+	}
+
+	~ResourceSearchTestClass() {
+		if (ResourceSearch) {
+			delete ResourceSearch;
+		}
+	}
+
+	void Make(const char* query) {
+		ResourceSearch = new mvceditor::ResourceSearchClass(mvceditor::StringHelperClass::charToIcu(query));
+	}
+
+};
+
 #define CHECK_MEMBER_RESOURCE(className, identifier, resource) \
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE(className), resource.ClassName);\
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE(identifier), resource.Identifier);
@@ -1058,11 +1081,10 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceParentClassShouldReturnPa
 		"}\n"
 		"?>\n"
 	));
-	CHECK_UNISTR_EQUALS("UserClass", ResourceFinder.GetResourceParentClassName(UNICODE_STRING_SIMPLE("AdminClass"), 
-		UNICODE_STRING_SIMPLE("")));
+	CHECK_UNISTR_EQUALS("UserClass", ResourceFinder.GetResourceParentClassName(UNICODE_STRING_SIMPLE("AdminClass")));
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceParentClassShouldReturnParentClassWhenGivenAMethod) {
+TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceParentClassShouldReturnParentClassForDeepHierarchy) {
 	 Prep(mvceditor::StringHelperClass::charToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -1078,8 +1100,8 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceParentClassShouldReturnPa
 		"}\n"
 		"?>\n"
 	));
-	CHECK_UNISTR_EQUALS("UserClass", ResourceFinder.GetResourceParentClassName(UNICODE_STRING_SIMPLE("SuperAdminClass"), 
-		UNICODE_STRING_SIMPLE("getName")));
+	CHECK_UNISTR_EQUALS("AdminClass", ResourceFinder.GetResourceParentClassName(UNICODE_STRING_SIMPLE("SuperAdminClass")));
+	CHECK_UNISTR_EQUALS("UserClass", ResourceFinder.GetResourceParentClassName(UNICODE_STRING_SIMPLE("AdminClass")));
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceMatchPositionShouldReturnValidPositionsForClassMethodFunctionAndMember) {
@@ -1491,6 +1513,23 @@ TEST_FIXTURE(ResourceFinderFileTestClass, FileFiltersShouldWorkWithNoWildcards) 
 
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("good.php"));
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("bad.php"));
+}
+
+TEST_FIXTURE(ResourceSearchTestClass, ShouldParseClassAndMethod) {
+	Make("News_model::get_news");
+	CHECK_UNISTR_EQUALS("News_model", ResourceSearch->GetClassName());
+	CHECK_UNISTR_EQUALS("get_news", ResourceSearch->GetMethodName());
+}
+
+TEST_FIXTURE(ResourceSearchTestClass, ShouldParseFileName) {
+	Make("class.User.php");
+	CHECK_UNISTR_EQUALS("class.User.php", ResourceSearch->GetFileName());
+}
+
+TEST_FIXTURE(ResourceSearchTestClass, ShouldParseFileNameAndLineNumber) {
+	Make("class.User.php:100");
+	CHECK_UNISTR_EQUALS("class.User.php", ResourceSearch->GetFileName());
+	CHECK_EQUAL(100, ResourceSearch->GetLineNumber());
 }
 
 }
