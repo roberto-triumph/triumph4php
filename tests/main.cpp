@@ -27,6 +27,7 @@
 #include <TestRunner.h>
 #include <unicode/uclean.h>
 #include <soci/mysql/soci-mysql.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -111,9 +112,9 @@ int main(int argc, char **argv) {
 
 	// change if you want to run only one test
 	bool runAll = true;
-	const char* suiteToRun = "SymbolTableTestClass";
+	const char* suiteToRun = "ApacheTestClass";
 	std::vector<const char*> testCasesToRun;
-	testCasesToRun.push_back("MatchesWithClassHierarchyInMultipleResourceFinders");
+	testCasesToRun.push_back("WalkShouldFindApacheConfigFile");
 	int ret = 0;
 	if (runAll) {
 		ret = UnitTest::RunAllTests();
@@ -131,5 +132,6 @@ int main(int argc, char **argv) {
 	
 	// clean up the MySQL library. Same reason as the ICU cleanup.
 	mysql_library_end();
+	sqlite_api::sqlite3_shutdown();
 	return ret;
 }
