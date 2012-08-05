@@ -38,6 +38,19 @@ wxFileName mvceditor::NativeFunctionsAsset() {
 	return fileName;
 }
 
+wxFileName mvceditor::ResourceSqlSchemaAsset() {
+	wxStandardPaths paths;
+	wxFileName pathExecutableFileName(paths.GetExecutablePath());
+	wxString nativeFileName = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
+	                          wxT("..") + wxFileName::GetPathSeparator() +
+	                          wxT("resources") + wxFileName::GetPathSeparator() +
+	                          wxT("sql") + wxFileName::GetPathSeparator() +
+							  wxT("resources.sql");
+	wxFileName fileName(nativeFileName);
+	fileName.Normalize();
+	return fileName;
+}
+
 wxFileName mvceditor::AutoCompleteImageAsset(wxString imageName) {
 	if (!wxImage::FindHandler(wxBITMAP_TYPE_XPM)) {
 		wxImage::AddHandler(new wxXPMHandler);	

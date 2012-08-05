@@ -219,26 +219,10 @@ else {
 echo "done\n";
 
 function initOutputPdo(PDO $outputPdo) {
-	$outputPdo->query(
-		'CREATE TABLE IF NOT EXISTS file_items ( ' .
-		'  file_item_id INTEGER PRIMARY KEY, full_path TEXT, last_modified DATETIME, is_parsed INTEGER, is_new INTEGER ' .
-		')'
-	);
-	$outputPdo->query(
-		'CREATE TABLE IF NOT EXISTS resources ( ' .
-		'  file_item_id INTEGER, key TEXT, identifier TEXT, class_name TEXT, ' .
-		'  type INTEGER, namespace_name TEXT, signature TEXT, comment TEXT, ' .
-		'  return_type TEXT, is_protected INTEGER, is_private INTEGER, ' .
-		'  is_static INTEGER, is_dynamic INTEGER, is_native INTEGER ' .
-		')'
-	);
-			
-	$outputPdo->query(
-		'CREATE UNIQUE INDEX IF NOT EXISTS idxFullPath ON file_items(full_path)'
-	);
-	$outputPdo->query(
-		'CREATE INDEX IF NOT EXISTS idxResourceKey ON resources(key, type)'
-	);
+	$outputPdo->query(file_get_contents(__DIR__ . './sql/resources.sql'));
+	
+	// delete any existing resources, since the generated file will only 
+	// contain the native functions it is safe to truncate the tables
 	$outputPdo->query(
 		'DELETE FROM file_items'
 	);

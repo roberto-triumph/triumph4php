@@ -44,13 +44,15 @@ class CodeIgniterTest extends PHPUnit_Framework_TestCase {
 	 * @var Zend_Db_Adapter_Abstract
 	 */
 	private $db;
+	
+	/**
+	 * full path to the sqlite database file.
+	 */
+	private $dbFileName;
 
 	function setUp() {
-		$this->dbName = sys_get_temp_dir() . '/urls.sqlite';
-		if (file_exists($this->dbName)) {
-			unlink($this->dbName);
-		}
-		$this->db = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $this->dbName));
+		$this->dbFileName = sys_get_temp_dir() . '/urls.sqlite';
+		$this->db = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $this->dbFileName));
 		Zend_Db_Table_Abstract::setDefaultAdapter($this->db);
 		$this->initOutputPdo($this->db);
 		
@@ -62,6 +64,9 @@ class CodeIgniterTest extends PHPUnit_Framework_TestCase {
 	function tearDown() {
 		if ($this->db) {
 			$this->db->closeConnection(); 
+		}
+		if (file_exists($this->dbFileName)) {
+			unlink($this->dbFileName);
 		}
 	}
 	
@@ -156,19 +161,9 @@ EOF;
 	}
 
 	private function initOutputPdo(Zend_Db_Adapter_Abstract $dbAdapter) {
-		$dbAdapter->query(
-			'CREATE TABLE IF NOT EXISTS file_items ( ' .
-			'  file_item_id INTEGER PRIMARY KEY, full_path TEXT, last_modified DATETIME, is_parsed INTEGER, is_new INTEGER ' .
-			')'
-		);
-		$dbAdapter->query(
-			'CREATE TABLE IF NOT EXISTS resources ( ' .
-			'  file_item_id INTEGER, key TEXT, identifier TEXT, class_name TEXT, ' .
-			'  type INTEGER, namespace_name TEXT, signature TEXT, comment TEXT, ' .
-			'  return_type TEXT, is_protected INTEGER, is_private INTEGER, ' .
-			'  is_static INTEGER, is_dynamic INTEGER, is_native INTEGER ' .
-			')'
-		);
+	
+		// get the 'raw' connection because it can handle multiple statements at once
+		$this->assertNotNull($dbAdapter->getConnection()->exec(file_get_contents(__DIR__ . './../../resources/sql/resources.sql')));
 	}
 }
 

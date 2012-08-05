@@ -117,19 +117,9 @@ class ResourceTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	private function initOutputPdo(Zend_Db_Adapter_Abstract $dbAdapter) {
-		$dbAdapter->query(
-			'CREATE TABLE IF NOT EXISTS file_items ( ' .
-			'  file_item_id INTEGER PRIMARY KEY, full_path TEXT, last_modified DATETIME, is_parsed INTEGER, is_new INTEGER ' .
-			')'
-		);
-		$dbAdapter->query(
-			'CREATE TABLE IF NOT EXISTS resources ( ' .
-			'  file_item_id INTEGER, key TEXT, identifier TEXT, class_name TEXT, ' .
-			'  type INTEGER, namespace_name TEXT, signature TEXT, comment TEXT, ' .
-			'  return_type TEXT, is_protected INTEGER, is_private INTEGER, ' .
-			'  is_static INTEGER, is_dynamic INTEGER, is_native INTEGER ' .
-			')'
-		);
+	
+		// get the 'raw' connection because it can handle multiple statements at once
+		$dbAdapter->getConnection()->exec(file_get_contents(__DIR__ . './../../resources/sql/resources.sql'));
 	}
 
 }

@@ -168,15 +168,14 @@ void mvceditor::ResourceFinderClass::SetVersion(pelet::Versions version) {
 }
 
 void mvceditor::ResourceFinderClass::InitMemory() {
-	OpenAndCreateTables(":memory:");
+	OpenAndCreateTables(wxT(":memory:"));
 }
 
 void mvceditor::ResourceFinderClass::InitFile(const wxFileName& fileName) {
-	std::string str = mvceditor::StringHelperClass::wxToChar(fileName.GetFullPath());
-	OpenAndCreateTables(str);
+	OpenAndCreateTables(fileName.GetFullPath());
 }
 
-void mvceditor::ResourceFinderClass::OpenAndCreateTables(std::string db) {
+void mvceditor::ResourceFinderClass::OpenAndCreateTables(const wxString& dbName) {
 	try {
 
 		// close any existing connection
@@ -184,28 +183,35 @@ void mvceditor::ResourceFinderClass::OpenAndCreateTables(std::string db) {
 			Session.close();
 			IsCacheInitialized = false;
 		}
-		Session.open(*soci::factory_sqlite3(), db);
-		std::string sql;
-		sql += "CREATE TABLE IF NOT EXISTS file_items (",
-		sql += "  file_item_id INTEGER PRIMARY KEY, full_path TEXT, last_modified DATETIME, is_parsed INTEGER, is_new INTEGER ";
-		sql += ");";
-		Session.once << sql;
-		sql = "";
-		sql += "CREATE TABLE IF NOT EXISTS resources (";
-		sql += "  file_item_id INTEGER, key TEXT, identifier TEXT, class_name TEXT, ";
-		sql += "  type INTEGER, namespace_name TEXT, signature TEXT, comment TEXT, ";
-		sql += "  return_type TEXT, is_protected INTEGER, is_private INTEGER, ";
-		sql += "  is_static INTEGER, is_dynamic INTEGER, is_native INTEGER";
-		sql += ");";
-		Session.once << sql;
+		if (dbName.CompareTo(wxT(":memory:")) == 0) {
+			Session.open(*soci::factory_sqlite3(), ":memory:");
+		}
+		else {
+			std::string stdDbName = mvceditor::StringHelperClass::wxToChar(dbName);
+			Session.open(*soci::factory_sqlite3(), stdDbName);
+		}
+			
+		// open the SQL script that contains the table creation statements
+		// the script is "nice" it takes care to not create the tables if
+		// they already exist
+		wxFileName sqlScriptFileName = mvceditor::ResourceSqlSchemaAsset();
+		if (sqlScriptFileName.FileExists()) {
+			wxFFile ffile(sqlScriptFileName.GetFullPath());
+			wxString sql;
+			ffile.ReadAll(&sql);
+			std::string stdSql = mvceditor::StringHelperClass::wxToChar(sql);
 
-		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idxFullPath ON file_items(full_path)";
-		Session.once << sql;
-
-		sql = "CREATE INDEX IF NOT EXISTS idxResourceKey ON resources(key, type)";
-		Session.once << sql;
-
-		IsCacheInitialized = true;
+			// get the 'raw' connection because it can handle multiple statements at once
+			char *errorMessage = NULL;
+			soci::sqlite3_session_backend* backend = static_cast<soci::sqlite3_session_backend*>(Session.get_backend());
+			sqlite_api::sqlite3_exec(backend->conn_, stdSql.c_str(), NULL, NULL, &errorMessage);
+			IsCacheInitialized = NULL == errorMessage;
+			if (errorMessage) {
+				wxString msg = mvceditor::StringHelperClass::charToWx(errorMessage);
+				wxASSERT_MSG(IsCacheInitialized, msg);
+				sqlite_api::sqlite3_free(errorMessage);
+			}
+		}
 	} catch(std::exception const& e) {
 		Session.close();
 		IsCacheInitialized = false;
@@ -1374,17 +1380,16 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::ResourceSt
 
 std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::FindByKeyExact(const std::string& key) {
 	
-	// using LIKE here so that comparisons are NOT case sensitive (so that pdo = PDO)
-	// TODO: better to just use SQLite collation capabilities
-	std::string whereCond = "key LIKE '" + key + "'";
+	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
+	std::string whereCond = "key = '" + key + "'";
 	return ResourceStatementMatches(whereCond, false);
 }
 
 std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::FindByKeyExactAndTypes(const std::string& key, const std::vector<int>& types, bool doLimit) {
 	std::ostringstream stream;
 
-	// using LIKE here so that comparisons are NOT case sensitive (so that pdo = PDO)
-	stream << "key LIKE '" << key << "' AND type IN(";
+	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
+	stream << "key = '" << key << "' AND type IN(";
 	for (size_t i = 0; i < types.size(); ++i) {
 		stream << types[i];
 		if (i < (types.size() - 1)) {
@@ -1429,10 +1434,10 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::FindByKeyS
 std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::FindByIdentifierExactAndTypes(const std::string& identifier, const std::vector<int>& types, bool doLimit) {
 	std::ostringstream stream;
 
-	// using LIKE here so that comparisons are NOT case sensitive (so that pdo = PDO)
+	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	// do not get fully qualified resources
 	// make sure to use the key because it is indexed
-	stream << "key LIKE '" << identifier << "' AND identifier = key AND type IN(";
+	stream << "key = '" << identifier << "' AND identifier = key AND type IN(";
 	for (size_t i = 0; i < types.size(); ++i) {
 		stream << types[i];
 		if (i < (types.size() - 1)) {
@@ -1447,7 +1452,6 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::FindByIden
 std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::FindByIdentifierStartAndTypes(const std::string& identifierStart, const std::vector<int>& types, bool doLimit) {
 	std::ostringstream stream;
 
-	// using LIKE here so that comparisons are NOT case sensitive (so that pdo = PDO)
 	// do not get fully qualified resources
 	// make sure to use the key because it is indexed
 	stream << "key LIKE '" << identifierStart << "%' AND identifier = key AND type IN(";

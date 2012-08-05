@@ -587,11 +587,11 @@ private:
 	 * create the database connection to the given db, and create tables to store the parsed resources
 	 * Also note that if a DB file / memory DB was previously open, this method
 	 * will close the existing db before the new db is opened.
-	 * @param db dbName, given to SQLite.  db can be a full path to a file or
+	 * @param wxString dbName, given to SQLite.  db can be a full path to a file or
 	 *        the special ":memory:" to create an in-memory db.  The
 	 *        file does not need to exist; if it does not exist it will be created.
 	 */
-	void OpenAndCreateTables(std::string db);
+	void OpenAndCreateTables(const wxString& dbName);
 	
 	/**
 	 * Goes through the given file and parses out resources.
