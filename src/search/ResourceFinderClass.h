@@ -79,7 +79,7 @@ public:
 		NAMESPACE_NAME
 	};
 
-	ResourceSearchClass(const UnicodeString& query);
+	ResourceSearchClass(UnicodeString query);
 
 	std::vector<UnicodeString> GetParentClasses() const;
 	void SetParentClasses(const std::vector<UnicodeString>& parents);

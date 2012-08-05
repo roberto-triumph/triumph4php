@@ -50,7 +50,7 @@ static UnicodeString QualifyName(const UnicodeString& namespaceName, const Unico
 	return qualifiedName;
 }
 
-mvceditor::ResourceSearchClass::ResourceSearchClass(const UnicodeString& resourceQuery)
+mvceditor::ResourceSearchClass::ResourceSearchClass(UnicodeString resourceQuery)
 	: FileName()
 	, ClassName()
 	, MethodName()
@@ -93,7 +93,8 @@ mvceditor::ResourceSearchClass::ResourceSearchClass(const UnicodeString& resourc
 	else {
 
 		// class names can only have alphanumerics or underscores
-		bool hasSymbols = NULL != u_strpbrk(resourceQuery.getBuffer(), UNICODE_STRING_SIMPLE("`!@#$%^&*()+={}|\\:;\"',./?").getBuffer());
+		UnicodeString symbols = UNICODE_STRING_SIMPLE("`!@#$%^&*()+={}|\\:;\"',./?");
+		bool hasSymbols = NULL != u_strpbrk(resourceQuery.getTerminatedBuffer(), symbols.getTerminatedBuffer());
 		if (hasSymbols) {
 			FileName = resourceQuery;
 			ResourceType = FILE_NAME;
