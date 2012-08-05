@@ -151,6 +151,7 @@ mvceditor::ResourceFinderClass::ResourceFinderClass()
 	, Parser()
 	, Session()
 	, Transaction(NULL)
+	, FileParsingBufferSize(32)
 	, IsCacheInitialized(false) {
 	Parser.SetClassObserver(this);
 	Parser.SetClassMemberObserver(this);
@@ -169,10 +170,15 @@ void mvceditor::ResourceFinderClass::SetVersion(pelet::Versions version) {
 
 void mvceditor::ResourceFinderClass::InitMemory() {
 	OpenAndCreateTables(wxT(":memory:"));
+	FileParsingBufferSize = 32;
+	FileParsingCache.clear();
+	FileParsingCache.resize(0);
+	FileParsingCache.reserve(FileParsingBufferSize);
 }
 
-void mvceditor::ResourceFinderClass::InitFile(const wxFileName& fileName) {
+void mvceditor::ResourceFinderClass::InitFile(const wxFileName& fileName, int fileParsingBufferSize) {
 	OpenAndCreateTables(fileName.GetFullPath());
+	FileParsingBufferSize = fileParsingBufferSize;
 }
 
 void mvceditor::ResourceFinderClass::OpenAndCreateTables(const wxString& dbName) {
@@ -232,9 +238,9 @@ void mvceditor::ResourceFinderClass::BeginSearch() {
 	FileParsingCache.clear();
 	NamespaceCache.clear();
 
-	
-	// 1,000 = good amount of resources for a med-to-large size project
-	FileParsingCache.reserve(1000);
+	FileParsingCache.clear();
+	FileParsingCache.resize(0);
+	FileParsingCache.reserve(FileParsingBufferSize);
 }
 
 void mvceditor::ResourceFinderClass::EndSearch() {
@@ -252,7 +258,7 @@ void mvceditor::ResourceFinderClass::EndSearch() {
 
 	
 	// reclaim mem since we no longer need it
-	FileParsingCache.reserve(10);
+	FileParsingCache.resize(1);
 
 }
 

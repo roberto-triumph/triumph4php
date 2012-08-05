@@ -197,12 +197,11 @@ private:
  * DirectorySearchClass search;
  * if (search.Init(wxT("/home/user/workspace/project/"))) {
  *   resourceFinder.FilesFilter.push_back(wxT("*.php"));
- *   if (resourceFinder.Prepare(wxT("UserClass"))) {
  *     while (search.More()) {
  *       search.Walk(resourceFinder);
  *     }
  *     //now that the resources have been cached, we can query the cache
- *     std::vector<mvceditor::ResourceClass> matches = resourceFinder.CollectNearMatchResources();
+ *     std::vector<mvceditor::ResourceClass> matches = resourceFinder.CollectNearMatchResources(wxT("UserClass"));
  *     if (!matches.empty()) {
  *       for (size_t i = 0; i < matches.size(); i++)  {
  *         mvceditor::ResourceClass resource = matches[i];
@@ -260,8 +259,12 @@ public:
 	 * will close the existing db before the new db is opened.
 	 * @param fileName the location where the database file is, or where it 
 	 *        will be created if it does not exist.
+	 * @param fileParsingBufferSize the size of an internal buffer where parsed resources are initially 
+	 *        stored. This is only a hint, the buffer will grow as necessary
+	 *        Setting this value to a high value (1024) is good for large projects that have a lot
+	 *        resources.
 	 */
-	void InitFile(const wxFileName& fileName);
+	void InitFile(const wxFileName& fileName, int fileParsingBufferSize = 32);
 
 	/**
 	 * Create the resource database that is backed by a SQLite in-memory database.
@@ -577,6 +580,13 @@ private:
 	 * @var int fileItemIndex the index of the FileCache entry that corresponds to the file located at fullPath
 	 */
 	int CurrentFileItemId;
+
+	/**
+	 * The initial size of FileParsingCache. This is only a hint, the buffer will grow as necessary
+	 * Setting this value to a high value (1024) is good for large projects that have a lot
+	 * resources.
+	 */
+	int FileParsingBufferSize;
 
 	/**
 	 * Flag to make sure we initialize the resource database.

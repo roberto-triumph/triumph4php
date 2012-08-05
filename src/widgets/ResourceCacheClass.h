@@ -128,9 +128,13 @@ public:
 	 * A resource DB file can only be initialized once.
 	 *
 	 * @param resourceDbFileName the location of the SQLite cache for the resource finder
+	 * @param fileParsingBufferSize the size of an internal buffer where parsed resources are initially 
+	 *        stored. This is only a hint, the buffer will grow as necessary
+	 *        Setting this value to a high value (1024) is good for large projects that have a lot
+	 *        resources.
 	 * @return bool FALSE if the resource file is already initialized
 	 */
-	bool InitGlobal(const wxFileName& resourceDbFileName);
+	bool InitGlobal(const wxFileName& resourceDbFileName, int fileParsingBufferSize = 32);
 
 	/**
 	 * check to see if a resource DB file is already loaded

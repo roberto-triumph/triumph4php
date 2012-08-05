@@ -113,7 +113,10 @@ bool mvceditor::ResourceFileReaderClass::ReadNextProject() {
 			PhpFileFilters = project.GetPhpFileExtensions();
 			CurrentResourceDbFileName = project.ResourceDbFileName;
 			if (!ResourceCache->IsInitGlobal(CurrentResourceDbFileName)) {
-				ResourceCache->InitGlobal(CurrentResourceDbFileName);
+
+				// since a directory can have may files, set the file parsing buffer
+				// to a high value
+				ResourceCache->InitGlobal(CurrentResourceDbFileName, 1024);
 			}
 			next = true;
 		}

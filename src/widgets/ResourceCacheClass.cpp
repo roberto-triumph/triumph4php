@@ -108,7 +108,7 @@ bool mvceditor::ResourceCacheClass::Update(const wxString& fileName, const Unico
 	return ret;
 }
 
-bool mvceditor::ResourceCacheClass::InitGlobal(const wxFileName& resourceDbFileName) {
+bool mvceditor::ResourceCacheClass::InitGlobal(const wxFileName& resourceDbFileName, int fileParsingBufferSize) {
 	wxMutexLocker locker(Mutex);
 	if (!locker.IsOk()) {
 		return false;
@@ -118,7 +118,7 @@ bool mvceditor::ResourceCacheClass::InitGlobal(const wxFileName& resourceDbFileN
 	int cnt = GlobalResourceFinders.count(resourceDbFileName.GetFullPath());
 	if (cnt <= 0) {
 		mvceditor::ResourceFinderClass* resourceFinder = new mvceditor::ResourceFinderClass();
-		resourceFinder->InitFile(resourceDbFileName);
+		resourceFinder->InitFile(resourceDbFileName, fileParsingBufferSize);
 		GlobalResourceFinders[resourceDbFileName.GetFullPath()] = resourceFinder;
 		ret = true;
 	}
