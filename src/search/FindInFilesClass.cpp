@@ -208,32 +208,6 @@ mvceditor::FindInFilesClass::OpenErrors mvceditor::FindInFilesClass::FileContent
 	}
 	return error;
 }
-/*
-wxString mvceditor::FindInFilesClass::CreateFilesFilterRegEx(const wxString& wildCardString) {
-
-	// TODO: remove and use SourceClass
-	wxString escapedExpression = wildCardString;
-	
-	// allow ? and * wildcards, turn ';' into '|'
-	wxString symbols = wxT("!@#$%^&()[]{}\\-+.\"|,");
-	int pos = escapedExpression.find_first_of(symbols, 0);
-	while (-1 != pos) {
-		wxString symbol = escapedExpression.substr(pos, 1);
-		symbol = wxT("\\") + symbol;
-		escapedExpression.replace(pos, 1, symbol, 2);
-		pos = escapedExpression.find_first_of(symbols, pos + 2);
-	}
-
-	// '$'  because we want to match the end of text
-	// we want each OR expression to be grouped together with parenthesis
-	escapedExpression = wxT("(") + escapedExpression;
-	escapedExpression.Replace(wxT(";"), wxT("$)|("));
-	escapedExpression.Replace(wxT("*"), wxT(".*"));
-	escapedExpression.Replace(wxT("?"), wxT(".?"));
-	escapedExpression.Append(wxT("$)"));
-	return escapedExpression;
-}
-*/
 
 mvceditor::FindInFilesClass& mvceditor::FindInFilesClass::operator=(const FindInFilesClass& findInFiles) {
 	Expression = findInFiles.Expression;
