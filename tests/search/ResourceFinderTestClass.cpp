@@ -216,27 +216,6 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].FullPath.GetFullPath());
 }
 
-/*
- * TODO: fix this case
-  currently searching "test" will not find the file named "config.test.php" but it should
- 
-TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFileWhenDoesNotStartWithSearch) {
-	TestFile = wxT("config.test.php");
-	Prep(wxString::FromAscii(
-		"<?php\n"
-		"function work() {\n"
-		"\t$s = 'hello';\n"
-		"}\n"
-		"?>\n"
-	));
-	CHECK(ResourceFinder.Prepare(wxT("test")));
-	ResourceFinder.Walk(TestProjectDir + TestFile);
-	CollectNearMatchResources();
-	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_EQUAL(TestProjectDir + wxT("config.test.php"), Matches[0].FullPath.GetFullPath(););
-}
- */
-
 TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldNotFindFileWhenFileNameMatchesButLineNumberIsTooBig) {
 	Prep(wxString::FromAscii(
 		"<?php\n"
