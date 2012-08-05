@@ -53,6 +53,11 @@ public:
 		, ResourceDbFileName() {
 		Search.Init(TestProjectDir);
 		PhpFileFilters.push_back(wxT("*.php"));
+		
+		// create the test dir, since FileTestFixture class is lazy
+		if (!wxDirExists(TestProjectDir)) {
+			wxMkdir(TestProjectDir, 0777);
+		}
 		ResourceDbFileName.Assign(TestProjectDir + wxT("resource_cache.db"));
 		ResourceCache.InitGlobal(ResourceDbFileName);
 	}

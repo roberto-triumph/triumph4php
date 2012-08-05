@@ -30,10 +30,18 @@
 
 
 FileTestFixtureClass::FileTestFixtureClass(const wxString& tempTestDirectory) {
-	wxString tempDir = wxFileName::GetTempDir();
-	wxFileName fileName(tempDir);
-	fileName.Normalize();
-	TestProjectDir = fileName.GetFullPath() + wxFileName::GetPathSeparator() + tempTestDirectory + wxFileName::GetPathSeparator();
+	wxFileName tempDir;
+	tempDir.AssignDir(wxFileName::GetTempDir());
+	tempDir.AppendDir(wxT("mvc-editor-tests"));
+
+	// put everything under a mvc-editor-tests test directory that way we can track
+	// what files get added
+	if (!tempDir.DirExists()) {
+		wxMkdir(tempDir.GetPath(), 0777);
+	}
+	
+	tempDir.AppendDir(tempTestDirectory);
+	TestProjectDir = tempDir.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR);
 	if (wxFileName::DirExists(TestProjectDir)) {
 		RecursiveRmDir(TestProjectDir);
 	}	
