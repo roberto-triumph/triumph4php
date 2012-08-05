@@ -120,38 +120,6 @@ private:
 	wxFileName CurrentResourceDbFileName;
 };
 
-/**
- * This class will take care of loading the php native functions assets file in 
- * a background thread.
- */
-class NativeFunctionsFileReaderClass : public ThreadWithHeartbeatClass {
-
-public:
-
-	/**
-	 * @param handler will receive EVENT_FILE_* and EVENT_WORK_* events when all 
-	 * files have been iterated through.
-	 */
-	NativeFunctionsFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
-
-	/**
-	 * prepare to iterate through the file that has the PHP native functions.
-	 *
-	 * @param resourceCache the existing resource cache, any new resources will be added to this cache
-	 * @return bool false if native functions file does not exist or thread could not be started
-	 */
-	bool Init(ResourceCacheClass* resourceCache);
-
-private:
-
-	/**
-	 * the global cache; the parsed resources will be copied to this cache object
-	 */
-	ResourceCacheClass* ResourceCache;
-
-	void Entry();
-};
-	
 class ResourcePluginClass : public PluginClass {
 
 public:
@@ -250,7 +218,7 @@ private:
 	void LoadPageFromResource(const wxString& finderQuery, const ResourceClass& resource);
 
 	/**
-	 * remove matches for php buil-in functions. as we dont want a source file to
+	 * remove matches for php built-in functions. as we dont want a source file to
 	 * open.
 	 * @param matches any native mataches from this given vector will be removed
 	 */
@@ -267,11 +235,6 @@ private:
 		 * background thread is not running
 		 */
 		FREE,
-
-		/**
-		 * background thread is running; used during initial project opening
-		 */
-		INDEXING_NATIVE_FUNCTIONS,
 
 		/**
 		 * background thread is running; used triggered an index operation only
@@ -291,12 +254,6 @@ private:
 	 * @var DirectorySearch
 	 */
 	ResourceFileReaderClass ResourceFileReader;
-
-	/**
-	 * to load the file that contains all of the PHP native functions
-	 * see mvceditor::NativeFunctionsAssets
-	 */
-	NativeFunctionsFileReaderClass NativeFunctionsReader;
 
 	/**
 	 * when a 'jump to resource' is done and we need to index a project, we

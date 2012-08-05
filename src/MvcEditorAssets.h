@@ -30,11 +30,9 @@
 namespace mvceditor {
 
 /**
- * @return the file location of the PHP native functions tag file. This file contains all of the
+ * @return the file location of the PHP native functions SQLite file. This file contains all of the
  *         classes, methods, functions, that are documented on the php.net site.  The file 
- *         is formatted as a ctags file
- * see the tags file format here: http://ctags.sourceforge.net/FORMAT
- * see the source code for the generator program here: https://github.com/robertop/phd
+ *         was generated using the script resources/native_resources_convert.php
  */
 wxFileName NativeFunctionsAsset();
 

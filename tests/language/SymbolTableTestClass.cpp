@@ -498,10 +498,10 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithDoFullyQualified
 	// function starts with the same name as the class
 	// but since we are asking for full matches only the function should
 	// be ignored
-	GlobalFinder.BuildResourceCacheForNativeFunctions();
 	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
 		"<?php\n"
 		"class My { function workA() {} function workB() {} } \n"
+		"function Mysql_query() {}"
 	);
 	DoFullyQualifiedMatchOnly = true;
 	Init(sourceCode);	
@@ -518,9 +518,9 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithSimilarClassAndF
 	// function starts with the same name as the class
 	// but since we are asking for full matches only the function should
 	// be ignored
-	GlobalFinder.BuildResourceCacheForNativeFunctions();
 	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
 		"<?php\n"
+		"function mysql_query() {} \n"
 		"class My { function workA() {} function workB() {} } \n"
 		"$my =  new My(); \n"
 	);

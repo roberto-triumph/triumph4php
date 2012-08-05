@@ -121,36 +121,9 @@ bool mvceditor::ResourceFileReaderClass::ReadNextProject() {
 	return next;
 }
 
-mvceditor::NativeFunctionsFileReaderClass::NativeFunctionsFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads) 
-	: ThreadWithHeartbeatClass(handler, runningThreads)
-	, ResourceCache(NULL)
-{
-
-}
-
-bool mvceditor::NativeFunctionsFileReaderClass::Init(mvceditor::ResourceCacheClass* resourceCache) {
-	wxFileName nativeFile = mvceditor::NativeFunctionsAsset();
-	bool good = false;
-	if (nativeFile.FileExists()) {
-		ResourceCache = resourceCache;
-		wxThreadError err = CreateSingleInstance();
-		if (err == wxTHREAD_NO_ERROR) {
-			SignalStart();
-			good = true;
-		}
-	}
-	return good;
-}
-
-void mvceditor::NativeFunctionsFileReaderClass::Entry() {
-	ResourceCache->BuildResourceCacheForNativeFunctionsGlobal();
-	SignalEnd();
-}
-
 mvceditor::ResourcePluginClass::ResourcePluginClass(mvceditor::AppClass& app)
 	: PluginClass(app)
 	, ResourceFileReader(*this, RunningThreads)
-	, NativeFunctionsReader(*this, RunningThreads)
 	, JumpToText()
 	, ProjectIndexMenu(NULL)
 	, State(FREE) 
@@ -194,8 +167,22 @@ void mvceditor::ResourcePluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 	ProjectIndexMenu->Enable(App.Structs.HasSources() && FREE == State);
 	GetStatusBarWithGauge()->AddGauge(_("Preparing Resource Index"), ID_COUNT_FILES_GAUGE, 
 			StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
-	if (NativeFunctionsReader.Init(GetResourceCache())) {
-		State = INDEXING_NATIVE_FUNCTIONS;		
+	GetResourceCache()->InitGlobal(mvceditor::NativeFunctionsAsset());
+	ResourceFileReader.InitProjectQueue(GetResourceCache(), App.Structs.Projects);
+	mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
+	
+	if (ResourceFileReader.StartReading(error)) {
+		State = INDEXING_PROJECT;
+		GetStatusBarWithGauge()->AddGauge(_("Indexing Projects"), ID_COUNT_FILES_GAUGE, 
+			StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
+	}
+	else if (mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING == error) {
+		wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
+		State = FREE;
+	}
+	else if (mvceditor::BackgroundFileReaderClass::NO_RESOURCES == error) {
+		mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
+		State = FREE;
 	}
 	else {
 		GetStatusBarWithGauge()->StopGauge(ID_COUNT_FILES_GAUGE);
@@ -249,24 +236,7 @@ void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
 		IndexingDialog = NULL;
 	}
 	mvceditor::ResourceSearchClass resourceSearch(mvceditor::StringHelperClass::wxToIcu(JumpToText));
-
-	if (INDEXING_NATIVE_FUNCTIONS == State) {
-		mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
-		if (ResourceFileReader.StartReading(error)) {
-			State = INDEXING_PROJECT;
-			GetStatusBarWithGauge()->AddGauge(_("Indexing Projects"), ID_COUNT_FILES_GAUGE, 
-				StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
-		}
-		else if (mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING == error) {
-			wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
-			State = FREE;
-		}
-		else if (mvceditor::BackgroundFileReaderClass::NO_RESOURCES == error) {
-			mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
-			State = FREE;
-		}
-	}
-	else if (INDEXING_PROJECT == State || GOTO == State) {
+	if (INDEXING_PROJECT == State || GOTO == State) {
 
 		// figure out what resources have been cached, so that next time we can jump
 		// to the results without creating a new background thread

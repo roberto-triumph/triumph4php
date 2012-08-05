@@ -292,15 +292,6 @@ public:
 	void EndSearch();
 	
 	/**
-	 * Builds cache for PHP native functions. After a call to this method, CollectNearMatchResources, 
-	 * GetResourceSignature methods will work for PHP native functions (array, string, file functions ...).
-	 * Note that one of the InitXXX() methods
-	 * must have been called before a call to this method is made.
-	 * @return bool TRUE if native functions file exists and was able to be read.
-	 */
-	bool BuildResourceCacheForNativeFunctions();
-	
-	/**
 	 * Parses the given string for resources.  This method would be used, for example, when wanting
 	 * to be able to find resources from a file currently being edited by a user but the user
 	 * has not yet saved the file so the new contents are not yet on disk.
@@ -713,18 +704,6 @@ private:
 	 * file before.
 	 */
 	bool FindInFileCache(const wxString& fullPath, mvceditor::FileItemClass& fileItem);
-
-	/**
-	 * Read all resources from the given tag file. After a call to this method,
-	 * all resources from fileName will be added the the internal resource 
-	 * cache.
-	 *
-	 * @param fileName full path to the tag file. fileName is a file that is
-	 *        in ctags format.
-	 * @param bool TRUE if the given file is the tags file for the built-in PHP functions.
-	 * @return bool TRUE if file exists and ALL of the containing tags are valid.
-	 */
-	bool LoadTagFile(const wxFileName& fileName, bool isNativeTags);
 	
 	/**
 	 * Get all of the traits that a given class uses. Checking is 

@@ -723,7 +723,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindP
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForNativeFunctions) {
-	ResourceFinder.BuildResourceCacheForNativeFunctions();
+	ResourceFinder.InitFile(mvceditor::NativeFunctionsAsset());
 
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("array_key"));
 	CHECK_VECTOR_SIZE(2, Matches);
@@ -1452,7 +1452,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, IsFileCacheEmptyWithNativeFunctions)
 	CHECK(ResourceFinder.IsFileCacheEmpty());
 	CHECK(ResourceFinder.IsResourceCacheEmpty());
 
-	ResourceFinder.BuildResourceCacheForNativeFunctions();
+	ResourceFinder.InitFile(mvceditor::NativeFunctionsAsset());
 	
 	// still empty
 	CHECK(ResourceFinder.IsFileCacheEmpty());

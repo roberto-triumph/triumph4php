@@ -30,6 +30,7 @@
 #include <code_control/CodeControlClass.h>
 #include <environment/StructsClass.h>
 #include <search/FindInFilesClass.h>
+#include <MvcEditorAssets.h>
 
 /**
  * This profiler can be used to test the speediness of the code editing control.
@@ -145,7 +146,7 @@ CodeControlProfilerAppClass::CodeControlProfilerAppClass()
 bool CodeControlProfilerAppClass::OnInit() {
 	Options.EnableAutomaticLineIndentation = true;
 	Options.EnableAutoCompletion = true;
-	Structs.ResourceCache.BuildResourceCacheForNativeFunctionsGlobal();
+	Structs.ResourceCache.InitGlobal(mvceditor::NativeFunctionsAsset());
 	
 	CodeControlFrameClass* frame = new CodeControlFrameClass(*this);
 	SetTopWindow(frame);

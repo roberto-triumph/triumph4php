@@ -114,8 +114,7 @@ int main() {
 }
 	
 void CacheLargeProject(mvceditor::ResourceCacheClass& resourceCache, wxString dirName) {
-	printf("...");
-	resourceCache.BuildResourceCacheForNativeFunctionsGlobal();
+	resourceCache.InitGlobal(mvceditor::NativeFunctionsAsset());
 	mvceditor::DirectorySearchClass directorySearch;
 	std::vector<wxString> fileFilters;
 	fileFilters.push_back(wxT("*.php"));

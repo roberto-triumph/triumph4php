@@ -32,7 +32,7 @@ wxFileName mvceditor::NativeFunctionsAsset() {
 	wxString nativeFileName = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
 	                          wxT("..") + wxFileName::GetPathSeparator() +
 	                          wxT("resources") + wxFileName::GetPathSeparator() +
-	                          wxT("php.tags");
+	                          wxT("php.db");
 	wxFileName fileName(nativeFileName);
 	fileName.Normalize();
 	return fileName;

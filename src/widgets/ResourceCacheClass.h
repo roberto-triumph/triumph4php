@@ -153,13 +153,6 @@ public:
 	bool WalkGlobal(const wxFileName& resourceDbFileName, DirectorySearchClass& directorySearch, const std::vector<wxString>& phpFileFilters);
 
 	/**
-	 * Will load the php native functions file that contains all built-in php functions and classes
-	 * into the GLOBAL cache.
-	 * @return false if lock could not be acquired
-	 */
-	bool BuildResourceCacheForNativeFunctionsGlobal();
-
-	/**
 	 * Writes the global cache into the given file. Format is this:
 	 *
 	 * TYPE,File name,Class name or Function name,Method / property name 

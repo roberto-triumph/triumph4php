@@ -28,6 +28,7 @@
 #include <language/SymbolTableClass.h>
 #include <search/DirectorySearchClass.h>
 #include <search/ResourceFinderClass.h>
+#include <MvcEditorAssets.h>
 #include <wx/filefn.h>
 #include <wx/timer.h>
 #include <wx/utils.h>
@@ -205,12 +206,12 @@ void ProfileNativeFunctionsParsing() {
 	size_t found;
 
 	time = wxGetLocalTimeMillis();
-	resourceFinder.BuildResourceCacheForNativeFunctions();
+	resourceFinder.InitFile(mvceditor::NativeFunctionsAsset());
 	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("stristr"));
 	std::vector<mvceditor::ResourceClass> matches = resourceFinder.CollectNearMatchResources(resourceSearch);
 	found = !matches.empty();
 	time = wxGetLocalTimeMillis() - time;
-	printf("time for resourceFinder on php.tags:%ld ms found:%d\n", time.ToLong(), (int)found);
+	printf("time for resourceFinder on php.db:%ld ms found:%d\n", time.ToLong(), (int)found);
 	
 	time = wxGetLocalTimeMillis();
 	resourceFinder.Walk(FileName);

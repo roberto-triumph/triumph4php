@@ -151,21 +151,6 @@ bool mvceditor::ResourceCacheClass::WalkGlobal(const wxFileName& resourceDbFileN
 	return true;
 }
 
-bool mvceditor::ResourceCacheClass::BuildResourceCacheForNativeFunctionsGlobal() {
-	wxMutexLocker locker(Mutex);
-	if (!locker.IsOk()) {
-		return false;
-	}
-	if (GlobalResourceFinders.count(wxT(":memory:")) == 0) {
-
-		// this is the case when Clear() is called right before this method
-		mvceditor::ResourceFinderClass* finder = new mvceditor::ResourceFinderClass;
-		finder->InitMemory();
-		GlobalResourceFinders[wxT(":memory:")] = finder;
-	}
-	return GlobalResourceFinders[wxT(":memory:")]->BuildResourceCacheForNativeFunctions();
-}
-
 bool mvceditor::ResourceCacheClass::PersistGlobal(const wxFileName& outputFile) {
 	wxMutexLocker locker(Mutex);
 	if (!locker.IsOk()) {
