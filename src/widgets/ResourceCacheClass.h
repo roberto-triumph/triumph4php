@@ -153,23 +153,6 @@ public:
 	bool WalkGlobal(const wxFileName& resourceDbFileName, DirectorySearchClass& directorySearch, const std::vector<wxString>& phpFileFilters);
 
 	/**
-	 * Writes the global cache into the given file. Format is this:
-	 *
-	 * TYPE,File name,Class name or Function name,Method / property name 
-	 *
-	 * Where TYPE is either CLASS, METHOD, MEMBER, FUNCTION. Method / property name 
-	 * may be empty for CLASS or FUNCTION types. File name is the full path
-	 *
-	 * Examples:
-	 * CLASS,/home/users/public_html/controllers/my_controller.php,MyController,
-	 * FUNCTION,/home/users/public_html/lib/calc.php,calculate,
-	 * METHOD,/home/users/public_html/controllers/my_controller.php,MyController,index
-	 *
-	 * @return bool TRUE if file was successfully written to.
-	 */
-	bool PersistGlobal(const wxFileName& outputFile);
-
-	/**
 	 * calls AllNonNativeClasses() method on the GLOBAL resource. This is usually done after all files have been indexed.
 	 * @see mvceditor::ResourceFinderClass::AllNonNativeClasses
 	 */
@@ -335,13 +318,6 @@ public:
 	 */
 	wxThreadError StartBackgroundUpdate(const wxString& fileName, const UnicodeString& code, bool isNew);
 
-	/**
-	 * Will run a background thread to persist the global cache to a file.
-	 * 
-	 * @param outputFile the file to write the global cache to.
-	 */
-	wxThreadError StartPersist(const wxFileName& outputFile);
-
 protected:
 	
 	/**
@@ -355,8 +331,7 @@ private:
 	 * the type of work that will happen in the background thread
 	 */
 	enum Modes {
-		UPDATE,
-		PERSIST
+		UPDATE
 	} Mode;
 
 	/**
@@ -364,12 +339,6 @@ private:
 	 * the thread is running. Pointer will NOT be owned by this object.
 	 */
 	ResourceCacheClass* ResourceCache;
-
-	/**
-	 * If the thread is to persist the cache, then this variable contains the file to write the
-	 * cache to.
-	 */
-	wxFileName OutputFile;
 
 	/**
 	 * the code that is being worked on by the background thread.

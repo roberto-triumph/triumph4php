@@ -25,6 +25,9 @@
  */
 require_once __DIR__ . '/../lib/opportunity/string.php';
 
+set_include_path(get_include_path() . PATH_SEPARATOR .  realpath(__DIR__ . '/../lib/'));
+require_once 'Zend/Db/Table.php';
+
 /**
  * This is a resource artifact.  The MVC Editor will use a list of resources to aid
  * in code completion.  The PHP code will only augment what the MVC Editor does; MVC Editor will already
@@ -34,6 +37,10 @@ require_once __DIR__ . '/../lib/opportunity/string.php';
  * are.
  */
 class MvcEditorResource {
+
+	protected $_name = 'resources';
+	
+	protected $_sequence = FALSE;
 
 	/**
 	 * This is the fully qualified name of a resource. This means that it includes a class name followed by
@@ -48,6 +55,13 @@ class MvcEditorResource {
 	 * @var string
 	 */
 	public $identifier;
+	
+	/**
+	 * The class of the resource; the class name only. For example, if the resource was 'MY_Email::read'
+	 * then the identifer would be 'MY_Email'
+	 * @var string
+	 */
+	public $className;
 	
 	/**
 	 * The fully qualified name of the type of this resource. This means that it includes a class name followed by
@@ -74,19 +88,19 @@ class MvcEditorResource {
 	 * forward or backslashes).
 	 * @var string
 	 */
-	public $fileName;
+	public $fullPath;
 	
 	/**
 	 * The type of this resource. One of the type constants.
 	 */
 	public $type;
 	
-	const TYPE_CLASS = 'CLASS';
-	const TYPE_CLASS_CONSTANT = 'CLASS_CONSTANT';
-	const TYPE_DEFINE = 'DEFINE';
-	const TYPE_FUNCTION = 'FUNCTION';
-	const TYPE_MEMBER = 'MEMBER';
-	const TYPE_METHOD = 'METHOD';
+	const TYPE_CLASS = 0;
+	const TYPE_METHOD = 1;
+	const TYPE_FUNCTION = 2;
+	const TYPE_MEMBER = 3;
+	const TYPE_DEFINE = 4;
+	const TYPE_CLASS_CONSTANT = 5;
 	
 	/**
 	 * Create a property resource(a class member). For now this property is assumed to have public access.
@@ -116,6 +130,8 @@ class MvcEditorResource {
 		$this->signature = $signature;
 		$this->comment = $comment;
 		$this->type = $type;
+		$this->fullPath = '';
+		$this->className = '';
 	}
 
 	/**
@@ -123,6 +139,7 @@ class MvcEditorResource {
 	 */
 	public function MakeMember($className, $propertyName, $propertyType, $comment) {
 		$resource = $className . '::' . $propertyName;
+		$this->className = $className;
 		$this->resource = $resource;
 		$this->identifier = $propertyName;
 		$this->returnType = $propertyType;
@@ -138,6 +155,7 @@ class MvcEditorResource {
 		$resource = $className . '::' . $methodName;
 		$signature = 'public function ' . $methodName . '(' . $methodArgs . ')';
 		$this->resource = $resource;
+		$this->className = $className;
 		$this->identifier = $methodName;
 		$this->returnType = $methodReturnType;
 		$this->signature = $signature;
@@ -185,61 +203,52 @@ class MvcEditorResource {
 	}
 	
 	/**
-	 * De-serialization. Will read the next resource from a resource cache file.
+	 * Retrieves all of the methods from the given files. Only resources that 
+	 * are methods will be returned.
 	 *
-	 * @param $fileResource file handle to the resource cache file.
-	 * @return bool TRUE if a resource instance was successfully read from the given file. If false, either
-	 * file is not a resource cache file or the file did not contain proper data.
+	 * @param Zend_Db_Adapter_Abstract $db the DB to query
+	 * @param int[] $fileItemIds the file item IDs to query
+	 * @return MvcEditorResource[] the resources that were found in any of the given files.
 	 */
-	public function FromFile($fileResource) {
-		$this->Clear();
-		$ret = false;
-		if (!feof($fileResource)) {
-			$line = trim(fgets($fileResource));
-			if (!empty($line)) {
-			
-				// File format:
-				//
-				// TYPE,File name,Class name or Function name,Method / property name 
-				//
-				// Where TYPE is either CLASS, METHOD, MEMBER, FUNCTION. Method / property name 
-				// may be empty for CLASS or FUNCTION types. File name is the full path
-				//
-				// Examples:
-				// CLASS,/home/users/public_html/controllers/my_controller.php,MyController,
-				// FUNCTION,/home/users/public_html/lib/calc.php,calculate,
-				// METHOD,/home/users/public_html/controllers/my_controller.php,MyController,index
-				$columns = explode(',', $line);
-				if (count($columns) >= 3 && self::TYPE_CLASS == $columns[0]) {
-					$this->MakeClass($columns[2]);
-					$this->fileName = $columns[1];
-					$ret = TRUE;
-				}
-				else if (count($columns) >= 3 && self::TYPE_FUNCTION == $columns[0]) {
-					$this->MakeFunction($columns[2], '');
-					$this->fileName = $columns[1];
-					$ret = TRUE;
-				}
-				else if (count($columns) >= 4 && self::TYPE_MEMBER == $columns[0]) {
-					$this->MakeMember($columns[2], $columns[3], '', '');
-					$this->fileName = $columns[1];
-					$ret = TRUE;
-				}
-				else if (count($columns) >= 4 && self::TYPE_METHOD == $columns[0]) {
-					$this->MakeMethod($columns[2], $columns[3], '', '', '');
-					$this->fileName = $columns[1];
-					$ret = TRUE;
-				}
-			}
+	public function MethodsFromFiles(Zend_Db_Adapter_Abstract $db, $fileItemIds) {
+		if (empty($fileItemIds)) {
+			return array();
 		}
-		return $ret;
+				
+		// key = identifier ==> don't get the fully qualified matches
+		$select = $db->select();
+		$select->from(array('r' => 'resources'), array('class_name', 'identifier', 'signature', 'return_type', 'comment'))
+			->join(array('f' => 'file_items'), 'r.file_item_id = f.file_item_id', array('full_path'));
+		$select->where("r.file_item_id IN(?)", $fileItemIds)->where('key = identifier')->where('type = ?', self::TYPE_METHOD);
+		$stmt = $db->query($select);
+		$methods = array();
+		while ($row = $stmt->fetch()) {
+			$method = new MvcEditorResource();
+			$method->MakeMethod($row['class_name'], $row['identifier'], $row['signature'], $row['return_type'], $row['comment']);
+			$method->fullPath = $row['full_path'];
+			$methods[] = $method;
+		}
+		return $methods;
  	}
 	
-	public function ClassName() {
-		$clazz = '';
-		if (self::TYPE_MEMBER == $this->type || self::TYPE_METHOD == $this->type) {
-			$clazz = \opstring\before($this->resource, '::' . $this->identifier);
+	public static function typeString($type) {
+		if (self::TYPE_CLASS == $type) {
+			return "CLASS";
 		}
-		return $clazz;
+		else if (self::TYPE_CLASS_CONSTANT == $type) {
+			return "CLASS_CONSTANT";
+		}
+		else if (self::TYPE_DEFINE == $type) {
+			return "DEFINE";
+		}
+		else if (self::TYPE_FUNCTION == $type) {
+			return "FUNCTION";
+		}
+		else if (self::TYPE_MEMBER == $type) {
+			return "MEMBER";
+		}
+		else if (self::TYPE_METHOD == $type) {
+			return "METHOD";
+		}
 	}
 }

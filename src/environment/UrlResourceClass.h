@@ -156,6 +156,11 @@ public:
 	 * of items.
 	 */
 	void ReplaceAll(const UrlResourceFinderClass& src);
+
+	/**
+	 * Removes all URLs from this object.
+	 */
+	void Clear();
 };
 	
 }

@@ -180,6 +180,9 @@ public:
 
 	wxString ErrorMessage;
 
+	
+	wxString LastCommandLine;
+
 protected:
 
 	/**

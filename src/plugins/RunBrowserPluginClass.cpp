@@ -206,10 +206,8 @@ mvceditor::RunBrowserPluginClass::RunBrowserPluginClass(mvceditor::AppClass& app
 	: PluginClass(app) 
 	, RecentUrls()
 	, PhpFrameworks(*this, RunningThreads, app.Structs.Environment)
-	, ResourceCacheThread(NULL)
 	, BrowserMenu(NULL)
 	, UrlMenu(NULL)
-	, ResourceCacheFileName()
 	, RunInBrowser(NULL)
 	, BrowserToolbar(NULL)
 	, State(FREE) {
@@ -423,7 +421,6 @@ void mvceditor::RunBrowserPluginClass::OnUrlDetectionComplete(mvceditor::UrlDete
 	for (size_t i = 0; i < event.Urls.size(); ++i) {
 		App.Structs.UrlResourceFinder.Urls.push_back(event.Urls[i]);
 	}
-	wxRemoveFile(ResourceCacheFileName.GetFullPath());
 	GetStatusBarWithGauge()->StopGauge(ID_URL_GAUGE);
 	
 	wxCommandEvent urlEvent(mvceditor::EVENT_APP_PROJECT_URLS);
@@ -436,7 +433,6 @@ void mvceditor::RunBrowserPluginClass::OnUrlDetectionComplete(mvceditor::UrlDete
 
 void mvceditor::RunBrowserPluginClass::OnUrlDetectionFailed(wxCommandEvent& event) {
 	mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, event.GetString());
-	wxRemoveFile(ResourceCacheFileName.GetFullPath());
 	GetStatusBarWithGauge()->StopGauge(ID_URL_GAUGE);
 	State = FREE;
 }
@@ -477,35 +473,30 @@ void mvceditor::RunBrowserPluginClass::OnUrlToolMenuItem(wxCommandEvent& event) 
 }
 
 void mvceditor::RunBrowserPluginClass::OnProjectIndexed(wxCommandEvent& event) {
-	if (!ResourceCacheThread.get()) {
-		ResourceCacheThread.reset(new mvceditor::ResourceCacheUpdateThreadClass(GetResourceCache(), *this, RunningThreads));
-	}
-	ResourceCacheFileName.Assign(wxFileName::CreateTempFileName(wxT("resource_cache")));
-	ResourceCacheThread->StartPersist(ResourceCacheFileName);
-	GetStatusBarWithGauge()->AddGauge(_("URL Detection"), ID_URL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
-}
-
-void mvceditor::RunBrowserPluginClass::OnCacheFileWorkComplete(wxCommandEvent& event) {
+	App.Structs.UrlResourceFinder.Clear();
 	mvceditor::EnvironmentClass* environment = GetEnvironment();
 
 	// look to see if any source directory is a virtual host doc root
-	std::vector<mvceditor::SourceClass> sources = App.Structs.AllEnabledSources();
 	bool started = false;
-	for (size_t i = 0; i < sources.size(); ++i) {
+	std::vector<mvceditor::ProjectClass>::const_iterator project;
+	for (project = App.Structs.Projects.begin(); project != App.Structs.Projects.end(); ++project) {
+		if (project->IsEnabled) {
+			std::vector<mvceditor::SourceClass>::const_iterator source;
 
-		// ATTN: allow at most one doc root per source directory for now
-		wxString rootDirFullPath = sources[i].RootDirectory.GetFullPath();
-		wxString projectRootUrl =  environment->Apache.GetUrl(rootDirFullPath);
-		if (!projectRootUrl.IsEmpty()) {
-			PhpFrameworks.InitUrlDetector(App.Structs.Frameworks, ResourceCacheFileName.GetFullPath(), projectRootUrl);
-			started = true;
-			break;
+			// a single project can have multiple directories. check each directory, and if 
+			// that directory is a web root then get the URLs for that project.
+			for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
+				wxString rootDirFullPath = source->RootDirectory.GetFullPath();
+				wxString projectRootUrl =  environment->Apache.GetUrl(rootDirFullPath);
+				if (!projectRootUrl.IsEmpty()) {
+					PhpFrameworks.InitUrlDetector(App.Structs.Frameworks, project->ResourceDbFileName.GetFullPath(), projectRootUrl);
+					started = true;
+				}
+			}
 		}
 	}
-	if (!started) {
-
-		// cleanup the file
-		wxRemoveFile(ResourceCacheFileName.GetFullPath());
+	if (started) {
+		GetStatusBarWithGauge()->AddGauge(_("URL Detection"), ID_URL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
 	}
 }
 
@@ -539,15 +530,10 @@ BEGIN_EVENT_TABLE(mvceditor::RunBrowserPluginClass, wxEvtHandler)
 	EVT_AUITOOLBAR_TOOL_DROPDOWN(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, mvceditor::RunBrowserPluginClass::OnUrlToolDropDown)
 	EVT_TOOL(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 4, mvceditor::RunBrowserPluginClass::OnUrlSearchTool)
 
-	// when the cache file has been generated start the URL detection. URL detection needs the resource cache file
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::RunBrowserPluginClass::OnCacheFileWorkComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::RunBrowserPluginClass::OnProcessInProgress)
-
 	// the URL detection handlers
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_URL_FAILED, mvceditor::RunBrowserPluginClass::OnUrlDetectionFailed)
 	EVT_FRAMEWORK_URL_COMPLETE(mvceditor::RunBrowserPluginClass::OnUrlDetectionComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::RunBrowserPluginClass::OnProcessInProgress)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::RunBrowserPluginClass::OnProcessInProgress)
 
 	// application events
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_UPDATED, mvceditor::RunBrowserPluginClass::OnPreferencesUpdated)

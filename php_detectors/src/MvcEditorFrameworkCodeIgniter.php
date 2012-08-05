@@ -30,6 +30,7 @@ require_once 'MvcEditorDatabaseInfo.php';
 require_once 'MvcEditorCallClass.php';
 require_once 'MvcEditorUrlClass.php';
 require_once 'MvcEditorViewInfo.php';
+require_once 'MvcEditorFileItem.php';
 require_once __DIR__ . '/../lib/opportunity/array.php';
 require_once __DIR__ . '/../lib/opportunity/string.php';
 
@@ -143,8 +144,8 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 	/**
 	 * @return the array of URLs for the given class name / file name.
 	 */
-	public function makeUrls($dir, $resoureCacheFileName, $host) {
-		if (!is_file($resoureCacheFileName)) {
+	public function makeUrls($dir, $resourceCacheFileName, $host) {
+		if (!is_file($resourceCacheFileName)) {
 			return array();
 		}
 		$dir = \opstring\ensure_ends_with($dir, '/');
@@ -160,40 +161,47 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 		include($dir . 'application/config/routes.php');
 		include($dir . 'application/config/config.php');
 		
-		$allUrls = array();
+		$allUrls = array();	
+		
+		$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $resourceCacheFileName));
+		Zend_Db_Table_Abstract::setDefaultAdapter($pdo);
+		$fileItem = new MvcEditorFileItemClass();
+		
+		// get all controller files, only controllers are accessible via URLs
+		$controllerDir = $dir . 'application/controllers';
+		$matchingFiles = $fileItem->MatchingFiles($controllerDir);
+		if (empty($matchingFiles)) {
+			$controllerDir = $dir . 'application\controllers';
+			$matchingFiles = $fileItem->MatchingFiles(realpath($controllerDir));
+		}
+
+		
 		$resource = new MvcEditorResource();
-		$handle = fopen($resoureCacheFileName, 'r');
-		if ($handle) {
-			while (!feof($handle)) {
-				if ($resource->FromFile($handle) && MvcEditorResource::TYPE_METHOD == $resource->type) {
-					
-					// is this resource from a controller file ? only controllers are accessible via URLs
-					$controllerDir = $dir . 'application/controllers';
-					
-					// normalize any paths to have forward slash
-					// doing this so that this logic works on MSW, linux, AND the vfs:// stream (tests)
-					$controllerDir = \opstring\replace($controllerDir, DIRECTORY_SEPARATOR, '/');
-					$resourceFileName = \opstring\replace($resource->fileName, DIRECTORY_SEPARATOR, '/');
-					if (\opstring\begins_with($resourceFileName, $controllerDir)) {
-						$controllerFile = \opstring\after($resourceFileName, $controllerDir);
-						$subDirectory = dirname($controllerFile);
-						if ('\\' == $subDirectory) {
-						
-							// hack to work around special case when there is no subdirectory
-							$subDirectory = '';
-						}
-						
-						// TODO: any controller arguments ... should get these from the user
-						// constructors are not web-accessible
-						// code igniter makes methods that start with underscore
-						if (\opstring\compare_case('__construct', $resource->identifier) && !\opstring\begins_with($resource->identifier, '_')) {
-							$extra = '';
-							$appUrl = $this->makeUrl($route, $config, $subDirectory, $resource->fileName, $resource->ClassName(), $resource->identifier, $extra);
-							$appUrl->url = $host . $appUrl->url;
-							$allUrls[] = $appUrl;
-						}
-					}
-				}
+		$methods = $resource->MethodsFromFiles($pdo, $matchingFiles);
+		foreach ($methods as $resource) {
+			
+			// normalize any paths to have forward slash
+			// doing this so that this logic works on MSW, linux, AND the vfs:// stream (tests)
+			$controllerDir = \opstring\replace($controllerDir, DIRECTORY_SEPARATOR, '/');
+			$resourceFullPath = \opstring\replace($resource->fullPath, DIRECTORY_SEPARATOR, '/');
+			
+			
+			$controllerFile = \opstring\after($resourceFullPath, $controllerDir);
+			$subDirectory = dirname($controllerFile);
+			if ('\\' == $subDirectory) {
+			
+				// hack to work around special case when there is no subdirectory
+				$subDirectory = '';
+			}
+			
+			// TODO: any controller arguments ... should get these from the user
+			// constructors are not web-accessible
+			// code igniter makes methods that start with underscore
+			if (\opstring\compare_case('__construct', $resource->identifier) && !\opstring\begins_with($resource->identifier, '_')) {
+				$extra = '';
+				$appUrl = $this->makeUrl($route, $config, $subDirectory, $resource->fullPath, $resource->className, $resource->identifier, $extra);
+				$appUrl->url = $host . $appUrl->url;
+				$allUrls[] = $appUrl;
 			}
 		}
 		return $allUrls;
@@ -511,7 +519,9 @@ class MvcEditorFrameworkCodeIgniter extends MvcEditorFrameworkBaseClass {
 			$url = $indexPage . trim($uri . '/');
 			$url = ltrim($url, '/');
 		}
-		
+		else {
+			$url = '';
+		}
 		if (isset($config['url_suffix']) && $config['url_suffix']) {
 			$url .= $config['url_suffix'];
 		}

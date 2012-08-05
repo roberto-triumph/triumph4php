@@ -24,6 +24,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 require_once __DIR__ . '/../src/MvcEditorResource.php';
+require_once __DIR__ . '/../src/MvcEditorFileItem.php';
 
 class ResourceTest extends PHPUnit_Framework_TestCase {
 
@@ -32,7 +33,17 @@ class ResourceTest extends PHPUnit_Framework_TestCase {
 	 */
 	private $resource;
 	
+	/**
+	 * connection to use
+	 * @var Zend_Db_Adapter_Abstract
+	 */
+	private $db;
+	
 	function setUp() {
+		$this->db = Zend_Db::factory('Pdo_Sqlite', array("dbname" => ":memory:"));
+		Zend_Db_Table_Abstract::setDefaultAdapter($this->db);
+		$this->initOutputPdo($this->db);
+		
 		$this->resource = new MvcEditorResource();
 	}
 
@@ -42,41 +53,83 @@ class ResourceTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('testFunction', $this->resource->identifier);
 	}
 	
-	function testFromFile() {
-		$contents = <<<EOF
-FUNCTION,/home/user/file.php,testFunction,
-CLASS,/home/user/class.file.php,MyClass
-METHOD,/home/user/class.file.php,MyClass,myMethod
-MEMBER,/home/user/class.file.php,MyClass,myProperty
-EOF;
-		$file = tmpfile();
-		fputs($file, $contents);
-		fseek($file, 0);
-		$this->assertEquals(TRUE, $this->resource->FromFile($file));
-		$this->assertEquals('testFunction', $this->resource->resource);
-		$this->assertEquals('testFunction', $this->resource->identifier);
-		$this->assertEquals('/home/user/file.php', $this->resource->fileName);
-		$this->assertEquals(MvcEditorResource::TYPE_FUNCTION, $this->resource->type);
+	function testMethodsFromFiles() {
+		$fileItem = new MvcEditorFileItemClass();
+		$fileItemId1 = $fileItem->insert(array('full_path' => 'c:\users\john\file.php'));
+		$fileItemId2 = $fileItem->insert(array('full_path' => 'c:\users\john\class.file.php'));
 		
-		$this->assertEquals(TRUE, $this->resource->FromFile($file));
-		$this->assertEquals('MyClass', $this->resource->resource);
-		$this->assertEquals('MyClass', $this->resource->identifier);
-		$this->assertEquals('/home/user/class.file.php', $this->resource->fileName);
-		$this->assertEquals(MvcEditorResource::TYPE_CLASS, $this->resource->type);
+		$this->db->insert('resources', array(
+			'key' => 'testFunction',
+			'file_item_id' => $fileItemId1,
+			'identifier' => 'testFunction',
+			'type' => MvcEditorResource::TYPE_FUNCTION			
+		));
+		$this->db->insert('resources', array(
+			'key' => 'MyClass',
+			'file_item_id' => $fileItemId2,
+			'identifier' => 'MyClass',
+			'class_name' => 'MyClass',
+			'type' => MvcEditorResource::TYPE_CLASS
+		));
 		
-		$this->assertEquals(TRUE, $this->resource->FromFile($file));
-		$this->assertEquals('MyClass::myMethod', $this->resource->resource);
-		$this->assertEquals('myMethod', $this->resource->identifier);
-		$this->assertEquals('/home/user/class.file.php', $this->resource->fileName);
-		$this->assertEquals(MvcEditorResource::TYPE_METHOD, $this->resource->type);
+		// for properties, insert 2 rows, this is how MVC editor does it
+		// see ResourceFinderClas for more info
+		$this->db->insert('resources', array(
+			'key' => 'MyClass::myProperty',
+			'file_item_id' => $fileItemId2,
+			'identifier' => 'myProperty',
+			'class_name' => 'MyClass',
+			'type' => MvcEditorResource::TYPE_MEMBER
+		));
+		$this->db->insert('resources', array(
+			'key' => 'myProperty',
+			'file_item_id' => $fileItemId2,
+			'identifier' => 'myProperty',
+			'class_name' => 'MyClass',
+			'type' => MvcEditorResource::TYPE_MEMBER
+		));
 		
-		$this->assertEquals(TRUE, $this->resource->FromFile($file));
-		$this->assertEquals('MyClass::myProperty', $this->resource->resource);
-		$this->assertEquals('myProperty', $this->resource->identifier);
-		$this->assertEquals('/home/user/class.file.php', $this->resource->fileName);
-		$this->assertEquals(MvcEditorResource::TYPE_MEMBER, $this->resource->type);
+		// for methods, insert 2 rows, this is how MVC editor does it
+		// see ResourceFinderClas for more info
+		$this->db->insert('resources', array(
+			'key' => 'MyClass::myMethod',
+			'file_item_id' => $fileItemId2,
+			'identifier' => 'myMethod',
+			'class_name' => 'MyClass',
+			'type' => MvcEditorResource::TYPE_METHOD
+		));
+		$this->db->insert('resources', array(
+			'key' => 'myMethod',
+			'file_item_id' => $fileItemId2,
+			'identifier' => 'myMethod',
+			'class_name' => 'MyClass',
+			'type' => MvcEditorResource::TYPE_METHOD
+		));
 		
-		$this->assertEquals(FALSE, $this->resource->FromFile($file));
+		$fileItemIds = array($fileItemId1, $fileItemId2);
+		$methods = $this->resource->MethodsFromFiles($this->db, $fileItemIds);
+		
+		$this->assertEquals(1, count($methods));
+		$method = $methods[0];
+		$this->assertEquals('myMethod', $method->identifier);
+		$this->assertEquals('c:\users\john\class.file.php', $method->fullPath);
+		$this->assertEquals(MvcEditorResource::TYPE_METHOD, $method->type);
+	}
+	
+	private function initOutputPdo(Zend_Db_Adapter_Abstract $dbAdapter) {
+		$dbAdapter->query(
+			'CREATE TABLE IF NOT EXISTS file_items ( ' .
+			'  file_item_id INTEGER PRIMARY KEY, full_path TEXT, last_modified DATETIME, is_parsed INTEGER, is_new INTEGER ' .
+			')'
+		);
+		$dbAdapter->query(
+			'CREATE TABLE IF NOT EXISTS resources ( ' .
+			'  file_item_id INTEGER, key TEXT, identifier TEXT, class_name TEXT, ' .
+			'  type INTEGER, namespace_name TEXT, signature TEXT, comment TEXT, ' .
+			'  return_type TEXT, is_protected INTEGER, is_private INTEGER, ' .
+			'  is_static INTEGER, is_dynamic INTEGER, is_native INTEGER ' .
+			')'
+		);
 	}
 
 }

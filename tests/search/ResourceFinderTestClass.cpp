@@ -1423,31 +1423,6 @@ TEST_FIXTURE(DynamicResourceTestClass, AddDynamicResourcesShouldNotDuplicateExis
 	CHECK_EQUAL(mvceditor::ResourceClass::FUNCTION, match.Type);
 }
 
-TEST_FIXTURE(ResourceFinderFileTestClass, Persist) {
-	Prep(wxString::FromAscii(
-		"<?php\n"
-		"class UserClass {\n"
-		"\tprivate $name;"
-		"\tfunction getName() {\n"
-		"\t\treturn $this->name;\n"
-		"\t}\n"
-		"}\n"
-		"function printUser($user) {\n"
-		"}\n"
-		"?>\n"
-	));
-	ResourceFinder.Walk(TestProjectDir + TestFile);
-	
-	wxFileName outputFile(TestProjectDir + wxT("index.csv"));
-	CHECK(ResourceFinder.Persist(outputFile, false));
-	wxString contents = GetFileContents(wxT("index.csv"));
-	wxStringTokenizer tokenizer(contents, wxT("\n"));
-	CHECK_EQUAL(wxT("CLASS,") + TestProjectDir + TestFile + wxT(",UserClass,"), tokenizer.GetNextToken());
-	CHECK_EQUAL(wxT("METHOD,") + TestProjectDir + TestFile + wxT(",UserClass,getName"), tokenizer.GetNextToken());
-	CHECK_EQUAL(wxT("MEMBER,") + TestProjectDir + TestFile + wxT(",UserClass,name"), tokenizer.GetNextToken());
-	CHECK_EQUAL(wxT("FUNCTION,") + TestProjectDir + TestFile + wxT(",printUser,"), tokenizer.GetNextToken());
-}
-
 TEST_FIXTURE(ResourceFinderMemoryTestClass, IsFileCacheEmptyWithNativeFunctions) {
 	CHECK(ResourceFinder.IsFileCacheEmpty());
 	CHECK(ResourceFinder.IsResourceCacheEmpty());

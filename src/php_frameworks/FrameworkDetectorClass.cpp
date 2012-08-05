@@ -111,6 +111,7 @@ bool mvceditor::DetectorActionClass::Init(int id, const EnvironmentClass& enviro
 	}
 		
 	wxString cmd = wxT("\"") + environment.Php.PhpExecutablePath + wxT("\"") + wxT(" \"") + scriptFileName.GetFullPath() + wxT("\"") + args;
+	LastCommandLine = cmd;
 	return Process.Init(cmd, id, CurrentPid);
 }
 
@@ -672,6 +673,7 @@ void mvceditor::PhpFrameworkDetectorClass::OnDatabaseDetectionComplete(wxCommand
 	Framework.Databases.insert(Framework.Databases.end(), DatabaseDetector.Databases.begin(), DatabaseDetector.Databases.end());
 	if (mvceditor::DetectorActionClass::NONE != DatabaseDetector.Error) {
 		wxString response = event.GetString();
+		response += wxT(" database info");
 		mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, response);
 	}
 
@@ -692,6 +694,7 @@ void mvceditor::PhpFrameworkDetectorClass::OnConfigFilesDetectionComplete(wxComm
 	Framework.ConfigFiles.insert(ConfigFilesDetector.ConfigFiles.begin(), ConfigFilesDetector.ConfigFiles.end());
 	if (mvceditor::DetectorActionClass::NONE != ConfigFilesDetector.Error) {
 		wxString response = event.GetString();
+		response += wxT(" config files");
 		mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, response);
 	}
 	NextDetection();
@@ -701,6 +704,8 @@ void mvceditor::PhpFrameworkDetectorClass::OnResourcesDetectionComplete(wxComman
 	Framework.Resources.insert(Framework.Resources.end(), ResourcesDetector.Resources.begin(), ResourcesDetector.Resources.end());
 	if (mvceditor::DetectorActionClass::NONE != ResourcesDetector.Error) {
 		wxString response = event.GetString();
+		response += wxT(" resources");
+		response += ResourcesDetector.LastCommandLine;
 		mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, response);
 	}
 	NextDetection();

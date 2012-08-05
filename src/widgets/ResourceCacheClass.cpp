@@ -151,19 +151,6 @@ bool mvceditor::ResourceCacheClass::WalkGlobal(const wxFileName& resourceDbFileN
 	return true;
 }
 
-bool mvceditor::ResourceCacheClass::PersistGlobal(const wxFileName& outputFile) {
-	wxMutexLocker locker(Mutex);
-	if (!locker.IsOk()) {
-		return false;
-	}
-	bool good = false;
-	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it;
-	for (it = GlobalResourceFinders.begin(); it != GlobalResourceFinders.end(); ++it) {
-		good |= it->second->Persist(outputFile, true);
-	}
-	return good;
-}
-
 std::vector<mvceditor::ResourceClass> mvceditor::ResourceCacheClass::AllNonNativeClassesGlobal() {
 	wxMutexLocker locker(Mutex);
 	std::vector<mvceditor::ResourceClass> res;
@@ -334,8 +321,10 @@ bool mvceditor::ResourceCacheClass::IsFileCacheEmpty() {
 		return true;
 	}
 	bool isEmpty = true;
+
+	// if at least one resource finder is not empty, return false
 	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it;
-	for (it = GlobalResourceFinders.begin(); it != GlobalResourceFinders.end(); ++it) {
+	for (it = GlobalResourceFinders.begin(); isEmpty && it != GlobalResourceFinders.end(); ++it) {
 		isEmpty = it->second->IsFileCacheEmpty();
 	}
 	return isEmpty;
@@ -347,8 +336,10 @@ bool mvceditor::ResourceCacheClass::IsResourceCacheEmpty() {
 		return true;
 	}
 	bool isEmpty = true;
+
+	// if at least one resource finder is not empty, return false
 	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it;
-	for (it = GlobalResourceFinders.begin(); it != GlobalResourceFinders.end(); ++it) {
+	for (it = GlobalResourceFinders.begin(); isEmpty && it != GlobalResourceFinders.end(); ++it) {
 		isEmpty = it->second->IsResourceCacheEmpty();
 	}
 	return isEmpty;
@@ -398,7 +389,6 @@ mvceditor::ResourceCacheUpdateThreadClass::ResourceCacheUpdateThreadClass(mvcedi
 	: ThreadWithHeartbeatClass(handler, runningThreads, eventId)
 	, Mode(UPDATE)
 	, ResourceCache(resourceCache)
-	, OutputFile()
 	, CurrentCode() 
 	, CurrentFileName(){
 }
@@ -413,7 +403,6 @@ wxThreadError mvceditor::ResourceCacheUpdateThreadClass::StartBackgroundUpdate(c
 	CurrentCode = code;
 	CurrentFileName = fileName;
 	CurrentFileIsNew = isNew;
-	OutputFile.Clear();
 	Mode = UPDATE;
 
 	wxThreadError error = CreateSingleInstance();
@@ -423,33 +412,13 @@ wxThreadError mvceditor::ResourceCacheUpdateThreadClass::StartBackgroundUpdate(c
 	return error;
 }
 
-wxThreadError mvceditor::ResourceCacheUpdateThreadClass::StartPersist(const wxFileName& outputFile) {
-	if (!ResourceCache) {
-		return wxTHREAD_NO_ERROR;
-	}
-	
-	// make sure to set these BEFORE calling CreateSingleInstance
-	// in order to prevent Entry from reading them while we write to them
-	OutputFile = outputFile;
-	Mode = PERSIST;
-	wxThreadError error = CreateSingleInstance();
-	if (wxTHREAD_NO_ERROR == error) {
-		SignalStart();		
-	}
-	return error;
-}
-
 void mvceditor::ResourceCacheUpdateThreadClass::Entry() {
 	if (UPDATE == Mode) {
 		ResourceCache->Update(CurrentFileName, CurrentCode, CurrentFileIsNew);
 	}
-	else if (PERSIST == Mode) {
-		ResourceCache->PersistGlobal(OutputFile);
-	}
-	
+
 	// cleanup.
 	CurrentFileName.resize(0);
 	CurrentCode.truncate(0);
-	OutputFile.Clear();
 	SignalEnd();
 }

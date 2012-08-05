@@ -25,6 +25,7 @@
  */
 require_once 'CodeIgniterFixtureClass.php';
 require_once __DIR__ . '/../src/MvcEditorFrameworkCodeIgniter.php';
+require_once __DIR__ . '/../src/MvcEditorFileItem.php';
 
 class CodeIgniterTest extends PHPUnit_Framework_TestCase {
 
@@ -37,11 +38,31 @@ class CodeIgniterTest extends PHPUnit_Framework_TestCase {
 	 * @var MvcEditorFrameworkCodeIgniter
 	 */
 	private $detector;
+	
+	/**
+	 * connection to use
+	 * @var Zend_Db_Adapter_Abstract
+	 */
+	private $db;
 
 	function setUp() {
+		$this->dbName = sys_get_temp_dir() . '/urls.sqlite';
+		if (file_exists($this->dbName)) {
+			unlink($this->dbName);
+		}
+		$this->db = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $this->dbName));
+		Zend_Db_Table_Abstract::setDefaultAdapter($this->db);
+		$this->initOutputPdo($this->db);
+		
 		$this->fs = new CodeIgniterFixtureClass();
 		$this->fs->skeleton();
 		$this->detector = new MvcEditorFrameworkCodeIgniter();
+	}
+	
+	function tearDown() {
+		if ($this->db) {
+			$this->db->closeConnection(); 
+		}
 	}
 	
 	function testIsUsedByWithRelativeSystemPath() {
@@ -57,21 +78,38 @@ class CodeIgniterTest extends PHPUnit_Framework_TestCase {
 	
 	function testUrlsSimple() {
 		
+		$fileItem = new MvcEditorFileItemClass();		
+		$fileItemId1 = $fileItem->insert(array('full_path' => 'vfs://application/controllers/welcome.php'));
+		$fileItemId2 = $fileItem->insert(array('full_path' => 'vfs://application/controllers/admin/admin.php'));
+		
 		// test a controller inside of a sub directory
-		$cacheContents = <<<'EOF'
-METHOD,vfs://application/controllers/welcome.php,Welcome,index
-METHOD,vfs://application/controllers/welcome.php,Welcome,about
-METHOD,vfs://application/controllers/admin/admin.php,Admin,index
-EOF;
-		$tmpDir = vfsStream::newDirectory('tmp');
-		vfsStreamWrapper::getRoot()->addChild($tmpDir);
-		$cacheFile = vfsStream::newFile('resources.csv');
-		$cacheFile->withContent($cacheContents);
-		$tmpDir->addChild($cacheFile);
+		$this->db->insert('resources', array(
+			'key' => 'index',
+			'file_item_id' => $fileItemId1,
+			'identifier' => 'index',
+			'class_name' => 'Welcome',
+			'type' => MvcEditorResource::TYPE_METHOD
+		));
+		$this->db->insert('resources', array(
+			'key' => 'about',
+			'file_item_id' => $fileItemId1,
+			'identifier' => 'about',
+			'class_name' => 'Welcome',
+			'type' => MvcEditorResource::TYPE_METHOD
+		));
+		$this->db->insert('resources', array(
+			'key' => 'index',
+			'file_item_id' => $fileItemId2,
+			'identifier' => 'index',
+			'class_name' => 'Admin',
+			'type' => MvcEditorResource::TYPE_METHOD
+		));
+		
+
 		$this->fs->config();
 		$this->fs->database();
 		$this->fs->routes();
-		$urls = $this->detector->makeUrls(vfsStream::url(''), vfsStream::url('tmp/resources.csv'), 'http://localhost');
+		$urls = $this->detector->makeUrls(vfsStream::url(''), $this->dbName, 'http://localhost');
 		$expected = array(
 			new MvcEditorUrlClass('http://localhost/index.php/welcome/index/', 'vfs://application/controllers/welcome.php', 'Welcome', 'index'),
 			new MvcEditorUrlClass('http://localhost/index.php/welcome/about/', 'vfs://application/controllers/welcome.php', 'Welcome', 'about'),
@@ -79,7 +117,7 @@ EOF;
 		);
 		$this->assertEquals($expected, $urls);
 		
-		$urls = $this->detector->makeUrls(vfsStream::url(''), vfsStream::url('tmp/resources.csv'), 'http://localhost/codeigniterapp/');
+		$urls = $this->detector->makeUrls(vfsStream::url(''), $this->dbName, 'http://localhost/codeigniterapp/');
 		$expected = array(
 			new MvcEditorUrlClass('http://localhost/index.php/admin/admin/about/', 'vfs://application/controllers/welcome.php', 'Welcome', 'about')
 		);
@@ -115,6 +153,22 @@ EOF;
 			new MvcEditorViewInfoClass(vfsStream::url('/application/views/index.php'), array('$name', '$address'))
 		);
 		$this->assertEquals($expected, $viewInfos);
+	}
+
+	private function initOutputPdo(Zend_Db_Adapter_Abstract $dbAdapter) {
+		$dbAdapter->query(
+			'CREATE TABLE IF NOT EXISTS file_items ( ' .
+			'  file_item_id INTEGER PRIMARY KEY, full_path TEXT, last_modified DATETIME, is_parsed INTEGER, is_new INTEGER ' .
+			')'
+		);
+		$dbAdapter->query(
+			'CREATE TABLE IF NOT EXISTS resources ( ' .
+			'  file_item_id INTEGER, key TEXT, identifier TEXT, class_name TEXT, ' .
+			'  type INTEGER, namespace_name TEXT, signature TEXT, comment TEXT, ' .
+			'  return_type TEXT, is_protected INTEGER, is_private INTEGER, ' .
+			'  is_static INTEGER, is_dynamic INTEGER, is_native INTEGER ' .
+			')'
+		);
 	}
 }
 

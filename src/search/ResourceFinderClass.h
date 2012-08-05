@@ -504,25 +504,6 @@ public:
 	void AddDynamicResources(const std::vector<ResourceClass>& dynamicResources);
 
 	/**
-	 * Writes the parsed resources into the given file. Format is this:
-	 *
-	 * TYPE,File name,Class name or Function name,Method / property name 
-	 *
-	 * Where TYPE is either CLASS, METHOD, MEMBER, FUNCTION. Method / property name 
-	 * may be empty for CLASS or FUNCTION types. File name is the full path
-	 *
-	 * Examples:
-	 * CLASS,/home/users/public_html/controllers/my_controller.php,MyController,
-	 * FUNCTION,/home/users/public_html/lib/calc.php,calculate,
-	 * METHOD,/home/users/public_html/controllers/my_controller.php,MyController,index
-	 *
-	 * @param outputFile the file to write the resources to
-	 * @param append TRUE to append to the outputFile. When FALSE, the file is overwritten
-	 * @return bool TRUE if file was successfully written to.
-	 */
-	bool Persist(const wxFileName& outputFile, bool append);
-
-	/**
 	 * @return vector of ALL parsed Resources. Be careful as this method may return
 	 * many items (10000+). Try to use the CollectXXX() methods as much as possible.
 	 * An example use of this method is when wanting to find all functions in a single file.

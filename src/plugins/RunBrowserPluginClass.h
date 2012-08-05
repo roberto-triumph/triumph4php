@@ -153,11 +153,6 @@ private:
 	void OnProjectsUpdated(wxCommandEvent& event);
 
 	/**
-	 * this will be called once the cache file has been persisted
-	*/
-	void OnCacheFileWorkComplete(wxCommandEvent& event);
-
-	/**
 	 * to show progress to the user
 	 */
 	void OnProcessInProgress(wxCommandEvent& event);
@@ -180,12 +175,6 @@ private:
 	 * class constructor)
 	 */
 	mvceditor::PhpFrameworkDetectorClass PhpFrameworks;
-	
-	/**
-	 * Will use a background thread to persist the global cache. The global cache file is
-	 * then used by the PHP URL detector.
-	 */
-	std::auto_ptr<ResourceCacheUpdateThreadClass> ResourceCacheThread;
 
 	/**
 	 * A popup menu to show the currently configured browsers. The same popup menu will be
@@ -198,11 +187,6 @@ private:
 	 * reused multiple times. This class will own it,  that's why we use auto_ptr here
 	 */
 	std::auto_ptr<wxMenu> UrlMenu;
-
-	/**
-	 * a temporary file for the resource cache to be written to
-	 */
-	wxFileName ResourceCacheFileName;
 
 	wxMenuItem* RunInBrowser;
 	

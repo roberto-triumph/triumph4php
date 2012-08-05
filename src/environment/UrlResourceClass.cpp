@@ -151,3 +151,7 @@ void mvceditor::UrlResourceFinderClass::ReplaceAll(const mvceditor::UrlResourceF
 	ChosenBrowser = src.ChosenBrowser;
 	ChosenUrl = src.ChosenUrl;
 }
+
+void mvceditor::UrlResourceFinderClass::Clear() {
+	Urls.clear();
+}

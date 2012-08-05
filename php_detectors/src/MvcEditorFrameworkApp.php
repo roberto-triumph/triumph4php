@@ -176,7 +176,7 @@ function runResources(MvcEditorFrameworkBaseClass $framework, $dir, $url, $file,
 				'ReturnType' => iniEscapeValue($resource->returnType),
 				'Signature' => iniEscapeValue($resource->signature),
 				'Comment' => iniEscapeValue($resource->comment),
-				'Type' => iniEscapeValue($resource->type)
+				'Type' => iniEscapeValue(MvcEditorResource::typeString($resource->type))
 			);
 			$keyIndex++;
 		}
@@ -194,7 +194,7 @@ function runMakeUrls(MvcEditorFrameworkBaseClass $framework, $dir, $url, $resour
 		// decided against using INI for this particular action; since there could be many URLS
 		// the MvcEditor INI parsing is not so great; a measly 2000+ entries takes 5 seconds to parse
 		// in INI form.
-		$outputFile = strlen($outputFile) > 0 ? $outputFile : "php:://stdout";
+		$outputFile = strlen($outputFile) > 0 ? $outputFile : "php://stdout";
 		$fp = fopen($outputFile, "wb");
 		if ($fp) {
 			foreach ($urls as $url) {
