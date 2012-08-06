@@ -26,7 +26,6 @@
 #include <MvcEditorAssets.h>
 #include <windows/StringHelperClass.h>
 #include <MvcEditorErrors.h>
-#include <wx/stdpaths.h>
 #include <wx/config.h>
 #include <wx/fileconf.h>
 #include <wx/tokenzr.h>
@@ -90,17 +89,10 @@ bool mvceditor::DetectorActionClass::Init(int id, const EnvironmentClass& enviro
 	CurrentId = id;
 	wxString action = GetAction();
 	wxFileName scriptFileName = mvceditor::PhpDetectorsAsset();
-	wxStandardPaths paths;
 
 	// the temporary file where the output will go
 	// make it a unique name
-	wxString tmpDir = paths.GetTempDir();
-	OutputFile.AssignDir(tmpDir);
-	wxLongLong time = wxGetLocalTimeMillis();
-	wxString tmpName = action + wxString::Format(wxT("_%s.ini"), time.ToString().c_str());
-	OutputFile.SetFullName(tmpName);
-	OutputFile.Normalize();	
-		
+	OutputFile = wxFileName::CreateTempFileName(mvceditor::TempDirAsset().GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR));		
 	wxString args =
 		wxT(" --action=\"") + action  + wxT("\"") +
 		wxT(" --dir=\"") + projectRootPath  + wxT("\"") +
@@ -133,6 +125,7 @@ void mvceditor::DetectorActionClass::OnProcessFailed(wxCommandEvent& event) {
 	ErrorMessage = event.GetString();
 	CurrentPid = 0;
 	wxPostEvent(&Handler, event);
+	wxRemoveFile(OutputFile.GetFullPath());
 }
 
 void mvceditor::DetectorActionClass::OnWorkInProgress(wxCommandEvent& event) {

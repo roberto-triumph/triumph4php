@@ -24,6 +24,7 @@
  */
 #include <PreferencesClass.h>
 #include <MvcEditorErrors.h>
+#include <MvcEditorAssets.h>
 #include <wx/fileconf.h>
 #include <wx/filename.h>
 #include <wx/menuutils.h>
@@ -347,8 +348,8 @@ void mvceditor::PreferencesClass::Save() {
 
 void mvceditor::PreferencesClass::InitConfig() {
 	wxStandardPaths paths;
-	wxString appConfigFileName = paths.GetUserConfigDir() + wxFileName::GetPathSeparator() + wxT(".mvc_editor.ini");
-	wxFileConfig* config = new wxFileConfig(wxT("mvc_editor"), wxEmptyString, appConfigFileName, wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
+	wxFileName configFileName(mvceditor::ConfigDirAsset().GetPath(), wxT("mvc-editor.ini"));
+	wxFileConfig* config = new wxFileConfig(wxT("mvc_editor"), wxEmptyString, configFileName.GetFullPath(), wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
 	wxConfigBase::Set(config);
 	// this config will be automatically deleted by wxWidgets at the end
 }

@@ -27,7 +27,6 @@
 #include <wx/fileconf.h>
 #include <wx/filename.h>
 #include <wx/keybinder.h>
-#include <wx/stdpaths.h>
 #include <wx/wfstream.h>
 #include <map>
 #include <vector>

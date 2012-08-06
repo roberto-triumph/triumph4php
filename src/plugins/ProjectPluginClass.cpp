@@ -30,7 +30,6 @@
 #include <wx/platinfo.h>
 #include <wx/filename.h>
 #include <wx/fileconf.h>
-#include <wx/stdpaths.h>
 #include <wx/valgen.h>
 #include <algorithm>
 

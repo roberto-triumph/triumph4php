@@ -48,13 +48,25 @@ wxFileName ResourceSqlSchemaAsset();
  */
 wxFileName AutoCompleteImageAsset(wxString imageName);
 
-
 /**
  * @return the file location of the PHP detector script.  The editor will use this script
  * to find out framework-specific stuff (routes, DB connections, etc...)
  */
 wxFileName PhpDetectorsAsset();
 
+/**
+ * @return the full path to a directory inside of the system temp directory
+ *         that has been created for MVC Editor. The directory is guaranteed to
+ *         exist.
+ */
+wxFileName TempDirAsset();
+
+/**
+ * @return the full path to a directory inside of the system user data directory
+ *         that has been created for MVC Editor. The directory is guaranteed to
+ *         exist.
+ */
+wxFileName ConfigDirAsset();
 
 }
 

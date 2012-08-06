@@ -32,7 +32,6 @@
 #include <wx/artprov.h>
 #include <wx/choicdlg.h>
 #include <wx/filename.h>
-#include <wx/stdpaths.h>
 #include <wx/wfstream.h>
 #include <wx/aboutdlg.h>
 #include <vector>

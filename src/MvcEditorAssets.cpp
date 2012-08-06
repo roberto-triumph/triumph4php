@@ -80,3 +80,25 @@ wxFileName mvceditor::PhpDetectorsAsset() {
 	scriptFileName.Normalize();
 	return scriptFileName;
 }
+
+wxFileName mvceditor::TempDirAsset() {
+	wxStandardPaths paths;
+	wxFileName tempDir;
+	tempDir.AssignDir(paths.GetTempDir());
+	tempDir.AppendDir(wxT("mvc-editor"));
+	if (!tempDir.DirExists()) {
+		wxMkdir(tempDir.GetPath(), 0777);
+	}
+	return tempDir;
+}
+
+wxFileName mvceditor::ConfigDirAsset() {
+	wxStandardPaths paths;
+	wxFileName tempDir;
+	tempDir.AssignDir(paths.GetUserConfigDir());
+	tempDir.AppendDir(wxT(".mvc-editor"));
+	if (!tempDir.DirExists()) {
+		wxMkdir(tempDir.GetPath(), 0777);
+	}
+	return tempDir;
+}

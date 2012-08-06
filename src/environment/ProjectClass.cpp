@@ -24,7 +24,7 @@
  */
 #include <environment/ProjectClass.h>
 #include <wx/tokenzr.h>
-#include <wx/stdpaths.h>
+#include <MvcEditorAssets.h>
 #include <vector>
 
 mvceditor::ProjectClass::ProjectClass()
@@ -194,9 +194,7 @@ bool mvceditor::ProjectClass::MakeResourceDbFileName() {
 	if (ResourceDbFileName.IsOk()) {
 		return true;
 	}
-	wxStandardPaths paths;
-	wxString userConfigFullPath = paths.GetUserConfigDir();
-	wxString tempFullPath = wxFileName::CreateTempFileName(userConfigFullPath + wxFileName::GetPathSeparators() + wxT("resource_finder_"));
-	ResourceDbFileName.Assign(tempFullPath);
-	return !tempFullPath.IsEmpty();
+	wxString tempDb = wxFileName::CreateTempFileName(mvceditor::ConfigDirAsset().GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME));
+	ResourceDbFileName.Assign(tempDb);
+	return ResourceDbFileName.IsOk();
 }
