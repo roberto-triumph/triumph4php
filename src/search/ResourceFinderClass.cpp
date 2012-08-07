@@ -36,6 +36,7 @@
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <sqlite3.h>
+#include <string>
 
 /**
  * appends name to namespace
@@ -237,6 +238,7 @@ void mvceditor::ResourceFinderClass::BeginSearch() {
 	}
 	FileParsingCache.clear();
 	NamespaceCache.clear();
+	TraitCache.clear();
 
 	FileParsingCache.clear();
 	FileParsingCache.resize(0);
@@ -255,11 +257,10 @@ void mvceditor::ResourceFinderClass::EndSearch() {
 	}
 	FileParsingCache.clear();
 	NamespaceCache.clear();
+	TraitCache.clear();
 
-	
 	// reclaim mem since we no longer need it
 	FileParsingCache.resize(1);
-
 }
 
 bool mvceditor::ResourceFinderClass::Walk(const wxString& fileName) {
@@ -292,11 +293,11 @@ void mvceditor::ResourceFinderClass::BuildResourceCacheForFile(const wxString& f
 
 	// remove all previous cached resources
 	mvceditor::FileItemClass fileItem;
-	bool foundFile = FindInFileCache(fullPath, fileItem);
+	bool foundFile = FindFileItemByFullPathExact(fullPath, fileItem);
 	if (foundFile) {
 		std::vector<int> fileItemIdsToRemove;
 		fileItemIdsToRemove.push_back(fileItem.FileId);
-		RemoveCachedResources(fileItemIdsToRemove);
+		RemovePersistedResources(fileItemIdsToRemove);
 	}
 	if (!foundFile) {
 
@@ -306,7 +307,7 @@ void mvceditor::ResourceFinderClass::BuildResourceCacheForFile(const wxString& f
 		fileItem.IsNew = isNew;
 		fileItem.DateTime = wxDateTime::Now();
 		fileItem.IsParsed = false;
-		PushIntoFileCache(fileItem);
+		PersistFileItem(fileItem);
 	}
 	
 	FileParsingCache.clear();
@@ -315,7 +316,8 @@ void mvceditor::ResourceFinderClass::BuildResourceCacheForFile(const wxString& f
 	pelet::LintResultsClass results;
 	Parser.ScanString(code, results);
 
-	PushIntoResourceCache(FileParsingCache, fileItem.FileId);
+	PersistResources(FileParsingCache, fileItem.FileId);
+	PersistTraits(TraitCache);
 	EndSearch();
 }
 
@@ -467,11 +469,16 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 	// for members from the class or any class it inherited from
 	std::vector<UnicodeString> parentClassNames = resourceSearch.GetParentClasses();
 	parentClassNames.push_back(resourceSearch.GetClassName());
+	std::vector<UnicodeString> traits = resourceSearch.GetTraits();
+	traits.push_back(resourceSearch.GetClassName());
+
 	if (resourceSearch.GetMethodName().isEmpty()) {
 		
 		// special case; query for all methods for a class (UserClass::)
 		std::vector<mvceditor::ResourceClass> memberMatches = CollectAllMembers(parentClassNames);
-		std::vector<mvceditor::ResourceClass> traitMatches = CollectAllTraitMembers(resourceSearch.GetClassName());
+
+		//get the methods that belong to a used trait
+		std::vector<mvceditor::ResourceClass> traitMatches = CollectAllTraitMembers(traits);
 
 		matches.insert(matches.end(), memberMatches.begin(), memberMatches.end());
 		matches.insert(matches.end(), traitMatches.begin(), traitMatches.end());
@@ -495,13 +502,18 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 		}
 	}
 	else {
-		InheritedTraits(resourceSearch.GetClassName(), parentClassNames);
 		std::vector<std::string> keyStarts;
 
 		// now that we found the parent classes, combine the parent class name and the queried method
 		// to make all of the keys we need to look for. remember that a resource class key is of the form
 		// ClassName::MethodName
 		for (std::vector<UnicodeString>::iterator it = parentClassNames.begin(); it != parentClassNames.end(); ++it) {
+			std::string keyStart = mvceditor::StringHelperClass::IcuToChar(*it);
+			keyStart += "::";
+			keyStart += mvceditor::StringHelperClass::IcuToChar(resourceSearch.GetMethodName());
+			keyStarts.push_back(keyStart);
+		}
+		for (std::vector<UnicodeString>::iterator it = traits.begin(); it != traits.end(); ++it) {
 			std::string keyStart = mvceditor::StringHelperClass::IcuToChar(*it);
 			keyStart += "::";
 			keyStart += mvceditor::StringHelperClass::IcuToChar(resourceSearch.GetMethodName());
@@ -524,21 +536,32 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectAll
 	return matches;
 }
 
-std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectAllTraitMembers(const UnicodeString& className) {
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectAllTraitMembers(const std::vector<UnicodeString>& classNames) {
 	std::vector<mvceditor::ResourceClass> matches;
-	std::vector<mvceditor::TraitResourceClass> traits = TraitCache[className];
+
+	std::vector<std::string> classNamesToLookFor;
+	for (std::vector<UnicodeString>::const_iterator it = classNames.begin(); it != classNames.end(); ++it) {
+		classNamesToLookFor.push_back(mvceditor::StringHelperClass::IcuToChar(*it));
+	}
+
+	// TODO use the correct namespace when querying for traits
+	std::vector<mvceditor::TraitResourceClass> traits = FindTraitsByClassName(classNamesToLookFor);
 	for (size_t j = 0; j < traits.size(); ++j) {
 		
 		// lets unqualify, the members cache key does not have the namespace name
-		int32_t index = traits[j].TraitClassName.lastIndexOf(UNICODE_STRING_SIMPLE("\\"));
-		UnicodeString traitClassNameOnly(traits[j].TraitClassName, index + 1);
-		UnicodeString key =  traitClassNameOnly + UNICODE_STRING_SIMPLE("::");
+		UnicodeString key =  traits[j].TraitClassName + UNICODE_STRING_SIMPLE("::");
 		
 		std::string stdKey = mvceditor::StringHelperClass::IcuToChar(key);
 		std::vector<mvceditor::ResourceClass> traitMatches = FindByKeyStart(stdKey, true);
-		matches.insert(matches.end(), traitMatches.begin(), traitMatches.end());
+		for (std::vector<mvceditor::ResourceClass>::iterator traitMember = traitMatches.begin(); traitMember != traitMatches.end(); ++traitMember) {
+			
+			// make sure we got the trait from the correct namespace
+			if (traits[j].NamespaceName.caseCompare(traitMember->NamespaceName, 0) == 0) {
+				matches.push_back(*traitMember);
+			}
+		}
 		
-		// TODO weed out Matches from methods from the wrong namespace
+		
 	}
 	
 	// now go through the result and change the method names of any aliased 
@@ -568,39 +591,6 @@ std::vector<mvceditor::ResourceClass>  mvceditor::ResourceFinderClass::CollectNe
 	return matches;
 }
 
-/***
-std::vector<UnicodeString> mvceditor::ResourceFinderClass::ClassHierarchy(const UnicodeString& className) {
-	std::vector<UnicodeString> parentClassNames;
-	parentClassNames.push_back(className);
-	UnicodeString lastClassName(className);
-	bool done = false;
-
-	std::vector<int> types;
-	types.push_back(mvceditor::ResourceClass::CLASS);
-	while (!done) {
-		done = true;
-
-		std::string key = mvceditor::StringHelperClass::IcuToChar(lastClassName);
-		std::vector<mvceditor::ResourceClass> matches = FindByKeyExactAndTypes(key, types, true);
-		for (std::vector<mvceditor::ResourceClass>::const_iterator it = matches.begin(); it != matches.end(); ++it) {
-			if (it->Type == ResourceClass::CLASS && 0 == it->ClassName.caseCompare(lastClassName, 0) && it->Signature.length()) {
-
-				// wont include interface names in this list, since it is very likely that the same function
-				// is actually implemented and we want to jump to the implementation instead
-				int32_t extendsPos = it->Signature.indexOf(UNICODE_STRING_SIMPLE("extends "));
-				if (extendsPos >= 0) {
-					lastClassName = ExtractParentClassFromSignature(it->Signature);
-					parentClassNames.push_back(lastClassName);
-					done = false;
-					break;
-				}
-			}
-		}
-	}
-	return parentClassNames;
-}
-*/
-
 UnicodeString mvceditor::ResourceFinderClass::GetResourceParentClassName(const UnicodeString& className) {
 	UnicodeString parentClassName;
 
@@ -617,10 +607,29 @@ UnicodeString mvceditor::ResourceFinderClass::GetResourceParentClassName(const U
 }
 
 std::vector<UnicodeString> mvceditor::ResourceFinderClass::GetResourceTraits(const UnicodeString& className, 
-		const UnicodeString& methodName) {
-	//TODO
-	std::vector<UnicodeString> traits;
-	return traits;
+																			 const UnicodeString& methodName) {
+	std::vector<UnicodeString> inheritedTraits;
+	bool match = false;
+	
+	std::vector<std::string> keys;
+	keys.push_back(mvceditor::StringHelperClass::IcuToChar(className));
+	std::vector<mvceditor::TraitResourceClass> matches = FindTraitsByClassName(keys);
+	for (size_t i = 0; i < matches.size(); ++i) {
+		UnicodeString fullyQualifiedTrait = QualifyName(matches[i].TraitNamespaceName, matches[i].TraitClassName);
+			
+		// trait is used unless there is an explicit insteadof 
+		match = true;
+		for (size_t j = 0; j < matches[i].InsteadOfs.size(); ++j) {
+			if (matches[i].InsteadOfs[j].caseCompare(fullyQualifiedTrait, 0) == 0) {
+				match = false;
+				break;
+			}
+		}
+		if (match) {
+			inheritedTraits.push_back(matches[i].TraitClassName);
+		}
+	}
+	return inheritedTraits;
 }
 
 
@@ -631,14 +640,14 @@ void mvceditor::ResourceFinderClass::BuildResourceCache(const wxString& fullPath
 	// have we looked at this file yet or is cache out of date? if not, then build the cache.
 	bool cached = false;
 	mvceditor::FileItemClass fileItem;
-	bool foundFile = FindInFileCache(fullPath, fileItem);
+	bool foundFile = FindFileItemByFullPathExact(fullPath, fileItem);
 	if (foundFile) {
 		bool needsToBeParsed = fileItem.NeedsToBeParsed(fileLastModifiedDateTime);
 		cached = !needsToBeParsed;
 	}
 	else {
 		fileItem.MakeNew(fileName, parseClasses);
-		PushIntoFileCache(fileItem);
+		PersistFileItem(fileItem);
 	}
 	if (parseClasses) {
 		if (!cached || !fileItem.IsParsed) {
@@ -648,7 +657,7 @@ void mvceditor::ResourceFinderClass::BuildResourceCache(const wxString& fullPath
 			if (foundFile) {
 				std::vector<int> fileItemIdsToRemove;
 				fileItemIdsToRemove.push_back(fileItem.FileId);
-				RemoveCachedResources(fileItemIdsToRemove);
+				RemovePersistedResources(fileItemIdsToRemove);
 			}			
 			FileParsingCache.clear();
 			
@@ -656,7 +665,8 @@ void mvceditor::ResourceFinderClass::BuildResourceCache(const wxString& fullPath
 			pelet::LintResultsClass lintResults;
 			wxFFile file(fullPath, wxT("rb"));
 			Parser.ScanFile(file.fp(), mvceditor::StringHelperClass::wxToIcu(fullPath), lintResults);
-			PushIntoResourceCache(FileParsingCache, fileItem.FileId);
+			PersistResources(FileParsingCache, fileItem.FileId);
+			PersistTraits(TraitCache);
 			FileParsingCache.clear();
 		}
 	}
@@ -691,58 +701,87 @@ void mvceditor::ResourceFinderClass::ClassFound(const UnicodeString& namespaceNa
 
 void mvceditor::ResourceFinderClass::TraitAliasFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
 												  const UnicodeString& traitMethodName, const UnicodeString& alias, pelet::TokenClass::TokenIds visibility) {
-	std::vector<mvceditor::TraitResourceClass> traitResources = TraitCache[QualifyName(namespaceName, className)];
-	for (size_t i = 0; i < traitResources.size(); ++i) {
-		if (traitResources[i].TraitClassName.caseCompare(traitUsedClassName, 0) == 0) {
-			traitResources[i].Aliased.push_back(alias);
-		}
+	
+	// the trait has already been put in the cache; we just need to update it
+	UnicodeString mapKey;
+	int capacity = 10 + namespaceName.length() + 1 + className.length() + 1 + traitUsedClassName.length();
+	int written = u_sprintf(mapKey.getBuffer(capacity), "%.*S-%.*S-%.*S", 
+		namespaceName.length(), namespaceName.getBuffer(), 
+		className.length(), className.getBuffer(),
+		traitUsedClassName.length(), traitUsedClassName.getBuffer());
+	mapKey.releaseBuffer(written);
+	
+	// this code assumes that TraitUseFound() is called before TraitAliasFound()
+	std::map<UnicodeString, std::vector<mvceditor::TraitResourceClass>, UnicodeStringComparatorClass>::iterator it;
+	it = TraitCache.find(mapKey);
+	if (!it->second.empty()) {
+		it->second.front().Aliased.push_back(alias);
+		it->second.back().Aliased.push_back(alias);
 	}
-	
-	// since traitResources was copied not a reference
-	TraitCache[QualifyName(namespaceName, className)] = traitResources;
-	
-	// put a non-qualified version too, sometimes the query will not contain a fully qualified name
-	TraitCache[className] = traitResources;
 }
 
 void mvceditor::ResourceFinderClass::TraitInsteadOfFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
 													   const UnicodeString& traitMethodName, const std::vector<UnicodeString>& insteadOfList) {
 	
-	std::vector<mvceditor::TraitResourceClass> traitResources = TraitCache[QualifyName(namespaceName, className)];
-	for (size_t i = 0; i < traitResources.size(); ++i) {
-		if (traitResources[i].TraitClassName.caseCompare(traitUsedClassName, 0) == 0) {
-			for (size_t j = 0; j < insteadOfList.size(); ++j) {
-				traitResources[i].Excluded.push_back(insteadOfList[j]);
-			}
-		}
+	// the trait has already been put in the cache; we just need to update it
+	UnicodeString mapKey;
+	int capacity = 10 + namespaceName.length() + 1 + className.length() + 1 + traitUsedClassName.length();
+	int written = u_sprintf(mapKey.getBuffer(capacity), "%.*S-%.*S-%.*S", 
+		namespaceName.length(), namespaceName.getBuffer(), 
+		className.length(), className.getBuffer(),
+		traitUsedClassName.length(), traitUsedClassName.getBuffer());
+	mapKey.releaseBuffer(written);
+	
+	// this code assumes that TraitUseFound() is called before TraitAliasFound()
+	std::map<UnicodeString, std::vector<mvceditor::TraitResourceClass>, UnicodeStringComparatorClass>::iterator it;
+	it = TraitCache.find(mapKey);
+	if (!it->second.empty()) {
+
+		it->second.front().InsteadOfs.insert(it->second.front().InsteadOfs.end(), insteadOfList.begin(), insteadOfList.end());
+		it->second.back().InsteadOfs.insert(it->second.back().InsteadOfs.end(), insteadOfList.begin(), insteadOfList.end());
 	}
-	
-	// since traitResources was copied not a reference
-	TraitCache[QualifyName(namespaceName, className)] = traitResources;
-	
-	// put a non-qualified version too, sometimes the query will not contain a fully qualified name
-	TraitCache[className] = traitResources;
 }
 
 void mvceditor::ResourceFinderClass::TraitUseFound(const UnicodeString& namespaceName, const UnicodeString& className, 
 												const UnicodeString& fullyQualifiedTraitName) {
-	mvceditor::TraitResourceClass newTraitResource;
-	newTraitResource.TraitClassName = fullyQualifiedTraitName;
 	
+	mvceditor::TraitResourceClass newTraitResource;
+	newTraitResource.ClassName = className;
+	newTraitResource.NamespaceName = namespaceName;
+
+	int32_t pos = fullyQualifiedTraitName.lastIndexOf(UNICODE_STRING_SIMPLE("\\"));
+	if (pos > 0) {
+		newTraitResource.TraitClassName.setTo(fullyQualifiedTraitName, 0, pos);
+		newTraitResource.TraitNamespaceName.setTo(fullyQualifiedTraitName, pos + 1);
+	}
+	else {
+		newTraitResource.TraitClassName = fullyQualifiedTraitName;
+		newTraitResource.TraitNamespaceName = UNICODE_STRING_SIMPLE("\\");
+	}
+
 	// only add if not already there
 	bool found = false;
-	std::vector<mvceditor::TraitResourceClass> traitResources = TraitCache[QualifyName(namespaceName, className)];
-	for (size_t i = 0; i < traitResources.size(); ++i) {
-		if (traitResources[i].TraitClassName.caseCompare(fullyQualifiedTraitName, 0) == 0) {
-			found = true;
-			break;
-		}
-	}
-	if (!found) {
-		TraitCache[QualifyName(namespaceName, className)].push_back(newTraitResource);
+	
+	UnicodeString mapKey;
+	
+	// 10 = max space for the FileItemId as a string
+	// key is a concatenation of file item id, fully qualified class and fully qualified trait
+	// this will make the alias and instead easier to update
+	int capacity = 10 + namespaceName.length() + 1 + className.length() + 1 + fullyQualifiedTraitName.length();
+	int written = u_sprintf(mapKey.getBuffer(capacity), "%.*S-%.*S-%.*S", 
+		namespaceName.length(), namespaceName.getBuffer(), 
+		className.length(), className.getBuffer(),
+		fullyQualifiedTraitName.length(), fullyQualifiedTraitName.getBuffer());
+	mapKey.releaseBuffer(written);
+
+	int count = TraitCache.count(mapKey);
+	if (count <= 0) {
+		newTraitResource.Key = QualifyName(namespaceName, className);
+		TraitCache[mapKey].push_back(newTraitResource);
 		
 		// put a non-qualified version too, sometimes the query will not contain a fully qualified name
-		TraitCache[className].push_back(newTraitResource);
+		newTraitResource.Key = className;
+		TraitCache[mapKey].push_back(newTraitResource);
 	}
 }
 
@@ -920,7 +959,7 @@ int mvceditor::ResourceFinderClass::GetLineCountFromFile(const wxString& fullPat
 	return lineCount;
 }
 
-void mvceditor::ResourceFinderClass::RemoveCachedResources(const std::vector<int>& fileItemIds) {
+void mvceditor::ResourceFinderClass::RemovePersistedResources(const std::vector<int>& fileItemIds) {
 	if (!IsCacheInitialized || fileItemIds.empty()) {
 		return;
 	}
@@ -1001,26 +1040,6 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectFul
 	return allMatches;
 }
 
-void mvceditor::ResourceFinderClass::InheritedTraits(const UnicodeString& fullyQualifiedClassName, std::vector<UnicodeString>& inheritedTraits) {
-	bool match = false;
-	std::vector<mvceditor::TraitResourceClass> traits = TraitCache[fullyQualifiedClassName];
-	for (size_t i = 0; i < traits.size(); ++i) {
-		UnicodeString traitClassName = traits[i].TraitClassName;
-			
-		// trait is used unless there is an explicit insteadof 
-		match = true;
-		for (size_t j = 0; j < traits[i].Excluded.size(); ++j) {
-			if (traits[i].Excluded[j].caseCompare(fullyQualifiedClassName, 0) == 0) {
-				match = false;
-				break;
-			}
-		}
-		if (match) {
-			inheritedTraits.push_back(traitClassName);
-		}
-	}
-}
-
 void mvceditor::ResourceFinderClass::EnsureMatchesExist(std::vector<ResourceClass>& matches) {
 
 	// remove from matches that have a file that is no longer in the file system
@@ -1044,7 +1063,7 @@ void mvceditor::ResourceFinderClass::EnsureMatchesExist(std::vector<ResourceClas
 		// remove all cached resources from files that no longer exist
 		std::vector<int>::iterator it = std::unique(fileItemIdsToRemove.begin(), fileItemIdsToRemove.end());
 		fileItemIdsToRemove.resize(it - fileItemIdsToRemove.begin());
-		RemoveCachedResources(fileItemIdsToRemove);
+		RemovePersistedResources(fileItemIdsToRemove);
 	}
 }
 
@@ -1095,8 +1114,8 @@ void mvceditor::ResourceFinderClass::Print() {
 			for (size_t k = 0; k < trait.Aliased.size(); k++) {
 				u_fprintf(out, "\tALIASES METHOD=%S\n", trait.Aliased[k].getTerminatedBuffer());
 			}
-			for (size_t k = 0; k < trait.Excluded.size(); k++) {
-				u_fprintf(out, "\tEXCLUDED METHOD=%S\n", trait.Excluded[k].getTerminatedBuffer());
+			for (size_t k = 0; k < trait.InsteadOfs.size(); k++) {
+				u_fprintf(out, "\tINSTEADOF METHOD=%S\n", trait.InsteadOfs[k].getTerminatedBuffer());
 			}
 		}		
 		
@@ -1214,11 +1233,11 @@ void mvceditor::ResourceFinderClass::AddDynamicResources(const std::vector<mvced
 	// GetResourceMatchFullPathFromResource() and GetResourceMatchFullPath() will return empty for dynamic 
 	// resources since there is no source code we can show the user.
 	int fileItemIndex = -1;
-	PushIntoResourceCache(newResources, fileItemIndex);
+	PersistResources(newResources, fileItemIndex);
 	EndSearch();
 }
 
-void mvceditor::ResourceFinderClass::PushIntoFileCache(mvceditor::FileItemClass& fileItem) {
+void mvceditor::ResourceFinderClass::PersistFileItem(mvceditor::FileItemClass& fileItem) {
 	if (!IsCacheInitialized) {
 		return;
 	}
@@ -1249,7 +1268,7 @@ void mvceditor::ResourceFinderClass::PushIntoFileCache(mvceditor::FileItemClass&
 	fileItem.FileId = sqlite3_last_insert_rowid(backend->session_.conn_);
 }
 
-bool mvceditor::ResourceFinderClass::FindInFileCache(const wxString& fullPath, mvceditor::FileItemClass& fileItem) {
+bool mvceditor::ResourceFinderClass::FindFileItemByFullPathExact(const wxString& fullPath, mvceditor::FileItemClass& fileItem) {
 	if (!IsCacheInitialized) {
 		return false;
 	}
@@ -1272,41 +1291,6 @@ bool mvceditor::ResourceFinderClass::FindInFileCache(const wxString& fullPath, m
 		fileItem.IsParsed = isParsed != 0;
 	}	
 	return foundFile;
-}
-
-std::vector<mvceditor::FileItemClass> mvceditor::ResourceFinderClass::FileItems(const std::vector<int>& fileItemIds) {
-	std::vector<mvceditor::FileItemClass> fileItems;
-	if (!IsCacheInitialized || fileItemIds.empty()) {
-		return fileItems;
-	}
-	std::ostringstream stream;
-	for (size_t i = 0; i < fileItemIds.size(); ++i) {
-		stream << fileItemIds[i];
-		if (i < (fileItemIds.size() - 1)) {
-			stream << ",";
-		}
-	}
-	std::string ids = stream.str();
-	int fileItemId;
-	std::string fullPath;
-	std::tm tm;
-	int isParsed;
-	int isNew;
-	std::string sql = "SELECT file_item_id, full_path, last_modified, is_parsed, is_new FROM file_items WHERE file_item_id IN(" + ids + ")";
-	soci::statement stmt = (Session.prepare << sql,
-		soci::into(fileItemId), soci::into(fullPath), soci::into(tm), soci::into(isParsed), soci::into(isNew)
-	);
-	stmt.execute();
-	while (stmt.fetch()) {
-		mvceditor::FileItemClass fileItem;
-		fileItem.DateTime.Set(tm);
-		fileItem.FileId = fileItemId;
-		fileItem.FullPath = mvceditor::StringHelperClass::charToWx(fullPath.c_str());
-		fileItem.IsNew = isNew != 0;
-		fileItem.IsParsed = isParsed != 0;
-		fileItems.push_back(fileItem);
-	}
-	return fileItems;
 }
 
 std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::ResourceStatementMatches(std::string whereCond, bool doLimit) {
@@ -1510,7 +1494,7 @@ void mvceditor::ResourceFinderClass::Clear() {
 	Session.once << "DELETE FROM resources;";
 }
 
-void mvceditor::ResourceFinderClass::PushIntoResourceCache(const std::vector<mvceditor::ResourceClass>& resources, int fileItemId) {
+void mvceditor::ResourceFinderClass::PersistResources(const std::vector<mvceditor::ResourceClass>& resources, int fileItemId) {
 	if (!IsCacheInitialized) {
 		return;
 	}
@@ -1565,6 +1549,120 @@ void mvceditor::ResourceFinderClass::PushIntoResourceCache(const std::vector<mvc
 		isNative = it->IsNative;
 		stmt.execute(true);
 	}
+}
+
+void mvceditor::ResourceFinderClass::PersistTraits(
+	const std::map<UnicodeString, std::vector<mvceditor::TraitResourceClass>, UnicodeStringComparatorClass>& traitMap) {
+	if (!IsCacheInitialized) {
+		return;
+	}
+	std::string sql;
+	sql += "INSERT OR IGNORE INTO trait_resources(";
+	sql += "key, class_name, namespace_name, trait_name, ";
+	sql += "trait_namespace_name, aliases, instead_ofs) VALUES ("; 
+	sql += "?, ?, ?, ?, ";
+	sql += "?, ?, ?)";
+	std::string key;
+	std::string className;
+	std::string namespaceName;
+	std::string traitClassName;
+	std::string traitNamespaceName;
+	std::string aliases;
+	std::string insteadOfs;
+
+	soci::statement stmt = (Session.prepare << sql,
+		soci::use(key), soci::use(className), soci::use(namespaceName), soci::use(traitClassName),
+		soci::use(traitNamespaceName), soci::use(aliases), soci::use(insteadOfs)
+	);
+	std::map<UnicodeString, std::vector<mvceditor::TraitResourceClass>, UnicodeStringComparatorClass>::const_iterator it;
+	for (it = traitMap.begin(); it != traitMap.end(); ++it) {
+		std::vector<mvceditor::TraitResourceClass>::const_iterator trait;
+		for (trait = it->second.begin(); trait != it->second.end(); ++trait) {
+			key = mvceditor::StringHelperClass::IcuToChar(trait->Key);
+			className = mvceditor::StringHelperClass::IcuToChar(trait->ClassName);
+			namespaceName = mvceditor::StringHelperClass::IcuToChar(trait->NamespaceName);
+			traitClassName = mvceditor::StringHelperClass::IcuToChar(trait->TraitClassName);
+			traitNamespaceName = mvceditor::StringHelperClass::IcuToChar(trait->TraitNamespaceName);
+			aliases = "";
+			for (std::vector<UnicodeString>::const_iterator alias = trait->Aliased.begin(); alias != trait->Aliased.end(); ++alias) {
+				aliases += mvceditor::StringHelperClass::IcuToChar(*alias);
+				aliases += ",";
+			}
+			if (!aliases.empty()) {
+				aliases.erase(aliases.end() - 1);
+			}
+			insteadOfs = "";
+			for (std::vector<UnicodeString>::const_iterator instead = trait->InsteadOfs.begin(); instead != trait->InsteadOfs.end(); ++instead) {
+				insteadOfs += mvceditor::StringHelperClass::IcuToChar(*instead);
+				insteadOfs += ",";
+			}
+			if (!insteadOfs.empty()) {
+				insteadOfs.erase(insteadOfs.end() - 1);
+			}
+			stmt.execute(true);
+		}
+	}
+}
+
+std::vector<mvceditor::TraitResourceClass> mvceditor::ResourceFinderClass::FindTraitsByClassName(const std::vector<std::string>& keyStarts) {
+	std::string join = "";
+	for (size_t i = 0; i < keyStarts.size(); ++i) {
+		join += "'";
+		join += keyStarts[i];
+		join += "'";
+		if (i < (keyStarts.size() - 1)) {
+			join += ",";
+		}
+	}
+	
+	std::string sql = "SELECT key, class_name, namespace_name, trait_name, trait_namespace_name, aliases, instead_ofs ";
+	sql += "FROM trait_resources WHERE key IN(" + join + ")";
+	std::string key;
+	std::string className;
+	std::string namespaceName;
+	std::string traitClassName;
+	std::string traitNamespaceName;
+	std::string aliases;
+	std::string insteadOfs;
+	
+	soci::statement stmt = (Session.prepare << sql,
+		soci::into(key), soci::into(className), soci::into(namespaceName), soci::into(traitClassName),
+		soci::into(traitNamespaceName), soci::into(aliases), soci::into(insteadOfs)
+	);
+	std::vector<mvceditor::TraitResourceClass> matches;
+	if (stmt.execute()) {
+		while (stmt.fetch()) {
+			mvceditor::TraitResourceClass trait;
+			trait.Key = mvceditor::StringHelperClass::charToIcu(key.c_str());
+			trait.ClassName = mvceditor::StringHelperClass::charToIcu(className.c_str());
+			trait.NamespaceName = mvceditor::StringHelperClass::charToIcu(namespaceName.c_str());
+			trait.TraitClassName = mvceditor::StringHelperClass::charToIcu(traitClassName.c_str());
+			trait.TraitNamespaceName = mvceditor::StringHelperClass::charToIcu(traitNamespaceName.c_str());
+			
+			size_t start = 0;
+			size_t found = aliases.find_first_of(",");
+			while (found != std::string::npos) {
+				trait.Aliased.push_back(mvceditor::StringHelperClass::charToIcu(aliases.substr(start, found).c_str()));	
+				start = found++;
+			}
+			if (!aliases.empty()) {
+				trait.Aliased.push_back(mvceditor::StringHelperClass::charToIcu(aliases.substr(start, found).c_str()));
+			}
+
+			start = 0;
+			found = insteadOfs.find_first_of(",");
+			while (found != std::string::npos) {
+				trait.InsteadOfs.push_back(mvceditor::StringHelperClass::charToIcu(insteadOfs.substr(start, found).c_str()));	
+				start = found++;
+			}
+			if (!insteadOfs.empty()) {
+				trait.InsteadOfs.push_back(mvceditor::StringHelperClass::charToIcu(insteadOfs.substr(start, found).c_str()));
+			}
+
+			matches.push_back(trait);
+		}
+	}
+	return matches;
 }
 
 mvceditor::ResourceClass::ResourceClass()
@@ -1649,7 +1747,7 @@ mvceditor::ResourceClass mvceditor::ResourceClass::MakeNamespace(const UnicodeSt
 mvceditor::TraitResourceClass::TraitResourceClass() 
 	: TraitClassName()
 	, Aliased()
-	, Excluded() {
+	, InsteadOfs() {
 		
 }
 

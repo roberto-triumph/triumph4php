@@ -552,6 +552,11 @@ private:
 	 * trait info for each class that uses a trait. The trait cache will contain the
 	 * aliases and naming resolutions (insteadof). Since a single class can use multiple traits
 	 * the value is a vector, each item in the result vector represents one trait being used.
+	 * the key to this map is the current file item ID + class name + trait name being parsed
+	 * key is a concatenation of file item id, fully qualified class and fully qualified trait
+	 * this will make the alias and instead easier to update.
+	 * the value will always be a 2 item vector: item 0 is the fully qualified key and 
+	 * item 1 is the class only key
 	 */
 	std::map<UnicodeString, std::vector<TraitResourceClass>, UnicodeStringComparatorClass> TraitCache;
 	
@@ -625,7 +630,7 @@ private:
 	 * 
 	 * @param fileItemids the list of file_item_id that will be deleted from the SQLite database.
 	 */
-	void RemoveCachedResources(const std::vector<int>& fileItemIds);
+	void RemovePersistedResources(const std::vector<int>& fileItemIds);
 	
 	/**
 	 * Collects all resources that are files and match the parsed Resource [given to Prepare()]. 
@@ -663,9 +668,9 @@ private:
 	std::vector<ResourceClass> CollectAllMembers(const std::vector<UnicodeString>& classNames);
 	
 	/**
-	 * collect all of the resources from all of the traits used by the given class
+	 * collect all of the resources from all of the traits used by the given classes
 	 */
-	std::vector<ResourceClass> CollectAllTraitMembers(const UnicodeString& className);
+	std::vector<ResourceClass> CollectAllTraitMembers(const std::vector<UnicodeString>& classNames);
 	
 	/**
 	 * Extracts the parent class from a class signature.  The class signature, as parsed by the parser contains a string
@@ -681,20 +686,6 @@ private:
 	 * If the file was deleted, then the match is invalidated and the cache for that file removed.
 	 */
 	void EnsureMatchesExist(std::vector<ResourceClass>& matches);
-
-	/**
-	 * create a new entry in the file cache. The item's FileId member will be set as well.
-	 */
-	void PushIntoFileCache(mvceditor::FileItemClass& fileItem);
-
-	/**
-	 * find the FileItem entry that has the given FullPath.
-	 * @param fullPath the full path to search for
-	 * @param fileItem the FileItem itself will be copied here (if found)
-	 * @return bool if TRUE it means that this ResourceFinder has encountered the given
-	 * file before.
-	 */
-	bool FindInFileCache(const wxString& fullPath, mvceditor::FileItemClass& fileItem);
 	
 	/**
 	 * Get all of the traits that a given class uses. Checking is 
@@ -704,13 +695,6 @@ private:
 	 * @param inheritedTraits the list of traits will be appended to this vector
 	 */
 	void InheritedTraits(const UnicodeString& fullyQualifiedClassName, std::vector<UnicodeString>& inheritedTraits);
-	
-	/**
-	 * bulk get operation for the given file item Ids.
-	 * @param fileItemIds the file items to get from the database
-	 * @return vector of file items that correspond to the given Ids
-	 */
-	std::vector<mvceditor::FileItemClass> FileItems(const std::vector<int>& fileItemIds);
 
 	/**
 	 * @param whereCond the WHERE clause of the query to execute (query will be into the resources table)
@@ -759,11 +743,40 @@ private:
 	std::vector<mvceditor::ResourceClass> FindByIdentifierStartAndTypes(const std::string& identifierStart, const std::vector<int>& types, bool doLimit);
 
 	/**
+	 * Write the file item into the database. The item's FileId member will be set as well.
+	 */
+	void PersistFileItem(mvceditor::FileItemClass& fileItem);
+
+	/**
+	 * Find the FileItem entry that has the given full path (exact, case insensitive search into
+	 * the database).
+	 *
+	 * @param fullPath the full path to search for
+	 * @param fileItem the FileItem itself will be copied here (if found)
+	 * @return bool if TRUE it means that this ResourceFinder has encountered the given
+	 * file before.
+	 */
+	bool FindFileItemByFullPathExact(const wxString& fullPath, mvceditor::FileItemClass& fileItem);
+
+	/**
 	 * add all of the given resources into the database.
 	 * @param resources the list of resources that were parsed out
 	 * @param int the file that the resources are located in
 	 */
-	void PushIntoResourceCache(const std::vector<mvceditor::ResourceClass>& resources, int fileitemId);
+	void PersistResources(const std::vector<mvceditor::ResourceClass>& resources, int fileitemId);
+
+	/**
+	 * add all of the given trait resources into the database.
+	 * @param traits the map of resources that were parsed out
+	 */
+	void PersistTraits(
+		const std::map<UnicodeString, std::vector<mvceditor::TraitResourceClass>, UnicodeStringComparatorClass>& traitMap);
+
+
+	/**
+	 * @return all of the traits that any of the given classes use.
+	 */
+	std::vector<mvceditor::TraitResourceClass> FindTraitsByClassName(const std::vector<std::string>& keyStarts);
 
 	/**
 	 * check the database AND the current file's parsed cache to see if the namespace has been seen
@@ -938,10 +951,36 @@ class TraitResourceClass {
 	
 public:
 
+	/**
+	 * the key is used to perform lookups into this table. The key will be either
+	 * 1. The name of the class that uses a trait (same as ClassName property)
+	 * 2. The fully qualified name of the class that uses the trait (concatenation of NamespaceName and ClassName)
+	 */
+	UnicodeString Key;
+
+	/**
+	 * the name of the class that uses a trait. This is the name of the class only
+	 * (no namespace)
+	 */
+	UnicodeString ClassName;
+
 	/** 
-	 * the fully qualified name of the trait being used
+	 * the namespace of the class that uses the trait. This will be "\" if the class is
+	 * in the root namespace
+	 */
+	UnicodeString NamespaceName;
+
+	/** 
+	 * the name of the class of the trait that is being used. This is the name of the class only
+	 * (no namespace)
 	 */
 	UnicodeString TraitClassName;
+
+	/**
+	 * the namespace of the trait being used. This will be "\" if the trait is
+	 * in the root namespace
+	 */
+	UnicodeString TraitNamespaceName;
 	
 	/**
 	 * The names of any aliases
@@ -952,7 +991,7 @@ public:
 	 * the names of any class names excluded from being used by the
 	 * 'insteadof' operator
 	 */
-	std::vector<UnicodeString> Excluded;
+	std::vector<UnicodeString> InsteadOfs;
 	
 	TraitResourceClass();
 };

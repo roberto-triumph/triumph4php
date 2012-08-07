@@ -1284,13 +1284,23 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraits) 
 		"    /* ... */ "
 		"}"
 	));
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("ezcReflectionMethod::getReturn"));
+	
+	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("ezcReflectionMethod::getReturn"));
+	
+	// tell the resource finder to look for traits
+	std::vector<UnicodeString> traits;
+	traits.push_back(UNICODE_STRING_SIMPLE("ezcReflectionReturnInfo"));
+	resourceSearch.SetTraits(traits);
+
+	Matches = ResourceFinder.CollectNearMatchResources(resourceSearch);
+
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_MEMBER_RESOURCE("ezcReflectionReturnInfo", "getReturnType", Matches[0]);
 	CHECK_UNISTR_EQUALS("getReturnType", Matches[0].Identifier);
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraitsWhenLookingForAllMethods) {
+	ResourceFinder.InitFile(wxFileName(wxT("c:\\users\\rperpuly\\desktop\\t.db")));
 	ResourceFinder.SetVersion(pelet::PHP_54); 
 	Prep(mvceditor::StringHelperClass::charToIcu(
 		"trait ezcReflectionReturnInfo { "
@@ -1306,10 +1316,18 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraitsWh
 		"	 }"
 		"}"
 	));
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("ezcReflectionMethod::"));
-	CHECK_VECTOR_SIZE(3, Matches);
+	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("ezcReflectionMethod::"));
+	
+	// tell the resource finder to look for traits
+	std::vector<UnicodeString> traits;
+	traits.push_back(UNICODE_STRING_SIMPLE("ezcReflectionReturnInfo"));
+	traits.push_back(UNICODE_STRING_SIMPLE("ezcReflectionFunctionInfo"));
+	resourceSearch.SetTraits(traits);
+
+	Matches = ResourceFinder.CollectNearMatchResources(resourceSearch);
 	
 	// for now just show both the aliased and original methods
+	CHECK_VECTOR_SIZE(3, Matches);
 	CHECK_MEMBER_RESOURCE("ezcReflectionReturnInfo", "getFunctionReturnType", Matches[0]);
 	CHECK_UNISTR_EQUALS("getFunctionReturnType", Matches[0].Identifier);
 	CHECK_MEMBER_RESOURCE("ezcReflectionFunctionInfo", "getReturnType", Matches[1]);

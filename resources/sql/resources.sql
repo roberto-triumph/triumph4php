@@ -75,6 +75,8 @@ CREATE TABLE IF NOT EXISTS resources (
 	-- 4. for namespaces, the key will always be the fully qualified namespace
 	--
 	-- storing it as case-insensitive because we always want to do case-insensitive lookups
+	-- Note that the key is not necessarily unique; 2 different files may declare the same
+	-- class / methods / functions.
 	key TEXT COLLATE NOCASE,
 	
 	-- the identifier is the lexeme of the resource. 
@@ -151,8 +153,56 @@ CREATE TABLE IF NOT EXISTS resources (
 	is_native INTEGER
 );
 
+-- This table stores all of the trait relationships that have been found by MVC Editor.
+-- note that this table will have "duplicate" entries for each trait.
+-- One entry will be as it was found in the source
+-- and one will be the "fully qualified" entry.  This will make it easy to
+-- perform all lookups using a single index (this is the purpose of the key
+-- column).
+CREATE TABLE IF NOT EXISTS trait_resources (
+
+	-- the key is used to perform lookups into this table. The key will be either
+	-- 1. The name of the class that uses a trait (same as class_name column)
+	-- 2. The fully qualified name of the class that uses the trait (concatenation of namespace_name and class_name)
+	-- storing it as case-insensitive because we always want to do case-insensitive lookups
+	key TEXT COLLATE NOCASE,
+	
+	-- the name of the class that uses a trait. This is the name of the class only
+	-- (no namespace)
+	-- storing it as case-insensitive because we always want to do case-insensitive lookups
+	class_name TEXT COLLATE NOCASE,
+	
+	-- the namespace of the class that uses the trait. This will be "\" if the class is
+	-- in the root namespace
+	-- storing it as case-insensitive because we always want to do case-insensitive lookups
+	namespace_name TEXT COLLATE NOCASE,
+	
+	-- the name of the class of the trait that is being used. This is the name of the class only
+	-- (no namespace)
+	-- storing it as case-insensitive because we always want to do case-insensitive lookups
+	trait_name TEXT COLLCATE NOCASE,
+	
+	-- the namespace of the trait being used. This will be "\" if the trait is
+	-- in the root namespace
+	-- storing it as case-insensitive because we always want to do case-insensitive lookups
+	trait_namespace_name TEXT COLLATE NOCASE,
+	
+	-- a comma-separated list of all of the aliased methods from the trait
+	aliases TEXT,
+	
+	-- a comma-separated list of all of the "insteadof" traits
+	instead_ofs TEXT
+);
+
 -- to enable fast lookups for file paths
 CREATE UNIQUE INDEX IF NOT EXISTS idxFullPath ON file_items(full_path);
 
--- to enable fast lookups for resources
+-- to enable fast lookups for resources.
+-- Note that the key is not necessarily unique; 2 different files may declare the same
+-- class / methods / functions.
 CREATE INDEX IF NOT EXISTS idxResourceKey ON resources(key, type);
+
+-- to enable fast lookups for traits.
+-- Note that the key is not necessarily unique; 2 different files may declare the same
+-- class / methods / functions.
+CREATE INDEX IF NOT EXISTS idxTraitKey ON trait_resources(key);
