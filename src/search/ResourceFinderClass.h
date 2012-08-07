@@ -423,6 +423,7 @@ public:
 	 *        looking at the trait conflict resolution (insteadof). In this case, returned traits will have been checked and
 	 *        passed the insteadof operator.
 	 * @param return vector UnicodeString the class' most immediate used traits (ie won't return the traits' traits). 
+	 *        returned vector is not guaranteed to be in any order
 	 */
 	std::vector<UnicodeString> GetResourceTraits(const UnicodeString& className, const UnicodeString& methodName);
 	
@@ -668,9 +669,12 @@ private:
 	std::vector<ResourceClass> CollectAllMembers(const std::vector<UnicodeString>& classNames);
 	
 	/**
-	 * collect all of the resources from all of the traits used by the given classes
+	 * collect all of the methods that are aliased from all of the traits used by the given classes
+	 * @param classNames the names of the classes to search  in. these are the classes that use the
+	 *        traits
+	 * @param methodName if non-empty then only aliases that begin with this name will be returned
 	 */
-	std::vector<ResourceClass> CollectAllTraitMembers(const std::vector<UnicodeString>& classNames);
+	std::vector<ResourceClass> CollectAllTraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName);
 	
 	/**
 	 * Extracts the parent class from a class signature.  The class signature, as parsed by the parser contains a string

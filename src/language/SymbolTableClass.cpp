@@ -128,7 +128,7 @@ static bool IsStaticExpression(const pelet::ExpressionClass& parsedExpression) {
 }
 
 /**
- * @return vector of all of the classes that are parent classes or used traits of the given
+ * @return vector of all of the classes that are parent classes of the given
  *         class. this method will search across all resource finders
  */
 static std::vector<UnicodeString> ClassParents(UnicodeString className, UnicodeString methodName, 
@@ -156,6 +156,10 @@ static std::vector<UnicodeString> ClassParents(UnicodeString className, UnicodeS
 	return parents;
 }
 
+/**
+ * @return vector of all of the traits that are used by any of the given class or parent classes.
+ *         This method will search across all resource finders
+ */
 static std::vector<UnicodeString> ClassUsedTraits(const UnicodeString& className, 
 												  const std::vector<UnicodeString>& parentClassNames, 
 												  const UnicodeString& methodName, 
@@ -180,6 +184,8 @@ static std::vector<UnicodeString> ClassUsedTraits(const UnicodeString& className
 				}
 			}
 		}
+
+		// next, look for traits used by the traits themselves
 		classesToLookup = nextTraitsToLookup;
 	} while (found);
 

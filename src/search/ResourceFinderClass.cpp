@@ -465,20 +465,22 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNearMatchMembers(const mvceditor::ResourceSearchClass& resourceSearch) {
 	std::vector<mvceditor::ResourceClass> matches;
 	
-	// look for the parent classes. when we are searching for members, we want to look
-	// for members from the class or any class it inherited from
-	std::vector<UnicodeString> parentClassNames = resourceSearch.GetParentClasses();
-	parentClassNames.push_back(resourceSearch.GetClassName());
+	// when looking for members we need to look
+	// 1. in the class itself
+	// 2. in any parent classes
+	// 3. in any used traits
+	std::vector<UnicodeString> classesToSearch = resourceSearch.GetParentClasses();
+	classesToSearch.push_back(resourceSearch.GetClassName());
 	std::vector<UnicodeString> traits = resourceSearch.GetTraits();
-	traits.push_back(resourceSearch.GetClassName());
+	classesToSearch.insert(classesToSearch.end(), traits.begin(), traits.end());
 
 	if (resourceSearch.GetMethodName().isEmpty()) {
 		
 		// special case; query for all methods for a class (UserClass::)
-		std::vector<mvceditor::ResourceClass> memberMatches = CollectAllMembers(parentClassNames);
+		std::vector<mvceditor::ResourceClass> memberMatches = CollectAllMembers(classesToSearch);
 
 		//get the methods that belong to a used trait
-		std::vector<mvceditor::ResourceClass> traitMatches = CollectAllTraitMembers(traits);
+		std::vector<mvceditor::ResourceClass> traitMatches = CollectAllTraitAliases(classesToSearch, UNICODE_STRING_SIMPLE(""));
 
 		matches.insert(matches.end(), memberMatches.begin(), memberMatches.end());
 		matches.insert(matches.end(), traitMatches.begin(), traitMatches.end());
@@ -507,19 +509,18 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 		// now that we found the parent classes, combine the parent class name and the queried method
 		// to make all of the keys we need to look for. remember that a resource class key is of the form
 		// ClassName::MethodName
-		for (std::vector<UnicodeString>::iterator it = parentClassNames.begin(); it != parentClassNames.end(); ++it) {
-			std::string keyStart = mvceditor::StringHelperClass::IcuToChar(*it);
-			keyStart += "::";
-			keyStart += mvceditor::StringHelperClass::IcuToChar(resourceSearch.GetMethodName());
-			keyStarts.push_back(keyStart);
-		}
-		for (std::vector<UnicodeString>::iterator it = traits.begin(); it != traits.end(); ++it) {
+		for (std::vector<UnicodeString>::iterator it = classesToSearch.begin(); it != classesToSearch.end(); ++it) {
 			std::string keyStart = mvceditor::StringHelperClass::IcuToChar(*it);
 			keyStart += "::";
 			keyStart += mvceditor::StringHelperClass::IcuToChar(resourceSearch.GetMethodName());
 			keyStarts.push_back(keyStart);
 		}
 		matches = FindByKeyStartMany(keyStarts, true);
+
+		// get any aliases
+		std::vector<mvceditor::ResourceClass> traitMatches = CollectAllTraitAliases(classesToSearch, resourceSearch.GetMethodName());
+		matches.insert(matches.end(), traitMatches.begin(), traitMatches.end());
+			
 	}
 	return matches;
 }
@@ -536,7 +537,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectAll
 	return matches;
 }
 
-std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectAllTraitMembers(const std::vector<UnicodeString>& classNames) {
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectAllTraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName) {
 	std::vector<mvceditor::ResourceClass> matches;
 
 	std::vector<std::string> classNamesToLookFor;
@@ -546,32 +547,23 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectAll
 
 	// TODO use the correct namespace when querying for traits
 	std::vector<mvceditor::TraitResourceClass> traits = FindTraitsByClassName(classNamesToLookFor);
-	for (size_t j = 0; j < traits.size(); ++j) {
-		
-		// lets unqualify, the members cache key does not have the namespace name
-		UnicodeString key =  traits[j].TraitClassName + UNICODE_STRING_SIMPLE("::");
-		
-		std::string stdKey = mvceditor::StringHelperClass::IcuToChar(key);
-		std::vector<mvceditor::ResourceClass> traitMatches = FindByKeyStart(stdKey, true);
-		for (std::vector<mvceditor::ResourceClass>::iterator traitMember = traitMatches.begin(); traitMember != traitMatches.end(); ++traitMember) {
-			
-			// make sure we got the trait from the correct namespace
-			if (traits[j].NamespaceName.caseCompare(traitMember->NamespaceName, 0) == 0) {
-				matches.push_back(*traitMember);
-			}
-		}
-		
-		
-	}
 	
-	// now go through the result and change the method names of any aliased 
+	// now go through the result and add the method names of any aliased methods
+	UnicodeString lowerMethodName(methodName);
+	lowerMethodName.toLower();
 	for (size_t i = 0; i < traits.size(); i++) {
 		std::vector<UnicodeString> aliases = traits[i].Aliased;
 		for (size_t a = 0; a < aliases.size(); a++) {
-			mvceditor::ResourceClass res;
-			res.ClassName = traits[i].TraitClassName;
-			res.Identifier = aliases[a];
-			matches.push_back(res);
+			UnicodeString alias(aliases[a]);
+			UnicodeString lowerAlias(alias);
+			lowerAlias.toLower();
+			bool useAlias = methodName.isEmpty() || lowerMethodName.indexOf(lowerAlias) == 0;
+			if (useAlias) {
+				mvceditor::ResourceClass res;
+				res.ClassName = traits[i].TraitClassName;
+				res.Identifier = alias;
+				matches.push_back(res);
+			}
 		}
 	}
 	return matches;
@@ -754,7 +746,16 @@ void mvceditor::ResourceFinderClass::TraitUseFound(const UnicodeString& namespac
 		newTraitResource.TraitClassName.setTo(fullyQualifiedTraitName, 0, pos);
 		newTraitResource.TraitNamespaceName.setTo(fullyQualifiedTraitName, pos + 1);
 	}
+	else if (0 == pos) {
+
+		// root namespace
+		newTraitResource.TraitClassName.setTo(fullyQualifiedTraitName, 1);
+		newTraitResource.TraitNamespaceName.setTo(UNICODE_STRING_SIMPLE("\\"));
+	}
 	else {
+
+		//this should never get here as the parser will always give us 
+		// fully qualified trait names
 		newTraitResource.TraitClassName = fullyQualifiedTraitName;
 		newTraitResource.TraitNamespaceName = UNICODE_STRING_SIMPLE("\\");
 	}
@@ -1630,8 +1631,8 @@ std::vector<mvceditor::TraitResourceClass> mvceditor::ResourceFinderClass::FindT
 		soci::into(traitNamespaceName), soci::into(aliases), soci::into(insteadOfs)
 	);
 	std::vector<mvceditor::TraitResourceClass> matches;
-	if (stmt.execute()) {
-		while (stmt.fetch()) {
+	if (stmt.execute(true)) {
+		do {
 			mvceditor::TraitResourceClass trait;
 			trait.Key = mvceditor::StringHelperClass::charToIcu(key.c_str());
 			trait.ClassName = mvceditor::StringHelperClass::charToIcu(className.c_str());
@@ -1660,7 +1661,7 @@ std::vector<mvceditor::TraitResourceClass> mvceditor::ResourceFinderClass::FindT
 			}
 
 			matches.push_back(trait);
-		}
+		} while (stmt.fetch());
 	}
 	return matches;
 }

@@ -877,22 +877,15 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithTraitInDifferent
 	CompletionSymbolTable.SetVersion(pelet::PHP_54);
 	GlobalFinder.SetVersion(pelet::PHP_54);
 	Finder1.SetVersion(pelet::PHP_54);
+
 	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
 		"<?php\n"
-		"class TraitClass { \n"
+		"trait TraitClass { \n"
 		" function work() {}\n"
 		"}\n"
 	);
 	GlobalFinder.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
-	
-	// TODO need to add the trait code to both caches for now because
-	// the resource finder will look for trait methods from its own resource finder
-	// meaning that if the class that uses the trait is only in Finder1 
-	// and the trait class is only in GlobalFinder, this test will fail.
-	// This means that if the user creates a trait, then creates a new file
-	// then the user will not get code completion for trait methods until the
-	// project get re-indexed. will need to fix this.
-	Finder1.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
+
 	sourceCode = mvceditor::StringHelperClass::charToIcu(
 		"namespace Second { \n"
 		"class MyClass {\n"

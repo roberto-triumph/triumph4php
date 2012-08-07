@@ -31,7 +31,7 @@
 #include <wx/filefn.h>
 #include <wx/timer.h>
 #include <wx/tokenzr.h>
-
+#include <algorithm>
 
 /**
  * This is a fixture to test that the resource finder works with
@@ -1272,7 +1272,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchNamespaceQualifiedCl
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\Second\\Child\\MyClass"), Matches[0].Identifier);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraits) {
+TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraitMembers) {
 	ResourceFinder.SetVersion(pelet::PHP_54);
 	Prep(mvceditor::StringHelperClass::charToIcu(
 		"trait ezcReflectionReturnInfo { "
@@ -1300,7 +1300,6 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraits) 
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraitsWhenLookingForAllMethods) {
-	ResourceFinder.InitFile(wxFileName(wxT("c:\\users\\rperpuly\\desktop\\t.db")));
 	ResourceFinder.SetVersion(pelet::PHP_54); 
 	Prep(mvceditor::StringHelperClass::charToIcu(
 		"trait ezcReflectionReturnInfo { "
@@ -1334,6 +1333,33 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraitsWh
 	CHECK_UNISTR_EQUALS("getReturnType", Matches[1].Identifier);
 	CHECK_MEMBER_RESOURCE("ezcReflectionReturnInfo", "getReturnType", Matches[2]);
 	CHECK_UNISTR_EQUALS("getReturnType", Matches[2].Identifier);
+}
+
+TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceTraitsShouldReturnAllTraits) {
+	//ResourceFinder.InitFile(wxFileName(wxT("c:\\users\\rperpuly\\desktop\\t.db")));
+	ResourceFinder.SetVersion(pelet::PHP_54); 
+	Prep(mvceditor::StringHelperClass::charToIcu(
+		"trait ezcReflectionReturnInfo { "
+		"    function getReturnType() { } "
+		"} "
+		"trait ezcReflectionFunctionInfo { "
+		"    function getReturnType() {  } "
+		"} "
+		" "
+		"class ezcReflectionMethod { "
+		"    use ezcReflectionReturnInfo, ezcReflectionFunctionInfo { "
+		"		ezcReflectionReturnInfo::getReturnType as getFunctionReturnType; "
+		"	 }"
+		"}"
+	));
+	std::vector<UnicodeString> traits = ResourceFinder.GetResourceTraits(
+		UNICODE_STRING_SIMPLE("ezcReflectionMethod"), UNICODE_STRING_SIMPLE(""));
+	CHECK_VECTOR_SIZE(2, traits);
+
+	// because traits are not guaranteed to be in order
+	std::sort(traits.begin(), traits.end());
+	CHECK_UNISTR_EQUALS("ezcReflectionFunctionInfo", traits[0]);
+	CHECK_UNISTR_EQUALS("ezcReflectionReturnInfo", traits[1]);
 }
 
 TEST_FIXTURE(DynamicResourceTestClass, AddDynamicResourcesShouldWorkWithCollect) {
