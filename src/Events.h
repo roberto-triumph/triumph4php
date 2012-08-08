@@ -129,6 +129,15 @@ typedef void (wxEvtHandler::*FileSavedEventClassFunction)(FileSavedEventClass&);
     wxStaticCastEvent( FileSavedEventClassFunction, & fn ), (wxObject *) NULL ),
 
 /**
+ * This is a one-time event that gets generated after the application main
+ * window is first shown to the user. When this event is generated, all 
+ * settings have been loaded from the config files. Plugins should not
+ * do heavy work in any of the menu or config related methods; they should
+ * do their heavy work in this event handler.
+ */
+extern const wxEventType EVENT_APP_READY;
+
+/**
  * Notification that the projects list has been opened / closed or any project's source definitions have 
  * updated. This event is fired AFTER the framework
  * detection is complete; it is safe to access a project's database connections, dynamic

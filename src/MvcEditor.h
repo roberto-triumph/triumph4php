@@ -34,9 +34,38 @@
 #include <wx/app.h>
 #include <wx/event.h>
 #include <wx/string.h>
+#include <wx/Timer.h>
 #include <vector>
 
 namespace mvceditor {
+
+// defined below
+class AppClass;
+
+/**
+ * A timer for a single-use.  We use this to 
+ * generate a one-time ready event that plugins can
+ * listen for when they want to perform something
+ * right after the main frame has been shown to the
+ * user for the first time.
+ */
+class SingleTimerClass : wxTimer {
+
+public:
+
+	/**
+	 * create AND begin the timer
+	 */
+	SingleTimerClass(mvceditor::AppClass& app);
+
+	/**
+	 * when the timer ends, generate an EVENT_APP_READY event
+	 */
+	void Notify();
+
+	mvceditor::AppClass& App;
+
+};
 
 class AppClass : public wxApp {
 
@@ -110,15 +139,23 @@ private:
 	AppFrameClass* AppFrame;
 
 	/**
-	 * Will need to load preferences for the project before all others. This pointer just points to one of the Plugins
-	 * in the Plugin vector; no need to delete.
+	 * With this timer, we will generate an EVENT_APP_INITIALIZED after the
+	 * window is initially shown to the user. We want to show the main
+	 * window to the user as fast as possible to make the app seem
+	 * fast.
 	 */
-	ProjectPluginClass* ProjectPlugin;
+	mvceditor::SingleTimerClass* Timer;
 
 	/**
 	 * Shows the user various editor messages (not related to their code)
 	 */
 	EditorMessagesPluginClass* EditorMessagesPlugin;
+
+	/**
+	 * the single timer class will delete the itself once it 
+	 * has been completed.
+	 */
+	friend class SingleTimerClass;
 
 };
 

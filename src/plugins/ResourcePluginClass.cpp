@@ -168,8 +168,6 @@ void mvceditor::ResourcePluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 	GetResourceCache()->Clear();
 	GetResourceCache()->SetVersion(GetEnvironment()->Php.Version);
 	ProjectIndexMenu->Enable(App.Structs.HasSources() && FREE == State);
-	GetStatusBarWithGauge()->AddGauge(_("Preparing Resource Index"), ID_COUNT_FILES_GAUGE, 
-			StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 	GetResourceCache()->InitGlobal(mvceditor::NativeFunctionsAsset());
 	ResourceFileReader.InitProjectQueue(GetResourceCache(), App.Structs.Projects);
 	mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
@@ -228,8 +226,10 @@ void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
 		}
 		if (hasNext) {
 			mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
-			ResourceFileReader.StartReading(error);
-			wxASSERT(mvceditor::BackgroundFileReaderClass::NONE == error);
+			if (!ResourceFileReader.StartReading(error)) {
+				wxString msg = wxString::Format(wxT("background file reader error: %d"), error);
+				wxASSERT_MSG(FALSE, msg);
+			}
 			return;
 		}
 	}
@@ -655,7 +655,6 @@ BEGIN_EVENT_TABLE(mvceditor::ResourcePluginClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_RESOURCE + 3, mvceditor::ResourcePluginClass::OnJump)
 	EVT_UPDATE_UI(wxID_ANY, mvceditor::ResourcePluginClass::OnUpdateUi)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FILE_READ_COMPLETE, mvceditor::ResourcePluginClass::OnWorkComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ResourcePluginClass::OnWorkComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ResourcePluginClass::OnWorkInProgress)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::ResourcePluginClass::OnProjectsUpdated)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_RE_INDEX, mvceditor::ResourcePluginClass::OnCmdReIndex)

@@ -113,10 +113,12 @@ void mvceditor::StatusBarWithGaugeClass::RedrawGauges() {
 }
 
 void mvceditor::StatusBarWithGaugeClass::SetColumn0Text(const wxString &text) {
+	RedrawGauges();
 	SetStatusText(text, 0);
 }
 
 void mvceditor::StatusBarWithGaugeClass::SetColumn1Text(const wxString &text) {
+	RedrawGauges();
 	SetStatusText(text, 1);
 }
 

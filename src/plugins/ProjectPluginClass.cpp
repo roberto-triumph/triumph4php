@@ -217,7 +217,7 @@ void mvceditor::ProjectPluginClass::OnProjectExploreOpenFile(wxCommandEvent& eve
 	}
 }
 
-void mvceditor::ProjectPluginClass::ProjectOpenDefault() {
+void mvceditor::ProjectPluginClass::OnAppReady(wxCommandEvent& event) {
 	DirectoriesToDetect.clear();
 	std::vector<mvceditor::SourceClass> allSources = App.Structs.AllEnabledSources();
 	if (!allSources.empty()) {
@@ -303,7 +303,8 @@ void mvceditor::ProjectPluginClass::OnProjectDefine(wxCommandEvent& event) {
 		// clear the detected framework info
 		App.Structs.Frameworks.clear();
 		App.Structs.Infos.clear();
-		ProjectOpenDefault();
+		wxCommandEvent readyEvt(mvceditor::EVENT_APP_READY);
+		OnAppReady(readyEvt);
 	}
 }
 
@@ -539,4 +540,5 @@ BEGIN_EVENT_TABLE(mvceditor::ProjectPluginClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_DETECTION_FAILED, mvceditor::ProjectPluginClass::OnFrameworkDetectionFailed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::ProjectPluginClass::OnFrameworkDetectionInProgress)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_UPDATED, mvceditor::ProjectPluginClass::SavePreferences)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::ProjectPluginClass::OnAppReady)
 END_EVENT_TABLE()

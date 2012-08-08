@@ -52,12 +52,6 @@ public:
 	~ProjectPluginClass();
 
 	/**
-	 * Opens the projects that are setup in App.Structs. It will be the ones that were opened on the last
-	 * run of the program, or ones that were updated by the user..
-	 */
-	void ProjectOpenDefault();
-
-	/**
 	 * Add menu items to the file menu
 	 */
 	void AddFileMenuItems(wxMenu* fileMenu);
@@ -116,6 +110,12 @@ private:
 	 * Open up a dialog so that the user can add more source directories
 	 */
 	void OnProjectDefine(wxCommandEvent& event);
+
+	/**
+	 * Opens the projects that are setup in App.Structs. It will be the ones that were opened on the last
+	 * run of the program, or ones that were updated by the user..
+	 */
+	void OnAppReady(wxCommandEvent& event);
 
 	/**
 	 * This object will be used to detct the various PHP framework artifacts (resources,

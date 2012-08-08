@@ -58,7 +58,9 @@ wxEvent* mvceditor::FileSavedEventClass::Clone() const {
 	return newEvt;
 }
 
+
 const wxEventType mvceditor::EVENT_PLUGIN_FILE_SAVED = wxNewEventType();
+const wxEventType mvceditor::EVENT_APP_READY = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_FILE_OPENED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_FILE_CLOSED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_PROJECTS_UPDATED = wxNewEventType();

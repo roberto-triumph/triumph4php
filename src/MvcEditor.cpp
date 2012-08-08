@@ -52,9 +52,9 @@ mvceditor::AppClass::AppClass()
 	, EventSink()
 	, Plugins()
 	, Preferences()
-	, ProjectPlugin(NULL) 
 	, EditorMessagesPlugin(NULL) {
 	AppFrame = NULL;
+	Timer = NULL;
 }
 
 /**
@@ -81,9 +81,6 @@ bool mvceditor::AppClass::OnInit() {
 	}	
 	Preferences.Load(AppFrame);
 
-	// open the default project
-	ProjectPlugin->ProjectOpenDefault();
-
 	AppFrame->AuiManagerUpdate();
 	if (CommandLine()) {
 		SetTopWindow(AppFrame);
@@ -94,12 +91,17 @@ bool mvceditor::AppClass::OnInit() {
 		// pointer will be managed by wxWidgets
 		// need to put this here because the logger needs an initialized window state
 		wxLog::SetActiveTarget(new mvceditor::EditorMessagesLoggerClass(*EditorMessagesPlugin));
+		Timer = new mvceditor::SingleTimerClass(*this);
 		return true;
 	}
 	return false;
 }
 
 mvceditor::AppClass::~AppClass() {
+	if (Timer) {
+		Timer->Stop();
+		delete Timer;
+	}
 	DeletePlugins();
 	
 	// calling cleanup here so that we can run this binary through a memory leak detector 
@@ -160,19 +162,18 @@ void mvceditor::AppClass::CreatePlugins() {
 
 	plugin = new EnvironmentPluginClass(*this);
 	Plugins.push_back(plugin);
-
-	// we want to keep a reference to this plugin
-	// we need to load the project options before all others
-	ProjectPlugin = new ProjectPluginClass(*this);
-	Plugins.push_back(ProjectPlugin);
+	plugin = new ProjectPluginClass(*this);
+	Plugins.push_back(plugin);
 	plugin = new OutlineViewPluginClass(*this);
 	Plugins.push_back(plugin);
 	plugin = new LintPluginClass(*this);
 	Plugins.push_back(plugin);
 	plugin = new SqlBrowserPluginClass(*this);
 	Plugins.push_back(plugin);
+
 	EditorMessagesPlugin = new mvceditor::EditorMessagesPluginClass(*this);
 	Plugins.push_back(EditorMessagesPlugin);
+
 	plugin = new CodeIgniterPluginClass(*this);
 	Plugins.push_back(plugin);
 	plugin = new RunBrowserPluginClass(*this);
@@ -207,5 +208,22 @@ void mvceditor::AppClass::DeletePlugins() {
 	}
 	Plugins.clear();
 	EditorMessagesPlugin = NULL;
-	ProjectPlugin = NULL;
+}
+
+mvceditor::SingleTimerClass::SingleTimerClass(mvceditor::AppClass& app)
+	: wxTimer()
+	, App(app) {
+	Start(1000, wxTIMER_ONE_SHOT);
+}
+
+void mvceditor::SingleTimerClass::Notify() {
+	
+	// tell all plugins that the app is ready to use
+	// the plugins will do / should do  their grunt
+	// work in their event handler
+	wxCommandEvent evt(mvceditor::EVENT_APP_READY);
+	App.EventSink.Publish(evt);
+
+	// we no longer need the timer
+	delete App.Timer;
 }
