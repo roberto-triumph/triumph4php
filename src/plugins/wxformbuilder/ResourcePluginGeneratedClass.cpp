@@ -68,16 +68,25 @@ ResourceSearchDialogGeneratedClass::ResourceSearchDialogGeneratedClass( wxWindow
 	SearchText = new wxTextCtrl( this, ID_SEARCHTEXT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	FlexGridSizer->Add( SearchText, 1, wxALL|wxEXPAND, 5 );
 	
-	ResultsLabel = new wxStaticText( this, ID_RESULTSLABEL, _("Status: OK"), wxDefaultPosition, wxDefaultSize, 0 );
-	ResultsLabel->Wrap( -1 );
-	FlexGridSizer->Add( ResultsLabel, 0, wxALL|wxEXPAND, 5 );
+	wxBoxSizer* bSizer4;
+	bSizer4 = new wxBoxSizer( wxHORIZONTAL );
+	
+	MatchesLabel = new wxStaticText( this, wxID_ANY, _("Matches: None"), wxDefaultPosition, wxDefaultSize, 0 );
+	MatchesLabel->Wrap( -1 );
+	bSizer4->Add( MatchesLabel, 1, wxALL|wxEXPAND, 5 );
+	
+	CacheStatusLabel = new wxStaticText( this, wxID_ANY, _("Cache Status: OK       "), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
+	CacheStatusLabel->Wrap( -1 );
+	bSizer4->Add( CacheStatusLabel, 1, wxALL, 5 );
+	
+	FlexGridSizer->Add( bSizer4, 1, wxEXPAND, 5 );
 	
 	wxBoxSizer* ChecklistSizer;
 	ChecklistSizer = new wxBoxSizer( wxHORIZONTAL );
 	
-	wxArrayString ResultsChoices;
-	Results = new wxCheckListBox( this, ID_RESULTS, wxDefaultPosition, wxDefaultSize, ResultsChoices, 0 );
-	ChecklistSizer->Add( Results, 1, wxALL|wxEXPAND, 5 );
+	wxArrayString MatchesListChoices;
+	MatchesList = new wxCheckListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, MatchesListChoices, 0 );
+	ChecklistSizer->Add( MatchesList, 1, wxALL|wxEXPAND, 5 );
 	
 	FlexGridSizer->Add( ChecklistSizer, 1, wxEXPAND, 5 );
 	
@@ -102,7 +111,7 @@ ResourceSearchDialogGeneratedClass::ResourceSearchDialogGeneratedClass( wxWindow
 	SearchText->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( ResourceSearchDialogGeneratedClass::OnSearchKeyDown ), NULL, this );
 	SearchText->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnSearchText ), NULL, this );
 	SearchText->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnSearchEnter ), NULL, this );
-	Results->Connect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnResultsDoubleClick ), NULL, this );
+	MatchesList->Connect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnResultsDoubleClick ), NULL, this );
 	ButtonsSizerCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnCancelButton ), NULL, this );
 	ButtonsSizerHelp->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnHelpButton ), NULL, this );
 	ButtonsSizerOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnOkButton ), NULL, this );
@@ -114,7 +123,7 @@ ResourceSearchDialogGeneratedClass::~ResourceSearchDialogGeneratedClass()
 	SearchText->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( ResourceSearchDialogGeneratedClass::OnSearchKeyDown ), NULL, this );
 	SearchText->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnSearchText ), NULL, this );
 	SearchText->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnSearchEnter ), NULL, this );
-	Results->Disconnect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnResultsDoubleClick ), NULL, this );
+	MatchesList->Disconnect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnResultsDoubleClick ), NULL, this );
 	ButtonsSizerCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnCancelButton ), NULL, this );
 	ButtonsSizerHelp->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnHelpButton ), NULL, this );
 	ButtonsSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ResourceSearchDialogGeneratedClass::OnOkButton ), NULL, this );

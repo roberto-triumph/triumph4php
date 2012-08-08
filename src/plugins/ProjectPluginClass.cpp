@@ -236,6 +236,7 @@ void mvceditor::ProjectPluginClass::OnAppReady(wxCommandEvent& event) {
 		}
 	}
 	else {
+
 		// still notify the plugins of the new project at program startup
 		// when the app starts the default project is opened
 		wxCommandEvent evt(mvceditor::EVENT_APP_PROJECTS_UPDATED);
@@ -274,7 +275,7 @@ void mvceditor::ProjectPluginClass::OnFrameworkDetectionFailed(wxCommandEvent& e
 			finished = false;
 		}
 	}
-	if (finished) {	
+	if (finished) {
 		wxCommandEvent projectOpenedEvent(mvceditor::EVENT_APP_PROJECTS_UPDATED);
 		App.EventSink.Publish(projectOpenedEvent);
 		mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();

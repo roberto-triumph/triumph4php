@@ -67,14 +67,13 @@ class ResourceSearchDialogGeneratedClass : public wxDialog
 			ID_RESOURCESEARCHDIALOGGENERATEDCLASS = 1000,
 			ID_SEARCHLABEL,
 			ID_SEARCHTEXT,
-			ID_RESULTSLABEL,
-			ID_RESULTS,
 		};
 		
 		wxStaticText* SearchLabel;
 		wxTextCtrl* SearchText;
-		wxStaticText* ResultsLabel;
-		wxCheckListBox* Results;
+		wxStaticText* MatchesLabel;
+		wxStaticText* CacheStatusLabel;
+		wxCheckListBox* MatchesList;
 		wxStdDialogButtonSizer* ButtonsSizer;
 		wxButton* ButtonsSizerOK;
 		wxButton* ButtonsSizerCancel;
@@ -92,7 +91,7 @@ class ResourceSearchDialogGeneratedClass : public wxDialog
 	
 	public:
 		
-		ResourceSearchDialogGeneratedClass( wxWindow* parent, wxWindowID id = ID_RESOURCESEARCHDIALOGGENERATEDCLASS, const wxString& title = _("Search For Resources"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 402,261 ), long style = wxDEFAULT_DIALOG_STYLE );
+		ResourceSearchDialogGeneratedClass( wxWindow* parent, wxWindowID id = ID_RESOURCESEARCHDIALOGGENERATEDCLASS, const wxString& title = _("Search For Resources"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 419,270 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~ResourceSearchDialogGeneratedClass();
 	
 };

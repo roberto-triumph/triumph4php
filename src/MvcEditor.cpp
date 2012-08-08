@@ -223,7 +223,4 @@ void mvceditor::SingleTimerClass::Notify() {
 	// work in their event handler
 	wxCommandEvent evt(mvceditor::EVENT_APP_READY);
 	App.EventSink.Publish(evt);
-
-	// we no longer need the timer
-	delete App.Timer;
 }

@@ -167,6 +167,12 @@ public:
 	 * @return bool
 	 */
 	bool NeedToIndex(const wxString& finderQuery) const;
+
+
+	/** 
+	 * returns a short string describing the status of the cache.
+	 */
+	wxString CacheStatus();
 	
 private:
 

@@ -197,15 +197,11 @@ void mvceditor::ResourcePluginClass::OnEnvironmentUpdated(wxCommandEvent& event)
 std::vector<mvceditor::ResourceClass> mvceditor::ResourcePluginClass::SearchForResources(const wxString& text) {
 	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
 	std::vector<mvceditor::ResourceClass> matches;
+	matches = resourceCache->CollectNearMatchResourcesFromAll(mvceditor::StringHelperClass::wxToIcu(text));
 
-	if (!NeedToIndex(text)) {	
+	// no need to show jump to results for native functions
+	RemoveNativeMatches(matches);
 
-		// if we know the indexing has already taken place lets just do the lookup; it will be quick.
-		matches = resourceCache->CollectNearMatchResourcesFromAll(mvceditor::StringHelperClass::wxToIcu(text));
-
-		// no need to show jump to results for native functions
-		RemoveNativeMatches(matches);
-	}
 	return matches;
 }
 
@@ -380,15 +376,6 @@ void mvceditor::ResourcePluginClass::OnJump(wxCommandEvent& event) {
 }
 
 void mvceditor::ResourcePluginClass::OnSearchForResource(wxCommandEvent& event) {
-	if (NeedToIndex(wxT("FakeClass"))) {
-		JumpToText = wxT("");
-		StartIndex();
-
-		// set the state here so that when indexing is done we know to
-		// open the search dialog.
-		State = GOTO;
-		return;
-	}
 	std::vector<mvceditor::ResourceClass> chosenResources;
 	wxString term;
 	mvceditor::ResourceSearchDialogClass dialog(GetMainWindow(), *this, term, chosenResources);
@@ -485,8 +472,15 @@ void mvceditor::ResourcePluginClass::RemoveNativeMatches(std::vector<mvceditor::
 	}
 }
 
+wxString mvceditor::ResourcePluginClass::CacheStatus() {
+	if (HasCodeLookups && HasFileLookups) {
+		return _("OK");
+	}
+	return _("Stale");
+}
+
 mvceditor::ResourceSearchDialogClass::ResourceSearchDialogClass(wxWindow* parent, ResourcePluginClass& resource,
-																wxString& term, 
+																wxString& term,
 																std::vector<mvceditor::ResourceClass>& chosenResources)
 	: ResourceSearchDialogGeneratedClass(parent)
 	, ResourcePlugin(resource)
@@ -494,33 +488,59 @@ mvceditor::ResourceSearchDialogClass::ResourceSearchDialogClass(wxWindow* parent
 	, MatchedResources() {
 	wxGenericValidator termValidator(&term);
 	TransferDataToWindow();
+	CacheStatusLabel->SetLabel(wxT("Cache Status: ") + resource.CacheStatus());
 }
 
 void mvceditor::ResourceSearchDialogClass::OnSearchText(wxCommandEvent& event) {
 	wxString text = SearchText->GetValue();
 	if (text.Length() > 3) {
-		if (!ResourcePlugin.NeedToIndex(text)) {
-			MatchedResources = ResourcePlugin.SearchForResources(text);
-			if (!MatchedResources.empty()) {
-				Results->Freeze();
-				ShowJumpToResults(text, MatchedResources);
-				Results->Thaw();
-			}
-			else {
-				Results->Clear();
-				ResultsLabel->SetLabel(_("No matches found"));
-			}
+		MatchedResources = ResourcePlugin.SearchForResources(text);
+		if (!MatchedResources.empty()) {
+			MatchesList->Freeze();
+			ShowJumpToResults(text, MatchedResources);
+			MatchesList->Thaw();
+		}
+		else {
+			MatchesList->Clear();
+			MatchesLabel->SetLabel(_("No matches found"));
 		}
 	}	
 }
 
 void mvceditor::ResourceSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
 	if (MatchedResources.size() == 1) {
+
+		// if there is only match, just take the user to it
 		TransferDataFromWindow();
 		ChosenResources.clear();
 		ChosenResources.push_back(MatchedResources[0]);
 		EndModal(wxOK);
 	}
+	else {
+		wxArrayInt selections;
+		if (MatchesList->GetSelections(selections)) {
+		
+			// open the checked items
+			for (size_t i = 0; i < selections.Count(); ++i) {
+				size_t matchIndex = selections.Item(i);
+				if (matchIndex >= 0 && matchIndex < MatchedResources.size()) {
+					ChosenResources.push_back(MatchedResources[matchIndex]);
+				}
+			}
+			EndModal(wxOK);
+		}
+		else {
+			// no checked items, take the user to the
+			// selected item
+			size_t selection = MatchesList->GetSelection();
+			if (selection >= 0 && selection < MatchedResources.size()) {
+				ChosenResources.push_back(MatchedResources[selection]);
+				EndModal(wxOK);
+			}
+		}
+
+	}
+
 }
 
 void mvceditor::ResourceSearchDialogClass::ShowJumpToResults(const wxString& finderQuery, const std::vector<mvceditor::ResourceClass>& allMatches) {
@@ -529,7 +549,7 @@ void mvceditor::ResourceSearchDialogClass::ShowJumpToResults(const wxString& fin
 	for (size_t i = 0; i < allMatches.size(); ++i) {
 		files.Add(allMatches[i].FullPath.GetFullPath());
 	}
-	Results->Clear();
+	MatchesList->Clear();
 	
 	// dont show the project path to the user
 	for (size_t i = 0; i < files.GetCount(); ++i) {
@@ -539,16 +559,16 @@ void mvceditor::ResourceSearchDialogClass::ShowJumpToResults(const wxString& fin
 			UnicodeString res = allMatches[i].ClassName + UNICODE_STRING_SIMPLE("::") + allMatches[i].Identifier;
 			shortName += wxT("  (") + mvceditor::StringHelperClass::IcuToWx(res) + wxT(")");
 		}
-		Results->Append(shortName);
+		MatchesList->Append(shortName);
 	}
-	ResultsLabel->SetLabel(wxString::Format(_("Found %d files. Please choose file(s) to open."), allMatches.size()));
+	MatchesLabel->SetLabel(wxString::Format(_("Found %d files. Please choose file(s) to open."), allMatches.size()));
 }
 
 void mvceditor::ResourceSearchDialogClass::OnOkButton(wxCommandEvent& event) {
 	TransferDataFromWindow();
 	ChosenResources.clear();
-	for (size_t i = 0; i < Results->GetCount(); ++i) {
-		if (Results->IsChecked(i)) {
+	for (size_t i = 0; i < MatchesList->GetCount(); ++i) {
+		if (MatchesList->IsChecked(i)) {
 			ChosenResources.push_back(MatchedResources[i]);
 		}
 	}
@@ -583,7 +603,10 @@ void mvceditor::ResourceSearchDialogClass::OnHelpButton(wxCommandEvent& event) {
 		"You can search entire class names\n"
 		"User:: (would match all methods including inherited methods, from User class)\n\n"
 		"You can search all methods\n"
-		"::print (would match all methods in all classes that start with 'print' )"
+		"::print (would match all methods in all classes that start with 'print' )\n\n"
+		"Cache Status:\n"
+		"The resource cache will be stale when the application is first opened and\n"
+		"will be OK after you have indexed the projects. "
 	);
 	help = wxGetTranslation(help);
 	wxMessageBox(help, _("Help"), wxOK);	
@@ -591,26 +614,26 @@ void mvceditor::ResourceSearchDialogClass::OnHelpButton(wxCommandEvent& event) {
 
 void mvceditor::ResourceSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 	int keyCode = event.GetKeyCode();
-	size_t selection = Results->GetSelection();
+	size_t selection = MatchesList->GetSelection();
 	if (keyCode == WXK_DOWN) {		
-		if (!Results->IsEmpty() && selection >= 0 && selection < (Results->GetCount() - 1)) {
-			Results->SetSelection(selection + 1);
+		if (!MatchesList->IsEmpty() && selection >= 0 && selection < (MatchesList->GetCount() - 1)) {
+			MatchesList->SetSelection(selection + 1);
 		}
-		else if (!Results->IsEmpty() && selection >= 0) {
+		else if (!MatchesList->IsEmpty() && selection >= 0) {
 
 			// cycle back to the beginning
-			Results->SetSelection(0);
+			MatchesList->SetSelection(0);
 		}
 		SearchText->SetFocus();
 	}
 	else if (keyCode == WXK_UP) {
-		if (!Results->IsEmpty() && selection > 0 && selection < Results->GetCount()) {
-			Results->SetSelection(selection - 1);
+		if (!MatchesList->IsEmpty() && selection > 0 && selection < MatchesList->GetCount()) {
+			MatchesList->SetSelection(selection - 1);
 		}
-		else if (!Results->IsEmpty() && selection == 0) {
+		else if (!MatchesList->IsEmpty() && selection == 0) {
 
 			// cycle back to the end
-			Results->SetSelection(Results->GetCount() - 1);
+			MatchesList->SetSelection(MatchesList->GetCount() - 1);
 		}
 		SearchText->SetFocus();
 	}
@@ -623,7 +646,7 @@ void mvceditor::ResourceSearchDialogClass::OnResultsDoubleClick(wxCommandEvent& 
 	TransferDataFromWindow();
 	ChosenResources.clear();
 	size_t selection = event.GetSelection();
-	if (selection >= 0 && selection < Results->GetCount()) {
+	if (selection >= 0 && selection < MatchesList->GetCount()) {
 		ChosenResources.push_back(MatchedResources[selection]);
 	}
 	if (ChosenResources.empty()) {

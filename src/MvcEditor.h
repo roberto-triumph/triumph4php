@@ -49,7 +49,7 @@ class AppClass;
  * right after the main frame has been shown to the
  * user for the first time.
  */
-class SingleTimerClass : wxTimer {
+class SingleTimerClass : public wxTimer {
 
 public:
 
@@ -150,12 +150,6 @@ private:
 	 * Shows the user various editor messages (not related to their code)
 	 */
 	EditorMessagesPluginClass* EditorMessagesPlugin;
-
-	/**
-	 * the single timer class will delete the itself once it 
-	 * has been completed.
-	 */
-	friend class SingleTimerClass;
 
 };
 
