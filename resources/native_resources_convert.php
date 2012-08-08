@@ -116,10 +116,10 @@ $insertStmt = $outputPdo->prepare('INSERT INTO resources(' .
 	'?, ?, ?, ?, ?, ?, ' .
 	'?, ?)'
 );
-
+$commentStatements = prepStatements($phdPdo);
 $if = fopen($tagsFile, 'rb');
 if ($if) {
-	$lineCount = 0;
+	$lineCount = 0;	
 	while (!feof($if)) {
 		$line = fgets($if);
 		if (strlen($line) > 0 && $line[0] == '!') {
@@ -149,15 +149,13 @@ if ($if) {
 		$type = ''; 
 		$namespaceName = '\\'; // the default namespace
 		$signature = ''; 
-		$comment = findComment($phdPdo, $identifier, $extensions); 
+		$comment = findComment($phdPdo, $identifier, $extensions, $commentStatements); 
 		$returnType = '';
 		$isProtected = 0;
 		$isPrivate = 0;
 		$isStatic = 0; 
 		$isDynamic = 0;
 		$isNative = 1;
-		
-		continue;
 		
 		$kind = strtolower($extensions['kind']);
 		if ('c' == $kind) {
@@ -236,6 +234,9 @@ else {
 }
 echo "done\n";
 
+/**
+ * creates the MVC editor resource database and creates the tables if necessary.
+ */
 function initOutputPdo(PDO $outputPdo) {
 	$outputPdo->query(file_get_contents(__DIR__ . './sql/resources.sql'));
 	
@@ -250,6 +251,14 @@ function initOutputPdo(PDO $outputPdo) {
 	
 }
 
+/**
+ * parses a column of a single tags file row into a map that has
+ * one key per extension. Returned array will always be the full
+ * name of the extension.
+ *
+ * @param $columns exploded line of tags file
+ * @return array associative array 
+ */
 function buildExtensions($columns) {
 	$extensions = array(
 		'kind' => '',
@@ -308,61 +317,131 @@ function buildExtensions($columns) {
 	return $extensions;
 }
 
-function findComment(PDO $phdPdo, $identifier, $extensions) {
-	$name = $identifier;
-	//echo "function_name=$name\n";
+/**
+ * prepares the SQL statements needed to query for comments from
+ * the PhD database.
+ *
+ * @parap PDO $phdPdo the connection to the PhD SQLite database
+ * @return array of prepared statements that read the PhD SQLite file
+ */
+function prepStatements(PDO $phdPdo) {
 	$changelogStmt = $phdPdo->prepare('SELECT version, change FROM changelogs WHERE function_name = ?');
 	$functionStmt = $phdPdo->prepare('SELECT purpose, return_type, return_description FROM functions WHERE name = ?');
 	$notesStmt = $phdPdo->prepare('SELECT type, description FROM notes WHERE function_name = ?');
 	$paramsStmt = $phdPdo->prepare('SELECT name, type, description, optional, initializer FROM params WHERE function_name = ?');
 	$seeAlsoStmt = $phdPdo->prepare('SELECT name, type, description FROM seealso WHERE function_name = ?');
+	return array(
+		'changelog' => $changelogStmt,
+		'function' => $functionStmt,
+		'notes' => $notesStmt,
+		'params' => $paramsStmt,
+		'seealso' => $seeAlsoStmt
+	);
+}
+
+/**
+ * Build the comment for the given tag.
+ *
+ * @param PDO $phdPdo the connection to the PhD database
+ * @param string $identifier the function name to look for
+ * @param array $extensions the tag extension; to get the class name if any
+ * @param array $commentStatements the prepared statements
+ * @return string the full comment
+ */
+function findComment(PDO $phdPdo, $identifier, $extensions, $commentStatements) {
+	$name = $identifier;
+	if ($extensions['class']) {
+		$name = $extensions['class'] . '.' . $identifier;
+	}
+	//echo "function_name=$name\n";
+	$changelogStmt = $commentStatements['changelog'];
+	$functionStmt = $commentStatements['function'];
+	$notesStmt = $commentStatements['notes'];
+	$paramsStmt = $commentStatements['params'];
+	$seeAlsoStmt = $commentStatements['seealso'];
 	
 	$comment = "";
 	
 	if ($functionStmt->execute(array($name))) {
 		$function = $functionStmt->fetch();
-		$comment .= $function['purpose'];
-		$comment .= "\nReturns: ";
-		$comment .= $function['return_type'] . "\n";
-		$comment .= $function['return_description'];
-		$comment .= "\n";
-		if ('apc_fetch' == $identifier) var_dump($function);
+		$functionBlock = '';
+		if (strlen($function['purpose'])) {
+			$functionBlock .= clean($function['purpose']);
+		}
+		if (strlen($function['return_type'])) {
+			$functionBlock .= "\nReturns: " . clean($function['return_type']) . "\n";
+		}
+		if (strlen($function['return_description'])) {
+			$functionBlock .= clean($function['return_description']);
+			$functionBlock .= "\n";
+		}		
+		if (strlen($functionBlock)) {
+			$comment .= $functionBlock . "\n";
+		}
 	}
 	if ($paramsStmt->execute(array($name))) {
-		$comment .= "\nParameters\n";
+		$paramBlock = "";
 		while ($param = $paramsStmt->fetch()) {
-			$comment .= $param['name'] . " <" . $param['type'] . "> " . $param['description'] . "\n";
-			if ('apc_fetch' == $identifier) var_dump($param);
+			$paramBlock .= clean($param['name']) . " [" . clean($param['type']) . "] " . clean($param['description']) . "\n";
 		}
-		$comment .= "\n";
+		if (strlen($paramBlock)) {
+			$comment .= "\nParameters\n" . $paramBlock . "\n";
+		}		
 	}
 	if ($notesStmt->execute(array($name))) {
-		$comment .= "\nNotes\n";
+		$notesBlock = '';
 		while ($note = $notesStmt->fetch()) {
-			$comment .= $note['type'] . ":" . $note['description'];
-			$comment .= "\n";
-			if ('apc_fetch' == $identifier) var_dump($note);
+			$notesBlock.= clean($note['type']) . ": " . clean($note['description']);
+			$notesBlock .= "\n";
 		}
-		$comment .= "\n";
+		if (strlen($notesBlock)) {
+			$comment .= $notesBlock . "\n";
+		}
 	}
 	if ($seeAlsoStmt->execute(array($name))) {
-		$comment .= "See Also:\n";
+		$seeAlsoBlock = '';
 		while ($see = $seeAlsoStmt->fetch()) {
-			$comment .= "@see " . $see['name'] . " " . $see['type'] . ":" . $see['description'] . "\n";
-			if ('apc_fetch' == $identifier) var_dump($see);
+			$seeAlsoBlock .= "@see " . clean($see['name']);
+			if (strlen($see['type'])) {
+				$seeAlsoBlock .= ' ' . clean($see['type']);
+			}
+			if (strlen($see['description'])) {
+				$seeAlsoBlock .= ':' . clean($see['description']) . "\n";
+			}
+			else {
+				$seeAlsoBlock .= "\n";
+			}
 		}
-		$comment .= "\n";
+		if (strlen($seeAlsoBlock)) {
+			$comment .= "See Also:\n" . $seeAlsoBlock . "\n";
+		}
 	}
 	if ($changelogStmt->execute(array($name))) {
-		$comment .= "Changelog\n";
+		$changelogBlock = '';
 		while ($changelog = $changelogStmt->fetch()) {
-			$comment .= $changelog['version'] . "\n" . $changelog['change'] . "\n\n";
-			if ('apc_fetch' == $identifier) var_dump($changelog);
+			if (strlen($changelog['version'])) {
+				$changelogBlock .= clean($changelog['version']) . "\n" ;
+			}
+			if (strlen($changelog['change'])) {
+				$changelogBlock .= clean($changelog['change']) . "\n\n";
+			}
 		}
-		$comment .= "\n";
+		if (strlen($changelogBlock)) {
+			$comment .= "Changelog\n" . $changelogBlock . "\n";
+		}
 	}
-	
-	$comment = "/**\n" . $comment . "*/";
-	if ('apc_fetch' == $identifier) var_dump($comment); 
+	if (strlen($comment)) {
+		$comment = "/**\n" . $comment . "*/";
+	}
 	return $comment;
+}
+
+/**
+ * PHP documentation has some HTML. we want to ignore the tags for now.
+ * @return the string, but with no HTML tags.
+ */
+function clean($str) {
+
+	// after the tags are stripped, remove spaces too
+	return trim(strip_tags($str));
 }
