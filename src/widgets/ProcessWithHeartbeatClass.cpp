@@ -44,7 +44,7 @@ mvceditor::ProcessWithHeartbeatClass::~ProcessWithHeartbeatClass() {
 	while (it != RunningProcesses.end()) {
 		it->second->Detach();
 		long pid = it->first;
-		wxProcess::Kill(pid);
+		wxProcess::Kill(pid, wxSIGILL);
 		delete it->second;
 		it++;
 	}
@@ -84,7 +84,15 @@ bool mvceditor::ProcessWithHeartbeatClass::Stop(long pid) {
 		// in Windows, wxSIGTERM is too nice and the process does not die
 		wxKillError killError = wxProcess::Kill(pid, wxSIGKILL); 
 		stopped = wxKILL_OK == killError;
-		delete it->second;
+		
+		/* 
+		 * do not delete the process pointer, as the wxWidgets docs for wxProcess states:
+		 *
+		 *  the object will delete itself upon reception of the process termination notification
+		 *
+		 * deleting it here would result in double delete (crash)
+		 */
+		/*delete it->second;*/
 		RunningProcesses.erase(it);
 	}
 	return stopped;
