@@ -217,7 +217,6 @@ mvceditor::RunBrowserPluginClass::RunBrowserPluginClass(mvceditor::AppClass& app
 void mvceditor::RunBrowserPluginClass::AddWindows() {
 	BrowserToolbar = new wxAuiToolBar(GetMainWindow(), wxID_ANY, wxDefaultPosition, wxDefaultSize,
                                          wxAUI_TB_DEFAULT_STYLE |
-                                         wxAUI_TB_OVERFLOW |
                                          wxAUI_TB_TEXT |
                                          wxAUI_TB_HORZ_TEXT);
     BrowserToolbar->SetToolBitmapSize(wxSize(16,16));
