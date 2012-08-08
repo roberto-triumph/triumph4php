@@ -83,7 +83,8 @@ class ResourceSearchDialogGeneratedClass : public wxDialog
 		virtual void OnSearchKeyDown( wxKeyEvent& event ) { event.Skip(); }
 		virtual void OnSearchText( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSearchEnter( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnResultsDoubleClick( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMatchesListDoubleClick( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMatchesListKeyDown( wxKeyEvent& event ) { event.Skip(); }
 		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }

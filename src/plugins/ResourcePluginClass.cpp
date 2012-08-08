@@ -517,12 +517,17 @@ void mvceditor::ResourceSearchDialogClass::OnSearchEnter(wxCommandEvent& event) 
 		EndModal(wxOK);
 	}
 	else {
-		wxArrayInt selections;
-		if (MatchesList->GetSelections(selections)) {
+		wxArrayInt checks;
+		for (size_t i = 0; i < MatchesList->GetCount(); ++i) {
+			if (MatchesList->IsChecked(i)) {
+				checks.Add(i);
+			}
+		}
+		if (checks.Count() > 1) {
 		
 			// open the checked items
-			for (size_t i = 0; i < selections.Count(); ++i) {
-				size_t matchIndex = selections.Item(i);
+			for (size_t i = 0; i < checks.Count(); ++i) {
+				size_t matchIndex = checks.Item(i);
 				if (matchIndex >= 0 && matchIndex < MatchedResources.size()) {
 					ChosenResources.push_back(MatchedResources[matchIndex]);
 				}
@@ -540,7 +545,6 @@ void mvceditor::ResourceSearchDialogClass::OnSearchEnter(wxCommandEvent& event) 
 		}
 
 	}
-
 }
 
 void mvceditor::ResourceSearchDialogClass::ShowJumpToResults(const wxString& finderQuery, const std::vector<mvceditor::ResourceClass>& allMatches) {
@@ -642,7 +646,7 @@ void mvceditor::ResourceSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 	}
 }
 
-void mvceditor::ResourceSearchDialogClass::OnResultsDoubleClick(wxCommandEvent& event) {
+void mvceditor::ResourceSearchDialogClass::OnMatchesListDoubleClick(wxCommandEvent& event) {
 	TransferDataFromWindow();
 	ChosenResources.clear();
 	size_t selection = event.GetSelection();
@@ -653,6 +657,16 @@ void mvceditor::ResourceSearchDialogClass::OnResultsDoubleClick(wxCommandEvent& 
 		return;
 	}
 	EndModal(wxOK);
+}
+
+void mvceditor::ResourceSearchDialogClass::OnMatchesListKeyDown(wxKeyEvent& event) {
+	if (event.GetKeyCode() == WXK_RETURN) {
+		wxCommandEvent cmdEvt;
+		OnSearchEnter(cmdEvt);
+	}
+	else {
+		event.Skip();
+	}
 }
 
 mvceditor::IndexingDialogClass::IndexingDialogClass(wxWindow* parent) 

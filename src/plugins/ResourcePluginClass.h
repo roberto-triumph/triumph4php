@@ -338,7 +338,9 @@ protected:
 
 	void OnSearchKeyDown(wxKeyEvent& event);
 
-	void OnResultsDoubleClick(wxCommandEvent& event);
+	void OnMatchesListDoubleClick(wxCommandEvent& event);
+
+	void OnMatchesListKeyDown(wxKeyEvent& event);
 	
 private:
 

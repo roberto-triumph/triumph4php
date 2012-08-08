@@ -26,7 +26,6 @@
 #include <widgets/ResourceCacheClass.h>
 #include <windows/AppFrameClass.h>
 #include <environment/StructsClass.h>
-#include <plugins/ProjectPluginClass.h>
 #include <plugins/EditorMessagesPluginClass.h>
 #include <PluginClass.h>
 #include <PreferencesClass.h>
