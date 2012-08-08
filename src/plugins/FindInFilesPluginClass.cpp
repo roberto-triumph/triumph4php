@@ -363,8 +363,9 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxComman
 
 void mvceditor::FindInFilesResultsPanelClass::OnFindInFilesComplete(wxCommandEvent& event) {
 	int matchedFilesSize = GetNumberOfMatchedFiles();
-	bool enableIterators = matchedFilesSize > 0 && !FindInFiles.ReplaceExpression.isEmpty();
-	EnableButtons(false, enableIterators, enableIterators);
+	bool enableReplace = matchedFilesSize > 0 && !FindInFiles.ReplaceExpression.isEmpty();
+	bool enableCopy = matchedFilesSize > 0;
+	EnableButtons(false, enableReplace, enableCopy);
 	Gauge->StopGauge(FindInFilesGaugeId);
 	if (event.GetInt() == BackgroundFileReaderClass::WALK) {
 		if (matchedFilesSize > 0) {
