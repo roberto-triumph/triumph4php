@@ -186,6 +186,13 @@ public:
 	 */
 	bool MakeResourceDbFileName();
 
+	/**
+	 * Deletes this project's resource cache from the file system.
+	 * This should be done when the user does not want MVC Editor
+	 * to cache a project's sources.
+	 */
+	void RemoveResourceDb();
+
 private:
 	
 	/**

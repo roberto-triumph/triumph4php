@@ -198,3 +198,9 @@ bool mvceditor::ProjectClass::MakeResourceDbFileName() {
 	ResourceDbFileName.Assign(tempDb);
 	return ResourceDbFileName.IsOk();
 }
+
+void mvceditor::ProjectClass::RemoveResourceDb() {
+	if (ResourceDbFileName.FileExists()) {
+		wxRemoveFile(ResourceDbFileName.GetFullPath());
+	}
+}

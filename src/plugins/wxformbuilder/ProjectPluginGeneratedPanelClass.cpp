@@ -120,11 +120,15 @@ ProjectDefinitionDialogGeneratedClass::ProjectDefinitionDialogGeneratedClass( wx
 	BoxSizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* FlexGridSizer;
-	FlexGridSizer = new wxFlexGridSizer( 6, 1, 0, 0 );
+	FlexGridSizer = new wxFlexGridSizer( 7, 1, 0, 0 );
 	FlexGridSizer->AddGrowableCol( 0 );
-	FlexGridSizer->AddGrowableRow( 3 );
+	FlexGridSizer->AddGrowableRow( 4 );
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );
 	FlexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	HelpLabel = new wxStaticText( this, wxID_ANY, _("A project is a list of directories where source code is located together with a human-firendly label. A project can contain multiple directories from different locations. Additionally, MVC Editor can be told to exclude certain files from the project."), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT );
+	HelpLabel->Wrap( 500 );
+	FlexGridSizer->Add( HelpLabel, 1, wxALL|wxEXPAND, 5 );
 	
 	LabelStatic = new wxStaticText( this, wxID_ANY, _("Project Label"), wxDefaultPosition, wxDefaultSize, 0 );
 	LabelStatic->Wrap( -1 );
@@ -261,15 +265,15 @@ ProjectListDialogGeneratedClass::ProjectListDialogGeneratedClass( wxWindow* pare
 	BoxSizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* FlexGridSizer;
-	FlexGridSizer = new wxFlexGridSizer( 4, 1, 0, 0 );
+	FlexGridSizer = new wxFlexGridSizer( 5, 1, 0, 0 );
 	FlexGridSizer->AddGrowableCol( 0 );
 	FlexGridSizer->AddGrowableRow( 1 );
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );
 	FlexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	ProjectsLabel = new wxStaticText( this, wxID_ANY, _("Defined Projects"), wxDefaultPosition, wxDefaultSize, 0 );
-	ProjectsLabel->Wrap( -1 );
-	FlexGridSizer->Add( ProjectsLabel, 0, wxALL|wxEXPAND, 5 );
+	HelpLabel = new wxStaticText( this, wxID_ANY, _("This is the list of projects that MVC Editor looks at.\n\nA project is merely a list of directories where source code is located together with a human-firendly label. A project can contain multiple directories from different locations. Additionally, MVC Editor can be told to exclude certain files from the project.\n\nA project can be enabled or disabled.  This is represented by the checkbox to the left of each. When a project is disabled, MVC Editor will not look at its resource cache."), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT );
+	HelpLabel->Wrap( 400 );
+	FlexGridSizer->Add( HelpLabel, 0, wxALL, 5 );
 	
 	wxArrayString ProjectsListChoices;
 	ProjectsList = new wxCheckListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, ProjectsListChoices, 0 );

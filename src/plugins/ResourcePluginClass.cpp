@@ -48,9 +48,10 @@ bool mvceditor::ResourceFileReaderClass::InitProjectQueue(mvceditor::ResourceCac
 		ProjectQueue.pop();
 	}
 	ResourceCache = resourceCache;
-	for (size_t i = 0; i < projects.size(); ++i) {
-		if (projects[i].IsEnabled && !projects[i].AllPhpSources().empty()) {
-			ProjectQueue.push(projects[i]);
+	std::vector<mvceditor::ProjectClass>::const_iterator project;
+	for (project = projects.begin(); project != projects.end(); ++project) {
+		if (project->IsEnabled && !project->AllPhpSources().empty()) {
+			ProjectQueue.push(*project);
 		}
 	}
 	return !ProjectQueue.empty();
@@ -83,7 +84,7 @@ bool mvceditor::ResourceFileReaderClass::InitForFile(mvceditor::ResourceCacheCla
 }
 
 bool mvceditor::ResourceFileReaderClass::FileRead(mvceditor::DirectorySearchClass& search) {
-	ResourceCache->WalkGlobal(CurrentResourceDbFileName.GetFullPath(), search, PhpFileFilters);
+	ResourceCache->WalkGlobal(CurrentResourceDbFileName, search, PhpFileFilters);
 	return false;
 }
 
@@ -109,12 +110,12 @@ bool mvceditor::ResourceFileReaderClass::ReadNextProject() {
 		mvceditor::ProjectClass project = ProjectQueue.front();
 		ProjectQueue.pop();
 		std::vector<mvceditor::SourceClass> sources = project.AllPhpSources();
-		if (Init(sources)) {			
+		if (Init(sources)) {
 			PhpFileFilters = project.GetPhpFileExtensions();
 			CurrentResourceDbFileName = project.ResourceDbFileName;
 			if (!ResourceCache->IsInitGlobal(CurrentResourceDbFileName)) {
 
-				// since a directory can have may files, set the file parsing buffer
+				// since a directory can have many files, set the file parsing buffer
 				// to a high value
 				ResourceCache->InitGlobal(CurrentResourceDbFileName, 1024);
 			}
@@ -159,17 +160,35 @@ void mvceditor::ResourcePluginClass::AddCodeControlClassContextMenuItems(wxMenu*
 	menu->Append(mvceditor::MENU_RESOURCE + 3, _("Jump To Source"));
 }
 
+void mvceditor::ResourcePluginClass::OnAppReady(wxCommandEvent& event) {
+	mvceditor::ResourceCacheClass* cache = GetResourceCache();
+	cache->SetVersion(GetEnvironment()->Php.Version);
+	cache->InitGlobal(mvceditor::NativeFunctionsAsset());
+	ProjectIndexMenu->Enable(App.Structs.HasSources() && FREE == State);
+	std::vector<mvceditor::ProjectClass>::const_iterator project;
+	for (project = App.Structs.Projects.begin(); project != App.Structs.Projects.end(); ++project) {
+		if (project->IsEnabled) {
+			cache->InitGlobal(project->ResourceDbFileName);
+		}
+	}
+
+	// tell the app that resource cache is available
+	wxCommandEvent indexedEvent(mvceditor::EVENT_APP_PROJECT_INDEXED);
+	App.EventSink.Publish(indexedEvent);
+}
+
 void mvceditor::ResourcePluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 	HasCodeLookups = false;
 	HasFileLookups = false;
 	if (ResourceFileReader.IsRunning()) {
 		ResourceFileReader.StopReading();
 	}
-	GetResourceCache()->Clear();
-	GetResourceCache()->SetVersion(GetEnvironment()->Php.Version);
+	mvceditor::ResourceCacheClass* cache = GetResourceCache();
+	cache->Clear();
+	cache->SetVersion(GetEnvironment()->Php.Version);
 	ProjectIndexMenu->Enable(App.Structs.HasSources() && FREE == State);
 	GetResourceCache()->InitGlobal(mvceditor::NativeFunctionsAsset());
-	ResourceFileReader.InitProjectQueue(GetResourceCache(), App.Structs.Projects);
+	ResourceFileReader.InitProjectQueue(cache, App.Structs.Projects);
 	mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
 	
 	if (ResourceFileReader.StartReading(error)) {
@@ -201,7 +220,6 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourcePluginClass::SearchForR
 
 	// no need to show jump to results for native functions
 	RemoveNativeMatches(matches);
-
 	return matches;
 }
 
@@ -696,4 +714,5 @@ BEGIN_EVENT_TABLE(mvceditor::ResourcePluginClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::ResourcePluginClass::OnProjectsUpdated)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_RE_INDEX, mvceditor::ResourcePluginClass::OnCmdReIndex)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_CLOSED, mvceditor::ResourcePluginClass::OnAppFileClosed)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::ResourcePluginClass::OnAppReady)
 END_EVENT_TABLE()

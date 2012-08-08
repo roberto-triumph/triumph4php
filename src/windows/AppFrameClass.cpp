@@ -692,6 +692,10 @@ void mvceditor::AppEventListenerForFrameClass::OnPreferencesUpdated(wxCommandEve
 	AppFrame->UpdatePreferences();
 }
 
+void mvceditor::AppEventListenerForFrameClass::OnAppReady(wxCommandEvent& event) {
+	AppFrame->OnProjectsUpdated();
+}
+
 BEGIN_EVENT_TABLE(mvceditor::AppFrameClass,  AppFrameGeneratedClass)
 	EVT_STC_SAVEPOINTREACHED(wxID_ANY, mvceditor::AppFrameClass::DisableSave)
 	EVT_STC_SAVEPOINTLEFT(wxID_ANY, mvceditor::AppFrameClass::EnableSave)
@@ -744,4 +748,5 @@ BEGIN_EVENT_TABLE(mvceditor::AppEventListenerForFrameClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::AppEventListenerForFrameClass::OnProjectsUpdated)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_FILE_OPEN, mvceditor::AppEventListenerForFrameClass::OnCmdFileOpen)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_UPDATED, mvceditor::AppEventListenerForFrameClass::OnPreferencesUpdated)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::AppEventListenerForFrameClass::OnAppReady)
 END_EVENT_TABLE()

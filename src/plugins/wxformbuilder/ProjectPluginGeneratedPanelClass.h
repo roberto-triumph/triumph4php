@@ -69,6 +69,7 @@ class ProjectDefinitionDialogGeneratedClass : public wxDialog
 	private:
 	
 	protected:
+		wxStaticText* HelpLabel;
 		wxStaticText* LabelStatic;
 		wxTextCtrl* Label;
 		wxStaticText* SourcesLabel;
@@ -90,7 +91,7 @@ class ProjectDefinitionDialogGeneratedClass : public wxDialog
 	
 	public:
 		
-		ProjectDefinitionDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Project Definition"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 592,475 ), long style = wxDEFAULT_DIALOG_STYLE );
+		ProjectDefinitionDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Project Definition"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 536,492 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~ProjectDefinitionDialogGeneratedClass();
 	
 };
@@ -133,7 +134,7 @@ class ProjectListDialogGeneratedClass : public wxDialog
 	private:
 	
 	protected:
-		wxStaticText* ProjectsLabel;
+		wxStaticText* HelpLabel;
 		wxCheckListBox* ProjectsList;
 		wxButton* AddButton;
 		wxButton* RemoveButton;
@@ -154,7 +155,7 @@ class ProjectListDialogGeneratedClass : public wxDialog
 	
 	public:
 		
-		ProjectListDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Defined Projects"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 371,349 ), long style = wxDEFAULT_DIALOG_STYLE );
+		ProjectListDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Defined Projects"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 437,492 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~ProjectListDialogGeneratedClass();
 	
 };

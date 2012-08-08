@@ -137,6 +137,13 @@ public:
 	bool InitGlobal(const wxFileName& resourceDbFileName, int fileParsingBufferSize = 32);
 
 	/**
+	 * Unregister a db file from the global resource finders.
+	 * @param resourceDbFileName the location of the SQLite cache for the 
+	 *        resource finder.
+	 */
+	void RemoveGlobal(const wxFileName& resourceDbFileName);
+
+	/**
 	 * check to see if a resource DB file is already loaded
 	 *
 	 * @return bool TRUE if db file is already loaded.

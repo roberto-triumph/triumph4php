@@ -22,9 +22,6 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <php_frameworks/FrameworkDetectorClass.h>
-#include <widgets/ResourceCacheClass.h>
-#include <windows/AppFrameClass.h>
 #include <environment/StructsClass.h>
 #include <plugins/EditorMessagesPluginClass.h>
 #include <PluginClass.h>
@@ -37,6 +34,9 @@
 #include <vector>
 
 namespace mvceditor {
+
+// forward declaration
+class AppFrameClass;
 
 // defined below
 class AppClass;

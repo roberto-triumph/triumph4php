@@ -180,6 +180,8 @@ private:
 
 	void OnAppFileClosed(wxCommandEvent& event);
 
+	void OnAppReady(wxCommandEvent& event);
+
 	void OnCmdReIndex(wxCommandEvent& event);
 	
 	void OnEnvironmentUpdated(wxCommandEvent& event);

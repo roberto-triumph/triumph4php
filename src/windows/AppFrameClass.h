@@ -67,6 +67,8 @@ private:
 
 	void OnPreferencesUpdated(wxCommandEvent& event);
 
+	void OnAppReady(wxCommandEvent& event);
+
 	/**
 	 * Need the frame to manipulate it
 	 */

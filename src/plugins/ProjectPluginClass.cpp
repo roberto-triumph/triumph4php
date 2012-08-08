@@ -293,8 +293,29 @@ void mvceditor::ProjectPluginClass::OnFrameworkFound(mvceditor::FrameworkFoundEv
 }
 
 void mvceditor::ProjectPluginClass::OnProjectDefine(wxCommandEvent& event) {
-	mvceditor::ProjectListDialogClass dialog(GetMainWindow(), App.Structs.Projects);
+	std::vector<mvceditor::ProjectClass> removedProjects;
+	mvceditor::ProjectListDialogClass dialog(GetMainWindow(), App.Structs.Projects, removedProjects);
 	if (wxOK == dialog.ShowModal()) {
+		std::vector<mvceditor::ProjectClass>::iterator project;
+
+		// delete the cache files for the projects the user has removed
+		// before deleting the file, must disconnect from the SQLite database
+		mvceditor::ResourceCacheClass* cache = GetResourceCache();
+		for (project = removedProjects.begin(); project != removedProjects.end(); ++project) {
+			cache->RemoveGlobal(project->ResourceDbFileName);
+			project->RemoveResourceDb();
+		}
+
+		// for new projects we need to fill in the file extensions
+		// the rest of the app assumes they are already filled in
+		for (project = App.Structs.Projects.begin(); project != App.Structs.Projects.end(); ++project) {
+
+			// need to set these; as they set in app load too
+			project->SetPhpFileExtensionsString(App.Structs.PhpFileFiltersString);
+			project->SetCssFileExtensionsString(App.Structs.CssFileFiltersString);
+			project->SetSqlFileExtensionsString(App.Structs.SqlFileFiltersString);
+		}
+
 		wxCommandEvent evt;
 		SavePreferences(evt);
 		wxConfigBase* config = wxConfig::Get();
@@ -443,10 +464,12 @@ void mvceditor::ProjectSourceDialogClass::OnCancelButton(wxCommandEvent& event) 
 	EndModal(wxCANCEL);
 }
 
-mvceditor::ProjectListDialogClass::ProjectListDialogClass(wxWindow* parent, std::vector<mvceditor::ProjectClass>& projects)
+mvceditor::ProjectListDialogClass::ProjectListDialogClass(wxWindow* parent, std::vector<mvceditor::ProjectClass>& projects,
+														  std::vector<mvceditor::ProjectClass>& removedProjects)
 	: ProjectListDialogGeneratedClass(parent)
 	, Projects(projects)
-	, EditedProjects(projects) {
+	, EditedProjects(projects)
+	, RemovedProjects(removedProjects) {
 	Populate();
 }
 
@@ -457,7 +480,11 @@ void mvceditor::ProjectListDialogClass::OnProjectsListDoubleClick(wxCommandEvent
 		mvceditor::ProjectDefinitionDialogClass dialog(this, project);
 		if (wxOK == dialog.ShowModal()) {
 			EditedProjects[selection] = project;
-			ProjectsList->SetString(selection, project.Label);
+			wxString label = project.Label;
+
+			// escape any ampersands in the label, list box needs them escaped
+			label.Replace(wxT("&"), wxT("&&"));
+			ProjectsList->SetString(selection, label);
 		}
 	}
 }
@@ -476,7 +503,11 @@ void mvceditor::ProjectListDialogClass::OnAddButton(wxCommandEvent& event) {
 	mvceditor::ProjectDefinitionDialogClass dialog(this, project);
 	if (wxOK == dialog.ShowModal()) {
 		EditedProjects.push_back(project);
-		ProjectsList->Append(project.Label);
+
+		// escape any ampersands in the label, list box needs them escaped
+		wxString label = project.Label;
+		label.Replace(wxT("&"), wxT("&&"));
+		ProjectsList->Append(label);
 		ProjectsList->Check(ProjectsList->GetCount() - 1, true);
 	}
 }
@@ -485,13 +516,14 @@ void mvceditor::ProjectListDialogClass::OnRemoveButton(wxCommandEvent& event) {
 	size_t selection = ProjectsList->GetSelection();
 	if (selection >= 0 && selection < EditedProjects.size()) {
 		mvceditor::ProjectClass project = EditedProjects[selection];
-		wxString msg = _("Are you sure you wish to remove the project? ");
+		wxString msg = _("Are you sure you wish to remove the project\n\n");
 		msg += project.Label;
-		msg += wxT("\n");
+		msg += wxT("\n\n");
 		msg += _("MVC Editor will no longer open or index files in any sources of this project. Note that no directories are actually deleted from the file system");
 		wxString caption = _("Remove Project");
 		int response = wxMessageBox(msg, caption, wxYES_NO);
 		if (wxYES == response) {
+			RemovedProjects.push_back(EditedProjects[selection]);
 			EditedProjects.erase(EditedProjects.begin() + selection);
 			ProjectsList->Delete(selection);
 		}
@@ -505,7 +537,11 @@ void mvceditor::ProjectListDialogClass::OnEditButton(wxCommandEvent& event) {
 		mvceditor::ProjectDefinitionDialogClass dialog(this, project);
 		if (wxOK == dialog.ShowModal()) {
 			EditedProjects[selection] = project;
-			ProjectsList->SetString(selection, project.Label);
+
+			// escape any ampersands in the label, list box needs them escaped
+			wxString label = project.Label;
+			label.Replace(wxT("&"), wxT("&&"));
+			ProjectsList->SetString(selection, label);
 		}
 	}
 }
@@ -526,7 +562,11 @@ void mvceditor::ProjectListDialogClass::Populate() {
 	ProjectsList->Clear();
 	for (size_t i = 0; i < EditedProjects.size(); ++i) {
 		mvceditor::ProjectClass project = EditedProjects[i];
-		ProjectsList->Append(project.Label);
+
+		// escape any ampersands in the label, list box needs them escaped
+		wxString label = project.Label;
+		label.Replace(wxT("&"), wxT("&&"));
+		ProjectsList->Append(label);
 		ProjectsList->Check(ProjectsList->GetCount() - 1, project.IsEnabled);
 	}
 }

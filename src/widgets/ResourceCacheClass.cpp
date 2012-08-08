@@ -125,6 +125,18 @@ bool mvceditor::ResourceCacheClass::InitGlobal(const wxFileName& resourceDbFileN
 	return ret;
 }
 
+void mvceditor::ResourceCacheClass::RemoveGlobal(const wxFileName& resourceDbFileName) {
+	wxMutexLocker locker(Mutex);
+	if (!locker.IsOk()) {
+		return;
+	}
+	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator item = GlobalResourceFinders.find(resourceDbFileName.GetFullPath());
+	if (item != GlobalResourceFinders.end()) {
+		delete item->second;
+		GlobalResourceFinders.erase(item);
+	}
+}
+
 bool mvceditor::ResourceCacheClass::IsInitGlobal(const wxFileName& resourceDbFileName) {
 	wxMutexLocker locker(Mutex);
 	if (!locker.IsOk()) {

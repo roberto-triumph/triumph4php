@@ -229,7 +229,12 @@ protected:
 
 public:
 
-	ProjectListDialogClass(wxWindow* parent, std::vector<mvceditor::ProjectClass>& projects);
+	/**
+	 * @param project the list of projects the user will edit / remove / add to
+	 * @param removedProjects the list of projects that the user has removed. This list will
+	 *        get populated only when the user clicks OK (and has removed a project)
+	 */
+	ProjectListDialogClass(wxWindow* parent, std::vector<mvceditor::ProjectClass>& projects, std::vector<mvceditor::ProjectClass>& removedProjects);
 
 private:
 
@@ -242,6 +247,12 @@ private:
 	 * The projects being edited by the user.
 	 */
 	std::vector<mvceditor::ProjectClass> EditedProjects;
+
+	/**
+	 * The list of projects that the user has decided to remove. This list will
+	 * get populated only when the user clicks OK (and has removed a project)
+	 */
+	std::vector<mvceditor::ProjectClass>& RemovedProjects;
 
 	/**
 	 * add the project labels to the check list box
