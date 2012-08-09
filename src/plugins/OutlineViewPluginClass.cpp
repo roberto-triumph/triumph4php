@@ -44,6 +44,7 @@ mvceditor::ResourceFinderBackgroundThreadClass::ResourceFinderBackgroundThreadCl
 	, FileName() {
 
 	// need this so that the resource finder parsers the file
+	ResourceFinder.InitMemory();
 	ResourceFinder.FileFilters.push_back(wxT("*.*"));
 }
 
@@ -57,7 +58,7 @@ bool mvceditor::ResourceFinderBackgroundThreadClass::Start(const wxString& fileN
 
 void mvceditor::ResourceFinderBackgroundThreadClass::Entry() {
 	if (wxFileName::FileExists(FileName)) {
-		ResourceFinder.Clear();
+		ResourceFinder.Wipe();
 
 		// need this call so that resources are actually parsed
 		ResourceFinder.Walk(FileName);
