@@ -51,6 +51,15 @@ bool mvceditor::ResourceFileReaderClass::InitProjectQueue(mvceditor::ResourceCac
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	for (project = projects.begin(); project != projects.end(); ++project) {
 		if (project->IsEnabled && !project->AllPhpSources().empty()) {
+			if (!ResourceCache->IsInitGlobal(project->ResourceDbFileName)) {
+
+				// since a directory can have many files, set the file parsing buffer
+				// to a high value
+				// init the file now so that it is available for code completion
+				// even though we know it is stale. The user is notified that the
+				// cache is stale and may not have all of the results.
+				ResourceCache->InitGlobal(project->ResourceDbFileName, 1024);
+			}
 			ProjectQueue.push(*project);
 		}
 	}
@@ -113,12 +122,6 @@ bool mvceditor::ResourceFileReaderClass::ReadNextProject() {
 		if (Init(sources)) {
 			PhpFileFilters = project.GetPhpFileExtensions();
 			CurrentResourceDbFileName = project.ResourceDbFileName;
-			if (!ResourceCache->IsInitGlobal(CurrentResourceDbFileName)) {
-
-				// since a directory can have many files, set the file parsing buffer
-				// to a high value
-				ResourceCache->InitGlobal(CurrentResourceDbFileName, 1024);
-			}
 			next = true;
 		}
 	}
