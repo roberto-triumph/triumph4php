@@ -84,6 +84,8 @@ mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass
 		).PaneBorder(true).Gripper(false).Floatable(false).Resizable(true));
 	AuiManager.AddPane(ToolsNotebook, wxAuiPaneInfo().Bottom().Caption(
 		_("Tools")).Floatable(false).MinSize(-1, 260).Hide().Layer(1));
+	AuiManager.AddPane(OutlineNotebook, wxAuiPaneInfo().Left().Caption(
+        _("Outlines")).Floatable(false).MinSize(260, -1).Hide());
 	
 	AuiManager.AddPane(ToolBar, wxAuiPaneInfo().Top(
 		).CaptionVisible(false).CloseButton(false).Gripper(
