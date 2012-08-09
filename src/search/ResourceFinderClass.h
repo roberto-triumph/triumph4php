@@ -201,7 +201,8 @@ private:
  *       search.Walk(resourceFinder);
  *     }
  *     //now that the resources have been cached, we can query the cache
- *     std::vector<mvceditor::ResourceClass> matches = resourceFinder.CollectNearMatchResources(wxT("UserClass"));
+ *     mvceditor::ResourceSearchClass search(UNICODE_STRING_SIMPLE("UserClass"));
+ *     std::vector<mvceditor::ResourceClass> matches = resourceFinder.CollectNearMatchResources(search);
  *     if (!matches.empty()) {
  *       for (size_t i = 0; i < matches.size(); i++)  {
  *         mvceditor::ResourceClass resource = matches[i];
@@ -209,9 +210,9 @@ private:
  *         // print the comment resource.Comment
  *         //  print the signature   resource.Signature
  *         // do something with the matched file
- *         UnicodeString className = resourceFinder.GetClassName(); //the class name parsed from resource (given in the Prepare method)
- *         UnicodeString methodName = resourceFinder.GetMethodName(); // the method name parsed from resource (given in the Prepare method)
- *         int lineNumber = resourceFinder.GetLineNumber(); // the line number parsed from resource (given in the Prepare method)
+ *         UnicodeString className = search.GetClassName(); //the class name parsed from resource (given in to ResourceSearchClass)
+ *         UnicodeString methodName = search.GetMethodName(); // the method name parsed from resource (given to ResourceSearchClass)
+ *         int lineNumber = search.GetLineNumber(); // the line number parsed from resource (given to ResourceSearchClass)
  *         
  *       }
  *     }
@@ -523,9 +524,11 @@ public:
 	std::vector<ResourceClass> AllNonNativeClasses() ;
 
 	/**
-	 * Removes all resources from the cache entirely.
+	 * Removes all resources from this resource finder entirely. If this
+	 * finder was initialized with a backing file, the backing database
+	 * file will be truncated also.
 	 */
-	void Clear();
+	void Wipe();
 	
 	/**
 	 * set the PHP version to handle
@@ -579,6 +582,13 @@ private:
 	 * Will use transaction to lock once instead of before and after every insert
 	 */
 	soci::transaction* Transaction;
+
+	/**
+	 * The full path to the backing SQLite file.  This may be invalid if this 
+	 * finder is a memory backed finder (was created with InitMemory() instead of
+	 * InitFile() ).
+	 */
+	wxFileName DbFileName;
 		
 	/**
 	 * The current file item being indexed.  We keep a class-wide member when parsing through many files.

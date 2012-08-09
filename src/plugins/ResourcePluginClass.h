@@ -192,9 +192,9 @@ private:
 	void OnUpdateUi(wxUpdateUIEvent& event);
 	
 	/**
-	 * Recurse through project files and gather resources.
+	 * Wipe the cache and re-index all of the enabled projects.
 	 */
-	void OnProjectIndex(wxCommandEvent& event);
+	void OnProjectWipeAndIndex(wxCommandEvent& event);
 	
 	/**
 	 * Handle to Go To Source menu event

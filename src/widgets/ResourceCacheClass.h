@@ -258,6 +258,13 @@ public:
 	 * Remove all items from all caches and also unregisters any and all files.
 	 */
 	void Clear();
+
+	/**
+	 * Remove all items from all caches ALSO wipes any persisted resources and unregisters any and all files.
+	 * In other words, any resources that were saved to the SQLite tables will be deleted too.
+	 * The SQLite file itself will not be deleted.
+	 */
+	void Wipe();
 	
 	/**
 	 * Set the version that the PHP parser should use.

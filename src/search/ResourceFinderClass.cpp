@@ -152,6 +152,7 @@ mvceditor::ResourceFinderClass::ResourceFinderClass()
 	, Parser()
 	, Session()
 	, Transaction(NULL)
+	, DbFileName()
 	, FileParsingBufferSize(32)
 	, IsCacheInitialized(false) {
 	Parser.SetClassObserver(this);
@@ -170,6 +171,7 @@ void mvceditor::ResourceFinderClass::SetVersion(pelet::Versions version) {
 }
 
 void mvceditor::ResourceFinderClass::InitMemory() {
+	DbFileName.Clear();
 	OpenAndCreateTables(wxT(":memory:"));
 	FileParsingBufferSize = 32;
 	FileParsingCache.clear();
@@ -178,6 +180,7 @@ void mvceditor::ResourceFinderClass::InitMemory() {
 }
 
 void mvceditor::ResourceFinderClass::InitFile(const wxFileName& fileName, int fileParsingBufferSize) {
+	DbFileName = fileName;
 	OpenAndCreateTables(fileName.GetFullPath());
 	FileParsingBufferSize = fileParsingBufferSize;
 }
@@ -1486,13 +1489,17 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::AllNonNati
 	return all;
 }
 
-void mvceditor::ResourceFinderClass::Clear() {
-	if (!IsCacheInitialized) {
-		return;
-	}
+void mvceditor::ResourceFinderClass::Wipe() {
 	FileParsingCache.clear();
-	Session.once << "DELETE FROM file_items;";
-	Session.once << "DELETE FROM resources;";
+	NamespaceCache.clear();
+	TraitCache.clear();
+
+	// dont wipe the native functions since we don't recreate it
+	// during the running of the app.
+	if (IsCacheInitialized && mvceditor::NativeFunctionsAsset() != DbFileName) {		
+		Session.once << "DELETE FROM file_items;";
+		Session.once << "DELETE FROM resources;";
+	}
 }
 
 void mvceditor::ResourceFinderClass::PersistResources(const std::vector<mvceditor::ResourceClass>& resources, int fileItemId) {

@@ -362,8 +362,34 @@ void mvceditor::ResourceCacheClass::Clear() {
 	if (!locker.IsOk()) {
 		return;
 	}
+
+	// ATTN: do NOT wipe finders, Clear() is meant for memory
+	// cleanup only
 	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it;
 	for (it = GlobalResourceFinders.begin(); it != GlobalResourceFinders.end(); ++it) {
+		delete it->second;
+	}
+	for (std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it =  Finders.begin(); it != Finders.end(); ++it) {
+		delete it->second;
+	}
+	for (std::map<wxString, mvceditor::SymbolTableClass*>::iterator it =  SymbolTables.begin(); it != SymbolTables.end(); ++it) {
+		delete it->second;
+	}
+	GlobalResourceFinders.clear();
+	Finders.clear();
+	SymbolTables.clear();	
+}
+
+void mvceditor::ResourceCacheClass::Wipe() {
+	wxMutexLocker locker(Mutex);
+	if (!locker.IsOk()) {
+		return;
+	}
+
+	// ATTN: DO wipe finders this is an explict call
+	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it;
+	for (it = GlobalResourceFinders.begin(); it != GlobalResourceFinders.end(); ++it) {
+		it->second->Wipe();
 		delete it->second;
 	}
 	for (std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it =  Finders.begin(); it != Finders.end(); ++it) {

@@ -346,7 +346,8 @@ void mvceditor::ResourcePluginClass::StartIndex() {
 	}
 }
 
-void mvceditor::ResourcePluginClass::OnProjectIndex(wxCommandEvent& event) {
+void mvceditor::ResourcePluginClass::OnProjectWipeAndIndex(wxCommandEvent& event) {
+	GetResourceCache()->Wipe();
 	StartIndex();
 }
 
@@ -704,7 +705,7 @@ void mvceditor::IndexingDialogClass::Increment() {
 }
 
 BEGIN_EVENT_TABLE(mvceditor::ResourcePluginClass, wxEvtHandler)
-	EVT_MENU(mvceditor::MENU_RESOURCE + 0, mvceditor::ResourcePluginClass::OnProjectIndex)
+	EVT_MENU(mvceditor::MENU_RESOURCE + 0, mvceditor::ResourcePluginClass::OnProjectWipeAndIndex)
 	EVT_MENU(mvceditor::MENU_RESOURCE + 1, mvceditor::ResourcePluginClass::OnJump)
 	EVT_MENU(mvceditor::MENU_RESOURCE + 2, mvceditor::ResourcePluginClass::OnSearchForResource)
 	EVT_MENU(mvceditor::MENU_RESOURCE + 3, mvceditor::ResourcePluginClass::OnJump)
