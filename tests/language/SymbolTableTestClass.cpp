@@ -576,7 +576,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAlias) 
 	);
 	Init(sourceCode);	
 	ToClass(UNICODE_STRING_SIMPLE("S\\"));
-	Scope.NamespaceAliases[UNICODE_STRING_SIMPLE("S")] = UNICODE_STRING_SIMPLE("\\Second");
+	Scope.AddNamespace(UNICODE_STRING_SIMPLE("\\Second"), UNICODE_STRING_SIMPLE("S"));
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_VECTOR_SIZE(1, ResourceMatches);
@@ -592,7 +592,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceStatic)
 	);
 	Init(sourceCode);	
 	ToClass(UNICODE_STRING_SIMPLE("namespace\\"));
-	Scope.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = UNICODE_STRING_SIMPLE("\\First\\Child");
+	Scope.AddNamespace(UNICODE_STRING_SIMPLE("\\First\\Child"), UNICODE_STRING_SIMPLE("namespace"));
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_VECTOR_SIZE(1, ResourceMatches);
@@ -621,7 +621,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceImporti
 	);
 	Init(sourceCode);	
 	ToClass(UNICODE_STRING_SIMPLE("F\\"));
-	Scope.NamespaceAliases[UNICODE_STRING_SIMPLE("F")] = UNICODE_STRING_SIMPLE("\\First");
+	Scope.AddNamespace(UNICODE_STRING_SIMPLE("\\First"), UNICODE_STRING_SIMPLE("F"));
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_VECTOR_SIZE(1, ResourceMatches);
@@ -650,7 +650,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClas
 	GlobalFinder.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
 	ToClass(UNICODE_STRING_SIMPLE("Othe"));
 	Scope.NamespaceName = UNICODE_STRING_SIMPLE("\\Second");
-	Scope.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = UNICODE_STRING_SIMPLE("\\Second");
+	Scope.AddNamespace(UNICODE_STRING_SIMPLE("\\Second"), UNICODE_STRING_SIMPLE("namespace"));
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);
 		
@@ -666,7 +666,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClas
 	ToClass(UNICODE_STRING_SIMPLE("\\Othe"));
 	
 	Scope.NamespaceName = UNICODE_STRING_SIMPLE("\\Second");
-	Scope.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = UNICODE_STRING_SIMPLE("\\Second");
+	Scope.AddNamespace(UNICODE_STRING_SIMPLE("\\Second"), UNICODE_STRING_SIMPLE("namespace"));
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_VECTOR_SIZE(1, ResourceMatches);
@@ -690,7 +690,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClas
 	GlobalFinder.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
 	ToClass(UNICODE_STRING_SIMPLE("Othe"));
 	Scope.NamespaceName = UNICODE_STRING_SIMPLE("\\Second");
-	Scope.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = UNICODE_STRING_SIMPLE("\\Second");
+	Scope.AddNamespace(UNICODE_STRING_SIMPLE("\\Second"), UNICODE_STRING_SIMPLE("namespace"));
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);
 		
@@ -716,7 +716,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndFunc
 	// global functions ARE automatically imported
 	ToFunction(UNICODE_STRING_SIMPLE("wor"));
 	Scope.NamespaceName = UNICODE_STRING_SIMPLE("\\First\\Child");
-	Scope.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = UNICODE_STRING_SIMPLE("\\First\\Child");
+	Scope.AddNamespace(UNICODE_STRING_SIMPLE("\\First\\Child"), UNICODE_STRING_SIMPLE("namespace"));
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_VECTOR_SIZE(1, ResourceMatches);
@@ -739,7 +739,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClas
 	// classes in the same namespace ARE automatically imported
 	ToClass(UNICODE_STRING_SIMPLE("MyC"));
 	Scope.NamespaceName = UNICODE_STRING_SIMPLE("\\First\\Child");
-	Scope.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = UNICODE_STRING_SIMPLE("\\First\\Child");
+	Scope.AddNamespace(UNICODE_STRING_SIMPLE("\\First\\Child"), UNICODE_STRING_SIMPLE("namespace"));
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);	
 	CHECK_VECTOR_SIZE(1, ResourceMatches);
@@ -761,7 +761,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceGlobalC
 	
 	ToClass(UNICODE_STRING_SIMPLE("Other"));
 	Scope.NamespaceName = UNICODE_STRING_SIMPLE("\\First\\Child");
-	Scope.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = UNICODE_STRING_SIMPLE("\\First\\Child");
+	Scope.AddNamespace(UNICODE_STRING_SIMPLE("\\First\\Child"), UNICODE_STRING_SIMPLE("namespace"));
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_VECTOR_SIZE(0, ResourceMatches);
@@ -778,8 +778,8 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndGlob
 	
 	// declare a namespace and import the global class as well
 	Scope.NamespaceName = UNICODE_STRING_SIMPLE("\\First\\Child");
-	Scope.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = UNICODE_STRING_SIMPLE("\\First\\Child");
-	Scope.NamespaceAliases[UNICODE_STRING_SIMPLE("OtherClass")] = UNICODE_STRING_SIMPLE("\\OtherClass");
+	Scope.AddNamespace(UNICODE_STRING_SIMPLE("\\First\\Child"), UNICODE_STRING_SIMPLE("namespace"));
+	Scope.AddNamespace(UNICODE_STRING_SIMPLE("\\OtherClass"), UNICODE_STRING_SIMPLE("OtherClass"));
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);
 		
@@ -898,7 +898,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithTraitInDifferent
 	Init(sourceCode);
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE(""), false, false);
 	Scope.NamespaceName = UNICODE_STRING_SIMPLE("\\Second");
-	Scope.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = UNICODE_STRING_SIMPLE("\\Second");
+	Scope.AddNamespace(UNICODE_STRING_SIMPLE("\\Second"), UNICODE_STRING_SIMPLE("namespace"));
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);
 		
@@ -1162,8 +1162,8 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringWithMultipleNamespaces) {
 	ScopeFinder.GetScopeString(sourceCode, pos, Scope);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), Scope.ClassName);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("work"), Scope.MethodName);
-	CHECK_UNISTR_EQUALS("\\PDOException", Scope.NamespaceAliases[UNICODE_STRING_SIMPLE("PE")]);
-	CHECK_UNISTR_EQUALS("\\Second\\Child", Scope.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")]);
+	CHECK_UNISTR_EQUALS("\\PDOException", Scope.GetFullNamespace(UNICODE_STRING_SIMPLE("PE")));
+	CHECK_UNISTR_EQUALS("\\Second\\Child", Scope.GetFullNamespace(UNICODE_STRING_SIMPLE("namespace")));
 }
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringWithNamespaceOnly) {
@@ -1178,7 +1178,7 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringWithNamespaceOnly) {
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), Scope.ClassName);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), Scope.MethodName);
 	CHECK_UNISTR_EQUALS("\\First\\Child", Scope.NamespaceName);
-	CHECK_UNISTR_EQUALS("\\First\\Child", Scope.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")]);
+	CHECK_UNISTR_EQUALS("\\First\\Child", Scope.GetFullNamespace(UNICODE_STRING_SIMPLE("namespace")));
 }
 
 }

@@ -83,8 +83,9 @@ static bool IsResourceVisible(const mvceditor::ResourceClass& resource, const pe
 			resQualified.append(resource.Identifier);
 				
 			// but if the resource is aliased then the class can be accessed
+			std::map<UnicodeString, UnicodeString, pelet::UnicodeStringComparatorClass> aliases = scope.GetNamespaceAliases();
 			std::map<UnicodeString, UnicodeString, pelet::UnicodeStringComparatorClass>::const_iterator it;
-			for (it = scope.NamespaceAliases.begin(); it != scope.NamespaceAliases.end(); ++it) {
+			for (it = aliases.begin(); it != aliases.end(); ++it) {
 				
 				// map key is the alias
 				// check to see if the expression begins with the alias
@@ -791,8 +792,9 @@ void mvceditor::SymbolTableClass::ResolveNamespaceAlias(pelet::ExpressionClass& 
 	// leave fully qualified names alon
 	UnicodeString name = parsedExpression.FirstValue();
 	if (!name.startsWith(UNICODE_STRING_SIMPLE("$")) && !name.startsWith(UNICODE_STRING_SIMPLE("\\"))) {
+		std::map<UnicodeString, UnicodeString, pelet::UnicodeStringComparatorClass> aliases = scope.GetNamespaceAliases();
 		std::map<UnicodeString, UnicodeString, pelet::UnicodeStringComparatorClass>::const_iterator it;
-		for (it = scope.NamespaceAliases.begin(); it != scope.NamespaceAliases.end(); ++it) {
+		for (it = aliases.begin(); it != aliases.end(); ++it) {
 			
 			// map key is the alias
 			// check to see if the expression begins with the alias
@@ -818,8 +820,9 @@ void mvceditor::SymbolTableClass::UnresolveNamespaceAlias(const pelet::Expressio
 	// leave variables and fully qualified names alone
 	if (!originalExpression.FirstValue().startsWith(UNICODE_STRING_SIMPLE("$")) && !originalExpression.FirstValue().startsWith(UNICODE_STRING_SIMPLE("\\"))) {
 		
+		std::map<UnicodeString, UnicodeString, pelet::UnicodeStringComparatorClass> aliases = scope.GetNamespaceAliases();
 		std::map<UnicodeString, UnicodeString, pelet::UnicodeStringComparatorClass>::const_iterator it;
-		for (it = scope.NamespaceAliases.begin(); it != scope.NamespaceAliases.end(); ++it) {
+		for (it = aliases.begin(); it != aliases.end(); ++it) {
 			
 			// map value is the fully qualified name
 			// check to see if the resource begins with the fully qualified aliased name
@@ -891,7 +894,7 @@ void mvceditor::ScopeFinderClass::NamespaceDeclarationFound(const UnicodeString&
 	
 	// add support for the namespace static operator
 	if (namespaceName != UNICODE_STRING_SIMPLE("\\")) {
-		Scope.NamespaceAliases[UNICODE_STRING_SIMPLE("namespace")] = namespaceName;
+		Scope.AddNamespace(namespaceName, UNICODE_STRING_SIMPLE("namespace"));
 	}
 }
 
@@ -899,7 +902,7 @@ void mvceditor::ScopeFinderClass::NamespaceUseFound(const UnicodeString& namespa
 	if (startingPos >= PosToCheck) {
 		return;
 	}
-	Scope.NamespaceAliases[alias] = namespaceName;
+	Scope.AddNamespace(namespaceName, alias);
 }
 
 void mvceditor::ScopeFinderClass::MethodScope(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
