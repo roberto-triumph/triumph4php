@@ -222,6 +222,8 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourcePluginClass::SearchForR
 	matches = resourceCache->CollectNearMatchResourcesFromAll(mvceditor::StringHelperClass::wxToIcu(text));
 
 	// no need to show jump to results for native functions
+	// TODO: CollectNearResourceMatches shows resources from files that were recently deleted
+	// need to hide them / remove them
 	RemoveNativeMatches(matches);
 	return matches;
 }
@@ -411,7 +413,11 @@ void mvceditor::ResourcePluginClass::OnSearchForResource(wxCommandEvent& event) 
 
 void mvceditor::ResourcePluginClass::LoadPageFromResource(const wxString& finderQuery, const mvceditor::ResourceClass& resource) {
 	mvceditor::ResourceSearchClass resourceSearch(mvceditor::StringHelperClass::wxToIcu(finderQuery));
-	GetNotebook()->LoadPage(resource.FullPath.GetFullPath());
+	wxFileName fileName = resource.FileName();
+	if (!fileName.FileExists()) {
+		mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, _("File no longer exists:") + fileName.GetFullPath());
+	}
+	GetNotebook()->LoadPage(resource.GetFullPath());
 	CodeControlClass* codeControl = GetCurrentCodeControl();
 	if (codeControl) {
 		int32_t position, 
@@ -573,7 +579,7 @@ void mvceditor::ResourceSearchDialogClass::ShowJumpToResults(const wxString& fin
 	wxArrayString files;
 	mvceditor::ResourceSearchClass resourceSearch(mvceditor::StringHelperClass::wxToIcu(finderQuery));
 	for (size_t i = 0; i < allMatches.size(); ++i) {
-		files.Add(allMatches[i].FullPath.GetFullPath());
+		files.Add(allMatches[i].GetFullPath());
 	}
 	MatchesList->Clear();
 	

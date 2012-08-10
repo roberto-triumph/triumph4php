@@ -129,7 +129,7 @@ void mvceditor::OutlineViewPluginClass::JumpToResource(const wxString& resource)
 	std::vector<mvceditor::ResourceClass> matches = resourceCache->CollectFullyQualifiedResourceFromAll(mvceditor::StringHelperClass::wxToIcu(resource));
 	if (!matches.empty()) {
 		mvceditor::ResourceClass resource = matches[0];
-		GetNotebook()->LoadPage(resource.FullPath.GetFullPath());
+		GetNotebook()->LoadPage(resource.GetFullPath());
 		CodeControlClass* codeControl = GetCurrentCodeControl();
 		if (codeControl) {
 			int32_t position, 

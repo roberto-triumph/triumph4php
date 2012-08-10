@@ -200,7 +200,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 	ResourceFinder.Walk(TestProjectDir + TestFile);
 	CollectNearMatchResources(mvceditor::StringHelperClass::wxToIcu(TestFile));
 	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].FullPath.GetFullPath());
+	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 }
 
 TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameIsASubset) {
@@ -213,7 +213,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 	ResourceFinder.Walk(TestProjectDir + TestFile);
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("est.php"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].FullPath.GetFullPath());
+	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 }
 
 TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldNotFindFileWhenFileNameMatchesButLineNumberIsTooBig) {
@@ -244,7 +244,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 	ResourceFinder.Walk(TestProjectDir + TestFile);
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("test.php:6"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].FullPath.GetFullPath());
+	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 }
 
 TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameDoesNotMatchCase) {
@@ -260,7 +260,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 	ResourceFinder.Walk(TestProjectDir + TestFile);
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("test.php:6"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].FullPath.GetFullPath());
+	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhenClassNameMatches) {
@@ -277,7 +277,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 	));	
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_EQUAL(TestFile, Matches[0].FullPath.GetFullPath());
+	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 	mvceditor::ResourceClass resource = Matches[0];
 	CHECK_NAMESPACE_RESOURCE("\\", "UserClass", resource);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), resource.ReturnType);
@@ -314,7 +314,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 	));
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("User"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_EQUAL(TestFile, Matches[0].FullPath.GetFullPath());
+	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhenClassNameHasAnExtends) {
@@ -346,7 +346,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 	));	
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass::getName"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_EQUAL(TestFile, Matches[0].FullPath.GetFullPath());
+	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 	mvceditor::ResourceClass resource = Matches[0];
 	CHECK_MEMBER_RESOURCE("UserClass", "getName", resource);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\"), resource.NamespaceName);
@@ -372,7 +372,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 	));	
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass::getName"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_EQUAL(TestFile, Matches[0].FullPath.GetFullPath());
+	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldNotFindFileWhenClassNameMatchesButMethodNameDoesNot) {
@@ -403,7 +403,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 	));
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("::getName"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_EQUAL(TestFile, Matches[0].FullPath.GetFullPath());
+	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 	CHECK_MEMBER_RESOURCE("UserClass", "getName", Matches[0]);
 }
 
@@ -425,7 +425,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldOnlyS
 	));	
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_EQUAL(TestFile, Matches[0].FullPath.GetFullPath());
+	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 	CHECK_UNISTR_EQUALS("UserClass", Matches[0].Identifier);
 	CHECK_EQUAL(false, Matches[0].IsNative);
 }
@@ -457,8 +457,8 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindT
 	));	
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(2, Matches);
-	CHECK_EQUAL(testFile, Matches[0].FullPath.GetFullPath());
-	CHECK_EQUAL(testFile2, Matches[1].FullPath.GetFullPath());
+	CHECK_EQUAL(testFile, Matches[0].GetFullPath());
+	CHECK_EQUAL(testFile2, Matches[1].GetFullPath());
 }
 
 TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldNotFindFileWhenItHasBeenModified) {
@@ -475,7 +475,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldNotFind
 	ResourceFinder.Walk(TestProjectDir + TestFile);
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].FullPath.GetFullPath());
+	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 	wxSleep(1);
 	Prep(wxString::FromAscii(
 		"<?php\n"
@@ -504,16 +504,16 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindC
 	));	
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("test.php"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_EQUAL(TestFile, Matches[0].FullPath.GetFullPath());
+	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_EQUAL(TestFile, Matches[0].FullPath.GetFullPath());
+	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("test.php"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_EQUAL(TestFile, Matches[0].FullPath.GetFullPath());
+	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_EQUAL(TestFile, Matches[0].FullPath.GetFullPath());
+	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFunctionWhenFunctionNameMatches) {
@@ -789,7 +789,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, InitFileShouldLoadDbFromFile) {
 	ResourceFinder.Walk(TestProjectDir + TestFile);
 	CollectNearMatchResources(mvceditor::StringHelperClass::wxToIcu(TestFile));
 	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].FullPath.GetFullPath());
+	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 
 	// do a lookup in the new resource finder that only looks at the DB file
 	// and does not parse the file system
@@ -797,7 +797,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, InitFileShouldLoadDbFromFile) {
 	newResourceFinder.InitFile(newDbFileName);
 	Matches = newResourceFinder.CollectNearMatchResources(mvceditor::StringHelperClass::wxToIcu(TestFile));
 	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].FullPath.GetFullPath());
+	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 }
 
 
@@ -906,8 +906,8 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesShould
 	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("UserClass"));
 	Matches = ResourceFinder.CollectFullyQualifiedResource(resourceSearch);
 	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_EQUAL(TestFile, Matches[0].FullPath.GetFullPath());
-	CHECK_EQUAL(TestFile, Matches[0].FullPath.GetFullPath());
+	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
+	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesShouldFindMatchesForCorrectClassMethod) {
@@ -968,7 +968,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectFullyQualifiedResourcesShouldFi
 	ResourceFinder.Walk(TestProjectDir + TestFile);
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].FullPath.GetFullPath());
+	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 	wxSleep(1);
 	Prep(wxString::FromAscii(
 		"<?php\n"
@@ -1009,10 +1009,15 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectFullyQualifiedResourcesShouldFi
 	ResourceFinder.Walk(TestProjectDir + TestFile);
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].FullPath.GetFullPath());
+	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 	CHECK(wxRemoveFile(TestProjectDir + TestFile));
 	Matches = ResourceFinder.CollectFullyQualifiedResource(resourceSearch);
-	CHECK_VECTOR_SIZE(0, Matches);
+
+	// before this was expected to be zero, but the code that ensures matched files
+	// exist is gone from the CollectNearMatchResources method because of performance
+	// issues and we want the method to be fast because it is performed during 
+	// user clicks
+	CHECK_VECTOR_SIZE(1, Matches);
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceMatchShouldReturnSignatureForConstructors) {

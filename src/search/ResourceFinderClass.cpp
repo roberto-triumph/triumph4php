@@ -395,6 +395,12 @@ bool mvceditor::ResourceFinderClass::GetResourceMatchPosition(const mvceditor::R
 }
 
 std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNearMatchResources(const mvceditor::ResourceSearchClass& resourceSearch) {
+
+	
+	// at one point there was a check here to see if the  resource files existed
+	// it was removed because it caused performance issues, since this method
+	// is called while the user is typing text.
+	// take care when coding; make sure that any code called by this method does not touch the file system
 	std::vector<mvceditor::ResourceClass> matches;
 	switch (resourceSearch.GetResourceType()) {
 		case mvceditor::ResourceSearchClass::FILE_NAME:
@@ -411,7 +417,6 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 			matches = CollectNearMatchNamespaces(resourceSearch);
 			break;
 	}
-	EnsureMatchesExist(matches);
 	sort(matches.begin(), matches.end());
 	return matches;
 }
@@ -440,7 +445,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 				if (0 == resourceSearch.GetLineNumber() || GetLineCountFromFile(fullPath) >= resourceSearch.GetLineNumber()) {
 					ResourceClass newItem;
 					newItem.FileItemId = fileItemId;
-					newItem.FullPath.Assign(fullPath);
+					newItem.SetFullPath(fullPath);
 					newItem.FileIsNew = isNew > 0;
 					matches.push_back(newItem);
 				}
@@ -999,7 +1004,11 @@ UnicodeString mvceditor::ResourceFinderClass::ExtractParentClassFromSignature(co
 }
 
 std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectFullyQualifiedResource(const mvceditor::ResourceSearchClass& resourceSearch) {
-	ResourceClass needle;
+
+	// at one point there was a check here to see if the  resource files existed
+	// it was removed because it caused performance issues, since this method
+	// is called while the user is typing text.
+	// take care when coding; make sure that any code called by this method does not touch the file system
 	std::vector<mvceditor::ResourceClass> allMatches;
 	if (resourceSearch.GetResourceType() == mvceditor::ResourceSearchClass::CLASS_NAME_METHOD_NAME) {
 
@@ -1040,7 +1049,6 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectFul
 			allMatches.push_back(matches[0]);
 		}
 	}
-	EnsureMatchesExist(allMatches);
 	return allMatches;
 }
 
@@ -1054,12 +1062,19 @@ void mvceditor::ResourceFinderClass::EnsureMatchesExist(std::vector<ResourceClas
 		// native matches wont have a FileItem assigned to them since they come from the tag file
 		// FileItemId is meaningless for dynamic resources
 		// is a file is new it wont be on disk; results are never stale in this case.
-		if (it->IsNative || it->IsDynamic || it->FileIsNew || !it->FullPath.IsOk() || it->FullPath.FileExists()) {
-			++it;
+		bool remove = false;
+		if (!it->IsNative && !it->IsDynamic && !it->FileIsNew) {
+			wxFileName fileName = it->FileName();
+			if (fileName.IsOk() && !fileName.FileExists()) {
+				remove = true;
+			}
 		}
-		else {
+		if (remove) {
 			fileItemIdsToRemove.push_back(it->FileItemId);
 			it = matches.erase(it);
+		}
+		else {
+			++it;
 		}
 	}
 	if (!fileItemIdsToRemove.empty()) {
@@ -1352,7 +1367,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::ResourceSt
 			resource.ReturnType = mvceditor::StringHelperClass::charToIcu(returnType.c_str());
 			resource.Comment = mvceditor::StringHelperClass::charToIcu(comment.c_str());
 			if (soci::i_ok == fullPathIndicator) {
-				resource.FullPath.Assign(mvceditor::StringHelperClass::charToWx(fullPath.c_str()));
+				resource.SetFullPath(mvceditor::StringHelperClass::charToWx(fullPath.c_str()));
 			}
 			resource.IsProtected = isProtected != 0;
 			resource.IsPrivate = isPrivate != 0;
@@ -1733,7 +1748,7 @@ void mvceditor::ResourceClass::Clear() {
 	Comment.remove();
 	Type = CLASS;
 	FileItemId = -1;
-	FullPath.Assign(wxT(""));
+	FullPath = wxT("");
 	Key.remove();
 	IsProtected = false;
 	IsPrivate = false;
@@ -1750,6 +1765,19 @@ mvceditor::ResourceClass mvceditor::ResourceClass::MakeNamespace(const UnicodeSt
 	namespaceItem.Identifier = namespaceName;
 	namespaceItem.Key = namespaceName;
 	return namespaceItem;
+}
+
+wxFileName mvceditor::ResourceClass::FileName() const {
+	wxFileName fileName(FullPath);
+	return fileName;
+}
+
+wxString  mvceditor::ResourceClass::GetFullPath() const {
+	return FullPath;
+}
+
+void mvceditor::ResourceClass::SetFullPath(const wxString& fullPath) {
+	FullPath = fullPath;
 }
 
 mvceditor::TraitResourceClass::TraitResourceClass() 

@@ -181,12 +181,12 @@ private:
  * 1) ResourceFinderClass object is instantiated
  * 2) The resource cache must be built.  The reason that this needs to be done explicitly is because the caller 
  *    may want to control that process (i.e. manually start, stop it, show a progess bar). 
- * 3) Caller will invoke the Prepare() method, giving it the item to search for.
- * 4) The search is performed by calling the CollectFullyQualifiedResource or CollectNearMatchResources() methods.
+ * 3) The search is performed by calling the CollectFullyQualifiedResource or CollectNearMatchResources() methods.
  *    Fully qualified search does exact matching while the near match search performs special logic (see method for
  *    details on search logic).
- * 5) Iteration of the search results is done through the GetResourceMatch(), GetResourceMatchCount() methods. The
- *    caller can get the artifact as well as the location of the artifact and its signature.
+ * 4) Iteration of the search results is done through the results vector that each of the Collect methods
+ *    returns.  Because this search is done on a database, the returned matches may contain matches from 
+ *    files that are no longer in the file system.
  * 
  * Note that the ResourceFinder cache will need to be refreshed if files are modified after the cache is built. Below
  * is some sample code of steps 1-5:
@@ -197,34 +197,29 @@ private:
  * DirectorySearchClass search;
  * if (search.Init(wxT("/home/user/workspace/project/"))) {
  *   resourceFinder.FilesFilter.push_back(wxT("*.php"));
- *     while (search.More()) {
- *       search.Walk(resourceFinder);
- *     }
- *     //now that the resources have been cached, we can query the cache
- *     mvceditor::ResourceSearchClass search(UNICODE_STRING_SIMPLE("UserClass"));
- *     std::vector<mvceditor::ResourceClass> matches = resourceFinder.CollectNearMatchResources(search);
- *     if (!matches.empty()) {
- *       for (size_t i = 0; i < matches.size(); i++)  {
- *         mvceditor::ResourceClass resource = matches[i];
- *         // do something with the resource 
- *         // print the comment resource.Comment
- *         //  print the signature   resource.Signature
- *         // do something with the matched file
- *         UnicodeString className = search.GetClassName(); //the class name parsed from resource (given in to ResourceSearchClass)
- *         UnicodeString methodName = search.GetMethodName(); // the method name parsed from resource (given to ResourceSearchClass)
- *         int lineNumber = search.GetLineNumber(); // the line number parsed from resource (given to ResourceSearchClass)
- *         
- *       }
- *     }
- *     else {
- *       puts("Resource not found\n");
+ *   while (search.More()) {
+ *     search.Walk(resourceFinder);
+ *   }
+ *   //now that the resources have been cached, we can query the cache
+ *   mvceditor::ResourceSearchClass search(UNICODE_STRING_SIMPLE("UserClass"));
+ *   std::vector<mvceditor::ResourceClass> matches = resourceFinder.CollectNearMatchResources(search);
+ *   if (!matches.empty()) {
+ *     for (size_t i = 0; i < matches.size(); i++)  {
+ *       mvceditor::ResourceClass resource = matches[i];
+ *       // do something with the resource 
+ *       // print the comment resource.Comment
+ *       //  print the signature   resource.Signature
+ *       // do something with the matched file
+ *       UnicodeString className = search.GetClassName(); //the class name parsed from resource (given in to ResourceSearchClass)
+ *       UnicodeString methodName = search.GetMethodName(); // the method name parsed from resource (given to ResourceSearchClass)
+ *       int lineNumber = search.GetLineNumber(); // the line number parsed from resource (given to ResourceSearchClass)    
  *     }
  *   }
  *   else {
- *     puts("Filter or Expression are not valid.\n");
+ *     puts("Resource not found\n");
  *   }
  * }
- * else  {
+ * else {
  *   puts("Directory not readable.\n");
  * }
  * </code>
@@ -344,6 +339,9 @@ public:
 	 * 
 	 * @param resourceSearch the resources to look for
 	 * @return std::vector<ResourceClass> the matched resources
+	 *         Because this search is done on a database,
+	 *         the returned list may contain matches from files that are no longer in 
+	 *         the file system.
 	 */
 	std::vector<ResourceClass> CollectFullyQualifiedResource(const mvceditor::ResourceSearchClass& resourceSearch);
 	
@@ -395,6 +393,9 @@ public:
 	 * 
 	 * @param resourceSearch the partial name of resources to look for
 	 * @return matches the list of matched resources (max of 50)
+	 *         Because this search is done on a database,
+	 *         the returned list may contain matches from files that are no longer in 
+	 *         the file system.
 	 */
 	std::vector<ResourceClass> CollectNearMatchResources(const mvceditor::ResourceSearchClass& resourceSearch);
 	
@@ -857,12 +858,6 @@ public:
 	 * @var UnicodeString
 	 */
 	UnicodeString Comment;
-
-	/**
-	 * Full path to the file where this resource was found. Note that this may not be a valid file
-	 * if a resources is a native or dynamic resource.
-	 */
-	wxFileName FullPath;
 	
 	/**
 	 * The resource item type
@@ -931,6 +926,24 @@ public:
 	 */
 	bool IsKeyEqualTo(const UnicodeString& key) const;
 
+	/**
+	 * @return the FileName that this resource is located in. This may be an
+	 *         invalid FileName if this resource is a native or dynamic resource.
+	 *         Note that this creates a new wxFileName, which may affect performance
+	 */
+	wxFileName FileName() const;
+
+	/**
+	 * @return the full path that this resource is located in.
+	 *         if a resource is a native or dynamic resource.
+	 */
+	wxString GetFullPath() const;
+
+	/**
+	 * @param fullPath the full path where this resource is located
+	 */
+	void SetFullPath(const wxString& fullPath);
+
 private:
 	
 	/**
@@ -942,6 +955,12 @@ private:
 	 * - A fully namespaced name (\First\Sec\Class)
 	 */
 	UnicodeString Key;
+
+	/**
+	 * Full path to the file where this resource was found. Note that this may not be a valid file
+	 * if a resource is a native or dynamic resource.
+	 */
+	wxString FullPath;
 
 	/**
 	 * The index to the file where this resource was found. 

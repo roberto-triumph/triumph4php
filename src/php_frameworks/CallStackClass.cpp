@@ -434,11 +434,11 @@ void mvceditor::CallStackClass::CreateCalls() {
 					// if we get here; we are able to know which class and method are being called
 					// lets add it to the queue so that this class/method will get recursed into next
 					if (mvceditor::ResourceClass::FUNCTION == it->Type || mvceditor::ResourceClass::METHOD == it->Type) {
-						if (it->FullPath.IsOk()) {
+						if (it->FileName().IsOk()) {
 							
 							// dynamic resources may not have a file path to go to
 							ResourceWithFile newItem;
-							newItem.FileName = it->FullPath;
+							newItem.FileName = it->FileName();
 							newItem.Resource = *it;
 							newItem.CallArguments = expr.ChainList[j].CallArguments;
 							newItem.ScopeVariables = ScopeVariables;
