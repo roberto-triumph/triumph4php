@@ -23,9 +23,9 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <UnitTest++.h>
-#include <widgets/ResourceCacheClass.h>
+#include <language/ResourceCacheClass.h>
 #include <FileTestFixtureClass.h>
-#include "unicode/ustream.h" //get the << overloaded operator, needed by UnitTest++
+#include <unicode/ustream.h> //get the << overloaded operator, needed by UnitTest++
 #include <MvcEditorChecks.h>
 
 /**

@@ -26,7 +26,7 @@
 #define __CALLSTACKCLASS_H__
 
 #include <pelet/ParserClass.h>
-#include <widgets/ResourceCacheClass.h>
+#include <language/ResourceCacheClass.h>
 #include <language/SymbolTableClass.h>
 #include <unicode/unistr.h>
 #include <wx/filename.h>

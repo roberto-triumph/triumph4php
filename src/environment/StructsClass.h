@@ -30,7 +30,7 @@
 #include <environment/UrlResourceClass.h>
 #include <environment/ProjectClass.h>
 #include <environment/SqlResourceFinderClass.h>
-#include <widgets/ResourceCacheClass.h>
+#include <language/ResourceCacheClass.h>
 #include <php_frameworks/FrameworkDetectorClass.h>
 #include <vector>
 

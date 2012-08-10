@@ -274,7 +274,7 @@ mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::StructsClass* structs, 
 	, Timer()
 	, FileIdentifier()
 	, Structs(structs)
-	, ResourceCacheUpdateThread(&structs->ResourceCache, *this, runningThreads)
+	, ResourceCacheBuilder(&structs->ResourceCache, *this, runningThreads)
 	, CurrentCallTipIndex(0)
 	, NeedToUpdateResources(false) 
 	, AreImagesRegistered(false) {
@@ -892,7 +892,7 @@ void mvceditor::PhpDocumentClass::MatchBraces(int posToCheck) {
 void mvceditor::PhpDocumentClass::OnModification(wxStyledTextEvent& event) {
 
 	// if already parsing then dont do anything
-	if (!Structs || ResourceCacheUpdateThread.IsRunning()) {
+	if (!Structs || ResourceCacheBuilder.IsRunning()) {
 		event.Skip();
 		return;
 	}
@@ -1053,11 +1053,11 @@ void mvceditor::PhpDocumentClass::OnResourceUpdateComplete(wxCommandEvent& event
 }
 
 void mvceditor::PhpDocumentClass::OnTimer(wxTimerEvent& event) {
-	if (NeedToUpdateResources && Structs && !ResourceCacheUpdateThread.IsRunning()) {
+	if (NeedToUpdateResources && Structs && !ResourceCacheBuilder.IsRunning()) {
 		UnicodeString text = GetSafeText();
 
 		// we need to differentiate between new and opened files (the 'true' arg)
-		ResourceCacheUpdateThread.StartBackgroundUpdate(FileIdentifier, text, !wxFileName::FileExists(Ctrl->GetFileName()));
+		ResourceCacheBuilder.StartBackgroundUpdate(FileIdentifier, text, !wxFileName::FileExists(Ctrl->GetFileName()));
 
 		// even if thread could not be started just prevent re-parsing until user 
 		// modified the text

@@ -26,6 +26,7 @@
 #include <pelet/TokenClass.h>
 #include <pelet/ParserClass.h>
 #include <language/SymbolTableClass.h>
+#include <language/ResourceCacheClass.h>
 #include <search/DirectorySearchClass.h>
 #include <search/ResourceFinderClass.h>
 #include <MvcEditorAssets.h>

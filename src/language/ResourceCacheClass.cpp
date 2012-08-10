@@ -22,7 +22,7 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <widgets/ResourceCacheClass.h>
+#include <language/ResourceCacheClass.h>
 #include <algorithm>
 
 mvceditor::ResourceCacheClass::ResourceCacheClass()
@@ -420,43 +420,4 @@ void mvceditor::ResourceCacheClass::SetVersion(pelet::Versions version) {
 		it->second->SetVersion(version);
 	}
 	
-}
-
-mvceditor::ResourceCacheUpdateThreadClass::ResourceCacheUpdateThreadClass(mvceditor::ResourceCacheClass* resourceCache, 
-		wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: ThreadWithHeartbeatClass(handler, runningThreads, eventId)
-	, Mode(UPDATE)
-	, ResourceCache(resourceCache)
-	, CurrentCode() 
-	, CurrentFileName(){
-}
-
-wxThreadError mvceditor::ResourceCacheUpdateThreadClass::StartBackgroundUpdate(const wxString& fileName, const UnicodeString& code, bool isNew) {
-	if (!ResourceCache) {
-		return wxTHREAD_NO_ERROR;
-	}
-
-	// make sure to set these BEFORE calling CreateSingleInstance
-	// in order to prevent Entry from reading them while we write to them
-	CurrentCode = code;
-	CurrentFileName = fileName;
-	CurrentFileIsNew = isNew;
-	Mode = UPDATE;
-
-	wxThreadError error = CreateSingleInstance();
-	if (wxTHREAD_NO_ERROR == error) {	
-		SignalStart();		
-	}
-	return error;
-}
-
-void mvceditor::ResourceCacheUpdateThreadClass::Entry() {
-	if (UPDATE == Mode) {
-		ResourceCache->Update(CurrentFileName, CurrentCode, CurrentFileIsNew);
-	}
-
-	// cleanup.
-	CurrentFileName.resize(0);
-	CurrentCode.truncate(0);
-	SignalEnd();
 }

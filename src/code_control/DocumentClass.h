@@ -30,6 +30,7 @@
 #include <pelet/ParserClass.h>
 #include <pelet/LanguageDiscoveryClass.h>
 #include <language/SymbolTableClass.h>
+#include <code_control/ResourceCacheBuilderClass.h>
 #include <environment/StructsClass.h>
 #include <wx/string.h>
 #include <wx/stc/stc.h>
@@ -361,9 +362,10 @@ private:
 	StructsClass* Structs;
 
 	/**
-	 * To parse the current source code in the background
+	 * To parse the current source code in the background and store it in
+	 * a shared cache that all of the opened code controls can access.
 	 */
-	ResourceCacheUpdateThreadClass ResourceCacheUpdateThread;
+	ResourceCacheBuilderClass ResourceCacheBuilder;
 	
 	/**
 	 * The resource signature currently being displayed in the calltip.

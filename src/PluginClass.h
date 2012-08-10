@@ -27,9 +27,7 @@
  
 #include <environment/EnvironmentClass.h>
 #include <environment/ProjectClass.h>
-#include <php_frameworks/FrameworkDetectorClass.h>
 #include <widgets/NotebookClass.h>
-#include <widgets/ResourceCacheClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
 #include <widgets/ThreadWithHeartbeatClass.h>
 #include <PreferencesClass.h>
@@ -41,6 +39,9 @@ namespace mvceditor {
 	
 // forward declaration to prevent #include of the AppClass
 class AppClass;
+
+// forward declaration to prevent #include of the ResourceCacheClass
+class ResourceCacheClass;
 
 /**
  * ATTN: Use this enum to build the Plugin menus
