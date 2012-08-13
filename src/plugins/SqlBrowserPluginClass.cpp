@@ -598,11 +598,24 @@ void mvceditor::SqlBrowserPanelClass::UnlinkFromCodeControl() {
 	CodeControl = NULL;
 }
 
+const wxEventType mvceditor::EVENT_SQL_META_DATA_COMPLETE = wxNewEventType();
+
+mvceditor::SqlMetaDataEventClass::SqlMetaDataEventClass(const mvceditor::SqlResourceFinderClass& newResources,
+														const std::vector<UnicodeString>& errors) 
+	: wxEvent(wxID_ANY, mvceditor::EVENT_SQL_META_DATA_COMPLETE)
+	, NewResources(newResources)
+	, Errors(errors) {
+}
+
+wxEvent* mvceditor::SqlMetaDataEventClass::Clone() const {
+	mvceditor::SqlMetaDataEventClass* evt = new 
+		mvceditor::SqlMetaDataEventClass(NewResources, Errors);
+	return evt;
+}
+
 mvceditor::SqlMetaDataFetchClass::SqlMetaDataFetchClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads)
 	: ThreadWithHeartbeatClass(handler, runningThreads)
-	, Infos() 
-	, Errors()
-	, NewResources() {
+	, Infos() {
 		
 }
 
@@ -612,7 +625,6 @@ bool mvceditor::SqlMetaDataFetchClass::Read(std::vector<mvceditor::DatabaseInfoC
 	// make sure to set these BEFORE calling CreateSingleInstance
 	// in order to prevent Entry from reading them while we write to them
 	Infos = infos;
-	Errors.clear();
 	wxThreadError err = CreateSingleInstance();
 	if (wxTHREAD_NO_RESOURCE == err) {
 		mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
@@ -628,21 +640,24 @@ bool mvceditor::SqlMetaDataFetchClass::Read(std::vector<mvceditor::DatabaseInfoC
 }
 
 void mvceditor::SqlMetaDataFetchClass::Entry() {
+	std::vector<UnicodeString> errors;
+	mvceditor::SqlResourceFinderClass newResources;
 	for (std::vector<mvceditor::DatabaseInfoClass>::iterator it = Infos.begin(); it != Infos.end(); ++it) {
-		UnicodeString error;
-		if (!NewResources.Fetch(*it, error)) {
-			Errors.push_back(error);
+		if (!TestDestroy()) {
+			UnicodeString error;
+			if (!newResources.Fetch(*it, error)) {
+				errors.push_back(error);
+			}
+		}
+		else {
+			break;
 		}
 	}
+	if (!TestDestroy()) {
+		mvceditor::SqlMetaDataEventClass evt(newResources, errors);
+		wxPostEvent(&Handler, evt);
+	}
 	SignalEnd();
-}
-
-void mvceditor::SqlMetaDataFetchClass::WriteResultsInto(mvceditor::SqlResourceFinderClass& dest) {
-	dest.Copy(NewResources);
-}
-
-std::vector<UnicodeString> mvceditor::SqlMetaDataFetchClass::GetErrors() {
-	return Errors;
 }
 
 mvceditor::SqlBrowserPluginClass::SqlBrowserPluginClass(mvceditor::AppClass& app) 
@@ -861,9 +876,11 @@ void mvceditor::SqlBrowserPluginClass::OnWorkInProgress(wxCommandEvent& event) {
 
 void mvceditor::SqlBrowserPluginClass::OnWorkComplete(wxCommandEvent& event) {
 	GetStatusBarWithGauge()->StopGauge(ID_SQL_METADATA_GAUGE);
-	SqlMetaDataFetch.WriteResultsInto(App.Structs.SqlResourceFinder);
+}
 
-	std::vector<UnicodeString> errors = SqlMetaDataFetch.GetErrors();
+void mvceditor::SqlBrowserPluginClass::OnSqlMetaDataComplete(mvceditor::SqlMetaDataEventClass& event) {
+	App.Structs.SqlResourceFinder.Copy(event.NewResources);
+	std::vector<UnicodeString> errors = event.Errors;
 	for (size_t i = 0; i < errors.size(); ++i) {
 		wxString wxError = mvceditor::StringHelperClass::IcuToWx(errors[i]);
 		mvceditor::EditorLogError(mvceditor::BAD_SQL, wxError);
@@ -957,6 +974,7 @@ BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPluginClass, wxEvtHandler)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::SqlBrowserPluginClass::OnContentNotebookPageChanged)
 	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::SqlBrowserPluginClass::OnContentNotebookPageClose)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::SqlBrowserPluginClass::OnProjectsUpdated)
+	EVT_SQL_META_DATA_COMPLETE(mvceditor::SqlBrowserPluginClass::OnSqlMetaDataComplete)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPanelClass, SqlBrowserPanelGeneratedClass)

@@ -333,8 +333,45 @@ private:
 };
 
 /**
+ * This event is generated once all of the meta data has been
+ * fetched from all of the SQL connections
+ */
+extern const wxEventType EVENT_SQL_META_DATA_COMPLETE;
+
+class SqlMetaDataEventClass : public wxEvent {
+
+public:
+
+	/**
+	 * The new resources that were found
+	 */
+	SqlResourceFinderClass NewResources;
+
+	/**
+	 * Get any connection errors that occurred in the background thread.
+	 */
+	std::vector<UnicodeString> Errors;
+	
+	SqlMetaDataEventClass(const mvceditor::SqlResourceFinderClass& resources, 
+		const std::vector<UnicodeString>& errors);
+
+	wxEvent* Clone() const;
+
+};
+
+typedef void (wxEvtHandler::*SqlMetaDataEventClassFunction)(SqlMetaDataEventClass&);
+
+#define EVT_SQL_META_DATA_COMPLETE(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_SQL_META_DATA_COMPLETE, wxID_ANY, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( SqlMetaDataEventClassFunction, & fn ), (wxObject *) NULL ),
+
+
+/**
  * This class will performt SQL metadata indexing (grabbing table and column names)
- * from all of the connections of the current project).
+ * from all of the connections of the current project). Once the list of tables 
+ * and columns has been retrieved, a SqlMetaDataEventClass event is generated 
+ * with the new resources
  */
 class SqlMetaDataFetchClass : public ThreadWithHeartbeatClass {
 
@@ -342,48 +379,29 @@ public:
 
 	/**
 	 * @param handler will get notified with EVENT_WORK_* events
+	 *        and the EVENT_SQL_META_DATA_COMPLETE event
 	 */
 	SqlMetaDataFetchClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
 	
 	/**
 	 * starts a background thread to read the metadata. Generates events while work
-	 * is in progress.
+	 * is in progress. Once the list of tables and columns has been retrieved, a 
+	 * SqlMetaDataEventClass event is generated with the new resources
+	 *
 	 * @see mvceditor::ThreadWithHearbeatClass
 	 * @param infos the connections to fetch info for.
 	 * @return bool TRUE if thread was started
 	 */
 	bool Read(std::vector<DatabaseInfoClass> infos);
-
-	/**
-	 * Once the background thread signals that it has finished
-	 * reading the metadata, call this method to get the results
-	 * of the work.
-	 *
-	 * @param dest the results of the background thread will be copied
-	 *        to dest
-	 */
-	void WriteResultsInto(SqlResourceFinderClass& dest);
-
-	/**
-	 * Get any connection errors that occurred in the background thread.
-	 * The errors are only from the last run.
-	 * Be careful to no access this while the background thread is running.
-	 */
-	std::vector<UnicodeString> GetErrors();
 	
 protected:
 
 	void Entry();
 	
-	std::vector<DatabaseInfoClass> Infos;
-
-	std::vector<UnicodeString> Errors;
-	
 	/**
-	 * This is a clean resource object; will only be accessed
-	 * background thread will only ever write to this object.
+	 * The connections to query; where the tables / columns will be fetched from 
 	 */
-	SqlResourceFinderClass NewResources;
+	std::vector<DatabaseInfoClass> Infos;
 };
 
 /**
@@ -425,6 +443,8 @@ private:
 	void OnWorkInProgress(wxCommandEvent& event);
 	
 	void OnWorkComplete(wxCommandEvent& event);
+
+	void OnSqlMetaDataComplete(mvceditor::SqlMetaDataEventClass& event);
 	
 	/**
 	 * synchronize the SQL query tab in the code control notebook with

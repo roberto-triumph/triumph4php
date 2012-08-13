@@ -140,9 +140,10 @@ void mvceditor::RunningThreadsClass::Remove(mvceditor::WorkerThreadClass* worker
 }
 
 void mvceditor::RunningThreadsClass::RemoveAndStop(mvceditor::WorkerThreadClass* worker) {
-	wxMutexLocker locker(Mutex);
-	wxASSERT(locker.IsOk());
-	
+
+	// no need to synchronize here as we are not touching the 
+	// internal vector
+
 	// wxThread::Delete will result in graceful thread termination 
 	// will call Remove() which will untrack the thread
 	worker->Delete();

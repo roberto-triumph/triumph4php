@@ -101,6 +101,18 @@ static void ListCtrlGet(wxListCtrl* list, wxString& column1Value, wxString& colu
 	}
 }
 
+const wxEventType mvceditor::EVENT_APACHE_FILE_READ_COMPLETE = wxNewEventType();
+
+mvceditor::ApacheFileReadCompleteEventClass::ApacheFileReadCompleteEventClass(const mvceditor::ApacheClass &apache)
+	: wxEvent(wxID_ANY, mvceditor::EVENT_APACHE_FILE_READ_COMPLETE)
+	, Apache(apache) {
+
+}
+
+wxEvent* mvceditor::ApacheFileReadCompleteEventClass::Clone() const {
+	mvceditor::ApacheFileReadCompleteEventClass* evt = new mvceditor::ApacheFileReadCompleteEventClass(Apache);
+	return evt;
+}
 
 mvceditor::ApacheFileReaderClass::ApacheFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads)
 	: BackgroundFileReaderClass(handler, runningThreads)
@@ -113,10 +125,6 @@ bool mvceditor::ApacheFileReaderClass::Init(const wxString& startDirectory) {
 	return BackgroundFileReaderClass::Init(startDirectory);
 }
 
-mvceditor::ApacheClass mvceditor::ApacheFileReaderClass::Results() const {
-	return ApacheResults;
-}
-
 bool mvceditor::ApacheFileReaderClass::FileMatch(const wxString& file) {
 	return true;
 }
@@ -126,18 +134,25 @@ bool mvceditor::ApacheFileReaderClass::FileRead(mvceditor::DirectorySearchClass&
 	if (search.Walk(ApacheResults)) {
 		ret = true;
 	}
-	if (!search.More()) {
+	if (!search.More() && !TestDestroy()) {
 		
 		// when we are done recursing, parse the matched files
 		std::vector<wxString> possibleConfigFiles = search.GetMatchedFiles();
 		
-		// there may be multiple files, at this point just print out the number of defined virtual hosts
+		// there may be multiple files, at this point just exist as soon as we find one file
+		// that we can recognize as a config file
+		bool found = false;
 		for (size_t i = 0; i <  possibleConfigFiles.size(); ++i) {
-			
-			// as soon as we find one exit
 			if (ApacheResults.SetHttpdPath(possibleConfigFiles[i])) {
+				found = true;
 				break;
 			}
+		}
+
+		// send the event once we have searched all files
+		if (found) {
+			mvceditor::ApacheFileReadCompleteEventClass evt(ApacheResults);
+			wxPostEvent(&Handler, evt);
 		}
 	}
 	return ret;
@@ -217,20 +232,21 @@ void mvceditor::ApacheEnvironmentPanelClass::Populate() {
 	}
 }
 
-void mvceditor::ApacheEnvironmentPanelClass::OnWorkComplete(wxCommandEvent& event) {
-	Gauge->SetValue(0);
-	ScanButton->SetLabel(_("Scan For Configuration"));
+void mvceditor::ApacheEnvironmentPanelClass::OnApacheFileReadComplete(mvceditor::ApacheFileReadCompleteEventClass& event) {
 		
-	mvceditor::ApacheClass newSettings = ApacheFileReader.Results();
-	
 	// setting the HTTPD path will reparse the file ... for now
 	// this is OK
-	EditedApache.SetHttpdPath(newSettings.GetHttpdPath());
+	EditedApache.SetHttpdPath(event.Apache.GetHttpdPath());
 	Populate();
 }
 
 void mvceditor::ApacheEnvironmentPanelClass::OnWorkInProgress(wxCommandEvent& event) {
 	Gauge->Pulse();
+}
+
+void mvceditor::ApacheEnvironmentPanelClass::OnWorkComplete(wxCommandEvent& event) {
+	Gauge->SetValue(0);
+	ScanButton->SetLabel(_("Scan For Configuration"));
 }
 
 void mvceditor::ApacheEnvironmentPanelClass::OnResize(wxSizeEvent& event) {
@@ -632,8 +648,9 @@ void mvceditor::EnvironmentPluginClass::AddPreferenceWindow(wxBookCtrlBase* pare
 }
 
 BEGIN_EVENT_TABLE(mvceditor::ApacheEnvironmentPanelClass, ApacheEnvironmentPanelGeneratedClass)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ApacheEnvironmentPanelClass::OnWorkComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ApacheEnvironmentPanelClass::OnWorkInProgress)
+	EVT_APACHE_FILE_READ_COMPLETE(mvceditor::ApacheEnvironmentPanelClass::OnApacheFileReadComplete)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ApacheEnvironmentPanelClass::OnWorkComplete)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::EnvironmentPluginClass, wxEvtHandler) 
