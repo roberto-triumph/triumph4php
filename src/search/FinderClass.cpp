@@ -25,7 +25,7 @@
 #include <search/FinderClass.h>
 #include <unicode/uchar.h>
 #include <unicode/ustdio.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <assert.h>
 
 mvceditor::FinderClass::FinderClass(UnicodeString expression, mvceditor::FinderClass::Modes mode)
@@ -259,10 +259,10 @@ bool mvceditor::FinderClass::FindPreviousExact(const UnicodeString& text, int32_
 		textLower.toLower();
 		UnicodeString expressionLower(Expression);
 		expressionLower.toLower();
-		foundIndex = mvceditor::StringHelperClass::FindPrevious(textLower, expressionLower, start);
+		foundIndex = mvceditor::FindPrevious(textLower, expressionLower, start);
 	}
 	else {
-		foundIndex = mvceditor::StringHelperClass::FindPrevious(text, Expression, start);
+		foundIndex = mvceditor::FindPrevious(text, Expression, start);
 	}
 	IsFound = -1 != foundIndex;
 	if (IsFound) {

@@ -23,62 +23,61 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <UnitTest++.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <unicode/ustream.h> //get the << overloaded operator, needed by UnitTest++
 
 SUITE(StringHelperTestClass) {
-	
 
 TEST(FindPreviousShouldReturnLastIndex) {
 	UnicodeString text = UNICODE_STRING_SIMPLE("this is a test of the backwards find");
 	UnicodeString expression = UNICODE_STRING_SIMPLE("test");
 	int32_t expected = text.indexOf(expression);
-	CHECK_EQUAL(expected, mvceditor::StringHelperClass::FindPrevious(text, expression, -1));
+	CHECK_EQUAL(expected, mvceditor::FindPrevious(text, expression, -1));
 }
 
 TEST(FindPreviousShouldReturnLastIndexWhenMatchIsAtBeginning) {
 	UnicodeString text = UNICODE_STRING_SIMPLE("this is a test of the backwards find");
 	UnicodeString expression = UNICODE_STRING_SIMPLE("this");
-	CHECK_EQUAL(0, mvceditor::StringHelperClass::FindPrevious(text, expression, -1));
+	CHECK_EQUAL(0, mvceditor::FindPrevious(text, expression, -1));
 }
 
 TEST(FindPreviousShouldReturnLastIndexWhenMatchIsAtEnd) {
 	UnicodeString text = UNICODE_STRING_SIMPLE("this is a test of the backwards find");
 	UnicodeString expression = UNICODE_STRING_SIMPLE("find");
 	int32_t expected = text.indexOf(expression);
-	CHECK_EQUAL(expected, mvceditor::StringHelperClass::FindPrevious(text, expression, -1));
+	CHECK_EQUAL(expected, mvceditor::FindPrevious(text, expression, -1));
 }
 
 TEST(FindPreviousShouldReturnLastIndexWhenMatchIsAtStart) {
 	UnicodeString text = UNICODE_STRING_SIMPLE("this is a test of the backwards find");
 	UnicodeString expression = UNICODE_STRING_SIMPLE("backwards");
 	int32_t expected = text.indexOf(expression);
-	CHECK_EQUAL(expected, mvceditor::StringHelperClass::FindPrevious(text, expression, expected + expression.length() - 1));
+	CHECK_EQUAL(expected, mvceditor::FindPrevious(text, expression, expected + expression.length() - 1));
 }
 
 TEST(FindPreviousShouldReturnNotFoundWhenMatchIsNotFound) {
 	UnicodeString text = UNICODE_STRING_SIMPLE("this is a test of the backwards find");
 	UnicodeString expression = UNICODE_STRING_SIMPLE("dackwards"); //1 char off d vs. b
-	CHECK_EQUAL(-1, mvceditor::StringHelperClass::FindPrevious(text, expression, -1));
+	CHECK_EQUAL(-1, mvceditor::FindPrevious(text, expression, -1));
 }
 
 
 TEST(FindPreviousShouldReturnNotFoundWhenMatchIsNotBeforeStart) {
 	UnicodeString text = UNICODE_STRING_SIMPLE("this is a test of the backwards find");
 	UnicodeString expression = UNICODE_STRING_SIMPLE("backwards");
-	CHECK_EQUAL(-1, mvceditor::StringHelperClass::FindPrevious(text, expression, 29)); // 29 = index of 'd' of "backward" 
+	CHECK_EQUAL(-1, mvceditor::FindPrevious(text, expression, 29)); // 29 = index of 'd' of "backward" 
 }
 
 TEST(WxToIcuConversions) {
 	UnicodeString uniStr = UNICODE_STRING_SIMPLE("this is a test of the conversions");
 	wxString wxStr = wxT("this is a test of the conversions");
 
-	CHECK_EQUAL(wxStr, mvceditor::StringHelperClass::IcuToWx(uniStr));
-	CHECK_EQUAL(uniStr, mvceditor::StringHelperClass::wxToIcu(wxStr));
+	CHECK_EQUAL(wxStr, mvceditor::IcuToWx(uniStr));
+	CHECK_EQUAL(uniStr, mvceditor::WxToIcu(wxStr));
 
 	// convert twice
-	UnicodeString test = mvceditor::StringHelperClass::wxToIcu(
-			mvceditor::StringHelperClass::IcuToWx(uniStr));
+	UnicodeString test = mvceditor::WxToIcu(
+			mvceditor::IcuToWx(uniStr));
 	CHECK_EQUAL(uniStr, test);
 }
 
@@ -86,12 +85,12 @@ TEST(IcuToCharConversions) {
 	UnicodeString uniStr = UNICODE_STRING_SIMPLE("this is a test of the conversions");
 	std::string str = "this is a test of the conversions";
 
-	CHECK_EQUAL(str, mvceditor::StringHelperClass::IcuToChar(uniStr));
-	CHECK_EQUAL(uniStr, mvceditor::StringHelperClass::charToIcu(str.c_str()));
+	CHECK_EQUAL(str, mvceditor::IcuToChar(uniStr));
+	CHECK_EQUAL(uniStr, mvceditor::CharToIcu(str.c_str()));
 
 	// convert twice
-	UnicodeString test = mvceditor::StringHelperClass::charToIcu(
-		mvceditor::StringHelperClass::IcuToChar(uniStr).c_str());
+	UnicodeString test = mvceditor::CharToIcu(
+		mvceditor::IcuToChar(uniStr).c_str());
 	CHECK_EQUAL(uniStr, test);
 }
 

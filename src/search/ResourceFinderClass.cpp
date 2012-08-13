@@ -24,7 +24,7 @@
  */
 #include <search/ResourceFinderClass.h>
 #include <search/FinderClass.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <MvcEditorAssets.h>
 #include <wx/filename.h>
 #include <algorithm>
@@ -197,7 +197,7 @@ void mvceditor::ResourceFinderClass::OpenAndCreateTables(const wxString& dbName)
 			Session.open(*soci::factory_sqlite3(), ":memory:");
 		}
 		else {
-			std::string stdDbName = mvceditor::StringHelperClass::wxToChar(dbName);
+			std::string stdDbName = mvceditor::WxToChar(dbName);
 			Session.open(*soci::factory_sqlite3(), stdDbName);
 		}
 			
@@ -209,7 +209,7 @@ void mvceditor::ResourceFinderClass::OpenAndCreateTables(const wxString& dbName)
 			wxFFile ffile(sqlScriptFileName.GetFullPath());
 			wxString sql;
 			ffile.ReadAll(&sql);
-			std::string stdSql = mvceditor::StringHelperClass::wxToChar(sql);
+			std::string stdSql = mvceditor::WxToChar(sql);
 
 			// get the 'raw' connection because it can handle multiple statements at once
 			char *errorMessage = NULL;
@@ -217,7 +217,7 @@ void mvceditor::ResourceFinderClass::OpenAndCreateTables(const wxString& dbName)
 			sqlite_api::sqlite3_exec(backend->conn_, stdSql.c_str(), NULL, NULL, &errorMessage);
 			IsCacheInitialized = NULL == errorMessage;
 			if (errorMessage) {
-				wxString msg = mvceditor::StringHelperClass::charToWx(errorMessage);
+				wxString msg = mvceditor::CharToWx(errorMessage);
 				wxASSERT_MSG(IsCacheInitialized, msg);
 				sqlite_api::sqlite3_free(errorMessage);
 			}
@@ -225,7 +225,7 @@ void mvceditor::ResourceFinderClass::OpenAndCreateTables(const wxString& dbName)
 	} catch(std::exception const& e) {
 		Session.close();
 		IsCacheInitialized = false;
-		wxString msg = mvceditor::StringHelperClass::charToWx(e.what());
+		wxString msg = mvceditor::CharToWx(e.what());
 		wxASSERT_MSG(IsCacheInitialized, msg);
 	}
 }
@@ -426,7 +426,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 		currentFileName,
 		extension;
 	std::vector<mvceditor::ResourceClass> matches;
-	std::string query = mvceditor::StringHelperClass::IcuToChar(resourceSearch.GetFileName());
+	std::string query = mvceditor::IcuToChar(resourceSearch.GetFileName());
 
 	// add the SQL wildcards
 	query = "'%" + query + "%'";
@@ -437,10 +437,10 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 		soci::into(match), soci::into(fileItemId), soci::into(isNew));
 	if (stmt.execute(true)) {
 		do {
-			wxString fullPath = mvceditor::StringHelperClass::charToWx(match.c_str());
+			wxString fullPath = mvceditor::CharToWx(match.c_str());
 			wxFileName::SplitPath(fullPath, &path, &currentFileName, &extension);
 			currentFileName += wxT(".") + extension;
-			wxString fileName = mvceditor::StringHelperClass::IcuToWx(resourceSearch.GetFileName());
+			wxString fileName = mvceditor::IcuToWx(resourceSearch.GetFileName());
 			if (wxNOT_FOUND != currentFileName.Lower().Find(fileName)) {
 				if (0 == resourceSearch.GetLineNumber() || GetLineCountFromFile(fullPath) >= resourceSearch.GetLineNumber()) {
 					ResourceClass newItem;
@@ -456,7 +456,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 }
 
 std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNearMatchNonMembers(const mvceditor::ResourceSearchClass& resourceSearch) {
-	std::string key = mvceditor::StringHelperClass::IcuToChar(resourceSearch.GetClassName());
+	std::string key = mvceditor::IcuToChar(resourceSearch.GetClassName());
 	std::vector<int> types;
 	types.push_back(mvceditor::ResourceClass::CLASS);
 	types.push_back(mvceditor::ResourceClass::DEFINE);
@@ -499,7 +499,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 		// if ClassName is empty, then just check method names This ensures 
 		// queries like '::getName' will work as well.
 		// make sure to NOT get fully qualified  matches (key=identifier)
-		std::string identifier = mvceditor::StringHelperClass::IcuToChar(resourceSearch.GetMethodName());
+		std::string identifier = mvceditor::IcuToChar(resourceSearch.GetMethodName());
 		std::vector<int> types;
 		types.push_back(mvceditor::ResourceClass::MEMBER);
 		types.push_back(mvceditor::ResourceClass::METHOD);
@@ -518,9 +518,9 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 		// to make all of the keys we need to look for. remember that a resource class key is of the form
 		// ClassName::MethodName
 		for (std::vector<UnicodeString>::iterator it = classesToSearch.begin(); it != classesToSearch.end(); ++it) {
-			std::string keyStart = mvceditor::StringHelperClass::IcuToChar(*it);
+			std::string keyStart = mvceditor::IcuToChar(*it);
 			keyStart += "::";
-			keyStart += mvceditor::StringHelperClass::IcuToChar(resourceSearch.GetMethodName());
+			keyStart += mvceditor::IcuToChar(resourceSearch.GetMethodName());
 			keyStarts.push_back(keyStart);
 		}
 		matches = FindByKeyStartMany(keyStarts, true);
@@ -537,7 +537,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectAll
 	std::vector<mvceditor::ResourceClass> matches;
 	std::vector<std::string> keyStarts;
 	for (size_t i = 0; i < classNames.size(); ++i) {
-		std::string keyStart = mvceditor::StringHelperClass::IcuToChar(classNames[i]);
+		std::string keyStart = mvceditor::IcuToChar(classNames[i]);
 		keyStart += "::";
 		keyStarts.push_back(keyStart);
 	}
@@ -550,7 +550,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectAll
 
 	std::vector<std::string> classNamesToLookFor;
 	for (std::vector<UnicodeString>::const_iterator it = classNames.begin(); it != classNames.end(); ++it) {
-		classNamesToLookFor.push_back(mvceditor::StringHelperClass::IcuToChar(*it));
+		classNamesToLookFor.push_back(mvceditor::IcuToChar(*it));
 	}
 
 	// TODO use the correct namespace when querying for traits
@@ -583,7 +583,7 @@ std::vector<mvceditor::ResourceClass>  mvceditor::ResourceFinderClass::CollectNe
 	// needle identifier contains a namespace operator; but it may be
 	// a namespace or a fully qualified name
 	UnicodeString key = resourceSearch.GetClassName();
-	std::string stdKey = mvceditor::StringHelperClass::IcuToChar(key);
+	std::string stdKey = mvceditor::IcuToChar(key);
 	matches = FindByKeyExact(stdKey);
 	if (matches.empty()) {
 		matches = FindByKeyStart(stdKey, true);
@@ -597,7 +597,7 @@ UnicodeString mvceditor::ResourceFinderClass::GetResourceParentClassName(const U
 	// first query to get the parent class name
 	std::vector<int> types;
 	types.push_back(mvceditor::ResourceClass::CLASS);
-	std::string key = mvceditor::StringHelperClass::IcuToChar(className);
+	std::string key = mvceditor::IcuToChar(className);
 	std::vector<mvceditor::ResourceClass> matches = FindByKeyExactAndTypes(key, types, true);
 	if (!matches.empty()) {
 		mvceditor::ResourceClass resource = matches[0];
@@ -612,7 +612,7 @@ std::vector<UnicodeString> mvceditor::ResourceFinderClass::GetResourceTraits(con
 	bool match = false;
 	
 	std::vector<std::string> keys;
-	keys.push_back(mvceditor::StringHelperClass::IcuToChar(className));
+	keys.push_back(mvceditor::IcuToChar(className));
 	std::vector<mvceditor::TraitResourceClass> matches = FindTraitsByClassName(keys);
 	for (size_t i = 0; i < matches.size(); ++i) {
 		UnicodeString fullyQualifiedTrait = QualifyName(matches[i].TraitNamespaceName, matches[i].TraitClassName);
@@ -664,7 +664,7 @@ void mvceditor::ResourceFinderClass::BuildResourceCache(const wxString& fullPath
 			// for now silently ignore files with parser errors
 			pelet::LintResultsClass lintResults;
 			wxFFile file(fullPath, wxT("rb"));
-			Parser.ScanFile(file.fp(), mvceditor::StringHelperClass::wxToIcu(fullPath), lintResults);
+			Parser.ScanFile(file.fp(), mvceditor::WxToIcu(fullPath), lintResults);
 			PersistResources(FileParsingCache, fileItem.FileId);
 			PersistTraits(TraitCache);
 			FileParsingCache.clear();
@@ -912,7 +912,7 @@ void mvceditor::ResourceFinderClass::FunctionFound(const UnicodeString& namespac
 
 bool mvceditor::ResourceFinderClass::IsNewNamespace(const UnicodeString& namespaceName) {
 	std::string sql = "SELECT COUNT(*) FROM resources WHERE key = ? AND type = ?";
-	std::string nm = mvceditor::StringHelperClass::IcuToChar(namespaceName);
+	std::string nm = mvceditor::IcuToChar(namespaceName);
 	int type = mvceditor::ResourceClass::NAMESPACE;
 	int count = 0;
 	soci::statement stmt = (Session.prepare << sql, soci::use(nm), soci::use(type), soci::into(count));
@@ -1022,7 +1022,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectFul
 		types.push_back(mvceditor::ResourceClass::CLASS_CONSTANT);
 		for (size_t i = 0; i < classHierarchy.size(); ++i) {
 			UnicodeString key = classHierarchy[i] + UNICODE_STRING_SIMPLE("::") + resourceSearch.GetMethodName();
-			std::string stdKey = mvceditor::StringHelperClass::IcuToChar(key);
+			std::string stdKey = mvceditor::IcuToChar(key);
 			std::vector<mvceditor::ResourceClass> matches = FindByKeyExactAndTypes(stdKey, types, true);
 			if (!matches.empty()) {
 				allMatches.push_back(matches[0]);
@@ -1031,7 +1031,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectFul
 	}
 	else if (mvceditor::ResourceSearchClass::NAMESPACE_NAME == resourceSearch.GetResourceType()) {
 		UnicodeString key = resourceSearch.GetClassName();
-		std::string stdKey = mvceditor::StringHelperClass::IcuToChar(key);
+		std::string stdKey = mvceditor::IcuToChar(key);
 
 		// make sure there is one and only one item that matches the search.
 		std::vector<mvceditor::ResourceClass> matches = FindByKeyExact(stdKey);
@@ -1041,7 +1041,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectFul
 	}
 	else {
 		UnicodeString key = resourceSearch.GetClassName();
-		std::string stdKey = mvceditor::StringHelperClass::IcuToChar(key);
+		std::string stdKey = mvceditor::IcuToChar(key);
 
 		// make sure there is one and only one item that matches the search.
 		std::vector<mvceditor::ResourceClass> matches = FindByKeyExact(stdKey);
@@ -1182,14 +1182,14 @@ void mvceditor::ResourceFinderClass::AddDynamicResources(const std::vector<mvced
 			std::string returnType, 
 				classNameOut, 
 				identifierOut;
-			std::string className = mvceditor::StringHelperClass::IcuToChar(resource.ClassName);
-			std::string identifier = mvceditor::StringHelperClass::IcuToChar(resource.Identifier);
+			std::string className = mvceditor::IcuToChar(resource.ClassName);
+			std::string identifier = mvceditor::IcuToChar(resource.Identifier);
 			Session.once << stream.str(), soci::use(className), soci::use(identifier), soci::into(returnType), soci::into(classNameOut)
 				, soci::into(identifierOut);
 			if (returnType.empty() && !classNameOut.empty() && !identifierOut.empty()) {
 
 				// resource already exists, but it does not have a return type. only update the return type
-				returnType = mvceditor::StringHelperClass::IcuToChar(resource.ReturnType);
+				returnType = mvceditor::IcuToChar(resource.ReturnType);
 				std::ostringstream updateStream;
 				updateStream << "UPDATE resources SET return_type = ? WHERE class_name = ? AND identifier = ? AND type IN("
 					<< mvceditor::ResourceClass::MEMBER
@@ -1219,14 +1219,14 @@ void mvceditor::ResourceFinderClass::AddDynamicResources(const std::vector<mvced
 			stream << "SELECT return_type, identifier FROM resources WHERE key = ? AND type IN("
 				<< mvceditor::ResourceClass::FUNCTION
 				<< ")";
-			std::string identifier = mvceditor::StringHelperClass::IcuToChar(resource.Identifier);
+			std::string identifier = mvceditor::IcuToChar(resource.Identifier);
 			std::string returnType;
 			std::string identifierOut;
 			Session.once << stream.str(), soci::use(identifier), soci::into(returnType), soci::into(identifierOut);
 			if (returnType.empty() && !identifier.empty()) {
 
 				// function already exists, just update the return type
-				returnType = mvceditor::StringHelperClass::IcuToChar(resource.ReturnType);
+				returnType = mvceditor::IcuToChar(resource.ReturnType);
 				std::ostringstream updateStream;
 				updateStream << "UPDATE resources SET return_type = ? WHERE key = ? AND type IN("
 					<< mvceditor::ResourceClass::FUNCTION
@@ -1260,7 +1260,7 @@ void mvceditor::ResourceFinderClass::PersistFileItem(mvceditor::FileItemClass& f
 	if (!IsCacheInitialized) {
 		return;
 	}
-	std::string fullPath = mvceditor::StringHelperClass::wxToChar(fileItem.FullPath);
+	std::string fullPath = mvceditor::WxToChar(fileItem.FullPath);
 	std::tm tm;
 	int isParsed = fileItem.IsParsed ? 1 : 0;
 	int isNew = fileItem.IsNew ? 1 : 0;
@@ -1296,7 +1296,7 @@ bool mvceditor::ResourceFinderClass::FindFileItemByFullPathExact(const wxString&
 	int isParsed;
 	int isNew;
 
-	std::string query = mvceditor::StringHelperClass::wxToChar(fullPath);
+	std::string query = mvceditor::WxToChar(fullPath);
 	std::string sql = "SELECT file_item_id, last_modified, is_parsed, is_new FROM file_items WHERE full_path = ?";
 	soci::statement stmt = (Session.prepare << sql, soci::use(query), 
 		soci::into(fileItemId), soci::into(lastModified), soci::into(isParsed), soci::into(isNew)
@@ -1358,16 +1358,16 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::ResourceSt
 			if (soci::i_ok == fileItemIdIndicator) {
 				resource.FileItemId = fileItemId;
 			}
-			resource.Key = mvceditor::StringHelperClass::charToIcu(key.c_str());
-			resource.Identifier = mvceditor::StringHelperClass::charToIcu(identifier.c_str());
-			resource.ClassName = mvceditor::StringHelperClass::charToIcu(className.c_str());
+			resource.Key = mvceditor::CharToIcu(key.c_str());
+			resource.Identifier = mvceditor::CharToIcu(identifier.c_str());
+			resource.ClassName = mvceditor::CharToIcu(className.c_str());
 			resource.Type = (mvceditor::ResourceClass::Types)type;
-			resource.NamespaceName = mvceditor::StringHelperClass::charToIcu(namespaceName.c_str());
-			resource.Signature = mvceditor::StringHelperClass::charToIcu(signature.c_str());
-			resource.ReturnType = mvceditor::StringHelperClass::charToIcu(returnType.c_str());
-			resource.Comment = mvceditor::StringHelperClass::charToIcu(comment.c_str());
+			resource.NamespaceName = mvceditor::CharToIcu(namespaceName.c_str());
+			resource.Signature = mvceditor::CharToIcu(signature.c_str());
+			resource.ReturnType = mvceditor::CharToIcu(returnType.c_str());
+			resource.Comment = mvceditor::CharToIcu(comment.c_str());
 			if (soci::i_ok == fullPathIndicator) {
-				resource.SetFullPath(mvceditor::StringHelperClass::charToWx(fullPath.c_str()));
+				resource.SetFullPath(mvceditor::CharToWx(fullPath.c_str()));
 			}
 			resource.IsProtected = isProtected != 0;
 			resource.IsPrivate = isPrivate != 0;
@@ -1557,14 +1557,14 @@ void mvceditor::ResourceFinderClass::PersistResources(const std::vector<mvcedito
 	);
 	std::vector<mvceditor::ResourceClass>::const_iterator it;
 	for (it = resources.begin(); it != resources.end(); ++it) {
-		key = mvceditor::StringHelperClass::IcuToChar(it->Key);
-		identifier = mvceditor::StringHelperClass::IcuToChar(it->Identifier);
-		className = mvceditor::StringHelperClass::IcuToChar(it->ClassName);
+		key = mvceditor::IcuToChar(it->Key);
+		identifier = mvceditor::IcuToChar(it->Identifier);
+		className = mvceditor::IcuToChar(it->ClassName);
 		type = it->Type;
-		namespaceName = mvceditor::StringHelperClass::IcuToChar(it->NamespaceName);
-		signature = mvceditor::StringHelperClass::IcuToChar(it->Signature);
-		returnType = mvceditor::StringHelperClass::IcuToChar(it->ReturnType);
-		comment = mvceditor::StringHelperClass::IcuToChar(it->Comment);
+		namespaceName = mvceditor::IcuToChar(it->NamespaceName);
+		signature = mvceditor::IcuToChar(it->Signature);
+		returnType = mvceditor::IcuToChar(it->ReturnType);
+		comment = mvceditor::IcuToChar(it->Comment);
 		isProtected = it->IsProtected;
 		isPrivate = it->IsPrivate;
 		isStatic = it->IsStatic;
@@ -1601,14 +1601,14 @@ void mvceditor::ResourceFinderClass::PersistTraits(
 	for (it = traitMap.begin(); it != traitMap.end(); ++it) {
 		std::vector<mvceditor::TraitResourceClass>::const_iterator trait;
 		for (trait = it->second.begin(); trait != it->second.end(); ++trait) {
-			key = mvceditor::StringHelperClass::IcuToChar(trait->Key);
-			className = mvceditor::StringHelperClass::IcuToChar(trait->ClassName);
-			namespaceName = mvceditor::StringHelperClass::IcuToChar(trait->NamespaceName);
-			traitClassName = mvceditor::StringHelperClass::IcuToChar(trait->TraitClassName);
-			traitNamespaceName = mvceditor::StringHelperClass::IcuToChar(trait->TraitNamespaceName);
+			key = mvceditor::IcuToChar(trait->Key);
+			className = mvceditor::IcuToChar(trait->ClassName);
+			namespaceName = mvceditor::IcuToChar(trait->NamespaceName);
+			traitClassName = mvceditor::IcuToChar(trait->TraitClassName);
+			traitNamespaceName = mvceditor::IcuToChar(trait->TraitNamespaceName);
 			aliases = "";
 			for (std::vector<UnicodeString>::const_iterator alias = trait->Aliased.begin(); alias != trait->Aliased.end(); ++alias) {
-				aliases += mvceditor::StringHelperClass::IcuToChar(*alias);
+				aliases += mvceditor::IcuToChar(*alias);
 				aliases += ",";
 			}
 			if (!aliases.empty()) {
@@ -1616,7 +1616,7 @@ void mvceditor::ResourceFinderClass::PersistTraits(
 			}
 			insteadOfs = "";
 			for (std::vector<UnicodeString>::const_iterator instead = trait->InsteadOfs.begin(); instead != trait->InsteadOfs.end(); ++instead) {
-				insteadOfs += mvceditor::StringHelperClass::IcuToChar(*instead);
+				insteadOfs += mvceditor::IcuToChar(*instead);
 				insteadOfs += ",";
 			}
 			if (!insteadOfs.empty()) {
@@ -1656,30 +1656,30 @@ std::vector<mvceditor::TraitResourceClass> mvceditor::ResourceFinderClass::FindT
 	if (stmt.execute(true)) {
 		do {
 			mvceditor::TraitResourceClass trait;
-			trait.Key = mvceditor::StringHelperClass::charToIcu(key.c_str());
-			trait.ClassName = mvceditor::StringHelperClass::charToIcu(className.c_str());
-			trait.NamespaceName = mvceditor::StringHelperClass::charToIcu(namespaceName.c_str());
-			trait.TraitClassName = mvceditor::StringHelperClass::charToIcu(traitClassName.c_str());
-			trait.TraitNamespaceName = mvceditor::StringHelperClass::charToIcu(traitNamespaceName.c_str());
+			trait.Key = mvceditor::CharToIcu(key.c_str());
+			trait.ClassName = mvceditor::CharToIcu(className.c_str());
+			trait.NamespaceName = mvceditor::CharToIcu(namespaceName.c_str());
+			trait.TraitClassName = mvceditor::CharToIcu(traitClassName.c_str());
+			trait.TraitNamespaceName = mvceditor::CharToIcu(traitNamespaceName.c_str());
 			
 			size_t start = 0;
 			size_t found = aliases.find_first_of(",");
 			while (found != std::string::npos) {
-				trait.Aliased.push_back(mvceditor::StringHelperClass::charToIcu(aliases.substr(start, found).c_str()));	
+				trait.Aliased.push_back(mvceditor::CharToIcu(aliases.substr(start, found).c_str()));	
 				start = found++;
 			}
 			if (!aliases.empty()) {
-				trait.Aliased.push_back(mvceditor::StringHelperClass::charToIcu(aliases.substr(start, found).c_str()));
+				trait.Aliased.push_back(mvceditor::CharToIcu(aliases.substr(start, found).c_str()));
 			}
 
 			start = 0;
 			found = insteadOfs.find_first_of(",");
 			while (found != std::string::npos) {
-				trait.InsteadOfs.push_back(mvceditor::StringHelperClass::charToIcu(insteadOfs.substr(start, found).c_str()));	
+				trait.InsteadOfs.push_back(mvceditor::CharToIcu(insteadOfs.substr(start, found).c_str()));	
 				start = found++;
 			}
 			if (!insteadOfs.empty()) {
-				trait.InsteadOfs.push_back(mvceditor::StringHelperClass::charToIcu(insteadOfs.substr(start, found).c_str()));
+				trait.InsteadOfs.push_back(mvceditor::CharToIcu(insteadOfs.substr(start, found).c_str()));
 			}
 
 			matches.push_back(trait);

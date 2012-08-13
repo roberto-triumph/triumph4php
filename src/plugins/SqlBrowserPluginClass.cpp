@@ -25,7 +25,7 @@
 #include <wx/valgen.h>
 #include <plugins/SqlBrowserPluginClass.h>
 #include <code_control/CodeControlClass.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <widgets/UnicodeStringValidatorClass.h>
 #include <MvcEditorErrors.h>
 #include <MvcEditor.h>
@@ -48,7 +48,7 @@ mvceditor::SqlConnectionDialogClass::SqlConnectionDialogClass(wxWindow* parent, 
 	Database->SetValue(wxT(""));
 	Port->SetValue(0);
 	for (size_t i = 0; i < EditedInfos.size(); i++) {
-		wxString label = mvceditor::StringHelperClass::IcuToWx(EditedInfos[i].Label);
+		wxString label = mvceditor::IcuToWx(EditedInfos[i].Label);
 		if (EditedInfos[i].IsDetected) {
 			label += _(" <Detected>");
 		}
@@ -61,15 +61,15 @@ mvceditor::SqlConnectionDialogClass::SqlConnectionDialogClass(wxWindow* parent, 
 void mvceditor::SqlConnectionDialogClass::UpdateTextInputs() {
 	bool allowEdit = true;
 	if (ChosenIndex < EditedInfos.size()) {
-		wxString label = mvceditor::StringHelperClass::IcuToWx(EditedInfos[ChosenIndex].Label);
+		wxString label = mvceditor::IcuToWx(EditedInfos[ChosenIndex].Label);
 		if (EditedInfos[ChosenIndex].IsDetected) {
 			label += _(" <Detected>");
 		}
 		Label->SetValue(label);
-		Host->SetValue(mvceditor::StringHelperClass::IcuToWx(EditedInfos[ChosenIndex].Host));
-		User->SetValue(mvceditor::StringHelperClass::IcuToWx(EditedInfos[ChosenIndex].User));
-		Password->SetValue(mvceditor::StringHelperClass::IcuToWx(EditedInfos[ChosenIndex].Password));
-		Database->SetValue(mvceditor::StringHelperClass::IcuToWx(EditedInfos[ChosenIndex].DatabaseName));
+		Host->SetValue(mvceditor::IcuToWx(EditedInfos[ChosenIndex].Host));
+		User->SetValue(mvceditor::IcuToWx(EditedInfos[ChosenIndex].User));
+		Password->SetValue(mvceditor::IcuToWx(EditedInfos[ChosenIndex].Password));
+		Database->SetValue(mvceditor::IcuToWx(EditedInfos[ChosenIndex].DatabaseName));
 		Port->SetValue(EditedInfos[ChosenIndex].Port);
 		List->Select(ChosenIndex);
 		allowEdit = !EditedInfos[ChosenIndex].IsDetected;
@@ -88,11 +88,11 @@ void mvceditor::SqlConnectionDialogClass::OnOkButton(wxCommandEvent& event) {
 
 		// save the old values
 		if (ChosenIndex < EditedInfos.size()) {
-			EditedInfos[ChosenIndex].Label = mvceditor::StringHelperClass::wxToIcu(Label->GetValue());
-			EditedInfos[ChosenIndex].Host = mvceditor::StringHelperClass::wxToIcu(Host->GetValue());
-			EditedInfos[ChosenIndex].User = mvceditor::StringHelperClass::wxToIcu(User->GetValue());
-			EditedInfos[ChosenIndex].Password = mvceditor::StringHelperClass::wxToIcu(Password->GetValue());
-			EditedInfos[ChosenIndex].DatabaseName = mvceditor::StringHelperClass::wxToIcu(Database->GetValue());
+			EditedInfos[ChosenIndex].Label = mvceditor::WxToIcu(Label->GetValue());
+			EditedInfos[ChosenIndex].Host = mvceditor::WxToIcu(Host->GetValue());
+			EditedInfos[ChosenIndex].User = mvceditor::WxToIcu(User->GetValue());
+			EditedInfos[ChosenIndex].Password = mvceditor::WxToIcu(Password->GetValue());
+			EditedInfos[ChosenIndex].DatabaseName = mvceditor::WxToIcu(Database->GetValue());
 			EditedInfos[ChosenIndex].Port = Port->GetValue();
 		}
 
@@ -117,11 +117,11 @@ void mvceditor::SqlConnectionDialogClass::OnTestButton(wxCommandEvent& event) {
 		if (index < EditedInfos.size()) {
 
 			// get the most up-to-date values that the user has input
-			EditedInfos[index].DatabaseName = mvceditor::StringHelperClass::wxToIcu(Database->GetValue());
-			EditedInfos[index].Host = mvceditor::StringHelperClass::wxToIcu(Host->GetValue());
+			EditedInfos[index].DatabaseName = mvceditor::WxToIcu(Database->GetValue());
+			EditedInfos[index].Host = mvceditor::WxToIcu(Host->GetValue());
 			EditedInfos[index].Port = Port->GetValue();
-			EditedInfos[index].User = mvceditor::StringHelperClass::wxToIcu(User->GetValue());
-			EditedInfos[index].Password = mvceditor::StringHelperClass::wxToIcu(Password->GetValue());
+			EditedInfos[index].User = mvceditor::WxToIcu(User->GetValue());
+			EditedInfos[index].Password = mvceditor::WxToIcu(Password->GetValue());
 			
 			TestQuery.Info.Copy(EditedInfos[index]);
 			wxThreadError error = wxTHREAD_NO_ERROR;
@@ -159,11 +159,11 @@ void mvceditor::SqlConnectionDialogClass::OnAddButton(wxCommandEvent& event) {
 
 	// save the old values
 	if (ChosenIndex < EditedInfos.size()) {
-		EditedInfos[ChosenIndex].Label = mvceditor::StringHelperClass::wxToIcu(Label->GetValue());
-		EditedInfos[ChosenIndex].Host = mvceditor::StringHelperClass::wxToIcu(Host->GetValue());
-		EditedInfos[ChosenIndex].User = mvceditor::StringHelperClass::wxToIcu(User->GetValue());
-		EditedInfos[ChosenIndex].Password = mvceditor::StringHelperClass::wxToIcu(Password->GetValue());
-		EditedInfos[ChosenIndex].DatabaseName = mvceditor::StringHelperClass::wxToIcu(Database->GetValue());
+		EditedInfos[ChosenIndex].Label = mvceditor::WxToIcu(Label->GetValue());
+		EditedInfos[ChosenIndex].Host = mvceditor::WxToIcu(Host->GetValue());
+		EditedInfos[ChosenIndex].User = mvceditor::WxToIcu(User->GetValue());
+		EditedInfos[ChosenIndex].Password = mvceditor::WxToIcu(Password->GetValue());
+		EditedInfos[ChosenIndex].DatabaseName = mvceditor::WxToIcu(Database->GetValue());
 		EditedInfos[ChosenIndex].Port = Port->GetValue();
 	}
 
@@ -234,7 +234,7 @@ void* mvceditor::SqlConnectionDialogClass::Entry() {
 	}
 	wxCommandEvent evt(QUERY_COMPLETE_EVENT, wxID_ANY);
 	evt.SetInt(success ? 1 : 0);
-	evt.SetString(mvceditor::StringHelperClass::IcuToWx(error));
+	evt.SetString(mvceditor::IcuToWx(error));
 	wxPostEvent(this, evt);
 	return 0;
 }
@@ -242,13 +242,13 @@ void* mvceditor::SqlConnectionDialogClass::Entry() {
 void mvceditor::SqlConnectionDialogClass::ShowTestResults(wxCommandEvent& event) {
 	wxString msg = _("Connection to %s@%s was successful");
 	msg = wxString::Format(msg, 
-		mvceditor::StringHelperClass::IcuToWx(TestQuery.Info.User).c_str(), 
-		mvceditor::StringHelperClass::IcuToWx(TestQuery.Info.Host).c_str());
+		mvceditor::IcuToWx(TestQuery.Info.User).c_str(), 
+		mvceditor::IcuToWx(TestQuery.Info.Host).c_str());
 	if (event.GetInt() == 0) {
 		msg = _("Connection to %s@%s failed: %s");
 		msg = wxString::Format(msg, 
-		mvceditor::StringHelperClass::IcuToWx(TestQuery.Info.User).c_str(), 
-		mvceditor::StringHelperClass::IcuToWx(TestQuery.Info.Host).c_str(), 
+		mvceditor::IcuToWx(TestQuery.Info.User).c_str(), 
+		mvceditor::IcuToWx(TestQuery.Info.Host).c_str(), 
 		event.GetString().c_str());
 	}
 	wxMessageBox(msg);
@@ -260,11 +260,11 @@ void mvceditor::SqlConnectionDialogClass::OnListboxSelected(wxCommandEvent& even
 	
 	// save the old values
 	if (ChosenIndex < EditedInfos.size() && !EditedInfos[ChosenIndex].IsDetected) {
-		EditedInfos[ChosenIndex].Label = mvceditor::StringHelperClass::wxToIcu(Label->GetValue());
-		EditedInfos[ChosenIndex].Host = mvceditor::StringHelperClass::wxToIcu(Host->GetValue());
-		EditedInfos[ChosenIndex].User = mvceditor::StringHelperClass::wxToIcu(User->GetValue());
-		EditedInfos[ChosenIndex].Password = mvceditor::StringHelperClass::wxToIcu(Password->GetValue());
-		EditedInfos[ChosenIndex].DatabaseName = mvceditor::StringHelperClass::wxToIcu(Database->GetValue());
+		EditedInfos[ChosenIndex].Label = mvceditor::WxToIcu(Label->GetValue());
+		EditedInfos[ChosenIndex].Host = mvceditor::WxToIcu(Host->GetValue());
+		EditedInfos[ChosenIndex].User = mvceditor::WxToIcu(User->GetValue());
+		EditedInfos[ChosenIndex].Password = mvceditor::WxToIcu(Password->GetValue());
+		EditedInfos[ChosenIndex].DatabaseName = mvceditor::WxToIcu(Database->GetValue());
 		EditedInfos[ChosenIndex].Port = Port->GetValue();
 	}
 
@@ -451,10 +451,10 @@ void mvceditor::SqlBrowserPanelClass::RenderAllResults() {
 					(results->QueryTime.ToLong() / 1000.00));
 			}
 			else {
-				msg = mvceditor::StringHelperClass::IcuToWx(results->Error);
+				msg = mvceditor::IcuToWx(results->Error);
 			}
 			int rowNumber = ResultsGrid->GetNumberRows();
-			wxString queryStart = mvceditor::StringHelperClass::IcuToWx(results->Query);
+			wxString queryStart = mvceditor::IcuToWx(results->Query);
 			ResultsGrid->AppendRows(1);
 			ResultsGrid->SetCellValue(wxGridCellCoords(rowNumber , 0), wxString::Format(wxT("%d"), results->LineNumber));
 			ResultsGrid->SetCellValue(wxGridCellCoords(rowNumber , 1), queryStart.Mid(0, 100)); 
@@ -463,7 +463,7 @@ void mvceditor::SqlBrowserPanelClass::RenderAllResults() {
 		if (!outputSummary && !results->Error.isEmpty()) {
 
 			// put error in the summary LABEL
-			UpdateLabels(mvceditor::StringHelperClass::IcuToWx(results->Error));
+			UpdateLabels(mvceditor::IcuToWx(results->Error));
 		}
 		else if (!outputSummary) {
 
@@ -495,7 +495,7 @@ void mvceditor::SqlBrowserPanelClass::Fill(mvceditor::SqlResultClass* results) {
 	if (results->HasRows) {
 		ResultsGrid->AppendCols(results->ColumnNames.size());
 		for (size_t i = 0; i < results->ColumnNames.size(); i++) {
-			ResultsGrid->SetColLabelValue(i, mvceditor::StringHelperClass::IcuToWx(results->ColumnNames[i]));
+			ResultsGrid->SetColLabelValue(i, mvceditor::IcuToWx(results->ColumnNames[i]));
 			autoSizeColumns.push_back(true);
 		}
 		ResultsGrid->SetDefaultCellOverflow(false);
@@ -503,7 +503,7 @@ void mvceditor::SqlBrowserPanelClass::Fill(mvceditor::SqlResultClass* results) {
 			ResultsGrid->AppendRows(1);
 			std::vector<UnicodeString> columnValues =  results->StringResults[i];
 			for (size_t colNumber = 0; colNumber < columnValues.size(); colNumber++) {
-				ResultsGrid->SetCellValue(rowNumber - 1, colNumber, mvceditor::StringHelperClass::IcuToWx(columnValues[colNumber]));
+				ResultsGrid->SetCellValue(rowNumber - 1, colNumber, mvceditor::IcuToWx(columnValues[colNumber]));
 				if (columnValues[colNumber].length() > 50) {
 					autoSizeColumns[colNumber] = false; 
 				}
@@ -528,7 +528,7 @@ void mvceditor::SqlBrowserPanelClass::Fill(mvceditor::SqlResultClass* results) {
 	// unfreeze the grid
 	ResultsGrid->EndBatch();
 	if (!results->Success) {
-		UpdateLabels(mvceditor::StringHelperClass::IcuToWx(results->Error));
+		UpdateLabels(mvceditor::IcuToWx(results->Error));
 	}
 	else {
 		UpdateLabels(wxString::Format(_("%d rows returned in %.3f sec"), 
@@ -546,19 +546,19 @@ void mvceditor::SqlBrowserPanelClass::UpdateLabels(const wxString& result) {
 			ConnectionLabel->SetLabel(wxString::Format(
 				wxT("%s:host=%s:%d user=%s dbname=%s"),
 				driver.c_str(),
-				mvceditor::StringHelperClass::IcuToWx(Query.Info.Host).c_str(),
+				mvceditor::IcuToWx(Query.Info.Host).c_str(),
 				Query.Info.Port,
-				mvceditor::StringHelperClass::IcuToWx(Query.Info.User).c_str(),
-				mvceditor::StringHelperClass::IcuToWx(Query.Info.DatabaseName).c_str()
+				mvceditor::IcuToWx(Query.Info.User).c_str(),
+				mvceditor::IcuToWx(Query.Info.DatabaseName).c_str()
 			));
 		}
 		else {
 			ConnectionLabel->SetLabel(wxString::Format(
 				wxT("%s:host=%s user=%s dbname=%s"),
 				driver.c_str(),
-				mvceditor::StringHelperClass::IcuToWx(Query.Info.Host).c_str(),
-				mvceditor::StringHelperClass::IcuToWx(Query.Info.User).c_str(),
-				mvceditor::StringHelperClass::IcuToWx(Query.Info.DatabaseName).c_str()
+				mvceditor::IcuToWx(Query.Info.Host).c_str(),
+				mvceditor::IcuToWx(Query.Info.User).c_str(),
+				mvceditor::IcuToWx(Query.Info.DatabaseName).c_str()
 			));
 		}
 	}
@@ -893,7 +893,7 @@ void mvceditor::SqlBrowserPluginClass::OnSqlMetaDataComplete(mvceditor::SqlMetaD
 	App.Structs.SqlResourceFinder.Copy(event.NewResources);
 	std::vector<UnicodeString> errors = event.Errors;
 	for (size_t i = 0; i < errors.size(); ++i) {
-		wxString wxError = mvceditor::StringHelperClass::IcuToWx(errors[i]);
+		wxString wxError = mvceditor::IcuToWx(errors[i]);
 		mvceditor::EditorLogError(mvceditor::BAD_SQL, wxError);
 	}
 }
@@ -918,15 +918,15 @@ void mvceditor::SqlBrowserPluginClass::LoadPreferences(wxConfigBase* config) {
 		do {
 			if (groupName.Find(wxT("DatabaseInfo_")) == 0) {
 				mvceditor::DatabaseInfoClass info;
-				info.DatabaseName = mvceditor::StringHelperClass::wxToIcu(config->Read(groupName + wxT("/DatabaseName")));
+				info.DatabaseName = mvceditor::WxToIcu(config->Read(groupName + wxT("/DatabaseName")));
 				wxString driverString = config->Read(groupName + wxT("/Driver"));
-				info.FileName = mvceditor::StringHelperClass::wxToIcu(config->Read(groupName + wxT("/FileName")));
-				info.Host = mvceditor::StringHelperClass::wxToIcu(config->Read(groupName + wxT("/Host")));
+				info.FileName = mvceditor::WxToIcu(config->Read(groupName + wxT("/FileName")));
+				info.Host = mvceditor::WxToIcu(config->Read(groupName + wxT("/Host")));
 				info.IsDetected = false;
-				info.Label = mvceditor::StringHelperClass::wxToIcu(config->Read(groupName + wxT("/Label")));
-				info.Password = mvceditor::StringHelperClass::wxToIcu(config->Read(groupName + wxT("/Password")));
+				info.Label = mvceditor::WxToIcu(config->Read(groupName + wxT("/Label")));
+				info.Password = mvceditor::WxToIcu(config->Read(groupName + wxT("/Password")));
 				config->Read(groupName + wxT("/Port"), &info.Port);
-				info.User = mvceditor::StringHelperClass::wxToIcu(config->Read(groupName + wxT("/User")));
+				info.User = mvceditor::WxToIcu(config->Read(groupName + wxT("/User")));
 				
 				if (driverString.CmpNoCase(wxT("MYSQL")) == 0) {
 					info.Driver = mvceditor::DatabaseInfoClass::MYSQL;
@@ -956,18 +956,18 @@ void mvceditor::SqlBrowserPluginClass::SavePreferences() {
 	for (size_t i = 0; i < App.Structs.Infos.size(); ++i) {
 		if (!App.Structs.Infos[i].IsDetected) {
 			config->SetPath(wxString::Format(wxT("/DatabaseInfo_%d"), saveIndex));
-			config->Write(wxT("DatabaseName"), mvceditor::StringHelperClass::IcuToWx(App.Structs.Infos[i].DatabaseName));
+			config->Write(wxT("DatabaseName"), mvceditor::IcuToWx(App.Structs.Infos[i].DatabaseName));
 			wxString driverString;
 			if (mvceditor::DatabaseInfoClass::MYSQL == App.Structs.Infos[i].Driver) {
 				driverString = wxT("MYSQL");
 			}
 			config->Write(wxT("Driver"), driverString);
-			config->Write(wxT("FileName"), mvceditor::StringHelperClass::IcuToWx(App.Structs.Infos[i].FileName));
-			config->Write(wxT("Host"), mvceditor::StringHelperClass::IcuToWx(App.Structs.Infos[i].Host));
-			config->Write(wxT("Label"), mvceditor::StringHelperClass::IcuToWx(App.Structs.Infos[i].Label));
-			config->Write(wxT("Password"), mvceditor::StringHelperClass::IcuToWx(App.Structs.Infos[i].Password));
+			config->Write(wxT("FileName"), mvceditor::IcuToWx(App.Structs.Infos[i].FileName));
+			config->Write(wxT("Host"), mvceditor::IcuToWx(App.Structs.Infos[i].Host));
+			config->Write(wxT("Label"), mvceditor::IcuToWx(App.Structs.Infos[i].Label));
+			config->Write(wxT("Password"), mvceditor::IcuToWx(App.Structs.Infos[i].Password));
 			config->Write(wxT("Port"), App.Structs.Infos[i].Port);
-			config->Write(wxT("User"), mvceditor::StringHelperClass::IcuToWx(App.Structs.Infos[i].User));
+			config->Write(wxT("User"), mvceditor::IcuToWx(App.Structs.Infos[i].User));
 			saveIndex++;
 		}
 	}

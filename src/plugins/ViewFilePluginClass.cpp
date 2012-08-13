@@ -26,7 +26,7 @@
 #include <MvcEditor.h>
 #include <MvcEditorErrors.h>
 #include <environment/UrlResourceClass.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <wx/artprov.h>
 
 static const int ID_VIEW_FILE_PANEL = wxNewId();
@@ -155,8 +155,8 @@ void mvceditor::ViewFilePluginClass::StartDetection() {
 	if (!url.IsEmpty()) {
 		wxFileName fileName = App.Structs.CurrentUrl.FileName;
 		if (fileName.IsOk()) {
-			UnicodeString className = mvceditor::StringHelperClass::wxToIcu(App.Structs.CurrentUrl.ClassName);
-			UnicodeString methodName =  mvceditor::StringHelperClass::wxToIcu(App.Structs.CurrentUrl.MethodName);
+			UnicodeString className = mvceditor::WxToIcu(App.Structs.CurrentUrl.ClassName);
+			UnicodeString methodName =  mvceditor::WxToIcu(App.Structs.CurrentUrl.MethodName);
 			
 			// TODO: this isn't good, resource cache is not meant to be read/written to from multiple threads
 			CallStackThread.InitCallStack(*GetResourceCache());

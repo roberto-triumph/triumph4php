@@ -24,8 +24,7 @@
  */
 #include <code_control/DocumentClass.h>
 #include <code_control/CodeControlClass.h>
-#include <windows/StringHelperClass.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <MvcEditorAssets.h>
 #include <wx/tokenzr.h>
 #include <wx/filename.h>
@@ -178,7 +177,7 @@ static wxString PhpCallTipSignature(size_t index, const std::vector<mvceditor::R
 	if (index >= size) {
 		return callTip;
 	}
-	wxString sig = mvceditor::StringHelperClass::IcuToWx(resources[index].Signature);
+	wxString sig = mvceditor::IcuToWx(resources[index].Signature);
 	if (size == 1) {
 		callTip = sig;
 	}
@@ -250,7 +249,7 @@ UnicodeString mvceditor::TextDocumentClass::GetSafeText() {
 
 UnicodeString mvceditor::TextDocumentClass::GetSafeSubstring(int startPos, int endPos) {
 	wxString s = Ctrl->GetTextRange(startPos, endPos);
-	UnicodeString ret = mvceditor::StringHelperClass::wxToIcu(s);
+	UnicodeString ret = mvceditor::WxToIcu(s);
 	return ret;
 }
 
@@ -404,12 +403,12 @@ void mvceditor::PhpDocumentClass::AppendSqlTableNames(const UnicodeString& word,
 			UnicodeString error;
 			std::vector<UnicodeString> results = Structs->SqlResourceFinder.FindTables(info, word);
 			for (size_t i = 0; i < results.size(); i++) {
-				wxString s = mvceditor::StringHelperClass::IcuToWx(results[i]);
+				wxString s = mvceditor::IcuToWx(results[i]);
 				autoCompleteList.push_back(s);
 			}
 			results = Structs->SqlResourceFinder.FindColumns(info, word);
 			for (size_t i = 0; i < results.size(); i++) {
-				wxString s = mvceditor::StringHelperClass::IcuToWx(results[i]);
+				wxString s = mvceditor::IcuToWx(results[i]);
 				autoCompleteList.push_back(s);
 			}
 		}
@@ -430,7 +429,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionHtml(const UnicodeString& 
 	else if (pelet::LanguageDiscoveryClass::SYNTAX_HTML_TAG == syntax) {
 		tokenizer.SetString(HTML_TAG_NAMES, wxT(" "), wxTOKEN_STRTOK);
 	}
-	wxString symbol = mvceditor::StringHelperClass::IcuToWx(word);
+	wxString symbol = mvceditor::IcuToWx(word);
 	while (tokenizer.HasMoreTokens()) {
 		wxString it = tokenizer.NextToken();
 		if (it.StartsWith(symbol)) {
@@ -494,7 +493,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 		if (!variableMatches.empty()) {
 			for (size_t i = 0; i < variableMatches.size(); ++i) {
 				wxString postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_VARIABLE);
-				autoCompleteList.push_back(mvceditor::StringHelperClass::IcuToWx(variableMatches[i]) + postFix);
+				autoCompleteList.push_back(mvceditor::IcuToWx(variableMatches[i]) + postFix);
 			}
 		}
 		else if (parsedExpression.ChainList.size() == 1) {
@@ -512,11 +511,11 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 				else if (mvceditor::ResourceClass::CLASS == res.Type) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_CLASS);
 				}
-				autoCompleteList.push_back(mvceditor::StringHelperClass::IcuToWx(res.Identifier) + postFix);
+				autoCompleteList.push_back(mvceditor::IcuToWx(res.Identifier) + postFix);
 			}
 
 			// when completing standalone function names, also include keyword matches
-			std::vector<wxString> keywordMatches = CollectNearMatchKeywords(mvceditor::StringHelperClass::IcuToWx(parsedExpression.ChainList[0].Name));
+			std::vector<wxString> keywordMatches = CollectNearMatchKeywords(mvceditor::IcuToWx(parsedExpression.ChainList[0].Name));
 			for (size_t i = 0; i < keywordMatches.size(); ++i) {
 				wxString postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_KEYWORD);
 				autoCompleteList.push_back(keywordMatches[i] + postFix);
@@ -527,7 +526,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 			// an object / function "chain"
 			for (size_t i = 0; i < AutoCompletionResourceMatches.size(); ++i) {
 				mvceditor::ResourceClass res = AutoCompletionResourceMatches[i];
-				wxString comp = mvceditor::StringHelperClass::IcuToWx(res.Identifier);
+				wxString comp = mvceditor::IcuToWx(res.Identifier);
 				wxString postFix;
 				if (mvceditor::ResourceClass::MEMBER == res.Type && res.IsPrivate) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PRIVATE_MEMBER);
@@ -558,7 +557,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 			wxFileName f2(Ctrl->GetFileName());
 			if (f1 == f2) {
 				for (size_t j = 0; j < viewInfo.TemplateVariables.size(); ++j) {
-					if (viewInfo.TemplateVariables[j].Find(mvceditor::StringHelperClass::IcuToWx(lastExpression)) == 0) {
+					if (viewInfo.TemplateVariables[j].Find(mvceditor::IcuToWx(lastExpression)) == 0) {
 						wxString postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_VARIABLE);
 						autoCompleteList.push_back(viewInfo.TemplateVariables[j] + postFix);
 					}
@@ -607,33 +606,33 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhpStatus(
 	}
 	else if (lastExpression.startsWith(UNICODE_STRING_SIMPLE("$")) && parsedExpression.ChainList.size() <= 1) {
 		completeStatus = _("No matching variables for: ");
-		completeStatus += mvceditor::StringHelperClass::IcuToWx(lastExpression);
+		completeStatus += mvceditor::IcuToWx(lastExpression);
 		completeStatus +=  _(" in scope: ");
-		completeStatus += mvceditor::StringHelperClass::IcuToWx(expressionScope.ClassName);
+		completeStatus += mvceditor::IcuToWx(expressionScope.ClassName);
 		completeStatus += _("::");
-		completeStatus += mvceditor::StringHelperClass::IcuToWx(expressionScope.MethodName);
+		completeStatus += mvceditor::IcuToWx(expressionScope.MethodName);
 	}
 	else if (parsedExpression.ChainList.size() == 1) {
 		completeStatus = _("No matching class, function, define, or keyword for: \"");
-		completeStatus += mvceditor::StringHelperClass::IcuToWx(lastExpression);
+		completeStatus += mvceditor::IcuToWx(lastExpression);
 		completeStatus += wxT("\"");
 	}
 	else if (AutoCompletionResourceMatches.empty()) {
 		if (mvceditor::SymbolTableMatchErrorClass::PARENT_ERROR == error.Type) {
 			completeStatus = _("parent not valid for scope: ");
-			completeStatus += mvceditor::StringHelperClass::IcuToWx(expressionScope.ClassName);
+			completeStatus += mvceditor::IcuToWx(expressionScope.ClassName);
 			completeStatus += _("::");
-			completeStatus += mvceditor::StringHelperClass::IcuToWx(expressionScope.MethodName);
+			completeStatus += mvceditor::IcuToWx(expressionScope.MethodName);
 		}
 		else if (mvceditor::SymbolTableMatchErrorClass::STATIC_ERROR == error.Type) {
 			completeStatus = _("Cannot access protected or private static member \"");
-			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorLexeme);
+			completeStatus += mvceditor::IcuToWx(error.ErrorLexeme);
 			completeStatus += _("\" in class: ");
-			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorClass);
+			completeStatus += mvceditor::IcuToWx(error.ErrorClass);
 		}
 		else if (mvceditor::SymbolTableMatchErrorClass::TYPE_RESOLUTION_ERROR == error.Type) {
 			completeStatus = _("Could not resolve type for \"");
-			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorLexeme);
+			completeStatus += mvceditor::IcuToWx(error.ErrorLexeme);
 			completeStatus += wxT("\"");
 		}
 		else if (mvceditor::SymbolTableMatchErrorClass::UNKNOWN_RESOURCE == error.Type) {
@@ -643,41 +642,41 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhpStatus(
 			else {
 				completeStatus = _("No public member matches for \"");
 			}
-			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorLexeme);
+			completeStatus += mvceditor::IcuToWx(error.ErrorLexeme);
 			completeStatus += _("\" in class: ");
-			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorClass);
+			completeStatus += mvceditor::IcuToWx(error.ErrorClass);
 		}
 		else if (mvceditor::SymbolTableMatchErrorClass::UNKNOWN_STATIC_RESOURCE == error.Type) {
 			completeStatus = _("No static member matches for \"");
-			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorLexeme);
+			completeStatus += mvceditor::IcuToWx(error.ErrorLexeme);
 			completeStatus += _("\" in class: ");
-			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorClass);
+			completeStatus += mvceditor::IcuToWx(error.ErrorClass);
 		}
 		else if (mvceditor::SymbolTableMatchErrorClass::VISIBILITY_ERROR == error.Type) {
 			completeStatus = _("Cannot access protected or private member \"");
-			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorLexeme);
+			completeStatus += mvceditor::IcuToWx(error.ErrorLexeme);
 			completeStatus += _("\" in class: ");
-			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorClass);
+			completeStatus += mvceditor::IcuToWx(error.ErrorClass);
 		}
 		else if (mvceditor::SymbolTableMatchErrorClass::ARRAY_ERROR == error.Type && !error.ErrorClass.isEmpty()) {
 			completeStatus = _("Cannot use object operator for array returned by \"");
-			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorClass);
+			completeStatus += mvceditor::IcuToWx(error.ErrorClass);
 			completeStatus += _("::");
-			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorLexeme);
+			completeStatus += mvceditor::IcuToWx(error.ErrorLexeme);
 		}
 		else if (mvceditor::SymbolTableMatchErrorClass::ARRAY_ERROR == error.Type) {
 			completeStatus = _("Cannot use object operator for array variable ");
-			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorLexeme);
+			completeStatus += mvceditor::IcuToWx(error.ErrorLexeme);
 		}
 		else if (mvceditor::SymbolTableMatchErrorClass::PRIMITIVE_ERROR == error.Type && !error.ErrorClass.isEmpty()) {
 			completeStatus = _("Cannot use object operator for primitive returned by \"");
-			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorClass);
+			completeStatus += mvceditor::IcuToWx(error.ErrorClass);
 			completeStatus += _("::");
-			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorLexeme);
+			completeStatus += mvceditor::IcuToWx(error.ErrorLexeme);
 		}
 		else if (mvceditor::SymbolTableMatchErrorClass::PRIMITIVE_ERROR == error.Type) {
 			completeStatus = _("Cannot use object operator for primitive variable \"");
-			completeStatus += mvceditor::StringHelperClass::IcuToWx(error.ErrorLexeme);
+			completeStatus += mvceditor::IcuToWx(error.ErrorLexeme);
 		}
 	}
 }
@@ -734,11 +733,11 @@ void mvceditor::PhpDocumentClass::HandleCallTip(wxChar ch, bool force) {
 				// here we will look for the constructor
 				// search for all methods of the class
 				UnicodeString className = matches[0].ClassName;
-				wxString constructorResourceSearch = mvceditor::StringHelperClass::IcuToWx(className);
+				wxString constructorResourceSearch = mvceditor::IcuToWx(className);
 				constructorResourceSearch += wxT("::");
 
 				// TODO: get class hierarchy
-				std::vector<mvceditor::ResourceClass> matches = Structs->ResourceCache.CollectNearMatchResourcesFromAll(mvceditor::StringHelperClass::wxToIcu(constructorResourceSearch));
+				std::vector<mvceditor::ResourceClass> matches = Structs->ResourceCache.CollectNearMatchResourcesFromAll(mvceditor::WxToIcu(constructorResourceSearch));
 				for (size_t i = 0; i < matches.size(); ++i) {
 					mvceditor::ResourceClass res = matches[i];
 					if (mvceditor::ResourceClass::METHOD == res.Type && UNICODE_STRING_SIMPLE("__construct") == res.Identifier) {
@@ -779,7 +778,7 @@ void mvceditor::PhpDocumentClass::HandleCallTip(wxChar ch, bool force) {
 			startOfArguments--;
 		}
 		if (startOfArguments >= 0 && !CurrentCallTipResources.empty() && CurrentCallTipIndex < CurrentCallTipResources.size()) {
-			wxString currentSignature = mvceditor::StringHelperClass::IcuToWx(CurrentCallTipResources[CurrentCallTipIndex].Signature);
+			wxString currentSignature = mvceditor::IcuToWx(CurrentCallTipResources[CurrentCallTipIndex].Signature);
 			int startHighlightPos = currentSignature.find(wxT('('));
 			
 			// sometimes the previous call tip is active, as in for example this line
@@ -1033,7 +1032,7 @@ void mvceditor::PhpDocumentClass::RegisterAutoCompletionImages() {
 
 void mvceditor::PhpDocumentClass::OnAutoCompletionSelected(wxStyledTextEvent& event) {
 	if (!AutoCompletionResourceMatches.empty()) {
-		UnicodeString selected = mvceditor::StringHelperClass::wxToIcu(event.GetText());
+		UnicodeString selected = mvceditor::WxToIcu(event.GetText());
 		
 		bool handled = false;
 		for (size_t i = 0; i < AutoCompletionResourceMatches.size(); ++i) {
@@ -1132,7 +1131,7 @@ std::vector<wxString> mvceditor::SqlDocumentClass::HandleAutoCompletionMySql(con
 	if (word.length() < 1) {
 		return autoCompleteList;
 	 }
-	wxString symbol = mvceditor::StringHelperClass::IcuToWx(word);
+	wxString symbol = mvceditor::IcuToWx(word);
 	symbol = symbol.Lower();
 	wxStringTokenizer tokenizer(wxT(""));
 	tokenizer.SetString(MYSQL_KEYWORDS, wxT(" "), wxTOKEN_STRTOK);
@@ -1150,12 +1149,12 @@ std::vector<wxString> mvceditor::SqlDocumentClass::HandleAutoCompletionMySql(con
 		UnicodeString error;
 		std::vector<UnicodeString> results = Structs->SqlResourceFinder.FindTables(CurrentInfo, word);
 		for (size_t i = 0; i < results.size(); i++) {
-			wxString s = mvceditor::StringHelperClass::IcuToWx(results[i]);
+			wxString s = mvceditor::IcuToWx(results[i]);
 			autoCompleteList.push_back(s);
 		}
 		results = Structs->SqlResourceFinder.FindColumns(CurrentInfo, word);
 		for (size_t i = 0; i < results.size(); i++) {
-			wxString s = mvceditor::StringHelperClass::IcuToWx(results[i]);
+			wxString s = mvceditor::IcuToWx(results[i]);
 			autoCompleteList.push_back(s);
 		}
 	}

@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <plugins/FinderPluginClass.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <widgets/UnicodeStringValidatorClass.h>
 #include <widgets/RegularExpressionValidatorClass.h>
 #include <wx/artprov.h>
@@ -373,7 +373,7 @@ void mvceditor::ReplacePanelClass::OnReplaceButton(wxCommandEvent& event) {
 		if (codeControl && Finder.GetLastMatch(position, length) &&
 			Finder.GetLastReplacementText(text, replaceText)) {
 			codeControl->SetSelectionByCharacterPosition(position, position + length);
-			codeControl->ReplaceSelection(StringHelperClass::IcuToWx(replaceText));
+			codeControl->ReplaceSelection(mvceditor::IcuToWx(replaceText));
 			codeControl->SetSelectionByCharacterPosition(position, position + replaceText.length());
 			Find(true);
 			ReplaceHistory.Save();

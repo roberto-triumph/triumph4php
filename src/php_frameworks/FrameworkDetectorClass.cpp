@@ -24,7 +24,7 @@
  */
 #include <php_frameworks/FrameworkDetectorClass.h>
 #include <MvcEditorAssets.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <MvcEditorErrors.h>
 #include <wx/config.h>
 #include <wx/fileconf.h>
@@ -213,17 +213,17 @@ bool mvceditor::DatabaseDetectorActionClass::Response() {
 		
 		// don't use wxFileConfig.SetPath method. it seems to mess with the group iteration
 		wxString s = result.Read(groupName + wxT("Host"));
-		info.Host = mvceditor::StringHelperClass::wxToIcu(s);
+		info.Host = mvceditor::WxToIcu(s);
 		s = result.Read(groupName + wxT("/User"));
-		info.User = mvceditor::StringHelperClass::wxToIcu(s);
+		info.User = mvceditor::WxToIcu(s);
 		s = result.Read(groupName + wxT("Password"));
-		info.Password = mvceditor::StringHelperClass::wxToIcu(s);
+		info.Password = mvceditor::WxToIcu(s);
 		s = result.Read(groupName + wxT("DatabaseName"));
-		info.DatabaseName = mvceditor::StringHelperClass::wxToIcu(s);
+		info.DatabaseName = mvceditor::WxToIcu(s);
 		s = result.Read(groupName + wxT("FileName"));
-		info.FileName = mvceditor::StringHelperClass::wxToIcu(s);
+		info.FileName = mvceditor::WxToIcu(s);
 		s = result.Read(groupName + wxT("Name"));
-		info.Label = mvceditor::StringHelperClass::wxToIcu(s);
+		info.Label = mvceditor::WxToIcu(s);
 		wxString driverString = result.Read(groupName + wxT("Driver"));
 		if (driverString.CmpNoCase(wxT("MYSQL")) == 0) {
 			info.Driver = mvceditor::DatabaseInfoClass::MYSQL;
@@ -308,17 +308,17 @@ bool mvceditor::ResourcesDetectorActionClass::Response() {
 		wxString resComment = result.Read(groupName + wxT("/Comment"));
 		
 		mvceditor::ResourceClass resource;
-		UnicodeString res = mvceditor::StringHelperClass::wxToIcu(resResource);
+		UnicodeString res = mvceditor::WxToIcu(resResource);
 		int32_t scopePos = res.indexOf(UNICODE_STRING_SIMPLE("::"));
 		UnicodeString className;
 		if (scopePos > 0) {
 			className.setTo(res, 0, scopePos);			
 			resource.ClassName = className;
 		}
-		resource.Identifier = mvceditor::StringHelperClass::wxToIcu(resIdentifier);	
-		resource.ReturnType = mvceditor::StringHelperClass::wxToIcu(resReturnType);
-		resource.Signature = mvceditor::StringHelperClass::wxToIcu(resSignature);
-		resource.Comment = mvceditor::StringHelperClass::wxToIcu(resComment);
+		resource.Identifier = mvceditor::WxToIcu(resIdentifier);	
+		resource.ReturnType = mvceditor::WxToIcu(resReturnType);
+		resource.Signature = mvceditor::WxToIcu(resSignature);
+		resource.Comment = mvceditor::WxToIcu(resComment);
 		bool found = false;
 		if (resType.CmpNoCase(wxT("CLASS")) == 0) {
 			resource.Type = mvceditor::ResourceClass::CLASS;

@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <plugins/FindInFilesPluginClass.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <widgets/UnicodeStringValidatorClass.h>
 #include <widgets/RegularExpressionValidatorClass.h>
 #include <MvcEditorErrors.h>
@@ -112,7 +112,7 @@ bool mvceditor::FindInFilesBackgroundReaderClass::FileRead(DirectorySearchClass&
 					break;
 				}
 				mvceditor::FindInFilesHitClass hit(fileName, 
-					StringHelperClass::IcuToWx(FindInFiles.GetCurrentLine()), 
+					mvceditor::IcuToWx(FindInFiles.GetCurrentLine()), 
 					FindInFiles.GetCurrentLineNumber());
 				hits.push_back(hit);
 
@@ -290,7 +290,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceButton(wxCommandEvent& ev
 				position == codeControl->GetCurrentPos() &&
 				finder.GetLastReplacementText(text, replaceText)) {
 				codeControl->SetSelectionAndEnsureVisible(position, position + length);
-				codeControl->ReplaceSelection(StringHelperClass::IcuToWx(replaceText));
+				codeControl->ReplaceSelection(mvceditor::IcuToWx(replaceText));
 				codeControl->SetSelectionByCharacterPosition(position, position + replaceText.length());
 			}
 		}
@@ -690,7 +690,7 @@ void mvceditor::FindInFilesPluginClass::OnEditFindInFiles(wxCommandEvent& event)
 	// prime finder with selected text
 	wxString selectedText = GetSelectedText();
 	if (!selectedText.empty()) {
-		PreviousFindInFiles.Expression = StringHelperClass::wxToIcu(selectedText);
+		PreviousFindInFiles.Expression = mvceditor::WxToIcu(selectedText);
 	}
 	FindInFilesDialogClass dialog(NULL, *this);
 	if (dialog.ShowModal() == wxID_OK) {

@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <php_frameworks/CallStackClass.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <algorithm>
 
 
@@ -135,7 +135,7 @@ bool mvceditor::CallStackClass::Recurse(pelet::Versions version, mvceditor::Call
 	bool newlyRegistered = ResourceCache.RegisterWorking(fileName.GetFullPath(), workingCache);
 
 	wxFFile file(fileName.GetFullPath(), wxT("rb"));
-	bool ret = Parser.ScanFile(file.fp(), mvceditor::StringHelperClass::wxToIcu(fileName.GetFullPath()), LintResults);
+	bool ret = Parser.ScanFile(file.fp(), mvceditor::WxToIcu(fileName.GetFullPath()), LintResults);
 	file.Close();
 	UnicodeString key = item.Resource.ClassName + UNICODE_STRING_SIMPLE("::")  + item.Resource.Identifier;
 	ParsedMethods[key] = true;
@@ -211,7 +211,7 @@ bool mvceditor::CallStackClass::Persist(wxFileName& fileName) {
 		wxString line;
 		for (std::vector<mvceditor::CallClass>::const_iterator it = List.begin(); it != List.end() && write; ++it) {
 			line.Clear();
-			line += mvceditor::StringHelperClass::IcuToWx(it->Serialize());
+			line += mvceditor::IcuToWx(it->Serialize());
 			if (!line.IsEmpty()) {
 				line += wxT("\n");
 				write = file.Write(line);

@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <language/SymbolTableClass.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <pelet/TokenClass.h>
 #include <algorithm>
 
@@ -583,7 +583,7 @@ void mvceditor::SymbolTableClass::CreateSymbolsFromFile(const wxString& fileName
 	// for now ignore parse errors
 	pelet::LintResultsClass results;
 	wxFFile file(fileName, wxT("rb"));
-	Parser.ScanFile(file.fp(), mvceditor::StringHelperClass::wxToIcu(fileName), results);
+	Parser.ScanFile(file.fp(), mvceditor::WxToIcu(fileName), results);
 }
 
 void mvceditor::SymbolTableClass::ExpressionCompletionMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope,

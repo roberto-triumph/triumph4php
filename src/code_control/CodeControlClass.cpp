@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <code_control/CodeControlClass.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <code_control/DocumentClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
 
@@ -63,7 +63,7 @@ static const int INDICATOR_TEXT_STYLE = 32;
  * is too big is truncated.
  */
 static wxString NiceDocText(const UnicodeString& comment) {
-	wxString wxComment = mvceditor::StringHelperClass::IcuToWx(comment);
+	wxString wxComment = mvceditor::IcuToWx(comment);
 	wxComment = wxComment.Trim();
 
 	// remove the beginning and ending '/*' and '*/'
@@ -300,8 +300,8 @@ void mvceditor::CodeControlClass::SetSelectionByCharacterPosition(int start, int
 	// GET_TEXT  message
 	SendMsg(2182, documentLength, (long)buf);
 	
-	SetSelection(StringHelperClass::CharToUtf8Pos(buf, documentLength, start), 
-		StringHelperClass::CharToUtf8Pos(buf, documentLength, end));
+	SetSelection(mvceditor::CharToUtf8Pos(buf, documentLength, start), 
+		mvceditor::CharToUtf8Pos(buf, documentLength, end));
 	delete[] buf;
 }
 
@@ -785,8 +785,8 @@ void  mvceditor::CodeControlClass::OnDoubleClick(wxStyledTextEvent& event) {
 		
 	// GET_TEXT  message
 	SendMsg(2182, documentLength, (long)buf);
-	charStartIndex = mvceditor::StringHelperClass::Utf8PosToChar(buf, documentLength, pos);
-	charEndIndex = mvceditor::StringHelperClass::Utf8PosToChar(buf, documentLength, endPos);
+	charStartIndex = mvceditor::Utf8PosToChar(buf, documentLength, pos);
+	charEndIndex = mvceditor::Utf8PosToChar(buf, documentLength, endPos);
 	
 	UnicodeString word = Document->GetSafeSubstring(pos, endPos);
 	if (!word.isEmpty()) {
@@ -910,8 +910,8 @@ void mvceditor::CodeControlClass::WordHiglightForwardSearch(wxIdleEvent& event) 
 			WordHighlightIsWordHighlighted = true;
 			
 			// convert match back to UTF-8 ugh
-			int utf8Start = mvceditor::StringHelperClass::CharToUtf8Pos(buf, documentLength, matchStart);
-			int utf8End = mvceditor::StringHelperClass::CharToUtf8Pos(buf, documentLength, matchStart + matchLength);
+			int utf8Start = mvceditor::CharToUtf8Pos(buf, documentLength, matchStart);
+			int utf8End = mvceditor::CharToUtf8Pos(buf, documentLength, matchStart + matchLength);
 
 			StartStyling(utf8Start, WordHighlightStyle);
 			SetStyling(utf8End - utf8Start, WordHighlightStyle);
@@ -942,8 +942,8 @@ void mvceditor::CodeControlClass::WordHiglightPreviousSearch(wxIdleEvent& event)
 			WordHighlightIsWordHighlighted = true;
 			
 			// convert match back to UTF-8 ugh
-			int utf8Start = mvceditor::StringHelperClass::CharToUtf8Pos(buf, documentLength, matchStart);
-			int utf8End = mvceditor::StringHelperClass::CharToUtf8Pos(buf, documentLength, matchStart + matchLength);
+			int utf8Start = mvceditor::CharToUtf8Pos(buf, documentLength, matchStart);
+			int utf8End = mvceditor::CharToUtf8Pos(buf, documentLength, matchStart + matchLength);
 
 			StartStyling(utf8Start, WordHighlightStyle);
 			SetStyling(utf8End - utf8Start, WordHighlightStyle);
@@ -979,7 +979,7 @@ void mvceditor::CodeControlClass::MarkLintError(const pelet::LintResultsClass& r
 		
 		// GET_TEXT  message
 		SendMsg(2182, documentLength, (long)buf);	
-		int byteNumber = mvceditor::StringHelperClass::CharToUtf8Pos(buf, documentLength, charNumber);
+		int byteNumber = mvceditor::CharToUtf8Pos(buf, documentLength, charNumber);
 		StartStyling(byteNumber, WordHighlightStyle);
 		SetStyling(errorLength, WordHighlightStyle);
 
@@ -1039,42 +1039,42 @@ void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
 			mvceditor::ResourceClass resource = matches[0];
 			wxString msg;
 			if (resource.Type == mvceditor::ResourceClass::FUNCTION) {
-				msg = mvceditor::StringHelperClass::IcuToWx(resource.Identifier);
+				msg = mvceditor::IcuToWx(resource.Identifier);
 				msg += wxT("\n\n");
-				msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
+				msg += mvceditor::IcuToWx(resource.Signature);
 				msg += wxT(" [ ");
-				msg += mvceditor::StringHelperClass::IcuToWx(resource.ReturnType);
+				msg += mvceditor::IcuToWx(resource.ReturnType);
 				msg += wxT(" ]");
 				
 			}
 			else if (resource.Type == mvceditor::ResourceClass::METHOD) {
-				msg = mvceditor::StringHelperClass::IcuToWx(resource.ClassName);
+				msg = mvceditor::IcuToWx(resource.ClassName);
 				msg += wxT("::");
-				msg += mvceditor::StringHelperClass::IcuToWx(resource.Identifier);
+				msg += mvceditor::IcuToWx(resource.Identifier);
 				msg += wxT("\n\n");
-				msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
+				msg += mvceditor::IcuToWx(resource.Signature);
 				if (!resource.ReturnType.isEmpty()) {
 					msg += wxT(" [ ");
-					msg += mvceditor::StringHelperClass::IcuToWx(resource.ReturnType);
+					msg += mvceditor::IcuToWx(resource.ReturnType);
 					msg += wxT(" ]");	
 				}
 			}
 			else if (resource.Type == mvceditor::ResourceClass::MEMBER || resource.Type == mvceditor::ResourceClass::CLASS_CONSTANT) {
-				msg = mvceditor::StringHelperClass::IcuToWx(resource.ClassName);
+				msg = mvceditor::IcuToWx(resource.ClassName);
 				msg += wxT("::");
-				msg += mvceditor::StringHelperClass::IcuToWx(resource.Identifier);
+				msg += mvceditor::IcuToWx(resource.Identifier);
 				msg += wxT("\n\n");
-				msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
+				msg += mvceditor::IcuToWx(resource.Signature);
 				if (!resource.ReturnType.isEmpty()) {
 					msg += wxT(" [ ");
-					msg += mvceditor::StringHelperClass::IcuToWx(resource.ReturnType);
+					msg += mvceditor::IcuToWx(resource.ReturnType);
 					msg += wxT(" ]");	
 				}
 			}
 			else {
-				msg = mvceditor::StringHelperClass::IcuToWx(resource.Identifier);
+				msg = mvceditor::IcuToWx(resource.Identifier);
 				msg += wxT("\n\n");
-				msg += mvceditor::StringHelperClass::IcuToWx(resource.Signature);
+				msg += mvceditor::IcuToWx(resource.Signature);
 			}
 			if (!resource.Comment.isEmpty()) {
 				msg += wxT("\n\n");
@@ -1101,7 +1101,7 @@ int mvceditor::CodeControlClass::LineFromCharacter(int charPos) {
 	
 	// GET_TEXT  message
 	SendMsg(2182, documentLength, (long)buf);
-	int pos = mvceditor::StringHelperClass::CharToUtf8Pos(buf, documentLength, charPos);
+	int pos = mvceditor::CharToUtf8Pos(buf, documentLength, charPos);
 	delete[] buf;
 	return LineFromPosition(pos);
 }

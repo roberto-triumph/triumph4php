@@ -25,7 +25,7 @@
 #include <UnitTest++.h>
 #include <FileTestFixtureClass.h>
 #include <search/FindInFilesClass.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 
 wxString FILE_1 = wxString::FromAscii(
 	"<?php\n"
@@ -124,9 +124,9 @@ TEST_FIXTURE(FindInFilesTestFixtureClass, ReplaceAllMatchesShouldReplaceAllMatch
 	FindInFiles.ReplaceExpression = UNICODE_STRING_SIMPLE("FILENAME_WORK");
 	FindInFiles.Mode = mvceditor::FinderClass::REGULAR_EXPRESSION;
 	CHECK(FindInFiles.Prepare());
-	UnicodeString newText = mvceditor::StringHelperClass::wxToIcu(FILE_2);
+	UnicodeString newText = mvceditor::WxToIcu(FILE_2);
 	CHECK_EQUAL(2, FindInFiles.ReplaceAllMatches(newText));
-	UnicodeString expectedText = mvceditor::StringHelperClass::wxToIcu(FILE_2);
+	UnicodeString expectedText = mvceditor::WxToIcu(FILE_2);
 	expectedText.findAndReplace(UNICODE_STRING_SIMPLE("WORK_FILE"), UNICODE_STRING_SIMPLE("FILENAME_WORK"));
 	CHECK_EQUAL(expectedText, newText);
 }

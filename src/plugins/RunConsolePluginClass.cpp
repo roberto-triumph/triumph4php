@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <plugins/RunConsolePluginClass.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <MvcEditorErrors.h>
 #include <MvcEditor.h>
 #include <wx/artprov.h>
@@ -405,7 +405,7 @@ void mvceditor::RunConsolePanelClass::AppendText(const wxString& text) {
 	bool prep = finder.Prepare();
 	wxASSERT(prep);
 	
-	UnicodeString uniText = mvceditor::StringHelperClass::wxToIcu(text);
+	UnicodeString uniText = mvceditor::WxToIcu(text);
 	int32_t totalLength = uniText.length();
 
 	wxFont regularFont = OutputWindow->GetFont();
@@ -425,7 +425,7 @@ void mvceditor::RunConsolePanelClass::AppendText(const wxString& text) {
 				// render the text prior to the hit as normal
 				OutputWindow->SetDefaultStyle(normalAttr);
 				UnicodeString beforeHit(uniText, index, hit.StartIndex - index);
-				OutputWindow->AppendText(mvceditor::StringHelperClass::IcuToWx(beforeHit));
+				OutputWindow->AppendText(mvceditor::IcuToWx(beforeHit));
 			}
 			wxString hitTrimmed = text.Mid(hit.StartIndex, hit.Length);
 			wxString hitContents = text.Mid(hit.StartIndex, hit.Length);
@@ -450,13 +450,13 @@ void mvceditor::RunConsolePanelClass::AppendText(const wxString& text) {
 				// render the ending boundary that was taken by the regular expression
 				OutputWindow->SetDefaultStyle(normalAttr);
 				UnicodeString afterHit(uniText, hit.StartIndex + hit.Length, 1);
-				OutputWindow->AppendText(mvceditor::StringHelperClass::IcuToWx(afterHit));
+				OutputWindow->AppendText(mvceditor::IcuToWx(afterHit));
 			}
 		}
 		else {
 			OutputWindow->SetDefaultStyle(normalAttr);
 			UnicodeString noHit(uniText, index);
-			OutputWindow->AppendText(mvceditor::StringHelperClass::IcuToWx(noHit));
+			OutputWindow->AppendText(mvceditor::IcuToWx(noHit));
 			index = -1;
 		}
 	}
@@ -499,14 +499,14 @@ UnicodeString mvceditor::RunConsolePanelClass::FileNameRegularExpression() {
 		// we need to escape backslashes so 1 escaped literal backslash=4 backslashes
 		uniRegEx += UNICODE_STRING_SIMPLE("(^|\\s)");
 		uniRegEx += UNICODE_STRING_SIMPLE("([A-Za-z]\\:[\\\\\\w_. ]+)\\\\");
-		uniRegEx += mvceditor::StringHelperClass::wxToIcu(extensionsRegEx);
+		uniRegEx += mvceditor::WxToIcu(extensionsRegEx);
 		uniRegEx += UNICODE_STRING_SIMPLE("($|\\s)"); 
 		
 	}
 	else {
 		uniRegEx += UNICODE_STRING_SIMPLE("(^|\\s)/");
 		uniRegEx += UNICODE_STRING_SIMPLE("([\\w_. /]+)");
-		uniRegEx += mvceditor::StringHelperClass::wxToIcu(extensionsRegEx);
+		uniRegEx += mvceditor::WxToIcu(extensionsRegEx);
 		uniRegEx += UNICODE_STRING_SIMPLE("($|\\s)"); 
 	}
 	return uniRegEx;

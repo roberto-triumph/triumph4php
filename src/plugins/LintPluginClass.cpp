@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <plugins/LintPluginClass.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <MvcEditorErrors.h>
 #include <MvcEditor.h>
 #include <Events.h>
@@ -70,7 +70,7 @@ bool mvceditor::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 	LastResults.CharacterPosition = 0;
 
 	wxFFile file(fileName, wxT("rb"));
-	if (Parser.LintFile(file.fp(), mvceditor::StringHelperClass::wxToIcu(fileName), LastResults)) {
+	if (Parser.LintFile(file.fp(), mvceditor::WxToIcu(fileName), LastResults)) {
 		WithNoErrors++;
 	}
 	else {
@@ -149,7 +149,7 @@ mvceditor::LintResultsPanelClass::~LintResultsPanelClass() {
 }
 
 void mvceditor::LintResultsPanelClass::AddError(const pelet::LintResultsClass& lintError) {
-	wxString err = StringHelperClass::IcuToWx(lintError.Error);
+	wxString err = mvceditor::IcuToWx(lintError.Error);
 	wxString line;
 	int capacity = lintError.Error.length() + lintError.UnicodeFilename.length() + 50;
 	UnicodeString msg;
@@ -163,7 +163,7 @@ void mvceditor::LintResultsPanelClass::AddError(const pelet::LintResultsClass& l
 		lintError.CharacterPosition
 	);
 	msg.releaseBuffer(written);
-	wxString wxMsg = mvceditor::StringHelperClass::IcuToWx(msg);
+	wxString wxMsg = mvceditor::IcuToWx(msg);
 	LintErrors.push_back(lintError);
 	ErrorsList->AppendString(wxMsg);
 }
@@ -180,7 +180,7 @@ void mvceditor::LintResultsPanelClass::RemoveErrorsFor(const wxString& fileName)
 	std::vector<pelet::LintResultsClass>::iterator it = LintErrors.begin();
 	int i = 0;
 
-	UnicodeString uniFileName = mvceditor::StringHelperClass::wxToIcu(fileName);
+	UnicodeString uniFileName = mvceditor::WxToIcu(fileName);
 	while (it != LintErrors.end()) {
 		if (it->UnicodeFilename == uniFileName) {
 			it = LintErrors.erase(it);
@@ -215,7 +215,7 @@ void mvceditor::LintResultsPanelClass::OnListDoubleClick(wxCommandEvent& event) 
 void mvceditor::LintResultsPanelClass::DisplayLintError(int index) {
 	pelet::LintResultsClass results = LintErrors[index];
 
-	wxString file = mvceditor::StringHelperClass::IcuToWx(results.UnicodeFilename);
+	wxString file = mvceditor::IcuToWx(results.UnicodeFilename);
 	Notebook->LoadPage(file);
 	Notebook->GetCurrentCodeControl()->MarkLintError(results);
 }

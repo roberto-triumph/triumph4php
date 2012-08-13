@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <widgets/NotebookClass.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <MvcEditor.h>
 #include <MvcEditorErrors.h>
 #include <wx/artprov.h>
@@ -255,7 +255,7 @@ bool mvceditor::NotebookClass::SaveCurrentPageAsNew() {
 				// SaveAs should have no effect on the state of the
 				// code control so dont use the control's save methods
 				wxString newFullPath = fileDialog.GetPath();
-				wxString code = StringHelperClass::IcuToWx(codeCtrl->GetSafeText());
+				wxString code = mvceditor::IcuToWx(codeCtrl->GetSafeText());
 				wxFile saveAsFile(newFullPath, wxFile::write);
 				saved = saveAsFile.IsOpened() && saveAsFile.Write(code);
 				if (!saved) {

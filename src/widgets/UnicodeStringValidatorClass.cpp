@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <widgets/UnicodeStringValidatorClass.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <wx/textctrl.h>
 #include <wx/combobox.h>
 
@@ -51,12 +51,12 @@ bool UnicodeStringValidatorClass::TransferFromWindow() {
 	wxComboBox* combo = wxDynamicCast(GetWindow(), wxComboBox);
 	if (t) {
 		wxString val = t->GetValue();
-		*Data = mvceditor::StringHelperClass::wxToIcu(val);
+		*Data = mvceditor::WxToIcu(val);
 		ret = true;
 	}
 	else if(combo) {
 		wxString val = combo->GetValue();
-		*Data = mvceditor::StringHelperClass::wxToIcu(val);
+		*Data = mvceditor::WxToIcu(val);
 		ret = true;
 	}
 	return ret;
@@ -67,12 +67,12 @@ bool UnicodeStringValidatorClass::TransferToWindow() {
 	wxTextCtrl* t = wxDynamicCast(GetWindow(), wxTextCtrl);
 	wxComboBox* combo = wxDynamicCast(GetWindow(), wxComboBox);
 	if (t) {
-		wxString val = mvceditor::StringHelperClass::IcuToWx(*Data);
+		wxString val = mvceditor::IcuToWx(*Data);
 		t->SetValue(val);
 		ret = true;
 	}
 	if (combo) {
-		wxString val = mvceditor::StringHelperClass::IcuToWx(*Data);
+		wxString val = mvceditor::IcuToWx(*Data);
 		combo->SetValue(val);
 		ret = true;
 	}

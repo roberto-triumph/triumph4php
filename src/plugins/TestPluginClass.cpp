@@ -24,7 +24,7 @@
  */
 #include <plugins/TestPluginClass.h>
 #include <search/FindInFilesClass.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <wx/artprov.h>
 
 int ID_GO_BUTTON = wxNewId();
@@ -59,7 +59,7 @@ void mvceditor::TestPluginClass::Go(wxCommandEvent& event) {
 	GetNotebook()->LoadPage(file);
 	mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
 	if (codeControl) {
-		codeControl->SetText(StringHelperClass::IcuToWx(str));
+		codeControl->SetText(mvceditor::IcuToWx(str));
 	}
 }
 

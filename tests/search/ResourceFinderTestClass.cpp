@@ -24,7 +24,7 @@
  */
 #include <UnitTest++.h>
 #include <search/ResourceFinderClass.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <FileTestFixtureClass.h>
 #include <MvcEditorAssets.h>
 #include <MvcEditorChecks.h>
@@ -126,7 +126,7 @@ public:
 		// create a small class that implements a magic method
 		// then add a dynamic resource that will be used to mimic the resource
 		// returned by the magic method.
-		ResourceFinder.BuildResourceCacheForFile(TestFile, mvceditor::StringHelperClass::charToIcu(
+		ResourceFinder.BuildResourceCacheForFile(TestFile, mvceditor::CharToIcu(
 			"<?php\n"
 			"class MyDynamicClass {\n"
 			"\tfunction work() {} \n"
@@ -171,7 +171,7 @@ public:
 	}
 
 	void Make(const char* query) {
-		ResourceSearch = new mvceditor::ResourceSearchClass(mvceditor::StringHelperClass::charToIcu(query));
+		ResourceSearch = new mvceditor::ResourceSearchClass(mvceditor::CharToIcu(query));
 	}
 
 };
@@ -198,7 +198,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 		"?>\n"
 	));
 	ResourceFinder.Walk(TestProjectDir + TestFile);
-	CollectNearMatchResources(mvceditor::StringHelperClass::wxToIcu(TestFile));
+	CollectNearMatchResources(mvceditor::WxToIcu(TestFile));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 }
@@ -264,7 +264,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhenClassNameMatches) {
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"/** this is my class */\n"
 		"class UserClass {\n"
@@ -287,7 +287,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldNotFindFileWhenClassNameDoesNotMatch) {
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -302,7 +302,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldNotFi
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhenClassNameIsNotTheExactSame) {
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserAdmin {\n"
 		"\tprivate $name;"
@@ -318,7 +318,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhenClassNameHasAnExtends) {
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class User extends Human {\n"
 		"\tprivate $name;"
@@ -333,7 +333,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhenClassNameAndMethodNameMatch) {
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;\n"
@@ -357,7 +357,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhenClassNameAndSecondMethodNameMatch) {
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -376,7 +376,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldNotFindFileWhenClassNameMatchesButMethodNameDoesNot) {
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -391,7 +391,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldNotFi
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhendMethodNameMatchesButClassIsNotGiven) {
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -408,7 +408,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldOnlySaveTheExactMatchWhenAnExactMatchIsFound) {
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -434,7 +434,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindT
 	wxString testFile = wxT("test.php");
 	wxString testFile2 = wxT("test2.php");
 	TestFile = testFile;
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -445,7 +445,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindT
 		"?>\n"
 	));	
 	TestFile = testFile2;
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -493,7 +493,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldNotFind
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindClassAfterFindingFile) {
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -517,7 +517,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindC
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFunctionWhenFunctionNameMatches) {
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -542,7 +542,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForClassesAndFunctions) {
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -568,7 +568,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForClassMembers) {
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\t/** the user name @var string */\n"
@@ -591,7 +591,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForClassConstant) {
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\t/** the max constant @var int */\n"
@@ -613,7 +613,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForDefines) {
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"/** the max constant @var int */\n"
 		"define('MAX_ITEMS', 1);\n"
@@ -633,7 +633,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 	
 	// adding 2 classes to the file because we want to test that the code can differentiate the two classes and
 	// match only on the class given
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -658,7 +658,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindP
 	
 	// adding 2 classes to the file because we want to test that the code can differentiate the two classes and
 	// match only on the class given
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -680,7 +680,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindP
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindPartialMatchesForClassMethodsWithNoClassName) {
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -752,7 +752,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindMat
 		"?>\n"
 	);
 	Prep(code);
-	UnicodeString uniCode  = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString uniCode  = mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -787,7 +787,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, InitFileShouldLoadDbFromFile) {
 		"?>\n"
 	));
 	ResourceFinder.Walk(TestProjectDir + TestFile);
-	CollectNearMatchResources(mvceditor::StringHelperClass::wxToIcu(TestFile));
+	CollectNearMatchResources(mvceditor::WxToIcu(TestFile));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 
@@ -795,14 +795,14 @@ TEST_FIXTURE(ResourceFinderFileTestClass, InitFileShouldLoadDbFromFile) {
 	// and does not parse the file system
 	mvceditor::ResourceFinderClass newResourceFinder;
 	newResourceFinder.InitFile(newDbFileName);
-	Matches = newResourceFinder.CollectNearMatchResources(mvceditor::StringHelperClass::wxToIcu(TestFile));
+	Matches = newResourceFinder.CollectNearMatchResources(mvceditor::WxToIcu(TestFile));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 }
 
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesWhenUsingBuildResourceCacheForFileAndUsingNewFile) {
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		
 		// this simulates the user writing a completely new file that has yet to be saved.
 		"<?php\n"
@@ -823,7 +823,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 		"}\n"		
 		"?>\n"
 	));	
-	UnicodeString uniCode  = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString uniCode  = mvceditor::CharToIcu(
 		"<?php\n"
 		"function printUser($user) {\n"
 		"\t echo $user->getName() . \"\\n\";"
@@ -838,7 +838,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldCollectAllMethodsWhenClassIsNotGiven) {
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;\n"
@@ -867,7 +867,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldColle
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldNotCollectParentClassesWhenInheritedClassNameIsGiven) {
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;\n"
@@ -894,7 +894,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldNotCo
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesShouldFindFileWhenClassNameMatches) {
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -914,7 +914,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesShould
 	
 	// adding 2 classes to the file because we want to test that the code can differentiate the two classes and
 	// match only on the class given
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -937,7 +937,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesShould
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesShouldNotFindFileWhenClassNameDoesNotMatch) {
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -1021,7 +1021,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectFullyQualifiedResourcesShouldFi
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceMatchShouldReturnSignatureForConstructors) {
-	 Prep(mvceditor::StringHelperClass::charToIcu(
+	 Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -1049,7 +1049,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceMatchShouldReturnSignatur
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceParentClassShouldReturnParentClass) {
-	 Prep(mvceditor::StringHelperClass::charToIcu(
+	 Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -1069,7 +1069,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceParentClassShouldReturnPa
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceParentClassShouldReturnParentClassForDeepHierarchy) {
-	 Prep(mvceditor::StringHelperClass::charToIcu(
+	 Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -1089,7 +1089,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceParentClassShouldReturnPa
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceMatchPositionShouldReturnValidPositionsForClassMethodFunctionAndMember) {
-	 UnicodeString icuCode = mvceditor::StringHelperClass::charToIcu(
+	 UnicodeString icuCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -1137,7 +1137,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceMatchPositionShouldReturn
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectQualifiedResourceNamespaces) {
-	 Prep(mvceditor::StringHelperClass::charToIcu(
+	 Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"namespace First\\Child; \n"
 		"class MyClass {\n"
@@ -1154,7 +1154,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectQualifiedResourceNamespaces) 
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectQualifiedResourceNamespacesShouldNotFindDuplicates) {
-	 Prep(mvceditor::StringHelperClass::charToIcu(
+	 Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"namespace First\\Child; \n"
 		"class MyClass {\n"
@@ -1165,7 +1165,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectQualifiedResourceNamespacesSh
 		"?>\n"
 	));
 	TestFile = wxT("test_2.php");
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"namespace First\\Child; \n"
 		"class TwoClass {\n"
@@ -1192,7 +1192,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectQualifiedResourceNamespacesSh
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectResourceInGlobalNamespaces) {
-	 Prep(mvceditor::StringHelperClass::charToIcu(
+	 Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class MyClass {\n"
 		"	function work() {} \n"
@@ -1213,7 +1213,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectResourceInGlobalNamespaces) {
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchNamespaces) {
-	 Prep(mvceditor::StringHelperClass::charToIcu(
+	 Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"namespace First\\Child; \n"
 		"class MyClass {\n"
@@ -1237,7 +1237,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchNamespaces) {
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchNamespaceQualifiedClassesAndFunctions) {
-	 Prep(mvceditor::StringHelperClass::charToIcu(
+	 Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"namespace First\\Child; \n"
 		"class MyClass {\n"
@@ -1262,7 +1262,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchNamespaceQualifiedCl
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchNamespaceQualifiedClassesShouldIgnoreOtherNamespaces) {
-	 Prep(mvceditor::StringHelperClass::charToIcu(
+	 Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"namespace First\\Child { \n"
 		"class MyClass { }\n"
@@ -1279,7 +1279,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchNamespaceQualifiedCl
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraitMembers) {
 	ResourceFinder.SetVersion(pelet::PHP_54);
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"trait ezcReflectionReturnInfo { "
 		"    function getReturnType() { } "
 		"} "
@@ -1306,7 +1306,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraitMem
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraitsWhenLookingForAllMethods) {
 	ResourceFinder.SetVersion(pelet::PHP_54); 
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"trait ezcReflectionReturnInfo { "
 		"    function getReturnType() { } "
 		"} "
@@ -1343,7 +1343,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraitsWh
 TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceTraitsShouldReturnAllTraits) {
 	//ResourceFinder.InitFile(wxFileName(wxT("c:\\users\\rperpuly\\desktop\\t.db")));
 	ResourceFinder.SetVersion(pelet::PHP_54); 
-	Prep(mvceditor::StringHelperClass::charToIcu(
+	Prep(mvceditor::CharToIcu(
 		"trait ezcReflectionReturnInfo { "
 		"    function getReturnType() { } "
 		"} "

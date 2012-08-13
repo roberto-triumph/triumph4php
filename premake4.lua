@@ -244,7 +244,6 @@ solution "mvc-editor"
 			"src/search/ResourceFinderClass.cpp",
 			"src/widgets/ThreadWithHeartbeatClass.cpp",
 			"src/widgets/ProcessWithHeartbeatClass.cpp",
-			"src/windows/StringHelperClass.cpp",
 			"src/MvcEditorErrors.cpp",
 			"src/MvcEditorAssets.cpp",
 			"src/MvcEditorString.cpp"
@@ -291,7 +290,6 @@ solution "mvc-editor"
 			"src/search/DirectorySearchClass.cpp",
 			"src/search/FinderClass.cpp",
 			"src/search/FindInFilesClass.cpp",
-			"src/windows/StringHelperClass.cpp",
 			"src/MvcEditorString.cpp"
 		}
 		includedirs { "src", "lib/pelet/include" }
@@ -324,7 +322,6 @@ solution "mvc-editor"
 			"src/search/FindInFilesClass.cpp",
 			"src/widgets/ThreadWithHeartbeatClass.cpp",
 			"src/widgets/ProcessWithHeartbeatClass.cpp",
-			"src/windows/StringHelperClass.cpp",
 			"src/MvcEditorString.cpp"
 		}
 		includedirs { "src", "lib/pelet/include" }
@@ -349,8 +346,8 @@ solution "mvc-editor"
 			"src/search/FindInFilesClass.cpp",
 			"src/search/DirectorySearchClass.cpp",
 			"src/search/FinderClass.cpp",
-			"src/windows/StringHelperClass.cpp",
-			"src/MvcEditorErrors.cpp"
+			"src/MvcEditorErrors.cpp",
+			"src/MvcEditorString.cpp"
 		}
 		includedirs { "src/" }
 		configuration "Debug"
@@ -371,7 +368,6 @@ solution "mvc-editor"
 			"src/widgets/ThreadWithHeartbeatClass.cpp",
 			"src/widgets/ProcessWithHeartbeatClass.cpp",
 			"src/widgets/StatusBarWithGaugeClass.cpp",
-			"src/windows/StringHelperClass.cpp",
 			"src/environment/DatabaseInfoClass.cpp",
 			"src/environment/*.cpp",
 			"src/php_frameworks/ProjectClass.cpp",

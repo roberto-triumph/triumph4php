@@ -26,7 +26,7 @@
 #include <MvcEditorChecks.h>
 #include <FileTestFixtureClass.h>
 #include <php_frameworks/CallStackClass.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 
 class CallStackFixtureTestClass : public FileTestFixtureClass {
 	
@@ -129,7 +129,7 @@ TEST_FIXTURE(CallStackFixtureTestClass, FailOnParseError) {
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
 	CHECK_EQUAL(false, CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
 
-	UnicodeString expected = mvceditor::StringHelperClass::wxToIcu(file.GetFullPath());
+	UnicodeString expected = mvceditor::WxToIcu(file.GetFullPath());
 	CHECK_EQUAL(expected, CallStack.LintResults.UnicodeFilename);
 	CHECK_EQUAL(mvceditor::CallStackClass::PARSE_ERR0R, error);
 }	

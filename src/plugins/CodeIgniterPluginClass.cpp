@@ -26,7 +26,7 @@
 #include <MvcEditorErrors.h>
 #include <MvcEditor.h>
 #include <Events.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <wx/choicdlg.h>
 
 mvceditor::CodeIgniterPluginClass::CodeIgniterPluginClass(mvceditor::AppClass& app)  
@@ -138,7 +138,7 @@ void mvceditor::CodeIgniterPluginClass::OnMenuItem(wxCommandEvent& event) {
 		else if (id == (int)(MENU_CODE_IGNITER + ConfigFiles.size() + 0)) {
 			mvceditor::CodeControlClass* codeControl = CreateCodeControl(wxT(""));
 			codeControl->SetDocumentMode(mvceditor::CodeControlClass::PHP);
-			UnicodeString contents = mvceditor::StringHelperClass::charToIcu(
+			UnicodeString contents = mvceditor::CharToIcu(
 				"<?php\n"
 				"\n"
 				"class Model_name extends CI_Model {\n"
@@ -157,7 +157,7 @@ void mvceditor::CodeIgniterPluginClass::OnMenuItem(wxCommandEvent& event) {
 		else if (id == (int)(MENU_CODE_IGNITER + ConfigFiles.size() + 1)) {
 			mvceditor::CodeControlClass* codeControl = CreateCodeControl(wxT(""));
 			codeControl->SetDocumentMode(mvceditor::CodeControlClass::PHP);
-			UnicodeString contents = mvceditor::StringHelperClass::charToIcu(
+			UnicodeString contents = mvceditor::CharToIcu(
 				"<?php\n"
 				"\n"
 				"class Controller extends CI_Controller {\n"

@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <widgets/RegularExpressionValidatorClass.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <search/FinderClass.h>
 #include <unicode/unistr.h>
 #include <unicode/regex.h>
@@ -133,11 +133,11 @@ bool mvceditor::RegularExpressionValidatorClass::TransferFromWindow() {
 	UnicodeString regEx;
 	if (t) {
 		wxString val = t->GetValue();
-		regEx = mvceditor::StringHelperClass::wxToIcu(val);
+		regEx = mvceditor::WxToIcu(val);
 	}
 	else if (combo) {
 		wxString val = combo->GetValue();
-		regEx = mvceditor::StringHelperClass::wxToIcu(val);
+		regEx = mvceditor::WxToIcu(val);
 	}
 	if (!regEx.isEmpty()) {
 		ret = true;
@@ -155,12 +155,12 @@ bool mvceditor::RegularExpressionValidatorClass::TransferToWindow() {
 	wxComboBox* combo = wxDynamicCast(GetWindow(), wxComboBox);
 	UnicodeString regEx;
 	if (t) {
-		wxString val = mvceditor::StringHelperClass::IcuToWx(*Data);
+		wxString val = mvceditor::IcuToWx(*Data);
 		t->SetValue(val);
 		ret = true;
 	}
 	else if (combo) {
-		wxString val = mvceditor::StringHelperClass::IcuToWx(*Data);
+		wxString val = mvceditor::IcuToWx(*Data);
 		combo->SetValue(val);
 		ret = true;
 	}
@@ -183,11 +183,11 @@ bool mvceditor::RegularExpressionValidatorClass::Validate(wxWindow *parent) {
 		UnicodeString regEx;
 		if (t) {
 			wxString val = t->GetValue();
-			regEx = mvceditor::StringHelperClass::wxToIcu(val);
+			regEx = mvceditor::WxToIcu(val);
 		}
 		else if (combo) {
 			wxString val = combo->GetValue();
-			regEx = mvceditor::StringHelperClass::wxToIcu(val);
+			regEx = mvceditor::WxToIcu(val);
 		}
 		if (!regEx.isEmpty()) {
 			UParseError parseError;

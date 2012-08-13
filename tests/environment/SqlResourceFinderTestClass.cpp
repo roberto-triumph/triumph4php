@@ -25,7 +25,7 @@
 #include <UnitTest++.h>
 #include <DatabaseTestFixtureClass.h>
 #include <environment/SqlResourceFinderClass.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <MvcEditorChecks.h>
 #include <unicode/ustdio.h>
 #include <wx/platinfo.h>
@@ -43,8 +43,8 @@ public:
 
 		// user name, pwd are #defines come from the premake script premake_opts.lua
 		Info.Host = UNICODE_STRING_SIMPLE("127.0.0.1");
-		Info.User = mvceditor::StringHelperClass::charToIcu(UserName().c_str());
-		Info.Password = mvceditor::StringHelperClass::charToIcu(Password().c_str());
+		Info.User = mvceditor::CharToIcu(UserName().c_str());
+		Info.Password = mvceditor::CharToIcu(Password().c_str());
 	}
 	
 	mvceditor::DatabaseInfoClass Info;

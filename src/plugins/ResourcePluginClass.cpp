@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <plugins/ResourcePluginClass.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <MvcEditorErrors.h>
 #include <MvcEditorAssets.h>
 #include <Events.h>
@@ -241,7 +241,7 @@ void mvceditor::ResourcePluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 std::vector<mvceditor::ResourceClass> mvceditor::ResourcePluginClass::SearchForResources(const wxString& text) {
 	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
 	std::vector<mvceditor::ResourceClass> matches;
-	matches = resourceCache->CollectNearMatchResourcesFromAll(mvceditor::StringHelperClass::wxToIcu(text));
+	matches = resourceCache->CollectNearMatchResourcesFromAll(mvceditor::WxToIcu(text));
 
 	// no need to show jump to results for native functions
 	// TODO: CollectNearResourceMatches shows resources from files that were recently deleted
@@ -279,7 +279,7 @@ void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
 		IndexingDialog->Destroy();
 		IndexingDialog = NULL;
 	}
-	mvceditor::ResourceSearchClass resourceSearch(mvceditor::StringHelperClass::wxToIcu(JumpToText));
+	mvceditor::ResourceSearchClass resourceSearch(mvceditor::WxToIcu(JumpToText));
 	if (INDEXING_PROJECT == State || GOTO == State) {
 
 		// figure out what resources have been cached, so that next time we can jump
@@ -443,7 +443,7 @@ void mvceditor::ResourcePluginClass::OnSearchForResource(wxCommandEvent& event) 
 
 
 void mvceditor::ResourcePluginClass::LoadPageFromResource(const wxString& finderQuery, const mvceditor::ResourceClass& resource) {
-	mvceditor::ResourceSearchClass resourceSearch(mvceditor::StringHelperClass::wxToIcu(finderQuery));
+	mvceditor::ResourceSearchClass resourceSearch(mvceditor::WxToIcu(finderQuery));
 	wxFileName fileName = resource.FileName();
 	if (!fileName.FileExists()) {
 		mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, _("File no longer exists:") + fileName.GetFullPath());
@@ -478,7 +478,7 @@ void mvceditor::ResourcePluginClass::OnUpdateUi(wxUpdateUIEvent& event) {
 }
 
 bool mvceditor::ResourcePluginClass::NeedToIndex(const wxString& finderQuery) const {
-	mvceditor::ResourceSearchClass resourceSearch(mvceditor::StringHelperClass::wxToIcu(finderQuery));
+	mvceditor::ResourceSearchClass resourceSearch(mvceditor::WxToIcu(finderQuery));
 	if ((mvceditor::ResourceSearchClass::CLASS_NAME == resourceSearch.GetResourceType() ||
 		mvceditor::ResourceSearchClass::CLASS_NAME_METHOD_NAME == resourceSearch.GetResourceType()) && !HasCodeLookups)  {
 		return true;
@@ -613,7 +613,7 @@ void mvceditor::ResourceSearchDialogClass::OnSearchEnter(wxCommandEvent& event) 
 
 void mvceditor::ResourceSearchDialogClass::ShowJumpToResults(const wxString& finderQuery, const std::vector<mvceditor::ResourceClass>& allMatches) {
 	wxArrayString files;
-	mvceditor::ResourceSearchClass resourceSearch(mvceditor::StringHelperClass::wxToIcu(finderQuery));
+	mvceditor::ResourceSearchClass resourceSearch(mvceditor::WxToIcu(finderQuery));
 	for (size_t i = 0; i < allMatches.size(); ++i) {
 		files.Add(allMatches[i].GetFullPath());
 	}
@@ -625,7 +625,7 @@ void mvceditor::ResourceSearchDialogClass::ShowJumpToResults(const wxString& fin
 		if (mvceditor::ResourceSearchClass::FILE_NAME != resourceSearch.GetResourceType() &&
 			mvceditor::ResourceSearchClass::FILE_NAME_LINE_NUMBER != resourceSearch.GetResourceType()) {
 			UnicodeString res = allMatches[i].ClassName + UNICODE_STRING_SIMPLE("::") + allMatches[i].Identifier;
-			shortName += wxT("  (") + mvceditor::StringHelperClass::IcuToWx(res) + wxT(")");
+			shortName += wxT("  (") + mvceditor::IcuToWx(res) + wxT(")");
 		}
 		MatchesList->Append(shortName);
 	}

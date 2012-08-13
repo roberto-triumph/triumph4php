@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <environment/SqlResourceFinderClass.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <soci.h>
 #include <algorithm>
 
@@ -61,7 +61,7 @@ bool mvceditor::SqlResourceFinderClass::Fetch(const mvceditor::DatabaseInfoClass
 		Tables[hash].clear();
 		Columns[hash].clear();
 		try {
-			std::string schema = mvceditor::StringHelperClass::IcuToChar(info.DatabaseName);
+			std::string schema = mvceditor::IcuToChar(info.DatabaseName);
 			std::string tableName;
 
 			// populate information_schema tables we want SQL code completion to work for the 
@@ -70,7 +70,7 @@ bool mvceditor::SqlResourceFinderClass::Fetch(const mvceditor::DatabaseInfoClass
 			soci::statement stmt = (session.prepare << query, soci::into(tableName), soci::use(schema));
 			stmt.execute();
 			while (Query.More(stmt, hasError, error)) {
-				UnicodeString uni = mvceditor::StringHelperClass::charToIcu(tableName.c_str());
+				UnicodeString uni = mvceditor::CharToIcu(tableName.c_str());
 				mvceditor::SqlResourceClass res(uni);
 				Tables[hash].push_back(res);
 			}
@@ -83,7 +83,7 @@ bool mvceditor::SqlResourceFinderClass::Fetch(const mvceditor::DatabaseInfoClass
 				stmt = (session.prepare << query, soci::into(schemaName));
 				stmt.execute();
 				while (Query.More(stmt, hasError, error)) {
-					UnicodeString uniSchema = mvceditor::StringHelperClass::charToIcu(schemaName.c_str());
+					UnicodeString uniSchema = mvceditor::CharToIcu(schemaName.c_str());
 					mvceditor::SqlResourceClass resSchema(uniSchema);
 					Tables[hash].push_back(resSchema);
 				}
@@ -100,7 +100,7 @@ bool mvceditor::SqlResourceFinderClass::Fetch(const mvceditor::DatabaseInfoClass
 				stmt = (session.prepare << query, soci::into(columnName), soci::use(schema));
 				stmt.execute();
 				while (Query.More(stmt, hasError, error)) {
-					UnicodeString uniColumn = mvceditor::StringHelperClass::charToIcu(columnName.c_str());
+					UnicodeString uniColumn = mvceditor::CharToIcu(columnName.c_str());
 					UnicodeString hash = Hash(info);
 					mvceditor::SqlResourceClass resColumn(uniColumn);
 					Columns[hash].push_back(resColumn);
@@ -112,7 +112,7 @@ bool mvceditor::SqlResourceFinderClass::Fetch(const mvceditor::DatabaseInfoClass
 		} 
 		catch (std::exception const& e) {
 			hasError = true;
-			error = mvceditor::StringHelperClass::charToIcu(e.what());
+			error = mvceditor::CharToIcu(e.what());
 		}
 	}
 	return !hasError;

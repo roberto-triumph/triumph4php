@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <language/SymbolTableClass.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <FileTestFixtureClass.h>
 #include <MvcEditorChecks.h>
 #include <UnitTest++.h>
@@ -178,7 +178,7 @@ public:
 SUITE(SymbolTableTestClass) {
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithFunctionName) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"function work() {}\n"
 	);
@@ -193,7 +193,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithFunctionName) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, VariableMatchesWithVariableName) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"$globalOne = 1;\n"
 		"$globalTwo = 2;\n"
@@ -208,7 +208,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, VariableMatchesWithVariableName) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, VariableMatchesWithLocalVariableOnly) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"$globalOne = 1;\n"
 		" function work() { $globalTwo = 2; } \n"
@@ -224,7 +224,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, VariableMatchesWithLocalVariableOnl
 TEST_FIXTURE(SymbolTableCompletionTestClass, ManyVariableAssignments) {
 
 	// completion matches should never return duplicates
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"$globalOne = 1;\n"
 		" function work() { $globalTwo = 2; } \n"
@@ -239,7 +239,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ManyVariableAssignments) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, VariableMatchesWithPredefinedVariable) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"$globalOne = 1;\n"
 		" function work() {  } \n"
@@ -254,7 +254,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, VariableMatchesWithPredefinedVariab
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodCall) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"$my = new MyClass;\n"
@@ -269,11 +269,11 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodCall) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodCallFromGlobalFinder) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"$my = new MyClass;\n"
 	);
-	UnicodeString sourceCodeGlobal = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCodeGlobal = mvceditor::CharToIcu(
 		"<?php class MyClass { function workA() {} function workB() {} } \n"	
 	);
 	Init(sourceCode);
@@ -287,17 +287,17 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodCallFromGlobalFind
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithLocalFinderOverridesGlobalFinder) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"$my = new MyClass;\n"
 	);
 
 	// in this test, simulate method workA() being deleted; it should not show
 	// as a match
-	UnicodeString sourceCodeGlobal = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCodeGlobal = mvceditor::CharToIcu(
 		"<?php class MyClass { function workA() {} function workB() {} } \n"	
 	);
-	UnicodeString sourceCodeOpened = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCodeOpened = mvceditor::CharToIcu(
 		"<?php class MyClass { function workB() {} } \n"	
 	);
 	Init(sourceCode);
@@ -316,7 +316,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithLocalFinderOverridesGlob
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithObjectWithoutMethodCall) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"$my = new MyClass;\n"
@@ -331,7 +331,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithObjectWithoutMethodCall)
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithStaticMethodCall) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} static function workB() {} } \n"
 	);
@@ -344,7 +344,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithStaticMethodCall) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithClassConstantCall) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class MyClass { const workA = 3; const workB = 4; } \n"
 		"$my = new MyClass(); \n"
@@ -366,7 +366,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithClassConstantCall) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithPrivateMethodCall) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} private function workB() {} } \n"
 		"$my = new MyClass;\n"
@@ -380,7 +380,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithPrivateMethodCall) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodChain) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class MyClass { /** @return OtherClass */ function workA() {} } \n"
 		"class OtherClass { var $time; function toString() {} }\n"
@@ -396,7 +396,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodChain) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithLongPropertyChain) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class MyClass { /** @return OtherClass */ function workA() {} } \n"
 		"class OtherClass { /** @var OtherClass */ var $parent; function toString() {} }\n"
@@ -413,7 +413,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithLongPropertyChain) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithLongMethodChain) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class MyClass { /** @return OtherClass */ function workA() {} } \n"
 		"class OtherClass { /** @return OtherClass */ function parent() {} }\n"
@@ -431,7 +431,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithLongMethodChain) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithFunctionChain) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"/** @return OtherClass */ function workA() {} \n"
 		"class FirstClass { /** @return OtherClass */ function status() {} } \n"
@@ -449,7 +449,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithFunctionChain) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithParentChain) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class FirstClass { /** @return OtherClass */ function status() {} } \n"
 		"class OtherClass extends FirstClass { var $time; function status() { } }\n"
@@ -468,7 +468,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithParentChain) {
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableCreatedFunctionChain) {
 
 	// variables created with a function should be resolved
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"/** @return OtherClass */ function workA() {} \n"
 		"class OtherClass { var $time;  /** @return FirstClass */ function toString() {} }\n"
@@ -486,7 +486,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableCreatedFunctionC
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableCreatedMethodChain) {
 
 	// variables created with a function should be resolved
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class OtherClass { var $time;  /** @return OtherClass */ function parent() {} }\n"
 		"$my = new OtherClass();\n"
@@ -502,7 +502,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableCreatedMethodCha
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithClassname) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} function workB() {} } \n"
 	);
@@ -520,7 +520,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithDoFullyQualified
 	// function starts with the same name as the class
 	// but since we are asking for full matches only the function should
 	// be ignored
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class My { function workA() {} function workB() {} } \n"
 		"function Mysql_query() {}"
@@ -540,7 +540,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithSimilarClassAndF
 	// function starts with the same name as the class
 	// but since we are asking for full matches only the function should
 	// be ignored
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"function mysql_query() {} \n"
 		"class My { function workA() {} function workB() {} } \n"
@@ -558,7 +558,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithSimilarClassAndF
 
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceNameCompletion) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"namespace Second {\n"
 		"class SecClass {}\n"
@@ -586,7 +586,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceNameCom
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAlias) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"namespace Second {\n"
 		"function work() {} \n"
@@ -606,7 +606,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAlias) 
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceStatic) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"namespace First\\Child { \n"
 		"class OtherClass {} \n"
@@ -624,7 +624,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceStatic)
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceImporting) {
 	
 	// define namespaces and classes in a separate file
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"namespace Second {\n"
 		"class MyClass { }\n"
@@ -636,7 +636,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceImporti
 	GlobalFinder.BuildResourceCacheForFile(wxT("defines.php"), sourceCode, true);
 	
 	// the code under test will import the namespaces
-	sourceCode = mvceditor::StringHelperClass::charToIcu(
+	sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"use First as F; \n"
 		"}"
@@ -659,13 +659,13 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceImporti
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClassInGlobalNamespace) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class OtherClass {} \n"
 	);
 	Init(sourceCode);
 	
-	sourceCode = mvceditor::StringHelperClass::charToIcu(
+	sourceCode = mvceditor::CharToIcu(
 		"namespace Second; \n"
 		"class MyClass {}"
 	);
@@ -696,7 +696,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClas
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClassInDifferentNamespace) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"namespace First\\Child {\n"
 		"class OtherClass {} \n"
@@ -704,7 +704,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClas
 	);
 	Init(sourceCode);
 	
-	sourceCode = mvceditor::StringHelperClass::charToIcu(
+	sourceCode = mvceditor::CharToIcu(
 		"namespace Second { \n"
 		"class MyClass {}  \n"
 		"} \n"
@@ -723,13 +723,13 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClas
 
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndFunctionInGlobalNamespace) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"function work() {}"
 	);
 	Init(sourceCode);
 	
-	sourceCode = mvceditor::StringHelperClass::charToIcu(
+	sourceCode = mvceditor::CharToIcu(
 		"namespace First\\Child; \n"
 		"class MyClass {}"
 	);
@@ -746,13 +746,13 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndFunc
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClassInSameNamespace) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"Class OtherClass {}"
 	);
 	Init(sourceCode);
 	
-	sourceCode = mvceditor::StringHelperClass::charToIcu(
+	sourceCode = mvceditor::CharToIcu(
 		"namespace First\\Child; \n"
 		"class MyClass {}"
 	);
@@ -769,13 +769,13 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClas
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceGlobalClassIsNotImported) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class OtherClass {}"
 	);
 	Init(sourceCode);
 	
-	sourceCode = mvceditor::StringHelperClass::charToIcu(
+	sourceCode = mvceditor::CharToIcu(
 		"namespace First\\Child; \n"
 		"class MyClass {}"
 	);
@@ -790,7 +790,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceGlobalC
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndGlobalClassImported) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class OtherClass {} \n"
 		"function work() {}"
@@ -816,7 +816,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithMethodCall) {
 	
 	// only doing light testing on ResourceMatches because the Matches* tests
 	// cover it already
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"$my = new MyClass;\n"
@@ -839,7 +839,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithMethodCall) {
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressionAndDuckTyping) {
 
 	// there was an overflow error in this scenario and it was causing a crash
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"$my = new MyClass;\n"
@@ -856,7 +856,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressio
 
 	// if we specify to not do duck typing then any variables that cannot be resolved should not 
 	// produce matches
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"/** no type here, should not work when duck typing flag is not set */\n"
@@ -876,7 +876,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownVariableA
 
 	// if we specify to not do duck typing then any variables that cannot be resolved should not 
 	// produce matches
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"/** no type here, should still work when duck typing flag is set */\n"
@@ -900,7 +900,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithTraitInDifferent
 	GlobalFinder.SetVersion(pelet::PHP_54);
 	Finder1.SetVersion(pelet::PHP_54);
 
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"trait TraitClass { \n"
 		" function work() {}\n"
@@ -908,7 +908,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithTraitInDifferent
 	);
 	GlobalFinder.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
 
-	sourceCode = mvceditor::StringHelperClass::charToIcu(
+	sourceCode = mvceditor::CharToIcu(
 		"namespace Second { \n"
 		"class MyClass {\n"
 		"	use \\TraitClass; \n"
@@ -932,7 +932,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillUnknownResourceError) {
 
 	// when a method could not be found make sure that the ErrorType
 	// and class name are properly set
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"$my = new MyClass;\n"
@@ -951,7 +951,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillResolutionError) {
 
 	// when a method cannot be resolved make sure that the ErrorType
 	// and class name are properly set
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"$my = new MyClass;\n"
@@ -971,7 +971,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillPrimitveError) {
 
 	// when a method is invoked on a primitive type make sure that the ErrorType
 	// and lexeme are properly set
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"$my = '124';\n"
@@ -990,7 +990,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, WithDuckTyping) {
 
 	// when a method cannot be resolved but DuckTyping flag is set
 	// resource should be found
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"function factory() {}\n"
@@ -1016,11 +1016,11 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithClassHierarchyInMultiple
 	 * code completion should recognize the inheritance chain, even though
 	 * the classes are stored in multiple resources finders
 	 */
-	UnicodeString sourceCodeParent = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCodeParent = mvceditor::CharToIcu(
 		"<?php\n"
 		"class MyBaseClass { function workBase() {}  } \n"
 	);
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class MyClass extends MyBaseClass { function workA() {} function workB() {} } \n"
 		"$my = new MyClass;\n"
@@ -1037,7 +1037,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithClassHierarchyInMultiple
 }
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldFindMethodScope) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"$globalVar = 34; \n"
 		"/** This is the user class */\n"
@@ -1067,7 +1067,7 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldFindMethodScope) {
 }
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldFindGlobalScopePastClass) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class MyClass { function work() { } }\n"
 		"$globalVar = new MyClass(); \n"
@@ -1083,7 +1083,7 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldFindGlobalScopePastClass)
 
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldFindFunctionScope) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"$globalVar = 34; \n"
 		"function setName($anotherName, $defaultName = 'Guest') {\n"
@@ -1100,7 +1100,7 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldFindFunctionScope) {
 }
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleUnfinishedBlock) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"$globalOne = 1;\n"
 		"function printUser(User $user) {\n"
@@ -1115,7 +1115,7 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleUnfinishedBlock) {
 }
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleUnfinishedClassMethod) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"$globalOne = 1;\n"
 		"class MyClass {\n"
@@ -1131,7 +1131,7 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleUnfinishedClassMeth
 }
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleTypeHinting) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"function printUser(User $user) {\n"
 		"\t$someName = '';\n"
@@ -1147,7 +1147,7 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleTypeHinting) {
 }
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleMultipleBlocks) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"$globalOne = 1;\n"
 		"function printUser(User $user) {\n"
@@ -1167,7 +1167,7 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleMultipleBlocks) {
 }
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringWithMultipleNamespaces) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"namespace First\\Child {"
 		"	use ArrayObject, Exception; \n"
@@ -1189,7 +1189,7 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringWithMultipleNamespaces) {
 }
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringWithNamespaceOnly) {
-	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"namespace First\\Child;"
 		"{CURSOR}"

@@ -24,7 +24,7 @@
  */
 #include <plugins/OutlineViewPluginClass.h>
 #include <language/SymbolTableClass.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <MvcEditor.h>
 #include <unicode/regex.h>
 #include <wx/artprov.h>
@@ -109,14 +109,14 @@ void mvceditor::OutlineViewPluginClass::BuildOutline(const wxString& className) 
 	std::vector<mvceditor::ResourceClass>  matches; 
 
 	// get the class resource itself
-	matches = resourceCache->CollectFullyQualifiedResourceFromAll(mvceditor::StringHelperClass::wxToIcu(className));
+	matches = resourceCache->CollectFullyQualifiedResourceFromAll(mvceditor::WxToIcu(className));
 	for (size_t i = 0; i < matches.size(); ++i) {
 		ResourceFinderBackground.Resources.push_back(matches[i]);
 	}
 
 	// make the resource finder match on all methods / properties
 	UnicodeString lookup;
-	lookup += mvceditor::StringHelperClass::wxToIcu(className);
+	lookup += mvceditor::WxToIcu(className);
 	lookup += UNICODE_STRING_SIMPLE("::");
 	matches = GetResourceCache()->CollectNearMatchResourcesFromAll(lookup);
 	for (size_t i = 0; i < matches.size(); ++i) {
@@ -126,7 +126,7 @@ void mvceditor::OutlineViewPluginClass::BuildOutline(const wxString& className) 
 
 void mvceditor::OutlineViewPluginClass::JumpToResource(const wxString& resource) {
 	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
-	std::vector<mvceditor::ResourceClass> matches = resourceCache->CollectFullyQualifiedResourceFromAll(mvceditor::StringHelperClass::wxToIcu(resource));
+	std::vector<mvceditor::ResourceClass> matches = resourceCache->CollectFullyQualifiedResourceFromAll(mvceditor::WxToIcu(resource));
 	if (!matches.empty()) {
 		mvceditor::ResourceClass resource = matches[0];
 		GetNotebook()->LoadPage(resource.GetFullPath());
@@ -221,7 +221,7 @@ void mvceditor::OutlineViewPluginPanelClass::SetStatus(const wxString& status) {
 void mvceditor::OutlineViewPluginPanelClass::SetClasses(const std::vector<mvceditor::ResourceClass>& classes) {
 	Choice->Clear();
 	for (size_t i = 0; i < classes.size(); ++i) {
-		Choice->AppendString(mvceditor::StringHelperClass::IcuToWx(classes[i].Identifier));
+		Choice->AppendString(mvceditor::IcuToWx(classes[i].Identifier));
 	}
 }
 
@@ -237,13 +237,13 @@ void mvceditor::OutlineViewPluginPanelClass::RefreshOutlines() {
 		int type = resources[i].Type;
 		if (mvceditor::ResourceClass::DEFINE == type && !resources[i].IsDynamic) {
 			UnicodeString res = resources[i].Identifier;
-			wxString label = mvceditor::StringHelperClass::IcuToWx(res);
+			wxString label = mvceditor::IcuToWx(res);
 			label = _("[D] ") + label;
 			Tree->AppendItem(rootId, label);
 		}
 		else if (mvceditor::ResourceClass::CLASS == type && !resources[i].IsDynamic) {
 			UnicodeString res = resources[i].Identifier;
-			wxString label = mvceditor::StringHelperClass::IcuToWx(res);
+			wxString label = mvceditor::IcuToWx(res);
 			label = _("[C] ") + label;
 			wxTreeItemId classId = Tree->AppendItem(rootId, label);
 
@@ -252,11 +252,11 @@ void mvceditor::OutlineViewPluginPanelClass::RefreshOutlines() {
 			for (size_t j = 0; j < resources.size(); ++j) {
 				if (resources[j].ClassName.caseCompare(resources[i].Identifier, 0) == 0  && !resources[j].IsDynamic) {
 					UnicodeString res = resources[j].Identifier;
-					wxString label = mvceditor::StringHelperClass::IcuToWx(res);
+					wxString label = mvceditor::IcuToWx(res);
 					if (mvceditor::ResourceClass::MEMBER == resources[j].Type) {
 						label = _("[P] ") + label;
 						if (!resources[j].ReturnType.isEmpty()) {
-							wxString returnType = mvceditor::StringHelperClass::IcuToWx(resources[j].ReturnType);
+							wxString returnType = mvceditor::IcuToWx(resources[j].ReturnType);
 							label = label + wxT(" [") + returnType + wxT("]");
 						}
 						Tree->AppendItem(classId, label);
@@ -268,10 +268,10 @@ void mvceditor::OutlineViewPluginPanelClass::RefreshOutlines() {
 						int32_t sigIndex = resources[j].Signature.indexOf(UNICODE_STRING_SIMPLE(" function ")); 
 						if (sigIndex > 0) {
 							UnicodeString sig(resources[j].Signature, sigIndex + 10);
-							label = _("[M] ") + mvceditor::StringHelperClass::IcuToWx(sig);
+							label = _("[M] ") + mvceditor::IcuToWx(sig);
 						}
 						if (!resources[j].ReturnType.isEmpty()) {
-							wxString returnType = mvceditor::StringHelperClass::IcuToWx(resources[j].ReturnType);
+							wxString returnType = mvceditor::IcuToWx(resources[j].ReturnType);
 							label += wxT(" [") + returnType + wxT("]");
 						}
 						Tree->AppendItem(classId, label);
@@ -285,17 +285,17 @@ void mvceditor::OutlineViewPluginPanelClass::RefreshOutlines() {
 		}
 		else if (mvceditor::ResourceClass::FUNCTION == type && !resources[i].IsDynamic) {
 			UnicodeString res = resources[i].Identifier;
-			wxString label = mvceditor::StringHelperClass::IcuToWx(res);
+			wxString label = mvceditor::IcuToWx(res);
 			label = _("[F] ") + label;
 
 			// add the function signature to the label
 			int32_t sigIndex = resources[i].Signature.indexOf(UNICODE_STRING_SIMPLE("function ")); 
 			if (sigIndex >= 0) {
 				UnicodeString sig(resources[i].Signature, sigIndex + 9);
-				label = _("[F] ") + mvceditor::StringHelperClass::IcuToWx(sig);
+				label = _("[F] ") + mvceditor::IcuToWx(sig);
 			}
 			if (!resources[i].ReturnType.isEmpty()) {
-				wxString returnType = mvceditor::StringHelperClass::IcuToWx(resources[i].ReturnType);
+				wxString returnType = mvceditor::IcuToWx(resources[i].ReturnType);
 				label += wxT(" [") + returnType + wxT("]");
 			}
 			Tree->AppendItem(rootId, label);

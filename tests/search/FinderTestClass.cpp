@@ -24,11 +24,11 @@
  */
 #include <UnitTest++.h>
 #include <search/FinderClass.h>
-#include <windows/StringHelperClass.h>
+#include <MvcEditorString.h>
 #include <unicode/unistr.h>
 #include <unicode/ustream.h> //get the << overloaded operator, needed by UnitTest++
 
-UnicodeString CODE = mvceditor::StringHelperClass::charToIcu(
+UnicodeString CODE = mvceditor::CharToIcu(
 	"<?php\n"
 	"/**\n"
 	" * function for computing area of circle\n"

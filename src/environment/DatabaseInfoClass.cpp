@@ -22,12 +22,13 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
- #include <environment/DatabaseInfoClass.h>
- #include <soci/mysql/soci-mysql.h>
- #include <soci/soci.h>
- #include <wx/datetime.h>
- #include <windows/StringHelperClass.h>
- #include <string>
+#include <environment/DatabaseInfoClass.h>
+#include <soci/mysql/soci-mysql.h>
+#include <soci/soci.h>
+#include <wx/datetime.h>
+#include <MvcEditorString.h>
+#include <unicode/ustdio.h>
+#include <string>
  
 mvceditor::DatabaseInfoClass::DatabaseInfoClass()
 	: Label()
@@ -187,14 +188,14 @@ bool mvceditor::SqlQueryClass::Connect(soci::session& session, UnicodeString& er
 	connString +=  UNICODE_STRING_SIMPLE("'");
 	
 	
-	std::string s = mvceditor::StringHelperClass::IcuToChar(connString);
+	std::string s = mvceditor::IcuToChar(connString);
 	try {
 		session.open(*soci::factory_mysql(), s.c_str());
 		success = true;
 		
 	} catch (std::exception const& e) {
 		success = false;
-		error = mvceditor::StringHelperClass::charToIcu(e.what());
+		error = mvceditor::CharToIcu(e.what());
 		if (host.caseCompare(UNICODE_STRING_SIMPLE("localhost"), 0) == 0) {
 			error += UNICODE_STRING_SIMPLE("localhost connections are routed to use TCP/IP. Is the server listening for TCP/IP connections?");
 		}
@@ -205,7 +206,7 @@ bool mvceditor::SqlQueryClass::Connect(soci::session& session, UnicodeString& er
 bool mvceditor::SqlQueryClass::Execute(soci::session& session, mvceditor::SqlResultClass& results, const UnicodeString& query) {
 	results.Success = false;
 	try {
-		std::string queryStd = mvceditor::StringHelperClass::IcuToChar(query);
+		std::string queryStd = mvceditor::IcuToChar(query);
 		soci::statement stmt = (session.prepare << queryStd, soci::into(results.Row));
 		
 		// dont pass TRUE to execute; it will fetch the first row and it makes it 
@@ -219,7 +220,7 @@ bool mvceditor::SqlQueryClass::Execute(soci::session& session, mvceditor::SqlRes
 		stmt.clean_up();
 	} catch (std::exception const& e) {
 		results.Success = false;
-		results.Error = mvceditor::StringHelperClass::charToIcu(e.what());
+		results.Error = mvceditor::CharToIcu(e.what());
 	}
 	return results.Success;
 }
@@ -235,7 +236,7 @@ bool mvceditor::SqlQueryClass::Execute(soci::statement& stmt, UnicodeString& err
 		
 	} catch (std::exception const& e) {
 		success = false;
-		error = mvceditor::StringHelperClass::charToIcu(e.what());
+		error = mvceditor::CharToIcu(e.what());
 	}
 	return success;
 }
@@ -246,7 +247,7 @@ bool mvceditor::SqlQueryClass::More(soci::statement& stmt, bool& hasError, Unico
 		ret = stmt.fetch() && stmt.got_data();
 	} catch (std::exception const& e) {
 		hasError = true;
-		error = mvceditor::StringHelperClass::charToIcu(e.what());
+		error = mvceditor::CharToIcu(e.what());
 	}
 	return ret;
 }
@@ -266,14 +267,14 @@ bool mvceditor::SqlQueryClass::ColumnNames(soci::row& row, std::vector<UnicodeSt
 	try {
 		for (size_t i = 0; i < row.size(); i++) {
 			soci::column_properties props = row.get_properties(i);
-			UnicodeString col = mvceditor::StringHelperClass::charToIcu(props.get_name().c_str());
+			UnicodeString col = mvceditor::CharToIcu(props.get_name().c_str());
 			columnNames.push_back(col);
 		}
 		data = true;
 	}
 	catch (std::exception const& e) {
 		data = false;
-		error = mvceditor::StringHelperClass::charToIcu(e.what());
+		error = mvceditor::CharToIcu(e.what());
 	}
 	return data;
 }
@@ -310,7 +311,7 @@ bool mvceditor::SqlQueryClass::NextRow(soci::row& row, std::vector<UnicodeString
 					out << date.Format(wxT("%Y-%m-%d %H:%M:%S")).ToAscii();
 					break;
 				}
-				col = mvceditor::StringHelperClass::charToIcu(out.str().c_str());
+				col = mvceditor::CharToIcu(out.str().c_str());
 			}
 			columnValues.push_back(col);
 		}
@@ -318,7 +319,7 @@ bool mvceditor::SqlQueryClass::NextRow(soci::row& row, std::vector<UnicodeString
 	}
 	catch (std::exception const& e) {
 		data = false;
-		error = mvceditor::StringHelperClass::charToIcu(e.what());
+		error = mvceditor::CharToIcu(e.what());
 	}
 	return data;
 }
