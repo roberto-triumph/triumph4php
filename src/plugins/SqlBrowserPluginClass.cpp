@@ -370,6 +370,17 @@ mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id,
 	UpdateLabels(wxT(""));
 }
 
+mvceditor::SqlBrowserPanelClass::~SqlBrowserPanelClass() {
+	if (MultipleSqlExecute.IsRunning()) {
+
+		// using force kill here because once we fire a query
+		// we cannot stop it (there is no interface that soci
+		// gives us)
+		MultipleSqlExecute.ForceKillInstance();
+	}
+}
+
+
 bool mvceditor::SqlBrowserPanelClass::Check() {
 	bool ret = 	CodeControl && Validate() && TransferDataFromWindow();
 	if (ret) {

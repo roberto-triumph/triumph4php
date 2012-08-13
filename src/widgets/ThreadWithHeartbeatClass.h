@@ -119,6 +119,14 @@ public:
 	 * Entry() method.
 	 */
 	void KillInstance();
+
+	
+	/**
+	 * If there is a background thread running, stop it. This IS NOT a graceful stoppage
+	 * the thread will terminate forcefully. It should only be used when TestDestroy()
+	 * cannot be called inside the background thread.
+	 */
+	void ForceKillInstance();
 	
 	/**
 	 * Will prepare to send events at regular intervals. After a call to this method, a 

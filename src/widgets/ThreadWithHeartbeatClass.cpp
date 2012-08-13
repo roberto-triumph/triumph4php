@@ -84,6 +84,15 @@ void mvceditor::ThreadWithHeartbeatClass::KillInstance() {
 	Timer.Stop();
 }
 
+void mvceditor::ThreadWithHeartbeatClass::ForceKillInstance() {
+	if (IsRunning()) {
+		RunningThreads.Remove(Worker);
+		Worker->Kill();
+		Worker = NULL;
+	}
+	Timer.Stop();
+}
+
 void mvceditor::ThreadWithHeartbeatClass::SignalStart() {
 	Timer.Start(200, wxTIMER_CONTINUOUS);
 }

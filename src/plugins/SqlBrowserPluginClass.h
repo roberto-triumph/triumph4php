@@ -211,6 +211,8 @@ public:
 	SqlBrowserPanelClass(wxWindow* parent, int id, mvceditor::StatusBarWithGaugeClass* gauge,
 		const SqlQueryClass& query, SqlBrowserPluginClass* plugin, mvceditor::RunningThreadsClass& runningThreads);
 	
+	~SqlBrowserPanelClass();
+
 	/**
 	 * Runs the query that is in the text control (in a separate thread).
 	 */
