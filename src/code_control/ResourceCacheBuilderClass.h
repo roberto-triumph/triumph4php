@@ -97,17 +97,23 @@ public:
 	 */
 	WorkingCacheBuilderClass(wxEvtHandler& handler,
 		mvceditor::RunningThreadsClass& runningThreads, int eventId = wxID_ANY);
+
+	/**
+	 * Will start the background thread 
+	 * 
+	 */
+	wxThreadError Init();
 		
 	/**
-	 * Will start a background thread to parse the resources of the given 
-	 * text.
+	 * Will parse the resources of the given text in a backgound thread and will
+	 * post an EVENT_WORKING_CACHE_COMPLETE when the parsing is complete.
 	 * 
 	 * @param fileName unique identifier for a file
 	 * @param code the file's most up-to-date source code (from the user-edited buffer)
 	 * @param bool if TRUE then tileName is a new file that is not yet written to disk
 	 * @param version The version of PHP to check against
 	 */
-	wxThreadError Init(const wxString& fileName, const UnicodeString& code, bool isNew, pelet::Versions version);
+	void Update(const wxString& fileName, const UnicodeString& code, bool isNew, pelet::Versions version);
 
 protected:
 	
@@ -117,6 +123,11 @@ protected:
 	void Entry();
 	
 private:
+
+	/**
+	 * to prevent simultaneous access to the private members
+	 */
+	wxMutex Mutex;
 
 	/**
 	 * the code that is being worked on by the background thread.

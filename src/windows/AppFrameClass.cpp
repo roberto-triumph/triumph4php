@@ -121,6 +121,17 @@ void mvceditor::AppFrameClass::OnClose(wxCloseEvent& event) {
 			delete logger;
 		}
 		wxLog::DontCreateOnDemand();
+
+		// cleanup all open code controls and tabs. this is because
+		// we want to destroy those items because they may have
+		// threads that are running
+		Notebook->CloseAllPages();
+		while (ToolsNotebook->GetPageCount() > 0) {
+			ToolsNotebook->DeletePage(0);
+		}
+		while (OutlineNotebook->GetPageCount() > 0) {
+			OutlineNotebook->DeletePage(0);
+		}
 		App.RunningThreads.StopAll();
 		Destroy();
 	}

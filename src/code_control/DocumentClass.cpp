@@ -312,6 +312,7 @@ void mvceditor::PhpDocumentClass::AttachToControl(CodeControlClass* ctrl) {
 
 	// do this so that when a new untitled file is created that code completion still works.
 	FileOpened(FileIdentifier);
+	WorkingCacheBuilder.Init();
 }
 
 void mvceditor::PhpDocumentClass::DetachFromControl(CodeControlClass* ctrl) {
@@ -325,6 +326,7 @@ void mvceditor::PhpDocumentClass::DetachFromControl(CodeControlClass* ctrl) {
 		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(wxStyledTextEventFunction, &mvceditor::PhpDocumentClass::OnAutoCompletionSelected),
 		NULL, this);
 	ctrl->ClearRegisteredImages();
+	WorkingCacheBuilder.KillInstance();
 }
 
 bool mvceditor::PhpDocumentClass::CanAutoComplete() {
@@ -887,9 +889,7 @@ void mvceditor::PhpDocumentClass::MatchBraces(int posToCheck) {
 }
 
 void mvceditor::PhpDocumentClass::OnModification(wxStyledTextEvent& event) {
-
-	// if already parsing then dont do anything
-	if (!Structs || WorkingCacheBuilder.IsRunning()) {
+	if (!Structs) {
 		event.Skip();
 		return;
 	}
@@ -998,11 +998,11 @@ void mvceditor::PhpDocumentClass::OnWorkingCacheComplete(mvceditor::WorkingCache
 }
 
 void mvceditor::PhpDocumentClass::OnTimer(wxTimerEvent& event) {
-	if (NeedToUpdateResources && Structs && !WorkingCacheBuilder.IsRunning()) {
+	if (NeedToUpdateResources && Structs) {
 		UnicodeString text = GetSafeText();
 
 		// we need to differentiate between new and opened files (the 'true' arg)
-		WorkingCacheBuilder.Init(FileIdentifier, text, !wxFileName::FileExists(Ctrl->GetFileName()), Structs->Environment.Php.Version);
+		WorkingCacheBuilder.Update(FileIdentifier, text, !wxFileName::FileExists(Ctrl->GetFileName()), Structs->Environment.Php.Version);
 
 		// even if thread could not be started just prevent re-parsing until user 
 		// modified the text
