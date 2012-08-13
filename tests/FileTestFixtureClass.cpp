@@ -66,10 +66,12 @@ void FileTestFixtureClass::RecursiveRmDir(wxString path) {
 		else if (wxDirExists(path + filename)) {
 			RecursiveRmDir(path + filename + wxFileName::GetPathSeparator());
 			wxString fullPath = path + filename;
-			wxRmDir(fullPath.fn_str());
+			bool good = wxRmdir(fullPath);
+			wxASSERT_MSG(good, wxT("could not remove directory:") + fullPath);
 		}
 		else {
-			wxRemoveFile(path +filename);
+			bool good = wxRemoveFile(path + filename);
+			wxASSERT_MSG(good, wxT("could not remove file:") + (path + filename));
 		}
 		next = dir.GetNext(&filename);
 	}
@@ -77,12 +79,13 @@ void FileTestFixtureClass::RecursiveRmDir(wxString path) {
 
 void FileTestFixtureClass::CreateFixtureFile(const wxString& fileName, const wxString& contents) {
 	if (!wxDirExists(TestProjectDir)) {
-		wxMkdir(TestProjectDir, 0777);
+		bool good = wxMkdir(TestProjectDir, 0777);
+		wxASSERT_MSG(good, _("Could not create directory: ") + TestProjectDir);
 	}
 	wxString fileToWrite = TestProjectDir + fileName;
 	std::ofstream file;
 	file.open(fileToWrite.fn_str(), std::ios::out | std::ios::binary | std::ios::trunc);
-	wxASSERT(file.good());
+	wxASSERT_MSG(file.good(), _("Could not open file for writing: ") + fileToWrite);
 	
 	// horrible code: must find a way to write many bytes at once
 	for (unsigned int i = 0; i < contents.Length(); ++i) {
@@ -134,11 +137,13 @@ wxString FileTestFixtureClass::GetFileContents(const wxString& fileName) {
 
 void FileTestFixtureClass::CreateSubDirectory(const wxString& subDirectory) {
 	if (!wxDirExists(TestProjectDir)) {
-		wxMkdir(TestProjectDir, 0777);
+		bool good = wxMkdir(TestProjectDir, 0777);
+		wxASSERT_MSG(good, _("Could not create directory:") + TestProjectDir);
 	}
 	wxString fullPath = TestProjectDir + subDirectory;
 	if (!wxDirExists(fullPath)) {
-		wxMkdir(fullPath, 0777);
+		bool good = wxMkdir(fullPath, 0777);
+		wxASSERT_MSG(good, _("Could not create directory:") + fullPath);
 	}
 }
 
