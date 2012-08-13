@@ -77,7 +77,7 @@ void mvceditor::BackgroundFileReaderClass::Entry() {
 	if (Mode == WALK) {
 		
 		// careful to test for destroy first
-		while(!isDestroy && DirectorySearch.More() ) {
+		while (!isDestroy && DirectorySearch.More()) {
 			bool res = FileRead(DirectorySearch);
 
 			// signal that the background thread has finished one file

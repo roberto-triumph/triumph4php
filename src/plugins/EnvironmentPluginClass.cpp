@@ -627,7 +627,7 @@ void mvceditor::EnvironmentPluginClass::OnPreferencesUpdated(wxCommandEvent& eve
 
 void mvceditor::EnvironmentPluginClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 	parent->AddPage(new mvceditor::WebBrowserEditPanelClass(parent, *GetEnvironment()), _("Web Browsers"));	
-	parent->AddPage(new mvceditor::ApacheEnvironmentPanelClass(parent, RunningThreads, *GetEnvironment()), _("Apache"));
+	parent->AddPage(new mvceditor::ApacheEnvironmentPanelClass(parent, App.RunningThreads, *GetEnvironment()), _("Apache"));
 	parent->AddPage(new mvceditor::PhpEnvironmentPanelClass(parent, *GetEnvironment()), _("PHP Executable"));
 }
 

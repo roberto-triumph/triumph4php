@@ -91,8 +91,8 @@ void mvceditor::CallStackThreadClass::Entry() {
 
 mvceditor::ViewFilePluginClass::ViewFilePluginClass(mvceditor::AppClass& app) 
 	: PluginClass(app) 
-	, FrameworkDetector(*this, RunningThreads, app.Structs.Environment) 
-	, CallStackThread(*this, RunningThreads) {
+	, FrameworkDetector(*this, app.RunningThreads, app.Structs.Environment) 
+	, CallStackThread(*this, app.RunningThreads) {
 }
 
 void mvceditor::ViewFilePluginClass::AddViewMenuItems(wxMenu* viewMenu) {

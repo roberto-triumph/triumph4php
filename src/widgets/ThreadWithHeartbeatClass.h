@@ -235,28 +235,29 @@ class RunningThreadsClass {
 	/**
 	 * This method will stop the given worker and forget.  This method
 	 * should be called by the main thread
-	 * The worker is gracefully stopped. But note that 
-	 * this method will block until the thread exits; which may not be
-	 * immediately.
+	 * The worker is gracefully stopped, meaning that the Thread must
+	 * check TestDestroy() periodically.
 	 * 
 	 * @param worker thread to stop.
 	 */
 	void RemoveAndStop(mvceditor::WorkerThreadClass* worker);
 
 	/**
-	 * stop all of the running threads. This method will block
-	 * until all threads have been killed.
+	 * stop all of the running threads.
 	 */
 	void StopAll();
 
 	private:
 
+	/**
+	 *  holds all threads that are alive and running
+	 */
 	std::vector<mvceditor::WorkerThreadClass*> Workers;
 	
-	wxMutex Mutex;
-	
-	wxCondition Condition;
-	
+	/**
+	 * prevent concurrent access to the internal vector
+	 */
+	wxMutex Mutex;	
 };
 
 }

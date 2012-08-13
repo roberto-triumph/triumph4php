@@ -37,7 +37,7 @@ static const int ID_FRAMEWORK_DETECTION_GAUGE = wxNewId();
 
 mvceditor::ProjectPluginClass::ProjectPluginClass(mvceditor::AppClass& app) 
 	: PluginClass(app)
-	, PhpFrameworks(*this, RunningThreads, app.Structs.Environment) 
+	, PhpFrameworks(*this, app.RunningThreads, app.Structs.Environment) 
 	, DirectoriesToDetect() {
 	wxPlatformInfo info;
 	switch (info.GetOperatingSystemId()) {

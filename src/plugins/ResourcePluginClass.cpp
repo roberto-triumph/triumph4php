@@ -88,8 +88,16 @@ bool mvceditor::ResourceFileReaderClass::FileRead(mvceditor::DirectorySearchClas
 	if (!search.More()) {
 
 		// the event handler will own the pointer to the global cache
-		mvceditor::GlobalCacheCompleteEventClass evt(GlobalCache);
-		wxPostEvent(&Handler, evt);
+		if (!TestDestroy()) {
+			mvceditor::GlobalCacheCompleteEventClass evt(GlobalCache);
+			wxPostEvent(&Handler, evt);
+		}
+		else {
+			
+			// if the thread is being stopped the the handler will not receive the
+			// event, we shouldn't send the event and clean the pointer ourselves
+			delete GlobalCache;
+		}
 		GlobalCache = NULL;
 	}
 	return false;
@@ -122,7 +130,7 @@ bool mvceditor::ResourceFileReaderClass::ReadNextProject() {
 
 mvceditor::ResourcePluginClass::ResourcePluginClass(mvceditor::AppClass& app)
 	: PluginClass(app)
-	, ResourceFileReader(*this, RunningThreads)
+	, ResourceFileReader(*this, app.RunningThreads)
 	, JumpToText()
 	, ProjectIndexMenu(NULL)
 	, State(FREE) 
@@ -212,7 +220,6 @@ void mvceditor::ResourcePluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 	
 	ResourceFileReader.InitProjectQueue(App.Structs.Projects, version);
 	mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
-	
 	if (ResourceFileReader.ReadNextProject() && ResourceFileReader.StartReading(error)) {
 		State = INDEXING_PROJECT;
 		GetStatusBarWithGauge()->AddGauge(_("Indexing Projects From Update"), ID_COUNT_FILES_GAUGE, 

@@ -205,7 +205,7 @@ void mvceditor::ChooseUrlDialogClass::OnKeyDown(wxKeyEvent& event) {
 mvceditor::RunBrowserPluginClass::RunBrowserPluginClass(mvceditor::AppClass& app)
 	: PluginClass(app) 
 	, RecentUrls()
-	, PhpFrameworks(*this, RunningThreads, app.Structs.Environment)
+	, PhpFrameworks(*this, app.RunningThreads, app.Structs.Environment)
 	, BrowserMenu(NULL)
 	, UrlMenu(NULL)
 	, RunInBrowser(NULL)

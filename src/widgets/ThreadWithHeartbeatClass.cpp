@@ -113,8 +113,7 @@ bool mvceditor::ThreadWithHeartbeatClass::IsRunning() const {
 
 mvceditor::RunningThreadsClass::RunningThreadsClass()
 	: Workers()
-	, Mutex() 
-	, Condition(Mutex) {
+	, Mutex() {
 		
 }
 
@@ -138,27 +137,31 @@ void mvceditor::RunningThreadsClass::Remove(mvceditor::WorkerThreadClass* worker
 			it++;
 		}
 	}
-	///Condition.Broadcast();
 }
 
 void mvceditor::RunningThreadsClass::RemoveAndStop(mvceditor::WorkerThreadClass* worker) {
 	wxMutexLocker locker(Mutex);
 	wxASSERT(locker.IsOk());
 	
-	// wxThread::Delete will result in graceful thread termination will call Remove() which will untrack the thread
+	// wxThread::Delete will result in graceful thread termination 
+	// will call Remove() which will untrack the thread
 	worker->Delete();
-	
-	///Condition.Wait();
 }
 
 void mvceditor::RunningThreadsClass::StopAll() {
-	wxMutexLocker locker(Mutex);
-	wxASSERT(locker.IsOk());
-	std::vector<mvceditor::WorkerThreadClass*>::iterator it = Workers.begin();
-	while (it != Workers.end()) {
+	std::vector<mvceditor::WorkerThreadClass*> copy;
+	{
+
+		// need to copy the threads so that we can Delete() them
+		// Delete() will call Remove() which also needs
+		// the mutex and we don't want a deadlock
+		wxMutexLocker locker(Mutex);
+		wxASSERT(locker.IsOk());
+		copy = Workers;
+	}
+	std::vector<mvceditor::WorkerThreadClass*>::iterator it;
+	for (it = copy.begin(); it != copy.end(); ++it) {
 		(*it)->Delete();
-		it = Workers.erase(it);
-		///RemoveAndStop(*it);
 	}
 }
 

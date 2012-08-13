@@ -69,7 +69,7 @@ void mvceditor::ResourceFinderBackgroundThreadClass::Entry() {
 
 mvceditor::OutlineViewPluginClass::OutlineViewPluginClass(mvceditor::AppClass& app)
 	: PluginClass(app)
-	, ResourceFinderBackground(*this, RunningThreads) {
+	, ResourceFinderBackground(*this, app.RunningThreads) {
 	
 }
 

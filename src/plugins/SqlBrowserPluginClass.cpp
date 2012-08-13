@@ -647,7 +647,7 @@ std::vector<UnicodeString> mvceditor::SqlMetaDataFetchClass::GetErrors() {
 
 mvceditor::SqlBrowserPluginClass::SqlBrowserPluginClass(mvceditor::AppClass& app) 
 	: PluginClass(app)
-	, SqlMetaDataFetch(*this, RunningThreads)
+	, SqlMetaDataFetch(*this, app.RunningThreads)
 	, ChosenIndex(0) {
 }
 
@@ -730,7 +730,7 @@ mvceditor::SqlBrowserPanelClass* mvceditor::SqlBrowserPluginClass::CreateResults
 	}
 	
 	mvceditor::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxNewId(), GetStatusBarWithGauge(), 
-		query, this, RunningThreads);
+		query, this, App.RunningThreads);
 	mvceditor::NotebookClass* codeNotebook = GetNotebook();
 	wxString tabText = codeNotebook->GetPageText(codeNotebook->GetPageIndex(codeControl));
 

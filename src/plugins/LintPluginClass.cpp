@@ -247,7 +247,7 @@ void mvceditor::LintResultsPanelClass::SelectPreviousError() {
 mvceditor::LintPluginClass::LintPluginClass(mvceditor::AppClass& app) 
 	: PluginClass(app)
 	, CheckOnSave(true)
-	, LintBackgroundFileReader(*this, RunningThreads)
+	, LintBackgroundFileReader(*this, app.RunningThreads)
 	, LintErrors() {
 	ResultsPanel = NULL;
 }

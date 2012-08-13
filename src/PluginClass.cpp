@@ -27,8 +27,7 @@
 #include <wx/artprov.h>
 
 mvceditor::PluginClass::PluginClass(mvceditor::AppClass& app)
-	: App(app)	
-	, RunningThreads()
+	: App(app)
 	, AuiManager(NULL)	
 	, StatusBarWithGauge(NULL)
 	, Notebook(NULL)
