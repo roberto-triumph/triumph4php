@@ -402,7 +402,8 @@ void mvceditor::RunConsolePanelClass::AppendText(const wxString& text) {
 	finder.Mode = mvceditor::FinderClass::REGULAR_EXPRESSION;
 	finder.CaseSensitive = false;
 	finder.Expression = FileNameRegularExpression();
-	wxASSERT(finder.Prepare());
+	bool prep = finder.Prepare();
+	wxASSERT(prep);
 	
 	UnicodeString uniText = mvceditor::StringHelperClass::wxToIcu(text);
 	int32_t totalLength = uniText.length();
@@ -491,7 +492,7 @@ UnicodeString mvceditor::RunConsolePanelClass::FileNameRegularExpression() {
 	}
 	extensionsRegEx = wxT("(") + extensionsRegEx  + wxT(")"); 
 	
-	UnicodeString uniRegEx;
+	UnicodeString uniRegEx = UNICODE_STRING_SIMPLE("(?mi)");
 	if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
 		
 		// pattern C:\\folder1\\folder2
