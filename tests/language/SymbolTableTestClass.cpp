@@ -343,6 +343,28 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithStaticMethodCall) {
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), ResourceMatches[0].Identifier);
 }
 
+TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithClassConstantCall) {
+	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
+		"<?php\n"
+		"class MyClass { const workA = 3; const workB = 4; } \n"
+		"$my = new MyClass(); \n"
+	);
+	Init(sourceCode);	
+	ToProperty(UNICODE_STRING_SIMPLE("MyClass"), UNICODE_STRING_SIMPLE("work"), false, true);
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
+		VariableMatches, ResourceMatches, DoDuckTyping, Error);
+	CHECK_VECTOR_SIZE(2, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workA"), ResourceMatches[0].Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), ResourceMatches[1].Identifier);
+
+	// check that a non-static call returns no matches
+	ResourceMatches.clear();
+	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE(""), false, false);
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
+		VariableMatches, ResourceMatches, DoDuckTyping, Error);
+	CHECK_VECTOR_SIZE(0, ResourceMatches);
+}
+
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithPrivateMethodCall) {
 	UnicodeString sourceCode = mvceditor::StringHelperClass::charToIcu(
 		"<?php\n"

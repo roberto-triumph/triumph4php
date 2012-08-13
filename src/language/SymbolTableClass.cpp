@@ -44,7 +44,13 @@
 static bool IsResourceVisible(const mvceditor::ResourceClass& resource, const pelet::ExpressionClass& originalParsedExpression,
 		const pelet::ScopeClass& scope,
 		bool isStaticCall, bool isThisCall, bool isParentCall) {
-	bool passesStaticCheck = isStaticCall == resource.IsStatic;
+	bool passesStaticCheck = true;
+	if (isStaticCall) {
+		passesStaticCheck = mvceditor::ResourceClass::CLASS_CONSTANT == resource.Type || resource.IsStatic;
+	}
+	else {
+		passesStaticCheck = mvceditor::ResourceClass::CLASS_CONSTANT != resource.Type && !resource.IsStatic;
+	}
 
 	// $this => can access this resource's private, parent's protected/public, other public
 	// parent => can access parent's protected/public

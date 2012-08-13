@@ -197,7 +197,8 @@ if ($if) {
 		// 'v' kind super global variables there is no type for them...
 		
 		$isProtected = stripos($extensions['access'], 'protected') !== FALSE ? 1 : 0;
-		$isProtected = stripos($extensions['access'], 'static') !== FALSE ? 1 : 0;
+		$isPrivate = stripos($extensions['access'], 'private') !== FALSE ? 1 : 0;		
+		$isStatic = stripos($extensions['access'], 'static') !== FALSE ? 1 : 0;
 		
 		$insertStmt->execute(array(
 			$fileItemId, $key, $identifier, $className, $type, $namespaceName,
