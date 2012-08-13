@@ -274,12 +274,12 @@ mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::StructsClass* structs, 
 	, Timer()
 	, FileIdentifier()
 	, Structs(structs)
-	, ResourceCacheBuilder(&structs->ResourceCache, *this, runningThreads)
+	, WorkingCacheBuilder(*this, runningThreads)
 	, CurrentCallTipIndex(0)
 	, NeedToUpdateResources(false) 
 	, AreImagesRegistered(false) {
 	Timer.SetOwner(this);
-	Timer.Start(500, false);
+	Timer.Start(500, wxTIMER_CONTINUOUS);
 
 	// need to give this new file unique name so because the
 	// resource updates object needs a unique name
@@ -290,7 +290,7 @@ mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::StructsClass* structs, 
 mvceditor::PhpDocumentClass::~PhpDocumentClass() {
 	Timer.Stop();
 	if (Structs) {
-		Structs->ResourceCache.Unregister(FileIdentifier);
+		Structs->ResourceCache.RemoveWorking(FileIdentifier);
 	}	
 }
 
@@ -843,16 +843,13 @@ void mvceditor::PhpDocumentClass::FileOpened(wxString fileName) {
 	
 	// in case the file name was changed and current file name is no  longer valid
 	if (Structs) {
-		Structs->ResourceCache.Unregister(FileIdentifier);
+		Structs->ResourceCache.RemoveWorking(FileIdentifier);
 	}
 
 	// important to set the fileIdentifier to the name;
 	// the ResourceCache object will need to know what files are being edited so it can mark them as 'dirty'
 	FileIdentifier = fileName;
 
-	if (Structs) {
-		Structs->ResourceCache.Register(FileIdentifier, false);
-	}
 	// trigger the resource cache
 	// so that code completion works when the file is first opened
 	NeedToUpdateResources = true;
@@ -892,7 +889,7 @@ void mvceditor::PhpDocumentClass::MatchBraces(int posToCheck) {
 void mvceditor::PhpDocumentClass::OnModification(wxStyledTextEvent& event) {
 
 	// if already parsing then dont do anything
-	if (!Structs || ResourceCacheBuilder.IsRunning()) {
+	if (!Structs || WorkingCacheBuilder.IsRunning()) {
 		event.Skip();
 		return;
 	}
@@ -905,61 +902,7 @@ void mvceditor::PhpDocumentClass::OnModification(wxStyledTextEvent& event) {
 	// we dont need to reparse when user is adding a 
 	// comment or a constant string
 	if (!InCommentOrStringStyle(Ctrl->GetCurrentPos())) {
-
-		// trigger reparsing only when a variable has been added or removed.
-		// We can detect when a variable is added by looking for 
-		// 1. when a statement ends ";"
-		// 2. a scope ends (to handle "if ($row = mysql_fetch_array()) {}" 
-		// 3. user pastes a block of text
-		// 4. user tweaks a variable name (ie change "$user" to "$allUsers")
-		// 5. user tweaks a function / class name (change "function work" to "function asyncWork")
-		//
-		// We can detect when a variable is removed ...
-		// 1. user deletes a block of text
-		// 2. user deletes char by char until we hit the beginning of a statement (if the
-		//    cursor is positioned right after a semicolon (with whitespace being insignigicant)
-		// 3. user cuts a block of text
-		// 4. user tweaks a variable name (ie change "$user" to "$allUsers")
-		// 5. user tweaks a function / class name (change "function work" to "function asyncWork")
-		//
-		// Also we will need to look for cases where the user fixes unmatched parenthesis / braces
-		// because these may fix lint errors (and allow symbol table to be built).
-		//
-		// it looks like all text operations (type in text, cut / copy/ paste) are funneled
-		// through the wxSTC_MOD_INSERTTEXT and wxSTC_MOD_DELETETEXT events so we just need 
-		// to inspect what text is being added / removed here
-		int mod = event.GetModificationType();
-		if (mod & wxSTC_MOD_INSERTTEXT || mod & wxSTC_MOD_DELETETEXT) {
-			wxString text = event.GetText();
-			if (text.find_first_of(wxT(";{}()")) != std::string::npos) {
-				NeedToUpdateResources = true;
-			}
-			else {
-
-				// get the whole word that's positioned at the modified text
-				// then check to see if it's a variable
-				int wordStart = Ctrl->WordStartPosition(event.GetPosition(), true);
-				int wordEnd = Ctrl->WordEndPosition(event.GetPosition(), true);
-				wxString word = Ctrl->GetTextRange(wordStart, wordEnd);
-				word.Trim(true);
-				if (!word.IsEmpty() && word.StartsWith(wxT("$"))) {
-					NeedToUpdateResources = true;
-				}
-				if (!word.IsEmpty()) {
-					
-					// get the previous word; if the previous word is the keyword
-					// "function" or "class" then the user changed a function or class name
-					int previousWordEnd = Ctrl->WordStartPosition(wordStart, false);
-					int previousWordStart = Ctrl->WordStartPosition(previousWordEnd, true);
-					wxString previousWord = Ctrl->GetTextRange(previousWordStart, previousWordEnd);
-					previousWord.Trim(true);
-					if (previousWord.CmpNoCase(wxT("function")) == 0 || previousWord.CmpNoCase(wxT("class")) == 0) {
-						NeedToUpdateResources = true;
-					}
-				}
-			}
-		}
-		
+		NeedToUpdateResources = true;	
 	}
 	event.Skip();
 }
@@ -1045,24 +988,25 @@ void mvceditor::PhpDocumentClass::OnCallTipClick(wxStyledTextEvent& evt) {
 	evt.Skip();
 }
 
-void mvceditor::PhpDocumentClass::OnResourceUpdateComplete(wxCommandEvent& event) {
-	if(!Timer.Start(500, false)) {
-		wxLogDebug(_("Could not start parsing timer."));
+void mvceditor::PhpDocumentClass::OnWorkingCacheComplete(mvceditor::WorkingCacheCompleteEventClass& event) {
+	bool good= Structs->ResourceCache.RegisterWorking(FileIdentifier, event.WorkingCache);
+	if (!good) {
+
+		// already there
+		Structs->ResourceCache.ReplaceWorking(FileIdentifier, event.WorkingCache);
 	}
-	event.Skip();
 }
 
 void mvceditor::PhpDocumentClass::OnTimer(wxTimerEvent& event) {
-	if (NeedToUpdateResources && Structs && !ResourceCacheBuilder.IsRunning()) {
+	if (NeedToUpdateResources && Structs && !WorkingCacheBuilder.IsRunning()) {
 		UnicodeString text = GetSafeText();
 
 		// we need to differentiate between new and opened files (the 'true' arg)
-		ResourceCacheBuilder.StartBackgroundUpdate(FileIdentifier, text, !wxFileName::FileExists(Ctrl->GetFileName()));
+		WorkingCacheBuilder.Init(FileIdentifier, text, !wxFileName::FileExists(Ctrl->GetFileName()), Structs->Environment.Php.Version);
 
 		// even if thread could not be started just prevent re-parsing until user 
 		// modified the text
 		NeedToUpdateResources = false;
-		Timer.Stop();
 	}
 	event.Skip();
 }
@@ -1322,6 +1266,6 @@ bool mvceditor::CssDocumentClass::InCommentOrStringStyle(int posToCheck) {
 }		
 
 BEGIN_EVENT_TABLE(mvceditor::PhpDocumentClass, wxEvtHandler)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::PhpDocumentClass::OnResourceUpdateComplete)
+	EVT_WORKING_CACHE_COMPLETE(mvceditor::PhpDocumentClass::OnWorkingCacheComplete)
 	EVT_TIMER(wxID_ANY, mvceditor::PhpDocumentClass::OnTimer)
 END_EVENT_TABLE()

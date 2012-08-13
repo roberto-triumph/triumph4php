@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __RESOURCEUPDATETHREADCLASS_H__
-#define __RESOURCEUPDATETHREADCLASS_H__
+#ifndef __MVCEDITORRESOURCECACHECLASS_H__
+#define __MVCEDITORRESOURCECACHECLASS_H__
 
 #include <search/ResourceFinderClass.h>
 #include <search/DirectorySearchClass.h>
@@ -33,6 +33,122 @@
 #include <wx/thread.h>
  
 namespace mvceditor {
+
+/**
+ * A global cache is a cache of an entire project.  All of a project's resources
+ * are stored in a SQLite file that is loaded when MVC Editor starts; this way
+ * the user can jump to files & classes without needing to re-index the 
+ * entire project.
+ */
+class GlobalCacheClass {
+
+public:
+
+	/**
+	 * The object that will parse and persist resources
+	 */
+	mvceditor::ResourceFinderClass ResourceFinder;
+
+	/**
+	 * The location of the SQLite file where the resources will be
+	 * stored.
+	 */
+	wxFileName ResourceDbFileName;
+
+	GlobalCacheClass();
+
+	/**
+	 * Opens the SQLite file, or creates it if it does not exist.
+	 *
+	 * @param resourceDbFileName the full path to the SQLite resources database.
+	 *        If this full path does not exist it will be created.
+	 * @param phpFileFilters the wildcards that hold which files to parse
+	 * @param version the PHP version that the parser will check against
+	 * @param fileParsingBufferSize the size of an internal buffer where parsed resources are initially 
+	 *        stored. This is only a hint, the buffer will grow as necessary
+	 *        Setting this value to a high value (1024) is good for large projects that have a lot
+	 *        resources.
+	*/
+	void Init(const wxFileName& resourceDbFileName, const std::vector<wxString>& phpFileFilters, pelet::Versions version, int fileParsingBufferSize = 32);
+
+	/**
+	 * Will update the resource finder by calling Walk(); meaning that the next file
+	 * given by the directorySearch will be parsed and its resources will be stored
+	 * in the database.
+	 *
+	 * @see mvceditor::ResourceFinderClass::Walk
+	 * @param resourceDbFileName the location of the SQLite cache for the resource finder. this 
+	 *        is the file where the resources will be persisted to
+	 * @param directorySearch keeps track of the file to parse
+	 */
+	void  Walk(DirectorySearchClass& directorySearch);
+
+	/**
+	 * @param version the PHP version that the parser will check against
+	 */
+	void SetVersion(pelet::Versions version);
+};
+
+/**
+ * The working cache is an in-memory cache of source code that is being edited
+ * by the user. It will be treated separately because it changes very often, and
+ * we don't want to disturb the global cache (which is much bigger).
+ */
+class WorkingCacheClass {
+
+public:
+
+	/**
+	 * The object that will parse and persist resources
+	 */
+	mvceditor::ResourceFinderClass ResourceFinder;
+
+	/**
+	 * The object that keeps track of variable types; we only need
+	 * to keep track of variable types for opened files.
+	 */
+	mvceditor::SymbolTableClass SymbolTable;
+
+	/**
+	 * The full path to the file being parsed.  This may also be an invalid file
+	 * path like "Untitled 1" if the user is editing a new file.
+	 */
+	wxString FileName;
+
+	/**
+	 * TRUE if the user is editing a new file
+	 */
+	bool IsNew;
+
+	WorkingCacheClass();
+
+	/**
+	 * @param fileName the full path to the file beign parsed
+	 * @param isNew TRUE if the user is editing a new file
+	 * @param version the PHP version that the parser will check against
+	 * @param createSymbols if TRUE then the symbol table is built from the file
+	 *        if this is true then fileName must be a valid full path
+	 */
+	void Init(const wxString& fileName, bool isNew, pelet::Versions version, bool createSymbols);
+
+	/**
+	 * Will parse the resources and determine type information for the given text 
+	 * and store the results into the this cache.
+	 * 
+	 * @param code the file's most up-to-date source code (from the user-edited buffer)
+	 * @return bool TRUE if code did not contain a syntax error
+	 */
+	bool Update(const UnicodeString& code);
+
+private:
+
+	/**
+	 * will run code through a lint check and choose not to update the cache if 
+	 * the code is not valid.
+	 */
+	pelet::ParserClass Parser;
+
+};
 
 /**
  * This class represents all the most up-to-date resources of the currently opened project
@@ -81,25 +197,36 @@ class ResourceCacheClass {
 	
 public:
 
-	/**
-	 * Make sure accesses are thread-safe
-	 */
-	wxMutex Mutex;
-
 	ResourceCacheClass();
 	
 	~ResourceCacheClass();
 	
 	/**
-	 * Creates a new resource finder for the given file.
+	 * Creates a new resource finder for the given file. This should be called 
+	 * when the user opens a file.
 	 * 
 	 * @param fileName unique identifier for a file
-	 * @param createSymbols if TRUE then the symbol table from the file will be created immediately; otherwise
-	 * caller will need to call Update() method to build the symbol table.
+	 * @param cache the working cache. Must have been initialized.
+	 *         This object will own the pointer and will delete
+	 *         when the file is unregistered or when this object is destroyed. If this method
+	 *         returns FALSE, then this object will NOT take ownership of the pointer and
+	 *         the caller must delete it.
 	 * @return bool TRUE if fileName was not previously registered
 	 * only a unique fileName can be registered 
 	 */
-	bool Register(const wxString& fileName, bool createSymbols);
+	bool RegisterWorking(const wxString& fileName, mvceditor::WorkingCacheClass* cache);
+
+	/**
+	 * Updates the working cache for a given file. Cache should be updated often 
+	 * so that the ExpressionCompletionMatches and ResourceMatches will return up-to-date info.
+	 * This method assumes that the cache is ready, ie. Update() method has been called
+	 * on it.
+	 *
+	 * @param fileName the file to update. This is the name given to the RegisterWorking() method
+	 * @param cache the new cache for the file. In this method, this object will ALWAYS take
+	 *        ownership of the cache, unlike RegisterWorking() method
+	 */
+	bool ReplaceWorking(const wxString& fileName, mvceditor::WorkingCacheClass* cache);
 	
 	/**
 	 * Cleans up the resource finder from the given file. This should be called whenever
@@ -107,36 +234,19 @@ public:
 	 * 
 	 * @param fileName unique identifier for a file
 	 */
-	void Unregister(const wxString& fileName);
-	
-	/**
-	 * Will parse the resources of the given text into the file's LOCAL cache.
-	 * The fileName must have been previously Register() 'ed
-	 * 
-	 * @param fileName unique identifier for a file that was given to Register()
-	 * @param code the file's most up-to-date source code (from the user-edited buffer)
-	 * @param bool if TRUE then fileName is a new file that is not yet written to disk
-	 * @return false if lock could not be acquired or code contains a parse error
-	 */
-	bool Update(const wxString& fileName, const UnicodeString& code, bool isNew);
+	void RemoveWorking(const wxString& fileName);
 
 	/**
-	 * Create a new global resource finder that is backed by the given 
-	 * file.  File may or may not exist; if file does not exist then it will
-	 * be created.
-	 * A resource DB file can only be initialized once.
+	 * Push a new cache into the global cache list. After a call
+	 * to this method, the cache is available for use by 
+	 * the ExpressionCompletionMatches and ResourceMatches methods
 	 *
-	 * @param resourceDbFileName the location of the SQLite cache for the resource finder
-	 * @param fileParsingBufferSize the size of an internal buffer where parsed resources are initially 
-	 *        stored. This is only a hint, the buffer will grow as necessary
-	 *        Setting this value to a high value (1024) is good for large projects that have a lot
-	 *        resources.
 	 * @return bool FALSE if the resource file is already initialized
 	 */
-	bool InitGlobal(const wxFileName& resourceDbFileName, int fileParsingBufferSize = 32);
+	bool RegisterGlobal(mvceditor::GlobalCacheClass* globalCache);
 
 	/**
-	 * Unregister a db file from the global resource finders.
+	 * Removes a db file from the global resource finders.
 	 * @param resourceDbFileName the location of the SQLite cache for the 
 	 *        resource finder.
 	 */
@@ -147,41 +257,30 @@ public:
 	 *
 	 * @return bool TRUE if db file is already loaded.
 	 */
-	bool IsInitGlobal(const wxFileName& resourceDbFileName);
-
-	/**
-	 * Will update the GLOBAL cache by calling Walk() on the global resource cache (in a thread safe manner)
-	 * The last finder created by InitGlobal() will be modified.
-	 *
-	 * @see mvceditor::ResourceFinderClass::Walk
-	 * @param resourceDbFileName the location of the SQLite cache for the resource finder. this 
-	 *        is the file where the resources will be persisted to
-	 * @param directorySearch keeps track of the file to parse
-	 * @param phpFileFilters the wildcards that hold which files to parse
-	 * @return false if lock could not be acquired
-	 */
-	bool WalkGlobal(const wxFileName& resourceDbFileName, DirectorySearchClass& directorySearch, const std::vector<wxString>& phpFileFilters);
+	bool IsInitGlobal(const wxFileName& resourceDbFileName) const;
 
 	/**
 	 * calls AllNonNativeClasses() method on the GLOBAL resource. This is usually done after all files have been indexed.
 	 * @see mvceditor::ResourceFinderClass::AllNonNativeClasses
 	 */
-	std::vector<ResourceClass> AllNonNativeClassesGlobal();
+	std::vector<ResourceClass> AllNonNativeClassesGlobal() const;
 	
 	/**
-	 * Searches all the registered resource finders plus the global given.
-	 * Will search only for full matches (it will call CollectFullyQualifiedResource
+	 * Searches all the registered caches (working AND global caches)
+	 * Will returm only for full exact matches (it will call CollectFullyQualifiedResource
 	 * on each resource finder).
+	 * @see mvceditor::ResourceFinderClass::CollectFullyQualifiedResource
 	 * @param search string to search for
 	 * @return std::vector<mvceditor::ResourceClass> matched resources 
 	 */
 	std::vector<mvceditor::ResourceClass> CollectFullyQualifiedResourceFromAll(const UnicodeString& search);
 	
 	/**
-	 * Searches all the registered resource finders plus the global given
-	 * Will search for near matches (it will call CollectNearMatchResources
+	 * Searches all the registered caches (working AND global caches)
+	 * Will return near matches (it will call CollectNearMatchResources
 	 * on each resource finder).
 	 *
+	 * @see mvceditor::ResourceFinderClass::CollectNearMatchResources
 	 * @param string to search for
 	 * @return std::vector<mvceditor::ResourceClass> matched resources
 	 */
@@ -244,12 +343,12 @@ public:
 	void Print();
 	
 	/**
-	 * @return TRUE if the cache has not been initialized with either a call to Register() or a call to WalkGlobal()
+	 * @return TRUE if the cache has not been initialized with either a call to RegisterWorking(), RegisterGlobal() or a call to WalkGlobal()
 	 */
 	bool IsFileCacheEmpty();
 
 	/**
-	 * @return TRUE if the cache has not been initialized with either a call to Register() or a call to WalkGlobal()
+	 * @return TRUE if the cache has not been initialized with either a call to RegisterWorking(), RegisterGlobal() or a call to WalkGlobal()
 	 */
 	bool IsResourceCacheEmpty();
 	
@@ -264,11 +363,6 @@ public:
 	 * The SQLite file itself will not be deleted.
 	 */
 	void Wipe();
-	
-	/**
-	 * Set the version that the PHP parser should use.
-	 */
-	void SetVersion(pelet::Versions version);
 	 
 private:
 		
@@ -281,26 +375,16 @@ private:
 	std::vector<ResourceFinderClass*> AllFinders();
 	
 	/**
-	 * These are the objects that will parse the source codes
+	 * These are the resource finders from the ENTIRE projecta; it may include stale resources
+	 * This class will own these pointers and will delete them when appropriate.
 	 */
-	std::map<wxString, ResourceFinderClass*> Finders;
+	std::vector<mvceditor::GlobalCacheClass*> GlobalCaches;
 	
 	/**
 	 * To calculate variable type information
+	 * This class will own these pointers and will delete them when appropriate.
 	 */
-	std::map<wxString, SymbolTableClass*> SymbolTables;
-
-	/**
-	 * These are the resource finders from the ENTIRE project; it may include stale resources
-	 * The key is the full path to the resource finder DB file, the value is the
-	 * resource finder itself.
-	 */
-	std::map<wxString, mvceditor::ResourceFinderClass*> GlobalResourceFinders;
-	
-	/**
-	 * the version of PHP to use when parsing source code
-	 */
-	pelet::Versions Version;
+	std::map<wxString, mvceditor::WorkingCacheClass*> WorkingCaches;
 };
 
 	 

@@ -261,10 +261,10 @@ private:
 	std::vector<wxString> CollectNearMatchKeywords(wxString word);
 
 	/**
-	 * This method will get called by the ResourceCache object when parsing of the
+	 * This method will get called by the WorkingCacheBuilderClass when parsing of the
 	 * code in this control has been completed.
 	 */
-	void OnResourceUpdateComplete(wxCommandEvent& event);
+	void OnWorkingCacheComplete(mvceditor::WorkingCacheCompleteEventClass& event);
 	
 	/**
 	 * This method will check to see if document is "dirty" and if so it will
@@ -362,10 +362,11 @@ private:
 	StructsClass* Structs;
 
 	/**
-	 * To parse the current source code in the background and store it in
-	 * a shared cache that all of the opened code controls can access.
+	 * To parse the current source code in the background. The builder will
+	 * notify us with the new cache via an event when it has completed building the
+	 * symbol table.
 	 */
-	ResourceCacheBuilderClass ResourceCacheBuilder;
+	WorkingCacheBuilderClass WorkingCacheBuilder;
 	
 	/**
 	 * The resource signature currently being displayed in the calltip.

@@ -189,11 +189,11 @@ public:
 	 * @param fileName the file to parse
 	 * @param className the class to start collecting
 	 * @param methodName the method to start collecting
+	 * @param version the PHP version to parse against
 	 * @param error any error is encountered, the cause of the error will be set here
 	 * @return TRUE on success, if FALSE then error will be filled.
 	 */
-	bool Build(const wxFileName& fileName, const UnicodeString& className, const UnicodeString& methodName, Errors& error);
-	
+	bool Build(const wxFileName& fileName, const UnicodeString& className, const UnicodeString& methodName, pelet::Versions version, Errors& error);
 	
 	/**
 	 * Saves the call stack to a file; in CSV format
@@ -300,7 +300,7 @@ private:
 	
 	void Clear();
 	
-	bool Recurse(Errors& error);
+	bool Recurse(pelet::Versions version, Errors& error);
 	
 	void CreateCalls();
 	

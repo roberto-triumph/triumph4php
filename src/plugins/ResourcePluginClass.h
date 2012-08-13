@@ -29,6 +29,7 @@
 #include <plugins/wxformbuilder/ResourcePluginGeneratedClass.h>
 #include <plugins/BackgroundFileReaderClass.h>
 #include <search/ResourceFinderClass.h>
+#include <code_control/ResourceCacheBuilderClass.h>
 #include <wx/string.h>
 #include <queue>
 
@@ -56,21 +57,22 @@ public:
 	 * prepare to iterate through all files of the given projects
 	 * that match the given wildcard.
 	 *
-	 * @param resourceCache the existing resources, any new resources will be added to this cache
 	 * @param projects the directories to be scanned (recursively)
+	 * @param version the version of PHP to check against
 	 * @return bool false if none of the projects are enabled or none of the projects have a PHP source directory
 	 */
-	bool InitProjectQueue(ResourceCacheClass* resourceCache, const std::vector<mvceditor::ProjectClass>& projects);
+	bool InitProjectQueue(const std::vector<mvceditor::ProjectClass>& projects, pelet::Versions version);
 
 	/**
 	 * prepare to iterate through the given file. The name part of the given file must match the wildcard.
 	 * This method can be used to update the resources once a file has been modified on disk.
 	 *
-	 * @param resourceCache the existing resources, any new resources will be added to this cache
+	 * @param project the project that holds the file
 	 * @param fullPath file to be scanned (full path, including name).
+	 * @param version the version of PHP to check against
 	 * @return bool false file does not exist
 	 */
-	bool InitForFile(ResourceCacheClass* resourceCache, const wxString& fullPath);
+	bool InitForFile(const mvceditor::ProjectClass& project, const wxString& fullPath, pelet::Versions version);
 
 	/**
 	 * @return TRUE if there are more projects in the queue
@@ -99,25 +101,20 @@ protected:
 private:
 
 	/**
-	 * The filters that match files to be parsed for resources.
-	 */
-	std::vector<wxString> PhpFileFilters;
-
-	/**
-	 * the global cache; the parsed resources will be copied to this cache object
-	 */
-	ResourceCacheClass* ResourceCache;
-
-	/**
 	 * Queue of projects to be indexed.
 	 */
 	std::queue<mvceditor::ProjectClass> ProjectQueue;
 
 	/**
-	 * full path to the location where the current parsed resources are being
-	 * written to.
+	 * the version of PHP to parse against
 	 */
-	wxFileName CurrentResourceDbFileName;
+	pelet::Versions Version;
+
+	/**
+	 * This class will not own this pointer. the pointer will be created by this clas
+	 * but it will be posted via an event and the event handler will own it.
+	 */
+	mvceditor::GlobalCacheClass* GlobalCache;
 };
 
 class ResourcePluginClass : public PluginClass {
@@ -184,8 +181,6 @@ private:
 
 	void OnCmdReIndex(wxCommandEvent& event);
 	
-	void OnEnvironmentUpdated(wxCommandEvent& event);
-	
 	/**
 	 * Toggle various widgets on or off based on the application state. 
 	 */
@@ -215,6 +210,12 @@ private:
 	 * Once the file parsing finishes alert the user.
 	 */
 	void OnWorkComplete(wxCommandEvent& event);
+
+	/**
+	 * When the global cache has been parsed add it to the resource cache
+	 * so that it is available for code completion
+	 */
+	void OnGlobalCacheComplete(mvceditor::GlobalCacheCompleteEventClass& event);
 	
 	/**
 	 * Opens the page and sets the cursor on the function/method/property/file that was searched for by the

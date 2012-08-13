@@ -68,6 +68,10 @@ wxThreadError mvceditor::ThreadWithHeartbeatClass::CreateSingleInstance() {
 		if (error == wxTHREAD_NO_ERROR) {
 			Worker->Run();
 		}
+		else {
+			delete Worker;
+			Worker = NULL;
+		}
 	}
 	return error;
 }
@@ -116,6 +120,7 @@ mvceditor::RunningThreadsClass::RunningThreadsClass()
 
 void mvceditor::RunningThreadsClass::Add(mvceditor::WorkerThreadClass* worker) {
 	wxMutexLocker locker(Mutex);
+	wxASSERT(locker.IsOk());
 	Workers.push_back(worker);
 }
 
@@ -133,16 +138,28 @@ void mvceditor::RunningThreadsClass::Remove(mvceditor::WorkerThreadClass* worker
 			it++;
 		}
 	}
-	Condition.Broadcast();
+	///Condition.Broadcast();
 }
 
 void mvceditor::RunningThreadsClass::RemoveAndStop(mvceditor::WorkerThreadClass* worker) {
 	wxMutexLocker locker(Mutex);
 	wxASSERT(locker.IsOk());
-	worker->Delete();
 	
 	// wxThread::Delete will result in graceful thread termination will call Remove() which will untrack the thread
-	Condition.Wait();
+	worker->Delete();
+	
+	///Condition.Wait();
+}
+
+void mvceditor::RunningThreadsClass::StopAll() {
+	wxMutexLocker locker(Mutex);
+	wxASSERT(locker.IsOk());
+	std::vector<mvceditor::WorkerThreadClass*>::iterator it = Workers.begin();
+	while (it != Workers.end()) {
+		(*it)->Delete();
+		it = Workers.erase(it);
+		///RemoveAndStop(*it);
+	}
 }
 
 const wxEventType mvceditor::EVENT_WORK_COMPLETE = wxNewEventType();

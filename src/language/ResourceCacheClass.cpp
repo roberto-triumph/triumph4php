@@ -25,153 +25,138 @@
 #include <language/ResourceCacheClass.h>
 #include <algorithm>
 
+mvceditor::GlobalCacheClass::GlobalCacheClass()
+	: ResourceFinder()	
+	, ResourceDbFileName() {
+
+}
+
+void mvceditor::GlobalCacheClass::Init(const wxFileName& resourceDbFileName, const std::vector<wxString>& phpFileFilters, pelet::Versions version, int fileParsingBuffer) {
+	ResourceDbFileName = resourceDbFileName;
+	ResourceFinder.FileFilters = phpFileFilters;
+	ResourceFinder.SetVersion(version);
+	ResourceFinder.InitFile(resourceDbFileName, fileParsingBuffer);
+}
+
+void mvceditor::GlobalCacheClass::Walk(mvceditor::DirectorySearchClass& search) {
+	search.Walk(ResourceFinder);
+}
+
+mvceditor::WorkingCacheClass::WorkingCacheClass()
+	: ResourceFinder()
+	, SymbolTable()
+	, FileName() 
+	, IsNew(true)
+	, Parser() {
+
+}
+
+bool mvceditor::WorkingCacheClass::Update(const UnicodeString& code) {
+	pelet::LintResultsClass results;
+
+	// check for syntax so that only 'good' code modifies the cache
+	bool ret = false;
+	if (Parser.LintString(code, results)) {
+		ResourceFinder.BuildResourceCacheForFile(FileName, code, IsNew);
+		SymbolTable.CreateSymbols(code);
+		ret = true;
+	}
+	return ret;
+}
+
+void mvceditor::WorkingCacheClass::Init(const wxString& fileName, bool isNew, pelet::Versions version, bool createSymbols) {
+	FileName = fileName;
+	IsNew = isNew;
+	ResourceFinder.SetVersion(version);
+	SymbolTable.SetVersion(version);
+	Parser.SetVersion(version);
+	ResourceFinder.InitMemory();
+	if (createSymbols) {
+
+		// ATTN: not using the configured php file filters, file is assume to be a PHP file
+		ResourceFinder.FileFilters.push_back(wxT("*.*"));
+		ResourceFinder.BeginSearch();
+		ResourceFinder.Walk(fileName);
+		ResourceFinder.EndSearch();
+		SymbolTable.CreateSymbolsFromFile(fileName);
+	}
+}
+
 mvceditor::ResourceCacheClass::ResourceCacheClass()
-	: Mutex()
-	, Finders()
-	, SymbolTables()
-	, GlobalResourceFinders() 
-	, Version(pelet::PHP_53) {
+	: GlobalCaches()
+	, WorkingCaches() {
+	
 }
 
 mvceditor::ResourceCacheClass::~ResourceCacheClass() {
 	Clear();
-}
+ }
 
-bool mvceditor::ResourceCacheClass::Register(const wxString& fileName, bool createSymbols) {
+bool mvceditor::ResourceCacheClass::RegisterWorking(const wxString& fileName, mvceditor::WorkingCacheClass* cache) {
 	bool ret = false;
-	wxMutexLocker locker(Mutex);
-	if (!locker.IsOk()) {
-		return false;
-	}
 
 	// careful to not overwrite the symbol table, resource finder pointers
-	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it = Finders.find(fileName);
-	std::map<wxString, mvceditor::SymbolTableClass*>::iterator itSymbols = SymbolTables.find(fileName);
-	if (it == Finders.end() && itSymbols == SymbolTables.end()) {
-		mvceditor::ResourceFinderClass* res = new mvceditor::ResourceFinderClass;
-		mvceditor::SymbolTableClass* table = new mvceditor::SymbolTableClass();
-		res->SetVersion(Version);
-		res->InitMemory();
-		table->SetVersion(Version);
-		Finders[fileName] = res;
-		SymbolTables[fileName] = table;
-		if (createSymbols) {
-			
-			// ATTN: not using the configured php file filters?
-			res->FileFilters.push_back(wxT("*.*"));
-			res->Walk(fileName);
-			table->CreateSymbolsFromFile(fileName);
-		}
+	std::map<wxString, mvceditor::WorkingCacheClass*>::iterator it = WorkingCaches.find(fileName);
+	if (it == WorkingCaches.end()) {
+		WorkingCaches[fileName] = cache;
 		ret = true;
 	}
 	return ret;
 }
 
-void mvceditor::ResourceCacheClass::Unregister(const wxString& fileName) {
-	wxMutexLocker locker(Mutex);
-	if (!locker.IsOk()) {
-		return;
-	}
-	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it = Finders.find(fileName);
-	if (it != Finders.end()) {
+bool mvceditor::ResourceCacheClass::ReplaceWorking(const wxString& fileName, mvceditor::WorkingCacheClass* cache) {
+	RemoveWorking(fileName);
+	return RegisterWorking(fileName, cache);
+}
+
+void mvceditor::ResourceCacheClass::RemoveWorking(const wxString& fileName) {
+	std::map<wxString, mvceditor::WorkingCacheClass*>::iterator it = WorkingCaches.find(fileName);
+	if (it != WorkingCaches.end()) {
 		delete it->second;
 	}
-	std::map<wxString, mvceditor::SymbolTableClass*>::iterator itSymbols = SymbolTables.find(fileName);
-	if (itSymbols != SymbolTables.end()) {
-		delete itSymbols->second;
-	}
-	Finders.erase(fileName);
-	SymbolTables.erase(fileName);
+	WorkingCaches.erase(fileName);
 }
 
-bool mvceditor::ResourceCacheClass::Update(const wxString& fileName, const UnicodeString& code, bool isNew) {
-	
-	wxMutexLocker locker(Mutex);
-	if (!locker.IsOk()) {
-		return false;
+bool mvceditor::ResourceCacheClass::RegisterGlobal(mvceditor::GlobalCacheClass* cache) {
+	bool found = IsInitGlobal(cache->ResourceDbFileName);
+	if (!found) {
+		GlobalCaches.push_back(cache);
+		return true;
 	}
-	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it = Finders.find(fileName);
-	std::map<wxString, mvceditor::SymbolTableClass*>::iterator itSymbols = SymbolTables.find(fileName);
-	bool ret = false;
-	if (it != Finders.end() && itSymbols != SymbolTables.end()) {
-		pelet::ParserClass parser;
-		parser.SetVersion(Version);
-		pelet::LintResultsClass results;
-		if (parser.LintString(code, results)) {
-			mvceditor::ResourceFinderClass* finder = it->second;
-			mvceditor::SymbolTableClass* symbolTable = itSymbols->second;
-			finder->BuildResourceCacheForFile(fileName, code, isNew);
-			symbolTable->CreateSymbols(code);
-			ret = true;
+	return false;
+}
+
+bool mvceditor::ResourceCacheClass::IsInitGlobal(const wxFileName& resourceDbFileName) const {
+	bool found = false;
+	std::vector<mvceditor::GlobalCacheClass*>::const_iterator it;
+	for (it = GlobalCaches.begin(); it != GlobalCaches.end(); ++it) {
+		if ((*it)->ResourceDbFileName == resourceDbFileName) {
+			found = true;
+			break;
 		}
 	}
-	return ret;
-}
-
-bool mvceditor::ResourceCacheClass::InitGlobal(const wxFileName& resourceDbFileName, int fileParsingBufferSize) {
-	wxMutexLocker locker(Mutex);
-	if (!locker.IsOk()) {
-		return false;
-	}
-	
-	bool ret = false;
-	int cnt = GlobalResourceFinders.count(resourceDbFileName.GetFullPath());
-	if (cnt <= 0) {
-		mvceditor::ResourceFinderClass* resourceFinder = new mvceditor::ResourceFinderClass();
-		resourceFinder->InitFile(resourceDbFileName, fileParsingBufferSize);
-		GlobalResourceFinders[resourceDbFileName.GetFullPath()] = resourceFinder;
-		ret = true;
-	}
-	return ret;
+	return found;
 }
 
 void mvceditor::ResourceCacheClass::RemoveGlobal(const wxFileName& resourceDbFileName) {
-	wxMutexLocker locker(Mutex);
-	if (!locker.IsOk()) {
-		return;
-	}
-	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator item = GlobalResourceFinders.find(resourceDbFileName.GetFullPath());
-	if (item != GlobalResourceFinders.end()) {
-		delete item->second;
-		GlobalResourceFinders.erase(item);
-	}
-}
-
-bool mvceditor::ResourceCacheClass::IsInitGlobal(const wxFileName& resourceDbFileName) {
-	wxMutexLocker locker(Mutex);
-	if (!locker.IsOk()) {
-		return false;
-	}
-	int cnt = GlobalResourceFinders.count(resourceDbFileName.GetFullPath());
-	return cnt > 0;
-}
-
-bool mvceditor::ResourceCacheClass::WalkGlobal(const wxFileName& resourceDbFileName, mvceditor::DirectorySearchClass& search, const std::vector<wxString>& phpFileFilters) {
-	wxMutexLocker locker(Mutex);
-	if (!locker.IsOk()) {
-		return false;
-	}
-
-	// need to do this so that the resource finder attempts to parse the files
-	// FileFilters and query string needs to be non-empty
-	for (std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it = GlobalResourceFinders.begin(); it != GlobalResourceFinders.end(); ++it) {
-		if (it->first == resourceDbFileName.GetFullPath()) {
-			it->second->FileFilters = phpFileFilters;
-			search.Walk(*it->second);
+	std::vector<mvceditor::GlobalCacheClass*>::iterator it;
+	it = GlobalCaches.begin();
+	while (it != GlobalCaches.end()) {
+		if ((*it)->ResourceDbFileName == resourceDbFileName) {
+			delete *it;
+			it = GlobalCaches.erase(it);
+		}
+		else {
+			it++;
 		}
 	}
-	return true;
 }
 
-std::vector<mvceditor::ResourceClass> mvceditor::ResourceCacheClass::AllNonNativeClassesGlobal() {
-	wxMutexLocker locker(Mutex);
-	std::vector<mvceditor::ResourceClass> res;
-	if (!locker.IsOk()) {
-		return res;
-	}
-	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it;
-	for (it = GlobalResourceFinders.begin(); it != GlobalResourceFinders.end(); ++it) {
-		std::vector<mvceditor::ResourceClass> finderResources = it->second->AllNonNativeClasses();
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceCacheClass::AllNonNativeClassesGlobal() const {
+	std::vector<mvceditor::ResourceClass> res; 
+	std::vector<mvceditor::GlobalCacheClass*>::const_iterator it;
+	for (it = GlobalCaches.begin(); it != GlobalCaches.end(); ++it) {
+		std::vector<mvceditor::ResourceClass> finderResources = (*it)->ResourceFinder.AllNonNativeClasses();
 		res.insert(res.end(), finderResources.begin(), finderResources.end());
 	}
 	return res;
@@ -179,23 +164,24 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceCacheClass::AllNonNativ
 
 std::vector<mvceditor::ResourceClass> mvceditor::ResourceCacheClass::CollectFullyQualifiedResourceFromAll(const UnicodeString& search) {
 	std::vector<mvceditor::ResourceClass> matches;
-	wxMutexLocker locker(Mutex);
-	if (!locker.IsOk()) {
-		return matches;
-	}
 	mvceditor::ResourceSearchClass resourceSearch(search);
 
 	// return all of the matches from all finders that were found by the Collect* call.
 	// This is a bit tricky because we want to prioritize matches in opened files 
 	// instead of the global finder, since the global finder will be outdated.
 	std::vector<mvceditor::ResourceFinderClass*> finders = AllFinders();
+	std::map<wxString, mvceditor::ResourceFinderClass*> openedFinders;
+	std::map<wxString, mvceditor::WorkingCacheClass*>::const_iterator it;
+	for (it = WorkingCaches.begin(); it != WorkingCaches.end(); ++it) {
+		openedFinders[it->first] = &it->second->ResourceFinder;
+	}
 	for (size_t i = 0; i < finders.size(); ++i) {
 		mvceditor::ResourceFinderClass* resourceFinder = finders[i];
 		std::vector<mvceditor::ResourceClass> finderMatches = resourceFinder->CollectFullyQualifiedResource(resourceSearch);
 		size_t count = finderMatches.size();
 		for (size_t j = 0; j < count; ++j) {
 			mvceditor::ResourceClass resource = finderMatches[j];
-			if (!mvceditor::IsResourceDirty(Finders, resource, resourceFinder)) {
+			if (!mvceditor::IsResourceDirty(openedFinders, resource, resourceFinder)) {
 				matches.push_back(resource);
 			}
 		}
@@ -206,23 +192,24 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceCacheClass::CollectFull
 
 std::vector<mvceditor::ResourceClass> mvceditor::ResourceCacheClass::CollectNearMatchResourcesFromAll(const UnicodeString& search) {
 	std::vector<mvceditor::ResourceClass> matches;
-	wxMutexLocker locker(Mutex);
-	if (!locker.IsOk()) {
-		return matches;
-	}
 	mvceditor::ResourceSearchClass resourceSearch(search);
 
 	// return all of the matches from all finders that were found by the Collect* call.
 	// This is a bit tricky because we want to prioritize matches in opened files 
 	// instead of the global finder, since the global finder will be outdated.
 	std::vector<mvceditor::ResourceFinderClass*> finders = AllFinders();
+	std::map<wxString, mvceditor::ResourceFinderClass*> openedFinders;
+	std::map<wxString, mvceditor::WorkingCacheClass*>::const_iterator it;
+	for (it = WorkingCaches.begin(); it != WorkingCaches.end(); ++it) {
+		openedFinders[it->first] = &it->second->ResourceFinder;
+	}
 	for (size_t i = 0; i < finders.size(); ++i) {
 		mvceditor::ResourceFinderClass* resourceFinder = finders[i];
 		std::vector<mvceditor::ResourceClass> finderMatches = resourceFinder->CollectNearMatchResources(resourceSearch);
 		size_t count = finderMatches.size();
 		for (size_t j = 0; j < count; ++j) {
 			mvceditor::ResourceClass resource = finderMatches[j];
-			if (!mvceditor::IsResourceDirty(Finders, resource, resourceFinder)) {
+			if (!mvceditor::IsResourceDirty(openedFinders, resource, resourceFinder)) {
 				matches.push_back(resource);
 			}
 		}
@@ -233,12 +220,13 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceCacheClass::CollectNear
 
 std::vector<mvceditor::ResourceFinderClass*> mvceditor::ResourceCacheClass::AllFinders() {
 	std::vector<mvceditor::ResourceFinderClass*> allResourceFinders;
-	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it;
-	for (it =  Finders.begin(); it != Finders.end(); ++it) {
-		allResourceFinders.push_back(it->second);
-	}	
-	for (it = GlobalResourceFinders.begin(); it != GlobalResourceFinders.end(); ++it) {
-		allResourceFinders.push_back(it->second);
+	std::map<wxString, mvceditor::WorkingCacheClass*>::iterator it;
+	for (it = WorkingCaches.begin(); it != WorkingCaches.end(); ++it) {
+		allResourceFinders.push_back(&it->second->ResourceFinder);
+	}
+	std::vector<mvceditor::GlobalCacheClass*>::iterator itGlobal;
+	for (itGlobal = GlobalCaches.begin(); itGlobal != GlobalCaches.end(); ++itGlobal) {
+		allResourceFinders.push_back(&((*itGlobal)->ResourceFinder));
 	}
 	return allResourceFinders;
 }
@@ -249,20 +237,20 @@ void mvceditor::ResourceCacheClass::ExpressionCompletionMatches(const wxString& 
 													 std::vector<mvceditor::ResourceClass>& resourceMatches,
 													 bool doDuckTyping,
 													 mvceditor::SymbolTableMatchErrorClass& error) {
-	wxMutexLocker locker(Mutex);
-	if (!locker.IsOk()) {
-		return;
-	}
-	std::map<wxString, mvceditor::SymbolTableClass*>::const_iterator itSymbols = SymbolTables.find(fileName);
+	std::map<wxString, mvceditor::WorkingCacheClass*>::const_iterator itWorkingCache = WorkingCaches.find(fileName);
 	bool foundSymbolTable = false;
-	if (itSymbols != SymbolTables.end()) {
-		mvceditor::SymbolTableClass* symbolTable = itSymbols->second;
-		if (symbolTable) {
-			foundSymbolTable = true;
-			std::vector<mvceditor::ResourceFinderClass*> allFinders = AllFinders();
-			symbolTable->ExpressionCompletionMatches(parsedExpression, expressionScope, allFinders, Finders, 
-				autoCompleteList, resourceMatches, doDuckTyping, error);
+	if (itWorkingCache != WorkingCaches.end()) {
+		foundSymbolTable = true;
+		std::vector<mvceditor::ResourceFinderClass*> allFinders = AllFinders();
+		std::map<wxString, mvceditor::ResourceFinderClass*> openedFinders;
+		std::map<wxString, mvceditor::WorkingCacheClass*>::const_iterator it;
+		for (it = WorkingCaches.begin(); it != WorkingCaches.end(); ++it) {
+			openedFinders[it->first] = &it->second->ResourceFinder;
 		}
+		mvceditor::WorkingCacheClass* cache = itWorkingCache->second;
+		cache->SymbolTable.ExpressionCompletionMatches(parsedExpression, expressionScope, allFinders, openedFinders, 
+			autoCompleteList, resourceMatches, doDuckTyping, error);
+	
 	}
 	if (!foundSymbolTable) {
 		error.Type = mvceditor::SymbolTableMatchErrorClass::UNREGISTERED_FILE;
@@ -274,22 +262,19 @@ void mvceditor::ResourceCacheClass::ResourceMatches(const wxString& fileName, co
 													std::vector<mvceditor::ResourceClass>& matches,
 													bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 													mvceditor::SymbolTableMatchErrorClass& error) {
-	wxMutexLocker locker(Mutex);
-	if (!locker.IsOk()) {
-		return;
-	}
-	std::map<wxString, mvceditor::SymbolTableClass*>::const_iterator itSymbols = SymbolTables.find(fileName);
+	std::map<wxString, mvceditor::WorkingCacheClass*>::const_iterator itWorkingCache = WorkingCaches.find(fileName);
 	bool foundSymbolTable = false;
-	if (itSymbols != SymbolTables.end()) {
-		mvceditor::SymbolTableClass* symbolTable = itSymbols->second;
-		if (symbolTable) {
-			foundSymbolTable = true;
-			///symbolTable->Print();
-			///GlobalResourceFinder.Print();
-			std::vector<mvceditor::ResourceFinderClass*> allFinders = AllFinders();
-			symbolTable->ResourceMatches(parsedExpression, expressionScope, allFinders, Finders, 
-				matches, doDuckTyping, doFullyQualifiedMatchOnly, error);
+	if (itWorkingCache != WorkingCaches.end()) {
+		foundSymbolTable = true;
+		std::vector<mvceditor::ResourceFinderClass*> allFinders = AllFinders();
+		std::map<wxString, mvceditor::ResourceFinderClass*> openedFinders;
+		std::map<wxString, mvceditor::WorkingCacheClass*>::const_iterator it;
+		for (it = WorkingCaches.begin(); it != WorkingCaches.end(); ++it) {
+			openedFinders[it->first] = &it->second->ResourceFinder;
 		}
+		mvceditor::WorkingCacheClass* cache = itWorkingCache->second;
+		cache->SymbolTable.ResourceMatches(parsedExpression, expressionScope, allFinders, openedFinders, 
+			matches, doDuckTyping, doFullyQualifiedMatchOnly, error);	
 	}
 	if (!foundSymbolTable) {
 		error.Type = mvceditor::SymbolTableMatchErrorClass::UNREGISTERED_FILE;
@@ -297,127 +282,72 @@ void mvceditor::ResourceCacheClass::ResourceMatches(const wxString& fileName, co
 }
 
 void mvceditor::ResourceCacheClass::GlobalAddDynamicResources(const std::vector<mvceditor::ResourceClass>& resources) {
-	wxMutexLocker locker(Mutex);
-	if (!locker.IsOk()) {
-		return;
-	}
-	if (GlobalResourceFinders.count(wxT(":memory:")) == 0) {
+	if (WorkingCaches.count(wxT(":memory:")) == 0) {
 
 		// this is the case when Clear() is called right before this method
-		mvceditor::ResourceFinderClass* finder = new mvceditor::ResourceFinderClass;
-		finder->InitMemory();
-		GlobalResourceFinders[wxT(":memory:")] = finder;
+		mvceditor::WorkingCacheClass* cache = new mvceditor::WorkingCacheClass;
+		cache->Init(wxT(":memory:"), true, pelet::PHP_53, false);
+		WorkingCaches[wxT(":memory:")] = cache;
 	}
-	GlobalResourceFinders[wxT(":memory:")]->AddDynamicResources(resources);
+	WorkingCaches[wxT(":memory:")]->ResourceFinder.AddDynamicResources(resources);
 }
 
 void mvceditor::ResourceCacheClass::Print() {
-	wxMutexLocker locker(Mutex);
-	if (!locker.IsOk()) {
-		return;
-	}
 	UFILE* ufout = u_finit(stdout, NULL, NULL);
-	u_fprintf(ufout, "Number of global caches: %d\n", GlobalResourceFinders.size());
-	u_fprintf(ufout, "Number of registered caches: %d\n", Finders.size());
-	u_fprintf(ufout, "Number of registered symbol tables: %d\n", SymbolTables.size());
+	u_fprintf(ufout, "Number of global caches: %d\n", GlobalCaches.size());
+	u_fprintf(ufout, "Number of working caches: %d\n", WorkingCaches.size());
 	u_fclose(ufout);
-	std::map<wxString, mvceditor::SymbolTableClass*>::const_iterator it = SymbolTables.begin();
-	for (; it != SymbolTables.end(); ++it) {
-		it->second->Print();
+	std::map<wxString, mvceditor::WorkingCacheClass*>::const_iterator it = WorkingCaches.begin();
+	for (; it != WorkingCaches.end(); ++it) {
+		it->second->SymbolTable.Print();
 	}
 }
 
 bool mvceditor::ResourceCacheClass::IsFileCacheEmpty() {
-	wxMutexLocker locker(Mutex);
-	if (!locker.IsOk()) {
-		return true;
-	}
 	bool isEmpty = true;
 
 	// if at least one resource finder is not empty, return false
-	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it;
-	for (it = GlobalResourceFinders.begin(); isEmpty && it != GlobalResourceFinders.end(); ++it) {
-		isEmpty = it->second->IsFileCacheEmpty();
+	std::vector<mvceditor::GlobalCacheClass*>::iterator it;
+	for (it = GlobalCaches.begin(); isEmpty && it != GlobalCaches.end(); ++it) {
+		isEmpty = (*it)->ResourceFinder.IsFileCacheEmpty();
 	}
 	return isEmpty;
 }
 
 bool mvceditor::ResourceCacheClass::IsResourceCacheEmpty() {
-	wxMutexLocker locker(Mutex);
-	if (!locker.IsOk()) {
-		return true;
-	}
 	bool isEmpty = true;
 
 	// if at least one resource finder is not empty, return false
-	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it;
-	for (it = GlobalResourceFinders.begin(); isEmpty && it != GlobalResourceFinders.end(); ++it) {
-		isEmpty = it->second->IsResourceCacheEmpty();
+	std::vector<mvceditor::GlobalCacheClass*>::iterator it;
+	for (it = GlobalCaches.begin(); isEmpty && it != GlobalCaches.end(); ++it) {
+		isEmpty = (*it)->ResourceFinder.IsResourceCacheEmpty();
 	}
 	return isEmpty;
 }
 
 void mvceditor::ResourceCacheClass::Clear() {
-	wxMutexLocker locker(Mutex);
-	if (!locker.IsOk()) {
-		return;
-	}
 
 	// ATTN: do NOT wipe finders, Clear() is meant for memory
 	// cleanup only
-	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it;
-	for (it = GlobalResourceFinders.begin(); it != GlobalResourceFinders.end(); ++it) {
-		delete it->second;
+	std::vector<mvceditor::GlobalCacheClass*>::iterator it;
+	for (it = GlobalCaches.begin(); it != GlobalCaches.end(); ++it) {
+		delete *it;
 	}
-	for (std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it =  Finders.begin(); it != Finders.end(); ++it) {
-		delete it->second;
+
+	std::map<wxString, mvceditor::WorkingCacheClass*>::iterator itWorking;
+	for (itWorking = WorkingCaches.begin(); itWorking != WorkingCaches.end(); ++itWorking) {
+		delete itWorking->second;
 	}
-	for (std::map<wxString, mvceditor::SymbolTableClass*>::iterator it =  SymbolTables.begin(); it != SymbolTables.end(); ++it) {
-		delete it->second;
-	}
-	GlobalResourceFinders.clear();
-	Finders.clear();
-	SymbolTables.clear();	
+	GlobalCaches.clear();
+	WorkingCaches.clear();
 }
 
 void mvceditor::ResourceCacheClass::Wipe() {
-	wxMutexLocker locker(Mutex);
-	if (!locker.IsOk()) {
-		return;
-	}
 
 	// ATTN: DO wipe finders this is an explict call
-	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it;
-	for (it = GlobalResourceFinders.begin(); it != GlobalResourceFinders.end(); ++it) {
-		it->second->Wipe();
-		delete it->second;
+	std::vector<mvceditor::GlobalCacheClass*>::iterator it;
+	for (it = GlobalCaches.begin(); it != GlobalCaches.end(); ++it) {
+		(*it)->ResourceFinder.Wipe();
 	}
-	for (std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it =  Finders.begin(); it != Finders.end(); ++it) {
-		delete it->second;
-	}
-	for (std::map<wxString, mvceditor::SymbolTableClass*>::iterator it =  SymbolTables.begin(); it != SymbolTables.end(); ++it) {
-		delete it->second;
-	}
-	GlobalResourceFinders.clear();
-	Finders.clear();
-	SymbolTables.clear();	
-}
-
-void mvceditor::ResourceCacheClass::SetVersion(pelet::Versions version) {
-	wxMutexLocker locker(Mutex);
-	if (!locker.IsOk()) {
-		return;
-	}
-	Version = version;
-	std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it;
-	for (it = GlobalResourceFinders.begin(); it != GlobalResourceFinders.end(); ++it) {
-		it->second->SetVersion(version);
-	}
-	for (std::map<wxString, mvceditor::ResourceFinderClass*>::iterator it =  Finders.begin(); it != Finders.end(); ++it) {
-		it->second->SetVersion(version);
-	}
-	for (std::map<wxString, mvceditor::SymbolTableClass*>::iterator it =  SymbolTables.begin(); it != SymbolTables.end(); ++it) {
-		it->second->SetVersion(version);
-	}
-	
+	Clear();
 }

@@ -84,7 +84,7 @@ int main() {
 	UnicodeString className = UNICODE_STRING_SIMPLE("News");
 	UnicodeString methodName = UNICODE_STRING_SIMPLE("index");
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
-	CallStack.Build(fileName, className, methodName, error);
+	CallStack.Build(fileName, className, methodName, pelet::PHP_53, error);
 	
 	UFILE* ufout = u_finit(stdout, NULL, NULL);
 	if (mvceditor::CallStackClass::NONE != error) {
@@ -114,10 +114,13 @@ int main() {
 }
 	
 void CacheLargeProject(mvceditor::ResourceCacheClass& resourceCache, wxString dirName) {
-	resourceCache.InitGlobal(mvceditor::NativeFunctionsAsset());
-	mvceditor::DirectorySearchClass directorySearch;
 	std::vector<wxString> fileFilters;
 	fileFilters.push_back(wxT("*.php"));
+
+	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass;
+	globalCache->Init(mvceditor::NativeFunctionsAsset(), fileFilters, pelet::PHP_53);
+	resourceCache.RegisterGlobal(globalCache);
+	mvceditor::DirectorySearchClass directorySearch;
 	bool found = directorySearch.Init(dirName);
 	if (!found) {
 		printf("Directory does not exist: %s\n", (const char*)dirName.ToAscii());
@@ -127,11 +130,14 @@ void CacheLargeProject(mvceditor::ResourceCacheClass& resourceCache, wxString di
 	if (fileName.FileExists()) {
 		wxRemoveFile(fileName.GetFullPath());
 	}
-	if (!resourceCache.InitGlobal(fileName)) {
-		printf("Could not initialize a global cache.\n");
+	mvceditor::GlobalCacheClass* projectCache = new mvceditor::GlobalCacheClass;
+	projectCache->Init(fileName, fileFilters, pelet::PHP_53);
+	while (directorySearch.More()) {
+		projectCache->Walk(directorySearch);
 	}
-	while (walked && directorySearch.More()) {
-		walked = resourceCache.WalkGlobal(fileName, directorySearch, fileFilters);
+
+	if (!resourceCache.RegisterGlobal(projectCache)) {
+		printf("Could not initialize the project cache.\n");
 	}
 	if (!walked) {
 		printf("Resource Cache could not be initialized!\n");

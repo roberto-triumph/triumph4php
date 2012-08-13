@@ -88,7 +88,7 @@ void mvceditor::CallStackClass::Clear() {
 }
 
 bool mvceditor::CallStackClass::Build(const wxFileName& fileName, const UnicodeString& className, const UnicodeString& methodName, 
-		mvceditor::CallStackClass::Errors& error) {
+		pelet::Versions version, mvceditor::CallStackClass::Errors& error) {
 	Clear();
 	mvceditor::ResourceClass nextResource;
 	nextResource.Type = mvceditor::ResourceClass::METHOD;
@@ -99,10 +99,10 @@ bool mvceditor::CallStackClass::Build(const wxFileName& fileName, const UnicodeS
 	item.FileName = fileName;
 	item.Resource = nextResource;
 	ResourcesRemaining.push(item);
-	return Recurse(error);
+	return Recurse(version, error);
 }
 
-bool mvceditor::CallStackClass::Recurse(mvceditor::CallStackClass::Errors& error) {
+bool mvceditor::CallStackClass::Recurse(pelet::Versions version, mvceditor::CallStackClass::Errors& error) {
 
 	// base case: no more functions to parse
 	if (ResourcesRemaining.empty()) {
@@ -130,7 +130,9 @@ bool mvceditor::CallStackClass::Recurse(mvceditor::CallStackClass::Errors& error
 
 	// need to create the symbols for the file if the cache does not have them yet; symbols allow us to know the variable
 	// types
-	bool newlyRegistered = ResourceCache.Register(fileName.GetFullPath(), true);
+	mvceditor::WorkingCacheClass* workingCache = new mvceditor::WorkingCacheClass;
+	workingCache->Init(fileName.GetFullPath(), false, version, true);
+	bool newlyRegistered = ResourceCache.RegisterWorking(fileName.GetFullPath(), workingCache);
 
 	wxFFile file(fileName.GetFullPath(), wxT("rb"));
 	bool ret = Parser.ScanFile(file.fp(), mvceditor::StringHelperClass::wxToIcu(fileName.GetFullPath()), LintResults);
@@ -175,7 +177,7 @@ bool mvceditor::CallStackClass::Recurse(mvceditor::CallStackClass::Errors& error
 			if (hasNext) {
 				ScopeFunctionCalls.clear();
 				ScopeVariables.clear();
-				return Recurse(error);
+				return Recurse(version, error);
 			}
 		}
 	}
@@ -189,7 +191,13 @@ bool mvceditor::CallStackClass::Recurse(mvceditor::CallStackClass::Errors& error
 	if (newlyRegistered) {
 
 		// clean up, but only if this method created the symbols
-		ResourceCache.Unregister(fileName.GetFullPath());
+		// this call will delete the WorkingCache pointer for us
+		ResourceCache.RemoveWorking(fileName.GetFullPath());
+	}
+	else {
+
+		// resource cache did not use the cache, delete it ourselves
+		delete workingCache;
 	}
 	return ret;
 

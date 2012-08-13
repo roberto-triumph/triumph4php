@@ -73,13 +73,16 @@ public:
 
 	void BuildCache() {
 		ResourceDbFileName.Assign(TestProjectDir + wxT("resource_cache.db"));
-		ResourceCache.InitGlobal(ResourceDbFileName);
-
+		mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass;
+		globalCache->Init(ResourceDbFileName, PhpFileFilters, pelet::PHP_53);
+		
 		mvceditor::DirectorySearchClass search;
 		search.Init(TestProjectDir + wxT("src"));
 		while (search.More()) {
-			ResourceCache.WalkGlobal(ResourceDbFileName, search, PhpFileFilters);
+			globalCache->Walk(search);
 		}
+		bool good = ResourceCache.RegisterGlobal(globalCache);
+		wxASSERT_MSG(good, _("global cache could not be registered"));
 	}
 };
 
@@ -90,11 +93,11 @@ TEST_FIXTURE(CallStackFixtureTestClass, FailOnUnknownResource) {
 	BuildCache();
 	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
-	CHECK_EQUAL(false, CallStack.Build(file, UNICODE_STRING_SIMPLE("UnknownClass"), UNICODE_STRING_SIMPLE("index"), error));
+	CHECK_EQUAL(false, CallStack.Build(file, UNICODE_STRING_SIMPLE("UnknownClass"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
 	CHECK_EQUAL(mvceditor::CallStackClass::RESOURCE_NOT_FOUND, error);
 	
 	error = mvceditor::CallStackClass::NONE;
-	CHECK_EQUAL(false, CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("unknownMethod"), error));
+	CHECK_EQUAL(false, CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("unknownMethod"), pelet::PHP_53, error));
 	CHECK_EQUAL(mvceditor::CallStackClass::RESOURCE_NOT_FOUND, error);
 }	
  
@@ -124,7 +127,7 @@ TEST_FIXTURE(CallStackFixtureTestClass, FailOnParseError) {
 	
 	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
-	CHECK_EQUAL(false, CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), error));
+	CHECK_EQUAL(false, CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
 
 	UnicodeString expected = mvceditor::StringHelperClass::wxToIcu(file.GetFullPath());
 	CHECK_EQUAL(expected, CallStack.LintResults.UnicodeFilename);
@@ -157,7 +160,7 @@ TEST_FIXTURE(CallStackFixtureTestClass, ResolutionError) {
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
 	
 	// we still want to return true because an incomplete call stack may be helpful in some cases
-	CHECK_EQUAL(true, CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), error));
+	CHECK_EQUAL(true, CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
 	CHECK_EQUAL(mvceditor::CallStackClass::RESOLUTION_ERROR, error);
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::UNKNOWN_RESOURCE, CallStack.MatchError.Type);
 	
@@ -194,7 +197,7 @@ TEST_FIXTURE(CallStackFixtureTestClass, FailOnEmptyCache) {
 	
 	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
-	CHECK_EQUAL(false, localCallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), error));
+	CHECK_EQUAL(false, localCallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
 	CHECK_EQUAL(mvceditor::CallStackClass::EMPTY_CACHE, error);
 }
 
@@ -204,7 +207,7 @@ TEST_FIXTURE(CallStackFixtureTestClass, SimpleMethodCall) {
 
 	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
-	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), error));
+	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
 	
 	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
@@ -263,7 +266,7 @@ TEST_FIXTURE(CallStackFixtureTestClass, MultipleMethodCalls) {
 
 	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
-	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), error));
+	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
 	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
 	
@@ -314,7 +317,7 @@ TEST_FIXTURE(CallStackFixtureTestClass, WithArrayKeyAssignment) {
 
 	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
-	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), error));
+	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
 	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
 	
@@ -362,7 +365,7 @@ TEST_FIXTURE(CallStackFixtureTestClass, WithMethodCall) {
 	
 	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
-	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), error));
+	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
 	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
 	
@@ -393,7 +396,7 @@ TEST_FIXTURE(CallStackFixtureTestClass, Persist) {
 
 	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
-	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), error));
+	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
 	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
 	CHECK_VECTOR_SIZE(7, CallStack.List);

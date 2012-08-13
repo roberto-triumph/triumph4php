@@ -36,38 +36,26 @@ static int ID_COUNT_FILES_GAUGE = wxNewId();
 
 mvceditor::ResourceFileReaderClass::ResourceFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads) 
 	: BackgroundFileReaderClass(handler, runningThreads)
-	, PhpFileFilters() 
-	, ResourceCache(NULL) 
 	, ProjectQueue()
-	, CurrentResourceDbFileName() {
+	, Version(pelet::PHP_53) 
+	, GlobalCache(NULL) {
 }
 
-bool mvceditor::ResourceFileReaderClass::InitProjectQueue(mvceditor::ResourceCacheClass* resourceCache, 
-														const std::vector<mvceditor::ProjectClass>& projects) {
+bool mvceditor::ResourceFileReaderClass::InitProjectQueue(const std::vector<mvceditor::ProjectClass>& projects, pelet::Versions version) {
 	while (!ProjectQueue.empty()) {
 		ProjectQueue.pop();
 	}
-	ResourceCache = resourceCache;
+	Version = version;
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	for (project = projects.begin(); project != projects.end(); ++project) {
 		if (project->IsEnabled && !project->AllPhpSources().empty()) {
-			if (!ResourceCache->IsInitGlobal(project->ResourceDbFileName)) {
-
-				// since a directory can have many files, set the file parsing buffer
-				// to a high value
-				// init the file now so that it is available for code completion
-				// even though we know it is stale. The user is notified that the
-				// cache is stale and may not have all of the results.
-				ResourceCache->InitGlobal(project->ResourceDbFileName, 1024);
-			}
 			ProjectQueue.push(*project);
 		}
 	}
 	return !ProjectQueue.empty();
 }
 
-bool mvceditor::ResourceFileReaderClass::InitForFile(mvceditor::ResourceCacheClass* resourceCache, 
-														const wxString& fullPath) {
+bool mvceditor::ResourceFileReaderClass::InitForFile(const mvceditor::ProjectClass& project, const wxString& fullPath, pelet::Versions version) {
 	while (!ProjectQueue.empty()) {
 		ProjectQueue.pop();
 	}
@@ -75,38 +63,41 @@ bool mvceditor::ResourceFileReaderClass::InitForFile(mvceditor::ResourceCacheCla
 	if (!fileName.FileExists()) {
 		return false;
 	}
-	PhpFileFilters.clear();
+	Version = version;
 
 	// break up name into dir + name, add name to file filters
 	mvceditor::SourceClass src;
 	src.RootDirectory.AssignDir(fullPath);
 	src.SetIncludeWildcards(fileName.GetFullName());
-	PhpFileFilters.push_back(fileName.GetFullName());
+	std::vector<wxString > phpFileFilters;
+	phpFileFilters.push_back(fileName.GetFullName());
 
 	std::vector<mvceditor::SourceClass> srcs;
 	srcs.push_back(src);
 	if (Init(srcs)) {
-		ResourceCache = resourceCache;
+		wxASSERT_MSG(GlobalCache == NULL, _("cache pointer has not been cleaned up"));
+		GlobalCache = new mvceditor::GlobalCacheClass();
+		GlobalCache->Init(project.ResourceDbFileName, phpFileFilters, version, 1024);
 		return true;
 	}
 	return false;
 }
 
 bool mvceditor::ResourceFileReaderClass::FileRead(mvceditor::DirectorySearchClass& search) {
-	ResourceCache->WalkGlobal(CurrentResourceDbFileName, search, PhpFileFilters);
+	GlobalCache->Walk(search);
+	if (!search.More()) {
+
+		// the event handler will own the pointer to the global cache
+		mvceditor::GlobalCacheCompleteEventClass evt(GlobalCache);
+		wxPostEvent(&Handler, evt);
+		GlobalCache = NULL;
+	}
 	return false;
 }
-
 bool mvceditor::ResourceFileReaderClass::FileMatch(const wxString& file) {
-	bool matchedFilter = false;
-	for (size_t i = 0; i < PhpFileFilters.size(); ++i) {
-		wxString filter = PhpFileFilters[i];
-		matchedFilter = !wxIsWild(filter) || wxMatchWild(filter, file);
-		if (matchedFilter) {
-			break;
-		}
-	}
-	return matchedFilter;
+
+	// ResourceFileReader class never return true from FileRead(), no need to match files
+	return false;
 }
 
 bool mvceditor::ResourceFileReaderClass::MoreProjects() const {
@@ -120,9 +111,10 @@ bool mvceditor::ResourceFileReaderClass::ReadNextProject() {
 		ProjectQueue.pop();
 		std::vector<mvceditor::SourceClass> sources = project.AllPhpSources();
 		if (Init(sources)) {
-			PhpFileFilters = project.GetPhpFileExtensions();
-			CurrentResourceDbFileName = project.ResourceDbFileName;
 			next = true;
+			wxASSERT_MSG(GlobalCache == NULL, _("cache pointer has not been cleaned up"));
+			GlobalCache = new mvceditor::GlobalCacheClass;
+			GlobalCache->Init(project.ResourceDbFileName, project.GetPhpFileExtensions(), Version, 1024);
 		}
 	}
 	return next;
@@ -164,14 +156,19 @@ void mvceditor::ResourcePluginClass::AddCodeControlClassContextMenuItems(wxMenu*
 }
 
 void mvceditor::ResourcePluginClass::OnAppReady(wxCommandEvent& event) {
-	mvceditor::ResourceCacheClass* cache = GetResourceCache();
-	cache->SetVersion(GetEnvironment()->Php.Version);
-	cache->InitGlobal(mvceditor::NativeFunctionsAsset());
+	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
+	pelet::Versions version = GetEnvironment()->Php.Version;
+
+	// the resource cache will own all of the globalCache pointers
+	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass;
+	globalCache->Init(mvceditor::NativeFunctionsAsset(), App.Structs.GetPhpFileExtensions(), version);
 	ProjectIndexMenu->Enable(App.Structs.HasSources() && FREE == State);
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	for (project = App.Structs.Projects.begin(); project != App.Structs.Projects.end(); ++project) {
 		if (project->IsEnabled) {
-			cache->InitGlobal(project->ResourceDbFileName);
+			mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass;
+			globalCache->Init(project->ResourceDbFileName, project->GetPhpFileExtensions(), version);
+			resourceCache->RegisterGlobal(globalCache);
 		}
 	}
 
@@ -186,17 +183,39 @@ void mvceditor::ResourcePluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 	if (ResourceFileReader.IsRunning()) {
 		ResourceFileReader.StopReading();
 	}
-	mvceditor::ResourceCacheClass* cache = GetResourceCache();
-	cache->Clear();
-	cache->SetVersion(GetEnvironment()->Php.Version);
+
+	// the user enabled/disaable projects
+	// need to clear the entire cache, then add only the newly enabled projects
+	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
+	resourceCache->Clear();
+	pelet::Versions version = GetEnvironment()->Php.Version;
 	ProjectIndexMenu->Enable(App.Structs.HasSources() && FREE == State);
-	GetResourceCache()->InitGlobal(mvceditor::NativeFunctionsAsset());
-	ResourceFileReader.InitProjectQueue(cache, App.Structs.Projects);
+	
+	// the resource cache will own all of the global cache pointers
+	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass;
+	globalCache->Init(mvceditor::NativeFunctionsAsset(), App.Structs.GetPhpFileExtensions(), version);
+	resourceCache->RegisterGlobal(globalCache);
+	
+	std::vector<mvceditor::ProjectClass>::const_iterator project;
+	for (project = App.Structs.Projects.begin(); project != App.Structs.Projects.end(); ++project) {
+		if (project->IsEnabled && !project->AllPhpSources().empty()) {
+
+			// register the project resource DB file now so that it is available for code completion
+			// even though we know it is stale. The user is notified that the
+			// cache is stale and may not have all of the results
+			// the resource cache will own these pointers
+			globalCache = new mvceditor::GlobalCacheClass;
+			globalCache->Init(project->ResourceDbFileName, project->GetPhpFileExtensions(), version);
+			resourceCache->RegisterGlobal(globalCache);
+		}
+	}
+	
+	ResourceFileReader.InitProjectQueue(App.Structs.Projects, version);
 	mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
 	
-	if (ResourceFileReader.StartReading(error)) {
+	if (ResourceFileReader.ReadNextProject() && ResourceFileReader.StartReading(error)) {
 		State = INDEXING_PROJECT;
-		GetStatusBarWithGauge()->AddGauge(_("Indexing Projects"), ID_COUNT_FILES_GAUGE, 
+		GetStatusBarWithGauge()->AddGauge(_("Indexing Projects From Update"), ID_COUNT_FILES_GAUGE, 
 			StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 	}
 	else if (mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING == error) {
@@ -210,10 +229,6 @@ void mvceditor::ResourcePluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 	else {
 		GetStatusBarWithGauge()->StopGauge(ID_COUNT_FILES_GAUGE);
 	}
-}
-
-void mvceditor::ResourcePluginClass::OnEnvironmentUpdated(wxCommandEvent& event) {
-	GetResourceCache()->SetVersion(GetEnvironment()->Php.Version);
 }
 
 std::vector<mvceditor::ResourceClass> mvceditor::ResourcePluginClass::SearchForResources(const wxString& text) {
@@ -307,17 +322,26 @@ void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
 	}
 }
 
+void mvceditor::ResourcePluginClass::OnGlobalCacheComplete(mvceditor::GlobalCacheCompleteEventClass& event) {
+	mvceditor::GlobalCacheClass* globalCache = event.GlobalCache;
+	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
+	if (resourceCache->IsInitGlobal(globalCache->ResourceDbFileName)) {
+		resourceCache->RemoveGlobal(globalCache->ResourceDbFileName);
+	}
+	resourceCache->RegisterGlobal(globalCache);
+}
+
 void mvceditor::ResourcePluginClass::StartIndex() {
 	if (App.Structs.HasSources()) {
 
 		//prevent two finds at a time
 		if (FREE == State) { 
 			ResourceCacheClass* resourceCache = GetResourceCache();
-			if (ResourceFileReader.InitProjectQueue(resourceCache, App.Structs.Projects) && ResourceFileReader.ReadNextProject()) {
+			if (ResourceFileReader.InitProjectQueue(App.Structs.Projects, GetEnvironment()->Php.Version) && ResourceFileReader.ReadNextProject()) {
 					mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
 					if (ResourceFileReader.StartReading(error)) {
 						State = INDEXING_PROJECT;
-						GetStatusBarWithGauge()->AddGauge(_("Indexing Projects"),
+						GetStatusBarWithGauge()->AddGauge(_("Indexing Projects at Start"),
 							ID_COUNT_FILES_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE,
 							wxGA_HORIZONTAL);
 						if (!HasCodeLookups) {
@@ -479,12 +503,17 @@ void mvceditor::ResourcePluginClass::OnAppFileClosed(wxCommandEvent& event) {
 	// as well. don't want single-leaf files to be parsed for resources .. or
 	// do we?
 	wxString fileName = event.GetString();
-	if (!App.Structs.IsAPhpSourceFile(fileName)) {
-		ResourceFileReader.InitForFile(GetResourceCache(), fileName);
-		mvceditor::BackgroundFileReaderClass::StartError error;
+	std::vector<mvceditor::ProjectClass>::const_iterator project;
+	pelet::Versions version = GetEnvironment()->Php.Version;
+	for (project = App.Structs.Projects.begin(); project != App.Structs.Projects.end(); ++project) {
 
-		// show user the error? not for now as they cannot do anything about it
-		ResourceFileReader.StartReading(error);
+		if (project->IsAPhpSourceFile(fileName)) {
+			ResourceFileReader.InitForFile(*project, fileName, version);
+			mvceditor::BackgroundFileReaderClass::StartError error;
+
+			// show user the error? not for now as they cannot do anything about it
+			ResourceFileReader.StartReading(error);
+		}
 	}
 }
 
@@ -725,4 +754,5 @@ BEGIN_EVENT_TABLE(mvceditor::ResourcePluginClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_RE_INDEX, mvceditor::ResourcePluginClass::OnCmdReIndex)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_CLOSED, mvceditor::ResourcePluginClass::OnAppFileClosed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::ResourcePluginClass::OnAppReady)
+	EVT_GLOBAL_CACHE_COMPLETE(mvceditor::ResourcePluginClass::OnGlobalCacheComplete)
 END_EVENT_TABLE()

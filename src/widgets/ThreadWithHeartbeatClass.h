@@ -243,7 +243,12 @@ class RunningThreadsClass {
 	 */
 	void RemoveAndStop(mvceditor::WorkerThreadClass* worker);
 
-	
+	/**
+	 * stop all of the running threads. This method will block
+	 * until all threads have been killed.
+	 */
+	void StopAll();
+
 	private:
 
 	std::vector<mvceditor::WorkerThreadClass*> Workers;

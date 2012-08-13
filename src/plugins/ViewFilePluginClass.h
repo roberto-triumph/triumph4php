@@ -81,7 +81,7 @@ public:
 	
 	void InitCallStack(ResourceCacheClass& resourceCache);
 	
-	bool InitThread(const wxFileName& fileName, const UnicodeString& className, const UnicodeString& methodName);
+	bool InitThread(const wxFileName& fileName, const UnicodeString& className, const UnicodeString& methodName, pelet::Versions version);
 	
 protected:
 	
@@ -94,6 +94,8 @@ private:
 	UnicodeString ClassName;
 	
 	UnicodeString MethodName;
+
+	pelet::Versions Version;
 };
 
 /**

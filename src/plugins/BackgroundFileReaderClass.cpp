@@ -53,22 +53,16 @@ bool mvceditor::BackgroundFileReaderClass::InitMatched() {
 bool mvceditor::BackgroundFileReaderClass::StartReading(StartError& error) {
 	error = NONE;
 	bool ret = false;
-	bool isAlive = IsRunning();
-	if (!isAlive) {
-		wxThreadError threadError = CreateSingleInstance();
-		if (threadError == wxTHREAD_NO_RESOURCE) {
-			error = NO_RESOURCES;
-		}
-		else if (threadError == wxTHREAD_RUNNING) {
-			error = ALREADY_RUNNING;
-		}
-		else {
-			ret = true;
-			SignalStart();
-		}		
+	wxThreadError threadError = CreateSingleInstance();
+	if (threadError == wxTHREAD_NO_RESOURCE) {
+		error = NO_RESOURCES;
+	}
+	else if (threadError == wxTHREAD_RUNNING) {
+		error = ALREADY_RUNNING;
 	}
 	else {
-		error = ALREADY_RUNNING;
+		ret = true;
+		SignalStart();
 	}
 	return ret;
 }

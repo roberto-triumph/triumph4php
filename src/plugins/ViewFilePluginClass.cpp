@@ -45,7 +45,8 @@ void mvceditor::CallStackThreadClass::InitCallStack(mvceditor::ResourceCacheClas
 	}
 }
 
-bool mvceditor::CallStackThreadClass::InitThread(const wxFileName& startFileName, const UnicodeString& className, const UnicodeString& methodName) {
+bool mvceditor::CallStackThreadClass::InitThread(const wxFileName& startFileName, const UnicodeString& className, const UnicodeString& methodName,
+												 pelet::Versions version) {
 	StackFile.Clear();
 	WriteError = false;
 	bool ret = false;
@@ -55,6 +56,7 @@ bool mvceditor::CallStackThreadClass::InitThread(const wxFileName& startFileName
 	StartFileName = startFileName;
 	ClassName = className;
 	MethodName = methodName;
+	Version = version;
 	LastError = mvceditor::CallStackClass::NONE;
 	wxThreadError threadError = CreateSingleInstance();
 	if (threadError == wxTHREAD_NO_RESOURCE) {
@@ -73,7 +75,7 @@ bool mvceditor::CallStackThreadClass::InitThread(const wxFileName& startFileName
 void mvceditor::CallStackThreadClass::Entry() {
 	
 	// build the call stack then save it to a temp file
-	if (CallStack->Build(StartFileName, ClassName, MethodName, LastError)) {
+	if (CallStack->Build(StartFileName, ClassName, MethodName, Version, LastError)) {
 		StackFile.AssignTempFileName(wxT("call_stack"));
 		if (!StackFile.IsOk()) {
 			mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, _("Could not create call stack file in ") + StackFile.GetFullPath());
@@ -155,8 +157,10 @@ void mvceditor::ViewFilePluginClass::StartDetection() {
 		if (fileName.IsOk()) {
 			UnicodeString className = mvceditor::StringHelperClass::wxToIcu(App.Structs.CurrentUrl.ClassName);
 			UnicodeString methodName =  mvceditor::StringHelperClass::wxToIcu(App.Structs.CurrentUrl.MethodName);
+			
+			// TODO: this isn't good, resource cache is not meant to be read/written to from multiple threads
 			CallStackThread.InitCallStack(*GetResourceCache());
-			if (!CallStackThread.InitThread(fileName, className, methodName)) {
+			if (!CallStackThread.InitThread(fileName, className, methodName, GetEnvironment()->Php.Version)) {
 				mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Call stack file creation failed"));
 			}
 			else {

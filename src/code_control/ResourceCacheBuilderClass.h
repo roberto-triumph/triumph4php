@@ -31,9 +31,54 @@
 
 namespace mvceditor {
 
+extern const wxEventType EVENT_WORKING_CACHE_COMPLETE;
+
+extern const wxEventType EVENT_GLOBAL_CACHE_COMPLETE;
+
+class WorkingCacheCompleteEventClass : public wxEvent {
+public:
+
+	/**
+	 * This will be owned by the event handler
+	 */
+	mvceditor::WorkingCacheClass* WorkingCache;
+
+	WorkingCacheCompleteEventClass(mvceditor::WorkingCacheClass* workingCache);
+
+	wxEvent* Clone() const;
+};
+
+typedef void (wxEvtHandler::*WorkingCacheCompleteEventClassFunction)(WorkingCacheCompleteEventClass&);
+
+#define EVT_WORKING_CACHE_COMPLETE(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_WORKING_CACHE_COMPLETE, wxID_ANY, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( WorkingCacheCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
+
+class GlobalCacheCompleteEventClass : public wxEvent {
+public:
+
+	/**
+	 * This will be owned by the event handler
+	 */
+	mvceditor::GlobalCacheClass* GlobalCache;
+
+	GlobalCacheCompleteEventClass(mvceditor::GlobalCacheClass* globalCache);
+
+	wxEvent* Clone() const;
+};
+
+typedef void (wxEvtHandler::*GlobalCacheCompleteEventClassFunction)(GlobalCacheCompleteEventClass&);
+
+#define EVT_GLOBAL_CACHE_COMPLETE(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_GLOBAL_CACHE_COMPLETE, wxID_ANY, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( GlobalCacheCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
+
+
 /**
  * This class will run the resource updates in a background thread.  The caller will use
- * the Register() method when a new file is opened by the user.  Every so ofte, the 
+ * the Register() method when a new file is opened by the user.  Every so often, the 
  * StartBackgroundUpdate() method should be called to trigger re-parsing of the resources
  * on the background task.  The results of the resource parsing will be stored in an 
  * internal cache that's separate from the 'global' cache; that way the entire global cache
@@ -41,27 +86,28 @@ namespace mvceditor {
  * This class will NEVER update the 'global' resource finder; the caller must take care
  * of updating the global resource finder when the user closes the file.
  */
-class ResourceCacheBuilderClass : public ThreadWithHeartbeatClass {
+class WorkingCacheBuilderClass : public ThreadWithHeartbeatClass {
 	
 public:
 
 	/**
 	 * @param the handler will get notified to EVENT_WORK* events with the given ID
-	 * pointer will NOT be owned by this object
+	 *        and the EVENT_WORKING_CACHE_COMPLETE.
+	 *        pointer will NOT be owned by this object
 	 */
-	ResourceCacheBuilderClass(ResourceCacheClass* resourceCache, wxEvtHandler& handler,
+	WorkingCacheBuilderClass(wxEvtHandler& handler,
 		mvceditor::RunningThreadsClass& runningThreads, int eventId = wxID_ANY);
 		
 	/**
-	 * Will run a background thread to parse the resources of the given 
+	 * Will start a background thread to parse the resources of the given 
 	 * text.
-	 * This method is thread-safe.
 	 * 
 	 * @param fileName unique identifier for a file
 	 * @param code the file's most up-to-date source code (from the user-edited buffer)
 	 * @param bool if TRUE then tileName is a new file that is not yet written to disk
+	 * @param version The version of PHP to check against
 	 */
-	wxThreadError StartBackgroundUpdate(const wxString& fileName, const UnicodeString& code, bool isNew);
+	wxThreadError Init(const wxString& fileName, const UnicodeString& code, bool isNew, pelet::Versions version);
 
 protected:
 	
@@ -71,19 +117,6 @@ protected:
 	void Entry();
 	
 private:
-
-	/**
-	 * the type of work that will happen in the background thread
-	 */
-	enum Modes {
-		UPDATE
-	} Mode;
-
-	/**
-	 * This is the object that will hold all of the resource cache. It should not be accessed while
-	 * the thread is running. Pointer will NOT be owned by this object.
-	 */
-	ResourceCacheClass* ResourceCache;
 
 	/**
 	 * the code that is being worked on by the background thread.
@@ -99,6 +132,11 @@ private:
 	 * if TRUE then tileName is a new file that does not yet exist on disk
 	 */
 	bool CurrentFileIsNew;
+
+	/**
+	 * The version of PHP to check against
+	 */
+	pelet::Versions CurrentVersion;
 
 };
 

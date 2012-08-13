@@ -121,6 +121,7 @@ void mvceditor::AppFrameClass::OnClose(wxCloseEvent& event) {
 			delete logger;
 		}
 		wxLog::DontCreateOnDemand();
+		App.RunningThreads.StopAll();
 		Destroy();
 	}
 }
