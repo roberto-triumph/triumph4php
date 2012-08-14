@@ -36,40 +36,52 @@ static int ID_CONTEXT_MENU_SHOW_OUTLINE_OTHER = wxNewId();
 static int ID_WINDOW_OUTLINE = wxNewId();
 static int ID_CONTEXT_MENU_SHOW_OUTLINE_CURRENT = wxNewId();
 
+const wxEventType mvceditor::EVENT_RESOURCE_FINDER_COMPLETE = wxNewEventType();
+
+mvceditor::ResourceFinderCompleteEventClass::ResourceFinderCompleteEventClass(const std::vector<mvceditor::ResourceClass>& resources)
+	: wxEvent(wxID_ANY, mvceditor::EVENT_RESOURCE_FINDER_COMPLETE)
+	, Resources(resources) {
+		
+}
+
+wxEvent* mvceditor::ResourceFinderCompleteEventClass::Clone() const {
+	return new mvceditor::ResourceFinderCompleteEventClass(Resources);
+}
+
 mvceditor::ResourceFinderBackgroundThreadClass::ResourceFinderBackgroundThreadClass(wxEvtHandler& handler,
 		mvceditor::RunningThreadsClass& runningThreads)
 	: ThreadWithHeartbeatClass(handler, runningThreads) 
-	, Resources()
 	, ResourceFinder() 
 	, FileName() {
-
-	// need this so that the resource finder parsers the file
-	ResourceFinder.InitMemory();
-	ResourceFinder.FileFilters.push_back(wxT("*.*"));
 }
 
 bool mvceditor::ResourceFinderBackgroundThreadClass::Start(const wxString& fileName, const mvceditor::EnvironmentClass& environment) {
 	FileName = fileName;
+	
+	// need this so that the resource finder parsers the file
+	ResourceFinder.InitMemory();
+	ResourceFinder.FileFilters.push_back(wxT("*.*"));
+	
 	ResourceFinder.SetVersion(environment.Php.Version);
 	wxThreadError error = CreateSingleInstance();
 	bool created = wxTHREAD_NO_ERROR == error;
 	return created;
 }
 
-void mvceditor::ResourceFinderBackgroundThreadClass::Entry() {
+void mvceditor::ResourceFinderBackgroundThreadClass::BackgroundWork() {
 	if (wxFileName::FileExists(FileName)) {
-		ResourceFinder.Wipe();
 
 		// need this call so that resources are actually parsed
 		ResourceFinder.Walk(FileName);
-		Resources = ResourceFinder.All();
-		SignalEnd();
+		std::vector<mvceditor::ResourceClass> resources = ResourceFinder.All();
+		mvceditor::ResourceFinderCompleteEventClass evt(resources);
+		wxPostEvent(&Handler, evt);
 	}
 }
 
 mvceditor::OutlineViewPluginClass::OutlineViewPluginClass(mvceditor::AppClass& app)
 	: PluginClass(app)
-	, ResourceFinderBackground(*this, app.RunningThreads) {
+	, ResourceFinderBackground(NULL) {
 	
 }
 
@@ -91,7 +103,8 @@ void mvceditor::OutlineViewPluginClass::AddCodeControlClassContextMenuItems(wxMe
 void mvceditor::OutlineViewPluginClass::BuildOutlineCurrentCodeControl() {
 	CodeControlClass* code = GetCurrentCodeControl();
 	if (code != NULL) {
-		if (ResourceFinderBackground.Start(code->GetFileName(), *GetEnvironment())) {
+		ResourceFinderBackground = new mvceditor::ResourceFinderBackgroundThreadClass(*this, App.RunningThreads);
+		if (ResourceFinderBackground->Start(code->GetFileName(), *GetEnvironment())) {
 			wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 			if (window != NULL) {
 				OutlineViewPluginPanelClass* outlineViewPanel = (OutlineViewPluginPanelClass*)window;
@@ -102,26 +115,22 @@ void mvceditor::OutlineViewPluginClass::BuildOutlineCurrentCodeControl() {
 	}
 }
 
-void mvceditor::OutlineViewPluginClass::BuildOutline(const wxString& className) {
-	ResourceFinderBackground.Resources.clear();
-	
+std::vector<mvceditor::ResourceClass> mvceditor::OutlineViewPluginClass::BuildOutline(const wxString& className) {	
 	mvceditor::ResourceCacheClass* resourceCache =  GetResourceCache();
-	std::vector<mvceditor::ResourceClass>  matches; 
+	std::vector<mvceditor::ResourceClass> allMatches;
+	std::vector<mvceditor::ResourceClass> matches; 
 
 	// get the class resource itself
 	matches = resourceCache->CollectFullyQualifiedResourceFromAll(mvceditor::WxToIcu(className));
-	for (size_t i = 0; i < matches.size(); ++i) {
-		ResourceFinderBackground.Resources.push_back(matches[i]);
-	}
+	allMatches.insert(allMatches.end(), matches.begin(), matches.end());
 
 	// make the resource finder match on all methods / properties
 	UnicodeString lookup;
 	lookup += mvceditor::WxToIcu(className);
 	lookup += UNICODE_STRING_SIMPLE("::");
 	matches = GetResourceCache()->CollectNearMatchResourcesFromAll(lookup);
-	for (size_t i = 0; i < matches.size(); ++i) {
-		ResourceFinderBackground.Resources.push_back(matches[i]);
-	}
+	allMatches.insert(allMatches.end(), matches.begin(), matches.end());
+	return allMatches;
 }
 
 void mvceditor::OutlineViewPluginClass::JumpToResource(const wxString& resource) {
@@ -146,12 +155,13 @@ void mvceditor::OutlineViewPluginClass::JumpToResource(const wxString& resource)
 void mvceditor::OutlineViewPluginClass::OnContextMenuOutline(wxCommandEvent& event) {
 	CodeControlClass* code = GetCurrentCodeControl();
 	bool modified = false;
+	std::vector<mvceditor::ResourceClass> matches;
 	if (event.GetId() == ID_CONTEXT_MENU_SHOW_OUTLINE_CURRENT || event.GetId() == mvceditor::MENU_OUTLINE) {
 		BuildOutlineCurrentCodeControl();
 		modified = true;
 	}
 	else if (event.GetId() == ID_CONTEXT_MENU_SHOW_OUTLINE_OTHER && code && !code->GetSelectedText().IsEmpty()) { 
-		BuildOutline(code->GetSelectedText()); 
+		matches = BuildOutline(code->GetSelectedText()); 
 		modified = true; 
 	} 
 	if (modified) {
@@ -162,7 +172,7 @@ void mvceditor::OutlineViewPluginClass::OnContextMenuOutline(wxCommandEvent& eve
 		if (window != NULL) {
 			outlineViewPanel = (OutlineViewPluginPanelClass*)window;
 			SetFocusToOutlineWindow(outlineViewPanel);
-			outlineViewPanel->RefreshOutlines();
+			outlineViewPanel->RefreshOutlines(matches);
 		}
 		else {
 			mvceditor::NotebookClass* notebook = GetNotebook();
@@ -170,7 +180,7 @@ void mvceditor::OutlineViewPluginClass::OnContextMenuOutline(wxCommandEvent& eve
 				outlineViewPanel = new OutlineViewPluginPanelClass(GetOutlineNotebook(), ID_WINDOW_OUTLINE, this, notebook);
 				if (AddOutlineWindow(outlineViewPanel, wxT("Outline"))) {
 					outlineViewPanel->SetClasses(GetResourceCache()->AllNonNativeClassesGlobal());
-					outlineViewPanel->RefreshOutlines();
+					outlineViewPanel->RefreshOutlines(matches);
 				}
 			}
 		}	
@@ -190,17 +200,20 @@ void mvceditor::OutlineViewPluginClass::OnContentNotebookPageChanged(wxAuiNotebo
 		OutlineViewPluginPanelClass* outlineViewPanel = (OutlineViewPluginPanelClass*)window;
 		SetFocusToOutlineWindow(outlineViewPanel);
 		BuildOutlineCurrentCodeControl();
-		outlineViewPanel->RefreshOutlines();
 	}
 	event.Skip();
 }
 
 void mvceditor::OutlineViewPluginClass::OnWorkComplete(wxCommandEvent &event) {
+	ResourceFinderBackground = NULL;
+}
+
+void mvceditor::OutlineViewPluginClass::OnResourceFinderComplete(mvceditor::ResourceFinderCompleteEventClass& event) {
 	wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 	if (window != NULL) {
 		OutlineViewPluginPanelClass* outlineViewPanel = (OutlineViewPluginPanelClass*)window;
 		SetFocusToOutlineWindow(outlineViewPanel);
-		outlineViewPanel->RefreshOutlines();
+		outlineViewPanel->RefreshOutlines(event.Resources);
 	}
 }
 
@@ -225,77 +238,78 @@ void mvceditor::OutlineViewPluginPanelClass::SetClasses(const std::vector<mvcedi
 	}
 }
 
-void mvceditor::OutlineViewPluginPanelClass::RefreshOutlines() {
+void mvceditor::OutlineViewPluginPanelClass::RefreshOutlines(const std::vector<mvceditor::ResourceClass>& resources) {
 	Tree->Freeze();
 	Tree->DeleteAllItems();
 	wxTreeItemId rootId = Tree->AddRoot(_("Outline"));
 	StatusLabel->SetLabel(_(""));
-	std::vector<mvceditor::ResourceClass> resources = Plugin->ResourceFinderBackground.Resources;
-	for (size_t i = 0; i < resources.size(); ++i) {
+	std::vector<mvceditor::ResourceClass>::const_iterator resource;
+	for (resource = resources.begin(); resource != resources.end(); ++resource) {
 
 		// for now never show dynamic resources since there is no way we can know where the source for them is.
-		int type = resources[i].Type;
-		if (mvceditor::ResourceClass::DEFINE == type && !resources[i].IsDynamic) {
-			UnicodeString res = resources[i].Identifier;
+		int type = resource->Type;
+		if (mvceditor::ResourceClass::DEFINE == type && !resource->IsDynamic) {
+			UnicodeString res = resource->Identifier;
 			wxString label = mvceditor::IcuToWx(res);
 			label = _("[D] ") + label;
 			Tree->AppendItem(rootId, label);
 		}
-		else if (mvceditor::ResourceClass::CLASS == type && !resources[i].IsDynamic) {
-			UnicodeString res = resources[i].Identifier;
+		else if (mvceditor::ResourceClass::CLASS == type && !resource->IsDynamic) {
+			UnicodeString res = resource->Identifier;
 			wxString label = mvceditor::IcuToWx(res);
 			label = _("[C] ") + label;
 			wxTreeItemId classId = Tree->AppendItem(rootId, label);
 
 			// for now just loop again through the resources
 			// for the class we are going to add
-			for (size_t j = 0; j < resources.size(); ++j) {
-				if (resources[j].ClassName.caseCompare(resources[i].Identifier, 0) == 0  && !resources[j].IsDynamic) {
-					UnicodeString res = resources[j].Identifier;
+			std::vector<mvceditor::ResourceClass>::const_iterator j;
+			for (j = resources.begin(); j != resources.end(); ++j) {
+				if (j->ClassName.caseCompare(resource->Identifier, 0) == 0  && !j->IsDynamic) {
+					UnicodeString res = j->Identifier;
 					wxString label = mvceditor::IcuToWx(res);
-					if (mvceditor::ResourceClass::MEMBER == resources[j].Type) {
+					if (mvceditor::ResourceClass::MEMBER == j->Type) {
 						label = _("[P] ") + label;
-						if (!resources[j].ReturnType.isEmpty()) {
-							wxString returnType = mvceditor::IcuToWx(resources[j].ReturnType);
+						if (!j->ReturnType.isEmpty()) {
+							wxString returnType = mvceditor::IcuToWx(j->ReturnType);
 							label = label + wxT(" [") + returnType + wxT("]");
 						}
 						Tree->AppendItem(classId, label);
 					}
-					else if (mvceditor::ResourceClass::METHOD == resources[j].Type) {
+					else if (mvceditor::ResourceClass::METHOD == j->Type) {
 						label = _("[M] ") + label;
 
 						// add the function signature to the label
-						int32_t sigIndex = resources[j].Signature.indexOf(UNICODE_STRING_SIMPLE(" function ")); 
+						int32_t sigIndex = j->Signature.indexOf(UNICODE_STRING_SIMPLE(" function ")); 
 						if (sigIndex > 0) {
-							UnicodeString sig(resources[j].Signature, sigIndex + 10);
+							UnicodeString sig(j->Signature, sigIndex + 10);
 							label = _("[M] ") + mvceditor::IcuToWx(sig);
 						}
-						if (!resources[j].ReturnType.isEmpty()) {
-							wxString returnType = mvceditor::IcuToWx(resources[j].ReturnType);
+						if (!j->ReturnType.isEmpty()) {
+							wxString returnType = mvceditor::IcuToWx(j->ReturnType);
 							label += wxT(" [") + returnType + wxT("]");
 						}
 						Tree->AppendItem(classId, label);
 					}
-					else if (mvceditor::ResourceClass::CLASS_CONSTANT == resources[j].Type) {
+					else if (mvceditor::ResourceClass::CLASS_CONSTANT == j->Type) {
 						label = _("[O] ") + label;
 						Tree->AppendItem(classId, label);
 					}
 				}
 			}
 		}
-		else if (mvceditor::ResourceClass::FUNCTION == type && !resources[i].IsDynamic) {
-			UnicodeString res = resources[i].Identifier;
+		else if (mvceditor::ResourceClass::FUNCTION == type && !resource->IsDynamic) {
+			UnicodeString res = resource->Identifier;
 			wxString label = mvceditor::IcuToWx(res);
 			label = _("[F] ") + label;
 
 			// add the function signature to the label
-			int32_t sigIndex = resources[i].Signature.indexOf(UNICODE_STRING_SIMPLE("function ")); 
+			int32_t sigIndex = resource->Signature.indexOf(UNICODE_STRING_SIMPLE("function ")); 
 			if (sigIndex >= 0) {
-				UnicodeString sig(resources[i].Signature, sigIndex + 9);
+				UnicodeString sig(resource->Signature, sigIndex + 9);
 				label = _("[F] ") + mvceditor::IcuToWx(sig);
 			}
-			if (!resources[i].ReturnType.isEmpty()) {
-				wxString returnType = mvceditor::IcuToWx(resources[i].ReturnType);
+			if (!resource->ReturnType.isEmpty()) {
+				wxString returnType = mvceditor::IcuToWx(resource->ReturnType);
 				label += wxT(" [") + returnType + wxT("]");
 			}
 			Tree->AppendItem(rootId, label);
@@ -322,8 +336,8 @@ void mvceditor::OutlineViewPluginPanelClass::OnHelpButton(wxCommandEvent& event)
 void mvceditor::OutlineViewPluginPanelClass::OnChoice(wxCommandEvent& event) {
 	wxString lookup = event.GetString();
 	if (!lookup.IsEmpty()) {
-		Plugin->BuildOutline(lookup);
-		RefreshOutlines();
+		std::vector<mvceditor::ResourceClass> resources = Plugin->BuildOutline(lookup);
+		RefreshOutlines(resources);
 	}
 }
 
@@ -394,4 +408,5 @@ BEGIN_EVENT_TABLE(mvceditor::OutlineViewPluginClass, wxEvtHandler)
 	EVT_MENU(ID_CONTEXT_MENU_SHOW_OUTLINE_OTHER, mvceditor::OutlineViewPluginClass::OnContextMenuOutline)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::OutlineViewPluginClass::OnContentNotebookPageChanged)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::OutlineViewPluginClass::OnWorkComplete)
+	EVT_RESOURCE_FINDER_COMPLETE(mvceditor::OutlineViewPluginClass::OnResourceFinderComplete)
 END_EVENT_TABLE()

@@ -94,7 +94,7 @@ bool mvceditor::FindInFilesBackgroundReaderClass::InitForReplace(wxEvtHandler* h
 	return InitMatched();
 }
 
-bool mvceditor::FindInFilesBackgroundReaderClass::FileRead(DirectorySearchClass& search) {
+bool mvceditor::FindInFilesBackgroundReaderClass::BackgroundFileRead(DirectorySearchClass& search) {
 	bool found = false;
 	found = search.Walk(FindInFiles);
 	if (found) {
@@ -127,7 +127,7 @@ bool mvceditor::FindInFilesBackgroundReaderClass::FileRead(DirectorySearchClass&
 	return found;
 }
 
-bool mvceditor::FindInFilesBackgroundReaderClass::FileMatch(const wxString& file) {
+bool mvceditor::FindInFilesBackgroundReaderClass::BackgroundFileMatch(const wxString& file) {
 	wxString fileToReplace = file;
 	int matches = 0;
 
@@ -143,7 +143,7 @@ mvceditor::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* 
 		StatusBarWithGaugeClass* gauge, mvceditor::RunningThreadsClass& runningThreads)
 	: FindInFilesResultsPanelGeneratedClass(parent)
 	, FindInFiles()
-	, FindInFilesBackgroundFileReader(*this, runningThreads)
+	, FindInFilesBackgroundFileReader(NULL)
 	, Notebook(notebook)
 	, Gauge(gauge)
 	, MatchedFiles(0) {
@@ -153,11 +153,11 @@ mvceditor::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* 
 mvceditor::FindInFilesResultsPanelClass::~FindInFilesResultsPanelClass() {
 
 	// make sure we kill any running searches
-	if (FindInFilesBackgroundFileReader.IsRunning()) {
-		FindInFilesBackgroundFileReader.StopReading();
+	if (FindInFilesBackgroundFileReader) {
+		FindInFilesBackgroundFileReader->StopReading();
 		
-		// dont try to kill the gauge as the gauge window is not valid anymore
-		// since this object has a program-wide scope.
+		// dont try to kill the gauge as the gauge window may not valid anymore
+		// if the program is closed while the find is running
 	}
 }
 
@@ -166,14 +166,15 @@ void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findI
 	MatchedFiles = 0;
 
 	// for now disallow another find when one is already active
-	if (FindInFilesBackgroundFileReader.IsRunning()) {
+	if (NULL != FindInFilesBackgroundFileReader) {
 		wxMessageBox(_("Find in files is already running. Please wait for it to finish."), _("Find In Files"));
 		return;
 	}
 	std::vector<wxString> skipFiles = Notebook->GetOpenedFiles();
-	if (FindInFilesBackgroundFileReader.InitForFind(this, FindInFiles, doHiddenFiles, skipFiles)) {
+	FindInFilesBackgroundFileReader = new mvceditor::FindInFilesBackgroundReaderClass(*this, Plugin.App.RunningThreads);
+	if (FindInFilesBackgroundFileReader->InitForFind(this, FindInFiles, doHiddenFiles, skipFiles)) {
 		mvceditor::BackgroundFileReaderClass::StartError error;
-		if (FindInFilesBackgroundFileReader.StartReading(error)) {
+		if (FindInFilesBackgroundFileReader->StartReading(error)) {
 			EnableButtons(true, false, false);
 			Gauge->AddGauge(_("Find In Files"), FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE, 
 				wxGA_HORIZONTAL);
@@ -184,13 +185,19 @@ void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findI
 		}
 		else if (error == mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING)  {
 			wxMessageBox(_("Find in files is already running. Please wait for it to finish."), _("Find In Files"));
+			delete FindInFilesBackgroundFileReader;
+			FindInFilesBackgroundFileReader = NULL;
 		}
 		else if (error == mvceditor::BackgroundFileReaderClass::NO_RESOURCES)  {
 			mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
+			delete FindInFilesBackgroundFileReader;
+			FindInFilesBackgroundFileReader = NULL;
 		}
 	}
 	else {
 		wxMessageBox(_("Please enter a valid expression and path."));
+		delete FindInFilesBackgroundFileReader;
+		FindInFilesBackgroundFileReader = NULL;
 	}
 }
 
@@ -317,7 +324,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceAllInFileButton(wxCommand
 void mvceditor::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxCommandEvent& event) {
 
 	// for now disallow another replace when one is already active
-	if (FindInFilesBackgroundFileReader.IsRunning()) {
+	if (NULL != FindInFilesBackgroundFileReader) {
 		wxMessageBox(_("Find in files is already running. Please wait for it to finish."), _("Find In Files"));
 		return;
 	}

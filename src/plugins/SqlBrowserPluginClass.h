@@ -151,7 +151,7 @@ public:
 	
 protected:
 
-	void Entry();
+	void BackgroundWork();
 
 private:
 
@@ -300,8 +300,9 @@ private:
 	
 	/**
 	 * used to process the SQL and execute the queries one at a time
+	 * This pointer will self-destruct
 	 */
-	MultipleSqlExecuteClass MultipleSqlExecute;
+	MultipleSqlExecuteClass* MultipleSqlExecute;
 	
 	/**
 	 * the accumulated results. This class will DELETE the pointers once it has rendered them.
@@ -398,7 +399,7 @@ public:
 	
 protected:
 
-	void Entry();
+	void BackgroundWork();
 	
 	/**
 	 * The connections to query; where the tables / columns will be fetched from 
@@ -473,9 +474,9 @@ private:
 	void SavePreferences();
 		
 	/**
-	 * To detect the SQL connections
+	 * To detect the SQL connections. This pointer will self-destruct
 	 */
-	SqlMetaDataFetchClass SqlMetaDataFetch;
+	SqlMetaDataFetchClass* SqlMetaDataFetch;
 	
 	/**
 	 * index into Infos vector; the connection that is currently active.

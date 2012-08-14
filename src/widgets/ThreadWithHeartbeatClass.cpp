@@ -24,73 +24,54 @@
  */
 #include <widgets/ThreadWithHeartbeatClass.h>
 
-mvceditor::WorkerThreadClass::WorkerThreadClass(mvceditor::RunningThreadsClass& runningThreads,
-		mvceditor::ThreadWithHeartbeatClass& owner)
-	: wxThread()
-	, RunningThreads(runningThreads) 
-	, Owner(owner) {
-
-}
-void* mvceditor::WorkerThreadClass::Entry() {
-	RunningThreads.Add(this);
-	Owner.Entry();
-	
-	// by doing this the owner can know when the work has been done
-	// since we are using detached threads, the thread delete themselves
-	Owner.Worker = NULL;
-	RunningThreads.Remove(this);
-	return 0;
-}
 
 mvceditor::ThreadWithHeartbeatClass::ThreadWithHeartbeatClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, 
 		int id)
 	: wxEvtHandler()
+	, wxThread()
 	, Handler(handler)
 	, Timer()
 	, RunningThreads(runningThreads)
 	, EventId(id) {
 	Timer.SetOwner(this);
-	Worker = NULL;
 }
 
 mvceditor::ThreadWithHeartbeatClass::~ThreadWithHeartbeatClass() {
-	KillInstance();
+	
 }
 
 wxThreadError mvceditor::ThreadWithHeartbeatClass::CreateSingleInstance() {
 	wxThreadError error = wxTHREAD_NO_ERROR;
-	if (IsRunning()) {
-		error = wxTHREAD_RUNNING;
+	error = Create();
+	if (error == wxTHREAD_NO_ERROR) {
+		SignalStart();
+		Run();
 	}
 	else {
-		Worker = new mvceditor::WorkerThreadClass(RunningThreads, *this);
-		error = Worker->Create();
-		if (error == wxTHREAD_NO_ERROR) {
-			Worker->Run();
-		}
-		else {
-			delete Worker;
-			Worker = NULL;
-		}
+		delete this;
 	}
 	return error;
 }
 
 void mvceditor::ThreadWithHeartbeatClass::KillInstance() {
-	if (IsRunning()) {
-		RunningThreads.RemoveAndStop(Worker);
-		Worker = NULL;
-	}
 	Timer.Stop();
+	
+	// RemoveAndStop() will call Delete which will gracefully end
+	// the thread and then SignalEnd() will be called; no need
+	// to call it here
+	RunningThreads.RemoveAndStop(this);
 }
 
 void mvceditor::ThreadWithHeartbeatClass::ForceKillInstance() {
-	if (IsRunning()) {
-		RunningThreads.Remove(Worker);
-		Worker->Kill();
-		Worker = NULL;
-	}
-	Timer.Stop();
+	
+	// since killing does not clean up, we must clean up
+	// ourselves. we need to trigger the complete event so 
+	// that the other code can remove their pointers to this
+	// object too
+	SignalEnd();
+	RunningThreads.Remove(this);
+	Kill();
+	delete this;
 }
 
 void mvceditor::ThreadWithHeartbeatClass::SignalStart() {
@@ -102,23 +83,25 @@ void mvceditor::ThreadWithHeartbeatClass::SignalEnd() {
 	wxCommandEvent evt(mvceditor::EVENT_WORK_COMPLETE, EventId);
 	wxPostEvent(&Handler, evt);
 }
-	
-bool mvceditor::ThreadWithHeartbeatClass::TestDestroy() {
-	bool ret = true;
-	if (Worker) {
-		ret = Worker->TestDestroy();
-	}
-	return ret;
-}
 
 void mvceditor::ThreadWithHeartbeatClass::OnTimer(wxTimerEvent& event) {
 	wxCommandEvent evt(mvceditor::EVENT_WORK_IN_PROGRESS, EventId);
 	wxPostEvent(&Handler, evt);
 }
 
-bool mvceditor::ThreadWithHeartbeatClass::IsRunning() const {
-	return Worker != NULL;
+void* mvceditor::ThreadWithHeartbeatClass::Entry() {
+	RunningThreads.Add(this);
+	BackgroundWork();
+	
+	// by doing this the owner can know when the work has been done
+	// since we are using detached threads, the thread delete themselves
+	RunningThreads.Remove(this);
+	if (!TestDestroy()) {
+		SignalEnd();
+	}
+	return 0;
 }
+
 
 mvceditor::RunningThreadsClass::RunningThreadsClass()
 	: Workers()
@@ -126,18 +109,18 @@ mvceditor::RunningThreadsClass::RunningThreadsClass()
 		
 }
 
-void mvceditor::RunningThreadsClass::Add(mvceditor::WorkerThreadClass* worker) {
+void mvceditor::RunningThreadsClass::Add(wxThread* thread) {
 	wxMutexLocker locker(Mutex);
 	wxASSERT(locker.IsOk());
-	Workers.push_back(worker);
+	Workers.push_back(thread);
 }
 
-void mvceditor::RunningThreadsClass::Remove(mvceditor::WorkerThreadClass* worker) {
+void mvceditor::RunningThreadsClass::Remove(wxThread* thread) {
 	wxMutexLocker locker(Mutex);
 	wxASSERT(locker.IsOk());
-	std::vector<mvceditor::WorkerThreadClass*>::iterator it = Workers.begin();
+	std::vector<wxThread*>::iterator it = Workers.begin();
 	while (it != Workers.end()) {
-		if (*it == worker) {
+		if (*it == thread) {
 			
 			// untrack only 
 			it = Workers.erase(it);
@@ -148,18 +131,19 @@ void mvceditor::RunningThreadsClass::Remove(mvceditor::WorkerThreadClass* worker
 	}
 }
 
-void mvceditor::RunningThreadsClass::RemoveAndStop(mvceditor::WorkerThreadClass* worker) {
+void mvceditor::RunningThreadsClass::RemoveAndStop(wxThread* thread) {
 
 	// no need to synchronize here as we are not touching the 
 	// internal vector
 
 	// wxThread::Delete will result in graceful thread termination 
 	// will call Remove() which will untrack the thread
-	worker->Delete();
+	Remove(thread);
+	thread->Delete();
 }
 
 void mvceditor::RunningThreadsClass::StopAll() {
-	std::vector<mvceditor::WorkerThreadClass*> copy;
+	std::vector<wxThread*> copy;
 	{
 
 		// need to copy the threads so that we can Delete() them
@@ -169,7 +153,7 @@ void mvceditor::RunningThreadsClass::StopAll() {
 		wxASSERT(locker.IsOk());
 		copy = Workers;
 	}
-	std::vector<mvceditor::WorkerThreadClass*>::iterator it;
+	std::vector<wxThread*>::iterator it;
 	for (it = copy.begin(); it != copy.end(); ++it) {
 		(*it)->Delete();
 	}

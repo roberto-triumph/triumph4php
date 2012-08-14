@@ -54,16 +54,6 @@ public:
 	ResourceFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
 
 	/**
-	 * prepare to iterate through all files of the given projects
-	 * that match the given wildcard.
-	 *
-	 * @param projects the directories to be scanned (recursively)
-	 * @param version the version of PHP to check against
-	 * @return bool false if none of the projects are enabled or none of the projects have a PHP source directory
-	 */
-	bool InitProjectQueue(const std::vector<mvceditor::ProjectClass>& projects, pelet::Versions version);
-
-	/**
 	 * prepare to iterate through the given file. The name part of the given file must match the wildcard.
 	 * This method can be used to update the resources once a file has been modified on disk.
 	 *
@@ -75,35 +65,25 @@ public:
 	bool InitForFile(const mvceditor::ProjectClass& project, const wxString& fullPath, pelet::Versions version);
 
 	/**
-	 * @return TRUE if there are more projects in the queue
-	 */
-	bool MoreProjects() const;
-
-	/**
 	 * initialize the next project in the queue to be read. After a call to this method, the background
 	 * thread can be started.
 	 * @return TRUE if the project has at least one source directory that exists
 	 */
-	bool ReadNextProject();
+	bool InitProject(const mvceditor::ProjectClass& project, pelet::Versions version);
 
 protected:
 
 	/**
 	 * Files will be parsed for resouces in a background thread.
 	 */
-	virtual bool FileRead(DirectorySearchClass& search);
+	virtual bool BackgroundFileRead(DirectorySearchClass& search);
 
 	/**
 	 * Resources will only look for PHP files.
 	 */
-	virtual bool FileMatch(const wxString& file);
+	virtual bool BackgroundFileMatch(const wxString& file);
 
 private:
-
-	/**
-	 * Queue of projects to be indexed.
-	 */
-	std::queue<mvceditor::ProjectClass> ProjectQueue;
 
 	/**
 	 * the version of PHP to parse against
@@ -232,6 +212,40 @@ private:
 	 * @param matches any native mataches from this given vector will be removed
 	 */
 	void RemoveNativeMatches(std::vector<mvceditor::ResourceClass>& matches) const;
+	
+	/**
+	 * prepare to iterate through all files of the given projects
+	 * that match the given wildcard.
+	 *
+	 * @param projects the directories to be scanned (recursively)
+	 * @return bool false if none of the projects are enabled or none of the projects have a PHP source directory
+	 */
+	bool InitProjectQueue(const std::vector<mvceditor::ProjectClass>& projects);
+
+	/**
+	 * prepare to iterate through the given file. The name part of the given file must match the wildcard.
+	 * This method can be used to update the resources once a file has been modified on disk.
+	 *
+	 * @param project the project that holds the file
+	 * @param fullPath file to be scanned (full path, including name).
+	 * @param version the version of PHP to check against
+	 * @return bool false file does not exist
+	 */
+	bool InitForFile(const mvceditor::ProjectClass& project, const wxString& fullPath, pelet::Versions version);
+
+	/**
+	 * @return TRUE if there are more projects in the queue
+	 */
+	bool MoreProjects() const;
+
+	/**
+	 * initialize the next project in the queue to be read. After a call to this method, the background
+	 * thread can be started.
+	 * @param version the version of PHP to check against
+	 * @return TRUE if the project has at least one source directory that exists
+	 */
+	bool ReadNextProject(pelet::Versions version);
+	
 
 	 /**
 	  * The various states control what this plugin does.
@@ -258,11 +272,10 @@ private:
 	};
 	
 	/**
-	 * Used to iterate through directories
-	 * 
-	 * @var DirectorySearch
+	 * Used to iterate through directories. This pointer will
+	 * delete itself automatically
 	 */
-	ResourceFileReaderClass ResourceFileReader;
+	ResourceFileReaderClass* ResourceFileReader;
 
 	/**
 	 * when a 'jump to resource' is done and we need to index a project, we
@@ -299,6 +312,11 @@ private:
 	* @var bool
 	*/
 	bool HasFileLookups;
+	
+	/**
+	 * Queue of projects to be indexed.
+	 */
+	std::queue<mvceditor::ProjectClass> ProjectQueue;
 
 	DECLARE_EVENT_TABLE()
 };

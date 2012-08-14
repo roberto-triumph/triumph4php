@@ -55,7 +55,7 @@ public:
 
 protected:
 
-	void Entry();
+	void BackgroundWork();
 
 private:
 
@@ -189,11 +189,17 @@ protected:
 	 * Used to start the detector process
 	 */
 	ProcessWithHeartbeatClass Process;
+	
+	/**
+	 * to manage the thread that parses responses
+	 */
+	mvceditor::RunningThreadsClass& RunningThreads;
 
 	/**
 	 * Used to parse the detector response in a background thread.
+	 * This pointer will automically cleanup after itself
 	 */
-	ResponseThreadWithHeartbeatClass ResponseThread;
+	ResponseThreadWithHeartbeatClass* ResponseThread;
 
 	/**
 	 * This handler will get notified after process has ended and response

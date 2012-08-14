@@ -62,7 +62,6 @@ bool mvceditor::BackgroundFileReaderClass::StartReading(StartError& error) {
 	}
 	else {
 		ret = true;
-		SignalStart();
 	}
 	return ret;
 }
@@ -71,14 +70,14 @@ void mvceditor::BackgroundFileReaderClass::StopReading() {
 	KillInstance();
 }
 
-void mvceditor::BackgroundFileReaderClass::Entry() {
+void mvceditor::BackgroundFileReaderClass::BackgroundWork() {
 	bool isDestroy = TestDestroy();
 	int counter = 0;
 	if (Mode == WALK) {
 		
 		// careful to test for destroy first
 		while (!isDestroy && DirectorySearch.More()) {
-			bool res = FileRead(DirectorySearch);
+			bool res = BackgroundFileRead(DirectorySearch);
 
 			// signal that the background thread has finished one file
 			counter++;
@@ -100,7 +99,7 @@ void mvceditor::BackgroundFileReaderClass::Entry() {
 		std::vector<wxString> matchedFiles = DirectorySearch.GetMatchedFiles();
 		int count = matchedFiles.size();
 		for (int i = 0; i < count && !isDestroy; i++) {
-			FileMatch(matchedFiles[i]);
+			BackgroundFileMatch(matchedFiles[i]);
 
 			// signal that the background thread has finished one file
 			counter++;
@@ -122,7 +121,6 @@ void mvceditor::BackgroundFileReaderClass::Entry() {
 		wxCommandEvent endEvent(EVENT_FILE_READ_COMPLETE, wxNewId());
 		endEvent.SetInt(Mode);
 		wxPostEvent(&Handler, endEvent);
-		SignalEnd();
 	}
 }
 

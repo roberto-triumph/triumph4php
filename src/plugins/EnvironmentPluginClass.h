@@ -85,9 +85,9 @@ public:
 	
 protected:
 
-		bool FileMatch(const wxString& file);
+		bool BackgroundFileMatch(const wxString& file);
 		
-		bool FileRead(DirectorySearchClass& search);
+		bool BackgroundFileRead(DirectorySearchClass& search);
 		
 private:
 
@@ -159,9 +159,14 @@ private:
 	EnvironmentClass& Environment;
 	
 	/**
+	 * keeps track of background threads
+	 */
+	mvceditor::RunningThreadsClass& RunningThreads;
+	
+	/**
 	 * To look for apache config files in the background
 	 */
-	ApacheFileReaderClass ApacheFileReader;
+	ApacheFileReaderClass* ApacheFileReader;
 	
 	/**
 	 * A copy of the current virtual hosts; this is the data structure that the 

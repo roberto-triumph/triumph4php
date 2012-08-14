@@ -174,13 +174,13 @@ protected:
 	 * Will parse the current file. 
 	 * @return TRUE if file had ZERO parse errors
 	 */
-	bool FileRead(DirectorySearchClass& search);
+	bool BackgroundFileRead(DirectorySearchClass& search);
 	
 	/**
 	 * 
 	 * will do nothing for now
 	 */
-	bool FileMatch(const wxString& file);
+	bool BackgroundFileMatch(const wxString& file);
 	
 
 private:

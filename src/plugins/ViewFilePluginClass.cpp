@@ -23,19 +23,29 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <plugins/ViewFilePluginClass.h>
-#include <MvcEditor.h>
-#include <MvcEditorErrors.h>
 #include <environment/UrlResourceClass.h>
+#include <MvcEditor.h>
+#include <MvcEditorAssets.h>
+#include <MvcEditorErrors.h>
 #include <MvcEditorString.h>
 #include <wx/artprov.h>
 
 static const int ID_VIEW_FILE_PANEL = wxNewId();
 
+mvceditor::CallStackCompleteEventClass::CallStackCompleteEventClass(mvceditor::CallStackClass::Errors error, bool writeError)
+	: wxEvent(wxID_ANY, mvceditor::EVENT_CALL_STACK_COMPLETE)
+	, LastError(error)
+	, WriteError(writeError) {
+}
+
+wxEvent* mvceditor::CallStackCompleteEventClass::Clone() const {
+	return new mvceditor::CallStackCompleteEventClass(LastError, WriteError);
+}
+
 mvceditor::CallStackThreadClass::CallStackThreadClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads)
 	: ThreadWithHeartbeatClass(handler, runningThreads) 
 	, CallStack(NULL)
-	, LastError(mvceditor::CallStackClass::NONE)
-	, StackFile() {
+	, PersistFile() {
 		
 }
 
@@ -46,9 +56,7 @@ void mvceditor::CallStackThreadClass::InitCallStack(mvceditor::ResourceCacheClas
 }
 
 bool mvceditor::CallStackThreadClass::InitThread(const wxFileName& startFileName, const UnicodeString& className, const UnicodeString& methodName,
-												 pelet::Versions version) {
-	StackFile.Clear();
-	WriteError = false;
+												 pelet::Versions version, const wxFileName& persistFile) {
 	bool ret = false;
 
 	// make sure to set these BEFORE calling CreateSingleInstance
@@ -57,7 +65,7 @@ bool mvceditor::CallStackThreadClass::InitThread(const wxFileName& startFileName
 	ClassName = className;
 	MethodName = methodName;
 	Version = version;
-	LastError = mvceditor::CallStackClass::NONE;
+	PersistFile = persistFile;
 	wxThreadError threadError = CreateSingleInstance();
 	if (threadError == wxTHREAD_NO_RESOURCE) {
 		mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
@@ -67,32 +75,39 @@ bool mvceditor::CallStackThreadClass::InitThread(const wxFileName& startFileName
 	}
 	else {	
 		ret = true;
-		SignalStart();
 	}
 	return ret;
 }
 
-void mvceditor::CallStackThreadClass::Entry() {
+void mvceditor::CallStackThreadClass::BackgroundWork() {
+	mvceditor::CallStackClass::Errors lastError = mvceditor::CallStackClass::NONE;
+	bool writeError = false;
 	
 	// build the call stack then save it to a temp file
-	if (CallStack->Build(StartFileName, ClassName, MethodName, Version, LastError)) {
-		StackFile.AssignTempFileName(wxT("call_stack"));
-		if (!StackFile.IsOk()) {
-			mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, _("Could not create call stack file in ") + StackFile.GetFullPath());
-			WriteError = true;
+	if (CallStack->Build(StartFileName, ClassName, MethodName, Version, lastError)) {
+		if (!PersistFile.IsOk()) {
+			mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, _("Could not create call stack file in ") + PersistFile.GetFullPath());
+			writeError = true;
 		}
-		else if (!CallStack->Persist(StackFile)) {
-			mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, _("Could not persist call stack file in ") + StackFile.GetFullPath());
-			WriteError = true;
+		else if (!CallStack->Persist(PersistFile)) {
+			mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, _("Could not persist call stack file in ") + PersistFile.GetFullPath());
+			writeError = true;
 		}
 	}
-	SignalEnd();
+	if (!TestDestroy()) {
+		mvceditor::CallStackCompleteEventClass evt(lastError, writeError);
+		wxPostEvent(&Handler, evt);
+	}
 }
 
 mvceditor::ViewFilePluginClass::ViewFilePluginClass(mvceditor::AppClass& app) 
 	: PluginClass(app) 
 	, FrameworkDetector(*this, app.RunningThreads, app.Structs.Environment) 
-	, CallStackThread(*this, app.RunningThreads) {
+	, CallStackPersistFile() 
+	, LastError(mvceditor::CallStackClass::NONE)
+	, WriteError(false)
+	, CallStackThread(NULL) {
+	
 }
 
 void mvceditor::ViewFilePluginClass::AddViewMenuItems(wxMenu* viewMenu) {
@@ -157,10 +172,12 @@ void mvceditor::ViewFilePluginClass::StartDetection() {
 		if (fileName.IsOk()) {
 			UnicodeString className = mvceditor::WxToIcu(App.Structs.CurrentUrl.ClassName);
 			UnicodeString methodName =  mvceditor::WxToIcu(App.Structs.CurrentUrl.MethodName);
+			CallStackPersistFile.AssignTempFileName(mvceditor::TempDirAsset().GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) + wxT("call_stack"));
 			
 			// TODO: this isn't good, resource cache is not meant to be read/written to from multiple threads
-			CallStackThread.InitCallStack(*GetResourceCache());
-			if (!CallStackThread.InitThread(fileName, className, methodName, GetEnvironment()->Php.Version)) {
+			CallStackThread = new mvceditor::CallStackThreadClass(*this, App.RunningThreads);
+			CallStackThread->InitCallStack(*GetResourceCache());
+			if (!CallStackThread->InitThread(fileName, className, methodName, GetEnvironment()->Php.Version, CallStackPersistFile)) {
 				mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Call stack file creation failed"));
 			}
 			else {
@@ -171,11 +188,17 @@ void mvceditor::ViewFilePluginClass::StartDetection() {
 }
 
 void mvceditor::ViewFilePluginClass::OnWorkComplete(wxCommandEvent& event) {
+	CallStackThread = NULL;
+}
+
+void mvceditor::ViewFilePluginClass::OnCallStackComplete(mvceditor::CallStackCompleteEventClass& event) {
 	if (!App.Structs.Frameworks.empty()) {
-		if (!FrameworkDetector.InitViewInfosDetector(App.Structs.Frameworks, App.Structs.UrlResourceFinder.ChosenUrl.Url.BuildURI(), CallStackThread.StackFile)) {
+		if (!FrameworkDetector.InitViewInfosDetector(App.Structs.Frameworks, App.Structs.UrlResourceFinder.ChosenUrl.Url.BuildURI(), CallStackPersistFile)) {
 			mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Could not start ViewInfos detector"));
 		}
 	}
+	LastError = event.LastError;
+	WriteError = event.WriteError;
 }
 	
 void mvceditor::ViewFilePluginClass::OnViewInfosDetectionComplete(mvceditor::ViewInfosDetectedEventClass& event) {
@@ -187,12 +210,12 @@ void mvceditor::ViewFilePluginClass::OnViewInfosDetectionComplete(mvceditor::Vie
 		viewPanel->UpdateResults();
 		SetFocusToToolsWindow(viewPanel);
 	}
-	wxRemoveFile(CallStackThread.StackFile.GetFullPath());
+	wxRemoveFile(CallStackPersistFile.GetFullPath());
 }
 
 void mvceditor::ViewFilePluginClass::OnViewInfosDetectionFailed(wxCommandEvent& event) {
 	mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, event.GetString());
-	wxRemoveFile(CallStackThread.StackFile.GetFullPath());
+	wxRemoveFile(CallStackPersistFile.GetFullPath());
 }
 
 mvceditor::UrlResourceFinderClass& mvceditor::ViewFilePluginClass::Urls() {
@@ -238,7 +261,7 @@ void mvceditor::ViewFilePanelClass::UpdateControllers() {
 }
 
 void mvceditor::ViewFilePanelClass::UpdateResults() {
-	if (Plugin.CallStackThread.LastError == mvceditor::CallStackClass::NONE || Plugin.CallStackThread.LastError == mvceditor::CallStackClass::RESOLUTION_ERROR) {
+	if (Plugin.LastError == mvceditor::CallStackClass::NONE || Plugin.LastError == mvceditor::CallStackClass::RESOLUTION_ERROR) {
 		
 		std::vector<mvceditor::ViewInfoClass> currentViewInfos = Plugin.CurrentViewInfos();
 		StatusLabel->SetLabel(wxString::Format(_("Found %d view files"), currentViewInfos.size()));
@@ -280,13 +303,13 @@ void mvceditor::ViewFilePanelClass::UpdateResults() {
 		}
 		TemplateVariablesTree->ExpandAll();
 	}
-	else if (Plugin.CallStackThread.WriteError) {
+	else if (Plugin.WriteError) {
 		StatusLabel->SetLabel(_("Error"));
 		mvceditor::EditorLogError(mvceditor::WARNING_OTHER, 
 			_("Could not Write Call stack file to file system"));
 	}
 	else {
-		switch (Plugin.CallStackThread.LastError) {
+		switch (Plugin.LastError) {
 			case mvceditor::CallStackClass::PARSE_ERR0R:
 				StatusLabel->SetLabel(_("The controller file has a syntax error."));
 				break;
@@ -409,6 +432,7 @@ mvceditor::StringTreeItemDataClass::StringTreeItemDataClass(const wxString& str)
 
 BEGIN_EVENT_TABLE(mvceditor::ViewFilePluginClass, wxEvtHandler) 
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ViewFilePluginClass::OnWorkComplete)
+	EVT_CALL_STACK_COMPLETE(mvceditor::ViewFilePluginClass::OnCallStackComplete)
 	EVT_FRAMEWORK_VIEW_INFOS_COMPLETE(mvceditor::ViewFilePluginClass::OnViewInfosDetectionComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_VIEW_FILES_FAILED, mvceditor::ViewFilePluginClass::OnViewInfosDetectionFailed)
 	EVT_MENU(mvceditor::MENU_VIEW_FILES + 0, mvceditor::ViewFilePluginClass::OnViewInfosMenu)

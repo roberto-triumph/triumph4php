@@ -273,7 +273,8 @@ mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::StructsClass* structs, 
 	, Timer()
 	, FileIdentifier()
 	, Structs(structs)
-	, WorkingCacheBuilder(*this, runningThreads)
+	, RunningThreads(runningThreads)
+	, WorkingCacheBuilder(NULL)
 	, CurrentCallTipIndex(0)
 	, NeedToUpdateResources(false) 
 	, AreImagesRegistered(false) {
@@ -311,7 +312,9 @@ void mvceditor::PhpDocumentClass::AttachToControl(CodeControlClass* ctrl) {
 
 	// do this so that when a new untitled file is created that code completion still works.
 	FileOpened(FileIdentifier);
-	WorkingCacheBuilder.Init();
+	wxASSERT(NULL == WorkingCacheBuilder);
+	WorkingCacheBuilder = new mvceditor::WorkingCacheBuilderClass(*this, RunningThreads);
+	WorkingCacheBuilder->Init();
 }
 
 void mvceditor::PhpDocumentClass::DetachFromControl(CodeControlClass* ctrl) {
@@ -325,7 +328,13 @@ void mvceditor::PhpDocumentClass::DetachFromControl(CodeControlClass* ctrl) {
 		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(wxStyledTextEventFunction, &mvceditor::PhpDocumentClass::OnAutoCompletionSelected),
 		NULL, this);
 	ctrl->ClearRegisteredImages();
-	WorkingCacheBuilder.KillInstance();
+	
+	// killInstance deletes the pointer 
+	if (WorkingCacheBuilder) {
+		WorkingCacheBuilder->KillInstance();
+	}
+	WorkingCacheBuilder = new mvceditor::WorkingCacheBuilderClass(*this, RunningThreads);
+	WorkingCacheBuilder->Init();
 }
 
 bool mvceditor::PhpDocumentClass::CanAutoComplete() {
@@ -1001,7 +1010,7 @@ void mvceditor::PhpDocumentClass::OnTimer(wxTimerEvent& event) {
 		UnicodeString text = GetSafeText();
 
 		// we need to differentiate between new and opened files (the 'true' arg)
-		WorkingCacheBuilder.Update(FileIdentifier, text, !wxFileName::FileExists(Ctrl->GetFileName()), Structs->Environment.Php.Version);
+		WorkingCacheBuilder->Update(FileIdentifier, text, !wxFileName::FileExists(Ctrl->GetFileName()), Structs->Environment.Php.Version);
 
 		// even if thread could not be started just prevent re-parsing until user 
 		// modified the text

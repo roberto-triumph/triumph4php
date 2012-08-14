@@ -37,19 +37,72 @@ namespace mvceditor {
 
 // defined  at the bottom of this file
 class ViewFilePanelClass;
+
+extern const wxEventType EVENT_CALL_STACK_COMPLETE;
+
+class CallStackCompleteEventClass : public wxEvent {
+
+public:
+
+	/**
+	 * error will be filled when a call stack file could not be generated
+	 */
+	CallStackClass::Errors LastError;
+	
+	/**
+	 * if TRUE an error occurred while attempting to write the call stack file to
+	 * the hard disk.
+	 */
+	bool WriteError;
+	
+	CallStackCompleteEventClass(mvceditor::CallStackClass::Errors error, bool writeError);
+	
+	wxEvent* Clone() const;
+	
+};
+
+typedef void (wxEvtHandler::*CallStackCompleteEventClassFunction)(CallStackCompleteEventClass&);
+
+#define EVT_CALL_STACK_COMPLETE(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_CALL_STACK_COMPLETE, wxID_ANY, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( CallStackCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
+
 	
 /**
  * Generates the call stack file in a background thread. This class
  * needs as input the starting entry point from which to start
- * recursing down the call stack.
+ * recursing down the call stack. The class will generate a
+ * EVENT_CALL_STACK_COMPLETE event as well
  * 
- * All public members are NOT thread safe. Do not attempt access
- * until the EVENT_WORK_COMPLETE event has been received.
  */
 class CallStackThreadClass : public ThreadWithHeartbeatClass {
 
 public:
 
+	/**
+	 * @param handler will be notified of EVENT_WORK_* events and EVENT_CALL_STACK_COMPLETE events as well
+	 */
+	CallStackThreadClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
+	
+	/**
+	 * one-time initialization, call this before InitThread
+	 */
+	void InitCallStack(ResourceCacheClass& resourceCache);
+	
+	
+	/**
+	 * starts the background thread
+	 */
+	bool InitThread(const wxFileName& fileName, const UnicodeString& className, const UnicodeString& methodName, pelet::Versions version,
+		const wxFileName& persistFileName);
+	
+protected:
+	
+	void BackgroundWork();
+	
+	private:
+	
 	/**
 	 * Used to generate the call stack file (file of all function calls of a URL); call stack 
 	 * file is required by the ViewInfos detector
@@ -58,36 +111,10 @@ public:
 	std::auto_ptr<CallStackClass> CallStack;
 	
 	/**
-	 * error will be filled when a call stack file could not be generated
-	 */
-	CallStackClass::Errors LastError;
-	
-	/**
 	 * The results of the call stack will be written to this file.
 	 * This class will pick the file name (it will be a temporary file).
 	 */
-	wxFileName StackFile;
-	
-	/**
-	 * if TRUE an error occurred while attempting to write the call stack file to
-	 * the hard disk.
-	 */
-	bool WriteError;
-
-	/**
-	 * @param handler will be notified of EVENT_WORK_* events
-	 */
-	CallStackThreadClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
-	
-	void InitCallStack(ResourceCacheClass& resourceCache);
-	
-	bool InitThread(const wxFileName& fileName, const UnicodeString& className, const UnicodeString& methodName, pelet::Versions version);
-	
-protected:
-	
-	void Entry();
-	
-private:
+	wxFileName PersistFile;
 
 	wxFileName StartFileName;
 	
@@ -113,8 +140,6 @@ class ViewFilePluginClass : public PluginClass {
 	
 public:
 
-	ViewFilePluginClass(mvceditor::AppClass& app);
-	
 	/**
 	 * A 'local' detector that will be used to get all of the
 	 * files for the current URL.
@@ -122,9 +147,23 @@ public:
 	mvceditor::PhpFrameworkDetectorClass FrameworkDetector;
 	
 	/**
-	 * used to generate the call stack for the current URL
+	 *  The file where the call stack was written to. This file is a 
+	 * temporary file, it needs to be deleted when we are done using it
 	 */
-	CallStackThreadClass CallStackThread;
+	wxFileName CallStackPersistFile;
+	
+	/**
+	 * error will be filled when a call stack file could not be generated
+	 */
+	CallStackClass::Errors LastError;
+	
+	/**
+	 * if TRUE an error occurred while attempting to write the call stack file to
+	 * the hard disk.
+	 */
+	bool WriteError;
+	
+	ViewFilePluginClass(mvceditor::AppClass& app);
 
 	void SetCurrentUrl(mvceditor::UrlResourceClass url);
 	
@@ -165,6 +204,8 @@ private:
 	
 	void OnWorkComplete(wxCommandEvent& event);
 	
+	void OnCallStackComplete(mvceditor::CallStackCompleteEventClass& event);
+	
 	void OnViewInfosDetectionComplete(ViewInfosDetectedEventClass& event);
 	
 	void OnViewInfosDetectionFailed(wxCommandEvent& event);
@@ -177,6 +218,13 @@ private:
 		FREE,
 		INDEXING
 	};
+	
+	/**
+	 * used to generate the call stack for the current URL
+	 * This pointer will automatically delete itself
+	 */
+	CallStackThreadClass* CallStackThread;
+	
 	
 	States State;
 	

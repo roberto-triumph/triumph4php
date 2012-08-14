@@ -58,9 +58,6 @@ mvceditor::WorkingCacheBuilderClass::WorkingCacheBuilderClass(wxEvtHandler& hand
 
 wxThreadError mvceditor::WorkingCacheBuilderClass::Init() {
 	wxThreadError error = CreateSingleInstance();
-	if (wxTHREAD_NO_ERROR == error) {	
-		SignalStart();		
-	}
 	return error;
 }
 	
@@ -77,7 +74,7 @@ void mvceditor::WorkingCacheBuilderClass::Update(const wxString& fileName, const
 	CurrentVersion = version;	
 }
 
-void mvceditor::WorkingCacheBuilderClass::Entry() {
+void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
 	while (!TestDestroy()) {
 		UnicodeString code;
 		wxString file;
@@ -124,7 +121,6 @@ void mvceditor::WorkingCacheBuilderClass::Entry() {
 			wxThread::Sleep(200);
 		}
 	}
-	SignalEnd();
 }
 
 const wxEventType mvceditor::EVENT_WORKING_CACHE_COMPLETE = wxNewEventType();

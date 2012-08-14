@@ -125,11 +125,11 @@ bool mvceditor::ApacheFileReaderClass::Init(const wxString& startDirectory) {
 	return BackgroundFileReaderClass::Init(startDirectory);
 }
 
-bool mvceditor::ApacheFileReaderClass::FileMatch(const wxString& file) {
+bool mvceditor::ApacheFileReaderClass::BackgroundFileMatch(const wxString& file) {
 	return true;
 }
 
-bool mvceditor::ApacheFileReaderClass::FileRead(mvceditor::DirectorySearchClass& search) {
+bool mvceditor::ApacheFileReaderClass::BackgroundFileRead(mvceditor::DirectorySearchClass& search) {
 	bool ret = false;
 	if (search.Walk(ApacheResults)) {
 		ret = true;
@@ -161,7 +161,8 @@ bool mvceditor::ApacheFileReaderClass::FileRead(mvceditor::DirectorySearchClass&
 mvceditor::ApacheEnvironmentPanelClass::ApacheEnvironmentPanelClass(wxWindow* parent, mvceditor::RunningThreadsClass& runningThreads, EnvironmentClass& environment)
 	: ApacheEnvironmentPanelGeneratedClass(parent)
 	, Environment(environment)
-	, ApacheFileReader(*this, runningThreads)
+	, RunningThreads(runningThreads)
+	, ApacheFileReader(NULL)
 	, EditedApache() {
 	EditedApache = environment.Apache;
 	wxGenericValidator manualValidator(&EditedApache.ManualConfiguration);	
@@ -178,19 +179,22 @@ mvceditor::ApacheEnvironmentPanelClass::ApacheEnvironmentPanelClass(wxWindow* pa
 }
 
 void mvceditor::ApacheEnvironmentPanelClass::OnScanButton(wxCommandEvent& event) {
-	if (!ApacheFileReader.IsRunning()) {
+	if (NULL == ApacheFileReader) {
 		wxString path = ApacheConfigurationDirectory->GetPath();
 		wxChar ch = wxFileName::GetPathSeparator();
 		if (path[path.Length() - 1] != ch) {
 			path.Append(ch);
 		}
 		mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
-		if (ApacheFileReader.Init(path) && ApacheFileReader.StartReading(error)) {
+		ApacheFileReader = new mvceditor::ApacheFileReaderClass(*this, RunningThreads);
+		if (ApacheFileReader->Init(path) && ApacheFileReader->StartReading(error)) {
 			VirtualHostList->DeleteAllItems();
 			ScanButton->SetLabel(_("Stop Scan"));
 			Gauge->Show();
 		}
 		else {
+			delete ApacheFileReader;
+			ApacheFileReader = NULL;
 			switch (error) {
 			case mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING:
 				wxMessageBox(_("Scanner is already running"), _("Configuration Not Found"), wxOK | wxCENTRE, this);
@@ -208,7 +212,7 @@ void mvceditor::ApacheEnvironmentPanelClass::OnScanButton(wxCommandEvent& event)
 		
 		// act like a stop button
 		Gauge->SetValue(0);
-		ApacheFileReader.StopReading();
+		ApacheFileReader->StopReading();
 		ScanButton->SetLabel(_("Scan For Configuration"));
 	}
 }
@@ -247,6 +251,7 @@ void mvceditor::ApacheEnvironmentPanelClass::OnWorkInProgress(wxCommandEvent& ev
 void mvceditor::ApacheEnvironmentPanelClass::OnWorkComplete(wxCommandEvent& event) {
 	Gauge->SetValue(0);
 	ScanButton->SetLabel(_("Scan For Configuration"));
+	ApacheFileReader = NULL;
 }
 
 void mvceditor::ApacheEnvironmentPanelClass::OnResize(wxSizeEvent& event) {
@@ -326,14 +331,15 @@ bool mvceditor::ApacheEnvironmentPanelClass::TransferDataFromWindow() {
 }
 
 void mvceditor::ApacheEnvironmentPanelClass::OnDirChanged(wxFileDirPickerEvent& event) {
-	if (!ApacheFileReader.IsRunning()) {
+	if (NULL == ApacheFileReader) {
 		wxString path = ApacheConfigurationDirectory->GetPath();
 		wxChar ch = wxFileName::GetPathSeparator();
 		if (path[path.Length() - 1] != ch) {
 			path.Append(ch);
 		}
+		ApacheFileReader = new mvceditor::ApacheFileReaderClass(*this, RunningThreads);
 		mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
-		if (ApacheFileReader.Init(path) && ApacheFileReader.StartReading(error)) {
+		if (ApacheFileReader->Init(path) && ApacheFileReader->StartReading(error)) {
 			VirtualHostList->DeleteAllItems();
 			ScanButton->SetLabel(_("Stop Scan"));
 			Gauge->Show();

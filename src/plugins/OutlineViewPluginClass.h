@@ -32,6 +32,30 @@
 #include <vector>
 
 namespace mvceditor {
+	
+extern const wxEventType EVENT_RESOURCE_FINDER_COMPLETE;
+	
+class ResourceFinderCompleteEventClass : public wxEvent {
+	
+	public:
+	
+	/**
+	 * Will contain all of the parsed resources. 
+	 */
+	std::vector<mvceditor::ResourceClass> Resources;
+	
+	ResourceFinderCompleteEventClass(const std::vector<mvceditor::ResourceClass>& resources);
+	
+	wxEvent* Clone() const;
+	
+};
+
+typedef void (wxEvtHandler::*ResourceFinderCompleteEventClassFunction)(ResourceFinderCompleteEventClass&);
+
+#define EVT_RESOURCE_FINDER_COMPLETE(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_RESOURCE_FINDER_COMPLETE, wxID_ANY, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( ResourceFinderCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
 
 /**
  * A small class that will parse source into resources. We want to do 
@@ -42,13 +66,7 @@ class ResourceFinderBackgroundThreadClass : ThreadWithHeartbeatClass {
 public:
 
 	/**
-	 * don't access this until the EVENT_WORK_COMPLETE event is 
-	 * generated
-     */
-	std::vector<ResourceClass> Resources;
-
-	/**
-	 * @param handler will get notified with EVENT_WORK_COMPLETE
+	 * @param handler will get notified with EVENT_WORK_COMPLETE and the EVENT_RESOURCE_FINDER_COMPLETE
 	 * events when parsing is complete.
 	 */
 	ResourceFinderBackgroundThreadClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
@@ -62,12 +80,12 @@ public:
 
 protected:
 
-	void Entry();
+	void BackgroundWork();
 
 private:
 
 	/**
-	 * to parse the resources out of a file
+	 * to parse the resources out of a file.
 	 */
 	ResourceFinderClass ResourceFinder;
 
@@ -88,10 +106,10 @@ class OutlineViewPluginClass : public PluginClass {
 public:
 
 	/**
-	 * Holds the currently outlines resources , will also parse
-	 * a piece of source code.
+	 * will also parse a piece of source code in a background thread and will wxPostEvent
+	 * the results to us. This pointer self-destructs
 	 */
-	ResourceFinderBackgroundThreadClass ResourceFinderBackground;
+	ResourceFinderBackgroundThreadClass* ResourceFinderBackground;
 	
 	/**
 	 * Creates a new OutlineViewPlugin.
@@ -128,7 +146,7 @@ public:
 	 * 
 	 * @param wxString className the name of the class to build the outline for.
 	 */
-	void BuildOutline(const wxString& className);
+	std::vector<mvceditor::ResourceClass> BuildOutline(const wxString& className);
 	
 	/**
 	 * Opens the file where the given resource is located.
@@ -143,11 +161,16 @@ private:
 	 * Updates the outlines based on the currently opened (and focused) file.
 	*/
 	void OnContentNotebookPageChanged(wxAuiNotebookEvent& event);
-
+	
+	/**
+	 * when thread is done null the reference
+	 */
+	void OnWorkComplete(wxCommandEvent& event);
+	
 	/**
 	 * when the parsing is complete update the panel.
 	 */
-	void OnWorkComplete(wxCommandEvent& event);
+	void OnResourceFinderComplete(mvceditor::ResourceFinderCompleteEventClass& event);
 	
 	DECLARE_EVENT_TABLE()
 };
@@ -181,7 +204,7 @@ class OutlineViewPluginPanelClass : public OutlineViewPluginGeneratedPanelClass 
 	/**
 	 * refresh the code control from the plugin source strings
 	 */
-	 void RefreshOutlines();
+	 void RefreshOutlines(const std::vector<ResourceClass>& resources);
 	
 protected:
 

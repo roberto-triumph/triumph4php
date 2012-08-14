@@ -36,29 +36,11 @@ static int ID_COUNT_FILES_GAUGE = wxNewId();
 
 mvceditor::ResourceFileReaderClass::ResourceFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads) 
 	: BackgroundFileReaderClass(handler, runningThreads)
-	, ProjectQueue()
 	, Version(pelet::PHP_53) 
 	, GlobalCache(NULL) {
 }
 
-bool mvceditor::ResourceFileReaderClass::InitProjectQueue(const std::vector<mvceditor::ProjectClass>& projects, pelet::Versions version) {
-	while (!ProjectQueue.empty()) {
-		ProjectQueue.pop();
-	}
-	Version = version;
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	for (project = projects.begin(); project != projects.end(); ++project) {
-		if (project->IsEnabled && !project->AllPhpSources().empty()) {
-			ProjectQueue.push(*project);
-		}
-	}
-	return !ProjectQueue.empty();
-}
-
 bool mvceditor::ResourceFileReaderClass::InitForFile(const mvceditor::ProjectClass& project, const wxString& fullPath, pelet::Versions version) {
-	while (!ProjectQueue.empty()) {
-		ProjectQueue.pop();
-	}
 	wxFileName fileName(fullPath);
 	if (!fileName.FileExists()) {
 		return false;
@@ -83,7 +65,7 @@ bool mvceditor::ResourceFileReaderClass::InitForFile(const mvceditor::ProjectCla
 	return false;
 }
 
-bool mvceditor::ResourceFileReaderClass::FileRead(mvceditor::DirectorySearchClass& search) {
+bool mvceditor::ResourceFileReaderClass::BackgroundFileRead(mvceditor::DirectorySearchClass& search) {
 	GlobalCache->Walk(search);
 	if (!search.More()) {
 
@@ -102,40 +84,33 @@ bool mvceditor::ResourceFileReaderClass::FileRead(mvceditor::DirectorySearchClas
 	}
 	return false;
 }
-bool mvceditor::ResourceFileReaderClass::FileMatch(const wxString& file) {
+bool mvceditor::ResourceFileReaderClass::BackgroundFileMatch(const wxString& file) {
 
 	// ResourceFileReader class never return true from FileRead(), no need to match files
 	return false;
 }
 
-bool mvceditor::ResourceFileReaderClass::MoreProjects() const {
-	return !ProjectQueue.empty();
-}
-
-bool mvceditor::ResourceFileReaderClass::ReadNextProject() {
+bool mvceditor::ResourceFileReaderClass::InitProject(const mvceditor::ProjectClass& project,  pelet::Versions version) {
 	bool next = false;
-	if (!ProjectQueue.empty()) {
-		mvceditor::ProjectClass project = ProjectQueue.front();
-		ProjectQueue.pop();
-		std::vector<mvceditor::SourceClass> sources = project.AllPhpSources();
-		if (Init(sources)) {
-			next = true;
-			wxASSERT_MSG(GlobalCache == NULL, _("cache pointer has not been cleaned up"));
-			GlobalCache = new mvceditor::GlobalCacheClass;
-			GlobalCache->Init(project.ResourceDbFileName, project.GetPhpFileExtensions(), Version, 1024);
-		}
+	std::vector<mvceditor::SourceClass> sources = project.AllPhpSources();
+	if (Init(sources)) {
+		next = true;
+		wxASSERT_MSG(GlobalCache == NULL, _("cache pointer has not been cleaned up"));
+		GlobalCache = new mvceditor::GlobalCacheClass;
+		GlobalCache->Init(project.ResourceDbFileName, project.GetPhpFileExtensions(), Version, 1024);
 	}
 	return next;
 }
 
 mvceditor::ResourcePluginClass::ResourcePluginClass(mvceditor::AppClass& app)
 	: PluginClass(app)
-	, ResourceFileReader(*this, app.RunningThreads)
+	, ResourceFileReader(NULL)
 	, JumpToText()
 	, ProjectIndexMenu(NULL)
 	, State(FREE) 
 	, HasCodeLookups(false)
-	, HasFileLookups(false) {
+	, HasFileLookups(false) 
+	, ProjectQueue() {
 	IndexingDialog = NULL;
 }
 
@@ -190,9 +165,10 @@ void mvceditor::ResourcePluginClass::OnAppReady(wxCommandEvent& event) {
 void mvceditor::ResourcePluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 	HasCodeLookups = false;
 	HasFileLookups = false;
-	if (ResourceFileReader.IsRunning()) {
-		ResourceFileReader.StopReading();
+	if (NULL != ResourceFileReader) {
+		ResourceFileReader->StopReading();
 	}
+	ResourceFileReader = new mvceditor::ResourceFileReaderClass(*this, App.RunningThreads);
 
 	// the user enabled/disaable projects
 	// need to clear the entire cache, then add only the newly enabled projects
@@ -219,10 +195,9 @@ void mvceditor::ResourcePluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 			resourceCache->RegisterGlobal(projectCache);
 		}
 	}
-	
-	ResourceFileReader.InitProjectQueue(App.Structs.Projects, version);
+	InitProjectQueue(App.Structs.Projects);
 	mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
-	if (ResourceFileReader.ReadNextProject() && ResourceFileReader.StartReading(error)) {
+	if (ReadNextProject(version) && ResourceFileReader->StartReading(error)) {
 		State = INDEXING_PROJECT;
 		GetStatusBarWithGauge()->AddGauge(_("Indexing Projects From Update"), ID_COUNT_FILES_GAUGE, 
 			StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
@@ -237,6 +212,10 @@ void mvceditor::ResourcePluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 	}
 	else {
 		GetStatusBarWithGauge()->StopGauge(ID_COUNT_FILES_GAUGE);
+	}
+	if (INDEXING_PROJECT != State) {
+		delete ResourceFileReader;
+		ResourceFileReader = NULL;
 	}
 }
 
@@ -260,18 +239,21 @@ void mvceditor::ResourcePluginClass::OnWorkInProgress(wxCommandEvent& event) {
 }
 
 void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
-	if (ResourceFileReader.MoreProjects()) {
+	ResourceFileReader = NULL;
+	if (MoreProjects()) {
 
 		// if the project queue is not empty then start reading the next project.
 		bool hasNext = false;
-		while (ResourceFileReader.MoreProjects() && !hasNext) {
-			hasNext = ResourceFileReader.ReadNextProject();
+		while (MoreProjects() && !hasNext) {
+			hasNext = ReadNextProject(GetEnvironment()->Php.Version);
 		}
 		if (hasNext) {
 			mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
-			if (!ResourceFileReader.StartReading(error)) {
+			if (!ResourceFileReader->StartReading(error)) {
 				wxString msg = wxString::Format(wxT("background file reader error: %d"), error);
 				wxASSERT_MSG(FALSE, msg);
+				delete ResourceFileReader;
+				ResourceFileReader = NULL;
 			}
 			return;
 		}
@@ -345,30 +327,34 @@ void mvceditor::ResourcePluginClass::StartIndex() {
 
 		//prevent two finds at a time
 		if (FREE == State) { 
-			if (ResourceFileReader.InitProjectQueue(App.Structs.Projects, GetEnvironment()->Php.Version) && ResourceFileReader.ReadNextProject()) {
-					mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
-					if (ResourceFileReader.StartReading(error)) {
-						State = INDEXING_PROJECT;
-						GetStatusBarWithGauge()->AddGauge(_("Indexing Projects at Start"),
-							ID_COUNT_FILES_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE,
-							wxGA_HORIZONTAL);
-						if (!HasCodeLookups) {
+			if (InitProjectQueue(App.Structs.Projects) && ReadNextProject(GetEnvironment()->Php.Version)) {
+				mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
+				if (ResourceFileReader->StartReading(error)) {
+					State = INDEXING_PROJECT;
+					GetStatusBarWithGauge()->AddGauge(_("Indexing Projects at Start"),
+						ID_COUNT_FILES_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE,
+						wxGA_HORIZONTAL);
+					if (!HasCodeLookups) {
 
-							// empty resouce cache, indexing will take a significant amount of time. make the 
-							// app more 'responsive' by showing a bigger gauge
-							if (!IndexingDialog) {
-								IndexingDialog = new mvceditor::IndexingDialogClass(NULL);
-							}
-							IndexingDialog->Show();
-							IndexingDialog->Start();
+						// empty resouce cache, indexing will take a significant amount of time. make the 
+						// app more 'responsive' by showing a bigger gauge
+						if (!IndexingDialog) {
+							IndexingDialog = new mvceditor::IndexingDialogClass(NULL);
 						}
+						IndexingDialog->Show();
+						IndexingDialog->Start();
 					}
-					else if (mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING == error) {
-						wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
-					}
-					else if (mvceditor::BackgroundFileReaderClass::NO_RESOURCES == error) {
-						mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
-					}
+				}
+				else if (mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING == error) {
+					wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
+				}
+				else if (mvceditor::BackgroundFileReaderClass::NO_RESOURCES == error) {
+					mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
+				}
+				if (INDEXING_PROJECT != State) {
+					delete ResourceFileReader;
+					ResourceFileReader = NULL;
+				}
 			}
 			else {
 				wxMessageBox(_("Invalid Project Path"), wxT("Warning"), wxICON_EXCLAMATION);
@@ -516,11 +502,20 @@ void mvceditor::ResourcePluginClass::OnAppFileClosed(wxCommandEvent& event) {
 	for (project = App.Structs.Projects.begin(); project != App.Structs.Projects.end(); ++project) {
 
 		if (project->IsAPhpSourceFile(fileName)) {
-			ResourceFileReader.InitForFile(*project, fileName, version);
+			ResourceFileReader = new mvceditor::ResourceFileReaderClass(*this, App.RunningThreads);
+			ResourceFileReader->InitForFile(*project, fileName, version);
 			mvceditor::BackgroundFileReaderClass::StartError error;
 
 			// show user the error? not for now as they cannot do anything about it
-			ResourceFileReader.StartReading(error);
+			if (!ResourceFileReader->StartReading(error)) {
+				delete ResourceFileReader;
+				ResourceFileReader = NULL;
+			}
+			else {
+				
+				// file can only belong to one project?
+				break;
+			}
 		}
 	}
 }
@@ -543,6 +538,43 @@ wxString mvceditor::ResourcePluginClass::CacheStatus() {
 	}
 	return _("Stale");
 }
+
+bool mvceditor::ResourcePluginClass::InitProjectQueue(const std::vector<mvceditor::ProjectClass>& projects) {
+	while (!ProjectQueue.empty()) {
+		ProjectQueue.pop();
+	}
+	std::vector<mvceditor::ProjectClass>::const_iterator project;
+	for (project = projects.begin(); project != projects.end(); ++project) {
+		if (project->IsEnabled && !project->AllPhpSources().empty()) {
+			ProjectQueue.push(*project);
+		}
+	}
+	return !ProjectQueue.empty();
+}
+
+bool mvceditor::ResourcePluginClass::MoreProjects() const {
+	return !ProjectQueue.empty();
+}
+
+
+bool mvceditor::ResourcePluginClass::ReadNextProject(pelet::Versions version) {
+	bool next = false;
+	if (!ProjectQueue.empty()) {
+		mvceditor::ProjectClass project = ProjectQueue.front();
+		ProjectQueue.pop();
+		wxASSERT(NULL == ResourceFileReader);
+		ResourceFileReader = new mvceditor::ResourceFileReaderClass(*this, App.RunningThreads);
+		if (ResourceFileReader->InitProject(project, version)) {
+			next = true;
+		}
+		else {
+			delete ResourceFileReader;
+			ResourceFileReader = NULL;
+		}
+	}
+	return next;
+}
+
 
 mvceditor::ResourceSearchDialogClass::ResourceSearchDialogClass(wxWindow* parent, ResourcePluginClass& resource,
 																wxString& term,

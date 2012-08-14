@@ -32,7 +32,6 @@
 #include <wx/valgen.h>
 #include <wx/tokenzr.h>
 
-const int ID_LINT_ERROR_COMMAND = wxNewId();
 const int ID_LINT_RESULTS_PANEL = wxNewId();
 const int ID_LINT_RESULTS_GAUGE = wxNewId();
 
@@ -118,7 +117,7 @@ bool mvceditor::LintBackgroundFileReaderClass::LintSingleFile(const wxString& fi
 	return error;
 }
 
-bool mvceditor::LintBackgroundFileReaderClass::FileRead(DirectorySearchClass &search) {
+bool mvceditor::LintBackgroundFileReaderClass::BackgroundFileRead(DirectorySearchClass &search) {
 	bool error = search.Walk(ParserDirectoryWalker);
 	if (error) {
 		mvceditor::LintResultsEventClass lintResultsEvent(ParserDirectoryWalker.LastResults);
@@ -127,7 +126,7 @@ bool mvceditor::LintBackgroundFileReaderClass::FileRead(DirectorySearchClass &se
 	return !error;
 }
 
-bool mvceditor::LintBackgroundFileReaderClass::FileMatch(const wxString& file) {
+bool mvceditor::LintBackgroundFileReaderClass::BackgroundFileMatch(const wxString& file) {
 	return true;
 }
 

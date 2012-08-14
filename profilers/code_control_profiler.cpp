@@ -122,6 +122,8 @@ private:
 	
 	void OnHelp(wxCommandEvent& event);
 	
+	void OnClose(wxCloseEvent& event);
+	
 	enum {
 		ID_CONTENT_ASSIST,
 		ID_CALL_TIP,
@@ -129,6 +131,8 @@ private:
 	};
 	
 	mvceditor::CodeControlClass* Ctrl;
+	
+	CodeControlProfilerAppClass& App;
 	
 
 	DECLARE_EVENT_TABLE()
@@ -165,7 +169,8 @@ int CodeControlProfilerAppClass::OnExit() {
 
 CodeControlFrameClass::CodeControlFrameClass(CodeControlProfilerAppClass& app) 
 	: wxFrame(NULL, wxID_ANY, wxT("CodeControlClass profiler"), wxDefaultPosition, 
-			wxSize(1024, 768)) {
+			wxSize(1024, 768)) 
+	, App(app) {
 	Ctrl = new mvceditor::CodeControlClass(this, app.Options, &app.Structs, app.RunningThreads, wxID_ANY);
 	Ctrl->SetDropTarget(new FileDropTargetClass(Ctrl));
 	Ctrl->SetDocumentMode(mvceditor::CodeControlClass::PHP);
@@ -187,6 +192,11 @@ void CodeControlFrameClass::OnHelp(wxCommandEvent& event) {
 	wxMessageBox(msg);
 }
 
+void CodeControlFrameClass::OnClose(wxCloseEvent& event) {
+	App.RunningThreads.StopAll();
+	event.Skip();
+}
+
 void CodeControlFrameClass::CreateMenu() {
 	wxMenuBar* menuBar = new wxMenuBar(0);
 	wxMenu* edit = new wxMenu();
@@ -201,4 +211,5 @@ BEGIN_EVENT_TABLE(CodeControlFrameClass, wxFrame)
 	EVT_MENU(CodeControlFrameClass::ID_CONTENT_ASSIST, CodeControlFrameClass::OnContentAssist)
 	EVT_MENU(CodeControlFrameClass::ID_CALL_TIP, CodeControlFrameClass::OnCallTip)
 	EVT_MENU(CodeControlFrameClass::ID_HELP, CodeControlFrameClass::OnHelp)
+	EVT_CLOSE(CodeControlFrameClass::OnClose)
 END_EVENT_TABLE()

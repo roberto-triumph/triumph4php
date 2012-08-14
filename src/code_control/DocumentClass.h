@@ -360,13 +360,20 @@ private:
 	 * This class will NOT own this pointer
 	 */
 	StructsClass* Structs;
+	
+	/**
+	 *  To keep track and stop the background thread that will parse the code for
+	 *  resources
+	 */
+	RunningThreadsClass& RunningThreads;
 
 	/**
 	 * To parse the current source code in the background. The builder will
 	 * notify us with the new cache via an event when it has completed building the
 	 * symbol table.
+	 * This pointer will self-destruct once we kill it
 	 */
-	WorkingCacheBuilderClass WorkingCacheBuilder;
+	WorkingCacheBuilderClass* WorkingCacheBuilder;
 	
 	/**
 	 * The resource signature currently being displayed in the calltip.

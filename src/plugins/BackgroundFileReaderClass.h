@@ -160,16 +160,16 @@ protected:
 	 * of the correspoding FILE_READ event; subclasses can use it in the
 	 * event handler if they want / need to.
 	 */
-	virtual bool FileRead(DirectorySearchClass& search) = 0;
+	virtual bool BackgroundFileRead(DirectorySearchClass& search) = 0;
 
 	/**
 	 * This method will be executed in it's own thread. The method
 	 * will be given a file that had a match (the files that
 	 * has DirectoryWalker.Walk() method return TRUE).
 	 */
-	virtual bool FileMatch(const wxString& file) = 0;
+	virtual bool BackgroundFileMatch(const wxString& file) = 0;
 
-	void Entry();
+	void BackgroundWork();
 
 private:
 

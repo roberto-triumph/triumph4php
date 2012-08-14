@@ -47,17 +47,15 @@ mvceditor::ResponseThreadWithHeartbeatClass::ResponseThreadWithHeartbeatClass(mv
 bool mvceditor::ResponseThreadWithHeartbeatClass::Init(wxFileName outputFile) {
 	OutputFile = outputFile;
 	if (wxTHREAD_NO_ERROR == CreateSingleInstance()) {
-		SignalStart();
 		return true;
 	}
 	return false;
 }
 
-void mvceditor::ResponseThreadWithHeartbeatClass::Entry() {
+void mvceditor::ResponseThreadWithHeartbeatClass::BackgroundWork() {
 	if (OutputFile.FileExists()) {
 		Action.Response();
 	}
-	SignalEnd();
 }
 
 mvceditor::DetectorActionClass::DetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads) 
@@ -65,7 +63,8 @@ mvceditor::DetectorActionClass::DetectorActionClass(wxEvtHandler& handler, mvced
 	, Error(NONE)
 	, ErrorMessage()
 	, Process(*this)
-	, ResponseThread(*this, runningThreads)
+	, RunningThreads(runningThreads)
+	, ResponseThread(NULL)
 	, Handler(handler)
 	, OutputFile()
 	, CurrentPid(0)
@@ -76,7 +75,9 @@ mvceditor::DetectorActionClass::~DetectorActionClass() {
 	if (CurrentPid > 0) {
 		Process.Stop(CurrentPid);
 	}
-	ResponseThread.KillInstance();
+	if (ResponseThread) {
+		ResponseThread->KillInstance();
+	}
 }
 
 bool mvceditor::DetectorActionClass::Init(int id, const EnvironmentClass& environment, const wxString& projectRootPath, const wxString& identifier, 
@@ -84,7 +85,7 @@ bool mvceditor::DetectorActionClass::Init(int id, const EnvironmentClass& enviro
 	Error = NONE;
 	ErrorMessage = wxT("");
 	Clear();
-	ResponseThread.KillInstance();
+	ResponseThread->KillInstance();
 
 	CurrentId = id;
 	wxString action = GetAction();
@@ -117,7 +118,8 @@ void mvceditor::DetectorActionClass::OnProcessComplete(wxCommandEvent& event) {
 
 	// kick off response parsing in a background thread.
 	// any running thread was stopped in Init()
-	ResponseThread.Init(OutputFile);
+	ResponseThread = new mvceditor::ResponseThreadWithHeartbeatClass(*this, RunningThreads);
+	ResponseThread->Init(OutputFile);
 }
 
 void mvceditor::DetectorActionClass::OnProcessFailed(wxCommandEvent& event) {
@@ -137,6 +139,7 @@ void mvceditor::DetectorActionClass::OnWorkInProgress(wxCommandEvent& event) {
 }
 
 void mvceditor::DetectorActionClass::OnWorkComplete(wxCommandEvent& event) {
+	ResponseThread = NULL;
 
 	// users expect an EVENT_PROCESS_COMPLETE event
 	wxCommandEvent completeEvent(mvceditor::EVENT_PROCESS_COMPLETE);
@@ -146,8 +149,8 @@ void mvceditor::DetectorActionClass::OnWorkComplete(wxCommandEvent& event) {
 }
 
 void mvceditor::DetectorActionClass::Stop() {
-	if (ResponseThread.IsRunning()) {
-		ResponseThread.KillInstance();
+	if (ResponseThread) {
+		ResponseThread->KillInstance();
 	}
 	if (CurrentPid > 0) {
 		Process.Stop(CurrentPid);

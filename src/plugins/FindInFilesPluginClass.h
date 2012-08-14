@@ -147,12 +147,12 @@ protected:
 	/**
 	 * Finds the expression in all files.
 	 */
-	bool FileRead(DirectorySearchClass& search);
+	bool BackgroundFileRead(DirectorySearchClass& search);
 
 	/**
 	 * Replaces this expression in all files.
 	 */
-	bool FileMatch(const wxString& file);
+	bool BackgroundFileMatch(const wxString& file);
 	
 private:
 
@@ -252,7 +252,7 @@ private:
 	 * Used to iterate through directories
 	 * @var DirectorySearchClass
 	 */
-	FindInFilesBackgroundReaderClass FindInFilesBackgroundFileReader;
+	FindInFilesBackgroundReaderClass* FindInFilesBackgroundFileReader;
 	
 	/**
 	 * To open the files 
