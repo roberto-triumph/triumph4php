@@ -168,7 +168,6 @@ void mvceditor::ResourcePluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 	if (NULL != ResourceFileReader) {
 		ResourceFileReader->StopReading();
 	}
-	ResourceFileReader = new mvceditor::ResourceFileReaderClass(*this, App.RunningThreads);
 
 	// the user enabled/disaable projects
 	// need to clear the entire cache, then add only the newly enabled projects

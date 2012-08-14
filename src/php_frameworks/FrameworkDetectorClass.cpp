@@ -85,7 +85,7 @@ bool mvceditor::DetectorActionClass::Init(int id, const EnvironmentClass& enviro
 	Error = NONE;
 	ErrorMessage = wxT("");
 	Clear();
-	ResponseThread->KillInstance();
+	wxASSERT(NULL == ResponseThread);
 
 	CurrentId = id;
 	wxString action = GetAction();

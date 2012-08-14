@@ -32,6 +32,8 @@
 
 static const int ID_VIEW_FILE_PANEL = wxNewId();
 
+const wxEventType mvceditor::EVENT_CALL_STACK_COMPLETE = wxNewEventType();
+
 mvceditor::CallStackCompleteEventClass::CallStackCompleteEventClass(mvceditor::CallStackClass::Errors error, bool writeError)
 	: wxEvent(wxID_ANY, mvceditor::EVENT_CALL_STACK_COMPLETE)
 	, LastError(error)

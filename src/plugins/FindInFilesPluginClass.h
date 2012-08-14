@@ -105,34 +105,34 @@ typedef void (wxEvtHandler::*FindInFilesHitEventClassFunction)(FindInFilesHitEve
 class FindInFilesBackgroundReaderClass: public BackgroundFileReaderClass {
 public:
 
+	/**
+	 * @param wxEvtHandler This object will receive the EVENT_FIND_IN_FILES_FILE_HIT events.
+	 *        and the EVENT_WORK_* events
+	 */
 	FindInFilesBackgroundReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
 
 	/**
 	 * Prepare to iterate through all files in the given directory.
 	 * 
-	 * @param wxEvtHandler* This object will receive the EVENT_FIND_IN_FILES_FILE_HIT events. The pointer will NOT be managed 
-	 *        (deleted) by this class. 
 	 * @param FindInFilesClass findInFiles the expression to search for
 	 * @param doHiddenFiles if TRUE then hidden files are searched
 	 * @param skipFiles full paths of files to not search. We want to NOT perform searches 
 	 *        in files that are already opened; those would result in incorrect hits.
 	 * @return True if directory is valid and the find expression is valid.
 	 */
-	bool InitForFind(wxEvtHandler* handler, FindInFilesClass findInFiles, bool doHiddenFiles, std::vector<wxString> skipFiles);
+	bool InitForFind(FindInFilesClass findInFiles, bool doHiddenFiles, std::vector<wxString> skipFiles);
 
 	/**
-	 * When replacing, the thread will replace all matched files. In case files are opened, we don't want to
+	 * When replacing, the thread will replace the files in the given hits. In case files are opened, we don't want to
 	 * replace them in the background since the user may have modified them but not saved them yet.
 	 * 
-	 * @param wxEvtHandler* This object will receive the various FIND events. The pointer will NOT be managed 
-	 *        (deleted) by this class. 
 	 * @param FindInFilesClass findInFiles the expression to search and replace with
+	 * @param hits the hits to be replaced
 	 * @param skipFiles full paths of files to not replace. We want to NOT perform replacements
 	 * in files that are already opened.
-	 * @return true if there are matching files from the previous find
-	 * operation.
+	 * @return true if hits is not empty
 	 */
-	bool InitForReplace(wxEvtHandler* handler, FindInFilesClass findInFiles, std::vector<wxString> skipFiles);
+	bool InitForReplace(FindInFilesClass findInFiles, const std::vector<mvceditor::FindInFilesHitClass>& hits, std::vector<wxString> skipFiles);
 
 	/**
 	 * Creates a Hit event for the current FindInFiles match. (the event will NOT be posted).
@@ -162,6 +162,11 @@ private:
 	 * @var FindInFilesClass
 	 */
 	FindInFilesClass FindInFiles;
+
+	/**
+	 * the hits to be replaced
+	 */
+	std::vector<mvceditor::FindInFilesHitClass> Hits;
 	
 	/**
 	 * Matched files that will NOT be replaced / searched
@@ -169,14 +174,6 @@ private:
 	 * show stale (and possibly wrong) hits
 	 */
 	std::vector<wxString> SkipFiles;
-	
-	/**
-	 * This object will receive the various FIND events. The pointer will NOT be managed 
-	 * deleted) by this class. 
-	 * 
-	 * @var wxEvtHandler*
-	 */
-	wxEvtHandler* Handler;
 };
 
 /** Implementing FindInFilesPanelGeneratedClass */
@@ -247,9 +244,20 @@ private:
 	 * @var FindInFilesClass
 	 */
 	FindInFilesClass FindInFiles;
+
+	/**
+	 * The matches (results of the find)
+	 */
+	std::vector<mvceditor::FindInFilesHitClass> AllHits;
+
+	/**
+	 * keeps track of the background thread
+	 */
+	mvceditor::RunningThreadsClass& RunningThreads;
 	
 	/**
-	 * Used to iterate through directories
+	 * Used to iterate through directories. this pointer will 
+	 * self-destruct
 	 * @var DirectorySearchClass
 	 */
 	FindInFilesBackgroundReaderClass* FindInFilesBackgroundFileReader;
@@ -321,6 +329,8 @@ private:
 	  * @param i index of hit to show. i is 0-based
 	  */
 	 void ShowMatch(int i);
+
+	 void OnWorkComplete(wxCommandEvent& event);
 	
 	DECLARE_EVENT_TABLE()
 };
