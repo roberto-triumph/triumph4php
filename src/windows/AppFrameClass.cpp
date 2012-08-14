@@ -133,7 +133,7 @@ void mvceditor::AppFrameClass::OnClose(wxCloseEvent& event) {
 			OutlineNotebook->DeletePage(0);
 		}
 		App.RunningThreads.StopAll();
-		Destroy();
+		event.Skip();
 	}
 }
 

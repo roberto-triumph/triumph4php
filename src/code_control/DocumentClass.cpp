@@ -332,9 +332,8 @@ void mvceditor::PhpDocumentClass::DetachFromControl(CodeControlClass* ctrl) {
 	// killInstance deletes the pointer 
 	if (WorkingCacheBuilder) {
 		WorkingCacheBuilder->KillInstance();
+		WorkingCacheBuilder = NULL;
 	}
-	WorkingCacheBuilder = new mvceditor::WorkingCacheBuilderClass(*this, RunningThreads);
-	WorkingCacheBuilder->Init();
 }
 
 bool mvceditor::PhpDocumentClass::CanAutoComplete() {

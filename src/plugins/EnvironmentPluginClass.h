@@ -85,10 +85,10 @@ public:
 	
 protected:
 
-		bool BackgroundFileMatch(const wxString& file);
-		
-		bool BackgroundFileRead(DirectorySearchClass& search);
-		
+	bool BackgroundFileMatch(const wxString& file);
+	
+	bool BackgroundFileRead(DirectorySearchClass& search);
+
 private:
 
 	ApacheClass ApacheResults;

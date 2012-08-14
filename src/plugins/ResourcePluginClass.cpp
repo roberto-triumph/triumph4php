@@ -90,6 +90,17 @@ bool mvceditor::ResourceFileReaderClass::BackgroundFileMatch(const wxString& fil
 	return false;
 }
 
+void mvceditor::ResourceFileReaderClass::BackgroundCleanup() {
+	if (GlobalCache) {
+
+		// if the thread was stopped by the user (via a program exit), then we still 
+		// own this pointer because we have not generated the event
+		delete GlobalCache;
+		GlobalCache = NULL;
+	}
+}
+
+
 bool mvceditor::ResourceFileReaderClass::InitProject(const mvceditor::ProjectClass& project,  pelet::Versions version) {
 	bool next = false;
 	std::vector<mvceditor::SourceClass> sources = project.AllPhpSources();

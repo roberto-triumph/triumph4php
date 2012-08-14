@@ -139,7 +139,7 @@ bool mvceditor::FindInFilesBackgroundReaderClass::BackgroundFileMatch(const wxSt
 	}
 	return matches > 0;
 }
-	
+
 mvceditor::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* parent, NotebookClass* notebook, 
 		StatusBarWithGaugeClass* gauge, mvceditor::RunningThreadsClass& runningThreads)
 	: FindInFilesResultsPanelGeneratedClass(parent)

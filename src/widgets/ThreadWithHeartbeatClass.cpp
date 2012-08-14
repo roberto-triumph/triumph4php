@@ -28,7 +28,7 @@
 mvceditor::ThreadWithHeartbeatClass::ThreadWithHeartbeatClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, 
 		int id)
 	: wxEvtHandler()
-	, wxThread()
+	, wxThread(wxTHREAD_DETACHED)
 	, Handler(handler)
 	, Timer()
 	, RunningThreads(runningThreads)
@@ -47,9 +47,6 @@ wxThreadError mvceditor::ThreadWithHeartbeatClass::CreateSingleInstance() {
 		SignalStart();
 		Run();
 	}
-	else {
-		delete this;
-	}
 	return error;
 }
 
@@ -64,14 +61,13 @@ void mvceditor::ThreadWithHeartbeatClass::KillInstance() {
 
 void mvceditor::ThreadWithHeartbeatClass::ForceKillInstance() {
 	
-	// since killing does not clean up, we must clean up
-	// ourselves. we need to trigger the complete event so 
+	// we need to trigger the complete event so 
 	// that the other code can remove their pointers to this
 	// object too
 	SignalEnd();
+	BackgroundCleanup();
 	RunningThreads.Remove(this);
 	Kill();
-	delete this;
 }
 
 void mvceditor::ThreadWithHeartbeatClass::SignalStart() {
@@ -95,11 +91,16 @@ void* mvceditor::ThreadWithHeartbeatClass::Entry() {
 	
 	// by doing this the owner can know when the work has been done
 	// since we are using detached threads, the thread delete themselves
+	BackgroundCleanup();
 	RunningThreads.Remove(this);
-	if (!TestDestroy()) {
+	///if (!TestDestroy()) {
 		SignalEnd();
-	}
+	///}
 	return 0;
+}
+
+void mvceditor::ThreadWithHeartbeatClass::BackgroundCleanup() {
+
 }
 
 

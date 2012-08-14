@@ -181,7 +181,6 @@ protected:
 	 * will do nothing for now
 	 */
 	bool BackgroundFileMatch(const wxString& file);
-	
 
 private:
 

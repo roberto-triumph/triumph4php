@@ -122,6 +122,14 @@ public:
 	 * This is the method to override; this method is executed in the background thread.
 	 */
 	virtual void BackgroundWork() = 0;
+
+	/**
+	 * if the thread allocates any dynamic memory (using NEW) but this thread is
+	 * Delete()'d before the thread gets a chance to wxPostEvent() to the main
+	 * thread, then it should delete the memory in this method. This method will
+	 * get called in the background thread.
+	 */
+	virtual void BackgroundCleanup();
 	
 protected:
 

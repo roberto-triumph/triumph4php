@@ -76,12 +76,14 @@ protected:
 	/**
 	 * Files will be parsed for resouces in a background thread.
 	 */
-	virtual bool BackgroundFileRead(DirectorySearchClass& search);
+	bool BackgroundFileRead(DirectorySearchClass& search);
 
 	/**
 	 * Resources will only look for PHP files.
 	 */
-	virtual bool BackgroundFileMatch(const wxString& file);
+	bool BackgroundFileMatch(const wxString& file);
+
+	void BackgroundCleanup();
 
 private:
 
@@ -91,7 +93,7 @@ private:
 	pelet::Versions Version;
 
 	/**
-	 * This class will not own this pointer. the pointer will be created by this clas
+	 * This class will not own this pointer. the pointer will be created by this class
 	 * but it will be posted via an event and the event handler will own it.
 	 */
 	mvceditor::GlobalCacheClass* GlobalCache;
