@@ -168,15 +168,17 @@ void mvceditor::ResourcePluginClass::OnAppReady(wxCommandEvent& event) {
 	pelet::Versions version = GetEnvironment()->Php.Version;
 
 	// the resource cache will own all of the globalCache pointers
-	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass;
-	globalCache->Init(mvceditor::NativeFunctionsAsset(), App.Structs.GetPhpFileExtensions(), version);
+	mvceditor::GlobalCacheClass* nativeCache = new mvceditor::GlobalCacheClass;
+	nativeCache->Init(mvceditor::NativeFunctionsAsset(), App.Structs.GetPhpFileExtensions(), version);
+	resourceCache->RegisterGlobal(nativeCache);
+
 	ProjectIndexMenu->Enable(App.Structs.HasSources() && FREE == State);
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	for (project = App.Structs.Projects.begin(); project != App.Structs.Projects.end(); ++project) {
 		if (project->IsEnabled) {
-			mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass;
-			globalCache->Init(project->ResourceDbFileName, project->GetPhpFileExtensions(), version);
-			resourceCache->RegisterGlobal(globalCache);
+			mvceditor::GlobalCacheClass* projectCache = new mvceditor::GlobalCacheClass;
+			projectCache->Init(project->ResourceDbFileName, project->GetPhpFileExtensions(), version);
+			resourceCache->RegisterGlobal(projectCache);
 		}
 	}
 
@@ -200,9 +202,9 @@ void mvceditor::ResourcePluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 	ProjectIndexMenu->Enable(App.Structs.HasSources() && FREE == State);
 	
 	// the resource cache will own all of the global cache pointers
-	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass;
-	globalCache->Init(mvceditor::NativeFunctionsAsset(), App.Structs.GetPhpFileExtensions(), version);
-	resourceCache->RegisterGlobal(globalCache);
+	mvceditor::GlobalCacheClass* nativeCache = new mvceditor::GlobalCacheClass;
+	nativeCache->Init(mvceditor::NativeFunctionsAsset(), App.Structs.GetPhpFileExtensions(), version);
+	resourceCache->RegisterGlobal(nativeCache);
 	
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	for (project = App.Structs.Projects.begin(); project != App.Structs.Projects.end(); ++project) {
@@ -212,9 +214,9 @@ void mvceditor::ResourcePluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 			// even though we know it is stale. The user is notified that the
 			// cache is stale and may not have all of the results
 			// the resource cache will own these pointers
-			globalCache = new mvceditor::GlobalCacheClass;
-			globalCache->Init(project->ResourceDbFileName, project->GetPhpFileExtensions(), version);
-			resourceCache->RegisterGlobal(globalCache);
+			mvceditor::GlobalCacheClass* projectCache = new mvceditor::GlobalCacheClass;
+			projectCache->Init(project->ResourceDbFileName, project->GetPhpFileExtensions(), version);
+			resourceCache->RegisterGlobal(projectCache);
 		}
 	}
 	
