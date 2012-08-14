@@ -385,11 +385,9 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithWorking
 
 	ResourceCache.ResourceMatches(File2, ParsedExpression, Scope, 
 		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
-	CHECK_EQUAL(1, ResourceMatches.size());
-	if (!ResourceMatches.empty()) {
-		CHECK_UNISTR_EQUALS("methodA", ResourceMatches[0].Identifier);
-		CHECK_UNISTR_EQUALS("ActionMy", ResourceMatches[0].ClassName);
-	}
+	CHECK_VECTOR_SIZE(1, ResourceMatches);
+	CHECK_UNISTR_EQUALS("methodA", ResourceMatches[0].Identifier);
+	CHECK_UNISTR_EQUALS("ActionMy", ResourceMatches[0].ClassName);
 }
 
 TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithStaleMatches) {

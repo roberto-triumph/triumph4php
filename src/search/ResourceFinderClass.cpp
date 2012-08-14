@@ -57,7 +57,7 @@ mvceditor::ResourceSearchClass::ResourceSearchClass(UnicodeString resourceQuery)
 	, MethodName()
 	, ResourceType(FILE_NAME)
 	, LineNumber(0) {
-	ResourceTypes resourceType = CLASS_NAME;
+	ResourceType = CLASS_NAME;
 
 	// :: => Class::method
 	// \ => \namespace\namespace
@@ -95,7 +95,16 @@ mvceditor::ResourceSearchClass::ResourceSearchClass(UnicodeString resourceQuery)
 
 		// class names can only have alphanumerics or underscores
 		UnicodeString symbols = UNICODE_STRING_SIMPLE("`!@#$%^&*()+={}|\\:;\"',./?");
-		bool hasSymbols = NULL != u_strpbrk(resourceQuery.getTerminatedBuffer(), symbols.getTerminatedBuffer());
+		
+		// not using getTerminatedBuffer() because that method triggers valgrind warnings
+		UChar* queryBuf = new UChar[resourceQuery.length() + 1];
+		u_memmove(queryBuf, resourceQuery.getBuffer(), resourceQuery.length());
+		queryBuf[resourceQuery.length()] = '\0';
+	
+		UChar* symbolBuf = new UChar[symbols.length() + 1];
+		u_memmove(symbolBuf, symbols.getBuffer(), symbols.length());
+		symbolBuf[symbols.length()] = '\0';
+		bool hasSymbols = NULL != u_strpbrk(queryBuf, symbolBuf);
 		if (hasSymbols) {
 			FileName = resourceQuery;
 			ResourceType = FILE_NAME;
@@ -104,6 +113,8 @@ mvceditor::ResourceSearchClass::ResourceSearchClass(UnicodeString resourceQuery)
 			ClassName = resourceQuery;
 			ResourceType = CLASS_NAME;
 		}
+		delete[] queryBuf;
+		delete[] symbolBuf;
 	}
 }
 
@@ -704,12 +715,20 @@ void mvceditor::ResourceFinderClass::TraitAliasFound(const UnicodeString& namesp
 	
 	// the trait has already been put in the cache; we just need to update it
 	UnicodeString mapKey;
+	mapKey += namespaceName;
+	mapKey += UNICODE_STRING_SIMPLE("-");
+	mapKey += className;
+	mapKey += UNICODE_STRING_SIMPLE("-");
+	mapKey += traitUsedClassName;
+	
+	/*
 	int capacity = 10 + namespaceName.length() + 1 + className.length() + 1 + traitUsedClassName.length();
 	int written = u_sprintf(mapKey.getBuffer(capacity), "%.*S-%.*S-%.*S", 
 		namespaceName.length(), namespaceName.getBuffer(), 
 		className.length(), className.getBuffer(),
 		traitUsedClassName.length(), traitUsedClassName.getBuffer());
 	mapKey.releaseBuffer(written);
+	*/
 	
 	// this code assumes that TraitUseFound() is called before TraitAliasFound()
 	std::map<UnicodeString, std::vector<mvceditor::TraitResourceClass>, UnicodeStringComparatorClass>::iterator it;
@@ -725,12 +744,21 @@ void mvceditor::ResourceFinderClass::TraitInsteadOfFound(const UnicodeString& na
 	
 	// the trait has already been put in the cache; we just need to update it
 	UnicodeString mapKey;
+	
+	mapKey += namespaceName;
+	mapKey += UNICODE_STRING_SIMPLE("-");
+	mapKey += className;
+	mapKey += UNICODE_STRING_SIMPLE("-");
+	mapKey += traitUsedClassName;
+	
+	/*
 	int capacity = 10 + namespaceName.length() + 1 + className.length() + 1 + traitUsedClassName.length();
 	int written = u_sprintf(mapKey.getBuffer(capacity), "%.*S-%.*S-%.*S", 
 		namespaceName.length(), namespaceName.getBuffer(), 
 		className.length(), className.getBuffer(),
 		traitUsedClassName.length(), traitUsedClassName.getBuffer());
 	mapKey.releaseBuffer(written);
+	*/
 	
 	// this code assumes that TraitUseFound() is called before TraitAliasFound()
 	std::map<UnicodeString, std::vector<mvceditor::TraitResourceClass>, UnicodeStringComparatorClass>::iterator it;
@@ -769,19 +797,24 @@ void mvceditor::ResourceFinderClass::TraitUseFound(const UnicodeString& namespac
 	}
 
 	// only add if not already there
-	bool found = false;
-	
 	UnicodeString mapKey;
+	mapKey += namespaceName;
+	mapKey += UNICODE_STRING_SIMPLE("-");
+	mapKey += className;
+	mapKey += UNICODE_STRING_SIMPLE("-");
+	mapKey += fullyQualifiedTraitName;
 	
 	// 10 = max space for the FileItemId as a string
 	// key is a concatenation of file item id, fully qualified class and fully qualified trait
 	// this will make the alias and instead easier to update
+	/*
 	int capacity = 10 + namespaceName.length() + 1 + className.length() + 1 + fullyQualifiedTraitName.length();
 	int written = u_sprintf(mapKey.getBuffer(capacity), "%.*S-%.*S-%.*S", 
 		namespaceName.length(), namespaceName.getBuffer(), 
 		className.length(), className.getBuffer(),
 		fullyQualifiedTraitName.length(), fullyQualifiedTraitName.getBuffer());
 	mapKey.releaseBuffer(written);
+	*/
 
 	int count = TraitCache.count(mapKey);
 	if (count <= 0) {
@@ -1695,7 +1728,6 @@ mvceditor::ResourceClass::ResourceClass()
 	, Signature()
 	, ReturnType()
 	, Comment()
-	, FullPath()
 	, Type(CLASS) 
 	, IsProtected(false)
 	, IsPrivate(false) 
@@ -1703,6 +1735,7 @@ mvceditor::ResourceClass::ResourceClass()
 	, IsDynamic(false)
 	, IsNative(false)
 	, Key()
+	, FullPath()
 	, FileItemId(-1) 
 	, FileIsNew(false) {
 		

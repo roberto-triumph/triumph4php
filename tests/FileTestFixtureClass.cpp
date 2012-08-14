@@ -54,6 +54,9 @@ void FileTestFixtureClass::RecursiveRmDir(wxString path) {
 	wxDir dir(path);
 	wxString filename;
 	bool next = dir.GetFirst(&filename, wxEmptyString, wxDIR_FILES | wxDIR_DIRS | wxDIR_HIDDEN);
+	
+	// this way so that gcc does not think that good is an unused variable
+	bool good;
 	while (next) {
 		
 		// wxRmDir does not handle symlinks
@@ -66,11 +69,11 @@ void FileTestFixtureClass::RecursiveRmDir(wxString path) {
 		else if (wxDirExists(path + filename)) {
 			RecursiveRmDir(path + filename + wxFileName::GetPathSeparator());
 			wxString fullPath = path + filename;
-			bool good = wxRmdir(fullPath);
+			good = wxRmdir(fullPath);
 			wxASSERT_MSG(good, wxT("could not remove directory:") + fullPath);
 		}
 		else {
-			bool good = wxRemoveFile(path + filename);
+			good = wxRemoveFile(path + filename);
 			wxASSERT_MSG(good, wxT("could not remove file:") + (path + filename));
 		}
 		next = dir.GetNext(&filename);
@@ -79,7 +82,10 @@ void FileTestFixtureClass::RecursiveRmDir(wxString path) {
 
 void FileTestFixtureClass::CreateFixtureFile(const wxString& fileName, const wxString& contents) {
 	if (!wxDirExists(TestProjectDir)) {
-		bool good = wxMkdir(TestProjectDir, 0777);
+		
+		// this way so that gcc does not think that good is an unused variable
+		bool good;
+		good = wxMkdir(TestProjectDir, 0777);
 		wxASSERT_MSG(good, _("Could not create directory: ") + TestProjectDir);
 	}
 	wxString fileToWrite = TestProjectDir + fileName;
@@ -136,13 +142,16 @@ wxString FileTestFixtureClass::GetFileContents(const wxString& fileName) {
 }
 
 void FileTestFixtureClass::CreateSubDirectory(const wxString& subDirectory) {
+	
+	// this way so that gcc does not think that good is an unused variable
+		bool good;
 	if (!wxDirExists(TestProjectDir)) {
-		bool good = wxMkdir(TestProjectDir, 0777);
+		good = wxMkdir(TestProjectDir, 0777);
 		wxASSERT_MSG(good, _("Could not create directory:") + TestProjectDir);
 	}
 	wxString fullPath = TestProjectDir + subDirectory;
 	if (!wxDirExists(fullPath)) {
-		bool good = wxMkdir(fullPath, 0777);
+		good = wxMkdir(fullPath, 0777);
 		wxASSERT_MSG(good, _("Could not create directory:") + fullPath);
 	}
 }

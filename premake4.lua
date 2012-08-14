@@ -125,12 +125,13 @@ function sociconfiguration()
 		MYSQL_LIB_DIR,
 		SQLITE_LIB_DIR
 	}
-	links { 
-		"soci_core_3_1", 
-		"soci_mysql_3_1", 
-		"soci_sqlite3_3_1" 
-	}
 	if os.is "windows" then 
+	
+		links { 
+			"soci_core_3_1", 
+			"soci_mysql_3_1", 
+			"soci_sqlite3_3_1" 
+		}
 		-- premake adds the lib prefix, we must take it away
 		links { 
 			string.match(MYSQL_LIB_NAME, "^([%w_]+)%.lib$"),
@@ -148,6 +149,11 @@ function sociconfiguration()
 		else
 			libdirs { "lib/soci/mvc-editor/lib" }
 		end
+		links { 
+			"soci_core", 
+			"soci_mysql", 
+			"soci_sqlite3" 
+		}
 		links { 
 			string.match(MYSQL_LIB_NAME, "^lib([%w_]+)%.so$"),
 			string.match(SQLITE_LIB_NAME , "^lib([%w_]+)%.so$") 
@@ -370,7 +376,6 @@ solution "mvc-editor"
 			"src/widgets/StatusBarWithGaugeClass.cpp",
 			"src/environment/DatabaseInfoClass.cpp",
 			"src/environment/*.cpp",
-			"src/php_frameworks/ProjectClass.cpp",
 			"src/language/*.cpp",
 			"src/search/FinderClass.cpp",
 			"src/search/FindInFilesClass.cpp",

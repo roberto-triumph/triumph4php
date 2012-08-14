@@ -81,7 +81,10 @@ public:
 		while (search.More()) {
 			globalCache->Walk(search);
 		}
-		bool good = ResourceCache.RegisterGlobal(globalCache);
+		
+		// this way so that gcc does not think that good is an unused variable
+		bool good;
+		good = ResourceCache.RegisterGlobal(globalCache);
 		wxASSERT_MSG(good, _("global cache could not be registered"));
 	}
 };

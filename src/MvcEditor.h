@@ -30,7 +30,7 @@
 #include <wx/app.h>
 #include <wx/event.h>
 #include <wx/string.h>
-#include <wx/Timer.h>
+#include <wx/timer.h>
 #include <vector>
 
 namespace mvceditor {

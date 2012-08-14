@@ -79,7 +79,6 @@ void mvceditor::WorkingCacheBuilderClass::Update(const wxString& fileName, const
 
 void mvceditor::WorkingCacheBuilderClass::Entry() {
 	while (!TestDestroy()) {
-		bool hasText = false;
 		UnicodeString code;
 		wxString file;
 		bool isNew;

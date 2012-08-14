@@ -402,7 +402,10 @@ void mvceditor::RunConsolePanelClass::AppendText(const wxString& text) {
 	finder.Mode = mvceditor::FinderClass::REGULAR_EXPRESSION;
 	finder.CaseSensitive = false;
 	finder.Expression = FileNameRegularExpression();
-	bool prep = finder.Prepare();
+	
+	// this way so that gcc does not think that good is an unused variable
+	bool prep;
+	prep = finder.Prepare();
 	wxASSERT(prep);
 	
 	UnicodeString uniText = mvceditor::WxToIcu(text);

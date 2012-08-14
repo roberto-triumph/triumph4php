@@ -30,21 +30,21 @@
 mvceditor::ProjectClass::ProjectClass()
 	: Label()
 	, Sources()
+	, ResourceDbFileName() 
 	, IsEnabled(true)
 	, PhpFileFilters()
 	, CssFileFilters()
-	, SqlFileFilters()
-	, ResourceDbFileName() {
+	, SqlFileFilters() {
 }
 
 mvceditor::ProjectClass::ProjectClass(const mvceditor::ProjectClass& project)
 	: Label(project.Label)
 	, Sources(project.Sources)
+	, ResourceDbFileName(project.ResourceDbFileName) 
 	, IsEnabled(project.IsEnabled)
 	, PhpFileFilters(project.PhpFileFilters)
 	, CssFileFilters(project.CssFileFilters)
-	, SqlFileFilters(project.SqlFileFilters) 
-	, ResourceDbFileName(project.ResourceDbFileName) {
+	, SqlFileFilters(project.SqlFileFilters) {
 }
 
 void mvceditor::ProjectClass::operator=(const mvceditor::ProjectClass& project) {

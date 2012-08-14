@@ -345,7 +345,6 @@ void mvceditor::ResourcePluginClass::StartIndex() {
 
 		//prevent two finds at a time
 		if (FREE == State) { 
-			ResourceCacheClass* resourceCache = GetResourceCache();
 			if (ResourceFileReader.InitProjectQueue(App.Structs.Projects, GetEnvironment()->Php.Version) && ResourceFileReader.ReadNextProject()) {
 					mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
 					if (ResourceFileReader.StartReading(error)) {

@@ -240,7 +240,7 @@ void mvceditor::FindInFilesResultsPanelClass::FindInOpenedFiles() {
 
 void mvceditor::FindInFilesResultsPanelClass::ShowNextMatch() {
 	wxArrayInt selections;
-	size_t selCount = ResultsList->GetSelections(selections);
+	ResultsList->GetSelections(selections);
 	ResultsList->DeselectAll();
 	int sel;
 	if (selections.GetCount() > 0 && selections[0] < ((int)ResultsList->GetCount() - 1)) {
@@ -256,7 +256,7 @@ void mvceditor::FindInFilesResultsPanelClass::ShowNextMatch() {
 
 void mvceditor::FindInFilesResultsPanelClass::ShowPreviousMatch() {
 	wxArrayInt selections;
-	size_t selCount = ResultsList->GetSelections(selections);
+	ResultsList->GetSelections(selections);
 	ResultsList->DeselectAll();
 	int sel;
 	if (selections.GetCount() > 0 && selections[0] > 0) {
