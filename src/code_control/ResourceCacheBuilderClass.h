@@ -103,6 +103,15 @@ public:
 	 * 
 	 */
 	wxThreadError Init();
+	
+	/**
+	 * this method blocks until the background thread terminates
+	 * we havce to do this when the event handler has the same lifetime as 
+	 * this object; we need the handler to be alive for longer than the 
+	 * thread is alive because the thread will generate the EVENT_WORK_COMPLETE
+	 * event after it has terminated (and the event handler needs to be valid)
+	 */
+	void Wait();
 		
 	/**
 	 * Will parse the resources of the given text in a backgound thread and will
@@ -128,6 +137,14 @@ private:
 	 * to prevent simultaneous access to the private members
 	 */
 	wxMutex Mutex;
+	
+	/**
+	 * to implement the blocking wait. the main thread will call wait()
+	 * on the condition right after it has deleted the background thread, once the
+	 * the background thread terminates nicely the background thread will
+	 * call broadcast and the main thread will unblock
+	 */
+	wxSemaphore Semaphore;
 
 	/**
 	 * the code that is being worked on by the background thread.

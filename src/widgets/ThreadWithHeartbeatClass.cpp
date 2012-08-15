@@ -73,9 +73,7 @@ void* mvceditor::ThreadWithHeartbeatClass::Entry() {
 	// since we are using detached threads, the thread delete themselves
 	BackgroundCleanup();
 	RunningThreads.Remove(this);
-	///if (!TestDestroy()) {
-		SignalEnd();
-	///}
+	SignalEnd();
 	return 0;
 }
 
@@ -87,7 +85,8 @@ void mvceditor::ThreadWithHeartbeatClass::BackgroundCleanup() {
 
 mvceditor::RunningThreadsClass::RunningThreadsClass()
 	: Workers()
-	, Mutex() {
+	, Mutex() 
+	, Semaphore(NULL) {
 		
 }
 
@@ -111,17 +110,9 @@ void mvceditor::RunningThreadsClass::Remove(wxThread* thread) {
 			it++;
 		}
 	}
-}
-
-void mvceditor::RunningThreadsClass::RemoveAndStop(wxThread* thread) {
-
-	// no need to synchronize here as we are not touching the 
-	// internal vector
-
-	// wxThread::Delete will result in graceful thread termination 
-	// will call Remove() which will untrack the thread
-	Remove(thread);
-	thread->Delete();
+	if (Semaphore) {
+		Semaphore->Post();
+	}
 }
 
 void mvceditor::RunningThreadsClass::StopAll() {
@@ -134,10 +125,23 @@ void mvceditor::RunningThreadsClass::StopAll() {
 		wxMutexLocker locker(Mutex);
 		wxASSERT(locker.IsOk());
 		copy = Workers;
+		
+		// clear the workers so that subsequent calls to 
+		// Stop() do not attempt to call Delete on the threads
+		// that we are going to call Delete() on
+		Workers.clear();
+		if (!copy.empty()) {
+			Semaphore = new wxSemaphore(0, copy.size());
+		}
 	}
-	std::vector<wxThread*>::iterator it;
-	for (it = copy.begin(); it != copy.end(); ++it) {
-		(*it)->Delete();
+	if (!copy.empty()) {
+		std::vector<wxThread*>::iterator it;
+		for (it = copy.begin(); it != copy.end(); ++it) {
+			(*it)->Delete();
+			Semaphore->Wait();
+		}
+		delete Semaphore;
+		Semaphore = NULL;
 	}
 }
 
@@ -150,8 +154,12 @@ void mvceditor::RunningThreadsClass::Stop(unsigned long threadId) {
 		for (it = Workers.begin(); it != Workers.end(); ++it) {
 			if ((*it)->GetId() == threadId) {
 				thread = *it;
+				it = Workers.erase(it);
 				break;
 			}
+		}
+		if (thread) {
+			Semaphore = new wxSemaphore(0, 1);
 		}
 	}
 	if (thread) {
@@ -160,6 +168,9 @@ void mvceditor::RunningThreadsClass::Stop(unsigned long threadId) {
 		// the Remove() method
 		// also, thread pointer will delete itself
 		thread->Delete();
+		Semaphore->Wait();
+		delete Semaphore;
+		Semaphore = NULL;
 	}
 }
 

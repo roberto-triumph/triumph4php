@@ -178,6 +178,12 @@ mvceditor::ApacheEnvironmentPanelClass::ApacheEnvironmentPanelClass(wxWindow* pa
 	Populate();
 }
 
+mvceditor::ApacheEnvironmentPanelClass::~ApacheEnvironmentPanelClass() {
+	if (RunningThreadId > 0) {
+		RunningThreads.Stop(RunningThreadId);
+	}
+}
+
 void mvceditor::ApacheEnvironmentPanelClass::OnScanButton(wxCommandEvent& event) {
 	if (0 == RunningThreadId) {
 		wxString path = ApacheConfigurationDirectory->GetPath();

@@ -206,12 +206,11 @@ mvceditor::RunBrowserPluginClass::RunBrowserPluginClass(mvceditor::AppClass& app
 	: PluginClass(app) 
 	, RecentUrls()
 	, PhpFrameworks(*this, app.RunningThreads, app.Structs.Environment)
-	, BrowserMenu(NULL)
-	, UrlMenu(NULL)
+	, BrowserMenu()
+	, UrlMenu()
 	, RunInBrowser(NULL)
 	, BrowserToolbar(NULL)
 	, State(FREE) {
-		
 }
 
 void mvceditor::RunBrowserPluginClass::AddWindows() {

@@ -267,6 +267,12 @@ private:
 	void OnWorkingCacheComplete(mvceditor::WorkingCacheCompleteEventClass& event);
 	
 	/**
+	 * when the background thread ends clear our pointer that way we dont
+	 * try to access deleted memory
+	 */
+	void OnWorkComplete(wxCommandEvent& event);
+	
+	/**
 	 * This method will check to see if document is "dirty" and if so it will
 	 * start re-parsing in the background
 	 */

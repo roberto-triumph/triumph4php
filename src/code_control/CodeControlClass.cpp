@@ -176,6 +176,7 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 }
 
 mvceditor::CodeControlClass::~CodeControlClass() {
+	Document->DetachFromControl(this);
 	delete Document;	
 }
 void mvceditor::CodeControlClass::TrackFile(const wxString& filename, UnicodeString& contents) {

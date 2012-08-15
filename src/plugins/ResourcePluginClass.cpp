@@ -220,6 +220,9 @@ void mvceditor::ResourcePluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 		State = FREE;
 		delete thread;
 	}
+	else if (thread) {
+		delete thread;
+	}
 }
 
 std::vector<mvceditor::ResourceClass> mvceditor::ResourcePluginClass::SearchForResources(const wxString& text) {

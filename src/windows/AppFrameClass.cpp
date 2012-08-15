@@ -121,6 +121,9 @@ void mvceditor::AppFrameClass::OnClose(wxCloseEvent& event) {
 			delete logger;
 		}
 		wxLog::DontCreateOnDemand();
+		
+		App.RunningThreads.StopAll();
+		
 
 		// cleanup all open code controls and tabs. this is because
 		// we want to destroy those items because they may have
@@ -132,7 +135,6 @@ void mvceditor::AppFrameClass::OnClose(wxCloseEvent& event) {
 		while (OutlineNotebook->GetPageCount() > 0) {
 			OutlineNotebook->DeletePage(0);
 		}
-		App.RunningThreads.StopAll();
 		event.Skip();
 	}
 }

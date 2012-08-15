@@ -144,6 +144,8 @@ public:
 	/** Constructor */
 	ApacheEnvironmentPanelClass(wxWindow* parent, mvceditor::RunningThreadsClass& runningThreads, EnvironmentClass& environment);
 	
+	~ApacheEnvironmentPanelClass();
+	
 	/**
 	 * transfers the settings from the window to the Environment data structure
 	 */

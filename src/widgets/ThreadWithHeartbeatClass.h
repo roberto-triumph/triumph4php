@@ -215,16 +215,6 @@ class RunningThreadsClass {
 	 * @param thread the thread to be untracked
 	 */
 	void Remove(wxThread* thread);
-	
-	/**
-	 * This method will stop the given worker and forget.  This method
-	 * should be called by the main thread
-	 * The worker is gracefully stopped, meaning that the Thread must
-	 * check TestDestroy() periodically.
-	 * 
-	 * @param thread the thread to stop (wxThread::Delete).
-	 */
-	void RemoveAndStop(wxThread* thread);
 
 	/**
 	 * stop all of the running threads.
@@ -258,6 +248,12 @@ class RunningThreadsClass {
 	 * prevent concurrent access to the internal vector
 	 */
 	wxMutex Mutex;	
+	
+	/**
+	 * to implement blocking wait when stopping all
+	 * threads
+	 */
+	wxSemaphore* Semaphore;
 };
 
 }

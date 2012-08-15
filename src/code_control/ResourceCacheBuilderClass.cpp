@@ -50,6 +50,7 @@ mvceditor::WorkingCacheBuilderClass::WorkingCacheBuilderClass(wxEvtHandler& hand
 															mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: ThreadWithHeartbeatClass(handler, runningThreads, eventId)
 	, Mutex()
+	, Semaphore(0 , 1)
 	, CurrentCode() 
 	, CurrentFileName() 
 	, CurrentFileIsNew(true) 
@@ -59,6 +60,10 @@ mvceditor::WorkingCacheBuilderClass::WorkingCacheBuilderClass(wxEvtHandler& hand
 wxThreadError mvceditor::WorkingCacheBuilderClass::Init() {
 	wxThreadError error = CreateSingleInstance();
 	return error;
+}
+
+void mvceditor::WorkingCacheBuilderClass::Wait() {
+	Semaphore.Wait();
 }
 	
 void mvceditor::WorkingCacheBuilderClass::Update(const wxString& fileName, const UnicodeString& code, bool isNew, pelet::Versions version) {
@@ -121,6 +126,7 @@ void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
 			wxThread::Sleep(200);
 		}
 	}
+	Semaphore.Post();
 }
 
 const wxEventType mvceditor::EVENT_WORKING_CACHE_COMPLETE = wxNewEventType();

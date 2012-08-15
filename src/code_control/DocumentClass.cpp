@@ -340,7 +340,14 @@ void mvceditor::PhpDocumentClass::DetachFromControl(CodeControlClass* ctrl) {
 	
 	// Stop() deletes the WorkingCacheBuilder pointer 
 	if (RunningThreadId > 0) {
+		
+		// since the background thread will be stopped nicely, it will still
+		// generate events as it is being stopped (EVENT_WORK_COMPLETE)
+		// since this object is the event handler, we must be guaranteed to be alive
+		// until the thread is actually deleted, otherwise the thread will use
+		// the handler but the handler will be invalid memory
 		RunningThreads.Stop(RunningThreadId);
+		WorkingCacheBuilder->Wait();
 		RunningThreadId = 0;
 		WorkingCacheBuilder = NULL;
 	}
@@ -1006,7 +1013,7 @@ void mvceditor::PhpDocumentClass::OnCallTipClick(wxStyledTextEvent& evt) {
 }
 
 void mvceditor::PhpDocumentClass::OnWorkingCacheComplete(mvceditor::WorkingCacheCompleteEventClass& event) {
-	bool good= Structs->ResourceCache.RegisterWorking(FileIdentifier, event.WorkingCache);
+	bool good = Structs->ResourceCache.RegisterWorking(FileIdentifier, event.WorkingCache);
 	if (!good) {
 
 		// already there
@@ -1014,8 +1021,12 @@ void mvceditor::PhpDocumentClass::OnWorkingCacheComplete(mvceditor::WorkingCache
 	}
 }
 
+void mvceditor::PhpDocumentClass::OnWorkComplete(wxCommandEvent& event) {
+	WorkingCacheBuilder = NULL;
+}
+
 void mvceditor::PhpDocumentClass::OnTimer(wxTimerEvent& event) {
-	if (NeedToUpdateResources && Structs) {
+	if (NeedToUpdateResources && Structs && WorkingCacheBuilder) {
 		UnicodeString text = GetSafeText();
 
 		// we need to differentiate between new and opened files (the 'true' arg)
@@ -1284,5 +1295,6 @@ bool mvceditor::CssDocumentClass::InCommentOrStringStyle(int posToCheck) {
 
 BEGIN_EVENT_TABLE(mvceditor::PhpDocumentClass, wxEvtHandler)
 	EVT_WORKING_CACHE_COMPLETE(mvceditor::PhpDocumentClass::OnWorkingCacheComplete)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::PhpDocumentClass::OnWorkComplete)
 	EVT_TIMER(wxID_ANY, mvceditor::PhpDocumentClass::OnTimer)
 END_EVENT_TABLE()
