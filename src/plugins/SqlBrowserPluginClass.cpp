@@ -351,12 +351,12 @@ void mvceditor::MultipleSqlExecuteClass::Close() {
 
 mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id, 
 		mvceditor::StatusBarWithGaugeClass* gauge, const mvceditor::SqlQueryClass& other,
-		mvceditor::SqlBrowserPluginClass* plugin, mvceditor::RunningThreadsClass& runningThreads) 
+		mvceditor::SqlBrowserPluginClass* plugin) 
 	: SqlBrowserPanelGeneratedClass(parent, id)
 	, Query(other)
 	, LastError()
 	, LastQuery()
-	, MultipleSqlExecute(NULL) 
+	, RunningThreadId(0) 
 	, Results()
 	, Gauge(gauge)
 	, Plugin(plugin) {
@@ -369,12 +369,12 @@ mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id,
 }
 
 mvceditor::SqlBrowserPanelClass::~SqlBrowserPanelClass() {
-	if (MultipleSqlExecute) {
+	if (RunningThreadId > 0) {
 
 		// using force kill here because once we fire a query
 		// we cannot stop it (there is no interface that soci
 		// gives us)
-		MultipleSqlExecute->ForceKillInstance();
+		Plugin->App.RunningThreads.Kill(RunningThreadId);
 	}
 }
 
@@ -389,15 +389,15 @@ bool mvceditor::SqlBrowserPanelClass::Check() {
 }
 
 void mvceditor::SqlBrowserPanelClass::Execute() {
-	if (Check() && !MultipleSqlExecute) {
-		MultipleSqlExecute = new mvceditor::MultipleSqlExecuteClass(*this, Plugin->App.RunningThreads, QueryId);
-		if (MultipleSqlExecute->Init(LastQuery, Query) && MultipleSqlExecute->Execute()) {
+	if (Check() && 0 == RunningThreadId) {
+		mvceditor::MultipleSqlExecuteClass* thread = new mvceditor::MultipleSqlExecuteClass(*this, Plugin->App.RunningThreads, QueryId);
+		if (thread->Init(LastQuery, Query) && thread->Execute()) {
+			RunningThreadId = thread->GetId();
 			Gauge->AddGauge(_("Running SQL queries"), ID_SQL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 		}
 		else {
-			delete MultipleSqlExecute;
-			MultipleSqlExecute = NULL;
-			
+			delete thread;
+			RunningThreadId = 0;			
 		}
 	}
 	else if (LastQuery.isEmpty()) {
@@ -590,7 +590,7 @@ void mvceditor::SqlBrowserPanelClass::OnWorkComplete(wxCommandEvent& event) {
 			delete Results[i];
 		}
 		Results.clear();
-		MultipleSqlExecute = NULL;
+		RunningThreadId = 0;
 		Gauge->StopGauge(ID_SQL_GAUGE);
 		Plugin->AuiManagerUpdate();
 	}
@@ -765,7 +765,7 @@ mvceditor::SqlBrowserPanelClass* mvceditor::SqlBrowserPluginClass::CreateResults
 	}
 	
 	mvceditor::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxNewId(), GetStatusBarWithGauge(), 
-		query, this, App.RunningThreads);
+		query, this);
 	mvceditor::NotebookClass* codeNotebook = GetNotebook();
 	wxString tabText = codeNotebook->GetPageText(codeNotebook->GetPageIndex(codeControl));
 

@@ -209,7 +209,7 @@ public:
 	 *        result sets
 	 */
 	SqlBrowserPanelClass(wxWindow* parent, int id, mvceditor::StatusBarWithGaugeClass* gauge,
-		const SqlQueryClass& query, SqlBrowserPluginClass* plugin, mvceditor::RunningThreadsClass& runningThreads);
+		const SqlQueryClass& query, SqlBrowserPluginClass* plugin);
 	
 	~SqlBrowserPanelClass();
 
@@ -299,10 +299,9 @@ private:
 	UnicodeString LastQuery;
 	
 	/**
-	 * used to process the SQL and execute the queries one at a time
-	 * This pointer will self-destruct
+	 * used to process stop a running query if this panel is closed.
 	 */
-	MultipleSqlExecuteClass* MultipleSqlExecute;
+	unsigned long RunningThreadId;
 	
 	/**
 	 * the accumulated results. This class will DELETE the pointers once it has rendered them.

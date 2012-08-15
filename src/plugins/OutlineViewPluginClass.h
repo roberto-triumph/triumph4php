@@ -104,12 +104,6 @@ private:
  */
 class OutlineViewPluginClass : public PluginClass {
 public:
-
-	/**
-	 * will also parse a piece of source code in a background thread and will wxPostEvent
-	 * the results to us. This pointer self-destructs
-	 */
-	ResourceFinderBackgroundThreadClass* ResourceFinderBackground;
 	
 	/**
 	 * Creates a new OutlineViewPlugin.
@@ -161,11 +155,6 @@ private:
 	 * Updates the outlines based on the currently opened (and focused) file.
 	*/
 	void OnContentNotebookPageChanged(wxAuiNotebookEvent& event);
-	
-	/**
-	 * when thread is done null the reference
-	 */
-	void OnWorkComplete(wxCommandEvent& event);
 	
 	/**
 	 * when the parsing is complete update the panel.

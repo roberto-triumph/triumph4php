@@ -244,9 +244,11 @@ private:
 	 * initialize the next project in the queue to be read. After a call to this method, the background
 	 * thread can be started.
 	 * @param version the version of PHP to check against
-	 * @return TRUE if the project has at least one source directory that exists
+	 * @return mvceditor::ResourceFileReaderClass* if the project has at least one source directory that exists
+	 *         otherwise NULL is returned. 
+	 *         since the returned pointer is a thread; the pointer will delete itself
 	 */
-	bool ReadNextProject(pelet::Versions version);
+	mvceditor::ResourceFileReaderClass* ReadNextProject(pelet::Versions version);
 	
 
 	 /**
@@ -272,12 +274,6 @@ private:
 		 */
 		GOTO
 	};
-	
-	/**
-	 * Used to iterate through directories. This pointer will
-	 * delete itself automatically
-	 */
-	ResourceFileReaderClass* ResourceFileReader;
 
 	/**
 	 * when a 'jump to resource' is done and we need to index a project, we
@@ -319,6 +315,8 @@ private:
 	 * Queue of projects to be indexed.
 	 */
 	std::queue<mvceditor::ProjectClass> ProjectQueue;
+
+	unsigned long RunningThreadId;
 
 	DECLARE_EVENT_TABLE()
 };

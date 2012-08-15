@@ -64,7 +64,7 @@ mvceditor::DetectorActionClass::DetectorActionClass(wxEvtHandler& handler, mvced
 	, ErrorMessage()
 	, Process(*this)
 	, RunningThreads(runningThreads)
-	, ResponseThread(NULL)
+	, RunningThreadId(0)
 	, Handler(handler)
 	, OutputFile()
 	, CurrentPid(0)
@@ -75,8 +75,8 @@ mvceditor::DetectorActionClass::~DetectorActionClass() {
 	if (CurrentPid > 0) {
 		Process.Stop(CurrentPid);
 	}
-	if (ResponseThread) {
-		ResponseThread->KillInstance();
+	if (RunningThreadId > 0) {
+		RunningThreads.Stop(RunningThreadId);
 	}
 }
 
@@ -85,7 +85,7 @@ bool mvceditor::DetectorActionClass::Init(int id, const EnvironmentClass& enviro
 	Error = NONE;
 	ErrorMessage = wxT("");
 	Clear();
-	wxASSERT(NULL == ResponseThread);
+	wxASSERT(0 == RunningThreadId);
 
 	CurrentId = id;
 	wxString action = GetAction();
@@ -118,8 +118,15 @@ void mvceditor::DetectorActionClass::OnProcessComplete(wxCommandEvent& event) {
 
 	// kick off response parsing in a background thread.
 	// any running thread was stopped in Init()
-	ResponseThread = new mvceditor::ResponseThreadWithHeartbeatClass(*this, RunningThreads);
-	ResponseThread->Init(OutputFile);
+	mvceditor::ResponseThreadWithHeartbeatClass* thread = 
+		new mvceditor::ResponseThreadWithHeartbeatClass(*this, RunningThreads);
+	if (thread->Init(OutputFile)) {
+		RunningThreadId = thread->GetId();
+	}
+	else {
+		RunningThreadId = 0;
+		delete thread;
+	}
 }
 
 void mvceditor::DetectorActionClass::OnProcessFailed(wxCommandEvent& event) {
@@ -139,7 +146,7 @@ void mvceditor::DetectorActionClass::OnWorkInProgress(wxCommandEvent& event) {
 }
 
 void mvceditor::DetectorActionClass::OnWorkComplete(wxCommandEvent& event) {
-	ResponseThread = NULL;
+	RunningThreadId = 0;
 
 	// users expect an EVENT_PROCESS_COMPLETE event
 	wxCommandEvent completeEvent(mvceditor::EVENT_PROCESS_COMPLETE);
@@ -149,8 +156,9 @@ void mvceditor::DetectorActionClass::OnWorkComplete(wxCommandEvent& event) {
 }
 
 void mvceditor::DetectorActionClass::Stop() {
-	if (ResponseThread) {
-		ResponseThread->KillInstance();
+	if (RunningThreadId > 0) {
+		RunningThreads.Stop(RunningThreadId);
+		RunningThreadId = 0;
 	}
 	if (CurrentPid > 0) {
 		Process.Stop(CurrentPid);

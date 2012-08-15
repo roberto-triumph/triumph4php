@@ -202,8 +202,6 @@ private:
 	 */
 	void OnViewInfosMenu(wxCommandEvent& event);
 	
-	void OnWorkComplete(wxCommandEvent& event);
-	
 	void OnCallStackComplete(mvceditor::CallStackCompleteEventClass& event);
 	
 	void OnViewInfosDetectionComplete(ViewInfosDetectedEventClass& event);
@@ -218,14 +216,7 @@ private:
 		FREE,
 		INDEXING
 	};
-	
-	/**
-	 * used to generate the call stack for the current URL
-	 * This pointer will automatically delete itself
-	 */
-	CallStackThreadClass* CallStackThread;
-	
-	
+
 	States State;
 	
 	DECLARE_EVENT_TABLE()

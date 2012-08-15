@@ -162,17 +162,17 @@ private:
 	 * keeps track of background threads
 	 */
 	mvceditor::RunningThreadsClass& RunningThreads;
-	
-	/**
-	 * To look for apache config files in the background
-	 */
-	ApacheFileReaderClass* ApacheFileReader;
-	
+		
 	/**
 	 * A copy of the current virtual hosts; this is the data structure that the 
 	 * user modifies (while the dialog is opened)
 	 */
 	ApacheClass EditedApache;
+
+	/**
+	 * the thread identifier, used to stop any running threads
+	 */
+	unsigned long RunningThreadId;
 	
 	/**
 	 * populate the dialog according to the ApacheClass settings

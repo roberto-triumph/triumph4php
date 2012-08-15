@@ -66,10 +66,6 @@ bool mvceditor::BackgroundFileReaderClass::StartReading(StartError& error) {
 	return ret;
 }
 
-void mvceditor::BackgroundFileReaderClass::StopReading() {
-	KillInstance();
-}
-
 void mvceditor::BackgroundFileReaderClass::BackgroundWork() {
 	bool isDestroy = TestDestroy();
 	int counter = 0;

@@ -254,14 +254,7 @@ private:
 	 * keeps track of the background thread
 	 */
 	mvceditor::RunningThreadsClass& RunningThreads;
-	
-	/**
-	 * Used to iterate through directories. this pointer will 
-	 * self-destruct
-	 * @var DirectorySearchClass
-	 */
-	FindInFilesBackgroundReaderClass* FindInFilesBackgroundFileReader;
-	
+		
 	/**
 	 * To open the files 
 	 * @var NotebookClass
@@ -285,6 +278,11 @@ private:
 	 * The unique identifier for the gauge.
 	 */
 	int FindInFilesGaugeId;
+
+	/**
+	 * to stop the thread if this panel is closed.
+	 */
+	unsigned long RunningThreadId;
 	
 	/**
 	 * Enable the controls that allow the user to replace hits or stop searches.

@@ -180,7 +180,6 @@ public:
 
 	wxString ErrorMessage;
 
-	
 	wxString LastCommandLine;
 
 protected:
@@ -196,10 +195,10 @@ protected:
 	mvceditor::RunningThreadsClass& RunningThreads;
 
 	/**
-	 * Used to parse the detector response in a background thread.
-	 * This pointer will automically cleanup after itself
+	 * background thread is used to parse the detector response.
+	 * Keep the ID around in case this object goes out of scope
 	 */
-	ResponseThreadWithHeartbeatClass* ResponseThread;
+	unsigned long RunningThreadId;
 
 	/**
 	 * This handler will get notified after process has ended and response

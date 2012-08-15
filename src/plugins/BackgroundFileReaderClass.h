@@ -145,11 +145,6 @@ public:
 	 * @return bool true if thread was created
 	 */
 	bool StartReading(StartError &error);
-	
-	/**
-	 * Stop the file walking.
-	 */
-	void StopReading();
 
 protected: 
 

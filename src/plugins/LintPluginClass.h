@@ -36,6 +36,8 @@
 namespace mvceditor {
 
 const wxEventType EVENT_LINT_ERROR = wxNewEventType();
+const wxEventType EVENT_LINT_SUMMARY = wxNewEventType();
+
 /**
  * One EVENT_LINT_ERROR event will be generated once a PHP lint error has been encountered.
  * See pelet::ParserClass about LintResultClass instances.
@@ -55,6 +57,26 @@ public:
 	wxEvent* Clone() const;
 };
 
+class LintResultsSummaryEventClass : public wxEvent {
+
+public:
+
+	/**
+	 * the number of files that were parsed
+	 */
+	int TotalFiles;
+
+	/**
+	 * the number of files with at lest one error
+	 */
+	int ErrorFiles;
+
+	LintResultsSummaryEventClass(int totalFiles, int errorFiles);
+
+	wxEvent* Clone() const;
+
+};
+
 typedef void (wxEvtHandler::*LintResultsEventClassFunction)(LintResultsEventClass&);
 
 #define EVT_LINT_ERROR(fn) \
@@ -62,6 +84,13 @@ typedef void (wxEvtHandler::*LintResultsEventClassFunction)(LintResultsEventClas
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( LintResultsEventClassFunction, & fn ), (wxObject *) NULL ),
 	
+typedef void (wxEvtHandler::*LintResultsSummaryEventClassFunction)(LintResultsSummaryEventClass&);
+
+#define EVT_LINT_SUMMARY(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_LINT_SUMMARY, wxID_ANY, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( LintResultsSummaryEventClassFunction, & fn ), (wxObject *) NULL ),
+
 /** 
  * This class will help in parsing the large project. It will enable access
  * to DirectorySearch and easily parse many files.
@@ -263,8 +292,6 @@ public:
 	bool CheckOnSave;
 
 	LintPluginClass(mvceditor::AppClass& app);
-	
-	~LintPluginClass();
 
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
 
@@ -293,6 +320,8 @@ private:
 	void OnLintFileComplete(wxCommandEvent& event);
 
 	void OnLintComplete(wxCommandEvent& event);
+
+	void OnLintSummary(mvceditor::LintResultsSummaryEventClass& event);
 	
 	void OnTimer(wxCommandEvent& event);
 	
@@ -300,7 +329,10 @@ private:
 	
 	void OnNotebookPageClosed(wxAuiNotebookEvent& event);	
 
-	LintBackgroundFileReaderClass LintBackgroundFileReader;
+	/**
+	 * to stop the lint background thread if the user closes the tab
+	 */
+	unsigned long RunningThreadId;
 
 	/**
 	 * This will hold all info about parse errors.

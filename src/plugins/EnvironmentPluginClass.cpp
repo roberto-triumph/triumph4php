@@ -162,8 +162,8 @@ mvceditor::ApacheEnvironmentPanelClass::ApacheEnvironmentPanelClass(wxWindow* pa
 	: ApacheEnvironmentPanelGeneratedClass(parent)
 	, Environment(environment)
 	, RunningThreads(runningThreads)
-	, ApacheFileReader(NULL)
-	, EditedApache() {
+	, EditedApache()
+	, RunningThreadId(0) {
 	EditedApache = environment.Apache;
 	wxGenericValidator manualValidator(&EditedApache.ManualConfiguration);	
 	Manual->SetValidator(manualValidator);
@@ -179,22 +179,23 @@ mvceditor::ApacheEnvironmentPanelClass::ApacheEnvironmentPanelClass(wxWindow* pa
 }
 
 void mvceditor::ApacheEnvironmentPanelClass::OnScanButton(wxCommandEvent& event) {
-	if (NULL == ApacheFileReader) {
+	if (0 == RunningThreadId) {
 		wxString path = ApacheConfigurationDirectory->GetPath();
 		wxChar ch = wxFileName::GetPathSeparator();
 		if (path[path.Length() - 1] != ch) {
 			path.Append(ch);
 		}
 		mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
-		ApacheFileReader = new mvceditor::ApacheFileReaderClass(*this, RunningThreads);
-		if (ApacheFileReader->Init(path) && ApacheFileReader->StartReading(error)) {
+		mvceditor::ApacheFileReaderClass* thread = new mvceditor::ApacheFileReaderClass(*this, RunningThreads);
+		if (thread->Init(path) && thread->StartReading(error)) {
+			RunningThreadId = thread->GetId();
 			VirtualHostList->DeleteAllItems();
 			ScanButton->SetLabel(_("Stop Scan"));
 			Gauge->Show();
 		}
 		else {
-			delete ApacheFileReader;
-			ApacheFileReader = NULL;
+			delete thread;
+			RunningThreadId = 0;
 			switch (error) {
 			case mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING:
 				wxMessageBox(_("Scanner is already running"), _("Configuration Not Found"), wxOK | wxCENTRE, this);
@@ -212,7 +213,8 @@ void mvceditor::ApacheEnvironmentPanelClass::OnScanButton(wxCommandEvent& event)
 		
 		// act like a stop button
 		Gauge->SetValue(0);
-		ApacheFileReader->StopReading();
+		RunningThreads.Stop(RunningThreadId);
+		RunningThreadId = 0;
 		ScanButton->SetLabel(_("Scan For Configuration"));
 	}
 }
@@ -251,7 +253,7 @@ void mvceditor::ApacheEnvironmentPanelClass::OnWorkInProgress(wxCommandEvent& ev
 void mvceditor::ApacheEnvironmentPanelClass::OnWorkComplete(wxCommandEvent& event) {
 	Gauge->SetValue(0);
 	ScanButton->SetLabel(_("Scan For Configuration"));
-	ApacheFileReader = NULL;
+	RunningThreadId = 0;
 }
 
 void mvceditor::ApacheEnvironmentPanelClass::OnResize(wxSizeEvent& event) {
@@ -331,20 +333,22 @@ bool mvceditor::ApacheEnvironmentPanelClass::TransferDataFromWindow() {
 }
 
 void mvceditor::ApacheEnvironmentPanelClass::OnDirChanged(wxFileDirPickerEvent& event) {
-	if (NULL == ApacheFileReader) {
+	if (0 == RunningThreadId) {
 		wxString path = ApacheConfigurationDirectory->GetPath();
 		wxChar ch = wxFileName::GetPathSeparator();
 		if (path[path.Length() - 1] != ch) {
 			path.Append(ch);
 		}
-		ApacheFileReader = new mvceditor::ApacheFileReaderClass(*this, RunningThreads);
+		mvceditor::ApacheFileReaderClass* thread = new mvceditor::ApacheFileReaderClass(*this, RunningThreads);
 		mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
-		if (ApacheFileReader->Init(path) && ApacheFileReader->StartReading(error)) {
+		if (thread->Init(path) && thread->StartReading(error)) {
+			RunningThreadId = thread->GetId();
 			VirtualHostList->DeleteAllItems();
 			ScanButton->SetLabel(_("Stop Scan"));
 			Gauge->Show();
 		}
 		else {
+			delete thread;
 			switch (error) {
 			case mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING:
 				wxMessageBox(_("Scanner is already running"), _("Configuration Not Found"), wxOK | wxCENTRE, this);

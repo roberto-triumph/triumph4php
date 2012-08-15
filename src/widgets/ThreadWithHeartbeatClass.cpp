@@ -50,26 +50,6 @@ wxThreadError mvceditor::ThreadWithHeartbeatClass::CreateSingleInstance() {
 	return error;
 }
 
-void mvceditor::ThreadWithHeartbeatClass::KillInstance() {
-	Timer.Stop();
-	
-	// RemoveAndStop() will call Delete which will gracefully end
-	// the thread and then SignalEnd() will be called; no need
-	// to call it here
-	RunningThreads.RemoveAndStop(this);
-}
-
-void mvceditor::ThreadWithHeartbeatClass::ForceKillInstance() {
-	
-	// we need to trigger the complete event so 
-	// that the other code can remove their pointers to this
-	// object too
-	SignalEnd();
-	BackgroundCleanup();
-	RunningThreads.Remove(this);
-	Kill();
-}
-
 void mvceditor::ThreadWithHeartbeatClass::SignalStart() {
 	Timer.Start(200, wxTIMER_CONTINUOUS);
 }
@@ -100,7 +80,8 @@ void* mvceditor::ThreadWithHeartbeatClass::Entry() {
 }
 
 void mvceditor::ThreadWithHeartbeatClass::BackgroundCleanup() {
-
+	// nothing here; subclasses can fill this is if they
+	// use dynamically allocated memory
 }
 
 
@@ -157,6 +138,52 @@ void mvceditor::RunningThreadsClass::StopAll() {
 	std::vector<wxThread*>::iterator it;
 	for (it = copy.begin(); it != copy.end(); ++it) {
 		(*it)->Delete();
+	}
+}
+
+void mvceditor::RunningThreadsClass::Stop(unsigned long threadId) {
+	wxThread* thread = NULL;
+	{
+		wxMutexLocker locker(Mutex);
+		wxASSERT(locker.IsOk());
+		std::vector<wxThread*>::iterator it;
+		for (it = Workers.begin(); it != Workers.end(); ++it) {
+			if ((*it)->GetId() == threadId) {
+				thread = *it;
+				break;
+			}
+		}
+	}
+	if (thread) {
+
+		// Delete will gracefully delete, which will endup calling
+		// the Remove() method
+		// also, thread pointer will delete itself
+		thread->Delete();
+	}
+}
+
+void mvceditor::RunningThreadsClass::Kill(unsigned long threadId) {
+	wxThread* thread = NULL;
+	{
+		wxMutexLocker locker(Mutex);
+		wxASSERT(locker.IsOk());
+		std::vector<wxThread*>::iterator it;
+		for (it = Workers.begin(); it != Workers.end(); ++it) {
+			if ((*it)->GetId() == threadId) {
+				thread = *it;
+
+				// different than Stop() method above; since
+				// wxThread::Kill won't gracefully terminate the thread
+				// Remove() never gets called. we must remove this pointer
+				// ourselves
+				it = Workers.erase(it);
+				break;
+			}
+		}
+	}
+	if (thread) {
+		thread->Kill();
 	}
 }
 

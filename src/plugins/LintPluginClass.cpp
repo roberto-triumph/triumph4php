@@ -44,6 +44,17 @@ wxEvent* mvceditor::LintResultsEventClass::Clone() const {
 	return new mvceditor::LintResultsEventClass(LintResults);
 }
 
+mvceditor::LintResultsSummaryEventClass::LintResultsSummaryEventClass(int totalFiles, int errorFiles)
+	: wxEvent(wxID_ANY, mvceditor::EVENT_LINT_SUMMARY)
+	, TotalFiles(totalFiles)
+	, ErrorFiles(errorFiles) {
+
+}
+
+wxEvent* mvceditor::LintResultsSummaryEventClass::Clone() const {
+	return new mvceditor::LintResultsSummaryEventClass(TotalFiles, ErrorFiles);
+}
+
 
 mvceditor::ParserDirectoryWalkerClass::ParserDirectoryWalkerClass() 
 	: LastResults()	
@@ -122,6 +133,12 @@ bool mvceditor::LintBackgroundFileReaderClass::BackgroundFileRead(DirectorySearc
 	if (error) {
 		mvceditor::LintResultsEventClass lintResultsEvent(ParserDirectoryWalker.LastResults);
 		wxPostEvent(&Handler, lintResultsEvent);
+	}
+	if (!search.More() && !TestDestroy()) {
+		int total = ParserDirectoryWalker.WithErrors + ParserDirectoryWalker.WithNoErrors;
+		int errors = ParserDirectoryWalker.WithNoErrors;
+		mvceditor::LintResultsSummaryEventClass summaryEvent(total, error);
+		wxPostEvent(&Handler, summaryEvent);
 	}
 	return !error;
 }
@@ -246,15 +263,9 @@ void mvceditor::LintResultsPanelClass::SelectPreviousError() {
 mvceditor::LintPluginClass::LintPluginClass(mvceditor::AppClass& app) 
 	: PluginClass(app)
 	, CheckOnSave(true)
-	, LintBackgroundFileReader(*this, app.RunningThreads)
+	, RunningThreadId(0)
 	, LintErrors() {
 	ResultsPanel = NULL;
-}
-
-mvceditor::LintPluginClass::~LintPluginClass() {
-	if (LintBackgroundFileReader.IsRunning()) {
-		LintBackgroundFileReader.StopReading();
-	}
 }
 
 void mvceditor::LintPluginClass::AddViewMenuItems(wxMenu* viewMenu) {
@@ -292,14 +303,15 @@ void mvceditor::LintPluginClass::SavePreferences(wxCommandEvent& event) {
 }
 
 void mvceditor::LintPluginClass::OnLintMenu(wxCommandEvent& event) {
-	if (LintBackgroundFileReader.IsRunning()) {
+	if (RunningThreadId > 0) {
 		wxMessageBox(_("There is already another lint check that is active. Please wait for it to finish."), _("Lint Check"));
 		return;
 	}
 	if (App.Structs.HasSources()) {
 		mvceditor::BackgroundFileReaderClass::StartError error;
-
-		if (LintBackgroundFileReader.BeginDirectoryLint(App.Structs.AllEnabledSources(), *GetEnvironment(), error)) {
+		mvceditor::LintBackgroundFileReaderClass* thread = new mvceditor::LintBackgroundFileReaderClass(*this, App.RunningThreads);
+		if (thread->BeginDirectoryLint(App.Structs.AllEnabledSources(), *GetEnvironment(), error)) {
+			RunningThreadId = thread->GetId();
 			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 			gauge->AddGauge(_("Lint Check"), ID_LINT_RESULTS_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 			
@@ -316,12 +328,15 @@ void mvceditor::LintPluginClass::OnLintMenu(wxCommandEvent& event) {
 		}
 		else if (error == mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING)  {
 			wxMessageBox(_("There is already another lint check that is active. Please wait for it to finish."), _("Lint Check"));
+			delete thread;
 		}
 		else if (error == mvceditor::BackgroundFileReaderClass::NO_RESOURCES)  {
 			mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
+			delete thread;
 		}
 		else {
 			wxMessageBox(_("Could not start parsing. Does project root path have files?"), _("Lint Check"));
+			delete thread;
 		}
 	}
 	else {
@@ -349,18 +364,13 @@ void mvceditor::LintPluginClass::OnLintError(mvceditor::LintResultsEventClass& e
 }
 
 void mvceditor::LintPluginClass::OnLintFileComplete(wxCommandEvent& event) {
-	
+
 }
 
 void mvceditor::LintPluginClass::OnLintComplete(wxCommandEvent& event) {
 	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 	gauge->StopGauge(ID_LINT_RESULTS_GAUGE);
-	if (ResultsPanel) {
-		int totalFiles = 0;
-		int errorFiles = 0;
-		LintBackgroundFileReader.LintTotals(totalFiles, errorFiles);
-		ResultsPanel->PrintSummary(totalFiles, errorFiles);
-	}
+	RunningThreadId = 0;
 }
 
 void mvceditor::LintPluginClass::OnTimer(wxCommandEvent& event) {
@@ -384,7 +394,8 @@ void mvceditor::LintPluginClass::OnFileSaved(mvceditor::FileSavedEventClass& eve
 	// errors (after they manually lint checked the project) then re-check
 	if (hasErrors || CheckOnSave) {
 		pelet::LintResultsClass lintResults;
-		bool error = LintBackgroundFileReader.LintSingleFile(fileName, App.Structs, *GetEnvironment(), lintResults);
+		mvceditor::LintBackgroundFileReaderClass* thread = new mvceditor::LintBackgroundFileReaderClass(*this, App.RunningThreads);
+		bool error = thread->LintSingleFile(fileName, App.Structs, *GetEnvironment(), lintResults);
 		if (error) {
 			
 			// handle the case where user has saved a file but has not clicked
@@ -407,6 +418,7 @@ void mvceditor::LintPluginClass::OnFileSaved(mvceditor::FileSavedEventClass& eve
 				codeControl->GotoPos(previousPos);
 			}
 		}
+		delete thread;
 	}
 }
 
@@ -417,11 +429,18 @@ void mvceditor::LintPluginClass::OnNotebookPageClosed(wxAuiNotebookEvent& event)
 	
 		// since this is a window, wxWidgets will do the memory cleanup
 		ResultsPanel = NULL;
-		if (LintBackgroundFileReader.IsRunning()) {
-			LintBackgroundFileReader.StopReading();
+		if (RunningThreadId > 0) {
+			App.RunningThreads.Stop(RunningThreadId);
+			RunningThreadId = 0;
 			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 			gauge->StopGauge(ID_LINT_RESULTS_GAUGE);
 		}
+	}
+}
+
+void mvceditor::LintPluginClass::OnLintSummary(mvceditor::LintResultsSummaryEventClass& event) {
+	if (ResultsPanel) {
+		ResultsPanel->PrintSummary(event.TotalFiles, event.ErrorFiles);
 	}
 }
 
@@ -444,4 +463,5 @@ BEGIN_EVENT_TABLE(mvceditor::LintPluginClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_UPDATED, mvceditor::LintPluginClass::SavePreferences)
 	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::LintPluginClass::OnNotebookPageClosed)
 	EVT_LINT_ERROR(mvceditor::LintPluginClass::OnLintError)
+	EVT_LINT_SUMMARY(mvceditor::LintPluginClass::OnLintSummary)
 END_EVENT_TABLE()

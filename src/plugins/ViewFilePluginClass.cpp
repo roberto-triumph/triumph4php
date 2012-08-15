@@ -107,8 +107,7 @@ mvceditor::ViewFilePluginClass::ViewFilePluginClass(mvceditor::AppClass& app)
 	, FrameworkDetector(*this, app.RunningThreads, app.Structs.Environment) 
 	, CallStackPersistFile() 
 	, LastError(mvceditor::CallStackClass::NONE)
-	, WriteError(false)
-	, CallStackThread(NULL) {
+	, WriteError(false) {
 	
 }
 
@@ -177,20 +176,19 @@ void mvceditor::ViewFilePluginClass::StartDetection() {
 			CallStackPersistFile.AssignTempFileName(mvceditor::TempDirAsset().GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) + wxT("call_stack"));
 			
 			// TODO: this isn't good, resource cache is not meant to be read/written to from multiple threads
-			CallStackThread = new mvceditor::CallStackThreadClass(*this, App.RunningThreads);
-			CallStackThread->InitCallStack(*GetResourceCache());
-			if (!CallStackThread->InitThread(fileName, className, methodName, GetEnvironment()->Php.Version, CallStackPersistFile)) {
+			// this pointer will delete itself when the thread terminates
+			mvceditor::CallStackThreadClass* thread = 
+				new mvceditor::CallStackThreadClass(*this, App.RunningThreads);
+			thread->InitCallStack(*GetResourceCache());
+			if (!thread->InitThread(fileName, className, methodName, GetEnvironment()->Php.Version, CallStackPersistFile)) {
 				mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Call stack file creation failed"));
+				delete thread;
 			}
 			else {
 				App.Structs.CurrentViewInfos.clear();
 			}				
 		}
 	}
-}
-
-void mvceditor::ViewFilePluginClass::OnWorkComplete(wxCommandEvent& event) {
-	CallStackThread = NULL;
 }
 
 void mvceditor::ViewFilePluginClass::OnCallStackComplete(mvceditor::CallStackCompleteEventClass& event) {
@@ -433,7 +431,6 @@ mvceditor::StringTreeItemDataClass::StringTreeItemDataClass(const wxString& str)
 }
 
 BEGIN_EVENT_TABLE(mvceditor::ViewFilePluginClass, wxEvtHandler) 
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ViewFilePluginClass::OnWorkComplete)
 	EVT_CALL_STACK_COMPLETE(mvceditor::ViewFilePluginClass::OnCallStackComplete)
 	EVT_FRAMEWORK_VIEW_INFOS_COMPLETE(mvceditor::ViewFilePluginClass::OnViewInfosDetectionComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_VIEW_FILES_FAILED, mvceditor::ViewFilePluginClass::OnViewInfosDetectionFailed)

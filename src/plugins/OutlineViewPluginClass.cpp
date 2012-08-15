@@ -80,8 +80,7 @@ void mvceditor::ResourceFinderBackgroundThreadClass::BackgroundWork() {
 }
 
 mvceditor::OutlineViewPluginClass::OutlineViewPluginClass(mvceditor::AppClass& app)
-	: PluginClass(app)
-	, ResourceFinderBackground(NULL) {
+	: PluginClass(app) {
 	
 }
 
@@ -103,14 +102,20 @@ void mvceditor::OutlineViewPluginClass::AddCodeControlClassContextMenuItems(wxMe
 void mvceditor::OutlineViewPluginClass::BuildOutlineCurrentCodeControl() {
 	CodeControlClass* code = GetCurrentCodeControl();
 	if (code != NULL) {
-		ResourceFinderBackground = new mvceditor::ResourceFinderBackgroundThreadClass(*this, App.RunningThreads);
-		if (ResourceFinderBackground->Start(code->GetFileName(), *GetEnvironment())) {
+
+		// this pointer will delete itself when the thread terminates
+		mvceditor::ResourceFinderBackgroundThreadClass* thread = 
+			new mvceditor::ResourceFinderBackgroundThreadClass(*this, App.RunningThreads);
+		if (thread->Start(code->GetFileName(), *GetEnvironment())) {
 			wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 			if (window != NULL) {
 				OutlineViewPluginPanelClass* outlineViewPanel = (OutlineViewPluginPanelClass*)window;
 				SetFocusToOutlineWindow(outlineViewPanel);
 				outlineViewPanel->SetStatus(_("Parsing ..."));
 			}
+		}
+		else {
+			delete thread;
 		}
 	}
 }
@@ -202,10 +207,6 @@ void mvceditor::OutlineViewPluginClass::OnContentNotebookPageChanged(wxAuiNotebo
 		BuildOutlineCurrentCodeControl();
 	}
 	event.Skip();
-}
-
-void mvceditor::OutlineViewPluginClass::OnWorkComplete(wxCommandEvent &event) {
-	ResourceFinderBackground = NULL;
 }
 
 void mvceditor::OutlineViewPluginClass::OnResourceFinderComplete(mvceditor::ResourceFinderCompleteEventClass& event) {
@@ -407,6 +408,5 @@ BEGIN_EVENT_TABLE(mvceditor::OutlineViewPluginClass, wxEvtHandler)
 	EVT_MENU(ID_CONTEXT_MENU_SHOW_OUTLINE_CURRENT, mvceditor::OutlineViewPluginClass::OnContextMenuOutline)
 	EVT_MENU(ID_CONTEXT_MENU_SHOW_OUTLINE_OTHER, mvceditor::OutlineViewPluginClass::OnContextMenuOutline)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::OutlineViewPluginClass::OnContentNotebookPageChanged)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::OutlineViewPluginClass::OnWorkComplete)
 	EVT_RESOURCE_FINDER_COMPLETE(mvceditor::OutlineViewPluginClass::OnResourceFinderComplete)
 END_EVENT_TABLE()

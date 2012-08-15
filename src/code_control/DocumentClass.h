@@ -368,12 +368,18 @@ private:
 	RunningThreadsClass& RunningThreads;
 
 	/**
-	 * To parse the current source code in the background. The builder will
+	 * The current source code is parsed in the background so that a symbol table can be
+	 * built in the backgroun without slowing the user down. The builder will
 	 * notify us with the new cache via an event when it has completed building the
 	 * symbol table.
-	 * This pointer will self-destruct once we kill it
 	 */
 	WorkingCacheBuilderClass* WorkingCacheBuilder;
+
+	/**
+	 * We keep the thread ID around so that we stop the thread when
+	 * this code control goes out of scope.
+	 */
+	unsigned long RunningThreadId;
 	
 	/**
 	 * The resource signature currently being displayed in the calltip.

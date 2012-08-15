@@ -109,14 +109,15 @@ public:
 	 * but it depends on the thread calling TestDestroy() as often  as possible during its
 	 * Entry() method.
 	 */
-	void KillInstance();
+	///void KillInstance();
 	
 	/**
 	 * If there is a background thread running, stop it. This IS NOT a graceful stoppage
 	 * the thread will terminate forcefully. It should only be used when TestDestroy()
 	 * cannot be called inside the background thread.
 	 */
-	void ForceKillInstance();	
+	/*void ForceKillInstance();	
+	*/
 	
 	/**
 	 * This is the method to override; this method is executed in the background thread.
@@ -229,6 +230,22 @@ class RunningThreadsClass {
 	 * stop all of the running threads.
 	 */
 	void StopAll();
+
+	/**
+	 * gracefully stops the thread with the given ID.
+	 * see wxThread::Delete
+	 *
+	 * @param thread ID of the thread to stop; see wxThread::GetId()
+	 */
+	void Stop(unsigned long threadId);
+
+	/**
+	 * *forcefully* stops the thread with the given ID.
+	 *
+	 * @param thread ID of the thread to stop; see wxThread::GetId()
+	 * see wxThread::Kill
+	 */
+	void Kill(unsigned long threadId);
 
 	private:
 

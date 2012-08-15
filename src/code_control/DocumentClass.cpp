@@ -275,6 +275,7 @@ mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::StructsClass* structs, 
 	, Structs(structs)
 	, RunningThreads(runningThreads)
 	, WorkingCacheBuilder(NULL)
+	, RunningThreadId(0)
 	, CurrentCallTipIndex(0)
 	, NeedToUpdateResources(false) 
 	, AreImagesRegistered(false) {
@@ -312,9 +313,17 @@ void mvceditor::PhpDocumentClass::AttachToControl(CodeControlClass* ctrl) {
 
 	// do this so that when a new untitled file is created that code completion still works.
 	FileOpened(FileIdentifier);
+	wxASSERT(0 == RunningThreadId);
 	wxASSERT(NULL == WorkingCacheBuilder);
 	WorkingCacheBuilder = new mvceditor::WorkingCacheBuilderClass(*this, RunningThreads);
-	WorkingCacheBuilder->Init();
+	if (wxTHREAD_NO_ERROR == WorkingCacheBuilder->Init()) {
+		RunningThreadId = WorkingCacheBuilder->GetId();
+	}
+	else {
+		delete WorkingCacheBuilder;
+		WorkingCacheBuilder = NULL;
+		RunningThreadId = 0;
+	}
 }
 
 void mvceditor::PhpDocumentClass::DetachFromControl(CodeControlClass* ctrl) {
@@ -329,9 +338,10 @@ void mvceditor::PhpDocumentClass::DetachFromControl(CodeControlClass* ctrl) {
 		NULL, this);
 	ctrl->ClearRegisteredImages();
 	
-	// killInstance deletes the pointer 
-	if (WorkingCacheBuilder) {
-		WorkingCacheBuilder->KillInstance();
+	// Stop() deletes the WorkingCacheBuilder pointer 
+	if (RunningThreadId > 0) {
+		RunningThreads.Stop(RunningThreadId);
+		RunningThreadId = 0;
 		WorkingCacheBuilder = NULL;
 	}
 }
