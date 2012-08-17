@@ -34,14 +34,20 @@
 static const int ID_SQL_GAUGE = wxNewId();
 static const int ID_SQL_METADATA_GAUGE = wxNewId();
 static const int ID_SQL_METADATA_FETCH = wxNewId();
+static const int ID_SQL_TEST = wxNewId();
 
 mvceditor::SqlConnectionDialogClass::SqlConnectionDialogClass(wxWindow* parent, std::vector<mvceditor::DatabaseInfoClass>& infos, 
-															  size_t& chosenIndex)
+															  size_t& chosenIndex,
+															  mvceditor::RunningThreadsClass& runningThreads)
 	: SqlConnectionDialogGeneratedClass(parent, wxID_ANY) 
 	, Infos(infos)
 	, EditedInfos(infos)
 	, TestQuery()
+	, RunningThreads(runningThreads)
+	, ConnectionIdentifier()
+	, RunningThreadId()
 	, ChosenIndex(chosenIndex) {
+	RunningThreads.AddEventHandler(this);
 	Label->SetValue(wxT(""));
 	Host->SetValue(wxT(""));
 	User->SetValue(wxT(""));
@@ -57,6 +63,10 @@ mvceditor::SqlConnectionDialogClass::SqlConnectionDialogClass(wxWindow* parent, 
 	}
 	UpdateTextInputs();
 	TransferDataToWindow();
+}
+
+mvceditor::SqlConnectionDialogClass::~SqlConnectionDialogClass() {
+	RunningThreads.RemoveEventHandler(this);
 }
 
 void mvceditor::SqlConnectionDialogClass::UpdateTextInputs() {
@@ -105,10 +115,13 @@ void mvceditor::SqlConnectionDialogClass::OnOkButton(wxCommandEvent& event) {
 }
 
 void mvceditor::SqlConnectionDialogClass::OnCancelButton(wxCommandEvent& event) {
-	wxThread* thread = GetThread();
-	if (thread) { 
-		thread->Kill();
+	soci::session session;
+	UnicodeString error;
+	if (TestQuery.Connect(session, error)) {
+		TestQuery.KillConnection(session, ConnectionIdentifier, error);
 	}
+	RunningThreads.Stop(RunningThreadId);
+	RunningThreadId = 0;
 	event.Skip();
 }
 
@@ -126,17 +139,13 @@ void mvceditor::SqlConnectionDialogClass::OnTestButton(wxCommandEvent& event) {
 			
 			TestQuery.Info.Copy(EditedInfos[index]);
 			wxThreadError error = wxTHREAD_NO_ERROR;
-
-			// TODO: WRONG! IsRunning() cannot be safely called with detached threads!!
-			if (GetThread() && GetThread()->IsRunning()) {
-				error = wxTHREAD_RUNNING;
-			}
-			else {
-				error = wxThreadHelper::Create();
-			}
+			
+			mvceditor::MultipleSqlExecuteClass* thread = new mvceditor::MultipleSqlExecuteClass(RunningThreads, ID_SQL_TEST, ConnectionIdentifier);
+			thread->Init(UNICODE_STRING_SIMPLE("SELECT 1"), TestQuery);
+			error = thread->CreateSingleInstance();
 			switch (error) {
 			case wxTHREAD_NO_ERROR:
-				GetThread()->Run();
+				RunningThreadId = thread->GetId();
 				wxWindow::FindWindowById(wxID_OK, this)->Disable();
 				wxWindow::FindWindowById(ID_TESTBUTTON, this)->Disable();
 				break;
@@ -224,37 +233,26 @@ void mvceditor::SqlConnectionDialogClass::OnHelpButton(wxCommandEvent& event) {
 	wxMessageBox(help, _("Help"));
 }
 
-void* mvceditor::SqlConnectionDialogClass::Entry() {
-	UnicodeString error;
-	soci::session session;
-	bool success = false;
-	if (TestQuery.Connect(session, error)) {
-		soci::statement stmt = (session.prepare << "SELECT 1");
-		success = TestQuery.Execute(stmt, error);
-		TestQuery.Close(session, stmt);
-	}
-	wxCommandEvent evt(QUERY_COMPLETE_EVENT, wxID_ANY);
-	evt.SetInt(success ? 1 : 0);
-	evt.SetString(mvceditor::IcuToWx(error));
-	wxPostEvent(this, evt);
-	return 0;
-}
-
 void mvceditor::SqlConnectionDialogClass::ShowTestResults(wxCommandEvent& event) {
+	mvceditor::SqlResultClass* result = (mvceditor::SqlResultClass*)event.GetClientData();
+	wxString error = mvceditor::IcuToWx(result->Error);
+	bool success = result->Success;
+	
 	wxString msg = _("Connection to %s@%s was successful");
 	msg = wxString::Format(msg, 
 		mvceditor::IcuToWx(TestQuery.Info.User).c_str(), 
 		mvceditor::IcuToWx(TestQuery.Info.Host).c_str());
-	if (event.GetInt() == 0) {
+	if (!success) {
 		msg = _("Connection to %s@%s failed: %s");
 		msg = wxString::Format(msg, 
 		mvceditor::IcuToWx(TestQuery.Info.User).c_str(), 
 		mvceditor::IcuToWx(TestQuery.Info.Host).c_str(), 
-		event.GetString().c_str());
+		error.c_str());
 	}
 	wxMessageBox(msg);
 	wxWindow::FindWindowById(wxID_OK, this)->Enable();
 	wxWindow::FindWindowById(ID_TESTBUTTON, this)->Enable();
+	delete result;
 }
 
 void mvceditor::SqlConnectionDialogClass::OnListboxSelected(wxCommandEvent& event) {
@@ -856,7 +854,7 @@ void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event
 	// first time a new project is created; its database may not exist).
 	// before, a user would not be able to edit the connection info once it was detected
 	// in order to make it less confusing about where the connection info comes from.
-	mvceditor::SqlConnectionDialogClass dialog(GetMainWindow(), App.Structs.Infos, ChosenIndex);
+	mvceditor::SqlConnectionDialogClass dialog(GetMainWindow(), App.Structs.Infos, ChosenIndex, App.RunningThreads);
 	if (dialog.ShowModal() == wxOK) {
 		
 		// if chosen connection changed need to update the code control so that it knows to use the new
@@ -1079,5 +1077,5 @@ BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPanelClass, SqlBrowserPanelGeneratedClass
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::SqlConnectionDialogClass, SqlConnectionDialogGeneratedClass)
-	EVT_COMMAND(wxID_ANY, QUERY_COMPLETE_EVENT, mvceditor::SqlConnectionDialogClass::ShowTestResults)
+	EVT_COMMAND(ID_SQL_TEST, QUERY_COMPLETE_EVENT, mvceditor::SqlConnectionDialogClass::ShowTestResults)
 END_EVENT_TABLE()

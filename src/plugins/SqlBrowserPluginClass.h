@@ -48,10 +48,11 @@ namespace mvceditor {
  */
 const wxEventType QUERY_COMPLETE_EVENT = wxNewEventType();
 
-// forward declaration; definiton is at the bottom of this file
+// forward declarations; definitons are at the bottom of this file
 class SqlBrowserPluginClass;
+class MultipleSqlExecuteClass;
 
-class SqlConnectionDialogClass : public SqlConnectionDialogGeneratedClass, wxThreadHelper {
+class SqlConnectionDialogClass : public SqlConnectionDialogGeneratedClass {
 
 public:
 
@@ -62,7 +63,10 @@ public:
 	 *        user will NOT be able to edit the detected connections.
 	 * @param size_t& chosenIndex the info item that the user selected 
 	 */
-	SqlConnectionDialogClass(wxWindow* parent, std::vector<mvceditor::DatabaseInfoClass>& infos, size_t& chosenIndex);
+	SqlConnectionDialogClass(wxWindow* parent, std::vector<mvceditor::DatabaseInfoClass>& infos, size_t& chosenIndex,
+		mvceditor::RunningThreadsClass& runningThreads);
+	
+	~SqlConnectionDialogClass();
 	
 private:
 
@@ -81,12 +85,7 @@ private:
 	void OnListboxSelected(wxCommandEvent& event);
 
 	void OnHelpButton(wxCommandEvent& event);
-	
-	/**
-	 * Connection test will happen in a separate thread so dialog stays responsive
-	 */
-	void* Entry();
-	
+		
 	void ShowTestResults(wxCommandEvent& event);
 	
 	/**
@@ -107,7 +106,26 @@ private:
 	 */
 	std::vector<DatabaseInfoClass> EditedInfos;
 	
-	SqlQueryClass TestQuery;
+	/**
+	 * to execute the test query
+	 */
+	mvceditor::SqlQueryClass TestQuery;
+	
+	/**
+	 * to keep track of the background thread that will
+	 * test the connection
+	 */
+	mvceditor::RunningThreadsClass& RunningThreads;
+	
+	/**
+	 * to kill the test query if needed
+	 */
+	mvceditor::ConnectionIdentifierClass ConnectionIdentifier;
+
+	/**
+	 * to kill the test query thread if needed
+	 */
+	int RunningThreadId;
 	
 	size_t& ChosenIndex;
 	
