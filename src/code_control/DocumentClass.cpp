@@ -166,9 +166,6 @@ enum AutoCompletionImages {
 	AUTOCOMP_IMAGE_PUBLIC_MEMBER
 };
 
-static const int ID_WORKING_CACHE_THREAD = wxNewId();
-
-
 /**
  * @return the signature of the resource at the given index.
  * signature is in a format that is ready for the Scintilla call tip (with up or down arrows as appropriate)
@@ -284,6 +281,7 @@ mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::StructsClass* structs, 
 	Timer.SetOwner(this);
 	Timer.Start(500, wxTIMER_CONTINUOUS);
 	RunningThreads.AddEventHandler(this);
+	WorkingCacheEventId = wxNewId();
 
 	// need to give this new file unique name so because the
 	// resource updates object needs a unique name
@@ -324,7 +322,7 @@ void mvceditor::PhpDocumentClass::AttachToControl(CodeControlClass* ctrl) {
 	FileOpened(FileIdentifier);
 	wxASSERT(0 == RunningThreadId);
 	wxASSERT(NULL == WorkingCacheBuilder);
-	WorkingCacheBuilder = new mvceditor::WorkingCacheBuilderClass(RunningThreads, ID_WORKING_CACHE_THREAD);
+	WorkingCacheBuilder = new mvceditor::WorkingCacheBuilderClass(RunningThreads, WorkingCacheEventId);
 	if (wxTHREAD_NO_ERROR == WorkingCacheBuilder->Init()) {
 		RunningThreadId = WorkingCacheBuilder->GetId();
 	}
@@ -1015,16 +1013,26 @@ void mvceditor::PhpDocumentClass::OnCallTipClick(wxStyledTextEvent& evt) {
 }
 
 void mvceditor::PhpDocumentClass::OnWorkingCacheComplete(mvceditor::WorkingCacheCompleteEventClass& event) {
-	bool good = Structs->ResourceCache.RegisterWorking(FileIdentifier, event.WorkingCache);
-	if (!good) {
+	if (event.GetId() == WorkingCacheEventId) {
+		bool good = Structs->ResourceCache.RegisterWorking(FileIdentifier, event.WorkingCache);
+		if (!good) {
 
-		// already there
-		Structs->ResourceCache.ReplaceWorking(FileIdentifier, event.WorkingCache);
+			// already there
+			Structs->ResourceCache.ReplaceWorking(FileIdentifier, event.WorkingCache);
+		}
+	}
+	else {
+		event.Skip();
 	}
 }
 
 void mvceditor::PhpDocumentClass::OnWorkComplete(wxCommandEvent& event) {
-	WorkingCacheBuilder = NULL;
+	if (event.GetId() == WorkingCacheEventId) {
+		WorkingCacheBuilder = NULL;
+	}
+	else {
+		event.Skip();
+	}
 }
 
 void mvceditor::PhpDocumentClass::OnTimer(wxTimerEvent& event) {
@@ -1296,7 +1304,7 @@ bool mvceditor::CssDocumentClass::InCommentOrStringStyle(int posToCheck) {
 }		
 
 BEGIN_EVENT_TABLE(mvceditor::PhpDocumentClass, wxEvtHandler)
-	EVT_WORKING_CACHE_COMPLETE(ID_WORKING_CACHE_THREAD, mvceditor::PhpDocumentClass::OnWorkingCacheComplete)
-	EVT_COMMAND(ID_WORKING_CACHE_THREAD, mvceditor::EVENT_WORK_COMPLETE, mvceditor::PhpDocumentClass::OnWorkComplete)
+	EVT_WORKING_CACHE_COMPLETE(wxID_ANY, mvceditor::PhpDocumentClass::OnWorkingCacheComplete)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::PhpDocumentClass::OnWorkComplete)
 	EVT_TIMER(wxID_ANY, mvceditor::PhpDocumentClass::OnTimer)
 END_EVENT_TABLE()

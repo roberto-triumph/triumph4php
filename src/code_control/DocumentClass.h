@@ -386,6 +386,13 @@ private:
 	 * this code control goes out of scope.
 	 */
 	unsigned long RunningThreadId;
+
+	/**
+	 * ID assigned to this document's thread. note that each code control has its own
+	 * instance of document, each document has its own thread and therefore must
+	 * have its own unique event ID.
+	 */
+	int WorkingCacheEventId;
 	
 	/**
 	 * The resource signature currently being displayed in the calltip.

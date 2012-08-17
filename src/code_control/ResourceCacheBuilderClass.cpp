@@ -91,7 +91,13 @@ void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
 			wxMutexLocker lock(Mutex);
 			wxASSERT(lock.IsOk());
 
-			code.setTo(CurrentCode);
+			// use extract to perform a pure copy
+			UErrorCode error = U_ZERO_ERROR;
+			int32_t len = CurrentCode.length();
+			UChar* buf = code.getBuffer(len);
+			CurrentCode.extract(buf, CurrentCode.length(), error);
+			code.releaseBuffer(len);
+
 			file.Append(CurrentFileName);
 			isNew = CurrentFileIsNew;
 			version = CurrentVersion;

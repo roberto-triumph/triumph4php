@@ -113,8 +113,8 @@ void mvceditor::ResourceCacheClass::RemoveWorking(const wxString& fileName) {
 	std::map<wxString, mvceditor::WorkingCacheClass*>::iterator it = WorkingCaches.find(fileName);
 	if (it != WorkingCaches.end()) {
 		delete it->second;
+		WorkingCaches.erase(it);
 	}
-	WorkingCaches.erase(fileName);
 }
 
 bool mvceditor::ResourceCacheClass::RegisterGlobal(mvceditor::GlobalCacheClass* cache) {
