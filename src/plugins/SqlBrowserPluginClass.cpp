@@ -309,7 +309,7 @@ void mvceditor::MultipleSqlExecuteClass::BackgroundWork() {
 	UnicodeString query;
 	bool connected = Query.Connect(Session, error);
 	if (connected) {
-		while (SqlLexer.NextQuery(query)) {		
+		while (SqlLexer.NextQuery(query) && !TestDestroy()) {		
 			wxLongLong start = wxGetLocalTimeMillis();
 
 			// create a new result on the heap; the event handler must delete it
@@ -318,13 +318,12 @@ void mvceditor::MultipleSqlExecuteClass::BackgroundWork() {
 			results->LineNumber = SqlLexer.GetLineNumber();
 			
 			Query.ConnectionIdentifier(Session, ConnectionIdentifier);
+
+			// always post the results even if the query has an error.
 			Query.Execute(Session, *results, query);
 			wxCommandEvent evt(QUERY_COMPLETE_EVENT, QueryId);
 			evt.SetClientData(results);
-			PostEvent(evt);
-			if (!results->Success) {
-				break;
-			}
+			PostEvent(evt);			
 		}
 		SqlLexer.Close();
 	}

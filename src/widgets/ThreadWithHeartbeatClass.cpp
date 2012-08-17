@@ -168,13 +168,18 @@ void mvceditor::RunningThreadsClass::Stop(unsigned long threadId) {
 		if (thread) {
 			Semaphore = new wxSemaphore(0, 1);
 		}
-		
+	}
+	if (thread && Semaphore) {
 		// Delete will gracefully delete, which will endup calling
 		// the Remove() method
 		// also, thread pointer will delete itself
+		// we must do this outside of the mutex because in windows
+		// detached threads are really just joinable threads and the wxThread::Delete()
+		// call blocks until the thread terminates; but if we call Delete
+		// inside the mutex we produce a deadlock since Remove() tries to lock
+		// the mutex too
 		thread->Delete();
-	}
-	if (thread) {
+
 		Semaphore->Wait();
 		delete Semaphore;
 		Semaphore = NULL;
