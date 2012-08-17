@@ -102,17 +102,19 @@ void mvceditor::RunningThreadsClass::Add(wxThread* thread) {
 }
 
 void mvceditor::RunningThreadsClass::Remove(wxThread* thread) {
-	wxMutexLocker locker(Mutex);
-	wxASSERT(locker.IsOk());
-	std::vector<wxThread*>::iterator it = Workers.begin();
-	while (it != Workers.end()) {
-		if (*it == thread) {
-			
-			// untrack only 
-			it = Workers.erase(it);
-		}
-		else {
-			it++;
+	{
+		wxMutexLocker locker(Mutex);
+		wxASSERT(locker.IsOk());
+		std::vector<wxThread*>::iterator it = Workers.begin();
+		while (it != Workers.end()) {
+			if (*it == thread) {
+				
+				// untrack only 
+				it = Workers.erase(it);
+			}
+			else {
+				it++;
+			}
 		}
 	}
 	if (Semaphore) {
@@ -166,13 +168,13 @@ void mvceditor::RunningThreadsClass::Stop(unsigned long threadId) {
 		if (thread) {
 			Semaphore = new wxSemaphore(0, 1);
 		}
-	}
-	if (thread) {
-
+		
 		// Delete will gracefully delete, which will endup calling
 		// the Remove() method
 		// also, thread pointer will delete itself
 		thread->Delete();
+	}
+	if (thread) {
 		Semaphore->Wait();
 		delete Semaphore;
 		Semaphore = NULL;

@@ -138,6 +138,14 @@ typedef void (wxEvtHandler::*FileSavedEventClassFunction)(FileSavedEventClass&);
 extern const wxEventType EVENT_APP_READY;
 
 /**
+ * This is a one-time event that gets generated after the user has clicked the
+ * Exit or Close button on the main frame AND the user has chosen to 
+ * not save the open files (or has already saved them).  Plugins can
+ * do any final cleanup in this event handler.
+ */
+extern const wxEventType EVENT_APP_EXIT;
+
+/**
  * Notification that the projects list has been opened / closed or any project's source definitions have 
  * updated. This event is fired AFTER the framework
  * detection is complete; it is safe to access a project's database connections, dynamic

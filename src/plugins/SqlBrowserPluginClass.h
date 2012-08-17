@@ -468,6 +468,8 @@ private:
 
 	void OnSqlMetaDataComplete(mvceditor::SqlMetaDataEventClass& event);
 	
+	void OnAppExit(wxCommandEvent& event);
+	
 	/**
 	 * synchronize the SQL query tab in the code control notebook with
 	 * the results tool notebook.  Will switch the page of the

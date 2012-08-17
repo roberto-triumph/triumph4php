@@ -434,6 +434,7 @@ void mvceditor::SqlBrowserPanelClass::Stop() {
 	}
 	Plugin->App.RunningThreads.Stop(RunningThreadId);
 	RunningThreadId = 0;
+	Gauge->StopGauge(ID_SQL_GAUGE);
 }
 
 void mvceditor::SqlBrowserPanelClass::OnQueryComplete(wxCommandEvent& event) {
@@ -947,6 +948,21 @@ void mvceditor::SqlBrowserPluginClass::OnToolsNotebookPageClose(wxAuiNotebookEve
 	}
 }
 
+void mvceditor::SqlBrowserPluginClass::OnAppExit(wxCommandEvent& event) {
+	wxAuiNotebook* notebook = GetToolsNotebook();
+	for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
+		wxWindow* toolsWindow = notebook->GetPage(i);
+
+		// only cast when we are sure of the type of window
+		// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
+		// methods
+		if (toolsWindow->GetName() == wxT("mvceditor::SqlBrowserPanelClass")) {
+			mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)toolsWindow;
+			panel->Stop();
+		}
+	}
+}
+
 void mvceditor::SqlBrowserPluginClass::OnWorkInProgress(wxCommandEvent& event) {
 	GetStatusBarWithGauge()->IncrementGauge(ID_SQL_METADATA_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
 }
@@ -1053,6 +1069,7 @@ BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPluginClass, wxEvtHandler)
 	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::SqlBrowserPluginClass::OnToolsNotebookPageClose)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::SqlBrowserPluginClass::OnProjectsUpdated)
 	EVT_SQL_META_DATA_COMPLETE(ID_SQL_METADATA_FETCH, mvceditor::SqlBrowserPluginClass::OnSqlMetaDataComplete)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_EXIT, mvceditor::SqlBrowserPluginClass::OnAppExit)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPanelClass, SqlBrowserPanelGeneratedClass)

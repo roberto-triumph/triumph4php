@@ -110,6 +110,8 @@ void mvceditor::AppFrameClass::OnClose(wxCloseEvent& event) {
 		destroy = Notebook->SaveAllModifiedPages();
 	}
 	if (destroy) {
+		wxCommandEvent exitEvent(mvceditor::EVENT_APP_EXIT);
+		App.EventSink.Publish(exitEvent);
 		
 		// need to detach the window from the keyboard BEFORE the window is invalidated
 		Preferences.KeyProfiles.GetSelProfile()->DetachAll();	
