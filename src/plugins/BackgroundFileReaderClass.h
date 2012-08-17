@@ -101,7 +101,7 @@ public:
 	 * 		  mvceditor::WORK_* events 
 	 * @see mvceditor::ThreadWithHeartbeatClass
 	 */
-	BackgroundFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
+	BackgroundFileReaderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
 	 * Prepare the background thread to iterate through all

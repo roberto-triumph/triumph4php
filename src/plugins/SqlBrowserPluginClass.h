@@ -122,12 +122,14 @@ class MultipleSqlExecuteClass : public ThreadWithHeartbeatClass {
 public:
 
 	/**
-	 * @param handler the object that will receive the EVENT_WORK_* events when queries are
+	 * @param runningThreads the object that will receive the EVENT_WORK_* events when queries are
 	 *        finished being executed
 	 * @param queryId this ID will be used by the handler; the handler should only handle its own
 	 *        query results.
+	 * @param connectionIdentifier the connection ID will be set, and the main thread can read
+	 *        the connection ID to kill a query when the user wants to cancel it
 	 */
-	MultipleSqlExecuteClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, int queryId);
+	MultipleSqlExecuteClass(mvceditor::RunningThreadsClass& runningThreads, int queryId, mvceditor::ConnectionIdentifierClass& connectionIdentifier);
 	
 	/**
 	 * Prepares queries to be run
@@ -183,6 +185,12 @@ private:
 	soci::session Session;
 
 	/**
+	 * the background thread and the main thread will share the connection ID;
+	 * the connection ID will be read by the main thread to kill a query when the user wants to cancel it
+	 */
+	ConnectionIdentifierClass& ConnectionIdentifier;
+
+	/**
 	 * This ID will be used to differentiate between the events that the various panels will generate.
 	 * Each panel will only handles the events generated from its own MultipleSqlExecute class.
 	 */
@@ -217,6 +225,11 @@ public:
 	 * Runs the query that is in the text control (in a separate thread).
 	 */
 	void Execute();
+
+	/**
+	 * kills a running query in a nice way.
+	 */
+	void Stop();
 
 	/**
 	 * When a query has finished running display the results in the grid
@@ -287,6 +300,13 @@ private:
 	 * The connection info
 	 */
 	SqlQueryClass Query;
+
+	/**
+	 * this enable the query thread to give us the connection
+	 * ID so that we can issue a kill command to stop
+	 * a query when this panel is destroyed.
+	 */
+	mvceditor::ConnectionIdentifierClass ConnectionIdentifier;
 	
 	/**
 	 * Filled in with the last error string from the database
@@ -354,7 +374,7 @@ public:
 	 */
 	std::vector<UnicodeString> Errors;
 	
-	SqlMetaDataEventClass(const mvceditor::SqlResourceFinderClass& resources, 
+	SqlMetaDataEventClass(int eventId, const mvceditor::SqlResourceFinderClass& resources, 
 		const std::vector<UnicodeString>& errors);
 
 	wxEvent* Clone() const;
@@ -363,8 +383,8 @@ public:
 
 typedef void (wxEvtHandler::*SqlMetaDataEventClassFunction)(SqlMetaDataEventClass&);
 
-#define EVT_SQL_META_DATA_COMPLETE(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_SQL_META_DATA_COMPLETE, wxID_ANY, -1, \
+#define EVT_SQL_META_DATA_COMPLETE(id, fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_SQL_META_DATA_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( SqlMetaDataEventClassFunction, & fn ), (wxObject *) NULL ),
 
@@ -380,10 +400,10 @@ class SqlMetaDataFetchClass : public ThreadWithHeartbeatClass {
 public:
 
 	/**
-	 * @param handler will get notified with EVENT_WORK_* events
+	 * @param runningThreads will get notified with EVENT_WORK_* events
 	 *        and the EVENT_SQL_META_DATA_COMPLETE event
 	 */
-	SqlMetaDataFetchClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
+	SqlMetaDataFetchClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 	
 	/**
 	 * starts a background thread to read the metadata. Generates events while work
@@ -463,6 +483,11 @@ private:
 	void OnContentNotebookPageClose(wxAuiNotebookEvent& event);
 
 	/**
+	 * when a results panel is closed, kill the running query
+	 */
+	void OnToolsNotebookPageClose(wxAuiNotebookEvent& event);
+
+	/**
 	 * Will start the SQL meta data background task
 	 */
 	void DetectMetadata();
@@ -471,12 +496,7 @@ private:
 	 * Saves the user-created infos using the global config.
 	 */
 	void SavePreferences();
-		
-	/**
-	 * To detect the SQL connections. This pointer will self-destruct
-	 */
-	SqlMetaDataFetchClass* SqlMetaDataFetch;
-	
+
 	/**
 	 * index into Infos vector; the connection that is currently active.
 	 * Any new results panels that are created will use this connection. Any

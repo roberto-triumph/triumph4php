@@ -49,7 +49,7 @@ public:
 
 	mvceditor::ApacheClass Apache;
 
-	ApacheFileReadCompleteEventClass(const mvceditor::ApacheClass& apache);
+	ApacheFileReadCompleteEventClass(int eventId, const mvceditor::ApacheClass& apache);
 
 	wxEvent* Clone() const;
 	
@@ -57,8 +57,8 @@ public:
 
 typedef void (wxEvtHandler::*ApacheFileReadCompleteEventClassFunction)(ApacheFileReadCompleteEventClass&);
 
-#define EVT_APACHE_FILE_READ_COMPLETE(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_APACHE_FILE_READ_COMPLETE, wxID_ANY, -1, \
+#define EVT_APACHE_FILE_READ_COMPLETE(id, fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_APACHE_FILE_READ_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( ApacheFileReadCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
 
@@ -75,7 +75,7 @@ public:
 	/**
 	 * @param handler the event handler for the EVENT_APACHE_FILE_READ_COMPLETE and EVENT_WORK_* events
 	 */
-	ApacheFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
+	ApacheFileReaderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 	
 	/**
 	 * setup the background thread (does not start the thread)

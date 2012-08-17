@@ -166,6 +166,8 @@ enum AutoCompletionImages {
 	AUTOCOMP_IMAGE_PUBLIC_MEMBER
 };
 
+static const int ID_WORKING_CACHE_THREAD = wxNewId();
+
 
 /**
  * @return the signature of the resource at the given index.
@@ -281,6 +283,7 @@ mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::StructsClass* structs, 
 	, AreImagesRegistered(false) {
 	Timer.SetOwner(this);
 	Timer.Start(500, wxTIMER_CONTINUOUS);
+	RunningThreads.AddEventHandler(this);
 
 	// need to give this new file unique name so because the
 	// resource updates object needs a unique name
@@ -293,6 +296,12 @@ mvceditor::PhpDocumentClass::~PhpDocumentClass() {
 	if (Structs) {
 		Structs->ResourceCache.RemoveWorking(FileIdentifier);
 	}	
+
+	// Stop() deletes the WorkingCacheBuilder pointer 
+	if (RunningThreadId > 0 && WorkingCacheBuilder) {
+		RunningThreads.Stop(RunningThreadId);
+	}
+	RunningThreads.RemoveEventHandler(this);
 }
 
 
@@ -315,7 +324,7 @@ void mvceditor::PhpDocumentClass::AttachToControl(CodeControlClass* ctrl) {
 	FileOpened(FileIdentifier);
 	wxASSERT(0 == RunningThreadId);
 	wxASSERT(NULL == WorkingCacheBuilder);
-	WorkingCacheBuilder = new mvceditor::WorkingCacheBuilderClass(*this, RunningThreads);
+	WorkingCacheBuilder = new mvceditor::WorkingCacheBuilderClass(RunningThreads, ID_WORKING_CACHE_THREAD);
 	if (wxTHREAD_NO_ERROR == WorkingCacheBuilder->Init()) {
 		RunningThreadId = WorkingCacheBuilder->GetId();
 	}
@@ -337,19 +346,12 @@ void mvceditor::PhpDocumentClass::DetachFromControl(CodeControlClass* ctrl) {
 		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(wxStyledTextEventFunction, &mvceditor::PhpDocumentClass::OnAutoCompletionSelected),
 		NULL, this);
 	ctrl->ClearRegisteredImages();
-	
+
 	// Stop() deletes the WorkingCacheBuilder pointer 
-	if (RunningThreadId > 0) {
-		
-		// since the background thread will be stopped nicely, it will still
-		// generate events as it is being stopped (EVENT_WORK_COMPLETE)
-		// since this object is the event handler, we must be guaranteed to be alive
-		// until the thread is actually deleted, otherwise the thread will use
-		// the handler but the handler will be invalid memory
+	if (RunningThreadId > 0 && WorkingCacheBuilder) {
 		RunningThreads.Stop(RunningThreadId);
-		WorkingCacheBuilder->Wait();
-		RunningThreadId = 0;
 		WorkingCacheBuilder = NULL;
+		RunningThreadId = 0;
 	}
 }
 
@@ -1294,7 +1296,7 @@ bool mvceditor::CssDocumentClass::InCommentOrStringStyle(int posToCheck) {
 }		
 
 BEGIN_EVENT_TABLE(mvceditor::PhpDocumentClass, wxEvtHandler)
-	EVT_WORKING_CACHE_COMPLETE(mvceditor::PhpDocumentClass::OnWorkingCacheComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::PhpDocumentClass::OnWorkComplete)
+	EVT_WORKING_CACHE_COMPLETE(ID_WORKING_CACHE_THREAD, mvceditor::PhpDocumentClass::OnWorkingCacheComplete)
+	EVT_COMMAND(ID_WORKING_CACHE_THREAD, mvceditor::EVENT_WORK_COMPLETE, mvceditor::PhpDocumentClass::OnWorkComplete)
 	EVT_TIMER(wxID_ANY, mvceditor::PhpDocumentClass::OnTimer)
 END_EVENT_TABLE()

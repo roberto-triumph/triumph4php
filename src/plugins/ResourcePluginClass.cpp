@@ -33,9 +33,10 @@
 #include <wx/valgen.h>
 
 static int ID_COUNT_FILES_GAUGE = wxNewId();
+static int ID_RESOURCE_READER = wxNewId();
 
-mvceditor::ResourceFileReaderClass::ResourceFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads) 
-	: BackgroundFileReaderClass(handler, runningThreads)
+mvceditor::ResourceFileReaderClass::ResourceFileReaderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId) 
+	: BackgroundFileReaderClass(runningThreads, eventId)
 	, Version(pelet::PHP_53) 
 	, GlobalCache(NULL) {
 }
@@ -71,8 +72,10 @@ bool mvceditor::ResourceFileReaderClass::BackgroundFileRead(mvceditor::Directory
 
 		// the event handler will own the pointer to the global cache
 		if (!TestDestroy()) {
-			mvceditor::GlobalCacheCompleteEventClass evt(GlobalCache);
-			wxPostEvent(&Handler, evt);
+
+			// eventId will be set by the PostEvent method
+			mvceditor::GlobalCacheCompleteEventClass evt(wxID_ANY, GlobalCache);
+			PostEvent(evt);
 		}
 		else {
 			
@@ -123,6 +126,7 @@ mvceditor::ResourcePluginClass::ResourcePluginClass(mvceditor::AppClass& app)
 	, ProjectQueue() 
 	, RunningThreadId(0) {
 	IndexingDialog = NULL;
+	App.RunningThreads.AddEventHandler(this);
 }
 
 void mvceditor::ResourcePluginClass::AddSearchMenuItems(wxMenu* searchMenu) {
@@ -515,7 +519,7 @@ void mvceditor::ResourcePluginClass::OnAppFileClosed(wxCommandEvent& event) {
 	for (project = App.Structs.Projects.begin(); project != App.Structs.Projects.end(); ++project) {
 
 		if (project->IsAPhpSourceFile(fileName)) {
-			mvceditor::ResourceFileReaderClass* thread = new mvceditor::ResourceFileReaderClass(*this, App.RunningThreads);
+			mvceditor::ResourceFileReaderClass* thread = new mvceditor::ResourceFileReaderClass(App.RunningThreads, ID_RESOURCE_READER);
 			thread->InitForFile(*project, fileName, version);
 			mvceditor::BackgroundFileReaderClass::StartError error;
 
@@ -575,7 +579,7 @@ mvceditor::ResourceFileReaderClass* mvceditor::ResourcePluginClass::ReadNextProj
 	if (!ProjectQueue.empty()) {
 		mvceditor::ProjectClass project = ProjectQueue.front();
 		ProjectQueue.pop();
-		thread = new mvceditor::ResourceFileReaderClass(*this, App.RunningThreads);
+		thread = new mvceditor::ResourceFileReaderClass(App.RunningThreads, ID_RESOURCE_READER);
 		if (!thread->InitProject(project, version)) {
 			delete thread;
 			thread = NULL;
@@ -797,11 +801,11 @@ BEGIN_EVENT_TABLE(mvceditor::ResourcePluginClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_RESOURCE + 2, mvceditor::ResourcePluginClass::OnSearchForResource)
 	EVT_MENU(mvceditor::MENU_RESOURCE + 3, mvceditor::ResourcePluginClass::OnJump)
 	EVT_UPDATE_UI(wxID_ANY, mvceditor::ResourcePluginClass::OnUpdateUi)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FILE_READ_COMPLETE, mvceditor::ResourcePluginClass::OnWorkComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ResourcePluginClass::OnWorkInProgress)
+	EVT_COMMAND(ID_RESOURCE_READER, mvceditor::EVENT_FILE_READ_COMPLETE, mvceditor::ResourcePluginClass::OnWorkComplete)
+	EVT_COMMAND(ID_RESOURCE_READER, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ResourcePluginClass::OnWorkInProgress)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::ResourcePluginClass::OnProjectsUpdated)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_RE_INDEX, mvceditor::ResourcePluginClass::OnCmdReIndex)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_CLOSED, mvceditor::ResourcePluginClass::OnAppFileClosed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::ResourcePluginClass::OnAppReady)
-	EVT_GLOBAL_CACHE_COMPLETE(mvceditor::ResourcePluginClass::OnGlobalCacheComplete)
+	EVT_GLOBAL_CACHE_COMPLETE(ID_RESOURCE_READER, mvceditor::ResourcePluginClass::OnGlobalCacheComplete)
 END_EVENT_TABLE()

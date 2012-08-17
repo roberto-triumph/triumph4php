@@ -83,7 +83,7 @@ public:
 	 */
 	std::vector<mvceditor::FindInFilesHitClass> Hits;
 
-	FindInFilesHitEventClass(const std::vector<mvceditor::FindInFilesHitClass>& hits);
+	FindInFilesHitEventClass(int eventId, const std::vector<mvceditor::FindInFilesHitClass>& hits);
 
 	wxEvent* Clone() const;
 };
@@ -93,8 +93,8 @@ const wxEventType EVENT_FIND_IN_FILES_FILE_HIT = wxNewEventType();
 
 typedef void (wxEvtHandler::*FindInFilesHitEventClassFunction)(FindInFilesHitEventClass&);
 
-#define EVT_FIND_IN_FILES_HITS(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_FIND_IN_FILES_FILE_HIT, wxID_ANY, -1, \
+#define EVT_FIND_IN_FILES_HITS(id, fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_FIND_IN_FILES_FILE_HIT, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( FindInFilesHitEventClassFunction, & fn ), (wxObject *) NULL ),
 
@@ -109,7 +109,7 @@ public:
 	 * @param wxEvtHandler This object will receive the EVENT_FIND_IN_FILES_FILE_HIT events.
 	 *        and the EVENT_WORK_* events
 	 */
-	FindInFilesBackgroundReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
+	FindInFilesBackgroundReaderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
 	 * Prepare to iterate through all files in the given directory.

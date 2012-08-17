@@ -44,7 +44,7 @@ class ResourceFinderCompleteEventClass : public wxEvent {
 	 */
 	std::vector<mvceditor::ResourceClass> Resources;
 	
-	ResourceFinderCompleteEventClass(const std::vector<mvceditor::ResourceClass>& resources);
+	ResourceFinderCompleteEventClass(int eventId, const std::vector<mvceditor::ResourceClass>& resources);
 	
 	wxEvent* Clone() const;
 	
@@ -52,8 +52,8 @@ class ResourceFinderCompleteEventClass : public wxEvent {
 
 typedef void (wxEvtHandler::*ResourceFinderCompleteEventClassFunction)(ResourceFinderCompleteEventClass&);
 
-#define EVT_RESOURCE_FINDER_COMPLETE(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_RESOURCE_FINDER_COMPLETE, wxID_ANY, -1, \
+#define EVT_RESOURCE_FINDER_COMPLETE(id, fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_RESOURCE_FINDER_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( ResourceFinderCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
 
@@ -66,10 +66,10 @@ class ResourceFinderBackgroundThreadClass : ThreadWithHeartbeatClass {
 public:
 
 	/**
-	 * @param handler will get notified with EVENT_WORK_COMPLETE and the EVENT_RESOURCE_FINDER_COMPLETE
+	 * @param runningThreads will get notified with EVENT_WORK_COMPLETE and the EVENT_RESOURCE_FINDER_COMPLETE
 	 * events when parsing is complete.
 	 */
-	ResourceFinderBackgroundThreadClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
+	ResourceFinderBackgroundThreadClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
 	 * start the background thread that parses the given file.

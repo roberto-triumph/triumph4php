@@ -54,18 +54,18 @@ mvceditor::FindInFilesHitClass::FindInFilesHitClass(const wxString& fileName, co
 
 }
 
-mvceditor::FindInFilesHitEventClass::FindInFilesHitEventClass(const std::vector<mvceditor::FindInFilesHitClass> &hits)
-	: wxEvent(wxID_ANY, mvceditor::EVENT_FIND_IN_FILES_FILE_HIT)
+mvceditor::FindInFilesHitEventClass::FindInFilesHitEventClass(int eventId, const std::vector<mvceditor::FindInFilesHitClass> &hits)
+	: wxEvent(eventId, mvceditor::EVENT_FIND_IN_FILES_FILE_HIT)
 	, Hits(hits) {
 }
 
 wxEvent* mvceditor::FindInFilesHitEventClass::Clone() const {
-	wxEvent* newEvt = new mvceditor::FindInFilesHitEventClass(Hits);
+	wxEvent* newEvt = new mvceditor::FindInFilesHitEventClass(GetId(), Hits);
 	return newEvt;
 }
 
-mvceditor::FindInFilesBackgroundReaderClass::FindInFilesBackgroundReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads) 
-	: BackgroundFileReaderClass(handler, runningThreads) 
+mvceditor::FindInFilesBackgroundReaderClass::FindInFilesBackgroundReaderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId) 
+	: BackgroundFileReaderClass(runningThreads, eventId) 
 	, FindInFiles()
 	, Hits()
 	, SkipFiles() {
@@ -90,6 +90,9 @@ bool mvceditor::FindInFilesBackgroundReaderClass::InitForReplace(mvceditor::Find
 																 const std::vector<mvceditor::FindInFilesHitClass>& hits,
 																 std::vector<wxString> skipFiles) {
 	FindInFiles = findInFiles;
+
+	// TODO when replacing use the hit list to populate the files
+	// we need a new method in the background file reader class
 	Hits = hits;
 	SkipFiles = skipFiles;
 	return InitMatched();
@@ -120,8 +123,11 @@ bool mvceditor::FindInFilesBackgroundReaderClass::BackgroundFileRead(DirectorySe
 			}
 			while (!destroy && FindInFiles.FindNext());
 			if (!destroy && !hits.empty()) {
-				mvceditor::FindInFilesHitEventClass hitEvent(hits);
-				wxPostEvent(&Handler, hitEvent);
+
+				// PostEvent will change the ID of the event to the correct
+				// one
+				mvceditor::FindInFilesHitEventClass hitEvent(wxID_ANY, hits);
+				PostEvent(hitEvent);
 			}
 		}
 	}
@@ -150,6 +156,7 @@ mvceditor::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* 
 	, MatchedFiles(0) 
 	, RunningThreadId(0){
 	FindInFilesGaugeId = wxNewId();
+	RunningThreads.AddEventHandler(this);
 }
 
 mvceditor::FindInFilesResultsPanelClass::~FindInFilesResultsPanelClass() {
@@ -161,6 +168,7 @@ mvceditor::FindInFilesResultsPanelClass::~FindInFilesResultsPanelClass() {
 		// dont try to kill the gauge as the gauge window may not valid anymore
 		// if the program is closed while the find is running
 	}
+	RunningThreads.RemoveEventHandler(this);
 }
 
 void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findInFiles, bool doHiddenFiles) {
@@ -174,7 +182,7 @@ void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findI
 	}
 	std::vector<wxString> skipFiles = Notebook->GetOpenedFiles();
 	mvceditor::FindInFilesBackgroundReaderClass* thread = 
-		new mvceditor::FindInFilesBackgroundReaderClass(*this, RunningThreads);
+		new mvceditor::FindInFilesBackgroundReaderClass(RunningThreads, FindInFilesGaugeId);
 	mvceditor::BackgroundFileReaderClass::StartError error;
 	if (thread->InitForFind(FindInFiles, doHiddenFiles, skipFiles) && thread->StartReading(error)) {
 		RunningThreadId = thread->GetId();
@@ -236,7 +244,7 @@ void mvceditor::FindInFilesResultsPanelClass::FindInOpenedFiles() {
 					}
 				}
 				if (!hits.empty()) {
-					mvceditor::FindInFilesHitEventClass hitEvent(hits);
+					mvceditor::FindInFilesHitEventClass hitEvent(FindInFilesGaugeId, hits);
 					wxPostEvent(this, hitEvent);
 				}
 			}
@@ -347,7 +355,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxComman
 		
 		// we've already searched, when replacing we should iterate through matched files hence we don't call DirectorySearch,.Init().
 		mvceditor::FindInFilesBackgroundReaderClass* thread = 
-			new mvceditor::FindInFilesBackgroundReaderClass(*this, RunningThreads);
+			new mvceditor::FindInFilesBackgroundReaderClass(RunningThreads, FindInFilesGaugeId);
 		thread->InitForReplace(FindInFiles, AllHits, Notebook->GetOpenedFiles());
 		mvceditor::BackgroundFileReaderClass::StartError error;
 		if (thread->StartReading(error)) {
@@ -397,11 +405,25 @@ void mvceditor::FindInFilesResultsPanelClass::OnFindInFilesComplete(wxCommandEve
 }
 
 void mvceditor::FindInFilesResultsPanelClass::OnWorkComplete(wxCommandEvent& event) {
+	if (event.GetId() != FindInFilesGaugeId) {
+
+		// event from another, concurrent find in files panel. let the other panel
+		// handle it
+		event.Skip();
+		return;
+	}
 	RunningThreadId = 0;
 }
 
 void mvceditor::FindInFilesResultsPanelClass::OnFileHit(mvceditor::FindInFilesHitEventClass& event) {
 	if (event.Hits.empty()) {
+		return;
+	}
+	if (event.GetId() != FindInFilesGaugeId) {
+
+		// event from another, concurrent find in files panel. let the other panel
+		// handle it
+		event.Skip();
 		return;
 	}
 	MatchedFiles++;
@@ -525,6 +547,13 @@ int mvceditor::FindInFilesResultsPanelClass::GetNumberOfMatchedFiles() {
 }
 
 void mvceditor::FindInFilesResultsPanelClass::OnTimer(wxCommandEvent& event) {
+	if (event.GetId() != FindInFilesGaugeId) {
+
+		// event from another, concurrent find in files panel. let the other panel
+		// handle it
+		event.Skip();
+		return;
+	}
 	Gauge->IncrementGauge(FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE);	
 }
 
@@ -797,7 +826,7 @@ BEGIN_EVENT_TABLE(mvceditor::FindInFilesResultsPanelClass, FindInFilesResultsPan
 	// remove this handler; when searching many files the GUI is redrawn constantly and doesn't
 	// look smooth
 	//EVT_COMMAND(wxID_ANY, EVENT_FILE_READ, mvceditor::FindInFilesResultsPanelClass::OnFileSearched)
-	EVT_FIND_IN_FILES_HITS(mvceditor::FindInFilesResultsPanelClass::OnFileHit)
+	EVT_FIND_IN_FILES_HITS(wxID_ANY, mvceditor::FindInFilesResultsPanelClass::OnFileHit)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FILE_READ_COMPLETE, mvceditor::FindInFilesResultsPanelClass::OnFindInFilesComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::FindInFilesResultsPanelClass::OnTimer)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::FindInFilesResultsPanelClass::OnWorkComplete)

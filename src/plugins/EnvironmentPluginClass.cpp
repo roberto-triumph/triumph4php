@@ -29,6 +29,8 @@
 #include <wx/string.h>
 #include <wx/valgen.h>
 
+static int ID_APACHE_FILE_READER = wxNewId();
+
 /**
  * A helper function to add a row into a list control. list control must have 2 columns
  * 
@@ -103,19 +105,19 @@ static void ListCtrlGet(wxListCtrl* list, wxString& column1Value, wxString& colu
 
 const wxEventType mvceditor::EVENT_APACHE_FILE_READ_COMPLETE = wxNewEventType();
 
-mvceditor::ApacheFileReadCompleteEventClass::ApacheFileReadCompleteEventClass(const mvceditor::ApacheClass &apache)
-	: wxEvent(wxID_ANY, mvceditor::EVENT_APACHE_FILE_READ_COMPLETE)
+mvceditor::ApacheFileReadCompleteEventClass::ApacheFileReadCompleteEventClass(int eventId, const mvceditor::ApacheClass &apache)
+	: wxEvent(eventId, mvceditor::EVENT_APACHE_FILE_READ_COMPLETE)
 	, Apache(apache) {
 
 }
 
 wxEvent* mvceditor::ApacheFileReadCompleteEventClass::Clone() const {
-	mvceditor::ApacheFileReadCompleteEventClass* evt = new mvceditor::ApacheFileReadCompleteEventClass(Apache);
+	mvceditor::ApacheFileReadCompleteEventClass* evt = new mvceditor::ApacheFileReadCompleteEventClass(GetId(), Apache);
 	return evt;
 }
 
-mvceditor::ApacheFileReaderClass::ApacheFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads)
-	: BackgroundFileReaderClass(handler, runningThreads)
+mvceditor::ApacheFileReaderClass::ApacheFileReaderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+: BackgroundFileReaderClass(runningThreads, eventId)
 	, ApacheResults() {
 }
 
@@ -151,8 +153,8 @@ bool mvceditor::ApacheFileReaderClass::BackgroundFileRead(mvceditor::DirectorySe
 
 		// send the event once we have searched all files
 		if (found) {
-			mvceditor::ApacheFileReadCompleteEventClass evt(ApacheResults);
-			wxPostEvent(&Handler, evt);
+			mvceditor::ApacheFileReadCompleteEventClass evt(ID_APACHE_FILE_READER, ApacheResults);
+			PostEvent(evt);
 		}
 	}
 	return ret;
@@ -164,6 +166,7 @@ mvceditor::ApacheEnvironmentPanelClass::ApacheEnvironmentPanelClass(wxWindow* pa
 	, RunningThreads(runningThreads)
 	, EditedApache()
 	, RunningThreadId(0) {
+	RunningThreads.AddEventHandler(this);
 	EditedApache = environment.Apache;
 	wxGenericValidator manualValidator(&EditedApache.ManualConfiguration);	
 	Manual->SetValidator(manualValidator);
@@ -182,6 +185,7 @@ mvceditor::ApacheEnvironmentPanelClass::~ApacheEnvironmentPanelClass() {
 	if (RunningThreadId > 0) {
 		RunningThreads.Stop(RunningThreadId);
 	}
+	RunningThreads.RemoveEventHandler(this);
 }
 
 void mvceditor::ApacheEnvironmentPanelClass::OnScanButton(wxCommandEvent& event) {
@@ -192,7 +196,7 @@ void mvceditor::ApacheEnvironmentPanelClass::OnScanButton(wxCommandEvent& event)
 			path.Append(ch);
 		}
 		mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
-		mvceditor::ApacheFileReaderClass* thread = new mvceditor::ApacheFileReaderClass(*this, RunningThreads);
+		mvceditor::ApacheFileReaderClass* thread = new mvceditor::ApacheFileReaderClass(RunningThreads, ID_APACHE_FILE_READER);
 		if (thread->Init(path) && thread->StartReading(error)) {
 			RunningThreadId = thread->GetId();
 			VirtualHostList->DeleteAllItems();
@@ -345,7 +349,7 @@ void mvceditor::ApacheEnvironmentPanelClass::OnDirChanged(wxFileDirPickerEvent& 
 		if (path[path.Length() - 1] != ch) {
 			path.Append(ch);
 		}
-		mvceditor::ApacheFileReaderClass* thread = new mvceditor::ApacheFileReaderClass(*this, RunningThreads);
+		mvceditor::ApacheFileReaderClass* thread = new mvceditor::ApacheFileReaderClass(RunningThreads, ID_APACHE_FILE_READER);
 		mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
 		if (thread->Init(path) && thread->StartReading(error)) {
 			RunningThreadId = thread->GetId();
@@ -664,9 +668,9 @@ void mvceditor::EnvironmentPluginClass::AddPreferenceWindow(wxBookCtrlBase* pare
 }
 
 BEGIN_EVENT_TABLE(mvceditor::ApacheEnvironmentPanelClass, ApacheEnvironmentPanelGeneratedClass)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ApacheEnvironmentPanelClass::OnWorkInProgress)
-	EVT_APACHE_FILE_READ_COMPLETE(mvceditor::ApacheEnvironmentPanelClass::OnApacheFileReadComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ApacheEnvironmentPanelClass::OnWorkComplete)
+	EVT_COMMAND(ID_APACHE_FILE_READER, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ApacheEnvironmentPanelClass::OnWorkInProgress)
+	EVT_APACHE_FILE_READ_COMPLETE(ID_APACHE_FILE_READER, mvceditor::ApacheEnvironmentPanelClass::OnApacheFileReadComplete)
+	EVT_COMMAND(ID_APACHE_FILE_READER, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ApacheEnvironmentPanelClass::OnWorkComplete)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::EnvironmentPluginClass, wxEvtHandler) 

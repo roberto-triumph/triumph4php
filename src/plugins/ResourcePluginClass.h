@@ -48,10 +48,10 @@ class ResourceFileReaderClass : public BackgroundFileReaderClass {
 public:
 
 	/**
-	 * @param handler will receive EVENT_FILE_* and EVENT_WORK_* events when all 
+	 * @param runningThreads will receive EVENT_FILE_* and EVENT_WORK_* events when all 
 	 * files have been iterated through.
 	 */
-	ResourceFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
+	ResourceFileReaderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
 	 * prepare to iterate through the given file. The name part of the given file must match the wildcard.

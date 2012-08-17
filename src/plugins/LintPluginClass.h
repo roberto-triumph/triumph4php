@@ -52,7 +52,7 @@ public:
 	 */
 	pelet::LintResultsClass LintResults;
 
-	LintResultsEventClass(const pelet::LintResultsClass& lintResults);
+	LintResultsEventClass(int eventId, const pelet::LintResultsClass& lintResults);
 
 	wxEvent* Clone() const;
 };
@@ -71,7 +71,7 @@ public:
 	 */
 	int ErrorFiles;
 
-	LintResultsSummaryEventClass(int totalFiles, int errorFiles);
+	LintResultsSummaryEventClass(int eventId, int totalFiles, int errorFiles);
 
 	wxEvent* Clone() const;
 
@@ -79,15 +79,15 @@ public:
 
 typedef void (wxEvtHandler::*LintResultsEventClassFunction)(LintResultsEventClass&);
 
-#define EVT_LINT_ERROR(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_LINT_ERROR, wxID_ANY, -1, \
+#define EVT_LINT_ERROR(id, fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_LINT_ERROR, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( LintResultsEventClassFunction, & fn ), (wxObject *) NULL ),
 	
 typedef void (wxEvtHandler::*LintResultsSummaryEventClassFunction)(LintResultsSummaryEventClass&);
 
-#define EVT_LINT_SUMMARY(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_LINT_SUMMARY, wxID_ANY, -1, \
+#define EVT_LINT_SUMMARY(id, fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_LINT_SUMMARY, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( LintResultsSummaryEventClassFunction, & fn ), (wxObject *) NULL ),
 
@@ -154,11 +154,11 @@ class LintBackgroundFileReaderClass : public BackgroundFileReaderClass {
 public:	
 
 	/**
-	 * @param handler the object that will receive LINT_ERROR events
+	 * @param runningThreads the object that will receive LINT_ERROR events
 	 * 	      as well as WORK_* events
 	 * @see mvceditor::ThreadWithHeartbeat class
 	 */
-	LintBackgroundFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
+	LintBackgroundFileReaderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 	
 	/**
 	 * Start the background thread.  Lint errors will be propagated as events.

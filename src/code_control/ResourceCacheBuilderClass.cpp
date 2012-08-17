@@ -24,31 +24,31 @@
  */
 #include <code_control/ResourceCacheBuilderClass.h>
 
-mvceditor::WorkingCacheCompleteEventClass::WorkingCacheCompleteEventClass(mvceditor::WorkingCacheClass* cache)
-	: wxEvent(wxID_ANY, mvceditor::EVENT_WORKING_CACHE_COMPLETE)
+mvceditor::WorkingCacheCompleteEventClass::WorkingCacheCompleteEventClass(int eventId, mvceditor::WorkingCacheClass* cache)
+	: wxEvent(eventId, mvceditor::EVENT_WORKING_CACHE_COMPLETE)
 	, WorkingCache(cache) {
 
 }
 
 wxEvent* mvceditor::WorkingCacheCompleteEventClass::Clone() const {
-	mvceditor::WorkingCacheCompleteEventClass* evt = new mvceditor::WorkingCacheCompleteEventClass(WorkingCache);
+	mvceditor::WorkingCacheCompleteEventClass* evt = new mvceditor::WorkingCacheCompleteEventClass(GetId(), WorkingCache);
 	return evt;
 }
 
-mvceditor::GlobalCacheCompleteEventClass::GlobalCacheCompleteEventClass(mvceditor::GlobalCacheClass* cache)
-	: wxEvent(wxID_ANY, mvceditor::EVENT_GLOBAL_CACHE_COMPLETE)
+mvceditor::GlobalCacheCompleteEventClass::GlobalCacheCompleteEventClass(int eventId, mvceditor::GlobalCacheClass* cache)
+	: wxEvent(eventId, mvceditor::EVENT_GLOBAL_CACHE_COMPLETE)
 	, GlobalCache(cache) {
 
 }
 
 wxEvent* mvceditor::GlobalCacheCompleteEventClass::Clone() const {
-	mvceditor::GlobalCacheCompleteEventClass* evt = new mvceditor::GlobalCacheCompleteEventClass(GlobalCache);
+	mvceditor::GlobalCacheCompleteEventClass* evt = new mvceditor::GlobalCacheCompleteEventClass(GetId(), GlobalCache);
 	return evt;
 }
 
-mvceditor::WorkingCacheBuilderClass::WorkingCacheBuilderClass(wxEvtHandler& handler, 
+mvceditor::WorkingCacheBuilderClass::WorkingCacheBuilderClass(
 															mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: ThreadWithHeartbeatClass(handler, runningThreads, eventId)
+	: ThreadWithHeartbeatClass(runningThreads, eventId)
 	, Mutex()
 	, Semaphore(0 , 1)
 	, CurrentCode() 
@@ -114,8 +114,9 @@ void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
 				// only send the event if the code passes the lint check
 				// otherwise we will delete a good symbol table, we want auto completion
 				// to work even if the code is broken
-				mvceditor::WorkingCacheCompleteEventClass evt(cache);
-				wxPostEvent(&Handler, evt);
+				// PostEvent will set the correct event Id
+				mvceditor::WorkingCacheCompleteEventClass evt(wxID_ANY, cache);
+				PostEvent(evt);
 			}
 			else {
 				// we still own the pointer since we did not send the event

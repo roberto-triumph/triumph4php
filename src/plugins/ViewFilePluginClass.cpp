@@ -31,21 +31,22 @@
 #include <wx/artprov.h>
 
 static const int ID_VIEW_FILE_PANEL = wxNewId();
+static const int ID_CALL_STACK_THREAD = wxNewId();
 
 const wxEventType mvceditor::EVENT_CALL_STACK_COMPLETE = wxNewEventType();
 
-mvceditor::CallStackCompleteEventClass::CallStackCompleteEventClass(mvceditor::CallStackClass::Errors error, bool writeError)
-	: wxEvent(wxID_ANY, mvceditor::EVENT_CALL_STACK_COMPLETE)
+mvceditor::CallStackCompleteEventClass::CallStackCompleteEventClass(int eventId, mvceditor::CallStackClass::Errors error, bool writeError)
+	: wxEvent(eventId, mvceditor::EVENT_CALL_STACK_COMPLETE)
 	, LastError(error)
 	, WriteError(writeError) {
 }
 
 wxEvent* mvceditor::CallStackCompleteEventClass::Clone() const {
-	return new mvceditor::CallStackCompleteEventClass(LastError, WriteError);
+	return new mvceditor::CallStackCompleteEventClass(GetId(), LastError, WriteError);
 }
 
-mvceditor::CallStackThreadClass::CallStackThreadClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads)
-	: ThreadWithHeartbeatClass(handler, runningThreads) 
+mvceditor::CallStackThreadClass::CallStackThreadClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+	: ThreadWithHeartbeatClass(runningThreads, eventId) 
 	, CallStack(NULL)
 	, PersistFile() {
 		
@@ -97,8 +98,10 @@ void mvceditor::CallStackThreadClass::BackgroundWork() {
 		}
 	}
 	if (!TestDestroy()) {
-		mvceditor::CallStackCompleteEventClass evt(lastError, writeError);
-		wxPostEvent(&Handler, evt);
+
+		// PostEvent() will set the proper EventId
+		mvceditor::CallStackCompleteEventClass evt(wxID_ANY, lastError, writeError);
+		PostEvent(evt);
 	}
 }
 
@@ -108,7 +111,7 @@ mvceditor::ViewFilePluginClass::ViewFilePluginClass(mvceditor::AppClass& app)
 	, CallStackPersistFile() 
 	, LastError(mvceditor::CallStackClass::NONE)
 	, WriteError(false) {
-	
+	App.RunningThreads.AddEventHandler(this);
 }
 
 void mvceditor::ViewFilePluginClass::AddViewMenuItems(wxMenu* viewMenu) {
@@ -178,7 +181,7 @@ void mvceditor::ViewFilePluginClass::StartDetection() {
 			// TODO: this isn't good, resource cache is not meant to be read/written to from multiple threads
 			// this pointer will delete itself when the thread terminates
 			mvceditor::CallStackThreadClass* thread = 
-				new mvceditor::CallStackThreadClass(*this, App.RunningThreads);
+				new mvceditor::CallStackThreadClass(App.RunningThreads, ID_CALL_STACK_THREAD);
 			thread->InitCallStack(*GetResourceCache());
 			if (!thread->InitThread(fileName, className, methodName, GetEnvironment()->Php.Version, CallStackPersistFile)) {
 				mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Call stack file creation failed"));
@@ -431,7 +434,7 @@ mvceditor::StringTreeItemDataClass::StringTreeItemDataClass(const wxString& str)
 }
 
 BEGIN_EVENT_TABLE(mvceditor::ViewFilePluginClass, wxEvtHandler) 
-	EVT_CALL_STACK_COMPLETE(mvceditor::ViewFilePluginClass::OnCallStackComplete)
+	EVT_CALL_STACK_COMPLETE(ID_CALL_STACK_THREAD, mvceditor::ViewFilePluginClass::OnCallStackComplete)
 	EVT_FRAMEWORK_VIEW_INFOS_COMPLETE(mvceditor::ViewFilePluginClass::OnViewInfosDetectionComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_VIEW_FILES_FAILED, mvceditor::ViewFilePluginClass::OnViewInfosDetectionFailed)
 	EVT_MENU(mvceditor::MENU_VIEW_FILES + 0, mvceditor::ViewFilePluginClass::OnViewInfosMenu)

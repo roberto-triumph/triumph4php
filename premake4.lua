@@ -598,3 +598,22 @@ solution "mvc-editor"
 			pickywarnings(_ACTION)
 		configuration "Release"
 			pickywarnings(_ACTION)
+
+	project "running_threads_tutorial"
+		language "C++"
+		kind "WindowedApp"
+		files { 
+			"tutorials/running_threads_tutorial.cpp",
+			"src/widgets/ThreadWithHeartbeatClass.cpp"
+		}
+		includedirs {
+			"src"
+		}
+		configuration "Debug"
+			pickywarnings(_ACTION)
+			wxconfiguration("Debug", _ACTION)
+			wxappconfiguration("Debug", _ACTION)
+	configuration "Release"
+			pickywarnings(_ACTION)
+			wxconfiguration("Release", _ACTION)
+			wxappconfiguration("Release", _ACTION)

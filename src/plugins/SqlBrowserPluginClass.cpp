@@ -33,6 +33,7 @@
 
 static const int ID_SQL_GAUGE = wxNewId();
 static const int ID_SQL_METADATA_GAUGE = wxNewId();
+static const int ID_SQL_METADATA_FETCH = wxNewId();
 
 mvceditor::SqlConnectionDialogClass::SqlConnectionDialogClass(wxWindow* parent, std::vector<mvceditor::DatabaseInfoClass>& infos, 
 															  size_t& chosenIndex)
@@ -273,11 +274,13 @@ void mvceditor::SqlConnectionDialogClass::OnListboxSelected(wxCommandEvent& even
 	UpdateTextInputs();
 }
 
-mvceditor::MultipleSqlExecuteClass::MultipleSqlExecuteClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, int queryId)
-	: ThreadWithHeartbeatClass(handler, runningThreads, queryId)
+mvceditor::MultipleSqlExecuteClass::MultipleSqlExecuteClass(mvceditor::RunningThreadsClass& runningThreads, int queryId,
+															mvceditor::ConnectionIdentifierClass& connectionIdentifier)
+	: ThreadWithHeartbeatClass(runningThreads, queryId)
 	, SqlLexer() 
 	, Query()
 	, Session()
+	, ConnectionIdentifier(connectionIdentifier)
 	, QueryId(queryId) {
 }
 
@@ -315,10 +318,12 @@ void mvceditor::MultipleSqlExecuteClass::BackgroundWork() {
 			mvceditor::SqlResultClass* results = new mvceditor::SqlResultClass;
 			results->QueryTime = wxGetLocalTimeMillis() - start;
 			results->LineNumber = SqlLexer.GetLineNumber();
+			
+			Query.ConnectionIdentifier(Session, ConnectionIdentifier);
 			Query.Execute(Session, *results, query);
 			wxCommandEvent evt(QUERY_COMPLETE_EVENT, QueryId);
 			evt.SetClientData(results);
-			wxPostEvent(&Handler, evt);
+			PostEvent(evt);
 			if (!results->Success) {
 				break;
 			}
@@ -335,7 +340,7 @@ void mvceditor::MultipleSqlExecuteClass::BackgroundWork() {
 		results->Error = error;
 		wxCommandEvent evt(QUERY_COMPLETE_EVENT, QueryId);
 		evt.SetClientData(results);
-		wxPostEvent(&Handler, evt);
+		PostEvent(evt);
 	}
 }
 
@@ -354,6 +359,7 @@ mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id,
 		mvceditor::SqlBrowserPluginClass* plugin) 
 	: SqlBrowserPanelGeneratedClass(parent, id)
 	, Query(other)
+	, ConnectionIdentifier()
 	, LastError()
 	, LastQuery()
 	, RunningThreadId(0) 
@@ -366,16 +372,14 @@ mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id,
 	ResultsGrid->DeleteRows(0, ResultsGrid->GetNumberRows());
 	ResultsGrid->ClearGrid();
 	UpdateLabels(wxT(""));
+	Plugin->App.RunningThreads.AddEventHandler(this);
 }
 
 mvceditor::SqlBrowserPanelClass::~SqlBrowserPanelClass() {
 	if (RunningThreadId > 0) {
-
-		// using force kill here because once we fire a query
-		// we cannot stop it (there is no interface that soci
-		// gives us)
-		Plugin->App.RunningThreads.Kill(RunningThreadId);
+		Stop();
 	}
+	Plugin->App.RunningThreads.RemoveEventHandler(this);
 }
 
 
@@ -390,7 +394,8 @@ bool mvceditor::SqlBrowserPanelClass::Check() {
 
 void mvceditor::SqlBrowserPanelClass::Execute() {
 	if (Check() && 0 == RunningThreadId) {
-		mvceditor::MultipleSqlExecuteClass* thread = new mvceditor::MultipleSqlExecuteClass(*this, Plugin->App.RunningThreads, QueryId);
+		mvceditor::MultipleSqlExecuteClass* thread = new mvceditor::MultipleSqlExecuteClass(
+			Plugin->App.RunningThreads, QueryId, ConnectionIdentifier);
 		if (thread->Init(LastQuery, Query) && thread->Execute()) {
 			RunningThreadId = thread->GetId();
 			Gauge->AddGauge(_("Running SQL queries"), ID_SQL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
@@ -408,10 +413,36 @@ void mvceditor::SqlBrowserPanelClass::Execute() {
 	}
 }
 
+void mvceditor::SqlBrowserPanelClass::Stop() {
+	// send a KILL sql command instead of killing the
+	// thread; that way the thread can gracefully exit
+	// we need to do both: kill the currently running 
+	// query (via a SQL KILL) and stop the thread
+	// so that the rest of the SQL statements are not
+	// sent to the server and the thread terminates
+	soci::session session;
+	UnicodeString error;
+	bool good = Query.Connect(session, error);
+	if (good) {
+		good = Query.KillConnection(session, ConnectionIdentifier, error);
+		if (!good) {
+			wxMessageBox(_("could not kill:") + mvceditor::IcuToWx(error));
+		}
+	}
+	else {
+		wxMessageBox(_("could not connect:") + mvceditor::IcuToWx(error));
+	}
+	Plugin->App.RunningThreads.Stop(RunningThreadId);
+	RunningThreadId = 0;
+}
+
 void mvceditor::SqlBrowserPanelClass::OnQueryComplete(wxCommandEvent& event) {
 	if (event.GetId() == QueryId) {
 		mvceditor::SqlResultClass* result = (mvceditor::SqlResultClass*)event.GetClientData();
 		Results.push_back(result);
+	}
+	else {
+		event.Skip();
 	}
 }
 
@@ -579,6 +610,9 @@ void mvceditor::SqlBrowserPanelClass::OnWorkInProgress(wxCommandEvent& event) {
 	if (event.GetId() == QueryId) {
 		Gauge->IncrementGauge(ID_SQL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
 	}
+	else {
+		event.Skip();
+	}
 }
 
 void mvceditor::SqlBrowserPanelClass::OnWorkComplete(wxCommandEvent& event) {
@@ -593,6 +627,9 @@ void mvceditor::SqlBrowserPanelClass::OnWorkComplete(wxCommandEvent& event) {
 		RunningThreadId = 0;
 		Gauge->StopGauge(ID_SQL_GAUGE);
 		Plugin->AuiManagerUpdate();
+	}
+	else {
+		event.Skip();
 	}
 }
 
@@ -617,21 +654,21 @@ void mvceditor::SqlBrowserPanelClass::UnlinkFromCodeControl() {
 
 const wxEventType mvceditor::EVENT_SQL_META_DATA_COMPLETE = wxNewEventType();
 
-mvceditor::SqlMetaDataEventClass::SqlMetaDataEventClass(const mvceditor::SqlResourceFinderClass& newResources,
+mvceditor::SqlMetaDataEventClass::SqlMetaDataEventClass(int eventId, const mvceditor::SqlResourceFinderClass& newResources,
 														const std::vector<UnicodeString>& errors) 
-	: wxEvent(wxID_ANY, mvceditor::EVENT_SQL_META_DATA_COMPLETE)
+	: wxEvent(eventId, mvceditor::EVENT_SQL_META_DATA_COMPLETE)
 	, NewResources(newResources)
 	, Errors(errors) {
 }
 
 wxEvent* mvceditor::SqlMetaDataEventClass::Clone() const {
 	mvceditor::SqlMetaDataEventClass* evt = new 
-		mvceditor::SqlMetaDataEventClass(NewResources, Errors);
+		mvceditor::SqlMetaDataEventClass(GetId(), NewResources, Errors);
 	return evt;
 }
 
-mvceditor::SqlMetaDataFetchClass::SqlMetaDataFetchClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads)
-	: ThreadWithHeartbeatClass(handler, runningThreads)
+mvceditor::SqlMetaDataFetchClass::SqlMetaDataFetchClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+	: ThreadWithHeartbeatClass(runningThreads, eventId)
 	, Infos() {
 		
 }
@@ -670,15 +707,19 @@ void mvceditor::SqlMetaDataFetchClass::BackgroundWork() {
 		}
 	}
 	if (!TestDestroy()) {
-		mvceditor::SqlMetaDataEventClass evt(newResources, errors);
-		wxPostEvent(&Handler, evt);
+
+		// PostEvent() will set the correct event Id
+		mvceditor::SqlMetaDataEventClass evt(wxID_ANY, newResources, errors);
+		PostEvent(evt);
 	}
 }
 
 mvceditor::SqlBrowserPluginClass::SqlBrowserPluginClass(mvceditor::AppClass& app) 
 	: PluginClass(app)
-	, SqlMetaDataFetch(NULL)
 	, ChosenIndex(0) {
+
+	// will get removed when the app terminates
+	App.RunningThreads.AddEventHandler(this);
 }
 
 mvceditor::SqlBrowserPluginClass::~SqlBrowserPluginClass() {
@@ -712,13 +753,12 @@ void mvceditor::SqlBrowserPluginClass::OnProjectsUpdated(wxCommandEvent& event) 
 void mvceditor::SqlBrowserPluginClass::DetectMetadata() {
 	ChosenIndex = 0;
 	if (!App.Structs.Infos.empty()) {
-		SqlMetaDataFetch = new mvceditor::SqlMetaDataFetchClass(*this, App.RunningThreads);
-		if (SqlMetaDataFetch->Read(App.Structs.Infos)) {
+		mvceditor::SqlMetaDataFetchClass* thread = new mvceditor::SqlMetaDataFetchClass(App.RunningThreads, ID_SQL_METADATA_FETCH);
+		if (thread->Read(App.Structs.Infos)) {
 			GetStatusBarWithGauge()->AddGauge(_("Fetching SQL meta data"), ID_SQL_METADATA_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
 		}
 		else {
-			delete SqlMetaDataFetch;
-			SqlMetaDataFetch = NULL;
+			delete thread;
 		}
 	}
 }
@@ -839,8 +879,10 @@ void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event
 		SavePreferences();
 
 		// redetect the SQL meta data
-		SqlMetaDataFetch = new mvceditor::SqlMetaDataFetchClass(*this, App.RunningThreads);
-		SqlMetaDataFetch->Read(App.Structs.Infos);
+		mvceditor::SqlMetaDataFetchClass* thread = new mvceditor::SqlMetaDataFetchClass(App.RunningThreads, ID_SQL_METADATA_FETCH);
+		if (!thread->Read(App.Structs.Infos)) {
+			delete thread;
+		}
 	}
 }
 
@@ -891,13 +933,26 @@ void mvceditor::SqlBrowserPluginClass::OnContentNotebookPageClose(wxAuiNotebookE
 	}
 }
 
+void mvceditor::SqlBrowserPluginClass::OnToolsNotebookPageClose(wxAuiNotebookEvent& event) {
+	wxAuiNotebook* notebook = GetToolsNotebook();
+	int sel = event.GetSelection();
+	wxWindow* toolsWindow = notebook->GetPage(sel);
+
+	// only cast when we are sure of the type of window
+	// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
+	// methods
+	if (toolsWindow->GetName() == wxT("mvceditor::SqlBrowserPanelClass")) {
+		mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)toolsWindow;
+		panel->Stop();
+	}
+}
+
 void mvceditor::SqlBrowserPluginClass::OnWorkInProgress(wxCommandEvent& event) {
 	GetStatusBarWithGauge()->IncrementGauge(ID_SQL_METADATA_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
 }
 
 void mvceditor::SqlBrowserPluginClass::OnWorkComplete(wxCommandEvent& event) {
 	GetStatusBarWithGauge()->StopGauge(ID_SQL_METADATA_GAUGE);
-	SqlMetaDataFetch = NULL;
 }
 
 void mvceditor::SqlBrowserPluginClass::OnSqlMetaDataComplete(mvceditor::SqlMetaDataEventClass& event) {
@@ -991,12 +1046,13 @@ BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPluginClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_SQL + 1, mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu)
 	EVT_MENU(mvceditor::MENU_SQL + 2, mvceditor::SqlBrowserPluginClass::OnRun)
 	EVT_MENU(mvceditor::MENU_SQL + 3, mvceditor::SqlBrowserPluginClass::OnSqlDetectMenu)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SqlBrowserPluginClass::OnWorkInProgress)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SqlBrowserPluginClass::OnWorkComplete)
+	EVT_COMMAND(ID_SQL_METADATA_FETCH, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SqlBrowserPluginClass::OnWorkInProgress)
+	EVT_COMMAND(ID_SQL_METADATA_FETCH, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SqlBrowserPluginClass::OnWorkComplete)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::SqlBrowserPluginClass::OnContentNotebookPageChanged)
-	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::SqlBrowserPluginClass::OnContentNotebookPageClose)
+	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_CODE_NOTEBOOK, mvceditor::SqlBrowserPluginClass::OnContentNotebookPageClose)
+	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::SqlBrowserPluginClass::OnToolsNotebookPageClose)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::SqlBrowserPluginClass::OnProjectsUpdated)
-	EVT_SQL_META_DATA_COMPLETE(mvceditor::SqlBrowserPluginClass::OnSqlMetaDataComplete)
+	EVT_SQL_META_DATA_COMPLETE(ID_SQL_METADATA_FETCH, mvceditor::SqlBrowserPluginClass::OnSqlMetaDataComplete)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPanelClass, SqlBrowserPanelGeneratedClass)

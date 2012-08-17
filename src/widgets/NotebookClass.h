@@ -65,6 +65,10 @@ public:
 	 */
 	EventSinkClass* EventSink;
 
+	/**
+	 * To keep track of any threads used for PHP parsing
+	 */
+	RunningThreadsClass* RunningThreads;
 	
 	/**
 	 * Constructor. Parent is needed, all others are optional.
@@ -256,12 +260,7 @@ private:
 	 * will use the close source code event to re-trigger project indexing.
 	 */
 	void OnNotebookPageClose(wxAuiNotebookEvent& evt);
-	
-	/**
-	 * To keep track of any threads used for PHP parsing
-	 */
-	mvceditor::RunningThreadsClass RunningThreads;
-	
+		
 	/**
 	 * The context menu for handling right-click options
 	 */

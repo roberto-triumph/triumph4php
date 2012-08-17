@@ -55,7 +55,7 @@ public:
 	 */
 	bool WriteError;
 	
-	CallStackCompleteEventClass(mvceditor::CallStackClass::Errors error, bool writeError);
+	CallStackCompleteEventClass(int eventId, mvceditor::CallStackClass::Errors error, bool writeError);
 	
 	wxEvent* Clone() const;
 	
@@ -63,8 +63,8 @@ public:
 
 typedef void (wxEvtHandler::*CallStackCompleteEventClassFunction)(CallStackCompleteEventClass&);
 
-#define EVT_CALL_STACK_COMPLETE(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_CALL_STACK_COMPLETE, wxID_ANY, -1, \
+#define EVT_CALL_STACK_COMPLETE(id, fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_CALL_STACK_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( CallStackCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
 
@@ -83,7 +83,7 @@ public:
 	/**
 	 * @param handler will be notified of EVENT_WORK_* events and EVENT_CALL_STACK_COMPLETE events as well
 	 */
-	CallStackThreadClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
+	CallStackThreadClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 	
 	/**
 	 * one-time initialization, call this before InitThread

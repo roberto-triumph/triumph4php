@@ -25,9 +25,8 @@
 #include <plugins/BackgroundFileReaderClass.h>
 
 
-mvceditor::BackgroundFileReaderClass::BackgroundFileReaderClass(wxEvtHandler& handler,
-		mvceditor::RunningThreadsClass& runningThreads)
-	: ThreadWithHeartbeatClass(handler, runningThreads)
+mvceditor::BackgroundFileReaderClass::BackgroundFileReaderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+	: ThreadWithHeartbeatClass(runningThreads, eventId)
 	, DirectorySearch()
 	, Mode(WALK) {
 }
@@ -87,7 +86,7 @@ void mvceditor::BackgroundFileReaderClass::BackgroundWork() {
 			if (!isDestroy) {
 				singleEvent.SetInt(counter);
 				singleEvent.SetClientData((void*) res);
-				wxPostEvent(&Handler, singleEvent);
+				PostEvent(singleEvent);
 			}
 		}
 	}
@@ -103,7 +102,7 @@ void mvceditor::BackgroundFileReaderClass::BackgroundWork() {
 			if (!isDestroy) {
 				wxCommandEvent singleEvent(EVENT_FILE_READ, wxNewId());
 				singleEvent.SetInt(counter);
-				wxPostEvent(&Handler, singleEvent);
+				PostEvent(singleEvent);
 			}
 		}
 	}
@@ -116,7 +115,7 @@ void mvceditor::BackgroundFileReaderClass::BackgroundWork() {
 	if (!isDestroy) {
 		wxCommandEvent endEvent(EVENT_FILE_READ_COMPLETE, wxNewId());
 		endEvent.SetInt(Mode);
-		wxPostEvent(&Handler, endEvent);
+		PostEvent(endEvent);
 	}
 }
 

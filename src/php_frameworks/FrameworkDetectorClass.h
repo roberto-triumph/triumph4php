@@ -49,7 +49,7 @@ class ResponseThreadWithHeartbeatClass : public ThreadWithHeartbeatClass {
 
 public:
 
-	ResponseThreadWithHeartbeatClass(DetectorActionClass& action, mvceditor::RunningThreadsClass& runningThreads);
+	ResponseThreadWithHeartbeatClass(DetectorActionClass& action, mvceditor::RunningThreadsClass& runningThreads, int eventId);
 	
 	bool Init(wxFileName outputFile);
 

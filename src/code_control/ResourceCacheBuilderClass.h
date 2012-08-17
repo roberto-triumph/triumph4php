@@ -43,15 +43,15 @@ public:
 	 */
 	mvceditor::WorkingCacheClass* WorkingCache;
 
-	WorkingCacheCompleteEventClass(mvceditor::WorkingCacheClass* workingCache);
+	WorkingCacheCompleteEventClass(int eventId, mvceditor::WorkingCacheClass* workingCache);
 
 	wxEvent* Clone() const;
 };
 
 typedef void (wxEvtHandler::*WorkingCacheCompleteEventClassFunction)(WorkingCacheCompleteEventClass&);
 
-#define EVT_WORKING_CACHE_COMPLETE(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_WORKING_CACHE_COMPLETE, wxID_ANY, -1, \
+#define EVT_WORKING_CACHE_COMPLETE(id, fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_WORKING_CACHE_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( WorkingCacheCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
 
@@ -63,15 +63,15 @@ public:
 	 */
 	mvceditor::GlobalCacheClass* GlobalCache;
 
-	GlobalCacheCompleteEventClass(mvceditor::GlobalCacheClass* globalCache);
+	GlobalCacheCompleteEventClass(int id, mvceditor::GlobalCacheClass* globalCache);
 
 	wxEvent* Clone() const;
 };
 
 typedef void (wxEvtHandler::*GlobalCacheCompleteEventClassFunction)(GlobalCacheCompleteEventClass&);
 
-#define EVT_GLOBAL_CACHE_COMPLETE(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_GLOBAL_CACHE_COMPLETE, wxID_ANY, -1, \
+#define EVT_GLOBAL_CACHE_COMPLETE(id, fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_GLOBAL_CACHE_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( GlobalCacheCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
 
@@ -91,12 +91,10 @@ class WorkingCacheBuilderClass : public ThreadWithHeartbeatClass {
 public:
 
 	/**
-	 * @param the handler will get notified to EVENT_WORK* events with the given ID
+	 * @param runningThreads the object will get notified to EVENT_WORK* events with the given ID
 	 *        and the EVENT_WORKING_CACHE_COMPLETE.
-	 *        pointer will NOT be owned by this object
 	 */
-	WorkingCacheBuilderClass(wxEvtHandler& handler,
-		mvceditor::RunningThreadsClass& runningThreads, int eventId = wxID_ANY);
+	WorkingCacheBuilderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
 	 * Will start the background thread 

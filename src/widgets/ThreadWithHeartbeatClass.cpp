@@ -23,16 +23,15 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <widgets/ThreadWithHeartbeatClass.h>
+#include <algorithm>
 
-
-mvceditor::ThreadWithHeartbeatClass::ThreadWithHeartbeatClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, 
-		int id)
+mvceditor::ThreadWithHeartbeatClass::ThreadWithHeartbeatClass(mvceditor::RunningThreadsClass& runningThreads, 
+		int eventId)
 	: wxEvtHandler()
 	, wxThread(wxTHREAD_DETACHED)
-	, Handler(handler)
 	, Timer()
 	, RunningThreads(runningThreads)
-	, EventId(id) {
+	, EventId(eventId) {
 	Timer.SetOwner(this);
 }
 
@@ -57,12 +56,13 @@ void mvceditor::ThreadWithHeartbeatClass::SignalStart() {
 void mvceditor::ThreadWithHeartbeatClass::SignalEnd() {
 	Timer.Stop();
 	wxCommandEvent evt(mvceditor::EVENT_WORK_COMPLETE, EventId);
-	wxPostEvent(&Handler, evt);
+	evt.SetString(wxString::Format(_("Thread %ld stopped...\n"), GetId()));
+	PostEvent(evt);
 }
 
 void mvceditor::ThreadWithHeartbeatClass::OnTimer(wxTimerEvent& event) {
 	wxCommandEvent evt(mvceditor::EVENT_WORK_IN_PROGRESS, EventId);
-	wxPostEvent(&Handler, evt);
+	PostEvent(evt);
 }
 
 void* mvceditor::ThreadWithHeartbeatClass::Entry() {
@@ -82,9 +82,14 @@ void mvceditor::ThreadWithHeartbeatClass::BackgroundCleanup() {
 	// use dynamically allocated memory
 }
 
+void mvceditor::ThreadWithHeartbeatClass::PostEvent(wxEvent& event) {
+	event.SetId(EventId);
+	RunningThreads.PostEvent(event);
+}
 
 mvceditor::RunningThreadsClass::RunningThreadsClass()
 	: Workers()
+	, Handlers()
 	, Mutex() 
 	, Semaphore(NULL) {
 		
@@ -174,27 +179,27 @@ void mvceditor::RunningThreadsClass::Stop(unsigned long threadId) {
 	}
 }
 
-void mvceditor::RunningThreadsClass::Kill(unsigned long threadId) {
-	wxThread* thread = NULL;
-	{
-		wxMutexLocker locker(Mutex);
-		wxASSERT(locker.IsOk());
-		std::vector<wxThread*>::iterator it;
-		for (it = Workers.begin(); it != Workers.end(); ++it) {
-			if ((*it)->GetId() == threadId) {
-				thread = *it;
+void mvceditor::RunningThreadsClass::AddEventHandler(wxEvtHandler *handler) {
+	wxMutexLocker locker(Mutex);
+	wxASSERT(locker.IsOk());
+	Handlers.push_back(handler);
+}
 
-				// different than Stop() method above; since
-				// wxThread::Kill won't gracefully terminate the thread
-				// Remove() never gets called. we must remove this pointer
-				// ourselves
-				it = Workers.erase(it);
-				break;
-			}
-		}
+void mvceditor::RunningThreadsClass::RemoveEventHandler(wxEvtHandler *handler) {
+	wxMutexLocker locker(Mutex);
+	wxASSERT(locker.IsOk());
+	std::vector<wxEvtHandler*>::iterator it = std::find(Handlers.begin(), Handlers.end(), handler);
+	if (it != Handlers.end()) {
+		Handlers.erase(it);
 	}
-	if (thread) {
-		thread->Kill();
+}
+
+void mvceditor::RunningThreadsClass::PostEvent(wxEvent& event) {
+	wxMutexLocker locker(Mutex);
+	wxASSERT(locker.IsOk());
+	std::vector<wxEvtHandler*>::iterator it;
+	for (it = Handlers.begin(); it != Handlers.end(); ++it) {
+		wxPostEvent(*it, event);
 	}
 }
 

@@ -29,11 +29,14 @@
  #include <soci.h>
  #include <vector>
  #include <wx/longlong.h>
+ #include <wx/thread.h>
  
  namespace mvceditor {
 
+ //defined below
  class SqlQueryClass;
- 
+ class ConnectionIdentifierClass;
+
  /**
  * This is the database connection information used by the framework.
  * The information will actually be located via a PHP script
@@ -252,6 +255,23 @@ class SqlQueryClass {
 	 * after every call to Query()
 	 */
 	void Close(soci::session& session, soci::statement& stmt);
+
+	/**
+	 * @param session the current open session
+	 * @param the connection ID, used to kill a running query
+	 */
+	void ConnectionIdentifier(soci::session& session, 
+		mvceditor::ConnectionIdentifierClass& connectionIdentifier);
+
+	/**
+	 * kills the connection (stops any query). this method is useful when
+	 * a query is executed in a background thread and we want to use the
+	 * main thread to kill the query; but we want to kill the query in a
+	 * nice way and avoid using wxThread::Kill
+	 */
+	bool KillConnection(soci::session& session, 
+						  mvceditor::ConnectionIdentifierClass& connectionIdentifier, 
+						  UnicodeString& error);
 	
 	/**
 	 * Will only copy Host, User, Database, Port, and Password
@@ -321,6 +341,40 @@ class SqlQueryClass {
 	long long GetAffectedRows(soci::statement& stmt);
 	
 };
+
+/**
+ * class that will share the connection ID between the main thread
+ * and the query thread in a safe manner.  the main thread will
+ * use the connection ID to issue a KILL SQL command when the 
+ * app exits or the panel is closed.
+ */
+class ConnectionIdentifierClass {
+
+public:
+
+	ConnectionIdentifierClass();
+
+	/**
+	 * safely set the connection ID
+	 */
+	void Set(unsigned long id);
+
+	
+	/**
+	 * safely get the connection ID
+	 */
+	unsigned long Get();
+
+private:
+
+	/**
+	 * for shared access protection
+	 */
+	wxMutex Mutex;
+
+	unsigned long ConnectionId;
+};
+
 
 }
 

@@ -33,7 +33,8 @@ namespace mvceditor {
 	
 /**
  * This event will be generated when the thread has completed its job
- * **successfully** A thread that has been killed will NOT generate this event.
+ * **successfully** A thread that has been stopped via RunningThreads::Stop()
+ * or will still generate this event.
  */
 extern const wxEventType EVENT_WORK_COMPLETE;
 /**
@@ -53,14 +54,15 @@ class RunningThreadsClass;
  * 
  * This class is also useful for correctly implementing background threads.
  * Threads in wxWidgets by default are detached; this means that IsAlive() and
- * IsRunning() methods cannot be called on them.  We implement those methods
- * here in this class in a safe manner.
+ * IsRunning() methods cannot be called on them. This class forces the use
+ * of RunningThreads class, which implements thread deletion correctly. The only
+ * restriction is that the given instance of RunningThreads must be valid
+ * until the threads have terminated (otherwise threads will attempt to post events
+ * to an invalid object). To make sure of this, the method RunningThreads::StopAll
+ * must be used to stop all running threads.
+ *
  * Threads created with this class are ALWAYS gracefully terminated.  This means
- * that the implementing classes must check TestDestroy() and exit promptly.
- * 
- * Note that if a thread is running at the time this object goes out of scope
- * the thread is stopped gracefully; which means that the destructor will block until
- * the thread has terminated.
+ * that the implementing classes MUST check TestDestroy() many times and exit promptly.
  * 
  */
 class ThreadWithHeartbeatClass : public wxEvtHandler, public wxThread {
@@ -68,11 +70,10 @@ class ThreadWithHeartbeatClass : public wxEvtHandler, public wxThread {
 public:
 	
 	/**
-	 * @param handler will receive the EVENT_WORK_* events
-	 * @param runningThreads to stop the thread gracefully if need be
+	 * @param runningThreads to stop the thread gracefully if need be. Will also receive the EVENT_WORK_* events
 	 * @param id if given, the generated event will have this id as its GetId() member.
 	 */
-	ThreadWithHeartbeatClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, int id = wxID_ANY);
+	ThreadWithHeartbeatClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 	
 	virtual ~ThreadWithHeartbeatClass();
 
@@ -103,21 +104,6 @@ public:
 	 *
 	 */
 	wxThreadError CreateSingleInstance();
-
-	/**
-	 * If there is a background thread running, stop it. This IS a graceful stoppage
-	 * but it depends on the thread calling TestDestroy() as often  as possible during its
-	 * Entry() method.
-	 */
-	///void KillInstance();
-	
-	/**
-	 * If there is a background thread running, stop it. This IS NOT a graceful stoppage
-	 * the thread will terminate forcefully. It should only be used when TestDestroy()
-	 * cannot be called inside the background thread.
-	 */
-	/*void ForceKillInstance();	
-	*/
 	
 	/**
 	 * This is the method to override; this method is executed in the background thread.
@@ -131,12 +117,15 @@ public:
 	 * get called in the background thread.
 	 */
 	virtual void BackgroundCleanup();
+
+	/**
+	 * send an event to all of the handlers that have registered via RunningThreads::AddHandler
+	 * method.
+	 */
+	void PostEvent(wxEvent& event);
 	
 protected:
 
-
-	wxEvtHandler& Handler;
-	
 	/**
 	 * This method is executed in the background thread.
 	 */
@@ -151,11 +140,10 @@ private:
 	
 	/**
 	 * Keeps a reference to this object's running thread; that way
-	 * we can stop it. Also, the RunningThreads object can be used
-	 * to stop all threads if needed.
+	 * we can send events to other threads.
 	 */
 	mvceditor::RunningThreadsClass& RunningThreads;
-	
+
 	/**
 	 * All generated events will have this ID as their EventId
 	 */
@@ -191,7 +179,7 @@ private:
  * 
  * This class will own the given threads, and will delete them if need be.
  */
-class RunningThreadsClass {
+ class RunningThreadsClass {
 
 	public:
 	
@@ -217,7 +205,10 @@ class RunningThreadsClass {
 	void Remove(wxThread* thread);
 
 	/**
-	 * stop all of the running threads.
+	 * stop all of the running threads. This method is guaranteed to block
+	 * until all threads have terminated. If this method is hanging 
+	 * indefinitely, it means that one of the running threads has not
+	 * been calling TestDestroy() correctly.
 	 */
 	void StopAll();
 
@@ -230,22 +221,41 @@ class RunningThreadsClass {
 	void Stop(unsigned long threadId);
 
 	/**
-	 * *forcefully* stops the thread with the given ID.
-	 *
-	 * @param thread ID of the thread to stop; see wxThread::GetId()
-	 * see wxThread::Kill
+	 * adds an event handler to this instance.  Running threads will
+	 * post events to all registered handlers.  The handlers pointer
+	 * is NOT owned by this object; the caller must ensure to call
+	 * RemoveEventHandler before the event handler goes out of scope.
 	 */
-	void Kill(unsigned long threadId);
+	void AddEventHandler(wxEvtHandler* handler);
+
+	/**
+	 * removes event handler to this instance, if handler has
+	 * not been registered then this method does nothing.
+	 */
+	void RemoveEventHandler(wxEvtHandler* handler);
+
+	/**
+	 * post an event (using wxPostEvent) to all registered handlers.
+	 * this means that the event will be received in the next event loop.
+	 */
+	void PostEvent(wxEvent& event);
 
 	private:
 
 	/**
-	 *  holds all threads that are alive and running
+	 * holds all threads that are alive and running. These are 'self-destructing'
+	 * threads that will tell us when they need to be removed.
 	 */
 	std::vector<wxThread*> Workers;
 	
 	/**
-	 * prevent concurrent access to the internal vector
+	 * holds all event handlers to post events to. This object
+	 * will not own these pointers.
+	 */
+	std::vector<wxEvtHandler*> Handlers;
+	
+	/**
+	 * prevent concurrent access to the internal vectors
 	 */
 	wxMutex Mutex;	
 	

@@ -34,25 +34,26 @@
 
 const int ID_LINT_RESULTS_PANEL = wxNewId();
 const int ID_LINT_RESULTS_GAUGE = wxNewId();
+const int ID_LINT_READER = wxNewId();
 
-mvceditor::LintResultsEventClass::LintResultsEventClass(const pelet::LintResultsClass& lintResults)
-	: wxEvent(mvceditor::EVENT_LINT_ERROR) 
+mvceditor::LintResultsEventClass::LintResultsEventClass(int eventId, const pelet::LintResultsClass& lintResults)
+	: wxEvent(eventId, mvceditor::EVENT_LINT_ERROR) 
 	, LintResults(lintResults) {
 }
 
 wxEvent* mvceditor::LintResultsEventClass::Clone() const {
-	return new mvceditor::LintResultsEventClass(LintResults);
+	return new mvceditor::LintResultsEventClass(GetId(), LintResults);
 }
 
-mvceditor::LintResultsSummaryEventClass::LintResultsSummaryEventClass(int totalFiles, int errorFiles)
-	: wxEvent(wxID_ANY, mvceditor::EVENT_LINT_SUMMARY)
+mvceditor::LintResultsSummaryEventClass::LintResultsSummaryEventClass(int eventId, int totalFiles, int errorFiles)
+	: wxEvent(eventId, mvceditor::EVENT_LINT_SUMMARY)
 	, TotalFiles(totalFiles)
 	, ErrorFiles(errorFiles) {
 
 }
 
 wxEvent* mvceditor::LintResultsSummaryEventClass::Clone() const {
-	return new mvceditor::LintResultsSummaryEventClass(TotalFiles, ErrorFiles);
+	return new mvceditor::LintResultsSummaryEventClass(GetId(), TotalFiles, ErrorFiles);
 }
 
 
@@ -90,8 +91,8 @@ bool mvceditor::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 	return ret;
 }
 
-mvceditor::LintBackgroundFileReaderClass::LintBackgroundFileReaderClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads)
-	: BackgroundFileReaderClass(handler, runningThreads)
+mvceditor::LintBackgroundFileReaderClass::LintBackgroundFileReaderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+	: BackgroundFileReaderClass(runningThreads, eventId)
 	, ParserDirectoryWalker() {
 		
 }
@@ -131,14 +132,14 @@ bool mvceditor::LintBackgroundFileReaderClass::LintSingleFile(const wxString& fi
 bool mvceditor::LintBackgroundFileReaderClass::BackgroundFileRead(DirectorySearchClass &search) {
 	bool error = search.Walk(ParserDirectoryWalker);
 	if (error) {
-		mvceditor::LintResultsEventClass lintResultsEvent(ParserDirectoryWalker.LastResults);
-		wxPostEvent(&Handler, lintResultsEvent);
+		mvceditor::LintResultsEventClass lintResultsEvent(ID_LINT_READER, ParserDirectoryWalker.LastResults);
+		PostEvent(lintResultsEvent);
 	}
 	if (!search.More() && !TestDestroy()) {
 		int totalFiles = ParserDirectoryWalker.WithErrors + ParserDirectoryWalker.WithNoErrors;
 		int errorFiles = ParserDirectoryWalker.WithNoErrors;
-		mvceditor::LintResultsSummaryEventClass summaryEvent(totalFiles, errorFiles);
-		wxPostEvent(&Handler, summaryEvent);
+		mvceditor::LintResultsSummaryEventClass summaryEvent(ID_LINT_READER, totalFiles, errorFiles);
+		PostEvent(summaryEvent);
 	}
 	return !error;
 }
@@ -266,6 +267,9 @@ mvceditor::LintPluginClass::LintPluginClass(mvceditor::AppClass& app)
 	, RunningThreadId(0)
 	, LintErrors() {
 	ResultsPanel = NULL;
+
+	// will get disconnected when the program exits
+	App.RunningThreads.AddEventHandler(this);
 }
 
 void mvceditor::LintPluginClass::AddViewMenuItems(wxMenu* viewMenu) {
@@ -309,7 +313,7 @@ void mvceditor::LintPluginClass::OnLintMenu(wxCommandEvent& event) {
 	}
 	if (App.Structs.HasSources()) {
 		mvceditor::BackgroundFileReaderClass::StartError error;
-		mvceditor::LintBackgroundFileReaderClass* thread = new mvceditor::LintBackgroundFileReaderClass(*this, App.RunningThreads);
+		mvceditor::LintBackgroundFileReaderClass* thread = new mvceditor::LintBackgroundFileReaderClass(App.RunningThreads, ID_LINT_READER);
 		if (thread->BeginDirectoryLint(App.Structs.AllEnabledSources(), *GetEnvironment(), error)) {
 			RunningThreadId = thread->GetId();
 			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
@@ -394,7 +398,7 @@ void mvceditor::LintPluginClass::OnFileSaved(mvceditor::FileSavedEventClass& eve
 	// errors (after they manually lint checked the project) then re-check
 	if (hasErrors || CheckOnSave) {
 		pelet::LintResultsClass lintResults;
-		mvceditor::LintBackgroundFileReaderClass* thread = new mvceditor::LintBackgroundFileReaderClass(*this, App.RunningThreads);
+		mvceditor::LintBackgroundFileReaderClass* thread = new mvceditor::LintBackgroundFileReaderClass(App.RunningThreads, ID_LINT_READER);
 		bool error = thread->LintSingleFile(fileName, App.Structs, *GetEnvironment(), lintResults);
 		if (error) {
 			
@@ -456,12 +460,12 @@ BEGIN_EVENT_TABLE(mvceditor::LintPluginClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_LINT_PHP + 0, mvceditor::LintPluginClass::OnLintMenu)
 	EVT_MENU(mvceditor::MENU_LINT_PHP + 1, mvceditor::LintPluginClass::OnNextLintError)
 	EVT_MENU(mvceditor::MENU_LINT_PHP + 2, mvceditor::LintPluginClass::OnPreviousLintError)
-	EVT_COMMAND(wxID_ANY, EVENT_FILE_READ,  mvceditor::LintPluginClass::OnLintFileComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::LintPluginClass::OnTimer)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::LintPluginClass::OnLintComplete)
+	EVT_COMMAND(ID_LINT_READER, EVENT_FILE_READ,  mvceditor::LintPluginClass::OnLintFileComplete)
+	EVT_COMMAND(ID_LINT_READER, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::LintPluginClass::OnTimer)
+	EVT_COMMAND(ID_LINT_READER, mvceditor::EVENT_WORK_COMPLETE, mvceditor::LintPluginClass::OnLintComplete)
 	EVT_PLUGIN_FILE_SAVED(mvceditor::LintPluginClass::OnFileSaved)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_UPDATED, mvceditor::LintPluginClass::SavePreferences)
 	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::LintPluginClass::OnNotebookPageClosed)
-	EVT_LINT_ERROR(mvceditor::LintPluginClass::OnLintError)
-	EVT_LINT_SUMMARY(mvceditor::LintPluginClass::OnLintSummary)
+	EVT_LINT_ERROR(ID_LINT_READER, mvceditor::LintPluginClass::OnLintError)
+	EVT_LINT_SUMMARY(ID_LINT_READER, mvceditor::LintPluginClass::OnLintSummary)
 END_EVENT_TABLE()

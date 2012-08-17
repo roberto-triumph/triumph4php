@@ -36,10 +36,11 @@ static const int ID_DETECT_CONFIG = wxNewId();
 static const int ID_DETECT_RESOURCES = wxNewId();
 static const int ID_DETECT_URL = wxNewId();
 static const int ID_DETECT_VIEW_FILES = wxNewId();
+static const int ID_RESPONSE_THREAD = wxNewId();
 
 mvceditor::ResponseThreadWithHeartbeatClass::ResponseThreadWithHeartbeatClass(mvceditor::DetectorActionClass& action, 
-		mvceditor::RunningThreadsClass& runningThreads) 
-	: ThreadWithHeartbeatClass(action, runningThreads) 
+		mvceditor::RunningThreadsClass& runningThreads, int eventId) 
+	: ThreadWithHeartbeatClass(runningThreads, eventId) 
 	, Action(action) 
 	, OutputFile() {
 }
@@ -69,6 +70,7 @@ mvceditor::DetectorActionClass::DetectorActionClass(wxEvtHandler& handler, mvced
 	, OutputFile()
 	, CurrentPid(0)
 	, CurrentId(0) {
+	RunningThreads.AddEventHandler(this);
 }
 
 mvceditor::DetectorActionClass::~DetectorActionClass() {
@@ -78,6 +80,7 @@ mvceditor::DetectorActionClass::~DetectorActionClass() {
 	if (RunningThreadId > 0) {
 		RunningThreads.Stop(RunningThreadId);
 	}
+	RunningThreads.RemoveEventHandler(this);
 }
 
 bool mvceditor::DetectorActionClass::Init(int id, const EnvironmentClass& environment, const wxString& projectRootPath, const wxString& identifier, 
@@ -119,7 +122,7 @@ void mvceditor::DetectorActionClass::OnProcessComplete(wxCommandEvent& event) {
 	// kick off response parsing in a background thread.
 	// any running thread was stopped in Init()
 	mvceditor::ResponseThreadWithHeartbeatClass* thread = 
-		new mvceditor::ResponseThreadWithHeartbeatClass(*this, RunningThreads);
+		new mvceditor::ResponseThreadWithHeartbeatClass(*this, RunningThreads, ID_RESPONSE_THREAD);
 	if (thread->Init(OutputFile)) {
 		RunningThreadId = thread->GetId();
 	}
@@ -791,8 +794,8 @@ BEGIN_EVENT_TABLE(mvceditor::DetectorActionClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::DetectorActionClass::OnProcessComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_FAILED, mvceditor::DetectorActionClass::OnProcessFailed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::DetectorActionClass::OnWorkInProgress)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::DetectorActionClass::OnWorkComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::DetectorActionClass::OnWorkInProgress)
+	EVT_COMMAND(ID_RESPONSE_THREAD, mvceditor::EVENT_WORK_COMPLETE, mvceditor::DetectorActionClass::OnWorkComplete)
+	EVT_COMMAND(ID_RESPONSE_THREAD, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::DetectorActionClass::OnWorkInProgress)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::PhpFrameworkDetectorClass, wxEvtHandler)

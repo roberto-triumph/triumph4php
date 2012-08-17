@@ -35,22 +35,23 @@
 static int ID_CONTEXT_MENU_SHOW_OUTLINE_OTHER = wxNewId();
 static int ID_WINDOW_OUTLINE = wxNewId();
 static int ID_CONTEXT_MENU_SHOW_OUTLINE_CURRENT = wxNewId();
+static int ID_RESOURCE_FINDER_BACKGROUND = wxNewId();
 
 const wxEventType mvceditor::EVENT_RESOURCE_FINDER_COMPLETE = wxNewEventType();
 
-mvceditor::ResourceFinderCompleteEventClass::ResourceFinderCompleteEventClass(const std::vector<mvceditor::ResourceClass>& resources)
-	: wxEvent(wxID_ANY, mvceditor::EVENT_RESOURCE_FINDER_COMPLETE)
+mvceditor::ResourceFinderCompleteEventClass::ResourceFinderCompleteEventClass(int eventId, const std::vector<mvceditor::ResourceClass>& resources)
+	: wxEvent(eventId, mvceditor::EVENT_RESOURCE_FINDER_COMPLETE)
 	, Resources(resources) {
 		
 }
 
 wxEvent* mvceditor::ResourceFinderCompleteEventClass::Clone() const {
-	return new mvceditor::ResourceFinderCompleteEventClass(Resources);
+	return new mvceditor::ResourceFinderCompleteEventClass(GetId(), Resources);
 }
 
-mvceditor::ResourceFinderBackgroundThreadClass::ResourceFinderBackgroundThreadClass(wxEvtHandler& handler,
-		mvceditor::RunningThreadsClass& runningThreads)
-	: ThreadWithHeartbeatClass(handler, runningThreads) 
+mvceditor::ResourceFinderBackgroundThreadClass::ResourceFinderBackgroundThreadClass(
+		mvceditor::RunningThreadsClass& runningThreads, int eventId)
+	: ThreadWithHeartbeatClass(runningThreads, eventId) 
 	, ResourceFinder() 
 	, FileName() {
 }
@@ -74,14 +75,16 @@ void mvceditor::ResourceFinderBackgroundThreadClass::BackgroundWork() {
 		// need this call so that resources are actually parsed
 		ResourceFinder.Walk(FileName);
 		std::vector<mvceditor::ResourceClass> resources = ResourceFinder.All();
-		mvceditor::ResourceFinderCompleteEventClass evt(resources);
-		wxPostEvent(&Handler, evt);
+		mvceditor::ResourceFinderCompleteEventClass evt(ID_RESOURCE_FINDER_BACKGROUND, resources);
+		PostEvent(evt);
 	}
 }
 
 mvceditor::OutlineViewPluginClass::OutlineViewPluginClass(mvceditor::AppClass& app)
 	: PluginClass(app) {
-	
+
+	// will get disconnected when the program exits
+	App.RunningThreads.AddEventHandler(this);
 }
 
 void mvceditor::OutlineViewPluginClass::AddViewMenuItems(wxMenu* viewMenu) {
@@ -105,7 +108,7 @@ void mvceditor::OutlineViewPluginClass::BuildOutlineCurrentCodeControl() {
 
 		// this pointer will delete itself when the thread terminates
 		mvceditor::ResourceFinderBackgroundThreadClass* thread = 
-			new mvceditor::ResourceFinderBackgroundThreadClass(*this, App.RunningThreads);
+			new mvceditor::ResourceFinderBackgroundThreadClass(App.RunningThreads, ID_RESOURCE_FINDER_BACKGROUND);
 		if (thread->Start(code->GetFileName(), *GetEnvironment())) {
 			wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 			if (window != NULL) {
@@ -408,5 +411,5 @@ BEGIN_EVENT_TABLE(mvceditor::OutlineViewPluginClass, wxEvtHandler)
 	EVT_MENU(ID_CONTEXT_MENU_SHOW_OUTLINE_CURRENT, mvceditor::OutlineViewPluginClass::OnContextMenuOutline)
 	EVT_MENU(ID_CONTEXT_MENU_SHOW_OUTLINE_OTHER, mvceditor::OutlineViewPluginClass::OnContextMenuOutline)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::OutlineViewPluginClass::OnContentNotebookPageChanged)
-	EVT_RESOURCE_FINDER_COMPLETE(mvceditor::OutlineViewPluginClass::OnResourceFinderComplete)
+	EVT_RESOURCE_FINDER_COMPLETE(ID_RESOURCE_FINDER_BACKGROUND, mvceditor::OutlineViewPluginClass::OnResourceFinderComplete)
 END_EVENT_TABLE()
