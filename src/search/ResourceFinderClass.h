@@ -224,6 +224,13 @@ private:
  * }
  * </code>
  * 
+ * The parsed resources can be persisted in a SQLite file by initializing this class with a 
+ * file name; see InitFile() method.  This class will create the SQLite if it does not already
+ * exist.
+ * The resource finder has an exception-free API, no exceptions will be ever thrown, even though
+ * it uses SOCI to execute queries (and SOCI uses exceptions). Instead
+ * the return values for methods of this class will be false, empty, or zero. Currently this class does not expose 
+ * the specific error code from SQLite.
  */
 class ResourceFinderClass : public pelet::ClassObserverClass, 
 	public pelet::ClassMemberObserverClass, 

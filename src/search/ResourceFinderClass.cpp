@@ -248,7 +248,13 @@ void mvceditor::ResourceFinderClass::BeginSearch() {
 		if (Transaction) {
 			delete Transaction;
 		}
-		Transaction = new soci::transaction(Session);
+		try {
+			Transaction = new soci::transaction(Session);
+		} catch (std::exception& e) {
+			delete Transaction;
+			Transaction = NULL;
+			// ATTN: at some point bubble these exceptions up?
+		}
 	}
 	FileParsingCache.clear();
 	NamespaceCache.clear();
@@ -265,7 +271,12 @@ void mvceditor::ResourceFinderClass::EndSearch() {
 		// commit until the very end; profiling showed that sqlite3 was
 		// being flushed to disk after every file and that was 
 		// resulting in very slow walks.
-		Transaction->commit();
+		try {
+			Transaction->commit();
+		} catch (std::exception& e) {
+			
+			// ATTN: at some point bubble these exceptions up?
+		}
 		delete Transaction;
 		Transaction = NULL;
 	}
@@ -444,24 +455,29 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 	std::string match;
 	int fileItemId;
 	int isNew;
-	soci::statement stmt = (Session.prepare << "SELECT full_path, file_item_id, is_new FROM file_items WHERE full_path LIKE " + query,
-		soci::into(match), soci::into(fileItemId), soci::into(isNew));
-	if (stmt.execute(true)) {
-		do {
-			wxString fullPath = mvceditor::CharToWx(match.c_str());
-			wxFileName::SplitPath(fullPath, &path, &currentFileName, &extension);
-			currentFileName += wxT(".") + extension;
-			wxString fileName = mvceditor::IcuToWx(resourceSearch.GetFileName());
-			if (wxNOT_FOUND != currentFileName.Lower().Find(fileName)) {
-				if (0 == resourceSearch.GetLineNumber() || GetLineCountFromFile(fullPath) >= resourceSearch.GetLineNumber()) {
-					ResourceClass newItem;
-					newItem.FileItemId = fileItemId;
-					newItem.SetFullPath(fullPath);
-					newItem.FileIsNew = isNew > 0;
-					matches.push_back(newItem);
+	try {
+		soci::statement stmt = (Session.prepare << "SELECT full_path, file_item_id, is_new FROM file_items WHERE full_path LIKE " + query,
+			soci::into(match), soci::into(fileItemId), soci::into(isNew));
+		if (stmt.execute(true)) {
+			do {
+				wxString fullPath = mvceditor::CharToWx(match.c_str());
+				wxFileName::SplitPath(fullPath, &path, &currentFileName, &extension);
+				currentFileName += wxT(".") + extension;
+				wxString fileName = mvceditor::IcuToWx(resourceSearch.GetFileName());
+				if (wxNOT_FOUND != currentFileName.Lower().Find(fileName)) {
+					if (0 == resourceSearch.GetLineNumber() || GetLineCountFromFile(fullPath) >= resourceSearch.GetLineNumber()) {
+						ResourceClass newItem;
+						newItem.FileItemId = fileItemId;
+						newItem.SetFullPath(fullPath);
+						newItem.FileIsNew = isNew > 0;
+						matches.push_back(newItem);
+					}
 				}
-			}
-		} while (stmt.fetch());
+			} while (stmt.fetch());
+		}
+	} catch (std::exception& e) {
+		
+		// ATTN: at some point bubble these exceptions up?
 	}
 	return matches;
 }
@@ -948,16 +964,21 @@ bool mvceditor::ResourceFinderClass::IsNewNamespace(const UnicodeString& namespa
 	std::string nm = mvceditor::IcuToChar(namespaceName);
 	int type = mvceditor::ResourceClass::NAMESPACE;
 	int count = 0;
-	soci::statement stmt = (Session.prepare << sql, soci::use(nm), soci::use(type), soci::into(count));
-	stmt.execute(true);
 	bool isNew = false;
-	if (count <= 0) {
-	 
-		// look in the current namespace cache, stuff that has not yet been added to the database
-		if (NamespaceCache.count(namespaceName) <= 0) {
-			isNew = true;
-			NamespaceCache[namespaceName] = 1;
-		}	
+	try {
+		soci::statement stmt = (Session.prepare << sql, soci::use(nm), soci::use(type), soci::into(count));
+		stmt.execute(true);
+		if (count <= 0) {
+		 
+			// look in the current namespace cache, stuff that has not yet been added to the database
+			if (NamespaceCache.count(namespaceName) <= 0) {
+				isNew = true;
+				NamespaceCache[namespaceName] = 1;
+			}	
+		}
+	} catch (std::exception& e) {
+		
+		// ATTN: at some point bubble these exceptions up?
 	}
 	return isNew;
 }
@@ -1014,8 +1035,13 @@ void mvceditor::ResourceFinderClass::RemovePersistedResources(const std::vector<
 		}
 	}
 	stream << ")";
-	Session.once << "DELETE FROM resources " << stream.str();
-	Session.once << "DELETE FROM file_items " << stream.str();
+	try {
+		Session.once << "DELETE FROM resources " << stream.str();
+		Session.once << "DELETE FROM file_items " << stream.str();
+	} catch (std::exception& e) {
+		
+		// ATTN: at some point bubble these exceptions up?
+	}
 }
 
 UnicodeString mvceditor::ResourceFinderClass::ExtractParentClassFromSignature(const UnicodeString& signature) const {
@@ -1180,7 +1206,12 @@ bool mvceditor::ResourceFinderClass::IsFileCacheEmpty() {
 		return true;
 	}
 	int count = 0;
-	Session.once << "SELECT COUNT(*) FROM file_items;", soci::into(count);
+	try {
+		Session.once << "SELECT COUNT(*) FROM file_items;", soci::into(count);
+	} catch (std::exception& e) {
+			
+		// ATTN: at some point bubble these exceptions up?
+	}
 	return count <= 0;
 }
 
@@ -1191,102 +1222,113 @@ bool mvceditor::ResourceFinderClass::IsResourceCacheEmpty() {
 
 	// make sure only parsed resource came from the native functions file.
 	int count = 0;
-	Session.once << "SELECT COUNT(*) FROM resources WHERE is_native = 0;", soci::into(count);
+	try {
+		Session.once << "SELECT COUNT(*) FROM resources WHERE is_native = 0;", soci::into(count);
+	} catch (std::exception& e) {
+		
+		// ATTN: at some point bubble these exceptions up?
+	}
 	return count <= 0;
 }
 
 void mvceditor::ResourceFinderClass::AddDynamicResources(const std::vector<mvceditor::ResourceClass>& dynamicResources) {
-	BeginSearch();
-	std::vector<mvceditor::ResourceClass> newResources;
-	
-	for (std::vector<mvceditor::ResourceClass>::const_iterator it = dynamicResources.begin(); it != dynamicResources.end(); ++it) {
-		mvceditor::ResourceClass resource = *it;
-		if (mvceditor::ResourceClass::MEMBER == resource.Type || mvceditor::ResourceClass::METHOD == resource.Type) {
+	try {
+		BeginSearch();
+		std::vector<mvceditor::ResourceClass> newResources;
+		
+		for (std::vector<mvceditor::ResourceClass>::const_iterator it = dynamicResources.begin(); it != dynamicResources.end(); ++it) {
+			mvceditor::ResourceClass resource = *it;
+			if (mvceditor::ResourceClass::MEMBER == resource.Type || mvceditor::ResourceClass::METHOD == resource.Type) {
 
-			// need to account for duplicates; if so then only update
-			bool updated = false;
-			std::ostringstream stream;
-			stream << "SELECT return_type, class_name, identifier FROM resources WHERE class_name = ? AND identifier = ? AND type IN("
-				<< mvceditor::ResourceClass::MEMBER
-				<< ","
-				<< mvceditor::ResourceClass::METHOD
-				<< ")";
-
-			std::string returnType, 
-				classNameOut, 
-				identifierOut;
-			std::string className = mvceditor::IcuToChar(resource.ClassName);
-			std::string identifier = mvceditor::IcuToChar(resource.Identifier);
-			Session.once << stream.str(), soci::use(className), soci::use(identifier), soci::into(returnType), soci::into(classNameOut)
-				, soci::into(identifierOut);
-			if (returnType.empty() && !classNameOut.empty() && !identifierOut.empty()) {
-
-				// resource already exists, but it does not have a return type. only update the return type
-				returnType = mvceditor::IcuToChar(resource.ReturnType);
-				std::ostringstream updateStream;
-				updateStream << "UPDATE resources SET return_type = ? WHERE class_name = ? AND identifier = ? AND type IN("
+				// need to account for duplicates; if so then only update
+				bool updated = false;
+				std::ostringstream stream;
+				stream << "SELECT return_type, class_name, identifier FROM resources WHERE class_name = ? AND identifier = ? AND type IN("
 					<< mvceditor::ResourceClass::MEMBER
 					<< ","
 					<< mvceditor::ResourceClass::METHOD
 					<< ")";
-				Session.once << updateStream.str(), soci::use(returnType), soci::use(className), soci::use(identifier);
-				updated = true;
-			}
-			else if (returnType.empty() && classNameOut.empty() && identifierOut.empty()) {
-				
-				// make sure to not insert duplicate items (if we found them)
-				resource.IsDynamic = true;
-				resource.Key = resource.Identifier;
-				newResources.push_back(resource);
-				
-				// the fully qualified version
-				resource.Key = resource.ClassName + UNICODE_STRING_SIMPLE("::") + resource.Identifier;
-				newResources.push_back(resource);
-			}
-		}
-		else {
 
-			// look at the function, cache
-			bool updated = false;
-			std::ostringstream stream;
-			stream << "SELECT return_type, identifier FROM resources WHERE key = ? AND type IN("
-				<< mvceditor::ResourceClass::FUNCTION
-				<< ")";
-			std::string identifier = mvceditor::IcuToChar(resource.Identifier);
-			std::string returnType;
-			std::string identifierOut;
-			Session.once << stream.str(), soci::use(identifier), soci::into(returnType), soci::into(identifierOut);
-			if (returnType.empty() && !identifier.empty()) {
+				std::string returnType, 
+					classNameOut, 
+					identifierOut;
+				std::string className = mvceditor::IcuToChar(resource.ClassName);
+				std::string identifier = mvceditor::IcuToChar(resource.Identifier);
+				Session.once << stream.str(), soci::use(className), soci::use(identifier), soci::into(returnType), soci::into(classNameOut)
+					, soci::into(identifierOut);
+				if (returnType.empty() && !classNameOut.empty() && !identifierOut.empty()) {
 
-				// function already exists, just update the return type
-				returnType = mvceditor::IcuToChar(resource.ReturnType);
-				std::ostringstream updateStream;
-				updateStream << "UPDATE resources SET return_type = ? WHERE key = ? AND type IN("
+					// resource already exists, but it does not have a return type. only update the return type
+					returnType = mvceditor::IcuToChar(resource.ReturnType);
+					std::ostringstream updateStream;
+					updateStream << "UPDATE resources SET return_type = ? WHERE class_name = ? AND identifier = ? AND type IN("
+						<< mvceditor::ResourceClass::MEMBER
+						<< ","
+						<< mvceditor::ResourceClass::METHOD
+						<< ")";
+					Session.once << updateStream.str(), soci::use(returnType), soci::use(className), soci::use(identifier);
+					updated = true;
+				}
+				else if (returnType.empty() && classNameOut.empty() && identifierOut.empty()) {
+					
+					// make sure to not insert duplicate items (if we found them)
+					resource.IsDynamic = true;
+					resource.Key = resource.Identifier;
+					newResources.push_back(resource);
+					
+					// the fully qualified version
+					resource.Key = resource.ClassName + UNICODE_STRING_SIMPLE("::") + resource.Identifier;
+					newResources.push_back(resource);
+				}
+			}
+			else {
+
+				// look at the function, cache
+				bool updated = false;
+				std::ostringstream stream;
+				stream << "SELECT return_type, identifier FROM resources WHERE key = ? AND type IN("
 					<< mvceditor::ResourceClass::FUNCTION
-					<< ")";				
-				Session.once << updateStream.str(), soci::use(returnType), soci::use(identifier);
-				updated = true;
-			}
-			else if (returnType.empty() && identifierOut.empty()) {
+					<< ")";
+				std::string identifier = mvceditor::IcuToChar(resource.Identifier);
+				std::string returnType;
+				std::string identifierOut;
+				Session.once << stream.str(), soci::use(identifier), soci::into(returnType), soci::into(identifierOut);
+				if (returnType.empty() && !identifier.empty()) {
 
-				// make sure to not insert duplicate items (if we found them)
-				resource.IsDynamic = true;
-				resource.Key = resource.Identifier;
-				newResources.push_back(resource);
-				
-				// the fully qualified version
-				resource.Key = QualifyName(resource.NamespaceName, resource.ClassName);
-				newResources.push_back(resource);
+					// function already exists, just update the return type
+					returnType = mvceditor::IcuToChar(resource.ReturnType);
+					std::ostringstream updateStream;
+					updateStream << "UPDATE resources SET return_type = ? WHERE key = ? AND type IN("
+						<< mvceditor::ResourceClass::FUNCTION
+						<< ")";				
+					Session.once << updateStream.str(), soci::use(returnType), soci::use(identifier);
+					updated = true;
+				}
+				else if (returnType.empty() && identifierOut.empty()) {
+
+					// make sure to not insert duplicate items (if we found them)
+					resource.IsDynamic = true;
+					resource.Key = resource.Identifier;
+					newResources.push_back(resource);
+					
+					// the fully qualified version
+					resource.Key = QualifyName(resource.NamespaceName, resource.ClassName);
+					newResources.push_back(resource);
+				}
 			}
 		}
-	}
 
-	// we dont want these resource to point to a file; 
-	// GetResourceMatchFullPathFromResource() and GetResourceMatchFullPath() will return empty for dynamic 
-	// resources since there is no source code we can show the user.
-	int fileItemIndex = -1;
-	PersistResources(newResources, fileItemIndex);
-	EndSearch();
+		// we dont want these resource to point to a file; 
+		// GetResourceMatchFullPathFromResource() and GetResourceMatchFullPath() will return empty for dynamic 
+		// resources since there is no source code we can show the user.
+		int fileItemIndex = -1;
+		PersistResources(newResources, fileItemIndex);
+		EndSearch();
+	}
+	catch (std::exception& e) {
+		
+		// ATTN: at some point bubble these exceptions up?
+	}
 }
 
 void mvceditor::ResourceFinderClass::PersistFileItem(mvceditor::FileItemClass& fileItem) {
@@ -1311,13 +1353,18 @@ void mvceditor::ResourceFinderClass::PersistFileItem(mvceditor::FileItemClass& f
 		// tm holds number of years since 1900 (2012 = 112)
 		tm.tm_year = wxTm.year - 1900;
 	}
-	soci::statement stmt = (Session.prepare <<
-		"INSERT INTO file_items (file_item_id, full_path, last_modified, is_parsed, is_new) VALUES(NULL, ?, ?, ?, ?)",
-		soci::use(fullPath), soci::use(tm), soci::use(isParsed), soci::use(isNew)
-	);
-	stmt.execute(true);
-	soci::sqlite3_statement_backend* backend = static_cast<soci::sqlite3_statement_backend*>(stmt.get_backend());
-	fileItem.FileId = sqlite3_last_insert_rowid(backend->session_.conn_);
+	try {
+		soci::statement stmt = (Session.prepare <<
+			"INSERT INTO file_items (file_item_id, full_path, last_modified, is_parsed, is_new) VALUES(NULL, ?, ?, ?, ?)",
+			soci::use(fullPath), soci::use(tm), soci::use(isParsed), soci::use(isNew)
+		);
+		stmt.execute(true);
+		soci::sqlite3_statement_backend* backend = static_cast<soci::sqlite3_statement_backend*>(stmt.get_backend());
+		fileItem.FileId = sqlite3_last_insert_rowid(backend->session_.conn_);
+	} catch (std::exception& e) {
+		
+		// ATTN: at some point bubble these exceptions up?
+	}
 }
 
 bool mvceditor::ResourceFinderClass::FindFileItemByFullPathExact(const wxString& fullPath, mvceditor::FileItemClass& fileItem) {
@@ -1328,20 +1375,26 @@ bool mvceditor::ResourceFinderClass::FindFileItemByFullPathExact(const wxString&
 	std::tm lastModified;
 	int isParsed;
 	int isNew;
+	bool foundFile = false;
 
 	std::string query = mvceditor::WxToChar(fullPath);
 	std::string sql = "SELECT file_item_id, last_modified, is_parsed, is_new FROM file_items WHERE full_path = ?";
-	soci::statement stmt = (Session.prepare << sql, soci::use(query), 
-		soci::into(fileItemId), soci::into(lastModified), soci::into(isParsed), soci::into(isNew)
-	);
-	bool foundFile = stmt.execute(true);
-	if (foundFile) {
-		fileItem.DateTime.Set(lastModified);
-		fileItem.FileId = fileItemId;
-		fileItem.FullPath = fullPath;
-		fileItem.IsNew = isNew != 0;
-		fileItem.IsParsed = isParsed != 0;
-	}	
+	try {
+		soci::statement stmt = (Session.prepare << sql, soci::use(query), 
+			soci::into(fileItemId), soci::into(lastModified), soci::into(isParsed), soci::into(isNew)
+		);
+		foundFile = stmt.execute(true);
+		if (foundFile) {
+			fileItem.DateTime.Set(lastModified);
+			fileItem.FileId = fileItemId;
+			fileItem.FullPath = fullPath;
+			fileItem.IsNew = isNew != 0;
+			fileItem.IsParsed = isParsed != 0;
+		}
+	} catch (std::exception& e) {
+			
+		// ATTN: at some point bubble these exceptions up?
+	}
 	return foundFile;
 }
 
@@ -1379,43 +1432,48 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::ResourceSt
 	soci::indicator fileItemIdIndicator,
 		fullPathIndicator,
 		fileIsNewIndicator;
-	soci::statement stmt = (Session.prepare << sql,
-		soci::into(fileItemId, fileItemIdIndicator), soci::into(key), soci::into(identifier), soci::into(className), 
-		soci::into(type), soci::into(namespaceName), soci::into(signature), 
-		soci::into(returnType), soci::into(comment), soci::into(fullPath, fullPathIndicator), soci::into(isProtected), soci::into(isPrivate), 
-		soci::into(isStatic), soci::into(isDynamic), soci::into(isNative), soci::into(fileIsNew, fileIsNewIndicator)
-	);
-	if (stmt.execute(true)) {
-		do {
-			mvceditor::ResourceClass resource;
-			if (soci::i_ok == fileItemIdIndicator) {
-				resource.FileItemId = fileItemId;
-			}
-			resource.Key = mvceditor::CharToIcu(key.c_str());
-			resource.Identifier = mvceditor::CharToIcu(identifier.c_str());
-			resource.ClassName = mvceditor::CharToIcu(className.c_str());
-			resource.Type = (mvceditor::ResourceClass::Types)type;
-			resource.NamespaceName = mvceditor::CharToIcu(namespaceName.c_str());
-			resource.Signature = mvceditor::CharToIcu(signature.c_str());
-			resource.ReturnType = mvceditor::CharToIcu(returnType.c_str());
-			resource.Comment = mvceditor::CharToIcu(comment.c_str());
-			if (soci::i_ok == fullPathIndicator) {
-				resource.SetFullPath(mvceditor::CharToWx(fullPath.c_str()));
-			}
-			resource.IsProtected = isProtected != 0;
-			resource.IsPrivate = isPrivate != 0;
-			resource.IsStatic = isStatic != 0;
-			resource.IsDynamic = isDynamic != 0;
-			resource.IsNative = isNative != 0;
-			if (soci::i_ok == fileIsNewIndicator) {
-				resource.FileIsNew = fileIsNew != 0;
-			}
-			else {
-				resource.FileIsNew = true;
-			}
+	try {
+		soci::statement stmt = (Session.prepare << sql,
+			soci::into(fileItemId, fileItemIdIndicator), soci::into(key), soci::into(identifier), soci::into(className), 
+			soci::into(type), soci::into(namespaceName), soci::into(signature), 
+			soci::into(returnType), soci::into(comment), soci::into(fullPath, fullPathIndicator), soci::into(isProtected), soci::into(isPrivate), 
+			soci::into(isStatic), soci::into(isDynamic), soci::into(isNative), soci::into(fileIsNew, fileIsNewIndicator)
+		);
+		if (stmt.execute(true)) {
+			do {
+				mvceditor::ResourceClass resource;
+				if (soci::i_ok == fileItemIdIndicator) {
+					resource.FileItemId = fileItemId;
+				}
+				resource.Key = mvceditor::CharToIcu(key.c_str());
+				resource.Identifier = mvceditor::CharToIcu(identifier.c_str());
+				resource.ClassName = mvceditor::CharToIcu(className.c_str());
+				resource.Type = (mvceditor::ResourceClass::Types)type;
+				resource.NamespaceName = mvceditor::CharToIcu(namespaceName.c_str());
+				resource.Signature = mvceditor::CharToIcu(signature.c_str());
+				resource.ReturnType = mvceditor::CharToIcu(returnType.c_str());
+				resource.Comment = mvceditor::CharToIcu(comment.c_str());
+				if (soci::i_ok == fullPathIndicator) {
+					resource.SetFullPath(mvceditor::CharToWx(fullPath.c_str()));
+				}
+				resource.IsProtected = isProtected != 0;
+				resource.IsPrivate = isPrivate != 0;
+				resource.IsStatic = isStatic != 0;
+				resource.IsDynamic = isDynamic != 0;
+				resource.IsNative = isNative != 0;
+				if (soci::i_ok == fileIsNewIndicator) {
+					resource.FileIsNew = fileIsNew != 0;
+				}
+				else {
+					resource.FileIsNew = true;
+				}
 
-			matches.push_back(resource);
-		} while (stmt.fetch());
+				matches.push_back(resource);
+			} while (stmt.fetch());
+		}
+	} catch (std::exception& e) {
+			
+		// ATTN: at some point bubble these exceptions up?
 	}
 	return matches;
 }
@@ -1544,9 +1602,14 @@ void mvceditor::ResourceFinderClass::Wipe() {
 
 	// dont wipe the native functions since we don't recreate it
 	// during the running of the app.
-	if (IsCacheInitialized && mvceditor::NativeFunctionsAsset() != DbFileName) {		
-		Session.once << "DELETE FROM file_items;";
-		Session.once << "DELETE FROM resources;";
+	if (IsCacheInitialized && mvceditor::NativeFunctionsAsset() != DbFileName) {
+		try {
+			Session.once << "DELETE FROM file_items;";
+			Session.once << "DELETE FROM resources;";
+		} catch (std::exception& e) {
+			
+		// ATTN: at some point bubble these exceptions up?
+		}
 	}
 }
 
@@ -1581,29 +1644,33 @@ void mvceditor::ResourceFinderClass::PersistResources(const std::vector<mvcedito
 	int isDynamic;
 	int isNative;
 
-	
-	soci::statement stmt = (Session.prepare << sql,
-		soci::use(fileItemId), soci::use(key), soci::use(identifier), soci::use(className), 
-		soci::use(type), soci::use(namespaceName), soci::use(signature), 
-		soci::use(returnType), soci::use(comment), soci::use(isProtected), soci::use(isPrivate), 
-		soci::use(isStatic), soci::use(isDynamic), soci::use(isNative)
-	);
-	std::vector<mvceditor::ResourceClass>::const_iterator it;
-	for (it = resources.begin(); it != resources.end(); ++it) {
-		key = mvceditor::IcuToChar(it->Key);
-		identifier = mvceditor::IcuToChar(it->Identifier);
-		className = mvceditor::IcuToChar(it->ClassName);
-		type = it->Type;
-		namespaceName = mvceditor::IcuToChar(it->NamespaceName);
-		signature = mvceditor::IcuToChar(it->Signature);
-		returnType = mvceditor::IcuToChar(it->ReturnType);
-		comment = mvceditor::IcuToChar(it->Comment);
-		isProtected = it->IsProtected;
-		isPrivate = it->IsPrivate;
-		isStatic = it->IsStatic;
-		isDynamic = it->IsDynamic;
-		isNative = it->IsNative;
-		stmt.execute(true);
+	try {
+		soci::statement stmt = (Session.prepare << sql,
+			soci::use(fileItemId), soci::use(key), soci::use(identifier), soci::use(className), 
+			soci::use(type), soci::use(namespaceName), soci::use(signature), 
+			soci::use(returnType), soci::use(comment), soci::use(isProtected), soci::use(isPrivate), 
+			soci::use(isStatic), soci::use(isDynamic), soci::use(isNative)
+		);
+		std::vector<mvceditor::ResourceClass>::const_iterator it;
+		for (it = resources.begin(); it != resources.end(); ++it) {
+			key = mvceditor::IcuToChar(it->Key);
+			identifier = mvceditor::IcuToChar(it->Identifier);
+			className = mvceditor::IcuToChar(it->ClassName);
+			type = it->Type;
+			namespaceName = mvceditor::IcuToChar(it->NamespaceName);
+			signature = mvceditor::IcuToChar(it->Signature);
+			returnType = mvceditor::IcuToChar(it->ReturnType);
+			comment = mvceditor::IcuToChar(it->Comment);
+			isProtected = it->IsProtected;
+			isPrivate = it->IsPrivate;
+			isStatic = it->IsStatic;
+			isDynamic = it->IsDynamic;
+			isNative = it->IsNative;
+			stmt.execute(true);
+		}
+	} catch (std::exception& e) {
+			
+		// ATTN: at some point bubble these exceptions up?
 	}
 }
 
@@ -1626,37 +1693,42 @@ void mvceditor::ResourceFinderClass::PersistTraits(
 	std::string aliases;
 	std::string insteadOfs;
 
-	soci::statement stmt = (Session.prepare << sql,
-		soci::use(key), soci::use(className), soci::use(namespaceName), soci::use(traitClassName),
-		soci::use(traitNamespaceName), soci::use(aliases), soci::use(insteadOfs)
-	);
-	std::map<UnicodeString, std::vector<mvceditor::TraitResourceClass>, UnicodeStringComparatorClass>::const_iterator it;
-	for (it = traitMap.begin(); it != traitMap.end(); ++it) {
-		std::vector<mvceditor::TraitResourceClass>::const_iterator trait;
-		for (trait = it->second.begin(); trait != it->second.end(); ++trait) {
-			key = mvceditor::IcuToChar(trait->Key);
-			className = mvceditor::IcuToChar(trait->ClassName);
-			namespaceName = mvceditor::IcuToChar(trait->NamespaceName);
-			traitClassName = mvceditor::IcuToChar(trait->TraitClassName);
-			traitNamespaceName = mvceditor::IcuToChar(trait->TraitNamespaceName);
-			aliases = "";
-			for (std::vector<UnicodeString>::const_iterator alias = trait->Aliased.begin(); alias != trait->Aliased.end(); ++alias) {
-				aliases += mvceditor::IcuToChar(*alias);
-				aliases += ",";
+	try {
+		soci::statement stmt = (Session.prepare << sql,
+			soci::use(key), soci::use(className), soci::use(namespaceName), soci::use(traitClassName),
+			soci::use(traitNamespaceName), soci::use(aliases), soci::use(insteadOfs)
+		);
+		std::map<UnicodeString, std::vector<mvceditor::TraitResourceClass>, UnicodeStringComparatorClass>::const_iterator it;
+		for (it = traitMap.begin(); it != traitMap.end(); ++it) {
+			std::vector<mvceditor::TraitResourceClass>::const_iterator trait;
+			for (trait = it->second.begin(); trait != it->second.end(); ++trait) {
+				key = mvceditor::IcuToChar(trait->Key);
+				className = mvceditor::IcuToChar(trait->ClassName);
+				namespaceName = mvceditor::IcuToChar(trait->NamespaceName);
+				traitClassName = mvceditor::IcuToChar(trait->TraitClassName);
+				traitNamespaceName = mvceditor::IcuToChar(trait->TraitNamespaceName);
+				aliases = "";
+				for (std::vector<UnicodeString>::const_iterator alias = trait->Aliased.begin(); alias != trait->Aliased.end(); ++alias) {
+					aliases += mvceditor::IcuToChar(*alias);
+					aliases += ",";
+				}
+				if (!aliases.empty()) {
+					aliases.erase(aliases.end() - 1);
+				}
+				insteadOfs = "";
+				for (std::vector<UnicodeString>::const_iterator instead = trait->InsteadOfs.begin(); instead != trait->InsteadOfs.end(); ++instead) {
+					insteadOfs += mvceditor::IcuToChar(*instead);
+					insteadOfs += ",";
+				}
+				if (!insteadOfs.empty()) {
+					insteadOfs.erase(insteadOfs.end() - 1);
+				}
+				stmt.execute(true);
 			}
-			if (!aliases.empty()) {
-				aliases.erase(aliases.end() - 1);
-			}
-			insteadOfs = "";
-			for (std::vector<UnicodeString>::const_iterator instead = trait->InsteadOfs.begin(); instead != trait->InsteadOfs.end(); ++instead) {
-				insteadOfs += mvceditor::IcuToChar(*instead);
-				insteadOfs += ",";
-			}
-			if (!insteadOfs.empty()) {
-				insteadOfs.erase(insteadOfs.end() - 1);
-			}
-			stmt.execute(true);
 		}
+	} catch (std::exception& e) {
+			
+		// ATTN: at some point bubble these exceptions up?
 	}
 }
 
@@ -1680,43 +1752,47 @@ std::vector<mvceditor::TraitResourceClass> mvceditor::ResourceFinderClass::FindT
 	std::string traitNamespaceName;
 	std::string aliases;
 	std::string insteadOfs;
-	
-	soci::statement stmt = (Session.prepare << sql,
-		soci::into(key), soci::into(className), soci::into(namespaceName), soci::into(traitClassName),
-		soci::into(traitNamespaceName), soci::into(aliases), soci::into(insteadOfs)
-	);
 	std::vector<mvceditor::TraitResourceClass> matches;
-	if (stmt.execute(true)) {
-		do {
-			mvceditor::TraitResourceClass trait;
-			trait.Key = mvceditor::CharToIcu(key.c_str());
-			trait.ClassName = mvceditor::CharToIcu(className.c_str());
-			trait.NamespaceName = mvceditor::CharToIcu(namespaceName.c_str());
-			trait.TraitClassName = mvceditor::CharToIcu(traitClassName.c_str());
-			trait.TraitNamespaceName = mvceditor::CharToIcu(traitNamespaceName.c_str());
+	try {
+		soci::statement stmt = (Session.prepare << sql,
+			soci::into(key), soci::into(className), soci::into(namespaceName), soci::into(traitClassName),
+			soci::into(traitNamespaceName), soci::into(aliases), soci::into(insteadOfs)
+		);
+		if (stmt.execute(true)) {
+			do {
+				mvceditor::TraitResourceClass trait;
+				trait.Key = mvceditor::CharToIcu(key.c_str());
+				trait.ClassName = mvceditor::CharToIcu(className.c_str());
+				trait.NamespaceName = mvceditor::CharToIcu(namespaceName.c_str());
+				trait.TraitClassName = mvceditor::CharToIcu(traitClassName.c_str());
+				trait.TraitNamespaceName = mvceditor::CharToIcu(traitNamespaceName.c_str());
+				
+				size_t start = 0;
+				size_t found = aliases.find_first_of(",");
+				while (found != std::string::npos) {
+					trait.Aliased.push_back(mvceditor::CharToIcu(aliases.substr(start, found).c_str()));	
+					start = found++;
+				}
+				if (!aliases.empty()) {
+					trait.Aliased.push_back(mvceditor::CharToIcu(aliases.substr(start, found).c_str()));
+				}
+
+				start = 0;
+				found = insteadOfs.find_first_of(",");
+				while (found != std::string::npos) {
+					trait.InsteadOfs.push_back(mvceditor::CharToIcu(insteadOfs.substr(start, found).c_str()));	
+					start = found++;
+				}
+				if (!insteadOfs.empty()) {
+					trait.InsteadOfs.push_back(mvceditor::CharToIcu(insteadOfs.substr(start, found).c_str()));
+				}
+
+				matches.push_back(trait);
+			} while (stmt.fetch());
+		}
+	} catch (std::exception& e) {
 			
-			size_t start = 0;
-			size_t found = aliases.find_first_of(",");
-			while (found != std::string::npos) {
-				trait.Aliased.push_back(mvceditor::CharToIcu(aliases.substr(start, found).c_str()));	
-				start = found++;
-			}
-			if (!aliases.empty()) {
-				trait.Aliased.push_back(mvceditor::CharToIcu(aliases.substr(start, found).c_str()));
-			}
-
-			start = 0;
-			found = insteadOfs.find_first_of(",");
-			while (found != std::string::npos) {
-				trait.InsteadOfs.push_back(mvceditor::CharToIcu(insteadOfs.substr(start, found).c_str()));	
-				start = found++;
-			}
-			if (!insteadOfs.empty()) {
-				trait.InsteadOfs.push_back(mvceditor::CharToIcu(insteadOfs.substr(start, found).c_str()));
-			}
-
-			matches.push_back(trait);
-		} while (stmt.fetch());
+		// ATTN: at some point bubble these exceptions up?
 	}
 	return matches;
 }
