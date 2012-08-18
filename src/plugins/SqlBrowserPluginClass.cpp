@@ -417,21 +417,23 @@ void mvceditor::SqlBrowserPanelClass::Stop() {
 	// query (via a SQL KILL) and stop the thread
 	// so that the rest of the SQL statements are not
 	// sent to the server and the thread terminates
-	soci::session session;
-	UnicodeString error;
-	bool good = Query.Connect(session, error);
-	if (good) {
-		good = Query.KillConnection(session, ConnectionIdentifier, error);
-		if (!good) {
-			wxMessageBox(_("could not kill:") + mvceditor::IcuToWx(error));
+	if (RunningThreadId > 0) {
+		soci::session session;
+		UnicodeString error;
+		bool good = Query.Connect(session, error);
+		if (good) {
+			good = Query.KillConnection(session, ConnectionIdentifier, error);
+			if (!good) {
+				wxMessageBox(_("could not kill connection:") + mvceditor::IcuToWx(error));
+			}
 		}
+		else {
+			wxMessageBox(_("could not connect:") + mvceditor::IcuToWx(error));
+		}
+		Plugin->App.RunningThreads.Stop(RunningThreadId);
+		RunningThreadId = 0;
+		Gauge->StopGauge(ID_SQL_GAUGE);
 	}
-	else {
-		wxMessageBox(_("could not connect:") + mvceditor::IcuToWx(error));
-	}
-	Plugin->App.RunningThreads.Stop(RunningThreadId);
-	RunningThreadId = 0;
-	Gauge->StopGauge(ID_SQL_GAUGE);
 }
 
 void mvceditor::SqlBrowserPanelClass::OnQueryComplete(wxCommandEvent& event) {
