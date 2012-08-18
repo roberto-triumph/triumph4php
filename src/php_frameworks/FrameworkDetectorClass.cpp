@@ -36,7 +36,6 @@ static const int ID_DETECT_CONFIG = wxNewId();
 static const int ID_DETECT_RESOURCES = wxNewId();
 static const int ID_DETECT_URL = wxNewId();
 static const int ID_DETECT_VIEW_FILES = wxNewId();
-static const int ID_RESPONSE_THREAD = wxNewId();
 
 mvceditor::ResponseThreadWithHeartbeatClass::ResponseThreadWithHeartbeatClass(mvceditor::DetectorActionClass& action, 
 		mvceditor::RunningThreadsClass& runningThreads, int eventId) 
@@ -71,6 +70,7 @@ mvceditor::DetectorActionClass::DetectorActionClass(wxEvtHandler& handler, mvced
 	, CurrentPid(0)
 	, CurrentId(0) {
 	RunningThreads.AddEventHandler(this);
+	ThreadEventId = wxNewId();
 }
 
 mvceditor::DetectorActionClass::~DetectorActionClass() {
@@ -122,7 +122,7 @@ void mvceditor::DetectorActionClass::OnProcessComplete(wxCommandEvent& event) {
 	// kick off response parsing in a background thread.
 	// any running thread was stopped in Init()
 	mvceditor::ResponseThreadWithHeartbeatClass* thread = 
-		new mvceditor::ResponseThreadWithHeartbeatClass(*this, RunningThreads, ID_RESPONSE_THREAD);
+		new mvceditor::ResponseThreadWithHeartbeatClass(*this, RunningThreads, ThreadEventId);
 	if (thread->Init(OutputFile)) {
 		RunningThreadId = thread->GetId();
 	}
@@ -141,21 +141,31 @@ void mvceditor::DetectorActionClass::OnProcessFailed(wxCommandEvent& event) {
 }
 
 void mvceditor::DetectorActionClass::OnWorkInProgress(wxCommandEvent& event) {
-	
-	// users expect an EVENT_PROCESS_IN_PROGRESS event but this handler
-	// handles both EVENT_PROCESS_IN_PROGRESS AND EVENT_WORK_IN_PROGRESS
-	wxCommandEvent inProgressEvent(mvceditor::EVENT_PROCESS_IN_PROGRESS);
-	wxPostEvent(&Handler, inProgressEvent);
+	if (event.GetId() == ThreadEventId) {
+		
+		// users expect an EVENT_PROCESS_IN_PROGRESS event but this handler
+		// handles both EVENT_PROCESS_IN_PROGRESS AND EVENT_WORK_IN_PROGRESS
+		wxCommandEvent inProgressEvent(mvceditor::EVENT_PROCESS_IN_PROGRESS);
+		wxPostEvent(&Handler, inProgressEvent);
+	}
+	else {
+		event.Skip();
+	}
 }
 
 void mvceditor::DetectorActionClass::OnWorkComplete(wxCommandEvent& event) {
-	RunningThreadId = 0;
+	if (event.GetId() == ThreadEventId) {
+		RunningThreadId = 0;
 
-	// users expect an EVENT_PROCESS_COMPLETE event
-	wxCommandEvent completeEvent(mvceditor::EVENT_PROCESS_COMPLETE);
-	completeEvent.SetId(CurrentId);
-	wxPostEvent(&Handler, completeEvent);
-	wxRemoveFile(OutputFile.GetFullPath());
+		// users expect an EVENT_PROCESS_COMPLETE event
+		wxCommandEvent completeEvent(mvceditor::EVENT_PROCESS_COMPLETE);
+		completeEvent.SetId(CurrentId);
+		wxPostEvent(&Handler, completeEvent);
+		wxRemoveFile(OutputFile.GetFullPath());
+	}
+	else {
+		event.Skip();
+	}
 }
 
 void mvceditor::DetectorActionClass::Stop() {
@@ -691,8 +701,6 @@ void mvceditor::PhpFrameworkDetectorClass::OnDatabaseDetectionComplete(wxCommand
 	wxString rootDir = Framework.RootDirectory;
 	Framework.Clear();
 	Framework.RootDirectory = rootDir;
-
-
 	NextDetection();
 }
 
@@ -794,8 +802,8 @@ BEGIN_EVENT_TABLE(mvceditor::DetectorActionClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::DetectorActionClass::OnProcessComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_FAILED, mvceditor::DetectorActionClass::OnProcessFailed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::DetectorActionClass::OnWorkInProgress)
-	EVT_COMMAND(ID_RESPONSE_THREAD, mvceditor::EVENT_WORK_COMPLETE, mvceditor::DetectorActionClass::OnWorkComplete)
-	EVT_COMMAND(ID_RESPONSE_THREAD, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::DetectorActionClass::OnWorkInProgress)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::DetectorActionClass::OnWorkComplete)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::DetectorActionClass::OnWorkInProgress)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::PhpFrameworkDetectorClass, wxEvtHandler)

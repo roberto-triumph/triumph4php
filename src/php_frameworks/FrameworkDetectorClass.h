@@ -199,6 +199,11 @@ protected:
 	 * Keep the ID around in case this object goes out of scope
 	 */
 	unsigned long RunningThreadId;
+	
+	/**
+	 *  to let each instance handle its own events
+	 */
+	int ThreadEventId;
 
 	/**
 	 * This handler will get notified after process has ended and response
