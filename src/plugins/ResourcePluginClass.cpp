@@ -213,6 +213,7 @@ void mvceditor::ResourcePluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 	if (RunningThreadId > 0) {
 		App.RunningThreads.Stop(RunningThreadId);
 		RunningThreadId = 0;
+		State = FREE;
 	}
 
 	// the user enabled/disaable projects
@@ -417,6 +418,12 @@ void mvceditor::ResourcePluginClass::StartIndex() {
 }
 
 void mvceditor::ResourcePluginClass::OnProjectWipeAndIndex(wxCommandEvent& event) {
+	if (RunningThreadId > 0) {
+		App.RunningThreads.Stop(RunningThreadId);
+		RunningThreadId = 0;
+		State = FREE;
+	}
+	
 	mvceditor::ResourceFileWipeThreadClass* thread = new mvceditor::ResourceFileWipeThreadClass(App.RunningThreads, ID_WIPE_THREAD);
 	bool  wipeStarted = false;
 	if  (thread->Init(App.Structs.Projects)) {
