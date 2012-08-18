@@ -40,6 +40,19 @@
 static const int ID_REGEX_MENU_START = 9000;
 static const int ID_REGEX_REPLACE_MENU_START = 10000;
 
+static std::vector<wxString> FilesFromHits(const std::vector<mvceditor::FindInFilesHitClass>& allHits) {
+	std::vector<wxString>  files;
+	std::vector<mvceditor::FindInFilesHitClass>::const_iterator hit;
+	for (hit = allHits.begin(); hit != allHits.end(); ++hit) {
+		files.push_back(hit->FileName);
+	}
+	if (!files.empty()) {
+		std::vector<wxString>::iterator newEnd = std::unique(files.begin(), files.end());
+		files.resize(newEnd - files.begin());
+	}
+	return files;
+}
+
 mvceditor::FindInFilesHitClass::FindInFilesHitClass()
 	: FileName()
 	, Preview()
@@ -67,7 +80,6 @@ wxEvent* mvceditor::FindInFilesHitEventClass::Clone() const {
 mvceditor::FindInFilesBackgroundReaderClass::FindInFilesBackgroundReaderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId) 
 	: BackgroundFileReaderClass(runningThreads, eventId) 
 	, FindInFiles()
-	, Hits()
 	, SkipFiles() {
 
 }
@@ -87,15 +99,11 @@ bool mvceditor::FindInFilesBackgroundReaderClass::InitForFind( mvceditor::FindIn
 }
 
 bool mvceditor::FindInFilesBackgroundReaderClass::InitForReplace(mvceditor::FindInFilesClass findInFiles,
-																 const std::vector<mvceditor::FindInFilesHitClass>& hits,
+																 const std::vector<wxString>& replaceFiles,
 																 std::vector<wxString> skipFiles) {
 	FindInFiles = findInFiles;
-
-	// TODO when replacing use the hit list to populate the files
-	// we need a new method in the background file reader class
-	Hits = hits;
 	SkipFiles = skipFiles;
-	return InitMatched();
+	return FindInFiles.Prepare() && InitMatched(replaceFiles);
 }
 
 bool mvceditor::FindInFilesBackgroundReaderClass::BackgroundFileRead(DirectorySearchClass& search) {
@@ -356,7 +364,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxComman
 		// we've already searched, when replacing we should iterate through matched files hence we don't call DirectorySearch,.Init().
 		mvceditor::FindInFilesBackgroundReaderClass* thread = 
 			new mvceditor::FindInFilesBackgroundReaderClass(RunningThreads, FindInFilesGaugeId);
-		thread->InitForReplace(FindInFiles, AllHits, Notebook->GetOpenedFiles());
+		thread->InitForReplace(FindInFiles, FilesFromHits(AllHits), Notebook->GetOpenedFiles());
 		mvceditor::BackgroundFileReaderClass::StartError error;
 		if (thread->StartReading(error)) {
 			RunningThreadId = thread->GetId();
@@ -394,7 +402,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnFindInFilesComplete(wxCommandEve
 			SetStatus(_("Did not Find any Matches"));
 		}
 	}
-	else if (event.GetEventType() == BackgroundFileReaderClass::MATCHED) {
+	else if (event.GetInt() == BackgroundFileReaderClass::MATCHED) {
 		if (matchedFilesSize > 0) {
 			SetStatus(wxString::Format(wxT("Replaced Matches in %d files"), matchedFilesSize));
 		}

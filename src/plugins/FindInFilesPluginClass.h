@@ -127,12 +127,12 @@ public:
 	 * replace them in the background since the user may have modified them but not saved them yet.
 	 * 
 	 * @param FindInFilesClass findInFiles the expression to search and replace with
-	 * @param hits the hits to be replaced
+	 * @param allHits the files to perform replacements in.
 	 * @param skipFiles full paths of files to not replace. We want to NOT perform replacements
 	 * in files that are already opened.
 	 * @return true if hits is not empty
 	 */
-	bool InitForReplace(FindInFilesClass findInFiles, const std::vector<mvceditor::FindInFilesHitClass>& hits, std::vector<wxString> skipFiles);
+	bool InitForReplace(FindInFilesClass findInFiles, const std::vector<wxString>& replaceFiles, std::vector<wxString> skipFiles);
 
 	/**
 	 * Creates a Hit event for the current FindInFiles match. (the event will NOT be posted).
@@ -162,11 +162,6 @@ private:
 	 * @var FindInFilesClass
 	 */
 	FindInFilesClass FindInFiles;
-
-	/**
-	 * the hits to be replaced
-	 */
-	std::vector<mvceditor::FindInFilesHitClass> Hits;
 	
 	/**
 	 * Matched files that will NOT be replaced / searched

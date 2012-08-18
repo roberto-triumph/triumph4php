@@ -131,12 +131,13 @@ public:
 	bool Init(std::vector<mvceditor::SourceClass> sources, DirectorySearchClass::Modes mode = DirectorySearchClass::RECURSIVE, bool doHiddenFiles = false);
 
 	/**
-	 * prepares the thread to iterate over the last set of matched files
+	 * prepares the thread to iterate over the given set of files
 	 * In this case the FileMatch() method will be called.
+	 * @param matchedFiles vector of full paths. Each full path will be given the to the BackgroundFileMatch() method.
 	 * @return bool true if there are matching files from the previous find
 	 * operation.
 	 */
-	bool InitMatched();
+	bool InitMatched(const std::vector<wxString>& matchedFiles);
 
 	/**
 	 * Will create a new thread and run it. If an existing thread is already running,
@@ -172,6 +173,11 @@ private:
 	 * The object that will be used to traverse the file system.
 	 */
 	DirectorySearchClass DirectorySearch;
+	
+	/**
+	 * The files to traverse through if the caller gave us a set of files
+	 */
+	std::vector<wxString> MatchedFiles;
 
 	/**
 	 * The mode that this instance of the background thread

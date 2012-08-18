@@ -44,9 +44,10 @@ bool mvceditor::BackgroundFileReaderClass::Init(std::vector<mvceditor::SourceCla
 }
 
 
-bool mvceditor::BackgroundFileReaderClass::InitMatched() {
+bool mvceditor::BackgroundFileReaderClass::InitMatched(const std::vector<wxString>& matchedFiles) {
 	Mode = MATCHED;
-	return !DirectorySearch.GetMatchedFiles().empty();
+	MatchedFiles = matchedFiles;
+	return !matchedFiles.empty();
 }
 
 bool mvceditor::BackgroundFileReaderClass::StartReading(StartError& error) {
@@ -91,10 +92,9 @@ void mvceditor::BackgroundFileReaderClass::BackgroundWork() {
 		}
 	}
 	else if (Mode == MATCHED) {
-		std::vector<wxString> matchedFiles = DirectorySearch.GetMatchedFiles();
-		int count = matchedFiles.size();
+		int count = MatchedFiles.size();
 		for (int i = 0; i < count && !isDestroy; i++) {
-			BackgroundFileMatch(matchedFiles[i]);
+			BackgroundFileMatch(MatchedFiles[i]);
 
 			// signal that the background thread has finished one file
 			counter++;
