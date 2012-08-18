@@ -358,11 +358,12 @@ public:
 	void Clear();
 
 	/**
-	 * Remove all items from all caches ALSO wipes any persisted resources and unregisters any and all files.
-	 * In other words, any resources that were saved to the SQLite tables will be deleted too.
+	 * Remove all items from only the global caches ALSO wipes any persisted resources and unregisters any and all global 
+	 * resource DB files. In other words, any resources that were saved to the SQLite tables will be deleted too.
 	 * The SQLite file itself will not be deleted.
+	 * The working caches are not removed.
 	 */
-	void Wipe();
+	void WipeGlobal();
 	 
 private:
 		

@@ -99,6 +99,35 @@ private:
 	mvceditor::GlobalCacheClass* GlobalCache;
 };
 
+/**
+ * event that is generated when all resources databases have been wiped
+ */
+const wxEventType EVENT_WIPE_COMPLETE = wxNewEventType();
+
+/**
+ * Class to 'wipe' resource databases (empty all of their contents)
+ */
+class ResourceFileWipeThreadClass : public mvceditor::ThreadWithHeartbeatClass {
+	
+public:
+
+	ResourceFileWipeThreadClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	
+	bool Init(const std::vector<mvceditor::ProjectClass>& projects);
+	
+protected:
+	
+	void BackgroundWork();
+	
+private:
+		
+	/**
+	 * The db files that need to be wiped.
+	 */
+	std::vector<wxFileName> ResourceDbFileNames;
+	
+};
+
 class ResourcePluginClass : public PluginClass {
 
 public:
@@ -249,6 +278,11 @@ private:
 	 *         since the returned pointer is a thread; the pointer will delete itself
 	 */
 	mvceditor::ResourceFileReaderClass* ReadNextProject(pelet::Versions version);
+	
+	/**
+	 * after the projects have been wiped, star the index process
+	 */
+	void OnWipeComplete(wxCommandEvent& event);
 	
 
 	 /**

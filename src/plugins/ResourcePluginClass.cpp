@@ -34,6 +34,7 @@
 
 static int ID_COUNT_FILES_GAUGE = wxNewId();
 static int ID_RESOURCE_READER = wxNewId();
+static int ID_WIPE_THREAD = wxNewId();
 
 mvceditor::ResourceFileReaderClass::ResourceFileReaderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId) 
 	: BackgroundFileReaderClass(runningThreads, eventId)
@@ -114,6 +115,35 @@ bool mvceditor::ResourceFileReaderClass::InitProject(const mvceditor::ProjectCla
 		GlobalCache->Init(project.ResourceDbFileName, project.GetPhpFileExtensions(), Version, 1024);
 	}
 	return next;
+}
+
+mvceditor::ResourceFileWipeThreadClass::ResourceFileWipeThreadClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+	: ThreadWithHeartbeatClass(runningThreads, eventId) 
+	, ResourceDbFileNames() {
+		
+}
+
+bool mvceditor::ResourceFileWipeThreadClass::Init(const std::vector<mvceditor::ProjectClass>& projects) {
+	std::vector<mvceditor::ProjectClass>::const_iterator it;
+	for (it = projects.begin(); it != projects.end(); ++it) {
+		if (it->IsEnabled && it->ResourceDbFileName.IsOk()) {
+			ResourceDbFileNames.push_back(it->ResourceDbFileName);
+		}
+	}
+	return !ResourceDbFileNames.empty();
+}
+
+void mvceditor::ResourceFileWipeThreadClass::BackgroundWork() {
+	std::vector<wxFileName>::iterator it;
+	for (it = ResourceDbFileNames.begin(); it != ResourceDbFileNames.end() && !TestDestroy(); ++it) {
+		mvceditor::ResourceFinderClass resourceFinder;
+		resourceFinder.InitFile(*it);
+		resourceFinder.Wipe();
+	}
+	if (!TestDestroy()) {
+		wxCommandEvent evt(mvceditor::EVENT_WIPE_COMPLETE);
+		PostEvent(evt);
+	}
 }
 
 mvceditor::ResourcePluginClass::ResourcePluginClass(mvceditor::AppClass& app)
@@ -216,7 +246,7 @@ void mvceditor::ResourcePluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 	if (thread && thread->StartReading(error)) {
 		RunningThreadId = thread->GetId();
 		State = INDEXING_PROJECT;
-		GetStatusBarWithGauge()->AddGauge(_("Indexing Projects From Update"), ID_COUNT_FILES_GAUGE, 
+		GetStatusBarWithGauge()->AddGauge(_("Indexing Projects"), ID_COUNT_FILES_GAUGE, 
 			StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 	}
 	else if (thread && mvceditor::BackgroundFileReaderClass::NO_RESOURCES == error) {
@@ -348,7 +378,7 @@ void mvceditor::ResourcePluginClass::StartIndex() {
 				if (thread && thread->StartReading(error)) {
 					RunningThreadId = thread->GetId();
 					State = INDEXING_PROJECT;
-					GetStatusBarWithGauge()->AddGauge(_("Indexing Projects at Start"),
+					GetStatusBarWithGauge()->AddGauge(_("Indexing Projects"),
 						ID_COUNT_FILES_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE,
 						wxGA_HORIZONTAL);
 					if (!HasCodeLookups) {
@@ -387,7 +417,26 @@ void mvceditor::ResourcePluginClass::StartIndex() {
 }
 
 void mvceditor::ResourcePluginClass::OnProjectWipeAndIndex(wxCommandEvent& event) {
-	GetResourceCache()->Wipe();
+	mvceditor::ResourceFileWipeThreadClass* thread = new mvceditor::ResourceFileWipeThreadClass(App.RunningThreads, ID_WIPE_THREAD);
+	bool  wipeStarted = false;
+	if  (thread->Init(App.Structs.Projects)) {
+		wxThreadError error = thread->CreateSingleInstance();
+		if (wxTHREAD_NO_ERROR == error) {
+			wipeStarted = true;
+			GetStatusBarWithGauge()->AddGauge(_("Indexing Projects"),
+							ID_COUNT_FILES_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
+		}
+	}
+	if (!wipeStarted) {
+
+		// no projects, just start the indexing process
+		delete thread;
+		StartIndex();
+	}
+}
+
+void mvceditor::ResourcePluginClass::OnWipeComplete(wxCommandEvent& event) {
+	GetStatusBarWithGauge()->StopGauge(ID_COUNT_FILES_GAUGE);
 	StartIndex();
 }
 
@@ -808,4 +857,6 @@ BEGIN_EVENT_TABLE(mvceditor::ResourcePluginClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_CLOSED, mvceditor::ResourcePluginClass::OnAppFileClosed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::ResourcePluginClass::OnAppReady)
 	EVT_GLOBAL_CACHE_COMPLETE(ID_RESOURCE_READER, mvceditor::ResourcePluginClass::OnGlobalCacheComplete)
+	EVT_COMMAND(ID_WIPE_THREAD, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ResourcePluginClass::OnWorkInProgress)
+	EVT_COMMAND(ID_WIPE_THREAD, mvceditor::EVENT_WIPE_COMPLETE, mvceditor::ResourcePluginClass::OnWipeComplete)
 END_EVENT_TABLE()

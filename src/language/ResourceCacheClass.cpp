@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <language/ResourceCacheClass.h>
+#include <MvcEditorAssets.h>
 #include <algorithm>
 
 mvceditor::GlobalCacheClass::GlobalCacheClass()
@@ -342,12 +343,22 @@ void mvceditor::ResourceCacheClass::Clear() {
 	WorkingCaches.clear();
 }
 
-void mvceditor::ResourceCacheClass::Wipe() {
+void mvceditor::ResourceCacheClass::WipeGlobal() {
 
 	// ATTN: DO wipe finders this is an explict call
 	std::vector<mvceditor::GlobalCacheClass*>::iterator it;
-	for (it = GlobalCaches.begin(); it != GlobalCaches.end(); ++it) {
-		(*it)->ResourceFinder.Wipe();
+	wxFileName nativeFunctionsFileName = mvceditor::NativeFunctionsAsset();
+	it = GlobalCaches.begin();
+	while(it != GlobalCaches.end()) {
+		
+		// do not remove the native cache; it never changes 
+		if ((*it)->ResourceDbFileName != nativeFunctionsFileName) {
+			(*it)->ResourceFinder.Wipe();
+			delete *it;
+			it = GlobalCaches.erase(it);
+		}
+		else {
+			++it;
+		}
 	}
-	Clear();
 }
