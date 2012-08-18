@@ -233,7 +233,7 @@
             <property name="minimum_size"></property>
             <property name="name">ResourceSearchDialogGeneratedClass</property>
             <property name="pos"></property>
-            <property name="size">419,270</property>
+            <property name="size">636,288</property>
             <property name="style">wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</property>
             <property name="subclass"></property>
             <property name="title">Search For Resources</property>

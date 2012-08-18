@@ -126,7 +126,7 @@ ProjectDefinitionDialogGeneratedClass::ProjectDefinitionDialogGeneratedClass( wx
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );
 	FlexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	HelpLabel = new wxStaticText( this, wxID_ANY, _("A project is a list of directories where source code is located together with a human-firendly label. A project can contain multiple directories from different locations. Additionally, MVC Editor can be told to exclude certain files from the project."), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT );
+	HelpLabel = new wxStaticText( this, wxID_ANY, _("A project is a list of directories where source code is located together with a human-friendly label. A project can contain multiple directories from different locations. Additionally, MVC Editor can be told to exclude certain files from the project."), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT );
 	HelpLabel->Wrap( 500 );
 	FlexGridSizer->Add( HelpLabel, 1, wxALL|wxEXPAND, 5 );
 	

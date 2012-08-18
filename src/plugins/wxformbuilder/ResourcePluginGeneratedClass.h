@@ -92,7 +92,7 @@ class ResourceSearchDialogGeneratedClass : public wxDialog
 	
 	public:
 		
-		ResourceSearchDialogGeneratedClass( wxWindow* parent, wxWindowID id = ID_RESOURCESEARCHDIALOGGENERATEDCLASS, const wxString& title = _("Search For Resources"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 419,270 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		ResourceSearchDialogGeneratedClass( wxWindow* parent, wxWindowID id = ID_RESOURCESEARCHDIALOGGENERATEDCLASS, const wxString& title = _("Search For Resources"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 636,288 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~ResourceSearchDialogGeneratedClass();
 	
 };

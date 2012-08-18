@@ -121,7 +121,7 @@ class ProjectSourceDialogGeneratedClass : public wxDialog
 	
 	public:
 		
-		ProjectSourceDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Project Source"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 513,438 ), long style = wxDEFAULT_DIALOG_STYLE );
+		ProjectSourceDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Project Source"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 536,541 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~ProjectSourceDialogGeneratedClass();
 	
 };

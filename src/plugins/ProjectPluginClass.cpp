@@ -423,6 +423,7 @@ void mvceditor::ProjectDefinitionDialogClass::OnSourcesListDoubleClick(wxCommand
 			EditedProject.Sources[selected] = src;
 		}
 	}
+	event.Skip();
 }
 
 void mvceditor::ProjectDefinitionDialogClass::Populate() {
@@ -483,10 +484,20 @@ void mvceditor::ProjectListDialogClass::OnProjectsListDoubleClick(wxCommandEvent
 			wxString label = project.Label;
 
 			// escape any ampersands in the label, list box needs them escaped
-			label.Replace(wxT("&"), wxT("&&"));
+			// only happens in win32
+			wxPlatformInfo info = wxPlatformInfo::Get();
+			if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
+				label.Replace(wxT("&"), wxT("&&"));
+			}
 			ProjectsList->SetString(selection, label);
+			
+			// on linux, setting the string causes the checkbox to not
+			// be drawn and it makes it look like the project is
+			// disabled
+			ProjectsList->Check(selection);
 		}
 	}
+	event.Skip();
 }
 
 void mvceditor::ProjectListDialogClass::OnProjectsListCheckbox(wxCommandEvent& event) {
@@ -496,6 +507,7 @@ void mvceditor::ProjectListDialogClass::OnProjectsListCheckbox(wxCommandEvent& e
 		project.IsEnabled = ProjectsList->IsChecked(selection);
 		EditedProjects[selection] = project;
 	}
+	event.Skip();
 }
 
 void mvceditor::ProjectListDialogClass::OnAddButton(wxCommandEvent& event) {
@@ -503,10 +515,14 @@ void mvceditor::ProjectListDialogClass::OnAddButton(wxCommandEvent& event) {
 	mvceditor::ProjectDefinitionDialogClass dialog(this, project);
 	if (wxOK == dialog.ShowModal()) {
 		EditedProjects.push_back(project);
+		wxString label = project.Label;
 
 		// escape any ampersands in the label, list box needs them escaped
-		wxString label = project.Label;
-		label.Replace(wxT("&"), wxT("&&"));
+		// only happens in win32
+		wxPlatformInfo info = wxPlatformInfo::Get();
+		if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
+			label.Replace(wxT("&"), wxT("&&"));
+		}
 		ProjectsList->Append(label);
 		ProjectsList->Check(ProjectsList->GetCount() - 1, true);
 	}
@@ -537,11 +553,20 @@ void mvceditor::ProjectListDialogClass::OnEditButton(wxCommandEvent& event) {
 		mvceditor::ProjectDefinitionDialogClass dialog(this, project);
 		if (wxOK == dialog.ShowModal()) {
 			EditedProjects[selection] = project;
-
-			// escape any ampersands in the label, list box needs them escaped
 			wxString label = project.Label;
-			label.Replace(wxT("&"), wxT("&&"));
+			
+			// escape any ampersands in the label, list box needs them escaped
+			// only happens in win32
+			wxPlatformInfo info = wxPlatformInfo::Get();
+			if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
+				label.Replace(wxT("&"), wxT("&&"));
+			}
 			ProjectsList->SetString(selection, label);
+			
+			// on linux, setting the string causes the checkbox to not
+			// be drawn and it makes it look like the project is
+			// disabled
+			ProjectsList->Check(selection);
 		}
 	}
 }
@@ -560,12 +585,16 @@ void mvceditor::ProjectListDialogClass::OnCancelButton(wxCommandEvent& event) {
 
 void mvceditor::ProjectListDialogClass::Populate() {
 	ProjectsList->Clear();
+	wxPlatformInfo info = wxPlatformInfo::Get();
 	for (size_t i = 0; i < EditedProjects.size(); ++i) {
 		mvceditor::ProjectClass project = EditedProjects[i];
+		wxString label = project.Label;
 
 		// escape any ampersands in the label, list box needs them escaped
-		wxString label = project.Label;
-		label.Replace(wxT("&"), wxT("&&"));
+		// only happens in win32
+		if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
+			label.Replace(wxT("&"), wxT("&&"));
+		}
 		ProjectsList->Append(label);
 		ProjectsList->Check(ProjectsList->GetCount() - 1, project.IsEnabled);
 	}
