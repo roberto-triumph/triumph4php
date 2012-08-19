@@ -60,13 +60,15 @@ public:
 
 private:
 
-	void OnProjectsUpdated(wxCommandEvent& event);
-
 	void OnCmdFileOpen(wxCommandEvent& event);
 
 	void OnPreferencesUpdated(wxCommandEvent& event);
 
 	void OnAppReady(wxCommandEvent& event);
+	
+	void OnCodeNotebookPageChanged(wxAuiNotebookEvent& event);
+	
+	void OnCodeNotebookPageClosed(wxAuiNotebookEvent& event);
 
 	/**
 	 * Need the frame to manipulate it
@@ -107,14 +109,14 @@ public:
 	void AuiManagerUpdate();
 
 	/**
-	 * notify all sub-windows of a new project.
-	 */
-	void OnProjectsUpdated();
-
-	/**
 	 * For a re-draw of all dialogs and windows based on new updated preferences
 	 */
 	void UpdatePreferences();
+	
+	/**
+	 * Updates the title bar with the name of the file being edited.
+	 */
+	void UpdateTitleBar();
 
 protected:
 

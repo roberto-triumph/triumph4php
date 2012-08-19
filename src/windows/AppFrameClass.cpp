@@ -669,35 +669,32 @@ void mvceditor::AppFrameClass::OnAnyAuiToolbarEvent(wxAuiToolBarEvent& event) {
 	event.Skip();
 }
 
-void mvceditor::AppFrameClass::OnProjectsUpdated() {
-	wxString msg;
-	if (App.Structs.HasSources()) {
-		msg = _("MVC Editor - Open Projects");
-		for (size_t i = 0; i < App.Structs.Projects.size(); ++i) {
-			if (App.Structs.Projects[i].IsEnabled) {
-				msg += wxT(": ");
-				msg += App.Structs.Projects[i].Label;
+void mvceditor::AppFrameClass::UpdatePreferences() {
+	Notebook->RefreshCodeControlOptions();
+}
+
+void mvceditor::AppFrameClass::UpdateTitleBar() {
+	if (Notebook->GetPageCount() > 0) {
+		mvceditor::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
+		if (codeControl) {
+			wxString fileName = codeControl->GetFileName();
+			if (fileName.IsEmpty()) {
+				
+				// file name empty means this is a new file, use the tab text
+				fileName = Notebook->GetPageText(Notebook->GetPageIndex(codeControl));
 			}
+			SetTitle(_("MVC Editor: ") + fileName);
 		}
 	}
 	else {
-		msg = _("MVC Editor");
+		SetTitle(_("MVC Editor"));
 	}
-	SetTitle(msg);
-}
-
-void mvceditor::AppFrameClass::UpdatePreferences() {
-	Notebook->RefreshCodeControlOptions();
 }
 
 mvceditor::AppEventListenerForFrameClass::AppEventListenerForFrameClass(mvceditor::AppFrameClass* appFrame)
 	: wxEvtHandler()
 	, AppFrame(appFrame) {
 
-}
-
-void mvceditor::AppEventListenerForFrameClass::OnProjectsUpdated(wxCommandEvent& event) {
-	AppFrame->OnProjectsUpdated();
 }
 
 void mvceditor::AppEventListenerForFrameClass::OnCmdFileOpen(wxCommandEvent& event) {
@@ -710,8 +707,12 @@ void mvceditor::AppEventListenerForFrameClass::OnPreferencesUpdated(wxCommandEve
 	AppFrame->UpdatePreferences();
 }
 
-void mvceditor::AppEventListenerForFrameClass::OnAppReady(wxCommandEvent& event) {
-	AppFrame->OnProjectsUpdated();
+void mvceditor::AppEventListenerForFrameClass::OnCodeNotebookPageChanged(wxAuiNotebookEvent& event) {
+	AppFrame->UpdateTitleBar();
+}
+
+void mvceditor::AppEventListenerForFrameClass::OnCodeNotebookPageClosed(wxAuiNotebookEvent& event) {
+	AppFrame->UpdateTitleBar();
 }
 
 BEGIN_EVENT_TABLE(mvceditor::AppFrameClass,  AppFrameGeneratedClass)
@@ -763,8 +764,8 @@ BEGIN_EVENT_TABLE(mvceditor::AppFrameClass,  AppFrameGeneratedClass)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::AppEventListenerForFrameClass, wxEvtHandler)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::AppEventListenerForFrameClass::OnProjectsUpdated)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_FILE_OPEN, mvceditor::AppEventListenerForFrameClass::OnCmdFileOpen)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_UPDATED, mvceditor::AppEventListenerForFrameClass::OnPreferencesUpdated)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::AppEventListenerForFrameClass::OnAppReady)
+	EVT_AUINOTEBOOK_PAGE_CHANGED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::AppEventListenerForFrameClass::OnCodeNotebookPageChanged)
+	EVT_AUINOTEBOOK_PAGE_CLOSED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::AppEventListenerForFrameClass::OnCodeNotebookPageClosed)
 END_EVENT_TABLE()
