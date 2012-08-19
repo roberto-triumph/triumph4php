@@ -161,8 +161,8 @@ mvceditor::ResourcePluginClass::ResourcePluginClass(mvceditor::AppClass& app)
 
 void mvceditor::ResourcePluginClass::AddSearchMenuItems(wxMenu* searchMenu) {
 	ProjectIndexMenu = searchMenu->Append(mvceditor::MENU_RESOURCE + 0, _("Index"), _("Index the project"));
-	searchMenu->Append(mvceditor::MENU_RESOURCE + 1, _("Jump To Resource Under Cursor"), _("Jump To Resource that is under the cursor"));
-	searchMenu->Append(mvceditor::MENU_RESOURCE + 2, _("Search for Resource..."), _("Search for a class, method, or function"));
+	searchMenu->Append(mvceditor::MENU_RESOURCE + 1, _("Jump To Resource Under Cursor\tF12"), _("Jump To Resource that is under the cursor"));
+	searchMenu->Append(mvceditor::MENU_RESOURCE + 2, _("Search for Resource...\tCTRL+R"), _("Search for a class, method, or function"));
 	ProjectIndexMenu->Enable(App.Structs.HasSources() && FREE == State);
 }
 

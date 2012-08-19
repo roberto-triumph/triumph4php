@@ -248,7 +248,7 @@
                 <event name="OnSetFocus"></event>
                 <event name="OnSize"></event>
                 <event name="OnUpdateUI"></event>
-                <object class="wxMenu" expanded="0">
+                <object class="wxMenu" expanded="1">
                     <property name="label">&amp;File</property>
                     <property name="name">FileMenu</property>
                     <property name="permission">protected</property>
@@ -262,7 +262,7 @@
                         <property name="label">New &amp;PHP File</property>
                         <property name="name">MenuItemFilePhpNew</property>
                         <property name="permission">none</property>
-                        <property name="shortcut"></property>
+                        <property name="shortcut">CTRL+N</property>
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection">OnFilePhpNew</event>
                         <event name="OnUpdateUI"></event>
@@ -386,7 +386,7 @@
                         <property name="label">Close File</property>
                         <property name="name">MenuItemFileClose</property>
                         <property name="permission">none</property>
-                        <property name="shortcut"></property>
+                        <property name="shortcut">CTRL+F4</property>
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection">OnFileClose</event>
                         <event name="OnUpdateUI"></event>
@@ -407,7 +407,7 @@
                         <event name="OnUpdateUI"></event>
                     </object>
                 </object>
-                <object class="wxMenu" expanded="0">
+                <object class="wxMenu" expanded="1">
                     <property name="label">&amp;Edit</property>
                     <property name="name">EditMenu</property>
                     <property name="permission">protected</property>
@@ -531,7 +531,7 @@
                     <property name="name">SearchMenu</property>
                     <property name="permission">protected</property>
                 </object>
-                <object class="wxMenu" expanded="0">
+                <object class="wxMenu" expanded="1">
                     <property name="label">&amp;Help</property>
                     <property name="name">HelpMenu</property>
                     <property name="permission">protected</property>

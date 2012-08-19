@@ -52,7 +52,7 @@ AppFrameGeneratedClass::AppFrameGeneratedClass( wxWindow* parent, wxWindowID id,
 	MenuBar = new wxMenuBar( 0 );
 	FileMenu = new wxMenu();
 	wxMenuItem* MenuItemFilePhpNew;
-	MenuItemFilePhpNew = new wxMenuItem( FileMenu, ID_FILE_PHP_NEW, wxString( _("New &PHP File") ) , _("Create a new PHP File"), wxITEM_NORMAL );
+	MenuItemFilePhpNew = new wxMenuItem( FileMenu, ID_FILE_PHP_NEW, wxString( _("New &PHP File") ) + wxT('\t') + wxT("CTRL+N"), _("Create a new PHP File"), wxITEM_NORMAL );
 	FileMenu->Append( MenuItemFilePhpNew );
 	
 	wxMenuItem* MenuItemFileSqlNew;
@@ -90,7 +90,7 @@ AppFrameGeneratedClass::AppFrameGeneratedClass( wxWindow* parent, wxWindowID id,
 	MenuItemRevert->Enable( false );
 	
 	wxMenuItem* MenuItemFileClose;
-	MenuItemFileClose = new wxMenuItem( FileMenu, ID_FILE_CLOSE, wxString( _("Close File") ) , _("Close the current file"), wxITEM_NORMAL );
+	MenuItemFileClose = new wxMenuItem( FileMenu, ID_FILE_CLOSE, wxString( _("Close File") ) + wxT('\t') + wxT("CTRL+F4"), _("Close the current file"), wxITEM_NORMAL );
 	FileMenu->Append( MenuItemFileClose );
 	MenuItemFileClose->Enable( false );
 	

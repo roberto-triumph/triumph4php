@@ -144,7 +144,7 @@ mvceditor::OutlineViewPluginClass::OutlineViewPluginClass(mvceditor::AppClass& a
 }
 
 void mvceditor::OutlineViewPluginClass::AddViewMenuItems(wxMenu* viewMenu) {
-	viewMenu->Append(mvceditor::MENU_OUTLINE, _("Outline Current File"),  _("Opens an outline view of the currently viewed file"), wxITEM_NORMAL);
+	viewMenu->Append(mvceditor::MENU_OUTLINE, _("Outline Current File\tSHIFT+F2"),  _("Opens an outline view of the currently viewed file"), wxITEM_NORMAL);
 }
 
 void mvceditor::OutlineViewPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
