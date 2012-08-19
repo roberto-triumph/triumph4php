@@ -32,12 +32,12 @@
 #include <algorithm>
 
 
-static int ID_CONTEXT_MENU_SHOW_OUTLINE_OTHER = wxNewId();
 static int ID_WINDOW_OUTLINE = wxNewId();
-static int ID_CONTEXT_MENU_SHOW_OUTLINE_CURRENT = wxNewId();
 static int ID_RESOURCE_FINDER_BACKGROUND = wxNewId();
+static int ID_GLOBAL_CLASSES_THREAD = wxNewId();
 
 const wxEventType mvceditor::EVENT_RESOURCE_FINDER_COMPLETE = wxNewEventType();
+const wxEventType mvceditor::EVENT_GLOBAL_CLASSES_COMPLETE = wxNewEventType();
 
 mvceditor::ResourceFinderCompleteEventClass::ResourceFinderCompleteEventClass(int eventId, const std::vector<mvceditor::ResourceClass>& resources)
 	: wxEvent(eventId, mvceditor::EVENT_RESOURCE_FINDER_COMPLETE)
@@ -47,6 +47,16 @@ mvceditor::ResourceFinderCompleteEventClass::ResourceFinderCompleteEventClass(in
 
 wxEvent* mvceditor::ResourceFinderCompleteEventClass::Clone() const {
 	return new mvceditor::ResourceFinderCompleteEventClass(GetId(), Resources);
+}
+
+mvceditor::GlobalClassesCompleteEventClass::GlobalClassesCompleteEventClass(int eventId, const std::vector<wxString> allClasses)
+	: wxEvent(eventId, mvceditor::EVENT_GLOBAL_CLASSES_COMPLETE)
+	, AllClasses(allClasses) {
+		
+}
+
+wxEvent* mvceditor::GlobalClassesCompleteEventClass::Clone() const {
+	return new mvceditor::GlobalClassesCompleteEventClass(GetId(), AllClasses);
 }
 
 mvceditor::ResourceFinderBackgroundThreadClass::ResourceFinderBackgroundThreadClass(
@@ -80,6 +90,52 @@ void mvceditor::ResourceFinderBackgroundThreadClass::BackgroundWork() {
 	}
 }
 
+mvceditor::GlobalClassesThreadClass::GlobalClassesThreadClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+	: ThreadWithHeartbeatClass(runningThreads, eventId)
+	, ResourceDbFileNames()
+	, AllClasses() {
+		
+}
+
+bool mvceditor::GlobalClassesThreadClass::Init(const std::vector<mvceditor::ProjectClass>& projects) {
+	std::vector<mvceditor::ProjectClass>::const_iterator project;
+	for (project = projects.begin(); project != projects.end(); ++project) {
+		if (project->IsEnabled && project->ResourceDbFileName.IsOk()) {
+			ResourceDbFileNames.push_back(project->ResourceDbFileName);
+		}
+	}
+	return !ResourceDbFileNames.empty();
+}
+
+void mvceditor::GlobalClassesThreadClass::BackgroundWork() {
+	std::vector<wxFileName>::iterator fileName;
+	
+	// grab the classes from all of the files
+	for (fileName = ResourceDbFileNames.begin(); fileName != ResourceDbFileNames.end() && !TestDestroy(); ++fileName) {
+		mvceditor::ResourceFinderClass finder;
+		finder.InitFile(*fileName);
+		std::vector<mvceditor::ResourceClass> matches = finder.AllNonNativeClasses();
+		std::vector<mvceditor::ResourceClass>::iterator match;
+		for (match = matches.begin(); match != matches.end() && !TestDestroy(); ++match) {
+			AllClasses.push_back(mvceditor::IcuToWx(match->ClassName));
+		}
+	}
+	if (!AllClasses.empty()) {
+		std::vector<wxString>::iterator it;
+		
+		// remove dups, in case dbs share common files
+		std::sort(AllClasses.begin(), AllClasses.end());
+		it = std::unique(AllClasses.begin(), AllClasses.end());
+		AllClasses.resize(it - AllClasses.begin());
+		if (!TestDestroy()) {
+			
+			// PostEvent() will set the correct event Id
+			mvceditor::GlobalClassesCompleteEventClass evt(wxID_ANY, AllClasses);
+			PostEvent(evt);
+		}
+	}	
+}
+
 mvceditor::OutlineViewPluginClass::OutlineViewPluginClass(mvceditor::AppClass& app)
 	: PluginClass(app) {
 
@@ -95,11 +151,6 @@ void mvceditor::OutlineViewPluginClass::AddKeyboardShortcuts(std::vector<Dynamic
 	std::map<int, wxString> menuItemIds;
 	menuItemIds[mvceditor::MENU_OUTLINE + 0] = wxT("Outline-Outline Current File");
 	AddDynamicCmd(menuItemIds, shortcuts);
-}
-
-void mvceditor::OutlineViewPluginClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
-	menu->Append(ID_CONTEXT_MENU_SHOW_OUTLINE_CURRENT, _("Outline Current File"),  _("Opens an outline view of the currently viewed file"), wxITEM_NORMAL);
-	menu->Append(ID_CONTEXT_MENU_SHOW_OUTLINE_OTHER, _("Show In Outline"),  _("Search for the selected resource and opens an outline view"), wxITEM_NORMAL);
 }
 
 void mvceditor::OutlineViewPluginClass::BuildOutlineCurrentCodeControl() {
@@ -160,42 +211,31 @@ void mvceditor::OutlineViewPluginClass::JumpToResource(const wxString& resource)
 	}	
 }
 
-void mvceditor::OutlineViewPluginClass::OnContextMenuOutline(wxCommandEvent& event) {
-	CodeControlClass* code = GetCurrentCodeControl();
-	bool modified = false;
-	std::vector<mvceditor::ResourceClass> matches;
-	if (event.GetId() == ID_CONTEXT_MENU_SHOW_OUTLINE_CURRENT || event.GetId() == mvceditor::MENU_OUTLINE) {
-		BuildOutlineCurrentCodeControl();
-		modified = true;
-	}
-	else if (event.GetId() == ID_CONTEXT_MENU_SHOW_OUTLINE_OTHER && code && !code->GetSelectedText().IsEmpty()) { 
-		matches = BuildOutline(code->GetSelectedText()); 
-		modified = true; 
-	} 
-	if (modified) {
+void mvceditor::OutlineViewPluginClass::OnOutlineMenu(wxCommandEvent& event) {
+	BuildOutlineCurrentCodeControl();
 		
-		// create / open the outline window
-		wxWindow* window = FindOutlineWindow(ID_WINDOW_OUTLINE);
-		OutlineViewPluginPanelClass* outlineViewPanel = NULL;
-		if (window != NULL) {
-			outlineViewPanel = (OutlineViewPluginPanelClass*)window;
-			SetFocusToOutlineWindow(outlineViewPanel);
-			outlineViewPanel->RefreshOutlines(matches);
-		}
-		else {
-			mvceditor::NotebookClass* notebook = GetNotebook();
-			if (notebook != NULL) {
-				outlineViewPanel = new OutlineViewPluginPanelClass(GetOutlineNotebook(), ID_WINDOW_OUTLINE, this, notebook);
-				if (AddOutlineWindow(outlineViewPanel, wxT("Outline"))) {
-					outlineViewPanel->SetClasses(GetResourceCache()->AllNonNativeClassesGlobal());
-					outlineViewPanel->RefreshOutlines(matches);
-				}
-			}
-		}	
+	// create / open the outline window
+	wxWindow* window = FindOutlineWindow(ID_WINDOW_OUTLINE);
+	OutlineViewPluginPanelClass* outlineViewPanel = NULL;
+	if (window != NULL) {
+		outlineViewPanel = (OutlineViewPluginPanelClass*)window;
+		SetFocusToOutlineWindow(outlineViewPanel);
 	}
 	else {
-		event.Skip();
-	}
+		mvceditor::NotebookClass* notebook = GetNotebook();
+		if (notebook != NULL) {
+			outlineViewPanel = new OutlineViewPluginPanelClass(GetOutlineNotebook(), ID_WINDOW_OUTLINE, this, notebook);
+			if (AddOutlineWindow(outlineViewPanel, wxT("Outline"))) {
+				
+				// the first time, get all of the classes to put in th drop down. note
+				// that this can take a while, do it in the background
+				mvceditor::GlobalClassesThreadClass* thread = new mvceditor::GlobalClassesThreadClass(App.RunningThreads, ID_GLOBAL_CLASSES_THREAD);
+				if (!thread->Init(App.Structs.Projects) || wxTHREAD_NO_ERROR != thread->CreateSingleInstance()) {
+					delete thread;
+				}
+			}
+		}
+	}	
 }
 
 void mvceditor::OutlineViewPluginClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& event) {
@@ -221,6 +261,15 @@ void mvceditor::OutlineViewPluginClass::OnResourceFinderComplete(mvceditor::Reso
 	}
 }
 
+void mvceditor::OutlineViewPluginClass::OnGlobalClassesComplete(mvceditor::GlobalClassesCompleteEventClass& event)  {
+	wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
+	if (window != NULL) {
+		OutlineViewPluginPanelClass* outlineViewPanel = (OutlineViewPluginPanelClass*)window;
+		SetFocusToOutlineWindow(outlineViewPanel);
+		outlineViewPanel->SetClasses(event.AllClasses);
+	}
+}
+
 mvceditor::OutlineViewPluginPanelClass::OutlineViewPluginPanelClass(wxWindow* parent, int windowId, OutlineViewPluginClass* plugin, 
 		NotebookClass* notebook)
 	: OutlineViewPluginGeneratedPanelClass(parent, windowId)
@@ -235,10 +284,10 @@ void mvceditor::OutlineViewPluginPanelClass::SetStatus(const wxString& status) {
 	StatusLabel->SetLabel(status);
 }
 
-void mvceditor::OutlineViewPluginPanelClass::SetClasses(const std::vector<mvceditor::ResourceClass>& classes) {
+void mvceditor::OutlineViewPluginPanelClass::SetClasses(const std::vector<wxString>& classes) {
 	Choice->Clear();
 	for (size_t i = 0; i < classes.size(); ++i) {
-		Choice->AppendString(mvceditor::IcuToWx(classes[i].Identifier));
+		Choice->AppendString(classes[i]);
 	}
 }
 
@@ -407,9 +456,8 @@ void mvceditor::OutlineViewPluginPanelClass::OnTreeItemActivated(wxTreeEvent& ev
 }
 
 BEGIN_EVENT_TABLE(mvceditor::OutlineViewPluginClass, wxEvtHandler)
-	EVT_MENU(mvceditor::MENU_OUTLINE, mvceditor::OutlineViewPluginClass::OnContextMenuOutline)
-	EVT_MENU(ID_CONTEXT_MENU_SHOW_OUTLINE_CURRENT, mvceditor::OutlineViewPluginClass::OnContextMenuOutline)
-	EVT_MENU(ID_CONTEXT_MENU_SHOW_OUTLINE_OTHER, mvceditor::OutlineViewPluginClass::OnContextMenuOutline)
+	EVT_MENU(mvceditor::MENU_OUTLINE, mvceditor::OutlineViewPluginClass::OnOutlineMenu)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::OutlineViewPluginClass::OnContentNotebookPageChanged)
 	EVT_RESOURCE_FINDER_COMPLETE(ID_RESOURCE_FINDER_BACKGROUND, mvceditor::OutlineViewPluginClass::OnResourceFinderComplete)
+	EVT_GLOBAL_CLASSES_COMPLETE(ID_GLOBAL_CLASSES_THREAD, mvceditor::OutlineViewPluginClass::OnGlobalClassesComplete)
 END_EVENT_TABLE()

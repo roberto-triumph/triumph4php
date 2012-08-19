@@ -34,6 +34,7 @@
 namespace mvceditor {
 	
 extern const wxEventType EVENT_RESOURCE_FINDER_COMPLETE;
+extern const wxEventType EVENT_GLOBAL_CLASSES_COMPLETE;
 	
 class ResourceFinderCompleteEventClass : public wxEvent {
 	
@@ -50,12 +51,37 @@ class ResourceFinderCompleteEventClass : public wxEvent {
 	
 };
 
+class GlobalClassesCompleteEventClass : public wxEvent {
+
+public:
+
+	/**
+	 * All of the classes that have been parsed by the
+	 * global cache
+	 */
+	std::vector<wxString> AllClasses;
+	
+	GlobalClassesCompleteEventClass(int eventId, const std::vector<wxString> allClasses);
+	
+	wxEvent* Clone() const;
+};
+
+
 typedef void (wxEvtHandler::*ResourceFinderCompleteEventClassFunction)(ResourceFinderCompleteEventClass&);
 
 #define EVT_RESOURCE_FINDER_COMPLETE(id, fn) \
 	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_RESOURCE_FINDER_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( ResourceFinderCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
+
+
+typedef void (wxEvtHandler::*GlobalClassesCompleteEventClassFunction)(GlobalClassesCompleteEventClass&);
+
+#define EVT_GLOBAL_CLASSES_COMPLETE(id, fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_GLOBAL_CLASSES_COMPLETE, id, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( GlobalClassesCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
+
 
 /**
  * A small class that will parse source into resources. We want to do 
@@ -97,6 +123,40 @@ private:
 };
 
 /**
+ * class to gather all of the classes from the global cache.
+ * Need to do this in the background because the SQLite file
+ * does not have an index on the resource_type column
+ */
+class GlobalClassesThreadClass : public mvceditor::ThreadWithHeartbeatClass {
+	
+public:
+
+	GlobalClassesThreadClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	
+	/**
+	 * @param projects the currently projects, which contain the full paths to resource DB files to read
+	 * @return TRUE if there is at least one enabled project
+	 */
+	bool Init(const std::vector<mvceditor::ProjectClass>& projects);
+	
+protected:
+
+	void BackgroundWork();
+	
+private:
+
+	/**
+	 * location of the resource database files
+	 */
+	std::vector<wxFileName> ResourceDbFileNames;
+	
+	/**
+	 * the resulting class list
+	 */
+	std::vector<wxString> AllClasses;
+};
+
+/**
  * This is a plugin that is designed to let the user see the classes / methods of 
  * the opened files and of related files.  The related files / classes / methods that are mentioned
  * in the opened files.
@@ -118,15 +178,10 @@ public:
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 	
 	/**
-	 * This plugin will add menui items to the context menu
-	 */
-	void AddCodeControlClassContextMenuItems(wxMenu* menu);
-	
-	/**
 	 * When the right click context menu is chosen on some selected text, open that resource into the outline control.
 	 * @param wxCommandEvent& event
 	 */
-	void OnContextMenuOutline(wxCommandEvent& event);
+	void OnOutlineMenu(wxCommandEvent& event);
 	
 	/**
 	 * Outlines the currently opened code control.  The currently opened file (the meory buffer) is parsed and an outline
@@ -161,6 +216,12 @@ private:
 	 */
 	void OnResourceFinderComplete(mvceditor::ResourceFinderCompleteEventClass& event);
 	
+	/**
+	 * When all the classes from the global cache have been gathered
+	 * update the outline panel
+	 */
+	void OnGlobalClassesComplete(mvceditor::GlobalClassesCompleteEventClass& event);
+	
 	DECLARE_EVENT_TABLE()
 };
 
@@ -188,7 +249,7 @@ class OutlineViewPluginPanelClass : public OutlineViewPluginGeneratedPanelClass 
 	/**
 	 * update the Choice options
 	 */
-	void SetClasses(const std::vector<ResourceClass>& classes);
+	void SetClasses(const std::vector<wxString>& classes);
 
 	/**
 	 * refresh the code control from the plugin source strings
