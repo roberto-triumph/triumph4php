@@ -374,13 +374,14 @@ void mvceditor::OutlineViewPluginPanelClass::RefreshOutlines(const std::vector<m
 
 void mvceditor::OutlineViewPluginPanelClass::OnHelpButton(wxCommandEvent& event) {
 	wxString help = wxString::FromAscii(
-		"The outline tab allows you to 	quickly browse through your project's resources.\n"
-		"1. The leftmost pane lists all of the resources of the file being viewed.\n"
-		"   Changing the contents of the middle outline is done with the Lookup button "
-		"   or the 'Show In Outline' context menu.\n"
-		"The 'Sync Outline' button will 'reset' the outline view with the outline of the file that is currently being viewed."
+		"The outline tab allows you to quickly browse through your project's classes.\n"
+		"1. The tree pane lists all of the resources of the file being viewed.\n"
+		"2. The drop down shows you all of the classes from all projects. You can "
+		"choose a class and the properties / methods for that class will be shown in "
+		"the tree pane.\n\n"
+		"The 'Sync With Editor' button will 'reset' the outline view with the outline "
+		"of the file that is currently being viewed."
 		"\n"
-		""
 	);
 	help = wxGetTranslation(help);
 	wxMessageBox(help, _("Help"));
