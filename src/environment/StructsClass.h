@@ -166,11 +166,6 @@ public:
 	 */
 	wxString RelativeFileName(const wxString& fullPath, wxString& projectLabel) const;
 
-	/**
-	 * TODO remove this method
-	 */
-	wxString FirstDirectory() const;
-
 };
 
 }

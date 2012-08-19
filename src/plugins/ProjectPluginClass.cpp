@@ -182,11 +182,13 @@ void mvceditor::ProjectPluginClass::AddPreferenceWindow(wxBookCtrlBase* parent) 
 }
 
 void mvceditor::ProjectPluginClass::OnProjectExplore(wxCommandEvent& event) {
-	if (App.Structs.HasSources()) {
+	std::vector<mvceditor::SourceClass> enabledSources = App.Structs.AllEnabledSources();
+	if (!enabledSources.empty()) {
+		wxFileName dir = enabledSources[0].RootDirectory;
 		wxString cmd;
 		cmd += ExplorerExecutable;
 		cmd += wxT(" \"");
-		cmd += App.Structs.FirstDirectory();
+		cmd += dir.GetPath();
 		cmd += wxT("\"");
 		long result = wxExecute(cmd);
 		if (!result) {

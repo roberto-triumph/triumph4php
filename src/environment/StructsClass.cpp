@@ -114,16 +114,3 @@ wxString mvceditor::StructsClass::RelativeFileName(const wxString &fullPath, wxS
 	}
 	return relativeName;
 }
-
-
-wxString mvceditor::StructsClass::FirstDirectory() const {
-	wxString fullPath;
-	std::vector<mvceditor::ProjectClass>::const_iterator it;
-	for (it = Projects.begin(); it != Projects.end(); ++it) {
-		if (it->IsEnabled && it->HasSources()) {
-			fullPath = it->Sources[0].RootDirectory.GetPath();
-			break;
-		}
-	}
-	return fullPath;
-}
