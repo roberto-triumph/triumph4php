@@ -153,27 +153,19 @@ void mvceditor::AppFrameClass::OnFileSave(wxCommandEvent& event) {
 }
 
 void mvceditor::AppFrameClass::OnFilePhpNew(wxCommandEvent& event) {
-	Notebook->AddMvcEditorPage();
-	mvceditor::CodeControlClass* ctrl = Notebook->GetCurrentCodeControl();
-	ctrl->SetDocumentMode(mvceditor::CodeControlClass::PHP);
+	Notebook->AddMvcEditorPage(mvceditor::CodeControlClass::PHP);
 }
 
 void mvceditor::AppFrameClass::OnFileSqlNew(wxCommandEvent& event) {
-	Notebook->AddMvcEditorPage();
-	mvceditor::CodeControlClass* ctrl = Notebook->GetCurrentCodeControl();
-	ctrl->SetDocumentMode(mvceditor::CodeControlClass::SQL);
+	Notebook->AddMvcEditorPage(mvceditor::CodeControlClass::SQL);
 }
 
 void mvceditor::AppFrameClass::OnFileCssNew(wxCommandEvent& event) {
-	Notebook->AddMvcEditorPage();
-	mvceditor::CodeControlClass* ctrl = Notebook->GetCurrentCodeControl();
-	ctrl->SetDocumentMode(mvceditor::CodeControlClass::CSS);
+	Notebook->AddMvcEditorPage(mvceditor::CodeControlClass::CSS);
 }
 
 void mvceditor::AppFrameClass::OnFileTextNew(wxCommandEvent& event) {
-	Notebook->AddMvcEditorPage();
-	mvceditor::CodeControlClass* ctrl = Notebook->GetCurrentCodeControl();
-	ctrl->SetDocumentMode(mvceditor::CodeControlClass::TEXT);
+	Notebook->AddMvcEditorPage(mvceditor::CodeControlClass::TEXT);
 }
 
 void mvceditor::AppFrameClass::OnFileOpen(wxCommandEvent& event) {

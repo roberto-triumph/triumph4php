@@ -791,8 +791,7 @@ void  mvceditor::SqlBrowserPluginClass::OnSqlBrowserToolsMenu(wxCommandEvent& ev
 		}
 	}
 	
-	mvceditor::CodeControlClass* ctrl = CreateCodeControl(wxString::Format(_("SQL Browser %d"), num));
-	ctrl->SetDocumentMode(mvceditor::CodeControlClass::SQL);
+	mvceditor::CodeControlClass* ctrl = CreateCodeControl(wxString::Format(_("SQL Browser %d"), num), mvceditor::CodeControlClass::SQL);
 	CreateResultsPanel(ctrl);
 	ctrl->SetFocus();
 }

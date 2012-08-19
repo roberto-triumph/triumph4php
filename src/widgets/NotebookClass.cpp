@@ -143,9 +143,26 @@ void mvceditor::NotebookClass::MarkPageAsNotModified(int windowId) {
 		SetPageText(pageNumber, filename);
 	}
 }
-void mvceditor::NotebookClass::AddMvcEditorPage() {
+void mvceditor::NotebookClass::AddMvcEditorPage(mvceditor::CodeControlClass::Mode mode) {
+	wxString format;
+	switch (mode) {
+		case mvceditor::CodeControlClass::TEXT:
+			format = _("Untitled %d.txt");
+			break;
+		case mvceditor::CodeControlClass::SQL:
+			format = _("Untitled %d.sql");
+			break;
+		case mvceditor::CodeControlClass::CSS:
+			format = _("Untitled %d.css");
+			break;
+		case mvceditor::CodeControlClass::PHP:
+			format = _("Untitled %d.php");
+			break;
+	}
+	
 	CodeControlClass* page = new CodeControlClass(this, *CodeControlOptions, Structs, *RunningThreads, wxID_ANY);
-	AddPage(page, wxString::Format(wxT("Untitled %d"), NewPageNumber++), true, 
+	page->SetDocumentMode(mode);
+	AddPage(page, wxString::Format(format, NewPageNumber++), true, 
 		wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_TOOLBAR, 
 		wxSize(16, 16)));
 }

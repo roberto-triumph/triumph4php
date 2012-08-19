@@ -235,9 +235,9 @@ wxWindow* mvceditor::PluginClass::GetMainWindow() const {
 	return ToolsNotebook->GetParent();
 }
 
-mvceditor::CodeControlClass* mvceditor::PluginClass::CreateCodeControl(const wxString& tabName) const {
+mvceditor::CodeControlClass* mvceditor::PluginClass::CreateCodeControl(const wxString& tabName, mvceditor::CodeControlClass::Mode mode) const {
 	mvceditor::NotebookClass* notebook = GetNotebook();
-	notebook->AddMvcEditorPage();
+	notebook->AddMvcEditorPage(mode);
 	if (!tabName.IsEmpty()) {
 		notebook->SetPageText(notebook->GetSelection(), tabName);
 	}

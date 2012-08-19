@@ -122,8 +122,9 @@ public:
 	
 	/**
 	 * Create a new source code control, and selects it.
+	 * @param mode the type of document the control will edit
 	 */
-	void AddMvcEditorPage();
+	void AddMvcEditorPage(mvceditor::CodeControlClass::Mode mode);
 	
 	/**
 	 * Prompts the user to pick an existing file and loads the contents of the

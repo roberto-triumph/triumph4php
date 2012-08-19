@@ -400,9 +400,10 @@ protected:
 	  * 
 	  * @param tabName the name that will go on the tab of the new page
 	  *        This can be empty; if empty then a default message is shown
+	  * @param mode the document mode that the control will be editing
 	  * @return CodeControlClass* this class will own the pointer, DONT delete it
 	  */
-	 CodeControlClass* CreateCodeControl(const wxString& tabName) const;
+	 CodeControlClass* CreateCodeControl(const wxString& tabName, mvceditor::CodeControlClass::Mode mode) const;
 
 	/**
 	 * This is a helper method that will add each of the given menu items as a 
