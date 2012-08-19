@@ -28,6 +28,7 @@
 #include <environment/ApacheClass.h>
 #include <pelet/TokenClass.h>
 #include <vector>
+#include <wx/config.h>
 
 namespace mvceditor {
 
@@ -107,14 +108,14 @@ public:
 	std::vector<WebBrowserClass> WebBrowsers;
 	
 	/**
-	 * Save the environment settings to the global config (wxConfigBase::Get())
+	 * Save the environment settings to the given config 
 	 */
-	void SaveToConfig() const;
+	void SaveToConfig(wxConfigBase* config) const;
 
 	/**
-	 * Get the environment settings from the global config (wxConfigBase::Get())
+	 * Get the environment settings from the given config
 	 */
-	void LoadFromConfig();
+	void LoadFromConfig(wxConfigBase* config);
 
 	/**
 	 * @param name the browser name to look up. lookup is case sensitive.

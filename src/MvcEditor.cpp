@@ -73,8 +73,8 @@ bool mvceditor::AppClass::OnInit() {
 
 	// load any settings from .INI files
 	PreferencesClass::InitConfig();
-	Structs.Environment.LoadFromConfig();
 	wxConfigBase* config = wxConfigBase::Get();
+	Structs.Environment.LoadFromConfig(config);
 	for (size_t i = 0; i < Plugins.size(); ++i) {
 		Plugins[i]->LoadPreferences(config);
 		Plugins[i]->AddKeyboardShortcuts(Preferences.DefaultKeyboardShortcutCmds);

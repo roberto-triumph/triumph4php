@@ -655,7 +655,9 @@ mvceditor::EnvironmentPluginClass::EnvironmentPluginClass(mvceditor::AppClass& a
 }
 
 void mvceditor::EnvironmentPluginClass::OnPreferencesUpdated(wxCommandEvent& event) {
+	wxConfigBase* config = wxConfigBase::Get();
 	mvceditor::EnvironmentClass* environment = GetEnvironment();
+	environment->SaveToConfig(config);
 	if (environment->Php.IsAuto) {
 		environment->Php.AutoDetermine();
 	}

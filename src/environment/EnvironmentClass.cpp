@@ -125,8 +125,7 @@ void mvceditor::PhpEnvironmentClass::AutoDetermine() {
 	}
 }
 
-void mvceditor::EnvironmentClass::LoadFromConfig() {
-	wxConfigBase* config = wxConfigBase::Get();
+void mvceditor::EnvironmentClass::LoadFromConfig(wxConfigBase* config) {
 	
 	int version = 0;
 	config->Read(wxT("Environment/PhpExecutablePath"), &Php.PhpExecutablePath);
@@ -187,8 +186,7 @@ void mvceditor::EnvironmentClass::LoadFromConfig() {
 	config->SetPath(oldPath);
 }
 
-void mvceditor::EnvironmentClass::SaveToConfig() const {
-	wxConfigBase* config = wxConfigBase::Get();
+void mvceditor::EnvironmentClass::SaveToConfig(wxConfigBase* config) const {
 	int version = 0;
 	if (pelet::PHP_53 == Php.Version) {
 		version = 1;
