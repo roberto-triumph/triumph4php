@@ -519,10 +519,12 @@ void mvceditor::RunConsolePanelClass::OnMouseMotion(wxMouseEvent& event) {
 	mvceditor::FileNameHitClass mouseHit = HitAt(event);
 	bool isCursorHand = mouseHit.Length > 0;
 	if (isCursorHand) {
-		SetCursor(wxCURSOR_HAND);
+		wxCursor cursor(wxCURSOR_HAND);
+		OutputWindow->SetCursor(cursor);
 	}
 	else {
-		SetCursor(wxCURSOR_ARROW);
+		OutputWindow->SetCursor(wxNullCursor);
+		event.Skip();
 	}
 }
 
@@ -538,6 +540,7 @@ void mvceditor::RunConsolePanelClass::OnLeftDown(wxMouseEvent& event) {
 			Plugin.LoadPage(fileName);
 		}
 	}
+	event.Skip();
 }
 
 mvceditor::FileNameHitClass mvceditor::RunConsolePanelClass::HitAt(wxMouseEvent& event) {
