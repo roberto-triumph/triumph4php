@@ -910,6 +910,35 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesShould
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 }
 
+TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesShouldFindFileWhenClassAndPropertyNameAreTheSame) {
+		
+	// the name of the class and the name of the property are the same
+	// the method under test should know the difference and only return the class resource
+	Prep(mvceditor::CharToIcu(
+		"<?php\n"
+		"class UserClass {\n"
+		"\tprivate $SetClass;\n"
+		"\tprivate $name;\n"
+		"\tfunction get() {\n"
+		"\t\treturn $this->name;\n"
+		"\t}\n"
+		"}\n"
+		"class SetClass {\n"
+		"\tprivate $users;"
+		"\tfunction get() {\n"
+		"\t\treturn $this->users;\n"
+		"\t}\n"
+		"}\n"
+		"?>\n"
+	));	
+	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("SetClass"));
+	Matches = ResourceFinder.CollectFullyQualifiedResource(resourceSearch);
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_UNISTR_EQUALS("SetClass", Matches[0].Identifier);
+	CHECK_UNISTR_EQUALS("SetClass", Matches[0].ClassName);
+	CHECK_EQUAL(mvceditor::ResourceClass::CLASS, Matches[0].Type);
+}
+
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesShouldFindMatchesForCorrectClassMethod) {
 	
 	// adding 2 classes to the file because we want to test that the code can differentiate the two classes and
