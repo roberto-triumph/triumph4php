@@ -137,7 +137,7 @@ bool mvceditor::LintBackgroundFileReaderClass::BackgroundFileRead(DirectorySearc
 	}
 	if (!search.More() && !TestDestroy()) {
 		int totalFiles = ParserDirectoryWalker.WithErrors + ParserDirectoryWalker.WithNoErrors;
-		int errorFiles = ParserDirectoryWalker.WithNoErrors;
+		int errorFiles = ParserDirectoryWalker.WithErrors;
 		mvceditor::LintResultsSummaryEventClass summaryEvent(ID_LINT_READER, totalFiles, errorFiles);
 		PostEvent(summaryEvent);
 	}
