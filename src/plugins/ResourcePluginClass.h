@@ -146,11 +146,15 @@ public:
 	 * Searches for a file that matches the given text. 
 	 * This wont be a straight equals search; it will be a "near match"
 	 * as defined by ResourceFinderClass::CollectNearMathResources()
+	 * when the given text is more than 2 characters long, and will
+	 * be an exact search as defined by CollectFullyQualifiedResources when the 
+	 * text is 2 characters long
 	 * This method assumes that index is up-to-date.
 
 	 * @param text search string to query for
 	 * @return the matching resources
-	 * @see ResourceFinderClass::CollectNearMathResources
+	 * @see ResourceFinderClass::CollectNearMacthResources
+	 * @see ResourceFinderClass::CollectFullyQualifiedResources
 	 */
 	std::vector<mvceditor::ResourceClass> SearchForResources(const wxString& text);
 	

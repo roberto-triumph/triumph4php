@@ -275,7 +275,8 @@ void mvceditor::ViewFilePanelClass::UpdateResults() {
 			wxString viewFile = currentViewInfos[i].FileName;
 
 			// remove the project root so that the dialog is not too 'wordy'
-			wxString text = Plugin.App.Structs.RelativeFileName(viewFile);
+			wxString projectLabel;
+			wxString text = Plugin.App.Structs.RelativeFileName(viewFile, projectLabel);
 			if (!wxFileName::FileExists(viewFile)) {
 
 				// show that the view file is missing
@@ -296,9 +297,10 @@ void mvceditor::ViewFilePanelClass::UpdateResults() {
 		for (size_t i = 0; i < currentViewInfos.size(); ++i) {
 			mvceditor::ViewInfoClass viewInfo = currentViewInfos[i];
 			wxString text = viewInfo.FileName;
+			wxString projectLabel;
 			
 			// remove the project root so that the dialog is not too 'wordy'
-			text = Plugin.App.Structs.RelativeFileName(text);
+			text = Plugin.App.Structs.RelativeFileName(text, projectLabel);
 			wxTreeItemId sub = TemplateVariablesTree->AppendItem(parent, text);
 			for (size_t j = 0; j < viewInfo.TemplateVariables.size(); ++j) {
 				TemplateVariablesTree->AppendItem(sub, viewInfo.TemplateVariables[j]);

@@ -263,12 +263,24 @@ void mvceditor::ResourcePluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 std::vector<mvceditor::ResourceClass> mvceditor::ResourcePluginClass::SearchForResources(const wxString& text) {
 	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
 	std::vector<mvceditor::ResourceClass> matches;
-	matches = resourceCache->CollectNearMatchResourcesFromAll(mvceditor::WxToIcu(text));
+	bool exactOnly = text.Length() <= 2;
+	if (exactOnly) {
+		matches = resourceCache->CollectFullyQualifiedResourceFromAll(mvceditor::WxToIcu(text));
+	}
+	else {
+		matches = resourceCache->CollectNearMatchResourcesFromAll(mvceditor::WxToIcu(text));
+	}
 
 	// no need to show jump to results for native functions
 	// TODO: CollectNearResourceMatches shows resources from files that were recently deleted
 	// need to hide them / remove them
 	RemoveNativeMatches(matches);
+	if (matches.empty() && !text.Contains(wxT("."))) {
+		
+		// dot == search for files
+		//matches = resourceCache->CollectNearMatchResourcesFromAll(mvceditor::WxToIcu(text + wxT(".")));
+		//RemoveNativeMatches(matches);
+	}
 	return matches;
 }
 
@@ -660,7 +672,7 @@ mvceditor::ResourceSearchDialogClass::ResourceSearchDialogClass(wxWindow* parent
 
 void mvceditor::ResourceSearchDialogClass::OnSearchText(wxCommandEvent& event) {
 	wxString text = SearchText->GetValue();
-	if (text.Length() > 3) {
+	if (text.Length() >= 2) {
 		MatchedResources = ResourcePlugin.SearchForResources(text);
 		if (!MatchedResources.empty()) {
 			MatchesList->Freeze();
@@ -671,7 +683,7 @@ void mvceditor::ResourceSearchDialogClass::OnSearchText(wxCommandEvent& event) {
 			MatchesList->Clear();
 			MatchesLabel->SetLabel(_("No matches found"));
 		}
-	}	
+	}
 }
 
 void mvceditor::ResourceSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
@@ -724,13 +736,27 @@ void mvceditor::ResourceSearchDialogClass::ShowJumpToResults(const wxString& fin
 	
 	// dont show the project path to the user
 	for (size_t i = 0; i < files.GetCount(); ++i) {
-		wxString shortName = ResourcePlugin.App.Structs.RelativeFileName(files[i]);
-		if (mvceditor::ResourceSearchClass::FILE_NAME != resourceSearch.GetResourceType() &&
-			mvceditor::ResourceSearchClass::FILE_NAME_LINE_NUMBER != resourceSearch.GetResourceType()) {
-			UnicodeString res = allMatches[i].ClassName + UNICODE_STRING_SIMPLE("::") + allMatches[i].Identifier;
-			shortName += wxT("  (") + mvceditor::IcuToWx(res) + wxT(")");
+		wxString projectLabel;
+		wxString relativeName = ResourcePlugin.App.Structs.RelativeFileName(files[i], projectLabel);
+		wxString matchLabel;
+		mvceditor::ResourceClass match = allMatches[i];
+		if (mvceditor::ResourceClass::MEMBER == match.Type || mvceditor::ResourceClass::METHOD == match.Type ||
+			mvceditor::ResourceClass::CLASS_CONSTANT == match.Type) {
+			matchLabel += mvceditor::IcuToWx(match.ClassName);
+			matchLabel += wxT("::");
+			matchLabel += mvceditor::IcuToWx(match.Identifier);
 		}
-		MatchesList->Append(shortName);
+		else if (mvceditor::ResourceClass::CLASS == match.Type || mvceditor::ResourceClass::FUNCTION == match.Type
+			|| mvceditor::ResourceClass::DEFINE == match.Type) {
+			matchLabel += mvceditor::IcuToWx(match.Identifier);
+		}
+		else {
+			matchLabel += mvceditor::IcuToWx(match.Identifier);
+		}
+		matchLabel += wxT(" - ");
+		matchLabel += relativeName;
+		matchLabel +=  wxT("  (") + projectLabel + wxT(")");
+		MatchesList->Append(matchLabel);
 	}
 	MatchesLabel->SetLabel(wxString::Format(_("Found %d files. Please choose file(s) to open."), allMatches.size()));
 }

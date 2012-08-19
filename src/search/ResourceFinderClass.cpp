@@ -468,6 +468,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 					if (0 == resourceSearch.GetLineNumber() || GetLineCountFromFile(fullPath) >= resourceSearch.GetLineNumber()) {
 						ResourceClass newItem;
 						newItem.FileItemId = fileItemId;
+						newItem.Identifier = mvceditor::WxToIcu(currentFileName);
 						newItem.SetFullPath(fullPath);
 						newItem.FileIsNew = isNew > 0;
 						matches.push_back(newItem);
@@ -1069,13 +1070,14 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectFul
 	// is called while the user is typing text.
 	// take care when coding; make sure that any code called by this method does not touch the file system
 	std::vector<mvceditor::ResourceClass> allMatches;
+	std::vector<int> types;
 	if (resourceSearch.GetResourceType() == mvceditor::ResourceSearchClass::CLASS_NAME_METHOD_NAME) {
 
 		// check the entire class hierachy; stop as soon as we found it
 		// combine the parent classes with the class being searched
 		std::vector<UnicodeString> classHierarchy = resourceSearch.GetParentClasses();
 		classHierarchy.push_back(resourceSearch.GetClassName());
-		std::vector<int> types;
+		
 		types.push_back(mvceditor::ResourceClass::MEMBER);
 		types.push_back(mvceditor::ResourceClass::METHOD);
 		types.push_back(mvceditor::ResourceClass::CLASS_CONSTANT);
@@ -1091,9 +1093,12 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectFul
 	else if (mvceditor::ResourceSearchClass::NAMESPACE_NAME == resourceSearch.GetResourceType()) {
 		UnicodeString key = resourceSearch.GetClassName();
 		std::string stdKey = mvceditor::IcuToChar(key);
+		types.push_back(mvceditor::ResourceClass::DEFINE);
+		types.push_back(mvceditor::ResourceClass::CLASS);
+		types.push_back(mvceditor::ResourceClass::FUNCTION);
 
 		// make sure there is one and only one item that matches the search.
-		std::vector<mvceditor::ResourceClass> matches = FindByKeyExact(stdKey);
+		std::vector<mvceditor::ResourceClass> matches = FindByKeyExactAndTypes(stdKey, types, true);
 		if (matches.size() == 1) {
 			allMatches.push_back(matches[0]);
 		}
@@ -1101,9 +1106,12 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectFul
 	else {
 		UnicodeString key = resourceSearch.GetClassName();
 		std::string stdKey = mvceditor::IcuToChar(key);
+		types.push_back(mvceditor::ResourceClass::DEFINE);
+		types.push_back(mvceditor::ResourceClass::CLASS);
+		types.push_back(mvceditor::ResourceClass::FUNCTION);
 
 		// make sure there is one and only one item that matches the search.
-		std::vector<mvceditor::ResourceClass> matches = FindByKeyExact(stdKey);
+		std::vector<mvceditor::ResourceClass> matches = FindByKeyExactAndTypes(stdKey, types, true);
 		if (matches.size() == 1) {
 			allMatches.push_back(matches[0]);
 		}

@@ -157,11 +157,14 @@ public:
 	 * Then this method returns "workspace/now.php"
 	 * 
 	 * @param full path to a file
+	 * @param projectLabel will be filled in with the label of the project
+	 *       where that contains the given fullPath. Note that this is 
+	 *       the first matching project
 	 * @return the part of the file without the source prefix
 	 * In the case that fullPath is not contained in any 
 	 * project's sources, then this method returns nothing.
 	 */
-	wxString RelativeFileName(const wxString& fullPath) const;
+	wxString RelativeFileName(const wxString& fullPath, wxString& projectLabel) const;
 
 	/**
 	 * TODO remove this method

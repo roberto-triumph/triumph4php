@@ -103,11 +103,14 @@ bool mvceditor::StructsClass::IsAPhpSourceFile(const wxString& fullPath) const {
 	return isPhp;
 }
 
-wxString mvceditor::StructsClass::RelativeFileName(const wxString &fullPath) const {
+wxString mvceditor::StructsClass::RelativeFileName(const wxString &fullPath, wxString& projectLabel) const {
 	wxString relativeName;
 	std::vector<mvceditor::ProjectClass>::const_iterator it;
 	for (it = Projects.begin(); it != Projects.end() && relativeName.IsEmpty(); ++it) {
 		relativeName = it->RelativeFileName(fullPath);
+		if (!relativeName.IsEmpty()) {
+			projectLabel = it->Label; 
+		}
 	}
 	return relativeName;
 }
