@@ -359,7 +359,12 @@ mvceditor::ProjectDefinitionDialogClass::ProjectDefinitionDialogClass(wxWindow* 
 	Label->SetValidator(labelValidator);
 	Populate();
 	TransferDataToWindow();
+	if (!SourcesList->IsEmpty()) {
+		SourcesList->SetSelection(0);
+	}
+	Label->SetFocus();
 }
+
 void mvceditor::ProjectDefinitionDialogClass::OnAddSource(wxCommandEvent& event) {
 	mvceditor::SourceClass newSrc;
 	mvceditor::ProjectSourceDialogClass dialog(this, newSrc);
@@ -443,6 +448,7 @@ mvceditor::ProjectSourceDialogClass::ProjectSourceDialogClass(wxWindow* parent, 
 	if (EditedSource.IncludeWildcardsString().IsEmpty()) {
 		IncludeWildcards->SetValue(wxT("*.*"));
 	}
+	RootDirectory->SetFocus();
 }
 
 void mvceditor::ProjectSourceDialogClass::OnOkButton(wxCommandEvent& event) {
@@ -472,6 +478,9 @@ mvceditor::ProjectListDialogClass::ProjectListDialogClass(wxWindow* parent, std:
 	, EditedProjects(projects)
 	, RemovedProjects(removedProjects) {
 	Populate();
+	if (!ProjectsList->IsEmpty()) {
+		ProjectsList->SetSelection(0);
+	}
 }
 
 void mvceditor::ProjectListDialogClass::OnProjectsListDoubleClick(wxCommandEvent& event) {

@@ -655,6 +655,7 @@ mvceditor::ResourceSearchDialogClass::ResourceSearchDialogClass(wxWindow* parent
 	wxGenericValidator termValidator(&term);
 	TransferDataToWindow();
 	CacheStatusLabel->SetLabel(wxT("Cache Status: ") + resource.CacheStatus());
+	SearchText->SetFocus();
 }
 
 void mvceditor::ResourceSearchDialogClass::OnSearchText(wxCommandEvent& event) {
