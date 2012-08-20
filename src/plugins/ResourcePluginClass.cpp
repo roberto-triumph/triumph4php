@@ -280,8 +280,8 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourcePluginClass::SearchForR
 	if (matches.empty() && !text.Contains(wxT("."))) {
 		
 		// dot == search for files
-		//matches = resourceCache->CollectNearMatchResourcesFromAll(mvceditor::WxToIcu(text + wxT(".")));
-		//RemoveNativeMatches(matches);
+		matches = resourceCache->CollectNearMatchResourcesFromAll(mvceditor::WxToIcu(text + wxT(".")));
+		RemoveNativeMatches(matches);
 	}
 	return matches;
 }
