@@ -238,6 +238,8 @@ void mvceditor::SqlConnectionDialogClass::OnHelpButton(wxCommandEvent& event) {
 		"MVC Editor can also detect CodeIgniter credentials and automatically populate connection credentials "
 		"from application/config/database.php. If you modify database.php you will need to reopen MVC Editor in order for the new "
 		"connection info to be populated.\n"
+		"If a connection is unchecked, it is considered as disabled and will NOT be used for code completion, but you "
+		"can still make queries to it via the SQL browser.\n"
 	);
 	help = wxGetTranslation(help);
 	wxMessageBox(help, _("SQL Connection Help"), wxOK, this);
