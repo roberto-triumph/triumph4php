@@ -32,7 +32,7 @@
 #include <wx/filename.h>
 #include <wx/valgen.h>
 
-static int ID_COUNT_FILES_GAUGE = wxNewId();
+static int ID_RESOURCE_READER_GAUGE = wxNewId();
 static int ID_RESOURCE_READER = wxNewId();
 static int ID_WIPE_THREAD = wxNewId();
 
@@ -243,11 +243,13 @@ void mvceditor::ResourcePluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 	}
 	InitProjectQueue(App.Structs.Projects);
 	mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
-	mvceditor::ResourceFileReaderClass* thread = ReadNextProject(version);
+
+	wxString projectLabel;
+	mvceditor::ResourceFileReaderClass* thread = ReadNextProject(version, projectLabel);
 	if (thread && thread->StartReading(error)) {
 		RunningThreadId = thread->GetId();
 		State = INDEXING_PROJECT;
-		GetStatusBarWithGauge()->AddGauge(_("Indexing Projects"), ID_COUNT_FILES_GAUGE, 
+		GetStatusBarWithGauge()->AddGauge(_("Indexing ") + projectLabel, ID_RESOURCE_READER_GAUGE, 
 			StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 	}
 	else if (thread && mvceditor::BackgroundFileReaderClass::NO_RESOURCES == error) {
@@ -285,7 +287,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourcePluginClass::SearchForR
 }
 
 void mvceditor::ResourcePluginClass::OnWorkInProgress(wxCommandEvent& event) {
-	GetStatusBarWithGauge()->IncrementGauge(ID_COUNT_FILES_GAUGE, StatusBarWithGaugeClass::INDETERMINATE_MODE);
+	GetStatusBarWithGauge()->IncrementGauge(ID_RESOURCE_READER_GAUGE, StatusBarWithGaugeClass::INDETERMINATE_MODE);
 	if (IndexingDialog && IndexingDialog->IsShown()) {
 		IndexingDialog->Increment();
 	}
@@ -298,11 +300,15 @@ void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
 		// if the project queue is not empty then start reading the next project.
 		bool hasNext = false;
 		while (MoreProjects() && !hasNext) {
-			mvceditor::ResourceFileReaderClass* thread = ReadNextProject(GetEnvironment()->Php.Version);
+			wxString projectLabel;
+			mvceditor::ResourceFileReaderClass* thread = ReadNextProject(GetEnvironment()->Php.Version, projectLabel);
 			if (thread) {
 				mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
 				if (thread->StartReading(error)) {
 					RunningThreadId = thread->GetId();
+					GetStatusBarWithGauge()->StopGauge(ID_RESOURCE_READER_GAUGE);
+					GetStatusBarWithGauge()->AddGauge(_("Indexing ") + projectLabel, 
+						ID_RESOURCE_READER_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 				}
 				else {
 					wxString msg = wxString::Format(wxT("background file reader error: %d"), error);
@@ -316,7 +322,7 @@ void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
 			return;
 		}
 	}
-	GetStatusBarWithGauge()->StopGauge(ID_COUNT_FILES_GAUGE);
+	GetStatusBarWithGauge()->StopGauge(ID_RESOURCE_READER_GAUGE);
 	if (IndexingDialog) {
 		IndexingDialog->Destroy();
 		IndexingDialog = NULL;
@@ -386,13 +392,14 @@ void mvceditor::ResourcePluginClass::StartIndex() {
 		//prevent two finds at a time
 		if (FREE == State) { 
 			if (InitProjectQueue(App.Structs.Projects)) {
-				mvceditor::ResourceFileReaderClass* thread = ReadNextProject(GetEnvironment()->Php.Version);
+				wxString projectLabel;
+				mvceditor::ResourceFileReaderClass* thread = ReadNextProject(GetEnvironment()->Php.Version, projectLabel);
 				mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
 				if (thread && thread->StartReading(error)) {
 					RunningThreadId = thread->GetId();
 					State = INDEXING_PROJECT;
-					GetStatusBarWithGauge()->AddGauge(_("Indexing Projects"),
-						ID_COUNT_FILES_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE,
+					GetStatusBarWithGauge()->AddGauge(_("Indexing ") + projectLabel,
+						ID_RESOURCE_READER_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE,
 						wxGA_HORIZONTAL);
 					if (!HasCodeLookups) {
 
@@ -443,7 +450,7 @@ void mvceditor::ResourcePluginClass::OnProjectWipeAndIndex(wxCommandEvent& event
 		if (wxTHREAD_NO_ERROR == error) {
 			wipeStarted = true;
 			GetStatusBarWithGauge()->AddGauge(_("Indexing Projects"),
-							ID_COUNT_FILES_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
+							ID_RESOURCE_READER_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 		}
 	}
 	if (!wipeStarted) {
@@ -455,7 +462,7 @@ void mvceditor::ResourcePluginClass::OnProjectWipeAndIndex(wxCommandEvent& event
 }
 
 void mvceditor::ResourcePluginClass::OnWipeComplete(wxCommandEvent& event) {
-	GetStatusBarWithGauge()->StopGauge(ID_COUNT_FILES_GAUGE);
+	GetStatusBarWithGauge()->StopGauge(ID_RESOURCE_READER_GAUGE);
 	StartIndex();
 }
 
@@ -642,11 +649,12 @@ bool mvceditor::ResourcePluginClass::MoreProjects() const {
 }
 
 
-mvceditor::ResourceFileReaderClass* mvceditor::ResourcePluginClass::ReadNextProject(pelet::Versions version) {
+mvceditor::ResourceFileReaderClass* mvceditor::ResourcePluginClass::ReadNextProject(pelet::Versions version, wxString& projectLabel) {
 	mvceditor::ResourceFileReaderClass* thread = NULL;
 	if (!ProjectQueue.empty()) {
 		mvceditor::ProjectClass project = ProjectQueue.front();
 		ProjectQueue.pop();
+		projectLabel = project.Label;
 		thread = new mvceditor::ResourceFileReaderClass(App.RunningThreads, ID_RESOURCE_READER);
 		if (!thread->InitProject(project, version)) {
 			delete thread;

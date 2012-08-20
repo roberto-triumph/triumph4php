@@ -277,11 +277,12 @@ private:
 	 * initialize the next project in the queue to be read. After a call to this method, the background
 	 * thread can be started.
 	 * @param version the version of PHP to check against
+	 * @param projectLabel the label of the project that will be read next is set here
 	 * @return mvceditor::ResourceFileReaderClass* if the project has at least one source directory that exists
 	 *         otherwise NULL is returned. 
 	 *         since the returned pointer is a thread; the pointer will delete itself
 	 */
-	mvceditor::ResourceFileReaderClass* ReadNextProject(pelet::Versions version);
+	mvceditor::ResourceFileReaderClass* ReadNextProject(pelet::Versions version, wxString& projectLabel);
 	
 	/**
 	 * after the projects have been wiped, star the index process
