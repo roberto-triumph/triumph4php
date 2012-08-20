@@ -48,10 +48,10 @@ int main() {
 		minor;
 	wxOperatingSystemId os = wxGetOsVersion(&major, &minor);
 	if (os == wxOS_WINDOWS_NT) {
-		DirName = wxT("C:\\Users\\Roberto\\sample_php_project\\");
+		DirName = wxT("C:\\Users\\Roberto\\sample_php_project");
 	}
 	else {
-		DirName = wxT("/home/roberto/workspace/sample_php_project/");
+		DirName = wxT("/home/roberto/workspace/sample_php_project");
 	}
 	ProfileFindInFilesExactMode();
 	ProfileFindInFilesCodeMode();
@@ -95,9 +95,10 @@ void ProfileFindInFilesCodeMode() {
 	wxLongLong time = wxGetLocalTimeMillis();
 	mvceditor::DirectorySearchClass directorySearch;
 	mvceditor::SourceClass src;
-	src.RootDirectory.Assign(DirName);
+	src.RootDirectory.AssignDir(DirName);
 	src.SetIncludeWildcards(wxT("*.php"));
 	std::vector<mvceditor::SourceClass> sources;
+	sources.push_back(src);
 	if (directorySearch.Init(sources)) {
 		mvceditor::FindInFilesClass findInFiles;
 		findInFiles.Expression = UNICODE_STRING_SIMPLE("class Db");
