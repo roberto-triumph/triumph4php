@@ -84,8 +84,13 @@ bool mvceditor::AppClass::OnInit() {
 	AppFrame->AuiManagerUpdate();
 	if (CommandLine()) {
 		SetTopWindow(AppFrame);
-		AppFrame->Maximize(true);
 		AppFrame->Show(true);
+
+		// maximize only after showing, that way the size event gets propagated and
+		// the main frame is drawn correctly at app start.
+		// if we don't do this, there is a nasty effect on windows OS that shows 
+		// the status bar in the middle of the page until the user re-maximizes the app
+		AppFrame->Maximize();
 
 		// this line is needed so that we get all the wxLogXXX messages
 		// pointer will be managed by wxWidgets
@@ -159,9 +164,8 @@ void mvceditor::AppClass::CreatePlugins() {
 	Plugins.push_back(plugin);
 	plugin = new ResourcePluginClass(*this);
 	Plugins.push_back(plugin);
-
 	plugin = new EnvironmentPluginClass(*this);
-	Plugins.push_back(plugin);
+	Plugins.push_back(plugin);	
 	plugin = new ProjectPluginClass(*this);
 	Plugins.push_back(plugin);
 	plugin = new OutlineViewPluginClass(*this);

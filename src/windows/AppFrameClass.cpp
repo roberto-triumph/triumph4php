@@ -91,8 +91,6 @@ mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass
 	AuiManager.AddPane(ToolBar, wxAuiPaneInfo().Top(
 		).CaptionVisible(false).CloseButton(false).Gripper(
 		false).DockFixed(true).PaneBorder(false).Floatable(false).Row(0).Position(0));
-
-	AuiManager.Update();
 	DefaultKeyboardShortcuts();
 }
 
