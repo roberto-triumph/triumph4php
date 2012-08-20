@@ -17,7 +17,7 @@
 #include <wx/sizer.h>
 #include <wx/grid.h>
 #include <wx/panel.h>
-#include <wx/listbox.h>
+#include <wx/checklst.h>
 #include <wx/textctrl.h>
 #include <wx/spinctrl.h>
 #include <wx/button.h>
@@ -66,7 +66,6 @@ class SqlConnectionDialogGeneratedClass : public wxDialog
 		{
 			ID_SQLCONNECTIONDIALOGCLASS = 1000,
 			ID_GLOBALCONNECTIONSLABEL,
-			ID_LIST,
 			ID_NAMELABEL,
 			ID_LABEL,
 			ID_HOSTLABEL,
@@ -86,7 +85,7 @@ class SqlConnectionDialogGeneratedClass : public wxDialog
 		};
 		
 		wxStaticText* ConnectionsLabel;
-		wxListBox* List;
+		wxCheckListBox* List;
 		wxStaticText* NameLabel;
 		wxTextCtrl* Label;
 		wxStaticText* HostLabel;
@@ -104,22 +103,25 @@ class SqlConnectionDialogGeneratedClass : public wxDialog
 		wxButton* TestButton;
 		wxButton* AddButton;
 		wxButton* DeleteButton;
-		wxStdDialogButtonSizer* m_sdbSizer2;
-		wxButton* m_sdbSizer2OK;
-		wxButton* m_sdbSizer2Cancel;
+		wxStdDialogButtonSizer* StdButtonsSizer;
+		wxButton* StdButtonsSizerOK;
+		wxButton* StdButtonsSizerCancel;
+		wxButton* StdButtonsSizerHelp;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnListboxSelected( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnChecklistSelected( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnChecklistToggled( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnLabelText( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnTestButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDeleteButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		SqlConnectionDialogGeneratedClass( wxWindow* parent, wxWindowID id = ID_SQLCONNECTIONDIALOGCLASS, const wxString& title = wxT("SQL Connections"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 592,325 ), long style = wxDEFAULT_DIALOG_STYLE );
+		SqlConnectionDialogGeneratedClass( wxWindow* parent, wxWindowID id = ID_SQLCONNECTIONDIALOGCLASS, const wxString& title = wxT("SQL Connections"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 667,319 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~SqlConnectionDialogGeneratedClass();
 	
 };

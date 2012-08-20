@@ -39,7 +39,8 @@ mvceditor::DatabaseInfoClass::DatabaseInfoClass()
 	, FileName()
 	, Driver(MYSQL)
 	, Port() 
-	, IsDetected(false) {
+	, IsDetected(false)
+	, IsEnabled(true) {
 		
 }
 
@@ -52,7 +53,8 @@ mvceditor::DatabaseInfoClass::DatabaseInfoClass(const mvceditor::DatabaseInfoCla
 	, FileName()
 	, Driver(MYSQL)
 	, Port() 
-	, IsDetected(false) {
+	, IsDetected(false)
+	, IsEnabled(true) {
 	Copy(other);
 }
 
@@ -66,6 +68,7 @@ void mvceditor::DatabaseInfoClass::Copy(const mvceditor::DatabaseInfoClass& src)
 	Driver = src.Driver;
 	Port = src.Port;
 	IsDetected = src.IsDetected;
+	IsEnabled = src.IsEnabled;
 }
 
 bool mvceditor::DatabaseInfoClass::SameAs(const mvceditor::DatabaseInfoClass& other) {

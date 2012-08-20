@@ -82,7 +82,9 @@ private:
 
 	void OnLabelText(wxCommandEvent& event);
 	
-	void OnListboxSelected(wxCommandEvent& event);
+	void OnChecklistSelected(wxCommandEvent& event);
+	
+	void OnChecklistToggled(wxCommandEvent& event);
 
 	void OnHelpButton(wxCommandEvent& event);
 		

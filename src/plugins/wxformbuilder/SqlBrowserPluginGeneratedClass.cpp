@@ -113,7 +113,8 @@ SqlConnectionDialogGeneratedClass::SqlConnectionDialogGeneratedClass( wxWindow* 
 	ConnectionsLabel->Wrap( -1 );
 	ConnectionsSizer->Add( ConnectionsLabel, 0, wxALL, 5 );
 	
-	List = new wxListBox( this, ID_LIST, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_SINGLE ); 
+	wxArrayString ListChoices;
+	List = new wxCheckListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, ListChoices, 0 );
 	ConnectionsSizer->Add( List, 1, wxALL|wxEXPAND, 5 );
 	
 	FormSizer->Add( ConnectionsSizer, 1, wxEXPAND, 5 );
@@ -190,13 +191,15 @@ SqlConnectionDialogGeneratedClass::SqlConnectionDialogGeneratedClass( wxWindow* 
 	DeleteButton = new wxButton( this, ID_SQLDELETEBUTTON, wxT("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
 	BottomSizer->Add( DeleteButton, 0, wxALL, 5 );
 	
-	m_sdbSizer2 = new wxStdDialogButtonSizer();
-	m_sdbSizer2OK = new wxButton( this, wxID_OK );
-	m_sdbSizer2->AddButton( m_sdbSizer2OK );
-	m_sdbSizer2Cancel = new wxButton( this, wxID_CANCEL );
-	m_sdbSizer2->AddButton( m_sdbSizer2Cancel );
-	m_sdbSizer2->Realize();
-	BottomSizer->Add( m_sdbSizer2, 1, wxEXPAND, 5 );
+	StdButtonsSizer = new wxStdDialogButtonSizer();
+	StdButtonsSizerOK = new wxButton( this, wxID_OK );
+	StdButtonsSizer->AddButton( StdButtonsSizerOK );
+	StdButtonsSizerCancel = new wxButton( this, wxID_CANCEL );
+	StdButtonsSizer->AddButton( StdButtonsSizerCancel );
+	StdButtonsSizerHelp = new wxButton( this, wxID_HELP );
+	StdButtonsSizer->AddButton( StdButtonsSizerHelp );
+	StdButtonsSizer->Realize();
+	BottomSizer->Add( StdButtonsSizer, 1, wxEXPAND, 5 );
 	
 	BodySizer->Add( BottomSizer, 0, wxEXPAND, 5 );
 	
@@ -206,22 +209,26 @@ SqlConnectionDialogGeneratedClass::SqlConnectionDialogGeneratedClass( wxWindow* 
 	this->Centre( wxBOTH );
 	
 	// Connect Events
-	List->Connect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( SqlConnectionDialogGeneratedClass::OnListboxSelected ), NULL, this );
+	List->Connect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( SqlConnectionDialogGeneratedClass::OnChecklistSelected ), NULL, this );
+	List->Connect( wxEVT_COMMAND_CHECKLISTBOX_TOGGLED, wxCommandEventHandler( SqlConnectionDialogGeneratedClass::OnChecklistToggled ), NULL, this );
 	Label->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( SqlConnectionDialogGeneratedClass::OnLabelText ), NULL, this );
 	TestButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlConnectionDialogGeneratedClass::OnTestButton ), NULL, this );
 	AddButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlConnectionDialogGeneratedClass::OnAddButton ), NULL, this );
 	DeleteButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlConnectionDialogGeneratedClass::OnDeleteButton ), NULL, this );
-	m_sdbSizer2OK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlConnectionDialogGeneratedClass::OnOkButton ), NULL, this );
+	StdButtonsSizerHelp->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlConnectionDialogGeneratedClass::OnHelpButton ), NULL, this );
+	StdButtonsSizerOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlConnectionDialogGeneratedClass::OnOkButton ), NULL, this );
 }
 
 SqlConnectionDialogGeneratedClass::~SqlConnectionDialogGeneratedClass()
 {
 	// Disconnect Events
-	List->Disconnect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( SqlConnectionDialogGeneratedClass::OnListboxSelected ), NULL, this );
+	List->Disconnect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( SqlConnectionDialogGeneratedClass::OnChecklistSelected ), NULL, this );
+	List->Disconnect( wxEVT_COMMAND_CHECKLISTBOX_TOGGLED, wxCommandEventHandler( SqlConnectionDialogGeneratedClass::OnChecklistToggled ), NULL, this );
 	Label->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( SqlConnectionDialogGeneratedClass::OnLabelText ), NULL, this );
 	TestButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlConnectionDialogGeneratedClass::OnTestButton ), NULL, this );
 	AddButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlConnectionDialogGeneratedClass::OnAddButton ), NULL, this );
 	DeleteButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlConnectionDialogGeneratedClass::OnDeleteButton ), NULL, this );
-	m_sdbSizer2OK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlConnectionDialogGeneratedClass::OnOkButton ), NULL, this );
+	StdButtonsSizerHelp->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlConnectionDialogGeneratedClass::OnHelpButton ), NULL, this );
+	StdButtonsSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlConnectionDialogGeneratedClass::OnOkButton ), NULL, this );
 	
 }

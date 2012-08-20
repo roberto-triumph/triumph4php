@@ -101,6 +101,13 @@ public:
 	 */
 	bool IsDetected;
 	
+	/**
+	 * TRUE if the user wants to use this connection.  The user may not want
+	 * to use the connection info but they may want to keep it around for later
+	 * use
+	 */
+	bool IsEnabled;
+	
 	DatabaseInfoClass();
 	
 	/**

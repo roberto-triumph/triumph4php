@@ -60,6 +60,7 @@ mvceditor::SqlConnectionDialogClass::SqlConnectionDialogClass(wxWindow* parent, 
 			label += _(" <Detected>");
 		}
 		List->Append(label);
+		List->Check(i, EditedInfos[i].IsEnabled);
 	}
 	UpdateTextInputs();
 	TransferDataToWindow();
@@ -73,9 +74,6 @@ void mvceditor::SqlConnectionDialogClass::UpdateTextInputs() {
 	bool allowEdit = true;
 	if (ChosenIndex < EditedInfos.size()) {
 		wxString label = mvceditor::IcuToWx(EditedInfos[ChosenIndex].Label);
-		if (EditedInfos[ChosenIndex].IsDetected) {
-			label += _(" <Detected>");
-		}
 		Label->SetValue(label);
 		Host->SetValue(mvceditor::IcuToWx(EditedInfos[ChosenIndex].Host));
 		User->SetValue(mvceditor::IcuToWx(EditedInfos[ChosenIndex].User));
@@ -185,6 +183,7 @@ void mvceditor::SqlConnectionDialogClass::OnAddButton(wxCommandEvent& event) {
 	List->Append(wxT("Untitled"));
 	ChosenIndex = List->GetCount() - 1;
 	List->SetSelection(List->GetCount() - 1);
+	List->Check(List->GetCount() - 1, newInfo.IsEnabled);
 
 	// put the newly "blank" values in the textboxes
 	UpdateTextInputs();
@@ -209,6 +208,11 @@ void mvceditor::SqlConnectionDialogClass::OnDeleteButton(wxCommandEvent& event) 
 			ChosenIndex = List->GetCount() - 1;
 		}
 		UpdateTextInputs();
+		wxString label = mvceditor::IcuToWx(EditedInfos[ChosenIndex].Label);
+		if (EditedInfos[ChosenIndex].IsDetected) {
+			label += _(" <Detected>");
+		}
+		List->SetStringSelection(label);
 	}
 }
 
@@ -218,19 +222,25 @@ void mvceditor::SqlConnectionDialogClass::OnLabelText(wxCommandEvent& event) {
 	int selection = List->GetSelection();
 	if (selection >= 0 && (size_t)selection < List->GetCount()) {
 		List->SetString(selection, Label->GetValue());
+		
+		// on linux, setting the string causes the checkbox to not
+		// be drawn and it makes it look like the project is
+		// disabled
+		List->Check(selection, EditedInfos[selection].IsEnabled);	
 	}
 }
 
 void mvceditor::SqlConnectionDialogClass::OnHelpButton(wxCommandEvent& event) {
 	wxString help = wxString::FromAscii(
-		"The SQL Connections dialog shows you the list of database connections that were detected.\n"
-		"This detection works only for supported frameworks (MVC Editor can support multiple frameworks).\n"
-		"If this list is empty it means that the editor the current project is not using one of the \n"
-		"supported frameworks. If you modify the file containing the database credentials you will need \n"
-		"to reopen the project"		
+		"The SQL Connections dialog shows you the list of database connections that were detected or created. "
+		"Any database connection listed here will be used by MVC Editor; MVC Editor will read the SQL meta data and use it "
+		"for code completion in the SQL query editor and the PHP editor.\n"
+		"MVC Editor can also detect CodeIgniter credentials and automatically populate connection credentials "
+		"from application/config/database.php. If you modify database.php you will need to reopen MVC Editor in order for the new "
+		"connection info to be populated.\n"
 	);
 	help = wxGetTranslation(help);
-	wxMessageBox(help, _("Help"));
+	wxMessageBox(help, _("SQL Connection Help"), wxOK, this);
 }
 
 void mvceditor::SqlConnectionDialogClass::ShowTestResults(wxCommandEvent& event) {
@@ -255,7 +265,7 @@ void mvceditor::SqlConnectionDialogClass::ShowTestResults(wxCommandEvent& event)
 	delete result;
 }
 
-void mvceditor::SqlConnectionDialogClass::OnListboxSelected(wxCommandEvent& event) {
+void mvceditor::SqlConnectionDialogClass::OnChecklistSelected(wxCommandEvent& event) {
 	
 	// save the old values
 	if (ChosenIndex < EditedInfos.size() && !EditedInfos[ChosenIndex].IsDetected) {
@@ -269,7 +279,29 @@ void mvceditor::SqlConnectionDialogClass::OnListboxSelected(wxCommandEvent& even
 
 	// put the newly chosen values in the textboxes
 	ChosenIndex = event.GetInt();
+	
 	UpdateTextInputs();
+	
+	if (ChosenIndex >= 0 && ChosenIndex < List->GetCount()) {
+		wxString label = mvceditor::IcuToWx(EditedInfos[ChosenIndex].Label);
+		if (EditedInfos[ChosenIndex].IsDetected) {
+			label += _(" <Detected>");
+		}
+		List->SetString(ChosenIndex, label);
+	
+		// on linux, setting the string causes the checkbox to not
+		// be drawn and it makes it look like the project is
+		// disabled
+		List->Check(ChosenIndex, EditedInfos[ChosenIndex].IsEnabled);
+	}
+}
+
+void mvceditor::SqlConnectionDialogClass::OnChecklistToggled(wxCommandEvent& event) {
+	size_t sel = event.GetSelection();
+	if (sel >= 0 && sel < EditedInfos.size()) {
+		EditedInfos[sel].IsEnabled = List->IsChecked(sel);
+	}
+	event.Skip();
 }
 
 mvceditor::MultipleSqlExecuteClass::MultipleSqlExecuteClass(mvceditor::RunningThreadsClass& runningThreads, int queryId,
@@ -697,9 +729,11 @@ void mvceditor::SqlMetaDataFetchClass::BackgroundWork() {
 	mvceditor::SqlResourceFinderClass newResources;
 	for (std::vector<mvceditor::DatabaseInfoClass>::iterator it = Infos.begin(); it != Infos.end(); ++it) {
 		if (!TestDestroy()) {
-			UnicodeString error;
-			if (!newResources.Fetch(*it, error)) {
-				errors.push_back(error);
+			if (it->IsEnabled) {
+				UnicodeString error;
+				if (!newResources.Fetch(*it, error)) {
+					errors.push_back(error);
+				}
 			}
 		}
 		else {
@@ -741,9 +775,6 @@ void mvceditor::SqlBrowserPluginClass::OnProjectsUpdated(wxCommandEvent& event) 
 	
 	// add the detected connections to the infos list
 	// this makes it easier; that way we always work with one list only
-
-	// TODO: make a AllEnabledDatabaseConnections method in StructsClass. that will clean
-	// some stuff up
 	for (size_t i = 0; i < App.Structs.Frameworks.size(); ++i) {
 		App.Structs.Infos.insert(App.Structs.Infos.end(), App.Structs.Frameworks[i].Databases.begin(), App.Structs.Frameworks[i].Databases.end());
 	}
@@ -1007,6 +1038,7 @@ void mvceditor::SqlBrowserPluginClass::LoadPreferences(wxConfigBase* config) {
 				info.Password = mvceditor::WxToIcu(config->Read(groupName + wxT("/Password")));
 				config->Read(groupName + wxT("/Port"), &info.Port);
 				info.User = mvceditor::WxToIcu(config->Read(groupName + wxT("/User")));
+				config->Read(groupName + wxT("/IsEnabled"), &info.IsEnabled);
 				
 				if (driverString.CmpNoCase(wxT("MYSQL")) == 0) {
 					info.Driver = mvceditor::DatabaseInfoClass::MYSQL;
@@ -1048,6 +1080,7 @@ void mvceditor::SqlBrowserPluginClass::SavePreferences() {
 			config->Write(wxT("Password"), mvceditor::IcuToWx(App.Structs.Infos[i].Password));
 			config->Write(wxT("Port"), App.Structs.Infos[i].Port);
 			config->Write(wxT("User"), mvceditor::IcuToWx(App.Structs.Infos[i].User));
+			config->Write(wxT("IsEnabled"), App.Structs.Infos[i].IsEnabled);
 			saveIndex++;
 		}
 	}

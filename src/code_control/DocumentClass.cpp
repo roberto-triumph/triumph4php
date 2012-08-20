@@ -424,7 +424,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionString(const UnicodeString
 void mvceditor::PhpDocumentClass::AppendSqlTableNames(const UnicodeString& word, std::vector<wxString>& autoCompleteList) {
 	for (size_t i = 0; i < Structs->Infos.size(); ++i) {
 		mvceditor::DatabaseInfoClass info = Structs->Infos[i];
-		if (!info.Host.isEmpty()) {
+		if (!info.Host.isEmpty() && info.IsEnabled) {
 			UnicodeString error;
 			std::vector<UnicodeString> results = Structs->SqlResourceFinder.FindTables(info, word);
 			for (size_t i = 0; i < results.size(); i++) {
