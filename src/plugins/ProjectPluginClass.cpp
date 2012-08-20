@@ -505,7 +505,7 @@ void mvceditor::ProjectListDialogClass::OnProjectsListDoubleClick(wxCommandEvent
 			// on linux, setting the string causes the checkbox to not
 			// be drawn and it makes it look like the project is
 			// disabled
-			ProjectsList->Check(selection);
+			ProjectsList->Check(selection, EditedProjects[selection].IsEnabled);
 		}
 	}
 	event.Skip();
@@ -577,7 +577,7 @@ void mvceditor::ProjectListDialogClass::OnEditButton(wxCommandEvent& event) {
 			// on linux, setting the string causes the checkbox to not
 			// be drawn and it makes it look like the project is
 			// disabled
-			ProjectsList->Check(selection);
+			ProjectsList->Check(selection, EditedProjects[selection].IsEnabled);
 		}
 	}
 }
