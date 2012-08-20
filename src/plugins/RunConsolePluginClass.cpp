@@ -105,7 +105,7 @@ void mvceditor::CliCommandEditDialogClass::OnHelpButton(wxCommandEvent& event) {
 		"bottom toolbar, enabling you to run it with one mouse click."
 	);
 	help = wxGetTranslation(help);
-	wxMessageBox(help, _("Help"));
+	wxMessageBox(help, _("CLI Command Help"), wxOK, this);
 }
 
 void mvceditor::CliCommandEditDialogClass::OnFileChanged(wxFileDirPickerEvent& event) {
@@ -217,7 +217,7 @@ void mvceditor::CliCommandListDialogClass::OnHelpButton(wxCommandEvent& event) {
 		"will affect the order of the command buttons in the toolbar."
 	);
 	help = wxGetTranslation(help);
-	wxMessageBox(help, _("Help"));
+	wxMessageBox(help, _("CLI Command Help"), wxOK, this);
 }
 
 mvceditor::RunConsolePanelClass::RunConsolePanelClass(wxWindow* parent, int id, 

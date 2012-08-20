@@ -383,7 +383,7 @@ void mvceditor::ViewFilePanelClass::OnHelpButton(wxCommandEvent& event) {
 		"that the template file was not found."
 	);
 	help = wxGetTranslation(help);
-	wxMessageBox(help);
+	wxMessageBox(help, _("View Files Help"), wxOK, this);
 }
 
 void mvceditor::ViewFilePanelClass::OnCurrentButton(wxCommandEvent &event) {

@@ -384,7 +384,7 @@ void mvceditor::OutlineViewPluginPanelClass::OnHelpButton(wxCommandEvent& event)
 		"\n"
 	);
 	help = wxGetTranslation(help);
-	wxMessageBox(help, _("Help"));
+	wxMessageBox(help, _("Outline Help"), wxOK, this);
 }
 
 void mvceditor::OutlineViewPluginPanelClass::OnChoice(wxCommandEvent& event) {

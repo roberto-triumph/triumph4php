@@ -806,7 +806,7 @@ void mvceditor::ResourceSearchDialogClass::OnHelpButton(wxCommandEvent& event) {
 		"will be OK after you have indexed the projects. "
 	);
 	help = wxGetTranslation(help);
-	wxMessageBox(help, _("Help"), wxOK);	
+	wxMessageBox(help, _("Resource Search Help"), wxOK, this);	
 }
 
 void mvceditor::ResourceSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
