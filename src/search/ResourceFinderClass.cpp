@@ -253,7 +253,10 @@ void mvceditor::ResourceFinderClass::BeginSearch() {
 		} catch (std::exception& e) {
 			delete Transaction;
 			Transaction = NULL;
+
 			// ATTN: at some point bubble these exceptions up?
+			// to avoid unreferenced local variable warnings in MSVC
+			e.what();
 		}
 	}
 	FileParsingCache.clear();
@@ -276,6 +279,8 @@ void mvceditor::ResourceFinderClass::EndSearch() {
 		} catch (std::exception& e) {
 			
 			// ATTN: at some point bubble these exceptions up?
+			// to avoid unreferenced local variable warnings in MSVC
+			e.what();
 		}
 		delete Transaction;
 		Transaction = NULL;
@@ -479,6 +484,8 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 	} catch (std::exception& e) {
 		
 		// ATTN: at some point bubble these exceptions up?
+		// to avoid unreferenced local variable warnings in MSVC
+		e.what();
 	}
 	return matches;
 }
@@ -980,6 +987,8 @@ bool mvceditor::ResourceFinderClass::IsNewNamespace(const UnicodeString& namespa
 	} catch (std::exception& e) {
 		
 		// ATTN: at some point bubble these exceptions up?
+		// to avoid unreferenced local variable warnings in MSVC
+		e.what();
 	}
 	return isNew;
 }
@@ -1042,6 +1051,8 @@ void mvceditor::ResourceFinderClass::RemovePersistedResources(const std::vector<
 	} catch (std::exception& e) {
 		
 		// ATTN: at some point bubble these exceptions up?
+		// to avoid unreferenced local variable warnings in MSVC
+		e.what();
 	}
 }
 
@@ -1219,6 +1230,8 @@ bool mvceditor::ResourceFinderClass::IsFileCacheEmpty() {
 	} catch (std::exception& e) {
 			
 		// ATTN: at some point bubble these exceptions up?
+		// to avoid unreferenced local variable warnings in MSVC
+		e.what();
 	}
 	return count <= 0;
 }
@@ -1235,6 +1248,8 @@ bool mvceditor::ResourceFinderClass::IsResourceCacheEmpty() {
 	} catch (std::exception& e) {
 		
 		// ATTN: at some point bubble these exceptions up?
+		// to avoid unreferenced local variable warnings in MSVC
+		e.what();
 	}
 	return count <= 0;
 }
@@ -1336,6 +1351,8 @@ void mvceditor::ResourceFinderClass::AddDynamicResources(const std::vector<mvced
 	catch (std::exception& e) {
 		
 		// ATTN: at some point bubble these exceptions up?
+		// to avoid unreferenced local variable warnings in MSVC
+		e.what();
 	}
 }
 
@@ -1372,6 +1389,8 @@ void mvceditor::ResourceFinderClass::PersistFileItem(mvceditor::FileItemClass& f
 	} catch (std::exception& e) {
 		
 		// ATTN: at some point bubble these exceptions up?
+		// to avoid unreferenced local variable warnings in MSVC
+		e.what();
 	}
 }
 
@@ -1402,6 +1421,8 @@ bool mvceditor::ResourceFinderClass::FindFileItemByFullPathExact(const wxString&
 	} catch (std::exception& e) {
 			
 		// ATTN: at some point bubble these exceptions up?
+		// to avoid unreferenced local variable warnings in MSVC
+		e.what();
 	}
 	return foundFile;
 }
@@ -1482,6 +1503,8 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::ResourceSt
 	} catch (std::exception& e) {
 			
 		// ATTN: at some point bubble these exceptions up?
+		// to avoid unreferenced local variable warnings in MSVC
+		e.what();
 	}
 	return matches;
 }
@@ -1616,7 +1639,9 @@ void mvceditor::ResourceFinderClass::Wipe() {
 			Session.once << "DELETE FROM resources;";
 		} catch (std::exception& e) {
 			
-		// ATTN: at some point bubble these exceptions up?
+			// ATTN: at some point bubble these exceptions up?
+			// to avoid unreferenced local variable warnings in MSVC
+			e.what();
 		}
 	}
 }
@@ -1679,6 +1704,8 @@ void mvceditor::ResourceFinderClass::PersistResources(const std::vector<mvcedito
 	} catch (std::exception& e) {
 			
 		// ATTN: at some point bubble these exceptions up?
+		// to avoid unreferenced local variable warnings in MSVC
+		e.what();
 	}
 }
 
@@ -1737,6 +1764,8 @@ void mvceditor::ResourceFinderClass::PersistTraits(
 	} catch (std::exception& e) {
 			
 		// ATTN: at some point bubble these exceptions up?
+		// to avoid unreferenced local variable warnings in MSVC
+		e.what();
 	}
 }
 
@@ -1801,6 +1830,8 @@ std::vector<mvceditor::TraitResourceClass> mvceditor::ResourceFinderClass::FindT
 	} catch (std::exception& e) {
 			
 		// ATTN: at some point bubble these exceptions up?
+		// to avoid unreferenced local variable warnings in MSVC
+		e.what();
 	}
 	return matches;
 }
