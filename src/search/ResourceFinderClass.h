@@ -951,6 +951,11 @@ public:
 	 */
 	void SetFullPath(const wxString& fullPath);
 
+	/**
+	 * @return TRUE if this is a function/method that has at least one parameter
+	 */
+	bool HasParameters() const;
+
 private:
 	
 	/**

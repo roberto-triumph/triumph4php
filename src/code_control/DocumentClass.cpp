@@ -1084,7 +1084,11 @@ void mvceditor::PhpDocumentClass::OnAutoCompletionSelected(wxStyledTextEvent& ev
 				wxString selected = event.GetText();
 				int startPos = Ctrl->WordStartPosition(Ctrl->GetCurrentPos(), true);
 				Ctrl->SetSelection(startPos, Ctrl->GetCurrentPos());
-				if (mvceditor::ResourceClass::FUNCTION == res.Type || mvceditor::ResourceClass::METHOD == res.Type) {
+				if ((mvceditor::ResourceClass::FUNCTION == res.Type || mvceditor::ResourceClass::METHOD == res.Type) && !res.HasParameters()) {
+					Ctrl->ReplaceSelection(selected + wxT("()"));
+					HandleCallTip(0, true);
+				}
+				else if (mvceditor::ResourceClass::FUNCTION == res.Type || mvceditor::ResourceClass::METHOD == res.Type) {
 					Ctrl->ReplaceSelection(selected + wxT("("));
 					HandleCallTip(0, true);
 				}

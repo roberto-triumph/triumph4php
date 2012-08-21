@@ -745,15 +745,6 @@ void mvceditor::ResourceFinderClass::TraitAliasFound(const UnicodeString& namesp
 	mapKey += UNICODE_STRING_SIMPLE("-");
 	mapKey += traitUsedClassName;
 	
-	/*
-	int capacity = 10 + namespaceName.length() + 1 + className.length() + 1 + traitUsedClassName.length();
-	int written = u_sprintf(mapKey.getBuffer(capacity), "%.*S-%.*S-%.*S", 
-		namespaceName.length(), namespaceName.getBuffer(), 
-		className.length(), className.getBuffer(),
-		traitUsedClassName.length(), traitUsedClassName.getBuffer());
-	mapKey.releaseBuffer(written);
-	*/
-	
 	// this code assumes that TraitUseFound() is called before TraitAliasFound()
 	std::map<UnicodeString, std::vector<mvceditor::TraitResourceClass>, UnicodeStringComparatorClass>::iterator it;
 	it = TraitCache.find(mapKey);
@@ -774,15 +765,6 @@ void mvceditor::ResourceFinderClass::TraitInsteadOfFound(const UnicodeString& na
 	mapKey += className;
 	mapKey += UNICODE_STRING_SIMPLE("-");
 	mapKey += traitUsedClassName;
-	
-	/*
-	int capacity = 10 + namespaceName.length() + 1 + className.length() + 1 + traitUsedClassName.length();
-	int written = u_sprintf(mapKey.getBuffer(capacity), "%.*S-%.*S-%.*S", 
-		namespaceName.length(), namespaceName.getBuffer(), 
-		className.length(), className.getBuffer(),
-		traitUsedClassName.length(), traitUsedClassName.getBuffer());
-	mapKey.releaseBuffer(written);
-	*/
 	
 	// this code assumes that TraitUseFound() is called before TraitAliasFound()
 	std::map<UnicodeString, std::vector<mvceditor::TraitResourceClass>, UnicodeStringComparatorClass>::iterator it;
@@ -821,6 +803,8 @@ void mvceditor::ResourceFinderClass::TraitUseFound(const UnicodeString& namespac
 	}
 
 	// only add if not already there
+	// key is a concatenation of file item id, fully qualified class and fully qualified trait
+	// this will make the alias and instead easier to update
 	UnicodeString mapKey;
 	mapKey += namespaceName;
 	mapKey += UNICODE_STRING_SIMPLE("-");
@@ -828,18 +812,6 @@ void mvceditor::ResourceFinderClass::TraitUseFound(const UnicodeString& namespac
 	mapKey += UNICODE_STRING_SIMPLE("-");
 	mapKey += fullyQualifiedTraitName;
 	
-	// 10 = max space for the FileItemId as a string
-	// key is a concatenation of file item id, fully qualified class and fully qualified trait
-	// this will make the alias and instead easier to update
-	/*
-	int capacity = 10 + namespaceName.length() + 1 + className.length() + 1 + fullyQualifiedTraitName.length();
-	int written = u_sprintf(mapKey.getBuffer(capacity), "%.*S-%.*S-%.*S", 
-		namespaceName.length(), namespaceName.getBuffer(), 
-		className.length(), className.getBuffer(),
-		fullyQualifiedTraitName.length(), fullyQualifiedTraitName.getBuffer());
-	mapKey.releaseBuffer(written);
-	*/
-
 	int count = TraitCache.count(mapKey);
 	if (count <= 0) {
 		newTraitResource.Key = QualifyName(namespaceName, className);
@@ -1926,6 +1898,13 @@ wxString  mvceditor::ResourceClass::GetFullPath() const {
 
 void mvceditor::ResourceClass::SetFullPath(const wxString& fullPath) {
 	FullPath = fullPath;
+}
+
+bool mvceditor::ResourceClass::HasParameters() const {
+
+	// watch out for default argument of "array()"
+	// look for the function name followed by parentheses
+	return Signature.indexOf(Identifier + UNICODE_STRING_SIMPLE("()")) < 0;
 }
 
 mvceditor::TraitResourceClass::TraitResourceClass() 
