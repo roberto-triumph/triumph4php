@@ -726,7 +726,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 
 	// test a built-in object query for all methods
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("PDO::"));
-	CHECK_VECTOR_SIZE(50, Matches);
+	CHECK_VECTOR_SIZE(91, Matches);
 	
 	// a fully qualified search
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("\\Exception"));

@@ -1407,7 +1407,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::ResourceSt
 	sql += whereCond;
 	sql += " ORDER BY key";
 	if (doLimit) {
-		sql += " LIMIT 50";
+		sql += " LIMIT 100";
 	}
 
 	std::vector<mvceditor::ResourceClass> matches;
