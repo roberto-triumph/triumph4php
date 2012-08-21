@@ -114,3 +114,15 @@ wxString mvceditor::StructsClass::RelativeFileName(const wxString &fullPath, wxS
 	}
 	return relativeName;
 }
+
+void mvceditor::StructsClass::ClearDetectedInfos() {
+	std::vector<mvceditor::DatabaseInfoClass>::iterator info = Infos.begin();
+	while(info != Infos.end()) {
+		if (info->IsDetected) {
+			info = Infos.erase(info);
+		}
+		else {
+			++info;
+		}
+	}
+}

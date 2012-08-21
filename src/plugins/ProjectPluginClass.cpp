@@ -326,7 +326,10 @@ void mvceditor::ProjectPluginClass::OnProjectDefine(wxCommandEvent& event) {
 		// re-start the project opening cycle
 		// clear the detected framework info
 		App.Structs.Frameworks.clear();
-		App.Structs.Infos.clear();
+
+		// only remove the database infos that were detected from
+		// PHP frameworks, leave the ones that the user created intact
+		App.Structs.ClearDetectedInfos();
 		wxCommandEvent readyEvt(mvceditor::EVENT_APP_READY);
 		OnAppReady(readyEvt);
 	}

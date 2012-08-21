@@ -166,6 +166,12 @@ public:
 	 */
 	wxString RelativeFileName(const wxString& fullPath, wxString& projectLabel) const;
 
+	/**
+	 * Removes all of the DatabaseInfo instances that were detected by
+	 * a PHP framework. This should be called before detection is re-attempted.
+	 */
+	void ClearDetectedInfos();
+
 };
 
 }
