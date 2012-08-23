@@ -276,7 +276,7 @@ ProjectListDialogGeneratedClass::ProjectListDialogGeneratedClass( wxWindow* pare
 	FlexGridSizer->Add( HelpLabel, 0, wxALL, 5 );
 	
 	wxArrayString ProjectsListChoices;
-	ProjectsList = new wxCheckListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, ProjectsListChoices, 0 );
+	ProjectsList = new wxCheckListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, ProjectsListChoices, wxLB_SINGLE );
 	FlexGridSizer->Add( ProjectsList, 1, wxALL|wxEXPAND, 5 );
 	
 	wxBoxSizer* CrudButtonsSizer;
@@ -291,6 +291,9 @@ ProjectListDialogGeneratedClass::ProjectListDialogGeneratedClass( wxWindow* pare
 	EditButton = new wxButton( this, wxID_ANY, _("Edit"), wxDefaultPosition, wxDefaultSize, 0 );
 	CrudButtonsSizer->Add( EditButton, 0, wxALL, 5 );
 	
+	AddFromDirectoryButton = new wxButton( this, wxID_ANY, _("Add Multiple"), wxDefaultPosition, wxDefaultSize, 0 );
+	CrudButtonsSizer->Add( AddFromDirectoryButton, 0, wxALL, 5 );
+	
 	FlexGridSizer->Add( CrudButtonsSizer, 1, wxEXPAND, 5 );
 	
 	ButtonsSizer = new wxStdDialogButtonSizer();
@@ -298,6 +301,8 @@ ProjectListDialogGeneratedClass::ProjectListDialogGeneratedClass( wxWindow* pare
 	ButtonsSizer->AddButton( ButtonsSizerOK );
 	ButtonsSizerCancel = new wxButton( this, wxID_CANCEL );
 	ButtonsSizer->AddButton( ButtonsSizerCancel );
+	ButtonsSizerHelp = new wxButton( this, wxID_HELP );
+	ButtonsSizer->AddButton( ButtonsSizerHelp );
 	ButtonsSizer->Realize();
 	FlexGridSizer->Add( ButtonsSizer, 1, wxEXPAND, 5 );
 	
@@ -314,7 +319,9 @@ ProjectListDialogGeneratedClass::ProjectListDialogGeneratedClass( wxWindow* pare
 	AddButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnAddButton ), NULL, this );
 	RemoveButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnRemoveButton ), NULL, this );
 	EditButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnEditButton ), NULL, this );
+	AddFromDirectoryButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnAddFromDirectoryButton ), NULL, this );
 	ButtonsSizerCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnCancelButton ), NULL, this );
+	ButtonsSizerHelp->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnHelpButton ), NULL, this );
 	ButtonsSizerOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnOkButton ), NULL, this );
 }
 
@@ -326,7 +333,9 @@ ProjectListDialogGeneratedClass::~ProjectListDialogGeneratedClass()
 	AddButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnAddButton ), NULL, this );
 	RemoveButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnRemoveButton ), NULL, this );
 	EditButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnEditButton ), NULL, this );
+	AddFromDirectoryButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnAddFromDirectoryButton ), NULL, this );
 	ButtonsSizerCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnCancelButton ), NULL, this );
+	ButtonsSizerHelp->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnHelpButton ), NULL, this );
 	ButtonsSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnOkButton ), NULL, this );
 	
 }

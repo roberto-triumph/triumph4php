@@ -31,6 +31,8 @@
 #include <wx/filename.h>
 #include <wx/fileconf.h>
 #include <wx/valgen.h>
+#include <wx/dir.h>
+#include <wx/dirdlg.h>
 #include <algorithm>
 
 static const int ID_FRAMEWORK_DETECTION_GAUGE = wxNewId();
@@ -528,18 +530,22 @@ void mvceditor::ProjectListDialogClass::OnAddButton(wxCommandEvent& event) {
 	mvceditor::ProjectClass project;
 	mvceditor::ProjectDefinitionDialogClass dialog(this, project);
 	if (wxOK == dialog.ShowModal()) {
-		EditedProjects.push_back(project);
-		wxString label = project.Label;
-
-		// escape any ampersands in the label, list box needs them escaped
-		// only happens in win32
-		wxPlatformInfo info = wxPlatformInfo::Get();
-		if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
-			label.Replace(wxT("&"), wxT("&&"));
-		}
-		ProjectsList->Append(label);
-		ProjectsList->Check(ProjectsList->GetCount() - 1, true);
+		AddProject(project);
 	}
+}
+
+void mvceditor::ProjectListDialogClass::AddProject(const mvceditor::ProjectClass& project) {
+	EditedProjects.push_back(project);
+	wxString label = project.Label;
+
+	// escape any ampersands in the label, list box needs them escaped
+	// only happens in win32
+	wxPlatformInfo info = wxPlatformInfo::Get();
+	if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
+		label.Replace(wxT("&"), wxT("&&"));
+	}
+	ProjectsList->Append(label);
+	ProjectsList->Check(ProjectsList->GetCount() - 1, true);
 }
 
 void mvceditor::ProjectListDialogClass::OnRemoveButton(wxCommandEvent& event) {
@@ -555,7 +561,14 @@ void mvceditor::ProjectListDialogClass::OnRemoveButton(wxCommandEvent& event) {
 		if (wxYES == response) {
 			RemovedProjects.push_back(EditedProjects[selection]);
 			EditedProjects.erase(EditedProjects.begin() + selection);
+			size_t oldSelection = ProjectsList->GetSelection();
 			ProjectsList->Delete(selection);
+			if (oldSelection < ProjectsList->GetCount()) {
+				ProjectsList->SetSelection(oldSelection);
+			}
+			else if (!ProjectsList->IsEmpty()) {
+				ProjectsList->SetSelection(ProjectsList->GetCount() - 1);
+			}
 		}
 	}
 }
@@ -612,6 +625,60 @@ void mvceditor::ProjectListDialogClass::Populate() {
 		ProjectsList->Append(label);
 		ProjectsList->Check(ProjectsList->GetCount() - 1, project.IsEnabled);
 	}
+}
+
+void mvceditor::ProjectListDialogClass::OnAddFromDirectoryButton(wxCommandEvent& event) {
+	wxString rootDir = wxDirSelector(_("Choose the directory where your projects are located"), wxEmptyString,
+		wxDD_DIR_MUST_EXIST, wxDefaultPosition, this);
+	if (!rootDir.IsEmpty()) {
+		wxDir dir(rootDir);
+		if (dir.IsOpened()) {
+			wxString fileName;
+			std::vector<wxString> subDirs;
+			bool cont = dir.GetFirst(&fileName, wxEmptyString, wxDIR_DIRS);
+			while (cont) {
+				subDirs.push_back(fileName);
+				cont = dir.GetNext(&fileName);
+			}
+			cont = !subDirs.empty();
+			if (!subDirs.empty()) {
+				int res = wxMessageBox(
+					wxString::Format(_("There are %d projects. Add them all?"), subDirs.size()), 
+					_("Add Projects From Directory"), wxCENTRE | wxYES_NO,  this);
+				cont = wxYES == res;
+			}
+			if (cont) {
+				for (size_t i = 0; i < subDirs.size(); ++i) {
+					mvceditor::ProjectClass project;
+					mvceditor::SourceClass newSrc;
+					newSrc.RootDirectory.AssignDir(rootDir);
+					newSrc.RootDirectory.AppendDir(subDirs[i]);
+					newSrc.SetIncludeWildcards(wxT("*.*"));
+					newSrc.SetExcludeWildcards(wxT(""));
+					project.AddSource(newSrc);
+					project.IsEnabled = true;
+					project.Label = subDirs[i];
+				
+					AddProject(project);
+				}
+			}
+			else if (subDirs.empty()) {
+				wxMessageBox(_("Directory does not contain any sub-directories"), 
+					_("Add Projects From Directory"), wxCENTRE, this);
+			}
+		}
+	}
+}
+
+void mvceditor::ProjectListDialogClass::OnHelpButton(wxCommandEvent& event) {
+	wxString help = wxString::FromAscii(
+		"Add: Will show the new project dialog\n"
+		"Remove: Will remove the selected project\n"
+		"Edit: Will edit the selected project\n"
+		"Add Multiple: Will create one project for each sub-directory of a given directory\n"
+	);
+	help = wxGetTranslation(help);
+	wxMessageBox(help, _("Defined Projects Help"), wxCENTRE, this);
 }
 
 BEGIN_EVENT_TABLE(mvceditor::ProjectPluginClass, wxEvtHandler)

@@ -226,6 +226,8 @@ protected:
 	void OnEditButton(wxCommandEvent& event);
 	void OnOkButton(wxCommandEvent& event);
 	void OnCancelButton(wxCommandEvent& event);
+	void OnAddFromDirectoryButton(wxCommandEvent& event);
+	void OnHelpButton(wxCommandEvent& event);
 
 public:
 
@@ -258,6 +260,13 @@ private:
 	 * add the project labels to the check list box
 	 */
 	void Populate();
+
+private:
+
+	/**
+	 * @param project to add to both the edited data structure and the GUI list
+	 */
+	void AddProject(const mvceditor::ProjectClass& project);
 
 };
 

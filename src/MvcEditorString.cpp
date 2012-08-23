@@ -158,10 +158,11 @@ int32_t mvceditor::FindPrevious(const UnicodeString& text, const UnicodeString& 
 }
 
 /**
- * conversion from wxString to C++ string
+ * conversion from wxString to C++ string. This should only be used
+ * when source is known to be an ascii string.
  */
 std::string mvceditor::WxToChar(const wxString& source) {
-	std::string s = std::string(source.mb_str());
+	std::string s = std::string(source.ToUTF8());
 	return s;
 }
 

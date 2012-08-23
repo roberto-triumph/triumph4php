@@ -91,7 +91,7 @@ class ProjectDefinitionDialogGeneratedClass : public wxDialog
 	
 	public:
 		
-		ProjectDefinitionDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Project Definition"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 536,492 ), long style = wxDEFAULT_DIALOG_STYLE );
+		ProjectDefinitionDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Project Definition"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 536,492 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~ProjectDefinitionDialogGeneratedClass();
 	
 };
@@ -121,7 +121,7 @@ class ProjectSourceDialogGeneratedClass : public wxDialog
 	
 	public:
 		
-		ProjectSourceDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Project Source"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 536,541 ), long style = wxDEFAULT_DIALOG_STYLE );
+		ProjectSourceDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Project Source"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 536,541 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~ProjectSourceDialogGeneratedClass();
 	
 };
@@ -139,9 +139,11 @@ class ProjectListDialogGeneratedClass : public wxDialog
 		wxButton* AddButton;
 		wxButton* RemoveButton;
 		wxButton* EditButton;
+		wxButton* AddFromDirectoryButton;
 		wxStdDialogButtonSizer* ButtonsSizer;
 		wxButton* ButtonsSizerOK;
 		wxButton* ButtonsSizerCancel;
+		wxButton* ButtonsSizerHelp;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnProjectsListDoubleClick( wxCommandEvent& event ) { event.Skip(); }
@@ -149,13 +151,15 @@ class ProjectListDialogGeneratedClass : public wxDialog
 		virtual void OnAddButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRemoveButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAddFromDirectoryButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		ProjectListDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Defined Projects"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 437,492 ), long style = wxDEFAULT_DIALOG_STYLE );
+		ProjectListDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Defined Projects"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 437,492 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~ProjectListDialogGeneratedClass();
 	
 };
