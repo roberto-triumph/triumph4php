@@ -174,7 +174,7 @@ private:
 	/**
 	 * the thread identifier, used to stop any running threads
 	 */
-	unsigned long RunningThreadId;
+	wxThreadIdType RunningThreadId;
 	
 	/**
 	 * populate the dialog according to the ApacheClass settings

@@ -103,7 +103,7 @@ public:
 	 *  }
 	 *
 	 */
-	wxThreadError CreateSingleInstance();
+	wxThreadError CreateSingleInstance(wxThreadIdType& threadId);
 	
 	/**
 	 * This is the method to override; this method is executed in the background thread.
@@ -218,7 +218,7 @@ private:
 	 *
 	 * @param thread ID of the thread to stop; see wxThread::GetId()
 	 */
-	void Stop(unsigned long threadId);
+	void Stop(wxThreadIdType threadId);
 
 	/**
 	 * adds an event handler to this instance.  Running threads will

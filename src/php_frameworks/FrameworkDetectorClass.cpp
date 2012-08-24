@@ -44,9 +44,9 @@ mvceditor::ResponseThreadWithHeartbeatClass::ResponseThreadWithHeartbeatClass(mv
 	, OutputFile() {
 }
 
-bool mvceditor::ResponseThreadWithHeartbeatClass::Init(wxFileName outputFile) {
+bool mvceditor::ResponseThreadWithHeartbeatClass::Init(wxFileName outputFile, wxThreadIdType& threadId) {
 	OutputFile = outputFile;
-	if (wxTHREAD_NO_ERROR == CreateSingleInstance()) {
+	if (wxTHREAD_NO_ERROR == CreateSingleInstance(threadId)) {
 		return true;
 	}
 	return false;
@@ -70,7 +70,6 @@ mvceditor::DetectorActionClass::DetectorActionClass(wxEvtHandler& handler, mvced
 	, CurrentPid(0)
 	, CurrentId(0) {
 	RunningThreads.AddEventHandler(this);
-	ThreadEventId = wxNewId();
 }
 
 mvceditor::DetectorActionClass::~DetectorActionClass() {
@@ -122,11 +121,8 @@ void mvceditor::DetectorActionClass::OnProcessComplete(wxCommandEvent& event) {
 	// kick off response parsing in a background thread.
 	// any running thread was stopped in Init()
 	mvceditor::ResponseThreadWithHeartbeatClass* thread = 
-		new mvceditor::ResponseThreadWithHeartbeatClass(*this, RunningThreads, ThreadEventId);
-	if (thread->Init(OutputFile)) {
-		RunningThreadId = thread->GetId();
-	}
-	else {
+		new mvceditor::ResponseThreadWithHeartbeatClass(*this, RunningThreads, CurrentId);
+	if (!thread->Init(OutputFile, RunningThreadId)) {
 		RunningThreadId = 0;
 		delete thread;
 	}
@@ -141,7 +137,7 @@ void mvceditor::DetectorActionClass::OnProcessFailed(wxCommandEvent& event) {
 }
 
 void mvceditor::DetectorActionClass::OnWorkInProgress(wxCommandEvent& event) {
-	if (event.GetId() == ThreadEventId) {
+	if (event.GetId() == CurrentId) {
 		
 		// users expect an EVENT_PROCESS_IN_PROGRESS event but this handler
 		// handles both EVENT_PROCESS_IN_PROGRESS AND EVENT_WORK_IN_PROGRESS
@@ -154,7 +150,7 @@ void mvceditor::DetectorActionClass::OnWorkInProgress(wxCommandEvent& event) {
 }
 
 void mvceditor::DetectorActionClass::OnWorkComplete(wxCommandEvent& event) {
-	if (event.GetId() == ThreadEventId) {
+	if (event.GetId() == CurrentId) {
 		RunningThreadId = 0;
 
 		// users expect an EVENT_PROCESS_COMPLETE event

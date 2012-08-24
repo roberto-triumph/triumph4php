@@ -51,7 +51,7 @@ public:
 
 	ResponseThreadWithHeartbeatClass(DetectorActionClass& action, mvceditor::RunningThreadsClass& runningThreads, int eventId);
 	
-	bool Init(wxFileName outputFile);
+	bool Init(wxFileName outputFile, wxThreadIdType& threadId);
 
 protected:
 
@@ -198,13 +198,8 @@ protected:
 	 * background thread is used to parse the detector response.
 	 * Keep the ID around in case this object goes out of scope
 	 */
-	unsigned long RunningThreadId;
+	wxThreadIdType RunningThreadId;
 	
-	/**
-	 *  to let each instance handle its own events
-	 */
-	int ThreadEventId;
-
 	/**
 	 * This handler will get notified after process has ended and response
 	 * has been parsed.
@@ -218,8 +213,14 @@ protected:
 
 private:
 
+	/**
+	 * to keep track of the external process (and kill it if need be)
+	 */
 	long CurrentPid;
 
+	/**
+	 *  to let each instance handle its own events
+	 */
 	int CurrentId;
 
 	DECLARE_EVENT_TABLE()

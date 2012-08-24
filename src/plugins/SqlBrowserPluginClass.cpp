@@ -140,7 +140,8 @@ void mvceditor::SqlConnectionDialogClass::OnTestButton(wxCommandEvent& event) {
 			
 			mvceditor::MultipleSqlExecuteClass* thread = new mvceditor::MultipleSqlExecuteClass(RunningThreads, ID_SQL_TEST, ConnectionIdentifier);
 			thread->Init(UNICODE_STRING_SIMPLE("SELECT 1"), TestQuery);
-			error = thread->CreateSingleInstance();
+			wxThreadIdType threadId;
+			error = thread->CreateSingleInstance(threadId);
 			switch (error) {
 			case wxTHREAD_NO_ERROR:
 				RunningThreadId = thread->GetId();
@@ -316,10 +317,10 @@ mvceditor::MultipleSqlExecuteClass::MultipleSqlExecuteClass(mvceditor::RunningTh
 	, QueryId(queryId) {
 }
 
-bool mvceditor::MultipleSqlExecuteClass::Execute() {
+bool mvceditor::MultipleSqlExecuteClass::Execute(wxThreadIdType& threadId) {
 	bool ret = false;
 	
-	wxThreadError error = CreateSingleInstance();
+	wxThreadError error = CreateSingleInstance(threadId);
 	switch (error) {
 	case wxTHREAD_NO_ERROR:
 		ret = true;
@@ -427,8 +428,7 @@ void mvceditor::SqlBrowserPanelClass::Execute() {
 	if (Check() && 0 == RunningThreadId) {
 		mvceditor::MultipleSqlExecuteClass* thread = new mvceditor::MultipleSqlExecuteClass(
 			Plugin->App.RunningThreads, QueryId, ConnectionIdentifier);
-		if (thread->Init(LastQuery, Query) && thread->Execute()) {
-			RunningThreadId = thread->GetId();
+		if (thread->Init(LastQuery, Query) && thread->Execute(RunningThreadId)) {
 			Gauge->AddGauge(_("Running SQL queries"), ID_SQL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 		}
 		else {
@@ -707,13 +707,13 @@ mvceditor::SqlMetaDataFetchClass::SqlMetaDataFetchClass(mvceditor::RunningThread
 		
 }
 
-bool mvceditor::SqlMetaDataFetchClass::Read(std::vector<mvceditor::DatabaseInfoClass> infos) {
+bool mvceditor::SqlMetaDataFetchClass::Read(std::vector<mvceditor::DatabaseInfoClass> infos, wxThreadIdType& threadId) {
 	bool ret = false;
 
 	// make sure to set these BEFORE calling CreateSingleInstance
 	// in order to prevent Entry from reading them while we write to them
 	Infos = infos;
-	wxThreadError err = CreateSingleInstance();
+	wxThreadError err = CreateSingleInstance(threadId);
 	if (wxTHREAD_NO_RESOURCE == err) {
 		mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
 	}
@@ -787,7 +787,8 @@ void mvceditor::SqlBrowserPluginClass::DetectMetadata() {
 	ChosenIndex = 0;
 	if (!App.Structs.Infos.empty()) {
 		mvceditor::SqlMetaDataFetchClass* thread = new mvceditor::SqlMetaDataFetchClass(App.RunningThreads, ID_SQL_METADATA_FETCH);
-		if (thread->Read(App.Structs.Infos)) {
+		wxThreadIdType threadId;
+		if (thread->Read(App.Structs.Infos, threadId)) {
 			GetStatusBarWithGauge()->AddGauge(_("Fetching SQL meta data"), ID_SQL_METADATA_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
 		}
 		else {
@@ -912,7 +913,8 @@ void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event
 
 		// redetect the SQL meta data
 		mvceditor::SqlMetaDataFetchClass* thread = new mvceditor::SqlMetaDataFetchClass(App.RunningThreads, ID_SQL_METADATA_FETCH);
-		if (!thread->Read(App.Structs.Infos)) {
+		wxThreadIdType threadId;
+		if (!thread->Read(App.Structs.Infos, threadId)) {
 			delete thread;
 		}
 	}

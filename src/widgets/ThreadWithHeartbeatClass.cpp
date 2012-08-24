@@ -39,10 +39,11 @@ mvceditor::ThreadWithHeartbeatClass::~ThreadWithHeartbeatClass() {
 	
 }
 
-wxThreadError mvceditor::ThreadWithHeartbeatClass::CreateSingleInstance() {
+wxThreadError mvceditor::ThreadWithHeartbeatClass::CreateSingleInstance(wxThreadIdType& threadId) {
 	wxThreadError error = wxTHREAD_NO_ERROR;
 	error = Create();
 	if (error == wxTHREAD_NO_ERROR) {
+		threadId = GetId();
 		SignalStart();
 		Run();
 	}
@@ -56,7 +57,8 @@ void mvceditor::ThreadWithHeartbeatClass::SignalStart() {
 void mvceditor::ThreadWithHeartbeatClass::SignalEnd() {
 	Timer.Stop();
 	wxCommandEvent evt(mvceditor::EVENT_WORK_COMPLETE, EventId);
-	evt.SetString(wxString::Format(_("Thread %ld stopped...\n"), GetId()));
+	wxString msg = wxString::Format(_("Thread %ld stopped...\n"), GetId());
+	evt.SetString(msg);
 	PostEvent(evt);
 }
 
@@ -68,7 +70,7 @@ void mvceditor::ThreadWithHeartbeatClass::OnTimer(wxTimerEvent& event) {
 void* mvceditor::ThreadWithHeartbeatClass::Entry() {
 	RunningThreads.Add(this);
 	BackgroundWork();
-	
+				
 	// by doing this the owner can know when the work has been done
 	// since we are using detached threads, the thread delete themselves
 	BackgroundCleanup();
@@ -152,7 +154,7 @@ void mvceditor::RunningThreadsClass::StopAll() {
 	}
 }
 
-void mvceditor::RunningThreadsClass::Stop(unsigned long threadId) {
+void mvceditor::RunningThreadsClass::Stop(wxThreadIdType threadId) {
 	wxThread* thread = NULL;
 	{
 		wxMutexLocker locker(Mutex);

@@ -100,7 +100,7 @@ public:
 	 * Will start the background thread 
 	 * 
 	 */
-	wxThreadError Init();
+	wxThreadError Init(wxThreadIdType& threadId);
 	
 	/**
 	 * this method blocks until the background thread terminates

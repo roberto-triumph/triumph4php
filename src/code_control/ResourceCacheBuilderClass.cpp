@@ -57,8 +57,8 @@ mvceditor::WorkingCacheBuilderClass::WorkingCacheBuilderClass(
 	, CurrentVersion(pelet::PHP_53) {
 }
 
-wxThreadError mvceditor::WorkingCacheBuilderClass::Init() {
-	wxThreadError error = CreateSingleInstance();
+wxThreadError mvceditor::WorkingCacheBuilderClass::Init(wxThreadIdType& threadId) {
+	wxThreadError error = CreateSingleInstance(threadId);
 	return error;
 }
 

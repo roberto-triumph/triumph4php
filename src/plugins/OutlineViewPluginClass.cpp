@@ -66,7 +66,7 @@ mvceditor::ResourceFinderBackgroundThreadClass::ResourceFinderBackgroundThreadCl
 	, FileName() {
 }
 
-bool mvceditor::ResourceFinderBackgroundThreadClass::Start(const wxString& fileName, const mvceditor::EnvironmentClass& environment) {
+bool mvceditor::ResourceFinderBackgroundThreadClass::Start(const wxString& fileName, const mvceditor::EnvironmentClass& environment, wxThreadIdType& threadId) {
 	FileName = fileName;
 	
 	// need this so that the resource finder parsers the file
@@ -74,7 +74,7 @@ bool mvceditor::ResourceFinderBackgroundThreadClass::Start(const wxString& fileN
 	ResourceFinder.FileFilters.push_back(wxT("*.*"));
 	
 	ResourceFinder.SetVersion(environment.Php.Version);
-	wxThreadError error = CreateSingleInstance();
+	wxThreadError error = CreateSingleInstance(threadId);
 	bool created = wxTHREAD_NO_ERROR == error;
 	return created;
 }
@@ -160,7 +160,8 @@ void mvceditor::OutlineViewPluginClass::BuildOutlineCurrentCodeControl() {
 		// this pointer will delete itself when the thread terminates
 		mvceditor::ResourceFinderBackgroundThreadClass* thread = 
 			new mvceditor::ResourceFinderBackgroundThreadClass(App.RunningThreads, ID_RESOURCE_FINDER_BACKGROUND);
-		if (thread->Start(code->GetFileName(), *GetEnvironment())) {
+		wxThreadIdType threadId;
+		if (thread->Start(code->GetFileName(), *GetEnvironment(), threadId)) {
 			wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 			if (window != NULL) {
 				OutlineViewPluginPanelClass* outlineViewPanel = (OutlineViewPluginPanelClass*)window;
@@ -230,7 +231,8 @@ void mvceditor::OutlineViewPluginClass::OnOutlineMenu(wxCommandEvent& event) {
 				// the first time, get all of the classes to put in th drop down. note
 				// that this can take a while, do it in the background
 				mvceditor::GlobalClassesThreadClass* thread = new mvceditor::GlobalClassesThreadClass(App.RunningThreads, ID_GLOBAL_CLASSES_THREAD);
-				if (!thread->Init(App.Structs.Projects) || wxTHREAD_NO_ERROR != thread->CreateSingleInstance()) {
+				wxThreadIdType threadId;
+				if (!thread->Init(App.Structs.Projects) || wxTHREAD_NO_ERROR != thread->CreateSingleInstance(threadId)) {
 					delete thread;
 				}
 			}

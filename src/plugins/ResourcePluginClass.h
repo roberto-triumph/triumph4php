@@ -355,7 +355,7 @@ private:
 	 */
 	std::queue<mvceditor::ProjectClass> ProjectQueue;
 
-	unsigned long RunningThreadId;
+	wxThreadIdType RunningThreadId;
 
 	DECLARE_EVENT_TABLE()
 };

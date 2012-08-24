@@ -82,13 +82,13 @@ public:
 	 * Start a process ASYNCHRONOUSLY
 	 *
 	 * @param command the command to start (with arguments as well)
-	 * @param int commandId command ID will be used when an EVENT_PROCESS_* is genereated
+	 * @param int eventId event ID will be used when an EVENT_PROCESS_* is genereated
 	 *        this way the caller can correlate a command to an event.
 	 * @param pid the PID of the new process will be set here
 	 * @return bool TRUE if the command was started successfully. if FALSE then 
 	 *         command is invalid or command is not found.
 	 */
-	bool Init(wxString command, int commandId, long& pid);
+	bool Init(wxString command, int eventId, long& pid);
 
 	/**
 	 * stop a running process.
@@ -139,6 +139,11 @@ private:
 	 * Any EVENT_PROCESS_* events are sent to this handler.
 	 */
 	wxEvtHandler& Handler;
+
+	/**
+	 * All generated events will have this ID
+	 */
+	int EventId;
 
 	/**
 	 * how often we check the process for new output

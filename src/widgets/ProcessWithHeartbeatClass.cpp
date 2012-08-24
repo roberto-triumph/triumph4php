@@ -34,7 +34,8 @@ mvceditor::ProcessWithHeartbeatClass::ProcessWithHeartbeatClass(wxEvtHandler& ha
 	: wxEvtHandler()
 	, RunningProcesses()
 	, Timer()
-	, Handler(handler) {
+	, Handler(handler) 
+	, EventId(0) {
 	Timer.SetOwner(this);
 }
 
@@ -50,8 +51,9 @@ mvceditor::ProcessWithHeartbeatClass::~ProcessWithHeartbeatClass() {
 	}
 }
 
-bool mvceditor::ProcessWithHeartbeatClass::Init(wxString command, int commandId, long& pid) {
-	wxProcess* newProcess = new wxProcess(this, commandId);
+bool mvceditor::ProcessWithHeartbeatClass::Init(wxString command, int eventId, long& pid) {
+	wxProcess* newProcess = new wxProcess(this, eventId);
+	EventId = eventId;
 	newProcess->Redirect();
 
 	// dont use newProcess::GetPid(), it seems to always return zero.
@@ -156,7 +158,7 @@ wxString mvceditor::ProcessWithHeartbeatClass::GetProcessOutput(wxProcess* proc)
 }
 
 void mvceditor::ProcessWithHeartbeatClass::OnTimer(wxTimerEvent& event) {
-	wxCommandEvent intProgressEvent(mvceditor::EVENT_PROCESS_IN_PROGRESS, wxID_ANY);
+	wxCommandEvent intProgressEvent(mvceditor::EVENT_PROCESS_IN_PROGRESS, EventId);
 	wxPostEvent(&Handler, intProgressEvent);
 }
 

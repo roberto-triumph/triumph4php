@@ -170,7 +170,7 @@ public:
 	 * return bool TRUE if and only if the thread was started.  If false, either thread could
 	 * not be started or directory is not valid. 
 	 */
-	bool BeginDirectoryLint(std::vector<mvceditor::SourceClass> sources, const EnvironmentClass& environment, StartError& error);
+	bool BeginDirectoryLint(std::vector<mvceditor::SourceClass> sources, const EnvironmentClass& environment, StartError& error, wxThreadIdType& threadId);
 
 	/**
 	 * Lint checks the given file in the current thread.  This is a thread-safe method;
@@ -332,7 +332,7 @@ private:
 	/**
 	 * to stop the lint background thread if the user closes the tab
 	 */
-	unsigned long RunningThreadId;
+	wxThreadIdType RunningThreadId;
 
 	/**
 	 * This will hold all info about parse errors.

@@ -99,13 +99,14 @@ mvceditor::LintBackgroundFileReaderClass::LintBackgroundFileReaderClass(mvcedito
 
 bool mvceditor::LintBackgroundFileReaderClass::BeginDirectoryLint(std::vector<mvceditor::SourceClass> sources,
 																  const mvceditor::EnvironmentClass& environment,
-																  mvceditor::BackgroundFileReaderClass::StartError& error) {
+																  mvceditor::BackgroundFileReaderClass::StartError& error,
+																  wxThreadIdType& threadId) {
 	bool good = false;
 	error = mvceditor::BackgroundFileReaderClass::NONE;
 	if (Init(sources)) {
 		ParserDirectoryWalker.SetVersion(environment.Php.Version);
 		ParserDirectoryWalker.ResetTotals();
-		if (StartReading(error)) {
+		if (StartReading(error, threadId)) {
 			good = true;
 		}
 	}
@@ -314,8 +315,7 @@ void mvceditor::LintPluginClass::OnLintMenu(wxCommandEvent& event) {
 	if (App.Structs.HasSources()) {
 		mvceditor::BackgroundFileReaderClass::StartError error;
 		mvceditor::LintBackgroundFileReaderClass* thread = new mvceditor::LintBackgroundFileReaderClass(App.RunningThreads, ID_LINT_READER);
-		if (thread->BeginDirectoryLint(App.Structs.AllEnabledSources(), *GetEnvironment(), error)) {
-			RunningThreadId = thread->GetId();
+		if (thread->BeginDirectoryLint(App.Structs.AllEnabledSources(), *GetEnvironment(), error, RunningThreadId)) {
 			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 			gauge->AddGauge(_("Lint Check"), ID_LINT_RESULTS_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 			

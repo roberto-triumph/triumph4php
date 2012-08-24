@@ -277,7 +277,7 @@ private:
 	/**
 	 * to stop the thread if this panel is closed.
 	 */
-	unsigned long RunningThreadId;
+	wxThreadIdType RunningThreadId;
 	
 	/**
 	 * Enable the controls that allow the user to replace hits or stop searches.

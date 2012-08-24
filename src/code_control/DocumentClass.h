@@ -385,7 +385,7 @@ private:
 	 * We keep the thread ID around so that we stop the thread when
 	 * this code control goes out of scope.
 	 */
-	unsigned long RunningThreadId;
+	wxThreadIdType RunningThreadId;
 
 	/**
 	 * ID assigned to this document's thread. note that each code control has its own

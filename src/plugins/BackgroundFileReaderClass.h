@@ -143,9 +143,13 @@ public:
 	 * Will create a new thread and run it. If an existing thread is already running,
 	 * it will be destroyed. This means that objects of this class will handle at most 
 	 * 1 concurrently running thread at a time.
+	 *
+	 * @param error if thread could not be started
+	 * @param threadId will be set with the new thread Id, thread Id can be used to stop the thread
+	 * @see wxThread::GetId()
 	 * @return bool true if thread was created
 	 */
-	bool StartReading(StartError &error);
+	bool StartReading(StartError &error, wxThreadIdType& threadId);
 
 protected: 
 

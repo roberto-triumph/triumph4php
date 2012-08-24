@@ -59,7 +59,7 @@ void mvceditor::CallStackThreadClass::InitCallStack(mvceditor::ResourceCacheClas
 }
 
 bool mvceditor::CallStackThreadClass::InitThread(const wxFileName& startFileName, const UnicodeString& className, const UnicodeString& methodName,
-												 pelet::Versions version, const wxFileName& persistFile) {
+												 pelet::Versions version, const wxFileName& persistFile, wxThreadIdType& threadId) {
 	bool ret = false;
 
 	// make sure to set these BEFORE calling CreateSingleInstance
@@ -69,7 +69,7 @@ bool mvceditor::CallStackThreadClass::InitThread(const wxFileName& startFileName
 	MethodName = methodName;
 	Version = version;
 	PersistFile = persistFile;
-	wxThreadError threadError = CreateSingleInstance();
+	wxThreadError threadError = CreateSingleInstance(threadId);
 	if (threadError == wxTHREAD_NO_RESOURCE) {
 		mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
 	}
@@ -183,7 +183,8 @@ void mvceditor::ViewFilePluginClass::StartDetection() {
 			mvceditor::CallStackThreadClass* thread = 
 				new mvceditor::CallStackThreadClass(App.RunningThreads, ID_CALL_STACK_THREAD);
 			thread->InitCallStack(*GetResourceCache());
-			if (!thread->InitThread(fileName, className, methodName, GetEnvironment()->Php.Version, CallStackPersistFile)) {
+			wxThreadIdType threadId;
+			if (!thread->InitThread(fileName, className, methodName, GetEnvironment()->Php.Version, CallStackPersistFile, threadId)) {
 				mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Call stack file creation failed"));
 				delete thread;
 			}

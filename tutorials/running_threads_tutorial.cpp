@@ -53,7 +53,7 @@ private:
 
 	mvceditor::RunningThreadsClass& RunningThreads;
 	wxTextCtrl* Text;
-	unsigned long RunningThreadId;
+	wxThreadIdType RunningThreadId;
 
 	DECLARE_EVENT_TABLE()
 };
@@ -114,8 +114,7 @@ void MyFrame::AddMenu() {
 
 void MyFrame::OnStartNewThread(wxCommandEvent& event) {
 	MyThread* thread = new MyThread(RunningThreads, ID_THREAD);
-	if (wxTHREAD_NO_ERROR == thread->CreateSingleInstance()) {
-		RunningThreadId = thread->GetId();
+	if (wxTHREAD_NO_ERROR == thread->CreateSingleInstance(RunningThreadId)) {
 		Text->AppendText(wxString::Format(_("Thread %ld started...\n"), RunningThreadId));
 	}
 }

@@ -323,10 +323,7 @@ void mvceditor::PhpDocumentClass::AttachToControl(CodeControlClass* ctrl) {
 	wxASSERT(0 == RunningThreadId);
 	wxASSERT(NULL == WorkingCacheBuilder);
 	WorkingCacheBuilder = new mvceditor::WorkingCacheBuilderClass(RunningThreads, WorkingCacheEventId);
-	if (wxTHREAD_NO_ERROR == WorkingCacheBuilder->Init()) {
-		RunningThreadId = WorkingCacheBuilder->GetId();
-	}
-	else {
+	if (wxTHREAD_NO_ERROR != WorkingCacheBuilder->Init(RunningThreadId)) {
 		delete WorkingCacheBuilder;
 		WorkingCacheBuilder = NULL;
 		RunningThreadId = 0;

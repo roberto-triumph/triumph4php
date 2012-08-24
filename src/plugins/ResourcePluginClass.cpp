@@ -246,8 +246,7 @@ void mvceditor::ResourcePluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 
 	wxString projectLabel;
 	mvceditor::ResourceFileReaderClass* thread = ReadNextProject(version, projectLabel);
-	if (thread && thread->StartReading(error)) {
-		RunningThreadId = thread->GetId();
+	if (thread && thread->StartReading(error, RunningThreadId)) {
 		State = INDEXING_PROJECT;
 		GetStatusBarWithGauge()->AddGauge(_("Indexing ") + projectLabel, ID_RESOURCE_READER_GAUGE, 
 			StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
@@ -304,8 +303,7 @@ void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
 			mvceditor::ResourceFileReaderClass* thread = ReadNextProject(GetEnvironment()->Php.Version, projectLabel);
 			if (thread) {
 				mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
-				if (thread->StartReading(error)) {
-					RunningThreadId = thread->GetId();
+				if (thread->StartReading(error, RunningThreadId)) {
 					GetStatusBarWithGauge()->StopGauge(ID_RESOURCE_READER_GAUGE);
 					GetStatusBarWithGauge()->AddGauge(_("Indexing ") + projectLabel, 
 						ID_RESOURCE_READER_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
@@ -395,8 +393,7 @@ void mvceditor::ResourcePluginClass::StartIndex() {
 				wxString projectLabel;
 				mvceditor::ResourceFileReaderClass* thread = ReadNextProject(GetEnvironment()->Php.Version, projectLabel);
 				mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
-				if (thread && thread->StartReading(error)) {
-					RunningThreadId = thread->GetId();
+				if (thread && thread->StartReading(error, RunningThreadId)) {
 					State = INDEXING_PROJECT;
 					GetStatusBarWithGauge()->AddGauge(_("Indexing ") + projectLabel,
 						ID_RESOURCE_READER_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE,
@@ -446,7 +443,8 @@ void mvceditor::ResourcePluginClass::OnProjectWipeAndIndex(wxCommandEvent& event
 	mvceditor::ResourceFileWipeThreadClass* thread = new mvceditor::ResourceFileWipeThreadClass(App.RunningThreads, ID_WIPE_THREAD);
 	bool  wipeStarted = false;
 	if  (thread->Init(App.Structs.Projects)) {
-		wxThreadError error = thread->CreateSingleInstance();
+		wxThreadIdType threadId;
+		wxThreadError error = thread->CreateSingleInstance(threadId);
 		if (wxTHREAD_NO_ERROR == error) {
 			wipeStarted = true;
 			GetStatusBarWithGauge()->AddGauge(_("Indexing Projects"),
@@ -599,12 +597,11 @@ void mvceditor::ResourcePluginClass::OnAppFileClosed(wxCommandEvent& event) {
 			mvceditor::BackgroundFileReaderClass::StartError error;
 
 			// show user the error? not for now as they cannot do anything about it
-			if (!thread->StartReading(error)) {
+			if (!thread->StartReading(error, RunningThreadId)) {
 				delete thread;
 			}
 			else {
-				RunningThreadId = thread->GetId();
-				
+
 				// file can only belong to one project?
 				break;
 			}

@@ -50,10 +50,10 @@ bool mvceditor::BackgroundFileReaderClass::InitMatched(const std::vector<wxStrin
 	return !matchedFiles.empty();
 }
 
-bool mvceditor::BackgroundFileReaderClass::StartReading(StartError& error) {
+bool mvceditor::BackgroundFileReaderClass::StartReading(StartError& error, wxThreadIdType& threadId) {
 	error = NONE;
 	bool ret = false;
-	wxThreadError threadError = CreateSingleInstance();
+	wxThreadError threadError = CreateSingleInstance(threadId);
 	if (threadError == wxTHREAD_NO_RESOURCE) {
 		error = NO_RESOURCES;
 	}

@@ -95,7 +95,7 @@ public:
 	 * starts the background thread
 	 */
 	bool InitThread(const wxFileName& fileName, const UnicodeString& className, const UnicodeString& methodName, pelet::Versions version,
-		const wxFileName& persistFileName);
+		const wxFileName& persistFileName, wxThreadIdType& threadId);
 	
 protected:
 	

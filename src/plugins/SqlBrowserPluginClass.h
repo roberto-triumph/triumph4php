@@ -161,9 +161,10 @@ public:
 	
 	/**
 	 * start a new thread and execute the current query.
+	 * @param threadId if thread was started, the thread Id will be set.
 	 * @return bool true if a new thread was started
 	 */
-	bool Execute();
+	bool Execute(wxThreadIdType& threadId);
 	
 	/**
 	 * cleans up the current connection. After a call to this session, stmt, and row are no longer
@@ -341,7 +342,7 @@ private:
 	/**
 	 * used to process stop a running query if this panel is closed.
 	 */
-	unsigned long RunningThreadId;
+	wxThreadIdType RunningThreadId;
 	
 	/**
 	 * the accumulated results. This class will DELETE the pointers once it has rendered them.
@@ -432,9 +433,10 @@ public:
 	 *
 	 * @see mvceditor::ThreadWithHearbeatClass
 	 * @param infos the connections to fetch info for.
+	 * @param threadId if thread was started the thread id will be set
 	 * @return bool TRUE if thread was started
 	 */
-	bool Read(std::vector<DatabaseInfoClass> infos);
+	bool Read(std::vector<DatabaseInfoClass> infos, wxThreadIdType& threadId);
 	
 protected:
 

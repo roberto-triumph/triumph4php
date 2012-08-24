@@ -101,8 +101,11 @@ public:
 	 * start the background thread that parses the given file.
 	 * @filename the file to parse
 	 * @param environment to get the php version
+	 * @param if thread was started, tghe thread Id will be set. the thread Id
+	 *        can be used to stop the thread
+	 * @see wxThread::GetId
 	 */
-	bool Start(const wxString& fileName, const EnvironmentClass& environment);
+	bool Start(const wxString& fileName, const EnvironmentClass& environment, wxThreadIdType& threadId);
 
 protected:
 
