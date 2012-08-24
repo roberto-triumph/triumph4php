@@ -479,6 +479,7 @@ void mvceditor::ResourcePluginClass::OnJump(wxCommandEvent& event) {
 		wxString term = codeControl->GetTextRange(startPos, endPos);
 	
 		std::vector<mvceditor::ResourceClass> matches = codeControl->GetCurrentSymbolResource();
+		RemoveNativeMatches(matches);
 		if (!matches.empty()) {
 			UnicodeString res = matches[0].ClassName + UNICODE_STRING_SIMPLE("::") + matches[0].Identifier;
 			if (matches.size() == 1) {
