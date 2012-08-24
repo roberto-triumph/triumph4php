@@ -30,30 +30,33 @@
 mvceditor::ProjectClass::ProjectClass()
 	: Label()
 	, Sources()
+	, PhpFileExtensions()
+	, CssFileExtensions()
+	, SqlFileExtensions()
+	, MiscFileExtensions()
 	, ResourceDbFileName() 
-	, IsEnabled(true)
-	, PhpFileFilters()
-	, CssFileFilters()
-	, SqlFileFilters() {
+	, IsEnabled(true) {
 }
 
 mvceditor::ProjectClass::ProjectClass(const mvceditor::ProjectClass& project)
 	: Label(project.Label)
 	, Sources(project.Sources)
+	, PhpFileExtensions(project.PhpFileExtensions)
+	, CssFileExtensions(project.CssFileExtensions)
+	, SqlFileExtensions(project.SqlFileExtensions) 
+	, MiscFileExtensions(project.MiscFileExtensions)
 	, ResourceDbFileName(project.ResourceDbFileName) 
-	, IsEnabled(project.IsEnabled)
-	, PhpFileFilters(project.PhpFileFilters)
-	, CssFileFilters(project.CssFileFilters)
-	, SqlFileFilters(project.SqlFileFilters) {
+	, IsEnabled(project.IsEnabled) {
 }
 
 void mvceditor::ProjectClass::operator=(const mvceditor::ProjectClass& project) {
 	Label = project.Label;
 	Sources = project.Sources;
 	IsEnabled = project.IsEnabled;
-	PhpFileFilters = project.PhpFileFilters;
-	CssFileFilters = project.CssFileFilters;
-	SqlFileFilters = project.SqlFileFilters;
+	PhpFileExtensions = project.PhpFileExtensions;
+	CssFileExtensions = project.CssFileExtensions;
+	SqlFileExtensions = project.SqlFileExtensions;
+	MiscFileExtensions = project.MiscFileExtensions;
 	ResourceDbFileName = project.ResourceDbFileName;
 }
 
@@ -66,11 +69,19 @@ void mvceditor::ProjectClass::ClearSources() {
 }
 
 std::vector<mvceditor::SourceClass> mvceditor::ProjectClass::AllPhpSources() const {
+	wxString phpExtensionsString;
+	for (size_t i = 0; i < PhpFileExtensions.size(); ++i) {
+		phpExtensionsString.Append(PhpFileExtensions[i]);
+		if (i < (PhpFileExtensions.size() - 1)) {
+			phpExtensionsString.Append(wxT(';'));
+		}
+	}
+
 	std::vector<mvceditor::SourceClass> phpSources;
 	for (size_t i = 0; i < Sources.size(); ++i) {
 		mvceditor::SourceClass phpSrc;
 		phpSrc.RootDirectory = Sources[i].RootDirectory;
-		phpSrc.SetIncludeWildcards(GetPhpFileExtensionsString());
+		phpSrc.SetIncludeWildcards(phpExtensionsString);
 		phpSources.push_back(phpSrc);
 	}
 	return phpSources;
@@ -104,6 +115,7 @@ wxString mvceditor::ProjectClass::RelativeFileName(const wxString& fullPath) con
 	return relativeName;
 }
 
+/*
 wxString mvceditor::ProjectClass::GetPhpFileExtensionsString() const {
 	wxString all;
 	for (size_t i = 0; i < PhpFileFilters.size(); ++i) {
@@ -172,6 +184,7 @@ wxString mvceditor::ProjectClass::GetSqlFileExtensionsString() const {
 	}
 	return all;
 }
+
 std::vector<wxString> mvceditor::ProjectClass::GetSqlFileExtensions() const {
 	std::vector<wxString> cpy;
 	for (size_t i = 0; i <SqlFileFilters.size(); ++i) {
@@ -189,6 +202,7 @@ void mvceditor::ProjectClass::SetSqlFileExtensionsString(wxString wildcardString
 		SqlFileFilters.push_back(wildcard);
 	}
 }
+*/
 
 bool mvceditor::ProjectClass::MakeResourceDbFileName() {
 	if (ResourceDbFileName.IsOk()) {

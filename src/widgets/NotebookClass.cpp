@@ -392,15 +392,15 @@ std::vector<wxString> mvceditor::NotebookClass::GetOpenedFiles() const {
 }
 
 wxString mvceditor::NotebookClass::CreateWildcardString() const {
-	wxString phpLabel = Structs->PhpFileFiltersString,
-		cssLabel = Structs->CssFileFiltersString,
-		sqlLabel = Structs->SqlFileFiltersString;
+	wxString phpLabel = Structs->PhpFileExtensionsString,
+		cssLabel = Structs->CssFileExtensionsString,
+		sqlLabel = Structs->SqlFileExtensionsString;
 	phpLabel.Replace(wxT(";"), wxT(" "));
 	cssLabel.Replace(wxT(";"), wxT(" "));
 	sqlLabel.Replace(wxT(";"), wxT(" "));
-	wxString php = Structs->PhpFileFiltersString,
-		css = Structs->CssFileFiltersString,
-		sql = Structs->SqlFileFiltersString;
+	wxString php = Structs->PhpFileExtensionsString,
+		css = Structs->CssFileExtensionsString,
+		sql = Structs->SqlFileExtensionsString;
 
 	wxString fileFilter = 
 		wxString::Format(wxT("PHP Files (%s)|%s|"), phpLabel.c_str(), php.c_str()) +

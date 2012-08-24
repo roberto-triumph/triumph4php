@@ -32,9 +32,13 @@ mvceditor::GlobalCacheClass::GlobalCacheClass()
 
 }
 
-void mvceditor::GlobalCacheClass::Init(const wxFileName& resourceDbFileName, const std::vector<wxString>& phpFileFilters, pelet::Versions version, int fileParsingBuffer) {
+void mvceditor::GlobalCacheClass::Init(const wxFileName& resourceDbFileName, 
+									   const std::vector<wxString>& phpFileExtensions, 
+									   const std::vector<wxString>& miscFileExtensions,
+									   pelet::Versions version, int fileParsingBuffer) {
 	ResourceDbFileName = resourceDbFileName;
-	ResourceFinder.FileFilters = phpFileFilters;
+	ResourceFinder.PhpFileExtensions = phpFileExtensions;
+	ResourceFinder.MiscFileExtensions = miscFileExtensions;
 	ResourceFinder.SetVersion(version);
 	ResourceFinder.InitFile(resourceDbFileName, fileParsingBuffer);
 }
@@ -75,7 +79,7 @@ void mvceditor::WorkingCacheClass::Init(const wxString& fileName, bool isNew, pe
 	if (createSymbols) {
 
 		// ATTN: not using the configured php file filters, file is assume to be a PHP file
-		ResourceFinder.FileFilters.push_back(wxT("*.*"));
+		ResourceFinder.PhpFileExtensions.push_back(wxT("*.*"));
 		ResourceFinder.BeginSearch();
 		ResourceFinder.Walk(fileName);
 		ResourceFinder.EndSearch();

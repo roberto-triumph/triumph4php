@@ -66,7 +66,7 @@ ProjectPluginGeneratedPanelClass::ProjectPluginGeneratedPanelClass( wxWindow* pa
 	AssociationsGridSizer->Add( AssociationsBoxSizer, 1, wxEXPAND, 5 );
 	
 	wxFlexGridSizer* AssociationsFormSizer;
-	AssociationsFormSizer = new wxFlexGridSizer( 3, 2, 0, 0 );
+	AssociationsFormSizer = new wxFlexGridSizer( 4, 2, 0, 0 );
 	AssociationsFormSizer->AddGrowableCol( 1 );
 	AssociationsFormSizer->SetFlexibleDirection( wxBOTH );
 	AssociationsFormSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
@@ -75,22 +75,29 @@ ProjectPluginGeneratedPanelClass::ProjectPluginGeneratedPanelClass( wxWindow* pa
 	PhpLabel->Wrap( -1 );
 	AssociationsFormSizer->Add( PhpLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	PhpFileFilters = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	AssociationsFormSizer->Add( PhpFileFilters, 1, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+	PhpFileExtensions = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	AssociationsFormSizer->Add( PhpFileExtensions, 1, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 	
 	CssLabel = new wxStaticText( this, wxID_ANY, _("CSS Files"), wxDefaultPosition, wxDefaultSize, 0 );
 	CssLabel->Wrap( -1 );
 	AssociationsFormSizer->Add( CssLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	CssFileFilters = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	AssociationsFormSizer->Add( CssFileFilters, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+	CssFileExtensions = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	AssociationsFormSizer->Add( CssFileExtensions, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 	
 	SqlLabel = new wxStaticText( this, wxID_ANY, _("SQL Files"), wxDefaultPosition, wxDefaultSize, 0 );
 	SqlLabel->Wrap( -1 );
 	AssociationsFormSizer->Add( SqlLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	SqlFileFilters = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	AssociationsFormSizer->Add( SqlFileFilters, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+	SqlFileExtensions = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	AssociationsFormSizer->Add( SqlFileExtensions, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+	
+	MiscLabel = new wxStaticText( this, wxID_ANY, _("Misc. Files"), wxDefaultPosition, wxDefaultSize, 0 );
+	MiscLabel->Wrap( -1 );
+	AssociationsFormSizer->Add( MiscLabel, 0, wxALL, 5 );
+	
+	MiscFileExtensions = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	AssociationsFormSizer->Add( MiscFileExtensions, 1, wxALL|wxEXPAND, 5 );
 	
 	AssociationsGridSizer->Add( AssociationsFormSizer, 3, wxEXPAND, 5 );
 	

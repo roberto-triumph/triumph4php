@@ -93,17 +93,24 @@ public:
 	/**
 	 * Serialized PHP file filters string from the config
 	 */
-	wxString PhpFileFiltersString;
+	wxString PhpFileExtensionsString;
 
 	/**
 	 * Serialized CSS file filters string from the config
 	 */
-	wxString CssFileFiltersString;
+	wxString CssFileExtensionsString;
 
 	/**
 	 * Serialized SQL file filters string from the config
 	 */
-	wxString SqlFileFiltersString;
+	wxString SqlFileExtensionsString;
+
+	/**
+	 * Serialized miscalleneous file filters string from the config
+	 * basically any files that we want to open in the editor, like
+	 * XML files, YML files, etc...
+	 */
+	wxString MiscFileExtensionsString;
 
 	/**
 	 * framework info that was detected
@@ -125,22 +132,34 @@ public:
 	bool HasSources() const;
 
 	/**
-	 * Returns the valid PHP file extensions for this project
-	 * @return std::vector<wxSring> a copy of the file extensions
+	 * Returns the valid PHP file extensions
+	 * @return std::vector<wxString> a copy of the file extensions
 	 */
 	std::vector<wxString> GetPhpFileExtensions() const;
 
 	/**
-	 * Returns the valid CSS file extensions for this project
-	 * @return std::vector<wxSring> a copy of the file extensions
+	 * Returns the valid CSS file extensions
+	 * @return std::vector<wxString> a copy of the file extensions
 	 */
 	std::vector<wxString> GetCssFileExtensions() const;
 
 	/**
-	 * Returns the valid SQL file extensions for this project
-	 * @return std::vector<wxSring> a copy of the file extensions
+	 * Returns the valid SQL file extensions 
+	 * @return std::vector<wxString> a copy of the file extensions
 	 */
 	std::vector<wxString> GetSqlFileExtensions() const;
+
+	/**
+	 * Returns the valid Misc. file extensions
+	 * @return std::vector<wxString> a copy of the file extensions
+	 */
+	std::vector<wxString> GetMiscFileExtensions() const;
+	
+	/**
+	 * Returns the all file extensions exception PHP file extensions
+	 * @return std::vector<wxString> a copy of the file extensions
+	 */
+	std::vector<wxString> GetNonPhpFileExtensions() const;
 
 	/**
 	 * @return TRUE if given full path is a PHP file, as determined by
@@ -171,6 +190,15 @@ public:
 	 * a PHP framework. This should be called before detection is re-attempted.
 	 */
 	void ClearDetectedInfos();
+
+	/**
+	 * copies the file filters into the project; we 
+	 * let the user define the file filters globally and we use
+	 * this method to propagate the setting to all projects
+	 *
+	 * @param project set the file filters on the given project
+	 */
+	void AssignFileExtensions(mvceditor::ProjectClass& project) const;
 
 };
 

@@ -46,7 +46,7 @@ public:
 		: FileTestFixtureClass(wxT("resource_finder"))
 		, ResourceFinder()
 		, TestFile(wxT("test.php")) {
-		ResourceFinder.FileFilters.push_back(wxT("*.php"));
+		ResourceFinder.PhpFileExtensions.push_back(wxT("*.php"));
 		if (wxDirExists(TestProjectDir)) {
 			RecursiveRmDir(TestProjectDir);
 		}
@@ -83,7 +83,7 @@ public:
 		: ResourceFinder()
 		, TestFile(wxT("test.php"))
 		, Matches() {
-		ResourceFinder.FileFilters.push_back(wxT("*.php"));
+		ResourceFinder.PhpFileExtensions.push_back(wxT("*.php"));
 		ResourceFinder.InitMemory();
 	}
 	
@@ -120,7 +120,7 @@ public:
 		, DynamicResources()
 		, Matches()
 		, TestFile(wxT("test.php")) {
-		ResourceFinder.FileFilters.push_back(wxT("*.php"));
+		ResourceFinder.PhpFileExtensions.push_back(wxT("*.php"));
 		ResourceFinder.InitMemory();
 		
 		// create a small class that implements a magic method
@@ -201,6 +201,26 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 	CollectNearMatchResources(mvceditor::WxToIcu(TestFile));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
+}
+
+TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameMatchesMiscFiles) {
+	Prep(wxString::FromAscii(
+		"<?php\n"
+		"$s = 'hello';\n"
+		"\n"
+		"?>\n"
+	));
+	ResourceFinder.MiscFileExtensions.push_back(wxT("*.yml"));
+	wxString miscFile = wxT("config.yml");
+	CreateFixtureFile(miscFile, wxString::FromAscii(
+		"app:\n"
+		"  debug: true\n"
+	));
+	ResourceFinder.Walk(TestProjectDir + TestFile);
+	ResourceFinder.Walk(TestProjectDir + miscFile);
+	CollectNearMatchResources(mvceditor::WxToIcu(miscFile));
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(TestProjectDir + miscFile, Matches[0].GetFullPath());
 }
 
 TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameIsASubset) {
@@ -1511,7 +1531,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, IsFileCacheEmptyWithAnotherFile) {
 	CHECK_EQUAL(false, ResourceFinder.IsResourceCacheEmpty());
 }
 
-TEST_FIXTURE(ResourceFinderFileTestClass, FileFiltersShouldWorkWithNoWildcards) {
+TEST_FIXTURE(ResourceFinderFileTestClass, PhpFileExtensionsShouldWorkWithNoWildcards) {
 
 	// create two files, a good.php and a bad.php. Set the filter to only
 	// look for good.php.  When waliking over bad.php, it should be skipped
@@ -1537,8 +1557,8 @@ TEST_FIXTURE(ResourceFinderFileTestClass, FileFiltersShouldWorkWithNoWildcards) 
 		"}\n"
 		"?>\n"
 	));	
-	ResourceFinder.FileFilters.clear();
-	ResourceFinder.FileFilters.push_back(wxT("good.php"));
+	ResourceFinder.PhpFileExtensions.clear();
+	ResourceFinder.PhpFileExtensions.push_back(wxT("good.php"));
 	
 	ResourceFinder.Walk(TestProjectDir + goodFile);
 	ResourceFinder.Walk(TestProjectDir + badFile);

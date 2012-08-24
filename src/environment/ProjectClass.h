@@ -50,6 +50,45 @@ public:
 	 */
 	std::vector<mvceditor::SourceClass> Sources;
 
+	
+	/**
+	 * The wildcard patterns that will be used to find PHP files in this
+	 * project.
+	 * Each item in the array will be one wildcard expression; where each
+	 * expression can contain either a '*' or a '?' for use in the
+	 * wxMatchWild() function.
+	 */
+	std::vector<wxString> PhpFileExtensions;
+
+	/**
+	 * The wildcard patterns that will be used to find CSS files in this
+	 * project.
+	 * Each item in the array will be one wildcard expression; where each
+	 * expression can contain either a '*' or a '?' for use in the
+	 * wxMatchWild() function.
+	 */
+	std::vector<wxString> CssFileExtensions;
+
+	/**
+	 * The wildcard patterns that will be used to find SQL files in this
+	 * project.
+	 * Each item in the array will be one wildcard expression; where each
+	 * expression can contain either a '*' or a '?' for use in the
+	 * wxMatchWild() function.
+	 */
+	std::vector<wxString> SqlFileExtensions;
+
+	/**
+	 * The wildcard patterns that will be used to find miscalleneous files in this
+	 * project. Misc. files are files that do not contain code but still want
+	 * to open them in the editor.
+	 *
+	 * Each item in the array will be one wildcard expression; where each
+	 * expression can contain either a '*' or a '?' for use in the
+	 * wxMatchWild() function.
+	 */
+	std::vector<wxString> MiscFileExtensions;
+
 	/**
 	 * The location of the resource cache for this project. The resource DB file contains all of
 	 * the parsed resources for all of this project's resources.
@@ -123,13 +162,13 @@ public:
 	 * @return wxString file extensions. This string will be suitable to
 	 * serialize the wildcard list.
 	 */
-	wxString GetPhpFileExtensionsString() const;
+	///wxString GetPhpFileExtensionsString() const;
 
 	/**
 	 * Returns the valid PHP file extensions for this project
 	 * @return std::vector<wxSring> a copy of the file extensions
 	 */
-	std::vector<wxString> GetPhpFileExtensions() const;
+	///std::vector<wxString> GetPhpFileExtensions() const;
 
 	/**
 	 * @param wxString Tokenizes the wildcards in the given string and adds them to the
@@ -137,20 +176,20 @@ public:
 	 * Each wildcard is assumed to be tokenized by a semicolon ';'
 	 * Existing filters are left intact
 	 */
-	void SetPhpFileExtensionsString(wxString wildcardString);
+	///void SetPhpFileExtensionsString(wxString wildcardString);
 
 	/**
 	 * Returns the valid CSS file extensions for this project
 	 * @return wxString file extensions. This string will be suitable to
 	 * serialize the wildcard list.
 	 */
-	wxString GetCssFileExtensionsString() const;
+	///wxString GetCssFileExtensionsString() const;
 
 	/**
 	 * Returns the valid CSS file extensions for this project
 	 * @return std::vector<wxSring> a copy of the file extensions
 	 */
-	std::vector<wxString> GetCssFileExtensions() const;
+	///std::vector<wxString> GetCssFileExtensions() const;
 
 	/**
 	 * @param wxString Tokenizes the wildcards in the given string and adds them to the
@@ -158,20 +197,20 @@ public:
 	 * Each wildcard is assumed to be tokenized by a semicolon ';'
 	 * Existing filters are left intact
 	 */
-	void SetCssFileExtensionsString(wxString wildcardString);
+	///void SetCssFileExtensionsString(wxString wildcardString);
 
 	/**
 	 * Returns the valid SQL file extensions for this project
 	 * @return wxString file extensions. This string will be suitable to
 	 * serialize the wildcard list.
 	 */
-	wxString GetSqlFileExtensionsString() const;
+	///wxString GetSqlFileExtensionsString() const;
 
 	/**
 	 * Returns the valid SQL file extensions for this project
 	 * @return std::vector<wxSring> a copy of the file extensions
 	 */
-	std::vector<wxString> GetSqlFileExtensions() const;
+	///std::vector<wxString> GetSqlFileExtensions() const;
 
 	/**
 	 * @param wxString Tokenizes the wildcards in the given string and adds them to the
@@ -179,7 +218,7 @@ public:
 	 * Each wildcard is assumed to be tokenized by a semicolon ';'
 	 * Existing filters are left intact
 	 */
-	void SetSqlFileExtensionsString(wxString wildcardString);
+	///void SetSqlFileExtensionsString(wxString wildcardString);
 
 	/**
 	 * creates a unique filename for the resources of this project. 
@@ -195,32 +234,6 @@ public:
 
 private:
 	
-	/**
-	 * The wildcard patterns that will be used to find PHP files in this
-	 * project.
-	 * Each item in the array will be one wildcard expression; where each
-	 * expression can contain either a '*' or a '?' for use in the
-	 * wxMatchWild() function.
-	 */
-	std::vector<wxString> PhpFileFilters;
-
-	/**
-	 * The wildcard patterns that will be used to find CSS files in this
-	 * project.
-	 * Each item in the array will be one wildcard expression; where each
-	 * expression can contain either a '*' or a '?' for use in the
-	 * wxMatchWild() function.
-	 */
-	std::vector<wxString> CssFileFilters;
-
-	/**
-	 * The wildcard patterns that will be used to find SQL files in this
-	 * project.
-	 * Each item in the array will be one wildcard expression; where each
-	 * expression can contain either a '*' or a '?' for use in the
-	 * wxMatchWild() function.
-	 */
-	std::vector<wxString> SqlFileFilters;
 };
 
 }

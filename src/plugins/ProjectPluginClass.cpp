@@ -82,9 +82,10 @@ void mvceditor::ProjectPluginClass::AddToolBarItems(wxAuiToolBar* toolbar) {
 
 void mvceditor::ProjectPluginClass::LoadPreferences(wxConfigBase* config) {
 	config->Read(wxT("/Project/ExplorerExecutable"), &ExplorerExecutable);
-	App.Structs.PhpFileFiltersString = config->Read(wxT("/Project/PhpFileFilters"), wxT("*.php"));
-	App.Structs.CssFileFiltersString = config->Read(wxT("/Project/CssFileFilters"), wxT("*.css"));
-	App.Structs.SqlFileFiltersString = config->Read(wxT("/Project/SqlFileFilters"), wxT("*.sql"));
+	App.Structs.PhpFileExtensionsString = config->Read(wxT("/Project/PhpFileExtensions"));
+	App.Structs.CssFileExtensionsString = config->Read(wxT("/Project/CssFileExtensions"));
+	App.Structs.SqlFileExtensionsString = config->Read(wxT("/Project/SqlFileExtensions"));
+	App.Structs.MiscFileExtensionsString = config->Read(wxT("/Project/MiscFileExtensions"));
 	
 	App.Structs.Projects.clear();
 	wxString key;
@@ -122,10 +123,7 @@ void mvceditor::ProjectPluginClass::LoadPreferences(wxConfigBase* config) {
 				}
 			}
 			if (newProject.HasSources()) {
-				newProject.SetPhpFileExtensionsString(App.Structs.PhpFileFiltersString);
-				newProject.SetCssFileExtensionsString(App.Structs.CssFileFiltersString);
-				newProject.SetSqlFileExtensionsString(App.Structs.SqlFileFiltersString);
-
+				App.Structs.AssignFileExtensions(newProject);
 				App.Structs.Projects.push_back(newProject);
 				projectIndex++;
 			}
@@ -137,9 +135,10 @@ void mvceditor::ProjectPluginClass::LoadPreferences(wxConfigBase* config) {
 void mvceditor::ProjectPluginClass::SavePreferences(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfig::Get();
 	config->Write(wxT("/Project/ExplorerExecutable"), ExplorerExecutable);
-	config->Write(wxT("/Project/PhpFileFilters"), App.Structs.PhpFileFiltersString);
-	config->Write(wxT("/Project/CssFileFilters"), App.Structs.CssFileFiltersString);
-	config->Write(wxT("/Project/SqlFileFilters"), App.Structs.SqlFileFiltersString);
+	config->Write(wxT("/Project/PhpFileExtensions"), App.Structs.PhpFileExtensionsString);
+	config->Write(wxT("/Project/CssFileExtensions"), App.Structs.CssFileExtensionsString);
+	config->Write(wxT("/Project/SqlFileExtensions"), App.Structs.SqlFileExtensionsString);
+	config->Write(wxT("/Project/MiscFileExtensions"), App.Structs.MiscFileExtensionsString);
 
 	// remove all project from the config
 	wxString key;
@@ -175,6 +174,12 @@ void mvceditor::ProjectPluginClass::SavePreferences(wxCommandEvent& event) {
 			config->Write(keyInclude, source.IncludeWildcardsString());
 			config->Write(keyExclude, source.ExcludeWildcardsString());
 		}
+	}
+
+	// also, update the projects to have new file extesions
+	std::vector<mvceditor::ProjectClass>::iterator project;
+	for (project = App.Structs.Projects.begin(); project != App.Structs.Projects.end(); ++project) {
+		App.Structs.AssignFileExtensions(*project);
 	}
 }
 
@@ -315,9 +320,7 @@ void mvceditor::ProjectPluginClass::OnProjectDefine(wxCommandEvent& event) {
 		for (project = App.Structs.Projects.begin(); project != App.Structs.Projects.end(); ++project) {
 
 			// need to set these; as they set in app load too
-			project->SetPhpFileExtensionsString(App.Structs.PhpFileFiltersString);
-			project->SetCssFileExtensionsString(App.Structs.CssFileFiltersString);
-			project->SetSqlFileExtensionsString(App.Structs.SqlFileFiltersString);
+			App.Structs.AssignFileExtensions(*project);
 		}
 
 		wxCommandEvent evt;
@@ -342,15 +345,17 @@ mvceditor::ProjectPluginPanelClass::ProjectPluginPanelClass(wxWindow *parent, mv
 	NonEmptyTextValidatorClass explorerValidator(&projectPlugin.ExplorerExecutable, Label);
 	ExplorerExecutable->SetValidator(explorerValidator);
 
-	NonEmptyTextValidatorClass phpFileFiltersValidator(&projectPlugin.App.Structs.PhpFileFiltersString, PhpLabel);
-	PhpFileFilters->SetValidator(phpFileFiltersValidator);
+	NonEmptyTextValidatorClass phpFileExtensionsValidator(&projectPlugin.App.Structs.PhpFileExtensionsString, PhpLabel);
+	PhpFileExtensions->SetValidator(phpFileExtensionsValidator);
 
-	NonEmptyTextValidatorClass cssFileFiltersValidator(&projectPlugin.App.Structs.CssFileFiltersString, CssLabel);
-	CssFileFilters->SetValidator(cssFileFiltersValidator);
+	NonEmptyTextValidatorClass cssFileExtensionsValidator(&projectPlugin.App.Structs.CssFileExtensionsString, CssLabel);
+	CssFileExtensions->SetValidator(cssFileExtensionsValidator);
 
-	NonEmptyTextValidatorClass sqlFileFiltersValidator(&projectPlugin.App.Structs.SqlFileFiltersString, SqlLabel);
-	SqlFileFilters->SetValidator(sqlFileFiltersValidator);
+	NonEmptyTextValidatorClass sqlFileExtensionsValidator(&projectPlugin.App.Structs.SqlFileExtensionsString, SqlLabel);
+	SqlFileExtensions->SetValidator(sqlFileExtensionsValidator);
 	
+	NonEmptyTextValidatorClass miscFileExtensionsValidator(&projectPlugin.App.Structs.MiscFileExtensionsString, MiscLabel);
+	MiscFileExtensions->SetValidator(miscFileExtensionsValidator);
 }
 
 void mvceditor::ProjectPluginPanelClass::OnFileChanged(wxFileDirPickerEvent& event) {

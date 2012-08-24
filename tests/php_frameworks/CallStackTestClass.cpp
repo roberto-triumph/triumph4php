@@ -34,15 +34,17 @@ public:
 
 	mvceditor::ResourceCacheClass ResourceCache;
 	mvceditor::CallStackClass CallStack;
-	std::vector<wxString> PhpFileFilters;
+	std::vector<wxString> PhpFileExtensions;
+	std::vector<wxString> MiscFileExtensions;
 	wxFileName ResourceDbFileName;
 	
 	CallStackFixtureTestClass()
 		: FileTestFixtureClass(wxT("call_stack")) 
 		, ResourceCache() 
 		, CallStack(ResourceCache)
-		, PhpFileFilters() {
-		PhpFileFilters.push_back(wxT("*.php"));
+		, PhpFileExtensions() 
+		, MiscFileExtensions() {
+		PhpFileExtensions.push_back(wxT("*.php"));
 		CreateSubDirectory(wxT("src"));
 	}
 
@@ -74,7 +76,7 @@ public:
 	void BuildCache() {
 		ResourceDbFileName.Assign(TestProjectDir + wxT("resource_cache.db"));
 		mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass;
-		globalCache->Init(ResourceDbFileName, PhpFileFilters, pelet::PHP_53);
+		globalCache->Init(ResourceDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 		
 		mvceditor::DirectorySearchClass search;
 		search.Init(TestProjectDir + wxT("src"));

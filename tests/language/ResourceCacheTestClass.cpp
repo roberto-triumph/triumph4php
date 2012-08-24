@@ -40,7 +40,8 @@ public:
 	mvceditor::ResourceCacheClass ResourceCache;
 	mvceditor::ResourceFinderClass Finder;
 	mvceditor::DirectorySearchClass Search;
-	std::vector<wxString> PhpFileFilters;
+	std::vector<wxString> PhpFileExtensions;
+	std::vector<wxString> MiscFileExtensions;
 	std::vector<mvceditor::ResourceClass> Matches;
 	wxFileName ResourceDbFileName;
 
@@ -49,11 +50,12 @@ public:
 		, ResourceCache()
 		, Finder()
 		, Search() 
-		, PhpFileFilters()
+		, PhpFileExtensions()
+		, MiscFileExtensions()
 		, Matches() 
 		, ResourceDbFileName() {
 		Search.Init(TestProjectDir);
-		PhpFileFilters.push_back(wxT("*.php"));
+		PhpFileExtensions.push_back(wxT("*.php"));
 		
 		// create the test dir, since FileTestFixture class is lazy
 		if (!wxDirExists(TestProjectDir)) {
@@ -75,7 +77,7 @@ public:
 
 	mvceditor::GlobalCacheClass* CreateGlobalCache(const wxString& srcDirectory) {
 		mvceditor::GlobalCacheClass* cache = new mvceditor::GlobalCacheClass();
-		cache->Init(ResourceDbFileName, PhpFileFilters, pelet::PHP_53);
+		cache->Init(ResourceDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 
 		
 		// must call init() here since we want to parse files from disk
@@ -109,7 +111,8 @@ public:
 	std::vector<mvceditor::ResourceClass> ResourceMatches;
 	mvceditor::SymbolTableMatchErrorClass Error;
 	mvceditor::DirectorySearchClass Search;
-	std::vector<wxString> PhpFileFilters;
+	std::vector<wxString> PhpFileExtensions;
+	std::vector<wxString> MiscFileExtensions;
 	wxFileName ResourceDbFileName;
 	
 	
@@ -130,11 +133,12 @@ public:
 		, ResourceMatches()
 		, Error()
 		, Search()
-		, PhpFileFilters()
+		, PhpFileExtensions()
+		, MiscFileExtensions()
 		, ResourceDbFileName() {
 		CreateSubDirectory(wxT("src"));
 		Search.Init(TestProjectDir + wxT("src"));
-		PhpFileFilters.push_back(wxT("*.php"));
+		PhpFileExtensions.push_back(wxT("*.php"));
 		Scope.ClassName = UNICODE_STRING_SIMPLE("");
 		Scope.MethodName = UNICODE_STRING_SIMPLE("");
 		ResourceDbFileName.Assign(TestProjectDir + wxT("resource_cache.db"));
@@ -160,7 +164,7 @@ public:
 
 	mvceditor::GlobalCacheClass* CreateGlobalCache(const wxString& srcDirectory) {
 		mvceditor::GlobalCacheClass* cache = new mvceditor::GlobalCacheClass();
-		cache->Init(ResourceDbFileName, PhpFileFilters, pelet::PHP_53);
+		cache->Init(ResourceDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 
 		
 		// must call init() here since we want to parse files from disk
@@ -171,7 +175,7 @@ public:
 
 	mvceditor::GlobalCacheClass* CreateGlobalCache(const wxFileName& resourceDbFile, const wxString& srcDirectory) {
 		mvceditor::GlobalCacheClass* cache = new mvceditor::GlobalCacheClass();
-		cache->Init(resourceDbFile, PhpFileFilters, pelet::PHP_53);
+		cache->Init(resourceDbFile, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 
 		
 		// must call init() here since we want to parse files from disk
@@ -187,7 +191,7 @@ TEST_FIXTURE(RegisterTestFixtureClass, RegisterShouldSucceed) {
 	
 	// this pointer should get deleted by the ResourceCacheClass
 	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass();
-	globalCache->Init(ResourceDbFileName, PhpFileFilters, pelet::PHP_53);
+	globalCache->Init(ResourceDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 	CHECK(ResourceCache.RegisterGlobal(globalCache));
 }
 
@@ -195,10 +199,10 @@ TEST_FIXTURE(RegisterTestFixtureClass, RegisterShouldFail) {
 
 	// these pointers should get deleted by the ResourceCacheClass
 	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass();
-	globalCache->Init(ResourceDbFileName, PhpFileFilters, pelet::PHP_53);
+	globalCache->Init(ResourceDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 	
 	mvceditor::GlobalCacheClass* secondGlobalCache = new mvceditor::GlobalCacheClass();
-	secondGlobalCache->Init(ResourceDbFileName, PhpFileFilters, pelet::PHP_53);
+	secondGlobalCache->Init(ResourceDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 
 	// test that the same resource DB cannot be added twice
 	CHECK(ResourceCache.RegisterGlobal(globalCache));
@@ -213,13 +217,13 @@ TEST_FIXTURE(RegisterTestFixtureClass, RegisterShouldSucceedAfterSucceedAfterUnr
 	// these pointers should get deleted by the ResourceCacheClass
 	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass();
 	wxFileName cacheDb1 = ResourceDbFileName; 
-	globalCache->Init(ResourceDbFileName, PhpFileFilters, pelet::PHP_53);
+	globalCache->Init(ResourceDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 	
 	mvceditor::GlobalCacheClass* secondGlobalCache = new mvceditor::GlobalCacheClass();
-	secondGlobalCache->Init(ResourceDbFileName, PhpFileFilters, pelet::PHP_53);
+	secondGlobalCache->Init(ResourceDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 
 	mvceditor::GlobalCacheClass* thirdGlobalCache = new mvceditor::GlobalCacheClass();
-	thirdGlobalCache->Init(ResourceDbFileName, PhpFileFilters, pelet::PHP_53);
+	thirdGlobalCache->Init(ResourceDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 
 	// test that the same resource DB is added, removed, then added again
 	CHECK(ResourceCache.RegisterGlobal(globalCache));
@@ -469,9 +473,9 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, MultipleGlobalFinders) {
 	// completion should still work
 	mvceditor::ResourceCacheClass newCache;
 	mvceditor::GlobalCacheClass* cache4 = new mvceditor::GlobalCacheClass();
-	cache4->Init(globalDb1, PhpFileFilters, pelet::PHP_53);
+	cache4->Init(globalDb1, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 	mvceditor::GlobalCacheClass* cache5 = new mvceditor::GlobalCacheClass();
-	cache5->Init(globalDb2, PhpFileFilters, pelet::PHP_53);
+	cache5->Init(globalDb2, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 
 	CHECK(newCache.RegisterGlobal(cache4));
 	CHECK(newCache.RegisterGlobal(cache5));

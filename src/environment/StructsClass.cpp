@@ -34,9 +34,10 @@ mvceditor::StructsClass::StructsClass()
 	, CurrentViewInfos() 
 	, Projects()
 	, CurrentUrl() 
-	, PhpFileFiltersString(wxT("*.php"))	
-	, CssFileFiltersString(wxT("*.css"))
-	, SqlFileFiltersString(wxT("*.sql"))
+	, PhpFileExtensionsString(wxT("*.php"))	
+	, CssFileExtensionsString(wxT("*.css"))
+	, SqlFileExtensionsString(wxT("*.sql"))
+	, MiscFileExtensionsString(wxT("*.js;*.html;*.yml;*.xml;*.txt"))
 	, Frameworks() {
 }
 
@@ -65,7 +66,7 @@ bool mvceditor::StructsClass::HasSources() const {
 
 std::vector<wxString> mvceditor::StructsClass::GetPhpFileExtensions() const {
 	std::vector<wxString> wildcards;
-	wxStringTokenizer tokenizer(PhpFileFiltersString, wxT(";"));
+	wxStringTokenizer tokenizer(PhpFileExtensionsString, wxT(";"));
 	while (tokenizer.HasMoreTokens()) {
 		wxString wildcard = tokenizer.NextToken();
 		wildcards.push_back(wildcard);
@@ -76,7 +77,7 @@ std::vector<wxString> mvceditor::StructsClass::GetPhpFileExtensions() const {
 
 std::vector<wxString> mvceditor::StructsClass::GetCssFileExtensions() const {
 	std::vector<wxString> wildcards;
-	wxStringTokenizer tokenizer(CssFileFiltersString, wxT(";"));
+	wxStringTokenizer tokenizer(CssFileExtensionsString, wxT(";"));
 	while (tokenizer.HasMoreTokens()) {
 		wxString wildcard = tokenizer.NextToken();
 		wildcards.push_back(wildcard);
@@ -86,11 +87,33 @@ std::vector<wxString> mvceditor::StructsClass::GetCssFileExtensions() const {
 
 std::vector<wxString> mvceditor::StructsClass::GetSqlFileExtensions() const {
 	std::vector<wxString> wildcards;
-	wxStringTokenizer tokenizer(SqlFileFiltersString, wxT(";"));
+	wxStringTokenizer tokenizer(SqlFileExtensionsString, wxT(";"));
 	while (tokenizer.HasMoreTokens()) {
 		wxString wildcard = tokenizer.NextToken();
 		wildcards.push_back(wildcard);
 	}
+	return wildcards;
+}
+
+std::vector<wxString> mvceditor::StructsClass::GetMiscFileExtensions() const {
+	std::vector<wxString> wildcards;
+	wxStringTokenizer tokenizer(MiscFileExtensionsString, wxT(";"));
+	while (tokenizer.HasMoreTokens()) {
+		wxString wildcard = tokenizer.NextToken();
+		wildcards.push_back(wildcard);
+	}
+	return wildcards;
+}
+
+std::vector<wxString> mvceditor::StructsClass::GetNonPhpFileExtensions() const {
+	std::vector<wxString> wildcards;
+	std::vector<wxString> css = GetCssFileExtensions();
+	std::vector<wxString> sql = GetSqlFileExtensions();
+	std::vector<wxString> misc = GetMiscFileExtensions();
+
+	wildcards.insert(wildcards.end(), css.begin(), css.end());
+	wildcards.insert(wildcards.end(), sql.begin(), sql.end());
+	wildcards.insert(wildcards.end(), misc.begin(), misc.end());
 	return wildcards;
 }
 
@@ -125,4 +148,11 @@ void mvceditor::StructsClass::ClearDetectedInfos() {
 			++info;
 		}
 	}
+}
+
+void mvceditor::StructsClass::AssignFileExtensions(mvceditor::ProjectClass &project) const {
+	project.PhpFileExtensions = GetPhpFileExtensions();
+	project.CssFileExtensions = GetCssFileExtensions();
+	project.SqlFileExtensions = GetSqlFileExtensions();
+	project.MiscFileExtensions = GetMiscFileExtensions();
 }

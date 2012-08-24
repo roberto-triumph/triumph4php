@@ -44,11 +44,13 @@ class ProjectPluginGeneratedPanelClass : public wxPanel
 		wxFilePickerCtrl* FilePicker;
 		wxStaticText* WildcardHelpText;
 		wxStaticText* PhpLabel;
-		wxTextCtrl* PhpFileFilters;
+		wxTextCtrl* PhpFileExtensions;
 		wxStaticText* CssLabel;
-		wxTextCtrl* CssFileFilters;
+		wxTextCtrl* CssFileExtensions;
 		wxStaticText* SqlLabel;
-		wxTextCtrl* SqlFileFilters;
+		wxTextCtrl* SqlFileExtensions;
+		wxStaticText* MiscLabel;
+		wxTextCtrl* MiscFileExtensions;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnFileChanged( wxFileDirPickerEvent& event ) { event.Skip(); }
@@ -56,7 +58,7 @@ class ProjectPluginGeneratedPanelClass : public wxPanel
 	
 	public:
 		
-		ProjectPluginGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,387 ), long style = wxTAB_TRAVERSAL );
+		ProjectPluginGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,416 ), long style = wxTAB_TRAVERSAL );
 		~ProjectPluginGeneratedPanelClass();
 	
 };

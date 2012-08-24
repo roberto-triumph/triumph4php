@@ -240,14 +240,26 @@ class ResourceFinderClass : public pelet::ClassObserverClass,
 public:
 
 	/**
-	 * The files to look in
+	 * The files to be parsed; these are php source code file 
+	 * extensions
 	 * 
 	 * @var vector<wxString> a lst of file filters 
 	 * Each item in the array will be one wildcard expression; where each
 	 * expression can contain either a '*' or a '?' for use in the
 	 * wxMatchWild() function.
 	 */
-	std::vector<wxString> FileFilters;
+	std::vector<wxString> PhpFileExtensions;
+
+	/**
+	 * The files to be recorded but not parsed; these are YML files, text
+	 * files, any other file extensions that we want to keep track of.
+	 * 
+	 * @var vector<wxString> a lst of file filters 
+	 * Each item in the array will be one wildcard expression; where each
+	 * expression can contain either a '*' or a '?' for use in the
+	 * wxMatchWild() function.
+	 */
+	std::vector<wxString> MiscFileExtensions;
 	
 	ResourceFinderClass();
 	~ResourceFinderClass();

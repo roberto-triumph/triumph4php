@@ -156,7 +156,8 @@ mvceditor::ResourceSearchClass::ResourceTypes mvceditor::ResourceSearchClass::Ge
 
 
 mvceditor::ResourceFinderClass::ResourceFinderClass()
-	: FileFilters()
+	: PhpFileExtensions()
+	, MiscFileExtensions()
 	, FileParsingCache()
 	, NamespaceCache()
 	, TraitCache()
@@ -296,8 +297,8 @@ void mvceditor::ResourceFinderClass::EndSearch() {
 bool mvceditor::ResourceFinderClass::Walk(const wxString& fileName) {
 	bool matchedFilter = false;
 	wxFileName file(fileName);
-	for (size_t i = 0; i < FileFilters.size(); ++i) {
-		wxString filter = FileFilters[i];
+	for (size_t i = 0; i < PhpFileExtensions.size(); ++i) {
+		wxString filter = PhpFileExtensions[i];
 		if (!wxIsWild(filter)) {
 
 			// exact match of the name portion of fileName
@@ -312,6 +313,26 @@ bool mvceditor::ResourceFinderClass::Walk(const wxString& fileName) {
 	}
 	if (matchedFilter) {
 		BuildResourceCache(fileName, true);
+	}
+	else {
+		// check the misc file filters
+		for (size_t i = 0; i < MiscFileExtensions.size(); ++i) {
+			wxString filter = MiscFileExtensions[i];
+			if (!wxIsWild(filter)) {
+
+				// exact match of the name portion of fileName
+				matchedFilter = file.GetFullName().CmpNoCase(filter) == 0;
+			}
+			else {
+				matchedFilter = wxMatchWild(filter, fileName);
+			}
+			if (matchedFilter) {
+				break;
+			}
+		}
+		if (matchedFilter) {
+			BuildResourceCache(fileName, false);
+		}
 	}
 
 	// no need to keep know which files have resources, most likely all files should have a resource

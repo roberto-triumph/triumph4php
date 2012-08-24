@@ -71,7 +71,7 @@ bool mvceditor::ResourceFinderBackgroundThreadClass::Start(const wxString& fileN
 	
 	// need this so that the resource finder parsers the file
 	ResourceFinder.InitMemory();
-	ResourceFinder.FileFilters.push_back(wxT("*.*"));
+	ResourceFinder.PhpFileExtensions.push_back(wxT("*.*"));
 	
 	ResourceFinder.SetVersion(environment.Php.Version);
 	wxThreadError error = CreateSingleInstance(threadId);
