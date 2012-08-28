@@ -114,11 +114,12 @@ int main() {
 }
 	
 void CacheLargeProject(mvceditor::ResourceCacheClass& resourceCache, wxString dirName) {
-	std::vector<wxString> fileFilters;
-	fileFilters.push_back(wxT("*.php"));
+	std::vector<wxString> phpFileExtensions,
+		miscFileExtensions;
+	phpFileExtensions.push_back(wxT("*.php"));
 
 	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass;
-	globalCache->Init(mvceditor::NativeFunctionsAsset(), fileFilters, pelet::PHP_53);
+	globalCache->Init(mvceditor::NativeFunctionsAsset(), phpFileExtensions, miscFileExtensions, pelet::PHP_53);
 	resourceCache.RegisterGlobal(globalCache);
 	mvceditor::DirectorySearchClass directorySearch;
 	bool found = directorySearch.Init(dirName);
@@ -131,7 +132,7 @@ void CacheLargeProject(mvceditor::ResourceCacheClass& resourceCache, wxString di
 		wxRemoveFile(fileName.GetFullPath());
 	}
 	mvceditor::GlobalCacheClass* projectCache = new mvceditor::GlobalCacheClass;
-	projectCache->Init(fileName, fileFilters, pelet::PHP_53);
+	projectCache->Init(fileName, phpFileExtensions, miscFileExtensions, pelet::PHP_53);
 	while (directorySearch.More()) {
 		projectCache->Walk(directorySearch);
 	}

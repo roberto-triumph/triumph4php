@@ -108,10 +108,10 @@ int main() {
 		FileName = wxT("/home/roberto/workspace/mvc-editor/php_detectors/lib/Zend/Config.php");
 		DirName = wxT("/home/roberto/workspace/sample_php_project/");
 	}
-	ProfileLexer();
-	ProfileParser();
+	//ProfileLexer();
+	//ProfileParser();
 	ProfileParserOnLargeProject();
-	ProfileNativeFunctionsParsing();
+	//ProfileNativeFunctionsParsing();
 	ProfileResourceFinderOnLargeProject();
 	
 	// calling cleanup here so that we can run this binary through a memory leak detector 
@@ -225,7 +225,7 @@ void ProfileNativeFunctionsParsing() {
 void ProfileResourceFinderOnLargeProject() {
 	printf("*******\n");
 	mvceditor::ResourceFinderClass resourceFinder;
-	resourceFinder.InitMemory();
+	resourceFinder.InitFile(wxFileName(wxT("C:\\users\\roberto\\desktop\\profiler.db")));
 	mvceditor::DirectorySearchClass search;
 	wxLongLong time;
 	if (DirName.IsEmpty() || !wxDirExists(DirName)) {
@@ -234,7 +234,7 @@ void ProfileResourceFinderOnLargeProject() {
 		return;
 	}
 	time = wxGetLocalTimeMillis();
-	resourceFinder.FileFilters.push_back(wxT("*.php"));
+	resourceFinder.PhpFileExtensions.push_back(wxT("*.php"));
 	search.Init(DirName);
 	while (search.More()) {
 		search.Walk(resourceFinder);

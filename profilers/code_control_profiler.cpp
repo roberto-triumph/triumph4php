@@ -151,9 +151,10 @@ bool CodeControlProfilerAppClass::OnInit() {
 	Options.EnableAutomaticLineIndentation = true;
 	Options.EnableAutoCompletion = true;
 	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass;
-	std::vector<wxString> phpFileFilters;
+	std::vector<wxString> phpFileFilters,
+		miscFileFilters;
 	phpFileFilters.push_back(wxT("*.php"));
-	globalCache->Init(mvceditor::NativeFunctionsAsset(), phpFileFilters, pelet::PHP_53);
+	globalCache->Init(mvceditor::NativeFunctionsAsset(), phpFileFilters, miscFileFilters, pelet::PHP_53);
 	Structs.ResourceCache.RegisterGlobal(globalCache);
 	
 	CodeControlFrameClass* frame = new CodeControlFrameClass(*this);
