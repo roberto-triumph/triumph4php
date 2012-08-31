@@ -260,7 +260,7 @@ void mvceditor::RunBrowserPluginClass::LoadPreferences(wxConfigBase* config) {
 	}
 }
 
-void mvceditor::RunBrowserPluginClass::OnPreferencesUpdated(wxCommandEvent& event) {
+void mvceditor::RunBrowserPluginClass::OnPreferencesSaved(wxCommandEvent& event) {
 
 	// need to update the browser toolbar if the user updates the environment
 	App.Structs.UrlResourceFinder.Browsers.clear();
@@ -535,7 +535,7 @@ BEGIN_EVENT_TABLE(mvceditor::RunBrowserPluginClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::RunBrowserPluginClass::OnProcessInProgress)
 
 	// application events
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_UPDATED, mvceditor::RunBrowserPluginClass::OnPreferencesUpdated)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::RunBrowserPluginClass::OnPreferencesSaved)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_INDEXED, mvceditor::RunBrowserPluginClass::OnProjectIndexed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::RunBrowserPluginClass::OnProjectsUpdated)
 	

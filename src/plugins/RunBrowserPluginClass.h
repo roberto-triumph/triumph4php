@@ -111,7 +111,7 @@ public:
 		
 private:
 
-	void OnPreferencesUpdated(wxCommandEvent& event);
+	void OnPreferencesSaved(wxCommandEvent& event);
 
 	/**
 	 * run the chosen URL in (an external) web browser 

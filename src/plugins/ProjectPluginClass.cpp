@@ -132,7 +132,7 @@ void mvceditor::ProjectPluginClass::LoadPreferences(wxConfigBase* config) {
 	}
 }
 
-void mvceditor::ProjectPluginClass::SavePreferences(wxCommandEvent& event) {
+void mvceditor::ProjectPluginClass::OnPreferencesSaved(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfig::Get();
 	config->Write(wxT("/Project/ExplorerExecutable"), ExplorerExecutable);
 	config->Write(wxT("/Project/PhpFileExtensions"), App.Structs.PhpFileExtensionsString);
@@ -336,7 +336,7 @@ void mvceditor::ProjectPluginClass::OnProjectDefine(wxCommandEvent& event) {
 		}
 
 		wxCommandEvent evt;
-		SavePreferences(evt);
+		OnPreferencesSaved(evt);
 		wxConfigBase* config = wxConfig::Get();
 		config->Flush();
 
@@ -706,7 +706,7 @@ BEGIN_EVENT_TABLE(mvceditor::ProjectPluginClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_DETECTION_COMPLETE, mvceditor::ProjectPluginClass::OnFrameworkDetectionComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_DETECTION_FAILED, mvceditor::ProjectPluginClass::OnFrameworkDetectionFailed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::ProjectPluginClass::OnFrameworkDetectionInProgress)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_UPDATED, mvceditor::ProjectPluginClass::SavePreferences)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::ProjectPluginClass::OnPreferencesSaved)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, mvceditor::ProjectPluginClass::OnPreferencesExternallyUpdated)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::ProjectPluginClass::OnAppReady)
 END_EVENT_TABLE()

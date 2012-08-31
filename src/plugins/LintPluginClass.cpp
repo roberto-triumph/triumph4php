@@ -301,7 +301,7 @@ void mvceditor::LintPluginClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 void mvceditor::LintPluginClass::LoadPreferences(wxConfigBase* config) {
 	config->Read(wxT("/LintCheck/CheckOnSave"), &CheckOnSave);
 }
-void mvceditor::LintPluginClass::SavePreferences(wxCommandEvent& event) {
+void mvceditor::LintPluginClass::OnPreferencesSaved(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfig::Get();
 	config->Write(wxT("/LintCheck/CheckOnSave"), CheckOnSave);
 }
@@ -463,7 +463,7 @@ BEGIN_EVENT_TABLE(mvceditor::LintPluginClass, wxEvtHandler)
 	EVT_COMMAND(ID_LINT_READER, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::LintPluginClass::OnTimer)
 	EVT_COMMAND(ID_LINT_READER, mvceditor::EVENT_WORK_COMPLETE, mvceditor::LintPluginClass::OnLintComplete)
 	EVT_PLUGIN_FILE_SAVED(mvceditor::LintPluginClass::OnFileSaved)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_UPDATED, mvceditor::LintPluginClass::SavePreferences)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::LintPluginClass::OnPreferencesSaved)
 	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::LintPluginClass::OnNotebookPageClosed)
 	EVT_LINT_ERROR(ID_LINT_READER, mvceditor::LintPluginClass::OnLintError)
 	EVT_LINT_SUMMARY(ID_LINT_READER, mvceditor::LintPluginClass::OnLintSummary)

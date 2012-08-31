@@ -652,7 +652,7 @@ mvceditor::EnvironmentPluginClass::EnvironmentPluginClass(mvceditor::AppClass& a
 	: PluginClass(app) {
 }
 
-void mvceditor::EnvironmentPluginClass::OnPreferencesUpdated(wxCommandEvent& event) {
+void mvceditor::EnvironmentPluginClass::OnPreferencesSaved(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfigBase::Get();
 	mvceditor::EnvironmentClass* environment = GetEnvironment();
 	environment->SaveToConfig(config);
@@ -680,5 +680,5 @@ BEGIN_EVENT_TABLE(mvceditor::ApacheEnvironmentPanelClass, ApacheEnvironmentPanel
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::EnvironmentPluginClass, wxEvtHandler) 
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_UPDATED, mvceditor::EnvironmentPluginClass::OnPreferencesUpdated) 	
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::EnvironmentPluginClass::OnPreferencesSaved) 	
 END_EVENT_TABLE()

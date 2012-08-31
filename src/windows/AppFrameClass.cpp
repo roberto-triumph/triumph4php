@@ -304,7 +304,7 @@ void mvceditor::AppFrameClass::OnEditPreferences(wxCommandEvent& event) {
 	prefDialog.Prepare();
 	int exitCode = prefDialog.ShowModal();
 	if (wxOK == exitCode) {
-		wxCommandEvent evt(mvceditor::EVENT_APP_PREFERENCES_UPDATED);
+		wxCommandEvent evt(mvceditor::EVENT_APP_PREFERENCES_SAVED);
 		App.EventSink.Publish(evt);
 
 		// signal that this app has modified the config file, that way the external
@@ -313,7 +313,7 @@ void mvceditor::AppFrameClass::OnEditPreferences(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::AppFrameClass::PreferencesUpdated() {
+void mvceditor::AppFrameClass::PreferencesSaved() {
 	Preferences.EnableSelectedProfile(this);
 	Notebook->RefreshCodeControlOptions();
 }
@@ -701,8 +701,8 @@ void mvceditor::AppEventListenerForFrameClass::OnCmdFileOpen(wxCommandEvent& eve
 	AppFrame->FileOpen(filenames);
 }
 
-void mvceditor::AppEventListenerForFrameClass::OnPreferencesUpdated(wxCommandEvent& event) {
-	AppFrame->PreferencesUpdated();
+void mvceditor::AppEventListenerForFrameClass::OnPreferencesSaved(wxCommandEvent& event) {
+	AppFrame->PreferencesSaved();
 }
 
 void mvceditor::AppEventListenerForFrameClass::OnPreferencesExternallyUpdated(wxCommandEvent& event) {
@@ -767,7 +767,7 @@ END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::AppEventListenerForFrameClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_FILE_OPEN, mvceditor::AppEventListenerForFrameClass::OnCmdFileOpen)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_UPDATED, mvceditor::AppEventListenerForFrameClass::OnPreferencesUpdated)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::AppEventListenerForFrameClass::OnPreferencesSaved)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, mvceditor::AppEventListenerForFrameClass::OnPreferencesExternallyUpdated)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::AppEventListenerForFrameClass::OnCodeNotebookPageChanged)
 	EVT_AUINOTEBOOK_PAGE_CLOSED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::AppEventListenerForFrameClass::OnCodeNotebookPageClosed)

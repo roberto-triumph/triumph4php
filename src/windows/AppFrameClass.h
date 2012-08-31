@@ -62,7 +62,7 @@ private:
 
 	void OnCmdFileOpen(wxCommandEvent& event);
 
-	void OnPreferencesUpdated(wxCommandEvent& event);
+	void OnPreferencesSaved(wxCommandEvent& event);
 
 	void OnPreferencesExternallyUpdated(wxCommandEvent& event);
 
@@ -113,7 +113,7 @@ public:
 	/**
 	 * For a re-draw of all dialogs and windows based on new updated preferences
 	 */
-	void PreferencesUpdated();
+	void PreferencesSaved();
 
 	/**
 	 * For a re-draw of all dialogs and windows based on new updated preferences

@@ -177,15 +177,15 @@ extern const wxEventType EVENT_APP_FILE_OPENED;
 extern const wxEventType EVENT_APP_FILE_CLOSED;
 
 /**
- * Notification that the user preferences have been updated. Listeners of this event
- * will  need to repaint any windows that are affected by the changes. Listeners
- * can access the new preferences via the App Preferences global.
- * This method will be called after the user changes the settings via Edit ... Preferences. 
- * The plugin should save the preferences to persistent storage (config) here
- *  The global config (wxConfig::Get()) should be used.
- * Listeners can access the new preferences via the App Environment global.
+ * Notification that the user preferences have been saved by the user. 
+ * This event will be genreated after the user changes the settings via Edit ... Preferences.
+ * Listeners of this event will  need to repaint any windows that are affected by the changes. Listeners
+ * can access the new preferences via the App Preferences global. Listeners also
+ * need to save the preferences to persistent storage (config) that were updated
+ * in the preferences forms (windows added in the AddPreferenceWindow() method).
+ * The global config (wxConfig::Get()) should be used.
  */
-extern const wxEventType EVENT_APP_PREFERENCES_UPDATED;
+extern const wxEventType EVENT_APP_PREFERENCES_SAVED;
 /**
  * Notification that the user preferences (the config INI file) has been updated by an 
  * external process. An example of this is the user having 2 instances of MVC Editor open

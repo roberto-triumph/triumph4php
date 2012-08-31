@@ -84,7 +84,7 @@ private:
 	/**
 	 * Save the preferences to persistent storage 
 	 */
-	void SavePreferences(wxCommandEvent& event);
+	void OnPreferencesSaved(wxCommandEvent& event);
 
 	void OnPreferencesExternallyUpdated(wxCommandEvent& event);
 
