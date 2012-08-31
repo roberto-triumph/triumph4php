@@ -1027,6 +1027,7 @@ void mvceditor::SqlBrowserPluginClass::AuiManagerUpdate() {
 }
 
 void mvceditor::SqlBrowserPluginClass::LoadPreferences(wxConfigBase* config) {
+	App.Structs.Infos.clear();
 	wxString groupName;
 	long index = 0;
 	if (config->GetFirstGroup(groupName, index)) {
@@ -1090,6 +1091,10 @@ void mvceditor::SqlBrowserPluginClass::SavePreferences() {
 	}
 	config->SetPath(wxT("/"));
 	config->Flush();
+
+	// signal that this app has modified the config file, that way the external
+	// modification check fails and the user will not be prompted to reload the config
+	App.UpdateConfigModifiedTime();
 }
 
 BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPluginClass, wxEvtHandler)

@@ -76,9 +76,17 @@ public:
 private:
 
 	/**
+	 * This method start the framework detection processes. It should be 
+	 * calle when the user adds/enables/removes a project.
+	 */
+	void StartDetectors();
+
+	/**
 	 * Save the preferences to persistent storage 
 	 */
 	void SavePreferences(wxCommandEvent& event);
+
+	void OnPreferencesExternallyUpdated(wxCommandEvent& event);
 
 	/**
 	 * Handler for the Project .. Explore menu 

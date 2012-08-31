@@ -64,6 +64,8 @@ private:
 
 	void OnPreferencesUpdated(wxCommandEvent& event);
 
+	void OnPreferencesExternallyUpdated(wxCommandEvent& event);
+
 	void OnAppReady(wxCommandEvent& event);
 	
 	void OnCodeNotebookPageChanged(wxAuiNotebookEvent& event);
@@ -111,7 +113,12 @@ public:
 	/**
 	 * For a re-draw of all dialogs and windows based on new updated preferences
 	 */
-	void UpdatePreferences();
+	void PreferencesUpdated();
+
+	/**
+	 * For a re-draw of all dialogs and windows based on new updated preferences
+	 */
+	void PreferencesExternallyUpdated();
 	
 	/**
 	 * Updates the title bar with the name of the file being edited.

@@ -304,11 +304,23 @@ void mvceditor::AppFrameClass::OnEditPreferences(wxCommandEvent& event) {
 	prefDialog.Prepare();
 	int exitCode = prefDialog.ShowModal();
 	if (wxOK == exitCode) {
-		Preferences.EnableSelectedProfile(this);
-		Notebook->RefreshCodeControlOptions();
 		wxCommandEvent evt(mvceditor::EVENT_APP_PREFERENCES_UPDATED);
 		App.EventSink.Publish(evt);
+
+		// signal that this app has modified the config file, that way the external
+		// modification check fails and the user will not be prompted to reload the config
+		App.UpdateConfigModifiedTime();
 	}
+}
+
+void mvceditor::AppFrameClass::PreferencesUpdated() {
+	Preferences.EnableSelectedProfile(this);
+	Notebook->RefreshCodeControlOptions();
+}
+
+void mvceditor::AppFrameClass::PreferencesExternallyUpdated() {
+	Preferences.EnableSelectedProfile(this);
+	Notebook->RefreshCodeControlOptions();
 }
 
 void mvceditor::AppFrameClass::OnEditContentAssist(wxCommandEvent& event) {
@@ -659,10 +671,6 @@ void mvceditor::AppFrameClass::OnAnyAuiToolbarEvent(wxAuiToolBarEvent& event) {
 	event.Skip();
 }
 
-void mvceditor::AppFrameClass::UpdatePreferences() {
-	Notebook->RefreshCodeControlOptions();
-}
-
 void mvceditor::AppFrameClass::UpdateTitleBar() {
 	if (Notebook->GetPageCount() > 0) {
 		mvceditor::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
@@ -694,7 +702,11 @@ void mvceditor::AppEventListenerForFrameClass::OnCmdFileOpen(wxCommandEvent& eve
 }
 
 void mvceditor::AppEventListenerForFrameClass::OnPreferencesUpdated(wxCommandEvent& event) {
-	AppFrame->UpdatePreferences();
+	AppFrame->PreferencesUpdated();
+}
+
+void mvceditor::AppEventListenerForFrameClass::OnPreferencesExternallyUpdated(wxCommandEvent& event) {
+	AppFrame->PreferencesExternallyUpdated();
 }
 
 void mvceditor::AppEventListenerForFrameClass::OnCodeNotebookPageChanged(wxAuiNotebookEvent& event) {
@@ -756,6 +768,7 @@ END_EVENT_TABLE()
 BEGIN_EVENT_TABLE(mvceditor::AppEventListenerForFrameClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_FILE_OPEN, mvceditor::AppEventListenerForFrameClass::OnCmdFileOpen)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_UPDATED, mvceditor::AppEventListenerForFrameClass::OnPreferencesUpdated)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, mvceditor::AppEventListenerForFrameClass::OnPreferencesExternallyUpdated)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::AppEventListenerForFrameClass::OnCodeNotebookPageChanged)
 	EVT_AUINOTEBOOK_PAGE_CLOSED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::AppEventListenerForFrameClass::OnCodeNotebookPageClosed)
 END_EVENT_TABLE()

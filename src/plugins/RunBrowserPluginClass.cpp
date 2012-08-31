@@ -243,7 +243,8 @@ void mvceditor::RunBrowserPluginClass::AddKeyboardShortcuts(std::vector<DynamicC
 }
 
 void mvceditor::RunBrowserPluginClass::LoadPreferences(wxConfigBase* config) {
-	
+	App.Structs.UrlResourceFinder.Browsers.clear();
+
 	// dont use the config; use the Environment that has already been seeded with 
 	// the proper data
 	mvceditor::EnvironmentClass* environment = GetEnvironment();

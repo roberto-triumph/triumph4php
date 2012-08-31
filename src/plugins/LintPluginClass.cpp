@@ -304,7 +304,6 @@ void mvceditor::LintPluginClass::LoadPreferences(wxConfigBase* config) {
 void mvceditor::LintPluginClass::SavePreferences(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfig::Get();
 	config->Write(wxT("/LintCheck/CheckOnSave"), CheckOnSave);
-	config->Flush();
 }
 
 void mvceditor::LintPluginClass::OnLintMenu(wxCommandEvent& event) {

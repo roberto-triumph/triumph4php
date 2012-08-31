@@ -220,7 +220,6 @@ void mvceditor::EnvironmentClass::SaveToConfig(wxConfigBase* config) const {
 			i++;
 		}
 	}
-	config->Flush();
 }
 
 bool mvceditor::EnvironmentClass::FindBrowserByName(const wxString& name, wxFileName& fileName) const {

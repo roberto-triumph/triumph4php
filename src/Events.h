@@ -186,6 +186,16 @@ extern const wxEventType EVENT_APP_FILE_CLOSED;
  * Listeners can access the new preferences via the App Environment global.
  */
 extern const wxEventType EVENT_APP_PREFERENCES_UPDATED;
+/**
+ * Notification that the user preferences (the config INI file) has been updated by an 
+ * external process. An example of this is the user having 2 instances of MVC Editor open
+ * and the user changed preferences in one of the instances.
+ *
+ * Listeners of this event will  need to repaint any windows that are affected by the changes. Listeners
+ * can access the new preferences via the App Preferences, Environment globals.
+ * The global config (wxConfig::Get()) should be used.
+ */
+extern const wxEventType EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED;
 
 /**
  * Notification the that project's urls have been determined (AppClass::UrlResourceFinder 
