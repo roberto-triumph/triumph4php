@@ -51,6 +51,31 @@ static UnicodeString QualifyName(const UnicodeString& namespaceName, const Unico
 	return qualifiedName;
 }
 
+/**
+ * escape a value so that it is suitable for using in a LIKE SQL clause
+ * ie. so that an underscore is treated literally
+ * @param value the value to escape
+ * @param c the character to USE for escaping. this should NOT be backslash,
+ *        as we have namespaces in the database and they use backslash
+ */
+static std::string SqlEscape(const std::string& value, char c) {
+	size_t i = 0;
+	std::string escaped;
+	size_t next = value.find("_", i);
+	while (next != std::string::npos) {
+		escaped += value.substr(i, next - i);
+		escaped += c;
+		escaped += "_";
+
+		i = next + 1;
+		next = value.find("_", i);
+	}
+	if (i < value.length()) {
+		escaped += value.substr(i);
+	}
+	return escaped;
+}
+
 mvceditor::ResourceSearchClass::ResourceSearchClass(UnicodeString resourceQuery)
 	: FileName()
 	, ClassName()
@@ -477,12 +502,14 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 	std::string query = mvceditor::IcuToChar(resourceSearch.GetFileName());
 
 	// add the SQL wildcards
-	query = "'%" + query + "%'";
+	std::string escaped = SqlEscape(query, '^');
+	query = "'%" + escaped + "%'";
 	std::string match;
 	int fileItemId;
 	int isNew;
 	try {
-		soci::statement stmt = (Session.prepare << "SELECT full_path, file_item_id, is_new FROM file_items WHERE full_path LIKE " + query,
+		soci::statement stmt = (Session.prepare << 
+			"SELECT full_path, file_item_id, is_new FROM file_items WHERE full_path LIKE " + query + " ESCAPE '^'",
 			soci::into(match), soci::into(fileItemId), soci::into(isNew));
 		if (stmt.execute(true)) {
 			do {
@@ -1525,13 +1552,15 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::FindByKeyE
 }
 
 std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::FindByKeyStart(const std::string& keyStart, bool doLimit) {
-	std::string whereCond = "key LIKE '" + keyStart + "%'";
+	std::string escaped = SqlEscape(keyStart, '^');
+	std::string whereCond = "key LIKE '" + escaped + "%' ESCAPE '^' ";
 	return ResourceStatementMatches(whereCond, doLimit);
 }
 
 std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::FindByKeyStartAndTypes(const std::string& keyStart, const std::vector<int>& types, bool doLimit) {
 	std::ostringstream stream;
-	stream << "key LIKE '" << keyStart << "%' AND type IN(";
+	std::string escaped = SqlEscape(keyStart, '^');
+	stream << "key LIKE '" << escaped << "%' ESCAPE '^' AND type IN(";
 	for (size_t i = 0; i < types.size(); ++i) {
 		stream << types[i];
 		if (i < (types.size() - 1)) {
@@ -1547,10 +1576,12 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::FindByKeyS
 		std::vector<mvceditor::ResourceClass> matches;
 		return matches;
 	}
+	std::string escaped = SqlEscape(keyStarts[0], '^');
 	std::ostringstream stream;
-	stream << "key LIKE '" << keyStarts[0] << "%'";
+	stream << "key LIKE '" << escaped << "%' ESCAPE '^' ";
 	for (size_t i = 1; i < keyStarts.size(); ++i) {
-		stream << " OR key LIKE '" << keyStarts[i] << "%'";
+		escaped = SqlEscape(keyStarts[i], '^');
+		stream << " OR key LIKE '" << escaped << "%' ESCAPE '^' ";
 	}
 	return ResourceStatementMatches(stream.str(), true);
 }
@@ -1578,7 +1609,8 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::FindByIden
 
 	// do not get fully qualified resources
 	// make sure to use the key because it is indexed
-	stream << "key LIKE '" << identifierStart << "%' AND identifier = key AND type IN(";
+	std::string escaped = SqlEscape(identifierStart, '^');
+	stream << "key LIKE '" << escaped << "%' ESCAPE '^' AND identifier = key AND type IN(";
 	for (size_t i = 0; i < types.size(); ++i) {
 		stream << types[i];
 		if (i < (types.size() - 1)) {
