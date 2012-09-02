@@ -131,7 +131,7 @@ static bool IsStaticExpression(const pelet::ExpressionClass& parsedExpression) {
 	}
 	return
 		parsedExpression.FirstValue().caseCompare(UNICODE_STRING_SIMPLE("self"), 0) == 0
-		|| (parsedExpression.ChainList.size() > 1 && parsedExpression.ChainList[1].IsStatic);
+		|| (parsedExpression.ChainList.Size() > 1 && parsedExpression.ChainList[1].IsStatic);
 }
 
 /**
@@ -303,7 +303,9 @@ static UnicodeString ResolveVariableType(const pelet::ScopeClass& expressionScop
 				pelet::ScopeClass peletScope;
 				pelet::ExpressionClass parsedExpression(peletScope);
 
-				parsedExpression.ChainList = symbol.ChainList;
+				for (size_t i = 0; i < symbol.ChainList.size(); ++i) {
+					parsedExpression.ChainList.PushBack(symbol.ChainList[i]);
+				}
 				std::vector<mvceditor::ResourceClass> resourceMatches;
 				symbolTable.ResourceMatches(parsedExpression, expressionScope, 
 					allResourceFinders, openedResourceFinders, resourceMatches, doDuckTyping, false, error);
@@ -380,7 +382,7 @@ static UnicodeString ResolveInitialLexemeType(const pelet::ExpressionClass& pars
 			error.ErrorLexeme = scopeClass;
 		}
 	}
-	else if (parsedExpression.ChainList.size() > 1) {
+	else if (parsedExpression.ChainList.Size() > 1) {
 
 		// a function or a class. need to get the type from the resource finders
 		// when ChainList has only one item, the item may be a partial function/class name
@@ -432,8 +434,8 @@ void mvceditor::SymbolTableMatchErrorClass::ToVisibility(const pelet::Expression
 	else {
 		Type = mvceditor::SymbolTableMatchErrorClass::VISIBILITY_ERROR;
 	}
-	if (!parsedExpression.ChainList.empty()) {
-		ErrorLexeme = parsedExpression.ChainList.back().Name;
+	if (!parsedExpression.ChainList.Empty()) {
+		ErrorLexeme = parsedExpression.ChainList[parsedExpression.ChainList.Size() - 1].Name;
 	}
 	ErrorClass = className;	
 }
@@ -459,7 +461,7 @@ void mvceditor::SymbolTableMatchErrorClass::ToPrimitiveError(const UnicodeString
 }
 
 void mvceditor::SymbolTableMatchErrorClass::ToUnknownResource(const pelet::ExpressionClass& parsedExpression, const UnicodeString& className) {
-	if (!parsedExpression.ChainList.empty()) {
+	if (!parsedExpression.ChainList.Empty()) {
 		if (IsStaticExpression(parsedExpression)) {
 			Type = mvceditor::SymbolTableMatchErrorClass::UNKNOWN_STATIC_RESOURCE;
 		}
@@ -467,7 +469,7 @@ void mvceditor::SymbolTableMatchErrorClass::ToUnknownResource(const pelet::Expre
 			Type = mvceditor::SymbolTableMatchErrorClass::UNKNOWN_RESOURCE;
 		}
 		ErrorClass = className;
-		ErrorLexeme = parsedExpression.ChainList.back().Name;
+		ErrorLexeme = parsedExpression.ChainList[parsedExpression.ChainList.Size() - 1].Name;
 	}
 }
 
@@ -514,7 +516,7 @@ void mvceditor::SymbolTableClass::VariableFound(const UnicodeString& namespaceNa
 	std::vector<mvceditor::SymbolClass>& symbols = GetScope(className, methodName);
 	bool found = false;
 	for (size_t i = 0; i < symbols.size(); ++i) {
-		if (!variable.ChainList.empty() && symbols[i].Variable == variable.ChainList[0].Name) {
+		if (!variable.ChainList.Empty() && symbols[i].Variable == variable.ChainList[0].Name) {
 			found = true;
 			
 			if (!variable.ArrayKey.isEmpty()) {
@@ -531,7 +533,7 @@ void mvceditor::SymbolTableClass::VariableFound(const UnicodeString& namespaceNa
 			break;
 		}
 	}
-	if (!found && !variable.ChainList.empty()) {
+	if (!found && !variable.ChainList.Empty()) {
 		UnicodeString name = variable.ChainList[0].Name;
 		mvceditor::SymbolClass::Types type;
 		std::vector<UnicodeString> arrayKeys;
@@ -542,7 +544,7 @@ void mvceditor::SymbolTableClass::VariableFound(const UnicodeString& namespaceNa
 				break;
 			case pelet::ExpressionClass::ARRAY:
 				type = mvceditor::SymbolClass::ARRAY;
-				arrayKeys = expression.ArrayKeys;
+				arrayKeys = expression.GetArrayKeys();
 				break;
 			case pelet::ExpressionClass::VARIABLE:
 			case pelet::ExpressionClass::FUNCTION_CALL:
@@ -562,7 +564,9 @@ void mvceditor::SymbolTableClass::VariableFound(const UnicodeString& namespaceNa
 			type = mvceditor::SymbolClass::ARRAY;
 		}
 		mvceditor::SymbolClass newSymbol(name, type);
-		newSymbol.ChainList = expression.ChainList;
+		for (size_t i = 0; i < expression.ChainList.Size(); ++i) {
+			newSymbol.ChainList.push_back(expression.ChainList[i]);
+		}
 		newSymbol.PhpDocType = variable.PhpDocType;
 		newSymbol.ArrayKeys = arrayKeys;
 		symbols.push_back(newSymbol);
@@ -593,7 +597,7 @@ void mvceditor::SymbolTableClass::ExpressionCompletionMatches(pelet::ExpressionC
 															  std::vector<mvceditor::ResourceClass>& autoCompleteResourceList,
 															  bool doDuckTyping,
 															  mvceditor::SymbolTableMatchErrorClass& error) const {
-	if (parsedExpression.ChainList.size() == 1 && parsedExpression.FirstValue().startsWith(UNICODE_STRING_SIMPLE("$"))) {
+	if (parsedExpression.ChainList.Size() == 1 && parsedExpression.FirstValue().startsWith(UNICODE_STRING_SIMPLE("$"))) {
 
 		// if expression does not have more than one chained called AND it starts with a '$' then we want to match (local)
 		// variables. This is just a SymbolTable search.
@@ -645,10 +649,10 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 	else if (typeToLookup.caseCompare(UNICODE_STRING_SIMPLE("array"), 0) == 0) {
 		error.ToArrayError(UNICODE_STRING_SIMPLE(""), parsedExpression.FirstValue());
 	}
-	else if (!parsedExpression.ChainList.empty()) {
+	else if (!parsedExpression.ChainList.Empty()) {
 
 		// need the empty check so that we don't overflow when doing 0 - 1 with size_t 
-		for (size_t i = 1;  i < (parsedExpression.ChainList.size() - 1) && !typeToLookup.isEmpty() && !error.HasError(); ++i) {	
+		for (size_t i = 1;  i < (parsedExpression.ChainList.Size() - 1) && !typeToLookup.isEmpty() && !error.HasError(); ++i) {	
 			UnicodeString nextResource = typeToLookup + UNICODE_STRING_SIMPLE("::") + parsedExpression.ChainList[i].Name;
 			UnicodeString resolvedType = ResolveResourceType(nextResource, allResourceFinders);
 
@@ -666,20 +670,20 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 	}
 
 	UnicodeString resourceToLookup;
-	if (!typeToLookup.isEmpty() && parsedExpression.ChainList.size() > 1 && !error.HasError()) {
-		resourceToLookup = typeToLookup + UNICODE_STRING_SIMPLE("::") + parsedExpression.ChainList.back().Name;
+	if (!typeToLookup.isEmpty() && parsedExpression.ChainList.Size() > 1 && !error.HasError()) {
+		resourceToLookup = typeToLookup + UNICODE_STRING_SIMPLE("::") + parsedExpression.ChainList[parsedExpression.ChainList.Size() - 1].Name;
 	}
 	else if (!typeToLookup.isEmpty() && !error.HasError()) {
 
 		// in this case; chain list is of size 1 (looking for a function / class name)
 		resourceToLookup = typeToLookup;
 	}
-	else if (!error.HasError() && parsedExpression.ChainList.size() > 1 && typeToLookup.isEmpty() && doDuckTyping) {
+	else if (!error.HasError() && parsedExpression.ChainList.Size() > 1 && typeToLookup.isEmpty() && doDuckTyping) {
 		
 		// here, even if the type of previous items in the chain could not be resolved
 		// but were also known NOT to be errors
 		// perform "duck typing" lookups; just look for methods in any class
-		resourceToLookup = UNICODE_STRING_SIMPLE("::") + parsedExpression.ChainList.back().Name;
+		resourceToLookup = UNICODE_STRING_SIMPLE("::") + parsedExpression.ChainList[parsedExpression.ChainList.Size() - 1].Name;
 	}
 
 	// now do the "final" lookup; here we will also perform access checks
