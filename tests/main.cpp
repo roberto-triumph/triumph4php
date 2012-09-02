@@ -29,6 +29,7 @@
 #include <soci/mysql/soci-mysql.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <string.h>
+#include <wx/wx.h>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -110,6 +111,13 @@ public:
 
 // run all tests
 int main(int argc, char **argv) {
+
+	// our classes use wxWidgets we must initialize the
+	// library
+	if (!wxInitialize()) {
+		puts("Could not initialize wxWidgets\n");
+		return -1;
+	}
 
 	// change if you want to run only one test
 	bool runAll = true;

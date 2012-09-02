@@ -42,20 +42,20 @@ class AppFrameClass;
 class AppClass;
 
 /**
- * A timer for a single-use.  We use this to 
- * generate a one-time ready event that plugins can
+ * We use this to generate a one-time ready event that plugins can
  * listen for when they want to perform something
  * right after the main frame has been shown to the
- * user for the first time.
+ * user for the first time. We also use this to check for changes
+ * to the global config file.
  */
-class SingleTimerClass : public wxTimer {
+class AppTimerClass : public wxTimer {
 
 public:
 
 	/**
 	 * create AND begin the timer
 	 */
-	SingleTimerClass(mvceditor::AppClass& app);
+	AppTimerClass(mvceditor::AppClass& app);
 
 	/**
 	 * when the timer ends, generate an EVENT_APP_READY event
@@ -90,6 +90,13 @@ public:
 	 */
 	EventSinkClass EventSink;
 
+	/**
+	 * keep track of the last time the config was modified. will use
+	 * this to check for external changes to the config file
+	 * by another instance of this application
+	 */
+	wxDateTime ConfigLastModified;
+
 	/** 
 	 * Initialize the application 
 	 */
@@ -98,6 +105,14 @@ public:
 	AppClass();
 
 	~AppClass();
+
+	void LoadPreferences();
+
+	/**
+	 * signal that this app has modified the config file, that way the external
+	 * modification check fails and the user will not be prompted to reload the config
+	 */
+	void UpdateConfigModifiedTime();
 
 private:
 
@@ -133,22 +148,32 @@ private:
 	PreferencesClass Preferences;
 
 	/**
+	 * With this timer, we will generate an EVENT_APP_INITIALIZED after the
+	 * window is initially shown to the user. We want to show the main
+	 * window to the user as fast as possible to make the app seem
+	 * fast.
+	 * Also, in this timer we will check for external updates to the 
+	 * global config file; and if the global config file has changed
+	 * reload those changes
+	 */
+	mvceditor::AppTimerClass Timer;
+
+	/**
 	 * The main application frame.
 	 */
 	AppFrameClass* AppFrame;
 
 	/**
-	 * With this timer, we will generate an EVENT_APP_INITIALIZED after the
-	 * window is initially shown to the user. We want to show the main
-	 * window to the user as fast as possible to make the app seem
-	 * fast.
-	 */
-	mvceditor::SingleTimerClass* Timer;
-
-	/**
 	 * Shows the user various editor messages (not related to their code)
 	 */
 	EditorMessagesPluginClass* EditorMessagesPlugin;
+
+	/**
+	 * TRUE if the EVENT_APP_READY has already been generated.
+	 */
+	bool IsAppReady;
+
+	friend class mvceditor::AppTimerClass;
 
 };
 

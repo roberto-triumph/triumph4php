@@ -652,13 +652,19 @@ mvceditor::EnvironmentPluginClass::EnvironmentPluginClass(mvceditor::AppClass& a
 	: PluginClass(app) {
 }
 
-void mvceditor::EnvironmentPluginClass::OnPreferencesUpdated(wxCommandEvent& event) {
+void mvceditor::EnvironmentPluginClass::OnPreferencesSaved(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfigBase::Get();
 	mvceditor::EnvironmentClass* environment = GetEnvironment();
 	environment->SaveToConfig(config);
 	if (environment->Php.IsAuto) {
 		environment->Php.AutoDetermine();
 	}
+
+	config->Flush();
+
+	// signal that this app has modified the config file, that way the external
+	// modification check fails and the user will not be prompted to reload the config
+	App.UpdateConfigModifiedTime();
 }
 
 void mvceditor::EnvironmentPluginClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
@@ -674,5 +680,5 @@ BEGIN_EVENT_TABLE(mvceditor::ApacheEnvironmentPanelClass, ApacheEnvironmentPanel
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::EnvironmentPluginClass, wxEvtHandler) 
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_UPDATED, mvceditor::EnvironmentPluginClass::OnPreferencesUpdated) 	
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::EnvironmentPluginClass::OnPreferencesSaved) 	
 END_EVENT_TABLE()

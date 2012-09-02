@@ -706,6 +706,7 @@ void mvceditor::RunConsolePluginClass::OnRunSavedCommands(wxCommandEvent& event)
 }
 
 void mvceditor::RunConsolePluginClass::LoadPreferences(wxConfigBase* config) {
+	CliCommands.clear();
 	long index;
 	wxString groupName;
 	bool found = config->GetFirstGroup(groupName, index);
@@ -756,6 +757,10 @@ void mvceditor::RunConsolePluginClass::PersistCommands() {
 		config->Write(key, CliCommands[i].WaitForArguments);
 	}
 	config->Flush();
+
+	// signal that this app has modified the config file, that way the external
+	// modification check fails and the user will not be prompted to reload the config
+	App.UpdateConfigModifiedTime();
 	FillCommandPanel();
 }
 

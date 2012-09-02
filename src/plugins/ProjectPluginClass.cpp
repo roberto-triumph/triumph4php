@@ -132,7 +132,7 @@ void mvceditor::ProjectPluginClass::LoadPreferences(wxConfigBase* config) {
 	}
 }
 
-void mvceditor::ProjectPluginClass::SavePreferences(wxCommandEvent& event) {
+void mvceditor::ProjectPluginClass::OnPreferencesSaved(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfig::Get();
 	config->Write(wxT("/Project/ExplorerExecutable"), ExplorerExecutable);
 	config->Write(wxT("/Project/PhpFileExtensions"), App.Structs.PhpFileExtensionsString);
@@ -227,6 +227,18 @@ void mvceditor::ProjectPluginClass::OnProjectExploreOpenFile(wxCommandEvent& eve
 }
 
 void mvceditor::ProjectPluginClass::OnAppReady(wxCommandEvent& event) {
+	StartDetectors();
+}
+
+void mvceditor::ProjectPluginClass::StartDetectors() {
+
+	// clear the detected framework info
+	App.Structs.Frameworks.clear();
+
+	// only remove the database infos that were detected from
+	// PHP frameworks, leave the ones that the user created intact
+	App.Structs.ClearDetectedInfos();
+
 	DirectoriesToDetect.clear();
 	std::vector<mvceditor::SourceClass> allSources = App.Structs.AllEnabledSources();
 	if (!allSources.empty()) {
@@ -324,20 +336,19 @@ void mvceditor::ProjectPluginClass::OnProjectDefine(wxCommandEvent& event) {
 		}
 
 		wxCommandEvent evt;
-		SavePreferences(evt);
+		OnPreferencesSaved(evt);
 		wxConfigBase* config = wxConfig::Get();
 		config->Flush();
 
-		// re-start the project opening cycle
-		// clear the detected framework info
-		App.Structs.Frameworks.clear();
-
-		// only remove the database infos that were detected from
-		// PHP frameworks, leave the ones that the user created intact
-		App.Structs.ClearDetectedInfos();
-		wxCommandEvent readyEvt(mvceditor::EVENT_APP_READY);
-		OnAppReady(readyEvt);
+		// signal that this app has modified the config file, that way the external
+		// modification check fails and the user will not be prompted to reload the config
+		App.UpdateConfigModifiedTime();
+		StartDetectors();
 	}
+}
+
+void mvceditor::ProjectPluginClass::OnPreferencesExternallyUpdated(wxCommandEvent& event) {
+	StartDetectors();
 }
 
 mvceditor::ProjectPluginPanelClass::ProjectPluginPanelClass(wxWindow *parent, mvceditor::ProjectPluginClass &projectPlugin) 
@@ -695,6 +706,7 @@ BEGIN_EVENT_TABLE(mvceditor::ProjectPluginClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_DETECTION_COMPLETE, mvceditor::ProjectPluginClass::OnFrameworkDetectionComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_DETECTION_FAILED, mvceditor::ProjectPluginClass::OnFrameworkDetectionFailed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::ProjectPluginClass::OnFrameworkDetectionInProgress)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_UPDATED, mvceditor::ProjectPluginClass::SavePreferences)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::ProjectPluginClass::OnPreferencesSaved)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, mvceditor::ProjectPluginClass::OnPreferencesExternallyUpdated)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::ProjectPluginClass::OnAppReady)
 END_EVENT_TABLE()

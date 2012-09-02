@@ -352,7 +352,7 @@ public:
 	
 private:
 
-	void OnPreferencesUpdated(wxCommandEvent& event);
+	void OnPreferencesSaved(wxCommandEvent& event);
 	
 	DECLARE_EVENT_TABLE()
 };

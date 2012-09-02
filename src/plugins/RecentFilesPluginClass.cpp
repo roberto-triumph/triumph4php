@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <plugins/RecentFilesPluginClass.h>
+#include <MvcEditor.h>
 
 static int MAX_RECENT_FILES = 10;
 
@@ -46,6 +47,9 @@ void mvceditor::RecentFilesPluginClass::AddFileMenuItems(wxMenu* fileMenu) {
 }
 
 void mvceditor::RecentFilesPluginClass::LoadPreferences(wxConfigBase* config) {
+	while (RecentFilesMenu->GetMenuItemCount() > 0) {
+		RecentFilesMenu->Delete(RecentFilesMenu->FindItemByPosition(0));
+	}
 	FileHistory.Load(*config);
 }
 
@@ -53,6 +57,10 @@ void mvceditor::RecentFilesPluginClass::SavePreferences() {
 	wxConfigBase* config = wxConfigBase::Get();
 	FileHistory.Save(*config);
 	config->Flush();
+
+	// signal that this app has modified the config file, that way the external
+	// modification check fails and the user will not be prompted to reload the config
+	App.UpdateConfigModifiedTime();
 }
 
 void mvceditor::RecentFilesPluginClass::OnRecentFileMenu(wxCommandEvent &event) {

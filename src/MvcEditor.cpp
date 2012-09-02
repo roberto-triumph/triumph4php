@@ -42,6 +42,7 @@
 #include <plugins/ViewFilePluginClass.h>
 #include <plugins/RecentFilesPluginClass.h>
 #include <MvcEditorErrors.h>
+#include <MvcEditorAssets.h>
 
 IMPLEMENT_APP(mvceditor::AppClass)
 
@@ -50,11 +51,13 @@ mvceditor::AppClass::AppClass()
 	, Structs()
 	, RunningThreads()
 	, EventSink()
+	, ConfigLastModified()
 	, Plugins()
 	, Preferences()
-	, EditorMessagesPlugin(NULL) {
+	, Timer(*this)
+	, EditorMessagesPlugin(NULL) 
+	, IsAppReady(false) {
 	AppFrame = NULL;
-	Timer = NULL;
 }
 
 /**
@@ -70,17 +73,8 @@ bool mvceditor::AppClass::OnInit() {
 	// all menu items must be present in the menu bar for shortcuts to take effect
 	AppFrame = new mvceditor::AppFrameClass(Plugins, *this, Preferences);
 	PluginWindows();
-
-	// load any settings from .INI files
-	PreferencesClass::InitConfig();
-	wxConfigBase* config = wxConfigBase::Get();
-	Structs.Environment.LoadFromConfig(config);
-	for (size_t i = 0; i < Plugins.size(); ++i) {
-		Plugins[i]->LoadPreferences(config);
-		Plugins[i]->AddKeyboardShortcuts(Preferences.DefaultKeyboardShortcutCmds);
-	}	
-	Preferences.Load(AppFrame);
-
+	Preferences.Init();
+	LoadPreferences();
 	AppFrame->AuiManagerUpdate();
 	if (CommandLine()) {
 		SetTopWindow(AppFrame);
@@ -96,17 +90,14 @@ bool mvceditor::AppClass::OnInit() {
 		// pointer will be managed by wxWidgets
 		// need to put this here because the logger needs an initialized window state
 		wxLog::SetActiveTarget(new mvceditor::EditorMessagesLoggerClass(*EditorMessagesPlugin));
-		Timer = new mvceditor::SingleTimerClass(*this);
+		Timer.Start(1000, wxTIMER_CONTINUOUS);
 		return true;
 	}
 	return false;
 }
 
 mvceditor::AppClass::~AppClass() {
-	if (Timer) {
-		Timer->Stop();
-		delete Timer;
-	}
+	Timer.Stop();
 	DeletePlugins();
 	
 	// calling cleanup here so that we can run this binary through a memory leak detector 
@@ -214,17 +205,74 @@ void mvceditor::AppClass::DeletePlugins() {
 	EditorMessagesPlugin = NULL;
 }
 
-mvceditor::SingleTimerClass::SingleTimerClass(mvceditor::AppClass& app)
-	: wxTimer()
-	, App(app) {
-	Start(1000, wxTIMER_ONE_SHOT);
+void mvceditor::AppClass::LoadPreferences() {
+
+	// load any settings from .INI files
+	PreferencesClass::InitConfig();
+	wxConfigBase* config = wxConfigBase::Get();
+	Structs.Environment.LoadFromConfig(config);
+	for (size_t i = 0; i < Plugins.size(); ++i) {
+		Plugins[i]->LoadPreferences(config);
+		Plugins[i]->AddKeyboardShortcuts(Preferences.DefaultKeyboardShortcutCmds);
+	}	
+	Preferences.Load(config, AppFrame);
+
+	wxCommandEvent event(mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED);
+	EventSink.Publish(event);
 }
 
-void mvceditor::SingleTimerClass::Notify() {
+void mvceditor::AppClass::UpdateConfigModifiedTime() {
+	wxFileName configFileName(mvceditor::ConfigDirAsset().GetPath(), wxT("mvc-editor.ini"));
+	if (configFileName.FileExists()) {
+		ConfigLastModified = configFileName.GetModificationTime();
+	}
+}
+
+mvceditor::AppTimerClass::AppTimerClass(mvceditor::AppClass& app)
+	: wxTimer()
+	, App(app) {
+}
+
+void mvceditor::AppTimerClass::Notify() {
 	
 	// tell all plugins that the app is ready to use
 	// the plugins will do / should do  their grunt
 	// work in their event handler
-	wxCommandEvent evt(mvceditor::EVENT_APP_READY);
-	App.EventSink.Publish(evt);
+	if (!App.IsAppReady) {
+		App.IsAppReady = true;
+		wxCommandEvent evt(mvceditor::EVENT_APP_READY);
+		App.EventSink.Publish(evt);
+		wxFileName configFileName(mvceditor::ConfigDirAsset().GetPath(), wxT("mvc-editor.ini"));
+		if (configFileName.FileExists()) {
+			App.ConfigLastModified = configFileName.GetModificationTime();
+		}
+	}
+	else {
+		wxFileName configFileName(mvceditor::ConfigDirAsset().GetPath(), wxT("mvc-editor.ini"));
+		if (configFileName.FileExists()) {
+			wxDateTime lastModified = configFileName.GetModificationTime();
+			if (lastModified.IsLaterThan(App.ConfigLastModified)) {
+
+				// stop the timer so that we dont show this prompt multiple times
+				App.Timer.Stop();
+				wxString msg = wxString::FromAscii(
+					"Preferences have been modified externally.\n"
+					"Reload the preferences?"	
+				);
+				msg = wxGetTranslation(msg);
+				int res = wxMessageBox(msg, _("Reload preferences"), wxCENTRE | wxYES_NO, App.AppFrame);
+				if (wxYES == res) {
+
+					// delete the old config ourselves
+					wxConfigBase* oldConfig = wxConfig::Get();
+					delete oldConfig;
+					wxConfig::Set(NULL);
+					App.LoadPreferences();
+
+					App.ConfigLastModified = configFileName.GetModificationTime();
+				}
+				App.Timer.Start(1000, wxTIMER_CONTINUOUS);
+			}
+		}
+	}
 }

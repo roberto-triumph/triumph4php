@@ -130,9 +130,10 @@ public:
 	/**
 	 * Load the preferences from persistent storage.
 	 * 
+	 * @param wxConfigBase* config the config object to load info from
 	 * @param wxFrame* we need a frame so we can attach keyboard listeners to it.
 	 */
-	void Load(wxFrame* frame);
+	void Load(wxConfigBase* config, wxFrame* frame);
 	
 	/**
 	 * Save the preferences to persistent storage.

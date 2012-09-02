@@ -307,7 +307,7 @@ protected:
 	
 private:
 
-	void SavePreferences(wxCommandEvent& event);
+	void OnPreferencesSaved(wxCommandEvent& event);
 
 	void OnLintMenu(wxCommandEvent& event);
 
