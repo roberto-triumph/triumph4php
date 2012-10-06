@@ -45,6 +45,8 @@ class AppFrameGeneratedClass : public wxFrame
 {
 	DECLARE_EVENT_TABLE()
 	private:
+		wxMenuItem* m_separator4;
+		wxMenuItem* m_separator3;
 		
 		// Private event handlers
 		void _wxFB_OnClose( wxCloseEvent& event ){ OnClose( event ); }
