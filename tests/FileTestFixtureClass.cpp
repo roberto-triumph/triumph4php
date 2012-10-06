@@ -57,6 +57,7 @@ void FileTestFixtureClass::RecursiveRmDir(wxString path) {
 	
 	// this way so that gcc does not think that good is an unused variable
 	bool good;
+	wxUnusedVar(good);
 	while (next) {
 		
 		// wxRmDir does not handle symlinks
@@ -85,6 +86,7 @@ void FileTestFixtureClass::CreateFixtureFile(const wxString& fileName, const wxS
 		
 		// this way so that gcc does not think that good is an unused variable
 		bool good;
+		wxUnusedVar(good);
 		good = wxMkdir(TestProjectDir, 0777);
 		wxASSERT_MSG(good, _("Could not create directory: ") + TestProjectDir);
 	}
@@ -144,7 +146,8 @@ wxString FileTestFixtureClass::GetFileContents(const wxString& fileName) {
 void FileTestFixtureClass::CreateSubDirectory(const wxString& subDirectory) {
 	
 	// this way so that gcc does not think that good is an unused variable
-		bool good;
+	bool good;
+	wxUnusedVar(good);
 	if (!wxDirExists(TestProjectDir)) {
 		good = wxMkdir(TestProjectDir, 0777);
 		wxASSERT_MSG(good, _("Could not create directory:") + TestProjectDir);

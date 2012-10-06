@@ -120,7 +120,12 @@ void mvceditor::PhpEnvironmentClass::AutoDetermine() {
 	if (is54) {
 		Version = pelet::PHP_54;
 	}
+	if (is53) {
+		Version = pelet::PHP_53;
+	}
 	else {
+		
+		// if version string changes
 		Version = pelet::PHP_53;
 	}
 }

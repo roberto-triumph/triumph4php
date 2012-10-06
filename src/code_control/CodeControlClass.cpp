@@ -778,7 +778,6 @@ void  mvceditor::CodeControlClass::OnDoubleClick(wxStyledTextEvent& event) {
 	SetStyling(GetTextLength(), 0);
 	
 	int charStartIndex = 0;
-	int charEndIndex = 0;
 	
 	// pos, endPos are byte offsets into the UTF-8 string, need to convert to char numbers
 	int documentLength = GetTextLength();
@@ -787,7 +786,7 @@ void  mvceditor::CodeControlClass::OnDoubleClick(wxStyledTextEvent& event) {
 	// GET_TEXT  message
 	SendMsg(2182, documentLength, (long)buf);
 	charStartIndex = mvceditor::Utf8PosToChar(buf, documentLength, pos);
-	charEndIndex = mvceditor::Utf8PosToChar(buf, documentLength, endPos);
+	mvceditor::Utf8PosToChar(buf, documentLength, endPos);
 	
 	UnicodeString word = Document->GetSafeSubstring(pos, endPos);
 	if (!word.isEmpty()) {

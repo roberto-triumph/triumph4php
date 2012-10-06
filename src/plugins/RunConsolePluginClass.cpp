@@ -405,6 +405,7 @@ void mvceditor::RunConsolePanelClass::AppendText(const wxString& text) {
 	
 	// this way so that gcc does not think that good is an unused variable
 	bool prep;
+	wxUnusedVar(prep);
 	prep = finder.Prepare();
 	wxASSERT(prep);
 	
@@ -769,11 +770,9 @@ void mvceditor::RunConsolePluginClass::AddCommand(const mvceditor::CliCommandCla
 }
 
 void mvceditor::RunConsolePluginClass::FillCommandPanel() {
-	bool added = false;
 	if (CommandToolbar == NULL) {
 		CommandToolbar = new wxAuiToolBar(GetMainWindow(), wxID_ANY, wxDefaultPosition, wxDefaultSize, 
 			  wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_OVERFLOW | wxAUI_TB_TEXT | wxAUI_TB_HORZ_TEXT);
-		added = true;
 		CommandToolbar->SetToolBitmapSize(wxSize(16,16));
 		CommandToolbar->SetOverflowVisible(false);
 	}
