@@ -78,7 +78,7 @@ CMAKE = 'cmake';
 -- on linux we will assume it is installed system-wide
 MYSQL_INCLUDE_DIR = '/usr/include/mysql/'
 MYSQL_LIB_NAME = 'libmysqlclient.so'
-MYSQL_LIB_DIR = '/usr/lib/'
+MYSQL_LIB_DIR = '/usr/lib/x86_64-linux-gnu/'
 
 -- On some unit tests, MVC Editor attempt to connect to a database
 -- Set the username and password to use here.
@@ -89,4 +89,4 @@ MVCEDITOR_DB_PASSWORD = '';
 -- will look for SQLite in these directories
 SQLITE_INCLUDE_DIR = '/usr/include/'
 SQLITE_LIB_NAME = 'libsqlite3.so'
-SQLITE_LIB_DIR = '/usr/lib/'
+SQLITE_LIB_DIR = '/usr/lib/x86_64-linux-gnu/'
