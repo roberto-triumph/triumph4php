@@ -67,7 +67,6 @@ AppFrameGeneratedClass::AppFrameGeneratedClass( wxWindow* parent, wxWindowID id,
 	MenuItemFileTextNew = new wxMenuItem( FileMenu, ID_FILE_TEXT_NEW_FILE, wxString( _("New Te&xt File") ) , _("Create a new text file"), wxITEM_NORMAL );
 	FileMenu->Append( MenuItemFileTextNew );
 	
-	wxMenuItem* m_separator4;
 	m_separator4 = FileMenu->AppendSeparator();
 	
 	wxMenuItem* MenuItemFileOpen;
@@ -117,7 +116,6 @@ AppFrameGeneratedClass::AppFrameGeneratedClass( wxWindow* parent, wxWindowID id,
 	MenuItemSelectAll = new wxMenuItem( EditMenu, wxID_SELECTALL, wxString( _("Select All") ) + wxT('\t') + wxT("CTRL+A"), _("Select Entire Text"), wxITEM_NORMAL );
 	EditMenu->Append( MenuItemSelectAll );
 	
-	wxMenuItem* m_separator3;
 	m_separator3 = EditMenu->AppendSeparator();
 	
 	wxMenuItem* MenuItemEditContentAssist;

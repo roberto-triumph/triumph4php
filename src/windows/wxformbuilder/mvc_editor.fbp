@@ -314,7 +314,7 @@
                     </object>
                     <object class="separator" expanded="0">
                         <property name="name">m_separator4</property>
-                        <property name="permission">none</property>
+                        <property name="permission">private</property>
                     </object>
                     <object class="wxMenuItem" expanded="0">
                         <property name="bitmap"></property>
@@ -473,7 +473,7 @@
                     </object>
                     <object class="separator" expanded="0">
                         <property name="name">m_separator3</property>
-                        <property name="permission">none</property>
+                        <property name="permission">private</property>
                     </object>
                     <object class="wxMenuItem" expanded="0">
                         <property name="bitmap"></property>

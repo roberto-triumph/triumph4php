@@ -26,7 +26,7 @@
 #define __symboltable__
 
 #include <pelet/ParserClass.h>
-#include <pelet/ParserObserverClass.h>
+#include <pelet/ParserTypeClass.h>
 #include <search/ResourceFinderClass.h>
 #include <MvcEditorString.h>
 #include <unicode/unistr.h>

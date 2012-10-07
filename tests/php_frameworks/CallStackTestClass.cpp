@@ -84,9 +84,9 @@ public:
 			globalCache->Walk(search);
 		}
 		
-		// this way so that gcc does not think that good is an unused variable
-		bool good;
-		good = ResourceCache.RegisterGlobal(globalCache);
+		// need to code it so that gcc does not think that good is an unused variable in release mode
+		bool good = ResourceCache.RegisterGlobal(globalCache);
+		wxUnusedVar(good);
 		wxASSERT_MSG(good, _("global cache could not be registered"));
 	}
 };

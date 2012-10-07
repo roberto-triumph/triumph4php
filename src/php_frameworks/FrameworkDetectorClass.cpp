@@ -111,7 +111,7 @@ bool mvceditor::DetectorActionClass::Init(int id, const EnvironmentClass& enviro
 }
 
 void mvceditor::DetectorActionClass::InitFromFile(wxString fileName) {
-	OutputFile = wxFileName::wxFileName(fileName);
+	OutputFile.Assign(fileName);
 	Response();
 }
 
@@ -701,7 +701,6 @@ void mvceditor::PhpFrameworkDetectorClass::OnDatabaseDetectionComplete(wxCommand
 }
 
 void mvceditor::PhpFrameworkDetectorClass::OnConfigFilesDetectionComplete(wxCommandEvent& event) {
-	std::map<wxString, wxString>::iterator it = ConfigFilesDetector.ConfigFiles.begin();
 	Framework.ConfigFiles.insert(ConfigFilesDetector.ConfigFiles.begin(), ConfigFilesDetector.ConfigFiles.end());
 	if (mvceditor::DetectorActionClass::NONE != ConfigFilesDetector.Error) {
 		wxString response = event.GetString();

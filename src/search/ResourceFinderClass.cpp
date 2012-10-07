@@ -1284,7 +1284,6 @@ void mvceditor::ResourceFinderClass::AddDynamicResources(const std::vector<mvced
 			if (mvceditor::ResourceClass::MEMBER == resource.Type || mvceditor::ResourceClass::METHOD == resource.Type) {
 
 				// need to account for duplicates; if so then only update
-				bool updated = false;
 				std::ostringstream stream;
 				stream << "SELECT return_type, class_name, identifier FROM resources WHERE class_name = ? AND identifier = ? AND type IN("
 					<< mvceditor::ResourceClass::MEMBER
@@ -1310,7 +1309,6 @@ void mvceditor::ResourceFinderClass::AddDynamicResources(const std::vector<mvced
 						<< mvceditor::ResourceClass::METHOD
 						<< ")";
 					Session.once << updateStream.str(), soci::use(returnType), soci::use(className), soci::use(identifier);
-					updated = true;
 				}
 				else if (returnType.empty() && classNameOut.empty() && identifierOut.empty()) {
 					
@@ -1327,7 +1325,6 @@ void mvceditor::ResourceFinderClass::AddDynamicResources(const std::vector<mvced
 			else {
 
 				// look at the function, cache
-				bool updated = false;
 				std::ostringstream stream;
 				stream << "SELECT return_type, identifier FROM resources WHERE key = ? AND type IN("
 					<< mvceditor::ResourceClass::FUNCTION
@@ -1345,7 +1342,6 @@ void mvceditor::ResourceFinderClass::AddDynamicResources(const std::vector<mvced
 						<< mvceditor::ResourceClass::FUNCTION
 						<< ")";				
 					Session.once << updateStream.str(), soci::use(returnType), soci::use(identifier);
-					updated = true;
 				}
 				else if (returnType.empty() && identifierOut.empty()) {
 
