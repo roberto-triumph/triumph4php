@@ -40,7 +40,8 @@ static const int ID_FRAMEWORK_DETECTION_GAUGE = wxNewId();
 mvceditor::ProjectPluginClass::ProjectPluginClass(mvceditor::AppClass& app) 
 	: PluginClass(app)
 	, PhpFrameworks(*this, app.RunningThreads, app.Structs.Environment) 
-	, DirectoriesToDetect() {
+	, DirectoriesToDetect() 
+	, IsDetecting(false) {
 	wxPlatformInfo info;
 	switch (info.GetOperatingSystemId()) {
 		case wxOS_WINDOWS_NT:
@@ -227,7 +228,11 @@ void mvceditor::ProjectPluginClass::OnProjectExploreOpenFile(wxCommandEvent& eve
 }
 
 void mvceditor::ProjectPluginClass::OnAppReady(wxCommandEvent& event) {
-	StartDetectors();
+
+	// if an existing detection is running, then let it finish
+	if (!IsDetecting) {
+		StartDetectors();
+	}
 }
 
 void mvceditor::ProjectPluginClass::StartDetectors() {
@@ -240,9 +245,10 @@ void mvceditor::ProjectPluginClass::StartDetectors() {
 	App.Structs.ClearDetectedInfos();
 
 	DirectoriesToDetect.clear();
+	IsDetecting = false;
 	std::vector<mvceditor::SourceClass> allSources = App.Structs.AllEnabledSources();
 	if (!allSources.empty()) {
-
+		
 		for (size_t i = 1; i < allSources.size(); ++i) {
 			DirectoriesToDetect.push_back(allSources[i].RootDirectory.GetPath());
 		}
@@ -252,6 +258,7 @@ void mvceditor::ProjectPluginClass::StartDetectors() {
 			DirectoriesToDetect.clear();
 		}
 		else {
+			IsDetecting = true;
 			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 			gauge->AddGauge(_("Framework Detection"), ID_FRAMEWORK_DETECTION_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
 		}
@@ -281,6 +288,7 @@ void mvceditor::ProjectPluginClass::OnFrameworkDetectionComplete(wxCommandEvent&
 		App.EventSink.Publish(projectOpenedEvent);
 		mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 		gauge->StopGauge(ID_FRAMEWORK_DETECTION_GAUGE);
+		IsDetecting = false;
 	}
 }
 
@@ -301,6 +309,7 @@ void mvceditor::ProjectPluginClass::OnFrameworkDetectionFailed(wxCommandEvent& e
 		App.EventSink.Publish(projectOpenedEvent);
 		mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 		gauge->StopGauge(ID_FRAMEWORK_DETECTION_GAUGE);
+		IsDetecting = true;
 	}
 }
 
@@ -343,12 +352,19 @@ void mvceditor::ProjectPluginClass::OnProjectDefine(wxCommandEvent& event) {
 		// signal that this app has modified the config file, that way the external
 		// modification check fails and the user will not be prompted to reload the config
 		App.UpdateConfigModifiedTime();
-		StartDetectors();
+
+		if (!IsDetecting) {
+			StartDetectors();
+		}
 	}
 }
 
 void mvceditor::ProjectPluginClass::OnPreferencesExternallyUpdated(wxCommandEvent& event) {
-	StartDetectors();
+	
+	// if an existing detection is running, then let it finish
+	if (!IsDetecting) {
+		StartDetectors();
+	}
 }
 
 mvceditor::ProjectPluginPanelClass::ProjectPluginPanelClass(wxWindow *parent, mvceditor::ProjectPluginClass &projectPlugin) 

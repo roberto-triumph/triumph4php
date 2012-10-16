@@ -709,6 +709,10 @@ void mvceditor::AppEventListenerForFrameClass::OnPreferencesExternallyUpdated(wx
 	AppFrame->PreferencesExternallyUpdated();
 }
 
+void mvceditor::AppEventListenerForFrameClass::OnAppReady(wxCommandEvent& event) {
+	AppFrame->PreferencesExternallyUpdated();
+}
+
 void mvceditor::AppEventListenerForFrameClass::OnCodeNotebookPageChanged(wxAuiNotebookEvent& event) {
 	AppFrame->UpdateTitleBar();
 }
@@ -769,6 +773,7 @@ BEGIN_EVENT_TABLE(mvceditor::AppEventListenerForFrameClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_FILE_OPEN, mvceditor::AppEventListenerForFrameClass::OnCmdFileOpen)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::AppEventListenerForFrameClass::OnPreferencesSaved)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, mvceditor::AppEventListenerForFrameClass::OnPreferencesExternallyUpdated)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::AppEventListenerForFrameClass::OnAppReady)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::AppEventListenerForFrameClass::OnCodeNotebookPageChanged)
 	EVT_AUINOTEBOOK_PAGE_CLOSED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::AppEventListenerForFrameClass::OnCodeNotebookPageClosed)
 END_EVENT_TABLE()

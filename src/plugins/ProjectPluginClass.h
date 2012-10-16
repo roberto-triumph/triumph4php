@@ -136,6 +136,11 @@ private:
 	 */
 	std::vector<wxString> DirectoriesToDetect;
 
+	/**
+	 * Flag that tells whether project detection is currently happening
+	 */
+	bool IsDetecting;
+
 
 	DECLARE_EVENT_TABLE()
 	

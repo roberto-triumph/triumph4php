@@ -216,9 +216,6 @@ void mvceditor::AppClass::LoadPreferences() {
 		Plugins[i]->AddKeyboardShortcuts(Preferences.DefaultKeyboardShortcutCmds);
 	}	
 	Preferences.Load(config, AppFrame);
-
-	wxCommandEvent event(mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED);
-	EventSink.Publish(event);
 }
 
 void mvceditor::AppClass::UpdateConfigModifiedTime() {
