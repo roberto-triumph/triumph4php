@@ -229,10 +229,6 @@ void mvceditor::ResourcePluginClass::OnAppReady(wxCommandEvent& event) {
 			resourceCache->RegisterGlobal(projectCache);
 		}
 	}
-
-	// tell the app that resource cache is available
-	wxCommandEvent indexedEvent(mvceditor::EVENT_APP_PROJECT_INDEXED);
-	App.EventSink.Publish(indexedEvent);
 }
 
 void mvceditor::ResourcePluginClass::OnProjectsUpdated(wxCommandEvent& event) {
