@@ -264,6 +264,7 @@ void mvceditor::AppTimerClass::Notify() {
 					wxConfigBase* oldConfig = wxConfig::Get();
 					delete oldConfig;
 					wxConfig::Set(NULL);
+					App.Preferences.ClearAllShortcuts();
 					App.LoadPreferences();
 
 					App.ConfigLastModified = configFileName.GetModificationTime();

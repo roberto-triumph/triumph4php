@@ -302,12 +302,16 @@ mvceditor::PreferencesClass::~PreferencesClass() {
 	//KeyProfileArray destructor deletes the pointers
 }
 
+void mvceditor::PreferencesClass::ClearAllShortcuts() {
+	KeyProfiles.Cleanup();
+	DefaultKeyboardShortcutCmds.clear();
+}
+
 void mvceditor::PreferencesClass::Load(wxConfigBase* config, wxFrame* frame) {
 	CodeControlOptions.StartEditMode();
 	CodeControlOptions.SetToLightTheme();
 	CodeControlOptions.CommitChanges();
 	KeyProfiles.Cleanup();
-	DefaultKeyboardShortcutCmds.clear();
 	CodeControlOptions.Load(config);
 	int totalCmdCount = 0;
 

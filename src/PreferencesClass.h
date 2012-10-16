@@ -134,6 +134,12 @@ public:
 	 * @param wxFrame* we need a frame so we can attach keyboard listeners to it.
 	 */
 	void Load(wxConfigBase* config, wxFrame* frame);
+
+	/**
+	 * delete all of the saved shortcuts.  This would be done before we reload a config
+	 * file that was changed externally.
+	 */
+	void ClearAllShortcuts();
 	
 	/**
 	 * Save the preferences to persistent storage.
