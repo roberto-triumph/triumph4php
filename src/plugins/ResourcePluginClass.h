@@ -164,11 +164,6 @@ public:
 	void OpenFile(wxString fileName);
 
 	/**
-	 * Trigger the start of the indexing background thread.
-	 */
-	void StartIndex();
-
-	/**
 	 * Returns true if files in the project have NOT already been cached by the resource finder. This does not
  	 * necesaarily mean that the resource finder has parsed them; if so far all resource lookups have been for
  	 * file names then the resource finder has not parsed a single file.  What it does mean is that the next call
@@ -187,6 +182,11 @@ public:
 	wxString CacheStatus();
 	
 private:
+
+	/**
+	 * Trigger the start of the indexing background thread.
+	 */
+	void StartIndex();
 
 	void OnProjectsUpdated(wxCommandEvent& event);
 
