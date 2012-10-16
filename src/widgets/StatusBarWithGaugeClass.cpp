@@ -31,6 +31,7 @@ mvceditor::StatusBarWithGaugeClass::StatusBarWithGaugeClass(wxWindow *parent, in
 }
 
 void mvceditor::StatusBarWithGaugeClass::AddGauge(const wxString& title, int id, int maxValue, int flags) {
+	wxASSERT_MSG(Gauges.count(id) == 0, wxString::Format(wxT("There is already another gauge with ID =%d; gauge name=%s"), id, title));
 	wxGauge* gauge = new wxGauge(this, wxID_ANY, maxValue, wxDefaultPosition, wxDefaultSize, flags);
 	if (maxValue != INDETERMINATE_MODE) {
 		gauge->SetValue(0);
