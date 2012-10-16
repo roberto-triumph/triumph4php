@@ -240,6 +240,15 @@ private:
 	 */
 	void PostEvent(wxEvent& event);
 
+	/**
+	 * Check to see if the given thread is being tracked; if it was previously
+	 * added with the Add() method but not yet removed via the Remove() or Stop()
+	 * methods.  If this returns true, then it means that the thread is definitely alive.
+	 * This is safe to call on detached or joinable threads, as it does not depend
+	 * on wxThread::IsAlive or  wxThread::IsRunning methods.
+	 */
+	bool IsRunning(wxThread* thread);
+
 	private:
 
 	/**

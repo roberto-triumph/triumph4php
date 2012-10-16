@@ -40,6 +40,7 @@ mvceditor::ThreadWithHeartbeatClass::~ThreadWithHeartbeatClass() {
 }
 
 wxThreadError mvceditor::ThreadWithHeartbeatClass::CreateSingleInstance(wxThreadIdType& threadId) {
+	wxASSERT_MSG(!RunningThreads.IsRunning(this), wxT("A new thread cannot be created because the current one is still not done."));
 	wxThreadError error = wxTHREAD_NO_ERROR;
 	error = Create();
 	if (error == wxTHREAD_NO_ERROR) {
@@ -210,6 +211,21 @@ void mvceditor::RunningThreadsClass::PostEvent(wxEvent& event) {
 	for (it = Handlers.begin(); it != Handlers.end(); ++it) {
 		wxPostEvent(*it, event);
 	}
+}
+
+bool mvceditor::RunningThreadsClass::IsRunning(wxThread* thread) {
+	bool found = false;
+	wxMutexLocker locker(Mutex);
+	wxASSERT(locker.IsOk());
+	std::vector<wxThread*>::iterator it = Workers.begin();
+	while (it != Workers.end()) {
+		if (*it == thread) {
+			found = true;
+			break;
+		}
+		++it;
+	}
+	return found;
 }
 
 const wxEventType mvceditor::EVENT_WORK_COMPLETE = wxNewEventType();
