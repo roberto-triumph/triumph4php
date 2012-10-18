@@ -226,7 +226,8 @@ bool mvceditor::DirectorySearchClass::Walk(mvceditor::DirectoryWalkerClass& walk
 	while (CurrentFiles.empty() && !Directories.empty()) {
 		
 		// enumerate the next directory, stop when we have a file to search
-		wxString path = Directories.top();
+		wxString path;
+		path.Append(Directories.top());
 		Directories.pop();
 		wxDir dir(path);
 		if (dir.IsOpened()) {			
@@ -237,7 +238,8 @@ bool mvceditor::DirectorySearchClass::Walk(mvceditor::DirectoryWalkerClass& walk
 	}
 	bool hit = false;
 	if (!CurrentFiles.empty()) {
-		wxString filename = CurrentFiles.top();
+		wxString filename;
+		filename.Append(CurrentFiles.top());
 		CurrentFiles.pop();
 		if (!HasCalledBegin) {
 			walker.BeginSearch();
@@ -261,23 +263,32 @@ const std::vector<wxString>& mvceditor::DirectorySearchClass::GetMatchedFiles() 
 
 void mvceditor::DirectorySearchClass::EnumerateAllFiles(const wxString& path) {
 	wxDir dir;
-	if (wxFileName::IsDirReadable(path) && dir.Open(path)) {
-		wxString filename;
-		int flags =  wxDIR_FILES | wxDIR_DIRS;
+	if (dir.Open(path)) {
+		int flags =  wxDIR_DIRS;
 		if (DoHiddenFiles) {
 			flags |=  wxDIR_HIDDEN;
 		}
-		bool next = dir.GetFirst(&filename, wxEmptyString, flags);
+		wxString subDirName;
+		bool next = dir.GetFirst(&subDirName, wxEmptyString, flags);
+		while (next) {
+			if (!subDirName.IsEmpty()) {
+				wxString fullPath = path + subDirName;
+				EnumerateAllFiles(fullPath + wxFileName::GetPathSeparator());
+			}
+			next = dir.GetNext(&subDirName);
+		}
+
+		flags = wxDIR_FILES;
+		if (DoHiddenFiles) {
+			flags |=  wxDIR_HIDDEN;
+		}
+		wxString filename;
+		next = dir.GetFirst(&filename, wxEmptyString, flags);
 		while (next) {
 			if (!filename.IsEmpty()) {
 				wxString fullPath = path + filename;
-				if (wxDirExists(fullPath)) {
-					EnumerateAllFiles(fullPath + wxFileName::GetPathSeparator());
-				}
-				else {
-					TotalFileCount++;
-					CurrentFiles.push(fullPath);
-				}
+				TotalFileCount++;
+				CurrentFiles.push(fullPath);
 			}
 			next = dir.GetNext(&filename);
 		}
