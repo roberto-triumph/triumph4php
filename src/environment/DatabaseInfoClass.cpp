@@ -195,7 +195,9 @@ bool mvceditor::SqlQueryClass::Connect(soci::session& session, UnicodeString& er
 	try {
 		session.open(*soci::factory_mysql(), s.c_str());
 		success = true;
-		
+	} catch (soci::mysql_soci_error const& e) {
+		success = false;
+		error = mvceditor::CharToIcu(e.what());	
 	} catch (std::exception const& e) {
 		success = false;
 		error = mvceditor::CharToIcu(e.what());

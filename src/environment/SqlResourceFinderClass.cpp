@@ -115,6 +115,9 @@ bool mvceditor::SqlResourceFinderClass::Fetch(const mvceditor::DatabaseInfoClass
 			error = mvceditor::CharToIcu(e.what());
 		}
 	}
+	else {
+		hasError = true;
+	}
 	return !hasError;
 }
 
