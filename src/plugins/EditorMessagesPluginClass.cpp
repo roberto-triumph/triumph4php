@@ -163,7 +163,7 @@ void mvceditor::EditorMessagesPluginClass::AddKeyboardShortcuts(std::vector<Dyna
 mvceditor::EditorMessagesLoggerClass::EditorMessagesLoggerClass(mvceditor::EditorMessagesPluginClass& plugin)
 	: wxLog()
 	, Plugin(plugin) {
-
+	SetLogLevel(wxLOG_Message);
 }
 
 void mvceditor::EditorMessagesLoggerClass::DoLog(wxLogLevel level, const wxChar *msg, time_t timestamp) {
