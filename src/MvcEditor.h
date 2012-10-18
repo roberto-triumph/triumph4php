@@ -114,6 +114,12 @@ public:
 	 */
 	void UpdateConfigModifiedTime();
 
+	/**
+	 * stop watching the confid file for external modifications. This would be done
+	 * when the user is editing the config from within the application.
+	 */
+	void StopConfigModifiedCheck();
+
 private:
 
 	/**

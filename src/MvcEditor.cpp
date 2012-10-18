@@ -73,7 +73,6 @@ bool mvceditor::AppClass::OnInit() {
 	// all menu items must be present in the menu bar for shortcuts to take effect
 	AppFrame = new mvceditor::AppFrameClass(Plugins, *this, Preferences);
 	PluginWindows();
-	Preferences.Init();
 	LoadPreferences();
 	AppFrame->AuiManagerUpdate();
 	if (CommandLine()) {
@@ -218,11 +217,16 @@ void mvceditor::AppClass::LoadPreferences() {
 	Preferences.Load(config, AppFrame);
 }
 
+void mvceditor::AppClass::StopConfigModifiedCheck() {
+	Timer.Stop();	
+}
+
 void mvceditor::AppClass::UpdateConfigModifiedTime() {
 	wxFileName configFileName(mvceditor::ConfigDirAsset().GetPath(), wxT("mvc-editor.ini"));
 	if (configFileName.FileExists()) {
 		ConfigLastModified = configFileName.GetModificationTime();
 	}
+	Timer.Start();
 }
 
 mvceditor::AppTimerClass::AppTimerClass(mvceditor::AppClass& app)

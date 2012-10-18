@@ -297,6 +297,8 @@ void mvceditor::AppFrameClass::OnEditSelectAll(wxCommandEvent& event) {
 }
 
 void mvceditor::AppFrameClass::OnEditPreferences(wxCommandEvent& event) {
+	App.StopConfigModifiedCheck();
+
 	PreferencesDialogClass prefDialog(this, Preferences);
 	for (size_t i = 0; i < Plugins.size(); ++i) {
 		Plugins[i]->AddPreferenceWindow(prefDialog.GetBookCtrl());
@@ -305,12 +307,12 @@ void mvceditor::AppFrameClass::OnEditPreferences(wxCommandEvent& event) {
 	int exitCode = prefDialog.ShowModal();
 	if (wxOK == exitCode) {
 		wxCommandEvent evt(mvceditor::EVENT_APP_PREFERENCES_SAVED);
-		App.EventSink.Publish(evt);
-
-		// signal that this app has modified the config file, that way the external
-		// modification check fails and the user will not be prompted to reload the config
-		App.UpdateConfigModifiedTime();
+		App.EventSink.Publish(evt);		
 	}
+
+	// signal that this app has modified the config file, that way the external
+	// modification check fails and the user will not be prompted to reload the config
+	App.UpdateConfigModifiedTime();
 }
 
 void mvceditor::AppFrameClass::PreferencesSaved() {
