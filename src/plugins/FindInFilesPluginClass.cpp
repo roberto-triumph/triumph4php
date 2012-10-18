@@ -40,6 +40,12 @@
 static const int ID_REGEX_MENU_START = 9000;
 static const int ID_REGEX_REPLACE_MENU_START = 10000;
 
+// maximuum number of find in files hits to be found; if there are more hits
+// than this the search will stop.  This is done because the user cannot 
+// possibly go through all hits; plus this program will allocate too much
+// memory
+static const int MAX_HITS = 1000;
+
 static std::vector<wxString> FilesFromHits(const std::vector<mvceditor::FindInFilesHitClass>& allHits) {
 	std::vector<wxString>  files;
 	std::vector<mvceditor::FindInFilesHitClass>::const_iterator hit;
@@ -460,7 +466,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnFileHit(mvceditor::FindInFilesHi
 	}
 
 	// dont bother with more than this many hits, user cannot possibly do through them all
-	if (AllHits.size() < 1000) {
+	if (AllHits.size() < MAX_HITS) {
 		MatchedFiles++;
 
 		wxArrayString hitList;
@@ -478,6 +484,9 @@ void mvceditor::FindInFilesResultsPanelClass::OnFileHit(mvceditor::FindInFilesHi
 		ResultsList->Thaw();
 		AllHits.insert(AllHits.end(), hits.begin(), hits.end());
 	}
+	else {
+		Stop();
+	}
 }
 
 void mvceditor::FindInFilesResultsPanelClass::OnStopButton(wxCommandEvent& event) {
@@ -487,7 +496,12 @@ void mvceditor::FindInFilesResultsPanelClass::OnStopButton(wxCommandEvent& event
 void mvceditor::FindInFilesResultsPanelClass::Stop() {
 	RunningThreads.Stop(RunningThreadId);
 	Gauge->StopGauge(FindInFilesGaugeId);
-	SetStatus(_("Search stopped"));
+	if (AllHits.size() >= MAX_HITS) {
+		SetStatus(_("Too many hits, Search stopped"));
+	}
+	else {
+		SetStatus(_("Search stopped"));
+	}
 	bool enableIterators = MatchedFiles > 0;
 	EnableButtons(false, enableIterators, enableIterators);
 }
