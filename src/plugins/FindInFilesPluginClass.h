@@ -68,7 +68,24 @@ public:
 
 	FindInFilesHitClass();
 
+	/**
+	 * This will fully clone hit; ie. deep copy FileName and Preview.
+	 * Deep copy makes copy constructor thread-safe because by default
+	 * wxStrings are shallow-cloned
+	 */
+	FindInFilesHitClass(const FindInFilesHitClass& hit);
+
+	/**
+	 * This will deep copy FileName and Preview.
+	 */
 	FindInFilesHitClass(const wxString& fileName, const wxString& preview, int lineNumber);
+
+	/**
+	 * This will fully clone hit; ie. deep copy FileName and Preview.
+	 * Deep copy makes assignment thread-safe because by default
+	 * wxStrings are shallow-cloned
+	 */
+	FindInFilesHitClass& operator=(const FindInFilesHitClass& hit);
 };
 
 /**

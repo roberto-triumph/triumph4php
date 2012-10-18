@@ -61,10 +61,24 @@ mvceditor::FindInFilesHitClass::FindInFilesHitClass()
 }
 
 mvceditor::FindInFilesHitClass::FindInFilesHitClass(const wxString& fileName, const wxString& preview, int lineNumber)
-	: FileName(fileName)
-	, Preview(preview)
+	: FileName(fileName.c_str())
+	, Preview(preview.c_str())
 	, LineNumber(lineNumber) {
 
+}
+
+mvceditor::FindInFilesHitClass::FindInFilesHitClass(const FindInFilesHitClass& hit) 
+	: FileName(hit.FileName.c_str())
+	, Preview(hit.Preview.c_str()) 
+	, LineNumber(hit.LineNumber) {
+
+}
+
+mvceditor::FindInFilesHitClass& mvceditor::FindInFilesHitClass::operator=(const FindInFilesHitClass& hit) {
+	FileName = hit.FileName.c_str();
+	Preview = hit.Preview.c_str();
+	LineNumber = hit.LineNumber;
+	return *this;
 }
 
 mvceditor::FindInFilesHitEventClass::FindInFilesHitEventClass(int eventId, const std::vector<mvceditor::FindInFilesHitClass> &hits)
@@ -434,20 +448,24 @@ void mvceditor::FindInFilesResultsPanelClass::OnFileHit(mvceditor::FindInFilesHi
 	}
 	MatchedFiles++;
 
-	// in case there are any hits
-	ResultsList->Freeze();
-	for (size_t i = 0; i < event.Hits.size(); ++i) {
-		mvceditor::FindInFilesHitClass hit = event.Hits[i];
+	wxArrayString hitList;
+	std::vector<mvceditor::FindInFilesHitClass>::const_iterator hit;
 
-		// in MSW the list control does not render the \t use another delimiter
-		wxString msg = hit.FileName + wxT("\t:") + 
-			wxString::Format(wxT("%d"), hit.LineNumber) + wxT("\t:") +
-			hit.Preview;
+	// in MSW the list control does not render the \t use another delimiter
+	wxString format = wxT("%s\t:%d\t:%s");
+	for (hit = event.Hits.begin(); hit != event.Hits.end(); ++hit) {
+		wxString msg = wxString::Format(format, hit->FileName, hit->LineNumber, hit->Preview);
 		msg.Trim();
-		ResultsList->Append(msg.SubString(0, 200));
+		hitList.Add(msg.SubString(0, 200));
 	}
-	ResultsList->Thaw();
-	AllHits.insert(AllHits.end(), event.Hits.begin(), event.Hits.end());
+
+	// dont bother with more than this many hits, user cannot possibly do through them all
+	if (AllHits.size() < 1000) {
+		ResultsList->Freeze();
+		ResultsList->Append(hitList);
+		ResultsList->Thaw();
+		AllHits.insert(AllHits.end(), event.Hits.begin(), event.Hits.end());
+	}
 }
 
 void mvceditor::FindInFilesResultsPanelClass::OnStopButton(wxCommandEvent& event) {
