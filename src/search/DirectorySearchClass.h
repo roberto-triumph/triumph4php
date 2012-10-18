@@ -28,6 +28,7 @@
 #include <wx/string.h>
 #include <wx/regex.h>
 #include <wx/filename.h>
+#include <wx/dir.h>
 #include <stack>
 #include <vector>
 
@@ -101,7 +102,7 @@ public:
 	 * Needed overloads to make SourceClass usable in STL data structures
 	 */
 	SourceClass(const mvceditor::SourceClass& src);
-	void operator=(const mvceditor::SourceClass& src);
+	SourceClass& operator=(const mvceditor::SourceClass& src);
 
 	/**
 	 * @param src object to copy from. after a call, this
@@ -230,8 +231,6 @@ public:
 
 	DirectorySearchClass();
 	
-	~DirectorySearchClass();
-	
 	/**
 	 * Initialize a search.
 	 * 
@@ -304,6 +303,20 @@ private:
 	 * @return bool TRUE if given full path matches the include/exclude wildcards
 	 */
 	bool MatchesWildcards(const wxString& fullPath) const;
+
+	/**
+	 * Adds all of the given paths' subdirectories into the directory stack.
+	 *
+	 * @param dir the directory to look in
+	 */
+	void AddSubDirectories(wxDir& dir);
+
+	/**
+	 * Adds all of the given paths' files into the file stack.
+	 *
+	 * @param dir the directory to look in
+	 */
+	void AddFiles(wxDir& dir);
 	
 	/**
 	 * The files that the DirectoryWalker matched on
@@ -324,7 +337,7 @@ private:
 	 * 
 	 * @var std::vector<wxString>
 	 */
-	std::stack<wxString*> Directories;
+	std::stack<wxString> Directories;
 
 	/**
 	 * Stores the wildcards so that we ignore files 

@@ -62,8 +62,9 @@ void mvceditor::SourceClass::Copy(const mvceditor::SourceClass& src) {
 	RootDirectory.AssignDir(path);
 }
 
-void mvceditor::SourceClass::operator=(const mvceditor::SourceClass& src) {
+mvceditor::SourceClass& mvceditor::SourceClass::operator=(const mvceditor::SourceClass& src) {
 	Copy(src);
+	return *this;
 }
 
 void mvceditor::SourceClass::ClearIncludeWildcards() {
@@ -156,14 +157,6 @@ mvceditor::DirectorySearchClass::DirectorySearchClass()
 	, HasCalledEnd(false) {
 }
 
-mvceditor::DirectorySearchClass::~DirectorySearchClass() {
-	while (!Directories.empty()) {
-		wxString* dir = Directories.top();
-		Directories.pop();
-		delete dir;
-	}
-}
-
 bool mvceditor::DirectorySearchClass::Init(const wxString& path, Modes mode, bool doHiddenFiles) {
 	mvceditor::SourceClass src;
 	src.RootDirectory.AssignDir(path);
@@ -180,9 +173,7 @@ bool mvceditor::DirectorySearchClass::Init(const std::vector<mvceditor::SourceCl
 		CurrentFiles.pop();
 	}
 	while (!Directories.empty()) {
-		wxString* dir = Directories.top();
 		Directories.pop();
-		delete dir;
 	}
 	MatchedFiles.clear();
 	wxChar separator = wxFileName::GetPathSeparator();
@@ -199,8 +190,7 @@ bool mvceditor::DirectorySearchClass::Init(const std::vector<mvceditor::SourceCl
 			if (wxDir::Exists(path)) {
 				total++;
 				if (RECURSIVE == mode) {
-					wxString* newString = new wxString(pathWithSeparator);
-					Directories.push(newString);
+					Directories.push(pathWithSeparator);
 				}
 				else {
 					EnumerateAllFiles(pathWithSeparator);
@@ -213,9 +203,7 @@ bool mvceditor::DirectorySearchClass::Init(const std::vector<mvceditor::SourceCl
 			CurrentFiles.pop();
 		}
 		while (!Directories.empty()) {
-			wxString* dir = Directories.top();
 			Directories.pop();
-			delete dir;
 		}
 		return false;
 	}
@@ -238,35 +226,14 @@ bool mvceditor::DirectorySearchClass::Walk(mvceditor::DirectoryWalkerClass& walk
 	while (CurrentFiles.empty() && !Directories.empty()) {
 		
 		// enumerate the next directory, stop when we have a file to search
-		wxString* path = Directories.top();
+		wxString path = Directories.top();
 		Directories.pop();
-		if (wxFileName::IsDirReadable(*path)) {
-			wxDir dir(*path);
+		wxDir dir(path);
+		if (dir.IsOpened()) {			
 			wxString filename;
-			int flags =  wxDIR_FILES | wxDIR_DIRS;
-			if (DoHiddenFiles) {
-				flags |=  wxDIR_HIDDEN;
-			}
-			bool next = dir.GetFirst(&filename, wxEmptyString, flags);
-			while (next) {
-				if (!filename.IsEmpty()) {
-					wxString* fullPath = new wxString(*path);
-					fullPath->Append(filename);
-					if (wxDirExists(*fullPath)) {
-						fullPath->Append(wxFileName::GetPathSeparator());
-						Directories.push(fullPath);
-					}
-					else {
-						if (MatchesWildcards(*fullPath)) {
-							CurrentFiles.push(*fullPath);
-						}
-						delete fullPath;
-					}
-				}
-				next = dir.GetNext(&filename);
-			}
+			AddSubDirectories(dir);
+			AddFiles(dir);
 		}
-		delete path;
 	}
 	bool hit = false;
 	if (!CurrentFiles.empty()) {
@@ -327,4 +294,44 @@ bool mvceditor::DirectorySearchClass::MatchesWildcards(const wxString &fullPath)
 		matches = Sources[i].Contains(fullPath);
 	}
 	return matches;
+}
+
+void mvceditor::DirectorySearchClass::AddFiles(wxDir& dir) {
+	int flags =  wxDIR_DIRS;
+	if (DoHiddenFiles) {
+		flags |=  wxDIR_HIDDEN;
+	}
+	wxString subDirName;
+	bool next = dir.GetFirst(&subDirName, wxEmptyString, flags);
+	while (next) {
+		if (!subDirName.IsEmpty()) {
+			wxString subDirFullPath;
+			subDirFullPath.Append(dir.GetName());
+			subDirFullPath.Append(wxFileName::GetPathSeparator());
+			subDirFullPath.Append(subDirName);
+			Directories.push(subDirFullPath);
+		}
+		next = dir.GetNext(&subDirName);
+	}
+}
+
+void mvceditor::DirectorySearchClass::AddSubDirectories(wxDir& dir) {
+	int flags =  wxDIR_FILES;
+	if (DoHiddenFiles) {
+		flags |=  wxDIR_HIDDEN;
+	}
+	wxString subFileName;
+	bool next = dir.GetFirst(&subFileName, wxEmptyString, flags);
+	while (next) {
+		if (!subFileName.IsEmpty()) {
+			wxString subFileFullPath;
+			subFileFullPath.Append(dir.GetName());
+			subFileFullPath.Append(wxFileName::GetPathSeparator());
+			subFileFullPath.Append(subFileName);
+			if (MatchesWildcards(subFileFullPath)) {
+				CurrentFiles.push(subFileFullPath);
+			}
+		}
+		next = dir.GetNext(&subFileName);
+	}
 }
