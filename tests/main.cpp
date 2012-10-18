@@ -143,5 +143,6 @@ int main(int argc, char **argv) {
 	// clean up the MySQL library. Same reason as the ICU cleanup.
 	mysql_library_end();
 	sqlite_api::sqlite3_shutdown();
+	wxUninitialize();
 	return ret;
 }
