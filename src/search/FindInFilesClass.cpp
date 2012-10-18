@@ -39,6 +39,7 @@ mvceditor::FindInFilesClass::FindInFilesClass(const UnicodeString& expression, m
 	, Mode(mode)
 	, CaseSensitive(true)
 	, Finder(expression, mode) 
+	, FFile()
 	, File(NULL)
 	, CurrentLine()
 	, LineNumber(0) {
@@ -75,9 +76,10 @@ bool mvceditor::FindInFilesClass::Walk(const wxString& fileName) {
 	CleanupStreams();
 	if (!fileName.empty()) {
 		
-		// TODO: unicode file names?
-		File = u_fopen(fileName.ToAscii(), "r", NULL, NULL);
-		if (File) {
+		// use wxWidgets file class as it allows us to properly open
+		// unicode filenames
+		if (FFile.Open(fileName, wxT("r"))) {
+			File = u_finit(FFile.fp(), NULL, NULL);
 			return FindNext();
 		}
 	}
@@ -93,7 +95,8 @@ bool mvceditor::FindInFilesClass::FindNext() {
 			++LineNumber;
 			
 			// ATTN: docs lie,... giving it a -1 for arg 2 does not work
-			u_fgets(CurrentLine.getBuffer(2048), 2048, File);
+			UChar* buf = CurrentLine.getBuffer(2048);
+			u_fgets(buf, 2047, File);
 			CurrentLine.releaseBuffer(-1);			
 			found = Finder.FindNext(CurrentLine, pos) && Finder.GetLastMatch(pos, length);
 			if (found) {
@@ -225,4 +228,5 @@ void mvceditor::FindInFilesClass::CleanupStreams() {
 		u_fclose(File);
 		File = NULL;
 	}
+	FFile.Close();
 }

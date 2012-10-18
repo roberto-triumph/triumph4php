@@ -255,6 +255,12 @@ private:
 	 * @var FinderClass
 	 */
 	FinderClass Finder;
+
+	/**
+	 * use wxWidgets file class as it allows us to properly open
+	 * unicode filenames
+	 */
+	wxFFile FFile;
 	
 	/**
 	 * The input stream; used to open the file
