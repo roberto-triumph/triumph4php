@@ -27,6 +27,8 @@
 
 #include <unicode/unistr.h>
 #include <wx/string.h>
+#include <vector>
+#include <map>
 
 namespace mvceditor {
 	
@@ -128,6 +130,27 @@ int CharToUtf8Pos(const char* bytes, int bytesLength, int charPos);
  * @return int32_t the index of the last occurrence of expression in text; -1 if not found
  */
 int32_t FindPrevious(const UnicodeString& text, const UnicodeString& expression, int start = -1);
+
+/**
+ * Deep Copy a vector of wxStrings. This is not trivial since wxString uses CopyOnWrite.
+ * This will be used when vectors of wxStrings are passed between threads via posted events.
+ *
+ *
+ * @param dest vector to insert/delete strings from
+ * @param src vector to copy from
+ */
+void DeepCopy(std::vector<wxString>& dest, const std::vector<wxString>& src);
+
+/**
+ * Deep Copy a vector of wxStrings. This is not trivial since wxString uses CopyOnWrite.
+ * This will be used when vectors of wxStrings are passed between threads via posted events.
+ *
+ *
+ * @param dest map to insert/delete strings from
+ * @param src map to copy from
+ */
+void DeepCopy(std::map<wxString, wxString>& dest, const std::map<wxString, wxString>& src);
+
 
 }
 

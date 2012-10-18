@@ -1877,7 +1877,31 @@ mvceditor::ResourceClass::ResourceClass()
 		
 }
 
+mvceditor::ResourceClass::ResourceClass(const mvceditor::ResourceClass& src)
+	: Identifier()
+	, ClassName()
+	, NamespaceName()
+	, Signature()
+	, ReturnType()
+	, Comment()
+	, Type(CLASS) 
+	, IsProtected(false)
+	, IsPrivate(false) 
+	, IsStatic(false)
+	, IsDynamic(false)
+	, IsNative(false)
+	, Key()
+	, FullPath()
+	, FileItemId(-1) 
+	, FileIsNew(false) {
+	Copy(src);
+}
+
 void mvceditor::ResourceClass::operator=(const ResourceClass& src) {
+	Copy(src);
+}
+
+void mvceditor::ResourceClass::Copy(const mvceditor::ResourceClass& src) {
 	Identifier = src.Identifier;
 	ClassName = src.ClassName;
 	NamespaceName = src.NamespaceName;
@@ -1885,7 +1909,9 @@ void mvceditor::ResourceClass::operator=(const ResourceClass& src) {
 	ReturnType = src.ReturnType;
 	Comment = src.Comment;
 	Type = src.Type;
-	FullPath = src.FullPath;
+
+	// deep copy the wxString, as this object may be passed between threads
+	FullPath = src.FullPath.c_str();
 	Key = src.Key;
 	FileItemId = src.FileItemId;
 	IsProtected = src.IsProtected;

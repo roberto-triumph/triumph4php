@@ -319,7 +319,7 @@ void mvceditor::ProjectPluginClass::OnFrameworkDetectionInProgress(wxCommandEven
 }
 
 void mvceditor::ProjectPluginClass::OnFrameworkFound(mvceditor::FrameworkFoundEventClass& event) {
-	App.Structs.Frameworks.push_back(event.Framework);
+	App.Structs.Frameworks.push_back(event.GetFramework());
 }
 
 void mvceditor::ProjectPluginClass::OnProjectDefine(wxCommandEvent& event) {

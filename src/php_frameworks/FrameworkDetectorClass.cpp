@@ -486,20 +486,17 @@ mvceditor::FrameworkClass::FrameworkClass()
 }
 
 mvceditor::FrameworkClass::FrameworkClass(const mvceditor::FrameworkClass& src) 
-	: Identifier(src.Identifier)
-	, RootDirectory(src.RootDirectory)
-	, ConfigFiles(src.ConfigFiles)
-	, Databases(src.Databases)
-	, Resources(src.Resources) {
-
+	: Identifier()
+	, RootDirectory()
+	, ConfigFiles()
+	, Databases()
+	, Resources() {
+	Copy(src);
 }
 
-void mvceditor::FrameworkClass::operator=(const mvceditor::FrameworkClass& src) {
-	Identifier = src.Identifier;
-	RootDirectory = src.RootDirectory;
-	ConfigFiles = src.ConfigFiles;
-	Databases = src.Databases;
-	Resources = src.Resources; 
+mvceditor::FrameworkClass& mvceditor::FrameworkClass::operator=(const mvceditor::FrameworkClass& src) {
+	Copy(src);
+	return *this;
 }
 
 void mvceditor::FrameworkClass::Clear() {
@@ -508,6 +505,17 @@ void mvceditor::FrameworkClass::Clear() {
 	ConfigFiles.clear();
 	Databases.clear();
 	Resources.clear(); 
+}
+
+void mvceditor::FrameworkClass::Copy(const mvceditor::FrameworkClass& src) {
+
+	// make sure to deep copy wxStrings as this object will be passed between
+	// threads and wxString by default shallow copies during assignments
+	Identifier = src.Identifier.c_str();
+	RootDirectory = src.RootDirectory.c_str();
+	mvceditor::DeepCopy(ConfigFiles, src.ConfigFiles);
+	Databases = src.Databases;
+	Resources = src.Resources;
 }
 
 mvceditor::PhpFrameworkDetectorClass::PhpFrameworkDetectorClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, const mvceditor::EnvironmentClass& environment)
@@ -763,7 +771,11 @@ wxEvent* mvceditor::FrameworkFoundEventClass::Clone() const {
 	return newEvt;
 }
 
-mvceditor::UrlDetectedEventClass::UrlDetectedEventClass(std::vector<mvceditor::UrlResourceClass> urls) 
+mvceditor::FrameworkClass mvceditor::FrameworkFoundEventClass::GetFramework() const {
+	return Framework;
+}
+
+mvceditor::UrlDetectedEventClass::UrlDetectedEventClass(const std::vector<mvceditor::UrlResourceClass>& urls) 
 	: wxEvent(wxID_ANY, mvceditor::EVENT_FRAMEWORK_URL_COMPLETE) 
 	, Urls(urls) {
 }
@@ -773,7 +785,11 @@ wxEvent* mvceditor::UrlDetectedEventClass::Clone() const {
 	return cloned;
 }
 
-mvceditor::ViewInfosDetectedEventClass::ViewInfosDetectedEventClass(std::vector<mvceditor::ViewInfoClass> viewInfos)
+std::vector<mvceditor::UrlResourceClass> mvceditor::UrlDetectedEventClass::GetUrls() const {
+	return Urls;
+}
+
+mvceditor::ViewInfosDetectedEventClass::ViewInfosDetectedEventClass(const std::vector<mvceditor::ViewInfoClass>& viewInfos)
 	: wxEvent(wxID_ANY, mvceditor::EVENT_FRAMEWORK_VIEW_FILES_COMPLETE)
 	, ViewInfos(viewInfos) {
 		
@@ -782,6 +798,35 @@ mvceditor::ViewInfosDetectedEventClass::ViewInfosDetectedEventClass(std::vector<
 wxEvent* mvceditor::ViewInfosDetectedEventClass::Clone() const {
 	wxEvent* cloned = new mvceditor::ViewInfosDetectedEventClass(ViewInfos);
 	return cloned;
+}
+
+std::vector<mvceditor::ViewInfoClass> mvceditor::ViewInfosDetectedEventClass::GetViewInfos() const {
+	return ViewInfos;
+}
+
+mvceditor::ViewInfoClass::ViewInfoClass() 
+	: FileName()
+	, TemplateVariables() {
+
+}
+
+mvceditor::ViewInfoClass::ViewInfoClass(const mvceditor::ViewInfoClass &src)
+	: FileName()
+	, TemplateVariables() {
+	Copy(src);
+}
+
+mvceditor::ViewInfoClass& mvceditor::ViewInfoClass::operator=(const mvceditor::ViewInfoClass &src) {
+	Copy(src);
+	return *this;
+}
+
+void mvceditor::ViewInfoClass::Copy(const mvceditor::ViewInfoClass &src) {
+
+	// make sure to deep copy wxStrings as this object will be passed between
+	// threads and wxString by default shallow copies during assignments
+	FileName = src.FileName.c_str();
+	mvceditor::DeepCopy(TemplateVariables, src.TemplateVariables);
 }
 
 

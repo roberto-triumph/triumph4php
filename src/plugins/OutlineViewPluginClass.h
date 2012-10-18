@@ -55,15 +55,25 @@ class GlobalClassesCompleteEventClass : public wxEvent {
 
 public:
 
-	/**
-	 * All of the classes that have been parsed by the
-	 * global cache
-	 */
-	std::vector<wxString> AllClasses;
-	
-	GlobalClassesCompleteEventClass(int eventId, const std::vector<wxString> allClasses);
+	GlobalClassesCompleteEventClass(int eventId, const std::vector<wxString>& allClasses);
 	
 	wxEvent* Clone() const;
+
+	/**
+	 * @return All of the classes that have been parsed by the
+	 * global cache
+	 */
+	std::vector<wxString> GetAllClasses() const;
+
+private:
+
+	/**
+	 * All of the classes that have been parsed by the
+	 * global cache. Hiding this vector because we want to make sure
+	 * it is deep copied every time since we this event will be handled
+	 * by multiple threads.
+	 */
+	std::vector<wxString> AllClasses;
 };
 
 

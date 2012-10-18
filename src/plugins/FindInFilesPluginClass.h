@@ -69,23 +69,35 @@ public:
 	FindInFilesHitClass();
 
 	/**
-	 * This will fully clone hit; ie. deep copy FileName and Preview.
-	 * Deep copy makes copy constructor thread-safe because by default
-	 * wxStrings are shallow-cloned
+	 * This will fully clone hit. Deep copy makes assignment thread-safe because by default
+	 * wxStrings are shallow-cloned.
+	 * @param hit to deep copy
 	 */
-	FindInFilesHitClass(const FindInFilesHitClass& hit);
+	FindInFilesHitClass(const mvceditor::FindInFilesHitClass& hit);
 
 	/**
-	 * This will deep copy FileName and Preview.
+	 * All parameters will be deep copied. Deep copy makes assignment thread-safe because by default
+	 * wxStrings are shallow-cloned.
+
+	 * @param fileName the full path to the file
+	 * @parm preview the contents of the line where the hit ocurred
+	 * @param lineNumber line (1 based) where the hit ocurred
 	 */
 	FindInFilesHitClass(const wxString& fileName, const wxString& preview, int lineNumber);
 
 	/**
-	 * This will fully clone hit; ie. deep copy FileName and Preview.
-	 * Deep copy makes assignment thread-safe because by default
-	 * wxStrings are shallow-cloned
+	 * This will fully clone hit. Deep copy makes assignment thread-safe because by default
+	 * wxStrings are shallow-cloned.
+	 * @param hit to deep copy
 	 */
-	FindInFilesHitClass& operator=(const FindInFilesHitClass& hit);
+	FindInFilesHitClass& operator=(const mvceditor::FindInFilesHitClass& hit);
+
+	/**
+	 * This will fully clone hit. Deep copy makes assignment thread-safe because by default
+	 * wxStrings are shallow-cloned.
+	 * @param hit to deep copy
+	 */
+	void Copy(const mvceditor::FindInFilesHitClass& src);
 };
 
 /**
@@ -96,13 +108,28 @@ class FindInFilesHitEventClass : public wxEvent {
 public:
 
 	/**
-	 * All of the hits for a single file.
+	 * @param id of the event, used to differentiate between multiple searches if they are happpening
+	 *        simultaneously
+	 * @param hits the hits found.  this vector will be deep copied.
 	 */
-	std::vector<mvceditor::FindInFilesHitClass> Hits;
-
 	FindInFilesHitEventClass(int eventId, const std::vector<mvceditor::FindInFilesHitClass>& hits);
 
 	wxEvent* Clone() const;
+
+	/**
+	 * @return vector of All of the hits for a single file.
+	 */
+	std::vector<mvceditor::FindInFilesHitClass> GetHits() const;
+
+private:
+
+	/**
+	 * All of the hits for a single file. Hiding this vector because we want to make sure
+	 * it is deep copied every time since we this event will be handled
+	 * by multiple threads.
+	 */
+	std::vector<mvceditor::FindInFilesHitClass> Hits;
+
 };
 
 

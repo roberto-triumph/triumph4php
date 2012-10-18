@@ -61,24 +61,31 @@ mvceditor::FindInFilesHitClass::FindInFilesHitClass()
 }
 
 mvceditor::FindInFilesHitClass::FindInFilesHitClass(const wxString& fileName, const wxString& preview, int lineNumber)
+
+	// use c_str() to deep copy
 	: FileName(fileName.c_str())
 	, Preview(preview.c_str())
 	, LineNumber(lineNumber) {
 
 }
 
-mvceditor::FindInFilesHitClass::FindInFilesHitClass(const FindInFilesHitClass& hit) 
-	: FileName(hit.FileName.c_str())
-	, Preview(hit.Preview.c_str()) 
-	, LineNumber(hit.LineNumber) {
-
+mvceditor::FindInFilesHitClass::FindInFilesHitClass(const mvceditor::FindInFilesHitClass& hit) 
+	: FileName()
+	, Preview() 
+	, LineNumber() {
+	Copy(hit);
 }
 
-mvceditor::FindInFilesHitClass& mvceditor::FindInFilesHitClass::operator=(const FindInFilesHitClass& hit) {
+mvceditor::FindInFilesHitClass& mvceditor::FindInFilesHitClass::operator=(const mvceditor::FindInFilesHitClass& hit) {
+	Copy(hit);
+	return *this;
+}
+
+
+void mvceditor::FindInFilesHitClass::Copy(const mvceditor::FindInFilesHitClass& hit) {
 	FileName = hit.FileName.c_str();
 	Preview = hit.Preview.c_str();
 	LineNumber = hit.LineNumber;
-	return *this;
 }
 
 mvceditor::FindInFilesHitEventClass::FindInFilesHitEventClass(int eventId, const std::vector<mvceditor::FindInFilesHitClass> &hits)
@@ -89,6 +96,10 @@ mvceditor::FindInFilesHitEventClass::FindInFilesHitEventClass(int eventId, const
 wxEvent* mvceditor::FindInFilesHitEventClass::Clone() const {
 	wxEvent* newEvt = new mvceditor::FindInFilesHitEventClass(GetId(), Hits);
 	return newEvt;
+}
+
+std::vector<mvceditor::FindInFilesHitClass> mvceditor::FindInFilesHitEventClass::GetHits() const {
+	return Hits;
 }
 
 mvceditor::FindInFilesBackgroundReaderClass::FindInFilesBackgroundReaderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId) 
@@ -436,7 +447,8 @@ void mvceditor::FindInFilesResultsPanelClass::OnWorkComplete(wxCommandEvent& eve
 }
 
 void mvceditor::FindInFilesResultsPanelClass::OnFileHit(mvceditor::FindInFilesHitEventClass& event) {
-	if (event.Hits.empty()) {
+	std::vector<mvceditor::FindInFilesHitClass> hits = event.GetHits();
+	if (hits.empty()) {
 		return;
 	}
 	if (event.GetId() != FindInFilesGaugeId) {
@@ -446,25 +458,25 @@ void mvceditor::FindInFilesResultsPanelClass::OnFileHit(mvceditor::FindInFilesHi
 		event.Skip();
 		return;
 	}
-	MatchedFiles++;
-
-	wxArrayString hitList;
-	std::vector<mvceditor::FindInFilesHitClass>::const_iterator hit;
-
-	// in MSW the list control does not render the \t use another delimiter
-	wxString format = wxT("%s\t:%d\t:%s");
-	for (hit = event.Hits.begin(); hit != event.Hits.end(); ++hit) {
-		wxString msg = wxString::Format(format, hit->FileName, hit->LineNumber, hit->Preview);
-		msg.Trim();
-		hitList.Add(msg.SubString(0, 200));
-	}
 
 	// dont bother with more than this many hits, user cannot possibly do through them all
 	if (AllHits.size() < 1000) {
+		MatchedFiles++;
+
+		wxArrayString hitList;
+		std::vector<mvceditor::FindInFilesHitClass>::const_iterator hit;
+
+		// in MSW the list control does not render the \t use another delimiter
+		wxString format = wxT("%s\t:%d\t:%s");
+		for (hit = hits.begin(); hit != hits.end(); ++hit) {
+			wxString msg = wxString::Format(format, hit->FileName, hit->LineNumber, hit->Preview);
+			msg.Trim();
+			hitList.Add(msg.SubString(0, 200));
+		}
 		ResultsList->Freeze();
 		ResultsList->Append(hitList);
 		ResultsList->Thaw();
-		AllHits.insert(AllHits.end(), event.Hits.begin(), event.Hits.end());
+		AllHits.insert(AllHits.end(), hits.begin(), hits.end());
 	}
 }
 

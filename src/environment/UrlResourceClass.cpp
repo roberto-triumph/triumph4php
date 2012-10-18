@@ -81,6 +81,11 @@ void mvceditor::UrlResourceClass::Reset() {
 	MethodName.Clear();
 }
 
+mvceditor::UrlResourceClass& mvceditor::UrlResourceClass::operator=(const mvceditor::UrlResourceClass& src) {
+	Copy(src);
+	return *this;
+}
+
 void mvceditor::UrlResourceClass::Copy(const mvceditor::UrlResourceClass& src) {
 	Url = src.Url;
 	FileName = src.FileName;

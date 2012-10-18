@@ -914,6 +914,7 @@ public:
 	bool IsNative;
 	
 	ResourceClass();
+	ResourceClass(const mvceditor::ResourceClass& src);
 
 	static mvceditor::ResourceClass MakeNamespace(const UnicodeString& namespaceName);
 	
@@ -921,6 +922,7 @@ public:
 	 * Clones a ResourceClass
 	 */
 	void operator=(const ResourceClass& src);
+	void Copy(const mvceditor::ResourceClass& src);
 	
 	/**
 	 * Defined a comparison function so that sorting algorithms work for resource containers. A resource is "less"

@@ -417,9 +417,10 @@ void mvceditor::RunBrowserPluginClass::ShowUrlDialog() {
 }
 
 void mvceditor::RunBrowserPluginClass::OnUrlDetectionComplete(mvceditor::UrlDetectedEventClass& event) {
-	for (size_t i = 0; i < event.Urls.size(); ++i) {
-		App.Structs.UrlResourceFinder.Urls.push_back(event.Urls[i]);
-	}
+	std::vector<mvceditor::UrlResourceClass> newUrls = event.GetUrls();
+	App.Structs.UrlResourceFinder.Urls.insert(App.Structs.UrlResourceFinder.Urls.end(),
+		newUrls.begin(), newUrls.end());
+
 	GetStatusBarWithGauge()->StopGauge(ID_URL_GAUGE);
 	
 	wxCommandEvent urlEvent(mvceditor::EVENT_APP_PROJECT_URLS);

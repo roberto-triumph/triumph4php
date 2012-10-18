@@ -49,14 +49,18 @@ wxEvent* mvceditor::ResourceFinderCompleteEventClass::Clone() const {
 	return new mvceditor::ResourceFinderCompleteEventClass(GetId(), Resources);
 }
 
-mvceditor::GlobalClassesCompleteEventClass::GlobalClassesCompleteEventClass(int eventId, const std::vector<wxString> allClasses)
+mvceditor::GlobalClassesCompleteEventClass::GlobalClassesCompleteEventClass(int eventId, const std::vector<wxString>& allClasses)
 	: wxEvent(eventId, mvceditor::EVENT_GLOBAL_CLASSES_COMPLETE)
-	, AllClasses(allClasses) {
-		
+	, AllClasses() {
+	mvceditor::DeepCopy(AllClasses, allClasses);
 }
 
 wxEvent* mvceditor::GlobalClassesCompleteEventClass::Clone() const {
 	return new mvceditor::GlobalClassesCompleteEventClass(GetId(), AllClasses);
+}
+
+std::vector<wxString> mvceditor::GlobalClassesCompleteEventClass::GetAllClasses() const {
+	return AllClasses;
 }
 
 mvceditor::ResourceFinderBackgroundThreadClass::ResourceFinderBackgroundThreadClass(
@@ -268,7 +272,7 @@ void mvceditor::OutlineViewPluginClass::OnGlobalClassesComplete(mvceditor::Globa
 	if (window != NULL) {
 		OutlineViewPluginPanelClass* outlineViewPanel = (OutlineViewPluginPanelClass*)window;
 		SetFocusToOutlineWindow(outlineViewPanel);
-		outlineViewPanel->SetClasses(event.AllClasses);
+		outlineViewPanel->SetClasses(event.GetAllClasses());
 	}
 }
 

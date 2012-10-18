@@ -376,6 +376,7 @@ solution "mvc-editor"
 			"src/widgets/StatusBarWithGaugeClass.cpp",
 			"src/environment/DatabaseInfoClass.cpp",
 			"src/environment/*.cpp",
+			"src/php_frameworks/*.cpp",
 			"src/language/*.cpp",
 			"src/search/FinderClass.cpp",
 			"src/search/FindInFilesClass.cpp",

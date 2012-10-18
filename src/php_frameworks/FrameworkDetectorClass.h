@@ -354,9 +354,32 @@ class ViewInfoClass {
 	
 	public:
 	
+	/**
+	 * Full path to the template file
+	 */
 	wxString FileName;
 	
+	/**
+	 * List of all of the variables assigned to this template
+	 */
 	std::vector<wxString> TemplateVariables;
+
+	ViewInfoClass();
+
+	/**
+	 * @param src the new info will be a deep copy of src
+	 */
+	ViewInfoClass(const mvceditor::ViewInfoClass& src);
+
+	/**
+	 * @param src the new info will be a deep copy of src
+	 */
+	mvceditor::ViewInfoClass& operator=(const mvceditor::ViewInfoClass& src);
+
+	/**
+	 * @param src the new info will be a deep copy of src
+	 */
+	void Copy(const mvceditor::ViewInfoClass& src);
 };
 
 
@@ -446,7 +469,9 @@ public:
 
 	FrameworkClass(const mvceditor::FrameworkClass& src);
 
-	void operator=(const mvceditor::FrameworkClass& src);
+	mvceditor::FrameworkClass& operator=(const mvceditor::FrameworkClass& src);
+
+	void Copy(const mvceditor::FrameworkClass& src);
 
 	void Clear();
 
@@ -610,51 +635,89 @@ private:
 class FrameworkFoundEventClass : public wxEvent {
 
 public:
-
 	
 	/**
-	 * The results of framework detection
+	 * @param mvceditor::FrameworkClass The results of framework detection
+	 *        will be deep copied
 	 */
-	mvceditor::FrameworkClass Framework;
-
 	FrameworkFoundEventClass(const mvceditor::FrameworkClass& framework);
+
+	/**
+	 * @return mvceditor::FrameworkClass The results of framework detection
+	 */
+	mvceditor::FrameworkClass GetFramework() const;
 
 	/**
 	 * needed by wxPostEvent
 	 */
 	wxEvent* Clone() const;
+
+private:
+
+	/**
+	 * The results of framework detection. Hiding this object because we want to make sure
+	 * it is deep copied every time since we this event will be handled
+	 * by multiple threads.
+	 */
+	mvceditor::FrameworkClass Framework;
+
 };
 
 class UrlDetectedEventClass : public wxEvent {
 
 	public:
-
-	/**
-	 * the URLs that were detected; these URLs are calculated using framework specific
-	 * routing rules. Urls will not contain a hostname
-	 */
-	std::vector<UrlResourceClass> Urls;
 	
-	UrlDetectedEventClass(std::vector<UrlResourceClass> urls);
+	/**
+	 * @param urls the results of the URL detection. will be deep copied
+	 */
+	UrlDetectedEventClass(const std::vector<UrlResourceClass>& urls);
 	
 	/**
 	 * needed by wxPostEvent
 	 */
 	wxEvent* Clone() const;
+
+	/**
+	 * @return the URLs that were detected; these URLs are calculated using framework specific
+	 *         routing rules. Urls will not contain a hostname
+	 *         Examples: /index.php", "/web/frontend_dev.php", "/user/login"
+	 */
+	std::vector<UrlResourceClass> GetUrls() const;
+
+private:
+
+	/**
+	 * the URLs that were detected; these URLs are calculated using framework specific
+	 * routing rules. Urls will not contain a hostname. 
+	 */
+	std::vector<UrlResourceClass> Urls;
 };
 
 class ViewInfosDetectedEventClass : public wxEvent {
 
-	public:	
+public:	
 	
-	std::vector<mvceditor::ViewInfoClass> ViewInfos;
-
-	ViewInfosDetectedEventClass(std::vector<mvceditor::ViewInfoClass> viewInfos);
+	ViewInfosDetectedEventClass(const std::vector<mvceditor::ViewInfoClass>& viewInfos);
 	
 	/**
 	 * needed by wxPostEvent
 	 */
 	wxEvent* Clone() const;
+
+	/** 
+	 * @return the list of view files and along with template variables contained 
+	 *         in those templates. 
+	 */
+	std::vector<mvceditor::ViewInfoClass> GetViewInfos() const;
+
+private:
+
+	/**
+	 * Hiding this vector because we want to make sure
+	 * it is deep copied every time since we this event will be handled
+	 * by multiple threads.
+	 */
+	std::vector<mvceditor::ViewInfoClass> ViewInfos;
 };
 
 

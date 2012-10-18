@@ -173,3 +173,17 @@ wxString mvceditor::CharToWx(const char* source) {
 	wxString wx(source, wxConvUTF8);
 	return wx;
 }
+
+void mvceditor::DeepCopy(std::vector<wxString>& dest, const std::vector<wxString>& src) {
+	dest.clear();
+	for (std::vector<wxString>::const_iterator s = src.begin(); s != src.end(); ++s) {
+		dest.push_back(s->c_str());
+	}
+}
+
+void mvceditor::DeepCopy(std::map<wxString, wxString>& dest, const std::map<wxString, wxString>& src) {
+	dest.clear();
+	for (std::map<wxString, wxString>::const_iterator s = src.begin(); s != src.end(); ++s) {
+		dest[s->first.c_str()] = s->second.c_str();
+	}
+}

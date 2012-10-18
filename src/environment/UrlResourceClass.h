@@ -72,13 +72,22 @@ public:
 
 	UrlResourceClass(wxString uri);
 
-	UrlResourceClass(const UrlResourceClass& src);
+	/**
+	 * @param src this item will be a deep copy of src
+	 */
+	UrlResourceClass(const mvceditor::UrlResourceClass& src);
 
 	/**
 	 * @param src item to copy from. after a call to this method, this item will have the
-	 * same properties as src
+	 * same properties as src. This is a deep copy
 	 */
-	void Copy(const UrlResourceClass& src);
+	void Copy(const mvceditor::UrlResourceClass& src);
+
+	/**
+	 * @param src item to copy from. after a call to this method, this item will have the
+	 * same properties as src. This is a deep copy
+	 */
+	mvceditor::UrlResourceClass& operator=(const mvceditor::UrlResourceClass& src);
 
 	void Reset();
 };
@@ -104,7 +113,7 @@ public:
 	 * the list of URLs that have been detected thus far. These are full URLs; "http://codeigniter.localhost/news/index"
 	 * These URLs are usually detected by the UrlDetectorClass
 	 */
-	std::vector<UrlResourceClass> Urls;
+	std::vector<mvceditor::UrlResourceClass> Urls;
 	
 	/**
 	 * The name of the browser that is selected

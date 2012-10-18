@@ -207,7 +207,7 @@ void mvceditor::ViewFilePluginClass::OnCallStackComplete(mvceditor::CallStackCom
 	
 void mvceditor::ViewFilePluginClass::OnViewInfosDetectionComplete(mvceditor::ViewInfosDetectedEventClass& event) {
 	wxWindow* window = FindOutlineWindow(ID_VIEW_FILE_PANEL);
-	App.Structs.CurrentViewInfos = event.ViewInfos;
+	App.Structs.CurrentViewInfos = event.GetViewInfos();
 	ViewFilePanelClass* viewPanel = NULL;
 	if (window) {
 		viewPanel = (ViewFilePanelClass*)window;
