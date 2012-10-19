@@ -44,7 +44,7 @@ static const int ID_REGEX_REPLACE_MENU_START = 10000;
 // than this the search will stop.  This is done because the user cannot 
 // possibly go through all hits; plus this program will allocate too much
 // memory
-static const int MAX_HITS = 1000;
+static const size_t MAX_HITS = 1000;
 
 static std::vector<wxString> FilesFromHits(const std::vector<mvceditor::FindInFilesHitClass>& allHits) {
 	std::vector<wxString>  files;
@@ -475,7 +475,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnFileHit(mvceditor::FindInFilesHi
 		// in MSW the list control does not render the \t use another delimiter
 		wxString format = wxT("%s\t:%d\t:%s");
 		for (hit = hits.begin(); hit != hits.end(); ++hit) {
-			wxString msg = wxString::Format(format, hit->FileName, hit->LineNumber, hit->Preview);
+			wxString msg = wxString::Format(format, hit->FileName.c_str(), hit->LineNumber, hit->Preview.c_str());
 			msg.Trim();
 			hitList.Add(msg.SubString(0, 200));
 		}
