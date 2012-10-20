@@ -60,11 +60,8 @@ std::vector<mvceditor::SourceClass> mvceditor::StructsClass::AllEnabledPhpSource
 	std::vector<mvceditor::SourceClass>::const_iterator src;
 	for (it = Projects.begin(); it != Projects.end(); ++it) {
 		if (it->IsEnabled) {
-			for (src = it->Sources.begin(); src !=  it->Sources.end(); ++src) {
-				mvceditor::SourceClass phpSrc = *src;
-				phpSrc.SetIncludeWildcards(PhpFileExtensionsString);
-				allSources.push_back(phpSrc);
-			}
+			std::vector<mvceditor::SourceClass> phpSources = it->AllPhpSources();
+			allSources.insert(allSources.end(), phpSources.begin(), phpSources.end());
 		}
 	}
 	return allSources;
