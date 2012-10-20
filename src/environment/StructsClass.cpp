@@ -41,7 +41,6 @@ mvceditor::StructsClass::StructsClass()
 	, Frameworks() {
 }
 
-
 std::vector<mvceditor::SourceClass> mvceditor::StructsClass::AllEnabledSources() const {
 	std::vector<mvceditor::SourceClass> allSources;
 	std::vector<mvceditor::ProjectClass>::const_iterator it;
@@ -49,6 +48,22 @@ std::vector<mvceditor::SourceClass> mvceditor::StructsClass::AllEnabledSources()
 		if (it->IsEnabled) {
 			for (size_t j = 0; j < it->Sources.size(); ++j) {
 				allSources.push_back(it->Sources[j]);
+			}
+		}
+	}
+	return allSources;
+}
+
+std::vector<mvceditor::SourceClass> mvceditor::StructsClass::AllEnabledPhpSources() const {
+	std::vector<mvceditor::SourceClass> allSources;
+	std::vector<mvceditor::ProjectClass>::const_iterator it;
+	std::vector<mvceditor::SourceClass>::const_iterator src;
+	for (it = Projects.begin(); it != Projects.end(); ++it) {
+		if (it->IsEnabled) {
+			for (src = it->Sources.begin(); src !=  it->Sources.end(); ++src) {
+				mvceditor::SourceClass phpSrc = *src;
+				phpSrc.SetIncludeWildcards(PhpFileExtensionsString);
+				allSources.push_back(phpSrc);
 			}
 		}
 	}
