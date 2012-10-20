@@ -76,11 +76,11 @@ std::vector<mvceditor::SourceClass> mvceditor::ProjectClass::AllPhpSources() con
 			phpExtensionsString.Append(wxT(';'));
 		}
 	}
-
+	std::vector<mvceditor::SourceClass>::const_iterator src;
 	std::vector<mvceditor::SourceClass> phpSources;
-	for (size_t i = 0; i < Sources.size(); ++i) {
+	for (src = Sources.begin(); src != Sources.end(); ++src) {
 		mvceditor::SourceClass phpSrc;
-		phpSrc.RootDirectory = Sources[i].RootDirectory;
+		phpSrc.RootDirectory = src->RootDirectory;
 		phpSrc.SetIncludeWildcards(phpExtensionsString);
 		phpSources.push_back(phpSrc);
 	}
