@@ -49,7 +49,6 @@ public:
 	 * The directories where source files are located in. 
 	 */
 	std::vector<mvceditor::SourceClass> Sources;
-
 	
 	/**
 	 * The wildcard patterns that will be used to find PHP files in this
@@ -156,69 +155,6 @@ public:
 	 * project's sources, then this method returns nothing.
 	 */
 	wxString RelativeFileName(const wxString& fullPath) const;
-
-	/**
-	 * Returns the valid PHP file extensions for this project
-	 * @return wxString file extensions. This string will be suitable to
-	 * serialize the wildcard list.
-	 */
-	///wxString GetPhpFileExtensionsString() const;
-
-	/**
-	 * Returns the valid PHP file extensions for this project
-	 * @return std::vector<wxSring> a copy of the file extensions
-	 */
-	///std::vector<wxString> GetPhpFileExtensions() const;
-
-	/**
-	 * @param wxString Tokenizes the wildcards in the given string and adds them to the
-	 * PhpFileFilters.
-	 * Each wildcard is assumed to be tokenized by a semicolon ';'
-	 * Existing filters are left intact
-	 */
-	///void SetPhpFileExtensionsString(wxString wildcardString);
-
-	/**
-	 * Returns the valid CSS file extensions for this project
-	 * @return wxString file extensions. This string will be suitable to
-	 * serialize the wildcard list.
-	 */
-	///wxString GetCssFileExtensionsString() const;
-
-	/**
-	 * Returns the valid CSS file extensions for this project
-	 * @return std::vector<wxSring> a copy of the file extensions
-	 */
-	///std::vector<wxString> GetCssFileExtensions() const;
-
-	/**
-	 * @param wxString Tokenizes the wildcards in the given string and adds them to the
-	 * CssFileFilters.
-	 * Each wildcard is assumed to be tokenized by a semicolon ';'
-	 * Existing filters are left intact
-	 */
-	///void SetCssFileExtensionsString(wxString wildcardString);
-
-	/**
-	 * Returns the valid SQL file extensions for this project
-	 * @return wxString file extensions. This string will be suitable to
-	 * serialize the wildcard list.
-	 */
-	///wxString GetSqlFileExtensionsString() const;
-
-	/**
-	 * Returns the valid SQL file extensions for this project
-	 * @return std::vector<wxSring> a copy of the file extensions
-	 */
-	///std::vector<wxString> GetSqlFileExtensions() const;
-
-	/**
-	 * @param wxString Tokenizes the wildcards in the given string and adds them to the
-	 * SqlFileFilters.
-	 * Each wildcard is assumed to be tokenized by a semicolon ';'
-	 * Existing filters are left intact
-	 */
-	///void SetSqlFileExtensionsString(wxString wildcardString);
 
 	/**
 	 * creates a unique filename for the resources of this project. 
