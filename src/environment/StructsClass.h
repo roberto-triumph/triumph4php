@@ -122,9 +122,21 @@ public:
 	/**
 	 * @return vector of all directories of all source files in all enabled
 	 * projects. For example, if there are 3 enabled projects, each with 2 sources
-	 * directories, then this method returns 4 source instances.
+	 * directories, then this method returns 4 source instances. Each returned source
+	 * will have the same include/exclude wildcards as the original source.
 	 */
 	std::vector<mvceditor::SourceClass> AllEnabledSources() const;
+
+	/**
+	 * Same as AllEnabledSources() but each returned source
+	 * will have the the PHP file filters as its include wildcards, not the same wildcards 
+	 * as the original source.
+	 *
+	 * @return vector of all directories of all source files in all enabled
+	 * projects. For example, if there are 3 enabled projects, each with 2 sources
+	 * directories, then this method returns 4 source instances.
+	 */
+	std::vector<mvceditor::SourceClass> AllEnabledPhpSources() const;
 
 	/**
 	 * @return bool TRUE if there is at least 1 enabled project that has AT LEAST 1 source

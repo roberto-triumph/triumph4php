@@ -76,11 +76,11 @@ std::vector<mvceditor::SourceClass> mvceditor::ProjectClass::AllPhpSources() con
 			phpExtensionsString.Append(wxT(';'));
 		}
 	}
-
+	std::vector<mvceditor::SourceClass>::const_iterator src;
 	std::vector<mvceditor::SourceClass> phpSources;
-	for (size_t i = 0; i < Sources.size(); ++i) {
+	for (src = Sources.begin(); src != Sources.end(); ++src) {
 		mvceditor::SourceClass phpSrc;
-		phpSrc.RootDirectory = Sources[i].RootDirectory;
+		phpSrc.RootDirectory = src->RootDirectory;
 		phpSrc.SetIncludeWildcards(phpExtensionsString);
 		phpSources.push_back(phpSrc);
 	}
@@ -114,95 +114,6 @@ wxString mvceditor::ProjectClass::RelativeFileName(const wxString& fullPath) con
 	}
 	return relativeName;
 }
-
-/*
-wxString mvceditor::ProjectClass::GetPhpFileExtensionsString() const {
-	wxString all;
-	for (size_t i = 0; i < PhpFileFilters.size(); ++i) {
-		all.Append(PhpFileFilters[i]);
-		if (i < (PhpFileFilters.size() - 1)) {
-			all.Append(wxT(';'));
-		}
-	}
-	return all;
-}
-
-std::vector<wxString> mvceditor::ProjectClass::GetPhpFileExtensions() const {
-	std::vector<wxString> cpy;
-	for (size_t i = 0; i < PhpFileFilters.size(); ++i) {
-		wxString s;
-		s.Append(PhpFileFilters[i]);
-		cpy.push_back(s);
-	}
-	return cpy;
-}
-
-void mvceditor::ProjectClass::SetPhpFileExtensionsString(wxString wildcardString) {
-	wxStringTokenizer tokenizer(wildcardString, wxT(";"));
-	while (tokenizer.HasMoreTokens()) {
-		wxString wildcard = tokenizer.NextToken();
-		PhpFileFilters.push_back(wildcard);
-	}
-}
-
-wxString mvceditor::ProjectClass::GetCssFileExtensionsString() const {
-	wxString all;
-	for (size_t i = 0; i < CssFileFilters.size(); ++i) {
-		all.Append(CssFileFilters[i]);
-		if (i < (CssFileFilters.size() - 1)) {
-			all.Append(wxT(';'));
-		}
-	}
-	return all;
-}
-
-std::vector<wxString> mvceditor::ProjectClass::GetCssFileExtensions() const {
-	std::vector<wxString> cpy;
-	for (size_t i = 0; i < CssFileFilters.size(); ++i) {
-		wxString s;
-		s.Append(CssFileFilters[i]);
-		cpy.push_back(s);
-	}
-	return cpy;
-}
-
-void mvceditor::ProjectClass::SetCssFileExtensionsString(wxString wildcardString) {
-	wxStringTokenizer tokenizer(wildcardString, wxT(";"));
-	while (tokenizer.HasMoreTokens()) {
-		wxString wildcard = tokenizer.NextToken();
-		CssFileFilters.push_back(wildcard);
-	}
-}
-
-wxString mvceditor::ProjectClass::GetSqlFileExtensionsString() const {
-	wxString all;
-	for (size_t i = 0; i < SqlFileFilters.size(); ++i) {
-		all.Append(SqlFileFilters[i]);
-		if (i < (SqlFileFilters.size() - 1)) {
-			all.Append(wxT(';'));
-		}
-	}
-	return all;
-}
-
-std::vector<wxString> mvceditor::ProjectClass::GetSqlFileExtensions() const {
-	std::vector<wxString> cpy;
-	for (size_t i = 0; i <SqlFileFilters.size(); ++i) {
-		wxString s;
-		s.Append(SqlFileFilters[i]);
-		cpy.push_back(s);
-	}
-	return cpy;
-}
-
-void mvceditor::ProjectClass::SetSqlFileExtensionsString(wxString wildcardString) {
-	wxStringTokenizer tokenizer(wildcardString, wxT(";"));
-	while (tokenizer.HasMoreTokens()) {
-		wxString wildcard = tokenizer.NextToken();
-		SqlFileFilters.push_back(wildcard);
-	}
-}
-*/
 
 bool mvceditor::ProjectClass::MakeResourceDbFileName() {
 	if (ResourceDbFileName.IsOk()) {

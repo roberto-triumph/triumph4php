@@ -108,14 +108,17 @@ wxString FileTestFixtureClass::HideFile(const wxString& fileName) {
 	// must do it the hard way
 	
 	// start with the windows way
-	wxString wxHideCmd = wxT("attrib +H ");
-	wxHideCmd += fileName;
-	size_t rawLength = 0;
+	wxPlatformInfo info;
+	if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
+		wxString wxHideCmd = wxT("attrib +H ");
+		wxHideCmd += fileName;
+		size_t rawLength = 0;
 
-	wxCharBuffer buf = wxConvUTF8.cWC2MB(wxHideCmd.c_str(), wxHideCmd.length() + 1, &rawLength);
-	const char *cmd = buf.data();
-	int ret = system(cmd);
-	if (ret != 0) {
+		wxCharBuffer buf = wxConvUTF8.cWC2MB(wxHideCmd.c_str(), wxHideCmd.length() + 1, &rawLength);
+		const char *cmd = buf.data();
+		system(cmd);
+	}
+	else if(info.GetOperatingSystemId() == wxOS_UNIX_LINUX) {
 		
 		//hide the file when running tests on a linux box by renaming to a dot file
 		wxString hiddenName;
