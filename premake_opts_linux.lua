@@ -43,7 +43,7 @@ ICU_CONFIG = 'icu-config'
 -- binary to get the various compiler linker flags to use the wxWidgets library. 
 -- Note that if you change this then it's because you installed wxWidgets in a 
 -- non-standard location; this means you will also need to add the wxWidgets 
--- lib directory to your LD_LIBRARY_PATH, otherwise the ICU library 
+-- lib directory to your LD_LIBRARY_PATH, otherwise the wxWidgets library 
 -- will not be found at runtime (ie. when you try to execute mvc-editor.exe).
 -- Also, if you build wxWidgets yourself, you will need to build the Unicode
 -- version, AND make sure to compile the wxStyledTextCtrl that is located
