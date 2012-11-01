@@ -293,6 +293,7 @@ bool mvceditor::SqlQueryClass::NextRow(soci::row& row, std::vector<UnicodeString
 			soci::column_properties props = row.get_properties(i);
 			std::ostringstream out;
 			UnicodeString col;
+			std::tm tm;
 			if (soci::i_null != indicator) {
 				switch(props.get_data_type()) {
 				case soci::dt_string:
@@ -312,8 +313,16 @@ bool mvceditor::SqlQueryClass::NextRow(soci::row& row, std::vector<UnicodeString
 					out << row.get<long long>(i);
 					break;
 				case soci::dt_date:
-					wxDateTime date(row.get<std::tm>(i));
-					out << date.Format(wxT("%Y-%m-%d %H:%M:%S")).ToAscii();
+					tm = row.get<std::tm>(i);
+					if (tm.tm_year != 0 && tm.tm_mon != 0 && tm.tm_mday != 0) {
+						wxDateTime date(tm);
+						out << date.Format(wxT("%Y-%m-%d %H:%M:%S")).ToAscii();
+					}
+					else {
+
+						// mysql allows dates of 0000-00-00
+						out << "0000-00-00 00:00:00";
+					}
 					break;
 				}
 				col = mvceditor::CharToIcu(out.str().c_str());
