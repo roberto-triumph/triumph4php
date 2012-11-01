@@ -825,29 +825,35 @@ void mvceditor::CodeControlClass::OnIdle(wxIdleEvent& event) {
 		// careful, GetModificationTime requires the file to exist
 		wxFileName file(CurrentFilename);
 		wxDateTime modifiedDateTime;
-		if (file.FileExists()) {
+		bool exists = file.FileExists();
+		if (exists) {
 			modifiedDateTime = file.GetModificationTime();
 		}
-		if (!file.FileExists() || modifiedDateTime.IsLaterThan(FileOpenedDateTime)) {
+		if (!exists || modifiedDateTime.IsLaterThan(FileOpenedDateTime)) {
+			
 			ModifiedDialogOpen = true;
 			wxString message = CurrentFilename;
 			int opts = 0;
-			if (file.FileExists()) {
+
+			// check again, in case file was modified externally at the same time
+			// this code is running
+			exists = file.FileExists();
+			if (exists) {
 				message += _("\n\nFile has been modified externally. Reload file and lose any changes?\n");
 				message += _("Yes will reload file, No will allow you to override the file.");
 				opts = wxYES_NO | wxICON_QUESTION;
 			}
 			else {
 				message += _("\n\nFile has been deleted externally.\n");
-				message += _("You wil need to save the file to store the contents.");
+				message += _("You will need to save the file to store the contents.");
 				opts = wxICON_QUESTION;
 			}
 			int res = wxMessageBox(message, _("Warning"), 
 				opts, this);
-			if (wxYES == res && file.FileExists()) {
+			if (wxYES == res && exists) {
 				LoadAndTrackFile(CurrentFilename);
 			}
-			else if (!file.FileExists()) {
+			else if (!exists) {
 
 				// so that next idle event user does not get asked the same question again
 				// since file does not exist, make it look like a new file
