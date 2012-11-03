@@ -312,17 +312,17 @@ private:
 	DECLARE_EVENT_TABLE()
 };
 
-class FinderPluginClass : public PluginClass {
+class FinderFeatureClass : public FeatureClass {
 
 public:
 
 	/**
 	 * Constructor
  	 */
-	FinderPluginClass(mvceditor::AppClass& app);
+	FinderFeatureClass(mvceditor::AppClass& app);
 	
 	/**
-	 * Add menu items to the edit menu for this plugin.
+	 * Add menu items to the edit menu for this feature.
 	 * 
 	 * @param wxMenu* menu the tools menu to add items to.
 	 */

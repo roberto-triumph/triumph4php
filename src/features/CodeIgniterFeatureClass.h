@@ -32,17 +32,17 @@
 namespace mvceditor {
 
 /**
- * This is a plugin that is designed to test the plugin mechanism. 
+ * This is a feature that is designed to test the feature mechanism. 
  * This is also useful for prototyping of a feature or debugging (instead of
  * repeating steps just put the code in the Go() method )
  */
-class CodeIgniterPluginClass : public PluginClass {
+class CodeIgniterFeatureClass : public FeatureClass {
 public:
 
-	CodeIgniterPluginClass(mvceditor::AppClass& app);
+	CodeIgniterFeatureClass(mvceditor::AppClass& app);
 		
 	/**
-	 * This plugin will create its own menu. 
+	 * This feature will create its own menu. 
 	 *
 	 * @param wxMenuBar* the menu bar to insert the new menu to
 	 */

@@ -39,8 +39,8 @@
 namespace mvceditor {
 
 // some forward declarations to prevent re-compilation as much as possible
-// Since this file is included by many plugins whenever a change to any included header
-// files is maded most plugins have to be re-compiled.
+// Since this file is included by many features whenever a change to any included header
+// files is maded most features have to be re-compiled.
 class TextDocumentClass;
 class ResourceCacheClass;
 

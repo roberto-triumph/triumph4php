@@ -809,7 +809,7 @@ void  mvceditor::CodeControlClass::OnDoubleClick(wxStyledTextEvent& event) {
 void mvceditor::CodeControlClass::OnContextMenu(wxContextMenuEvent& event) {
 	wxWindow* frame = GetGrandParent();
 
-	// Let the frame handle it because we want plugins to have menu items
+	// Let the frame handle it because we want features to have menu items
 	if (frame) {
 		frame->ProcessEvent(event);
 	}

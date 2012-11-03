@@ -222,12 +222,12 @@ void mvceditor::CliCommandListDialogClass::OnHelpButton(wxCommandEvent& event) {
 
 mvceditor::RunConsolePanelClass::RunConsolePanelClass(wxWindow* parent, int id, 
 													   mvceditor::StatusBarWithGaugeClass* gauge, 
-													   mvceditor::RunConsolePluginClass& plugin)
+													   mvceditor::RunConsoleFeatureClass& feature)
 	: RunConsolePanelGeneratedClass(parent, id)
 	, CommandString()
 	, ProcessWithHeartbeat(*this)
 	, Gauge(gauge)
-	, Plugin(plugin)
+	, Feature(feature)
 	, FileNameHits()
 	, CurrentPid(0) {
 	wxGenericValidator commandValidator(&CommandString);
@@ -387,8 +387,8 @@ void mvceditor::RunConsolePanelClass::OnStoreButton(wxCommandEvent& event) {
 		// using NULL so that the dialog is centered on the screen
 		mvceditor::CliCommandEditDialogClass dialog(NULL, wxID_ANY, newCommand);
 		if (dialog.ShowModal() == wxID_OK) {
-			Plugin.AddCommand(newCommand);
-			Plugin.PersistCommands();
+			Feature.AddCommand(newCommand);
+			Feature.PersistCommands();
 		}
 	}
 }
@@ -469,9 +469,9 @@ void mvceditor::RunConsolePanelClass::AppendText(const wxString& text) {
 UnicodeString mvceditor::RunConsolePanelClass::FileNameRegularExpression() {
 	wxPlatformInfo info;
 	std::vector<wxString> allExtensions;
-	std::vector<wxString> phpExtensions = Plugin.App.Globals.GetPhpFileExtensions();
-	std::vector<wxString> cssExtensions = Plugin.App.Globals.GetCssFileExtensions();
-	std::vector<wxString> sqlExtensions = Plugin.App.Globals.GetSqlFileExtensions();
+	std::vector<wxString> phpExtensions = Feature.App.Globals.GetPhpFileExtensions();
+	std::vector<wxString> cssExtensions = Feature.App.Globals.GetCssFileExtensions();
+	std::vector<wxString> sqlExtensions = Feature.App.Globals.GetSqlFileExtensions();
 	for (size_t i = 0; i < phpExtensions.size(); ++i) {
 		allExtensions.push_back(phpExtensions[i]);
 	}
@@ -538,7 +538,7 @@ void mvceditor::RunConsolePanelClass::OnLeftDown(wxMouseEvent& event) {
 		// trim because the regular expression may contain a space at the beginning or the end
 		fileName.Trim(false).Trim(true);
 		if (wxFileName::FileExists(fileName)) {
-			Plugin.LoadPage(fileName);
+			Feature.LoadPage(fileName);
 		}
 	}
 	event.Skip();
@@ -561,8 +561,8 @@ mvceditor::FileNameHitClass mvceditor::RunConsolePanelClass::HitAt(wxMouseEvent&
 	return mouseHit;
 }
 
-mvceditor::RunConsolePluginClass::RunConsolePluginClass(mvceditor::AppClass& app)
-	: PluginClass(app)
+mvceditor::RunConsoleFeatureClass::RunConsoleFeatureClass(mvceditor::AppClass& app)
+	: FeatureClass(app)
 	, RunCliMenuItem(NULL)
 	, RunCliWithArgsMenuItem(NULL)
 	, RunCliInNewWindowMenuItem(NULL)
@@ -570,7 +570,7 @@ mvceditor::RunConsolePluginClass::RunConsolePluginClass(mvceditor::AppClass& app
 	, CommandToolbar(NULL) {
 }
 
-void mvceditor::RunConsolePluginClass::AddNewMenu(wxMenuBar* menuBar) {
+void mvceditor::RunConsoleFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 	wxMenu* cliMenu = new wxMenu(0);
 	RunCliMenuItem = new wxMenuItem(cliMenu, mvceditor::MENU_RUN_PHP + 0, _("Run As CLI\tF7"), 
 		_("Run File As a PHP Command Line Script"), wxITEM_NORMAL);
@@ -593,7 +593,7 @@ void mvceditor::RunConsolePluginClass::AddNewMenu(wxMenuBar* menuBar) {
 	menuBar->Append(cliMenu, _("CLI"));
 }
 
-void mvceditor::RunConsolePluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+void mvceditor::RunConsoleFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
 	menuItemIds[mvceditor::MENU_RUN_PHP + 0] = wxT("Console-Run");
 	menuItemIds[mvceditor::MENU_RUN_PHP + 1] = wxT("Console-Run With Arguments");
@@ -602,7 +602,7 @@ void mvceditor::RunConsolePluginClass::AddKeyboardShortcuts(std::vector<DynamicC
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
-void mvceditor::RunConsolePluginClass::OnRunFileAsCli(wxCommandEvent& event) {
+void mvceditor::RunConsoleFeatureClass::OnRunFileAsCli(wxCommandEvent& event) {
 	CodeControlClass* code = GetCurrentCodeControl();
 	if (code) {
 
@@ -631,7 +631,7 @@ void mvceditor::RunConsolePluginClass::OnRunFileAsCli(wxCommandEvent& event) {
 	}	
 }
 
-void mvceditor::RunConsolePluginClass::OnRunFileAsCliInNewWindow(wxCommandEvent& event) {
+void mvceditor::RunConsoleFeatureClass::OnRunFileAsCliInNewWindow(wxCommandEvent& event) {
 	CodeControlClass* code = GetCurrentCodeControl();
 	if (code) {
 
@@ -649,7 +649,7 @@ void mvceditor::RunConsolePluginClass::OnRunFileAsCliInNewWindow(wxCommandEvent&
 	}
 }
 
-void mvceditor::RunConsolePluginClass::RunCommand(const mvceditor::CliCommandClass& command, bool inNewWindow) {
+void mvceditor::RunConsoleFeatureClass::RunCommand(const mvceditor::CliCommandClass& command, bool inNewWindow) {
 	if (inNewWindow) {
 		RunConsolePanelClass* window = new RunConsolePanelClass(GetToolsNotebook(), ID_WINDOW_CONSOLE, 
 			GetStatusBarWithGauge(), *this);
@@ -685,7 +685,7 @@ void mvceditor::RunConsolePluginClass::RunCommand(const mvceditor::CliCommandCla
 	}
 }
 
-void mvceditor::RunConsolePluginClass::OnUpdateUi(wxUpdateUIEvent& event) {
+void mvceditor::RunConsoleFeatureClass::OnUpdateUi(wxUpdateUIEvent& event) {
 	bool hasEditors = NULL != GetCurrentCodeControl();
 	RunCliMenuItem->Enable(hasEditors);
 	RunCliInNewWindowMenuItem->Enable(hasEditors);
@@ -694,19 +694,19 @@ void mvceditor::RunConsolePluginClass::OnUpdateUi(wxUpdateUIEvent& event) {
 	event.Skip();
 }
 
-void mvceditor::RunConsolePluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
+void mvceditor::RunConsoleFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 	toolBar->AddTool(mvceditor::MENU_RUN_PHP + 0, _("Run"), wxArtProvider::GetBitmap(
 		wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), _("Run"));
 }
 
-void mvceditor::RunConsolePluginClass::OnRunSavedCommands(wxCommandEvent& event) {
+void mvceditor::RunConsoleFeatureClass::OnRunSavedCommands(wxCommandEvent& event) {
 	mvceditor::CliCommandListDialogClass dialog(GetMainWindow(), wxID_ANY, CliCommands);
 	if (dialog.ShowModal() == wxID_OK) {
 		PersistCommands();
 	}
 }
 
-void mvceditor::RunConsolePluginClass::LoadPreferences(wxConfigBase* config) {
+void mvceditor::RunConsoleFeatureClass::LoadPreferences(wxConfigBase* config) {
 	CliCommands.clear();
 	long index;
 	wxString groupName;
@@ -732,7 +732,7 @@ void mvceditor::RunConsolePluginClass::LoadPreferences(wxConfigBase* config) {
 	FillCommandPanel();
 }
 
-void mvceditor::RunConsolePluginClass::PersistCommands() {
+void mvceditor::RunConsoleFeatureClass::PersistCommands() {
 	wxConfigBase* config = wxConfig::Get();
 
 	// delete any previous commands that are in the config
@@ -765,11 +765,11 @@ void mvceditor::RunConsolePluginClass::PersistCommands() {
 	FillCommandPanel();
 }
 
-void mvceditor::RunConsolePluginClass::AddCommand(const mvceditor::CliCommandClass& command) {
+void mvceditor::RunConsoleFeatureClass::AddCommand(const mvceditor::CliCommandClass& command) {
 	CliCommands.push_back(command);
 }
 
-void mvceditor::RunConsolePluginClass::FillCommandPanel() {
+void mvceditor::RunConsoleFeatureClass::FillCommandPanel() {
 	if (CommandToolbar == NULL) {
 		CommandToolbar = new wxAuiToolBar(GetMainWindow(), wxID_ANY, wxDefaultPosition, wxDefaultSize, 
 			  wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_OVERFLOW | wxAUI_TB_TEXT | wxAUI_TB_HORZ_TEXT);
@@ -803,7 +803,7 @@ void mvceditor::RunConsolePluginClass::FillCommandPanel() {
 	AuiManager->Update();
 }
 
-void mvceditor::RunConsolePluginClass::OnCommandButtonClick(wxCommandEvent& event) {
+void mvceditor::RunConsoleFeatureClass::OnCommandButtonClick(wxCommandEvent& event) {
 	size_t index = (size_t)event.GetId();
 	index = index - (mvceditor::MENU_RUN_PHP + 5);
 	if (index >= 0 && index < CliCommands.size()) {
@@ -812,7 +812,7 @@ void mvceditor::RunConsolePluginClass::OnCommandButtonClick(wxCommandEvent& even
 	}
 }
 
-void mvceditor::RunConsolePluginClass::LoadPage(const wxString& fileName) {
+void mvceditor::RunConsoleFeatureClass::LoadPage(const wxString& fileName) {
 	GetNotebook()->LoadPage(fileName);
 }
 
@@ -828,15 +828,15 @@ BEGIN_EVENT_TABLE(mvceditor::RunConsolePanelClass, wxPanel)
 	EVT_COMMAND(ID_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::RunConsolePanelClass::OnProcessFailed)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(mvceditor::RunConsolePluginClass, wxEvtHandler) 
-	EVT_MENU(mvceditor::MENU_RUN_PHP + 0, mvceditor::RunConsolePluginClass::OnRunFileAsCli)
-	EVT_MENU(mvceditor::MENU_RUN_PHP + 1, mvceditor::RunConsolePluginClass::OnRunFileAsCli)
-	EVT_MENU(mvceditor::MENU_RUN_PHP + 2, mvceditor::RunConsolePluginClass::OnRunFileAsCliInNewWindow)
-	EVT_MENU(mvceditor::MENU_RUN_PHP + 3, mvceditor::RunConsolePluginClass::OnRunFileAsCliInNewWindow)
-	EVT_MENU(mvceditor::MENU_RUN_PHP + 4, mvceditor::RunConsolePluginClass::OnRunSavedCommands)
-	EVT_UPDATE_UI(wxID_ANY, mvceditor::RunConsolePluginClass::OnUpdateUi)
+BEGIN_EVENT_TABLE(mvceditor::RunConsoleFeatureClass, wxEvtHandler) 
+	EVT_MENU(mvceditor::MENU_RUN_PHP + 0, mvceditor::RunConsoleFeatureClass::OnRunFileAsCli)
+	EVT_MENU(mvceditor::MENU_RUN_PHP + 1, mvceditor::RunConsoleFeatureClass::OnRunFileAsCli)
+	EVT_MENU(mvceditor::MENU_RUN_PHP + 2, mvceditor::RunConsoleFeatureClass::OnRunFileAsCliInNewWindow)
+	EVT_MENU(mvceditor::MENU_RUN_PHP + 3, mvceditor::RunConsoleFeatureClass::OnRunFileAsCliInNewWindow)
+	EVT_MENU(mvceditor::MENU_RUN_PHP + 4, mvceditor::RunConsoleFeatureClass::OnRunSavedCommands)
+	EVT_UPDATE_UI(wxID_ANY, mvceditor::RunConsoleFeatureClass::OnUpdateUi)
 
 	// take up all the rest of the IDs for the command buttons
 	EVT_MENU_RANGE(mvceditor::MENU_RUN_PHP + 5, mvceditor::MENU_RUN_PHP + 55, 
-	mvceditor::RunConsolePluginClass::OnCommandButtonClick)
+	mvceditor::RunConsoleFeatureClass::OnCommandButtonClick)
 END_EVENT_TABLE()

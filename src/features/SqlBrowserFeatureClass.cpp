@@ -388,7 +388,7 @@ void mvceditor::MultipleSqlExecuteClass::Close() {
 
 mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id, 
 		mvceditor::StatusBarWithGaugeClass* gauge, const mvceditor::SqlQueryClass& other,
-		mvceditor::SqlBrowserPluginClass* plugin) 
+		mvceditor::SqlBrowserFeatureClass* feature) 
 	: SqlBrowserPanelGeneratedClass(parent, id)
 	, Query(other)
 	, ConnectionIdentifier()
@@ -397,21 +397,21 @@ mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id,
 	, RunningThreadId(0) 
 	, Results()
 	, Gauge(gauge)
-	, Plugin(plugin) {
+	, Feature(feature) {
 	CodeControl = NULL;
 	QueryId = id;
 	ResultsGrid->DeleteCols(0, ResultsGrid->GetNumberCols());
 	ResultsGrid->DeleteRows(0, ResultsGrid->GetNumberRows());
 	ResultsGrid->ClearGrid();
 	UpdateLabels(wxT(""));
-	Plugin->App.RunningThreads.AddEventHandler(this);
+	Feature->App.RunningThreads.AddEventHandler(this);
 }
 
 mvceditor::SqlBrowserPanelClass::~SqlBrowserPanelClass() {
 	if (RunningThreadId > 0) {
 		Stop();
 	}
-	Plugin->App.RunningThreads.RemoveEventHandler(this);
+	Feature->App.RunningThreads.RemoveEventHandler(this);
 }
 
 
@@ -427,7 +427,7 @@ bool mvceditor::SqlBrowserPanelClass::Check() {
 void mvceditor::SqlBrowserPanelClass::Execute() {
 	if (Check() && 0 == RunningThreadId) {
 		mvceditor::MultipleSqlExecuteClass* thread = new mvceditor::MultipleSqlExecuteClass(
-			Plugin->App.RunningThreads, QueryId, ConnectionIdentifier);
+			Feature->App.RunningThreads, QueryId, ConnectionIdentifier);
 		if (thread->Init(LastQuery, Query) && thread->Execute(RunningThreadId)) {
 			Gauge->AddGauge(_("Running SQL queries"), ID_SQL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 		}
@@ -464,7 +464,7 @@ void mvceditor::SqlBrowserPanelClass::Stop() {
 		else {
 			wxMessageBox(_("could not connect:") + mvceditor::IcuToWx(error));
 		}
-		Plugin->App.RunningThreads.Stop(RunningThreadId);
+		Feature->App.RunningThreads.Stop(RunningThreadId);
 		RunningThreadId = 0;
 		Gauge->StopGauge(ID_SQL_GAUGE);
 	}
@@ -510,7 +510,7 @@ void mvceditor::SqlBrowserPanelClass::RenderAllResults() {
 			Fill(results);
 		}
 		else if (results->Success && results->HasRows && outputSummary) {
-			mvceditor::SqlBrowserPanelClass* newPanel = Plugin->CreateResultsPanel(CodeControl);
+			mvceditor::SqlBrowserPanelClass* newPanel = Feature->CreateResultsPanel(CodeControl);
 			newPanel->Fill(results);
 		}
 		if (outputSummary) {
@@ -660,7 +660,7 @@ void mvceditor::SqlBrowserPanelClass::OnWorkComplete(wxCommandEvent& event) {
 		Results.clear();
 		RunningThreadId = 0;
 		Gauge->StopGauge(ID_SQL_GAUGE);
-		Plugin->AuiManagerUpdate();
+		Feature->AuiManagerUpdate();
 	}
 	else {
 		event.Skip();
@@ -750,18 +750,18 @@ void mvceditor::SqlMetaDataFetchClass::BackgroundWork() {
 	}
 }
 
-mvceditor::SqlBrowserPluginClass::SqlBrowserPluginClass(mvceditor::AppClass& app) 
-	: PluginClass(app)
+mvceditor::SqlBrowserFeatureClass::SqlBrowserFeatureClass(mvceditor::AppClass& app) 
+	: FeatureClass(app)
 	, ChosenIndex(0) {
 
 	// will get removed when the app terminates
 	App.RunningThreads.AddEventHandler(this);
 }
 
-mvceditor::SqlBrowserPluginClass::~SqlBrowserPluginClass() {
+mvceditor::SqlBrowserFeatureClass::~SqlBrowserFeatureClass() {
 }
 
-void mvceditor::SqlBrowserPluginClass::OnProjectsUpdated(wxCommandEvent& event) {
+void mvceditor::SqlBrowserFeatureClass::OnProjectsUpdated(wxCommandEvent& event) {
 
 
 	// remove any connections previously detected
@@ -783,7 +783,7 @@ void mvceditor::SqlBrowserPluginClass::OnProjectsUpdated(wxCommandEvent& event) 
 	DetectMetadata();
 }
 
-void mvceditor::SqlBrowserPluginClass::DetectMetadata() {
+void mvceditor::SqlBrowserFeatureClass::DetectMetadata() {
 	ChosenIndex = 0;
 	if (!App.Globals.Infos.empty()) {
 		mvceditor::SqlMetaDataFetchClass* thread = new mvceditor::SqlMetaDataFetchClass(App.RunningThreads, ID_SQL_METADATA_FETCH);
@@ -797,7 +797,7 @@ void mvceditor::SqlBrowserPluginClass::DetectMetadata() {
 	}
 }
 
-void mvceditor::SqlBrowserPluginClass::AddNewMenu(wxMenuBar* menuBar) {
+void mvceditor::SqlBrowserFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 	wxMenu* sqlMenu = new wxMenu(0);
 	sqlMenu->Append(mvceditor::MENU_SQL + 0, _("SQL Browser\tSHIFT+F9"), _("Open a window for SQL browsing"),
 		wxITEM_NORMAL);
@@ -810,12 +810,12 @@ void mvceditor::SqlBrowserPluginClass::AddNewMenu(wxMenuBar* menuBar) {
 	menuBar->Append(sqlMenu, _("SQL"));
 }
 
-void mvceditor::SqlBrowserPluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
+void mvceditor::SqlBrowserFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 	toolBar->AddTool(mvceditor::MENU_SQL + 0, _("SQL Browser"), wxArtProvider::GetBitmap(
 		wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), wxT("Open the SQL Browser"), wxITEM_NORMAL);
 }
 
-void  mvceditor::SqlBrowserPluginClass::OnSqlBrowserToolsMenu(wxCommandEvent& event) {
+void  mvceditor::SqlBrowserFeatureClass::OnSqlBrowserToolsMenu(wxCommandEvent& event) {
 	int num = 1;
 	mvceditor::NotebookClass* notebook = GetNotebook();
 	for (size_t i = 0; i < notebook->GetPageCount(); i++) {
@@ -830,7 +830,7 @@ void  mvceditor::SqlBrowserPluginClass::OnSqlBrowserToolsMenu(wxCommandEvent& ev
 	ctrl->SetFocus();
 }
 
-mvceditor::SqlBrowserPanelClass* mvceditor::SqlBrowserPluginClass::CreateResultsPanel(mvceditor::CodeControlClass* codeControl) {
+mvceditor::SqlBrowserPanelClass* mvceditor::SqlBrowserFeatureClass::CreateResultsPanel(mvceditor::CodeControlClass* codeControl) {
 	mvceditor::SqlQueryClass query;
 	if (ChosenIndex < App.Globals.Infos.size()) {
 		query.Info.Copy(App.Globals.Infos[ChosenIndex]);
@@ -842,14 +842,14 @@ mvceditor::SqlBrowserPanelClass* mvceditor::SqlBrowserPluginClass::CreateResults
 	mvceditor::NotebookClass* codeNotebook = GetNotebook();
 	wxString tabText = codeNotebook->GetPageText(codeNotebook->GetPageIndex(codeControl));
 
-	// name the windows, since there could be multiple windows from various plugins; we want to know which opened tools windows
-	// are from this plugin
+	// name the windows, since there could be multiple windows from various features; we want to know which opened tools windows
+	// are from this feature
 	AddToolsWindow(sqlPanel, tabText, wxT("mvceditor::SqlBrowserPanelClass"));
 	sqlPanel->LinkToCodeControl(codeControl);
 	return sqlPanel;
 }
 
-void mvceditor::SqlBrowserPluginClass::OnRun(wxCommandEvent& event) {
+void mvceditor::SqlBrowserFeatureClass::OnRun(wxCommandEvent& event) {
 	mvceditor::CodeControlClass* ctrl = GetNotebook()->GetCurrentCodeControl();
 	if (ctrl && ctrl->GetDocumentMode() == mvceditor::CodeControlClass::SQL) {
 		
@@ -881,7 +881,7 @@ void mvceditor::SqlBrowserPluginClass::OnRun(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event) {
+void mvceditor::SqlBrowserFeatureClass::OnSqlConnectionMenu(wxCommandEvent& event) {
 
 	// decided to always allow the user to edit the connection info in order to
 	// allow the user to create a new database from within the editor (the very 
@@ -920,11 +920,11 @@ void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event
 	}
 }
 
-void mvceditor::SqlBrowserPluginClass::OnSqlDetectMenu(wxCommandEvent& event) {
+void mvceditor::SqlBrowserFeatureClass::OnSqlDetectMenu(wxCommandEvent& event) {
 	DetectMetadata();
 }
 
-void mvceditor::SqlBrowserPluginClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& event) {
+void mvceditor::SqlBrowserFeatureClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& event) {
 	mvceditor::CodeControlClass* contentWindow = GetNotebook()->GetCodeControl(event.GetSelection());
 	if (contentWindow) {
 		wxAuiNotebook* notebook = GetToolsNotebook();
@@ -947,7 +947,7 @@ void mvceditor::SqlBrowserPluginClass::OnContentNotebookPageChanged(wxAuiNoteboo
 	}
 }
 
-void mvceditor::SqlBrowserPluginClass::OnContentNotebookPageClose(wxAuiNotebookEvent& event) {
+void mvceditor::SqlBrowserFeatureClass::OnContentNotebookPageClose(wxAuiNotebookEvent& event) {
 	mvceditor::CodeControlClass* contentWindow = GetNotebook()->GetCodeControl(event.GetSelection());
 	if (contentWindow) {
 		wxAuiNotebook* notebook = GetToolsNotebook();
@@ -967,7 +967,7 @@ void mvceditor::SqlBrowserPluginClass::OnContentNotebookPageClose(wxAuiNotebookE
 	}
 }
 
-void mvceditor::SqlBrowserPluginClass::OnToolsNotebookPageClose(wxAuiNotebookEvent& event) {
+void mvceditor::SqlBrowserFeatureClass::OnToolsNotebookPageClose(wxAuiNotebookEvent& event) {
 	wxAuiNotebook* notebook = GetToolsNotebook();
 	int sel = event.GetSelection();
 	wxWindow* toolsWindow = notebook->GetPage(sel);
@@ -981,7 +981,7 @@ void mvceditor::SqlBrowserPluginClass::OnToolsNotebookPageClose(wxAuiNotebookEve
 	}
 }
 
-void mvceditor::SqlBrowserPluginClass::OnAppExit(wxCommandEvent& event) {
+void mvceditor::SqlBrowserFeatureClass::OnAppExit(wxCommandEvent& event) {
 	wxAuiNotebook* notebook = GetToolsNotebook();
 	for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
 		wxWindow* toolsWindow = notebook->GetPage(i);
@@ -996,15 +996,15 @@ void mvceditor::SqlBrowserPluginClass::OnAppExit(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::SqlBrowserPluginClass::OnWorkInProgress(wxCommandEvent& event) {
+void mvceditor::SqlBrowserFeatureClass::OnWorkInProgress(wxCommandEvent& event) {
 	GetStatusBarWithGauge()->IncrementGauge(ID_SQL_METADATA_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
 }
 
-void mvceditor::SqlBrowserPluginClass::OnWorkComplete(wxCommandEvent& event) {
+void mvceditor::SqlBrowserFeatureClass::OnWorkComplete(wxCommandEvent& event) {
 	GetStatusBarWithGauge()->StopGauge(ID_SQL_METADATA_GAUGE);
 }
 
-void mvceditor::SqlBrowserPluginClass::OnSqlMetaDataComplete(mvceditor::SqlMetaDataEventClass& event) {
+void mvceditor::SqlBrowserFeatureClass::OnSqlMetaDataComplete(mvceditor::SqlMetaDataEventClass& event) {
 	App.Globals.SqlResourceFinder.Copy(event.NewResources);
 	std::vector<UnicodeString> errors = event.Errors;
 	for (size_t i = 0; i < errors.size(); ++i) {
@@ -1013,7 +1013,7 @@ void mvceditor::SqlBrowserPluginClass::OnSqlMetaDataComplete(mvceditor::SqlMetaD
 	}
 }
 
-void mvceditor::SqlBrowserPluginClass::AddKeyboardShortcuts(std::vector<mvceditor::DynamicCmdClass>& shortcuts) {
+void mvceditor::SqlBrowserFeatureClass::AddKeyboardShortcuts(std::vector<mvceditor::DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
 	menuItemIds[mvceditor::MENU_SQL + 0] = wxT("SQL-Browser");
 	menuItemIds[mvceditor::MENU_SQL + 1] = wxT("SQL-Connections");
@@ -1022,11 +1022,11 @@ void mvceditor::SqlBrowserPluginClass::AddKeyboardShortcuts(std::vector<mvcedito
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
-void mvceditor::SqlBrowserPluginClass::AuiManagerUpdate() {
+void mvceditor::SqlBrowserFeatureClass::AuiManagerUpdate() {
 	AuiManager->Update();
 }
 
-void mvceditor::SqlBrowserPluginClass::LoadPreferences(wxConfigBase* config) {
+void mvceditor::SqlBrowserFeatureClass::LoadPreferences(wxConfigBase* config) {
 	App.Globals.Infos.clear();
 	wxString groupName;
 	long index = 0;
@@ -1054,7 +1054,7 @@ void mvceditor::SqlBrowserPluginClass::LoadPreferences(wxConfigBase* config) {
 	}
 }
 
-void mvceditor::SqlBrowserPluginClass::SavePreferences() {
+void mvceditor::SqlBrowserFeatureClass::SavePreferences() {
 	wxConfigBase* config = wxConfig::Get();
 	wxString groupName;
 	long index = 0;
@@ -1097,19 +1097,19 @@ void mvceditor::SqlBrowserPluginClass::SavePreferences() {
 	App.UpdateConfigModifiedTime();
 }
 
-BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPluginClass, wxEvtHandler)
-	EVT_MENU(mvceditor::MENU_SQL + 0, mvceditor::SqlBrowserPluginClass::OnSqlBrowserToolsMenu)	
-	EVT_MENU(mvceditor::MENU_SQL + 1, mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu)
-	EVT_MENU(mvceditor::MENU_SQL + 2, mvceditor::SqlBrowserPluginClass::OnRun)
-	EVT_MENU(mvceditor::MENU_SQL + 3, mvceditor::SqlBrowserPluginClass::OnSqlDetectMenu)
-	EVT_COMMAND(ID_SQL_METADATA_FETCH, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SqlBrowserPluginClass::OnWorkInProgress)
-	EVT_COMMAND(ID_SQL_METADATA_FETCH, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SqlBrowserPluginClass::OnWorkComplete)
-	EVT_AUINOTEBOOK_PAGE_CHANGED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::SqlBrowserPluginClass::OnContentNotebookPageChanged)
-	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_CODE_NOTEBOOK, mvceditor::SqlBrowserPluginClass::OnContentNotebookPageClose)
-	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::SqlBrowserPluginClass::OnToolsNotebookPageClose)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::SqlBrowserPluginClass::OnProjectsUpdated)
-	EVT_SQL_META_DATA_COMPLETE(ID_SQL_METADATA_FETCH, mvceditor::SqlBrowserPluginClass::OnSqlMetaDataComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_EXIT, mvceditor::SqlBrowserPluginClass::OnAppExit)
+BEGIN_EVENT_TABLE(mvceditor::SqlBrowserFeatureClass, wxEvtHandler)
+	EVT_MENU(mvceditor::MENU_SQL + 0, mvceditor::SqlBrowserFeatureClass::OnSqlBrowserToolsMenu)	
+	EVT_MENU(mvceditor::MENU_SQL + 1, mvceditor::SqlBrowserFeatureClass::OnSqlConnectionMenu)
+	EVT_MENU(mvceditor::MENU_SQL + 2, mvceditor::SqlBrowserFeatureClass::OnRun)
+	EVT_MENU(mvceditor::MENU_SQL + 3, mvceditor::SqlBrowserFeatureClass::OnSqlDetectMenu)
+	EVT_COMMAND(ID_SQL_METADATA_FETCH, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SqlBrowserFeatureClass::OnWorkInProgress)
+	EVT_COMMAND(ID_SQL_METADATA_FETCH, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SqlBrowserFeatureClass::OnWorkComplete)
+	EVT_AUINOTEBOOK_PAGE_CHANGED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::SqlBrowserFeatureClass::OnContentNotebookPageChanged)
+	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_CODE_NOTEBOOK, mvceditor::SqlBrowserFeatureClass::OnContentNotebookPageClose)
+	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::SqlBrowserFeatureClass::OnToolsNotebookPageClose)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::SqlBrowserFeatureClass::OnProjectsUpdated)
+	EVT_SQL_META_DATA_COMPLETE(ID_SQL_METADATA_FETCH, mvceditor::SqlBrowserFeatureClass::OnSqlMetaDataComplete)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_EXIT, mvceditor::SqlBrowserFeatureClass::OnAppExit)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPanelClass, SqlBrowserPanelGeneratedClass)

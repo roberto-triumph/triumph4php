@@ -902,7 +902,7 @@ public:
 	/**
 	 * TRUE if this is a resource is a 'dynamic' resource; it means that the resource
 	 * is not actually in the source; it was either generated via a PHPDoc comment (@property, @method)
-	 * or a a Plugin object.
+	 * or a a Feature object.
 	 */
 	bool IsDynamic;
 

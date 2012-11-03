@@ -42,7 +42,7 @@ class AppFrameClass;
 class AppClass;
 
 /**
- * We use this to generate a one-time ready event that plugins can
+ * We use this to generate a one-time ready event that features can
  * listen for when they want to perform something
  * right after the main frame has been shown to the
  * user for the first time. We also use this to check for changes
@@ -82,10 +82,10 @@ public:
 	mvceditor::RunningThreadsClass RunningThreads;
 
 	/**
-	 * Any plugins should post any useful events to this event handler
-	 * then all other plugins will get notified.  This is how
-	 * inter-plugin communication is done in a way to reduce coupling
-	 * Plugins need not push themselves onto this sink, the application will do 
+	 * Any features should post any useful events to this event handler
+	 * then all other features will get notified.  This is how
+	 * inter-feature communication is done in a way to reduce coupling
+	 * Features need not push themselves onto this sink, the application will do 
 	 * so at app start.
 	 */
 	EventSinkClass EventSink;
@@ -128,24 +128,24 @@ private:
 	bool CommandLine();
 
 	/**
-	 * create plugins. only instantiates and nothing else
+	 * create features. only instantiates and nothing else
 	 */
 	void CreatePlugins();
 	
 	/**
-	 * delete plugins from memory
+	 * delete features from memory
 	 */
 	void DeletePlugins();
 
 	/**
-	 * asks plugins for any windows they want to create
+	 * asks features for any windows they want to create
 	 */
 	void PluginWindows();
 
 	/**
 	 * Additional functionality
 	 */
-	std::vector<PluginClass*> Plugins;
+	std::vector<FeatureClass*> Features;
 	
 	/**
 	 * The user preferences.  
@@ -172,7 +172,7 @@ private:
 	/**
 	 * Shows the user various editor messages (not related to their code)
 	 */
-	EditorMessagesPluginClass* EditorMessagesPlugin;
+	EditorMessagesFeatureClass* EditorMessagesPlugin;
 
 	/**
 	 * TRUE if the EVENT_APP_READY has already been generated.

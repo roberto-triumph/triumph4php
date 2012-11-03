@@ -172,8 +172,8 @@ void mvceditor::ResourceFileWipeThreadClass::BackgroundWork() {
 	}
 }
 
-mvceditor::ResourcePluginClass::ResourcePluginClass(mvceditor::AppClass& app)
-	: PluginClass(app)
+mvceditor::ResourceFeatureClass::ResourceFeatureClass(mvceditor::AppClass& app)
+	: FeatureClass(app)
 	, JumpToText()
 	, ProjectIndexMenu(NULL)
 	, Timer()
@@ -187,14 +187,14 @@ mvceditor::ResourcePluginClass::ResourcePluginClass(mvceditor::AppClass& app)
 	App.RunningThreads.AddEventHandler(this);
 }
 
-void mvceditor::ResourcePluginClass::AddSearchMenuItems(wxMenu* searchMenu) {
+void mvceditor::ResourceFeatureClass::AddSearchMenuItems(wxMenu* searchMenu) {
 	ProjectIndexMenu = searchMenu->Append(mvceditor::MENU_RESOURCE + 0, _("Index"), _("Index the project"));
 	searchMenu->Append(mvceditor::MENU_RESOURCE + 1, _("Jump To Resource Under Cursor\tF12"), _("Jump To Resource that is under the cursor"));
 	searchMenu->Append(mvceditor::MENU_RESOURCE + 2, _("Search for Resource...\tCTRL+R"), _("Search for a class, method, or function"));
 	ProjectIndexMenu->Enable(App.Globals.HasSources() && FREE == State);
 }
 
-void mvceditor::ResourcePluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+void mvceditor::ResourceFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
 	menuItemIds[mvceditor::MENU_RESOURCE + 0] = wxT("Resource-Index Project");
 	menuItemIds[mvceditor::MENU_RESOURCE + 1] = wxT("Resource-Jump To Resource Under Cursor");
@@ -202,16 +202,16 @@ void mvceditor::ResourcePluginClass::AddKeyboardShortcuts(std::vector<DynamicCmd
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
-void mvceditor::ResourcePluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
+void mvceditor::ResourceFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 	toolBar->AddTool(mvceditor::MENU_RESOURCE + 0, wxT("Index"), wxArtProvider::GetBitmap(
 		wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), wxT("Index"), wxITEM_NORMAL);
 }
 
-void mvceditor::ResourcePluginClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
+void mvceditor::ResourceFeatureClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
 	menu->Append(mvceditor::MENU_RESOURCE + 3, _("Jump To Source"));
 }
 
-void mvceditor::ResourcePluginClass::OnAppReady(wxCommandEvent& event) {
+void mvceditor::ResourceFeatureClass::OnAppReady(wxCommandEvent& event) {
 	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
 	pelet::Versions version = GetEnvironment()->Php.Version;
 
@@ -242,7 +242,7 @@ void mvceditor::ResourcePluginClass::OnAppReady(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::ResourcePluginClass::OnProjectsUpdated(wxCommandEvent& event) {
+void mvceditor::ResourceFeatureClass::OnProjectsUpdated(wxCommandEvent& event) {
 	HasCodeLookups = false;
 	HasFileLookups = false;
 	if (RunningThreadId > 0) {
@@ -297,7 +297,7 @@ void mvceditor::ResourcePluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 	}
 }
 
-std::vector<mvceditor::ResourceClass> mvceditor::ResourcePluginClass::SearchForResources(const wxString& text) {
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFeatureClass::SearchForResources(const wxString& text) {
 	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
 	std::vector<mvceditor::ResourceClass> matches;
 	bool exactOnly = text.Length() <= 2;
@@ -321,14 +321,14 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourcePluginClass::SearchForR
 	return matches;
 }
 
-void mvceditor::ResourcePluginClass::OnWorkInProgress(wxCommandEvent& event) {
+void mvceditor::ResourceFeatureClass::OnWorkInProgress(wxCommandEvent& event) {
 	GetStatusBarWithGauge()->IncrementGauge(ID_RESOURCE_READER_GAUGE, StatusBarWithGaugeClass::INDETERMINATE_MODE);
 	if (IndexingDialog && IndexingDialog->IsShown()) {
 		IndexingDialog->Increment();
 	}
 }
 
-void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
+void mvceditor::ResourceFeatureClass::OnWorkComplete(wxCommandEvent& event) {
 	RunningThreadId = 0;
 	if (MoreProjects()) {
 
@@ -411,7 +411,7 @@ void mvceditor::ResourcePluginClass::OnWorkComplete(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::ResourcePluginClass::OnGlobalCacheComplete(mvceditor::GlobalCacheCompleteEventClass& event) {
+void mvceditor::ResourceFeatureClass::OnGlobalCacheComplete(mvceditor::GlobalCacheCompleteEventClass& event) {
 	mvceditor::GlobalCacheClass* globalCache = event.GlobalCache;
 	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
 	if (resourceCache->IsInitGlobal(globalCache->ResourceDbFileName)) {
@@ -420,7 +420,7 @@ void mvceditor::ResourcePluginClass::OnGlobalCacheComplete(mvceditor::GlobalCach
 	resourceCache->RegisterGlobal(globalCache);
 }
 
-void mvceditor::ResourcePluginClass::StartIndex() {
+void mvceditor::ResourceFeatureClass::StartIndex() {
 	if (App.Globals.HasSources()) {
 
 		//prevent two finds at a time
@@ -469,7 +469,7 @@ void mvceditor::ResourcePluginClass::StartIndex() {
 	}
 }
 
-void mvceditor::ResourcePluginClass::OnProjectWipeAndIndex(wxCommandEvent& event) {
+void mvceditor::ResourceFeatureClass::OnProjectWipeAndIndex(wxCommandEvent& event) {
 	if (RunningThreadId > 0) {
 		App.RunningThreads.Stop(RunningThreadId);
 		RunningThreadId = 0;
@@ -495,12 +495,12 @@ void mvceditor::ResourcePluginClass::OnProjectWipeAndIndex(wxCommandEvent& event
 	}
 }
 
-void mvceditor::ResourcePluginClass::OnWipeComplete(wxCommandEvent& event) {
+void mvceditor::ResourceFeatureClass::OnWipeComplete(wxCommandEvent& event) {
 	GetStatusBarWithGauge()->StopGauge(ID_RESOURCE_READER_GAUGE);
 	StartIndex();
 }
 
-void mvceditor::ResourcePluginClass::OnJump(wxCommandEvent& event) {
+void mvceditor::ResourceFeatureClass::OnJump(wxCommandEvent& event) {
 
 	// jump to selected resources
 	CodeControlClass* codeControl = GetCurrentCodeControl();
@@ -544,7 +544,7 @@ void mvceditor::ResourcePluginClass::OnJump(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::ResourcePluginClass::OnSearchForResource(wxCommandEvent& event) {
+void mvceditor::ResourceFeatureClass::OnSearchForResource(wxCommandEvent& event) {
 	std::vector<mvceditor::ResourceClass> chosenResources;
 	wxString term;
 	mvceditor::ResourceSearchDialogClass dialog(GetMainWindow(), *this, term, chosenResources);
@@ -556,7 +556,7 @@ void mvceditor::ResourcePluginClass::OnSearchForResource(wxCommandEvent& event) 
 }
 
 
-void mvceditor::ResourcePluginClass::LoadPageFromResource(const wxString& finderQuery, const mvceditor::ResourceClass& resource) {
+void mvceditor::ResourceFeatureClass::LoadPageFromResource(const wxString& finderQuery, const mvceditor::ResourceClass& resource) {
 	mvceditor::ResourceSearchClass resourceSearch(mvceditor::WxToIcu(finderQuery));
 	wxFileName fileName = resource.FileName();
 	if (!fileName.FileExists()) {
@@ -586,12 +586,12 @@ void mvceditor::ResourcePluginClass::LoadPageFromResource(const wxString& finder
 	}
 }
 
-void mvceditor::ResourcePluginClass::OnUpdateUi(wxUpdateUIEvent& event) {
+void mvceditor::ResourceFeatureClass::OnUpdateUi(wxUpdateUIEvent& event) {
 	ProjectIndexMenu->Enable(App.Globals.HasSources() && FREE == State);
 	event.Skip();
 }
 
-bool mvceditor::ResourcePluginClass::NeedToIndex(const wxString& finderQuery) const {
+bool mvceditor::ResourceFeatureClass::NeedToIndex(const wxString& finderQuery) const {
 	mvceditor::ResourceSearchClass resourceSearch(mvceditor::WxToIcu(finderQuery));
 	if ((mvceditor::ResourceSearchClass::CLASS_NAME == resourceSearch.GetResourceType() ||
 		mvceditor::ResourceSearchClass::CLASS_NAME_METHOD_NAME == resourceSearch.GetResourceType()) && !HasCodeLookups)  {
@@ -604,11 +604,11 @@ bool mvceditor::ResourcePluginClass::NeedToIndex(const wxString& finderQuery) co
 	return false;
 }
 
-void mvceditor::ResourcePluginClass::OpenFile(wxString fileName) {
+void mvceditor::ResourceFeatureClass::OpenFile(wxString fileName) {
 	GetNotebook()->LoadPage(fileName);
 }
 
-void mvceditor::ResourcePluginClass::OnCmdReIndex(wxCommandEvent& event) {
+void mvceditor::ResourceFeatureClass::OnCmdReIndex(wxCommandEvent& event) {
 
 	// only index when there is a project open
 	if (App.Globals.HasSources()) {
@@ -617,7 +617,7 @@ void mvceditor::ResourcePluginClass::OnCmdReIndex(wxCommandEvent& event) {
 }
 
 
-void mvceditor::ResourcePluginClass::OnAppFileClosed(wxCommandEvent& event) {
+void mvceditor::ResourceFeatureClass::OnAppFileClosed(wxCommandEvent& event) {
 
 	// only index when there is a project open
 	// need to make sure that the file that was closed is in the opened project
@@ -652,7 +652,7 @@ void mvceditor::ResourcePluginClass::OnAppFileClosed(wxCommandEvent& event) {
 	App.Globals.ResourceCache.RemoveWorking(fileIdentifier);
 }
 
-void mvceditor::ResourcePluginClass::RemoveNativeMatches(std::vector<mvceditor::ResourceClass>& matches) const {
+void mvceditor::ResourceFeatureClass::RemoveNativeMatches(std::vector<mvceditor::ResourceClass>& matches) const {
 	std::vector<mvceditor::ResourceClass>::iterator it = matches.begin();
 	while (it != matches.end()) {
 		if (it->IsNative) {
@@ -664,14 +664,14 @@ void mvceditor::ResourcePluginClass::RemoveNativeMatches(std::vector<mvceditor::
 	}
 }
 
-wxString mvceditor::ResourcePluginClass::CacheStatus() {
+wxString mvceditor::ResourceFeatureClass::CacheStatus() {
 	if (HasCodeLookups && HasFileLookups) {
 		return _("OK");
 	}
 	return _("Stale");
 }
 
-bool mvceditor::ResourcePluginClass::InitProjectQueue(const std::vector<mvceditor::ProjectClass>& projects) {
+bool mvceditor::ResourceFeatureClass::InitProjectQueue(const std::vector<mvceditor::ProjectClass>& projects) {
 	while (!ProjectQueue.empty()) {
 		ProjectQueue.pop();
 	}
@@ -684,12 +684,12 @@ bool mvceditor::ResourcePluginClass::InitProjectQueue(const std::vector<mvcedito
 	return !ProjectQueue.empty();
 }
 
-bool mvceditor::ResourcePluginClass::MoreProjects() const {
+bool mvceditor::ResourceFeatureClass::MoreProjects() const {
 	return !ProjectQueue.empty();
 }
 
 
-mvceditor::ResourceFileReaderClass* mvceditor::ResourcePluginClass::ReadNextProject(pelet::Versions version, wxString& projectLabel) {
+mvceditor::ResourceFileReaderClass* mvceditor::ResourceFeatureClass::ReadNextProject(pelet::Versions version, wxString& projectLabel) {
 	mvceditor::ResourceFileReaderClass* thread = NULL;
 	if (!ProjectQueue.empty()) {
 		mvceditor::ProjectClass project = ProjectQueue.front();
@@ -704,7 +704,7 @@ mvceditor::ResourceFileReaderClass* mvceditor::ResourcePluginClass::ReadNextProj
 	return thread;
 }
 
-void mvceditor::ResourcePluginClass::OnWorkingCacheComplete(mvceditor::WorkingCacheCompleteEventClass& event) {
+void mvceditor::ResourceFeatureClass::OnWorkingCacheComplete(mvceditor::WorkingCacheCompleteEventClass& event) {
 	wxString fileIdentifier = event.GetFileIdentifier();
 	bool good = App.Globals.ResourceCache.RegisterWorking(fileIdentifier, event.WorkingCache);
 	if (!good) {
@@ -715,7 +715,7 @@ void mvceditor::ResourcePluginClass::OnWorkingCacheComplete(mvceditor::WorkingCa
 	event.Skip();
 }
 
-void mvceditor::ResourcePluginClass::OnTimer(wxTimerEvent& event) {
+void mvceditor::ResourceFeatureClass::OnTimer(wxTimerEvent& event) {
 	if (WorkingCacheBuilder) {
 		mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
 		if (codeControl && codeControl->GetDocumentMode() == mvceditor::CodeControlClass::PHP) {
@@ -733,7 +733,7 @@ void mvceditor::ResourcePluginClass::OnTimer(wxTimerEvent& event) {
 	event.Skip();
 }
 
-mvceditor::ResourceSearchDialogClass::ResourceSearchDialogClass(wxWindow* parent, ResourcePluginClass& resource,
+mvceditor::ResourceSearchDialogClass::ResourceSearchDialogClass(wxWindow* parent, ResourceFeatureClass& resource,
 																wxString& term,
 																std::vector<mvceditor::ResourceClass>& chosenResources)
 	: ResourceSearchDialogGeneratedClass(parent)
@@ -954,22 +954,22 @@ void mvceditor::IndexingDialogClass::Increment() {
 	Gauge->Pulse();
 }
 
-BEGIN_EVENT_TABLE(mvceditor::ResourcePluginClass, wxEvtHandler)
-	EVT_MENU(mvceditor::MENU_RESOURCE + 0, mvceditor::ResourcePluginClass::OnProjectWipeAndIndex)
-	EVT_MENU(mvceditor::MENU_RESOURCE + 1, mvceditor::ResourcePluginClass::OnJump)
-	EVT_MENU(mvceditor::MENU_RESOURCE + 2, mvceditor::ResourcePluginClass::OnSearchForResource)
-	EVT_MENU(mvceditor::MENU_RESOURCE + 3, mvceditor::ResourcePluginClass::OnJump)
-	EVT_UPDATE_UI(wxID_ANY, mvceditor::ResourcePluginClass::OnUpdateUi)
-	EVT_COMMAND(ID_RESOURCE_READER, mvceditor::EVENT_FILE_READ_COMPLETE, mvceditor::ResourcePluginClass::OnWorkComplete)
-	EVT_COMMAND(ID_RESOURCE_READER, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ResourcePluginClass::OnWorkInProgress)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::ResourcePluginClass::OnProjectsUpdated)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_RE_INDEX, mvceditor::ResourcePluginClass::OnCmdReIndex)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_CLOSED, mvceditor::ResourcePluginClass::OnAppFileClosed)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::ResourcePluginClass::OnAppReady)
-	EVT_GLOBAL_CACHE_COMPLETE(ID_RESOURCE_READER, mvceditor::ResourcePluginClass::OnGlobalCacheComplete)
-	EVT_COMMAND(ID_WIPE_THREAD, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ResourcePluginClass::OnWorkInProgress)
-	EVT_COMMAND(ID_WIPE_THREAD, mvceditor::EVENT_WIPE_COMPLETE, mvceditor::ResourcePluginClass::OnWipeComplete)
+BEGIN_EVENT_TABLE(mvceditor::ResourceFeatureClass, wxEvtHandler)
+	EVT_MENU(mvceditor::MENU_RESOURCE + 0, mvceditor::ResourceFeatureClass::OnProjectWipeAndIndex)
+	EVT_MENU(mvceditor::MENU_RESOURCE + 1, mvceditor::ResourceFeatureClass::OnJump)
+	EVT_MENU(mvceditor::MENU_RESOURCE + 2, mvceditor::ResourceFeatureClass::OnSearchForResource)
+	EVT_MENU(mvceditor::MENU_RESOURCE + 3, mvceditor::ResourceFeatureClass::OnJump)
+	EVT_UPDATE_UI(wxID_ANY, mvceditor::ResourceFeatureClass::OnUpdateUi)
+	EVT_COMMAND(ID_RESOURCE_READER, mvceditor::EVENT_FILE_READ_COMPLETE, mvceditor::ResourceFeatureClass::OnWorkComplete)
+	EVT_COMMAND(ID_RESOURCE_READER, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ResourceFeatureClass::OnWorkInProgress)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::ResourceFeatureClass::OnProjectsUpdated)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_RE_INDEX, mvceditor::ResourceFeatureClass::OnCmdReIndex)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_CLOSED, mvceditor::ResourceFeatureClass::OnAppFileClosed)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::ResourceFeatureClass::OnAppReady)
+	EVT_GLOBAL_CACHE_COMPLETE(ID_RESOURCE_READER, mvceditor::ResourceFeatureClass::OnGlobalCacheComplete)
+	EVT_COMMAND(ID_WIPE_THREAD, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ResourceFeatureClass::OnWorkInProgress)
+	EVT_COMMAND(ID_WIPE_THREAD, mvceditor::EVENT_WIPE_COMPLETE, mvceditor::ResourceFeatureClass::OnWipeComplete)
 
-	EVT_WORKING_CACHE_COMPLETE(wxID_ANY, mvceditor::ResourcePluginClass::OnWorkingCacheComplete)
-	EVT_TIMER(wxID_ANY, mvceditor::ResourcePluginClass::OnTimer)
+	EVT_WORKING_CACHE_COMPLETE(wxID_ANY, mvceditor::ResourceFeatureClass::OnWorkingCacheComplete)
+	EVT_TIMER(wxID_ANY, mvceditor::ResourceFeatureClass::OnTimer)
 END_EVENT_TABLE()

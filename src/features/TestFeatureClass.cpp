@@ -29,21 +29,21 @@
 
 int ID_GO_BUTTON = wxNewId();
 
-void mvceditor::TestPluginClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
+void mvceditor::TestFeatureClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
 }
 
-void mvceditor::TestPluginClass::AddEditMenuItems(wxMenu* editMenu) {
+void mvceditor::TestFeatureClass::AddEditMenuItems(wxMenu* editMenu) {
 }
 
-void mvceditor::TestPluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
+void mvceditor::TestFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 	toolBar->AddTool(ID_GO_BUTTON, wxT("GO"), wxArtProvider::GetBitmap(
 	                     wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), wxT("GO"), wxITEM_NORMAL);
 }
 
-void mvceditor::TestPluginClass::AddWindows() {
+void mvceditor::TestFeatureClass::AddWindows() {
 }
 
-void mvceditor::TestPluginClass::Go(wxCommandEvent& event) {
+void mvceditor::TestFeatureClass::Go(wxCommandEvent& event) {
 	//wxMessageBox(wxT("Clicked the GO! button"));
 	wxString file = wxT("/home/roberto/workspace/sample_php_project/high_ascii.php");
 	
@@ -63,10 +63,10 @@ void mvceditor::TestPluginClass::Go(wxCommandEvent& event) {
 	}
 }
 
-mvceditor::TestPluginClass::TestPluginClass(mvceditor::AppClass& app)
-	: PluginClass(app) {
+mvceditor::TestFeatureClass::TestFeatureClass(mvceditor::AppClass& app)
+	: FeatureClass(app) {
 }
 
-BEGIN_EVENT_TABLE(mvceditor::TestPluginClass, wxEvtHandler)
-	EVT_MENU(ID_GO_BUTTON, TestPluginClass::Go)
+BEGIN_EVENT_TABLE(mvceditor::TestFeatureClass, wxEvtHandler)
+	EVT_MENU(ID_GO_BUTTON, TestFeatureClass::Go)
 END_EVENT_TABLE()

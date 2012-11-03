@@ -47,11 +47,11 @@ int ID_UPPERCASE = wxNewId();
 int ID_MENU_MORE = wxNewId();
 int ID_TOOLBAR = wxNewId();
 
-mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass*>& plugins,
+mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::FeatureClass*>& features,
 										mvceditor::AppClass& app,
 										mvceditor::PreferencesClass& preferences)
 	: AppFrameGeneratedClass(NULL)
-	, Plugins(plugins)
+	, Features(features)
 	, Listener(this)
 	, App(app)
 	, Preferences(preferences)
@@ -142,10 +142,10 @@ void mvceditor::AppFrameClass::OnClose(wxCloseEvent& event) {
 void mvceditor::AppFrameClass::OnFileSave(wxCommandEvent& event) {
 	Notebook->SaveCurrentPage();
 	mvceditor::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
-	mvceditor::FileSavedEventClass pluginEvent(codeControl);
+	mvceditor::FileSavedEventClass featureEvent(codeControl);
 
-	for (size_t i = 0; i < Plugins.size(); i++) {
-		wxPostEvent(Plugins[i], pluginEvent);
+	for (size_t i = 0; i < Features.size(); i++) {
+		wxPostEvent(Features[i], featureEvent);
 	}
 }
 
@@ -299,8 +299,8 @@ void mvceditor::AppFrameClass::OnEditPreferences(wxCommandEvent& event) {
 	App.StopConfigModifiedCheck();
 
 	PreferencesDialogClass prefDialog(this, Preferences);
-	for (size_t i = 0; i < Plugins.size(); ++i) {
-		Plugins[i]->AddPreferenceWindow(prefDialog.GetBookCtrl());
+	for (size_t i = 0; i < Features.size(); ++i) {
+		Features[i]->AddPreferenceWindow(prefDialog.GetBookCtrl());
 	}
 	prefDialog.Prepare();
 	int exitCode = prefDialog.ShowModal();
@@ -420,40 +420,40 @@ void mvceditor::AppFrameClass::AuiManagerUpdate() {
 	AuiManager.Update();
 }
 
-void mvceditor::AppFrameClass::LoadPlugin(mvceditor::PluginClass* plugin) {
+void mvceditor::AppFrameClass::LoadPlugin(mvceditor::FeatureClass* feature) {
 	
-	// propagate GUI events to plugins, so that they can handle menu events themselves
-	// plugin menus
-	plugin->InitWindow(GetStatusBarWithGauge(), Notebook, ToolsNotebook, OutlineNotebook, &AuiManager, GetMenuBar());
+	// propagate GUI events to features, so that they can handle menu events themselves
+	// feature menus
+	feature->InitWindow(GetStatusBarWithGauge(), Notebook, ToolsNotebook, OutlineNotebook, &AuiManager, GetMenuBar());
 	
 	//  when adding the separators, we dont want a separator at the very end
-	// we dont need separators if the plugin did not add any menu items
+	// we dont need separators if the feature did not add any menu items
 	size_t oldFileMenuCount = FileMenu->GetMenuItemCount();
-	plugin->AddFileMenuItems(FileMenu);
+	feature->AddFileMenuItems(FileMenu);
 	if (oldFileMenuCount != FileMenu->GetMenuItemCount() && oldFileMenuCount > 0) {
 		FileMenu->InsertSeparator(oldFileMenuCount);
 	}
 
 	size_t oldEditMenuCount = EditMenu->GetMenuItemCount();
-	plugin->AddEditMenuItems(EditMenu);
+	feature->AddEditMenuItems(EditMenu);
 	if (oldEditMenuCount != EditMenu->GetMenuItemCount() && oldEditMenuCount > 0) {
 		EditMenu->InsertSeparator(oldEditMenuCount);
 	}
 
 	size_t oldViewMenuCount = ViewMenu->GetMenuItemCount();
-	plugin->AddViewMenuItems(ViewMenu);
+	feature->AddViewMenuItems(ViewMenu);
 	if (oldViewMenuCount != ViewMenu->GetMenuItemCount() && oldViewMenuCount > 0) {
 		ViewMenu->InsertSeparator(oldViewMenuCount);
 	}
 
 	size_t oldSearchMenuCount = SearchMenu->GetMenuItemCount();
-	plugin->AddSearchMenuItems(SearchMenu);
+	feature->AddSearchMenuItems(SearchMenu);
 	if (oldSearchMenuCount != SearchMenu->GetMenuItemCount() && oldSearchMenuCount > 0) {
 		SearchMenu->InsertSeparator(oldSearchMenuCount);
 	}
 
 	wxMenuBar* menuBar = GetMenuBar();
-	plugin->AddNewMenu(menuBar);
+	feature->AddNewMenu(menuBar);
 
 	// new menus may have been added; push the Help menu all the way to the end
 	int helpIndex = menuBar->FindMenu(_("&Help"));
@@ -470,8 +470,8 @@ void mvceditor::AppFrameClass::LoadPlugin(mvceditor::PluginClass* plugin) {
 	wxMenuItem* exitMenu = FileMenu->Remove(wxID_EXIT);
 	FileMenu->Append(exitMenu);
 
-	plugin->AddToolBarItems(ToolBar);
-	plugin->AddWindows();
+	feature->AddToolBarItems(ToolBar);
+	feature->AddWindows();
 }
 
 void mvceditor::AppFrameClass::OnContextMenu(wxContextMenuEvent& event) {
@@ -493,8 +493,8 @@ void mvceditor::AppFrameClass::OnContextMenu(wxContextMenuEvent& event) {
 		contextMenu.AppendSeparator();
 		contextMenu.Append(wxID_FIND, _("Find"));
 		contextMenu.AppendSeparator();
-		for (size_t i = 0; i < Plugins.size(); ++i) {
-			Plugins[i]->AddCodeControlClassContextMenuItems(&contextMenu);
+		for (size_t i = 0; i < Features.size(); ++i) {
+			Features[i]->AddCodeControlClassContextMenuItems(&contextMenu);
 		}
 		
 		// no need to delete moreMenu pointer, the contextMenu will delete it for us
@@ -744,12 +744,12 @@ BEGIN_EVENT_TABLE(mvceditor::AppFrameClass,  AppFrameGeneratedClass)
 
 	// ATTN: STOP! DO NOT HANDLE ANY APP EVENTS HERE! SEE AppEventListenerForFrameClass
 
-	// we want to propagate these events to the plugins, we will do so here
-	// at first, wxWindow::PushEventHandler was used (each plugin was added to the event chain of
+	// we want to propagate these events to the features, we will do so here
+	// at first, wxWindow::PushEventHandler was used (each feature was added to the event chain of
 	// the app frame), but that function could no longer be used when the event sink was 
-	// introduced; since for any plugin that did not handle the event the app frame would get the event
-	// (because the plugin had the frame in its handler chain)
-	// for now we will only restrict to the plugin menus, since AppFrameGeneratedClass already handles
+	// introduced; since for any feature that did not handle the event the app frame would get the event
+	// (because the feature had the frame in its handler chain)
+	// for now we will only restrict to the feature menus, since AppFrameGeneratedClass already handles
 	// some events I could not just do EVT_MENU(wxID_ANY,...); putting this line would mean
 	// that OnAnyMenuCommandEvent would need to handle all of the AppFrame menus (and adding a new menu item
 	// to the app frame menus would involve modifying OnAnyMenuCommandEvent AND AppFrameGeneratedClass

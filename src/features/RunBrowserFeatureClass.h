@@ -88,7 +88,7 @@ private:
 	UrlResourceClass& ChosenUrl;
 };
 	
-class RunBrowserPluginClass : public PluginClass {
+class RunBrowserFeatureClass : public FeatureClass {
 
 public:
 
@@ -101,7 +101,7 @@ public:
 	 */
 	std::vector<UrlResourceClass> RecentUrls;
 
-	RunBrowserPluginClass(mvceditor::AppClass& app);
+	RunBrowserFeatureClass(mvceditor::AppClass& app);
 	
 	void AddWindows();
 	

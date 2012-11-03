@@ -49,7 +49,7 @@ namespace mvceditor {
 const wxEventType QUERY_COMPLETE_EVENT = wxNewEventType();
 
 // forward declarations; definitons are at the bottom of this file
-class SqlBrowserPluginClass;
+class SqlBrowserFeatureClass;
 class MultipleSqlExecuteClass;
 
 class SqlConnectionDialogClass : public SqlConnectionDialogGeneratedClass {
@@ -234,11 +234,11 @@ public:
 	 * @param int id the window ID
 	 * @param mvceditor::StatusBarWithGaugeClass* the gauge control. this class will NOT own the pointer
 	 * @param mvceditor::SqlQueryClass connection settings to prime the browser with
-	 * @param SqlBrowserPluginClass used to create a new panel (and attach it to the tools window) for 
+	 * @param SqlBrowserFeatureClass used to create a new panel (and attach it to the tools window) for 
 	 *        result sets
 	 */
 	SqlBrowserPanelClass(wxWindow* parent, int id, mvceditor::StatusBarWithGaugeClass* gauge,
-		const SqlQueryClass& query, SqlBrowserPluginClass* plugin);
+		const SqlQueryClass& query, SqlBrowserFeatureClass* feature);
 	
 	~SqlBrowserPanelClass();
 
@@ -364,7 +364,7 @@ private:
 	/**
 	 * needed to create the results panel and attach it to the tools window.
 	 */
-	SqlBrowserPluginClass* Plugin;
+	SqlBrowserFeatureClass* Feature;
 
 	/**
 	 * This ID will be used to differentiate between the events that the various panels will generate.
@@ -449,16 +449,16 @@ protected:
 };
 
 /**
- * This is a plugin to manage SQL connections and make queries to the database.
+ * This is a feature to manage SQL connections and make queries to the database.
  */
-class SqlBrowserPluginClass : public PluginClass {
+class SqlBrowserFeatureClass : public FeatureClass {
 public:
-	SqlBrowserPluginClass(mvceditor::AppClass& app);
+	SqlBrowserFeatureClass(mvceditor::AppClass& app);
 	
-	~SqlBrowserPluginClass();
+	~SqlBrowserFeatureClass();
 
 	/**
-	 * This plugin will have menu to create ad-hoc queries
+	 * This feature will have menu to create ad-hoc queries
 	 */
 	void AddNewMenu(wxMenuBar* menuBar);
 

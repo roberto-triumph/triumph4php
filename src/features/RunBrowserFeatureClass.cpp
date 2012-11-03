@@ -202,8 +202,8 @@ void mvceditor::ChooseUrlDialogClass::OnKeyDown(wxKeyEvent& event) {
 	}
 }
 
-mvceditor::RunBrowserPluginClass::RunBrowserPluginClass(mvceditor::AppClass& app)
-	: PluginClass(app) 
+mvceditor::RunBrowserFeatureClass::RunBrowserFeatureClass(mvceditor::AppClass& app)
+	: FeatureClass(app) 
 	, RecentUrls()
 	, PhpFrameworks(*this, app.RunningThreads, app.Globals.Environment)
 	, BrowserMenu()
@@ -213,7 +213,7 @@ mvceditor::RunBrowserPluginClass::RunBrowserPluginClass(mvceditor::AppClass& app
 	, State(FREE) {
 }
 
-void mvceditor::RunBrowserPluginClass::AddWindows() {
+void mvceditor::RunBrowserFeatureClass::AddWindows() {
 	BrowserToolbar = new wxAuiToolBar(GetMainWindow(), wxID_ANY, wxDefaultPosition, wxDefaultSize,
                                          wxAUI_TB_DEFAULT_STYLE |
                                          wxAUI_TB_TEXT |
@@ -236,13 +236,13 @@ void mvceditor::RunBrowserPluginClass::AddWindows() {
 		false).DockFixed(true).PaneBorder(false).Floatable(false).Row(1).Position(0));
 }	
 
-void mvceditor::RunBrowserPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+void mvceditor::RunBrowserFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	//std::map<int, wxString> menuItemIds;
 	//menuItemIds[mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 1] = wxT("Run-In Web Browser");
 	//AddDynamicCmd(menuItemIds, shortcuts);
 }
 
-void mvceditor::RunBrowserPluginClass::LoadPreferences(wxConfigBase* config) {
+void mvceditor::RunBrowserFeatureClass::LoadPreferences(wxConfigBase* config) {
 	App.Globals.UrlResourceFinder.Browsers.clear();
 
 	// dont use the config; use the Environment that has already been seeded with 
@@ -260,7 +260,7 @@ void mvceditor::RunBrowserPluginClass::LoadPreferences(wxConfigBase* config) {
 	}
 }
 
-void mvceditor::RunBrowserPluginClass::OnPreferencesSaved(wxCommandEvent& event) {
+void mvceditor::RunBrowserFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 
 	// need to update the browser toolbar if the user updates the environment
 	App.Globals.UrlResourceFinder.Browsers.clear();
@@ -280,7 +280,7 @@ void mvceditor::RunBrowserPluginClass::OnPreferencesSaved(wxCommandEvent& event)
 	}
 }
 
-void mvceditor::RunBrowserPluginClass::OnRunInWebBrowser(wxCommandEvent& event) {
+void mvceditor::RunBrowserFeatureClass::OnRunInWebBrowser(wxCommandEvent& event) {
 	wxString browserName = App.Globals.UrlResourceFinder.ChosenBrowser;
 	wxURI url = App.Globals.UrlResourceFinder.ChosenUrl.Url;
 	if (!browserName.IsEmpty() && !url.BuildURI().IsEmpty()) {
@@ -289,7 +289,7 @@ void mvceditor::RunBrowserPluginClass::OnRunInWebBrowser(wxCommandEvent& event) 
 	}
 }
 
-void mvceditor::RunBrowserPluginClass::OnBrowserToolDropDown(wxAuiToolBarEvent& event) {
+void mvceditor::RunBrowserFeatureClass::OnBrowserToolDropDown(wxAuiToolBarEvent& event) {
 	if (event.IsDropDownClicked()) {
 		BrowserToolbar->SetToolSticky(event.GetId(), true);
 		mvceditor::EnvironmentClass* environment = GetEnvironment();
@@ -322,7 +322,7 @@ void mvceditor::RunBrowserPluginClass::OnBrowserToolDropDown(wxAuiToolBarEvent& 
 	}
 }
 
-void mvceditor::RunBrowserPluginClass::OnUrlToolDropDown(wxAuiToolBarEvent& event) {
+void mvceditor::RunBrowserFeatureClass::OnUrlToolDropDown(wxAuiToolBarEvent& event) {
 	if (event.IsDropDownClicked()) {
 		if (App.Globals.UrlResourceFinder.Urls.empty()) {
 			return;
@@ -358,7 +358,7 @@ void mvceditor::RunBrowserPluginClass::OnUrlToolDropDown(wxAuiToolBarEvent& even
 	}
 }
 
-void mvceditor::RunBrowserPluginClass::OnUrlSearchTool(wxCommandEvent& event) {
+void mvceditor::RunBrowserFeatureClass::OnUrlSearchTool(wxCommandEvent& event) {
 	if (!App.Globals.UrlResourceFinder.Urls.empty()) {
 		ShowUrlDialog();
 	}
@@ -367,26 +367,26 @@ void mvceditor::RunBrowserPluginClass::OnUrlSearchTool(wxCommandEvent& event) {
 		// we need the resource cache; the resource cache is needed to figure out the URLs
 		// for each controller.
 		// we will trigger the project indexing, then once the project has been indexed 
-		// this plugin will kick off the URL detector, then show the URLs.
+		// this feature will kick off the URL detector, then show the URLs.
 		State = INDEXING;
 		wxCommandEvent indexEvent(mvceditor::EVENT_CMD_RE_INDEX);
 		App.EventSink.Publish(indexEvent);
 	}
 }
 
-void mvceditor::RunBrowserPluginClass::OnCmdUrls(wxCommandEvent& event) {
+void mvceditor::RunBrowserFeatureClass::OnCmdUrls(wxCommandEvent& event) {
 	
 	// we need the resource cache; the resource cache is needed to figure out the URLs
 	// for each controller.
 	// we will trigger the project indexing, then once the project has been indexed 
-	// this plugin will kick off the URL detector, then show the URLs.
+	// this feature will kick off the URL detector, then show the URLs.
 	
 	// dont set the state flag so that the dialog does not show
 	wxCommandEvent indexEvent(mvceditor::EVENT_CMD_RE_INDEX);
 	App.EventSink.Publish(indexEvent);
 }
 
-void mvceditor::RunBrowserPluginClass::ShowUrlDialog() {
+void mvceditor::RunBrowserFeatureClass::ShowUrlDialog() {
 	mvceditor::ChooseUrlDialogClass dialog(GetMainWindow(), App.Globals.UrlResourceFinder, App.Globals.UrlResourceFinder.ChosenUrl);
 	if (wxOK == dialog.ShowModal() && !App.Globals.UrlResourceFinder.ChosenUrl.Url.BuildURI().IsEmpty()) {
 				
@@ -416,7 +416,7 @@ void mvceditor::RunBrowserPluginClass::ShowUrlDialog() {
 	}
 }
 
-void mvceditor::RunBrowserPluginClass::OnUrlDetectionComplete(mvceditor::UrlDetectedEventClass& event) {
+void mvceditor::RunBrowserFeatureClass::OnUrlDetectionComplete(mvceditor::UrlDetectedEventClass& event) {
 	std::vector<mvceditor::UrlResourceClass> newUrls = event.GetUrls();
 	App.Globals.UrlResourceFinder.Urls.insert(App.Globals.UrlResourceFinder.Urls.end(),
 		newUrls.begin(), newUrls.end());
@@ -431,13 +431,13 @@ void mvceditor::RunBrowserPluginClass::OnUrlDetectionComplete(mvceditor::UrlDete
 	State = FREE;
 }
 
-void mvceditor::RunBrowserPluginClass::OnUrlDetectionFailed(wxCommandEvent& event) {
+void mvceditor::RunBrowserFeatureClass::OnUrlDetectionFailed(wxCommandEvent& event) {
 	mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, event.GetString());
 	GetStatusBarWithGauge()->StopGauge(ID_URL_GAUGE);
 	State = FREE;
 }
 
-void mvceditor::RunBrowserPluginClass::OnBrowserToolMenuItem(wxCommandEvent& event) {
+void mvceditor::RunBrowserFeatureClass::OnBrowserToolMenuItem(wxCommandEvent& event) {
 
 	// detect the chosen browser based on the menu item name
 	// change the current selection only if name is found
@@ -454,7 +454,7 @@ void mvceditor::RunBrowserPluginClass::OnBrowserToolMenuItem(wxCommandEvent& eve
 	}
 }
 
-void mvceditor::RunBrowserPluginClass::OnUrlToolMenuItem(wxCommandEvent& event) {
+void mvceditor::RunBrowserFeatureClass::OnUrlToolMenuItem(wxCommandEvent& event) {
 	
 	// detect the chosen url based on the menu item name
 	// change the current selection only if name is found
@@ -472,7 +472,7 @@ void mvceditor::RunBrowserPluginClass::OnUrlToolMenuItem(wxCommandEvent& event) 
 	}
 }
 
-void mvceditor::RunBrowserPluginClass::OnProjectIndexed(wxCommandEvent& event) {
+void mvceditor::RunBrowserFeatureClass::OnProjectIndexed(wxCommandEvent& event) {
 	App.Globals.UrlResourceFinder.Clear();
 	mvceditor::EnvironmentClass* environment = GetEnvironment();
 
@@ -500,11 +500,11 @@ void mvceditor::RunBrowserPluginClass::OnProjectIndexed(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::RunBrowserPluginClass::OnProcessInProgress(wxCommandEvent& event) {
+void mvceditor::RunBrowserFeatureClass::OnProcessInProgress(wxCommandEvent& event) {
 	GetStatusBarWithGauge()->UpdateGauge(ID_URL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
 }
 
-void mvceditor::RunBrowserPluginClass::OnProjectsUpdated(wxCommandEvent& event) {
+void mvceditor::RunBrowserFeatureClass::OnProjectsUpdated(wxCommandEvent& event) {
 	RecentUrls.clear();
 	App.Globals.UrlResourceFinder.Urls.clear();
 	App.Globals.UrlResourceFinder.ChosenUrl.Reset();
@@ -520,26 +520,26 @@ void mvceditor::RunBrowserPluginClass::OnProjectsUpdated(wxCommandEvent& event) 
 	}
 }
 
-BEGIN_EVENT_TABLE(mvceditor::RunBrowserPluginClass, wxEvtHandler) 
+BEGIN_EVENT_TABLE(mvceditor::RunBrowserFeatureClass, wxEvtHandler) 
 	
-	// if the end values of the ranges need to be modified, need to modify mvceditor::PluginClass::MenuIds as well
-	EVT_MENU_RANGE(mvceditor::MENU_RUN_BROWSER + 0, mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS - 1, mvceditor::RunBrowserPluginClass::OnBrowserToolMenuItem)
-	EVT_MENU_RANGE(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS, mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS - 1, mvceditor::RunBrowserPluginClass::OnUrlToolMenuItem)
-	EVT_TOOL(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 1, mvceditor::RunBrowserPluginClass::OnRunInWebBrowser)
-	EVT_AUITOOLBAR_TOOL_DROPDOWN(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, mvceditor::RunBrowserPluginClass::OnBrowserToolDropDown)
-	EVT_AUITOOLBAR_TOOL_DROPDOWN(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, mvceditor::RunBrowserPluginClass::OnUrlToolDropDown)
-	EVT_TOOL(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 4, mvceditor::RunBrowserPluginClass::OnUrlSearchTool)
+	// if the end values of the ranges need to be modified, need to modify mvceditor::FeatureClass::MenuIds as well
+	EVT_MENU_RANGE(mvceditor::MENU_RUN_BROWSER + 0, mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS - 1, mvceditor::RunBrowserFeatureClass::OnBrowserToolMenuItem)
+	EVT_MENU_RANGE(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS, mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS - 1, mvceditor::RunBrowserFeatureClass::OnUrlToolMenuItem)
+	EVT_TOOL(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 1, mvceditor::RunBrowserFeatureClass::OnRunInWebBrowser)
+	EVT_AUITOOLBAR_TOOL_DROPDOWN(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, mvceditor::RunBrowserFeatureClass::OnBrowserToolDropDown)
+	EVT_AUITOOLBAR_TOOL_DROPDOWN(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, mvceditor::RunBrowserFeatureClass::OnUrlToolDropDown)
+	EVT_TOOL(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 4, mvceditor::RunBrowserFeatureClass::OnUrlSearchTool)
 
 	// the URL detection handlers
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_URL_FAILED, mvceditor::RunBrowserPluginClass::OnUrlDetectionFailed)
-	EVT_FRAMEWORK_URL_COMPLETE(mvceditor::RunBrowserPluginClass::OnUrlDetectionComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::RunBrowserPluginClass::OnProcessInProgress)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_URL_FAILED, mvceditor::RunBrowserFeatureClass::OnUrlDetectionFailed)
+	EVT_FRAMEWORK_URL_COMPLETE(mvceditor::RunBrowserFeatureClass::OnUrlDetectionComplete)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::RunBrowserFeatureClass::OnProcessInProgress)
 
 	// application events
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::RunBrowserPluginClass::OnPreferencesSaved)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_INDEXED, mvceditor::RunBrowserPluginClass::OnProjectIndexed)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::RunBrowserPluginClass::OnProjectsUpdated)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::RunBrowserFeatureClass::OnPreferencesSaved)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_INDEXED, mvceditor::RunBrowserFeatureClass::OnProjectIndexed)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::RunBrowserFeatureClass::OnProjectsUpdated)
 	
-	// command handlers to enable communication with other plugins
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_PROJECT_URLS, mvceditor::RunBrowserPluginClass::OnCmdUrls)
+	// command handlers to enable communication with other features
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_PROJECT_URLS, mvceditor::RunBrowserFeatureClass::OnCmdUrls)
 END_EVENT_TABLE()

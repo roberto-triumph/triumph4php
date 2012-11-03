@@ -262,8 +262,8 @@ void mvceditor::LintResultsPanelClass::SelectPreviousError() {
 	}
 }
 
-mvceditor::LintPluginClass::LintPluginClass(mvceditor::AppClass& app) 
-	: PluginClass(app)
+mvceditor::LintFeatureClass::LintFeatureClass(mvceditor::AppClass& app) 
+	: FeatureClass(app)
 	, CheckOnSave(true)
 	, RunningThreadId(0)
 	, LintErrors() {
@@ -273,18 +273,18 @@ mvceditor::LintPluginClass::LintPluginClass(mvceditor::AppClass& app)
 	App.RunningThreads.AddEventHandler(this);
 }
 
-void mvceditor::LintPluginClass::AddViewMenuItems(wxMenu* viewMenu) {
+void mvceditor::LintFeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
 	viewMenu->Append(mvceditor::MENU_LINT_PHP + 0, _("Lint Check"), _("Performs syntax check on the current project"), wxITEM_NORMAL);
 	viewMenu->Append(mvceditor::MENU_LINT_PHP + 1, _("Show Next Lint Error\tF4"), _("Selects the next lint error in the code window"), wxITEM_NORMAL);
 	viewMenu->Append(mvceditor::MENU_LINT_PHP + 2, _("Show Previous Lint Error\tSHIFT+F4"), _("Selects the previous lint error in the code window"), wxITEM_NORMAL);
 }
 
-void mvceditor::LintPluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
+void mvceditor::LintFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 	wxBitmap bitmap = wxArtProvider::GetBitmap(wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16));
 	toolBar->AddTool(mvceditor::MENU_LINT_PHP + 0, _("Lint Check"), bitmap, _("Performs syntax check on the current project"));
 }
 
-void mvceditor::LintPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+void mvceditor::LintFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
 	menuItemIds[mvceditor::MENU_LINT_PHP + 0] = wxT("Lint Check - Lint Check Project");
 	menuItemIds[mvceditor::MENU_LINT_PHP + 1] = wxT("Lint Check - Show Next Lint Error");
@@ -292,21 +292,21 @@ void mvceditor::LintPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClas
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
-void mvceditor::LintPluginClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
+void mvceditor::LintFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 	parent->AddPage(
 		new mvceditor::LintPluginPreferencesPanelClass(parent, *this),
 		_("PHP Lint Check"));
 }
 
-void mvceditor::LintPluginClass::LoadPreferences(wxConfigBase* config) {
+void mvceditor::LintFeatureClass::LoadPreferences(wxConfigBase* config) {
 	config->Read(wxT("/LintCheck/CheckOnSave"), &CheckOnSave);
 }
-void mvceditor::LintPluginClass::OnPreferencesSaved(wxCommandEvent& event) {
+void mvceditor::LintFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfig::Get();
 	config->Write(wxT("/LintCheck/CheckOnSave"), CheckOnSave);
 }
 
-void mvceditor::LintPluginClass::OnLintMenu(wxCommandEvent& event) {
+void mvceditor::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
 	if (RunningThreadId > 0) {
 		wxMessageBox(_("There is already another lint check that is active. Please wait for it to finish."), _("Lint Check"));
 		return;
@@ -347,41 +347,41 @@ void mvceditor::LintPluginClass::OnLintMenu(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::LintPluginClass::OnNextLintError(wxCommandEvent& event) {
+void mvceditor::LintFeatureClass::OnNextLintError(wxCommandEvent& event) {
 	if (ResultsPanel) {
 		ResultsPanel->SelectNextError();
 	}
 }
 
-void mvceditor::LintPluginClass::OnPreviousLintError(wxCommandEvent& event) {
+void mvceditor::LintFeatureClass::OnPreviousLintError(wxCommandEvent& event) {
 	if (ResultsPanel) {
 		ResultsPanel->SelectPreviousError();
 	}
 }
 
-void mvceditor::LintPluginClass::OnLintError(mvceditor::LintResultsEventClass& event) {
+void mvceditor::LintFeatureClass::OnLintError(mvceditor::LintResultsEventClass& event) {
 	pelet::LintResultsClass results = event.LintResults;
 	if (ResultsPanel) {
 		ResultsPanel->AddError(results);
 	}
 }
 
-void mvceditor::LintPluginClass::OnLintFileComplete(wxCommandEvent& event) {
+void mvceditor::LintFeatureClass::OnLintFileComplete(wxCommandEvent& event) {
 
 }
 
-void mvceditor::LintPluginClass::OnLintComplete(wxCommandEvent& event) {
+void mvceditor::LintFeatureClass::OnLintComplete(wxCommandEvent& event) {
 	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 	gauge->StopGauge(ID_LINT_RESULTS_GAUGE);
 	RunningThreadId = 0;
 }
 
-void mvceditor::LintPluginClass::OnTimer(wxCommandEvent& event) {
+void mvceditor::LintFeatureClass::OnTimer(wxCommandEvent& event) {
 	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 	gauge->IncrementGauge(ID_LINT_RESULTS_GAUGE, StatusBarWithGaugeClass::INDETERMINATE_MODE);	
 }
 
-void mvceditor::LintPluginClass::OnFileSaved(mvceditor::FileSavedEventClass& event) {
+void mvceditor::LintFeatureClass::OnFileSaved(mvceditor::FileSavedEventClass& event) {
 	mvceditor::CodeControlClass* codeControl = event.GetCodeControl();
 	wxString fileName = codeControl->GetFileName();
 	codeControl->ClearLintErrors();
@@ -425,7 +425,7 @@ void mvceditor::LintPluginClass::OnFileSaved(mvceditor::FileSavedEventClass& eve
 	}
 }
 
-void mvceditor::LintPluginClass::OnNotebookPageClosed(wxAuiNotebookEvent& event) {
+void mvceditor::LintFeatureClass::OnNotebookPageClosed(wxAuiNotebookEvent& event) {
 	wxAuiNotebook* notebook = GetToolsNotebook();
 	int selection = event.GetSelection();
 	if (notebook->GetPage(selection) == ResultsPanel) {
@@ -441,30 +441,30 @@ void mvceditor::LintPluginClass::OnNotebookPageClosed(wxAuiNotebookEvent& event)
 	}
 }
 
-void mvceditor::LintPluginClass::OnLintSummary(mvceditor::LintResultsSummaryEventClass& event) {
+void mvceditor::LintFeatureClass::OnLintSummary(mvceditor::LintResultsSummaryEventClass& event) {
 	if (ResultsPanel) {
 		ResultsPanel->PrintSummary(event.TotalFiles, event.ErrorFiles);
 	}
 }
 
 mvceditor::LintPluginPreferencesPanelClass::LintPluginPreferencesPanelClass(wxWindow* parent,
-																			mvceditor::LintPluginClass& plugin)
+																			mvceditor::LintFeatureClass& feature)
 	: LintPluginPreferencesGeneratedPanelClass(parent, wxID_ANY)
-	, Plugin(plugin) {
-	wxGenericValidator checkValidator(&Plugin.CheckOnSave);
+	, Feature(feature) {
+	wxGenericValidator checkValidator(&Feature.CheckOnSave);
 	CheckOnSave->SetValidator(checkValidator);
 }
 
-BEGIN_EVENT_TABLE(mvceditor::LintPluginClass, wxEvtHandler) 
-	EVT_MENU(mvceditor::MENU_LINT_PHP + 0, mvceditor::LintPluginClass::OnLintMenu)
-	EVT_MENU(mvceditor::MENU_LINT_PHP + 1, mvceditor::LintPluginClass::OnNextLintError)
-	EVT_MENU(mvceditor::MENU_LINT_PHP + 2, mvceditor::LintPluginClass::OnPreviousLintError)
-	EVT_COMMAND(ID_LINT_READER, EVENT_FILE_READ,  mvceditor::LintPluginClass::OnLintFileComplete)
-	EVT_COMMAND(ID_LINT_READER, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::LintPluginClass::OnTimer)
-	EVT_COMMAND(ID_LINT_READER, mvceditor::EVENT_WORK_COMPLETE, mvceditor::LintPluginClass::OnLintComplete)
-	EVT_PLUGIN_FILE_SAVED(mvceditor::LintPluginClass::OnFileSaved)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::LintPluginClass::OnPreferencesSaved)
-	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::LintPluginClass::OnNotebookPageClosed)
-	EVT_LINT_ERROR(ID_LINT_READER, mvceditor::LintPluginClass::OnLintError)
-	EVT_LINT_SUMMARY(ID_LINT_READER, mvceditor::LintPluginClass::OnLintSummary)
+BEGIN_EVENT_TABLE(mvceditor::LintFeatureClass, wxEvtHandler) 
+	EVT_MENU(mvceditor::MENU_LINT_PHP + 0, mvceditor::LintFeatureClass::OnLintMenu)
+	EVT_MENU(mvceditor::MENU_LINT_PHP + 1, mvceditor::LintFeatureClass::OnNextLintError)
+	EVT_MENU(mvceditor::MENU_LINT_PHP + 2, mvceditor::LintFeatureClass::OnPreviousLintError)
+	EVT_COMMAND(ID_LINT_READER, EVENT_FILE_READ,  mvceditor::LintFeatureClass::OnLintFileComplete)
+	EVT_COMMAND(ID_LINT_READER, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::LintFeatureClass::OnTimer)
+	EVT_COMMAND(ID_LINT_READER, mvceditor::EVENT_WORK_COMPLETE, mvceditor::LintFeatureClass::OnLintComplete)
+	EVT_PLUGIN_FILE_SAVED(mvceditor::LintFeatureClass::OnFileSaved)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::LintFeatureClass::OnPreferencesSaved)
+	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::LintFeatureClass::OnNotebookPageClosed)
+	EVT_LINT_ERROR(ID_LINT_READER, mvceditor::LintFeatureClass::OnLintError)
+	EVT_LINT_SUMMARY(ID_LINT_READER, mvceditor::LintFeatureClass::OnLintSummary)
 END_EVENT_TABLE()

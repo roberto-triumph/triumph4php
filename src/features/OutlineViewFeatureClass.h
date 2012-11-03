@@ -170,21 +170,21 @@ private:
 };
 
 /**
- * This is a plugin that is designed to let the user see the classes / methods of 
+ * This is a feature that is designed to let the user see the classes / methods of 
  * the opened files and of related files.  The related files / classes / methods that are mentioned
  * in the opened files.
  * 
  */
-class OutlineViewPluginClass : public PluginClass {
+class OutlineViewFeatureClass : public FeatureClass {
 public:
 	
 	/**
 	 * Creates a new OutlineViewPlugin.
 	 */
-	OutlineViewPluginClass(mvceditor::AppClass& app);
+	OutlineViewFeatureClass(mvceditor::AppClass& app);
 
 	/**
-	 * This plugin will have a view menu entry
+	 * This feature will have a view menu entry
 	 */
 	void AddViewMenuItems(wxMenu* viewMenu);
 
@@ -247,12 +247,12 @@ class OutlineViewPluginPanelClass : public OutlineViewPluginGeneratedPanelClass 
 	 * 
 	 * @param wxWindow* parent the parent window
 	 * @param int windowId the window ID
-	 * @param OutlineViewPluginClass* plugin the object that will execute the business logic. This panel will NOT
-	 *        own the pointer.  The caller must DELETE the plugin when appropriate. This parameter MUST NOT BE NULL!
+	 * @param OutlineViewFeatureClass* feature the object that will execute the business logic. This panel will NOT
+	 *        own the pointer.  The caller must DELETE the feature when appropriate. This parameter MUST NOT BE NULL!
 	 * @param NotebookClass* notebook we need to listen to the notebook page change events so that the outline is updated to show
 	 *        an outline of the newly opened page
 	 */
-	OutlineViewPluginPanelClass(wxWindow* parent, int windowId, OutlineViewPluginClass* plugin, NotebookClass* notebook);
+	OutlineViewPluginPanelClass(wxWindow* parent, int windowId, OutlineViewFeatureClass* feature, NotebookClass* notebook);
 	
 	/**
 	 * update the status label
@@ -265,7 +265,7 @@ class OutlineViewPluginPanelClass : public OutlineViewPluginGeneratedPanelClass 
 	void SetClasses(const std::vector<wxString>& classes);
 
 	/**
-	 * refresh the code control from the plugin source strings
+	 * refresh the code control from the feature source strings
 	 */
 	 void RefreshOutlines(const std::vector<ResourceClass>& resources);
 	
@@ -290,10 +290,10 @@ protected:
 private:
 
 	/**
-	 * The plugin class that will execute all logic. 
-	 * @var OutlineViewPluginClass*
+	 * The feature class that will execute all logic. 
+	 * @var OutlineViewFeatureClass*
 	 */
-	OutlineViewPluginClass* Plugin;
+	OutlineViewFeatureClass* Feature;
 	
 	/**
 	 * The notebook to listen (for page changing) events  to

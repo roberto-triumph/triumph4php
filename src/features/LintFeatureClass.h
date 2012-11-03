@@ -279,9 +279,9 @@ private:
 
 /**
  * This is the class that will manage all of the UI buttons and menus
- * for the plugin
+ * for the feature
  */
-class LintPluginClass : public PluginClass {
+class LintFeatureClass : public FeatureClass {
 	
 public:
 	
@@ -291,7 +291,7 @@ public:
 	 */
 	bool CheckOnSave;
 
-	LintPluginClass(mvceditor::AppClass& app);
+	LintFeatureClass(mvceditor::AppClass& app);
 
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
 
@@ -353,9 +353,9 @@ class LintPluginPreferencesPanelClass : public LintPluginPreferencesGeneratedPan
 
 public:
 
-	LintPluginClass& Plugin;
+	LintFeatureClass& Feature;
 
-	LintPluginPreferencesPanelClass(wxWindow* parent, LintPluginClass& plugin);
+	LintPluginPreferencesPanelClass(wxWindow* parent, LintFeatureClass& feature);
 };
 
 }

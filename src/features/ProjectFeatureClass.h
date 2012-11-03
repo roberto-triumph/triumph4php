@@ -34,7 +34,7 @@ namespace mvceditor {
 // defined below
 class ProjectPluginPanelClass;
 
-class ProjectPluginClass : public PluginClass {
+class ProjectFeatureClass : public FeatureClass {
 
 public:
 
@@ -45,11 +45,11 @@ public:
 	wxString ExplorerExecutable;
 
 	/**
-	 * Create a new instance of ProjectPluginClass.
+	 * Create a new instance of ProjectFeatureClass.
 	 */
-	ProjectPluginClass(mvceditor::AppClass& app);
+	ProjectFeatureClass(mvceditor::AppClass& app);
 	
-	~ProjectPluginClass();
+	~ProjectFeatureClass();
 
 	/**
 	 * Add menu items to the file menu
@@ -153,7 +153,7 @@ public:
 	/**
 	 * Construct a new instance
 	 */
-	ProjectPluginPanelClass(wxWindow* parent, ProjectPluginClass& projectPlugin);
+	ProjectPluginPanelClass(wxWindow* parent, ProjectFeatureClass& projectPlugin);
 
 protected:
 

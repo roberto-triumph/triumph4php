@@ -140,24 +140,24 @@ void mvceditor::GlobalClassesThreadClass::BackgroundWork() {
 	}	
 }
 
-mvceditor::OutlineViewPluginClass::OutlineViewPluginClass(mvceditor::AppClass& app)
-	: PluginClass(app) {
+mvceditor::OutlineViewFeatureClass::OutlineViewFeatureClass(mvceditor::AppClass& app)
+	: FeatureClass(app) {
 
 	// will get disconnected when the program exits
 	App.RunningThreads.AddEventHandler(this);
 }
 
-void mvceditor::OutlineViewPluginClass::AddViewMenuItems(wxMenu* viewMenu) {
+void mvceditor::OutlineViewFeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
 	viewMenu->Append(mvceditor::MENU_OUTLINE, _("Outline Current File\tSHIFT+F2"),  _("Opens an outline view of the currently viewed file"), wxITEM_NORMAL);
 }
 
-void mvceditor::OutlineViewPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+void mvceditor::OutlineViewFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
 	menuItemIds[mvceditor::MENU_OUTLINE + 0] = wxT("Outline-Outline Current File");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
-void mvceditor::OutlineViewPluginClass::BuildOutlineCurrentCodeControl() {
+void mvceditor::OutlineViewFeatureClass::BuildOutlineCurrentCodeControl() {
 	CodeControlClass* code = GetCurrentCodeControl();
 	if (code != NULL) {
 
@@ -179,7 +179,7 @@ void mvceditor::OutlineViewPluginClass::BuildOutlineCurrentCodeControl() {
 	}
 }
 
-std::vector<mvceditor::ResourceClass> mvceditor::OutlineViewPluginClass::BuildOutline(const wxString& className) {	
+std::vector<mvceditor::ResourceClass> mvceditor::OutlineViewFeatureClass::BuildOutline(const wxString& className) {	
 	mvceditor::ResourceCacheClass* resourceCache =  GetResourceCache();
 	std::vector<mvceditor::ResourceClass> allMatches;
 	std::vector<mvceditor::ResourceClass> matches; 
@@ -197,7 +197,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::OutlineViewPluginClass::BuildOu
 	return allMatches;
 }
 
-void mvceditor::OutlineViewPluginClass::JumpToResource(const wxString& resource) {
+void mvceditor::OutlineViewFeatureClass::JumpToResource(const wxString& resource) {
 	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
 	std::vector<mvceditor::ResourceClass> matches = resourceCache->CollectFullyQualifiedResourceFromAll(mvceditor::WxToIcu(resource));
 	if (!matches.empty()) {
@@ -216,7 +216,7 @@ void mvceditor::OutlineViewPluginClass::JumpToResource(const wxString& resource)
 	}	
 }
 
-void mvceditor::OutlineViewPluginClass::OnOutlineMenu(wxCommandEvent& event) {
+void mvceditor::OutlineViewFeatureClass::OnOutlineMenu(wxCommandEvent& event) {
 	BuildOutlineCurrentCodeControl();
 		
 	// create / open the outline window
@@ -244,7 +244,7 @@ void mvceditor::OutlineViewPluginClass::OnOutlineMenu(wxCommandEvent& event) {
 	}	
 }
 
-void mvceditor::OutlineViewPluginClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& event) {
+void mvceditor::OutlineViewFeatureClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& event) {
 	wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 
 	// only change the outline if the user is looking at the outline.  otherwise, it gets 
@@ -258,7 +258,7 @@ void mvceditor::OutlineViewPluginClass::OnContentNotebookPageChanged(wxAuiNotebo
 	event.Skip();
 }
 
-void mvceditor::OutlineViewPluginClass::OnResourceFinderComplete(mvceditor::ResourceFinderCompleteEventClass& event) {
+void mvceditor::OutlineViewFeatureClass::OnResourceFinderComplete(mvceditor::ResourceFinderCompleteEventClass& event) {
 	wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 	if (window != NULL) {
 		OutlineViewPluginPanelClass* outlineViewPanel = (OutlineViewPluginPanelClass*)window;
@@ -267,7 +267,7 @@ void mvceditor::OutlineViewPluginClass::OnResourceFinderComplete(mvceditor::Reso
 	}
 }
 
-void mvceditor::OutlineViewPluginClass::OnGlobalClassesComplete(mvceditor::GlobalClassesCompleteEventClass& event)  {
+void mvceditor::OutlineViewFeatureClass::OnGlobalClassesComplete(mvceditor::GlobalClassesCompleteEventClass& event)  {
 	wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 	if (window != NULL) {
 		OutlineViewPluginPanelClass* outlineViewPanel = (OutlineViewPluginPanelClass*)window;
@@ -276,10 +276,10 @@ void mvceditor::OutlineViewPluginClass::OnGlobalClassesComplete(mvceditor::Globa
 	}
 }
 
-mvceditor::OutlineViewPluginPanelClass::OutlineViewPluginPanelClass(wxWindow* parent, int windowId, OutlineViewPluginClass* plugin, 
+mvceditor::OutlineViewPluginPanelClass::OutlineViewPluginPanelClass(wxWindow* parent, int windowId, OutlineViewFeatureClass* feature, 
 		NotebookClass* notebook)
 	: OutlineViewPluginGeneratedPanelClass(parent, windowId)
-	, Plugin(plugin)
+	, Feature(feature)
 	, Notebook(notebook) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
@@ -396,13 +396,13 @@ void mvceditor::OutlineViewPluginPanelClass::OnHelpButton(wxCommandEvent& event)
 void mvceditor::OutlineViewPluginPanelClass::OnChoice(wxCommandEvent& event) {
 	wxString lookup = event.GetString();
 	if (!lookup.IsEmpty()) {
-		std::vector<mvceditor::ResourceClass> resources = Plugin->BuildOutline(lookup);
+		std::vector<mvceditor::ResourceClass> resources = Feature->BuildOutline(lookup);
 		RefreshOutlines(resources);
 	}
 }
 
 void mvceditor::OutlineViewPluginPanelClass::OnSyncButton(wxCommandEvent& event) {
-	Plugin->BuildOutlineCurrentCodeControl();
+	Feature->BuildOutlineCurrentCodeControl();
 }
 
 void mvceditor::OutlineViewPluginPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
@@ -455,16 +455,16 @@ void mvceditor::OutlineViewPluginPanelClass::OnTreeItemActivated(wxTreeEvent& ev
 		}
 	}
 	if (!resource.IsEmpty()) {
-		Plugin->JumpToResource(resource);
+		Feature->JumpToResource(resource);
 	}
 	else {
 		event.Skip();
 	}
 }
 
-BEGIN_EVENT_TABLE(mvceditor::OutlineViewPluginClass, wxEvtHandler)
-	EVT_MENU(mvceditor::MENU_OUTLINE, mvceditor::OutlineViewPluginClass::OnOutlineMenu)
-	EVT_AUINOTEBOOK_PAGE_CHANGED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::OutlineViewPluginClass::OnContentNotebookPageChanged)
-	EVT_RESOURCE_FINDER_COMPLETE(ID_RESOURCE_FINDER_BACKGROUND, mvceditor::OutlineViewPluginClass::OnResourceFinderComplete)
-	EVT_GLOBAL_CLASSES_COMPLETE(ID_GLOBAL_CLASSES_THREAD, mvceditor::OutlineViewPluginClass::OnGlobalClassesComplete)
+BEGIN_EVENT_TABLE(mvceditor::OutlineViewFeatureClass, wxEvtHandler)
+	EVT_MENU(mvceditor::MENU_OUTLINE, mvceditor::OutlineViewFeatureClass::OnOutlineMenu)
+	EVT_AUINOTEBOOK_PAGE_CHANGED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::OutlineViewFeatureClass::OnContentNotebookPageChanged)
+	EVT_RESOURCE_FINDER_COMPLETE(ID_RESOURCE_FINDER_BACKGROUND, mvceditor::OutlineViewFeatureClass::OnResourceFinderComplete)
+	EVT_GLOBAL_CLASSES_COMPLETE(ID_GLOBAL_CLASSES_THREAD, mvceditor::OutlineViewFeatureClass::OnGlobalClassesComplete)
 END_EVENT_TABLE()

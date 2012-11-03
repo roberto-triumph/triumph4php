@@ -30,32 +30,32 @@
 namespace mvceditor {
 
 /**
- * This is a plugin that is designed to test the plugin mechanism. 
+ * This is a feature that is designed to test the feature mechanism. 
  * This is also useful for prototyping of a feature or debugging (instead of
  * repeating steps just put the code in the Go() method )
  */
-class TestPluginClass : public PluginClass {
+class TestFeatureClass : public FeatureClass {
 public:
 
-	TestPluginClass(mvceditor::AppClass& app);
+	TestFeatureClass(mvceditor::AppClass& app);
 		
 	/**
-	 * This plugin will have no Edit menu items
+	 * This feature will have no Edit menu items
 	 */
 	void AddEditMenuItems(wxMenu* editMenu);
 
 	/**
-	 * This plugin will have one toolbar button, when clicked the Go() method will get called
+	 * This feature will have one toolbar button, when clicked the Go() method will get called
 	 */
 	void AddToolBarItems(wxAuiToolBar* toolBar);
 	
 	/**
-	 * This plugin will have no extra windows.
+	 * This feature will have no extra windows.
 	 */
 	void AddWindows();
 	
 	/**
-	 * This plugin will have no context menu items
+	 * This feature will have no context menu items
 	 */
 	void AddCodeControlClassContextMenuItems(wxMenu* menu);
 	

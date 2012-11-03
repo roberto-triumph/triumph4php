@@ -44,7 +44,7 @@ class AppClass;
 class ResourceCacheClass;
 
 /**
- * ATTN: Use this enum to build the Plugin menus
+ * ATTN: Use this enum to build the Feature menus
  * Since wxKeyBinder uses menu IDs to serialize the shortcuts, the menu IDs
  * cannot change (else KeyBinder will not bind the shortcut; or worse it may
  * crash.  For now we will use this enum to make sure the IDs are consistent
@@ -77,7 +77,7 @@ enum MenuIds {
 };
 
 /**
- * Plugin examples:
+ * Feature examples:
  * SVN
  * Text modifiers (up case, lowercase, code beautifiers)
  * Run script
@@ -92,45 +92,45 @@ enum MenuIds {
  * PECL installer
  * 
  * 
- * Window locations: Left (skinny window), Bottom (wide window), Main (Center). Plugins can create as many windows
+ * Window locations: Left (skinny window), Bottom (wide window), Main (Center). Features can create as many windows
  * as they see fit (maybe in any location??).
  * 
- * Actions: Plugin can define actions, menu items for those actions, 
- *          Also, context menu items for those actions, plugin will be given the selected text
+ * Actions: Feature can define actions, menu items for those actions, 
+ *          Also, context menu items for those actions, feature will be given the selected text
  * 
- * Toolbars: Plugins will be given the ability to define toolbar buttons or other controls, either left-justified or right-justified.
+ * Toolbars: Features will be given the ability to define toolbar buttons or other controls, either left-justified or right-justified.
  * 
  * 
- * Plugins will be given:
- * 1) Project Class contains the current project 
+ * Features will be given:
+ * 1) The GlobalsClass that holds all application-wide data structures. 
  * 2) StatusBarWithGaugeClass to show progress to the user
- * 3) The tools window notebook.  plugins can add their windowx
- * 4) The code notebook.  Plugins can query which is the currently opened file, any selected text, etc...
+ * 3) The tools window notebook.  features can add their windows
+ * 4) The code notebook.  Features can query which is the currently opened file, any selected text, etc...
  * 5) An instance of Environment class; contains the apache configuration that is installed in the system. Note that the 
  *    Apache class may not be initialized to point at a proper config file.
- * 6) Note that unless specified, all pointers that a plugin is given (Notebook, statubar, etc.. )will be taken care of by the 
- *    application and the plugin SHOULD NOT delete them.  However, any pointers created by the plugin will need to be deleted
- *    by the plugin itself.  Window pointers usually do not need to be deleted because of the wxWindgets framework.
+ * 6) Note that unless specified, all pointers that a feature is given (Notebook, status bar, etc.. )will be taken care of by the 
+ *    application and the feature SHOULD NOT delete them.  However, any pointers created by the feature will need to be deleted
+ *    by the feature itself.  wxWindow pointers usually do not need to be deleted because the wxWidgets framework manages them.
  *  
  * Lifecycle:
- *  + One instance of plugin per application.  plugins are created during program startup and deleted during application exit.
- *  + During startup, AddMenuItems method is called. The plugin can override this method to create menu items.
- *    Plugins inherit from wxEvtHandler, so event tables or Connect method may be used to listen for menu or any other window) events
+ *  + One instance of feature per application.  features are created during program startup and deleted during application exit.
+ *  + During startup, AddMenuItems method is called. The feature can override this method to create menu items.
+ *    Features inherit from wxEvtHandler, so event tables or Connect method may be used to listen for menu or any other window) events
  *
  * Events:
  * The application has an "Event Sink", any interesting events are posted to the event sink. These can be
  * editor events (like, for example, when a file has been opened, when settings have changed, etc).  Also,
  * ** some ** window events are put in the event sink; all menu events, toolbar events and some AUI events.
- * All plugins are automatically added as handles for the event sink; what this all means is that a plugin
+ * All features are automatically added as handles for the event sink; what this all means is that a feature
  * can implement menu items and toolbar buttons by adding event table entries as if it were the main
  * frame. 
- * The event sink is a two-way communication, plugins can send commands to the event sink or they can
- * handle commands from other plugins as well.
+ * The event sink is a two-way communication, features can send commands to the event sink or they can
+ * handle commands from other features as well.
  *
  * See EventSinkClass for more info.
  * 
  */
-class PluginClass : public wxEvtHandler {
+class FeatureClass : public wxEvtHandler {
 
 public:
 
@@ -142,15 +142,15 @@ public:
 
 	/**
 	 * Constructor
-	 * @param app the handler that may receive events from plugins.
+	 * @param app the handler that may receive events from features.
 	 * Note that at the start, any window pointers are not yet initialized
  	 */
-	PluginClass(AppClass& app);
+	FeatureClass(AppClass& app);
 	
 	/**
 	 * Destructor.  May be overidden by sub classes.
 	 */
-	virtual ~PluginClass();
+	virtual ~FeatureClass();
 
 	/**
 	 * Set the windows. All of these pointers will NOT be
@@ -158,7 +158,7 @@ public:
 	 * 
 	 * @param StatusBarWithGaugeClass& statusBarWithGauge the status bar.
 	 * @param NotebookClass& notebook the opened source code files
-	 * @param wxAuiNotebook& toolsNotebook the parent window for all plugin windows
+	 * @param wxAuiNotebook& toolsNotebook the parent window for all feature windows
 	 * @param wxAuiNotebook& outlineNotebook the parent window for all outline type windows (left side)
 	 * @param wxAuiManager auiManager the AUI manager used to update the frame
 	 * @param wxMenuBar* menuBar the application menu bar
@@ -167,7 +167,7 @@ public:
 		wxAuiNotebook* outlineNotebook, wxAuiManager* auiManager, wxMenuBar* menuBar);
 		
 	/**
-	 * Add menu items to the view menu for this plugin. Remeber to use the MenuIds enum when building
+	 * Add menu items to the view menu for this feature. Remeber to use the MenuIds enum when building
 	 * menu items.
 	 * 
 	 * @param wxMenu* menu the view menu to add items to.
@@ -175,7 +175,7 @@ public:
 	virtual void AddViewMenuItems(wxMenu* viewMenu);
 
 	/**
-	 * Add menu items to the search menu for this plugin. Remeber to use the MenuIds enum when building
+	 * Add menu items to the search menu for this feature. Remeber to use the MenuIds enum when building
 	 * menu items.
 	 * 
 	 * @param wxMenu* menu the view menu to add items to.
@@ -183,7 +183,7 @@ public:
 	virtual void AddSearchMenuItems(wxMenu* searchMenu);
 
 	/**
-	 * Add menu items to the file menu for this plugin. Remeber to use the MenuIds enum when building
+	 * Add menu items to the file menu for this feature. Remeber to use the MenuIds enum when building
 	 * menu items.
 	 * 
 	 * @param wxMenu* menu the tools menu to add items to.
@@ -191,7 +191,7 @@ public:
 	virtual void AddFileMenuItems(wxMenu* fileMenu);
 
 	/**
-	 * Add menu items to the edit menu for this plugin. Remeber to use the MenuIds enum when building
+	 * Add menu items to the edit menu for this feature. Remeber to use the MenuIds enum when building
 	 * menu items.
 	 * 
 	 * @param wxMenu* menu the tools menu to add items to.
@@ -199,7 +199,7 @@ public:
 	virtual void AddEditMenuItems(wxMenu* editMenu);
 	
 	/**
-	 * Plugin may create its own menu. The plugin should override this method if it desires to create an entirely new menu.
+	 * Feature may create its own menu. The feature should override this method if it desires to create an entirely new menu.
 	 * Remeber to use the MenuIds enum when building
 	 * menu items.
 	 * @param wxMenuBar* the menu bar to insert the new menu to
@@ -220,13 +220,13 @@ public:
 	/**
 	 * Add a tab to the preferences window. This method is invoked only when the user chooses Edit ... Preferences
 	 * 
-	 * @param wxBookCtrlBase* the parent that will contain all preference dialogs.  Once the plugin's window is added, the 
+	 * @param wxBookCtrlBase* the parent that will contain all preference dialogs.  Once the feature's window is added, the 
 	 * parent will take care of deletion. Note that to add a dialog you will need to call wxBookCtrlBase::AddPage
 	 */
 	virtual void AddPreferenceWindow(wxBookCtrlBase* parent);
 	
 	/**
-	 * This method will be called every time the user right-clicks on an active code control window. Plugins may define
+	 * This method will be called every time the user right-clicks on an active code control window. Features may define
 	 * special menu items  to be shown to the user when the user right-clicks on a code control. The active code control 
 	 * can then be accessed via the NotebookClass.
 	 * 
@@ -235,7 +235,7 @@ public:
 	virtual void AddCodeControlClassContextMenuItems(wxMenu* menu);
 	
 	/**
-	 * This method will be called during application startup; the plugin should load the preferences from persistent 
+	 * This method will be called during application startup; the feature should load the preferences from persistent 
 	 * storage (confg) here
 	 * 
 	 * @param wxConfigBase* the config where settings are stored.
@@ -296,7 +296,7 @@ protected:
 
 	/**
 	 * Check to see if the given window is the tools window that's currently active
-	 * This method is useful when a plugin creates multiple tools windows
+	 * This method is useful when a feature creates multiple tools windows
 	 *
 	 * @param wxString name the window name to check (wxWindow::GetName())
 	 * @return bool true if the selected (active) tools window's name is equal to the given name.
@@ -381,7 +381,7 @@ protected:
 	wxString GetSelectedText() const;
 	
 	/**
-	 * The status bar that the plugin can use to display a gauge to the user. Do NOT delete the pointer.
+	 * The status bar that the feature can use to display a gauge to the user. Do NOT delete the pointer.
 	 * 
 	 * @return StatusBarWithGaugeClass*
 	 */	
@@ -435,7 +435,7 @@ protected:
 	private:
 	
 	/**
-	 * The widget that plugin uses to display status to the user.
+	 * The widget that feature uses to display status to the user.
 	 * 
 	 * @var StatusBarWithGaugeClass*
 	 */
@@ -449,14 +449,14 @@ protected:
 	NotebookClass* Notebook;
 	
 	/**
-	 * Parent container that will hold all plugins' tools windows.
+	 * Parent container that will hold all features' tools windows.
 	 * 
 	 * @var wxAuiNotebook*
 	 */
 	wxAuiNotebook* ToolsNotebook;
 
 	/**
-	 * Parent container that will hold all plugins' outline windows.
+	 * Parent container that will hold all features' outline windows.
 	 * 
 	 * @var wxAuiNotebook*
 	 */

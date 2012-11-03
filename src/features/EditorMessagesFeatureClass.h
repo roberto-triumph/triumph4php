@@ -58,11 +58,11 @@ protected:
 /**
  * This class is the handler for the editor message menu items.  
  */
-class EditorMessagesPluginClass : public PluginClass, wxLog {
+class EditorMessagesFeatureClass : public FeatureClass, wxLog {
 
 public:
 
-	EditorMessagesPluginClass(mvceditor::AppClass& app);
+	EditorMessagesFeatureClass(mvceditor::AppClass& app);
 
 	void AddViewMenuItems(wxMenu* toolsMenu);
 
@@ -88,7 +88,7 @@ private:
 
 /**
  * This class will take care of receiving the log messages
- * and proxying them to the plugin. 
+ * and proxying them to the feature. 
  * It is done this way because wxWidgets will delete the Log target
  * (pointer given to wxLog::SetLogTarget()) so we need to
  * give it a pointer that is managed by wxWidgets
@@ -97,13 +97,13 @@ class EditorMessagesLoggerClass : public wxLog {
 
 public:
 
-	EditorMessagesLoggerClass(EditorMessagesPluginClass& plugin);
+	EditorMessagesLoggerClass(EditorMessagesFeatureClass& feature);
 
 	void DoLog(wxLogLevel level, const wxChar *msg, time_t timestamp);
 
 private:
 
-	EditorMessagesPluginClass& Plugin;
+	EditorMessagesFeatureClass& Feature;
 };
 
 }

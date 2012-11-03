@@ -35,12 +35,12 @@ namespace mvceditor {
  * This is a class that will MVC Editor will use to manage keyboard shortcuts.  
  * Default functionality of the Keybinder classes is not sufficient because
  * (1) MVC Editor menus are dynamic; they can be updated or removed when new 
- *     plugins
+ *     features
  * (2) MVC Editor menus can even change for different projects; we would like
  *     shortcuts to tolerant of menu items is not being attached to the menu bar.
  * (3) We want to de-couple the Menu from the shortcuts because default keybinder
  *     functionality uses Menu IDs; and Menu IDs in this app can change between
- *     app instances (depending on plugins and projects).
+ *     app instances (depending on features and projects).
  */
 class DynamicCmdClass {
 

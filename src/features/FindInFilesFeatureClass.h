@@ -209,7 +209,7 @@ private:
 	
 	/**
 	 * Matched files that will NOT be replaced / searched
-	 * The plugin will make the background thread skip the files that are currently opened; this way the result do not
+	 * The feature will make the background thread skip the files that are currently opened; this way the result do not
 	 * show stale (and possibly wrong) hits
 	 */
 	std::vector<wxString> SkipFiles;
@@ -372,7 +372,7 @@ private:
 	DECLARE_EVENT_TABLE()
 };
 
-class FindInFilesPluginClass : public PluginClass {
+class FindInFilesFeatureClass : public FeatureClass {
 
 public:
 	
@@ -415,10 +415,10 @@ public:
 	/**
 	 * Constructor
 	 */
-	FindInFilesPluginClass(mvceditor::AppClass& app);
+	FindInFilesFeatureClass(mvceditor::AppClass& app);
 	
 	/**
-	 * Add menu items to the search menu for this plugin.
+	 * Add menu items to the search menu for this feature.
 	 * 
 	 * @param wxMenu* menu the tools menu to add items to.
 	 */
@@ -460,7 +460,7 @@ class FindInFilesDialogClass: public FindInFilesDialogGeneratedClass {
 	
 public:
 
-	FindInFilesDialogClass(wxWindow* parent, FindInFilesPluginClass& plugin);
+	FindInFilesDialogClass(wxWindow* parent, FindInFilesFeatureClass& feature);
 	
 	~FindInFilesDialogClass();
 
@@ -474,7 +474,7 @@ protected:
 
 private:
 
-	FindInFilesPluginClass& Plugin;
+	FindInFilesFeatureClass& Feature;
 
 	int CurrentInsertionPointFind;
 

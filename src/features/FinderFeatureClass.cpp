@@ -517,11 +517,11 @@ void mvceditor::ReplacePanelClass::OnReplaceKillFocus(wxFocusEvent& event) {
 	event.Skip();
 }
 
-mvceditor::FinderPluginClass::FinderPluginClass(mvceditor::AppClass& app)
-	: PluginClass(app) {
+mvceditor::FinderFeatureClass::FinderFeatureClass(mvceditor::AppClass& app)
+	: FeatureClass(app) {
 }
 	
-void mvceditor::FinderPluginClass::AddEditMenuItems(wxMenu* editMenu) {
+void mvceditor::FinderFeatureClass::AddEditMenuItems(wxMenu* editMenu) {
 	editMenu->Append(mvceditor::MENU_FINDER + 0, _("Find\tCTRL+F"), _("Find"));
 	editMenu->Append(mvceditor::MENU_FINDER + 1, _("Find Next\tF3"), _("Advance to the next match"));
 	editMenu->Append(mvceditor::MENU_FINDER + 2, _("Find Previous\tSHIFT+F3"), _("Advance to the previous match"));
@@ -529,7 +529,7 @@ void mvceditor::FinderPluginClass::AddEditMenuItems(wxMenu* editMenu) {
 	editMenu->Append(mvceditor::MENU_FINDER + 4, _("Go To Line\tCTRL+G"), _("Go To Line"));
 }
 
-void mvceditor::FinderPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+void mvceditor::FinderFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
 	menuItemIds[mvceditor::MENU_FINDER + 0] = wxT("Find-Show Find Panel");
 	menuItemIds[mvceditor::MENU_FINDER + 1] = wxT("Find-Next");
@@ -539,7 +539,7 @@ void mvceditor::FinderPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdCl
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
-void mvceditor::FinderPluginClass::OnEditFind(wxCommandEvent& event) {
+void mvceditor::FinderFeatureClass::OnEditFind(wxCommandEvent& event) {
 	wxWindow* parent = GetMainWindow();
 	
 	// hide replace panel id it is shown, doesnt look good when find and the replace panel are shown
@@ -571,7 +571,7 @@ void mvceditor::FinderPluginClass::OnEditFind(wxCommandEvent& event) {
 	}
 }
 	
-void mvceditor::FinderPluginClass::OnEditFindNext(wxCommandEvent& event) {
+void mvceditor::FinderFeatureClass::OnEditFindNext(wxCommandEvent& event) {
 	mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
 	if (codeControl) {
 		OnEditFind(event);
@@ -584,7 +584,7 @@ void mvceditor::FinderPluginClass::OnEditFindNext(wxCommandEvent& event) {
 	}
 }
 	
-void mvceditor::FinderPluginClass::OnEditFindPrevious(wxCommandEvent& event) {
+void mvceditor::FinderFeatureClass::OnEditFindPrevious(wxCommandEvent& event) {
 	mvceditor::CodeControlClass* codeControl  = GetCurrentCodeControl();
 	if (codeControl) {
 		OnEditFind(event);
@@ -596,7 +596,7 @@ void mvceditor::FinderPluginClass::OnEditFindPrevious(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::FinderPluginClass::OnEditReplace(wxCommandEvent& event) {
+void mvceditor::FinderFeatureClass::OnEditReplace(wxCommandEvent& event) {
 	wxWindow* parent = GetMainWindow();
 	
 	// hide find panel id it is shown, doesnt look good when find and the replace panel are shown
@@ -628,7 +628,7 @@ void mvceditor::FinderPluginClass::OnEditReplace(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::FinderPluginClass::OnEditGoToLine(wxCommandEvent& event) {
+void mvceditor::FinderFeatureClass::OnEditGoToLine(wxCommandEvent& event) {
 	CodeControlClass* codeControl = GetCurrentCodeControl();
 	if (codeControl) {
 		int maxLines = codeControl->GetLineCount();
@@ -699,11 +699,11 @@ BEGIN_EVENT_TABLE(mvceditor::ReplacePanelClass, ReplacePanelGeneratedClass)
 	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_PHP_WHITESPACE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(mvceditor::FinderPluginClass, wxEvtHandler) 
-	EVT_MENU(mvceditor::MENU_FINDER + 0, mvceditor::FinderPluginClass::OnEditFind)
-	EVT_MENU(mvceditor::MENU_FINDER + 1, mvceditor::FinderPluginClass::OnEditFindNext)
-	EVT_MENU(mvceditor::MENU_FINDER + 2, mvceditor::FinderPluginClass::OnEditFindPrevious)
-	EVT_MENU(mvceditor::MENU_FINDER + 3, mvceditor::FinderPluginClass::OnEditReplace)
-	EVT_MENU(mvceditor::MENU_FINDER + 4, mvceditor::FinderPluginClass::OnEditGoToLine)
+BEGIN_EVENT_TABLE(mvceditor::FinderFeatureClass, wxEvtHandler) 
+	EVT_MENU(mvceditor::MENU_FINDER + 0, mvceditor::FinderFeatureClass::OnEditFind)
+	EVT_MENU(mvceditor::MENU_FINDER + 1, mvceditor::FinderFeatureClass::OnEditFindNext)
+	EVT_MENU(mvceditor::MENU_FINDER + 2, mvceditor::FinderFeatureClass::OnEditFindPrevious)
+	EVT_MENU(mvceditor::MENU_FINDER + 3, mvceditor::FinderFeatureClass::OnEditReplace)
+	EVT_MENU(mvceditor::MENU_FINDER + 4, mvceditor::FinderFeatureClass::OnEditGoToLine)
 END_EVENT_TABLE()
 

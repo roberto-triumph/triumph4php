@@ -28,13 +28,13 @@
 static int MAX_RECENT_FILES = 10;
 
 
-mvceditor::RecentFilesPluginClass::RecentFilesPluginClass(mvceditor::AppClass& app)
-	: PluginClass(app)
+mvceditor::RecentFilesFeatureClass::RecentFilesFeatureClass(mvceditor::AppClass& app)
+	: FeatureClass(app)
 	, FileHistory(MAX_RECENT_FILES, mvceditor::MENU_RECENT_FILES) {
 	RecentFilesMenu = NULL;
 }
 
-void mvceditor::RecentFilesPluginClass::AddFileMenuItems(wxMenu* fileMenu) {
+void mvceditor::RecentFilesFeatureClass::AddFileMenuItems(wxMenu* fileMenu) {
 
 	// ATTN: possible problem. according to wxWidgets docs
 	//     Append the submenu to the parent menu after you have added your menu items, or accelerators may
@@ -46,14 +46,14 @@ void mvceditor::RecentFilesPluginClass::AddFileMenuItems(wxMenu* fileMenu) {
 	fileMenu->Append(mvceditor::MENU_RECENT_FILES + MAX_RECENT_FILES + 1, _("Recent Files"),  RecentFilesMenu, _("Recent Files"));
 }
 
-void mvceditor::RecentFilesPluginClass::LoadPreferences(wxConfigBase* config) {
+void mvceditor::RecentFilesFeatureClass::LoadPreferences(wxConfigBase* config) {
 	while (RecentFilesMenu->GetMenuItemCount() > 0) {
 		RecentFilesMenu->Delete(RecentFilesMenu->FindItemByPosition(0));
 	}
 	FileHistory.Load(*config);
 }
 
-void mvceditor::RecentFilesPluginClass::SavePreferences() {
+void mvceditor::RecentFilesFeatureClass::SavePreferences() {
 	wxConfigBase* config = wxConfigBase::Get();
 	FileHistory.Save(*config);
 	config->Flush();
@@ -63,7 +63,7 @@ void mvceditor::RecentFilesPluginClass::SavePreferences() {
 	App.UpdateConfigModifiedTime();
 }
 
-void mvceditor::RecentFilesPluginClass::OnRecentFileMenu(wxCommandEvent &event) {
+void mvceditor::RecentFilesFeatureClass::OnRecentFileMenu(wxCommandEvent &event) {
 	size_t id = (size_t)event.GetId();
 	if (id >= (size_t)mvceditor::MENU_RECENT_FILES && id < (mvceditor::MENU_RECENT_FILES + FileHistory.GetCount())) {
 		size_t index = id - mvceditor::MENU_RECENT_FILES;
@@ -91,18 +91,18 @@ void mvceditor::RecentFilesPluginClass::OnRecentFileMenu(wxCommandEvent &event) 
 	}
 }
 
-void mvceditor::RecentFilesPluginClass::OnAppFileOpened(wxCommandEvent& event) {
+void mvceditor::RecentFilesFeatureClass::OnAppFileOpened(wxCommandEvent& event) {
 	wxString fileName = event.GetString();
 	FileHistory.AddFileToHistory(fileName);
 	SavePreferences();
 }
 
-BEGIN_EVENT_TABLE(mvceditor::RecentFilesPluginClass, wxEvtHandler)
+BEGIN_EVENT_TABLE(mvceditor::RecentFilesFeatureClass, wxEvtHandler)
 
 	/**
 	* Since there could be 1...N recent file items we cannot listen to one menu item's event
 	* we have to listen to all menu events
 	*/
-	EVT_MENU_RANGE(mvceditor::MENU_RECENT_FILES, mvceditor::MENU_RECENT_FILES + MAX_RECENT_FILES, mvceditor::RecentFilesPluginClass::OnRecentFileMenu)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_OPENED, mvceditor::RecentFilesPluginClass::OnAppFileOpened)
+	EVT_MENU_RANGE(mvceditor::MENU_RECENT_FILES, mvceditor::MENU_RECENT_FILES + MAX_RECENT_FILES, mvceditor::RecentFilesFeatureClass::OnRecentFileMenu)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_OPENED, mvceditor::RecentFilesFeatureClass::OnAppFileOpened)
 END_EVENT_TABLE()

@@ -332,13 +332,13 @@ protected:
 };
 
 /**
- * This plugin will handle the application stack configuration options.
+ * This feature will handle the application stack configuration options.
  */
-class EnvironmentPluginClass : public PluginClass {
+class EnvironmentFeatureClass : public FeatureClass {
 
 public:
 
-	EnvironmentPluginClass(mvceditor::AppClass& app);
+	EnvironmentFeatureClass(mvceditor::AppClass& app);
 
 	/**
 	 * Add the environment dialogs to the preferences notebook

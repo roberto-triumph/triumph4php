@@ -26,7 +26,7 @@
 #include <MvcEditor.h>
 #include <wx/artprov.h>
 
-mvceditor::PluginClass::PluginClass(mvceditor::AppClass& app)
+mvceditor::FeatureClass::FeatureClass(mvceditor::AppClass& app)
 	: App(app)
 	, AuiManager(NULL)	
 	, StatusBarWithGauge(NULL)
@@ -36,10 +36,10 @@ mvceditor::PluginClass::PluginClass(mvceditor::AppClass& app)
 	, MenuBar(NULL) {
 }
 
-mvceditor::PluginClass::~PluginClass() {
+mvceditor::FeatureClass::~FeatureClass() {
 }
 
-void mvceditor::PluginClass::InitWindow(StatusBarWithGaugeClass* statusBarWithGauge, NotebookClass* notebook, wxAuiNotebook* toolsNotebook, 
+void mvceditor::FeatureClass::InitWindow(StatusBarWithGaugeClass* statusBarWithGauge, NotebookClass* notebook, wxAuiNotebook* toolsNotebook, 
 	wxAuiNotebook* outlineNotebook, wxAuiManager* auiManager, wxMenuBar* menuBar) {
 	StatusBarWithGauge = statusBarWithGauge;
 	Notebook = notebook;
@@ -49,41 +49,41 @@ void mvceditor::PluginClass::InitWindow(StatusBarWithGaugeClass* statusBarWithGa
 	MenuBar = menuBar;
 }
 
-mvceditor::NotebookClass* mvceditor::PluginClass::GetNotebook() const {
+mvceditor::NotebookClass* mvceditor::FeatureClass::GetNotebook() const {
 	return Notebook;
 }
 
-mvceditor::EnvironmentClass* mvceditor::PluginClass::GetEnvironment() {
+mvceditor::EnvironmentClass* mvceditor::FeatureClass::GetEnvironment() {
 	return &App.Globals.Environment;
 }
 
-mvceditor::ResourceCacheClass* mvceditor::PluginClass::GetResourceCache() {
+mvceditor::ResourceCacheClass* mvceditor::FeatureClass::GetResourceCache() {
 	return &App.Globals.ResourceCache;
 }
 
-void mvceditor::PluginClass::AddViewMenuItems(wxMenu* viewMenu) {
+void mvceditor::FeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
 }
 
-void mvceditor::PluginClass::AddSearchMenuItems(wxMenu* searchMenu) {
+void mvceditor::FeatureClass::AddSearchMenuItems(wxMenu* searchMenu) {
 }
 
-void mvceditor::PluginClass::AddFileMenuItems(wxMenu* fileMenu) {
+void mvceditor::FeatureClass::AddFileMenuItems(wxMenu* fileMenu) {
 }
 
-void mvceditor::PluginClass::AddEditMenuItems(wxMenu* editMenu) {
+void mvceditor::FeatureClass::AddEditMenuItems(wxMenu* editMenu) {
 }
 
-void mvceditor::PluginClass::AddNewMenu(wxMenuBar* menuBar) {
+void mvceditor::FeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 }
 
-void mvceditor::PluginClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
+void mvceditor::FeatureClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
 }
 
-void mvceditor::PluginClass::AddKeyboardShortcuts(std::vector<mvceditor::DynamicCmdClass>& shortcuts) {
+void mvceditor::FeatureClass::AddKeyboardShortcuts(std::vector<mvceditor::DynamicCmdClass>& shortcuts) {
 
 }
 
-bool mvceditor::PluginClass::AddToolsWindow(wxWindow* window, wxString tabName, wxString windowName) {
+bool mvceditor::FeatureClass::AddToolsWindow(wxWindow* window, wxString tabName, wxString windowName) {
 	if (!windowName.IsEmpty()) {
 		window->SetName(windowName);
 	}
@@ -101,7 +101,7 @@ bool mvceditor::PluginClass::AddToolsWindow(wxWindow* window, wxString tabName, 
 	return false;
 }
 
-bool mvceditor::PluginClass::AddOutlineWindow(wxWindow* window, wxString name) {
+bool mvceditor::FeatureClass::AddOutlineWindow(wxWindow* window, wxString name) {
 	if (OutlineNotebook->AddPage(window, name)) {
 		int index = OutlineNotebook->GetPageIndex(window);
 		if (index != wxNOT_FOUND) {
@@ -116,15 +116,15 @@ bool mvceditor::PluginClass::AddOutlineWindow(wxWindow* window, wxString name) {
 	return false;
 }
 
-wxWindow* mvceditor::PluginClass::FindToolsWindow(int windowId) const {
+wxWindow* mvceditor::FeatureClass::FindToolsWindow(int windowId) const {
 	return wxWindow::FindWindowById(windowId, GetToolsNotebook());
 }
 
-wxWindow* mvceditor::PluginClass::FindOutlineWindow(int windowId) const {
+wxWindow* mvceditor::FeatureClass::FindOutlineWindow(int windowId) const {
 	return wxWindow::FindWindowById(windowId, GetOutlineNotebook());
 }
 
-bool mvceditor::PluginClass::IsToolsWindowSelected(int windowId) const {
+bool mvceditor::FeatureClass::IsToolsWindowSelected(int windowId) const {
 	wxWindow* window = wxWindow::FindWindowById(windowId, GetToolsNotebook());
 	wxAuiPaneInfo info = AuiManager->GetPane(ToolsNotebook);
 	if (!info.IsShown()) {
@@ -137,7 +137,7 @@ bool mvceditor::PluginClass::IsToolsWindowSelected(int windowId) const {
 	return windowIndex != wxNOT_FOUND && windowIndex == ToolsNotebook->GetSelection();
 }
 
-bool mvceditor::PluginClass::IsToolsWindowSelectedByName(const wxString& name) const {
+bool mvceditor::FeatureClass::IsToolsWindowSelectedByName(const wxString& name) const {
 	wxAuiPaneInfo info = AuiManager->GetPane(ToolsNotebook);
 	if (!info.IsShown()) {
 		
@@ -152,7 +152,7 @@ bool mvceditor::PluginClass::IsToolsWindowSelectedByName(const wxString& name) c
 	return false;
 }
 
-bool mvceditor::PluginClass::IsOutlineWindowSelected(int windowId) const {
+bool mvceditor::FeatureClass::IsOutlineWindowSelected(int windowId) const {
 	
 	wxWindow* window = wxWindow::FindWindowById(windowId, GetOutlineNotebook());
 	wxAuiPaneInfo info = AuiManager->GetPane(OutlineNotebook);
@@ -166,29 +166,29 @@ bool mvceditor::PluginClass::IsOutlineWindowSelected(int windowId) const {
 	return windowIndex != wxNOT_FOUND && windowIndex == OutlineNotebook->GetSelection();
 }
 
-bool mvceditor::PluginClass::AddContentWindow(wxWindow* window, const wxString& name) {
+bool mvceditor::FeatureClass::AddContentWindow(wxWindow* window, const wxString& name) {
 	return Notebook->AddPage(window, name, true, 
 		wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_TOOLBAR, 
 		wxSize(16, 16)));
 }
 
-mvceditor::CodeControlClass* mvceditor::PluginClass::GetCurrentCodeControl() const {
+mvceditor::CodeControlClass* mvceditor::FeatureClass::GetCurrentCodeControl() const {
 	return Notebook->GetCurrentCodeControl();
 }
 
-wxAuiNotebook* mvceditor::PluginClass::GetToolsNotebook() const {
+wxAuiNotebook* mvceditor::FeatureClass::GetToolsNotebook() const {
 	return ToolsNotebook;
 }
 
-wxAuiNotebook* mvceditor::PluginClass::GetOutlineNotebook() const {
+wxAuiNotebook* mvceditor::FeatureClass::GetOutlineNotebook() const {
 	return OutlineNotebook;
 }
 
-mvceditor::StatusBarWithGaugeClass* mvceditor::PluginClass::GetStatusBarWithGauge() const {
+mvceditor::StatusBarWithGaugeClass* mvceditor::FeatureClass::GetStatusBarWithGauge() const {
 	return StatusBarWithGauge;
 }
 
-void mvceditor::PluginClass::SetFocusToToolsWindow(wxWindow* window) {
+void mvceditor::FeatureClass::SetFocusToToolsWindow(wxWindow* window) {
 	int index = ToolsNotebook->GetPageIndex(window);
 	if (index != wxNOT_FOUND) {
 		ToolsNotebook->SetSelection(index);
@@ -199,7 +199,7 @@ void mvceditor::PluginClass::SetFocusToToolsWindow(wxWindow* window) {
 	}
 }
 
-void mvceditor::PluginClass::SetFocusToOutlineWindow(wxWindow* window) {
+void mvceditor::FeatureClass::SetFocusToOutlineWindow(wxWindow* window) {
 	int index = OutlineNotebook->GetPageIndex(window);
 	if (index != wxNOT_FOUND) {
 		OutlineNotebook->SetSelection(index);
@@ -210,7 +210,7 @@ void mvceditor::PluginClass::SetFocusToOutlineWindow(wxWindow* window) {
 	}
 }
 
-wxString mvceditor::PluginClass::GetSelectedText() const {
+wxString mvceditor::FeatureClass::GetSelectedText() const {
 	CodeControlClass* page = GetCurrentCodeControl();
 	wxString selectedText;
 	if (page) {
@@ -219,23 +219,23 @@ wxString mvceditor::PluginClass::GetSelectedText() const {
 	return selectedText;
 }
 
-void mvceditor::PluginClass::AddWindows() {
+void mvceditor::FeatureClass::AddWindows() {
 }
 
-void mvceditor::PluginClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
+void mvceditor::FeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 }
 
-void mvceditor::PluginClass::LoadPreferences(wxConfigBase* config) {
+void mvceditor::FeatureClass::LoadPreferences(wxConfigBase* config) {
 }
 
-void mvceditor::PluginClass::AddToolBarItems(wxAuiToolBar* toolBar) {
+void mvceditor::FeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 }
 
-wxWindow* mvceditor::PluginClass::GetMainWindow() const {
+wxWindow* mvceditor::FeatureClass::GetMainWindow() const {
 	return ToolsNotebook->GetParent();
 }
 
-mvceditor::CodeControlClass* mvceditor::PluginClass::CreateCodeControl(const wxString& tabName, mvceditor::CodeControlClass::Mode mode) const {
+mvceditor::CodeControlClass* mvceditor::FeatureClass::CreateCodeControl(const wxString& tabName, mvceditor::CodeControlClass::Mode mode) const {
 	mvceditor::NotebookClass* notebook = GetNotebook();
 	notebook->AddMvcEditorPage(mode);
 	if (!tabName.IsEmpty()) {
@@ -245,7 +245,7 @@ mvceditor::CodeControlClass* mvceditor::PluginClass::CreateCodeControl(const wxS
 	return ctrl;
 }
 
-void mvceditor::PluginClass::AddDynamicCmd(std::map<int, wxString> menuItemIds, std::vector<mvceditor::DynamicCmdClass>& shortcuts) {
+void mvceditor::FeatureClass::AddDynamicCmd(std::map<int, wxString> menuItemIds, std::vector<mvceditor::DynamicCmdClass>& shortcuts) {
 	for (std::map<int, wxString>::iterator it = menuItemIds.begin(); it != menuItemIds.end(); ++it) {
 		wxMenuItem* item = MenuBar->FindItem(it->first);
 		wxASSERT_MSG(item, wxT("Menu item not found:") + it->second);

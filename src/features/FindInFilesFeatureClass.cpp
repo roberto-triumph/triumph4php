@@ -607,21 +607,21 @@ void mvceditor::FindInFilesResultsPanelClass::OnTimer(wxCommandEvent& event) {
 	Gauge->IncrementGauge(FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE);	
 }
 
-mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvceditor::FindInFilesPluginClass& plugin)
+mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvceditor::FindInFilesFeatureClass& feature)
 	: FindInFilesDialogGeneratedClass(parent, wxID_ANY)
-	, Plugin(plugin)
+	, Feature(feature)
 	, CurrentInsertionPointFind(0)
 	, CurrentInsertionPointReplace(0) {
-	Plugin.FindHistory.Attach(FindText);
-	Plugin.ReplaceHistory.Attach(ReplaceWithText);
-	Plugin.DirectoriesHistory.Attach(Directory);
-	Plugin.FilesHistory.Attach(FilesFilter);
+	Feature.FindHistory.Attach(FindText);
+	Feature.ReplaceHistory.Attach(ReplaceWithText);
+	Feature.DirectoriesHistory.Attach(Directory);
+	Feature.FilesHistory.Attach(FilesFilter);
 	
 	// the first time showing this dialog populate the filter to have only PHP file extensions
 	if (FilesFilter->GetCount() <= 0) {
-		Plugin.PreviousFindInFiles.Source.SetIncludeWildcards(plugin.App.Globals.PhpFileExtensionsString);
+		Feature.PreviousFindInFiles.Source.SetIncludeWildcards(feature.App.Globals.PhpFileExtensionsString);
 	}
-	std::vector<mvceditor::SourceClass> sources = plugin.App.Globals.AllEnabledSources();
+	std::vector<mvceditor::SourceClass> sources = feature.App.Globals.AllEnabledSources();
 	for (size_t i = 0; i < sources.size(); ++i) {
 		mvceditor::SourceClass src = sources[i];
 		wxString fullPath = src.RootDirectory.GetFullPath();
@@ -633,7 +633,7 @@ mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvce
 	// select the last used path by default
 	bool isUsed = false;
 	int foundIndex = -1;
-	wxString lastUsedPath = plugin.PreviousFindInFiles.Source.RootDirectory.GetFullPath();
+	wxString lastUsedPath = feature.PreviousFindInFiles.Source.RootDirectory.GetFullPath();
 	if (!lastUsedPath.IsEmpty()) {
 		int foundIndex = Directory->FindString(lastUsedPath, false);
 		if (foundIndex >= 0) {
@@ -646,18 +646,18 @@ mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvce
 	else if (Directory->GetCount() > 0) {
 		Directory->SetSelection(0);
 	}
-	mvceditor::RegularExpressionValidatorClass regExValidator(&Plugin.PreviousFindInFiles.Expression, FinderMode);
+	mvceditor::RegularExpressionValidatorClass regExValidator(&Feature.PreviousFindInFiles.Expression, FinderMode);
 	FindText->SetValidator(regExValidator);
-	UnicodeStringValidatorClass replaceExpressionValidator(&Plugin.PreviousFindInFiles.ReplaceExpression);
-	wxGenericValidator modeValidator(&Plugin.PreviousFindInFiles.Mode);
-	wxGenericValidator caseValidator(&Plugin.PreviousFindInFiles.CaseSensitive);
+	UnicodeStringValidatorClass replaceExpressionValidator(&Feature.PreviousFindInFiles.ReplaceExpression);
+	wxGenericValidator modeValidator(&Feature.PreviousFindInFiles.Mode);
+	wxGenericValidator caseValidator(&Feature.PreviousFindInFiles.CaseSensitive);
 	ReplaceWithText->SetValidator(replaceExpressionValidator);
 	FinderMode->SetValidator(modeValidator);
 	CaseSensitive->SetValidator(caseValidator);
-	wxGenericValidator doHiddenFilesValidator(&Plugin.DoHiddenFiles);
+	wxGenericValidator doHiddenFilesValidator(&Feature.DoHiddenFiles);
 	DoHiddenFiles->SetValidator(doHiddenFilesValidator);
 
-	FilesFilter->SetValue(Plugin.PreviousFindInFiles.Source.IncludeWildcardsString());
+	FilesFilter->SetValue(Feature.PreviousFindInFiles.Source.IncludeWildcardsString());
 
 	FindText->SetFocus();
 
@@ -685,24 +685,24 @@ mvceditor::FindInFilesDialogClass::~FindInFilesDialogClass() {
 
 void mvceditor::FindInFilesDialogClass::OnOkButton(wxCommandEvent& event) {
 	if (TransferDataFromWindow()) {
-		Plugin.PreviousFindInFiles.Source.SetIncludeWildcards(FilesFilter->GetValue());
-		if (!Plugin.PreviousFindInFiles.Prepare()) {
+		Feature.PreviousFindInFiles.Source.SetIncludeWildcards(FilesFilter->GetValue());
+		if (!Feature.PreviousFindInFiles.Prepare()) {
 			wxMessageBox(_("Expression is not valid."), _("Find In Files"), wxOK | wxCENTER, this);
 		}
 		else if (Directory->GetValue().IsEmpty()) {
 			wxMessageBox(_("Find path must not be empty."), _("Find In Files"), wxOK | wxCENTER, this);
 		}
 		else {
-			Plugin.PreviousFindInFiles.Source.RootDirectory.AssignDir(Directory->GetValue());
-			Plugin.FindHistory.Save();
-			Plugin.ReplaceHistory.Save();
-			Plugin.DirectoriesHistory.Save();
-			Plugin.FilesHistory.Save();
+			Feature.PreviousFindInFiles.Source.RootDirectory.AssignDir(Directory->GetValue());
+			Feature.FindHistory.Save();
+			Feature.ReplaceHistory.Save();
+			Feature.DirectoriesHistory.Save();
+			Feature.FilesHistory.Save();
 
-			Plugin.FindHistory.Detach();
-			Plugin.ReplaceHistory.Detach();
-			Plugin.DirectoriesHistory.Detach();
-			Plugin.FilesHistory.Detach();
+			Feature.FindHistory.Detach();
+			Feature.ReplaceHistory.Detach();
+			Feature.DirectoriesHistory.Detach();
+			Feature.FilesHistory.Detach();
 			EndModal(wxID_OK);
 		}
 	}
@@ -711,10 +711,10 @@ void mvceditor::FindInFilesDialogClass::OnOkButton(wxCommandEvent& event) {
 void mvceditor::FindInFilesDialogClass::OnCancelButton(wxCommandEvent& event) {
 
 	// need to do this to prevent crash on app exit
-	Plugin.FindHistory.Detach();
-	Plugin.ReplaceHistory.Detach();
-	Plugin.DirectoriesHistory.Detach();
-	Plugin.FilesHistory.Detach();
+	Feature.FindHistory.Detach();
+	Feature.ReplaceHistory.Detach();
+	Feature.DirectoriesHistory.Detach();
+	Feature.FilesHistory.Detach();
 	EndModal(wxID_CANCEL);
 }
 
@@ -756,14 +756,14 @@ void mvceditor::FindInFilesDialogClass::OnKillFocusReplaceText(wxFocusEvent& eve
 	event.Skip();
 }
 
-mvceditor::FindInFilesPluginClass::FindInFilesPluginClass(mvceditor::AppClass& app)
-	: PluginClass(app)
+mvceditor::FindInFilesFeatureClass::FindInFilesFeatureClass(mvceditor::AppClass& app)
+	: FeatureClass(app)
 	, PreviousFindInFiles()
 	, DoHiddenFiles(false)
 	, ResultsPanels() {
 }
 
-void mvceditor::FindInFilesPluginClass::AddSearchMenuItems(wxMenu* searchMenu) {
+void mvceditor::FindInFilesFeatureClass::AddSearchMenuItems(wxMenu* searchMenu) {
 	searchMenu->Append(mvceditor::MENU_FIND_IN_FILES + 0, _("Find In Files\tCTRL+SHIFT+F"), 
 		_("Find an expression by searching entire directory contents"));
 	searchMenu->Append(mvceditor::MENU_FIND_IN_FILES + 1, _("Next Find In Files Match\tALT+F3"), 
@@ -772,7 +772,7 @@ void mvceditor::FindInFilesPluginClass::AddSearchMenuItems(wxMenu* searchMenu) {
 		_("Move the cursor to the previous Find In Files Match"));
 }
 
-void mvceditor::FindInFilesPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+void mvceditor::FindInFilesFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
 	menuItemIds[mvceditor::MENU_FIND_IN_FILES + 0] = wxT("Find-Find In Files");
 	menuItemIds[mvceditor::MENU_FIND_IN_FILES + 1] = wxT("Find-Find In Files Next Match");
@@ -780,7 +780,7 @@ void mvceditor::FindInFilesPluginClass::AddKeyboardShortcuts(std::vector<Dynamic
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
-void mvceditor::FindInFilesPluginClass::OnEditFindInFiles(wxCommandEvent& event) {
+void mvceditor::FindInFilesFeatureClass::OnEditFindInFiles(wxCommandEvent& event) {
 
 	// prime finder with selected text
 	wxString selectedText = GetSelectedText();
@@ -798,7 +798,7 @@ void mvceditor::FindInFilesPluginClass::OnEditFindInFiles(wxCommandEvent& event)
 	}
 }
 
-void mvceditor::FindInFilesPluginClass::OnEditFindInFilesNext(wxCommandEvent& event) {
+void mvceditor::FindInFilesFeatureClass::OnEditFindInFilesNext(wxCommandEvent& event) {
 	wxAuiNotebook* notebook = GetToolsNotebook();
 	int selection = notebook->GetSelection();
 	wxWindow* window = notebook->GetPage(selection);
@@ -814,7 +814,7 @@ void mvceditor::FindInFilesPluginClass::OnEditFindInFilesNext(wxCommandEvent& ev
 	}
 }
 
-void mvceditor::FindInFilesPluginClass::OnEditFindInFilesPrevious(wxCommandEvent& event) {
+void mvceditor::FindInFilesFeatureClass::OnEditFindInFilesPrevious(wxCommandEvent& event) {
 	wxAuiNotebook* notebook = GetToolsNotebook();
 	int selection = notebook->GetSelection();
 	wxWindow* window = notebook->GetPage(selection);
@@ -830,7 +830,7 @@ void mvceditor::FindInFilesPluginClass::OnEditFindInFilesPrevious(wxCommandEvent
 	}
 }
 
-void mvceditor::FindInFilesPluginClass::OnToolsNotebookPageClosed(wxAuiNotebookEvent& event) {
+void mvceditor::FindInFilesFeatureClass::OnToolsNotebookPageClosed(wxAuiNotebookEvent& event) {
 	int selection = event.GetSelection();
 	wxAuiNotebook* notebook = GetToolsNotebook();
 	wxWindow* window = notebook->GetPage(selection);
@@ -882,11 +882,11 @@ BEGIN_EVENT_TABLE(mvceditor::FindInFilesResultsPanelClass, FindInFilesResultsPan
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::FindInFilesResultsPanelClass::OnWorkComplete)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(mvceditor::FindInFilesPluginClass, wxEvtHandler)
-	EVT_MENU(mvceditor::MENU_FIND_IN_FILES + 0, mvceditor::FindInFilesPluginClass::OnEditFindInFiles)
-	EVT_MENU(mvceditor::MENU_FIND_IN_FILES + 1, mvceditor::FindInFilesPluginClass::OnEditFindInFilesNext)
-	EVT_MENU(mvceditor::MENU_FIND_IN_FILES + 2, mvceditor::FindInFilesPluginClass::OnEditFindInFilesPrevious)
-	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::FindInFilesPluginClass::OnToolsNotebookPageClosed)
+BEGIN_EVENT_TABLE(mvceditor::FindInFilesFeatureClass, wxEvtHandler)
+	EVT_MENU(mvceditor::MENU_FIND_IN_FILES + 0, mvceditor::FindInFilesFeatureClass::OnEditFindInFiles)
+	EVT_MENU(mvceditor::MENU_FIND_IN_FILES + 1, mvceditor::FindInFilesFeatureClass::OnEditFindInFilesNext)
+	EVT_MENU(mvceditor::MENU_FIND_IN_FILES + 2, mvceditor::FindInFilesFeatureClass::OnEditFindInFilesPrevious)
+	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::FindInFilesFeatureClass::OnToolsNotebookPageClosed)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::FindInFilesDialogClass, FindInFilesDialogGeneratedClass)

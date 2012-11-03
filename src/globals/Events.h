@@ -86,13 +86,13 @@ class CodeControlClass;
 extern const wxEventType EVENT_PLUGIN_FILE_SAVED;
 
 /**
- * This is an event that will tell a plugin that a file has been saved.
- * The plugin will get a pointer to the CodeControl that was saved.
+ * This is an event that will tell a feature that a file has been saved.
+ * The feature will get a pointer to the CodeControl that was saved.
  * From the code control; the event handler can get the file name
  * or file contents if so desired.
  * Using a new event class as opposed to a wxCommandEvent because
  * wxCommandEvents propagate by default; but we do not want
- * these events to propagate. This is because plugins are hooked into
+ * these events to propagate. This is because features are hooked into
  * the main frame's event table; and if the event were to propagate
  * then it would result in an infine loop.
  */
@@ -131,7 +131,7 @@ typedef void (wxEvtHandler::*FileSavedEventClassFunction)(FileSavedEventClass&);
 /**
  * This is a one-time event that gets generated after the application main
  * window is first shown to the user. When this event is generated, all 
- * settings have been loaded from the config files. Plugins should not
+ * settings have been loaded from the config files. Features should not
  * do heavy work in any of the menu or config related methods; they should
  * do their heavy work in this event handler.
  */
@@ -140,7 +140,7 @@ extern const wxEventType EVENT_APP_READY;
 /**
  * This is a one-time event that gets generated after the user has clicked the
  * Exit or Close button on the main frame AND the user has chosen to 
- * not save the open files (or has already saved them).  Plugins can
+ * not save the open files (or has already saved them).  Features can
  * do any final cleanup in this event handler.
  */
 extern const wxEventType EVENT_APP_EXIT;
@@ -157,7 +157,7 @@ extern const wxEventType EVENT_APP_PROJECTS_UPDATED;
  * Notification that the that the current project
  * has been indexed (project's resource cache has been udpated); the event listeners can 
  * get the project name
- * or resource cache from its [PluginClass] member properties if so desired.
+ * or resource cache from its [FeatureClass] member properties if so desired.
  * Note that the cache may be updated when the user clicks the 'index' button or by 
  * some other, automatic action.
  */
@@ -211,7 +211,7 @@ extern const wxEventType EVENT_CMD_RE_INDEX;
 /**
  * Tell the app to open a new file.
  * The command event should set the file to be opened with event.SetString()
- * Note that the app will do NOTHING if the path is invalid; the plugin should
+ * Note that the app will do NOTHING if the path is invalid; the feature should
  * make sure the path is valid.
  */
 extern const wxEventType EVENT_CMD_FILE_OPEN;

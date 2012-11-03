@@ -105,8 +105,8 @@ void mvceditor::CallStackThreadClass::BackgroundWork() {
 	}
 }
 
-mvceditor::ViewFilePluginClass::ViewFilePluginClass(mvceditor::AppClass& app) 
-	: PluginClass(app) 
+mvceditor::ViewFileFeatureClass::ViewFileFeatureClass(mvceditor::AppClass& app) 
+	: FeatureClass(app) 
 	, FrameworkDetector(*this, app.RunningThreads, app.Globals.Environment) 
 	, CallStackPersistFile() 
 	, LastError(mvceditor::CallStackClass::NONE)
@@ -114,12 +114,12 @@ mvceditor::ViewFilePluginClass::ViewFilePluginClass(mvceditor::AppClass& app)
 	App.RunningThreads.AddEventHandler(this);
 }
 
-void mvceditor::ViewFilePluginClass::AddViewMenuItems(wxMenu* viewMenu) {
+void mvceditor::ViewFileFeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
 	viewMenu->Append(mvceditor::MENU_VIEW_FILES + 0, _("Views"), 
 		_("Shows the view (template) files for the currently selected URL"), wxITEM_NORMAL);
 }
 
-void mvceditor::ViewFilePluginClass::OnViewInfosMenu(wxCommandEvent& event) {
+void mvceditor::ViewFileFeatureClass::OnViewInfosMenu(wxCommandEvent& event) {
 	if (!App.Globals.UrlResourceFinder.Urls.empty()) {
 		ShowPanel();
 	}
@@ -135,7 +135,7 @@ void mvceditor::ViewFilePluginClass::OnViewInfosMenu(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::ViewFilePluginClass::OnProjectUrls(wxCommandEvent& event) {
+void mvceditor::ViewFileFeatureClass::OnProjectUrls(wxCommandEvent& event) {
 	
 	// if we triggered the indexing
 	if (INDEXING == State) {
@@ -144,7 +144,7 @@ void mvceditor::ViewFilePluginClass::OnProjectUrls(wxCommandEvent& event) {
 	State = FREE;
 }
 
-void mvceditor::ViewFilePluginClass::ShowPanel() {
+void mvceditor::ViewFileFeatureClass::ShowPanel() {
 	wxWindow* window = FindOutlineWindow(ID_VIEW_FILE_PANEL);
 	mvceditor::ViewFilePanelClass* viewPanel = NULL;
 	if (window) {
@@ -158,7 +158,7 @@ void mvceditor::ViewFilePluginClass::ShowPanel() {
 	viewPanel->UpdateControllers();
 }
 
-wxString mvceditor::ViewFilePluginClass::CurrentFile() {
+wxString mvceditor::ViewFileFeatureClass::CurrentFile() {
 	mvceditor::CodeControlClass* ctrl = GetCurrentCodeControl();
 	wxString fileName;
 	if (ctrl) {
@@ -167,7 +167,7 @@ wxString mvceditor::ViewFilePluginClass::CurrentFile() {
 	return fileName;
 }
 
-void mvceditor::ViewFilePluginClass::StartDetection() {	
+void mvceditor::ViewFileFeatureClass::StartDetection() {	
 	
 	// start the chain reaction
 	wxString url = App.Globals.CurrentUrl.Url.BuildURI();
@@ -195,7 +195,7 @@ void mvceditor::ViewFilePluginClass::StartDetection() {
 	}
 }
 
-void mvceditor::ViewFilePluginClass::OnCallStackComplete(mvceditor::CallStackCompleteEventClass& event) {
+void mvceditor::ViewFileFeatureClass::OnCallStackComplete(mvceditor::CallStackCompleteEventClass& event) {
 	if (!App.Globals.Frameworks.empty()) {
 		if (!FrameworkDetector.InitViewInfosDetector(App.Globals.Frameworks, App.Globals.UrlResourceFinder.ChosenUrl.Url.BuildURI(), CallStackPersistFile)) {
 			mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Could not start ViewInfos detector"));
@@ -205,7 +205,7 @@ void mvceditor::ViewFilePluginClass::OnCallStackComplete(mvceditor::CallStackCom
 	WriteError = event.WriteError;
 }
 	
-void mvceditor::ViewFilePluginClass::OnViewInfosDetectionComplete(mvceditor::ViewInfosDetectedEventClass& event) {
+void mvceditor::ViewFileFeatureClass::OnViewInfosDetectionComplete(mvceditor::ViewInfosDetectedEventClass& event) {
 	wxWindow* window = FindOutlineWindow(ID_VIEW_FILE_PANEL);
 	App.Globals.CurrentViewInfos = event.GetViewInfos();
 	ViewFilePanelClass* viewPanel = NULL;
@@ -217,33 +217,33 @@ void mvceditor::ViewFilePluginClass::OnViewInfosDetectionComplete(mvceditor::Vie
 	wxRemoveFile(CallStackPersistFile.GetFullPath());
 }
 
-void mvceditor::ViewFilePluginClass::OnViewInfosDetectionFailed(wxCommandEvent& event) {
+void mvceditor::ViewFileFeatureClass::OnViewInfosDetectionFailed(wxCommandEvent& event) {
 	mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, event.GetString());
 	wxRemoveFile(CallStackPersistFile.GetFullPath());
 }
 
-mvceditor::UrlResourceFinderClass& mvceditor::ViewFilePluginClass::Urls() {
+mvceditor::UrlResourceFinderClass& mvceditor::ViewFileFeatureClass::Urls() {
 	return App.Globals.UrlResourceFinder;
 }
 
-void mvceditor::ViewFilePluginClass::OpenFile(wxString file) {
+void mvceditor::ViewFileFeatureClass::OpenFile(wxString file) {
 	wxFileName fileName(file);
 	if (fileName.IsOk()) {
 		GetNotebook()->LoadPage(fileName.GetFullPath());
 	}
 }
 
-void mvceditor::ViewFilePluginClass::SetCurrentUrl(mvceditor::UrlResourceClass url) {
+void mvceditor::ViewFileFeatureClass::SetCurrentUrl(mvceditor::UrlResourceClass url) {
 	App.Globals.CurrentUrl = url;
 }
 
-std::vector<mvceditor::ViewInfoClass> mvceditor::ViewFilePluginClass::CurrentViewInfos() {
+std::vector<mvceditor::ViewInfoClass> mvceditor::ViewFileFeatureClass::CurrentViewInfos() {
 	return App.Globals.CurrentViewInfos;
 }
 
-mvceditor::ViewFilePanelClass::ViewFilePanelClass(wxWindow* parent, int id, mvceditor::ViewFilePluginClass& plugin)
+mvceditor::ViewFilePanelClass::ViewFilePanelClass(wxWindow* parent, int id, mvceditor::ViewFileFeatureClass& feature)
 	: ViewFilePanelGeneratedClass(parent, id)
-	, Plugin(plugin) {
+	, Feature(feature) {
 	StatusLabel->SetLabel(_(""));
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
@@ -251,7 +251,7 @@ mvceditor::ViewFilePanelClass::ViewFilePanelClass(wxWindow* parent, int id, mvce
 
 void mvceditor::ViewFilePanelClass::UpdateControllers() {
 	wxArrayString controllers;
-	mvceditor::UrlResourceFinderClass& urls = Plugin.Urls();
+	mvceditor::UrlResourceFinderClass& urls = Feature.Urls();
 	std::vector<mvceditor::UrlResourceClass>::iterator it;
 	for (it = urls.Urls.begin(); it != urls.Urls.end(); ++it) {
 		if (wxNOT_FOUND == controllers.Index(it->ClassName)) {
@@ -265,9 +265,9 @@ void mvceditor::ViewFilePanelClass::UpdateControllers() {
 }
 
 void mvceditor::ViewFilePanelClass::UpdateResults() {
-	if (Plugin.LastError == mvceditor::CallStackClass::NONE || Plugin.LastError == mvceditor::CallStackClass::RESOLUTION_ERROR) {
+	if (Feature.LastError == mvceditor::CallStackClass::NONE || Feature.LastError == mvceditor::CallStackClass::RESOLUTION_ERROR) {
 		
-		std::vector<mvceditor::ViewInfoClass> currentViewInfos = Plugin.CurrentViewInfos();
+		std::vector<mvceditor::ViewInfoClass> currentViewInfos = Feature.CurrentViewInfos();
 		StatusLabel->SetLabel(wxString::Format(_("Found %d view files"), currentViewInfos.size()));
 		FileTree->DeleteAllItems();
 
@@ -277,7 +277,7 @@ void mvceditor::ViewFilePanelClass::UpdateResults() {
 
 			// remove the project root so that the dialog is not too 'wordy'
 			wxString projectLabel;
-			wxString text = Plugin.App.Globals.RelativeFileName(viewFile, projectLabel);
+			wxString text = Feature.App.Globals.RelativeFileName(viewFile, projectLabel);
 			if (!wxFileName::FileExists(viewFile)) {
 
 				// show that the view file is missing
@@ -301,7 +301,7 @@ void mvceditor::ViewFilePanelClass::UpdateResults() {
 			wxString projectLabel;
 			
 			// remove the project root so that the dialog is not too 'wordy'
-			text = Plugin.App.Globals.RelativeFileName(text, projectLabel);
+			text = Feature.App.Globals.RelativeFileName(text, projectLabel);
 			wxTreeItemId sub = TemplateVariablesTree->AppendItem(parent, text);
 			for (size_t j = 0; j < viewInfo.TemplateVariables.size(); ++j) {
 				TemplateVariablesTree->AppendItem(sub, viewInfo.TemplateVariables[j]);
@@ -309,13 +309,13 @@ void mvceditor::ViewFilePanelClass::UpdateResults() {
 		}
 		TemplateVariablesTree->ExpandAll();
 	}
-	else if (Plugin.WriteError) {
+	else if (Feature.WriteError) {
 		StatusLabel->SetLabel(_("Error"));
 		mvceditor::EditorLogError(mvceditor::WARNING_OTHER, 
 			_("Could not Write Call stack file to file system"));
 	}
 	else {
-		switch (Plugin.LastError) {
+		switch (Feature.LastError) {
 			case mvceditor::CallStackClass::PARSE_ERR0R:
 				StatusLabel->SetLabel(_("The controller file has a syntax error."));
 				break;
@@ -346,7 +346,7 @@ void mvceditor::ViewFilePanelClass::OnActionChoice(wxCommandEvent& event) {
 	wxString controller = Controller->GetStringSelection();
 	wxString action = Action->GetStringSelection();
 
-	mvceditor::UrlResourceFinderClass& urls = Plugin.Urls();
+	mvceditor::UrlResourceFinderClass& urls = Feature.Urls();
 	mvceditor::UrlResourceClass url;
 	std::vector<mvceditor::UrlResourceClass>::iterator it;
 	for (it = urls.Urls.begin(); it != urls.Urls.end(); ++it) {
@@ -357,8 +357,8 @@ void mvceditor::ViewFilePanelClass::OnActionChoice(wxCommandEvent& event) {
 	}
 	if (!url.Url.BuildURI().IsEmpty()) {
 		StatusLabel->SetLabel(_("Detecting"));
-		Plugin.SetCurrentUrl(url);
-		Plugin.StartDetection();
+		Feature.SetCurrentUrl(url);
+		Feature.StartDetection();
 	}
 }
 
@@ -366,7 +366,7 @@ void mvceditor::ViewFilePanelClass::OnControllerChoice(wxCommandEvent &event) {
 	ClearResults();
 
 	wxString controller = event.GetString();
-	mvceditor::UrlResourceFinderClass& urls = Plugin.Urls();
+	mvceditor::UrlResourceFinderClass& urls = Feature.Urls();
 	std::vector<mvceditor::UrlResourceClass>::iterator it;
 	for (it = urls.Urls.begin(); it != urls.Urls.end(); ++it) {
 		if (it->ClassName.CmpNoCase(controller) == 0) {
@@ -391,9 +391,9 @@ void mvceditor::ViewFilePanelClass::OnCurrentButton(wxCommandEvent &event) {
 	ClearResults();
 	UpdateControllers();
 
-	wxString current = Plugin.CurrentFile();
+	wxString current = Feature.CurrentFile();
 	wxFileName currentFileName(current);
-	mvceditor::UrlResourceFinderClass& urls = Plugin.Urls();
+	mvceditor::UrlResourceFinderClass& urls = Feature.Urls();
 	std::vector<mvceditor::UrlResourceClass>::iterator it;
 	for (it = urls.Urls.begin(); it != urls.Urls.end(); ++it) {
 		if (it->FileName == currentFileName) {
@@ -425,7 +425,7 @@ void mvceditor::ViewFilePanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 		mvceditor::StringTreeItemDataClass* data = (mvceditor::StringTreeItemDataClass*)FileTree->GetItemData(item);
 		if (data) {
 			file =  data->Str;
-			Plugin.OpenFile(file);
+			Feature.OpenFile(file);
 		}
 	}
 }
@@ -436,10 +436,10 @@ mvceditor::StringTreeItemDataClass::StringTreeItemDataClass(const wxString& str)
 
 }
 
-BEGIN_EVENT_TABLE(mvceditor::ViewFilePluginClass, wxEvtHandler) 
-	EVT_CALL_STACK_COMPLETE(ID_CALL_STACK_THREAD, mvceditor::ViewFilePluginClass::OnCallStackComplete)
-	EVT_FRAMEWORK_VIEW_INFOS_COMPLETE(mvceditor::ViewFilePluginClass::OnViewInfosDetectionComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_VIEW_FILES_FAILED, mvceditor::ViewFilePluginClass::OnViewInfosDetectionFailed)
-	EVT_MENU(mvceditor::MENU_VIEW_FILES + 0, mvceditor::ViewFilePluginClass::OnViewInfosMenu)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_URLS, mvceditor::ViewFilePluginClass::OnProjectUrls)
+BEGIN_EVENT_TABLE(mvceditor::ViewFileFeatureClass, wxEvtHandler) 
+	EVT_CALL_STACK_COMPLETE(ID_CALL_STACK_THREAD, mvceditor::ViewFileFeatureClass::OnCallStackComplete)
+	EVT_FRAMEWORK_VIEW_INFOS_COMPLETE(mvceditor::ViewFileFeatureClass::OnViewInfosDetectionComplete)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_VIEW_FILES_FAILED, mvceditor::ViewFileFeatureClass::OnViewInfosDetectionFailed)
+	EVT_MENU(mvceditor::MENU_VIEW_FILES + 0, mvceditor::ViewFileFeatureClass::OnViewInfosMenu)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_URLS, mvceditor::ViewFileFeatureClass::OnProjectUrls)
 END_EVENT_TABLE()

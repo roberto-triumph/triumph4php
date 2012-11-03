@@ -29,21 +29,21 @@
 #include <globals/String.h>
 #include <wx/choicdlg.h>
 
-mvceditor::CodeIgniterPluginClass::CodeIgniterPluginClass(mvceditor::AppClass& app)  
-	: PluginClass(app)
+mvceditor::CodeIgniterFeatureClass::CodeIgniterFeatureClass(mvceditor::AppClass& app)  
+	: FeatureClass(app)
 	, ConfigFiles() 
 	, CodeIgniterMenu(NULL) {
 	MenuBar = NULL;
 }
 
-void mvceditor::CodeIgniterPluginClass::AddNewMenu(wxMenuBar *menuBar) {
+void mvceditor::CodeIgniterFeatureClass::AddNewMenu(wxMenuBar *menuBar) {
 	MenuBar = menuBar;
 
 	// don't insert it just yet ... we only want to add it to the menu bar
 	// for the projects that use Code Igniter
 }
 
-void mvceditor::CodeIgniterPluginClass::OnProjectsUpdated(wxCommandEvent& event) {
+void mvceditor::CodeIgniterFeatureClass::OnProjectsUpdated(wxCommandEvent& event) {
 	ConfigFiles.clear();
 	for (size_t i = 0; i < App.Globals.Frameworks.size(); ++i) {
 		ConfigFiles.insert(App.Globals.Frameworks[i].ConfigFiles.begin(), App.Globals.Frameworks[i].ConfigFiles.end());
@@ -79,7 +79,7 @@ void mvceditor::CodeIgniterPluginClass::OnProjectsUpdated(wxCommandEvent& event)
 	}
 }
 
-void mvceditor::CodeIgniterPluginClass::UpdateMenu() {
+void mvceditor::CodeIgniterFeatureClass::UpdateMenu() {
 	wxMenuItemList list = CodeIgniterMenu->GetMenuItems();
 	std::map<wxString, wxString>::const_iterator it = ConfigFiles.begin();
 	for (size_t i = 0; it != ConfigFiles.end(); ++it) {
@@ -110,7 +110,7 @@ void mvceditor::CodeIgniterPluginClass::UpdateMenu() {
 	}
 }
 
-void mvceditor::CodeIgniterPluginClass::OnMenuItem(wxCommandEvent& event) {
+void mvceditor::CodeIgniterFeatureClass::OnMenuItem(wxCommandEvent& event) {
 	int id = event.GetId();
 	wxMenuItem* item = CodeIgniterMenu->FindItem(id);
 	if (item) {
@@ -183,13 +183,13 @@ void mvceditor::CodeIgniterPluginClass::OnMenuItem(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::CodeIgniterPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+void mvceditor::CodeIgniterFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	
 	// none for now since the code igniter menu is dynamic and is 
 	// shown/hidden depending on the project
 }
 
-void mvceditor::CodeIgniterPluginClass::GoToView() {
+void mvceditor::CodeIgniterFeatureClass::GoToView() {
 	mvceditor::CodeControlClass* codeCtrl = GetCurrentCodeControl();
 	if (codeCtrl) {
 		std::vector<mvceditor::ViewInfoClass> viewInfos = App.Globals.CurrentViewInfos;
@@ -224,7 +224,7 @@ void mvceditor::CodeIgniterPluginClass::GoToView() {
 	}
 }
 
-void mvceditor::CodeIgniterPluginClass::GoToController() {
+void mvceditor::CodeIgniterFeatureClass::GoToController() {
 	mvceditor::CodeControlClass* codeCtrl = GetCurrentCodeControl();
 	if (codeCtrl) {
 		wxFileName currentFileName(codeCtrl->GetFileName());
@@ -235,7 +235,7 @@ void mvceditor::CodeIgniterPluginClass::GoToController() {
 	}
 }
 
-BEGIN_EVENT_TABLE(mvceditor::CodeIgniterPluginClass, wxEvtHandler) 
-	EVT_MENU_RANGE(MENU_CODE_IGNITER, MENU_CODE_IGNITER + 15, mvceditor::CodeIgniterPluginClass::OnMenuItem)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::CodeIgniterPluginClass::OnProjectsUpdated)
+BEGIN_EVENT_TABLE(mvceditor::CodeIgniterFeatureClass, wxEvtHandler) 
+	EVT_MENU_RANGE(MENU_CODE_IGNITER, MENU_CODE_IGNITER + 15, mvceditor::CodeIgniterFeatureClass::OnMenuItem)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::CodeIgniterFeatureClass::OnProjectsUpdated)
 END_EVENT_TABLE()

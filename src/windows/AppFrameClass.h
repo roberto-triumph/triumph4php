@@ -88,7 +88,7 @@ class AppFrameClass : public AppFrameGeneratedClass {
 
 public:
 	
-	AppFrameClass(const std::vector<PluginClass*>& plugins, AppClass&  app,
+	AppFrameClass(const std::vector<FeatureClass*>& features, AppClass&  app,
 		PreferencesClass& preferences);
 	
 	~AppFrameClass();
@@ -100,10 +100,10 @@ public:
 	void FileOpen(const std::vector<wxString>& filenames);
 
 	/**
-	 * get all of the plugin's extra windows and menus and attach them to the main frame.
+	 * get all of the feature's extra windows and menus and attach them to the main frame.
 	 * This class will not own this pointer
 	 */
-	void LoadPlugin(PluginClass* plugin);
+	void LoadPlugin(FeatureClass* feature);
 
 	/**
 	 * this should be called whenever a new window is added.
@@ -161,7 +161,7 @@ protected:
 private:
 	
 	/**
-	 * Status bar accessor.  This status bar allows plugins to easily add gauges to the status bar.
+	 * Status bar accessor.  This status bar allows features to easily add gauges to the status bar.
 	 * 
 	 * @return StatusBarWithGaugeClass do NOT delete the pointer.  This class will take care of memory management.
 	 */
@@ -254,19 +254,19 @@ private:
 	void DefaultKeyboardShortcuts();
 
 	/**
-	 * propagate menu events to plugins, so that they can handle menu events themselves
+	 * propagate menu events to features, so that they can handle menu events themselves
 	 * their own menus
 	 */
 	void OnAnyMenuCommandEvent(wxCommandEvent& event);
 
 	/**
-	 * propagate aui notebook events to plugins, so that they can handle menu events themselves
+	 * propagate aui notebook events to features, so that they can handle menu events themselves
 	 * their own menus
 	 */
 	void OnAnyAuiNotebookEvent(wxAuiNotebookEvent& event);
 
 	/**
-	 * propagate aui toolbar events to plugins, so that they can handle menu events themselves
+	 * propagate aui toolbar events to features, so that they can handle menu events themselves
 	 * their own menus
 	 */
 	void OnAnyAuiToolbarEvent(wxAuiToolBarEvent& event);
@@ -281,7 +281,7 @@ private:
 	/**
 	 * Additional functionality
 	 */
-	const std::vector<PluginClass*>& Plugins;
+	const std::vector<FeatureClass*>& Features;
 
 	/**
 	 * Used to listen for app events.
@@ -307,7 +307,7 @@ private:
 	wxAuiToolBar* ToolBar;
 	
 	/**
-	 * To hold the various plugin
+	 * To hold the various feature
 	 * panels in place.
 	 * @var wxAuiNotebook*
 	 */

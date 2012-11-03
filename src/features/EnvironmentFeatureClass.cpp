@@ -648,11 +648,11 @@ void mvceditor::VirtualHostCreateDialogClass::OnOkButton(wxCommandEvent& event) 
 	}
 }
 
-mvceditor::EnvironmentPluginClass::EnvironmentPluginClass(mvceditor::AppClass& app)
-	: PluginClass(app) {
+mvceditor::EnvironmentFeatureClass::EnvironmentFeatureClass(mvceditor::AppClass& app)
+	: FeatureClass(app) {
 }
 
-void mvceditor::EnvironmentPluginClass::OnPreferencesSaved(wxCommandEvent& event) {
+void mvceditor::EnvironmentFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfigBase::Get();
 	mvceditor::EnvironmentClass* environment = GetEnvironment();
 	environment->SaveToConfig(config);
@@ -667,7 +667,7 @@ void mvceditor::EnvironmentPluginClass::OnPreferencesSaved(wxCommandEvent& event
 	App.UpdateConfigModifiedTime();
 }
 
-void mvceditor::EnvironmentPluginClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
+void mvceditor::EnvironmentFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 	parent->AddPage(new mvceditor::WebBrowserEditPanelClass(parent, *GetEnvironment()), _("Web Browsers"));	
 	parent->AddPage(new mvceditor::ApacheEnvironmentPanelClass(parent, App.RunningThreads, *GetEnvironment()), _("Apache"));
 	parent->AddPage(new mvceditor::PhpEnvironmentPanelClass(parent, *GetEnvironment()), _("PHP Executable"));
@@ -679,6 +679,6 @@ BEGIN_EVENT_TABLE(mvceditor::ApacheEnvironmentPanelClass, ApacheEnvironmentPanel
 	EVT_COMMAND(ID_APACHE_FILE_READER, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ApacheEnvironmentPanelClass::OnWorkComplete)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(mvceditor::EnvironmentPluginClass, wxEvtHandler) 
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::EnvironmentPluginClass::OnPreferencesSaved) 	
+BEGIN_EVENT_TABLE(mvceditor::EnvironmentFeatureClass, wxEvtHandler) 
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::EnvironmentFeatureClass::OnPreferencesSaved) 	
 END_EVENT_TABLE()

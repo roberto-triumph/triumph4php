@@ -136,7 +136,7 @@ protected:
  * 
  * After all of this, it will populate a window with the view files.
  */
-class ViewFilePluginClass : public PluginClass {
+class ViewFileFeatureClass : public FeatureClass {
 	
 public:
 
@@ -163,7 +163,7 @@ public:
 	 */
 	bool WriteError;
 	
-	ViewFilePluginClass(mvceditor::AppClass& app);
+	ViewFileFeatureClass(mvceditor::AppClass& app);
 
 	void SetCurrentUrl(mvceditor::UrlResourceClass url);
 	
@@ -179,7 +179,7 @@ public:
 
 	/**
 	 * starts the view file detection process. This is an asynchronous operation.
-	 * When view files are detected, the plugin will update the
+	 * When view files are detected, the feature will update the
 	 * panel appropriately.
 	 */
 	void StartDetection();
@@ -226,9 +226,9 @@ class ViewFilePanelClass : public ViewFilePanelGeneratedClass {
 	
 public:
 
-	ViewFilePluginClass& Plugin;
+	ViewFileFeatureClass& Feature;
 	
-	ViewFilePanelClass(wxWindow* parent, int id, ViewFilePluginClass& plugin);
+	ViewFilePanelClass(wxWindow* parent, int id, ViewFileFeatureClass& feature);
 
 	void UpdateResults();
 

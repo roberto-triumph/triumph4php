@@ -37,8 +37,8 @@
 
 static const int ID_FRAMEWORK_DETECTION_GAUGE = wxNewId();
 
-mvceditor::ProjectPluginClass::ProjectPluginClass(mvceditor::AppClass& app) 
-	: PluginClass(app)
+mvceditor::ProjectFeatureClass::ProjectFeatureClass(mvceditor::AppClass& app) 
+	: FeatureClass(app)
 	, PhpFrameworks(*this, app.RunningThreads, app.Globals.Environment) 
 	, DirectoriesToDetect() 
 	, IsDetecting(false) {
@@ -56,32 +56,32 @@ mvceditor::ProjectPluginClass::ProjectPluginClass(mvceditor::AppClass& app)
 	}
 }
 
-mvceditor::ProjectPluginClass::~ProjectPluginClass() {
+mvceditor::ProjectFeatureClass::~ProjectFeatureClass() {
 	PhpFrameworks.Stop();
 }
 
-void mvceditor::ProjectPluginClass::AddFileMenuItems(wxMenu* fileMenu) {
+void mvceditor::ProjectFeatureClass::AddFileMenuItems(wxMenu* fileMenu) {
 	fileMenu->Append(mvceditor::MENU_PROJECT + 3, _("Projects"), _("Add additional source directories to the current project"), wxITEM_NORMAL);
 	fileMenu->Append(mvceditor::MENU_PROJECT + 1, _("Explore"), _("Open An explorer window in the Project Root"), wxITEM_NORMAL);
 	fileMenu->Append(mvceditor::MENU_PROJECT + 2, _("Explore Open File"), _("Open An explorer window in the currently opened file"), wxITEM_NORMAL);
 }
 
 
-void mvceditor::ProjectPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+void mvceditor::ProjectFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
 	menuItemIds[mvceditor::MENU_PROJECT + 1] = wxT("Project-Explore");
 	menuItemIds[mvceditor::MENU_PROJECT + 2] = wxT("Project-Explore File");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
-void mvceditor::ProjectPluginClass::AddToolBarItems(wxAuiToolBar* toolbar) {
+void mvceditor::ProjectFeatureClass::AddToolBarItems(wxAuiToolBar* toolbar) {
 	wxBitmap bitmap = wxArtProvider::GetBitmap(wxART_FOLDER_OPEN, wxART_TOOLBAR, wxSize(16, 16));
 	toolbar->AddTool(mvceditor::MENU_PROJECT + 1, _("Explore"), bitmap, _("Open An explorer window in the Project Root"));
 	bitmap = wxArtProvider::GetBitmap(wxART_FOLDER_OPEN, wxART_TOOLBAR, wxSize(16, 16));
 	toolbar->AddTool(mvceditor::MENU_PROJECT + 2, _("Explore Open File"), bitmap, _("Open An explorer window in the currently opened file"));
 }
 
-void mvceditor::ProjectPluginClass::LoadPreferences(wxConfigBase* config) {
+void mvceditor::ProjectFeatureClass::LoadPreferences(wxConfigBase* config) {
 	config->Read(wxT("/Project/ExplorerExecutable"), &ExplorerExecutable);
 	App.Globals.PhpFileExtensionsString = config->Read(wxT("/Project/PhpFileExtensions"));
 	App.Globals.CssFileExtensionsString = config->Read(wxT("/Project/CssFileExtensions"));
@@ -133,7 +133,7 @@ void mvceditor::ProjectPluginClass::LoadPreferences(wxConfigBase* config) {
 	}
 }
 
-void mvceditor::ProjectPluginClass::OnPreferencesSaved(wxCommandEvent& event) {
+void mvceditor::ProjectFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfig::Get();
 	config->Write(wxT("/Project/ExplorerExecutable"), ExplorerExecutable);
 	config->Write(wxT("/Project/PhpFileExtensions"), App.Globals.PhpFileExtensionsString);
@@ -184,12 +184,12 @@ void mvceditor::ProjectPluginClass::OnPreferencesSaved(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::ProjectPluginClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
+void mvceditor::ProjectFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 	ProjectPluginPanelClass* panel = new ProjectPluginPanelClass(parent, *this);
 	parent->AddPage(panel, wxT("Project"));
 }
 
-void mvceditor::ProjectPluginClass::OnProjectExplore(wxCommandEvent& event) {
+void mvceditor::ProjectFeatureClass::OnProjectExplore(wxCommandEvent& event) {
 	std::vector<mvceditor::SourceClass> enabledSources = App.Globals.AllEnabledSources();
 	if (!enabledSources.empty()) {
 		wxFileName dir = enabledSources[0].RootDirectory;
@@ -208,7 +208,7 @@ void mvceditor::ProjectPluginClass::OnProjectExplore(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::ProjectPluginClass::OnProjectExploreOpenFile(wxCommandEvent& event) {
+void mvceditor::ProjectFeatureClass::OnProjectExploreOpenFile(wxCommandEvent& event) {
 	CodeControlClass* code = GetCurrentCodeControl();
 	if (code != NULL && !code->GetFileName().IsEmpty()) {
 		wxFileName fileName(code->GetFileName());
@@ -227,7 +227,7 @@ void mvceditor::ProjectPluginClass::OnProjectExploreOpenFile(wxCommandEvent& eve
 	}
 }
 
-void mvceditor::ProjectPluginClass::OnAppReady(wxCommandEvent& event) {
+void mvceditor::ProjectFeatureClass::OnAppReady(wxCommandEvent& event) {
 
 	// if an existing detection is running, then let it finish
 	if (!IsDetecting) {
@@ -235,7 +235,7 @@ void mvceditor::ProjectPluginClass::OnAppReady(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::ProjectPluginClass::StartDetectors() {
+void mvceditor::ProjectFeatureClass::StartDetectors() {
 
 	// clear the detected framework info
 	App.Globals.Frameworks.clear();
@@ -265,14 +265,14 @@ void mvceditor::ProjectPluginClass::StartDetectors() {
 	}
 	else {
 
-		// still notify the plugins of the new project at program startup
+		// still notify the features of the new project at program startup
 		// when the app starts the default project is opened
 		wxCommandEvent evt(mvceditor::EVENT_APP_PROJECTS_UPDATED);
 		App.EventSink.Publish(evt);
 	}
 }
 
-void mvceditor::ProjectPluginClass::OnFrameworkDetectionComplete(wxCommandEvent& event) {
+void mvceditor::ProjectFeatureClass::OnFrameworkDetectionComplete(wxCommandEvent& event) {
 	bool finished = true;
 
 	// detection on the next directory; skipping any errors
@@ -292,7 +292,7 @@ void mvceditor::ProjectPluginClass::OnFrameworkDetectionComplete(wxCommandEvent&
 	}
 }
 
-void mvceditor::ProjectPluginClass::OnFrameworkDetectionFailed(wxCommandEvent& event) {
+void mvceditor::ProjectFeatureClass::OnFrameworkDetectionFailed(wxCommandEvent& event) {
 	mvceditor::EditorLogError(mvceditor::BAD_PHP_EXECUTABLE, event.GetString());
 	bool finished = true;
 
@@ -313,16 +313,16 @@ void mvceditor::ProjectPluginClass::OnFrameworkDetectionFailed(wxCommandEvent& e
 	}
 }
 
-void mvceditor::ProjectPluginClass::OnFrameworkDetectionInProgress(wxCommandEvent& event) {
+void mvceditor::ProjectFeatureClass::OnFrameworkDetectionInProgress(wxCommandEvent& event) {
 	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 	gauge->IncrementGauge(ID_FRAMEWORK_DETECTION_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
 }
 
-void mvceditor::ProjectPluginClass::OnFrameworkFound(mvceditor::FrameworkFoundEventClass& event) {
+void mvceditor::ProjectFeatureClass::OnFrameworkFound(mvceditor::FrameworkFoundEventClass& event) {
 	App.Globals.Frameworks.push_back(event.GetFramework());
 }
 
-void mvceditor::ProjectPluginClass::OnProjectDefine(wxCommandEvent& event) {
+void mvceditor::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
 	std::vector<mvceditor::ProjectClass> removedProjects;
 	mvceditor::ProjectListDialogClass dialog(GetMainWindow(), App.Globals.Projects, removedProjects);
 	if (wxOK == dialog.ShowModal()) {
@@ -359,7 +359,7 @@ void mvceditor::ProjectPluginClass::OnProjectDefine(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::ProjectPluginClass::OnPreferencesExternallyUpdated(wxCommandEvent& event) {
+void mvceditor::ProjectFeatureClass::OnPreferencesExternallyUpdated(wxCommandEvent& event) {
 	
 	// if an existing detection is running, then let it finish
 	if (!IsDetecting) {
@@ -367,7 +367,7 @@ void mvceditor::ProjectPluginClass::OnPreferencesExternallyUpdated(wxCommandEven
 	}
 }
 
-mvceditor::ProjectPluginPanelClass::ProjectPluginPanelClass(wxWindow *parent, mvceditor::ProjectPluginClass &projectPlugin) 
+mvceditor::ProjectPluginPanelClass::ProjectPluginPanelClass(wxWindow *parent, mvceditor::ProjectFeatureClass &projectPlugin) 
 : ProjectPluginGeneratedPanelClass(parent) {
 	NonEmptyTextValidatorClass explorerValidator(&projectPlugin.ExplorerExecutable, Label);
 	ExplorerExecutable->SetValidator(explorerValidator);
@@ -713,16 +713,16 @@ void mvceditor::ProjectListDialogClass::OnHelpButton(wxCommandEvent& event) {
 	wxMessageBox(help, _("Defined Projects Help"), wxCENTRE, this);
 }
 
-BEGIN_EVENT_TABLE(mvceditor::ProjectPluginClass, wxEvtHandler)
-	EVT_MENU(mvceditor::MENU_PROJECT + 1, mvceditor::ProjectPluginClass::OnProjectExplore)
-	EVT_MENU(mvceditor::MENU_PROJECT + 2, mvceditor::ProjectPluginClass::OnProjectExploreOpenFile)
-	EVT_MENU(mvceditor::MENU_PROJECT + 3, mvceditor::ProjectPluginClass::OnProjectDefine)
+BEGIN_EVENT_TABLE(mvceditor::ProjectFeatureClass, wxEvtHandler)
+	EVT_MENU(mvceditor::MENU_PROJECT + 1, mvceditor::ProjectFeatureClass::OnProjectExplore)
+	EVT_MENU(mvceditor::MENU_PROJECT + 2, mvceditor::ProjectFeatureClass::OnProjectExploreOpenFile)
+	EVT_MENU(mvceditor::MENU_PROJECT + 3, mvceditor::ProjectFeatureClass::OnProjectDefine)
 
-	EVT_FRAMEWORK_FOUND(mvceditor::ProjectPluginClass::OnFrameworkFound)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_DETECTION_COMPLETE, mvceditor::ProjectPluginClass::OnFrameworkDetectionComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_DETECTION_FAILED, mvceditor::ProjectPluginClass::OnFrameworkDetectionFailed)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::ProjectPluginClass::OnFrameworkDetectionInProgress)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::ProjectPluginClass::OnPreferencesSaved)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, mvceditor::ProjectPluginClass::OnPreferencesExternallyUpdated)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::ProjectPluginClass::OnAppReady)
+	EVT_FRAMEWORK_FOUND(mvceditor::ProjectFeatureClass::OnFrameworkFound)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_DETECTION_COMPLETE, mvceditor::ProjectFeatureClass::OnFrameworkDetectionComplete)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_DETECTION_FAILED, mvceditor::ProjectFeatureClass::OnFrameworkDetectionFailed)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::ProjectFeatureClass::OnFrameworkDetectionInProgress)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::ProjectFeatureClass::OnPreferencesSaved)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, mvceditor::ProjectFeatureClass::OnPreferencesExternallyUpdated)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::ProjectFeatureClass::OnAppReady)
 END_EVENT_TABLE()

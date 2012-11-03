@@ -30,11 +30,11 @@
 
 namespace mvceditor {
 
-class RecentFilesPluginClass : public PluginClass {
+class RecentFilesFeatureClass : public FeatureClass {
 
 public:
 
-	RecentFilesPluginClass(mvceditor::AppClass& app);
+	RecentFilesFeatureClass(mvceditor::AppClass& app);
 
 	void AddFileMenuItems(wxMenu* fileMenu);
 

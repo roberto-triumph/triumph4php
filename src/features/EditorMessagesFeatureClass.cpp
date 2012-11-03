@@ -99,16 +99,16 @@ void mvceditor::EditorMessagesPanelClass::AddMessage(wxLogLevel level, const wxC
 }
 
 
-mvceditor::EditorMessagesPluginClass::EditorMessagesPluginClass(mvceditor::AppClass& app)
-	: PluginClass(app) {
+mvceditor::EditorMessagesFeatureClass::EditorMessagesFeatureClass(mvceditor::AppClass& app)
+	: FeatureClass(app) {
 }
 
-void mvceditor::EditorMessagesPluginClass::AddViewMenuItems(wxMenu *viewMenu) {
+void mvceditor::EditorMessagesFeatureClass::AddViewMenuItems(wxMenu *viewMenu) {
 	viewMenu->Append(mvceditor::MENU_EDITOR_MESSAGES, _("Editor Messages"), 
 		_("Editor Messages"));
 }
 
-void mvceditor::EditorMessagesPluginClass::OnMenu(wxCommandEvent& event) {
+void mvceditor::EditorMessagesFeatureClass::OnMenu(wxCommandEvent& event) {
 	wxWindow* window = FindToolsWindow(ID_DEBUG_WINDOW);
 	if (window) {
 		SetFocusToToolsWindow(window);
@@ -119,7 +119,7 @@ void mvceditor::EditorMessagesPluginClass::OnMenu(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::EditorMessagesPluginClass::AddMessage(wxLogLevel level, const wxChar* msg, time_t timestamp) {
+void mvceditor::EditorMessagesFeatureClass::AddMessage(wxLogLevel level, const wxChar* msg, time_t timestamp) {
 
 	// in MSW ignore log messages dealting with SetFocus() 
 	// If we don't ignore this, the app will stack overflow when the app is minized 
@@ -154,22 +154,22 @@ void mvceditor::EditorMessagesPluginClass::AddMessage(wxLogLevel level, const wx
 	panel->AddMessage(level, msg, timestamp);
 }
 
-void mvceditor::EditorMessagesPluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+void mvceditor::EditorMessagesFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
 	menuItemIds[mvceditor::MENU_EDITOR_MESSAGES] = wxT("Editor-Messages");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
-mvceditor::EditorMessagesLoggerClass::EditorMessagesLoggerClass(mvceditor::EditorMessagesPluginClass& plugin)
+mvceditor::EditorMessagesLoggerClass::EditorMessagesLoggerClass(mvceditor::EditorMessagesFeatureClass& feature)
 	: wxLog()
-	, Plugin(plugin) {
+	, Feature(feature) {
 	SetLogLevel(wxLOG_Message);
 }
 
 void mvceditor::EditorMessagesLoggerClass::DoLog(wxLogLevel level, const wxChar *msg, time_t timestamp) {
-	Plugin.AddMessage(level, msg, timestamp);
+	Feature.AddMessage(level, msg, timestamp);
 }
 
-BEGIN_EVENT_TABLE(mvceditor::EditorMessagesPluginClass, mvceditor::PluginClass)
-	EVT_MENU(mvceditor::MENU_EDITOR_MESSAGES, mvceditor::EditorMessagesPluginClass::OnMenu)
+BEGIN_EVENT_TABLE(mvceditor::EditorMessagesFeatureClass, mvceditor::FeatureClass)
+	EVT_MENU(mvceditor::MENU_EDITOR_MESSAGES, mvceditor::EditorMessagesFeatureClass::OnMenu)
 END_EVENT_TABLE()

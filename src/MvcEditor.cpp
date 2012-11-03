@@ -52,7 +52,7 @@ mvceditor::AppClass::AppClass()
 	, RunningThreads()
 	, EventSink()
 	, ConfigLastModified()
-	, Plugins()
+	, Features()
 	, Preferences()
 	, Timer(*this)
 	, EditorMessagesPlugin(NULL) 
@@ -68,10 +68,10 @@ bool mvceditor::AppClass::OnInit() {
 	CreatePlugins();
 
 	// due to the way keyboard shortcuts are serialized, we need to load the
-	// frame and initialize the plugin windows so that all menus are created
+	// frame and initialize the feature windows so that all menus are created
 	// and only then can we load the keyboard shortcuts from the INI file
 	// all menu items must be present in the menu bar for shortcuts to take effect
-	AppFrame = new mvceditor::AppFrameClass(Plugins, *this, Preferences);
+	AppFrame = new mvceditor::AppFrameClass(Features, *this, Preferences);
 	PluginWindows();
 	LoadPreferences();
 	AppFrame->AuiManagerUpdate();
@@ -146,61 +146,61 @@ bool mvceditor::AppClass::CommandLine() {
 }
 
 void mvceditor::AppClass::CreatePlugins() {
-	PluginClass* plugin = new RunConsolePluginClass(*this);
-	Plugins.push_back(plugin);
-	plugin = new FinderPluginClass(*this);
-	Plugins.push_back(plugin);
-	plugin = new FindInFilesPluginClass(*this);
-	Plugins.push_back(plugin);
-	plugin = new ResourcePluginClass(*this);
-	Plugins.push_back(plugin);
-	plugin = new EnvironmentPluginClass(*this);
-	Plugins.push_back(plugin);	
-	plugin = new ProjectPluginClass(*this);
-	Plugins.push_back(plugin);
-	plugin = new OutlineViewPluginClass(*this);
-	Plugins.push_back(plugin);
-	plugin = new LintPluginClass(*this);
-	Plugins.push_back(plugin);
-	plugin = new SqlBrowserPluginClass(*this);
-	Plugins.push_back(plugin);
+	FeatureClass* feature = new RunConsoleFeatureClass(*this);
+	Features.push_back(feature);
+	feature = new FinderFeatureClass(*this);
+	Features.push_back(feature);
+	feature = new FindInFilesFeatureClass(*this);
+	Features.push_back(feature);
+	feature = new ResourceFeatureClass(*this);
+	Features.push_back(feature);
+	feature = new EnvironmentFeatureClass(*this);
+	Features.push_back(feature);	
+	feature = new ProjectFeatureClass(*this);
+	Features.push_back(feature);
+	feature = new OutlineViewFeatureClass(*this);
+	Features.push_back(feature);
+	feature = new LintFeatureClass(*this);
+	Features.push_back(feature);
+	feature = new SqlBrowserFeatureClass(*this);
+	Features.push_back(feature);
 
-	EditorMessagesPlugin = new mvceditor::EditorMessagesPluginClass(*this);
-	Plugins.push_back(EditorMessagesPlugin);
+	EditorMessagesPlugin = new mvceditor::EditorMessagesFeatureClass(*this);
+	Features.push_back(EditorMessagesPlugin);
 
-	plugin = new CodeIgniterPluginClass(*this);
-	Plugins.push_back(plugin);
-	plugin = new RunBrowserPluginClass(*this);
-	Plugins.push_back(plugin);
-	plugin = new ViewFilePluginClass(*this);
-	Plugins.push_back(plugin);
-	plugin = new RecentFilesPluginClass(*this);
-	Plugins.push_back(plugin);
+	feature = new CodeIgniterFeatureClass(*this);
+	Features.push_back(feature);
+	feature = new RunBrowserFeatureClass(*this);
+	Features.push_back(feature);
+	feature = new ViewFileFeatureClass(*this);
+	Features.push_back(feature);
+	feature = new RecentFilesFeatureClass(*this);
+	Features.push_back(feature);
 	
-	// TODO test plugin need to find a quicker way to toggling it ON / OFF
-	//plugin = new TestPluginClass(*this);
-	//Plugins.push_back(plugin);
+	// TODO test feature need to find a quicker way to toggling it ON / OFF
+	//feature = new TestFeatureClass(*this);
+	//Features.push_back(feature);
 
-	// connect the plugins to the event sink so that they can
+	// connect the features to the event sink so that they can
 	// receive app events
-	for (size_t i = 0; i < Plugins.size(); ++i) {
-		EventSink.PushHandler(Plugins[i]);
+	for (size_t i = 0; i < Features.size(); ++i) {
+		EventSink.PushHandler(Features[i]);
 	}
 }
 
 void mvceditor::AppClass::PluginWindows() {
-	for (size_t i = 0; i < Plugins.size(); ++i) {
-		AppFrame->LoadPlugin(Plugins[i]);
+	for (size_t i = 0; i < Features.size(); ++i) {
+		AppFrame->LoadPlugin(Features[i]);
 	}
 }
 
 void mvceditor::AppClass::DeletePlugins() {
 
 	// if i delete in the same loop as the PopEventHandler, wx assertions fail.
-	for (size_t i = 0; i < Plugins.size(); ++i) {
-		delete Plugins[i];
+	for (size_t i = 0; i < Features.size(); ++i) {
+		delete Features[i];
 	}
-	Plugins.clear();
+	Features.clear();
 	EditorMessagesPlugin = NULL;
 }
 
@@ -210,9 +210,9 @@ void mvceditor::AppClass::LoadPreferences() {
 	PreferencesClass::InitConfig();
 	wxConfigBase* config = wxConfigBase::Get();
 	Globals.Environment.LoadFromConfig(config);
-	for (size_t i = 0; i < Plugins.size(); ++i) {
-		Plugins[i]->LoadPreferences(config);
-		Plugins[i]->AddKeyboardShortcuts(Preferences.DefaultKeyboardShortcutCmds);
+	for (size_t i = 0; i < Features.size(); ++i) {
+		Features[i]->LoadPreferences(config);
+		Features[i]->AddKeyboardShortcuts(Preferences.DefaultKeyboardShortcutCmds);
 	}	
 	Preferences.Load(config, AppFrame);
 }
@@ -236,8 +236,8 @@ mvceditor::AppTimerClass::AppTimerClass(mvceditor::AppClass& app)
 
 void mvceditor::AppTimerClass::Notify() {
 	
-	// tell all plugins that the app is ready to use
-	// the plugins will do / should do  their grunt
+	// tell all features that the app is ready to use
+	// the features will do / should do  their grunt
 	// work in their event handler
 	if (!App.IsAppReady) {
 		App.IsAppReady = true;

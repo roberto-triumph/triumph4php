@@ -128,11 +128,11 @@ private:
 	
 };
 
-class ResourcePluginClass : public PluginClass {
+class ResourceFeatureClass : public FeatureClass {
 
 public:
 	
-	ResourcePluginClass(mvceditor::AppClass& app);
+	ResourceFeatureClass(mvceditor::AppClass& app);
 
 	void AddSearchMenuItems(wxMenu* searchMenu);
 
@@ -302,7 +302,7 @@ private:
 	void OnTimer(wxTimerEvent& event);
 
 	 /**
-	  * The various states control what this plugin does.
+	  * The various states control what this feature does.
 	  * Because indexing runs in a background thread we need to save
 	  * whether or not the user triggered an index or triggered a lookup
 	  */
@@ -387,7 +387,7 @@ private:
 class ResourceSearchDialogClass : public ResourceSearchDialogGeneratedClass {
 public:
 
-	ResourceSearchDialogClass(wxWindow* parent, ResourcePluginClass& resource, wxString& term, 
+	ResourceSearchDialogClass(wxWindow* parent, ResourceFeatureClass& resource, wxString& term, 
 		std::vector<mvceditor::ResourceClass>& chosenResources);
 		
 	/**
@@ -429,11 +429,11 @@ protected:
 private:
 
 	/**
-	 * The resource plugin reference.  The dialog will use this reference to actually perform the search.
+	 * The resource feature reference.  The dialog will use this reference to actually perform the search.
 	 * 
-	 * @var ResourcePluginClass
+	 * @var ResourceFeatureClass
 	 */
-	ResourcePluginClass& ResourcePlugin;
+	ResourceFeatureClass& ResourcePlugin;
 
 	/**
 	 * Handle the results of the resource lookups.
