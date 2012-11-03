@@ -59,6 +59,8 @@ mvceditor::EditorBehaviorPanelClass::EditorBehaviorPanelClass(wxWindow* parent, 
 	TrimTrailingSpaceBeforeSave->SetValidator(trimTrailingSpaceValidator);
 	wxGenericValidator removeTrailingBlankLinesValidator(&options.RemoveTrailingBlankLinesBeforeSave);
 	RemoveTrailingBlankLines->SetValidator(removeTrailingBlankLinesValidator);
+	wxGenericValidator callTipOnMouseHoverValidator(&options.EnableCallTipsOnMouseHover);
+	EnableCallTipOnMouseHover->SetValidator(callTipOnMouseHoverValidator);
 }
 
 void mvceditor::EditorBehaviorPanelClass::OnIndentUsingSpaces(wxCommandEvent& event) {

@@ -40,6 +40,7 @@ mvceditor::CodeControlOptionsClass::CodeControlOptionsClass() {
 	EnableWordWrap = false;
 	TrimTrailingSpaceBeforeSave = false;
 	RemoveTrailingBlankLinesBeforeSave = true;
+	EnableCallTipsOnMouseHover = true;
 	wxOperatingSystemId os = wxGetOsVersion();
 	if (wxOS_WINDOWS == os) {  
 		LineEndingMode = wxSTC_EOL_CRLF;
@@ -443,6 +444,7 @@ void mvceditor::CodeControlOptionsClass::Load(wxConfigBase* config) {
 	config->Read(wxT("EditorBehavior/EnableWordWrap"), &EnableWordWrap);
 	config->Read(wxT("EditorBehavior/TrimTrailingSpaceBeforeSave"), &TrimTrailingSpaceBeforeSave);
 	config->Read(wxT("EditorBehavior/RemoveTrailingBlankLinesBeforeSave"), &RemoveTrailingBlankLinesBeforeSave);
+	config->Read(wxT("EditorBehavior/EnableCallTipsOnMouseHover"), &EnableCallTipsOnMouseHover); 
 	for (size_t i = 0; i < PhpStyles.size(); ++i) {
 		PhpStyles[i].Read(config);
 	}
@@ -470,6 +472,7 @@ void mvceditor::CodeControlOptionsClass::Save(wxConfigBase* config) {
 	config->Write(wxT("EditorBehavior/EnableWordWrap"), EnableWordWrap);
 	config->Write(wxT("EditorBehavior/TrimTrailingSpaceBeforeSave"), TrimTrailingSpaceBeforeSave);
 	config->Write(wxT("EditorBehavior/RemoveTrailingBlankLinesBeforeSave"), RemoveTrailingBlankLinesBeforeSave);
+	config->Write(wxT("EditorBehavior/EnableCallTipsOnMouseHover"), EnableCallTipsOnMouseHover);
 	for (size_t i = 0; i < PhpStyles.size(); ++i) {
 		PhpStyles[i].Write(config);
 	}

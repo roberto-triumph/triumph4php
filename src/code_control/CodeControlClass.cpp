@@ -171,7 +171,6 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 	UsePopUp(false);
 	SetYCaretPolicy(wxSTC_CARET_EVEN, 0);
 	ApplyPreferences();
-	SetMouseDwellTime(1000);
 }
 
 mvceditor::CodeControlClass::~CodeControlClass() {
@@ -468,6 +467,12 @@ void mvceditor::CodeControlClass::ApplyPreferences() {
 	}
 	else {
 		SetWrapMode(wxSTC_WRAP_NONE);
+	}
+	if (CodeControlOptions.EnableCallTipsOnMouseHover) {
+		SetMouseDwellTime(1000);
+	}
+	else {
+		SetMouseDwellTime(wxSTC_TIME_FOREVER);
 	}
 	if (Document) {
 		

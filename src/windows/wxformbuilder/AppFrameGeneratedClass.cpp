@@ -256,7 +256,7 @@ EditorBehaviorPanelGeneratedClass::EditorBehaviorPanelGeneratedClass( wxWindow* 
 	StaticBoxSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Editor Behaviors") ), wxVERTICAL );
 	
 	wxFlexGridSizer* FlexGridSizer;
-	FlexGridSizer = new wxFlexGridSizer( 5, 2, 0, 0 );
+	FlexGridSizer = new wxFlexGridSizer( 6, 2, 0, 0 );
 	FlexGridSizer->AddGrowableCol( 0 );
 	FlexGridSizer->AddGrowableCol( 1 );
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );
@@ -305,6 +305,12 @@ EditorBehaviorPanelGeneratedClass::EditorBehaviorPanelGeneratedClass( wxWindow* 
 	
 	RemoveTrailingBlankLines = new wxCheckBox( this, ID_REMOVETRAILINGBLANKLINES, _("Remove Trailing Blank Lines (PHP)"), wxDefaultPosition, wxDefaultSize, 0 );
 	FlexGridSizer->Add( RemoveTrailingBlankLines, 0, wxALL, 5 );
+	
+	EnableCallTipOnMouseHover = new wxCheckBox( this, ID_ENABLECALLTIPONMOUSEHOVER, _("Enable CallTip On Mouse Hover"), wxDefaultPosition, wxDefaultSize, 0 );
+	FlexGridSizer->Add( EnableCallTipOnMouseHover, 0, wxALL, 5 );
+	
+	
+	FlexGridSizer->Add( 0, 0, 1, wxEXPAND, 5 );
 	
 	wxBoxSizer* NumbersSizer;
 	NumbersSizer = new wxBoxSizer( wxHORIZONTAL );

@@ -202,6 +202,7 @@ class EditorBehaviorPanelGeneratedClass : public wxPanel
 			ID_ENABLEDYNAMICAUTOCOMPLETION,
 			ID_TRIMTRAILINGSPACEBEFORESAVE,
 			ID_REMOVETRAILINGBLANKLINES,
+			ID_ENABLECALLTIPONMOUSEHOVER,
 		};
 		
 		wxCheckBox* EnableCodeFolding;
@@ -217,6 +218,8 @@ class EditorBehaviorPanelGeneratedClass : public wxPanel
 		wxCheckBox* EnableDynamicAutoCompletion;
 		wxCheckBox* TrimTrailingSpaceBeforeSave;
 		wxCheckBox* RemoveTrailingBlankLines;
+		wxCheckBox* EnableCallTipOnMouseHover;
+		
 		wxStaticText* TabWidthLabel;
 		wxSpinCtrl* TabWidth;
 		wxStaticText* SpacesPerIndentLabel;
@@ -230,7 +233,7 @@ class EditorBehaviorPanelGeneratedClass : public wxPanel
 	
 	public:
 		
-		EditorBehaviorPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 572,295 ), long style = wxTAB_TRAVERSAL );
+		EditorBehaviorPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 603,339 ), long style = wxTAB_TRAVERSAL );
 		~EditorBehaviorPanelGeneratedClass();
 	
 };

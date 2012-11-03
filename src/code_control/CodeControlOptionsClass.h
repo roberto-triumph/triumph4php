@@ -211,6 +211,12 @@ public:
 	 */
 	bool RemoveTrailingBlankLinesBeforeSave;
 
+	/**
+	 * if TRUE, the editor will show a call tip whenever the user puts the mouse
+	 * over a function / class name.
+	 */
+	bool EnableCallTipsOnMouseHover;
+
 	CodeControlOptionsClass();
 
 	/**
