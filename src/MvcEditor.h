@@ -23,8 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <globals/GlobalsClass.h>
-#include <features/EditorMessagesPluginClass.h>
-#include <features/PluginClass.h>
+#include <features/EditorMessagesFeatureClass.h>
+#include <features/FeatureClass.h>
 #include <PreferencesClass.h>
 #include <globals/Events.h>
 #include <wx/app.h>

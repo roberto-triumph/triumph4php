@@ -27,20 +27,20 @@
 #include <unicode/uclean.h>
 
 #include <windows/AppFrameClass.h>
-#include <features/EnvironmentPluginClass.h>
-#include <features/FindInFilesPluginClass.h>
-#include <features/FinderPluginClass.h>
-#include <features/ProjectPluginClass.h>
-#include <features/OutlineViewPluginClass.h>
-#include <features/ResourcePluginClass.h>
-#include <features/RunConsolePluginClass.h>
-#include <features/RunBrowserPluginClass.h>
-#include <features/LintPluginClass.h>
-#include <features/SqlBrowserPluginClass.h>
-#include <features/EditorMessagesPluginClass.h>
-#include <features/CodeIgniterPluginClass.h>
-#include <features/ViewFilePluginClass.h>
-#include <features/RecentFilesPluginClass.h>
+#include <features/EnvironmentFeatureClass.h>
+#include <features/FindInFilesFeatureClass.h>
+#include <features/FinderFeatureClass.h>
+#include <features/ProjectFeatureClass.h>
+#include <features/OutlineViewFeatureClass.h>
+#include <features/ResourceFeatureClass.h>
+#include <features/RunConsoleFeatureClass.h>
+#include <features/RunBrowserFeatureClass.h>
+#include <features/LintFeatureClass.h>
+#include <features/SqlBrowserFeatureClass.h>
+#include <features/EditorMessagesFeatureClass.h>
+#include <features/CodeIgniterFeatureClass.h>
+#include <features/ViewFileFeatureClass.h>
+#include <features/RecentFilesFeatureClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 

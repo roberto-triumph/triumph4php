@@ -28,7 +28,7 @@
 #include <globals/ProjectClass.h>
 #include <windows/wxformbuilder/AppFrameGeneratedClass.h>
 #include <widgets/NotebookClass.h>
-#include <features/PluginClass.h>
+#include <features/FeatureClass.h>
 #include <PreferencesClass.h>
 #include <globals/Events.h>
 #include <wx/aui/aui.h>
