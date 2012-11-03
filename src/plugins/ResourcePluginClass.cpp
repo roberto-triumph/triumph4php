@@ -191,7 +191,7 @@ void mvceditor::ResourcePluginClass::AddSearchMenuItems(wxMenu* searchMenu) {
 	ProjectIndexMenu = searchMenu->Append(mvceditor::MENU_RESOURCE + 0, _("Index"), _("Index the project"));
 	searchMenu->Append(mvceditor::MENU_RESOURCE + 1, _("Jump To Resource Under Cursor\tF12"), _("Jump To Resource that is under the cursor"));
 	searchMenu->Append(mvceditor::MENU_RESOURCE + 2, _("Search for Resource...\tCTRL+R"), _("Search for a class, method, or function"));
-	ProjectIndexMenu->Enable(App.Structs.HasSources() && FREE == State);
+	ProjectIndexMenu->Enable(App.Globals.HasSources() && FREE == State);
 }
 
 void mvceditor::ResourcePluginClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
@@ -217,14 +217,14 @@ void mvceditor::ResourcePluginClass::OnAppReady(wxCommandEvent& event) {
 
 	// the resource cache will own all of the globalCache pointers
 	mvceditor::GlobalCacheClass* nativeCache = new mvceditor::GlobalCacheClass;
-	std::vector<wxString> otherFileExtensions = App.Structs.GetNonPhpFileExtensions();
+	std::vector<wxString> otherFileExtensions = App.Globals.GetNonPhpFileExtensions();
 	
-	nativeCache->Init(mvceditor::NativeFunctionsAsset(), App.Structs.GetPhpFileExtensions(), otherFileExtensions, version);
+	nativeCache->Init(mvceditor::NativeFunctionsAsset(), App.Globals.GetPhpFileExtensions(), otherFileExtensions, version);
 	resourceCache->RegisterGlobal(nativeCache);
 
-	ProjectIndexMenu->Enable(App.Structs.HasSources() && FREE == State);
+	ProjectIndexMenu->Enable(App.Globals.HasSources() && FREE == State);
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	for (project = App.Structs.Projects.begin(); project != App.Structs.Projects.end(); ++project) {
+	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
 		if (project->IsEnabled) {
 			mvceditor::GlobalCacheClass* projectCache = new mvceditor::GlobalCacheClass;
 			projectCache->Init(project->ResourceDbFileName, project->PhpFileExtensions, otherFileExtensions, version);
@@ -256,16 +256,16 @@ void mvceditor::ResourcePluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
 	resourceCache->Clear();
 	pelet::Versions version = GetEnvironment()->Php.Version;
-	ProjectIndexMenu->Enable(App.Structs.HasSources() && FREE == State);
-	std::vector<wxString> otherFileExtensions = App.Structs.GetNonPhpFileExtensions();
+	ProjectIndexMenu->Enable(App.Globals.HasSources() && FREE == State);
+	std::vector<wxString> otherFileExtensions = App.Globals.GetNonPhpFileExtensions();
 	
 	// the resource cache will own all of the global cache pointers
 	mvceditor::GlobalCacheClass* nativeCache = new mvceditor::GlobalCacheClass;
-	nativeCache->Init(mvceditor::NativeFunctionsAsset(), App.Structs.GetPhpFileExtensions(), otherFileExtensions, version);
+	nativeCache->Init(mvceditor::NativeFunctionsAsset(), App.Globals.GetPhpFileExtensions(), otherFileExtensions, version);
 	resourceCache->RegisterGlobal(nativeCache);
 	
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	for (project = App.Structs.Projects.begin(); project != App.Structs.Projects.end(); ++project) {
+	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
 		if (project->IsEnabled && !project->AllPhpSources().empty()) {
 
 			// register the project resource DB file now so that it is available for code completion
@@ -277,7 +277,7 @@ void mvceditor::ResourcePluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 			resourceCache->RegisterGlobal(projectCache);
 		}
 	}
-	InitProjectQueue(App.Structs.Projects);
+	InitProjectQueue(App.Globals.Projects);
 	mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
 
 	wxString projectLabel;
@@ -421,11 +421,11 @@ void mvceditor::ResourcePluginClass::OnGlobalCacheComplete(mvceditor::GlobalCach
 }
 
 void mvceditor::ResourcePluginClass::StartIndex() {
-	if (App.Structs.HasSources()) {
+	if (App.Globals.HasSources()) {
 
 		//prevent two finds at a time
 		if (FREE == State) { 
-			if (InitProjectQueue(App.Structs.Projects)) {
+			if (InitProjectQueue(App.Globals.Projects)) {
 				wxString projectLabel;
 				mvceditor::ResourceFileReaderClass* thread = ReadNextProject(GetEnvironment()->Php.Version, projectLabel);
 				mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
@@ -478,7 +478,7 @@ void mvceditor::ResourcePluginClass::OnProjectWipeAndIndex(wxCommandEvent& event
 	
 	mvceditor::ResourceFileWipeThreadClass* thread = new mvceditor::ResourceFileWipeThreadClass(App.RunningThreads, ID_WIPE_THREAD);
 	bool  wipeStarted = false;
-	if  (thread->Init(App.Structs.Projects)) {
+	if  (thread->Init(App.Globals.Projects)) {
 		wxThreadIdType threadId;
 		wxThreadError error = thread->CreateSingleInstance(threadId);
 		if (wxTHREAD_NO_ERROR == error) {
@@ -587,7 +587,7 @@ void mvceditor::ResourcePluginClass::LoadPageFromResource(const wxString& finder
 }
 
 void mvceditor::ResourcePluginClass::OnUpdateUi(wxUpdateUIEvent& event) {
-	ProjectIndexMenu->Enable(App.Structs.HasSources() && FREE == State);
+	ProjectIndexMenu->Enable(App.Globals.HasSources() && FREE == State);
 	event.Skip();
 }
 
@@ -611,7 +611,7 @@ void mvceditor::ResourcePluginClass::OpenFile(wxString fileName) {
 void mvceditor::ResourcePluginClass::OnCmdReIndex(wxCommandEvent& event) {
 
 	// only index when there is a project open
-	if (App.Structs.HasSources()) {
+	if (App.Globals.HasSources()) {
 		StartIndex();
 	}
 }
@@ -626,7 +626,7 @@ void mvceditor::ResourcePluginClass::OnAppFileClosed(wxCommandEvent& event) {
 	wxString fileName = event.GetString();
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	pelet::Versions version = GetEnvironment()->Php.Version;
-	for (project = App.Structs.Projects.begin(); project != App.Structs.Projects.end(); ++project) {
+	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
 
 		if (project->IsAPhpSourceFile(fileName)) {
 			mvceditor::ResourceFileReaderClass* thread = new mvceditor::ResourceFileReaderClass(App.RunningThreads, ID_RESOURCE_READER);
@@ -649,7 +649,7 @@ void mvceditor::ResourcePluginClass::OnAppFileClosed(wxCommandEvent& event) {
 	// the event ID is the ID of the code control that was closed
 	// this needs to be the same as mvceditor::CodeControlClass::GetIdString
 	wxString fileIdentifier = wxString::Format(wxT("File_%d"), event.GetId());
-	App.Structs.ResourceCache.RemoveWorking(fileIdentifier);
+	App.Globals.ResourceCache.RemoveWorking(fileIdentifier);
 }
 
 void mvceditor::ResourcePluginClass::RemoveNativeMatches(std::vector<mvceditor::ResourceClass>& matches) const {
@@ -706,11 +706,11 @@ mvceditor::ResourceFileReaderClass* mvceditor::ResourcePluginClass::ReadNextProj
 
 void mvceditor::ResourcePluginClass::OnWorkingCacheComplete(mvceditor::WorkingCacheCompleteEventClass& event) {
 	wxString fileIdentifier = event.GetFileIdentifier();
-	bool good = App.Structs.ResourceCache.RegisterWorking(fileIdentifier, event.WorkingCache);
+	bool good = App.Globals.ResourceCache.RegisterWorking(fileIdentifier, event.WorkingCache);
 	if (!good) {
 
 		// already there
-		App.Structs.ResourceCache.ReplaceWorking(fileIdentifier, event.WorkingCache);
+		App.Globals.ResourceCache.ReplaceWorking(fileIdentifier, event.WorkingCache);
 	}
 	event.Skip();
 }
@@ -727,7 +727,7 @@ void mvceditor::ResourcePluginClass::OnTimer(wxTimerEvent& event) {
 			// we need to differentiate between new and opened files (the 'true' arg)
 			WorkingCacheBuilder->Update(fileIdentifier, text, 
 				!wxFileName::FileExists(codeControl->GetFileName()),
-				App.Structs.Environment.Php.Version);
+				App.Globals.Environment.Php.Version);
 		}
 	}
 	event.Skip();
@@ -813,7 +813,7 @@ void mvceditor::ResourceSearchDialogClass::ShowJumpToResults(const wxString& fin
 	// dont show the project path to the user
 	for (size_t i = 0; i < files.GetCount(); ++i) {
 		wxString projectLabel;
-		wxString relativeName = ResourcePlugin.App.Structs.RelativeFileName(files[i], projectLabel);
+		wxString relativeName = ResourcePlugin.App.Globals.RelativeFileName(files[i], projectLabel);
 		wxString matchLabel;
 		mvceditor::ResourceClass match = allMatches[i];
 		if (mvceditor::ResourceClass::MEMBER == match.Type || mvceditor::ResourceClass::METHOD == match.Type ||

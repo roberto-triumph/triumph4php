@@ -28,7 +28,7 @@
 #include <unicode/uclean.h>
 #include <globals/CodeControlOptionsClass.h>
 #include <globals/Assets.h>
-#include <globals/StructsClass.h>
+#include <globals/GlobalsClass.h>
 #include <code_control/CodeControlStyles.h>
 #include <code_control/CodeControlClass.h>
 #include <search/FindInFilesClass.h>
@@ -48,7 +48,7 @@ public:
 	virtual int OnExit();
 	
 	mvceditor::CodeControlOptionsClass Options;
-	mvceditor::StructsClass Structs;
+	mvceditor::GlobalsClass Globals;
 	mvceditor::RunningThreadsClass RunningThreads;
 };
 
@@ -144,7 +144,7 @@ IMPLEMENT_APP(CodeControlProfilerAppClass)
 CodeControlProfilerAppClass::CodeControlProfilerAppClass() 
 	: wxApp()
 	, Options()
-	, Structs() {
+	, Globals() {
 		
 }
 
@@ -158,7 +158,7 @@ bool CodeControlProfilerAppClass::OnInit() {
 		miscFileFilters;
 	phpFileFilters.push_back(wxT("*.php"));
 	globalCache->Init(mvceditor::NativeFunctionsAsset(), phpFileFilters, miscFileFilters, pelet::PHP_53);
-	Structs.ResourceCache.RegisterGlobal(globalCache);
+	Globals.ResourceCache.RegisterGlobal(globalCache);
 	
 	CodeControlFrameClass* frame = new CodeControlFrameClass(*this);
 	SetTopWindow(frame);
@@ -175,7 +175,7 @@ CodeControlFrameClass::CodeControlFrameClass(CodeControlProfilerAppClass& app)
 	: wxFrame(NULL, wxID_ANY, wxT("CodeControlClass profiler"), wxDefaultPosition, 
 			wxSize(1024, 768)) 
 	, App(app) {
-	Ctrl = new mvceditor::CodeControlClass(this, app.Options, &app.Structs, wxID_ANY);
+	Ctrl = new mvceditor::CodeControlClass(this, app.Options, &app.Globals, wxID_ANY);
 	Ctrl->SetDropTarget(new FileDropTargetClass(Ctrl));
 	Ctrl->SetDocumentMode(mvceditor::CodeControlClass::PHP);
 	CreateMenu();

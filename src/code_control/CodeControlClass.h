@@ -26,7 +26,7 @@
 #define MVCEDITORCODECONTROLCLASS_H_
 
 #include <globals/CodeControlOptionsClass.h>
-#include <globals/StructsClass.h>
+#include <globals/GlobalsClass.h>
 #include <wx/stc/stc.h>
 #include <wx/timer.h>
 #include <unicode/unistr.h>
@@ -92,11 +92,11 @@ public:
 
 	/**
 	 * Constructor. 
-	 * @param StructsClass* To get items needed for autocompletion. This object
+	 * @param GlobalsClass* To get items needed for autocompletion. This object
 	 *        will NOT own the pointer
 	 */
 	CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,
-					StructsClass* structs,
+					GlobalsClass* globals,
 	                 int id, const wxPoint& position =
 	                     wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0,
 	                 const wxString& name = wxT("code"));
@@ -467,7 +467,7 @@ private:
 	* and to use the proper version of PHP for auto completion.
 	* This class will NOT own this pointer.
 	*/
-	StructsClass* Structs;
+	GlobalsClass* Globals;
 
 	/**
 	 * This is the current specialization (document type) that is being used. This

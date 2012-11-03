@@ -260,7 +260,7 @@ void mvceditor::TextDocumentClass::DetachFromControl(CodeControlClass* ctrl) {
 
 }
 
-mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::StructsClass* structs)
+mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::GlobalsClass* globals)
 	: wxEvtHandler()
 	, TextDocumentClass()
 	, LanguageDiscovery()
@@ -269,7 +269,7 @@ mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::StructsClass* structs)
 	, ScopeFinder()
 	, CurrentCallTipResources()
 	, AutoCompletionResourceMatches()
-	, Structs(structs)
+	, Globals(globals)
 	, CurrentCallTipIndex(0)
 	, AreImagesRegistered(false) {
 
@@ -371,16 +371,16 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionString(const UnicodeString
 }
 
 void mvceditor::PhpDocumentClass::AppendSqlTableNames(const UnicodeString& word, std::vector<wxString>& autoCompleteList) {
-	for (size_t i = 0; i < Structs->Infos.size(); ++i) {
-		mvceditor::DatabaseInfoClass info = Structs->Infos[i];
+	for (size_t i = 0; i < Globals->Infos.size(); ++i) {
+		mvceditor::DatabaseInfoClass info = Globals->Infos[i];
 		if (!info.Host.isEmpty() && info.IsEnabled) {
 			UnicodeString error;
-			std::vector<UnicodeString> results = Structs->SqlResourceFinder.FindTables(info, word);
+			std::vector<UnicodeString> results = Globals->SqlResourceFinder.FindTables(info, word);
 			for (size_t i = 0; i < results.size(); i++) {
 				wxString s = mvceditor::IcuToWx(results[i]);
 				autoCompleteList.push_back(s);
 			}
-			results = Structs->SqlResourceFinder.FindColumns(info, word);
+			results = Globals->SqlResourceFinder.FindColumns(info, word);
 			for (size_t i = 0; i < results.size(); i++) {
 				wxString s = mvceditor::IcuToWx(results[i]);
 				autoCompleteList.push_back(s);
@@ -439,15 +439,15 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionHtml(const UnicodeString& 
 }
 
 void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& code, const UnicodeString& word, pelet::LanguageDiscoveryClass::Syntax syntax, wxString& completeStatus) {
-	if (!Structs) {
+	if (!Globals) {
 		return;
 	}
 	if (!AreImagesRegistered) {
 		RegisterAutoCompletionImages();
 	}
-	Lexer.SetVersion(Structs->Environment.Php.Version);
-	Parser.SetVersion(Structs->Environment.Php.Version);
-	ScopeFinder.SetVersion(Structs->Environment.Php.Version);
+	Lexer.SetVersion(Globals->Environment.Php.Version);
+	Parser.SetVersion(Globals->Environment.Php.Version);
+	ScopeFinder.SetVersion(Globals->Environment.Php.Version);
 	
 	std::vector<wxString> autoCompleteList;
 	std::vector<UnicodeString> variableMatches;
@@ -462,7 +462,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 	if (!lastExpression.isEmpty()) {
 		Parser.ParseExpression(lastExpression, parsedExpression);
 		ScopeFinder.GetScopeString(code, expressionPos, expressionScope);
-		Structs->ResourceCache.ExpressionCompletionMatches(Ctrl->GetIdString(), parsedExpression, expressionScope,
+		Globals->ResourceCache.ExpressionCompletionMatches(Ctrl->GetIdString(), parsedExpression, expressionScope,
 				variableMatches, AutoCompletionResourceMatches, doDuckTyping, error);
 		if (!variableMatches.empty()) {
 			for (size_t i = 0; i < variableMatches.size(); ++i) {
@@ -525,8 +525,8 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 		}
 
 		// auto complete any template variables
-		for (size_t i = 0; i < Structs->CurrentViewInfos.size(); ++i) {
-			mvceditor::ViewInfoClass viewInfo = Structs->CurrentViewInfos[i];
+		for (size_t i = 0; i < Globals->CurrentViewInfos.size(); ++i) {
+			mvceditor::ViewInfoClass viewInfo = Globals->CurrentViewInfos[i];
 			wxFileName f1(viewInfo.FileName);
 			wxFileName f2(Ctrl->GetFileName());
 			if (f1 == f2) {
@@ -656,7 +656,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhpStatus(
 }
 
 void mvceditor::PhpDocumentClass::HandleCallTip(wxChar ch, bool force) {
-	if (!Structs) {
+	if (!Globals) {
 		return;
 	}
 	
@@ -711,7 +711,7 @@ void mvceditor::PhpDocumentClass::HandleCallTip(wxChar ch, bool force) {
 				constructorResourceSearch += wxT("::");
 
 				// TODO: get class hierarchy
-				std::vector<mvceditor::ResourceClass> matches = Structs->ResourceCache.CollectNearMatchResourcesFromAll(mvceditor::WxToIcu(constructorResourceSearch));
+				std::vector<mvceditor::ResourceClass> matches = Globals->ResourceCache.CollectNearMatchResourcesFromAll(mvceditor::WxToIcu(constructorResourceSearch));
 				for (size_t i = 0; i < matches.size(); ++i) {
 					mvceditor::ResourceClass res = matches[i];
 					if (mvceditor::ResourceClass::METHOD == res.Type && UNICODE_STRING_SIMPLE("__construct") == res.Identifier) {
@@ -802,13 +802,13 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetCurrentSym
 	
 	UnicodeString lastExpression = lexer.LastExpression(code);
 	bool doDuckTyping = true;
-	if (Structs && !lastExpression.isEmpty()) {
+	if (Globals && !lastExpression.isEmpty()) {
 		parser.ParseExpression(lastExpression, parsedExpression);
 		scopeFinder.GetScopeString(code, endPos, scopeResult);
 
 		// for now do nothing with error
 		mvceditor::SymbolTableMatchErrorClass error;
-		Structs->ResourceCache.ResourceMatches(Ctrl->GetIdString(), parsedExpression, scopeResult, matches, 
+		Globals->ResourceCache.ResourceMatches(Ctrl->GetIdString(), parsedExpression, scopeResult, matches, 
 			doDuckTyping, true, error);
 	}
 	return matches;
@@ -883,7 +883,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetSymbolAt(i
 
 		// for now do nothing with error
 		mvceditor::SymbolTableMatchErrorClass error;
-		Structs->ResourceCache.ResourceMatches(Ctrl->GetIdString(), parsedExpression, expressionScope, matches, 
+		Globals->ResourceCache.ResourceMatches(Ctrl->GetIdString(), parsedExpression, expressionScope, matches, 
 			doDuckTyping, true, error);
 	}
 	return matches;
@@ -1001,7 +1001,7 @@ void mvceditor::PhpDocumentClass::OnAutoCompletionSelected(wxStyledTextEvent& ev
 }
 
 wxString mvceditor::PhpDocumentClass::GetPhpKeywords() const {
-	if (pelet::PHP_54 == Structs->Environment.Php.Version) {
+	if (pelet::PHP_54 == Globals->Environment.Php.Version) {
 		return PHP_KEYWORDS + wxT(" ") + PHP_54_KEYWORDS;
 	}
 	return PHP_KEYWORDS;
@@ -1014,9 +1014,9 @@ wxString mvceditor::PhpDocumentClass::GetJavascriptKeywords() const {
 	return JAVASCRIPT_KEYWORDS;
 }
 
-mvceditor::SqlDocumentClass::SqlDocumentClass(mvceditor::StructsClass* structs, const mvceditor::DatabaseInfoClass& currentInfo) 
+mvceditor::SqlDocumentClass::SqlDocumentClass(mvceditor::GlobalsClass* globals, const mvceditor::DatabaseInfoClass& currentInfo) 
 	: TextDocumentClass() 
-	, Structs(structs)
+	, Globals(globals)
 	, CurrentInfo(currentInfo) {
 		
 }
@@ -1070,12 +1070,12 @@ std::vector<wxString> mvceditor::SqlDocumentClass::HandleAutoCompletionMySql(con
 	// look at the meta data
 	if (!CurrentInfo.Host.isEmpty()) {
 		UnicodeString error;
-		std::vector<UnicodeString> results = Structs->SqlResourceFinder.FindTables(CurrentInfo, word);
+		std::vector<UnicodeString> results = Globals->SqlResourceFinder.FindTables(CurrentInfo, word);
 		for (size_t i = 0; i < results.size(); i++) {
 			wxString s = mvceditor::IcuToWx(results[i]);
 			autoCompleteList.push_back(s);
 		}
-		results = Structs->SqlResourceFinder.FindColumns(CurrentInfo, word);
+		results = Globals->SqlResourceFinder.FindColumns(CurrentInfo, word);
 		for (size_t i = 0; i < results.size(); i++) {
 			wxString s = mvceditor::IcuToWx(results[i]);
 			autoCompleteList.push_back(s);

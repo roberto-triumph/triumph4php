@@ -45,8 +45,8 @@ void mvceditor::CodeIgniterPluginClass::AddNewMenu(wxMenuBar *menuBar) {
 
 void mvceditor::CodeIgniterPluginClass::OnProjectsUpdated(wxCommandEvent& event) {
 	ConfigFiles.clear();
-	for (size_t i = 0; i < App.Structs.Frameworks.size(); ++i) {
-		ConfigFiles.insert(App.Structs.Frameworks[i].ConfigFiles.begin(), App.Structs.Frameworks[i].ConfigFiles.end());
+	for (size_t i = 0; i < App.Globals.Frameworks.size(); ++i) {
+		ConfigFiles.insert(App.Globals.Frameworks[i].ConfigFiles.begin(), App.Globals.Frameworks[i].ConfigFiles.end());
 	}
 	if (!ConfigFiles.empty()) {
 
@@ -74,8 +74,8 @@ void mvceditor::CodeIgniterPluginClass::OnProjectsUpdated(wxCommandEvent& event)
 		}
 	}
 	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
-	for (size_t i = 0; i < App.Structs.Frameworks.size(); ++i) {
-		resourceCache->GlobalAddDynamicResources(App.Structs.Frameworks[i].Resources);
+	for (size_t i = 0; i < App.Globals.Frameworks.size(); ++i) {
+		resourceCache->GlobalAddDynamicResources(App.Globals.Frameworks[i].Resources);
 	}
 }
 
@@ -192,7 +192,7 @@ void mvceditor::CodeIgniterPluginClass::AddKeyboardShortcuts(std::vector<Dynamic
 void mvceditor::CodeIgniterPluginClass::GoToView() {
 	mvceditor::CodeControlClass* codeCtrl = GetCurrentCodeControl();
 	if (codeCtrl) {
-		std::vector<mvceditor::ViewInfoClass> viewInfos = App.Structs.CurrentViewInfos;
+		std::vector<mvceditor::ViewInfoClass> viewInfos = App.Globals.CurrentViewInfos;
 
 		// go through the chosen url, and get the templates for that controller
 		wxArrayString controllerViews;
@@ -228,7 +228,7 @@ void mvceditor::CodeIgniterPluginClass::GoToController() {
 	mvceditor::CodeControlClass* codeCtrl = GetCurrentCodeControl();
 	if (codeCtrl) {
 		wxFileName currentFileName(codeCtrl->GetFileName());
-		mvceditor::UrlResourceClass urlResource = App.Structs.CurrentUrl;
+		mvceditor::UrlResourceClass urlResource = App.Globals.CurrentUrl;
 		if (urlResource.FileName.IsOk()) {
 			GetNotebook()->LoadPage(urlResource.FileName.GetFullPath());
 		}

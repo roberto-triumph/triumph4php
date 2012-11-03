@@ -39,7 +39,7 @@ static const int ID_FRAMEWORK_DETECTION_GAUGE = wxNewId();
 
 mvceditor::ProjectPluginClass::ProjectPluginClass(mvceditor::AppClass& app) 
 	: PluginClass(app)
-	, PhpFrameworks(*this, app.RunningThreads, app.Structs.Environment) 
+	, PhpFrameworks(*this, app.RunningThreads, app.Globals.Environment) 
 	, DirectoriesToDetect() 
 	, IsDetecting(false) {
 	wxPlatformInfo info;
@@ -83,12 +83,12 @@ void mvceditor::ProjectPluginClass::AddToolBarItems(wxAuiToolBar* toolbar) {
 
 void mvceditor::ProjectPluginClass::LoadPreferences(wxConfigBase* config) {
 	config->Read(wxT("/Project/ExplorerExecutable"), &ExplorerExecutable);
-	App.Structs.PhpFileExtensionsString = config->Read(wxT("/Project/PhpFileExtensions"));
-	App.Structs.CssFileExtensionsString = config->Read(wxT("/Project/CssFileExtensions"));
-	App.Structs.SqlFileExtensionsString = config->Read(wxT("/Project/SqlFileExtensions"));
-	App.Structs.MiscFileExtensionsString = config->Read(wxT("/Project/MiscFileExtensions"));
+	App.Globals.PhpFileExtensionsString = config->Read(wxT("/Project/PhpFileExtensions"));
+	App.Globals.CssFileExtensionsString = config->Read(wxT("/Project/CssFileExtensions"));
+	App.Globals.SqlFileExtensionsString = config->Read(wxT("/Project/SqlFileExtensions"));
+	App.Globals.MiscFileExtensionsString = config->Read(wxT("/Project/MiscFileExtensions"));
 	
-	App.Structs.Projects.clear();
+	App.Globals.Projects.clear();
 	wxString key;
 	long index;
 	int projectIndex = 0;
@@ -124,8 +124,8 @@ void mvceditor::ProjectPluginClass::LoadPreferences(wxConfigBase* config) {
 				}
 			}
 			if (newProject.HasSources()) {
-				App.Structs.AssignFileExtensions(newProject);
-				App.Structs.Projects.push_back(newProject);
+				App.Globals.AssignFileExtensions(newProject);
+				App.Globals.Projects.push_back(newProject);
 				projectIndex++;
 			}
 		}
@@ -136,10 +136,10 @@ void mvceditor::ProjectPluginClass::LoadPreferences(wxConfigBase* config) {
 void mvceditor::ProjectPluginClass::OnPreferencesSaved(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfig::Get();
 	config->Write(wxT("/Project/ExplorerExecutable"), ExplorerExecutable);
-	config->Write(wxT("/Project/PhpFileExtensions"), App.Structs.PhpFileExtensionsString);
-	config->Write(wxT("/Project/CssFileExtensions"), App.Structs.CssFileExtensionsString);
-	config->Write(wxT("/Project/SqlFileExtensions"), App.Structs.SqlFileExtensionsString);
-	config->Write(wxT("/Project/MiscFileExtensions"), App.Structs.MiscFileExtensionsString);
+	config->Write(wxT("/Project/PhpFileExtensions"), App.Globals.PhpFileExtensionsString);
+	config->Write(wxT("/Project/CssFileExtensions"), App.Globals.CssFileExtensionsString);
+	config->Write(wxT("/Project/SqlFileExtensions"), App.Globals.SqlFileExtensionsString);
+	config->Write(wxT("/Project/MiscFileExtensions"), App.Globals.MiscFileExtensionsString);
 
 	// remove all project from the config
 	wxString key;
@@ -156,8 +156,8 @@ void mvceditor::ProjectPluginClass::OnPreferencesSaved(wxCommandEvent& event) {
 		config->DeleteGroup(keysToDelete[i]);
 	}
 	
-	for (size_t i = 0; i < App.Structs.Projects.size(); ++i) {
-		mvceditor::ProjectClass project = App.Structs.Projects[i];
+	for (size_t i = 0; i < App.Globals.Projects.size(); ++i) {
+		mvceditor::ProjectClass project = App.Globals.Projects[i];
 		wxString keyLabel = wxString::Format(wxT("/Project_%d/Label"), i);
 		wxString keyEnabled = wxString::Format(wxT("/Project_%d/IsEnabled"), i);
 		wxString keyResourceDbFileName = wxString::Format(wxT("/Project_%d/ResourceDbFileName"), i);	
@@ -179,8 +179,8 @@ void mvceditor::ProjectPluginClass::OnPreferencesSaved(wxCommandEvent& event) {
 
 	// also, update the projects to have new file extesions
 	std::vector<mvceditor::ProjectClass>::iterator project;
-	for (project = App.Structs.Projects.begin(); project != App.Structs.Projects.end(); ++project) {
-		App.Structs.AssignFileExtensions(*project);
+	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
+		App.Globals.AssignFileExtensions(*project);
 	}
 }
 
@@ -190,7 +190,7 @@ void mvceditor::ProjectPluginClass::AddPreferenceWindow(wxBookCtrlBase* parent) 
 }
 
 void mvceditor::ProjectPluginClass::OnProjectExplore(wxCommandEvent& event) {
-	std::vector<mvceditor::SourceClass> enabledSources = App.Structs.AllEnabledSources();
+	std::vector<mvceditor::SourceClass> enabledSources = App.Globals.AllEnabledSources();
 	if (!enabledSources.empty()) {
 		wxFileName dir = enabledSources[0].RootDirectory;
 		wxString cmd;
@@ -238,15 +238,15 @@ void mvceditor::ProjectPluginClass::OnAppReady(wxCommandEvent& event) {
 void mvceditor::ProjectPluginClass::StartDetectors() {
 
 	// clear the detected framework info
-	App.Structs.Frameworks.clear();
+	App.Globals.Frameworks.clear();
 
 	// only remove the database infos that were detected from
 	// PHP frameworks, leave the ones that the user created intact
-	App.Structs.ClearDetectedInfos();
+	App.Globals.ClearDetectedInfos();
 
 	DirectoriesToDetect.clear();
 	IsDetecting = false;
-	std::vector<mvceditor::SourceClass> allSources = App.Structs.AllEnabledSources();
+	std::vector<mvceditor::SourceClass> allSources = App.Globals.AllEnabledSources();
 	if (!allSources.empty()) {
 		
 		for (size_t i = 1; i < allSources.size(); ++i) {
@@ -254,7 +254,7 @@ void mvceditor::ProjectPluginClass::StartDetectors() {
 		}
 		bool started = PhpFrameworks.Init(allSources[0].RootDirectory.GetPath());
 		if (!started) {
-			mvceditor::EditorLogError(mvceditor::BAD_PHP_EXECUTABLE, App.Structs.Environment.Php.PhpExecutablePath); 
+			mvceditor::EditorLogError(mvceditor::BAD_PHP_EXECUTABLE, App.Globals.Environment.Php.PhpExecutablePath); 
 			DirectoriesToDetect.clear();
 		}
 		else {
@@ -319,12 +319,12 @@ void mvceditor::ProjectPluginClass::OnFrameworkDetectionInProgress(wxCommandEven
 }
 
 void mvceditor::ProjectPluginClass::OnFrameworkFound(mvceditor::FrameworkFoundEventClass& event) {
-	App.Structs.Frameworks.push_back(event.GetFramework());
+	App.Globals.Frameworks.push_back(event.GetFramework());
 }
 
 void mvceditor::ProjectPluginClass::OnProjectDefine(wxCommandEvent& event) {
 	std::vector<mvceditor::ProjectClass> removedProjects;
-	mvceditor::ProjectListDialogClass dialog(GetMainWindow(), App.Structs.Projects, removedProjects);
+	mvceditor::ProjectListDialogClass dialog(GetMainWindow(), App.Globals.Projects, removedProjects);
 	if (wxOK == dialog.ShowModal()) {
 		std::vector<mvceditor::ProjectClass>::iterator project;
 
@@ -338,10 +338,10 @@ void mvceditor::ProjectPluginClass::OnProjectDefine(wxCommandEvent& event) {
 
 		// for new projects we need to fill in the file extensions
 		// the rest of the app assumes they are already filled in
-		for (project = App.Structs.Projects.begin(); project != App.Structs.Projects.end(); ++project) {
+		for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
 
 			// need to set these; as they set in app load too
-			App.Structs.AssignFileExtensions(*project);
+			App.Globals.AssignFileExtensions(*project);
 		}
 
 		wxCommandEvent evt;
@@ -372,16 +372,16 @@ mvceditor::ProjectPluginPanelClass::ProjectPluginPanelClass(wxWindow *parent, mv
 	NonEmptyTextValidatorClass explorerValidator(&projectPlugin.ExplorerExecutable, Label);
 	ExplorerExecutable->SetValidator(explorerValidator);
 
-	NonEmptyTextValidatorClass phpFileExtensionsValidator(&projectPlugin.App.Structs.PhpFileExtensionsString, PhpLabel);
+	NonEmptyTextValidatorClass phpFileExtensionsValidator(&projectPlugin.App.Globals.PhpFileExtensionsString, PhpLabel);
 	PhpFileExtensions->SetValidator(phpFileExtensionsValidator);
 
-	NonEmptyTextValidatorClass cssFileExtensionsValidator(&projectPlugin.App.Structs.CssFileExtensionsString, CssLabel);
+	NonEmptyTextValidatorClass cssFileExtensionsValidator(&projectPlugin.App.Globals.CssFileExtensionsString, CssLabel);
 	CssFileExtensions->SetValidator(cssFileExtensionsValidator);
 
-	NonEmptyTextValidatorClass sqlFileExtensionsValidator(&projectPlugin.App.Structs.SqlFileExtensionsString, SqlLabel);
+	NonEmptyTextValidatorClass sqlFileExtensionsValidator(&projectPlugin.App.Globals.SqlFileExtensionsString, SqlLabel);
 	SqlFileExtensions->SetValidator(sqlFileExtensionsValidator);
 	
-	NonEmptyTextValidatorClass miscFileExtensionsValidator(&projectPlugin.App.Structs.MiscFileExtensionsString, MiscLabel);
+	NonEmptyTextValidatorClass miscFileExtensionsValidator(&projectPlugin.App.Globals.MiscFileExtensionsString, MiscLabel);
 	MiscFileExtensions->SetValidator(miscFileExtensionsValidator);
 }
 

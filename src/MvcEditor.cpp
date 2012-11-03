@@ -48,7 +48,7 @@ IMPLEMENT_APP(mvceditor::AppClass)
 
 mvceditor::AppClass::AppClass()
 	: wxApp()
-	, Structs()
+	, Globals()
 	, RunningThreads()
 	, EventSink()
 	, ConfigLastModified()
@@ -209,7 +209,7 @@ void mvceditor::AppClass::LoadPreferences() {
 	// load any settings from .INI files
 	PreferencesClass::InitConfig();
 	wxConfigBase* config = wxConfigBase::Get();
-	Structs.Environment.LoadFromConfig(config);
+	Globals.Environment.LoadFromConfig(config);
 	for (size_t i = 0; i < Plugins.size(); ++i) {
 		Plugins[i]->LoadPreferences(config);
 		Plugins[i]->AddKeyboardShortcuts(Preferences.DefaultKeyboardShortcutCmds);

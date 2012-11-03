@@ -113,13 +113,13 @@ bool mvceditor::LintBackgroundFileReaderClass::BeginDirectoryLint(std::vector<mv
 	return good;
 }
 
-bool mvceditor::LintBackgroundFileReaderClass::LintSingleFile(const wxString& fileName, const mvceditor::StructsClass& structs, 
+bool mvceditor::LintBackgroundFileReaderClass::LintSingleFile(const wxString& fileName, const mvceditor::GlobalsClass& globals, 
 															  const mvceditor::EnvironmentClass& environment, pelet::LintResultsClass& results) {
 
 	// ATTN: use a local instance of ParserClass so that this method is thread safe
 	// and can be run when a background thread is already running.
 	bool error = false;
-	if (structs.IsAPhpSourceFile(fileName)) {
+	if (globals.IsAPhpSourceFile(fileName)) {
 		ParserDirectoryWalkerClass walker;
 		walker.SetVersion(environment.Php.Version);
 		error = walker.Walk(fileName);
@@ -311,10 +311,10 @@ void mvceditor::LintPluginClass::OnLintMenu(wxCommandEvent& event) {
 		wxMessageBox(_("There is already another lint check that is active. Please wait for it to finish."), _("Lint Check"));
 		return;
 	}
-	if (App.Structs.HasSources()) {
+	if (App.Globals.HasSources()) {
 		mvceditor::BackgroundFileReaderClass::StartError error;
 		mvceditor::LintBackgroundFileReaderClass* thread = new mvceditor::LintBackgroundFileReaderClass(App.RunningThreads, ID_LINT_READER);
-		if (thread->BeginDirectoryLint(App.Structs.AllEnabledPhpSources(), *GetEnvironment(), error, RunningThreadId)) {
+		if (thread->BeginDirectoryLint(App.Globals.AllEnabledPhpSources(), *GetEnvironment(), error, RunningThreadId)) {
 			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 			gauge->AddGauge(_("Lint Check"), ID_LINT_RESULTS_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 			
@@ -398,7 +398,7 @@ void mvceditor::LintPluginClass::OnFileSaved(mvceditor::FileSavedEventClass& eve
 	if (hasErrors || CheckOnSave) {
 		pelet::LintResultsClass lintResults;
 		mvceditor::LintBackgroundFileReaderClass* thread = new mvceditor::LintBackgroundFileReaderClass(App.RunningThreads, ID_LINT_READER);
-		bool error = thread->LintSingleFile(fileName, App.Structs, *GetEnvironment(), lintResults);
+		bool error = thread->LintSingleFile(fileName, App.Globals, *GetEnvironment(), lintResults);
 		if (error) {
 			
 			// handle the case where user has saved a file but has not clicked

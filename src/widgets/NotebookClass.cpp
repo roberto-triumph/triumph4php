@@ -36,7 +36,7 @@ mvceditor::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id,
 	const wxPoint& pos, const wxSize& size, long style)
 	: wxAuiNotebook(parent, id, pos, size, style)
 	, CodeControlOptions(NULL)
-	, Structs(NULL)
+	, Globals(NULL)
 	, EventSink(NULL)
 	, ContextMenu(NULL)
 	, NewPageNumber(1) {
@@ -160,7 +160,7 @@ void mvceditor::NotebookClass::AddMvcEditorPage(mvceditor::CodeControlClass::Mod
 	}
 	
 	// make sure to use a unique ID, other source code depends on this
-	CodeControlClass* page = new CodeControlClass(this, *CodeControlOptions, Structs, wxNewId());
+	CodeControlClass* page = new CodeControlClass(this, *CodeControlOptions, Globals, wxNewId());
 	page->SetDocumentMode(mode);
 	AddPage(page, wxString::Format(format, NewPageNumber++), true, 
 		wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_TOOLBAR, 
@@ -211,7 +211,7 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename) {
 		if (error == mvceditor::FindInFilesClass::NONE) {
 
 			// make sure to use a unique ID, other source code depends on this
-			CodeControlClass* newCode = new CodeControlClass(this, *CodeControlOptions, Structs, wxNewId());
+			CodeControlClass* newCode = new CodeControlClass(this, *CodeControlOptions, Globals, wxNewId());
 			newCode->TrackFile(filename, fileContents);
 
 			// if user dragged in a file on an opened file we want still want to accept dragged files
@@ -394,15 +394,15 @@ std::vector<wxString> mvceditor::NotebookClass::GetOpenedFiles() const {
 }
 
 wxString mvceditor::NotebookClass::CreateWildcardString() const {
-	wxString phpLabel = Structs->PhpFileExtensionsString,
-		cssLabel = Structs->CssFileExtensionsString,
-		sqlLabel = Structs->SqlFileExtensionsString;
+	wxString phpLabel = Globals->PhpFileExtensionsString,
+		cssLabel = Globals->CssFileExtensionsString,
+		sqlLabel = Globals->SqlFileExtensionsString;
 	phpLabel.Replace(wxT(";"), wxT(" "));
 	cssLabel.Replace(wxT(";"), wxT(" "));
 	sqlLabel.Replace(wxT(";"), wxT(" "));
-	wxString php = Structs->PhpFileExtensionsString,
-		css = Structs->CssFileExtensionsString,
-		sql = Structs->SqlFileExtensionsString;
+	wxString php = Globals->PhpFileExtensionsString,
+		css = Globals->CssFileExtensionsString,
+		sql = Globals->SqlFileExtensionsString;
 
 	wxString fileFilter = 
 		wxString::Format(wxT("PHP Files (%s)|%s|"), phpLabel.c_str(), php.c_str()) +

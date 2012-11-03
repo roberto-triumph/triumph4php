@@ -148,7 +148,7 @@ static wxString NiceDocText(const UnicodeString& comment) {
 }
 
 mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,
-			mvceditor::StructsClass* structs,
+			mvceditor::GlobalsClass* globals,
 			int id, const wxPoint& position, const wxSize& size, long style,
 			const wxString& name)
 		: wxStyledTextCtrl(parent, id, position, size, style, name)
@@ -157,7 +157,7 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 		, WordHighlightFinder()
 		, WordHighlightWord()
 		, CurrentInfo()
-		, Structs(structs)
+		, Globals(globals)
 		, WordHighlightPreviousIndex(-1)
 		, WordHighlightNextIndex(-1)
 		, WordHighlightStyle(0)
@@ -426,7 +426,7 @@ void mvceditor::CodeControlClass::AutoDetectDocumentMode() {
 	wxString file = GetFileName();
 	
 	bool found = false;
-	std::vector<wxString> wildcards = Structs->GetPhpFileExtensions();
+	std::vector<wxString> wildcards = Globals->GetPhpFileExtensions();
 	for (size_t i = 0; i < wildcards.size(); ++i) {
 		if (wxMatchWild(wildcards[i], file)) {
 			found = true;
@@ -435,7 +435,7 @@ void mvceditor::CodeControlClass::AutoDetectDocumentMode() {
 		}
 	}
 	if (!found) {
-		wildcards = Structs->GetCssFileExtensions();
+		wildcards = Globals->GetCssFileExtensions();
 		for (size_t i = 0; i < wildcards.size(); ++i) {
 			if (wxMatchWild(wildcards[i], file)) {
 				found = true;
@@ -445,7 +445,7 @@ void mvceditor::CodeControlClass::AutoDetectDocumentMode() {
 		}	
 	}
 	if (!found) {
-		wildcards = Structs->GetSqlFileExtensions();
+		wildcards = Globals->GetSqlFileExtensions();
 		for (size_t i = 0; i < wildcards.size(); ++i) {
 			if (wxMatchWild(wildcards[i], file)) {
 				found = true;
@@ -483,13 +483,13 @@ void mvceditor::CodeControlClass::ApplyPreferences() {
 		Document = NULL;
 	}
 	if (mvceditor::CodeControlClass::SQL == DocumentMode) {
-		Document = new mvceditor::SqlDocumentClass(Structs, CurrentInfo);
+		Document = new mvceditor::SqlDocumentClass(Globals, CurrentInfo);
 		Document->SetControl(this);
 		SetCodeControlOptions(CodeControlOptions.SqlStyles);
 		SetSqlOptions();
 	}
 	else if (mvceditor::CodeControlClass::PHP == DocumentMode) {
-		Document = new mvceditor::PhpDocumentClass(Structs);
+		Document = new mvceditor::PhpDocumentClass(Globals);
 		Document->SetControl(this);
 		SetCodeControlOptions(CodeControlOptions.PhpStyles);
 		SetPhpOptions();

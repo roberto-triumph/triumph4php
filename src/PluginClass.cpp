@@ -54,11 +54,11 @@ mvceditor::NotebookClass* mvceditor::PluginClass::GetNotebook() const {
 }
 
 mvceditor::EnvironmentClass* mvceditor::PluginClass::GetEnvironment() {
-	return &App.Structs.Environment;
+	return &App.Globals.Environment;
 }
 
 mvceditor::ResourceCacheClass* mvceditor::PluginClass::GetResourceCache() {
-	return &App.Structs.ResourceCache;
+	return &App.Globals.ResourceCache;
 }
 
 void mvceditor::PluginClass::AddViewMenuItems(wxMenu* viewMenu) {

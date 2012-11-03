@@ -40,7 +40,7 @@ namespace mvceditor {
  * Class that groups together all of the Analysis source code; ie
  * the source code's resources, URLs, and templates.
  */
-class StructsClass {
+class GlobalsClass {
 
 public:
 
@@ -117,7 +117,7 @@ public:
 	 */
 	std::vector<mvceditor::FrameworkClass> Frameworks;
 
-	StructsClass();
+	GlobalsClass();
 
 	/**
 	 * @return vector of all directories of all source files in all enabled

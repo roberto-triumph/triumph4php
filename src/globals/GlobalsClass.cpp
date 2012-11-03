@@ -22,10 +22,10 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <globals/StructsClass.h>
+#include <globals/GlobalsClass.h>
 #include <wx/tokenzr.h>
 
-mvceditor::StructsClass::StructsClass()
+mvceditor::GlobalsClass::GlobalsClass()
 	: Environment()
 	, ResourceCache()
 	, UrlResourceFinder()
@@ -41,7 +41,7 @@ mvceditor::StructsClass::StructsClass()
 	, Frameworks() {
 }
 
-std::vector<mvceditor::SourceClass> mvceditor::StructsClass::AllEnabledSources() const {
+std::vector<mvceditor::SourceClass> mvceditor::GlobalsClass::AllEnabledSources() const {
 	std::vector<mvceditor::SourceClass> allSources;
 	std::vector<mvceditor::ProjectClass>::const_iterator it;
 	for (it = Projects.begin(); it != Projects.end(); ++it) {
@@ -54,7 +54,7 @@ std::vector<mvceditor::SourceClass> mvceditor::StructsClass::AllEnabledSources()
 	return allSources;
 }
 
-std::vector<mvceditor::SourceClass> mvceditor::StructsClass::AllEnabledPhpSources() const {
+std::vector<mvceditor::SourceClass> mvceditor::GlobalsClass::AllEnabledPhpSources() const {
 	std::vector<mvceditor::SourceClass> allSources;
 	std::vector<mvceditor::ProjectClass>::const_iterator it;
 	std::vector<mvceditor::SourceClass>::const_iterator src;
@@ -67,7 +67,7 @@ std::vector<mvceditor::SourceClass> mvceditor::StructsClass::AllEnabledPhpSource
 	return allSources;
 }
 
-bool mvceditor::StructsClass::HasSources() const {
+bool mvceditor::GlobalsClass::HasSources() const {
 	bool hasSources = false;
 	for (size_t i = 0; i < Projects.size() && !hasSources; ++i) {
 		mvceditor::ProjectClass project = Projects[i];
@@ -76,7 +76,7 @@ bool mvceditor::StructsClass::HasSources() const {
 	return hasSources;
 }
 
-std::vector<wxString> mvceditor::StructsClass::GetPhpFileExtensions() const {
+std::vector<wxString> mvceditor::GlobalsClass::GetPhpFileExtensions() const {
 	std::vector<wxString> wildcards;
 	wxStringTokenizer tokenizer(PhpFileExtensionsString, wxT(";"));
 	while (tokenizer.HasMoreTokens()) {
@@ -87,7 +87,7 @@ std::vector<wxString> mvceditor::StructsClass::GetPhpFileExtensions() const {
 }
 
 
-std::vector<wxString> mvceditor::StructsClass::GetCssFileExtensions() const {
+std::vector<wxString> mvceditor::GlobalsClass::GetCssFileExtensions() const {
 	std::vector<wxString> wildcards;
 	wxStringTokenizer tokenizer(CssFileExtensionsString, wxT(";"));
 	while (tokenizer.HasMoreTokens()) {
@@ -97,7 +97,7 @@ std::vector<wxString> mvceditor::StructsClass::GetCssFileExtensions() const {
 	return wildcards;
 }
 
-std::vector<wxString> mvceditor::StructsClass::GetSqlFileExtensions() const {
+std::vector<wxString> mvceditor::GlobalsClass::GetSqlFileExtensions() const {
 	std::vector<wxString> wildcards;
 	wxStringTokenizer tokenizer(SqlFileExtensionsString, wxT(";"));
 	while (tokenizer.HasMoreTokens()) {
@@ -107,7 +107,7 @@ std::vector<wxString> mvceditor::StructsClass::GetSqlFileExtensions() const {
 	return wildcards;
 }
 
-std::vector<wxString> mvceditor::StructsClass::GetMiscFileExtensions() const {
+std::vector<wxString> mvceditor::GlobalsClass::GetMiscFileExtensions() const {
 	std::vector<wxString> wildcards;
 	wxStringTokenizer tokenizer(MiscFileExtensionsString, wxT(";"));
 	while (tokenizer.HasMoreTokens()) {
@@ -117,7 +117,7 @@ std::vector<wxString> mvceditor::StructsClass::GetMiscFileExtensions() const {
 	return wildcards;
 }
 
-std::vector<wxString> mvceditor::StructsClass::GetNonPhpFileExtensions() const {
+std::vector<wxString> mvceditor::GlobalsClass::GetNonPhpFileExtensions() const {
 	std::vector<wxString> wildcards;
 	std::vector<wxString> css = GetCssFileExtensions();
 	std::vector<wxString> sql = GetSqlFileExtensions();
@@ -129,7 +129,7 @@ std::vector<wxString> mvceditor::StructsClass::GetNonPhpFileExtensions() const {
 	return wildcards;
 }
 
-bool mvceditor::StructsClass::IsAPhpSourceFile(const wxString& fullPath) const {
+bool mvceditor::GlobalsClass::IsAPhpSourceFile(const wxString& fullPath) const {
 	bool isPhp = false;
 	std::vector<mvceditor::ProjectClass>::const_iterator it;
 	for (it = Projects.begin(); it != Projects.end() && !isPhp; ++it) {
@@ -138,7 +138,7 @@ bool mvceditor::StructsClass::IsAPhpSourceFile(const wxString& fullPath) const {
 	return isPhp;
 }
 
-wxString mvceditor::StructsClass::RelativeFileName(const wxString &fullPath, wxString& projectLabel) const {
+wxString mvceditor::GlobalsClass::RelativeFileName(const wxString &fullPath, wxString& projectLabel) const {
 	wxString relativeName;
 	std::vector<mvceditor::ProjectClass>::const_iterator it;
 	for (it = Projects.begin(); it != Projects.end() && relativeName.IsEmpty(); ++it) {
@@ -150,7 +150,7 @@ wxString mvceditor::StructsClass::RelativeFileName(const wxString &fullPath, wxS
 	return relativeName;
 }
 
-void mvceditor::StructsClass::ClearDetectedInfos() {
+void mvceditor::GlobalsClass::ClearDetectedInfos() {
 	std::vector<mvceditor::DatabaseInfoClass>::iterator info = Infos.begin();
 	while(info != Infos.end()) {
 		if (info->IsDetected) {
@@ -162,7 +162,7 @@ void mvceditor::StructsClass::ClearDetectedInfos() {
 	}
 }
 
-void mvceditor::StructsClass::AssignFileExtensions(mvceditor::ProjectClass &project) const {
+void mvceditor::GlobalsClass::AssignFileExtensions(mvceditor::ProjectClass &project) const {
 	project.PhpFileExtensions = GetPhpFileExtensions();
 	project.CssFileExtensions = GetCssFileExtensions();
 	project.SqlFileExtensions = GetSqlFileExtensions();

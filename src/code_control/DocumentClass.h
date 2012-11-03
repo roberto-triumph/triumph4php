@@ -31,7 +31,7 @@
 #include <pelet/LanguageDiscoveryClass.h>
 #include <language/SymbolTableClass.h>
 #include <code_control/ResourceCacheBuilderClass.h>
-#include <globals/StructsClass.h>
+#include <globals/GlobalsClass.h>
 #include <wx/string.h>
 #include <wx/stc/stc.h>
 #include <unicode/unistr.h>
@@ -167,10 +167,10 @@ class PhpDocumentClass : public wxEvtHandler, public TextDocumentClass {
 public:
 
 	/**
-	 * @param structs This class will NOT own this pointer. Caller must manage (delete) it.
-	 *   structs helps with autocompletion
+	 * @param globals This class will NOT own this pointer. Caller must manage (delete) it.
+	 *   globals helps with autocompletion
 	 */
-	PhpDocumentClass(mvceditor::StructsClass* structs);
+	PhpDocumentClass(mvceditor::GlobalsClass* globals);
 
 	~PhpDocumentClass();
 
@@ -329,7 +329,7 @@ private:
 	 * To access any global structures: the resource cache, template variables
 	 * This class will NOT own this pointer
 	 */
-	StructsClass* Structs;
+	GlobalsClass* Globals;
 	
 	/**
 	 * The resource signature currently being displayed in the calltip.
@@ -353,11 +353,11 @@ class SqlDocumentClass : public TextDocumentClass {
 public:
 
 	/**
-	 * @param structs This class will NOT own this pointer. Caller must manage (delete) it.
-	 *   structs helps with autocompletion
+	 * @param globals This class will NOT own this pointer. Caller must manage (delete) it.
+	 *   globals helps with autocompletion
 	 * @param currentInfo the connection to fetch database metadata for (auto completion)
 	 */
-	SqlDocumentClass(StructsClass* structs, const DatabaseInfoClass& currentInfo);
+	SqlDocumentClass(GlobalsClass* globals, const DatabaseInfoClass& currentInfo);
 
 	/**
 	 * Will enable auto complete for SQL keywords and SQL table metadata
@@ -389,7 +389,7 @@ private:
 	/**
 	 * This class will NOT own this pointer
 	 */
-	StructsClass*  Structs;
+	GlobalsClass*  Globals;
 
 	/**
 	 * the connection to fetch database metadata for (auto completion)

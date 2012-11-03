@@ -107,7 +107,7 @@ void mvceditor::CallStackThreadClass::BackgroundWork() {
 
 mvceditor::ViewFilePluginClass::ViewFilePluginClass(mvceditor::AppClass& app) 
 	: PluginClass(app) 
-	, FrameworkDetector(*this, app.RunningThreads, app.Structs.Environment) 
+	, FrameworkDetector(*this, app.RunningThreads, app.Globals.Environment) 
 	, CallStackPersistFile() 
 	, LastError(mvceditor::CallStackClass::NONE)
 	, WriteError(false) {
@@ -120,7 +120,7 @@ void mvceditor::ViewFilePluginClass::AddViewMenuItems(wxMenu* viewMenu) {
 }
 
 void mvceditor::ViewFilePluginClass::OnViewInfosMenu(wxCommandEvent& event) {
-	if (!App.Structs.UrlResourceFinder.Urls.empty()) {
+	if (!App.Globals.UrlResourceFinder.Urls.empty()) {
 		ShowPanel();
 	}
 	else {
@@ -170,12 +170,12 @@ wxString mvceditor::ViewFilePluginClass::CurrentFile() {
 void mvceditor::ViewFilePluginClass::StartDetection() {	
 	
 	// start the chain reaction
-	wxString url = App.Structs.CurrentUrl.Url.BuildURI();
+	wxString url = App.Globals.CurrentUrl.Url.BuildURI();
 	if (!url.IsEmpty()) {
-		wxFileName fileName = App.Structs.CurrentUrl.FileName;
+		wxFileName fileName = App.Globals.CurrentUrl.FileName;
 		if (fileName.IsOk()) {
-			UnicodeString className = mvceditor::WxToIcu(App.Structs.CurrentUrl.ClassName);
-			UnicodeString methodName =  mvceditor::WxToIcu(App.Structs.CurrentUrl.MethodName);
+			UnicodeString className = mvceditor::WxToIcu(App.Globals.CurrentUrl.ClassName);
+			UnicodeString methodName =  mvceditor::WxToIcu(App.Globals.CurrentUrl.MethodName);
 			CallStackPersistFile.AssignTempFileName(mvceditor::TempDirAsset().GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) + wxT("call_stack"));
 			
 			// TODO: this isn't good, resource cache is not meant to be read/written to from multiple threads
@@ -189,15 +189,15 @@ void mvceditor::ViewFilePluginClass::StartDetection() {
 				delete thread;
 			}
 			else {
-				App.Structs.CurrentViewInfos.clear();
+				App.Globals.CurrentViewInfos.clear();
 			}				
 		}
 	}
 }
 
 void mvceditor::ViewFilePluginClass::OnCallStackComplete(mvceditor::CallStackCompleteEventClass& event) {
-	if (!App.Structs.Frameworks.empty()) {
-		if (!FrameworkDetector.InitViewInfosDetector(App.Structs.Frameworks, App.Structs.UrlResourceFinder.ChosenUrl.Url.BuildURI(), CallStackPersistFile)) {
+	if (!App.Globals.Frameworks.empty()) {
+		if (!FrameworkDetector.InitViewInfosDetector(App.Globals.Frameworks, App.Globals.UrlResourceFinder.ChosenUrl.Url.BuildURI(), CallStackPersistFile)) {
 			mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Could not start ViewInfos detector"));
 		}
 	}
@@ -207,7 +207,7 @@ void mvceditor::ViewFilePluginClass::OnCallStackComplete(mvceditor::CallStackCom
 	
 void mvceditor::ViewFilePluginClass::OnViewInfosDetectionComplete(mvceditor::ViewInfosDetectedEventClass& event) {
 	wxWindow* window = FindOutlineWindow(ID_VIEW_FILE_PANEL);
-	App.Structs.CurrentViewInfos = event.GetViewInfos();
+	App.Globals.CurrentViewInfos = event.GetViewInfos();
 	ViewFilePanelClass* viewPanel = NULL;
 	if (window) {
 		viewPanel = (ViewFilePanelClass*)window;
@@ -223,7 +223,7 @@ void mvceditor::ViewFilePluginClass::OnViewInfosDetectionFailed(wxCommandEvent& 
 }
 
 mvceditor::UrlResourceFinderClass& mvceditor::ViewFilePluginClass::Urls() {
-	return App.Structs.UrlResourceFinder;
+	return App.Globals.UrlResourceFinder;
 }
 
 void mvceditor::ViewFilePluginClass::OpenFile(wxString file) {
@@ -234,11 +234,11 @@ void mvceditor::ViewFilePluginClass::OpenFile(wxString file) {
 }
 
 void mvceditor::ViewFilePluginClass::SetCurrentUrl(mvceditor::UrlResourceClass url) {
-	App.Structs.CurrentUrl = url;
+	App.Globals.CurrentUrl = url;
 }
 
 std::vector<mvceditor::ViewInfoClass> mvceditor::ViewFilePluginClass::CurrentViewInfos() {
-	return App.Structs.CurrentViewInfos;
+	return App.Globals.CurrentViewInfos;
 }
 
 mvceditor::ViewFilePanelClass::ViewFilePanelClass(wxWindow* parent, int id, mvceditor::ViewFilePluginClass& plugin)
@@ -277,7 +277,7 @@ void mvceditor::ViewFilePanelClass::UpdateResults() {
 
 			// remove the project root so that the dialog is not too 'wordy'
 			wxString projectLabel;
-			wxString text = Plugin.App.Structs.RelativeFileName(viewFile, projectLabel);
+			wxString text = Plugin.App.Globals.RelativeFileName(viewFile, projectLabel);
 			if (!wxFileName::FileExists(viewFile)) {
 
 				// show that the view file is missing
@@ -301,7 +301,7 @@ void mvceditor::ViewFilePanelClass::UpdateResults() {
 			wxString projectLabel;
 			
 			// remove the project root so that the dialog is not too 'wordy'
-			text = Plugin.App.Structs.RelativeFileName(text, projectLabel);
+			text = Plugin.App.Globals.RelativeFileName(text, projectLabel);
 			wxTreeItemId sub = TemplateVariablesTree->AppendItem(parent, text);
 			for (size_t j = 0; j < viewInfo.TemplateVariables.size(); ++j) {
 				TemplateVariablesTree->AppendItem(sub, viewInfo.TemplateVariables[j]);

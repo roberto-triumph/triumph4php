@@ -70,7 +70,7 @@ mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass
 	// when the notebook is empty we want to accept dragged files
 	Notebook->SetDropTarget(new FileDropTargetClass(Notebook));
 	Notebook->CodeControlOptions = &Preferences.CodeControlOptions;
-	Notebook->Structs = &App.Structs;
+	Notebook->Globals = &App.Globals;
 	Notebook->EventSink = &App.EventSink;
 	
 	ToolsNotebook = new wxAuiNotebook(this, mvceditor::ID_TOOLS_NOTEBOOK, wxDefaultPosition, wxDefaultSize, 

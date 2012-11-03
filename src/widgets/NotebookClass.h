@@ -26,7 +26,7 @@
 #define MVCEDITORNOTEBOOKCLASS_H_
 
 #include <code_control/CodeControlClass.h>
-#include <globals/StructsClass.h>
+#include <globals/GlobalsClass.h>
 #include <globals/Events.h>
 #include <wx/wx.h>
 #include <wx/aui/aui.h>
@@ -55,7 +55,7 @@ public:
 	 * This object is required by the source code controls
 	 * This class will NOT own this pointer.
 	 */
-	StructsClass* Structs;
+	GlobalsClass* Globals;
 
 	/**
 	 * This object will be used to publish app events. When an editor tab is closed;

@@ -765,10 +765,10 @@ void mvceditor::SqlBrowserPluginClass::OnProjectsUpdated(wxCommandEvent& event) 
 
 
 	// remove any connections previously detected
-	std::vector<mvceditor::DatabaseInfoClass>::iterator it = App.Structs.Infos.begin();
-	while (it != App.Structs.Infos.end()) {
+	std::vector<mvceditor::DatabaseInfoClass>::iterator it = App.Globals.Infos.begin();
+	while (it != App.Globals.Infos.end()) {
 		if (it->IsDetected) {
-			it = App.Structs.Infos.erase(it);
+			it = App.Globals.Infos.erase(it);
 		}
 		else {
 			++it;
@@ -777,18 +777,18 @@ void mvceditor::SqlBrowserPluginClass::OnProjectsUpdated(wxCommandEvent& event) 
 	
 	// add the detected connections to the infos list
 	// this makes it easier; that way we always work with one list only
-	for (size_t i = 0; i < App.Structs.Frameworks.size(); ++i) {
-		App.Structs.Infos.insert(App.Structs.Infos.end(), App.Structs.Frameworks[i].Databases.begin(), App.Structs.Frameworks[i].Databases.end());
+	for (size_t i = 0; i < App.Globals.Frameworks.size(); ++i) {
+		App.Globals.Infos.insert(App.Globals.Infos.end(), App.Globals.Frameworks[i].Databases.begin(), App.Globals.Frameworks[i].Databases.end());
 	}
 	DetectMetadata();
 }
 
 void mvceditor::SqlBrowserPluginClass::DetectMetadata() {
 	ChosenIndex = 0;
-	if (!App.Structs.Infos.empty()) {
+	if (!App.Globals.Infos.empty()) {
 		mvceditor::SqlMetaDataFetchClass* thread = new mvceditor::SqlMetaDataFetchClass(App.RunningThreads, ID_SQL_METADATA_FETCH);
 		wxThreadIdType threadId;
-		if (thread->Read(App.Structs.Infos, threadId)) {
+		if (thread->Read(App.Globals.Infos, threadId)) {
 			GetStatusBarWithGauge()->AddGauge(_("Fetching SQL meta data"), ID_SQL_METADATA_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
 		}
 		else {
@@ -832,9 +832,9 @@ void  mvceditor::SqlBrowserPluginClass::OnSqlBrowserToolsMenu(wxCommandEvent& ev
 
 mvceditor::SqlBrowserPanelClass* mvceditor::SqlBrowserPluginClass::CreateResultsPanel(mvceditor::CodeControlClass* codeControl) {
 	mvceditor::SqlQueryClass query;
-	if (ChosenIndex < App.Structs.Infos.size()) {
-		query.Info.Copy(App.Structs.Infos[ChosenIndex]);
-		codeControl->SetCurrentInfo(App.Structs.Infos[ChosenIndex]);
+	if (ChosenIndex < App.Globals.Infos.size()) {
+		query.Info.Copy(App.Globals.Infos[ChosenIndex]);
+		codeControl->SetCurrentInfo(App.Globals.Infos[ChosenIndex]);
 	}
 	
 	mvceditor::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxNewId(), GetStatusBarWithGauge(), 
@@ -888,7 +888,7 @@ void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event
 	// first time a new project is created; its database may not exist).
 	// before, a user would not be able to edit the connection info once it was detected
 	// in order to make it less confusing about where the connection info comes from.
-	mvceditor::SqlConnectionDialogClass dialog(GetMainWindow(), App.Structs.Infos, ChosenIndex, App.RunningThreads);
+	mvceditor::SqlConnectionDialogClass dialog(GetMainWindow(), App.Globals.Infos, ChosenIndex, App.RunningThreads);
 	if (dialog.ShowModal() == wxOK) {
 		
 		// if chosen connection changed need to update the code control so that it knows to use the new
@@ -903,8 +903,8 @@ void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event
 			// methods
 			if (window->GetName() == wxT("mvceditor::SqlBrowserPanelClass")) {
 				mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)window;
-				if (ChosenIndex < App.Structs.Infos.size()) {
-					panel->SetCurrentInfo(App.Structs.Infos[ChosenIndex]);
+				if (ChosenIndex < App.Globals.Infos.size()) {
+					panel->SetCurrentInfo(App.Globals.Infos[ChosenIndex]);
 				}
 				panel->UpdateLabels(wxT(""));
 			}
@@ -914,7 +914,7 @@ void mvceditor::SqlBrowserPluginClass::OnSqlConnectionMenu(wxCommandEvent& event
 		// redetect the SQL meta data
 		mvceditor::SqlMetaDataFetchClass* thread = new mvceditor::SqlMetaDataFetchClass(App.RunningThreads, ID_SQL_METADATA_FETCH);
 		wxThreadIdType threadId;
-		if (!thread->Read(App.Structs.Infos, threadId)) {
+		if (!thread->Read(App.Globals.Infos, threadId)) {
 			delete thread;
 		}
 	}
@@ -1005,7 +1005,7 @@ void mvceditor::SqlBrowserPluginClass::OnWorkComplete(wxCommandEvent& event) {
 }
 
 void mvceditor::SqlBrowserPluginClass::OnSqlMetaDataComplete(mvceditor::SqlMetaDataEventClass& event) {
-	App.Structs.SqlResourceFinder.Copy(event.NewResources);
+	App.Globals.SqlResourceFinder.Copy(event.NewResources);
 	std::vector<UnicodeString> errors = event.Errors;
 	for (size_t i = 0; i < errors.size(); ++i) {
 		wxString wxError = mvceditor::IcuToWx(errors[i]);
@@ -1027,7 +1027,7 @@ void mvceditor::SqlBrowserPluginClass::AuiManagerUpdate() {
 }
 
 void mvceditor::SqlBrowserPluginClass::LoadPreferences(wxConfigBase* config) {
-	App.Structs.Infos.clear();
+	App.Globals.Infos.clear();
 	wxString groupName;
 	long index = 0;
 	if (config->GetFirstGroup(groupName, index)) {
@@ -1047,7 +1047,7 @@ void mvceditor::SqlBrowserPluginClass::LoadPreferences(wxConfigBase* config) {
 				
 				if (driverString.CmpNoCase(wxT("MYSQL")) == 0) {
 					info.Driver = mvceditor::DatabaseInfoClass::MYSQL;
-					App.Structs.Infos.push_back(info);
+					App.Globals.Infos.push_back(info);
 				}
 			}
 		} while (config->GetNextGroup(groupName, index));
@@ -1070,22 +1070,22 @@ void mvceditor::SqlBrowserPluginClass::SavePreferences() {
 
 	// now save all of the new ones
 	int saveIndex = 0;
-	for (size_t i = 0; i < App.Structs.Infos.size(); ++i) {
-		if (!App.Structs.Infos[i].IsDetected) {
+	for (size_t i = 0; i < App.Globals.Infos.size(); ++i) {
+		if (!App.Globals.Infos[i].IsDetected) {
 			config->SetPath(wxString::Format(wxT("/DatabaseInfo_%d"), saveIndex));
-			config->Write(wxT("DatabaseName"), mvceditor::IcuToWx(App.Structs.Infos[i].DatabaseName));
+			config->Write(wxT("DatabaseName"), mvceditor::IcuToWx(App.Globals.Infos[i].DatabaseName));
 			wxString driverString;
-			if (mvceditor::DatabaseInfoClass::MYSQL == App.Structs.Infos[i].Driver) {
+			if (mvceditor::DatabaseInfoClass::MYSQL == App.Globals.Infos[i].Driver) {
 				driverString = wxT("MYSQL");
 			}
 			config->Write(wxT("Driver"), driverString);
-			config->Write(wxT("FileName"), mvceditor::IcuToWx(App.Structs.Infos[i].FileName));
-			config->Write(wxT("Host"), mvceditor::IcuToWx(App.Structs.Infos[i].Host));
-			config->Write(wxT("Label"), mvceditor::IcuToWx(App.Structs.Infos[i].Label));
-			config->Write(wxT("Password"), mvceditor::IcuToWx(App.Structs.Infos[i].Password));
-			config->Write(wxT("Port"), App.Structs.Infos[i].Port);
-			config->Write(wxT("User"), mvceditor::IcuToWx(App.Structs.Infos[i].User));
-			config->Write(wxT("IsEnabled"), App.Structs.Infos[i].IsEnabled);
+			config->Write(wxT("FileName"), mvceditor::IcuToWx(App.Globals.Infos[i].FileName));
+			config->Write(wxT("Host"), mvceditor::IcuToWx(App.Globals.Infos[i].Host));
+			config->Write(wxT("Label"), mvceditor::IcuToWx(App.Globals.Infos[i].Label));
+			config->Write(wxT("Password"), mvceditor::IcuToWx(App.Globals.Infos[i].Password));
+			config->Write(wxT("Port"), App.Globals.Infos[i].Port);
+			config->Write(wxT("User"), mvceditor::IcuToWx(App.Globals.Infos[i].User));
+			config->Write(wxT("IsEnabled"), App.Globals.Infos[i].IsEnabled);
 			saveIndex++;
 		}
 	}

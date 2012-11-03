@@ -22,7 +22,7 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <globals/StructsClass.h>
+#include <globals/GlobalsClass.h>
 #include <plugins/EditorMessagesPluginClass.h>
 #include <PluginClass.h>
 #include <PreferencesClass.h>
@@ -74,7 +74,7 @@ public:
 	 * Important source code program structures, like resources (tags)
 	 * URLs, templates.
 	 */
-	mvceditor::StructsClass Structs;
+	mvceditor::GlobalsClass Globals;
 	
 	/**
 	 * To keep track of background threads

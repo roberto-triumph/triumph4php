@@ -469,9 +469,9 @@ void mvceditor::RunConsolePanelClass::AppendText(const wxString& text) {
 UnicodeString mvceditor::RunConsolePanelClass::FileNameRegularExpression() {
 	wxPlatformInfo info;
 	std::vector<wxString> allExtensions;
-	std::vector<wxString> phpExtensions = Plugin.App.Structs.GetPhpFileExtensions();
-	std::vector<wxString> cssExtensions = Plugin.App.Structs.GetCssFileExtensions();
-	std::vector<wxString> sqlExtensions = Plugin.App.Structs.GetSqlFileExtensions();
+	std::vector<wxString> phpExtensions = Plugin.App.Globals.GetPhpFileExtensions();
+	std::vector<wxString> cssExtensions = Plugin.App.Globals.GetCssFileExtensions();
+	std::vector<wxString> sqlExtensions = Plugin.App.Globals.GetSqlFileExtensions();
 	for (size_t i = 0; i < phpExtensions.size(); ++i) {
 		allExtensions.push_back(phpExtensions[i]);
 	}

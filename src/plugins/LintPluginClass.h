@@ -179,12 +179,12 @@ public:
 	 *
 	 * Lint errors will be propagated as events.
 	 * @param wxString fileName the full path of the file to lint
-	 * @param structs needed to perform exclude wildcard checks
+	 * @param globals needed to perform exclude wildcard checks
 	 * @param environment to know which PHP version to check against
 	 * @param results the lint error, will only be filled when there is a lint error
 	 * @return TRUE if the file contains a lint error.
 	 */
-	bool LintSingleFile(const wxString& fileName, const mvceditor::StructsClass& structs, const EnvironmentClass& environment,
+	bool LintSingleFile(const wxString& fileName, const mvceditor::GlobalsClass& globals, const EnvironmentClass& environment,
 		pelet::LintResultsClass& results);
 
 	/**

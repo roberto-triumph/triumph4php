@@ -120,7 +120,7 @@ private:
 	void OnProjectDefine(wxCommandEvent& event);
 
 	/**
-	 * Opens the projects that are setup in App.Structs. It will be the ones that were opened on the last
+	 * Opens the projects that are setup in App.Globals. It will be the ones that were opened on the last
 	 * run of the program, or ones that were updated by the user..
 	 */
 	void OnAppReady(wxCommandEvent& event);

@@ -236,7 +236,7 @@ void mvceditor::OutlineViewPluginClass::OnOutlineMenu(wxCommandEvent& event) {
 				// that this can take a while, do it in the background
 				mvceditor::GlobalClassesThreadClass* thread = new mvceditor::GlobalClassesThreadClass(App.RunningThreads, ID_GLOBAL_CLASSES_THREAD);
 				wxThreadIdType threadId;
-				if (!thread->Init(App.Structs.Projects) || wxTHREAD_NO_ERROR != thread->CreateSingleInstance(threadId)) {
+				if (!thread->Init(App.Globals.Projects) || wxTHREAD_NO_ERROR != thread->CreateSingleInstance(threadId)) {
 					delete thread;
 				}
 			}
