@@ -24,8 +24,8 @@
  */
 #include <code_control/DocumentClass.h>
 #include <code_control/CodeControlClass.h>
-#include <MvcEditorString.h>
-#include <MvcEditorAssets.h>
+#include <globals/String.h>
+#include <globals/Assets.h>
 #include <wx/tokenzr.h>
 #include <wx/filename.h>
 #include <algorithm>

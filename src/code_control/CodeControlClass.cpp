@@ -23,11 +23,11 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <code_control/CodeControlClass.h>
-#include <MvcEditorString.h>
+#include <globals/String.h>
 #include <code_control/DocumentClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
 
-#include <MvcEditorErrors.h>
+#include <globals/Errors.h>
 #include <wx/filename.h>
 #include <wx/stc/stc.h>
 #include <wx/utils.h>

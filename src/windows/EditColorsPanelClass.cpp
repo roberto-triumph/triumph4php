@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <windows/EditColorsPanelClass.h>
+#include <code_control/CodeControlStyles.h>
 #include <wx/stc/stc.h>
 
 mvceditor::EditColorsPanelClass::EditColorsPanelClass(wxWindow* parent, mvceditor::CodeControlOptionsClass& options)
@@ -142,11 +143,11 @@ void mvceditor::EditColorsPanelClass::OnThemeChoice(wxCommandEvent& event) {
 	listBoxEvent.SetInt(sel);
 	switch (choice) {
 		case 0:
-			CodeControlOptions.SetToLightTheme();
+			mvceditor::CodeControlStylesSetToLightTheme(CodeControlOptions);
 			wxPostEvent(this, listBoxEvent);
 			break;
 		case 1:
-			CodeControlOptions.SetToDarkTheme();
+			mvceditor::CodeControlStylesSetToDarkTheme(CodeControlOptions);
 			wxPostEvent(this, listBoxEvent);
 			break;
 	}

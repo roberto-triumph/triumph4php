@@ -22,7 +22,7 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <environment/ApacheClass.h>
+#include <globals/ApacheClass.h>
 #include <wx/dir.h>
 #include <wx/filename.h>
 #include <wx/textfile.h>

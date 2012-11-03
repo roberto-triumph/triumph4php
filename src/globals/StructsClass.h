@@ -26,10 +26,10 @@
 #ifndef __MVCEDITOR_STRUCTSCLASS_H__
 #define __MVCEDITOR_STRUCTSCLASS_H__
 
-#include <environment/EnvironmentClass.h>
-#include <environment/UrlResourceClass.h>
-#include <environment/ProjectClass.h>
-#include <environment/SqlResourceFinderClass.h>
+#include <globals/EnvironmentClass.h>
+#include <globals/UrlResourceClass.h>
+#include <globals/ProjectClass.h>
+#include <globals/SqlResourceFinderClass.h>
 #include <language/ResourceCacheClass.h>
 #include <php_frameworks/FrameworkDetectorClass.h>
 #include <vector>

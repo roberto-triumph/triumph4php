@@ -26,7 +26,7 @@
 #include <MvcEditorChecks.h>
 #include <FileTestFixtureClass.h>
 #include <php_frameworks/CallStackClass.h>
-#include <MvcEditorString.h>
+#include <globals/String.h>
 
 class CallStackFixtureTestClass : public FileTestFixtureClass {
 	

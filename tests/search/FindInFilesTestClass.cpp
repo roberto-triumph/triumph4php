@@ -25,7 +25,7 @@
 #include <UnitTest++.h>
 #include <FileTestFixtureClass.h>
 #include <search/FindInFilesClass.h>
-#include <MvcEditorString.h>
+#include <globals/String.h>
 
 wxString FILE_1 = wxString::FromAscii(
 	"<?php\n"

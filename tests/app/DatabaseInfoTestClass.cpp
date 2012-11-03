@@ -24,8 +24,8 @@
  */
 #include <UnitTest++.h>
 #include <DatabaseTestFixtureClass.h>
-#include <environment/DatabaseInfoClass.h>
-#include <MvcEditorString.h>
+#include <globals/DatabaseInfoClass.h>
+#include <globals/String.h>
 #include <MvcEditorChecks.h>
 #include <soci.h>
 

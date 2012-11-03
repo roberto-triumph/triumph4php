@@ -26,8 +26,8 @@
 #define MVCEDITORNOTEBOOKCLASS_H_
 
 #include <code_control/CodeControlClass.h>
-#include <environment/StructsClass.h>
-#include <Events.h>
+#include <globals/StructsClass.h>
+#include <globals/Events.h>
 #include <wx/wx.h>
 #include <wx/aui/aui.h>
 #include <wx/dnd.h>

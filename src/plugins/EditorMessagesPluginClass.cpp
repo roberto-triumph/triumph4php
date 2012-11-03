@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <plugins/EditorMessagesPluginClass.h>
-#include <MvcEditorErrors.h>
+#include <globals/Errors.h>
 
 static const int ID_DEBUG_WINDOW = wxNewId();
 

@@ -25,8 +25,8 @@
 #ifndef MVCEDITORCODECONTROLCLASS_H_
 #define MVCEDITORCODECONTROLCLASS_H_
 
-#include <code_control/CodeControlOptionsClass.h>
-#include <environment/StructsClass.h>
+#include <globals/CodeControlOptionsClass.h>
+#include <globals/StructsClass.h>
 #include <wx/stc/stc.h>
 #include <wx/timer.h>
 #include <unicode/unistr.h>

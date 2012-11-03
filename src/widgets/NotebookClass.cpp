@@ -23,9 +23,9 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <widgets/NotebookClass.h>
-#include <MvcEditorString.h>
+#include <globals/String.h>
 #include <MvcEditor.h>
-#include <MvcEditorErrors.h>
+#include <globals/Errors.h>
 #include <wx/artprov.h>
 #include <wx/filename.h>
 #include <wx/file.h>

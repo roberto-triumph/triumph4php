@@ -23,9 +23,9 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <php_frameworks/FrameworkDetectorClass.h>
-#include <MvcEditorAssets.h>
-#include <MvcEditorString.h>
-#include <MvcEditorErrors.h>
+#include <globals/Assets.h>
+#include <globals/String.h>
+#include <globals/Errors.h>
 #include <wx/config.h>
 #include <wx/fileconf.h>
 #include <wx/tokenzr.h>

@@ -28,7 +28,7 @@
 #include <search/DirectorySearchClass.h>
 #include <search/FindInFilesClass.h>
 #include <pelet/ParserClass.h>
-#include <MvcEditorString.h>
+#include <globals/String.h>
 #include <wx/datetime.h>
 #include <wx/string.h>
 #include <wx/filename.h>

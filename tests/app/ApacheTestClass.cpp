@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <UnitTest++.h>
-#include <environment/ApacheClass.h>
+#include <globals/ApacheClass.h>
 #include <FileTestFixtureClass.h>
 #include <wx/filename.h>
 #include <wx/platinfo.h>

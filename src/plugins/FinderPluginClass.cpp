@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <plugins/FinderPluginClass.h>
-#include <MvcEditorString.h>
+#include <globals/String.h>
 #include <widgets/UnicodeStringValidatorClass.h>
 #include <widgets/RegularExpressionValidatorClass.h>
 #include <wx/artprov.h>

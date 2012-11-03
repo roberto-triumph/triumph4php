@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <php_frameworks/CallStackClass.h>
-#include <MvcEditorString.h>
+#include <globals/String.h>
 #include <algorithm>
 
 

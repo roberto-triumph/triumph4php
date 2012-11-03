@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <widgets/UnicodeStringValidatorClass.h>
-#include <MvcEditorString.h>
+#include <globals/String.h>
 #include <wx/textctrl.h>
 #include <wx/combobox.h>
 

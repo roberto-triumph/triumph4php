@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <UnitTest++.h>
-#include <environment/UrlResourceClass.h>
+#include <globals/UrlResourceClass.h>
 #include <MvcEditorChecks.h>
 
 class UrlResourceFixtureClass {

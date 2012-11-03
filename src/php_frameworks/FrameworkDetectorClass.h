@@ -28,9 +28,9 @@
 #include <search/ResourceFinderClass.h>
 #include <widgets/ProcessWithHeartbeatClass.h>
 #include <widgets/ThreadWithHeartbeatClass.h>
-#include <environment/DatabaseInfoClass.h>
-#include <environment/EnvironmentClass.h>
-#include <environment/UrlResourceClass.h>
+#include <globals/DatabaseInfoClass.h>
+#include <globals/EnvironmentClass.h>
+#include <globals/UrlResourceClass.h>
 #include <wx/string.h>
 #include <wx/event.h>
 #include <map>

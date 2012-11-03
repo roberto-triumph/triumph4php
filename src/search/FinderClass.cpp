@@ -25,7 +25,7 @@
 #include <search/FinderClass.h>
 #include <unicode/uchar.h>
 #include <unicode/ustdio.h>
-#include <MvcEditorString.h>
+#include <globals/String.h>
 #include <assert.h>
 
 mvceditor::FinderClass::FinderClass(UnicodeString expression, mvceditor::FinderClass::Modes mode)

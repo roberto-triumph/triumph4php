@@ -24,7 +24,7 @@
  */
 #include <plugins/TestPluginClass.h>
 #include <search/FindInFilesClass.h>
-#include <MvcEditorString.h>
+#include <globals/String.h>
 #include <wx/artprov.h>
 
 int ID_GO_BUTTON = wxNewId();

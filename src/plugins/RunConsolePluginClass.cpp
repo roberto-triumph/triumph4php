@@ -23,8 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <plugins/RunConsolePluginClass.h>
-#include <MvcEditorString.h>
-#include <MvcEditorErrors.h>
+#include <globals/String.h>
+#include <globals/Errors.h>
 #include <MvcEditor.h>
 #include <wx/artprov.h>
 #include <wx/filename.h>

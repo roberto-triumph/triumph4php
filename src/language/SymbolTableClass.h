@@ -28,7 +28,7 @@
 #include <pelet/ParserClass.h>
 #include <pelet/ParserTypeClass.h>
 #include <search/ResourceFinderClass.h>
-#include <MvcEditorString.h>
+#include <globals/String.h>
 #include <unicode/unistr.h>
 #include <map>
 #include <vector>

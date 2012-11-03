@@ -28,7 +28,7 @@
 #include <PluginClass.h>
 #include <plugins/wxformbuilder/RunBrowserPluginGeneratedClass.h>
 #include <php_frameworks/FrameworkDetectorClass.h>
-#include <environment/UrlResourceClass.h>
+#include <globals/UrlResourceClass.h>
 #include <wx/string.h>
 #include <vector>
 #include <memory>

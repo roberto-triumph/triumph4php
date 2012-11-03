@@ -25,7 +25,7 @@
  #ifndef _SQLRESOURCEFINDERCLASS_H__
  #define _SQLRESOURCEFINDERCLASS_H__
  
- #include <environment/DatabaseInfoClass.h>
+ #include <globals/DatabaseInfoClass.h>
  #include <unicode/unistr.h>
  #include <vector>
  #include <map>

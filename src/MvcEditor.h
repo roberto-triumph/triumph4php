@@ -22,11 +22,11 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <environment/StructsClass.h>
+#include <globals/StructsClass.h>
 #include <plugins/EditorMessagesPluginClass.h>
 #include <PluginClass.h>
 #include <PreferencesClass.h>
-#include <Events.h>
+#include <globals/Events.h>
 #include <wx/app.h>
 #include <wx/event.h>
 #include <wx/string.h>

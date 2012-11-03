@@ -238,7 +238,7 @@ solution "mvc-editor"
 		files {
 			"tests/**.cpp",
 			"tests/**.h",
-			"src/environment/*.cpp",
+			"src/globals/*.cpp",
 			"src/language/SqlLexicalAnalyzerClass.cpp",
 			"src/language/SymbolTableClass.cpp",
 			"src/language/ResourceCacheClass.cpp",
@@ -249,10 +249,7 @@ solution "mvc-editor"
 			"src/search/FindInFilesClass.cpp",
 			"src/search/ResourceFinderClass.cpp",
 			"src/widgets/ThreadWithHeartbeatClass.cpp",
-			"src/widgets/ProcessWithHeartbeatClass.cpp",
-			"src/MvcEditorErrors.cpp",
-			"src/MvcEditorAssets.cpp",
-			"src/MvcEditorString.cpp"
+			"src/widgets/ProcessWithHeartbeatClass.cpp"
 		}
 
 		-- these will be used by the SqlResourceFinder tests
@@ -271,8 +268,16 @@ solution "mvc-editor"
 				string.format("MVCEDITOR_DB_PASSWORD=%s", MVCEDITOR_DB_PASSWORD)
 			}
 		end;
-		includedirs { "src/", "lib/UnitTest++/src/", "tests/", "lib/pelet/include" }
-		links { "unit_test++", "pelet" }
+		includedirs { 
+			"lib/UnitTest++/src/", 
+			"lib/pelet/include",
+			"src/", 
+			"tests/", 
+		}
+		links { 
+			"unit_test++", 
+			"pelet"
+		}
 
 		sociconfiguration()
 		configuration "Debug"
@@ -289,14 +294,14 @@ solution "mvc-editor"
 		kind "ConsoleApp"
 		files {
 			"profilers/resource_finder_profiler.cpp",
-			"src/MvcEditorErrors.cpp",
-			"src/MvcEditorAssets.cpp",
+			"src/globals/Errors.cpp",
+			"src/globals/Assets.cpp",
 			"src/language/*.cpp",
 			"src/search/ResourceFinderClass.cpp",
 			"src/search/DirectorySearchClass.cpp",
 			"src/search/FinderClass.cpp",
 			"src/search/FindInFilesClass.cpp",
-			"src/MvcEditorString.cpp"
+			"src/globals/String.cpp"
 		}
 		includedirs { "src", "lib/pelet/include" }
 		links { "pelet" }
@@ -317,18 +322,15 @@ solution "mvc-editor"
 		kind "ConsoleApp"
 		files {
 			"profilers/call_stack_profiler.cpp",
-			"src/MvcEditorErrors.cpp",
-			"src/MvcEditorAssets.cpp",
 			"src/language/*.cpp",
 			"src/php_frameworks/*.cpp",
-			"src/environment/*.cpp",
+			"src/globals/*.cpp",
 			"src/search/ResourceFinderClass.cpp",
 			"src/search/DirectorySearchClass.cpp",
 			"src/search/FinderClass.cpp",
 			"src/search/FindInFilesClass.cpp",
 			"src/widgets/ThreadWithHeartbeatClass.cpp",
-			"src/widgets/ProcessWithHeartbeatClass.cpp",
-			"src/MvcEditorString.cpp"
+			"src/widgets/ProcessWithHeartbeatClass.cpp"
 		}
 		includedirs { "src", "lib/pelet/include" }
 		links { "pelet" }
@@ -352,8 +354,8 @@ solution "mvc-editor"
 			"src/search/FindInFilesClass.cpp",
 			"src/search/DirectorySearchClass.cpp",
 			"src/search/FinderClass.cpp",
-			"src/MvcEditorErrors.cpp",
-			"src/MvcEditorString.cpp"
+			"src/globals/Errors.cpp",
+			"src/globals/String.cpp"
 		}
 		includedirs { "src/" }
 		configuration "Debug"
@@ -374,17 +376,13 @@ solution "mvc-editor"
 			"src/widgets/ThreadWithHeartbeatClass.cpp",
 			"src/widgets/ProcessWithHeartbeatClass.cpp",
 			"src/widgets/StatusBarWithGaugeClass.cpp",
-			"src/environment/DatabaseInfoClass.cpp",
-			"src/environment/*.cpp",
+			"src/globals/*.cpp",
 			"src/php_frameworks/*.cpp",
 			"src/language/*.cpp",
 			"src/search/FinderClass.cpp",
 			"src/search/FindInFilesClass.cpp",
 			"src/search/ResourceFinderClass.cpp",
-			"src/search/DirectorySearchClass.cpp",
-			"src/MvcEditorErrors.cpp",
-			"src/MvcEditorAssets.cpp",
-			"src/MvcEditorString.cpp"
+			"src/search/DirectorySearchClass.cpp"
 		}
 		includedirs { "src/", "lib/pelet/include" }
 		links { "pelet" }

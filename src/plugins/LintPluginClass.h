@@ -28,7 +28,7 @@
 
 #include <vector>
 #include <PluginClass.h>
-#include <Events.h>
+#include <globals/Events.h>
 #include <search/DirectorySearchClass.h>
 #include <plugins/BackgroundFileReaderClass.h>
 #include <plugins/wxformbuilder/LintPluginGeneratedClass.h>

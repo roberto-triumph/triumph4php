@@ -24,8 +24,8 @@
  */
 #include <UnitTest++.h>
 #include <DatabaseTestFixtureClass.h>
-#include <environment/SqlResourceFinderClass.h>
-#include <MvcEditorString.h>
+#include <globals/SqlResourceFinderClass.h>
+#include <globals/String.h>
 #include <MvcEditorChecks.h>
 #include <unicode/ustdio.h>
 #include <wx/platinfo.h>

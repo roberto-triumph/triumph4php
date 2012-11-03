@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <language/SymbolTableClass.h>
-#include <MvcEditorString.h>
+#include <globals/String.h>
 #include <pelet/TokenClass.h>
 #include <algorithm>
 

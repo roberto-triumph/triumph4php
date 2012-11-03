@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <language/ResourceCacheClass.h>
-#include <MvcEditorAssets.h>
+#include <globals/Assets.h>
 #include <algorithm>
 
 mvceditor::GlobalCacheClass::GlobalCacheClass()

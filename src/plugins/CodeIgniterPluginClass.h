@@ -26,7 +26,7 @@
 #define CODEIGNITER_PLUGIN_CLASS_H
 
 #include <PluginClass.h>
-#include <environment/ProjectClass.h>
+#include <globals/ProjectClass.h>
 #include <php_frameworks/FrameworkDetectorClass.h>
 
 namespace mvceditor {

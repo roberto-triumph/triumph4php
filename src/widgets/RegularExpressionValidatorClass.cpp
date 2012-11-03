@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <widgets/RegularExpressionValidatorClass.h>
-#include <MvcEditorString.h>
+#include <globals/String.h>
 #include <search/FinderClass.h>
 #include <unicode/unistr.h>
 #include <unicode/regex.h>

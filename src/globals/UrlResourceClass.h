@@ -25,7 +25,7 @@
 #ifndef __MVCEDITORURLRESOURCECLASS_H__
 #define __MVCEDITORURLRESOURCECLASS_H__
 
-#include <environment/EnvironmentClass.h>
+#include <globals/EnvironmentClass.h>
 #include <wx/url.h>
 #include <vector>
 

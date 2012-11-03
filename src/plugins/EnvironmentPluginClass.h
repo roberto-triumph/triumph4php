@@ -27,7 +27,7 @@
 
 #include <PluginClass.h>
 #include <plugins/BackgroundFileReaderClass.h>
-#include <environment/EnvironmentClass.h>
+#include <globals/EnvironmentClass.h>
 #include <plugins/wxformbuilder/EnvironmentGeneratedDialogClass.h>
 
 namespace mvceditor {

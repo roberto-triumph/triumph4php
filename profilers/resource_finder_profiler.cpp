@@ -29,7 +29,7 @@
 #include <language/ResourceCacheClass.h>
 #include <search/DirectorySearchClass.h>
 #include <search/ResourceFinderClass.h>
-#include <MvcEditorAssets.h>
+#include <globals/Assets.h>
 #include <wx/filefn.h>
 #include <wx/timer.h>
 #include <wx/utils.h>

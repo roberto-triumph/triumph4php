@@ -28,8 +28,8 @@
 
 #include <PluginClass.h>
 #include <plugins/wxformbuilder/SqlBrowserPluginGeneratedClass.h>
-#include <environment/ProjectClass.h>
-#include <environment/DatabaseInfoClass.h>
+#include <globals/ProjectClass.h>
+#include <globals/DatabaseInfoClass.h>
 #include <widgets/ThreadWithHeartbeatClass.h>
 #include <language/SqlLexicalAnalyzerClass.h>
 #include <wx/thread.h>

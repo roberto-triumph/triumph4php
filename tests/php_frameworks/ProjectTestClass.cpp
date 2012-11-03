@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <UnitTest++.h>
-#include <environment/ProjectClass.h>
+#include <globals/ProjectClass.h>
 #include <php_frameworks/FrameworkDetectorClass.h>
 #include <FileTestFixtureClass.h>
 #include <wx/event.h>

@@ -26,11 +26,12 @@
 #include <wx/dnd.h>
 #include <wx/filename.h>
 #include <unicode/uclean.h>
-#include <code_control/CodeControlOptionsClass.h>
+#include <globals/CodeControlOptionsClass.h>
+#include <globals/Assets.h>
+#include <globals/StructsClass.h>
+#include <code_control/CodeControlStyles.h>
 #include <code_control/CodeControlClass.h>
-#include <environment/StructsClass.h>
 #include <search/FindInFilesClass.h>
-#include <MvcEditorAssets.h>
 
 /**
  * This profiler can be used to test the speediness of the code editing control.
@@ -148,6 +149,8 @@ CodeControlProfilerAppClass::CodeControlProfilerAppClass()
 }
 
 bool CodeControlProfilerAppClass::OnInit() {
+	mvceditor::CodeControlStylesInit(Options);
+	mvceditor::CodeControlStylesSetToLightTheme(Options);
 	Options.EnableAutomaticLineIndentation = true;
 	Options.EnableAutoCompletion = true;
 	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass;

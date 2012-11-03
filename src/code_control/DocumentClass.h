@@ -25,13 +25,13 @@
 #ifndef __MVCEDITOR_DOCUMENTCLASS_H__
 #define __MVCEDITOR_DOCUMENTCLASS_H__
 
-#include <environment/ProjectClass.h>
+#include <globals/ProjectClass.h>
 #include <pelet/LexicalAnalyzerClass.h>
 #include <pelet/ParserClass.h>
 #include <pelet/LanguageDiscoveryClass.h>
 #include <language/SymbolTableClass.h>
 #include <code_control/ResourceCacheBuilderClass.h>
-#include <environment/StructsClass.h>
+#include <globals/StructsClass.h>
 #include <wx/string.h>
 #include <wx/stc/stc.h>
 #include <unicode/unistr.h>

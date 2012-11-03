@@ -24,7 +24,7 @@
  */
 #include <plugins/OutlineViewPluginClass.h>
 #include <language/SymbolTableClass.h>
-#include <MvcEditorString.h>
+#include <globals/String.h>
 #include <MvcEditor.h>
 #include <unicode/regex.h>
 #include <wx/artprov.h>

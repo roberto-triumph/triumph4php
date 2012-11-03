@@ -25,7 +25,7 @@
 #ifndef __environmentclass__
 #define __environmentclass__
 
-#include <environment/ApacheClass.h>
+#include <globals/ApacheClass.h>
 #include <pelet/TokenClass.h>
 #include <vector>
 #include <wx/config.h>

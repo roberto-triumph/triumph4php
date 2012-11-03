@@ -41,8 +41,8 @@
 #include <plugins/CodeIgniterPluginClass.h>
 #include <plugins/ViewFilePluginClass.h>
 #include <plugins/RecentFilesPluginClass.h>
-#include <MvcEditorErrors.h>
-#include <MvcEditorAssets.h>
+#include <globals/Errors.h>
+#include <globals/Assets.h>
 
 IMPLEMENT_APP(mvceditor::AppClass)
 

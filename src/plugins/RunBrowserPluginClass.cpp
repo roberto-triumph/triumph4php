@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <plugins/RunBrowserPluginClass.h>
-#include <MvcEditorErrors.h>
+#include <globals/Errors.h>
 #include <MvcEditor.h>
 #include <wx/artprov.h>
 #include <wx/valgen.h>

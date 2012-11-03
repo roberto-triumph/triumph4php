@@ -24,8 +24,8 @@
  */
 #include <search/ResourceFinderClass.h>
 #include <search/FinderClass.h>
-#include <MvcEditorString.h>
-#include <MvcEditorAssets.h>
+#include <globals/String.h>
+#include <globals/Assets.h>
 #include <wx/filename.h>
 #include <algorithm>
 #include <fstream>

@@ -22,11 +22,11 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <environment/DatabaseInfoClass.h>
+#include <globals/DatabaseInfoClass.h>
 #include <soci/mysql/soci-mysql.h>
 #include <soci/soci.h>
 #include <wx/datetime.h>
-#include <MvcEditorString.h>
+#include <globals/String.h>
 #include <unicode/ustdio.h>
 #include <string>
  

@@ -26,7 +26,7 @@
 #include <language/ResourceCacheClass.h>
 #include <php_frameworks/CallStackClass.h>
 #include <php_frameworks/FrameworkDetectorClass.h>
-#include <MvcEditorAssets.h>
+#include <globals/Assets.h>
 #include <wx/app.h>
 #include <wx/stdpaths.h>
 

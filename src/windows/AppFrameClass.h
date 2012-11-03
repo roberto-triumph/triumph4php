@@ -25,12 +25,12 @@
 #ifndef MVCEDITORAPPFRAMECLASS_H_
 #define MVCEDITORAPPFRAMECLASS_H_
 
-#include <environment/ProjectClass.h>
+#include <globals/ProjectClass.h>
 #include <windows/wxformbuilder/AppFrameGeneratedClass.h>
 #include <widgets/NotebookClass.h>
 #include <PluginClass.h>
 #include <PreferencesClass.h>
-#include <Events.h>
+#include <globals/Events.h>
 #include <wx/aui/aui.h>
 
 namespace mvceditor {

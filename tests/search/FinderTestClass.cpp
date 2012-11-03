@@ -24,7 +24,7 @@
  */
 #include <UnitTest++.h>
 #include <search/FinderClass.h>
-#include <MvcEditorString.h>
+#include <globals/String.h>
 #include <unicode/unistr.h>
 #include <unicode/ustream.h> //get the << overloaded operator, needed by UnitTest++
 

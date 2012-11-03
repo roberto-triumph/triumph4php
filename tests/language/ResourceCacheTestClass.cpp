@@ -24,7 +24,7 @@
  */
 #include <UnitTest++.h>
 #include <language/ResourceCacheClass.h>
-#include <MvcEditorString.h>
+#include <globals/String.h>
 #include <FileTestFixtureClass.h>
 #include <unicode/ustream.h> //get the << overloaded operator, needed by UnitTest++
 #include <MvcEditorChecks.h>

@@ -23,10 +23,10 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <plugins/CodeIgniterPluginClass.h>
-#include <MvcEditorErrors.h>
+#include <globals/Errors.h>
 #include <MvcEditor.h>
-#include <Events.h>
-#include <MvcEditorString.h>
+#include <globals/Events.h>
+#include <globals/String.h>
 #include <wx/choicdlg.h>
 
 mvceditor::CodeIgniterPluginClass::CodeIgniterPluginClass(mvceditor::AppClass& app)  

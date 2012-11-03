@@ -22,9 +22,9 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <environment/ProjectClass.h>
+#include <globals/ProjectClass.h>
 #include <wx/tokenzr.h>
-#include <MvcEditorAssets.h>
+#include <globals/Assets.h>
 #include <vector>
 
 mvceditor::ProjectClass::ProjectClass()

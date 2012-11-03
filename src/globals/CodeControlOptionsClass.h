@@ -218,11 +218,6 @@ public:
 	bool EnableCallTipsOnMouseHover;
 
 	CodeControlOptionsClass();
-
-	/**
-	 * Initializes the color schemes. 
-	 */
-	void Init();
 	
 	/**
 	 * Prepares the edited preferences by copying them FROM the real settings. From this point on, all calls to 
@@ -237,16 +232,6 @@ public:
 	 * only affects style preferences and not the public properties.
 	 */
 	void CommitChanges();
-	
-	/**
-	 * Set the color scheme to the default (dark on light) scheme
-	 */
-	void SetToLightTheme();
-
-	/**
-	 * Set the color scheme to the light on dark scheme
-	 */
-	void SetToDarkTheme();
 	
 	/**
 	 * Load state from persistent storage

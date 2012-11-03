@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <environment/SqlResourceFinderClass.h>
-#include <MvcEditorString.h>
+#include <globals/SqlResourceFinderClass.h>
+#include <globals/String.h>
 #include <soci.h>
 #include <algorithm>
 

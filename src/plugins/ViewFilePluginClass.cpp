@@ -23,11 +23,11 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <plugins/ViewFilePluginClass.h>
-#include <environment/UrlResourceClass.h>
+#include <globals/UrlResourceClass.h>
 #include <MvcEditor.h>
-#include <MvcEditorAssets.h>
-#include <MvcEditorErrors.h>
-#include <MvcEditorString.h>
+#include <globals/Assets.h>
+#include <globals/Errors.h>
+#include <globals/String.h>
 #include <wx/artprov.h>
 
 static const int ID_VIEW_FILE_PANEL = wxNewId();

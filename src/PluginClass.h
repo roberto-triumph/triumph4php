@@ -25,8 +25,8 @@
 #ifndef __mvceditorpluginclass__
 #define __mvceditorpluginclass__
  
-#include <environment/EnvironmentClass.h>
-#include <environment/ProjectClass.h>
+#include <globals/EnvironmentClass.h>
+#include <globals/ProjectClass.h>
 #include <widgets/NotebookClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
 #include <widgets/ThreadWithHeartbeatClass.h>

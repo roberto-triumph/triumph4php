@@ -24,9 +24,9 @@
  */
 #include <UnitTest++.h>
 #include <search/ResourceFinderClass.h>
-#include <MvcEditorString.h>
+#include <globals/String.h>
 #include <FileTestFixtureClass.h>
-#include <MvcEditorAssets.h>
+#include <globals/Assets.h>
 #include <MvcEditorChecks.h>
 #include <wx/filefn.h>
 #include <wx/timer.h>

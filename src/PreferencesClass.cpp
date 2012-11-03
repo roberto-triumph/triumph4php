@@ -23,8 +23,9 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <PreferencesClass.h>
-#include <MvcEditorErrors.h>
-#include <MvcEditorAssets.h>
+#include <code_control/CodeControlStyles.h>
+#include <globals/Errors.h>
+#include <globals/Assets.h>
 #include <wx/fileconf.h>
 #include <wx/filename.h>
 #include <wx/menuutils.h>
@@ -295,7 +296,7 @@ mvceditor::PreferencesClass::PreferencesClass()
 }
 
 void mvceditor::PreferencesClass::Init() {
-	CodeControlOptions.Init();
+	mvceditor::CodeControlStylesInit(CodeControlOptions);
 }
 
 mvceditor::PreferencesClass::~PreferencesClass() {
@@ -309,7 +310,7 @@ void mvceditor::PreferencesClass::ClearAllShortcuts() {
 
 void mvceditor::PreferencesClass::Load(wxConfigBase* config, wxFrame* frame) {
 	CodeControlOptions.StartEditMode();
-	CodeControlOptions.SetToLightTheme();
+	mvceditor::CodeControlStylesSetToLightTheme(CodeControlOptions);
 	CodeControlOptions.CommitChanges();
 	KeyProfiles.Cleanup();
 	CodeControlOptions.Load(config);
