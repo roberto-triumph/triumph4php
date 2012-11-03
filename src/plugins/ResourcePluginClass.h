@@ -289,6 +289,17 @@ private:
 	 */
 	void OnWipeComplete(wxCommandEvent& event);
 	
+	/**
+	 * This method will get called by the WorkingCacheBuilderClass when parsing of the
+	 * code in this control has been completed.
+	 */
+	void OnWorkingCacheComplete(mvceditor::WorkingCacheCompleteEventClass& event);
+	
+	/**
+	 * This method will check to see if the current document is "dirty" and if so it will
+	 * start re-parsing the document in the background
+	 */
+	void OnTimer(wxTimerEvent& event);
 
 	 /**
 	  * The various states control what this plugin does.
@@ -332,6 +343,19 @@ private:
 	 * this dialog will only be alive while project is being indexed
 	 */
 	IndexingDialogClass* IndexingDialog;
+
+	/**
+	 * Used to control how often to check for resource re-parsing
+	 */
+	wxTimer Timer;
+
+	/**
+	 * The current source code is parsed in the background so that a symbol table can be
+	 * built in the backgroun without slowing the user down. The builder will
+	 * notify us with the new cache via an event when it has completed building the
+	 * symbol table.
+	 */
+	WorkingCacheBuilderClass* WorkingCacheBuilder;
 	
 	/**
 	 * To check if parsing is happening at the moment; and what files we are parsing.

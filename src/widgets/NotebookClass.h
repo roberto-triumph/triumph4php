@@ -64,11 +64,6 @@ public:
 	 * handled in a separate cache by ResourceCacheClass).
 	 */
 	EventSinkClass* EventSink;
-
-	/**
-	 * To keep track of any threads used for PHP parsing
-	 */
-	RunningThreadsClass* RunningThreads;
 	
 	/**
 	 * Constructor. Parent is needed, all others are optional.

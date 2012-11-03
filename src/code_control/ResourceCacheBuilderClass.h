@@ -43,9 +43,18 @@ public:
 	 */
 	mvceditor::WorkingCacheClass* WorkingCache;
 
-	WorkingCacheCompleteEventClass(int eventId, mvceditor::WorkingCacheClass* workingCache);
+	WorkingCacheCompleteEventClass(int eventId, const wxString& fileIdentifier, mvceditor::WorkingCacheClass* workingCache);
 
 	wxEvent* Clone() const;
+
+	/**
+	 * @return the file identifier given in the constructor
+	 */
+	wxString GetFileIdentifier() const;
+
+private:
+
+	wxString FileIdentifier;
 };
 
 typedef void (wxEvtHandler::*WorkingCacheCompleteEventClassFunction)(WorkingCacheCompleteEventClass&);

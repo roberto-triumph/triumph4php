@@ -24,15 +24,20 @@
  */
 #include <code_control/ResourceCacheBuilderClass.h>
 
-mvceditor::WorkingCacheCompleteEventClass::WorkingCacheCompleteEventClass(int eventId, mvceditor::WorkingCacheClass* cache)
+mvceditor::WorkingCacheCompleteEventClass::WorkingCacheCompleteEventClass(int eventId, const wxString& fileIdentifier, mvceditor::WorkingCacheClass* cache)
 	: wxEvent(eventId, mvceditor::EVENT_WORKING_CACHE_COMPLETE)
-	, WorkingCache(cache) {
+	, WorkingCache(cache) 
+	, FileIdentifier(fileIdentifier.c_str()) {
 
 }
 
 wxEvent* mvceditor::WorkingCacheCompleteEventClass::Clone() const {
-	mvceditor::WorkingCacheCompleteEventClass* evt = new mvceditor::WorkingCacheCompleteEventClass(GetId(), WorkingCache);
+	mvceditor::WorkingCacheCompleteEventClass* evt = new mvceditor::WorkingCacheCompleteEventClass(GetId(), FileIdentifier, WorkingCache);
 	return evt;
+}
+
+wxString mvceditor::WorkingCacheCompleteEventClass::GetFileIdentifier() const {
+	return FileIdentifier;
 }
 
 mvceditor::GlobalCacheCompleteEventClass::GlobalCacheCompleteEventClass(int eventId, mvceditor::GlobalCacheClass* cache)
@@ -74,7 +79,9 @@ void mvceditor::WorkingCacheBuilderClass::Update(const wxString& fileName, const
 	wxASSERT(lock.IsOk());
 
 	CurrentCode = code;
-	CurrentFileName = fileName;
+
+	// make sure this is a copy
+	CurrentFileName = fileName.c_str();
 	CurrentFileIsNew = isNew;
 	CurrentVersion = version;	
 }
@@ -121,7 +128,7 @@ void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
 				// otherwise we will delete a good symbol table, we want auto completion
 				// to work even if the code is broken
 				// PostEvent will set the correct event Id
-				mvceditor::WorkingCacheCompleteEventClass evt(wxID_ANY, cache);
+				mvceditor::WorkingCacheCompleteEventClass evt(wxID_ANY, file, cache);
 				PostEvent(evt);
 			}
 			else {

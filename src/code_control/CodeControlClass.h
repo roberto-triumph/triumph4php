@@ -94,11 +94,9 @@ public:
 	 * Constructor. 
 	 * @param StructsClass* To get items needed for autocompletion. This object
 	 *        will NOT own the pointer
-	 * @param runningThreads To keep track of background threads
-	 * 
 	 */
 	CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,
-					StructsClass* structs, mvceditor::RunningThreadsClass& runningThreads,
+					StructsClass* structs,
 	                 int id, const wxPoint& position =
 	                     wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0,
 	                 const wxString& name = wxT("code"));
@@ -295,6 +293,13 @@ public:
 	void SetAsHidden(bool isHidden);
 
 	/**
+	 * @return the ID as a string; this is guranteed to be a unique identifier. This string 
+	 *  can be used to track code control windows; GetFileName() cannot be used in these
+	 *  cases since FileName can be empty string for new files.
+	 */
+	wxString GetIdString() const;
+
+	/**
 	 * The options to enable/disable various look & feel items
 	 *
 	 * @var CodeControlOptionsClass
@@ -471,11 +476,6 @@ private:
 	 * This object owns this pointer and will need to delete it.
 	 */
 	TextDocumentClass* Document;
-	
-	/**
-	 * To manage the background threads used in PHP parsing
-	 */
-	mvceditor::RunningThreadsClass& RunningThreads;
 
 	/**
 	* Used by the word highlight feature. The location from where to start searching (back)

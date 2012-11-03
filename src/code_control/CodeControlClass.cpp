@@ -148,7 +148,7 @@ static wxString NiceDocText(const UnicodeString& comment) {
 }
 
 mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,
-			mvceditor::StructsClass* structs, mvceditor::RunningThreadsClass& runningThreads,
+			mvceditor::StructsClass* structs,
 			int id, const wxPoint& position, const wxSize& size, long style,
 			const wxString& name)
 		: wxStyledTextCtrl(parent, id, position, size, style, name)
@@ -158,7 +158,6 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 		, WordHighlightWord()
 		, CurrentInfo()
 		, Structs(structs)
-		, RunningThreads(runningThreads)
 		, WordHighlightPreviousIndex(-1)
 		, WordHighlightNextIndex(-1)
 		, WordHighlightStyle(0)
@@ -485,7 +484,7 @@ void mvceditor::CodeControlClass::ApplyPreferences() {
 		SetSqlOptions();
 	}
 	else if (mvceditor::CodeControlClass::PHP == DocumentMode) {
-		Document = new mvceditor::PhpDocumentClass(Structs, RunningThreads);
+		Document = new mvceditor::PhpDocumentClass(Structs);
 		Document->SetControl(this);
 		SetCodeControlOptions(CodeControlOptions.PhpStyles);
 		SetPhpOptions();
@@ -1196,6 +1195,11 @@ void mvceditor::CodeControlClass::RemoveTrailingBlankLines() {
 			done = true;
 		}
 	}
+}
+
+wxString mvceditor::CodeControlClass::GetIdString() const {
+	wxString idString = wxString::Format(wxT("File_%d"), GetId());
+	return idString;
 }
 
 BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)

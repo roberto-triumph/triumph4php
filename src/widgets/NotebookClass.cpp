@@ -38,7 +38,6 @@ mvceditor::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id,
 	, CodeControlOptions(NULL)
 	, Structs(NULL)
 	, EventSink(NULL)
-	, RunningThreads(NULL)
 	, ContextMenu(NULL)
 	, NewPageNumber(1) {
 }
@@ -79,7 +78,7 @@ void mvceditor::NotebookClass::SavePageIfModified(wxAuiNotebookEvent& event) {
 		// tell the app that a file has been closed
 		wxString fileName = codeCtrl->GetFileName();
 		wxCommandEvent cmdEvent(mvceditor::EVENT_APP_FILE_CLOSED);
-		cmdEvent.SetId(wxID_ANY);
+		cmdEvent.SetId(codeCtrl->GetId());
 		cmdEvent.SetString(fileName);
 		EventSink->Publish(cmdEvent);
 	}
@@ -160,7 +159,8 @@ void mvceditor::NotebookClass::AddMvcEditorPage(mvceditor::CodeControlClass::Mod
 			break;
 	}
 	
-	CodeControlClass* page = new CodeControlClass(this, *CodeControlOptions, Structs, *RunningThreads, wxID_ANY);
+	// make sure to use a unique ID, other source code depends on this
+	CodeControlClass* page = new CodeControlClass(this, *CodeControlOptions, Structs, wxNewId());
 	page->SetDocumentMode(mode);
 	AddPage(page, wxString::Format(format, NewPageNumber++), true, 
 		wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_TOOLBAR, 
@@ -209,7 +209,9 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename) {
 		// not using wxStyledTextCtrl::LoadFile() because it does not correctly handle files with high ascii characters
 		mvceditor::FindInFilesClass::OpenErrors error = FindInFilesClass::FileContents(filename, fileContents);
 		if (error == mvceditor::FindInFilesClass::NONE) {
-			CodeControlClass* newCode = new CodeControlClass(this, *CodeControlOptions, Structs, *RunningThreads, wxID_ANY);
+
+			// make sure to use a unique ID, other source code depends on this
+			CodeControlClass* newCode = new CodeControlClass(this, *CodeControlOptions, Structs, wxNewId());
 			newCode->TrackFile(filename, fileContents);
 
 			// if user dragged in a file on an opened file we want still want to accept dragged files

@@ -72,7 +72,6 @@ mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::PluginClass
 	Notebook->CodeControlOptions = &Preferences.CodeControlOptions;
 	Notebook->Structs = &App.Structs;
 	Notebook->EventSink = &App.EventSink;
-	Notebook->RunningThreads = &App.RunningThreads;
 	
 	ToolsNotebook = new wxAuiNotebook(this, mvceditor::ID_TOOLS_NOTEBOOK, wxDefaultPosition, wxDefaultSize, 
 		wxAUI_NB_TOP | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_CLOSE_ON_ACTIVE_TAB | wxAUI_NB_TAB_MOVE);

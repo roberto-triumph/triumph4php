@@ -260,7 +260,7 @@ void mvceditor::TextDocumentClass::DetachFromControl(CodeControlClass* ctrl) {
 
 }
 
-mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::StructsClass* structs, mvceditor::RunningThreadsClass& runningThreads)
+mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::StructsClass* structs)
 	: wxEvtHandler()
 	, TextDocumentClass()
 	, LanguageDiscovery()
@@ -269,37 +269,13 @@ mvceditor::PhpDocumentClass::PhpDocumentClass(mvceditor::StructsClass* structs, 
 	, ScopeFinder()
 	, CurrentCallTipResources()
 	, AutoCompletionResourceMatches()
-	, Timer()
-	, FileIdentifier()
 	, Structs(structs)
-	, RunningThreads(runningThreads)
-	, WorkingCacheBuilder(NULL)
-	, RunningThreadId(0)
 	, CurrentCallTipIndex(0)
-	, NeedToUpdateResources(false) 
 	, AreImagesRegistered(false) {
-	Timer.SetOwner(this);
-	Timer.Start(500, wxTIMER_CONTINUOUS);
-	RunningThreads.AddEventHandler(this);
-	WorkingCacheEventId = wxNewId();
 
-	// need to give this new file unique name so because the
-	// resource updates object needs a unique name
-	wxLongLong time = wxGetLocalTimeMillis();
-	FileIdentifier = wxString::Format(wxT("File_%s"), time.ToString().c_str());
 }
 
 mvceditor::PhpDocumentClass::~PhpDocumentClass() {
-	Timer.Stop();
-	if (Structs) {
-		Structs->ResourceCache.RemoveWorking(FileIdentifier);
-	}	
-
-	// Stop() deletes the WorkingCacheBuilder pointer 
-	if (RunningThreadId > 0 && WorkingCacheBuilder) {
-		RunningThreads.Stop(RunningThreadId);
-	}
-	RunningThreads.RemoveEventHandler(this);
 }
 
 
@@ -311,43 +287,19 @@ void mvceditor::PhpDocumentClass::AttachToControl(CodeControlClass* ctrl) {
 	ctrl->Connect(wxID_ANY, wxID_ANY, wxEVT_STC_CALLTIP_CLICK, 
 		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(wxStyledTextEventFunction, &mvceditor::PhpDocumentClass::OnCallTipClick),
 		NULL, this);
-	ctrl->Connect(wxID_ANY, wxID_ANY, wxEVT_STC_MODIFIED, 
-		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(wxStyledTextEventFunction, &mvceditor::PhpDocumentClass::OnModification),
-		NULL, this);
 	ctrl->Connect(wxID_ANY, wxID_ANY, wxEVT_STC_AUTOCOMP_SELECTION,
 		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(wxStyledTextEventFunction, &mvceditor::PhpDocumentClass::OnAutoCompletionSelected),
 		NULL, this);
-
-	// do this so that when a new untitled file is created that code completion still works.
-	FileOpened(FileIdentifier);
-	wxASSERT(0 == RunningThreadId);
-	wxASSERT(NULL == WorkingCacheBuilder);
-	WorkingCacheBuilder = new mvceditor::WorkingCacheBuilderClass(RunningThreads, WorkingCacheEventId);
-	if (wxTHREAD_NO_ERROR != WorkingCacheBuilder->Init(RunningThreadId)) {
-		delete WorkingCacheBuilder;
-		WorkingCacheBuilder = NULL;
-		RunningThreadId = 0;
-	}
 }
 
 void mvceditor::PhpDocumentClass::DetachFromControl(CodeControlClass* ctrl) {
 	ctrl->Disconnect(wxID_ANY, wxID_ANY, wxEVT_STC_CALLTIP_CLICK, 
 		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(wxStyledTextEventFunction, &mvceditor::PhpDocumentClass::OnCallTipClick),
 		NULL, this);
-	ctrl->Disconnect(wxID_ANY, wxID_ANY, wxEVT_STC_MODIFIED, 
-		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(wxStyledTextEventFunction, &mvceditor::PhpDocumentClass::OnModification),
-		NULL, this);
 	ctrl->Disconnect(wxID_ANY, wxID_ANY, wxEVT_STC_AUTOCOMP_SELECTION,
 		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(wxStyledTextEventFunction, &mvceditor::PhpDocumentClass::OnAutoCompletionSelected),
 		NULL, this);
 	ctrl->ClearRegisteredImages();
-
-	// Stop() deletes the WorkingCacheBuilder pointer 
-	if (RunningThreadId > 0 && WorkingCacheBuilder) {
-		RunningThreads.Stop(RunningThreadId);
-		WorkingCacheBuilder = NULL;
-		RunningThreadId = 0;
-	}
 }
 
 bool mvceditor::PhpDocumentClass::CanAutoComplete() {
@@ -510,7 +462,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 	if (!lastExpression.isEmpty()) {
 		Parser.ParseExpression(lastExpression, parsedExpression);
 		ScopeFinder.GetScopeString(code, expressionPos, expressionScope);
-		Structs->ResourceCache.ExpressionCompletionMatches(FileIdentifier, parsedExpression, expressionScope,
+		Structs->ResourceCache.ExpressionCompletionMatches(Ctrl->GetIdString(), parsedExpression, expressionScope,
 				variableMatches, AutoCompletionResourceMatches, doDuckTyping, error);
 		if (!variableMatches.empty()) {
 			for (size_t i = 0; i < variableMatches.size(); ++i) {
@@ -856,26 +808,13 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetCurrentSym
 
 		// for now do nothing with error
 		mvceditor::SymbolTableMatchErrorClass error;
-		Structs->ResourceCache.ResourceMatches(FileIdentifier, parsedExpression, scopeResult, matches, 
+		Structs->ResourceCache.ResourceMatches(Ctrl->GetIdString(), parsedExpression, scopeResult, matches, 
 			doDuckTyping, true, error);
 	}
 	return matches;
 }
 
 void mvceditor::PhpDocumentClass::FileOpened(wxString fileName) {
-	
-	// in case the file name was changed and current file name is no  longer valid
-	if (Structs) {
-		Structs->ResourceCache.RemoveWorking(FileIdentifier);
-	}
-
-	// important to set the fileIdentifier to the name;
-	// the ResourceCache object will need to know what files are being edited so it can mark them as 'dirty'
-	FileIdentifier = fileName;
-
-	// trigger the resource cache
-	// so that code completion works when the file is first opened
-	NeedToUpdateResources = true;
 }
 
 void mvceditor::PhpDocumentClass::MatchBraces(int posToCheck) {
@@ -907,25 +846,6 @@ void mvceditor::PhpDocumentClass::MatchBraces(int posToCheck) {
 	else {
 		Ctrl->BraceHighlight(wxSTC_INVALID_POSITION, wxSTC_INVALID_POSITION);
 	}
-}
-
-void mvceditor::PhpDocumentClass::OnModification(wxStyledTextEvent& event) {
-	if (!Structs) {
-		event.Skip();
-		return;
-	}
-	if (!Ctrl || Ctrl != event.GetEventObject()) {
-		event.Skip();
-		return;
-	}
-
-	// we want to keep the re-parsings to a minimum
-	// we dont need to reparse when user is adding a 
-	// comment or a constant string
-	if (!InCommentOrStringStyle(Ctrl->GetCurrentPos())) {
-		NeedToUpdateResources = true;	
-	}
-	event.Skip();
 }
 
 std::vector<wxString> mvceditor::PhpDocumentClass::CollectNearMatchKeywords(wxString resource) {
@@ -963,7 +883,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetSymbolAt(i
 
 		// for now do nothing with error
 		mvceditor::SymbolTableMatchErrorClass error;
-		Structs->ResourceCache.ResourceMatches(FileIdentifier, parsedExpression, expressionScope, matches, 
+		Structs->ResourceCache.ResourceMatches(Ctrl->GetIdString(), parsedExpression, expressionScope, matches, 
 			doDuckTyping, true, error);
 	}
 	return matches;
@@ -1007,43 +927,6 @@ void mvceditor::PhpDocumentClass::OnCallTipClick(wxStyledTextEvent& evt) {
 		}
 	}
 	evt.Skip();
-}
-
-void mvceditor::PhpDocumentClass::OnWorkingCacheComplete(mvceditor::WorkingCacheCompleteEventClass& event) {
-	if (event.GetId() == WorkingCacheEventId) {
-		bool good = Structs->ResourceCache.RegisterWorking(FileIdentifier, event.WorkingCache);
-		if (!good) {
-
-			// already there
-			Structs->ResourceCache.ReplaceWorking(FileIdentifier, event.WorkingCache);
-		}
-	}
-	else {
-		event.Skip();
-	}
-}
-
-void mvceditor::PhpDocumentClass::OnWorkComplete(wxCommandEvent& event) {
-	if (event.GetId() == WorkingCacheEventId) {
-		WorkingCacheBuilder = NULL;
-	}
-	else {
-		event.Skip();
-	}
-}
-
-void mvceditor::PhpDocumentClass::OnTimer(wxTimerEvent& event) {
-	if (NeedToUpdateResources && Structs && WorkingCacheBuilder) {
-		UnicodeString text = GetSafeText();
-
-		// we need to differentiate between new and opened files (the 'true' arg)
-		WorkingCacheBuilder->Update(FileIdentifier, text, !wxFileName::FileExists(Ctrl->GetFileName()), Structs->Environment.Php.Version);
-
-		// even if thread could not be started just prevent re-parsing until user 
-		// modified the text
-		NeedToUpdateResources = false;
-	}
-	event.Skip();
 }
 
 void mvceditor::PhpDocumentClass::RegisterAutoCompletionImages() {
@@ -1302,10 +1185,4 @@ bool mvceditor::CssDocumentClass::InCommentOrStringStyle(int posToCheck) {
 
 	// dont match braces inside strings or comments.
 	return wxSTC_CSS_COMMENT == style || wxSTC_CSS_DOUBLESTRING == style || wxSTC_CSS_SINGLESTRING == style;
-}		
-
-BEGIN_EVENT_TABLE(mvceditor::PhpDocumentClass, wxEvtHandler)
-	EVT_WORKING_CACHE_COMPLETE(wxID_ANY, mvceditor::PhpDocumentClass::OnWorkingCacheComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::PhpDocumentClass::OnWorkComplete)
-	EVT_TIMER(wxID_ANY, mvceditor::PhpDocumentClass::OnTimer)
-END_EVENT_TABLE()
+}

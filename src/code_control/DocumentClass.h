@@ -169,9 +169,8 @@ public:
 	/**
 	 * @param structs This class will NOT own this pointer. Caller must manage (delete) it.
 	 *   structs helps with autocompletion
-	 * @param runningThreads To keep track of background threads
 	 */
-	PhpDocumentClass(mvceditor::StructsClass* structs, mvceditor::RunningThreadsClass& runningThreads);
+	PhpDocumentClass(mvceditor::StructsClass* structs);
 
 	~PhpDocumentClass();
 
@@ -261,24 +260,6 @@ private:
 	std::vector<wxString> CollectNearMatchKeywords(wxString word);
 
 	/**
-	 * This method will get called by the WorkingCacheBuilderClass when parsing of the
-	 * code in this control has been completed.
-	 */
-	void OnWorkingCacheComplete(mvceditor::WorkingCacheCompleteEventClass& event);
-	
-	/**
-	 * when the background thread ends clear our pointer that way we dont
-	 * try to access deleted memory
-	 */
-	void OnWorkComplete(wxCommandEvent& event);
-	
-	/**
-	 * This method will check to see if document is "dirty" and if so it will
-	 * start re-parsing in the background
-	 */
-	void OnTimer(wxTimerEvent& event);
-
-	/**
 	 * Handle the call tip up/down arrow events
 	 */
 	void OnCallTipClick(wxStyledTextEvent& evt);
@@ -293,12 +274,6 @@ private:
 	 * @return bool TRUE if the position is at a PHP comment or PHP string
 	 */
 	bool InCommentOrStringStyle(int posToCheck);
-
-	/**
-	 * When text is changed, we will update the resource cache if need be (retrigger the 
-	 * buulding of the symbol table)
-	 */
-	void OnModification(wxStyledTextEvent& event);
 
 	void RegisterAutoCompletionImages();
 
@@ -351,48 +326,10 @@ private:
 	std::vector<mvceditor::ResourceClass> AutoCompletionResourceMatches;
 
 	/**
-	 * Used to control how often to check for resource re-parsing
-	 */
-	wxTimer Timer;
-
-	/**
-	 * A unique string used to identify this code control. This string is used in conjunction with 
-	 * the ResourceCache object.
-	 */
-	wxString FileIdentifier;
-
-	/**
 	 * To access any global structures: the resource cache, template variables
 	 * This class will NOT own this pointer
 	 */
 	StructsClass* Structs;
-	
-	/**
-	 *  To keep track and stop the background thread that will parse the code for
-	 *  resources
-	 */
-	RunningThreadsClass& RunningThreads;
-
-	/**
-	 * The current source code is parsed in the background so that a symbol table can be
-	 * built in the backgroun without slowing the user down. The builder will
-	 * notify us with the new cache via an event when it has completed building the
-	 * symbol table.
-	 */
-	WorkingCacheBuilderClass* WorkingCacheBuilder;
-
-	/**
-	 * We keep the thread ID around so that we stop the thread when
-	 * this code control goes out of scope.
-	 */
-	wxThreadIdType RunningThreadId;
-
-	/**
-	 * ID assigned to this document's thread. note that each code control has its own
-	 * instance of document, each document has its own thread and therefore must
-	 * have its own unique event ID.
-	 */
-	int WorkingCacheEventId;
 	
 	/**
 	 * The resource signature currently being displayed in the calltip.
@@ -401,20 +338,10 @@ private:
 	size_t CurrentCallTipIndex;
 
 	/**
-	 * This flag will control whether the document is "dirty" and needs to be re-parsed
-	 * This is NOT the same as GetModify() from scintilla; scintilla's Modify will be
-	 * set to false if the user undoes changes; but if a user undoes changes we still
-	 * want to trigger a re-parsing
-	 */
-	bool NeedToUpdateResources;
-
-	/**
 	 * TRUE if the auto complete images have been registered.
 	 */
 	bool AreImagesRegistered;
 
-
-	DECLARE_EVENT_TABLE()
 };
 
 /**

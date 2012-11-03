@@ -176,6 +176,8 @@ mvceditor::ResourcePluginClass::ResourcePluginClass(mvceditor::AppClass& app)
 	: PluginClass(app)
 	, JumpToText()
 	, ProjectIndexMenu(NULL)
+	, Timer()
+	, WorkingCacheBuilder(NULL)
 	, State(FREE) 
 	, HasCodeLookups(false)
 	, HasFileLookups(false) 
@@ -228,6 +230,15 @@ void mvceditor::ResourcePluginClass::OnAppReady(wxCommandEvent& event) {
 			projectCache->Init(project->ResourceDbFileName, project->PhpFileExtensions, otherFileExtensions, version);
 			resourceCache->RegisterGlobal(projectCache);
 		}
+	}
+	
+	WorkingCacheBuilder = new mvceditor::WorkingCacheBuilderClass(App.RunningThreads, wxNewId());
+	Timer.SetOwner(this);
+	Timer.Start(2000, wxTIMER_CONTINUOUS);
+	wxThreadIdType threadId;
+	if (wxTHREAD_NO_ERROR != WorkingCacheBuilder->Init(threadId)) {
+		delete WorkingCacheBuilder;
+		WorkingCacheBuilder = NULL;
 	}
 }
 
@@ -633,6 +644,12 @@ void mvceditor::ResourcePluginClass::OnAppFileClosed(wxCommandEvent& event) {
 			}
 		}
 	}
+
+	// Notebook class assigns unique IDs to CodeControlClass objects
+	// the event ID is the ID of the code control that was closed
+	// this needs to be the same as mvceditor::CodeControlClass::GetIdString
+	wxString fileIdentifier = wxString::Format(wxT("File_%d"), event.GetId());
+	App.Structs.ResourceCache.RemoveWorking(fileIdentifier);
 }
 
 void mvceditor::ResourcePluginClass::RemoveNativeMatches(std::vector<mvceditor::ResourceClass>& matches) const {
@@ -687,6 +704,34 @@ mvceditor::ResourceFileReaderClass* mvceditor::ResourcePluginClass::ReadNextProj
 	return thread;
 }
 
+void mvceditor::ResourcePluginClass::OnWorkingCacheComplete(mvceditor::WorkingCacheCompleteEventClass& event) {
+	wxString fileIdentifier = event.GetFileIdentifier();
+	bool good = App.Structs.ResourceCache.RegisterWorking(fileIdentifier, event.WorkingCache);
+	if (!good) {
+
+		// already there
+		App.Structs.ResourceCache.ReplaceWorking(fileIdentifier, event.WorkingCache);
+	}
+	event.Skip();
+}
+
+void mvceditor::ResourcePluginClass::OnTimer(wxTimerEvent& event) {
+	if (WorkingCacheBuilder) {
+		mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
+		if (codeControl && codeControl->GetDocumentMode() == mvceditor::CodeControlClass::PHP) {
+			UnicodeString text = codeControl->GetSafeText();
+
+			// Notebook class assigns unique IDs to CodeControlClass objects
+			wxString fileIdentifier = codeControl->GetIdString();
+
+			// we need to differentiate between new and opened files (the 'true' arg)
+			WorkingCacheBuilder->Update(fileIdentifier, text, 
+				!wxFileName::FileExists(codeControl->GetFileName()),
+				App.Structs.Environment.Php.Version);
+		}
+	}
+	event.Skip();
+}
 
 mvceditor::ResourceSearchDialogClass::ResourceSearchDialogClass(wxWindow* parent, ResourcePluginClass& resource,
 																wxString& term,
@@ -924,4 +969,7 @@ BEGIN_EVENT_TABLE(mvceditor::ResourcePluginClass, wxEvtHandler)
 	EVT_GLOBAL_CACHE_COMPLETE(ID_RESOURCE_READER, mvceditor::ResourcePluginClass::OnGlobalCacheComplete)
 	EVT_COMMAND(ID_WIPE_THREAD, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ResourcePluginClass::OnWorkInProgress)
 	EVT_COMMAND(ID_WIPE_THREAD, mvceditor::EVENT_WIPE_COMPLETE, mvceditor::ResourcePluginClass::OnWipeComplete)
+
+	EVT_WORKING_CACHE_COMPLETE(wxID_ANY, mvceditor::ResourcePluginClass::OnWorkingCacheComplete)
+	EVT_TIMER(wxID_ANY, mvceditor::ResourcePluginClass::OnTimer)
 END_EVENT_TABLE()

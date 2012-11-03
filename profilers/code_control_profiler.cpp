@@ -172,7 +172,7 @@ CodeControlFrameClass::CodeControlFrameClass(CodeControlProfilerAppClass& app)
 	: wxFrame(NULL, wxID_ANY, wxT("CodeControlClass profiler"), wxDefaultPosition, 
 			wxSize(1024, 768)) 
 	, App(app) {
-	Ctrl = new mvceditor::CodeControlClass(this, app.Options, &app.Structs, app.RunningThreads, wxID_ANY);
+	Ctrl = new mvceditor::CodeControlClass(this, app.Options, &app.Structs, wxID_ANY);
 	Ctrl->SetDropTarget(new FileDropTargetClass(Ctrl));
 	Ctrl->SetDocumentMode(mvceditor::CodeControlClass::PHP);
 	CreateMenu();
@@ -187,8 +187,8 @@ void CodeControlFrameClass::OnContentAssist(wxCommandEvent& event) {
 }
 
 void CodeControlFrameClass::OnHelp(wxCommandEvent& event) {
-	wxString msg = wxT("This is a program that can be used to profile the source code control. Testing of the ");
-	msg += wxT("auto completion and call tips can be done by using the menu items, just like in the App.\n\n");
+	wxString msg = wxT("This is a program that can be used to profile the source code control. ");
+	msg += wxT("Unfortunately auto completion & call tips won't work because that code is is separate.\n\n");
 	msg += wxT("Dragging a file into the window will open its contents.");
 	wxMessageBox(msg);
 }
