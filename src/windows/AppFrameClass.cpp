@@ -24,7 +24,7 @@
  */
 #include <windows/AppFrameClass.h>
 #include <AppVersion.h>
-#include <PluginClass.h>
+#include <features/PluginClass.h>
 #include <MvcEditor.h>
 #include <windows/PreferencesDialogClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
