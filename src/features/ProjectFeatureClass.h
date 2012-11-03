@@ -26,7 +26,7 @@
 #define PROJECTFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
-#include <features/wxformbuilder/ProjectPluginGeneratedPanelClass.h>
+#include <features/wxformbuilder/ProjectFeatureForms.h>
 #include <wx/filepicker.h>
 
 namespace mvceditor {

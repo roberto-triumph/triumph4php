@@ -26,7 +26,7 @@
 #define __EDITORMESSAGESFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
-#include <features/wxformbuilder/EditorMessagesPluginGeneratedClass.h>
+#include <features/wxformbuilder/EditorMessagesFeatureForms.h>
 #include <wx/log.h>
 
 namespace mvceditor {

@@ -26,7 +26,7 @@
 #define __RESOURCEFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
-#include <features/wxformbuilder/ResourcePluginGeneratedClass.h>
+#include <features/wxformbuilder/ResourceFeatureForms.h>
 #include <features/BackgroundFileReaderClass.h>
 #include <search/ResourceFinderClass.h>
 #include <code_control/ResourceCacheBuilderClass.h>

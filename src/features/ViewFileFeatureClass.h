@@ -29,7 +29,7 @@
 #include <php_frameworks/FrameworkDetectorClass.h>
 #include <php_frameworks/CallStackClass.h>
 #include <widgets/ThreadWithHeartbeatClass.h>
-#include <features/wxformbuilder/ViewFilePluginGeneratedClass.h>
+#include <features/wxformbuilder/ViewFileFeatureForms.h>
 #include <unicode/unistr.h>
 #include <memory>
 

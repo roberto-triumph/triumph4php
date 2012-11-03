@@ -27,7 +27,7 @@
 
 #include <features/FeatureClass.h>
 #include <pelet/ParserClass.h>
-#include <features/wxformbuilder/OutlineViewPluginPanelClass.h>
+#include <features/wxformbuilder/OutlineViewFeatureForms.h>
 #include <widgets/ThreadWithHeartbeatClass.h>
 #include <vector>
 

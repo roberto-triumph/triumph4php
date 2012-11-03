@@ -26,7 +26,7 @@
 #define __RUNBROWSERFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
-#include <features/wxformbuilder/RunBrowserPluginGeneratedClass.h>
+#include <features/wxformbuilder/RunBrowserFeatureForms.h>
 #include <php_frameworks/FrameworkDetectorClass.h>
 #include <globals/UrlResourceClass.h>
 #include <wx/string.h>

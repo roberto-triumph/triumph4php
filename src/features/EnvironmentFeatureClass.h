@@ -28,7 +28,7 @@
 #include <features/FeatureClass.h>
 #include <features/BackgroundFileReaderClass.h>
 #include <globals/EnvironmentClass.h>
-#include <features/wxformbuilder/EnvironmentGeneratedDialogClass.h>
+#include <features/wxformbuilder/EnvironmentFeatureForms.h>
 
 namespace mvceditor {
 

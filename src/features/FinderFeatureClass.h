@@ -25,7 +25,7 @@
 #ifndef MVCEDITORFINDERFEATURECLASS_H_
 #define MVCEDITORFINDERFEATURECLASS_H_
 
-#include <features/wxformbuilder/FinderPluginGeneratedClass.h>
+#include <features/wxformbuilder/FinderFeatureForms.h>
 #include <widgets/ComboBoxHistoryClass.h>
 #include <widgets/NotebookClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>

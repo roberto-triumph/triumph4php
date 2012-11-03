@@ -27,7 +27,7 @@
 #define SQL_EDITOR_FEATURECLASS_H__
 
 #include <features/FeatureClass.h>
-#include <features/wxformbuilder/SqlBrowserPluginGeneratedClass.h>
+#include <features/wxformbuilder/SqlBrowserFeatureForms.h>
 #include <globals/ProjectClass.h>
 #include <globals/DatabaseInfoClass.h>
 #include <widgets/ThreadWithHeartbeatClass.h>

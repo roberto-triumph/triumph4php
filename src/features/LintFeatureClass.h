@@ -31,7 +31,7 @@
 #include <globals/Events.h>
 #include <search/DirectorySearchClass.h>
 #include <features/BackgroundFileReaderClass.h>
-#include <features/wxformbuilder/LintPluginGeneratedClass.h>
+#include <features/wxformbuilder/LintFeatureForms.h>
 
 namespace mvceditor {
 
