@@ -46,7 +46,7 @@ class OutlineViewGeneratedPanelClass : public wxPanel
 	protected:
 		enum
 		{
-			ID_OUTLINEVIEWPLUGINGENERATEDPANELCLASS = 1000,
+			ID_OUTLINEVIEWGENERATEDPANELCLASS = 1000,
 			ID_SYNCBUTTON,
 			ID_CHOICE,
 			ID_STATUSLABEL,
@@ -69,7 +69,7 @@ class OutlineViewGeneratedPanelClass : public wxPanel
 	
 	public:
 		
-		OutlineViewGeneratedPanelClass( wxWindow* parent, wxWindowID id = ID_OUTLINEVIEWPLUGINGENERATEDPANELCLASS, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 502,657 ), long style = wxTAB_TRAVERSAL );
+		OutlineViewGeneratedPanelClass( wxWindow* parent, wxWindowID id = ID_OUTLINEVIEWGENERATEDPANELCLASS, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 502,657 ), long style = wxTAB_TRAVERSAL );
 		~OutlineViewGeneratedPanelClass();
 	
 };

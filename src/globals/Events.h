@@ -83,7 +83,7 @@ private:
 class CodeControlClass;
 
 
-extern const wxEventType EVENT_PLUGIN_FILE_SAVED;
+extern const wxEventType EVENT_FEATURE_FILE_SAVED;
 
 /**
  * This is an event that will tell a feature that a file has been saved.
@@ -123,8 +123,8 @@ private:
 
 typedef void (wxEvtHandler::*FileSavedEventClassFunction)(FileSavedEventClass&);
 
-#define EVT_PLUGIN_FILE_SAVED(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_PLUGIN_FILE_SAVED, wxID_ANY, -1, \
+#define EVT_FEATURE_FILE_SAVED(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_FEATURE_FILE_SAVED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( FileSavedEventClassFunction, & fn ), (wxObject *) NULL ),
 

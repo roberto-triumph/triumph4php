@@ -153,7 +153,7 @@ public:
 	/**
 	 * Construct a new instance
 	 */
-	ProjectPreferencesPanelClass(wxWindow* parent, ProjectFeatureClass& projectPlugin);
+	ProjectPreferencesPanelClass(wxWindow* parent, ProjectFeatureClass& projectFeature);
 
 protected:
 

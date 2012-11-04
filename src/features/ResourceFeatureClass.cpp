@@ -737,7 +737,7 @@ mvceditor::ResourceSearchDialogClass::ResourceSearchDialogClass(wxWindow* parent
 																wxString& term,
 																std::vector<mvceditor::ResourceClass>& chosenResources)
 	: ResourceSearchDialogGeneratedClass(parent)
-	, ResourcePlugin(resource)
+	, ResourceFeature(resource)
 	, ChosenResources(chosenResources) 
 	, MatchedResources() {
 	wxGenericValidator termValidator(&term);
@@ -749,7 +749,7 @@ mvceditor::ResourceSearchDialogClass::ResourceSearchDialogClass(wxWindow* parent
 void mvceditor::ResourceSearchDialogClass::OnSearchText(wxCommandEvent& event) {
 	wxString text = SearchText->GetValue();
 	if (text.Length() >= 2) {
-		MatchedResources = ResourcePlugin.SearchForResources(text);
+		MatchedResources = ResourceFeature.SearchForResources(text);
 		if (!MatchedResources.empty()) {
 			MatchesList->Freeze();
 			ShowJumpToResults(text, MatchedResources);
@@ -813,7 +813,7 @@ void mvceditor::ResourceSearchDialogClass::ShowJumpToResults(const wxString& fin
 	// dont show the project path to the user
 	for (size_t i = 0; i < files.GetCount(); ++i) {
 		wxString projectLabel;
-		wxString relativeName = ResourcePlugin.App.Globals.RelativeFileName(files[i], projectLabel);
+		wxString relativeName = ResourceFeature.App.Globals.RelativeFileName(files[i], projectLabel);
 		wxString matchLabel;
 		mvceditor::ResourceClass match = allMatches[i];
 		if (mvceditor::ResourceClass::MEMBER == match.Type || mvceditor::ResourceClass::METHOD == match.Type ||

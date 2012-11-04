@@ -433,7 +433,7 @@ private:
 	 * 
 	 * @var ResourceFeatureClass
 	 */
-	ResourceFeatureClass& ResourcePlugin;
+	ResourceFeatureClass& ResourceFeature;
 
 	/**
 	 * Handle the results of the resource lookups.

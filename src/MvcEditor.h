@@ -130,17 +130,17 @@ private:
 	/**
 	 * create features. only instantiates and nothing else
 	 */
-	void CreatePlugins();
+	void CreateFeatures();
 	
 	/**
 	 * delete features from memory
 	 */
-	void DeletePlugins();
+	void DeleteFeatures();
 
 	/**
 	 * asks features for any windows they want to create
 	 */
-	void PluginWindows();
+	void FeatureWindows();
 
 	/**
 	 * Additional functionality
@@ -172,7 +172,7 @@ private:
 	/**
 	 * Shows the user various editor messages (not related to their code)
 	 */
-	EditorMessagesFeatureClass* EditorMessagesPlugin;
+	EditorMessagesFeatureClass* EditorMessagesFeature;
 
 	/**
 	 * TRUE if the EVENT_APP_READY has already been generated.

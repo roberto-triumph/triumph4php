@@ -44,7 +44,7 @@ void mvceditor::EventSinkClass::Publish(wxEvent& event) {
 
 
 mvceditor::FileSavedEventClass::FileSavedEventClass(mvceditor::CodeControlClass* codeControl)
-	: wxEvent(wxID_ANY, mvceditor::EVENT_PLUGIN_FILE_SAVED)
+	: wxEvent(wxID_ANY, mvceditor::EVENT_FEATURE_FILE_SAVED)
 	, CodeControl(codeControl) {
 
 }
@@ -59,7 +59,7 @@ wxEvent* mvceditor::FileSavedEventClass::Clone() const {
 }
 
 
-const wxEventType mvceditor::EVENT_PLUGIN_FILE_SAVED = wxNewEventType();
+const wxEventType mvceditor::EVENT_FEATURE_FILE_SAVED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_READY = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_EXIT = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_FILE_OPENED = wxNewEventType();

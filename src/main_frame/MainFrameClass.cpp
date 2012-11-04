@@ -420,7 +420,7 @@ void mvceditor::MainFrameClass::AuiManagerUpdate() {
 	AuiManager.Update();
 }
 
-void mvceditor::MainFrameClass::LoadPlugin(mvceditor::FeatureClass* feature) {
+void mvceditor::MainFrameClass::LoadFeature(mvceditor::FeatureClass* feature) {
 	
 	// propagate GUI events to features, so that they can handle menu events themselves
 	// feature menus

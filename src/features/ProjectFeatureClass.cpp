@@ -367,21 +367,21 @@ void mvceditor::ProjectFeatureClass::OnPreferencesExternallyUpdated(wxCommandEve
 	}
 }
 
-mvceditor::ProjectPreferencesPanelClass::ProjectPreferencesPanelClass(wxWindow *parent, mvceditor::ProjectFeatureClass &projectPlugin) 
+mvceditor::ProjectPreferencesPanelClass::ProjectPreferencesPanelClass(wxWindow *parent, mvceditor::ProjectFeatureClass &projectFeature) 
 : ProjectPreferencesGeneratedPanelClass(parent) {
-	NonEmptyTextValidatorClass explorerValidator(&projectPlugin.ExplorerExecutable, Label);
+	NonEmptyTextValidatorClass explorerValidator(&projectFeature.ExplorerExecutable, Label);
 	ExplorerExecutable->SetValidator(explorerValidator);
 
-	NonEmptyTextValidatorClass phpFileExtensionsValidator(&projectPlugin.App.Globals.PhpFileExtensionsString, PhpLabel);
+	NonEmptyTextValidatorClass phpFileExtensionsValidator(&projectFeature.App.Globals.PhpFileExtensionsString, PhpLabel);
 	PhpFileExtensions->SetValidator(phpFileExtensionsValidator);
 
-	NonEmptyTextValidatorClass cssFileExtensionsValidator(&projectPlugin.App.Globals.CssFileExtensionsString, CssLabel);
+	NonEmptyTextValidatorClass cssFileExtensionsValidator(&projectFeature.App.Globals.CssFileExtensionsString, CssLabel);
 	CssFileExtensions->SetValidator(cssFileExtensionsValidator);
 
-	NonEmptyTextValidatorClass sqlFileExtensionsValidator(&projectPlugin.App.Globals.SqlFileExtensionsString, SqlLabel);
+	NonEmptyTextValidatorClass sqlFileExtensionsValidator(&projectFeature.App.Globals.SqlFileExtensionsString, SqlLabel);
 	SqlFileExtensions->SetValidator(sqlFileExtensionsValidator);
 	
-	NonEmptyTextValidatorClass miscFileExtensionsValidator(&projectPlugin.App.Globals.MiscFileExtensionsString, MiscLabel);
+	NonEmptyTextValidatorClass miscFileExtensionsValidator(&projectFeature.App.Globals.MiscFileExtensionsString, MiscLabel);
 	MiscFileExtensions->SetValidator(miscFileExtensionsValidator);
 }
 

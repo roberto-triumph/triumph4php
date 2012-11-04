@@ -103,7 +103,7 @@ public:
 	 * get all of the feature's extra windows and menus and attach them to the main frame.
 	 * This class will not own this pointer
 	 */
-	void LoadPlugin(FeatureClass* feature);
+	void LoadFeature(FeatureClass* feature);
 
 	/**
 	 * this should be called whenever a new window is added.

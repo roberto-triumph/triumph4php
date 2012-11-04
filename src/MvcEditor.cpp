@@ -55,7 +55,7 @@ mvceditor::AppClass::AppClass()
 	, Features()
 	, Preferences()
 	, Timer(*this)
-	, EditorMessagesPlugin(NULL) 
+	, EditorMessagesFeature(NULL) 
 	, IsAppReady(false) {
 	MainFrame = NULL;
 }
@@ -65,14 +65,14 @@ mvceditor::AppClass::AppClass()
  */
 bool mvceditor::AppClass::OnInit() {
 	Preferences.Init();
-	CreatePlugins();
+	CreateFeatures();
 
 	// due to the way keyboard shortcuts are serialized, we need to load the
 	// frame and initialize the feature windows so that all menus are created
 	// and only then can we load the keyboard shortcuts from the INI file
 	// all menu items must be present in the menu bar for shortcuts to take effect
 	MainFrame = new mvceditor::MainFrameClass(Features, *this, Preferences);
-	PluginWindows();
+	FeatureWindows();
 	LoadPreferences();
 	MainFrame->AuiManagerUpdate();
 	if (CommandLine()) {
@@ -88,7 +88,7 @@ bool mvceditor::AppClass::OnInit() {
 		// this line is needed so that we get all the wxLogXXX messages
 		// pointer will be managed by wxWidgets
 		// need to put this here because the logger needs an initialized window state
-		wxLog::SetActiveTarget(new mvceditor::EditorMessagesLoggerClass(*EditorMessagesPlugin));
+		wxLog::SetActiveTarget(new mvceditor::EditorMessagesLoggerClass(*EditorMessagesFeature));
 		Timer.Start(1000, wxTIMER_CONTINUOUS);
 		return true;
 	}
@@ -97,7 +97,7 @@ bool mvceditor::AppClass::OnInit() {
 
 mvceditor::AppClass::~AppClass() {
 	Timer.Stop();
-	DeletePlugins();
+	DeleteFeatures();
 	
 	// calling cleanup here so that we can run this binary through a memory leak detector 
 	// ICU will cache many things and that will cause the detector to output "possible leaks"
@@ -145,7 +145,7 @@ bool mvceditor::AppClass::CommandLine() {
 	return ret;
 }
 
-void mvceditor::AppClass::CreatePlugins() {
+void mvceditor::AppClass::CreateFeatures() {
 	FeatureClass* feature = new RunConsoleFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new FinderFeatureClass(*this);
@@ -165,8 +165,8 @@ void mvceditor::AppClass::CreatePlugins() {
 	feature = new SqlBrowserFeatureClass(*this);
 	Features.push_back(feature);
 
-	EditorMessagesPlugin = new mvceditor::EditorMessagesFeatureClass(*this);
-	Features.push_back(EditorMessagesPlugin);
+	EditorMessagesFeature = new mvceditor::EditorMessagesFeatureClass(*this);
+	Features.push_back(EditorMessagesFeature);
 
 	feature = new CodeIgniterFeatureClass(*this);
 	Features.push_back(feature);
@@ -188,20 +188,20 @@ void mvceditor::AppClass::CreatePlugins() {
 	}
 }
 
-void mvceditor::AppClass::PluginWindows() {
+void mvceditor::AppClass::FeatureWindows() {
 	for (size_t i = 0; i < Features.size(); ++i) {
-		MainFrame->LoadPlugin(Features[i]);
+		MainFrame->LoadFeature(Features[i]);
 	}
 }
 
-void mvceditor::AppClass::DeletePlugins() {
+void mvceditor::AppClass::DeleteFeatures() {
 
 	// if i delete in the same loop as the PopEventHandler, wx assertions fail.
 	for (size_t i = 0; i < Features.size(); ++i) {
 		delete Features[i];
 	}
 	Features.clear();
-	EditorMessagesPlugin = NULL;
+	EditorMessagesFeature = NULL;
 }
 
 void mvceditor::AppClass::LoadPreferences() {
