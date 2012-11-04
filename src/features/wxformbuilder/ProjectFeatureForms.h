@@ -31,9 +31,9 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class ProjectPluginGeneratedPanelClass
+/// Class ProjectPreferencesGeneratedPanelClass
 ///////////////////////////////////////////////////////////////////////////////
-class ProjectPluginGeneratedPanelClass : public wxPanel 
+class ProjectPreferencesGeneratedPanelClass : public wxPanel 
 {
 	private:
 	
@@ -58,8 +58,8 @@ class ProjectPluginGeneratedPanelClass : public wxPanel
 	
 	public:
 		
-		ProjectPluginGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,416 ), long style = wxTAB_TRAVERSAL );
-		~ProjectPluginGeneratedPanelClass();
+		ProjectPreferencesGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,416 ), long style = wxTAB_TRAVERSAL );
+		~ProjectPreferencesGeneratedPanelClass();
 	
 };
 

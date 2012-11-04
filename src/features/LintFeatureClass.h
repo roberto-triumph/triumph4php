@@ -349,13 +349,13 @@ private:
 	DECLARE_EVENT_TABLE()
 };
 
-class LintPluginPreferencesPanelClass : public LintPluginPreferencesGeneratedPanelClass {
+class LintPreferencesPanelClass : public LintPreferencesGeneratedPanelClass {
 
 public:
 
 	LintFeatureClass& Feature;
 
-	LintPluginPreferencesPanelClass(wxWindow* parent, LintFeatureClass& feature);
+	LintPreferencesPanelClass(wxWindow* parent, LintFeatureClass& feature);
 };
 
 }

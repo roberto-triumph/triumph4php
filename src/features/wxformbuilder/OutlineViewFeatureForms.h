@@ -29,9 +29,9 @@
 ///////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class OutlineViewPluginGeneratedPanelClass
+/// Class OutlineViewGeneratedPanelClass
 ///////////////////////////////////////////////////////////////////////////////
-class OutlineViewPluginGeneratedPanelClass : public wxPanel 
+class OutlineViewGeneratedPanelClass : public wxPanel 
 {
 	DECLARE_EVENT_TABLE()
 	private:
@@ -69,8 +69,8 @@ class OutlineViewPluginGeneratedPanelClass : public wxPanel
 	
 	public:
 		
-		OutlineViewPluginGeneratedPanelClass( wxWindow* parent, wxWindowID id = ID_OUTLINEVIEWPLUGINGENERATEDPANELCLASS, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 502,657 ), long style = wxTAB_TRAVERSAL );
-		~OutlineViewPluginGeneratedPanelClass();
+		OutlineViewGeneratedPanelClass( wxWindow* parent, wxWindowID id = ID_OUTLINEVIEWPLUGINGENERATEDPANELCLASS, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 502,657 ), long style = wxTAB_TRAVERSAL );
+		~OutlineViewGeneratedPanelClass();
 	
 };
 

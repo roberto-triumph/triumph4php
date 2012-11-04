@@ -9,14 +9,14 @@
 
 ///////////////////////////////////////////////////////////////////////////
 
-BEGIN_EVENT_TABLE( OutlineViewPluginGeneratedPanelClass, wxPanel )
-	EVT_BUTTON( wxID_HELP, OutlineViewPluginGeneratedPanelClass::_wxFB_OnHelpButton )
-	EVT_BUTTON( ID_SYNCBUTTON, OutlineViewPluginGeneratedPanelClass::_wxFB_OnSyncButton )
-	EVT_CHOICE( ID_CHOICE, OutlineViewPluginGeneratedPanelClass::_wxFB_OnChoice )
-	EVT_TREE_ITEM_ACTIVATED( ID_TREE, OutlineViewPluginGeneratedPanelClass::_wxFB_OnTreeItemActivated )
+BEGIN_EVENT_TABLE( OutlineViewGeneratedPanelClass, wxPanel )
+	EVT_BUTTON( wxID_HELP, OutlineViewGeneratedPanelClass::_wxFB_OnHelpButton )
+	EVT_BUTTON( ID_SYNCBUTTON, OutlineViewGeneratedPanelClass::_wxFB_OnSyncButton )
+	EVT_CHOICE( ID_CHOICE, OutlineViewGeneratedPanelClass::_wxFB_OnChoice )
+	EVT_TREE_ITEM_ACTIVATED( ID_TREE, OutlineViewGeneratedPanelClass::_wxFB_OnTreeItemActivated )
 END_EVENT_TABLE()
 
-OutlineViewPluginGeneratedPanelClass::OutlineViewPluginGeneratedPanelClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+OutlineViewGeneratedPanelClass::OutlineViewGeneratedPanelClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	wxBoxSizer* BoxSizer;
 	BoxSizer = new wxBoxSizer( wxHORIZONTAL );
@@ -69,6 +69,6 @@ OutlineViewPluginGeneratedPanelClass::OutlineViewPluginGeneratedPanelClass( wxWi
 	this->Layout();
 }
 
-OutlineViewPluginGeneratedPanelClass::~OutlineViewPluginGeneratedPanelClass()
+OutlineViewGeneratedPanelClass::~OutlineViewGeneratedPanelClass()
 {
 }

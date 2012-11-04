@@ -9,7 +9,7 @@
 
 ///////////////////////////////////////////////////////////////////////////
 
-ProjectPluginGeneratedPanelClass::ProjectPluginGeneratedPanelClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+ProjectPreferencesGeneratedPanelClass::ProjectPreferencesGeneratedPanelClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	wxFlexGridSizer* fgSizer2;
 	fgSizer2 = new wxFlexGridSizer( 2, 1, 0, 0 );
@@ -109,13 +109,13 @@ ProjectPluginGeneratedPanelClass::ProjectPluginGeneratedPanelClass( wxWindow* pa
 	this->Layout();
 	
 	// Connect Events
-	FilePicker->Connect( wxEVT_COMMAND_FILEPICKER_CHANGED, wxFileDirPickerEventHandler( ProjectPluginGeneratedPanelClass::OnFileChanged ), NULL, this );
+	FilePicker->Connect( wxEVT_COMMAND_FILEPICKER_CHANGED, wxFileDirPickerEventHandler( ProjectPreferencesGeneratedPanelClass::OnFileChanged ), NULL, this );
 }
 
-ProjectPluginGeneratedPanelClass::~ProjectPluginGeneratedPanelClass()
+ProjectPreferencesGeneratedPanelClass::~ProjectPreferencesGeneratedPanelClass()
 {
 	// Disconnect Events
-	FilePicker->Disconnect( wxEVT_COMMAND_FILEPICKER_CHANGED, wxFileDirPickerEventHandler( ProjectPluginGeneratedPanelClass::OnFileChanged ), NULL, this );
+	FilePicker->Disconnect( wxEVT_COMMAND_FILEPICKER_CHANGED, wxFileDirPickerEventHandler( ProjectPreferencesGeneratedPanelClass::OnFileChanged ), NULL, this );
 	
 }
 

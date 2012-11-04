@@ -168,7 +168,7 @@ void mvceditor::OutlineViewFeatureClass::BuildOutlineCurrentCodeControl() {
 		if (thread->Start(code->GetFileName(), *GetEnvironment(), threadId)) {
 			wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 			if (window != NULL) {
-				OutlineViewPluginPanelClass* outlineViewPanel = (OutlineViewPluginPanelClass*)window;
+				OutlineViewPanelClass* outlineViewPanel = (OutlineViewPanelClass*)window;
 				SetFocusToOutlineWindow(outlineViewPanel);
 				outlineViewPanel->SetStatus(_("Parsing ..."));
 			}
@@ -221,15 +221,15 @@ void mvceditor::OutlineViewFeatureClass::OnOutlineMenu(wxCommandEvent& event) {
 		
 	// create / open the outline window
 	wxWindow* window = FindOutlineWindow(ID_WINDOW_OUTLINE);
-	OutlineViewPluginPanelClass* outlineViewPanel = NULL;
+	OutlineViewPanelClass* outlineViewPanel = NULL;
 	if (window != NULL) {
-		outlineViewPanel = (OutlineViewPluginPanelClass*)window;
+		outlineViewPanel = (OutlineViewPanelClass*)window;
 		SetFocusToOutlineWindow(outlineViewPanel);
 	}
 	else {
 		mvceditor::NotebookClass* notebook = GetNotebook();
 		if (notebook != NULL) {
-			outlineViewPanel = new OutlineViewPluginPanelClass(GetOutlineNotebook(), ID_WINDOW_OUTLINE, this, notebook);
+			outlineViewPanel = new OutlineViewPanelClass(GetOutlineNotebook(), ID_WINDOW_OUTLINE, this, notebook);
 			if (AddOutlineWindow(outlineViewPanel, wxT("Outline"))) {
 				
 				// the first time, get all of the classes to put in th drop down. note
@@ -251,7 +251,7 @@ void mvceditor::OutlineViewFeatureClass::OnContentNotebookPageChanged(wxAuiNoteb
 	// annoying if the user is looking at run output, switches PHP files, and the outline
 	// gets changed.
 	if (window != NULL && IsOutlineWindowSelected(ID_WINDOW_OUTLINE)) {
-		OutlineViewPluginPanelClass* outlineViewPanel = (OutlineViewPluginPanelClass*)window;
+		OutlineViewPanelClass* outlineViewPanel = (OutlineViewPanelClass*)window;
 		SetFocusToOutlineWindow(outlineViewPanel);
 		BuildOutlineCurrentCodeControl();
 	}
@@ -261,7 +261,7 @@ void mvceditor::OutlineViewFeatureClass::OnContentNotebookPageChanged(wxAuiNoteb
 void mvceditor::OutlineViewFeatureClass::OnResourceFinderComplete(mvceditor::ResourceFinderCompleteEventClass& event) {
 	wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 	if (window != NULL) {
-		OutlineViewPluginPanelClass* outlineViewPanel = (OutlineViewPluginPanelClass*)window;
+		OutlineViewPanelClass* outlineViewPanel = (OutlineViewPanelClass*)window;
 		SetFocusToOutlineWindow(outlineViewPanel);
 		outlineViewPanel->RefreshOutlines(event.Resources);
 	}
@@ -270,15 +270,15 @@ void mvceditor::OutlineViewFeatureClass::OnResourceFinderComplete(mvceditor::Res
 void mvceditor::OutlineViewFeatureClass::OnGlobalClassesComplete(mvceditor::GlobalClassesCompleteEventClass& event)  {
 	wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 	if (window != NULL) {
-		OutlineViewPluginPanelClass* outlineViewPanel = (OutlineViewPluginPanelClass*)window;
+		OutlineViewPanelClass* outlineViewPanel = (OutlineViewPanelClass*)window;
 		SetFocusToOutlineWindow(outlineViewPanel);
 		outlineViewPanel->SetClasses(event.GetAllClasses());
 	}
 }
 
-mvceditor::OutlineViewPluginPanelClass::OutlineViewPluginPanelClass(wxWindow* parent, int windowId, OutlineViewFeatureClass* feature, 
+mvceditor::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int windowId, OutlineViewFeatureClass* feature, 
 		NotebookClass* notebook)
-	: OutlineViewPluginGeneratedPanelClass(parent, windowId)
+	: OutlineViewGeneratedPanelClass(parent, windowId)
 	, Feature(feature)
 	, Notebook(notebook) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
@@ -286,18 +286,18 @@ mvceditor::OutlineViewPluginPanelClass::OutlineViewPluginPanelClass(wxWindow* pa
 	
 }
 
-void mvceditor::OutlineViewPluginPanelClass::SetStatus(const wxString& status) {
+void mvceditor::OutlineViewPanelClass::SetStatus(const wxString& status) {
 	StatusLabel->SetLabel(status);
 }
 
-void mvceditor::OutlineViewPluginPanelClass::SetClasses(const std::vector<wxString>& classes) {
+void mvceditor::OutlineViewPanelClass::SetClasses(const std::vector<wxString>& classes) {
 	Choice->Clear();
 	for (size_t i = 0; i < classes.size(); ++i) {
 		Choice->AppendString(classes[i]);
 	}
 }
 
-void mvceditor::OutlineViewPluginPanelClass::RefreshOutlines(const std::vector<mvceditor::ResourceClass>& resources) {
+void mvceditor::OutlineViewPanelClass::RefreshOutlines(const std::vector<mvceditor::ResourceClass>& resources) {
 	Tree->Freeze();
 	Tree->DeleteAllItems();
 	wxTreeItemId rootId = Tree->AddRoot(_("Outline"));
@@ -378,7 +378,7 @@ void mvceditor::OutlineViewPluginPanelClass::RefreshOutlines(const std::vector<m
 	Tree->Thaw();
 }
 
-void mvceditor::OutlineViewPluginPanelClass::OnHelpButton(wxCommandEvent& event) {
+void mvceditor::OutlineViewPanelClass::OnHelpButton(wxCommandEvent& event) {
 	wxString help = wxString::FromAscii(
 		"The outline tab allows you to quickly browse through your project's classes.\n"
 		"1. The tree pane lists all of the resources of the file being viewed.\n"
@@ -393,7 +393,7 @@ void mvceditor::OutlineViewPluginPanelClass::OnHelpButton(wxCommandEvent& event)
 	wxMessageBox(help, _("Outline Help"), wxOK, this);
 }
 
-void mvceditor::OutlineViewPluginPanelClass::OnChoice(wxCommandEvent& event) {
+void mvceditor::OutlineViewPanelClass::OnChoice(wxCommandEvent& event) {
 	wxString lookup = event.GetString();
 	if (!lookup.IsEmpty()) {
 		std::vector<mvceditor::ResourceClass> resources = Feature->BuildOutline(lookup);
@@ -401,11 +401,11 @@ void mvceditor::OutlineViewPluginPanelClass::OnChoice(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::OutlineViewPluginPanelClass::OnSyncButton(wxCommandEvent& event) {
+void mvceditor::OutlineViewPanelClass::OnSyncButton(wxCommandEvent& event) {
 	Feature->BuildOutlineCurrentCodeControl();
 }
 
-void mvceditor::OutlineViewPluginPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
+void mvceditor::OutlineViewPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 
 	// the method name is the leaf node, the class name is the parent of the activated node
 	wxTreeItemId item = event.GetItem();

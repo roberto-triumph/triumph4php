@@ -179,7 +179,7 @@ class OutlineViewFeatureClass : public FeatureClass {
 public:
 	
 	/**
-	 * Creates a new OutlineViewPlugin.
+	 * Creates a new OutlineViewFeature.
 	 */
 	OutlineViewFeatureClass(mvceditor::AppClass& app);
 
@@ -238,7 +238,7 @@ private:
 	DECLARE_EVENT_TABLE()
 };
 
-class OutlineViewPluginPanelClass : public OutlineViewPluginGeneratedPanelClass {
+class OutlineViewPanelClass : public OutlineViewGeneratedPanelClass {
 
 	public:
 
@@ -252,7 +252,7 @@ class OutlineViewPluginPanelClass : public OutlineViewPluginGeneratedPanelClass 
 	 * @param NotebookClass* notebook we need to listen to the notebook page change events so that the outline is updated to show
 	 *        an outline of the newly opened page
 	 */
-	OutlineViewPluginPanelClass(wxWindow* parent, int windowId, OutlineViewFeatureClass* feature, NotebookClass* notebook);
+	OutlineViewPanelClass(wxWindow* parent, int windowId, OutlineViewFeatureClass* feature, NotebookClass* notebook);
 	
 	/**
 	 * update the status label

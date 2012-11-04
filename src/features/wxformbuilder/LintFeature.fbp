@@ -219,7 +219,7 @@
             <property name="id">wxID_ANY</property>
             <property name="maximum_size"></property>
             <property name="minimum_size"></property>
-            <property name="name">LintPluginPreferencesGeneratedPanelClass</property>
+            <property name="name">LintPreferencesGeneratedPanelClass</property>
             <property name="pos"></property>
             <property name="size">583,340</property>
             <property name="subclass"></property>

@@ -33,7 +33,7 @@
             <property name="id">ID_OUTLINEVIEWPLUGINGENERATEDPANELCLASS</property>
             <property name="maximum_size"></property>
             <property name="minimum_size"></property>
-            <property name="name">OutlineViewPluginGeneratedPanelClass</property>
+            <property name="name">OutlineViewGeneratedPanelClass</property>
             <property name="pos"></property>
             <property name="size">502,657</property>
             <property name="subclass"></property>

@@ -44,7 +44,7 @@ LintResultsGeneratedPanelClass::~LintResultsGeneratedPanelClass()
 	
 }
 
-LintPluginPreferencesGeneratedPanelClass::LintPluginPreferencesGeneratedPanelClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+LintPreferencesGeneratedPanelClass::LintPreferencesGeneratedPanelClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	wxBoxSizer* BozSizer;
 	BozSizer = new wxBoxSizer( wxVERTICAL );
@@ -70,6 +70,6 @@ LintPluginPreferencesGeneratedPanelClass::LintPluginPreferencesGeneratedPanelCla
 	this->Layout();
 }
 
-LintPluginPreferencesGeneratedPanelClass::~LintPluginPreferencesGeneratedPanelClass()
+LintPreferencesGeneratedPanelClass::~LintPreferencesGeneratedPanelClass()
 {
 }

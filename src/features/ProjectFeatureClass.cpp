@@ -185,7 +185,7 @@ void mvceditor::ProjectFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 }
 
 void mvceditor::ProjectFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
-	ProjectPluginPanelClass* panel = new ProjectPluginPanelClass(parent, *this);
+	ProjectPreferencesPanelClass* panel = new ProjectPreferencesPanelClass(parent, *this);
 	parent->AddPage(panel, wxT("Project"));
 }
 
@@ -367,8 +367,8 @@ void mvceditor::ProjectFeatureClass::OnPreferencesExternallyUpdated(wxCommandEve
 	}
 }
 
-mvceditor::ProjectPluginPanelClass::ProjectPluginPanelClass(wxWindow *parent, mvceditor::ProjectFeatureClass &projectPlugin) 
-: ProjectPluginGeneratedPanelClass(parent) {
+mvceditor::ProjectPreferencesPanelClass::ProjectPreferencesPanelClass(wxWindow *parent, mvceditor::ProjectFeatureClass &projectPlugin) 
+: ProjectPreferencesGeneratedPanelClass(parent) {
 	NonEmptyTextValidatorClass explorerValidator(&projectPlugin.ExplorerExecutable, Label);
 	ExplorerExecutable->SetValidator(explorerValidator);
 
@@ -385,7 +385,7 @@ mvceditor::ProjectPluginPanelClass::ProjectPluginPanelClass(wxWindow *parent, mv
 	MiscFileExtensions->SetValidator(miscFileExtensionsValidator);
 }
 
-void mvceditor::ProjectPluginPanelClass::OnFileChanged(wxFileDirPickerEvent& event) {
+void mvceditor::ProjectPreferencesPanelClass::OnFileChanged(wxFileDirPickerEvent& event) {
 	ExplorerExecutable->SetValue(event.GetPath());
 	event.Skip();
 }

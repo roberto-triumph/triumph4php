@@ -35,7 +35,7 @@ static const int ID_FIND_PANEL = wxNewId();
 static const int ID_REPLACE_PANEL = wxNewId(); 
 
 // these IDs are needed so that the IDs of the Regular expression help menu
-// do not collide with the menu IDs of the FindInFilesPlugin
+// do not collide with the menu IDs of the FindInFilesFeature
 static const int ID_REGEX_MENU_START = 11000;
 static const int ID_REGEX_REPLACE_FIND_MENU_START = 12000;
 static const int ID_REGEX_REPLACE_MENU_START = 13000;

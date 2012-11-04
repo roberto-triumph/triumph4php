@@ -50,9 +50,9 @@ class LintResultsGeneratedPanelClass : public wxPanel
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class LintPluginPreferencesGeneratedPanelClass
+/// Class LintPreferencesGeneratedPanelClass
 ///////////////////////////////////////////////////////////////////////////////
-class LintPluginPreferencesGeneratedPanelClass : public wxPanel 
+class LintPreferencesGeneratedPanelClass : public wxPanel 
 {
 	private:
 	
@@ -61,8 +61,8 @@ class LintPluginPreferencesGeneratedPanelClass : public wxPanel
 	
 	public:
 		
-		LintPluginPreferencesGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 583,340 ), long style = wxTAB_TRAVERSAL );
-		~LintPluginPreferencesGeneratedPanelClass();
+		LintPreferencesGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 583,340 ), long style = wxTAB_TRAVERSAL );
+		~LintPreferencesGeneratedPanelClass();
 	
 };
 

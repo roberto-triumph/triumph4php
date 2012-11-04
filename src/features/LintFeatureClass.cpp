@@ -294,7 +294,7 @@ void mvceditor::LintFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdCla
 
 void mvceditor::LintFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 	parent->AddPage(
-		new mvceditor::LintPluginPreferencesPanelClass(parent, *this),
+		new mvceditor::LintPreferencesPanelClass(parent, *this),
 		_("PHP Lint Check"));
 }
 
@@ -447,9 +447,9 @@ void mvceditor::LintFeatureClass::OnLintSummary(mvceditor::LintResultsSummaryEve
 	}
 }
 
-mvceditor::LintPluginPreferencesPanelClass::LintPluginPreferencesPanelClass(wxWindow* parent,
+mvceditor::LintPreferencesPanelClass::LintPreferencesPanelClass(wxWindow* parent,
 																			mvceditor::LintFeatureClass& feature)
-	: LintPluginPreferencesGeneratedPanelClass(parent, wxID_ANY)
+	: LintPreferencesGeneratedPanelClass(parent, wxID_ANY)
 	, Feature(feature) {
 	wxGenericValidator checkValidator(&Feature.CheckOnSave);
 	CheckOnSave->SetValidator(checkValidator);

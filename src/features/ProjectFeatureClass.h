@@ -32,7 +32,7 @@
 namespace mvceditor {
 
 // defined below
-class ProjectPluginPanelClass;
+class ProjectPreferencesPanelClass;
 
 class ProjectFeatureClass : public FeatureClass {
 
@@ -146,14 +146,14 @@ private:
 	
 };
 
-class ProjectPluginPanelClass : public ProjectPluginGeneratedPanelClass {
+class ProjectPreferencesPanelClass : public ProjectPreferencesGeneratedPanelClass {
 	
 public:
 
 	/**
 	 * Construct a new instance
 	 */
-	ProjectPluginPanelClass(wxWindow* parent, ProjectFeatureClass& projectPlugin);
+	ProjectPreferencesPanelClass(wxWindow* parent, ProjectFeatureClass& projectPlugin);
 
 protected:
 

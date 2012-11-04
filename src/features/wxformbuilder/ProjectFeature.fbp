@@ -33,7 +33,7 @@
             <property name="id">wxID_ANY</property>
             <property name="maximum_size"></property>
             <property name="minimum_size"></property>
-            <property name="name">ProjectPluginGeneratedPanelClass</property>
+            <property name="name">ProjectPreferencesGeneratedPanelClass</property>
             <property name="pos"></property>
             <property name="size">500,416</property>
             <property name="subclass"></property>
