@@ -22,14 +22,14 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef MVCEDITORAPPFRAMECLASS_H_
-#define MVCEDITORAPPFRAMECLASS_H_
+#ifndef MVCEDITORMAINFRAMECLASS_H_
+#define MVCEDITORMAINFRAMECLASS_H_
 
 #include <globals/ProjectClass.h>
-#include <windows/wxformbuilder/AppFrameGeneratedClass.h>
+#include <main_frame/wxformbuilder/MainFrameForms.h>
 #include <widgets/NotebookClass.h>
 #include <features/FeatureClass.h>
-#include <PreferencesClass.h>
+#include <main_frame/PreferencesClass.h>
 #include <globals/Events.h>
 #include <wx/aui/aui.h>
 
@@ -39,11 +39,11 @@ namespace mvceditor {
 class AppClass;
 
 // defined at the bottom of this file
-class AppFrameClass;
+class MainFrameClass;
 
 /**
  * This class is used to listen for app events.  It is a separate class
- * because the AppFrame should handle them; the app propagates
+ * because the MainFrame should handle them; the app propagates
  * the menu, tool, and AUI events to the event sink; if the frame
  * were a listener to the sink then events would be
  * trigger indefinitely (since the frame would get an event, publish it
@@ -56,7 +56,7 @@ public:
 	/**
 	 * @param frame this class will not own the pointer
 	*/
-	AppEventListenerForFrameClass(AppFrameClass* frame);
+	AppEventListenerForFrameClass(MainFrameClass* frame);
 
 private:
 
@@ -75,7 +75,7 @@ private:
 	/**
 	 * Need the frame to manipulate it
 	 */
-	AppFrameClass* AppFrame;
+	MainFrameClass* MainFrame;
 
 	DECLARE_EVENT_TABLE()
 };
@@ -84,14 +84,14 @@ private:
  * The main frame; contains all menus, toolbars, and notebooks.  For now there is only one
  * instance of a main frame per app.
  */
-class AppFrameClass : public AppFrameGeneratedClass {
+class MainFrameClass : public MainFrameGeneratedClass {
 
 public:
 	
-	AppFrameClass(const std::vector<FeatureClass*>& features, AppClass&  app,
+	MainFrameClass(const std::vector<FeatureClass*>& features, AppClass&  app,
 		PreferencesClass& preferences);
 	
-	~AppFrameClass();
+	~MainFrameClass();
 	
 	/**
 	 * Loads the given files into the application, one page for each file.
@@ -127,7 +127,7 @@ public:
 
 protected:
 
-	// Handlers for AppFrameGeneratedClass events.
+	// Handlers for MainFrameGeneratedClass events.
 	void OnClose(wxCloseEvent& event);
 	
 	/**
@@ -324,4 +324,4 @@ private:
 };
 
 }
-#endif // MVCEDITORAPPFRAMECLASS_H_
+#endif // MVCEDITORMAINFRAMECLASS_H_

@@ -76,5 +76,5 @@ const int mvceditor::ID_TOOLS_NOTEBOOK = wxNewId();
 const int mvceditor::ID_OUTLINE_NOTEBOOK = wxNewId();
 
 // ATTN: this is hardcoded because of the way that the notebook is created
-// within the AppFrameGeneratedClass (created by wxFormBuilder)
+// within the MainFrameForms (created by wxFormBuilder)
 const int mvceditor::ID_CODE_NOTEBOOK = 1000;

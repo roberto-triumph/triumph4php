@@ -5,8 +5,8 @@
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef __AppFrameGeneratedClass__
-#define __AppFrameGeneratedClass__
+#ifndef __MainFrameForms__
+#define __MainFrameForms__
 
 #include <wx/intl.h>
 
@@ -39,9 +39,9 @@ namespace mvceditor{ class NotebookClass; }
 ///////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class AppFrameGeneratedClass
+/// Class MainFrameGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class AppFrameGeneratedClass : public wxFrame 
+class MainFrameGeneratedClass : public wxFrame 
 {
 	DECLARE_EVENT_TABLE()
 	private:
@@ -75,7 +75,8 @@ class AppFrameGeneratedClass : public wxFrame
 	protected:
 		enum
 		{
-			ID_NOTEBOOK = 1000,
+			ID_MAINFRAMEGENERATEDCLASS = 1000,
+			ID_NOTEBOOK,
 			ID_FILE_PHP_NEW,
 			ID_FILE_SQL_NEW,
 			ID_FILE_CSS_NEW,
@@ -123,8 +124,8 @@ class AppFrameGeneratedClass : public wxFrame
 	
 	public:
 		
-		AppFrameGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("MVC Editor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 800,600 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
-		~AppFrameGeneratedClass();
+		MainFrameGeneratedClass( wxWindow* parent, wxWindowID id = ID_MAINFRAMEGENERATEDCLASS, const wxString& title = _("MVC Editor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 800,600 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		~MainFrameGeneratedClass();
 	
 };
 
@@ -238,4 +239,4 @@ class EditorBehaviorPanelGeneratedClass : public wxPanel
 	
 };
 
-#endif //__AppFrameGeneratedClass__
+#endif //__MainFrameForms__

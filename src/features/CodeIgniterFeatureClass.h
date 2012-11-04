@@ -89,7 +89,7 @@ private:
 
 	/**
 	 * Saving the menu bar so that the code igniter menu can be removed when a project is not
-	 * a code igniter project. This class will NOT own this pointer (the AppFrame will).
+	 * a code igniter project. This class will NOT own this pointer (the MainFrame will).
 	 */
 	wxMenuBar* MenuBar;
 	

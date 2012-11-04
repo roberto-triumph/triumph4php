@@ -22,7 +22,7 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <PreferencesClass.h>
+#include <main_frame/PreferencesClass.h>
 #include <code_control/CodeControlStyles.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>

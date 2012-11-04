@@ -26,7 +26,7 @@
 #include <wx/cmdline.h>
 #include <unicode/uclean.h>
 
-#include <windows/AppFrameClass.h>
+#include <main_frame/MainFrameClass.h>
 #include <features/EnvironmentFeatureClass.h>
 #include <features/FindInFilesFeatureClass.h>
 #include <features/FinderFeatureClass.h>
@@ -57,7 +57,7 @@ mvceditor::AppClass::AppClass()
 	, Timer(*this)
 	, EditorMessagesPlugin(NULL) 
 	, IsAppReady(false) {
-	AppFrame = NULL;
+	MainFrame = NULL;
 }
 
 /**
@@ -71,19 +71,19 @@ bool mvceditor::AppClass::OnInit() {
 	// frame and initialize the feature windows so that all menus are created
 	// and only then can we load the keyboard shortcuts from the INI file
 	// all menu items must be present in the menu bar for shortcuts to take effect
-	AppFrame = new mvceditor::AppFrameClass(Features, *this, Preferences);
+	MainFrame = new mvceditor::MainFrameClass(Features, *this, Preferences);
 	PluginWindows();
 	LoadPreferences();
-	AppFrame->AuiManagerUpdate();
+	MainFrame->AuiManagerUpdate();
 	if (CommandLine()) {
-		SetTopWindow(AppFrame);
-		AppFrame->Show(true);
+		SetTopWindow(MainFrame);
+		MainFrame->Show(true);
 
 		// maximize only after showing, that way the size event gets propagated and
 		// the main frame is drawn correctly at app start.
 		// if we don't do this, there is a nasty effect on windows OS that shows 
 		// the status bar in the middle of the page until the user re-maximizes the app
-		AppFrame->Maximize();
+		MainFrame->Maximize();
 
 		// this line is needed so that we get all the wxLogXXX messages
 		// pointer will be managed by wxWidgets
@@ -136,7 +136,7 @@ bool mvceditor::AppClass::CommandLine() {
 		if (parser.Found(wxT("file"), &filename)) {
 			std::vector<wxString> filenames;
 			filenames.push_back(filename);
-			AppFrame->FileOpen(filenames);
+			MainFrame->FileOpen(filenames);
 		}
 	}
 	else if (-1 == result) {
@@ -190,7 +190,7 @@ void mvceditor::AppClass::CreatePlugins() {
 
 void mvceditor::AppClass::PluginWindows() {
 	for (size_t i = 0; i < Features.size(); ++i) {
-		AppFrame->LoadPlugin(Features[i]);
+		MainFrame->LoadPlugin(Features[i]);
 	}
 }
 
@@ -214,7 +214,7 @@ void mvceditor::AppClass::LoadPreferences() {
 		Features[i]->LoadPreferences(config);
 		Features[i]->AddKeyboardShortcuts(Preferences.DefaultKeyboardShortcutCmds);
 	}	
-	Preferences.Load(config, AppFrame);
+	Preferences.Load(config, MainFrame);
 }
 
 void mvceditor::AppClass::StopConfigModifiedCheck() {
@@ -261,7 +261,7 @@ void mvceditor::AppTimerClass::Notify() {
 					"Reload the preferences?"	
 				);
 				msg = wxGetTranslation(msg);
-				int res = wxMessageBox(msg, _("Reload preferences"), wxCENTRE | wxYES_NO, App.AppFrame);
+				int res = wxMessageBox(msg, _("Reload preferences"), wxCENTRE | wxYES_NO, App.MainFrame);
 				if (wxYES == res) {
 
 					// delete the old config ourselves

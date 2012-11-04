@@ -30,7 +30,7 @@
 #include <widgets/NotebookClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
 #include <widgets/ThreadWithHeartbeatClass.h>
-#include <PreferencesClass.h>
+#include <main_frame/PreferencesClass.h>
 #include <wx/event.h>
 #include <wx/propdlg.h>
 #include <vector>

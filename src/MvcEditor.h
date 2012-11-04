@@ -25,7 +25,7 @@
 #include <globals/GlobalsClass.h>
 #include <features/EditorMessagesFeatureClass.h>
 #include <features/FeatureClass.h>
-#include <PreferencesClass.h>
+#include <main_frame/PreferencesClass.h>
 #include <globals/Events.h>
 #include <wx/app.h>
 #include <wx/event.h>
@@ -36,7 +36,7 @@
 namespace mvceditor {
 
 // forward declaration
-class AppFrameClass;
+class MainFrameClass;
 
 // defined below
 class AppClass;
@@ -167,7 +167,7 @@ private:
 	/**
 	 * The main application frame.
 	 */
-	AppFrameClass* AppFrame;
+	MainFrameClass* MainFrame;
 
 	/**
 	 * Shows the user various editor messages (not related to their code)

@@ -22,7 +22,7 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <windows/AppFrameClass.h>
+#include <windows/MainFrameClass.h>
 #include <AppVersion.h>
 #include <features/FeatureClass.h>
 #include <MvcEditor.h>
@@ -47,10 +47,10 @@ int ID_UPPERCASE = wxNewId();
 int ID_MENU_MORE = wxNewId();
 int ID_TOOLBAR = wxNewId();
 
-mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::FeatureClass*>& features,
+mvceditor::MainFrameClass::MainFrameClass(const std::vector<mvceditor::FeatureClass*>& features,
 										mvceditor::AppClass& app,
 										mvceditor::PreferencesClass& preferences)
-	: AppFrameGeneratedClass(NULL)
+	: MainFrameGeneratedClass(NULL)
 	, Features(features)
 	, Listener(this)
 	, App(app)
@@ -93,15 +93,15 @@ mvceditor::AppFrameClass::AppFrameClass(const std::vector<mvceditor::FeatureClas
 	DefaultKeyboardShortcuts();
 }
 
-mvceditor::AppFrameClass::~AppFrameClass() {
+mvceditor::MainFrameClass::~MainFrameClass() {
 	AuiManager.UnInit();
 }
 
-mvceditor::StatusBarWithGaugeClass* mvceditor::AppFrameClass::GetStatusBarWithGauge() {
+mvceditor::StatusBarWithGaugeClass* mvceditor::MainFrameClass::GetStatusBarWithGauge() {
 	return (StatusBarWithGaugeClass*)GetStatusBar();
 }
 
-void mvceditor::AppFrameClass::OnClose(wxCloseEvent& event) {
+void mvceditor::MainFrameClass::OnClose(wxCloseEvent& event) {
 	bool destroy = true;
 	if (event.CanVeto()) {
 		destroy = Notebook->SaveAllModifiedPages();
@@ -139,7 +139,7 @@ void mvceditor::AppFrameClass::OnClose(wxCloseEvent& event) {
 	}
 }
 
-void mvceditor::AppFrameClass::OnFileSave(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnFileSave(wxCommandEvent& event) {
 	Notebook->SaveCurrentPage();
 	mvceditor::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
 	mvceditor::FileSavedEventClass featureEvent(codeControl);
@@ -149,43 +149,43 @@ void mvceditor::AppFrameClass::OnFileSave(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::AppFrameClass::OnFilePhpNew(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnFilePhpNew(wxCommandEvent& event) {
 	Notebook->AddMvcEditorPage(mvceditor::CodeControlClass::PHP);
 }
 
-void mvceditor::AppFrameClass::OnFileSqlNew(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnFileSqlNew(wxCommandEvent& event) {
 	Notebook->AddMvcEditorPage(mvceditor::CodeControlClass::SQL);
 }
 
-void mvceditor::AppFrameClass::OnFileCssNew(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnFileCssNew(wxCommandEvent& event) {
 	Notebook->AddMvcEditorPage(mvceditor::CodeControlClass::CSS);
 }
 
-void mvceditor::AppFrameClass::OnFileTextNew(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnFileTextNew(wxCommandEvent& event) {
 	Notebook->AddMvcEditorPage(mvceditor::CodeControlClass::TEXT);
 }
 
-void mvceditor::AppFrameClass::OnFileOpen(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnFileOpen(wxCommandEvent& event) {
 	Notebook->LoadPage();
 }
 
-void mvceditor::AppFrameClass::OnFileSaveAs(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnFileSaveAs(wxCommandEvent& event) {
 	Notebook->SaveCurrentPageAsNew();
 }
 
-void mvceditor::AppFrameClass::FileOpen(const std::vector<wxString>& filenames) {
+void mvceditor::MainFrameClass::FileOpen(const std::vector<wxString>& filenames) {
 	Notebook->LoadPages(filenames);
 }
 
-void mvceditor::AppFrameClass::OnFileClose(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnFileClose(wxCommandEvent& event) {
 	Notebook->CloseCurrentPage();
 }
 
-void mvceditor::AppFrameClass::OnFileExit(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnFileExit(wxCommandEvent& event) {
 	Close();
 }
 
-void mvceditor::AppFrameClass::OnFileRevert(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnFileRevert(wxCommandEvent& event) {
 	CodeControlClass* code = Notebook->GetCurrentCodeControl();
 	if (NULL != code && !code->IsNew()) {
 		int res = wxMessageBox(_("Reload file and lose all changes?"), _("MVC Editor"), wxICON_QUESTION | wxYES_NO, this);
@@ -195,7 +195,7 @@ void mvceditor::AppFrameClass::OnFileRevert(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::AppFrameClass::OnEditCut(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnEditCut(wxCommandEvent& event) {
 
 	// need to handle cut in all text controls
 	wxWindow* obj = wxWindow::FindFocus();
@@ -220,7 +220,7 @@ void mvceditor::AppFrameClass::OnEditCut(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::AppFrameClass::OnEditCopy(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnEditCopy(wxCommandEvent& event) {
 
 	// need to handle copy in all text controls
 	wxWindow* obj = wxWindow::FindFocus();
@@ -245,7 +245,7 @@ void mvceditor::AppFrameClass::OnEditCopy(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::AppFrameClass::OnEditPaste(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnEditPaste(wxCommandEvent& event) {
 
 	// need to handle paste in all text controls
 	wxWindow* obj = wxWindow::FindFocus();
@@ -270,7 +270,7 @@ void mvceditor::AppFrameClass::OnEditPaste(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::AppFrameClass::OnEditSelectAll(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnEditSelectAll(wxCommandEvent& event) {
 
 	// need to handle select All in all text controls
 	wxWindow* obj = wxWindow::FindFocus();
@@ -295,7 +295,7 @@ void mvceditor::AppFrameClass::OnEditSelectAll(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::AppFrameClass::OnEditPreferences(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnEditPreferences(wxCommandEvent& event) {
 	App.StopConfigModifiedCheck();
 
 	PreferencesDialogClass prefDialog(this, Preferences);
@@ -314,31 +314,31 @@ void mvceditor::AppFrameClass::OnEditPreferences(wxCommandEvent& event) {
 	App.UpdateConfigModifiedTime();
 }
 
-void mvceditor::AppFrameClass::PreferencesSaved() {
+void mvceditor::MainFrameClass::PreferencesSaved() {
 	Preferences.EnableSelectedProfile(this);
 	Notebook->RefreshCodeControlOptions();
 }
 
-void mvceditor::AppFrameClass::PreferencesExternallyUpdated() {
+void mvceditor::MainFrameClass::PreferencesExternallyUpdated() {
 	Preferences.EnableSelectedProfile(this);
 	Notebook->RefreshCodeControlOptions();
 }
 
-void mvceditor::AppFrameClass::OnEditContentAssist(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnEditContentAssist(wxCommandEvent& event) {
 	CodeControlClass* page = Notebook->GetCurrentCodeControl();
 	if (page) {
 		page->HandleAutoCompletion();
 	}
 }
 
-void mvceditor::AppFrameClass::OnEditCallTip(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnEditCallTip(wxCommandEvent& event) {
 	CodeControlClass* page = Notebook->GetCurrentCodeControl();
 	if (page) {
 		page->HandleCallTip(0, true);
 	}
 }
 
-void mvceditor::AppFrameClass::EnableSave(wxStyledTextEvent& event) {
+void mvceditor::MainFrameClass::EnableSave(wxStyledTextEvent& event) {
 	ToolBar->EnableTool(ID_TOOLBAR_SAVE, true);
 	ToolBar->Refresh();
 	
@@ -350,7 +350,7 @@ void mvceditor::AppFrameClass::EnableSave(wxStyledTextEvent& event) {
 	Notebook->MarkPageAsModified(event.GetId());
 }
 
-void mvceditor::AppFrameClass::DisableSave(wxStyledTextEvent& event) {
+void mvceditor::MainFrameClass::DisableSave(wxStyledTextEvent& event) {
 	ToolBar->EnableTool(ID_TOOLBAR_SAVE, false);
 	ToolBar->Refresh();
 	
@@ -362,7 +362,7 @@ void mvceditor::AppFrameClass::DisableSave(wxStyledTextEvent& event) {
 	Notebook->MarkPageAsNotModified(event.GetId());
 }
 
-void mvceditor::AppFrameClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& event) {
+void mvceditor::MainFrameClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& event) {
 	int newPage = event.GetSelection();
 	bool isPageModified = Notebook->IsPageModified(newPage);
 	ToolBar->EnableTool(ID_TOOLBAR_SAVE, isPageModified);
@@ -375,7 +375,7 @@ void mvceditor::AppFrameClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& 
 	event.Skip();
 }
 
-void mvceditor::AppFrameClass::OnHelpAbout(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnHelpAbout(wxCommandEvent& event) {
 	wxAboutDialogInfo info;
 	info.AddDeveloper(wxT("Roberto Perpuly"));
 	info.SetCopyright(wxT("(c)2009-2011 Roberto Perpuly"));
@@ -385,11 +385,11 @@ void mvceditor::AppFrameClass::OnHelpAbout(wxCommandEvent& event) {
 	wxAboutBox(info);
 }
 
-void mvceditor::AppFrameClass::SaveCurrentFile(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::SaveCurrentFile(wxCommandEvent& event) {
 	Notebook->SaveCurrentPage();
 }
 
-void mvceditor::AppFrameClass::OnUpdateUi(wxUpdateUIEvent& event) {
+void mvceditor::MainFrameClass::OnUpdateUi(wxUpdateUIEvent& event) {
 	bool hasEditors = Notebook->GetPageCount() > 0;
 	int currentPage = Notebook->GetSelection();
 	CodeControlClass* code = Notebook->GetCurrentCodeControl();
@@ -408,19 +408,19 @@ void mvceditor::AppFrameClass::OnUpdateUi(wxUpdateUIEvent& event) {
 	event.Skip();
 }
 
-void mvceditor::AppFrameClass::CreateToolBarButtons() {
+void mvceditor::MainFrameClass::CreateToolBarButtons() {
 	ToolBar->AddTool(ID_TOOLBAR_SAVE, _("Save"), wxArtProvider::GetBitmap(
 		wxART_FILE_SAVE, wxART_TOOLBAR, wxSize(16, 16)), _("Save"));
 	ToolBar->EnableTool(ID_TOOLBAR_SAVE, false);
 	ToolBar->Realize();
 }
 
-void mvceditor::AppFrameClass::AuiManagerUpdate() {
+void mvceditor::MainFrameClass::AuiManagerUpdate() {
 	ToolBar->Realize();
 	AuiManager.Update();
 }
 
-void mvceditor::AppFrameClass::LoadPlugin(mvceditor::FeatureClass* feature) {
+void mvceditor::MainFrameClass::LoadPlugin(mvceditor::FeatureClass* feature) {
 	
 	// propagate GUI events to features, so that they can handle menu events themselves
 	// feature menus
@@ -474,7 +474,7 @@ void mvceditor::AppFrameClass::LoadPlugin(mvceditor::FeatureClass* feature) {
 	feature->AddWindows();
 }
 
-void mvceditor::AppFrameClass::OnContextMenu(wxContextMenuEvent& event) {
+void mvceditor::MainFrameClass::OnContextMenu(wxContextMenuEvent& event) {
 	CodeControlClass* codeWindow = Notebook->GetCurrentCodeControl();
 	
 	// only show the user if and only if
@@ -526,70 +526,70 @@ void mvceditor::AppFrameClass::OnContextMenu(wxContextMenuEvent& event) {
 	}
 }
 
-void mvceditor::AppFrameClass::OnUndo(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnUndo(wxCommandEvent& event) {
 	mvceditor::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
 	if (codeControl) {
 		codeControl->Undo();
 	}
 }
 
-void mvceditor::AppFrameClass::OnRedo(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnRedo(wxCommandEvent& event) {
 	mvceditor::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
 	if (codeControl) {
 		codeControl->Redo();
 	}
 }
 
-void mvceditor::AppFrameClass::OnCutLine(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnCutLine(wxCommandEvent& event) {
 	mvceditor::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
 	if (codeControl) {
 		codeControl->CmdKeyExecute(wxSTC_CMD_LINECUT);
 	}
 }
 
-void mvceditor::AppFrameClass::OnDuplicateLine(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnDuplicateLine(wxCommandEvent& event) {
 	mvceditor::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
 	if (codeControl) {
 		codeControl->CmdKeyExecute(wxSTC_CMD_LINEDUPLICATE);
 	}
 }
 
-void mvceditor::AppFrameClass::OnDeleteLine(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnDeleteLine(wxCommandEvent& event) {
 	mvceditor::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
 	if (codeControl) {
 		codeControl->CmdKeyExecute(wxSTC_CMD_LINEDELETE);
 	}
 }
 
-void mvceditor::AppFrameClass::OnTransposeLine(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnTransposeLine(wxCommandEvent& event) {
 	mvceditor::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
 	if (codeControl) {
 		codeControl->CmdKeyExecute(wxSTC_CMD_LINETRANSPOSE);
 	}
 }
 
-void mvceditor::AppFrameClass::OnCopyLine(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnCopyLine(wxCommandEvent& event) {
 	mvceditor::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
 	if (codeControl) {
 		codeControl->CmdKeyExecute(wxSTC_CMD_LINECOPY);
 	}
 }
 
-void mvceditor::AppFrameClass::OnLowecase(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnLowecase(wxCommandEvent& event) {
 	mvceditor::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
 	if (codeControl) {
 		codeControl->CmdKeyExecute(wxSTC_CMD_LOWERCASE);
 	}
 }
 
-void mvceditor::AppFrameClass::OnUppercase(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnUppercase(wxCommandEvent& event) {
 	mvceditor::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
 	if (codeControl) {
 		codeControl->CmdKeyExecute(wxSTC_CMD_UPPERCASE);
 	}
 }
 
-void mvceditor::AppFrameClass::OnCodeControlUpdate(wxStyledTextEvent& event) {
+void mvceditor::MainFrameClass::OnCodeControlUpdate(wxStyledTextEvent& event) {
 	CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
 	if (codeControl) {
 		int pos = codeControl->GetCurrentPos();
@@ -605,7 +605,7 @@ void mvceditor::AppFrameClass::OnCodeControlUpdate(wxStyledTextEvent& event) {
 	}
 }
 
-void mvceditor::AppFrameClass::DefaultKeyboardShortcuts() {
+void mvceditor::MainFrameClass::DefaultKeyboardShortcuts() {
 
 	// ATTN: when a new menu item is added to the form builder 
 	// we will need to add an entry here so that shortcuts
@@ -635,11 +635,11 @@ void mvceditor::AppFrameClass::DefaultKeyboardShortcuts() {
 	}
 }
 
-void mvceditor::AppFrameClass::OnAnyMenuCommandEvent(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnAnyMenuCommandEvent(wxCommandEvent& event) {
 	App.EventSink.Publish(event);
 }
 
-void mvceditor::AppFrameClass::OnAnyAuiNotebookEvent(wxAuiNotebookEvent& event) {
+void mvceditor::MainFrameClass::OnAnyAuiNotebookEvent(wxAuiNotebookEvent& event) {
 	if (event.GetEventType() == wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSED) {
 		if (mvceditor::ID_CODE_NOTEBOOK == event.GetId()) {
 			
@@ -667,12 +667,12 @@ void mvceditor::AppFrameClass::OnAnyAuiNotebookEvent(wxAuiNotebookEvent& event) 
 	event.Skip();
 }
 
-void mvceditor::AppFrameClass::OnAnyAuiToolbarEvent(wxAuiToolBarEvent& event) {
+void mvceditor::MainFrameClass::OnAnyAuiToolbarEvent(wxAuiToolBarEvent& event) {
 	App.EventSink.Publish(event);
 	event.Skip();
 }
 
-void mvceditor::AppFrameClass::UpdateTitleBar() {
+void mvceditor::MainFrameClass::UpdateTitleBar() {
 	if (Notebook->GetPageCount() > 0) {
 		mvceditor::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
 		if (codeControl) {
@@ -690,57 +690,57 @@ void mvceditor::AppFrameClass::UpdateTitleBar() {
 	}
 }
 
-mvceditor::AppEventListenerForFrameClass::AppEventListenerForFrameClass(mvceditor::AppFrameClass* appFrame)
+mvceditor::AppEventListenerForFrameClass::AppEventListenerForFrameClass(mvceditor::MainFrameClass* mainFrame)
 	: wxEvtHandler()
-	, AppFrame(appFrame) {
+	, MainFrame(mainFrame) {
 
 }
 
 void mvceditor::AppEventListenerForFrameClass::OnCmdFileOpen(wxCommandEvent& event) {
 	std::vector<wxString> filenames;
 	filenames.push_back(event.GetString());
-	AppFrame->FileOpen(filenames);
+	MainFrame->FileOpen(filenames);
 }
 
 void mvceditor::AppEventListenerForFrameClass::OnPreferencesSaved(wxCommandEvent& event) {
-	AppFrame->PreferencesSaved();
+	MainFrame->PreferencesSaved();
 }
 
 void mvceditor::AppEventListenerForFrameClass::OnPreferencesExternallyUpdated(wxCommandEvent& event) {
-	AppFrame->PreferencesExternallyUpdated();
+	MainFrame->PreferencesExternallyUpdated();
 }
 
 void mvceditor::AppEventListenerForFrameClass::OnAppReady(wxCommandEvent& event) {
-	AppFrame->PreferencesExternallyUpdated();
+	MainFrame->PreferencesExternallyUpdated();
 }
 
 void mvceditor::AppEventListenerForFrameClass::OnCodeNotebookPageChanged(wxAuiNotebookEvent& event) {
-	AppFrame->UpdateTitleBar();
+	MainFrame->UpdateTitleBar();
 }
 
 void mvceditor::AppEventListenerForFrameClass::OnCodeNotebookPageClosed(wxAuiNotebookEvent& event) {
-	AppFrame->UpdateTitleBar();
+	MainFrame->UpdateTitleBar();
 }
 
-BEGIN_EVENT_TABLE(mvceditor::AppFrameClass,  AppFrameGeneratedClass)
-	EVT_STC_SAVEPOINTREACHED(wxID_ANY, mvceditor::AppFrameClass::DisableSave)
-	EVT_STC_SAVEPOINTLEFT(wxID_ANY, mvceditor::AppFrameClass::EnableSave)
-	EVT_STC_UPDATEUI(wxID_ANY, mvceditor::AppFrameClass::OnCodeControlUpdate)
-	EVT_UPDATE_UI(wxID_ANY, mvceditor::AppFrameClass::OnUpdateUi)
-	EVT_CONTEXT_MENU(mvceditor::AppFrameClass::OnContextMenu)
+BEGIN_EVENT_TABLE(mvceditor::MainFrameClass,  MainFrameGeneratedClass)
+	EVT_STC_SAVEPOINTREACHED(wxID_ANY, mvceditor::MainFrameClass::DisableSave)
+	EVT_STC_SAVEPOINTLEFT(wxID_ANY, mvceditor::MainFrameClass::EnableSave)
+	EVT_STC_UPDATEUI(wxID_ANY, mvceditor::MainFrameClass::OnCodeControlUpdate)
+	EVT_UPDATE_UI(wxID_ANY, mvceditor::MainFrameClass::OnUpdateUi)
+	EVT_CONTEXT_MENU(mvceditor::MainFrameClass::OnContextMenu)
 
 	// these are context menu handlers; the menu handlers are already accounted for
-	// in the AppFrameGeneratedClass
-	EVT_MENU(wxID_UNDO, mvceditor::AppFrameClass::OnUndo)
-	EVT_MENU(wxID_REDO, mvceditor::AppFrameClass::OnRedo)
-	EVT_MENU(ID_CUT_LINE, mvceditor::AppFrameClass::OnCutLine)
-	EVT_MENU(ID_DUPLICATE_LINE, mvceditor::AppFrameClass::OnDuplicateLine)
-	EVT_MENU(ID_DELETE_LINE, mvceditor::AppFrameClass::OnDeleteLine)
-	EVT_MENU(ID_TRANSPOSE_LINE, mvceditor::AppFrameClass::OnTransposeLine)
-	EVT_MENU(ID_COPY_LINE, mvceditor::AppFrameClass::OnCopyLine)
-	EVT_MENU(ID_LOWERCASE, mvceditor::AppFrameClass::OnLowecase)
-	EVT_MENU(ID_UPPERCASE, mvceditor::AppFrameClass::OnUppercase)
-	EVT_MENU(ID_TOOLBAR_SAVE, mvceditor::AppFrameClass::SaveCurrentFile)
+	// in the MainFrameGeneratedClass
+	EVT_MENU(wxID_UNDO, mvceditor::MainFrameClass::OnUndo)
+	EVT_MENU(wxID_REDO, mvceditor::MainFrameClass::OnRedo)
+	EVT_MENU(ID_CUT_LINE, mvceditor::MainFrameClass::OnCutLine)
+	EVT_MENU(ID_DUPLICATE_LINE, mvceditor::MainFrameClass::OnDuplicateLine)
+	EVT_MENU(ID_DELETE_LINE, mvceditor::MainFrameClass::OnDeleteLine)
+	EVT_MENU(ID_TRANSPOSE_LINE, mvceditor::MainFrameClass::OnTransposeLine)
+	EVT_MENU(ID_COPY_LINE, mvceditor::MainFrameClass::OnCopyLine)
+	EVT_MENU(ID_LOWERCASE, mvceditor::MainFrameClass::OnLowecase)
+	EVT_MENU(ID_UPPERCASE, mvceditor::MainFrameClass::OnUppercase)
+	EVT_MENU(ID_TOOLBAR_SAVE, mvceditor::MainFrameClass::SaveCurrentFile)
 
 	// ATTN: STOP! DO NOT HANDLE ANY APP EVENTS HERE! SEE AppEventListenerForFrameClass
 
@@ -749,25 +749,25 @@ BEGIN_EVENT_TABLE(mvceditor::AppFrameClass,  AppFrameGeneratedClass)
 	// the app frame), but that function could no longer be used when the event sink was 
 	// introduced; since for any feature that did not handle the event the app frame would get the event
 	// (because the feature had the frame in its handler chain)
-	// for now we will only restrict to the feature menus, since AppFrameGeneratedClass already handles
+	// for now we will only restrict to the feature menus, since MainFrameGeneratedClass already handles
 	// some events I could not just do EVT_MENU(wxID_ANY,...); putting this line would mean
-	// that OnAnyMenuCommandEvent would need to handle all of the AppFrame menus (and adding a new menu item
-	// to the app frame menus would involve modifying OnAnyMenuCommandEvent AND AppFrameGeneratedClass
-	EVT_MENU_RANGE(mvceditor::MENU_START, mvceditor::MENU_END, mvceditor::AppFrameClass::OnAnyMenuCommandEvent)
-	EVT_TOOL_RANGE(mvceditor::MENU_START, mvceditor::MENU_END, mvceditor::AppFrameClass::OnAnyMenuCommandEvent)
+	// that OnAnyMenuCommandEvent would need to handle all of the MainFrame menus (and adding a new menu item
+	// to the app frame menus would involve modifying OnAnyMenuCommandEvent AND MainFrameGeneratedClass
+	EVT_MENU_RANGE(mvceditor::MENU_START, mvceditor::MENU_END, mvceditor::MainFrameClass::OnAnyMenuCommandEvent)
+	EVT_TOOL_RANGE(mvceditor::MENU_START, mvceditor::MENU_END, mvceditor::MainFrameClass::OnAnyMenuCommandEvent)
 
 	// make sure notebook events are propagated to the app event sink
-	EVT_AUINOTEBOOK_PAGE_CHANGED(wxID_ANY, mvceditor::AppFrameClass::OnAnyAuiNotebookEvent)
-	EVT_AUINOTEBOOK_PAGE_CHANGING(wxID_ANY, mvceditor::AppFrameClass::OnAnyAuiNotebookEvent)
-	EVT_AUINOTEBOOK_PAGE_CLOSE(wxID_ANY, mvceditor::AppFrameClass::OnAnyAuiNotebookEvent)
-	EVT_AUINOTEBOOK_PAGE_CLOSED(wxID_ANY, mvceditor::AppFrameClass::OnAnyAuiNotebookEvent) 
+	EVT_AUINOTEBOOK_PAGE_CHANGED(wxID_ANY, mvceditor::MainFrameClass::OnAnyAuiNotebookEvent)
+	EVT_AUINOTEBOOK_PAGE_CHANGING(wxID_ANY, mvceditor::MainFrameClass::OnAnyAuiNotebookEvent)
+	EVT_AUINOTEBOOK_PAGE_CLOSE(wxID_ANY, mvceditor::MainFrameClass::OnAnyAuiNotebookEvent)
+	EVT_AUINOTEBOOK_PAGE_CLOSED(wxID_ANY, mvceditor::MainFrameClass::OnAnyAuiNotebookEvent) 
 	
 	// make sure the tool bar events are propagated to the app event sink
-	EVT_AUITOOLBAR_BEGIN_DRAG(wxID_ANY, mvceditor::AppFrameClass::OnAnyAuiToolbarEvent)
-	EVT_AUITOOLBAR_MIDDLE_CLICK(wxID_ANY, mvceditor::AppFrameClass::OnAnyAuiToolbarEvent)
-	EVT_AUITOOLBAR_OVERFLOW_CLICK(wxID_ANY, mvceditor::AppFrameClass::OnAnyAuiToolbarEvent)
-	EVT_AUITOOLBAR_RIGHT_CLICK(wxID_ANY, mvceditor::AppFrameClass::OnAnyAuiToolbarEvent)
-	EVT_AUITOOLBAR_TOOL_DROPDOWN(wxID_ANY, mvceditor::AppFrameClass::OnAnyAuiToolbarEvent)
+	EVT_AUITOOLBAR_BEGIN_DRAG(wxID_ANY, mvceditor::MainFrameClass::OnAnyAuiToolbarEvent)
+	EVT_AUITOOLBAR_MIDDLE_CLICK(wxID_ANY, mvceditor::MainFrameClass::OnAnyAuiToolbarEvent)
+	EVT_AUITOOLBAR_OVERFLOW_CLICK(wxID_ANY, mvceditor::MainFrameClass::OnAnyAuiToolbarEvent)
+	EVT_AUITOOLBAR_RIGHT_CLICK(wxID_ANY, mvceditor::MainFrameClass::OnAnyAuiToolbarEvent)
+	EVT_AUITOOLBAR_TOOL_DROPDOWN(wxID_ANY, mvceditor::MainFrameClass::OnAnyAuiToolbarEvent)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::AppEventListenerForFrameClass, wxEvtHandler)

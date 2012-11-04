@@ -7,35 +7,35 @@
 
 #include "../../widgets/NotebookClass.h"
 
-#include "AppFrameGeneratedClass.h"
+#include "MainFrameForms.h"
 
 ///////////////////////////////////////////////////////////////////////////
 
-BEGIN_EVENT_TABLE( AppFrameGeneratedClass, wxFrame )
-	EVT_CLOSE( AppFrameGeneratedClass::_wxFB_OnClose )
-	EVT_AUINOTEBOOK_PAGE_CHANGED( ID_NOTEBOOK, AppFrameGeneratedClass::_wxFB_OnContentNotebookPageChanged )
-	EVT_AUINOTEBOOK_PAGE_CLOSE( ID_NOTEBOOK, AppFrameGeneratedClass::_wxFB_OnContentNotebookPageClose )
-	EVT_MENU( ID_FILE_PHP_NEW, AppFrameGeneratedClass::_wxFB_OnFilePhpNew )
-	EVT_MENU( ID_FILE_SQL_NEW, AppFrameGeneratedClass::_wxFB_OnFileSqlNew )
-	EVT_MENU( ID_FILE_CSS_NEW, AppFrameGeneratedClass::_wxFB_OnFileCssNew )
-	EVT_MENU( ID_FILE_TEXT_NEW_FILE, AppFrameGeneratedClass::_wxFB_OnFileTextNew )
-	EVT_MENU( wxID_OPEN, AppFrameGeneratedClass::_wxFB_OnFileOpen )
-	EVT_MENU( wxID_SAVE, AppFrameGeneratedClass::_wxFB_OnFileSave )
-	EVT_MENU( wxID_SAVEAS, AppFrameGeneratedClass::_wxFB_OnFileSaveAs )
-	EVT_MENU( ID_FILE_REVERT, AppFrameGeneratedClass::_wxFB_OnFileRevert )
-	EVT_MENU( ID_FILE_CLOSE, AppFrameGeneratedClass::_wxFB_OnFileClose )
-	EVT_MENU( wxID_EXIT, AppFrameGeneratedClass::_wxFB_OnFileExit )
-	EVT_MENU( wxID_CUT, AppFrameGeneratedClass::_wxFB_OnEditCut )
-	EVT_MENU( wxID_COPY, AppFrameGeneratedClass::_wxFB_OnEditCopy )
-	EVT_MENU( wxID_PASTE, AppFrameGeneratedClass::_wxFB_OnEditPaste )
-	EVT_MENU( wxID_SELECTALL, AppFrameGeneratedClass::_wxFB_OnEditSelectAll )
-	EVT_MENU( ID_EDIT_CONTENT_ASSIST, AppFrameGeneratedClass::_wxFB_OnEditContentAssist )
-	EVT_MENU( ID_EDIT_CALL_TIP, AppFrameGeneratedClass::_wxFB_OnEditCallTip )
-	EVT_MENU( ID_EDIT_PREFERENCES, AppFrameGeneratedClass::_wxFB_OnEditPreferences )
-	EVT_MENU( ID_ABOUT, AppFrameGeneratedClass::_wxFB_OnHelpAbout )
+BEGIN_EVENT_TABLE( MainFrameGeneratedClass, wxFrame )
+	EVT_CLOSE( MainFrameGeneratedClass::_wxFB_OnClose )
+	EVT_AUINOTEBOOK_PAGE_CHANGED( ID_NOTEBOOK, MainFrameGeneratedClass::_wxFB_OnContentNotebookPageChanged )
+	EVT_AUINOTEBOOK_PAGE_CLOSE( ID_NOTEBOOK, MainFrameGeneratedClass::_wxFB_OnContentNotebookPageClose )
+	EVT_MENU( ID_FILE_PHP_NEW, MainFrameGeneratedClass::_wxFB_OnFilePhpNew )
+	EVT_MENU( ID_FILE_SQL_NEW, MainFrameGeneratedClass::_wxFB_OnFileSqlNew )
+	EVT_MENU( ID_FILE_CSS_NEW, MainFrameGeneratedClass::_wxFB_OnFileCssNew )
+	EVT_MENU( ID_FILE_TEXT_NEW_FILE, MainFrameGeneratedClass::_wxFB_OnFileTextNew )
+	EVT_MENU( wxID_OPEN, MainFrameGeneratedClass::_wxFB_OnFileOpen )
+	EVT_MENU( wxID_SAVE, MainFrameGeneratedClass::_wxFB_OnFileSave )
+	EVT_MENU( wxID_SAVEAS, MainFrameGeneratedClass::_wxFB_OnFileSaveAs )
+	EVT_MENU( ID_FILE_REVERT, MainFrameGeneratedClass::_wxFB_OnFileRevert )
+	EVT_MENU( ID_FILE_CLOSE, MainFrameGeneratedClass::_wxFB_OnFileClose )
+	EVT_MENU( wxID_EXIT, MainFrameGeneratedClass::_wxFB_OnFileExit )
+	EVT_MENU( wxID_CUT, MainFrameGeneratedClass::_wxFB_OnEditCut )
+	EVT_MENU( wxID_COPY, MainFrameGeneratedClass::_wxFB_OnEditCopy )
+	EVT_MENU( wxID_PASTE, MainFrameGeneratedClass::_wxFB_OnEditPaste )
+	EVT_MENU( wxID_SELECTALL, MainFrameGeneratedClass::_wxFB_OnEditSelectAll )
+	EVT_MENU( ID_EDIT_CONTENT_ASSIST, MainFrameGeneratedClass::_wxFB_OnEditContentAssist )
+	EVT_MENU( ID_EDIT_CALL_TIP, MainFrameGeneratedClass::_wxFB_OnEditCallTip )
+	EVT_MENU( ID_EDIT_PREFERENCES, MainFrameGeneratedClass::_wxFB_OnEditPreferences )
+	EVT_MENU( ID_ABOUT, MainFrameGeneratedClass::_wxFB_OnHelpAbout )
 END_EVENT_TABLE()
 
-AppFrameGeneratedClass::AppFrameGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
+MainFrameGeneratedClass::MainFrameGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
 {
 	this->SetSizeHints( wxSize( -1,-1 ), wxDefaultSize );
 	
@@ -151,7 +151,7 @@ AppFrameGeneratedClass::AppFrameGeneratedClass( wxWindow* parent, wxWindowID id,
 	
 }
 
-AppFrameGeneratedClass::~AppFrameGeneratedClass()
+MainFrameGeneratedClass::~MainFrameGeneratedClass()
 {
 }
 
