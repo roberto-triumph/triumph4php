@@ -22,7 +22,7 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <windows/EditColorsPanelClass.h>
+#include <main_frame/EditColorsPanelClass.h>
 #include <code_control/CodeControlStyles.h>
 #include <wx/stc/stc.h>
 

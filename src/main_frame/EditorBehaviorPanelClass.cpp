@@ -22,7 +22,7 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <windows/EditorBehaviorPanelClass.h>
+#include <main_frame/EditorBehaviorPanelClass.h>
 #include <wx/valgen.h>
 
 mvceditor::EditorBehaviorPanelClass::EditorBehaviorPanelClass(wxWindow* parent, mvceditor::CodeControlOptionsClass& options)
