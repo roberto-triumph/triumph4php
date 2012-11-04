@@ -27,6 +27,18 @@
 #include <globals/Assets.h>
 #include <vector>
 
+static wxString Join(const std::vector<wxString>& list, const wxString& separator) {
+	wxString joined;
+	for (size_t i = 0; i < list.size(); ++i) {
+		joined.Append(list[i]);
+		if (i < (list.size() - 1)) {
+			joined.Append(separator);
+		}
+	}
+	return joined;
+}
+
+
 mvceditor::ProjectClass::ProjectClass()
 	: Label()
 	, Sources()
@@ -69,22 +81,41 @@ void mvceditor::ProjectClass::ClearSources() {
 }
 
 std::vector<mvceditor::SourceClass> mvceditor::ProjectClass::AllPhpSources() const {
-	wxString phpExtensionsString;
-	for (size_t i = 0; i < PhpFileExtensions.size(); ++i) {
-		phpExtensionsString.Append(PhpFileExtensions[i]);
-		if (i < (PhpFileExtensions.size() - 1)) {
-			phpExtensionsString.Append(wxT(';'));
-		}
-	}
+	wxString phpExtensionsString = Join(PhpFileExtensions, wxT(";"));
+	
 	std::vector<mvceditor::SourceClass>::const_iterator src;
 	std::vector<mvceditor::SourceClass> phpSources;
 	for (src = Sources.begin(); src != Sources.end(); ++src) {
 		mvceditor::SourceClass phpSrc;
 		phpSrc.RootDirectory = src->RootDirectory;
 		phpSrc.SetIncludeWildcards(phpExtensionsString);
+		phpSrc.SetExcludeWildcards(src->ExcludeWildcardsString());
 		phpSources.push_back(phpSrc);
 	}
 	return phpSources;
+}
+
+std::vector<mvceditor::SourceClass> mvceditor::ProjectClass::AllSources() const {
+	
+	// get all extensions we know about
+	std::vector<wxString> allExtensions;
+	allExtensions.insert(allExtensions.end(), CssFileExtensions.begin(), CssFileExtensions.end());
+	allExtensions.insert(allExtensions.end(), MiscFileExtensions.begin(), MiscFileExtensions.end());
+	allExtensions.insert(allExtensions.end(), PhpFileExtensions.begin(), PhpFileExtensions.end());
+	allExtensions.insert(allExtensions.end(), SqlFileExtensions.begin(), SqlFileExtensions.end());
+	wxString allExtensionsString = Join(allExtensions, wxT(";"));
+
+	// make the new sources to return
+	std::vector<mvceditor::SourceClass>::const_iterator src;
+	std::vector<mvceditor::SourceClass> allSources;
+	for (src = Sources.begin(); src != Sources.end(); ++src) {
+		mvceditor::SourceClass allSrc;
+		allSrc.RootDirectory = src->RootDirectory;
+		allSrc.SetIncludeWildcards(allExtensionsString);
+		allSrc.SetExcludeWildcards(src->ExcludeWildcardsString());
+		allSources.push_back(allSrc);
+	}
+	return allSources;
 }
 
 bool mvceditor::ProjectClass::IsAPhpSourceFile(const wxString& fullPath) const {
@@ -128,4 +159,12 @@ void mvceditor::ProjectClass::RemoveResourceDb() {
 	if (ResourceDbFileName.FileExists()) {
 		wxRemoveFile(ResourceDbFileName.GetFullPath());
 	}
+}
+
+std::vector<wxString> mvceditor::ProjectClass::AllNonPhpExtensions() const {
+	std::vector<wxString> allExtensions;
+	allExtensions.insert(allExtensions.end(), CssFileExtensions.begin(), CssFileExtensions.end());
+	allExtensions.insert(allExtensions.end(), MiscFileExtensions.begin(), MiscFileExtensions.end());
+	allExtensions.insert(allExtensions.end(), SqlFileExtensions.begin(), SqlFileExtensions.end());
+	return allExtensions;
 }

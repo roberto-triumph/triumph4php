@@ -124,11 +124,24 @@ public:
 	void ClearSources();
 	
 	/**
+	 * This method will return a list of sources suitable
+	 * for recursing into this project to find all of the PHP Source
+	 * code files in this project.
+	 *
 	 * @return all of this project's source directories
-	 * but with the added restriction of including only the
-	 * PHP file extension
+	 * but with the PHP extensions added to each source.
 	 */
 	std::vector<mvceditor::SourceClass> AllPhpSources() const;
+
+	/**
+	 * This method will return a list of sources suitable for recursing into
+	 * this project to find all relevant files; ie PHP, CSS, SQL,
+	 * and all misc file extensions.
+	 *
+	 * @return all of this project's sources with all of the wildcards (PHP, CSS, SQL,
+	 * and misc file extensions) added to each sources. 
+	 */
+	std::vector<mvceditor::SourceClass> AllSources() const;
 
 	/**
 	 * @return TRUE if given full path is a PHP file, as determined by
@@ -167,6 +180,13 @@ public:
 	 * to cache a project's sources.
 	 */
 	void RemoveResourceDb();
+
+	/**
+	 *
+	 * return the CssFileExtensions + SqlFileExtensions + MiscFileExtensions for this project.
+	 * @return all extension wilcards except for PHP wildcards
+	 */
+	std::vector<wxString> AllNonPhpExtensions() const;
 
 private:
 	

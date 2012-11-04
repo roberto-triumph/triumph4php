@@ -99,6 +99,11 @@ public:
 	}
 
 	bool operator()(const UnitTest::Test* test) const {
+		// if no specific test cases need to be run, then run all tests in
+		// a suite
+		if (TestCases.empty()) {
+			return true;
+		}
 		bool ret = false;
 		for (std::vector<const char*>::const_iterator it =  TestCases.begin(); it != TestCases.end(); ++it) {
 			if (strcmp(*it, test->m_details.testName) == 0) {
@@ -122,9 +127,8 @@ int main(int argc, char **argv) {
 
 	// change if you want to run only one test
 	bool runAll = true;
-	const char* suiteToRun = "ApacheTestClass";
+	const char* suiteToRun = "ProjectTestClass";
 	std::vector<const char*> testCasesToRun;
-	testCasesToRun.push_back("WalkShouldFindApacheConfigFile");
 	int ret = 0;
 	if (runAll) {
 		ret = UnitTest::RunAllTests();

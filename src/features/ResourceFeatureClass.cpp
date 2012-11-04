@@ -108,21 +108,6 @@ void mvceditor::ResourceFileReaderClass::BackgroundCleanup() {
 
 bool mvceditor::ResourceFileReaderClass::InitProject(const mvceditor::ProjectClass& project,  pelet::Versions version) {
 	bool next = false;
-	std::vector<wxString> miscFileExtensions;
-	miscFileExtensions.insert(miscFileExtensions.end(), project.CssFileExtensions.begin(), project.CssFileExtensions.end());
-	miscFileExtensions.insert(miscFileExtensions.end(), project.SqlFileExtensions.begin(), project.SqlFileExtensions.end());
-	miscFileExtensions.insert(miscFileExtensions.end(), project.MiscFileExtensions.begin(), project.MiscFileExtensions.end());
-		
-	std::vector<mvceditor::SourceClass> sources = project.AllPhpSources();
-	wxString allWildcards;
-	for (size_t i = 0; i < project.PhpFileExtensions.size(); ++i) {
-		allWildcards  += project.PhpFileExtensions[i];
-		allWildcards  += wxT(";");
-	}
-	for (size_t i = 0; i < miscFileExtensions.size(); ++i) {
-		allWildcards  += miscFileExtensions[i];
-		allWildcards  += wxT(";");
-	}
 	
 	// add the rest of the file filters; that way file reader will hand them over to the
 	// resource finder
@@ -130,10 +115,8 @@ bool mvceditor::ResourceFileReaderClass::InitProject(const mvceditor::ProjectCla
 	// we want to see (PHP + all the rest) but we tell the resource cache
 	// which ones are PHP files and which ones are of other types so that it
 	// does not bother and try to parse non-php files
-	std::vector<mvceditor::SourceClass>::iterator source;
-	for (source = sources.begin(); source != sources.end(); ++source) {
-		source->SetIncludeWildcards(allWildcards);
-	}
+	std::vector<wxString> miscFileExtensions = project.AllNonPhpExtensions();	
+	std::vector<mvceditor::SourceClass> sources = project.AllSources();
 	if (Init(sources)) {
 		next = true;
 		wxASSERT_MSG(GlobalCache == NULL, _("cache pointer has not been cleaned up"));
