@@ -149,7 +149,7 @@ static wxString NiceDocText(const UnicodeString& comment) {
 
 mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,
 			mvceditor::GlobalsClass* globals,
-			int id, const wxPoint& position, const wxSize& size, long style,
+			wxWindowID id, const wxPoint& position, const wxSize& size, long style,
 			const wxString& name)
 		: wxStyledTextCtrl(parent, id, position, size, style, name)
 		, CodeControlOptions(options)

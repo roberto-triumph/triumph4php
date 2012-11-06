@@ -97,7 +97,7 @@ public:
 	 */
 	CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,
 					GlobalsClass* globals,
-	                 int id, const wxPoint& position =
+	                 wxWindowID id, const wxPoint& position =
 	                     wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0,
 	                 const wxString& name = wxT("code"));
 
