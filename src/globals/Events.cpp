@@ -77,4 +77,4 @@ const int mvceditor::ID_OUTLINE_NOTEBOOK = wxNewId();
 
 // ATTN: this is hardcoded because of the way that the notebook is created
 // within the MainFrameForms (created by wxFormBuilder)
-const int mvceditor::ID_CODE_NOTEBOOK = 1000;
+const int mvceditor::ID_CODE_NOTEBOOK = 1001;
