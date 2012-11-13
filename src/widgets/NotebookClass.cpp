@@ -188,6 +188,7 @@ void mvceditor::NotebookClass::LoadPage() {
 }
 
 void mvceditor::NotebookClass::LoadPage(const wxString& filename) {
+	this->Freeze();
 	bool found = false;
 	
 	// if file is already opened just bring it to the forefront
@@ -237,6 +238,7 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename) {
 			mvceditor::EditorLogError(mvceditor::CHARSET_DETECTION, filename);
 		}
 	}
+	this->Thaw();
 }
 
 void mvceditor::NotebookClass::LoadPages(const std::vector<wxString>& filenames) {
