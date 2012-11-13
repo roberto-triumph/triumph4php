@@ -73,6 +73,8 @@ public:
 		const wxSize& size = wxDefaultSize, 
 		long style = wxAUI_NB_DEFAULT_STYLE | wxAUI_NB_WINDOWLIST_BUTTON);
 	
+	~NotebookClass();
+
 	/**
 	 * Changes the text of the page tab to mark it having changes that have 
 	 * NOT been saved.
