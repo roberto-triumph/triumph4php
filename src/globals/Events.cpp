@@ -72,9 +72,12 @@ const wxEventType mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED = wxNewEve
 const wxEventType mvceditor::EVENT_CMD_RE_INDEX = wxNewEventType();
 const wxEventType mvceditor::EVENT_CMD_FILE_OPEN = wxNewEventType();
 const wxEventType mvceditor::EVENT_CMD_PROJECT_URLS = wxNewEventType();
-const int mvceditor::ID_TOOLS_NOTEBOOK = wxNewId();
-const int mvceditor::ID_OUTLINE_NOTEBOOK = wxNewId();
 
-// ATTN: this is hardcoded because of the way that the notebook is created
-// within the MainFrameForms (created by wxFormBuilder)
-const int mvceditor::ID_CODE_NOTEBOOK = 1001;
+const long mvceditor::ID_TOOLS_NOTEBOOK = 1003;
+const long mvceditor::ID_OUTLINE_NOTEBOOK = 1002;
+
+/*
+ *ATTN: this is hardcoded because of the way that the notebook is created
+ * within the MainFrameForms (created by wxFormBuilder)
+ */
+const long mvceditor::ID_CODE_NOTEBOOK = 1001;
