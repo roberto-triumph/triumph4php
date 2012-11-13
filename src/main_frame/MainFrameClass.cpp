@@ -123,6 +123,11 @@ void mvceditor::MainFrameClass::OnClose(wxCloseEvent& event) {
 		wxLog::DontCreateOnDemand();
 		
 		App.RunningThreads.StopAll();
+
+		// delete the features first so that we can destroy
+		// the windows without worrying if the features
+		// may access them.
+		App.DeleteFeatures();
 		
 
 		// cleanup all open code controls and tabs. this is because

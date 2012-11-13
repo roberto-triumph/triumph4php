@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <globals/Events.h>
+#include <algorithm>
 
 mvceditor::EventSinkClass::EventSinkClass() 
 	: Handlers() {
@@ -30,6 +31,10 @@ mvceditor::EventSinkClass::EventSinkClass()
 
 void mvceditor::EventSinkClass::PushHandler(wxEvtHandler *handler) {
 	Handlers.push_back(handler);
+}
+
+void mvceditor::EventSinkClass::RemoveAllHandlers() {
+	Handlers.clear();
 }
 
 void mvceditor::EventSinkClass::Publish(wxEvent& event) {

@@ -120,6 +120,11 @@ public:
 	 */
 	void StopConfigModifiedCheck();
 
+	/**
+	 * delete features from memory in a safe way
+	 */
+	void DeleteFeatures();
+
 private:
 
 	/**
@@ -131,11 +136,6 @@ private:
 	 * create features. only instantiates and nothing else
 	 */
 	void CreateFeatures();
-	
-	/**
-	 * delete features from memory
-	 */
-	void DeleteFeatures();
 
 	/**
 	 * asks features for any windows they want to create

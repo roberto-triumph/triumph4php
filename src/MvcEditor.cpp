@@ -196,7 +196,11 @@ void mvceditor::AppClass::FeatureWindows() {
 
 void mvceditor::AppClass::DeleteFeatures() {
 
-	// if i delete in the same loop as the PopEventHandler, wx assertions fail.
+	// disconnect from events so that events dont get sent after
+	// features are destroyed
+	EventSink.RemoveAllHandlers();
+
+	// now it should be safe to 
 	for (size_t i = 0; i < Features.size(); ++i) {
 		delete Features[i];
 	}

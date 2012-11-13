@@ -89,8 +89,10 @@ void mvceditor::ResourceFinderBackgroundThreadClass::BackgroundWork() {
 		// need this call so that resources are actually parsed
 		ResourceFinder.Walk(FileName);
 		std::vector<mvceditor::ResourceClass> resources = ResourceFinder.All();
-		mvceditor::ResourceFinderCompleteEventClass evt(ID_RESOURCE_FINDER_BACKGROUND, resources);
-		PostEvent(evt);
+		if (!TestDestroy()) {
+			mvceditor::ResourceFinderCompleteEventClass evt(ID_RESOURCE_FINDER_BACKGROUND, resources);
+			PostEvent(evt);
+		}
 	}
 }
 

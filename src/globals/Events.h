@@ -70,6 +70,12 @@ public:
 	void PushHandler(wxEvtHandler* handler);
 
 	/**
+	 * forget all of the pushed handlers. After a call to this method, further calls
+	 * to Publish() will do nothing.
+	 */
+	void RemoveAllHandlers();
+
+	/**
 	 * @param event send the event to all registered handlers
 	 */
 	void Publish(wxEvent& event);
