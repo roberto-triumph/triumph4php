@@ -517,6 +517,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 				wxFileName::SplitPath(fullPath, &path, &currentFileName, &extension);
 				currentFileName += wxT(".") + extension;
 				wxString fileName = mvceditor::IcuToWx(resourceSearch.GetFileName());
+				fileName = fileName.Lower();
 				if (wxNOT_FOUND != currentFileName.Lower().Find(fileName)) {
 					if (0 == resourceSearch.GetLineNumber() || GetLineCountFromFile(fullPath) >= resourceSearch.GetLineNumber()) {
 						ResourceClass newItem;

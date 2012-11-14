@@ -283,6 +283,22 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 }
 
+TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameSearchDoesNotMatchCase) {
+	TestFile = wxT("test.php");
+	Prep(wxString::FromAscii(
+		"<?php\n"
+		"\t\r\n"
+		"\t\r"
+		"\t$s = 'hello';\n"
+		"\n"
+		"?>\n"
+	));
+	ResourceFinder.Walk(TestProjectDir + TestFile);
+	CollectNearMatchResources(UNICODE_STRING_SIMPLE("TEST.php"));
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
+}
+
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhenClassNameMatches) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
