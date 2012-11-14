@@ -1039,6 +1039,11 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectFullyQualifiedResourcesShouldFi
 	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("AdminClass"));
 	Matches = ResourceFinder.CollectFullyQualifiedResource(resourceSearch);
 	CHECK_VECTOR_SIZE(1, Matches);
+
+	// make sure that file lookups work as well
+	mvceditor::ResourceSearchClass resourceFileSearch(UNICODE_STRING_SIMPLE("test.php"));
+	Matches = ResourceFinder.CollectNearMatchResources(resourceFileSearch);
+	CHECK_VECTOR_SIZE(1, Matches);
 }
 
 TEST_FIXTURE(ResourceFinderFileTestClass, CollectFullyQualifiedResourcesShouldFindClassWhenFileHasBeenDeleted) {
@@ -1390,7 +1395,6 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraitsWh
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceTraitsShouldReturnAllTraits) {
-	//ResourceFinder.InitFile(wxFileName(wxT("c:\\users\\rperpuly\\desktop\\t.db")));
 	ResourceFinder.SetVersion(pelet::PHP_54); 
 	Prep(mvceditor::CharToIcu(
 		"trait ezcReflectionReturnInfo { "

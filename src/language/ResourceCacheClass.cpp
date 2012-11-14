@@ -69,8 +69,10 @@ bool mvceditor::WorkingCacheClass::Update(const UnicodeString& code) {
 	return ret;
 }
 
-void mvceditor::WorkingCacheClass::Init(const wxString& fileName, bool isNew, pelet::Versions version, bool createSymbols) {
+void mvceditor::WorkingCacheClass::Init(const wxString& fileName, 
+										const wxString& fileIdentifier, bool isNew, pelet::Versions version, bool createSymbols) {
 	FileName = fileName;
+	FileIdentifier = fileIdentifier;
 	IsNew = isNew;
 	ResourceFinder.SetVersion(version);
 	SymbolTable.SetVersion(version);
@@ -206,7 +208,18 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceCacheClass::CollectNear
 	std::map<wxString, mvceditor::ResourceFinderClass*> openedFinders;
 	std::map<wxString, mvceditor::WorkingCacheClass*>::const_iterator it;
 	for (it = WorkingCaches.begin(); it != WorkingCaches.end(); ++it) {
-		openedFinders[it->first] = &it->second->ResourceFinder;
+		if (it->second->IsNew) {
+
+			// use the file identifier as a key to the map
+			openedFinders[it->first] = &it->second->ResourceFinder;
+		}
+		else {
+
+			// use the filename being edited as a key to the map
+			// this is needed so that we can know to remove matches
+			// that come from dirty files
+			openedFinders[it->second->FileName] = &it->second->ResourceFinder;
+		}
 	}
 	for (size_t i = 0; i < finders.size(); ++i) {
 		mvceditor::ResourceFinderClass* resourceFinder = finders[i];
@@ -291,7 +304,7 @@ void mvceditor::ResourceCacheClass::GlobalAddDynamicResources(const std::vector<
 
 		// this is the case when Clear() is called right before this method
 		mvceditor::WorkingCacheClass* cache = new mvceditor::WorkingCacheClass;
-		cache->Init(wxT(":memory:"), true, pelet::PHP_53, false);
+		cache->Init(wxT(":memory:"), wxT(":memory:"), true, pelet::PHP_53, false);
 		WorkingCaches[wxT(":memory:")] = cache;
 	}
 	WorkingCaches[wxT(":memory:")]->ResourceFinder.AddDynamicResources(resources);

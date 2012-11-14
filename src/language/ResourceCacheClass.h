@@ -112,10 +112,15 @@ public:
 	mvceditor::SymbolTableClass SymbolTable;
 
 	/**
-	 * The full path to the file being parsed.  This may also be an invalid file
-	 * path like "Untitled 1" if the user is editing a new file.
+	 * The full path to the file being parsed. This may be the empty string
+	 * if the file resides completely in memory
 	 */
 	wxString FileName;
+
+	/**
+	 * A unique, *non-empty* identifier string. 
+	 */
+	wxString FileIdentifier;
 
 	/**
 	 * TRUE if the user is editing a new file
@@ -125,13 +130,14 @@ public:
 	WorkingCacheClass();
 
 	/**
-	 * @param fileName the full path to the file beign parsed
+	 * @param fileName the full path to the file being parsed
+	 * @param fileIdentifier  A unique, *non-empty* identifier string. 
 	 * @param isNew TRUE if the user is editing a new file
 	 * @param version the PHP version that the parser will check against
 	 * @param createSymbols if TRUE then the symbol table is built from the file
 	 *        if this is true then fileName must be a valid full path
 	 */
-	void Init(const wxString& fileName, bool isNew, pelet::Versions version, bool createSymbols);
+	void Init(const wxString& fileName, const wxString& fileIdentifier, bool isNew, pelet::Versions version, bool createSymbols);
 
 	/**
 	 * Will parse the resources and determine type information for the given text 

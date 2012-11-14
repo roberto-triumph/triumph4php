@@ -741,6 +741,11 @@ void mvceditor::ResourceFinderClass::BuildResourceCache(const wxString& fullPath
 				std::vector<int> fileItemIdsToRemove;
 				fileItemIdsToRemove.push_back(fileItem.FileId);
 				RemovePersistedResources(fileItemIdsToRemove);
+
+				// the previous line deleted the file from file_items
+				// we need to re-add it
+				fileItem.MakeNew(fileName, parseClasses);
+				PersistFileItem(fileItem);
 			}			
 			FileParsingCache.clear();
 			

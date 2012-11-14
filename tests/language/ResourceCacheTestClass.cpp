@@ -70,7 +70,7 @@ public:
 
 	mvceditor::WorkingCacheClass* CreateWorkingCache(const wxString& fileName, const UnicodeString& code) {
 		mvceditor::WorkingCacheClass* cache = new mvceditor::WorkingCacheClass();
-		cache->Init(fileName, true, pelet::PHP_53, false);
+		cache->Init(fileName, fileName, true, pelet::PHP_53, false);
 		cache->Update(code);
 		return cache;
 	}
@@ -157,7 +157,7 @@ public:
 
 	mvceditor::WorkingCacheClass* CreateWorkingCache(const wxString& fileName, const UnicodeString& code) {
 		mvceditor::WorkingCacheClass* cache = new mvceditor::WorkingCacheClass();
-		cache->Init(fileName, true, pelet::PHP_53, false);
+		cache->Init(fileName, fileName, true, pelet::PHP_53, false);
 		cache->Update(code);
 		return cache;
 	}

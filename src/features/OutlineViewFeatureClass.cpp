@@ -71,7 +71,7 @@ mvceditor::ResourceFinderBackgroundThreadClass::ResourceFinderBackgroundThreadCl
 }
 
 bool mvceditor::ResourceFinderBackgroundThreadClass::Start(const wxString& fileName, const mvceditor::EnvironmentClass& environment, wxThreadIdType& threadId) {
-	FileName = fileName;
+	FileName = fileName.c_str();
 	
 	// need this so that the resource finder parsers the file
 	ResourceFinder.InitMemory();
