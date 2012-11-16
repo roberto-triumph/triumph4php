@@ -63,8 +63,8 @@ TEST_FIXTURE(DatabaseInfoTestFixtureClass, ConnectQueryAndResults) {
 	CHECK_EQUAL(0, results.Error.length());
 	CHECK(results.Success);
 	CHECK_EQUAL(3, results.AffectedRows);
-	CHECK_VECTOR_SIZE(3, results.StringResults);
 	CHECK_EQUAL(0, error.length());
+	CHECK_VECTOR_SIZE(3, results.StringResults);
 	CHECK_UNISTR_EQUALS("1", results.StringResults[0][0]);
 	CHECK_UNISTR_EQUALS("one", results.StringResults[0][1]);
 	
