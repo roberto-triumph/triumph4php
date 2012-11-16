@@ -89,8 +89,8 @@ MYSQL_LIB_DIR = os.pathsearch('libmysqlclient.so',
 -- On some unit tests, MVC Editor attempt to connect to a database
 -- Set the username and password to use here.
 -- MVC Editor will create (and drop) the schema that it uses
-MVCEDITOR_DB_USER = 'root';
-MVCEDITOR_DB_PASSWORD = 'ctc';
+MVCEDITOR_DB_USER = 'mvc-editor';
+MVCEDITOR_DB_PASSWORD = '';
 
 -- will look for SQLite in these directories
 SQLITE_INCLUDE_DIR = '/usr/include/'
