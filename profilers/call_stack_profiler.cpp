@@ -89,10 +89,10 @@ int main() {
 	UFILE* ufout = u_finit(stdout, NULL, NULL);
 	if (mvceditor::CallStackClass::NONE != error) {
 		u_fprintf(ufout, "Call stack error:%d Match Error:%d Error Lexeme:%S\n", 
-			error, CallStack.MatchError.Type, CallStack.MatchError.ErrorLexeme.getTerminatedBuffer());
+			(int)error, (int)CallStack.MatchError.Type, CallStack.MatchError.ErrorLexeme.getTerminatedBuffer());
 	}
 	u_fclose(ufout);
-	printf("The call stack is %ld items long\n", CallStack.List.size());
+	printf("The call stack is %d items long\n", (int)CallStack.List.size());
 	wxFileName outputFile;
 	
 	// the temporary file where the output will go
@@ -173,6 +173,6 @@ void CacheLargeProject(mvceditor::ResourceCacheClass& resourceCache, wxString di
 	wxExecute(cmd, wxEXEC_SYNC);
 	ResourceDetector.InitFromFile(outputFile.GetFullPath());
 	ResourceCache.GlobalAddDynamicResources(ResourceDetector.Resources);
-	printf("dynamic resources=%ld\n", ResourceDetector.Resources.size());
+	printf("dynamic resources=%d\n", (int)ResourceDetector.Resources.size());
 	wxRemoveFile(outputFile.GetFullPath());
 }
