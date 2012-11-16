@@ -32,7 +32,11 @@
 FileTestFixtureClass::FileTestFixtureClass(const wxString& tempTestDirectory) {
 	wxFileName tempDir;
 	tempDir.AssignDir(wxFileName::GetTempDir());
-	tempDir.AppendDir(wxT("mvc-editor-tests"));
+
+	// make sure to add the system user name to the directory that way
+	// multiple users will not trample on each other's test files
+	// this is useful for building under buildbot
+	tempDir.AppendDir(wxT("mvc-editor-tests-") + wxGetUserId());
 
 	// put everything under a mvc-editor-tests test directory that way we can track
 	// what files get added
