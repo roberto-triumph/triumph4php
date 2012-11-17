@@ -22,6 +22,7 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
+#include <stdio.h>
 #include <stdarg.h>
 #include <UnitTest++.h>
 #include <TestReporterStdout.h>
@@ -120,7 +121,9 @@ int main(int argc, char **argv) {
 
 	// our classes use wxWidgets we must initialize the
 	// library
-	if (!wxInitialize()) {
+	wxApp::CheckBuildOptions(WX_BUILD_OPTIONS_SIGNATURE, "program");
+	wxInitializer initializer;
+	if (!initializer) {
 		puts("Could not initialize wxWidgets\n");
 		return -1;
 	}
