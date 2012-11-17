@@ -131,7 +131,9 @@ bool mvceditor::CallStackClass::Recurse(pelet::Versions version, mvceditor::Call
 	// need to create the symbols for the file if the cache does not have them yet; symbols allow us to know the variable
 	// types
 	mvceditor::WorkingCacheClass* workingCache = new mvceditor::WorkingCacheClass;
-	workingCache->Init(fileName.GetFullPath(), false, version, true);
+
+	// here file identifier == file name because file name exists and is unique
+	workingCache->Init(fileName.GetFullPath(), fileName.GetFullPath(), false, version, true);
 	bool newlyRegistered = ResourceCache.RegisterWorking(fileName.GetFullPath(), workingCache);
 
 	wxFFile file(fileName.GetFullPath(), wxT("rb"));

@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOREVENT_H__
-#define __MVCEDITOREVENT_H__
+#ifndef __MVCEDITOREVENTS_H__
+#define __MVCEDITOREVENTS_H__
 
 #include <wx/event.h>
 #include <vector>
@@ -68,6 +68,12 @@ public:
 	 * will not own the pointer.
 	 */
 	void PushHandler(wxEvtHandler* handler);
+
+	/**
+	 * forget all of the pushed handlers. After a call to this method, further calls
+	 * to Publish() will do nothing.
+	 */
+	void RemoveAllHandlers();
 
 	/**
 	 * @param event send the event to all registered handlers
@@ -225,19 +231,20 @@ extern const wxEventType EVENT_CMD_PROJECT_URLS;
  * The window ID of the Tools Notebook. Use this to connect to the notebook
  * events for the tools notebook
  */
-extern const int ID_TOOLS_NOTEBOOK;
+extern const long ID_TOOLS_NOTEBOOK;
 
 /**
  * The window ID of the outline notebook. Use this to connect to the notebook
  * events for the outline notebook
  */
-extern const int ID_OUTLINE_NOTEBOOK;
+extern const long ID_OUTLINE_NOTEBOOK;
 
 /**
  * The window ID of the source code notebook. Use this to connect to the notebook
  * events for the code notebook
  */
-extern const int ID_CODE_NOTEBOOK;
+extern const long ID_CODE_NOTEBOOK;
+
 }
 
 #endif

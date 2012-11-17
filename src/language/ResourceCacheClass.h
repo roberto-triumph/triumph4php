@@ -92,21 +92,6 @@ public:
 	void SetVersion(pelet::Versions version);
 };
 
-class GlobalCacheCompleteEventClass : public wxEvent {
-public:
-
-	/**
-	 * This will be owned by the event handler
-	 */
-	mvceditor::GlobalCacheClass* GlobalCache;
-
-	GlobalCacheCompleteEventClass(int id, mvceditor::GlobalCacheClass* globalCache);
-
-	wxEvent* Clone() const;
-};
-
-
-
 /**
  * The working cache is an in-memory cache of source code that is being edited
  * by the user. It will be treated separately because it changes very often, and
@@ -128,10 +113,15 @@ public:
 	mvceditor::SymbolTableClass SymbolTable;
 
 	/**
-	 * The full path to the file being parsed.  This may also be an invalid file
-	 * path like "Untitled 1" if the user is editing a new file.
+	 * The full path to the file being parsed. This may be the empty string
+	 * if the file resides completely in memory
 	 */
 	wxString FileName;
+
+	/**
+	 * A unique, *non-empty* identifier string. 
+	 */
+	wxString FileIdentifier;
 
 	/**
 	 * TRUE if the user is editing a new file
@@ -141,13 +131,14 @@ public:
 	WorkingCacheClass();
 
 	/**
-	 * @param fileName the full path to the file beign parsed
+	 * @param fileName the full path to the file being parsed
+	 * @param fileIdentifier  A unique, *non-empty* identifier string. 
 	 * @param isNew TRUE if the user is editing a new file
 	 * @param version the PHP version that the parser will check against
 	 * @param createSymbols if TRUE then the symbol table is built from the file
 	 *        if this is true then fileName must be a valid full path
 	 */
-	void Init(const wxString& fileName, bool isNew, pelet::Versions version, bool createSymbols);
+	void Init(const wxString& fileName, const wxString& fileIdentifier, bool isNew, pelet::Versions version, bool createSymbols);
 
 	/**
 	 * Will parse the resources and determine type information for the given text 
@@ -418,6 +409,7 @@ extern const wxEventType EVENT_WORKING_CACHE_COMPLETE;
  */
 extern const wxEventType EVENT_GLOBAL_CACHE_COMPLETE;
 
+
 class WorkingCacheCompleteEventClass : public wxEvent {
 public:
 
@@ -426,7 +418,17 @@ public:
 	 */
 	mvceditor::WorkingCacheClass* WorkingCache;
 
-	WorkingCacheCompleteEventClass(int eventId, const wxString& fileIdentifier, mvceditor::WorkingCacheClass* workingCache);
+	/**
+	 * @param evetId the event ID
+	 * @param fileName full path to the file that was parsed. note that this may
+	 *        not be unique; it can be empty if a "new" code control is being
+	 *        parsed 
+	 * @param fileIdentifier a unique string
+	 * @param workingCache the parsed resource data for the file.
+	 *        this pointer will be owned by the event handler.
+	 */
+	WorkingCacheCompleteEventClass(int eventId, 
+		const wxString& fileName, const wxString& fileIdentifier, mvceditor::WorkingCacheClass* workingCache);
 
 	wxEvent* Clone() const;
 
@@ -435,9 +437,29 @@ public:
 	 */
 	wxString GetFileIdentifier() const;
 
+	/**
+	 * @return the file name given in the constructor
+	 */
+	wxString GetFileName() const;
+
 private:
+	
+	wxString FileName;
 
 	wxString FileIdentifier;
+};
+
+class GlobalCacheCompleteEventClass : public wxEvent {
+public:
+
+	/**
+	 * This will be owned by the event handler
+	 */
+	mvceditor::GlobalCacheClass* GlobalCache;
+
+	GlobalCacheCompleteEventClass(int id, mvceditor::GlobalCacheClass* globalCache);
+
+	wxEvent* Clone() const;
 };
 
 }
@@ -448,6 +470,13 @@ typedef void (wxEvtHandler::*WorkingCacheCompleteEventClassFunction)(mvceditor::
 	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_WORKING_CACHE_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( WorkingCacheCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
+
+typedef void (wxEvtHandler::*GlobalCacheCompleteEventClassFunction)(mvceditor::GlobalCacheCompleteEventClass&);
+
+#define EVT_GLOBAL_CACHE_COMPLETE(id, fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_GLOBAL_CACHE_COMPLETE, id, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( GlobalCacheCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
 
 typedef void (wxEvtHandler::*GlobalCacheCompleteEventClassFunction)(mvceditor::GlobalCacheCompleteEventClass&);
 

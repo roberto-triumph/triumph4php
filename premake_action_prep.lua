@@ -179,7 +179,7 @@ function checkSoci()
 				error "SOCI library has not been built.  Execute the premake soci action: ./premake4 soci"
 			end
 		else
-			libs = os.matchfiles("lib/soci/src/mvc-editor/lib/*.so*");
+			libs = os.matchfiles("lib/soci/mvc-editor/lib/*.so*");
 			if #libs > 0 then
 				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/lib/*.so* Debug/");
 				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/lib/*.so* Release/");

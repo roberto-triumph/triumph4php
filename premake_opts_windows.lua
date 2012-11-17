@@ -111,7 +111,7 @@ MYSQL_LIB_NAME = 'libmysql.lib'
 -- On some unit tests, MVC Editor attempt to connect to a database
 -- Set the username and password to use here.
 -- MVC Editor will create (and drop) the schema that it uses
-MVCEDITOR_DB_USER = 'root';
+MVCEDITOR_DB_USER = 'mvc-editor';
 MVCEDITOR_DB_PASSWORD = '';
 
 -- will look for SQLite in these directories

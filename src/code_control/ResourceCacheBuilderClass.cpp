@@ -31,6 +31,7 @@ mvceditor::WorkingCacheBuilderClass::WorkingCacheBuilderClass(
 	, Semaphore(0 , 1)
 	, CurrentCode() 
 	, CurrentFileName() 
+	, CurrentFileIdentifier()
 	, CurrentFileIsNew(true) 
 	, CurrentVersion(pelet::PHP_53) {
 }
@@ -44,7 +45,9 @@ void mvceditor::WorkingCacheBuilderClass::Wait() {
 	Semaphore.Wait();
 }
 	
-void mvceditor::WorkingCacheBuilderClass::Update(const wxString& fileName, const UnicodeString& code, bool isNew, pelet::Versions version) {
+void mvceditor::WorkingCacheBuilderClass::Update(const wxString& fileName, 
+												 const wxString& fileIdentifier,
+												 const UnicodeString& code, bool isNew, pelet::Versions version) {
 	
 	// make sure to lock the mutex
 	// in order to prevent Entry from reading them while we write to them
@@ -55,6 +58,7 @@ void mvceditor::WorkingCacheBuilderClass::Update(const wxString& fileName, const
 
 	// make sure this is a copy
 	CurrentFileName = fileName.c_str();
+	CurrentFileIdentifier = fileIdentifier.c_str();
 	CurrentFileIsNew = isNew;
 	CurrentVersion = version;	
 }
@@ -62,7 +66,8 @@ void mvceditor::WorkingCacheBuilderClass::Update(const wxString& fileName, const
 void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
 	while (!TestDestroy()) {
 		UnicodeString code;
-		wxString file;
+		wxString fileName;
+		wxString fileIdentifier;
 		bool isNew;
 		pelet::Versions version;
 		{
@@ -78,13 +83,15 @@ void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
 			CurrentCode.extract(buf, CurrentCode.length(), error);
 			code.releaseBuffer(len);
 
-			file.Append(CurrentFileName);
+			fileName = CurrentFileName.c_str();
+			fileIdentifier = CurrentFileIdentifier.c_str();
 			isNew = CurrentFileIsNew;
 			version = CurrentVersion;
 
 			// cleanup.
 			CurrentCode.truncate(0);
 			CurrentFileName.resize(0);
+			CurrentFileIdentifier.resize(0);
 			CurrentFileIsNew = false;
 		}
 
@@ -93,7 +100,7 @@ void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
 			// make sure to use the local variables and not the class ones
 			// since this code is outside the mutex
 			mvceditor::WorkingCacheClass* cache = new mvceditor::WorkingCacheClass();
-			cache->Init(file, isNew, version, false);
+			cache->Init(fileName, fileIdentifier, isNew, version, false);
 			bool good = cache->Update(code);
 			if (good && !TestDestroy()) {
 
@@ -101,7 +108,7 @@ void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
 				// otherwise we will delete a good symbol table, we want auto completion
 				// to work even if the code is broken
 				// PostEvent will set the correct event Id
-				mvceditor::WorkingCacheCompleteEventClass evt(wxID_ANY, file, cache);
+				mvceditor::WorkingCacheCompleteEventClass evt(wxID_ANY, fileName, fileIdentifier, cache);
 				PostEvent(evt);
 			}
 			else {

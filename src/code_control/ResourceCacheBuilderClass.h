@@ -69,12 +69,13 @@ public:
 	 * Will parse the resources of the given text in a backgound thread and will
 	 * post an EVENT_WORKING_CACHE_COMPLETE when the parsing is complete.
 	 * 
-	 * @param fileName unique identifier for a file
+	 * @param fileName full path to the file. this can be empty string is contents are new.
+	 * @param fileIdentifier unique identifier for a file
 	 * @param code the file's most up-to-date source code (from the user-edited buffer)
 	 * @param bool if TRUE then tileName is a new file that is not yet written to disk
 	 * @param version The version of PHP to check against
 	 */
-	void Update(const wxString& fileName, const UnicodeString& code, bool isNew, pelet::Versions version);
+	void Update(const wxString& fileName, const wxString& fileIdentifier, const UnicodeString& code, bool isNew, pelet::Versions version);
 
 protected:
 	
@@ -104,9 +105,15 @@ private:
 	UnicodeString CurrentCode;
 	
 	/**
-	 * the name of the file that is being worked on by the background thread.
+	 * full path to the file that is being worked on by the background thread.
+	 * this can be empty string if file is a new file.
 	 */
 	wxString CurrentFileName;
+
+	/**
+	 * string that uniquely identifies the file that is being worked on by the background thread.
+	 */
+	wxString CurrentFileIdentifier;
 
 	/**
 	 * if TRUE then tileName is a new file that does not yet exist on disk

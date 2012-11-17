@@ -468,8 +468,8 @@ void mvceditor::ResourceFeatureClass::OnAppFileClosed(wxCommandEvent& event) {
 	// Notebook class assigns unique IDs to CodeControlClass objects
 	// the event ID is the ID of the code control that was closed
 	// this needs to be the same as mvceditor::CodeControlClass::GetIdString
-	wxString fileIdentifier = wxString::Format(wxT("File_%d"), event.GetId());
-	App.Globals.ResourceCache.RemoveWorking(fileIdentifier);
+	wxString idString = wxString::Format(wxT("File_%d"), event.GetId());
+	App.Globals.ResourceCache.RemoveWorking(idString);
 }
 
 void mvceditor::ResourceFeatureClass::RemoveNativeMatches(std::vector<mvceditor::ResourceClass>& matches) const {
@@ -508,12 +508,12 @@ void mvceditor::ResourceFeatureClass::OnTimer(wxTimerEvent& event) {
 		if (codeControl && codeControl->GetDocumentMode() == mvceditor::CodeControlClass::PHP) {
 			UnicodeString text = codeControl->GetSafeText();
 
-			// Notebook class assigns unique IDs to CodeControlClass objects
-			wxString fileIdentifier = codeControl->GetIdString();
-
 			// we need to differentiate between new and opened files (the 'true' arg)
-			WorkingCacheBuilder->Update(fileIdentifier, text, 
-				!wxFileName::FileExists(codeControl->GetFileName()),
+			WorkingCacheBuilder->Update(
+				codeControl->GetFileName(),
+				codeControl->GetIdString(),
+				text, 
+				codeControl->IsNew(),
 				App.Globals.Environment.Php.Version);
 		}
 	}

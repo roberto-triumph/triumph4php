@@ -42,6 +42,10 @@ mvceditor::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id,
 	, NewPageNumber(1) {
 }
 
+mvceditor::NotebookClass::~NotebookClass() {
+	delete ContextMenu;
+}
+
 mvceditor::CodeControlClass* mvceditor::NotebookClass::GetCodeControl(size_t pageNumber) const {
 	mvceditor::CodeControlClass* codeControl = NULL;
 	if (pageNumber < GetPageCount()) {
@@ -184,6 +188,7 @@ void mvceditor::NotebookClass::LoadPage() {
 }
 
 void mvceditor::NotebookClass::LoadPage(const wxString& filename) {
+	this->Freeze();
 	bool found = false;
 	
 	// if file is already opened just bring it to the forefront
@@ -233,12 +238,15 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename) {
 			mvceditor::EditorLogError(mvceditor::CHARSET_DETECTION, filename);
 		}
 	}
+	this->Thaw();
 }
 
 void mvceditor::NotebookClass::LoadPages(const std::vector<wxString>& filenames) {
+	this->Freeze();
 	for (size_t i = 0; i < filenames.size(); ++i) {
 		LoadPage(filenames[i]);
 	}
+	this->Thaw();
 }
 
 void mvceditor::NotebookClass::RefreshCodeControlOptions() {
@@ -355,9 +363,11 @@ void mvceditor::NotebookClass::OnCloseAllPages(wxCommandEvent& event) {
 }
 
 void mvceditor::NotebookClass::CloseAllPages() {
+	this->Freeze();
 	while (GetPageCount()) {
 		DeletePage(0);
 	}
+	this->Thaw();
 }
 
 void mvceditor::NotebookClass::CloseCurrentPage() {

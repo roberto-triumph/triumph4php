@@ -3,4 +3,4 @@
 	url = https://github.com/robertop/pelet.git
 [submodule "lib/soci"]
 	path = lib/soci
-	url = git://soci.git.sourceforge.net/gitroot/soci/soci
+	url = git://git.code.sf.net/p/soci/code-0
