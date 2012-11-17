@@ -31,7 +31,9 @@ mvceditor::ThreadWithHeartbeatClass::ThreadWithHeartbeatClass(mvceditor::Running
 	, wxThread(wxTHREAD_DETACHED)
 	, Timer()
 	, RunningThreads(runningThreads)
-	, EventId(eventId) {
+	, EventId(eventId)
+	, Mutex()
+	, Cancelled(false) {
 	Timer.SetOwner(this);
 }
 
@@ -90,25 +92,36 @@ void mvceditor::ThreadWithHeartbeatClass::PostEvent(wxEvent& event) {
 	RunningThreads.PostEvent(event);
 }
 
-mvceditor::RunningThreadsClass::RunningThreadsClass()
+void mvceditor::ThreadWithHeartbeatClass::Cancel() {
+	wxMutexLocker locker(Mutex);
+	Cancelled = true;
+}
+
+bool mvceditor::ThreadWithHeartbeatClass::IsCancelled() {
+	wxMutexLocker locker(Mutex);
+	return Cancelled;
+}
+
+mvceditor::RunningThreadsClass::RunningThreadsClass(bool doPostEvents)
 	: Workers()
 	, Handlers()
 	, Mutex() 
-	, Semaphore(NULL) {
+	, Semaphore(NULL)
+	, DoPostEvents(doPostEvents) {
 		
 }
 
-void mvceditor::RunningThreadsClass::Add(wxThread* thread) {
+void mvceditor::RunningThreadsClass::Add(mvceditor::ThreadWithHeartbeatClass* thread) {
 	wxMutexLocker locker(Mutex);
 	wxASSERT(locker.IsOk());
 	Workers.push_back(thread);
 }
 
-void mvceditor::RunningThreadsClass::Remove(wxThread* thread) {
+void mvceditor::RunningThreadsClass::Remove(mvceditor::ThreadWithHeartbeatClass* thread) {
 	{
 		wxMutexLocker locker(Mutex);
 		wxASSERT(locker.IsOk());
-		std::vector<wxThread*>::iterator it = Workers.begin();
+		std::vector<mvceditor::ThreadWithHeartbeatClass*>::iterator it = Workers.begin();
 		while (it != Workers.end()) {
 			if (*it == thread) {
 				
@@ -126,7 +139,7 @@ void mvceditor::RunningThreadsClass::Remove(wxThread* thread) {
 }
 
 void mvceditor::RunningThreadsClass::StopAll() {
-	std::vector<wxThread*> copy;
+	std::vector<mvceditor::ThreadWithHeartbeatClass*> copy;
 	{
 
 		// need to copy the threads so that we can Delete() them
@@ -145,8 +158,9 @@ void mvceditor::RunningThreadsClass::StopAll() {
 		}
 	}
 	if (!copy.empty()) {
-		std::vector<wxThread*>::iterator it;
+		std::vector<mvceditor::ThreadWithHeartbeatClass*>::iterator it;
 		for (it = copy.begin(); it != copy.end(); ++it) {
+			(*it)->Cancel();
 			(*it)->Delete();
 			Semaphore->Wait();
 		}
@@ -156,11 +170,11 @@ void mvceditor::RunningThreadsClass::StopAll() {
 }
 
 void mvceditor::RunningThreadsClass::Stop(wxThreadIdType threadId) {
-	wxThread* thread = NULL;
+	mvceditor::ThreadWithHeartbeatClass* thread = NULL;
 	{
 		wxMutexLocker locker(Mutex);
 		wxASSERT(locker.IsOk());
-		std::vector<wxThread*>::iterator it;
+		std::vector<mvceditor::ThreadWithHeartbeatClass*>::iterator it;
 		for (it = Workers.begin(); it != Workers.end(); ++it) {
 			if ((*it)->GetId() == threadId) {
 				thread = *it;
@@ -181,6 +195,7 @@ void mvceditor::RunningThreadsClass::Stop(wxThreadIdType threadId) {
 		// call blocks until the thread terminates; but if we call Delete
 		// inside the mutex we produce a deadlock since Remove() tries to lock
 		// the mutex too
+		thread->Cancel();
 		thread->Delete();
 
 		Semaphore->Wait();
@@ -209,15 +224,20 @@ void mvceditor::RunningThreadsClass::PostEvent(wxEvent& event) {
 	wxASSERT(locker.IsOk());
 	std::vector<wxEvtHandler*>::iterator it;
 	for (it = Handlers.begin(); it != Handlers.end(); ++it) {
-		wxPostEvent(*it, event);
+		if (DoPostEvents) {
+			wxPostEvent(*it, event);
+		}
+		else {
+			(*it)->ProcessEvent(event);
+		}
 	}
 }
 
-bool mvceditor::RunningThreadsClass::IsRunning(wxThread* thread) {
+bool mvceditor::RunningThreadsClass::IsRunning(mvceditor::ThreadWithHeartbeatClass* thread) {
 	bool found = false;
 	wxMutexLocker locker(Mutex);
 	wxASSERT(locker.IsOk());
-	std::vector<wxThread*>::iterator it = Workers.begin();
+	std::vector<mvceditor::ThreadWithHeartbeatClass*>::iterator it = Workers.begin();
 	while (it != Workers.end()) {
 		if (*it == thread) {
 			found = true;

@@ -27,63 +27,8 @@
 
 #include <widgets/ThreadWithHeartbeatClass.h>
 #include <language/ResourceCacheClass.h>
-#include <wx/event.h>
 
 namespace mvceditor {
-
-extern const wxEventType EVENT_WORKING_CACHE_COMPLETE;
-
-extern const wxEventType EVENT_GLOBAL_CACHE_COMPLETE;
-
-class WorkingCacheCompleteEventClass : public wxEvent {
-public:
-
-	/**
-	 * This will be owned by the event handler
-	 */
-	mvceditor::WorkingCacheClass* WorkingCache;
-
-	WorkingCacheCompleteEventClass(int eventId, const wxString& fileIdentifier, mvceditor::WorkingCacheClass* workingCache);
-
-	wxEvent* Clone() const;
-
-	/**
-	 * @return the file identifier given in the constructor
-	 */
-	wxString GetFileIdentifier() const;
-
-private:
-
-	wxString FileIdentifier;
-};
-
-typedef void (wxEvtHandler::*WorkingCacheCompleteEventClassFunction)(WorkingCacheCompleteEventClass&);
-
-#define EVT_WORKING_CACHE_COMPLETE(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_WORKING_CACHE_COMPLETE, id, -1, \
-    (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( WorkingCacheCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
-
-class GlobalCacheCompleteEventClass : public wxEvent {
-public:
-
-	/**
-	 * This will be owned by the event handler
-	 */
-	mvceditor::GlobalCacheClass* GlobalCache;
-
-	GlobalCacheCompleteEventClass(int id, mvceditor::GlobalCacheClass* globalCache);
-
-	wxEvent* Clone() const;
-};
-
-typedef void (wxEvtHandler::*GlobalCacheCompleteEventClassFunction)(GlobalCacheCompleteEventClass&);
-
-#define EVT_GLOBAL_CACHE_COMPLETE(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_GLOBAL_CACHE_COMPLETE, id, -1, \
-    (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( GlobalCacheCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
-
 
 /**
  * This class will run the resource updates in a background thread.  The caller will use

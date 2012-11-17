@@ -32,6 +32,7 @@
 #include <globals/DatabaseInfoClass.h>
 #include <widgets/ThreadWithHeartbeatClass.h>
 #include <language/SqlLexicalAnalyzerClass.h>
+#include <actions/SqlMetaDataActionClass.h>
 #include <wx/thread.h>
 #include <vector>
 #include <unicode/unistr.h>
@@ -373,79 +374,6 @@ private:
 	int QueryId;
 	
 	DECLARE_EVENT_TABLE()
-};
-
-/**
- * This event is generated once all of the meta data has been
- * fetched from all of the SQL connections
- */
-extern const wxEventType EVENT_SQL_META_DATA_COMPLETE;
-
-class SqlMetaDataEventClass : public wxEvent {
-
-public:
-
-	/**
-	 * The new resources that were found
-	 */
-	SqlResourceFinderClass NewResources;
-
-	/**
-	 * Get any connection errors that occurred in the background thread.
-	 */
-	std::vector<UnicodeString> Errors;
-	
-	SqlMetaDataEventClass(int eventId, const mvceditor::SqlResourceFinderClass& resources, 
-		const std::vector<UnicodeString>& errors);
-
-	wxEvent* Clone() const;
-
-};
-
-typedef void (wxEvtHandler::*SqlMetaDataEventClassFunction)(SqlMetaDataEventClass&);
-
-#define EVT_SQL_META_DATA_COMPLETE(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_SQL_META_DATA_COMPLETE, id, -1, \
-    (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( SqlMetaDataEventClassFunction, & fn ), (wxObject *) NULL ),
-
-
-/**
- * This class will performt SQL metadata indexing (grabbing table and column names)
- * from all of the connections of the current project). Once the list of tables 
- * and columns has been retrieved, a SqlMetaDataEventClass event is generated 
- * with the new resources
- */
-class SqlMetaDataFetchClass : public ThreadWithHeartbeatClass {
-
-public:
-
-	/**
-	 * @param runningThreads will get notified with EVENT_WORK_* events
-	 *        and the EVENT_SQL_META_DATA_COMPLETE event
-	 */
-	SqlMetaDataFetchClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
-	
-	/**
-	 * starts a background thread to read the metadata. Generates events while work
-	 * is in progress. Once the list of tables and columns has been retrieved, a 
-	 * SqlMetaDataEventClass event is generated with the new resources
-	 *
-	 * @see mvceditor::ThreadWithHearbeatClass
-	 * @param infos the connections to fetch info for.
-	 * @param threadId if thread was started the thread id will be set
-	 * @return bool TRUE if thread was started
-	 */
-	bool Read(std::vector<DatabaseInfoClass> infos, wxThreadIdType& threadId);
-	
-protected:
-
-	void BackgroundWork();
-	
-	/**
-	 * The connections to query; where the tables / columns will be fetched from 
-	 */
-	std::vector<DatabaseInfoClass> Infos;
 };
 
 /**

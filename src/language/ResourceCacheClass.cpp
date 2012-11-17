@@ -26,6 +26,36 @@
 #include <globals/Assets.h>
 #include <algorithm>
 
+mvceditor::WorkingCacheCompleteEventClass::WorkingCacheCompleteEventClass(int eventId, const wxString& fileIdentifier, mvceditor::WorkingCacheClass* cache)
+	: wxEvent(eventId, mvceditor::EVENT_WORKING_CACHE_COMPLETE)
+	, WorkingCache(cache) 
+	, FileIdentifier(fileIdentifier.c_str()) {
+
+}
+
+wxEvent* mvceditor::WorkingCacheCompleteEventClass::Clone() const {
+	mvceditor::WorkingCacheCompleteEventClass* evt = new mvceditor::WorkingCacheCompleteEventClass(GetId(), FileIdentifier, WorkingCache);
+	return evt;
+}
+
+wxString mvceditor::WorkingCacheCompleteEventClass::GetFileIdentifier() const {
+	return FileIdentifier;
+}
+
+mvceditor::GlobalCacheCompleteEventClass::GlobalCacheCompleteEventClass(int eventId, mvceditor::GlobalCacheClass* cache)
+	: wxEvent(eventId, mvceditor::EVENT_GLOBAL_CACHE_COMPLETE)
+	, GlobalCache(cache) {
+
+}
+
+wxEvent* mvceditor::GlobalCacheCompleteEventClass::Clone() const {
+	mvceditor::GlobalCacheCompleteEventClass* evt = new mvceditor::GlobalCacheCompleteEventClass(GetId(), GlobalCache);
+	return evt;
+}
+
+const wxEventType mvceditor::EVENT_WORKING_CACHE_COMPLETE = wxNewEventType();
+const wxEventType mvceditor::EVENT_GLOBAL_CACHE_COMPLETE = wxNewEventType();
+
 mvceditor::GlobalCacheClass::GlobalCacheClass()
 	: ResourceFinder()	
 	, ResourceDbFileName() {

@@ -31,6 +31,7 @@
 #include <unicode/unistr.h>
 #include <map>
 #include <wx/thread.h>
+#include <wx/event.h>
  
 namespace mvceditor {
 
@@ -90,6 +91,21 @@ public:
 	 */
 	void SetVersion(pelet::Versions version);
 };
+
+class GlobalCacheCompleteEventClass : public wxEvent {
+public:
+
+	/**
+	 * This will be owned by the event handler
+	 */
+	mvceditor::GlobalCacheClass* GlobalCache;
+
+	GlobalCacheCompleteEventClass(int id, mvceditor::GlobalCacheClass* globalCache);
+
+	wxEvent* Clone() const;
+};
+
+
 
 /**
  * The working cache is an in-memory cache of source code that is being edited
@@ -390,7 +406,54 @@ private:
 	std::map<wxString, mvceditor::WorkingCacheClass*> WorkingCaches;
 };
 
-	 
+/**
+ * Event that will hold the results of a resource finder 
+ * parsing an entire directory.
+ */
+extern const wxEventType EVENT_WORKING_CACHE_COMPLETE;
+
+/**
+ * Event that will hold the results of resource finder & symbol table
+ * on a single file.
+ */
+extern const wxEventType EVENT_GLOBAL_CACHE_COMPLETE;
+
+class WorkingCacheCompleteEventClass : public wxEvent {
+public:
+
+	/**
+	 * This will be owned by the event handler
+	 */
+	mvceditor::WorkingCacheClass* WorkingCache;
+
+	WorkingCacheCompleteEventClass(int eventId, const wxString& fileIdentifier, mvceditor::WorkingCacheClass* workingCache);
+
+	wxEvent* Clone() const;
+
+	/**
+	 * @return the file identifier given in the constructor
+	 */
+	wxString GetFileIdentifier() const;
+
+private:
+
+	wxString FileIdentifier;
+};
+
 }
+
+typedef void (wxEvtHandler::*WorkingCacheCompleteEventClassFunction)(mvceditor::WorkingCacheCompleteEventClass&);
+
+#define EVT_WORKING_CACHE_COMPLETE(id, fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_WORKING_CACHE_COMPLETE, id, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( WorkingCacheCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
+
+typedef void (wxEvtHandler::*GlobalCacheCompleteEventClassFunction)(mvceditor::GlobalCacheCompleteEventClass&);
+
+#define EVT_GLOBAL_CACHE_COMPLETE(id, fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_GLOBAL_CACHE_COMPLETE, id, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( GlobalCacheCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
 
 #endif

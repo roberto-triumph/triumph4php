@@ -33,98 +33,7 @@
 #include <wx/valgen.h>
 
 static int ID_RESOURCE_READER_GAUGE = wxNewId();
-static int ID_RESOURCE_READER = wxNewId();
 static int ID_WIPE_THREAD = wxNewId();
-
-mvceditor::ResourceFileReaderClass::ResourceFileReaderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId) 
-	: BackgroundFileReaderClass(runningThreads, eventId)
-	, Version(pelet::PHP_53) 
-	, GlobalCache(NULL) {
-}
-
-bool mvceditor::ResourceFileReaderClass::InitForFile(const mvceditor::ProjectClass& project, const wxString& fullPath, pelet::Versions version) {
-	wxFileName fileName(fullPath);
-	if (!fileName.FileExists()) {
-		return false;
-	}
-	Version = version;
-
-	// break up name into dir + name, add name to file filters
-	mvceditor::SourceClass src;
-	src.RootDirectory.AssignDir(fullPath);
-	src.SetIncludeWildcards(fileName.GetFullName());
-	std::vector<wxString> phpFileExtensions;
-	phpFileExtensions.push_back(fileName.GetFullName());
-	std::vector<wxString> miscFileExtensions;
-
-	std::vector<mvceditor::SourceClass> srcs;
-	srcs.push_back(src);
-	if (Init(srcs)) {
-		wxASSERT_MSG(GlobalCache == NULL, _("cache pointer has not been cleaned up"));
-		GlobalCache = new mvceditor::GlobalCacheClass();
-		GlobalCache->Init(project.ResourceDbFileName, phpFileExtensions, miscFileExtensions, version, 1024);
-		return true;
-	}
-	return false;
-}
-
-bool mvceditor::ResourceFileReaderClass::BackgroundFileRead(mvceditor::DirectorySearchClass& search) {
-	GlobalCache->Walk(search);
-	if (!search.More()) {
-
-		// the event handler will own the pointer to the global cache
-		if (!TestDestroy()) {
-
-			// eventId will be set by the PostEvent method
-			mvceditor::GlobalCacheCompleteEventClass evt(wxID_ANY, GlobalCache);
-			PostEvent(evt);
-		}
-		else {
-			
-			// if the thread is being stopped the the handler will not receive the
-			// event, we shouldn't send the event and clean the pointer ourselves
-			delete GlobalCache;
-		}
-		GlobalCache = NULL;
-	}
-	return false;
-}
-bool mvceditor::ResourceFileReaderClass::BackgroundFileMatch(const wxString& file) {
-
-	// ResourceFileReader class never return true from FileRead(), no need to match files
-	return false;
-}
-
-void mvceditor::ResourceFileReaderClass::BackgroundCleanup() {
-	if (GlobalCache) {
-
-		// if the thread was stopped by the user (via a program exit), then we still 
-		// own this pointer because we have not generated the event
-		delete GlobalCache;
-		GlobalCache = NULL;
-	}
-}
-
-
-bool mvceditor::ResourceFileReaderClass::InitProject(const mvceditor::ProjectClass& project,  pelet::Versions version) {
-	bool next = false;
-	
-	// add the rest of the file filters; that way file reader will hand them over to the
-	// resource finder
-	// it gets a bit confusing; we tell the background file reader all of the files
-	// we want to see (PHP + all the rest) but we tell the resource cache
-	// which ones are PHP files and which ones are of other types so that it
-	// does not bother and try to parse non-php files
-	std::vector<wxString> miscFileExtensions = project.AllNonPhpExtensions();	
-	std::vector<mvceditor::SourceClass> sources = project.AllSources();
-	if (Init(sources)) {
-		next = true;
-		wxASSERT_MSG(GlobalCache == NULL, _("cache pointer has not been cleaned up"));
-		GlobalCache = new mvceditor::GlobalCacheClass;
-		GlobalCache->Init(project.ResourceDbFileName, project.PhpFileExtensions, miscFileExtensions, Version, 1024);
-	}
-	return next;
-}
 
 mvceditor::ResourceFileWipeThreadClass::ResourceFileWipeThreadClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: ThreadWithHeartbeatClass(runningThreads, eventId) 
@@ -164,10 +73,8 @@ mvceditor::ResourceFeatureClass::ResourceFeatureClass(mvceditor::AppClass& app)
 	, State(FREE) 
 	, HasCodeLookups(false)
 	, HasFileLookups(false) 
-	, ProjectQueue() 
 	, RunningThreadId(0) {
 	IndexingDialog = NULL;
-	App.RunningThreads.AddEventHandler(this);
 }
 
 void mvceditor::ResourceFeatureClass::AddSearchMenuItems(wxMenu* searchMenu) {
@@ -195,26 +102,10 @@ void mvceditor::ResourceFeatureClass::AddCodeControlClassContextMenuItems(wxMenu
 }
 
 void mvceditor::ResourceFeatureClass::OnAppReady(wxCommandEvent& event) {
-	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
-	pelet::Versions version = GetEnvironment()->Php.Version;
 
-	// the resource cache will own all of the globalCache pointers
-	mvceditor::GlobalCacheClass* nativeCache = new mvceditor::GlobalCacheClass;
-	std::vector<wxString> otherFileExtensions = App.Globals.GetNonPhpFileExtensions();
-	
-	nativeCache->Init(mvceditor::NativeFunctionsAsset(), App.Globals.GetPhpFileExtensions(), otherFileExtensions, version);
-	resourceCache->RegisterGlobal(nativeCache);
+	mvceditor::ResourceCacheInitActionClass action(App.RunningThreads, wxID_ANY);
+	action.Init(App.Globals);
 
-	ProjectIndexMenu->Enable(App.Globals.HasSources() && FREE == State);
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
-		if (project->IsEnabled) {
-			mvceditor::GlobalCacheClass* projectCache = new mvceditor::GlobalCacheClass;
-			projectCache->Init(project->ResourceDbFileName, project->PhpFileExtensions, otherFileExtensions, version);
-			resourceCache->RegisterGlobal(projectCache);
-		}
-	}
-	
 	WorkingCacheBuilder = new mvceditor::WorkingCacheBuilderClass(App.RunningThreads, wxNewId());
 	Timer.SetOwner(this);
 	Timer.Start(2000, wxTIMER_CONTINUOUS);
@@ -234,48 +125,32 @@ void mvceditor::ResourceFeatureClass::OnProjectsUpdated(wxCommandEvent& event) {
 		State = FREE;
 	}
 
-	// the user enabled/disaable projects
-	// need to clear the entire cache, then add only the newly enabled projects
-	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
-	resourceCache->Clear();
-	pelet::Versions version = GetEnvironment()->Php.Version;
 	ProjectIndexMenu->Enable(App.Globals.HasSources() && FREE == State);
-	std::vector<wxString> otherFileExtensions = App.Globals.GetNonPhpFileExtensions();
-	
-	// the resource cache will own all of the global cache pointers
-	mvceditor::GlobalCacheClass* nativeCache = new mvceditor::GlobalCacheClass;
-	nativeCache->Init(mvceditor::NativeFunctionsAsset(), App.Globals.GetPhpFileExtensions(), otherFileExtensions, version);
-	resourceCache->RegisterGlobal(nativeCache);
-	
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
-		if (project->IsEnabled && !project->AllPhpSources().empty()) {
 
-			// register the project resource DB file now so that it is available for code completion
-			// even though we know it is stale. The user is notified that the
-			// cache is stale and may not have all of the results
-			// the resource cache will own these pointers
-			mvceditor::GlobalCacheClass* projectCache = new mvceditor::GlobalCacheClass;
-			projectCache->Init(project->ResourceDbFileName, project->PhpFileExtensions, otherFileExtensions, version);
-			resourceCache->RegisterGlobal(projectCache);
+	// the user enabled/disabled projects
+	// need to clear the entire cache, then add only the newly enabled projects
+	mvceditor::ResourceCacheInitActionClass action(App.RunningThreads, wxID_ANY);
+	action.Init(App.Globals);
+
+	// now lets start re-indexing the projects
+	mvceditor::ProjectResourceActionClass* thread = new ProjectResourceActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
+	if (thread->Init(App.Globals)) {
+		RunningThreadId = 0;
+		wxThreadError err = thread->CreateSingleInstance(RunningThreadId);
+		if (wxTHREAD_NO_ERROR == err) {
+			State = INDEXING_PROJECT;
+			GetStatusBarWithGauge()->AddGauge(_("Indexing "), ID_RESOURCE_READER_GAUGE, 
+				StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
+		}
+		else {
+			if (wxTHREAD_NO_RESOURCE == err) {
+				mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
+			}
+			State = FREE;
+			delete thread;
 		}
 	}
-	InitProjectQueue(App.Globals.Projects);
-	mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
-
-	wxString projectLabel;
-	mvceditor::ResourceFileReaderClass* thread = ReadNextProject(version, projectLabel);
-	if (thread && thread->StartReading(error, RunningThreadId)) {
-		State = INDEXING_PROJECT;
-		GetStatusBarWithGauge()->AddGauge(_("Indexing ") + projectLabel, ID_RESOURCE_READER_GAUGE, 
-			StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
-	}
-	else if (thread && mvceditor::BackgroundFileReaderClass::NO_RESOURCES == error) {
-		mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
-		State = FREE;
-		delete thread;
-	}
-	else if (thread) {
+	else {
 		delete thread;
 	}
 }
@@ -313,32 +188,6 @@ void mvceditor::ResourceFeatureClass::OnWorkInProgress(wxCommandEvent& event) {
 
 void mvceditor::ResourceFeatureClass::OnWorkComplete(wxCommandEvent& event) {
 	RunningThreadId = 0;
-	if (MoreProjects()) {
-
-		// if the project queue is not empty then start reading the next project.
-		bool hasNext = false;
-		while (MoreProjects() && !hasNext) {
-			wxString projectLabel;
-			mvceditor::ResourceFileReaderClass* thread = ReadNextProject(GetEnvironment()->Php.Version, projectLabel);
-			if (thread) {
-				mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
-				if (thread->StartReading(error, RunningThreadId)) {
-					GetStatusBarWithGauge()->StopGauge(ID_RESOURCE_READER_GAUGE);
-					GetStatusBarWithGauge()->AddGauge(_("Indexing ") + projectLabel, 
-						ID_RESOURCE_READER_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
-				}
-				else {
-					wxString msg = wxString::Format(wxT("background file reader error: %d"), error);
-					wxASSERT_MSG(FALSE, msg);
-					delete thread;
-				}
-				hasNext = true;
-			}
-		}
-		if (hasNext) {
-			return;
-		}
-	}
 	GetStatusBarWithGauge()->StopGauge(ID_RESOURCE_READER_GAUGE);
 	if (IndexingDialog) {
 		IndexingDialog->Destroy();
@@ -394,29 +243,19 @@ void mvceditor::ResourceFeatureClass::OnWorkComplete(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::ResourceFeatureClass::OnGlobalCacheComplete(mvceditor::GlobalCacheCompleteEventClass& event) {
-	mvceditor::GlobalCacheClass* globalCache = event.GlobalCache;
-	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
-	if (resourceCache->IsInitGlobal(globalCache->ResourceDbFileName)) {
-		resourceCache->RemoveGlobal(globalCache->ResourceDbFileName);
-	}
-	resourceCache->RegisterGlobal(globalCache);
-}
-
 void mvceditor::ResourceFeatureClass::StartIndex() {
 	if (App.Globals.HasSources()) {
 
 		//prevent two finds at a time
 		if (FREE == State) { 
-			if (InitProjectQueue(App.Globals.Projects)) {
-				wxString projectLabel;
-				mvceditor::ResourceFileReaderClass* thread = ReadNextProject(GetEnvironment()->Php.Version, projectLabel);
-				mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
-				if (thread && thread->StartReading(error, RunningThreadId)) {
+			mvceditor::ProjectResourceActionClass* thread = new ProjectResourceActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
+			if (thread->Init(App.Globals)) {
+				RunningThreadId = 0;
+				wxThreadError err = thread->CreateSingleInstance(RunningThreadId);
+				if (wxTHREAD_NO_ERROR == err) {
 					State = INDEXING_PROJECT;
-					GetStatusBarWithGauge()->AddGauge(_("Indexing ") + projectLabel,
-						ID_RESOURCE_READER_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE,
-						wxGA_HORIZONTAL);
+					GetStatusBarWithGauge()->AddGauge(_("Indexing "), ID_RESOURCE_READER_GAUGE, 
+						StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 					if (!HasCodeLookups) {
 
 						// empty resouce cache, indexing will take a significant amount of time. make the 
@@ -427,16 +266,14 @@ void mvceditor::ResourceFeatureClass::StartIndex() {
 						IndexingDialog->Show();
 						IndexingDialog->Start();
 					}
+
 				}
-				else if (mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING == error) {
-					wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
-				}
-				else if (mvceditor::BackgroundFileReaderClass::NO_RESOURCES == error) {
-					mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
-				}
-				if (thread && INDEXING_PROJECT != State) {
+				else {
+					if (wxTHREAD_NO_RESOURCE == err) {
+						mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
+					}
+					State = FREE;
 					delete thread;
-					RunningThreadId = 0;
 				}
 			}
 			else {
@@ -612,12 +449,12 @@ void mvceditor::ResourceFeatureClass::OnAppFileClosed(wxCommandEvent& event) {
 	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
 
 		if (project->IsAPhpSourceFile(fileName)) {
-			mvceditor::ResourceFileReaderClass* thread = new mvceditor::ResourceFileReaderClass(App.RunningThreads, ID_RESOURCE_READER);
+			mvceditor::ProjectResourceActionClass* thread = new mvceditor::ProjectResourceActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
 			thread->InitForFile(*project, fileName, version);
-			mvceditor::BackgroundFileReaderClass::StartError error;
 
 			// show user the error? not for now as they cannot do anything about it
-			if (!thread->StartReading(error, RunningThreadId)) {
+			wxThreadError err = thread->CreateSingleInstance(RunningThreadId);
+			if (wxTHREAD_NO_ERROR == err) {
 				delete thread;
 			}
 			else {
@@ -652,39 +489,6 @@ wxString mvceditor::ResourceFeatureClass::CacheStatus() {
 		return _("OK");
 	}
 	return _("Stale");
-}
-
-bool mvceditor::ResourceFeatureClass::InitProjectQueue(const std::vector<mvceditor::ProjectClass>& projects) {
-	while (!ProjectQueue.empty()) {
-		ProjectQueue.pop();
-	}
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	for (project = projects.begin(); project != projects.end(); ++project) {
-		if (project->IsEnabled && !project->AllPhpSources().empty()) {
-			ProjectQueue.push(*project);
-		}
-	}
-	return !ProjectQueue.empty();
-}
-
-bool mvceditor::ResourceFeatureClass::MoreProjects() const {
-	return !ProjectQueue.empty();
-}
-
-
-mvceditor::ResourceFileReaderClass* mvceditor::ResourceFeatureClass::ReadNextProject(pelet::Versions version, wxString& projectLabel) {
-	mvceditor::ResourceFileReaderClass* thread = NULL;
-	if (!ProjectQueue.empty()) {
-		mvceditor::ProjectClass project = ProjectQueue.front();
-		ProjectQueue.pop();
-		projectLabel = project.Label;
-		thread = new mvceditor::ResourceFileReaderClass(App.RunningThreads, ID_RESOURCE_READER);
-		if (!thread->InitProject(project, version)) {
-			delete thread;
-			thread = NULL;
-		}
-	}
-	return thread;
 }
 
 void mvceditor::ResourceFeatureClass::OnWorkingCacheComplete(mvceditor::WorkingCacheCompleteEventClass& event) {
@@ -943,13 +747,12 @@ BEGIN_EVENT_TABLE(mvceditor::ResourceFeatureClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_RESOURCE + 2, mvceditor::ResourceFeatureClass::OnSearchForResource)
 	EVT_MENU(mvceditor::MENU_RESOURCE + 3, mvceditor::ResourceFeatureClass::OnJump)
 	EVT_UPDATE_UI(wxID_ANY, mvceditor::ResourceFeatureClass::OnUpdateUi)
-	EVT_COMMAND(ID_RESOURCE_READER, mvceditor::EVENT_FILE_READ_COMPLETE, mvceditor::ResourceFeatureClass::OnWorkComplete)
-	EVT_COMMAND(ID_RESOURCE_READER, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ResourceFeatureClass::OnWorkInProgress)
+	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ResourceFeatureClass::OnWorkComplete)
+	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ResourceFeatureClass::OnWorkInProgress)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::ResourceFeatureClass::OnProjectsUpdated)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_RE_INDEX, mvceditor::ResourceFeatureClass::OnCmdReIndex)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_CLOSED, mvceditor::ResourceFeatureClass::OnAppFileClosed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::ResourceFeatureClass::OnAppReady)
-	EVT_GLOBAL_CACHE_COMPLETE(ID_RESOURCE_READER, mvceditor::ResourceFeatureClass::OnGlobalCacheComplete)
 	EVT_COMMAND(ID_WIPE_THREAD, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ResourceFeatureClass::OnWorkInProgress)
 	EVT_COMMAND(ID_WIPE_THREAD, mvceditor::EVENT_WIPE_COMPLETE, mvceditor::ResourceFeatureClass::OnWipeComplete)
 

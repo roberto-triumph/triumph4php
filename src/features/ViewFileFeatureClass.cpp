@@ -111,7 +111,6 @@ mvceditor::ViewFileFeatureClass::ViewFileFeatureClass(mvceditor::AppClass& app)
 	, CallStackPersistFile() 
 	, LastError(mvceditor::CallStackClass::NONE)
 	, WriteError(false) {
-	App.RunningThreads.AddEventHandler(this);
 }
 
 void mvceditor::ViewFileFeatureClass::AddViewMenuItems(wxMenu* viewMenu) {

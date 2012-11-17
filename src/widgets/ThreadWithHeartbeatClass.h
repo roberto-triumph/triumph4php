@@ -123,6 +123,8 @@ public:
 	 * method.
 	 */
 	void PostEvent(wxEvent& event);
+
+	void Cancel();
 	
 protected:
 
@@ -130,7 +132,9 @@ protected:
 	 * This method is executed in the background thread.
 	 */
 	void* Entry();
-	
+
+	bool IsCancelled();
+
 private:
 
 	/**
@@ -148,6 +152,10 @@ private:
 	 * All generated events will have this ID as their EventId
 	 */
 	int EventId;
+
+	wxMutex Mutex;
+
+	bool Cancelled;
 	
 	/**
 	 * Will generate a EVENT_WORK_IN_PROGRESS event
@@ -183,7 +191,7 @@ private:
 
 	public:
 	
-	RunningThreadsClass();
+	RunningThreadsClass(bool doPostEvents = true);
 	
 	/**
 	 * Keeps track of the given worker.  Most of the times we will
@@ -194,7 +202,7 @@ private:
 	 * 
 	 * @param worker must be a DETACHED thread
 	 */
-	void Add(wxThread* thread);
+	void Add(mvceditor::ThreadWithHeartbeatClass* thread);
 	
 	/**
 	 * Method to "forget" the given worker.
@@ -202,7 +210,7 @@ private:
 	 * exits the Entry() method (in the background thread).
 	 * @param thread the thread to be untracked
 	 */
-	void Remove(wxThread* thread);
+	void Remove(mvceditor::ThreadWithHeartbeatClass* thread);
 
 	/**
 	 * stop all of the running threads. This method is guaranteed to block
@@ -247,7 +255,7 @@ private:
 	 * This is safe to call on detached or joinable threads, as it does not depend
 	 * on wxThread::IsAlive or  wxThread::IsRunning methods.
 	 */
-	bool IsRunning(wxThread* thread);
+	bool IsRunning(mvceditor::ThreadWithHeartbeatClass* thread);
 
 	private:
 
@@ -255,7 +263,7 @@ private:
 	 * holds all threads that are alive and running. These are 'self-destructing'
 	 * threads that will tell us when they need to be removed.
 	 */
-	std::vector<wxThread*> Workers;
+	std::vector<mvceditor::ThreadWithHeartbeatClass*> Workers;
 	
 	/**
 	 * holds all event handlers to post events to. This object
@@ -273,6 +281,8 @@ private:
 	 * threads
 	 */
 	wxSemaphore* Semaphore;
+
+	bool DoPostEvents;
 };
 
 }

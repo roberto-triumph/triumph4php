@@ -142,9 +142,6 @@ void mvceditor::GlobalClassesThreadClass::BackgroundWork() {
 
 mvceditor::OutlineViewFeatureClass::OutlineViewFeatureClass(mvceditor::AppClass& app)
 	: FeatureClass(app) {
-
-	// will get disconnected when the program exits
-	App.RunningThreads.AddEventHandler(this);
 }
 
 void mvceditor::OutlineViewFeatureClass::AddViewMenuItems(wxMenu* viewMenu) {

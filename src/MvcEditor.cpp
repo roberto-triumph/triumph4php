@@ -51,6 +51,7 @@ mvceditor::AppClass::AppClass()
 	, Globals()
 	, RunningThreads()
 	, EventSink()
+	, GlobalsChangeHandler(Globals)
 	, ConfigLastModified()
 	, Features()
 	, Preferences()
@@ -65,6 +66,7 @@ mvceditor::AppClass::AppClass()
  */
 bool mvceditor::AppClass::OnInit() {
 	Preferences.Init();
+	RunningThreads.AddEventHandler(&GlobalsChangeHandler);
 	CreateFeatures();
 
 	// due to the way keyboard shortcuts are serialized, we need to load the
@@ -97,6 +99,7 @@ bool mvceditor::AppClass::OnInit() {
 
 mvceditor::AppClass::~AppClass() {
 	Timer.Stop();
+	RunningThreads.RemoveEventHandler(&GlobalsChangeHandler);
 	DeleteFeatures();
 	
 	// calling cleanup here so that we can run this binary through a memory leak detector 
@@ -185,6 +188,7 @@ void mvceditor::AppClass::CreateFeatures() {
 	// receive app events
 	for (size_t i = 0; i < Features.size(); ++i) {
 		EventSink.PushHandler(Features[i]);
+		RunningThreads.AddEventHandler(Features[i]);
 	}
 }
 
@@ -195,6 +199,9 @@ void mvceditor::AppClass::FeatureWindows() {
 }
 
 void mvceditor::AppClass::DeleteFeatures() {
+	for (size_t i = 0; i < Features.size(); ++i) {
+		RunningThreads.RemoveEventHandler(Features[i]);
+	}
 
 	// if i delete in the same loop as the PopEventHandler, wx assertions fail.
 	for (size_t i = 0; i < Features.size(); ++i) {

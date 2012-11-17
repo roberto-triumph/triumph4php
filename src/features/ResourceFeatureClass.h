@@ -29,6 +29,7 @@
 #include <features/wxformbuilder/ResourceFeatureForms.h>
 #include <features/BackgroundFileReaderClass.h>
 #include <search/ResourceFinderClass.h>
+#include <actions/ProjectResourceActionClass.h>
 #include <code_control/ResourceCacheBuilderClass.h>
 #include <wx/string.h>
 #include <queue>
@@ -37,67 +38,6 @@ namespace mvceditor {
 
 // these are defined at the bottom
 class IndexingDialogClass;
-
-/**
- * This class will take care of iterating through all files in a project
- * and parsing the resources so that queries to ResourceFinderClass
- * will work.
- */
-class ResourceFileReaderClass : public BackgroundFileReaderClass {
-
-public:
-
-	/**
-	 * @param runningThreads will receive EVENT_FILE_* and EVENT_WORK_* events when all 
-	 * files have been iterated through.
-	 */
-	ResourceFileReaderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
-
-	/**
-	 * prepare to iterate through the given file. The name part of the given file must match the wildcard.
-	 * This method can be used to update the resources once a file has been modified on disk.
-	 *
-	 * @param project the project that holds the file
-	 * @param fullPath file to be scanned (full path, including name).
-	 * @param version the version of PHP to check against
-	 * @return bool false file does not exist
-	 */
-	bool InitForFile(const mvceditor::ProjectClass& project, const wxString& fullPath, pelet::Versions version);
-
-	/**
-	 * initialize the next project in the queue to be read. After a call to this method, the background
-	 * thread can be started.
-	 * @return TRUE if the project has at least one source directory that exists
-	 */
-	bool InitProject(const mvceditor::ProjectClass& project, pelet::Versions version);
-
-protected:
-
-	/**
-	 * Files will be parsed for resouces in a background thread.
-	 */
-	bool BackgroundFileRead(DirectorySearchClass& search);
-
-	/**
-	 * Resources will only look for PHP files.
-	 */
-	bool BackgroundFileMatch(const wxString& file);
-
-	void BackgroundCleanup();
-
-private:
-
-	/**
-	 * the version of PHP to parse against
-	 */
-	pelet::Versions Version;
-
-	/**
-	 * This class will not own this pointer. the pointer will be created by this class
-	 * but it will be posted via an event and the event handler will own it.
-	 */
-	mvceditor::GlobalCacheClass* GlobalCache;
-};
 
 /**
  * event that is generated when all resources databases have been wiped
@@ -225,12 +165,6 @@ private:
 	 * Once the file parsing finishes alert the user.
 	 */
 	void OnWorkComplete(wxCommandEvent& event);
-
-	/**
-	 * When the global cache has been parsed add it to the resource cache
-	 * so that it is available for code completion
-	 */
-	void OnGlobalCacheComplete(mvceditor::GlobalCacheCompleteEventClass& event);
 	
 	/**
 	 * Opens the page and sets the cursor on the function/method/property/file that was searched for by the
@@ -249,15 +183,6 @@ private:
 	void RemoveNativeMatches(std::vector<mvceditor::ResourceClass>& matches) const;
 	
 	/**
-	 * prepare to iterate through all files of the given projects
-	 * that match the given wildcard.
-	 *
-	 * @param projects the directories to be scanned (recursively)
-	 * @return bool false if none of the projects are enabled or none of the projects have a PHP source directory
-	 */
-	bool InitProjectQueue(const std::vector<mvceditor::ProjectClass>& projects);
-
-	/**
 	 * prepare to iterate through the given file. The name part of the given file must match the wildcard.
 	 * This method can be used to update the resources once a file has been modified on disk.
 	 *
@@ -268,22 +193,6 @@ private:
 	 */
 	bool InitForFile(const mvceditor::ProjectClass& project, const wxString& fullPath, pelet::Versions version);
 
-	/**
-	 * @return TRUE if there are more projects in the queue
-	 */
-	bool MoreProjects() const;
-
-	/**
-	 * initialize the next project in the queue to be read. After a call to this method, the background
-	 * thread can be started.
-	 * @param version the version of PHP to check against
-	 * @param projectLabel the label of the project that will be read next is set here
-	 * @return mvceditor::ResourceFileReaderClass* if the project has at least one source directory that exists
-	 *         otherwise NULL is returned. 
-	 *         since the returned pointer is a thread; the pointer will delete itself
-	 */
-	mvceditor::ResourceFileReaderClass* ReadNextProject(pelet::Versions version, wxString& projectLabel);
-	
 	/**
 	 * after the projects have been wiped, star the index process
 	 */
@@ -373,11 +282,6 @@ private:
 	* @var bool
 	*/
 	bool HasFileLookups;
-	
-	/**
-	 * Queue of projects to be indexed.
-	 */
-	std::queue<mvceditor::ProjectClass> ProjectQueue;
 
 	wxThreadIdType RunningThreadId;
 

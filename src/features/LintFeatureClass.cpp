@@ -268,9 +268,6 @@ mvceditor::LintFeatureClass::LintFeatureClass(mvceditor::AppClass& app)
 	, RunningThreadId(0)
 	, LintErrors() {
 	ResultsPanel = NULL;
-
-	// will get disconnected when the program exits
-	App.RunningThreads.AddEventHandler(this);
 }
 
 void mvceditor::LintFeatureClass::AddViewMenuItems(wxMenu* viewMenu) {

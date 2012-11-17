@@ -239,6 +239,7 @@ solution "mvc-editor"
 			"tests/**.cpp",
 			"tests/**.h",
 			"src/globals/*.cpp",
+			"src/actions/*.cpp",
 			"src/language/SqlLexicalAnalyzerClass.cpp",
 			"src/language/SymbolTableClass.cpp",
 			"src/language/ResourceCacheClass.cpp",
