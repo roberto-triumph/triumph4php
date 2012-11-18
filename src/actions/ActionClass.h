@@ -80,6 +80,7 @@ public:
  */
 extern const int ID_EVENT_ACTION_GLOBAL_CACHE;
 extern const int ID_EVENT_ACTION_SQL_METADATA;
+extern const int ID_EVENT_ACTION_FRAMEWORK_DETECTION;
 
 }
 

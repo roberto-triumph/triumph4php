@@ -57,3 +57,4 @@ void mvceditor::InitializerActionClass::BackgroundWork() {
 
 const int mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE = wxNewId();
 const int mvceditor::ID_EVENT_ACTION_SQL_METADATA = wxNewId();
+const int mvceditor::ID_EVENT_ACTION_FRAMEWORK_DETECTION = wxNewId();

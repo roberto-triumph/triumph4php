@@ -26,6 +26,7 @@
 #define PROJECTFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
+#include <actions/ProjectFrameworkDetectionActionClass.h>
 #include <features/wxformbuilder/ProjectFeatureForms.h>
 #include <wx/filepicker.h>
 
@@ -100,14 +101,8 @@ private:
 	 */
 	void OnProjectExploreOpenFile(wxCommandEvent& event);
 
-	/**
-	 * This is the callback that gets called when the PHP framework detectors have 
-	 * successfully run
-	 */
-	void OnFrameworkFound(mvceditor::FrameworkFoundEventClass& event);
 	void OnFrameworkDetectionComplete(wxCommandEvent& event);
 	void OnFrameworkDetectionInProgress(wxCommandEvent& event);
-	void OnFrameworkDetectionFailed(wxCommandEvent& event);
 
 	/**
 	 * close all projects and all resources that depend on it
@@ -129,12 +124,7 @@ private:
 	 * This object will be used to detct the various PHP framework artifacts (resources,
 	 * database connections, route URLs).
 	 */
-	mvceditor::PhpFrameworkDetectorClass PhpFrameworks;
-
-	/**
-	 * a 'queue' of folders to perform framework detection on
-	 */
-	std::vector<wxString> DirectoriesToDetect;
+	mvceditor::ProjectFrameworkDetectionActionClass FrameworkDetectionAction;
 
 	/**
 	 * Flag that tells whether project detection is currently happening

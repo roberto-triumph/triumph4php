@@ -489,8 +489,7 @@ void mvceditor::RunBrowserFeatureClass::OnProjectIndexed(wxCommandEvent& event) 
 				wxString rootDirFullPath = source->RootDirectory.GetFullPath();
 				wxString projectRootUrl =  environment->Apache.GetUrl(rootDirFullPath);
 				if (!projectRootUrl.IsEmpty()) {
-					PhpFrameworks.InitUrlDetector(App.Globals.Frameworks, project->ResourceDbFileName.GetFullPath(), projectRootUrl);
-					started = true;
+					started = PhpFrameworks.InitUrlDetector(App.Globals.Frameworks, project->ResourceDbFileName.GetFullPath(), projectRootUrl);
 				}
 			}
 		}

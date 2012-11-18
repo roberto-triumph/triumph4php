@@ -39,8 +39,7 @@ static const int ID_FRAMEWORK_DETECTION_GAUGE = wxNewId();
 
 mvceditor::ProjectFeatureClass::ProjectFeatureClass(mvceditor::AppClass& app) 
 	: FeatureClass(app)
-	, PhpFrameworks(*this, app.RunningThreads, app.Globals.Environment) 
-	, DirectoriesToDetect() 
+	, FrameworkDetectionAction(app.RunningThreads, mvceditor::ID_EVENT_ACTION_FRAMEWORK_DETECTION) 
 	, IsDetecting(false) {
 	wxPlatformInfo info;
 	switch (info.GetOperatingSystemId()) {
@@ -57,7 +56,6 @@ mvceditor::ProjectFeatureClass::ProjectFeatureClass(mvceditor::AppClass& app)
 }
 
 mvceditor::ProjectFeatureClass::~ProjectFeatureClass() {
-	PhpFrameworks.Stop();
 }
 
 void mvceditor::ProjectFeatureClass::AddFileMenuItems(wxMenu* fileMenu) {
@@ -244,24 +242,11 @@ void mvceditor::ProjectFeatureClass::StartDetectors() {
 	// PHP frameworks, leave the ones that the user created intact
 	App.Globals.ClearDetectedInfos();
 
-	DirectoriesToDetect.clear();
 	IsDetecting = false;
-	std::vector<mvceditor::SourceClass> allSources = App.Globals.AllEnabledSources();
-	if (!allSources.empty()) {
-		
-		for (size_t i = 1; i < allSources.size(); ++i) {
-			DirectoriesToDetect.push_back(allSources[i].RootDirectory.GetPath());
-		}
-		bool started = PhpFrameworks.Init(allSources[0].RootDirectory.GetPath());
-		if (!started) {
-			mvceditor::EditorLogError(mvceditor::BAD_PHP_EXECUTABLE, App.Globals.Environment.Php.PhpExecutablePath); 
-			DirectoriesToDetect.clear();
-		}
-		else {
-			IsDetecting = true;
-			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
-			gauge->AddGauge(_("Framework Detection"), ID_FRAMEWORK_DETECTION_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
-		}
+	if (FrameworkDetectionAction.Init(App.Globals)) {
+		IsDetecting = true;
+		mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
+		gauge->AddGauge(_("Framework Detection"), ID_FRAMEWORK_DETECTION_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
 	}
 	else {
 
@@ -273,53 +258,16 @@ void mvceditor::ProjectFeatureClass::StartDetectors() {
 }
 
 void mvceditor::ProjectFeatureClass::OnFrameworkDetectionComplete(wxCommandEvent& event) {
-	bool finished = true;
-
-	// detection on the next directory; skipping any errors
-	while (!DirectoriesToDetect.empty() && finished) {
-		wxString nextDirectory = DirectoriesToDetect.back();
-		DirectoriesToDetect.pop_back();
-		if (PhpFrameworks.Init(nextDirectory)) {
-			finished = false;
-		}
-	}
-	if (finished) {	
-		wxCommandEvent projectOpenedEvent(mvceditor::EVENT_APP_PROJECTS_UPDATED);
-		App.EventSink.Publish(projectOpenedEvent);
-		mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
-		gauge->StopGauge(ID_FRAMEWORK_DETECTION_GAUGE);
-		IsDetecting = false;
-	}
-}
-
-void mvceditor::ProjectFeatureClass::OnFrameworkDetectionFailed(wxCommandEvent& event) {
-	mvceditor::EditorLogError(mvceditor::BAD_PHP_EXECUTABLE, event.GetString());
-	bool finished = true;
-
-	// detection on the next directory; skipping any errors
-	while (!DirectoriesToDetect.empty() && finished) {
-		wxString nextDirectory = DirectoriesToDetect.back();
-		DirectoriesToDetect.pop_back();
-		if (PhpFrameworks.Init(nextDirectory)) {
-			finished = false;
-		}
-	}
-	if (finished) {
-		wxCommandEvent projectOpenedEvent(mvceditor::EVENT_APP_PROJECTS_UPDATED);
-		App.EventSink.Publish(projectOpenedEvent);
-		mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
-		gauge->StopGauge(ID_FRAMEWORK_DETECTION_GAUGE);
-		IsDetecting = true;
-	}
+	wxCommandEvent projectOpenedEvent(mvceditor::EVENT_APP_PROJECTS_UPDATED);
+	App.EventSink.Publish(projectOpenedEvent);
+	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
+	gauge->StopGauge(ID_FRAMEWORK_DETECTION_GAUGE);
+	IsDetecting = false;
 }
 
 void mvceditor::ProjectFeatureClass::OnFrameworkDetectionInProgress(wxCommandEvent& event) {
 	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 	gauge->IncrementGauge(ID_FRAMEWORK_DETECTION_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
-}
-
-void mvceditor::ProjectFeatureClass::OnFrameworkFound(mvceditor::FrameworkFoundEventClass& event) {
-	App.Globals.Frameworks.push_back(event.GetFramework());
 }
 
 void mvceditor::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
@@ -718,10 +666,8 @@ BEGIN_EVENT_TABLE(mvceditor::ProjectFeatureClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_PROJECT + 2, mvceditor::ProjectFeatureClass::OnProjectExploreOpenFile)
 	EVT_MENU(mvceditor::MENU_PROJECT + 3, mvceditor::ProjectFeatureClass::OnProjectDefine)
 
-	EVT_FRAMEWORK_FOUND(mvceditor::ProjectFeatureClass::OnFrameworkFound)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_DETECTION_COMPLETE, mvceditor::ProjectFeatureClass::OnFrameworkDetectionComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_DETECTION_FAILED, mvceditor::ProjectFeatureClass::OnFrameworkDetectionFailed)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::ProjectFeatureClass::OnFrameworkDetectionInProgress)
+	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_FRAMEWORK_DETECTION, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ProjectFeatureClass::OnFrameworkDetectionComplete)
+	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_FRAMEWORK_DETECTION, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::ProjectFeatureClass::OnFrameworkDetectionInProgress)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::ProjectFeatureClass::OnPreferencesSaved)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, mvceditor::ProjectFeatureClass::OnPreferencesExternallyUpdated)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::ProjectFeatureClass::OnAppReady)
