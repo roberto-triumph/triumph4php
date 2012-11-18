@@ -162,6 +162,7 @@ void mvceditor::NotebookClass::AddMvcEditorPage(mvceditor::CodeControlClass::Mod
 			format = _("Untitled %d.php");
 			break;
 	}
+	this->Freeze();
 	
 	// make sure to use a unique ID, other source code depends on this
 	CodeControlClass* page = new CodeControlClass(this, *CodeControlOptions, Globals, wxNewId());
@@ -169,6 +170,7 @@ void mvceditor::NotebookClass::AddMvcEditorPage(mvceditor::CodeControlClass::Mod
 	AddPage(page, wxString::Format(format, NewPageNumber++), true, 
 		wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_TOOLBAR, 
 		wxSize(16, 16)));
+	this->Thaw();
 }
 
 void mvceditor::NotebookClass::LoadPage() {
