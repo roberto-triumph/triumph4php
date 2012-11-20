@@ -47,9 +47,14 @@ SUITE(DatabaseInfoClassTest) {
 
 TEST_FIXTURE(DatabaseInfoTestFixtureClass, ConnectQueryAndResults) {
 	Exec("CREATE TABLE names (id INT, name VARCHAR(255));");
+	
+	// without the explicit transaction, this test fails on
+	// ubuntu 12.04 and mysql 5.5
+	Exec("BEGIN");
 	Exec("INSERT INTO names(id, name) VALUES(1, 'one')");
 	Exec("INSERT INTO names(id, name) VALUES(2, 'two')");
 	Exec("INSERT INTO names(id, name) VALUES(3, 'three')");
+	Exec("COMMIT");
 	
 	soci::session session;
 	mvceditor::SqlQueryClass query;
@@ -77,10 +82,15 @@ TEST_FIXTURE(DatabaseInfoTestFixtureClass, ConnectQueryAndResults) {
 
 TEST_FIXTURE(DatabaseInfoTestFixtureClass, MultipleQueries) {
 	Exec("CREATE TABLE names (id INT, name VARCHAR(255));");
-	Exec("CREATE TABLE places (id INT, name VARCHAR(255));");
+	Exec("CREATE TABLE places (id INT, name VARCHAR(255));");	
+	
+	// without the explicit transaction, this test fails on
+	// ubuntu 12.04 and mysql 5.5
+	Exec("BEGIN");
 	Exec("INSERT INTO names(id, name) VALUES(1, 'one')");
 	Exec("INSERT INTO names(id, name) VALUES(2, 'two')");
 	Exec("INSERT INTO names(id, name) VALUES(3, 'three')");
+	Exec("COMMIT");
 	
 	soci::session session;
 	mvceditor::SqlQueryClass query;
