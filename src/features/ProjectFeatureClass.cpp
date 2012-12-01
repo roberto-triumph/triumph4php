@@ -225,46 +225,6 @@ void mvceditor::ProjectFeatureClass::OnProjectExploreOpenFile(wxCommandEvent& ev
 	}
 }
 
-void mvceditor::ProjectFeatureClass::OnAppReady(wxCommandEvent& event) {
-
-	// if an existing detection is running, then let it finish
-	if (!IsDetecting) {
-		StartDetectors();
-	}
-}
-
-void mvceditor::ProjectFeatureClass::StartDetectors() {
-
-	// clear the detected framework info
-	App.Globals.Frameworks.clear();
-
-	// only remove the database infos that were detected from
-	// PHP frameworks, leave the ones that the user created intact
-	App.Globals.ClearDetectedInfos();
-
-	IsDetecting = false;
-	if (FrameworkDetectionAction.Init(App.Globals)) {
-		IsDetecting = true;
-		mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
-		gauge->AddGauge(_("Framework Detection"), ID_FRAMEWORK_DETECTION_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
-	}
-	else {
-
-		// still notify the features of the new project at program startup
-		// when the app starts the default project is opened
-		wxCommandEvent evt(mvceditor::EVENT_APP_PROJECTS_UPDATED);
-		App.EventSink.Publish(evt);
-	}
-}
-
-void mvceditor::ProjectFeatureClass::OnFrameworkDetectionComplete(wxCommandEvent& event) {
-	wxCommandEvent projectOpenedEvent(mvceditor::EVENT_APP_PROJECTS_UPDATED);
-	App.EventSink.Publish(projectOpenedEvent);
-	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
-	gauge->StopGauge(ID_FRAMEWORK_DETECTION_GAUGE);
-	IsDetecting = false;
-}
-
 void mvceditor::ProjectFeatureClass::OnFrameworkDetectionInProgress(wxCommandEvent& event) {
 	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 	gauge->IncrementGauge(ID_FRAMEWORK_DETECTION_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
@@ -302,17 +262,19 @@ void mvceditor::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
 		App.UpdateConfigModifiedTime();
 
 		if (!IsDetecting) {
-			StartDetectors();
+			
+			// TODO
+			// need to be able to tell which projects are new
+			// then we update just the new projects
 		}
 	}
 }
 
 void mvceditor::ProjectFeatureClass::OnPreferencesExternallyUpdated(wxCommandEvent& event) {
 	
-	// if an existing detection is running, then let it finish
-	if (!IsDetecting) {
-		StartDetectors();
-	}
+	// TODO
+	// need to be able to tell which projects are new
+	// then we update just the new projects
 }
 
 mvceditor::ProjectPreferencesPanelClass::ProjectPreferencesPanelClass(wxWindow *parent, mvceditor::ProjectFeatureClass &projectFeature) 
@@ -666,9 +628,7 @@ BEGIN_EVENT_TABLE(mvceditor::ProjectFeatureClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_PROJECT + 2, mvceditor::ProjectFeatureClass::OnProjectExploreOpenFile)
 	EVT_MENU(mvceditor::MENU_PROJECT + 3, mvceditor::ProjectFeatureClass::OnProjectDefine)
 
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_FRAMEWORK_DETECTION, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ProjectFeatureClass::OnFrameworkDetectionComplete)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_FRAMEWORK_DETECTION, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::ProjectFeatureClass::OnFrameworkDetectionInProgress)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::ProjectFeatureClass::OnPreferencesSaved)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, mvceditor::ProjectFeatureClass::OnPreferencesExternallyUpdated)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::ProjectFeatureClass::OnAppReady)
 END_EVENT_TABLE()

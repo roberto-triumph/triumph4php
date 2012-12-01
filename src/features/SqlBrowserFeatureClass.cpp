@@ -693,15 +693,6 @@ mvceditor::SqlBrowserFeatureClass::SqlBrowserFeatureClass(mvceditor::AppClass& a
 mvceditor::SqlBrowserFeatureClass::~SqlBrowserFeatureClass() {
 }
 
-void mvceditor::SqlBrowserFeatureClass::OnProjectsUpdated(wxCommandEvent& event) {
-
-
-	// remove any connections previously detected
-	SqlMetaDataInitActionClass action(App.RunningThreads, wxID_ANY);
-	action.Init(App.Globals);
-	DetectMetadata();
-}
-
 void mvceditor::SqlBrowserFeatureClass::DetectMetadata() {
 	ChosenIndex = 0;
 	if (!App.Globals.Infos.empty()) {
@@ -1055,7 +1046,6 @@ BEGIN_EVENT_TABLE(mvceditor::SqlBrowserFeatureClass, wxEvtHandler)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::SqlBrowserFeatureClass::OnContentNotebookPageChanged)
 	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_CODE_NOTEBOOK, mvceditor::SqlBrowserFeatureClass::OnContentNotebookPageClose)
 	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::SqlBrowserFeatureClass::OnToolsNotebookPageClose)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::SqlBrowserFeatureClass::OnProjectsUpdated)
 	EVT_SQL_META_DATA_COMPLETE(mvceditor::ID_EVENT_ACTION_SQL_METADATA, mvceditor::SqlBrowserFeatureClass::OnSqlMetaDataComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_EXIT, mvceditor::SqlBrowserFeatureClass::OnAppExit)
 END_EVENT_TABLE()

@@ -52,10 +52,17 @@ void mvceditor::GlobalsChangeHandlerClass::OnGlobalCacheComplete(mvceditor::Glob
 	Globals.ResourceCache.RegisterGlobal(globalCache);
 }
 
+void mvceditor::GlobalsChangeHandlerClass::OnUrlDetectionComplete(mvceditor::UrlDetectedEventClass& event) {
+	std::vector<mvceditor::UrlResourceClass> newUrls = event.GetUrls();
+	Globals.UrlResourceFinder.Urls.insert(Globals.UrlResourceFinder.Urls.end(),
+		newUrls.begin(), newUrls.end());
+}
+
 BEGIN_EVENT_TABLE(mvceditor::GlobalsChangeHandlerClass, wxEvtHandler)
 	EVT_FRAMEWORK_FOUND(mvceditor::GlobalsChangeHandlerClass::OnFrameworkFound)
 	EVT_SQL_META_DATA_COMPLETE(mvceditor::ID_EVENT_ACTION_SQL_METADATA, mvceditor::GlobalsChangeHandlerClass::OnSqlMetaDataComplete)
 	EVT_GLOBAL_CACHE_COMPLETE(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE, mvceditor::GlobalsChangeHandlerClass::OnGlobalCacheComplete)
+	EVT_FRAMEWORK_URL_COMPLETE(mvceditor::GlobalsChangeHandlerClass::OnUrlDetectionComplete)
 END_EVENT_TABLE()
 
 

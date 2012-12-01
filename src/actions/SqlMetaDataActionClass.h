@@ -86,6 +86,8 @@ public:
 
 	void BackgroundWork();
 
+	wxString GetLabel() const;
+
 private:
 	
 	/**
@@ -101,6 +103,8 @@ public:
 	SqlMetaDataInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 	void Work(mvceditor::GlobalsClass& globals);
+
+	wxString GetLabel() const;
 };
 
 }

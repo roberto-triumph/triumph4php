@@ -70,6 +70,9 @@ bool mvceditor::ProjectFrameworkDetectionActionClass::Init(mvceditor::GlobalsCla
 			mvceditor::EditorLogError(mvceditor::BAD_PHP_EXECUTABLE, globals.Environment.Php.PhpExecutablePath); 
 			DirectoriesToDetect.clear();
 		}
+		else {
+			SetStatus(_("Detecting Frameworks for ") + allSources[0].RootDirectory.GetName());
+		}
 	}
 	if (!started) {
 		delete PhpFrameworks;
@@ -92,6 +95,8 @@ void mvceditor::ProjectFrameworkDetectionActionClass::OnFrameworkDetectionComple
 		DirectoriesToDetect.pop_back();
 		if (PhpFrameworks->Init(nextDirectory)) {
 			finished = false;
+			wxFileName fileName(nextDirectory);
+			SetStatus(_("Detecting Frameworks for ") + fileName.GetName());
 		}
 	}
 	if (finished) {
@@ -115,6 +120,8 @@ void mvceditor::ProjectFrameworkDetectionActionClass::OnFrameworkDetectionFailed
 		DirectoriesToDetect.pop_back();
 		if (PhpFrameworks->Init(nextDirectory)) {
 			finished = false;
+			wxFileName fileName(nextDirectory);
+			SetStatus(_("Detecting Frameworks for ") + fileName.GetName());
 		}
 	}
 	if (finished) {
@@ -129,7 +136,7 @@ void mvceditor::ProjectFrameworkDetectionActionClass::OnFrameworkDetectionFailed
 }
 
 void mvceditor::ProjectFrameworkDetectionActionClass::OnFrameworkDetectionInProgress(wxCommandEvent& event) {
-	wxCommandEvent newEvt(mvceditor::EVENT_PROCESS_IN_PROGRESS);
+	wxCommandEvent newEvt(mvceditor::EVENT_WORK_IN_PROGRESS);
 	PostEvent(newEvt);
 }
 
@@ -140,6 +147,10 @@ void mvceditor::ProjectFrameworkDetectionActionClass::BackgroundWork() {
 
 void mvceditor::ProjectFrameworkDetectionActionClass::OnFrameworkFound(mvceditor::FrameworkFoundEventClass& event) {
 	PostEvent(event);
+}
+
+wxString mvceditor::ProjectFrameworkDetectionActionClass::GetLabel() const {
+	return _("MVC Framework Detection");
 }
 
 BEGIN_EVENT_TABLE(mvceditor::ProjectFrameworkDetectionActionClass, wxEvtHandler)

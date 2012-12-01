@@ -48,7 +48,19 @@ public:
 
 	virtual bool Init(mvceditor::GlobalsClass& globals) = 0;
 
+	virtual wxString GetLabel() const = 0;
+
 	virtual bool DoAsync();
+
+	void SetStatus(const wxString& status);
+
+	wxString GetStatus();
+
+private:
+
+	wxString Status;
+
+	wxMutex Mutex;
 
 };
 
@@ -78,9 +90,13 @@ public:
  * as the eventIDs for the corresponding actions unless 
  * it is not possible.
  */
+extern const int ID_EVENT_ACTION_GLOBAL_CACHE_INIT;
 extern const int ID_EVENT_ACTION_GLOBAL_CACHE;
+extern const int ID_EVENT_ACTION_SQL_METADATA_INIT;
 extern const int ID_EVENT_ACTION_SQL_METADATA;
 extern const int ID_EVENT_ACTION_FRAMEWORK_DETECTION;
+extern const int ID_EVENT_ACTION_CODE_IGNITER_DETECTED;
+extern const int ID_EVENT_ACTION_URL_RESOURCES;
 
 }
 

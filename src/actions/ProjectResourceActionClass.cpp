@@ -70,6 +70,9 @@ bool mvceditor::ProjectResourceActionClass::Init(mvceditor::GlobalsClass& global
 			Projects.push_back(*project);
 		}
 	}
+	if (!Projects.empty()) {
+		SetStatus(_("Indexing Projects"));
+	}
 	return !Projects.empty();
 }
 
@@ -116,6 +119,7 @@ void mvceditor::ProjectResourceActionClass::IterateProjects() {
 
 		if (DirectorySearch.Init(sources)) {
 			wxASSERT_MSG(GlobalCache == NULL, _("cache pointer has not been cleaned up"));
+			SetStatus(_("Updating Index for ") + project.Label);
 			GlobalCache = new mvceditor::GlobalCacheClass;
 			GlobalCache->Init(project.ResourceDbFileName, project.PhpFileExtensions, miscFileExtensions, Version, 1024);
 			IterateDirectory();
@@ -131,6 +135,10 @@ void mvceditor::ProjectResourceActionClass::BackgroundCleanup() {
 		delete GlobalCache;
 		GlobalCache = NULL;
 	}
+}
+
+wxString mvceditor::ProjectResourceActionClass::GetLabel() const {
+	return _("Project Resource Parsing");
 }
 
 mvceditor::ResourceCacheInitActionClass::ResourceCacheInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
@@ -163,4 +171,8 @@ void mvceditor::ResourceCacheInitActionClass::Work(mvceditor::GlobalsClass &glob
 			globals.ResourceCache.RegisterGlobal(projectCache);
 		}
 	}
+}
+
+wxString mvceditor::ResourceCacheInitActionClass::GetLabel() const {
+	return _("Resource cache initialization");
 }

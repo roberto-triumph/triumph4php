@@ -30,6 +30,10 @@ mvceditor::StatusBarWithGaugeClass::StatusBarWithGaugeClass(wxWindow *parent, in
 			, GaugeTitles() {
 }
 
+bool mvceditor::StatusBarWithGaugeClass::HasGauge(int id) const {
+	return Gauges.count(id) > 0;
+}
+
 void mvceditor::StatusBarWithGaugeClass::AddGauge(const wxString& title, int id, int maxValue, int flags) {
 	wxString msg = wxString::Format(wxT("There is already another gauge with ID =%d; gauge name=%s"), id, title.c_str());
 	wxUnusedVar(msg);
@@ -57,6 +61,21 @@ void mvceditor::StatusBarWithGaugeClass::UpdateGauge(int id, int update) {
 
 void mvceditor::StatusBarWithGaugeClass::IncrementGauge(int id, int increment) {
 	if (Gauges.count(id) > 0) {
+		wxGauge* gauge = Gauges[id];
+		if (increment != INDETERMINATE_MODE) {
+			gauge->SetValue(gauge->GetValue() + increment);
+		}
+		else {
+			gauge->Pulse();
+		}
+	}
+}
+
+void mvceditor::StatusBarWithGaugeClass::IncrementAndRenameGauge(int id, const wxString& title, int increment) {
+	if (Gauges.count(id) > 0) {
+		GaugeTitles[id] = title;
+		RedrawGauges();
+
 		wxGauge* gauge = Gauges[id];
 		if (increment != INDETERMINATE_MODE) {
 			gauge->SetValue(gauge->GetValue() + increment);

@@ -152,24 +152,6 @@ extern const wxEventType EVENT_APP_READY;
 extern const wxEventType EVENT_APP_EXIT;
 
 /**
- * Notification that the projects list has been opened / closed or any project's source definitions have 
- * updated. This event is fired AFTER the framework
- * detection is complete; it is safe to access a project's database connections, dynamic
- * resources, etc... via the application globals.
- */
-extern const wxEventType EVENT_APP_PROJECTS_UPDATED;
-
-/**
- * Notification that the that the current project
- * has been indexed (project's resource cache has been udpated); the event listeners can 
- * get the project name
- * or resource cache from its [FeatureClass] member properties if so desired.
- * Note that the cache may be updated when the user clicks the 'index' button or by 
- * some other, automatic action.
- */
-extern const wxEventType EVENT_APP_PROJECT_INDEXED;
-
-/**
  * Notification that an existing file has been opened.  The event will contain
  * the full path of the file that was opened in the GetString() method; 
  */
@@ -204,28 +186,12 @@ extern const wxEventType EVENT_APP_PREFERENCES_SAVED;
 extern const wxEventType EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED;
 
 /**
- * Notification the that project's urls have been determined (AppClass::UrlResourceFinder 
- * has been filled with the project's urls)
- */
-extern const wxEventType EVENT_APP_PROJECT_URLS;
-
-/**
- * Tell the app to re-index the current project.
- */
-extern const wxEventType EVENT_CMD_RE_INDEX;
-
-/**
  * Tell the app to open a new file.
  * The command event should set the file to be opened with event.SetString()
  * Note that the app will do NOTHING if the path is invalid; the feature should
  * make sure the path is valid.
  */
 extern const wxEventType EVENT_CMD_FILE_OPEN;
-
-/**
- * Tell the app to build a list of the project's URLs
- */
-extern const wxEventType EVENT_CMD_PROJECT_URLS;
 
 /**
  * The window ID of the Tools Notebook. Use this to connect to the notebook

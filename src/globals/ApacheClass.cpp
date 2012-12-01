@@ -67,6 +67,34 @@ mvceditor::ApacheClass::ApacheClass()
 	, Port(0) { 
 }
 
+mvceditor::ApacheClass::ApacheClass(const mvceditor::ApacheClass& src) 
+	: ManualConfiguration()
+	, VirtualHostMappings()
+	, HttpdPath()
+	, ServerRoot()
+	, Port(){
+	Copy(src);
+}
+
+mvceditor::ApacheClass& mvceditor::ApacheClass::operator=(const mvceditor::ApacheClass& src) {
+	Copy(src);
+	return *this;
+}
+
+void mvceditor::ApacheClass::Copy(const mvceditor::ApacheClass& src) {
+
+	// make sure to completely copy wxStrings 
+	ManualConfiguration = src.ManualConfiguration;
+	VirtualHostMappings.clear();
+	HttpdPath = src.HttpdPath.c_str();
+	ServerRoot = src.ServerRoot.c_str();
+	Port = src.Port;
+	std::map<wxString, wxString>::const_iterator it;
+	for (it = src.VirtualHostMappings.begin(); it != src.VirtualHostMappings.end(); ++it) {
+		VirtualHostMappings[it->first.c_str()] = it->second.c_str();
+	}
+}
+
 void mvceditor::ApacheClass::ClearMappings() {
 	VirtualHostMappings.clear();
 }

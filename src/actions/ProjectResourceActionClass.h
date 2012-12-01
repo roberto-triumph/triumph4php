@@ -78,6 +78,8 @@ public:
 
 	void BackgroundCleanup();
 
+	wxString GetLabel() const;
+
 private:
 
 	/**
@@ -126,6 +128,8 @@ public:
 	ResourceCacheInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 	void Work(mvceditor::GlobalsClass& globals);
+
+	wxString GetLabel() const;
 };
 
 }

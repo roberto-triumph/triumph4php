@@ -127,29 +127,11 @@ private:
 	void OnUrlToolMenuItem(wxCommandEvent& event);
 	
 	void OnUrlSearchTool(wxCommandEvent& event);
-	
-	/**
-	 * When URL detection succeeds, the URLs are added
-	 * to the dialog that is shown to the user.
-	 */
-	void OnUrlDetectionComplete(UrlDetectedEventClass& event);
-	
-	/**
-	 * If URL detection fails, then most likely this is an environment issue
-	 * (PHP binary not found)
-	 */
-	void OnUrlDetectionFailed(wxCommandEvent& event);
-
-	/**
-	 * When a project is indexed, lets call the url detector and get the
-	 * urls for a project.
-	 */
-	void OnProjectIndexed(wxCommandEvent& event);
 
 	/**
 	 * when a project is opened clean the Recent list
 	 */
-	void OnProjectsUpdated(wxCommandEvent& event);
+	void OnUrlResourceActionComplete(wxCommandEvent& event);
 
 	/**
 	 * to show progress to the user
@@ -160,21 +142,7 @@ private:
 	 * show the user the URL dialog and open the chosen url
 	 */
 	void ShowUrlDialog();
-	
-	/**
-	 * Listen for events that trigger URL building
-	 */
-	void OnCmdUrls(wxCommandEvent& event);
-	
-	/**
-	 * A local instance of the detector so that we can resolve
-	 * framework URLs according to each specific PHP framework routing rules
-	 * Needs to be local because this class needs to be the event handler
-	 * for the url detection (event handler is given in the PhpFrameworkDetector
-	 * class constructor)
-	 */
-	mvceditor::PhpFrameworkDetectorClass PhpFrameworks;
-
+		
 	/**
 	 * A popup menu to show the currently configured browsers. The same popup menu will be
 	 * reused multiple times. This class will own it,  that's why we use auto_ptr here
@@ -190,18 +158,6 @@ private:
 	wxMenuItem* RunInBrowser;
 	
 	wxAuiToolBar* BrowserToolbar;
-
-	/**
-	 * This is used to control the URL dialog. Since a click of the Search for URLs button
-	 * may trigger a project re-index, and index notification is done through event
-	 * handlers, the logic will span multiple methods. This flag will be used
-	 * to see if the search for URLs button triggered an index, if so then the
-	 * URL dialog box will be shown after URLs have been detected.
-	 */
-	enum States {
-		FREE, // default state
-		INDEXING // cache is empty, resource indexing was triggered
-	} State;
 	
 	DECLARE_EVENT_TABLE()
 };

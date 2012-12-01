@@ -123,24 +123,9 @@ void mvceditor::ViewFileFeatureClass::OnViewInfosMenu(wxCommandEvent& event) {
 		ShowPanel();
 	}
 	else {
-		
-		// we need the resource cache; the resource cache is needed to figure out the URLs
-		// and templates for each controller.
-		// we will trigger the project indexing, then once the project has been indexed 
-		// we will show the panel.
-		State = INDEXING;
-		wxCommandEvent indexEvent(mvceditor::EVENT_CMD_PROJECT_URLS);
-		App.EventSink.Publish(indexEvent);
+		mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, 
+			_("Could not determine template files."));
 	}
-}
-
-void mvceditor::ViewFileFeatureClass::OnProjectUrls(wxCommandEvent& event) {
-	
-	// if we triggered the indexing
-	if (INDEXING == State) {
-		ShowPanel();	
-	}
-	State = FREE;
 }
 
 void mvceditor::ViewFileFeatureClass::ShowPanel() {
@@ -440,5 +425,4 @@ BEGIN_EVENT_TABLE(mvceditor::ViewFileFeatureClass, wxEvtHandler)
 	EVT_FRAMEWORK_VIEW_INFOS_COMPLETE(mvceditor::ViewFileFeatureClass::OnViewInfosDetectionComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_VIEW_FILES_FAILED, mvceditor::ViewFileFeatureClass::OnViewInfosDetectionFailed)
 	EVT_MENU(mvceditor::MENU_VIEW_FILES + 0, mvceditor::ViewFileFeatureClass::OnViewInfosMenu)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_URLS, mvceditor::ViewFileFeatureClass::OnProjectUrls)
 END_EVENT_TABLE()

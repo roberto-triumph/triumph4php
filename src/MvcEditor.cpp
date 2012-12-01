@@ -52,6 +52,7 @@ mvceditor::AppClass::AppClass()
 	, RunningThreads()
 	, EventSink()
 	, GlobalsChangeHandler(Globals)
+	, Sequences(Globals, RunningThreads)
 	, ConfigLastModified()
 	, Features()
 	, Preferences()
@@ -254,6 +255,7 @@ void mvceditor::AppTimerClass::Notify() {
 		App.IsAppReady = true;
 		wxCommandEvent evt(mvceditor::EVENT_APP_READY);
 		App.EventSink.Publish(evt);
+		App.Sequences.AppStart();
 		wxFileName configFileName(mvceditor::ConfigDirAsset().GetPath(), wxT("mvc-editor.ini"));
 		if (configFileName.FileExists()) {
 			App.ConfigLastModified = configFileName.GetModificationTime();

@@ -22,57 +22,74 @@
  * @copyright  2012 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_PROJECTFRAMEWORKDETECTIONACTIONCLASS_H__
-#define __MVCEDITOR_PROJECTFRAMEWORKDETECTIONACTIONCLASS_H__
+#ifndef __MVCEDITOR_URLRESOURCEACTIONCLASS_H__
+#define __MVCEDITOR_URLRESOURCEACTIONCLASS_H__
 
-#include <php_frameworks/FrameworkDetectorClass.h>
-#include <widgets/ThreadWithHeartbeatClass.h>
-#include <actions/ProjectResourceActionClass.h>
-#include <actions/SqlMetaDataActionClass.h>
-#include <wx/string.h>
-#include <wx/event.h>
+#include <actions/ActionClass.h>
+#include <queue>
 
 namespace mvceditor {
 
-
-class ProjectFrameworkDetectionActionClass : public ActionClass {
+class UrlResourceActionClass : public mvceditor::ActionClass {
 
 public:
 
-	ProjectFrameworkDetectionActionClass(mvceditor::RunningThreadsClass& runningThread, int eventId);
+	UrlResourceActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
-	~ProjectFrameworkDetectionActionClass();
+	~UrlResourceActionClass();
 
 	bool Init(mvceditor::GlobalsClass& globals);
 
 	bool DoAsync();
 
-	wxString GetLabel() const;
-
 	void BackgroundWork();
+
+	wxString GetLabel() const;
 
 private:
 
-	void OnFrameworkDetectionComplete(wxCommandEvent& event);
-	void OnFrameworkDetectionFailed(wxCommandEvent& event);
-	void OnFrameworkDetectionInProgress(wxCommandEvent& event);
-	void OnFrameworkFound(mvceditor::FrameworkFoundEventClass& event);
+	/**
+	 * When URL detection succeeds, propagate the event to the thread event handlers
+	 */
+	void OnUrlDetectionComplete(UrlDetectedEventClass& event);
 
 	/**
-	 * This object will be used to detct the various PHP framework artifacts (resources,
-	 * database connections, route URLs). This class will own this pointer.
+	 * while the url detection is in progress, propagate the events up the
+	 * running threads so that they ultimately get to the main frame
+	 */
+	void OnUrlDetectionInProgress(wxCommandEvent& event);
+
+	/**
+	 * If URL detection fails, then most likely this is an environment issue
+	 * (PHP binary not found)
+	 */
+	void OnUrlDetectionFailed(wxCommandEvent& event);
+
+	/**
+	 * This object will be used to detcet the various PHP framework route URLs). 
+	 * This class will own this pointer.
 	 */
 	mvceditor::PhpFrameworkDetectorClass* PhpFrameworks;
 
 	mvceditor::RunningThreadsClass& RunningThreads;
 
+	mvceditor::ApacheClass Apache;
+
+	std::vector<mvceditor::FrameworkClass> DetectedFrameworks;
+
 	/**
-	 * a 'queue' of folders to perform framework detection on
+	 * the resource cache database files; each db file will be run through
+	 * url detection.
 	 */
-	std::vector<wxString> DirectoriesToDetect;
+	std::queue<wxString> ResourceDbFileNames;
+
+	/**
+	 * the root urls; each directory will be run through
+	 * url detection.
+	 */
+	std::queue<wxString> RootUrls;
 
 	DECLARE_EVENT_TABLE()
-
 };
 
 }

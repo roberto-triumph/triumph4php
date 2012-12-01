@@ -133,8 +133,6 @@ private:
 	void OnAppFileClosed(wxCommandEvent& event);
 
 	void OnAppReady(wxCommandEvent& event);
-
-	void OnCmdReIndex(wxCommandEvent& event);
 	
 	/**
 	 * Toggle various widgets on or off based on the application state. 

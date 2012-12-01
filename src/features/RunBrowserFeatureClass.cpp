@@ -205,12 +205,10 @@ void mvceditor::ChooseUrlDialogClass::OnKeyDown(wxKeyEvent& event) {
 mvceditor::RunBrowserFeatureClass::RunBrowserFeatureClass(mvceditor::AppClass& app)
 	: FeatureClass(app) 
 	, RecentUrls()
-	, PhpFrameworks(*this, app.RunningThreads, app.Globals.Environment)
 	, BrowserMenu()
 	, UrlMenu()
 	, RunInBrowser(NULL)
-	, BrowserToolbar(NULL)
-	, State(FREE) {
+	, BrowserToolbar(NULL) {
 }
 
 void mvceditor::RunBrowserFeatureClass::AddWindows() {
@@ -364,26 +362,9 @@ void mvceditor::RunBrowserFeatureClass::OnUrlSearchTool(wxCommandEvent& event) {
 	}
 	else {
 		
-		// we need the resource cache; the resource cache is needed to figure out the URLs
-		// for each controller.
-		// we will trigger the project indexing, then once the project has been indexed 
-		// this feature will kick off the URL detector, then show the URLs.
-		State = INDEXING;
-		wxCommandEvent indexEvent(mvceditor::EVENT_CMD_RE_INDEX);
-		App.EventSink.Publish(indexEvent);
+		mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER,
+			_("Could not determine URL routes."));
 	}
-}
-
-void mvceditor::RunBrowserFeatureClass::OnCmdUrls(wxCommandEvent& event) {
-	
-	// we need the resource cache; the resource cache is needed to figure out the URLs
-	// for each controller.
-	// we will trigger the project indexing, then once the project has been indexed 
-	// this feature will kick off the URL detector, then show the URLs.
-	
-	// dont set the state flag so that the dialog does not show
-	wxCommandEvent indexEvent(mvceditor::EVENT_CMD_RE_INDEX);
-	App.EventSink.Publish(indexEvent);
 }
 
 void mvceditor::RunBrowserFeatureClass::ShowUrlDialog() {
@@ -414,27 +395,6 @@ void mvceditor::RunBrowserFeatureClass::ShowUrlDialog() {
 			ExternalBrowser(browserName, App.Globals.UrlResourceFinder.ChosenUrl.Url, environment);
 		}
 	}
-}
-
-void mvceditor::RunBrowserFeatureClass::OnUrlDetectionComplete(mvceditor::UrlDetectedEventClass& event) {
-	std::vector<mvceditor::UrlResourceClass> newUrls = event.GetUrls();
-	App.Globals.UrlResourceFinder.Urls.insert(App.Globals.UrlResourceFinder.Urls.end(),
-		newUrls.begin(), newUrls.end());
-
-	GetStatusBarWithGauge()->StopGauge(ID_URL_GAUGE);
-	
-	wxCommandEvent urlEvent(mvceditor::EVENT_APP_PROJECT_URLS);
-	App.EventSink.Publish(urlEvent);
-	if (INDEXING == State) {
-		ShowUrlDialog();
-	}
-	State = FREE;
-}
-
-void mvceditor::RunBrowserFeatureClass::OnUrlDetectionFailed(wxCommandEvent& event) {
-	mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, event.GetString());
-	GetStatusBarWithGauge()->StopGauge(ID_URL_GAUGE);
-	State = FREE;
 }
 
 void mvceditor::RunBrowserFeatureClass::OnBrowserToolMenuItem(wxCommandEvent& event) {
@@ -472,41 +432,12 @@ void mvceditor::RunBrowserFeatureClass::OnUrlToolMenuItem(wxCommandEvent& event)
 	}
 }
 
-void mvceditor::RunBrowserFeatureClass::OnProjectIndexed(wxCommandEvent& event) {
-	App.Globals.UrlResourceFinder.Clear();
-	mvceditor::EnvironmentClass* environment = GetEnvironment();
-
-	// look to see if any source directory is a virtual host doc root
-	bool started = false;
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
-		if (project->IsEnabled) {
-			std::vector<mvceditor::SourceClass>::const_iterator source;
-
-			// a single project can have multiple directories. check each directory, and if 
-			// that directory is a web root then get the URLs for that project.
-			for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
-				wxString rootDirFullPath = source->RootDirectory.GetFullPath();
-				wxString projectRootUrl =  environment->Apache.GetUrl(rootDirFullPath);
-				if (!projectRootUrl.IsEmpty()) {
-					started = PhpFrameworks.InitUrlDetector(App.Globals.Frameworks, project->ResourceDbFileName.GetFullPath(), projectRootUrl);
-				}
-			}
-		}
-	}
-	if (started) {
-		GetStatusBarWithGauge()->AddGauge(_("URL Detection"), ID_URL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
-	}
-}
-
 void mvceditor::RunBrowserFeatureClass::OnProcessInProgress(wxCommandEvent& event) {
 	GetStatusBarWithGauge()->UpdateGauge(ID_URL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
 }
 
-void mvceditor::RunBrowserFeatureClass::OnProjectsUpdated(wxCommandEvent& event) {
+void mvceditor::RunBrowserFeatureClass::OnUrlResourceActionComplete(wxCommandEvent& event) {
 	RecentUrls.clear();
-	App.Globals.UrlResourceFinder.Urls.clear();
-	App.Globals.UrlResourceFinder.ChosenUrl.Reset();
 	if (BrowserToolbar) {
 		BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, _("No URLs"));
 		BrowserToolbar->Realize();
@@ -529,16 +460,8 @@ BEGIN_EVENT_TABLE(mvceditor::RunBrowserFeatureClass, wxEvtHandler)
 	EVT_AUITOOLBAR_TOOL_DROPDOWN(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, mvceditor::RunBrowserFeatureClass::OnUrlToolDropDown)
 	EVT_TOOL(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 4, mvceditor::RunBrowserFeatureClass::OnUrlSearchTool)
 
-	// the URL detection handlers
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_URL_FAILED, mvceditor::RunBrowserFeatureClass::OnUrlDetectionFailed)
-	EVT_FRAMEWORK_URL_COMPLETE(mvceditor::RunBrowserFeatureClass::OnUrlDetectionComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::RunBrowserFeatureClass::OnProcessInProgress)
-
 	// application events
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::RunBrowserFeatureClass::OnPreferencesSaved)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_INDEXED, mvceditor::RunBrowserFeatureClass::OnProjectIndexed)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::RunBrowserFeatureClass::OnProjectsUpdated)
+	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_URL_RESOURCES, mvceditor::EVENT_WORK_COMPLETE, mvceditor::RunBrowserFeatureClass::OnUrlResourceActionComplete)
 	
-	// command handlers to enable communication with other features
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_PROJECT_URLS, mvceditor::RunBrowserFeatureClass::OnCmdUrls)
 END_EVENT_TABLE()

@@ -46,6 +46,7 @@ int ID_LOWERCASE = wxNewId();
 int ID_UPPERCASE = wxNewId();
 int ID_MENU_MORE = wxNewId();
 int ID_TOOLBAR = wxNewId();
+static int ID_SEQUENCE_GAUGE = wxNewId();
 
 mvceditor::MainFrameClass::MainFrameClass(const std::vector<mvceditor::FeatureClass*>& features,
 										mvceditor::AppClass& app,
@@ -62,6 +63,7 @@ mvceditor::MainFrameClass::MainFrameClass(const std::vector<mvceditor::FeatureCl
 	SetStatusBar(gauge);
 
 	App.EventSink.PushHandler(&Listener);
+	App.RunningThreads.AddEventHandler(this);
 	
 	AuiManager.SetManagedWindow(this);
 	ToolBar = new wxAuiToolBar(this, ID_TOOLBAR, wxDefaultPosition, wxDefaultSize, 
@@ -122,6 +124,7 @@ void mvceditor::MainFrameClass::OnClose(wxCloseEvent& event) {
 		}
 		wxLog::DontCreateOnDemand();
 		
+		App.RunningThreads.RemoveEventHandler(this);
 		App.RunningThreads.StopAll();
 
 		// delete the features first so that we can destroy
@@ -695,6 +698,23 @@ void mvceditor::MainFrameClass::UpdateTitleBar() {
 	}
 }
 
+void mvceditor::MainFrameClass::OnWorkInProgress(wxCommandEvent& event) {
+	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
+	wxString title = App.Sequences.GetStatus();
+	if (!gauge->HasGauge(ID_SEQUENCE_GAUGE)) {
+		gauge->AddGauge(title, ID_SEQUENCE_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
+	}
+	else {
+		gauge->IncrementAndRenameGauge(ID_SEQUENCE_GAUGE, title, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
+	}
+
+}
+
+void mvceditor::MainFrameClass::OnWorkComplete(wxCommandEvent& event) {
+	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
+	gauge->StopGauge(ID_SEQUENCE_GAUGE);
+}
+
 mvceditor::AppEventListenerForFrameClass::AppEventListenerForFrameClass(mvceditor::MainFrameClass* mainFrame)
 	: wxEvtHandler()
 	, MainFrame(mainFrame) {
@@ -773,6 +793,10 @@ BEGIN_EVENT_TABLE(mvceditor::MainFrameClass,  MainFrameGeneratedClass)
 	EVT_AUITOOLBAR_OVERFLOW_CLICK(wxID_ANY, mvceditor::MainFrameClass::OnAnyAuiToolbarEvent)
 	EVT_AUITOOLBAR_RIGHT_CLICK(wxID_ANY, mvceditor::MainFrameClass::OnAnyAuiToolbarEvent)
 	EVT_AUITOOLBAR_TOOL_DROPDOWN(wxID_ANY, mvceditor::MainFrameClass::OnAnyAuiToolbarEvent)
+
+	// make sure to show status of running sequences
+	EVT_COMMAND(wxID_ANY, mvceditor::SEQUENCE_APP_START_IN_PROGRESS, mvceditor::MainFrameClass::OnWorkInProgress)
+	EVT_COMMAND(wxID_ANY, mvceditor::SEQUENCE_APP_START_COMPLETE, mvceditor::MainFrameClass::OnWorkComplete)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::AppEventListenerForFrameClass, wxEvtHandler)

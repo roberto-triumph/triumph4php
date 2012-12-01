@@ -25,12 +25,30 @@
 #include <actions/ActionClass.h>
 
 mvceditor::ActionClass::ActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: ThreadWithHeartbeatClass(runningThreads, eventId) {
+	: ThreadWithHeartbeatClass(runningThreads, eventId) 
+	, Status()
+	, Mutex() {
 
 }
 
 bool mvceditor::ActionClass::DoAsync() {
 	return true;
+}
+
+void mvceditor::ActionClass::SetStatus(const wxString& status) {
+
+	// make sure to synchronize since this may be called from multiple threads
+	wxMutexLocker locker(Mutex);
+
+	// make sure to copy, since this may be called from multiple threads
+	Status = status.c_str();
+}
+
+wxString mvceditor::ActionClass::GetStatus() {
+
+	// make sure to synchronize since this may be called from multiple threads
+	wxMutexLocker locker(Mutex);
+	return Status;
 }
 
 mvceditor::InitializerActionClass::InitializerActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
@@ -55,6 +73,10 @@ void mvceditor::InitializerActionClass::BackgroundWork() {
 	
 }
 
+const int mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_INIT = wxNewId();
 const int mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE = wxNewId();
+const int mvceditor::ID_EVENT_ACTION_SQL_METADATA_INIT = wxNewId();
 const int mvceditor::ID_EVENT_ACTION_SQL_METADATA = wxNewId();
 const int mvceditor::ID_EVENT_ACTION_FRAMEWORK_DETECTION = wxNewId();
+const int mvceditor::ID_EVENT_ACTION_CODE_IGNITER_DETECTED = wxNewId();
+const int mvceditor::ID_EVENT_ACTION_URL_RESOURCES = wxNewId();

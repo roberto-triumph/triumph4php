@@ -76,6 +76,22 @@ public:
 	bool ManualConfiguration;
 
 	ApacheClass();
+
+	/**
+	 * completely copy an instance
+	 */
+	ApacheClass(const mvceditor::ApacheClass& src);
+
+	/**
+	 * completely copy an instance
+	 */
+	mvceditor::ApacheClass& operator=(const mvceditor::ApacheClass& src);
+
+	/**
+	 * completely copy an instance
+	 * @param src item to copy from
+	 */
+	void Copy(const mvceditor::ApacheClass& src);
 	
 	/**
 	 * removes all of the virtual host mappings

@@ -22,54 +22,23 @@
  * @copyright  2012 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_GLOBALSCHANGECLASS_H__
-#define __MVCEDITOR_GLOBALSCHANGECLASS_H__
+#ifndef __MVCEDITOR_CODEIGNITERACTIONCLASS_H__
+#define __MVCEDITOR_CODEIGNITERACTIONCLASS_H__
 
+#include <actions/ActionClass.h>
 #include <globals/GlobalsClass.h>
-#include <actions/SqlMetaDataActionClass.h>
-#include <actions/ProjectResourceActionClass.h>
-#include <wx/event.h>
 
 namespace mvceditor {
 
-/**
- * Class responsible for capturing all events that modify the global
- * structures and performs the updates.
- * This class will not be directly invoked; all actions will Post events
- * to this handler.
- */
-class GlobalsChangeHandlerClass : public wxEvtHandler {
+class CodeIgniterInitializerActionClass : public mvceditor::InitializerActionClass {
 
 public:
 
-	GlobalsChangeHandlerClass(mvceditor::GlobalsClass& globals);
+	CodeIgniterInitializerActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
-private:
+	void Work(mvceditor::GlobalsClass& globals);
 
-	mvceditor::GlobalsClass& Globals;
-
-	/**
-	 * This is the callback that gets called when the PHP framework detectors have 
-	 * successfully run
-	 */
-	void OnFrameworkFound(mvceditor::FrameworkFoundEventClass& event);
-
-	void OnSqlMetaDataComplete(mvceditor::SqlMetaDataEventClass& event);
-
-	/**
-	 * This method will get called by the WorkingCacheBuilderClass when parsing of the
-	 * code in this control has been completed.
-	 */
-	void OnGlobalCacheComplete(mvceditor::GlobalCacheCompleteEventClass& event);
-
-	/**
-	 * This method will get called when routes / URL are detected in any of the
-	 * opened projects.
-	 */
-	void OnUrlDetectionComplete(UrlDetectedEventClass& event);
-	
-	DECLARE_EVENT_TABLE()
-
+	wxString GetLabel() const;
 };
 
 }

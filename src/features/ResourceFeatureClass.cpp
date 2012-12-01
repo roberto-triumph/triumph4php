@@ -103,9 +103,8 @@ void mvceditor::ResourceFeatureClass::AddCodeControlClassContextMenuItems(wxMenu
 
 void mvceditor::ResourceFeatureClass::OnAppReady(wxCommandEvent& event) {
 
-	mvceditor::ResourceCacheInitActionClass action(App.RunningThreads, wxID_ANY);
-	action.Init(App.Globals);
-
+	// setup the timer that will be used to build the symbol table
+	// in the background for the opened files.
 	WorkingCacheBuilder = new mvceditor::WorkingCacheBuilderClass(App.RunningThreads, wxNewId());
 	Timer.SetOwner(this);
 	Timer.Start(2000, wxTIMER_CONTINUOUS);
@@ -113,45 +112,6 @@ void mvceditor::ResourceFeatureClass::OnAppReady(wxCommandEvent& event) {
 	if (wxTHREAD_NO_ERROR != WorkingCacheBuilder->Init(threadId)) {
 		delete WorkingCacheBuilder;
 		WorkingCacheBuilder = NULL;
-	}
-}
-
-void mvceditor::ResourceFeatureClass::OnProjectsUpdated(wxCommandEvent& event) {
-	HasCodeLookups = false;
-	HasFileLookups = false;
-	if (RunningThreadId > 0) {
-		App.RunningThreads.Stop(RunningThreadId);
-		RunningThreadId = 0;
-		State = FREE;
-	}
-
-	ProjectIndexMenu->Enable(App.Globals.HasSources() && FREE == State);
-
-	// the user enabled/disabled projects
-	// need to clear the entire cache, then add only the newly enabled projects
-	mvceditor::ResourceCacheInitActionClass action(App.RunningThreads, wxID_ANY);
-	action.Init(App.Globals);
-
-	// now lets start re-indexing the projects
-	mvceditor::ProjectResourceActionClass* thread = new ProjectResourceActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
-	if (thread->Init(App.Globals)) {
-		RunningThreadId = 0;
-		wxThreadError err = thread->CreateSingleInstance(RunningThreadId);
-		if (wxTHREAD_NO_ERROR == err) {
-			State = INDEXING_PROJECT;
-			GetStatusBarWithGauge()->AddGauge(_("Indexing "), ID_RESOURCE_READER_GAUGE, 
-				StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
-		}
-		else {
-			if (wxTHREAD_NO_RESOURCE == err) {
-				mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
-			}
-			State = FREE;
-			delete thread;
-		}
-	}
-	else {
-		delete thread;
 	}
 }
 
@@ -235,10 +195,6 @@ void mvceditor::ResourceFeatureClass::OnWorkComplete(wxCommandEvent& event) {
 					LoadPageFromResource(JumpToText, chosenResources[i]);
 				}
 			}
-		}
-		else if (INDEXING_PROJECT == previousState) {
-			wxCommandEvent indexedEvent(mvceditor::EVENT_APP_PROJECT_INDEXED);
-			App.EventSink.Publish(indexedEvent);
 		}
 	}
 }
@@ -427,15 +383,6 @@ bool mvceditor::ResourceFeatureClass::NeedToIndex(const wxString& finderQuery) c
 void mvceditor::ResourceFeatureClass::OpenFile(wxString fileName) {
 	GetNotebook()->LoadPage(fileName);
 }
-
-void mvceditor::ResourceFeatureClass::OnCmdReIndex(wxCommandEvent& event) {
-
-	// only index when there is a project open
-	if (App.Globals.HasSources()) {
-		StartIndex();
-	}
-}
-
 
 void mvceditor::ResourceFeatureClass::OnAppFileClosed(wxCommandEvent& event) {
 
@@ -749,8 +696,6 @@ BEGIN_EVENT_TABLE(mvceditor::ResourceFeatureClass, wxEvtHandler)
 	EVT_UPDATE_UI(wxID_ANY, mvceditor::ResourceFeatureClass::OnUpdateUi)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ResourceFeatureClass::OnWorkComplete)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ResourceFeatureClass::OnWorkInProgress)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::ResourceFeatureClass::OnProjectsUpdated)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_RE_INDEX, mvceditor::ResourceFeatureClass::OnCmdReIndex)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_CLOSED, mvceditor::ResourceFeatureClass::OnAppFileClosed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::ResourceFeatureClass::OnAppReady)
 	EVT_COMMAND(ID_WIPE_THREAD, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ResourceFeatureClass::OnWorkInProgress)

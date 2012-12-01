@@ -41,6 +41,11 @@ public:
 	 * When window is resized redraw accordingly
 	 */
     void OnSize(wxSizeEvent& event);
+
+	/**
+	 * @return bool TRUE if the gauge with the given ID already exists
+	 */
+	bool HasGauge(int id) const;
 	
 	/**
 	 * Adds a progress bar to this status bar.
@@ -67,6 +72,15 @@ public:
 	 * @param update number to increment by can be INDETERMINATE_MODE to make the gauge just pulse
 	 */
 	void IncrementGauge(int id, int increment = 1);
+
+	/**
+	 * Increments the progress.
+	 * 
+	 * @param int id the gauge ID
+	 * @param wxString new title for the gauge, will be displayed next to the progress bar
+	 * @param update number to increment by can be INDETERMINATE_MODE to make the gauge just pulse
+	 */
+	void IncrementAndRenameGauge(int id, const wxString& title, int increment = 1);
 	
 	/**
 	 * Removes the progress bar (user will no longer see it)

@@ -48,6 +48,9 @@ mvceditor::SqlMetaDataActionClass::SqlMetaDataActionClass(mvceditor::RunningThre
 
 bool mvceditor::SqlMetaDataActionClass::Init(mvceditor::GlobalsClass& globals) {
 	Infos = globals.Infos;
+	if (!Infos.empty()) {
+		SetStatus(_("Detecting SQL metadata"));
+	}
 	return !Infos.empty();
 }
 
@@ -57,6 +60,8 @@ void mvceditor::SqlMetaDataActionClass::BackgroundWork() {
 	for (std::vector<mvceditor::DatabaseInfoClass>::iterator it = Infos.begin(); it != Infos.end(); ++it) {
 		if (!IsCancelled()) {
 			if (it->IsEnabled) {
+				wxString wxLabel = mvceditor::IcuToWx(it->Label);
+				SetStatus(_("Detecting SQL Metadata for ") + wxLabel);
 				UnicodeString error;
 				if (!newResources.Fetch(*it, error)) {
 					errors.push_back(error);
@@ -73,6 +78,10 @@ void mvceditor::SqlMetaDataActionClass::BackgroundWork() {
 		mvceditor::SqlMetaDataEventClass evt(wxID_ANY, newResources, errors);
 		PostEvent(evt);
 	}
+}
+
+wxString mvceditor::SqlMetaDataActionClass::GetLabel() const {
+	return _("SQL metadata detection");
 }
 
 mvceditor::SqlMetaDataInitActionClass::SqlMetaDataInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
@@ -98,4 +107,8 @@ void mvceditor::SqlMetaDataInitActionClass::Work(mvceditor::GlobalsClass& global
 	for (size_t i = 0; i < globals.Frameworks.size(); ++i) {
 		globals.Infos.insert(globals.Infos.end(), globals.Frameworks[i].Databases.begin(), globals.Frameworks[i].Databases.end());
 	}
+}
+
+wxString mvceditor::SqlMetaDataInitActionClass::GetLabel() const {
+	return _("SQL connection intialization");
 }

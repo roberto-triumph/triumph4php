@@ -24,6 +24,7 @@
  */
 #include <features/CodeIgniterFeatureClass.h>
 #include <globals/Errors.h>
+#include <actions/ActionClass.h>
 #include <MvcEditor.h>
 #include <globals/Events.h>
 #include <globals/String.h>
@@ -43,7 +44,7 @@ void mvceditor::CodeIgniterFeatureClass::AddNewMenu(wxMenuBar *menuBar) {
 	// for the projects that use Code Igniter
 }
 
-void mvceditor::CodeIgniterFeatureClass::OnProjectsUpdated(wxCommandEvent& event) {
+void mvceditor::CodeIgniterFeatureClass::OnCodeIgniterInitialized(wxCommandEvent& event) {
 	ConfigFiles.clear();
 	for (size_t i = 0; i < App.Globals.Frameworks.size(); ++i) {
 		ConfigFiles.insert(App.Globals.Frameworks[i].ConfigFiles.begin(), App.Globals.Frameworks[i].ConfigFiles.end());
@@ -72,10 +73,6 @@ void mvceditor::CodeIgniterFeatureClass::OnProjectsUpdated(wxCommandEvent& event
 			delete CodeIgniterMenu;
 			CodeIgniterMenu = NULL;
 		}
-	}
-	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
-	for (size_t i = 0; i < App.Globals.Frameworks.size(); ++i) {
-		resourceCache->GlobalAddDynamicResources(App.Globals.Frameworks[i].Resources);
 	}
 }
 
@@ -237,5 +234,5 @@ void mvceditor::CodeIgniterFeatureClass::GoToController() {
 
 BEGIN_EVENT_TABLE(mvceditor::CodeIgniterFeatureClass, wxEvtHandler) 
 	EVT_MENU_RANGE(MENU_CODE_IGNITER, MENU_CODE_IGNITER + 15, mvceditor::CodeIgniterFeatureClass::OnMenuItem)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECTS_UPDATED, mvceditor::CodeIgniterFeatureClass::OnProjectsUpdated)
+	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_CODE_IGNITER_DETECTED, mvceditor::EVENT_WORK_COMPLETE, mvceditor::CodeIgniterFeatureClass::OnCodeIgniterInitialized)
 END_EVENT_TABLE()

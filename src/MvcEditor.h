@@ -28,6 +28,7 @@
 #include <main_frame/PreferencesClass.h>
 #include <globals/Events.h>
 #include <actions/GlobalsChangeHandlerClass.h>
+#include <actions/SequenceClass.h>
 #include <wx/app.h>
 #include <wx/event.h>
 #include <wx/string.h>
@@ -96,6 +97,11 @@ public:
 	 * actions and will update the global data structures accordingly
 	 */
 	mvceditor::GlobalsChangeHandlerClass GlobalsChangeHandler;
+
+	/**
+	 * To run multiple steps.
+	 */
+	mvceditor::SequenceClass Sequences;
 
 	/**
 	 * keep track of the last time the config was modified. will use
