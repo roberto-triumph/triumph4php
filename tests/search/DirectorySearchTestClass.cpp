@@ -315,7 +315,24 @@ TEST_FIXTURE(SourceFixtureClass, ContainsShouldReturnTrue) {
 	Make(root, wxT("*"), wxT("file_two.php"));
 	test = root + wxFileName::GetPathSeparators() + wxT("file.php");
 	CHECK(Source.Contains(test));
+}
 
+TEST_FIXTURE(SourceFixtureClass, ExcludeWildcardsShouldBeResetToEmpty) {
+	wxString root = wxFileName::GetTempDir();
+	Make(root, wxT("*.php"), wxT("*.inc"));
+	CHECK_EQUAL(wxT("*.inc"), Source.ExcludeWildcardsString());
+
+	Make(root, wxT("*.php"), wxT(""));
+	CHECK_EQUAL(wxT(""), Source.ExcludeWildcardsString());
+}
+
+TEST_FIXTURE(SourceFixtureClass, IncludeWildcardsShouldBeResetToEmpty) {
+	wxString root = wxFileName::GetTempDir();
+	Make(root, wxT("*.php"), wxT("*.inc"));
+	CHECK_EQUAL(wxT("*.php"), Source.IncludeWildcardsString());
+
+	Make(root, wxT(""), wxT(""));
+	CHECK_EQUAL(wxT(""), Source.IncludeWildcardsString());
 }
 
 }

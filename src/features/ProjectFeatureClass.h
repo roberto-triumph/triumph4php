@@ -232,8 +232,16 @@ public:
 	 * @param project the list of projects the user will edit / remove / add to
 	 * @param removedProjects the list of projects that the user has removed. This list will
 	 *        get populated only when the user clicks OK (and has removed a project)
+	 * @param touchedProjects the list of projects that have been . This list will
+	 *        get populated only when the user clicks OK (and has touched a project). "Touched"
+	 *        means that at the project's source directories list has been changed in any way;
+	 *        if a project has a new source, a project has one fewer source, a source's 
+	 *        include/exclude wildcards have been changed. This list also includes any completely
+	 *        new projects as well.
 	 */
-	ProjectListDialogClass(wxWindow* parent, std::vector<mvceditor::ProjectClass>& projects, std::vector<mvceditor::ProjectClass>& removedProjects);
+	ProjectListDialogClass(wxWindow* parent, std::vector<mvceditor::ProjectClass>& projects, 
+		std::vector<mvceditor::ProjectClass>& removedProjects,
+		std::vector<mvceditor::ProjectClass>& touchedProjects);
 
 private:
 
@@ -252,6 +260,12 @@ private:
 	 * get populated only when the user clicks OK (and has removed a project)
 	 */
 	std::vector<mvceditor::ProjectClass>& RemovedProjects;
+
+	/**
+	 * The list of projects that the user has added/modified/removed source directories. This list will
+	 * get populated only when the user clicks OK (and has touched a project)
+	 */
+	std::vector<mvceditor::ProjectClass>& TouchedProjects;
 
 	/**
 	 * add the project labels to the check list box

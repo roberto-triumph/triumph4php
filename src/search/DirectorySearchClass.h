@@ -205,6 +205,13 @@ public:
 };
 
 /**
+ * @return bool TRUE if has the same sources as b. source lists are the same if and only if
+ *  a and b have the same number of items
+ *  each source a and b has the same root directory, include, and exclude wildcards
+ */
+bool CompareSourceLists(const std::vector<mvceditor::SourceClass>& a, const std::vector<mvceditor::SourceClass>& b);
+
+/**
  * This class will iterate through directories, giving each file to a DirectoryWalker. The unique feature of this class is 
  * that only one file will be walked with each invocation of the Walk() method. This makes it possible for  
  * dialogs that need to recurse the file system to be built that will leave the UI responsive (by only walking through one file at

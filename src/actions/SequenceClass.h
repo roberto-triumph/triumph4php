@@ -51,8 +51,15 @@ class SequenceClass : public wxEvtHandler {
 
 public:
 
+	/**
+	 * The global data structures; each action will read these as their
+	 * input
+	 */
 	mvceditor::GlobalsClass& Globals;
 
+	/**
+	 * This will be used by the actions to create background threads
+	 */
 	mvceditor::RunningThreadsClass& RunningThreads;
 
 	SequenceClass(mvceditor::GlobalsClass& globals, mvceditor::RunningThreadsClass& runningThreads);
@@ -71,9 +78,20 @@ public:
 
 	/**
 	 * start the project refresh sequence.  This sequence should be run when the user
-	 * has added / removed a project, or edited a project's sources list.
+	 * has added / removed a project, or edited a project's sources list. This sequence
+	 * will do the following, but only on the given projects, as opposed to all projects
+	 * like AppStart sequence.
+	 * - Remove the project cache, urls, SQL table metada for the removed projects
+	 * - Detect the PHP framework that the project is using
+	 * - Load the resource cache if it exists
+	 * - Start the resource cache update for the project
+	 * - Load the project's database connections
+	 * - Detect the SQL table metadata for the project's database connections
+	 *
+	 * @param updateProjects the list of projects that were updated ie. new/removed/edited 
+	 *       source directories, wildcards, etc...
 	 */
-	void ProjectsRefreshed(const mvceditor::ProjectClass& refreshedProjects);
+	void ProjectDefinitionsUpdated(const std::vector<mvceditor::ProjectClass>& touchedProjects);
 
 	/**
 	 * @return wxString a short description of which step is currently being run

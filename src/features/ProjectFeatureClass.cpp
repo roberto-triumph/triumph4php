@@ -231,8 +231,8 @@ void mvceditor::ProjectFeatureClass::OnFrameworkDetectionInProgress(wxCommandEve
 }
 
 void mvceditor::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
-	std::vector<mvceditor::ProjectClass> removedProjects;
-	mvceditor::ProjectListDialogClass dialog(GetMainWindow(), App.Globals.Projects, removedProjects);
+	std::vector<mvceditor::ProjectClass> removedProjects, touchedProjects;
+	mvceditor::ProjectListDialogClass dialog(GetMainWindow(), App.Globals.Projects, removedProjects, touchedProjects);
 	if (wxOK == dialog.ShowModal()) {
 		std::vector<mvceditor::ProjectClass>::iterator project;
 
@@ -262,10 +262,9 @@ void mvceditor::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
 		App.UpdateConfigModifiedTime();
 
 		if (!IsDetecting) {
-			
-			// TODO
-			// need to be able to tell which projects are new
-			// then we update just the new projects
+
+			// start the sequence that will update all global dats structures
+			App.Sequences.ProjectDefinitionsUpdated(touchedProjects);
 		}
 	}
 }
@@ -421,11 +420,13 @@ void mvceditor::ProjectSourceDialogClass::OnCancelButton(wxCommandEvent& event) 
 }
 
 mvceditor::ProjectListDialogClass::ProjectListDialogClass(wxWindow* parent, std::vector<mvceditor::ProjectClass>& projects,
-														  std::vector<mvceditor::ProjectClass>& removedProjects)
+														  std::vector<mvceditor::ProjectClass>& removedProjects,
+														  std::vector<mvceditor::ProjectClass>& touchedProjects)
 	: ProjectListDialogGeneratedClass(parent)
 	, Projects(projects)
 	, EditedProjects(projects)
-	, RemovedProjects(removedProjects) {
+	, RemovedProjects(removedProjects) 
+	, TouchedProjects(touchedProjects) {
 	Populate();
 	if (!ProjectsList->IsEmpty()) {
 		ProjectsList->SetSelection(0);
@@ -541,10 +542,41 @@ void mvceditor::ProjectListDialogClass::OnEditButton(wxCommandEvent& event) {
 }
 
 void mvceditor::ProjectListDialogClass::OnOkButton(wxCommandEvent& event) {
-	Projects = EditedProjects;
+	
+	// create the cache files first. that way we can use the cache file name as a 
+	// pseudo unique identifier
 	for (size_t i = 0; i < Projects.size(); ++i) {
 		Projects[i].MakeResourceDbFileName();
 	}
+
+	// go thorough the edited projects and see which ones actually changed
+	// here, Projects is the original list and EditedProjects is the list that the
+	// user modified
+	std::vector<mvceditor::ProjectClass>::const_iterator project;
+	std::vector<mvceditor::ProjectClass>::const_iterator editedProject;
+	for (editedProject = EditedProjects.begin(); editedProject != EditedProjects.end(); ++editedProject) {
+
+		// if we dont find the edited project in the original project, then it has been changed
+		// by the reverse, if we find the edited project in the original projects list then it has 
+		/// NOT changed
+		bool touched = true;
+		for (project = Projects.begin(); project != Projects.end(); ++project) {
+			bool isSame = mvceditor::CompareSourceLists(project->Sources, editedProject->Sources);
+			bool hasBeenReEnabled = editedProject->IsEnabled && !project->IsEnabled;
+
+			// even if 2 projects are the same, if the project went from disabled to enabled
+			// we want to label it as touched so that parsing takes place
+			if (isSame && !hasBeenReEnabled) {
+				touched = false;
+				break;
+			}
+		}
+		if (touched) {
+			TouchedProjects.push_back(*editedProject);
+		}
+	}
+	
+	Projects = EditedProjects;
 	EndModal(wxOK);
 }
 

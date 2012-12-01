@@ -72,6 +72,13 @@ public:
 	bool Init(mvceditor::GlobalsClass& globals);
 
 	/**
+	 * This method can be used to set the projects to be scanned.  By default, all of the projects in the
+	 * globals list are scanned.  Sometimes, like for example when a single project is edited, we dont want
+	 * to scan all of the projects since they have not been changed. This method must be called the Init method.
+	 */
+	void SetTouchedProjects(const std::vector<mvceditor::ProjectClass>& touchedProjects);
+
+	/**
 	 * Files will be parsed for resouces in a background thread.
 	 */
 	void BackgroundWork();
@@ -102,6 +109,11 @@ private:
 	 * but it will be posted via an event and the event handler will own it.
 	 */
 	mvceditor::GlobalCacheClass* GlobalCache;
+
+	/**
+	 * TRUE if we should iterate though the touched projects and not all projects.
+	 */
+	bool DoTouchedProjects;
 
 	/**
 	 * recurse through all sources in a single project

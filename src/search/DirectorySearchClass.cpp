@@ -80,8 +80,8 @@ void mvceditor::SourceClass::SetIncludeWildcards(const wxString& wildcardString)
 		delete IncludeRegEx;
 		IncludeRegEx = NULL;
 	}
-	if (!wildcardString.IsEmpty()) {
-		IncludeWildcards = wildcardString;
+	IncludeWildcards = wildcardString;
+	if (!wildcardString.IsEmpty()) {		
 		IncludeRegEx = new wxRegEx(WildcardRegEx(IncludeWildcards), wxRE_ICASE | wxRE_ADVANCED);
 	}
 }
@@ -91,8 +91,8 @@ void mvceditor::SourceClass::SetExcludeWildcards(const wxString& wildcardString)
 		delete ExcludeRegEx;
 		ExcludeRegEx = NULL;
 	}
+	ExcludeWildcards = wildcardString;
 	if (!wildcardString.IsEmpty()) {
-		ExcludeWildcards = wildcardString;
 		ExcludeRegEx = new wxRegEx(WildcardRegEx(ExcludeWildcards), wxRE_ICASE | wxRE_ADVANCED);
 	}
 }
@@ -144,6 +144,34 @@ wxString mvceditor::SourceClass::WildcardRegEx(const wxString& wildCardString) {
 	escapedExpression.Replace(wxT("?"), wxT(".?"));
 	escapedExpression.Append(wxT("$)"));
 	return escapedExpression;
+}
+
+bool mvceditor::CompareSourceLists(const std::vector<mvceditor::SourceClass>& a, const std::vector<mvceditor::SourceClass>& b) {
+	if (a.size() != b.size()) {
+		return false;
+	}
+	std::vector<mvceditor::SourceClass>::const_iterator aSource, bSource;
+
+	// must compare this way since there lists are not guaranteed to be in any particular order
+	for (aSource = a.begin(); aSource != a.end(); ++aSource) {
+		bool found = false;
+		for (bSource = b.begin(); bSource != b.end(); ++bSource) {
+			if (aSource->RootDirectory == bSource->RootDirectory &&
+				aSource->IncludeWildcardsString() == bSource->IncludeWildcardsString() &&
+				aSource->ExcludeWildcardsString() == bSource->ExcludeWildcardsString()) {
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+
+			// as soon as 1 item in list a is not found in list b, the lists are not the same
+			return false;
+		}
+	}
+
+	// all items in list a were found in list b
+	return true;
 }
 
 mvceditor::DirectorySearchClass::DirectorySearchClass()

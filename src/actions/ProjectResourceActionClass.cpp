@@ -31,7 +31,8 @@ mvceditor::ProjectResourceActionClass::ProjectResourceActionClass(mvceditor::Run
 	, Projects()
 	, DirectorySearch()
 	, Version(pelet::PHP_53) 
-	, GlobalCache(NULL) {
+	, GlobalCache(NULL)
+	, DoTouchedProjects(false) {
 }
 
 bool mvceditor::ProjectResourceActionClass::InitForFile(const mvceditor::ProjectClass& project, const wxString& fullPath, pelet::Versions version) {
@@ -60,14 +61,22 @@ bool mvceditor::ProjectResourceActionClass::InitForFile(const mvceditor::Project
 	return false;
 }
 
+void mvceditor::ProjectResourceActionClass::SetTouchedProjects(const std::vector<mvceditor::ProjectClass>& touchedProjects) {
+	DoTouchedProjects = true;
+	Projects = touchedProjects;
+}
+
 bool mvceditor::ProjectResourceActionClass::Init(mvceditor::GlobalsClass& globals) {
 	Version = globals.Environment.Php.Version;
-
-	Projects.clear();
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
-		if (project->IsEnabled && !project->AllPhpSources().empty()) {
-			Projects.push_back(*project);
+	
+	// if we were not given projects, scan all of them
+	if (!DoTouchedProjects) {
+		Projects.clear();
+		std::vector<mvceditor::ProjectClass>::const_iterator project;
+		for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
+			if (project->IsEnabled && !project->AllPhpSources().empty()) {
+				Projects.push_back(*project);
+			}
 		}
 	}
 	if (!Projects.empty()) {
