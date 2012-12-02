@@ -34,14 +34,19 @@
 namespace mvceditor {
 
 /**
- * this event will be generated while the AppStart sequence is running
+ * this event will be generated when a sequence has begun
  */
-extern const wxEventType SEQUENCE_APP_START_IN_PROGRESS;
+extern const wxEventType EVENT_SEQUENCE_START;
+
+/**
+ * this event will be generated while a sequence is running
+ */
+extern const wxEventType EVENT_SEQUENCE_IN_PROGRESS;
 
 /**
  * this event will be generated when the AppStart sequence is complete
  */
-extern const wxEventType SEQUENCE_APP_START_COMPLETE;
+extern const wxEventType EVENT_SEQUENCE_COMPLETE;
 
 /**
  * This class runs all of the added steps in sequence, one
@@ -92,6 +97,13 @@ public:
 	 *       source directories, wildcards, etc...
 	 */
 	void ProjectDefinitionsUpdated(const std::vector<mvceditor::ProjectClass>& touchedProjects);
+
+	/**
+	 * Start the full resource cache rebuild sequence.  This will include
+	 * - wiping all existing global caches from all projects
+	 * - indexing all enabled projects
+	 */
+	void ResourceCacheWipeAndIndex();
 
 	/**
 	 * @return wxString a short description of which step is currently being run

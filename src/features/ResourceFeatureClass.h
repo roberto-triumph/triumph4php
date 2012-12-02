@@ -39,35 +39,6 @@ namespace mvceditor {
 // these are defined at the bottom
 class IndexingDialogClass;
 
-/**
- * event that is generated when all resources databases have been wiped
- */
-const wxEventType EVENT_WIPE_COMPLETE = wxNewEventType();
-
-/**
- * Class to 'wipe' resource databases (empty all of their contents)
- */
-class ResourceFileWipeThreadClass : public mvceditor::ThreadWithHeartbeatClass {
-	
-public:
-
-	ResourceFileWipeThreadClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
-	
-	bool Init(const std::vector<mvceditor::ProjectClass>& projects);
-	
-protected:
-	
-	void BackgroundWork();
-	
-private:
-		
-	/**
-	 * The db files that need to be wiped.
-	 */
-	std::vector<wxFileName> ResourceDbFileNames;
-	
-};
-
 class ResourceFeatureClass : public FeatureClass {
 
 public:
@@ -103,19 +74,6 @@ public:
 	 */
 	void OpenFile(wxString fileName);
 
-	/**
-	 * Returns true if files in the project have NOT already been cached by the resource finder. This does not
- 	 * necesaarily mean that the resource finder has parsed them; if so far all resource lookups have been for
- 	 * file names then the resource finder has not parsed a single file.  What it does mean is that the next call
-	 * to ResourceFinderClass::LocateResourceInFileSystem will be really slow because the appropriate cache has
-	 * not been built. (ie file lookups will be fast after the first file lookup, class lookups will be
-	 * slow until the second file lookup)
-	 *
-	 * @return bool
-	 */
-	bool NeedToIndex(const wxString& finderQuery) const;
-
-
 	/** 
 	 * returns a short string describing the status of the cache.
 	 */
@@ -123,16 +81,13 @@ public:
 	
 private:
 
-	/**
-	 * Trigger the start of the indexing background thread.
-	 */
-	void StartIndex();
-
 	void OnProjectsUpdated(wxCommandEvent& event);
 
 	void OnAppFileClosed(wxCommandEvent& event);
 
 	void OnAppReady(wxCommandEvent& event);
+
+	void OnAppStartSequenceComplete(wxCommandEvent& event);
 	
 	/**
 	 * Toggle various widgets on or off based on the application state. 
@@ -157,12 +112,12 @@ private:
 	/**
 	 * During file iteration we will pulse the gauge.
 	 */
-	void OnWorkInProgress(wxCommandEvent& event);
+	void OnWipeAndIndexWorkInProgress(wxCommandEvent& event);
 
 	/**
 	 * Once the file parsing finishes alert the user.
 	 */
-	void OnWorkComplete(wxCommandEvent& event);
+	void OnWipeAndIndexWorkComplete(wxCommandEvent& event);
 	
 	/**
 	 * Opens the page and sets the cursor on the function/method/property/file that was searched for by the
@@ -190,11 +145,6 @@ private:
 	 * @return bool false file does not exist
 	 */
 	bool InitForFile(const mvceditor::ProjectClass& project, const wxString& fullPath, pelet::Versions version);
-
-	/**
-	 * after the projects have been wiped, star the index process
-	 */
-	void OnWipeComplete(wxCommandEvent& event);
 	
 	/**
 	 * This method will get called by the WorkingCacheBuilderClass when parsing of the
@@ -207,30 +157,6 @@ private:
 	 * start re-parsing the document in the background
 	 */
 	void OnTimer(wxTimerEvent& event);
-
-	 /**
-	  * The various states control what this feature does.
-	  * Because indexing runs in a background thread we need to save
-	  * whether or not the user triggered an index or triggered a lookup
-	  */
-	 enum States {
-
-		/**
-		 * background thread is not running
-		 */
-		FREE,
-
-		/**
-		 * background thread is running; used triggered an index operation only
-		 */
-		INDEXING_PROJECT,
-
-		/**
-		 * background thread is running; used triggered a resource lookup
-		 * once thread finishes results will be shown to the user
-		 */
-		GOTO
-	};
 
 	/**
 	 * when a 'jump to resource' is done and we need to index a project, we
@@ -263,24 +189,17 @@ private:
 	 * symbol table.
 	 */
 	WorkingCacheBuilderClass* WorkingCacheBuilder;
-	
+
 	/**
-	 * To check if parsing is happening at the moment; and what files we are parsing.
+	 * cache will be considered stale at app start. once all projects have
+	 * been indexed then it will be considered as good; though this is a real
+	 * naive status as it does not take file system changes from external processes
 	 */
-	States State;
-
-	/**
-	* Flag that will store when files have been parsed.
-	* @var bool
-	*/
-	bool HasCodeLookups;
-
-	/**
-	* Flag that will store when file names have been walked over and cached.
-	* @var bool
-	*/
-	bool HasFileLookups;
-
+	enum CacheStatus {
+		CACHE_STALE,
+		CACHE_OK
+	} CacheState;
+	
 	wxThreadIdType RunningThreadId;
 
 	DECLARE_EVENT_TABLE()

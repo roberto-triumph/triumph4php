@@ -272,14 +272,19 @@ private:
 	void OnAnyAuiToolbarEvent(wxAuiToolBarEvent& event);
 
 	/**
-	 * when a sequence is running show the Gauge
+	 * when a sequence has started show the Gauge
 	 */
-	void OnWorkInProgress(wxCommandEvent& event);
+	void OnSequenceStart(wxCommandEvent& event);
+
+	/**
+	 * when a sequence is running pulse the Gauge
+	 */
+	void OnSequenceInProgress(wxCommandEvent& event);
 
 	/**
 	 * when a sequence has completed stop the Gauge
 	 */
-	void OnWorkComplete(wxCommandEvent& event);
+	void OnSequenceComplete(wxCommandEvent& event);
 
 	/**
 	 * GUI framework object, used to programatically position the different windows

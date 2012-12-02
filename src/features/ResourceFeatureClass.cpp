@@ -27,42 +27,11 @@
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 #include <globals/Events.h>
+#include <actions/ResourceWipeActionClass.h>
 #include <MvcEditor.h>
 #include <wx/artprov.h>
 #include <wx/filename.h>
 #include <wx/valgen.h>
-
-static int ID_RESOURCE_READER_GAUGE = wxNewId();
-static int ID_WIPE_THREAD = wxNewId();
-
-mvceditor::ResourceFileWipeThreadClass::ResourceFileWipeThreadClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: ThreadWithHeartbeatClass(runningThreads, eventId) 
-	, ResourceDbFileNames() {
-		
-}
-
-bool mvceditor::ResourceFileWipeThreadClass::Init(const std::vector<mvceditor::ProjectClass>& projects) {
-	std::vector<mvceditor::ProjectClass>::const_iterator it;
-	for (it = projects.begin(); it != projects.end(); ++it) {
-		if (it->IsEnabled && it->ResourceDbFileName.IsOk()) {
-			ResourceDbFileNames.push_back(it->ResourceDbFileName);
-		}
-	}
-	return !ResourceDbFileNames.empty();
-}
-
-void mvceditor::ResourceFileWipeThreadClass::BackgroundWork() {
-	std::vector<wxFileName>::iterator it;
-	for (it = ResourceDbFileNames.begin(); it != ResourceDbFileNames.end() && !TestDestroy(); ++it) {
-		mvceditor::ResourceFinderClass resourceFinder;
-		resourceFinder.InitFile(*it);
-		resourceFinder.Wipe();
-	}
-	if (!TestDestroy()) {
-		wxCommandEvent evt(mvceditor::EVENT_WIPE_COMPLETE);
-		PostEvent(evt);
-	}
-}
 
 mvceditor::ResourceFeatureClass::ResourceFeatureClass(mvceditor::AppClass& app)
 	: FeatureClass(app)
@@ -70,10 +39,8 @@ mvceditor::ResourceFeatureClass::ResourceFeatureClass(mvceditor::AppClass& app)
 	, ProjectIndexMenu(NULL)
 	, Timer()
 	, WorkingCacheBuilder(NULL)
-	, State(FREE) 
-	, HasCodeLookups(false)
-	, HasFileLookups(false) 
-	, RunningThreadId(0) {
+	, RunningThreadId(0) 
+	, CacheState(CACHE_STALE) {
 	IndexingDialog = NULL;
 }
 
@@ -81,7 +48,7 @@ void mvceditor::ResourceFeatureClass::AddSearchMenuItems(wxMenu* searchMenu) {
 	ProjectIndexMenu = searchMenu->Append(mvceditor::MENU_RESOURCE + 0, _("Index"), _("Index the project"));
 	searchMenu->Append(mvceditor::MENU_RESOURCE + 1, _("Jump To Resource Under Cursor\tF12"), _("Jump To Resource that is under the cursor"));
 	searchMenu->Append(mvceditor::MENU_RESOURCE + 2, _("Search for Resource...\tCTRL+R"), _("Search for a class, method, or function"));
-	ProjectIndexMenu->Enable(App.Globals.HasSources() && FREE == State);
+	ProjectIndexMenu->Enable(App.Globals.HasSources());
 }
 
 void mvceditor::ResourceFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
@@ -139,141 +106,29 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFeatureClass::SearchFor
 	return matches;
 }
 
-void mvceditor::ResourceFeatureClass::OnWorkInProgress(wxCommandEvent& event) {
-	GetStatusBarWithGauge()->IncrementGauge(ID_RESOURCE_READER_GAUGE, StatusBarWithGaugeClass::INDETERMINATE_MODE);
+void mvceditor::ResourceFeatureClass::OnAppStartSequenceComplete(wxCommandEvent& event) {
+	CacheState = CACHE_OK;
+}
+
+void mvceditor::ResourceFeatureClass::OnWipeAndIndexWorkInProgress(wxCommandEvent& event) {
 	if (IndexingDialog && IndexingDialog->IsShown()) {
 		IndexingDialog->Increment();
 	}
 }
 
-void mvceditor::ResourceFeatureClass::OnWorkComplete(wxCommandEvent& event) {
+void mvceditor::ResourceFeatureClass::OnWipeAndIndexWorkComplete(wxCommandEvent& event) {
 	RunningThreadId = 0;
-	GetStatusBarWithGauge()->StopGauge(ID_RESOURCE_READER_GAUGE);
 	if (IndexingDialog) {
 		IndexingDialog->Destroy();
 		IndexingDialog = NULL;
 	}
-	mvceditor::ResourceSearchClass resourceSearch(mvceditor::WxToIcu(JumpToText));
-	if (INDEXING_PROJECT == State || GOTO == State) {
-
-		// figure out what resources have been cached, so that next time we can jump
-		// to the results without creating a new background thread
-		if (mvceditor::ResourceSearchClass::CLASS_NAME == resourceSearch.GetResourceType() ||
-			mvceditor::ResourceSearchClass::CLASS_NAME_METHOD_NAME == resourceSearch.GetResourceType()) {
-			HasCodeLookups = true;
-			HasFileLookups = true;
-		}
-		else if (mvceditor::ResourceSearchClass::FILE_NAME == resourceSearch.GetResourceType() ||
-			mvceditor::ResourceSearchClass::FILE_NAME_LINE_NUMBER == resourceSearch.GetResourceType()) {
-			HasFileLookups = true;
-		}
-
-		// if we indexed because of a user query; need to show the user the results.
-		States previousState = State;
-		State = FREE;
-		std::vector<mvceditor::ResourceClass> chosenResources;
-		if (GOTO == previousState && !JumpToText.IsEmpty()) {
-			std::vector<mvceditor::ResourceClass> matches = SearchForResources(JumpToText);
-			if (matches.size() == 1) {
-				LoadPageFromResource(JumpToText, matches[0]);
-			}
-			else if (!matches.empty()) {
-				mvceditor::ResourceSearchDialogClass dialog(GetMainWindow(), *this, JumpToText, chosenResources);
-				dialog.Prepopulate(JumpToText, matches);
-				if (dialog.ShowModal() == wxOK) {
-					for (size_t i = 0; i < chosenResources.size(); ++i) {
-						LoadPageFromResource(JumpToText, chosenResources[i]);
-					}
-				}
-			}
-		}
-		else if (GOTO == previousState && JumpToText.IsEmpty()) {
-			wxString term;
-			mvceditor::ResourceSearchDialogClass dialog(GetMainWindow(), *this, term, chosenResources);
-			if (dialog.ShowModal() == wxOK) {
-				for (size_t i = 0; i < chosenResources.size(); ++i) {
-					LoadPageFromResource(JumpToText, chosenResources[i]);
-				}
-			}
-		}
-	}
-}
-
-void mvceditor::ResourceFeatureClass::StartIndex() {
-	if (App.Globals.HasSources()) {
-
-		//prevent two finds at a time
-		if (FREE == State) { 
-			mvceditor::ProjectResourceActionClass* thread = new ProjectResourceActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
-			if (thread->Init(App.Globals)) {
-				RunningThreadId = 0;
-				wxThreadError err = thread->CreateSingleInstance(RunningThreadId);
-				if (wxTHREAD_NO_ERROR == err) {
-					State = INDEXING_PROJECT;
-					GetStatusBarWithGauge()->AddGauge(_("Indexing "), ID_RESOURCE_READER_GAUGE, 
-						StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
-					if (!HasCodeLookups) {
-
-						// empty resouce cache, indexing will take a significant amount of time. make the 
-						// app more 'responsive' by showing a bigger gauge
-						if (!IndexingDialog) {
-							IndexingDialog = new mvceditor::IndexingDialogClass(NULL);
-						}
-						IndexingDialog->Show();
-						IndexingDialog->Start();
-					}
-
-				}
-				else {
-					if (wxTHREAD_NO_RESOURCE == err) {
-						mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
-					}
-					State = FREE;
-					delete thread;
-				}
-			}
-			else {
-				wxMessageBox(_("Invalid Project Path"), wxT("Warning"), wxICON_EXCLAMATION);
-			}
-		}
-		else {
-			wxMessageBox(_("Indexing is already taking place. Please wait."), wxT("Warning"), wxICON_EXCLAMATION);
-		}
-	}
-	else {
-		wxMessageBox(_("This feature can only be used when you open project"), wxT("Warning"), wxICON_EXCLAMATION);
-	}
 }
 
 void mvceditor::ResourceFeatureClass::OnProjectWipeAndIndex(wxCommandEvent& event) {
-	if (RunningThreadId > 0) {
-		App.RunningThreads.Stop(RunningThreadId);
-		RunningThreadId = 0;
-		State = FREE;
-	}
-	
-	mvceditor::ResourceFileWipeThreadClass* thread = new mvceditor::ResourceFileWipeThreadClass(App.RunningThreads, ID_WIPE_THREAD);
-	bool  wipeStarted = false;
-	if  (thread->Init(App.Globals.Projects)) {
-		wxThreadIdType threadId;
-		wxThreadError error = thread->CreateSingleInstance(threadId);
-		if (wxTHREAD_NO_ERROR == error) {
-			wipeStarted = true;
-			GetStatusBarWithGauge()->AddGauge(_("Indexing Projects"),
-							ID_RESOURCE_READER_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
-		}
-	}
-	if (!wipeStarted) {
-
-		// no projects, just start the indexing process
-		delete thread;
-		StartIndex();
-	}
-}
-
-void mvceditor::ResourceFeatureClass::OnWipeComplete(wxCommandEvent& event) {
-	GetStatusBarWithGauge()->StopGauge(ID_RESOURCE_READER_GAUGE);
-	StartIndex();
+	App.Sequences.ResourceCacheWipeAndIndex();
+	IndexingDialog = new mvceditor::IndexingDialogClass(GetMainWindow());
+	IndexingDialog->Show();
+	IndexingDialog->Start();
 }
 
 void mvceditor::ResourceFeatureClass::OnJump(wxCommandEvent& event) {
@@ -306,16 +161,6 @@ void mvceditor::ResourceFeatureClass::OnJump(wxCommandEvent& event) {
 					}
 				}
 			}
-		}
-		else if (NeedToIndex(term)) {
-			
-			// maybe cache has not been created or user has not indexed the project, lets index the project and try again			
-			JumpToText = term;
-			StartIndex();
-
-			// set the state here so that when indexing is done we know to
-			// open the matches.
-			State = GOTO;
 		}
 	}
 }
@@ -363,21 +208,8 @@ void mvceditor::ResourceFeatureClass::LoadPageFromResource(const wxString& finde
 }
 
 void mvceditor::ResourceFeatureClass::OnUpdateUi(wxUpdateUIEvent& event) {
-	ProjectIndexMenu->Enable(App.Globals.HasSources() && FREE == State);
+	ProjectIndexMenu->Enable(App.Globals.HasSources());
 	event.Skip();
-}
-
-bool mvceditor::ResourceFeatureClass::NeedToIndex(const wxString& finderQuery) const {
-	mvceditor::ResourceSearchClass resourceSearch(mvceditor::WxToIcu(finderQuery));
-	if ((mvceditor::ResourceSearchClass::CLASS_NAME == resourceSearch.GetResourceType() ||
-		mvceditor::ResourceSearchClass::CLASS_NAME_METHOD_NAME == resourceSearch.GetResourceType()) && !HasCodeLookups)  {
-		return true;
-	}
-	else if ((mvceditor::ResourceSearchClass::FILE_NAME == resourceSearch.GetResourceType() ||
-		mvceditor::ResourceSearchClass::FILE_NAME_LINE_NUMBER == resourceSearch.GetResourceType()) && !HasFileLookups) {
-		return true;
-	}
-	return false;
 }
 
 void mvceditor::ResourceFeatureClass::OpenFile(wxString fileName) {
@@ -432,7 +264,7 @@ void mvceditor::ResourceFeatureClass::RemoveNativeMatches(std::vector<mvceditor:
 }
 
 wxString mvceditor::ResourceFeatureClass::CacheStatus() {
-	if (HasCodeLookups && HasFileLookups) {
+	if (CACHE_OK == CacheState) {
 		return _("OK");
 	}
 	return _("Stale");
@@ -694,12 +526,12 @@ BEGIN_EVENT_TABLE(mvceditor::ResourceFeatureClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_RESOURCE + 2, mvceditor::ResourceFeatureClass::OnSearchForResource)
 	EVT_MENU(mvceditor::MENU_RESOURCE + 3, mvceditor::ResourceFeatureClass::OnJump)
 	EVT_UPDATE_UI(wxID_ANY, mvceditor::ResourceFeatureClass::OnUpdateUi)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ResourceFeatureClass::OnWorkComplete)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ResourceFeatureClass::OnWorkInProgress)
+
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_CLOSED, mvceditor::ResourceFeatureClass::OnAppFileClosed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::ResourceFeatureClass::OnAppReady)
-	EVT_COMMAND(ID_WIPE_THREAD, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ResourceFeatureClass::OnWorkInProgress)
-	EVT_COMMAND(ID_WIPE_THREAD, mvceditor::EVENT_WIPE_COMPLETE, mvceditor::ResourceFeatureClass::OnWipeComplete)
+	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ResourceFeatureClass::OnWipeAndIndexWorkInProgress)
+	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ResourceFeatureClass::OnWipeAndIndexWorkComplete)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_SEQUENCE_COMPLETE, mvceditor::ResourceFeatureClass::OnAppStartSequenceComplete)
 
 	EVT_WORKING_CACHE_COMPLETE(wxID_ANY, mvceditor::ResourceFeatureClass::OnWorkingCacheComplete)
 	EVT_TIMER(wxID_ANY, mvceditor::ResourceFeatureClass::OnTimer)

@@ -698,7 +698,7 @@ void mvceditor::MainFrameClass::UpdateTitleBar() {
 	}
 }
 
-void mvceditor::MainFrameClass::OnWorkInProgress(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnSequenceStart(wxCommandEvent& event) {
 	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 	wxString title = App.Sequences.GetStatus();
 	if (!gauge->HasGauge(ID_SEQUENCE_GAUGE)) {
@@ -707,10 +707,15 @@ void mvceditor::MainFrameClass::OnWorkInProgress(wxCommandEvent& event) {
 	else {
 		gauge->IncrementAndRenameGauge(ID_SEQUENCE_GAUGE, title, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
 	}
-
 }
 
-void mvceditor::MainFrameClass::OnWorkComplete(wxCommandEvent& event) {
+void mvceditor::MainFrameClass::OnSequenceInProgress(wxCommandEvent& event) {
+	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
+	wxString title = App.Sequences.GetStatus();
+	gauge->IncrementAndRenameGauge(ID_SEQUENCE_GAUGE, title, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
+}
+
+void mvceditor::MainFrameClass::OnSequenceComplete(wxCommandEvent& event) {
 	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 	gauge->StopGauge(ID_SEQUENCE_GAUGE);
 }
@@ -795,8 +800,9 @@ BEGIN_EVENT_TABLE(mvceditor::MainFrameClass,  MainFrameGeneratedClass)
 	EVT_AUITOOLBAR_TOOL_DROPDOWN(wxID_ANY, mvceditor::MainFrameClass::OnAnyAuiToolbarEvent)
 
 	// make sure to show status of running sequences
-	EVT_COMMAND(wxID_ANY, mvceditor::SEQUENCE_APP_START_IN_PROGRESS, mvceditor::MainFrameClass::OnWorkInProgress)
-	EVT_COMMAND(wxID_ANY, mvceditor::SEQUENCE_APP_START_COMPLETE, mvceditor::MainFrameClass::OnWorkComplete)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_SEQUENCE_START, mvceditor::MainFrameClass::OnSequenceStart)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_SEQUENCE_IN_PROGRESS, mvceditor::MainFrameClass::OnSequenceInProgress)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_SEQUENCE_COMPLETE, mvceditor::MainFrameClass::OnSequenceComplete)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::AppEventListenerForFrameClass, wxEvtHandler)

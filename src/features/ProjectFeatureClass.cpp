@@ -263,7 +263,7 @@ void mvceditor::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
 
 		if (!IsDetecting) {
 
-			// start the sequence that will update all global dats structures
+			// start the sequence that will update all global data structures
 			App.Sequences.ProjectDefinitionsUpdated(touchedProjects);
 		}
 	}
@@ -271,9 +271,13 @@ void mvceditor::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
 
 void mvceditor::ProjectFeatureClass::OnPreferencesExternallyUpdated(wxCommandEvent& event) {
 	
-	// TODO
-	// need to be able to tell which projects are new
-	// then we update just the new projects
+	// start the sequence that will update all global data structures
+	// at this point, we dont know which projects need to be reparsed
+	// since another instance of mvc-editor added them, it is assumed that 
+	// the other instance has parsed them and built the cache.  
+	// this instance will just load the cache into memory
+	std::vector<mvceditor::ProjectClass> touchedProjects;
+	App.Sequences.ProjectDefinitionsUpdated(touchedProjects);
 }
 
 mvceditor::ProjectPreferencesPanelClass::ProjectPreferencesPanelClass(wxWindow *parent, mvceditor::ProjectFeatureClass &projectFeature) 

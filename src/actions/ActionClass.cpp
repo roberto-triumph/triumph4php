@@ -80,3 +80,4 @@ const int mvceditor::ID_EVENT_ACTION_SQL_METADATA = wxNewId();
 const int mvceditor::ID_EVENT_ACTION_FRAMEWORK_DETECTION = wxNewId();
 const int mvceditor::ID_EVENT_ACTION_CODE_IGNITER_DETECTED = wxNewId();
 const int mvceditor::ID_EVENT_ACTION_URL_RESOURCES = wxNewId();
+const int mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE = wxNewId();
