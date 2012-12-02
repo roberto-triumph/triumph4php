@@ -97,7 +97,7 @@ typedef void (wxEvtHandler::*GlobalClassesCompleteEventClassFunction)(GlobalClas
  * A small class that will parse source into resources. We want to do 
  * this in a background thread in case the user is viewing a big file.
  */
-class ResourceFinderBackgroundThreadClass : ThreadWithHeartbeatClass {
+class ResourceFinderBackgroundThreadClass : public ThreadWithHeartbeatClass {
 
 public:
 
@@ -108,14 +108,13 @@ public:
 	ResourceFinderBackgroundThreadClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
-	 * start the background thread that parses the given file.
+	 * start to parses the given file in  a backgound thread. this will NOT create a thread, rather it
+	 * will signal the already-started thread to parse the given file.
+	 *
 	 * @filename the file to parse
-	 * @param environment to get the php version
-	 * @param if thread was started, tghe thread Id will be set. the thread Id
-	 *        can be used to stop the thread
-	 * @see wxThread::GetId
+	 * @param phpVersion the php version to use for parsing the file.
 	 */
-	bool Start(const wxString& fileName, const EnvironmentClass& environment, wxThreadIdType& threadId);
+	void Start(const wxString& fileName, pelet::Versions phpVersion);
 
 protected:
 
@@ -124,14 +123,21 @@ protected:
 private:
 
 	/**
-	 * to parse the resources out of a file.
+	 * Since this thread will be alive as long as the program is running, we guard against access
+	 * for FileName, PhpVersion  variables. We want to start one thread that will handle all code notebook
+	 * tab changes instead of creating one thread each time the user changes to a new tab.
 	 */
-	ResourceFinderClass ResourceFinder;
+	wxMutex Mutex;
 
 	/**
 	 * the current file being parsed
 	 */
 	wxString FileName;
+
+	/**
+	 * the version of PHP to check against when parsing
+	 */
+	pelet::Versions PhpVersion;
 
 };
 
@@ -234,6 +240,15 @@ private:
 	 * update the outline panel
 	 */
 	void OnGlobalClassesComplete(mvceditor::GlobalClassesCompleteEventClass& event);
+
+	/**
+	 * Since this thread will be alive as long as the program is running, we guard against access
+	 * for FileName, PhpVersion  variables. We want to start one thread that will handle all code notebook
+	 * tab changes instead of creating one thread each time the user changes to a new tab.
+	 * Since ResourceFinderBackgroundThread class inherits from wxThread, it will be deleted
+	 * automaticall and is NOT owned by this object.
+	 */
+	mvceditor::ResourceFinderBackgroundThreadClass* ResourceFinderBackgroundThread;
 	
 	DECLARE_EVENT_TABLE()
 };

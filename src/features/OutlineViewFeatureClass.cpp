@@ -66,32 +66,52 @@ std::vector<wxString> mvceditor::GlobalClassesCompleteEventClass::GetAllClasses(
 mvceditor::ResourceFinderBackgroundThreadClass::ResourceFinderBackgroundThreadClass(
 		mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: ThreadWithHeartbeatClass(runningThreads, eventId) 
-	, ResourceFinder() 
-	, FileName() {
+	, Mutex()
+	, FileName()
+	, PhpVersion(pelet::PHP_53){
 }
 
-bool mvceditor::ResourceFinderBackgroundThreadClass::Start(const wxString& fileName, const mvceditor::EnvironmentClass& environment, wxThreadIdType& threadId) {
+void mvceditor::ResourceFinderBackgroundThreadClass::Start(const wxString& fileName, pelet::Versions phpVersion) {
+
+	// here, set the file name to be parsed. on the next loop background work, it will be parsed
+	// make sure to deep copy the string
+	wxMutexLocker locker(Mutex);
 	FileName = fileName.c_str();
-	
-	// need this so that the resource finder parsers the file
-	ResourceFinder.InitMemory();
-	ResourceFinder.PhpFileExtensions.push_back(wxT("*.*"));
-	
-	ResourceFinder.SetVersion(environment.Php.Version);
-	wxThreadError error = CreateSingleInstance(threadId);
-	bool created = wxTHREAD_NO_ERROR == error;
-	return created;
+	PhpVersion = phpVersion;
 }
 
 void mvceditor::ResourceFinderBackgroundThreadClass::BackgroundWork() {
-	if (wxFileName::FileExists(FileName)) {
+	while (!TestDestroy()) {
+		wxString fileName;
+		pelet::Versions version;
+		{
+			// make sure synchronize access and deep copy the wxString as wxString is 
+			// not thread safe
+			wxMutexLocker locker(Mutex);
+			fileName = FileName.c_str();
+			version = PhpVersion;
+			
+			// clear so that for the next loop we dont reparse the file
+			FileName.Clear();
+		}
+		if (!fileName.IsEmpty() && wxFileName::FileExists(fileName)) {
+			
 
-		// need this call so that resources are actually parsed
-		ResourceFinder.Walk(FileName);
-		std::vector<mvceditor::ResourceClass> resources = ResourceFinder.All();
+			// need this call so that resources are actually parsed
+			// need this so that the resource finder parsers the file
+			mvceditor::ResourceFinderClass resourceFinder;
+			resourceFinder.InitMemory();
+			resourceFinder.PhpFileExtensions.push_back(wxT("*.*"));
+
+			resourceFinder.Walk(fileName);
+			std::vector<mvceditor::ResourceClass> resources = resourceFinder.All();
+			if (!TestDestroy()) {
+				mvceditor::ResourceFinderCompleteEventClass evt(ID_RESOURCE_FINDER_BACKGROUND, resources);
+				PostEvent(evt);
+			}
+		}
 		if (!TestDestroy()) {
-			mvceditor::ResourceFinderCompleteEventClass evt(ID_RESOURCE_FINDER_BACKGROUND, resources);
-			PostEvent(evt);
+			wxSleep(1);
 		}
 	}
 }
@@ -143,7 +163,8 @@ void mvceditor::GlobalClassesThreadClass::BackgroundWork() {
 }
 
 mvceditor::OutlineViewFeatureClass::OutlineViewFeatureClass(mvceditor::AppClass& app)
-	: FeatureClass(app) {
+	: FeatureClass(app) 
+	, ResourceFinderBackgroundThread(NULL) {
 }
 
 void mvceditor::OutlineViewFeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
@@ -161,19 +182,24 @@ void mvceditor::OutlineViewFeatureClass::BuildOutlineCurrentCodeControl() {
 	if (code != NULL) {
 
 		// this pointer will delete itself when the thread terminates
-		mvceditor::ResourceFinderBackgroundThreadClass* thread = 
-			new mvceditor::ResourceFinderBackgroundThreadClass(App.RunningThreads, ID_RESOURCE_FINDER_BACKGROUND);
-		wxThreadIdType threadId;
-		if (thread->Start(code->GetFileName(), *GetEnvironment(), threadId)) {
+		if (!ResourceFinderBackgroundThread) {
+			ResourceFinderBackgroundThread = 
+				new mvceditor::ResourceFinderBackgroundThreadClass(App.RunningThreads, ID_RESOURCE_FINDER_BACKGROUND);
+			wxThreadIdType threadId;
+			wxThreadError err = ResourceFinderBackgroundThread->CreateSingleInstance(threadId);
+			if (err != wxTHREAD_NO_ERROR) {
+				delete ResourceFinderBackgroundThread;
+				ResourceFinderBackgroundThread = NULL;
+			}
+		}
+		if (ResourceFinderBackgroundThread) {
+			ResourceFinderBackgroundThread->Start(code->GetFileName(), GetEnvironment()->Php.Version);
 			wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 			if (window != NULL) {
 				OutlineViewPanelClass* outlineViewPanel = (OutlineViewPanelClass*)window;
 				SetFocusToOutlineWindow(outlineViewPanel);
 				outlineViewPanel->SetStatus(_("Parsing ..."));
 			}
-		}
-		else {
-			delete thread;
 		}
 	}
 }
