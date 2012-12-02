@@ -39,8 +39,7 @@ static const int ID_FRAMEWORK_DETECTION_GAUGE = wxNewId();
 
 mvceditor::ProjectFeatureClass::ProjectFeatureClass(mvceditor::AppClass& app) 
 	: FeatureClass(app)
-	, FrameworkDetectionAction(app.RunningThreads, mvceditor::ID_EVENT_ACTION_FRAMEWORK_DETECTION) 
-	, IsDetecting(false) {
+	, FrameworkDetectionAction(app.RunningThreads, mvceditor::ID_EVENT_ACTION_FRAMEWORK_DETECTION) {
 	wxPlatformInfo info;
 	switch (info.GetOperatingSystemId()) {
 		case wxOS_WINDOWS_NT:
@@ -231,6 +230,22 @@ void mvceditor::ProjectFeatureClass::OnFrameworkDetectionInProgress(wxCommandEve
 }
 
 void mvceditor::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
+	
+	// make sure that no existing project index or wipe action is running
+	// as we will re-trigger an index if the user makes any modifications to
+	// the project sources
+	if (App.Sequences.Running()) {
+		wxString msg = wxString::FromAscii(
+			"There is an existing background task running. Since the changes "
+			"made from this dialog may re-trigger a project index sequence, "
+			"you may not make modifications until the existing background task ends.\n"
+			"Please wait until the current background task ends."
+		);
+		msg = wxGetTranslation(msg);
+		wxMessageBox(msg, _("Warning"), wxICON_WARNING | wxOK, GetMainWindow());
+		return;
+	}
+
 	std::vector<mvceditor::ProjectClass> removedProjects, touchedProjects;
 	mvceditor::ProjectListDialogClass dialog(GetMainWindow(), App.Globals.Projects, removedProjects, touchedProjects);
 	if (wxOK == dialog.ShowModal()) {
@@ -261,11 +276,8 @@ void mvceditor::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
 		// modification check fails and the user will not be prompted to reload the config
 		App.UpdateConfigModifiedTime();
 
-		if (!IsDetecting) {
-
-			// start the sequence that will update all global data structures
-			App.Sequences.ProjectDefinitionsUpdated(touchedProjects);
-		}
+		// start the sequence that will update all global data structures
+		App.Sequences.ProjectDefinitionsUpdated(touchedProjects);
 	}
 }
 

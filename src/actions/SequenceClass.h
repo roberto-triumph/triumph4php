@@ -78,8 +78,12 @@ public:
 	 * - Start the resource cache update for the project
 	 * - Load the project's database connections
 	 * - Detect the SQL table metadata for the project's database connections
+	 *
+	 * @return bool FALSE if there is a sequence already running. if there is an existing
+	 *         sequence running then we will not start another sequence as sequences deal with 
+	 *         GlobalsClass and running many sequences may cause problems 
 	 */
-	void AppStart();
+	bool AppStart();
 
 	/**
 	 * start the project refresh sequence.  This sequence should be run when the user
@@ -95,15 +99,21 @@ public:
 	 *
 	 * @param updateProjects the list of projects that were updated ie. new/removed/edited 
 	 *       source directories, wildcards, etc...
+	 * @return bool FALSE if there is a sequence already running. if there is an existing
+	 *         sequence running then we will not start another sequence as sequences deal with 
+	 *         GlobalsClass and running many sequences may cause problems 
 	 */
-	void ProjectDefinitionsUpdated(const std::vector<mvceditor::ProjectClass>& touchedProjects);
+	bool ProjectDefinitionsUpdated(const std::vector<mvceditor::ProjectClass>& touchedProjects);
 
 	/**
 	 * Start the full resource cache rebuild sequence.  This will include
 	 * - wiping all existing global caches from all projects
 	 * - indexing all enabled projects
+	 * @return bool FALSE if there is a sequence already running. if there is an existing
+	 *         sequence running then we will not start another sequence as sequences deal with 
+	 *         GlobalsClass and running many sequences may cause problems 
 	 */
-	void ResourceCacheWipeAndIndex();
+	bool ResourceCacheWipeAndIndex();
 
 	/**
 	 * @return wxString a short description of which step is currently being run

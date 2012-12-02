@@ -57,7 +57,10 @@ mvceditor::SequenceClass::~SequenceClass() {
 	}
 }
 
-void mvceditor::SequenceClass::AppStart() {
+bool mvceditor::SequenceClass::AppStart() {
+	if (Running()) {
+		return false;
+	}
 
 	// this will check to see if any source directories use PHP frameworks
 	// we need to do this before all others
@@ -87,9 +90,13 @@ void mvceditor::SequenceClass::AppStart() {
 	AddStep(new mvceditor::UrlResourceActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_RESOURCES));
 
 	Run();
+	return true;
 }
 
-void mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvceditor::ProjectClass>& touchedProjects) {
+bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvceditor::ProjectClass>& touchedProjects) {
+	if (Running()) {
+		return false;
+	}
 
 	// this will check to see if any source directories use PHP frameworks
 	// we need to do this before all others
@@ -128,9 +135,13 @@ void mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvced
 	AddStep(new mvceditor::UrlResourceActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_RESOURCES));
 
 	Run();
+	return true;
 }
 
-void mvceditor::SequenceClass::ResourceCacheWipeAndIndex() {
+bool mvceditor::SequenceClass::ResourceCacheWipeAndIndex() {
+	if (Running()) {
+		return false;
+	}
 
 	// this step will wipe the global cache from all projects
 	AddStep(new mvceditor::ResourceWipeActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE, Globals.Projects));
@@ -144,6 +155,7 @@ void mvceditor::SequenceClass::ResourceCacheWipeAndIndex() {
 	AddStep(new mvceditor::UrlResourceActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_RESOURCES));
 
 	Run();
+	return true;
 }
 
 void mvceditor::SequenceClass::AddStep(mvceditor::ActionClass* step) {

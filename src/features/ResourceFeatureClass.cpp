@@ -39,7 +39,6 @@ mvceditor::ResourceFeatureClass::ResourceFeatureClass(mvceditor::AppClass& app)
 	, ProjectIndexMenu(NULL)
 	, Timer()
 	, WorkingCacheBuilder(NULL)
-	, RunningThreadId(0) 
 	, CacheState(CACHE_STALE) {
 	IndexingDialog = NULL;
 }
@@ -75,6 +74,9 @@ void mvceditor::ResourceFeatureClass::OnAppReady(wxCommandEvent& event) {
 	WorkingCacheBuilder = new mvceditor::WorkingCacheBuilderClass(App.RunningThreads, wxNewId());
 	Timer.SetOwner(this);
 	Timer.Start(2000, wxTIMER_CONTINUOUS);
+
+	// no need to keep track of this thread ID it will be
+	// alive until the app terminates
 	wxThreadIdType threadId;
 	if (wxTHREAD_NO_ERROR != WorkingCacheBuilder->Init(threadId)) {
 		delete WorkingCacheBuilder;
@@ -117,7 +119,6 @@ void mvceditor::ResourceFeatureClass::OnWipeAndIndexWorkInProgress(wxCommandEven
 }
 
 void mvceditor::ResourceFeatureClass::OnWipeAndIndexWorkComplete(wxCommandEvent& event) {
-	RunningThreadId = 0;
 	if (IndexingDialog) {
 		IndexingDialog->Destroy();
 		IndexingDialog = NULL;
@@ -125,10 +126,14 @@ void mvceditor::ResourceFeatureClass::OnWipeAndIndexWorkComplete(wxCommandEvent&
 }
 
 void mvceditor::ResourceFeatureClass::OnProjectWipeAndIndex(wxCommandEvent& event) {
-	App.Sequences.ResourceCacheWipeAndIndex();
-	IndexingDialog = new mvceditor::IndexingDialogClass(GetMainWindow());
-	IndexingDialog->Show();
-	IndexingDialog->Start();
+	if (App.Sequences.ResourceCacheWipeAndIndex()) {
+		IndexingDialog = new mvceditor::IndexingDialogClass(GetMainWindow());
+		IndexingDialog->Show();
+		IndexingDialog->Start();
+	}
+	else {
+		mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, _("Please wait until the running background task ends."));
+	}
 }
 
 void mvceditor::ResourceFeatureClass::OnJump(wxCommandEvent& event) {
@@ -232,14 +237,12 @@ void mvceditor::ResourceFeatureClass::OnAppFileClosed(wxCommandEvent& event) {
 			thread->InitForFile(*project, fileName, version);
 
 			// show user the error? not for now as they cannot do anything about it
-			wxThreadError err = thread->CreateSingleInstance(RunningThreadId);
-			if (wxTHREAD_NO_ERROR == err) {
+			// no need to track thread ID as this thread runs for a very short time since
+			// we are only indexing one file
+			wxThreadIdType threadId;
+			wxThreadError err = thread->CreateSingleInstance(threadId);
+			if (wxTHREAD_NO_ERROR != err) {
 				delete thread;
-			}
-			else {
-
-				// file can only belong to one project?
-				break;
 			}
 		}
 	}

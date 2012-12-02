@@ -200,8 +200,6 @@ private:
 		CACHE_OK
 	} CacheState;
 	
-	wxThreadIdType RunningThreadId;
-
 	DECLARE_EVENT_TABLE()
 };
 
