@@ -37,7 +37,6 @@ mvceditor::ResourceFeatureClass::ResourceFeatureClass(mvceditor::AppClass& app)
 	: FeatureClass(app)
 	, JumpToText()
 	, ProjectIndexMenu(NULL)
-	, Timer()
 	, WorkingCacheBuilder(NULL)
 	, CacheState(CACHE_STALE) {
 	IndexingDialog = NULL;
@@ -69,11 +68,9 @@ void mvceditor::ResourceFeatureClass::AddCodeControlClassContextMenuItems(wxMenu
 
 void mvceditor::ResourceFeatureClass::OnAppReady(wxCommandEvent& event) {
 
-	// setup the timer that will be used to build the symbol table
+	// setup the thread that will be used to build the symbol table
 	// in the background for the opened files.
 	WorkingCacheBuilder = new mvceditor::WorkingCacheBuilderClass(App.RunningThreads, wxNewId());
-	Timer.SetOwner(this);
-	Timer.Start(2000, wxTIMER_CONTINUOUS);
 
 	// no need to keep track of this thread ID it will be
 	// alive until the app terminates
@@ -284,7 +281,25 @@ void mvceditor::ResourceFeatureClass::OnWorkingCacheComplete(mvceditor::WorkingC
 	event.Skip();
 }
 
-void mvceditor::ResourceFeatureClass::OnTimer(wxTimerEvent& event) {
+void mvceditor::ResourceFeatureClass::OnAppFileSaved(mvceditor::FileSavedEventClass& event) {
+	if (WorkingCacheBuilder) {
+		mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
+		if (codeControl && codeControl->GetDocumentMode() == mvceditor::CodeControlClass::PHP) {
+			UnicodeString text = codeControl->GetSafeText();
+
+			// we need to differentiate between new and opened files (the 'true' arg)
+			WorkingCacheBuilder->Update(
+				codeControl->GetFileName(),
+				codeControl->GetIdString(),
+				text, 
+				codeControl->IsNew(),
+				App.Globals.Environment.Php.Version);
+		}
+	}
+	event.Skip();
+}
+
+void mvceditor::ResourceFeatureClass::OnAppFileOpened(wxCommandEvent& event) {
 	if (WorkingCacheBuilder) {
 		mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
 		if (codeControl && codeControl->GetDocumentMode() == mvceditor::CodeControlClass::PHP) {
@@ -531,11 +546,12 @@ BEGIN_EVENT_TABLE(mvceditor::ResourceFeatureClass, wxEvtHandler)
 	EVT_UPDATE_UI(wxID_ANY, mvceditor::ResourceFeatureClass::OnUpdateUi)
 
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_CLOSED, mvceditor::ResourceFeatureClass::OnAppFileClosed)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_OPENED, mvceditor::ResourceFeatureClass::OnAppFileOpened)
+	EVT_FEATURE_FILE_SAVED(mvceditor::ResourceFeatureClass::OnAppFileSaved)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::ResourceFeatureClass::OnAppReady)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ResourceFeatureClass::OnWipeAndIndexWorkInProgress)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ResourceFeatureClass::OnWipeAndIndexWorkComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_SEQUENCE_COMPLETE, mvceditor::ResourceFeatureClass::OnAppStartSequenceComplete)
 
 	EVT_WORKING_CACHE_COMPLETE(wxID_ANY, mvceditor::ResourceFeatureClass::OnWorkingCacheComplete)
-	EVT_TIMER(wxID_ANY, mvceditor::ResourceFeatureClass::OnTimer)
 END_EVENT_TABLE()

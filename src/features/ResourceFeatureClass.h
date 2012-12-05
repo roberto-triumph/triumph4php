@@ -153,10 +153,16 @@ private:
 	void OnWorkingCacheComplete(mvceditor::WorkingCacheCompleteEventClass& event);
 	
 	/**
-	 * This method will check to see if the current document is "dirty" and if so it will
-	 * start re-parsing the document in the background
+	 * This method will start re-parsing the document in the background. this will allow the 
+	 * code completion to be up-to-date after a file is saved.
 	 */
-	void OnTimer(wxTimerEvent& event);
+	void OnAppFileSaved(mvceditor::FileSavedEventClass& event);
+
+	/**
+	 * This method will start re-parsing the document in the background. this will allow the 
+	 * code completion to be up-to-date after a file is *opened*
+	 */
+	void OnAppFileOpened(wxCommandEvent& event);
 
 	/**
 	 * when a 'jump to resource' is done and we need to index a project, we
@@ -176,11 +182,6 @@ private:
 	 * this dialog will only be alive while project is being indexed
 	 */
 	IndexingDialogClass* IndexingDialog;
-
-	/**
-	 * Used to control how often to check for resource re-parsing
-	 */
-	wxTimer Timer;
 
 	/**
 	 * The current source code is parsed in the background so that a symbol table can be
