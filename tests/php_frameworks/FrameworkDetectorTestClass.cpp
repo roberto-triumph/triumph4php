@@ -28,10 +28,10 @@
 #include <FileTestFixtureClass.h>
 #include <wx/event.h>
 
-class ProjectTestFixtureClass : public FileTestFixtureClass {
+class FrameworkDetectorFixtureClass : public FileTestFixtureClass {
 public:	
-	ProjectTestFixtureClass() 
-		: FileTestFixtureClass(wxT("project_test"))
+	FrameworkDetectorFixtureClass() 
+		: FileTestFixtureClass(wxT("framework_detector_test"))
 		, Handler()
 		, RunningThreads()
 		, FrameworkDetector(Handler, RunningThreads) 
@@ -39,7 +39,7 @@ public:
 		, ResourcesDetector(Handler, RunningThreads) {
 	}
 	
-	virtual ~ProjectTestFixtureClass() {
+	virtual ~FrameworkDetectorFixtureClass() {
 	}
 
 	wxEvtHandler Handler;
@@ -49,9 +49,9 @@ public:
 	mvceditor::ResourcesDetectorActionClass ResourcesDetector;
 };
 
-SUITE(ProjectTestClass) {
+SUITE(FrameworkDetectorTestClass) {
 
-TEST_FIXTURE(ProjectTestFixtureClass, ShouldParseFrameworkResponse) {
+TEST_FIXTURE(FrameworkDetectorFixtureClass, ShouldParseFrameworkResponse) {
 	wxString result = wxString::FromAscii(
 		"framework_0 = \"Test\"\n"
 		"framework_1 = \"Symfony\"\n"
@@ -67,7 +67,7 @@ TEST_FIXTURE(ProjectTestFixtureClass, ShouldParseFrameworkResponse) {
 	}
 }
 	
-TEST_FIXTURE(ProjectTestFixtureClass, ShouldParseDatabaseResponse) {
+TEST_FIXTURE(FrameworkDetectorFixtureClass, ShouldParseDatabaseResponse) {
 	wxString result = wxString::FromAscii(
 		"[local_dev]\n"
 		"Environment = \"dev\"\n"
@@ -101,7 +101,7 @@ TEST_FIXTURE(ProjectTestFixtureClass, ShouldParseDatabaseResponse) {
 	}
 }
 
-TEST_FIXTURE(ProjectTestFixtureClass, ShouldParseResourcesResponse) {
+TEST_FIXTURE(FrameworkDetectorFixtureClass, ShouldParseResourcesResponse) {
 	wxString result = wxString::FromAscii(
 		"[Resource_72]\n"
 		"Resource = \"CI_Controller::news_model\"\n"
