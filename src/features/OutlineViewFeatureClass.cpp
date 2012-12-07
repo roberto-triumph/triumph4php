@@ -101,6 +101,7 @@ void mvceditor::ResourceFinderBackgroundThreadClass::BackgroundWork() {
 			// need this so that the resource finder parsers the file
 			mvceditor::ResourceFinderClass resourceFinder;
 			resourceFinder.InitMemory();
+			resourceFinder.SetVersion(version);
 			resourceFinder.PhpFileExtensions.push_back(wxT("*.*"));
 
 			resourceFinder.Walk(fileName);
