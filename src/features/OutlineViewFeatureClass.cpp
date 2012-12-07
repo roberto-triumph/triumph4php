@@ -317,10 +317,17 @@ void mvceditor::OutlineViewPanelClass::SetStatus(const wxString& status) {
 }
 
 void mvceditor::OutlineViewPanelClass::SetClasses(const std::vector<wxString>& classes) {
-	Choice->Clear();
+
+	// there could be many classes, lets update the combo box in one shot
+	wxArrayString wxArr;
+	wxArr.Alloc(classes.size());
 	for (size_t i = 0; i < classes.size(); ++i) {
-		Choice->AppendString(classes[i]);
+		wxArr.Add(classes[i]);
 	}
+	Choice->Freeze();
+	Choice->Clear();
+	Choice->Append(wxArr);
+	Choice->Thaw();
 }
 
 void mvceditor::OutlineViewPanelClass::RefreshOutlines(const std::vector<mvceditor::ResourceClass>& resources) {
