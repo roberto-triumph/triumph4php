@@ -31,6 +31,10 @@ mvceditor::ActionClass::ActionClass(mvceditor::RunningThreadsClass& runningThrea
 
 }
 
+mvceditor::ActionClass::~ActionClass() {
+
+}
+
 bool mvceditor::ActionClass::DoAsync() {
 	return true;
 }
@@ -41,7 +45,8 @@ void mvceditor::ActionClass::SetStatus(const wxString& status) {
 	wxMutexLocker locker(Mutex);
 
 	// make sure to copy, since this may be called from multiple threads
-	Status = status.c_str();
+	Status.Clear();
+	Status.Append(status.c_str());
 }
 
 wxString mvceditor::ActionClass::GetStatus() {

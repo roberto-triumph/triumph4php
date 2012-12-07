@@ -46,6 +46,8 @@ public:
 
 	ActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
+	virtual ~ActionClass();
+
 	virtual bool Init(mvceditor::GlobalsClass& globals) = 0;
 
 	virtual wxString GetLabel() const = 0;
