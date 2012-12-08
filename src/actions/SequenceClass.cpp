@@ -35,7 +35,8 @@ mvceditor::SequenceClass::SequenceClass(mvceditor::GlobalsClass& globals, mvcedi
 	: Globals(globals)
 	, RunningThreads(runningThreads)
 	, Steps()
-	, IsRunning(false) {
+	, IsRunning(false) 
+	, IsCurrentStepAsync(false) {
 	RunningThreads.AddEventHandler(this);
 }
 
@@ -174,6 +175,11 @@ void mvceditor::SequenceClass::OnActionComplete(wxCommandEvent& event) {
 	if (!Steps.empty()) {
 
 		// remove the step that just finished
+		// note that async steps automatically delete themselves since they
+		// are run using wxThread::run so we take care to not double-delete those
+		if (!IsCurrentStepAsync) {
+			delete Steps.front();
+		}
 		Steps.pop();
 	}
 
@@ -193,12 +199,14 @@ void mvceditor::SequenceClass::RunNextStep() {
 		return;
 	}
 	IsRunning = false;
+	IsCurrentStepAsync = false;
 	while (!Steps.empty()) {
 		if (!Steps.front()->DoAsync()) {
 
 			// if the step is not asynchronous, it means that it does not
 			// need us to start a new thread
 			Steps.front()->Init(Globals);
+			IsCurrentStepAsync = false;
 
 			// step does not involve async; we are done with this step
 			// even though we dont start a background thread, the 
@@ -231,6 +239,7 @@ void mvceditor::SequenceClass::RunNextStep() {
 
 				// everything went OK. wait for the background thread to finish
 				IsRunning = true;
+				IsCurrentStepAsync = true;
 				break;
 			}
 			else {

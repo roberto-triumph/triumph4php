@@ -164,6 +164,13 @@ private:
 	 */
 	bool IsRunning;
 
+	/**
+	 * Flag that tells if the currently running step is async. we need to
+	 * know when a step is not async, because async steps delete themselves
+	 * (because they use wxThread::run) while sync steps do not
+	 */
+	bool IsCurrentStepAsync;
+
 	DECLARE_EVENT_TABLE()
 };
 
