@@ -28,16 +28,33 @@
 
 mvceditor::ProjectFrameworkDetectionActionClass::ProjectFrameworkDetectionActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: ActionClass(runningThreads, eventId) 
-	, PhpFrameworks(NULL) 
-	, RunningThreads(runningThreads) {
-
+	, PhpFrameworks(*this, runningThreads) 
+	, Environment() {
+	
+	// using connect instead of event tables so that there is no chance that an
+	// event handler gets called after this instance is destroyed
+	// the reason for doind this is that action are only alive for a short
+	// period of time
+	Connect(mvceditor::EVENT_FRAMEWORK_FOUND, 
+		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(FrameworkFoundEventClassFunction, &mvceditor::ProjectFrameworkDetectionActionClass::OnFrameworkFound),
+		NULL, this
+	);
+	Connect(mvceditor::EVENT_FRAMEWORK_DETECTION_COMPLETE, wxCommandEventHandler(mvceditor::ProjectFrameworkDetectionActionClass::OnFrameworkDetectionComplete), NULL, this);
+	Connect(mvceditor::EVENT_FRAMEWORK_DETECTION_FAILED, wxCommandEventHandler(mvceditor::ProjectFrameworkDetectionActionClass::OnFrameworkDetectionFailed), NULL, this);
+	Connect(mvceditor::EVENT_PROCESS_IN_PROGRESS, wxCommandEventHandler(mvceditor::ProjectFrameworkDetectionActionClass::OnFrameworkDetectionInProgress), NULL, this);
+	Connect(mvceditor::EVENT_WORK_IN_PROGRESS, wxCommandEventHandler(mvceditor::ProjectFrameworkDetectionActionClass::OnFrameworkDetectionInProgress), NULL, this);
 }
 
 mvceditor::ProjectFrameworkDetectionActionClass::~ProjectFrameworkDetectionActionClass() {
-	if (PhpFrameworks) {
-		PhpFrameworks->Stop();
-		delete PhpFrameworks;
-	}
+	Disconnect(mvceditor::EVENT_FRAMEWORK_FOUND, 
+			(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(FrameworkFoundEventClassFunction, &mvceditor::ProjectFrameworkDetectionActionClass::OnFrameworkFound), 
+			NULL, this
+	);
+	Disconnect(mvceditor::EVENT_FRAMEWORK_DETECTION_COMPLETE, wxCommandEventHandler(mvceditor::ProjectFrameworkDetectionActionClass::OnFrameworkDetectionComplete), NULL, this);
+	Disconnect(mvceditor::EVENT_FRAMEWORK_DETECTION_FAILED, wxCommandEventHandler(mvceditor::ProjectFrameworkDetectionActionClass::OnFrameworkDetectionFailed), NULL, this);
+	Disconnect(mvceditor::EVENT_PROCESS_IN_PROGRESS, wxCommandEventHandler(mvceditor::ProjectFrameworkDetectionActionClass::OnFrameworkDetectionInProgress), NULL, this);
+	Disconnect(mvceditor::EVENT_WORK_IN_PROGRESS, wxCommandEventHandler(mvceditor::ProjectFrameworkDetectionActionClass::OnFrameworkDetectionInProgress), NULL, this);
+	PhpFrameworks.Stop();
 }
 
 bool mvceditor::ProjectFrameworkDetectionActionClass::DoAsync() {
@@ -45,11 +62,7 @@ bool mvceditor::ProjectFrameworkDetectionActionClass::DoAsync() {
 }
 
 bool mvceditor::ProjectFrameworkDetectionActionClass::Init(mvceditor::GlobalsClass& globals) {
-	if (PhpFrameworks) {
-		delete PhpFrameworks;
-		PhpFrameworks = NULL;
-	}
-
+	
 	// clear the detected framework info
 	globals.Frameworks.clear();
 
@@ -58,16 +71,17 @@ bool mvceditor::ProjectFrameworkDetectionActionClass::Init(mvceditor::GlobalsCla
 	globals.ClearDetectedInfos();
 
 	DirectoriesToDetect.clear();
+	Environment = globals.Environment;
+
 	std::vector<mvceditor::SourceClass> allSources = globals.AllEnabledSources();
 	bool started = false;
-	PhpFrameworks = new mvceditor::PhpFrameworkDetectorClass(*this, RunningThreads, globals.Environment);
 	if (!allSources.empty()) {		
 		for (size_t i = 1; i < allSources.size(); ++i) {
 			DirectoriesToDetect.push_back(allSources[i].RootDirectory.GetPath());
 		}
-		started = PhpFrameworks->Init(allSources[0].RootDirectory.GetPath());
+		started = PhpFrameworks.Init(allSources[0].RootDirectory.GetPath(), Environment);
 		if (!started) {
-			mvceditor::EditorLogError(mvceditor::BAD_PHP_EXECUTABLE, globals.Environment.Php.PhpExecutablePath); 
+			mvceditor::EditorLogError(mvceditor::BAD_PHP_EXECUTABLE, Environment.Php.PhpExecutablePath); 
 			DirectoriesToDetect.clear();
 		}
 		else {
@@ -75,8 +89,6 @@ bool mvceditor::ProjectFrameworkDetectionActionClass::Init(mvceditor::GlobalsCla
 		}
 	}
 	if (!started) {
-		delete PhpFrameworks;
-		PhpFrameworks = NULL;
 
 		// nothing to do we are done. this needs to be called so that we can move on
 		// to the next step in the sequence
@@ -93,15 +105,13 @@ void mvceditor::ProjectFrameworkDetectionActionClass::OnFrameworkDetectionComple
 	while (!DirectoriesToDetect.empty() && finished) {
 		wxString nextDirectory = DirectoriesToDetect.back();
 		DirectoriesToDetect.pop_back();
-		if (PhpFrameworks->Init(nextDirectory)) {
+		if (PhpFrameworks.Init(nextDirectory, Environment)) {
 			finished = false;
 			wxFileName fileName(nextDirectory);
 			SetStatus(_("Detecting Frameworks for ") + fileName.GetName());
 		}
 	}
 	if (finished) {
-		delete PhpFrameworks;
-		PhpFrameworks = NULL;
 
 		// nothing to do we are done. this needs to be called so that we can move on
 		// to the next step in the sequence
@@ -118,15 +128,13 @@ void mvceditor::ProjectFrameworkDetectionActionClass::OnFrameworkDetectionFailed
 	while (!DirectoriesToDetect.empty() && finished) {
 		wxString nextDirectory = DirectoriesToDetect.back();
 		DirectoriesToDetect.pop_back();
-		if (PhpFrameworks->Init(nextDirectory)) {
+		if (PhpFrameworks.Init(nextDirectory, Environment)) {
 			finished = false;
 			wxFileName fileName(nextDirectory);
 			SetStatus(_("Detecting Frameworks for ") + fileName.GetName());
 		}
 	}
 	if (finished) {
-		delete PhpFrameworks;
-		PhpFrameworks = NULL;
 
 		// nothing to do we are done. this needs to be called so that we can move on
 		// to the next step in the sequence
@@ -152,10 +160,3 @@ void mvceditor::ProjectFrameworkDetectionActionClass::OnFrameworkFound(mvceditor
 wxString mvceditor::ProjectFrameworkDetectionActionClass::GetLabel() const {
 	return _("MVC Framework Detection");
 }
-
-BEGIN_EVENT_TABLE(mvceditor::ProjectFrameworkDetectionActionClass, wxEvtHandler)
-	EVT_FRAMEWORK_FOUND(mvceditor::ProjectFrameworkDetectionActionClass::OnFrameworkFound)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_DETECTION_COMPLETE, mvceditor::ProjectFrameworkDetectionActionClass::OnFrameworkDetectionComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_DETECTION_FAILED, mvceditor::ProjectFrameworkDetectionActionClass::OnFrameworkDetectionFailed)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::ProjectFrameworkDetectionActionClass::OnFrameworkDetectionInProgress)
-END_EVENT_TABLE()

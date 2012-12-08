@@ -60,19 +60,19 @@ private:
 
 	/**
 	 * This object will be used to detct the various PHP framework artifacts (resources,
-	 * database connections, route URLs). This class will own this pointer.
+	 * database connections, route URLs)
 	 */
-	mvceditor::PhpFrameworkDetectorClass* PhpFrameworks;
-
-	mvceditor::RunningThreadsClass& RunningThreads;
+	mvceditor::PhpFrameworkDetectorClass PhpFrameworks;
 
 	/**
 	 * a 'queue' of folders to perform framework detection on
 	 */
 	std::vector<wxString> DirectoriesToDetect;
 
-	DECLARE_EVENT_TABLE()
-
+	/**
+	 * the PhpFrameworks instance needs this to find out the PHP executable location
+	 */
+	mvceditor::EnvironmentClass Environment;
 };
 
 }

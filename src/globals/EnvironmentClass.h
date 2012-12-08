@@ -56,6 +56,20 @@ public:
 	bool IsAuto;
 	
 	PhpEnvironmentClass();
+
+	/**
+	 * completely copy an instance
+	 * @param src item to copy from
+	 */
+	PhpEnvironmentClass(const mvceditor::PhpEnvironmentClass& src);
+
+	/**
+	 * completely copy an instance
+	 * @param src item to copy from
+	 */
+	mvceditor::PhpEnvironmentClass& operator=(const mvceditor::PhpEnvironmentClass& src);
+
+	void Copy(const mvceditor::PhpEnvironmentClass& src);
 	
 	/**
 	 * Use the PHP executable to determine the PHP verion and
@@ -82,9 +96,25 @@ public:
 
 	WebBrowserClass();
 
-	WebBrowserClass(const WebBrowserClass& other);
+	/**
+	 * completely copy an instance
+	 * @param src item to copy from
+	 */
+	WebBrowserClass(const mvceditor::WebBrowserClass& src);
 
 	WebBrowserClass(wxString name, wxFileName fullPath);
+
+	/**
+	 * completely copy an instance
+	 * @param src item to copy from
+	 */
+	mvceditor::WebBrowserClass& operator=(const mvceditor::WebBrowserClass& src);
+
+	/**
+	 * completely copy an instance
+	 * @param src item to copy from
+	 */
+	void Copy(const mvceditor::WebBrowserClass& src);
 };
 
 /**
@@ -97,6 +127,24 @@ class EnvironmentClass {
 public:
 	EnvironmentClass();
 	~EnvironmentClass();
+
+	/**
+	 * completely copy an instance
+	 * @param src item to copy from
+	 */
+	EnvironmentClass(const mvceditor::EnvironmentClass& src);
+
+	/**
+	 * completely copy an instance
+	 * @param src item to copy from
+	 */
+	mvceditor::EnvironmentClass& operator=(const mvceditor::EnvironmentClass& src);
+
+	/**
+	 * completely copy an instance
+	 * @param src item to copy from
+	 */
+	void Copy(const mvceditor::EnvironmentClass& src);
 	
 	ApacheClass Apache;
 	
@@ -123,6 +171,10 @@ public:
 	 * @return TRUE if name was found.
 	 */
 	bool FindBrowserByName(const wxString& name, wxFileName& fileName) const;
+
+private:
+
+	void AddDefaults();
 };
 
 }

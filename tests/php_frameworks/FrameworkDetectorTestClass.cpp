@@ -28,15 +28,19 @@
 #include <FileTestFixtureClass.h>
 #include <wx/event.h>
 
+static int ID_DETECTOR_FRAMEWORK = wxNewId();
+static int ID_DETECTOR_DATABASE = wxNewId();
+static int ID_DETECTOR_RESOURCES = wxNewId();
+
 class FrameworkDetectorFixtureClass : public FileTestFixtureClass {
 public:	
 	FrameworkDetectorFixtureClass() 
 		: FileTestFixtureClass(wxT("framework_detector_test"))
 		, Handler()
 		, RunningThreads()
-		, FrameworkDetector(Handler, RunningThreads) 
-		, DatabaseDetector(Handler, RunningThreads)
-		, ResourcesDetector(Handler, RunningThreads) {
+		, FrameworkDetector(Handler, RunningThreads, ID_DETECTOR_FRAMEWORK) 
+		, DatabaseDetector(Handler, RunningThreads, ID_DETECTOR_DATABASE)
+		, ResourcesDetector(Handler, RunningThreads, ID_DETECTOR_RESOURCES) {
 	}
 	
 	virtual ~FrameworkDetectorFixtureClass() {

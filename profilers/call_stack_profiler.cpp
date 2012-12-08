@@ -52,7 +52,7 @@ HandlerClass Handler;
 mvceditor::ResourceCacheClass ResourceCache;
 mvceditor::RunningThreadsClass RunningThreads;
 mvceditor::CallStackClass CallStack(ResourceCache);
-mvceditor::ResourcesDetectorActionClass ResourceDetector(Handler, RunningThreads);
+mvceditor::ResourcesDetectorActionClass ResourceDetector(Handler, RunningThreads, wxID_ANY);
 wxString DirName;
 wxString StartingFile;
 

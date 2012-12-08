@@ -67,14 +67,13 @@ private:
 
 	/**
 	 * This object will be used to detcet the various PHP framework route URLs). 
-	 * This class will own this pointer.
 	 */
-	mvceditor::PhpFrameworkDetectorClass* PhpFrameworks;
+	mvceditor::PhpFrameworkDetectorClass PhpFrameworks;
 
-	mvceditor::RunningThreadsClass& RunningThreads;
-
-	mvceditor::ApacheClass Apache;
-
+	/**
+	 * we need to know what framework is being used so that we can know how to
+	 * interpret the urls
+	 */
 	std::vector<mvceditor::FrameworkClass> DetectedFrameworks;
 
 	/**
@@ -89,7 +88,11 @@ private:
 	 */
 	std::queue<wxString> RootUrls;
 
-	DECLARE_EVENT_TABLE()
+	/**
+	 * the PhpFrameworks instance needs this to find out the PHP executable location
+	 */
+	mvceditor::EnvironmentClass Environment;
+
 };
 
 }

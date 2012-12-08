@@ -58,7 +58,7 @@ void mvceditor::ResponseThreadWithHeartbeatClass::BackgroundWork() {
 	}
 }
 
-mvceditor::DetectorActionClass::DetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads) 
+mvceditor::DetectorActionClass::DetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, int eventId) 
 	: wxEvtHandler()
 	, Error(NONE)
 	, ErrorMessage()
@@ -68,28 +68,35 @@ mvceditor::DetectorActionClass::DetectorActionClass(wxEvtHandler& handler, mvced
 	, Handler(handler)
 	, OutputFile()
 	, CurrentPid(0)
-	, CurrentId(0) {
+	, EventId(eventId) {
 	RunningThreads.AddEventHandler(this);
+
+	// using connect instead of event tables so that there is no chance that an
+	// event handler gets called after this instance is destroyed
+	Connect(EventId, mvceditor::EVENT_PROCESS_COMPLETE, wxCommandEventHandler(mvceditor::DetectorActionClass::OnProcessComplete), NULL, this);
+	Connect(EventId, mvceditor::EVENT_PROCESS_FAILED, wxCommandEventHandler(mvceditor::DetectorActionClass::OnProcessFailed), NULL, this);
+	Connect(EventId, mvceditor::EVENT_PROCESS_IN_PROGRESS, wxCommandEventHandler(mvceditor::DetectorActionClass::OnWorkInProgress), NULL, this);
+	Connect(EventId, mvceditor::EVENT_WORK_COMPLETE, wxCommandEventHandler(mvceditor::DetectorActionClass::OnWorkComplete), NULL, this);
+	Connect(EventId, mvceditor::EVENT_WORK_IN_PROGRESS, wxCommandEventHandler(mvceditor::DetectorActionClass::OnWorkInProgress), NULL, this);
 }
 
 mvceditor::DetectorActionClass::~DetectorActionClass() {
-	if (CurrentPid > 0) {
-		Process.Stop(CurrentPid);
-	}
-	if (RunningThreadId > 0) {
-		RunningThreads.Stop(RunningThreadId);
-	}
+	Disconnect(EventId, mvceditor::EVENT_PROCESS_COMPLETE, wxCommandEventHandler(mvceditor::DetectorActionClass::OnProcessComplete), NULL, this);
+	Disconnect(EventId, mvceditor::EVENT_PROCESS_FAILED, wxCommandEventHandler(mvceditor::DetectorActionClass::OnProcessFailed), NULL, this);
+	Disconnect(EventId, mvceditor::EVENT_PROCESS_IN_PROGRESS, wxCommandEventHandler(mvceditor::DetectorActionClass::OnWorkInProgress), NULL, this);
+	Disconnect(EventId, mvceditor::EVENT_WORK_COMPLETE, wxCommandEventHandler(mvceditor::DetectorActionClass::OnWorkComplete), NULL, this);
+	Disconnect(EventId, mvceditor::EVENT_WORK_IN_PROGRESS, wxCommandEventHandler(mvceditor::DetectorActionClass::OnWorkInProgress), NULL, this);
 	RunningThreads.RemoveEventHandler(this);
+	Stop();
 }
 
-bool mvceditor::DetectorActionClass::Init(int id, const EnvironmentClass& environment, const wxString& projectRootPath, const wxString& identifier, 
+bool mvceditor::DetectorActionClass::Init(const wxString& phpExecutablePath, const wxString& projectRootPath, const wxString& identifier, 
 		std::map<wxString, wxString> moreParams) {
 	Error = NONE;
 	ErrorMessage = wxT("");
 	Clear();
 	wxASSERT(0 == RunningThreadId);
 
-	CurrentId = id;
 	wxString action = GetAction();
 	wxFileName scriptFileName = mvceditor::PhpDetectorsAsset();
 
@@ -105,9 +112,9 @@ bool mvceditor::DetectorActionClass::Init(int id, const EnvironmentClass& enviro
 		args += wxT(" --") + it->first + wxT("=\"") + it->second + wxT("\"");
 	}
 		
-	wxString cmd = wxT("\"") + environment.Php.PhpExecutablePath + wxT("\"") + wxT(" \"") + scriptFileName.GetFullPath() + wxT("\"") + args;
+	wxString cmd = wxT("\"") + phpExecutablePath + wxT("\"") + wxT(" \"") + scriptFileName.GetFullPath() + wxT("\"") + args;
 	LastCommandLine = cmd;
-	return Process.Init(cmd, id, CurrentPid);
+	return Process.Init(cmd, EventId, CurrentPid);
 }
 
 void mvceditor::DetectorActionClass::InitFromFile(wxString fileName) {
@@ -121,7 +128,7 @@ void mvceditor::DetectorActionClass::OnProcessComplete(wxCommandEvent& event) {
 	// kick off response parsing in a background thread.
 	// any running thread was stopped in Init()
 	mvceditor::ResponseThreadWithHeartbeatClass* thread = 
-		new mvceditor::ResponseThreadWithHeartbeatClass(*this, RunningThreads, CurrentId);
+		new mvceditor::ResponseThreadWithHeartbeatClass(*this, RunningThreads, EventId);
 	if (!thread->Init(OutputFile, RunningThreadId)) {
 		RunningThreadId = 0;
 		delete thread;
@@ -137,7 +144,7 @@ void mvceditor::DetectorActionClass::OnProcessFailed(wxCommandEvent& event) {
 }
 
 void mvceditor::DetectorActionClass::OnWorkInProgress(wxCommandEvent& event) {
-	if (event.GetId() == CurrentId) {
+	if (event.GetEventType() == mvceditor::EVENT_WORK_IN_PROGRESS) {
 		
 		// users expect an EVENT_PROCESS_IN_PROGRESS event but this handler
 		// handles both EVENT_PROCESS_IN_PROGRESS AND EVENT_WORK_IN_PROGRESS
@@ -145,17 +152,17 @@ void mvceditor::DetectorActionClass::OnWorkInProgress(wxCommandEvent& event) {
 		wxPostEvent(&Handler, inProgressEvent);
 	}
 	else {
-		event.Skip();
+		wxPostEvent(&Handler, event);
 	}
 }
 
 void mvceditor::DetectorActionClass::OnWorkComplete(wxCommandEvent& event) {
-	if (event.GetId() == CurrentId) {
+	if (event.GetId() == EventId) {
 		RunningThreadId = 0;
 
 		// users expect an EVENT_PROCESS_COMPLETE event
 		wxCommandEvent completeEvent(mvceditor::EVENT_PROCESS_COMPLETE);
-		completeEvent.SetId(CurrentId);
+		completeEvent.SetId(EventId);
 		wxPostEvent(&Handler, completeEvent);
 		wxRemoveFile(OutputFile.GetFullPath());
 	}
@@ -174,10 +181,9 @@ void mvceditor::DetectorActionClass::Stop() {
 	}
 }
 
-mvceditor::FrameworkDetectorActionClass::FrameworkDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads)
-	: DetectorActionClass(handler, runningThreads)
+mvceditor::FrameworkDetectorActionClass::FrameworkDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, int eventId)
+	: DetectorActionClass(handler, runningThreads, eventId)
 	, Frameworks() {
-
 }
 
 void mvceditor::FrameworkDetectorActionClass::Clear() {
@@ -206,8 +212,8 @@ bool mvceditor::FrameworkDetectorActionClass::Response() {
 	return ret;
 }
 
-mvceditor::DatabaseDetectorActionClass::DatabaseDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads)
-	: DetectorActionClass(handler, runningThreads)
+mvceditor::DatabaseDetectorActionClass::DatabaseDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, int eventId)
+	: DetectorActionClass(handler, runningThreads, eventId)
 	, Databases() {
 
 }
@@ -261,8 +267,8 @@ bool mvceditor::DatabaseDetectorActionClass::Response() {
 	return ret;
 }
 
-mvceditor::ConfigFilesDetectorActionClass::ConfigFilesDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads) 
-	: DetectorActionClass(handler, runningThreads)
+mvceditor::ConfigFilesDetectorActionClass::ConfigFilesDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, int eventId) 
+	: DetectorActionClass(handler, runningThreads, eventId)
 	, ConfigFiles() {
 
 }
@@ -296,8 +302,8 @@ bool mvceditor::ConfigFilesDetectorActionClass::Response() {
 	return ret;
 }
 
-mvceditor::ResourcesDetectorActionClass::ResourcesDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads)
-	: DetectorActionClass(handler, runningThreads)
+mvceditor::ResourcesDetectorActionClass::ResourcesDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, int eventId)
+	: DetectorActionClass(handler, runningThreads, eventId)
 	, Resources() {
 
 }
@@ -375,8 +381,8 @@ bool mvceditor::ResourcesDetectorActionClass::Response() {
 	return ret;
 }
 
-mvceditor::UrlDetectorActionClass::UrlDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads) 
-	: DetectorActionClass(handler, runningThreads)
+mvceditor::UrlDetectorActionClass::UrlDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, int eventId) 
+	: DetectorActionClass(handler, runningThreads, eventId)
 	, Urls() {
 		
 }
@@ -424,8 +430,8 @@ bool mvceditor::UrlDetectorActionClass::Response() {
 	return ret;
 }
 
-mvceditor::ViewInfosDetectorActionClass::ViewInfosDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads) 
-	: DetectorActionClass(handler, runningThreads) {
+mvceditor::ViewInfosDetectorActionClass::ViewInfosDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, int eventId) 
+	: DetectorActionClass(handler, runningThreads, eventId) {
 		
 }
 
@@ -518,21 +524,62 @@ void mvceditor::FrameworkClass::Copy(const mvceditor::FrameworkClass& src) {
 	Resources = src.Resources;
 }
 
-mvceditor::PhpFrameworkDetectorClass::PhpFrameworkDetectorClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, const mvceditor::EnvironmentClass& environment)
+mvceditor::PhpFrameworkDetectorClass::PhpFrameworkDetectorClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads)
 	: wxEvtHandler()
-	, FrameworkDetector(*this, runningThreads)
-	, ConfigFilesDetector(*this, runningThreads)
-	, DatabaseDetector(*this, runningThreads)
-	, ResourcesDetector(*this, runningThreads)
-	, UrlDetector(*this, runningThreads)
-	, ViewInfosDetector(*this, runningThreads)
+	, FrameworkDetector(*this, runningThreads, ID_DETECT_FRAMEWORK)
+	, ConfigFilesDetector(*this, runningThreads, ID_DETECT_CONFIG)
+	, DatabaseDetector(*this, runningThreads, ID_DETECT_DATABASE)
+	, ResourcesDetector(*this, runningThreads, ID_DETECT_RESOURCES)
+	, UrlDetector(*this, runningThreads, ID_DETECT_URL)
+	, ViewInfosDetector(*this, runningThreads, ID_DETECT_VIEW_FILES)
 	, FrameworkIdentifiersLeftToDetect()
 	, UrlsDetected()
 	, ViewInfosDetected()
 	, Framework()
 	, Handler(handler)
-	, Environment(environment) {
-		
+	, PhpExecutablePath() {
+
+	// using connect instead of event tables so that there is no chance that an
+	// event handler gets called after this instance is destroyed
+	FrameworkDetector.Connect(ID_DETECT_FRAMEWORK, mvceditor::EVENT_PROCESS_COMPLETE, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnFrameworkDetectionComplete), NULL, this);
+	FrameworkDetector.Connect(ID_DETECT_FRAMEWORK, mvceditor::EVENT_PROCESS_FAILED, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed), NULL, this);
+	FrameworkDetector.Connect(ID_DETECT_FRAMEWORK, mvceditor::EVENT_PROCESS_IN_PROGRESS, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnWorkInProgress), NULL, this);
+	DatabaseDetector.Connect(ID_DETECT_DATABASE, mvceditor::EVENT_PROCESS_COMPLETE, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnDatabaseDetectionComplete), NULL, this);
+	DatabaseDetector.Connect(ID_DETECT_DATABASE, mvceditor::EVENT_PROCESS_FAILED, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed), NULL, this);
+	DatabaseDetector.Connect(ID_DETECT_DATABASE, mvceditor::EVENT_PROCESS_IN_PROGRESS, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnWorkInProgress), NULL, this);
+	ConfigFilesDetector.Connect(ID_DETECT_CONFIG, mvceditor::EVENT_PROCESS_COMPLETE, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnConfigFilesDetectionComplete), NULL, this);
+	ConfigFilesDetector.Connect(ID_DETECT_CONFIG, mvceditor::EVENT_PROCESS_FAILED, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed), NULL, this);
+	ConfigFilesDetector.Connect(ID_DETECT_CONFIG, mvceditor::EVENT_PROCESS_IN_PROGRESS, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnWorkInProgress), NULL, this);
+	ResourcesDetector.Connect(ID_DETECT_RESOURCES, mvceditor::EVENT_PROCESS_COMPLETE, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnResourcesDetectionComplete), NULL, this);
+	ResourcesDetector.Connect(ID_DETECT_RESOURCES, mvceditor::EVENT_PROCESS_FAILED, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed), NULL, this);
+	ResourcesDetector.Connect(ID_DETECT_RESOURCES, mvceditor::EVENT_PROCESS_IN_PROGRESS, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnWorkInProgress), NULL, this);
+	UrlDetector.Connect(ID_DETECT_URL, mvceditor::EVENT_PROCESS_COMPLETE, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnUrlDetectionComplete), NULL, this);
+	UrlDetector.Connect(ID_DETECT_URL, mvceditor::EVENT_PROCESS_FAILED, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnUrlDetectionFailed), NULL, this);
+	UrlDetector.Connect(ID_DETECT_URL, mvceditor::EVENT_PROCESS_IN_PROGRESS, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnWorkInProgress), NULL, this);
+	ViewInfosDetector.Connect(ID_DETECT_VIEW_FILES, mvceditor::EVENT_PROCESS_COMPLETE, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnViewInfosDetectionComplete), NULL, this);
+	ViewInfosDetector.Connect(ID_DETECT_VIEW_FILES, mvceditor::EVENT_PROCESS_FAILED, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnViewInfosDetectionFailed), NULL, this);
+	ViewInfosDetector.Connect(ID_DETECT_VIEW_FILES, mvceditor::EVENT_PROCESS_IN_PROGRESS, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnWorkInProgress), NULL, this);
+}
+
+mvceditor::PhpFrameworkDetectorClass::~PhpFrameworkDetectorClass() {
+	FrameworkDetector.Disconnect(ID_DETECT_FRAMEWORK, mvceditor::EVENT_PROCESS_COMPLETE, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnFrameworkDetectionComplete), NULL, this);
+	FrameworkDetector.Disconnect(ID_DETECT_FRAMEWORK, mvceditor::EVENT_PROCESS_FAILED, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed), NULL, this);
+	FrameworkDetector.Disconnect(ID_DETECT_FRAMEWORK, mvceditor::EVENT_PROCESS_IN_PROGRESS, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnWorkInProgress), NULL, this);
+	DatabaseDetector.Disconnect(ID_DETECT_DATABASE, mvceditor::EVENT_PROCESS_COMPLETE, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnDatabaseDetectionComplete), NULL, this);
+	DatabaseDetector.Disconnect(ID_DETECT_DATABASE, mvceditor::EVENT_PROCESS_FAILED, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed), NULL, this);
+	DatabaseDetector.Disconnect(ID_DETECT_DATABASE, mvceditor::EVENT_PROCESS_IN_PROGRESS, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnWorkInProgress), NULL, this);
+	ConfigFilesDetector.Disconnect(ID_DETECT_CONFIG, mvceditor::EVENT_PROCESS_COMPLETE, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnConfigFilesDetectionComplete), NULL, this);
+	ConfigFilesDetector.Disconnect(ID_DETECT_CONFIG, mvceditor::EVENT_PROCESS_FAILED, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed), NULL, this);
+	ConfigFilesDetector.Disconnect(ID_DETECT_CONFIG, mvceditor::EVENT_PROCESS_IN_PROGRESS, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnWorkInProgress), NULL, this);
+	ResourcesDetector.Disconnect(ID_DETECT_RESOURCES, mvceditor::EVENT_PROCESS_COMPLETE, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnResourcesDetectionComplete), NULL, this);
+	ResourcesDetector.Disconnect(ID_DETECT_RESOURCES, mvceditor::EVENT_PROCESS_FAILED, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed), NULL, this);
+	ResourcesDetector.Disconnect(ID_DETECT_RESOURCES, mvceditor::EVENT_PROCESS_IN_PROGRESS, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnWorkInProgress), NULL, this);
+	UrlDetector.Disconnect(ID_DETECT_URL, mvceditor::EVENT_PROCESS_COMPLETE, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnUrlDetectionComplete), NULL, this);
+	UrlDetector.Disconnect(ID_DETECT_URL, mvceditor::EVENT_PROCESS_FAILED, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnUrlDetectionFailed), NULL, this);
+	UrlDetector.Disconnect(ID_DETECT_URL, mvceditor::EVENT_PROCESS_IN_PROGRESS, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnWorkInProgress), NULL, this);
+	ViewInfosDetector.Disconnect(ID_DETECT_VIEW_FILES, mvceditor::EVENT_PROCESS_COMPLETE, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnViewInfosDetectionComplete), NULL, this);
+	ViewInfosDetector.Disconnect(ID_DETECT_VIEW_FILES, mvceditor::EVENT_PROCESS_FAILED, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnViewInfosDetectionFailed), NULL, this);
+	ViewInfosDetector.Disconnect(ID_DETECT_VIEW_FILES, mvceditor::EVENT_PROCESS_IN_PROGRESS, wxCommandEventHandler(mvceditor::PhpFrameworkDetectorClass::OnWorkInProgress), NULL, this);
 }
 
 void mvceditor::PhpFrameworkDetectorClass::Clear() {
@@ -549,15 +596,19 @@ void mvceditor::PhpFrameworkDetectorClass::Stop() {
 	Clear();
 }
 
-bool mvceditor::PhpFrameworkDetectorClass::Init(const wxString& dir) {
+bool mvceditor::PhpFrameworkDetectorClass::Init(const wxString& dir, const EnvironmentClass& environment) {
 	Framework.RootDirectory = dir;
+	PhpExecutablePath = environment.Php.PhpExecutablePath;
 	std::map<wxString, wxString> moreParams;
-	return FrameworkDetector.Init(ID_DETECT_FRAMEWORK, Environment, dir, wxT(""), moreParams);
+	return FrameworkDetector.Init(PhpExecutablePath, dir, wxT(""), moreParams);
 }
 
-bool mvceditor::PhpFrameworkDetectorClass::InitUrlDetector(const std::vector<mvceditor::FrameworkClass>& frameworks, const wxString& resourceCacheFileName, const wxString& baseUrl) {
+bool mvceditor::PhpFrameworkDetectorClass::InitUrlDetector(const std::vector<mvceditor::FrameworkClass>& frameworks, 
+														   const wxString& resourceCacheFileName, const wxString& baseUrl,
+														   const EnvironmentClass& environment) {
 	UrlsDetected.clear();
 	FrameworkIdentifiersLeftToDetect.clear();
+	PhpExecutablePath = environment.Php.PhpExecutablePath;
 	for (size_t i = 0; i < frameworks.size(); ++i) {
 		std::vector<wxString> next;
 		next.push_back(frameworks[i].Identifier);
@@ -572,9 +623,12 @@ bool mvceditor::PhpFrameworkDetectorClass::InitUrlDetector(const std::vector<mvc
 	return !frameworks.empty();
 }
 
-bool mvceditor::PhpFrameworkDetectorClass::InitViewInfosDetector(const std::vector<mvceditor::FrameworkClass>& frameworks, const wxString& url, const wxFileName& callStackFile) {
+bool mvceditor::PhpFrameworkDetectorClass::InitViewInfosDetector(const std::vector<mvceditor::FrameworkClass>& frameworks, 
+																 const wxString& url, const wxFileName& callStackFile, 
+																 const EnvironmentClass& environment) {
 	ViewInfosDetected.clear();
 	FrameworkIdentifiersLeftToDetect.clear();
+	PhpExecutablePath = environment.Php.PhpExecutablePath;
 	for (size_t i = 0; i < frameworks.size(); ++i) {
 		std::vector<wxString> next;
 		next.push_back(frameworks[i].Identifier);
@@ -603,17 +657,18 @@ void mvceditor::PhpFrameworkDetectorClass::NextDetection() {
 		
 		Framework.Identifier = framework;
 		if (action == wxT("databaseInfo")) {
-			DatabaseDetector.Init(ID_DETECT_DATABASE, Environment, Framework.RootDirectory, framework, moreParams);
+			DatabaseDetector.Init(PhpExecutablePath, Framework.RootDirectory, framework, moreParams);
 		}
 		else if (action == wxT("configFiles")) {
-			ConfigFilesDetector.Init(ID_DETECT_CONFIG, Environment, Framework.RootDirectory, framework, moreParams);
+			ConfigFilesDetector.Init(PhpExecutablePath, Framework.RootDirectory, framework, moreParams);
 		}
 		else if (action == wxT("resources")) {
-			ResourcesDetector.Init(ID_DETECT_RESOURCES, Environment, Framework.RootDirectory, framework, moreParams);
+			ResourcesDetector.Init(PhpExecutablePath, Framework.RootDirectory, framework, moreParams);
 		}
 	}
 	else {	
 		wxCommandEvent completeEvent(mvceditor::EVENT_FRAMEWORK_DETECTION_COMPLETE);
+		completeEvent.SetId(wxID_ANY);
 		wxPostEvent(&Handler, completeEvent);
 	}
 }
@@ -630,7 +685,7 @@ void mvceditor::PhpFrameworkDetectorClass::NextUrlDetection() {
 		std::map<wxString, wxString> moreParams;
 		moreParams[wxT("file")] = fileName;
 		moreParams[wxT("host")] = baseUrl;
-		UrlDetector.Init(ID_DETECT_URL, Environment, rootDirectory, framework, moreParams);
+		UrlDetector.Init(PhpExecutablePath, rootDirectory, framework, moreParams);
 	}
 	else {
 		mvceditor::UrlDetectedEventClass urlEvent(UrlsDetected);
@@ -650,7 +705,7 @@ void mvceditor::PhpFrameworkDetectorClass::NextViewInfosDetection() {
 		std::map<wxString, wxString> moreParams;
 		moreParams[wxT("url")] = url;
 		moreParams[wxT("file")] = callStackFile;
-		ViewInfosDetector.Init(ID_DETECT_VIEW_FILES, Environment, rootDirectory, framework, moreParams);
+		ViewInfosDetector.Init(PhpExecutablePath, rootDirectory, framework, moreParams);
 	}
 	else {
 		mvceditor::ViewInfosDetectedEventClass viewInfosEvent(ViewInfosDetected);
@@ -838,28 +893,3 @@ const wxEventType mvceditor::EVENT_FRAMEWORK_URL_FAILED = wxNewEventType();
 const wxEventType mvceditor::EVENT_FRAMEWORK_VIEW_FILES_COMPLETE = wxNewEventType();
 const wxEventType mvceditor::EVENT_FRAMEWORK_VIEW_FILES_FAILED = wxNewEventType();
 
-BEGIN_EVENT_TABLE(mvceditor::DetectorActionClass, wxEvtHandler)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::DetectorActionClass::OnProcessComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_FAILED, mvceditor::DetectorActionClass::OnProcessFailed)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::DetectorActionClass::OnWorkInProgress)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::DetectorActionClass::OnWorkComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::DetectorActionClass::OnWorkInProgress)
-END_EVENT_TABLE()
-
-BEGIN_EVENT_TABLE(mvceditor::PhpFrameworkDetectorClass, wxEvtHandler)
-	EVT_COMMAND(ID_DETECT_FRAMEWORK, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::PhpFrameworkDetectorClass::OnFrameworkDetectionComplete)
-	EVT_COMMAND(ID_DETECT_DATABASE, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::PhpFrameworkDetectorClass::OnDatabaseDetectionComplete)
-	EVT_COMMAND(ID_DETECT_CONFIG, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::PhpFrameworkDetectorClass::OnConfigFilesDetectionComplete)
-	EVT_COMMAND(ID_DETECT_RESOURCES, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::PhpFrameworkDetectorClass::OnResourcesDetectionComplete)
-	EVT_COMMAND(ID_DETECT_URL, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::PhpFrameworkDetectorClass::OnUrlDetectionComplete)
-	EVT_COMMAND(ID_DETECT_VIEW_FILES, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::PhpFrameworkDetectorClass::OnViewInfosDetectionComplete)
-	
-	EVT_COMMAND(ID_DETECT_FRAMEWORK, mvceditor::EVENT_PROCESS_FAILED, mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed)
-	EVT_COMMAND(ID_DETECT_DATABASE, mvceditor::EVENT_PROCESS_FAILED, mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed)
-	EVT_COMMAND(ID_DETECT_CONFIG, mvceditor::EVENT_PROCESS_FAILED, mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed)
-	EVT_COMMAND(ID_DETECT_RESOURCES, mvceditor::EVENT_PROCESS_FAILED, mvceditor::PhpFrameworkDetectorClass::OnDetectionFailed)
-	EVT_COMMAND(ID_DETECT_URL, mvceditor::EVENT_PROCESS_FAILED, mvceditor::PhpFrameworkDetectorClass::OnUrlDetectionFailed)
-	EVT_COMMAND(ID_DETECT_VIEW_FILES, mvceditor::EVENT_PROCESS_FAILED, mvceditor::PhpFrameworkDetectorClass::OnViewInfosDetectionFailed)
-	
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::PhpFrameworkDetectorClass::OnWorkInProgress)
-END_EVENT_TABLE()

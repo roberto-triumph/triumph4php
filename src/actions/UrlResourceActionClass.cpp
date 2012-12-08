@@ -27,19 +27,30 @@
 mvceditor::UrlResourceActionClass::UrlResourceActionClass(
 	mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: ActionClass(runningThreads, eventId)
-	, PhpFrameworks(NULL) 
-	, RunningThreads(runningThreads)
-	, Apache()
+	, PhpFrameworks(*this, runningThreads) 
 	, DetectedFrameworks()
-	, ResourceDbFileNames() {
+	, ResourceDbFileNames()
+	, Environment() {
 
+	// using connect instead of event tables so that there is no chance that an
+	// event handler gets called after this instance is destroyed
+	// the reason for doing this is that action are only alive for a short
+	// period of time
+	Connect(mvceditor::EVENT_FRAMEWORK_URL_COMPLETE, 
+		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(UrlDetectedEventClassFunction, &mvceditor::UrlResourceActionClass::OnUrlDetectionComplete), 
+		NULL, this
+	);
+	Connect(mvceditor::EVENT_FRAMEWORK_URL_FAILED, wxCommandEventHandler(mvceditor::UrlResourceActionClass::OnUrlDetectionFailed), NULL, this);
+	Connect(mvceditor::EVENT_PROCESS_IN_PROGRESS, wxCommandEventHandler(mvceditor::UrlResourceActionClass::OnUrlDetectionInProgress), NULL, this);
 }
 
 mvceditor::UrlResourceActionClass::~UrlResourceActionClass() {
-	if (PhpFrameworks) {
-		PhpFrameworks->Stop();
-		delete PhpFrameworks;
-	}
+	Disconnect(mvceditor::EVENT_FRAMEWORK_URL_COMPLETE, 
+		(wxObjectEventFunction) (wxEventFunction)  wxStaticCastEvent(UrlDetectedEventClassFunction, &mvceditor::UrlResourceActionClass::OnUrlDetectionComplete), 
+		NULL, this);
+	Disconnect(mvceditor::EVENT_FRAMEWORK_URL_FAILED, wxCommandEventHandler(mvceditor::UrlResourceActionClass::OnUrlDetectionFailed), NULL, this);
+	Disconnect(mvceditor::EVENT_PROCESS_IN_PROGRESS, wxCommandEventHandler(mvceditor::UrlResourceActionClass::OnUrlDetectionInProgress), NULL, this);
+	PhpFrameworks.Stop();
 }
 
 bool mvceditor::UrlResourceActionClass::Init(mvceditor::GlobalsClass& globals) {
@@ -47,10 +58,7 @@ bool mvceditor::UrlResourceActionClass::Init(mvceditor::GlobalsClass& globals) {
 	globals.UrlResourceFinder.ChosenUrl.Reset();
 	globals.UrlResourceFinder.Clear();
 	
-	if (!PhpFrameworks) {
-		PhpFrameworks = new mvceditor::PhpFrameworkDetectorClass(*this, RunningThreads, globals.Environment);
-	}
-	Apache = globals.Environment.Apache;
+	Environment = globals.Environment;
 	DetectedFrameworks = globals.Frameworks;
 
 	// look to see if any source directory is a virtual host doc root
@@ -64,7 +72,7 @@ bool mvceditor::UrlResourceActionClass::Init(mvceditor::GlobalsClass& globals) {
 			// that directory is a web root then get the URLs for that project.
 			for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
 				wxString rootDirFullPath = source->RootDirectory.GetFullPath();
-				wxString projectRootUrl =  globals.Environment.Apache.GetUrl(rootDirFullPath);
+				wxString projectRootUrl =  Environment.Apache.GetUrl(rootDirFullPath);
 				if (!projectRootUrl.IsEmpty()) {
 					ResourceDbFileNames.push(project->ResourceDbFileName.GetFullPath());
 					RootUrls.push(projectRootUrl);
@@ -78,14 +86,12 @@ bool mvceditor::UrlResourceActionClass::Init(mvceditor::GlobalsClass& globals) {
 		wxString rootUrl = RootUrls.front();
 		ResourceDbFileNames.pop();
 		RootUrls.pop();
-		started = PhpFrameworks->InitUrlDetector(DetectedFrameworks, resourceDbFileName, rootUrl);
+		started = PhpFrameworks.InitUrlDetector(DetectedFrameworks, resourceDbFileName, rootUrl, Environment);
 		if (started) {
 			SetStatus(_("Detecting URL routes for ") + rootUrl);
 		}
 	}
 	if (!started) {
-		delete PhpFrameworks;
-		PhpFrameworks = NULL;
 
 		// nothing to do we are done. this needs to be called so that we can move on
 		// to the next step in the sequence
@@ -113,7 +119,7 @@ void mvceditor::UrlResourceActionClass::OnUrlDetectionFailed(wxCommandEvent& eve
 		wxString rootUrl = RootUrls.front();
 		ResourceDbFileNames.pop();
 		RootUrls.pop();
-		bool started = PhpFrameworks->InitUrlDetector(DetectedFrameworks, resourceDbFileName, rootUrl);
+		bool started = PhpFrameworks.InitUrlDetector(DetectedFrameworks, resourceDbFileName, rootUrl, Environment);
 		if (started) {
 			SetStatus(_("Detecting URL routes for ") + rootUrl);
 			done = false;
@@ -131,7 +137,7 @@ void mvceditor::UrlResourceActionClass::OnUrlDetectionFailed(wxCommandEvent& eve
 void mvceditor::UrlResourceActionClass::OnUrlDetectionComplete(mvceditor::UrlDetectedEventClass& event) {
 
 	// propagate the event so that the globalschangehandler class knows to update the globals
-	RunningThreads.PostEvent(event);
+	PostEvent(event);
 
 	bool done = true;
 	while (!ResourceDbFileNames.empty()) {
@@ -141,7 +147,7 @@ void mvceditor::UrlResourceActionClass::OnUrlDetectionComplete(mvceditor::UrlDet
 		wxString rootUrl = RootUrls.front();
 		ResourceDbFileNames.pop();
 		RootUrls.pop();
-		bool started = PhpFrameworks->InitUrlDetector(DetectedFrameworks, resourceDbFileName, rootUrl);
+		bool started = PhpFrameworks.InitUrlDetector(DetectedFrameworks, resourceDbFileName, rootUrl, Environment);
 		if (started) {
 			SetStatus(_("Detecting URL routes for ") + rootUrl);
 			done = false;
@@ -164,9 +170,3 @@ void mvceditor::UrlResourceActionClass::OnUrlDetectionInProgress(wxCommandEvent&
 wxString mvceditor::UrlResourceActionClass::GetLabel() const {
 	return _("MVC Framework Routing Detection");
 }
-
-BEGIN_EVENT_TABLE(mvceditor::UrlResourceActionClass, wxEvtHandler) 
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FRAMEWORK_URL_FAILED, mvceditor::UrlResourceActionClass::OnUrlDetectionFailed)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::UrlResourceActionClass::OnUrlDetectionInProgress)
-	EVT_FRAMEWORK_URL_COMPLETE(mvceditor::UrlResourceActionClass::OnUrlDetectionComplete)
-END_EVENT_TABLE()

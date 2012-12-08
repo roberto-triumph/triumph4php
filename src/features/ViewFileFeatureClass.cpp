@@ -107,7 +107,7 @@ void mvceditor::CallStackThreadClass::BackgroundWork() {
 
 mvceditor::ViewFileFeatureClass::ViewFileFeatureClass(mvceditor::AppClass& app) 
 	: FeatureClass(app) 
-	, FrameworkDetector(*this, app.RunningThreads, app.Globals.Environment) 
+	, FrameworkDetector(*this, app.RunningThreads) 
 	, CallStackPersistFile() 
 	, LastError(mvceditor::CallStackClass::NONE)
 	, WriteError(false) {
@@ -181,7 +181,8 @@ void mvceditor::ViewFileFeatureClass::StartDetection() {
 
 void mvceditor::ViewFileFeatureClass::OnCallStackComplete(mvceditor::CallStackCompleteEventClass& event) {
 	if (!App.Globals.Frameworks.empty()) {
-		if (!FrameworkDetector.InitViewInfosDetector(App.Globals.Frameworks, App.Globals.UrlResourceFinder.ChosenUrl.Url.BuildURI(), CallStackPersistFile)) {
+		if (!FrameworkDetector.InitViewInfosDetector(App.Globals.Frameworks, 
+				App.Globals.UrlResourceFinder.ChosenUrl.Url.BuildURI(), CallStackPersistFile, App.Globals.Environment)) {
 			mvceditor::EditorLogWarning(mvceditor::PROJECT_DETECTION, _("Could not start ViewInfos detector"));
 		}
 	}

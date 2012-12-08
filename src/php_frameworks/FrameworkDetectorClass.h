@@ -110,8 +110,10 @@ public:
 	 * just like if it was connected to a ProcessWithHeartbeat object. The events are posted
 	 * after the responses are parsed; it is safe to access the results from the event handlers.
 	 * @param runningThreads To keep track of background threads
+	 * @param int evenetId event ID will be used when an EVENT_PROCESS_* is genereated
+	 *        this way the caller can correlate a command to an event.
 	 */
-	DetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
+	DetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, int eventId);
 	virtual ~DetectorActionClass();
 
 	/**
@@ -119,9 +121,7 @@ public:
 	 * immediately; the handler given in the constructor will get notified
 	 * when the process finishes
 	 *
-	 * @param int commandId command ID will be used when an EVENT_PROCESS_* is genereated
-	 *        this way the caller can correlate a command to an event.
-	 * @param environment to get location of PHP binary "php-win.exe" / php
+	 * @param phpExecutablepath location of PHP binary "php-win.exe" / php
 	 * @param projectRootPath location of the project to run detection on ie. the project that
 	 *        the user is modifying
 	 * @param identifier the detected framework identifier
@@ -129,7 +129,7 @@ public:
 	 *       need the starting dashes (ie. the key should be "file" instead of "--file").
 	 * @return wxString the command (operating system command line) that will run the PHP detection code.
 	 */
-	bool Init(int id, const EnvironmentClass& environment, const wxString& projectRootPath, const wxString& identifier,
+	bool Init(const wxString& phpExecutablePath, const wxString& projectRootPath, const wxString& identifier,
 		std::map<wxString, wxString> moreParams);
 
 	/**
@@ -221,12 +221,9 @@ private:
 	/**
 	 *  to let each instance handle its own events
 	 */
-	int CurrentId;
-
-	DECLARE_EVENT_TABLE()
+	int EventId;
 
 	friend class ResponseThreadWithHeartbeatClass;
-
 };
 	
 /**
@@ -242,7 +239,7 @@ public:
 
 	std::vector<wxString> Frameworks;
 
-	FrameworkDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
+	FrameworkDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 protected:
 
@@ -266,7 +263,7 @@ public:
 
 	std::vector<DatabaseInfoClass> Databases;
 
-	DatabaseDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
+	DatabaseDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, int eventId);
 	
 protected:
 
@@ -289,7 +286,7 @@ public:
 	
 	std::map<wxString, wxString> ConfigFiles;
 
-	ConfigFilesDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
+	ConfigFilesDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 protected:
 
@@ -312,7 +309,7 @@ public:
 	
 	std::vector<mvceditor::ResourceClass> Resources;
 
-	ResourcesDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
+	ResourcesDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 protected:
 
@@ -335,7 +332,7 @@ public:
 
 	std::vector<UrlResourceClass> Urls;
 
-	UrlDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
+	UrlDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, int eventId);
 	
 protected:
 
@@ -397,7 +394,7 @@ public:
 	
 	std::vector<mvceditor::ViewInfoClass> ViewInfos;
 
-	ViewInfosDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
+	ViewInfosDetectorActionClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 protected:
 
@@ -496,9 +493,10 @@ public:
 	/**
 	 * @param event handler that will receive the EVENT_FRAMEWORK_FOUND, EVENT_FRAMEWORK_URL
 	 * events. Also, the handler will get an EVENT_PROCESS_IN_PROGRESS while the detectors are running
-	 * @param the environment; which contains the location of the PHP binary
 	 */
-	PhpFrameworkDetectorClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads, const EnvironmentClass& environment);
+	PhpFrameworkDetectorClass(wxEvtHandler& handler, mvceditor::RunningThreadsClass& runningThreads);
+
+	~PhpFrameworkDetectorClass();
 	
 	/**
 	 * deletes any detected data
@@ -515,8 +513,9 @@ public:
 	 * @param dir the project's root directory
 	 * @return bool TRUE if detection started successfully. If false, then it is likely that the PHP executable path
 	 * is not correct
+	 * @param the environment; which contains the location of the PHP binary
 	 */
-	bool Init(const wxString& dir);
+	bool Init(const wxString& dir, const EnvironmentClass& environment);
 	
 	/**
 	 * kicks off the URL detector; URL detector is used to ask the PHP framework to
@@ -533,10 +532,12 @@ public:
 	 *        if the virtual host document root is /home/user/public, the project root directory is 
 	 *        /home/user/public/secret_project, then the baseUrl should be 
 	          http://localhost/secret_project
+	 * @param the environment; which contains the location of the PHP binary
 	 * @return bool TRUE if detection started successfully. If false, then it is likely that the PHP executable path
 	 * is not correct or that no PHP frameworks were detected.
 	 */
-	bool InitUrlDetector(const std::vector<mvceditor::FrameworkClass>& frameworks, const wxString& resourceCacheFileName, const wxString& baseUrl);
+	bool InitUrlDetector(const std::vector<mvceditor::FrameworkClass>& frameworks, const wxString& resourceCacheFileName, const wxString& baseUrl,
+		const mvceditor::EnvironmentClass& environment);
 	
 	/**
 	 * kicks off the View files detector, the View files detector is used to ask the PHP framework to
@@ -547,8 +548,10 @@ public:
 	 * @param url the URL of the action to query
 	 * @param callStackFile the location of the call stack file that contains all of the function calls
 	 *        for the given URL.
+	 * @param the environment; which contains the location of the PHP binary
 	 */
-	bool InitViewInfosDetector(const std::vector<mvceditor::FrameworkClass>& frameworks, const wxString& url, const wxFileName& callStackFile);
+	bool InitViewInfosDetector(const std::vector<mvceditor::FrameworkClass>& frameworks, const wxString& url, const wxFileName& callStackFile,
+		const mvceditor::EnvironmentClass& environment);
 	
 	/**
 	 * Stop any active detections and delete any data.
@@ -599,9 +602,9 @@ private:
 	wxEvtHandler& Handler;
 	
 	/**
-	 * The environment; used to get the location of the PHP executable
+	 * the location of the PHP executable (php.exe)
 	 */
-	const EnvironmentClass& Environment;
+	wxString  PhpExecutablePath;
 	
 	/**
 	 * methods that get called when one of the external processes finishes
@@ -628,8 +631,6 @@ private:
 	void NextViewInfosDetection();
 	
 	void OnWorkInProgress(wxCommandEvent& event);
-	
-	DECLARE_EVENT_TABLE()
 };
 
 class FrameworkFoundEventClass : public wxEvent {

@@ -33,48 +33,30 @@ mvceditor::WebBrowserClass::WebBrowserClass()
 
 }
 
-
-mvceditor::WebBrowserClass::WebBrowserClass(const mvceditor::WebBrowserClass& other) 
-	: Name(other.Name)
-	, FullPath(other.FullPath) {
-
+mvceditor::WebBrowserClass::WebBrowserClass(const mvceditor::WebBrowserClass& src) 
+	: Name()
+	, FullPath() {
+	Copy(src);
 }
 
 mvceditor::WebBrowserClass::WebBrowserClass(wxString name, wxFileName fullPath) 
-	: Name(name)
+	: Name(name.c_str())
 	, FullPath(fullPath) {
 
 }
 
-mvceditor::EnvironmentClass::EnvironmentClass()
-		: Apache()
-		, Php()
-		, WebBrowsers() {
-	wxPlatformInfo info;
-	wxString userHome = wxGetUserHome();
-
-	// these are the default installation locations
-	switch (info.GetOperatingSystemId()) {
-		case wxOS_UNIX_LINUX:
-			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Mozilla Firefox"), wxFileName(wxT("/usr/bin/firefox"))));
-			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Google Chrome"), wxFileName(wxT("/usr/bin/google-chrome"))));
-			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Opera"), wxFileName(wxT("/usr/bin/opera"))));
-			break;
-		case wxOS_WINDOWS_NT:
-			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Mozilla Firefox"), wxFileName(wxT("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe"))));
-
-			// by default google installs itself in the user home
-			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Google Chrome"), wxFileName(userHome + wxT("\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe"))));
-			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Internet Explorer"), wxFileName(wxT("C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe"))));
-			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Opera"), wxFileName(wxT("C:\\Program Files (x86)\\Opera\\opera.exe"))));
-			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Safari"), wxFileName(wxT("C:\\Program Files (x86)\\Safari\\Safari.exe"))));
-			break;
-		default:
-			break;
-	}
+mvceditor::WebBrowserClass& mvceditor::WebBrowserClass::operator=(const mvceditor::WebBrowserClass& src) {
+	Copy(src);
+	return *this;
 }
 
-mvceditor::EnvironmentClass::~EnvironmentClass() {
+void mvceditor::WebBrowserClass::Copy(const mvceditor::WebBrowserClass& src) {
+
+	// using c_str() to completely clone a wxString, as by default
+	// the assignment operator is a shallow copy
+	// this makes the copies thread-safe
+	Name = src.Name.c_str();
+	FullPath= src.FullPath;
 }
 
 mvceditor::PhpEnvironmentClass::PhpEnvironmentClass() 
@@ -92,6 +74,28 @@ mvceditor::PhpEnvironmentClass::PhpEnvironmentClass()
 		default:
 			break;
 	}
+}
+
+mvceditor::PhpEnvironmentClass::PhpEnvironmentClass(const mvceditor::PhpEnvironmentClass& src) 
+	: PhpExecutablePath()
+	, Version(pelet::PHP_53)
+	, IsAuto(true) {
+	Copy(src);
+}
+
+mvceditor::PhpEnvironmentClass& mvceditor::PhpEnvironmentClass::operator=(const mvceditor::PhpEnvironmentClass& src) {
+	Copy(src);
+	return *this;
+}
+
+void mvceditor::PhpEnvironmentClass::Copy(const mvceditor::PhpEnvironmentClass &src) {
+
+	// using c_str() to completely clone a wxString, as by default
+	// the assignment operator is a shallow copy
+	// this makes the copies thread-safe
+	PhpExecutablePath = src.PhpExecutablePath.c_str();
+	Version = src.Version;
+	IsAuto = src.IsAuto;
 }
 
 void mvceditor::PhpEnvironmentClass::AutoDetermine() {
@@ -127,6 +131,59 @@ void mvceditor::PhpEnvironmentClass::AutoDetermine() {
 		
 		// if version string changes
 		Version = pelet::PHP_53;
+	}
+}
+
+mvceditor::EnvironmentClass::EnvironmentClass()
+	: Apache()
+	, Php()
+	, WebBrowsers() {
+	AddDefaults();
+}
+
+mvceditor::EnvironmentClass::EnvironmentClass(const mvceditor::EnvironmentClass& src) 
+	: Apache()
+	, Php()
+	, WebBrowsers() {
+	Copy(src);
+}
+
+mvceditor::EnvironmentClass::~EnvironmentClass() {
+}
+
+mvceditor::EnvironmentClass& mvceditor::EnvironmentClass::operator=(const mvceditor::EnvironmentClass &src) {
+	Copy(src);
+	return *this;
+}
+
+void mvceditor::EnvironmentClass::Copy(const mvceditor::EnvironmentClass& src) {
+	Apache = src.Apache;
+	Php = src.Php;
+	WebBrowsers = src.WebBrowsers;
+}
+
+void mvceditor::EnvironmentClass::AddDefaults() {
+	wxPlatformInfo info;
+	wxString userHome = wxGetUserHome();
+
+	// these are the default installation locations
+	switch (info.GetOperatingSystemId()) {
+		case wxOS_UNIX_LINUX:
+			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Mozilla Firefox"), wxFileName(wxT("/usr/bin/firefox"))));
+			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Google Chrome"), wxFileName(wxT("/usr/bin/google-chrome"))));
+			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Opera"), wxFileName(wxT("/usr/bin/opera"))));
+			break;
+		case wxOS_WINDOWS_NT:
+			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Mozilla Firefox"), wxFileName(wxT("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe"))));
+
+			// by default google installs itself in the user home
+			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Google Chrome"), wxFileName(userHome + wxT("\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe"))));
+			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Internet Explorer"), wxFileName(wxT("C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe"))));
+			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Opera"), wxFileName(wxT("C:\\Program Files (x86)\\Opera\\opera.exe"))));
+			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Safari"), wxFileName(wxT("C:\\Program Files (x86)\\Safari\\Safari.exe"))));
+			break;
+		default:
+			break;
 	}
 }
 
