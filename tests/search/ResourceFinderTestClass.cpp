@@ -337,6 +337,23 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldNotFi
 	CHECK_VECTOR_SIZE(0, Matches);
 }
 
+TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldUseFileSearchWhenResourceIsNotFound) {
+	TestFile = wxT("UserClass.php");
+	Prep(mvceditor::CharToIcu(
+		"<?php\n"
+		"class AdminClass {\n"
+		"\tprivate $name;"
+		"\tfunction getName() {\n"
+		"\t\treturn $this->name;\n"
+		"\t}\n"
+		"}\n"
+		"?>\n"
+	));
+	CollectNearMatchResources(UNICODE_STRING_SIMPLE("user"));
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
+}
+
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhenClassNameIsNotTheExactSame) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"

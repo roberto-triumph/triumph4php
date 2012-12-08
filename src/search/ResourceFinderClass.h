@@ -370,7 +370,9 @@ public:
 	 *  1) A class name or function is given:
 	 *    a class name or function will match if the class/function starts with the query.  If the query is 'User', 
 	 *    the  classes like 'UserAdmin', 'UserGuest' will match, Functions like 'userPrint', 'userIsLoggedIn' 
-	 *    will match as well.
+	 *    will match as well. Note that if a class name or function is not found, then file name search (item 3 below)
+	 *    is performed.  This logic makes it easier for the user to search for something without having to type
+	 *    in entire file names.
 	 * 
 	 *  2) A method name is given:
 	 *     When looking for a method / property, only match methods or properties.  For example, if the query is
@@ -664,12 +666,13 @@ private:
 	void RemovePersistedResources(const std::vector<int>& fileItemIds);
 	
 	/**
-	 * Collects all resources that are files and match the parsed Resource [given to Prepare()]. 
+	 * Collects all resources that are files and match the given name. 
 	 * Any hits will be returned
 	 *
-	 * @param resourceSearch the name of resources to look for
+	 * @param search the name of file to look for. 
+	 * @param lineNumber if this is greater than zero, then only files that contain this many lines will be returned
 	 */
-	std::vector<ResourceClass> CollectNearMatchFiles(const mvceditor::ResourceSearchClass& resourceSearch);
+	std::vector<ResourceClass> CollectNearMatchFiles(const UnicodeString& search, int lineNumber);
 
 	/**
 	 * Collects all resources that are classes / functions / defines and match the the given Resource search.

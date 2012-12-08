@@ -96,12 +96,6 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFeatureClass::SearchFor
 	// TODO: CollectNearResourceMatches shows resources from files that were recently deleted
 	// need to hide them / remove them
 	RemoveNativeMatches(matches);
-	if (matches.empty() && !text.Contains(wxT("."))) {
-		
-		// dot == search for files
-		matches = resourceCache->CollectNearMatchResourcesFromAll(mvceditor::WxToIcu(text + wxT(".")));
-		RemoveNativeMatches(matches);
-	}
 	return matches;
 }
 

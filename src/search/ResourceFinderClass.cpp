@@ -478,10 +478,13 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 	switch (resourceSearch.GetResourceType()) {
 		case mvceditor::ResourceSearchClass::FILE_NAME:
 		case mvceditor::ResourceSearchClass::FILE_NAME_LINE_NUMBER:
-			matches = CollectNearMatchFiles(resourceSearch);
+			matches = CollectNearMatchFiles(resourceSearch.GetFileName(), resourceSearch.GetLineNumber());
 			break;
 		case mvceditor::ResourceSearchClass::CLASS_NAME:
 			matches = CollectNearMatchNonMembers(resourceSearch);
+			if (matches.empty()) {
+				matches = CollectNearMatchFiles(resourceSearch.GetClassName(), resourceSearch.GetLineNumber());
+			}
 			break;
 		case mvceditor::ResourceSearchClass::CLASS_NAME_METHOD_NAME:
 			matches = CollectNearMatchMembers(resourceSearch);
@@ -494,12 +497,12 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 	return matches;
 }
 
-std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNearMatchFiles(const mvceditor::ResourceSearchClass& resourceSearch) {
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNearMatchFiles(const UnicodeString& search, int lineNumber) {
 	wxString path,
 		currentFileName,
 		extension;
 	std::vector<mvceditor::ResourceClass> matches;
-	std::string query = mvceditor::IcuToChar(resourceSearch.GetFileName());
+	std::string query = mvceditor::IcuToChar(search);
 
 	// add the SQL wildcards
 	std::string escaped = SqlEscape(query, '^');
@@ -516,10 +519,10 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 				wxString fullPath = mvceditor::CharToWx(match.c_str());
 				wxFileName::SplitPath(fullPath, &path, &currentFileName, &extension);
 				currentFileName += wxT(".") + extension;
-				wxString fileName = mvceditor::IcuToWx(resourceSearch.GetFileName());
+				wxString fileName = mvceditor::IcuToWx(search);
 				fileName = fileName.Lower();
 				if (wxNOT_FOUND != currentFileName.Lower().Find(fileName)) {
-					if (0 == resourceSearch.GetLineNumber() || GetLineCountFromFile(fullPath) >= resourceSearch.GetLineNumber()) {
+					if (0 == lineNumber || GetLineCountFromFile(fullPath) >= lineNumber) {
 						ResourceClass newItem;
 						newItem.FileItemId = fileItemId;
 						newItem.Identifier = mvceditor::WxToIcu(currentFileName);
