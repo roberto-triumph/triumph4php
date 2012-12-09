@@ -244,6 +244,12 @@ public:
 	void RemoveErrorsFor(const wxString& fileName);
 
 	/**
+	 * add a lint error, and updates the total counts. 
+	 * This would be called when a user introduces a lint error.
+	 */
+	void AddErrorsFor(const wxString& fileName, const pelet::LintResultsClass& lintResult);
+
+	/**
 	 * Marks up the source code control window with the error that is located
 	 * at the given index.  For example; if given index is 0 then the first lint 
 	 * result file (added via AddError()) will be opened, scrolled to the lint error line, and the 
@@ -268,6 +274,12 @@ public:
 	 */
 	void PrintSummary(int totalFiles, int errorFiles);
 
+	/**
+	 * updates the file count label based on errors that have been fixed or new errors that 
+	 * have been introduced
+	 */
+	void UpdateSummary();
+	
 	virtual void OnListDoubleClick(wxCommandEvent& event);
 
 private:
@@ -275,6 +287,10 @@ private:
 	NotebookClass* Notebook;
 
 	std::vector<pelet::LintResultsClass>& LintErrors;
+
+	int TotalFiles;
+
+	int ErrorFiles;
 };
 
 /**

@@ -972,6 +972,7 @@ void mvceditor::CodeControlClass::MarkLintError(const pelet::LintResultsClass& r
 	
 	// positions in scintilla are byte offsets. convert chars to bytes so we can mark
 	// the squigglies properly
+	int byteNumber = 0;
 	if (result.CharacterPosition >= 0) {
 		MarkerAdd(result.LineNumber - 1, LINT_RESULT_MARKER);
 
@@ -989,7 +990,7 @@ void mvceditor::CodeControlClass::MarkLintError(const pelet::LintResultsClass& r
 		
 		// GET_TEXT  message
 		SendMsg(2182, documentLength, (long)buf);	
-		int byteNumber = mvceditor::CharToUtf8Pos(buf, documentLength, charNumber);
+		byteNumber = mvceditor::CharToUtf8Pos(buf, documentLength, charNumber);
 		StartStyling(byteNumber, WordHighlightStyle);
 		SetStyling(errorLength, WordHighlightStyle);
 
@@ -998,6 +999,9 @@ void mvceditor::CodeControlClass::MarkLintError(const pelet::LintResultsClass& r
 		delete[] buf;
 	}
 	Colourise(0, -1);	
+
+	wxString error = mvceditor::IcuToWx(result.Error);
+	CallTipShow(byteNumber, error);
 }
 
 void mvceditor::CodeControlClass::ClearLintErrors() {

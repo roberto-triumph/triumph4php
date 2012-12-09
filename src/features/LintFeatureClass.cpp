@@ -158,7 +158,9 @@ mvceditor::LintResultsPanelClass::LintResultsPanelClass(wxWindow *parent, int id
 														std::vector<pelet::LintResultsClass>& lintErrors)
 	: LintResultsGeneratedPanelClass(parent, id) 
 	, Notebook(notebook) 
-	, LintErrors(lintErrors) {
+	, LintErrors(lintErrors)
+	, TotalFiles(0)
+	, ErrorFiles(0) {
 			
 }
 
@@ -199,28 +201,68 @@ void mvceditor::LintResultsPanelClass::RemoveErrorsFor(const wxString& fileName)
 	int i = 0;
 
 	UnicodeString uniFileName = mvceditor::WxToIcu(fileName);
+	bool found = false;
 	while (it != LintErrors.end()) {
 		if (it->UnicodeFilename == uniFileName) {
 			it = LintErrors.erase(it);
 			ErrorsList->Delete(i);
 			i--;
+			found = true;
 		}
 		else {
 			i++;
 			it++;
 		}
 	}
+	if (found) {
+		ErrorFiles--;
+		UpdateSummary();
+	}
+}
+
+void mvceditor::LintResultsPanelClass::AddErrorsFor(const wxString& fileName, const pelet::LintResultsClass& lintResult) {
+	// remove the lint result data structures as well as the 
+	// display list
+	std::vector<pelet::LintResultsClass>::iterator it = LintErrors.begin();
+	int i = 0;
+	bool found = false;
+	UnicodeString uniFileName = mvceditor::WxToIcu(fileName);
+	while (it != LintErrors.end()) {
+		if (it->UnicodeFilename == uniFileName) {
+			it = LintErrors.erase(it);
+			ErrorsList->Delete(i);
+			i--;
+			found = true;
+		}
+		else {
+			i++;
+			it++;
+		}
+	}
+	AddError(lintResult);
+
+	// if this file has an error for the first time, increment the counter
+	if (!found) {
+		ErrorFiles++;
+	}
+	UpdateSummary();
 }
 
 void mvceditor::LintResultsPanelClass::PrintSummary(int totalFiles, int errorFiles) {
-	if (0 == errorFiles) {
+	TotalFiles = totalFiles;
+	ErrorFiles = errorFiles;
+	UpdateSummary();
+}
+
+void mvceditor::LintResultsPanelClass::UpdateSummary() {
+	if (0 == ErrorFiles) {
 		this->Label->SetLabel(
-			wxString::Format(_("No errors found; checked %d files"), totalFiles)
+			wxString::Format(_("No errors found; checked %d files"), TotalFiles)
 		);
 	}
 	else {
 		this->Label->SetLabel(
-			wxString::Format(_("Found %d files with errors; checked %d files"), errorFiles, totalFiles)
+			wxString::Format(_("Found %d files with errors; checked %d files"), ErrorFiles, TotalFiles)
 		);
 	}
 }
@@ -382,15 +424,9 @@ void mvceditor::LintFeatureClass::OnFileSaved(mvceditor::FileSavedEventClass& ev
 	mvceditor::CodeControlClass* codeControl = event.GetCodeControl();
 	wxString fileName = codeControl->GetFileName();
 	codeControl->ClearLintErrors();
-
 	bool hasErrors = !LintErrors.empty();
 
-	// remove lint results for this file from the display list
-	if (ResultsPanel) {
-		ResultsPanel->RemoveErrorsFor(fileName);
-	}
-
-	// if user has configure to do lint check on saving or user is cleanin up
+	// if user has configure to do lint check on saving or user is cleaning up
 	// errors (after they manually lint checked the project) then re-check
 	if (hasErrors || CheckOnSave) {
 		pelet::LintResultsClass lintResults;
@@ -400,23 +436,28 @@ void mvceditor::LintFeatureClass::OnFileSaved(mvceditor::FileSavedEventClass& ev
 			
 			// handle the case where user has saved a file but has not clicked
 			// on the Lint project button.
-			if (!ResultsPanel) {
-				ResultsPanel = new LintResultsPanelClass(GetToolsNotebook(), ID_LINT_RESULTS_PANEL, GetNotebook(), LintErrors);
-				AddToolsWindow(ResultsPanel, _("Lint Check"));
-				SetFocusToToolsWindow(ResultsPanel);
-			}
-			int previousPos = -1;
-			mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
-			if (codeControl) {
-				previousPos = GetCurrentCodeControl()->GetCurrentPos();
-			}
-			ResultsPanel->AddError(lintResults);
+			if (ResultsPanel) {
 
-			// diplaying the lint causes things to be redrawn; put the cursor 
-			// where the user left it
-			if (previousPos >= 0 && codeControl) {
-				codeControl->GotoPos(previousPos);
+				// remove lint results for this file from the display list	
+				// and put the new error
+				ResultsPanel->AddErrorsFor(fileName, lintResults);
 			}
+			if (codeControl) {
+				int previousPos = codeControl->GetCurrentPos();
+				codeControl->MarkLintError(lintResults);
+			
+				// diplaying the lint causes things to be redrawn; put the cursor 
+				// where the user left it
+				codeControl->GotoPos(previousPos);
+				codeControl->SetFocus();
+
+				wxString error = mvceditor::IcuToWx(lintResults.Error);
+				error += wxString::Format(wxT(" on line %d, offset %d"), lintResults.LineNumber, lintResults.CharacterPosition);
+				codeControl->CallTipShow(previousPos, error);
+			}
+		}
+		else if (ResultsPanel) {
+			ResultsPanel->RemoveErrorsFor(fileName);
 		}
 		delete thread;
 	}
