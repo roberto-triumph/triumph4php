@@ -560,6 +560,13 @@ public:
 	
 private:
 
+	int IdDetectFramework;
+	int IdDetectDatabase;
+	int IdDetectConfig;
+	int IdDetectResources;
+	int IdDetectUrl;
+	int IdDetectViewFiles;
+	
 	/**
 	 * To call the PHP framework detection scripts.
 	 */
@@ -605,7 +612,7 @@ private:
 	 * the location of the PHP executable (php.exe)
 	 */
 	wxString  PhpExecutablePath;
-	
+
 	/**
 	 * methods that get called when one of the external processes finishes
 	 */
