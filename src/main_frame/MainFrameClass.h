@@ -72,6 +72,8 @@ private:
 	
 	void OnCodeNotebookPageClosed(wxAuiNotebookEvent& event);
 
+	void OnAppFileCreated(wxCommandEvent& event);
+
 	/**
 	 * Need the frame to manipulate it
 	 */

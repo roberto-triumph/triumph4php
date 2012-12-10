@@ -115,6 +115,10 @@ bool mvceditor::NotebookClass::SavePage(int pageIndex) {
 					: newFilename;
 				SetPageText(pageIndex, newFilename);
 				saved = true;
+
+				wxCommandEvent createdEvt(mvceditor::EVENT_APP_FILE_CREATED);
+				createdEvt.SetString(newFullPath);
+				EventSink->Publish(createdEvt);
 			}
 		}
 	}
@@ -291,6 +295,10 @@ bool mvceditor::NotebookClass::SaveCurrentPageAsNew() {
 					wxMessageBox(wxT("Could Not Save File."));
 				}
 				saveAsFile.Close();
+
+				wxCommandEvent createdEvt(mvceditor::EVENT_APP_FILE_CREATED);
+				createdEvt.SetString(newFullPath);
+				EventSink->Publish(createdEvt);
 			}
 		}
 	}

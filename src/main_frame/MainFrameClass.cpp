@@ -752,6 +752,10 @@ void mvceditor::AppEventListenerForFrameClass::OnCodeNotebookPageClosed(wxAuiNot
 	MainFrame->UpdateTitleBar();
 }
 
+void mvceditor::AppEventListenerForFrameClass::OnAppFileCreated(wxCommandEvent& event) {
+	MainFrame->UpdateTitleBar();
+}
+
 BEGIN_EVENT_TABLE(mvceditor::MainFrameClass,  MainFrameGeneratedClass)
 	EVT_STC_SAVEPOINTREACHED(wxID_ANY, mvceditor::MainFrameClass::DisableSave)
 	EVT_STC_SAVEPOINTLEFT(wxID_ANY, mvceditor::MainFrameClass::EnableSave)
@@ -807,6 +811,7 @@ END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::AppEventListenerForFrameClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_FILE_OPEN, mvceditor::AppEventListenerForFrameClass::OnCmdFileOpen)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_CREATED, mvceditor::AppEventListenerForFrameClass::OnAppFileCreated)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::AppEventListenerForFrameClass::OnPreferencesSaved)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, mvceditor::AppEventListenerForFrameClass::OnPreferencesExternallyUpdated)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::AppEventListenerForFrameClass::OnAppReady)

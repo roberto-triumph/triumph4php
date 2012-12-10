@@ -65,6 +65,12 @@ private:
 	 */
 	void OnAppFileOpened(wxCommandEvent& event);
 
+	/**
+	 * when a file has been created, add it to the recent
+	 * list.
+	 */
+	void OnAppFileCreated(wxCommandEvent& event);
+
 	DECLARE_EVENT_TABLE()
 };
 

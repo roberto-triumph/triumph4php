@@ -158,6 +158,13 @@ extern const wxEventType EVENT_APP_EXIT;
 extern const wxEventType EVENT_APP_FILE_OPENED;
 
 /**
+ * Notification that a new file has been created on the file system.  A file is created when
+ * the user opens a new buffer and then saves it. The event will contain
+ * the full path of the file that was opened in the GetString() method; 
+ */
+extern const wxEventType EVENT_APP_FILE_CREATED;
+
+/**
  * Notification that a file has been closed.  The event will contain
  * the full path of the file that was closed; the path may be the 
  * empty string when a new file is closed.
