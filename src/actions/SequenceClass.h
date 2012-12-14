@@ -125,6 +125,12 @@ public:
 	 */
 	bool Running() const;
 
+	/**
+	 * stops a sequence that is currently running. Note that RunningThreads.StopAll()
+	 * must have been called in order for this method to work.
+	 */
+	void Stop();
+
 protected:
 
 	/**

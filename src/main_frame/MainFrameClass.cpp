@@ -123,9 +123,11 @@ void mvceditor::MainFrameClass::OnClose(wxCloseEvent& event) {
 			delete logger;
 		}
 		wxLog::DontCreateOnDemand();
-		
+		App.Sequences.Stop();
+
 		App.RunningThreads.RemoveEventHandler(this);
 		App.RunningThreads.StopAll();
+		
 
 		// delete the features first so that we can destroy
 		// the windows without worrying if the features

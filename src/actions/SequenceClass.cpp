@@ -42,9 +42,18 @@ mvceditor::SequenceClass::SequenceClass(mvceditor::GlobalsClass& globals, mvcedi
 
 mvceditor::SequenceClass::~SequenceClass() {
 	RunningThreads.RemoveEventHandler(this);
+	Stop();
+}
+
+void mvceditor::SequenceClass::Stop() {
 	if (!Steps.empty()) {
 
-		// no need to delete. it will delete itself
+		// remove the step that just finished
+		// note that async steps automatically delete themselves since they
+		// are run using wxThread::run so we take care to not double-delete those
+		if (!IsCurrentStepAsync) {
+			delete Steps.front();
+		}
 		Steps.pop();
 	}
 
@@ -56,6 +65,7 @@ mvceditor::SequenceClass::~SequenceClass() {
 		delete Steps.front();
 		Steps.pop();
 	}
+	IsRunning = false;
 }
 
 bool mvceditor::SequenceClass::AppStart() {
