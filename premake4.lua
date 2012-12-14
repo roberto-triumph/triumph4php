@@ -478,6 +478,9 @@ solution "mvc-editor"
 		configuration "Release"
 			wxconfiguration("Release", _ACTION)
 			wxappconfiguration("Release", _ACTION)
+		configuration { "gmake or codelite" }
+			-- prevent warning: deprecated conversion from string constant to char*
+			buildoptions { "-Wwrite-strings" }
 
 	project "pelet"
 		language "C++"
