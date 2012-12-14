@@ -462,6 +462,9 @@ solution "mvc-editor"
 		configuration { "vs2008" }
 			-- prevent warning from killing build: warning C4018: '<' : signed/unsigned mismatch
 			buildoptions { "/W1" }
+		configuration { "gmake or codelite" }
+			-- prevent warning: deprecated conversion from string constant to char*
+			buildoptions { "-Wno-write-strings" }
 
 	project "keybinder_test"
 		language "C++"
@@ -475,6 +478,9 @@ solution "mvc-editor"
 		configuration "Release"
 			wxconfiguration("Release", _ACTION)
 			wxappconfiguration("Release", _ACTION)
+		configuration { "gmake or codelite" }
+			-- prevent warning: deprecated conversion from string constant to char*
+			buildoptions { "-Wno-write-strings" }
 
 	project "pelet"
 		language "C++"

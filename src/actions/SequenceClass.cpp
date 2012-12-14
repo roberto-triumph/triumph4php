@@ -32,7 +32,8 @@
 #include <globals/Errors.h>
 
 mvceditor::SequenceClass::SequenceClass(mvceditor::GlobalsClass& globals, mvceditor::RunningThreadsClass& runningThreads)
-	: Globals(globals)
+	: wxEvtHandler()
+	, Globals(globals)
 	, RunningThreads(runningThreads)
 	, Steps()
 	, IsRunning(false) 
