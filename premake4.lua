@@ -464,7 +464,7 @@ solution "mvc-editor"
 			buildoptions { "/W1" }
 		configuration { "gmake or codelite" }
 			-- prevent warning: deprecated conversion from string constant to char*
-			buildoptions { "-Wwrite-strings" }
+			buildoptions { "-Wno-write-strings" }
 
 	project "keybinder_test"
 		language "C++"
@@ -480,7 +480,7 @@ solution "mvc-editor"
 			wxappconfiguration("Release", _ACTION)
 		configuration { "gmake or codelite" }
 			-- prevent warning: deprecated conversion from string constant to char*
-			buildoptions { "-Wwrite-strings" }
+			buildoptions { "-Wno-write-strings" }
 
 	project "pelet"
 		language "C++"
