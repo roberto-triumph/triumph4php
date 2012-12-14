@@ -413,12 +413,15 @@ public:
 	 * Note that if any exact matches are found, then no near-matches will be collected.
 	 * 
 	 * @param resourceSearch the partial name of resources to look for
+	 * @param doCollectFileNames if TRUE, then file name matches will be returned if no
+	 *        class / function names are found
 	 * @return matches the list of matched resources (max of 50)
 	 *         Because this search is done on a database,
 	 *         the returned list may contain matches from files that are no longer in 
 	 *         the file system.
 	 */
-	std::vector<ResourceClass> CollectNearMatchResources(const mvceditor::ResourceSearchClass& resourceSearch);
+	std::vector<ResourceClass> CollectNearMatchResources(const mvceditor::ResourceSearchClass& resourceSearch,
+		bool doCollectFileNames = false);
 	
 	/**
 	 * Get the parent class of a given resource. For example, let's say source code contained two classes: AdminClass and 

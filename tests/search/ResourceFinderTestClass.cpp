@@ -61,9 +61,9 @@ public:
 		CreateFixtureFile(TestFile, source);
 	}
 
-	void CollectNearMatchResources(const UnicodeString& search) {
+	void CollectNearMatchResources(const UnicodeString& search, bool doCollectFileNames = false) {
 		mvceditor::ResourceSearchClass resourceSearch(search);
-		Matches = ResourceFinder.CollectNearMatchResources(resourceSearch);
+		Matches = ResourceFinder.CollectNearMatchResources(resourceSearch, doCollectFileNames);
 	}
 
 	mvceditor::ResourceFinderClass ResourceFinder;
@@ -96,9 +96,9 @@ public:
 		ResourceFinder.BuildResourceCacheForFile(TestFile, source, true);
 	}
 
-	void CollectNearMatchResources(const UnicodeString& search) {
+	void CollectNearMatchResources(const UnicodeString& search, bool doCollectFileNames = false) {
 		mvceditor::ResourceSearchClass resourceSearch(search);
-		Matches = ResourceFinder.CollectNearMatchResources(resourceSearch);
+		Matches = ResourceFinder.CollectNearMatchResources(resourceSearch, doCollectFileNames);
 	}
 
 	mvceditor::ResourceFinderClass ResourceFinder;
@@ -349,7 +349,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldUseFi
 		"}\n"
 		"?>\n"
 	));
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("user"));
+	CollectNearMatchResources(UNICODE_STRING_SIMPLE("user"), true);
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 }

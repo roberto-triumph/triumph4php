@@ -263,7 +263,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceCacheClass::CollectNear
 	}
 	for (size_t i = 0; i < finders.size(); ++i) {
 		mvceditor::ResourceFinderClass* resourceFinder = finders[i];
-		std::vector<mvceditor::ResourceClass> finderMatches = resourceFinder->CollectNearMatchResources(resourceSearch);
+		std::vector<mvceditor::ResourceClass> finderMatches = resourceFinder->CollectNearMatchResources(resourceSearch, true);
 		size_t count = finderMatches.size();
 		for (size_t j = 0; j < count; ++j) {
 			mvceditor::ResourceClass resource = finderMatches[j];

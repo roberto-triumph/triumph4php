@@ -703,7 +703,7 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 					matches = finder->CollectFullyQualifiedResource(resourceSearch);
 				}
 				else {
-					matches = finder->CollectNearMatchResources(resourceSearch);
+					matches = finder->CollectNearMatchResources(resourceSearch, false);
 				}
 				
 				// now we loop through the possbile matches and remove stuff that does not 

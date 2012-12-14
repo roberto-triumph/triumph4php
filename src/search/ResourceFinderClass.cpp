@@ -467,7 +467,9 @@ bool mvceditor::ResourceFinderClass::GetResourceMatchPosition(const mvceditor::R
 	return false;
 }
 
-std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNearMatchResources(const mvceditor::ResourceSearchClass& resourceSearch) {
+std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNearMatchResources(
+	const mvceditor::ResourceSearchClass& resourceSearch,
+	bool doCollectFileNames) {
 
 	
 	// at one point there was a check here to see if the  resource files existed
@@ -482,7 +484,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 			break;
 		case mvceditor::ResourceSearchClass::CLASS_NAME:
 			matches = CollectNearMatchNonMembers(resourceSearch);
-			if (matches.empty()) {
+			if (matches.empty() && doCollectFileNames) {
 				matches = CollectNearMatchFiles(resourceSearch.GetClassName(), resourceSearch.GetLineNumber());
 			}
 			break;
