@@ -98,8 +98,10 @@ bool mvceditor::WorkingCacheClass::Update(const UnicodeString& code) {
 	pelet::LintResultsClass results;
 
 	// check for syntax so that only 'good' code modifies the cache
+	// allow empty code to be valid; that way code completion works
+	// on newly created files
 	bool ret = false;
-	if (Parser.LintString(code, results)) {
+	if (code.isEmpty() || Parser.LintString(code, results)) {
 		ResourceFinder.BuildResourceCacheForFile(FileName, code, IsNew);
 		SymbolTable.CreateSymbols(code);
 		ret = true;

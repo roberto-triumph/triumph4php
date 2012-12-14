@@ -541,6 +541,9 @@ BEGIN_EVENT_TABLE(mvceditor::ResourceFeatureClass, wxEvtHandler)
 
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_CLOSED, mvceditor::ResourceFeatureClass::OnAppFileClosed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_OPENED, mvceditor::ResourceFeatureClass::OnAppFileOpened)
+
+	// we will treat file new and file opened the same
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_NEW, mvceditor::ResourceFeatureClass::OnAppFileOpened)
 	EVT_FEATURE_FILE_SAVED(mvceditor::ResourceFeatureClass::OnAppFileSaved)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::ResourceFeatureClass::OnAppReady)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ResourceFeatureClass::OnWipeAndIndexWorkInProgress)

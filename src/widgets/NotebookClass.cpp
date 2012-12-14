@@ -174,7 +174,13 @@ void mvceditor::NotebookClass::AddMvcEditorPage(mvceditor::CodeControlClass::Mod
 	AddPage(page, wxString::Format(format, NewPageNumber++), true, 
 		wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_TOOLBAR, 
 		wxSize(16, 16)));
+
+	// make the gui response ASAP thaw it before notifying the rest of the app
 	this->Thaw();
+
+	wxCommandEvent newEvent(mvceditor::EVENT_APP_FILE_NEW);
+	EventSink->Publish(newEvent);
+	
 }
 
 void mvceditor::NotebookClass::LoadPage() {

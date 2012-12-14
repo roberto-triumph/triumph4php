@@ -165,6 +165,13 @@ extern const wxEventType EVENT_APP_FILE_OPENED;
 extern const wxEventType EVENT_APP_FILE_CREATED;
 
 /**
+ * Notification that a new code control tab has been created.  Since this is a 
+ * file not yet on the file system, there is no filename associated with the new 
+ * tab.
+ */
+extern const wxEventType EVENT_APP_FILE_NEW;
+
+/**
  * Notification that a file has been closed.  The event will contain
  * the full path of the file that was closed; the path may be the 
  * empty string when a new file is closed.

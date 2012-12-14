@@ -95,10 +95,12 @@ void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
 			CurrentFileIsNew = false;
 		}
 
-		if (!code.isEmpty()) {
+		if (!fileIdentifier.IsEmpty()) {
 
 			// make sure to use the local variables and not the class ones
 			// since this code is outside the mutex
+			// even if code is empty, lets create a working cache so that the 
+			// file is registered and code completion works
 			mvceditor::WorkingCacheClass* cache = new mvceditor::WorkingCacheClass();
 			cache->Init(fileName, fileIdentifier, isNew, version, false);
 			bool good = cache->Update(code);
