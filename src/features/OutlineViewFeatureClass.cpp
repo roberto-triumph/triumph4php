@@ -288,7 +288,6 @@ void mvceditor::OutlineViewFeatureClass::OnResourceFinderComplete(mvceditor::Res
 	wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 	if (window != NULL) {
 		OutlineViewPanelClass* outlineViewPanel = (OutlineViewPanelClass*)window;
-		SetFocusToOutlineWindow(outlineViewPanel);
 		outlineViewPanel->RefreshOutlines(event.Resources);
 	}
 }
@@ -299,6 +298,15 @@ void mvceditor::OutlineViewFeatureClass::OnGlobalClassesComplete(mvceditor::Glob
 		OutlineViewPanelClass* outlineViewPanel = (OutlineViewPanelClass*)window;
 		SetFocusToOutlineWindow(outlineViewPanel);
 		outlineViewPanel->SetClasses(event.GetAllClasses());
+	}
+}
+
+void mvceditor::OutlineViewFeatureClass::OnFileSaved(mvceditor::FileSavedEventClass& event) {
+	wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
+
+	// if the outline tab is showing, lets update the contents (by notifying the background thread to reparse the file)
+	if (window != NULL && ResourceFinderBackgroundThread) {
+		ResourceFinderBackgroundThread->Start(event.GetCodeControl()->GetFileName(), GetEnvironment()->Php.Version);
 	}
 }
 
@@ -500,4 +508,5 @@ BEGIN_EVENT_TABLE(mvceditor::OutlineViewFeatureClass, wxEvtHandler)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::OutlineViewFeatureClass::OnContentNotebookPageChanged)
 	EVT_RESOURCE_FINDER_COMPLETE(ID_RESOURCE_FINDER_BACKGROUND, mvceditor::OutlineViewFeatureClass::OnResourceFinderComplete)
 	EVT_GLOBAL_CLASSES_COMPLETE(ID_GLOBAL_CLASSES_THREAD, mvceditor::OutlineViewFeatureClass::OnGlobalClassesComplete)
+	EVT_FEATURE_FILE_SAVED(mvceditor::OutlineViewFeatureClass::OnFileSaved)
 END_EVENT_TABLE()

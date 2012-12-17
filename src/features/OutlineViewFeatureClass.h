@@ -240,6 +240,12 @@ private:
 	 * update the outline panel
 	 */
 	void OnGlobalClassesComplete(mvceditor::GlobalClassesCompleteEventClass& event);
+	
+	/**
+	 * when a file is saved and the outline tab is opened, make sure to refresh the outline
+	 * tab contents with the latest content
+	 */
+	void OnFileSaved(mvceditor::FileSavedEventClass& event);
 
 	/**
 	 * Since this thread will be alive as long as the program is running, we guard against access
