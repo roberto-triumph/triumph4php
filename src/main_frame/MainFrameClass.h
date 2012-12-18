@@ -148,6 +148,7 @@ protected:
 	void OnFileRun(wxCommandEvent& event);
 	void OnFileOpen(wxCommandEvent& event);
 	void OnFileSaveAs(wxCommandEvent& event);
+	void OnFileSaveAll(wxCommandEvent& event);
 	void OnFileRevert(wxCommandEvent& event);
 	void OnFileClose(wxCommandEvent& event);
 	void OnFileExit(wxCommandEvent& event);

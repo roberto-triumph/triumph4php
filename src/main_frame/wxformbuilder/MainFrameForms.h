@@ -59,6 +59,7 @@ class MainFrameGeneratedClass : public wxFrame
 		void _wxFB_OnFileOpen( wxCommandEvent& event ){ OnFileOpen( event ); }
 		void _wxFB_OnFileSave( wxCommandEvent& event ){ OnFileSave( event ); }
 		void _wxFB_OnFileSaveAs( wxCommandEvent& event ){ OnFileSaveAs( event ); }
+		void _wxFB_OnFileSaveAll( wxCommandEvent& event ){ OnFileSaveAll( event ); }
 		void _wxFB_OnFileRevert( wxCommandEvent& event ){ OnFileRevert( event ); }
 		void _wxFB_OnFileClose( wxCommandEvent& event ){ OnFileClose( event ); }
 		void _wxFB_OnFileExit( wxCommandEvent& event ){ OnFileExit( event ); }
@@ -81,6 +82,7 @@ class MainFrameGeneratedClass : public wxFrame
 			ID_FILE_SQL_NEW,
 			ID_FILE_CSS_NEW,
 			ID_FILE_TEXT_NEW_FILE,
+			ID_FILE_SAVE_ALL,
 			ID_FILE_REVERT,
 			ID_FILE_CLOSE,
 			ID_EDIT_CONTENT_ASSIST,
@@ -109,6 +111,7 @@ class MainFrameGeneratedClass : public wxFrame
 		virtual void OnFileOpen( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFileSave( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFileSaveAs( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnFileSaveAll( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFileRevert( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFileClose( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFileExit( wxCommandEvent& event ) { event.Skip(); }

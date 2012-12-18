@@ -338,6 +338,14 @@ bool mvceditor::NotebookClass::SaveAllModifiedPages() {
 	return changed;
 }
 
+void mvceditor::NotebookClass::SaveAllModifiedPagesWithoutPrompting() {
+	for (size_t i = 0; i < GetPageCount(); i++) {
+		if (IsPageModified(i)) {
+			SavePage(i);
+		}
+	}
+}
+
 bool mvceditor::NotebookClass::IsPageModified(int pageNumber) const {
 	CodeControlClass* codeCtrl = GetCodeControl(pageNumber);
 	return codeCtrl && codeCtrl->GetModify();

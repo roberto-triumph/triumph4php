@@ -22,6 +22,7 @@ BEGIN_EVENT_TABLE( MainFrameGeneratedClass, wxFrame )
 	EVT_MENU( wxID_OPEN, MainFrameGeneratedClass::_wxFB_OnFileOpen )
 	EVT_MENU( wxID_SAVE, MainFrameGeneratedClass::_wxFB_OnFileSave )
 	EVT_MENU( wxID_SAVEAS, MainFrameGeneratedClass::_wxFB_OnFileSaveAs )
+	EVT_MENU( ID_FILE_SAVE_ALL, MainFrameGeneratedClass::_wxFB_OnFileSaveAll )
 	EVT_MENU( ID_FILE_REVERT, MainFrameGeneratedClass::_wxFB_OnFileRevert )
 	EVT_MENU( ID_FILE_CLOSE, MainFrameGeneratedClass::_wxFB_OnFileClose )
 	EVT_MENU( wxID_EXIT, MainFrameGeneratedClass::_wxFB_OnFileExit )
@@ -82,6 +83,11 @@ MainFrameGeneratedClass::MainFrameGeneratedClass( wxWindow* parent, wxWindowID i
 	MenuItemFileSaveAs = new wxMenuItem( FileMenu, wxID_SAVEAS, wxString( _("Save &As") ) , wxEmptyString, wxITEM_NORMAL );
 	FileMenu->Append( MenuItemFileSaveAs );
 	MenuItemFileSaveAs->Enable( false );
+	
+	wxMenuItem* MenuItemSaveAll;
+	MenuItemSaveAll = new wxMenuItem( FileMenu, ID_FILE_SAVE_ALL, wxString( _("Save A&ll") ) + wxT('\t') + wxT("CTRL+SHIFT+S"), wxEmptyString, wxITEM_NORMAL );
+	FileMenu->Append( MenuItemSaveAll );
+	MenuItemSaveAll->Enable( false );
 	
 	wxMenuItem* MenuItemRevert;
 	MenuItemRevert = new wxMenuItem( FileMenu, ID_FILE_REVERT, wxString( _("Revert") ) , _("Reload the file from Disk"), wxITEM_NORMAL );

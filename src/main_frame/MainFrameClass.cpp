@@ -183,6 +183,10 @@ void mvceditor::MainFrameClass::OnFileSaveAs(wxCommandEvent& event) {
 	Notebook->SaveCurrentPageAsNew();
 }
 
+void mvceditor::MainFrameClass::OnFileSaveAll(wxCommandEvent& event) {
+	Notebook->SaveAllModifiedPagesWithoutPrompting();
+}
+
 void mvceditor::MainFrameClass::FileOpen(const std::vector<wxString>& filenames) {
 	Notebook->LoadPages(filenames);
 }
@@ -357,6 +361,16 @@ void mvceditor::MainFrameClass::EnableSave(wxStyledTextEvent& event) {
 	//Layout();  commenting this out because it is causing find/find in files replace all matches in file to not work
 	MenuBar->Enable(wxID_SAVEAS, true);
 	MenuBar->Enable(ID_FILE_REVERT, true);
+
+	// if at least one document needs to be saved, enable the save all menu
+	bool someModified = false;
+	for (size_t i = 0; i < Notebook->GetPageCount(); ++i) {
+		mvceditor::CodeControlClass* ctrl = Notebook->GetCodeControl(i);
+		if (ctrl) {
+			someModified |= ctrl->GetModify();
+		}
+	}
+	MenuBar->Enable(ID_FILE_SAVE_ALL, someModified);
 	Notebook->MarkPageAsModified(event.GetId());
 }
 
@@ -369,6 +383,15 @@ void mvceditor::MainFrameClass::DisableSave(wxStyledTextEvent& event) {
 	//Layout(); commenting this out because it is causing find/find in files replace all matches in file to not work
 	MenuBar->Enable(wxID_SAVEAS, false);
 	MenuBar->Enable(ID_FILE_REVERT, false);
+
+	bool someModified = false;
+	for (size_t i = 0; i < Notebook->GetPageCount(); ++i) {
+		mvceditor::CodeControlClass* ctrl = Notebook->GetCodeControl(i);
+		if (ctrl) {
+			someModified |= ctrl->GetModify();
+		}
+	}
+	MenuBar->Enable(ID_FILE_SAVE_ALL, someModified);
 	Notebook->MarkPageAsNotModified(event.GetId());
 }
 
@@ -632,6 +655,7 @@ void mvceditor::MainFrameClass::DefaultKeyboardShortcuts() {
 	defaultMenus[wxID_OPEN] = wxT("File-Open");
 	defaultMenus[wxID_SAVE] = wxT("File-Save");
 	defaultMenus[wxID_SAVEAS] = wxT("File-Save As");
+	defaultMenus[ID_FILE_SAVE_ALL] = wxT("File-Save All");
 	defaultMenus[ID_FILE_REVERT] = wxT("File-Revert");
 	defaultMenus[ID_FILE_CLOSE] = wxT("File-Close");
 	defaultMenus[wxID_EXIT] = wxT("File-Exit");

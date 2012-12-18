@@ -152,11 +152,20 @@ public:
 	
 	/**
 	 * Look through all open files and save the modified files. Prompts for 
-	 * names for all new files.
+	 * names for all new files. This is a bit different from SaveAllModifiedPagesWithoutPrompting
+	 * in that this method will always ask the user which files to save, where as 
+	 * SaveAllModifiedPagesWithoutPrompting will not prompt the user unless the file is new.
 	 * 
 	 * @return bool false if the user cancels the save process.
 	 */
 	bool SaveAllModifiedPages();
+
+	/**
+	 * Look through all open files and save the modified files. Will only 
+	 * prompts for names for new buffers.
+	 *
+	 */
+	void SaveAllModifiedPagesWithoutPrompting();
 
 	/**
 	 * Get the source code control at the given index.
