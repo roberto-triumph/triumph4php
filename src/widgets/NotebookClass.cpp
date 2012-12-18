@@ -380,8 +380,18 @@ void mvceditor::NotebookClass::OnCloseAllPages(wxCommandEvent& event) {
 
 void mvceditor::NotebookClass::CloseAllPages() {
 	this->Freeze();
-	while (GetPageCount()) {
+	while (GetPageCount() > 0) {
 		DeletePage(0);
+
+		// notify owner that the tab has been closed
+		// we must do it here; aui notebook's DeletePage does not
+		// generate events
+		wxAuiNotebookEvent evt(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSED, this->GetId());
+
+		// tab index
+		evt.SetSelection(0);
+		evt.SetEventObject(this);
+		EventSink->Publish(evt);
 	}
 	this->Thaw();
 }

@@ -600,6 +600,10 @@ void mvceditor::MainFrameClass::OnUppercase(wxCommandEvent& event) {
 }
 
 void mvceditor::MainFrameClass::OnCodeControlUpdate(wxStyledTextEvent& event) {
+	UpdateStatusBar();
+}
+
+void mvceditor::MainFrameClass::UpdateStatusBar() {
 	CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
 	if (codeControl) {
 		int pos = codeControl->GetCurrentPos();
@@ -612,6 +616,9 @@ void mvceditor::MainFrameClass::OnCodeControlUpdate(wxStyledTextEvent& event) {
 		GetStatusBarWithGauge()->SetColumn1Text(
 			wxString::Format(wxT("Line:%d Column:%d Offset:%d"), line, column, pos)
 		);
+	}
+	else {
+		GetStatusBarWithGauge()->SetColumn1Text(wxEmptyString);
 	}
 }
 
@@ -750,13 +757,17 @@ void mvceditor::AppEventListenerForFrameClass::OnCodeNotebookPageChanged(wxAuiNo
 	MainFrame->UpdateTitleBar();
 }
 
-void mvceditor::AppEventListenerForFrameClass::OnCodeNotebookPageClosed(wxAuiNotebookEvent& event) {
-	MainFrame->UpdateTitleBar();
-}
-
 void mvceditor::AppEventListenerForFrameClass::OnAppFileCreated(wxCommandEvent& event) {
 	MainFrame->UpdateTitleBar();
 }
+
+void mvceditor::AppEventListenerForFrameClass::OnCodeNotebookPageClosed(wxAuiNotebookEvent& event) {
+	MainFrame->UpdateTitleBar();
+
+	// in case all notebook tabs have been closed, we need to refresh the cursor position
+	MainFrame->UpdateStatusBar();
+}
+
 
 BEGIN_EVENT_TABLE(mvceditor::MainFrameClass,  MainFrameGeneratedClass)
 	EVT_STC_SAVEPOINTREACHED(wxID_ANY, mvceditor::MainFrameClass::DisableSave)

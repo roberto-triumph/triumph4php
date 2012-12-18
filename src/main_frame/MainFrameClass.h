@@ -127,6 +127,11 @@ public:
 	 */
 	void UpdateTitleBar();
 
+	/**
+	 * repaint the status bar; cursor line position
+	 */
+	void UpdateStatusBar();
+
 protected:
 
 	// Handlers for MainFrameGeneratedClass events.
