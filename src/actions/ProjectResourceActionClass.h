@@ -49,6 +49,8 @@ public:
 	 */
 	ProjectResourceActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
+	~ProjectResourceActionClass();
+
 	/**
 	 * prepare to iterate through the given file. The name part of the given file must match the wildcard.
 	 * This method can be used to update the resources once a file has been modified on disk.

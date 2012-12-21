@@ -35,6 +35,10 @@ mvceditor::ProjectResourceActionClass::ProjectResourceActionClass(mvceditor::Run
 	, DoTouchedProjects(false) {
 }
 
+mvceditor::ProjectResourceActionClass::~ProjectResourceActionClass() {
+	BackgroundCleanup();
+}
+
 bool mvceditor::ProjectResourceActionClass::InitForFile(const mvceditor::ProjectClass& project, const wxString& fullPath, pelet::Versions version) {
 	wxFileName fileName(fullPath);
 	if (!fileName.FileExists()) {
@@ -128,6 +132,9 @@ void mvceditor::ProjectResourceActionClass::IterateProjects() {
 
 		if (DirectorySearch.Init(sources)) {
 			wxASSERT_MSG(GlobalCache == NULL, _("cache pointer has not been cleaned up"));
+			if (GlobalCache) {
+				delete GlobalCache;
+			}
 			SetStatus(_("Updating Index for ") + project.Label);
 			GlobalCache = new mvceditor::GlobalCacheClass;
 			GlobalCache->Init(project.ResourceDbFileName, project.PhpFileExtensions, miscFileExtensions, Version, 1024);
