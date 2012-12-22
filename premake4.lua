@@ -243,7 +243,6 @@ solution "mvc-editor"
 			"src/language/SqlLexicalAnalyzerClass.cpp",
 			"src/language/SymbolTableClass.cpp",
 			"src/language/ResourceCacheClass.cpp",
-			"src/php_frameworks/FrameworkDetectorClass.cpp",
 			"src/php_frameworks/CallStackClass.cpp",
 			"src/search/DirectorySearchClass.cpp",
 			"src/search/FinderClass.cpp",
