@@ -550,14 +550,19 @@ void mvceditor::CodeControlClass::SetPhpOptions() {
 			// use the PHP default settings as the catch-all for settings not yet exposed
 			// (Javascript) so the user sees a uniform style.
 			int styles[] = {
-				wxSTC_STYLE_DEFAULT,
-				wxSTC_HJ_START, wxSTC_HJ_DEFAULT, wxSTC_HJ_COMMENT,
-				wxSTC_HJ_COMMENTLINE, wxSTC_HJ_COMMENTDOC, wxSTC_HJ_NUMBER,
-				wxSTC_HJ_WORD, wxSTC_HJ_KEYWORD, wxSTC_HJ_DOUBLESTRING,
-				wxSTC_HJ_SINGLESTRING, wxSTC_HJ_SYMBOLS, wxSTC_HJ_STRINGEOL,
-				wxSTC_HJ_REGEX
+				wxSTC_STYLE_DEFAULT, wxSTC_HJ_START, wxSTC_HJ_DEFAULT, 
+				wxSTC_HJ_COMMENT, wxSTC_HJ_COMMENTLINE, wxSTC_HJ_COMMENTDOC, 
+				wxSTC_HJ_NUMBER, wxSTC_HJ_WORD, wxSTC_HJ_KEYWORD, 
+				wxSTC_HJ_DOUBLESTRING, wxSTC_HJ_SINGLESTRING, wxSTC_HJ_SYMBOLS, 
+
+				// sgml styles take care of the <!DOCTYPE declarations
+				wxSTC_HJ_STRINGEOL, wxSTC_HJ_REGEX, wxSTC_H_SGML_1ST_PARAM, 
+				wxSTC_H_SGML_1ST_PARAM_COMMENT, wxSTC_H_SGML_BLOCK_DEFAULT, wxSTC_H_SGML_COMMAND, 
+				wxSTC_H_SGML_COMMENT, wxSTC_H_SGML_DEFAULT, wxSTC_H_SGML_DOUBLESTRING, 
+				wxSTC_H_SGML_ENTITY, wxSTC_H_SGML_ERROR, wxSTC_H_SGML_SIMPLESTRING, 
+				wxSTC_H_SGML_SPECIAL
 			};
-			for (int j = 0; j < 14; ++j) {
+			for (int j = 0; j < 25; ++j) {
 				StyleSetFont(styles[j], pref.Font);
 				StyleSetForeground(styles[j], pref.Color);
 				StyleSetBackground(styles[j], pref.BackgroundColor);
