@@ -49,7 +49,6 @@ public:
 	
 	mvceditor::CodeControlOptionsClass Options;
 	mvceditor::GlobalsClass Globals;
-	mvceditor::RunningThreadsClass RunningThreads;
 };
 
 /**
@@ -197,7 +196,6 @@ void CodeControlFrameClass::OnHelp(wxCommandEvent& event) {
 }
 
 void CodeControlFrameClass::OnClose(wxCloseEvent& event) {
-	App.RunningThreads.StopAll();
 	event.Skip();
 }
 

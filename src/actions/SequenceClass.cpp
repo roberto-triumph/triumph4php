@@ -23,11 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <actions/SequenceClass.h>
-#include <actions/ProjectFrameworkDetectionActionClass.h>
 #include <actions/ProjectResourceActionClass.h>
 #include <actions/SqlMetaDataActionClass.h>
-#include <actions/CodeIgniterInitializerActionClass.h>
-#include <actions/UrlResourceActionClass.h>
 #include <actions/ResourceWipeActionClass.h>
 #include <globals/Errors.h>
 
@@ -74,10 +71,6 @@ bool mvceditor::SequenceClass::AppStart() {
 		return false;
 	}
 
-	// this will check to see if any source directories use PHP frameworks
-	// we need to do this before all others
-	AddStep(new mvceditor::ProjectFrameworkDetectionActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_FRAMEWORK_DETECTION));
-
 	// this will load the cache from the hard disk
 	// load the cache from hard disk so that code completion and 
 	// resource searching is available immediately after the app starts
@@ -92,15 +85,6 @@ bool mvceditor::SequenceClass::AppStart() {
 	// this will discover the db schema info (tables, columns)
 	AddStep(new mvceditor::SqlMetaDataActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA));
 
-	// this will initialize the code igniter specific features if code igniter was
-	// detected
-	AddStep(new mvceditor::CodeIgniterInitializerActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_CODE_IGNITER_DETECTED));
-
-	// after frameworks have been detected AND the project resources have been parsed we
-	// can look for URLs.  we need the project to be parsed so that we know all of the 
-	// project's classes.
-	AddStep(new mvceditor::UrlResourceActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_RESOURCES));
-
 	Run();
 	return true;
 }
@@ -109,10 +93,6 @@ bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvced
 	if (Running()) {
 		return false;
 	}
-
-	// this will check to see if any source directories use PHP frameworks
-	// we need to do this before all others
-	AddStep(new mvceditor::ProjectFrameworkDetectionActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_FRAMEWORK_DETECTION));
 
 	// this step will wipe the global cache; this is needed in case a project has
 	// new exclude wilcards or a source directory has been removed.  the ProjectResourceActionClass
@@ -137,15 +117,6 @@ bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvced
 	// this will discover the db schema info (tables, columns)
 	AddStep(new mvceditor::SqlMetaDataActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA));
 
-	// this will initialize the code igniter specific features if code igniter was
-	// detected
-	AddStep(new mvceditor::CodeIgniterInitializerActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_CODE_IGNITER_DETECTED));
-
-	// after frameworks have been detected AND the project resources have been parsed we
-	// can look for URLs.  we need the project to be parsed so that we know all of the 
-	// project's classes.
-	AddStep(new mvceditor::UrlResourceActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_RESOURCES));
-
 	Run();
 	return true;
 }
@@ -160,11 +131,6 @@ bool mvceditor::SequenceClass::ResourceCacheWipeAndIndex() {
 
 	// this will recurse though all directories and parse the source code
 	AddStep(new mvceditor::ProjectResourceActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE));
-
-	// after project resources have been parsed we
-	// can look for URLs.  we need the project to be parsed so that we know all of the 
-	// project's classes (controllers).
-	AddStep(new mvceditor::UrlResourceActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_RESOURCES));
 
 	Run();
 	return true;

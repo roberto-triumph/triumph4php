@@ -31,14 +31,12 @@ mvceditor::GlobalsClass::GlobalsClass()
 	, UrlResourceFinder()
 	, SqlResourceFinder()
 	, Infos()
-	, CurrentViewInfos() 
 	, Projects()
 	, CurrentUrl() 
 	, PhpFileExtensionsString(wxT("*.php"))	
 	, CssFileExtensionsString(wxT("*.css"))
 	, SqlFileExtensionsString(wxT("*.sql"))
-	, MiscFileExtensionsString(wxT("*.js;*.html;*.yml;*.xml;*.txt"))
-	, Frameworks() {
+	, MiscFileExtensionsString(wxT("*.js;*.html;*.yml;*.xml;*.txt")) {
 }
 
 std::vector<mvceditor::SourceClass> mvceditor::GlobalsClass::AllEnabledSources() const {

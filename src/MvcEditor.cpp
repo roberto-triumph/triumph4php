@@ -38,8 +38,6 @@
 #include <features/LintFeatureClass.h>
 #include <features/SqlBrowserFeatureClass.h>
 #include <features/EditorMessagesFeatureClass.h>
-#include <features/CodeIgniterFeatureClass.h>
-#include <features/ViewFileFeatureClass.h>
 #include <features/RecentFilesFeatureClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
@@ -172,11 +170,7 @@ void mvceditor::AppClass::CreateFeatures() {
 	EditorMessagesFeature = new mvceditor::EditorMessagesFeatureClass(*this);
 	Features.push_back(EditorMessagesFeature);
 
-	feature = new CodeIgniterFeatureClass(*this);
-	Features.push_back(feature);
 	feature = new RunBrowserFeatureClass(*this);
-	Features.push_back(feature);
-	feature = new ViewFileFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new RecentFilesFeatureClass(*this);
 	Features.push_back(feature);

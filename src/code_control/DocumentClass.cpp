@@ -523,21 +523,6 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 				autoCompleteList.push_back(comp + postFix);
 			}
 		}
-
-		// auto complete any template variables
-		for (size_t i = 0; i < Globals->CurrentViewInfos.size(); ++i) {
-			mvceditor::ViewInfoClass viewInfo = Globals->CurrentViewInfos[i];
-			wxFileName f1(viewInfo.FileName);
-			wxFileName f2(Ctrl->GetFileName());
-			if (f1 == f2) {
-				for (size_t j = 0; j < viewInfo.TemplateVariables.size(); ++j) {
-					if (viewInfo.TemplateVariables[j].Find(mvceditor::IcuToWx(lastExpression)) == 0) {
-						wxString postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_VARIABLE);
-						autoCompleteList.push_back(viewInfo.TemplateVariables[j] + postFix);
-					}
-				}
-			}
-		}
 		
 		// in case of a double quoted string, complete SQL table names too
 		// this is in addition to auto completing any variable names inside the string too

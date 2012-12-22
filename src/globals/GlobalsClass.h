@@ -31,7 +31,6 @@
 #include <globals/ProjectClass.h>
 #include <globals/SqlResourceFinderClass.h>
 #include <language/ResourceCacheClass.h>
-#include <php_frameworks/FrameworkDetectorClass.h>
 #include <vector>
 
 namespace mvceditor {
@@ -75,12 +74,6 @@ public:
 	std::vector<DatabaseInfoClass> Infos;
 
 	/**
-	 * All of the views of the currently selected controller/action
-	 * pair.
-	 */
-	std::vector<mvceditor::ViewInfoClass> CurrentViewInfos;
-
-	/**
 	 * All of the projects defined by the user.
 	 */
 	std::vector<mvceditor::ProjectClass> Projects;
@@ -111,11 +104,6 @@ public:
 	 * XML files, YML files, etc...
 	 */
 	wxString MiscFileExtensionsString;
-
-	/**
-	 * framework info that was detected
-	 */
-	std::vector<mvceditor::FrameworkClass> Frameworks;
 
 	GlobalsClass();
 

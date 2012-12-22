@@ -26,7 +26,6 @@
 #define PROJECTFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
-#include <actions/ProjectFrameworkDetectionActionClass.h>
 #include <features/wxformbuilder/ProjectFeatureForms.h>
 #include <wx/filepicker.h>
 
@@ -77,12 +76,6 @@ public:
 private:
 
 	/**
-	 * This method start the framework detection processes. It should be 
-	 * calle when the user adds/enables/removes a project.
-	 */
-	void StartDetectors();
-
-	/**
 	 * Save the preferences to persistent storage 
 	 */
 	void OnPreferencesSaved(wxCommandEvent& event);
@@ -101,9 +94,6 @@ private:
 	 */
 	void OnProjectExploreOpenFile(wxCommandEvent& event);
 
-	void OnFrameworkDetectionComplete(wxCommandEvent& event);
-	void OnFrameworkDetectionInProgress(wxCommandEvent& event);
-
 	/**
 	 * close all projects and all resources that depend on it
 	 */
@@ -113,12 +103,6 @@ private:
 	 * Open up a dialog so that the user can add more source directories
 	 */
 	void OnProjectDefine(wxCommandEvent& event);
-
-	/**
-	 * This object will be used to detct the various PHP framework artifacts (resources,
-	 * database connections, route URLs).
-	 */
-	mvceditor::ProjectFrameworkDetectionActionClass FrameworkDetectionAction;
 
 	DECLARE_EVENT_TABLE()
 	

@@ -25,7 +25,7 @@
 
 #include <language/ResourceCacheClass.h>
 #include <php_frameworks/CallStackClass.h>
-#include <php_frameworks/FrameworkDetectorClass.h>
+#include <widgets/ThreadWithHeartbeatClass.h>
 #include <globals/Assets.h>
 #include <wx/app.h>
 #include <wx/stdpaths.h>
@@ -52,7 +52,6 @@ HandlerClass Handler;
 mvceditor::ResourceCacheClass ResourceCache;
 mvceditor::RunningThreadsClass RunningThreads;
 mvceditor::CallStackClass CallStack(ResourceCache);
-mvceditor::ResourcesDetectorActionClass ResourceDetector(Handler, RunningThreads, wxID_ANY);
 wxString DirName;
 wxString StartingFile;
 
@@ -146,33 +145,4 @@ void CacheLargeProject(mvceditor::ResourceCacheClass& resourceCache, wxString di
 	else {
 		printf("Caching complete\n");
 	}
-	
-	// create these resources so that call stack can recurse into CodeIgniter libs
-	wxStandardPaths paths;
-	wxFileName outputFile;
-	wxString action = wxT("resources");
-	wxFileName scriptFileName = mvceditor::PhpDetectorsAsset();
-	
-	// the temporary file where the output will go
-	// make it a unique name
-	wxString tmpDir = paths.GetTempDir();
-	outputFile.AssignDir(tmpDir);
-	wxLongLong time = wxGetLocalTimeMillis();
-	wxString tmpName = action + wxString::Format(wxT("_%s.ini"), time.ToString().c_str());
-	outputFile.SetFullName(tmpName);
-	outputFile.Normalize();	
-	
-	wxString cmd = wxString::FromAscii("php  ");
-	cmd += scriptFileName.GetFullPath();
-	cmd += wxString::FromAscii(" "
-		"--identifier=code-igniter "
-		"--action=\"resources\" ");
-	cmd += wxT("--dir=\"") + dirName + wxT("\" ");
-	cmd += wxT("--output=\"") + outputFile.GetFullPath() + wxT("\" ");
-		
-	wxExecute(cmd, wxEXEC_SYNC);
-	ResourceDetector.InitFromFile(outputFile.GetFullPath());
-	ResourceCache.GlobalAddDynamicResources(ResourceDetector.Resources);
-	printf("dynamic resources=%d\n", (int)ResourceDetector.Resources.size());
-	wxRemoveFile(outputFile.GetFullPath());
 }

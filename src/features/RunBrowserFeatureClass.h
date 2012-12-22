@@ -27,7 +27,6 @@
 
 #include <features/FeatureClass.h>
 #include <features/wxformbuilder/RunBrowserFeatureForms.h>
-#include <php_frameworks/FrameworkDetectorClass.h>
 #include <globals/UrlResourceClass.h>
 #include <wx/string.h>
 #include <vector>

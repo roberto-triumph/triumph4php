@@ -35,11 +35,8 @@
 #include <wx/dirdlg.h>
 #include <algorithm>
 
-static const int ID_FRAMEWORK_DETECTION_GAUGE = wxNewId();
-
 mvceditor::ProjectFeatureClass::ProjectFeatureClass(mvceditor::AppClass& app) 
-	: FeatureClass(app)
-	, FrameworkDetectionAction(app.RunningThreads, mvceditor::ID_EVENT_ACTION_FRAMEWORK_DETECTION) {
+	: FeatureClass(app) {
 	wxPlatformInfo info;
 	switch (info.GetOperatingSystemId()) {
 		case wxOS_WINDOWS_NT:
@@ -222,11 +219,6 @@ void mvceditor::ProjectFeatureClass::OnProjectExploreOpenFile(wxCommandEvent& ev
 	else {
 		wxMessageBox(_("Need to open a file first."), _("Project Explore"));
 	}
-}
-
-void mvceditor::ProjectFeatureClass::OnFrameworkDetectionInProgress(wxCommandEvent& event) {
-	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
-	gauge->IncrementGauge(ID_FRAMEWORK_DETECTION_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
 }
 
 void mvceditor::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
@@ -676,7 +668,6 @@ BEGIN_EVENT_TABLE(mvceditor::ProjectFeatureClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_PROJECT + 2, mvceditor::ProjectFeatureClass::OnProjectExploreOpenFile)
 	EVT_MENU(mvceditor::MENU_PROJECT + 3, mvceditor::ProjectFeatureClass::OnProjectDefine)
 
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_FRAMEWORK_DETECTION, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::ProjectFeatureClass::OnFrameworkDetectionInProgress)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::ProjectFeatureClass::OnPreferencesSaved)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, mvceditor::ProjectFeatureClass::OnPreferencesExternallyUpdated)
 END_EVENT_TABLE()

@@ -48,12 +48,6 @@ private:
 
 	mvceditor::GlobalsClass& Globals;
 
-	/**
-	 * This is the callback that gets called when the PHP framework detectors have 
-	 * successfully run
-	 */
-	void OnFrameworkFound(mvceditor::FrameworkFoundEventClass& event);
-
 	void OnSqlMetaDataComplete(mvceditor::SqlMetaDataEventClass& event);
 
 	/**
@@ -61,12 +55,6 @@ private:
 	 * code in this control has been completed.
 	 */
 	void OnGlobalCacheComplete(mvceditor::GlobalCacheCompleteEventClass& event);
-
-	/**
-	 * This method will get called when routes / URL are detected in any of the
-	 * opened projects.
-	 */
-	void OnUrlDetectionComplete(UrlDetectedEventClass& event);
 	
 	DECLARE_EVENT_TABLE()
 

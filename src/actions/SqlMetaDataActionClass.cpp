@@ -101,12 +101,6 @@ void mvceditor::SqlMetaDataInitActionClass::Work(mvceditor::GlobalsClass& global
 			++it;
 		}
 	}
-	
-	// add the detected connections to the infos list
-	// this makes it easier; that way we always work with one list only
-	for (size_t i = 0; i < globals.Frameworks.size(); ++i) {
-		globals.Infos.insert(globals.Infos.end(), globals.Frameworks[i].Databases.begin(), globals.Frameworks[i].Databases.end());
-	}
 }
 
 wxString mvceditor::SqlMetaDataInitActionClass::GetLabel() const {
