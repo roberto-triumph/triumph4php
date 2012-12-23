@@ -177,6 +177,7 @@ void mvceditor::SequenceClass::RunNextStep() {
 	}
 	IsRunning = false;
 	IsCurrentStepAsync = false;
+	bool isSequenceDone = false;
 	while (!Steps.empty()) {
 		if (!Steps.front()->DoAsync()) {
 
@@ -211,6 +212,7 @@ void mvceditor::SequenceClass::RunNextStep() {
 					Steps.pop();
 				}
 				mvceditor::EditorLogError(mvceditor::WARNING_OTHER, _("The system is low on resources. Close some programs and try again."));
+				isSequenceDone = true;				
 			}
 			else if (isInit && wxTHREAD_NO_ERROR == err) {
 
@@ -225,8 +227,18 @@ void mvceditor::SequenceClass::RunNextStep() {
 				// lets move on to the next step
 				delete Steps.front();
 				Steps.pop();
+				if (Steps.empty()) {
+					isSequenceDone = true;
+				}
 			}
 		}
+	}
+	if (isSequenceDone) {
+		
+		// this can happen when the last step could not be 
+		// initialized; then no EVT_WORK_COMPLETE will be generated
+		wxCommandEvent sequenceEvent(mvceditor::EVENT_SEQUENCE_COMPLETE);
+		RunningThreads.PostEvent(sequenceEvent);
 	}
 }
 
