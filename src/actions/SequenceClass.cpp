@@ -77,6 +77,10 @@ bool mvceditor::SequenceClass::AppStart() {
 	// resource searching is available immediately after the app starts
 	AddStep(new mvceditor::ResourceCacheInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_INIT));
 
+	// this will load the url entry point cache
+	// do this before the rest so the urls become available asap
+	AddStep(new mvceditor::UrlResourceFinderInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_DETECTOR_INIT));
+
 	// this will update the resource cache by parsing newly modified files
 	AddStep(new mvceditor::ProjectResourceActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE));
 
@@ -85,9 +89,6 @@ bool mvceditor::SequenceClass::AppStart() {
 	
 	// this will discover the db schema info (tables, columns)
 	AddStep(new mvceditor::SqlMetaDataActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA));
-
-	// this will load the url entry point cache
-	AddStep(new mvceditor::UrlResourceFinderInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_DETECTOR_INIT));
 
 	// this will detect the urls (entry points) that a project has
 	AddStep(new mvceditor::UrlDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_DETECTOR));
@@ -112,6 +113,10 @@ bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvced
 	// resource searching is available immediately after the app starts
 	AddStep(new mvceditor::ResourceCacheInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_INIT));
 
+	// this will load the url entry point cache
+	// do this before the rest so the urls become available asap
+	AddStep(new mvceditor::UrlResourceFinderInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_DETECTOR_INIT));
+
 	// this will update the resource cache by parsing newly modified files
 	mvceditor::ProjectResourceActionClass* action = 
 		new mvceditor::ProjectResourceActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
@@ -123,9 +128,6 @@ bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvced
 	
 	// this will discover the db schema info (tables, columns)
 	AddStep(new mvceditor::SqlMetaDataActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA));
-
-	// this will load the url entry point cache
-	AddStep(new mvceditor::UrlResourceFinderInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_DETECTOR_INIT));
 
 	// this will detect the urls (entry points) that a project has
 	AddStep(new mvceditor::UrlDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_DETECTOR));
