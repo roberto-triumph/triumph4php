@@ -296,6 +296,7 @@ solution "mvc-editor"
 			"profilers/resource_finder_profiler.cpp",
 			"src/globals/Errors.cpp",
 			"src/globals/Assets.cpp",
+			"src/globals/Sqlite.cpp",
 			"src/language/*.cpp",
 			"src/search/ResourceFinderClass.cpp",
 			"src/search/DirectorySearchClass.cpp",
@@ -344,7 +345,32 @@ solution "mvc-editor"
 			pickywarnings(_ACTION)
 			icuconfiguration("Release", _ACTION)
 			wxconfiguration("Release", _ACTION)
-
+                        
+	project "action_profiler"
+		language "C++"
+		kind "WindowedApp"
+		files {
+			"src/actions/*.cpp",
+			"src/globals/*.cpp",
+			"src/language/*.cpp",
+			"src/search/*.cpp",
+			"src/widgets/ProcessWithHeartbeatClass.cpp",
+			"src/widgets/ThreadWithHeartbeatClass.cpp",
+			"profilers/action_profiler.cpp"
+		}
+		includedirs { "src", "lib/pelet/include" }
+		links { "pelet" }
+		sociconfiguration()
+		configuration "Debug"
+			pickywarnings(_ACTION)
+			icuconfiguration("Debug", _ACTION)
+			wxconfiguration("Debug", _ACTION)
+			wxappconfiguration("Debug", _ACTION)
+		configuration { "Release" }
+			pickywarnings(_ACTION)
+			icuconfiguration("Release", _ACTION)
+			wxconfiguration("Release", _ACTION)
+			wxappconfiguration("Release", _ACTION)
 
 	project "find_in_files_profiler"
 		language "C++"

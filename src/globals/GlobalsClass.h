@@ -84,6 +84,11 @@ public:
 	UrlResourceClass CurrentUrl;
 
 	/**
+	 * The name of the browser that is selected
+	 */
+	wxString ChosenBrowser;
+
+	/**
 	 * Serialized PHP file filters string from the config
 	 */
 	wxString PhpFileExtensionsString;

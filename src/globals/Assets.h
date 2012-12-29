@@ -55,6 +55,17 @@ wxFileName AutoCompleteImageAsset(wxString imageName);
 wxFileName PhpDetectorsAsset();
 
 /**
+ * @return the directory location of the PHP URL detector scripts.  The editor will use these scripts
+ * to find out framework-specific URL routes
+ */
+wxFileName UrlDetectorsAsset();
+
+/**
+ * @return the file location of the SQL script to create the detector database.
+ */
+wxFileName DetectorSqlSchemaAsset();
+
+/**
  * @return the full path to a directory inside of the system temp directory
  *         that has been created for MVC Editor. The directory is guaranteed to
  *         exist.

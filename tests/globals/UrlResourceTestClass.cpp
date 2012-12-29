@@ -23,24 +23,85 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <UnitTest++.h>
+#include <FileTestFixtureClass.h>
 #include <globals/UrlResourceClass.h>
+#include <globals/String.h>
+#include <soci/soci.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 #include <MvcEditorChecks.h>
+#include <string>
 
-class UrlResourceFixtureClass {
+class UrlResourceFixtureClass : public FileTestFixtureClass {
 
 public:
 
 	mvceditor::UrlResourceFinderClass Finder;
+	soci::session Session1,
+		Session2;
+	wxFileName DetectorDbFileName1,
+		DetectorDbFileName2;
 	
 	UrlResourceFixtureClass()
-		: Finder() {
-		Add(wxT("http://localhost/index.php"));
-		Add(wxT("http://localhost/frontend.php"));
+		: FileTestFixtureClass(wxT("url_resource_finder"))
+		, Finder()
+		, Session1()
+		, DetectorDbFileName1()
+		, Session2()
+		, DetectorDbFileName2(){
+
+		// create the test dir so that the sqlite file can be created
+		DetectorDbFileName1.Assign(TestProjectDir, wxT("detectors.sqlite"));
+		Finder.AttachFile(DetectorDbFileName1);
+		Session1.open(*soci::factory_sqlite3(), mvceditor::WxToChar(DetectorDbFileName1.GetFullPath()));
+		AddToDb1("http://localhost/index.php", 
+			"/home/user/welcome.php", "WelcomeController", "index");
+		AddToDb1("http://localhost/frontend.php",
+			"/home/user/frontend.php", "FrontendController", "action");
+
+		// setup the name for the second test db but dont create it yet
+		DetectorDbFileName2.Assign(TestProjectDir, wxT("detectors_2.sqlite"));
 	}
 
-	void Add(wxString urlString) {
-		mvceditor::UrlResourceClass urlResource(urlString);
-		Finder.Urls.push_back(urlResource);
+	~UrlResourceFixtureClass() {
+		Session1.close();
+		Session2.close();
+	}
+
+	void AddToDb1(std::string url, std::string fileName, std::string className, std::string methodName) {
+		soci::statement stmt = (Session1.prepare <<
+			"INSERT INTO url_resources(url, full_path, class_name, method_name) VALUES (?, ?, ?, ?)",
+			soci::use(url), soci::use(fileName),
+			soci::use(className), soci::use(methodName)
+		);
+		stmt.execute(true);
+	}
+
+	void InitDb2() {
+		Finder.AttachFile(DetectorDbFileName2);
+		Session2.open(*soci::factory_sqlite3(), mvceditor::WxToChar(DetectorDbFileName2.GetFullPath()));
+	}
+
+	void AddToDb2(std::string url, std::string fileName, std::string className, std::string methodName) {
+		soci::statement stmt = (Session2.prepare <<
+			"INSERT INTO url_resources(url, full_path, class_name, method_name) VALUES (?, ?, ?, ?)",
+			soci::use(url), soci::use(fileName),
+			soci::use(className), soci::use(methodName)
+		);
+		stmt.execute(true);
+	}
+
+	int DatabaseRecordsNumDb1() {
+		int cnt;
+		Session1.once << "SELECT COUNT(*) FROM url_resources; ",
+			soci::into(cnt);
+		return cnt;
+	}
+
+	int DatabaseRecordsNumDb2() {
+		int cnt;
+		Session2.once << "SELECT COUNT(*) FROM url_resources; ",
+			soci::into(cnt);
+		return cnt;
 	}
 
 };
@@ -48,16 +109,30 @@ public:
 SUITE(UrlResourceTestClass) {
 
 TEST_FIXTURE(UrlResourceFixtureClass, FindByUrlMatch) {
+	CHECK_EQUAL(2, DatabaseRecordsNumDb1());
+
 	wxURI toFind(wxT("http://localhost/frontend.php"));
 	mvceditor::UrlResourceClass urlResource;
 	CHECK(Finder.FindByUrl(toFind, urlResource));
 	CHECK(toFind == urlResource.Url);
 	CHECK_EQUAL(wxT("http://localhost/frontend.php"), urlResource.Url.BuildURI());
+	
+	// use filename to compare because we want this test to run on windows and on
+	// linux without needing modifications
+	CHECK(wxFileName(wxT("/home/user/frontend.php")) == urlResource.FileName);
+	CHECK_EQUAL(wxT("FrontendController"), urlResource.ClassName);
+	CHECK_EQUAL(wxT("action"), urlResource.MethodName);
 
 	toFind.Create(wxT("http://localhost/index.php"));
 	CHECK(Finder.FindByUrl(toFind, urlResource));
 	CHECK(toFind == urlResource.Url);
 	CHECK_EQUAL(wxT("http://localhost/index.php"), urlResource.Url.BuildURI());
+
+	// use filename to compare because we want this test to run on windows and on
+	// linux without needing modifications
+	CHECK(wxFileName(wxT("/home/user/welcome.php")) == urlResource.FileName);
+	CHECK_EQUAL(wxT("WelcomeController"), urlResource.ClassName);
+	CHECK_EQUAL(wxT("index"), urlResource.MethodName);
 }
 
 TEST_FIXTURE(UrlResourceFixtureClass, FindByUrlNoMatch) {
@@ -67,11 +142,45 @@ TEST_FIXTURE(UrlResourceFixtureClass, FindByUrlNoMatch) {
 	CHECK(urlResource.Url.BuildURI().IsEmpty());
 }
 
+TEST_FIXTURE(UrlResourceFixtureClass, FindUrlWithMultipleDbs) {
+	InitDb2();
+	AddToDb2("http://localhost/frontend_dev.php",
+			"/home/user/project2/frontend.php", "FrontendController", "action");
+
+	// test the find across multiple dbs
+	wxURI toFind;
+	toFind.Create(wxT("http://localhost/frontend_dev.php"));
+	mvceditor::UrlResourceClass urlResource;
+
+	CHECK(Finder.FindByUrl(toFind, urlResource));
+	
+	CHECK(toFind == urlResource.Url);
+
+	// use filename to compare because we want this test to run on windows and on
+	// linux without needing modifications
+	CHECK(wxFileName(wxT("/home/user/project2/frontend.php")) == urlResource.FileName);
+	CHECK_EQUAL(wxT("FrontendController"), urlResource.ClassName);
+	CHECK_EQUAL(wxT("action"), urlResource.MethodName);
+}
+
 TEST_FIXTURE(UrlResourceFixtureClass, FilterUrl) {
 	std::vector<mvceditor::UrlResourceClass> urls;
 	Finder.FilterUrls(wxT("front"), urls);
 	CHECK_VECTOR_SIZE(1, urls);
 	CHECK_EQUAL(wxT("http://localhost/frontend.php"), urls[0].Url.BuildURI());
+}
+
+TEST_FIXTURE(UrlResourceFixtureClass, FilterUrlWithMultipleDbs) {
+	InitDb2();
+	AddToDb2("http://localhost/frontend_dev.php",
+			"/home/user/project2/frontend.php", "FrontendController", "action");
+
+	// test the filter across multiple dbs
+	std::vector<mvceditor::UrlResourceClass> urls;
+	Finder.FilterUrls(wxT("front"), urls);
+	CHECK_VECTOR_SIZE(2, urls);
+	CHECK_EQUAL(wxT("http://localhost/frontend.php"), urls[0].Url.BuildURI());
+	CHECK_EQUAL(wxT("http://localhost/frontend_dev.php"), urls[1].Url.BuildURI());
 }
 
 TEST_FIXTURE(UrlResourceFixtureClass, FilterUrlNoMatches) {
@@ -83,49 +192,23 @@ TEST_FIXTURE(UrlResourceFixtureClass, FilterUrlNoMatches) {
 TEST_FIXTURE(UrlResourceFixtureClass, DeleteUrlMatch) {
 	wxURI toDelete(wxT("http://localhost/frontend.php"));
 	Finder.DeleteUrl(toDelete);
-	CHECK_VECTOR_SIZE(1, Finder.Urls);
-	CHECK_EQUAL(wxT("http://localhost/index.php"), Finder.Urls[0].Url.BuildURI());
+	CHECK_EQUAL(1, DatabaseRecordsNumDb1());
 }
 
 TEST_FIXTURE(UrlResourceFixtureClass, DeleteUrlNoMatch) {
 	wxURI toDelete(wxT("http://localhost/backend.php"));
 	Finder.DeleteUrl(toDelete);
-	CHECK_VECTOR_SIZE(2, Finder.Urls);
+	CHECK_EQUAL(2, DatabaseRecordsNumDb1());
 }
 
-TEST_FIXTURE(UrlResourceFixtureClass, AddUniqueUrl) {
-	wxURI newUri(wxT("http://localhost/backend.php"));
-	CHECK(Finder.AddUniqueUrl(newUri));
-	CHECK_VECTOR_SIZE(3, Finder.Urls);
+TEST_FIXTURE(UrlResourceFixtureClass, WipeAcrossMultipleDbs) {
+	InitDb2();
+	AddToDb2("http://localhost/frontend_dev.php",
+			"/home/user/project2/frontend.php", "FrontendController", "action");
 
-	// dont test the index for now, just make sure that find works
-	mvceditor::UrlResourceClass urlResource;
-	CHECK(Finder.FindByUrl(newUri, urlResource));
-}
-
-TEST_FIXTURE(UrlResourceFixtureClass, AddUniqueUrlNonUnique) {
-	wxURI newUri(wxT("http://localhost/frontend.php"));
-	CHECK_EQUAL(false, Finder.AddUniqueUrl(newUri));
-	CHECK_VECTOR_SIZE(2, Finder.Urls);
-}
-
-TEST_FIXTURE(UrlResourceFixtureClass, ReplaceAll) {
-	mvceditor::UrlResourceFinderClass newFinder;
-	wxURI newUri(wxT("http://localhost/backend.php"));
-	newFinder.AddUniqueUrl(newUri);
-
-	newFinder.ReplaceAll(Finder);
-	CHECK_VECTOR_SIZE(2, newFinder.Urls);
-
-	// dont test the index for now, just make sure that find works
-	wxURI firstUri(wxT("http://localhost/index.php"));
-	wxURI secondUri(wxT("http://localhost/frontend.php"));
-	mvceditor::UrlResourceClass urlResource;
-	CHECK(newFinder.FindByUrl(firstUri, urlResource));
-	CHECK(newFinder.FindByUrl(secondUri, urlResource));
-
-	// existing item should be gone
-	CHECK_EQUAL(false, newFinder.FindByUrl(newUri, urlResource));
+	Finder.Wipe();
+	CHECK_EQUAL(0, DatabaseRecordsNumDb1());
+	CHECK_EQUAL(0, DatabaseRecordsNumDb2());
 }
 
 }

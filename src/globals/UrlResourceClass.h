@@ -27,7 +27,7 @@
 
 #include <globals/EnvironmentClass.h>
 #include <wx/url.h>
-#include <vector>
+#include <soci/soci.h>
 
 namespace mvceditor {
 
@@ -102,32 +102,21 @@ public:
 class UrlResourceFinderClass {
 
 public:
-
-	/**
-	 * the list of web browsers available to the editor. These are the 'friendly'
-	 * names that are used by the Environment class.
-	 */
-	std::vector<wxString> Browsers;
-	
-	/**
-	 * the list of URLs that have been detected thus far. These are full URLs; "http://codeigniter.localhost/news/index"
-	 * These URLs are usually detected by the UrlDetectorClass
-	 */
-	std::vector<mvceditor::UrlResourceClass> Urls;
-	
-	/**
-	 * The name of the browser that is selected
-	 */
-	wxString ChosenBrowser;
-	
-	/**
-	 * the URL that is selected
-	 */
-	UrlResourceClass ChosenUrl;
 		
 	UrlResourceFinderClass();
 
-	UrlResourceFinderClass(const UrlResourceFinderClass& src);
+	~UrlResourceFinderClass();
+
+	/**
+	 * opens the url resource cache at the given file location
+	 * This can be called multiple times safely.
+	 * This sqlite database will have the schema from resources/sql/detectors.sql
+	 *
+	 * @param fileName the location of the detectors sqlite database.
+	 *        if fileName does not exist, it will be created.
+	 * @return bool TRUE if cache could be successfully opened / created
+	 */
+	bool AttachFile(const wxFileName& fileName);
 	
 	/**
 	 * check to see if the given URL exists in the Urls list; if the URL
@@ -154,22 +143,28 @@ public:
 	void DeleteUrl(const wxURI& url);
 
 	/**
-	 * @param the URL to add
-	 * @return FALSE if URL is already there (a duplicate will NOT be inserted)
+	 * Removes all URLs from the backing databases. This is a destructive operation;
+	 * if you just want to close the opened connections use the Close method
 	 */
-	bool AddUniqueUrl(const wxURI& url);
+	void Wipe();
 
 	/**
-	 * @param src Replace all items in all public properties with the items in src.
-	 * After a call to this method, this and src will have the same (copies)
-	 * of items.
+	 * Closes the opened connections; but the backing databases are left intact.
 	 */
-	void ReplaceAll(const UrlResourceFinderClass& src);
+	void Close();
 
 	/**
-	 * Removes all URLs from this object.
+	 * @return int number of urls
 	 */
-	void Clear();
+	int Count();
+
+private:
+
+	/**
+	 * the opened connection to the detector databases.
+	 */
+	std::vector<soci::session*> Sessions;
+
 };
 	
 }

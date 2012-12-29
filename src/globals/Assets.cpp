@@ -81,6 +81,19 @@ wxFileName mvceditor::PhpDetectorsAsset() {
 	return scriptFileName;
 }
 
+wxFileName mvceditor::UrlDetectorsAsset() {
+	wxStandardPaths paths;
+	wxFileName pathExecutableFileName(paths.GetExecutablePath());
+	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
+		wxT("..") + wxFileName::GetPathSeparator() +
+		wxT("php_detectors") + wxFileName::GetPathSeparator() +
+		wxT("url_detectors");
+	wxFileName scriptsFileName;
+	scriptsFileName.AssignDir(scriptsFullPath);
+	scriptsFileName.Normalize();
+	return scriptsFileName;
+}
+
 wxFileName mvceditor::TempDirAsset() {
 	wxStandardPaths paths;
 	wxFileName tempDir;
@@ -101,4 +114,17 @@ wxFileName mvceditor::ConfigDirAsset() {
 		wxMkdir(tempDir.GetPath(), 0777);
 	}
 	return tempDir;
+}
+
+wxFileName mvceditor::DetectorSqlSchemaAsset() {
+	wxStandardPaths paths;
+	wxFileName pathExecutableFileName(paths.GetExecutablePath());
+	wxString nativeFileName = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
+	                          wxT("..") + wxFileName::GetPathSeparator() +
+	                          wxT("resources") + wxFileName::GetPathSeparator() +
+	                          wxT("sql") + wxFileName::GetPathSeparator() +
+							  wxT("detectors.sql");
+	wxFileName fileName(nativeFileName);
+	fileName.Normalize();
+	return fileName;
 }

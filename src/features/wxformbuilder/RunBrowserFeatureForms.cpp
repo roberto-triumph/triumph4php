@@ -41,15 +41,6 @@ ChooseUrlDialogGeneratedClass::ChooseUrlDialogGeneratedClass( wxWindow* parent, 
 	OpenLabel->Wrap( -1 );
 	TopSizer->Add( OpenLabel, 1, wxALL|wxEXPAND, 5 );
 	
-	AddButton = new wxButton( this, ID_ADDBUTTON, _("Add URL"), wxDefaultPosition, wxDefaultSize, 0 );
-	TopSizer->Add( AddButton, 0, wxALL|wxALIGN_RIGHT, 5 );
-	
-	CloneButton = new wxButton( this, ID_CLONEBUTTON, _("Clone URL"), wxDefaultPosition, wxDefaultSize, 0 );
-	TopSizer->Add( CloneButton, 0, wxALL, 5 );
-	
-	DeleteButton = new wxButton( this, ID_DELETEBUTTON, _("Delete URL"), wxDefaultPosition, wxDefaultSize, 0 );
-	TopSizer->Add( DeleteButton, 0, wxALL, 5 );
-	
 	GridSizer->Add( TopSizer, 1, wxEXPAND, 5 );
 	
 	UrlList = new wxListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_SINGLE ); 
@@ -74,9 +65,6 @@ ChooseUrlDialogGeneratedClass::ChooseUrlDialogGeneratedClass( wxWindow* parent, 
 	Filter->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( ChooseUrlDialogGeneratedClass::OnKeyDown ), NULL, this );
 	Filter->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnText ), NULL, this );
 	Filter->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnTextEnter ), NULL, this );
-	AddButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnAddButton ), NULL, this );
-	CloneButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnCloneButton ), NULL, this );
-	DeleteButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnDeleteButton ), NULL, this );
 	UrlList->Connect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnListItemSelected ), NULL, this );
 	ButtonSizerOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnOkButton ), NULL, this );
 }
@@ -87,10 +75,42 @@ ChooseUrlDialogGeneratedClass::~ChooseUrlDialogGeneratedClass()
 	Filter->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( ChooseUrlDialogGeneratedClass::OnKeyDown ), NULL, this );
 	Filter->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnText ), NULL, this );
 	Filter->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnTextEnter ), NULL, this );
-	AddButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnAddButton ), NULL, this );
-	CloneButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnCloneButton ), NULL, this );
-	DeleteButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnDeleteButton ), NULL, this );
 	UrlList->Disconnect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnListItemSelected ), NULL, this );
 	ButtonSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnOkButton ), NULL, this );
+	
+}
+
+UrlDetectorPanelGeneratedClass::UrlDetectorPanelGeneratedClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+{
+	wxBoxSizer* BoxSizer;
+	BoxSizer = new wxBoxSizer( wxVERTICAL );
+	
+	wxFlexGridSizer* FlexGridSizer;
+	FlexGridSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	FlexGridSizer->AddGrowableCol( 0 );
+	FlexGridSizer->AddGrowableRow( 1 );
+	FlexGridSizer->SetFlexibleDirection( wxBOTH );
+	FlexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	Label = new wxStaticText( this, wxID_ANY, _("URL Detectors"), wxDefaultPosition, wxDefaultSize, 0 );
+	Label->Wrap( -1 );
+	FlexGridSizer->Add( Label, 0, wxALL, 5 );
+	
+	UrlDetectorTree = new wxTreeCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_DEFAULT_STYLE|wxTR_EDIT_LABELS );
+	FlexGridSizer->Add( UrlDetectorTree, 1, wxALL|wxALIGN_BOTTOM|wxEXPAND, 5 );
+	
+	BoxSizer->Add( FlexGridSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( BoxSizer );
+	this->Layout();
+	
+	// Connect Events
+	UrlDetectorTree->Connect( wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler( UrlDetectorPanelGeneratedClass::OnTreeItemActivated ), NULL, this );
+}
+
+UrlDetectorPanelGeneratedClass::~UrlDetectorPanelGeneratedClass()
+{
+	// Disconnect Events
+	UrlDetectorTree->Disconnect( wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler( UrlDetectorPanelGeneratedClass::OnTreeItemActivated ), NULL, this );
 	
 }

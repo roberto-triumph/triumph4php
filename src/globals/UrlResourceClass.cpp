@@ -23,33 +23,11 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <globals/UrlResourceClass.h>
-#include <algorithm>
-
-/**
- * Class that will be used with the STL algorithms to find item in the URLResourceFinder list
- * Items will be looked up by URL; only unique URLs will be allowed in the list.
- */
-class UrlPredicateClass {
-
-public:
-
-	/**
-	 * @param url the URL to match on (according to wxURI::operator==)
-	 */
-	UrlPredicateClass(const wxURI& url) 
-		: Url(url) {
-
-	}
-
-	bool operator()(const mvceditor::UrlResourceClass& item) const {
-		return  item.Url == Url;
-	}
-
-private:
-
-	wxURI Url;
-
-};
+#include <globals/String.h>
+#include <globals/Assets.h>
+#include <globals/Sqlite.h>
+#include <soci/sqlite3/soci-sqlite3.h>
+#include <wx/ffile.h>
 
 mvceditor::UrlResourceClass::UrlResourceClass()
  : Url()
@@ -89,74 +67,203 @@ mvceditor::UrlResourceClass& mvceditor::UrlResourceClass::operator=(const mvcedi
 void mvceditor::UrlResourceClass::Copy(const mvceditor::UrlResourceClass& src) {
 	Url = src.Url;
 	FileName = src.FileName;
-	ClassName = src.ClassName;
-	MethodName = src.MethodName;
+	ClassName = src.ClassName.c_str();
+	MethodName = src.MethodName.c_str();
 }
 
 mvceditor::UrlResourceFinderClass::UrlResourceFinderClass()
-	: Browsers()
-	, Urls() 
-	, ChosenBrowser() 
-	, ChosenUrl()  {
+	: Sessions() {
 		
 }
 
-mvceditor::UrlResourceFinderClass::UrlResourceFinderClass(const mvceditor::UrlResourceFinderClass& src)
-	: Browsers()
-	, Urls()
-	, ChosenBrowser()
-	, ChosenUrl() {
-	ReplaceAll(src);
+mvceditor::UrlResourceFinderClass::~UrlResourceFinderClass() {
+	Close();
+}
+
+bool mvceditor::UrlResourceFinderClass::AttachFile(const wxFileName& fileName) {
+	wxASSERT_MSG(fileName.IsOk(), _("File name given to UrlResourceFinderClass::InitFile is not OK."));
+	if (!fileName.IsOk()) {
+		return false;
+	}
+	bool isOpened = false;
+	std::string stdDbName = mvceditor::WxToChar(fileName.GetFullPath());
+	soci::session* session = new soci::session();
+	try {
+		session->open(*soci::factory_sqlite3(), stdDbName);
+	
+		// open the SQL script that contains the table creation statements
+		// the script is "nice" it takes care to not create the tables if
+		// they already exist
+		wxFileName sqlScriptFileName = mvceditor::DetectorSqlSchemaAsset();
+		wxString error;
+		isOpened = mvceditor::SqlScript(sqlScriptFileName, *session, error);
+		wxASSERT_MSG(isOpened, error);
+		if (isOpened) {
+			Sessions.push_back(session);
+		}
+	} catch(std::exception const& e) {
+		isOpened = false;
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxASSERT_MSG(isOpened, msg);
+	}
+	if (!isOpened) {
+		session->close();
+		delete session;
+	}
+	return isOpened;
 }
 
 
 bool mvceditor::UrlResourceFinderClass::FindByUrl(const wxURI& url, mvceditor::UrlResourceClass& urlResource) {
 	bool ret = false;
-	UrlPredicateClass pred(url);
-	std::vector<mvceditor::UrlResourceClass>::const_iterator it = std::find_if(Urls.begin(), Urls.end(), pred);
-	if (it != Urls.end()) {
-		ret = true;
-		urlResource.Copy(*it);
+	if (Sessions.empty()) {
+		return ret;
+	}
+	std::vector<soci::session*>::iterator session;
+	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
+		std::string stdUrlWhere = mvceditor::WxToChar(url.BuildURI());
+		std::string stdUrl;
+		std::string stdFullPath;
+		std::string stdClassName;
+		std::string stdMethodName;
+		try {
+			soci::statement stmt = ((*session)->prepare << 
+				"SELECT url, full_path, class_name, method_name FROM url_resources WHERE url = ? ",
+				soci::use(stdUrlWhere),
+				soci::into(stdUrl), soci::into(stdFullPath), 
+				soci::into(stdClassName), soci::into(stdMethodName) 
+			);
+			if (stmt.execute(true)) {
+				urlResource.Url.Create(mvceditor::CharToWx(stdUrl.c_str()));
+				urlResource.FileName.Assign(mvceditor::CharToWx(stdFullPath.c_str()));
+				urlResource.ClassName = mvceditor::CharToWx(stdClassName.c_str());
+				urlResource.MethodName = mvceditor::CharToWx(stdMethodName.c_str());
+				ret = true;
+			}
+		} catch (std::exception& e) {
+			wxUnusedVar(e);
+			wxString msg = mvceditor::CharToWx(e.what());
+			wxASSERT_MSG(false, msg);
+		}
 	}
 	return ret;
 }
 
 void mvceditor::UrlResourceFinderClass::DeleteUrl(const wxURI& url) {
-	UrlPredicateClass pred(url);
-	std::vector<mvceditor::UrlResourceClass>::iterator it = std::find_if(Urls.begin(), Urls.end(), pred);
-	if (it != Urls.end()) {
-		Urls.erase(it);
+	if (Sessions.empty()) {
+		return;
 	}
-}
-
-void mvceditor::UrlResourceFinderClass::FilterUrls(const wxString& filter, std::vector<UrlResourceClass>& matchedUrls) {
-	for (size_t i = 0; i < Urls.size(); ++i) {
-		if (Urls[i].Url.BuildURI().Contains(filter)) {
-			matchedUrls.push_back(Urls[i]);
+	std::string stdUrl = mvceditor::WxToChar(url.BuildURI());
+	std::vector<soci::session*>::iterator session;
+	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
+		try {
+			soci::statement stmt = ((*session)->prepare << 
+				"DELETE FROM url_resources WHERE url = ? ",
+				soci::use(stdUrl)
+			);
+			stmt.execute(true);
+		} catch (std::exception& e) {
+			wxUnusedVar(e);
+			wxString msg = mvceditor::CharToWx(e.what());
+			wxASSERT_MSG(false, msg);
 		}
 	}
 }
 
-bool mvceditor::UrlResourceFinderClass::AddUniqueUrl(const wxURI& url) {
-	bool added = false;
-	UrlPredicateClass pred(url);
-	std::vector<mvceditor::UrlResourceClass>::iterator it = std::find_if(Urls.begin(), Urls.end(), pred);
-	if (it == Urls.end()) {
-		mvceditor::UrlResourceClass newUrl;
-		newUrl.Url = url;
-		Urls.push_back(newUrl);
-		added = true;
+void mvceditor::UrlResourceFinderClass::FilterUrls(const wxString& filter, std::vector<UrlResourceClass>& matchedUrls) {
+	if (Sessions.empty()) {
+		return;
 	}
-	return added;
+	std::vector<soci::session*>::iterator session;
+	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
+		std::string stdUrl;
+		std::string stdFullPath;
+		std::string stdClassName;
+		std::string stdMethodName;
+		std::string stdFilter = mvceditor::WxToChar(filter);
+		std::string escaped = mvceditor::SqlEscape(stdFilter, '^');
+
+		// hmmm... query might not be optimal for 1000s of urls
+		// not sure if the number of urls will go into the 1000s
+		std::string sql = "SELECT url, full_path, class_name, method_name ";
+		sql += "FROM url_resources WHERE url LIKE '%" + escaped + "%' ESCAPE '^' LIMIT 100";
+
+		try {
+			soci::statement stmt = ((*session)->prepare << sql,
+				soci::into(stdUrl), soci::into(stdFullPath),
+				soci::into(stdClassName), soci::into(stdMethodName)
+			);
+			if (stmt.execute(true)) {
+				do {
+					mvceditor::UrlResourceClass urlResource;
+					urlResource.Url.Create(mvceditor::CharToWx(stdUrl.c_str()));
+					urlResource.FileName.Assign(mvceditor::CharToWx(stdFullPath.c_str()));
+					urlResource.ClassName = mvceditor::CharToWx(stdClassName.c_str());
+					urlResource.MethodName = mvceditor::CharToWx(stdMethodName.c_str());
+
+					matchedUrls.push_back(urlResource);
+				} while (stmt.fetch());
+			}
+		}
+		catch (std::exception& e) {
+			wxUnusedVar(e);
+			wxString msg = mvceditor::CharToWx(e.what());
+			wxASSERT_MSG(false, msg);
+		}
+	}
 }
 
-void mvceditor::UrlResourceFinderClass::ReplaceAll(const mvceditor::UrlResourceFinderClass& src) {
-	Browsers = src.Browsers;
-	Urls = src.Urls;
-	ChosenBrowser = src.ChosenBrowser;
-	ChosenUrl = src.ChosenUrl;
+void mvceditor::UrlResourceFinderClass::Wipe() {
+	if (Sessions.empty()) {
+		return;
+	}
+	std::vector<soci::session*>::iterator session;
+	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
+		try {
+			(*session)->once << "DELETE FROM url_resources";
+		} catch (std::exception& e) {
+			wxUnusedVar(e);
+			wxString msg = mvceditor::CharToWx(e.what());
+			wxASSERT_MSG(false, msg);
+		}
+	}
 }
 
-void mvceditor::UrlResourceFinderClass::Clear() {
-	Urls.clear();
+int mvceditor::UrlResourceFinderClass::Count() {
+	int totalCount = 0;
+	if (Sessions.empty()) {
+		return totalCount;
+	}
+	std::vector<soci::session*>::iterator session;
+	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
+		int dbCount;
+		try {
+			soci::statement stmt = (
+				(*session)->prepare << "SELECT COUNT(*) FROM url_resources", 
+				soci::into(dbCount));
+			stmt.execute(true);
+
+			// aggregate counts across all dbs
+			totalCount += dbCount;
+		} catch (std::exception& e) {
+			wxUnusedVar(e);
+			wxString msg = mvceditor::CharToWx(e.what());
+			wxASSERT_MSG(false, msg);
+		}
+	}
+	return totalCount;
+}
+
+void mvceditor::UrlResourceFinderClass::Close() {
+	std::vector<soci::session*>::iterator session;
+	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
+		try {
+			(*session)->close();
+		} catch (std::exception& e) {
+			wxUnusedVar(e);
+			// ignore close exceptions since we want to clean up
+		}
+		delete (*session);
+	}
+	Sessions.clear();
 }

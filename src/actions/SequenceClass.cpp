@@ -26,6 +26,7 @@
 #include <actions/ProjectResourceActionClass.h>
 #include <actions/SqlMetaDataActionClass.h>
 #include <actions/ResourceWipeActionClass.h>
+#include <actions/UrlDetectorActionClass.h>
 #include <globals/Errors.h>
 
 mvceditor::SequenceClass::SequenceClass(mvceditor::GlobalsClass& globals, mvceditor::RunningThreadsClass& runningThreads)
@@ -85,6 +86,12 @@ bool mvceditor::SequenceClass::AppStart() {
 	// this will discover the db schema info (tables, columns)
 	AddStep(new mvceditor::SqlMetaDataActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA));
 
+	// this will load the url entry point cache
+	AddStep(new mvceditor::UrlResourceFinderInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_DETECTOR_INIT));
+
+	// this will detect the urls (entry points) that a project has
+	AddStep(new mvceditor::UrlDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_DETECTOR));
+
 	Run();
 	return true;
 }
@@ -117,6 +124,12 @@ bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvced
 	// this will discover the db schema info (tables, columns)
 	AddStep(new mvceditor::SqlMetaDataActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA));
 
+	// this will load the url entry point cache
+	AddStep(new mvceditor::UrlResourceFinderInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_DETECTOR_INIT));
+
+	// this will detect the urls (entry points) that a project has
+	AddStep(new mvceditor::UrlDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_DETECTOR));
+
 	Run();
 	return true;
 }
@@ -132,6 +145,20 @@ bool mvceditor::SequenceClass::ResourceCacheWipeAndIndex() {
 	// this will recurse though all directories and parse the source code
 	AddStep(new mvceditor::ProjectResourceActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE));
 
+	// this will detect the urls (entry points) that a project has
+	AddStep(new mvceditor::UrlDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_DETECTOR));
+
+	Run();
+	return true;
+}
+
+bool mvceditor::SequenceClass::Build(std::vector<mvceditor::ActionClass*> actions) {
+	if (Running()) {
+		return false;
+	}
+	for (size_t i = 0; i < actions.size(); i++) {
+		AddStep(actions[i]);
+	}
 	Run();
 	return true;
 }
@@ -264,21 +291,19 @@ const wxEventType mvceditor::EVENT_SEQUENCE_IN_PROGRESS = wxNewEventType();
 const wxEventType mvceditor::EVENT_SEQUENCE_COMPLETE = wxNewEventType();
 
 BEGIN_EVENT_TABLE(mvceditor::SequenceClass, wxEvtHandler)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_FRAMEWORK_DETECTION, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_INIT, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_SQL_METADATA_INIT, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_SQL_METADATA, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_CODE_IGNITER_DETECTED, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_URL_RESOURCES, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
+	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_URL_DETECTOR_INIT, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
+	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_URL_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
 
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_FRAMEWORK_DETECTION, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_INIT, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_SQL_METADATA_INIT, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_SQL_METADATA, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_CODE_IGNITER_DETECTED, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_URL_RESOURCES, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
+	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_URL_DETECTOR_INIT, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
+	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_URL_DETECTOR, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
 END_EVENT_TABLE()

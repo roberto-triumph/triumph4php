@@ -95,10 +95,12 @@ void mvceditor::ProjectFeatureClass::LoadPreferences(wxConfigBase* config) {
 			wxString keyLabel = wxString::Format(wxT("/Project_%d/Label"), projectIndex);
 			wxString keyEnabled = wxString::Format(wxT("/Project_%d/IsEnabled"), projectIndex);
 			wxString keyResourceDbFileName = wxString::Format(wxT("/Project_%d/ResourceDbFileName"), projectIndex);
+			wxString keyDetectorDbFileName = wxString::Format(wxT("/Project_%d/DetectorDbFileName"), projectIndex);
 			wxString keySourceCount = wxString::Format(wxT("/Project_%d/SourceCount"), projectIndex);
 			config->Read(keyLabel, &newProject.Label);
 			config->Read(keyEnabled, &newProject.IsEnabled);
 			newProject.ResourceDbFileName.Assign(config->Read(keyResourceDbFileName));
+			newProject.DetectorDbFileName.Assign(config->Read(keyDetectorDbFileName));
 			config->Read(keySourceCount, &sourcesCount);
 			for (int j = 0; j < sourcesCount; ++j) {
 				wxString keyRootPath = wxString::Format(wxT("/Project_%d/Source_%d_RootDirectory"), projectIndex, j);
@@ -154,11 +156,13 @@ void mvceditor::ProjectFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 		mvceditor::ProjectClass project = App.Globals.Projects[i];
 		wxString keyLabel = wxString::Format(wxT("/Project_%d/Label"), i);
 		wxString keyEnabled = wxString::Format(wxT("/Project_%d/IsEnabled"), i);
-		wxString keyResourceDbFileName = wxString::Format(wxT("/Project_%d/ResourceDbFileName"), i);	
+		wxString keyResourceDbFileName = wxString::Format(wxT("/Project_%d/ResourceDbFileName"), i);
+		wxString keyDetectorDbFileName = wxString::Format(wxT("/Project_%d/DetectorDbFileName"), i);
 		wxString keySourceCount = wxString::Format(wxT("/Project_%d/SourceCount"), i);
 		config->Write(keyLabel, project.Label);
 		config->Write(keyEnabled, project.IsEnabled);
 		config->Write(keyResourceDbFileName, project.ResourceDbFileName.GetFullPath());
+		config->Write(keyDetectorDbFileName, project.DetectorDbFileName.GetFullPath());
 		config->Write(keySourceCount, (int)project.Sources.size());
 		for (size_t j = 0; j < project.Sources.size(); ++j) {
 			mvceditor::SourceClass source = project.Sources[j];			
@@ -248,7 +252,7 @@ void mvceditor::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
 		mvceditor::ResourceCacheClass* cache = GetResourceCache();
 		for (project = removedProjects.begin(); project != removedProjects.end(); ++project) {
 			cache->RemoveGlobal(project->ResourceDbFileName);
-			project->RemoveResourceDb();
+			project->RemoveCacheDbs();
 		}
 
 		// for new projects we need to fill in the file extensions
@@ -550,12 +554,6 @@ void mvceditor::ProjectListDialogClass::OnEditButton(wxCommandEvent& event) {
 }
 
 void mvceditor::ProjectListDialogClass::OnOkButton(wxCommandEvent& event) {
-	
-	// create the cache files first. that way we can use the cache file name as a 
-	// pseudo unique identifier
-	for (size_t i = 0; i < Projects.size(); ++i) {
-		Projects[i].MakeResourceDbFileName();
-	}
 
 	// go thorough the edited projects and see which ones actually changed
 	// here, Projects is the original list and EditedProjects is the list that the
@@ -585,6 +583,13 @@ void mvceditor::ProjectListDialogClass::OnOkButton(wxCommandEvent& event) {
 	}
 	
 	Projects = EditedProjects;
+	
+	// create the cache files 
+	for (size_t i = 0; i < Projects.size(); ++i) {
+		if (Projects[i].IsEnabled) {
+			Projects[i].TouchCacheDbs();
+		}
+	}
 	EndModal(wxOK);
 }
 

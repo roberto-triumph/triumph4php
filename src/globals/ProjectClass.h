@@ -93,9 +93,19 @@ public:
 	 * the parsed resources for all of this project's resources.
 	 * This file will be invalid for new projects, until the MakeDbFileName() method gets called.
 	 *
+	 * The SQL schema for this cache can be found in resources/sql/resource.sql
 	 * @see mvceditor::ResourceFinderClass
 	 */
 	wxFileName ResourceDbFileName;
+
+	/**
+	 * The location of the detectors cache this project. The detectors DB file contains all of
+	 * the detected for all of this project.
+	 * This file will be invalid for new projects, until the MakeDbFileName() method gets called.
+	 *
+	 * The SQL schema for this cache can be found in resources/sql/detectors.sql
+	 */
+	wxFileName DetectorDbFileName;
 
 	/**
 	 * If TRUE, this project is enabled and is used by MVC Editor.
@@ -170,16 +180,21 @@ public:
 	wxString RelativeFileName(const wxString& fullPath) const;
 
 	/**
-	 * creates a unique filename for the resources of this project. 
+	 * creates the Resource cache db or the detector cache DB
+	 * if they don't exist or if this project is new 
+	 * (ResourceDbFileName or DetectorDbFileName are empty [the strings themselves
+	 * are empty]).  If the files already exist, this method does nothing.
+	 * This method does not initialize the dbs or create the schema. that is
+	 * done by either ResourceFinderClass or UrlResourceFinderClass
 	 */
-	bool MakeResourceDbFileName();
+	bool TouchCacheDbs();
 
 	/**
 	 * Deletes this project's resource cache from the file system.
 	 * This should be done when the user does not want MVC Editor
 	 * to cache a project's sources.
 	 */
-	void RemoveResourceDb();
+	void RemoveCacheDbs();
 
 	/**
 	 *

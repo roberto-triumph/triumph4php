@@ -116,6 +116,16 @@ public:
 	bool ResourceCacheWipeAndIndex();
 
 	/**
+	 * start running a sequence of arbritrary actions. actions will run 
+	 * in the order that they are given. 
+	 *
+	 * @param actions the list of actions to run. action pointers will be owned by
+	 *        this class.
+	 * @return bool FALSE if there is a sequence already running.
+	 */
+	bool Build(std::vector<mvceditor::ActionClass*> actions);
+
+	/**
 	 * @return wxString a short description of which step is currently being run
 	 */
 	wxString GetStatus();

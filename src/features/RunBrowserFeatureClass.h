@@ -42,17 +42,11 @@ class ChooseUrlDialogClass : public ChooseUrlDialogGeneratedClass {
 	
 public:
 
-	ChooseUrlDialogClass(wxWindow* parent, UrlResourceFinderClass& urls, UrlResourceClass& chosenUrl);
+	ChooseUrlDialogClass(wxWindow* parent, UrlResourceFinderClass* urls, UrlResourceClass& chosenUrl);
 	
 protected:
 
 	void OnOkButton(wxCommandEvent& event);
-
-	void OnAddButton(wxCommandEvent& event);
-
-	void OnDeleteButton(wxCommandEvent& event);
-
-	void OnCloneButton(wxCommandEvent& event);
 
 	void OnTextEnter(wxCommandEvent& event);
 
@@ -71,20 +65,34 @@ private:
 	/**
 	 * The list of URLs, it will contain URLs that were detected and URLs that were input
 	 * by the user.
+	 * This pointer will not be owned by thie class
 	 */
-	UrlResourceFinderClass& UrlResourceFinder;
-
-	/**
-	 * Any changes by the user are held here until the user clicks OK.
-	 * If the user clicks Cancel we dont want to change the 
-	 * UrlResourceFinder
-	 */
-	UrlResourceFinderClass EditedUrlResourceFinder;
+	UrlResourceFinderClass* UrlResourceFinder;
 
 	/**
 	 * The URL that the user selected.
 	 */
 	UrlResourceClass& ChosenUrl;
+};
+
+class UrlDetectorPanelClass : public UrlDetectorPanelGeneratedClass {
+
+public:
+
+	UrlDetectorPanelClass(wxWindow* parent, int id, mvceditor::NotebookClass* codeNotebook);
+
+	void Init(const wxString& detectorRootDir);
+
+protected:
+	void OnTreeItemActivated(wxTreeEvent& event);
+
+private:
+
+	void FillSubTree(const wxString& detectorRootDir, wxTreeItemId treeItemDir);
+
+	mvceditor::NotebookClass* CodeNotebook;
+
+	DECLARE_EVENT_TABLE()
 };
 	
 class RunBrowserFeatureClass : public FeatureClass {
@@ -126,6 +134,10 @@ private:
 	void OnUrlToolMenuItem(wxCommandEvent& event);
 	
 	void OnUrlSearchTool(wxCommandEvent& event);
+
+	void AddNewMenu(wxMenuBar* menuBar);
+
+	void OnUrlDetectectorMenu(wxCommandEvent& event);
 
 	/**
 	 * when a project is opened clean the Recent list

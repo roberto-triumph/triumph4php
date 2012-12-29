@@ -284,6 +284,15 @@ void mvceditor::EnvironmentClass::SaveToConfig(wxConfigBase* config) const {
 	}
 }
 
+std::vector<wxString> mvceditor::EnvironmentClass::BrowserNames() const {
+	std::vector<wxString> names;
+	std::vector<mvceditor::WebBrowserClass>::const_iterator browser;
+	for (browser = WebBrowsers.begin(); browser != WebBrowsers.end(); ++browser) {
+		names.push_back(browser->Name);
+	}
+	return names;
+}
+
 bool mvceditor::EnvironmentClass::FindBrowserByName(const wxString& name, wxFileName& fileName) const {
 	bool found = false;
 	for(std::vector<mvceditor::WebBrowserClass>::const_iterator it = WebBrowsers.begin(); it != WebBrowsers.end(); ++it) {

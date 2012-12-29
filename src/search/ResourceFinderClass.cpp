@@ -26,6 +26,7 @@
 #include <search/FinderClass.h>
 #include <globals/String.h>
 #include <globals/Assets.h>
+#include <globals/Sqlite.h>
 #include <wx/filename.h>
 #include <algorithm>
 #include <fstream>
@@ -35,7 +36,6 @@
 #include <unicode/numfmt.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
-#include <sqlite3.h>
 #include <string>
 
 /**
@@ -49,31 +49,6 @@ static UnicodeString QualifyName(const UnicodeString& namespaceName, const Unico
 	}
 	qualifiedName.append(name);
 	return qualifiedName;
-}
-
-/**
- * escape a value so that it is suitable for using in a LIKE SQL clause
- * ie. so that an underscore is treated literally
- * @param value the value to escape
- * @param c the character to USE for escaping. this should NOT be backslash,
- *        as we have namespaces in the database and they use backslash
- */
-static std::string SqlEscape(const std::string& value, char c) {
-	size_t i = 0;
-	std::string escaped;
-	size_t next = value.find("_", i);
-	while (next != std::string::npos) {
-		escaped += value.substr(i, next - i);
-		escaped += c;
-		escaped += "_";
-
-		i = next + 1;
-		next = value.find("_", i);
-	}
-	if (i < value.length()) {
-		escaped += value.substr(i);
-	}
-	return escaped;
 }
 
 mvceditor::ResourceSearchClass::ResourceSearchClass(UnicodeString resourceQuery)
@@ -237,27 +212,13 @@ void mvceditor::ResourceFinderClass::OpenAndCreateTables(const wxString& dbName)
 			std::string stdDbName = mvceditor::WxToChar(dbName);
 			Session.open(*soci::factory_sqlite3(), stdDbName);
 		}
-			
-		// open the SQL script that contains the table creation statements
-		// the script is "nice" it takes care to not create the tables if
-		// they already exist
-		wxFileName sqlScriptFileName = mvceditor::ResourceSqlSchemaAsset();
-		if (sqlScriptFileName.FileExists()) {
-			wxFFile ffile(sqlScriptFileName.GetFullPath());
-			wxString sql;
-			ffile.ReadAll(&sql);
-			std::string stdSql = mvceditor::WxToChar(sql);
-
-			// get the 'raw' connection because it can handle multiple statements at once
-			char *errorMessage = NULL;
-			soci::sqlite3_session_backend* backend = static_cast<soci::sqlite3_session_backend*>(Session.get_backend());
-			sqlite_api::sqlite3_exec(backend->conn_, stdSql.c_str(), NULL, NULL, &errorMessage);
-			IsCacheInitialized = NULL == errorMessage;
-			if (errorMessage) {
-				wxString msg = mvceditor::CharToWx(errorMessage);
-				wxASSERT_MSG(IsCacheInitialized, msg);
-				sqlite_api::sqlite3_free(errorMessage);
-			}
+		wxString error;
+		if (mvceditor::SqlScript(mvceditor::ResourceSqlSchemaAsset(), Session, error)) {
+			IsCacheInitialized = true;
+		}
+		else {
+			IsCacheInitialized = false;
+			wxASSERT_MSG(IsCacheInitialized, error);
 		}
 	} catch(std::exception const& e) {
 		Session.close();
