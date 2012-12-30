@@ -48,6 +48,29 @@ public:
 };
 
 /**
+ * the set of parameters that will be used for each 
+ * external url detector PHP script call
+ */
+class UrlDetectorParamsClass {
+
+public:
+
+	wxString PhpExecutablePath;
+	wxString ScriptName;
+	wxString SourceDir;
+	wxString ResourceDbFileName;
+	wxString RootUrl;
+	wxString OutputDbFileName;
+
+	UrlDetectorParamsClass();
+
+	/**
+	 * build the command line to be executed for each url detector
+	 */
+	wxString BuildCmdLine() const;
+};
+
+/**
  * This class will run all url detectors across all enabled projects. This means that there is
  * one external process execution for each project source directory / url detector combination
  */
@@ -73,38 +96,16 @@ private:
 	mvceditor::ProcessWithHeartbeatClass Process;
 
 	/**
-	 * the set of parameters that will be used for each 
-	 * external url detector PHP script call
-	 */
-	struct DetectorParamsStruct {
-		wxString ScriptName;
-		wxString SourceDir;
-		wxString ResourceDbFileName;
-		wxString RootUrl;
-		wxString OutputDbFileName;
-	} DetectorParams;
-
-	/**
 	 * we will perform one external call for each item in this
 	 * queue
 	 */
-	std::queue<DetectorParamsStruct> ParamsQueue;
-
-	/**
-	 * the PhpFrameworks instance needs this to find out the PHP executable location
-	 */
-	mvceditor::EnvironmentClass Environment;
+	std::queue<mvceditor::UrlDetectorParamsClass> ParamsQueue;
 
 	/**
 	 * pop the next set of params from the queue and call the php url 
 	 * detector.
 	 */
 	void NextDetection();
-
-	/**
-	 * build the command line to be executed for each url detector
-	 */
-	wxString BuildCmdLine(DetectorParamsStruct params);
 
 	/**
 	 * @return all of the PHP URL detector scripts. These can be either ones

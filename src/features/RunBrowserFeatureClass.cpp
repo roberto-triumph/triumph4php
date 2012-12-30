@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <features/RunBrowserFeatureClass.h>
+#include <actions/UrlDetectorActionClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 #include <MvcEditor.h>
@@ -143,10 +144,13 @@ void mvceditor::ChooseUrlDialogClass::OnKeyDown(wxKeyEvent& event) {
 	}
 }
 
-mvceditor::UrlDetectorPanelClass::UrlDetectorPanelClass(wxWindow* parent, int id, mvceditor::NotebookClass* codeNotebook)
+mvceditor::UrlDetectorPanelClass::UrlDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
+														mvceditor::EventSinkClass& eventSink)
 	: UrlDetectorPanelGeneratedClass(parent, id) 
-	, CodeNotebook(codeNotebook) {
-
+	, Globals(globals) 
+	, EventSink(eventSink) {
+	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
+		wxART_TOOLBAR, wxSize(16, 16))));
 }
 
 void mvceditor::UrlDetectorPanelClass::Init(const wxString& detectorRootDir) {
@@ -156,6 +160,19 @@ void mvceditor::UrlDetectorPanelClass::Init(const wxString& detectorRootDir) {
 	FillSubTree(detectorRootDir, UrlDetectorTree->GetRootItem());
 	UrlDetectorTree->Expand(UrlDetectorTree->GetRootItem());
 	UrlDetectorTree->Thaw();
+}
+
+void mvceditor::UrlDetectorPanelClass::UpdateProjects() {
+	wxArrayString projectLabels;
+	std::vector<mvceditor::ProjectClass>::const_iterator project;
+	for (project = Globals.Projects.begin(); project != Globals.Projects.end(); ++project) {
+		projectLabels.Add(project->Label);
+	}
+	ProjectChoice->Clear();
+	if (!projectLabels.IsEmpty()) {
+		ProjectChoice->Append(projectLabels);
+		ProjectChoice->Select(0);
+	}
 }
 
 void mvceditor::UrlDetectorPanelClass::FillSubTree(const wxString& detectorRootDir, wxTreeItemId treeItemDir) {
@@ -182,8 +199,71 @@ void mvceditor::UrlDetectorPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 	wxTreeItemId id = event.GetItem();
 	wxString name = UrlDetectorTree->GetItemText(id);
 	wxFileName fullFileName(detectorRootDir.GetPath(), name);
-	CodeNotebook->LoadPage(fullFileName.GetFullPath());
+	
+	wxCommandEvent openEvent(mvceditor::EVENT_CMD_FILE_OPEN);
+	openEvent.SetString(fullFileName.GetFullPath());
+	EventSink.Publish(openEvent);
+}
 
+void mvceditor::UrlDetectorPanelClass::OnHelpButton(wxCommandEvent& event) {
+	wxString help = wxString::FromAscii(
+		"URL Detectors are PHP scripts that MVC Editor uses to find out "
+		"all of the valid URL routes for your projects.  \n"
+		"MVC Editor can detect routes for CodeIgniter projects.\n"
+	);
+	help = wxGetTranslation(help);
+	wxMessageBox(help, _("URL Detectors Help"), wxOK, this);
+}
+
+void mvceditor::UrlDetectorPanelClass::OnTestButton(wxCommandEvent& event) {
+	
+	// create the command to test the selected detector on the selected
+	// project
+	int projectChoiceIndex = ProjectChoice->GetSelection();
+	if (ProjectChoice->IsEmpty() || projectChoiceIndex >= (int)Globals.Projects.size()) {
+		wxMessageBox(_("Please choose a project to test the URL detector on."));
+		return;
+	}
+
+	// make sure that a child item in the tree is selected
+	wxTreeItemId itemId = UrlDetectorTree->GetSelection();
+	if (!itemId.IsOk() || UrlDetectorTree->GetRootItem() == itemId) {
+		wxMessageBox(_("Please choose a URL detector to test."));
+		return;
+	}
+	mvceditor::ProjectClass project = Globals.Projects[projectChoiceIndex];
+	if (project.Sources.empty()) {
+		wxMessageBox(_("Selected project does not have any source directories. Please choose another project"));
+		return;
+	}	
+	mvceditor::SourceClass source = project.Sources[0];
+	wxString rootUrl = Globals.Environment.Apache.GetUrl(source.RootDirectory.GetPath());
+	if (rootUrl.IsEmpty()) {
+		wxMessageBox(_("Cannot determine the root URL selected project. Please add a virtual host mapping for ") + source.RootDirectory.GetPath() +
+			_(" under Edit -> Preferences -> Apache"));
+		return;
+	}
+	
+	wxFileName detectorRootDir = mvceditor::UrlDetectorsAsset();
+	wxString name = UrlDetectorTree->GetItemText(itemId);
+	wxFileName fullFileName(detectorRootDir.GetPath(), name);
+
+	// leave OutputDbFileName empty; that way the results are output to
+	// STDOUT
+	// that way the user can easily see what URLs would be detected
+	mvceditor::UrlDetectorParamsClass params;
+	params.PhpExecutablePath = Globals.Environment.Php.PhpExecutablePath;
+	params.ScriptName = fullFileName.GetFullPath();
+	params.SourceDir = source.RootDirectory.GetPath();
+	params.ResourceDbFileName = project.ResourceDbFileName.GetFullPath();
+	params.RootUrl = rootUrl;
+
+	wxString cmdLine = params.BuildCmdLine();
+
+	// send the command line to a new app command event to start a process
+	wxCommandEvent runEvent(mvceditor::EVENT_CMD_RUN_COMMAND);
+	runEvent.SetString(cmdLine);
+	EventSink.Publish(runEvent);
 }
 
 mvceditor::RunBrowserFeatureClass::RunBrowserFeatureClass(mvceditor::AppClass& app)
@@ -220,7 +300,9 @@ void mvceditor::RunBrowserFeatureClass::AddWindows() {
 
 void mvceditor::RunBrowserFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 	wxMenu* menu = new wxMenu(0);
-	menu->Append(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 5, _("URL Detectors"), _("View the URL Detectors"), wxITEM_NORMAL);
+	menu->Append(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 5, _("View URL Detectors"), _("View the URL Detectors"), wxITEM_NORMAL);
+	menu->Append(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 6, _("Run URL Detection"), _("Run the URL Detectors against the current projects"), wxITEM_NORMAL);
+	menu->Append(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 7, _("Test URL Detection"), _("Test the URL Detectors by running it and showing the results"), wxITEM_NORMAL);
 	menuBar->Append(menu, _("Detectors"));
 }
 
@@ -406,9 +488,10 @@ void mvceditor::RunBrowserFeatureClass::OnUrlDetectectorMenu(wxCommandEvent& eve
 	}
 	else {
 		mvceditor::UrlDetectorPanelClass* panel = new mvceditor::UrlDetectorPanelClass(GetOutlineNotebook(), ID_URL_DETECTOR_PANEL, 
-			GetNotebook());
+			App.Globals, App.EventSink);
 		if (AddOutlineWindow(panel, _("URL Detectors"))) {
 			panel->Init(mvceditor::UrlDetectorsAsset().GetPath(wxPATH_NATIVE));
+			panel->UpdateProjects();
 		}
 	}
 }

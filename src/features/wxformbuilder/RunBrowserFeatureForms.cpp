@@ -86,17 +86,42 @@ UrlDetectorPanelGeneratedClass::UrlDetectorPanelGeneratedClass( wxWindow* parent
 	BoxSizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* FlexGridSizer;
-	FlexGridSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	FlexGridSizer = new wxFlexGridSizer( 3, 1, 0, 0 );
 	FlexGridSizer->AddGrowableCol( 0 );
-	FlexGridSizer->AddGrowableRow( 1 );
+	FlexGridSizer->AddGrowableRow( 2 );
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );
 	FlexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
+	wxBoxSizer* TopSizer;
+	TopSizer = new wxBoxSizer( wxHORIZONTAL );
+	
+	ProjectLabel = new wxStaticText( this, wxID_ANY, _("Project To Test"), wxDefaultPosition, wxDefaultSize, 0 );
+	ProjectLabel->Wrap( -1 );
+	TopSizer->Add( ProjectLabel, 0, wxALL|wxEXPAND, 5 );
+	
+	wxArrayString ProjectChoiceChoices;
+	ProjectChoice = new wxChoice( this, ID_PROJECT_CHOICE, wxDefaultPosition, wxDefaultSize, ProjectChoiceChoices, 0 );
+	ProjectChoice->SetSelection( 0 );
+	TopSizer->Add( ProjectChoice, 1, wxALL|wxEXPAND, 5 );
+	
+	TestButton = new wxButton( this, ID_TEST_DETECTOR_BUTTON, _("Test"), wxDefaultPosition, wxDefaultSize, 0 );
+	TopSizer->Add( TestButton, 0, wxALL, 5 );
+	
+	HelpButton = new wxBitmapButton( this, wxID_HELP, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	TopSizer->Add( HelpButton, 0, wxALL, 5 );
+	
+	FlexGridSizer->Add( TopSizer, 1, wxEXPAND, 5 );
+	
+	wxBoxSizer* LabelSizer;
+	LabelSizer = new wxBoxSizer( wxHORIZONTAL );
+	
 	Label = new wxStaticText( this, wxID_ANY, _("URL Detectors"), wxDefaultPosition, wxDefaultSize, 0 );
 	Label->Wrap( -1 );
-	FlexGridSizer->Add( Label, 0, wxALL, 5 );
+	LabelSizer->Add( Label, 1, wxALL|wxEXPAND, 5 );
 	
-	UrlDetectorTree = new wxTreeCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_DEFAULT_STYLE|wxTR_EDIT_LABELS );
+	FlexGridSizer->Add( LabelSizer, 1, wxEXPAND, 5 );
+	
+	UrlDetectorTree = new wxTreeCtrl( this, ID_DETECTOR_TREE, wxDefaultPosition, wxDefaultSize, wxTR_DEFAULT_STYLE|wxTR_EDIT_LABELS );
 	FlexGridSizer->Add( UrlDetectorTree, 1, wxALL|wxALIGN_BOTTOM|wxEXPAND, 5 );
 	
 	BoxSizer->Add( FlexGridSizer, 1, wxEXPAND, 5 );
@@ -105,12 +130,16 @@ UrlDetectorPanelGeneratedClass::UrlDetectorPanelGeneratedClass( wxWindow* parent
 	this->Layout();
 	
 	// Connect Events
+	TestButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( UrlDetectorPanelGeneratedClass::OnTestButton ), NULL, this );
+	HelpButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( UrlDetectorPanelGeneratedClass::OnHelpButton ), NULL, this );
 	UrlDetectorTree->Connect( wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler( UrlDetectorPanelGeneratedClass::OnTreeItemActivated ), NULL, this );
 }
 
 UrlDetectorPanelGeneratedClass::~UrlDetectorPanelGeneratedClass()
 {
 	// Disconnect Events
+	TestButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( UrlDetectorPanelGeneratedClass::OnTestButton ), NULL, this );
+	HelpButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( UrlDetectorPanelGeneratedClass::OnHelpButton ), NULL, this );
 	UrlDetectorTree->Disconnect( wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler( UrlDetectorPanelGeneratedClass::OnTreeItemActivated ), NULL, this );
 	
 }

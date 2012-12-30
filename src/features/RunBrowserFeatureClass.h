@@ -79,18 +79,41 @@ class UrlDetectorPanelClass : public UrlDetectorPanelGeneratedClass {
 
 public:
 
-	UrlDetectorPanelClass(wxWindow* parent, int id, mvceditor::NotebookClass* codeNotebook);
+	UrlDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
+		mvceditor::EventSinkClass& eventSink);
 
+	/**
+	 * This should be called when the detector tree needs to be updated.
+	 *
+	 * @param wxString the root directory where the URL detectors are located
+	 */
 	void Init(const wxString& detectorRootDir);
+
+	/**
+	 * updates the project choice with the given projects. This should be called whenever
+	 * the global project list has been changed.
+	 * The project list will be read from GlobalsClass
+	 */
+	void UpdateProjects();
 
 protected:
 	void OnTreeItemActivated(wxTreeEvent& event);
+	void OnHelpButton(wxCommandEvent& event);
+	void OnTestButton(wxCommandEvent& event);
 
 private:
 
 	void FillSubTree(const wxString& detectorRootDir, wxTreeItemId treeItemDir);
 
-	mvceditor::NotebookClass* CodeNotebook;
+	/**
+	 * to access the project list
+	 */
+	mvceditor::GlobalsClass& Globals;
+
+	/**
+	 * to send app commands to open and run a file
+	 */
+	mvceditor::EventSinkClass& EventSink;
 
 	DECLARE_EVENT_TABLE()
 };

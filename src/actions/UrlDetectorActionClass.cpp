@@ -70,11 +70,31 @@ wxString mvceditor::UrlResourceFinderInitActionClass::GetLabel() const {
 	return wxT("URL Detection Init");
 }
 
+mvceditor::UrlDetectorParamsClass::UrlDetectorParamsClass() 
+	: PhpExecutablePath()
+	, ScriptName()
+	, SourceDir()
+	, ResourceDbFileName()
+	, RootUrl()
+	, OutputDbFileName() {
+
+}
+
+wxString mvceditor::UrlDetectorParamsClass::BuildCmdLine() const {
+	wxString cmdLine;
+	cmdLine = wxT("\"") + PhpExecutablePath + wxT("\"") + 
+		wxT(" ") + wxT("\"") + ScriptName + wxT("\"") + 
+		wxT(" --sourceDir=") + wxT("\"") + SourceDir + wxT("\"") + 
+		wxT(" --resourceDbFileName=") + wxT("\"") + ResourceDbFileName + wxT("\"") + 
+		wxT(" --host=") + wxT("\"") + RootUrl + wxT("\"") +
+		wxT(" --outputDbFileName=") + wxT("\"") + OutputDbFileName + wxT("\"");
+	return cmdLine;
+}
+
 mvceditor::UrlDetectorActionClass::UrlDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: ActionClass(runningThreads, eventId)
 	, Process(*this)
-	, ParamsQueue()
-	, Environment() {
+	, ParamsQueue() {
 
 }
 
@@ -82,7 +102,6 @@ bool mvceditor::UrlDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
 	while (!ParamsQueue.empty()) {
 		ParamsQueue.pop();
 	}
-	Environment = globals.Environment;
 	std::vector<wxString> detectorScripts = DetectorScripts();
 
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
@@ -94,11 +113,12 @@ bool mvceditor::UrlDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
 	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
 		for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
 			for (scriptName = detectorScripts.begin(); scriptName != detectorScripts.end(); ++scriptName) {
-				DetectorParamsStruct params;
+				mvceditor::UrlDetectorParamsClass params;
+				params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
 				params.ScriptName = *scriptName;
 				params.SourceDir = source->RootDirectory.GetPath();
 				params.ResourceDbFileName = project->ResourceDbFileName.GetFullPath();
-				params.RootUrl = Environment.Apache.GetUrl(source->RootDirectory.GetPath());
+				params.RootUrl = globals.Environment.Apache.GetUrl(source->RootDirectory.GetPath());
 				params.OutputDbFileName = project->DetectorDbFileName.GetFullPath();
 				if (!params.RootUrl.IsEmpty()) {
 					ParamsQueue.push(params);
@@ -132,23 +152,12 @@ void mvceditor::UrlDetectorActionClass::NextDetection() {
 	if (ParamsQueue.empty()) {
 		return;
 	}
-	DetectorParamsStruct params = ParamsQueue.front();
+	mvceditor::UrlDetectorParamsClass params = ParamsQueue.front();
 	ParamsQueue.pop();
 
-	wxString cmdLine = BuildCmdLine(params);
+	wxString cmdLine = params.BuildCmdLine();
 	long pid;
 	Process.Init(cmdLine, ID_URL_DETECTOR_PROCESS, pid);
-}
-
-wxString mvceditor::UrlDetectorActionClass::BuildCmdLine(DetectorParamsStruct params) {
-	wxString cmdLine;
-	cmdLine = wxT("\"") + Environment.Php.PhpExecutablePath + wxT("\"") + 
-		wxT(" ") + wxT("\"") + params.ScriptName + wxT("\"") + 
-		wxT(" --sourceDir=") + wxT("\"") + params.SourceDir + wxT("\"") + 
-		wxT(" --resourceDbFileName=") + wxT("\"") + params.ResourceDbFileName + wxT("\"") + 
-		wxT(" --host=") + wxT("\"") + params.RootUrl + wxT("\"") + 
-		wxT(" --outputDbFileName=") + wxT("\"") + params.OutputDbFileName + wxT("\"");
-	return cmdLine;
 }
 
 std::vector<wxString> mvceditor::UrlDetectorActionClass::DetectorScripts() {
