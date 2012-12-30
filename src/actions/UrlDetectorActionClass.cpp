@@ -155,6 +155,8 @@ void mvceditor::UrlDetectorActionClass::NextDetection() {
 	mvceditor::UrlDetectorParamsClass params = ParamsQueue.front();
 	ParamsQueue.pop();
 
+	SetStatus(_("Determining Routes for ") + params.RootUrl);
+
 	wxString cmdLine = params.BuildCmdLine();
 	long pid;
 	Process.Init(cmdLine, ID_URL_DETECTOR_PROCESS, pid);

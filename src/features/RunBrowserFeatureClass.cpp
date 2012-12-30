@@ -302,7 +302,6 @@ void mvceditor::RunBrowserFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 	wxMenu* menu = new wxMenu(0);
 	menu->Append(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 5, _("View URL Detectors"), _("View the URL Detectors"), wxITEM_NORMAL);
 	menu->Append(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 6, _("Run URL Detection"), _("Run the URL Detectors against the current projects"), wxITEM_NORMAL);
-	menu->Append(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 7, _("Test URL Detection"), _("Test the URL Detectors by running it and showing the results"), wxITEM_NORMAL);
 	menuBar->Append(menu, _("Detectors"));
 }
 
@@ -481,7 +480,7 @@ void mvceditor::RunBrowserFeatureClass::OnBrowserToolMenuItem(wxCommandEvent& ev
 	}
 }
 
-void mvceditor::RunBrowserFeatureClass::OnUrlDetectectorMenu(wxCommandEvent& event) {
+void mvceditor::RunBrowserFeatureClass::OnViewUrlDetectors(wxCommandEvent& event) {
 	wxWindow* window = FindOutlineWindow(ID_URL_DETECTOR_PANEL);
 	if (window) {
 		SetFocusToOutlineWindow(window);
@@ -494,6 +493,20 @@ void mvceditor::RunBrowserFeatureClass::OnUrlDetectectorMenu(wxCommandEvent& eve
 			panel->UpdateProjects();
 		}
 	}
+}
+
+void mvceditor::RunBrowserFeatureClass::OnRunUrlDetectors(wxCommandEvent& event) {
+	if (App.Sequences.Running()) {
+		wxMessageBox(_("Please wait for the current background task to finish"));
+		return;
+	}
+	std::vector<mvceditor::ActionClass*> actions;
+
+	// the sequence class will own this pointer
+	actions.push_back(
+		new mvceditor::UrlDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_URL_DETECTOR)	
+	);
+	App.Sequences.Build(actions);
 }
 
 void mvceditor::RunBrowserFeatureClass::OnUrlToolMenuItem(wxCommandEvent& event) {
@@ -546,7 +559,8 @@ BEGIN_EVENT_TABLE(mvceditor::RunBrowserFeatureClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::RunBrowserFeatureClass::OnPreferencesSaved)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_URL_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::RunBrowserFeatureClass::OnUrlResourceActionComplete)
 
-	EVT_MENU(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 5, mvceditor::RunBrowserFeatureClass::OnUrlDetectectorMenu)
+	EVT_MENU(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 5, mvceditor::RunBrowserFeatureClass::OnViewUrlDetectors)
+	EVT_MENU(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 6, mvceditor::RunBrowserFeatureClass::OnRunUrlDetectors)
 	
 END_EVENT_TABLE()
 

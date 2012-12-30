@@ -160,7 +160,9 @@ private:
 
 	void AddNewMenu(wxMenuBar* menuBar);
 
-	void OnUrlDetectectorMenu(wxCommandEvent& event);
+	void OnViewUrlDetectors(wxCommandEvent& event);
+
+	void OnRunUrlDetectors(wxCommandEvent& event);
 
 	/**
 	 * when a project is opened clean the Recent list
