@@ -49,21 +49,36 @@ wxFileName ResourceSqlSchemaAsset();
 wxFileName AutoCompleteImageAsset(wxString imageName);
 
 /**
- * @return the file location of the PHP detector script.  The editor will use this script
- * to find out framework-specific stuff (routes, DB connections, etc...)
+ * @return the base directory location of the PHP URL scripts.  The editor will use this as the
+ * include path when calling all PHP detectors
  */
-wxFileName PhpDetectorsAsset();
+wxFileName PhpDetectorsBaseAsset();
 
 /**
  * @return the directory location of the PHP URL detector scripts.  The editor will use these scripts
- * to find out framework-specific URL routes
+ * to find out framework-specific URL routes. These are the URL detectors that are provided
+ * by MVC editor.
  */
-wxFileName UrlDetectorsAsset();
+wxFileName UrlDetectorsGlobalAsset();
+
+/**
+ * @return the directory location of the PHP URL detector scripts.  The editor will use these scripts
+ * to find out framework-specific URL routes. These are the URL detectors that the user
+ * creates for their own projects.
+ */
+wxFileName UrlDetectorsLocalAsset();
 
 /**
  * @return the file location of the SQL script to create the detector database.
  */
 wxFileName DetectorSqlSchemaAsset();
+
+/**
+ * @return the base directory location of the skeletons.  Skeletons are "templates"
+ * that are used when the editor needs to paste source code in a (new) file; we 
+ * don't hardcode the code in the executable.
+ */
+wxFileName SkeletonsBaseAsset();
 
 /**
  * @return the full path to a directory inside of the system temp directory

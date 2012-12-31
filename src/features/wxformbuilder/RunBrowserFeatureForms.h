@@ -36,7 +36,8 @@
 #define ID_FILTER 1001
 #define ID_PROJECT_CHOICE 1002
 #define ID_TEST_DETECTOR_BUTTON 1003
-#define ID_DETECTOR_TREE 1004
+#define ID_ADD_BUTTON 1004
+#define ID_DETECTOR_TREE 1005
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class ChooseUrlDialogGeneratedClass
@@ -79,12 +80,14 @@ class UrlDetectorPanelGeneratedClass : public wxPanel
 		wxStaticText* ProjectLabel;
 		wxChoice* ProjectChoice;
 		wxButton* TestButton;
+		wxButton* AddButton;
 		wxBitmapButton* HelpButton;
 		wxStaticText* Label;
 		wxTreeCtrl* UrlDetectorTree;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnTestButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAddButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnTreeItemActivated( wxTreeEvent& event ) { event.Skip(); }
 		

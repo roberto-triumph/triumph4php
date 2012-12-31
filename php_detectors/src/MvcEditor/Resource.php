@@ -197,36 +197,7 @@ class MvcEditor_Resource {
 		$this->comment = '';
 		$this->type = '';
 	}
-	
-	/**
-	 * Retrieves all of the methods from the given files. Only resources that 
-	 * are methods will be returned.
-	 *
-	 * @param Zend_Db_Adapter_Abstract $db the DB to query
-	 * @param int[] $fileItemIds the file item IDs to query
-	 * @return MvcEditor_Resource[] the resources that were found in any of the given files.
-	 */
-	public function MethodsFromFiles(Zend_Db_Adapter_Abstract $db, $fileItemIds) {
-		if (empty($fileItemIds)) {
-			return array();
-		}
-				
-		// key = identifier ==> don't get the fully qualified matches
-		$select = $db->select();
-		$select->from(array('r' => 'resources'), array('class_name', 'identifier', 'signature', 'return_type', 'comment'))
-			->join(array('f' => 'file_items'), 'r.file_item_id = f.file_item_id', array('full_path'));
-		$select->where("r.file_item_id IN(?)", $fileItemIds)->where('key = identifier')->where('type = ?', self::TYPE_METHOD);
-		$stmt = $db->query($select);
-		$methods = array();
-		while ($row = $stmt->fetch()) {
-			$method = new MvcEditor_Resource();
-			$method->MakeMethod($row['class_name'], $row['identifier'], $row['signature'], $row['return_type'], $row['comment']);
-			$method->fullPath = $row['full_path'];
-			$methods[] = $method;
-		}
-		return $methods;
- 	}
-	
+		
 	public static function typeString($type) {
 		if (self::TYPE_CLASS == $type) {
 			return "CLASS";

@@ -68,20 +68,19 @@ wxFileName mvceditor::AutoCompleteImageAsset(wxString imageName) {
 	return fileName;
 }
 
-wxFileName mvceditor::PhpDetectorsAsset() {
+wxFileName mvceditor::PhpDetectorsBaseAsset() {
 	wxStandardPaths paths;
 	wxFileName pathExecutableFileName(paths.GetExecutablePath());
-	wxString scriptFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
+	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
 		wxT("..") + wxFileName::GetPathSeparator() +
-		wxT("php_detectors") + wxFileName::GetPathSeparator() +
-		wxT("src") + wxFileName::GetPathSeparator() +
-		wxT("MvcEditorFrameworkApp.php");
-	wxFileName scriptFileName(scriptFullPath);
-	scriptFileName.Normalize();
-	return scriptFileName;
+		wxT("php_detectors");
+	wxFileName scriptsFileName;
+	scriptsFileName.AssignDir(scriptsFullPath);
+	scriptsFileName.Normalize();
+	return scriptsFileName;
 }
 
-wxFileName mvceditor::UrlDetectorsAsset() {
+wxFileName mvceditor::UrlDetectorsGlobalAsset() {
 	wxStandardPaths paths;
 	wxFileName pathExecutableFileName(paths.GetExecutablePath());
 	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
@@ -92,6 +91,16 @@ wxFileName mvceditor::UrlDetectorsAsset() {
 	scriptsFileName.AssignDir(scriptsFullPath);
 	scriptsFileName.Normalize();
 	return scriptsFileName;
+}
+
+wxFileName mvceditor::UrlDetectorsLocalAsset() {
+	wxStandardPaths paths;
+	wxFileName configDir = mvceditor::ConfigDirAsset();
+	configDir.AppendDir(wxT("url_detectors"));
+	if (!configDir.DirExists()) {
+		wxMkdir(configDir.GetPath(), 0777);
+	}
+	return configDir;
 }
 
 wxFileName mvceditor::TempDirAsset() {
@@ -127,4 +136,17 @@ wxFileName mvceditor::DetectorSqlSchemaAsset() {
 	wxFileName fileName(nativeFileName);
 	fileName.Normalize();
 	return fileName;
+}
+
+wxFileName mvceditor::SkeletonsBaseAsset() {
+	wxStandardPaths paths;
+	wxFileName pathExecutableFileName(paths.GetExecutablePath());
+	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
+		wxT("..") + wxFileName::GetPathSeparator() +
+		wxT("resources") + wxFileName::GetPathSeparator() +
+		wxT("skeletons");
+	wxFileName scriptsFileName;
+	scriptsFileName.AssignDir(scriptsFullPath);
+	scriptsFileName.Normalize();
+	return scriptsFileName;
 }

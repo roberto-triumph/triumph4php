@@ -84,10 +84,8 @@ public:
 
 	/**
 	 * This should be called when the detector tree needs to be updated.
-	 *
-	 * @param wxString the root directory where the URL detectors are located
 	 */
-	void Init(const wxString& detectorRootDir);
+	void Init();
 
 	/**
 	 * updates the project choice with the given projects. This should be called whenever
@@ -100,6 +98,7 @@ protected:
 	void OnTreeItemActivated(wxTreeEvent& event);
 	void OnHelpButton(wxCommandEvent& event);
 	void OnTestButton(wxCommandEvent& event);
+	void OnAddButton(wxCommandEvent& event);
 
 private:
 

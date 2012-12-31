@@ -72,6 +72,7 @@ wxString mvceditor::UrlResourceFinderInitActionClass::GetLabel() const {
 
 mvceditor::UrlDetectorParamsClass::UrlDetectorParamsClass() 
 	: PhpExecutablePath()
+	, PhpIncludePath()
 	, ScriptName()
 	, SourceDir()
 	, ResourceDbFileName()
@@ -83,9 +84,10 @@ mvceditor::UrlDetectorParamsClass::UrlDetectorParamsClass()
 wxString mvceditor::UrlDetectorParamsClass::BuildCmdLine() const {
 	wxString cmdLine;
 	cmdLine = wxT("\"") + PhpExecutablePath + wxT("\"") + 
-		wxT(" ") + wxT("\"") + ScriptName + wxT("\"") + 
-		wxT(" --sourceDir=") + wxT("\"") + SourceDir + wxT("\"") + 
-		wxT(" --resourceDbFileName=") + wxT("\"") + ResourceDbFileName + wxT("\"") + 
+		wxT(" -d include_path=") + wxT("\"") + PhpIncludePath.GetPath() + wxT("\"") + 
+		wxT(" ") + wxT("\"") + ScriptName.GetFullPath() + wxT("\"") + 
+		wxT(" --sourceDir=") + wxT("\"") + SourceDir.GetPath() + wxT("\"") + 
+		wxT(" --resourceDbFileName=") + wxT("\"") + ResourceDbFileName.GetFullPath() + wxT("\"") + 
 		wxT(" --host=") + wxT("\"") + RootUrl + wxT("\"") +
 		wxT(" --outputDbFileName=") + wxT("\"") + OutputDbFileName + wxT("\"");
 	return cmdLine;
@@ -115,8 +117,9 @@ bool mvceditor::UrlDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
 			for (scriptName = detectorScripts.begin(); scriptName != detectorScripts.end(); ++scriptName) {
 				mvceditor::UrlDetectorParamsClass params;
 				params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
+				params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset();
 				params.ScriptName = *scriptName;
-				params.SourceDir = source->RootDirectory.GetPath();
+				params.SourceDir = source->RootDirectory;
 				params.ResourceDbFileName = project->ResourceDbFileName.GetFullPath();
 				params.RootUrl = globals.Environment.Apache.GetUrl(source->RootDirectory.GetPath());
 				params.OutputDbFileName = project->DetectorDbFileName.GetFullPath();
@@ -165,9 +168,13 @@ void mvceditor::UrlDetectorActionClass::NextDetection() {
 std::vector<wxString> mvceditor::UrlDetectorActionClass::DetectorScripts() {
 	std::vector<wxString> scripts;
 	DirTraverserClass traverser(scripts);
-	wxDir dir;
-	if (dir.Open(mvceditor::UrlDetectorsAsset().GetFullPath())) {
-		dir.Traverse(traverser, wxEmptyString, wxDIR_DIRS | wxDIR_FILES);
+	wxDir globalDir;
+	if (globalDir.Open(mvceditor::UrlDetectorsGlobalAsset().GetFullPath())) {
+		globalDir.Traverse(traverser, wxEmptyString, wxDIR_DIRS | wxDIR_FILES);
+	}
+	wxDir localDir;
+	if (localDir.Open(mvceditor::UrlDetectorsLocalAsset().GetFullPath())) {
+		localDir.Traverse(traverser, wxEmptyString, wxDIR_DIRS | wxDIR_FILES);
 	}
 	return  scripts;
 }

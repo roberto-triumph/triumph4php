@@ -144,6 +144,26 @@ void mvceditor::ChooseUrlDialogClass::OnKeyDown(wxKeyEvent& event) {
 	}
 }
 
+/**
+ * small class to hold the full path to the detector script on each
+ * tree item
+ */
+class TreeItemDataStringClass : public wxTreeItemData {
+
+public:
+
+	wxString FullPath;
+
+	TreeItemDataStringClass(wxString fullPath);
+
+};
+
+TreeItemDataStringClass::TreeItemDataStringClass(wxString fullPath) 
+	: wxTreeItemData() 
+	, FullPath(fullPath) {
+	
+}
+
 mvceditor::UrlDetectorPanelClass::UrlDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
 														mvceditor::EventSinkClass& eventSink)
 	: UrlDetectorPanelGeneratedClass(parent, id) 
@@ -153,12 +173,20 @@ mvceditor::UrlDetectorPanelClass::UrlDetectorPanelClass(wxWindow* parent, int id
 		wxART_TOOLBAR, wxSize(16, 16))));
 }
 
-void mvceditor::UrlDetectorPanelClass::Init(const wxString& detectorRootDir) {
+void mvceditor::UrlDetectorPanelClass::Init() {
+	wxString globalRootDir = mvceditor::UrlDetectorsGlobalAsset().GetPath(wxPATH_NATIVE);
+	wxString localRootDir = mvceditor::UrlDetectorsLocalAsset().GetPath(wxPATH_NATIVE);
+	
 	UrlDetectorTree->Freeze();
 	UrlDetectorTree->DeleteAllItems();
 	UrlDetectorTree->AddRoot(_("URL Detectors"));
-	FillSubTree(detectorRootDir, UrlDetectorTree->GetRootItem());
-	UrlDetectorTree->Expand(UrlDetectorTree->GetRootItem());
+	wxTreeItemId globalItemId = UrlDetectorTree->AppendItem(UrlDetectorTree->GetRootItem(), _("Global"));
+	wxTreeItemId localItemId = UrlDetectorTree->AppendItem(UrlDetectorTree->GetRootItem(), _("Local"));
+	
+	FillSubTree(globalRootDir, globalItemId);
+	FillSubTree(localRootDir, localItemId);
+
+	UrlDetectorTree->ExpandAllChildren(UrlDetectorTree->GetRootItem());
 	UrlDetectorTree->Thaw();
 }
 
@@ -187,7 +215,9 @@ void mvceditor::UrlDetectorPanelClass::FillSubTree(const wxString& detectorRootD
 		}
 		if (dir.GetFirst(&fileName, wxEmptyString, wxDIR_FILES)) {
 			do {
-				UrlDetectorTree->AppendItem(treeItemDir, fileName);
+				wxFileName fullPath(detectorRootDir, fileName);
+				TreeItemDataStringClass* treeItemData = new TreeItemDataStringClass(fullPath.GetFullPath());
+				UrlDetectorTree->AppendItem(treeItemDir, fileName, -1, -1, treeItemData);
 			} while (dir.GetNext(&fileName));
 
 		}
@@ -195,14 +225,14 @@ void mvceditor::UrlDetectorPanelClass::FillSubTree(const wxString& detectorRootD
 }
 
 void mvceditor::UrlDetectorPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
-	wxFileName detectorRootDir = mvceditor::UrlDetectorsAsset();
 	wxTreeItemId id = event.GetItem();
-	wxString name = UrlDetectorTree->GetItemText(id);
-	wxFileName fullFileName(detectorRootDir.GetPath(), name);
 	
-	wxCommandEvent openEvent(mvceditor::EVENT_CMD_FILE_OPEN);
-	openEvent.SetString(fullFileName.GetFullPath());
-	EventSink.Publish(openEvent);
+	TreeItemDataStringClass* treeItemData = (TreeItemDataStringClass*)UrlDetectorTree->GetItemData(id);
+	if (treeItemData) {
+		wxCommandEvent openEvent(mvceditor::EVENT_CMD_FILE_OPEN);
+		openEvent.SetString(treeItemData->FullPath);
+		EventSink.Publish(openEvent);
+	}
 }
 
 void mvceditor::UrlDetectorPanelClass::OnHelpButton(wxCommandEvent& event) {
@@ -213,6 +243,54 @@ void mvceditor::UrlDetectorPanelClass::OnHelpButton(wxCommandEvent& event) {
 	);
 	help = wxGetTranslation(help);
 	wxMessageBox(help, _("URL Detectors Help"), wxOK, this);
+}
+
+void mvceditor::UrlDetectorPanelClass::OnAddButton(wxCommandEvent& event) {
+	wxString name = ::wxGetTextFromUser(_("Please enter a file name (no extension)"), _("Create a URL Detector"), wxEmptyString, 
+		// grandParent == outline notebook's parent (the frame)
+		this->GetGrandParent());
+	wxString forbidden = wxFileName::GetForbiddenChars();
+	if (name.find_first_of(forbidden, 0) != std::string::npos) {
+		wxMessageBox(_("Please enter valid a file name"));
+		return;
+	}
+	if (!name.EndsWith(wxT(".php"))) {
+		name += wxT(".php");
+	}
+	wxFileName localDetectorScript(mvceditor::UrlDetectorsLocalAsset().GetPath(), name);
+	if (localDetectorScript.FileExists()) {
+		wxMessageBox(_("File name already exists. Please enter another name."));
+		return;
+	}
+
+	wxFile file;
+	if (file.Create(localDetectorScript.GetFullPath())) {
+		
+		// populate the file with some starter code to guide the user
+		wxFileName urlDetectorSkeleton = mvceditor::SkeletonsBaseAsset();
+		urlDetectorSkeleton.Assign(urlDetectorSkeleton.GetPath(), wxT("UrlDetector.skeleton.php"));
+		wxFFile skeletonFile(urlDetectorSkeleton.GetFullPath().fn_str(), wxT("r"));
+		wxASSERT_MSG(skeletonFile.IsOpened(), _("UrlDetector.skeleton.php is not found."));
+		wxString contents;
+		skeletonFile.ReadAll(&contents);
+		file.Write(contents);
+
+		// close file so that it can be opened later on by the app
+		file.Close();
+		wxCommandEvent openEvent(mvceditor::EVENT_CMD_FILE_OPEN);
+		openEvent.SetString(localDetectorScript.GetFullPath());
+		EventSink.Publish(openEvent);
+
+		// add the tree node also
+		TreeItemDataStringClass* treeItemData = new TreeItemDataStringClass(localDetectorScript.GetFullPath());
+		wxTreeItemId localLabelTreeItemId = UrlDetectorTree->GetLastChild(UrlDetectorTree->GetRootItem());
+		UrlDetectorTree->AppendItem(localLabelTreeItemId, name, -1,-1, treeItemData);
+		UrlDetectorTree->SortChildren(localLabelTreeItemId);
+		UrlDetectorTree->ExpandAllChildren(localLabelTreeItemId);
+	}
+	else {
+		wxMessageBox(_("File could not be created:") + localDetectorScript.GetFullPath());
+	}
 }
 
 void mvceditor::UrlDetectorPanelClass::OnTestButton(wxCommandEvent& event) {
@@ -243,19 +321,23 @@ void mvceditor::UrlDetectorPanelClass::OnTestButton(wxCommandEvent& event) {
 			_(" under Edit -> Preferences -> Apache"));
 		return;
 	}
+	TreeItemDataStringClass* treeItemData = (TreeItemDataStringClass*)UrlDetectorTree->GetItemData(itemId);
+	if (!treeItemData) {
+		wxMessageBox(_("Please choose a URL detector to test."));
+		return;
+	}
 	
-	wxFileName detectorRootDir = mvceditor::UrlDetectorsAsset();
-	wxString name = UrlDetectorTree->GetItemText(itemId);
-	wxFileName fullFileName(detectorRootDir.GetPath(), name);
+	wxString detectorScriptFullPath = treeItemData->FullPath;
 
 	// leave OutputDbFileName empty; that way the results are output to
 	// STDOUT
 	// that way the user can easily see what URLs would be detected
 	mvceditor::UrlDetectorParamsClass params;
 	params.PhpExecutablePath = Globals.Environment.Php.PhpExecutablePath;
-	params.ScriptName = fullFileName.GetFullPath();
-	params.SourceDir = source.RootDirectory.GetPath();
-	params.ResourceDbFileName = project.ResourceDbFileName.GetFullPath();
+	params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset();
+	params.ScriptName = detectorScriptFullPath;
+	params.SourceDir = source.RootDirectory;
+	params.ResourceDbFileName = project.ResourceDbFileName;
 	params.RootUrl = rootUrl;
 
 	wxString cmdLine = params.BuildCmdLine();
@@ -489,7 +571,7 @@ void mvceditor::RunBrowserFeatureClass::OnViewUrlDetectors(wxCommandEvent& event
 		mvceditor::UrlDetectorPanelClass* panel = new mvceditor::UrlDetectorPanelClass(GetOutlineNotebook(), ID_URL_DETECTOR_PANEL, 
 			App.Globals, App.EventSink);
 		if (AddOutlineWindow(panel, _("URL Detectors"))) {
-			panel->Init(mvceditor::UrlDetectorsAsset().GetPath(wxPATH_NATIVE));
+			panel->Init();
 			panel->UpdateProjects();
 		}
 	}

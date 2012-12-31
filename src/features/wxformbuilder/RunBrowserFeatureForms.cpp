@@ -104,8 +104,11 @@ UrlDetectorPanelGeneratedClass::UrlDetectorPanelGeneratedClass( wxWindow* parent
 	ProjectChoice->SetSelection( 0 );
 	TopSizer->Add( ProjectChoice, 1, wxALL|wxEXPAND, 5 );
 	
-	TestButton = new wxButton( this, ID_TEST_DETECTOR_BUTTON, _("Test"), wxDefaultPosition, wxDefaultSize, 0 );
+	TestButton = new wxButton( this, ID_TEST_DETECTOR_BUTTON, _("Test"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT );
 	TopSizer->Add( TestButton, 0, wxALL, 5 );
+	
+	AddButton = new wxButton( this, ID_ADD_BUTTON, _("Add"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT );
+	TopSizer->Add( AddButton, 0, wxALL, 5 );
 	
 	HelpButton = new wxBitmapButton( this, wxID_HELP, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	TopSizer->Add( HelpButton, 0, wxALL, 5 );
@@ -131,6 +134,7 @@ UrlDetectorPanelGeneratedClass::UrlDetectorPanelGeneratedClass( wxWindow* parent
 	
 	// Connect Events
 	TestButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( UrlDetectorPanelGeneratedClass::OnTestButton ), NULL, this );
+	AddButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( UrlDetectorPanelGeneratedClass::OnAddButton ), NULL, this );
 	HelpButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( UrlDetectorPanelGeneratedClass::OnHelpButton ), NULL, this );
 	UrlDetectorTree->Connect( wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler( UrlDetectorPanelGeneratedClass::OnTreeItemActivated ), NULL, this );
 }
@@ -139,6 +143,7 @@ UrlDetectorPanelGeneratedClass::~UrlDetectorPanelGeneratedClass()
 {
 	// Disconnect Events
 	TestButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( UrlDetectorPanelGeneratedClass::OnTestButton ), NULL, this );
+	AddButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( UrlDetectorPanelGeneratedClass::OnAddButton ), NULL, this );
 	HelpButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( UrlDetectorPanelGeneratedClass::OnHelpButton ), NULL, this );
 	UrlDetectorTree->Disconnect( wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler( UrlDetectorPanelGeneratedClass::OnTreeItemActivated ), NULL, this );
 	

@@ -48,6 +48,6 @@ class MvcEditor_FileItemTable extends Zend_Db_Table_Abstract {
 		$select->where('full_path LIKE ?', $startingPath);
 		$stmt = $select->query();
 		
-		return $stmt->fetchAll();
+		return $stmt->fetchAll(Zend_Db::FETCH_OBJ);
 	}
 }

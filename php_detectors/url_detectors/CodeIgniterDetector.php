@@ -1,12 +1,155 @@
 <?php
+/**
+ * This software is released under the terms of the MIT License
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * @copyright  2009-2011 Roberto Perpuly
+ * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
+ */
 
-require_once(dirname(__FILE__) . '/../bootstrap.php');
+/**
+ * The goal of this script is to discover all of the URLs that a PHP code igniter project. This means
+ * that it will list all of the URLs that correspond all of the project's controller functions. This script
+ * is a bit smarter because it is able to detect default controllers and also read the code igniter
+ * config for url suffixes.
+ *
+ * This script is part of MVC Editor's URL Detection feature; it enables the editor to have a 
+ * list of all of a project's urls so that the user can easily open / jump to URLs. More
+ * info can be about MVC Editor's URL detector feature can be found at 
+ * http://code.google.com/p/mvc-editor/wiki/URLDetectors
+ */
 
+// the bootstrap file setups up the include path and autoload mechanism so that
+// all libraries are accessible without needing to be required.
+require_once('bootstrap.php');
+
+/**
+ * This function will look at the given program arguments and will validate them.
+ * If the required arguments have been passed then it will call the URL detector function,
+ * otherwise it will stop the program.
+ * This function is called at the end of this script (see last line of this file).
+ * The help text below describes the arguments that are needed.
+ */
+function parseArgs() {
+	$rules = array(
+		'sourceDir|d=s' => 'Required. The base directory that the project resides in',
+		'resourceDbFileName|i=s' => 'Required. SQLite file that contains the project\'s files, classes, and methods. This file is created by ' .
+			'MVC Editor; MVC Editor performs INSERTs as it indexes a project.',
+		'host|s=s' => 'Required. Host name to start the URLs with. MVC Editor determines the host name by using the configured ' .
+			'virtual host mappings that the user adds via the menu Edit -> Preferences -> Apache',
+		'outputDbFileName|o-s' => 'Optional. If given, the output will be written to the given file. If not given, output goes to STDOUT.',
+		'help|h' => 'This help message'
+	);
+	$opts = new Zend_Console_Getopt($rules);
+
+	// trim any quotes
+	$sourceDir = trim($opts->getOption('sourceDir'), " \r\n\t'\"");
+	$resourceDbFileName = trim($opts->getOption('resourceDbFileName'), " \r\n\t'\"");
+	$host = trim($opts->getOption('host'), " \r\n\t'\"");
+	$outputDbFileName = trim($opts->getOption('outputDbFileName'), " \r\n\t'\"");
+	$help = trim($opts->getOption('help'), " \r\n\t'\"");
+
+	if ($help) {
+		$helpMessage = <<<EOF
+The goal of this script is to discover all of the URLs that a PHP code igniter project. This means
+that it will list all of the URLs that correspond all of the project's controller functions. This script
+is a bit smarter because it is able to detect default controllers and also read the code igniter
+config for url suffixes.
+
+This script is part of MVC Editor's URL Detection feature; it enables the editor to have a 
+list of all of a project's urls so that the user can easily open / jump to URLs. More
+info can be about MVC Editor's URL detector feature can be found at 
+http://code.google.com/p/mvc-editor/wiki/URLDetectors
+
+When a required argument is invalid or missing, the program will exit with an error code (-1)
+
+EOF;
+
+		echo $helpMessage;
+		echo "\n";
+		echo $opts->getUsageMessage();
+		exit(-1);
+	}
+
+	if (!$sourceDir) {
+		echo "Missing argument: --sourceDir. See --help for details.\n";
+		exit(-1);
+	}
+	if (!is_dir($sourceDir)) {
+		echo "sourceDir is not a valid directory. Is \"{$sourceDir}\" a directory? Is it readable? \n";
+		exit(-1);
+	}
+
+	if (!$resourceDbFileName) {
+		echo "Missing argument: --resourceDbFileName. See --help for details.\n";
+		exit(-1);
+	}
+
+	if (!$host) {
+		echo "Missing argument: --host. See --help for details.\n";
+		exit(-1);
+	}
+
+	// call the function that will return all detected URLs
+	$arrUrls = detectUrls($sourceDir, $resourceDbFileName, $host);
+
+	// now send the detected URLs to either STDOUT or store in the 
+	// sqlite DB
+	if ($outputDbFileName) {
+		$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $outputDbFileName));
+		$urlResourceTable = new MvcEditor_UrlResourceTable($pdo);
+		$urlResourceTable->saveUrls($arrUrls, $sourceDir);
+		echo "Url dectection complete, written to {$outputDbFileName}\n";
+	}
+	else {
+		if (!empty($arrUrls)) {
+			echo str_pad("URL", 60) . str_pad("File name", 90) . str_pad("Class", 20) . str_pad("Method", 20) . "\n";
+			foreach ($arrUrls as $url) {
+				echo str_pad($url->url, 60);
+				echo str_pad($url->fileName, 90);
+				echo str_pad($url->className, 20);
+				echo str_pad($url->methodName, 20);
+				echo "\n";
+			}
+		}
+		else {
+			echo "No URLs were detected for {$sourceDir}\n";
+		}
+	}
+}
+
+/**
+ * This function will use the resource cache to lookup all controllers and their methods.  Then it
+ * will create a MvcEditor_Url instance for each method; note that the routes file is 
+ * also consulted and we will generate URLs for the default controller.
+ *
+ * @param  string $sourceDir            the root directory of the project in question
+ * @param  string $resourceDbFileName   the location of the resource cache SQLite file; as created by MVC Editor
+ * @param  string $host                 the hostname of the application; this will be used a the prefix on all URLs
+ * @return MvcEditor_Url[]              array of MvcEditor_Url instances the detected URLs
+ */
 function detectUrls($sourceDir, $resourceDbFileName, $host) {
 	if (!is_file($resourceDbFileName)) {
 		return array();
 	}
-	$sourceDir = \opstring\ensure_ends_with($sourceDir, '/');
+	$sourceDir = \opstring\ensure_ends_with($sourceDir, DIRECTORY_SEPARATOR);
 	$host = \opstring\ensure_ends_with($host, '/');
 
 	// TODO: handle multiple apps
@@ -20,6 +163,9 @@ function detectUrls($sourceDir, $resourceDbFileName, $host) {
 		// this source directory does not contain a code igniter directory.
 		return array();
 	}
+	
+	// get the code igniter configuration so that we can use it to build the
+	// correct routes
 	$config = array();
 	$route = array();
 	include($sourceDir . 'application/config/routes.php');
@@ -27,40 +173,33 @@ function detectUrls($sourceDir, $resourceDbFileName, $host) {
 
 	$allUrls = array();	
 
+	// lookup all controller files from the resource cache, only controllers are accessible via URLs
+	// since file names in the cache are OS dependant, need to use the correct directory separators
 	$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $resourceDbFileName));
-	Zend_Db_Table_Abstract::setDefaultAdapter($pdo);
-	$fileItemTable = new MvcEditor_FileItemTable();
-
-	// get all controller files, only controllers are accessible via URLs
-	$controllerDir = $sourceDir . 'application/controllers';
+	$fileItemTable = new MvcEditor_FileItemTable($pdo);
+	$controllerDir = $sourceDir . 'application' . DIRECTORY_SEPARATOR . 'controllers';
 	$matchingFiles = $fileItemTable->MatchingFiles($controllerDir);
-	if (empty($matchingFiles)) {
-		$controllerDir = $sourceDir . 'application\controllers';
-		$matchingFiles = $fileItemTable->MatchingFiles(realpath($controllerDir));
-	}
-
-	$resource = new MvcEditor_Resource();
-	$methods = $resource->MethodsFromFiles($pdo, $matchingFiles);
+	
+	// lookup all of the methods for all controller files.
+	$resourceTable = new MvcEditor_ResourceTable($pdo);
+	$methods = $resourceTable->MethodsFromFiles($matchingFiles);
 	foreach ($methods as $resource) {
 		
-		// normalize any paths to have forward slash
-		// doing this so that this logic works on MSW, linux, AND the vfs:// stream (tests)
-		$controllerDir = \opstring\replace($controllerDir, DIRECTORY_SEPARATOR, '/');
-		$resourceFullPath = \opstring\replace($resource->fullPath, DIRECTORY_SEPARATOR, '/');
-		
-		
-		$controllerFile = \opstring\after($resourceFullPath, $controllerDir);
+		// need to handle any sub-directories underneath the controllers; as the subdirectory
+		// is propagated in the URL
+		$controllerFile = \opstring\after($resource->fullPath, $controllerDir);
 		$subDirectory = dirname($controllerFile);
-		if ('\\' == $subDirectory) {
+		if ('\\' == $subDirectory || '/' == $subDirectory) {
 		
 			// hack to work around special case when there is no subdirectory
 			$subDirectory = '';
 		}
 		
-		// TODO: any controller arguments ... should get these from the user
 		// constructors are not web-accessible
 		// code igniter makes methods that start with underscore
 		if (\opstring\compare_case('__construct', $resource->identifier) && !\opstring\begins_with($resource->identifier, '_')) {
+			
+			// TODO: any controller arguments ... should get these from the user somehow
 			$extra = '';
 			$appUrl = makeUrl($route, $config, $subDirectory, $resource->fullPath, $resource->className, $resource->identifier, $extra);
 			$appUrl->url = $host . $appUrl->url;
@@ -70,6 +209,18 @@ function detectUrls($sourceDir, $resourceDbFileName, $host) {
 	return $allUrls;
 }
 
+/**
+ * Resolves the given class name - method name pair into the URL.
+ *
+ * @param  array  $route the code igniter $routes array
+ * @param  array  $config the code igniter $config array
+ * @param  string $subDirectory  if non-empty means that the controller is in a sub-directory of application/controllers
+ * @param  string $fileName the name of the controller file
+ * @param  string $className the name of the controller class
+ * @param  string $methodName the name of the method
+ * @param  string $extra any extra segments to append to the URL
+ * @return MvcEditor_Url the full URL after routing rules have been applied.
+ */
 function makeUrl($route, $config, $subDirectory, $fileName, $className, $methodName, $extra) {
 	
 	// this function was taken from http://codeigniter.com/forums/viewthread/102438
@@ -141,69 +292,6 @@ function makeUrl($route, $config, $subDirectory, $fileName, $className, $methodN
 	return $mvcUrl;
 }
 
-$rules = array(
-	'sourceDir|d=s' => 'The base directory that the project resides in [Required]',
-	'resourceDbFileName|i=s' => 'SQLite file that contains the project\'s files, classes, and methods [Required]',
-	'host|s=s' => 'Host name to start the URLs with [Required]',
-	'outputDbFileName|o=s' => 'If given, the output will be written to the given file [optional, if not given, output goes to STDOUT)',
-	'help|h' => 'A help message'
-);
-$opts = new Zend_Console_Getopt($rules);
 
-// trim any quotes
-$sourceDir = trim($opts->getOption('sourceDir'), " \r\n\t'\"");
-$resourceDbFileName = trim($opts->getOption('resourceDbFileName'), " \r\n\t'\"");
-$host = trim($opts->getOption('host'), " \r\n\t'\"");
-$outputDbFileName = trim($opts->getOption('outputDbFileName'), " \r\n\t'\"");
-$help = trim($opts->getOption('help'), " \r\n\t'\"");
-
-if ($help) {
-	echo <<<EOF
-This is the gateway that will be responsible for communicating with the editor app.
-This is a strict command line interface; the editor will invoke this script via a command (and 
-with some arguments) and this app will parse the arguments and respond accordingly.
-For example, let's say the user opened a SQL browser.  The editor needs to know the SQL credentials to
-use. The editor will run this script asking for the credentials.  
-
-   php CodeIgniterDetector.php --dir="/home/user/projects/ci_project/" 
-
-When any argument is invalid or missing, the program will exit with an error code (-1)
-EOF;
-	exit(0);
-}
-
-if (!$sourceDir) {
-	echo "Missing argument: --dir. See --help for details.\n";
-	exit (-1);
-}
-
-if (!$resourceDbFileName) {
-	echo "Missing argument: --file. See --help for details.\n";
-	exit (-1);
-}
-
-if (!$host) {
-	echo "Missing argument: --host. See --help for details.\n";
-	exit (-1);
-}
-
-$arrUrls = detectUrls($sourceDir, $resourceDbFileName, $host);
-
-// now send the detected URLs to either STDOUT or store in the 
-// sqlite DB
-if ($outputDbFileName) {
-	$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $outputDbFileName));
-	$urlResourceTable = new MvcEditor_UrlResourceTable($pdo);
-	$urlResourceTable->saveUrls($arrUrls, $sourceDir);
-	echo "Url dectection complete, written to {$outputDbFileName}\n";
-}
-else {
-	echo str_pad("URL", 60) . str_pad("File name", 90) . str_pad("Class", 20) . str_pad("Method", 20) . "\n";
-	foreach ($arrUrls as $url) {
-		echo str_pad($url->url, 60);
-		echo str_pad($url->fileName, 90);
-		echo str_pad($url->className, 20);
-		echo str_pad($url->methodName, 20);
-		echo "\n";
-	}
-}
+// start running this script
+parseArgs();

@@ -49,17 +49,61 @@ public:
 
 /**
  * the set of parameters that will be used for each 
- * external url detector PHP script call
+ * external url detector PHP script call. All of 
+ * these params are required with the exception of
+ * OutputDbFileName.
  */
 class UrlDetectorParamsClass {
 
 public:
 
+	/**
+	 * location to the php executable (php.exe / php)
+	 * this is usually retrieved from mvceditor::EnvironmentClass
+	 */
 	wxString PhpExecutablePath;
-	wxString ScriptName;
-	wxString SourceDir;
-	wxString ResourceDbFileName;
+
+	/**
+	 * the base location of the php detector scripts. this is used as the 
+	 * include path so that both local detectors and global detectors
+	 * can access the php detector sources (since local detectors and global
+	 * detectors are located in separate directories, we need to use
+	 * include_path)
+	 */
+	wxFileName PhpIncludePath;
+
+	/**
+	 * The actual PHP script to run.
+	 */
+	wxFileName ScriptName;
+
+	/**
+	 * Argument to the URL detector script; the base directory of the project to scan
+	 */
+	wxFileName SourceDir;
+
+	/**
+	 * Argument to the URL detector script; the location of the resource cache SQLite db.
+	 * this db is created when the project is indexed and can be accessed via the 
+	 * GlobalsClass::Projects list
+	 */
+	wxFileName ResourceDbFileName;
+
+	/**
+	 * Argument to the URL detector script; the base URL of the project in question. This is 
+	 * usually calculated with the help of ApacheClass.
+	 * Examples: "http://localhost" ; "http://dev.localhost"
+	 */
 	wxString RootUrl;
+
+	/**
+	 * Argument to the URL detector script; the location of th detectors cache SQLite db.
+	 * this db is created when the project is indexed and can be accessed via the 
+	 * GlobalsClass::Projects list. This argument is optional; it can be empty in which
+	 * case the script outputs to STDOUT; leaving this argument empty is useful
+	 * for testing url detectors; so that the results are visible in the console wthout
+	 * needing to query the SQLite db.
+	 */
 	wxString OutputDbFileName;
 
 	UrlDetectorParamsClass();
