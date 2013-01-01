@@ -199,8 +199,9 @@ private:
  * if the cache file already exists, then WalkGlobal() may return immediately if the file
  * to be parsed has not been modified since the last time we parsed it.
  *
- * Note that all of the methods of this class can be safely accessed by multiple
- * threads.
+ * Note that NONE of the methods of this class can be safely accessed by multiple
+ * threads. Concurrent access can be achieved by creating separate instances of 
+ * ResourceCacheClas with both pointing to the same DB files.
  */
 class ResourceCacheClass {
 	
