@@ -148,7 +148,8 @@ wxString mvceditor::UrlDetectorActionClass::GetLabel() const {
 }
 
 void mvceditor::UrlDetectorActionClass::BackgroundWork() {
-
+	// nothing is done in the background, we use ProcessWithHeartbeatClass
+	// here
 }
 
 void mvceditor::UrlDetectorActionClass::NextDetection() {
@@ -208,4 +209,5 @@ void mvceditor::UrlDetectorActionClass::OnProcessInProgress(wxCommandEvent &even
 BEGIN_EVENT_TABLE(mvceditor::UrlDetectorActionClass, mvceditor::ActionClass) 
 	EVT_COMMAND(ID_URL_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::UrlDetectorActionClass::OnProcessInProgress)
 	EVT_COMMAND(ID_URL_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::UrlDetectorActionClass::OnProcessComplete)
+	EVT_COMMAND(ID_URL_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::UrlDetectorActionClass::OnProcessFailed)
 END_EVENT_TABLE()

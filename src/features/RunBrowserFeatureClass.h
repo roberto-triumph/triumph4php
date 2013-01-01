@@ -96,13 +96,21 @@ public:
 
 protected:
 	void OnTreeItemActivated(wxTreeEvent& event);
+	void OnTreeItemRightClick(wxTreeEvent& event);
+	void OnTreeItemDelete(wxTreeEvent& event);
 	void OnHelpButton(wxCommandEvent& event);
 	void OnTestButton(wxCommandEvent& event);
 	void OnAddButton(wxCommandEvent& event);
+	void OnTreeItemEndLabelEdit(wxTreeEvent& event);
 
 private:
 
 	void FillSubTree(const wxString& detectorRootDir, wxTreeItemId treeItemDir);
+
+	// context menu handlers for the URL detector tree
+	void OnMenuOpenDetector(wxCommandEvent& event);
+	void OnMenuRenameDetector(wxCommandEvent& event);
+	void OnMenuDeleteDetector(wxCommandEvent& event);
 
 	/**
 	 * to access the project list

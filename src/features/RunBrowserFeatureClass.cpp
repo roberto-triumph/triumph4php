@@ -37,6 +37,10 @@ static const size_t MAX_BROWSERS = 10;
 static const size_t MAX_URLS = 40;
 static const int ID_URL_DETECTOR_PANEL = wxNewId();
 
+static const int ID_URL_DETECTOR_TREE_OPEN = wxNewId();
+static const int ID_URL_DETECTOR_TREE_RENAME = wxNewId();
+static const int ID_URL_DETECTOR_TREE_DELETE = wxNewId();
+
 static void ExternalBrowser(const wxString& browserName, const wxURI& url, mvceditor::EnvironmentClass* environment) {
 	wxFileName webBrowserPath;
 	bool found = environment->FindBrowserByName(browserName, webBrowserPath);
@@ -174,8 +178,8 @@ mvceditor::UrlDetectorPanelClass::UrlDetectorPanelClass(wxWindow* parent, int id
 }
 
 void mvceditor::UrlDetectorPanelClass::Init() {
-	wxString globalRootDir = mvceditor::UrlDetectorsGlobalAsset().GetPath(wxPATH_NATIVE);
-	wxString localRootDir = mvceditor::UrlDetectorsLocalAsset().GetPath(wxPATH_NATIVE);
+	wxString globalRootDir = mvceditor::UrlDetectorsGlobalAsset().GetPath();
+	wxString localRootDir = mvceditor::UrlDetectorsLocalAsset().GetPath();
 	
 	UrlDetectorTree->Freeze();
 	UrlDetectorTree->DeleteAllItems();
@@ -226,7 +230,6 @@ void mvceditor::UrlDetectorPanelClass::FillSubTree(const wxString& detectorRootD
 
 void mvceditor::UrlDetectorPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 	wxTreeItemId id = event.GetItem();
-	
 	TreeItemDataStringClass* treeItemData = (TreeItemDataStringClass*)UrlDetectorTree->GetItemData(id);
 	if (treeItemData) {
 		wxCommandEvent openEvent(mvceditor::EVENT_CMD_FILE_OPEN);
@@ -272,6 +275,7 @@ void mvceditor::UrlDetectorPanelClass::OnAddButton(wxCommandEvent& event) {
 		wxFFile skeletonFile(urlDetectorSkeleton.GetFullPath().fn_str(), wxT("r"));
 		wxASSERT_MSG(skeletonFile.IsOpened(), _("UrlDetector.skeleton.php is not found."));
 		wxString contents;
+		
 		skeletonFile.ReadAll(&contents);
 		file.Write(contents);
 
@@ -346,6 +350,105 @@ void mvceditor::UrlDetectorPanelClass::OnTestButton(wxCommandEvent& event) {
 	wxCommandEvent runEvent(mvceditor::EVENT_CMD_RUN_COMMAND);
 	runEvent.SetString(cmdLine);
 	EventSink.Publish(runEvent);
+}
+
+void mvceditor::UrlDetectorPanelClass::OnTreeItemRightClick(wxTreeEvent& event) {
+	wxTreeItemId treeItemId = event.GetItem();
+	TreeItemDataStringClass* data = (TreeItemDataStringClass*)UrlDetectorTree->GetItemData(treeItemId);
+	if (data) {
+		UrlDetectorTree->SelectItem(treeItemId, true);
+
+		// only show the menu on the filenames not the "local" or "global" labels
+		wxTreeItemId i = treeItemId;
+		bool isLocalDetector = false;
+		while (i != UrlDetectorTree->GetRootItem()) {
+			wxString label = UrlDetectorTree->GetItemText(i);
+			if (_("Local") == label) {
+				isLocalDetector = true;
+				break;
+			}
+			i = UrlDetectorTree->GetItemParent(i);
+		}
+
+		wxMenu menu;
+		menu.Append(ID_URL_DETECTOR_TREE_OPEN, _("Open"), _("Open the selected URL Detector"));	
+		menu.Append(ID_URL_DETECTOR_TREE_RENAME, _("Rename"), _("Rename the selected URL Detector"));
+		menu.Append(ID_URL_DETECTOR_TREE_DELETE, _("Delete"), _("Delete the selected URL Detector"));
+	
+		// only show the destructive menu items on the "local" detectors
+		menu.Enable(ID_URL_DETECTOR_TREE_RENAME, isLocalDetector);
+		menu.Enable(ID_URL_DETECTOR_TREE_DELETE, isLocalDetector);
+
+		wxPoint pos = event.GetPoint();
+		PopupMenu(&menu, pos);
+	}
+	event.Skip();
+}
+
+void mvceditor::UrlDetectorPanelClass::OnTreeItemDelete(wxTreeEvent& event) {
+	wxTreeItemId treeItemId = event.GetItem();
+	TreeItemDataStringClass* data = (TreeItemDataStringClass*)UrlDetectorTree->GetItemData(treeItemId);
+	if (data) {
+		wxRemoveFile(data->FullPath);
+	}
+	event.Skip();
+}
+
+void mvceditor::UrlDetectorPanelClass::OnMenuOpenDetector(wxCommandEvent& event) {
+	wxTreeItemId id = UrlDetectorTree->GetSelection();
+	TreeItemDataStringClass* treeItemData = (TreeItemDataStringClass*)UrlDetectorTree->GetItemData(id);
+	if (treeItemData) {
+		wxCommandEvent openEvent(mvceditor::EVENT_CMD_FILE_OPEN);
+		openEvent.SetString(treeItemData->FullPath);
+		EventSink.Publish(openEvent);
+	}
+}
+
+void mvceditor::UrlDetectorPanelClass::OnMenuRenameDetector(wxCommandEvent& event) {
+	wxTreeItemId id = UrlDetectorTree->GetSelection();
+	TreeItemDataStringClass* treeItemData = (TreeItemDataStringClass*)UrlDetectorTree->GetItemData(id);
+	if (treeItemData) {
+		UrlDetectorTree->EditLabel(id);	
+	}
+}
+
+void mvceditor::UrlDetectorPanelClass::OnMenuDeleteDetector(wxCommandEvent& event) {
+	wxTreeItemId treeItemId = UrlDetectorTree->GetSelection();
+	TreeItemDataStringClass* data = (TreeItemDataStringClass*)UrlDetectorTree->GetItemData(treeItemId);
+	if (data) {
+		int res = wxMessageBox(_("Delete this detector? The operation cannot be undone.\n") + data->FullPath, _("Delete URL detector"), wxYES_NO, 
+			this->GetGrandParent());
+		if (wxYES == res) {
+			UrlDetectorTree->Delete(treeItemId);
+		}
+	}
+}
+
+void mvceditor::UrlDetectorPanelClass::OnTreeItemEndLabelEdit(wxTreeEvent& event) {
+	wxTreeItemId treeItemId = event.GetItem();
+	wxString newName = event.GetLabel();
+	if (newName.find_first_of(wxFileName::GetForbiddenChars(), 0) != std::string::npos) {
+		wxMessageBox(_("Filename contains invalid characters."));
+		event.Veto();
+	}
+	else {
+
+		// rename the file and set the tree item data; the label itself will be set 
+		// by the next event handler
+		TreeItemDataStringClass* data = (TreeItemDataStringClass*)UrlDetectorTree->GetItemData(treeItemId);
+		wxASSERT(data);
+		wxFileName oldFileName(data->FullPath);
+		wxFileName newFileName(oldFileName.GetPath(), newName);
+		if (!newFileName.FileExists()) {
+			data->FullPath = newFileName.GetFullPath();
+			wxRenameFile(oldFileName.GetFullPath(), newFileName.GetFullPath());
+			event.Skip();
+		}
+		else {
+			wxMessageBox(_("File name already exists. Please choose a different name."));
+			event.Veto();
+		}
+	}
 }
 
 mvceditor::RunBrowserFeatureClass::RunBrowserFeatureClass(mvceditor::AppClass& app)
@@ -648,4 +751,7 @@ END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::UrlDetectorPanelClass, UrlDetectorPanelGeneratedClass)
 	EVT_TREE_ITEM_ACTIVATED(wxID_ANY, mvceditor::UrlDetectorPanelClass::OnTreeItemActivated)
+	EVT_MENU(ID_URL_DETECTOR_TREE_OPEN, mvceditor::UrlDetectorPanelClass::OnMenuOpenDetector)
+	EVT_MENU(ID_URL_DETECTOR_TREE_RENAME, mvceditor::UrlDetectorPanelClass::OnMenuRenameDetector)
+	EVT_MENU(ID_URL_DETECTOR_TREE_DELETE, mvceditor::UrlDetectorPanelClass::OnMenuDeleteDetector)
 END_EVENT_TABLE()

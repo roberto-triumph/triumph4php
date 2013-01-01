@@ -124,7 +124,7 @@ UrlDetectorPanelGeneratedClass::UrlDetectorPanelGeneratedClass( wxWindow* parent
 	
 	FlexGridSizer->Add( LabelSizer, 1, wxEXPAND, 5 );
 	
-	UrlDetectorTree = new wxTreeCtrl( this, ID_DETECTOR_TREE, wxDefaultPosition, wxDefaultSize, wxTR_DEFAULT_STYLE|wxTR_EDIT_LABELS );
+	UrlDetectorTree = new wxTreeCtrl( this, ID_DETECTOR_TREE, wxDefaultPosition, wxDefaultSize, wxTR_DEFAULT_STYLE|wxTR_EDIT_LABELS|wxTR_SINGLE );
 	FlexGridSizer->Add( UrlDetectorTree, 1, wxALL|wxALIGN_BOTTOM|wxEXPAND, 5 );
 	
 	BoxSizer->Add( FlexGridSizer, 1, wxEXPAND, 5 );
@@ -136,7 +136,10 @@ UrlDetectorPanelGeneratedClass::UrlDetectorPanelGeneratedClass( wxWindow* parent
 	TestButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( UrlDetectorPanelGeneratedClass::OnTestButton ), NULL, this );
 	AddButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( UrlDetectorPanelGeneratedClass::OnAddButton ), NULL, this );
 	HelpButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( UrlDetectorPanelGeneratedClass::OnHelpButton ), NULL, this );
+	UrlDetectorTree->Connect( wxEVT_COMMAND_TREE_DELETE_ITEM, wxTreeEventHandler( UrlDetectorPanelGeneratedClass::OnTreeItemDelete ), NULL, this );
+	UrlDetectorTree->Connect( wxEVT_COMMAND_TREE_END_LABEL_EDIT, wxTreeEventHandler( UrlDetectorPanelGeneratedClass::OnTreeItemEndLabelEdit ), NULL, this );
 	UrlDetectorTree->Connect( wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler( UrlDetectorPanelGeneratedClass::OnTreeItemActivated ), NULL, this );
+	UrlDetectorTree->Connect( wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK, wxTreeEventHandler( UrlDetectorPanelGeneratedClass::OnTreeItemRightClick ), NULL, this );
 }
 
 UrlDetectorPanelGeneratedClass::~UrlDetectorPanelGeneratedClass()
@@ -145,6 +148,9 @@ UrlDetectorPanelGeneratedClass::~UrlDetectorPanelGeneratedClass()
 	TestButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( UrlDetectorPanelGeneratedClass::OnTestButton ), NULL, this );
 	AddButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( UrlDetectorPanelGeneratedClass::OnAddButton ), NULL, this );
 	HelpButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( UrlDetectorPanelGeneratedClass::OnHelpButton ), NULL, this );
+	UrlDetectorTree->Disconnect( wxEVT_COMMAND_TREE_DELETE_ITEM, wxTreeEventHandler( UrlDetectorPanelGeneratedClass::OnTreeItemDelete ), NULL, this );
+	UrlDetectorTree->Disconnect( wxEVT_COMMAND_TREE_END_LABEL_EDIT, wxTreeEventHandler( UrlDetectorPanelGeneratedClass::OnTreeItemEndLabelEdit ), NULL, this );
 	UrlDetectorTree->Disconnect( wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler( UrlDetectorPanelGeneratedClass::OnTreeItemActivated ), NULL, this );
+	UrlDetectorTree->Disconnect( wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK, wxTreeEventHandler( UrlDetectorPanelGeneratedClass::OnTreeItemRightClick ), NULL, this );
 	
 }

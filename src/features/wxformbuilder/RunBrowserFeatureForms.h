@@ -89,7 +89,10 @@ class UrlDetectorPanelGeneratedClass : public wxPanel
 		virtual void OnTestButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnTreeItemDelete( wxTreeEvent& event ) { event.Skip(); }
+		virtual void OnTreeItemEndLabelEdit( wxTreeEvent& event ) { event.Skip(); }
 		virtual void OnTreeItemActivated( wxTreeEvent& event ) { event.Skip(); }
+		virtual void OnTreeItemRightClick( wxTreeEvent& event ) { event.Skip(); }
 		
 	
 	public:

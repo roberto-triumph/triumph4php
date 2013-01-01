@@ -82,11 +82,15 @@ EOF;
 	}
 
 	// call the function that will return all detected URLs
-	$arrUrls = detectUrls($sourceDir, $resourceDbFileName, $host);
+	$doSkip = TRUE;
+	$arrUrls = detectUrls($sourceDir, $resourceDbFileName, $host, $doSkip);
+	if ($doSkip) {
+		echo "Detector " . basename(__FILE__, '.php') . " cannot detect URLs {$sourceDir} ... skipping\n";
+	}
+	else if ($outputDbFileName) {
 
-	// now send the detected URLs to either STDOUT or store in the 
-	// sqlite DB
-	if ($outputDbFileName) {
+		// now send the detected URLs to either STDOUT or store in the 
+		// sqlite DB	
 		$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $outputDbFileName));
 		$urlResourceTable = new MvcEditor_UrlResourceTable($pdo);
 		$urlResourceTable->saveUrls($arrUrls, $sourceDir);
@@ -117,13 +121,22 @@ EOF;
  * @param  string $sourceDir            the root directory of the project in question
  * @param  string $resourceDbFileName   the location of the resource cache SQLite file; as created by MVC Editor
  * @param  string $host                 the hostname of the application; this will be used a the prefix on all URLs
+ * @param  boolean $doSkip               out parameter; if TRUE then this detector does not know how
+ *                                       to detect URLs for the given source directory; this situation
+ *                                       is different than zero URLs being detected.
  * @return MvcEditor_Url[]              array of MvcEditor_Url instances the detected URLs
  */
-function detectUrls($sourceDir, $resourceDbFileName, $host) {
+function detectUrls($sourceDir, $resourceDbFileName, $host, &$doSkip) {
 	$allUrls = array();
 	if (!is_file($resourceDbFileName)) {
 		return $allUrls;
 	}
+	
+	// need to check that this detector is able to recognize the directory structure of sourceDir
+	// if not, then we need to skip detection by returning immediately and setting $doSkip to TRUE.
+	// by skipping detection, we prevent any detected URLs from the previous detection script
+	// from being deleted.
+	$doSkip = TRUE;
 	
 	// add your logic here; usually it will consist of querying the SQLIte database in $resourceDbFileName
 	// getting all controller - method pairs.

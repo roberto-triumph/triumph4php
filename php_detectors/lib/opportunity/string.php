@@ -41,7 +41,7 @@ namespace opstring;
  */
 function ensure_ends_with($haystack, $needle) {
 	
-	if (substr($haystack, - 1) != $needle) {
+	if (substr($haystack, -1) != $needle) {
 		$haystack.= $needle;
 	}
 	return $haystack;
@@ -52,13 +52,31 @@ function ensure_ends_with($haystack, $needle) {
  * is case-sensitive.
  *
  * @param $haystack the string to search in
- * @param $needle the character to search for
+ * @param $needle the string to search for
  * @return boolean TRUE if haystack begins with needle Examples:
  *         haystack: "combo box" needle: "com"
  *         haystack: "combo box" needle: "combo"
  */
 function begins_with($haystack, $needle) {
-	return stripos($haystack, $needle) === 0;
+	return strpos($haystack, $needle) === 0;
+}
+
+/**
+ * Convenience function that checks whether haystack ends with needle. Comparison
+ * is case-sensitive.
+ *
+ * @param $haystack the string to search in
+ * @param $needle the string to search for
+ * @return boolean TRUE if haystack begins with needle Examples:
+ *         haystack: "combo box" needle: "box"
+ *         haystack: "combo box" needle: "x"
+ */
+function ends_with($haystack, $needle) {
+	if (strlen($needle) > strlen($haystack)) {
+		return FALSE;
+	}
+	$lastPiece = substr($haystack, strlen($haystack) - strlen($needle));
+	return \opstring\compare($lastPiece, $needle) == 0;
 }
 
 /**
@@ -149,3 +167,30 @@ function compare_case($str1, $str2) {
 	}
 	return 0;
 }
+
+/**
+ * Check to see if needle is in part of haystack.
+ *
+ * @param string $haystack the string to search in
+ * @param string $needle the string to search for
+ * @return boolean TRUE if needle is in haystack. Search is case-sensitive
+ */
+function contains($haystack, $needle) {
+	return strpos($haystack, $needle) !== FALSE;
+}
+
+/**
+ * Returns a piece of haystack, starting from start and
+ * going length characters.
+ *
+ * @param string $haystack the original string
+ * @param int start the position to start in. This can be a negative
+ *        number just like substr() function
+ * @param int length the number of characters to take.
+ * @return string the substring
+ */
+function sub($haystack, $start, $length = 0) {
+	return substr($haystack, $start, $length);
+}
+
+

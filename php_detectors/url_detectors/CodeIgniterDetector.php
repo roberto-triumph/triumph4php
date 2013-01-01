@@ -108,11 +108,15 @@ EOF;
 	}
 
 	// call the function that will return all detected URLs
-	$arrUrls = detectUrls($sourceDir, $resourceDbFileName, $host);
+	$doSkip = TRUE;
+	$arrUrls = detectUrls($sourceDir, $resourceDbFileName, $host, $doSkip);
+	if ($doSkip) {
+		echo "Detector " . basename(__FILE__, '.php') . " cannot detect URLs {$sourceDir} ... skipping\n";
+	}
+	else if ($outputDbFileName) {
 
-	// now send the detected URLs to either STDOUT or store in the 
-	// sqlite DB
-	if ($outputDbFileName) {
+		// now send the detected URLs to either STDOUT or store in the 
+		// sqlite DB	
 		$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $outputDbFileName));
 		$urlResourceTable = new MvcEditor_UrlResourceTable($pdo);
 		$urlResourceTable->saveUrls($arrUrls, $sourceDir);
@@ -140,12 +144,16 @@ EOF;
  * will create a MvcEditor_Url instance for each method; note that the routes file is 
  * also consulted and we will generate URLs for the default controller.
  *
- * @param  string $sourceDir            the root directory of the project in question
- * @param  string $resourceDbFileName   the location of the resource cache SQLite file; as created by MVC Editor
- * @param  string $host                 the hostname of the application; this will be used a the prefix on all URLs
- * @return MvcEditor_Url[]              array of MvcEditor_Url instances the detected URLs
+ * @param  string  $sourceDir            the root directory of the project in question
+ * @param  string  $resourceDbFileName   the location of the resource cache SQLite file; as created by MVC Editor
+ * @param  string  $host                 the hostname of the application; this will be used a the prefix on all URLs
+ * @param  boolean $doSkip               out parameter; if TRUE then this detector does not know how
+ *                                       to detect URLs for the given source directory; this situation
+ *                                       is different than zero URLs being detected.
+ * @return MvcEditor_Url[]               array of MvcEditor_Url instances the detected URLs
  */
-function detectUrls($sourceDir, $resourceDbFileName, $host) {
+function detectUrls($sourceDir, $resourceDbFileName, $host, &$doSkip) {
+	$doSkip = TRUE;
 	if (!is_file($resourceDbFileName)) {
 		return array();
 	}
@@ -163,6 +171,7 @@ function detectUrls($sourceDir, $resourceDbFileName, $host) {
 		// this source directory does not contain a code igniter directory.
 		return array();
 	}
+	$doSkip = FALSE;
 	
 	// get the code igniter configuration so that we can use it to build the
 	// correct routes

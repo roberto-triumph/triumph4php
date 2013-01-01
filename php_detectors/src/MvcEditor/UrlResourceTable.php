@@ -47,6 +47,9 @@ class MvcEditor_UrlResourceTable extends Zend_Db_Table_Abstract {
 		$sourceDir = \opstring\replace($sourceDir, '_', '^_');
 		$strWhere = $this->getAdapter()->quoteInto("full_path LIKE ? ESCAPE '^'", $sourceDir . '%');
 		$this->delete($strWhere);
+		
+		// sqlite optimizes transactions really well; use transaction so that the inserts are faster
+		$this->getAdapter()->beginTransaction();
 		foreach ($arrUrls as $url) {
 			
 			$this->insert(array(
@@ -56,5 +59,6 @@ class MvcEditor_UrlResourceTable extends Zend_Db_Table_Abstract {
 				'method_name' => $url->methodName
 			));
 		}
+		$this->getAdapter()->commit();
 	}
 }
