@@ -86,17 +86,24 @@ void mvceditor::ChooseUrlDialogClass::OnOkButton(wxCommandEvent& event) {
 		if (index >= 0) {
 			wxURI selection(UrlList->GetString(index));
 			UrlResourceFinder->FindByUrl(selection, ChosenUrl);
+
+			// add the extra string also
+			wxURI entireUri(ChosenUrl.Url.BuildURI() + ExtraText->GetValue());
+			ChosenUrl.Url = entireUri;
 		}
 		EndModal(wxOK);
 	}
 }
 
 void mvceditor::ChooseUrlDialogClass::OnListItemSelected(wxCommandEvent& event) {
+	wxString finalUrl = UrlList->GetStringSelection() + ExtraText->GetValue();
+	FinalUrlLabel->SetLabel(finalUrl);
 	event.Skip();
 }
 
-void mvceditor::ChooseUrlDialogClass::OnText(wxCommandEvent& event) {
+void mvceditor::ChooseUrlDialogClass::OnFilterText(wxCommandEvent& event) {
 	wxString filter = Filter->GetValue();
+	UrlList->Freeze();
 	if (filter.IsEmpty()) {
 		
 		// empty string =  no filter show all
@@ -113,7 +120,6 @@ void mvceditor::ChooseUrlDialogClass::OnText(wxCommandEvent& event) {
 	else {
 		std::vector<mvceditor::UrlResourceClass> filteredUrls;
 		UrlResourceFinder->FilterUrls(filter, filteredUrls);
-
 		UrlList->Clear();
 		for (size_t i = 0; i < filteredUrls.size(); ++i) {
 			UrlList->Append(filteredUrls[i].Url.BuildURI());
@@ -122,13 +128,16 @@ void mvceditor::ChooseUrlDialogClass::OnText(wxCommandEvent& event) {
 			UrlList->Select(0);
 		}
 	}
+	UrlList->Thaw();
+	wxString finalUrl = UrlList->GetStringSelection() + ExtraText->GetValue();
+	FinalUrlLabel->SetLabel(finalUrl);
 }
 
-void mvceditor::ChooseUrlDialogClass::OnTextEnter(wxCommandEvent& event) {
+void mvceditor::ChooseUrlDialogClass::OnFilterTextEnter(wxCommandEvent& event) {
 	OnOkButton(event);	
 }
 
-void mvceditor::ChooseUrlDialogClass::OnKeyDown(wxKeyEvent& event) {
+void mvceditor::ChooseUrlDialogClass::OnFilterKeyDown(wxKeyEvent& event) {
 	if (event.GetKeyCode() == WXK_DOWN && event.GetModifiers() == wxMOD_NONE) {
 		int selection = UrlList->GetSelection();
 		if (selection >= 0 && selection < (int)(UrlList->GetCount() - 1)) {
@@ -147,6 +156,19 @@ void mvceditor::ChooseUrlDialogClass::OnKeyDown(wxKeyEvent& event) {
 		event.Skip();
 	}
 }
+
+void mvceditor::ChooseUrlDialogClass::OnExtraText(wxCommandEvent& event) {
+	wxString finalUrl = UrlList->GetStringSelection() + ExtraText->GetValue();
+	FinalUrlLabel->SetLabel(finalUrl);
+	event.Skip();
+}
+
+void mvceditor::ChooseUrlDialogClass::OnExtraChar(wxKeyEvent& event) {
+	wxString finalUrl = UrlList->GetStringSelection() + ExtraText->GetValue();
+	FinalUrlLabel->SetLabel(finalUrl);
+	event.Skip();
+}
+
 
 /**
  * small class to hold the full path to the detector script on each
@@ -702,7 +724,14 @@ void mvceditor::RunBrowserFeatureClass::OnUrlToolMenuItem(wxCommandEvent& event)
 	if (UrlMenu.get()) {
 		wxString name = UrlMenu->GetLabelText(event.GetId());
 		mvceditor::UrlResourceClass urlResource;
-		bool found = App.Globals.UrlResourceFinder.FindByUrl(name, urlResource);
+		bool found = false;
+		for (size_t i = 0; i < RecentUrls.size(); i++) {
+			if (RecentUrls[i].Url.BuildURI() == name) {
+				urlResource = RecentUrls[i]; 
+				found = true;
+				break;
+			}
+		}
 		if (found) {
 			App.Globals.CurrentUrl = urlResource;
 			BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, name);

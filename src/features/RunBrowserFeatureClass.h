@@ -48,9 +48,13 @@ protected:
 
 	void OnOkButton(wxCommandEvent& event);
 
-	void OnTextEnter(wxCommandEvent& event);
-
-	void OnKeyDown(wxKeyEvent& event);
+	/**
+	 * events on the filter textbox, so that the list gets updates
+	 * as the user types in text
+	 */
+	void OnFilterText(wxCommandEvent& event);
+	void OnFilterTextEnter(wxCommandEvent& event);
+	void OnFilterKeyDown(wxKeyEvent& event);
 	
 	/**
 	 * updates the URL label so that the user can see the exact URL to 
@@ -58,7 +62,12 @@ protected:
 	 */
 	void OnListItemSelected(wxCommandEvent& event);
 
-	void OnText(wxCommandEvent& event);
+	/**
+	 * events on the extra textbox, so that the list gets updates
+	 * as the user types in text
+	 */
+	void OnExtraText(wxCommandEvent& event);
+	void OnExtraChar(wxKeyEvent& event);
 
 private:
 

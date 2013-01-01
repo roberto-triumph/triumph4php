@@ -50,21 +50,27 @@ class ChooseUrlDialogGeneratedClass : public wxDialog
 		wxTextCtrl* Filter;
 		wxStaticText* OpenLabel;
 		wxListBox* UrlList;
+		wxStaticText* ExtraLabel;
+		wxTextCtrl* ExtraText;
+		wxStaticText* FinalLabel;
+		wxStaticText* FinalUrlLabel;
 		wxStdDialogButtonSizer* ButtonSizer;
 		wxButton* ButtonSizerOK;
 		wxButton* ButtonSizerCancel;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnKeyDown( wxKeyEvent& event ) { event.Skip(); }
-		virtual void OnText( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnTextEnter( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnFilterKeyDown( wxKeyEvent& event ) { event.Skip(); }
+		virtual void OnFilterText( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnFilterTextEnter( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnListItemSelected( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnExtraChar( wxKeyEvent& event ) { event.Skip(); }
+		virtual void OnExtraText( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		ChooseUrlDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Choose URL To Open"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 638,435 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP );
+		ChooseUrlDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Choose URL To Open"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 638,461 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~ChooseUrlDialogGeneratedClass();
 	
 };
