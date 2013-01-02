@@ -27,6 +27,8 @@
 #include <FileTestFixtureClass.h>
 #include <php_frameworks/CallStackClass.h>
 #include <globals/String.h>
+#include <soci/soci.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 
 class CallStackFixtureTestClass : public FileTestFixtureClass {
 	
@@ -91,6 +93,10 @@ public:
 	}
 };
 
+#define CHECK_CALL_STACK(i, type, expression) \
+	CHECK_EQUAL(type, CallStack.List[i].Type);\
+	CHECK_EQUAL(expression, CallStack.List[i].ExpressionString());
+
 SUITE(CallStackTestClass) {
 
 TEST_FIXTURE(CallStackFixtureTestClass, FailOnUnknownResource) {
@@ -104,7 +110,7 @@ TEST_FIXTURE(CallStackFixtureTestClass, FailOnUnknownResource) {
 	error = mvceditor::CallStackClass::NONE;
 	CHECK_EQUAL(false, CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("unknownMethod"), pelet::PHP_53, error));
 	CHECK_EQUAL(mvceditor::CallStackClass::RESOURCE_NOT_FOUND, error);
-}	
+}
  
 TEST_FIXTURE(CallStackFixtureTestClass, FailOnParseError) {
 	
@@ -170,23 +176,14 @@ TEST_FIXTURE(CallStackFixtureTestClass, ResolutionError) {
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::UNKNOWN_RESOURCE, CallStack.MatchError.Type);
 	
 	// since load can be resolved the call stack should have it	
-	wxFileName newFile(TestProjectDir + wxT("call_stack.txt"));
-	CHECK(CallStack.Persist(newFile));
-	
-	wxString contents;
-	wxFFile ffile;
-	CHECK(ffile.Open(newFile.GetFullPath()));
-	ffile.ReadAll(&contents);
-	wxString expected = wxString::FromAscii(
-		"BEGIN_METHOD,News,index\n"
-		"ARRAY,$data,title\n"
-		"RETURN\n"
-		"BEGIN_METHOD,CI_Loader,view\n"
-		"PARAM,SCALAR,\"index\"\n"
-		"PARAM,ARRAY,$data,title\n"
-		"RETURN\n"
-	);
-	CHECK_EQUAL(expected, contents);
+	CHECK_VECTOR_SIZE(7, CallStack.List);
+	CHECK_CALL_STACK(0, mvceditor::CallClass::BEGIN_METHOD, "News,index");
+	CHECK_CALL_STACK(1, mvceditor::CallClass::ARRAY, "$data,title");
+	CHECK_CALL_STACK(2, mvceditor::CallClass::RETURN, "");
+	CHECK_CALL_STACK(3, mvceditor::CallClass::BEGIN_METHOD, "CI_Loader,view");
+	CHECK_CALL_STACK(4, mvceditor::CallClass::PARAM, "SCALAR,\"index\"");
+	CHECK_CALL_STACK(5, mvceditor::CallClass::PARAM, "ARRAY,$data,title");
+	CHECK_CALL_STACK(6, mvceditor::CallClass::RETURN, "");
 }	
 
 TEST_FIXTURE(CallStackFixtureTestClass, FailOnStackLimit) {
@@ -217,33 +214,13 @@ TEST_FIXTURE(CallStackFixtureTestClass, SimpleMethodCall) {
 	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
 	CHECK_VECTOR_SIZE(7, CallStack.List);
-	
-	CHECK_EQUAL(mvceditor::CallClass::BEGIN_METHOD, CallStack.List[0].Type);
-	CHECK_UNISTR_EQUALS("index", CallStack.List[0].Resource.Identifier);
-	CHECK_UNISTR_EQUALS("News", CallStack.List[0].Resource.ClassName);
-	
-	CHECK_EQUAL(mvceditor::CallClass::ARRAY, CallStack.List[1].Type);
-	CHECK_UNISTR_EQUALS("$data", CallStack.List[1].Symbol.Variable);
-	CHECK_VECTOR_SIZE(1, CallStack.List[1].Symbol.ArrayKeys);
-	CHECK_UNISTR_EQUALS("title", CallStack.List[1].Symbol.ArrayKeys[0]);
-	
-	CHECK_EQUAL(mvceditor::CallClass::RETURN, CallStack.List[2].Type);
-	
-	CHECK_EQUAL(mvceditor::CallClass::BEGIN_METHOD, CallStack.List[3].Type);
-	CHECK_UNISTR_EQUALS("view", CallStack.List[3].Resource.Identifier);
-	CHECK_UNISTR_EQUALS("CI_Loader", CallStack.List[3].Resource.ClassName);
-	
-	CHECK_EQUAL(mvceditor::CallClass::PARAM, CallStack.List[4].Type);
-	CHECK_UNISTR_EQUALS("index", CallStack.List[4].Expression.FirstValue());
-	CHECK_EQUAL(pelet::ExpressionClass::SCALAR, CallStack.List[4].Expression.ExpressionType);
-	
-	CHECK_EQUAL(mvceditor::CallClass::PARAM, CallStack.List[5].Type);
-	CHECK_UNISTR_EQUALS("$data", CallStack.List[5].Expression.FirstValue());
-	CHECK_EQUAL(mvceditor::SymbolClass::ARRAY, CallStack.List[5].Symbol.Type);
-	CHECK_VECTOR_SIZE(1, CallStack.List[5].Symbol.ArrayKeys);
-	CHECK_UNISTR_EQUALS("title", CallStack.List[5].Symbol.ArrayKeys[0]);
-	
-	CHECK_EQUAL(mvceditor::CallClass::RETURN, CallStack.List[6].Type);
+	CHECK_CALL_STACK(0, mvceditor::CallClass::BEGIN_METHOD, "News,index");
+	CHECK_CALL_STACK(1, mvceditor::CallClass::ARRAY, "$data,title");
+	CHECK_CALL_STACK(2, mvceditor::CallClass::RETURN, "");
+	CHECK_CALL_STACK(3, mvceditor::CallClass::BEGIN_METHOD, "CI_Loader,view");
+	CHECK_CALL_STACK(4, mvceditor::CallClass::PARAM, "SCALAR,\"index\"");
+	CHECK_CALL_STACK(5, mvceditor::CallClass::PARAM, "ARRAY,$data,title");
+	CHECK_CALL_STACK(6, mvceditor::CallClass::RETURN, "");
 }
 
 TEST_FIXTURE(CallStackFixtureTestClass, MultipleMethodCalls) {
@@ -274,30 +251,20 @@ TEST_FIXTURE(CallStackFixtureTestClass, MultipleMethodCalls) {
 	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
 	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
-	
-	wxFileName newFile(TestProjectDir + wxT("call_stack.txt"));
-	CHECK(CallStack.Persist(newFile));
-	
-	wxString contents;
-	wxFFile ffile;
-	CHECK(ffile.Open(newFile.GetFullPath()));
-	ffile.ReadAll(&contents);
-	wxString expected = wxString::FromAscii(
-		"BEGIN_METHOD,News,index\n"
-		"ARRAY,$data,title\n"
-		"RETURN\n"
-		"BEGIN_METHOD,CI_Loader,view\n"
-		"PARAM,SCALAR,\"header\"\n"
-		"RETURN\n"
-		"BEGIN_METHOD,CI_Loader,view\n"
-		"PARAM,SCALAR,\"index\"\n"
-		"PARAM,ARRAY,$data,title\n"
-		"RETURN\n"
-		"BEGIN_METHOD,CI_Loader,view\n"
-		"PARAM,SCALAR,\"footer\"\n"
-		"RETURN\n"
-	);
-	CHECK_EQUAL(expected, contents);
+	CHECK_VECTOR_SIZE(13, CallStack.List);
+	CHECK_CALL_STACK(0, mvceditor::CallClass::BEGIN_METHOD, "News,index");
+	CHECK_CALL_STACK(1, mvceditor::CallClass::ARRAY, "$data,title");
+	CHECK_CALL_STACK(2, mvceditor::CallClass::RETURN, "");
+	CHECK_CALL_STACK(3, mvceditor::CallClass::BEGIN_METHOD, "CI_Loader,view");
+	CHECK_CALL_STACK(4, mvceditor::CallClass::PARAM, "SCALAR,\"header\"");
+	CHECK_CALL_STACK(5, mvceditor::CallClass::RETURN, "");
+	CHECK_CALL_STACK(6, mvceditor::CallClass::BEGIN_METHOD, "CI_Loader,view");
+	CHECK_CALL_STACK(7, mvceditor::CallClass::PARAM, "SCALAR,\"index\"");
+	CHECK_CALL_STACK(8, mvceditor::CallClass::PARAM, "ARRAY,$data,title");
+	CHECK_CALL_STACK(9, mvceditor::CallClass::RETURN, "");
+	CHECK_CALL_STACK(10, mvceditor::CallClass::BEGIN_METHOD, "CI_Loader,view");
+	CHECK_CALL_STACK(11, mvceditor::CallClass::PARAM, "SCALAR,\"footer\"");
+	CHECK_CALL_STACK(12, mvceditor::CallClass::RETURN, "");
 }
 
 TEST_FIXTURE(CallStackFixtureTestClass, WithArrayKeyAssignment) {
@@ -325,24 +292,14 @@ TEST_FIXTURE(CallStackFixtureTestClass, WithArrayKeyAssignment) {
 	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
 	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
-	
-	wxFileName newFile(TestProjectDir + wxT("call_stack.txt"));
-	CHECK(CallStack.Persist(newFile));
-	
-	wxString contents;
-	wxFFile ffile;
-	CHECK(ffile.Open(newFile.GetFullPath()));
-	ffile.ReadAll(&contents);
-	wxString expected = wxString::FromAscii(
-		"BEGIN_METHOD,News,index\n"
-		"ARRAY,$data,title,name\n"
-		"RETURN\n"
-		"BEGIN_METHOD,CI_Loader,view\n"
-		"PARAM,SCALAR,\"index\"\n"
-		"PARAM,ARRAY,$data,title,name\n"
-		"RETURN\n"
-	);
-	CHECK_EQUAL(expected, contents);
+	CHECK_VECTOR_SIZE(7, CallStack.List);
+	CHECK_CALL_STACK(0, mvceditor::CallClass::BEGIN_METHOD, "News,index");
+	CHECK_CALL_STACK(1, mvceditor::CallClass::ARRAY, "$data,title,name");
+	CHECK_CALL_STACK(2, mvceditor::CallClass::RETURN, "");
+	CHECK_CALL_STACK(3, mvceditor::CallClass::BEGIN_METHOD, "CI_Loader,view");
+	CHECK_CALL_STACK(4, mvceditor::CallClass::PARAM, "SCALAR,\"index\"");
+	CHECK_CALL_STACK(5, mvceditor::CallClass::PARAM, "ARRAY,$data,title,name");
+	CHECK_CALL_STACK(6, mvceditor::CallClass::RETURN, "");
 }
 
 
@@ -373,56 +330,81 @@ TEST_FIXTURE(CallStackFixtureTestClass, WithMethodCall) {
 	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
 	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
-	
-	wxFileName newFile(TestProjectDir + wxT("call_stack.txt"));
-	CHECK(CallStack.Persist(newFile));
-	
-	wxString contents;
-	wxFFile ffile;
-	CHECK(ffile.Open(newFile.GetFullPath()));
-	ffile.ReadAll(&contents);
-	wxString expected = wxString::FromAscii(
-		"BEGIN_METHOD,News,index\n"
-		"ARRAY,$data,title,name\n"
-		"RETURN\n"
-		"BEGIN_METHOD,CI_Loader,defaultVars\n"
-		"RETURN\n"
-		"BEGIN_METHOD,CI_Loader,view\n"
-		"PARAM,SCALAR,\"index\"\n"
-		"PARAM,ARRAY,$data,title,name\n"
-		"RETURN\n"
-	);
-	CHECK_EQUAL(expected, contents);
+	CHECK_VECTOR_SIZE(9, CallStack.List);
+	CHECK_CALL_STACK(0, mvceditor::CallClass::BEGIN_METHOD, "News,index");
+	CHECK_CALL_STACK(1, mvceditor::CallClass::ARRAY, "$data,title,name");
+	CHECK_CALL_STACK(2, mvceditor::CallClass::RETURN, "");
+	CHECK_CALL_STACK(3, mvceditor::CallClass::BEGIN_METHOD, "CI_Loader,defaultVars");
+	CHECK_CALL_STACK(4, mvceditor::CallClass::RETURN, "");
+	CHECK_CALL_STACK(5, mvceditor::CallClass::BEGIN_METHOD, "CI_Loader,view");
+	CHECK_CALL_STACK(6, mvceditor::CallClass::PARAM, "SCALAR,\"index\"");
+	CHECK_CALL_STACK(7, mvceditor::CallClass::PARAM, "ARRAY,$data,title,name");
+	CHECK_CALL_STACK(8, mvceditor::CallClass::RETURN, "");
 }
 
 TEST_FIXTURE(CallStackFixtureTestClass, Persist) {
 	SetupFile(wxT("news.php"), Simple());
 	BuildCache();
+	wxFileName detectorDbFileName(TestProjectDir, wxT("detectors.db"));
 
 	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
 	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
+	CHECK(CallStack.Persist(detectorDbFileName));
+
 	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
-	CHECK_VECTOR_SIZE(7, CallStack.List);
-	
-	wxFileName newFile(TestProjectDir + wxT("call_stack.txt"));
-	CHECK(CallStack.Persist(newFile));
-	
-	wxString contents;
-	wxFFile ffile;
-	CHECK(ffile.Open(newFile.GetFullPath()));
-	ffile.ReadAll(&contents);
-	wxString expected = wxString::FromAscii(
-		"BEGIN_METHOD,News,index\n"
-		"ARRAY,$data,title\n"
-		"RETURN\n"
-		"BEGIN_METHOD,CI_Loader,view\n"
-		"PARAM,SCALAR,\"index\"\n"
-		"PARAM,ARRAY,$data,title\n"
-		"RETURN\n"
+	CHECK_EQUAL((size_t)7, CallStack.List.size());
+
+	// now check the sqlite db contents
+	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(detectorDbFileName.GetFullPath()));
+	int stepNumber;
+	std::string type;
+	std::string expression;
+	int rowCount;
+
+	session.once << "SELECT COUNT(*) FROM call_stacks", soci::into(rowCount);
+	CHECK_EQUAL(7, rowCount);
+
+	soci::statement stmt = (session.prepare <<
+		"SELECT step_number, step_type, expression FROM call_stacks",
+		soci::into(stepNumber), soci::into(type), soci::into(expression)
 	);
-	CHECK_EQUAL(expected, contents);	
+	CHECK(stmt.execute(true));
+	CHECK_EQUAL(0, stepNumber);
+	CHECK_EQUAL("BEGIN_METHOD", type);
+	CHECK_EQUAL("News,index", expression);
+
+	CHECK(stmt.fetch());
+	CHECK_EQUAL(1, stepNumber);
+	CHECK_EQUAL("ARRAY", type);
+	CHECK_EQUAL("$data,title", expression);
+
+	CHECK(stmt.fetch());
+	CHECK_EQUAL(2, stepNumber);
+	CHECK_EQUAL("RETURN", type);
+	CHECK_EQUAL("", expression);
+
+	CHECK(stmt.fetch());
+	CHECK_EQUAL(3, stepNumber);
+	CHECK_EQUAL("BEGIN_METHOD", type);
+	CHECK_EQUAL("CI_Loader,view", expression);
+
+	CHECK(stmt.fetch());
+	CHECK_EQUAL(4, stepNumber);
+	CHECK_EQUAL("PARAM", type);
+	CHECK_EQUAL("SCALAR,\"index\"", expression);
+
+	CHECK(stmt.fetch());
+	CHECK_EQUAL(5, stepNumber);
+	CHECK_EQUAL("PARAM", type);
+	CHECK_EQUAL("ARRAY,$data,title", expression);
+
+	CHECK(stmt.fetch());
+	CHECK_EQUAL(6, stepNumber);
+	CHECK_EQUAL("RETURN", type);
+	CHECK_EQUAL("", expression);
+
 }
 
 }

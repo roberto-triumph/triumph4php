@@ -84,56 +84,6 @@ private:
 	UrlResourceClass& ChosenUrl;
 };
 
-class UrlDetectorPanelClass : public UrlDetectorPanelGeneratedClass {
-
-public:
-
-	UrlDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
-		mvceditor::EventSinkClass& eventSink);
-
-	/**
-	 * This should be called when the detector tree needs to be updated.
-	 */
-	void Init();
-
-	/**
-	 * updates the project choice with the given projects. This should be called whenever
-	 * the global project list has been changed.
-	 * The project list will be read from GlobalsClass
-	 */
-	void UpdateProjects();
-
-protected:
-	void OnTreeItemActivated(wxTreeEvent& event);
-	void OnTreeItemRightClick(wxTreeEvent& event);
-	void OnTreeItemDelete(wxTreeEvent& event);
-	void OnHelpButton(wxCommandEvent& event);
-	void OnTestButton(wxCommandEvent& event);
-	void OnAddButton(wxCommandEvent& event);
-	void OnTreeItemEndLabelEdit(wxTreeEvent& event);
-
-private:
-
-	void FillSubTree(const wxString& detectorRootDir, wxTreeItemId treeItemDir);
-
-	// context menu handlers for the URL detector tree
-	void OnMenuOpenDetector(wxCommandEvent& event);
-	void OnMenuRenameDetector(wxCommandEvent& event);
-	void OnMenuDeleteDetector(wxCommandEvent& event);
-
-	/**
-	 * to access the project list
-	 */
-	mvceditor::GlobalsClass& Globals;
-
-	/**
-	 * to send app commands to open and run a file
-	 */
-	mvceditor::EventSinkClass& EventSink;
-
-	DECLARE_EVENT_TABLE()
-};
-	
 class RunBrowserFeatureClass : public FeatureClass {
 
 public:
@@ -173,17 +123,6 @@ private:
 	void OnUrlToolMenuItem(wxCommandEvent& event);
 	
 	void OnUrlSearchTool(wxCommandEvent& event);
-
-	void AddNewMenu(wxMenuBar* menuBar);
-
-	void OnViewUrlDetectors(wxCommandEvent& event);
-
-	void OnRunUrlDetectors(wxCommandEvent& event);
-
-	/**
-	 * when a project is opened clean the Recent list
-	 */
-	void OnUrlResourceActionComplete(wxCommandEvent& event);
 
 	/**
 	 * to show progress to the user

@@ -101,10 +101,9 @@ public:
 	void ToBeginMethod(const mvceditor::ResourceClass& resource);
 	void ToReturn();
 	
-	/**
-	 * output a line that serializes this call instance into a file
-	 */
-	UnicodeString Serialize() const;
+	std::string StepTypeString() const;
+
+	std::string ExpressionString() const;
 
 };
 

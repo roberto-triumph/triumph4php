@@ -24,7 +24,11 @@
  */
 #include <php_frameworks/CallStackClass.h>
 #include <globals/String.h>
+#include <globals/Assets.h>
 #include <algorithm>
+#include <soci/soci.h>
+#include <soci/sqlite3/soci-sqlite3.h>
+#include <globals/sqlite.h>
 
 
 static UnicodeString EscapeScalar(const UnicodeString& expr) {
@@ -206,22 +210,35 @@ bool mvceditor::CallStackClass::Recurse(pelet::Versions version, mvceditor::Call
 }
 
 bool mvceditor::CallStackClass::Persist(wxFileName& fileName) {
-	bool write = false;
-	wxFFile file;
-	if (file.Open(fileName.GetFullPath(), wxT("wb"))) {
-		write = true;
-		wxString line;
-		for (std::vector<mvceditor::CallClass>::const_iterator it = List.begin(); it != List.end() && write; ++it) {
-			line.Clear();
-			line += mvceditor::IcuToWx(it->Serialize());
-			if (!line.IsEmpty()) {
-				line += wxT("\n");
-				write = file.Write(line);
-			}
+	wxFileName detectorSqlScript = mvceditor::DetectorSqlSchemaAsset();
+	wxString error;
+	std::string stdDbName = mvceditor::WxToChar(fileName.GetFullPath());
+	soci::session session(*soci::factory_sqlite3(), stdDbName);
+	bool good = false;
+	try {		
+		good = mvceditor::SqlScript(detectorSqlScript, session, error);
+		wxASSERT_MSG(good, wxT("failed to run sql script ") + detectorSqlScript.GetFullPath());
+		
+		int stepNumber = 0;
+		std::string stepType;
+		std::string expression;
+		soci::transaction transaction(session);
+		soci::statement stmt = (session.prepare <<
+			"INSERT INTO call_stacks(step_number, step_type, expression) VALUES (?, ?, ?)",
+			soci::use(stepNumber), soci::use(stepType), soci::use(expression)
+		);
+		for (std::vector<mvceditor::CallClass>::const_iterator it = List.begin(); it != List.end(); ++it) {
+			stepType = it->StepTypeString();
+			expression = it->ExpressionString();
+			stmt.execute(true);
+			stepNumber++;
 		}
-		file.Close();
+		transaction.commit();
+	} catch (std::exception& e) {
+		wxUnusedVar(e);
+		good = false;
 	}
-	return write;
+	return good;
 }
 
 void mvceditor::CallStackClass::ExpressionFound(const pelet::ExpressionClass& expression) {
@@ -505,11 +522,41 @@ void mvceditor::CallClass::ToScalar(const mvceditor::SymbolClass& symbol) {
 	Symbol = symbol;
 }
 
-UnicodeString mvceditor::CallClass::Serialize() const {
+std::string mvceditor::CallClass::StepTypeString() const {
+	switch (Type) {
+		case mvceditor::CallClass::ARRAY:
+			return "ARRAY";
+			break;
+		case mvceditor::CallClass::BEGIN_FUNCTION:
+			return "BEGIN_FUNCTION";
+			break;
+		case mvceditor::CallClass::BEGIN_METHOD:
+			return "BEGIN_METHOD";
+			break;
+		case mvceditor::CallClass::OBJECT:
+			return "OBJECT";
+			break;
+		case mvceditor::CallClass::NONE:
+
+			// none will be skipped always
+			break;
+		case mvceditor::CallClass::PARAM:
+			return "PARAM";
+			break;
+		case mvceditor::CallClass::RETURN:
+			return "RETURN";
+			break;
+		case mvceditor::CallClass::SCALAR:
+			return "SCALAR";
+			break;
+	}
+	return "";
+}
+
+std::string mvceditor::CallClass::ExpressionString() const {
 	UnicodeString line;
 	switch (Type) {
 		case mvceditor::CallClass::ARRAY:
-			line += UNICODE_STRING_SIMPLE("ARRAY,");
 			line += Symbol.Variable;
 			for (size_t j = 0; j < Symbol.ArrayKeys.size(); ++j) {
 				line += UNICODE_STRING_SIMPLE(",");
@@ -518,19 +565,16 @@ UnicodeString mvceditor::CallClass::Serialize() const {
 			break;
 
 		case mvceditor::CallClass::BEGIN_FUNCTION:
-			line += UNICODE_STRING_SIMPLE("BEGIN_FUNCTION,");
 			line += Resource.Identifier;
 			break;
 
 		case mvceditor::CallClass::BEGIN_METHOD:
-			line += UNICODE_STRING_SIMPLE("BEGIN_METHOD,");
 			line += Resource.ClassName;
 			line += UNICODE_STRING_SIMPLE(",");
 			line += Resource.Identifier;
 			break;
 
 		case mvceditor::CallClass::OBJECT:
-			line += UNICODE_STRING_SIMPLE("OBJECT,");
 			line += Symbol.Variable;
 			break;
 
@@ -539,7 +583,6 @@ UnicodeString mvceditor::CallClass::Serialize() const {
 			// none will be skipped always
 			break;
 		case mvceditor::CallClass::PARAM:
-			line += UNICODE_STRING_SIMPLE("PARAM,");
 			if (mvceditor::SymbolClass::ARRAY == Symbol.Type) {
 				line += UNICODE_STRING_SIMPLE("ARRAY,");
 				line += Symbol.Variable;
@@ -593,7 +636,6 @@ UnicodeString mvceditor::CallClass::Serialize() const {
 			break;
 
 		case mvceditor::CallClass::RETURN:
-			line += UNICODE_STRING_SIMPLE("RETURN");
 			break;
 
 		case mvceditor::CallClass::SCALAR:
@@ -606,5 +648,6 @@ UnicodeString mvceditor::CallClass::Serialize() const {
 			}
 			break;
 	}
-	return line;
+	std::string stdLine = mvceditor::IcuToChar(line);
+	return stdLine;
 }

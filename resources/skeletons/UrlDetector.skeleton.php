@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The goal of this script is to discover all of the URLs for your PHP projecta. This means
+ * The goal of this script is to discover all of the URLs for your PHP projects. This means
  * that it will list all of the URLs that correspond all of the project's controller functions. This script
  * will be called via a command line; it is a normal command line script.
  *

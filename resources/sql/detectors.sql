@@ -61,3 +61,44 @@ CREATE TABLE IF NOT EXISTS url_resources (
 	-- storing it as case-insensitive because we always want to do case-insensitive lookups
 	method_name TEXT NOT NULL COLLATE NOCASE
 );
+
+CREATE TABLE IF NOT EXISTS call_stacks (
+	
+	-- zero-based index of the 
+	-- where zero (0) is the first step: the entry point. all queries for a
+	-- complete call stack should be sorted by this column so that the call stack 
+	-- list is in order of program execution.
+	step_number INTEGER NOT NULL PRIMARY KEY,
+	
+	-- the type of step
+	-- BEGIN_FUNCTION, BEGIN_METHOD,
+	-- ARRAY, SCALAR, OBJECT, PARAM, or RETURN
+	step_type VARCHAR(50) NOT NULL,
+	
+	-- this is  a string of text that is dependant on the step type
+	-- the possibilities:
+	--
+	-- BEGIN_FUNCTION expression is the function name
+	-- BEGIN_METHOD expression is the class and method name (class::method)
+	-- ARRAY expression is the array variable name followed by a comma separated list of the array keys
+	-- SCALAR expression is the lexeme (string contents)
+	-- OBJECT expression is the variable name 
+	-- PARAM expression is the param type (ARRAY, SCALAR, OBJECT, ot VARIABLE)
+	--       followed by the serialized type
+	-- RETURN expression is empty
+	expression TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS template_files (
+
+	-- this is the full path to the template file. 
+	-- It contains OS-dependant directoy separators
+	full_path TEXT NOT NULL PRIMARY KEY,
+
+	-- This is the comma separated list of templates variables
+	-- Each variable will have th siguil ('$')
+	variables TEXT NOT NULL
+);
+
+
+
