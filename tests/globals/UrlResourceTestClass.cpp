@@ -47,9 +47,10 @@ public:
 		, Session1()
 		, DetectorDbFileName1()
 		, Session2()
-		, DetectorDbFileName2(){
-
+		, DetectorDbFileName2() {
+	
 		// create the test dir so that the sqlite file can be created
+		TouchTestDir();
 		DetectorDbFileName1.Assign(TestProjectDir, wxT("detectors.sqlite"));
 		Finder.AttachFile(DetectorDbFileName1);
 		Session1.open(*soci::factory_sqlite3(), mvceditor::WxToChar(DetectorDbFileName1.GetFullPath()));

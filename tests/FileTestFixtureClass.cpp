@@ -86,14 +86,7 @@ void FileTestFixtureClass::RecursiveRmDir(wxString path) {
 }
 
 void FileTestFixtureClass::CreateFixtureFile(const wxString& fileName, const wxString& contents) {
-	if (!wxDirExists(TestProjectDir)) {
-		
-		// this way so that gcc does not think that good is an unused variable
-		bool good;
-		wxUnusedVar(good);
-		good = wxMkdir(TestProjectDir, 0777);
-		wxASSERT_MSG(good, _("Could not create directory: ") + TestProjectDir);
-	}
+	TouchTestDir();
 	wxString fileToWrite = TestProjectDir + fileName;
 	std::ofstream file;
 	file.open(fileToWrite.fn_str(), std::ios::out | std::ios::binary | std::ios::trunc);
@@ -151,18 +144,26 @@ wxString FileTestFixtureClass::GetFileContents(const wxString& fileName) {
 }
 
 void FileTestFixtureClass::CreateSubDirectory(const wxString& subDirectory) {
-	
-	// this way so that gcc does not think that good is an unused variable
-	bool good;
-	wxUnusedVar(good);
-	if (!wxDirExists(TestProjectDir)) {
-		good = wxMkdir(TestProjectDir, 0777);
-		wxASSERT_MSG(good, _("Could not create directory:") + TestProjectDir);
-	}
+	TouchTestDir();
 	wxString fullPath = TestProjectDir + subDirectory;
 	if (!wxDirExists(fullPath)) {
-		good = wxMkdir(fullPath, 0777);
+		bool good = wxMkdir(fullPath, 0777);
+
+		// this way so that gcc does not think that good is an unused variable
+		// in release mode
+		wxUnusedVar(good);
 		wxASSERT_MSG(good, _("Could not create directory:") + fullPath);
+	}
+}
+
+void FileTestFixtureClass::TouchTestDir() {
+	if (!wxDirExists(TestProjectDir)) {
+		bool good = wxMkdir(TestProjectDir, 0777);
+		
+		// this way so that gcc does not think that good is an unused variable
+		// in release mode
+		wxUnusedVar(good);
+		wxASSERT_MSG(good, _("Could not create directory:") + TestProjectDir);
 	}
 }
 

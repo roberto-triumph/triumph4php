@@ -66,6 +66,11 @@ public:
 	 * Reads the file into a string and returns the string.
 	 */
 	wxString GetFileContents(const wxString& fileName);
+
+	/**
+	 * Creates the test dir if it does not already exist.
+	 */
+	void TouchTestDir();
 	
 	/**
 	 * 

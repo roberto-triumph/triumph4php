@@ -353,6 +353,7 @@ solution "mvc-editor"
 			"src/actions/*.cpp",
 			"src/globals/*.cpp",
 			"src/language/*.cpp",
+			"src/php_frameworks/*.cpp",
 			"src/search/*.cpp",
 			"src/widgets/ProcessWithHeartbeatClass.cpp",
 			"src/widgets/ThreadWithHeartbeatClass.cpp",
