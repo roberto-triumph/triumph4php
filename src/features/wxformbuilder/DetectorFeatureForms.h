@@ -25,6 +25,7 @@
 #include <wx/sizer.h>
 #include <wx/treectrl.h>
 #include <wx/panel.h>
+#include <wx/textctrl.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -33,9 +34,9 @@
 #define ID_ADD_BUTTON 1002
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class DetectorPanelGeneratedClass
+/// Class UrlDetectorPanelGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class DetectorPanelGeneratedClass : public wxPanel 
+class UrlDetectorPanelGeneratedClass : public wxPanel 
 {
 	private:
 	
@@ -49,19 +50,44 @@ class DetectorPanelGeneratedClass : public wxPanel
 		wxTreeCtrl* DetectorTree;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnTestButton( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnAddButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnTreeItemDelete( wxTreeEvent& event ) { event.Skip(); }
-		virtual void OnTreeItemEndLabelEdit( wxTreeEvent& event ) { event.Skip(); }
-		virtual void OnTreeItemActivated( wxTreeEvent& event ) { event.Skip(); }
-		virtual void OnTreeItemRightClick( wxTreeEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		DetectorPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
-		~DetectorPanelGeneratedClass();
+		UrlDetectorPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
+		~UrlDetectorPanelGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class TemplateFilesDetectorPanelGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class TemplateFilesDetectorPanelGeneratedClass : public wxPanel 
+{
+	private:
+	
+	protected:
+		wxStaticText* ProjectLabel;
+		wxChoice* ProjectChoice;
+		wxButton* TestButton;
+		wxButton* AddButton;
+		wxBitmapButton* HelpButton;
+		wxStaticText* UrlToTestLabel;
+		wxTextCtrl* UrlToTest;
+		wxButton* ChooseUrlButton;
+		wxStaticText* Label;
+		wxTreeCtrl* DetectorTree;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnAddButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnChooseUrlButton( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		TemplateFilesDetectorPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
+		~TemplateFilesDetectorPanelGeneratedClass();
 	
 };
 

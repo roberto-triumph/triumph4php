@@ -24,7 +24,10 @@
  */
 #include <features/DetectorFeatureClass.h>
 #include <actions/UrlDetectorActionClass.h>
+#include <actions/CallStackActionClass.h>
+#include <actions/TemplateFilesDetectorActionClass.h>
 #include <widgets/TreeItemDataStringClass.h>
+#include <widgets/ChooseUrlDialogClass.h>
 #include <globals/Assets.h>
 #include <MvcEditor.h>
 #include <wx/artprov.h>
@@ -47,6 +50,17 @@ mvceditor::DetectorClass::~DetectorClass() {
 
 mvceditor::UrlDetectorClass::UrlDetectorClass()  {
 
+}
+
+bool mvceditor::UrlDetectorClass::CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project) {
+	mvceditor::SourceClass source = project.Sources[0];
+	wxString rootUrl = globals.Environment.Apache.GetUrl(source.RootDirectory.GetPath());
+	if (rootUrl.IsEmpty()) {
+		wxMessageBox(_("Cannot determine the root URL of the selected project. Please add a virtual host mapping for ") + source.RootDirectory.GetPath() +
+			_(" under Edit -> Preferences -> Apache"));
+		return false;
+	}
+	return true;
 }
 
 wxString mvceditor::UrlDetectorClass::TestCommandLine(const mvceditor::GlobalsClass& globals, 
@@ -98,25 +112,36 @@ mvceditor::TemplateFilesDetectorClass::TemplateFilesDetectorClass()
 
 }
 
+bool  mvceditor::TemplateFilesDetectorClass::CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project) {
+	return true;
+}
+
 wxString mvceditor::TemplateFilesDetectorClass::TestCommandLine(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project,
 																const wxString& detectorScriptFullPath) {
-	// TODO
-	return wxT("");
+	mvceditor::TemplateFilesDetectorParamsClass params;
+	mvceditor::SourceClass source = project.Sources[0];
+
+	params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
+	params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset().GetFullPath();
+	params.ScriptName = detectorScriptFullPath;
+	params.SourceDir = source.RootDirectory;
+	params.DetectorDbFileName = project.DetectorDbFileName;
+	params.OutputDbFileName = wxT("");
+	return params.BuildCmdLine();
 }
 
 wxFileName mvceditor::TemplateFilesDetectorClass::LocalRootDir() {
-	// TODO
-	return wxFileName();
+	return mvceditor::TemplateFilesDetectorsLocalAsset();
 }
 
 wxFileName mvceditor::TemplateFilesDetectorClass::GlobalRootDir() {
-	// TODO
-	return wxFileName();
+	return mvceditor::TemplateFilesDetectorsGlobalAsset();
 }
 
 wxFileName mvceditor::TemplateFilesDetectorClass::SkeletonFile() {
-	// TODO
-	return wxFileName();
+	wxFileName skeletonFile = mvceditor::SkeletonsBaseAsset();
+	skeletonFile.Assign(skeletonFile.GetPath(), wxT("TemplateFilesDetector.skeleton.php"));
+	return skeletonFile;
 }
 
 wxString mvceditor::TemplateFilesDetectorClass::Label() {
@@ -124,26 +149,55 @@ wxString mvceditor::TemplateFilesDetectorClass::Label() {
 }
 
 wxString mvceditor::TemplateFilesDetectorClass::HelpMessage() {
-	// TODO
-	return wxString();
+	wxString help = wxString::FromAscii(
+		"Template files detectors are PHP scripts that MVC Editor uses to find out "
+		"all of the 'view' files for your projects.  \n"
+		"MVC Editor can detect view files for CodeIgniter projects.\n"
+	);
+	help = wxGetTranslation(help);
+	return help;
 }
 
-mvceditor::DetectorPanelClass::DetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
-														mvceditor::EventSinkClass& eventSink,
-														mvceditor::DetectorClass* detector)
-	: DetectorPanelGeneratedClass(parent, id) 
+mvceditor::DetectorTreeHandlerClass::DetectorTreeHandlerClass(wxTreeCtrl* detectorTree,
+															  wxButton* testButton,
+															  wxButton* addButton,
+															  wxButton* helpButton,
+															  wxChoice* projectChoice,
+															  mvceditor::DetectorClass* detector,
+															  mvceditor::GlobalsClass& globals, 
+															  mvceditor::EventSinkClass& eventSink)
+	: wxEvtHandler()
+	, DetectorTree(detectorTree)
+	, TestButton(testButton)
+	, AddButton(addButton)
+	, HelpButton(helpButton)
+	, ProjectChoice(projectChoice)
+	, Detector(detector) 
 	, Globals(globals) 
-	, EventSink(eventSink)
-	, Detector(detector) {
-	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
-		wxART_TOOLBAR, wxSize(16, 16))));
+	, EventSink(eventSink) {
+
+	// Connect Events
+	TestButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(DetectorTreeHandlerClass::OnTestButton), NULL, this);
+	AddButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(DetectorTreeHandlerClass::OnAddButton), NULL, this);
+	HelpButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(DetectorTreeHandlerClass::OnHelpButton), NULL, this);
+	DetectorTree->Connect(wxEVT_COMMAND_TREE_DELETE_ITEM, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemDelete), NULL, this);
+	DetectorTree->Connect(wxEVT_COMMAND_TREE_END_LABEL_EDIT, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemEndLabelEdit), NULL, this);
+	DetectorTree->Connect(wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemActivated), NULL, this);
+	DetectorTree->Connect(wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemRightClick), NULL, this);
 }
 
-mvceditor::DetectorPanelClass::~DetectorPanelClass() {
-	delete Detector;
+mvceditor::DetectorTreeHandlerClass::~DetectorTreeHandlerClass() {
+	// Connect Events
+	TestButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(DetectorTreeHandlerClass::OnTestButton), NULL, this);
+	AddButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(DetectorTreeHandlerClass::OnAddButton), NULL, this);
+	HelpButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(DetectorTreeHandlerClass::OnHelpButton), NULL, this);
+	DetectorTree->Disconnect(wxEVT_COMMAND_TREE_DELETE_ITEM, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemDelete), NULL, this);
+	DetectorTree->Disconnect(wxEVT_COMMAND_TREE_END_LABEL_EDIT, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemEndLabelEdit), NULL, this);
+	DetectorTree->Disconnect(wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemActivated), NULL, this);
+	DetectorTree->Disconnect(wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemRightClick), NULL, this);
 }
 
-void mvceditor::DetectorPanelClass::Init() {
+void mvceditor::DetectorTreeHandlerClass::Init() {
 	wxString globalRootDir = Detector->GlobalRootDir().GetFullPath();
 	wxString localRootDir = Detector->LocalRootDir().GetFullPath();
 	
@@ -160,7 +214,7 @@ void mvceditor::DetectorPanelClass::Init() {
 	DetectorTree->Thaw();
 }
 
-void mvceditor::DetectorPanelClass::UpdateProjects() {
+void mvceditor::DetectorTreeHandlerClass::UpdateProjects() {
 	wxArrayString projectLabels;
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	for (project = Globals.Projects.begin(); project != Globals.Projects.end(); ++project) {
@@ -173,7 +227,7 @@ void mvceditor::DetectorPanelClass::UpdateProjects() {
 	}
 }
 
-void mvceditor::DetectorPanelClass::FillSubTree(const wxString& detectorRootDir, wxTreeItemId treeItemDir) {
+void mvceditor::DetectorTreeHandlerClass::FillSubTree(const wxString& detectorRootDir, wxTreeItemId treeItemDir) {
 	wxDir dir;
 	if (dir.Open(detectorRootDir)) {
 		wxString fileName;
@@ -194,7 +248,7 @@ void mvceditor::DetectorPanelClass::FillSubTree(const wxString& detectorRootDir,
 	}
 }
 
-void mvceditor::DetectorPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
+void mvceditor::DetectorTreeHandlerClass::OnTreeItemActivated(wxTreeEvent& event) {
 	wxTreeItemId id = event.GetItem();
 	TreeItemDataStringClass* treeItemData = (TreeItemDataStringClass*)DetectorTree->GetItemData(id);
 	if (treeItemData) {
@@ -204,18 +258,20 @@ void mvceditor::DetectorPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 	}
 }
 
-void mvceditor::DetectorPanelClass::OnHelpButton(wxCommandEvent& event) {
+void mvceditor::DetectorTreeHandlerClass::OnHelpButton(wxCommandEvent& event) {
 	wxString help = Detector->HelpMessage();
-	wxMessageBox(help, _("Help"), wxOK, this);
+	wxMessageBox(help, _("Help"), wxOK);
 }
 
-void mvceditor::DetectorPanelClass::OnAddButton(wxCommandEvent& event) {
-	wxString name = ::wxGetTextFromUser(_("Please enter a file name (no extension)"), _("Create a URL Detector"), wxEmptyString, 
-		// grandParent == outline notebook's parent (the frame)
-		this->GetGrandParent());
+void mvceditor::DetectorTreeHandlerClass::OnAddButton(wxCommandEvent& event) {
+	wxString name = ::wxGetTextFromUser(_("Please enter a file name (no extension)"), _("Create a URL Detector"), wxEmptyString);
 	wxString forbidden = wxFileName::GetForbiddenChars();
 	if (name.find_first_of(forbidden, 0) != std::string::npos) {
 		wxMessageBox(_("Please enter valid a file name"));
+		return;
+	}
+	if (name.IsEmpty()) {
+		wxMessageBox(_("Please enter a file name"));
 		return;
 	}
 	if (!name.EndsWith(wxT(".php"))) {
@@ -257,7 +313,7 @@ void mvceditor::DetectorPanelClass::OnAddButton(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::DetectorPanelClass::OnTestButton(wxCommandEvent& event) {
+void mvceditor::DetectorTreeHandlerClass::OnTestButton(wxCommandEvent& event) {
 	
 	// create the command to test the selected detector on the selected
 	// project
@@ -267,44 +323,34 @@ void mvceditor::DetectorPanelClass::OnTestButton(wxCommandEvent& event) {
 		return;
 	}
 
-	// make sure that a child item in the tree is selected
-	wxTreeItemId itemId = DetectorTree->GetSelection();
-	if (!itemId.IsOk() || DetectorTree->GetRootItem() == itemId) {
-		wxMessageBox(_("Please choose a detector to test."));
-		return;
-	}
 	mvceditor::ProjectClass project = Globals.Projects[projectChoiceIndex];
 	if (project.Sources.empty()) {
 		wxMessageBox(_("Selected project does not have any source directories. Please choose another project"));
 		return;
 	}	
-	mvceditor::SourceClass source = project.Sources[0];
-	wxString rootUrl = Globals.Environment.Apache.GetUrl(source.RootDirectory.GetPath());
-	if (rootUrl.IsEmpty()) {
-		wxMessageBox(_("Cannot determine the root URL of the selected project. Please add a virtual host mapping for ") + source.RootDirectory.GetPath() +
-			_(" under Edit -> Preferences -> Apache"));
-		return;
-	}
-	TreeItemDataStringClass* treeItemData = (TreeItemDataStringClass*)DetectorTree->GetItemData(itemId);
+	
+	// make sure that item selected is an actual detector and not a label
+	wxTreeItemId itemId = DetectorTree->GetSelection();
+	TreeItemDataStringClass* treeItemData = itemId.IsOk() ? 
+		(TreeItemDataStringClass*)DetectorTree->GetItemData(itemId)
+		: NULL;
 	if (!treeItemData) {
 		wxMessageBox(_("Please choose a detector to test."));
 		return;
 	}
 	
 	wxString detectorScriptFullPath = treeItemData->Str;
+	if (Detector->CanTest(Globals, project)) {	
+		wxString cmdLine = Detector->TestCommandLine(Globals, project, detectorScriptFullPath);
 
-	// leave OutputDbFileName empty; that way the results are output to
-	// STDOUT
-	// that way the user can easily see what URLs would be detected
-	wxString cmdLine = Detector->TestCommandLine(Globals, project, detectorScriptFullPath);
-
-	// send the command line to a new app command event to start a process
-	wxCommandEvent runEvent(mvceditor::EVENT_CMD_RUN_COMMAND);
-	runEvent.SetString(cmdLine);
-	EventSink.Publish(runEvent);
+		// send the command line to a new app command event to start a process
+		wxCommandEvent runEvent(mvceditor::EVENT_CMD_RUN_COMMAND);
+		runEvent.SetString(cmdLine);
+		EventSink.Publish(runEvent);
+	}
 }
 
-void mvceditor::DetectorPanelClass::OnTreeItemRightClick(wxTreeEvent& event) {
+void mvceditor::DetectorTreeHandlerClass::OnTreeItemRightClick(wxTreeEvent& event) {
 	wxTreeItemId treeItemId = event.GetItem();
 	TreeItemDataStringClass* data = (TreeItemDataStringClass*)DetectorTree->GetItemData(treeItemId);
 	if (data) {
@@ -332,12 +378,12 @@ void mvceditor::DetectorPanelClass::OnTreeItemRightClick(wxTreeEvent& event) {
 		menu.Enable(ID_DETECTOR_TREE_DELETE, isLocalDetector);
 
 		wxPoint pos = event.GetPoint();
-		PopupMenu(&menu, pos);
+		DetectorTree->PopupMenu(&menu, pos);
 	}
 	event.Skip();
 }
 
-void mvceditor::DetectorPanelClass::OnTreeItemDelete(wxTreeEvent& event) {
+void mvceditor::DetectorTreeHandlerClass::OnTreeItemDelete(wxTreeEvent& event) {
 	wxTreeItemId treeItemId = event.GetItem();
 	TreeItemDataStringClass* data = (TreeItemDataStringClass*)DetectorTree->GetItemData(treeItemId);
 	if (data) {
@@ -346,7 +392,7 @@ void mvceditor::DetectorPanelClass::OnTreeItemDelete(wxTreeEvent& event) {
 	event.Skip();
 }
 
-void mvceditor::DetectorPanelClass::OnMenuOpenDetector(wxCommandEvent& event) {
+void mvceditor::DetectorTreeHandlerClass::OnMenuOpenDetector(wxCommandEvent& event) {
 	wxTreeItemId id = DetectorTree->GetSelection();
 	TreeItemDataStringClass* treeItemData = (TreeItemDataStringClass*)DetectorTree->GetItemData(id);
 	if (treeItemData) {
@@ -356,7 +402,7 @@ void mvceditor::DetectorPanelClass::OnMenuOpenDetector(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::DetectorPanelClass::OnMenuRenameDetector(wxCommandEvent& event) {
+void mvceditor::DetectorTreeHandlerClass::OnMenuRenameDetector(wxCommandEvent& event) {
 	wxTreeItemId id = DetectorTree->GetSelection();
 	TreeItemDataStringClass* treeItemData = (TreeItemDataStringClass*)DetectorTree->GetItemData(id);
 	if (treeItemData) {
@@ -364,19 +410,18 @@ void mvceditor::DetectorPanelClass::OnMenuRenameDetector(wxCommandEvent& event) 
 	}
 }
 
-void mvceditor::DetectorPanelClass::OnMenuDeleteDetector(wxCommandEvent& event) {
+void mvceditor::DetectorTreeHandlerClass::OnMenuDeleteDetector(wxCommandEvent& event) {
 	wxTreeItemId treeItemId = DetectorTree->GetSelection();
 	TreeItemDataStringClass* data = (TreeItemDataStringClass*)DetectorTree->GetItemData(treeItemId);
 	if (data) {
-		int res = wxMessageBox(_("Delete this detector? The operation cannot be undone.\n") + data->Str, _("Delete URL detector"), wxYES_NO, 
-			this->GetGrandParent());
+		int res = wxMessageBox(_("Delete this detector? The operation cannot be undone.\n") + data->Str, _("Delete URL detector"), wxYES_NO);
 		if (wxYES == res) {
 			DetectorTree->Delete(treeItemId);
 		}
 	}
 }
 
-void mvceditor::DetectorPanelClass::OnTreeItemEndLabelEdit(wxTreeEvent& event) {
+void mvceditor::DetectorTreeHandlerClass::OnTreeItemEndLabelEdit(wxTreeEvent& event) {
 	wxTreeItemId treeItemId = event.GetItem();
 	wxString newName = event.GetLabel();
 	if (newName.find_first_of(wxFileName::GetForbiddenChars(), 0) != std::string::npos) {
@@ -403,6 +448,88 @@ void mvceditor::DetectorPanelClass::OnTreeItemEndLabelEdit(wxTreeEvent& event) {
 	}
 }
 
+mvceditor::UrlDetectorPanelClass::UrlDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
+														mvceditor::EventSinkClass& eventSink)
+	: UrlDetectorPanelGeneratedClass(parent, id) 
+	, Detector() 
+	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink) {
+	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
+		wxART_TOOLBAR, wxSize(16, 16))));
+
+	// propagate the menu events to the handler since the handler is not connected to the 
+	// GUI it will not get them by default
+	Connect(ID_DETECTOR_TREE_OPEN, wxEVT_COMMAND_MENU_SELECTED, 
+		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuOpenDetector), NULL, &Handler);
+	Connect(ID_DETECTOR_TREE_RENAME, wxEVT_COMMAND_MENU_SELECTED, 
+		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuRenameDetector), NULL, &Handler);
+	Connect(ID_DETECTOR_TREE_DELETE, wxEVT_COMMAND_MENU_SELECTED, 
+		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
+}
+
+mvceditor::UrlDetectorPanelClass::~UrlDetectorPanelClass() {
+	Disconnect(ID_DETECTOR_TREE_OPEN, wxEVT_COMMAND_MENU_SELECTED, 
+		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuOpenDetector), NULL, &Handler);
+	Disconnect(ID_DETECTOR_TREE_RENAME, wxEVT_COMMAND_MENU_SELECTED, 
+		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuRenameDetector), NULL, &Handler);
+	Disconnect(ID_DETECTOR_TREE_DELETE, wxEVT_COMMAND_MENU_SELECTED, 
+		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
+}
+
+void mvceditor::UrlDetectorPanelClass::Init() {
+	Handler.Init();
+}
+
+void mvceditor::UrlDetectorPanelClass::UpdateProjects() {
+	Handler.UpdateProjects();
+}
+
+mvceditor::TemplateFilesDetectorPanelClass::TemplateFilesDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
+														mvceditor::EventSinkClass& eventSink,
+														mvceditor::RunningThreadsClass& runningThreads)
+	: TemplateFilesDetectorPanelGeneratedClass(parent, id) 
+	, Detector() 
+	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink)
+	, TestUrl()
+	, Globals(globals) 
+	, RunningThreads(runningThreads) {
+	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
+		wxART_TOOLBAR, wxSize(16, 16))));
+
+	// propagate the menu events to the handler since the handler is not connected to the 
+	// GUI it will not get them by default
+	Connect(ID_DETECTOR_TREE_OPEN, wxEVT_COMMAND_MENU_SELECTED, 
+		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuOpenDetector), NULL, &Handler);
+	Connect(ID_DETECTOR_TREE_RENAME, wxEVT_COMMAND_MENU_SELECTED, 
+		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuRenameDetector), NULL, &Handler);
+	Connect(ID_DETECTOR_TREE_DELETE, wxEVT_COMMAND_MENU_SELECTED, 
+		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
+}
+
+mvceditor::TemplateFilesDetectorPanelClass::~TemplateFilesDetectorPanelClass() {
+	Disconnect(ID_DETECTOR_TREE_OPEN, wxEVT_COMMAND_MENU_SELECTED, 
+		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuOpenDetector), NULL, &Handler);
+	Disconnect(ID_DETECTOR_TREE_RENAME, wxEVT_COMMAND_MENU_SELECTED, 
+		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuRenameDetector), NULL, &Handler);
+	Disconnect(ID_DETECTOR_TREE_DELETE, wxEVT_COMMAND_MENU_SELECTED, 
+		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
+}
+
+void mvceditor::TemplateFilesDetectorPanelClass::Init() {
+	Handler.Init();
+}
+
+void mvceditor::TemplateFilesDetectorPanelClass::UpdateProjects() {
+	Handler.UpdateProjects();
+}
+
+void mvceditor::TemplateFilesDetectorPanelClass::OnChooseUrlButton(wxCommandEvent& event) {
+	TestUrl.Reset();
+	mvceditor::ChooseUrlDialogClass dialog(this, Globals.UrlResourceFinder, TestUrl);
+	if (dialog.ShowModal() == wxOK) {
+		UrlToTest->SetValue(TestUrl.Url.BuildURI());
+	}
+}
+
 mvceditor::DetectorFeatureClass::DetectorFeatureClass(mvceditor::AppClass &app)
 	: FeatureClass(app) {
 
@@ -426,8 +553,8 @@ void mvceditor::DetectorFeatureClass::OnViewUrlDetectors(wxCommandEvent& event) 
 		SetFocusToOutlineWindow(window);
 	}
 	else {
-		mvceditor::DetectorPanelClass* panel = new mvceditor::DetectorPanelClass(GetOutlineNotebook(), ID_URL_DETECTOR_PANEL, 
-			App.Globals, App.EventSink, new mvceditor::UrlDetectorClass());
+		mvceditor::UrlDetectorPanelClass* panel = new mvceditor::UrlDetectorPanelClass(GetOutlineNotebook(), ID_URL_DETECTOR_PANEL, 
+			App.Globals, App.EventSink);
 		if (AddOutlineWindow(panel, _("URL Detectors"))) {
 			panel->Init();
 			panel->UpdateProjects();
@@ -441,8 +568,8 @@ void mvceditor::DetectorFeatureClass::OnViewTemplateFileDetectors(wxCommandEvent
 		SetFocusToOutlineWindow(window);
 	}
 	else {
-		mvceditor::DetectorPanelClass* panel = new mvceditor::DetectorPanelClass(GetOutlineNotebook(), ID_URL_DETECTOR_PANEL, 
-			App.Globals, App.EventSink, new mvceditor::TemplateFilesDetectorClass());
+		mvceditor::TemplateFilesDetectorPanelClass* panel = new mvceditor::TemplateFilesDetectorPanelClass(GetOutlineNotebook(), ID_URL_DETECTOR_PANEL, 
+			App.Globals, App.EventSink, App.RunningThreads);
 		if (AddOutlineWindow(panel, _("Template Files Detectors"))) {
 			panel->Init();
 			panel->UpdateProjects();
@@ -485,12 +612,4 @@ BEGIN_EVENT_TABLE(mvceditor::DetectorFeatureClass, mvceditor::FeatureClass)
 	EVT_MENU(mvceditor::MENU_DETECTORS + 1, mvceditor::DetectorFeatureClass::OnViewTemplateFileDetectors)
 	EVT_MENU(mvceditor::MENU_DETECTORS + 2, mvceditor::DetectorFeatureClass::OnRunUrlDetectors)
 	EVT_MENU(mvceditor::MENU_DETECTORS + 3, mvceditor::DetectorFeatureClass::OnRunTemplateFileDetectors)
-END_EVENT_TABLE()
-
-
-BEGIN_EVENT_TABLE(mvceditor::DetectorPanelClass, DetectorPanelGeneratedClass)
-	EVT_TREE_ITEM_ACTIVATED(wxID_ANY, mvceditor::DetectorPanelClass::OnTreeItemActivated)
-	EVT_MENU(ID_DETECTOR_TREE_OPEN, mvceditor::DetectorPanelClass::OnMenuOpenDetector)
-	EVT_MENU(ID_DETECTOR_TREE_RENAME, mvceditor::DetectorPanelClass::OnMenuRenameDetector)
-	EVT_MENU(ID_DETECTOR_TREE_DELETE, mvceditor::DetectorPanelClass::OnMenuDeleteDetector)
 END_EVENT_TABLE()

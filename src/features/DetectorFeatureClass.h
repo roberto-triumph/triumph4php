@@ -38,6 +38,8 @@ public:
 
 	virtual ~DetectorClass();
 
+	virtual bool CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project) = 0;
+
 	virtual wxString TestCommandLine(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project,
 		const wxString& detectorScriptFullPath) = 0;
 
@@ -58,6 +60,8 @@ public:
 
 	UrlDetectorClass();
 
+	bool CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project);
+
 	wxString TestCommandLine(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project,
 		const wxString& detectorScriptFullPath);
 
@@ -77,6 +81,8 @@ public:
 
 	TemplateFilesDetectorClass();
 
+	bool CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project);
+
 	wxString TestCommandLine(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project,
 		const wxString& detectorScriptFullPath);
 
@@ -91,7 +97,104 @@ public:
 	wxString HelpMessage();
 };
 
-class DetectorPanelClass : public DetectorPanelGeneratedClass {
+class DetectorTreeHandlerClass : public wxEvtHandler {
+
+public:
+
+	/**
+	 * @param detectorTree the wxTreeCtrl that renders the files. pointer will NOT be
+	 *        owned by this class
+	 * @param testButton pointer will NOT be owned by this class
+	 * @param addButton pointer will NOT be owned by this class
+	 * @param helpButton pointer will NOT be owned by this class
+	 * @param detector to get the file locations. pointer will NOT be owned by this class
+	 */
+	DetectorTreeHandlerClass(wxTreeCtrl* detectorTree, wxButton* testButton, wxButton* addButton,
+		wxButton* helpButton, wxChoice* projectChoice,
+		mvceditor::DetectorClass* detector,
+		mvceditor::GlobalsClass& globals, mvceditor::EventSinkClass& eventSink);
+
+	~DetectorTreeHandlerClass();
+
+	void Init();
+
+	void UpdateProjects();
+
+	// context menu handlers for the URL detector tree
+	void OnMenuOpenDetector(wxCommandEvent& event);
+	void OnMenuRenameDetector(wxCommandEvent& event);
+	void OnMenuDeleteDetector(wxCommandEvent& event);
+
+private:
+	void FillSubTree(const wxString& detectorRootDir, wxTreeItemId treeItemDir);
+
+	// tree control event handlers
+	void OnTreeItemActivated(wxTreeEvent& event);
+	void OnTreeItemRightClick(wxTreeEvent& event);
+	void OnTreeItemDelete(wxTreeEvent& event);
+	void OnTreeItemEndLabelEdit(wxTreeEvent& event);
+
+	// button click handlers
+	void OnHelpButton(wxCommandEvent& event);
+	void OnTestButton(wxCommandEvent& event);
+	void OnAddButton(wxCommandEvent& event);
+
+	
+	wxTreeCtrl* DetectorTree;
+	wxButton* TestButton;
+	wxButton* AddButton;
+	wxButton* HelpButton;
+	wxChoice* ProjectChoice;
+
+	mvceditor::DetectorClass* Detector;
+
+	/**
+	 * to access the project list
+	 */
+	mvceditor::GlobalsClass& Globals;
+
+	/**
+	 * to send app commands to open and run a file
+	 */
+	mvceditor::EventSinkClass& EventSink;
+
+}; 
+
+class UrlDetectorPanelClass : public UrlDetectorPanelGeneratedClass {
+
+public:
+
+	/**
+	 * @param parent window parent
+	 * @param id window ID
+	 * @param globals to access the projects list
+	 * @param eventSink to send the app file and run commands
+	 */
+	UrlDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
+		mvceditor::EventSinkClass& eventSink);
+
+	~UrlDetectorPanelClass();
+
+	/**
+	 * This should be called when the detector tree needs to be updated.
+	 */
+	void Init();
+
+	/**
+	 * updates the project choice with the given projects. This should be called whenever
+	 * the global project list has been changed.
+	 * The project list will be read from GlobalsClass
+	 */
+	void UpdateProjects();
+
+private:
+
+	mvceditor::UrlDetectorClass Detector;
+
+	mvceditor::DetectorTreeHandlerClass Handler;
+};
+
+class TemplateFilesDetectorPanelClass : public TemplateFilesDetectorPanelGeneratedClass {
 
 public:
 
@@ -102,11 +205,10 @@ public:
 	 * @param eventSink to send the app file and run commands
 	 * @param detector this class will own the pointer
 	 */
-	DetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
-		mvceditor::EventSinkClass& eventSink,
-		mvceditor::DetectorClass* detector);
+	TemplateFilesDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
+		mvceditor::EventSinkClass& eventSink, mvceditor::RunningThreadsClass& runningThreads);
 
-	~DetectorPanelClass();
+	~TemplateFilesDetectorPanelClass();
 
 	/**
 	 * This should be called when the detector tree needs to be updated.
@@ -121,39 +223,26 @@ public:
 	void UpdateProjects();
 
 protected:
-	void OnTreeItemActivated(wxTreeEvent& event);
-	void OnTreeItemRightClick(wxTreeEvent& event);
-	void OnTreeItemDelete(wxTreeEvent& event);
-	void OnHelpButton(wxCommandEvent& event);
-	void OnTestButton(wxCommandEvent& event);
-	void OnAddButton(wxCommandEvent& event);
-	void OnTreeItemEndLabelEdit(wxTreeEvent& event);
+
+	void OnChooseUrlButton(wxCommandEvent& event);
 
 private:
 
-	void FillSubTree(const wxString& detectorRootDir, wxTreeItemId treeItemDir);
+	mvceditor::TemplateFilesDetectorClass Detector;
 
-	// context menu handlers for the URL detector tree
-	void OnMenuOpenDetector(wxCommandEvent& event);
-	void OnMenuRenameDetector(wxCommandEvent& event);
-	void OnMenuDeleteDetector(wxCommandEvent& event);
+	mvceditor::DetectorTreeHandlerClass Handler;
 
 	/**
-	 * to access the project list
+	 * The URL to use for testing the detector
+	 */
+	mvceditor::UrlResourceClass TestUrl;
+
+	/**
+	 * to access the url resource list
 	 */
 	mvceditor::GlobalsClass& Globals;
 
-	/**
-	 * to send app commands to open and run a file
-	 */
-	mvceditor::EventSinkClass& EventSink;
-
-	/**
-	 * this class will own this pointer.
-	 */
-	mvceditor::DetectorClass* Detector;
-
-	DECLARE_EVENT_TABLE()
+	mvceditor::RunningThreadsClass& RunningThreads;
 };
 
 class DetectorFeatureClass : public mvceditor::FeatureClass {

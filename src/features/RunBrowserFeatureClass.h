@@ -34,56 +34,6 @@
 
 namespace mvceditor {
 
-/**
- * small dialog that allows the user to choose a URL to run. User can also
- * add, delete, and modify items in the global URL list (URLResourceFinderClass).
- */
-class ChooseUrlDialogClass : public ChooseUrlDialogGeneratedClass {
-	
-public:
-
-	ChooseUrlDialogClass(wxWindow* parent, UrlResourceFinderClass* urls, UrlResourceClass& chosenUrl);
-	
-protected:
-
-	void OnOkButton(wxCommandEvent& event);
-
-	/**
-	 * events on the filter textbox, so that the list gets updates
-	 * as the user types in text
-	 */
-	void OnFilterText(wxCommandEvent& event);
-	void OnFilterTextEnter(wxCommandEvent& event);
-	void OnFilterKeyDown(wxKeyEvent& event);
-	
-	/**
-	 * updates the URL label so that the user can see the exact URL to 
-	 * be opened in the browser
-	 */
-	void OnListItemSelected(wxCommandEvent& event);
-
-	/**
-	 * events on the extra textbox, so that the list gets updates
-	 * as the user types in text
-	 */
-	void OnExtraText(wxCommandEvent& event);
-	void OnExtraChar(wxKeyEvent& event);
-
-private:
-
-	/**
-	 * The list of URLs, it will contain URLs that were detected and URLs that were input
-	 * by the user.
-	 * This pointer will not be owned by thie class
-	 */
-	UrlResourceFinderClass* UrlResourceFinder;
-
-	/**
-	 * The URL that the user selected.
-	 */
-	UrlResourceClass& ChosenUrl;
-};
-
 class RunBrowserFeatureClass : public FeatureClass {
 
 public:

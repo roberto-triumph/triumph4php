@@ -24,6 +24,7 @@
  */
 #include <features/RunBrowserFeatureClass.h>
 #include <globals/Errors.h>
+#include <widgets/ChooseUrlDialogClass.h>
 #include <MvcEditor.h>
 #include <wx/artprov.h>
 
@@ -50,113 +51,6 @@ static void ExternalBrowser(const wxString& browserName, const wxURI& url, mvced
 	if (pid <= 0) {
 		mvceditor::EditorLogWarning(mvceditor::BAD_WEB_BROWSER_EXECUTABLE, cmd);
 	}
-}
-
-mvceditor::ChooseUrlDialogClass::ChooseUrlDialogClass(wxWindow* parent, mvceditor::UrlResourceFinderClass* urls, mvceditor::UrlResourceClass& chosenUrl)
-	: ChooseUrlDialogGeneratedClass(parent, wxID_ANY)
-	, UrlResourceFinder(urls)
-	, ChosenUrl(chosenUrl) {
-
-	// get some urls to prepopulate the list
-	std::vector<mvceditor::UrlResourceClass> allUrlResources;
-	urls->FilterUrls(wxT("http://"), allUrlResources);
-	for (size_t i = 0; i < allUrlResources.size(); ++i) {
-		UrlList->Append(allUrlResources[i].Url.BuildURI());
-	}
-	if (UrlList->GetCount() > 0) {
-		UrlList->Select(0);
-	}
-	TransferDataToWindow();
-	Filter->SetFocus();
-}
-
-void mvceditor::ChooseUrlDialogClass::OnOkButton(wxCommandEvent& event) {
-	if (Validate() && TransferDataFromWindow()) {
-		int index = UrlList->GetSelection();
-		if (index >= 0) {
-			wxURI selection(UrlList->GetString(index));
-			UrlResourceFinder->FindByUrl(selection, ChosenUrl);
-
-			// add the extra string also
-			wxURI entireUri(ChosenUrl.Url.BuildURI() + ExtraText->GetValue());
-			ChosenUrl.Url = entireUri;
-		}
-		EndModal(wxOK);
-	}
-}
-
-void mvceditor::ChooseUrlDialogClass::OnListItemSelected(wxCommandEvent& event) {
-	wxString finalUrl = UrlList->GetStringSelection() + ExtraText->GetValue();
-	FinalUrlLabel->SetLabel(finalUrl);
-	event.Skip();
-}
-
-void mvceditor::ChooseUrlDialogClass::OnFilterText(wxCommandEvent& event) {
-	wxString filter = Filter->GetValue();
-	UrlList->Freeze();
-	if (filter.IsEmpty()) {
-		
-		// empty string =  no filter show all
-		UrlList->Clear();
-		std::vector<mvceditor::UrlResourceClass> allUrlResources;
-		UrlResourceFinder->FilterUrls(wxT("http://"), allUrlResources);
-		for (size_t i = 0; i < allUrlResources.size(); ++i) {
-			UrlList->Append(allUrlResources[i].Url.BuildURI());
-		}
-		if (UrlList->GetCount() > 0) {
-			UrlList->Select(0);
-		}
-	}
-	else {
-		std::vector<mvceditor::UrlResourceClass> filteredUrls;
-		UrlResourceFinder->FilterUrls(filter, filteredUrls);
-		UrlList->Clear();
-		for (size_t i = 0; i < filteredUrls.size(); ++i) {
-			UrlList->Append(filteredUrls[i].Url.BuildURI());
-		}
-		if (UrlList->GetCount() > 0) {
-			UrlList->Select(0);
-		}
-	}
-	UrlList->Thaw();
-	wxString finalUrl = UrlList->GetStringSelection() + ExtraText->GetValue();
-	FinalUrlLabel->SetLabel(finalUrl);
-}
-
-void mvceditor::ChooseUrlDialogClass::OnFilterTextEnter(wxCommandEvent& event) {
-	OnOkButton(event);	
-}
-
-void mvceditor::ChooseUrlDialogClass::OnFilterKeyDown(wxKeyEvent& event) {
-	if (event.GetKeyCode() == WXK_DOWN && event.GetModifiers() == wxMOD_NONE) {
-		int selection = UrlList->GetSelection();
-		if (selection >= 0 && selection < (int)(UrlList->GetCount() - 1)) {
-			UrlList->SetSelection(selection  + 1);
-		}
-		Filter->SetFocus();
-	}
-	else if (event.GetKeyCode() == WXK_UP && event.GetModifiers() == wxMOD_NONE) {
-		int selection = UrlList->GetSelection();
-		if (selection > 0 && selection < (int)UrlList->GetCount()) {
-			UrlList->SetSelection(selection  - 1);
-		}
-		Filter->SetFocus();
-	}
-	else {
-		event.Skip();
-	}
-}
-
-void mvceditor::ChooseUrlDialogClass::OnExtraText(wxCommandEvent& event) {
-	wxString finalUrl = UrlList->GetStringSelection() + ExtraText->GetValue();
-	FinalUrlLabel->SetLabel(finalUrl);
-	event.Skip();
-}
-
-void mvceditor::ChooseUrlDialogClass::OnExtraChar(wxKeyEvent& event) {
-	wxString finalUrl = UrlList->GetStringSelection() + ExtraText->GetValue();
-	FinalUrlLabel->SetLabel(finalUrl);
-	event.Skip();
 }
 
 mvceditor::RunBrowserFeatureClass::RunBrowserFeatureClass(mvceditor::AppClass& app)
@@ -319,7 +213,7 @@ void mvceditor::RunBrowserFeatureClass::OnUrlSearchTool(wxCommandEvent& event) {
 }
 
 void mvceditor::RunBrowserFeatureClass::ShowUrlDialog() {
-	mvceditor::ChooseUrlDialogClass dialog(GetMainWindow(), &App.Globals.UrlResourceFinder, App.Globals.CurrentUrl);
+	mvceditor::ChooseUrlDialogClass dialog(GetMainWindow(), App.Globals.UrlResourceFinder, App.Globals.CurrentUrl);
 	if (wxOK == dialog.ShowModal() && !App.Globals.CurrentUrl.Url.BuildURI().IsEmpty()) {
 				
 		// 'select' the URL (make it the current in the toolbar)
