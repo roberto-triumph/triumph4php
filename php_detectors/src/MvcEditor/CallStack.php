@@ -97,7 +97,7 @@ class MvcEditor_CallStack {
 		$this->clear();
 		$ret = false;
 		$line = trim($line);
-		if (empty($line)) {
+		if (empty($line) && \opstring\compare($stepType, 'RETURN') != 0) {
 			return $ret;
 		}
 			

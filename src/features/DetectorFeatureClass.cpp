@@ -527,6 +527,15 @@ void mvceditor::TemplateFilesDetectorPanelClass::OnChooseUrlButton(wxCommandEven
 	mvceditor::ChooseUrlDialogClass dialog(this, Globals.UrlResourceFinder, TestUrl);
 	if (dialog.ShowModal() == wxOK) {
 		UrlToTest->SetValue(TestUrl.Url.BuildURI());
+		mvceditor::CallStackActionClass* action = new mvceditor::CallStackActionClass(RunningThreads, wxID_ANY);
+		action->SetCallStackStart(TestUrl.FileName,
+			mvceditor::WxToIcu(TestUrl.ClassName),
+			mvceditor::WxToIcu(TestUrl.MethodName),
+			Globals.Projects[ProjectChoice->GetSelection()].DetectorDbFileName
+		);
+		wxThreadIdType threadId;
+		action->Init(Globals);
+		action->CreateSingleInstance(threadId);
 	}
 }
 
@@ -568,7 +577,7 @@ void mvceditor::DetectorFeatureClass::OnViewTemplateFileDetectors(wxCommandEvent
 		SetFocusToOutlineWindow(window);
 	}
 	else {
-		mvceditor::TemplateFilesDetectorPanelClass* panel = new mvceditor::TemplateFilesDetectorPanelClass(GetOutlineNotebook(), ID_URL_DETECTOR_PANEL, 
+		mvceditor::TemplateFilesDetectorPanelClass* panel = new mvceditor::TemplateFilesDetectorPanelClass(GetOutlineNotebook(), ID_TEMPLATE_FILES_DETECTOR_PANEL, 
 			App.Globals, App.EventSink, App.RunningThreads);
 		if (AddOutlineWindow(panel, _("Template Files Detectors"))) {
 			panel->Init();

@@ -23,33 +23,11 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <actions/UrlDetectorActionClass.h>
+#include <search/RecursiveDirTraverserClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 
 static int ID_URL_DETECTOR_PROCESS = wxNewId();
-
-class DirTraverserClass : public wxDirTraverser {
-public:
-
-    DirTraverserClass(std::vector<wxString>& fullPaths) 
-		: FullPaths(fullPaths) {
-	}
-
-    virtual wxDirTraverseResult OnFile(const wxString& filename)
-    {
-        FullPaths.push_back(filename);
-        return wxDIR_CONTINUE;
-    }
-
-    virtual wxDirTraverseResult OnDir(const wxString& WXUNUSED(dirname))
-    {
-        return wxDIR_CONTINUE;
-    }
-
-private:
-
-    std::vector<wxString>& FullPaths;
-};
 
 mvceditor::UrlResourceFinderInitActionClass::UrlResourceFinderInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: InitializerActionClass(runningThreads, eventId) {
@@ -168,7 +146,7 @@ void mvceditor::UrlDetectorActionClass::NextDetection() {
 
 std::vector<wxString> mvceditor::UrlDetectorActionClass::DetectorScripts() {
 	std::vector<wxString> scripts;
-	DirTraverserClass traverser(scripts);
+	mvceditor::RecursiveDirTraverserClass traverser(scripts);
 	wxDir globalDir;
 	if (globalDir.Open(mvceditor::UrlDetectorsGlobalAsset().GetFullPath())) {
 		globalDir.Traverse(traverser, wxEmptyString, wxDIR_DIRS | wxDIR_FILES);

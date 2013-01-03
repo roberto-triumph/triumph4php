@@ -23,6 +23,11 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <actions/TemplateFilesDetectorActionClass.h>
+#include <globals/Assets.h>
+#include <globals/Errors.h>
+#include <search/RecursiveDirTraverserClass.h>
+
+static int ID_TEMPLATE_FILES_DETECTOR_PROCESS = wxNewId();
 
 mvceditor::TemplateFilesDetectorParamsClass::TemplateFilesDetectorParamsClass() 
 	: PhpExecutablePath()
@@ -44,3 +49,121 @@ wxString mvceditor::TemplateFilesDetectorParamsClass::BuildCmdLine() const {
 		wxT(" --outputDbFileName=") + wxT("\"") + OutputDbFileName + wxT("\"");
 	return cmdLine;
 }
+
+mvceditor::TemplateFilesDetectorActionClass::TemplateFilesDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+	: ActionClass(runningThreads, eventId)
+	, Process(*this)
+	, ParamsQueue() {
+
+}
+
+bool mvceditor::TemplateFilesDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
+	while (!ParamsQueue.empty()) {
+		ParamsQueue.pop();
+	}
+	std::vector<wxString> detectorScripts = DetectorScripts();
+
+	std::vector<mvceditor::ProjectClass>::const_iterator project;
+	std::vector<mvceditor::SourceClass>::const_iterator source;
+	std::vector<wxString>::const_iterator scriptName;
+
+	// need to call each url detector once for each different source directory
+	// that's why there's 3 loops
+	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
+		for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
+			for (scriptName = detectorScripts.begin(); scriptName != detectorScripts.end(); ++scriptName) {
+				mvceditor::TemplateFilesDetectorParamsClass params;
+				params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
+				params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset();
+				params.ScriptName = *scriptName;
+				params.SourceDir = source->RootDirectory;
+				params.DetectorDbFileName = project->DetectorDbFileName.GetFullPath();
+				params.OutputDbFileName = project->DetectorDbFileName.GetFullPath();
+				if (params.ScriptName.FileExists()) {
+					ParamsQueue.push(params);
+				}
+			}
+		}
+	}
+	bool started = false;
+	if (!ParamsQueue.empty()) {
+		
+		// start the first external process
+		NextDetection();
+		started = true;
+	}
+	return started;
+}
+
+bool mvceditor::TemplateFilesDetectorActionClass::DoAsync() {
+	return false;
+}
+
+wxString mvceditor::TemplateFilesDetectorActionClass::GetLabel() const {
+	return wxT("Template File Detectors");
+}
+
+void mvceditor::TemplateFilesDetectorActionClass::BackgroundWork() {
+	// nothing is done in the background, we use ProcessWithHeartbeatClass
+	// here
+}
+
+void mvceditor::TemplateFilesDetectorActionClass::NextDetection() {
+	if (ParamsQueue.empty()) {
+		return;
+	}
+	mvceditor::TemplateFilesDetectorParamsClass params = ParamsQueue.front();
+	ParamsQueue.pop();
+
+	SetStatus(_("Determining Template Files for ") + params.SourceDir.GetPath());
+
+	wxString cmdLine = params.BuildCmdLine();
+	long pid;
+	Process.Init(cmdLine, ID_TEMPLATE_FILES_DETECTOR_PROCESS, pid);
+}
+
+std::vector<wxString> mvceditor::TemplateFilesDetectorActionClass::DetectorScripts() {
+	std::vector<wxString> scripts;
+	mvceditor::RecursiveDirTraverserClass traverser(scripts);
+	wxDir globalDir;
+	if (globalDir.Open(mvceditor::TemplateFilesDetectorsGlobalAsset().GetFullPath())) {
+		globalDir.Traverse(traverser, wxEmptyString, wxDIR_DIRS | wxDIR_FILES);
+	}
+	wxDir localDir;
+	if (localDir.Open(mvceditor::TemplateFilesDetectorsLocalAsset().GetFullPath())) {
+		localDir.Traverse(traverser, wxEmptyString, wxDIR_DIRS | wxDIR_FILES);
+	}
+	return  scripts;
+}
+
+void mvceditor::TemplateFilesDetectorActionClass::OnProcessComplete(wxCommandEvent &event) {
+	if (ParamsQueue.empty()) {
+		wxCommandEvent completeEvent(mvceditor::EVENT_WORK_COMPLETE);
+		PostEvent(completeEvent);
+	}
+	else {
+		NextDetection();
+	}
+}
+
+void mvceditor::TemplateFilesDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
+	mvceditor::EditorLogError(mvceditor::WARNING_OTHER, event.GetString());
+	if (ParamsQueue.empty()) {
+		wxCommandEvent completeEvent(mvceditor::EVENT_WORK_COMPLETE);
+		PostEvent(completeEvent);
+	}
+	else {
+		NextDetection();
+	}
+}
+
+void mvceditor::TemplateFilesDetectorActionClass::OnProcessInProgress(wxCommandEvent &event) {
+	wxCommandEvent inProgressEvent(mvceditor::EVENT_WORK_IN_PROGRESS);
+	PostEvent(inProgressEvent);
+}
+
+BEGIN_EVENT_TABLE(mvceditor::TemplateFilesDetectorActionClass, mvceditor::ActionClass) 
+	EVT_COMMAND(ID_TEMPLATE_FILES_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::TemplateFilesDetectorActionClass::OnProcessInProgress)
+	EVT_COMMAND(ID_TEMPLATE_FILES_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::TemplateFilesDetectorActionClass::OnProcessComplete)
+	EVT_COMMAND(ID_TEMPLATE_FILES_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::TemplateFilesDetectorActionClass::OnProcessFailed)
+END_EVENT_TABLE()

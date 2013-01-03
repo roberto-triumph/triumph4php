@@ -26,6 +26,8 @@
 #define __MVCEDITOR_TEMPLATEFILESDETECTORACTIONCLASS_H__
 
 #include <actions/ActionClass.h>
+#include <widgets/ProcessWithHeartbeatClass.h>
+#include <queue>
 
 namespace mvceditor {
 
@@ -87,6 +89,65 @@ public:
 	 * build the command line to be executed for each url detector
 	 */
 	wxString BuildCmdLine() const;
+};
+
+/**
+ * This class will run all template file detectors across all enabled projects. This means that there is
+ * one external process execution for each project source directory / template file detector combination
+ * 
+ * The template files detector requires that the call stack already be built; the template files detectors
+ * iterate through the call stack to find the template method calls themselves.
+ * the CallStackActionClass
+ * can be used to build the call stack. This means that the CallStackActionClass should be run immediately before
+ * this action.
+ */
+class TemplateFilesDetectorActionClass : public mvceditor::ActionClass {
+
+public:
+
+	TemplateFilesDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+
+	bool Init(mvceditor::GlobalsClass& globals);
+
+	bool DoAsync();
+
+	wxString GetLabel() const;
+
+	void BackgroundWork();
+
+private:
+
+	/**
+	 * used to run the external url detector PHP script
+	 */
+	mvceditor::ProcessWithHeartbeatClass Process;
+
+	/**
+	 * we will perform one external call for each item in this
+	 * queue
+	 */
+	std::queue<mvceditor::TemplateFilesDetectorParamsClass> ParamsQueue;
+
+	/**
+	 * pop the next set of params from the queue and call the php url 
+	 * detector.
+	 */
+	void NextDetection();
+
+	/**
+	 * @return all of the PHP URL detector scripts. These can be either ones
+	 * provided by default or ones created by the user.
+	 */
+	std::vector<wxString> DetectorScripts();
+
+	void OnProcessComplete(wxCommandEvent& event);
+
+	void OnProcessInProgress(wxCommandEvent& event);
+
+	void OnProcessFailed(wxCommandEvent& event);
+
+	DECLARE_EVENT_TABLE()
+
 };
 
 }
