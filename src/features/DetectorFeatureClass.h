@@ -97,6 +97,27 @@ public:
 	wxString HelpMessage();
 };
 
+class TagDetectorClass : public mvceditor::DetectorClass {
+public:
+
+	TagDetectorClass();
+
+	bool CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project);
+
+	wxString TestCommandLine(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project,
+		const wxString& detectorScriptFullPath);
+
+	wxFileName LocalRootDir();
+
+	wxFileName GlobalRootDir();
+
+	wxFileName SkeletonFile();
+
+	wxString Label();
+
+	wxString HelpMessage();
+};
+
 class DetectorTreeHandlerClass : public wxEvtHandler {
 
 public:
@@ -203,7 +224,7 @@ public:
 	 * @param id window ID
 	 * @param globals to access the projects list
 	 * @param eventSink to send the app file and run commands
-	 * @param detector this class will own the pointer
+	 * @param runningThreads  used to run the background processes.
 	 */
 	TemplateFilesDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
 		mvceditor::EventSinkClass& eventSink, mvceditor::RunningThreadsClass& runningThreads);
@@ -245,6 +266,44 @@ private:
 	mvceditor::RunningThreadsClass& RunningThreads;
 };
 
+class TagDetectorPanelClass : public TagDetectorPanelGeneratedClass {
+
+public:
+
+	/**
+	 * @param parent window parent
+	 * @param id window ID
+	 * @param globals to access the projects list
+	 * @param eventSink to send the app file and run commands
+	 */
+	TagDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
+		mvceditor::EventSinkClass& eventSink);
+
+	~TagDetectorPanelClass();
+
+	/**
+	 * This should be called when the detector tree needs to be updated.
+	 */
+	void Init();
+
+	/**
+	 * updates the project choice with the given projects. This should be called whenever
+	 * the global project list has been changed.
+	 * The project list will be read from GlobalsClass
+	 */
+	void UpdateProjects();
+
+protected:
+
+	void OnChooseUrlButton(wxCommandEvent& event);
+
+private:
+
+	mvceditor::TagDetectorClass Detector;
+
+	mvceditor::DetectorTreeHandlerClass Handler;
+};
+
 class DetectorFeatureClass : public mvceditor::FeatureClass {
 
 public:
@@ -259,8 +318,10 @@ private:
 
 	void OnViewUrlDetectors(wxCommandEvent& event);
 	void OnViewTemplateFileDetectors(wxCommandEvent& event);
+	void OnViewTagDetectors(wxCommandEvent& event);
 	void OnRunUrlDetectors(wxCommandEvent& event);
 	void OnRunTemplateFileDetectors(wxCommandEvent& event);
+	void OnRunTagDetectors(wxCommandEvent& event);
 
 	DECLARE_EVENT_TABLE()
 

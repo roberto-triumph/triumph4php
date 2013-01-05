@@ -126,6 +126,29 @@ wxFileName mvceditor::TemplateFilesDetectorsLocalAsset() {
 	return configDir;
 }
 
+wxFileName mvceditor::TagDetectorsLocalAsset() {
+	wxStandardPaths paths;
+	wxFileName configDir = mvceditor::ConfigDirAsset();
+	configDir.AppendDir(wxT("tag_detectors"));
+	if (!configDir.DirExists()) {
+		wxMkdir(configDir.GetPath(), 0777);
+	}
+	return configDir;
+}
+
+wxFileName mvceditor::TagDetectorsGlobalAsset() {
+	wxStandardPaths paths;
+	wxFileName pathExecutableFileName(paths.GetExecutablePath());
+	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
+		wxT("..") + wxFileName::GetPathSeparator() +
+		wxT("php_detectors") + wxFileName::GetPathSeparator() +
+		wxT("tag_detectors");
+	wxFileName scriptsFileName;
+	scriptsFileName.AssignDir(scriptsFullPath);
+	scriptsFileName.Normalize();
+	return scriptsFileName;
+}
+
 wxFileName mvceditor::TempDirAsset() {
 	wxStandardPaths paths;
 	wxFileName tempDir;

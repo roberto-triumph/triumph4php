@@ -24,6 +24,7 @@
  */
 #include <features/DetectorFeatureClass.h>
 #include <actions/UrlDetectorActionClass.h>
+#include <actions/TagDetectorActionClass.h>
 #include <actions/CallStackActionClass.h>
 #include <actions/TemplateFilesDetectorActionClass.h>
 #include <widgets/TreeItemDataStringClass.h>
@@ -34,6 +35,7 @@
 
 static const int ID_URL_DETECTOR_PANEL = wxNewId();
 static const int ID_TEMPLATE_FILES_DETECTOR_PANEL = wxNewId();
+static const int ID_TAG_DETECTOR_PANEL = wxNewId();
 
 static const int ID_DETECTOR_TREE_OPEN = wxNewId();
 static const int ID_DETECTOR_TREE_RENAME = wxNewId();
@@ -153,6 +155,56 @@ wxString mvceditor::TemplateFilesDetectorClass::HelpMessage() {
 		"Template files detectors are PHP scripts that MVC Editor uses to find out "
 		"all of the 'view' files for your projects.  \n"
 		"MVC Editor can detect view files for CodeIgniter projects.\n"
+	);
+	help = wxGetTranslation(help);
+	return help;
+}
+
+mvceditor::TagDetectorClass::TagDetectorClass()  {
+
+}
+
+bool mvceditor::TagDetectorClass::CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project) {
+	return true;
+}
+
+wxString mvceditor::TagDetectorClass::TestCommandLine(const mvceditor::GlobalsClass& globals, 
+													  const mvceditor::ProjectClass& project,
+													  const wxString& detectorScriptFullPath) {
+	mvceditor::SourceClass source = project.Sources[0];
+	wxString rootUrl = globals.Environment.Apache.GetUrl(source.RootDirectory.GetPath());
+
+	mvceditor::TagDetectorParamsClass params;
+	params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
+	params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset();
+	params.ScriptName = detectorScriptFullPath;
+	params.SourceDir = source.RootDirectory;
+	return params.BuildCmdLine();
+}
+
+wxFileName mvceditor::TagDetectorClass::LocalRootDir() {
+	return mvceditor::TagDetectorsLocalAsset();
+}
+
+wxFileName mvceditor::TagDetectorClass::GlobalRootDir() {
+	return mvceditor::TagDetectorsGlobalAsset();
+}
+
+wxFileName mvceditor::TagDetectorClass::SkeletonFile() {
+	wxFileName skeletonFile = mvceditor::SkeletonsBaseAsset();
+	skeletonFile.Assign(skeletonFile.GetPath(), wxT("TagDetector.skeleton.php"));
+	return skeletonFile;
+}
+
+wxString mvceditor::TagDetectorClass::Label() {
+	return _("Tag Detectors");
+}
+
+wxString mvceditor::TagDetectorClass::HelpMessage() {
+	wxString help = wxString::FromAscii(
+		"Tag Detectors are PHP scripts that MVC Editor uses to find out "
+		"any tags (methods, properties, or classes) that PHP frameworks dynamically create.  \n"
+		"MVC Editor can detect tags for CodeIgniter projects.\n"
 	);
 	help = wxGetTranslation(help);
 	return help;
@@ -539,6 +591,41 @@ void mvceditor::TemplateFilesDetectorPanelClass::OnChooseUrlButton(wxCommandEven
 	}
 }
 
+mvceditor::TagDetectorPanelClass::TagDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
+														mvceditor::EventSinkClass& eventSink)
+	: TagDetectorPanelGeneratedClass(parent, id) 
+	, Detector() 
+	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink) {
+	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
+		wxART_TOOLBAR, wxSize(16, 16))));
+
+	// propagate the menu events to the handler since the handler is not connected to the 
+	// GUI it will not get them by default
+	Connect(ID_DETECTOR_TREE_OPEN, wxEVT_COMMAND_MENU_SELECTED, 
+		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuOpenDetector), NULL, &Handler);
+	Connect(ID_DETECTOR_TREE_RENAME, wxEVT_COMMAND_MENU_SELECTED, 
+		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuRenameDetector), NULL, &Handler);
+	Connect(ID_DETECTOR_TREE_DELETE, wxEVT_COMMAND_MENU_SELECTED, 
+		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
+}
+
+mvceditor::TagDetectorPanelClass::~TagDetectorPanelClass() {
+	Disconnect(ID_DETECTOR_TREE_OPEN, wxEVT_COMMAND_MENU_SELECTED, 
+		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuOpenDetector), NULL, &Handler);
+	Disconnect(ID_DETECTOR_TREE_RENAME, wxEVT_COMMAND_MENU_SELECTED, 
+		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuRenameDetector), NULL, &Handler);
+	Disconnect(ID_DETECTOR_TREE_DELETE, wxEVT_COMMAND_MENU_SELECTED, 
+		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
+}
+
+void mvceditor::TagDetectorPanelClass::Init() {
+	Handler.Init();
+}
+
+void mvceditor::TagDetectorPanelClass::UpdateProjects() {
+	Handler.UpdateProjects();
+}
+
 mvceditor::DetectorFeatureClass::DetectorFeatureClass(mvceditor::AppClass &app)
 	: FeatureClass(app) {
 
@@ -547,12 +634,14 @@ mvceditor::DetectorFeatureClass::DetectorFeatureClass(mvceditor::AppClass &app)
 void mvceditor::DetectorFeatureClass::AddViewMenuItems(wxMenu* menu) {
 	menu->Append(mvceditor::MENU_DETECTORS + 0, _("View URL Detectors"), _("View the URL Detectors"), wxITEM_NORMAL);
 	menu->Append(mvceditor::MENU_DETECTORS + 1, _("View Template File Detectors"), _("View the Template File Detectors"), wxITEM_NORMAL);
+	menu->Append(mvceditor::MENU_DETECTORS + 2, _("View Tag Detectors"), _("View the Tag Detectors"), wxITEM_NORMAL);
 }
 
 void mvceditor::DetectorFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 	wxMenu* menu = new wxMenu(0);
-	menu->Append(mvceditor::MENU_DETECTORS + 2, _("Run URL Detection"), _("Run the URL Detectors against the current projects"), wxITEM_NORMAL);
-	menu->Append(mvceditor::MENU_DETECTORS + 3, _("Run Template File Detection"), _("Run the Template file Detectors against the current projects"), wxITEM_NORMAL);
+	menu->Append(mvceditor::MENU_DETECTORS + 3, _("Run URL Detection"), _("Run the URL Detectors against the current projects"), wxITEM_NORMAL);
+	menu->Append(mvceditor::MENU_DETECTORS + 4, _("Run Template File Detection"), _("Run the Template file Detectors against the current projects"), wxITEM_NORMAL);
+	menu->Append(mvceditor::MENU_DETECTORS + 5, _("Run Tag Detection"), _("Run the Tag Detectors against the current projects"), wxITEM_NORMAL);
 	menuBar->Append(menu, _("Detectors"));
 }
 
@@ -580,6 +669,21 @@ void mvceditor::DetectorFeatureClass::OnViewTemplateFileDetectors(wxCommandEvent
 		mvceditor::TemplateFilesDetectorPanelClass* panel = new mvceditor::TemplateFilesDetectorPanelClass(GetOutlineNotebook(), ID_TEMPLATE_FILES_DETECTOR_PANEL, 
 			App.Globals, App.EventSink, App.RunningThreads);
 		if (AddOutlineWindow(panel, _("Template Files Detectors"))) {
+			panel->Init();
+			panel->UpdateProjects();
+		}
+	}
+}
+
+void mvceditor::DetectorFeatureClass::OnViewTagDetectors(wxCommandEvent& event) {
+	wxWindow* window = FindOutlineWindow(ID_TAG_DETECTOR_PANEL);
+	if (window) {
+		SetFocusToOutlineWindow(window);
+	}
+	else {
+		mvceditor::TagDetectorPanelClass* panel = new mvceditor::TagDetectorPanelClass(GetOutlineNotebook(), ID_TAG_DETECTOR_PANEL, 
+			App.Globals, App.EventSink);
+		if (AddOutlineWindow(panel, _("Tag Detectors"))) {
 			panel->Init();
 			panel->UpdateProjects();
 		}
@@ -616,9 +720,15 @@ void mvceditor::DetectorFeatureClass::OnRunTemplateFileDetectors(wxCommandEvent&
 	*/
 }
 
+void mvceditor::DetectorFeatureClass::OnRunTagDetectors(wxCommandEvent& event) {
+	// TODO
+}
+
 BEGIN_EVENT_TABLE(mvceditor::DetectorFeatureClass, mvceditor::FeatureClass)
 	EVT_MENU(mvceditor::MENU_DETECTORS + 0, mvceditor::DetectorFeatureClass::OnViewUrlDetectors)
 	EVT_MENU(mvceditor::MENU_DETECTORS + 1, mvceditor::DetectorFeatureClass::OnViewTemplateFileDetectors)
-	EVT_MENU(mvceditor::MENU_DETECTORS + 2, mvceditor::DetectorFeatureClass::OnRunUrlDetectors)
-	EVT_MENU(mvceditor::MENU_DETECTORS + 3, mvceditor::DetectorFeatureClass::OnRunTemplateFileDetectors)
+	EVT_MENU(mvceditor::MENU_DETECTORS + 2, mvceditor::DetectorFeatureClass::OnViewTagDetectors)
+	EVT_MENU(mvceditor::MENU_DETECTORS + 3, mvceditor::DetectorFeatureClass::OnRunUrlDetectors)
+	EVT_MENU(mvceditor::MENU_DETECTORS + 4, mvceditor::DetectorFeatureClass::OnRunTemplateFileDetectors)
+	EVT_MENU(mvceditor::MENU_DETECTORS + 5, mvceditor::DetectorFeatureClass::OnRunTagDetectors)
 END_EVENT_TABLE()

@@ -101,4 +101,67 @@ CREATE TABLE IF NOT EXISTS template_files (
 );
 
 
+--
+-- this table will store all of the "dynamic" tags 
+-- (methods and properties) that MVC Editor could not detect because
+-- they are added during runtime.  MVC Editor will look at this table
+-- during the code completion process.
+--
+CREATE TABLE IF NOT EXISTS detected_tags (
+
+	-- 
+	-- needed for Zend_Db_Table_Abstract 
+	--
+	id INTEGER PRIMARY KEY AUTOINCREMENT, 
+	
+	--
+	-- The key is the string that MVC Editor will use to query
+	-- The key is either the method / property / function name, or
+	-- the fully qualified name (class::method, class::property)
+	-- this is NOT unique because there can be two properties that
+	-- have the same name in different classes.
+	--
+	key TEXT NOT NULL COLLATE NOCASE,
+	
+	-- 
+	-- type of tag
+	-- 0 = CLASS
+	-- 1 = METHOD
+	-- 2 = FUNCTION
+	-- 3 = MEMBER 
+	-- 4 = DEFINE
+	-- 5 = CLASS CONSTANT
+	--
+	type INTEGER NOT NULL,
+	
+	--
+	-- the name of the class of this tag (only the class name)
+	--
+	class_name TEXT NOT NULL COLLATE NOCASE,
+	
+	--
+	-- the name of the method or property of this tag 
+	-- (only the property or method name)
+	--
+	method_name TEXT NOT NULL COLLATE NOCASE,
+	
+	--
+	-- the class name of the member; or the return type
+	-- if this tag is a method. This is the fully qualified name 
+	-- with namespaces
+	--
+	return_type TEXT NOT NULL COLLATE NOCASE,
+	
+	--
+	-- the fully qualified namespace that this tag is located in.
+	-- there is always a value here; if the tag is in the root
+	-- namespace then this column will have the value '\'
+	--
+	namespace_name TEXT NOT NULL COLLATE NOCASE
+);
+
+-- to enable fast lookups for detected tags.
+-- Note that the key is not necessarily unique; 2 different files may declare the same
+-- class / methods / functions.
+CREATE INDEX IF NOT EXISTS idxDetectedTagKey ON detected_tags(key, type);
 

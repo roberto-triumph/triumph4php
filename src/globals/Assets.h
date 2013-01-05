@@ -62,6 +62,13 @@ wxFileName PhpDetectorsBaseAsset();
 wxFileName UrlDetectorsGlobalAsset();
 
 /**
+ * @return the directory location of the PHP URL detector scripts.  The editor will use these scripts
+ * to find out framework-specific URL routes. These are the URL detectors that the user
+ * creates for their own projects.
+ */
+wxFileName UrlDetectorsLocalAsset();
+
+/**
  * @return the directory location of the PHP template files detector scripts.  The editor will use these scripts
  * to find out framework-specific template files. These are the template files detectors that the user
  * creates for their own projects.
@@ -76,11 +83,18 @@ wxFileName TemplateFilesDetectorsLocalAsset();
 wxFileName TemplateFilesDetectorsGlobalAsset();
 
 /**
- * @return the directory location of the PHP URL detector scripts.  The editor will use these scripts
- * to find out framework-specific URL routes. These are the URL detectors that the user
+ * @return the directory location of the PHP tag detector scripts.  The editor will use these scripts
+ * to find out framework-specific template files. These are the template files detectors that the user
  * creates for their own projects.
  */
-wxFileName UrlDetectorsLocalAsset();
+wxFileName TagDetectorsLocalAsset();
+
+/**
+ * @return the directory location of the PHP tag detector scripts.  The editor will use these scripts
+ * to find out framework-specific template files. These are the template files detectors that are provided
+ * by MVC editor.
+ */
+wxFileName TagDetectorsGlobalAsset();
 
 /**
  * @return the file location of the SQL script to create the detector database.

@@ -34,10 +34,6 @@
  */
 class MvcEditor_Resource {
 
-	protected $_name = 'resources';
-	
-	protected $_sequence = FALSE;
-
 	/**
 	 * This is the fully qualified name of a resource. This means that it includes a class name followed by
 	 * the method name, with a "::" in the middle. For example 'MY_Email::read'
