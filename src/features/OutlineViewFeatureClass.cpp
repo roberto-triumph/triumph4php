@@ -25,7 +25,13 @@
 #include <features/OutlineViewFeatureClass.h>
 #include <language/SymbolTableClass.h>
 #include <globals/String.h>
+#include <globals/Assets.h>
+#include <globals/Errors.h>
+#include <language/TagParserClass.h>
+#include <globals/Sqlite.h>
 #include <MvcEditor.h>
+#include <soci/soci.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 #include <unicode/regex.h>
 #include <wx/artprov.h>
 #include <vector>
@@ -99,16 +105,29 @@ void mvceditor::ResourceFinderBackgroundThreadClass::BackgroundWork() {
 
 			// need this call so that resources are actually parsed
 			// need this so that the resource finder parsers the file
+			mvceditor::TagParserClass tagParser;
 			mvceditor::ResourceFinderClass resourceFinder;
-			resourceFinder.InitMemory();
-			resourceFinder.SetVersion(version);
-			resourceFinder.PhpFileExtensions.push_back(wxT("*.*"));
+			try {
+				soci::session session(*soci::factory_sqlite3(), ":memory:");
+				wxString error;
+				if (!mvceditor::SqlScript(mvceditor::ResourceSqlSchemaAsset(), session, error)) {
+					wxASSERT_MSG(false, error);
+				}
+				tagParser.Init(&session);
+				tagParser.SetVersion(version);
+				tagParser.PhpFileExtensions.push_back(wxT("*.*"));
+				tagParser.Walk(fileName);
 
-			resourceFinder.Walk(fileName);
-			std::vector<mvceditor::ResourceClass> resources = resourceFinder.All();
-			if (!TestDestroy()) {
-				mvceditor::ResourceFinderCompleteEventClass evt(ID_RESOURCE_FINDER_BACKGROUND, resources);
-				PostEvent(evt);
+				resourceFinder.Init(&session);
+				std::vector<mvceditor::ResourceClass> resources = resourceFinder.All();
+				if (!TestDestroy()) {
+					mvceditor::ResourceFinderCompleteEventClass evt(ID_RESOURCE_FINDER_BACKGROUND, resources);
+					PostEvent(evt);
+				}
+			}
+			catch (std::exception& e) {
+				wxString wxMsg = wxString::FromAscii(e.what());
+				mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, wxMsg);
 			}
 		}
 		if (!TestDestroy()) {
@@ -139,12 +158,20 @@ void mvceditor::GlobalClassesThreadClass::BackgroundWork() {
 	
 	// grab the classes from all of the files
 	for (fileName = ResourceDbFileNames.begin(); fileName != ResourceDbFileNames.end() && !TestDestroy(); ++fileName) {
-		mvceditor::ResourceFinderClass finder;
-		finder.InitFile(*fileName);
-		std::vector<mvceditor::ResourceClass> matches = finder.AllNonNativeClasses();
-		std::vector<mvceditor::ResourceClass>::iterator match;
-		for (match = matches.begin(); match != matches.end() && !TestDestroy(); ++match) {
-			AllClasses.push_back(mvceditor::IcuToWx(match->ClassName));
+		try {
+			soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(mvceditor::ResourceSqlSchemaAsset().GetFullPath()));
+			
+			mvceditor::ResourceFinderClass finder;
+			finder.Init(&session);
+			std::vector<mvceditor::ResourceClass> matches = finder.AllNonNativeClasses();
+			std::vector<mvceditor::ResourceClass>::iterator match;
+			for (match = matches.begin(); match != matches.end() && !TestDestroy(); ++match) {
+				AllClasses.push_back(mvceditor::IcuToWx(match->ClassName));
+			}
+		}
+		catch (std::exception& e) {
+			wxString wxMsg = wxString::FromAscii(e.what());
+			mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, wxMsg);
 		}
 	}
 	if (!AllClasses.empty()) {

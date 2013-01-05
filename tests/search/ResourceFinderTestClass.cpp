@@ -23,11 +23,15 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <UnitTest++.h>
+#include <FileTestFixtureClass.h>
+#include <MvcEditorChecks.h>
+#include <language/TagParserClass.h>
 #include <search/ResourceFinderClass.h>
 #include <globals/String.h>
-#include <FileTestFixtureClass.h>
 #include <globals/Assets.h>
-#include <MvcEditorChecks.h>
+#include <globals/Sqlite.h>
+#include <soci/soci.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 #include <wx/filefn.h>
 #include <wx/timer.h>
 #include <wx/tokenzr.h>
@@ -44,13 +48,20 @@ class ResourceFinderFileTestClass : public FileTestFixtureClass {
 public:	
 	ResourceFinderFileTestClass() 
 		: FileTestFixtureClass(wxT("resource_finder"))
+		, TagParser()
 		, ResourceFinder()
 		, TestFile(wxT("test.php")) {
-		ResourceFinder.PhpFileExtensions.push_back(wxT("*.php"));
+		Session.open(*soci::factory_sqlite3(), ":memory:");
+		wxString error;
+		if (!mvceditor::SqlScript(mvceditor::ResourceSqlSchemaAsset(), Session, error)) {
+			wxASSERT_MSG(false, error);
+		}
+		TagParser.Init(&Session);
+		TagParser.PhpFileExtensions.push_back(wxT("*.php"));
 		if (wxDirExists(TestProjectDir)) {
 			RecursiveRmDir(TestProjectDir);
 		}
-		ResourceFinder.InitMemory();
+		ResourceFinder.Init(&Session);
 	}
 	
 	/**
@@ -66,6 +77,8 @@ public:
 		Matches = ResourceFinder.CollectNearMatchResources(resourceSearch, doCollectFileNames);
 	}
 
+	soci::session Session;
+	mvceditor::TagParserClass TagParser;
 	mvceditor::ResourceFinderClass ResourceFinder;
 	wxString TestFile;
 	std::vector<mvceditor::ResourceClass> Matches;
@@ -80,11 +93,19 @@ public:
 class ResourceFinderMemoryTestClass {
 public:	
 	ResourceFinderMemoryTestClass() 
-		: ResourceFinder()
+		: Session()
+		, TagParser()
+		, ResourceFinder()
 		, TestFile(wxT("test.php"))
 		, Matches() {
-		ResourceFinder.PhpFileExtensions.push_back(wxT("*.php"));
-		ResourceFinder.InitMemory();
+		Session.open(*soci::factory_sqlite3(), ":memory:");
+		wxString error;
+		if (!mvceditor::SqlScript(mvceditor::ResourceSqlSchemaAsset(), Session, error)) {
+			wxASSERT_MSG(false, error);
+		}
+		TagParser.PhpFileExtensions.push_back(wxT("*.php"));
+		TagParser.Init(&Session);
+		ResourceFinder.Init(&Session);
 	}
 	
 	/**
@@ -93,7 +114,7 @@ public:
 	 * ResourceFinderFileTestClass::Prep method
 	 */
 	void Prep(const UnicodeString& source) {
-		ResourceFinder.BuildResourceCacheForFile(TestFile, source, true);
+		TagParser.BuildResourceCacheForFile(TestFile, source, true);
 	}
 
 	void CollectNearMatchResources(const UnicodeString& search, bool doCollectFileNames = false) {
@@ -101,56 +122,11 @@ public:
 		Matches = ResourceFinder.CollectNearMatchResources(resourceSearch, doCollectFileNames);
 	}
 
+	soci::session Session;
+	mvceditor::TagParserClass TagParser;
 	mvceditor::ResourceFinderClass ResourceFinder;
 	wxString TestFile;
 	std::vector<mvceditor::ResourceClass> Matches;
-};
-
-class DynamicResourceTestClass {
-
-public:
-
-	mvceditor::ResourceFinderClass ResourceFinder;
-	std::vector<mvceditor::ResourceClass> DynamicResources;
-	std::vector<mvceditor::ResourceClass> Matches;
-	wxString TestFile;
-
-	DynamicResourceTestClass() 
-		: ResourceFinder() 
-		, DynamicResources()
-		, Matches()
-		, TestFile(wxT("test.php")) {
-		ResourceFinder.PhpFileExtensions.push_back(wxT("*.php"));
-		ResourceFinder.InitMemory();
-		
-		// create a small class that implements a magic method
-		// then add a dynamic resource that will be used to mimic the resource
-		// returned by the magic method.
-		ResourceFinder.BuildResourceCacheForFile(TestFile, mvceditor::CharToIcu(
-			"<?php\n"
-			"class MyDynamicClass {\n"
-			"\tfunction work() {} \n"
-			"\tfunction __get($name) {\n"
-			"\t\treturn $name == 'address' ? '123 main st.' : '';\n"
-			"\t}\n"
-			"}\n"
-			"function globalHandle() {\n"
-			"\treturn new MyDynamicClass;\n"
-			"}\n"
-		), true);
-
-		mvceditor::ResourceClass res;
-		res.Identifier = UNICODE_STRING_SIMPLE("address");
-		res.ReturnType = UNICODE_STRING_SIMPLE("string");
-		res.Type = mvceditor::ResourceClass::MEMBER;
-		res.ClassName = UNICODE_STRING_SIMPLE("MyDynamicClass");
-		DynamicResources.push_back(res);
-	}
-
-	void CollectNearMatchResources(const UnicodeString& search) {
-		mvceditor::ResourceSearchClass resourceSearch(search);
-		Matches = ResourceFinder.CollectNearMatchResources(resourceSearch);
-	}
 };
 
 class ResourceSearchTestClass {
@@ -197,7 +173,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 		"\n"
 		"?>\n"
 	));
-	ResourceFinder.Walk(TestProjectDir + TestFile);
+	TagParser.Walk(TestProjectDir + TestFile);
 	CollectNearMatchResources(mvceditor::WxToIcu(TestFile));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
@@ -210,14 +186,14 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 		"\n"
 		"?>\n"
 	));
-	ResourceFinder.MiscFileExtensions.push_back(wxT("*.yml"));
+	TagParser.MiscFileExtensions.push_back(wxT("*.yml"));
 	wxString miscFile = wxT("config.yml");
 	CreateFixtureFile(miscFile, wxString::FromAscii(
 		"app:\n"
 		"  debug: true\n"
 	));
-	ResourceFinder.Walk(TestProjectDir + TestFile);
-	ResourceFinder.Walk(TestProjectDir + miscFile);
+	TagParser.Walk(TestProjectDir + TestFile);
+	TagParser.Walk(TestProjectDir + miscFile);
 	CollectNearMatchResources(mvceditor::WxToIcu(miscFile));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestProjectDir + miscFile, Matches[0].GetFullPath());
@@ -230,7 +206,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 		"\n"
 		"?>\n"
 	));
-	ResourceFinder.Walk(TestProjectDir + TestFile);
+	TagParser.Walk(TestProjectDir + TestFile);
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("est.php"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
@@ -243,7 +219,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldNotFind
 		"\n"
 		"?>\n"
 	));
-	ResourceFinder.Walk(TestProjectDir + TestFile);
+	TagParser.Walk(TestProjectDir + TestFile);
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("test.php:100"));
 	CHECK_VECTOR_SIZE(0, Matches);
 	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("test.php:100"));
@@ -261,7 +237,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 		"\n"
 		"?>\n"
 	));
-	ResourceFinder.Walk(TestProjectDir + TestFile);
+	TagParser.Walk(TestProjectDir + TestFile);
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("test.php:6"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
@@ -277,7 +253,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 		"\n"
 		"?>\n"
 	));
-	ResourceFinder.Walk(TestProjectDir + TestFile);
+	TagParser.Walk(TestProjectDir + TestFile);
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("test.php:6"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
@@ -293,7 +269,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 		"\n"
 		"?>\n"
 	));
-	ResourceFinder.Walk(TestProjectDir + TestFile);
+	TagParser.Walk(TestProjectDir + TestFile);
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("TEST.php"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
@@ -525,7 +501,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldNotFind
 		"}\n"
 		"?>\n"
 	));	
-	ResourceFinder.Walk(TestProjectDir + TestFile);
+	TagParser.Walk(TestProjectDir + TestFile);
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
@@ -540,7 +516,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldNotFind
 		"}\n"
 		"?>\n"
 	));
-	ResourceFinder.Walk(TestProjectDir + TestFile);
+	TagParser.Walk(TestProjectDir + TestFile);
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(0, Matches);
 }
@@ -755,7 +731,8 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindP
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForNativeFunctions) {
-	ResourceFinder.InitFile(mvceditor::NativeFunctionsAsset());
+	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(mvceditor::NativeFunctionsAsset().GetFullPath()));
+	ResourceFinder.Init(&session);
 
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("array_key"));
 	CHECK_VECTOR_SIZE(2, Matches);
@@ -822,37 +799,13 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindMat
 		"}\n"
 		"?>\n"
 	);
-	ResourceFinder.Walk(TestProjectDir + TestFile);
-	ResourceFinder.BuildResourceCacheForFile(TestProjectDir + TestFile, uniCode, false);
+	TagParser.Walk(TestProjectDir + TestFile);
+	TagParser.BuildResourceCacheForFile(TestProjectDir + TestFile, uniCode, false);
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("printUse"));
 	CHECK_VECTOR_SIZE(2, Matches);
 	CHECK_UNISTR_EQUALS("printUser", Matches[0].Identifier);
 	CHECK_UNISTR_EQUALS("printUserList", Matches[1].Identifier);
 }
-
-TEST_FIXTURE(ResourceFinderFileTestClass, InitFileShouldLoadDbFromFile) {
-	wxFileName newDbFileName(TestProjectDir, wxT("test.db"));
-	ResourceFinder.InitFile(newDbFileName);
-	Prep(wxString::FromAscii(
-		"<?php\n"
-		"$s = 'hello';\n"
-		"\n"
-		"?>\n"
-	));
-	ResourceFinder.Walk(TestProjectDir + TestFile);
-	CollectNearMatchResources(mvceditor::WxToIcu(TestFile));
-	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
-
-	// do a lookup in the new resource finder that only looks at the DB file
-	// and does not parse the file system
-	mvceditor::ResourceFinderClass newResourceFinder;
-	newResourceFinder.InitFile(newDbFileName);
-	Matches = newResourceFinder.CollectNearMatchResources(mvceditor::WxToIcu(TestFile));
-	CHECK_VECTOR_SIZE(1, Matches);
-	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
-}
-
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesWhenUsingBuildResourceCacheForFileAndUsingNewFile) {
 	Prep(mvceditor::CharToIcu(
@@ -884,7 +837,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 		"$user = new UserClass();\n"
 	);
 	wxString fileName = wxT("Untitled");
-	ResourceFinder.BuildResourceCacheForFile(fileName, uniCode, true);
+	TagParser.BuildResourceCacheForFile(fileName, uniCode, true);
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("printUse"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("printUser", Matches[0].Identifier);
@@ -1047,7 +1000,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectFullyQualifiedResourcesShouldFi
 		"}\n"
 		"?>\n"
 	));	
-	ResourceFinder.Walk(TestProjectDir + TestFile);
+	TagParser.Walk(TestProjectDir + TestFile);
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
@@ -1068,7 +1021,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectFullyQualifiedResourcesShouldFi
 		"}\n"
 		"?>\n"
 	));
-	ResourceFinder.Walk(TestProjectDir + TestFile);
+	TagParser.Walk(TestProjectDir + TestFile);
 	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("AdminClass"));
 	Matches = ResourceFinder.CollectFullyQualifiedResource(resourceSearch);
 	CHECK_VECTOR_SIZE(1, Matches);
@@ -1093,7 +1046,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectFullyQualifiedResourcesShouldFi
 		"?>\n"
 	));	
 	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("UserClass"));
-	ResourceFinder.Walk(TestProjectDir + TestFile);
+	TagParser.Walk(TestProjectDir + TestFile);
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
@@ -1365,7 +1318,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchNamespaceQualifiedCl
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraitMembers) {
-	ResourceFinder.SetVersion(pelet::PHP_54);
+	TagParser.SetVersion(pelet::PHP_54);
 	Prep(mvceditor::CharToIcu(
 		"trait ezcReflectionReturnInfo { "
 		"    function getReturnType() { } "
@@ -1392,7 +1345,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraitMem
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraitsWhenLookingForAllMethods) {
-	ResourceFinder.SetVersion(pelet::PHP_54); 
+	TagParser.SetVersion(pelet::PHP_54); 
 	Prep(mvceditor::CharToIcu(
 		"trait ezcReflectionReturnInfo { "
 		"    function getReturnType() { } "
@@ -1428,7 +1381,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraitsWh
 }
 
 TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceTraitsShouldReturnAllTraits) {
-	ResourceFinder.SetVersion(pelet::PHP_54); 
+	TagParser.SetVersion(pelet::PHP_54); 
 	Prep(mvceditor::CharToIcu(
 		"trait ezcReflectionReturnInfo { "
 		"    function getReturnType() { } "
@@ -1453,95 +1406,12 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceTraitsShouldReturnAllTrai
 	CHECK_UNISTR_EQUALS("ezcReflectionReturnInfo", traits[1]);
 }
 
-TEST_FIXTURE(DynamicResourceTestClass, AddDynamicResourcesShouldWorkWithCollect) {
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("MyDynamicClass::"));
-	CHECK_VECTOR_SIZE(2, Matches);
-	CHECK_UNISTR_EQUALS("__get", Matches[0].Identifier);
-	CHECK_UNISTR_EQUALS("work", Matches[1].Identifier);
-
-	// now add the dyamic property to the cache
-	ResourceFinder.AddDynamicResources(DynamicResources);
-
-	// now test the Collect functionality works as it does for resources that were parsed
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("MyDynamicClass::"));
-	CHECK_VECTOR_SIZE(3, Matches);
-	mvceditor::ResourceClass match = Matches[0];
-	CHECK_MEMBER_RESOURCE("MyDynamicClass", "__get", match);
-	CHECK_UNISTR_EQUALS("__get", match.Identifier);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), match.ReturnType);
-	CHECK_EQUAL(mvceditor::ResourceClass::METHOD, match.Type);
-
-	match = Matches[1];
-	CHECK_MEMBER_RESOURCE("MyDynamicClass", "address", match);
-	CHECK_UNISTR_EQUALS("address", match.Identifier);
-	CHECK_UNISTR_EQUALS("string", match.ReturnType);
-	CHECK_EQUAL(mvceditor::ResourceClass::MEMBER, match.Type);
-
-	match = Matches[2];
-	CHECK_MEMBER_RESOURCE("MyDynamicClass", "work", match);
-	CHECK_UNISTR_EQUALS("work", match.Identifier);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), match.ReturnType);
-	CHECK_EQUAL(mvceditor::ResourceClass::METHOD, match.Type);
-}
-
-TEST_FIXTURE(DynamicResourceTestClass, AddDynamicResourcesShouldWorkWhenUsedBeforeWalk) {
-
-	// now add the dyamic property to the cache before calling Walk()
-	ResourceFinder.AddDynamicResources(DynamicResources);
-
-	// now test the Collect functionality works as it does for resources that were parsed
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("MyDynamicClass::"));
-	CHECK_VECTOR_SIZE(3, Matches);
-	mvceditor::ResourceClass match = Matches[0];
-	CHECK_MEMBER_RESOURCE("MyDynamicClass", "__get", match);
-	CHECK_UNISTR_EQUALS("__get", match.Identifier);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), match.ReturnType);
-	CHECK_EQUAL(mvceditor::ResourceClass::METHOD, match.Type);
-
-	match = Matches[1];
-	CHECK_MEMBER_RESOURCE("MyDynamicClass", "address", match);
-	CHECK_UNISTR_EQUALS("address", match.Identifier);
-	CHECK_UNISTR_EQUALS("string", match.ReturnType);
-	CHECK_EQUAL(mvceditor::ResourceClass::MEMBER, match.Type);
-
-	match = Matches[2];
-	CHECK_MEMBER_RESOURCE("MyDynamicClass", "work", match);
-	CHECK_UNISTR_EQUALS("work", match.Identifier);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), match.ReturnType);
-	CHECK_EQUAL(mvceditor::ResourceClass::METHOD, match.Type);
-}
-
-TEST_FIXTURE(DynamicResourceTestClass, AddDynamicResourcesShouldNotDuplicateExistingResources) {
-	
-	// in this test check that we can assign a return type to a function that already
-	// exists
-	mvceditor::ResourceClass res;
-	res.Identifier = UNICODE_STRING_SIMPLE("globalHandle");
-	res.ClassName = UNICODE_STRING_SIMPLE("");
-	res.ReturnType = UNICODE_STRING_SIMPLE("MyDynamicClass");
-	res.Type = mvceditor::ResourceClass::FUNCTION;
-	DynamicResources.push_back(res);
-
-	// now add the dyamic property to the cache before calling Walk()
-	ResourceFinder.AddDynamicResources(DynamicResources);
-
-	// now test the Collect functionality works as it does for resources that were parsed
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("globalHandle"));
-	CHECK_VECTOR_SIZE(1, Matches);
-	mvceditor::ResourceClass match = Matches[0];
-	CHECK_UNISTR_EQUALS("", match.ClassName);
-	CHECK_UNISTR_EQUALS("globalHandle", match.Identifier);
-	CHECK_UNISTR_EQUALS("MyDynamicClass", match.ReturnType);
-	CHECK_EQUAL(false, match.IsDynamic);
-	CHECK_UNISTR_EQUALS("function globalHandle()", match.Signature);
-	CHECK_EQUAL(mvceditor::ResourceClass::FUNCTION, match.Type);
-}
-
 TEST_FIXTURE(ResourceFinderMemoryTestClass, IsFileCacheEmptyWithNativeFunctions) {
 	CHECK(ResourceFinder.IsFileCacheEmpty());
 	CHECK(ResourceFinder.IsResourceCacheEmpty());
 
-	ResourceFinder.InitFile(mvceditor::NativeFunctionsAsset());
+	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(mvceditor::NativeFunctionsAsset().GetFullPath()));;
+	ResourceFinder.Init(&session);
 	
 	// still empty
 	CHECK(ResourceFinder.IsFileCacheEmpty());
@@ -1562,7 +1432,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, IsFileCacheEmptyWithAnotherFile) {
 		"}\n"
 		"?>\n"
 	));	
-	ResourceFinder.Walk(TestProjectDir + TestFile);
+	TagParser.Walk(TestProjectDir + TestFile);
 
 	CHECK_EQUAL(false, ResourceFinder.IsFileCacheEmpty());
 	CHECK_EQUAL(false, ResourceFinder.IsResourceCacheEmpty());
@@ -1594,11 +1464,11 @@ TEST_FIXTURE(ResourceFinderFileTestClass, PhpFileExtensionsShouldWorkWithNoWildc
 		"}\n"
 		"?>\n"
 	));	
-	ResourceFinder.PhpFileExtensions.clear();
-	ResourceFinder.PhpFileExtensions.push_back(wxT("good.php"));
+	TagParser.PhpFileExtensions.clear();
+	TagParser.PhpFileExtensions.push_back(wxT("good.php"));
 	
-	ResourceFinder.Walk(TestProjectDir + goodFile);
-	ResourceFinder.Walk(TestProjectDir + badFile);
+	TagParser.Walk(TestProjectDir + goodFile);
+	TagParser.Walk(TestProjectDir + badFile);
 
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("good.php"));
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("bad.php"));

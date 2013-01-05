@@ -27,6 +27,7 @@
 
 #include <search/ResourceFinderClass.h>
 #include <search/DirectorySearchClass.h>
+#include <language/TagParserClass.h>
 #include <language/SymbolTableClass.h>
 #include <unicode/unistr.h>
 #include <map>
@@ -46,7 +47,12 @@ class GlobalCacheClass {
 public:
 
 	/**
-	 * The object that will parse and persist resources
+	 * The object that will parse and persist tags
+	 */
+	mvceditor::TagParserClass TagParser;
+
+	/**
+	 * The object that will be used to lookup tags
 	 */
 	mvceditor::ResourceFinderClass ResourceFinder;
 
@@ -90,6 +96,20 @@ public:
 	 * @param version the PHP version that the parser will check against
 	 */
 	void SetVersion(pelet::Versions version);
+
+private:
+
+	soci::session Session;
+
+	/**
+	 * create the database connection to the given db, and create tables to store the parsed resources
+	 * If the file does not exist; it will be created and the schema will be initialized as
+	 * well.
+	 *
+	 * @param wxString dbName, given to SQLite.  db can be a full path to a file  The
+	 *        file does not need to exist; if it does not exist it will be created.
+	 */
+	void OpenAndCreateTables(const wxString& dbName);
 };
 
 /**
@@ -102,7 +122,12 @@ class WorkingCacheClass {
 public:
 
 	/**
-	 * The object that will parse and persist resources
+	 * The object that will parse and persist tags
+	 */
+	mvceditor::TagParserClass TagParser;
+
+	/**
+	 * The object that will be used to lookup tags
 	 */
 	mvceditor::ResourceFinderClass ResourceFinder;
 
@@ -156,6 +181,18 @@ private:
 	 * the code is not valid.
 	 */
 	pelet::ParserClass Parser;
+
+	/**
+	 * this will hold a memory-based sqlite db for use by this working cache
+	 */
+	soci::session Session;
+
+	/**
+	 * create the database connection to a SQLite memory db will be created and the schema will be initialized as
+	 * well.
+	 *
+	 */
+	void OpenAndCreateTables();
 
 };
 
@@ -295,12 +332,6 @@ public:
 	 * @return std::vector<mvceditor::ResourceClass> matched resources
 	 */
 	std::vector<mvceditor::ResourceClass> CollectNearMatchResourcesFromAll(const UnicodeString& search);
-
-	/**
-	 * thread-safe wrapper for ResourceFinderClass::AddDynamicResouces on the GLOBAL cache
-	 * @see ResourceFinderClass::AddDynamicResources
-	 */
-	void GlobalAddDynamicResources(const std::vector<ResourceClass>& resources);
 	
 	/**
 	 * Collects all near matches that are possible candidates for completion of the parsed expression.

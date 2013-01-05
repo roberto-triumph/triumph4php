@@ -25,7 +25,6 @@
 #include <search/ResourceFinderClass.h>
 #include <search/FinderClass.h>
 #include <globals/String.h>
-#include <globals/Assets.h>
 #include <globals/Sqlite.h>
 #include <wx/filename.h>
 #include <algorithm>
@@ -35,7 +34,6 @@
 #include <unicode/fmtable.h>
 #include <unicode/numfmt.h>
 #include <soci/soci.h>
-#include <soci/sqlite3/soci-sqlite3.h>
 #include <string>
 
 /**
@@ -156,206 +154,17 @@ mvceditor::ResourceSearchClass::ResourceTypes mvceditor::ResourceSearchClass::Ge
 
 
 mvceditor::ResourceFinderClass::ResourceFinderClass()
-	: PhpFileExtensions()
-	, MiscFileExtensions()
-	, FileParsingCache()
-	, NamespaceCache()
-	, TraitCache()
-	, Parser()
-	, Session()
-	, Transaction(NULL)
-	, DbFileName()
-	, FileParsingBufferSize(32)
+	: Session(NULL)
 	, IsCacheInitialized(false) {
-	Parser.SetClassObserver(this);
-	Parser.SetClassMemberObserver(this);
-	Parser.SetFunctionObserver(this);
 }
 
 mvceditor::ResourceFinderClass::~ResourceFinderClass() {
-	if (Transaction) {
-		delete Transaction;
-	}
+
 }
 
-void mvceditor::ResourceFinderClass::SetVersion(pelet::Versions version) {
-	Parser.SetVersion(version);
-}
-
-void mvceditor::ResourceFinderClass::InitMemory() {
-	DbFileName.Clear();
-	OpenAndCreateTables(wxT(":memory:"));
-	FileParsingBufferSize = 32;
-	FileParsingCache.clear();
-	FileParsingCache.resize(0);
-	FileParsingCache.reserve(FileParsingBufferSize);
-}
-
-void mvceditor::ResourceFinderClass::InitFile(const wxFileName& fileName, int fileParsingBufferSize) {
-	DbFileName = fileName;
-	OpenAndCreateTables(fileName.GetFullPath());
-	FileParsingBufferSize = fileParsingBufferSize;
-}
-
-void mvceditor::ResourceFinderClass::OpenAndCreateTables(const wxString& dbName) {
-	try {
-
-		// close any existing connection
-		if (IsCacheInitialized) {
-			Session.close();
-			IsCacheInitialized = false;
-		}
-		if (dbName.CompareTo(wxT(":memory:")) == 0) {
-			Session.open(*soci::factory_sqlite3(), ":memory:");
-		}
-		else {
-			std::string stdDbName = mvceditor::WxToChar(dbName);
-			Session.open(*soci::factory_sqlite3(), stdDbName);
-		}
-		wxString error;
-		if (mvceditor::SqlScript(mvceditor::ResourceSqlSchemaAsset(), Session, error)) {
-			IsCacheInitialized = true;
-		}
-		else {
-			IsCacheInitialized = false;
-			wxASSERT_MSG(IsCacheInitialized, error);
-		}
-	} catch(std::exception const& e) {
-		Session.close();
-		IsCacheInitialized = false;
-		wxString msg = mvceditor::CharToWx(e.what());
-		wxASSERT_MSG(IsCacheInitialized, msg);
-	}
-}
-
-void mvceditor::ResourceFinderClass::BeginSearch() {
-	if (IsCacheInitialized) {
-
-		// rollback any previous transaction, as commits should be explicit
-		if (Transaction) {
-			delete Transaction;
-		}
-		try {
-			Transaction = new soci::transaction(Session);
-		} catch (std::exception& e) {
-			delete Transaction;
-			Transaction = NULL;
-
-			// ATTN: at some point bubble these exceptions up?
-			// to avoid unreferenced local variable warnings in MSVC
-			e.what();
-		}
-	}
-	FileParsingCache.clear();
-	NamespaceCache.clear();
-	TraitCache.clear();
-
-	FileParsingCache.clear();
-	FileParsingCache.resize(0);
-	FileParsingCache.reserve(FileParsingBufferSize);
-}
-
-void mvceditor::ResourceFinderClass::EndSearch() {
-	if (Transaction) {
-
-		// commit until the very end; profiling showed that sqlite3 was
-		// being flushed to disk after every file and that was 
-		// resulting in very slow walks.
-		try {
-			Transaction->commit();
-		} catch (std::exception& e) {
-			
-			// ATTN: at some point bubble these exceptions up?
-			// to avoid unreferenced local variable warnings in MSVC
-			e.what();
-		}
-		delete Transaction;
-		Transaction = NULL;
-	}
-	FileParsingCache.clear();
-	NamespaceCache.clear();
-	TraitCache.clear();
-
-	// reclaim mem since we no longer need it
-	FileParsingCache.resize(1);
-}
-
-bool mvceditor::ResourceFinderClass::Walk(const wxString& fileName) {
-	bool matchedFilter = false;
-	wxFileName file(fileName);
-	for (size_t i = 0; i < PhpFileExtensions.size(); ++i) {
-		wxString filter = PhpFileExtensions[i];
-		if (!wxIsWild(filter)) {
-
-			// exact match of the name portion of fileName
-			matchedFilter = file.GetFullName().CmpNoCase(filter) == 0;
-		}
-		else {
-			matchedFilter =  wxMatchWild(filter, fileName);
-		}
-		if (matchedFilter) {
-			break;
-		}
-	}
-	if (matchedFilter) {
-		BuildResourceCache(fileName, true);
-	}
-	else {
-		// check the misc file filters
-		for (size_t i = 0; i < MiscFileExtensions.size(); ++i) {
-			wxString filter = MiscFileExtensions[i];
-			if (!wxIsWild(filter)) {
-
-				// exact match of the name portion of fileName
-				matchedFilter = file.GetFullName().CmpNoCase(filter) == 0;
-			}
-			else {
-				matchedFilter = wxMatchWild(filter, fileName);
-			}
-			if (matchedFilter) {
-				break;
-			}
-		}
-		if (matchedFilter) {
-			BuildResourceCache(fileName, false);
-		}
-	}
-
-	// no need to keep know which files have resources, most likely all files should have a resource
-	return false;
-}
-
-void mvceditor::ResourceFinderClass::BuildResourceCacheForFile(const wxString& fullPath, const UnicodeString& code, bool isNew) {
-	BeginSearch();
-
-	// remove all previous cached resources
-	mvceditor::FileItemClass fileItem;
-	bool foundFile = FindFileItemByFullPathExact(fullPath, fileItem);
-	if (foundFile) {
-		std::vector<int> fileItemIdsToRemove;
-		fileItemIdsToRemove.push_back(fileItem.FileId);
-		RemovePersistedResources(fileItemIdsToRemove);
-	}
-	if (!foundFile) {
-
-		// if caller just calls this method without calling Walk(); then file cache will be empty
-		// need to add an entry so that GetResourceMatchFullPathFromResource works correctly
-		fileItem.FullPath = fullPath;
-		fileItem.IsNew = isNew;
-		fileItem.DateTime = wxDateTime::Now();
-		fileItem.IsParsed = false;
-		PersistFileItem(fileItem);
-	}
-	
-	FileParsingCache.clear();
-
-	// for now silently ignore parse errors
-	pelet::LintResultsClass results;
-	Parser.ScanString(code, results);
-
-	PersistResources(FileParsingCache, fileItem.FileId);
-	PersistTraits(TraitCache);
-	EndSearch();
+void mvceditor::ResourceFinderClass::Init(soci::session* session) {
+	Session = session;
+	IsCacheInitialized = true;
 }
 
 bool mvceditor::ResourceFinderClass::GetResourceMatchPosition(const mvceditor::ResourceClass& resource, const UnicodeString& text, int32_t& pos, 
@@ -474,7 +283,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::CollectNea
 	int fileItemId;
 	int isNew;
 	try {
-		soci::statement stmt = (Session.prepare << 
+		soci::statement stmt = (Session->prepare << 
 			"SELECT full_path, file_item_id, is_new FROM file_items WHERE full_path LIKE " + query + " ESCAPE '^'",
 			soci::into(match), soci::into(fileItemId), soci::into(isNew));
 		if (stmt.execute(true)) {
@@ -682,309 +491,6 @@ std::vector<UnicodeString> mvceditor::ResourceFinderClass::GetResourceTraits(con
 	return inheritedTraits;
 }
 
-
-void mvceditor::ResourceFinderClass::BuildResourceCache(const wxString& fullPath, bool parseClasses) {
-	wxFileName fileName(fullPath);
-	wxDateTime fileLastModifiedDateTime = fileName.GetModificationTime();
-	
-	// have we looked at this file yet or is cache out of date? if not, then build the cache.
-	bool cached = false;
-	mvceditor::FileItemClass fileItem;
-	bool foundFile = FindFileItemByFullPathExact(fullPath, fileItem);
-	if (foundFile) {
-		bool needsToBeParsed = fileItem.NeedsToBeParsed(fileLastModifiedDateTime);
-		cached = !needsToBeParsed;
-	}
-	else {
-		fileItem.MakeNew(fileName, parseClasses);
-		PersistFileItem(fileItem);
-	}
-	if (parseClasses) {
-		if (!cached || !fileItem.IsParsed) {
-
-			// no need to look for resources if the file had not yet existed, this will save much time
-			// this optimization was found by using the profiler
-			if (foundFile) {
-				std::vector<int> fileItemIdsToRemove;
-				fileItemIdsToRemove.push_back(fileItem.FileId);
-				RemovePersistedResources(fileItemIdsToRemove);
-
-				// the previous line deleted the file from file_items
-				// we need to re-add it
-				fileItem.MakeNew(fileName, parseClasses);
-				PersistFileItem(fileItem);
-			}			
-			FileParsingCache.clear();
-			
-			// for now silently ignore files with parser errors
-			pelet::LintResultsClass lintResults;
-			wxFFile file(fullPath, wxT("rb"));
-			Parser.ScanFile(file.fp(), mvceditor::WxToIcu(fullPath), lintResults);
-			PersistResources(FileParsingCache, fileItem.FileId);
-			PersistTraits(TraitCache);
-			FileParsingCache.clear();
-		}
-	}
-}
-
-void mvceditor::ResourceFinderClass::ClassFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& signature, 
-		const UnicodeString& comment, const int lineNumber) {
-	ResourceClass classItem;
-	classItem.Identifier = className;
-	classItem.ClassName = className;
-	classItem.NamespaceName = namespaceName;
-	classItem.Key = className;
-	classItem.Type = ResourceClass::CLASS;
-	classItem.Signature = signature;
-	classItem.ReturnType = UNICODE_STRING_SIMPLE("");
-	classItem.Comment = comment;
-	classItem.IsNative = false;
-	FileParsingCache.push_back(classItem);
-
-	if (IsNewNamespace(namespaceName)) {
-
-		// a resource for the namespace itself
-		mvceditor::ResourceClass namespaceItem = mvceditor::ResourceClass::MakeNamespace(namespaceName);
-		FileParsingCache.push_back(namespaceItem);
-	}
-
-	classItem.Identifier = QualifyName(namespaceName, className);
-	classItem.Key = QualifyName(namespaceName, className);
-	FileParsingCache.push_back(classItem);
-
-}
-
-void mvceditor::ResourceFinderClass::TraitAliasFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
-												  const UnicodeString& traitMethodName, const UnicodeString& alias, pelet::TokenClass::TokenIds visibility) {
-	
-	// the trait has already been put in the cache; we just need to update it
-	UnicodeString mapKey;
-	mapKey += namespaceName;
-	mapKey += UNICODE_STRING_SIMPLE("-");
-	mapKey += className;
-	mapKey += UNICODE_STRING_SIMPLE("-");
-	mapKey += traitUsedClassName;
-	
-	// this code assumes that TraitUseFound() is called before TraitAliasFound()
-	std::map<UnicodeString, std::vector<mvceditor::TraitResourceClass>, UnicodeStringComparatorClass>::iterator it;
-	it = TraitCache.find(mapKey);
-	if (!it->second.empty()) {
-		it->second.front().Aliased.push_back(alias);
-		it->second.back().Aliased.push_back(alias);
-	}
-}
-
-void mvceditor::ResourceFinderClass::TraitInsteadOfFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
-													   const UnicodeString& traitMethodName, const std::vector<UnicodeString>& insteadOfList) {
-	
-	// the trait has already been put in the cache; we just need to update it
-	UnicodeString mapKey;
-	
-	mapKey += namespaceName;
-	mapKey += UNICODE_STRING_SIMPLE("-");
-	mapKey += className;
-	mapKey += UNICODE_STRING_SIMPLE("-");
-	mapKey += traitUsedClassName;
-	
-	// this code assumes that TraitUseFound() is called before TraitAliasFound()
-	std::map<UnicodeString, std::vector<mvceditor::TraitResourceClass>, UnicodeStringComparatorClass>::iterator it;
-	it = TraitCache.find(mapKey);
-	if (!it->second.empty()) {
-
-		it->second.front().InsteadOfs.insert(it->second.front().InsteadOfs.end(), insteadOfList.begin(), insteadOfList.end());
-		it->second.back().InsteadOfs.insert(it->second.back().InsteadOfs.end(), insteadOfList.begin(), insteadOfList.end());
-	}
-}
-
-void mvceditor::ResourceFinderClass::TraitUseFound(const UnicodeString& namespaceName, const UnicodeString& className, 
-												const UnicodeString& fullyQualifiedTraitName) {
-	
-	mvceditor::TraitResourceClass newTraitResource;
-	newTraitResource.ClassName = className;
-	newTraitResource.NamespaceName = namespaceName;
-
-	int32_t pos = fullyQualifiedTraitName.lastIndexOf(UNICODE_STRING_SIMPLE("\\"));
-	if (pos > 0) {
-		newTraitResource.TraitClassName.setTo(fullyQualifiedTraitName, 0, pos);
-		newTraitResource.TraitNamespaceName.setTo(fullyQualifiedTraitName, pos + 1);
-	}
-	else if (0 == pos) {
-
-		// root namespace
-		newTraitResource.TraitClassName.setTo(fullyQualifiedTraitName, 1);
-		newTraitResource.TraitNamespaceName.setTo(UNICODE_STRING_SIMPLE("\\"));
-	}
-	else {
-
-		//this should never get here as the parser will always give us 
-		// fully qualified trait names
-		newTraitResource.TraitClassName = fullyQualifiedTraitName;
-		newTraitResource.TraitNamespaceName = UNICODE_STRING_SIMPLE("\\");
-	}
-
-	// only add if not already there
-	// key is a concatenation of file item id, fully qualified class and fully qualified trait
-	// this will make the alias and instead easier to update
-	UnicodeString mapKey;
-	mapKey += namespaceName;
-	mapKey += UNICODE_STRING_SIMPLE("-");
-	mapKey += className;
-	mapKey += UNICODE_STRING_SIMPLE("-");
-	mapKey += fullyQualifiedTraitName;
-	
-	int count = TraitCache.count(mapKey);
-	if (count <= 0) {
-		newTraitResource.Key = QualifyName(namespaceName, className);
-		TraitCache[mapKey].push_back(newTraitResource);
-		
-		// put a non-qualified version too, sometimes the query will not contain a fully qualified name
-		newTraitResource.Key = className;
-		TraitCache[mapKey].push_back(newTraitResource);
-	}
-}
-
-void mvceditor::ResourceFinderClass::DefineDeclarationFound(const UnicodeString& namespaceName, const UnicodeString& variableName, 
-		const UnicodeString& variableValue, const UnicodeString& comment, const int lineNumber) {
-	ResourceClass defineItem;
-	defineItem.Identifier = variableName;
-	defineItem.Key = variableName;
-	defineItem.Type = ResourceClass::DEFINE;
-	defineItem.Signature = variableValue;
-	defineItem.ReturnType = UNICODE_STRING_SIMPLE("");
-	defineItem.Comment = comment;
-	defineItem.IsNative = false;
-	FileParsingCache.push_back(defineItem);
-
-	defineItem.Identifier = QualifyName(namespaceName, variableName);
-	defineItem.Key = QualifyName(namespaceName, variableName);
-	FileParsingCache.push_back(defineItem);
-}
-
-void mvceditor::ResourceFinderClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
-		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
-		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber) {
-	ResourceClass item;
-	item.Identifier = methodName;
-	item.ClassName = className;
-	item.NamespaceName = namespaceName;
-	item.Key = methodName;
-	item.Type = ResourceClass::METHOD;
-	if (!returnType.isEmpty()) {
-		item.Signature = returnType + UNICODE_STRING_SIMPLE(" ");
-	}
-
-	item.Signature += signature;
-	item.ReturnType = returnType;
-	item.Comment = comment;
-	switch (visibility) {
-	case pelet::TokenClass::PROTECTED:
-		item.IsProtected = true;
-		break;
-	case pelet::TokenClass::PRIVATE:
-		item.IsPrivate = true;
-		break;
-	default:
-		break;
-	}
-	item.IsStatic = isStatic;
-	item.IsNative = false;
-	FileParsingCache.push_back(item);
-	
-	// insert a complete name so that we can quickly lookup all methods for a single class
-	item.Key = className + UNICODE_STRING_SIMPLE("::") + methodName;
-	FileParsingCache.push_back(item);
-}
-
-void mvceditor::ResourceFinderClass::PropertyFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& propertyName,
-                                        const UnicodeString& propertyType, const UnicodeString& comment, 
-										pelet::TokenClass::TokenIds visibility, bool isConst, bool isStatic,
-										const int lineNumber) {
-	UnicodeString filteredProperty(propertyName);
-	if (!isStatic) {
-
-		// remove the siguil from the property name when the variable is not static;
-		// because when using non-static access ("->") the siguil is not used
-		// this affects the code completion functionality
-		filteredProperty.findAndReplace(UNICODE_STRING_SIMPLE("$"), UNICODE_STRING_SIMPLE(""));
-	}
-	ResourceClass item;
-	item.Identifier = filteredProperty;
-	item.ClassName = className;
-	item.NamespaceName = namespaceName;
-	item.Key = filteredProperty;
-	item.Type = isConst ? ResourceClass::CLASS_CONSTANT : ResourceClass::MEMBER;
-	item.Signature =  className + UNICODE_STRING_SIMPLE("::") + filteredProperty;
-	item.ReturnType = propertyType;
-	item.Comment = comment;
-	switch (visibility) {
-	case pelet::TokenClass::PROTECTED:
-		item.IsProtected = true;
-		break;
-	case pelet::TokenClass::PRIVATE:
-		item.IsPrivate = true;
-		break;
-	default:
-		break;
-	}
-	item.IsStatic = isStatic;
-	item.IsNative = false;
-	FileParsingCache.push_back(item);
-	
-	// insert a complete name so that we can quickly lookup all methods for a single class
-	item.Key = className + UNICODE_STRING_SIMPLE("::") + filteredProperty;
-	FileParsingCache.push_back(item);
-}
-
-void mvceditor::ResourceFinderClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, 
-		const UnicodeString& returnType, const UnicodeString& comment, const int lineNumber) {
-	ResourceClass item;
-	item.Identifier = functionName;
-	item.NamespaceName = namespaceName;
-	item.Key = functionName;
-	item.Type = ResourceClass::FUNCTION;
-	item.Signature = signature;
-	item.ReturnType = returnType;
-	item.Comment = comment;
-	item.IsNative = false;
-	FileParsingCache.push_back(item);
-		
-	if (IsNewNamespace(namespaceName)) {
-		mvceditor::ResourceClass namespaceItem = mvceditor::ResourceClass::MakeNamespace(namespaceName);
-		FileParsingCache.push_back(namespaceItem);
-	}
-		
-	// put in the namespace cache so that qualified name lookups work too
-	item.Identifier = QualifyName(namespaceName, functionName);
-	item.Key = QualifyName(namespaceName, functionName);
-	FileParsingCache.push_back(item);
-}
-
-bool mvceditor::ResourceFinderClass::IsNewNamespace(const UnicodeString& namespaceName) {
-	std::string sql = "SELECT COUNT(*) FROM resources WHERE key = ? AND type = ?";
-	std::string nm = mvceditor::IcuToChar(namespaceName);
-	int type = mvceditor::ResourceClass::NAMESPACE;
-	int count = 0;
-	bool isNew = false;
-	try {
-		soci::statement stmt = (Session.prepare << sql, soci::use(nm), soci::use(type), soci::into(count));
-		stmt.execute(true);
-		if (count <= 0) {
-		 
-			// look in the current namespace cache, stuff that has not yet been added to the database
-			if (NamespaceCache.count(namespaceName) <= 0) {
-				isNew = true;
-				NamespaceCache[namespaceName] = 1;
-			}	
-		}
-	} catch (std::exception& e) {
-		
-		// ATTN: at some point bubble these exceptions up?
-		// to avoid unreferenced local variable warnings in MSVC
-		e.what();
-	}
-	return isNew;
-}
-
 int mvceditor::ResourceFinderClass::GetLineCountFromFile(const wxString& fullPath) const {
 	int lineCount = 0;
 	std::ifstream file;
@@ -1022,30 +528,6 @@ int mvceditor::ResourceFinderClass::GetLineCountFromFile(const wxString& fullPat
 		file.close();
 	}
 	return lineCount;
-}
-
-void mvceditor::ResourceFinderClass::RemovePersistedResources(const std::vector<int>& fileItemIds) {
-	if (!IsCacheInitialized || fileItemIds.empty()) {
-		return;
-	}
-	std::ostringstream stream;
-	stream << "WHERE file_item_id IN (";
-	for (size_t i = 0; i < fileItemIds.size(); ++i) {
-		stream << fileItemIds[i];
-		if (i < (fileItemIds.size() - 1)) {
-			stream << ",";
-		}
-	}
-	stream << ")";
-	try {
-		Session.once << "DELETE FROM resources " << stream.str();
-		Session.once << "DELETE FROM file_items " << stream.str();
-	} catch (std::exception& e) {
-		
-		// ATTN: at some point bubble these exceptions up?
-		// to avoid unreferenced local variable warnings in MSVC
-		e.what();
-	}
 }
 
 UnicodeString mvceditor::ResourceFinderClass::ExtractParentClassFromSignature(const UnicodeString& signature) const {
@@ -1147,69 +629,6 @@ void mvceditor::ResourceFinderClass::EnsureMatchesExist(std::vector<ResourceClas
 			++it;
 		}
 	}
-	if (!fileItemIdsToRemove.empty()) {
-		
-		// remove all cached resources from files that no longer exist
-		std::vector<int>::iterator it = std::unique(fileItemIdsToRemove.begin(), fileItemIdsToRemove.end());
-		fileItemIdsToRemove.resize(it - fileItemIdsToRemove.begin());
-		RemovePersistedResources(fileItemIdsToRemove);
-	}
-}
-
-void mvceditor::ResourceFinderClass::Print() {
-	UFILE *out = u_finit(stdout, NULL, NULL);
-	std::vector<mvceditor::ResourceClass> matches = ResourceStatementMatches("1=1", false);
-	for (std::vector<mvceditor::ResourceClass>::const_iterator it = matches.begin(); it != matches.end(); ++it) {
-		switch (it->Type) {
-			case mvceditor::ResourceClass::CLASS :
-			case mvceditor::ResourceClass::DEFINE :
-			case mvceditor::ResourceClass::FUNCTION :
-
-				u_fprintf(out, "RESOURCE: Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S Type=%d\n",
-					it->Key.length(), it->Key.getBuffer(),
-					it->Identifier.length(), it->Identifier.getBuffer(),  
-					it->ClassName.length(), it->ClassName.getBuffer(),
-					it->NamespaceName.length(), it->NamespaceName.getBuffer(),
-					it->Type);
-				break;
-			case mvceditor::ResourceClass::CLASS_CONSTANT :
-			case mvceditor::ResourceClass::MEMBER :
-			case mvceditor::ResourceClass::METHOD :
-				u_fprintf(out, "MEMBER: Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S ReturnType=%.*S Type=%d\n", 
-					it->Key.length(), it->Key.getBuffer(),
-					it->Identifier.length(), it->Identifier.getBuffer(),  
-					it->ClassName.length(), it->ClassName.getBuffer(),
-					it->NamespaceName.length(), it->NamespaceName.getBuffer(),
-					it->ReturnType.length(), it->ReturnType.getBuffer(), it->Type);
-				break;
-			case mvceditor::ResourceClass::NAMESPACE :
-				u_fprintf(out, "NAMESPACE:Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S  Type=%d\n", 
-					it->Key.length(), it->Key.getBuffer(),
-					it->Identifier.length(), it->Identifier.getBuffer(),  
-					it->ClassName.length(), it->ClassName.getBuffer(),
-					it->NamespaceName.length(), it->NamespaceName.getBuffer(),
-					it->Type);
-				break;
-		}
-	}
-	for (std::map<UnicodeString, std::vector<mvceditor::TraitResourceClass>, UnicodeStringComparatorClass>::const_iterator it = TraitCache.begin(); it != TraitCache.end(); ++it) {
-		u_fprintf(out, "TRAITS USED BY: %.*S\n",
-			it->first.length(), it->first.getBuffer());
-		std::vector<mvceditor::TraitResourceClass> traits =  it->second;
-		for (size_t j = 0; j < traits.size(); ++j) {
-			mvceditor::TraitResourceClass trait = traits[j];
-			u_fprintf(out, "\tTRAIT NAME=%.*S\n",
-				trait.TraitClassName.length(), trait.TraitClassName.getBuffer());
-			for (size_t k = 0; k < trait.Aliased.size(); k++) {
-				u_fprintf(out, "\tALIASES METHOD=%S\n", trait.Aliased[k].getTerminatedBuffer());
-			}
-			for (size_t k = 0; k < trait.InsteadOfs.size(); k++) {
-				u_fprintf(out, "\tINSTEADOF METHOD=%S\n", trait.InsteadOfs[k].getTerminatedBuffer());
-			}
-		}		
-		
-	}
-	u_fclose(out);
 }
 
 bool mvceditor::ResourceFinderClass::IsFileCacheEmpty() {
@@ -1218,7 +637,7 @@ bool mvceditor::ResourceFinderClass::IsFileCacheEmpty() {
 	}
 	int count = 0;
 	try {
-		Session.once << "SELECT COUNT(*) FROM file_items;", soci::into(count);
+		Session->once << "SELECT COUNT(*) FROM file_items;", soci::into(count);
 	} catch (std::exception& e) {
 			
 		// ATTN: at some point bubble these exceptions up?
@@ -1236,7 +655,7 @@ bool mvceditor::ResourceFinderClass::IsResourceCacheEmpty() {
 	// make sure only parsed resource came from the native functions file.
 	int count = 0;
 	try {
-		Session.once << "SELECT COUNT(*) FROM resources WHERE is_native = 0;", soci::into(count);
+		Session->once << "SELECT COUNT(*) FROM resources WHERE is_native = 0;", soci::into(count);
 	} catch (std::exception& e) {
 		
 		// ATTN: at some point bubble these exceptions up?
@@ -1244,142 +663,6 @@ bool mvceditor::ResourceFinderClass::IsResourceCacheEmpty() {
 		e.what();
 	}
 	return count <= 0;
-}
-
-void mvceditor::ResourceFinderClass::AddDynamicResources(const std::vector<mvceditor::ResourceClass>& dynamicResources) {
-	try {
-		BeginSearch();
-		std::vector<mvceditor::ResourceClass> newResources;
-		
-		for (std::vector<mvceditor::ResourceClass>::const_iterator it = dynamicResources.begin(); it != dynamicResources.end(); ++it) {
-			mvceditor::ResourceClass resource = *it;
-			if (mvceditor::ResourceClass::MEMBER == resource.Type || mvceditor::ResourceClass::METHOD == resource.Type) {
-
-				// need to account for duplicates; if so then only update
-				std::ostringstream stream;
-				stream << "SELECT return_type, class_name, identifier FROM resources WHERE class_name = ? AND identifier = ? AND type IN("
-					<< mvceditor::ResourceClass::MEMBER
-					<< ","
-					<< mvceditor::ResourceClass::METHOD
-					<< ")";
-
-				std::string returnType, 
-					classNameOut, 
-					identifierOut;
-				std::string className = mvceditor::IcuToChar(resource.ClassName);
-				std::string identifier = mvceditor::IcuToChar(resource.Identifier);
-				Session.once << stream.str(), soci::use(className), soci::use(identifier), soci::into(returnType), soci::into(classNameOut)
-					, soci::into(identifierOut);
-				if (returnType.empty() && !classNameOut.empty() && !identifierOut.empty()) {
-
-					// resource already exists, but it does not have a return type. only update the return type
-					returnType = mvceditor::IcuToChar(resource.ReturnType);
-					std::ostringstream updateStream;
-					updateStream << "UPDATE resources SET return_type = ? WHERE class_name = ? AND identifier = ? AND type IN("
-						<< mvceditor::ResourceClass::MEMBER
-						<< ","
-						<< mvceditor::ResourceClass::METHOD
-						<< ")";
-					Session.once << updateStream.str(), soci::use(returnType), soci::use(className), soci::use(identifier);
-				}
-				else if (returnType.empty() && classNameOut.empty() && identifierOut.empty()) {
-					
-					// make sure to not insert duplicate items (if we found them)
-					resource.IsDynamic = true;
-					resource.Key = resource.Identifier;
-					newResources.push_back(resource);
-					
-					// the fully qualified version
-					resource.Key = resource.ClassName + UNICODE_STRING_SIMPLE("::") + resource.Identifier;
-					newResources.push_back(resource);
-				}
-			}
-			else {
-
-				// look at the function, cache
-				std::ostringstream stream;
-				stream << "SELECT return_type, identifier FROM resources WHERE key = ? AND type IN("
-					<< mvceditor::ResourceClass::FUNCTION
-					<< ")";
-				std::string identifier = mvceditor::IcuToChar(resource.Identifier);
-				std::string returnType;
-				std::string identifierOut;
-				Session.once << stream.str(), soci::use(identifier), soci::into(returnType), soci::into(identifierOut);
-				if (returnType.empty() && !identifier.empty()) {
-
-					// function already exists, just update the return type
-					returnType = mvceditor::IcuToChar(resource.ReturnType);
-					std::ostringstream updateStream;
-					updateStream << "UPDATE resources SET return_type = ? WHERE key = ? AND type IN("
-						<< mvceditor::ResourceClass::FUNCTION
-						<< ")";				
-					Session.once << updateStream.str(), soci::use(returnType), soci::use(identifier);
-				}
-				else if (returnType.empty() && identifierOut.empty()) {
-
-					// make sure to not insert duplicate items (if we found them)
-					resource.IsDynamic = true;
-					resource.Key = resource.Identifier;
-					newResources.push_back(resource);
-					
-					// the fully qualified version
-					resource.Key = QualifyName(resource.NamespaceName, resource.ClassName);
-					newResources.push_back(resource);
-				}
-			}
-		}
-
-		// we dont want these resource to point to a file; 
-		// GetResourceMatchFullPathFromResource() and GetResourceMatchFullPath() will return empty for dynamic 
-		// resources since there is no source code we can show the user.
-		int fileItemIndex = -1;
-		PersistResources(newResources, fileItemIndex);
-		EndSearch();
-	}
-	catch (std::exception& e) {
-		
-		// ATTN: at some point bubble these exceptions up?
-		// to avoid unreferenced local variable warnings in MSVC
-		e.what();
-	}
-}
-
-void mvceditor::ResourceFinderClass::PersistFileItem(mvceditor::FileItemClass& fileItem) {
-	if (!IsCacheInitialized) {
-		return;
-	}
-	std::string fullPath = mvceditor::WxToChar(fileItem.FullPath);
-	std::tm tm;
-	int isParsed = fileItem.IsParsed ? 1 : 0;
-	int isNew = fileItem.IsNew ? 1 : 0;
-	if (fileItem.DateTime.IsValid()) {
-		wxDateTime::Tm wxTm = fileItem.DateTime.GetTm();
-		tm.tm_hour = wxTm.hour;
-		tm.tm_isdst = fileItem.DateTime.IsDST();
-		tm.tm_mday = wxTm.mday;
-		tm.tm_min = wxTm.min;
-		tm.tm_mon = wxTm.mon;
-		tm.tm_sec = wxTm.sec;
-		tm.tm_wday = fileItem.DateTime.GetWeekDay();
-		tm.tm_yday = fileItem.DateTime.GetDayOfYear();
-
-		// tm holds number of years since 1900 (2012 = 112)
-		tm.tm_year = wxTm.year - 1900;
-	}
-	try {
-		soci::statement stmt = (Session.prepare <<
-			"INSERT INTO file_items (file_item_id, full_path, last_modified, is_parsed, is_new) VALUES(NULL, ?, ?, ?, ?)",
-			soci::use(fullPath), soci::use(tm), soci::use(isParsed), soci::use(isNew)
-		);
-		stmt.execute(true);
-		soci::sqlite3_statement_backend* backend = static_cast<soci::sqlite3_statement_backend*>(stmt.get_backend());
-		fileItem.FileId = sqlite3_last_insert_rowid(backend->session_.conn_);
-	} catch (std::exception& e) {
-		
-		// ATTN: at some point bubble these exceptions up?
-		// to avoid unreferenced local variable warnings in MSVC
-		e.what();
-	}
 }
 
 bool mvceditor::ResourceFinderClass::FindFileItemByFullPathExact(const wxString& fullPath, mvceditor::FileItemClass& fileItem) {
@@ -1395,7 +678,7 @@ bool mvceditor::ResourceFinderClass::FindFileItemByFullPathExact(const wxString&
 	std::string query = mvceditor::WxToChar(fullPath);
 	std::string sql = "SELECT file_item_id, last_modified, is_parsed, is_new FROM file_items WHERE full_path = ?";
 	try {
-		soci::statement stmt = (Session.prepare << sql, soci::use(query), 
+		soci::statement stmt = (Session->prepare << sql, soci::use(query), 
 			soci::into(fileItemId), soci::into(lastModified), soci::into(isParsed), soci::into(isNew)
 		);
 		foundFile = stmt.execute(true);
@@ -1450,7 +733,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::ResourceSt
 		fullPathIndicator,
 		fileIsNewIndicator;
 	try {
-		soci::statement stmt = (Session.prepare << sql,
+		soci::statement stmt = (Session->prepare << sql,
 			soci::into(fileItemId, fileItemIdIndicator), soci::into(key), soci::into(identifier), soci::into(className), 
 			soci::into(type), soci::into(namespaceName), soci::into(signature), 
 			soci::into(returnType), soci::into(comment), soci::into(fullPath, fullPathIndicator), soci::into(isProtected), soci::into(isPrivate), 
@@ -1619,149 +902,6 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceFinderClass::AllNonNati
 	return all;
 }
 
-void mvceditor::ResourceFinderClass::Wipe() {
-	FileParsingCache.clear();
-	NamespaceCache.clear();
-	TraitCache.clear();
-
-	// dont wipe the native functions since we don't recreate it
-	// during the running of the app.
-	if (IsCacheInitialized && mvceditor::NativeFunctionsAsset() != DbFileName) {
-		try {
-			Session.once << "DELETE FROM file_items;";
-			Session.once << "DELETE FROM resources;";
-		} catch (std::exception& e) {
-			
-			// ATTN: at some point bubble these exceptions up?
-			// to avoid unreferenced local variable warnings in MSVC
-			e.what();
-		}
-	}
-}
-
-void mvceditor::ResourceFinderClass::PersistResources(const std::vector<mvceditor::ResourceClass>& resources, int fileItemId) {
-	if (!IsCacheInitialized) {
-		return;
-	}
-	std::string sql;
-	sql += "INSERT OR IGNORE INTO resources (";
-	sql += "file_item_id, key, identifier, class_name, ";
-	sql += "type, namespace_name, signature, ";
-	sql += "return_type, comment, is_protected, is_private, ";
-	sql += "is_static, is_dynamic, is_native";
-	sql += ") VALUES(";
-	sql += "?, ?, ?, ?, ";
-	sql += "?, ?, ?, ";
-	sql += "?, ?, ?, ?, ";
-	sql += "?, ?, ?";
-	sql += ");";
-
-	std::string key;
-	std::string identifier;
-	std::string className;
-	int type;
-	std::string namespaceName;
-	std::string signature;
-	std::string returnType;
-	std::string comment;
-	int isProtected;
-	int isPrivate;
-	int isStatic;
-	int isDynamic;
-	int isNative;
-
-	try {
-		soci::statement stmt = (Session.prepare << sql,
-			soci::use(fileItemId), soci::use(key), soci::use(identifier), soci::use(className), 
-			soci::use(type), soci::use(namespaceName), soci::use(signature), 
-			soci::use(returnType), soci::use(comment), soci::use(isProtected), soci::use(isPrivate), 
-			soci::use(isStatic), soci::use(isDynamic), soci::use(isNative)
-		);
-		std::vector<mvceditor::ResourceClass>::const_iterator it;
-		for (it = resources.begin(); it != resources.end(); ++it) {
-			key = mvceditor::IcuToChar(it->Key);
-			identifier = mvceditor::IcuToChar(it->Identifier);
-			className = mvceditor::IcuToChar(it->ClassName);
-			type = it->Type;
-			namespaceName = mvceditor::IcuToChar(it->NamespaceName);
-			signature = mvceditor::IcuToChar(it->Signature);
-			returnType = mvceditor::IcuToChar(it->ReturnType);
-			comment = mvceditor::IcuToChar(it->Comment);
-			isProtected = it->IsProtected;
-			isPrivate = it->IsPrivate;
-			isStatic = it->IsStatic;
-			isDynamic = it->IsDynamic;
-			isNative = it->IsNative;
-			stmt.execute(true);
-		}
-	} catch (std::exception& e) {
-			
-		// ATTN: at some point bubble these exceptions up?
-		// to avoid unreferenced local variable warnings in MSVC
-		e.what();
-	}
-}
-
-void mvceditor::ResourceFinderClass::PersistTraits(
-	const std::map<UnicodeString, std::vector<mvceditor::TraitResourceClass>, UnicodeStringComparatorClass>& traitMap) {
-	if (!IsCacheInitialized) {
-		return;
-	}
-	std::string sql;
-	sql += "INSERT OR IGNORE INTO trait_resources(";
-	sql += "key, class_name, namespace_name, trait_name, ";
-	sql += "trait_namespace_name, aliases, instead_ofs) VALUES ("; 
-	sql += "?, ?, ?, ?, ";
-	sql += "?, ?, ?)";
-	std::string key;
-	std::string className;
-	std::string namespaceName;
-	std::string traitClassName;
-	std::string traitNamespaceName;
-	std::string aliases;
-	std::string insteadOfs;
-
-	try {
-		soci::statement stmt = (Session.prepare << sql,
-			soci::use(key), soci::use(className), soci::use(namespaceName), soci::use(traitClassName),
-			soci::use(traitNamespaceName), soci::use(aliases), soci::use(insteadOfs)
-		);
-		std::map<UnicodeString, std::vector<mvceditor::TraitResourceClass>, UnicodeStringComparatorClass>::const_iterator it;
-		for (it = traitMap.begin(); it != traitMap.end(); ++it) {
-			std::vector<mvceditor::TraitResourceClass>::const_iterator trait;
-			for (trait = it->second.begin(); trait != it->second.end(); ++trait) {
-				key = mvceditor::IcuToChar(trait->Key);
-				className = mvceditor::IcuToChar(trait->ClassName);
-				namespaceName = mvceditor::IcuToChar(trait->NamespaceName);
-				traitClassName = mvceditor::IcuToChar(trait->TraitClassName);
-				traitNamespaceName = mvceditor::IcuToChar(trait->TraitNamespaceName);
-				aliases = "";
-				for (std::vector<UnicodeString>::const_iterator alias = trait->Aliased.begin(); alias != trait->Aliased.end(); ++alias) {
-					aliases += mvceditor::IcuToChar(*alias);
-					aliases += ",";
-				}
-				if (!aliases.empty()) {
-					aliases.erase(aliases.end() - 1);
-				}
-				insteadOfs = "";
-				for (std::vector<UnicodeString>::const_iterator instead = trait->InsteadOfs.begin(); instead != trait->InsteadOfs.end(); ++instead) {
-					insteadOfs += mvceditor::IcuToChar(*instead);
-					insteadOfs += ",";
-				}
-				if (!insteadOfs.empty()) {
-					insteadOfs.erase(insteadOfs.end() - 1);
-				}
-				stmt.execute(true);
-			}
-		}
-	} catch (std::exception& e) {
-			
-		// ATTN: at some point bubble these exceptions up?
-		// to avoid unreferenced local variable warnings in MSVC
-		e.what();
-	}
-}
-
 std::vector<mvceditor::TraitResourceClass> mvceditor::ResourceFinderClass::FindTraitsByClassName(const std::vector<std::string>& keyStarts) {
 	std::string join = "";
 	for (size_t i = 0; i < keyStarts.size(); ++i) {
@@ -1784,7 +924,7 @@ std::vector<mvceditor::TraitResourceClass> mvceditor::ResourceFinderClass::FindT
 	std::string insteadOfs;
 	std::vector<mvceditor::TraitResourceClass> matches;
 	try {
-		soci::statement stmt = (Session.prepare << sql,
+		soci::statement stmt = (Session->prepare << sql,
 			soci::into(key), soci::into(className), soci::into(namespaceName), soci::into(traitClassName),
 			soci::into(traitNamespaceName), soci::into(aliases), soci::into(insteadOfs)
 		);

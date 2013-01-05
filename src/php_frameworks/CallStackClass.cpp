@@ -29,6 +29,7 @@
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <globals/sqlite.h>
+#include <wx/FFile.h>
 
 
 static UnicodeString EscapeScalar(const UnicodeString& expr) {

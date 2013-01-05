@@ -32,6 +32,8 @@
 #include <globals/Assets.h>
 #include <MvcEditor.h>
 #include <wx/artprov.h>
+#include <wx/file.h>
+#include <wx/ffile.h>
 
 static const int ID_URL_DETECTOR_PANEL = wxNewId();
 static const int ID_TEMPLATE_FILES_DETECTOR_PANEL = wxNewId();

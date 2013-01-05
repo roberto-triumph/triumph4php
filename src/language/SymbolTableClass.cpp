@@ -25,6 +25,7 @@
 #include <language/SymbolTableClass.h>
 #include <globals/String.h>
 #include <pelet/TokenClass.h>
+#include <wx/ffile.h>
 #include <algorithm>
 
 /*

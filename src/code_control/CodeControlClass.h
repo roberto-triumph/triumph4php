@@ -27,6 +27,7 @@
 
 #include <globals/CodeControlOptionsClass.h>
 #include <globals/GlobalsClass.h>
+#include <search/FinderClass.h>
 #include <wx/stc/stc.h>
 #include <wx/timer.h>
 #include <unicode/unistr.h>

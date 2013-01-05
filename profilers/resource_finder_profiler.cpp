@@ -30,6 +30,9 @@
 #include <search/DirectorySearchClass.h>
 #include <search/ResourceFinderClass.h>
 #include <globals/Assets.h>
+#include <globals/Sqlite.h>
+#include <soci/soci.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 #include <wx/filefn.h>
 #include <wx/timer.h>
 #include <wx/utils.h>
@@ -54,10 +57,10 @@ void ProfileParser();
 void ProfileParserOnLargeProject();
 
 /**
- * Profiles the PaserClass and ResourceFinder classes using the native.php file 
- * in resources  directory.  It profiles two consecutive times in order to
- * compare caching. By using the results of ProfileLexer test, we can find out
- * how much overhead parsing takes.
+ * Profiles the TagPaserClass and ResourceFinderClass using the php.db file 
+ * in resources directory.  It profiles two consecutive times in order to
+ * compare caching. By using this in combination with the results of 
+ * ProfileLexer test, we can find out how much overhead initializing a db file takes.
  */
 void ProfileNativeFunctionsParsing();
 
@@ -96,6 +99,11 @@ wxString FileName;
  */
 wxString DirName;
 
+/**
+ * Full path to the location of the SQLITE resource db.  This file will be created if it does not exist,
+ */
+wxString DbFileName;
+
 int main() {
 	int major,
 		minor;
@@ -103,10 +111,12 @@ int main() {
 	if (os == wxOS_WINDOWS_NT) {
 		FileName = wxT("C:\\Users\\roberto\\Documents\\mvc-editor\\php_detectors\\lib\\Zend\\Config.php");
 		DirName = wxT("C:\\Users\\roberto\\sample_php_project");
+		DbFileName = wxT("C:\\Users\\roberto\\Desktop\\resource.db");
 	}
 	else {
 		FileName = wxT("/home/roberto/workspace/mvc-editor/php_detectors/lib/Zend/Config.php");
 		DirName = wxT("/home/roberto/workspace/sample_php_project/");
+		DbFileName = wxT("/home/roberto/workspace/resource.db");
 	}
 	//ProfileLexer();
 	//ProfileParser();
@@ -197,17 +207,24 @@ void ProfileParser() {
 
 void ProfileNativeFunctionsParsing() {
 	printf("*******\n");
-	mvceditor::ResourceFinderClass resourceFinder;
-	resourceFinder.InitMemory();
-	if (FileName.IsEmpty() || !wxFileExists(FileName)) {
-		printf("Nor running ProfileNativeFunctionsParsing because file was not found: %s", (const char*)FileName.ToAscii());
-		return;
+	
+	// initialize the sqlite db
+	soci::session session;
+	try {
+		session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(mvceditor::NativeFunctionsAsset().GetFullPath()));
+	} catch(std::exception const& e) {
+		session.close();
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxASSERT_MSG(false, msg);
 	}
+	mvceditor::ResourceFinderClass resourceFinder;
+
 	wxLongLong time;
 	size_t found;
 
 	time = wxGetLocalTimeMillis();
-	resourceFinder.InitFile(mvceditor::NativeFunctionsAsset());
+	resourceFinder.Init(&session);
+	
 	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("stristr"));
 	std::vector<mvceditor::ResourceClass> matches = resourceFinder.CollectNearMatchResources(resourceSearch);
 	found = !matches.empty();
@@ -215,17 +232,32 @@ void ProfileNativeFunctionsParsing() {
 	printf("time for resourceFinder on php.db:%ld ms found:%d\n", time.ToLong(), (int)found);
 	
 	time = wxGetLocalTimeMillis();
-	resourceFinder.Walk(FileName);
 	matches = resourceFinder.CollectNearMatchResources(UNICODE_STRING_SIMPLE("mysql_query"));
 	time = wxGetLocalTimeMillis() - time;
 	found = !matches.empty();
-	printf("time for resourceFinder on php.tags after caching:%ld ms found:%d\n", time.ToLong(), (int)found);
+	printf("time for resourceFinder on php.db after caching:%ld ms found:%d\n", time.ToLong(), (int)found);
 }
 
 void ProfileResourceFinderOnLargeProject() {
 	printf("*******\n");
+	// initialize the sqlite db
+	soci::session session;
+	try {
+		session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(DbFileName));
+		wxString error;
+		if (!mvceditor::SqlScript(mvceditor::ResourceSqlSchemaAsset(), session, error)) {
+			wxASSERT_MSG(false, error);
+		}
+	} catch(std::exception const& e) {
+		session.close();
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxASSERT_MSG(false, msg);
+	}
+
+	mvceditor::TagParserClass tagParser;
 	mvceditor::ResourceFinderClass resourceFinder;
-	resourceFinder.InitFile(wxFileName(wxT("C:\\users\\roberto\\desktop\\profiler.db")));
+
+	
 	mvceditor::DirectorySearchClass search;
 	wxLongLong time;
 	if (DirName.IsEmpty() || !wxDirExists(DirName)) {
@@ -234,10 +266,12 @@ void ProfileResourceFinderOnLargeProject() {
 		return;
 	}
 	time = wxGetLocalTimeMillis();
-	resourceFinder.PhpFileExtensions.push_back(wxT("*.php"));
+	tagParser.PhpFileExtensions.push_back(wxT("*.php"));
+	tagParser.Init(&session);
+	resourceFinder.Init(&session);
 	search.Init(DirName);
 	while (search.More()) {
-		search.Walk(resourceFinder);
+		search.Walk(tagParser);
 	}
 	std::vector<mvceditor::ResourceClass> matches = resourceFinder.CollectNearMatchResources(UNICODE_STRING_SIMPLE("ExtendedRecordSetForUnitTestAddGetLeftJoin"));
 	time = wxGetLocalTimeMillis() - time;
@@ -247,7 +281,7 @@ void ProfileResourceFinderOnLargeProject() {
 	time = wxGetLocalTimeMillis();
 	search.Init(DirName);
 	while (search.More()) {
-		search.Walk(resourceFinder);
+		search.Walk(tagParser);
 	}
 	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("Record::get"));
 	matches = resourceFinder.CollectNearMatchResources(resourceSearch);

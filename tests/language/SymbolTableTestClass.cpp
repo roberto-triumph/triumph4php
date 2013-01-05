@@ -23,7 +23,12 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <language/SymbolTableClass.h>
+#include <language/TagParserClass.h>
 #include <globals/String.h>
+#include <globals/Sqlite.h>
+#include <globals/Assets.h>
+#include <soci/soci.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 #include <FileTestFixtureClass.h>
 #include <MvcEditorChecks.h>
 #include <UnitTest++.h>
@@ -81,6 +86,10 @@ public:
 	pelet::ExpressionClass ParsedExpression;
 	std::vector<mvceditor::ResourceFinderClass*> AllFinders;
 	std::map<wxString, mvceditor::ResourceFinderClass*> OpenedFinders;
+	soci::session SessionGlobal;
+	soci::session Session1;
+	mvceditor::TagParserClass TagParserGlobal;
+	mvceditor::TagParserClass TagParser1;
 	mvceditor::ResourceFinderClass Finder1;
 	mvceditor::ResourceFinderClass GlobalFinder;
 	std::vector<UnicodeString> VariableMatches;
@@ -94,6 +103,10 @@ public:
 		, Scope()
 		, ParsedExpression(Scope)
 		, OpenedFinders()
+		, SessionGlobal(*soci::factory_sqlite3(), ":memory:")
+		, Session1(*soci::factory_sqlite3(), ":memory:")
+		, TagParserGlobal()
+		, TagParser1()
 		, Finder1()
 		, GlobalFinder()
 		, VariableMatches()
@@ -101,12 +114,23 @@ public:
 		, DoDuckTyping(false)
 		, DoFullyQualifiedMatchOnly(false)
 		, Error() {
-		Finder1.InitMemory();
-		GlobalFinder.InitMemory();
+		wxString error;
+		if (!mvceditor::SqlScript(mvceditor::ResourceSqlSchemaAsset(), SessionGlobal, error)) {
+			wxASSERT_MSG(false, error);
+		}
+		if (!mvceditor::SqlScript(mvceditor::ResourceSqlSchemaAsset(), Session1, error)) {
+			wxASSERT_MSG(false, error);
+		}
+		TagParserGlobal.Init(&SessionGlobal);
+		GlobalFinder.Init(&SessionGlobal);
+
+		TagParser1.Init(&Session1);
+		Finder1.Init(&Session1);
+		
 	}
 
 	void Init(const UnicodeString& sourceCode) {
-		Finder1.BuildResourceCacheForFile(wxT("untitled"), sourceCode, true);
+		TagParser1.BuildResourceCacheForFile(wxT("untitled"), sourceCode, true);
 		OpenedFinders[wxT("untitled")] = &Finder1;
 		AllFinders.push_back(&Finder1);
 		AllFinders.push_back(&GlobalFinder);
@@ -277,7 +301,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodCallFromGlobalFind
 		"<?php class MyClass { function workA() {} function workB() {} } \n"	
 	);
 	Init(sourceCode);
-	GlobalFinder.BuildResourceCacheForFile(wxT("MyClass.php"), sourceCodeGlobal, true);
+	TagParserGlobal.BuildResourceCacheForFile(wxT("MyClass.php"), sourceCodeGlobal, true);
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false, false);
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);
@@ -301,10 +325,19 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithLocalFinderOverridesGlob
 		"<?php class MyClass { function workB() {} } \n"	
 	);
 	Init(sourceCode);
-	GlobalFinder.BuildResourceCacheForFile(wxT("MyClass.php"), sourceCodeGlobal, true);
+	TagParserGlobal.BuildResourceCacheForFile(wxT("MyClass.php"), sourceCodeGlobal, true);
+
+	soci::session localSession(*soci::factory_sqlite3(), ":memory:");
+	wxString error;
+	if (!mvceditor::SqlScript(mvceditor::ResourceSqlSchemaAsset(), localSession, error)) {
+		wxASSERT_MSG(false, error);
+	}
+
+	mvceditor::TagParserClass localTagPaser;
+	localTagPaser.Init(&localSession);
+	localTagPaser.BuildResourceCacheForFile(wxT("MyClass.php"), sourceCodeOpened, true);
 	mvceditor::ResourceFinderClass localFinder;
-	localFinder.InitMemory();
-	localFinder.BuildResourceCacheForFile(wxT("MyClass.php"), sourceCodeOpened, true);
+	localFinder.Init(&localSession);
 	OpenedFinders[wxT("MyClass.php")] = &localFinder;
 	AllFinders.push_back(&localFinder);
 
@@ -633,7 +666,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceImporti
 		"class OtherClass { }\n"
 		"}\n"
 	);
-	GlobalFinder.BuildResourceCacheForFile(wxT("defines.php"), sourceCode, true);
+	TagParserGlobal.BuildResourceCacheForFile(wxT("defines.php"), sourceCode, true);
 	
 	// the code under test will import the namespaces
 	sourceCode = mvceditor::CharToIcu(
@@ -669,7 +702,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClas
 		"namespace Second; \n"
 		"class MyClass {}"
 	);
-	GlobalFinder.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
+	TagParserGlobal.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
 	ToClass(UNICODE_STRING_SIMPLE("Othe"));
 	Scope.NamespaceName = UNICODE_STRING_SIMPLE("\\Second");
 	Scope.AddNamespace(UNICODE_STRING_SIMPLE("\\Second"), UNICODE_STRING_SIMPLE("namespace"));
@@ -709,7 +742,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClas
 		"class MyClass {}  \n"
 		"} \n"
 	);
-	GlobalFinder.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
+	TagParserGlobal.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
 	ToClass(UNICODE_STRING_SIMPLE("Othe"));
 	Scope.NamespaceName = UNICODE_STRING_SIMPLE("\\Second");
 	Scope.AddNamespace(UNICODE_STRING_SIMPLE("\\Second"), UNICODE_STRING_SIMPLE("namespace"));
@@ -733,7 +766,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndFunc
 		"namespace First\\Child; \n"
 		"class MyClass {}"
 	);
-	GlobalFinder.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
+	TagParserGlobal.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
 	
 	// global functions ARE automatically imported
 	ToFunction(UNICODE_STRING_SIMPLE("wor"));
@@ -756,7 +789,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClas
 		"namespace First\\Child; \n"
 		"class MyClass {}"
 	);
-	GlobalFinder.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
+	TagParserGlobal.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
 	
 	// classes in the same namespace ARE automatically imported
 	ToClass(UNICODE_STRING_SIMPLE("MyC"));
@@ -779,7 +812,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceGlobalC
 		"namespace First\\Child; \n"
 		"class MyClass {}"
 	);
-	GlobalFinder.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
+	TagParserGlobal.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
 	
 	ToClass(UNICODE_STRING_SIMPLE("Other"));
 	Scope.NamespaceName = UNICODE_STRING_SIMPLE("\\First\\Child");
@@ -897,8 +930,8 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownVariableA
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithTraitInDifferentNamespace) {
 	CompletionSymbolTable.SetVersion(pelet::PHP_54);
-	GlobalFinder.SetVersion(pelet::PHP_54);
-	Finder1.SetVersion(pelet::PHP_54);
+	TagParserGlobal.SetVersion(pelet::PHP_54);
+	TagParser1.SetVersion(pelet::PHP_54);
 
 	UnicodeString sourceCode = mvceditor::CharToIcu(
 		"<?php\n"
@@ -906,7 +939,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithTraitInDifferent
 		" function work() {}\n"
 		"}\n"
 	);
-	GlobalFinder.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
+	TagParserGlobal.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
 
 	sourceCode = mvceditor::CharToIcu(
 		"namespace Second { \n"
@@ -1025,7 +1058,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithClassHierarchyInMultiple
 		"class MyClass extends MyBaseClass { function workA() {} function workB() {} } \n"
 		"$my = new MyClass;\n"
 	);
-	GlobalFinder.BuildResourceCacheForFile(wxT("untitled 2"), sourceCodeParent, true);
+	TagParserGlobal.BuildResourceCacheForFile(wxT("untitled 2"), sourceCodeParent, true);
 	Init(sourceCode);
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE(""), false, false);
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 

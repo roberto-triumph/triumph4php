@@ -26,7 +26,7 @@
 #define OUTLINE_VIEW_FEATURECLASS_H__
 
 #include <features/FeatureClass.h>
-#include <pelet/ParserClass.h>
+#include <pelet/TokenClass.h>
 #include <features/wxformbuilder/OutlineViewFeatureForms.h>
 #include <widgets/ThreadWithHeartbeatClass.h>
 #include <vector>

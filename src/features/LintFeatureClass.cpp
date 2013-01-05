@@ -31,6 +31,7 @@
 #include <wx/artprov.h>
 #include <wx/valgen.h>
 #include <wx/tokenzr.h>
+#include <wx/ffile.h>
 
 const int ID_LINT_RESULTS_PANEL = wxNewId();
 const int ID_LINT_RESULTS_GAUGE = wxNewId();

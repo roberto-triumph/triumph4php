@@ -24,6 +24,10 @@
  */
 #include <language/ResourceCacheClass.h>
 #include <globals/Assets.h>
+#include <globals/Sqlite.h>
+#include <soci/soci.h>
+#include <soci/sqlite3/soci-sqlite3.h>
+
 #include <algorithm>
 
 mvceditor::WorkingCacheCompleteEventClass::WorkingCacheCompleteEventClass(int eventId, 
@@ -65,7 +69,8 @@ const wxEventType mvceditor::EVENT_WORKING_CACHE_COMPLETE = wxNewEventType();
 const wxEventType mvceditor::EVENT_GLOBAL_CACHE_COMPLETE = wxNewEventType();
 
 mvceditor::GlobalCacheClass::GlobalCacheClass()
-	: ResourceFinder()	
+	: TagParser() 
+	, ResourceFinder()	
 	, ResourceDbFileName() {
 
 }
@@ -73,20 +78,39 @@ mvceditor::GlobalCacheClass::GlobalCacheClass()
 void mvceditor::GlobalCacheClass::Init(const wxFileName& resourceDbFileName, 
 									   const std::vector<wxString>& phpFileExtensions, 
 									   const std::vector<wxString>& miscFileExtensions,
-									   pelet::Versions version, int fileParsingBuffer) {
+									   pelet::Versions version, int fileParsingBufferSize) {
 	ResourceDbFileName = resourceDbFileName;
-	ResourceFinder.PhpFileExtensions = phpFileExtensions;
-	ResourceFinder.MiscFileExtensions = miscFileExtensions;
-	ResourceFinder.SetVersion(version);
-	ResourceFinder.InitFile(resourceDbFileName, fileParsingBuffer);
+	TagParser.PhpFileExtensions = phpFileExtensions;
+	TagParser.MiscFileExtensions = miscFileExtensions;
+	OpenAndCreateTables(resourceDbFileName.GetFullPath());
+
+	TagParser.SetVersion(version);
+	TagParser.Init(&Session, fileParsingBufferSize);
+	ResourceFinder.Init(&Session);
+}
+
+void mvceditor::GlobalCacheClass::OpenAndCreateTables(const wxString& dbName) {
+	try {
+		std::string stdDbName = mvceditor::WxToChar(dbName);
+		Session.open(*soci::factory_sqlite3(), stdDbName);
+		wxString error;
+		if (!mvceditor::SqlScript(mvceditor::ResourceSqlSchemaAsset(), Session, error)) {
+			wxASSERT_MSG(false, error);
+		}
+	} catch(std::exception const& e) {
+		Session.close();
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxASSERT_MSG(false, msg);
+	}
 }
 
 void mvceditor::GlobalCacheClass::Walk(mvceditor::DirectorySearchClass& search) {
-	search.Walk(ResourceFinder);
+	search.Walk(TagParser);
 }
 
 mvceditor::WorkingCacheClass::WorkingCacheClass()
-	: ResourceFinder()
+	: TagParser()
+	, ResourceFinder()
 	, SymbolTable()
 	, FileName() 
 	, IsNew(true)
@@ -102,7 +126,7 @@ bool mvceditor::WorkingCacheClass::Update(const UnicodeString& code) {
 	// on newly created files
 	bool ret = false;
 	if (code.isEmpty() || Parser.LintString(code, results)) {
-		ResourceFinder.BuildResourceCacheForFile(FileName, code, IsNew);
+		TagParser.BuildResourceCacheForFile(FileName, code, IsNew);
 		SymbolTable.CreateSymbols(code);
 		ret = true;
 	}
@@ -114,18 +138,37 @@ void mvceditor::WorkingCacheClass::Init(const wxString& fileName,
 	FileName = fileName;
 	FileIdentifier = fileIdentifier;
 	IsNew = isNew;
-	ResourceFinder.SetVersion(version);
+	OpenAndCreateTables();
+
+	
 	SymbolTable.SetVersion(version);
 	Parser.SetVersion(version);
-	ResourceFinder.InitMemory();
+	
+	TagParser.Init(&Session);
+	TagParser.SetVersion(version);
+	ResourceFinder.Init(&Session);
 	if (createSymbols) {
 
 		// ATTN: not using the configured php file filters, file is assume to be a PHP file
-		ResourceFinder.PhpFileExtensions.push_back(wxT("*.*"));
-		ResourceFinder.BeginSearch();
-		ResourceFinder.Walk(fileName);
-		ResourceFinder.EndSearch();
+		TagParser.PhpFileExtensions.push_back(wxT("*.*"));
+		TagParser.BeginSearch();
+		TagParser.Walk(fileName);
+		TagParser.EndSearch();
 		SymbolTable.CreateSymbolsFromFile(fileName);
+	}
+}
+
+void mvceditor::WorkingCacheClass::OpenAndCreateTables() {
+	try {
+		Session.open(*soci::factory_sqlite3(), ":memory:");
+		wxString error;
+		if (!mvceditor::SqlScript(mvceditor::ResourceSqlSchemaAsset(), Session, error)) {
+			wxASSERT_MSG(false, error);
+		}
+	} catch(std::exception const& e) {
+		Session.close();
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxASSERT_MSG(false, msg);
 	}
 }
 
@@ -339,17 +382,6 @@ void mvceditor::ResourceCacheClass::ResourceMatches(const wxString& fileName, co
 	}
 }
 
-void mvceditor::ResourceCacheClass::GlobalAddDynamicResources(const std::vector<mvceditor::ResourceClass>& resources) {
-	if (WorkingCaches.count(wxT(":memory:")) == 0) {
-
-		// this is the case when Clear() is called right before this method
-		mvceditor::WorkingCacheClass* cache = new mvceditor::WorkingCacheClass;
-		cache->Init(wxT(":memory:"), wxT(":memory:"), true, pelet::PHP_53, false);
-		WorkingCaches[wxT(":memory:")] = cache;
-	}
-	WorkingCaches[wxT(":memory:")]->ResourceFinder.AddDynamicResources(resources);
-}
-
 void mvceditor::ResourceCacheClass::Print() {
 	UFILE* ufout = u_finit(stdout, NULL, NULL);
 	u_fprintf(ufout, "Number of global caches: %d\n", GlobalCaches.size());
@@ -410,7 +442,7 @@ void mvceditor::ResourceCacheClass::WipeGlobal() {
 		
 		// do not remove the native cache; it never changes 
 		if ((*it)->ResourceDbFileName != nativeFunctionsFileName) {
-			(*it)->ResourceFinder.Wipe();
+			(*it)->TagParser.Wipe();
 			delete *it;
 			it = GlobalCaches.erase(it);
 		}

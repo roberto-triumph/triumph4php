@@ -23,6 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <actions/ResourceWipeActionClass.h>
+#include <soci/soci.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 
 mvceditor::ResourceWipeActionClass::ResourceWipeActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId,
 															const std::vector<mvceditor::ProjectClass>& projects)
@@ -45,9 +47,19 @@ bool mvceditor::ResourceWipeActionClass::Init(mvceditor::GlobalsClass& globals) 
 void mvceditor::ResourceWipeActionClass::BackgroundWork() {
 	std::vector<wxFileName>::iterator it;
 	for (it = ResourceDbFileNames.begin(); it != ResourceDbFileNames.end() && !TestDestroy(); ++it) {
-		mvceditor::ResourceFinderClass resourceFinder;
-		resourceFinder.InitFile(*it);
-		resourceFinder.Wipe();
+		
+		// initialize the sqlite db
+		soci::session session;
+		try {
+			session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(it->GetFullPath()));
+			mvceditor::TagParserClass tagParser;
+			tagParser.Init(&session);
+			tagParser.Wipe();
+		} catch(std::exception const& e) {
+			session.close();
+			wxString msg = mvceditor::CharToWx(e.what());
+			wxASSERT_MSG(false, msg);
+		}
 	}
 }
 

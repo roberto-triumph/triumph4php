@@ -26,8 +26,8 @@
 #include <globals/String.h>
 #include <code_control/DocumentClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
-
 #include <globals/Errors.h>
+#include <search/FindInFilesClass.h>
 #include <wx/filename.h>
 #include <wx/stc/stc.h>
 #include <wx/utils.h>
