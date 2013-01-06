@@ -25,7 +25,7 @@
 #ifndef __MVCEDITORRESOURCECACHECLASS_H__
 #define __MVCEDITORRESOURCECACHECLASS_H__
 
-#include <search/ResourceFinderClass.h>
+#include <search/ParsedTagFinderClass.h>
 #include <search/DirectorySearchClass.h>
 #include <language/TagParserClass.h>
 #include <language/SymbolTableClass.h>
@@ -54,7 +54,7 @@ public:
 	/**
 	 * The object that will be used to lookup tags
 	 */
-	mvceditor::ResourceFinderClass ResourceFinder;
+	mvceditor::ParsedTagFinderClass ResourceFinder;
 
 	/**
 	 * The location of the SQLite file where the resources will be
@@ -81,12 +81,12 @@ public:
 		const std::vector<wxString>& miscFileExtensions, pelet::Versions version, int fileParsingBufferSize = 32);
 
 	/**
-	 * Will update the resource finder by calling Walk(); meaning that the next file
+	 * Will update the tag finder by calling Walk(); meaning that the next file
 	 * given by the directorySearch will be parsed and its resources will be stored
 	 * in the database.
 	 *
-	 * @see mvceditor::ResourceFinderClass::Walk
-	 * @param resourceDbFileName the location of the SQLite cache for the resource finder. this 
+	 * @see mvceditor::ParsedTagFinderClass::Walk
+	 * @param resourceDbFileName the location of the SQLite cache for the tag finder. this 
 	 *        is the file where the resources will be persisted to
 	 * @param directorySearch keeps track of the file to parse
 	 */
@@ -129,7 +129,7 @@ public:
 	/**
 	 * The object that will be used to lookup tags
 	 */
-	mvceditor::ResourceFinderClass ResourceFinder;
+	mvceditor::ParsedTagFinderClass ResourceFinder;
 
 	/**
 	 * The object that keeps track of variable types; we only need
@@ -208,12 +208,12 @@ private:
  * completion to be helpful on code not yet saved.
  *
  * Usage:
- * The resource cache can handle multiple global caches; this can be used to separate the
- * resource cache into multiple files; one file per project. Something like this:
+ * The tag cache can handle multiple global caches; this can be used to separate the
+ * tag cache into multiple files; one file per project. Something like this:
  *
  * @code
  
- * mvceditor::ResourceCacheClass cache;
+ * mvceditor::TagCacheClass cache;
  *
  * // setup the parsed resources to be saved into the user's home directory
  * // note that file need not exist
@@ -231,7 +231,7 @@ private:
  *
  * @endcode
  *
- * Since ResourceCacheClass is backed by ResourceFinderClass, the global resource finders 
+ * Since TagCacheClass is backed by ParsedTagFinderClass, the global tag finders 
  * are stored on disk and are preserved across application restarts. This means that 
  * if the cache file already exists, then WalkGlobal() may return immediately if the file
  * to be parsed has not been modified since the last time we parsed it.
@@ -240,16 +240,16 @@ private:
  * threads. Concurrent access can be achieved by creating separate instances of 
  * ResourceCacheClas with both pointing to the same DB files.
  */
-class ResourceCacheClass {
+class TagCacheClass {
 	
 public:
 
-	ResourceCacheClass();
+	TagCacheClass();
 	
-	~ResourceCacheClass();
+	~TagCacheClass();
 	
 	/**
-	 * Creates a new resource finder for the given file. This should be called 
+	 * Creates a new tag finder for the given file. This should be called 
 	 * when the user opens a file.
 	 * 
 	 * @param fileName unique identifier for a file
@@ -276,7 +276,7 @@ public:
 	bool ReplaceWorking(const wxString& fileName, mvceditor::WorkingCacheClass* cache);
 	
 	/**
-	 * Cleans up the resource finder from the given file. This should be called whenever
+	 * Cleans up the tag finder from the given file. This should be called whenever
 	 * the user is no longer editing the file.
 	 * 
 	 * @param fileName unique identifier for a file
@@ -288,50 +288,50 @@ public:
 	 * to this method, the cache is available for use by 
 	 * the ExpressionCompletionMatches and ResourceMatches methods
 	 *
-	 * @return bool FALSE if the resource file is already initialized
+	 * @return bool FALSE if the tag file is already initialized
 	 */
 	bool RegisterGlobal(mvceditor::GlobalCacheClass* globalCache);
 
 	/**
-	 * Removes a db file from the global resource finders.
+	 * Removes a db file from the global tag finders.
 	 * @param resourceDbFileName the location of the SQLite cache for the 
-	 *        resource finder.
+	 *        tag finder.
 	 */
 	void RemoveGlobal(const wxFileName& resourceDbFileName);
 
 	/**
-	 * check to see if a resource DB file is already loaded
+	 * check to see if a tag DB file is already loaded
 	 *
 	 * @return bool TRUE if db file is already loaded.
 	 */
 	bool IsInitGlobal(const wxFileName& resourceDbFileName) const;
 
 	/**
-	 * calls AllNonNativeClasses() method on the GLOBAL resource. This is usually done after all files have been indexed.
-	 * @see mvceditor::ResourceFinderClass::AllNonNativeClasses
+	 * calls AllNonNativeClasses() method on the GLOBAL tag. This is usually done after all files have been indexed.
+	 * @see mvceditor::ParsedTagFinderClass::AllNonNativeClasses
 	 */
-	std::vector<ResourceClass> AllNonNativeClassesGlobal() const;
+	std::vector<TagClass> AllNonNativeClassesGlobal() const;
 	
 	/**
 	 * Searches all the registered caches (working AND global caches)
 	 * Will returm only for full exact matches (it will call CollectFullyQualifiedResource
-	 * on each resource finder).
-	 * @see mvceditor::ResourceFinderClass::CollectFullyQualifiedResource
+	 * on each tag finder).
+	 * @see mvceditor::ParsedTagFinderClass::CollectFullyQualifiedResource
 	 * @param search string to search for
-	 * @return std::vector<mvceditor::ResourceClass> matched resources 
+	 * @return std::vector<mvceditor::TagClass> matched resources 
 	 */
-	std::vector<mvceditor::ResourceClass> CollectFullyQualifiedResourceFromAll(const UnicodeString& search);
+	std::vector<mvceditor::TagClass> CollectFullyQualifiedResourceFromAll(const UnicodeString& search);
 	
 	/**
 	 * Searches all the registered caches (working AND global caches)
 	 * Will return near matches (it will call CollectNearMatchResources
-	 * on each resource finder).
+	 * on each tag finder).
 	 *
-	 * @see mvceditor::ResourceFinderClass::CollectNearMatchResources
+	 * @see mvceditor::ParsedTagFinderClass::CollectNearMatchResources
 	 * @param string to search for
-	 * @return std::vector<mvceditor::ResourceClass> matched resources
+	 * @return std::vector<mvceditor::TagClass> matched resources
 	 */
-	std::vector<mvceditor::ResourceClass> CollectNearMatchResourcesFromAll(const UnicodeString& search);
+	std::vector<mvceditor::TagClass> CollectNearMatchResourcesFromAll(const UnicodeString& search);
 	
 	/**
 	 * Collects all near matches that are possible candidates for completion of the parsed expression.
@@ -348,38 +348,38 @@ public:
 	 *        a function / static class call.
 	 * @param doDuckTyping if an expression chain could not be fully resolved; then we could still
 	 *        perform a search for the expression member in ALL classes. The lookups will not be
-	 *        slower because ResourceFinderClass still handles them
+	 *        slower because ParsedTagFinderClass still handles them
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
 	void ExpressionCompletionMatches(const wxString& fileName, const pelet::ExpressionClass& parsedExpression, const pelet::ScopeClass& expressionScope, 
 		std::vector<UnicodeString>& autoCompleteList,
-		std::vector<ResourceClass>& autoCompleteResourceList,
+		std::vector<TagClass>& autoCompleteResourceList,
 		bool doDuckTyping,
 		SymbolTableMatchErrorClass& error);
 
 	/**
-	 * This method will resolve the given parsed expression and will figure out the type of a resource.
+	 * This method will resolve the given parsed expression and will figure out the type of a tag.
 	 * Basically just a calls the ResourceMatches() of the given file's SymbolTable. See that method for more info
 	 * 
 	 * @param fileName the symbol table of this registered file will be searched
 	 * @parm parsedExpression the parsed expression; from ParserClass::ParseExpression() 
 	 * @param expressionScope the scope where parsed expression is located.  The scope let's us know which variables are
 	 *        available. See ScopeFinderClass for more info.
-	 * @param matches all of the resource matches will be put here
+	 * @param matches all of the tag matches will be put here
 	 * @param doDuckTyping if an expression chain could not be fully resolved; then we could still
 	 *        perform a search for the expression member in ALL classes. The lookups will not be
-	 *        slower because ResourceFinderClass still handles them
+	 *        slower because ParsedTagFinderClass still handles them
 	 * @param doFullyQualifiedMatchOnly if TRUE the only resources that match fully qualified resources will be
 	 *        returned
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
 	void ResourceMatches(const wxString& fileName, const pelet::ExpressionClass& parsedExpression, const pelet::ScopeClass& expressionScope, 
-		std::vector<ResourceClass>& matches,
+		std::vector<TagClass>& matches,
 		bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 		SymbolTableMatchErrorClass& error);
 	
 	/**
-	 * print the resource cache to stdout. Really only useful for debugging and not much else
+	 * print the tag cache to stdout. Really only useful for debugging and not much else
 	 */
 	void Print();
 	
@@ -400,7 +400,7 @@ public:
 
 	/**
 	 * Remove all items from only the global caches ALSO wipes any persisted resources and unregisters any and all global 
-	 * resource DB files. In other words, any resources that were saved to the SQLite tables will be deleted too.
+	 * tag DB files. In other words, any resources that were saved to the SQLite tables will be deleted too.
 	 * The SQLite file itself will not be deleted.
 	 * The working caches are not removed.
 	 */
@@ -409,15 +409,15 @@ public:
 private:
 		
 	/**
-	 * Returns a list that contains all of the resource finders for the registered files plus
-	 * the global resource finders.
+	 * Returns a list that contains all of the tag finders for the registered files plus
+	 * the global tag finders.
 	 * 
-	 * This clas owns the resource finder pointers, do NOT delete them
+	 * This clas owns the tag finder pointers, do NOT delete them
 	 */
-	std::vector<ResourceFinderClass*> AllFinders();
+	std::vector<ParsedTagFinderClass*> AllFinders();
 	
 	/**
-	 * These are the resource finders from the ENTIRE projecta; it may include stale resources
+	 * These are the tag finders from the ENTIRE projecta; it may include stale resources
 	 * This class will own these pointers and will delete them when appropriate.
 	 */
 	std::vector<mvceditor::GlobalCacheClass*> GlobalCaches;
@@ -430,13 +430,13 @@ private:
 };
 
 /**
- * Event that will hold the results of a resource finder 
+ * Event that will hold the results of a tag finder 
  * parsing an entire directory.
  */
 extern const wxEventType EVENT_WORKING_CACHE_COMPLETE;
 
 /**
- * Event that will hold the results of resource finder & symbol table
+ * Event that will hold the results of tag finder & symbol table
  * on a single file.
  */
 extern const wxEventType EVENT_GLOBAL_CACHE_COMPLETE;
@@ -456,7 +456,7 @@ public:
 	 *        not be unique; it can be empty if a "new" code control is being
 	 *        parsed 
 	 * @param fileIdentifier a unique string
-	 * @param workingCache the parsed resource data for the file.
+	 * @param workingCache the parsed tag data for the file.
 	 *        this pointer will be owned by the event handler.
 	 */
 	WorkingCacheCompleteEventClass(int eventId, 

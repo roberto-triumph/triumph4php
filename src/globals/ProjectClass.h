@@ -89,12 +89,12 @@ public:
 	std::vector<wxString> MiscFileExtensions;
 
 	/**
-	 * The location of the resource cache for this project. The resource DB file contains all of
+	 * The location of the tag cache for this project. The tag DB file contains all of
 	 * the parsed resources for all of this project's resources.
 	 * This file will be invalid for new projects, until the MakeDbFileName() method gets called.
 	 *
 	 * The SQL schema for this cache can be found in resources/sql/resource.sql
-	 * @see mvceditor::ResourceFinderClass
+	 * @see mvceditor::ParsedTagFinderClass
 	 */
 	wxFileName ResourceDbFileName;
 
@@ -185,12 +185,12 @@ public:
 	 * (ResourceDbFileName or DetectorDbFileName are empty [the strings themselves
 	 * are empty]).  If the files already exist, this method does nothing.
 	 * This method does not initialize the dbs or create the schema. that is
-	 * done by either ResourceFinderClass or UrlResourceFinderClass
+	 * done by either ParsedTagFinderClass or UrlResourceFinderClass
 	 */
 	bool TouchCacheDbs();
 
 	/**
-	 * Deletes this project's resource cache from the file system.
+	 * Deletes this project's tag cache from the file system.
 	 * This should be done when the user does not want MVC Editor
 	 * to cache a project's sources.
 	 */

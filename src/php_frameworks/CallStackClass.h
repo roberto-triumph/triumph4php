@@ -26,7 +26,7 @@
 #define __CALLSTACKCLASS_H__
 
 #include <pelet/ParserClass.h>
-#include <language/ResourceCacheClass.h>
+#include <language/TagCacheClass.h>
 #include <language/SymbolTableClass.h>
 #include <unicode/unistr.h>
 #include <wx/filename.h>
@@ -70,7 +70,7 @@ class CallClass {
 	/**
 	 * the function / method being called
 	 */
-	ResourceClass Resource;
+	TagClass Resource;
 	
 	/**
 	 * If a variable, then this is the variable name
@@ -97,8 +97,8 @@ public:
 	void ToScalar(const mvceditor::SymbolClass& symbol);
 	void ToObject(const mvceditor::SymbolClass& symbol);
 	void ToParam(const pelet::ExpressionClass& expr);
-	void ToBeginFunction(const mvceditor::ResourceClass& resource);
-	void ToBeginMethod(const mvceditor::ResourceClass& resource);
+	void ToBeginFunction(const mvceditor::TagClass& tag);
+	void ToBeginMethod(const mvceditor::TagClass& tag);
 	void ToReturn();
 	
 	std::string StepTypeString() const;
@@ -139,7 +139,7 @@ public:
 	    PARSE_ERR0R,
 
 	    /**
-	     * while recursing the call stack, we encountered a resource that could not be resolved (an object
+	     * while recursing the call stack, we encountered a tag that could not be resolved (an object
 	     * without a type
 	     */
 	    RESOLUTION_ERROR,
@@ -151,7 +151,7 @@ public:
 	    STACK_LIMIT,
 		
 		/**
-		 * the given resource cache is empty; the call stack class wont be able to quickly know where a 
+		 * the given tag cache is empty; the call stack class wont be able to quickly know where a 
 		 * specific class is located.
 		 */
 		EMPTY_CACHE
@@ -176,10 +176,10 @@ public:
 	SymbolTableMatchErrorClass MatchError;
 
 	/**
-	 * @param ResourceCacheClass& need the resource cache so that functions can be resolved
+	 * @param TagCacheClass& need the tag cache so that functions can be resolved
 	 * into their corresponding file locations
 	 */
-	CallStackClass(ResourceCacheClass& resourceCache);
+	CallStackClass(TagCacheClass& resourceCache);
 
 	/**
 	 * Will open up the file, parse it, and collect all function calls. This is recursive (will open up
@@ -257,7 +257,7 @@ private:
 		
 		wxFileName FileName;
 		
-		mvceditor::ResourceClass Resource;
+		mvceditor::TagClass Resource;
 		
 		std::vector<pelet::ExpressionClass> CallArguments;
 		
@@ -274,7 +274,7 @@ private:
 	/**
 	 * Used to 'jump' to the calling function
 	 */
-	ResourceCacheClass& ResourceCache;
+	TagCacheClass& TagCache;
 	
 	/**
 	 * Holds all variables for the current scope
@@ -291,7 +291,7 @@ private:
 	std::map<UnicodeString, bool, UnicodeStringComparatorClass> ParsedMethods;
 	
 	/**
-	 * this flag will be set when the parser hits the scope (resource) we are looking for.  If we dont
+	 * this flag will be set when the parser hits the scope (tag) we are looking for.  If we dont
 	 * find the scope we are looking for, then either the input scope was wrong, or some other
 	 * unknown error has occurred
 	 */

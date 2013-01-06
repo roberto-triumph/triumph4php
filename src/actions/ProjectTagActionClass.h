@@ -34,12 +34,12 @@ namespace mvceditor {
 
 /**
  * This class will take care of iterating through all files in a project
- * and parsing the resources so that queries to ResourceFinderClass
+ * and parsing the resources so that queries to ParsedTagFinderClass
  * will work.
- * The ProjectResourceActionClass will generate a GlobalCacheCompleteEventClass 
+ * The ProjectTagActionClass will generate a GlobalCacheCompleteEventClass 
  * event once each project  has been parsed.
  */
-class ProjectResourceActionClass : public ActionClass {
+class ProjectTagActionClass : public ActionClass {
 
 public:
 
@@ -47,9 +47,9 @@ public:
 	 * @param runningThreads will receive EVENT_FILE_* and EVENT_WORK_* events when all 
 	 * files have been iterated through.
 	 */
-	ProjectResourceActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	ProjectTagActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
-	~ProjectResourceActionClass();
+	~ProjectTagActionClass();
 
 	/**
 	 * prepare to iterate through the given file. The name part of the given file must match the wildcard.
@@ -130,8 +130,8 @@ private:
 };
 
 /**
- * This class will prime the resource cache with all of the
- * enabled projects. The resource cache will be primed; although
+ * This class will prime the tag cache with all of the
+ * enabled projects. The tag cache will be primed; although
  * it will be primed with the existing cache file which may be
  * stale. 
  */

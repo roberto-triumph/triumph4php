@@ -26,8 +26,8 @@
 #include <MvcEditorChecks.h>
 #include <ActionTestFixtureClass.h>
 #include <FileTestFixtureClass.h>
-#include <actions/ProjectResourceActionClass.h>
-#include <language/ResourceCacheClass.h>
+#include <actions/ProjectTagActionClass.h>
+#include <language/TagCacheClass.h>
 #include <wx/event.h>
 
 static int ID_EVENT = wxNewId();
@@ -38,7 +38,7 @@ static int ID_EVENT = wxNewId();
 	output += dir1;
 
 
-class ProjectResourceActionTestClass : public ActionTestFixtureClass, public FileTestFixtureClass {
+class ProjectTagActionTestClass : public ActionTestFixtureClass, public FileTestFixtureClass {
 
 public:
 
@@ -47,7 +47,7 @@ public:
 	 * the object under test. we will assert that the object generates
 	 * events.
 	 */
-	mvceditor::ProjectResourceActionClass ProjectResourceAction;
+	mvceditor::ProjectTagActionClass ProjectTagAction;
 
 	/**
 	 * Create projects to be scanned
@@ -64,10 +64,10 @@ public:
 	 */
 	std::vector<mvceditor::GlobalCacheClass*> GlobalCaches;
 
-	ProjectResourceActionTestClass() 
+	ProjectTagActionTestClass() 
 		: ActionTestFixtureClass()
 		, FileTestFixtureClass(wxT("resource_file_reader"))
-		, ProjectResourceAction(RunningThreads, ID_EVENT) 
+		, ProjectTagAction(RunningThreads, ID_EVENT) 
 		, Project1()
 		, Project2()
 		, Globals()
@@ -83,7 +83,7 @@ public:
 		Project2.PhpFileExtensions.push_back(wxT("*.php"));
 	}
 
-	~ProjectResourceActionTestClass() {
+	~ProjectTagActionTestClass() {
 		std::vector<mvceditor::GlobalCacheClass*>::iterator cache;
 		for (cache = GlobalCaches.begin(); cache != GlobalCaches.end(); ++cache) {
 			delete (*cache);
@@ -104,13 +104,13 @@ public:
 	DECLARE_EVENT_TABLE()
 };
 
-BEGIN_EVENT_TABLE(ProjectResourceActionTestClass, ActionTestFixtureClass) 
-	EVT_GLOBAL_CACHE_COMPLETE(ID_EVENT, ProjectResourceActionTestClass::OnGlobalCacheComplete)
+BEGIN_EVENT_TABLE(ProjectTagActionTestClass, ActionTestFixtureClass) 
+	EVT_GLOBAL_CACHE_COMPLETE(ID_EVENT, ProjectTagActionTestClass::OnGlobalCacheComplete)
 END_EVENT_TABLE()
 
-SUITE(ProjectResourceActionTestClass) {
+SUITE(ProjectTagActionTestClass) {
 
-TEST_FIXTURE(ProjectResourceActionTestClass, InitProject) {
+TEST_FIXTURE(ProjectTagActionTestClass, InitProject) {
 	// test that when we intialize 1 project we get 1
 	// global cache pointer
 
@@ -124,17 +124,17 @@ TEST_FIXTURE(ProjectResourceActionTestClass, InitProject) {
 	Project1.ResourceDbFileName.Assign(TestProjectDir, wxT("cache_project_1.db"));
 	Globals.Projects.push_back(Project1);
 
-	CHECK(ProjectResourceAction.Init(Globals));
+	CHECK(ProjectTagAction.Init(Globals));
 
-	ProjectResourceAction.BackgroundWork();
+	ProjectTagAction.BackgroundWork();
 
 	CHECK_VECTOR_SIZE(1, GlobalCaches);
 	CHECK(NULL != GlobalCaches[0]);
-	mvceditor::ResourceSearchClass search(UNICODE_STRING_SIMPLE("User"));
+	mvceditor::TagSearchClass search(UNICODE_STRING_SIMPLE("User"));
 	CHECK_VECTOR_SIZE(1, GlobalCaches[0]->ResourceFinder.CollectFullyQualifiedResource(search));
 }
 
-TEST_FIXTURE(ProjectResourceActionTestClass, InitMultipleProjects) {
+TEST_FIXTURE(ProjectTagActionTestClass, InitMultipleProjects) {
 	// test that when we intialize 2 project we get 2
 	// global cache pointers
 
@@ -154,18 +154,18 @@ TEST_FIXTURE(ProjectResourceActionTestClass, InitMultipleProjects) {
 	Globals.Projects.push_back(Project1);
 	Globals.Projects.push_back(Project2);
 
-	CHECK(ProjectResourceAction.Init(Globals));
+	CHECK(ProjectTagAction.Init(Globals));
 
-	ProjectResourceAction.BackgroundWork();
+	ProjectTagAction.BackgroundWork();
 
 	CHECK_VECTOR_SIZE(2, GlobalCaches);
 	CHECK(NULL != GlobalCaches[0]);
 	CHECK(NULL != GlobalCaches[1]);
 
-	mvceditor::ResourceSearchClass searchFirst(UNICODE_STRING_SIMPLE("User"));
+	mvceditor::TagSearchClass searchFirst(UNICODE_STRING_SIMPLE("User"));
 	CHECK_VECTOR_SIZE(1, GlobalCaches[0]->ResourceFinder.CollectFullyQualifiedResource(searchFirst));
 
-	mvceditor::ResourceSearchClass searchSecond(UNICODE_STRING_SIMPLE("Role"));
+	mvceditor::TagSearchClass searchSecond(UNICODE_STRING_SIMPLE("Role"));
 	CHECK_VECTOR_SIZE(1, GlobalCaches[1]->ResourceFinder.CollectFullyQualifiedResource(searchSecond));
 }
 

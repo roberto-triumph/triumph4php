@@ -22,7 +22,7 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <language/ResourceCacheClass.h>
+#include <language/TagCacheClass.h>
 #include <globals/Assets.h>
 #include <globals/Sqlite.h>
 #include <soci/soci.h>
@@ -172,20 +172,20 @@ void mvceditor::WorkingCacheClass::OpenAndCreateTables() {
 	}
 }
 
-mvceditor::ResourceCacheClass::ResourceCacheClass()
+mvceditor::TagCacheClass::TagCacheClass()
 	: GlobalCaches()
 	, WorkingCaches() {
 	
 }
 
-mvceditor::ResourceCacheClass::~ResourceCacheClass() {
+mvceditor::TagCacheClass::~TagCacheClass() {
 	Clear();
  }
 
-bool mvceditor::ResourceCacheClass::RegisterWorking(const wxString& fileName, mvceditor::WorkingCacheClass* cache) {
+bool mvceditor::TagCacheClass::RegisterWorking(const wxString& fileName, mvceditor::WorkingCacheClass* cache) {
 	bool ret = false;
 
-	// careful to not overwrite the symbol table, resource finder pointers
+	// careful to not overwrite the symbol table, tag finder pointers
 	std::map<wxString, mvceditor::WorkingCacheClass*>::iterator it = WorkingCaches.find(fileName);
 	if (it == WorkingCaches.end()) {
 		WorkingCaches[fileName] = cache;
@@ -194,12 +194,12 @@ bool mvceditor::ResourceCacheClass::RegisterWorking(const wxString& fileName, mv
 	return ret;
 }
 
-bool mvceditor::ResourceCacheClass::ReplaceWorking(const wxString& fileName, mvceditor::WorkingCacheClass* cache) {
+bool mvceditor::TagCacheClass::ReplaceWorking(const wxString& fileName, mvceditor::WorkingCacheClass* cache) {
 	RemoveWorking(fileName);
 	return RegisterWorking(fileName, cache);
 }
 
-void mvceditor::ResourceCacheClass::RemoveWorking(const wxString& fileName) {
+void mvceditor::TagCacheClass::RemoveWorking(const wxString& fileName) {
 	std::map<wxString, mvceditor::WorkingCacheClass*>::iterator it = WorkingCaches.find(fileName);
 	if (it != WorkingCaches.end()) {
 		delete it->second;
@@ -207,7 +207,7 @@ void mvceditor::ResourceCacheClass::RemoveWorking(const wxString& fileName) {
 	}
 }
 
-bool mvceditor::ResourceCacheClass::RegisterGlobal(mvceditor::GlobalCacheClass* cache) {
+bool mvceditor::TagCacheClass::RegisterGlobal(mvceditor::GlobalCacheClass* cache) {
 	bool found = IsInitGlobal(cache->ResourceDbFileName);
 	if (!found) {
 		GlobalCaches.push_back(cache);
@@ -216,7 +216,7 @@ bool mvceditor::ResourceCacheClass::RegisterGlobal(mvceditor::GlobalCacheClass* 
 	return false;
 }
 
-bool mvceditor::ResourceCacheClass::IsInitGlobal(const wxFileName& resourceDbFileName) const {
+bool mvceditor::TagCacheClass::IsInitGlobal(const wxFileName& resourceDbFileName) const {
 	bool found = false;
 	std::vector<mvceditor::GlobalCacheClass*>::const_iterator it;
 	for (it = GlobalCaches.begin(); it != GlobalCaches.end(); ++it) {
@@ -228,7 +228,7 @@ bool mvceditor::ResourceCacheClass::IsInitGlobal(const wxFileName& resourceDbFil
 	return found;
 }
 
-void mvceditor::ResourceCacheClass::RemoveGlobal(const wxFileName& resourceDbFileName) {
+void mvceditor::TagCacheClass::RemoveGlobal(const wxFileName& resourceDbFileName) {
 	std::vector<mvceditor::GlobalCacheClass*>::iterator it;
 	it = GlobalCaches.begin();
 	while (it != GlobalCaches.end()) {
@@ -242,37 +242,37 @@ void mvceditor::ResourceCacheClass::RemoveGlobal(const wxFileName& resourceDbFil
 	}
 }
 
-std::vector<mvceditor::ResourceClass> mvceditor::ResourceCacheClass::AllNonNativeClassesGlobal() const {
-	std::vector<mvceditor::ResourceClass> res; 
+std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllNonNativeClassesGlobal() const {
+	std::vector<mvceditor::TagClass> res; 
 	std::vector<mvceditor::GlobalCacheClass*>::const_iterator it;
 	for (it = GlobalCaches.begin(); it != GlobalCaches.end(); ++it) {
-		std::vector<mvceditor::ResourceClass> finderResources = (*it)->ResourceFinder.AllNonNativeClasses();
+		std::vector<mvceditor::TagClass> finderResources = (*it)->ResourceFinder.AllNonNativeClasses();
 		res.insert(res.end(), finderResources.begin(), finderResources.end());
 	}
 	return res;
 }
 
-std::vector<mvceditor::ResourceClass> mvceditor::ResourceCacheClass::CollectFullyQualifiedResourceFromAll(const UnicodeString& search) {
-	std::vector<mvceditor::ResourceClass> matches;
-	mvceditor::ResourceSearchClass resourceSearch(search);
+std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectFullyQualifiedResourceFromAll(const UnicodeString& search) {
+	std::vector<mvceditor::TagClass> matches;
+	mvceditor::TagSearchClass tagSearch(search);
 
 	// return all of the matches from all finders that were found by the Collect* call.
 	// This is a bit tricky because we want to prioritize matches in opened files 
 	// instead of the global finder, since the global finder will be outdated.
-	std::vector<mvceditor::ResourceFinderClass*> finders = AllFinders();
-	std::map<wxString, mvceditor::ResourceFinderClass*> openedFinders;
+	std::vector<mvceditor::ParsedTagFinderClass*> finders = AllFinders();
+	std::map<wxString, mvceditor::ParsedTagFinderClass*> openedFinders;
 	std::map<wxString, mvceditor::WorkingCacheClass*>::const_iterator it;
 	for (it = WorkingCaches.begin(); it != WorkingCaches.end(); ++it) {
 		openedFinders[it->first] = &it->second->ResourceFinder;
 	}
 	for (size_t i = 0; i < finders.size(); ++i) {
-		mvceditor::ResourceFinderClass* resourceFinder = finders[i];
-		std::vector<mvceditor::ResourceClass> finderMatches = resourceFinder->CollectFullyQualifiedResource(resourceSearch);
+		mvceditor::ParsedTagFinderClass* tagFinder = finders[i];
+		std::vector<mvceditor::TagClass> finderMatches = tagFinder->CollectFullyQualifiedResource(tagSearch);
 		size_t count = finderMatches.size();
 		for (size_t j = 0; j < count; ++j) {
-			mvceditor::ResourceClass resource = finderMatches[j];
-			if (!mvceditor::IsResourceDirty(openedFinders, resource, resourceFinder)) {
-				matches.push_back(resource);
+			mvceditor::TagClass tag = finderMatches[j];
+			if (!mvceditor::IsResourceDirty(openedFinders, tag, tagFinder)) {
+				matches.push_back(tag);
 			}
 		}
 	}
@@ -280,15 +280,15 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceCacheClass::CollectFull
 	return matches;
 }
 
-std::vector<mvceditor::ResourceClass> mvceditor::ResourceCacheClass::CollectNearMatchResourcesFromAll(const UnicodeString& search) {
-	std::vector<mvceditor::ResourceClass> matches;
-	mvceditor::ResourceSearchClass resourceSearch(search);
+std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectNearMatchResourcesFromAll(const UnicodeString& search) {
+	std::vector<mvceditor::TagClass> matches;
+	mvceditor::TagSearchClass tagSearch(search);
 
 	// return all of the matches from all finders that were found by the Collect* call.
 	// This is a bit tricky because we want to prioritize matches in opened files 
 	// instead of the global finder, since the global finder will be outdated.
-	std::vector<mvceditor::ResourceFinderClass*> finders = AllFinders();
-	std::map<wxString, mvceditor::ResourceFinderClass*> openedFinders;
+	std::vector<mvceditor::ParsedTagFinderClass*> finders = AllFinders();
+	std::map<wxString, mvceditor::ParsedTagFinderClass*> openedFinders;
 	std::map<wxString, mvceditor::WorkingCacheClass*>::const_iterator it;
 	for (it = WorkingCaches.begin(); it != WorkingCaches.end(); ++it) {
 		if (it->second->IsNew) {
@@ -305,13 +305,13 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceCacheClass::CollectNear
 		}
 	}
 	for (size_t i = 0; i < finders.size(); ++i) {
-		mvceditor::ResourceFinderClass* resourceFinder = finders[i];
-		std::vector<mvceditor::ResourceClass> finderMatches = resourceFinder->CollectNearMatchResources(resourceSearch, true);
+		mvceditor::ParsedTagFinderClass* tagFinder = finders[i];
+		std::vector<mvceditor::TagClass> finderMatches = tagFinder->CollectNearMatchResources(tagSearch, true);
 		size_t count = finderMatches.size();
 		for (size_t j = 0; j < count; ++j) {
-			mvceditor::ResourceClass resource = finderMatches[j];
-			if (!mvceditor::IsResourceDirty(openedFinders, resource, resourceFinder)) {
-				matches.push_back(resource);
+			mvceditor::TagClass tag = finderMatches[j];
+			if (!mvceditor::IsResourceDirty(openedFinders, tag, tagFinder)) {
+				matches.push_back(tag);
 			}
 		}
 	}
@@ -319,8 +319,8 @@ std::vector<mvceditor::ResourceClass> mvceditor::ResourceCacheClass::CollectNear
 	return matches;
 }
 
-std::vector<mvceditor::ResourceFinderClass*> mvceditor::ResourceCacheClass::AllFinders() {
-	std::vector<mvceditor::ResourceFinderClass*> allResourceFinders;
+std::vector<mvceditor::ParsedTagFinderClass*> mvceditor::TagCacheClass::AllFinders() {
+	std::vector<mvceditor::ParsedTagFinderClass*> allResourceFinders;
 	std::map<wxString, mvceditor::WorkingCacheClass*>::iterator it;
 	for (it = WorkingCaches.begin(); it != WorkingCaches.end(); ++it) {
 		allResourceFinders.push_back(&it->second->ResourceFinder);
@@ -332,18 +332,18 @@ std::vector<mvceditor::ResourceFinderClass*> mvceditor::ResourceCacheClass::AllF
 	return allResourceFinders;
 }
 
-void mvceditor::ResourceCacheClass::ExpressionCompletionMatches(const wxString& fileName, const pelet::ExpressionClass& parsedExpression, 
+void mvceditor::TagCacheClass::ExpressionCompletionMatches(const wxString& fileName, const pelet::ExpressionClass& parsedExpression, 
 													const pelet::ScopeClass& expressionScope, 
 													 std::vector<UnicodeString>& autoCompleteList,
-													 std::vector<mvceditor::ResourceClass>& resourceMatches,
+													 std::vector<mvceditor::TagClass>& resourceMatches,
 													 bool doDuckTyping,
 													 mvceditor::SymbolTableMatchErrorClass& error) {
 	std::map<wxString, mvceditor::WorkingCacheClass*>::const_iterator itWorkingCache = WorkingCaches.find(fileName);
 	bool foundSymbolTable = false;
 	if (itWorkingCache != WorkingCaches.end()) {
 		foundSymbolTable = true;
-		std::vector<mvceditor::ResourceFinderClass*> allFinders = AllFinders();
-		std::map<wxString, mvceditor::ResourceFinderClass*> openedFinders;
+		std::vector<mvceditor::ParsedTagFinderClass*> allFinders = AllFinders();
+		std::map<wxString, mvceditor::ParsedTagFinderClass*> openedFinders;
 		std::map<wxString, mvceditor::WorkingCacheClass*>::const_iterator it;
 		for (it = WorkingCaches.begin(); it != WorkingCaches.end(); ++it) {
 			openedFinders[it->first] = &it->second->ResourceFinder;
@@ -358,17 +358,17 @@ void mvceditor::ResourceCacheClass::ExpressionCompletionMatches(const wxString& 
 	}
 }
 
-void mvceditor::ResourceCacheClass::ResourceMatches(const wxString& fileName, const pelet::ExpressionClass& parsedExpression, 
+void mvceditor::TagCacheClass::ResourceMatches(const wxString& fileName, const pelet::ExpressionClass& parsedExpression, 
 													const pelet::ScopeClass& expressionScope, 
-													std::vector<mvceditor::ResourceClass>& matches,
+													std::vector<mvceditor::TagClass>& matches,
 													bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 													mvceditor::SymbolTableMatchErrorClass& error) {
 	std::map<wxString, mvceditor::WorkingCacheClass*>::const_iterator itWorkingCache = WorkingCaches.find(fileName);
 	bool foundSymbolTable = false;
 	if (itWorkingCache != WorkingCaches.end()) {
 		foundSymbolTable = true;
-		std::vector<mvceditor::ResourceFinderClass*> allFinders = AllFinders();
-		std::map<wxString, mvceditor::ResourceFinderClass*> openedFinders;
+		std::vector<mvceditor::ParsedTagFinderClass*> allFinders = AllFinders();
+		std::map<wxString, mvceditor::ParsedTagFinderClass*> openedFinders;
 		std::map<wxString, mvceditor::WorkingCacheClass*>::const_iterator it;
 		for (it = WorkingCaches.begin(); it != WorkingCaches.end(); ++it) {
 			openedFinders[it->first] = &it->second->ResourceFinder;
@@ -382,7 +382,7 @@ void mvceditor::ResourceCacheClass::ResourceMatches(const wxString& fileName, co
 	}
 }
 
-void mvceditor::ResourceCacheClass::Print() {
+void mvceditor::TagCacheClass::Print() {
 	UFILE* ufout = u_finit(stdout, NULL, NULL);
 	u_fprintf(ufout, "Number of global caches: %d\n", GlobalCaches.size());
 	u_fprintf(ufout, "Number of working caches: %d\n", WorkingCaches.size());
@@ -393,10 +393,10 @@ void mvceditor::ResourceCacheClass::Print() {
 	}
 }
 
-bool mvceditor::ResourceCacheClass::IsFileCacheEmpty() {
+bool mvceditor::TagCacheClass::IsFileCacheEmpty() {
 	bool isEmpty = true;
 
-	// if at least one resource finder is not empty, return false
+	// if at least one tag finder is not empty, return false
 	std::vector<mvceditor::GlobalCacheClass*>::iterator it;
 	for (it = GlobalCaches.begin(); isEmpty && it != GlobalCaches.end(); ++it) {
 		isEmpty = (*it)->ResourceFinder.IsFileCacheEmpty();
@@ -404,10 +404,10 @@ bool mvceditor::ResourceCacheClass::IsFileCacheEmpty() {
 	return isEmpty;
 }
 
-bool mvceditor::ResourceCacheClass::IsResourceCacheEmpty() {
+bool mvceditor::TagCacheClass::IsResourceCacheEmpty() {
 	bool isEmpty = true;
 
-	// if at least one resource finder is not empty, return false
+	// if at least one tag finder is not empty, return false
 	std::vector<mvceditor::GlobalCacheClass*>::iterator it;
 	for (it = GlobalCaches.begin(); isEmpty && it != GlobalCaches.end(); ++it) {
 		isEmpty = (*it)->ResourceFinder.IsResourceCacheEmpty();
@@ -415,7 +415,7 @@ bool mvceditor::ResourceCacheClass::IsResourceCacheEmpty() {
 	return isEmpty;
 }
 
-void mvceditor::ResourceCacheClass::Clear() {
+void mvceditor::TagCacheClass::Clear() {
 
 	// ATTN: do NOT wipe finders, Clear() is meant for memory
 	// cleanup only
@@ -432,7 +432,7 @@ void mvceditor::ResourceCacheClass::Clear() {
 	WorkingCaches.clear();
 }
 
-void mvceditor::ResourceCacheClass::WipeGlobal() {
+void mvceditor::TagCacheClass::WipeGlobal() {
 
 	// ATTN: DO wipe finders this is an explict call
 	std::vector<mvceditor::GlobalCacheClass*>::iterator it;

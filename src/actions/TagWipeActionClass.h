@@ -31,13 +31,13 @@
 namespace mvceditor {
 
 /**
- * Class to 'wipe' resource databases (empty all of their contents)
+ * Class to 'wipe' tag databases (empty all of their contents)
  */
-class ResourceWipeActionClass : public mvceditor::ActionClass {
+class TagWipeActionClass : public mvceditor::ActionClass {
 	
 public:
 
-	ResourceWipeActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId,
+	TagWipeActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId,
 		const std::vector<mvceditor::ProjectClass>& projects);
 	
 	bool Init(mvceditor::GlobalsClass& globals);

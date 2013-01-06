@@ -45,7 +45,7 @@ static int ID_GLOBAL_CLASSES_THREAD = wxNewId();
 const wxEventType mvceditor::EVENT_RESOURCE_FINDER_COMPLETE = wxNewEventType();
 const wxEventType mvceditor::EVENT_GLOBAL_CLASSES_COMPLETE = wxNewEventType();
 
-mvceditor::ResourceFinderCompleteEventClass::ResourceFinderCompleteEventClass(int eventId, const std::vector<mvceditor::ResourceClass>& resources)
+mvceditor::ResourceFinderCompleteEventClass::ResourceFinderCompleteEventClass(int eventId, const std::vector<mvceditor::TagClass>& resources)
 	: wxEvent(eventId, mvceditor::EVENT_RESOURCE_FINDER_COMPLETE)
 	, Resources(resources) {
 		
@@ -104,9 +104,9 @@ void mvceditor::ResourceFinderBackgroundThreadClass::BackgroundWork() {
 			
 
 			// need this call so that resources are actually parsed
-			// need this so that the resource finder parsers the file
+			// need this so that the tag finder parsers the file
 			mvceditor::TagParserClass tagParser;
-			mvceditor::ResourceFinderClass resourceFinder;
+			mvceditor::ParsedTagFinderClass tagFinder;
 			try {
 				soci::session session(*soci::factory_sqlite3(), ":memory:");
 				wxString error;
@@ -118,8 +118,8 @@ void mvceditor::ResourceFinderBackgroundThreadClass::BackgroundWork() {
 				tagParser.PhpFileExtensions.push_back(wxT("*.*"));
 				tagParser.Walk(fileName);
 
-				resourceFinder.Init(&session);
-				std::vector<mvceditor::ResourceClass> resources = resourceFinder.All();
+				tagFinder.Init(&session);
+				std::vector<mvceditor::TagClass> resources = tagFinder.All();
 				if (!TestDestroy()) {
 					mvceditor::ResourceFinderCompleteEventClass evt(ID_RESOURCE_FINDER_BACKGROUND, resources);
 					PostEvent(evt);
@@ -161,10 +161,10 @@ void mvceditor::GlobalClassesThreadClass::BackgroundWork() {
 		try {
 			soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(mvceditor::ResourceSqlSchemaAsset().GetFullPath()));
 			
-			mvceditor::ResourceFinderClass finder;
+			mvceditor::ParsedTagFinderClass finder;
 			finder.Init(&session);
-			std::vector<mvceditor::ResourceClass> matches = finder.AllNonNativeClasses();
-			std::vector<mvceditor::ResourceClass>::iterator match;
+			std::vector<mvceditor::TagClass> matches = finder.AllNonNativeClasses();
+			std::vector<mvceditor::TagClass>::iterator match;
 			for (match = matches.begin(); match != matches.end() && !TestDestroy(); ++match) {
 				AllClasses.push_back(mvceditor::IcuToWx(match->ClassName));
 			}
@@ -232,35 +232,33 @@ void mvceditor::OutlineViewFeatureClass::BuildOutlineCurrentCodeControl() {
 	}
 }
 
-std::vector<mvceditor::ResourceClass> mvceditor::OutlineViewFeatureClass::BuildOutline(const wxString& className) {	
-	mvceditor::ResourceCacheClass* resourceCache =  GetResourceCache();
-	std::vector<mvceditor::ResourceClass> allMatches;
-	std::vector<mvceditor::ResourceClass> matches; 
+std::vector<mvceditor::TagClass> mvceditor::OutlineViewFeatureClass::BuildOutline(const wxString& className) {	
+	std::vector<mvceditor::TagClass> allMatches;
+	std::vector<mvceditor::TagClass> matches; 
 
-	// get the class resource itself
-	matches = resourceCache->CollectFullyQualifiedResourceFromAll(mvceditor::WxToIcu(className));
+	// get the class tag itself
+	matches = App.Globals.TagCache.CollectFullyQualifiedResourceFromAll(mvceditor::WxToIcu(className));
 	allMatches.insert(allMatches.end(), matches.begin(), matches.end());
 
-	// make the resource finder match on all methods / properties
+	// make the tag finder match on all methods / properties
 	UnicodeString lookup;
 	lookup += mvceditor::WxToIcu(className);
 	lookup += UNICODE_STRING_SIMPLE("::");
-	matches = GetResourceCache()->CollectNearMatchResourcesFromAll(lookup);
+	matches = App.Globals.TagCache.CollectNearMatchResourcesFromAll(lookup);
 	allMatches.insert(allMatches.end(), matches.begin(), matches.end());
 	return allMatches;
 }
 
-void mvceditor::OutlineViewFeatureClass::JumpToResource(const wxString& resource) {
-	mvceditor::ResourceCacheClass* resourceCache = GetResourceCache();
-	std::vector<mvceditor::ResourceClass> matches = resourceCache->CollectFullyQualifiedResourceFromAll(mvceditor::WxToIcu(resource));
+void mvceditor::OutlineViewFeatureClass::JumpToResource(const wxString& tag) {
+	std::vector<mvceditor::TagClass> matches = App.Globals.TagCache.CollectFullyQualifiedResourceFromAll(mvceditor::WxToIcu(tag));
 	if (!matches.empty()) {
-		mvceditor::ResourceClass resource = matches[0];
-		GetNotebook()->LoadPage(resource.GetFullPath());
+		mvceditor::TagClass tag = matches[0];
+		GetNotebook()->LoadPage(tag.GetFullPath());
 		CodeControlClass* codeControl = GetCurrentCodeControl();
 		if (codeControl) {
 			int32_t position, 
 				length;
-			bool found = mvceditor::ResourceFinderClass::GetResourceMatchPosition(resource, codeControl->GetSafeText(), position, length);
+			bool found = mvceditor::ParsedTagFinderClass::GetResourceMatchPosition(tag, codeControl->GetSafeText(), position, length);
 			if (found) {
 				codeControl->SetSelectionAndEnsureVisible(position, position + length);
 			}
@@ -365,36 +363,36 @@ void mvceditor::OutlineViewPanelClass::SetClasses(const std::vector<wxString>& c
 	Choice->Thaw();
 }
 
-void mvceditor::OutlineViewPanelClass::RefreshOutlines(const std::vector<mvceditor::ResourceClass>& resources) {
+void mvceditor::OutlineViewPanelClass::RefreshOutlines(const std::vector<mvceditor::TagClass>& resources) {
 	Tree->Freeze();
 	Tree->DeleteAllItems();
 	wxTreeItemId rootId = Tree->AddRoot(_("Outline"));
 	StatusLabel->SetLabel(_(""));
-	std::vector<mvceditor::ResourceClass>::const_iterator resource;
-	for (resource = resources.begin(); resource != resources.end(); ++resource) {
+	std::vector<mvceditor::TagClass>::const_iterator tag;
+	for (tag = resources.begin(); tag != resources.end(); ++tag) {
 
 		// for now never show dynamic resources since there is no way we can know where the source for them is.
-		int type = resource->Type;
-		if (mvceditor::ResourceClass::DEFINE == type && !resource->IsDynamic) {
-			UnicodeString res = resource->Identifier;
+		int type = tag->Type;
+		if (mvceditor::TagClass::DEFINE == type && !tag->IsDynamic) {
+			UnicodeString res = tag->Identifier;
 			wxString label = mvceditor::IcuToWx(res);
 			label = _("[D] ") + label;
 			Tree->AppendItem(rootId, label);
 		}
-		else if (mvceditor::ResourceClass::CLASS == type && !resource->IsDynamic) {
-			UnicodeString res = resource->Identifier;
+		else if (mvceditor::TagClass::CLASS == type && !tag->IsDynamic) {
+			UnicodeString res = tag->Identifier;
 			wxString label = mvceditor::IcuToWx(res);
 			label = _("[C] ") + label;
 			wxTreeItemId classId = Tree->AppendItem(rootId, label);
 
 			// for now just loop again through the resources
 			// for the class we are going to add
-			std::vector<mvceditor::ResourceClass>::const_iterator j;
+			std::vector<mvceditor::TagClass>::const_iterator j;
 			for (j = resources.begin(); j != resources.end(); ++j) {
-				if (j->ClassName.caseCompare(resource->Identifier, 0) == 0  && !j->IsDynamic) {
+				if (j->ClassName.caseCompare(tag->Identifier, 0) == 0  && !j->IsDynamic) {
 					UnicodeString res = j->Identifier;
 					wxString label = mvceditor::IcuToWx(res);
-					if (mvceditor::ResourceClass::MEMBER == j->Type) {
+					if (mvceditor::TagClass::MEMBER == j->Type) {
 						label = _("[P] ") + label;
 						if (!j->ReturnType.isEmpty()) {
 							wxString returnType = mvceditor::IcuToWx(j->ReturnType);
@@ -402,7 +400,7 @@ void mvceditor::OutlineViewPanelClass::RefreshOutlines(const std::vector<mvcedit
 						}
 						Tree->AppendItem(classId, label);
 					}
-					else if (mvceditor::ResourceClass::METHOD == j->Type) {
+					else if (mvceditor::TagClass::METHOD == j->Type) {
 						label = _("[M] ") + label;
 
 						// add the function signature to the label
@@ -417,26 +415,26 @@ void mvceditor::OutlineViewPanelClass::RefreshOutlines(const std::vector<mvcedit
 						}
 						Tree->AppendItem(classId, label);
 					}
-					else if (mvceditor::ResourceClass::CLASS_CONSTANT == j->Type) {
+					else if (mvceditor::TagClass::CLASS_CONSTANT == j->Type) {
 						label = _("[O] ") + label;
 						Tree->AppendItem(classId, label);
 					}
 				}
 			}
 		}
-		else if (mvceditor::ResourceClass::FUNCTION == type && !resource->IsDynamic) {
-			UnicodeString res = resource->Identifier;
+		else if (mvceditor::TagClass::FUNCTION == type && !tag->IsDynamic) {
+			UnicodeString res = tag->Identifier;
 			wxString label = mvceditor::IcuToWx(res);
 			label = _("[F] ") + label;
 
 			// add the function signature to the label
-			int32_t sigIndex = resource->Signature.indexOf(UNICODE_STRING_SIMPLE("function ")); 
+			int32_t sigIndex = tag->Signature.indexOf(UNICODE_STRING_SIMPLE("function ")); 
 			if (sigIndex >= 0) {
-				UnicodeString sig(resource->Signature, sigIndex + 9);
+				UnicodeString sig(tag->Signature, sigIndex + 9);
 				label = _("[F] ") + mvceditor::IcuToWx(sig);
 			}
-			if (!resource->ReturnType.isEmpty()) {
-				wxString returnType = mvceditor::IcuToWx(resource->ReturnType);
+			if (!tag->ReturnType.isEmpty()) {
+				wxString returnType = mvceditor::IcuToWx(tag->ReturnType);
 				label += wxT(" [") + returnType + wxT("]");
 			}
 			Tree->AppendItem(rootId, label);
@@ -464,7 +462,7 @@ void mvceditor::OutlineViewPanelClass::OnHelpButton(wxCommandEvent& event) {
 void mvceditor::OutlineViewPanelClass::OnChoice(wxCommandEvent& event) {
 	wxString lookup = event.GetString();
 	if (!lookup.IsEmpty()) {
-		std::vector<mvceditor::ResourceClass> resources = Feature->BuildOutline(lookup);
+		std::vector<mvceditor::TagClass> resources = Feature->BuildOutline(lookup);
 		RefreshOutlines(resources);
 	}
 }
@@ -485,12 +483,12 @@ void mvceditor::OutlineViewPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 		event.Skip();
 		return;
 	}
-	wxString resource;
+	wxString tag;
 	if (methodSig.StartsWith(wxT("[P]")) || methodSig.StartsWith(wxT("[M]"))) {
 		wxString classNameSig = Tree->GetItemText(parentItem);
 		classNameSig = classNameSig.Mid(4); // 4 = length of '[C] '
 
-		resource = classNameSig + wxT("::");
+		tag = classNameSig + wxT("::");
 		methodSig = methodSig.Mid(4); // 4= length of '[M] '
 		
 		// extract just the name from the label (function call args or property type)
@@ -499,12 +497,12 @@ void mvceditor::OutlineViewPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 			index = methodSig.Index(wxT('['));
 		}
 		if (wxNOT_FOUND != index) {
-			resource += methodSig.Mid(0, index);
+			tag += methodSig.Mid(0, index);
 		}
 		else {
 
 			// sig is not of a function, and prop does not have a type
-			resource += methodSig;
+			tag += methodSig;
 		}
 	}
 	else if (methodSig.StartsWith(wxT("[D]")) || methodSig.StartsWith(wxT("[F]"))) {
@@ -516,14 +514,14 @@ void mvceditor::OutlineViewPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 			index = methodSig.Index(wxT('['));
 		}
 		if (wxNOT_FOUND != index) {
-			resource += methodSig.Mid(0, index);
+			tag += methodSig.Mid(0, index);
 		}
 		else {
-			resource += methodSig;
+			tag += methodSig;
 		}
 	}
-	if (!resource.IsEmpty()) {
-		Feature->JumpToResource(resource);
+	if (!tag.IsEmpty()) {
+		Feature->JumpToResource(tag);
 	}
 	else {
 		event.Skip();

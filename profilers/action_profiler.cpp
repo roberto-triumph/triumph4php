@@ -24,7 +24,7 @@
  */
 #include <wx/wx.h>
 #include <actions/SequenceClass.h>
-#include <actions/ProjectResourceActionClass.h>
+#include <actions/ProjectTagActionClass.h>
 #include <actions/UrlDetectorActionClass.h>
 #include <unicode/uclean.h>
 #include <soci/mysql/soci-mysql.h>
@@ -133,7 +133,7 @@ void MyApp::Stop() {
 void MyApp::BuildSequence() {
 	std::vector<mvceditor::ActionClass*> actions;
 	actions.push_back(
-		new mvceditor::ProjectResourceActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE)
+		new mvceditor::ProjectTagActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE)
 	);
 	actions.push_back(
 		new mvceditor::UrlDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_DETECTOR)

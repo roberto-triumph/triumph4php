@@ -22,11 +22,11 @@
  * @copyright  2012 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <actions/ProjectResourceActionClass.h>
+#include <actions/ProjectTagActionClass.h>
 #include <code_control/ResourceCacheBuilderClass.h>
 #include <globals/Assets.h>
 
-mvceditor::ProjectResourceActionClass::ProjectResourceActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId) 
+mvceditor::ProjectTagActionClass::ProjectTagActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId) 
 	: ActionClass(runningThreads, eventId)
 	, Projects()
 	, DirectorySearch()
@@ -35,11 +35,11 @@ mvceditor::ProjectResourceActionClass::ProjectResourceActionClass(mvceditor::Run
 	, DoTouchedProjects(false) {
 }
 
-mvceditor::ProjectResourceActionClass::~ProjectResourceActionClass() {
+mvceditor::ProjectTagActionClass::~ProjectTagActionClass() {
 	BackgroundCleanup();
 }
 
-bool mvceditor::ProjectResourceActionClass::InitForFile(const mvceditor::ProjectClass& project, const wxString& fullPath, pelet::Versions version) {
+bool mvceditor::ProjectTagActionClass::InitForFile(const mvceditor::ProjectClass& project, const wxString& fullPath, pelet::Versions version) {
 	wxFileName fileName(fullPath);
 	if (!fileName.FileExists()) {
 		return false;
@@ -65,12 +65,12 @@ bool mvceditor::ProjectResourceActionClass::InitForFile(const mvceditor::Project
 	return false;
 }
 
-void mvceditor::ProjectResourceActionClass::SetTouchedProjects(const std::vector<mvceditor::ProjectClass>& touchedProjects) {
+void mvceditor::ProjectTagActionClass::SetTouchedProjects(const std::vector<mvceditor::ProjectClass>& touchedProjects) {
 	DoTouchedProjects = true;
 	Projects = touchedProjects;
 }
 
-bool mvceditor::ProjectResourceActionClass::Init(mvceditor::GlobalsClass& globals) {
+bool mvceditor::ProjectTagActionClass::Init(mvceditor::GlobalsClass& globals) {
 	Version = globals.Environment.Php.Version;
 	
 	// if we were not given projects, scan all of them
@@ -90,7 +90,7 @@ bool mvceditor::ProjectResourceActionClass::Init(mvceditor::GlobalsClass& global
 }
 
 
-void mvceditor::ProjectResourceActionClass::BackgroundWork() {
+void mvceditor::ProjectTagActionClass::BackgroundWork() {
 	if (DirectorySearch.More() && Projects.empty()) {
 		IterateDirectory();
 	}
@@ -99,7 +99,7 @@ void mvceditor::ProjectResourceActionClass::BackgroundWork() {
 	}
 }
 
-void mvceditor::ProjectResourceActionClass::IterateDirectory() {
+void mvceditor::ProjectTagActionClass::IterateDirectory() {
 	
 	// careful to test for destroy first
 	while (!IsCancelled() && DirectorySearch.More()) {
@@ -124,7 +124,7 @@ void mvceditor::ProjectResourceActionClass::IterateDirectory() {
 	}
 }
 
-void mvceditor::ProjectResourceActionClass::IterateProjects() {
+void mvceditor::ProjectTagActionClass::IterateProjects() {
 	for (size_t i = 0; !IsCancelled() && i < Projects.size(); ++i) {
 		mvceditor::ProjectClass project = Projects[i];
 		std::vector<wxString> miscFileExtensions = project.AllNonPhpExtensions();	
@@ -143,7 +143,7 @@ void mvceditor::ProjectResourceActionClass::IterateProjects() {
 	}
 }
 
-void mvceditor::ProjectResourceActionClass::BackgroundCleanup() {
+void mvceditor::ProjectTagActionClass::BackgroundCleanup() {
 	if (GlobalCache) {
 
 		// if the thread was stopped by the user (via a program exit), then we still 
@@ -153,7 +153,7 @@ void mvceditor::ProjectResourceActionClass::BackgroundCleanup() {
 	}
 }
 
-wxString mvceditor::ProjectResourceActionClass::GetLabel() const {
+wxString mvceditor::ProjectTagActionClass::GetLabel() const {
 	return _("Project Resource Parsing");
 }
 
@@ -165,26 +165,26 @@ mvceditor::ResourceCacheInitActionClass::ResourceCacheInitActionClass(mvceditor:
 void mvceditor::ResourceCacheInitActionClass::Work(mvceditor::GlobalsClass &globals) {
 
 	// need to clear the entire cache, then add only the newly enabled projects
-	globals.ResourceCache.Clear();
+	globals.TagCache.Clear();
 	pelet::Versions version = globals.Environment.Php.Version;
 	std::vector<wxString> otherFileExtensions = globals.GetNonPhpFileExtensions();
 	
-	// the resource cache will own all of the global cache pointers
+	// the tag cache will own all of the global cache pointers
 	mvceditor::GlobalCacheClass* nativeCache = new mvceditor::GlobalCacheClass;
 	nativeCache->Init(mvceditor::NativeFunctionsAsset(), globals.GetPhpFileExtensions(), otherFileExtensions, version);
-	globals.ResourceCache.RegisterGlobal(nativeCache);
+	globals.TagCache.RegisterGlobal(nativeCache);
 	
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
 		if (project->IsEnabled && !project->AllPhpSources().empty()) {
 
-			// register the project resource DB file now so that it is available for code completion
+			// register the project tag DB file now so that it is available for code completion
 			// even though we know it is stale. The user is notified that the
 			// cache is stale and may not have all of the results
-			// the resource cache will own these pointers
+			// the tag cache will own these pointers
 			mvceditor::GlobalCacheClass* projectCache = new mvceditor::GlobalCacheClass;
 			projectCache->Init(project->ResourceDbFileName, project->PhpFileExtensions, otherFileExtensions, version);
-			globals.ResourceCache.RegisterGlobal(projectCache);
+			globals.TagCache.RegisterGlobal(projectCache);
 		}
 	}
 }

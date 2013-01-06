@@ -157,7 +157,7 @@ bool CodeControlProfilerAppClass::OnInit() {
 		miscFileFilters;
 	phpFileFilters.push_back(wxT("*.php"));
 	globalCache->Init(mvceditor::NativeFunctionsAsset(), phpFileFilters, miscFileFilters, pelet::PHP_53);
-	Globals.ResourceCache.RegisterGlobal(globalCache);
+	Globals.TagCache.RegisterGlobal(globalCache);
 	
 	CodeControlFrameClass* frame = new CodeControlFrameClass(*this);
 	SetTopWindow(frame);

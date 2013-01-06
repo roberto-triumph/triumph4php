@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#include <language/ResourceCacheClass.h>
+#include <language/TagCacheClass.h>
 #include <php_frameworks/CallStackClass.h>
 #include <widgets/ThreadWithHeartbeatClass.h>
 #include <globals/Assets.h>
@@ -35,7 +35,7 @@
  * A full resource cache is required so that we can know the location
  * of the function definitions.
  */
-void CacheLargeProject(mvceditor::ResourceCacheClass& resourceCache, wxString dirName) ;
+void CacheLargeProject(mvceditor::TagCacheClass& tagCache, wxString dirName) ;
 
 class HandlerClass : public wxEvtHandler {
 
@@ -49,9 +49,9 @@ public:
 };
 
 HandlerClass Handler;
-mvceditor::ResourceCacheClass ResourceCache;
+mvceditor::TagCacheClass TagCache;
 mvceditor::RunningThreadsClass RunningThreads;
-mvceditor::CallStackClass CallStack(ResourceCache);
+mvceditor::CallStackClass CallStack(TagCache);
 wxString DirName;
 wxString StartingFile;
 
@@ -77,7 +77,7 @@ int main() {
 		DirName = wxT("/home/roberto/public_html/ember");
 		StartingFile = wxT("/home/roberto/public_html/ember/application/controllers/news.php");
 	}
-	CacheLargeProject(ResourceCache, DirName);
+	CacheLargeProject(TagCache, DirName);
 	
 	wxFileName fileName(StartingFile);
 	UnicodeString className = UNICODE_STRING_SIMPLE("News");
@@ -112,14 +112,14 @@ int main() {
 	return 0;
 }
 	
-void CacheLargeProject(mvceditor::ResourceCacheClass& resourceCache, wxString dirName) {
+void CacheLargeProject(mvceditor::TagCacheClass& tagCache, wxString dirName) {
 	std::vector<wxString> phpFileExtensions,
 		miscFileExtensions;
 	phpFileExtensions.push_back(wxT("*.php"));
 
 	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass;
 	globalCache->Init(mvceditor::NativeFunctionsAsset(), phpFileExtensions, miscFileExtensions, pelet::PHP_53);
-	resourceCache.RegisterGlobal(globalCache);
+	tagCache.RegisterGlobal(globalCache);
 	mvceditor::DirectorySearchClass directorySearch;
 	bool found = directorySearch.Init(dirName);
 	if (!found) {
@@ -136,7 +136,7 @@ void CacheLargeProject(mvceditor::ResourceCacheClass& resourceCache, wxString di
 		projectCache->Walk(directorySearch);
 	}
 
-	if (!resourceCache.RegisterGlobal(projectCache)) {
+	if (!tagCache.RegisterGlobal(projectCache)) {
 		printf("Could not initialize the project cache.\n");
 	}
 	if (!walked) {

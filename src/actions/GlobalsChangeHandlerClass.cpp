@@ -42,10 +42,10 @@ void mvceditor::GlobalsChangeHandlerClass::OnSqlMetaDataComplete(mvceditor::SqlM
 
 void mvceditor::GlobalsChangeHandlerClass::OnGlobalCacheComplete(mvceditor::GlobalCacheCompleteEventClass& event) {
 	mvceditor::GlobalCacheClass* globalCache = event.GlobalCache;
-	if (Globals.ResourceCache.IsInitGlobal(globalCache->ResourceDbFileName)) {
-		Globals.ResourceCache.RemoveGlobal(globalCache->ResourceDbFileName);
+	if (Globals.TagCache.IsInitGlobal(globalCache->ResourceDbFileName)) {
+		Globals.TagCache.RemoveGlobal(globalCache->ResourceDbFileName);
 	}
-	Globals.ResourceCache.RegisterGlobal(globalCache);
+	Globals.TagCache.RegisterGlobal(globalCache);
 }
 
 

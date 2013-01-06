@@ -40,8 +40,8 @@ namespace mvceditor {
 // forward declaration to prevent #include of the AppClass
 class AppClass;
 
-// forward declaration to prevent #include of the ResourceCacheClass
-class ResourceCacheClass;
+// forward declaration to prevent #include of the TagCacheClass
+class TagCacheClass;
 
 /**
  * ATTN: Use this enum to build the Feature menus
@@ -353,13 +353,6 @@ protected:
 	 * @return NotebookClass*
 	 */
 	NotebookClass* GetNotebook() const;
-
-	/**
-	 * The resource cache. Guaranteed to be not null. Do NOT delete the pointer
-	 * 
-	 * @return ResourceCacheClass*
-	 */
-	ResourceCacheClass* GetResourceCache();
 	
 	/**
 	 * Set the given page to be the selected page for the tools notebook

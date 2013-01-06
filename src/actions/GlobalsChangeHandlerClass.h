@@ -27,7 +27,7 @@
 
 #include <globals/GlobalsClass.h>
 #include <actions/SqlMetaDataActionClass.h>
-#include <actions/ProjectResourceActionClass.h>
+#include <actions/ProjectTagActionClass.h>
 #include <wx/event.h>
 
 namespace mvceditor {

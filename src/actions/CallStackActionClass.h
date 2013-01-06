@@ -70,7 +70,7 @@ private:
 	 * This is used by the call stack class to find out the file name (full paths) of the
 	 * classes / methods.
 	 */
-	mvceditor::ResourceCacheClass ResourceCache;
+	mvceditor::TagCacheClass TagCache;
 	
 	/**
 	 * Used to generate the call stack file (file of all function calls of a URL); call stack 

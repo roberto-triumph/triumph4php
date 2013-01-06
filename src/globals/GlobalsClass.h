@@ -30,7 +30,7 @@
 #include <globals/UrlResourceClass.h>
 #include <globals/ProjectClass.h>
 #include <globals/SqlResourceFinderClass.h>
-#include <language/ResourceCacheClass.h>
+#include <language/TagCacheClass.h>
 #include <vector>
 
 namespace mvceditor {
@@ -53,7 +53,7 @@ public:
 	/**
 	 * This object will be used to parse the resources of files that are currently open.
 	 */
-	ResourceCacheClass ResourceCache;
+	TagCacheClass TagCache;
 
 	/**
 	 * The URLs (entry points to the current project) that have been detected so far. Also holds the 

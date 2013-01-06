@@ -5,8 +5,8 @@
 
 mvceditor::CallStackActionClass::CallStackActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: ActionClass(runningThreads, eventId) 
-	, ResourceCache()
-	, CallStack(ResourceCache)
+	, TagCache()
+	, CallStack(TagCache)
 	, DetectorDbFileName()
 	, StartFileName() 
 	, StartClassName() 
@@ -27,11 +27,11 @@ bool mvceditor::CallStackActionClass::Init(mvceditor::GlobalsClass& globals) {
 	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
 		if (project->IsEnabled && !project->AllPhpSources().empty()) {
 
-			// register the project resource DB file now so that it is available for code completion
-			// the resource cache will own these pointers
+			// register the project tag DB file now so that it is available for code completion
+			// the tag cache will own these pointers
 			mvceditor::GlobalCacheClass* projectCache = new mvceditor::GlobalCacheClass;
 			projectCache->Init(project->ResourceDbFileName, project->PhpFileExtensions, otherFileExtensions, Version);
-			ResourceCache.RegisterGlobal(projectCache);
+			TagCache.RegisterGlobal(projectCache);
 			ret = true;
 		}
 	}

@@ -26,7 +26,7 @@
 #include <FileTestFixtureClass.h>
 #include <MvcEditorChecks.h>
 #include <language/TagParserClass.h>
-#include <search/ResourceFinderClass.h>
+#include <search/ParsedTagFinderClass.h>
 #include <globals/String.h>
 #include <globals/Assets.h>
 #include <globals/Sqlite.h>
@@ -38,18 +38,18 @@
 #include <algorithm>
 
 /**
- * This is a fixture to test that the resource finder works with
+ * This is a fixture to test that the tag finder works with
  * files.  We will use this sparingly since the parser (really the
  * LexicalAnalyzerClass) is the one responsible for tokenizing 
  * the input.
  * Using the file fixture less often means that tests run faster.
  */
-class ResourceFinderFileTestClass : public FileTestFixtureClass {
+class ParsedTagFinderFileTestClass : public FileTestFixtureClass {
 public:	
-	ResourceFinderFileTestClass() 
-		: FileTestFixtureClass(wxT("resource_finder"))
+	ParsedTagFinderFileTestClass() 
+		: FileTestFixtureClass(wxT("tag_finder"))
 		, TagParser()
-		, ResourceFinder()
+		, ParsedTagFinder()
 		, TestFile(wxT("test.php")) {
 		Session.open(*soci::factory_sqlite3(), ":memory:");
 		wxString error;
@@ -61,27 +61,27 @@ public:
 		if (wxDirExists(TestProjectDir)) {
 			RecursiveRmDir(TestProjectDir);
 		}
-		ResourceFinder.Init(&Session);
+		ParsedTagFinder.Init(&Session);
 	}
 	
 	/**
 	 * creates a file that will contain the given contents.
-	 * Then the resource finder is run on the new file
+	 * Then the tag finder is run on the new file
 	 */
 	void Prep(const wxString& source) {
 		CreateFixtureFile(TestFile, source);
 	}
 
 	void CollectNearMatchResources(const UnicodeString& search, bool doCollectFileNames = false) {
-		mvceditor::ResourceSearchClass resourceSearch(search);
-		Matches = ResourceFinder.CollectNearMatchResources(resourceSearch, doCollectFileNames);
+		mvceditor::TagSearchClass tagSearch(search);
+		Matches = ParsedTagFinder.CollectNearMatchResources(tagSearch, doCollectFileNames);
 	}
 
 	soci::session Session;
 	mvceditor::TagParserClass TagParser;
-	mvceditor::ResourceFinderClass ResourceFinder;
+	mvceditor::ParsedTagFinderClass ParsedTagFinder;
 	wxString TestFile;
-	std::vector<mvceditor::ResourceClass> Matches;
+	std::vector<mvceditor::TagClass> Matches;
 };
 
 /**
@@ -90,12 +90,12 @@ public:
  * lead to the tests running faster since we dont have to repeatedly
  * create and delete actual files.
  */
-class ResourceFinderMemoryTestClass {
+class ParsedTagFinderMemoryTestClass {
 public:	
-	ResourceFinderMemoryTestClass() 
+	ParsedTagFinderMemoryTestClass() 
 		: Session()
 		, TagParser()
-		, ResourceFinder()
+		, ParsedTagFinder()
 		, TestFile(wxT("test.php"))
 		, Matches() {
 		Session.open(*soci::factory_sqlite3(), ":memory:");
@@ -105,68 +105,68 @@ public:
 		}
 		TagParser.PhpFileExtensions.push_back(wxT("*.php"));
 		TagParser.Init(&Session);
-		ResourceFinder.Init(&Session);
+		ParsedTagFinder.Init(&Session);
 	}
 	
 	/**
-	 * will call the object under test (will make the resource finder 
+	 * will call the object under test (will make the tag finder 
 	 * parse the given source code. this is a bit different than the
-	 * ResourceFinderFileTestClass::Prep method
+	 * ParsedTagFinderFileTestClass::Prep method
 	 */
 	void Prep(const UnicodeString& source) {
 		TagParser.BuildResourceCacheForFile(TestFile, source, true);
 	}
 
 	void CollectNearMatchResources(const UnicodeString& search, bool doCollectFileNames = false) {
-		mvceditor::ResourceSearchClass resourceSearch(search);
-		Matches = ResourceFinder.CollectNearMatchResources(resourceSearch, doCollectFileNames);
+		mvceditor::TagSearchClass tagSearch(search);
+		Matches = ParsedTagFinder.CollectNearMatchResources(tagSearch, doCollectFileNames);
 	}
 
 	soci::session Session;
 	mvceditor::TagParserClass TagParser;
-	mvceditor::ResourceFinderClass ResourceFinder;
+	mvceditor::ParsedTagFinderClass ParsedTagFinder;
 	wxString TestFile;
-	std::vector<mvceditor::ResourceClass> Matches;
+	std::vector<mvceditor::TagClass> Matches;
 };
 
-class ResourceSearchTestClass {
+class TagSearchTestClass {
 
 public:
 
-	mvceditor::ResourceSearchClass* ResourceSearch;
+	mvceditor::TagSearchClass* TagSearch;
 
-	ResourceSearchTestClass()
-		: ResourceSearch(NULL) {
+	TagSearchTestClass()
+		: TagSearch(NULL) {
 	
 	}
 
-	~ResourceSearchTestClass() {
-		if (ResourceSearch) {
-			delete ResourceSearch;
+	~TagSearchTestClass() {
+		if (TagSearch) {
+			delete TagSearch;
 		}
 	}
 
 	void Make(const char* query) {
-		ResourceSearch = new mvceditor::ResourceSearchClass(mvceditor::CharToIcu(query));
+		TagSearch = new mvceditor::TagSearchClass(mvceditor::CharToIcu(query));
 	}
 
 };
 
-#define CHECK_MEMBER_RESOURCE(className, identifier, resource) \
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE(className), resource.ClassName);\
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE(identifier), resource.Identifier);
+#define CHECK_MEMBER_RESOURCE(className, identifier, tag) \
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE(className), tag.ClassName);\
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE(identifier), tag.Identifier);
 
-#define CHECK_RESOURCE(identifier, resource) \
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE(identifier), resource.Identifier);
+#define CHECK_RESOURCE(identifier, tag) \
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE(identifier), tag.Identifier);
 
-#define CHECK_NAMESPACE_RESOURCE(namespaceName, identifier, resource) \
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE(namespaceName), resource.NamespaceName);\
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE(identifier), resource.Identifier);
+#define CHECK_NAMESPACE_RESOURCE(namespaceName, identifier, tag) \
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE(namespaceName), tag.NamespaceName);\
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE(identifier), tag.Identifier);
 
 
-SUITE(ResourceFinderTestClass) {
+SUITE(ParsedTagFinderTestClass) {
 
-TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameMatches) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameMatches) {
 	Prep(wxString::FromAscii(
 		"<?php\n"
 		"$s = 'hello';\n"
@@ -179,7 +179,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 }
 
-TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameMatchesMiscFiles) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameMatchesMiscFiles) {
 	Prep(wxString::FromAscii(
 		"<?php\n"
 		"$s = 'hello';\n"
@@ -199,7 +199,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 	CHECK_EQUAL(TestProjectDir + miscFile, Matches[0].GetFullPath());
 }
 
-TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameIsASubset) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameIsASubset) {
 	Prep(wxString::FromAscii(
 		"<?php\n"
 		"$s = 'hello';\n"
@@ -212,7 +212,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 }
 
-TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldNotFindFileWhenFileNameMatchesButLineNumberIsTooBig) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldNotFindFileWhenFileNameMatchesButLineNumberIsTooBig) {
 	Prep(wxString::FromAscii(
 		"<?php\n"
 		"$s = 'hello';\n"
@@ -222,11 +222,11 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldNotFind
 	TagParser.Walk(TestProjectDir + TestFile);
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("test.php:100"));
 	CHECK_VECTOR_SIZE(0, Matches);
-	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("test.php:100"));
-	CHECK_EQUAL(100, resourceSearch.GetLineNumber());
+	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("test.php:100"));
+	CHECK_EQUAL(100, tagSearch.GetLineNumber());
 }
 
-TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameMatchesAndFileHasDifferentLineEndings) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameMatchesAndFileHasDifferentLineEndings) {
 	
 	// should count unix, windows & mac line endings
 	Prep(wxString::FromAscii(
@@ -243,7 +243,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 }
 
-TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameDoesNotMatchCase) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameDoesNotMatchCase) {
 	TestFile = wxT("TeST.php");
 	Prep(wxString::FromAscii(
 		"<?php\n"
@@ -259,7 +259,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 }
 
-TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameSearchDoesNotMatchCase) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameSearchDoesNotMatchCase) {
 	TestFile = wxT("test.php");
 	Prep(wxString::FromAscii(
 		"<?php\n"
@@ -275,7 +275,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindFil
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhenClassNameMatches) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhenClassNameMatches) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"/** this is my class */\n"
@@ -290,15 +290,15 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
-	mvceditor::ResourceClass resource = Matches[0];
-	CHECK_NAMESPACE_RESOURCE("\\", "UserClass", resource);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), resource.ReturnType);
-	CHECK_UNISTR_EQUALS("class UserClass", resource.Signature);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** this is my class */"), resource.Comment);
-	CHECK_EQUAL(mvceditor::ResourceClass::CLASS, resource.Type);
+	mvceditor::TagClass tag = Matches[0];
+	CHECK_NAMESPACE_RESOURCE("\\", "UserClass", tag);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), tag.ReturnType);
+	CHECK_UNISTR_EQUALS("class UserClass", tag.Signature);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** this is my class */"), tag.Comment);
+	CHECK_EQUAL(mvceditor::TagClass::CLASS, tag.Type);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldNotFindFileWhenClassNameDoesNotMatch) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldNotFindFileWhenClassNameDoesNotMatch) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -313,7 +313,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldNotFi
 	CHECK_VECTOR_SIZE(0, Matches);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldUseFileSearchWhenResourceIsNotFound) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldUseFileSearchWhenResourceIsNotFound) {
 	TestFile = wxT("UserClass.php");
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
@@ -330,7 +330,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldUseFi
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhenClassNameIsNotTheExactSame) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhenClassNameIsNotTheExactSame) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserAdmin {\n"
@@ -346,7 +346,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhenClassNameHasAnExtends) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhenClassNameHasAnExtends) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class User extends Human {\n"
@@ -361,7 +361,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 	CHECK_VECTOR_SIZE(1, Matches);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhenClassNameAndMethodNameMatch) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhenClassNameAndMethodNameMatch) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -376,16 +376,16 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass::getName"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
-	mvceditor::ResourceClass resource = Matches[0];
-	CHECK_MEMBER_RESOURCE("UserClass", "getName", resource);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\"), resource.NamespaceName);
-	CHECK_UNISTR_EQUALS("string", resource.ReturnType);
-	CHECK_UNISTR_EQUALS("string public function getName()", resource.Signature);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** returns the name @return string */"), resource.Comment);
-	CHECK_EQUAL(mvceditor::ResourceClass::METHOD, resource.Type);
+	mvceditor::TagClass tag = Matches[0];
+	CHECK_MEMBER_RESOURCE("UserClass", "getName", tag);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\"), tag.NamespaceName);
+	CHECK_UNISTR_EQUALS("string", tag.ReturnType);
+	CHECK_UNISTR_EQUALS("string public function getName()", tag.Signature);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** returns the name @return string */"), tag.Comment);
+	CHECK_EQUAL(mvceditor::TagClass::METHOD, tag.Type);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhenClassNameAndSecondMethodNameMatch) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhenClassNameAndSecondMethodNameMatch) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -404,7 +404,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldNotFindFileWhenClassNameMatchesButMethodNameDoesNot) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldNotFindFileWhenClassNameMatchesButMethodNameDoesNot) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -419,7 +419,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldNotFi
 	CHECK_VECTOR_SIZE(0, Matches);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhendMethodNameMatchesButClassIsNotGiven) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhendMethodNameMatchesButClassIsNotGiven) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -436,7 +436,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 	CHECK_MEMBER_RESOURCE("UserClass", "getName", Matches[0]);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldOnlySaveTheExactMatchWhenAnExactMatchIsFound) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldOnlySaveTheExactMatchWhenAnExactMatchIsFound) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -459,7 +459,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldOnlyS
 	CHECK_EQUAL(false, Matches[0].IsNative);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindTwoFilesWhenClassNameMatches) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindTwoFilesWhenClassNameMatches) {
 	wxString testFile = wxT("test.php");
 	wxString testFile2 = wxT("test2.php");
 	TestFile = testFile;
@@ -490,7 +490,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindT
 	CHECK_EQUAL(testFile2, Matches[1].GetFullPath());
 }
 
-TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldNotFindFileWhenItHasBeenModified) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldNotFindFileWhenItHasBeenModified) {
 	Prep(wxString::FromAscii(
 		"<?php\n"
 		"class UserClass {\n"
@@ -521,7 +521,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldNotFind
 	CHECK_VECTOR_SIZE(0, Matches);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindClassAfterFindingFile) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindClassAfterFindingFile) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -545,7 +545,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindC
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFunctionWhenFunctionNameMatches) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFunctionWhenFunctionNameMatches) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -562,15 +562,15 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindF
 	));	
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("printUser"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	mvceditor::ResourceClass resource = Matches[0];
-	CHECK_UNISTR_EQUALS("printUser", resource.Identifier);
-	CHECK_UNISTR_EQUALS("void", resource.ReturnType);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("function printUser($user)"), resource.Signature);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** print a user @return void */"), resource.Comment);
-	CHECK_EQUAL(mvceditor::ResourceClass::FUNCTION, resource.Type);
+	mvceditor::TagClass tag = Matches[0];
+	CHECK_UNISTR_EQUALS("printUser", tag.Identifier);
+	CHECK_UNISTR_EQUALS("void", tag.ReturnType);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("function printUser($user)"), tag.Signature);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** print a user @return void */"), tag.Comment);
+	CHECK_EQUAL(mvceditor::TagClass::FUNCTION, tag.Type);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForClassesAndFunctions) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForClassesAndFunctions) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -596,7 +596,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 	CHECK_UNISTR_EQUALS("userClassPrint", Matches[1].Identifier);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForClassMembers) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForClassMembers) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -610,16 +610,16 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 	));	
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass::name"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	mvceditor::ResourceClass resource = Matches[0];
-	CHECK_MEMBER_RESOURCE("UserClass", "name", resource);
-	CHECK_UNISTR_EQUALS("string", resource.ReturnType);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::name"), resource.Signature);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** the user name @var string */"), resource.Comment);
-	CHECK_EQUAL(mvceditor::ResourceClass::MEMBER, resource.Type);
+	mvceditor::TagClass tag = Matches[0];
+	CHECK_MEMBER_RESOURCE("UserClass", "name", tag);
+	CHECK_UNISTR_EQUALS("string", tag.ReturnType);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::name"), tag.Signature);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** the user name @var string */"), tag.Comment);
+	CHECK_EQUAL(mvceditor::TagClass::MEMBER, tag.Type);
 }
 
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForClassConstant) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForClassConstant) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -633,15 +633,15 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 	));	
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass::MAX"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	mvceditor::ResourceClass resource = Matches[0];
-	CHECK_MEMBER_RESOURCE("UserClass", "MAX", resource);
-	CHECK_UNISTR_EQUALS("int", resource.ReturnType);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::MAX"), resource.Signature);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** the max constant @var int */"), resource.Comment);
-	CHECK_EQUAL(mvceditor::ResourceClass::CLASS_CONSTANT, resource.Type);
+	mvceditor::TagClass tag = Matches[0];
+	CHECK_MEMBER_RESOURCE("UserClass", "MAX", tag);
+	CHECK_UNISTR_EQUALS("int", tag.ReturnType);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::MAX"), tag.Signature);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** the max constant @var int */"), tag.Comment);
+	CHECK_EQUAL(mvceditor::TagClass::CLASS_CONSTANT, tag.Type);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForDefines) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForDefines) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"/** the max constant @var int */\n"
@@ -650,15 +650,15 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 	));	
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("MAX_ITEMS"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	mvceditor::ResourceClass resource = Matches[0];
-	CHECK_UNISTR_EQUALS("MAX_ITEMS", resource.Identifier);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), resource.ReturnType);
-	CHECK_UNISTR_EQUALS("1", resource.Signature);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** the max constant @var int */"), resource.Comment);
-	CHECK_EQUAL(mvceditor::ResourceClass::DEFINE, resource.Type);
+	mvceditor::TagClass tag = Matches[0];
+	CHECK_UNISTR_EQUALS("MAX_ITEMS", tag.Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), tag.ReturnType);
+	CHECK_UNISTR_EQUALS("1", tag.Signature);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** the max constant @var int */"), tag.Comment);
+	CHECK_EQUAL(mvceditor::TagClass::DEFINE, tag.Type);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForCorrectClassMethod) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForCorrectClassMethod) {
 	
 	// adding 2 classes to the file because we want to test that the code can differentiate the two classes and
 	// match only on the class given
@@ -683,7 +683,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 	CHECK_MEMBER_RESOURCE("UserClass", "get", Matches[0]);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindPartialMatchesForCorrectClassMethod) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindPartialMatchesForCorrectClassMethod) {
 	
 	// adding 2 classes to the file because we want to test that the code can differentiate the two classes and
 	// match only on the class given
@@ -708,7 +708,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindP
 	CHECK_MEMBER_RESOURCE("UserClass", "getName", Matches[0]);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindPartialMatchesForClassMethodsWithNoClassName) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindPartialMatchesForClassMethodsWithNoClassName) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -730,9 +730,9 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindP
 	CHECK_MEMBER_RESOURCE("UserClass", "getName", Matches[0]);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForNativeFunctions) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForNativeFunctions) {
 	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(mvceditor::NativeFunctionsAsset().GetFullPath()));
-	ResourceFinder.Init(&session);
+	ParsedTagFinder.Init(&session);
 
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("array_key"));
 	CHECK_VECTOR_SIZE(2, Matches);
@@ -765,7 +765,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 	CHECK_UNISTR_EQUALS("Exception", Matches[0].ClassName);
 }
 
-TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindMatchesWhenUsingBuildResourceCacheForFile) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldFindMatchesWhenUsingBuildResourceCacheForFile) {
 	
 	// write a file, "modify" the file in memory by adding a method, we should find the new method
 	wxString code  = wxString::FromAscii(
@@ -807,7 +807,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectNearMatchResourcesShouldFindMat
 	CHECK_UNISTR_EQUALS("printUserList", Matches[1].Identifier);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesWhenUsingBuildResourceCacheForFileAndUsingNewFile) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesWhenUsingBuildResourceCacheForFileAndUsingNewFile) {
 	Prep(mvceditor::CharToIcu(
 		
 		// this simulates the user writing a completely new file that has yet to be saved.
@@ -843,7 +843,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldFindM
 	CHECK_UNISTR_EQUALS("printUser", Matches[0].Identifier);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldCollectAllMethodsWhenClassIsNotGiven) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldCollectAllMethodsWhenClassIsNotGiven) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -872,7 +872,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldColle
 	CHECK_MEMBER_RESOURCE("UserClass", "userName", Matches[2]);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldNotCollectParentClassesWhenInheritedClassNameIsGiven) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldNotCollectParentClassesWhenInheritedClassNameIsGiven) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -899,7 +899,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchResourcesShouldNotCo
 	CHECK_UNISTR_EQUALS("AdminClass", Matches[0].Identifier);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesShouldFindFileWhenClassNameMatches) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectFullyQualifiedResourcesShouldFindFileWhenClassNameMatches) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -909,17 +909,17 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesShould
 		"\t}\n"
 		"}\n"
 	));	
-	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("UserClass"));
-	Matches = ResourceFinder.CollectFullyQualifiedResource(resourceSearch);
+	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("UserClass"));
+	Matches = ParsedTagFinder.CollectFullyQualifiedResource(tagSearch);
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesShouldFindFileWhenClassAndPropertyNameAreTheSame) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectFullyQualifiedResourcesShouldFindFileWhenClassAndPropertyNameAreTheSame) {
 		
 	// the name of the class and the name of the property are the same
-	// the method under test should know the difference and only return the class resource
+	// the method under test should know the difference and only return the class tag
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -937,15 +937,15 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesShould
 		"}\n"
 		"?>\n"
 	));	
-	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("SetClass"));
-	Matches = ResourceFinder.CollectFullyQualifiedResource(resourceSearch);
+	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("SetClass"));
+	Matches = ParsedTagFinder.CollectFullyQualifiedResource(tagSearch);
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("SetClass", Matches[0].Identifier);
 	CHECK_UNISTR_EQUALS("SetClass", Matches[0].ClassName);
-	CHECK_EQUAL(mvceditor::ResourceClass::CLASS, Matches[0].Type);
+	CHECK_EQUAL(mvceditor::TagClass::CLASS, Matches[0].Type);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesShouldFindMatchesForCorrectClassMethod) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectFullyQualifiedResourcesShouldFindMatchesForCorrectClassMethod) {
 	
 	// adding 2 classes to the file because we want to test that the code can differentiate the two classes and
 	// match only on the class given
@@ -965,13 +965,13 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesShould
 		"}\n"
 		"?>\n"
 	));	
-	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("UserClass::get"));
-	Matches = ResourceFinder.CollectFullyQualifiedResource(resourceSearch);
+	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("UserClass::get"));
+	Matches = ParsedTagFinder.CollectFullyQualifiedResource(tagSearch);
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_MEMBER_RESOURCE("UserClass", "get", Matches[0]);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesShouldNotFindFileWhenClassNameDoesNotMatch) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectFullyQualifiedResourcesShouldNotFindFileWhenClassNameDoesNotMatch) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -981,14 +981,14 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectFullyQualifiedResourcesShould
 		"\t}\n"
 		"}\n"
 	));	
-	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("User"));
-	Matches = ResourceFinder.CollectFullyQualifiedResource(resourceSearch);
+	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("User"));
+	Matches = ParsedTagFinder.CollectFullyQualifiedResource(tagSearch);
 	CHECK_VECTOR_SIZE(0, Matches);
 }
 
-TEST_FIXTURE(ResourceFinderFileTestClass, CollectFullyQualifiedResourcesShouldFindClassWhenFileHasBeenModified) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectFullyQualifiedResourcesShouldFindClassWhenFileHasBeenModified) {
 	
-	// this method is testing the scenario where the resource cache is modified and when the CollectFullyQualifiedResource
+	// this method is testing the scenario where the tag cache is modified and when the CollectFullyQualifiedResource
 	// method is checked that the cache is re-sorted and searched correctly
 	Prep(wxString::FromAscii(
 		"<?php\n"
@@ -1022,19 +1022,19 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectFullyQualifiedResourcesShouldFi
 		"?>\n"
 	));
 	TagParser.Walk(TestProjectDir + TestFile);
-	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("AdminClass"));
-	Matches = ResourceFinder.CollectFullyQualifiedResource(resourceSearch);
+	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("AdminClass"));
+	Matches = ParsedTagFinder.CollectFullyQualifiedResource(tagSearch);
 	CHECK_VECTOR_SIZE(1, Matches);
 
 	// make sure that file lookups work as well
-	mvceditor::ResourceSearchClass resourceFileSearch(UNICODE_STRING_SIMPLE("test.php"));
-	Matches = ResourceFinder.CollectNearMatchResources(resourceFileSearch);
+	mvceditor::TagSearchClass tagFileSearch(UNICODE_STRING_SIMPLE("test.php"));
+	Matches = ParsedTagFinder.CollectNearMatchResources(tagFileSearch);
 	CHECK_VECTOR_SIZE(1, Matches);
 }
 
-TEST_FIXTURE(ResourceFinderFileTestClass, CollectFullyQualifiedResourcesShouldFindClassWhenFileHasBeenDeleted) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectFullyQualifiedResourcesShouldFindClassWhenFileHasBeenDeleted) {
 	
-	// this method is testing the scenario where the resource cache invalidates matches when files have been deleted
+	// this method is testing the scenario where the tag cache invalidates matches when files have been deleted
 	Prep(wxString::FromAscii(
 		"<?php\n"
 		"class UserClass {\n"
@@ -1045,13 +1045,13 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectFullyQualifiedResourcesShouldFi
 		"}\n"
 		"?>\n"
 	));	
-	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("UserClass"));
+	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("UserClass"));
 	TagParser.Walk(TestProjectDir + TestFile);
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 	CHECK(wxRemoveFile(TestProjectDir + TestFile));
-	Matches = ResourceFinder.CollectFullyQualifiedResource(resourceSearch);
+	Matches = ParsedTagFinder.CollectFullyQualifiedResource(tagSearch);
 
 	// before this was expected to be zero, but the code that ensures matched files
 	// exist is gone from the CollectNearMatchResources method because of performance
@@ -1060,7 +1060,7 @@ TEST_FIXTURE(ResourceFinderFileTestClass, CollectFullyQualifiedResourcesShouldFi
 	CHECK_VECTOR_SIZE(1, Matches);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceMatchShouldReturnSignatureForConstructors) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceMatchShouldReturnSignatureForConstructors) {
 	 Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -1082,13 +1082,13 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceMatchShouldReturnSignatur
 		"}\n"
 		"?>\n"
 	));
-	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("UserClass::__construct"));
-	Matches = ResourceFinder.CollectFullyQualifiedResource(resourceSearch);
-	mvceditor::ResourceClass resource = Matches[0];
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("public function __construct($name)"), resource.Signature);
+	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("UserClass::__construct"));
+	Matches = ParsedTagFinder.CollectFullyQualifiedResource(tagSearch);
+	mvceditor::TagClass tag = Matches[0];
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("public function __construct($name)"), tag.Signature);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceParentClassShouldReturnParentClass) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceParentClassShouldReturnParentClass) {
 	 Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -1105,10 +1105,10 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceParentClassShouldReturnPa
 		"}\n"
 		"?>\n"
 	));
-	CHECK_UNISTR_EQUALS("UserClass", ResourceFinder.GetResourceParentClassName(UNICODE_STRING_SIMPLE("AdminClass")));
+	CHECK_UNISTR_EQUALS("UserClass", ParsedTagFinder.GetResourceParentClassName(UNICODE_STRING_SIMPLE("AdminClass")));
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceParentClassShouldReturnParentClassForDeepHierarchy) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceParentClassShouldReturnParentClassForDeepHierarchy) {
 	 Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -1124,11 +1124,11 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceParentClassShouldReturnPa
 		"}\n"
 		"?>\n"
 	));
-	CHECK_UNISTR_EQUALS("AdminClass", ResourceFinder.GetResourceParentClassName(UNICODE_STRING_SIMPLE("SuperAdminClass")));
-	CHECK_UNISTR_EQUALS("UserClass", ResourceFinder.GetResourceParentClassName(UNICODE_STRING_SIMPLE("AdminClass")));
+	CHECK_UNISTR_EQUALS("AdminClass", ParsedTagFinder.GetResourceParentClassName(UNICODE_STRING_SIMPLE("SuperAdminClass")));
+	CHECK_UNISTR_EQUALS("UserClass", ParsedTagFinder.GetResourceParentClassName(UNICODE_STRING_SIMPLE("AdminClass")));
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceMatchPositionShouldReturnValidPositionsForClassMethodFunctionAndMember) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceMatchPositionShouldReturnValidPositionsForClassMethodFunctionAndMember) {
 	 UnicodeString icuCode = mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -1147,7 +1147,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceMatchPositionShouldReturn
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("UserClass", Matches[0].Identifier);
-	CHECK(mvceditor::ResourceFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
+	CHECK(mvceditor::ParsedTagFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
 	CHECK_EQUAL(6, pos);
 	CHECK_EQUAL(16, length);
 	
@@ -1155,7 +1155,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceMatchPositionShouldReturn
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("::getName"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_MEMBER_RESOURCE("UserClass", "getName", Matches[0]);
-	CHECK(mvceditor::ResourceFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
+	CHECK(mvceditor::ParsedTagFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
 	CHECK_EQUAL(icuCode.indexOf(UNICODE_STRING_SIMPLE("function getName()")), (int32_t)pos);
 	CHECK_EQUAL(17, length);
 	
@@ -1163,7 +1163,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceMatchPositionShouldReturn
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass::name"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_MEMBER_RESOURCE("UserClass", "name", Matches[0]);
-	CHECK(mvceditor::ResourceFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
+	CHECK(mvceditor::ParsedTagFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
 	CHECK_EQUAL(icuCode.indexOf(UNICODE_STRING_SIMPLE("private $name")), (int32_t)pos);
 	CHECK_EQUAL(14, length);
 	
@@ -1171,12 +1171,12 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceMatchPositionShouldReturn
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("printUser"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("printUser", Matches[0].Identifier);
-	CHECK(mvceditor::ResourceFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
+	CHECK(mvceditor::ParsedTagFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
 	CHECK_EQUAL(icuCode.indexOf(UNICODE_STRING_SIMPLE("function printUser")), (int32_t)pos);
 	CHECK_EQUAL(19, length);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectQualifiedResourceNamespaces) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectQualifiedResourceNamespaces) {
 	 Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"namespace First\\Child; \n"
@@ -1187,13 +1187,13 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectQualifiedResourceNamespaces) 
 		"function singleWork() { } \n"
 		"?>\n"
 	));
-	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"));
-	Matches = ResourceFinder.CollectFullyQualifiedResource(resourceSearch);
+	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"));
+	Matches = ParsedTagFinder.CollectFullyQualifiedResource(tagSearch);
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), Matches[0].Identifier);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectQualifiedResourceNamespacesShouldNotFindDuplicates) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectQualifiedResourceNamespacesShouldNotFindDuplicates) {
 	 Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"namespace First\\Child; \n"
@@ -1214,14 +1214,14 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectQualifiedResourceNamespacesSh
 		"\n"
 		"?>\n"
 	));	
-	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"));
-	Matches = ResourceFinder.CollectFullyQualifiedResource(resourceSearch);
+	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"));
+	Matches = ParsedTagFinder.CollectFullyQualifiedResource(tagSearch);
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), Matches[0].Identifier);
 
-	std::vector<mvceditor::ResourceClass> all = ResourceFinder.All();
+	std::vector<mvceditor::TagClass> all = ParsedTagFinder.All();
 
-	//  6 resources total
+	//  6 tags total
 	// namespace First\\Child 
 	// class MyClass
 	// function MyClass::work
@@ -1231,7 +1231,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectQualifiedResourceNamespacesSh
 	CHECK_VECTOR_SIZE(6, all);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectResourceInGlobalNamespaces) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectResourceInGlobalNamespaces) {
 	 Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class MyClass {\n"
@@ -1241,18 +1241,18 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectResourceInGlobalNamespaces) {
 		"function singleWork() { } \n"
 		"?>\n"
 	));
-	 mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("\\MyClass"));
-	Matches = ResourceFinder.CollectFullyQualifiedResource(resourceSearch);
+	 mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("\\MyClass"));
+	Matches = ParsedTagFinder.CollectFullyQualifiedResource(tagSearch);
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("\\MyClass", Matches[0].Identifier);
 	
-	mvceditor::ResourceSearchClass resourceSearchFunction(UNICODE_STRING_SIMPLE("\\singleWork"));
-	Matches = ResourceFinder.CollectFullyQualifiedResource(resourceSearchFunction);
+	mvceditor::TagSearchClass tagSearchFunction(UNICODE_STRING_SIMPLE("\\singleWork"));
+	Matches = ParsedTagFinder.CollectFullyQualifiedResource(tagSearchFunction);
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("\\singleWork", Matches[0].Identifier);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchNamespaces) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchNamespaces) {
 	 Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"namespace First\\Child; \n"
@@ -1276,7 +1276,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchNamespaces) {
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\singleWork"), Matches[2].Identifier);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchNamespaceQualifiedClassesAndFunctions) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchNamespaceQualifiedClassesAndFunctions) {
 	 Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"namespace First\\Child; \n"
@@ -1301,7 +1301,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchNamespaceQualifiedCl
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\singleWork"), Matches[1].Identifier);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchNamespaceQualifiedClassesShouldIgnoreOtherNamespaces) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchNamespaceQualifiedClassesShouldIgnoreOtherNamespaces) {
 	 Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"namespace First\\Child { \n"
@@ -1317,7 +1317,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchNamespaceQualifiedCl
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\Second\\Child\\MyClass"), Matches[0].Identifier);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraitMembers) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchesShouldFindTraitMembers) {
 	TagParser.SetVersion(pelet::PHP_54);
 	Prep(mvceditor::CharToIcu(
 		"trait ezcReflectionReturnInfo { "
@@ -1330,21 +1330,21 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraitMem
 		"}"
 	));
 	
-	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("ezcReflectionMethod::getReturn"));
+	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("ezcReflectionMethod::getReturn"));
 	
-	// tell the resource finder to look for traits
+	// tell the tag finder to look for traits
 	std::vector<UnicodeString> traits;
 	traits.push_back(UNICODE_STRING_SIMPLE("ezcReflectionReturnInfo"));
-	resourceSearch.SetTraits(traits);
+	tagSearch.SetTraits(traits);
 
-	Matches = ResourceFinder.CollectNearMatchResources(resourceSearch);
+	Matches = ParsedTagFinder.CollectNearMatchResources(tagSearch);
 
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_MEMBER_RESOURCE("ezcReflectionReturnInfo", "getReturnType", Matches[0]);
 	CHECK_UNISTR_EQUALS("getReturnType", Matches[0].Identifier);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraitsWhenLookingForAllMethods) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchesShouldFindTraitsWhenLookingForAllMethods) {
 	TagParser.SetVersion(pelet::PHP_54); 
 	Prep(mvceditor::CharToIcu(
 		"trait ezcReflectionReturnInfo { "
@@ -1360,15 +1360,15 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraitsWh
 		"	 }"
 		"}"
 	));
-	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("ezcReflectionMethod::"));
+	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("ezcReflectionMethod::"));
 	
-	// tell the resource finder to look for traits
+	// tell the tag finder to look for traits
 	std::vector<UnicodeString> traits;
 	traits.push_back(UNICODE_STRING_SIMPLE("ezcReflectionReturnInfo"));
 	traits.push_back(UNICODE_STRING_SIMPLE("ezcReflectionFunctionInfo"));
-	resourceSearch.SetTraits(traits);
+	tagSearch.SetTraits(traits);
 
-	Matches = ResourceFinder.CollectNearMatchResources(resourceSearch);
+	Matches = ParsedTagFinder.CollectNearMatchResources(tagSearch);
 	
 	// for now just show both the aliased and original methods
 	CHECK_VECTOR_SIZE(3, Matches);
@@ -1380,7 +1380,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, CollectNearMatchesShouldFindTraitsWh
 	CHECK_UNISTR_EQUALS("getReturnType", Matches[2].Identifier);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceTraitsShouldReturnAllTraits) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceTraitsShouldReturnAllTraits) {
 	TagParser.SetVersion(pelet::PHP_54); 
 	Prep(mvceditor::CharToIcu(
 		"trait ezcReflectionReturnInfo { "
@@ -1396,7 +1396,7 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceTraitsShouldReturnAllTrai
 		"	 }"
 		"}"
 	));
-	std::vector<UnicodeString> traits = ResourceFinder.GetResourceTraits(
+	std::vector<UnicodeString> traits = ParsedTagFinder.GetResourceTraits(
 		UNICODE_STRING_SIMPLE("ezcReflectionMethod"), UNICODE_STRING_SIMPLE(""));
 	CHECK_VECTOR_SIZE(2, traits);
 
@@ -1406,21 +1406,21 @@ TEST_FIXTURE(ResourceFinderMemoryTestClass, GetResourceTraitsShouldReturnAllTrai
 	CHECK_UNISTR_EQUALS("ezcReflectionReturnInfo", traits[1]);
 }
 
-TEST_FIXTURE(ResourceFinderMemoryTestClass, IsFileCacheEmptyWithNativeFunctions) {
-	CHECK(ResourceFinder.IsFileCacheEmpty());
-	CHECK(ResourceFinder.IsResourceCacheEmpty());
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, IsFileCacheEmptyWithNativeFunctions) {
+	CHECK(ParsedTagFinder.IsFileCacheEmpty());
+	CHECK(ParsedTagFinder.IsResourceCacheEmpty());
 
 	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(mvceditor::NativeFunctionsAsset().GetFullPath()));;
-	ResourceFinder.Init(&session);
+	ParsedTagFinder.Init(&session);
 	
 	// still empty
-	CHECK(ResourceFinder.IsFileCacheEmpty());
-	CHECK(ResourceFinder.IsResourceCacheEmpty());
+	CHECK(ParsedTagFinder.IsFileCacheEmpty());
+	CHECK(ParsedTagFinder.IsResourceCacheEmpty());
 }
 
-TEST_FIXTURE(ResourceFinderFileTestClass, IsFileCacheEmptyWithAnotherFile) {
-	CHECK(ResourceFinder.IsFileCacheEmpty());
-	CHECK(ResourceFinder.IsResourceCacheEmpty());
+TEST_FIXTURE(ParsedTagFinderFileTestClass, IsFileCacheEmptyWithAnotherFile) {
+	CHECK(ParsedTagFinder.IsFileCacheEmpty());
+	CHECK(ParsedTagFinder.IsResourceCacheEmpty());
 
 	Prep(wxString::FromAscii(
 		"<?php\n"
@@ -1434,11 +1434,11 @@ TEST_FIXTURE(ResourceFinderFileTestClass, IsFileCacheEmptyWithAnotherFile) {
 	));	
 	TagParser.Walk(TestProjectDir + TestFile);
 
-	CHECK_EQUAL(false, ResourceFinder.IsFileCacheEmpty());
-	CHECK_EQUAL(false, ResourceFinder.IsResourceCacheEmpty());
+	CHECK_EQUAL(false, ParsedTagFinder.IsFileCacheEmpty());
+	CHECK_EQUAL(false, ParsedTagFinder.IsResourceCacheEmpty());
 }
 
-TEST_FIXTURE(ResourceFinderFileTestClass, PhpFileExtensionsShouldWorkWithNoWildcards) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, PhpFileExtensionsShouldWorkWithNoWildcards) {
 
 	// create two files, a good.php and a bad.php. Set the filter to only
 	// look for good.php.  When waliking over bad.php, it should be skipped
@@ -1474,21 +1474,21 @@ TEST_FIXTURE(ResourceFinderFileTestClass, PhpFileExtensionsShouldWorkWithNoWildc
 	CollectNearMatchResources(UNICODE_STRING_SIMPLE("bad.php"));
 }
 
-TEST_FIXTURE(ResourceSearchTestClass, ShouldParseClassAndMethod) {
+TEST_FIXTURE(TagSearchTestClass, ShouldParseClassAndMethod) {
 	Make("News_model::get_news");
-	CHECK_UNISTR_EQUALS("News_model", ResourceSearch->GetClassName());
-	CHECK_UNISTR_EQUALS("get_news", ResourceSearch->GetMethodName());
+	CHECK_UNISTR_EQUALS("News_model", TagSearch->GetClassName());
+	CHECK_UNISTR_EQUALS("get_news", TagSearch->GetMethodName());
 }
 
-TEST_FIXTURE(ResourceSearchTestClass, ShouldParseFileName) {
+TEST_FIXTURE(TagSearchTestClass, ShouldParseFileName) {
 	Make("class.User.php");
-	CHECK_UNISTR_EQUALS("class.User.php", ResourceSearch->GetFileName());
+	CHECK_UNISTR_EQUALS("class.User.php", TagSearch->GetFileName());
 }
 
-TEST_FIXTURE(ResourceSearchTestClass, ShouldParseFileNameAndLineNumber) {
+TEST_FIXTURE(TagSearchTestClass, ShouldParseFileNameAndLineNumber) {
 	Make("class.User.php:100");
-	CHECK_UNISTR_EQUALS("class.User.php", ResourceSearch->GetFileName());
-	CHECK_EQUAL(100, ResourceSearch->GetLineNumber());
+	CHECK_UNISTR_EQUALS("class.User.php", TagSearch->GetFileName());
+	CHECK_EQUAL(100, TagSearch->GetLineNumber());
 }
 
 }

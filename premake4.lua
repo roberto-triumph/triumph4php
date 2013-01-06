@@ -243,7 +243,6 @@ solution "mvc-editor"
 			"src/language/*.cpp",
 			"src/php_frameworks/CallStackClass.cpp",
 			"src/search/*.cpp",
-			"src/search/ResourceFinderClass.cpp",
 			"src/widgets/ThreadWithHeartbeatClass.cpp",
 			"src/widgets/ProcessWithHeartbeatClass.cpp"
 		}
@@ -285,19 +284,17 @@ solution "mvc-editor"
 			icuconfiguration("Release", _ACTION)
 			wxconfiguration("Release", _ACTION)
 
-	project "resource_finder_profiler"
+	project "tag_finder_profiler"
 		language "C++"
 		kind "ConsoleApp"
 		files {
-			"profilers/resource_finder_profiler.cpp",
+			"profilers/tag_finder_profiler.cpp",
 			"src/globals/Errors.cpp",
 			"src/globals/Assets.cpp",
 			"src/globals/Sqlite.cpp",
+			"src/globals/TagClass.cpp",
 			"src/language/*.cpp",
-			"src/search/ResourceFinderClass.cpp",
-			"src/search/DirectorySearchClass.cpp",
-			"src/search/FinderClass.cpp",
-			"src/search/FindInFilesClass.cpp",
+			"src/search/*.cpp",
 			"src/globals/String.cpp"
 		}
 		includedirs { "src", "lib/pelet/include" }
@@ -322,10 +319,7 @@ solution "mvc-editor"
 			"src/language/*.cpp",
 			"src/php_frameworks/*.cpp",
 			"src/globals/*.cpp",
-			"src/search/ResourceFinderClass.cpp",
-			"src/search/DirectorySearchClass.cpp",
-			"src/search/FinderClass.cpp",
-			"src/search/FindInFilesClass.cpp",
+			"src/search/*.cpp",
 			"src/widgets/ThreadWithHeartbeatClass.cpp",
 			"src/widgets/ProcessWithHeartbeatClass.cpp"
 		}
@@ -402,10 +396,7 @@ solution "mvc-editor"
 			"src/globals/*.cpp",
 			"src/php_frameworks/*.cpp",
 			"src/language/*.cpp",
-			"src/search/FinderClass.cpp",
-			"src/search/FindInFilesClass.cpp",
-			"src/search/ResourceFinderClass.cpp",
-			"src/search/DirectorySearchClass.cpp"
+			"src/search/*.cpp"
 		}
 		includedirs { "src/", "lib/pelet/include" }
 		links { "pelet" }

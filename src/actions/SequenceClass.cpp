@@ -23,9 +23,9 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <actions/SequenceClass.h>
-#include <actions/ProjectResourceActionClass.h>
+#include <actions/ProjectTagActionClass.h>
 #include <actions/SqlMetaDataActionClass.h>
-#include <actions/ResourceWipeActionClass.h>
+#include <actions/TagWipeActionClass.h>
 #include <actions/UrlDetectorActionClass.h>
 #include <globals/Errors.h>
 
@@ -74,15 +74,15 @@ bool mvceditor::SequenceClass::AppStart() {
 
 	// this will load the cache from the hard disk
 	// load the cache from hard disk so that code completion and 
-	// resource searching is available immediately after the app starts
+	// tag searching is available immediately after the app starts
 	AddStep(new mvceditor::ResourceCacheInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_INIT));
 
 	// this will load the url entry point cache
 	// do this before the rest so the urls become available asap
 	AddStep(new mvceditor::UrlResourceFinderInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_DETECTOR_INIT));
 
-	// this will update the resource cache by parsing newly modified files
-	AddStep(new mvceditor::ProjectResourceActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE));
+	// this will update the tag cache by parsing newly modified files
+	AddStep(new mvceditor::ProjectTagActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE));
 
 	// this will prime the sql connections
 	AddStep(new mvceditor::SqlMetaDataInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA_INIT));
@@ -103,23 +103,23 @@ bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvced
 	}
 
 	// this step will wipe the global cache; this is needed in case a project has
-	// new exclude wilcards or a source directory has been removed.  the ProjectResourceActionClass
+	// new exclude wilcards or a source directory has been removed.  the ProjectTagActionClass
 	// will just recurse directories and update the cache, it does not recurse the index
 	// hence it won't remove items that don't need to be there
-	AddStep(new mvceditor::ResourceWipeActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE, touchedProjects));
+	AddStep(new mvceditor::TagWipeActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE, touchedProjects));
 
 	// this will load the cache from the hard disk
 	// load the cache from hard disk so that code completion and 
-	// resource searching is available immediately after the app starts
+	// tag searching is available immediately after the app starts
 	AddStep(new mvceditor::ResourceCacheInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_INIT));
 
 	// this will load the url entry point cache
 	// do this before the rest so the urls become available asap
 	AddStep(new mvceditor::UrlResourceFinderInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_DETECTOR_INIT));
 
-	// this will update the resource cache by parsing newly modified files
-	mvceditor::ProjectResourceActionClass* action = 
-		new mvceditor::ProjectResourceActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
+	// this will update the tag cache by parsing newly modified files
+	mvceditor::ProjectTagActionClass* action = 
+		new mvceditor::ProjectTagActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
 	action->SetTouchedProjects(touchedProjects);
 	AddStep(action);
 
@@ -136,16 +136,16 @@ bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvced
 	return true;
 }
 
-bool mvceditor::SequenceClass::ResourceCacheWipeAndIndex() {
+bool mvceditor::SequenceClass::TagCacheWipeAndIndex() {
 	if (Running()) {
 		return false;
 	}
 
 	// this step will wipe the global cache from all projects
-	AddStep(new mvceditor::ResourceWipeActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE, Globals.Projects));
+	AddStep(new mvceditor::TagWipeActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE, Globals.Projects));
 
 	// this will recurse though all directories and parse the source code
-	AddStep(new mvceditor::ProjectResourceActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE));
+	AddStep(new mvceditor::ProjectTagActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE));
 
 	// this will detect the urls (entry points) that a project has
 	AddStep(new mvceditor::UrlDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_DETECTOR));

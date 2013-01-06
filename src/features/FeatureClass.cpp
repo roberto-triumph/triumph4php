@@ -57,10 +57,6 @@ mvceditor::EnvironmentClass* mvceditor::FeatureClass::GetEnvironment() {
 	return &App.Globals.Environment;
 }
 
-mvceditor::ResourceCacheClass* mvceditor::FeatureClass::GetResourceCache() {
-	return &App.Globals.ResourceCache;
-}
-
 void mvceditor::FeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
 }
 

@@ -249,9 +249,8 @@ void mvceditor::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
 
 		// delete the cache files for the projects the user has removed
 		// before deleting the file, must disconnect from the SQLite database
-		mvceditor::ResourceCacheClass* cache = GetResourceCache();
 		for (project = removedProjects.begin(); project != removedProjects.end(); ++project) {
-			cache->RemoveGlobal(project->ResourceDbFileName);
+			App.Globals.TagCache.RemoveGlobal(project->ResourceDbFileName);
 			project->RemoveCacheDbs();
 		}
 

@@ -167,10 +167,10 @@ enum AutoCompletionImages {
 };
 
 /**
- * @return the signature of the resource at the given index.
+ * @return the signature of the tag at the given index.
  * signature is in a format that is ready for the Scintilla call tip (with up or down arrows as appropriate)
  */
-static wxString PhpCallTipSignature(size_t index, const std::vector<mvceditor::ResourceClass>& resources) {
+static wxString PhpCallTipSignature(size_t index, const std::vector<mvceditor::TagClass>& resources) {
 	wxString callTip;
 	size_t size = resources.size();
 	if (index >= size) {
@@ -215,10 +215,10 @@ void mvceditor::TextDocumentClass::HandleAutoCompletion(wxString& completeStatus
 void mvceditor::TextDocumentClass::HandleCallTip(wxChar ch, bool force) {
 }
 
-std::vector<mvceditor::ResourceClass> mvceditor::TextDocumentClass::GetCurrentSymbolResource() {
+std::vector<mvceditor::TagClass> mvceditor::TextDocumentClass::GetCurrentSymbolResource() {
 
 	// plain text docs don't have structure
-	std::vector<mvceditor::ResourceClass> resources;
+	std::vector<mvceditor::TagClass> resources;
 	return resources;
 }
 
@@ -462,7 +462,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 	if (!lastExpression.isEmpty()) {
 		Parser.ParseExpression(lastExpression, parsedExpression);
 		ScopeFinder.GetScopeString(code, expressionPos, expressionScope);
-		Globals->ResourceCache.ExpressionCompletionMatches(Ctrl->GetIdString(), parsedExpression, expressionScope,
+		Globals->TagCache.ExpressionCompletionMatches(Ctrl->GetIdString(), parsedExpression, expressionScope,
 				variableMatches, AutoCompletionResourceMatches, doDuckTyping, error);
 		if (!variableMatches.empty()) {
 			for (size_t i = 0; i < variableMatches.size(); ++i) {
@@ -474,15 +474,15 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 			
 			// a bunch of function, define, or class names
 			for (size_t i = 0; i < AutoCompletionResourceMatches.size(); ++i) {
-				mvceditor::ResourceClass res = AutoCompletionResourceMatches[i];
+				mvceditor::TagClass res = AutoCompletionResourceMatches[i];
 				wxString postFix;
-				if (mvceditor::ResourceClass::DEFINE == res.Type) {
+				if (mvceditor::TagClass::DEFINE == res.Type) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_VARIABLE);
 				}
-				else if (mvceditor::ResourceClass::FUNCTION == res.Type) {
+				else if (mvceditor::TagClass::FUNCTION == res.Type) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_FUNCTION);
 				}
-				else if (mvceditor::ResourceClass::CLASS == res.Type) {
+				else if (mvceditor::TagClass::CLASS == res.Type) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_CLASS);
 				}
 				autoCompleteList.push_back(mvceditor::IcuToWx(res.Identifier) + postFix);
@@ -499,25 +499,25 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 			
 			// an object / function "chain"
 			for (size_t i = 0; i < AutoCompletionResourceMatches.size(); ++i) {
-				mvceditor::ResourceClass res = AutoCompletionResourceMatches[i];
+				mvceditor::TagClass res = AutoCompletionResourceMatches[i];
 				wxString comp = mvceditor::IcuToWx(res.Identifier);
 				wxString postFix;
-				if (mvceditor::ResourceClass::MEMBER == res.Type && res.IsPrivate) {
+				if (mvceditor::TagClass::MEMBER == res.Type && res.IsPrivate) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PRIVATE_MEMBER);
 				}
-				else if (mvceditor::ResourceClass::MEMBER == res.Type && res.IsProtected) {
+				else if (mvceditor::TagClass::MEMBER == res.Type && res.IsProtected) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PROTECTED_MEMBER);
 				}
-				else if (mvceditor::ResourceClass::MEMBER == res.Type) {
+				else if (mvceditor::TagClass::MEMBER == res.Type) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PUBLIC_MEMBER);
 				}
-				else if (mvceditor::ResourceClass::METHOD == res.Type && res.IsPrivate) {
+				else if (mvceditor::TagClass::METHOD == res.Type && res.IsPrivate) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PRIVATE_METHOD);
 				}
-				else if (mvceditor::ResourceClass::METHOD == res.Type && res.IsProtected) {
+				else if (mvceditor::TagClass::METHOD == res.Type && res.IsProtected) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PROTECTED_METHOD);
 				}
-				else if (mvceditor::ResourceClass::METHOD == res.Type) {
+				else if (mvceditor::TagClass::METHOD == res.Type) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PUBLIC_METHOD);
 				}
 				autoCompleteList.push_back(comp + postFix);
@@ -678,11 +678,11 @@ void mvceditor::PhpDocumentClass::HandleCallTip(wxChar ch, bool force) {
 		if (currentPos >= 0) {
 			CurrentCallTipResources.clear();
 			CurrentCallTipIndex = 0;
-			std::vector<mvceditor::ResourceClass> matches = GetSymbolAt(currentPos);
+			std::vector<mvceditor::TagClass> matches = GetSymbolAt(currentPos);
 			for (size_t i = 0; i < matches.size(); ++i) {
-				mvceditor::ResourceClass resource = matches[i];
-				if (mvceditor::ResourceClass::FUNCTION == resource.Type || mvceditor::ResourceClass::METHOD == resource.Type) {
-					CurrentCallTipResources.push_back(resource);
+				mvceditor::TagClass tag = matches[i];
+				if (mvceditor::TagClass::FUNCTION == tag.Type || mvceditor::TagClass::METHOD == tag.Type) {
+					CurrentCallTipResources.push_back(tag);
 				}
 			}
 			if (CurrentCallTipResources.empty() && hasMethodCall && !matches.empty()) {
@@ -696,13 +696,13 @@ void mvceditor::PhpDocumentClass::HandleCallTip(wxChar ch, bool force) {
 				constructorResourceSearch += wxT("::");
 
 				// TODO: get class hierarchy
-				std::vector<mvceditor::ResourceClass> matches = Globals->ResourceCache.CollectNearMatchResourcesFromAll(mvceditor::WxToIcu(constructorResourceSearch));
+				std::vector<mvceditor::TagClass> matches = Globals->TagCache.CollectNearMatchResourcesFromAll(mvceditor::WxToIcu(constructorResourceSearch));
 				for (size_t i = 0; i < matches.size(); ++i) {
-					mvceditor::ResourceClass res = matches[i];
-					if (mvceditor::ResourceClass::METHOD == res.Type && UNICODE_STRING_SIMPLE("__construct") == res.Identifier) {
+					mvceditor::TagClass res = matches[i];
+					if (mvceditor::TagClass::METHOD == res.Type && UNICODE_STRING_SIMPLE("__construct") == res.Identifier) {
 						CurrentCallTipResources.push_back(res);
 					}
-					else if (mvceditor::ResourceClass::METHOD == res.Type && className == res.Identifier) {
+					else if (mvceditor::TagClass::METHOD == res.Type && className == res.Identifier) {
 						CurrentCallTipResources.push_back(res);
 					}
 				}
@@ -767,17 +767,17 @@ void mvceditor::PhpDocumentClass::HandleCallTip(wxChar ch, bool force) {
 	}
 }
 
-std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetCurrentSymbolResource() {
+std::vector<mvceditor::TagClass> mvceditor::PhpDocumentClass::GetCurrentSymbolResource() {
 	
 	// if the cursor is in the middle of an identifier, find the end of the
-	// current identifier; that way we can know the full name of the resource we want
+	// current identifier; that way we can know the full name of the tag we want
 	// to get
 	int currentPos = Ctrl->GetCurrentPos();
 	int endPos = Ctrl->WordEndPosition(currentPos, true);
 	
 	UnicodeString code = GetSafeSubstring(0, endPos);
 	
-	std::vector<mvceditor::ResourceClass> matches;
+	std::vector<mvceditor::TagClass> matches;
 	pelet::LexicalAnalyzerClass lexer;
 	pelet::ParserClass parser;
 	pelet::ScopeClass scope;
@@ -793,7 +793,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetCurrentSym
 
 		// for now do nothing with error
 		mvceditor::SymbolTableMatchErrorClass error;
-		Globals->ResourceCache.ResourceMatches(Ctrl->GetIdString(), parsedExpression, scopeResult, matches, 
+		Globals->TagCache.ResourceMatches(Ctrl->GetIdString(), parsedExpression, scopeResult, matches, 
 			doDuckTyping, true, error);
 	}
 	return matches;
@@ -833,25 +833,25 @@ void mvceditor::PhpDocumentClass::MatchBraces(int posToCheck) {
 	}
 }
 
-std::vector<wxString> mvceditor::PhpDocumentClass::CollectNearMatchKeywords(wxString resource) {
-	resource = resource.Lower();
+std::vector<wxString> mvceditor::PhpDocumentClass::CollectNearMatchKeywords(wxString tag) {
+	tag = tag.Lower();
 	std::vector<wxString> matchedKeywords;
 	wxString keywords = GetPhpKeywords();
 	wxStringTokenizer tokens(keywords, wxT(" "));
 	while (tokens.HasMoreTokens()) {
 		wxString keyword = tokens.GetNextToken();
 		wxString keywordLower = keyword.Lower();
-		if (0 == keywordLower.Find(resource)) {
+		if (0 == keywordLower.Find(tag)) {
 			matchedKeywords.push_back(keyword);
 		}
 	}
 	return matchedKeywords;
 }
 
-std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetSymbolAt(int posToCheck) {
+std::vector<mvceditor::TagClass> mvceditor::PhpDocumentClass::GetSymbolAt(int posToCheck) {
 	UnicodeString code = GetSafeSubstring(0, posToCheck);
 	
-	std::vector<mvceditor::ResourceClass> matches;
+	std::vector<mvceditor::TagClass> matches;
 	pelet::LexicalAnalyzerClass lexer;
 	pelet::ParserClass parser;
 	pelet::ScopeClass scope;
@@ -868,7 +868,7 @@ std::vector<mvceditor::ResourceClass> mvceditor::PhpDocumentClass::GetSymbolAt(i
 
 		// for now do nothing with error
 		mvceditor::SymbolTableMatchErrorClass error;
-		Globals->ResourceCache.ResourceMatches(Ctrl->GetIdString(), parsedExpression, expressionScope, matches, 
+		Globals->TagCache.ResourceMatches(Ctrl->GetIdString(), parsedExpression, expressionScope, matches, 
 			doDuckTyping, true, error);
 	}
 	return matches;
@@ -940,7 +940,7 @@ void mvceditor::PhpDocumentClass::OnAutoCompletionSelected(wxStyledTextEvent& ev
 		
 		bool handled = false;
 		for (size_t i = 0; i < AutoCompletionResourceMatches.size(); ++i) {
-			mvceditor::ResourceClass res = AutoCompletionResourceMatches[i];
+			mvceditor::TagClass res = AutoCompletionResourceMatches[i];
 			if (res.Identifier == selected) {
 
 				// user had selected  a function /method name; let's add the 
@@ -949,11 +949,11 @@ void mvceditor::PhpDocumentClass::OnAutoCompletionSelected(wxStyledTextEvent& ev
 				wxString selected = event.GetText();
 				int startPos = Ctrl->WordStartPosition(Ctrl->GetCurrentPos(), true);
 				Ctrl->SetSelection(startPos, Ctrl->GetCurrentPos());
-				if ((mvceditor::ResourceClass::FUNCTION == res.Type || mvceditor::ResourceClass::METHOD == res.Type) && !res.HasParameters()) {
+				if ((mvceditor::TagClass::FUNCTION == res.Type || mvceditor::TagClass::METHOD == res.Type) && !res.HasParameters()) {
 					Ctrl->ReplaceSelection(selected + wxT("()"));
 					HandleCallTip(0, true);
 				}
-				else if (mvceditor::ResourceClass::FUNCTION == res.Type || mvceditor::ResourceClass::METHOD == res.Type) {
+				else if (mvceditor::TagClass::FUNCTION == res.Type || mvceditor::TagClass::METHOD == res.Type) {
 					Ctrl->ReplaceSelection(selected + wxT("("));
 					HandleCallTip(0, true);
 				}

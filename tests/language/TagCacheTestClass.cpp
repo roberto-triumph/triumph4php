@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <UnitTest++.h>
-#include <language/ResourceCacheClass.h>
+#include <language/TagCacheClass.h>
 #include <globals/String.h>
 #include <FileTestFixtureClass.h>
 #include <unicode/ustream.h> //get the << overloaded operator, needed by UnitTest++
@@ -37,23 +37,23 @@ class RegisterTestFixtureClass : public FileTestFixtureClass {
 
 public:
 
-	mvceditor::ResourceCacheClass ResourceCache;
-	mvceditor::ResourceFinderClass Finder;
+	mvceditor::TagCacheClass TagCache;
+	mvceditor::ParsedTagFinderClass Finder;
 	mvceditor::DirectorySearchClass Search;
 	std::vector<wxString> PhpFileExtensions;
 	std::vector<wxString> MiscFileExtensions;
-	std::vector<mvceditor::ResourceClass> Matches;
-	wxFileName ResourceDbFileName;
+	std::vector<mvceditor::TagClass> Matches;
+	wxFileName TagDbFileName;
 
 	RegisterTestFixtureClass()
 		: FileTestFixtureClass(wxT("resource-cache"))
-		, ResourceCache()
+		, TagCache()
 		, Finder()
 		, Search() 
 		, PhpFileExtensions()
 		, MiscFileExtensions()
 		, Matches() 
-		, ResourceDbFileName() {
+		, TagDbFileName() {
 		Search.Init(TestProjectDir);
 		PhpFileExtensions.push_back(wxT("*.php"));
 		
@@ -61,11 +61,11 @@ public:
 		if (!wxDirExists(TestProjectDir)) {
 			wxMkdir(TestProjectDir, 0777);
 		}
-		ResourceDbFileName.Assign(TestProjectDir + wxT("resource_cache.db"));
+		TagDbFileName.Assign(TestProjectDir + wxT("resource_cache.db"));
 	}
 
 	void CollectNearMatchResourcesFromAll(const UnicodeString& search) {
-		Matches = ResourceCache.CollectNearMatchResourcesFromAll(search);
+		Matches = TagCache.CollectNearMatchResourcesFromAll(search);
 	}
 
 	mvceditor::WorkingCacheClass* CreateWorkingCache(const wxString& fileName, const UnicodeString& code) {
@@ -77,7 +77,7 @@ public:
 
 	mvceditor::GlobalCacheClass* CreateGlobalCache(const wxString& srcDirectory) {
 		mvceditor::GlobalCacheClass* cache = new mvceditor::GlobalCacheClass();
-		cache->Init(ResourceDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+		cache->Init(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 
 		
 		// must call init() here since we want to parse files from disk
@@ -95,7 +95,7 @@ class ExpressionCompletionMatchesFixtureClass : public FileTestFixtureClass  {
 
 public:
 
-	mvceditor::ResourceCacheClass ResourceCache;
+	mvceditor::TagCacheClass TagCache;
 	wxString GlobalFile;
 	wxString File1;
 	wxString File2;
@@ -108,17 +108,17 @@ public:
 	pelet::ExpressionClass ParsedExpression;
 
 	std::vector<UnicodeString> VariableMatches;
-	std::vector<mvceditor::ResourceClass> ResourceMatches;
+	std::vector<mvceditor::TagClass> ResourceMatches;
 	mvceditor::SymbolTableMatchErrorClass Error;
 	mvceditor::DirectorySearchClass Search;
 	std::vector<wxString> PhpFileExtensions;
 	std::vector<wxString> MiscFileExtensions;
-	wxFileName ResourceDbFileName;
+	wxFileName TagDbFileName;
 	
 	
 	ExpressionCompletionMatchesFixtureClass() 
 		: FileTestFixtureClass(wxT("resource-cache"))
-		, ResourceCache()
+		, TagCache()
 		, GlobalFile(wxT("src") + wxFileName::GetPathSeparators() + wxT("global.php"))
 		, File1(wxT("src") + wxFileName::GetPathSeparators() + wxT("file1.php"))
 		, File2(wxT("src") + wxFileName::GetPathSeparators() + wxT("file2.php"))
@@ -135,13 +135,13 @@ public:
 		, Search()
 		, PhpFileExtensions()
 		, MiscFileExtensions()
-		, ResourceDbFileName() {
+		, TagDbFileName() {
 		CreateSubDirectory(wxT("src"));
 		Search.Init(TestProjectDir + wxT("src"));
 		PhpFileExtensions.push_back(wxT("*.php"));
 		Scope.ClassName = UNICODE_STRING_SIMPLE("");
 		Scope.MethodName = UNICODE_STRING_SIMPLE("");
-		ResourceDbFileName.Assign(TestProjectDir + wxT("resource_cache.db"));
+		TagDbFileName.Assign(TestProjectDir + wxT("resource_cache.db"));
 	}
 	
 	void ToProperty(const UnicodeString& variableName, const UnicodeString& methodName) {
@@ -164,7 +164,7 @@ public:
 
 	mvceditor::GlobalCacheClass* CreateGlobalCache(const wxString& srcDirectory) {
 		mvceditor::GlobalCacheClass* cache = new mvceditor::GlobalCacheClass();
-		cache->Init(ResourceDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+		cache->Init(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 
 		
 		// must call init() here since we want to parse files from disk
@@ -189,24 +189,24 @@ SUITE(ResourceCacheTestClass) {
 
 TEST_FIXTURE(RegisterTestFixtureClass, RegisterShouldSucceed) {	
 	
-	// this pointer should get deleted by the ResourceCacheClass
+	// this pointer should get deleted by the TagCacheClass
 	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass();
-	globalCache->Init(ResourceDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
-	CHECK(ResourceCache.RegisterGlobal(globalCache));
+	globalCache->Init(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+	CHECK(TagCache.RegisterGlobal(globalCache));
 }
 
 TEST_FIXTURE(RegisterTestFixtureClass, RegisterShouldFail) {
 
-	// these pointers should get deleted by the ResourceCacheClass
+	// these pointers should get deleted by the TagCacheClass
 	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass();
-	globalCache->Init(ResourceDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+	globalCache->Init(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 	
 	mvceditor::GlobalCacheClass* secondGlobalCache = new mvceditor::GlobalCacheClass();
-	secondGlobalCache->Init(ResourceDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+	secondGlobalCache->Init(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 
 	// test that the same resource DB cannot be added twice
-	CHECK(ResourceCache.RegisterGlobal(globalCache));
-	CHECK_EQUAL(false, ResourceCache.RegisterGlobal(secondGlobalCache));
+	CHECK(TagCache.RegisterGlobal(globalCache));
+	CHECK_EQUAL(false, TagCache.RegisterGlobal(secondGlobalCache));
 
 	// must delete the new pointer since the cache did not take ownership
 	delete secondGlobalCache;
@@ -214,22 +214,22 @@ TEST_FIXTURE(RegisterTestFixtureClass, RegisterShouldFail) {
 
 TEST_FIXTURE(RegisterTestFixtureClass, RegisterShouldSucceedAfterSucceedAfterUnregistering) {
 
-	// these pointers should get deleted by the ResourceCacheClass
+	// these pointers should get deleted by the TagCacheClass
 	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass();
-	wxFileName cacheDb1 = ResourceDbFileName; 
-	globalCache->Init(ResourceDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+	wxFileName cacheDb1 = TagDbFileName; 
+	globalCache->Init(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 	
 	mvceditor::GlobalCacheClass* secondGlobalCache = new mvceditor::GlobalCacheClass();
-	secondGlobalCache->Init(ResourceDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+	secondGlobalCache->Init(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 
 	mvceditor::GlobalCacheClass* thirdGlobalCache = new mvceditor::GlobalCacheClass();
-	thirdGlobalCache->Init(ResourceDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+	thirdGlobalCache->Init(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 
 	// test that the same resource DB is added, removed, then added again
-	CHECK(ResourceCache.RegisterGlobal(globalCache));
-	CHECK_EQUAL(false, ResourceCache.RegisterGlobal(secondGlobalCache));
-	ResourceCache.RemoveGlobal(ResourceDbFileName);
-	CHECK(ResourceCache.RegisterGlobal(thirdGlobalCache));
+	CHECK(TagCache.RegisterGlobal(globalCache));
+	CHECK_EQUAL(false, TagCache.RegisterGlobal(secondGlobalCache));
+	TagCache.RemoveGlobal(TagDbFileName);
+	CHECK(TagCache.RegisterGlobal(thirdGlobalCache));
 
 	// must delete the new pointer since the cache did not take ownership
 	delete secondGlobalCache;
@@ -248,14 +248,14 @@ TEST_FIXTURE(RegisterTestFixtureClass, CollectShouldGetFromAllFinders) {
 	CreateFixtureFile(file3, wxT("<?php class ActionThey { function w() {} }"));
 	
 	// parse the 3 files for resources. these pointers should get deleted by
-	// ResourceCacheClass
+	// TagCacheClass
 	mvceditor::WorkingCacheClass* cache1 = CreateWorkingCache(file1, code1);
 	mvceditor::WorkingCacheClass* cache2 = CreateWorkingCache(file2, code2);
 	mvceditor::GlobalCacheClass* cache3 = CreateGlobalCache(wxT("src"));
 	
-	CHECK(ResourceCache.RegisterWorking(file1, cache1));
-	CHECK(ResourceCache.RegisterWorking(file2, cache2));
-	CHECK(ResourceCache.RegisterGlobal(cache3));	
+	CHECK(TagCache.RegisterWorking(file1, cache1));
+	CHECK(TagCache.RegisterWorking(file2, cache2));
+	CHECK(TagCache.RegisterGlobal(cache3));	
 	
 	// now perform the search. will search for any resource that starts with 'Action'
 	// all 3 caches should hit
@@ -268,7 +268,7 @@ TEST_FIXTURE(RegisterTestFixtureClass, CollectShouldGetFromAllFinders) {
 	CHECK_UNISTR_EQUALS("ActionThey", Matches[1].Identifier);
 	CHECK_UNISTR_EQUALS("ActionYou", Matches[2].Identifier);
 
-	ResourceCache.Clear();
+	TagCache.Clear();
 }
 
 TEST_FIXTURE(RegisterTestFixtureClass, NearMatchesShouldIgnoreStaleResources) {
@@ -289,8 +289,8 @@ TEST_FIXTURE(RegisterTestFixtureClass, NearMatchesShouldIgnoreStaleResources) {
 	mvceditor::WorkingCacheClass* cache1 = CreateWorkingCache(fileName.GetFullPath(), code2);
 	mvceditor::GlobalCacheClass* cache2 = CreateGlobalCache(wxT("src"));
 
-	CHECK(ResourceCache.RegisterWorking(fileName.GetFullPath(), cache1));
-	CHECK(ResourceCache.RegisterGlobal(cache2));
+	CHECK(TagCache.RegisterWorking(fileName.GetFullPath(), cache1));
+	CHECK(TagCache.RegisterGlobal(cache2));
 	
 	CollectNearMatchResourcesFromAll(UNICODE_STRING_SIMPLE("ActionMy::methodA"));
 	CHECK_VECTOR_SIZE(0, Matches);
@@ -302,7 +302,7 @@ TEST_FIXTURE(RegisterTestFixtureClass, NearMatchesShouldIgnoreStaleResources) {
 TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, CompletionMatchesWithGlobalCache) {
 	
 	// in this test we will create a class in file1; file2 will use that class
-	// the ResourceCache object should be able to detect the variable type of 
+	// the TagCache object should be able to detect the variable type of 
 	// the variable in file2
 	wxString code1 =  wxT("<?php class ActionYou  { function w() {} }");
 	Code2 = UNICODE_STRING_SIMPLE("<?php $action = new ActionYou(); $action->w(); ");
@@ -311,11 +311,11 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, CompletionMatchesWithGloba
 	mvceditor::WorkingCacheClass* cache1 = CreateWorkingCache(File2, Code2);
 	mvceditor::GlobalCacheClass* cache2 = CreateGlobalCache(wxT("src"));
 	
-	CHECK(ResourceCache.RegisterWorking(File2, cache1));
-	CHECK(ResourceCache.RegisterGlobal(cache2));
+	CHECK(TagCache.RegisterWorking(File2, cache1));
+	CHECK(TagCache.RegisterGlobal(cache2));
 	
 	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("w"));
-	ResourceCache.ExpressionCompletionMatches(File2, ParsedExpression, Scope, 
+	TagCache.ExpressionCompletionMatches(File2, ParsedExpression, Scope, 
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_VECTOR_SIZE(1, ResourceMatches);
 	CHECK_UNISTR_EQUALS("w", ResourceMatches[0].Identifier);
@@ -335,12 +335,12 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, WorkingCachePrecedenceOver
 	mvceditor::WorkingCacheClass* cache2 = CreateWorkingCache(File2, Code2);
 	mvceditor::GlobalCacheClass* cache3 = CreateGlobalCache(wxT("src"));
 	
-	CHECK(ResourceCache.RegisterWorking(File1, cache1));
-	CHECK(ResourceCache.RegisterWorking(File2, cache2));
-	CHECK(ResourceCache.RegisterGlobal(cache3));
+	CHECK(TagCache.RegisterWorking(File1, cache1));
+	CHECK(TagCache.RegisterWorking(File2, cache2));
+	CHECK(TagCache.RegisterGlobal(cache3));
 	
 	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("w"));
-	ResourceCache.ExpressionCompletionMatches(File1, ParsedExpression, Scope, 
+	TagCache.ExpressionCompletionMatches(File1, ParsedExpression, Scope, 
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);
 
 	CHECK_VECTOR_SIZE(1, ResourceMatches);
@@ -359,11 +359,11 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithGlobalC
 	mvceditor::WorkingCacheClass* cache1 = CreateWorkingCache(File1, Code1);
 	mvceditor::GlobalCacheClass* cache2 = CreateGlobalCache(wxT("src"));
 	
-	CHECK(ResourceCache.RegisterWorking(File1, cache1));
-	CHECK(ResourceCache.RegisterGlobal(cache2));
+	CHECK(TagCache.RegisterWorking(File1, cache1));
+	CHECK(TagCache.RegisterGlobal(cache2));
 	
 	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("w"));
-	ResourceCache.ResourceMatches(File1, ParsedExpression, Scope, 
+	TagCache.ResourceMatches(File1, ParsedExpression, Scope, 
 		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_VECTOR_SIZE(1, ResourceMatches);
 	CHECK_UNISTR_EQUALS("w", ResourceMatches[0].Identifier);
@@ -382,12 +382,12 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithWorking
 	mvceditor::WorkingCacheClass* cache1 = CreateWorkingCache(File1, Code1);
 	mvceditor::WorkingCacheClass* cache2 = CreateWorkingCache(File2, Code2);
 	
-	CHECK(ResourceCache.RegisterWorking(File1, cache1));
-	CHECK(ResourceCache.RegisterWorking(File2, cache2));
+	CHECK(TagCache.RegisterWorking(File1, cache1));
+	CHECK(TagCache.RegisterWorking(File2, cache2));
 	
 	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("methodA"));
 
-	ResourceCache.ResourceMatches(File2, ParsedExpression, Scope, 
+	TagCache.ResourceMatches(File2, ParsedExpression, Scope, 
 		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_VECTOR_SIZE(1, ResourceMatches);
 	CHECK_UNISTR_EQUALS("methodA", ResourceMatches[0].Identifier);
@@ -410,11 +410,11 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithStaleMa
 	mvceditor::WorkingCacheClass* cache1 = CreateWorkingCache(File1, Code1);
 	mvceditor::GlobalCacheClass* cache2 = CreateGlobalCache(wxT("src"));
 
-	CHECK(ResourceCache.RegisterWorking(File1, cache1));
-	CHECK(ResourceCache.RegisterGlobal(cache2));
+	CHECK(TagCache.RegisterWorking(File1, cache1));
+	CHECK(TagCache.RegisterGlobal(cache2));
 	
 	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("methodA"));
-	ResourceCache.ResourceMatches(File1, ParsedExpression, Scope, 
+	TagCache.ResourceMatches(File1, ParsedExpression, Scope, 
 		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_VECTOR_SIZE(1, ResourceMatches);
 	CHECK_UNISTR_EQUALS("methodA", ResourceMatches[0].Identifier);
@@ -423,10 +423,10 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithStaleMa
 	// now update the code by creating a working version of the global code.
 	// ie. the user opening a file.
 	mvceditor::WorkingCacheClass* cache3 = CreateWorkingCache(GlobalFile, Code2);
-	CHECK(ResourceCache.RegisterWorking(GlobalFile, cache3));
+	CHECK(TagCache.RegisterWorking(GlobalFile, cache3));
 	
 	ResourceMatches.clear();
-	ResourceCache.ResourceMatches(GlobalFile, ParsedExpression, Scope, 
+	TagCache.ResourceMatches(GlobalFile, ParsedExpression, Scope, 
 		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_VECTOR_SIZE(0, ResourceMatches);
 }
@@ -452,17 +452,17 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, MultipleGlobalFinders) {
 
 	mvceditor::GlobalCacheClass* cache1 = CreateGlobalCache(globalDb1, globalRoot1);
 	mvceditor::GlobalCacheClass* cache2 = CreateGlobalCache(globalDb2, globalRoot2);
-	CHECK(ResourceCache.RegisterGlobal(cache1));
-	CHECK(ResourceCache.RegisterGlobal(cache2));
+	CHECK(TagCache.RegisterGlobal(cache1));
+	CHECK(TagCache.RegisterGlobal(cache2));
 
 	// initialize a symbol table
 	Code1 = UNICODE_STRING_SIMPLE("<?php $action = new ActionMy(); ");
 	mvceditor::WorkingCacheClass* cache3 = CreateWorkingCache(File1, Code1);
-	CHECK(ResourceCache.RegisterWorking(File1, cache3));
+	CHECK(TagCache.RegisterWorking(File1, cache3));
 
 	// try a completion
 	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("methodA"));
-	ResourceCache.ResourceMatches(File1, ParsedExpression, Scope, 
+	TagCache.ResourceMatches(File1, ParsedExpression, Scope, 
 		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_VECTOR_SIZE(1, ResourceMatches);
 	CHECK_UNISTR_EQUALS("methodA", ResourceMatches[0].Identifier);
@@ -471,7 +471,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, MultipleGlobalFinders) {
 	// create another resource cache, but we will initialize them with the
 	// parsed cache; we won't need to walk over the files (re-parse them) and
 	// completion should still work
-	mvceditor::ResourceCacheClass newCache;
+	mvceditor::TagCacheClass newCache;
 	mvceditor::GlobalCacheClass* cache4 = new mvceditor::GlobalCacheClass();
 	cache4->Init(globalDb1, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 	mvceditor::GlobalCacheClass* cache5 = new mvceditor::GlobalCacheClass();

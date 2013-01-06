@@ -26,9 +26,9 @@
 #include <pelet/TokenClass.h>
 #include <pelet/ParserClass.h>
 #include <language/SymbolTableClass.h>
-#include <language/ResourceCacheClass.h>
+#include <language/TagCacheClass.h>
 #include <search/DirectorySearchClass.h>
-#include <search/ResourceFinderClass.h>
+#include <search/ParsedTagFinderClass.h>
 #include <globals/Assets.h>
 #include <globals/Sqlite.h>
 #include <soci/soci.h>
@@ -57,7 +57,7 @@ void ProfileParser();
 void ProfileParserOnLargeProject();
 
 /**
- * Profiles the TagPaserClass and ResourceFinderClass using the php.db file 
+ * Profiles the TagPaserClass and ParsedTagFinderClass using the php.db file 
  * in resources directory.  It profiles two consecutive times in order to
  * compare caching. By using this in combination with the results of 
  * ProfileLexer test, we can find out how much overhead initializing a db file takes.
@@ -217,25 +217,25 @@ void ProfileNativeFunctionsParsing() {
 		wxString msg = mvceditor::CharToWx(e.what());
 		wxASSERT_MSG(false, msg);
 	}
-	mvceditor::ResourceFinderClass resourceFinder;
+	mvceditor::ParsedTagFinderClass tagFinder;
 
 	wxLongLong time;
 	size_t found;
 
 	time = wxGetLocalTimeMillis();
-	resourceFinder.Init(&session);
+	tagFinder.Init(&session);
 	
-	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("stristr"));
-	std::vector<mvceditor::ResourceClass> matches = resourceFinder.CollectNearMatchResources(resourceSearch);
+	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("stristr"));
+	std::vector<mvceditor::TagClass> matches = tagFinder.CollectNearMatchResources(tagSearch);
 	found = !matches.empty();
 	time = wxGetLocalTimeMillis() - time;
-	printf("time for resourceFinder on php.db:%ld ms found:%d\n", time.ToLong(), (int)found);
+	printf("time for tagFinder on php.db:%ld ms found:%d\n", time.ToLong(), (int)found);
 	
 	time = wxGetLocalTimeMillis();
-	matches = resourceFinder.CollectNearMatchResources(UNICODE_STRING_SIMPLE("mysql_query"));
+	matches = tagFinder.CollectNearMatchResources(UNICODE_STRING_SIMPLE("mysql_query"));
 	time = wxGetLocalTimeMillis() - time;
 	found = !matches.empty();
-	printf("time for resourceFinder on php.db after caching:%ld ms found:%d\n", time.ToLong(), (int)found);
+	printf("time for tagFinder on php.db after caching:%ld ms found:%d\n", time.ToLong(), (int)found);
 }
 
 void ProfileResourceFinderOnLargeProject() {
@@ -255,7 +255,7 @@ void ProfileResourceFinderOnLargeProject() {
 	}
 
 	mvceditor::TagParserClass tagParser;
-	mvceditor::ResourceFinderClass resourceFinder;
+	mvceditor::ParsedTagFinderClass tagFinder;
 
 	
 	mvceditor::DirectorySearchClass search;
@@ -268,26 +268,26 @@ void ProfileResourceFinderOnLargeProject() {
 	time = wxGetLocalTimeMillis();
 	tagParser.PhpFileExtensions.push_back(wxT("*.php"));
 	tagParser.Init(&session);
-	resourceFinder.Init(&session);
+	tagFinder.Init(&session);
 	search.Init(DirName);
 	while (search.More()) {
 		search.Walk(tagParser);
 	}
-	std::vector<mvceditor::ResourceClass> matches = resourceFinder.CollectNearMatchResources(UNICODE_STRING_SIMPLE("ExtendedRecordSetForUnitTestAddGetLeftJoin"));
+	std::vector<mvceditor::TagClass> matches = tagFinder.CollectNearMatchResources(UNICODE_STRING_SIMPLE("ExtendedRecordSetForUnitTestAddGetLeftJoin"));
 	time = wxGetLocalTimeMillis() - time;
 	size_t found =  matches.size();
-	printf("time for resourceFinder on entire project:%ld ms found:%d\n", time.ToLong(), (int)found);
+	printf("time for tagFinder on entire project:%ld ms found:%d\n", time.ToLong(), (int)found);
 
 	time = wxGetLocalTimeMillis();
 	search.Init(DirName);
 	while (search.More()) {
 		search.Walk(tagParser);
 	}
-	mvceditor::ResourceSearchClass resourceSearch(UNICODE_STRING_SIMPLE("Record::get"));
-	matches = resourceFinder.CollectNearMatchResources(resourceSearch);
+	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("Record::get"));
+	matches = tagFinder.CollectNearMatchResources(tagSearch);
 	time = wxGetLocalTimeMillis() - time;
 	found = matches.size();
-	printf("time for resourceFinder on entire project after caching:%ld ms found:%d\n", time.ToLong(), (int)found);
+	printf("time for tagFinder on entire project after caching:%ld ms found:%d\n", time.ToLong(), (int)found);
 }
 
 ParserDirectoryWalkerClass::ParserDirectoryWalkerClass() 

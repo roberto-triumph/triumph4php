@@ -43,9 +43,9 @@ class ResourceFinderCompleteEventClass : public wxEvent {
 	/**
 	 * Will contain all of the parsed resources. 
 	 */
-	std::vector<mvceditor::ResourceClass> Resources;
+	std::vector<mvceditor::TagClass> Resources;
 	
-	ResourceFinderCompleteEventClass(int eventId, const std::vector<mvceditor::ResourceClass>& resources);
+	ResourceFinderCompleteEventClass(int eventId, const std::vector<mvceditor::TagClass>& resources);
 	
 	wxEvent* Clone() const;
 	
@@ -153,7 +153,7 @@ public:
 	GlobalClassesThreadClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 	
 	/**
-	 * @param projects the currently projects, which contain the full paths to resource DB files to read
+	 * @param projects the currently projects, which contain the full paths to tag DB files to read
 	 * @return TRUE if there is at least one enabled project
 	 */
 	bool Init(const std::vector<mvceditor::ProjectClass>& projects);
@@ -165,7 +165,7 @@ protected:
 private:
 
 	/**
-	 * location of the resource database files
+	 * location of the tag database files
 	 */
 	std::vector<wxFileName> ResourceDbFileNames;
 	
@@ -197,7 +197,7 @@ public:
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 	
 	/**
-	 * When the right click context menu is chosen on some selected text, open that resource into the outline control.
+	 * When the right click context menu is chosen on some selected text, open that tag into the outline control.
 	 * @param wxCommandEvent& event
 	 */
 	void OnOutlineMenu(wxCommandEvent& event);
@@ -210,18 +210,18 @@ public:
 	
 	/**
 	 * Builds an outline based on the given line of text.  Note that this does not parse a file; it searches the
-	 * global ResourceCache
+	 * global TagCache
 	 * 
 	 * @param wxString className the name of the class to build the outline for.
 	 */
-	std::vector<mvceditor::ResourceClass> BuildOutline(const wxString& className);
+	std::vector<mvceditor::TagClass> BuildOutline(const wxString& className);
 	
 	/**
-	 * Opens the file where the given resource is located.
+	 * Opens the file where the given tag is located.
 	 * 
-	 * @param wxString teh fully qualified resource
+	 * @param wxString teh fully qualified tag
 	 */
-	void JumpToResource(const wxString& resource);
+	void JumpToResource(const wxString& tag);
 	
 private:		
 		
@@ -288,7 +288,7 @@ class OutlineViewPanelClass : public OutlineViewGeneratedPanelClass {
 	/**
 	 * refresh the code control from the feature source strings
 	 */
-	 void RefreshOutlines(const std::vector<ResourceClass>& resources);
+	 void RefreshOutlines(const std::vector<TagClass>& resources);
 	
 protected:
 
@@ -298,7 +298,7 @@ protected:
 	void OnHelpButton(wxCommandEvent& event);
 	
 	/**
-	 * take the selected choice, perform a resource lookup, and get the outline
+	 * take the selected choice, perform a tag lookup, and get the outline
 	 */
 	void OnChoice(wxCommandEvent& event);
 
@@ -322,7 +322,7 @@ private:
 	NotebookClass* Notebook;
 	
 	/**
-	 * double clicking on a  resource name in the tree will make the editor open up that resource
+	 * double clicking on a  tag name in the tree will make the editor open up that tag
 	 */
 	void OnTreeItemActivated(wxTreeEvent& event);
 };

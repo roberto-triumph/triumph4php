@@ -84,16 +84,16 @@ public:
 	mvceditor::SymbolTableClass CompletionSymbolTable;
 	pelet::ScopeClass Scope;
 	pelet::ExpressionClass ParsedExpression;
-	std::vector<mvceditor::ResourceFinderClass*> AllFinders;
-	std::map<wxString, mvceditor::ResourceFinderClass*> OpenedFinders;
+	std::vector<mvceditor::ParsedTagFinderClass*> AllFinders;
+	std::map<wxString, mvceditor::ParsedTagFinderClass*> OpenedFinders;
 	soci::session SessionGlobal;
 	soci::session Session1;
 	mvceditor::TagParserClass TagParserGlobal;
 	mvceditor::TagParserClass TagParser1;
-	mvceditor::ResourceFinderClass Finder1;
-	mvceditor::ResourceFinderClass GlobalFinder;
+	mvceditor::ParsedTagFinderClass Finder1;
+	mvceditor::ParsedTagFinderClass GlobalFinder;
 	std::vector<UnicodeString> VariableMatches;
-	std::vector<mvceditor::ResourceClass> ResourceMatches;
+	std::vector<mvceditor::TagClass> ResourceMatches;
 	bool DoDuckTyping;
 	bool DoFullyQualifiedMatchOnly;
 	mvceditor::SymbolTableMatchErrorClass Error;
@@ -336,7 +336,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithLocalFinderOverridesGlob
 	mvceditor::TagParserClass localTagPaser;
 	localTagPaser.Init(&localSession);
 	localTagPaser.BuildResourceCacheForFile(wxT("MyClass.php"), sourceCodeOpened, true);
-	mvceditor::ResourceFinderClass localFinder;
+	mvceditor::ParsedTagFinderClass localFinder;
 	localFinder.Init(&localSession);
 	OpenedFinders[wxT("MyClass.php")] = &localFinder;
 	AllFinders.push_back(&localFinder);
@@ -541,11 +541,11 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithClassname) {
 	);
 	Init(sourceCode);	
 	ToClass(UNICODE_STRING_SIMPLE("MyCl"));
-	std::vector<mvceditor::ResourceClass> resources;
+	std::vector<mvceditor::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
-		resources, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
-	CHECK_VECTOR_SIZE(1, resources);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass"), resources[0].Identifier);
+		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
+	CHECK_VECTOR_SIZE(1, tags);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass"), tags[0].Identifier);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithDoFullyQualifiedNameOnly) {
@@ -561,11 +561,11 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithDoFullyQualified
 	DoFullyQualifiedMatchOnly = true;
 	Init(sourceCode);	
 	ToClass(UNICODE_STRING_SIMPLE("My"));
-	std::vector<mvceditor::ResourceClass> resources;
+	std::vector<mvceditor::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
-		resources, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
-	CHECK_VECTOR_SIZE(1, resources);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("My"), resources[0].Identifier);
+		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
+	CHECK_VECTOR_SIZE(1, tags);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("My"), tags[0].Identifier);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithSimilarClassAndFunctionName) {
@@ -581,12 +581,12 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithSimilarClassAndF
 	);
 	Init(sourceCode);	
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE(""), false, false);
-	std::vector<mvceditor::ResourceClass> resources;
+	std::vector<mvceditor::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
-		resources, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
-	CHECK_VECTOR_SIZE(2, resources);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workA"), resources[0].Identifier);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), resources[1].Identifier);
+		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
+	CHECK_VECTOR_SIZE(2, tags);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workA"), tags[0].Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), tags[1].Identifier);
 }
 
 
@@ -856,15 +856,15 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithMethodCall) {
 	);
 	Init(sourceCode);	
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false, false);
-	std::vector<mvceditor::ResourceClass> resources;
+	std::vector<mvceditor::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
-		resources, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
-	CHECK_EQUAL((size_t)2, resources.size());
-	if ((size_t)2 == resources.size()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("workA"), resources[0].Identifier);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass"), resources[0].ClassName);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), resources[1].Identifier);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass"), resources[1].ClassName);
+		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
+	CHECK_EQUAL((size_t)2, tags.size());
+	if ((size_t)2 == tags.size()) {
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("workA"), tags[0].Identifier);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass"), tags[0].ClassName);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), tags[1].Identifier);
+		CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass"), tags[1].ClassName);
 	}
 }
 
@@ -879,10 +879,10 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressio
 	);
 	Init(sourceCode);
 	ToFunction(UNICODE_STRING_SIMPLE("unknown"));
-	std::vector<mvceditor::ResourceClass> resources;
+	std::vector<mvceditor::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
-		resources, true, false, Error);
-	CHECK_EQUAL((size_t)0, resources.size());
+		tags, true, false, Error);
+	CHECK_EQUAL((size_t)0, tags.size());
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressionAndNoDuckTyping) {
@@ -898,10 +898,10 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressio
 	);
 	Init(sourceCode);	
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false, false);
-	std::vector<mvceditor::ResourceClass> resources;
+	std::vector<mvceditor::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
-		resources, false, false, Error);
-	CHECK_EQUAL((size_t)0, resources.size());
+		tags, false, false, Error);
+	CHECK_EQUAL((size_t)0, tags.size());
 }
 
 
@@ -918,14 +918,14 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownVariableA
 	);
 	Init(sourceCode);	
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false, false);
-	std::vector<mvceditor::ResourceClass> resources;
+	std::vector<mvceditor::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
-		resources, true, false, Error);
-	CHECK_VECTOR_SIZE(2, resources);
-	CHECK_UNISTR_EQUALS("workA", resources[0].Identifier);
-	CHECK_UNISTR_EQUALS("MyClass", resources[0].ClassName);
-	CHECK_UNISTR_EQUALS("workB", resources[1].Identifier);
-	CHECK_UNISTR_EQUALS("MyClass", resources[1].ClassName);
+		tags, true, false, Error);
+	CHECK_VECTOR_SIZE(2, tags);
+	CHECK_UNISTR_EQUALS("workA", tags[0].Identifier);
+	CHECK_UNISTR_EQUALS("MyClass", tags[0].ClassName);
+	CHECK_UNISTR_EQUALS("workB", tags[1].Identifier);
+	CHECK_UNISTR_EQUALS("MyClass", tags[1].ClassName);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithTraitInDifferentNamespace) {
@@ -972,10 +972,10 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillUnknownResourceError) {
 	);
 	Init(sourceCode);	
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("unknownFunc"), false, false);
-	std::vector<mvceditor::ResourceClass> resources;
+	std::vector<mvceditor::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
-		resources, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
-	CHECK_EQUAL((size_t)0, resources.size());
+		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
+	CHECK_EQUAL((size_t)0, tags.size());
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::UNKNOWN_RESOURCE, Error.Type);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass"),  Error.ErrorClass);
 }
@@ -992,10 +992,10 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillResolutionError) {
 	Init(sourceCode);	
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("workB"), true, false);
 	ExpressionAppendChain(UNICODE_STRING_SIMPLE("prop"), false);
-	std::vector<mvceditor::ResourceClass> resources;
+	std::vector<mvceditor::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
-		resources, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
-	CHECK_EQUAL((size_t)0, resources.size());
+		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
+	CHECK_EQUAL((size_t)0, tags.size());
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::TYPE_RESOLUTION_ERROR, Error.Type);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"),  Error.ErrorLexeme);
 }
@@ -1011,10 +1011,10 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillPrimitveError) {
 	);
 	Init(sourceCode);	
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("wor"), false, false);
-	std::vector<mvceditor::ResourceClass> resources;
+	std::vector<mvceditor::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedExpression, Scope, AllFinders, OpenedFinders, 
-		resources, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
-	CHECK_EQUAL((size_t)0, resources.size());
+		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
+	CHECK_EQUAL((size_t)0, tags.size());
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::PRIMITIVE_ERROR, Error.Type);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("$my"),  Error.ErrorLexeme);
 }
@@ -1047,7 +1047,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithClassHierarchyInMultiple
 	 * user opens a file, writes code for a base class
 	 * user opens another file, writes code for a class that uses the base class
 	 * code completion should recognize the inheritance chain, even though
-	 * the classes are stored in multiple resources finders
+	 * the classes are stored in multiple tags finders
 	 */
 	UnicodeString sourceCodeParent = mvceditor::CharToIcu(
 		"<?php\n"

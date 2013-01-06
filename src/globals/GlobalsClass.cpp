@@ -27,7 +27,7 @@
 
 mvceditor::GlobalsClass::GlobalsClass()
 	: Environment()
-	, ResourceCache()
+	, TagCache()
 	, UrlResourceFinder()
 	, SqlResourceFinder()
 	, Infos()

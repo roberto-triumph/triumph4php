@@ -34,7 +34,7 @@ class CallStackFixtureTestClass : public FileTestFixtureClass {
 	
 public:
 
-	mvceditor::ResourceCacheClass ResourceCache;
+	mvceditor::TagCacheClass TagCache;
 	mvceditor::CallStackClass CallStack;
 	std::vector<wxString> PhpFileExtensions;
 	std::vector<wxString> MiscFileExtensions;
@@ -42,8 +42,8 @@ public:
 	
 	CallStackFixtureTestClass()
 		: FileTestFixtureClass(wxT("call_stack")) 
-		, ResourceCache() 
-		, CallStack(ResourceCache)
+		, TagCache() 
+		, CallStack(TagCache)
 		, PhpFileExtensions() 
 		, MiscFileExtensions() {
 		PhpFileExtensions.push_back(wxT("*.php"));
@@ -87,7 +87,7 @@ public:
 		}
 		
 		// need to code it so that gcc does not think that good is an unused variable in release mode
-		bool good = ResourceCache.RegisterGlobal(globalCache);
+		bool good = TagCache.RegisterGlobal(globalCache);
 		wxUnusedVar(good);
 		wxASSERT_MSG(good, _("global cache could not be registered"));
 	}
@@ -194,7 +194,7 @@ TEST_FIXTURE(CallStackFixtureTestClass, FailOnEmptyCache) {
 	SetupFile(wxT("news.php"), Simple());
 	BuildCache();
 
-	mvceditor::ResourceCacheClass localCache;
+	mvceditor::TagCacheClass localCache;
 	mvceditor::CallStackClass localCallStack(localCache);
 	
 	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));

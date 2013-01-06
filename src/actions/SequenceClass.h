@@ -74,8 +74,8 @@ public:
 	/**
 	 * start the application start sequence. The project update sequence will do the following:
 	 * - Detect the PHP framework that the project is using
-	 * - Load the resource cache if it exists
-	 * - Start the resource cache update for the project
+	 * - Load the tag cache if it exists
+	 * - Start the tag cache update for the project
 	 * - Load the project's database connections
 	 * - Detect the SQL table metadata for the project's database connections
 	 *
@@ -92,8 +92,8 @@ public:
 	 * like AppStart sequence.
 	 * - Remove the project cache, urls, SQL table metada for the removed projects
 	 * - Detect the PHP framework that the project is using
-	 * - Load the resource cache if it exists
-	 * - Start the resource cache update for the project
+	 * - Load the tag cache if it exists
+	 * - Start the tag cache update for the project
 	 * - Load the project's database connections
 	 * - Detect the SQL table metadata for the project's database connections
 	 *
@@ -106,14 +106,14 @@ public:
 	bool ProjectDefinitionsUpdated(const std::vector<mvceditor::ProjectClass>& touchedProjects);
 
 	/**
-	 * Start the full resource cache rebuild sequence.  This will include
+	 * Start the full tag cache rebuild sequence.  This will include
 	 * - wiping all existing global caches from all projects
 	 * - indexing all enabled projects
 	 * @return bool FALSE if there is a sequence already running. if there is an existing
 	 *         sequence running then we will not start another sequence as sequences deal with 
 	 *         GlobalsClass and running many sequences may cause problems 
 	 */
-	bool ResourceCacheWipeAndIndex();
+	bool TagCacheWipeAndIndex();
 
 	/**
 	 * start running a sequence of arbritrary actions. actions will run 

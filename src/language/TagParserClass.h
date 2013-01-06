@@ -26,7 +26,7 @@
 #define __MVCEDITOR_TAGPARSERCLASS_H__
 
 #include <search/DirectorySearchClass.h>
-#include <search/ResourceFinderClass.h>
+#include <search/ParsedTagFinderClass.h>
 #include <pelet/ParserClass.h>
 #include <wx/datetime.h>
 #include <wx/string.h>
@@ -85,7 +85,7 @@ public:
 	~TagParserClass();
 
 	/**
-	 * Create the resource database that is backed by the given session. 
+	 * Create the tag database that is backed by the given session. 
 	 * This method can used to have the tag parser write to either a SQLite hard disk file
 	 * or a SQLite in-memory database.
 	 * By using an in-memory database, lookups are faster. This method would be used
@@ -146,7 +146,7 @@ public:
 		const UnicodeString& comment, const int lineNumber);
 
 	/**
-	 * When a define has been found, add it to the resource cache
+	 * When a define has been found, add it to the tag cache
 	 */
 	void DefineDeclarationFound(const UnicodeString& namespaceName, const UnicodeString& variableName, const UnicodeString& variableValue, 
 			const UnicodeString& comment, const int lineNumber);
@@ -180,12 +180,12 @@ public:
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment, const int lineNumber);
 
 	/**
-	 * Print the resource cache to stdout.  Useful for debugging only.
+	 * Print the tag cache to stdout.  Useful for debugging only.
 	 */
 	void Print();
 
 	/**
-	 * Removes all resources from this resource finder entirely. If this
+	 * Removes all resources from this tag finder entirely. If this
 	 * finder was initialized with a backing file, the backing database
 	 * file will be truncated also.
 	 */
@@ -203,7 +203,7 @@ private:
 	 * files are being parsed. After all files have been parsed, these resources will be
 	 * added to the database.
 	 */
-	std::vector<ResourceClass> FileParsingCache;
+	std::vector<TagClass> FileParsingCache;
 
 	/**
 	 * cache of namespaces, used because the same namespace may be declared in multiple 
@@ -223,7 +223,7 @@ private:
 	 * the value will always be a 2 item vector: item 0 is the fully qualified key and 
 	 * item 1 is the class only key
 	 */
-	std::map<UnicodeString, std::vector<TraitResourceClass>, UnicodeStringComparatorClass> TraitCache;
+	std::map<UnicodeString, std::vector<TraitTagClass>, UnicodeStringComparatorClass> TraitCache;
 	
 	/**
 	 * Used to parse through code for classes & methods
@@ -233,7 +233,7 @@ private:
 	pelet::ParserClass Parser;
 
 	/**
-	 * The connection to the database that backs the resource cache
+	 * The connection to the database that backs the tag cache
 	 * The database will hold all of the files that have been looked at, as well
 	 * as all of the resources that were parsed.
 	 * This class will NOT own the pointer.
@@ -249,9 +249,9 @@ private:
 	/**
 	 * The current file item being indexed.  We keep a class-wide member when parsing through many files.
 	 * 
-	 * @var int fileItemIndex the index of the FileCache entry that corresponds to the file located at fullPath
+	 * @var int fileTagId the dataabse ID of the FileTag entry that corresponds to the file located at fullPath
 	 */
-	int CurrentFileItemId;
+	int CurrentFileTagId;
 
 	/**
 	 * The initial size of FileParsingCache. This is only a hint, the buffer will grow as necessary
@@ -261,7 +261,7 @@ private:
 	int FileParsingBufferSize;
 
 	/**
-	 * Flag to make sure we initialize the resource database.
+	 * Flag to make sure we initialize the tag database.
 	 */
 	bool IsCacheInitialized;
 	
@@ -269,7 +269,7 @@ private:
 	 * Goes through the given file and parses out resources.
 	 * 
 	 * @param wxString fullPath full path to the file to look at
-	 * @param bool parseClasses if TRUE, file will be opened and ResourceCache will be populated.  Otherwise, only FileCache
+	 * @param bool parseClasses if TRUE, file will be opened and TagCache will be populated.  Otherwise, only FileCache
 	 *        will be populated.
 	 */
 	void BuildResourceCache(const wxString& fullPath, bool parseClasses);
@@ -277,44 +277,44 @@ private:
 	/**
 	 * remove all resources for the given file_item_ids.
 	 * 
-	 * @param fileItemids the list of file_item_id that will be deleted from the SQLite database.
+	 * @param fileTagids the list of file_item_id that will be deleted from the SQLite database.
 	 */
-	void RemovePersistedResources(const std::vector<int>& fileItemIds);
+	void RemovePersistedResources(const std::vector<int>& fileTagIds);
 	
 	/**
 	 * Write the file item into the database. The item's FileId member will be set as well.
 	 */
-	void PersistFileItem(mvceditor::FileItemClass& fileItem);
+	void PersistFileTag(mvceditor::FileTagClass& fileTag);
 
 	/**
-	 * Find the FileItem entry that has the given full path (exact, case insensitive search into
+	 * Find the FileTag entry that has the given full path (exact, case insensitive search into
 	 * the database).
 	 *
 	 * @param fullPath the full path to search for
-	 * @param fileItem the FileItem itself will be copied here (if found)
+	 * @param fileTag the FileTag itself will be copied here (if found)
 	 * @return bool if TRUE it means that this ResourceFinder has encountered the given
 	 * file before.
 	 */
-	bool FindFileItemByFullPathExact(const wxString& fullPath, mvceditor::FileItemClass& fileItem);
+	bool FindFileTagByFullPathExact(const wxString& fullPath, mvceditor::FileTagClass& fileTag);
 
 	/**
 	 * add all of the given resources into the database.
 	 * @param resources the list of resources that were parsed out
 	 * @param int the file that the resources are located in
 	 */
-	void PersistResources(const std::vector<mvceditor::ResourceClass>& resources, int fileitemId);
+	void PersistResources(const std::vector<mvceditor::TagClass>& resources, int fileitemId);
 
 	/**
 	 * add all of the given trait resources into the database.
 	 * @param traits the map of resources that were parsed out
 	 */
 	void PersistTraits(
-		const std::map<UnicodeString, std::vector<mvceditor::TraitResourceClass>, UnicodeStringComparatorClass>& traitMap);
+		const std::map<UnicodeString, std::vector<mvceditor::TraitTagClass>, UnicodeStringComparatorClass>& traitMap);
 
 	/**
 	 * @return all of the traits that any of the given classes use.
 	 */
-	std::vector<mvceditor::TraitResourceClass> FindTraitsByClassName(const std::vector<std::string>& keyStarts);
+	std::vector<mvceditor::TraitTagClass> FindTraitsByClassName(const std::vector<std::string>& keyStarts);
 
 	/**
 	 * check the database AND the current file's parsed cache to see if the namespace has been seen

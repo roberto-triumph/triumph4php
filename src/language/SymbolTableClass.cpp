@@ -29,40 +29,40 @@
 #include <algorithm>
 
 /*
- * Checks that a resource matches visiblity rules.  Visibility rules include
+ * Checks that a tag matches visiblity rules.  Visibility rules include
  * 1) public/private/protected
  * 2) static/instance
  * 3) namespace aliases
  * 
- * @param resource the resource to check
+ * @param tag the tag to check
  * @param originalParsedExpression the original query being asked for
  * @param scope the scope of the query being parsed
- * @param isStaticCall if TRUE, then resource is visible if the resource is also static
- * @param isThisCall if TRUE, then resource is visible if the resource is private, protected, or public
- * @param isParentCall if TRUE, then resource is visible if the resource is protected, or public
- * @return bool true if resource is visible
+ * @param isStaticCall if TRUE, then tag is visible if the tag is also static
+ * @param isThisCall if TRUE, then tag is visible if the tag is private, protected, or public
+ * @param isParentCall if TRUE, then tag is visible if the tag is protected, or public
+ * @return bool true if tag is visible
  */
-static bool IsResourceVisible(const mvceditor::ResourceClass& resource, const pelet::ExpressionClass& originalParsedExpression,
+static bool IsResourceVisible(const mvceditor::TagClass& tag, const pelet::ExpressionClass& originalParsedExpression,
 		const pelet::ScopeClass& scope,
 		bool isStaticCall, bool isThisCall, bool isParentCall) {
 	bool passesStaticCheck = true;
 	if (isStaticCall) {
-		passesStaticCheck = mvceditor::ResourceClass::CLASS_CONSTANT == resource.Type || resource.IsStatic;
+		passesStaticCheck = mvceditor::TagClass::CLASS_CONSTANT == tag.Type || tag.IsStatic;
 	}
 	else {
-		passesStaticCheck = mvceditor::ResourceClass::CLASS_CONSTANT != resource.Type && !resource.IsStatic;
+		passesStaticCheck = mvceditor::TagClass::CLASS_CONSTANT != tag.Type && !tag.IsStatic;
 	}
 
-	// $this => can access this resource's private, parent's protected/public, other public
+	// $this => can access this tag's private, parent's protected/public, other public
 	// parent => can access parent's protected/public
 	// neither => can only access public
-	bool passesVisibilityCheck = !resource.IsPrivate && !resource.IsProtected;
+	bool passesVisibilityCheck = !tag.IsPrivate && !tag.IsProtected;
 	if (!passesVisibilityCheck && isParentCall) {
 
-		// this check assumes that the resource finder has traversed the inheritance chain
-		// properly. then, by a process of elimination, if the resource class is not
+		// this check assumes that the tag finder has traversed the inheritance chain
+		// properly. then, by a process of elimination, if the tag class is not
 		// the symbol then we only show protected/public resources
-		passesVisibilityCheck = resource.IsProtected;
+		passesVisibilityCheck = tag.IsProtected;
 	}
 	else if (!passesVisibilityCheck) {
 
@@ -75,21 +75,21 @@ static bool IsResourceVisible(const mvceditor::ResourceClass& resource, const pe
 	// we must perform this logic here
 	bool passesNamespaceCheck = true;			
 	UnicodeString name = originalParsedExpression.FirstValue();
-	if (!name.startsWith(UNICODE_STRING_SIMPLE("$")) && !name.startsWith(UNICODE_STRING_SIMPLE("\\")) && mvceditor::ResourceClass::CLASS == resource.Type) {
+	if (!name.startsWith(UNICODE_STRING_SIMPLE("$")) && !name.startsWith(UNICODE_STRING_SIMPLE("\\")) && mvceditor::TagClass::CLASS == tag.Type) {
 		
-		// if the resource if a global class and the current namespace is NOT the global namespace, 
+		// if the tag if a global class and the current namespace is NOT the global namespace, 
 		// then the class cannot be accessed
-		// this assumes that resource finder was successful
+		// this assumes that tag finder was successful
 		if (!scope.IsGlobalNamespace()) {
 			passesNamespaceCheck = false;
 			
-			UnicodeString resQualified(resource.NamespaceName);
+			UnicodeString resQualified(tag.NamespaceName);
 			if (!resQualified.endsWith(UNICODE_STRING_SIMPLE("\\"))) {
 				resQualified.append(UNICODE_STRING_SIMPLE("\\"));
 			}
-			resQualified.append(resource.Identifier);
+			resQualified.append(tag.Identifier);
 				
-			// but if the resource is aliased then the class can be accessed
+			// but if the tag is aliased then the class can be accessed
 			std::map<UnicodeString, UnicodeString, pelet::UnicodeStringComparatorClass> aliases = scope.GetNamespaceAliases();
 			std::map<UnicodeString, UnicodeString, pelet::UnicodeStringComparatorClass>::const_iterator it;
 			for (it = aliases.begin(); it != aliases.end(); ++it) {
@@ -106,7 +106,7 @@ static bool IsResourceVisible(const mvceditor::ResourceClass& resource, const pe
 			}
 			if (!passesNamespaceCheck) {
 				
-				// check to see if resource is from the declared namespace
+				// check to see if tag is from the declared namespace
 				// when comparing namespaces make sure both end with slash so that we compare
 				// full namespace names
 				UnicodeString scopeNs = scope.NamespaceName;
@@ -137,10 +137,10 @@ static bool IsStaticExpression(const pelet::ExpressionClass& parsedExpression) {
 
 /**
  * @return vector of all of the classes that are parent classes of the given
- *         class. this method will search across all resource finders
+ *         class. this method will search across all tag finders
  */
 static std::vector<UnicodeString> ClassParents(UnicodeString className, UnicodeString methodName, 
-												 const std::vector<mvceditor::ResourceFinderClass*>& allResourceFinders) {
+												 const std::vector<mvceditor::ParsedTagFinderClass*>& allResourceFinders) {
 	std::vector<UnicodeString> parents;
 	bool found = false;
 	UnicodeString classToLookup = className;
@@ -166,12 +166,12 @@ static std::vector<UnicodeString> ClassParents(UnicodeString className, UnicodeS
 
 /**
  * @return vector of all of the traits that are used by any of the given class or parent classes.
- *         This method will search across all resource finders
+ *         This method will search across all tag finders
  */
 static std::vector<UnicodeString> ClassUsedTraits(const UnicodeString& className, 
 												  const std::vector<UnicodeString>& parentClassNames, 
 												  const UnicodeString& methodName, 
-												  const std::vector<mvceditor::ResourceFinderClass*>& allResourceFinders) {
+												  const std::vector<mvceditor::ParsedTagFinderClass*>& allResourceFinders) {
 
 	// trait support; a class can use multiple traits; hence the different logic 
 	std::vector<UnicodeString> classesToLookup;
@@ -201,30 +201,30 @@ static std::vector<UnicodeString> ClassUsedTraits(const UnicodeString& className
 }
 
 /**
- * Figure out a resource's type by looking at all of the given finders.
+ * Figure out a tag's type by looking at all of the given finders.
  * @param resourceToLookup MUST BE fully qualified (class name  + method name,  or function name).  string can have the
  *        object operator "::" that separates the class and method name.
  * @param allResourceFinders all of the finders to look in
- * @return the resource's type; (for methods, it's the return type of the method) could be empty string if type could 
+ * @return the tag's type; (for methods, it's the return type of the method) could be empty string if type could 
  *         not be determined 
  */
 static UnicodeString ResolveResourceType(UnicodeString resourceToLookup, 
-										 const std::vector<mvceditor::ResourceFinderClass*>& allResourceFinders) {
+										 const std::vector<mvceditor::ParsedTagFinderClass*>& allResourceFinders) {
 	UnicodeString type;
-	mvceditor::ResourceSearchClass resourceSearch(resourceToLookup);
-	resourceSearch.SetParentClasses(ClassParents(resourceSearch.GetClassName(), resourceSearch.GetMethodName(), allResourceFinders));
-	resourceSearch.SetTraits(ClassUsedTraits(resourceSearch.GetClassName(), resourceSearch.GetParentClasses(), resourceSearch.GetMethodName(), allResourceFinders));
+	mvceditor::TagSearchClass tagSearch(resourceToLookup);
+	tagSearch.SetParentClasses(ClassParents(tagSearch.GetClassName(), tagSearch.GetMethodName(), allResourceFinders));
+	tagSearch.SetTraits(ClassUsedTraits(tagSearch.GetClassName(), tagSearch.GetParentClasses(), tagSearch.GetMethodName(), allResourceFinders));
 
-	// need to get the type from the resource finders
+	// need to get the type from the tag finders
 	for (size_t j = 0; j < allResourceFinders.size(); ++j) {
-		mvceditor::ResourceFinderClass* finder = allResourceFinders[j];
-		std::vector<mvceditor::ResourceClass> matches = finder->CollectFullyQualifiedResource(resourceSearch);
+		mvceditor::ParsedTagFinderClass* finder = allResourceFinders[j];
+		std::vector<mvceditor::TagClass> matches = finder->CollectFullyQualifiedResource(tagSearch);
 		if (!matches.empty()) {
 
 			// since we are doing fully qualified matches, all matches are from the inheritance chain; ie. all methods
 			// will have the same signature (return type)
-			mvceditor::ResourceClass match = matches[0];
-			if (mvceditor::ResourceClass::CLASS == match.Type) {
+			mvceditor::TagClass match = matches[0];
+			if (mvceditor::TagClass::CLASS == match.Type) {
 				type = match.ClassName;
 			}
 			else {
@@ -262,8 +262,8 @@ static UnicodeString ResolveResourceType(UnicodeString resourceToLookup,
  * @return the variable's type; could be empty string if type could not be determined 
  */
 static UnicodeString ResolveVariableType(const pelet::ScopeClass& expressionScope, 
-										 const std::vector<mvceditor::ResourceFinderClass*>& allResourceFinders,
-										 const std::map<wxString, mvceditor::ResourceFinderClass*>& openedResourceFinders, 
+										 const std::vector<mvceditor::ParsedTagFinderClass*>& allResourceFinders,
+										 const std::map<wxString, mvceditor::ParsedTagFinderClass*>& openedResourceFinders, 
 										 bool doDuckTyping,
 										 mvceditor::SymbolTableMatchErrorClass& error,
 										 const UnicodeString& variable, 
@@ -305,11 +305,11 @@ static UnicodeString ResolveVariableType(const pelet::ScopeClass& expressionScop
 				pelet::ExpressionClass parsedExpression(peletScope);
 
 				parsedExpression.ChainList = symbol.ChainList;
-				std::vector<mvceditor::ResourceClass> resourceMatches;
+				std::vector<mvceditor::TagClass> resourceMatches;
 				symbolTable.ResourceMatches(parsedExpression, expressionScope, 
 					allResourceFinders, openedResourceFinders, resourceMatches, doDuckTyping, false, error);
 				if (!resourceMatches.empty()) {
-					if (mvceditor::ResourceClass::CLASS == resourceMatches[0].Type) {
+					if (mvceditor::TagClass::CLASS == resourceMatches[0].Type) {
 						type = resourceMatches[0].ClassName;
 					}
 					else {
@@ -331,13 +331,13 @@ static UnicodeString ResolveVariableType(const pelet::ScopeClass& expressionScop
  * @param parsedExpression the expression to resolved.
  * @param scope the scope (to resolve variables)
  * @param allResourceFinders all of the finders to look in
- * @param openedResourceFindesr the resource finders from the opened files
- * @return the resource's type; (for methods, it's the return type of the method) could be empty string if type could not be determined 
+ * @param openedResourceFindesr the tag finders from the opened files
+ * @return the tag's type; (for methods, it's the return type of the method) could be empty string if type could not be determined 
  */
 static UnicodeString ResolveInitialLexemeType(const pelet::ExpressionClass& parsedExpression, 
 											  const pelet::ScopeClass& expressionScope, 
-											  const std::vector<mvceditor::ResourceFinderClass*>& allResourceFinders,
-											  const std::map<wxString, mvceditor::ResourceFinderClass*>& openedResourceFinders,
+											  const std::vector<mvceditor::ParsedTagFinderClass*>& allResourceFinders,
+											  const std::map<wxString, mvceditor::ParsedTagFinderClass*>& openedResourceFinders,
 											  bool doDuckTyping,
 											  mvceditor::SymbolTableMatchErrorClass& error,
 											  const std::vector<mvceditor::SymbolClass>& scopeSymbols,
@@ -365,7 +365,7 @@ static UnicodeString ResolveInitialLexemeType(const pelet::ExpressionClass& pars
 		
 		// look at the class signature of the current class that is in scope; that will tell us
 		// what class is the parent
-		// this code assumes that the resource finders have parsed the same exact code as the code that the
+		// this code assumes that the tag finders have parsed the same exact code as the code that the
 		// symbol table has parsed.
 		// also, determine the type of "parent" by looking at the scope
 		UnicodeString scopeClass = expressionScope.ClassName;
@@ -383,7 +383,7 @@ static UnicodeString ResolveInitialLexemeType(const pelet::ExpressionClass& pars
 	}
 	else if (parsedExpression.ChainList.size() > 1) {
 
-		// a function or a class. need to get the type from the resource finders
+		// a function or a class. need to get the type from the tag finders
 		// when ChainList has only one item, the item may be a partial function/class name
 		// so we may not find it. 
 		if (IsStaticExpression(parsedExpression)) {
@@ -588,10 +588,10 @@ void mvceditor::SymbolTableClass::CreateSymbolsFromFile(const wxString& fileName
 }
 
 void mvceditor::SymbolTableClass::ExpressionCompletionMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope,
-															  const std::vector<mvceditor::ResourceFinderClass*>& allResourceFinders,
-															  const std::map<wxString, mvceditor::ResourceFinderClass*>& openedResourceFinders,
+															  const std::vector<mvceditor::ParsedTagFinderClass*>& allResourceFinders,
+															  const std::map<wxString, mvceditor::ParsedTagFinderClass*>& openedResourceFinders,
 															  std::vector<UnicodeString>& autoCompleteVariableList,
-															  std::vector<mvceditor::ResourceClass>& autoCompleteResourceList,
+															  std::vector<mvceditor::TagClass>& autoCompleteResourceList,
 															  bool doDuckTyping,
 															  mvceditor::SymbolTableMatchErrorClass& error) const {
 	if (parsedExpression.ChainList.size() == 1 && parsedExpression.FirstValue().startsWith(UNICODE_STRING_SIMPLE("$"))) {
@@ -619,9 +619,9 @@ void mvceditor::SymbolTableClass::ExpressionCompletionMatches(pelet::ExpressionC
 }
 
 void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope, 
-												  const std::vector<mvceditor::ResourceFinderClass*>& allResourceFinders,
-												  const std::map<wxString, mvceditor::ResourceFinderClass*>& openedResourceFinders,
-												  std::vector<mvceditor::ResourceClass>& resourceMatches,
+												  const std::vector<mvceditor::ParsedTagFinderClass*>& allResourceFinders,
+												  const std::map<wxString, mvceditor::ParsedTagFinderClass*>& openedResourceFinders,
+												  std::vector<mvceditor::TagClass>& resourceMatches,
 												  bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 												  mvceditor::SymbolTableMatchErrorClass& error) const {
 	std::vector<mvceditor::SymbolClass> scopeSymbols;
@@ -691,31 +691,31 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 	bool isParentCall = parsedExpression.FirstValue().caseCompare(UNICODE_STRING_SIMPLE("parent"), 0) == 0;
 
 	if (!error.HasError()) {
-		mvceditor::ResourceSearchClass resourceSearch(resourceToLookup);
-		resourceSearch.SetParentClasses(ClassParents(resourceSearch.GetClassName(), resourceSearch.GetMethodName(), allResourceFinders));
-		resourceSearch.SetTraits(ClassUsedTraits(resourceSearch.GetClassName(), resourceSearch.GetParentClasses(), resourceSearch.GetMethodName(), allResourceFinders));
+		mvceditor::TagSearchClass tagSearch(resourceToLookup);
+		tagSearch.SetParentClasses(ClassParents(tagSearch.GetClassName(), tagSearch.GetMethodName(), allResourceFinders));
+		tagSearch.SetTraits(ClassUsedTraits(tagSearch.GetClassName(), tagSearch.GetParentClasses(), tagSearch.GetMethodName(), allResourceFinders));
 		for (size_t j = 0; j < allResourceFinders.size(); ++j) {
-			mvceditor::ResourceFinderClass* finder = allResourceFinders[j];
+			mvceditor::ParsedTagFinderClass* finder = allResourceFinders[j];
 
 			// only do duck typing if needed. otherwise, make sure that we have a type match first.
 			if ((doDuckTyping || !typeToLookup.isEmpty())) {
-				std::vector<mvceditor::ResourceClass> matches;
+				std::vector<mvceditor::TagClass> matches;
 				if (doFullyQualifiedMatchOnly) {
-					matches = finder->CollectFullyQualifiedResource(resourceSearch);
+					matches = finder->CollectFullyQualifiedResource(tagSearch);
 				}
 				else {
-					matches = finder->CollectNearMatchResources(resourceSearch, false);
+					matches = finder->CollectNearMatchResources(tagSearch, false);
 				}
 				
 				// now we loop through the possbile matches and remove stuff that does not 
 				// make sense because of visibility rules or resources that are 
 				// duplicated in two separate caches
 				for (size_t k = 0; k < matches.size(); ++k) {
-					mvceditor::ResourceClass resource = matches[k];
-					bool isVisible = IsResourceVisible(resource, originalExpression, expressionScope, isStaticCall, isThisCall, isParentCall);
-					if (!mvceditor::IsResourceDirty(openedResourceFinders, resource, finder) && isVisible) {
-						UnresolveNamespaceAlias(originalExpression, expressionScope, resource);
-						resourceMatches.push_back(resource);
+					mvceditor::TagClass tag = matches[k];
+					bool isVisible = IsResourceVisible(tag, originalExpression, expressionScope, isStaticCall, isThisCall, isParentCall);
+					if (!mvceditor::IsResourceDirty(openedResourceFinders, tag, finder) && isVisible) {
+						UnresolveNamespaceAlias(originalExpression, expressionScope, tag);
+						resourceMatches.push_back(tag);
 					}
 					else if (!isVisible) {
 						visibilityError = true;
@@ -821,8 +821,8 @@ void mvceditor::SymbolTableClass::ResolveNamespaceAlias(pelet::ExpressionClass& 
 	}
 }
 
-void mvceditor::SymbolTableClass::UnresolveNamespaceAlias(const pelet::ExpressionClass& originalExpression, const pelet::ScopeClass& scope, mvceditor::ResourceClass& resource) const {
-	UnicodeString name = resource.Identifier;
+void mvceditor::SymbolTableClass::UnresolveNamespaceAlias(const pelet::ExpressionClass& originalExpression, const pelet::ScopeClass& scope, mvceditor::TagClass& tag) const {
+	UnicodeString name = tag.Identifier;
 	
 	// leave variables and fully qualified names alone
 	if (!originalExpression.FirstValue().startsWith(UNICODE_STRING_SIMPLE("$")) && !originalExpression.FirstValue().startsWith(UNICODE_STRING_SIMPLE("\\"))) {
@@ -832,7 +832,7 @@ void mvceditor::SymbolTableClass::UnresolveNamespaceAlias(const pelet::Expressio
 		for (it = aliases.begin(); it != aliases.end(); ++it) {
 			
 			// map value is the fully qualified name
-			// check to see if the resource begins with the fully qualified aliased name
+			// check to see if the tag begins with the fully qualified aliased name
 			// need to watch out for the namespace operator
 			// the expression may or may not have it
 			UnicodeString qualified(it->second);
@@ -842,7 +842,7 @@ void mvceditor::SymbolTableClass::UnresolveNamespaceAlias(const pelet::Expressio
 			if (name.startsWith(qualified)) {
 				UnicodeString afterQualified(name, it->second.length());
 				name = it->first + afterQualified;
-				resource.Identifier = name;
+				tag.Identifier = name;
 				break;
 			}
 		}
@@ -853,16 +853,16 @@ void mvceditor::SymbolTableClass::SetVersion(pelet::Versions version) {
 	Parser.SetVersion(version);
 }
 
-bool mvceditor::IsResourceDirty(const std::map<wxString, mvceditor::ResourceFinderClass*>& finders, 
-								const ResourceClass& resource, mvceditor::ResourceFinderClass* resourceFinder) {
+bool mvceditor::IsResourceDirty(const std::map<wxString, mvceditor::ParsedTagFinderClass*>& finders, 
+								const TagClass& tag, mvceditor::ParsedTagFinderClass* tagFinder) {
 	bool ret = false;
-	wxString matchFullName = resource.GetFullPath();
-	std::map<wxString, mvceditor::ResourceFinderClass*>::const_iterator it = finders.begin();
+	wxString matchFullName = tag.GetFullPath();
+	std::map<wxString, mvceditor::ParsedTagFinderClass*>::const_iterator it = finders.begin();
 	while (it != finders.end()) {
 
-		// a match from one of the opened resource finders can never be 'dirty' because the resource cache 
+		// a match from one of the opened tag finders can never be 'dirty' because the tag cache 
 		// has been updated by the Update() method
-		if (it->first.CompareTo(matchFullName) == 0 && it->second != resourceFinder) {
+		if (it->first.CompareTo(matchFullName) == 0 && it->second != tagFinder) {
 			ret = true;
 			break;
 		}

@@ -22,11 +22,11 @@
  * @copyright  2012 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <actions/ResourceWipeActionClass.h>
+#include <actions/TagWipeActionClass.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 
-mvceditor::ResourceWipeActionClass::ResourceWipeActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId,
+mvceditor::TagWipeActionClass::TagWipeActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId,
 															const std::vector<mvceditor::ProjectClass>& projects)
 	: ActionClass(runningThreads, eventId) 
 	, ResourceDbFileNames() {
@@ -38,13 +38,13 @@ mvceditor::ResourceWipeActionClass::ResourceWipeActionClass(mvceditor::RunningTh
 	}
 }
 
-bool mvceditor::ResourceWipeActionClass::Init(mvceditor::GlobalsClass& globals) {
+bool mvceditor::TagWipeActionClass::Init(mvceditor::GlobalsClass& globals) {
 
 	// will only wipe the projects given in the constructor, not all of the projects
 	return !ResourceDbFileNames.empty();
 }
 
-void mvceditor::ResourceWipeActionClass::BackgroundWork() {
+void mvceditor::TagWipeActionClass::BackgroundWork() {
 	std::vector<wxFileName>::iterator it;
 	for (it = ResourceDbFileNames.begin(); it != ResourceDbFileNames.end() && !TestDestroy(); ++it) {
 		
@@ -63,6 +63,6 @@ void mvceditor::ResourceWipeActionClass::BackgroundWork() {
 	}
 }
 
-wxString mvceditor::ResourceWipeActionClass::GetLabel() const {
-	return wxT("Resource Cache Wipe");
+wxString mvceditor::TagWipeActionClass::GetLabel() const {
+	return wxT("Tag Cache Wipe");
 }

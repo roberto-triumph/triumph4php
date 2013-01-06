@@ -22,31 +22,21 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITORRESOURCEFINDER_H__
-#define __MVCEDITORRESOURCEFINDER_H__
+#ifndef __MVCEDITORPARSEDTAGFINDERCLASS_H__
+#define __MVCEDITORPARSEDTAGFINDERCLASS_H__
 
-#include <search/DirectorySearchClass.h>
-#include <pelet/ParserClass.h>
-#include <globals/String.h>
-#include <wx/datetime.h>
+#include <globals/TagClass.h>
 #include <wx/string.h>
-#include <wx/filename.h>
 #include <soci/soci.h>
 #include <unicode/unistr.h>
 #include <vector>
-#include <map>
 
 namespace mvceditor {
 
-// these are defined at the bottom of the file
-class ResourceClass; 
-class TraitResourceClass;
-class FileItemClass;
-
 /**
- * This represents a single 'query' for a resource; ie. this is how the tell the resource finder
+ * This represents a single 'query' for a tag; ie. this is how the tell the tag finder
  * what to look for.
- * A resource string can be one of: class name, file name, method name, file name with line number
+ * A tag string can be one of: class name, file name, method name, file name with line number
  * Examples:
  * 
  * user.php //looks for the file named user.php
@@ -56,7 +46,7 @@ class FileItemClass;
  * User:: //looks for all methods and properties for the user class
  * 
  */
-class ResourceSearchClass {
+class TagSearchClass {
 
 public:
 
@@ -78,7 +68,7 @@ public:
 		NAMESPACE_NAME
 	};
 
-	ResourceSearchClass(UnicodeString query);
+	TagSearchClass(UnicodeString query);
 
 	std::vector<UnicodeString> GetParentClasses() const;
 	void SetParentClasses(const std::vector<UnicodeString>& parents);
@@ -115,29 +105,29 @@ public:
 	int GetLineNumber() const;
 	
 	/**
-	 * Returns the resource type that was given in the Prepare() methods. 
+	 * Returns the tag type that was given in the Prepare() methods. 
 	 * @return ResourceTypes
 	 */
-	ResourceSearchClass::ResourceTypes GetResourceType() const;
+	TagSearchClass::ResourceTypes GetResourceType() const;
 
 private:
 
 	/**
-	 * the file name parsed from resource string 
+	 * the file name parsed from tag string 
 	 * 
 	 * @var UnicodeString
 	 */
 	UnicodeString FileName;
 
 	/**
-	 * the class name parsed from resource string 
+	 * the class name parsed from tag string 
 	 * 
 	 * @var UnicodeString
 	 */
 	UnicodeString ClassName;
 	
 	/**
-	 * the method name parsed from resource string
+	 * the method name parsed from tag string
 	 * 
 	 * @var UnicodeString
 	 */
@@ -160,12 +150,12 @@ private:
 	std::vector<UnicodeString> Traits;
 	
 	/**
-	 * The resource type that was parsed
+	 * The tag type that was parsed
 	 */
 	ResourceTypes ResourceType;
 	
 	/**
-	 * the line number parsed from resource string 
+	 * the line number parsed from tag string 
 	 * 
 	 * @var int
 	 */
@@ -174,12 +164,12 @@ private:
 };
 
 /**
- * The ResourceFinderClass is used to locate source code artifacts (classes, functions, methods, and files). The 
+ * The ParsedTagFinderClass is used to locate source code artifacts (classes, functions, methods, and files). The 
  * general flow of a search is as follows:
  * 
- * 1) The resource cache must be built using TagParserClass. 
- * 2) An object of type ResourceFinderClass is instantiated and initialized using the same connection
- *    as the TagParserClass; that way the ResourceFinderClass reads whatever tags the TagParserClass found.
+ * 1) The tag cache must be built using TagParserClass. 
+ * 2) An object of type ParsedTagFinderClass is instantiated and initialized using the same connection
+ *    as the TagParserClass; that way the ParsedTagFinderClass reads whatever tags the TagParserClass found.
  * 3) The search is performed by calling the CollectFullyQualifiedResource or CollectNearMatchResources() methods.
  *    Fully qualified search does exact matching while the near match search performs special logic (see method for
  *    details on search logic).
@@ -190,20 +180,20 @@ private:
  * The parsed resources are persisted in a SQLite database; the database may be a file backed database or
  * a memory-backed SQLite database.
  *
- * The ResourceFinderClass has an exception-free API, no exceptions will be ever thrown, even though
+ * The ParsedTagFinderClass has an exception-free API, no exceptions will be ever thrown, even though
  * it uses SOCI to execute queries (and SOCI uses exceptions). Instead
  * the return values for methods of this class will be false, empty, or zero. Currently this class does not expose 
  * the specific error code from SQLite.
  */
-class ResourceFinderClass {
+class ParsedTagFinderClass {
 
 public:
 	
-	ResourceFinderClass();
-	~ResourceFinderClass();
+	ParsedTagFinderClass();
+	~ParsedTagFinderClass();
 
 	/**
-	 * Create the resource database that is backed by the given session. 
+	 * Create the tag database that is backed by the given session. 
 	 * This method can used to have the tag parser write to either  a file-backed db or a memory db.
 	 * By using an in-memory database, lookups are faster.
 	 * Note that this method assumes that the schema has already been created.
@@ -213,7 +203,7 @@ public:
 	void Init(soci::session* session);
 		
 	/**
-	 * Looks for the resource, using exact, case insensitive matching. Will collect the fully qualified resource name 
+	 * Looks for the tag, using exact, case insensitive matching. Will collect the fully qualified tag name 
 	 * itself.
 	 * For example for the following class:
 	 * 
@@ -225,7 +215,7 @@ public:
 	 *  } 
 	 * }
 	 * 
-	 * ONLY the following resource queries will result in a match:
+	 * ONLY the following tag queries will result in a match:
 	 * 
 	 * UserClass
 	 * UserClass::name
@@ -237,7 +227,7 @@ public:
 	 *   class AdminClass extends UserClass {
 	 *   }
 	 * 
-	 * then the folowing resource queries will NOT result in a match
+	 * then the folowing tag queries will NOT result in a match
 	 *
 	 * AdminClass
 	 * AdminClass::name
@@ -245,16 +235,16 @@ public:
 	 *
 	 * To search the hierarchy, the GetResourceParentClassName() and GetResourceTraits() methods can be useful
 	 * 
-	 * @param resourceSearch the resources to look for
-	 * @return std::vector<ResourceClass> the matched resources
+	 * @param tagSearch the resources to look for
+	 * @return std::vector<TagClass> the matched resources
 	 *         Because this search is done on a database,
 	 *         the returned list may contain matches from files that are no longer in 
 	 *         the file system.
 	 */
-	std::vector<ResourceClass> CollectFullyQualifiedResource(const mvceditor::ResourceSearchClass& resourceSearch);
+	std::vector<TagClass> CollectFullyQualifiedResource(const mvceditor::TagSearchClass& tagSearch);
 	
 	/**
-	 * Looks for the resource, using a near-match logic. Logic is as follows:
+	 * Looks for the tag, using a near-match logic. Logic is as follows:
 	 * 
 	 *  1) A class name or function is given:
 	 *    a class name or function will match if the class/function starts with the query.  If the query is 'User', 
@@ -292,7 +282,7 @@ public:
 	 *  } 
 	 * }
 	 * 
-	 * the following resource queries will result in a match:
+	 * the following tag queries will result in a match:
 	 * 
 	 * UserClass
 	 * name
@@ -301,7 +291,7 @@ public:
 	 * 
 	 * Note that if any exact matches are found, then no near-matches will be collected.
 	 * 
-	 * @param resourceSearch the partial name of resources to look for
+	 * @param tagSearch the partial name of resources to look for
 	 * @param doCollectFileNames if TRUE, then file name matches will be returned if no
 	 *        class / function names are found
 	 * @return matches the list of matched resources (max of 50)
@@ -309,14 +299,14 @@ public:
 	 *         the returned list may contain matches from files that are no longer in 
 	 *         the file system.
 	 */
-	std::vector<ResourceClass> CollectNearMatchResources(const mvceditor::ResourceSearchClass& resourceSearch,
+	std::vector<TagClass> CollectNearMatchResources(const mvceditor::TagSearchClass& tagSearch,
 		bool doCollectFileNames = false);
 	
 	/**
-	 * Get the parent class of a given resource. For example, let's say source code contained two classes: AdminClass and 
+	 * Get the parent class of a given tag. For example, let's say source code contained two classes: AdminClass and 
 	 * UserClass, AdminClass inherited from UserClass.  When this method is called in this manner
 	 * 
-	 * resourceFinder.GetResourceParentClassName(UNICODE_STRING_SIMPLE("AdminClass"))
+	 * tagFinder.GetResourceParentClassName(UNICODE_STRING_SIMPLE("AdminClass"))
 	 * 
 	 * then this method will return "UserClass"
 	 * 
@@ -326,10 +316,10 @@ public:
 	UnicodeString GetResourceParentClassName(const UnicodeString& className);
 
 	/**
-	 * Get the traits used by a given resource. For example, let's say source code contained a class and two traits: UserClass,
+	 * Get the traits used by a given tag. For example, let's say source code contained a class and two traits: UserClass,
 	 * a Save trait and a Load trait; AdminClass uses the Save and Load traits.  When this method is called in this manner
 	 * 
-	 * resourceFinder.GetResourceTraits(UNICODE_STRING_SIMPLE("AdminClass"))
+	 * tagFinder.GetResourceTraits(UNICODE_STRING_SIMPLE("AdminClass"))
 	 * 
 	 * then this method will return ["Save", "Load"]
 	 * 
@@ -343,32 +333,32 @@ public:
 	std::vector<UnicodeString> GetResourceTraits(const UnicodeString& className, const UnicodeString& methodName);
 	
 	/**
-	 * Searches the given text for the position of the given resource.  For example, if the resource matched 3 items
-	 * and this method is called with index=2, then text will be searched for resource 2 and will return the 
-	 * position of resource 2 in text
+	 * Searches the given text for the position of the given tag.  For example, if the tag matched 3 items
+	 * and this method is called with index=2, then text will be searched for tag 2 and will return the 
+	 * position of tag 2 in text
 	 * 
-	 * @param resource the resource match to look for
+	 * @param tag the tag match to look for
 	 * @param UnicodeString text the text to look in
-	 * @param int32_t pos the position where resource starts [in the text]
-	 * @param int32_t length the length of the resource [in the text]
+	 * @param int32_t pos the position where tag starts [in the text]
+	 * @param int32_t length the length of the tag [in the text]
 	 * @return bool true if match was found in text
 	 */
-	static bool GetResourceMatchPosition(const ResourceClass& resource, const UnicodeString& text, int32_t& pos, int32_t& length);
+	static bool GetResourceMatchPosition(const TagClass& tag, const UnicodeString& text, int32_t& pos, int32_t& length);
 	
 	/**
-	 * Print the resource cache to stdout.  Useful for debugging only.
+	 * Print the tag cache to stdout.  Useful for debugging only.
 	 */
 	void Print();
 	
 	/**
-	 * @return bool true if this resource finder has not parsed any files (or those files did not have
+	 * @return bool true if this tag finder has not parsed any files (or those files did not have
 	 * any resources). Will also return true if the ONLY file that has been cached is the native functions
 	 * file.
 	 */
 	bool IsFileCacheEmpty();
 
 	/**
-	 * @return bool true if this resource finder has not parsed any resources. Will also return true if the 
+	 * @return bool true if this tag finder has not parsed any resources. Will also return true if the 
 	 * ONLY resources that have been cached are those for the the native functions
 	 * file. Note that this could return TRUE even though the file cache is not empty.
 	 */
@@ -379,7 +369,7 @@ public:
 	 * many items (10000+). Try to use the CollectXXX() methods as much as possible.
 	 * An example use of this method is when wanting to find all functions in a single file.
 	 */
-	std::vector<ResourceClass> All();
+	std::vector<TagClass> All();
 
 	/**
 	 * @return vector of ALL parsed class Resources. Be careful as this method may return
@@ -387,12 +377,12 @@ public:
 	 * An example use of this method is when wanting to find all classes in a project.
 	 * This method will NOT return native PHP classes (ie. PDO, DateTime).
 	 */
-	std::vector<ResourceClass> AllNonNativeClasses();
+	std::vector<TagClass> AllNonNativeClasses();
 	
 private:
 		
 	/**
-	 * The connection to the database that backs the resource cache
+	 * The connection to the database that backs the tag cache
 	 * The database will hold all of the files that have been looked at, as well
 	 * as all of the resources that were parsed.
 	 * This class will NOT own the pointer.
@@ -400,7 +390,7 @@ private:
 	soci::session* Session;
 
 	/**
-	 * Flag to make sure we initialize the resource database.
+	 * Flag to make sure we initialize the tag database.
 	 */
 	bool IsCacheInitialized;
 	
@@ -419,34 +409,34 @@ private:
 	 * @param search the name of file to look for. 
 	 * @param lineNumber if this is greater than zero, then only files that contain this many lines will be returned
 	 */
-	std::vector<ResourceClass> CollectNearMatchFiles(const UnicodeString& search, int lineNumber);
+	std::vector<TagClass> CollectNearMatchFiles(const UnicodeString& search, int lineNumber);
 
 	/**
 	 * Collects all resources that are classes / functions / defines and match the the given Resource search.
 	 * Any hits will be returned
 	 *
-	 * @param resourceSearch the name of resources to look for
+	 * @param tagSearch the name of resources to look for
 	 */
-	std::vector<ResourceClass> CollectNearMatchNonMembers(const mvceditor::ResourceSearchClass& resourceSearch);
+	std::vector<TagClass> CollectNearMatchNonMembers(const mvceditor::TagSearchClass& tagSearch);
 	
 	/**
 	 * Collects all resources that are class methods / properties and match the given Resource search.
 	 * Any hits will be returned
 	 * 
-	 * @param resourceSearch the name of resources to look for
+	 * @param tagSearch the name of resources to look for
 	 */
-	std::vector<ResourceClass> CollectNearMatchMembers(const mvceditor::ResourceSearchClass& resourceSearch);
+	std::vector<TagClass> CollectNearMatchMembers(const mvceditor::TagSearchClass& tagSearch);
 	
 	/**
 	 * Collects all resources that are namespaces and match the given Resource search.
 	 * Any hits will be returned
 	 */
-	std::vector<ResourceClass> CollectNearMatchNamespaces(const mvceditor::ResourceSearchClass& resourceSearch);
+	std::vector<TagClass> CollectNearMatchNamespaces(const mvceditor::TagSearchClass& tagSearch);
 	
 	/**
 	 * Collect all of the resources that are methods / properties of the given classes.
 	 */
-	std::vector<ResourceClass> CollectAllMembers(const std::vector<UnicodeString>& classNames);
+	std::vector<TagClass> CollectAllMembers(const std::vector<UnicodeString>& classNames);
 	
 	/**
 	 * collect all of the methods that are aliased from all of the traits used by the given classes
@@ -454,7 +444,7 @@ private:
 	 *        traits
 	 * @param methodName if non-empty then only aliases that begin with this name will be returned
 	 */
-	std::vector<ResourceClass> CollectAllTraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName);
+	std::vector<TagClass> CollectAllTraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName);
 	
 	/**
 	 * Extracts the parent class from a class signature.  The class signature, as parsed by the parser contains a string
@@ -469,7 +459,7 @@ private:
 	 * Look through all of the matches and verifies that the file still actually exists (file has not been deleted).
 	 * If the file was deleted, then the match is removed from the matches vector.
 	 */
-	void EnsureMatchesExist(std::vector<ResourceClass>& matches);
+	void EnsureMatchesExist(std::vector<TagClass>& matches);
 	
 	/**
 	 * Get all of the traits that a given class uses. Checking is 
@@ -489,58 +479,58 @@ private:
 	 *        most of the time you want to set this to TRUE
 	 * @return the vector of resources pulled from the statement's results
 	 */
-	std::vector<mvceditor::ResourceClass> ResourceStatementMatches(std::string whereCond, bool doLimit);
+	std::vector<mvceditor::TagClass> ResourceStatementMatches(std::string whereCond, bool doLimit);
 
 	/**
 	 * @return all resources that match the key exact (case insensitive)
 	 */
-	std::vector<mvceditor::ResourceClass> FindByKeyExact(const std::string& key);
+	std::vector<mvceditor::TagClass> FindByKeyExact(const std::string& key);
 	
 	/**
 	 * @return all resources that match the key exact (case insensitive) AND are of the given types
 	 */
-	std::vector<mvceditor::ResourceClass> FindByKeyExactAndTypes(const std::string& key, const std::vector<int>& types, bool doLimit);
+	std::vector<mvceditor::TagClass> FindByKeyExactAndTypes(const std::string& key, const std::vector<int>& types, bool doLimit);
 
 	/**
 	 * @return all resources whose key begins with the given keyStart (case insensitive)
 	 */
-	std::vector<mvceditor::ResourceClass> FindByKeyStart(const std::string& keyStart, bool doLimit);
+	std::vector<mvceditor::TagClass> FindByKeyStart(const std::string& keyStart, bool doLimit);
 	
 	/**
 	 * @return all resources whose key begins with the given keyStart (case insensitive) AND are of the given types 
 	 */
-	std::vector<mvceditor::ResourceClass> FindByKeyStartAndTypes(const std::string& keyStart, const std::vector<int>& types, bool doLimit);
+	std::vector<mvceditor::TagClass> FindByKeyStartAndTypes(const std::string& keyStart, const std::vector<int>& types, bool doLimit);
 	
 	/**
 	 * @return all resources whose key begins with the given at least one of the given keyStart (case insensitive)
 	 */
-	std::vector<mvceditor::ResourceClass> FindByKeyStartMany(const std::vector<std::string>& keyStarts, bool doLimit);
+	std::vector<mvceditor::TagClass> FindByKeyStartMany(const std::vector<std::string>& keyStarts, bool doLimit);
 
 	/**
 	 * @return all resources whose identifier begins with the given identifier(case insensitive)
 	 */
-	std::vector<mvceditor::ResourceClass> FindByIdentifierExactAndTypes(const std::string& identifier, const std::vector<int>& types, bool doLimit);
+	std::vector<mvceditor::TagClass> FindByIdentifierExactAndTypes(const std::string& identifier, const std::vector<int>& types, bool doLimit);
 	
 	/**
 	 * @return all resources whose identifier begins with the given identifierStart (case insensitive) AND are of the given type 
 	 */
-	std::vector<mvceditor::ResourceClass> FindByIdentifierStartAndTypes(const std::string& identifierStart, const std::vector<int>& types, bool doLimit);
+	std::vector<mvceditor::TagClass> FindByIdentifierStartAndTypes(const std::string& identifierStart, const std::vector<int>& types, bool doLimit);
 
 	/**
-	 * Find the FileItem entry that has the given full path (exact, case insensitive search into
+	 * Find the FileTag entry that has the given full path (exact, case insensitive search into
 	 * the database).
 	 *
 	 * @param fullPath the full path to search for
-	 * @param fileItem the FileItem itself will be copied here (if found)
+	 * @param fileTag the FileTag itself will be copied here (if found)
 	 * @return bool if TRUE it means that this ResourceFinder has encountered the given
 	 * file before.
 	 */
-	bool FindFileItemByFullPathExact(const wxString& fullPath, mvceditor::FileItemClass& fileItem);
+	bool FindFileTagByFullPathExact(const wxString& fullPath, mvceditor::FileTagClass& fileTag);
 
 	/**
 	 * @return all of the traits that any of the given classes use.
 	 */
-	std::vector<mvceditor::TraitResourceClass> FindTraitsByClassName(const std::vector<std::string>& keyStarts);
+	std::vector<mvceditor::TraitTagClass> FindTraitsByClassName(const std::vector<std::string>& keyStarts);
 
 	/**
 	 * check the database AND the current file's parsed cache to see if the namespace has been seen
@@ -549,290 +539,6 @@ private:
 	 *  parsed cache
 	 */
 	bool IsNewNamespace(const UnicodeString& namespaceName);
-};
-
-/**
- * This class represents each resource we have found in the project.  
- */
-class ResourceClass {
-
-public:
-
-	/**
-	 * All the resources we collect
-	 */
-	enum Types {
-		CLASS,
-		METHOD,
-		FUNCTION,
-		MEMBER,
-		DEFINE,
-		CLASS_CONSTANT,
-		NAMESPACE
-	};
-	
-	/**
-	 * The identifer name of this resource. Members will not have a class name with it; ie. a Name method's Identifier will be Name
-	 * @var UnicodeString
-	 */
-	UnicodeString Identifier;
-	
-	/**
-	 * The name of the class that this resource belongs to; only members will have a class name with it: ie. User::Name
-	 * The class name will NOT have the namespace
-	 * @var UnicodeString
-	 */
-	UnicodeString ClassName;
-	
-	/**
-	 * The namespace that this function / class is in.
-	 */
-	UnicodeString NamespaceName;
-	
-	/**
-	 * The resource signature. For methods / functions; it is the entire argument list
-	 * For classes; it is the class declaration ("class User extends Object implements ISerializable")
-	 * @var UnicodeString
-	 */
-	UnicodeString Signature;
-	
-	/**
-	 * If this resource item is a method / function / member, ReturnType is the function's return type
-	 * @var UnicodeString
-	 */
-	UnicodeString ReturnType;
-	
-	/**
-	 * The PHPDoc comment attached to the resource.
-	 * @var UnicodeString
-	 */
-	UnicodeString Comment;
-
-	/**
-	 * Same as FileItemClass::IsNew ie TRUE if this resource was parsed from contents
-	 * not yet written to disk
-	 * @see FileItemClass::IsNew
-	 */
-	bool FileIsNew;
-	
-	/**
-	 * The resource item type
-	 * @var ReourceClass::Type
-	 */
-	ResourceClass::Types Type;
-
-	/**
-	 * TRUE if this is a protected member
-	 */
-	bool IsProtected;
-
-	/**
-	 * TRUE if this is a private member
-	 */
-	bool IsPrivate;
-
-	/**
-	 * TRUE if this is a static member
-	 */
-	bool IsStatic;
-
-	/**
-	 * TRUE if this is a resource is a 'dynamic' resource; it means that the resource
-	 * is not actually in the source; it was either generated via a PHPDoc comment (@property, @method)
-	 * or a a Feature object.
-	 */
-	bool IsDynamic;
-
-	/**
-	 * TRUE if this is a 'native' resource; one of the standard PHP functions / classes (str_*, array_*,
-	 * DateTime).  This also includes any extensions (PDO, memcache, etc..) basically anything function
-	 * that is documented in php.net.
-	 */
-	bool IsNative;
-
-	/**
-	 * This is the "key" that we will use for lookups. This is the string that will be used to index resources
-	 * by so that we can use binary search.
-	 * The key can be one of:
-	 * - A single identifier (class name, function name, property / method name)
-	 * - A full member name (Class::Method)
-	 * - A fully namespaced name (\First\Sec\Class)
-	 */
-	UnicodeString Key;
-
-	/**
-	 * Full path to the file where this resource was found. Note that this may not be a valid file
-	 * if a resource is a native or dynamic resource.
-	 */
-	wxString FullPath;
-
-	/**
-	 * The index to the file where this resource was found. 
-	 */
-	int FileItemId;
-	
-	ResourceClass();
-	ResourceClass(const mvceditor::ResourceClass& src);
-
-	static mvceditor::ResourceClass MakeNamespace(const UnicodeString& namespaceName);
-	
-	/**
-	 * Clones a ResourceClass
-	 */
-	void operator=(const ResourceClass& src);
-	void Copy(const mvceditor::ResourceClass& src);
-	
-	/**
-	 * Defined a comparison function so that sorting algorithms work for resource containers. A resource is "less"
-	 * than  another if Resource property is less than the other. (essentially containers are sorted by 
-	 * Resource).
-	 */
-	bool operator<(const ResourceClass& a) const;
-
-	/**
-	 * Defined a comparison function so for find function. This will compare resource names in an 
-	 * exact, case sensitive manner.
-	 */	
-	bool operator==(const ResourceClass& a) const;
-
-	/**
-	 * set all properties to empty string
-	 */
-	void Clear();
-	
-	/**
-	 * @return TRUE if given key is the same as this resource's key (case insensitive)
-	 */
-	bool IsKeyEqualTo(const UnicodeString& key) const;
-
-	/**
-	 * @return the FileName that this resource is located in. This may be an
-	 *         invalid FileName if this resource is a native or dynamic resource.
-	 *         Note that this creates a new wxFileName, which may affect performance
-	 */
-	wxFileName FileName() const;
-
-	/**
-	 * @return the full path that this resource is located in.
-	 *         if a resource is a native or dynamic resource.
-	 */
-	wxString GetFullPath() const;
-
-	/**
-	 * @param fullPath the full path where this resource is located
-	 */
-	void SetFullPath(const wxString& fullPath);
-
-	/**
-	 * @return TRUE if this is a function/method that has at least one parameter
-	 */
-	bool HasParameters() const;
-
-};
-
-class TraitResourceClass {
-	
-public:
-
-	/**
-	 * the key is used to perform lookups into this table. The key will be either
-	 * 1. The name of the class that uses a trait (same as ClassName property)
-	 * 2. The fully qualified name of the class that uses the trait (concatenation of NamespaceName and ClassName)
-	 */
-	UnicodeString Key;
-
-	/**
-	 * the name of the class that uses a trait. This is the name of the class only
-	 * (no namespace)
-	 */
-	UnicodeString ClassName;
-
-	/** 
-	 * the namespace of the class that uses the trait. This will be "\" if the class is
-	 * in the root namespace
-	 */
-	UnicodeString NamespaceName;
-
-	/** 
-	 * the name of the class of the trait that is being used. This is the name of the class only
-	 * (no namespace)
-	 */
-	UnicodeString TraitClassName;
-
-	/**
-	 * the namespace of the trait being used. This will be "\" if the trait is
-	 * in the root namespace
-	 */
-	UnicodeString TraitNamespaceName;
-	
-	/**
-	 * The names of any aliases
-	 */
-	std::vector<UnicodeString> Aliased;
-	
-	/**
-	 * the names of any class names excluded from being used by the
-	 * 'insteadof' operator
-	 */
-	std::vector<UnicodeString> InsteadOfs;
-	
-	TraitResourceClass();
-};
-
-/**
- * This struct will be used to keep track of which files we have already cached.  The last modified timestamp
- * will be used so that we dont look at files that have not been modified since we last parsed them
- */
-class FileItemClass {
-
-public:
-	
-	/**
-	 * The full path to the file where this resource was found
-	 */
-	wxString FullPath;
-	
-	/**
-	 * The time that this resource was looked at.
-	 */
-	wxDateTime DateTime;
-
-	/**
-	 * unique identifier for this file. Guaranteed to be unique once this itemsd
-	 * has been saved to the database.
-	 */
-	int FileId;
-	
-	/**
-	 * whether or not file has been parsed, could be false if we only looked for files
-	 */
-	bool IsParsed;
-
-	/**
-	 * If TRUE, then this file is not yet written to disk (ie the resource only exists in memory
-	 * ( but not yet in the filesystem). This is needed because the finder will do
-	 * a sanity check to ensure that the file that contained a match still exists. Iif a file is deleted 
-	 * after a file was cached then we want to eliminate that match. But, this sanity checks would kill
-	 * matches that were a result of a manual call to BuildResourceCacheForFile. This flag ensures
-	 * proper operation (resources that were parsed from code that the user has typed in but no yet
-	 * saved are NOT removed).
-	 */
-	bool IsNew;
-
-	FileItemClass();
-
-	/**
-	 * Check to see if this file needs to be parsed. A file needs to be parsed when
-	 * 1. it is seen for the first time
-	 * 2. has not been parsed yet (IsParsed is FALSE)
-	 * 3. it has been modified since the last time we parsed it
-	 */
-	bool NeedsToBeParsed(const wxDateTime& fileLastModifiedTime) const;
-
-	/**
-	 * initialize the members of this file item for insertion into the database.
-	 */
-	void MakeNew(const wxFileName& fileName, bool isParsed);
 };
 
 }

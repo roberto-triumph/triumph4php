@@ -28,8 +28,8 @@
 #include <features/FeatureClass.h>
 #include <features/wxformbuilder/ResourceFeatureForms.h>
 #include <features/BackgroundFileReaderClass.h>
-#include <search/ResourceFinderClass.h>
-#include <actions/ProjectResourceActionClass.h>
+#include <search/ParsedTagFinderClass.h>
+#include <actions/ProjectTagActionClass.h>
 #include <code_control/ResourceCacheBuilderClass.h>
 #include <wx/string.h>
 #include <queue>
@@ -39,11 +39,11 @@ namespace mvceditor {
 // these are defined at the bottom
 class IndexingDialogClass;
 
-class ResourceFeatureClass : public FeatureClass {
+class TagFeatureClass : public FeatureClass {
 
 public:
 	
-	ResourceFeatureClass(mvceditor::AppClass& app);
+	TagFeatureClass(mvceditor::AppClass& app);
 
 	void AddSearchMenuItems(wxMenu* searchMenu);
 
@@ -56,7 +56,7 @@ public:
 	/**
 	 * Searches for a file that matches the given text. 
 	 * This wont be a straight equals search; it will be a "near match"
-	 * as defined by ResourceFinderClass::CollectNearMathResources()
+	 * as defined by ParsedTagFinderClass::CollectNearMathResources()
 	 * when the given text is more than 2 characters long, and will
 	 * be an exact search as defined by CollectFullyQualifiedResources when the 
 	 * text is 2 characters long
@@ -64,10 +64,10 @@ public:
 
 	 * @param text search string to query for
 	 * @return the matching resources
-	 * @see ResourceFinderClass::CollectNearMacthResources
-	 * @see ResourceFinderClass::CollectFullyQualifiedResources
+	 * @see ParsedTagFinderClass::CollectNearMacthResources
+	 * @see ParsedTagFinderClass::CollectFullyQualifiedResources
 	 */
-	std::vector<mvceditor::ResourceClass> SearchForResources(const wxString& text);
+	std::vector<mvceditor::TagClass> SearchForResources(const wxString& text);
 	
 	/**
 	 * @param wxString full path to the file that will be opened.
@@ -121,19 +121,19 @@ private:
 	
 	/**
 	 * Opens the page and sets the cursor on the function/method/property/file that was searched for by the
-	 * resource finder
+	 * tag finder
 	 * 
 	 * @param finderQuery will be used to get the line number to scroll to
-	 * @param resource the resource to load
+	 * @param tag the tag to load
 	 */
-	void LoadPageFromResource(const wxString& finderQuery, const ResourceClass& resource);
+	void LoadPageFromResource(const wxString& finderQuery, const TagClass& tag);
 
 	/**
 	 * remove matches for php built-in functions. as we dont want a source file to
 	 * open.
 	 * @param matches any native mataches from this given vector will be removed
 	 */
-	void RemoveNativeMatches(std::vector<mvceditor::ResourceClass>& matches) const;
+	void RemoveNativeMatches(std::vector<mvceditor::TagClass>& matches) const;
 	
 	/**
 	 * prepare to iterate through the given file. The name part of the given file must match the wildcard.
@@ -165,7 +165,7 @@ private:
 	void OnAppFileOpened(wxCommandEvent& event);
 
 	/**
-	 * when a 'jump to resource' is done and we need to index a project, we
+	 * when a 'jump to tag' is done and we need to index a project, we
 	 * need to keep the search string so that after indexing we can
 	 * search the index.
 	 */
@@ -207,14 +207,14 @@ private:
 class ResourceSearchDialogClass : public ResourceSearchDialogGeneratedClass {
 public:
 
-	ResourceSearchDialogClass(wxWindow* parent, ResourceFeatureClass& resource, wxString& term, 
-		std::vector<mvceditor::ResourceClass>& chosenResources);
+	ResourceSearchDialogClass(wxWindow* parent, TagFeatureClass& tag, wxString& term, 
+		std::vector<mvceditor::TagClass>& chosenResources);
 		
 	/**
 	 * @param text to place in the search text
 	 * @param matches to place in the results list
 	 */
-	void Prepopulate(const wxString& text, const std::vector<mvceditor::ResourceClass>& matches);
+	void Prepopulate(const wxString& text, const std::vector<mvceditor::TagClass>& matches);
 
 protected:
 
@@ -249,27 +249,27 @@ protected:
 private:
 
 	/**
-	 * The resource feature reference.  The dialog will use this reference to actually perform the search.
+	 * The tag feature reference.  The dialog will use this reference to actually perform the search.
 	 * 
-	 * @var ResourceFeatureClass
+	 * @var TagFeatureClass
 	 */
-	ResourceFeatureClass& ResourceFeature;
+	TagFeatureClass& ResourceFeature;
 
 	/**
-	 * Handle the results of the resource lookups.
+	 * Handle the results of the tag lookups.
 	 */
-	void ShowJumpToResults(const wxString& finderQuery, const std::vector<mvceditor::ResourceClass>& matches);
+	void ShowJumpToResults(const wxString& finderQuery, const std::vector<mvceditor::TagClass>& matches);
 
 	/**
 	 * List that will get populated with the files to be opened. These are the
 	 * files that the user selects.
 	 */
-	std::vector<mvceditor::ResourceClass>& ChosenResources;
+	std::vector<mvceditor::TagClass>& ChosenResources;
 
 	/**
 	 * results of the most recent search
 	 */
-	std::vector<mvceditor::ResourceClass> MatchedResources;
+	std::vector<mvceditor::TagClass> MatchedResources;
 };
 
 /**

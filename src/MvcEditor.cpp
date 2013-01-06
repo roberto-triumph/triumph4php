@@ -32,7 +32,7 @@
 #include <features/FinderFeatureClass.h>
 #include <features/ProjectFeatureClass.h>
 #include <features/OutlineViewFeatureClass.h>
-#include <features/ResourceFeatureClass.h>
+#include <features/TagFeatureClass.h>
 #include <features/RunConsoleFeatureClass.h>
 #include <features/RunBrowserFeatureClass.h>
 #include <features/LintFeatureClass.h>
@@ -155,7 +155,7 @@ void mvceditor::AppClass::CreateFeatures() {
 	Features.push_back(feature);
 	feature = new FindInFilesFeatureClass(*this);
 	Features.push_back(feature);
-	feature = new ResourceFeatureClass(*this);
+	feature = new TagFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new EnvironmentFeatureClass(*this);
 	Features.push_back(feature);	

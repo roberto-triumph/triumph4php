@@ -55,7 +55,7 @@ mvceditor::CallClass::CallClass()
 	, Type(NONE) {
 }
 
-mvceditor::CallStackClass::CallStackClass(mvceditor::ResourceCacheClass& resourceCache)
+mvceditor::CallStackClass::CallStackClass(mvceditor::TagCacheClass& resourceCache)
 	: List()
 	, LintResults()
 	, MatchError()
@@ -64,7 +64,7 @@ mvceditor::CallStackClass::CallStackClass(mvceditor::ResourceCacheClass& resourc
 	, CurrentMethod()
 	, CurrentFunction()
 	, ResourcesRemaining()
-	, ResourceCache(resourceCache)
+	, TagCache(resourceCache)
 	, ScopeVariables()
 	, ScopeFunctionCalls()
 	, ParsedMethods()
@@ -95,8 +95,8 @@ void mvceditor::CallStackClass::Clear() {
 bool mvceditor::CallStackClass::Build(const wxFileName& fileName, const UnicodeString& className, const UnicodeString& methodName, 
 		pelet::Versions version, mvceditor::CallStackClass::Errors& error) {
 	Clear();
-	mvceditor::ResourceClass nextResource;
-	nextResource.Type = mvceditor::ResourceClass::METHOD;
+	mvceditor::TagClass nextResource;
+	nextResource.Type = mvceditor::TagClass::METHOD;
 	nextResource.ClassName = className;
 	nextResource.Identifier = methodName;
 
@@ -119,14 +119,14 @@ bool mvceditor::CallStackClass::Recurse(pelet::Versions version, mvceditor::Call
 		error = STACK_LIMIT;
 		return false;
 	}
-	if (ResourceCache.IsResourceCacheEmpty()) {
+	if (TagCache.IsResourceCacheEmpty()) {
 		error = EMPTY_CACHE;
 		return false;
 	}
 
 	ResourceWithFile item = ResourcesRemaining.front();
 
-	// don't pop() yet; the parser callbacks need to know the resource that we want to examine
+	// don't pop() yet; the parser callbacks need to know the tag that we want to examine
 	// this is because we only want to look at expressions in one function
 	wxFileName fileName = item.FileName;
 
@@ -139,7 +139,7 @@ bool mvceditor::CallStackClass::Recurse(pelet::Versions version, mvceditor::Call
 
 	// here file identifier == file name because file name exists and is unique
 	workingCache->Init(fileName.GetFullPath(), fileName.GetFullPath(), false, version, true);
-	bool newlyRegistered = ResourceCache.RegisterWorking(fileName.GetFullPath(), workingCache);
+	bool newlyRegistered = TagCache.RegisterWorking(fileName.GetFullPath(), workingCache);
 
 	wxFFile file(fileName.GetFullPath(), wxT("rb"));
 	bool ret = Parser.ScanFile(file.fp(), mvceditor::WxToIcu(fileName.GetFullPath()), LintResults);
@@ -199,11 +199,11 @@ bool mvceditor::CallStackClass::Recurse(pelet::Versions version, mvceditor::Call
 
 		// clean up, but only if this method created the symbols
 		// this call will delete the WorkingCache pointer for us
-		ResourceCache.RemoveWorking(fileName.GetFullPath());
+		TagCache.RemoveWorking(fileName.GetFullPath());
 	}
 	else {
 
-		// resource cache did not use the cache, delete it ourselves
+		// tag cache did not use the cache, delete it ourselves
 		delete workingCache;
 	}
 	return ret;
@@ -385,10 +385,10 @@ void mvceditor::CallStackClass::CreateCalls() {
 
 	// add it to the code to signal the start of a function call
 	mvceditor::CallClass cBegin;
-	if (mvceditor::ResourceClass::FUNCTION == item.Resource.Type) {
+	if (mvceditor::TagClass::FUNCTION == item.Resource.Type) {
 		cBegin.ToBeginFunction(item.Resource);
 	}
-	else if (mvceditor::ResourceClass::METHOD == item.Resource.Type) {
+	else if (mvceditor::TagClass::METHOD == item.Resource.Type) {
 		cBegin.ToBeginMethod(item.Resource);
 	}
 	if (mvceditor::CallClass::NONE != cBegin.Type) {
@@ -450,18 +450,18 @@ void mvceditor::CallStackClass::CreateCalls() {
 			// call arguments properly
 			subExpr.ChainList.push_back(expr.ChainList[j]);
 			if (expr.ChainList[j].IsFunction) {
-				std::vector<mvceditor::ResourceClass> matches;
+				std::vector<mvceditor::TagClass> matches;
 				mvceditor::SymbolTableMatchErrorClass singleMatchError;
 				pelet::ScopeClass scopeResult;
 				scopeResult.ClassName = expr.Scope.ClassName;
 				scopeResult.MethodName = expr.Scope.MethodName;
 
-				ResourceCache.ResourceMatches(item.FileName.GetFullPath(), subExpr, scopeResult, matches, false, true, singleMatchError);
-				for (std::vector<mvceditor::ResourceClass>::iterator it = matches.begin(); it != matches.end(); ++it) {
+				TagCache.ResourceMatches(item.FileName.GetFullPath(), subExpr, scopeResult, matches, false, true, singleMatchError);
+				for (std::vector<mvceditor::TagClass>::iterator it = matches.begin(); it != matches.end(); ++it) {
 
 					// if we get here; we are able to know which class and method are being called
 					// lets add it to the queue so that this class/method will get recursed into next
-					if (mvceditor::ResourceClass::FUNCTION == it->Type || mvceditor::ResourceClass::METHOD == it->Type) {
+					if (mvceditor::TagClass::FUNCTION == it->Type || mvceditor::TagClass::METHOD == it->Type) {
 						if (it->FileName().IsOk()) {
 							
 							// dynamic resources may not have a file path to go to
@@ -494,14 +494,14 @@ void mvceditor::CallClass::ToArray(const mvceditor::SymbolClass& symbol) {
 	Symbol = symbol;
 }
 
-void mvceditor::CallClass::ToBeginFunction(const mvceditor::ResourceClass& resource) {
+void mvceditor::CallClass::ToBeginFunction(const mvceditor::TagClass& tag) {
 	Type = mvceditor::CallClass::BEGIN_FUNCTION;
-	Resource = resource;
+	Resource = tag;
 }
 
-void mvceditor::CallClass::ToBeginMethod(const mvceditor::ResourceClass& resource) {
+void mvceditor::CallClass::ToBeginMethod(const mvceditor::TagClass& tag) {
 	Type = mvceditor::CallClass::BEGIN_METHOD;
-	Resource = resource;
+	Resource = tag;
 }
 
 void mvceditor::CallClass::ToObject(const mvceditor::SymbolClass& symbol) {
