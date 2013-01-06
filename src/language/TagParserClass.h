@@ -26,7 +26,7 @@
 #define __MVCEDITOR_TAGPARSERCLASS_H__
 
 #include <search/DirectorySearchClass.h>
-#include <search/ParsedTagFinderClass.h>
+#include <globals/TagClass.h>
 #include <pelet/ParserClass.h>
 #include <wx/datetime.h>
 #include <wx/string.h>

@@ -59,7 +59,7 @@ bool mvceditor::ProjectTagActionClass::InitForFile(const mvceditor::ProjectClass
 	if (DirectorySearch.Init(srcs)) {
 		wxASSERT_MSG(GlobalCache == NULL, _("cache pointer has not been cleaned up"));
 		GlobalCache = new mvceditor::GlobalCacheClass();
-		GlobalCache->Init(project.ResourceDbFileName, phpFileExtensions, miscFileExtensions, version, 1024);
+		GlobalCache->InitGlobalTag(project.ResourceDbFileName, phpFileExtensions, miscFileExtensions, version, 1024);
 		return true;
 	}
 	return false;
@@ -137,7 +137,7 @@ void mvceditor::ProjectTagActionClass::IterateProjects() {
 			}
 			SetStatus(_("Updating Index for ") + project.Label);
 			GlobalCache = new mvceditor::GlobalCacheClass;
-			GlobalCache->Init(project.ResourceDbFileName, project.PhpFileExtensions, miscFileExtensions, Version, 1024);
+			GlobalCache->InitGlobalTag(project.ResourceDbFileName, project.PhpFileExtensions, miscFileExtensions, Version, 1024);
 			IterateDirectory();
 		}
 	}
@@ -157,12 +157,12 @@ wxString mvceditor::ProjectTagActionClass::GetLabel() const {
 	return _("Project Resource Parsing");
 }
 
-mvceditor::ResourceCacheInitActionClass::ResourceCacheInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+mvceditor::ProjectTagInitActionClass::ProjectTagInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: InitializerActionClass(runningThreads, eventId) {
 
 }
 
-void mvceditor::ResourceCacheInitActionClass::Work(mvceditor::GlobalsClass &globals) {
+void mvceditor::ProjectTagInitActionClass::Work(mvceditor::GlobalsClass &globals) {
 
 	// need to clear the entire cache, then add only the newly enabled projects
 	globals.TagCache.Clear();
@@ -171,7 +171,7 @@ void mvceditor::ResourceCacheInitActionClass::Work(mvceditor::GlobalsClass &glob
 	
 	// the tag cache will own all of the global cache pointers
 	mvceditor::GlobalCacheClass* nativeCache = new mvceditor::GlobalCacheClass;
-	nativeCache->Init(mvceditor::NativeFunctionsAsset(), globals.GetPhpFileExtensions(), otherFileExtensions, version);
+	nativeCache->InitGlobalTag(mvceditor::NativeFunctionsAsset(), globals.GetPhpFileExtensions(), otherFileExtensions, version);
 	globals.TagCache.RegisterGlobal(nativeCache);
 	
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
@@ -183,12 +183,12 @@ void mvceditor::ResourceCacheInitActionClass::Work(mvceditor::GlobalsClass &glob
 			// cache is stale and may not have all of the results
 			// the tag cache will own these pointers
 			mvceditor::GlobalCacheClass* projectCache = new mvceditor::GlobalCacheClass;
-			projectCache->Init(project->ResourceDbFileName, project->PhpFileExtensions, otherFileExtensions, version);
+			projectCache->InitGlobalTag(project->ResourceDbFileName, project->PhpFileExtensions, otherFileExtensions, version);
 			globals.TagCache.RegisterGlobal(projectCache);
 		}
 	}
 }
 
-wxString mvceditor::ResourceCacheInitActionClass::GetLabel() const {
-	return _("Resource cache initialization");
+wxString mvceditor::ProjectTagInitActionClass::GetLabel() const {
+	return _("Project tags initialization");
 }

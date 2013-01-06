@@ -723,7 +723,13 @@ void mvceditor::DetectorFeatureClass::OnRunTemplateFileDetectors(wxCommandEvent&
 }
 
 void mvceditor::DetectorFeatureClass::OnRunTagDetectors(wxCommandEvent& event) {
-	// TODO
+	std::vector<mvceditor::ActionClass*> actions;
+
+	// the sequence class will own this pointer
+	actions.push_back(
+		new mvceditor::TagDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_DETECTOR)
+	);
+	App.Sequences.Build(actions);
 }
 
 BEGIN_EVENT_TABLE(mvceditor::DetectorFeatureClass, mvceditor::FeatureClass)

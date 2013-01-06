@@ -60,7 +60,8 @@ class MvcEditor_DetectedTagTable extends Zend_Db_Table_Abstract {
 				'class_name' => $tag->className,
 				'method_name' => $tag->identifier,
 				'return_type' => $tag->returnType,
-				'namespace_name' => $tag->namespaceName
+				'namespace_name' => $tag->namespaceName,
+				'comment' => $tag->comment
 			));
 			
 			$this->insert(array(
@@ -69,7 +70,8 @@ class MvcEditor_DetectedTagTable extends Zend_Db_Table_Abstract {
 				'class_name' => $tag->className,
 				'method_name' => $tag->identifier,
 				'return_type' => $tag->returnType,
-				'namespace_name' => $tag->namespaceName
+				'namespace_name' => $tag->namespaceName,
+				'comment' => $tag->comment
 			));
 		}
 		$this->getAdapter()->commit();

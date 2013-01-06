@@ -135,11 +135,11 @@ private:
  * it will be primed with the existing cache file which may be
  * stale. 
  */
-class ResourceCacheInitActionClass : public mvceditor::InitializerActionClass {
+class ProjectTagInitActionClass : public mvceditor::InitializerActionClass {
 
 public:
 
-	ResourceCacheInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	ProjectTagInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 	void Work(mvceditor::GlobalsClass& globals);
 

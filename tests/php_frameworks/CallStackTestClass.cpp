@@ -78,7 +78,7 @@ public:
 	void BuildCache() {
 		ResourceDbFileName.Assign(TestProjectDir + wxT("resource_cache.db"));
 		mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass;
-		globalCache->Init(ResourceDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+		globalCache->InitGlobalTag(ResourceDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 		
 		mvceditor::DirectorySearchClass search;
 		search.Init(TestProjectDir + wxT("src"));

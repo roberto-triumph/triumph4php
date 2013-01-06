@@ -156,7 +156,7 @@ bool CodeControlProfilerAppClass::OnInit() {
 	std::vector<wxString> phpFileFilters,
 		miscFileFilters;
 	phpFileFilters.push_back(wxT("*.php"));
-	globalCache->Init(mvceditor::NativeFunctionsAsset(), phpFileFilters, miscFileFilters, pelet::PHP_53);
+	globalCache->InitGlobalTag(mvceditor::NativeFunctionsAsset(), phpFileFilters, miscFileFilters, pelet::PHP_53);
 	Globals.TagCache.RegisterGlobal(globalCache);
 	
 	CodeControlFrameClass* frame = new CodeControlFrameClass(*this);

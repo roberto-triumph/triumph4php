@@ -61,6 +61,12 @@ class MvcEditor_DetectedTag {
 	 * @var string
 	 */
 	public $returnType;
+	
+	/**
+	 * A friendly message that is displayed to the user when this tag is shown.
+	 * @var string
+	 */
+	public $comment;
 		
 	/**
 	 * The type of this resource. One of the type constants.
@@ -77,52 +83,55 @@ class MvcEditor_DetectedTag {
 	/**
 	 * Create a property resource(a class member). For now this property is assumed to have public access.
 	 */
-	public static function CreateMember($className, $propertyName, $propertyType, $namespaceName = '\\') {
+	public static function CreateMember($className, $propertyName, $propertyType, $namespaceName = '\\', $comment = '') {
 		$member = new MvcEditor_DetectedTag();
-		$member->MakeMember($className, $propertyName, $propertyType, $namespaceName);
+		$member->MakeMember($className, $propertyName, $propertyType, $namespaceName, $comment);
 		return $member;
 	}
 	
 	/**
 	 * Create a method resource(a class member). For now this method is assumed to have public access.
 	 */
-	public static function CreateMethod($className, $methodName, $methodReturnType, $namespaceName = '\\') {
+	public static function CreateMethod($className, $methodName, $methodReturnType, $namespaceName = '\\', $comment = '') {
 		$method = new MvcEditor_DetectedTag();
-		$method->MakeMethod($className, $methodName, $methodReturnType, $namespaceName);
+		$method->MakeMethod($className, $methodName, $methodReturnType, $namespaceName, $comment);
 		return $method;
 	}
 	
 	/**
 	 * create a filled or empty instance. If creating an empty instance, the MakeXXX methods will be useful.
 	 */
-	public function __construct($resource = '', $identifier = '', $returnType = '', $type = '', $namespaceName = '\\') {
+	public function __construct($resource = '', $identifier = '', $returnType = '', $type = '', $namespaceName = '\\', $comment = '') {
 		$this->resource = $resource;
 		$this->identifier = $identifier;
 		$this->returnType = $returnType;
 		$this->type = $type;
 		$this->className = '';
 		$this->namespaceName = $namespaceName;
+		$this->comment = $comment;
 	}
 
 	/**
 	 * Create a property resource(a class member). For now this property is assumed to have public access.
 	 */
-	public function MakeMember($className, $propertyName, $propertyType, $namespaceName) {
+	public function MakeMember($className, $propertyName, $propertyType, $namespaceName, $comment) {
 		$this->className = $className;
 		$this->identifier = $propertyName;
 		$this->returnType = $propertyType;
 		$this->namespaceName = $namespaceName;
+		$this->comment = $comment;
 		$this->type = self::TYPE_MEMBER;
 	}
 	
 	/**
 	 * Create a class method. For now this method is assumed to have public access.
 	 */
-	public function MakeMethod($className, $methodName, $methodReturnType, $namespaceName) {
+	public function MakeMethod($className, $methodName, $methodReturnType, $namespaceName, $comment) {
 		$this->className = $className;
 		$this->identifier = $methodName;
 		$this->returnType = $methodReturnType;
 		$this->namespaceName = $namespaceName;
+		$this->comment = $comment;
 		$this->type = self::TYPE_METHOD;
 	}
 	
@@ -130,7 +139,7 @@ class MvcEditor_DetectedTag {
 	 * Sets the properties so that this resource is a function.
 	 * @return void
 	 */
-	public function MakeFunction($functionName, $returnType, $namespaceName) {
+	public function MakeFunction($functionName, $returnType, $namespaceName, $comment) {
 		$resource = $functionName;
 		$this->identifier = $functionName;
 		$this->returnType = $returnType;
@@ -141,6 +150,7 @@ class MvcEditor_DetectedTag {
 	public function Clear() {
 		$this->identifier = '';
 		$this->returnType = '';
+		$this->comment = '';
 		$this->type = '';
 	}
 		

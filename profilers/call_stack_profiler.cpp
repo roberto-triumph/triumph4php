@@ -118,7 +118,7 @@ void CacheLargeProject(mvceditor::TagCacheClass& tagCache, wxString dirName) {
 	phpFileExtensions.push_back(wxT("*.php"));
 
 	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass;
-	globalCache->Init(mvceditor::NativeFunctionsAsset(), phpFileExtensions, miscFileExtensions, pelet::PHP_53);
+	globalCache->InitGlobalTag(mvceditor::NativeFunctionsAsset(), phpFileExtensions, miscFileExtensions, pelet::PHP_53);
 	tagCache.RegisterGlobal(globalCache);
 	mvceditor::DirectorySearchClass directorySearch;
 	bool found = directorySearch.Init(dirName);
@@ -131,7 +131,7 @@ void CacheLargeProject(mvceditor::TagCacheClass& tagCache, wxString dirName) {
 		wxRemoveFile(fileName.GetFullPath());
 	}
 	mvceditor::GlobalCacheClass* projectCache = new mvceditor::GlobalCacheClass;
-	projectCache->Init(fileName, phpFileExtensions, miscFileExtensions, pelet::PHP_53);
+	projectCache->InitGlobalTag(fileName, phpFileExtensions, miscFileExtensions, pelet::PHP_53);
 	while (directorySearch.More()) {
 		projectCache->Walk(directorySearch);
 	}

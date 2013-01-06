@@ -84,6 +84,76 @@ public:
 	wxString BuildCmdLine() const;
 };
 
+/**
+ * This class will run all tag detectors across all enabled projects. This means that there is
+ * one external process execution for each project source directory / tag detector combination
+ */
+class TagDetectorActionClass : public mvceditor::ActionClass {
+
+public:
+
+	TagDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+
+	bool Init(mvceditor::GlobalsClass& globals);
+
+	bool DoAsync();
+
+	wxString GetLabel() const;
+
+	void BackgroundWork();
+
+private:
+
+	/**
+	 * used to run the external tag detector PHP script
+	 */
+	mvceditor::ProcessWithHeartbeatClass Process;
+
+	/**
+	 * we will perform one external call for each item in this
+	 * queue
+	 */
+	std::queue<mvceditor::TagDetectorParamsClass> ParamsQueue;
+
+	/**
+	 * pop the next set of params from the queue and call the php tag 
+	 * detector.
+	 */
+	void NextDetection();
+
+	/**
+	 * @return all of the PHP tag detector scripts. These can be either ones
+	 * provided by default or ones created by the user.
+	 */
+	std::vector<wxString> DetectorScripts();
+
+	void OnProcessComplete(wxCommandEvent& event);
+
+	void OnProcessInProgress(wxCommandEvent& event);
+
+	void OnProcessFailed(wxCommandEvent& event);
+
+	DECLARE_EVENT_TABLE()
+
+};
+
+/**
+ * This class will prime the detected tag cache with all of the
+ * enabled projects. The tag cache will be primed; although
+ * it will be primed with the existing cache file which may be
+ * stale. 
+ */
+class TagDetectorInitActionClass : public mvceditor::InitializerActionClass {
+
+public:
+
+	TagDetectorInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+
+	void Work(mvceditor::GlobalsClass& globals);
+
+	wxString GetLabel() const;
+};
+
 }
 
 #endif

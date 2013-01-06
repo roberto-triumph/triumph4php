@@ -30,8 +30,13 @@ bool mvceditor::CallStackActionClass::Init(mvceditor::GlobalsClass& globals) {
 			// register the project tag DB file now so that it is available for code completion
 			// the tag cache will own these pointers
 			mvceditor::GlobalCacheClass* projectCache = new mvceditor::GlobalCacheClass;
-			projectCache->Init(project->ResourceDbFileName, project->PhpFileExtensions, otherFileExtensions, Version);
+			projectCache->InitGlobalTag(project->ResourceDbFileName, project->PhpFileExtensions, otherFileExtensions, Version);
 			TagCache.RegisterGlobal(projectCache);
+
+			// initialize the detected tag cache too so that more methods can be resolved
+			projectCache = new mvceditor::GlobalCacheClass;
+			projectCache->InitDetectorTag(project->DetectorDbFileName);
+			globals.TagCache.RegisterGlobal(projectCache);
 			ret = true;
 		}
 	}

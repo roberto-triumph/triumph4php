@@ -25,7 +25,7 @@
 #ifndef __MVCEDITORRESOURCECACHECLASS_H__
 #define __MVCEDITORRESOURCECACHECLASS_H__
 
-#include <search/ParsedTagFinderClass.h>
+#include <search/TagFinderClass.h>
 #include <search/DirectorySearchClass.h>
 #include <language/TagParserClass.h>
 #include <language/SymbolTableClass.h>
@@ -53,8 +53,9 @@ public:
 
 	/**
 	 * The object that will be used to lookup tags
+	 * This class will own this pointer
 	 */
-	mvceditor::ParsedTagFinderClass ResourceFinder;
+	mvceditor::TagFinderClass* TagFinder;
 
 	/**
 	 * The location of the SQLite file where the resources will be
@@ -64,8 +65,10 @@ public:
 
 	GlobalCacheClass();
 
+	~GlobalCacheClass();
+
 	/**
-	 * Opens the SQLite file, or creates it if it does not exist.
+	 * Opens the SQLite resource db file, or creates it if it does not exist.
 	 *
 	 * @param resourceDbFileName the full path to the SQLite resources database.
 	 *        If this full path does not exist it will be created.
@@ -77,15 +80,23 @@ public:
 	 *        Setting this value to a high value (1024) is good for large projects that have a lot
 	 *        resources.
 	*/
-	void Init(const wxFileName& resourceDbFileName, const std::vector<wxString>& phpFileExtensions, 
+	void InitGlobalTag(const wxFileName& tagDbFileName, const std::vector<wxString>& phpFileExtensions, 
 		const std::vector<wxString>& miscFileExtensions, pelet::Versions version, int fileParsingBufferSize = 32);
+
+	/**
+	 * Opens the detector db SQLite file, or creates it if it does not exist.
+	 *
+	 * @param detectorDbFileName the full path to the SQLite detectors database.
+	 *        If this full path does not exist it will be created.
+	*/
+	void InitDetectorTag(const wxFileName& detectorDbFileName);
 
 	/**
 	 * Will update the tag finder by calling Walk(); meaning that the next file
 	 * given by the directorySearch will be parsed and its resources will be stored
 	 * in the database.
 	 *
-	 * @see mvceditor::ParsedTagFinderClass::Walk
+	 * @see mvceditor::TagFinderClass::Walk
 	 * @param resourceDbFileName the location of the SQLite cache for the tag finder. this 
 	 *        is the file where the resources will be persisted to
 	 * @param directorySearch keeps track of the file to parse
@@ -108,8 +119,10 @@ private:
 	 *
 	 * @param wxString dbName, given to SQLite.  db can be a full path to a file  The
 	 *        file does not need to exist; if it does not exist it will be created.
+	 * @param schemaFileName the filename of the SQL script that contains the schema.
+	 *        The schema file will be run if the db has to be created.
 	 */
-	void OpenAndCreateTables(const wxString& dbName);
+	void OpenAndCreateTables(const wxString& dbName, const wxFileName& schemaFileName);
 };
 
 /**
@@ -129,7 +142,7 @@ public:
 	/**
 	 * The object that will be used to lookup tags
 	 */
-	mvceditor::ParsedTagFinderClass ResourceFinder;
+	mvceditor::ParsedTagFinderClass TagFinder;
 
 	/**
 	 * The object that keeps track of variable types; we only need
@@ -316,7 +329,7 @@ public:
 	 * Searches all the registered caches (working AND global caches)
 	 * Will returm only for full exact matches (it will call CollectFullyQualifiedResource
 	 * on each tag finder).
-	 * @see mvceditor::ParsedTagFinderClass::CollectFullyQualifiedResource
+	 * @see mvceditor::TagFinderClass::CollectFullyQualifiedResource
 	 * @param search string to search for
 	 * @return std::vector<mvceditor::TagClass> matched resources 
 	 */
@@ -327,7 +340,7 @@ public:
 	 * Will return near matches (it will call CollectNearMatchResources
 	 * on each tag finder).
 	 *
-	 * @see mvceditor::ParsedTagFinderClass::CollectNearMatchResources
+	 * @see mvceditor::TagFinderClass::CollectNearMatchResources
 	 * @param string to search for
 	 * @return std::vector<mvceditor::TagClass> matched resources
 	 */
@@ -348,7 +361,7 @@ public:
 	 *        a function / static class call.
 	 * @param doDuckTyping if an expression chain could not be fully resolved; then we could still
 	 *        perform a search for the expression member in ALL classes. The lookups will not be
-	 *        slower because ParsedTagFinderClass still handles them
+	 *        slower because TagFinderClass still handles them
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
 	void ExpressionCompletionMatches(const wxString& fileName, const pelet::ExpressionClass& parsedExpression, const pelet::ScopeClass& expressionScope, 
@@ -368,7 +381,7 @@ public:
 	 * @param matches all of the tag matches will be put here
 	 * @param doDuckTyping if an expression chain could not be fully resolved; then we could still
 	 *        perform a search for the expression member in ALL classes. The lookups will not be
-	 *        slower because ParsedTagFinderClass still handles them
+	 *        slower because TagFinderClass still handles them
 	 * @param doFullyQualifiedMatchOnly if TRUE the only resources that match fully qualified resources will be
 	 *        returned
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
@@ -397,14 +410,6 @@ public:
 	 * Remove all items from all caches and also unregisters any and all files.
 	 */
 	void Clear();
-
-	/**
-	 * Remove all items from only the global caches ALSO wipes any persisted resources and unregisters any and all global 
-	 * tag DB files. In other words, any resources that were saved to the SQLite tables will be deleted too.
-	 * The SQLite file itself will not be deleted.
-	 * The working caches are not removed.
-	 */
-	void WipeGlobal();
 	 
 private:
 		
@@ -414,7 +419,7 @@ private:
 	 * 
 	 * This clas owns the tag finder pointers, do NOT delete them
 	 */
-	std::vector<ParsedTagFinderClass*> AllFinders();
+	std::vector<TagFinderClass*> AllFinders();
 	
 	/**
 	 * These are the tag finders from the ENTIRE projecta; it may include stale resources

@@ -84,8 +84,8 @@ public:
 	mvceditor::SymbolTableClass CompletionSymbolTable;
 	pelet::ScopeClass Scope;
 	pelet::ExpressionClass ParsedExpression;
-	std::vector<mvceditor::ParsedTagFinderClass*> AllFinders;
-	std::map<wxString, mvceditor::ParsedTagFinderClass*> OpenedFinders;
+	std::vector<mvceditor::TagFinderClass*> AllFinders;
+	std::map<wxString, mvceditor::TagFinderClass*> OpenedFinders;
 	soci::session SessionGlobal;
 	soci::session Session1;
 	mvceditor::TagParserClass TagParserGlobal;

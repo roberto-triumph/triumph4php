@@ -179,7 +179,7 @@ public:
 	 * @param TagCacheClass& need the tag cache so that functions can be resolved
 	 * into their corresponding file locations
 	 */
-	CallStackClass(TagCacheClass& resourceCache);
+	CallStackClass(TagCacheClass& tagCache);
 
 	/**
 	 * Will open up the file, parse it, and collect all function calls. This is recursive (will open up

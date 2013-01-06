@@ -77,7 +77,7 @@ public:
 
 	mvceditor::GlobalCacheClass* CreateGlobalCache(const wxString& srcDirectory) {
 		mvceditor::GlobalCacheClass* cache = new mvceditor::GlobalCacheClass();
-		cache->Init(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+		cache->InitGlobalTag(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 
 		
 		// must call init() here since we want to parse files from disk
@@ -164,7 +164,7 @@ public:
 
 	mvceditor::GlobalCacheClass* CreateGlobalCache(const wxString& srcDirectory) {
 		mvceditor::GlobalCacheClass* cache = new mvceditor::GlobalCacheClass();
-		cache->Init(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+		cache->InitGlobalTag(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 
 		
 		// must call init() here since we want to parse files from disk
@@ -175,7 +175,7 @@ public:
 
 	mvceditor::GlobalCacheClass* CreateGlobalCache(const wxFileName& resourceDbFile, const wxString& srcDirectory) {
 		mvceditor::GlobalCacheClass* cache = new mvceditor::GlobalCacheClass();
-		cache->Init(resourceDbFile, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+		cache->InitGlobalTag(resourceDbFile, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 
 		
 		// must call init() here since we want to parse files from disk
@@ -191,7 +191,7 @@ TEST_FIXTURE(RegisterTestFixtureClass, RegisterShouldSucceed) {
 	
 	// this pointer should get deleted by the TagCacheClass
 	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass();
-	globalCache->Init(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+	globalCache->InitGlobalTag(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 	CHECK(TagCache.RegisterGlobal(globalCache));
 }
 
@@ -199,10 +199,10 @@ TEST_FIXTURE(RegisterTestFixtureClass, RegisterShouldFail) {
 
 	// these pointers should get deleted by the TagCacheClass
 	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass();
-	globalCache->Init(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+	globalCache->InitGlobalTag(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 	
 	mvceditor::GlobalCacheClass* secondGlobalCache = new mvceditor::GlobalCacheClass();
-	secondGlobalCache->Init(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+	secondGlobalCache->InitGlobalTag(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 
 	// test that the same resource DB cannot be added twice
 	CHECK(TagCache.RegisterGlobal(globalCache));
@@ -217,13 +217,13 @@ TEST_FIXTURE(RegisterTestFixtureClass, RegisterShouldSucceedAfterSucceedAfterUnr
 	// these pointers should get deleted by the TagCacheClass
 	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass();
 	wxFileName cacheDb1 = TagDbFileName; 
-	globalCache->Init(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+	globalCache->InitGlobalTag(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 	
 	mvceditor::GlobalCacheClass* secondGlobalCache = new mvceditor::GlobalCacheClass();
-	secondGlobalCache->Init(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+	secondGlobalCache->InitGlobalTag(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 
 	mvceditor::GlobalCacheClass* thirdGlobalCache = new mvceditor::GlobalCacheClass();
-	thirdGlobalCache->Init(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+	thirdGlobalCache->InitGlobalTag(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 
 	// test that the same resource DB is added, removed, then added again
 	CHECK(TagCache.RegisterGlobal(globalCache));
@@ -473,9 +473,9 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, MultipleGlobalFinders) {
 	// completion should still work
 	mvceditor::TagCacheClass newCache;
 	mvceditor::GlobalCacheClass* cache4 = new mvceditor::GlobalCacheClass();
-	cache4->Init(globalDb1, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+	cache4->InitGlobalTag(globalDb1, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 	mvceditor::GlobalCacheClass* cache5 = new mvceditor::GlobalCacheClass();
-	cache5->Init(globalDb2, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+	cache5->InitGlobalTag(globalDb2, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 
 	CHECK(newCache.RegisterGlobal(cache4));
 	CHECK(newCache.RegisterGlobal(cache5));

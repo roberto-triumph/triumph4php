@@ -79,6 +79,7 @@ bool mvceditor::SqlScript(const wxFileName& sqlScriptFileName, soci::session& se
 			}
 		} catch (std::exception& e) {
 			error = mvceditor::CharToWx(e.what());
+			wxASSERT_MSG(false, error);
 		}
 	}
 	return ret;

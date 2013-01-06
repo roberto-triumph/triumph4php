@@ -157,7 +157,12 @@ CREATE TABLE IF NOT EXISTS detected_tags (
 	-- there is always a value here; if the tag is in the root
 	-- namespace then this column will have the value '\'
 	--
-	namespace_name TEXT NOT NULL COLLATE NOCASE
+	namespace_name TEXT NOT NULL COLLATE NOCASE,
+	
+	--
+	-- Description text that is shown to the user
+	--
+	comment TEXT NOT NULL
 );
 
 -- to enable fast lookups for detected tags.

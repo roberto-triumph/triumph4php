@@ -185,12 +185,56 @@ private:
  * the return values for methods of this class will be false, empty, or zero. Currently this class does not expose 
  * the specific error code from SQLite.
  */
-class ParsedTagFinderClass {
+class TagFinderClass {
 
 public:
 	
-	ParsedTagFinderClass();
-	~ParsedTagFinderClass();
+	TagFinderClass();
+	virtual ~TagFinderClass();
+
+	/**
+	 * this is a virtual method so that each tag finder can use to perform a query to
+	 * get all of its class tags. This is a virtual method so that each specific tag finder
+	 * can define what table names and columns to query.
+	 *
+	 * @return vector of ALL parsed class Resources. Be careful as this method may return
+	 * many items (10000+). Try to use the CollectXXX() methods as much as possible.
+	 * An example use of this method is when wanting to find all classes in a project.
+	 * This method will NOT return native PHP classes (ie. PDO, DateTime).
+	 */
+	virtual std::vector<TagClass> AllNonNativeClasses() = 0;
+
+protected:
+
+	/**
+	 * The connection to the database that backs the tag cache
+	 * The database will hold all of the files that have been looked at, as well
+	 * as all of the resources that were parsed.
+	 * This class will NOT own the pointer.
+	 */
+	soci::session* Session;
+
+	/**
+	 * Flag to make sure we initialize the tag database.
+	 */
+	bool IsCacheInitialized;
+
+	/**
+	 * this is a virtual method so that each tag finder can use to perform a query to
+	 * get a certain portion of its tags. This is a virtual method so that each specific tag finder
+	 * can define what table names and columns to query.
+	 *
+	 * @param whereCond the WHERE clause of the query to execute (query will be into the resources table)
+	 *        this does NOT have the "where" keyword.  examples:  
+	 *        "Key = 'ClassName'"
+	 *        "Key = 'ClassName::Method' AND Type IN(3)"
+	 * @param doLimit if TRUE a max amount of results will be returned, if FALSE then ALL results will be returned
+	 *        most of the time you want to set this to TRUE
+	 * @return the vector of resources pulled from the statement's results
+	 */
+	virtual std::vector<mvceditor::TagClass> ResourceStatementMatches(std::string whereCond, bool doLimit) = 0;
+
+public:
 
 	/**
 	 * Create the tag database that is backed by the given session. 
@@ -371,29 +415,9 @@ public:
 	 */
 	std::vector<TagClass> All();
 
-	/**
-	 * @return vector of ALL parsed class Resources. Be careful as this method may return
-	 * many items (10000+). Try to use the CollectXXX() methods as much as possible.
-	 * An example use of this method is when wanting to find all classes in a project.
-	 * This method will NOT return native PHP classes (ie. PDO, DateTime).
-	 */
-	std::vector<TagClass> AllNonNativeClasses();
 	
 private:
-		
-	/**
-	 * The connection to the database that backs the tag cache
-	 * The database will hold all of the files that have been looked at, as well
-	 * as all of the resources that were parsed.
-	 * This class will NOT own the pointer.
-	 */
-	soci::session* Session;
-
-	/**
-	 * Flag to make sure we initialize the tag database.
-	 */
-	bool IsCacheInitialized;
-	
+			
 	/**
 	 * Get the line count from the given file.
 	 * 
@@ -471,17 +495,6 @@ private:
 	void InheritedTraits(const UnicodeString& fullyQualifiedClassName, std::vector<UnicodeString>& inheritedTraits);
 
 	/**
-	 * @param whereCond the WHERE clause of the query to execute (query will be into the resources table)
-	 *        this does NOT have the "where" keyword.  examples:  
-	 *        "Key = 'ClassName'"
-	 *        "Key = 'ClassName::Method' AND Type IN(3)"
-	 * @param doLimit if TRUE a max amount of results will be returned, if FALSE then ALL results will be returned
-	 *        most of the time you want to set this to TRUE
-	 * @return the vector of resources pulled from the statement's results
-	 */
-	std::vector<mvceditor::TagClass> ResourceStatementMatches(std::string whereCond, bool doLimit);
-
-	/**
 	 * @return all resources that match the key exact (case insensitive)
 	 */
 	std::vector<mvceditor::TagClass> FindByKeyExact(const std::string& key);
@@ -539,6 +552,71 @@ private:
 	 *  parsed cache
 	 */
 	bool IsNewNamespace(const UnicodeString& namespaceName);
+};
+
+/**
+ * the ParsedTagFinderClass will query from the resources db. The resources db
+ * has different columns than the detectors db.
+ */
+class ParsedTagFinderClass : public mvceditor::TagFinderClass {
+
+public:
+	
+	ParsedTagFinderClass();
+
+	/**
+	 * @return vector of ALL parsed class Resources. Be careful as this method may return
+	 * many items (10000+). Try to use the CollectXXX() methods as much as possible.
+	 * An example use of this method is when wanting to find all classes in a project.
+	 * This method will NOT return native PHP classes (ie. PDO, DateTime).
+	 */
+	virtual std::vector<TagClass> AllNonNativeClasses();
+
+protected:
+
+	/**
+	 * @param whereCond the WHERE clause of the query to execute (query will be into the resources table)
+	 *        this does NOT have the "where" keyword.  examples:  
+	 *        "Key = 'ClassName'"
+	 *        "Key = 'ClassName::Method' AND Type IN(3)"
+	 * @param doLimit if TRUE a max amount of results will be returned, if FALSE then ALL results will be returned
+	 *        most of the time you want to set this to TRUE
+	 * @return the vector of resources pulled from the statement's results
+	 */
+	virtual std::vector<mvceditor::TagClass> ResourceStatementMatches(std::string whereCond, bool doLimit);
+};
+
+
+/**
+ * the DetectedTagFinderClass will query from the detectors db. The detectors db
+ * has different columns than the resources db.
+ */
+class DetectedTagFinderClass : public mvceditor::TagFinderClass {
+
+public:
+	
+	DetectedTagFinderClass();
+
+	/**
+	 * @return vector of ALL parsed class Resources. Be careful as this method may return
+	 * many items (10000+). Try to use the CollectXXX() methods as much as possible.
+	 * An example use of this method is when wanting to find all classes in a project.
+	 * This method will NOT return native PHP classes (ie. PDO, DateTime).
+	 */
+	virtual std::vector<TagClass> AllNonNativeClasses();
+
+protected:
+
+	/**
+	 * @param whereCond the WHERE clause of the query to execute (query will be into the resources table)
+	 *        this does NOT have the "where" keyword.  examples:  
+	 *        "Key = 'ClassName'"
+	 *        "Key = 'ClassName::Method' AND Type IN(3)"
+	 * @param doLimit if TRUE a max amount of results will be returned, if FALSE then ALL results will be returned
+	 *        most of the time you want to set this to TRUE
+	 * @return the vector of resources pulled from the statement's results
+	 */
+	virtual std::vector<mvceditor::TagClass> ResourceStatementMatches(std::string whereCond, bool doLimit);
 };
 
 }

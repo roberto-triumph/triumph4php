@@ -27,7 +27,7 @@
 
 #include <pelet/ParserClass.h>
 #include <pelet/ParserTypeClass.h>
-#include <search/ParsedTagFinderClass.h>
+#include <search/TagFinderClass.h>
 #include <globals/String.h>
 #include <unicode/unistr.h>
 #include <map>
@@ -320,7 +320,7 @@ public:
 	 * @param expressionScope the scope where parsed expression is located.  The scope let's us know which variables are
 	 *        available. See ScopeFinderClass for more info.
 	 * @param allResourceFindesr all of the tag finders to look in
-	 * @param openedResourceFinders the tag cache will be used to look up class methods and function return
+	 * @param openedTagFinders the tag cache will be used to look up class methods and function return
 	 *        values. This map should contain only cache for files that are currently being edited.  The key
 	 *        of the map is the file's full path, the value is the cache itself.
 	 * @param autoCompleteVariableList the results of the matches; these are the names of the variables that
@@ -330,12 +330,12 @@ public:
 	 *        a function / static class call. 
 	 * @param doDuckTyping if an expression chain could not be fully resolved; then we could still
 	 *        perform a search for the expression member in ALL classes. The lookups will not be
-	 *        slower because ParsedTagFinderClass still handles them
+	 *        slower because TagFinderClass still handles them
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear() )
 	 */
 	void ExpressionCompletionMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope, 
-		const std::vector<mvceditor::ParsedTagFinderClass*>& allResourceFinders,
-		const std::map<wxString, ParsedTagFinderClass*>& openedResourceFinders,
+		const std::vector<mvceditor::TagFinderClass*>& allTagFinders,
+		const std::map<wxString, TagFinderClass*>& openedTagFinders,
 		std::vector<UnicodeString>& autoCompleteVariableList,
 		std::vector<TagClass>& autoCompleteResourceList,
 		bool doDuckTyping,
@@ -358,22 +358,22 @@ public:
 	 * @param parsedExpression the expression to resolve. This is usually the result of the ParserClass::ParserExpression
 	 * @param expressionScope the scope where parsed expression is located.  The scope let's us know which variables are
 	 *        available. See ScopeFinderClass for more info.
-	 * @param allResourceFinders the tag finders to look in
-	 * @param openedResourceFinders the tag cache will be used to look up class methods and function return
+	 * @param allTagFinders the tag finders to look in
+	 * @param openedTagFinders the tag cache will be used to look up class methods and function return
 	 *        values. This map should contain only cache for files that are currently being edited.  The key
 	 *        of the map is the file's full path, the value is the cache itself
 	 * @param resourceMatches the tag matches; these are the names of the items that
 	 *        are "near matches" to the parsed expression.
 	 * @param doDuckTyping if an expression chain could not be fully resolved; then we could still
 	 *        perform a search for the expression member in ALL classes. The lookups will not be
-	 *        slower because ParsedTagFinderClass still handles them
+	 *        slower because TagFinderClass still handles them
 	 * @param doFullyQualifiedMatchOnly if TRUE the only resources that match fully qualified resources will be
 	 *        returned
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
 	void ResourceMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope, 
-		const std::vector<mvceditor::ParsedTagFinderClass*>& allResourceFinders,
-		const std::map<wxString, ParsedTagFinderClass*>& openedResourceFinders,
+		const std::vector<mvceditor::TagFinderClass*>& allTagFinders,
+		const std::map<wxString, TagFinderClass*>& openedTagFinders,
 		std::vector<TagClass>& resourceMatches,
 		bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 		SymbolTableMatchErrorClass& error) const;
@@ -428,8 +428,8 @@ private:
 	void ResolveNamespaceAlias(pelet::ExpressionClass& parsedExpression, const pelet::ScopeClass& scope) const;
 	
 	/**
-	 * Modifies the RESOURCE; unresolving namespaces alias to their aliased equivalents. We need to 
-	 * do this because the ResourceFinder class only deals with fully qualified namespaces, it knows nothing
+	 * Modifies the tag; unresolving namespaces alias to their aliased equivalents. We need to 
+	 * do this because the TagFinder class only deals with fully qualified namespaces, it knows nothing
 	 * about the aliases
 	 * 
 	 * @param the original expression to resolve
@@ -468,9 +468,9 @@ private:
  *        one of the finders in the map or it may be another stand-alone one.
  * @return bool TRUE if tag is stale (should not be shown to the user)
  */
-bool IsResourceDirty(const std::map<wxString, ParsedTagFinderClass*>& finders, 
+bool IsResourceDirty(const std::map<wxString, TagFinderClass*>& finders, 
 											 const TagClass& tag, 
-											 mvceditor::ParsedTagFinderClass* tagFinder);
+											 mvceditor::TagFinderClass* tagFinder);
 
 /**
  * This class can be used to determine what function or namespace that a

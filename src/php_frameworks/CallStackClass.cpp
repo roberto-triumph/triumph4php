@@ -55,7 +55,7 @@ mvceditor::CallClass::CallClass()
 	, Type(NONE) {
 }
 
-mvceditor::CallStackClass::CallStackClass(mvceditor::TagCacheClass& resourceCache)
+mvceditor::CallStackClass::CallStackClass(mvceditor::TagCacheClass& tagCache)
 	: List()
 	, LintResults()
 	, MatchError()
@@ -64,7 +64,7 @@ mvceditor::CallStackClass::CallStackClass(mvceditor::TagCacheClass& resourceCach
 	, CurrentMethod()
 	, CurrentFunction()
 	, ResourcesRemaining()
-	, TagCache(resourceCache)
+	, TagCache(tagCache)
 	, ScopeVariables()
 	, ScopeFunctionCalls()
 	, ParsedMethods()
@@ -224,6 +224,9 @@ bool mvceditor::CallStackClass::Persist(wxFileName& fileName) {
 		std::string stepType;
 		std::string expression;
 		soci::transaction transaction(session);
+
+		// delete any old rows; we only store one call stack for the active URL
+		session.once << "DELETE FROM call_stacks";
 		soci::statement stmt = (session.prepare <<
 			"INSERT INTO call_stacks(step_number, step_type, expression) VALUES (?, ?, ?)",
 			soci::use(stepNumber), soci::use(stepType), soci::use(expression)
@@ -237,7 +240,9 @@ bool mvceditor::CallStackClass::Persist(wxFileName& fileName) {
 		transaction.commit();
 	} catch (std::exception& e) {
 		wxUnusedVar(e);
+		error = mvceditor::CharToWx(e.what());
 		good = false;
+		wxASSERT_MSG(good, error);
 	}
 	return good;
 }
