@@ -85,14 +85,14 @@ EOF;
 		// sqlite DB	
 		$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $outputDbFileName));
 		$templateFileTable = new MvcEditor_TemplateFileTable($pdo);
-		$templateFileTable->saveTemplates($arrTemplates);
+		$templateFileTable->saveTemplateFiles($arrTemplates);
 		echo "Template file dectection complete, written to {$outputDbFileName}\n";
 	}
 	else {
 		if (!empty($arrTemplates)) {
-			echo str_pad("Template File", 60) . str_pad("Variables", 90) . "\n";
+			echo str_pad("Template File", 100) . str_pad("Variables", 90) . "\n";
 			foreach ($arrTemplates as $template) {
-				echo str_pad($template->fullPath, 60);
+				echo str_pad($template->fullPath, 100);
 				echo str_pad(join(',', $template->variables), 90);
 				echo "\n";
 			}
@@ -145,7 +145,6 @@ function detectTemplates($sourceDir, $detectorDbFileName, &$doSkip) {
 	$inViewMethod = FALSE;
 	$paramIndex = 0;
 	foreach ($callStacks as $call) {
-		echo "step $i type={$call->type} \n";
 		if (MvcEditor_CallStack::BEGIN_METHOD == $call->type && strcasecmp('CI_Loader::view', $call->resource) == 0) {
 			$inViewMethod = TRUE;
 			$paramIndex = 0;
@@ -153,6 +152,7 @@ function detectTemplates($sourceDir, $detectorDbFileName, &$doSkip) {
 		else if (MvcEditor_CallStack::PARAM == $call->type && $inViewMethod) {
 			if (0 == $paramIndex) {
 				$currentTemplate = new MvcEditor_TemplateFile();
+				$currentTemplate->variables = array();
 				$currentTemplate->fullPath = $call->scalar;
 				
 				// most of the time views are given as relative relatives; starting from the application/views/ directory
@@ -168,14 +168,13 @@ function detectTemplates($sourceDir, $detectorDbFileName, &$doSkip) {
 					// or the programmer has a bug in the project.
 					$currentTemplate->fullPath = \opstring\replace($currentTemplate->fullPath, '/', DIRECTORY_SEPARATOR);
 					$currentTemplate->fullPath = \opstring\replace($currentTemplate->fullPath, '\\', DIRECTORY_SEPARATOR);
-					$currentTemplate->fullPath = $dir . DIRECTORY_SEPARATOR . 'application' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $currentTemplate->fullPath;
+					$currentTemplate->fullPath = $sourceDir . 'application' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $currentTemplate->fullPath;
 					
 					// push it now just in case the template does not get any variables
 					$allTemplates[] = $currentTemplate;
 				}
 			}
 			else if (1 == $paramIndex) {
-				$currentTemplate->variables = array();
 				if (MvcEditor_CallStack::T_ARRAY == $call->paramType) {
 					foreach ($call->arrayKeys as $key) {
 					

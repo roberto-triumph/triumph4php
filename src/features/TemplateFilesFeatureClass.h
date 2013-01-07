@@ -38,7 +38,8 @@ namespace mvceditor {
  * (1) generate the call stack file in a background thread
  * (2) call the PHP view file detector (in an external process)
  * 
- * After all of this, it will populate a window with the view files.
+ * After all of this, it will populate a window with the template files
+ * for the URL that the user has selected.
  */
 class TemplateFeatureClass : public mvceditor::FeatureClass {
 	

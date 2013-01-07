@@ -26,8 +26,11 @@
 #include <language/TagCacheClass.h>
 #include <php_frameworks/CallStackClass.h>
 #include <widgets/ThreadWithHeartbeatClass.h>
+#include <actions/TagDetectorActionClass.h>
+#include <actions/CallStackActionClass.h>
 #include <globals/Assets.h>
 #include <wx/app.h>
+#include <wx/String.h>
 #include <wx/stdpaths.h>
 
 /**
@@ -52,8 +55,13 @@ HandlerClass Handler;
 mvceditor::TagCacheClass TagCache;
 mvceditor::RunningThreadsClass RunningThreads;
 mvceditor::CallStackClass CallStack(TagCache);
-wxString DirName;
+wxString SourceDir;
 wxString StartingFile;
+wxString PhpExecutableFullPath;
+wxString PhpIncludePathFullPath;
+wxString PhpTagDectectorFullPath;
+wxString TagCacheDbFullPath;
+wxString DetectorDbFullPath;
 
 /**
  * This program will generate the call stack output for the test directory.
@@ -70,14 +78,24 @@ int main() {
 	int major, minor;
 	wxOperatingSystemId os = wxGetOsVersion(&major, &minor);
 	if (os == wxOS_WINDOWS_NT) {
-		DirName = wxT("C:\\Users\\roberto\\Software\\wamp\\www\\ember");
-		StartingFile = wxT("C:\\Users\\roberto\\Software\\wamp\\www\\ember\\application\\controllers\\news.php");
+		SourceDir = wxT("C:\\Users\\roberto\\Software\\wamp\\www\\ember");
+		StartingFile = SourceDir + wxT("\\application\\controllers\\news.php");
+		PhpExecutableFullPath = wxT("php.exe");
+		PhpIncludePathFullPath = wxT("C:\\Users\\roberto\\Documents\\mvc-editor\\php_detectors");
+		PhpTagDectectorFullPath = wxT("C:\\Users\\roberto\\Documents\\mvc-editor\\php_detectors\\tag_detectors\\CodeIgniterTagDetector.php");
+		TagCacheDbFullPath = wxT("C:\\Users\\roberto\\Desktop\\tags.db");
+		DetectorDbFullPath = wxT("C:\\Users\\roberto\\Desktop\\detectors.db");
 	}
 	else {
-		DirName = wxT("/home/roberto/public_html/ember");
-		StartingFile = wxT("/home/roberto/public_html/ember/application/controllers/news.php");
+		SourceDir = wxT("/home/roberto/public_html/ember");
+		StartingFile = SourceDir + wxT("/application/controllers/news.php");
+		PhpExecutableFullPath = wxT("php");
+		PhpIncludePathFullPath = wxT("/home/roberto/workspace/mvc-editor/php_detectors/src");
+		PhpTagDectectorFullPath = wxT("/home/roberto/workspace/mvc-editor/php_detectors/tag_detectors/CodeIgniterTagDetector.php");
+		TagCacheDbFullPath = wxT("/home/roberto/workspace/tags.db");
+		DetectorDbFullPath = wxT("/home/roberto/workspace/detectors.db");
 	}
-	CacheLargeProject(TagCache, DirName);
+	CacheLargeProject(TagCache, SourceDir);
 	
 	wxFileName fileName(StartingFile);
 	UnicodeString className = UNICODE_STRING_SIMPLE("News");
@@ -92,50 +110,35 @@ int main() {
 	}
 	u_fclose(ufout);
 	printf("The call stack is %d items long\n", (int)CallStack.List.size());
-	wxFileName outputFile;
-	
-	// the temporary file where the output will go
-	// make it a unique name
-	
-	wxStandardPaths paths;
-	wxString tmpDir = paths.GetTempDir();
-	outputFile.AssignDir(tmpDir);
-	wxLongLong time = wxGetLocalTimeMillis();
-	wxString tmpName = wxT("call_stack") + wxString::Format(wxT("_%s.ini"), time.ToString().c_str());
-	outputFile.SetFullName(tmpName);
-	outputFile.Normalize();	
-	
-	CallStack.Persist(outputFile);
-	
-	printf("Call stack written to:%s\n", (const char*)outputFile.GetFullPath().ToAscii());
-
+	CallStack.Persist(wxFileName(DetectorDbFullPath));
+	printf("Call stack written to:%s\n", (const char*)DetectorDbFullPath.ToAscii());
 	return 0;
 }
 	
-void CacheLargeProject(mvceditor::TagCacheClass& tagCache, wxString dirName) {
+void CacheLargeProject(mvceditor::TagCacheClass& tagCache, wxString sourceDir) {
 	std::vector<wxString> phpFileExtensions,
 		miscFileExtensions;
 	phpFileExtensions.push_back(wxT("*.php"));
 
+	// load the php native functions into the cache
 	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass;
 	globalCache->InitGlobalTag(mvceditor::NativeFunctionsAsset(), phpFileExtensions, miscFileExtensions, pelet::PHP_53);
 	tagCache.RegisterGlobal(globalCache);
+
+	// parse tags of the code igniter project 
 	mvceditor::DirectorySearchClass directorySearch;
-	bool found = directorySearch.Init(dirName);
+	bool found = directorySearch.Init(sourceDir);
 	if (!found) {
-		printf("Directory does not exist: %s\n", (const char*)dirName.ToAscii());
+		printf("Directory does not exist: %s\n", (const char*)sourceDir.ToAscii());
 	}
 	bool walked = true;
-	wxFileName fileName(wxFileName::GetTempDir() + wxFileName::GetPathSeparators() + wxT("call_stack_profiler_resource_cache.db"));
-	if (fileName.FileExists()) {
-		wxRemoveFile(fileName.GetFullPath());
-	}
+	
+	// load the project tags that were just parsed
 	mvceditor::GlobalCacheClass* projectCache = new mvceditor::GlobalCacheClass;
-	projectCache->InitGlobalTag(fileName, phpFileExtensions, miscFileExtensions, pelet::PHP_53);
+	projectCache->InitGlobalTag(wxFileName(TagCacheDbFullPath), phpFileExtensions, miscFileExtensions, pelet::PHP_53);
 	while (directorySearch.More()) {
 		projectCache->Walk(directorySearch);
 	}
-
 	if (!tagCache.RegisterGlobal(projectCache)) {
 		printf("Could not initialize the project cache.\n");
 	}
@@ -144,5 +147,29 @@ void CacheLargeProject(mvceditor::TagCacheClass& tagCache, wxString dirName) {
 	}
 	else {
 		printf("Caching complete\n");
+	}
+	// run the tag detector script for code igniter 
+	mvceditor::TagDetectorParamsClass params;
+	params.PhpExecutablePath = PhpExecutableFullPath;
+	params.PhpIncludePath.AssignDir(PhpIncludePathFullPath);
+	params.ScriptName.Assign(PhpTagDectectorFullPath); 
+	params.SourceDir.AssignDir(sourceDir);
+	params.OutputDbFileName = DetectorDbFullPath;
+	
+	wxArrayString output, error;
+	wxExecute(params.BuildCmdLine(), output, error, 0);
+	for (size_t i = 0; i < output.GetCount(); i++) {
+		printf("%s\n", mvceditor::WxToChar(output[i]).c_str());
+	}
+	for (size_t i = 0; i < error.GetCount(); i++) {
+		printf("%s\n", mvceditor::WxToChar(error[i]).c_str());
+	}
+	printf("Command is %s\n", mvceditor::WxToChar(params.BuildCmdLine()).c_str());
+
+	// load the detected tags cache
+	mvceditor::GlobalCacheClass* detectorCache = new mvceditor::GlobalCacheClass;
+	detectorCache->InitDetectorTag(wxFileName(DetectorDbFullPath));
+	if (!tagCache.RegisterGlobal(detectorCache)) {
+		printf("Could not initialize the detector cache.\n");
 	}
 }

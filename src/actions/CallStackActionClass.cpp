@@ -36,8 +36,10 @@ bool mvceditor::CallStackActionClass::Init(mvceditor::GlobalsClass& globals) {
 			// initialize the detected tag cache too so that more methods can be resolved
 			projectCache = new mvceditor::GlobalCacheClass;
 			projectCache->InitDetectorTag(project->DetectorDbFileName);
-			globals.TagCache.RegisterGlobal(projectCache);
+			TagCache.RegisterGlobal(projectCache);
 			ret = true;
+			SetStatus(_("Calculating call stack for ") + mvceditor::IcuToWx(StartClassName) + wxT("::") + 
+				mvceditor::IcuToWx(StartMethodName));
 		}
 	}
 	return ret;

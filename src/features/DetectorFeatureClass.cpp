@@ -581,7 +581,7 @@ void mvceditor::TemplateFilesDetectorPanelClass::OnChooseUrlButton(wxCommandEven
 	mvceditor::ChooseUrlDialogClass dialog(this, Globals.UrlResourceFinder, TestUrl);
 	if (dialog.ShowModal() == wxOK) {
 		UrlToTest->SetValue(TestUrl.Url.BuildURI());
-		mvceditor::CallStackActionClass* action = new mvceditor::CallStackActionClass(RunningThreads, wxID_ANY);
+		mvceditor::CallStackActionClass* action = new mvceditor::CallStackActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_CALL_STACK);
 		action->SetCallStackStart(TestUrl.FileName,
 			mvceditor::WxToIcu(TestUrl.ClassName),
 			mvceditor::WxToIcu(TestUrl.MethodName),
@@ -707,7 +707,6 @@ void mvceditor::DetectorFeatureClass::OnRunUrlDetectors(wxCommandEvent& event) {
 }
 
 void mvceditor::DetectorFeatureClass::OnRunTemplateFileDetectors(wxCommandEvent& event) {
-	/*
 	if (App.Sequences.Running()) {
 		wxMessageBox(_("Please wait for the current background task to finish"));
 		return;
@@ -715,11 +714,25 @@ void mvceditor::DetectorFeatureClass::OnRunTemplateFileDetectors(wxCommandEvent&
 	std::vector<mvceditor::ActionClass*> actions;
 
 	// the sequence class will own this pointer
+	mvceditor::CallStackActionClass* callStackAction =  new mvceditor::CallStackActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_CALL_STACK);
+	mvceditor::UrlResourceClass urlResource = App.Globals.CurrentUrl;
+	std::vector<mvceditor::ProjectClass>::const_iterator project;
+	wxFileName detectorDbFileName;
+	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
+		if (project->IsAPhpSourceFile(urlResource.FileName.GetFullPath())) {
+			detectorDbFileName = project->DetectorDbFileName;
+			break;
+		}
+	}
+	callStackAction->SetCallStackStart(urlResource.FileName,
+		mvceditor::WxToIcu(urlResource.ClassName),
+		mvceditor::WxToIcu(urlResource.MethodName),
+		detectorDbFileName);
+	actions.push_back(callStackAction);
 	actions.push_back(
-		new mvceditor::UrlDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_URL_DETECTOR)	
+		new mvceditor::TemplateFilesDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_DETECTOR)
 	);
 	App.Sequences.Build(actions);
-	*/
 }
 
 void mvceditor::DetectorFeatureClass::OnRunTagDetectors(wxCommandEvent& event) {

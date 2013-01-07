@@ -320,6 +320,8 @@ solution "mvc-editor"
 			"src/php_frameworks/*.cpp",
 			"src/globals/*.cpp",
 			"src/search/*.cpp",
+			"src/actions/ActionClass.cpp",
+			"src/actions/TagDetectorActionClass.cpp",
 			"src/widgets/ThreadWithHeartbeatClass.cpp",
 			"src/widgets/ProcessWithHeartbeatClass.cpp"
 		}

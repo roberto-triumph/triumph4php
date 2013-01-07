@@ -67,7 +67,7 @@ bool mvceditor::TemplateFilesDetectorActionClass::Init(mvceditor::GlobalsClass& 
 	std::vector<mvceditor::SourceClass>::const_iterator source;
 	std::vector<wxString>::const_iterator scriptName;
 
-	// need to call each url detector once for each different source directory
+	// need to call each template files detector once for each different source directory
 	// that's why there's 3 loops
 	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
 		for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {

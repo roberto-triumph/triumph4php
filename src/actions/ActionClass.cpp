@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2009-2011 Roberto Perpuly
+ * @copyright  2009-20Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <actions/ActionClass.h>
@@ -88,3 +88,4 @@ const int mvceditor::ID_EVENT_ACTION_TAG_DETECTOR_INIT = wxNewId();
 const int mvceditor::ID_EVENT_ACTION_TAG_DETECTOR = wxNewId();
 const int mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE = wxNewId();
 const int mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_DETECTOR = wxNewId();
+const int mvceditor::ID_EVENT_ACTION_CALL_STACK = wxNewId();
