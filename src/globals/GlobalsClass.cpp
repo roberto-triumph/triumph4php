@@ -66,6 +66,17 @@ std::vector<mvceditor::SourceClass> mvceditor::GlobalsClass::AllEnabledPhpSource
 	return allSources;
 }
 
+std::vector<mvceditor::ProjectClass> mvceditor::GlobalsClass::AllEnabledProjects() const {
+	std::vector<mvceditor::ProjectClass> enabledProjects;
+	std::vector<mvceditor::ProjectClass>::const_iterator it;
+	for (it = Projects.begin(); it != Projects.end(); ++it) {
+		if (it->IsEnabled) {
+			enabledProjects.push_back(*it);
+		}
+	}
+	return enabledProjects;
+}
+
 bool mvceditor::GlobalsClass::HasSources() const {
 	bool hasSources = false;
 	for (size_t i = 0; i < Projects.size() && !hasSources; ++i) {

@@ -271,10 +271,9 @@ void mvceditor::DetectorTreeHandlerClass::Init() {
 void mvceditor::DetectorTreeHandlerClass::UpdateProjects() {
 	wxArrayString projectLabels;
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	for (project = Globals.Projects.begin(); project != Globals.Projects.end(); ++project) {
-		if (project->IsEnabled) {
-			projectLabels.Add(project->Label);
-		}
+	std::vector<mvceditor::ProjectClass> enabledProjects = Globals.AllEnabledProjects();
+	for (project = enabledProjects.begin(); project != enabledProjects.end(); ++project) {
+		projectLabels.Add(project->Label);
 	}
 	ProjectChoice->Clear();
 	if (!projectLabels.IsEmpty()) {
@@ -378,8 +377,7 @@ void mvceditor::DetectorTreeHandlerClass::OnTestButton(wxCommandEvent& event) {
 		wxMessageBox(_("Please choose a project to test the detector on."));
 		return;
 	}
-
-	mvceditor::ProjectClass project = Globals.Projects[projectChoiceIndex];
+	mvceditor::ProjectClass project = Globals.AllEnabledProjects()[projectChoiceIndex];
 	if (project.Sources.empty()) {
 		wxMessageBox(_("Selected project does not have any source directories. Please choose another project"));
 		return;

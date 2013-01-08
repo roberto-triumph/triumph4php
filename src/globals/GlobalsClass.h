@@ -132,6 +132,11 @@ public:
 	std::vector<mvceditor::SourceClass> AllEnabledPhpSources() const;
 
 	/**
+	 * @return vector of all enabled projects
+	 */
+	std::vector<mvceditor::ProjectClass> AllEnabledProjects() const;
+
+	/**
 	 * @return bool TRUE if there is at least 1 enabled project that has AT LEAST 1 source
 	 */
 	bool HasSources() const;

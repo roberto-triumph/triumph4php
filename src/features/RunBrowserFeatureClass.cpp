@@ -183,7 +183,12 @@ void mvceditor::RunBrowserFeatureClass::OnUrlToolDropDown(wxAuiToolBarEvent& eve
 
 		wxBitmap bmp = wxArtProvider::GetBitmap(wxART_QUESTION, wxART_OTHER, wxSize(16,16));
 		for (size_t i = 0; i < RecentUrls.size() && i < MAX_URLS; ++i) {
-			wxMenuItem* menuItem =  new wxMenuItem(UrlMenu.get(), mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + i, RecentUrls[i].Url.BuildURI());
+			wxString url = RecentUrls[i].Url.BuildURI();
+
+			// make sure to watch out for ampersans in the URL, so that the menu does not think 
+			// they are menu accelerators
+			url.Replace(wxT("&"), wxT("&&"));
+			wxMenuItem* menuItem =  new wxMenuItem(UrlMenu.get(), mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + i, url);
 			menuItem->SetBitmap(bmp);
 			UrlMenu->Append(menuItem);
 		}
