@@ -35,6 +35,9 @@ class MvcEditor_TemplateFileTable extends Zend_Db_Table_Abstract {
 		
 		// sqlite optimizes transactions really well; use transaction so that the inserts are faster
 		$this->getAdapter()->beginTransaction();
+		
+		// delete any old rows; we only store one set of template files for now
+		$this->delete('');
 		foreach ($templateFiles as $templateFile) {
 			$variables = join(',', $templateFile->variables);
 			$this->insert(array(

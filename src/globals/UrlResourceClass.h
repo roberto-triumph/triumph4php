@@ -129,6 +129,26 @@ public:
 	bool FindByUrl(const wxURI& url, UrlResourceClass& urlResource);
 
 	/**
+	 * check to see if the given class / method is a URL entry point. If the class/method combination
+	 * exists then urlResource is filled with the contents of the URL.
+	 * This way, the caller can "resolve" a class/method name into a URL
+	 * Comparison is done in a case-insensitive manner
+	 *
+	 * @return TRUE if there is a URL resource that has the given controller class name AND method name
+	 */
+	bool FindByClassMethod(const wxString& className, const wxString& methodName, UrlResourceClass& urlResource);
+
+	/**
+	 * Get all UrlResources that have their FullPath equal to fullPath. if the URL
+	 * exists then urlResource it is appended to urlResources;
+	 * This way, the caller can "resolve" a file name into all of the URLs for that file.
+	 * Comparison is done in a case-insensitive manner
+	 *
+	 * @return TRUE if there is a URL resource that has the given full path
+	 */
+	bool FilterByFullPath(const wxString& fullPath, std::vector<UrlResourceClass>& urlResources);
+
+	/**
 	 * Searches all URLs for the URLs that match the given filter; and will copy matching
 	 * URLs to matchedUrls.
 	 * @param filter string if filter is a substring of URL then its considered a match.
@@ -157,6 +177,17 @@ public:
 	 * @return int number of urls
 	 */
 	int Count();
+
+	/**
+	 * returns all of the controller names that were detected
+	 */
+	std::vector<wxString> AllControllerNames();
+
+	/**
+	 * returns all of the method names that were detected. These are just the 
+	 * methods from the detected URLs.
+	 */
+	std::vector<wxString> AllMethodNames(const wxString& controllerClassName);
 
 private:
 

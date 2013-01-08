@@ -5,19 +5,19 @@
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#include "ViewFileFeatureForms.h"
+#include "TemplateFilesFeatureForms.h"
 
 ///////////////////////////////////////////////////////////////////////////
 
-BEGIN_EVENT_TABLE( ViewFilePanelGeneratedClass, wxPanel )
-	EVT_CHOICE( ID_CONTROLLER, ViewFilePanelGeneratedClass::_wxFB_OnControllerChoice )
-	EVT_CHOICE( ID_ACTION, ViewFilePanelGeneratedClass::_wxFB_OnActionChoice )
-	EVT_BUTTON( ID_HELPBUTTON, ViewFilePanelGeneratedClass::_wxFB_OnHelpButton )
-	EVT_BUTTON( ID_CURRENTBUTTON, ViewFilePanelGeneratedClass::_wxFB_OnCurrentButton )
-	EVT_TREE_ITEM_ACTIVATED( ID_FILETREE, ViewFilePanelGeneratedClass::_wxFB_OnTreeItemActivated )
+BEGIN_EVENT_TABLE( TemplateFilesPanelGeneratedClass, wxPanel )
+	EVT_CHOICE( ID_CONTROLLER, TemplateFilesPanelGeneratedClass::_wxFB_OnControllerChoice )
+	EVT_CHOICE( ID_ACTION, TemplateFilesPanelGeneratedClass::_wxFB_OnActionChoice )
+	EVT_BUTTON( ID_HELPBUTTON, TemplateFilesPanelGeneratedClass::_wxFB_OnHelpButton )
+	EVT_BUTTON( ID_CURRENTBUTTON, TemplateFilesPanelGeneratedClass::_wxFB_OnCurrentButton )
+	EVT_TREE_ITEM_ACTIVATED( ID_FILETREE, TemplateFilesPanelGeneratedClass::_wxFB_OnTreeItemActivated )
 END_EVENT_TABLE()
 
-ViewFilePanelGeneratedClass::ViewFilePanelGeneratedClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+TemplateFilesPanelGeneratedClass::TemplateFilesPanelGeneratedClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	wxBoxSizer* PanelSizer;
 	PanelSizer = new wxBoxSizer( wxVERTICAL );
@@ -108,6 +108,6 @@ ViewFilePanelGeneratedClass::ViewFilePanelGeneratedClass( wxWindow* parent, wxWi
 	this->Layout();
 }
 
-ViewFilePanelGeneratedClass::~ViewFilePanelGeneratedClass()
+TemplateFilesPanelGeneratedClass::~TemplateFilesPanelGeneratedClass()
 {
 }

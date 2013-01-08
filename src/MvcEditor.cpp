@@ -40,6 +40,7 @@
 #include <features/EditorMessagesFeatureClass.h>
 #include <features/RecentFilesFeatureClass.h>
 #include <features/DetectorFeatureClass.h>
+#include <features/TemplateFilesFeatureClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 
@@ -176,6 +177,8 @@ void mvceditor::AppClass::CreateFeatures() {
 	feature = new RecentFilesFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new DetectorFeatureClass(*this);
+	Features.push_back(feature);
+	feature =  new TemplateFilesFeatureClass(*this);
 	Features.push_back(feature);
 	
 	// TODO test feature need to find a quicker way to toggling it ON / OFF

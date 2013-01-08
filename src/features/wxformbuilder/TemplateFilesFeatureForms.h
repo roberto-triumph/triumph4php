@@ -5,8 +5,8 @@
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef __ViewFileFeatureForms__
-#define __ViewFileFeatureForms__
+#ifndef __TemplateFilesFeatureForms__
+#define __TemplateFilesFeatureForms__
 
 #include <wx/intl.h>
 
@@ -29,9 +29,9 @@
 ///////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class ViewFilePanelGeneratedClass
+/// Class TemplateFilesPanelGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class ViewFilePanelGeneratedClass : public wxPanel 
+class TemplateFilesPanelGeneratedClass : public wxPanel 
 {
 	DECLARE_EVENT_TABLE()
 	private:
@@ -81,9 +81,9 @@ class ViewFilePanelGeneratedClass : public wxPanel
 	
 	public:
 		
-		ViewFilePanelGeneratedClass( wxWindow* parent, wxWindowID id = ID_VIEWFILESPANELGENERATEDCLASS, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 409,444 ), long style = wxTAB_TRAVERSAL );
-		~ViewFilePanelGeneratedClass();
+		TemplateFilesPanelGeneratedClass( wxWindow* parent, wxWindowID id = ID_VIEWFILESPANELGENERATEDCLASS, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 409,444 ), long style = wxTAB_TRAVERSAL );
+		~TemplateFilesPanelGeneratedClass();
 	
 };
 
-#endif //__ViewFileFeatureForms__
+#endif //__TemplateFilesFeatureForms__

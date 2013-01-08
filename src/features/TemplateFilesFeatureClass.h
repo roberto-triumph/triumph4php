@@ -26,6 +26,8 @@
 #define __TEMPLATEFILES_FEATURECLASS_H__
 
 #include <features/FeatureClass.h>
+#include <features/wxformbuilder/TemplateFilesFeatureForms.h>
+#include <globals/TemplateFileClass.h>
 
 namespace mvceditor {
 
@@ -41,7 +43,7 @@ namespace mvceditor {
  * After all of this, it will populate a window with the template files
  * for the URL that the user has selected.
  */
-class TemplateFeatureClass : public mvceditor::FeatureClass {
+class TemplateFilesFeatureClass : public mvceditor::FeatureClass {
 	
 public:
 	
@@ -57,7 +59,7 @@ public:
 	 * the final result; the view files that correspond to the
 	 * current URL
 	 */
-	std::vector<mvceditor::ViewInfoClass> CurrentViewInfos();
+	std::vector<mvceditor::TemplateFileClass> CurrentTemplates();
 
 	/**
 	 * starts the view file detection process. This is an asynchronous operation.
@@ -82,7 +84,12 @@ private:
 	/**
 	 * show (or create) the view files window and start the calculations if needed
 	 */
-	void OnViewInfosMenu(wxCommandEvent& event);
+	void OnTemplateFilesMenu(wxCommandEvent& event);
+
+	/**
+	 * when the template file detection process completes update the variable tree
+	 */
+	void OnTemplateDetectionComplete(wxCommandEvent& event);
 		
 	void ShowPanel();
 	
