@@ -91,9 +91,14 @@ CREATE TABLE IF NOT EXISTS call_stacks (
 
 CREATE TABLE IF NOT EXISTS template_files (
 
+	-- 
+	-- needed for Zend_Db_Table_Abstract 
+	--
+	id INTEGER PRIMARY KEY AUTOINCREMENT, 
+	
 	-- this is the full path to the template file. 
 	-- It contains OS-dependant directoy separators
-	full_path TEXT NOT NULL PRIMARY KEY,
+	full_path TEXT NOT NULL,
 
 	-- This is the comma separated list of templates variables
 	-- Each variable will have th siguil ('$')

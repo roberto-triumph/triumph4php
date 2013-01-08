@@ -272,7 +272,9 @@ void mvceditor::DetectorTreeHandlerClass::UpdateProjects() {
 	wxArrayString projectLabels;
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	for (project = Globals.Projects.begin(); project != Globals.Projects.end(); ++project) {
-		projectLabels.Add(project->Label);
+		if (project->IsEnabled) {
+			projectLabels.Add(project->Label);
+		}
 	}
 	ProjectChoice->Clear();
 	if (!projectLabels.IsEmpty()) {

@@ -142,7 +142,10 @@ std::vector<mvceditor::TemplateFileClass> mvceditor::TemplateFilesFeatureClass::
 void mvceditor::TemplateFilesFeatureClass::OnTemplateDetectionComplete(wxCommandEvent& event) {
 	wxWindow* window = FindOutlineWindow(ID_TEMPLATE_FILES_PANEL);
 	mvceditor::TemplateFilesPanelClass* templateFilesPanel = NULL;
-	if (!window) {
+	if (window) {
+		templateFilesPanel = (mvceditor::TemplateFilesPanelClass*) window;
+	}
+	else {
 		templateFilesPanel = new mvceditor::TemplateFilesPanelClass(GetOutlineNotebook(), ID_TEMPLATE_FILES_PANEL, *this);
 		AddOutlineWindow(templateFilesPanel, _("Templates"));
 	}
