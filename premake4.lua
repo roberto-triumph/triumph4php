@@ -241,7 +241,6 @@ solution "mvc-editor"
 			"src/globals/*.cpp",
 			"src/actions/*.cpp",
 			"src/language/*.cpp",
-			"src/php_frameworks/CallStackClass.cpp",
 			"src/search/*.cpp",
 			"src/widgets/ThreadWithHeartbeatClass.cpp",
 			"src/widgets/ProcessWithHeartbeatClass.cpp"
@@ -317,7 +316,6 @@ solution "mvc-editor"
 		files {
 			"profilers/call_stack_profiler.cpp",
 			"src/language/*.cpp",
-			"src/php_frameworks/*.cpp",
 			"src/globals/*.cpp",
 			"src/search/*.cpp",
 			"src/actions/ActionClass.cpp",
@@ -345,7 +343,6 @@ solution "mvc-editor"
 			"src/actions/*.cpp",
 			"src/globals/*.cpp",
 			"src/language/*.cpp",
-			"src/php_frameworks/*.cpp",
 			"src/search/*.cpp",
 			"src/widgets/ProcessWithHeartbeatClass.cpp",
 			"src/widgets/ThreadWithHeartbeatClass.cpp",
@@ -396,7 +393,6 @@ solution "mvc-editor"
 			"src/widgets/ProcessWithHeartbeatClass.cpp",
 			"src/widgets/StatusBarWithGaugeClass.cpp",
 			"src/globals/*.cpp",
-			"src/php_frameworks/*.cpp",
 			"src/language/*.cpp",
 			"src/search/*.cpp"
 		}

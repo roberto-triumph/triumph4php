@@ -24,7 +24,7 @@
  */
 
 #include <language/TagCacheClass.h>
-#include <php_frameworks/CallStackClass.h>
+#include <language/CallStackClass.h>
 #include <widgets/ThreadWithHeartbeatClass.h>
 #include <actions/TagDetectorActionClass.h>
 #include <actions/CallStackActionClass.h>

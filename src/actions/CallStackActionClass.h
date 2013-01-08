@@ -26,7 +26,7 @@
 #define __MVCEDITOR_CALLSTACKACTIONCLASS_H__
 
 #include <actions/ActionClass.h>
-#include <php_frameworks/CallStackClass.h>
+#include <language/CallStackClass.h>
 
 namespace mvceditor {
 

@@ -25,7 +25,7 @@
 #include <UnitTest++.h>
 #include <MvcEditorChecks.h>
 #include <FileTestFixtureClass.h>
-#include <php_frameworks/CallStackClass.h>
+#include <language/CallStackClass.h>
 #include <globals/String.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
