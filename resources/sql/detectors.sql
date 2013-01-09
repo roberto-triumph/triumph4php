@@ -62,6 +62,10 @@ CREATE TABLE IF NOT EXISTS url_resources (
 	method_name TEXT NOT NULL COLLATE NOCASE
 );
 
+-- 
+-- This table stores the call stack for the URL that is currently selected in MVC Editor.
+-- This table is populated by MVC Editor before the template files detectors are called.
+--
 CREATE TABLE IF NOT EXISTS call_stacks (
 	
 	-- zero-based index of the 
@@ -89,6 +93,10 @@ CREATE TABLE IF NOT EXISTS call_stacks (
 	expression TEXT NOT NULL
 );
 
+-- 
+-- This table stores the detected template files.  Template file detector scripts will insert
+-- into this table when they recognize a template file and its variables.
+--
 CREATE TABLE IF NOT EXISTS template_files (
 
 	-- 
@@ -97,7 +105,7 @@ CREATE TABLE IF NOT EXISTS template_files (
 	id INTEGER PRIMARY KEY AUTOINCREMENT, 
 	
 	-- this is the full path to the template file. 
-	-- It contains OS-dependant directoy separators
+	-- It contains OS-dependant directory separators
 	full_path TEXT NOT NULL,
 
 	-- This is the comma separated list of templates variables
@@ -169,6 +177,68 @@ CREATE TABLE IF NOT EXISTS detected_tags (
 	--
 	comment TEXT NOT NULL
 );
+
+
+-- 
+-- this table list the detected database connections; database detector
+-- scripts will populated this table based on a framework's config
+-- file.
+--
+CREATE TABLE IF NOT EXISTS database_tags (
+	
+	--
+	-- this is the full path to the source directory
+	-- that contains the database settings. Note that this
+	-- is the source as entered by the user in the "Project Sources". 
+	-- It contains OS-dependant directory separators
+	--
+	source_dir_full_path TEXT NOT NULL COLLATE NOCASE,
+
+	--
+	-- the framework-defined "environment" where
+	-- this connection is used
+	--
+	environment TEXT NOT NULL COLLATE NOCASE,
+	
+	--
+	-- a friendly label for this connection. MVC Editor will show
+	-- this to the user.
+	--
+	name TEXT NOT NULL COLLATE NOCASE,
+	
+	--
+	-- the database server program that this connection
+	-- connects to. MVC Editor will use this to determine
+	-- which database driver to use
+	--
+	driver TEXT NOT NULL COLLATE NOCASE,
+	
+	--
+	-- the IP or host name of the connection. MVC Editor will use this to determine
+	-- what host to connect to.
+	--
+	host TEXT NOT NULL COLLATE NOCASE,
+	
+	--
+	-- the port number of the connection. MVC Editor will use this to determine
+	-- what port to connect to.
+	--
+	port INTEGER NOT NULL COLLATE NOCASE,
+	
+	--
+	-- user of the connection. MVC Editor will use this to determine
+	-- what user to connect as.
+	--
+	username TEXT NOT NULL COLLATE NOCASE,
+	
+	--
+	-- the password of the connection. MVC Editor will use this to determine
+	-- what password to use when connecting. Note that this is 
+	-- stored in plain text.
+	--
+	password TEXT NOT NULL COLLATE NOCASE
+);
+
 
 -- to enable fast lookups for detected tags.
 -- Note that the key is not necessarily unique; 2 different files may declare the same

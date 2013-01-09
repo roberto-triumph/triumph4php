@@ -97,6 +97,20 @@ wxFileName TagDetectorsLocalAsset();
 wxFileName TagDetectorsGlobalAsset();
 
 /**
+ * @return the directory location of the PHP database detector scripts.  The editor will use these scripts
+ * to find out framework-specific template files. These are the template files detectors that the user
+ * creates for their own projects.
+ */
+wxFileName DatabaseDetectorsLocalAsset();
+
+/**
+ * @return the directory location of the PHP database detector scripts.  The editor will use these scripts
+ * to find out framework-specific template files. These are the template files detectors that are provided
+ * by MVC editor.
+ */
+wxFileName DatabaseDetectorsGlobalAsset();
+
+/**
  * @return the file location of the SQL script to create the detector database.
  */
 wxFileName DetectorSqlSchemaAsset();

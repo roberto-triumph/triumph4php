@@ -118,6 +118,27 @@ public:
 	wxString HelpMessage();
 };
 
+class DatabaseDetectorClass : public mvceditor::DetectorClass {
+public:
+
+	DatabaseDetectorClass();
+
+	bool CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project);
+
+	wxString TestCommandLine(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project,
+		const wxString& detectorScriptFullPath);
+
+	wxFileName LocalRootDir();
+
+	wxFileName GlobalRootDir();
+
+	wxFileName SkeletonFile();
+
+	wxString Label();
+
+	wxString HelpMessage();
+};
+
 class DetectorTreeHandlerClass : public wxEvtHandler {
 
 public:
@@ -304,6 +325,41 @@ private:
 	mvceditor::DetectorTreeHandlerClass Handler;
 };
 
+class DatabaseDetectorPanelClass : public DatabaseDetectorPanelGeneratedClass {
+
+public:
+
+	/**
+	 * @param parent window parent
+	 * @param id window ID
+	 * @param globals to access the projects list
+	 * @param eventSink to send the app file and run commands
+	 */
+	DatabaseDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
+		mvceditor::EventSinkClass& eventSink);
+
+	~DatabaseDetectorPanelClass();
+
+	/**
+	 * This should be called when the detector tree needs to be updated.
+	 */
+	void Init();
+
+	/**
+	 * updates the project choice with the given projects. This should be called whenever
+	 * the global project list has been changed.
+	 * The project list will be read from GlobalsClass
+	 */
+	void UpdateProjects();
+
+private:
+
+	mvceditor::DatabaseDetectorClass Detector;
+
+	mvceditor::DetectorTreeHandlerClass Handler;
+};
+
+
 class DetectorFeatureClass : public mvceditor::FeatureClass {
 
 public:
@@ -319,9 +375,12 @@ private:
 	void OnViewUrlDetectors(wxCommandEvent& event);
 	void OnViewTemplateFileDetectors(wxCommandEvent& event);
 	void OnViewTagDetectors(wxCommandEvent& event);
+	void OnViewDatabaseDetectors(wxCommandEvent& event);
+
 	void OnRunUrlDetectors(wxCommandEvent& event);
 	void OnRunTemplateFileDetectors(wxCommandEvent& event);
 	void OnRunTagDetectors(wxCommandEvent& event);
+	void OnRunDatabaseDetectors(wxCommandEvent& event);
 
 	DECLARE_EVENT_TABLE()
 

@@ -149,6 +149,29 @@ wxFileName mvceditor::TagDetectorsGlobalAsset() {
 	return scriptsFileName;
 }
 
+wxFileName mvceditor::DatabaseDetectorsLocalAsset() {
+	wxStandardPaths paths;
+	wxFileName configDir = mvceditor::ConfigDirAsset();
+	configDir.AppendDir(wxT("database_detectors"));
+	if (!configDir.DirExists()) {
+		wxMkdir(configDir.GetPath(), 0777);
+	}
+	return configDir;
+}
+
+wxFileName mvceditor::DatabaseDetectorsGlobalAsset() {
+	wxStandardPaths paths;
+	wxFileName pathExecutableFileName(paths.GetExecutablePath());
+	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
+		wxT("..") + wxFileName::GetPathSeparator() +
+		wxT("php_detectors") + wxFileName::GetPathSeparator() +
+		wxT("database_detectors");
+	wxFileName scriptsFileName;
+	scriptsFileName.AssignDir(scriptsFullPath);
+	scriptsFileName.Normalize();
+	return scriptsFileName;
+}
+
 wxFileName mvceditor::TempDirAsset() {
 	wxStandardPaths paths;
 	wxFileName tempDir;
