@@ -30,15 +30,15 @@ class MvcEditor_ResourceTable extends Zend_Db_Table_Abstract {
 	
 	protected $_primary = array('file_item_id', 'key');
 	
-		/**
+	/**
 	 * Retrieves all of the methods from the given files. Only resources that 
-	 * are methods will be returned.
+	 * are methods will be returned. Only public methods are returned.
 	 *
 	 * @param Zend_Db_Adapter_Abstract $db the DB to query
 	 * @param MvcEditor_FileItem[] $fileItems the file item IDs to query
 	 * @return MvcEditor_Resource[] the resources that were found in any of the given files.
 	 */
-	public function MethodsFromFiles($fileItems) {
+	public function PublicMethodsFromFiles($fileItems) {
 		if (empty($fileItems)) {
 			return array();
 		}
@@ -51,7 +51,11 @@ class MvcEditor_ResourceTable extends Zend_Db_Table_Abstract {
 		$select = $this->_db->select();
 		$select->from(array('r' => 'resources'), array('class_name', 'identifier', 'signature', 'return_type', 'comment'))
 			->join(array('f' => 'file_items'), 'r.file_item_id = f.file_item_id', array('full_path'));
-		$select->where("r.file_item_id IN(?)", $fileItemIds)->where('key = identifier')->where('type = ?', MvcEditor_Resource::TYPE_METHOD);
+		$select->where("r.file_item_id IN(?)", $fileItemIds)
+			->where('key = identifier')
+			->where('type = ?', MvcEditor_Resource::TYPE_METHOD)
+			->where('is_private = 0')
+			->where('is_protected = 0');			
 		$stmt = $select->query();
 		$methods = array();
 		while ($row = $stmt->fetch(Zend_Db::FETCH_ASSOC)) {
