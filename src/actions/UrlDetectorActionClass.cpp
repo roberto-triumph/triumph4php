@@ -35,11 +35,12 @@ mvceditor::UrlResourceFinderInitActionClass::UrlResourceFinderInitActionClass(mv
 }
 
 void mvceditor::UrlResourceFinderInitActionClass::Work(mvceditor::GlobalsClass& globals) {
+	SetStatus(_("URL Detection Init"));
 	globals.UrlResourceFinder.Close();
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
 		if (project->IsEnabled) {
-			globals.UrlResourceFinder.AttachFile(project->DetectorDbFileName);
+			globals.UrlResourceFinder.CreateAndAttachFile(project->DetectorDbFileName, mvceditor::DetectorSqlSchemaAsset());
 		}
 	}
 }

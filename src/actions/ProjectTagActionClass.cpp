@@ -163,6 +163,7 @@ mvceditor::ProjectTagInitActionClass::ProjectTagInitActionClass(mvceditor::Runni
 }
 
 void mvceditor::ProjectTagInitActionClass::Work(mvceditor::GlobalsClass &globals) {
+	SetStatus(_("Project tags initialization"));
 
 	// need to clear the entire cache, then add only the newly enabled projects
 	globals.TagCache.Clear();

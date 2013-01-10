@@ -69,9 +69,9 @@ public:
 	/**
 	 * The datatabase connections. These are all of the connections, there may be a 
 	 * mix of connections created by the user and connections that were detected
-	 * by the DatabaseDetector.
+	 * by the DatabaseDetector scripts.
 	 */ 
-	std::vector<DatabaseInfoClass> Infos;
+	std::vector<DatabaseTagClass> DatabaseTags;
 
 	/**
 	 * All of the projects defined by the user.

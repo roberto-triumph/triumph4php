@@ -27,7 +27,7 @@
 
 #include <globals/EnvironmentClass.h>
 #include <wx/url.h>
-#include <soci/soci.h>
+#include <globals/Sqlite.h>
 
 namespace mvceditor {
 
@@ -99,25 +99,12 @@ public:
  * The URLs here are a combination of detected URLs and URLs manually entered in by the user.
  * For a big application, there may be hundreds or thousands of these.
  */
-class UrlResourceFinderClass {
+class UrlResourceFinderClass : public mvceditor::SqliteFinderClass {
 
 public:
 		
 	UrlResourceFinderClass();
 
-	~UrlResourceFinderClass();
-
-	/**
-	 * opens the url resource cache at the given file location
-	 * This can be called multiple times safely.
-	 * This sqlite database will have the schema from resources/sql/detectors.sql
-	 *
-	 * @param fileName the location of the detectors sqlite database.
-	 *        if fileName does not exist, it will be created.
-	 * @return bool TRUE if cache could be successfully opened / created
-	 */
-	bool AttachFile(const wxFileName& fileName);
-	
 	/**
 	 * check to see if the given URL exists in the Urls list; if the URL
 	 * exists then urlResource is filled with the contents of the URL.
@@ -169,11 +156,6 @@ public:
 	void Wipe();
 
 	/**
-	 * Closes the opened connections; but the backing databases are left intact.
-	 */
-	void Close();
-
-	/**
 	 * @return int number of urls
 	 */
 	int Count();
@@ -188,13 +170,6 @@ public:
 	 * methods from the detected URLs.
 	 */
 	std::vector<wxString> AllMethodNames(const wxString& controllerClassName);
-
-private:
-
-	/**
-	 * the opened connection to the detector databases.
-	 */
-	std::vector<soci::session*> Sessions;
 
 };
 	

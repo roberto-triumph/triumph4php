@@ -30,7 +30,7 @@ mvceditor::GlobalsClass::GlobalsClass()
 	, TagCache()
 	, UrlResourceFinder()
 	, SqlResourceFinder()
-	, Infos()
+	, DatabaseTags()
 	, Projects()
 	, CurrentUrl() 
 	, ChosenBrowser()
@@ -161,13 +161,13 @@ wxString mvceditor::GlobalsClass::RelativeFileName(const wxString &fullPath, wxS
 }
 
 void mvceditor::GlobalsClass::ClearDetectedInfos() {
-	std::vector<mvceditor::DatabaseInfoClass>::iterator info = Infos.begin();
-	while(info != Infos.end()) {
-		if (info->IsDetected) {
-			info = Infos.erase(info);
+	std::vector<mvceditor::DatabaseTagClass>::iterator it = DatabaseTags.begin();
+	while(it != DatabaseTags.end()) {
+		if (it->IsDetected) {
+			it = DatabaseTags.erase(it);
 		}
 		else {
-			++info;
+			++it;
 		}
 	}
 }

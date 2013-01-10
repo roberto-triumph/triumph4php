@@ -26,6 +26,7 @@
 #include <FileTestFixtureClass.h>
 #include <globals/UrlResourceClass.h>
 #include <globals/String.h>
+#include <globals/Assets.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <MvcEditorChecks.h>
@@ -52,7 +53,7 @@ public:
 		// create the test dir so that the sqlite file can be created
 		TouchTestDir();
 		DetectorDbFileName1.Assign(TestProjectDir, wxT("detectors.sqlite"));
-		Finder.AttachFile(DetectorDbFileName1);
+		CHECK(Finder.CreateAndAttachFile(DetectorDbFileName1, mvceditor::DetectorSqlSchemaAsset()));
 		Session1.open(*soci::factory_sqlite3(), mvceditor::WxToChar(DetectorDbFileName1.GetFullPath()));
 		AddToDb1("http://localhost/index.php", 
 			"/home/user/welcome.php", "WelcomeController", "index");
@@ -78,7 +79,7 @@ public:
 	}
 
 	void InitDb2() {
-		Finder.AttachFile(DetectorDbFileName2);
+		CHECK(Finder.CreateAndAttachFile(DetectorDbFileName2, mvceditor::DetectorSqlSchemaAsset()));
 		Session2.open(*soci::factory_sqlite3(), mvceditor::WxToChar(DetectorDbFileName2.GetFullPath()));
 	}
 

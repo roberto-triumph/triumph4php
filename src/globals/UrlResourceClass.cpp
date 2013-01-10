@@ -72,47 +72,9 @@ void mvceditor::UrlResourceClass::Copy(const mvceditor::UrlResourceClass& src) {
 }
 
 mvceditor::UrlResourceFinderClass::UrlResourceFinderClass()
-	: Sessions() {
+	: SqliteFinderClass() {
 		
 }
-
-mvceditor::UrlResourceFinderClass::~UrlResourceFinderClass() {
-	Close();
-}
-
-bool mvceditor::UrlResourceFinderClass::AttachFile(const wxFileName& fileName) {
-	wxASSERT_MSG(fileName.IsOk(), _("File name given to UrlResourceFinderClass::InitFile is not OK."));
-	if (!fileName.IsOk()) {
-		return false;
-	}
-	bool isOpened = false;
-	std::string stdDbName = mvceditor::WxToChar(fileName.GetFullPath());
-	soci::session* session = new soci::session();
-	try {
-		session->open(*soci::factory_sqlite3(), stdDbName);
-	
-		// open the SQL script that contains the table creation statements
-		// the script is "nice" it takes care to not create the tables if
-		// they already exist
-		wxFileName sqlScriptFileName = mvceditor::DetectorSqlSchemaAsset();
-		wxString error;
-		isOpened = mvceditor::SqlScript(sqlScriptFileName, *session, error);
-		wxASSERT_MSG(isOpened, error);
-		if (isOpened) {
-			Sessions.push_back(session);
-		}
-	} catch(std::exception const& e) {
-		isOpened = false;
-		wxString msg = mvceditor::CharToWx(e.what());
-		wxASSERT_MSG(isOpened, msg);
-	}
-	if (!isOpened) {
-		session->close();
-		delete session;
-	}
-	return isOpened;
-}
-
 
 bool mvceditor::UrlResourceFinderClass::FindByUrl(const wxURI& url, mvceditor::UrlResourceClass& urlResource) {
 	bool ret = false;
@@ -326,20 +288,6 @@ int mvceditor::UrlResourceFinderClass::Count() {
 		}
 	}
 	return totalCount;
-}
-
-void mvceditor::UrlResourceFinderClass::Close() {
-	std::vector<soci::session*>::iterator session;
-	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
-		try {
-			(*session)->close();
-		} catch (std::exception& e) {
-			wxUnusedVar(e);
-			// ignore close exceptions since we want to clean up
-		}
-		delete (*session);
-	}
-	Sessions.clear();
 }
 
 std::vector<wxString> mvceditor::UrlResourceFinderClass::AllControllerNames() {

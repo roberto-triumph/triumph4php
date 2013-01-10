@@ -24,28 +24,28 @@
  */
 #include <UnitTest++.h>
 #include <DatabaseTestFixtureClass.h>
-#include <globals/DatabaseInfoClass.h>
+#include <globals/DatabaseTagClass.h>
 #include <globals/String.h>
 #include <MvcEditorChecks.h>
 #include <soci.h>
 
-class DatabaseInfoTestFixtureClass : public DatabaseTestFixtureClass {
+class DatabaseTagTestFixtureClass : public DatabaseTestFixtureClass {
 public:
-	DatabaseInfoTestFixtureClass()
-		: DatabaseTestFixtureClass("database_info")
-		, Info() {
-		Info.DatabaseName = UNICODE_STRING_SIMPLE("database_info");
-		Info.Host = UNICODE_STRING_SIMPLE("127.0.0.1");
-		Info.User = mvceditor::CharToIcu(UserName().c_str());
-		Info.Password = mvceditor::CharToIcu(Password().c_str());
+	DatabaseTagTestFixtureClass()
+		: DatabaseTestFixtureClass("database_tag")
+		, DatabaseTag() {
+		DatabaseTag.Schema = UNICODE_STRING_SIMPLE("database_tag");
+		DatabaseTag.Host = UNICODE_STRING_SIMPLE("127.0.0.1");
+		DatabaseTag.User = mvceditor::CharToIcu(UserName().c_str());
+		DatabaseTag.Password = mvceditor::CharToIcu(Password().c_str());
 	}
 	
-	mvceditor::DatabaseInfoClass Info;
+	mvceditor::DatabaseTagClass DatabaseTag;
 };
 
-SUITE(DatabaseInfoClassTest) {
+SUITE(DatabaseTagClassTest) {
 
-TEST_FIXTURE(DatabaseInfoTestFixtureClass, ConnectQueryAndResults) {
+TEST_FIXTURE(DatabaseTagTestFixtureClass, ConnectQueryAndResults) {
 	Exec("CREATE TABLE names (id INT, name VARCHAR(255));");
 	
 	// without the explicit transaction, this test fails on
@@ -60,7 +60,7 @@ TEST_FIXTURE(DatabaseInfoTestFixtureClass, ConnectQueryAndResults) {
 	mvceditor::SqlQueryClass query;
 	UnicodeString error;
 	
-	query.Info.Copy(Info);
+	query.DatabaseTag.Copy(DatabaseTag);
 	CHECK(query.Connect(session, error));
 	CHECK_EQUAL(0, error.length());
 	mvceditor::SqlResultClass results;
@@ -80,7 +80,7 @@ TEST_FIXTURE(DatabaseInfoTestFixtureClass, ConnectQueryAndResults) {
 	CHECK_UNISTR_EQUALS("three", results.StringResults[2][1]);
 }
 
-TEST_FIXTURE(DatabaseInfoTestFixtureClass, MultipleQueries) {
+TEST_FIXTURE(DatabaseTagTestFixtureClass, MultipleQueries) {
 	Exec("CREATE TABLE names (id INT, name VARCHAR(255));");
 	Exec("CREATE TABLE places (id INT, name VARCHAR(255));");	
 	
@@ -96,7 +96,7 @@ TEST_FIXTURE(DatabaseInfoTestFixtureClass, MultipleQueries) {
 	mvceditor::SqlQueryClass query;
 	UnicodeString error;
 	
-	query.Info.Copy(Info);
+	query.DatabaseTag.Copy(DatabaseTag);
 	CHECK(query.Connect(session, error));
 	CHECK_EQUAL(0, error.length());
 	mvceditor::SqlResultClass results;

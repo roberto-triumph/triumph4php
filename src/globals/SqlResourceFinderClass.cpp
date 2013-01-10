@@ -45,14 +45,14 @@ mvceditor::SqlResourceFinderClass::SqlResourceFinderClass()
 }
 
 void mvceditor::SqlResourceFinderClass::Copy(const mvceditor::SqlResourceFinderClass& src) {
-	Query.Info.Copy(src.Query.Info);
+	Query.DatabaseTag.Copy(src.Query.DatabaseTag);
 	Tables = src.Tables;
 	Columns = src.Columns;
 }
 
-bool mvceditor::SqlResourceFinderClass::Fetch(const mvceditor::DatabaseInfoClass& info, UnicodeString& error) {
+bool mvceditor::SqlResourceFinderClass::Fetch(const mvceditor::DatabaseTagClass& info, UnicodeString& error) {
 	bool hasError = false;
-	Query.Info.Copy(info);
+	Query.DatabaseTag.Copy(info);
 	soci::session session;
 	if (Query.Connect(session, error)) {
 		UnicodeString hash = Hash(info);
@@ -61,7 +61,7 @@ bool mvceditor::SqlResourceFinderClass::Fetch(const mvceditor::DatabaseInfoClass
 		Tables[hash].clear();
 		Columns[hash].clear();
 		try {
-			std::string schema = mvceditor::IcuToChar(info.DatabaseName);
+			std::string schema = mvceditor::IcuToChar(info.Schema);
 			std::string tableName;
 
 			// populate information_schema tables we want SQL code completion to work for the 
@@ -121,7 +121,7 @@ bool mvceditor::SqlResourceFinderClass::Fetch(const mvceditor::DatabaseInfoClass
 	return !hasError;
 }
 
-std::vector<UnicodeString> mvceditor::SqlResourceFinderClass::FindTables(const mvceditor::DatabaseInfoClass& info, const UnicodeString& partialTableName) {
+std::vector<UnicodeString> mvceditor::SqlResourceFinderClass::FindTables(const mvceditor::DatabaseTagClass& info, const UnicodeString& partialTableName) {
 	std::vector<UnicodeString> ret;
 	UnicodeString hash = Hash(info);
 	std::vector<mvceditor::SqlResourceClass> infoTables = Tables[hash];
@@ -136,7 +136,7 @@ std::vector<UnicodeString> mvceditor::SqlResourceFinderClass::FindTables(const m
 	return ret;
 }
 
-std::vector<UnicodeString> mvceditor::SqlResourceFinderClass::FindColumns(const mvceditor::DatabaseInfoClass& info, const UnicodeString& partialColumnName) {
+std::vector<UnicodeString> mvceditor::SqlResourceFinderClass::FindColumns(const mvceditor::DatabaseTagClass& info, const UnicodeString& partialColumnName) {
 	std::vector<UnicodeString> ret;
 	UnicodeString hash =  Hash(info);
 	std::vector<mvceditor::SqlResourceClass> infoColumns = Columns[hash];
@@ -151,8 +151,8 @@ std::vector<UnicodeString> mvceditor::SqlResourceFinderClass::FindColumns(const 
 	return ret;
 }
 
-UnicodeString mvceditor::SqlResourceFinderClass::Hash(const mvceditor::DatabaseInfoClass& info) {
-	UnicodeString hash = info.Host + UNICODE_STRING_SIMPLE("--") + info.DatabaseName + UNICODE_STRING_SIMPLE("---") +
+UnicodeString mvceditor::SqlResourceFinderClass::Hash(const mvceditor::DatabaseTagClass& info) {
+	UnicodeString hash = info.Host + UNICODE_STRING_SIMPLE("--") + info.Schema + UNICODE_STRING_SIMPLE("---") +
 		info.FileName;
 	return hash;
 }

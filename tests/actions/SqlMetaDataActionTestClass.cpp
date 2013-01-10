@@ -45,15 +45,15 @@ public:
 		, SqlMetaDataAction(RunningThreads, ID_SQL_METADATA_FETCH) 
 		, Results() 
 		, Globals() {
-		mvceditor::DatabaseInfoClass info;
-		info.DatabaseName = UNICODE_STRING_SIMPLE("metadata_fetch");
+		mvceditor::DatabaseTagClass dbTag;
+		dbTag.Schema = UNICODE_STRING_SIMPLE("metadata_fetch");
 
 		// user name, pwd are #defines come from the premake script premake_opts.lua
-		info.Host = UNICODE_STRING_SIMPLE("127.0.0.1");
-		info.User = mvceditor::CharToIcu(UserName().c_str());
-		info.Password = mvceditor::CharToIcu(Password().c_str());
+		dbTag.Host = UNICODE_STRING_SIMPLE("127.0.0.1");
+		dbTag.User = mvceditor::CharToIcu(UserName().c_str());
+		dbTag.Password = mvceditor::CharToIcu(Password().c_str());
 
-		Globals.Infos.push_back(info);
+		Globals.DatabaseTags.push_back(dbTag);
 
 		CreateTable();
 	}
@@ -80,7 +80,7 @@ TEST_FIXTURE(SqlMetaDataActionTestFixtureClass, Fetch) {
 
 	SqlMetaDataAction.BackgroundWork();
 
-	std::vector<UnicodeString> tables = Results.FindTables(Globals.Infos[0], UNICODE_STRING_SIMPLE("my_users"));
+	std::vector<UnicodeString> tables = Results.FindTables(Globals.DatabaseTags[0], UNICODE_STRING_SIMPLE("my_users"));
 	CHECK_VECTOR_SIZE(1, tables);
 	CHECK_UNISTR_EQUALS("my_users", tables[0]); 
 }

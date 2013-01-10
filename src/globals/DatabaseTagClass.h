@@ -22,11 +22,11 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
- #ifndef __DATABASEINFOCLASS_H__
- #define __DATABASEINFOCLASS_H__
+ #ifndef __MVCEDITOR_DATABASETAGCLASS_H__
+ #define __MVCEDITOR_DATABASETAGCLASS_H__
  
  #include <unicode/unistr.h>
- #include <soci.h>
+ #include <globals/Sqlite.h>
  #include <vector>
  #include <wx/longlong.h>
  #include <wx/thread.h>
@@ -43,7 +43,7 @@
  * (MvcEditorFrameworkApp.php) and not the C++ code. this way we
  * can extend / modifify the code for different frameworks.
  */
-class DatabaseInfoClass {
+class DatabaseTagClass {
 
 public:
 
@@ -77,7 +77,7 @@ public:
 	/**
 	 * The database (schema name) to connect to
 	 */
-	UnicodeString DatabaseName;
+	UnicodeString Schema;
 	
 	/**
 	 * The full path to the database (in case of SQLite)
@@ -108,23 +108,23 @@ public:
 	 */
 	bool IsEnabled;
 	
-	DatabaseInfoClass();
+	DatabaseTagClass();
 	
 	/**
 	 * copy the attributes from src to this object.
 	 */
-	DatabaseInfoClass(const DatabaseInfoClass& other);
+	DatabaseTagClass(const DatabaseTagClass& other);
 	
 	/**
 	 * copy the attributes from src to this object.
 	 */
-	void Copy(const DatabaseInfoClass& src);
+	void Copy(const DatabaseTagClass& src);
 	
 	/**
 	 * @return true if this info is the "equal to" another; equality is not
 	 * based on pointers it is based on host and database name
 	 */
-	bool SameAs(const DatabaseInfoClass& other);
+	bool SameAs(const DatabaseTagClass& other);
 };
 
 /**
@@ -233,7 +233,7 @@ class SqlQueryClass {
 	/**
 	 * The database info to use when connecting
 	 */
-	DatabaseInfoClass Info;
+	DatabaseTagClass DatabaseTag;
 	
 	SqlQueryClass();
 	
@@ -382,6 +382,18 @@ private:
 	unsigned long ConnectionId;
 };
 
+class DatabaseTagFinderClass : public mvceditor::SqliteFinderClass {
+
+public:
+
+	DatabaseTagFinderClass();
+
+	/**
+	 * @return all of the database tags in all of the attached databases
+	 */
+	std::vector<mvceditor::DatabaseTagClass> All();
+
+};
 
 }
 

@@ -274,7 +274,7 @@ public:
 	/**
 	 * Set the connection to use to fetch the SQL table metadata
 	 */
-	void SetCurrentInfo(const DatabaseInfoClass& other);
+	void SetCurrentDbTag(const DatabaseTagClass& other);
 
 	/**
 	 * Calculate the line number from the given CHARACTER position. Scintilla's
@@ -461,7 +461,7 @@ private:
 	/**
 	 * The connection to use to fetch the SQL table metadata.
 	 */
-	DatabaseInfoClass CurrentInfo;
+	DatabaseTagClass CurrentDbTag;
 
 	/**
 	* This object will be used to parse the resources of files that are currently open

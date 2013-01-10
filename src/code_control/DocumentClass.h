@@ -355,9 +355,9 @@ public:
 	/**
 	 * @param globals This class will NOT own this pointer. Caller must manage (delete) it.
 	 *   globals helps with autocompletion
-	 * @param currentInfo the connection to fetch database metadata for (auto completion)
+	 * @param currentDbTag the connection to fetch database metadata for (auto completion)
 	 */
-	SqlDocumentClass(GlobalsClass* globals, const DatabaseInfoClass& currentInfo);
+	SqlDocumentClass(GlobalsClass* globals, const DatabaseTagClass& currentDbTag);
 
 	/**
 	 * Will enable auto complete for SQL keywords and SQL table metadata
@@ -394,7 +394,7 @@ private:
 	/**
 	 * the connection to fetch database metadata for (auto completion)
 	 */
-	DatabaseInfoClass CurrentInfo;
+	DatabaseTagClass CurrentDbTag;
 };
 
 class CssDocumentClass : public TextDocumentClass {

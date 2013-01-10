@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <actions/GlobalsChangeHandlerClass.h>
+#include <globals/DatabaseTagClass.h>
 #include <actions/ActionClass.h>
 #include <globals/Errors.h>
 
@@ -48,10 +49,35 @@ void mvceditor::GlobalsChangeHandlerClass::OnGlobalCacheComplete(mvceditor::Glob
 	Globals.TagCache.RegisterGlobal(globalCache);
 }
 
+void mvceditor::GlobalsChangeHandlerClass::OnDatabaseTagsComplete(wxCommandEvent& event) {
+	
+	// first remove all detected connections that were previously detected
+	std::vector<mvceditor::DatabaseTagClass>::iterator info;
+	info = Globals.DatabaseTags.begin();
+	while(info != Globals.DatabaseTags.end()) {
+		if (info->IsDetected) {
+			info = Globals.DatabaseTags.erase(info);
+		}
+		else {
+			info++;
+		}
+	}
+
+	mvceditor::DatabaseTagFinderClass finder;
+	std::vector<mvceditor::ProjectClass>::const_iterator project;
+	std::vector<mvceditor::ProjectClass> projects = Globals.AllEnabledProjects();
+	for (project = projects.begin(); project != projects.end(); ++project) {
+		finder.AttachExistingFile(project->DetectorDbFileName);
+	}
+	std::vector<mvceditor::DatabaseTagClass> detected = finder.All();
+	Globals.DatabaseTags.insert(Globals.DatabaseTags.end(), detected.begin(), detected.end());
+}
+
 
 BEGIN_EVENT_TABLE(mvceditor::GlobalsChangeHandlerClass, wxEvtHandler)
 	EVT_SQL_META_DATA_COMPLETE(mvceditor::ID_EVENT_ACTION_SQL_METADATA, mvceditor::GlobalsChangeHandlerClass::OnSqlMetaDataComplete)
 	EVT_GLOBAL_CACHE_COMPLETE(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE, mvceditor::GlobalsChangeHandlerClass::OnGlobalCacheComplete)
+	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_DATABASE_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::GlobalsChangeHandlerClass::OnDatabaseTagsComplete)
 END_EVENT_TABLE()
 
 

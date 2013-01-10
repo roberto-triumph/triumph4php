@@ -93,18 +93,7 @@ private:
 	/**
 	 * The connections to query; where the tables / columns will be fetched from 
 	 */
-	std::vector<DatabaseInfoClass> Infos;
-};
-
-class SqlMetaDataInitActionClass : public mvceditor::InitializerActionClass {
-
-public:
-
-	SqlMetaDataInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
-
-	void Work(mvceditor::GlobalsClass& globals);
-
-	wxString GetLabel() const;
+	std::vector<DatabaseTagClass> DatabaseTags;
 };
 
 }

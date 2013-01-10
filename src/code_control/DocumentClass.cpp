@@ -371,16 +371,16 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionString(const UnicodeString
 }
 
 void mvceditor::PhpDocumentClass::AppendSqlTableNames(const UnicodeString& word, std::vector<wxString>& autoCompleteList) {
-	for (size_t i = 0; i < Globals->Infos.size(); ++i) {
-		mvceditor::DatabaseInfoClass info = Globals->Infos[i];
-		if (!info.Host.isEmpty() && info.IsEnabled) {
+	for (size_t i = 0; i < Globals->DatabaseTags.size(); ++i) {
+		mvceditor::DatabaseTagClass dbTag = Globals->DatabaseTags[i];
+		if (!dbTag.Host.isEmpty() && dbTag.IsEnabled) {
 			UnicodeString error;
-			std::vector<UnicodeString> results = Globals->SqlResourceFinder.FindTables(info, word);
+			std::vector<UnicodeString> results = Globals->SqlResourceFinder.FindTables(dbTag, word);
 			for (size_t i = 0; i < results.size(); i++) {
 				wxString s = mvceditor::IcuToWx(results[i]);
 				autoCompleteList.push_back(s);
 			}
-			results = Globals->SqlResourceFinder.FindColumns(info, word);
+			results = Globals->SqlResourceFinder.FindColumns(dbTag, word);
 			for (size_t i = 0; i < results.size(); i++) {
 				wxString s = mvceditor::IcuToWx(results[i]);
 				autoCompleteList.push_back(s);
@@ -999,10 +999,10 @@ wxString mvceditor::PhpDocumentClass::GetJavascriptKeywords() const {
 	return JAVASCRIPT_KEYWORDS;
 }
 
-mvceditor::SqlDocumentClass::SqlDocumentClass(mvceditor::GlobalsClass* globals, const mvceditor::DatabaseInfoClass& currentInfo) 
+mvceditor::SqlDocumentClass::SqlDocumentClass(mvceditor::GlobalsClass* globals, const mvceditor::DatabaseTagClass& currentDbTag) 
 	: TextDocumentClass() 
 	, Globals(globals)
-	, CurrentInfo(currentInfo) {
+	, CurrentDbTag(currentDbTag) {
 		
 }
 
@@ -1053,14 +1053,14 @@ std::vector<wxString> mvceditor::SqlDocumentClass::HandleAutoCompletionMySql(con
 	}
 	
 	// look at the meta data
-	if (!CurrentInfo.Host.isEmpty()) {
+	if (!CurrentDbTag.Host.isEmpty()) {
 		UnicodeString error;
-		std::vector<UnicodeString> results = Globals->SqlResourceFinder.FindTables(CurrentInfo, word);
+		std::vector<UnicodeString> results = Globals->SqlResourceFinder.FindTables(CurrentDbTag, word);
 		for (size_t i = 0; i < results.size(); i++) {
 			wxString s = mvceditor::IcuToWx(results[i]);
 			autoCompleteList.push_back(s);
 		}
-		results = Globals->SqlResourceFinder.FindColumns(CurrentInfo, word);
+		results = Globals->SqlResourceFinder.FindColumns(CurrentDbTag, word);
 		for (size_t i = 0; i < results.size(); i++) {
 			wxString s = mvceditor::IcuToWx(results[i]);
 			autoCompleteList.push_back(s);

@@ -29,7 +29,7 @@
 #include <features/FeatureClass.h>
 #include <features/wxformbuilder/SqlBrowserFeatureForms.h>
 #include <globals/ProjectClass.h>
-#include <globals/DatabaseInfoClass.h>
+#include <globals/DatabaseTagClass.h>
 #include <widgets/ThreadWithHeartbeatClass.h>
 #include <language/SqlLexicalAnalyzerClass.h>
 #include <actions/SqlMetaDataActionClass.h>
@@ -59,12 +59,12 @@ public:
 
 	/**
 	 * @param wxWindow* the parent window
-	 * @param vector<DatabaseInfoClass> will get populated with the values that the user entered. The list can
+	 * @param vector<DatabaseTagClass> will get populated with the values that the user entered. The list can
 	 *        also contain the connections that were detected by the DatabaseDetector 
 	 *        user will NOT be able to edit the detected connections.
 	 * @param size_t& chosenIndex the info item that the user selected 
 	 */
-	SqlConnectionDialogClass(wxWindow* parent, std::vector<mvceditor::DatabaseInfoClass>& infos, size_t& chosenIndex,
+	SqlConnectionDialogClass(wxWindow* parent, std::vector<mvceditor::DatabaseTagClass>& dbTags, size_t& chosenIndex,
 		mvceditor::RunningThreadsClass& runningThreads);
 	
 	~SqlConnectionDialogClass();
@@ -101,13 +101,13 @@ private:
 	/**
 	 * The info list to modify AFTER the user clicks OK
 	 */
-	std::vector<DatabaseInfoClass>& Infos;
+	std::vector<DatabaseTagClass>& DatabaseTags;
 
 	/**
 	 * The info list to user modifies. This will contain both the user-created
 	 * connections and the detected ones
 	 */
-	std::vector<DatabaseInfoClass> EditedInfos;
+	std::vector<DatabaseTagClass> EditedDatabaseTags;
 	
 	/**
 	 * to execute the test query
@@ -261,7 +261,7 @@ public:
 	/**
 	 * signal to this panel that the user changed the connection.
 	 */
-	void SetCurrentInfo(const DatabaseInfoClass& info);
+	void SetCurrentInfo(const DatabaseTagClass& info);
 	
 	/**
 	 * Sets the connection label and the result label.
@@ -450,7 +450,7 @@ private:
 	void SavePreferences();
 
 	/**
-	 * index into Infos vector; the connection that is currently active.
+	 * index into DatabaseTags vector; the connection that is currently active.
 	 * Any new results panels that are created will use this connection. Any
 	 * existing results panels will keep their original connection.
 	 */

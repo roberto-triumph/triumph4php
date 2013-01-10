@@ -165,25 +165,22 @@ mvceditor::DatabaseDetectorInitActionClass::DatabaseDetectorInitActionClass(mvce
 }
 
 void mvceditor::DatabaseDetectorInitActionClass::Work(mvceditor::GlobalsClass &globals) {
+	SetStatus(_("Database tags detector initialization"));
 
 	// initialize the detected tag cache only the enabled projects	
+	mvceditor::DatabaseTagFinderClass finder;
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
-		if (project->IsEnabled && !project->AllPhpSources().empty()) {
-
-			// register the detector tag DB file now so that it is available for code completion
-			// even though we know it is stale. The user is notified that the
-			// cache is stale and may not have all of the results
-			// the tag cache will own these pointers
-			mvceditor::GlobalCacheClass* projectCache = new mvceditor::GlobalCacheClass;
-			projectCache->InitDetectorTag(project->DetectorDbFileName);
-			globals.TagCache.RegisterGlobal(projectCache);
+		if (project->IsEnabled) {
+			finder.AttachExistingFile(project->DetectorDbFileName);
 		}
 	}
+	std::vector<mvceditor::DatabaseTagClass> detected = finder.All();
+	globals.DatabaseTags.insert(globals.DatabaseTags.end(), detected.begin(), detected.end());
 }
 
 wxString mvceditor::DatabaseDetectorInitActionClass::GetLabel() const {
-	return _("Tag detector initialization");
+	return _("Database tags detector initialization");
 }
 
 

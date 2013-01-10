@@ -63,6 +63,57 @@ std::string SqlEscape(const std::string& value, char c);
  */
 bool SqlScript(const wxFileName& sqlScriptFileName, soci::session& session, wxString& error);
 
+/**
+ * Class that holds connections to all attached databases. It will
+ * close them when the class goes out of scope.
+ */
+class SqliteFinderClass {
+
+public:
+		
+	SqliteFinderClass();
+
+	virtual ~SqliteFinderClass();
+
+	/**
+	 * opens the sqlite file at the given file location
+	 * This can be called multiple times safely. If the filename does 
+	 * not exist, this method will return FALSE.
+	 *
+	 * @param fileName the location of the detectors sqlite database.
+	 *        if fileName does not exist, it will be created.
+	 * @return bool TRUE if cache could be successfully opened / created
+	 */
+	bool AttachExistingFile(const wxFileName& fileName);
+
+	/**
+	 * opens the sqlite file at the given file location, or create the 
+	 * file if it does not exist. Note that the schema sql script
+	 * is always run to make sure that the schema is up-to-date. The 
+	 * SQL script that contains the table creation statements
+	 * must be "nice" and take care to not error out if the tables already exist
+	 *
+	 * @param fileName the location of the detectors sqlite database.
+	 *        if fileName does not exist, it will be created.
+	 * @param schemaFileName SQL file that contains the SQL commands to be
+	 *        run when the file is new (the CREATE TABLE statements)
+	 * @return bool TRUE if cache could be successfully opened / created
+	 */
+	bool CreateAndAttachFile(const wxFileName& fileName, const wxFileName& schemaFileName);
+
+	/**
+	 * Closes the opened connections; but the backing databases are left intact.
+	 */
+	void Close();
+
+protected:
+
+	/**
+	 * the opened connection to the detector databases.
+	 */
+	std::vector<soci::session*> Sessions;
+
+};
 
 }
 

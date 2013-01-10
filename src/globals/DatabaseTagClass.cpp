@@ -22,20 +22,21 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <globals/DatabaseInfoClass.h>
+#include <globals/DatabaseTagClass.h>
 #include <soci/mysql/soci-mysql.h>
 #include <soci/soci.h>
 #include <wx/datetime.h>
 #include <globals/String.h>
+#include <globals/Errors.h>
 #include <unicode/ustdio.h>
 #include <string>
  
-mvceditor::DatabaseInfoClass::DatabaseInfoClass()
+mvceditor::DatabaseTagClass::DatabaseTagClass()
 	: Label()
 	, Host()
 	, User()
 	, Password()
-	, DatabaseName()
+	, Schema()
 	, FileName()
 	, Driver(MYSQL)
 	, Port() 
@@ -44,12 +45,12 @@ mvceditor::DatabaseInfoClass::DatabaseInfoClass()
 		
 }
 
-mvceditor::DatabaseInfoClass::DatabaseInfoClass(const mvceditor::DatabaseInfoClass& other) 
+mvceditor::DatabaseTagClass::DatabaseTagClass(const mvceditor::DatabaseTagClass& other) 
 	: Label()
 	, Host()
 	, User()
 	, Password()
-	, DatabaseName()
+	, Schema()
 	, FileName()
 	, Driver(MYSQL)
 	, Port() 
@@ -58,12 +59,12 @@ mvceditor::DatabaseInfoClass::DatabaseInfoClass(const mvceditor::DatabaseInfoCla
 	Copy(other);
 }
 
-void mvceditor::DatabaseInfoClass::Copy(const mvceditor::DatabaseInfoClass& src) {
+void mvceditor::DatabaseTagClass::Copy(const mvceditor::DatabaseTagClass& src) {
 	Label = src.Label;
 	Host = src.Host;
 	User = src.User;
 	Password = src.Password;
-	DatabaseName = src.DatabaseName;
+	Schema = src.Schema;
 	FileName = src.FileName;
 	Driver = src.Driver;
 	Port = src.Port;
@@ -71,8 +72,8 @@ void mvceditor::DatabaseInfoClass::Copy(const mvceditor::DatabaseInfoClass& src)
 	IsEnabled = src.IsEnabled;
 }
 
-bool mvceditor::DatabaseInfoClass::SameAs(const mvceditor::DatabaseInfoClass& other) {
-	return Host.caseCompare(other.Host, 0) == 0 && DatabaseName.caseCompare(other.DatabaseName, 0) == 0;
+bool mvceditor::DatabaseTagClass::SameAs(const mvceditor::DatabaseTagClass& other) {
+	return Host.caseCompare(other.Host, 0) == 0 && Schema.caseCompare(other.Schema, 0) == 0;
 }
 
 mvceditor::SqlResultClass::SqlResultClass() 
@@ -132,15 +133,15 @@ void mvceditor::SqlResultClass::Init(mvceditor::SqlQueryClass& query, soci::sess
 }
 
 mvceditor::SqlQueryClass::SqlQueryClass()
-	: Info() {
+	: DatabaseTag() {
 }
 
 mvceditor::SqlQueryClass::SqlQueryClass(const mvceditor::SqlQueryClass& other) 
-	: Info(other.Info) {
+	: DatabaseTag(other.DatabaseTag) {
 }
 
 void mvceditor::SqlQueryClass::Copy(const mvceditor::SqlQueryClass& src) {
-	Info.Copy(src.Info);
+	DatabaseTag.Copy(src.DatabaseTag);
 }
 
 void mvceditor::SqlQueryClass::Close(soci::statement& stmt) {
@@ -162,7 +163,7 @@ void mvceditor::SqlQueryClass::Close(soci::session& session, soci::statement& st
 
 bool mvceditor::SqlQueryClass::Connect(soci::session& session, UnicodeString& error) {
 	bool success = false;
-	UnicodeString host = Info.Host;
+	UnicodeString host = DatabaseTag.Host;
 	
 	// using localhost triggers socket file lookups in linux
 	// and socket files can be in various places on various distros
@@ -174,20 +175,20 @@ bool mvceditor::SqlQueryClass::Connect(soci::session& session, UnicodeString& er
 	// 6 =  max length of port (65535) + null character
 	UnicodeString portString;
 	UChar* buffer = portString.getBuffer(7);
-	int32_t written = u_sprintf(buffer, "%d", Info.Port);
+	int32_t written = u_sprintf(buffer, "%d", DatabaseTag.Port);
 	portString.releaseBuffer(written);
 	
 	UnicodeString connString;
 	connString = UNICODE_STRING_SIMPLE("db=");
-	connString += Info.DatabaseName;
+	connString += DatabaseTag.Schema;
 	connString += UNICODE_STRING_SIMPLE(" host=");
 	connString += host;
 	connString += UNICODE_STRING_SIMPLE(" port=");
 	connString += portString;
 	connString += UNICODE_STRING_SIMPLE(" user=");
-	connString += Info.User;
+	connString += DatabaseTag.User;
 	connString += UNICODE_STRING_SIMPLE(" password='");
-	connString += Info.Password;
+	connString += DatabaseTag.Password;
 	connString +=  UNICODE_STRING_SIMPLE("'");
 	
 	
@@ -339,7 +340,7 @@ bool mvceditor::SqlQueryClass::NextRow(soci::row& row, std::vector<UnicodeString
 }
 
 void mvceditor::SqlQueryClass::ConnectionIdentifier(soci::session& session, mvceditor::ConnectionIdentifierClass& connectionIdentifier) {
-	wxASSERT_MSG(mvceditor::DatabaseInfoClass::MYSQL == Info.Driver, wxT("Only MySQL is supported for now"));
+	wxASSERT_MSG(mvceditor::DatabaseTagClass::MYSQL == DatabaseTag.Driver, wxT("Only MySQL is supported for now"));
 	soci::mysql_session_backend* backend = static_cast<soci::mysql_session_backend*>(session.get_backend());
 	MYSQL* mysql = backend->conn_;
 	unsigned long id = mysql_thread_id(mysql);
@@ -378,4 +379,54 @@ void mvceditor::ConnectionIdentifierClass::Set(unsigned long id) {
 	wxMutexLocker locker(Mutex);
 	wxASSERT(locker.IsOk());
 	ConnectionId = id;
+}
+
+mvceditor::DatabaseTagFinderClass::DatabaseTagFinderClass()
+	: SqliteFinderClass() {
+}
+
+std::vector<mvceditor::DatabaseTagClass> mvceditor::DatabaseTagFinderClass::All() {
+	std::vector<mvceditor::DatabaseTagClass> allDbTags;
+	std::vector<soci::session*>::iterator session;
+	std::string label,
+		schema,
+		driver,
+		host,
+		user,
+		password;
+	int port;
+	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
+		try {
+			soci::statement stmt = ((*session)->prepare <<
+				"SELECT label, \"schema\", driver, host, port, \"user\", password FROM database_tags",
+				soci::into(label), soci::into(schema), soci::into(driver), 
+				soci::into(host), soci::into(port), soci::into(user), 
+				soci::into(password)
+			);
+			if (stmt.execute(true)) {
+				do {
+					mvceditor::DatabaseTagClass dbTag;
+					dbTag.Schema = mvceditor::CharToIcu(schema.c_str());
+					if (driver == "MYSQL") {
+						dbTag.Driver = mvceditor::DatabaseTagClass::MYSQL;
+					}
+					dbTag.Host = mvceditor::CharToIcu(host.c_str());
+					dbTag.IsDetected = true;
+					dbTag.IsEnabled = true;
+					dbTag.Label = mvceditor::CharToIcu(label.c_str());
+					dbTag.Password = mvceditor::CharToIcu(password.c_str());
+					dbTag.Port = port;
+					dbTag.User = mvceditor::CharToIcu(user.c_str());
+
+					allDbTags.push_back(dbTag);
+
+				} while (stmt.fetch());
+			}
+		} catch (std::exception& e) {
+			wxString msg = mvceditor::CharToWx(e.what());
+			wxUnusedVar(msg);
+			mvceditor::EditorLogError(mvceditor::WARNING_OTHER, msg);
+		}
+	}
+	return allDbTags;
 }

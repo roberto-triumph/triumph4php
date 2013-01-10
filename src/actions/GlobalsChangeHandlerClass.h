@@ -55,6 +55,12 @@ private:
 	 * code in this control has been completed.
 	 */
 	void OnGlobalCacheComplete(mvceditor::GlobalCacheCompleteEventClass& event);
+
+	/**
+	 * when the php database detectors have completed, put all of the detected database
+	 * tags in the globals list.
+	 */
+	void OnDatabaseTagsComplete(wxCommandEvent& event);
 	
 	DECLARE_EVENT_TABLE()
 

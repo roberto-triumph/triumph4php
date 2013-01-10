@@ -185,6 +185,11 @@ CREATE TABLE IF NOT EXISTS detected_tags (
 -- file.
 --
 CREATE TABLE IF NOT EXISTS database_tags (
+
+	-- 
+	-- needed for Zend_Db_Table_Abstract 
+	--
+	id INTEGER PRIMARY KEY AUTOINCREMENT, 
 	
 	--
 	-- this is the full path to the source directory
@@ -193,18 +198,18 @@ CREATE TABLE IF NOT EXISTS database_tags (
 	-- It contains OS-dependant directory separators
 	--
 	source_dir_full_path TEXT NOT NULL COLLATE NOCASE,
-
-	--
-	-- the framework-defined "environment" where
-	-- this connection is used
-	--
-	environment TEXT NOT NULL COLLATE NOCASE,
 	
 	--
 	-- a friendly label for this connection. MVC Editor will show
 	-- this to the user.
 	--
-	name TEXT NOT NULL COLLATE NOCASE,
+	label TEXT NOT NULL COLLATE NOCASE,
+	
+	--
+	-- the database name (schema) for this connection. MVC Editor will \
+	-- use this to determine which database driver to use
+	--
+	schema TEXT NOT NULL COLLATE NOCASE,
 	
 	--
 	-- the database server program that this connection
@@ -229,7 +234,7 @@ CREATE TABLE IF NOT EXISTS database_tags (
 	-- user of the connection. MVC Editor will use this to determine
 	-- what user to connect as.
 	--
-	username TEXT NOT NULL COLLATE NOCASE,
+	"user" TEXT NOT NULL COLLATE NOCASE,
 	
 	--
 	-- the password of the connection. MVC Editor will use this to determine

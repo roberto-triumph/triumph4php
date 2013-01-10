@@ -83,11 +83,15 @@ bool mvceditor::SequenceClass::AppStart() {
 	// do this before the rest so the urls become available asap
 	AddStep(new mvceditor::UrlResourceFinderInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_DETECTOR_INIT));
 
-	// this will prime the sql connections
-	AddStep(new mvceditor::SqlMetaDataInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA_INIT));
+	// this will prime the sql connections from the php detectors
+	AddStep(new mvceditor::DatabaseDetectorInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_DETECTOR_INIT));
 
 	// this will prime the detected tags cache
 	AddStep(new mvceditor::TagDetectorInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_DETECTOR_INIT));
+
+	// this will attempt to detect new sql connections from the php detectors
+	// this can go here because it does not need the tag cache to be up-to-date
+	AddStep(new mvceditor::DatabaseDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_DETECTOR));
 
 	// this will update the tag cache by parsing newly modified files
 	AddStep(new mvceditor::ProjectTagActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE));
@@ -128,8 +132,12 @@ bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvced
 	// this will prime the detected tags cache
 	AddStep(new mvceditor::TagDetectorInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_DETECTOR_INIT));
 
-	// this will prime the sql connections
-	AddStep(new mvceditor::SqlMetaDataInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA_INIT));
+	// this will prime the sql connections from the php detectors
+	AddStep(new mvceditor::DatabaseDetectorInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_DETECTOR_INIT));
+
+	// this will attempt to detect new sql connections from the php detectors
+	// this can go here because it does not need the tag cache to be up-to-date
+	AddStep(new mvceditor::DatabaseDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_DETECTOR));
 
 	// this will update the tag cache by parsing newly modified files
 	mvceditor::ProjectTagActionClass* action = 

@@ -156,7 +156,7 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 		, CurrentFilename()		
 		, WordHighlightFinder()
 		, WordHighlightWord()
-		, CurrentInfo()
+		, CurrentDbTag()
 		, Globals(globals)
 		, WordHighlightPreviousIndex(-1)
 		, WordHighlightNextIndex(-1)
@@ -483,7 +483,7 @@ void mvceditor::CodeControlClass::ApplyPreferences() {
 		Document = NULL;
 	}
 	if (mvceditor::CodeControlClass::SQL == DocumentMode) {
-		Document = new mvceditor::SqlDocumentClass(Globals, CurrentInfo);
+		Document = new mvceditor::SqlDocumentClass(Globals, CurrentDbTag);
 		Document->SetControl(this);
 		SetCodeControlOptions(CodeControlOptions.SqlStyles);
 		SetSqlOptions();
@@ -1010,12 +1010,12 @@ void mvceditor::CodeControlClass::ClearLintErrors() {
 	SetStyling(GetLength(), 0);
 }
 
-void mvceditor::CodeControlClass::SetCurrentInfo(const mvceditor::DatabaseInfoClass& currentInfo) {
-	CurrentInfo.Copy(currentInfo);
+void mvceditor::CodeControlClass::SetCurrentDbTag(const mvceditor::DatabaseTagClass& currentDbTag) {
+	CurrentDbTag.Copy(currentDbTag);
 	
 	// if SQL document is active we need to change the currentInfo in that object
 	// but since C++ does has poor RTTI we dont know what type Document pointer currently is
-	// for now just refresh everything which will update CurrentInfo
+	// for now just refresh everything which will update CurrentDbTag
 	ApplyPreferences();
 }
 

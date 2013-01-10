@@ -25,7 +25,7 @@
  #ifndef _SQLRESOURCEFINDERCLASS_H__
  #define _SQLRESOURCEFINDERCLASS_H__
  
- #include <globals/DatabaseInfoClass.h>
+ #include <globals/DatabaseTagClass.h>
  #include <unicode/unistr.h>
  #include <vector>
  #include <map>
@@ -85,7 +85,7 @@ public:
 	 * @param info the connection parameters
 	 * @return bool false on error, error gets filled in with error message
 	 */
-	bool Fetch(const DatabaseInfoClass& info, UnicodeString& error);
+	bool Fetch(const DatabaseTagClass& info, UnicodeString& error);
 	
 	/**
 	 * @param info the connection to search in. only tables from this connection will be returned
@@ -93,7 +93,7 @@ public:
 	 * @return vector<UnicodeString> all table names that start with the partial table name
 	 * returned table names will be sorted in ascending order
 	 */
-	std::vector<UnicodeString> FindTables(const DatabaseInfoClass& info, const UnicodeString& partialTableName);
+	std::vector<UnicodeString> FindTables(const DatabaseTagClass& info, const UnicodeString& partialTableName);
 	
 	/**
 	 * Searches ALL columns of ALL tables.
@@ -103,7 +103,7 @@ public:
 	 * will return empty vector when table name is empty
 	 * returned column names will be sorted in ascending order
 	 */
-	std::vector<UnicodeString> FindColumns(const DatabaseInfoClass& info, const UnicodeString& partialColumnName);
+	std::vector<UnicodeString> FindColumns(const DatabaseTagClass& info, const UnicodeString& partialColumnName);
 	
 	private:
 
@@ -111,7 +111,7 @@ public:
 	 * turn the info into a string that way we can link tables to a connection and we don't 
 	 * have to keep a pointer to the info around.
 	 */
-	UnicodeString Hash(const DatabaseInfoClass& info);
+	UnicodeString Hash(const DatabaseTagClass& info);
 	
 	/**
 	 * To make the queries

@@ -37,16 +37,11 @@ class MvcEditor_DatabaseTag {
 	const DRIVER_MYSQL = 'MYSQL';
 	const DRIVER_POSTGRESQL = 'POSTGRESQL';
 	const DRIVER_SQLITE = 'SQLITE';
-
-	/**
-	 * @var string the name of the environment. MVC Editor will display this to the user.
-	 */
-	public $environment;
 	
 	/**
 	 * @var string an optional friendly name for this connection. MVC Editor will display this to the user.
 	 */
-	public $name;
+	public $label;
 	
 	/**
 	 * @var string one of the driver constants above
@@ -73,12 +68,12 @@ class MvcEditor_DatabaseTag {
 	/**
 	 * @var string The schema to read (required)
 	 */
-	public $databaseName;
+	public $schema;
 	
 	/**
 	 * User that MVC Editor will use when connecting. (Optional)
 	 */
-	public $userName;
+	public $user;
 	
 	/**
 	 * Password that MVC Editor will use when connecting. (Optional)
@@ -88,22 +83,20 @@ class MvcEditor_DatabaseTag {
 	
 	/**
 	 * @param $driver string required; one of the driver constants above
-	 * @param $environment string optional
-	 * @param $name string optional
+	 * @param $label string optional
 	 * @param $host string required
 	 * @param $port int optional, can be zero; zero will mean the default port
-	 * @param $databaseName string the schema to read (required)
+	 * @param $schema string the schema to read (required)
 	 * @param $fileName string for SQLite required. This must be a full path
 	 * @param $user string optional
 	 * @param $password string optional
 	 */
-	public function __construct($driver, $environment, $name, $host, $port, $databaseName, $fileName, $user, $password) {
+	public function __construct($driver, $label, $host, $port, $schema, $fileName, $user, $password) {
 		$this->driver = $driver;
-		$this->environment = $environment;
-		$this->name = $name;
+		$this->label = $label;
 		$this->host = $host;
 		$this->port = $port;
-		$this->databaseName = $databaseName;
+		$this->schema = $schema;
 		$this->fileName = $fileName;
 		$this->user = $user;
 		$this->password = $password;

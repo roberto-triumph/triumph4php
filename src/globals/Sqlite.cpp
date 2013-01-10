@@ -84,3 +84,85 @@ bool mvceditor::SqlScript(const wxFileName& sqlScriptFileName, soci::session& se
 	}
 	return ret;
 }
+
+mvceditor::SqliteFinderClass::SqliteFinderClass()
+	: Sessions() {
+}
+
+mvceditor::SqliteFinderClass::~SqliteFinderClass() {
+	Close();
+}
+
+void mvceditor::SqliteFinderClass::Close() {
+	std::vector<soci::session*>::iterator session;
+	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
+		try {
+			(*session)->close();
+		} catch (std::exception& e) {
+			wxUnusedVar(e);
+			// ignore close exceptions since we want to clean up
+		}
+		delete (*session);
+	}
+	Sessions.clear();
+}
+
+bool mvceditor::SqliteFinderClass::AttachExistingFile(const wxFileName& fileName) {
+	wxASSERT_MSG(fileName.IsOk(), _("File name given to SqliteFinderClass::AttachExistingFile is not OK."));
+	if (!fileName.IsOk()) {
+		return false;
+	}
+	bool isOpened = false;
+	std::string stdDbName = mvceditor::WxToChar(fileName.GetFullPath());
+	soci::session* session = new soci::session();
+	try {
+		session->open(*soci::factory_sqlite3(), stdDbName);
+		isOpened = true;
+		Sessions.push_back(session);
+	} catch(std::exception const& e) {
+		isOpened = false;
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxASSERT_MSG(isOpened, msg);
+	}
+	if (!isOpened) {
+		session->close();
+		delete session;
+	}
+	return isOpened;
+}
+
+bool mvceditor::SqliteFinderClass::CreateAndAttachFile(const wxFileName& fileName, const wxFileName& schemaFileName) {
+	wxASSERT_MSG(fileName.IsOk(), _("File name given to SqliteFinderClass::CreateAndAttachFile is not OK."));
+	if (!fileName.IsOk()) {
+		return false;
+	}
+	wxASSERT_MSG(schemaFileName.IsOk(), _("File name given to SqliteFinderClass::CreateAndAttachFile is not OK."));
+	if (!fileName.IsOk()) {
+		return false;
+	}
+	bool isOpened = false;
+	std::string stdDbName = mvceditor::WxToChar(fileName.GetFullPath());
+	soci::session* session = new soci::session();
+	try {
+		session->open(*soci::factory_sqlite3(), stdDbName);
+	
+		// open the SQL script that contains the table creation statements
+		// the script is "nice" it takes care to not create the tables if
+		// they already exist
+		wxString error;
+		isOpened = mvceditor::SqlScript(schemaFileName, *session, error);
+		wxASSERT_MSG(isOpened, error);
+		if (isOpened) {
+			Sessions.push_back(session);
+		}
+	} catch(std::exception const& e) {
+		isOpened = false;
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxASSERT_MSG(isOpened, msg);
+	}
+	if (!isOpened) {
+		session->close();
+		delete session;
+	}
+	return isOpened;
+}
