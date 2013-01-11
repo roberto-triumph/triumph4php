@@ -48,6 +48,17 @@ public:
 private:
 
 	/**
+	 * pair together a project name and the config files for that
+	 * project, that way we can build the submenus.
+	 */
+	struct ConfigPair {
+		wxString ProjectLabel;
+		std::vector<mvceditor::ConfigTagClass> ConfigTags;	
+	};
+
+	std::vector<ConfigPair> ConfigPairs;
+
+	/**
 	 * Read all of the detected config tags into memory; that way we can
 	 * assign them a menu ID (the index into this vector will be used
 	 * as the menu ID).

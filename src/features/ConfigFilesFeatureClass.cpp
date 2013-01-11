@@ -33,6 +33,7 @@ static size_t MAX_CONFIG_MENU_ITEMS = 100;
 
 mvceditor::ConfigFilesFeatureClass::ConfigFilesFeatureClass(mvceditor::AppClass& app)
 	: FeatureClass(app) 
+	, ConfigPairs()
 	, ConfigTags()
 	, ConfigMenu(NULL) {
 
@@ -52,29 +53,48 @@ void mvceditor::ConfigFilesFeatureClass::OnAppReady(wxCommandEvent& event) {
 }
 
 void mvceditor::ConfigFilesFeatureClass::RebuildMenu() {
+	ConfigPairs.clear();
+	ConfigTags.clear();
 
 	// get the menus; need to keep them in memory
 	// because we use the index to know which menu was selected
-	mvceditor::ConfigTagFinderClass finder;
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
 		if (project->IsEnabled) {
+			ConfigPair pair;
+			pair.ProjectLabel = project->Label;
+			mvceditor::ConfigTagFinderClass finder;
 			finder.AttachExistingFile(project->DetectorDbFileName);
+			pair.ConfigTags = finder.All();
+			if (!pair.ConfigTags.empty()) {
+				ConfigTags.insert(ConfigTags.end(), pair.ConfigTags.begin(), pair.ConfigTags.end());
+				ConfigPairs.push_back(pair);
+			}
 		}
 	}
-	ConfigTags = finder.All();
 
 	while (ConfigMenu->GetMenuItemCount() > 0) {
-		ConfigMenu->Delete(ConfigMenu->FindItemByPosition(0));
+
+		// use destroy because these are all submenus
+		ConfigMenu->Destroy(ConfigMenu->FindItemByPosition(0)->GetId());
 	}
+	std::vector<ConfigPair>::const_iterator configPair;
 	std::vector<mvceditor::ConfigTagClass>::const_iterator config;
 	size_t i = 0;
-	for (config = ConfigTags.begin(); config != ConfigTags.end(); ++config) {
-		ConfigMenu->Append(mvceditor::CONFIG_DETECTORS + i, config->MenuLabel() , config->ConfigFileName.GetFullPath(), wxITEM_NORMAL);
-		i++;
-		if (i >= MAX_CONFIG_MENU_ITEMS) {
-			break;
+
+	// make sure to not make more menu items than are allowed.
+	for (configPair = ConfigPairs.begin(); configPair != ConfigPairs.end() && i < MAX_CONFIG_MENU_ITEMS; ++configPair) {
+		wxMenu* submenu = new wxMenu(0);
+		for (config = configPair->ConfigTags.begin(); config != configPair->ConfigTags.end(); ++config) {
+			submenu->Append(mvceditor::CONFIG_DETECTORS + i, config->MenuLabel() , config->ConfigFileName.GetFullPath(), wxITEM_NORMAL);
+			i++;
+			if (i >= MAX_CONFIG_MENU_ITEMS) {
+				break;
+			}
 		}
+		wxString projectLabel(configPair->ProjectLabel);
+		projectLabel.Replace(wxT("&"), wxT("&&"));
+		ConfigMenu->AppendSubMenu(submenu, projectLabel);
 	}
 }
 
