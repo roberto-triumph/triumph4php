@@ -80,22 +80,21 @@ EOF;
 		// sqlite DB	
 		$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $outputDbFileName));
 		$databaseTagTable = new MvcEditor_DatabaseTagTable($pdo);
-		$databaseTagTable->saveDatabases($arrDatabases, $sourceDir);
+		$databaseTagTable->saveDatabaseTags($arrDatabases, $sourceDir);
 		echo "Database dectection complete, written to {$outputDbFileName}\n";
 	}
 	else {
 		if (!empty($arrDatabases)) {
-			echo str_pad("Name", 30) . str_pad("Environment", 20) . str_pad("Driver", 20) . 
+			echo str_pad("Schema", 20) . str_pad("Driver", 20) . 
 			str_pad("Host", 20) . str_pad("Port", 10) . str_pad("File", 60) . 
 			str_pad("Username", 20) . str_pad("Password", 20) . "\n";
 			foreach ($arrDatabases as $database) {
-				echo str_pad($database->name, 30);
-				echo str_pad($database->environment, 20);
+				echo str_pad($database->schema, 30);
 				echo str_pad($database->driver, 20);
 				echo str_pad($database->host, 20);
 				echo str_pad($database->port, 10);
 				echo str_pad($database->fileName, 60);
-				echo str_pad($database->userName, 20);
+				echo str_pad($database->user, 20);
 				echo str_pad($database->password, 20);
 				echo "\n";
 			}

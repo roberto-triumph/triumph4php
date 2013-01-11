@@ -111,8 +111,11 @@ void mvceditor::DatabaseDetectorActionClass::NextDetection() {
 	}
 	mvceditor::DatabaseDetectorParamsClass params = ParamsQueue.front();
 	ParamsQueue.pop();
-
-	SetStatus(_("Detecting Databases for ") + params.SourceDir.GetName());
+	
+	wxArrayString dirs = params.SourceDir.GetDirs();
+	if (!dirs.IsEmpty()) {
+		SetStatus(_("DB Detect / ") + dirs.back());
+	}
 
 	wxString cmdLine = params.BuildCmdLine();
 	long pid;
