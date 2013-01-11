@@ -56,12 +56,6 @@ public:
 	UrlResourceFinderClass& Urls();
 
 	/**
-	 * the final result; the view files that correspond to the
-	 * current URL
-	 */
-	std::vector<mvceditor::TemplateFileClass> CurrentTemplates();
-
-	/**
 	 * starts the view file detection process. This is an asynchronous operation.
 	 * When view files are detected, the feature will update the
 	 * panel appropriately.

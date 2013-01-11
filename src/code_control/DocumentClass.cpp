@@ -26,6 +26,7 @@
 #include <code_control/CodeControlClass.h>
 #include <globals/String.h>
 #include <globals/Assets.h>
+#include <globals/TemplateFileClass.h>
 #include <wx/tokenzr.h>
 #include <wx/filename.h>
 #include <algorithm>
@@ -523,6 +524,23 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 				autoCompleteList.push_back(comp + postFix);
 			}
 		}
+		// auto complete any template variables
+		std::vector<mvceditor::TemplateFileClass> templateFiles = Globals->CurrentTemplates();
+		std::vector<mvceditor::TemplateFileClass>::const_iterator templateFile;
+		std::vector<wxString>::const_iterator variable;
+
+		for (templateFile =  templateFiles.begin(); templateFile != templateFiles.end(); ++templateFile) {
+			wxFileName f1(templateFile->FullPath);
+			wxFileName f2(Ctrl->GetFileName());
+			if (f1 == f2) {
+				for (variable = templateFile->Variables.begin(); variable != templateFile->Variables.end(); ++variable) {
+					if (variable->Find(mvceditor::IcuToWx(lastExpression)) == 0) {
+						wxString postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_VARIABLE);
+						autoCompleteList.push_back(*variable + postFix);
+					}
+				}
+			}
+		}                  
 		
 		// in case of a double quoted string, complete SQL table names too
 		// this is in addition to auto completing any variable names inside the string too

@@ -30,6 +30,7 @@
 #include <globals/UrlResourceClass.h>
 #include <globals/ProjectClass.h>
 #include <globals/SqlResourceFinderClass.h>
+#include <globals/TemplateFileClass.h>
 #include <language/TagCacheClass.h>
 #include <vector>
 
@@ -209,6 +210,17 @@ public:
 	 * @param project set the file filters on the given project
 	 */
 	void AssignFileExtensions(mvceditor::ProjectClass& project) const;
+
+	
+	/**
+	 * The current template files that have been calculated to be used
+	 * by the CurrentUrl.
+	 */
+	// TODO clarify what url is used to calulate these template files
+	// since this method just reads from the detector db, the templates
+	// are for the url as picked in the template files panel and NOT
+	// the URL dialog.
+	std::vector<mvceditor::TemplateFileClass> CurrentTemplates() const;
 
 };
 

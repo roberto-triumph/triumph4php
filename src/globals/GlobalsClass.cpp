@@ -178,3 +178,18 @@ void mvceditor::GlobalsClass::AssignFileExtensions(mvceditor::ProjectClass &proj
 	project.SqlFileExtensions = GetSqlFileExtensions();
 	project.MiscFileExtensions = GetMiscFileExtensions();
 }
+
+std::vector<mvceditor::TemplateFileClass> mvceditor::GlobalsClass::CurrentTemplates() const {
+	mvceditor::UrlResourceClass urlResource = CurrentUrl;
+	std::vector<mvceditor::ProjectClass>::const_iterator project;
+	wxFileName detectorDbFileName;
+	for (project = Projects.begin(); project != Projects.end(); ++project) {
+		if (project->IsAPhpSourceFile(urlResource.FileName.GetFullPath())) {
+			detectorDbFileName = project->DetectorDbFileName;
+			break;
+		}
+	}
+	mvceditor::TemplateFileTagClass fileTags;
+	fileTags.Init(detectorDbFileName);
+	return fileTags.All();
+}

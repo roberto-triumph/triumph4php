@@ -124,21 +124,6 @@ void mvceditor::TemplateFilesFeatureClass::SetCurrentUrl(mvceditor::UrlResourceC
 	App.Globals.CurrentUrl = url;
 }
 
-std::vector<mvceditor::TemplateFileClass> mvceditor::TemplateFilesFeatureClass::CurrentTemplates() {
-	mvceditor::UrlResourceClass urlResource = App.Globals.CurrentUrl;
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	wxFileName detectorDbFileName;
-	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
-		if (project->IsAPhpSourceFile(urlResource.FileName.GetFullPath())) {
-			detectorDbFileName = project->DetectorDbFileName;
-			break;
-		}
-	}
-	mvceditor::TemplateFileTagClass fileTags;
-	fileTags.Init(detectorDbFileName);
-	return fileTags.All();
-}
-
 void mvceditor::TemplateFilesFeatureClass::OnTemplateDetectionComplete(wxCommandEvent& event) {
 	wxWindow* window = FindOutlineWindow(ID_TEMPLATE_FILES_PANEL);
 	mvceditor::TemplateFilesPanelClass* templateFilesPanel = NULL;
@@ -172,7 +157,7 @@ void mvceditor::TemplateFilesPanelClass::UpdateControllers() {
 }
 
 void mvceditor::TemplateFilesPanelClass::UpdateResults() {		
-	std::vector<mvceditor::TemplateFileClass> currentTemplates = Feature.CurrentTemplates();
+	std::vector<mvceditor::TemplateFileClass> currentTemplates = Feature.App.Globals.CurrentTemplates();
 	StatusLabel->SetLabel(wxString::Format(_("Found %d view files"), currentTemplates.size()));
 	FileTree->DeleteAllItems();
 
