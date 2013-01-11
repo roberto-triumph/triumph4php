@@ -60,7 +60,7 @@ FinderPanelGeneratedClass::FinderPanelGeneratedClass( wxWindow* parent, wxWindow
 	Wrap = new wxCheckBox( this, ID_WRAP, _("Wrap"), wxDefaultPosition, wxDefaultSize, 0 );
 	FindSizer->Add( Wrap, 0, wxALL|wxEXPAND, 5 );
 	
-	wxString FinderModeChoices[] = { _("Exact"), _("Regular Expression") };
+	wxString FinderModeChoices[] = { _("Exact"), _("Case Insensitive"), _("Regular Expression") };
 	int FinderModeNChoices = sizeof( FinderModeChoices ) / sizeof( wxString );
 	FinderMode = new wxRadioBox( this, wxID_ANY, _("Mode"), wxDefaultPosition, wxDefaultSize, FinderModeNChoices, FinderModeChoices, 3, wxRA_SPECIFY_COLS );
 	FinderMode->SetSelection( 0 );
@@ -209,7 +209,7 @@ ReplacePanelGeneratedClass::ReplacePanelGeneratedClass( wxWindow* parent, wxWind
 	wxBoxSizer* ModeSizer;
 	ModeSizer = new wxBoxSizer( wxVERTICAL );
 	
-	wxString FinderModeChoices[] = { _("Exact"), _("Regular Expression") };
+	wxString FinderModeChoices[] = { _("Exact"), _("Case Insensitive"), _("Regular Expression") };
 	int FinderModeNChoices = sizeof( FinderModeChoices ) / sizeof( wxString );
 	FinderMode = new wxRadioBox( this, wxID_ANY, _("Mode"), wxDefaultPosition, wxDefaultSize, FinderModeNChoices, FinderModeChoices, 1, wxRA_SPECIFY_ROWS );
 	FinderMode->SetSelection( 0 );

@@ -105,7 +105,7 @@ FindInFilesDialogGeneratedClass::FindInFilesDialogGeneratedClass( wxWindow* pare
 	wxBoxSizer* OptionsSizer;
 	OptionsSizer = new wxBoxSizer( wxHORIZONTAL );
 	
-	wxString FinderModeChoices[] = { wxT("Exact"), wxT("Regular Expression") };
+	wxString FinderModeChoices[] = { wxT("Exact"), wxT("Case Insensitive"), wxT("Regular Expression") };
 	int FinderModeNChoices = sizeof( FinderModeChoices ) / sizeof( wxString );
 	FinderMode = new wxRadioBox( this, wxID_ANY, wxT("Find Mode"), wxDefaultPosition, wxDefaultSize, FinderModeNChoices, FinderModeChoices, 3, wxRA_SPECIFY_ROWS );
 	FinderMode->SetSelection( 0 );
@@ -113,10 +113,6 @@ FindInFilesDialogGeneratedClass::FindInFilesDialogGeneratedClass( wxWindow* pare
 	
 	wxStaticBoxSizer* CheckboxSizer;
 	CheckboxSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Options") ), wxVERTICAL );
-	
-	CaseSensitive = new wxCheckBox( this, wxID_ANY, wxT("Case Sensitive"), wxDefaultPosition, wxDefaultSize, 0 );
-	CaseSensitive->SetValue(true); 
-	CheckboxSizer->Add( CaseSensitive, 0, wxLEFT, 5 );
 	
 	DoHiddenFiles = new wxCheckBox( this, wxID_ANY, wxT("Search Hidden Files"), wxDefaultPosition, wxDefaultSize, 0 );
 	CheckboxSizer->Add( DoHiddenFiles, 0, wxALL, 5 );

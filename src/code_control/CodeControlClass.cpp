@@ -801,7 +801,6 @@ void  mvceditor::CodeControlClass::OnDoubleClick(wxStyledTextEvent& event) {
 	if (!word.isEmpty()) {
 		WordHighlightFinder.Expression = word;
 		WordHighlightFinder.Mode = mvceditor::FinderClass::EXACT;
-		WordHighlightFinder.CaseSensitive = true;
 		if (WordHighlightFinder.Prepare()) {
 			WordHighlightPreviousIndex = charStartIndex;
 			WordHighlightNextIndex = charStartIndex;

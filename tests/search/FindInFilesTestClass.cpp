@@ -72,7 +72,7 @@ TEST_FIXTURE(FindInFilesTestFixtureClass, WalkShouldLocateNextMatchWhenItReturns
 TEST_FIXTURE(FindInFilesTestFixtureClass, FindNextShouldLocateNextMatchWhenSearchingFromTheMiddle) {
 	CreateFixtureFile(wxT("user.php"), FILE_1);
 	FindInFiles.Expression = UNICODE_STRING_SIMPLE("name");
-	FindInFiles.CaseSensitive = false;
+	FindInFiles.Mode = mvceditor::FinderClass::CASE_INSENSITIVE;
 	CHECK(FindInFiles.Prepare());
 	CHECK(FindInFiles.Walk(TestProjectDir + wxT("user.php")));
 	CHECK_EQUAL(3, FindInFiles.GetCurrentLineNumber());
@@ -84,10 +84,10 @@ TEST_FIXTURE(FindInFilesTestFixtureClass, FindNextShouldLocateNextMatchWhenSearc
 	
 }
 
-TEST_FIXTURE(FindInFilesTestFixtureClass, FindNextShouldLocateNextMatchWhenSearchingCaseInsesitive) {
+TEST_FIXTURE(FindInFilesTestFixtureClass, FindNextShouldLocateNextMatchWhenSearchingCaseInsensitive) {
 	CreateFixtureFile(wxT("user.php"), FILE_1);
 	FindInFiles.Expression = UNICODE_STRING_SIMPLE("userclass");
-	FindInFiles.CaseSensitive = false;
+	FindInFiles.Mode = mvceditor::FinderClass::CASE_INSENSITIVE;
 	CHECK(FindInFiles.Prepare());
 	CHECK(FindInFiles.Walk(TestProjectDir + wxT("user.php")));
 	CHECK_EQUAL(2, FindInFiles.GetCurrentLineNumber());

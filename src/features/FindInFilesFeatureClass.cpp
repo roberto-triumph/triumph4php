@@ -650,10 +650,8 @@ mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvce
 	FindText->SetValidator(regExValidator);
 	UnicodeStringValidatorClass replaceExpressionValidator(&Feature.PreviousFindInFiles.ReplaceExpression);
 	wxGenericValidator modeValidator(&Feature.PreviousFindInFiles.Mode);
-	wxGenericValidator caseValidator(&Feature.PreviousFindInFiles.CaseSensitive);
 	ReplaceWithText->SetValidator(replaceExpressionValidator);
 	FinderMode->SetValidator(modeValidator);
-	CaseSensitive->SetValidator(caseValidator);
 	wxGenericValidator doHiddenFilesValidator(&Feature.DoHiddenFiles);
 	DoHiddenFiles->SetValidator(doHiddenFilesValidator);
 

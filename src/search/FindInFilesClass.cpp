@@ -37,7 +37,6 @@ mvceditor::FindInFilesClass::FindInFilesClass(const UnicodeString& expression, m
 	, ReplaceExpression()
 	, Source()
 	, Mode(mode)
-	, CaseSensitive(true)
 	, Finder(expression, mode) 
 	, FFile()
 	, File(NULL)
@@ -50,7 +49,6 @@ mvceditor::FindInFilesClass::FindInFilesClass(const FindInFilesClass& findInFile
 	ReplaceExpression = findInFiles.ReplaceExpression;
 	Source = findInFiles.Source;
 	Mode = findInFiles.Mode;
-	CaseSensitive = findInFiles.CaseSensitive;
 	Finder.Expression = findInFiles.Finder.Expression;
 	Finder.Mode = findInFiles.Finder.Mode;
 	File = NULL;
@@ -65,7 +63,6 @@ bool mvceditor::FindInFilesClass::Prepare() {
 	Finder.Expression = Expression;
 	Finder.Mode = Mode;
 	Finder.ReplaceExpression = ReplaceExpression;
-	Finder.CaseSensitive = CaseSensitive;
 	return Finder.Prepare();
 }
 
@@ -153,7 +150,6 @@ void mvceditor::FindInFilesClass::CopyFinder(FinderClass& dest) {
 	dest.Expression = Finder.Expression;
 	dest.ReplaceExpression = Finder.ReplaceExpression;
 	dest.Mode = Finder.Mode;
-	dest.CaseSensitive = Finder.CaseSensitive;
 	dest.Wrap = Finder.Wrap;
 }
 
@@ -217,7 +213,6 @@ mvceditor::FindInFilesClass& mvceditor::FindInFilesClass::operator=(const FindIn
 	ReplaceExpression = findInFiles.ReplaceExpression;
 	Source = findInFiles.Source;
 	Mode = findInFiles.Mode;
-	CaseSensitive = findInFiles.CaseSensitive;
 	Finder.Expression = findInFiles.Finder.Expression;
 	Finder.Mode = findInFiles.Finder.Mode;
 	return *this;

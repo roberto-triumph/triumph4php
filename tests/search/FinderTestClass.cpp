@@ -60,8 +60,7 @@ TEST(FindNextUsingExactModeShouldReturnValidIndexWhenSearching) {
 
 TEST(FindNextUsingExactModeShouldReturnValidIndexWhenSearchingCaseInsensitive) {
 	UnicodeString tofind(UNICODE_STRING_SIMPLE("$pi"));
-	mvceditor::FinderClass finder(tofind, mvceditor::FinderClass::EXACT);
-	finder.CaseSensitive = false;
+	mvceditor::FinderClass finder(tofind, mvceditor::FinderClass::CASE_INSENSITIVE);
 	CHECK(finder.Prepare());
 	int32_t expectedIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("$PI"));
 	CHECK(finder.FindNext(CODE));
@@ -74,7 +73,6 @@ TEST(FindNextUsingExactModeShouldReturnValidIndexWhenSearchingCaseInsensitive) {
 TEST(FindNextUsingExactModeShouldReturnInvalidIndexWhenNotFound) {
 	UnicodeString tofind(UNICODE_STRING_SIMPLE("$pi"));
 	mvceditor::FinderClass finder(tofind, mvceditor::FinderClass::EXACT);
-	finder.CaseSensitive = true;
 	CHECK(finder.Prepare());
 	CHECK_EQUAL(false, finder.FindNext(CODE));
 	int32_t position, length;
@@ -110,9 +108,8 @@ TEST(FindNextUsingRegularExpressionModeShouldReturnValidIndexWhenSearching) {
 }
 
 TEST(FindNextUsingRegularExpressionModeShouldReturnValidIndexWhenSearchingCaseInsensitive) {
-	UnicodeString tofind(UNICODE_STRING_SIMPLE("\\$pi\\s*=\\s*\\d+\\.\\d+"));
+	UnicodeString tofind(UNICODE_STRING_SIMPLE("(?i)\\$pi\\s*=\\s*\\d+\\.\\d+"));
 	mvceditor::FinderClass finder(tofind, mvceditor::FinderClass::REGULAR_EXPRESSION);
-	finder.CaseSensitive = false;
 	CHECK(finder.Prepare());
 	int32_t expectedIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("$PI"));
 	CHECK(finder.FindNext(CODE));

@@ -51,7 +51,6 @@ class FindInFilesDialogGeneratedClass : public wxDialog
 		wxDirPickerCtrl* DirectoryDirPicker;
 		wxComboBox* FilesFilter;
 		wxRadioBox* FinderMode;
-		wxCheckBox* CaseSensitive;
 		wxCheckBox* DoHiddenFiles;
 		wxStdDialogButtonSizer* ButtonsSizer;
 		wxButton* ButtonsSizerOK;

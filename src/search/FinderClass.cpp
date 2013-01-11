@@ -32,7 +32,6 @@ mvceditor::FinderClass::FinderClass(UnicodeString expression, mvceditor::FinderC
 	: Expression(expression)
 	, ReplaceExpression()
 	, Mode(mode)
-	, CaseSensitive(false)
 	, Wrap(false)
 	, Pattern(NULL)
 	, LastPosition(0)
@@ -58,7 +57,8 @@ bool mvceditor::FinderClass::Prepare() {
 	if (mvceditor::FinderClass::REGULAR_EXPRESSION == Mode) {
 		PrepareForRegularExpressionMode();
 	}
-	IsPrepared = !Expression.isEmpty() && (mvceditor::FinderClass::EXACT == Mode || U_SUCCESS(PatternErrorCode));
+	IsPrepared = !Expression.isEmpty() && 
+		(mvceditor::FinderClass::EXACT == Mode || mvceditor::FinderClass::CASE_INSENSITIVE == Mode || U_SUCCESS(PatternErrorCode));
 	return IsPrepared;
 }
 
@@ -68,7 +68,8 @@ bool mvceditor::FinderClass::FindNext(const UnicodeString& text, int32_t start) 
 		ResetLastHit();
 		switch(Mode) {
 			case mvceditor::FinderClass::EXACT:
-				found = FindNextExact(text, start);
+			case mvceditor::FinderClass::CASE_INSENSITIVE:
+				found = FindNextExact(text, start, EXACT == Mode);
 				break;
 			case mvceditor::FinderClass::REGULAR_EXPRESSION:
 				found = FindNextRegularExpression(text, start);
@@ -77,7 +78,8 @@ bool mvceditor::FinderClass::FindNext(const UnicodeString& text, int32_t start) 
 		if (Wrap && !found) {
 			switch(Mode) {
 				case mvceditor::FinderClass::EXACT:
-					found = FindNextExact(text, 0);
+				case mvceditor::FinderClass::CASE_INSENSITIVE:
+					found = FindNextExact(text, 0, EXACT == Mode);
 					break;
 				case mvceditor::FinderClass::REGULAR_EXPRESSION:
 					found = FindNextRegularExpression(text, 0);
@@ -92,7 +94,11 @@ bool mvceditor::FinderClass::FindPrevious(const UnicodeString& text, int32_t sta
 	bool found = false;
 	if(mvceditor::FinderClass::EXACT == Mode) {
 		ResetLastHit();
-		found = FindPreviousExact(text, start);
+		found = FindPreviousExact(text, start, true);
+	}
+	else if(mvceditor::FinderClass::CASE_INSENSITIVE == Mode) {
+		ResetLastHit();
+		found = FindPreviousExact(text, start, false);
 	}
 	else {
 		// lazy way of backwards searching, search from the beginning until
@@ -232,9 +238,9 @@ void mvceditor::FinderClass::EscapeRegEx(UnicodeString& regEx) {
 	regEx.findAndReplace(UNICODE_STRING_SIMPLE("|"), UNICODE_STRING_SIMPLE("\\|"));	
 }
 
-bool mvceditor::FinderClass::FindNextExact(const UnicodeString& text, int32_t start) {
+bool mvceditor::FinderClass::FindNextExact(const UnicodeString& text, int32_t start, bool caseSensitive) {
 	int32_t foundIndex = 0;
-	if (!CaseSensitive) {
+	if (!caseSensitive) {
 		UnicodeString textLower(text);
 		textLower.toLower();
 		UnicodeString expressionLower(Expression);
@@ -252,9 +258,9 @@ bool mvceditor::FinderClass::FindNextExact(const UnicodeString& text, int32_t st
 	return IsFound;
 }
 
-bool mvceditor::FinderClass::FindPreviousExact(const UnicodeString& text, int32_t start) {
+bool mvceditor::FinderClass::FindPreviousExact(const UnicodeString& text, int32_t start, bool caseSensitive) {
 	int32_t foundIndex = 0;
-	if (!CaseSensitive) {
+	if (caseSensitive) {
 		UnicodeString textLower(text);
 		textLower.toLower();
 		UnicodeString expressionLower(Expression);
@@ -309,8 +315,5 @@ bool mvceditor::FinderClass::FindNextRegularExpression(const UnicodeString& text
 
 void mvceditor::FinderClass::PrepareForRegularExpressionMode() {
 	int flags = 0;
-	if (!CaseSensitive) {
-		flags |= UREGEX_CASE_INSENSITIVE;
-	}
 	Pattern = RegexPattern::compile(Expression, flags, PatternErrorCode);
 }

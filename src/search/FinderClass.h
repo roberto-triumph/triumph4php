@@ -61,12 +61,15 @@ public:
 
 	/**
 	 * All possible search modes
-	 * 
+	 * EXACT - exact case sensitive matching
+	 * CASE_INSENSITIVE - exact but case insensitive matching
+	 * REGULAR_EXPRESSION - a regular expression
 	 * @var enum
 	 */
 	enum Modes {
 		EXACT = 0,
-		REGULAR_EXPRESSION = 1
+		CASE_INSENSITIVE = 1,
+		REGULAR_EXPRESSION = 2
 	};
 	
 	/**
@@ -185,14 +188,7 @@ public:
 	 * @var int one of the search modes
 	 */
 	int Mode;
-	
-	/**
-	 * Flag for case sensitive matching.
-	 * 
-	 * @var bool
-	 */
-	bool CaseSensitive;
-	
+		
 	/**
 	 * Flag for wrapping the search; ie if no hit then search from the beginning 
 	 */
@@ -254,22 +250,24 @@ private:
 	/**
 	 * Finds the next instance of this expression in the given text using exact matching.
 	 * 
-	 * @var const UnicodeString& text the text to search in
-	 * @var int start the index to start searching from
+	 * @param const UnicodeString& text the text to search in
+	 * @param int start the index to start searching from
+	 * @param bool caseSensitive if TRUE then search will be case sensitive 
 	 * @return bool true if expression is found. This method will also set the
 	 *         LastPosition, LastLength private variables.
 	 */
-	bool FindNextExact(const UnicodeString& text, int32_t start = 0);
+	bool FindNextExact(const UnicodeString& text, int32_t start = 0, bool caseSensitive = false);
 	
 	/**
 	 * Finds the last instance of this expression in the given text using exact matching.
 	 * 
-	 * @var const UnicodeString& text the text to search in
-	 * @var int start the index to start searching from (search will be done backwards)
+	 * @param const UnicodeString& text the text to search in
+	 * @param int start the index to start searching from (search will be done backwards)
+	 * @param bool caseSensitive if TRUE then search will be case sensitive 
 	 * @return bool true if expression is found. This method will also set the
 	 *         LastPosition, LastLength private variables.
 	 */
-	bool FindPreviousExact(const UnicodeString&text, int32_t start = 0);
+	bool FindPreviousExact(const UnicodeString&text, int32_t start = 0, bool caseSensitive = false);
 	
 	/**
 	 * Finds this expression in the given text using regular expression matching.

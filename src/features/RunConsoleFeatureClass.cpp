@@ -400,7 +400,6 @@ wxString mvceditor::RunConsolePanelClass::GetCommand() const {
 void mvceditor::RunConsolePanelClass::AppendText(const wxString& text) {
 	mvceditor::FinderClass finder;
 	finder.Mode = mvceditor::FinderClass::REGULAR_EXPRESSION;
-	finder.CaseSensitive = false;
 	finder.Expression = FileNameRegularExpression();
 	
 	// this way so that gcc does not think that good is an unused variable

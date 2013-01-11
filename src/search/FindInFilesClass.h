@@ -153,13 +153,6 @@ public:
 	int Mode;
 	
 	/**
-	 * Flag for case sensitive matching.
-	 * 
-	 * @var bool if true, the search will be case sensitive
-	 */
-	bool CaseSensitive;
-
-	/**
 	 * Prepare  Expression, ReplaceExpression. 
 	 * @return bool if Expression, ReplaceExpression are valid
 	 */
