@@ -607,12 +607,15 @@ void mvceditor::FinderFeatureClass::LoadPreferences(wxConfigBase* config) {
 
 void mvceditor::FinderFeatureClass::OnEditFind(wxCommandEvent& event) {
 	wxWindow* parent = GetMainWindow();
+	parent->Freeze();
+	bool transferExpression = false;
 	
 	// hide replace panel id it is shown, doesnt look good when find and the replace panel are shown
 	wxWindow* replaceWindow = wxWindow::FindWindowById(ID_REPLACE_PANEL, parent);
 	if (replaceWindow) {
 		AuiManager->GetPane(replaceWindow).Show(false);
-		AuiManager->Update();
+		replaceWindow->TransferDataFromWindow();
+		transferExpression = true;
 	}
 	
 	// show the find panel 
@@ -628,13 +631,17 @@ void mvceditor::FinderFeatureClass::OnEditFind(wxCommandEvent& event) {
 	if (window) {
 		FinderPanelClass* panel = (FinderPanelClass*) window;
 		wxString selectedText = GetSelectedText();
+		if (selectedText.empty() && transferExpression) {
+			selectedText = mvceditor::IcuToWx(FinderReplace.Expression);
+		}
 		if (!selectedText.empty()) {
 			panel->SetExpression(selectedText);
 		}
 		AuiManager->GetPane(window).Show();
-		AuiManager->Update();
 		panel->SetFocusOnFindText();
 	}
+	parent->Thaw();
+	AuiManager->Update();
 }
 	
 void mvceditor::FinderFeatureClass::OnEditFindNext(wxCommandEvent& event) {
@@ -664,12 +671,17 @@ void mvceditor::FinderFeatureClass::OnEditFindPrevious(wxCommandEvent& event) {
 
 void mvceditor::FinderFeatureClass::OnEditReplace(wxCommandEvent& event) {
 	wxWindow* parent = GetMainWindow();
-	
+	parent->Freeze();
+	bool transferExpression = false; 
+
 	// hide find panel id it is shown, doesnt look good when find and the replace panel are shown
 	wxWindow* findWindow = wxWindow::FindWindowById(ID_FIND_PANEL, parent);
 	if (findWindow) {
+		// so that we can get the most up-to-date value from the textbox
+		findWindow->TransferDataFromWindow();
+
 		AuiManager->GetPane(findWindow).Show(false);
-		AuiManager->Update();
+		transferExpression = true;
 	}
 	
 	// show the replace panel
@@ -685,13 +697,17 @@ void mvceditor::FinderFeatureClass::OnEditReplace(wxCommandEvent& event) {
 	if (window) {
 		ReplacePanelClass* panel = (ReplacePanelClass*) window;
 		wxString selectedText = GetSelectedText();
+		if (selectedText.empty() && transferExpression) {
+			selectedText = mvceditor::IcuToWx(Finder.Expression);
+		}
 		if (!selectedText.empty()) {
 			panel->SetExpression(selectedText);
 		}
 		AuiManager->GetPane(window).Show();
-		AuiManager->Update();
 		panel->SetFocusOnFindText();
 	}
+	parent->Thaw();
+	AuiManager->Update();
 }
 
 void mvceditor::FinderFeatureClass::OnEditGoToLine(wxCommandEvent& event) {
