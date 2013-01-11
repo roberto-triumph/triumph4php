@@ -236,7 +236,9 @@ public:
 	
 	/**
 	 * This method will be called during application startup; the feature should load the preferences from persistent 
-	 * storage (confg) here
+	 * storage (confg) here.
+	 * Note: There is no virtual method for saving preferences. You can just access the wxConfig
+	 * pointer from the singleton instance wxConfigBase::Get and save whenever appropriate.
 	 * 
 	 * @param wxConfigBase* the config where settings are stored.
 	 */

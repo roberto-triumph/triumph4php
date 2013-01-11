@@ -40,9 +40,11 @@ static const int ID_REGEX_MENU_START = 11000;
 static const int ID_REGEX_REPLACE_FIND_MENU_START = 12000;
 static const int ID_REGEX_REPLACE_MENU_START = 13000;
 
-mvceditor::FinderPanelClass::FinderPanelClass(wxWindow* parent, mvceditor::NotebookClass* notebook, wxAuiManager* auiManager, int windowId)
+mvceditor::FinderPanelClass::FinderPanelClass(wxWindow* parent, int windowId, 
+											  mvceditor::FinderClass& finder,
+											  mvceditor::NotebookClass* notebook, wxAuiManager* auiManager)
 		: FinderPanelGeneratedClass(parent, windowId)
-		, Finder()
+		, Finder(finder)
 		, ComboBoxHistory(FindText)
 		, Notebook(notebook)
 		, AuiManager(auiManager) 
@@ -62,6 +64,7 @@ mvceditor::FinderPanelClass::FinderPanelClass(wxWindow* parent, mvceditor::Noteb
 		wxART_TOOLBAR, wxSize(16, 16))));
 	CloseButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_ERROR, 
 		wxART_FRAME_ICON, wxSize(16, 16))));
+	TransferDataToWindow();
 }
 
 void mvceditor::FinderPanelClass::SetFocusOnFindText() {
@@ -79,6 +82,10 @@ void mvceditor::FinderPanelClass::FindNext() {
 	if (Validate() && TransferDataFromWindow()) {
 		if (Finder.Prepare()) {
 			Find();
+				
+			wxConfigBase* config = wxConfigBase::Get();
+			config->Write(wxT("/Finder/Wrap"), Finder.Wrap);
+			config->Write(wxT("/Finder/Mode"), Finder.Mode);
 		}
 		else {
 			SetStatus(_("Status: Invalid Expression"));	
@@ -90,6 +97,10 @@ void mvceditor::FinderPanelClass::FindPrevious() {
 	if (Validate() && TransferDataFromWindow()) {
 		if (Finder.Prepare()) {
 			Find(false);
+
+			wxConfigBase* config = wxConfigBase::Get();
+			config->Write(wxT("/Finder/Wrap"), Finder.Wrap);
+			config->Write(wxT("/Finder/Mode"), Finder.Mode);
 		}
 		else {
 			SetStatus(_("Status: Invalid Expression"));	
@@ -174,6 +185,13 @@ void mvceditor::FinderPanelClass::SetStatus(const wxString& message) {
 void mvceditor::FinderPanelClass::OnCloseButton(wxCommandEvent& event) {
 	AuiManager->GetPane(this).Hide();
 	AuiManager->Update();
+
+	// give focus back to the code control
+	// better user experience
+	mvceditor::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
+	if (codeControl) {
+		codeControl->SetFocus();
+	}
 }
 
 void mvceditor::FinderPanelClass::OnFindEnter(wxCommandEvent& event) {
@@ -205,15 +223,23 @@ void mvceditor::FinderPanelClass::OnFindKeyDown(wxKeyEvent& event) {
 	if (event.GetKeyCode() == WXK_ESCAPE) {
 		AuiManager->GetPane(this).Hide();
 		AuiManager->Update();
+
+		// give focus back to the code control
+		// better user experience
+		mvceditor::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
+		if (codeControl) {
+			codeControl->SetFocus();
+		}
 	}
 	else {
 		event.Skip();
 	}	
 }
 
-mvceditor::ReplacePanelClass::ReplacePanelClass(wxWindow* parent, mvceditor::NotebookClass* notebook, wxAuiManager* auiManager, int windowId)
+mvceditor::ReplacePanelClass::ReplacePanelClass(wxWindow* parent, int windowId, mvceditor::FinderClass& finder,
+												mvceditor::NotebookClass* notebook, wxAuiManager* auiManager)
 		: ReplacePanelGeneratedClass(parent, windowId)
-		, Finder()
+		, Finder(finder)
 		, FindHistory(FindText)
 		, ReplaceHistory(ReplaceWithText)
 		, Notebook(notebook)
@@ -245,6 +271,7 @@ mvceditor::ReplacePanelClass::ReplacePanelClass(wxWindow* parent, mvceditor::Not
 		wxART_TOOLBAR, wxSize(16, 16))));
 	ReplaceWithText->MoveAfterInTabOrder(FindText);
 	RegExReplaceHelpButton->MoveAfterInTabOrder(ReplaceWithText);
+	TransferDataToWindow();
 }
 
 void mvceditor::ReplacePanelClass::SetFocusOnFindText() {
@@ -262,6 +289,10 @@ void mvceditor::ReplacePanelClass::FindNext() {
 	if (Validate() && TransferDataFromWindow()) {
 		if (Finder.Prepare()) {
 			Find();
+
+			wxConfigBase* config = wxConfigBase::Get();
+			config->Write(wxT("/Finder/ReplaceWrap"), Finder.Wrap);
+			config->Write(wxT("/Finder/ReplaceMode"), Finder.Mode);
 		}
 		else {
 			SetStatus(_("Status: Invalid Expression"));	
@@ -273,6 +304,10 @@ void mvceditor::ReplacePanelClass::FindPrevious() {
 	if (Validate() && TransferDataFromWindow()) {
 		if (Finder.Prepare()) {
 			Find(false);
+
+			wxConfigBase* config = wxConfigBase::Get();
+			config->Write(wxT("/Finder/ReplaceWrap"), Finder.Wrap);
+			config->Write(wxT("/Finder/ReplaceMode"), Finder.Mode);
 		}
 		else {
 			SetStatus(_("Status: Invalid Expression"));	
@@ -358,6 +393,13 @@ void mvceditor::ReplacePanelClass::SetStatus(const wxString& message) {
 void mvceditor::ReplacePanelClass::OnCloseButton(wxCommandEvent& event) {
 	AuiManager->GetPane(this).Hide();
 	AuiManager->Update();
+
+	// give focus back to the code control
+	// better user experience
+	mvceditor::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
+	if (codeControl) {
+		codeControl->SetFocus();
+	}
 }
 
 void mvceditor::ReplacePanelClass::OnReplaceButton(wxCommandEvent& event) {
@@ -442,6 +484,13 @@ void mvceditor::ReplacePanelClass::OnFindKeyDown(wxKeyEvent& event) {
 	else  if (event.GetKeyCode() == WXK_ESCAPE) {
 		AuiManager->GetPane(this).Hide();
 		AuiManager->Update();
+
+		// give focus back to the code control
+		// better user experience
+		mvceditor::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
+		if (codeControl) {
+			codeControl->SetFocus();
+		}
 	}
 	else {
 		event.Skip();
@@ -463,6 +512,13 @@ void mvceditor::ReplacePanelClass::OnReplaceKeyDown(wxKeyEvent& event) {
 	else  if (event.GetKeyCode() == WXK_ESCAPE) {
 		AuiManager->GetPane(this).Hide();
 		AuiManager->Update();
+
+		// give focus back to the code control
+		// better user experience
+		mvceditor::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
+		if (codeControl) {
+			codeControl->SetFocus();
+		}
 	}
 	else {
 		event.Skip();
@@ -518,7 +574,9 @@ void mvceditor::ReplacePanelClass::OnReplaceKillFocus(wxFocusEvent& event) {
 }
 
 mvceditor::FinderFeatureClass::FinderFeatureClass(mvceditor::AppClass& app)
-	: FeatureClass(app) {
+	: FeatureClass(app) 
+	, Finder()
+	, FinderReplace() {
 }
 	
 void mvceditor::FinderFeatureClass::AddEditMenuItems(wxMenu* editMenu) {
@@ -539,6 +597,14 @@ void mvceditor::FinderFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdC
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
+void mvceditor::FinderFeatureClass::LoadPreferences(wxConfigBase* config) {
+	config->Read(wxT("/Finder/Wrap"), &Finder.Wrap);
+	config->Read(wxT("/Finder/Mode"), &Finder.Mode);
+	config->Read(wxT("/Finder/ReplaceWrap"), &FinderReplace.Wrap);
+	config->Read(wxT("/Finder/ReplaceMode"), &FinderReplace.Mode);
+}
+
+
 void mvceditor::FinderFeatureClass::OnEditFind(wxCommandEvent& event) {
 	wxWindow* parent = GetMainWindow();
 	
@@ -552,7 +618,7 @@ void mvceditor::FinderFeatureClass::OnEditFind(wxCommandEvent& event) {
 	// show the find panel 
 	wxWindow* window = wxWindow::FindWindowById(ID_FIND_PANEL, parent);
 	if (!window) {
-		window = new FinderPanelClass(parent, GetNotebook(), AuiManager, ID_FIND_PANEL);
+		window = new FinderPanelClass(parent, ID_FIND_PANEL, Finder, GetNotebook(), AuiManager);
 		if (!AuiManager->AddPane(window, 
 			wxAuiPaneInfo().Bottom().Row(1).Floatable(false).DockFixed(true).CaptionVisible(false).CloseButton(false))) {
 			window->Destroy();
@@ -609,7 +675,7 @@ void mvceditor::FinderFeatureClass::OnEditReplace(wxCommandEvent& event) {
 	// show the replace panel
 	wxWindow* window = wxWindow::FindWindowById(ID_REPLACE_PANEL, parent);
 	if (!window) {
-		window = new ReplacePanelClass(parent, GetNotebook(), AuiManager, ID_REPLACE_PANEL);
+		window = new ReplacePanelClass(parent, ID_REPLACE_PANEL, FinderReplace, GetNotebook(), AuiManager);
 		if (!AuiManager->AddPane(window, 
 			wxAuiPaneInfo().Bottom().Row(1).Floatable(false).DockFixed(true).CaptionVisible(false).CloseButton(false))) {
 			window->Destroy();

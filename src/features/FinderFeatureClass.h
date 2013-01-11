@@ -65,12 +65,14 @@ public:
 	 * Construct a new finder dialog
 	 * 
 	 * @param wxWindow* parent the parent window
+	 * @param int windowId the window ID
+	 * @param finder the finder instance to use for searching
 	 * @param NotebookClass notebook the object that holds the text. The pointer will NOT be managed (deleted) by this class. 
 	 * @param wxAuiManager* auiManager used to hide this panel.  This class will NOT
 	 *        delete the pointer, it is up to the caller.
-	 * @param int windowId the window ID
+	 
 	 */
-	FinderPanelClass(wxWindow* parent, NotebookClass* notebook, wxAuiManager* auiManager, int windowId);
+	FinderPanelClass(wxWindow* parent, int windowId, mvceditor::FinderClass& finder, NotebookClass* notebook, wxAuiManager* auiManager);
 
 	/**
 	 * The focus will  be set on the find text box.
@@ -127,7 +129,7 @@ private:
 	 * 
 	 * @var FinderClass
 	 */
-	FinderClass Finder;
+	FinderClass& Finder;
 	
 	/**
 	 * Holds previously entered searches
@@ -198,12 +200,13 @@ public:
 	 * Construct a new finder dialog
 	 * 
 	 * @param wxWindow* parent the parent window
+	 * @param int windowId the window ID
+	 * @param finder the object that does the searching
 	 * @param NotebookClass notebook the object that holds the text. The pointer will NOT be managed (deleted) by this class. 
 	 * @param wxAuiManager* auiManager used to hide this panel.  This class will NOT
 	 *        delete the pointer, it is up to the caller.
-	 * @param int windowId the window ID
 	 */
-	ReplacePanelClass(wxWindow* parent, NotebookClass* notebook, wxAuiManager* auiManager, int windowId);
+	ReplacePanelClass(wxWindow* parent, int windowId, mvceditor::FinderClass& finder, NotebookClass* notebook, wxAuiManager* auiManager);
 
 	/**
 	 * Enables/disables replace buttons
@@ -273,7 +276,7 @@ private:
 	 * 
 	 * @var FinderClass
 	 */
-	FinderClass Finder;
+	FinderClass &Finder;
 	
 	/**
 	 * Holds previously entered searches
@@ -330,7 +333,15 @@ public:
 
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 
+	void LoadPreferences(wxConfigBase* config);
+
 private:
+
+	/**
+	 * will perform the searching
+	 */
+	mvceditor::FinderClass Finder;
+	mvceditor::FinderClass FinderReplace;
 
 	/**
 	 * show the find dialog 
