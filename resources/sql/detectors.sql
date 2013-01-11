@@ -206,7 +206,7 @@ CREATE TABLE IF NOT EXISTS database_tags (
 	label TEXT NOT NULL COLLATE NOCASE,
 	
 	--
-	-- the database name (schema) for this connection. MVC Editor will \
+	-- the database name (schema) for this connection. MVC Editor will 
 	-- use this to determine which database driver to use
 	--
 	schema TEXT NOT NULL COLLATE NOCASE,
@@ -242,6 +242,39 @@ CREATE TABLE IF NOT EXISTS database_tags (
 	-- stored in plain text.
 	--
 	password TEXT NOT NULL COLLATE NOCASE
+);
+
+-- 
+-- this table list the detected config files; config detector
+-- scripts will populate this table based on a framework's config
+-- files.
+--
+CREATE TABLE IF NOT EXISTS config_tags (
+
+	-- 
+	-- needed for Zend_Db_Table_Abstract 
+	--
+	id INTEGER PRIMARY KEY AUTOINCREMENT, 
+	
+	--
+	-- this is the full path to the source directory
+	-- that contains the database settings. Note that this
+	-- is the source as entered by the user in the "Project Sources". 
+	-- It contains OS-dependant directory separators
+	--
+	source_dir_full_path TEXT NOT NULL COLLATE NOCASE,
+	
+	--
+	-- a friendly label for this connection. MVC Editor will show
+	-- this to the user.
+	--
+	label TEXT NOT NULL COLLATE NOCASE,
+	
+	--
+	-- the full path of the config file. MVC Editor will 
+	-- use path to open the config file when the user asks for it.
+	--
+	full_path TEXT NOT NULL COLLATE NOCASE
 );
 
 
