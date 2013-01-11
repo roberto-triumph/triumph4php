@@ -44,6 +44,15 @@ namespace mvceditor {
  */
 class GlobalCacheClass {
 
+private:
+
+	/**
+	 * The connection to the tagcache sqlite db file
+	 * This needs to be declared first because the
+	 * tagparser uses it; and we want it to be cleaned up last
+	 */
+	soci::session Session;
+
 public:
 
 	/**
@@ -109,9 +118,6 @@ public:
 	void SetVersion(pelet::Versions version);
 
 private:
-
-	soci::session Session;
-
 	/**
 	 * create the database connection to the given db, and create tables to store the parsed resources
 	 * If the file does not exist; it will be created and the schema will be initialized as

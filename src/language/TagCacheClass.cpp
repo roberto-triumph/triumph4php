@@ -69,7 +69,8 @@ const wxEventType mvceditor::EVENT_WORKING_CACHE_COMPLETE = wxNewEventType();
 const wxEventType mvceditor::EVENT_GLOBAL_CACHE_COMPLETE = wxNewEventType();
 
 mvceditor::GlobalCacheClass::GlobalCacheClass()
-	: TagParser() 
+	: Session()
+	, TagParser() 
 	, TagFinder(NULL)	
 	, ResourceDbFileName() {
 
