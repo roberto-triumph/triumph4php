@@ -80,6 +80,7 @@ wxString mvceditor::UrlDetectorClass::TestCommandLine(const mvceditor::GlobalsCl
 	params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset();
 	params.ScriptName = detectorScriptFullPath;
 	params.SourceDir = source.RootDirectory;
+	params.RootUrl = rootUrl;
 	params.ResourceDbFileName = project.ResourceDbFileName;
 	return params.BuildCmdLine();
 }

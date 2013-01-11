@@ -191,7 +191,7 @@ function detectUrls($sourceDir, $resourceDbFileName, $host, &$doSkip) {
 	
 	// lookup all of the methods for all controller files.
 	$resourceTable = new MvcEditor_ResourceTable($pdo);
-	$methods = $resourceTable->MethodsFromFiles($matchingFiles);
+	$methods = $resourceTable->PublicMethodsFromFiles($matchingFiles);
 	foreach ($methods as $resource) {
 		
 		// need to handle any sub-directories underneath the controllers; as the subdirectory
