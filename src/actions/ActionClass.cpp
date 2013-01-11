@@ -91,3 +91,4 @@ const int mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_DETECTOR = wxNewId();
 const int mvceditor::ID_EVENT_ACTION_CALL_STACK = wxNewId();
 const int mvceditor::ID_EVENT_ACTION_DATABASE_DETECTOR_INIT = wxNewId();
 const int mvceditor::ID_EVENT_ACTION_DATABASE_DETECTOR = wxNewId();
+const int mvceditor::ID_EVENT_ACTION_CONFIG_DETECTOR = wxNewId();

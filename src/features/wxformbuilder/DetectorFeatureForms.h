@@ -145,4 +145,31 @@ class DatabaseDetectorPanelGeneratedClass : public wxPanel
 	
 };
 
+///////////////////////////////////////////////////////////////////////////////
+/// Class ConfigDetectorPanelGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class ConfigDetectorPanelGeneratedClass : public wxPanel 
+{
+	private:
+	
+	protected:
+		wxStaticText* ProjectLabel;
+		wxChoice* ProjectChoice;
+		wxButton* TestButton;
+		wxButton* AddButton;
+		wxBitmapButton* HelpButton;
+		wxStaticText* Label;
+		wxTreeCtrl* DetectorTree;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		ConfigDetectorPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
+		~ConfigDetectorPanelGeneratedClass();
+	
+};
+
 #endif //__DetectorFeatureForms__

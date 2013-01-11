@@ -28,6 +28,7 @@
 #include <actions/CallStackActionClass.h>
 #include <actions/TemplateFilesDetectorActionClass.h>
 #include <actions/DatabaseDetectorActionClass.h>
+#include <actions/ConfigDetectorActionClass.h>
 #include <widgets/TreeItemDataStringClass.h>
 #include <widgets/ChooseUrlDialogClass.h>
 #include <globals/Assets.h>
@@ -40,6 +41,7 @@ static const int ID_URL_DETECTOR_PANEL = wxNewId();
 static const int ID_TEMPLATE_FILES_DETECTOR_PANEL = wxNewId();
 static const int ID_TAG_DETECTOR_PANEL = wxNewId();
 static const int ID_DATABASE_DETECTOR_PANEL = wxNewId();
+static const int ID_CONFIG_DETECTOR_PANEL = wxNewId();
 
 static const int ID_DETECTOR_TREE_OPEN = wxNewId();
 static const int ID_DETECTOR_TREE_RENAME = wxNewId();
@@ -226,7 +228,6 @@ wxString mvceditor::DatabaseDetectorClass::TestCommandLine(const mvceditor::Glob
 													  const mvceditor::ProjectClass& project,
 													  const wxString& detectorScriptFullPath) {
 	mvceditor::SourceClass source = project.Sources[0];
-	wxString rootUrl = globals.Environment.Apache.GetUrl(source.RootDirectory.GetPath());
 
 	mvceditor::DatabaseDetectorParamsClass params;
 	params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
@@ -259,6 +260,56 @@ wxString mvceditor::DatabaseDetectorClass::HelpMessage() {
 		"Database Detectors are PHP scripts that MVC Editor uses to find out "
 		"any database connections that PHP frameworks dynamically create.  \n"
 		"MVC Editor can detect database connections for CodeIgniter projects.\n"
+	);
+	help = wxGetTranslation(help);
+	return help;
+}
+
+mvceditor::ConfigDetectorClass::ConfigDetectorClass()  {
+
+}
+
+bool mvceditor::ConfigDetectorClass::CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project) {
+	return true;
+}
+
+wxString mvceditor::ConfigDetectorClass::TestCommandLine(const mvceditor::GlobalsClass& globals, 
+													  const mvceditor::ProjectClass& project,
+													  const wxString& detectorScriptFullPath) {
+	
+	mvceditor::SourceClass source = project.Sources[0];														  
+	
+	mvceditor::ConfigDetectorParamsClass params;
+	params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
+	params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset();
+	params.ScriptName = detectorScriptFullPath;
+	params.SourceDir = source.RootDirectory;
+	return params.BuildCmdLine();
+}
+
+wxFileName mvceditor::ConfigDetectorClass::LocalRootDir() {
+	return mvceditor::ConfigDetectorsLocalAsset();
+}
+
+wxFileName mvceditor::ConfigDetectorClass::GlobalRootDir() {
+	return mvceditor::ConfigDetectorsGlobalAsset();
+}
+
+wxFileName mvceditor::ConfigDetectorClass::SkeletonFile() {
+	wxFileName skeletonFile = mvceditor::SkeletonsBaseAsset();
+	skeletonFile.Assign(skeletonFile.GetPath(), wxT("ConfigDetector.skeleton.php"));
+	return skeletonFile;
+}
+
+wxString mvceditor::ConfigDetectorClass::Label() {
+	return _("Config Detectors");
+}
+
+wxString mvceditor::ConfigDetectorClass::HelpMessage() {
+	wxString help = wxString::FromAscii(
+		"Config Detectors are PHP scripts that MVC Editor uses to find out "
+		"any config files that PHP frameworks use.  \n"
+		"MVC Editor can detect config files for CodeIgniter projects.\n"
 	);
 	help = wxGetTranslation(help);
 	return help;
@@ -715,6 +766,41 @@ void mvceditor::DatabaseDetectorPanelClass::UpdateProjects() {
 	Handler.UpdateProjects();
 }
 
+mvceditor::ConfigDetectorPanelClass::ConfigDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
+														mvceditor::EventSinkClass& eventSink)
+	: ConfigDetectorPanelGeneratedClass(parent, id) 
+	, Detector() 
+	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink) {
+	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
+		wxART_TOOLBAR, wxSize(16, 16))));
+
+	// propagate the menu events to the handler since the handler is not connected to the 
+	// GUI it will not get them by default
+	Connect(ID_DETECTOR_TREE_OPEN, wxEVT_COMMAND_MENU_SELECTED, 
+		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuOpenDetector), NULL, &Handler);
+	Connect(ID_DETECTOR_TREE_RENAME, wxEVT_COMMAND_MENU_SELECTED, 
+		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuRenameDetector), NULL, &Handler);
+	Connect(ID_DETECTOR_TREE_DELETE, wxEVT_COMMAND_MENU_SELECTED, 
+		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
+}
+
+mvceditor::ConfigDetectorPanelClass::~ConfigDetectorPanelClass() {
+	Disconnect(ID_DETECTOR_TREE_OPEN, wxEVT_COMMAND_MENU_SELECTED, 
+		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuOpenDetector), NULL, &Handler);
+	Disconnect(ID_DETECTOR_TREE_RENAME, wxEVT_COMMAND_MENU_SELECTED, 
+		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuRenameDetector), NULL, &Handler);
+	Disconnect(ID_DETECTOR_TREE_DELETE, wxEVT_COMMAND_MENU_SELECTED, 
+		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
+}
+
+void mvceditor::ConfigDetectorPanelClass::Init() {
+	Handler.Init();
+}
+
+void mvceditor::ConfigDetectorPanelClass::UpdateProjects() {
+	Handler.UpdateProjects();
+}
+
 mvceditor::DetectorFeatureClass::DetectorFeatureClass(mvceditor::AppClass &app)
 	: FeatureClass(app) {
 
@@ -725,14 +811,16 @@ void mvceditor::DetectorFeatureClass::AddViewMenuItems(wxMenu* menu) {
 	menu->Append(mvceditor::MENU_DETECTORS + 1, _("View Template File Detectors"), _("View the Template File Detectors"), wxITEM_NORMAL);
 	menu->Append(mvceditor::MENU_DETECTORS + 2, _("View Tag Detectors"), _("View the Tag Detectors"), wxITEM_NORMAL);
 	menu->Append(mvceditor::MENU_DETECTORS + 3, _("View Database Detectors"), _("View the Database Detectors"), wxITEM_NORMAL);
+	menu->Append(mvceditor::MENU_DETECTORS + 4, _("View Config Detectors"), _("View the config Detectors"), wxITEM_NORMAL);
 }
 
 void mvceditor::DetectorFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 	wxMenu* menu = new wxMenu(0);
-	menu->Append(mvceditor::MENU_DETECTORS + 4, _("Run URL Detection"), _("Run the URL Detectors against the current projects"), wxITEM_NORMAL);
-	menu->Append(mvceditor::MENU_DETECTORS + 5, _("Run Template File Detection"), _("Run the Template file Detectors against the current projects"), wxITEM_NORMAL);
-	menu->Append(mvceditor::MENU_DETECTORS + 5, _("Run Tag Detection"), _("Run the Tag Detectors against the current projects"), wxITEM_NORMAL);
-	menu->Append(mvceditor::MENU_DETECTORS + 6, _("Run Database Detection"), _("Run the Database Detectors against the current projects"), wxITEM_NORMAL);
+	menu->Append(mvceditor::MENU_DETECTORS + 5, _("Run URL Detection"), _("Run the URL Detectors against the current projects"), wxITEM_NORMAL);
+	menu->Append(mvceditor::MENU_DETECTORS + 6, _("Run Template File Detection"), _("Run the Template file Detectors against the current projects"), wxITEM_NORMAL);
+	menu->Append(mvceditor::MENU_DETECTORS + 7, _("Run Tag Detection"), _("Run the Tag Detectors against the current projects"), wxITEM_NORMAL);
+	menu->Append(mvceditor::MENU_DETECTORS + 8, _("Run Database Detection"), _("Run the Database Detectors against the current projects"), wxITEM_NORMAL);
+	menu->Append(mvceditor::MENU_DETECTORS + 9, _("Run Config Detection"), _("Run the Config Detectors against the current projects"), wxITEM_NORMAL);
 	menuBar->Append(menu, _("Detectors"));
 }
 
@@ -790,6 +878,21 @@ void mvceditor::DetectorFeatureClass::OnViewDatabaseDetectors(wxCommandEvent& ev
 		mvceditor::DatabaseDetectorPanelClass* panel = new mvceditor::DatabaseDetectorPanelClass(GetOutlineNotebook(), ID_DATABASE_DETECTOR_PANEL, 
 			App.Globals, App.EventSink);
 		if (AddOutlineWindow(panel, _("Database Detectors"))) {
+			panel->Init();
+			panel->UpdateProjects();
+		}
+	}
+}
+
+void mvceditor::DetectorFeatureClass::OnViewConfigDetectors(wxCommandEvent& event) {
+	wxWindow* window = FindOutlineWindow(ID_CONFIG_DETECTOR_PANEL);
+	if (window) {
+		SetFocusToOutlineWindow(window);
+	}
+	else {
+		mvceditor::ConfigDetectorPanelClass* panel = new mvceditor::ConfigDetectorPanelClass(GetOutlineNotebook(), ID_CONFIG_DETECTOR_PANEL, 
+			App.Globals, App.EventSink);
+		if (AddOutlineWindow(panel, _("Config Detectors"))) {
 			panel->Init();
 			panel->UpdateProjects();
 		}
@@ -859,13 +962,26 @@ void mvceditor::DetectorFeatureClass::OnRunDatabaseDetectors(wxCommandEvent& eve
 	App.Sequences.Build(actions);
 }
 
+void mvceditor::DetectorFeatureClass::OnRunConfigDetectors(wxCommandEvent& event) {
+	std::vector<mvceditor::ActionClass*> actions;
+
+	// the sequence class will own this pointer
+	actions.push_back(
+		new mvceditor::ConfigDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_CONFIG_DETECTOR)
+	);
+	App.Sequences.Build(actions);
+}
+
 BEGIN_EVENT_TABLE(mvceditor::DetectorFeatureClass, mvceditor::FeatureClass)
 	EVT_MENU(mvceditor::MENU_DETECTORS + 0, mvceditor::DetectorFeatureClass::OnViewUrlDetectors)
 	EVT_MENU(mvceditor::MENU_DETECTORS + 1, mvceditor::DetectorFeatureClass::OnViewTemplateFileDetectors)
 	EVT_MENU(mvceditor::MENU_DETECTORS + 2, mvceditor::DetectorFeatureClass::OnViewTagDetectors)
 	EVT_MENU(mvceditor::MENU_DETECTORS + 3, mvceditor::DetectorFeatureClass::OnViewDatabaseDetectors)
-	EVT_MENU(mvceditor::MENU_DETECTORS + 4, mvceditor::DetectorFeatureClass::OnRunUrlDetectors)
-	EVT_MENU(mvceditor::MENU_DETECTORS + 5, mvceditor::DetectorFeatureClass::OnRunTemplateFileDetectors)
-	EVT_MENU(mvceditor::MENU_DETECTORS + 6, mvceditor::DetectorFeatureClass::OnRunTagDetectors)
-	EVT_MENU(mvceditor::MENU_DETECTORS + 7, mvceditor::DetectorFeatureClass::OnRunDatabaseDetectors)
+	EVT_MENU(mvceditor::MENU_DETECTORS + 4, mvceditor::DetectorFeatureClass::OnViewConfigDetectors)
+
+	EVT_MENU(mvceditor::MENU_DETECTORS + 5, mvceditor::DetectorFeatureClass::OnRunUrlDetectors)
+	EVT_MENU(mvceditor::MENU_DETECTORS + 6, mvceditor::DetectorFeatureClass::OnRunTemplateFileDetectors)
+	EVT_MENU(mvceditor::MENU_DETECTORS + 7, mvceditor::DetectorFeatureClass::OnRunTagDetectors)
+	EVT_MENU(mvceditor::MENU_DETECTORS + 8, mvceditor::DetectorFeatureClass::OnRunDatabaseDetectors)
+	EVT_MENU(mvceditor::MENU_DETECTORS + 9, mvceditor::DetectorFeatureClass::OnRunConfigDetectors)
 END_EVENT_TABLE()
