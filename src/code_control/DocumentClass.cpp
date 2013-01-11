@@ -39,7 +39,7 @@ static const wxString PHP_KEYWORDS = wxString::FromAscii(
 	"__FILE__ __DIR__ __FUNCTION__ __CLASS__ __METHOD__ __NAMESPACE__ "
 	"require require_once include include_once stdClass parent self abstract "
 	"clone namespace use as new bool boolean float double real string int "
-	"integer var endif endwhile endfor endforeach endswitch"
+	"integer var endif endwhile endfor endforeach endswitch try throw catch"
 );
 
 static const wxString PHP_54_KEYWORDS = wxString::FromAscii(
