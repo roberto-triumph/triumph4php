@@ -78,7 +78,7 @@ EOF;
 		// sqlite DB	
 		$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $outputDbFileName));
 		$configTagTable = new MvcEditor_ConfigTagTable($pdo);
-		$configTagTable->saveConfigs($arrConfigTags, $sourceDir);
+		$configTagTable->saveConfigTags($arrConfigTags, $sourceDir);
 		echo "Config dectection complete, written to {$outputDbFileName}\n";
 	}
 	else {
