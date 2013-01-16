@@ -92,3 +92,5 @@ const int mvceditor::ID_EVENT_ACTION_CALL_STACK = wxNewId();
 const int mvceditor::ID_EVENT_ACTION_DATABASE_DETECTOR_INIT = wxNewId();
 const int mvceditor::ID_EVENT_ACTION_DATABASE_DETECTOR = wxNewId();
 const int mvceditor::ID_EVENT_ACTION_CONFIG_DETECTOR = wxNewId();
+const int mvceditor::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK = wxNewId();
+const int mvceditor::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK = wxNewId();

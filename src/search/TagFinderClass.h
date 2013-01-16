@@ -204,6 +204,7 @@ public:
 	 */
 	virtual std::vector<TagClass> AllNonNativeClasses() = 0;
 
+
 protected:
 
 	/**
@@ -233,6 +234,28 @@ protected:
 	 * @return the vector of resources pulled from the statement's results
 	 */
 	virtual std::vector<mvceditor::TagClass> ResourceStatementMatches(std::string whereCond, bool doLimit) = 0;
+
+	/**
+	 * Collects all resources that are files and match the given name. 
+	 * Any hits will be returned
+	 *
+	 * @param search the name of file to look for. 
+	 * @param lineNumber if this is greater than zero, then only files that contain this many lines will be returned
+	 */
+	virtual std::vector<TagClass> CollectNearMatchFiles(const UnicodeString& search, int lineNumber) = 0;
+
+	/**
+	 * collect all of the methods that are aliased from all of the traits used by the given classes
+	 * @param classNames the names of the classes to search  in. these are the classes that use the
+	 *        traits
+	 * @param methodName if non-empty then only aliases that begin with this name will be returned
+	 */
+	virtual std::vector<TagClass> CollectAllTraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName) = 0;
+
+	/**
+	 * @return all of the traits that any of the given classes use.
+	 */
+	virtual std::vector<mvceditor::TraitTagClass> FindTraitsByClassName(const std::vector<std::string>& keyStarts) = 0;
 
 public:
 
@@ -415,9 +438,8 @@ public:
 	 */
 	std::vector<TagClass> All();
 
-	
-private:
-			
+protected:
+
 	/**
 	 * Get the line count from the given file.
 	 * 
@@ -425,16 +447,9 @@ private:
 	 * @return int line count
 	 */
 	int GetLineCountFromFile(const wxString& fullPath) const;
-		
-	/**
-	 * Collects all resources that are files and match the given name. 
-	 * Any hits will be returned
-	 *
-	 * @param search the name of file to look for. 
-	 * @param lineNumber if this is greater than zero, then only files that contain this many lines will be returned
-	 */
-	std::vector<TagClass> CollectNearMatchFiles(const UnicodeString& search, int lineNumber);
 
+private:
+		
 	/**
 	 * Collects all resources that are classes / functions / defines and match the the given Resource search.
 	 * Any hits will be returned
@@ -461,15 +476,7 @@ private:
 	 * Collect all of the resources that are methods / properties of the given classes.
 	 */
 	std::vector<TagClass> CollectAllMembers(const std::vector<UnicodeString>& classNames);
-	
-	/**
-	 * collect all of the methods that are aliased from all of the traits used by the given classes
-	 * @param classNames the names of the classes to search  in. these are the classes that use the
-	 *        traits
-	 * @param methodName if non-empty then only aliases that begin with this name will be returned
-	 */
-	std::vector<TagClass> CollectAllTraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName);
-	
+		
 	/**
 	 * Extracts the parent class from a class signature.  The class signature, as parsed by the parser contains a string
 	 * "extends ZZZZ ", then this method will return "ZZZZ"
@@ -541,11 +548,6 @@ private:
 	bool FindFileTagByFullPathExact(const wxString& fullPath, mvceditor::FileTagClass& fileTag);
 
 	/**
-	 * @return all of the traits that any of the given classes use.
-	 */
-	std::vector<mvceditor::TraitTagClass> FindTraitsByClassName(const std::vector<std::string>& keyStarts);
-
-	/**
 	 * check the database AND the current file's parsed cache to see if the namespace has been seen
 	 * before.
 	 * @return bool TRUE if the namespace is NOT in the database and its NOT in the current file
@@ -583,7 +585,29 @@ protected:
 	 *        most of the time you want to set this to TRUE
 	 * @return the vector of resources pulled from the statement's results
 	 */
-	virtual std::vector<mvceditor::TagClass> ResourceStatementMatches(std::string whereCond, bool doLimit);
+	std::vector<mvceditor::TagClass> ResourceStatementMatches(std::string whereCond, bool doLimit);
+
+	/**
+	 * Collects all resources that are files and match the given name. 
+	 * Any hits will be returned
+	 *
+	 * @param search the name of file to look for. 
+	 * @param lineNumber if this is greater than zero, then only files that contain this many lines will be returned
+	 */
+	std::vector<TagClass> CollectNearMatchFiles(const UnicodeString& search, int lineNumber);
+
+	/**
+	 * collect all of the methods that are aliased from all of the traits used by the given classes
+	 * @param classNames the names of the classes to search  in. these are the classes that use the
+	 *        traits
+	 * @param methodName if non-empty then only aliases that begin with this name will be returned
+	 */
+	std::vector<TagClass> CollectAllTraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName);
+
+	/**
+	 * @return all of the traits that any of the given classes use.
+	 */
+	std::vector<mvceditor::TraitTagClass> FindTraitsByClassName(const std::vector<std::string>& keyStarts);
 };
 
 
@@ -603,7 +627,7 @@ public:
 	 * An example use of this method is when wanting to find all classes in a project.
 	 * This method will NOT return native PHP classes (ie. PDO, DateTime).
 	 */
-	virtual std::vector<TagClass> AllNonNativeClasses();
+	std::vector<TagClass> AllNonNativeClasses();
 
 protected:
 
@@ -616,7 +640,29 @@ protected:
 	 *        most of the time you want to set this to TRUE
 	 * @return the vector of resources pulled from the statement's results
 	 */
-	virtual std::vector<mvceditor::TagClass> ResourceStatementMatches(std::string whereCond, bool doLimit);
+	std::vector<mvceditor::TagClass> ResourceStatementMatches(std::string whereCond, bool doLimit);
+
+	/**
+	 * Collects all resources that are files and match the given name. 
+	 * Any hits will be returned
+	 *
+	 * @param search the name of file to look for. 
+	 * @param lineNumber if this is greater than zero, then only files that contain this many lines will be returned
+	 */
+	std::vector<TagClass> CollectNearMatchFiles(const UnicodeString& search, int lineNumber);
+
+	/**
+	 * collect all of the methods that are aliased from all of the traits used by the given classes
+	 * @param classNames the names of the classes to search  in. these are the classes that use the
+	 *        traits
+	 * @param methodName if non-empty then only aliases that begin with this name will be returned
+	 */
+	std::vector<TagClass> CollectAllTraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName);
+
+	/**
+	 * @return all of the traits that any of the given classes use.
+	 */
+	std::vector<mvceditor::TraitTagClass> FindTraitsByClassName(const std::vector<std::string>& keyStarts);
 };
 
 }

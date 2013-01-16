@@ -115,10 +115,10 @@ public:
 		, DoFullyQualifiedMatchOnly(false)
 		, Error() {
 		wxString error;
-		if (!mvceditor::SqlScript(mvceditor::ResourceSqlSchemaAsset(), SessionGlobal, error)) {
+		if (!mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), SessionGlobal, error)) {
 			wxASSERT_MSG(false, error);
 		}
-		if (!mvceditor::SqlScript(mvceditor::ResourceSqlSchemaAsset(), Session1, error)) {
+		if (!mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), Session1, error)) {
 			wxASSERT_MSG(false, error);
 		}
 		TagParserGlobal.Init(&SessionGlobal);
@@ -329,7 +329,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithLocalFinderOverridesGlob
 
 	soci::session localSession(*soci::factory_sqlite3(), ":memory:");
 	wxString error;
-	if (!mvceditor::SqlScript(mvceditor::ResourceSqlSchemaAsset(), localSession, error)) {
+	if (!mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), localSession, error)) {
 		wxASSERT_MSG(false, error);
 	}
 

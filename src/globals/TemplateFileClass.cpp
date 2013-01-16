@@ -70,16 +70,10 @@ void mvceditor::TemplateFileTagClass::Init(const wxFileName& detectorDbFileName)
 	try {
 		Session.close();
 		std::string stdDbName = mvceditor::WxToChar(detectorDbFileName.GetFullPath());
+
+		// we should be able to open this since it has been created by
+		// the DetectorCacheDbVersionActionClass
 		Session.open(*soci::factory_sqlite3(), stdDbName);
-	
-		// open the SQL script that contains the table creation statements
-		// the script is "nice" it takes care to not create the tables if
-		// they already exist
-		wxFileName sqlScriptFileName = mvceditor::DetectorSqlSchemaAsset();
-		wxString error;
-		bool isOpened = mvceditor::SqlScript(sqlScriptFileName, Session, error);
-		wxUnusedVar(isOpened);
-		wxASSERT_MSG(isOpened, _("Cannot execute SQL script on ") + detectorDbFileName.GetFullPath());
 	} catch (std::exception& e) {
 		wxString msg = mvceditor::CharToWx(e.what());
 		wxUnusedVar(msg);

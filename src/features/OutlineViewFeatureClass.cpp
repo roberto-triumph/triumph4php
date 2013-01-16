@@ -110,7 +110,7 @@ void mvceditor::ResourceFinderBackgroundThreadClass::BackgroundWork() {
 			try {
 				soci::session session(*soci::factory_sqlite3(), ":memory:");
 				wxString error;
-				if (!mvceditor::SqlScript(mvceditor::ResourceSqlSchemaAsset(), session, error)) {
+				if (!mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), session, error)) {
 					wxASSERT_MSG(false, error);
 				}
 				tagParser.Init(&session);

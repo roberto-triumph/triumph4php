@@ -245,7 +245,7 @@ void ProfileResourceFinderOnLargeProject() {
 	try {
 		session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(DbFileName));
 		wxString error;
-		if (!mvceditor::SqlScript(mvceditor::ResourceSqlSchemaAsset(), session, error)) {
+		if (!mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), session, error)) {
 			wxASSERT_MSG(false, error);
 		}
 	} catch(std::exception const& e) {

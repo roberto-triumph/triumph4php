@@ -50,10 +50,16 @@ public:
 		, Session2()
 		, DetectorDbFileName2() {
 	
+		DetectorDbFileName1.Assign(TestProjectDir, wxT("detectors.sqlite"));
 		// create the test dir so that the sqlite file can be created
 		TouchTestDir();
-		DetectorDbFileName1.Assign(TestProjectDir, wxT("detectors.sqlite"));
-		CHECK(Finder.CreateAndAttachFile(DetectorDbFileName1, mvceditor::DetectorSqlSchemaAsset()));
+		wxString error;
+		Session1.open(*soci::factory_sqlite3(), mvceditor::WxToChar(DetectorDbFileName1.GetFullPath()));
+		CHECK(mvceditor::SqliteSqlScript(mvceditor::DetectorSqlSchemaAsset(), Session1, error));
+		
+		CHECK(Finder.AttachExistingFile(DetectorDbFileName1));
+
+		Session1.close();
 		Session1.open(*soci::factory_sqlite3(), mvceditor::WxToChar(DetectorDbFileName1.GetFullPath()));
 		AddToDb1("http://localhost/index.php", 
 			"/home/user/welcome.php", "WelcomeController", "index");
@@ -79,7 +85,11 @@ public:
 	}
 
 	void InitDb2() {
-		CHECK(Finder.CreateAndAttachFile(DetectorDbFileName2, mvceditor::DetectorSqlSchemaAsset()));
+		wxString error;
+		Session2.open(*soci::factory_sqlite3(), mvceditor::WxToChar(DetectorDbFileName2.GetFullPath()));
+		CHECK(mvceditor::SqliteSqlScript(mvceditor::DetectorSqlSchemaAsset(), Session2, error));
+		CHECK(Finder.AttachExistingFile(DetectorDbFileName2));
+		Session2.close();
 		Session2.open(*soci::factory_sqlite3(), mvceditor::WxToChar(DetectorDbFileName2.GetFullPath()));
 	}
 

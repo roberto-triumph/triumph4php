@@ -40,13 +40,14 @@ namespace mvceditor {
  *        as this projet stores string that are likely to have backslashes
  *        (ie. PHP namespace names, file names) in the database.
  */
-std::string SqlEscape(const std::string& value, char c);
+std::string SqliteSqlEscape(const std::string& value, char c);
 
 /**
  * Run multiple SQL statements that are located in fileName
- * using the given connection. Note that the database is not
- * cleared at all before this is run; so the sql statements
- * will error out if, for example this function is called
+ * using the given connection. Note that the database is completely
+ * cleared (all tables are deleted) before this is run and any info is lost;
+ * Tables are cleared so that the sql statements will never error out, 
+ * for example this function is called
  * with a CREATE TABLE statement of a database that already has
  * a table.
  *
@@ -61,7 +62,28 @@ std::string SqlEscape(const std::string& value, char c);
  *
  * Exceptions are never thrown.
  */
-bool SqlScript(const wxFileName& sqlScriptFileName, soci::session& session, wxString& error);
+bool SqliteSqlScript(const wxFileName& sqlScriptFileName, soci::session& session, wxString& error);
+
+/**
+ * Check the version number in the schem_version table.
+ * This function will never throw an exception. On SQL exception, this
+ * function will return 0 (an assert will be generated)
+ *
+ * @param session opened connection to detector db or tag db 
+ * @return int the number in the schema_version table
+ */
+int SqliteSchemaVersion(soci::session& session);
+
+/**
+ * @param sessionn opened connection
+ * @param [out] vector of table names that exist in the opened connection. will be pushed into.
+ * @param error will be filled in case of a db error.
+ * @return bool TRUE if there was no db error.
+ *
+ * This function will never throw an exception. On SQL exception, this
+ * function will return false (an assert will be generated)
+ */
+bool SqliteTables(soci::session& session, std::vector<std::string>& tableNames, wxString& error);
 
 /**
  * Class that holds connections to all attached databases. It will
@@ -99,7 +121,8 @@ public:
 	 *        run when the file is new (the CREATE TABLE statements)
 	 * @return bool TRUE if cache could be successfully opened / created
 	 */
-	bool CreateAndAttachFile(const wxFileName& fileName, const wxFileName& schemaFileName);
+	/// TODO: remove this method
+	//bool CreateAndAttachFile(const wxFileName& fileName, const wxFileName& schemaFileName);
 
 	/**
 	 * Closes the opened connections; but the backing databases are left intact.

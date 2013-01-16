@@ -167,6 +167,14 @@ void FileTestFixtureClass::TouchTestDir() {
 	}
 }
 
+wxFileName FileTestFixtureClass::AbsoluteDir(const wxString& dirName) {
+	wxFileName fileName;
+	fileName.AssignDir(TestProjectDir);
+	fileName.AppendDir(dirName);
+	return fileName;
+
+}
+
 std::ostream& operator<<(std::ostream& out, const wxString& s) {
 	out << s.ToAscii();
 	return out;	

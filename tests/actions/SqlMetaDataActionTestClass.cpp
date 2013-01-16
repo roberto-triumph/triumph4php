@@ -28,6 +28,9 @@
 #include <ActionTestFixtureClass.h>
 #include <DatabaseTestFixtureClass.h>
 #include <actions/SqlMetaDataActionClass.h>
+#include <globals/Assets.h>
+#include <soci/soci.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 
 static int ID_SQL_METADATA_FETCH = wxNewId();
 
@@ -37,14 +40,12 @@ public:
 
 	mvceditor::SqlMetaDataActionClass SqlMetaDataAction;
 	mvceditor::SqlResourceFinderClass Results;
-	mvceditor::GlobalsClass Globals;
 
 	SqlMetaDataActionTestFixtureClass()
 		: ActionTestFixtureClass()
 		, DatabaseTestFixtureClass("metadata_fetch") 
 		, SqlMetaDataAction(RunningThreads, ID_SQL_METADATA_FETCH) 
-		, Results() 
-		, Globals() {
+		, Results() {
 		mvceditor::DatabaseTagClass dbTag;
 		dbTag.Schema = UNICODE_STRING_SIMPLE("metadata_fetch");
 

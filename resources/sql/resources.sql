@@ -194,6 +194,15 @@ CREATE TABLE IF NOT EXISTS trait_resources (
 	instead_ofs TEXT
 );
 
+--
+-- MVC Editor will check the version number in this table and compare it against the
+-- version the code expects.  MVC Editor will recreate the database if the
+-- versions do not match
+--
+CREATE TABLE schema_version (
+	version_number INT NOT NULL
+);
+
 -- to enable fast lookups for file paths
 CREATE UNIQUE INDEX IF NOT EXISTS idxFullPath ON file_items(full_path);
 
@@ -206,3 +215,8 @@ CREATE INDEX IF NOT EXISTS idxResourceKey ON resources(key, type);
 -- Note that the key is not necessarily unique; 2 different files may declare the same
 -- class / methods / functions.
 CREATE INDEX IF NOT EXISTS idxTraitKey ON trait_resources(key);
+
+--
+-- This number must match the version in CacheDbVersionActionClass.cpp
+--
+INSERT INTO schema_version (version_number) VALUES(1);

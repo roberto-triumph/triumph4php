@@ -94,7 +94,13 @@ public:
 	 * This file will be invalid for new projects, until the MakeDbFileName() method gets called.
 	 *
 	 * The SQL schema for this cache can be found in resources/sql/resource.sql
+	 * Schema management will be done by TagCacheDbVersionClass. We will check the version
+	 * of the schema in the db against the schema the code expects and will re-create the schema
+	 * if the versions differ.  This check will be done at app start, so that in most of the code
+	 * we can assume that the schema is up-to-date.
+	 *
 	 * @see mvceditor::ParsedTagFinderClass
+	 * @see mvceditor::TagCacheDbVersionActionClass
 	 */
 	wxFileName ResourceDbFileName;
 
@@ -104,6 +110,12 @@ public:
 	 * This file will be invalid for new projects, until the MakeDbFileName() method gets called.
 	 *
 	 * The SQL schema for this cache can be found in resources/sql/detectors.sql
+	 * Schema management will be done by DetectorCacheDbVersionClass. We will check the version
+	 * of the schema in the db against the schema the code expects and will re-create the schema
+	 * if the versions differ.  This check will be done at app start, so that in most of the code
+	 * we can assume that the schema is up-to-date.
+	 *
+	 * @see mvceditor::DetectorCacheDbVersionClass
 	 */
 	wxFileName DetectorDbFileName;
 

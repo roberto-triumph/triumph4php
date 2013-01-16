@@ -109,11 +109,16 @@ void mvceditor::GlobalCacheClass::InitDetectorTag(const wxFileName& detectorDbFi
 void mvceditor::GlobalCacheClass::OpenAndCreateTables(const wxString& dbName, const wxFileName& schemaFileName) {
 	try {
 		std::string stdDbName = mvceditor::WxToChar(dbName);
+		
+		// we should be able to open this since it has been created by
+		// the TagCacheDbVersionActionClass
 		Session.open(*soci::factory_sqlite3(), stdDbName);
-		wxString error;
+		/// TODO: remove since we are created 
+		/*wxString error;
 		if (!mvceditor::SqlScript(schemaFileName, Session, error)) {
 			wxASSERT_MSG(false, error);
 		}
+		*/
 	} catch(std::exception const& e) {
 		Session.close();
 		wxString msg = mvceditor::CharToWx(e.what());
@@ -179,7 +184,7 @@ void mvceditor::WorkingCacheClass::OpenAndCreateTables() {
 	try {
 		Session.open(*soci::factory_sqlite3(), ":memory:");
 		wxString error;
-		if (!mvceditor::SqlScript(mvceditor::ResourceSqlSchemaAsset(), Session, error)) {
+		if (!mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), Session, error)) {
 			wxASSERT_MSG(false, error);
 		}
 	} catch(std::exception const& e) {

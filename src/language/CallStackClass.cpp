@@ -211,15 +211,14 @@ bool mvceditor::CallStackClass::Recurse(pelet::Versions version, mvceditor::Call
 }
 
 bool mvceditor::CallStackClass::Persist(wxFileName& fileName) {
-	wxFileName detectorSqlScript = mvceditor::DetectorSqlSchemaAsset();
 	wxString error;
 	std::string stdDbName = mvceditor::WxToChar(fileName.GetFullPath());
+
+	// we should be able to open this since it has been created by
+	// the DetectorCacheDbVersionActionClass
 	soci::session session(*soci::factory_sqlite3(), stdDbName);
 	bool good = false;
 	try {		
-		good = mvceditor::SqlScript(detectorSqlScript, session, error);
-		wxASSERT_MSG(good, wxT("failed to run sql script ") + detectorSqlScript.GetFullPath());
-		
 		int stepNumber = 0;
 		std::string stepType;
 		std::string expression;
@@ -238,6 +237,7 @@ bool mvceditor::CallStackClass::Persist(wxFileName& fileName) {
 			stepNumber++;
 		}
 		transaction.commit();
+		good = true;
 	} catch (std::exception& e) {
 		wxUnusedVar(e);
 		error = mvceditor::CharToWx(e.what());

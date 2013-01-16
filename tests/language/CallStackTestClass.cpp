@@ -27,6 +27,8 @@
 #include <FileTestFixtureClass.h>
 #include <language/CallStackClass.h>
 #include <globals/String.h>
+#include <globals/Sqlite.h>
+#include <globals/Assets.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 
@@ -77,6 +79,11 @@ public:
 
 	void BuildCache() {
 		ResourceDbFileName.Assign(TestProjectDir + wxT("resource_cache.db"));
+		soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(ResourceDbFileName.GetFullPath()));
+		wxString error;
+		mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), session, error);
+		session.close();
+
 		mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass;
 		globalCache->InitGlobalTag(ResourceDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 		
@@ -346,6 +353,10 @@ TEST_FIXTURE(CallStackFixtureTestClass, Persist) {
 	SetupFile(wxT("news.php"), Simple());
 	BuildCache();
 	wxFileName detectorDbFileName(TestProjectDir, wxT("detectors.db"));
+	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(detectorDbFileName.GetFullPath()));
+	wxString errorString;
+	mvceditor::SqliteSqlScript(mvceditor::DetectorSqlSchemaAsset(), session, errorString);
+	session.close();
 
 	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
@@ -357,7 +368,8 @@ TEST_FIXTURE(CallStackFixtureTestClass, Persist) {
 	CHECK_EQUAL((size_t)7, CallStack.List.size());
 
 	// now check the sqlite db contents
-	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(detectorDbFileName.GetFullPath()));
+	session.close();
+	session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(detectorDbFileName.GetFullPath()));
 	int stepNumber;
 	std::string type;
 	std::string expression;

@@ -28,6 +28,10 @@
 #include <FileTestFixtureClass.h>
 #include <unicode/ustream.h> //get the << overloaded operator, needed by UnitTest++
 #include <MvcEditorChecks.h>
+#include <globals/Assets.h>
+#include <globals/Sqlite.h>
+#include <soci/soci.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 
 /**
  * fixture that holds the object under test for 
@@ -62,6 +66,10 @@ public:
 			wxMkdir(TestProjectDir, 0777);
 		}
 		TagDbFileName.Assign(TestProjectDir + wxT("resource_cache.db"));
+
+		soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(TagDbFileName.GetFullPath()));
+		wxString error;
+		mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), session, error);
 	}
 
 	void CollectNearMatchResourcesFromAll(const UnicodeString& search) {
@@ -163,6 +171,10 @@ public:
 	}
 
 	mvceditor::GlobalCacheClass* CreateGlobalCache(const wxString& srcDirectory) {
+		soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(TagDbFileName.GetFullPath()));
+		wxString errorString;
+		mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), session, errorString);
+
 		mvceditor::GlobalCacheClass* cache = new mvceditor::GlobalCacheClass();
 		cache->InitGlobalTag(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 
@@ -174,6 +186,10 @@ public:
 	}
 
 	mvceditor::GlobalCacheClass* CreateGlobalCache(const wxFileName& resourceDbFile, const wxString& srcDirectory) {
+		soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(resourceDbFile.GetFullPath()));
+		wxString errorString;
+		mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), session, errorString);
+
 		mvceditor::GlobalCacheClass* cache = new mvceditor::GlobalCacheClass();
 		cache->InitGlobalTag(resourceDbFile, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 

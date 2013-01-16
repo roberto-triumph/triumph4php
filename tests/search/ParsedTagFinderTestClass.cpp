@@ -53,7 +53,7 @@ public:
 		, TestFile(wxT("test.php")) {
 		Session.open(*soci::factory_sqlite3(), ":memory:");
 		wxString error;
-		if (!mvceditor::SqlScript(mvceditor::ResourceSqlSchemaAsset(), Session, error)) {
+		if (!mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), Session, error)) {
 			wxASSERT_MSG(false, error);
 		}
 		TagParser.Init(&Session);
@@ -100,7 +100,7 @@ public:
 		, Matches() {
 		Session.open(*soci::factory_sqlite3(), ":memory:");
 		wxString error;
-		if (!mvceditor::SqlScript(mvceditor::ResourceSqlSchemaAsset(), Session, error)) {
+		if (!mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), Session, error)) {
 			wxASSERT_MSG(false, error);
 		}
 		TagParser.PhpFileExtensions.push_back(wxT("*.php"));

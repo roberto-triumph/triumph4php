@@ -48,7 +48,7 @@ void mvceditor::ConfigFilesFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 	// the detected config files
 }
 
-void mvceditor::ConfigFilesFeatureClass::OnAppReady(wxCommandEvent& event) {
+void mvceditor::ConfigFilesFeatureClass::OnConfigDetectorComplete(wxCommandEvent& event) {
 	RebuildMenu();
 }
 
@@ -64,11 +64,13 @@ void mvceditor::ConfigFilesFeatureClass::RebuildMenu() {
 			ConfigPair pair;
 			pair.ProjectLabel = project->Label;
 			mvceditor::ConfigTagFinderClass finder;
-			finder.AttachExistingFile(project->DetectorDbFileName);
-			pair.ConfigTags = finder.All();
-			if (!pair.ConfigTags.empty()) {
-				ConfigTags.insert(ConfigTags.end(), pair.ConfigTags.begin(), pair.ConfigTags.end());
-				ConfigPairs.push_back(pair);
+			if (project->DetectorDbFileName.IsOk()) {
+				finder.AttachExistingFile(project->DetectorDbFileName);
+				pair.ConfigTags = finder.All();
+				if (!pair.ConfigTags.empty()) {
+					ConfigTags.insert(ConfigTags.end(), pair.ConfigTags.begin(), pair.ConfigTags.end());
+					ConfigPairs.push_back(pair);
+				}
 			}
 		}
 	}
@@ -115,5 +117,5 @@ void mvceditor::ConfigFilesFeatureClass::OnConfigMenuItem(wxCommandEvent& event)
 BEGIN_EVENT_TABLE(mvceditor::ConfigFilesFeatureClass, mvceditor::FeatureClass) 
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_CONFIG_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ConfigFilesFeatureClass::OnConfigFilesDetected)
 	EVT_MENU_RANGE(mvceditor::CONFIG_DETECTORS, mvceditor::CONFIG_DETECTORS + MAX_CONFIG_MENU_ITEMS, mvceditor::ConfigFilesFeatureClass::OnConfigMenuItem)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::ConfigFilesFeatureClass::OnAppReady)
+	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_CONFIG_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ConfigFilesFeatureClass::OnConfigDetectorComplete)
 END_EVENT_TABLE()

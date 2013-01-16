@@ -40,7 +40,7 @@ void mvceditor::UrlResourceFinderInitActionClass::Work(mvceditor::GlobalsClass& 
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
 		if (project->IsEnabled) {
-			globals.UrlResourceFinder.CreateAndAttachFile(project->DetectorDbFileName, mvceditor::DetectorSqlSchemaAsset());
+			globals.UrlResourceFinder.AttachExistingFile(project->DetectorDbFileName);
 		}
 	}
 }

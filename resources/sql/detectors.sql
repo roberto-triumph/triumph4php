@@ -277,9 +277,21 @@ CREATE TABLE IF NOT EXISTS config_tags (
 	full_path TEXT NOT NULL COLLATE NOCASE
 );
 
+--
+-- MVC Editor will check the version number in this table and compare it against the
+-- version the code expects.  MVC Editor will recreate the database if the
+-- versions do not match
+--
+CREATE TABLE schema_version (
+	version_number INT NOT NULL
+);
 
 -- to enable fast lookups for detected tags.
 -- Note that the key is not necessarily unique; 2 different files may declare the same
 -- class / methods / functions.
 CREATE INDEX IF NOT EXISTS idxDetectedTagKey ON detected_tags(key, type);
 
+--
+-- This number must match the version in CacheDbVersionActionClass.cpp
+--
+INSERT INTO schema_version (version_number) VALUES(1);

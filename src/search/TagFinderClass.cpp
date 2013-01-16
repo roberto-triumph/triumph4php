@@ -26,6 +26,7 @@
 #include <search/FinderClass.h>
 #include <globals/String.h>
 #include <globals/Sqlite.h>
+#include <globals/Errors.h>
 #include <wx/filename.h>
 #include <algorithm>
 #include <fstream>
@@ -269,51 +270,6 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchReso
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchFiles(const UnicodeString& search, int lineNumber) {
-	wxString path,
-		currentFileName,
-		extension;
-	std::vector<mvceditor::TagClass> matches;
-	std::string query = mvceditor::IcuToChar(search);
-
-	// add the SQL wildcards
-	std::string escaped = SqlEscape(query, '^');
-	query = "'%" + escaped + "%'";
-	std::string match;
-	int fileTagId;
-	int isNew;
-	try {
-		soci::statement stmt = (Session->prepare << 
-			"SELECT full_path, file_item_id, is_new FROM file_items WHERE full_path LIKE " + query + " ESCAPE '^'",
-			soci::into(match), soci::into(fileTagId), soci::into(isNew));
-		if (stmt.execute(true)) {
-			do {
-				wxString fullPath = mvceditor::CharToWx(match.c_str());
-				wxFileName::SplitPath(fullPath, &path, &currentFileName, &extension);
-				currentFileName += wxT(".") + extension;
-				wxString fileName = mvceditor::IcuToWx(search);
-				fileName = fileName.Lower();
-				if (wxNOT_FOUND != currentFileName.Lower().Find(fileName)) {
-					if (0 == lineNumber || GetLineCountFromFile(fullPath) >= lineNumber) {
-						TagClass newTag;
-						newTag.FileTagId = fileTagId;
-						newTag.Identifier = mvceditor::WxToIcu(currentFileName);
-						newTag.SetFullPath(fullPath);
-						newTag.FileIsNew = isNew > 0;
-						matches.push_back(newTag);
-					}
-				}
-			} while (stmt.fetch());
-		}
-	} catch (std::exception& e) {
-		
-		// ATTN: at some point bubble these exceptions up?
-		// to avoid unreferenced local variable warnings in MSVC
-		e.what();
-	}
-	return matches;
-}
-
 std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchNonMembers(const mvceditor::TagSearchClass& tagSearch) {
 	std::string key = mvceditor::IcuToChar(tagSearch.GetClassName());
 	std::vector<int> types;
@@ -401,38 +357,6 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectAllMembers(co
 		keyStarts.push_back(keyStart);
 	}
 	matches = FindByKeyStartMany(keyStarts, true);
-	return matches;
-}
-
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectAllTraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName) {
-	std::vector<mvceditor::TagClass> matches;
-
-	std::vector<std::string> classNamesToLookFor;
-	for (std::vector<UnicodeString>::const_iterator it = classNames.begin(); it != classNames.end(); ++it) {
-		classNamesToLookFor.push_back(mvceditor::IcuToChar(*it));
-	}
-
-	// TODO use the correct namespace when querying for traits
-	std::vector<mvceditor::TraitTagClass> traits = FindTraitsByClassName(classNamesToLookFor);
-	
-	// now go through the result and add the method names of any aliased methods
-	UnicodeString lowerMethodName(methodName);
-	lowerMethodName.toLower();
-	for (size_t i = 0; i < traits.size(); i++) {
-		std::vector<UnicodeString> aliases = traits[i].Aliased;
-		for (size_t a = 0; a < aliases.size(); a++) {
-			UnicodeString alias(aliases[a]);
-			UnicodeString lowerAlias(alias);
-			lowerAlias.toLower();
-			bool useAlias = methodName.isEmpty() || lowerMethodName.indexOf(lowerAlias) == 0;
-			if (useAlias) {
-				mvceditor::TagClass res;
-				res.ClassName = traits[i].TraitClassName;
-				res.Identifier = alias;
-				matches.push_back(res);
-			}
-		}
-	}
 	return matches;
 }
 
@@ -639,10 +563,9 @@ bool mvceditor::TagFinderClass::IsFileCacheEmpty() {
 	try {
 		Session->once << "SELECT COUNT(*) FROM file_items;", soci::into(count);
 	} catch (std::exception& e) {
-			
-		// ATTN: at some point bubble these exceptions up?
-		// to avoid unreferenced local variable warnings in MSVC
-		e.what();
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxUnusedVar(msg);
+		wxASSERT_MSG(false, msg);
 	}
 	return count <= 0;
 }
@@ -657,10 +580,9 @@ bool mvceditor::TagFinderClass::IsResourceCacheEmpty() {
 	try {
 		Session->once << "SELECT COUNT(*) FROM resources WHERE is_native = 0;", soci::into(count);
 	} catch (std::exception& e) {
-		
-		// ATTN: at some point bubble these exceptions up?
-		// to avoid unreferenced local variable warnings in MSVC
-		e.what();
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxUnusedVar(msg);
+		wxASSERT_MSG(false, msg);
 	}
 	return count <= 0;
 }
@@ -690,10 +612,9 @@ bool mvceditor::TagFinderClass::FindFileTagByFullPathExact(const wxString& fullP
 			fileTag.IsParsed = isParsed != 0;
 		}
 	} catch (std::exception& e) {
-			
-		// ATTN: at some point bubble these exceptions up?
-		// to avoid unreferenced local variable warnings in MSVC
-		e.what();
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxUnusedVar(msg);
+		wxASSERT_MSG(false, msg);
 	}
 	return foundFile;
 }
@@ -721,14 +642,14 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::FindByKeyExactAndTyp
 }
 
 std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::FindByKeyStart(const std::string& keyStart, bool doLimit) {
-	std::string escaped = SqlEscape(keyStart, '^');
+	std::string escaped = mvceditor::SqliteSqlEscape(keyStart, '^');
 	std::string whereCond = "key LIKE '" + escaped + "%' ESCAPE '^' ";
 	return ResourceStatementMatches(whereCond, doLimit);
 }
 
 std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::FindByKeyStartAndTypes(const std::string& keyStart, const std::vector<int>& types, bool doLimit) {
 	std::ostringstream stream;
-	std::string escaped = SqlEscape(keyStart, '^');
+	std::string escaped = mvceditor::SqliteSqlEscape(keyStart, '^');
 	stream << "key LIKE '" << escaped << "%' ESCAPE '^' AND type IN(";
 	for (size_t i = 0; i < types.size(); ++i) {
 		stream << types[i];
@@ -745,11 +666,11 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::FindByKeyStartMany(c
 		std::vector<mvceditor::TagClass> matches;
 		return matches;
 	}
-	std::string escaped = SqlEscape(keyStarts[0], '^');
+	std::string escaped = mvceditor::SqliteSqlEscape(keyStarts[0], '^');
 	std::ostringstream stream;
 	stream << "key LIKE '" << escaped << "%' ESCAPE '^' ";
 	for (size_t i = 1; i < keyStarts.size(); ++i) {
-		escaped = SqlEscape(keyStarts[i], '^');
+		escaped = mvceditor::SqliteSqlEscape(keyStarts[i], '^');
 		stream << " OR key LIKE '" << escaped << "%' ESCAPE '^' ";
 	}
 	return ResourceStatementMatches(stream.str(), true);
@@ -778,7 +699,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::FindByIdentifierStar
 
 	// do not get fully qualified resources
 	// make sure to use the key because it is indexed
-	std::string escaped = SqlEscape(identifierStart, '^');
+	std::string escaped = mvceditor::SqliteSqlEscape(identifierStart, '^');
 	stream << "key LIKE '" << escaped << "%' ESCAPE '^' AND identifier = key AND type IN(";
 	for (size_t i = 0; i < types.size(); ++i) {
 		stream << types[i];
@@ -813,73 +734,6 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::All() {
 	return all;
 }
 
-std::vector<mvceditor::TraitTagClass> mvceditor::TagFinderClass::FindTraitsByClassName(const std::vector<std::string>& keyStarts) {
-	std::string join = "";
-	for (size_t i = 0; i < keyStarts.size(); ++i) {
-		join += "'";
-		join += keyStarts[i];
-		join += "'";
-		if (i < (keyStarts.size() - 1)) {
-			join += ",";
-		}
-	}
-	
-	std::string sql = "SELECT key, class_name, namespace_name, trait_name, trait_namespace_name, aliases, instead_ofs ";
-	sql += "FROM trait_resources WHERE key IN(" + join + ")";
-	std::string key;
-	std::string className;
-	std::string namespaceName;
-	std::string traitClassName;
-	std::string traitNamespaceName;
-	std::string aliases;
-	std::string insteadOfs;
-	std::vector<mvceditor::TraitTagClass> matches;
-	try {
-		soci::statement stmt = (Session->prepare << sql,
-			soci::into(key), soci::into(className), soci::into(namespaceName), soci::into(traitClassName),
-			soci::into(traitNamespaceName), soci::into(aliases), soci::into(insteadOfs)
-		);
-		if (stmt.execute(true)) {
-			do {
-				mvceditor::TraitTagClass trait;
-				trait.Key = mvceditor::CharToIcu(key.c_str());
-				trait.ClassName = mvceditor::CharToIcu(className.c_str());
-				trait.NamespaceName = mvceditor::CharToIcu(namespaceName.c_str());
-				trait.TraitClassName = mvceditor::CharToIcu(traitClassName.c_str());
-				trait.TraitNamespaceName = mvceditor::CharToIcu(traitNamespaceName.c_str());
-				
-				size_t start = 0;
-				size_t found = aliases.find_first_of(",");
-				while (found != std::string::npos) {
-					trait.Aliased.push_back(mvceditor::CharToIcu(aliases.substr(start, found).c_str()));	
-					start = found++;
-				}
-				if (!aliases.empty()) {
-					trait.Aliased.push_back(mvceditor::CharToIcu(aliases.substr(start, found).c_str()));
-				}
-
-				start = 0;
-				found = insteadOfs.find_first_of(",");
-				while (found != std::string::npos) {
-					trait.InsteadOfs.push_back(mvceditor::CharToIcu(insteadOfs.substr(start, found).c_str()));	
-					start = found++;
-				}
-				if (!insteadOfs.empty()) {
-					trait.InsteadOfs.push_back(mvceditor::CharToIcu(insteadOfs.substr(start, found).c_str()));
-				}
-
-				matches.push_back(trait);
-			} while (stmt.fetch());
-		}
-	} catch (std::exception& e) {
-			
-		// ATTN: at some point bubble these exceptions up?
-		// to avoid unreferenced local variable warnings in MSVC
-		e.what();
-	}
-	return matches;
-}
-
 mvceditor::ParsedTagFinderClass::ParsedTagFinderClass()
 	: TagFinderClass() {
 
@@ -891,8 +745,6 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::AllNonNativeCl
 	std::vector<mvceditor::TagClass> all = ResourceStatementMatches(stream.str(), false);
 	return all;
 }
-
-
 
 std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ResourceStatementMatches(std::string whereCond, bool doLimit) {
 	std::string sql;
@@ -968,13 +820,156 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ResourceStatem
 			} while (stmt.fetch());
 		}
 	} catch (std::exception& e) {
-			
-		// ATTN: at some point bubble these exceptions up?
-		// to avoid unreferenced local variable warnings in MSVC
-		e.what();
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxUnusedVar(msg);
+		wxASSERT_MSG(false, msg);
 	}
 	return matches;
 }
+
+std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::CollectNearMatchFiles(const UnicodeString& search, int lineNumber) {
+	wxString path,
+		currentFileName,
+		extension;
+	std::vector<mvceditor::TagClass> matches;
+	std::string query = mvceditor::IcuToChar(search);
+
+	// add the SQL wildcards
+	std::string escaped = mvceditor::SqliteSqlEscape(query, '^');
+	query = "'%" + escaped + "%'";
+	std::string match;
+	int fileTagId;
+	int isNew;
+	try {
+		soci::statement stmt = (Session->prepare << 
+			"SELECT full_path, file_item_id, is_new FROM file_items WHERE full_path LIKE " + query + " ESCAPE '^'",
+			soci::into(match), soci::into(fileTagId), soci::into(isNew));
+		if (stmt.execute(true)) {
+			do {
+				wxString fullPath = mvceditor::CharToWx(match.c_str());
+				wxFileName::SplitPath(fullPath, &path, &currentFileName, &extension);
+				currentFileName += wxT(".") + extension;
+				wxString fileName = mvceditor::IcuToWx(search);
+				fileName = fileName.Lower();
+				if (wxNOT_FOUND != currentFileName.Lower().Find(fileName)) {
+					if (0 == lineNumber || GetLineCountFromFile(fullPath) >= lineNumber) {
+						TagClass newTag;
+						newTag.FileTagId = fileTagId;
+						newTag.Identifier = mvceditor::WxToIcu(currentFileName);
+						newTag.SetFullPath(fullPath);
+						newTag.FileIsNew = isNew > 0;
+						matches.push_back(newTag);
+					}
+				}
+			} while (stmt.fetch());
+		}
+	} catch (std::exception& e) {
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxUnusedVar(msg);
+		wxASSERT_MSG(false, msg);
+	}
+	return matches;
+}
+
+std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::CollectAllTraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName) {
+	std::vector<mvceditor::TagClass> matches;
+
+	std::vector<std::string> classNamesToLookFor;
+	for (std::vector<UnicodeString>::const_iterator it = classNames.begin(); it != classNames.end(); ++it) {
+		classNamesToLookFor.push_back(mvceditor::IcuToChar(*it));
+	}
+
+	// TODO use the correct namespace when querying for traits
+	std::vector<mvceditor::TraitTagClass> traits = FindTraitsByClassName(classNamesToLookFor);
+	
+	// now go through the result and add the method names of any aliased methods
+	UnicodeString lowerMethodName(methodName);
+	lowerMethodName.toLower();
+	for (size_t i = 0; i < traits.size(); i++) {
+		std::vector<UnicodeString> aliases = traits[i].Aliased;
+		for (size_t a = 0; a < aliases.size(); a++) {
+			UnicodeString alias(aliases[a]);
+			UnicodeString lowerAlias(alias);
+			lowerAlias.toLower();
+			bool useAlias = methodName.isEmpty() || lowerMethodName.indexOf(lowerAlias) == 0;
+			if (useAlias) {
+				mvceditor::TagClass res;
+				res.ClassName = traits[i].TraitClassName;
+				res.Identifier = alias;
+				matches.push_back(res);
+			}
+		}
+	}
+	return matches;
+}
+
+std::vector<mvceditor::TraitTagClass> mvceditor::ParsedTagFinderClass::FindTraitsByClassName(const std::vector<std::string>& keyStarts) {
+	std::string join = "";
+	for (size_t i = 0; i < keyStarts.size(); ++i) {
+		join += "'";
+		join += keyStarts[i];
+		join += "'";
+		if (i < (keyStarts.size() - 1)) {
+			join += ",";
+		}
+	}
+	
+	std::string sql = "SELECT key, class_name, namespace_name, trait_name, trait_namespace_name, aliases, instead_ofs ";
+	sql += "FROM trait_resources WHERE key IN(" + join + ")";
+	std::string key;
+	std::string className;
+	std::string namespaceName;
+	std::string traitClassName;
+	std::string traitNamespaceName;
+	std::string aliases;
+	std::string insteadOfs;
+	std::vector<mvceditor::TraitTagClass> matches;
+	try {
+		soci::statement stmt = (Session->prepare << sql,
+			soci::into(key), soci::into(className), soci::into(namespaceName), soci::into(traitClassName),
+			soci::into(traitNamespaceName), soci::into(aliases), soci::into(insteadOfs)
+		);
+		if (stmt.execute(true)) {
+			do {
+				mvceditor::TraitTagClass trait;
+				trait.Key = mvceditor::CharToIcu(key.c_str());
+				trait.ClassName = mvceditor::CharToIcu(className.c_str());
+				trait.NamespaceName = mvceditor::CharToIcu(namespaceName.c_str());
+				trait.TraitClassName = mvceditor::CharToIcu(traitClassName.c_str());
+				trait.TraitNamespaceName = mvceditor::CharToIcu(traitNamespaceName.c_str());
+				
+				size_t start = 0;
+				size_t found = aliases.find_first_of(",");
+				while (found != std::string::npos) {
+					trait.Aliased.push_back(mvceditor::CharToIcu(aliases.substr(start, found).c_str()));	
+					start = found++;
+				}
+				if (!aliases.empty()) {
+					trait.Aliased.push_back(mvceditor::CharToIcu(aliases.substr(start, found).c_str()));
+				}
+
+				start = 0;
+				found = insteadOfs.find_first_of(",");
+				while (found != std::string::npos) {
+					trait.InsteadOfs.push_back(mvceditor::CharToIcu(insteadOfs.substr(start, found).c_str()));	
+					start = found++;
+				}
+				if (!insteadOfs.empty()) {
+					trait.InsteadOfs.push_back(mvceditor::CharToIcu(insteadOfs.substr(start, found).c_str()));
+				}
+
+				matches.push_back(trait);
+			} while (stmt.fetch());
+		}
+	} catch (std::exception& e) {
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxUnusedVar(msg);
+		wxASSERT_MSG(false, msg);
+	}
+	return matches;
+}
+
+
 
 mvceditor::DetectedTagFinderClass::DetectedTagFinderClass()
 	: TagFinderClass() {
@@ -1034,10 +1029,30 @@ std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::ResourceStat
 			} while (stmt.fetch());
 		}
 	} catch (std::exception& e) {
-			
-		// ATTN: at some point bubble these exceptions up?
-		// to avoid unreferenced local variable warnings in MSVC
-		e.what();
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxUnusedVar(msg);
+		wxASSERT_MSG(false, msg);
 	}
+	return matches;
+}
+
+std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::CollectNearMatchFiles(const UnicodeString& search, int lineNumber) {
+	
+	// detector db does not have  a file_items table
+	std::vector<mvceditor::TagClass> matches;
+	return matches;
+}
+
+std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::CollectAllTraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName) {
+	
+	// detector db does not have  a trait_resources table
+	std::vector<mvceditor::TagClass> matches;
+	return matches;
+}
+
+std::vector<mvceditor::TraitTagClass> mvceditor::DetectedTagFinderClass::FindTraitsByClassName(const std::vector<std::string>& keyStarts) {
+	
+	// detector db does not have  a trait_resources table
+	std::vector<mvceditor::TraitTagClass> matches;
 	return matches;
 }

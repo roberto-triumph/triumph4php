@@ -28,7 +28,10 @@
 #include <FileTestFixtureClass.h>
 #include <actions/ProjectTagActionClass.h>
 #include <language/TagCacheClass.h>
+#include <globals/Assets.h>
 #include <wx/event.h>
+#include <soci/soci.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 
 static int ID_EVENT = wxNewId();
 
@@ -42,20 +45,11 @@ class ProjectTagActionTestClass : public ActionTestFixtureClass, public FileTest
 
 public:
 
-	
 	/**
 	 * the object under test. we will assert that the object generates
 	 * events.
 	 */
 	mvceditor::ProjectTagActionClass ProjectTagAction;
-
-	/**
-	 * Create projects to be scanned
-	 */
-	mvceditor::ProjectClass Project1, 
-							Project2;
-
-	mvceditor::GlobalsClass Globals;
 	
 	/**
 	 * the results to check; these pointers com from the
@@ -68,19 +62,11 @@ public:
 		: ActionTestFixtureClass()
 		, FileTestFixtureClass(wxT("resource_file_reader"))
 		, ProjectTagAction(RunningThreads, ID_EVENT) 
-		, Project1()
-		, Project2()
-		, Globals()
-		, GlobalCaches() {		
-		CreateSubDirectory(wxT("src_project_1"));
-		CreateSubDirectory(wxT("src_project_2"));
-
-		// set the project to the src directory
-		AddSourceDir(Project1, wxT("src_project_1"));
-		Project1.PhpFileExtensions.push_back(wxT("*.php"));
-
-		AddSourceDir(Project2, wxT("src_project_2"));
-		Project2.PhpFileExtensions.push_back(wxT("*.php"));
+		, GlobalCaches() {
+		CreateProject(AbsoluteDir(wxT("src_project_1")), TestProjectDir);
+		soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.Projects[0].ResourceDbFileName.GetFullPath()));
+		wxString error;
+		mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), session, error);
 	}
 
 	~ProjectTagActionTestClass() {
@@ -88,13 +74,6 @@ public:
 		for (cache = GlobalCaches.begin(); cache != GlobalCaches.end(); ++cache) {
 			delete (*cache);
 		}
-	}
-
-	void AddSourceDir(mvceditor::ProjectClass& project, const wxString& dir) {
-		mvceditor::SourceClass srcProject;
-		srcProject.RootDirectory.AssignDir(TestProjectDir);
-		srcProject.RootDirectory.AppendDir(dir);
-		project.AddSource(srcProject);
 	}
 
 	void OnGlobalCacheComplete(mvceditor::GlobalCacheCompleteEventClass& event) {
@@ -116,13 +95,10 @@ TEST_FIXTURE(ProjectTagActionTestClass, InitProject) {
 
 	wxString srcFile;
 	MAKE_FILENAME(srcFile, wxT("src_project_1"), wxT("User.php"));
+	CreateSubDirectory(wxT("src_project_1"));
 
 	wxString contents = wxT("<?php class User {}");
-	Project1.Label = wxT("test project");
 	CreateFixtureFile(srcFile, contents);
-
-	Project1.ResourceDbFileName.Assign(TestProjectDir, wxT("cache_project_1.db"));
-	Globals.Projects.push_back(Project1);
 
 	CHECK(ProjectTagAction.Init(Globals));
 
@@ -138,21 +114,23 @@ TEST_FIXTURE(ProjectTagActionTestClass, InitMultipleProjects) {
 	// test that when we intialize 2 project we get 2
 	// global cache pointers
 
+	CreateSubDirectory(wxT("src_project_1"));
 	wxString srcFileProject1;
 	MAKE_FILENAME(srcFileProject1, wxT("src_project_1"), wxT("User.php"));
 	wxString contents = wxT("<?php class User {}");
-	Project1.Label = wxT("test project 1");
 	CreateFixtureFile(srcFileProject1, contents);
-	Project1.ResourceDbFileName.Assign(TestProjectDir, wxT("cache_project_1.db"));
 
+	CreateProject(AbsoluteDir(wxT("src_project_2")), TestProjectDir);
+	CreateSubDirectory(wxT("src_project_2"));
 	wxString srcFileProject2;
 	MAKE_FILENAME(srcFileProject2, wxT("src_project_2"), wxT("Role.php"));
 	contents = wxT("<?php class Role {}");
-	Project2.Label = wxT("test project 2");
 	CreateFixtureFile(srcFileProject2, contents);
-	Project2.ResourceDbFileName.Assign(TestProjectDir, wxT("cache_project_2.db"));
-	Globals.Projects.push_back(Project1);
-	Globals.Projects.push_back(Project2);
+	soci::session session;
+	session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.Projects[1].ResourceDbFileName.GetFullPath()));
+	wxString error;
+	mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), session, error);
+
 
 	CHECK(ProjectTagAction.Init(Globals));
 

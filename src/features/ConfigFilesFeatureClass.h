@@ -77,10 +77,10 @@ private:
 	void RebuildMenu();
 
 	/**
-	 * when the app has been loaded completely, load all of the
+	 * when the config detector has completed, load all of the
 	 * projects' config files and build the menu.
 	 */
-	void OnAppReady(wxCommandEvent& event);
+	void OnConfigDetectorComplete(wxCommandEvent& event);
 
 	/**
 	 * when the config detectors have finished running, load all of the
