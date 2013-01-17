@@ -62,11 +62,13 @@ void mvceditor::TemplateFileClass::Init(const wxString& fullPath, const std::vec
 }
 
 mvceditor::TemplateFileTagClass::TemplateFileTagClass()
-: Session() {
+	: Session() 
+	, IsInitialized(false) {
 
 }
 
 void mvceditor::TemplateFileTagClass::Init(const wxFileName& detectorDbFileName) {
+	IsInitialized = false;
 	try {
 		Session.close();
 		std::string stdDbName = mvceditor::WxToChar(detectorDbFileName.GetFullPath());
@@ -74,6 +76,7 @@ void mvceditor::TemplateFileTagClass::Init(const wxFileName& detectorDbFileName)
 		// we should be able to open this since it has been created by
 		// the DetectorCacheDbVersionActionClass
 		Session.open(*soci::factory_sqlite3(), stdDbName);
+		IsInitialized = true;
 	} catch (std::exception& e) {
 		wxString msg = mvceditor::CharToWx(e.what());
 		wxUnusedVar(msg);
@@ -83,6 +86,10 @@ void mvceditor::TemplateFileTagClass::Init(const wxFileName& detectorDbFileName)
 
 std::vector<mvceditor::TemplateFileClass> mvceditor::TemplateFileTagClass::All() {
 	std::vector<mvceditor::TemplateFileClass> templates;
+	if (!IsInitialized) {
+		return templates;
+	}
+	
 	std::string fullPath, 
 				variables;
 	soci::statement stmt = (Session.prepare <<

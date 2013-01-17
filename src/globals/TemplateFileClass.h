@@ -88,6 +88,8 @@ public:
 private:
 
 	soci::session Session;
+
+	bool IsInitialized;
 };
 
 }
