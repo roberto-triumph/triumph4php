@@ -68,17 +68,131 @@ wxFileName mvceditor::AutoCompleteImageAsset(wxString imageName) {
 	return fileName;
 }
 
-wxFileName mvceditor::PhpDetectorsAsset() {
+wxFileName mvceditor::PhpDetectorsBaseAsset() {
 	wxStandardPaths paths;
 	wxFileName pathExecutableFileName(paths.GetExecutablePath());
-	wxString scriptFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
+	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
+		wxT("..") + wxFileName::GetPathSeparator() +
+		wxT("php_detectors");
+	wxFileName scriptsFileName;
+	scriptsFileName.AssignDir(scriptsFullPath);
+	scriptsFileName.Normalize();
+	return scriptsFileName;
+}
+
+wxFileName mvceditor::UrlDetectorsGlobalAsset() {
+	wxStandardPaths paths;
+	wxFileName pathExecutableFileName(paths.GetExecutablePath());
+	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
 		wxT("..") + wxFileName::GetPathSeparator() +
 		wxT("php_detectors") + wxFileName::GetPathSeparator() +
-		wxT("src") + wxFileName::GetPathSeparator() +
-		wxT("MvcEditorFrameworkApp.php");
-	wxFileName scriptFileName(scriptFullPath);
-	scriptFileName.Normalize();
-	return scriptFileName;
+		wxT("url_detectors");
+	wxFileName scriptsFileName;
+	scriptsFileName.AssignDir(scriptsFullPath);
+	scriptsFileName.Normalize();
+	return scriptsFileName;
+}
+
+wxFileName mvceditor::UrlDetectorsLocalAsset() {
+	wxStandardPaths paths;
+	wxFileName configDir = mvceditor::ConfigDirAsset();
+	configDir.AppendDir(wxT("url_detectors"));
+	if (!configDir.DirExists()) {
+		wxMkdir(configDir.GetPath(), 0777);
+	}
+	return configDir;
+}
+
+wxFileName mvceditor::TemplateFilesDetectorsGlobalAsset() {
+	wxStandardPaths paths;
+	wxFileName pathExecutableFileName(paths.GetExecutablePath());
+	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
+		wxT("..") + wxFileName::GetPathSeparator() +
+		wxT("php_detectors") + wxFileName::GetPathSeparator() +
+		wxT("template_files_detectors");
+	wxFileName scriptsFileName;
+	scriptsFileName.AssignDir(scriptsFullPath);
+	scriptsFileName.Normalize();
+	return scriptsFileName;
+}
+
+wxFileName mvceditor::TemplateFilesDetectorsLocalAsset() {
+	wxStandardPaths paths;
+	wxFileName configDir = mvceditor::ConfigDirAsset();
+	configDir.AppendDir(wxT("template_files_detectors"));
+	if (!configDir.DirExists()) {
+		wxMkdir(configDir.GetPath(), 0777);
+	}
+	return configDir;
+}
+
+wxFileName mvceditor::TagDetectorsLocalAsset() {
+	wxStandardPaths paths;
+	wxFileName configDir = mvceditor::ConfigDirAsset();
+	configDir.AppendDir(wxT("tag_detectors"));
+	if (!configDir.DirExists()) {
+		wxMkdir(configDir.GetPath(), 0777);
+	}
+	return configDir;
+}
+
+wxFileName mvceditor::TagDetectorsGlobalAsset() {
+	wxStandardPaths paths;
+	wxFileName pathExecutableFileName(paths.GetExecutablePath());
+	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
+		wxT("..") + wxFileName::GetPathSeparator() +
+		wxT("php_detectors") + wxFileName::GetPathSeparator() +
+		wxT("tag_detectors");
+	wxFileName scriptsFileName;
+	scriptsFileName.AssignDir(scriptsFullPath);
+	scriptsFileName.Normalize();
+	return scriptsFileName;
+}
+
+wxFileName mvceditor::DatabaseDetectorsLocalAsset() {
+	wxStandardPaths paths;
+	wxFileName configDir = mvceditor::ConfigDirAsset();
+	configDir.AppendDir(wxT("database_detectors"));
+	if (!configDir.DirExists()) {
+		wxMkdir(configDir.GetPath(), 0777);
+	}
+	return configDir;
+}
+
+wxFileName mvceditor::DatabaseDetectorsGlobalAsset() {
+	wxStandardPaths paths;
+	wxFileName pathExecutableFileName(paths.GetExecutablePath());
+	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
+		wxT("..") + wxFileName::GetPathSeparator() +
+		wxT("php_detectors") + wxFileName::GetPathSeparator() +
+		wxT("database_detectors");
+	wxFileName scriptsFileName;
+	scriptsFileName.AssignDir(scriptsFullPath);
+	scriptsFileName.Normalize();
+	return scriptsFileName;
+}
+
+wxFileName mvceditor::ConfigDetectorsLocalAsset() {
+	wxStandardPaths paths;
+	wxFileName configDir = mvceditor::ConfigDirAsset();
+	configDir.AppendDir(wxT("config_detectors"));
+	if (!configDir.DirExists()) {
+		wxMkdir(configDir.GetPath(), 0777);
+	}
+	return configDir;
+}
+
+wxFileName mvceditor::ConfigDetectorsGlobalAsset() {
+	wxStandardPaths paths;
+	wxFileName pathExecutableFileName(paths.GetExecutablePath());
+	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
+		wxT("..") + wxFileName::GetPathSeparator() +
+		wxT("php_detectors") + wxFileName::GetPathSeparator() +
+		wxT("config_detectors");
+	wxFileName scriptsFileName;
+	scriptsFileName.AssignDir(scriptsFullPath);
+	scriptsFileName.Normalize();
+	return scriptsFileName;
 }
 
 wxFileName mvceditor::TempDirAsset() {
@@ -101,4 +215,30 @@ wxFileName mvceditor::ConfigDirAsset() {
 		wxMkdir(tempDir.GetPath(), 0777);
 	}
 	return tempDir;
+}
+
+wxFileName mvceditor::DetectorSqlSchemaAsset() {
+	wxStandardPaths paths;
+	wxFileName pathExecutableFileName(paths.GetExecutablePath());
+	wxString nativeFileName = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
+	                          wxT("..") + wxFileName::GetPathSeparator() +
+	                          wxT("resources") + wxFileName::GetPathSeparator() +
+	                          wxT("sql") + wxFileName::GetPathSeparator() +
+							  wxT("detectors.sql");
+	wxFileName fileName(nativeFileName);
+	fileName.Normalize();
+	return fileName;
+}
+
+wxFileName mvceditor::SkeletonsBaseAsset() {
+	wxStandardPaths paths;
+	wxFileName pathExecutableFileName(paths.GetExecutablePath());
+	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
+		wxT("..") + wxFileName::GetPathSeparator() +
+		wxT("resources") + wxFileName::GetPathSeparator() +
+		wxT("skeletons");
+	wxFileName scriptsFileName;
+	scriptsFileName.AssignDir(scriptsFullPath);
+	scriptsFileName.Normalize();
+	return scriptsFileName;
 }

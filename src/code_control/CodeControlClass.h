@@ -27,6 +27,7 @@
 
 #include <globals/CodeControlOptionsClass.h>
 #include <globals/GlobalsClass.h>
+#include <search/FinderClass.h>
 #include <wx/stc/stc.h>
 #include <wx/timer.h>
 #include <unicode/unistr.h>
@@ -42,7 +43,7 @@ namespace mvceditor {
 // Since this file is included by many features whenever a change to any included header
 // files is maded most features have to be re-compiled.
 class TextDocumentClass;
-class ResourceCacheClass;
+class TagCacheClass;
 
 
 /**
@@ -238,9 +239,9 @@ public:
 	/**
 	 * Returns the resources that match the the current cursor position.
 	 *
-	 * @return resource matches
+	 * @return tag matches
 	 */
-	std::vector<ResourceClass> GetCurrentSymbolResource();
+	std::vector<TagClass> GetCurrentSymbolResource();
 
 	/**
 	 * Applies the current prefernces to this window. This method should be called when the CodeControlOptions class
@@ -273,7 +274,7 @@ public:
 	/**
 	 * Set the connection to use to fetch the SQL table metadata
 	 */
-	void SetCurrentInfo(const DatabaseInfoClass& other);
+	void SetCurrentDbTag(const DatabaseTagClass& other);
 
 	/**
 	 * Calculate the line number from the given CHARACTER position. Scintilla's
@@ -460,7 +461,7 @@ private:
 	/**
 	 * The connection to use to fetch the SQL table metadata.
 	 */
-	DatabaseInfoClass CurrentInfo;
+	DatabaseTagClass CurrentDbTag;
 
 	/**
 	* This object will be used to parse the resources of files that are currently open

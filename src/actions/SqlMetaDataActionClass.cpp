@@ -42,22 +42,22 @@ wxEvent* mvceditor::SqlMetaDataEventClass::Clone() const {
 
 mvceditor::SqlMetaDataActionClass::SqlMetaDataActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: ActionClass(runningThreads, eventId)
-	, Infos() {
+	, DatabaseTags() {
 		
 }
 
 bool mvceditor::SqlMetaDataActionClass::Init(mvceditor::GlobalsClass& globals) {
-	Infos = globals.Infos;
-	if (!Infos.empty()) {
+	DatabaseTags = globals.DatabaseTags;
+	if (!DatabaseTags.empty()) {
 		SetStatus(_("Detecting SQL metadata"));
 	}
-	return !Infos.empty();
+	return !DatabaseTags.empty();
 }
 
 void mvceditor::SqlMetaDataActionClass::BackgroundWork() {
 	std::vector<UnicodeString> errors;
 	mvceditor::SqlResourceFinderClass newResources;
-	for (std::vector<mvceditor::DatabaseInfoClass>::iterator it = Infos.begin(); it != Infos.end(); ++it) {
+	for (std::vector<mvceditor::DatabaseTagClass>::iterator it = DatabaseTags.begin(); it != DatabaseTags.end(); ++it) {
 		if (!IsCancelled()) {
 			if (it->IsEnabled) {
 				wxString wxLabel = mvceditor::IcuToWx(it->Label);
@@ -82,33 +82,4 @@ void mvceditor::SqlMetaDataActionClass::BackgroundWork() {
 
 wxString mvceditor::SqlMetaDataActionClass::GetLabel() const {
 	return _("SQL metadata detection");
-}
-
-mvceditor::SqlMetaDataInitActionClass::SqlMetaDataInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: InitializerActionClass(runningThreads, eventId) {
-
-}
-
-void mvceditor::SqlMetaDataInitActionClass::Work(mvceditor::GlobalsClass& globals) {
-	
-	// remove any connections previously detected
-	std::vector<mvceditor::DatabaseInfoClass>::iterator it = globals.Infos.begin();
-	while (it != globals.Infos.end()) {
-		if (it->IsDetected) {
-			it = globals.Infos.erase(it);
-		}
-		else {
-			++it;
-		}
-	}
-	
-	// add the detected connections to the infos list
-	// this makes it easier; that way we always work with one list only
-	for (size_t i = 0; i < globals.Frameworks.size(); ++i) {
-		globals.Infos.insert(globals.Infos.end(), globals.Frameworks[i].Databases.begin(), globals.Frameworks[i].Databases.end());
-	}
-}
-
-wxString mvceditor::SqlMetaDataInitActionClass::GetLabel() const {
-	return _("SQL connection intialization");
 }

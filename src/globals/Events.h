@@ -208,6 +208,13 @@ extern const wxEventType EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED;
 extern const wxEventType EVENT_CMD_FILE_OPEN;
 
 /**
+ * Tell the app to run a command. The app will run the command line
+ * and will dispolay the output in a panel.
+ * The command line to run should  be set with event.SetString()
+ */
+extern const wxEventType EVENT_CMD_RUN_COMMAND;
+
+/**
  * The window ID of the Tools Notebook. Use this to connect to the notebook
  * events for the tools notebook
  */

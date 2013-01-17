@@ -27,10 +27,28 @@
 
 ActionTestFixtureClass::ActionTestFixtureClass()
 	: wxEvtHandler() 
-	, RunningThreads(false) {		
+	, RunningThreads(false)
+	, Globals() {		
 	RunningThreads.AddEventHandler(this);
 }
 
 ActionTestFixtureClass::~ActionTestFixtureClass() {
 	RunningThreads.RemoveEventHandler(this);
+}
+
+void ActionTestFixtureClass::CreateProject(const wxFileName& sourceDir, const wxString& cacheDir) {
+	mvceditor::ProjectClass project;
+	
+	int projectNum = Globals.Projects.size() + 1;
+	project.Label = wxString::Format(wxT("project %d"), projectNum);
+	project.IsEnabled = true;
+	project.ResourceDbFileName.Assign(cacheDir, wxString::Format(wxT("tag_cache_%d.db"), projectNum));
+	project.DetectorDbFileName.Assign(cacheDir, wxString::Format(wxT("detector_cache_%d.db"), projectNum));
+
+	mvceditor::SourceClass srcProject;
+	srcProject.RootDirectory.Assign(sourceDir);
+	project.AddSource(srcProject);
+	project.PhpFileExtensions.push_back(wxT("*.php"));
+	
+	Globals.Projects.push_back(project);
 }

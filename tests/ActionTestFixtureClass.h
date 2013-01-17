@@ -27,6 +27,8 @@
 #define __ACTIONTESTFIXTURECLASS_H__ 
 
 #include <wx/event.h>
+#include <wx/filename.h>
+#include <globals/GlobalsClass.h>
 #include <widgets/ThreadWithHeartbeatClass.h>
 
 /**
@@ -39,9 +41,24 @@ public:
 
 	mvceditor::RunningThreadsClass RunningThreads;
 
+	/**
+	 * Since ActionClass::Init() needs a GlobalsClass parameter
+	 */
+	mvceditor::GlobalsClass Globals;
+
 	ActionTestFixtureClass();
 
 	virtual ~ActionTestFixtureClass();
+	
+	/**
+	 * Creates a project and adds it to the end of Globals.Projects
+	 * Only the data structure is created. File system is not touched
+	 * at all. Any source dir or db cache files are NOT created.
+	 *
+	 * @param sourceDir the directory that contains source files (php)
+	 * @param cacheDir the directory to place the cache db files
+	 */
+	void CreateProject(const wxFileName& sourceDir, const wxString& cacheDir);
 };
 
 #endif

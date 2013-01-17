@@ -23,16 +23,13 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <actions/GlobalsChangeHandlerClass.h>
+#include <globals/DatabaseTagClass.h>
 #include <actions/ActionClass.h>
 #include <globals/Errors.h>
 
 mvceditor::GlobalsChangeHandlerClass::GlobalsChangeHandlerClass(mvceditor::GlobalsClass& globals) 
 	: wxEvtHandler()
 	, Globals(globals) {
-}
-
-void mvceditor::GlobalsChangeHandlerClass::OnFrameworkFound(mvceditor::FrameworkFoundEventClass& event) {
-	Globals.Frameworks.push_back(event.GetFramework());
 }
 
 void mvceditor::GlobalsChangeHandlerClass::OnSqlMetaDataComplete(mvceditor::SqlMetaDataEventClass& event) {
@@ -46,23 +43,41 @@ void mvceditor::GlobalsChangeHandlerClass::OnSqlMetaDataComplete(mvceditor::SqlM
 
 void mvceditor::GlobalsChangeHandlerClass::OnGlobalCacheComplete(mvceditor::GlobalCacheCompleteEventClass& event) {
 	mvceditor::GlobalCacheClass* globalCache = event.GlobalCache;
-	if (Globals.ResourceCache.IsInitGlobal(globalCache->ResourceDbFileName)) {
-		Globals.ResourceCache.RemoveGlobal(globalCache->ResourceDbFileName);
+	if (Globals.TagCache.IsInitGlobal(globalCache->ResourceDbFileName)) {
+		Globals.TagCache.RemoveGlobal(globalCache->ResourceDbFileName);
 	}
-	Globals.ResourceCache.RegisterGlobal(globalCache);
+	Globals.TagCache.RegisterGlobal(globalCache);
 }
 
-void mvceditor::GlobalsChangeHandlerClass::OnUrlDetectionComplete(mvceditor::UrlDetectedEventClass& event) {
-	std::vector<mvceditor::UrlResourceClass> newUrls = event.GetUrls();
-	Globals.UrlResourceFinder.Urls.insert(Globals.UrlResourceFinder.Urls.end(),
-		newUrls.begin(), newUrls.end());
+void mvceditor::GlobalsChangeHandlerClass::OnDatabaseTagsComplete(wxCommandEvent& event) {
+	
+	// first remove all detected connections that were previously detected
+	std::vector<mvceditor::DatabaseTagClass>::iterator info;
+	info = Globals.DatabaseTags.begin();
+	while(info != Globals.DatabaseTags.end()) {
+		if (info->IsDetected) {
+			info = Globals.DatabaseTags.erase(info);
+		}
+		else {
+			info++;
+		}
+	}
+
+	mvceditor::DatabaseTagFinderClass finder;
+	std::vector<mvceditor::ProjectClass>::const_iterator project;
+	std::vector<mvceditor::ProjectClass> projects = Globals.AllEnabledProjects();
+	for (project = projects.begin(); project != projects.end(); ++project) {
+		finder.AttachExistingFile(project->DetectorDbFileName);
+	}
+	std::vector<mvceditor::DatabaseTagClass> detected = finder.All();
+	Globals.DatabaseTags.insert(Globals.DatabaseTags.end(), detected.begin(), detected.end());
 }
+
 
 BEGIN_EVENT_TABLE(mvceditor::GlobalsChangeHandlerClass, wxEvtHandler)
-	EVT_FRAMEWORK_FOUND(mvceditor::GlobalsChangeHandlerClass::OnFrameworkFound)
 	EVT_SQL_META_DATA_COMPLETE(mvceditor::ID_EVENT_ACTION_SQL_METADATA, mvceditor::GlobalsChangeHandlerClass::OnSqlMetaDataComplete)
 	EVT_GLOBAL_CACHE_COMPLETE(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE, mvceditor::GlobalsChangeHandlerClass::OnGlobalCacheComplete)
-	EVT_FRAMEWORK_URL_COMPLETE(mvceditor::GlobalsChangeHandlerClass::OnUrlDetectionComplete)
+	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_DATABASE_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::GlobalsChangeHandlerClass::OnDatabaseTagsComplete)
 END_EVENT_TABLE()
 
 

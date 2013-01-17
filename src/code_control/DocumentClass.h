@@ -98,9 +98,9 @@ public:
 	/**
 	 * Returns the resources that match the the current cursor position.
 	 *
-	 * @return resource matches
+	 * @return tag matches
 	 */
-	virtual std::vector<ResourceClass> GetCurrentSymbolResource();
+	virtual std::vector<TagClass> GetCurrentSymbolResource();
 
 	/**
 	 * This method will get called when a new file is opened OR when a 
@@ -180,13 +180,13 @@ public:
 	bool CanAutoComplete();
 
 	/**
-	 * Use the project's resource finder to find auto complete suggestions
+	 * Use the project's tag finder to find auto complete suggestions
 	 */
 	void HandleAutoCompletion(wxString& completeStatus);
 
 	void HandleCallTip(wxChar ch = 0, bool force = false);
 
-	std::vector<ResourceClass> GetCurrentSymbolResource();
+	std::vector<TagClass> GetCurrentSymbolResource();
 
 	void FileOpened(wxString fileName);
 
@@ -203,7 +203,7 @@ public:
 	 * @param int posToCheck a SCINTILLA POSITION (ie. BYTES not characters)
 	 * @return list of resources that the symbol can be
 	 */
-	std::vector<ResourceClass> GetSymbolAt(int posToCheck);
+	std::vector<TagClass> GetSymbolAt(int posToCheck);
 
 	wxString GetPhpKeywords() const;
 	
@@ -317,22 +317,22 @@ private:
 	/**
 	 * The resources used to populate the call tips
 	 */
-	std::vector<ResourceClass> CurrentCallTipResources;
+	std::vector<TagClass> CurrentCallTipResources;
 
 	/**
 	 * The resources that are shown in the code completion list. Keeping these around
 	 * so that we can append the '(' for method calls.
 	 */
-	std::vector<mvceditor::ResourceClass> AutoCompletionResourceMatches;
+	std::vector<mvceditor::TagClass> AutoCompletionResourceMatches;
 
 	/**
-	 * To access any global structures: the resource cache, template variables
+	 * To access any global structures: the tag cache, template variables
 	 * This class will NOT own this pointer
 	 */
 	GlobalsClass* Globals;
 	
 	/**
-	 * The resource signature currently being displayed in the calltip.
+	 * The tag signature currently being displayed in the calltip.
 	 * index into CurrentCallTipResources
 	 */
 	size_t CurrentCallTipIndex;
@@ -355,9 +355,9 @@ public:
 	/**
 	 * @param globals This class will NOT own this pointer. Caller must manage (delete) it.
 	 *   globals helps with autocompletion
-	 * @param currentInfo the connection to fetch database metadata for (auto completion)
+	 * @param currentDbTag the connection to fetch database metadata for (auto completion)
 	 */
-	SqlDocumentClass(GlobalsClass* globals, const DatabaseInfoClass& currentInfo);
+	SqlDocumentClass(GlobalsClass* globals, const DatabaseTagClass& currentDbTag);
 
 	/**
 	 * Will enable auto complete for SQL keywords and SQL table metadata
@@ -394,7 +394,7 @@ private:
 	/**
 	 * the connection to fetch database metadata for (auto completion)
 	 */
-	DatabaseInfoClass CurrentInfo;
+	DatabaseTagClass CurrentDbTag;
 };
 
 class CssDocumentClass : public TextDocumentClass {

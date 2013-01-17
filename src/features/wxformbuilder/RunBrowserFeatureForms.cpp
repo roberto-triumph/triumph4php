@@ -41,19 +41,39 @@ ChooseUrlDialogGeneratedClass::ChooseUrlDialogGeneratedClass( wxWindow* parent, 
 	OpenLabel->Wrap( -1 );
 	TopSizer->Add( OpenLabel, 1, wxALL|wxEXPAND, 5 );
 	
-	AddButton = new wxButton( this, ID_ADDBUTTON, _("Add URL"), wxDefaultPosition, wxDefaultSize, 0 );
-	TopSizer->Add( AddButton, 0, wxALL|wxALIGN_RIGHT, 5 );
-	
-	CloneButton = new wxButton( this, ID_CLONEBUTTON, _("Clone URL"), wxDefaultPosition, wxDefaultSize, 0 );
-	TopSizer->Add( CloneButton, 0, wxALL, 5 );
-	
-	DeleteButton = new wxButton( this, ID_DELETEBUTTON, _("Delete URL"), wxDefaultPosition, wxDefaultSize, 0 );
-	TopSizer->Add( DeleteButton, 0, wxALL, 5 );
-	
 	GridSizer->Add( TopSizer, 1, wxEXPAND, 5 );
 	
 	UrlList = new wxListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_SINGLE ); 
 	GridSizer->Add( UrlList, 0, wxALL|wxEXPAND, 5 );
+	
+	wxFlexGridSizer* ExtraSizer;
+	ExtraSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	ExtraSizer->AddGrowableCol( 0 );
+	ExtraSizer->AddGrowableRow( 1 );
+	ExtraSizer->SetFlexibleDirection( wxHORIZONTAL );
+	ExtraSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	ExtraLabel = new wxStaticText( this, wxID_ANY, _("Extra"), wxDefaultPosition, wxDefaultSize, 0 );
+	ExtraLabel->Wrap( -1 );
+	ExtraSizer->Add( ExtraLabel, 1, wxALL|wxEXPAND, 5 );
+	
+	ExtraText = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	ExtraSizer->Add( ExtraText, 0, wxALL|wxEXPAND, 5 );
+	
+	GridSizer->Add( ExtraSizer, 1, wxEXPAND, 5 );
+	
+	wxBoxSizer* FinalSizer;
+	FinalSizer = new wxBoxSizer( wxVERTICAL );
+	
+	FinalLabel = new wxStaticText( this, wxID_ANY, _("Final URL"), wxDefaultPosition, wxDefaultSize, 0 );
+	FinalLabel->Wrap( -1 );
+	FinalSizer->Add( FinalLabel, 0, wxALL, 5 );
+	
+	FinalUrlLabel = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	FinalUrlLabel->Wrap( -1 );
+	FinalSizer->Add( FinalUrlLabel, 0, wxALL|wxEXPAND, 5 );
+	
+	GridSizer->Add( FinalSizer, 1, wxEXPAND, 5 );
 	
 	ButtonSizer = new wxStdDialogButtonSizer();
 	ButtonSizerOK = new wxButton( this, wxID_OK );
@@ -71,26 +91,24 @@ ChooseUrlDialogGeneratedClass::ChooseUrlDialogGeneratedClass( wxWindow* parent, 
 	this->Centre( wxBOTH );
 	
 	// Connect Events
-	Filter->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( ChooseUrlDialogGeneratedClass::OnKeyDown ), NULL, this );
-	Filter->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnText ), NULL, this );
-	Filter->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnTextEnter ), NULL, this );
-	AddButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnAddButton ), NULL, this );
-	CloneButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnCloneButton ), NULL, this );
-	DeleteButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnDeleteButton ), NULL, this );
+	Filter->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( ChooseUrlDialogGeneratedClass::OnFilterKeyDown ), NULL, this );
+	Filter->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnFilterText ), NULL, this );
+	Filter->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnFilterTextEnter ), NULL, this );
 	UrlList->Connect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnListItemSelected ), NULL, this );
+	ExtraText->Connect( wxEVT_CHAR, wxKeyEventHandler( ChooseUrlDialogGeneratedClass::OnExtraChar ), NULL, this );
+	ExtraText->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnExtraText ), NULL, this );
 	ButtonSizerOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnOkButton ), NULL, this );
 }
 
 ChooseUrlDialogGeneratedClass::~ChooseUrlDialogGeneratedClass()
 {
 	// Disconnect Events
-	Filter->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( ChooseUrlDialogGeneratedClass::OnKeyDown ), NULL, this );
-	Filter->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnText ), NULL, this );
-	Filter->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnTextEnter ), NULL, this );
-	AddButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnAddButton ), NULL, this );
-	CloneButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnCloneButton ), NULL, this );
-	DeleteButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnDeleteButton ), NULL, this );
+	Filter->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( ChooseUrlDialogGeneratedClass::OnFilterKeyDown ), NULL, this );
+	Filter->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnFilterText ), NULL, this );
+	Filter->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnFilterTextEnter ), NULL, this );
 	UrlList->Disconnect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnListItemSelected ), NULL, this );
+	ExtraText->Disconnect( wxEVT_CHAR, wxKeyEventHandler( ChooseUrlDialogGeneratedClass::OnExtraChar ), NULL, this );
+	ExtraText->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnExtraText ), NULL, this );
 	ButtonSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnOkButton ), NULL, this );
 	
 }

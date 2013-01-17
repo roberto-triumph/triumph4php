@@ -30,8 +30,8 @@
 #include <globals/UrlResourceClass.h>
 #include <globals/ProjectClass.h>
 #include <globals/SqlResourceFinderClass.h>
-#include <language/ResourceCacheClass.h>
-#include <php_frameworks/FrameworkDetectorClass.h>
+#include <globals/TemplateFileClass.h>
+#include <language/TagCacheClass.h>
 #include <vector>
 
 namespace mvceditor {
@@ -54,7 +54,7 @@ public:
 	/**
 	 * This object will be used to parse the resources of files that are currently open.
 	 */
-	ResourceCacheClass ResourceCache;
+	TagCacheClass TagCache;
 
 	/**
 	 * The URLs (entry points to the current project) that have been detected so far. Also holds the 
@@ -70,15 +70,9 @@ public:
 	/**
 	 * The datatabase connections. These are all of the connections, there may be a 
 	 * mix of connections created by the user and connections that were detected
-	 * by the DatabaseDetector.
+	 * by the DatabaseDetector scripts.
 	 */ 
-	std::vector<DatabaseInfoClass> Infos;
-
-	/**
-	 * All of the views of the currently selected controller/action
-	 * pair.
-	 */
-	std::vector<mvceditor::ViewInfoClass> CurrentViewInfos;
+	std::vector<DatabaseTagClass> DatabaseTags;
 
 	/**
 	 * All of the projects defined by the user.
@@ -89,6 +83,11 @@ public:
 	 * the URL that the user chose to view files from
 	 */
 	UrlResourceClass CurrentUrl;
+
+	/**
+	 * The name of the browser that is selected
+	 */
+	wxString ChosenBrowser;
 
 	/**
 	 * Serialized PHP file filters string from the config
@@ -112,11 +111,6 @@ public:
 	 */
 	wxString MiscFileExtensionsString;
 
-	/**
-	 * framework info that was detected
-	 */
-	std::vector<mvceditor::FrameworkClass> Frameworks;
-
 	GlobalsClass();
 
 	/**
@@ -137,6 +131,11 @@ public:
 	 * directories, then this method returns 4 source instances.
 	 */
 	std::vector<mvceditor::SourceClass> AllEnabledPhpSources() const;
+
+	/**
+	 * @return vector of all enabled projects
+	 */
+	std::vector<mvceditor::ProjectClass> AllEnabledProjects() const;
 
 	/**
 	 * @return bool TRUE if there is at least 1 enabled project that has AT LEAST 1 source
@@ -211,6 +210,17 @@ public:
 	 * @param project set the file filters on the given project
 	 */
 	void AssignFileExtensions(mvceditor::ProjectClass& project) const;
+
+	
+	/**
+	 * The current template files that have been calculated to be used
+	 * by the CurrentUrl.
+	 */
+	// TODO clarify what url is used to calulate these template files
+	// since this method just reads from the detector db, the templates
+	// are for the url as picked in the template files panel and NOT
+	// the URL dialog.
+	std::vector<mvceditor::TemplateFileClass> CurrentTemplates() const;
 
 };
 

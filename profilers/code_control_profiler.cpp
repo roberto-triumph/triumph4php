@@ -49,7 +49,6 @@ public:
 	
 	mvceditor::CodeControlOptionsClass Options;
 	mvceditor::GlobalsClass Globals;
-	mvceditor::RunningThreadsClass RunningThreads;
 };
 
 /**
@@ -157,8 +156,8 @@ bool CodeControlProfilerAppClass::OnInit() {
 	std::vector<wxString> phpFileFilters,
 		miscFileFilters;
 	phpFileFilters.push_back(wxT("*.php"));
-	globalCache->Init(mvceditor::NativeFunctionsAsset(), phpFileFilters, miscFileFilters, pelet::PHP_53);
-	Globals.ResourceCache.RegisterGlobal(globalCache);
+	globalCache->InitGlobalTag(mvceditor::NativeFunctionsAsset(), phpFileFilters, miscFileFilters, pelet::PHP_53);
+	Globals.TagCache.RegisterGlobal(globalCache);
 	
 	CodeControlFrameClass* frame = new CodeControlFrameClass(*this);
 	SetTopWindow(frame);
@@ -197,7 +196,6 @@ void CodeControlFrameClass::OnHelp(wxCommandEvent& event) {
 }
 
 void CodeControlFrameClass::OnClose(wxCloseEvent& event) {
-	App.RunningThreads.StopAll();
 	event.Skip();
 }
 

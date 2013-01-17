@@ -26,19 +26,19 @@
 #define __RESOURCECACHEBUILDERTHREADCLASS_H__
 
 #include <widgets/ThreadWithHeartbeatClass.h>
-#include <language/ResourceCacheClass.h>
+#include <language/TagCacheClass.h>
 
 namespace mvceditor {
 
 /**
- * This class will run the resource updates in a background thread.  The caller will use
+ * This class will run the tag updates in a background thread.  The caller will use
  * the Register() method when a new file is opened by the user.  Every so often, the 
  * StartBackgroundUpdate() method should be called to trigger re-parsing of the resources
- * on the background task.  The results of the resource parsing will be stored in an 
+ * on the background task.  The results of the tag parsing will be stored in an 
  * internal cache that's separate from the 'global' cache; that way the entire global cache
  * does not have to be re-sorted every time we want to parse new contents.
- * This class will NEVER update the 'global' resource finder; the caller must take care
- * of updating the global resource finder when the user closes the file.
+ * This class will NEVER update the 'global' tag finder; the caller must take care
+ * of updating the global tag finder when the user closes the file.
  */
 class WorkingCacheBuilderClass : public ThreadWithHeartbeatClass {
 	

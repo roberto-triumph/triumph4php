@@ -27,18 +27,17 @@
 
 mvceditor::GlobalsClass::GlobalsClass()
 	: Environment()
-	, ResourceCache()
+	, TagCache()
 	, UrlResourceFinder()
 	, SqlResourceFinder()
-	, Infos()
-	, CurrentViewInfos() 
+	, DatabaseTags()
 	, Projects()
 	, CurrentUrl() 
+	, ChosenBrowser()
 	, PhpFileExtensionsString(wxT("*.php"))	
 	, CssFileExtensionsString(wxT("*.css"))
 	, SqlFileExtensionsString(wxT("*.sql"))
-	, MiscFileExtensionsString(wxT("*.js;*.html;*.yml;*.xml;*.txt"))
-	, Frameworks() {
+	, MiscFileExtensionsString(wxT("*.js;*.html;*.yml;*.xml;*.txt")) {
 }
 
 std::vector<mvceditor::SourceClass> mvceditor::GlobalsClass::AllEnabledSources() const {
@@ -65,6 +64,17 @@ std::vector<mvceditor::SourceClass> mvceditor::GlobalsClass::AllEnabledPhpSource
 		}
 	}
 	return allSources;
+}
+
+std::vector<mvceditor::ProjectClass> mvceditor::GlobalsClass::AllEnabledProjects() const {
+	std::vector<mvceditor::ProjectClass> enabledProjects;
+	std::vector<mvceditor::ProjectClass>::const_iterator it;
+	for (it = Projects.begin(); it != Projects.end(); ++it) {
+		if (it->IsEnabled) {
+			enabledProjects.push_back(*it);
+		}
+	}
+	return enabledProjects;
 }
 
 bool mvceditor::GlobalsClass::HasSources() const {
@@ -151,13 +161,13 @@ wxString mvceditor::GlobalsClass::RelativeFileName(const wxString &fullPath, wxS
 }
 
 void mvceditor::GlobalsClass::ClearDetectedInfos() {
-	std::vector<mvceditor::DatabaseInfoClass>::iterator info = Infos.begin();
-	while(info != Infos.end()) {
-		if (info->IsDetected) {
-			info = Infos.erase(info);
+	std::vector<mvceditor::DatabaseTagClass>::iterator it = DatabaseTags.begin();
+	while(it != DatabaseTags.end()) {
+		if (it->IsDetected) {
+			it = DatabaseTags.erase(it);
 		}
 		else {
-			++info;
+			++it;
 		}
 	}
 }
@@ -167,4 +177,23 @@ void mvceditor::GlobalsClass::AssignFileExtensions(mvceditor::ProjectClass &proj
 	project.CssFileExtensions = GetCssFileExtensions();
 	project.SqlFileExtensions = GetSqlFileExtensions();
 	project.MiscFileExtensions = GetMiscFileExtensions();
+}
+
+std::vector<mvceditor::TemplateFileClass> mvceditor::GlobalsClass::CurrentTemplates() const {
+	std::vector<mvceditor::TemplateFileClass> templates;
+	mvceditor::UrlResourceClass urlResource = CurrentUrl;
+	std::vector<mvceditor::ProjectClass>::const_iterator project;
+	wxFileName detectorDbFileName;
+	for (project = Projects.begin(); project != Projects.end(); ++project) {
+		if (project->IsAPhpSourceFile(urlResource.FileName.GetFullPath())) {
+			detectorDbFileName = project->DetectorDbFileName;
+			break;
+		}
+	}
+	if (detectorDbFileName.IsOk()) {
+		mvceditor::TemplateFileTagClass fileTags;
+		fileTags.Init(detectorDbFileName);
+		templates = fileTags.All();
+	}
+	return templates;
 }

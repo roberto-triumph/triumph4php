@@ -27,7 +27,7 @@
 
 #include <globals/GlobalsClass.h>
 #include <actions/SqlMetaDataActionClass.h>
-#include <actions/ProjectResourceActionClass.h>
+#include <actions/ProjectTagActionClass.h>
 #include <wx/event.h>
 
 namespace mvceditor {
@@ -48,12 +48,6 @@ private:
 
 	mvceditor::GlobalsClass& Globals;
 
-	/**
-	 * This is the callback that gets called when the PHP framework detectors have 
-	 * successfully run
-	 */
-	void OnFrameworkFound(mvceditor::FrameworkFoundEventClass& event);
-
 	void OnSqlMetaDataComplete(mvceditor::SqlMetaDataEventClass& event);
 
 	/**
@@ -63,10 +57,10 @@ private:
 	void OnGlobalCacheComplete(mvceditor::GlobalCacheCompleteEventClass& event);
 
 	/**
-	 * This method will get called when routes / URL are detected in any of the
-	 * opened projects.
+	 * when the php database detectors have completed, put all of the detected database
+	 * tags in the globals list.
 	 */
-	void OnUrlDetectionComplete(UrlDetectedEventClass& event);
+	void OnDatabaseTagsComplete(wxCommandEvent& event);
 	
 	DECLARE_EVENT_TABLE()
 

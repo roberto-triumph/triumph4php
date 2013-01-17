@@ -26,8 +26,8 @@
 #include <globals/String.h>
 #include <code_control/DocumentClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
-
 #include <globals/Errors.h>
+#include <search/FindInFilesClass.h>
 #include <wx/filename.h>
 #include <wx/stc/stc.h>
 #include <wx/utils.h>
@@ -56,7 +56,7 @@ static const int INDICATOR_PHP_STYLE = 128;
 static const int INDICATOR_TEXT_STYLE = 32;
 
 /**
- * Turns a resource PHPDoc comment into a nicer format that is more suitable
+ * Turns a tag PHPDoc comment into a nicer format that is more suitable
  * to display. Any beginning '*'s are removed.
  *
  * Also, any HTML entities are handled (ignored), and any comment that
@@ -156,7 +156,7 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 		, CurrentFilename()		
 		, WordHighlightFinder()
 		, WordHighlightWord()
-		, CurrentInfo()
+		, CurrentDbTag()
 		, Globals(globals)
 		, WordHighlightPreviousIndex(-1)
 		, WordHighlightNextIndex(-1)
@@ -358,7 +358,7 @@ void mvceditor::CodeControlClass::HandleAutomaticIndentation(char chr) {
 	}
 }
 
-std::vector<mvceditor::ResourceClass> mvceditor::CodeControlClass::GetCurrentSymbolResource() {
+std::vector<mvceditor::TagClass> mvceditor::CodeControlClass::GetCurrentSymbolResource() {
 	return Document->GetCurrentSymbolResource();
 }
 
@@ -483,7 +483,7 @@ void mvceditor::CodeControlClass::ApplyPreferences() {
 		Document = NULL;
 	}
 	if (mvceditor::CodeControlClass::SQL == DocumentMode) {
-		Document = new mvceditor::SqlDocumentClass(Globals, CurrentInfo);
+		Document = new mvceditor::SqlDocumentClass(Globals, CurrentDbTag);
 		Document->SetControl(this);
 		SetCodeControlOptions(CodeControlOptions.SqlStyles);
 		SetSqlOptions();
@@ -1014,12 +1014,12 @@ void mvceditor::CodeControlClass::ClearLintErrors() {
 	SetStyling(GetLength(), 0);
 }
 
-void mvceditor::CodeControlClass::SetCurrentInfo(const mvceditor::DatabaseInfoClass& currentInfo) {
-	CurrentInfo.Copy(currentInfo);
+void mvceditor::CodeControlClass::SetCurrentDbTag(const mvceditor::DatabaseTagClass& currentDbTag) {
+	CurrentDbTag.Copy(currentDbTag);
 	
 	// if SQL document is active we need to change the currentInfo in that object
 	// but since C++ does has poor RTTI we dont know what type Document pointer currently is
-	// for now just refresh everything which will update CurrentInfo
+	// for now just refresh everything which will update CurrentDbTag
 	ApplyPreferences();
 }
 
@@ -1049,54 +1049,54 @@ void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
 		int pos = event.GetPosition();
 
 		// if the cursor is in the middle of an identifier, find the end of the
-		// current identifier; that way we can know the full name of the resource we want
+		// current identifier; that way we can know the full name of the tag we want
 		// to get
 		int endPos = WordEndPosition(pos, true);
-		std::vector<mvceditor::ResourceClass> matches = ((PhpDocumentClass *)Document)->GetSymbolAt(endPos);
+		std::vector<mvceditor::TagClass> matches = ((PhpDocumentClass *)Document)->GetSymbolAt(endPos);
 		if (!matches.empty()) {
-			mvceditor::ResourceClass resource = matches[0];
+			mvceditor::TagClass tag = matches[0];
 			wxString msg;
-			if (resource.Type == mvceditor::ResourceClass::FUNCTION) {
-				msg = mvceditor::IcuToWx(resource.Identifier);
+			if (tag.Type == mvceditor::TagClass::FUNCTION) {
+				msg = mvceditor::IcuToWx(tag.Identifier);
 				msg += wxT("\n\n");
-				msg += mvceditor::IcuToWx(resource.Signature);
+				msg += mvceditor::IcuToWx(tag.Signature);
 				msg += wxT(" [ ");
-				msg += mvceditor::IcuToWx(resource.ReturnType);
+				msg += mvceditor::IcuToWx(tag.ReturnType);
 				msg += wxT(" ]");
 				
 			}
-			else if (resource.Type == mvceditor::ResourceClass::METHOD) {
-				msg = mvceditor::IcuToWx(resource.ClassName);
+			else if (tag.Type == mvceditor::TagClass::METHOD) {
+				msg = mvceditor::IcuToWx(tag.ClassName);
 				msg += wxT("::");
-				msg += mvceditor::IcuToWx(resource.Identifier);
+				msg += mvceditor::IcuToWx(tag.Identifier);
 				msg += wxT("\n\n");
-				msg += mvceditor::IcuToWx(resource.Signature);
-				if (!resource.ReturnType.isEmpty()) {
+				msg += mvceditor::IcuToWx(tag.Signature);
+				if (!tag.ReturnType.isEmpty()) {
 					msg += wxT(" [ ");
-					msg += mvceditor::IcuToWx(resource.ReturnType);
+					msg += mvceditor::IcuToWx(tag.ReturnType);
 					msg += wxT(" ]");	
 				}
 			}
-			else if (resource.Type == mvceditor::ResourceClass::MEMBER || resource.Type == mvceditor::ResourceClass::CLASS_CONSTANT) {
-				msg = mvceditor::IcuToWx(resource.ClassName);
+			else if (tag.Type == mvceditor::TagClass::MEMBER || tag.Type == mvceditor::TagClass::CLASS_CONSTANT) {
+				msg = mvceditor::IcuToWx(tag.ClassName);
 				msg += wxT("::");
-				msg += mvceditor::IcuToWx(resource.Identifier);
+				msg += mvceditor::IcuToWx(tag.Identifier);
 				msg += wxT("\n\n");
-				msg += mvceditor::IcuToWx(resource.Signature);
-				if (!resource.ReturnType.isEmpty()) {
+				msg += mvceditor::IcuToWx(tag.Signature);
+				if (!tag.ReturnType.isEmpty()) {
 					msg += wxT(" [ ");
-					msg += mvceditor::IcuToWx(resource.ReturnType);
+					msg += mvceditor::IcuToWx(tag.ReturnType);
 					msg += wxT(" ]");	
 				}
 			}
 			else {
-				msg = mvceditor::IcuToWx(resource.Identifier);
+				msg = mvceditor::IcuToWx(tag.Identifier);
 				msg += wxT("\n\n");
-				msg += mvceditor::IcuToWx(resource.Signature);
+				msg += mvceditor::IcuToWx(tag.Signature);
 			}
-			if (!resource.Comment.isEmpty()) {
+			if (!tag.Comment.isEmpty()) {
 				msg += wxT("\n\n");
-				msg += NiceDocText(resource.Comment);
+				msg += NiceDocText(tag.Comment);
 			}
 			if (!msg.IsEmpty()) {
 				if (CallTipActive()) {

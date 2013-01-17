@@ -27,7 +27,7 @@
 
 #include <globals/EnvironmentClass.h>
 #include <wx/url.h>
-#include <vector>
+#include <globals/Sqlite.h>
 
 namespace mvceditor {
 
@@ -99,36 +99,12 @@ public:
  * The URLs here are a combination of detected URLs and URLs manually entered in by the user.
  * For a big application, there may be hundreds or thousands of these.
  */
-class UrlResourceFinderClass {
+class UrlResourceFinderClass : public mvceditor::SqliteFinderClass {
 
 public:
-
-	/**
-	 * the list of web browsers available to the editor. These are the 'friendly'
-	 * names that are used by the Environment class.
-	 */
-	std::vector<wxString> Browsers;
-	
-	/**
-	 * the list of URLs that have been detected thus far. These are full URLs; "http://codeigniter.localhost/news/index"
-	 * These URLs are usually detected by the UrlDetectorClass
-	 */
-	std::vector<mvceditor::UrlResourceClass> Urls;
-	
-	/**
-	 * The name of the browser that is selected
-	 */
-	wxString ChosenBrowser;
-	
-	/**
-	 * the URL that is selected
-	 */
-	UrlResourceClass ChosenUrl;
 		
 	UrlResourceFinderClass();
 
-	UrlResourceFinderClass(const UrlResourceFinderClass& src);
-	
 	/**
 	 * check to see if the given URL exists in the Urls list; if the URL
 	 * exists then urlResource is filled with the contents of the URL.
@@ -138,6 +114,26 @@ public:
 	 * @return TRUE if there is a URL resource that has the given URL member
 	 */
 	bool FindByUrl(const wxURI& url, UrlResourceClass& urlResource);
+
+	/**
+	 * check to see if the given class / method is a URL entry point. If the class/method combination
+	 * exists then urlResource is filled with the contents of the URL.
+	 * This way, the caller can "resolve" a class/method name into a URL
+	 * Comparison is done in a case-insensitive manner
+	 *
+	 * @return TRUE if there is a URL resource that has the given controller class name AND method name
+	 */
+	bool FindByClassMethod(const wxString& className, const wxString& methodName, UrlResourceClass& urlResource);
+
+	/**
+	 * Get all UrlResources that have their FullPath equal to fullPath. if the URL
+	 * exists then urlResource it is appended to urlResources;
+	 * This way, the caller can "resolve" a file name into all of the URLs for that file.
+	 * Comparison is done in a case-insensitive manner
+	 *
+	 * @return TRUE if there is a URL resource that has the given full path
+	 */
+	bool FilterByFullPath(const wxString& fullPath, std::vector<UrlResourceClass>& urlResources);
 
 	/**
 	 * Searches all URLs for the URLs that match the given filter; and will copy matching
@@ -154,22 +150,27 @@ public:
 	void DeleteUrl(const wxURI& url);
 
 	/**
-	 * @param the URL to add
-	 * @return FALSE if URL is already there (a duplicate will NOT be inserted)
+	 * Removes all URLs from the backing databases. This is a destructive operation;
+	 * if you just want to close the opened connections use the Close method
 	 */
-	bool AddUniqueUrl(const wxURI& url);
+	void Wipe();
 
 	/**
-	 * @param src Replace all items in all public properties with the items in src.
-	 * After a call to this method, this and src will have the same (copies)
-	 * of items.
+	 * @return int number of urls
 	 */
-	void ReplaceAll(const UrlResourceFinderClass& src);
+	int Count();
 
 	/**
-	 * Removes all URLs from this object.
+	 * returns all of the controller names that were detected
 	 */
-	void Clear();
+	std::vector<wxString> AllControllerNames();
+
+	/**
+	 * returns all of the method names that were detected. These are just the 
+	 * methods from the detected URLs.
+	 */
+	std::vector<wxString> AllMethodNames(const wxString& controllerClassName);
+
 };
 	
 }

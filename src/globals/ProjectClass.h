@@ -89,13 +89,35 @@ public:
 	std::vector<wxString> MiscFileExtensions;
 
 	/**
-	 * The location of the resource cache for this project. The resource DB file contains all of
+	 * The location of the tag cache for this project. The tag DB file contains all of
 	 * the parsed resources for all of this project's resources.
 	 * This file will be invalid for new projects, until the MakeDbFileName() method gets called.
 	 *
-	 * @see mvceditor::ResourceFinderClass
+	 * The SQL schema for this cache can be found in resources/sql/resource.sql
+	 * Schema management will be done by TagCacheDbVersionClass. We will check the version
+	 * of the schema in the db against the schema the code expects and will re-create the schema
+	 * if the versions differ.  This check will be done at app start, so that in most of the code
+	 * we can assume that the schema is up-to-date.
+	 *
+	 * @see mvceditor::ParsedTagFinderClass
+	 * @see mvceditor::TagCacheDbVersionActionClass
 	 */
 	wxFileName ResourceDbFileName;
+
+	/**
+	 * The location of the detectors cache this project. The detectors DB file contains all of
+	 * the detected for all of this project.
+	 * This file will be invalid for new projects, until the MakeDbFileName() method gets called.
+	 *
+	 * The SQL schema for this cache can be found in resources/sql/detectors.sql
+	 * Schema management will be done by DetectorCacheDbVersionClass. We will check the version
+	 * of the schema in the db against the schema the code expects and will re-create the schema
+	 * if the versions differ.  This check will be done at app start, so that in most of the code
+	 * we can assume that the schema is up-to-date.
+	 *
+	 * @see mvceditor::DetectorCacheDbVersionClass
+	 */
+	wxFileName DetectorDbFileName;
 
 	/**
 	 * If TRUE, this project is enabled and is used by MVC Editor.
@@ -170,16 +192,21 @@ public:
 	wxString RelativeFileName(const wxString& fullPath) const;
 
 	/**
-	 * creates a unique filename for the resources of this project. 
+	 * creates the Resource cache db or the detector cache DB
+	 * if they don't exist or if this project is new 
+	 * (ResourceDbFileName or DetectorDbFileName are empty [the strings themselves
+	 * are empty]).  If the files already exist, this method does nothing.
+	 * This method does not initialize the dbs or create the schema. that is
+	 * done by either ParsedTagFinderClass or UrlResourceFinderClass
 	 */
-	bool MakeResourceDbFileName();
+	bool TouchCacheDbs();
 
 	/**
-	 * Deletes this project's resource cache from the file system.
+	 * Deletes this project's tag cache from the file system.
 	 * This should be done when the user does not want MVC Editor
 	 * to cache a project's sources.
 	 */
-	void RemoveResourceDb();
+	void RemoveCacheDbs();
 
 	/**
 	 *

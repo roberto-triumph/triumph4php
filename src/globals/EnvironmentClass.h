@@ -166,6 +166,11 @@ public:
 	void LoadFromConfig(wxConfigBase* config);
 
 	/**
+	 * @return vector of all WebBrowsers' names
+	 */
+	std::vector<wxString> BrowserNames() const;
+
+	/**
 	 * @param name the browser name to look up. lookup is case sensitive.
 	 * @param fullPath will get filled with the full path of the corresponding browser
 	 * @return TRUE if name was found.

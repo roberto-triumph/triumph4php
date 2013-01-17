@@ -27,7 +27,6 @@
 
 #include <features/FeatureClass.h>
 #include <features/wxformbuilder/RunBrowserFeatureForms.h>
-#include <php_frameworks/FrameworkDetectorClass.h>
 #include <globals/UrlResourceClass.h>
 #include <wx/string.h>
 #include <vector>
@@ -35,59 +34,6 @@
 
 namespace mvceditor {
 
-/**
- * small dialog that allows the user to choose a URL to run. User can also
- * add, delete, and modify items in the global URL list (URLResourceFinderClass).
- */
-class ChooseUrlDialogClass : public ChooseUrlDialogGeneratedClass {
-	
-public:
-
-	ChooseUrlDialogClass(wxWindow* parent, UrlResourceFinderClass& urls, UrlResourceClass& chosenUrl);
-	
-protected:
-
-	void OnOkButton(wxCommandEvent& event);
-
-	void OnAddButton(wxCommandEvent& event);
-
-	void OnDeleteButton(wxCommandEvent& event);
-
-	void OnCloneButton(wxCommandEvent& event);
-
-	void OnTextEnter(wxCommandEvent& event);
-
-	void OnKeyDown(wxKeyEvent& event);
-	
-	/**
-	 * updates the URL label so that the user can see the exact URL to 
-	 * be opened in the browser
-	 */
-	void OnListItemSelected(wxCommandEvent& event);
-
-	void OnText(wxCommandEvent& event);
-
-private:
-
-	/**
-	 * The list of URLs, it will contain URLs that were detected and URLs that were input
-	 * by the user.
-	 */
-	UrlResourceFinderClass& UrlResourceFinder;
-
-	/**
-	 * Any changes by the user are held here until the user clicks OK.
-	 * If the user clicks Cancel we dont want to change the 
-	 * UrlResourceFinder
-	 */
-	UrlResourceFinderClass EditedUrlResourceFinder;
-
-	/**
-	 * The URL that the user selected.
-	 */
-	UrlResourceClass& ChosenUrl;
-};
-	
 class RunBrowserFeatureClass : public FeatureClass {
 
 public:
@@ -127,11 +73,6 @@ private:
 	void OnUrlToolMenuItem(wxCommandEvent& event);
 	
 	void OnUrlSearchTool(wxCommandEvent& event);
-
-	/**
-	 * when a project is opened clean the Recent list
-	 */
-	void OnUrlResourceActionComplete(wxCommandEvent& event);
 
 	/**
 	 * to show progress to the user

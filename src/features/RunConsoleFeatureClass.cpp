@@ -258,17 +258,15 @@ void mvceditor::RunConsolePanelClass::OnPageClose(wxAuiNotebookEvent& evt) {
 	evt.Skip();
 }
 
-void  mvceditor::RunConsolePanelClass::SetToRunCommand(const mvceditor::CliCommandClass& command) {
+void  mvceditor::RunConsolePanelClass::SetToRunCommand(const wxString& cmdLine, bool waitForArguments) {
 	
-	// command is a file name, lets run it through PHP
 	// cannot run new files that have not been saved yet
-	wxString cmdLine = command.CmdLine();
 	if (!cmdLine.empty()) {
 		CommandString = cmdLine;
 		TransferDataToWindow();
 
 		// if user chose the 'with arguments' then do not proceed let the user put in arguments
-		if (command.WaitForArguments) {
+		if (waitForArguments) {
 			Command->SetInsertionPointEnd();
 			Command->SetFocus();
 		}
@@ -622,7 +620,7 @@ void mvceditor::RunConsoleFeatureClass::OnRunFileAsCli(wxCommandEvent& event) {
 				RunConsolePanelClass* runConsolePanel = (mvceditor::RunConsolePanelClass*)GetToolsNotebook()->GetPage(selection);
 				inNewWindow = cmd.CmdLine() != runConsolePanel->GetCommand();
 			}
-			RunCommand(cmd, inNewWindow);
+			RunCommand(cmd.CmdLine(), cmd.WaitForArguments, inNewWindow);
 		}
 		else {
 			wxMessageBox(_("PHP script needs to be saved in order to run it."));
@@ -640,7 +638,7 @@ void mvceditor::RunConsoleFeatureClass::OnRunFileAsCliInNewWindow(wxCommandEvent
 			cmd.Executable = GetEnvironment()->Php.PhpExecutablePath;
 			cmd.Arguments = code->GetFileName();
 			cmd.WaitForArguments = (mvceditor::MENU_RUN_PHP + 3) == event.GetId();
-			RunCommand(cmd, true);
+			RunCommand(cmd.CmdLine(), cmd.WaitForArguments, true);
 		}
 		else {
 			wxMessageBox(_("PHP script needs to be saved in order to run it."));
@@ -648,14 +646,14 @@ void mvceditor::RunConsoleFeatureClass::OnRunFileAsCliInNewWindow(wxCommandEvent
 	}
 }
 
-void mvceditor::RunConsoleFeatureClass::RunCommand(const mvceditor::CliCommandClass& command, bool inNewWindow) {
+void mvceditor::RunConsoleFeatureClass::RunCommand(const wxString& cmdLine, bool waitForArguments, bool inNewWindow) {
 	if (inNewWindow) {
 		RunConsolePanelClass* window = new RunConsolePanelClass(GetToolsNotebook(), ID_WINDOW_CONSOLE, 
 			GetStatusBarWithGauge(), *this);
 
 		// set the name so that we can know which window pointer can be safely cast this panel back to the RunConsolePanelClass
 		if (AddToolsWindow(window, _("Run"), wxT("mvceditor::RunConsolePanelClass"))) {
-			window->SetToRunCommand(command);
+			window->SetToRunCommand(cmdLine, waitForArguments);
 		}
 	}
 	else {
@@ -679,7 +677,7 @@ void mvceditor::RunConsoleFeatureClass::RunCommand(const mvceditor::CliCommandCl
 		if (runConsolePanel) {
 			
 			// window already created, will just re-run the command that's already there
-			runConsolePanel->SetToRunCommand(command);
+			runConsolePanel->SetToRunCommand(cmdLine, waitForArguments);
 		}
 	}
 }
@@ -807,12 +805,16 @@ void mvceditor::RunConsoleFeatureClass::OnCommandButtonClick(wxCommandEvent& eve
 	index = index - (mvceditor::MENU_RUN_PHP + 5);
 	if (index >= 0 && index < CliCommands.size()) {
 		mvceditor::CliCommandClass cmd = CliCommands[index];
-		RunCommand(cmd, true);
+		RunCommand(cmd.CmdLine(), cmd.WaitForArguments, true);
 	}
 }
 
 void mvceditor::RunConsoleFeatureClass::LoadPage(const wxString& fileName) {
 	GetNotebook()->LoadPage(fileName);
+}
+
+void mvceditor::RunConsoleFeatureClass::OnAppCommandRun(wxCommandEvent& event) {
+	RunCommand(event.GetString(), false, false);
 }
 
 mvceditor::FileNameHitClass::FileNameHitClass()
@@ -838,4 +840,6 @@ BEGIN_EVENT_TABLE(mvceditor::RunConsoleFeatureClass, wxEvtHandler)
 	// take up all the rest of the IDs for the command buttons
 	EVT_MENU_RANGE(mvceditor::MENU_RUN_PHP + 5, mvceditor::MENU_RUN_PHP + 55, 
 	mvceditor::RunConsoleFeatureClass::OnCommandButtonClick)
+
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_RUN_COMMAND, mvceditor::RunConsoleFeatureClass::OnAppCommandRun)
 END_EVENT_TABLE()

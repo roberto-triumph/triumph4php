@@ -32,15 +32,16 @@
 #include <features/FinderFeatureClass.h>
 #include <features/ProjectFeatureClass.h>
 #include <features/OutlineViewFeatureClass.h>
-#include <features/ResourceFeatureClass.h>
+#include <features/TagFeatureClass.h>
 #include <features/RunConsoleFeatureClass.h>
 #include <features/RunBrowserFeatureClass.h>
 #include <features/LintFeatureClass.h>
 #include <features/SqlBrowserFeatureClass.h>
 #include <features/EditorMessagesFeatureClass.h>
-#include <features/CodeIgniterFeatureClass.h>
-#include <features/ViewFileFeatureClass.h>
 #include <features/RecentFilesFeatureClass.h>
+#include <features/DetectorFeatureClass.h>
+#include <features/TemplateFilesFeatureClass.h>
+#include <features/ConfigFilesFeatureClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 
@@ -156,7 +157,7 @@ void mvceditor::AppClass::CreateFeatures() {
 	Features.push_back(feature);
 	feature = new FindInFilesFeatureClass(*this);
 	Features.push_back(feature);
-	feature = new ResourceFeatureClass(*this);
+	feature = new TagFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new EnvironmentFeatureClass(*this);
 	Features.push_back(feature);	
@@ -172,13 +173,15 @@ void mvceditor::AppClass::CreateFeatures() {
 	EditorMessagesFeature = new mvceditor::EditorMessagesFeatureClass(*this);
 	Features.push_back(EditorMessagesFeature);
 
-	feature = new CodeIgniterFeatureClass(*this);
-	Features.push_back(feature);
 	feature = new RunBrowserFeatureClass(*this);
 	Features.push_back(feature);
-	feature = new ViewFileFeatureClass(*this);
-	Features.push_back(feature);
 	feature = new RecentFilesFeatureClass(*this);
+	Features.push_back(feature);
+	feature = new DetectorFeatureClass(*this);
+	Features.push_back(feature);
+	feature =  new TemplateFilesFeatureClass(*this);
+	Features.push_back(feature);
+	feature = new ConfigFilesFeatureClass(*this);
 	Features.push_back(feature);
 	
 	// TODO test feature need to find a quicker way to toggling it ON / OFF

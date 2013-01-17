@@ -240,15 +240,8 @@ solution "mvc-editor"
 			"tests/**.h",
 			"src/globals/*.cpp",
 			"src/actions/*.cpp",
-			"src/language/SqlLexicalAnalyzerClass.cpp",
-			"src/language/SymbolTableClass.cpp",
-			"src/language/ResourceCacheClass.cpp",
-			"src/php_frameworks/FrameworkDetectorClass.cpp",
-			"src/php_frameworks/CallStackClass.cpp",
-			"src/search/DirectorySearchClass.cpp",
-			"src/search/FinderClass.cpp",
-			"src/search/FindInFilesClass.cpp",
-			"src/search/ResourceFinderClass.cpp",
+			"src/language/*.cpp",
+			"src/search/*.cpp",
 			"src/widgets/ThreadWithHeartbeatClass.cpp",
 			"src/widgets/ProcessWithHeartbeatClass.cpp"
 		}
@@ -290,18 +283,17 @@ solution "mvc-editor"
 			icuconfiguration("Release", _ACTION)
 			wxconfiguration("Release", _ACTION)
 
-	project "resource_finder_profiler"
+	project "tag_finder_profiler"
 		language "C++"
 		kind "ConsoleApp"
 		files {
-			"profilers/resource_finder_profiler.cpp",
+			"profilers/tag_finder_profiler.cpp",
 			"src/globals/Errors.cpp",
 			"src/globals/Assets.cpp",
+			"src/globals/Sqlite.cpp",
+			"src/globals/TagClass.cpp",
 			"src/language/*.cpp",
-			"src/search/ResourceFinderClass.cpp",
-			"src/search/DirectorySearchClass.cpp",
-			"src/search/FinderClass.cpp",
-			"src/search/FindInFilesClass.cpp",
+			"src/search/*.cpp",
 			"src/globals/String.cpp"
 		}
 		includedirs { "src", "lib/pelet/include" }
@@ -324,12 +316,10 @@ solution "mvc-editor"
 		files {
 			"profilers/call_stack_profiler.cpp",
 			"src/language/*.cpp",
-			"src/php_frameworks/*.cpp",
 			"src/globals/*.cpp",
-			"src/search/ResourceFinderClass.cpp",
-			"src/search/DirectorySearchClass.cpp",
-			"src/search/FinderClass.cpp",
-			"src/search/FindInFilesClass.cpp",
+			"src/search/*.cpp",
+			"src/actions/ActionClass.cpp",
+			"src/actions/TagDetectorActionClass.cpp",
 			"src/widgets/ThreadWithHeartbeatClass.cpp",
 			"src/widgets/ProcessWithHeartbeatClass.cpp"
 		}
@@ -345,7 +335,32 @@ solution "mvc-editor"
 			pickywarnings(_ACTION)
 			icuconfiguration("Release", _ACTION)
 			wxconfiguration("Release", _ACTION)
-
+                        
+	project "action_profiler"
+		language "C++"
+		kind "WindowedApp"
+		files {
+			"src/actions/*.cpp",
+			"src/globals/*.cpp",
+			"src/language/*.cpp",
+			"src/search/*.cpp",
+			"src/widgets/ProcessWithHeartbeatClass.cpp",
+			"src/widgets/ThreadWithHeartbeatClass.cpp",
+			"profilers/action_profiler.cpp"
+		}
+		includedirs { "src", "lib/pelet/include" }
+		links { "pelet" }
+		sociconfiguration()
+		configuration "Debug"
+			pickywarnings(_ACTION)
+			icuconfiguration("Debug", _ACTION)
+			wxconfiguration("Debug", _ACTION)
+			wxappconfiguration("Debug", _ACTION)
+		configuration { "Release" }
+			pickywarnings(_ACTION)
+			icuconfiguration("Release", _ACTION)
+			wxconfiguration("Release", _ACTION)
+			wxappconfiguration("Release", _ACTION)
 
 	project "find_in_files_profiler"
 		language "C++"
@@ -378,12 +393,8 @@ solution "mvc-editor"
 			"src/widgets/ProcessWithHeartbeatClass.cpp",
 			"src/widgets/StatusBarWithGaugeClass.cpp",
 			"src/globals/*.cpp",
-			"src/php_frameworks/*.cpp",
 			"src/language/*.cpp",
-			"src/search/FinderClass.cpp",
-			"src/search/FindInFilesClass.cpp",
-			"src/search/ResourceFinderClass.cpp",
-			"src/search/DirectorySearchClass.cpp"
+			"src/search/*.cpp"
 		}
 		includedirs { "src/", "lib/pelet/include" }
 		links { "pelet" }

@@ -40,8 +40,8 @@ namespace mvceditor {
 // forward declaration to prevent #include of the AppClass
 class AppClass;
 
-// forward declaration to prevent #include of the ResourceCacheClass
-class ResourceCacheClass;
+// forward declaration to prevent #include of the TagCacheClass
+class TagCacheClass;
 
 /**
  * ATTN: Use this enum to build the Feature menus
@@ -71,9 +71,11 @@ enum MenuIds {
 	MENU_EDITOR_MESSAGES = 10900,
 	MENU_CODE_IGNITER = 11000,
 	MENU_RUN_BROWSER = 11100,
-	MENU_VIEW_FILES = 11200,
+	MENU_TEMPLATE_FILES = 11200,
 	MENU_RECENT_FILES = 11300,
-	MENU_END = 11400
+	MENU_DETECTORS = 11400,
+	CONFIG_DETECTORS = 11500,
+	MENU_END = 11600
 };
 
 /**
@@ -236,9 +238,7 @@ public:
 	
 	/**
 	 * This method will be called during application startup; the feature should load the preferences from persistent 
-	 * storage (confg) here.
-	 * Note: There is no virtual method for saving preferences. You can just access the wxConfig
-	 * pointer from the singleton instance wxConfigBase::Get and save whenever appropriate.
+	 * storage (confg) here
 	 * 
 	 * @param wxConfigBase* the config where settings are stored.
 	 */
@@ -355,13 +355,6 @@ protected:
 	 */
 	NotebookClass* GetNotebook() const;
 
-	/**
-	 * The resource cache. Guaranteed to be not null. Do NOT delete the pointer
-	 * 
-	 * @return ResourceCacheClass*
-	 */
-	ResourceCacheClass* GetResourceCache();
-	
 	/**
 	 * Set the given page to be the selected page for the tools notebook
 	 * @param wxWindow the window that the tools notebook will be visible

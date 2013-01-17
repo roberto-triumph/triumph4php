@@ -74,6 +74,7 @@ const wxEventType mvceditor::EVENT_APP_FILE_CLOSED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_PREFERENCES_SAVED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED = wxNewEventType();
 const wxEventType mvceditor::EVENT_CMD_FILE_OPEN = wxNewEventType();
+const wxEventType mvceditor::EVENT_CMD_RUN_COMMAND = wxNewEventType();
 
 const long mvceditor::ID_TOOLS_NOTEBOOK = 1003;
 const long mvceditor::ID_OUTLINE_NOTEBOOK = 1002;

@@ -24,6 +24,7 @@
  */
 #include <widgets/NotebookClass.h>
 #include <globals/String.h>
+#include <search/FindInFilesClass.h>
 #include <MvcEditor.h>
 #include <globals/Errors.h>
 #include <wx/artprov.h>

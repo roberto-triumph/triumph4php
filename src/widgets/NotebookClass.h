@@ -61,7 +61,7 @@ public:
 	 * This object will be used to publish app events. When an editor tab is closed;
 	 * we need to trigger project re-indexing since it has not been updated with
 	 * the changes made to the file that was opened (the parsed resources were being 
-	 * handled in a separate cache by ResourceCacheClass).
+	 * handled in a separate cache by TagCacheClass).
 	 */
 	EventSinkClass* EventSink;
 	
