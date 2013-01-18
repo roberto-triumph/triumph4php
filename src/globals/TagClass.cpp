@@ -52,7 +52,8 @@ mvceditor::TagClass::TagClass(const mvceditor::TagClass& src)
 	, Signature()
 	, ReturnType()
 	, Comment()
-	, Type(CLASS) 
+	, FileIsNew(false)
+	, Type(CLASS)	
 	, IsProtected(false)
 	, IsPrivate(false) 
 	, IsStatic(false)
@@ -60,8 +61,7 @@ mvceditor::TagClass::TagClass(const mvceditor::TagClass& src)
 	, IsNative(false)
 	, Key()
 	, FullPath()
-	, FileTagId(-1) 
-	, FileIsNew(false) {
+	, FileTagId(-1) {
 	Copy(src);
 }
 
