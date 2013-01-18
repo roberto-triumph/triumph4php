@@ -27,8 +27,8 @@
 #include <widgets/ChooseUrlDialogClass.h>
 #include <MvcEditor.h>
 #include <wx/artprov.h>
+#include <algorithm>
 
-static const int ID_URL_GAUGE = wxNewId();
 static const size_t MAX_BROWSERS = 10;
 static const size_t MAX_URLS = 40;
 
@@ -135,7 +135,6 @@ void mvceditor::RunBrowserFeatureClass::OnRunInWebBrowser(wxCommandEvent& event)
 void mvceditor::RunBrowserFeatureClass::OnBrowserToolDropDown(wxAuiToolBarEvent& event) {
 	if (event.IsDropDownClicked()) {
 		BrowserToolbar->SetToolSticky(event.GetId(), true);
-		mvceditor::EnvironmentClass* environment = GetEnvironment();
 
 		// create the popup menu that contains all the available browser names
 		if (!BrowserMenu.get()) {
