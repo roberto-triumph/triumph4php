@@ -110,7 +110,8 @@ int main() {
 	}
 	u_fclose(ufout);
 	printf("The call stack is %d items long\n", (int)CallStack.List.size());
-	CallStack.Persist(wxFileName(DetectorDbFullPath));
+	wxFileName detectorDbFileName(DetectorDbFullPath);
+	CallStack.Persist(detectorDbFileName);
 	printf("Call stack written to:%s\n", (const char*)DetectorDbFullPath.ToAscii());
 	return 0;
 }
