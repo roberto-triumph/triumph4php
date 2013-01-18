@@ -59,17 +59,14 @@ bool mvceditor::CallStackActionClass::SetCallStackStart(const wxFileName& startF
 
 void mvceditor::CallStackActionClass::BackgroundWork() {
 	mvceditor::CallStackClass::Errors lastError = mvceditor::CallStackClass::NONE;
-	bool writeError = false;
 	
 	// build the call stack then save it to a temp file
 	if (CallStack.Build(StartFileName, StartClassName, StartMethodName, Version, lastError)) {
 		if (!DetectorDbFileName.IsOk()) {
 			mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, _("Could not create call stack file in ") + DetectorDbFileName.GetFullPath());
-			writeError = true;
 		}
 		else if (!CallStack.Persist(DetectorDbFileName)) {
 			mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, _("Could not persist call stack file in ") + DetectorDbFileName.GetFullPath());
-			writeError = true;
 		}
 	}
 }
