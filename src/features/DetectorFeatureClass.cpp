@@ -446,7 +446,7 @@ void mvceditor::DetectorTreeHandlerClass::OnAddButton(wxCommandEvent& event) {
 		
 		// populate the file with some starter code to guide the user
 		wxFileName urlDetectorSkeleton = Detector->SkeletonFile();
-		wxFFile skeletonFile(urlDetectorSkeleton.GetFullPath());
+		wxFFile skeletonFile(urlDetectorSkeleton.GetFullPath(), wxT("rb"));
 		wxASSERT_MSG(skeletonFile.IsOpened(), _("Skeleton file not found."));
 		wxString contents;
 		
