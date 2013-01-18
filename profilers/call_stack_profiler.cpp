@@ -30,7 +30,7 @@
 #include <actions/CallStackActionClass.h>
 #include <globals/Assets.h>
 #include <wx/app.h>
-#include <wx/String.h>
+#include <wx/string.h>
 #include <wx/stdpaths.h>
 
 /**
