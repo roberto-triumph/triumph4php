@@ -46,8 +46,8 @@ public:
 		: FileTestFixtureClass(wxT("url_resource_finder"))
 		, Finder()
 		, Session1()
-		, DetectorDbFileName1()
 		, Session2()
+		, DetectorDbFileName1()
 		, DetectorDbFileName2() {
 	
 		DetectorDbFileName1.Assign(TestProjectDir, wxT("detectors.sqlite"));
