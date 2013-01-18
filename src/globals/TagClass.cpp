@@ -32,6 +32,7 @@ mvceditor::TagClass::TagClass()
 	, Signature()
 	, ReturnType()
 	, Comment()
+	, FileIsNew(false)
 	, Type(CLASS) 
 	, IsProtected(false)
 	, IsPrivate(false) 
@@ -40,8 +41,7 @@ mvceditor::TagClass::TagClass()
 	, IsNative(false)
 	, Key()
 	, FullPath()
-	, FileTagId(-1) 
-	, FileIsNew(false) {
+	, FileTagId(-1) {
 		
 }
 
