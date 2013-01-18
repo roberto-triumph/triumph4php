@@ -28,7 +28,7 @@
 #include <algorithm>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
-#include <globals/sqlite.h>
+#include <globals/Sqlite.h>
 #include <wx/FFile.h>
 
 
