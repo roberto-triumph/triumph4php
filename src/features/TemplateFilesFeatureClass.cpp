@@ -210,7 +210,6 @@ void mvceditor::TemplateFilesPanelClass::OnActionChoice(wxCommandEvent& event) {
 	wxString controller = Controller->GetStringSelection();
 	wxString action = Action->GetStringSelection();
 
-	mvceditor::UrlResourceFinderClass& urls = Feature.Urls();
 	mvceditor::UrlResourceClass url;
 	std::vector<mvceditor::UrlResourceClass>::iterator it;
 	bool found = Feature.App.Globals.UrlResourceFinder.FindByClassMethod(controller, action, url);
