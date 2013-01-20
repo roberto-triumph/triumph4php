@@ -25,9 +25,7 @@
 #include <actions/ActionClass.h>
 
 mvceditor::ActionClass::ActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: ThreadWithHeartbeatClass(runningThreads, eventId) 
-	, Status()
-	, Mutex() {
+	: ThreadWithHeartbeatClass(runningThreads, eventId) {
 
 }
 
@@ -41,19 +39,11 @@ bool mvceditor::ActionClass::DoAsync() {
 
 void mvceditor::ActionClass::SetStatus(const wxString& status) {
 
-	// make sure to synchronize since this may be called from multiple threads
-	wxMutexLocker locker(Mutex);
-
-	// make sure to copy, since this may be called from multiple threads
-	Status.Clear();
-	Status.Append(status.c_str());
-}
-
-wxString mvceditor::ActionClass::GetStatus() {
-
-	// make sure to synchronize since this may be called from multiple threads
-	wxMutexLocker locker(Mutex);
-	return Status;
+	wxCommandEvent evt(mvceditor::EVENT_ACTION_STATUS);
+	
+	// make sure to copy, since wxString copy is not thread safe
+	evt.SetString(status.c_str());
+	PostEvent(evt);
 }
 
 mvceditor::InitializerActionClass::InitializerActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
@@ -94,3 +84,5 @@ const int mvceditor::ID_EVENT_ACTION_DATABASE_DETECTOR = wxNewId();
 const int mvceditor::ID_EVENT_ACTION_CONFIG_DETECTOR = wxNewId();
 const int mvceditor::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK = wxNewId();
 const int mvceditor::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK = wxNewId();
+
+const wxEventType mvceditor::EVENT_ACTION_STATUS = wxNewEventType();

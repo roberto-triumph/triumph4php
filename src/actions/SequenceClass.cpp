@@ -316,14 +316,6 @@ void mvceditor::SequenceClass::RunNextStep() {
 	}
 }
 
-wxString mvceditor::SequenceClass::GetStatus() {
-	wxString status;
-	if (!Steps.empty()) {
-		status = Steps.front()->GetStatus();
-	}
-	return status;
-}
-
 bool mvceditor::SequenceClass::Running() const {
 	return IsRunning;
 }

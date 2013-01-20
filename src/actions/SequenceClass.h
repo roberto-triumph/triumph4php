@@ -39,7 +39,8 @@ namespace mvceditor {
 extern const wxEventType EVENT_SEQUENCE_START;
 
 /**
- * this event will be generated while a sequence is running
+ * this event will be generated while a sequence is running; it is 
+ * generated consitantly every 200-300 ms.
  */
 extern const wxEventType EVENT_SEQUENCE_IN_PROGRESS;
 
@@ -124,11 +125,6 @@ public:
 	 * @return bool FALSE if there is a sequence already running.
 	 */
 	bool Build(std::vector<mvceditor::ActionClass*> actions);
-
-	/**
-	 * @return wxString a short description of which step is currently being run
-	 */
-	wxString GetStatus();
 
 	/**
 	 * @return bool TRUE if there is a sequence currently running.

@@ -288,6 +288,11 @@ private:
 	 * when a sequence is running pulse the Gauge
 	 */
 	void OnSequenceInProgress(wxCommandEvent& event);
+	
+	/**
+	 * when a sequence status changes update the gauge title
+	 */
+	void OnSequenceActionStatus(wxCommandEvent& event);
 
 	/**
 	 * when a sequence has completed stop the Gauge

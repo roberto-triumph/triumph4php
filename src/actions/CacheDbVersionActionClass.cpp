@@ -47,6 +47,7 @@ mvceditor::TagCacheDbVersionActionClass::TagCacheDbVersionActionClass(mvceditor:
 }
 
 bool mvceditor::TagCacheDbVersionActionClass::Init(mvceditor::GlobalsClass& globals) {
+	SetStatus(_("Tag Cache Check"));
 	bool ret = false;
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
@@ -100,6 +101,7 @@ mvceditor::DetectorCacheDbVersionActionClass::DetectorCacheDbVersionActionClass(
 }
 
 bool mvceditor::DetectorCacheDbVersionActionClass::Init(mvceditor::GlobalsClass& globals) {
+	SetStatus(_("Detector Cache Check"));
 	bool ret = false;
 	std::vector<mvceditor::ProjectClass>::iterator project;
 	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {

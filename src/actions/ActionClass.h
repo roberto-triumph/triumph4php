@@ -54,15 +54,11 @@ public:
 
 	virtual bool DoAsync();
 
+	/**
+	 * Generates a EVENT_ACTION_STATUS event with the given string
+	 * as the wxCommandEvent.GetString
+	 */
 	void SetStatus(const wxString& status);
-
-	wxString GetStatus();
-
-private:
-
-	wxString Status;
-
-	wxMutex Mutex;
 
 };
 
@@ -108,6 +104,13 @@ extern const int ID_EVENT_ACTION_CONFIG_DETECTOR;
 extern const int ID_EVENT_ACTION_GLOBAL_CACHE_WIPE;
 extern const int ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK;
 extern const int ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK;
+
+/*
+ * this event will be generated while a sequence is running, it
+ * is generated everytime the status of the sequence changes. The
+ * new status of the sequence can be retrieved via wxCommandEvent.GetString
+ */
+extern const wxEventType EVENT_ACTION_STATUS;
 
 }
 
