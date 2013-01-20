@@ -63,6 +63,7 @@ public:
 		, FileTestFixtureClass(wxT("resource_file_reader"))
 		, ProjectTagAction(RunningThreads, ID_EVENT) 
 		, GlobalCaches() {
+		TouchTestDir();
 		CreateProject(AbsoluteDir(wxT("src_project_1")), TestProjectDir);
 		soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.Projects[0].ResourceDbFileName.GetFullPath()));
 		wxString error;
