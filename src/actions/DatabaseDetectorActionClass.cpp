@@ -56,6 +56,7 @@ mvceditor::DatabaseDetectorActionClass::DatabaseDetectorActionClass(mvceditor::R
 }
 
 bool mvceditor::DatabaseDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
+	SetStatus(_("DB Detect"));
 	while (!ParamsQueue.empty()) {
 		ParamsQueue.pop();
 	}
@@ -168,7 +169,7 @@ mvceditor::DatabaseDetectorInitActionClass::DatabaseDetectorInitActionClass(mvce
 }
 
 void mvceditor::DatabaseDetectorInitActionClass::Work(mvceditor::GlobalsClass &globals) {
-	SetStatus(_("Database tags detector initialization"));
+	SetStatus(_("DB Detect Init"));
 
 	// initialize the detected tag cache only the enabled projects	
 	mvceditor::DatabaseTagFinderClass finder;

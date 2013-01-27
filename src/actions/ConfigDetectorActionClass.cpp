@@ -56,6 +56,7 @@ mvceditor::ConfigDetectorActionClass::ConfigDetectorActionClass(mvceditor::Runni
 }
 
 bool mvceditor::ConfigDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
+	SetStatus(_("Config Detector"));
 	while (!ParamsQueue.empty()) {
 		ParamsQueue.pop();
 	}
@@ -111,9 +112,10 @@ void mvceditor::ConfigDetectorActionClass::NextDetection() {
 	}
 	mvceditor::ConfigDetectorParamsClass params = ParamsQueue.front();
 	ParamsQueue.pop();
-
-	SetStatus(_("Detecting config files for ") + params.SourceDir.GetName());
-
+	wxArrayString dirs = params.SourceDir.GetDirs();
+	if (!dirs.IsEmpty()) {
+		SetStatus(_("Config Detector / ") + dirs.back());
+	}
 	wxString cmdLine = params.BuildCmdLine();
 	long pid;
 	Process.Init(cmdLine, ID_CONFIG_DETECTOR_PROCESS, pid);

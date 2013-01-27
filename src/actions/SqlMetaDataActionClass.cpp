@@ -47,10 +47,8 @@ mvceditor::SqlMetaDataActionClass::SqlMetaDataActionClass(mvceditor::RunningThre
 }
 
 bool mvceditor::SqlMetaDataActionClass::Init(mvceditor::GlobalsClass& globals) {
+	SetStatus(_("SQL Meta"));
 	DatabaseTags = globals.DatabaseTags;
-	if (!DatabaseTags.empty()) {
-		SetStatus(_("Detecting SQL metadata"));
-	}
 	return !DatabaseTags.empty();
 }
 
@@ -61,7 +59,7 @@ void mvceditor::SqlMetaDataActionClass::BackgroundWork() {
 		if (!IsCancelled()) {
 			if (it->IsEnabled) {
 				wxString wxLabel = mvceditor::IcuToWx(it->Label);
-				SetStatus(_("Detecting SQL Metadata for ") + wxLabel);
+				SetStatus(_("SQL Meta / ") + wxLabel);
 				UnicodeString error;
 				if (!newResources.Fetch(*it, error)) {
 					errors.push_back(error);

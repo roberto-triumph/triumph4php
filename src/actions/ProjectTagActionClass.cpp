@@ -71,6 +71,7 @@ void mvceditor::ProjectTagActionClass::SetTouchedProjects(const std::vector<mvce
 }
 
 bool mvceditor::ProjectTagActionClass::Init(mvceditor::GlobalsClass& globals) {
+	SetStatus(_("Tag Cache"));
 	Version = globals.Environment.Php.Version;
 	
 	// if we were not given projects, scan all of them
@@ -82,9 +83,6 @@ bool mvceditor::ProjectTagActionClass::Init(mvceditor::GlobalsClass& globals) {
 				Projects.push_back(*project);
 			}
 		}
-	}
-	if (!Projects.empty()) {
-		SetStatus(_("Indexing Projects"));
 	}
 	return !Projects.empty();
 }
@@ -135,7 +133,7 @@ void mvceditor::ProjectTagActionClass::IterateProjects() {
 			if (GlobalCache) {
 				delete GlobalCache;
 			}
-			SetStatus(_("Updating Index for ") + project.Label);
+			SetStatus(_("Tag Cache / ") + project.Label);
 			GlobalCache = new mvceditor::GlobalCacheClass;
 			GlobalCache->InitGlobalTag(project.ResourceDbFileName, project.PhpFileExtensions, miscFileExtensions, Version, 1024);
 			IterateDirectory();
@@ -163,7 +161,7 @@ mvceditor::ProjectTagInitActionClass::ProjectTagInitActionClass(mvceditor::Runni
 }
 
 void mvceditor::ProjectTagInitActionClass::Work(mvceditor::GlobalsClass &globals) {
-	SetStatus(_("Project tags initialization"));
+	SetStatus(_("Tag Cache Init"));
 
 	// need to clear the entire cache, then add only the newly enabled projects
 	globals.TagCache.Clear();
