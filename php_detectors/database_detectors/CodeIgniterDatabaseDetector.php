@@ -150,7 +150,8 @@ function detectDatabases($sourceDir, &$doSkip) {
 		include ($sourceDir . 'application/config/database.php');
 		if ($db) {
 			foreach ($db as $groupName => $groupConnection) {
-				if (strcasecmp('mysql', $groupConnection['dbdriver']) == 0) {
+				if (\opstring\compare_case('mysql', $groupConnection['dbdriver']) == 0 || 
+					\opstring\compare_case('mysqli', $groupConnection['dbdriver']) == 0) {
 					$tag = tagFromDbArray($groupName, $groupConnection);
 					$allDatabases[] = $tag;
 				}
