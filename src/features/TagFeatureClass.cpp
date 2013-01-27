@@ -148,12 +148,35 @@ void mvceditor::TagFeatureClass::OnJump(wxCommandEvent& event) {
 				LoadPageFromResource(term, matches[0]);
 			}
 			else {
-				std::vector<mvceditor::TagClass> chosenResources;
-				mvceditor::ResourceSearchDialogClass dialog(GetMainWindow(), *this, term, chosenResources);
-				dialog.Prepopulate(term, matches);
-				if (dialog.ShowModal() == wxOK) {
-					for (size_t i = 0; i < chosenResources.size(); ++i) {
-						LoadPageFromResource(JumpToText, chosenResources[i]);
+
+				// if we have more than one match, lets pick the match from the same project
+				// that the currently opened file is in.
+				wxFileName openedFile = codeControl->GetFileName();
+				int tagProjectMatchCount = 0;
+				mvceditor::TagClass tagProjectMatch;
+				if (openedFile.IsOk() && !codeControl->IsNew()) {
+					std::vector<mvceditor::ProjectClass>::const_iterator project;
+					std::vector<mvceditor::TagClass>::const_iterator tag;
+					for (tag = matches.begin(); tag != matches.end(); ++tag) {
+						for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
+							if (project->IsAPhpSourceFile(openedFile.GetFullPath()) && project->IsAPhpSourceFile(tag->FullPath)) {
+								tagProjectMatch = *tag;
+								tagProjectMatchCount++;
+							}
+						}
+					}
+				}
+				if (tagProjectMatchCount == 1) {
+					LoadPageFromResource(term, tagProjectMatch);
+				}
+				else {
+					std::vector<mvceditor::TagClass> chosenResources;
+					mvceditor::ResourceSearchDialogClass dialog(GetMainWindow(), *this, term, chosenResources);
+					dialog.Prepopulate(term, matches);
+					if (dialog.ShowModal() == wxOK) {
+						for (size_t i = 0; i < chosenResources.size(); ++i) {
+							LoadPageFromResource(JumpToText, chosenResources[i]);
+						}
 					}
 				}
 			}

@@ -493,10 +493,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectFullyQualifie
 		for (size_t i = 0; i < classHierarchy.size(); ++i) {
 			UnicodeString key = classHierarchy[i] + UNICODE_STRING_SIMPLE("::") + tagSearch.GetMethodName();
 			std::string stdKey = mvceditor::IcuToChar(key);
-			std::vector<mvceditor::TagClass> matches = FindByKeyExactAndTypes(stdKey, types, true);
-			if (!matches.empty()) {
-				allMatches.push_back(matches[0]);
-			}
+			allMatches = FindByKeyExactAndTypes(stdKey, types, true);
 		}
 	}
 	else if (mvceditor::TagSearchClass::NAMESPACE_NAME == tagSearch.GetResourceType()) {
@@ -506,11 +503,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectFullyQualifie
 		types.push_back(mvceditor::TagClass::CLASS);
 		types.push_back(mvceditor::TagClass::FUNCTION);
 
-		// make sure there is one and only one item that matches the search.
-		std::vector<mvceditor::TagClass> matches = FindByKeyExactAndTypes(stdKey, types, true);
-		if (matches.size() == 1) {
-			allMatches.push_back(matches[0]);
-		}
+		allMatches = FindByKeyExactAndTypes(stdKey, types, true);
 	}
 	else {
 		UnicodeString key = tagSearch.GetClassName();
@@ -519,11 +512,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectFullyQualifie
 		types.push_back(mvceditor::TagClass::CLASS);
 		types.push_back(mvceditor::TagClass::FUNCTION);
 
-		// make sure there is one and only one item that matches the search.
-		std::vector<mvceditor::TagClass> matches = FindByKeyExactAndTypes(stdKey, types, true);
-		if (matches.size() == 1) {
-			allMatches.push_back(matches[0]);
-		}
+		allMatches = FindByKeyExactAndTypes(stdKey, types, true);
 	}
 	return allMatches;
 }
