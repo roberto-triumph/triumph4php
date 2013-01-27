@@ -150,6 +150,7 @@ void mvceditor::TagFeatureClass::OnJump(wxCommandEvent& event) {
 			else {
 				std::vector<mvceditor::TagClass> chosenResources;
 				mvceditor::ResourceSearchDialogClass dialog(GetMainWindow(), *this, term, chosenResources);
+				dialog.Prepopulate(term, matches);
 				if (dialog.ShowModal() == wxOK) {
 					for (size_t i = 0; i < chosenResources.size(); ++i) {
 						LoadPageFromResource(JumpToText, chosenResources[i]);
