@@ -138,10 +138,11 @@ class ProjectListDialogGeneratedClass : public wxDialog
 	protected:
 		wxStaticText* HelpLabel;
 		wxCheckListBox* ProjectsList;
+		wxButton* SelectAll;
 		wxButton* AddButton;
-		wxButton* RemoveButton;
-		wxButton* EditButton;
 		wxButton* AddFromDirectoryButton;
+		wxButton* EditButton;
+		wxButton* RemoveButton;
 		wxStdDialogButtonSizer* ButtonsSizer;
 		wxButton* ButtonsSizerOK;
 		wxButton* ButtonsSizerCancel;
@@ -150,10 +151,11 @@ class ProjectListDialogGeneratedClass : public wxDialog
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnProjectsListDoubleClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnProjectsListCheckbox( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSelectAllButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddButton( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnRemoveButton( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnEditButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddFromDirectoryButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnEditButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRemoveButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
@@ -161,7 +163,7 @@ class ProjectListDialogGeneratedClass : public wxDialog
 	
 	public:
 		
-		ProjectListDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Defined Projects"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 437,492 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		ProjectListDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Defined Projects"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 504,507 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~ProjectListDialogGeneratedClass();
 	
 };

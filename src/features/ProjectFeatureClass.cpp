@@ -444,6 +444,23 @@ mvceditor::ProjectListDialogClass::ProjectListDialogClass(wxWindow* parent, std:
 	}
 }
 
+void mvceditor::ProjectListDialogClass::OnSelectAllButton(wxCommandEvent& event) {
+
+	// this will be a toggle button; if all items are checked then
+	// this button should de-check them
+	bool isAllChecked = true;
+	for (size_t i = 0; i < ProjectsList->GetCount(); i++) {
+		isAllChecked &= ProjectsList->IsChecked(i);
+	}
+
+	for (size_t i = 0; i < ProjectsList->GetCount(); i++) {
+		ProjectsList->Check(i, !isAllChecked);
+
+		// Check does not emit an event, need to update the project data structure
+		EditedProjects[i].IsEnabled = !isAllChecked;
+	}
+}
+
 void mvceditor::ProjectListDialogClass::OnProjectsListDoubleClick(wxCommandEvent& event) {
 	size_t selection = event.GetSelection();
 	if (selection >= 0 && selection < EditedProjects.size()) {
@@ -503,32 +520,60 @@ void mvceditor::ProjectListDialogClass::AddProject(const mvceditor::ProjectClass
 }
 
 void mvceditor::ProjectListDialogClass::OnRemoveButton(wxCommandEvent& event) {
-	size_t selection = ProjectsList->GetSelection();
-	if (selection >= 0 && selection < EditedProjects.size()) {
-		mvceditor::ProjectClass project = EditedProjects[selection];
-		wxString msg = _("Are you sure you wish to remove the project\n\n");
-		msg += project.Label;
-		msg += wxT("\n\n");
+	wxArrayInt selections;
+	ProjectsList->GetSelections(selections);
+	if (selections.GetCount() > 0) {
+		wxString projectLabels;
+		for (size_t i = 0 ; i <  selections.GetCount(); ++i) {
+			size_t selection = selections[i];
+			if (selection >= 0  && selection < EditedProjects.size()) {
+				mvceditor::ProjectClass project = EditedProjects[selection];
+				projectLabels += project.Label;
+				projectLabels += wxT("\n");
+			}
+		}
+		
+		wxString msg = _("Are you sure you wish to remove the projects\n\n");
+		msg += projectLabels;
+		msg += wxT("\n");
 		msg += _("MVC Editor will no longer open or index files in any sources of this project. Note that no directories are actually deleted from the file system");
-		wxString caption = _("Remove Project");
+		wxString caption = _("Remove Projects");
 		int response = wxMessageBox(msg, caption, wxYES_NO);
 		if (wxYES == response) {
-			RemovedProjects.push_back(EditedProjects[selection]);
-			EditedProjects.erase(EditedProjects.begin() + selection);
-			size_t oldSelection = ProjectsList->GetSelection();
-			ProjectsList->Delete(selection);
-			if (oldSelection < ProjectsList->GetCount()) {
-				ProjectsList->SetSelection(oldSelection);
+
+			// copy all the items that are NOT to be removed into a new vector
+			std::vector<mvceditor::ProjectClass> remainingProjects;
+			wxArrayString remainingLabels;
+
+			for (size_t i = 0; i < EditedProjects.size(); ++i) {
+
+				// we dont find the index in the selected list means that the 
+				// user does NOT want to remove it
+				if (selections.Index(i) == wxNOT_FOUND) {
+					remainingProjects.push_back(EditedProjects[i]);
+					remainingLabels.Add(EditedProjects[i].Label);
+				}
+				else {
+					RemovedProjects.push_back(EditedProjects[i]);	
+				}
 			}
-			else if (!ProjectsList->IsEmpty()) {
-				ProjectsList->SetSelection(ProjectsList->GetCount() - 1);
+			EditedProjects = remainingProjects;
+			ProjectsList->Set(remainingLabels);
+			for (size_t i = 0; i < EditedProjects.size(); ++i) {
+				ProjectsList->Check(i, EditedProjects[i].IsEnabled);
 			}
 		}
 	}
 }
 
 void mvceditor::ProjectListDialogClass::OnEditButton(wxCommandEvent& event) {
-	size_t selection = ProjectsList->GetSelection();
+	wxArrayInt selections;
+	ProjectsList->GetSelections(selections);
+	if (selections.GetCount() != 1) {
+		wxMessageBox(_("Please select a single project to edit."));
+		return;
+	}
+	size_t selection = selections[0];
 	if (selection >= 0 && selection < EditedProjects.size()) {
 		mvceditor::ProjectClass project = EditedProjects[selection];
 		mvceditor::ProjectDefinitionDialogClass dialog(this, project);
@@ -560,6 +605,14 @@ void mvceditor::ProjectListDialogClass::OnOkButton(wxCommandEvent& event) {
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	std::vector<mvceditor::ProjectClass>::const_iterator editedProject;
 	for (editedProject = EditedProjects.begin(); editedProject != EditedProjects.end(); ++editedProject) {
+
+		// if a project is disabled then we wont need to update the cache so we can
+		// leave it as not touched. 
+		// short circuiting the loop since comparing source lists was shown to be expensive
+		// under a profiler.
+		if (!editedProject->IsEnabled) {
+			continue;
+		}
 
 		// if we dont find the edited project in the original project, then it has been changed
 		// by the reverse, if we find the edited project in the original projects list then it has 
@@ -620,30 +673,38 @@ void mvceditor::ProjectListDialogClass::OnAddFromDirectoryButton(wxCommandEvent&
 		wxDir dir(rootDir);
 		if (dir.IsOpened()) {
 			wxString fileName;
-			std::vector<wxString> subDirs;
+			wxArrayString subDirs;
 			bool cont = dir.GetFirst(&fileName, wxEmptyString, wxDIR_DIRS);
 			while (cont) {
-				subDirs.push_back(fileName);
+				subDirs.Add(fileName);
 				cont = dir.GetNext(&fileName);
 			}
+			subDirs.Sort();
+			wxArrayInt selections;
 			cont = !subDirs.empty();
-			if (!subDirs.empty()) {
-				int res = wxMessageBox(
-					wxString::Format(_("There are %d projects. Add them all?"), subDirs.size()), 
-					_("Add Projects From Directory"), wxCENTRE | wxYES_NO,  this);
-				cont = wxYES == res;
+			if (!subDirs.empty()) {				
+				size_t chosenCount = wxGetMultipleChoices(
+					selections,
+					wxString::Format(_("There are %d projects. Please choose directories to create projects for"), subDirs.GetCount()),
+					_("Add Multiple"),
+					subDirs,
+					this
+				);
+				cont = chosenCount > 0;
 			}
 			if (cont) {
-				for (size_t i = 0; i < subDirs.size(); ++i) {
+				for (size_t i = 0; i < selections.GetCount(); ++i) {
+					wxString chosenSubDir = subDirs[selections[i]];
+
 					mvceditor::ProjectClass project;
 					mvceditor::SourceClass newSrc;
 					newSrc.RootDirectory.AssignDir(rootDir);
-					newSrc.RootDirectory.AppendDir(subDirs[i]);
+					newSrc.RootDirectory.AppendDir(chosenSubDir);
 					newSrc.SetIncludeWildcards(wxT("*.*"));
 					newSrc.SetExcludeWildcards(wxT(""));
 					project.AddSource(newSrc);
 					project.IsEnabled = true;
-					project.Label = subDirs[i];
+					project.Label = chosenSubDir;
 				
 					AddProject(project);
 				}
