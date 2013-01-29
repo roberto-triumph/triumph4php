@@ -368,7 +368,18 @@ void mvceditor::TagCacheClass::ExpressionCompletionMatches(const wxString& fileN
 		std::map<wxString, mvceditor::TagFinderClass*> openedFinders;
 		std::map<wxString, mvceditor::WorkingCacheClass*>::const_iterator it;
 		for (it = WorkingCaches.begin(); it != WorkingCaches.end(); ++it) {
-			openedFinders[it->first] = &it->second->TagFinder;
+			if (it->second->IsNew) {
+
+				// use the file identifier as a key to the map
+				openedFinders[it->first] = &it->second->TagFinder;
+			}
+			else {
+				
+				// use the filename being edited as a key to the map
+				// this is needed so that we can know to remove matches
+				// that come from dirty files
+				openedFinders[it->second->FileName] = &it->second->TagFinder;
+			}
 		}
 		mvceditor::WorkingCacheClass* cache = itWorkingCache->second;
 		cache->SymbolTable.ExpressionCompletionMatches(parsedExpression, expressionScope, allFinders, openedFinders, 
@@ -393,7 +404,18 @@ void mvceditor::TagCacheClass::ResourceMatches(const wxString& fileName, const p
 		std::map<wxString, mvceditor::TagFinderClass*> openedFinders;
 		std::map<wxString, mvceditor::WorkingCacheClass*>::const_iterator it;
 		for (it = WorkingCaches.begin(); it != WorkingCaches.end(); ++it) {
-			openedFinders[it->first] = &it->second->TagFinder;
+			if (it->second->IsNew) {
+
+				// use the file identifier as a key to the map
+				openedFinders[it->first] = &it->second->TagFinder;
+			}
+			else {
+				
+				// use the filename being edited as a key to the map
+				// this is needed so that we can know to remove matches
+				// that come from dirty files
+				openedFinders[it->second->FileName] = &it->second->TagFinder;
+			}
 		}
 		mvceditor::WorkingCacheClass* cache = itWorkingCache->second;
 		cache->SymbolTable.ResourceMatches(parsedExpression, expressionScope, allFinders, openedFinders, 
