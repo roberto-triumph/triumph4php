@@ -262,6 +262,11 @@ void mvceditor::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
 			App.Globals.AssignFileExtensions(*project);
 		}
 
+		// need to set the same for the touched projects too since they are a deep copy
+		for (project = touchedProjects.begin(); project != touchedProjects.end(); ++project) {
+			App.Globals.AssignFileExtensions(*project);
+		}
+
 		wxCommandEvent evt;
 		OnPreferencesSaved(evt);
 		wxConfigBase* config = wxConfig::Get();
@@ -603,7 +608,7 @@ void mvceditor::ProjectListDialogClass::OnOkButton(wxCommandEvent& event) {
 	// here, Projects is the original list and EditedProjects is the list that the
 	// user modified
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	std::vector<mvceditor::ProjectClass>::const_iterator editedProject;
+	std::vector<mvceditor::ProjectClass>::iterator editedProject;
 	for (editedProject = EditedProjects.begin(); editedProject != EditedProjects.end(); ++editedProject) {
 
 		// if a project is disabled then we wont need to update the cache so we can
@@ -630,18 +635,17 @@ void mvceditor::ProjectListDialogClass::OnOkButton(wxCommandEvent& event) {
 			}
 		}
 		if (touched) {
+
+			// create the cache files for this project since it may be a
+			// completely new project
+			if (editedProject->IsEnabled) {
+				editedProject->TouchCacheDbs();
+			}
 			TouchedProjects.push_back(*editedProject);
 		}
 	}
 	
 	Projects = EditedProjects;
-	
-	// create the cache files 
-	for (size_t i = 0; i < Projects.size(); ++i) {
-		if (Projects[i].IsEnabled) {
-			Projects[i].TouchCacheDbs();
-		}
-	}
 	EndModal(wxOK);
 }
 

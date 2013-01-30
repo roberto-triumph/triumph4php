@@ -230,6 +230,7 @@ void mvceditor::TagCacheClass::RemoveWorking(const wxString& fileName) {
 }
 
 bool mvceditor::TagCacheClass::RegisterGlobal(mvceditor::GlobalCacheClass* cache) {
+	wxASSERT_MSG(cache->ResourceDbFileName.IsOk(), _("Global cache cannot be an empty filename"));
 	bool found = IsInitGlobal(cache->ResourceDbFileName);
 	if (!found) {
 		GlobalCaches.push_back(cache);
