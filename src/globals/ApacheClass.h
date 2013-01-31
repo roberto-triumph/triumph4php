@@ -195,7 +195,7 @@ private:
 	 * @param wxString configPath the path to check
 	 * @return wxString the absolute path
 	 */
-	wxString MakeAbsolute(const wxString& configPath);
+	wxString MakeAbsolute(wxString configPath);
 	
 	/**
 	 * The directory name => host name.  We will use these mappings to turn a file system path into a 
