@@ -972,6 +972,34 @@ void mvceditor::DetectorFeatureClass::OnRunConfigDetectors(wxCommandEvent& event
 	App.Sequences.Build(actions);
 }
 
+void mvceditor::DetectorFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
+	wxWindow* window = FindOutlineWindow(ID_URL_DETECTOR_PANEL);
+	if (window) {
+		mvceditor::UrlDetectorPanelClass* panel = (mvceditor::UrlDetectorPanelClass*) window;
+		panel->UpdateProjects();
+	}
+	window = FindOutlineWindow(ID_TEMPLATE_FILES_DETECTOR_PANEL);
+	if (window) {
+		mvceditor::TemplateFilesDetectorPanelClass* panel = (mvceditor::TemplateFilesDetectorPanelClass*) window;
+		panel->UpdateProjects();
+	}
+	window = FindOutlineWindow(ID_TAG_DETECTOR_PANEL);
+	if (window) {
+		mvceditor::TagDetectorPanelClass* panel = (mvceditor::TagDetectorPanelClass*) window;
+		panel->UpdateProjects();
+	}
+	window = FindOutlineWindow(ID_DATABASE_DETECTOR_PANEL);
+	if (window) {
+		mvceditor::DatabaseDetectorPanelClass* panel = (mvceditor::DatabaseDetectorPanelClass*) window;
+		panel->UpdateProjects();
+	}
+	window = FindOutlineWindow(ID_CONFIG_DETECTOR_PANEL);
+	if (window) {
+		mvceditor::ConfigDetectorPanelClass* panel = (mvceditor::ConfigDetectorPanelClass*) window;
+		panel->UpdateProjects();
+	}
+}
+
 BEGIN_EVENT_TABLE(mvceditor::DetectorFeatureClass, mvceditor::FeatureClass)
 	EVT_MENU(mvceditor::MENU_DETECTORS + 0, mvceditor::DetectorFeatureClass::OnViewUrlDetectors)
 	EVT_MENU(mvceditor::MENU_DETECTORS + 1, mvceditor::DetectorFeatureClass::OnViewTemplateFileDetectors)
@@ -984,4 +1012,6 @@ BEGIN_EVENT_TABLE(mvceditor::DetectorFeatureClass, mvceditor::FeatureClass)
 	EVT_MENU(mvceditor::MENU_DETECTORS + 7, mvceditor::DetectorFeatureClass::OnRunTagDetectors)
 	EVT_MENU(mvceditor::MENU_DETECTORS + 8, mvceditor::DetectorFeatureClass::OnRunDatabaseDetectors)
 	EVT_MENU(mvceditor::MENU_DETECTORS + 9, mvceditor::DetectorFeatureClass::OnRunConfigDetectors)
+
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::DetectorFeatureClass::OnPreferencesSaved)
 END_EVENT_TABLE()

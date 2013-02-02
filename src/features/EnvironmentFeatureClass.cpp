@@ -663,8 +663,6 @@ void mvceditor::EnvironmentFeatureClass::OnPreferencesSaved(wxCommandEvent& even
 		environment->Php.AutoDetermine();
 	}
 
-	config->Flush();
-
 	// signal that this app has modified the config file, that way the external
 	// modification check fails and the user will not be prompted to reload the config
 	App.UpdateConfigModifiedTime();

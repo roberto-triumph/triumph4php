@@ -267,10 +267,10 @@ void mvceditor::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
 			App.Globals.AssignFileExtensions(*project);
 		}
 
-		wxCommandEvent evt;
-		OnPreferencesSaved(evt);
+		wxCommandEvent evt(mvceditor::EVENT_APP_PREFERENCES_SAVED);
+		App.EventSink.Publish(evt);
 		wxConfigBase* config = wxConfig::Get();
-		config->Flush();
+		config->Flush();		
 
 		// signal that this app has modified the config file, that way the external
 		// modification check fails and the user will not be prompted to reload the config
