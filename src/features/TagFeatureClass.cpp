@@ -369,10 +369,12 @@ mvceditor::ResourceSearchDialogClass::ResourceSearchDialogClass(wxWindow* parent
 	SearchText->SetFocus();
 
 	ProjectChoice->Append(_("All Enabled Projects"), (void*)NULL);
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	for (project = tag.App.Globals.Projects.begin(); project != tag.App.Globals.Projects.end(); ++project) {
-		if (project->IsEnabled) {
-			ProjectChoice->Append(project->Label, new mvceditor::ProjectClass(*project));
+	for (size_t i = 0; i < tag.App.Globals.Projects.size(); ++i) {
+		if (tag.App.Globals.Projects[i].IsEnabled) {
+
+			// should be ok to reference this vector since it wont change because this is a 
+			// modal dialog
+			ProjectChoice->Append(tag.App.Globals.Projects[i].Label, &tag.App.Globals.Projects[i]);
 		}
 	}
 	ProjectChoice->Select(0);
