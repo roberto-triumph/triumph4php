@@ -133,6 +133,31 @@ bool mvceditor::ProjectClass::IsAPhpSourceFile(const wxString& fullPath) const {
 	return matches;
 }
 
+bool mvceditor::ProjectClass::IsASourceFile(const wxString& fullPath) const {
+	bool matches = false;
+
+	// first do a directotry check  only. since AllSources() clones the 
+	// Sources list; it can be expensive due to regex re-compilation of the
+	// wildcards. for performance, we make sure that the file in question
+	// is definitely in the sources before we copy the sources list
+	for (size_t i = 0; i < Sources.size() && !matches; ++i) {
+		for (size_t i = 0; i < Sources.size() && !matches; ++i) {
+			matches = Sources[i].IsInRootDirectory(fullPath);
+		}
+	}
+	if (matches) {
+		matches = false;
+
+		// a file is considered a file if its in a source directory and it matches
+		// any of the recognized file extensions
+		std::vector<mvceditor::SourceClass> allSources = AllSources();
+		for (size_t i = 0; i < allSources.size() && !matches; ++i) {
+			matches = allSources[i].Contains(fullPath);
+		}
+	}
+	return matches;
+}
+
 bool mvceditor::ProjectClass::HasSources() const {
 	return !Sources.empty();
 }

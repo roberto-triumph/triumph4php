@@ -155,11 +155,21 @@ public:
 
 	/**
 	 * @return bool TRUE if the given full path is contained in this source.
-	 * This means that fullPath is in the RootDirectory (or one of RootDirectory)
+	 * This means that fullPath is in the RootDirectory (or one of RootDirectory's
 	 * sub-directories) and fullPath's file extension matches the
 	 * include files AND it does NOT match the exclude files.
 	 */
 	bool Contains(const wxString& fullPath) const;
+
+	/**
+	 * Check to see if the given full path is in the RootDirectory.  This check
+	 * can be done to quickly eliminate a full path without needing to check the
+	 * wildcards.  
+	 *
+	 * @return bool TRUE if the given full path is in the RootDirectory (or one of RootDirectory's
+	 * sub-directories)
+	 */
+	bool IsInRootDirectory(const wxString& fullPath) const;
 
 	private:
 

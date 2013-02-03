@@ -172,6 +172,14 @@ public:
 	 */
 	bool IsAPhpSourceFile(const wxString& fullPath) const;
 
+	
+	/**
+	 * @return TRUE if given full path is a file, as determined by
+	 * the sources directories and the php file 
+	 * extensions wilcard.
+	 */
+	bool IsASourceFile(const wxString& fullPath) const;
+
 	/**
 	 * @return bool TRUE if this project has AT LEAST 1 source
 	 */

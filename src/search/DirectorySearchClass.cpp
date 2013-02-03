@@ -111,7 +111,7 @@ bool mvceditor::SourceClass::Contains(const wxString& fullPath) const {
 	// 1. fullPath must be in RootDirectory
 	// 2. fullPath must NOT match the exclude wildcards if set
 	// 2. fullPath must match wildcards
-	if (fullPath.Find(RootDirectory.GetFullPath()) != 0) {
+	if (!IsInRootDirectory(fullPath)) {
 		return false;
 	}
 	if (ExcludeRegEx && ExcludeRegEx->IsValid()) {
@@ -121,6 +121,15 @@ bool mvceditor::SourceClass::Contains(const wxString& fullPath) const {
 	}
 	bool matchedInclude = IncludeRegEx  && IncludeRegEx->IsValid() && IncludeRegEx->Matches(fullPath);
 	return matchedInclude;
+}
+
+bool mvceditor::SourceClass::IsInRootDirectory(const wxString& fullPath) const {
+
+	// ATTN: should this be case sensitive for different OSes?
+	if (fullPath.Find(RootDirectory.GetFullPath()) != 0) {
+		return false;
+	}
+	return true;
 }
 
 wxString mvceditor::SourceClass::WildcardRegEx(const wxString& wildCardString) {
