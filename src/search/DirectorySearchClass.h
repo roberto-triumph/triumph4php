@@ -159,7 +159,7 @@ public:
 	 * sub-directories) and fullPath's file extension matches the
 	 * include files AND it does NOT match the exclude files.
 	 */
-	bool Contains(const wxString& fullPath) const;
+	bool Contains(const wxString& fullPath);
 
 	/**
 	 * Check to see if the given full path is in the RootDirectory.  This check
@@ -319,7 +319,7 @@ private:
 	 * @param fullPath full path to the file to be checked.
 	 * @return bool TRUE if given full path matches the include/exclude wildcards
 	 */
-	bool MatchesWildcards(const wxString& fullPath) const;
+	bool MatchesWildcards(const wxString& fullPath);
 
 	/**
 	 * Adds all of the given paths' subdirectories into the directory stack.
