@@ -355,7 +355,7 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsDefinedInDifferen
 	CreateHttpdFileWithIncludeFile(hostsFilePath, ConfigSubDirectory);
 	CreateVirtualHostDifferentOrder(ConfigSubDirectory);
 	Walk();
-	CHECK_EQUAL(1, Apache.GetVirtualHostMappings().size());
+	CHECK_EQUAL((size_t)1, Apache.GetVirtualHostMappings().size());
 	wxString url = Apache.GetUrl(TestProjectDir + PhpFile);
 	wxString expectedUrl = wxT("http://localhost.testing.com/test.php");
 	CHECK_EQUAL(expectedUrl, url);	

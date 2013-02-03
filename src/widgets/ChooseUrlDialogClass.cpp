@@ -173,7 +173,7 @@ std::vector<mvceditor::UrlResourceClass> mvceditor::ChooseUrlDialogClass::GetFil
 	UrlResourceFinder.FilterUrls(filter, filteredUrls);
 
 	// check that the controller is part of the project's sources
-	std::vector<mvceditor::UrlResourceClass>::const_iterator url = filteredUrls.begin();
+	std::vector<mvceditor::UrlResourceClass>::iterator url = filteredUrls.begin();
 	while (url != filteredUrls.end()) {
 		wxFileName fileName = url->FileName;
 		wxString fullPath = fileName.GetFullPath();
