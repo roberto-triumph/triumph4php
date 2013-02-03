@@ -81,7 +81,7 @@ void mvceditor::TagFeatureClass::OnAppReady(wxCommandEvent& event) {
 	}
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFeatureClass::SearchForResources(const wxString& text) {
+std::vector<mvceditor::TagClass> mvceditor::TagFeatureClass::SearchForResources(const wxString& text, std::vector<mvceditor::ProjectClass*> projects) {
 	std::vector<mvceditor::TagClass> matches;
 	bool exactOnly = text.Length() <= 2;
 	if (exactOnly) {
@@ -95,6 +95,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFeatureClass::SearchForResources(
 	// TODO: CollectNearResourceMatches shows resources from files that were recently deleted
 	// need to hide them / remove them
 	RemoveNativeMatches(matches);
+	KeepMatchesFromProjects(matches, projects);
 	return matches;
 }
 
@@ -148,11 +149,35 @@ void mvceditor::TagFeatureClass::OnJump(wxCommandEvent& event) {
 				LoadPageFromResource(term, matches[0]);
 			}
 			else {
-				std::vector<mvceditor::TagClass> chosenResources;
-				mvceditor::ResourceSearchDialogClass dialog(GetMainWindow(), *this, term, chosenResources);
-				if (dialog.ShowModal() == wxOK) {
-					for (size_t i = 0; i < chosenResources.size(); ++i) {
-						LoadPageFromResource(JumpToText, chosenResources[i]);
+
+				// if we have more than one match, lets pick the match from the same project
+				// that the currently opened file is in.
+				wxFileName openedFile = codeControl->GetFileName();
+				int tagProjectMatchCount = 0;
+				mvceditor::TagClass tagProjectMatch;
+				if (openedFile.IsOk() && !codeControl->IsNew()) {
+					std::vector<mvceditor::ProjectClass>::const_iterator project;
+					std::vector<mvceditor::TagClass>::const_iterator tag;
+					for (tag = matches.begin(); tag != matches.end(); ++tag) {
+						for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
+							if (project->IsAPhpSourceFile(openedFile.GetFullPath()) && project->IsAPhpSourceFile(tag->FullPath)) {
+								tagProjectMatch = *tag;
+								tagProjectMatchCount++;
+							}
+						}
+					}
+				}
+				if (tagProjectMatchCount == 1) {
+					LoadPageFromResource(term, tagProjectMatch);
+				}
+				else {
+					std::vector<mvceditor::TagClass> chosenResources;
+					mvceditor::ResourceSearchDialogClass dialog(GetMainWindow(), *this, term, chosenResources);
+					dialog.Prepopulate(term, matches);
+					if (dialog.ShowModal() == wxOK) {
+						for (size_t i = 0; i < chosenResources.size(); ++i) {
+							LoadPageFromResource(JumpToText, chosenResources[i]);
+						}
 					}
 				}
 			}
@@ -256,6 +281,26 @@ void mvceditor::TagFeatureClass::RemoveNativeMatches(std::vector<mvceditor::TagC
 	}
 }
 
+void mvceditor::TagFeatureClass::KeepMatchesFromProjects(std::vector<mvceditor::TagClass>& matches, std::vector<mvceditor::ProjectClass*> projects) const {
+	std::vector<mvceditor::TagClass>::iterator tag = matches.begin();
+	std::vector<mvceditor::ProjectClass*>::const_iterator project;
+	while (tag != matches.end()) {
+		bool isInProjects = false;
+		for (project = projects.begin(); project != projects.end(); ++project) {
+			isInProjects = (*project)->IsASourceFile(tag->GetFullPath());
+			if (isInProjects) {
+				break;
+			}
+		}
+		if (!isInProjects) {
+			tag = matches.erase(tag);
+		}
+		else {
+			tag++;
+		}
+	}
+}
+
 wxString mvceditor::TagFeatureClass::CacheStatus() {
 	if (CACHE_OK == CacheState) {
 		return _("OK");
@@ -310,7 +355,8 @@ void mvceditor::TagFeatureClass::OnAppFileOpened(wxCommandEvent& event) {
 	event.Skip();
 }
 
-mvceditor::ResourceSearchDialogClass::ResourceSearchDialogClass(wxWindow* parent, TagFeatureClass& tag,
+mvceditor::ResourceSearchDialogClass::ResourceSearchDialogClass(wxWindow* parent, 
+																TagFeatureClass& tag,
 																wxString& term,
 																std::vector<mvceditor::TagClass>& chosenResources)
 	: ResourceSearchDialogGeneratedClass(parent)
@@ -321,12 +367,36 @@ mvceditor::ResourceSearchDialogClass::ResourceSearchDialogClass(wxWindow* parent
 	TransferDataToWindow();
 	CacheStatusLabel->SetLabel(wxT("Cache Status: ") + tag.CacheStatus());
 	SearchText->SetFocus();
+
+	ProjectChoice->Append(_("All Enabled Projects"), (void*)NULL);
+	for (size_t i = 0; i < tag.App.Globals.Projects.size(); ++i) {
+		if (tag.App.Globals.Projects[i].IsEnabled) {
+
+			// should be ok to reference this vector since it wont change because this is a 
+			// modal dialog
+			ProjectChoice->Append(tag.App.Globals.Projects[i].Label, &tag.App.Globals.Projects[i]);
+		}
+	}
+	ProjectChoice->Select(0);
 }
 
 void mvceditor::ResourceSearchDialogClass::OnSearchText(wxCommandEvent& event) {
 	wxString text = SearchText->GetValue();
+	std::vector<mvceditor::ProjectClass*> projects;
+	bool showAllProjects = ProjectChoice->GetSelection() == 0;
+	if (!showAllProjects) {
+		projects.push_back((mvceditor::ProjectClass*)ProjectChoice->GetClientData(ProjectChoice->GetSelection()));
+	}
+	else {
+
+		// the first item in the wxChoice will not have client data; the "all" option
+		for (size_t i = 1; i < ProjectChoice->GetCount(); ++i) {
+			projects.push_back((mvceditor::ProjectClass*) ProjectChoice->GetClientData(i));
+		}
+	}
+
 	if (text.Length() >= 2) {
-		MatchedResources = ResourceFeature.SearchForResources(text);
+		MatchedResources = ResourceFeature.SearchForResources(text, projects);
 		if (!MatchedResources.empty()) {
 			MatchesList->Freeze();
 			ShowJumpToResults(text, MatchedResources);
@@ -381,16 +451,27 @@ void mvceditor::ResourceSearchDialogClass::OnSearchEnter(wxCommandEvent& event) 
 
 void mvceditor::ResourceSearchDialogClass::ShowJumpToResults(const wxString& finderQuery, const std::vector<mvceditor::TagClass>& allMatches) {
 	wxArrayString files;
-	mvceditor::TagSearchClass tagSearch(mvceditor::WxToIcu(finderQuery));
 	for (size_t i = 0; i < allMatches.size(); ++i) {
 		files.Add(allMatches[i].GetFullPath());
 	}
 	MatchesList->Clear();
+	bool showAllProjects = ProjectChoice->GetSelection() == 0;
+	mvceditor::ProjectClass* selectedProject = NULL;
+	if (!showAllProjects) {
+		selectedProject = (mvceditor::ProjectClass*)ProjectChoice->GetClientData(ProjectChoice->GetSelection());
+	}
 	
 	// dont show the project path to the user
 	for (size_t i = 0; i < files.GetCount(); ++i) {
 		wxString projectLabel;
-		wxString relativeName = ResourceFeature.App.Globals.RelativeFileName(files[i], projectLabel);
+		wxString relativeName;
+		if (showAllProjects) {
+			relativeName = ResourceFeature.App.Globals.RelativeFileName(files[i], projectLabel);
+		}
+		else {
+			relativeName = selectedProject->RelativeFileName(files[i]);
+			projectLabel = selectedProject->Label;
+		}
 		wxString matchLabel;
 		mvceditor::TagClass match = allMatches[i];
 		if (mvceditor::TagClass::MEMBER == match.Type || mvceditor::TagClass::METHOD == match.Type ||
@@ -513,6 +594,10 @@ void mvceditor::ResourceSearchDialogClass::OnMatchesListKeyDown(wxKeyEvent& even
 	else {
 		event.Skip();
 	}
+}
+
+void mvceditor::ResourceSearchDialogClass::OnProjectChoice(wxCommandEvent& event) {
+	OnSearchText(event);
 }
 
 mvceditor::IndexingDialogClass::IndexingDialogClass(wxWindow* parent) 

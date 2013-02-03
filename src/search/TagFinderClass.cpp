@@ -493,10 +493,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectFullyQualifie
 		for (size_t i = 0; i < classHierarchy.size(); ++i) {
 			UnicodeString key = classHierarchy[i] + UNICODE_STRING_SIMPLE("::") + tagSearch.GetMethodName();
 			std::string stdKey = mvceditor::IcuToChar(key);
-			std::vector<mvceditor::TagClass> matches = FindByKeyExactAndTypes(stdKey, types, true);
-			if (!matches.empty()) {
-				allMatches.push_back(matches[0]);
-			}
+			allMatches = FindByKeyExactAndTypes(stdKey, types, true);
 		}
 	}
 	else if (mvceditor::TagSearchClass::NAMESPACE_NAME == tagSearch.GetResourceType()) {
@@ -506,11 +503,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectFullyQualifie
 		types.push_back(mvceditor::TagClass::CLASS);
 		types.push_back(mvceditor::TagClass::FUNCTION);
 
-		// make sure there is one and only one item that matches the search.
-		std::vector<mvceditor::TagClass> matches = FindByKeyExactAndTypes(stdKey, types, true);
-		if (matches.size() == 1) {
-			allMatches.push_back(matches[0]);
-		}
+		allMatches = FindByKeyExactAndTypes(stdKey, types, true);
 	}
 	else {
 		UnicodeString key = tagSearch.GetClassName();
@@ -519,11 +512,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectFullyQualifie
 		types.push_back(mvceditor::TagClass::CLASS);
 		types.push_back(mvceditor::TagClass::FUNCTION);
 
-		// make sure there is one and only one item that matches the search.
-		std::vector<mvceditor::TagClass> matches = FindByKeyExactAndTypes(stdKey, types, true);
-		if (matches.size() == 1) {
-			allMatches.push_back(matches[0]);
-		}
+		allMatches = FindByKeyExactAndTypes(stdKey, types, true);
 	}
 	return allMatches;
 }
@@ -674,41 +663,6 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::FindByKeyStartMany(c
 		stream << " OR key LIKE '" << escaped << "%' ESCAPE '^' ";
 	}
 	return ResourceStatementMatches(stream.str(), true);
-}
-
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::FindByIdentifierExactAndTypes(const std::string& identifier, const std::vector<int>& types, bool doLimit) {
-	std::ostringstream stream;
-
-	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
-	// do not get fully qualified resources
-	// make sure to use the key because it is indexed
-	stream << "key = '" << identifier << "' AND identifier = key AND type IN(";
-	for (size_t i = 0; i < types.size(); ++i) {
-		stream << types[i];
-		if (i < (types.size() - 1)) {
-			stream << ",";
-		}
-	}
-	stream << ")";
-	return ResourceStatementMatches(stream.str(), doLimit);
-
-}
-
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::FindByIdentifierStartAndTypes(const std::string& identifierStart, const std::vector<int>& types, bool doLimit) {
-	std::ostringstream stream;
-
-	// do not get fully qualified resources
-	// make sure to use the key because it is indexed
-	std::string escaped = mvceditor::SqliteSqlEscape(identifierStart, '^');
-	stream << "key LIKE '" << escaped << "%' ESCAPE '^' AND identifier = key AND type IN(";
-	for (size_t i = 0; i < types.size(); ++i) {
-		stream << types[i];
-		if (i < (types.size() - 1)) {
-			stream << ",";
-		}
-	}
-	stream << ")";
-	return ResourceStatementMatches(stream.str(), doLimit);
 }
 
 std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::All() {
@@ -969,7 +923,40 @@ std::vector<mvceditor::TraitTagClass> mvceditor::ParsedTagFinderClass::FindTrait
 	return matches;
 }
 
+std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::FindByIdentifierExactAndTypes(const std::string& identifier, const std::vector<int>& types, bool doLimit) {
+	std::ostringstream stream;
 
+	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
+	// do not get fully qualified resources
+	// make sure to use the key because it is indexed
+	stream << "key = '" << identifier << "' AND identifier = key AND type IN(";
+	for (size_t i = 0; i < types.size(); ++i) {
+		stream << types[i];
+		if (i < (types.size() - 1)) {
+			stream << ",";
+		}
+	}
+	stream << ")";
+	return ResourceStatementMatches(stream.str(), doLimit);
+
+}
+
+std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::FindByIdentifierStartAndTypes(const std::string& identifierStart, const std::vector<int>& types, bool doLimit) {
+	std::ostringstream stream;
+
+	// do not get fully qualified resources
+	// make sure to use the key because it is indexed
+	std::string escaped = mvceditor::SqliteSqlEscape(identifierStart, '^');
+	stream << "key LIKE '" << escaped << "%' ESCAPE '^' AND identifier = key AND type IN(";
+	for (size_t i = 0; i < types.size(); ++i) {
+		stream << types[i];
+		if (i < (types.size() - 1)) {
+			stream << ",";
+		}
+	}
+	stream << ")";
+	return ResourceStatementMatches(stream.str(), doLimit);
+}
 
 mvceditor::DetectedTagFinderClass::DetectedTagFinderClass()
 	: TagFinderClass() {
@@ -1055,4 +1042,39 @@ std::vector<mvceditor::TraitTagClass> mvceditor::DetectedTagFinderClass::FindTra
 	// detector db does not have  a trait_resources table
 	std::vector<mvceditor::TraitTagClass> matches;
 	return matches;
+}
+
+
+std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::FindByIdentifierExactAndTypes(const std::string& identifier, const std::vector<int>& types, bool doLimit) {
+	std::ostringstream stream;
+
+	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
+	// do not get fully qualified resources
+	// make sure to use the key because it is indexed
+	stream << "key = '" << identifier << "' AND method_name = key AND type IN(";
+	for (size_t i = 0; i < types.size(); ++i) {
+		stream << types[i];
+		if (i < (types.size() - 1)) {
+			stream << ",";
+		}
+	}
+	stream << ")";
+	return ResourceStatementMatches(stream.str(), doLimit);
+}
+
+std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::FindByIdentifierStartAndTypes(const std::string& identifierStart, const std::vector<int>& types, bool doLimit) {
+	std::ostringstream stream;
+
+	// do not get fully qualified resources
+	// make sure to use the key because it is indexed
+	std::string escaped = mvceditor::SqliteSqlEscape(identifierStart, '^');
+	stream << "key LIKE '" << escaped << "%' ESCAPE '^' AND method_name = key AND type IN(";
+	for (size_t i = 0; i < types.size(); ++i) {
+		stream << types[i];
+		if (i < (types.size() - 1)) {
+			stream << ",";
+		}
+	}
+	stream << ")";
+	return ResourceStatementMatches(stream.str(), doLimit);
 }

@@ -63,11 +63,13 @@ public:
 	 * This method assumes that index is up-to-date.
 
 	 * @param text search string to query for
+	 * @param projects matches from these projects will be kept; all others will be erased.
+	 *        this method will not own the project pointers
 	 * @return the matching resources
 	 * @see ParsedTagFinderClass::CollectNearMacthResources
 	 * @see ParsedTagFinderClass::CollectFullyQualifiedResources
 	 */
-	std::vector<mvceditor::TagClass> SearchForResources(const wxString& text);
+	std::vector<mvceditor::TagClass> SearchForResources(const wxString& text, std::vector<mvceditor::ProjectClass*> projects);
 	
 	/**
 	 * @param wxString full path to the file that will be opened.
@@ -131,9 +133,18 @@ private:
 	/**
 	 * remove matches for php built-in functions. as we dont want a source file to
 	 * open.
-	 * @param matches any native mataches from this given vector will be removed
+	 * @param matches any native matches from this given vector will be removed
 	 */
 	void RemoveNativeMatches(std::vector<mvceditor::TagClass>& matches) const;
+
+	/**
+	 * Further filter matches by only the matches that belong to the given projects.
+	 *
+	 * @param matches the tags list to modify
+	 * @param projects matches from these projects will be kept; all others will be erased.
+	 *        this method will not own the project pointers
+	 */
+	void KeepMatchesFromProjects(std::vector<mvceditor::TagClass>& matches, std::vector<mvceditor::ProjectClass*> projects) const;
 	
 	/**
 	 * prepare to iterate through the given file. The name part of the given file must match the wildcard.
@@ -207,7 +218,14 @@ private:
 class ResourceSearchDialogClass : public ResourceSearchDialogGeneratedClass {
 public:
 
-	ResourceSearchDialogClass(wxWindow* parent, TagFeatureClass& tag, wxString& term, 
+	/**
+	 * @param parent the parent window
+	 * @param tag the feature, used to perform the search logic
+	 * @param term string to prepopulate the input box
+	 * @param chosenResources out parameter, the list of resources that the user chose
+	 */
+	ResourceSearchDialogClass(wxWindow* parent, 
+		TagFeatureClass& tag, wxString& term, 
 		std::vector<mvceditor::TagClass>& chosenResources);
 		
 	/**
@@ -245,6 +263,8 @@ protected:
 	void OnMatchesListDoubleClick(wxCommandEvent& event);
 
 	void OnMatchesListKeyDown(wxKeyEvent& event);
+
+	void OnProjectChoice(wxCommandEvent& event);
 	
 private:
 

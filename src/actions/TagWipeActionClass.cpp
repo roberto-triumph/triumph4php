@@ -39,6 +39,7 @@ mvceditor::TagWipeActionClass::TagWipeActionClass(mvceditor::RunningThreadsClass
 }
 
 bool mvceditor::TagWipeActionClass::Init(mvceditor::GlobalsClass& globals) {
+	SetStatus(_("Tag Cache Wipe"));
 
 	// will only wipe the projects given in the constructor, not all of the projects
 	return !ResourceDbFileNames.empty();
@@ -47,7 +48,7 @@ bool mvceditor::TagWipeActionClass::Init(mvceditor::GlobalsClass& globals) {
 void mvceditor::TagWipeActionClass::BackgroundWork() {
 	std::vector<wxFileName>::iterator it;
 	for (it = ResourceDbFileNames.begin(); it != ResourceDbFileNames.end() && !TestDestroy(); ++it) {
-		
+		SetStatus(_("Tag Cache Wipe / ") + it->GetName());
 		// initialize the sqlite db
 		soci::session session;
 		try {

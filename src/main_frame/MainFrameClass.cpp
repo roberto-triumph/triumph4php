@@ -320,12 +320,16 @@ void mvceditor::MainFrameClass::OnEditPreferences(wxCommandEvent& event) {
 	int exitCode = prefDialog.ShowModal();
 	if (wxOK == exitCode) {
 		wxCommandEvent evt(mvceditor::EVENT_APP_PREFERENCES_SAVED);
-		App.EventSink.Publish(evt);		
-	}
+		App.EventSink.Publish(evt);
 
-	// signal that this app has modified the config file, that way the external
-	// modification check fails and the user will not be prompted to reload the config
-	App.UpdateConfigModifiedTime();
+		// sine the event handlers have updated the config; lets persist the changes
+		wxConfigBase* config = wxConfig::Get();
+		config->Flush();
+
+		// signal that this app has modified the config file, that way the external
+		// modification check fails and the user will not be prompted to reload the config
+		App.UpdateConfigModifiedTime();
+	}
 }
 
 void mvceditor::MainFrameClass::PreferencesSaved() {

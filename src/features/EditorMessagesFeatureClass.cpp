@@ -42,9 +42,10 @@ mvceditor::EditorMessagesPanelClass::EditorMessagesPanelClass(wxWindow* parent, 
 }
 
 void mvceditor::EditorMessagesPanelClass::OnClearButton(wxCommandEvent& event) {
-	Grid->ClearGrid();
 	int rowCount = Grid->GetNumberRows();
-	Grid->DeleteRows(0, rowCount);
+	if (rowCount > 0) {
+		Grid->DeleteRows(0, rowCount);
+	}
 }
 
 void mvceditor::EditorMessagesPanelClass::AddMessage(wxLogLevel level, const wxChar* msg, time_t timestamp) {

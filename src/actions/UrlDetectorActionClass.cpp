@@ -35,7 +35,7 @@ mvceditor::UrlResourceFinderInitActionClass::UrlResourceFinderInitActionClass(mv
 }
 
 void mvceditor::UrlResourceFinderInitActionClass::Work(mvceditor::GlobalsClass& globals) {
-	SetStatus(_("URL Detection Init"));
+	SetStatus(_("Url Detect Init"));
 	globals.UrlResourceFinder.Close();
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
@@ -80,6 +80,7 @@ mvceditor::UrlDetectorActionClass::UrlDetectorActionClass(mvceditor::RunningThre
 }
 
 bool mvceditor::UrlDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
+	SetStatus(_("Url Detect"));
 	while (!ParamsQueue.empty()) {
 		ParamsQueue.pop();
 	}
@@ -92,18 +93,20 @@ bool mvceditor::UrlDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
 	// need to call each url detector once for each different source directory
 	// that's why there's 3 loops
 	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
-		for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
-			for (scriptName = detectorScripts.begin(); scriptName != detectorScripts.end(); ++scriptName) {
-				mvceditor::UrlDetectorParamsClass params;
-				params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
-				params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset();
-				params.ScriptName = *scriptName;
-				params.SourceDir = source->RootDirectory;
-				params.ResourceDbFileName = project->ResourceDbFileName.GetFullPath();
-				params.RootUrl = globals.Environment.Apache.GetUrl(source->RootDirectory.GetPath());
-				params.OutputDbFileName = project->DetectorDbFileName.GetFullPath();
-				if (!params.RootUrl.IsEmpty()) {
-					ParamsQueue.push(params);
+		if (project->IsEnabled) {
+			for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
+				for (scriptName = detectorScripts.begin(); scriptName != detectorScripts.end(); ++scriptName) {
+					mvceditor::UrlDetectorParamsClass params;
+					params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
+					params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset();
+					params.ScriptName = *scriptName;
+					params.SourceDir = source->RootDirectory;
+					params.ResourceDbFileName = project->ResourceDbFileName.GetFullPath();
+					params.RootUrl = globals.Environment.Apache.GetUrl(source->RootDirectory.GetPath());
+					params.OutputDbFileName = project->DetectorDbFileName.GetFullPath();
+					if (!params.RootUrl.IsEmpty()) {
+						ParamsQueue.push(params);
+					}
 				}
 			}
 		}
@@ -137,9 +140,10 @@ void mvceditor::UrlDetectorActionClass::NextDetection() {
 	}
 	mvceditor::UrlDetectorParamsClass params = ParamsQueue.front();
 	ParamsQueue.pop();
-
-	SetStatus(_("Determining Routes for ") + params.RootUrl);
-
+	wxArrayString dirs = params.SourceDir.GetDirs();
+	if (!dirs.IsEmpty()) {
+		SetStatus(_("Url Detect / ") +  dirs.back());
+	}
 	wxString cmdLine = params.BuildCmdLine();
 	long pid;
 	Process.Init(cmdLine, ID_URL_DETECTOR_PROCESS, pid);

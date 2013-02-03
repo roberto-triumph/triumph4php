@@ -131,6 +131,21 @@ public:
 			"</VirtualHost>\n"
 		));
 	}
+
+	
+	/**
+	 * Creates a file that contains only virtual host config with the
+	 * ServerName directive After the DocumentRoot directive.
+	 */
+	void CreateVirtualHostDifferentOrder(const wxString& subDirectory) {
+		CreateSubDirectoryFile(subDirectory, VirtualHostFile, wxString::FromAscii(
+			"<VirtualHost *:80>\n"
+			"  ServerAdmin webmaster@localhost\n"
+			"  DocumentRoot ") + TestProjectDir + wxString::FromAscii("\n"
+			"  ServerName localhost.testing.com\n"			
+			"</VirtualHost>\n"
+		));
+	}
 	
 	wxFileName TestProjectDirFileName() {
 		wxFileName fileName(TestProjectDir);
@@ -329,6 +344,18 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsAnIncludedFile) {
 	CHECK_EQUAL((size_t)1, Search.GetMatchedFiles().size());
 	wxString actualHttpdPath = Search.GetMatchedFiles()[0];
 	CHECK_EQUAL(FileName(ConfigSubDirectory, HttpdFile).GetFullPath(), actualHttpdPath);
+	wxString url = Apache.GetUrl(TestProjectDir + PhpFile);
+	wxString expectedUrl = wxT("http://localhost.testing.com/test.php");
+	CHECK_EQUAL(expectedUrl, url);	
+}
+
+TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsDefinedInDifferentOrder) {
+	wxString hostsFilePath(TestProjectDir);
+	hostsFilePath.Append(ConfigSubDirectory).Append(wxFileName::GetPathSeparator()).Append(VirtualHostFile);
+	CreateHttpdFileWithIncludeFile(hostsFilePath, ConfigSubDirectory);
+	CreateVirtualHostDifferentOrder(ConfigSubDirectory);
+	Walk();
+	CHECK_EQUAL(1, Apache.GetVirtualHostMappings().size());
 	wxString url = Apache.GetUrl(TestProjectDir + PhpFile);
 	wxString expectedUrl = wxT("http://localhost.testing.com/test.php");
 	CHECK_EQUAL(expectedUrl, url);	

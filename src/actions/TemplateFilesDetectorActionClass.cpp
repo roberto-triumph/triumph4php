@@ -58,6 +58,7 @@ mvceditor::TemplateFilesDetectorActionClass::TemplateFilesDetectorActionClass(mv
 }
 
 bool mvceditor::TemplateFilesDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
+	SetStatus(_("Template Detect"));
 	while (!ParamsQueue.empty()) {
 		ParamsQueue.pop();
 	}
@@ -115,8 +116,10 @@ void mvceditor::TemplateFilesDetectorActionClass::NextDetection() {
 	mvceditor::TemplateFilesDetectorParamsClass params = ParamsQueue.front();
 	ParamsQueue.pop();
 
-	SetStatus(_("Determining Template Files for ") + params.SourceDir.GetPath());
-
+	wxArrayString dirs = params.SourceDir.GetDirs();
+	if (!dirs.IsEmpty()) {
+		SetStatus(_("Template Detect") + dirs.back());
+	}
 	wxString cmdLine = params.BuildCmdLine();
 	long pid;
 	Process.Init(cmdLine, ID_TEMPLATE_FILES_DETECTOR_PROCESS, pid);

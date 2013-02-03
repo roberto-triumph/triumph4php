@@ -76,6 +76,10 @@ public:
 	void RemoveAllHandlers();
 
 	/**
+	 * Nore that the event is processed IMMEDIATELY ie. within the same 
+	 * event loop. This method will not return control until all of the
+	 * handlers have processed the event.
+	 *
 	 * @param event send the event to all registered handlers
 	 */
 	void Publish(wxEvent& event);
@@ -186,6 +190,8 @@ extern const wxEventType EVENT_APP_FILE_CLOSED;
  * need to save the preferences to persistent storage (config) that were updated
  * in the preferences forms (windows added in the AddPreferenceWindow() method).
  * The global config (wxConfig::Get()) should be used.
+ * Note that the app will flush the changes after all handlers have been called, so there 
+ * is no need for each handler to call wxConfig::Flush()
  */
 extern const wxEventType EVENT_APP_PREFERENCES_SAVED;
 /**

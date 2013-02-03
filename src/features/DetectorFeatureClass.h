@@ -437,6 +437,8 @@ private:
 	void OnRunTagDetectors(wxCommandEvent& event);
 	void OnRunDatabaseDetectors(wxCommandEvent& event);
 	void OnRunConfigDetectors(wxCommandEvent& event);
+	
+	void OnPreferencesSaved(wxCommandEvent& event);
 
 	DECLARE_EVENT_TABLE()
 

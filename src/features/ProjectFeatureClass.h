@@ -194,6 +194,7 @@ class ProjectListDialogClass : public ProjectListDialogGeneratedClass {
 
 protected:
 
+	void OnSelectAllButton(wxCommandEvent& event);
 	void OnProjectsListDoubleClick(wxCommandEvent& event);
 	void OnProjectsListCheckbox(wxCommandEvent& event);
 	void OnAddButton(wxCommandEvent& event);

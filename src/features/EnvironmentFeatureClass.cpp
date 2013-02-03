@@ -189,8 +189,12 @@ mvceditor::ApacheEnvironmentPanelClass::~ApacheEnvironmentPanelClass() {
 }
 
 void mvceditor::ApacheEnvironmentPanelClass::OnScanButton(wxCommandEvent& event) {
+	wxString path = ApacheConfigurationDirectory->GetPath();
+	if (path.IsEmpty()) {
+		wxMessageBox(_("Please enter a configuration directory"));
+		return;
+	}
 	if (0 == RunningThreadId) {
-		wxString path = ApacheConfigurationDirectory->GetPath();
 		wxChar ch = wxFileName::GetPathSeparator();
 		if (path[path.Length() - 1] != ch) {
 			path.Append(ch);
@@ -249,9 +253,8 @@ void mvceditor::ApacheEnvironmentPanelClass::Populate() {
 
 void mvceditor::ApacheEnvironmentPanelClass::OnApacheFileReadComplete(mvceditor::ApacheFileReadCompleteEventClass& event) {
 		
-	// setting the HTTPD path will reparse the file ... for now
-	// this is OK
-	EditedApache.SetHttpdPath(event.Apache.GetHttpdPath());
+	// copy the result apache object to overwrite what is shown in the dialog
+	EditedApache.Copy(event.Apache);
 	Populate();
 }
 
@@ -296,7 +299,7 @@ void mvceditor::ApacheEnvironmentPanelClass::OnUpdateUi(wxUpdateUIEvent& event) 
 	AddButton->Enable(enableButtons);
 	
 	// scan button is only for automatic configuration mode
-	ScanButton->Enable(!enableButtons);
+	ScanButton->Enable(!enableButtons && !ApacheConfigurationDirectory->GetPath().IsEmpty());
 	ApacheConfigurationDirectory->Enable(!enableButtons);
 	event.Skip();
 }
@@ -659,8 +662,6 @@ void mvceditor::EnvironmentFeatureClass::OnPreferencesSaved(wxCommandEvent& even
 	if (environment->Php.IsAuto) {
 		environment->Php.AutoDetermine();
 	}
-
-	config->Flush();
 
 	// signal that this app has modified the config file, that way the external
 	// modification check fails and the user will not be prompted to reload the config

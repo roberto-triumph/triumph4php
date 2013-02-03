@@ -56,6 +56,7 @@ mvceditor::TagDetectorActionClass::TagDetectorActionClass(mvceditor::RunningThre
 }
 
 bool mvceditor::TagDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
+	SetStatus(_("Tag Detection"));
 	while (!ParamsQueue.empty()) {
 		ParamsQueue.pop();
 	}
@@ -111,9 +112,10 @@ void mvceditor::TagDetectorActionClass::NextDetection() {
 	}
 	mvceditor::TagDetectorParamsClass params = ParamsQueue.front();
 	ParamsQueue.pop();
-
-	SetStatus(_("Detecting Tags for ") + params.SourceDir.GetName());
-
+	wxArrayString dirs = params.SourceDir.GetDirs();
+	if (!dirs.IsEmpty()) {
+		SetStatus(_("Tag Detection / ") + dirs.back());
+	}
 	wxString cmdLine = params.BuildCmdLine();
 	long pid;
 	Process.Init(cmdLine, ID_TAG_DETECTOR_PROCESS, pid);
@@ -165,6 +167,7 @@ mvceditor::TagDetectorInitActionClass::TagDetectorInitActionClass(mvceditor::Run
 }
 
 void mvceditor::TagDetectorInitActionClass::Work(mvceditor::GlobalsClass &globals) {
+	SetStatus(_("Tag Detection Init"));
 
 	// initialize the detected tag cache only the enabled projects	
 	std::vector<mvceditor::ProjectClass>::const_iterator project;

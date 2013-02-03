@@ -21,6 +21,7 @@
 #include <wx/dialog.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
+#include <wx/choice.h>
 #include <wx/checklst.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -71,6 +72,8 @@ class ResourceSearchDialogGeneratedClass : public wxDialog
 		
 		wxStaticText* SearchLabel;
 		wxTextCtrl* SearchText;
+		wxStaticText* m_staticText4;
+		wxChoice* ProjectChoice;
 		wxStaticText* MatchesLabel;
 		wxStaticText* CacheStatusLabel;
 		wxCheckListBox* MatchesList;
@@ -83,6 +86,7 @@ class ResourceSearchDialogGeneratedClass : public wxDialog
 		virtual void OnSearchKeyDown( wxKeyEvent& event ) { event.Skip(); }
 		virtual void OnSearchText( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSearchEnter( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnProjectChoice( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnMatchesListDoubleClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnMatchesListKeyDown( wxKeyEvent& event ) { event.Skip(); }
 		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
@@ -92,7 +96,7 @@ class ResourceSearchDialogGeneratedClass : public wxDialog
 	
 	public:
 		
-		ResourceSearchDialogGeneratedClass( wxWindow* parent, wxWindowID id = ID_RESOURCESEARCHDIALOGGENERATEDCLASS, const wxString& title = _("Search For Resources"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 636,288 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		ResourceSearchDialogGeneratedClass( wxWindow* parent, wxWindowID id = ID_RESOURCESEARCHDIALOGGENERATEDCLASS, const wxString& title = _("Search For Resources"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 634,333 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~ResourceSearchDialogGeneratedClass();
 	
 };

@@ -253,18 +253,29 @@ void mvceditor::SequenceClass::RunNextStep() {
 	IsCurrentStepAsync = false;
 	bool isSequenceDone = false;
 	while (!Steps.empty()) {
+		bool isInit = false;
 		if (!Steps.front()->DoAsync()) {
 
 			// if the step is not asynchronous, it means that it does not
 			// need us to start a new thread
-			Steps.front()->Init(Globals);
+			isInit = Steps.front()->Init(Globals);
 			IsCurrentStepAsync = false;
 
-			// step does not involve async; we are done with this step
-			// even though we dont start a background thread, the 
-			// sync actions still generate EVT_WORK_COMPLETE events. let's
-			// wait for it.
-			break;
+			if (!isInit) {
+
+				// if the step is not initialized, move on to the next step.
+				Steps.pop();
+				if (Steps.empty()) {
+					isSequenceDone = true;
+				}
+			}
+			else {
+				// step does not involve async; we are done with this step
+				// even though we dont start a background thread, the 
+				// sync actions still generate EVT_WORK_COMPLETE events. let's
+				// wait for it.
+				break;
+			}
 		}
 		else {
 

@@ -159,7 +159,7 @@ void mvceditor::GlobalClassesThreadClass::BackgroundWork() {
 	// grab the classes from all of the files
 	for (fileName = ResourceDbFileNames.begin(); fileName != ResourceDbFileNames.end() && !TestDestroy(); ++fileName) {
 		try {
-			soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(mvceditor::ResourceSqlSchemaAsset().GetFullPath()));
+			soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(fileName->GetFullPath()));
 			
 			mvceditor::ParsedTagFinderClass finder;
 			finder.Init(&session);

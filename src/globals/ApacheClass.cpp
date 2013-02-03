@@ -290,6 +290,10 @@ void mvceditor::ApacheClass::ParseApacheConfigFile(const wxString& includedFile)
 				}
 				if (!skipParsing && 0 == lineLower.Find(wxT("serverroot"))) {
 					ServerRoot = line.Mid(10).Trim(false).Trim(true); //10= length of 'ServerRoot'
+
+					// trim any quotes that the path may have
+					ServerRoot.Replace(wxT("\""), wxT(""));
+					ServerRoot.Replace(wxT("'"), wxT(""));
 				}
 				if (!skipParsing && 0 == lineLower.Find(wxT("include "))) {
 					wxString nextFile = line.Mid(8).Trim(false).Trim(true); //8= length of 'Include'
@@ -326,12 +330,15 @@ void mvceditor::ApacheClass::ParseApacheConfigFile(const wxString& includedFile)
 						Port = portLong;
 					}
 				}
-				if (!currentDocumentRoot.IsEmpty()) {
-					if (currentServerName.IsEmpty()) {
-
-						// this is the case for the server document root (outside a virtual host tag)
-						currentServerName = wxT("localhost");
-					}
+				if (!currentDocumentRoot.IsEmpty() && !inVirtualHost) {
+					// this is the case for the server document root (outside a virtual host tag)
+					currentServerName = wxT("localhost");
+					SetVirtualHostMapping(currentDocumentRoot, currentServerName);
+					currentServerName = wxT("");
+					currentDocumentRoot = wxT("");
+					currentPort = wxT("");
+				}
+				else if (inVirtualHost && !currentDocumentRoot.IsEmpty() && !currentServerName.IsEmpty()) {
 					SetVirtualHostMapping(currentDocumentRoot, currentServerName);
 					currentServerName = wxT("");
 					currentDocumentRoot = wxT("");
@@ -377,10 +384,20 @@ void mvceditor::ApacheClass::ParseApacheConfigFile(const wxString& includedFile)
 	}
 }
 
-wxString mvceditor::ApacheClass::MakeAbsolute(const wxString& configPath) {
+wxString mvceditor::ApacheClass::MakeAbsolute(wxString configPath) {
+	wxString serverRootNative(ServerRoot);
+	
+	// in windows apache installs, paths use forward slashes ie. "c:/wamp/bin/apache/2.2.17/conf"
+	// in linux this code does nothing
+	wxString sep(wxFileName::GetPathSeparator());
+	serverRootNative.Replace(wxT("/"), sep);
+	configPath.Replace(wxT("/"), sep);
+	
 	wxFileName fileName(configPath);
+	wxFileName serverRootFileName;
+	serverRootFileName.AssignDir(serverRootNative);
 	if (!fileName.IsAbsolute()) {
-		fileName.MakeAbsolute(ServerRoot);
+		fileName.Assign(serverRootFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) + configPath);
 	}
 	return fileName.GetFullPath();
 }

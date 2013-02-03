@@ -257,6 +257,16 @@ protected:
 	 */
 	virtual std::vector<mvceditor::TraitTagClass> FindTraitsByClassName(const std::vector<std::string>& keyStarts) = 0;
 
+	/**
+	 * @return all resources whose identifier begins with the given identifier(case insensitive)
+	 */
+	virtual std::vector<mvceditor::TagClass> FindByIdentifierExactAndTypes(const std::string& identifier, const std::vector<int>& types, bool doLimit) = 0;
+	
+	/**
+	 * @return all resources whose identifier begins with the given identifierStart (case insensitive) AND are of the given type 
+	 */
+	virtual std::vector<mvceditor::TagClass> FindByIdentifierStartAndTypes(const std::string& identifierStart, const std::vector<int>& types, bool doLimit) = 0;
+
 public:
 
 	/**
@@ -527,16 +537,6 @@ private:
 	std::vector<mvceditor::TagClass> FindByKeyStartMany(const std::vector<std::string>& keyStarts, bool doLimit);
 
 	/**
-	 * @return all resources whose identifier begins with the given identifier(case insensitive)
-	 */
-	std::vector<mvceditor::TagClass> FindByIdentifierExactAndTypes(const std::string& identifier, const std::vector<int>& types, bool doLimit);
-	
-	/**
-	 * @return all resources whose identifier begins with the given identifierStart (case insensitive) AND are of the given type 
-	 */
-	std::vector<mvceditor::TagClass> FindByIdentifierStartAndTypes(const std::string& identifierStart, const std::vector<int>& types, bool doLimit);
-
-	/**
 	 * Find the FileTag entry that has the given full path (exact, case insensitive search into
 	 * the database).
 	 *
@@ -608,6 +608,16 @@ protected:
 	 * @return all of the traits that any of the given classes use.
 	 */
 	std::vector<mvceditor::TraitTagClass> FindTraitsByClassName(const std::vector<std::string>& keyStarts);
+
+	/**
+	 * @return all resources whose identifier begins with the given identifier(case insensitive)
+	 */
+	std::vector<mvceditor::TagClass> FindByIdentifierExactAndTypes(const std::string& identifier, const std::vector<int>& types, bool doLimit);
+	
+	/**
+	 * @return all resources whose identifier begins with the given identifierStart (case insensitive) AND are of the given type 
+	 */
+	std::vector<mvceditor::TagClass> FindByIdentifierStartAndTypes(const std::string& identifierStart, const std::vector<int>& types, bool doLimit);
 };
 
 
@@ -663,6 +673,16 @@ protected:
 	 * @return all of the traits that any of the given classes use.
 	 */
 	std::vector<mvceditor::TraitTagClass> FindTraitsByClassName(const std::vector<std::string>& keyStarts);
+	
+	/**
+	 * @return all resources whose identifier begins with the given identifier(case insensitive)
+	 */
+	std::vector<mvceditor::TagClass> FindByIdentifierExactAndTypes(const std::string& identifier, const std::vector<int>& types, bool doLimit);
+	
+	/**
+	 * @return all resources whose identifier begins with the given identifierStart (case insensitive) AND are of the given type 
+	 */
+	std::vector<mvceditor::TagClass> FindByIdentifierStartAndTypes(const std::string& identifierStart, const std::vector<int>& types, bool doLimit);
 };
 
 }

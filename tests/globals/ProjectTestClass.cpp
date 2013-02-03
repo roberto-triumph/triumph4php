@@ -91,6 +91,18 @@ TEST_FIXTURE(ProjectFixtureClass, AllSourcesShouldReturnExcludedWildcards) {
 	CHECK_EQUAL(wxT("*\\cache\\*"), actual.ExcludeWildcardsString());
 }
 
+TEST_FIXTURE(ProjectFixtureClass, IsASourceFileShouldReturnFalseWhenAnUnknownWildcard) {
+	AddSrc(wxT("controllers"), wxT("*"), wxT("*\\cache\\*"));
+	wxString fileToCheck = TestProjectDir + wxT("controllers") + wxFileName::GetPathSeparator() + wxT("hello.tmp");
+	CHECK_EQUAL(false, Project.IsASourceFile(fileToCheck));
+}
+
+TEST_FIXTURE(ProjectFixtureClass, IsASourceFileShouldReturnTrueWhenKnownWildcard) {
+	AddSrc(wxT("controllers"), wxT("*"), wxT("*\\cache\\*"));
+	wxString fileToCheck = TestProjectDir + wxT("controllers") + wxFileName::GetPathSeparator() + wxT("hello.css");
+	CHECK(Project.IsASourceFile(fileToCheck));
+}
+
 TEST_FIXTURE(ProjectFixtureClass, AllNonPhpExtesions) {
 	std::vector<wxString> exts = Project.AllNonPhpExtensions();
 	CHECK_VECTOR_SIZE(3, exts);

@@ -20,6 +20,7 @@ wxString mvceditor::CallStackActionClass::GetLabel() const {
 }
 
 bool mvceditor::CallStackActionClass::Init(mvceditor::GlobalsClass& globals) {
+	SetStatus(_("Call Stack Gen"));
 	bool ret = false;
 	Version = globals.Environment.Php.Version;
 	std::vector<wxString> otherFileExtensions = globals.GetNonPhpFileExtensions();
@@ -38,7 +39,7 @@ bool mvceditor::CallStackActionClass::Init(mvceditor::GlobalsClass& globals) {
 			projectCache->InitDetectorTag(project->DetectorDbFileName);
 			TagCache.RegisterGlobal(projectCache);
 			ret = true;
-			SetStatus(_("Calculating call stack for ") + mvceditor::IcuToWx(StartClassName) + wxT("::") + 
+			SetStatus(_("Call Stack Gen ") + mvceditor::IcuToWx(StartClassName) + wxT("::") + 
 				mvceditor::IcuToWx(StartMethodName));
 		}
 	}
