@@ -11,14 +11,15 @@
 #include <wx/intl.h>
 
 #include <wx/string.h>
-#include <wx/textctrl.h>
+#include <wx/stattext.h>
 #include <wx/gdicmn.h>
 #include <wx/font.h>
 #include <wx/colour.h>
 #include <wx/settings.h>
+#include <wx/textctrl.h>
+#include <wx/choice.h>
 #include <wx/sizer.h>
 #include <wx/statbox.h>
-#include <wx/stattext.h>
 #include <wx/listbox.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
@@ -36,7 +37,10 @@ class ChooseUrlDialogGeneratedClass : public wxDialog
 	private:
 	
 	protected:
+		wxStaticText* UrlLabel;
 		wxTextCtrl* Filter;
+		wxStaticText* ProjectLabel;
+		wxChoice* ProjectChoice;
 		wxStaticText* OpenLabel;
 		wxListBox* UrlList;
 		wxStaticText* ExtraLabel;
@@ -51,6 +55,7 @@ class ChooseUrlDialogGeneratedClass : public wxDialog
 		virtual void OnFilterKeyDown( wxKeyEvent& event ) { event.Skip(); }
 		virtual void OnFilterText( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFilterTextEnter( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnProjectChoice( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnListItemSelected( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnExtraChar( wxKeyEvent& event ) { event.Skip(); }
 		virtual void OnExtraText( wxCommandEvent& event ) { event.Skip(); }
@@ -59,7 +64,7 @@ class ChooseUrlDialogGeneratedClass : public wxDialog
 	
 	public:
 		
-		ChooseUrlDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Choose URL To Open"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 638,461 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		ChooseUrlDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Choose URL To Open"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 638,503 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~ChooseUrlDialogGeneratedClass();
 	
 };

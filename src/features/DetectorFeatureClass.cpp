@@ -681,7 +681,7 @@ void mvceditor::TemplateFilesDetectorPanelClass::UpdateProjects() {
 
 void mvceditor::TemplateFilesDetectorPanelClass::OnChooseUrlButton(wxCommandEvent& event) {
 	TestUrl.Reset();
-	mvceditor::ChooseUrlDialogClass dialog(this, Globals.UrlResourceFinder, TestUrl);
+	mvceditor::ChooseUrlDialogClass dialog(this, Globals.UrlResourceFinder, Globals.Projects, TestUrl);
 	if (dialog.ShowModal() == wxOK) {
 		UrlToTest->SetValue(TestUrl.Url.BuildURI());
 		mvceditor::CallStackActionClass* action = new mvceditor::CallStackActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_CALL_STACK);

@@ -26,8 +26,30 @@ ChooseUrlDialogGeneratedClass::ChooseUrlDialogGeneratedClass( wxWindow* parent, 
 	wxStaticBoxSizer* FilterSizer;
 	FilterSizer = new wxStaticBoxSizer( new wxStaticBox( this, ID_FILTERSIZER, _("Filter URLs") ), wxVERTICAL );
 	
+	wxFlexGridSizer* FilterGridSizer;
+	FilterGridSizer = new wxFlexGridSizer( 2, 2, 0, 0 );
+	FilterGridSizer->AddGrowableCol( 1 );
+	FilterGridSizer->AddGrowableRow( 1 );
+	FilterGridSizer->SetFlexibleDirection( wxBOTH );
+	FilterGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	UrlLabel = new wxStaticText( this, wxID_ANY, _("Filter"), wxDefaultPosition, wxDefaultSize, 0 );
+	UrlLabel->Wrap( -1 );
+	FilterGridSizer->Add( UrlLabel, 0, wxALL, 5 );
+	
 	Filter = new wxTextCtrl( this, ID_FILTER, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
-	FilterSizer->Add( Filter, 1, wxALL|wxEXPAND, 5 );
+	FilterGridSizer->Add( Filter, 1, wxALL|wxEXPAND, 5 );
+	
+	ProjectLabel = new wxStaticText( this, wxID_ANY, _("Project"), wxDefaultPosition, wxDefaultSize, 0 );
+	ProjectLabel->Wrap( -1 );
+	FilterGridSizer->Add( ProjectLabel, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	wxArrayString ProjectChoiceChoices;
+	ProjectChoice = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, ProjectChoiceChoices, 0 );
+	ProjectChoice->SetSelection( 0 );
+	FilterGridSizer->Add( ProjectChoice, 1, wxALL|wxEXPAND, 5 );
+	
+	FilterSizer->Add( FilterGridSizer, 1, wxEXPAND, 5 );
 	
 	GridSizer->Add( FilterSizer, 1, wxEXPAND, 5 );
 	
@@ -43,8 +65,8 @@ ChooseUrlDialogGeneratedClass::ChooseUrlDialogGeneratedClass( wxWindow* parent, 
 	
 	GridSizer->Add( TopSizer, 1, wxEXPAND, 5 );
 	
-	UrlList = new wxListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_SINGLE ); 
-	GridSizer->Add( UrlList, 0, wxALL|wxEXPAND, 5 );
+	UrlList = new wxListBox( this, wxID_ANY, wxDefaultPosition, wxSize( -1,175 ), 0, NULL, wxLB_SINGLE ); 
+	GridSizer->Add( UrlList, 1, wxALL|wxEXPAND, 5 );
 	
 	wxFlexGridSizer* ExtraSizer;
 	ExtraSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
@@ -94,6 +116,7 @@ ChooseUrlDialogGeneratedClass::ChooseUrlDialogGeneratedClass( wxWindow* parent, 
 	Filter->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( ChooseUrlDialogGeneratedClass::OnFilterKeyDown ), NULL, this );
 	Filter->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnFilterText ), NULL, this );
 	Filter->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnFilterTextEnter ), NULL, this );
+	ProjectChoice->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnProjectChoice ), NULL, this );
 	UrlList->Connect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnListItemSelected ), NULL, this );
 	ExtraText->Connect( wxEVT_CHAR, wxKeyEventHandler( ChooseUrlDialogGeneratedClass::OnExtraChar ), NULL, this );
 	ExtraText->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnExtraText ), NULL, this );
@@ -106,6 +129,7 @@ ChooseUrlDialogGeneratedClass::~ChooseUrlDialogGeneratedClass()
 	Filter->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( ChooseUrlDialogGeneratedClass::OnFilterKeyDown ), NULL, this );
 	Filter->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnFilterText ), NULL, this );
 	Filter->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnFilterTextEnter ), NULL, this );
+	ProjectChoice->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnProjectChoice ), NULL, this );
 	UrlList->Disconnect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnListItemSelected ), NULL, this );
 	ExtraText->Disconnect( wxEVT_CHAR, wxKeyEventHandler( ChooseUrlDialogGeneratedClass::OnExtraChar ), NULL, this );
 	ExtraText->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnExtraText ), NULL, this );

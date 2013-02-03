@@ -27,6 +27,7 @@
 
 #include <features/wxformbuilder/RunBrowserFeatureForms.h>
 #include <globals/UrlResourceClass.h>
+#include <globals/ProjectClass.h>
 #include <wx/wx.h>
 
 namespace mvceditor {
@@ -39,7 +40,9 @@ class ChooseUrlDialogClass : public ChooseUrlDialogGeneratedClass {
 	
 public:
 
-	ChooseUrlDialogClass(wxWindow* parent, UrlResourceFinderClass& urls, UrlResourceClass& chosenUrl);
+	ChooseUrlDialogClass(wxWindow* parent, UrlResourceFinderClass& urls, 
+		const std::vector<mvceditor::ProjectClass>& projects,
+		UrlResourceClass& chosenUrl);
 	
 protected:
 
@@ -66,7 +69,37 @@ protected:
 	void OnExtraText(wxCommandEvent& event);
 	void OnExtraChar(wxKeyEvent& event);
 
+	/**
+	 * when a project is selected filter urls to show only urls from
+	 * the chosen project.
+	 */
+	void OnProjectChoice(wxCommandEvent& event);
+
 private:
+
+	/**
+	 * Get the matching urls. a matching url is one that starts with the 
+	 * filter string (case insensitive).
+	 *
+	 * @return the urls that match filter. 
+	 */
+	std::vector<mvceditor::UrlResourceClass> GetFilteredUrls(const wxString& filter);
+
+	/**
+	 * Get the matching urls. a matching url is one that starts with the 
+	 * filter string (case insensitive) AND the URL belongs to the given project.
+	 * A URL belongs to a project if the URL's controller file is in the project's
+	 * sources.
+	 *
+	 * @return the urls that match filter and the project. 
+	 */
+	std::vector<mvceditor::UrlResourceClass> GetFilteredUrlsByProject(const wxString& filter, const mvceditor::ProjectClass& project);
+
+	/**
+	 * fills the url list box with the given urls. any previously existing urls in the 
+	 * list box are removed.
+	 */
+	void FillUrlList(const std::vector<mvceditor::UrlResourceClass>& urls);
 
 	/**
 	 * The list of URLs, it will contain URLs that were detected and URLs that were input
@@ -79,6 +112,12 @@ private:
 	 * The URL that the user selected.
 	 */
 	UrlResourceClass& ChosenUrl;
+
+	/**
+	 * The defined projects. Will use them to allow the user to filter URLs
+	 * by project
+	 */
+	std::vector<mvceditor::ProjectClass> Projects;
 };
 
 }
