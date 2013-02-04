@@ -69,7 +69,16 @@ public:
 	 */
 	mvceditor::PhpEnvironmentClass& operator=(const mvceditor::PhpEnvironmentClass& src);
 
+	/**
+	 * completely copy an instance
+	 * @param src item to copy from
+	 */
 	void Copy(const mvceditor::PhpEnvironmentClass& src);
+	
+	/**
+	 * assign defaults based on the current operating system
+	 */
+	void Init();
 	
 	/**
 	 * Use the PHP executable to determine the PHP verion and
@@ -139,6 +148,11 @@ public:
 	 * @param src item to copy from
 	 */
 	mvceditor::EnvironmentClass& operator=(const mvceditor::EnvironmentClass& src);
+	
+	/**
+	 *  assigns default values based on the current operating system
+	 */
+	void Init();
 
 	/**
 	 * completely copy an instance

@@ -63,17 +63,6 @@ mvceditor::PhpEnvironmentClass::PhpEnvironmentClass()
 	: PhpExecutablePath(wxT(""))
 	, Version(pelet::PHP_53) 
 	, IsAuto(true) {
-	wxPlatformInfo info;
-	switch (info.GetOperatingSystemId()) {
-		case wxOS_UNIX_LINUX:
-			PhpExecutablePath = wxT("php");
-			break;
-		case wxOS_WINDOWS_NT:
-			PhpExecutablePath = wxT("php-win.exe");
-			break;
-		default:
-			break;
-	}
 }
 
 mvceditor::PhpEnvironmentClass::PhpEnvironmentClass(const mvceditor::PhpEnvironmentClass& src) 
@@ -86,6 +75,20 @@ mvceditor::PhpEnvironmentClass::PhpEnvironmentClass(const mvceditor::PhpEnvironm
 mvceditor::PhpEnvironmentClass& mvceditor::PhpEnvironmentClass::operator=(const mvceditor::PhpEnvironmentClass& src) {
 	Copy(src);
 	return *this;
+}
+
+void mvceditor::PhpEnvironmentClass::Init() {
+	wxPlatformInfo info;
+	switch (info.GetOperatingSystemId()) {
+		case wxOS_UNIX_LINUX:
+			PhpExecutablePath = wxT("php");
+			break;
+		case wxOS_WINDOWS_NT:
+			PhpExecutablePath = wxT("php-win.exe");
+			break;
+		default:
+			break;
+	}
 }
 
 void mvceditor::PhpEnvironmentClass::Copy(const mvceditor::PhpEnvironmentClass &src) {
@@ -138,6 +141,11 @@ mvceditor::EnvironmentClass::EnvironmentClass()
 	: Apache()
 	, Php()
 	, WebBrowsers() {
+
+}
+
+void mvceditor::EnvironmentClass::Init() {
+	Php.Init();
 	AddDefaults();
 }
 

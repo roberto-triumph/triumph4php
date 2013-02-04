@@ -67,6 +67,7 @@ mvceditor::AppClass::AppClass()
  * when app starts, create the new app frame
  */
 bool mvceditor::AppClass::OnInit() {
+	Globals.Environment.Init();
 	Preferences.Init();
 	RunningThreads.AddEventHandler(&GlobalsChangeHandler);
 	CreateFeatures();
