@@ -307,8 +307,10 @@ bool mvceditor::SqlQueryClass::NextRow(soci::row& row, std::vector<UnicodeString
 					out << row.get<int>(i);
 					break;
 				case soci::dt_unsigned_long:
-				case soci::dt_unsigned_long_long:
 					out << row.get<unsigned long>(i);
+					break;
+				case soci::dt_unsigned_long_long:
+					out << row.get<unsigned long long>(i);
 					break;
 				case soci::dt_long_long:
 					out << row.get<long long>(i);
