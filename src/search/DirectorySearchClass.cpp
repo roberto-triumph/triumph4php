@@ -158,6 +158,10 @@ wxString mvceditor::SourceClass::WildcardRegEx(const wxString& wildCardString) {
 	return escapedExpression;
 }
 
+bool mvceditor::SourceClass::Exists() const {
+	return RootDirectory.DirExists();
+}
+
 bool mvceditor::CompareSourceLists(const std::vector<mvceditor::SourceClass>& a, const std::vector<mvceditor::SourceClass>& b) {
 	if (a.size() != b.size()) {
 		return false;

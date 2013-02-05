@@ -75,6 +75,7 @@ bool mvceditor::SequenceClass::AppStart() {
 	if (Running()) {
 		return false;
 	}
+	SourceCheck();
 
 	// before we do anything else, make sure that the cache files are the same version as the
 	// code expects them to be
@@ -123,6 +124,7 @@ bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvced
 	if (Running()) {
 		return false;
 	}
+	SourceCheck();
 
 	// before we do anything else, make sure that the cache files are the same version as the
 	// code expects them to be
@@ -182,6 +184,7 @@ bool mvceditor::SequenceClass::TagCacheWipeAndIndex() {
 	if (Running()) {
 		return false;
 	}
+	SourceCheck();
 
 	// this step will wipe the global cache from all projects
 	AddStep(new mvceditor::TagWipeActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE, Globals.Projects));
@@ -203,6 +206,7 @@ bool mvceditor::SequenceClass::Build(std::vector<mvceditor::ActionClass*> action
 	if (Running()) {
 		return false;
 	}
+	SourceCheck();
 	for (size_t i = 0; i < actions.size(); i++) {
 		AddStep(actions[i]);
 	}
@@ -334,6 +338,22 @@ bool mvceditor::SequenceClass::Running() const {
 void mvceditor::SequenceClass::OnActionInProgress(wxCommandEvent &event) {
 	wxCommandEvent sequenceEvent(mvceditor::EVENT_SEQUENCE_IN_PROGRESS);
 	RunningThreads.PostEvent(sequenceEvent);
+}
+
+void mvceditor::SequenceClass::SourceCheck() {
+	std::vector<mvceditor::ProjectClass>::const_iterator project;
+	std::vector<mvceditor::SourceClass>::const_iterator source;
+	for (project = Globals.Projects.begin(); project != Globals.Projects.end(); ++ project) {
+		if (project->IsEnabled) {
+			for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
+				if (!source->Exists()) {
+					mvceditor::EditorLogError(
+						mvceditor::ERR_INVALID_DIRECTORY, source->RootDirectory.GetPath()
+					);
+				}
+			}
+		}
+	}
 }
 
 const wxEventType mvceditor::EVENT_SEQUENCE_START = wxNewEventType();

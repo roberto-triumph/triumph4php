@@ -245,10 +245,10 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename) {
 			EventSink->Publish(openEvent);
 		}
 		else if (error == mvceditor::FindInFilesClass::FILE_NOT_FOUND) {
-			wxLogError(_("File Not Found:") + filename);
+			mvceditor::EditorLogError(mvceditor::ERR_INVALID_FILE, filename);
 		}
 		else if (mvceditor::FindInFilesClass::CHARSET_DETECTION == error) {
-			mvceditor::EditorLogError(mvceditor::CHARSET_DETECTION, filename);
+			mvceditor::EditorLogError(mvceditor::ERR_CHARSET_DETECTION, filename);
 		}
 	}
 	this->Thaw();

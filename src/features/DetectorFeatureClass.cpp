@@ -32,6 +32,7 @@
 #include <widgets/TreeItemDataStringClass.h>
 #include <widgets/ChooseUrlDialogClass.h>
 #include <globals/Assets.h>
+#include <globals/Errors.h>
 #include <MvcEditor.h>
 #include <wx/artprov.h>
 #include <wx/file.h>
@@ -923,23 +924,32 @@ void mvceditor::DetectorFeatureClass::OnRunTemplateFileDetectors(wxCommandEvent&
 	// the sequence class will own this pointer
 	mvceditor::CallStackActionClass* callStackAction =  new mvceditor::CallStackActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_CALL_STACK);
 	mvceditor::UrlResourceClass urlResource = App.Globals.CurrentUrl;
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	wxFileName detectorDbFileName;
-	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
-		if (project->IsAPhpSourceFile(urlResource.FileName.GetFullPath())) {
-			detectorDbFileName = project->DetectorDbFileName;
-			break;
+	
+	if (!urlResource.Url.GetServer().IsEmpty() && urlResource.FileName.IsOk()
+		&& !urlResource.ClassName.IsEmpty() && !urlResource.MethodName.IsEmpty()) {
+
+		std::vector<mvceditor::ProjectClass>::const_iterator project;
+		wxFileName detectorDbFileName;
+		for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
+			if (project->IsAPhpSourceFile(urlResource.FileName.GetFullPath())) {
+				detectorDbFileName = project->DetectorDbFileName;
+				break;
+			}
 		}
+		callStackAction->SetCallStackStart(urlResource.FileName,
+			mvceditor::WxToIcu(urlResource.ClassName),
+			mvceditor::WxToIcu(urlResource.MethodName),
+			detectorDbFileName);
+		actions.push_back(callStackAction);
+		actions.push_back(
+			new mvceditor::TemplateFilesDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_DETECTOR)
+		);
+		App.Sequences.Build(actions);
 	}
-	callStackAction->SetCallStackStart(urlResource.FileName,
-		mvceditor::WxToIcu(urlResource.ClassName),
-		mvceditor::WxToIcu(urlResource.MethodName),
-		detectorDbFileName);
-	actions.push_back(callStackAction);
-	actions.push_back(
-		new mvceditor::TemplateFilesDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_DETECTOR)
-	);
-	App.Sequences.Build(actions);
+	else {
+		mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, 
+			_("Need to choose a URL to detect templates for. Template files feature depends on the URL detectors feature."));
+	}
 }
 
 void mvceditor::DetectorFeatureClass::OnRunTagDetectors(wxCommandEvent& event) {

@@ -234,10 +234,10 @@ void mvceditor::CodeControlClass::LoadAndTrackFile(const wxString& fileName) {
 		TrackFile(fileName, contents);
 	}
 	else if (error == mvceditor::FindInFilesClass::FILE_NOT_FOUND) {
-		wxLogError(_("File Not Found:") + fileName);
+		mvceditor::EditorLogError(mvceditor::ERR_INVALID_FILE, fileName);
 	}
 	else if (mvceditor::FindInFilesClass::CHARSET_DETECTION == error) {
-		mvceditor::EditorLogError(mvceditor::CHARSET_DETECTION, fileName);
+		mvceditor::EditorLogError(mvceditor::ERR_CHARSET_DETECTION, fileName);
 	}
 }
 

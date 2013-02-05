@@ -237,7 +237,7 @@ void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findI
 		delete thread;
 	}
 	else if (error == mvceditor::BackgroundFileReaderClass::NO_RESOURCES)  {
-		mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
+		mvceditor::EditorLogError(mvceditor::ERR_LOW_RESOURCES);
 		delete thread;
 	}
 	else {
@@ -408,7 +408,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxComman
 			delete thread;
 		}
 		else if (error == mvceditor::BackgroundFileReaderClass::NO_RESOURCES)  {
-			mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
+			mvceditor::EditorLogError(mvceditor::ERR_LOW_RESOURCES);
 			delete thread;
 		}
 	}

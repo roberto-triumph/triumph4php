@@ -301,7 +301,7 @@ void  mvceditor::RunConsolePanelClass::RunCommand(wxCommandEvent& event) {
 		if (!stopped) {
 
 			// stale PID??
-			mvceditor::EditorLogError(mvceditor::ROGUE_PROCESS, 
+			mvceditor::EditorLogError(mvceditor::ERR_ROGUE_PROCESS, 
 				wxString::Format(wxT("Process ID: %ld."), CurrentPid));
 		}
 		

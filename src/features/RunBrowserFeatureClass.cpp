@@ -36,7 +36,7 @@ static void ExternalBrowser(const wxString& browserName, const wxURI& url, mvced
 	wxFileName webBrowserPath;
 	bool found = environment->FindBrowserByName(browserName, webBrowserPath);
 	if (!found || !webBrowserPath.IsOk()) {
-		mvceditor::EditorLogWarning(mvceditor::BAD_WEB_BROWSER_EXECUTABLE, webBrowserPath.GetFullPath());
+		mvceditor::EditorLogWarning(mvceditor::ERR_BAD_WEB_BROWSER_EXECUTABLE, webBrowserPath.GetFullPath());
 		return;
 	}
 	wxString cmd = wxT("\"") + webBrowserPath.GetFullPath() + wxT("\""); 
@@ -49,7 +49,7 @@ static void ExternalBrowser(const wxString& browserName, const wxURI& url, mvced
 	// that the browser crashed. 
 	long pid = wxExecute(cmd, wxEXEC_ASYNC | wxEXEC_MAKE_GROUP_LEADER);
 	if (pid <= 0) {
-		mvceditor::EditorLogWarning(mvceditor::BAD_WEB_BROWSER_EXECUTABLE, cmd);
+		mvceditor::EditorLogWarning(mvceditor::ERR_BAD_WEB_BROWSER_EXECUTABLE, cmd);
 	}
 }
 

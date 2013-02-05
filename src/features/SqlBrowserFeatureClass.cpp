@@ -149,7 +149,7 @@ void mvceditor::SqlConnectionDialogClass::OnTestButton(wxCommandEvent& event) {
 				break;
 			case wxTHREAD_NO_RESOURCE:
 			case wxTHREAD_MISC_ERROR:
-				mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
+				mvceditor::EditorLogError(mvceditor::ERR_LOW_RESOURCES);
 				break;
 			case wxTHREAD_RUNNING:
 			case wxTHREAD_KILLED:
@@ -326,7 +326,7 @@ bool mvceditor::MultipleSqlExecuteClass::Execute(wxThreadIdType& threadId) {
 		break;
 	case wxTHREAD_NO_RESOURCE:
 	case wxTHREAD_MISC_ERROR:
-		mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
+		mvceditor::EditorLogError(mvceditor::ERR_LOW_RESOURCES);
 		break;
 	case wxTHREAD_RUNNING:
 	case wxTHREAD_KILLED:
@@ -703,7 +703,7 @@ void mvceditor::SqlBrowserFeatureClass::DetectMetadata() {
 			GetStatusBarWithGauge()->AddGauge(_("Fetching SQL meta data"), ID_SQL_METADATA_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
 		}
 		else if (wxTHREAD_NO_RESOURCE == err) {
-			mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
+			mvceditor::EditorLogError(mvceditor::ERR_LOW_RESOURCES);
 			delete thread;
 		}
 		else if (wxTHREAD_RUNNING == err) {
@@ -843,7 +843,7 @@ void mvceditor::SqlBrowserFeatureClass::OnSqlConnectionMenu(wxCommandEvent& even
 				GetStatusBarWithGauge()->AddGauge(_("Fetching SQL meta data"), ID_SQL_METADATA_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
 			}
 			else if (wxTHREAD_NO_RESOURCE == err) {
-				mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
+				mvceditor::EditorLogError(mvceditor::ERR_LOW_RESOURCES);
 				delete thread;
 			}
 			else if (wxTHREAD_RUNNING == err) {
@@ -948,7 +948,7 @@ void mvceditor::SqlBrowserFeatureClass::OnSqlMetaDataComplete(mvceditor::SqlMeta
 	std::vector<UnicodeString> errors = event.Errors;
 	for (size_t i = 0; i < errors.size(); ++i) {
 		wxString wxError = mvceditor::IcuToWx(errors[i]);
-		mvceditor::EditorLogError(mvceditor::BAD_SQL, wxError);
+		mvceditor::EditorLogError(mvceditor::ERR_BAD_SQL, wxError);
 	}
 }
 

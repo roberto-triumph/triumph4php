@@ -354,7 +354,18 @@ void mvceditor::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
 	if (App.Globals.HasSources()) {
 		mvceditor::BackgroundFileReaderClass::StartError error;
 		mvceditor::LintBackgroundFileReaderClass* thread = new mvceditor::LintBackgroundFileReaderClass(App.RunningThreads, ID_LINT_READER);
-		if (thread->BeginDirectoryLint(App.Globals.AllEnabledPhpSources(), *GetEnvironment(), error, RunningThreadId)) {
+		std::vector<mvceditor::SourceClass> phpSources = App.Globals.AllEnabledPhpSources();
+
+		// output an error if a source directory no longer exists
+		std::vector<mvceditor::SourceClass>::const_iterator source;
+		for (source = phpSources.begin(); source != phpSources.end(); ++source) {
+			if (!source->Exists()) {
+				mvceditor::EditorLogError(mvceditor::ERR_INVALID_DIRECTORY, 
+					source->RootDirectory.GetPath()
+				);
+			}
+		}
+		if (thread->BeginDirectoryLint(phpSources, *GetEnvironment(), error, RunningThreadId)) {
 			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 			gauge->AddGauge(_("Lint Check"), ID_LINT_RESULTS_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 			
@@ -374,11 +385,10 @@ void mvceditor::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
 			delete thread;
 		}
 		else if (error == mvceditor::BackgroundFileReaderClass::NO_RESOURCES)  {
-			mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
+			mvceditor::EditorLogError(mvceditor::ERR_LOW_RESOURCES);
 			delete thread;
 		}
 		else {
-			wxMessageBox(_("Could not start parsing. Does project root path have files?"), _("Lint Check"));
 			delete thread;
 		}
 	}

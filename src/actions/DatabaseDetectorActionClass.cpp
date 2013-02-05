@@ -71,14 +71,16 @@ bool mvceditor::DatabaseDetectorActionClass::Init(mvceditor::GlobalsClass& globa
 	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
 		if (project->IsEnabled && project->HasSources()) {
 			for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
-				for (scriptName = detectorScripts.begin(); scriptName != detectorScripts.end(); ++scriptName) {
-					mvceditor::DatabaseDetectorParamsClass params;
-					params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath.c_str();
-					params.PhpIncludePath.Assign(mvceditor::PhpDetectorsBaseAsset());
-					params.ScriptName = scriptName->c_str();
-					params.SourceDir.AssignDir(source->RootDirectory.GetPath());
-					params.OutputDbFileName = project->DetectorDbFileName.GetFullPath().c_str();
-					ParamsQueue.push(params);
+				if (source->Exists()) {
+					for (scriptName = detectorScripts.begin(); scriptName != detectorScripts.end(); ++scriptName) {
+						mvceditor::DatabaseDetectorParamsClass params;
+						params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath.c_str();
+						params.PhpIncludePath.Assign(mvceditor::PhpDetectorsBaseAsset());
+						params.ScriptName = scriptName->c_str();
+						params.SourceDir.AssignDir(source->RootDirectory.GetPath());
+						params.OutputDbFileName = project->DetectorDbFileName.GetFullPath().c_str();
+						ParamsQueue.push(params);
+					}
 				}
 			}
 		}

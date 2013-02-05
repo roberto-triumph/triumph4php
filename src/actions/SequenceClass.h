@@ -162,6 +162,14 @@ private:
 	 * start the next step in the sequence.
 	 */
 	void RunNextStep();
+
+	/**
+	 * will perform a check to make sure that all sources for all enabled projects
+	 * exist and if not an error will be logged.  This check will be performed at the
+	 * start of all sequences so that we print out at most 1 error for each
+	 * missing source, and not 1 error for each missing source and each action.
+	 */
+	void SourceCheck();
 	
 	/**
 	 * The steps in the current sequence.  

@@ -201,7 +201,8 @@ void mvceditor::TagFeatureClass::LoadPageFromResource(const wxString& finderQuer
 	mvceditor::TagSearchClass tagSearch(mvceditor::WxToIcu(finderQuery));
 	wxFileName fileName = tag.FileName();
 	if (!fileName.FileExists()) {
-		mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, _("File no longer exists:") + fileName.GetFullPath());
+		mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, _("File Not Found:") + fileName.GetFullPath());
+		return;
 	}
 	GetNotebook()->LoadPage(tag.GetFullPath());
 	CodeControlClass* codeControl = GetCurrentCodeControl();
