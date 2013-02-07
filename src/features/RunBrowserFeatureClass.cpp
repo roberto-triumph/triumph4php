@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <features/RunBrowserFeatureClass.h>
+#include <actions/UrlDetectorActionClass.h>
 #include <globals/Errors.h>
 #include <widgets/ChooseUrlDialogClass.h>
 #include <MvcEditor.h>
@@ -59,7 +60,10 @@ mvceditor::RunBrowserFeatureClass::RunBrowserFeatureClass(mvceditor::AppClass& a
 	, BrowserMenu()
 	, UrlMenu()
 	, RunInBrowser(NULL)
-	, BrowserToolbar(NULL) {
+	, BrowserToolbar(NULL)
+	, GaugeDialog(NULL)
+	, IsUrlCacheStale(false)
+	, IsWaitingForUrlDetection(false) {
 }
 
 void mvceditor::RunBrowserFeatureClass::AddWindows() {
@@ -207,7 +211,21 @@ void mvceditor::RunBrowserFeatureClass::OnUrlToolDropDown(wxAuiToolBarEvent& eve
 }
 
 void mvceditor::RunBrowserFeatureClass::OnUrlSearchTool(wxCommandEvent& event) {
-	if (App.Globals.UrlResourceFinder.Count() > 0) {
+	if (IsUrlCacheStale) {
+		IsWaitingForUrlDetection = true;
+
+		mvceditor::UrlDetectorActionClass* action = new mvceditor::UrlDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_URL_DETECTOR);
+		std::vector<mvceditor::ActionClass*> actions;
+		actions.push_back(action);
+		App.Sequences.Build(actions);
+
+		if (GaugeDialog) {
+			GaugeDialog->Destroy();
+			GaugeDialog = NULL;
+		}
+		GaugeDialog = new mvceditor::GaugeDialogClass(GetMainWindow(), _("URL Detection"));
+	}
+	else if (App.Globals.UrlResourceFinder.Count() > 0) {
 		ShowUrlDialog();
 	}
 	else {
@@ -289,6 +307,43 @@ void mvceditor::RunBrowserFeatureClass::OnUrlToolMenuItem(wxCommandEvent& event)
 	}
 }
 
+void mvceditor::RunBrowserFeatureClass::OnFileSaved(mvceditor::FileSavedEventClass& event) {
+	if (IsUrlCacheStale) {
+
+		// already know that cache is stale, then no need to check for dirty again
+		return;
+	}
+	mvceditor::CodeControlClass* control = event.GetCodeControl();
+	if (!control) {
+		return;
+	}
+	wxString fileName = control->GetFileName();
+	std::vector<mvceditor::ProjectClass>::const_iterator project;
+	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
+		if (project->IsEnabled && project->IsAPhpSourceFile(fileName)) {
+			IsUrlCacheStale = true;
+			break;
+		}
+	}
+}
+
+void mvceditor::RunBrowserFeatureClass::OnUrlDetectionComplete(wxCommandEvent& event) {
+	IsUrlCacheStale = false;
+	if (!IsWaitingForUrlDetection) {
+
+		// we did not trigger the url detection
+		return;
+	}
+	if (GaugeDialog) {
+		GaugeDialog->Destroy();
+		GaugeDialog = NULL;
+	}
+	IsWaitingForUrlDetection = false;
+
+	// we triggered the url detection, show the user the url dialog
+	ShowUrlDialog();
+}
+
 BEGIN_EVENT_TABLE(mvceditor::RunBrowserFeatureClass, wxEvtHandler) 
 	
 	// if the end values of the ranges need to be modified, need to modify mvceditor::FeatureClass::MenuIds as well
@@ -301,6 +356,7 @@ BEGIN_EVENT_TABLE(mvceditor::RunBrowserFeatureClass, wxEvtHandler)
 
 	// application events
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::RunBrowserFeatureClass::OnPreferencesSaved)
-	
+	EVT_FEATURE_FILE_SAVED(mvceditor::RunBrowserFeatureClass::OnFileSaved)
+	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_URL_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::RunBrowserFeatureClass::OnUrlDetectionComplete)
 END_EVENT_TABLE()
 

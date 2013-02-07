@@ -31,13 +31,12 @@
 #include <search/TagFinderClass.h>
 #include <actions/ProjectTagActionClass.h>
 #include <code_control/ResourceCacheBuilderClass.h>
+#include <widgets/GaugeDialogClass.h>
 #include <wx/string.h>
 #include <queue>
 
 namespace mvceditor {
 
-// these are defined at the bottom
-class IndexingDialogClass;
 
 class TagFeatureClass : public FeatureClass {
 
@@ -110,16 +109,6 @@ private:
 	 * Handle to Search For Resource menu event
 	 */
 	void OnSearchForResource(wxCommandEvent& event);
-
-	/**
-	 * During file iteration we will pulse the gauge.
-	 */
-	void OnWipeAndIndexWorkInProgress(wxCommandEvent& event);
-
-	/**
-	 * Once the file parsing finishes alert the user.
-	 */
-	void OnWipeAndIndexWorkComplete(wxCommandEvent& event);
 	
 	/**
 	 * Opens the page and sets the cursor on the function/method/property/file that was searched for by the
@@ -192,7 +181,7 @@ private:
 	 * A more prominent status bar that indicated progress
 	 * this dialog will only be alive while project is being indexed
 	 */
-	IndexingDialogClass* IndexingDialog;
+	mvceditor::GaugeDialogClass* IndexingDialog;
 
 	/**
 	 * The current source code is parsed in the background so that a symbol table can be
@@ -292,30 +281,5 @@ private:
 	std::vector<mvceditor::TagClass> MatchedResources;
 };
 
-/**
- * A small dialog so that the user knows the editor is indexing.  Creating a full-fledged
- * dialog because the lower status bar might not be enough feedback.
- */
-class IndexingDialogClass : public IndexingDialogGeneratedClass {
-
-public:
-
-	IndexingDialogClass(wxWindow* parent);
-
-	/**
-	 * initialize this dialog's gauge (in pulse mode)
-	 */
-	void Start();
-
-	/**
-	 * increment this dialog's gauge
-	 */
-	void Increment();
-
-protected:
-
-	void OnHideButton(wxCommandEvent& event);
-
-};
 }
 #endif // __RESOURCEFEATURECLASS_H__
