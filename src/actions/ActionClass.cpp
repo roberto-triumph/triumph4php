@@ -42,7 +42,8 @@ void mvceditor::ActionClass::SetStatus(const wxString& status) {
 	wxCommandEvent evt(mvceditor::EVENT_ACTION_STATUS);
 	
 	// make sure to copy, since wxString copy is not thread safe
-	evt.SetString(status.c_str());
+	wxString cpy(status.c_str());
+	evt.SetString(cpy);
 	PostEvent(evt);
 }
 

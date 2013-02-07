@@ -214,6 +214,29 @@ bool mvceditor::SequenceClass::Build(std::vector<mvceditor::ActionClass*> action
 	return true;
 }
 
+bool mvceditor::SequenceClass::DatabaseDetection() {
+	if (Running()) {
+		return false;
+	}
+
+	// this will attempt to detect new sql connections from the php detectors
+	AddStep(new mvceditor::DatabaseDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_DETECTOR));
+
+	// this will prime the sql connections from the php detectors
+	// this is being done here so that we can guarantee that SqlMetaData has the
+	// most up-to-date database tags. The GlobalsChangeHandlerClass also reads
+	// the database tags from the detector db, but since it also works on events
+	// we cannot gurantee that the GlobalsChangeHandlerClass EVENT_WORK_COMPLETE handler will get called
+	// before the SequenceClass EVENT_WORK_COMPLETE handler.
+	AddStep(new mvceditor::DatabaseDetectorInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_DETECTOR_INIT));
+
+	// this will discover the db schema info (tables, columns)
+	AddStep(new mvceditor::SqlMetaDataActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA));
+
+	Run();
+	return true;
+}
+
 void mvceditor::SequenceClass::AddStep(mvceditor::ActionClass* step) {
 	Steps.push(step);
 }

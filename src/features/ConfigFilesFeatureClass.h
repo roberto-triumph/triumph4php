@@ -94,6 +94,13 @@ private:
 	 */
 	void OnConfigMenuItem(wxCommandEvent& event);
 
+	/**
+	 * when a file has been saved; check to see if it is one of the config
+	 * files that has been changed.  If, so the trigger database
+	 * detection
+	 */
+	void OnFileSaved(mvceditor::FileSavedEventClass& event);
+
 	DECLARE_EVENT_TABLE()
 };
 

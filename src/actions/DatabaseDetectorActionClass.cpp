@@ -141,8 +141,8 @@ std::vector<wxString> mvceditor::DatabaseDetectorActionClass::DetectorScripts() 
 
 void mvceditor::DatabaseDetectorActionClass::OnProcessComplete(wxCommandEvent &event) {
 	if (ParamsQueue.empty()) {
-		wxCommandEvent completeEvent(mvceditor::EVENT_WORK_COMPLETE);
-		PostEvent(completeEvent);
+		wxCommandEvent detectionCompleteEvent(mvceditor::EVENT_WORK_COMPLETE);
+		PostEvent(detectionCompleteEvent);
 	}
 	else {
 		NextDetection();
@@ -152,8 +152,8 @@ void mvceditor::DatabaseDetectorActionClass::OnProcessComplete(wxCommandEvent &e
 void mvceditor::DatabaseDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
 	mvceditor::EditorLogError(mvceditor::WARNING_OTHER, event.GetString());
 	if (ParamsQueue.empty()) {
-		wxCommandEvent completeEvent(mvceditor::EVENT_WORK_COMPLETE);
-		PostEvent(completeEvent);
+		wxCommandEvent detectionCompleteEvent(mvceditor::EVENT_WORK_COMPLETE);
+		PostEvent(detectionCompleteEvent);
 	}
 	else {
 		NextDetection();
@@ -173,6 +173,18 @@ mvceditor::DatabaseDetectorInitActionClass::DatabaseDetectorInitActionClass(mvce
 void mvceditor::DatabaseDetectorInitActionClass::Work(mvceditor::GlobalsClass &globals) {
 	SetStatus(_("DB Detect Init"));
 
+	// first remove all detected connections that were previously detected
+	std::vector<mvceditor::DatabaseTagClass>::iterator info;
+	info = globals.DatabaseTags.begin();
+	while(info != globals.DatabaseTags.end()) {
+		if (info->IsDetected) {
+			info = globals.DatabaseTags.erase(info);
+		}
+		else {
+			info++;
+		}
+	}
+
 	// initialize the detected tag cache only the enabled projects	
 	mvceditor::DatabaseTagFinderClass finder;
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
@@ -188,7 +200,6 @@ void mvceditor::DatabaseDetectorInitActionClass::Work(mvceditor::GlobalsClass &g
 wxString mvceditor::DatabaseDetectorInitActionClass::GetLabel() const {
 	return _("Database tags detector initialization");
 }
-
 
 BEGIN_EVENT_TABLE(mvceditor::DatabaseDetectorActionClass, mvceditor::ActionClass) 
 	EVT_COMMAND(ID_DATABASE_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::DatabaseDetectorActionClass::OnProcessInProgress)

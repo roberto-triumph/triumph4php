@@ -412,12 +412,6 @@ private:
 	
 	void OnRun(wxCommandEvent& event);
 	
-	void OnWorkInProgress(wxCommandEvent& event);
-	
-	void OnWorkComplete(wxCommandEvent& event);
-
-	void OnSqlMetaDataComplete(mvceditor::SqlMetaDataEventClass& event);
-	
 	void OnAppExit(wxCommandEvent& event);
 	
 	/**

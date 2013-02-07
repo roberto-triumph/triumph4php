@@ -60,9 +60,13 @@ wxString MessageFromError(mvceditor::Errors error, const wxString& extra) {
 			msg = mvceditor::MessageWithFix(_("Could not open file due to a character set detection error. ") + extra,
 				_("This seems to be a binary, encrypted, or compressed file.  MVC Editor cannot open binary, encrypted, or compressed files."));
 			break;
-		case mvceditor::ERR_BAD_SQL:
-			msg = mvceditor::MessageWithFix(_("Error executing SQL MetaData query. ") + extra,
-				_("Is the database server up and running?"));
+		case mvceditor::ERR_BAD_SQL_CONNECTION:
+			msg = mvceditor::MessageWithFix(_("Error connecting to DB. ") + extra,
+				_("Start your database server\nOR Go To SQL ... Connections and correct the DB info. \nOR Go to your project's DB config file and correct the settings."));
+			break;
+		case mvceditor::ERR_BAD_SQL_QUERY:
+			msg = mvceditor::MessageWithFix(_("Error executing SQL query. ") + extra,
+				_("Query has a syntax error\nOR database database server is not running?"));
 			break;
 		case mvceditor::ERR_MISSING_KEYBOARD_SHORTCUT:
 			msg = mvceditor::MessageWithFix(_("Could not find menu item for shortcut. ") + extra,
@@ -74,11 +78,11 @@ wxString MessageFromError(mvceditor::Errors error, const wxString& extra) {
 			break;
 		case mvceditor::ERR_INVALID_FILE:
 			msg = mvceditor::MessageWithFix(_("Could not load file: ") + extra,
-				_("Does file exist? Do you have access rights?"));
+				_("Does file exist?\nDo you have access rights?"));
 			break;
 		case mvceditor::ERR_INVALID_DIRECTORY:
 			msg = mvceditor::MessageWithFix(_("Could not open directory: ") + extra,
-				_("Does the directory exist? Do you have access rights? Restore the directory or go to File ... Defined Projects to remove the nonexistant source."));
+				_("Does the directory exist?\nDo you have access rights?\nRestore the directory \nOR go to File ... Defined Projects to remove the nonexistant source."));
 			break;
 		case mvceditor::WARNING_OTHER:
 			msg = extra;
