@@ -59,9 +59,9 @@ mvceditor::RunBrowserFeatureClass::RunBrowserFeatureClass(mvceditor::AppClass& a
 	, RecentUrls()
 	, BrowserMenu()
 	, UrlMenu()
+	, GaugeDialog(NULL)
 	, RunInBrowser(NULL)
 	, BrowserToolbar(NULL)
-	, GaugeDialog(NULL)
 	, IsUrlCacheStale(false)
 	, IsWaitingForUrlDetection(false) {
 }
