@@ -329,6 +329,13 @@ void mvceditor::MainFrameClass::OnEditPreferences(wxCommandEvent& event) {
 		// signal that this app has modified the config file, that way the external
 		// modification check fails and the user will not be prompted to reload the config
 		App.UpdateConfigModifiedTime();
+
+		// since preferences setting can affect php and url detection
+		// if the user changed them we must re-detect all tags
+		// for example if the user changed PHP version new classes may become
+		// parseable; new urls may come from a new virtual host that was just
+		// entered
+		App.Sequences.AppStart();
 	}
 }
 
