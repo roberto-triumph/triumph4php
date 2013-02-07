@@ -224,8 +224,6 @@ class LintResultsPanelClass : public LintResultsGeneratedPanelClass {
 public:
 
 	LintResultsPanelClass(wxWindow *parent, int id, NotebookClass* notebook, std::vector<pelet::LintResultsClass>& lintErrors);
-
-	~LintResultsPanelClass();
 	
 	/**
 	 * adds to the list box widget AND the parseResults data structure
@@ -354,13 +352,6 @@ private:
 	 * This will hold all info about parse errors.
 	 */
 	std::vector<pelet::LintResultsClass> LintErrors;
-	
-	/**
-	 * The panel that shows the lint errors. Note that this window
-	 * may be deleted by the user at any time, be careful that
-	 * you check that it is not null before accessing it
-	 */
-	mvceditor::LintResultsPanelClass* ResultsPanel;
 	
 	DECLARE_EVENT_TABLE()
 };
