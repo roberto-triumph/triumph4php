@@ -120,7 +120,7 @@ void mvceditor::TemplateFilesDetectorActionClass::NextDetection() {
 
 	wxArrayString dirs = params.SourceDir.GetDirs();
 	if (!dirs.IsEmpty()) {
-		SetStatus(_("Template Detect") + dirs.back());
+		SetStatus(_("Template Detect / ") + dirs.back());
 	}
 	wxString cmdLine = params.BuildCmdLine();
 	long pid;
