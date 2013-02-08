@@ -508,6 +508,9 @@ void mvceditor::ResourceSearchDialogClass::ShowJumpToResults(const wxString& fin
 		matchLabel +=  wxT("  (") + projectLabel + wxT(")");
 		MatchesList->Append(matchLabel);
 	}
+	if (!MatchesList->IsEmpty()) {
+		MatchesList->Select(0);
+	}
 	MatchesLabel->SetLabel(wxString::Format(_("Found %d files. Please choose file(s) to open."), allMatches.size()));
 }
 
