@@ -62,7 +62,7 @@ void mvceditor::SqlMetaDataActionClass::BackgroundWork() {
 				SetStatus(_("SQL Meta / ") + wxLabel);
 				UnicodeString error;
 				if (!newResources.Fetch(*it, error)) {
-					errors.push_back(error);
+					errors.push_back(it->Label + UNICODE_STRING_SIMPLE(": ") + error);
 				}
 			}
 		}

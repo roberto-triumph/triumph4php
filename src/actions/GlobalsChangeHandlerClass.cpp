@@ -37,7 +37,7 @@ void mvceditor::GlobalsChangeHandlerClass::OnSqlMetaDataComplete(mvceditor::SqlM
 	std::vector<UnicodeString> errors = event.Errors;
 	for (size_t i = 0; i < errors.size(); ++i) {
 		wxString wxError = mvceditor::IcuToWx(errors[i]);
-		mvceditor::EditorLogError(mvceditor::BAD_SQL, wxError);
+		mvceditor::EditorLogError(mvceditor::ERR_BAD_SQL_CONNECTION, wxError);
 	}
 }
 

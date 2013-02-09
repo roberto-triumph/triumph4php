@@ -101,15 +101,6 @@ std::vector<mvceditor::TagClass> mvceditor::TagFeatureClass::SearchForResources(
 
 void mvceditor::TagFeatureClass::OnAppStartSequenceComplete(wxCommandEvent& event) {
 	CacheState = CACHE_OK;
-}
-
-void mvceditor::TagFeatureClass::OnWipeAndIndexWorkInProgress(wxCommandEvent& event) {
-	if (IndexingDialog && IndexingDialog->IsShown()) {
-		IndexingDialog->Increment();
-	}
-}
-
-void mvceditor::TagFeatureClass::OnWipeAndIndexWorkComplete(wxCommandEvent& event) {
 	if (IndexingDialog) {
 		IndexingDialog->Destroy();
 		IndexingDialog = NULL;
@@ -118,7 +109,7 @@ void mvceditor::TagFeatureClass::OnWipeAndIndexWorkComplete(wxCommandEvent& even
 
 void mvceditor::TagFeatureClass::OnProjectWipeAndIndex(wxCommandEvent& event) {
 	if (App.Sequences.TagCacheWipeAndIndex()) {
-		IndexingDialog = new mvceditor::IndexingDialogClass(GetMainWindow());
+		IndexingDialog = new mvceditor::GaugeDialogClass(GetMainWindow(), _("Wiping and Rebuilding Index"));
 		IndexingDialog->Show();
 		IndexingDialog->Start();
 	}
@@ -201,7 +192,8 @@ void mvceditor::TagFeatureClass::LoadPageFromResource(const wxString& finderQuer
 	mvceditor::TagSearchClass tagSearch(mvceditor::WxToIcu(finderQuery));
 	wxFileName fileName = tag.FileName();
 	if (!fileName.FileExists()) {
-		mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, _("File no longer exists:") + fileName.GetFullPath());
+		mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, _("File Not Found:") + fileName.GetFullPath());
+		return;
 	}
 	GetNotebook()->LoadPage(tag.GetFullPath());
 	CodeControlClass* codeControl = GetCurrentCodeControl();
@@ -240,14 +232,15 @@ void mvceditor::TagFeatureClass::OnAppFileClosed(wxCommandEvent& event) {
 
 	// only index when there is a project open
 	// need to make sure that the file that was closed is in the opened project
-	// as well. don't want single-leaf files to be parsed for resources .. or
+	// as well.
+	// ATTN: don't want single-leaf files to be parsed for resources .. or
 	// do we?
 	wxString fileName = event.GetString();
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	pelet::Versions version = GetEnvironment()->Php.Version;
 	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
 
-		if (project->IsAPhpSourceFile(fileName)) {
+		if (project->IsEnabled && project->IsAPhpSourceFile(fileName)) {
 			mvceditor::ProjectTagActionClass* thread = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
 			thread->InitForFile(*project, fileName, version);
 
@@ -332,6 +325,29 @@ void mvceditor::TagFeatureClass::OnAppFileSaved(mvceditor::FileSavedEventClass& 
 				text, 
 				codeControl->IsNew(),
 				App.Globals.Environment.Php.Version);
+		}
+	}
+
+	// persist the resources to the "global" cache
+	// this is needed so that if the url detector is triggered while 
+	// a file is opened the url detector gets the latest resources
+	wxString fileName = event.GetCodeControl()->GetFileName();
+	std::vector<mvceditor::ProjectClass>::const_iterator project;
+	pelet::Versions version = GetEnvironment()->Php.Version;
+	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
+
+		if (project->IsEnabled && project->IsAPhpSourceFile(fileName)) {
+			mvceditor::ProjectTagActionClass* thread = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
+			thread->InitForFile(*project, fileName, version);
+
+			// show user the error? not for now as they cannot do anything about it
+			// no need to track thread ID as this thread runs for a very short time since
+			// we are only indexing one file
+			wxThreadIdType threadId;
+			wxThreadError err = thread->CreateSingleInstance(threadId);
+			if (wxTHREAD_NO_ERROR != err) {
+				delete thread;
+			}
 		}
 	}
 	event.Skip();
@@ -492,6 +508,9 @@ void mvceditor::ResourceSearchDialogClass::ShowJumpToResults(const wxString& fin
 		matchLabel +=  wxT("  (") + projectLabel + wxT(")");
 		MatchesList->Append(matchLabel);
 	}
+	if (!MatchesList->IsEmpty()) {
+		MatchesList->Select(0);
+	}
 	MatchesLabel->SetLabel(wxString::Format(_("Found %d files. Please choose file(s) to open."), allMatches.size()));
 }
 
@@ -600,22 +619,6 @@ void mvceditor::ResourceSearchDialogClass::OnProjectChoice(wxCommandEvent& event
 	OnSearchText(event);
 }
 
-mvceditor::IndexingDialogClass::IndexingDialogClass(wxWindow* parent) 
-	: IndexingDialogGeneratedClass(parent) {
-}
-
-void mvceditor::IndexingDialogClass::OnHideButton(wxCommandEvent &event) {
-	Hide();
-}
-
-void mvceditor::IndexingDialogClass::Start() {
-	Gauge->Pulse();
-}
-
-void mvceditor::IndexingDialogClass::Increment() {
-	Gauge->Pulse();
-}
-
 BEGIN_EVENT_TABLE(mvceditor::TagFeatureClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_RESOURCE + 0, mvceditor::TagFeatureClass::OnProjectWipeAndIndex)
 	EVT_MENU(mvceditor::MENU_RESOURCE + 1, mvceditor::TagFeatureClass::OnJump)
@@ -630,8 +633,6 @@ BEGIN_EVENT_TABLE(mvceditor::TagFeatureClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_NEW, mvceditor::TagFeatureClass::OnAppFileOpened)
 	EVT_FEATURE_FILE_SAVED(mvceditor::TagFeatureClass::OnAppFileSaved)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::TagFeatureClass::OnAppReady)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::TagFeatureClass::OnWipeAndIndexWorkInProgress)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE, mvceditor::EVENT_WORK_COMPLETE, mvceditor::TagFeatureClass::OnWipeAndIndexWorkComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_SEQUENCE_COMPLETE, mvceditor::TagFeatureClass::OnAppStartSequenceComplete)
 
 	EVT_WORKING_CACHE_COMPLETE(wxID_ANY, mvceditor::TagFeatureClass::OnWorkingCacheComplete)

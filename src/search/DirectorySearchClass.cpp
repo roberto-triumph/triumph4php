@@ -80,7 +80,22 @@ void mvceditor::SourceClass::SetIncludeWildcards(const wxString& wildcardString)
 		delete IncludeRegEx;
 		IncludeRegEx = NULL;
 	}
-	IncludeWildcards = wildcardString;
+	IncludeWildcards = wxT("");
+
+	// tokenize so that we can ignore multiple consecutive semicolons
+	// also remove spaces at the end of each wilcard since they are not significant
+	wxStringTokenizer tok(wildcardString, wxT(";"), wxTOKEN_STRTOK);
+	while (tok.HasMoreTokens()) {
+		wxString next = tok.NextToken();
+		next.Trim(false).Trim(true);
+		if (!next.IsEmpty()) {
+			IncludeWildcards += next;
+			IncludeWildcards += wxT(";");
+		}
+	}
+	if (IncludeWildcards.EndsWith(wxT(";"))) {
+		IncludeWildcards.RemoveLast();
+	}
 
 	// don't compile the wildcard reg ex yet. lets perform lazy initialization since
 	// so that we dont incur the hit of reg ex compilation until we need to.
@@ -91,7 +106,23 @@ void mvceditor::SourceClass::SetExcludeWildcards(const wxString& wildcardString)
 		delete ExcludeRegEx;
 		ExcludeRegEx = NULL;
 	}
-	ExcludeWildcards = wildcardString;
+
+	ExcludeWildcards = wxT("");
+
+	// tokenize so that we can ignore multiple consecutive semicolons
+	// also remove spaces at the end of each wilcard since they are not significant
+	wxStringTokenizer tok(wildcardString, wxT(";"), wxTOKEN_STRTOK);
+	while (tok.HasMoreTokens()) {
+		wxString next = tok.NextToken();
+		next.Trim(false).Trim(true);
+		if (!next.IsEmpty()) {
+			ExcludeWildcards += next;
+			ExcludeWildcards += wxT(";");
+		}
+	}
+	if (ExcludeWildcards.EndsWith(wxT(";"))) {
+		ExcludeWildcards.RemoveLast();
+	}
 
 	// don't compile the wildcard reg ex yet. lets perform lazy initialization since
 	// so that we dont incur the hit of reg ex compilation until we need to.
@@ -136,7 +167,7 @@ bool mvceditor::SourceClass::IsInRootDirectory(const wxString& fullPath) const {
 }
 
 wxString mvceditor::SourceClass::WildcardRegEx(const wxString& wildCardString) {
-	wxString escapedExpression = wildCardString;
+	wxString escapedExpression(wildCardString);
 	
 	// allow ? and * wildcards, turn ';' into '|'
 	wxString symbols = wxT("!@#$%^&()[]{}\\-+.\"|,");
@@ -156,6 +187,10 @@ wxString mvceditor::SourceClass::WildcardRegEx(const wxString& wildCardString) {
 	escapedExpression.Replace(wxT("?"), wxT(".?"));
 	escapedExpression.Append(wxT("$)"));
 	return escapedExpression;
+}
+
+bool mvceditor::SourceClass::Exists() const {
+	return RootDirectory.DirExists();
 }
 
 bool mvceditor::CompareSourceLists(const std::vector<mvceditor::SourceClass>& a, const std::vector<mvceditor::SourceClass>& b) {

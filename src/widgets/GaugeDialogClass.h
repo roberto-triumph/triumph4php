@@ -19,54 +19,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2009-20Roberto Perpuly
+ * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <actions/ActionClass.h>
+#ifndef __MVCEDITOR_GAUGEDIALOGCLASS_H__
+#define __MVCEDITOR_GAUGEDIALOGCLASS_H__
 
-mvceditor::ActionClass::ActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: ThreadWithHeartbeatClass(runningThreads, eventId) {
+#include <features/wxformbuilder/ResourceFeatureForms.h>
+#include <wx/timer.h>
+
+namespace mvceditor {
+
+/**
+ * A small dialog that contains a Gauge (progress bar) and a label. This dialog
+ * will make the gauge pulse without any outside code.
+ *
+ * Sometimes it is best to create a full-fledged dialog because the gauge that is 
+ * located in the lower status bar might not be enough feedback for the user.
+ */
+class GaugeDialogClass : public IndexingDialogGeneratedClass {
+
+public:
+
+	GaugeDialogClass(wxWindow* parent, const wxString& label);
+
+	/**
+	 * initialize this dialog's gauge (in pulse mode)
+	 */
+	void Start();
+
+protected:
+
+	void OnHideButton(wxCommandEvent& event);
+
+	void OnTimer(wxTimerEvent& event);
+
+private:
+
+	wxTimer Timer;
+
+	DECLARE_EVENT_TABLE()
+};
 
 }
 
-mvceditor::ActionClass::~ActionClass() {
-
-}
-
-bool mvceditor::ActionClass::DoAsync() {
-	return true;
-}
-
-void mvceditor::ActionClass::SetStatus(const wxString& status) {
-
-	wxCommandEvent evt(mvceditor::EVENT_ACTION_STATUS);
-	
-	// make sure to copy, since wxString copy is not thread safe
-	wxString cpy(status.c_str());
-	evt.SetString(cpy);
-	PostEvent(evt);
-}
-
-mvceditor::InitializerActionClass::InitializerActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: ActionClass(runningThreads, eventId) {
-
-}
-
-bool mvceditor::InitializerActionClass::Init(mvceditor::GlobalsClass& globals) {
-	Work(globals);
-	
-	wxCommandEvent evt(mvceditor::EVENT_WORK_COMPLETE);
-	PostEvent(evt);
-	return true;
-}
-
-
-bool mvceditor::InitializerActionClass::DoAsync() {
-	return false;
-}
-
-void mvceditor::InitializerActionClass::BackgroundWork() {
-	
-}
-
-const wxEventType mvceditor::EVENT_ACTION_STATUS = wxNewEventType();
+#endif

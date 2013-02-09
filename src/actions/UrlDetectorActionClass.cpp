@@ -95,17 +95,19 @@ bool mvceditor::UrlDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
 	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
 		if (project->IsEnabled) {
 			for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
-				for (scriptName = detectorScripts.begin(); scriptName != detectorScripts.end(); ++scriptName) {
-					mvceditor::UrlDetectorParamsClass params;
-					params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
-					params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset();
-					params.ScriptName = *scriptName;
-					params.SourceDir = source->RootDirectory;
-					params.ResourceDbFileName = project->ResourceDbFileName.GetFullPath();
-					params.RootUrl = globals.Environment.Apache.GetUrl(source->RootDirectory.GetPath());
-					params.OutputDbFileName = project->DetectorDbFileName.GetFullPath();
-					if (!params.RootUrl.IsEmpty()) {
-						ParamsQueue.push(params);
+				if (source->Exists()) {
+					for (scriptName = detectorScripts.begin(); scriptName != detectorScripts.end(); ++scriptName) {
+						mvceditor::UrlDetectorParamsClass params;
+						params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
+						params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset();
+						params.ScriptName = *scriptName;
+						params.SourceDir = source->RootDirectory;
+						params.ResourceDbFileName = project->ResourceDbFileName.GetFullPath();
+						params.RootUrl = globals.Environment.Apache.GetUrl(source->RootDirectory.GetPath());
+						params.OutputDbFileName = project->DetectorDbFileName.GetFullPath();
+						if (!params.RootUrl.IsEmpty()) {
+							ParamsQueue.push(params);
+						}
 					}
 				}
 			}

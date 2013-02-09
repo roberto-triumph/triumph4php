@@ -198,7 +198,7 @@ void mvceditor::ProjectFeatureClass::OnProjectExplore(wxCommandEvent& event) {
 		cmd += wxT("\"");
 		long result = wxExecute(cmd);
 		if (!result) {
-			mvceditor::EditorLogError(mvceditor::BAD_EXPLORER_EXCUTABLE, cmd);
+			mvceditor::EditorLogError(mvceditor::ERR_BAD_EXPLORER_EXCUTABLE, cmd);
 		}
 	}
 	else {
@@ -217,7 +217,7 @@ void mvceditor::ProjectFeatureClass::OnProjectExploreOpenFile(wxCommandEvent& ev
 		cmd += wxT("\"");
 		long result = wxExecute(cmd);
 		if (!result) {
-			mvceditor::EditorLogError(mvceditor::BAD_EXPLORER_EXCUTABLE, cmd);
+			mvceditor::EditorLogError(mvceditor::ERR_BAD_EXPLORER_EXCUTABLE, cmd);
 		}
 	}
 	else {

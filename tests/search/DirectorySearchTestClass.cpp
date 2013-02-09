@@ -85,7 +85,7 @@ public:
 	 * removes all wildcards and assigns the given wildcards
 	 */
 	void Make(const wxString& src, const wxString& include, const wxString& exclude) {
-		Source.RootDirectory.Assign(src);
+		Source.RootDirectory.AssignDir(src);
 		Source.ClearIncludeWildcards();
 		Source.ClearExcludeWildcards();
 		Source.SetIncludeWildcards(include);
@@ -268,34 +268,34 @@ TEST_FIXTURE(DirectorySearchTestClass, WalkShouldSkipFileThatMatchExcludeWildcar
 }
 
 TEST_FIXTURE(SourceFixtureClass, ContainsShouldReturnFalse) {
-	wxString root = wxFileName::GetTempDir() + wxFileName::GetPathSeparators() + 
+	wxString root = wxFileName::GetTempDir() + wxFileName::GetPathSeparator() + 
 		wxT("temp");
 	Make(root, wxT("*.php"), wxT("*.phtml"));
 
 	// outside of  root dir
-	wxString test = wxFileName::GetTempDir() + wxFileName::GetPathSeparators() + wxT("file.php");
+	wxString test = wxFileName::GetTempDir() + wxFileName::GetPathSeparator() + wxT("file.php");
 	CHECK_EQUAL(false, Source.Contains(test));
 
 	// matches an exclude wildcard
-	test = root + wxFileName::GetPathSeparators() + wxT("file.phtml");
+	test = root + wxFileName::GetPathSeparator() + wxT("file.phtml");
 	CHECK_EQUAL(false, Source.Contains(test));
 
 	// in sub-directory and matches exclude wildcard
-	test = root + wxFileName::GetPathSeparators() + wxT("tmp") + wxFileName::GetPathSeparators() + wxT("file.phtml");
+	test = root + wxFileName::GetPathSeparator() + wxT("tmp") + wxFileName::GetPathSeparator() + wxT("file.phtml");
 	CHECK_EQUAL(false, Source.Contains(test));
 
 	// does not match an include wildcard 
-	test = root + wxFileName::GetPathSeparators() + wxT("file.class");
+	test = root + wxFileName::GetPathSeparator() + wxT("file.class");
 	CHECK_EQUAL(false, Source.Contains(test));
 }
 
 TEST_FIXTURE(SourceFixtureClass, ContainsShouldReturnFalse2) {
-	wxString root = wxFileName::GetTempDir() + wxFileName::GetPathSeparators() + 
+	wxString root = wxFileName::GetTempDir() + wxFileName::GetPathSeparator() + 
 		wxT("temp");
 	
 	// exclude wildcards take precedence
 	Make(root, wxT("*"), wxT("file.phtml"));
-	wxString test = root + wxFileName::GetPathSeparators() + wxT("file.phtml");
+	wxString test = root + wxFileName::GetPathSeparator() + wxT("file.phtml");
 	CHECK_EQUAL(false, Source.Contains(test));
 }
 
@@ -304,16 +304,32 @@ TEST_FIXTURE(SourceFixtureClass, ContainsShouldReturnTrue) {
 	Make(root, wxT("*.php"), wxT(""));
 
 	// same as root dir
-	wxString test = root + wxFileName::GetPathSeparators() + wxT("file.php");
+	wxString test = root + wxFileName::GetPathSeparator() + wxT("file.php");
 	CHECK(Source.Contains(test));
 
 	// in sub-directory
-	test = root + wxFileName::GetPathSeparators() + wxT("temp") + wxFileName::GetPathSeparators() + wxT("file.php");
+	test = root + wxFileName::GetPathSeparator() + wxT("temp") + wxFileName::GetPathSeparator() + wxT("file.php");
 	CHECK(Source.Contains(test));
 
 	// does not match the exclude list
 	Make(root, wxT("*"), wxT("file_two.php"));
-	test = root + wxFileName::GetPathSeparators() + wxT("file.php");
+	test = root + wxFileName::GetPathSeparator() + wxT("file.php");
+	CHECK(Source.Contains(test));
+}
+
+TEST_FIXTURE(SourceFixtureClass, ContainsHandleWildcardsWithSpaces) {
+	wxString root = wxFileName::GetTempDir() + wxFileName::GetPathSeparator() + 
+		wxT("temp");
+
+	// test that the wildcards are trimmed, since ending spaces are no signigicant
+	// also test that consecutive semicolons are treated as one
+	Make(root, wxT("*"), wxT(";; ;*.phtml; "));
+
+	// outside of  root dir
+	wxString test;
+
+	// matches something not excluded
+	test = root + wxFileName::GetPathSeparator() + wxT("file.php");
 	CHECK(Source.Contains(test));
 }
 

@@ -32,49 +32,58 @@ static wxString FIX_SEPARATOR = wxT("\n\nFix\n\n");
 wxString MessageFromError(mvceditor::Errors error, const wxString& extra) {
 	wxString msg;
 	switch (error) {
-		case mvceditor::BAD_EXPLORER_EXCUTABLE:
+		case mvceditor::ERR_BAD_EXPLORER_EXCUTABLE:
 			msg = mvceditor::MessageWithFix(_("Could not run explorer. ") + extra, 
 				_("Go To Edit ... Preferences, choose the Project tab to change the location of the explorer binary."));
 			break;
-		case mvceditor::BAD_PHP_EXECUTABLE:
+		case mvceditor::ERR_BAD_PHP_EXECUTABLE:
 			msg = mvceditor::MessageWithFix(_("PHP binary not found. ") + extra,
 				_("Go To Project ... Environment to choose the location of the PHP binary."));
 			break;
-		case mvceditor::LOW_RESOURCES:
+		case mvceditor::ERR_LOW_RESOURCES:
 			msg = mvceditor::MessageWithFix(_("Your system is way too busy. Please try again later. ") + extra,
 				_("Try closing some programs non-essential program or restarting MVC Editor."));
 			break;
-		case mvceditor::PROJECT_DETECTION:
+		case mvceditor::ERR_PROJECT_DETECTION:
 			msg = mvceditor::MessageWithFix(_("Error detecting PHP framework. ") + extra,
 				_("Are you developing a new framework detection script? Is the script correct?"));
 			break;
-		case mvceditor::DATABASE_DETECTION:
+		case mvceditor::ERR_DATABASE_DETECTION:
 			msg = mvceditor::MessageWithFix(_("Error detecting database info. ") + extra,
 				_("Are you developing a new framework detection script? Is the script correct?"));
 			break;
-		case mvceditor::ROGUE_PROCESS:
+		case mvceditor::ERR_ROGUE_PROCESS:
 			msg = mvceditor::MessageWithFix(_("Could not stop background process. ") + extra,
 				_("Restart MVC Editor"));
 			break;
-		case mvceditor::CHARSET_DETECTION:
+		case mvceditor::ERR_CHARSET_DETECTION:
 			msg = mvceditor::MessageWithFix(_("Could not open file due to a character set detection error. ") + extra,
 				_("This seems to be a binary, encrypted, or compressed file.  MVC Editor cannot open binary, encrypted, or compressed files."));
 			break;
-		case mvceditor::BAD_SQL:
-			msg = mvceditor::MessageWithFix(_("Error executing SQL MetaData query. ") + extra,
-				_("Is the database server up and running?"));
+		case mvceditor::ERR_BAD_SQL_CONNECTION:
+			msg = mvceditor::MessageWithFix(_("Error connecting to DB. ") + extra,
+				_("Start your database server\nOR Go To SQL ... Connections and correct the DB info. \nOR Go to your project's DB config file and correct the settings."));
 			break;
-		case mvceditor::MISSING_KEYBOARD_SHORTCUT:
+		case mvceditor::ERR_BAD_SQL_QUERY:
+			msg = mvceditor::MessageWithFix(_("Error executing SQL query. ") + extra,
+				_("Query has a syntax error\nOR database database server is not running?"));
+			break;
+		case mvceditor::ERR_MISSING_KEYBOARD_SHORTCUT:
 			msg = mvceditor::MessageWithFix(_("Could not find menu item for shortcut. ") + extra,
 				_("All other menu shortcuts were loaded successfully and are functional. If you want to get rid of this message; Go to Edit ... Preferences, then Click OK to re-write the config file."));
 			break;
-		case mvceditor::CORRUPT_KEYBOARD_SHORTCUT:
+		case mvceditor::ERR_CORRUPT_KEYBOARD_SHORTCUT:
 			msg = mvceditor::MessageWithFix(_("Could not load menu shortcuts from config file. ") + extra,
 				_("All other menu shortcuts were loaded successfully and are functional. If you want to get rid of this message; Go to Edit ... Preferences, then Click OK to re-write the config file."));
 			break;
-		case mvceditor::INVALID_FILE:
+		case mvceditor::ERR_INVALID_FILE:
 			msg = mvceditor::MessageWithFix(_("Could not load file: ") + extra,
-				_("Does file exist? Do you have access rights?"));
+				_("Does file exist?\nDo you have access rights?"));
+			break;
+		case mvceditor::ERR_INVALID_DIRECTORY:
+			msg = mvceditor::MessageWithFix(_("Could not open directory: ") + extra,
+				_("Does the directory exist?\nDo you have access rights?\nRestore the directory \nOR go to File ... Defined Projects to remove the nonexistant source."));
+			break;
 		case mvceditor::WARNING_OTHER:
 			msg = extra;
 		default:

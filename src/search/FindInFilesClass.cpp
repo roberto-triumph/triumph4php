@@ -140,7 +140,7 @@ int mvceditor::FindInFilesClass::ReplaceAllMatchesInFile(const wxString& fileNam
 			}
 		}
 		else if (mvceditor::FindInFilesClass::CHARSET_DETECTION == error) {
-			mvceditor::EditorLogError(mvceditor::CHARSET_DETECTION, fileName);
+			mvceditor::EditorLogError(mvceditor::ERR_CHARSET_DETECTION, fileName);
 		}
 	}
 	return matches;

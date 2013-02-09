@@ -165,10 +165,6 @@ mvceditor::LintResultsPanelClass::LintResultsPanelClass(wxWindow *parent, int id
 			
 }
 
-mvceditor::LintResultsPanelClass::~LintResultsPanelClass() {
-	ClearErrors();
-}
-
 void mvceditor::LintResultsPanelClass::AddError(const pelet::LintResultsClass& lintError) {
 	wxString err = mvceditor::IcuToWx(lintError.Error);
 	wxString line;
@@ -310,7 +306,6 @@ mvceditor::LintFeatureClass::LintFeatureClass(mvceditor::AppClass& app)
 	, CheckOnSave(true)
 	, RunningThreadId(0)
 	, LintErrors() {
-	ResultsPanel = NULL;
 }
 
 void mvceditor::LintFeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
@@ -354,19 +349,32 @@ void mvceditor::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
 	if (App.Globals.HasSources()) {
 		mvceditor::BackgroundFileReaderClass::StartError error;
 		mvceditor::LintBackgroundFileReaderClass* thread = new mvceditor::LintBackgroundFileReaderClass(App.RunningThreads, ID_LINT_READER);
-		if (thread->BeginDirectoryLint(App.Globals.AllEnabledPhpSources(), *GetEnvironment(), error, RunningThreadId)) {
+		std::vector<mvceditor::SourceClass> phpSources = App.Globals.AllEnabledPhpSources();
+
+		// output an error if a source directory no longer exists
+		std::vector<mvceditor::SourceClass>::const_iterator source;
+		for (source = phpSources.begin(); source != phpSources.end(); ++source) {
+			if (!source->Exists()) {
+				mvceditor::EditorLogError(mvceditor::ERR_INVALID_DIRECTORY, 
+					source->RootDirectory.GetPath()
+				);
+			}
+		}
+		if (thread->BeginDirectoryLint(phpSources, *GetEnvironment(), error, RunningThreadId)) {
 			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 			gauge->AddGauge(_("Lint Check"), ID_LINT_RESULTS_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 			
 			// create / open the outline window
-			if (ResultsPanel) {
-				ResultsPanel->ClearErrors();
-				SetFocusToToolsWindow(ResultsPanel);
+			wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
+			if (window) {
+				mvceditor::LintResultsPanelClass* resultsPanel = (mvceditor::LintResultsPanelClass*) window;
+				resultsPanel->ClearErrors();
+				SetFocusToToolsWindow(resultsPanel);
 			}
 			else {
-				ResultsPanel = new LintResultsPanelClass(GetToolsNotebook(), ID_LINT_RESULTS_PANEL, GetNotebook(), LintErrors);
-				AddToolsWindow(ResultsPanel, _("Lint Check"));
-				SetFocusToToolsWindow(ResultsPanel);
+				mvceditor::LintResultsPanelClass* resultsPanel = new LintResultsPanelClass(GetToolsNotebook(), ID_LINT_RESULTS_PANEL, GetNotebook(), LintErrors);
+				AddToolsWindow(resultsPanel, _("Lint Check"));
+				SetFocusToToolsWindow(resultsPanel);
 			}
 		}
 		else if (error == mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING)  {
@@ -374,11 +382,10 @@ void mvceditor::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
 			delete thread;
 		}
 		else if (error == mvceditor::BackgroundFileReaderClass::NO_RESOURCES)  {
-			mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
+			mvceditor::EditorLogError(mvceditor::ERR_LOW_RESOURCES);
 			delete thread;
 		}
 		else {
-			wxMessageBox(_("Could not start parsing. Does project root path have files?"), _("Lint Check"));
 			delete thread;
 		}
 	}
@@ -388,21 +395,27 @@ void mvceditor::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
 }
 
 void mvceditor::LintFeatureClass::OnNextLintError(wxCommandEvent& event) {
-	if (ResultsPanel) {
-		ResultsPanel->SelectNextError();
+	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
+	if (window) {
+		mvceditor::LintResultsPanelClass* resultsPanel = (mvceditor::LintResultsPanelClass*) window;
+		resultsPanel->SelectNextError();
 	}
 }
 
 void mvceditor::LintFeatureClass::OnPreviousLintError(wxCommandEvent& event) {
-	if (ResultsPanel) {
-		ResultsPanel->SelectPreviousError();
+	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
+	if (window) {
+		mvceditor::LintResultsPanelClass* resultsPanel = (mvceditor::LintResultsPanelClass*) window;
+		resultsPanel->SelectPreviousError();
 	}
 }
 
 void mvceditor::LintFeatureClass::OnLintError(mvceditor::LintResultsEventClass& event) {
 	pelet::LintResultsClass results = event.LintResults;
-	if (ResultsPanel) {
-		ResultsPanel->AddError(results);
+	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
+	if (window) {
+		mvceditor::LintResultsPanelClass* resultsPanel = (mvceditor::LintResultsPanelClass*) window;
+		resultsPanel->AddError(results);
 	}
 }
 
@@ -427,6 +440,12 @@ void mvceditor::LintFeatureClass::OnFileSaved(mvceditor::FileSavedEventClass& ev
 	codeControl->ClearLintErrors();
 	bool hasErrors = !LintErrors.empty();
 
+	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
+	mvceditor::LintResultsPanelClass* resultsPanel = NULL;
+	if (window) {
+		resultsPanel = (mvceditor::LintResultsPanelClass*) window;
+	}
+
 	// if user has configure to do lint check on saving or user is cleaning up
 	// errors (after they manually lint checked the project) then re-check
 	if (hasErrors || CheckOnSave) {
@@ -437,11 +456,11 @@ void mvceditor::LintFeatureClass::OnFileSaved(mvceditor::FileSavedEventClass& ev
 			
 			// handle the case where user has saved a file but has not clicked
 			// on the Lint project button.
-			if (ResultsPanel) {
+			if (resultsPanel) {
 
 				// remove lint results for this file from the display list	
 				// and put the new error
-				ResultsPanel->AddErrorsFor(fileName, lintResults);
+				resultsPanel->AddErrorsFor(fileName, lintResults);
 			}
 			if (codeControl) {
 				int previousPos = codeControl->GetCurrentPos();
@@ -457,8 +476,8 @@ void mvceditor::LintFeatureClass::OnFileSaved(mvceditor::FileSavedEventClass& ev
 				codeControl->CallTipShow(previousPos, error);
 			}
 		}
-		else if (ResultsPanel) {
-			ResultsPanel->RemoveErrorsFor(fileName);
+		else if (resultsPanel) {
+			resultsPanel->RemoveErrorsFor(fileName);
 		}
 		delete thread;
 	}
@@ -467,22 +486,25 @@ void mvceditor::LintFeatureClass::OnFileSaved(mvceditor::FileSavedEventClass& ev
 void mvceditor::LintFeatureClass::OnNotebookPageClosed(wxAuiNotebookEvent& event) {
 	wxAuiNotebook* notebook = GetToolsNotebook();
 	int selection = event.GetSelection();
-	if (notebook->GetPage(selection) == ResultsPanel) {
-	
-		// since this is a window, wxWidgets will do the memory cleanup
-		ResultsPanel = NULL;
+	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
+	if (notebook->GetPage(selection) == window) {
 		if (RunningThreadId > 0) {
 			App.RunningThreads.Stop(RunningThreadId);
 			RunningThreadId = 0;
 			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 			gauge->StopGauge(ID_LINT_RESULTS_GAUGE);
 		}
+		
+		// dont need to show the errors no need to keep the errors
+		LintErrors.clear();
 	}
 }
 
 void mvceditor::LintFeatureClass::OnLintSummary(mvceditor::LintResultsSummaryEventClass& event) {
-	if (ResultsPanel) {
-		ResultsPanel->PrintSummary(event.TotalFiles, event.ErrorFiles);
+	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
+	if (window) {
+		mvceditor::LintResultsPanelClass* resultsPanel = (mvceditor::LintResultsPanelClass*) window;
+		resultsPanel->PrintSummary(event.TotalFiles, event.ErrorFiles);
 	}
 }
 

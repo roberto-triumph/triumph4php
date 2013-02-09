@@ -19,54 +19,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2009-20Roberto Perpuly
+ * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <actions/ActionClass.h>
+#include <widgets/GaugeDialogClass.h>
 
-mvceditor::ActionClass::ActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: ThreadWithHeartbeatClass(runningThreads, eventId) {
+const static int ID_GAUGE_DIALOG_TIMER = wxNewId();
 
+mvceditor::GaugeDialogClass::GaugeDialogClass(wxWindow* parent, const wxString& label) 
+	: IndexingDialogGeneratedClass(parent)
+	, Timer(this, ID_GAUGE_DIALOG_TIMER) {
 }
 
-mvceditor::ActionClass::~ActionClass() {
-
+void mvceditor::GaugeDialogClass::OnHideButton(wxCommandEvent &event) {
+	Hide();
+	Timer.Stop();
 }
 
-bool mvceditor::ActionClass::DoAsync() {
-	return true;
+void mvceditor::GaugeDialogClass::Start() {
+	Gauge->Pulse();
+	Timer.Start(200, wxTIMER_CONTINUOUS);
 }
 
-void mvceditor::ActionClass::SetStatus(const wxString& status) {
-
-	wxCommandEvent evt(mvceditor::EVENT_ACTION_STATUS);
-	
-	// make sure to copy, since wxString copy is not thread safe
-	wxString cpy(status.c_str());
-	evt.SetString(cpy);
-	PostEvent(evt);
+void mvceditor::GaugeDialogClass::OnTimer(wxTimerEvent& event) {
+	Gauge->Pulse();
 }
 
-mvceditor::InitializerActionClass::InitializerActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: ActionClass(runningThreads, eventId) {
-
-}
-
-bool mvceditor::InitializerActionClass::Init(mvceditor::GlobalsClass& globals) {
-	Work(globals);
-	
-	wxCommandEvent evt(mvceditor::EVENT_WORK_COMPLETE);
-	PostEvent(evt);
-	return true;
-}
-
-
-bool mvceditor::InitializerActionClass::DoAsync() {
-	return false;
-}
-
-void mvceditor::InitializerActionClass::BackgroundWork() {
-	
-}
-
-const wxEventType mvceditor::EVENT_ACTION_STATUS = wxNewEventType();
+BEGIN_EVENT_TABLE(mvceditor::GaugeDialogClass, IndexingDialogGeneratedClass)
+	EVT_TIMER(ID_GAUGE_DIALOG_TIMER, mvceditor::GaugeDialogClass::OnTimer) 
+END_EVENT_TABLE()

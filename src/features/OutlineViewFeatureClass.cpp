@@ -220,13 +220,28 @@ void mvceditor::OutlineViewFeatureClass::BuildOutlineCurrentCodeControl() {
 				ResourceFinderBackgroundThread = NULL;
 			}
 		}
+		
 		if (ResourceFinderBackgroundThread) {
-			ResourceFinderBackgroundThread->Start(code->GetFileName(), GetEnvironment()->Php.Version);
+			wxString fileName = code->GetFileName();
+			OutlineViewPanelClass* outlineViewPanel = NULL;
 			wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
-			if (window != NULL) {
-				OutlineViewPanelClass* outlineViewPanel = (OutlineViewPanelClass*)window;
-				SetFocusToOutlineWindow(outlineViewPanel);
-				outlineViewPanel->SetStatus(_("Parsing ..."));
+			if (window) {
+				outlineViewPanel = (OutlineViewPanelClass*)window;
+			}
+			bool fileExists = wxFileName::FileExists(fileName);
+			if (fileExists) {
+				ResourceFinderBackgroundThread->Start(fileName, GetEnvironment()->Php.Version);
+				if (outlineViewPanel) {					
+					SetFocusToOutlineWindow(outlineViewPanel);
+					outlineViewPanel->SetStatus(_("Parsing ..."));
+				}				
+			}
+			else {
+				// show the error on the outline tab and the regular error mechanism
+				if (outlineViewPanel) {	
+					outlineViewPanel->SetStatus(_("Invalid File"));
+				}
+				mvceditor::EditorLogError(mvceditor::ERR_INVALID_FILE, fileName);
 			}
 		}
 	}
@@ -342,7 +357,7 @@ mvceditor::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int wi
 	, Notebook(notebook) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
-	
+	SetStatus(_(""));	
 }
 
 void mvceditor::OutlineViewPanelClass::SetStatus(const wxString& status) {

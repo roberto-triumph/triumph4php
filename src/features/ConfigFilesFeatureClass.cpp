@@ -114,8 +114,25 @@ void mvceditor::ConfigFilesFeatureClass::OnConfigMenuItem(wxCommandEvent& event)
 	}
 }
 
+void mvceditor::ConfigFilesFeatureClass::OnFileSaved(mvceditor::FileSavedEventClass& event) {
+	std::vector<mvceditor::ConfigTagClass>::const_iterator configTag;
+	bool isConfigFileSaved = false;
+	wxString fileSaved = event.GetCodeControl()->GetFileName();
+	for (configTag = ConfigTags.begin(); configTag != ConfigTags.end(); ++configTag) {
+		isConfigFileSaved = configTag->ConfigFileName == fileSaved;
+		if (isConfigFileSaved) {
+			break;
+		}
+	}
+	if (isConfigFileSaved) {
+		App.Sequences.DatabaseDetection();
+	}
+}
+
+
 BEGIN_EVENT_TABLE(mvceditor::ConfigFilesFeatureClass, mvceditor::FeatureClass) 
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_CONFIG_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ConfigFilesFeatureClass::OnConfigFilesDetected)
 	EVT_MENU_RANGE(mvceditor::CONFIG_DETECTORS, mvceditor::CONFIG_DETECTORS + MAX_CONFIG_MENU_ITEMS, mvceditor::ConfigFilesFeatureClass::OnConfigMenuItem)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_CONFIG_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ConfigFilesFeatureClass::OnConfigDetectorComplete)
+	EVT_FEATURE_FILE_SAVED(mvceditor::ConfigFilesFeatureClass::OnFileSaved)
 END_EVENT_TABLE()

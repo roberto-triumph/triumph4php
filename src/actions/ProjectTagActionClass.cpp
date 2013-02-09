@@ -48,7 +48,7 @@ bool mvceditor::ProjectTagActionClass::InitForFile(const mvceditor::ProjectClass
 
 	// break up name into dir + name, add name to file filters
 	mvceditor::SourceClass src;
-	src.RootDirectory.AssignDir(fullPath);
+	src.RootDirectory.AssignDir(fileName.GetPath());
 	src.SetIncludeWildcards(fileName.GetFullName());
 	std::vector<wxString> phpFileExtensions;
 	phpFileExtensions.push_back(fileName.GetFullName());

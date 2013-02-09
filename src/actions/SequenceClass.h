@@ -117,6 +117,16 @@ public:
 	bool TagCacheWipeAndIndex();
 
 	/**
+	 * Start the database detection sequence. This will include
+	 * - redetect project's database connections
+	 * - read metadata from the project's database connections
+	 *
+	 * This sequence is usually done when the user modifies a framework's
+	 * database config file.
+	 */
+	bool DatabaseDetection();
+
+	/**
 	 * start running a sequence of arbritrary actions. actions will run 
 	 * in the order that they are given. 
 	 *
@@ -162,6 +172,14 @@ private:
 	 * start the next step in the sequence.
 	 */
 	void RunNextStep();
+
+	/**
+	 * will perform a check to make sure that all sources for all enabled projects
+	 * exist and if not an error will be logged.  This check will be performed at the
+	 * start of all sequences so that we print out at most 1 error for each
+	 * missing source, and not 1 error for each missing source and each action.
+	 */
+	void SourceCheck();
 	
 	/**
 	 * The steps in the current sequence.  

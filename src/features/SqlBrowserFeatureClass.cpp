@@ -149,7 +149,7 @@ void mvceditor::SqlConnectionDialogClass::OnTestButton(wxCommandEvent& event) {
 				break;
 			case wxTHREAD_NO_RESOURCE:
 			case wxTHREAD_MISC_ERROR:
-				mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
+				mvceditor::EditorLogError(mvceditor::ERR_LOW_RESOURCES);
 				break;
 			case wxTHREAD_RUNNING:
 			case wxTHREAD_KILLED:
@@ -326,7 +326,7 @@ bool mvceditor::MultipleSqlExecuteClass::Execute(wxThreadIdType& threadId) {
 		break;
 	case wxTHREAD_NO_RESOURCE:
 	case wxTHREAD_MISC_ERROR:
-		mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
+		mvceditor::EditorLogError(mvceditor::ERR_LOW_RESOURCES);
 		break;
 	case wxTHREAD_RUNNING:
 	case wxTHREAD_KILLED:
@@ -695,29 +695,12 @@ mvceditor::SqlBrowserFeatureClass::~SqlBrowserFeatureClass() {
 
 void mvceditor::SqlBrowserFeatureClass::DetectMetadata() {
 	ChosenIndex = 0;
-	mvceditor::SqlMetaDataActionClass* thread = new mvceditor::SqlMetaDataActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA);
-	if (thread->Init(App.Globals)) {
-		wxThreadIdType threadId;
-		wxThreadError err = thread->CreateSingleInstance(threadId);
-		if (wxTHREAD_NO_ERROR == err) {
-			GetStatusBarWithGauge()->AddGauge(_("Fetching SQL meta data"), ID_SQL_METADATA_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
-		}
-		else if (wxTHREAD_NO_RESOURCE == err) {
-			mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
-			delete thread;
-		}
-		else if (wxTHREAD_RUNNING == err) {
-			mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, 
-				_("There is already another SQL MetaData fetch that is active. Please wait for it to finish.")
-			);
-			delete thread;
-		}
-	}
-	else {
 
-		// no connections are setup, so nothing to detect
-		delete thread;
-	}
+	// thread will be owned by SequenceClass
+	mvceditor::SqlMetaDataActionClass* thread = new mvceditor::SqlMetaDataActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA);
+	std::vector<mvceditor::ActionClass*> actions;
+	actions.push_back(thread);
+	App.Sequences.Build(actions);
 }
 
 void mvceditor::SqlBrowserFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
@@ -843,7 +826,7 @@ void mvceditor::SqlBrowserFeatureClass::OnSqlConnectionMenu(wxCommandEvent& even
 				GetStatusBarWithGauge()->AddGauge(_("Fetching SQL meta data"), ID_SQL_METADATA_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
 			}
 			else if (wxTHREAD_NO_RESOURCE == err) {
-				mvceditor::EditorLogError(mvceditor::LOW_RESOURCES);
+				mvceditor::EditorLogError(mvceditor::ERR_LOW_RESOURCES);
 				delete thread;
 			}
 			else if (wxTHREAD_RUNNING == err) {
@@ -932,23 +915,6 @@ void mvceditor::SqlBrowserFeatureClass::OnAppExit(wxCommandEvent& event) {
 			mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)toolsWindow;
 			panel->Stop();
 		}
-	}
-}
-
-void mvceditor::SqlBrowserFeatureClass::OnWorkInProgress(wxCommandEvent& event) {
-	GetStatusBarWithGauge()->IncrementGauge(ID_SQL_METADATA_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
-}
-
-void mvceditor::SqlBrowserFeatureClass::OnWorkComplete(wxCommandEvent& event) {
-	GetStatusBarWithGauge()->StopGauge(ID_SQL_METADATA_GAUGE);
-}
-
-void mvceditor::SqlBrowserFeatureClass::OnSqlMetaDataComplete(mvceditor::SqlMetaDataEventClass& event) {
-	App.Globals.SqlResourceFinder.Copy(event.NewResources);
-	std::vector<UnicodeString> errors = event.Errors;
-	for (size_t i = 0; i < errors.size(); ++i) {
-		wxString wxError = mvceditor::IcuToWx(errors[i]);
-		mvceditor::EditorLogError(mvceditor::BAD_SQL, wxError);
 	}
 }
 
@@ -1041,12 +1007,9 @@ BEGIN_EVENT_TABLE(mvceditor::SqlBrowserFeatureClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_SQL + 1, mvceditor::SqlBrowserFeatureClass::OnSqlConnectionMenu)
 	EVT_MENU(mvceditor::MENU_SQL + 2, mvceditor::SqlBrowserFeatureClass::OnRun)
 	EVT_MENU(mvceditor::MENU_SQL + 3, mvceditor::SqlBrowserFeatureClass::OnSqlDetectMenu)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_SQL_METADATA, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SqlBrowserFeatureClass::OnWorkInProgress)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_SQL_METADATA, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SqlBrowserFeatureClass::OnWorkComplete)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::SqlBrowserFeatureClass::OnContentNotebookPageChanged)
 	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_CODE_NOTEBOOK, mvceditor::SqlBrowserFeatureClass::OnContentNotebookPageClose)
 	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::SqlBrowserFeatureClass::OnToolsNotebookPageClose)
-	EVT_SQL_META_DATA_COMPLETE(mvceditor::ID_EVENT_ACTION_SQL_METADATA, mvceditor::SqlBrowserFeatureClass::OnSqlMetaDataComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_EXIT, mvceditor::SqlBrowserFeatureClass::OnAppExit)
 END_EVENT_TABLE()
 

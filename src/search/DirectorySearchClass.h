@@ -171,6 +171,11 @@ public:
 	 */
 	bool IsInRootDirectory(const wxString& fullPath) const;
 
+	/**
+	 * @return TRUE if this source directory actually exists in the file system
+	 */
+	bool Exists() const;
+
 	private:
 
 	/**

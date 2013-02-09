@@ -72,16 +72,18 @@ bool mvceditor::TemplateFilesDetectorActionClass::Init(mvceditor::GlobalsClass& 
 	// that's why there's 3 loops
 	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
 		for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
-			for (scriptName = detectorScripts.begin(); scriptName != detectorScripts.end(); ++scriptName) {
-				mvceditor::TemplateFilesDetectorParamsClass params;
-				params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
-				params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset();
-				params.ScriptName = *scriptName;
-				params.SourceDir = source->RootDirectory;
-				params.DetectorDbFileName = project->DetectorDbFileName.GetFullPath();
-				params.OutputDbFileName = project->DetectorDbFileName.GetFullPath();
-				if (params.ScriptName.FileExists()) {
-					ParamsQueue.push(params);
+			if (source->Exists()) {
+				for (scriptName = detectorScripts.begin(); scriptName != detectorScripts.end(); ++scriptName) {
+					mvceditor::TemplateFilesDetectorParamsClass params;
+					params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
+					params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset();
+					params.ScriptName = *scriptName;
+					params.SourceDir = source->RootDirectory;
+					params.DetectorDbFileName = project->DetectorDbFileName.GetFullPath();
+					params.OutputDbFileName = project->DetectorDbFileName.GetFullPath();
+					if (params.ScriptName.FileExists()) {
+						ParamsQueue.push(params);
+					}
 				}
 			}
 		}
@@ -118,7 +120,7 @@ void mvceditor::TemplateFilesDetectorActionClass::NextDetection() {
 
 	wxArrayString dirs = params.SourceDir.GetDirs();
 	if (!dirs.IsEmpty()) {
-		SetStatus(_("Template Detect") + dirs.back());
+		SetStatus(_("Template Detect / ") + dirs.back());
 	}
 	wxString cmdLine = params.BuildCmdLine();
 	long pid;
