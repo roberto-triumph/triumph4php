@@ -58,7 +58,8 @@ class TagCacheClass;
  */
 enum MenuIds {
 	// start way out here to prevent collisions with default menus
-	MENU_START = 10000,
+	// and action IDs ID_EVENT_ACTION_*
+	MENU_START = wxID_HIGHEST + 10000,
 	MENU_FINDER = 10000,
 	MENU_FIND_IN_FILES = 10100,
 	MENU_SQL = 10200,

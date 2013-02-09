@@ -68,21 +68,5 @@ void mvceditor::InitializerActionClass::BackgroundWork() {
 	
 }
 
-const int mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_INIT = wxNewId();
-const int mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE = wxNewId();
-const int mvceditor::ID_EVENT_ACTION_SQL_METADATA_INIT = wxNewId();
-const int mvceditor::ID_EVENT_ACTION_SQL_METADATA = wxNewId();
-const int mvceditor::ID_EVENT_ACTION_URL_DETECTOR_INIT = wxNewId();
-const int mvceditor::ID_EVENT_ACTION_URL_DETECTOR = wxNewId();
-const int mvceditor::ID_EVENT_ACTION_TAG_DETECTOR_INIT = wxNewId();
-const int mvceditor::ID_EVENT_ACTION_TAG_DETECTOR = wxNewId();
-const int mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE = wxNewId();
-const int mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_DETECTOR = wxNewId();
-const int mvceditor::ID_EVENT_ACTION_CALL_STACK = wxNewId();
-const int mvceditor::ID_EVENT_ACTION_DATABASE_DETECTOR_INIT = wxNewId();
-const int mvceditor::ID_EVENT_ACTION_DATABASE_DETECTOR = wxNewId();
-const int mvceditor::ID_EVENT_ACTION_CONFIG_DETECTOR = wxNewId();
-const int mvceditor::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK = wxNewId();
-const int mvceditor::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK = wxNewId();
-
 const wxEventType mvceditor::EVENT_ACTION_STATUS = wxNewEventType();
+

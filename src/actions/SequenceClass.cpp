@@ -241,6 +241,7 @@ void mvceditor::SequenceClass::OnActionComplete(wxCommandEvent& event) {
 	}
 	else {
 		wxCommandEvent sequenceEvent(mvceditor::EVENT_SEQUENCE_COMPLETE);
+		sequenceEvent.SetId(wxID_ANY);
 		RunningThreads.PostEvent(sequenceEvent);
 	}
 }
@@ -323,6 +324,7 @@ void mvceditor::SequenceClass::RunNextStep() {
 		// this can happen when the last step could not be 
 		// initialized; then no EVT_WORK_COMPLETE will be generated
 		wxCommandEvent sequenceEvent(mvceditor::EVENT_SEQUENCE_COMPLETE);
+		sequenceEvent.SetId(wxID_ANY);
 		RunningThreads.PostEvent(sequenceEvent);
 	}
 }
