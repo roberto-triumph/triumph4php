@@ -339,6 +339,7 @@ mvceditor::DetectorTreeHandlerClass::DetectorTreeHandlerClass(wxTreeCtrl* detect
 	AddButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(DetectorTreeHandlerClass::OnAddButton), NULL, this);
 	HelpButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(DetectorTreeHandlerClass::OnHelpButton), NULL, this);
 	DetectorTree->Connect(wxEVT_COMMAND_TREE_DELETE_ITEM, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemDelete), NULL, this);
+	DetectorTree->Connect(wxEVT_COMMAND_TREE_BEGIN_LABEL_EDIT, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemBeginLabelEdit), NULL, this);
 	DetectorTree->Connect(wxEVT_COMMAND_TREE_END_LABEL_EDIT, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemEndLabelEdit), NULL, this);
 	DetectorTree->Connect(wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemActivated), NULL, this);
 	DetectorTree->Connect(wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemRightClick), NULL, this);
@@ -350,6 +351,7 @@ mvceditor::DetectorTreeHandlerClass::~DetectorTreeHandlerClass() {
 	AddButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(DetectorTreeHandlerClass::OnAddButton), NULL, this);
 	HelpButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(DetectorTreeHandlerClass::OnHelpButton), NULL, this);
 	DetectorTree->Disconnect(wxEVT_COMMAND_TREE_DELETE_ITEM, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemDelete), NULL, this);
+	DetectorTree->Disconnect(wxEVT_COMMAND_TREE_BEGIN_LABEL_EDIT, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemBeginLabelEdit), NULL, this);
 	DetectorTree->Disconnect(wxEVT_COMMAND_TREE_END_LABEL_EDIT, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemEndLabelEdit), NULL, this);
 	DetectorTree->Disconnect(wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemActivated), NULL, this);
 	DetectorTree->Disconnect(wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemRightClick), NULL, this);
@@ -579,11 +581,36 @@ void mvceditor::DetectorTreeHandlerClass::OnMenuDeleteDetector(wxCommandEvent& e
 	}
 }
 
+void mvceditor::DetectorTreeHandlerClass::OnTreeItemBeginLabelEdit(wxTreeEvent& event) {
+
+	// only allow edited when detector is a "local" detector
+	wxTreeItemId i = event.GetItem();
+	bool isLocalDetector = false;
+	while (i != DetectorTree->GetRootItem()) {
+		wxString label = DetectorTree->GetItemText(i);
+		if (_("Local") == label) {
+			isLocalDetector = true;
+			break;
+		}
+		i = DetectorTree->GetItemParent(i);
+	}
+	if (isLocalDetector) {
+		event.Skip();
+	}
+	else {
+		event.Veto();
+	}
+}
+
 void mvceditor::DetectorTreeHandlerClass::OnTreeItemEndLabelEdit(wxTreeEvent& event) {
 	wxTreeItemId treeItemId = event.GetItem();
 	wxString newName = event.GetLabel();
 	if (newName.find_first_of(wxFileName::GetForbiddenChars(), 0) != std::string::npos) {
 		wxMessageBox(_("Filename contains invalid characters."));
+		event.Veto();
+	}
+	else if (newName.IsEmpty()) {
+		wxMessageBox(_("Filename cannot be empty."));
 		event.Veto();
 	}
 	else {
@@ -594,7 +621,12 @@ void mvceditor::DetectorTreeHandlerClass::OnTreeItemEndLabelEdit(wxTreeEvent& ev
 		wxASSERT(data);
 		wxFileName oldFileName(data->Str);
 		wxFileName newFileName(oldFileName.GetPath(), newName);
-		if (!newFileName.FileExists()) {
+		if (oldFileName == newFileName) {
+			
+			// no name change== dont try to move files
+			return;
+		}
+		else if (!newFileName.FileExists()) {
 			data->Str = newFileName.GetFullPath();
 			wxRenameFile(oldFileName.GetFullPath(), newFileName.GetFullPath());
 			event.Skip();

@@ -195,6 +195,7 @@ private:
 	void OnTreeItemActivated(wxTreeEvent& event);
 	void OnTreeItemRightClick(wxTreeEvent& event);
 	void OnTreeItemDelete(wxTreeEvent& event);
+	void OnTreeItemBeginLabelEdit(wxTreeEvent& event);
 	void OnTreeItemEndLabelEdit(wxTreeEvent& event);
 
 	// button click handlers
