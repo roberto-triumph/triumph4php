@@ -689,7 +689,9 @@ void mvceditor::TemplateFilesDetectorPanelClass::OnChooseUrlButton(wxCommandEven
 		action->SetCallStackStart(TestUrl.FileName,
 			mvceditor::WxToIcu(TestUrl.ClassName),
 			mvceditor::WxToIcu(TestUrl.MethodName),
-			Globals.Projects[ProjectChoice->GetSelection()].DetectorDbFileName
+
+			// the selection index is the index of the enabled projects
+			Globals.AllEnabledProjects()[ProjectChoice->GetSelection()].DetectorDbFileName
 		);
 		wxThreadIdType threadId;
 		action->Init(Globals);
