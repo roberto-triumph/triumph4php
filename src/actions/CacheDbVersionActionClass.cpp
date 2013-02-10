@@ -37,7 +37,7 @@ static const int SCHEMA_VERSION_TAGS = 1;
  * This number must match the number on the schema_version table of the
  * detectors db; if numbers do not match the db will be recreated.
  */
-static const int SCHEMA_VERSION_DETECTOR = 1;
+static const int SCHEMA_VERSION_DETECTOR = 2;
 
 mvceditor::TagCacheDbVersionActionClass::TagCacheDbVersionActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: ActionClass(runningThreads, eventId)

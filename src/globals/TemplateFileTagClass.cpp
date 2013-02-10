@@ -93,7 +93,7 @@ std::vector<mvceditor::TemplateFileTagClass> mvceditor::TemplateFileTagFinderCla
 	std::string fullPath, 
 				variables;
 	soci::statement stmt = (Session.prepare <<
-		"SELECT full_path, variables FROM template_files;",
+		"SELECT full_path, variables FROM template_file_tags;",
 		soci::into(fullPath), soci::into(variables)
 	);
 	if (stmt.execute(true)) {

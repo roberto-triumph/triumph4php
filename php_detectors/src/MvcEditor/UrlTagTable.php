@@ -24,50 +24,41 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-/**
- * This is a class that represents a URL resource. MVC Editor will use these URL
- * objects to open files, run web pages, and inspect controllers and view files.
- */
-class MvcEditor_Url  {
+class MvcEditor_UrlTagTable extends Zend_Db_Table_Abstract {
+
+	protected $_name = 'url_tags';
 
 	/**
-	 * These are relative URLs; they are relative to the server root and may contain a query string.
-	 * For example, if a user would type in "http://localhost.codeigniter/index.php/news/index" the
-	 * this URL should contain "index.php/news/index"
-	 *
-	 * @var string
+	 * saves the given MvcEditor_Urls into the database.
+	 * 
+	 * @param MvcEditor_Url[] $arrUrls the urls to insert 
 	 */
-	public $url;
-	
-	/**
-	 * The file where the source code of the URL is located in.  This is the entry point
-	 * to the URL; for a framework $fileName will be the location of the controller.
-	 * fileName is full path (os-dependant).
-	 * @var string
-	 */
-	public $fileName;
-	
-	/**
-	 * The name of the controller class that handles this URL.  If a project does not
-	 * use a framework, this will be empty.
-	 *
-	 * @var string
-	 */
-	public $className;
-	
-	/**
-	 * The name of the controller method that handles this URL.  If a project does not
-	 * use a framework, this will be empty.
-	 *
-	 * @var string
-	 */
-	public $methodName;
-	
-
-	public function __construct($url, $fileName, $className, $methodName) {
-		$this->url = $url;
-		$this->fileName = $fileName;
-		$this->className = $className;
-		$this->methodName = $methodName;
+	function saveUrls($arrUrls, $sourceDir) {
+		if (!is_array($arrUrls)) {
+			return;
+		}
+		
+		// delete all old urls
+		/// make sure that sourceDir ends with the separator to make sure
+		// only the correct entries are deleted
+		// also  escape a value so that it is suitable for using in a LIKE SQL clause
+		// ie. so that an underscore is treated literally
+		$sourceDir = \opstring\ensure_ends_with($sourceDir, DIRECTORY_SEPARATOR);
+		$sourceDir = \opstring\replace($sourceDir, '_', '^_');
+		$strWhere = $this->getAdapter()->quoteInto("full_path LIKE ? ESCAPE '^'", $sourceDir . '%');
+		$this->delete($strWhere);
+		
+		// sqlite optimizes transactions really well; use transaction so that the inserts are faster
+		$this->getAdapter()->beginTransaction();
+		foreach ($arrUrls as $url) {
+			
+			$this->insert(array(
+				'url' => $url->url,
+				'full_path' => $url->fileName,
+				'class_name' => $url->className,
+				'method_name' => $url->methodName
+			));
+		}
+		$this->getAdapter()->commit();
 	}
 }

@@ -30,13 +30,13 @@
 --
 
 
--- this table will store all of the detected URLs. A URL Resource
+-- this table will store all of the detected URLs. A URL tag
 -- stores a URL along with the location of the entry point; ie. what
 -- class / method is invoked when the URL is requested.
 -- 
 -- in the case that a single function is invoked, ClassName will be 
 -- empty and MethodName will contain the name of the function being called.
-CREATE TABLE IF NOT EXISTS url_resources (
+CREATE TABLE IF NOT EXISTS url_tags (
 
 	-- full URL; including protocol, host, file, and query args
 	-- http://localhost/file.php?x=1&c=2
@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS call_stacks (
 -- This table stores the detected template files.  Template file detector scripts will insert
 -- into this table when they recognize a template file and its variables.
 --
-CREATE TABLE IF NOT EXISTS template_files (
+CREATE TABLE IF NOT EXISTS template_file_tags (
 
 	-- 
 	-- needed for Zend_Db_Table_Abstract 
@@ -294,4 +294,4 @@ CREATE INDEX IF NOT EXISTS idxDetectedTagKey ON detected_tags(key, type);
 --
 -- This number must match the version in CacheDbVersionActionClass.cpp
 --
-INSERT INTO schema_version (version_number) VALUES(1);
+INSERT INTO schema_version (version_number) VALUES(2);

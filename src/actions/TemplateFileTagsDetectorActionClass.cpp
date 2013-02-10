@@ -71,18 +71,20 @@ bool mvceditor::TemplateFileTagsDetectorActionClass::Init(mvceditor::GlobalsClas
 	// need to call each template files detector once for each different source directory
 	// that's why there's 3 loops
 	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
-		for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
-			if (source->Exists()) {
-				for (scriptName = detectorScripts.begin(); scriptName != detectorScripts.end(); ++scriptName) {
-					mvceditor::TemplateFileTagsDetectorParamsClass params;
-					params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
-					params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset();
-					params.ScriptName = *scriptName;
-					params.SourceDir = source->RootDirectory;
-					params.DetectorDbFileName = project->DetectorDbFileName.GetFullPath();
-					params.OutputDbFileName = project->DetectorDbFileName.GetFullPath();
-					if (params.ScriptName.FileExists()) {
-						ParamsQueue.push(params);
+		if (project->IsEnabled && project->HasSources()) {
+			for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
+				if (source->Exists()) {
+					for (scriptName = detectorScripts.begin(); scriptName != detectorScripts.end(); ++scriptName) {
+						mvceditor::TemplateFileTagsDetectorParamsClass params;
+						params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
+						params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset();
+						params.ScriptName = *scriptName;
+						params.SourceDir = source->RootDirectory;
+						params.DetectorDbFileName = project->DetectorDbFileName.GetFullPath();
+						params.OutputDbFileName = project->DetectorDbFileName.GetFullPath();
+						if (params.ScriptName.FileExists()) {
+							ParamsQueue.push(params);
+						}
 					}
 				}
 			}

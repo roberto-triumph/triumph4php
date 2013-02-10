@@ -84,7 +84,7 @@ EOF;
 		// now send the detected URLs to either STDOUT or store in the 
 		// sqlite DB	
 		$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $outputDbFileName));
-		$templateFileTable = new MvcEditor_TemplateFileTable($pdo);
+		$templateFileTable = new MvcEditor_TemplateFileTagTable($pdo);
 		$templateFileTable->saveTemplateFiles($arrTemplates);
 		echo "Template file detection complete, written to {$outputDbFileName}\n";
 	}
@@ -151,7 +151,7 @@ function detectTemplates($sourceDir, $detectorDbFileName, &$doSkip) {
 		}
 		else if (MvcEditor_CallStack::PARAM == $call->type && $inViewMethod) {
 			if (0 == $paramIndex) {
-				$currentTemplate = new MvcEditor_TemplateFile();
+				$currentTemplate = new MvcEditor_TemplateFileTag();
 				$currentTemplate->variables = array();
 				$currentTemplate->fullPath = $call->scalar;
 				

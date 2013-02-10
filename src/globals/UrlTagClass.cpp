@@ -90,7 +90,7 @@ bool mvceditor::UrlTagFinderClass::FindByUrl(const wxURI& url, mvceditor::UrlTag
 		std::string stdMethodName;
 		try {
 			soci::statement stmt = ((*session)->prepare << 
-				"SELECT url, full_path, class_name, method_name FROM url_resources WHERE url = ? ",
+				"SELECT url, full_path, class_name, method_name FROM url_tags WHERE url = ? ",
 				soci::use(stdUrlWhere),
 				soci::into(stdUrl), soci::into(stdFullPath), 
 				soci::into(stdClassName), soci::into(stdMethodName) 
@@ -126,7 +126,7 @@ bool mvceditor::UrlTagFinderClass::FindByClassMethod(const wxString& className, 
 		std::string stdMethodName;
 		try {
 			soci::statement stmt = ((*session)->prepare << 
-				"SELECT url, full_path, class_name, method_name FROM url_resources WHERE class_name = ? AND method_name = ?",
+				"SELECT url, full_path, class_name, method_name FROM url_tags WHERE class_name = ? AND method_name = ?",
 				soci::use(stdClassNameWhere), soci::use(stdMethodNameWhere),
 				soci::into(stdUrl), soci::into(stdFullPath), 
 				soci::into(stdClassName), soci::into(stdMethodName) 
@@ -161,7 +161,7 @@ bool mvceditor::UrlTagFinderClass::FilterByFullPath(const wxString& fullPath, st
 		std::string stdMethodName;
 		try {
 			soci::statement stmt = ((*session)->prepare << 
-				"SELECT url, full_path, class_name, method_name FROM url_resources WHERE full_path = ?",
+				"SELECT url, full_path, class_name, method_name FROM url_tags WHERE full_path = ?",
 				soci::use(stdFullPathWhere),
 				soci::into(stdUrl), soci::into(stdFullPath), 
 				soci::into(stdClassName), soci::into(stdMethodName) 
@@ -194,7 +194,7 @@ void mvceditor::UrlTagFinderClass::DeleteUrl(const wxURI& url) {
 	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
 		try {
 			soci::statement stmt = ((*session)->prepare << 
-				"DELETE FROM url_resources WHERE url = ? ",
+				"DELETE FROM url_tags WHERE url = ? ",
 				soci::use(stdUrl)
 			);
 			stmt.execute(true);
@@ -222,7 +222,7 @@ void mvceditor::UrlTagFinderClass::FilterUrls(const wxString& filter, std::vecto
 		// hmmm... query might not be optimal for 1000s of urls
 		// not sure if the number of urls will go into the 1000s
 		std::string sql = "SELECT url, full_path, class_name, method_name ";
-		sql += "FROM url_resources WHERE url LIKE '%" + escaped + "%' ESCAPE '^' LIMIT 100";
+		sql += "FROM url_tags WHERE url LIKE '%" + escaped + "%' ESCAPE '^' LIMIT 100";
 
 		try {
 			soci::statement stmt = ((*session)->prepare << sql,
@@ -256,7 +256,7 @@ void mvceditor::UrlTagFinderClass::Wipe() {
 	std::vector<soci::session*>::iterator session;
 	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
 		try {
-			(*session)->once << "DELETE FROM url_resources";
+			(*session)->once << "DELETE FROM url_tags";
 		} catch (std::exception& e) {
 			wxUnusedVar(e);
 			wxString msg = mvceditor::CharToWx(e.what());
@@ -275,7 +275,7 @@ int mvceditor::UrlTagFinderClass::Count() {
 		int dbCount;
 		try {
 			soci::statement stmt = (
-				(*session)->prepare << "SELECT COUNT(*) FROM url_resources", 
+				(*session)->prepare << "SELECT COUNT(*) FROM url_tags", 
 				soci::into(dbCount));
 			stmt.execute(true);
 
@@ -297,7 +297,7 @@ std::vector<wxString> mvceditor::UrlTagFinderClass::AllControllerNames() {
 	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
 		try {
 			soci::statement stmt =((*session)->prepare <<
-				"SELECT DISTINCT class_name FROM url_resources", soci::into(controller)
+				"SELECT DISTINCT class_name FROM url_tags", soci::into(controller)
 			);
 			if (stmt.execute(true)) {
 				do {
@@ -322,7 +322,7 @@ std::vector<wxString> mvceditor::UrlTagFinderClass::AllMethodNames(const wxStrin
 	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
 		try {
 			soci::statement stmt =((*session)->prepare <<
-				"SELECT DISTINCT method_name FROM url_resources WHERE class_name = ?", 
+				"SELECT DISTINCT method_name FROM url_tags WHERE class_name = ?", 
 				soci::use(controllerWhere), soci::into(methodName)
 			);
 			if (stmt.execute(true)) {

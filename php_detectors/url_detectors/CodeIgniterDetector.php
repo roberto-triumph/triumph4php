@@ -118,7 +118,7 @@ EOF;
 		// now send the detected URLs to either STDOUT or store in the 
 		// sqlite DB	
 		$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $outputDbFileName));
-		$urlResourceTable = new MvcEditor_UrlResourceTable($pdo);
+		$urlResourceTable = new MvcEditor_UrlTagTable($pdo);
 		$urlResourceTable->saveUrls($arrUrls, $sourceDir);
 		echo "Url dectection complete, written to {$outputDbFileName}\n";
 	}
@@ -297,7 +297,7 @@ function makeUrl($route, $config, $subDirectory, $fileName, $className, $methodN
 	if (isset($config['url_suffix']) && $config['url_suffix']) {
 		$url .= $config['url_suffix'];
 	}
-	$mvcUrl = new MvcEditor_Url($url, $fileName, $className, $methodName);
+	$mvcUrl = new MvcEditor_UrlTag($url, $fileName, $className, $methodName);
 	return $mvcUrl;
 }
 

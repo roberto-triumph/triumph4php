@@ -77,7 +77,7 @@ public:
 
 	void AddToDb1(std::string url, std::string fileName, std::string className, std::string methodName) {
 		soci::statement stmt = (Session1.prepare <<
-			"INSERT INTO url_resources(url, full_path, class_name, method_name) VALUES (?, ?, ?, ?)",
+			"INSERT INTO url_tags(url, full_path, class_name, method_name) VALUES (?, ?, ?, ?)",
 			soci::use(url), soci::use(fileName),
 			soci::use(className), soci::use(methodName)
 		);
@@ -95,7 +95,7 @@ public:
 
 	void AddToDb2(std::string url, std::string fileName, std::string className, std::string methodName) {
 		soci::statement stmt = (Session2.prepare <<
-			"INSERT INTO url_resources(url, full_path, class_name, method_name) VALUES (?, ?, ?, ?)",
+			"INSERT INTO url_tags(url, full_path, class_name, method_name) VALUES (?, ?, ?, ?)",
 			soci::use(url), soci::use(fileName),
 			soci::use(className), soci::use(methodName)
 		);
@@ -104,14 +104,14 @@ public:
 
 	int DatabaseRecordsNumDb1() {
 		int cnt;
-		Session1.once << "SELECT COUNT(*) FROM url_resources; ",
+		Session1.once << "SELECT COUNT(*) FROM url_tags; ",
 			soci::into(cnt);
 		return cnt;
 	}
 
 	int DatabaseRecordsNumDb2() {
 		int cnt;
-		Session2.once << "SELECT COUNT(*) FROM url_resources; ",
+		Session2.once << "SELECT COUNT(*) FROM url_tags; ",
 			soci::into(cnt);
 		return cnt;
 	}
