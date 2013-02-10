@@ -493,7 +493,8 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectFullyQualifie
 		for (size_t i = 0; i < classHierarchy.size(); ++i) {
 			UnicodeString key = classHierarchy[i] + UNICODE_STRING_SIMPLE("::") + tagSearch.GetMethodName();
 			std::string stdKey = mvceditor::IcuToChar(key);
-			allMatches = FindByKeyExactAndTypes(stdKey, types, true);
+			std::vector<mvceditor::TagClass> matches = FindByKeyExactAndTypes(stdKey, types, true);
+			allMatches.insert(allMatches.end(), matches.begin(), matches.end());
 		}
 	}
 	else if (mvceditor::TagSearchClass::NAMESPACE_NAME == tagSearch.GetResourceType()) {

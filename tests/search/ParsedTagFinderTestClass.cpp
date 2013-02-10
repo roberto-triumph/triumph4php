@@ -1060,7 +1060,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectFullyQualifiedResourcesShouldF
 	CHECK_VECTOR_SIZE(1, Matches);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceMatchShouldReturnSignatureForConstructors) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectFullyQualifiedResourceShouldReturnSignatureForConstructors) {
 	 Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -1086,6 +1086,35 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceMatchShouldReturnSignatu
 	Matches = ParsedTagFinder.CollectFullyQualifiedResource(tagSearch);
 	mvceditor::TagClass tag = Matches[0];
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("public function __construct($name)"), tag.Signature);
+}
+
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectFullyQualifiedResourceShouldReturnInheritedMember) {
+	 Prep(mvceditor::CharToIcu(
+		"<?php\n"
+		"class UserClass {\n"
+		"\tprotected $name;\n"
+		"\tfunction getName() {\n"
+		"\t\treturn $this->name;\n"
+		"\t}\n"
+		"\tfunction __construct($name) {\n"
+		"\t\t$this->name = 'guest';\n"
+		"\t\tif ($name) \n"
+		"\t\t\t$this->name = 'guest';\n"
+		"\t}\n"
+		"}\n"
+		"class AdminClass extends UserClass {\n"
+		"}\n"
+		"?>\n"
+	));
+	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("AdminClass::name"));
+	std::vector<UnicodeString> parents;
+	parents.push_back(UNICODE_STRING_SIMPLE("UserClass"));
+	tagSearch.SetParentClasses(parents);
+	Matches = ParsedTagFinder.CollectFullyQualifiedResource(tagSearch);
+	CHECK_VECTOR_SIZE(1, Matches);
+	mvceditor::TagClass tag = Matches[0];
+	CHECK_UNISTR_EQUALS("UserClass", tag.ClassName);
+	CHECK_UNISTR_EQUALS("name", tag.Identifier);
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceParentClassShouldReturnParentClass) {

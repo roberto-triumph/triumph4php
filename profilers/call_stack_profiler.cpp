@@ -32,26 +32,28 @@
 #include <wx/app.h>
 #include <wx/string.h>
 #include <wx/stdpaths.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 
 /**
  * Caches the given directory, putting all resources in the resource cache.
  * A full resource cache is required so that we can know the location
  * of the function definitions.
  */
-void CacheLargeProject(mvceditor::TagCacheClass& tagCache, wxString dirName) ;
+void CacheLargeProject(mvceditor::TagCacheClass& tagCache, wxString dirName);
 
-class HandlerClass : public wxEvtHandler {
+/**
+ * Creates the cache db by removing the file if it exists, then creating a new file
+ * and running the sql in sqlScriptFullPath
+ */
+void CreateCacheDb(const wxString& cacheDbFullPath, const wxFileName& sqlScript);
 
-public:
-		HandlerClass()
-			: wxEvtHandler() {
-				
-		}
+/**
+ * load all of the tag files into the given cache. This is needed so that the
+ * cache class queries the cache Db files we create in this program.
+ */
+void TagCacheInit(mvceditor::TagCacheClass& tagCache);
 
 
-};
-
-HandlerClass Handler;
 mvceditor::TagCacheClass TagCache;
 mvceditor::RunningThreadsClass RunningThreads;
 mvceditor::CallStackClass CallStack(TagCache);
@@ -90,12 +92,15 @@ int main() {
 		SourceDir = wxT("/home/roberto/public_html/ember");
 		StartingFile = SourceDir + wxT("/application/controllers/news.php");
 		PhpExecutableFullPath = wxT("php");
-		PhpIncludePathFullPath = wxT("/home/roberto/workspace/mvc-editor/php_detectors/src");
+		PhpIncludePathFullPath = wxT("/home/roberto/workspace/mvc-editor/php_detectors");
 		PhpTagDectectorFullPath = wxT("/home/roberto/workspace/mvc-editor/php_detectors/tag_detectors/CodeIgniterTagDetector.php");
 		TagCacheDbFullPath = wxT("/home/roberto/workspace/tags.db");
 		DetectorDbFullPath = wxT("/home/roberto/workspace/detectors.db");
 	}
+	CreateCacheDb(TagCacheDbFullPath, mvceditor::ResourceSqlSchemaAsset());
+	CreateCacheDb(DetectorDbFullPath, mvceditor::DetectorSqlSchemaAsset());
 	CacheLargeProject(TagCache, SourceDir);
+	TagCacheInit(TagCache);
 	
 	wxFileName fileName(StartingFile);
 	UnicodeString className = UNICODE_STRING_SIMPLE("News");
@@ -105,8 +110,10 @@ int main() {
 	
 	UFILE* ufout = u_finit(stdout, NULL, NULL);
 	if (mvceditor::CallStackClass::NONE != error) {
-		u_fprintf(ufout, "Call stack error:%d Match Error:%d Error Lexeme:%S\n", 
-			(int)error, (int)CallStack.MatchError.Type, CallStack.MatchError.ErrorLexeme.getTerminatedBuffer());
+		u_fprintf(ufout, "Call stack error:%d Match Error:%d Error Lexeme:%S Error Class:%S\n", 
+			(int)error, (int)CallStack.MatchError.Type, 
+			CallStack.MatchError.ErrorLexeme.getTerminatedBuffer(),
+			CallStack.MatchError.ErrorClass.getTerminatedBuffer());
 	}
 	u_fclose(ufout);
 	printf("The call stack is %d items long\n", (int)CallStack.List.size());
@@ -121,34 +128,20 @@ void CacheLargeProject(mvceditor::TagCacheClass& tagCache, wxString sourceDir) {
 		miscFileExtensions;
 	phpFileExtensions.push_back(wxT("*.php"));
 
-	// load the php native functions into the cache
-	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass;
-	globalCache->InitGlobalTag(mvceditor::NativeFunctionsAsset(), phpFileExtensions, miscFileExtensions, pelet::PHP_53);
-	tagCache.RegisterGlobal(globalCache);
-
 	// parse tags of the code igniter project 
 	mvceditor::DirectorySearchClass directorySearch;
 	bool found = directorySearch.Init(sourceDir);
 	if (!found) {
 		printf("Directory does not exist: %s\n", (const char*)sourceDir.ToAscii());
 	}
-	bool walked = true;
 	
-	// load the project tags that were just parsed
-	mvceditor::GlobalCacheClass* projectCache = new mvceditor::GlobalCacheClass;
-	projectCache->InitGlobalTag(wxFileName(TagCacheDbFullPath), phpFileExtensions, miscFileExtensions, pelet::PHP_53);
+	mvceditor::GlobalCacheClass projectCache;
+	projectCache.InitGlobalTag(wxFileName(TagCacheDbFullPath), phpFileExtensions, miscFileExtensions, pelet::PHP_53);
 	while (directorySearch.More()) {
-		projectCache->Walk(directorySearch);
+		projectCache.Walk(directorySearch);
 	}
-	if (!tagCache.RegisterGlobal(projectCache)) {
-		printf("Could not initialize the project cache.\n");
-	}
-	if (!walked) {
-		printf("Resource Cache could not be initialized!\n");
-	}
-	else {
-		printf("Caching complete\n");
-	}
+	printf("Caching complete\n");
+	
 	// run the tag detector script for code igniter 
 	mvceditor::TagDetectorParamsClass params;
 	params.PhpExecutablePath = PhpExecutableFullPath;
@@ -166,7 +159,45 @@ void CacheLargeProject(mvceditor::TagCacheClass& tagCache, wxString sourceDir) {
 		printf("%s\n", mvceditor::WxToChar(error[i]).c_str());
 	}
 	printf("Command is %s\n", mvceditor::WxToChar(params.BuildCmdLine()).c_str());
+}
 
+void CreateCacheDb(const wxString& cacheDbFullPath, const wxFileName& sqlScript) {
+	
+	// if file exists delete it; it may have an old schema
+	if (wxFileName::FileExists(cacheDbFullPath)) {
+		wxRemoveFile(cacheDbFullPath);
+	}
+	wxSleep(1);
+	
+	std::string stdFilename = mvceditor::WxToChar(cacheDbFullPath);
+	soci::session session(*soci::factory_sqlite3(), stdFilename);
+	wxString error;
+	bool good = mvceditor::SqliteSqlScript(sqlScript, session, error);
+	if (!good) {
+		puts(error.ToAscii());
+	}
+	session.close();
+}
+
+void TagCacheInit(mvceditor::TagCacheClass& tagCache) {
+	std::vector<wxString> phpFileExtensions,
+		miscFileExtensions;
+	phpFileExtensions.push_back(wxT("*.php"));
+	
+	// load the php native functions into the cache
+	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass;
+	globalCache->InitGlobalTag(mvceditor::NativeFunctionsAsset(), phpFileExtensions, miscFileExtensions, pelet::PHP_53);
+	if (!tagCache.RegisterGlobal(globalCache)) {
+		printf("Could not initialize the native functions cache.\n");
+	}
+	
+	// load the project tags that were just parsed
+	mvceditor::GlobalCacheClass* projectCache = new mvceditor::GlobalCacheClass;
+	projectCache->InitGlobalTag(wxFileName(TagCacheDbFullPath), phpFileExtensions, miscFileExtensions, pelet::PHP_53);
+	if (!tagCache.RegisterGlobal(projectCache)) {
+		printf("Could not initialize the project cache.\n");
+	}
+	
 	// load the detected tags cache
 	mvceditor::GlobalCacheClass* detectorCache = new mvceditor::GlobalCacheClass;
 	detectorCache->InitDetectorTag(wxFileName(DetectorDbFullPath));
