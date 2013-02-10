@@ -80,7 +80,7 @@ wxFileName mvceditor::PhpDetectorsBaseAsset() {
 	return scriptsFileName;
 }
 
-wxFileName mvceditor::UrlDetectorsGlobalAsset() {
+wxFileName mvceditor::UrlTagDetectorsGlobalAsset() {
 	wxStandardPaths paths;
 	wxFileName pathExecutableFileName(paths.GetExecutablePath());
 	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
@@ -93,7 +93,7 @@ wxFileName mvceditor::UrlDetectorsGlobalAsset() {
 	return scriptsFileName;
 }
 
-wxFileName mvceditor::UrlDetectorsLocalAsset() {
+wxFileName mvceditor::UrlTagDetectorsLocalAsset() {
 	wxStandardPaths paths;
 	wxFileName configDir = mvceditor::ConfigDirAsset();
 	configDir.AppendDir(wxT("url_detectors"));
@@ -116,7 +116,7 @@ wxFileName mvceditor::TemplateFilesDetectorsGlobalAsset() {
 	return scriptsFileName;
 }
 
-wxFileName mvceditor::TemplateFilesDetectorsLocalAsset() {
+wxFileName mvceditor::TemplateFileTagsDetectorsLocalAsset() {
 	wxStandardPaths paths;
 	wxFileName configDir = mvceditor::ConfigDirAsset();
 	configDir.AppendDir(wxT("template_files_detectors"));
@@ -149,7 +149,7 @@ wxFileName mvceditor::TagDetectorsGlobalAsset() {
 	return scriptsFileName;
 }
 
-wxFileName mvceditor::DatabaseDetectorsLocalAsset() {
+wxFileName mvceditor::DatabaseTagDetectorsLocalAsset() {
 	wxStandardPaths paths;
 	wxFileName configDir = mvceditor::ConfigDirAsset();
 	configDir.AppendDir(wxT("database_detectors"));
@@ -159,7 +159,7 @@ wxFileName mvceditor::DatabaseDetectorsLocalAsset() {
 	return configDir;
 }
 
-wxFileName mvceditor::DatabaseDetectorsGlobalAsset() {
+wxFileName mvceditor::DatabaseTagDetectorsGlobalAsset() {
 	wxStandardPaths paths;
 	wxFileName pathExecutableFileName(paths.GetExecutablePath());
 	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
@@ -172,7 +172,7 @@ wxFileName mvceditor::DatabaseDetectorsGlobalAsset() {
 	return scriptsFileName;
 }
 
-wxFileName mvceditor::ConfigDetectorsLocalAsset() {
+wxFileName mvceditor::ConfigTagDetectorsLocalAsset() {
 	wxStandardPaths paths;
 	wxFileName configDir = mvceditor::ConfigDirAsset();
 	configDir.AppendDir(wxT("config_detectors"));
@@ -182,7 +182,7 @@ wxFileName mvceditor::ConfigDetectorsLocalAsset() {
 	return configDir;
 }
 
-wxFileName mvceditor::ConfigDetectorsGlobalAsset() {
+wxFileName mvceditor::ConfigTagDetectorsGlobalAsset() {
 	wxStandardPaths paths;
 	wxFileName pathExecutableFileName(paths.GetExecutablePath());
 	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +

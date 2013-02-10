@@ -137,7 +137,7 @@ std::vector<wxString> mvceditor::TemplateFileTagsDetectorActionClass::DetectorSc
 		globalDir.Traverse(traverser, wxEmptyString, wxDIR_DIRS | wxDIR_FILES);
 	}
 	wxDir localDir;
-	if (localDir.Open(mvceditor::TemplateFilesDetectorsLocalAsset().GetFullPath())) {
+	if (localDir.Open(mvceditor::TemplateFileTagsDetectorsLocalAsset().GetFullPath())) {
 		localDir.Traverse(traverser, wxEmptyString, wxDIR_DIRS | wxDIR_FILES);
 	}
 	return  scripts;

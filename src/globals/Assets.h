@@ -59,21 +59,21 @@ wxFileName PhpDetectorsBaseAsset();
  * to find out framework-specific URL routes. These are the URL detectors that are provided
  * by MVC editor.
  */
-wxFileName UrlDetectorsGlobalAsset();
+wxFileName UrlTagDetectorsGlobalAsset();
 
 /**
  * @return the directory location of the PHP URL detector scripts.  The editor will use these scripts
  * to find out framework-specific URL routes. These are the URL detectors that the user
  * creates for their own projects.
  */
-wxFileName UrlDetectorsLocalAsset();
+wxFileName UrlTagDetectorsLocalAsset();
 
 /**
  * @return the directory location of the PHP template files detector scripts.  The editor will use these scripts
  * to find out framework-specific template files. These are the template files detectors that the user
  * creates for their own projects.
  */
-wxFileName TemplateFilesDetectorsLocalAsset();
+wxFileName TemplateFileTagsDetectorsLocalAsset();
 
 /**
  * @return the directory location of the PHP template files detector scripts.  The editor will use these scripts
@@ -101,28 +101,28 @@ wxFileName TagDetectorsGlobalAsset();
  * to find out framework-specific database settings. These are the database detectors that the user
  * creates for their own projects.
  */
-wxFileName DatabaseDetectorsLocalAsset();
+wxFileName DatabaseTagDetectorsLocalAsset();
 
 /**
  * @return the directory location of the PHP database detector scripts.  The editor will use these scripts
  * to find out framework-specific database settings. These are the database detectors that are provided
  * by MVC editor.
  */
-wxFileName DatabaseDetectorsGlobalAsset();
+wxFileName DatabaseTagDetectorsGlobalAsset();
 
 /**
  * @return the directory location of the PHP Config detector scripts.  The editor will use these scripts
  * to find out framework-specific Config files. These are the Config files detectors that the user
  * creates for their own projects.
  */
-wxFileName ConfigDetectorsLocalAsset();
+wxFileName ConfigTagDetectorsLocalAsset();
 
 /**
  * @return the directory location of the PHP Config detector scripts.  The editor will use these scripts
  * to find out framework-specific Config files. These are the Config files detectors that are provided
  * by MVC editor.
  */
-wxFileName ConfigDetectorsGlobalAsset();
+wxFileName ConfigTagDetectorsGlobalAsset();
 
 /**
  * @return the file location of the SQL script to create the detector database.

@@ -27,8 +27,8 @@
 #include <actions/TagDetectorActionClass.h>
 #include <actions/CallStackActionClass.h>
 #include <actions/TemplateFileTagsDetectorActionClass.h>
-#include <actions/DatabaseDetectorActionClass.h>
-#include <actions/ConfigDetectorActionClass.h>
+#include <actions/DatabaseTagDetectorActionClass.h>
+#include <actions/ConfigTagDetectorActionClass.h>
 #include <widgets/TreeItemDataStringClass.h>
 #include <widgets/ChooseUrlDialogClass.h>
 #include <globals/Assets.h>
@@ -57,11 +57,11 @@ mvceditor::DetectorClass::~DetectorClass() {
 
 }
 
-mvceditor::UrlDetectorClass::UrlDetectorClass()  {
+mvceditor::UrlTagDetectorClass::UrlTagDetectorClass()  {
 
 }
 
-bool mvceditor::UrlDetectorClass::CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project) {
+bool mvceditor::UrlTagDetectorClass::CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project) {
 	mvceditor::SourceClass source = project.Sources[0];
 	wxString rootUrl = globals.Environment.Apache.GetUrl(source.RootDirectory.GetPath());
 	if (rootUrl.IsEmpty()) {
@@ -72,7 +72,7 @@ bool mvceditor::UrlDetectorClass::CanTest(const mvceditor::GlobalsClass& globals
 	return true;
 }
 
-wxString mvceditor::UrlDetectorClass::TestCommandLine(const mvceditor::GlobalsClass& globals, 
+wxString mvceditor::UrlTagDetectorClass::TestCommandLine(const mvceditor::GlobalsClass& globals, 
 													  const mvceditor::ProjectClass& project,
 													  const wxString& detectorScriptFullPath) {
 	mvceditor::SourceClass source = project.Sources[0];
@@ -88,25 +88,25 @@ wxString mvceditor::UrlDetectorClass::TestCommandLine(const mvceditor::GlobalsCl
 	return params.BuildCmdLine();
 }
 
-wxFileName mvceditor::UrlDetectorClass::LocalRootDir() {
-	return mvceditor::UrlDetectorsLocalAsset();
+wxFileName mvceditor::UrlTagDetectorClass::LocalRootDir() {
+	return mvceditor::UrlTagDetectorsLocalAsset();
 }
 
-wxFileName mvceditor::UrlDetectorClass::GlobalRootDir() {
-	return mvceditor::UrlDetectorsGlobalAsset();
+wxFileName mvceditor::UrlTagDetectorClass::GlobalRootDir() {
+	return mvceditor::UrlTagDetectorsGlobalAsset();
 }
 
-wxFileName mvceditor::UrlDetectorClass::SkeletonFile() {
+wxFileName mvceditor::UrlTagDetectorClass::SkeletonFile() {
 	wxFileName skeletonFile = mvceditor::SkeletonsBaseAsset();
 	skeletonFile.Assign(skeletonFile.GetPath(), wxT("UrlDetector.skeleton.php"));
 	return skeletonFile;
 }
 
-wxString mvceditor::UrlDetectorClass::Label() {
+wxString mvceditor::UrlTagDetectorClass::Label() {
 	return _("URL Detectors");
 }
 
-wxString mvceditor::UrlDetectorClass::HelpMessage() {
+wxString mvceditor::UrlTagDetectorClass::HelpMessage() {
 	wxString help = wxString::FromAscii(
 		"URL Detectors are PHP scripts that MVC Editor uses to find out "
 		"all of the valid URL routes for your projects.  \n"
@@ -116,16 +116,16 @@ wxString mvceditor::UrlDetectorClass::HelpMessage() {
 	return help;
 }
 
-mvceditor::TemplateFilesDetectorClass::TemplateFilesDetectorClass() 
+mvceditor::TemplateFileTagsDetectorClass::TemplateFileTagsDetectorClass() 
 	: DetectorClass() {
 
 }
 
-bool  mvceditor::TemplateFilesDetectorClass::CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project) {
+bool  mvceditor::TemplateFileTagsDetectorClass::CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project) {
 	return true;
 }
 
-wxString mvceditor::TemplateFilesDetectorClass::TestCommandLine(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project,
+wxString mvceditor::TemplateFileTagsDetectorClass::TestCommandLine(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project,
 																const wxString& detectorScriptFullPath) {
 	mvceditor::TemplateFileTagsDetectorParamsClass params;
 	mvceditor::SourceClass source = project.Sources[0];
@@ -139,25 +139,25 @@ wxString mvceditor::TemplateFilesDetectorClass::TestCommandLine(const mvceditor:
 	return params.BuildCmdLine();
 }
 
-wxFileName mvceditor::TemplateFilesDetectorClass::LocalRootDir() {
-	return mvceditor::TemplateFilesDetectorsLocalAsset();
+wxFileName mvceditor::TemplateFileTagsDetectorClass::LocalRootDir() {
+	return mvceditor::TemplateFileTagsDetectorsLocalAsset();
 }
 
-wxFileName mvceditor::TemplateFilesDetectorClass::GlobalRootDir() {
+wxFileName mvceditor::TemplateFileTagsDetectorClass::GlobalRootDir() {
 	return mvceditor::TemplateFilesDetectorsGlobalAsset();
 }
 
-wxFileName mvceditor::TemplateFilesDetectorClass::SkeletonFile() {
+wxFileName mvceditor::TemplateFileTagsDetectorClass::SkeletonFile() {
 	wxFileName skeletonFile = mvceditor::SkeletonsBaseAsset();
 	skeletonFile.Assign(skeletonFile.GetPath(), wxT("TemplateFilesDetector.skeleton.php"));
 	return skeletonFile;
 }
 
-wxString mvceditor::TemplateFilesDetectorClass::Label() {
+wxString mvceditor::TemplateFileTagsDetectorClass::Label() {
 	return _("Template File Detectors");
 }
 
-wxString mvceditor::TemplateFilesDetectorClass::HelpMessage() {
+wxString mvceditor::TemplateFileTagsDetectorClass::HelpMessage() {
 	wxString help = wxString::FromAscii(
 		"Template files detectors are PHP scripts that MVC Editor uses to find out "
 		"all of the 'view' files for your projects.  \n"
@@ -217,20 +217,20 @@ wxString mvceditor::TagDetectorClass::HelpMessage() {
 	return help;
 }
 
-mvceditor::DatabaseDetectorClass::DatabaseDetectorClass()  {
+mvceditor::DatabaseTagDetectorClass::DatabaseTagDetectorClass()  {
 
 }
 
-bool mvceditor::DatabaseDetectorClass::CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project) {
+bool mvceditor::DatabaseTagDetectorClass::CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project) {
 	return true;
 }
 
-wxString mvceditor::DatabaseDetectorClass::TestCommandLine(const mvceditor::GlobalsClass& globals, 
+wxString mvceditor::DatabaseTagDetectorClass::TestCommandLine(const mvceditor::GlobalsClass& globals, 
 													  const mvceditor::ProjectClass& project,
 													  const wxString& detectorScriptFullPath) {
 	mvceditor::SourceClass source = project.Sources[0];
 
-	mvceditor::DatabaseDetectorParamsClass params;
+	mvceditor::DatabaseTagDetectorParamsClass params;
 	params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
 	params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset();
 	params.ScriptName = detectorScriptFullPath;
@@ -238,25 +238,25 @@ wxString mvceditor::DatabaseDetectorClass::TestCommandLine(const mvceditor::Glob
 	return params.BuildCmdLine();
 }
 
-wxFileName mvceditor::DatabaseDetectorClass::LocalRootDir() {
-	return mvceditor::DatabaseDetectorsLocalAsset();
+wxFileName mvceditor::DatabaseTagDetectorClass::LocalRootDir() {
+	return mvceditor::DatabaseTagDetectorsLocalAsset();
 }
 
-wxFileName mvceditor::DatabaseDetectorClass::GlobalRootDir() {
-	return mvceditor::DatabaseDetectorsGlobalAsset();
+wxFileName mvceditor::DatabaseTagDetectorClass::GlobalRootDir() {
+	return mvceditor::DatabaseTagDetectorsGlobalAsset();
 }
 
-wxFileName mvceditor::DatabaseDetectorClass::SkeletonFile() {
+wxFileName mvceditor::DatabaseTagDetectorClass::SkeletonFile() {
 	wxFileName skeletonFile = mvceditor::SkeletonsBaseAsset();
 	skeletonFile.Assign(skeletonFile.GetPath(), wxT("DatabaseDetector.skeleton.php"));
 	return skeletonFile;
 }
 
-wxString mvceditor::DatabaseDetectorClass::Label() {
+wxString mvceditor::DatabaseTagDetectorClass::Label() {
 	return _("Database Detectors");
 }
 
-wxString mvceditor::DatabaseDetectorClass::HelpMessage() {
+wxString mvceditor::DatabaseTagDetectorClass::HelpMessage() {
 	wxString help = wxString::FromAscii(
 		"Database Detectors are PHP scripts that MVC Editor uses to find out "
 		"any database connections that PHP frameworks dynamically create.  \n"
@@ -266,21 +266,21 @@ wxString mvceditor::DatabaseDetectorClass::HelpMessage() {
 	return help;
 }
 
-mvceditor::ConfigDetectorClass::ConfigDetectorClass()  {
+mvceditor::ConfigTagDetectorClass::ConfigTagDetectorClass()  {
 
 }
 
-bool mvceditor::ConfigDetectorClass::CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project) {
+bool mvceditor::ConfigTagDetectorClass::CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project) {
 	return true;
 }
 
-wxString mvceditor::ConfigDetectorClass::TestCommandLine(const mvceditor::GlobalsClass& globals, 
+wxString mvceditor::ConfigTagDetectorClass::TestCommandLine(const mvceditor::GlobalsClass& globals, 
 													  const mvceditor::ProjectClass& project,
 													  const wxString& detectorScriptFullPath) {
 	
 	mvceditor::SourceClass source = project.Sources[0];														  
 	
-	mvceditor::ConfigDetectorParamsClass params;
+	mvceditor::ConfigTagDetectorParamsClass params;
 	params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
 	params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset();
 	params.ScriptName = detectorScriptFullPath;
@@ -288,25 +288,25 @@ wxString mvceditor::ConfigDetectorClass::TestCommandLine(const mvceditor::Global
 	return params.BuildCmdLine();
 }
 
-wxFileName mvceditor::ConfigDetectorClass::LocalRootDir() {
-	return mvceditor::ConfigDetectorsLocalAsset();
+wxFileName mvceditor::ConfigTagDetectorClass::LocalRootDir() {
+	return mvceditor::ConfigTagDetectorsLocalAsset();
 }
 
-wxFileName mvceditor::ConfigDetectorClass::GlobalRootDir() {
-	return mvceditor::ConfigDetectorsGlobalAsset();
+wxFileName mvceditor::ConfigTagDetectorClass::GlobalRootDir() {
+	return mvceditor::ConfigTagDetectorsGlobalAsset();
 }
 
-wxFileName mvceditor::ConfigDetectorClass::SkeletonFile() {
+wxFileName mvceditor::ConfigTagDetectorClass::SkeletonFile() {
 	wxFileName skeletonFile = mvceditor::SkeletonsBaseAsset();
 	skeletonFile.Assign(skeletonFile.GetPath(), wxT("ConfigDetector.skeleton.php"));
 	return skeletonFile;
 }
 
-wxString mvceditor::ConfigDetectorClass::Label() {
+wxString mvceditor::ConfigTagDetectorClass::Label() {
 	return _("Config Detectors");
 }
 
-wxString mvceditor::ConfigDetectorClass::HelpMessage() {
+wxString mvceditor::ConfigTagDetectorClass::HelpMessage() {
 	wxString help = wxString::FromAscii(
 		"Config Detectors are PHP scripts that MVC Editor uses to find out "
 		"any config files that PHP frameworks use.  \n"
@@ -638,7 +638,7 @@ void mvceditor::DetectorTreeHandlerClass::OnTreeItemEndLabelEdit(wxTreeEvent& ev
 	}
 }
 
-mvceditor::UrlDetectorPanelClass::UrlDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
+mvceditor::UrlTagDetectorPanelClass::UrlTagDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
 														mvceditor::EventSinkClass& eventSink)
 	: UrlDetectorPanelGeneratedClass(parent, id) 
 	, Detector() 
@@ -656,7 +656,7 @@ mvceditor::UrlDetectorPanelClass::UrlDetectorPanelClass(wxWindow* parent, int id
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
 }
 
-mvceditor::UrlDetectorPanelClass::~UrlDetectorPanelClass() {
+mvceditor::UrlTagDetectorPanelClass::~UrlTagDetectorPanelClass() {
 	Disconnect(ID_DETECTOR_TREE_OPEN, wxEVT_COMMAND_MENU_SELECTED, 
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuOpenDetector), NULL, &Handler);
 	Disconnect(ID_DETECTOR_TREE_RENAME, wxEVT_COMMAND_MENU_SELECTED, 
@@ -665,15 +665,15 @@ mvceditor::UrlDetectorPanelClass::~UrlDetectorPanelClass() {
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
 }
 
-void mvceditor::UrlDetectorPanelClass::Init() {
+void mvceditor::UrlTagDetectorPanelClass::Init() {
 	Handler.Init();
 }
 
-void mvceditor::UrlDetectorPanelClass::UpdateProjects() {
+void mvceditor::UrlTagDetectorPanelClass::UpdateProjects() {
 	Handler.UpdateProjects();
 }
 
-mvceditor::TemplateFilesDetectorPanelClass::TemplateFilesDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
+mvceditor::TemplateFileTagsDetectorPanelClass::TemplateFileTagsDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
 														mvceditor::EventSinkClass& eventSink,
 														mvceditor::RunningThreadsClass& runningThreads)
 	: TemplateFilesDetectorPanelGeneratedClass(parent, id) 
@@ -695,7 +695,7 @@ mvceditor::TemplateFilesDetectorPanelClass::TemplateFilesDetectorPanelClass(wxWi
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
 }
 
-mvceditor::TemplateFilesDetectorPanelClass::~TemplateFilesDetectorPanelClass() {
+mvceditor::TemplateFileTagsDetectorPanelClass::~TemplateFileTagsDetectorPanelClass() {
 	Disconnect(ID_DETECTOR_TREE_OPEN, wxEVT_COMMAND_MENU_SELECTED, 
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuOpenDetector), NULL, &Handler);
 	Disconnect(ID_DETECTOR_TREE_RENAME, wxEVT_COMMAND_MENU_SELECTED, 
@@ -704,15 +704,15 @@ mvceditor::TemplateFilesDetectorPanelClass::~TemplateFilesDetectorPanelClass() {
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
 }
 
-void mvceditor::TemplateFilesDetectorPanelClass::Init() {
+void mvceditor::TemplateFileTagsDetectorPanelClass::Init() {
 	Handler.Init();
 }
 
-void mvceditor::TemplateFilesDetectorPanelClass::UpdateProjects() {
+void mvceditor::TemplateFileTagsDetectorPanelClass::UpdateProjects() {
 	Handler.UpdateProjects();
 }
 
-void mvceditor::TemplateFilesDetectorPanelClass::OnChooseUrlButton(wxCommandEvent& event) {
+void mvceditor::TemplateFileTagsDetectorPanelClass::OnChooseUrlButton(wxCommandEvent& event) {
 	TestUrl.Reset();
 	mvceditor::ChooseUrlDialogClass dialog(this, Globals.UrlTagFinder, Globals.Projects, TestUrl);
 	if (dialog.ShowModal() == wxOK) {
@@ -766,7 +766,7 @@ void mvceditor::TagDetectorPanelClass::UpdateProjects() {
 	Handler.UpdateProjects();
 }
 
-mvceditor::DatabaseDetectorPanelClass::DatabaseDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
+mvceditor::DatabaseTagDetectorPanelClass::DatabaseTagDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
 														mvceditor::EventSinkClass& eventSink)
 	: DatabaseDetectorPanelGeneratedClass(parent, id) 
 	, Detector() 
@@ -784,7 +784,7 @@ mvceditor::DatabaseDetectorPanelClass::DatabaseDetectorPanelClass(wxWindow* pare
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
 }
 
-mvceditor::DatabaseDetectorPanelClass::~DatabaseDetectorPanelClass() {
+mvceditor::DatabaseTagDetectorPanelClass::~DatabaseTagDetectorPanelClass() {
 	Disconnect(ID_DETECTOR_TREE_OPEN, wxEVT_COMMAND_MENU_SELECTED, 
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuOpenDetector), NULL, &Handler);
 	Disconnect(ID_DETECTOR_TREE_RENAME, wxEVT_COMMAND_MENU_SELECTED, 
@@ -793,15 +793,15 @@ mvceditor::DatabaseDetectorPanelClass::~DatabaseDetectorPanelClass() {
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
 }
 
-void mvceditor::DatabaseDetectorPanelClass::Init() {
+void mvceditor::DatabaseTagDetectorPanelClass::Init() {
 	Handler.Init();
 }
 
-void mvceditor::DatabaseDetectorPanelClass::UpdateProjects() {
+void mvceditor::DatabaseTagDetectorPanelClass::UpdateProjects() {
 	Handler.UpdateProjects();
 }
 
-mvceditor::ConfigDetectorPanelClass::ConfigDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
+mvceditor::ConfigTagDetectorPanelClass::ConfigTagDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
 														mvceditor::EventSinkClass& eventSink)
 	: ConfigDetectorPanelGeneratedClass(parent, id) 
 	, Detector() 
@@ -819,7 +819,7 @@ mvceditor::ConfigDetectorPanelClass::ConfigDetectorPanelClass(wxWindow* parent, 
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
 }
 
-mvceditor::ConfigDetectorPanelClass::~ConfigDetectorPanelClass() {
+mvceditor::ConfigTagDetectorPanelClass::~ConfigTagDetectorPanelClass() {
 	Disconnect(ID_DETECTOR_TREE_OPEN, wxEVT_COMMAND_MENU_SELECTED, 
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuOpenDetector), NULL, &Handler);
 	Disconnect(ID_DETECTOR_TREE_RENAME, wxEVT_COMMAND_MENU_SELECTED, 
@@ -828,11 +828,11 @@ mvceditor::ConfigDetectorPanelClass::~ConfigDetectorPanelClass() {
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
 }
 
-void mvceditor::ConfigDetectorPanelClass::Init() {
+void mvceditor::ConfigTagDetectorPanelClass::Init() {
 	Handler.Init();
 }
 
-void mvceditor::ConfigDetectorPanelClass::UpdateProjects() {
+void mvceditor::ConfigTagDetectorPanelClass::UpdateProjects() {
 	Handler.UpdateProjects();
 }
 
@@ -865,7 +865,7 @@ void mvceditor::DetectorFeatureClass::OnViewUrlDetectors(wxCommandEvent& event) 
 		SetFocusToOutlineWindow(window);
 	}
 	else {
-		mvceditor::UrlDetectorPanelClass* panel = new mvceditor::UrlDetectorPanelClass(GetOutlineNotebook(), ID_URL_DETECTOR_PANEL, 
+		mvceditor::UrlTagDetectorPanelClass* panel = new mvceditor::UrlTagDetectorPanelClass(GetOutlineNotebook(), ID_URL_DETECTOR_PANEL, 
 			App.Globals, App.EventSink);
 		if (AddOutlineWindow(panel, _("URL Detectors"))) {
 			panel->Init();
@@ -880,7 +880,7 @@ void mvceditor::DetectorFeatureClass::OnViewTemplateFileDetectors(wxCommandEvent
 		SetFocusToOutlineWindow(window);
 	}
 	else {
-		mvceditor::TemplateFilesDetectorPanelClass* panel = new mvceditor::TemplateFilesDetectorPanelClass(GetOutlineNotebook(), ID_TEMPLATE_FILES_DETECTOR_PANEL, 
+		mvceditor::TemplateFileTagsDetectorPanelClass* panel = new mvceditor::TemplateFileTagsDetectorPanelClass(GetOutlineNotebook(), ID_TEMPLATE_FILES_DETECTOR_PANEL, 
 			App.Globals, App.EventSink, App.RunningThreads);
 		if (AddOutlineWindow(panel, _("Template Files Detectors"))) {
 			panel->Init();
@@ -910,7 +910,7 @@ void mvceditor::DetectorFeatureClass::OnViewDatabaseDetectors(wxCommandEvent& ev
 		SetFocusToOutlineWindow(window);
 	}
 	else {
-		mvceditor::DatabaseDetectorPanelClass* panel = new mvceditor::DatabaseDetectorPanelClass(GetOutlineNotebook(), ID_DATABASE_DETECTOR_PANEL, 
+		mvceditor::DatabaseTagDetectorPanelClass* panel = new mvceditor::DatabaseTagDetectorPanelClass(GetOutlineNotebook(), ID_DATABASE_DETECTOR_PANEL, 
 			App.Globals, App.EventSink);
 		if (AddOutlineWindow(panel, _("Database Detectors"))) {
 			panel->Init();
@@ -925,7 +925,7 @@ void mvceditor::DetectorFeatureClass::OnViewConfigDetectors(wxCommandEvent& even
 		SetFocusToOutlineWindow(window);
 	}
 	else {
-		mvceditor::ConfigDetectorPanelClass* panel = new mvceditor::ConfigDetectorPanelClass(GetOutlineNotebook(), ID_CONFIG_DETECTOR_PANEL, 
+		mvceditor::ConfigTagDetectorPanelClass* panel = new mvceditor::ConfigTagDetectorPanelClass(GetOutlineNotebook(), ID_CONFIG_DETECTOR_PANEL, 
 			App.Globals, App.EventSink);
 		if (AddOutlineWindow(panel, _("Config Detectors"))) {
 			panel->Init();
@@ -1001,7 +1001,7 @@ void mvceditor::DetectorFeatureClass::OnRunDatabaseDetectors(wxCommandEvent& eve
 
 	// the sequence class will own this pointer
 	actions.push_back(
-		new mvceditor::DatabaseDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_DETECTOR)
+		new mvceditor::DatabaseTagDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR)
 	);
 	App.Sequences.Build(actions);
 }
@@ -1011,7 +1011,7 @@ void mvceditor::DetectorFeatureClass::OnRunConfigDetectors(wxCommandEvent& event
 
 	// the sequence class will own this pointer
 	actions.push_back(
-		new mvceditor::ConfigDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_CONFIG_DETECTOR)
+		new mvceditor::ConfigTagDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR)
 	);
 	App.Sequences.Build(actions);
 }
@@ -1019,12 +1019,12 @@ void mvceditor::DetectorFeatureClass::OnRunConfigDetectors(wxCommandEvent& event
 void mvceditor::DetectorFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	wxWindow* window = FindOutlineWindow(ID_URL_DETECTOR_PANEL);
 	if (window) {
-		mvceditor::UrlDetectorPanelClass* panel = (mvceditor::UrlDetectorPanelClass*) window;
+		mvceditor::UrlTagDetectorPanelClass* panel = (mvceditor::UrlTagDetectorPanelClass*) window;
 		panel->UpdateProjects();
 	}
 	window = FindOutlineWindow(ID_TEMPLATE_FILES_DETECTOR_PANEL);
 	if (window) {
-		mvceditor::TemplateFilesDetectorPanelClass* panel = (mvceditor::TemplateFilesDetectorPanelClass*) window;
+		mvceditor::TemplateFileTagsDetectorPanelClass* panel = (mvceditor::TemplateFileTagsDetectorPanelClass*) window;
 		panel->UpdateProjects();
 	}
 	window = FindOutlineWindow(ID_TAG_DETECTOR_PANEL);
@@ -1034,12 +1034,12 @@ void mvceditor::DetectorFeatureClass::OnPreferencesSaved(wxCommandEvent& event) 
 	}
 	window = FindOutlineWindow(ID_DATABASE_DETECTOR_PANEL);
 	if (window) {
-		mvceditor::DatabaseDetectorPanelClass* panel = (mvceditor::DatabaseDetectorPanelClass*) window;
+		mvceditor::DatabaseTagDetectorPanelClass* panel = (mvceditor::DatabaseTagDetectorPanelClass*) window;
 		panel->UpdateProjects();
 	}
 	window = FindOutlineWindow(ID_CONFIG_DETECTOR_PANEL);
 	if (window) {
-		mvceditor::ConfigDetectorPanelClass* panel = (mvceditor::ConfigDetectorPanelClass*) window;
+		mvceditor::ConfigTagDetectorPanelClass* panel = (mvceditor::ConfigTagDetectorPanelClass*) window;
 		panel->UpdateProjects();
 	}
 }

@@ -155,11 +155,11 @@ std::vector<wxString> mvceditor::UrlTagDetectorActionClass::DetectorScripts() {
 	std::vector<wxString> scripts;
 	mvceditor::RecursiveDirTraverserClass traverser(scripts);
 	wxDir globalDir;
-	if (globalDir.Open(mvceditor::UrlDetectorsGlobalAsset().GetFullPath())) {
+	if (globalDir.Open(mvceditor::UrlTagDetectorsGlobalAsset().GetFullPath())) {
 		globalDir.Traverse(traverser, wxEmptyString, wxDIR_DIRS | wxDIR_FILES);
 	}
 	wxDir localDir;
-	if (localDir.Open(mvceditor::UrlDetectorsLocalAsset().GetFullPath())) {
+	if (localDir.Open(mvceditor::UrlTagDetectorsLocalAsset().GetFullPath())) {
 		localDir.Traverse(traverser, wxEmptyString, wxDIR_DIRS | wxDIR_FILES);
 	}
 	return  scripts;

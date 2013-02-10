@@ -22,14 +22,14 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <actions/DatabaseDetectorActionClass.h>
+#include <actions/DatabaseTagDetectorActionClass.h>
 #include <globals/Assets.h>
 #include <globals/Errors.h>
 #include <search/RecursiveDirTraverserClass.h>
 
-static const int ID_DATABASE_DETECTOR_PROCESS = wxNewId();
+static const int ID_DATABASE_TAG_DETECTOR_PROCESS = wxNewId();
 
-mvceditor::DatabaseDetectorParamsClass::DatabaseDetectorParamsClass() 
+mvceditor::DatabaseTagDetectorParamsClass::DatabaseTagDetectorParamsClass() 
 	: PhpExecutablePath()
 	, PhpIncludePath()
 	, ScriptName()
@@ -38,7 +38,7 @@ mvceditor::DatabaseDetectorParamsClass::DatabaseDetectorParamsClass()
 
 }
 
-wxString mvceditor::DatabaseDetectorParamsClass::BuildCmdLine() const {
+wxString mvceditor::DatabaseTagDetectorParamsClass::BuildCmdLine() const {
 	wxString cmdLine;
 	cmdLine = wxT("\"") + PhpExecutablePath + wxT("\"") + 
 		wxT(" -d include_path=") + wxT("\"") + PhpIncludePath.GetPath() + wxT("\"") + 
@@ -48,14 +48,14 @@ wxString mvceditor::DatabaseDetectorParamsClass::BuildCmdLine() const {
 	return cmdLine;
 }
 
-mvceditor::DatabaseDetectorActionClass::DatabaseDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+mvceditor::DatabaseTagDetectorActionClass::DatabaseTagDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: ActionClass(runningThreads, eventId)
 	, Process(*this)
 	, ParamsQueue() {
 
 }
 
-bool mvceditor::DatabaseDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
+bool mvceditor::DatabaseTagDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
 	SetStatus(_("DB Detect"));
 	while (!ParamsQueue.empty()) {
 		ParamsQueue.pop();
@@ -73,7 +73,7 @@ bool mvceditor::DatabaseDetectorActionClass::Init(mvceditor::GlobalsClass& globa
 			for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
 				if (source->Exists()) {
 					for (scriptName = detectorScripts.begin(); scriptName != detectorScripts.end(); ++scriptName) {
-						mvceditor::DatabaseDetectorParamsClass params;
+						mvceditor::DatabaseTagDetectorParamsClass params;
 						params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath.c_str();
 						params.PhpIncludePath.Assign(mvceditor::PhpDetectorsBaseAsset());
 						params.ScriptName = scriptName->c_str();
@@ -95,24 +95,24 @@ bool mvceditor::DatabaseDetectorActionClass::Init(mvceditor::GlobalsClass& globa
 	return started;
 }
 
-bool mvceditor::DatabaseDetectorActionClass::DoAsync() {
+bool mvceditor::DatabaseTagDetectorActionClass::DoAsync() {
 	return false;
 }
 
-wxString mvceditor::DatabaseDetectorActionClass::GetLabel() const {
+wxString mvceditor::DatabaseTagDetectorActionClass::GetLabel() const {
 	return wxT("Database Detectors");
 }
 
-void mvceditor::DatabaseDetectorActionClass::BackgroundWork() {
+void mvceditor::DatabaseTagDetectorActionClass::BackgroundWork() {
 	// nothing is done in the background, we use ProcessWithHeartbeatClass
 	// here
 }
 
-void mvceditor::DatabaseDetectorActionClass::NextDetection() {
+void mvceditor::DatabaseTagDetectorActionClass::NextDetection() {
 	if (ParamsQueue.empty()) {
 		return;
 	}
-	mvceditor::DatabaseDetectorParamsClass params = ParamsQueue.front();
+	mvceditor::DatabaseTagDetectorParamsClass params = ParamsQueue.front();
 	ParamsQueue.pop();
 	
 	wxArrayString dirs = params.SourceDir.GetDirs();
@@ -122,24 +122,24 @@ void mvceditor::DatabaseDetectorActionClass::NextDetection() {
 
 	wxString cmdLine = params.BuildCmdLine();
 	long pid;
-	Process.Init(cmdLine, ID_DATABASE_DETECTOR_PROCESS, pid);
+	Process.Init(cmdLine, ID_DATABASE_TAG_DETECTOR_PROCESS, pid);
 }
 
-std::vector<wxString> mvceditor::DatabaseDetectorActionClass::DetectorScripts() {
+std::vector<wxString> mvceditor::DatabaseTagDetectorActionClass::DetectorScripts() {
 	std::vector<wxString> scripts;
 	mvceditor::RecursiveDirTraverserClass traverser(scripts);
 	wxDir globalDir;
-	if (globalDir.Open(mvceditor::DatabaseDetectorsGlobalAsset().GetFullPath())) {
+	if (globalDir.Open(mvceditor::DatabaseTagDetectorsGlobalAsset().GetFullPath())) {
 		globalDir.Traverse(traverser, wxEmptyString, wxDIR_DIRS | wxDIR_FILES);
 	}
 	wxDir localDir;
-	if (localDir.Open(mvceditor::DatabaseDetectorsLocalAsset().GetFullPath())) {
+	if (localDir.Open(mvceditor::DatabaseTagDetectorsLocalAsset().GetFullPath())) {
 		localDir.Traverse(traverser, wxEmptyString, wxDIR_DIRS | wxDIR_FILES);
 	}
 	return  scripts;
 }
 
-void mvceditor::DatabaseDetectorActionClass::OnProcessComplete(wxCommandEvent &event) {
+void mvceditor::DatabaseTagDetectorActionClass::OnProcessComplete(wxCommandEvent &event) {
 	if (ParamsQueue.empty()) {
 		wxCommandEvent detectionCompleteEvent(mvceditor::EVENT_WORK_COMPLETE);
 		PostEvent(detectionCompleteEvent);
@@ -149,7 +149,7 @@ void mvceditor::DatabaseDetectorActionClass::OnProcessComplete(wxCommandEvent &e
 	}
 }
 
-void mvceditor::DatabaseDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
+void mvceditor::DatabaseTagDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
 	mvceditor::EditorLogError(mvceditor::WARNING_OTHER, event.GetString());
 	if (ParamsQueue.empty()) {
 		wxCommandEvent detectionCompleteEvent(mvceditor::EVENT_WORK_COMPLETE);
@@ -160,17 +160,17 @@ void mvceditor::DatabaseDetectorActionClass::OnProcessFailed(wxCommandEvent &eve
 	}
 }
 
-void mvceditor::DatabaseDetectorActionClass::OnProcessInProgress(wxCommandEvent &event) {
+void mvceditor::DatabaseTagDetectorActionClass::OnProcessInProgress(wxCommandEvent &event) {
 	wxCommandEvent inProgressEvent(mvceditor::EVENT_WORK_IN_PROGRESS);
 	PostEvent(inProgressEvent);
 }
 
-mvceditor::DatabaseDetectorInitActionClass::DatabaseDetectorInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+mvceditor::DatabaseTagDetectorInitActionClass::DatabaseTagDetectorInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: InitializerActionClass(runningThreads, eventId) {
 
 }
 
-void mvceditor::DatabaseDetectorInitActionClass::Work(mvceditor::GlobalsClass &globals) {
+void mvceditor::DatabaseTagDetectorInitActionClass::Work(mvceditor::GlobalsClass &globals) {
 	SetStatus(_("DB Detect Init"));
 
 	// first remove all detected connections that were previously detected
@@ -197,12 +197,12 @@ void mvceditor::DatabaseDetectorInitActionClass::Work(mvceditor::GlobalsClass &g
 	globals.DatabaseTags.insert(globals.DatabaseTags.end(), detected.begin(), detected.end());
 }
 
-wxString mvceditor::DatabaseDetectorInitActionClass::GetLabel() const {
+wxString mvceditor::DatabaseTagDetectorInitActionClass::GetLabel() const {
 	return _("Database tags detector initialization");
 }
 
-BEGIN_EVENT_TABLE(mvceditor::DatabaseDetectorActionClass, mvceditor::ActionClass) 
-	EVT_COMMAND(ID_DATABASE_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::DatabaseDetectorActionClass::OnProcessInProgress)
-	EVT_COMMAND(ID_DATABASE_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::DatabaseDetectorActionClass::OnProcessComplete)
-	EVT_COMMAND(ID_DATABASE_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::DatabaseDetectorActionClass::OnProcessFailed)
+BEGIN_EVENT_TABLE(mvceditor::DatabaseTagDetectorActionClass, mvceditor::ActionClass) 
+	EVT_COMMAND(ID_DATABASE_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::DatabaseTagDetectorActionClass::OnProcessInProgress)
+	EVT_COMMAND(ID_DATABASE_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::DatabaseTagDetectorActionClass::OnProcessComplete)
+	EVT_COMMAND(ID_DATABASE_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::DatabaseTagDetectorActionClass::OnProcessFailed)
 END_EVENT_TABLE()

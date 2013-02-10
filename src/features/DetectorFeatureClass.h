@@ -55,10 +55,10 @@ public:
 
 };
 
-class UrlDetectorClass : public mvceditor::DetectorClass {
+class UrlTagDetectorClass : public mvceditor::DetectorClass {
 public:
 
-	UrlDetectorClass();
+	UrlTagDetectorClass();
 
 	bool CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project);
 
@@ -76,10 +76,10 @@ public:
 	wxString HelpMessage();
 };
 
-class TemplateFilesDetectorClass : public mvceditor::DetectorClass {
+class TemplateFileTagsDetectorClass : public mvceditor::DetectorClass {
 public:
 
-	TemplateFilesDetectorClass();
+	TemplateFileTagsDetectorClass();
 
 	bool CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project);
 
@@ -118,10 +118,10 @@ public:
 	wxString HelpMessage();
 };
 
-class DatabaseDetectorClass : public mvceditor::DetectorClass {
+class DatabaseTagDetectorClass : public mvceditor::DetectorClass {
 public:
 
-	DatabaseDetectorClass();
+	DatabaseTagDetectorClass();
 
 	bool CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project);
 
@@ -139,10 +139,10 @@ public:
 	wxString HelpMessage();
 };
 
-class ConfigDetectorClass : public mvceditor::DetectorClass {
+class ConfigTagDetectorClass : public mvceditor::DetectorClass {
 public:
 
-	ConfigDetectorClass();
+	ConfigTagDetectorClass();
 
 	bool CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project);
 
@@ -224,7 +224,7 @@ private:
 
 }; 
 
-class UrlDetectorPanelClass : public UrlDetectorPanelGeneratedClass {
+class UrlTagDetectorPanelClass : public UrlDetectorPanelGeneratedClass {
 
 public:
 
@@ -234,10 +234,10 @@ public:
 	 * @param globals to access the projects list
 	 * @param eventSink to send the app file and run commands
 	 */
-	UrlDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
+	UrlTagDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
 		mvceditor::EventSinkClass& eventSink);
 
-	~UrlDetectorPanelClass();
+	~UrlTagDetectorPanelClass();
 
 	/**
 	 * This should be called when the detector tree needs to be updated.
@@ -253,12 +253,12 @@ public:
 
 private:
 
-	mvceditor::UrlDetectorClass Detector;
+	mvceditor::UrlTagDetectorClass Detector;
 
 	mvceditor::DetectorTreeHandlerClass Handler;
 };
 
-class TemplateFilesDetectorPanelClass : public TemplateFilesDetectorPanelGeneratedClass {
+class TemplateFileTagsDetectorPanelClass : public TemplateFilesDetectorPanelGeneratedClass {
 
 public:
 
@@ -269,10 +269,10 @@ public:
 	 * @param eventSink to send the app file and run commands
 	 * @param runningThreads  used to run the background processes.
 	 */
-	TemplateFilesDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
+	TemplateFileTagsDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
 		mvceditor::EventSinkClass& eventSink, mvceditor::RunningThreadsClass& runningThreads);
 
-	~TemplateFilesDetectorPanelClass();
+	~TemplateFileTagsDetectorPanelClass();
 
 	/**
 	 * This should be called when the detector tree needs to be updated.
@@ -292,7 +292,7 @@ protected:
 
 private:
 
-	mvceditor::TemplateFilesDetectorClass Detector;
+	mvceditor::TemplateFileTagsDetectorClass Detector;
 
 	mvceditor::DetectorTreeHandlerClass Handler;
 
@@ -347,7 +347,7 @@ private:
 	mvceditor::DetectorTreeHandlerClass Handler;
 };
 
-class DatabaseDetectorPanelClass : public DatabaseDetectorPanelGeneratedClass {
+class DatabaseTagDetectorPanelClass : public DatabaseDetectorPanelGeneratedClass {
 
 public:
 
@@ -357,10 +357,10 @@ public:
 	 * @param globals to access the projects list
 	 * @param eventSink to send the app file and run commands
 	 */
-	DatabaseDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
+	DatabaseTagDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
 		mvceditor::EventSinkClass& eventSink);
 
-	~DatabaseDetectorPanelClass();
+	~DatabaseTagDetectorPanelClass();
 
 	/**
 	 * This should be called when the detector tree needs to be updated.
@@ -376,12 +376,12 @@ public:
 
 private:
 
-	mvceditor::DatabaseDetectorClass Detector;
+	mvceditor::DatabaseTagDetectorClass Detector;
 
 	mvceditor::DetectorTreeHandlerClass Handler;
 };
 
-class ConfigDetectorPanelClass : public ConfigDetectorPanelGeneratedClass {
+class ConfigTagDetectorPanelClass : public ConfigDetectorPanelGeneratedClass {
 
 public:
 
@@ -391,10 +391,10 @@ public:
 	 * @param globals to access the projects list
 	 * @param eventSink to send the app file and run commands
 	 */
-	ConfigDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
+	ConfigTagDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
 		mvceditor::EventSinkClass& eventSink);
 
-	~ConfigDetectorPanelClass();
+	~ConfigTagDetectorPanelClass();
 
 	/**
 	 * This should be called when the detector tree needs to be updated.
@@ -410,7 +410,7 @@ public:
 
 private:
 
-	mvceditor::ConfigDetectorClass Detector;
+	mvceditor::ConfigTagDetectorClass Detector;
 
 	mvceditor::DetectorTreeHandlerClass Handler;
 };

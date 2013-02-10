@@ -70,7 +70,7 @@ public:
 	/**
 	 * The datatabase connections. These are all of the connections, there may be a 
 	 * mix of connections created by the user and connections that were detected
-	 * by the DatabaseDetector scripts.
+	 * by the DatabaseTagDetector scripts.
 	 */ 
 	std::vector<DatabaseTagClass> DatabaseTags;
 

@@ -34,7 +34,7 @@ namespace mvceditor {
 /**
  * This feature will take all of the detected config files and
  * will populate a menu with config files from each project.
- * The config files are detected with the help of ConfigDetectorActionClass
+ * The config files are detected with the help of ConfigTagDetectorActionClass
  * and are read with the help of ConfigTagFinderClass.
  */
 class ConfigFilesFeatureClass : public mvceditor::FeatureClass {

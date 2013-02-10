@@ -77,7 +77,7 @@ void mvceditor::GlobalsChangeHandlerClass::OnDatabaseTagsComplete(wxCommandEvent
 BEGIN_EVENT_TABLE(mvceditor::GlobalsChangeHandlerClass, wxEvtHandler)
 	EVT_SQL_META_DATA_COMPLETE(mvceditor::ID_EVENT_ACTION_SQL_METADATA, mvceditor::GlobalsChangeHandlerClass::OnSqlMetaDataComplete)
 	EVT_GLOBAL_CACHE_COMPLETE(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE, mvceditor::GlobalsChangeHandlerClass::OnGlobalCacheComplete)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_DATABASE_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::GlobalsChangeHandlerClass::OnDatabaseTagsComplete)
+	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::GlobalsChangeHandlerClass::OnDatabaseTagsComplete)
 END_EVENT_TABLE()
 
 

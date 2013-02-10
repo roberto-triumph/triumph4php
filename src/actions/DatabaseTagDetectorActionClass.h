@@ -37,7 +37,7 @@ namespace mvceditor {
  * these params are required with the exception of
  * OutputDbFileName.
  */
-class DatabaseDetectorParamsClass {
+class DatabaseTagDetectorParamsClass {
 
 public:
 
@@ -76,7 +76,7 @@ public:
 	 */
 	wxString OutputDbFileName;
 
-	DatabaseDetectorParamsClass();
+	DatabaseTagDetectorParamsClass();
 
 	/**
 	 * build the command line to be executed for each url detector
@@ -88,11 +88,11 @@ public:
  * This class will run all database detectors across all enabled projects. This means that there is
  * one external process execution for each project source directory / database detector combination
  */
-class DatabaseDetectorActionClass : public mvceditor::ActionClass {
+class DatabaseTagDetectorActionClass : public mvceditor::ActionClass {
 
 public:
 
-	DatabaseDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	DatabaseTagDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 	bool Init(mvceditor::GlobalsClass& globals);
 
@@ -113,7 +113,7 @@ private:
 	 * we will perform one external call for each item in this
 	 * queue
 	 */
-	std::queue<mvceditor::DatabaseDetectorParamsClass> ParamsQueue;
+	std::queue<mvceditor::DatabaseTagDetectorParamsClass> ParamsQueue;
 
 	/**
 	 * pop the next set of params from the queue and call the php database 
@@ -143,11 +143,11 @@ private:
  * it will be primed with the existing cache file which may be
  * stale. 
  */
-class DatabaseDetectorInitActionClass : public mvceditor::InitializerActionClass {
+class DatabaseTagDetectorInitActionClass : public mvceditor::InitializerActionClass {
 
 public:
 
-	DatabaseDetectorInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	DatabaseTagDetectorInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 	void Work(mvceditor::GlobalsClass& globals);
 

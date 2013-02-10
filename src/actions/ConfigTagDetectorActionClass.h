@@ -37,7 +37,7 @@ namespace mvceditor {
  * these params are required with the exception of
  * OutputDbFileName.
  */
-class ConfigDetectorParamsClass {
+class ConfigTagDetectorParamsClass {
 
 public:
 
@@ -76,7 +76,7 @@ public:
 	 */
 	wxString OutputDbFileName;
 
-	ConfigDetectorParamsClass();
+	ConfigTagDetectorParamsClass();
 
 	/**
 	 * build the command line to be executed for each url detector
@@ -88,11 +88,11 @@ public:
  * This class will run all config detectors across all enabled projects. This means that there is
  * one external process execution for each project source directory / config detector combination
  */
-class ConfigDetectorActionClass : public mvceditor::ActionClass {
+class ConfigTagDetectorActionClass : public mvceditor::ActionClass {
 
 public:
 
-	ConfigDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	ConfigTagDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 	bool Init(mvceditor::GlobalsClass& globals);
 
@@ -113,7 +113,7 @@ private:
 	 * we will perform one external call for each item in this
 	 * queue
 	 */
-	std::queue<mvceditor::ConfigDetectorParamsClass> ParamsQueue;
+	std::queue<mvceditor::ConfigTagDetectorParamsClass> ParamsQueue;
 
 	/**
 	 * pop the next set of params from the queue and call the php database 

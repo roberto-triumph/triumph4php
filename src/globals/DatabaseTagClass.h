@@ -95,7 +95,7 @@ public:
 	int Port;
 
 	/**
-	 * True if this connection was detected by a DatabaseDetector. If this flaf
+	 * True if this connection was detected by a DatabaseTagDetector. If this flag
 	 * is set the connection will be treated specially (it will not be persisted
 	 * to the config as it can be re-detected).
 	 */

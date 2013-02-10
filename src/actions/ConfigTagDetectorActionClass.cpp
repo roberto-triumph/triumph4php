@@ -22,14 +22,14 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <actions/ConfigDetectorActionClass.h>
+#include <actions/ConfigTagDetectorActionClass.h>
 #include <globals/Assets.h>
 #include <globals/Errors.h>
 #include <search/RecursiveDirTraverserClass.h>
 
-static const int ID_CONFIG_DETECTOR_PROCESS = wxNewId();
+static const int ID_CONFIG_TAG_DETECTOR_PROCESS = wxNewId();
 
-mvceditor::ConfigDetectorParamsClass::ConfigDetectorParamsClass() 
+mvceditor::ConfigTagDetectorParamsClass::ConfigTagDetectorParamsClass() 
 	: PhpExecutablePath()
 	, PhpIncludePath()
 	, ScriptName()
@@ -38,7 +38,7 @@ mvceditor::ConfigDetectorParamsClass::ConfigDetectorParamsClass()
 
 }
 
-wxString mvceditor::ConfigDetectorParamsClass::BuildCmdLine() const {
+wxString mvceditor::ConfigTagDetectorParamsClass::BuildCmdLine() const {
 	wxString cmdLine;
 	cmdLine = wxT("\"") + PhpExecutablePath + wxT("\"") + 
 		wxT(" -d include_path=") + wxT("\"") + PhpIncludePath.GetPath() + wxT("\"") + 
@@ -48,15 +48,15 @@ wxString mvceditor::ConfigDetectorParamsClass::BuildCmdLine() const {
 	return cmdLine;
 }
 
-mvceditor::ConfigDetectorActionClass::ConfigDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+mvceditor::ConfigTagDetectorActionClass::ConfigTagDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: ActionClass(runningThreads, eventId)
 	, Process(*this)
 	, ParamsQueue() {
 
 }
 
-bool mvceditor::ConfigDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
-	SetStatus(_("Config Detector"));
+bool mvceditor::ConfigTagDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
+	SetStatus(_("Config Tag Detector"));
 	while (!ParamsQueue.empty()) {
 		ParamsQueue.pop();
 	}
@@ -73,7 +73,7 @@ bool mvceditor::ConfigDetectorActionClass::Init(mvceditor::GlobalsClass& globals
 			for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
 				if (source->Exists()) {
 					for (scriptName = detectorScripts.begin(); scriptName != detectorScripts.end(); ++scriptName) {
-						mvceditor::ConfigDetectorParamsClass params;
+						mvceditor::ConfigTagDetectorParamsClass params;
 						params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath.c_str();
 						params.PhpIncludePath.Assign(mvceditor::PhpDetectorsBaseAsset());
 						params.ScriptName = scriptName->c_str();
@@ -95,49 +95,49 @@ bool mvceditor::ConfigDetectorActionClass::Init(mvceditor::GlobalsClass& globals
 	return started;
 }
 
-bool mvceditor::ConfigDetectorActionClass::DoAsync() {
+bool mvceditor::ConfigTagDetectorActionClass::DoAsync() {
 	return false;
 }
 
-wxString mvceditor::ConfigDetectorActionClass::GetLabel() const {
-	return wxT("Config Detectors");
+wxString mvceditor::ConfigTagDetectorActionClass::GetLabel() const {
+	return wxT("Config Tag Detectors");
 }
 
-void mvceditor::ConfigDetectorActionClass::BackgroundWork() {
+void mvceditor::ConfigTagDetectorActionClass::BackgroundWork() {
 	// nothing is done in the background, we use ProcessWithHeartbeatClass
 	// here
 }
 
-void mvceditor::ConfigDetectorActionClass::NextDetection() {
+void mvceditor::ConfigTagDetectorActionClass::NextDetection() {
 	if (ParamsQueue.empty()) {
 		return;
 	}
-	mvceditor::ConfigDetectorParamsClass params = ParamsQueue.front();
+	mvceditor::ConfigTagDetectorParamsClass params = ParamsQueue.front();
 	ParamsQueue.pop();
 	wxArrayString dirs = params.SourceDir.GetDirs();
 	if (!dirs.IsEmpty()) {
-		SetStatus(_("Config Detector / ") + dirs.back());
+		SetStatus(_("Config Tag Detector / ") + dirs.back());
 	}
 	wxString cmdLine = params.BuildCmdLine();
 	long pid;
-	Process.Init(cmdLine, ID_CONFIG_DETECTOR_PROCESS, pid);
+	Process.Init(cmdLine, ID_CONFIG_TAG_DETECTOR_PROCESS, pid);
 }
 
-std::vector<wxString> mvceditor::ConfigDetectorActionClass::DetectorScripts() {
+std::vector<wxString> mvceditor::ConfigTagDetectorActionClass::DetectorScripts() {
 	std::vector<wxString> scripts;
 	mvceditor::RecursiveDirTraverserClass traverser(scripts);
 	wxDir globalDir;
-	if (globalDir.Open(mvceditor::ConfigDetectorsGlobalAsset().GetFullPath())) {
+	if (globalDir.Open(mvceditor::ConfigTagDetectorsGlobalAsset().GetFullPath())) {
 		globalDir.Traverse(traverser, wxEmptyString, wxDIR_DIRS | wxDIR_FILES);
 	}
 	wxDir localDir;
-	if (localDir.Open(mvceditor::ConfigDetectorsLocalAsset().GetFullPath())) {
+	if (localDir.Open(mvceditor::ConfigTagDetectorsLocalAsset().GetFullPath())) {
 		localDir.Traverse(traverser, wxEmptyString, wxDIR_DIRS | wxDIR_FILES);
 	}
 	return  scripts;
 }
 
-void mvceditor::ConfigDetectorActionClass::OnProcessComplete(wxCommandEvent &event) {
+void mvceditor::ConfigTagDetectorActionClass::OnProcessComplete(wxCommandEvent &event) {
 	if (ParamsQueue.empty()) {
 		wxCommandEvent completeEvent(mvceditor::EVENT_WORK_COMPLETE);
 		PostEvent(completeEvent);
@@ -147,7 +147,7 @@ void mvceditor::ConfigDetectorActionClass::OnProcessComplete(wxCommandEvent &eve
 	}
 }
 
-void mvceditor::ConfigDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
+void mvceditor::ConfigTagDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
 	mvceditor::EditorLogError(mvceditor::WARNING_OTHER, event.GetString());
 	if (ParamsQueue.empty()) {
 		wxCommandEvent completeEvent(mvceditor::EVENT_WORK_COMPLETE);
@@ -158,13 +158,13 @@ void mvceditor::ConfigDetectorActionClass::OnProcessFailed(wxCommandEvent &event
 	}
 }
 
-void mvceditor::ConfigDetectorActionClass::OnProcessInProgress(wxCommandEvent &event) {
+void mvceditor::ConfigTagDetectorActionClass::OnProcessInProgress(wxCommandEvent &event) {
 	wxCommandEvent inProgressEvent(mvceditor::EVENT_WORK_IN_PROGRESS);
 	PostEvent(inProgressEvent);
 }
 
-BEGIN_EVENT_TABLE(mvceditor::ConfigDetectorActionClass, mvceditor::ActionClass) 
-	EVT_COMMAND(ID_CONFIG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::ConfigDetectorActionClass::OnProcessInProgress)
-	EVT_COMMAND(ID_CONFIG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::ConfigDetectorActionClass::OnProcessComplete)
-	EVT_COMMAND(ID_CONFIG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::ConfigDetectorActionClass::OnProcessFailed)
+BEGIN_EVENT_TABLE(mvceditor::ConfigTagDetectorActionClass, mvceditor::ActionClass) 
+	EVT_COMMAND(ID_CONFIG_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::ConfigTagDetectorActionClass::OnProcessInProgress)
+	EVT_COMMAND(ID_CONFIG_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::ConfigTagDetectorActionClass::OnProcessComplete)
+	EVT_COMMAND(ID_CONFIG_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::ConfigTagDetectorActionClass::OnProcessFailed)
 END_EVENT_TABLE()
