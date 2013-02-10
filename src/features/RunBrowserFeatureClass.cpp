@@ -223,7 +223,7 @@ void mvceditor::RunBrowserFeatureClass::OnUrlSearchTool(wxCommandEvent& event) {
 			GaugeDialog->Destroy();
 			GaugeDialog = NULL;
 		}
-		GaugeDialog = new mvceditor::GaugeDialogClass(GetMainWindow(), _("URL Detection"));
+		GaugeDialog = new mvceditor::GaugeDialogClass(GetMainWindow(), _("URL Detection"), _("Running URL Detection"));
 	}
 	else if (App.Globals.UrlResourceFinder.Count() > 0) {
 		ShowUrlDialog();

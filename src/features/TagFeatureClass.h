@@ -26,7 +26,7 @@
 #define __RESOURCEFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
-#include <features/wxformbuilder/ResourceFeatureForms.h>
+#include <features/wxformbuilder/TagFeatureForms.h>
 #include <features/BackgroundFileReaderClass.h>
 #include <search/TagFinderClass.h>
 #include <actions/ProjectTagActionClass.h>
@@ -204,7 +204,7 @@ private:
 	DECLARE_EVENT_TABLE()
 };
 
-class ResourceSearchDialogClass : public ResourceSearchDialogGeneratedClass {
+class TagSearchDialogClass : public TagSearchDialogGeneratedClass {
 public:
 
 	/**
@@ -213,7 +213,7 @@ public:
 	 * @param term string to prepopulate the input box
 	 * @param chosenResources out parameter, the list of resources that the user chose
 	 */
-	ResourceSearchDialogClass(wxWindow* parent, 
+	TagSearchDialogClass(wxWindow* parent, 
 		TagFeatureClass& tag, wxString& term, 
 		std::vector<mvceditor::TagClass>& chosenResources);
 		

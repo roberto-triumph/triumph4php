@@ -26,9 +26,10 @@
 
 const static int ID_GAUGE_DIALOG_TIMER = wxNewId();
 
-mvceditor::GaugeDialogClass::GaugeDialogClass(wxWindow* parent, const wxString& label) 
-	: IndexingDialogGeneratedClass(parent)
+mvceditor::GaugeDialogClass::GaugeDialogClass(wxWindow* parent, const wxString& title, const wxString& label) 
+	: GaugeDialogGeneratedClass(parent, wxID_ANY, title)
 	, Timer(this, ID_GAUGE_DIALOG_TIMER) {
+	Label->SetLabel(label);
 }
 
 void mvceditor::GaugeDialogClass::OnHideButton(wxCommandEvent &event) {
@@ -45,6 +46,6 @@ void mvceditor::GaugeDialogClass::OnTimer(wxTimerEvent& event) {
 	Gauge->Pulse();
 }
 
-BEGIN_EVENT_TABLE(mvceditor::GaugeDialogClass, IndexingDialogGeneratedClass)
+BEGIN_EVENT_TABLE(mvceditor::GaugeDialogClass, GaugeDialogGeneratedClass)
 	EVT_TIMER(ID_GAUGE_DIALOG_TIMER, mvceditor::GaugeDialogClass::OnTimer) 
 END_EVENT_TABLE()

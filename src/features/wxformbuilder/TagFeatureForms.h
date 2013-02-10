@@ -5,68 +5,37 @@
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef __ResourceFeatureForms__
-#define __ResourceFeatureForms__
+#ifndef __TagFeatureForms__
+#define __TagFeatureForms__
 
 #include <wx/intl.h>
 
-#include <wx/gauge.h>
+#include <wx/string.h>
+#include <wx/stattext.h>
 #include <wx/gdicmn.h>
 #include <wx/font.h>
 #include <wx/colour.h>
 #include <wx/settings.h>
-#include <wx/string.h>
-#include <wx/button.h>
-#include <wx/sizer.h>
-#include <wx/dialog.h>
-#include <wx/stattext.h>
 #include <wx/textctrl.h>
 #include <wx/choice.h>
+#include <wx/sizer.h>
 #include <wx/checklst.h>
+#include <wx/button.h>
+#include <wx/dialog.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class IndexingDialogGeneratedClass
+/// Class TagSearchDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class IndexingDialogGeneratedClass : public wxDialog 
+class TagSearchDialogGeneratedClass : public wxDialog 
 {
 	private:
 	
 	protected:
 		enum
 		{
-			ID_INDEXINGDIALOGGENERATEDCLASS = 1000,
-			ID_GAUGE,
-			ID_HIDEBUTTON,
-		};
-		
-		wxGauge* Gauge;
-		wxButton* HideButton;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void OnHideButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
-	public:
-		
-		IndexingDialogGeneratedClass( wxWindow* parent, wxWindowID id = ID_INDEXINGDIALOGGENERATEDCLASS, const wxString& title = _("Indexing ..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 392,107 ), long style = wxCAPTION|wxSTAY_ON_TOP );
-		~IndexingDialogGeneratedClass();
-	
-};
-
-///////////////////////////////////////////////////////////////////////////////
-/// Class ResourceSearchDialogGeneratedClass
-///////////////////////////////////////////////////////////////////////////////
-class ResourceSearchDialogGeneratedClass : public wxDialog 
-{
-	private:
-	
-	protected:
-		enum
-		{
-			ID_RESOURCESEARCHDIALOGGENERATEDCLASS = 1000,
-			ID_SEARCHLABEL,
+			ID_SEARCHLABEL = 1000,
 			ID_SEARCHTEXT,
 		};
 		
@@ -96,9 +65,9 @@ class ResourceSearchDialogGeneratedClass : public wxDialog
 	
 	public:
 		
-		ResourceSearchDialogGeneratedClass( wxWindow* parent, wxWindowID id = ID_RESOURCESEARCHDIALOGGENERATEDCLASS, const wxString& title = _("Search For Resources"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 634,333 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
-		~ResourceSearchDialogGeneratedClass();
+		TagSearchDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Search For PHP Tags"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 634,333 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		~TagSearchDialogGeneratedClass();
 	
 };
 
-#endif //__ResourceFeatureForms__
+#endif //__TagFeatureForms__

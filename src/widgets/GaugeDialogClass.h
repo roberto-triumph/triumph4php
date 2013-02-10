@@ -25,7 +25,7 @@
 #ifndef __MVCEDITOR_GAUGEDIALOGCLASS_H__
 #define __MVCEDITOR_GAUGEDIALOGCLASS_H__
 
-#include <features/wxformbuilder/ResourceFeatureForms.h>
+#include <widgets/wxformbuilder/GaugeDialogWidget.h>
 #include <wx/timer.h>
 
 namespace mvceditor {
@@ -37,11 +37,11 @@ namespace mvceditor {
  * Sometimes it is best to create a full-fledged dialog because the gauge that is 
  * located in the lower status bar might not be enough feedback for the user.
  */
-class GaugeDialogClass : public IndexingDialogGeneratedClass {
+class GaugeDialogClass : public GaugeDialogGeneratedClass {
 
 public:
 
-	GaugeDialogClass(wxWindow* parent, const wxString& label);
+	GaugeDialogClass(wxWindow* parent, const wxString& title, const wxString& label);
 
 	/**
 	 * initialize this dialog's gauge (in pulse mode)

@@ -109,7 +109,7 @@ void mvceditor::TagFeatureClass::OnAppStartSequenceComplete(wxCommandEvent& even
 
 void mvceditor::TagFeatureClass::OnProjectWipeAndIndex(wxCommandEvent& event) {
 	if (App.Sequences.TagCacheWipeAndIndex()) {
-		IndexingDialog = new mvceditor::GaugeDialogClass(GetMainWindow(), _("Wiping and Rebuilding Index"));
+		IndexingDialog = new mvceditor::GaugeDialogClass(GetMainWindow(), _("Indexing"), _("Wiping and Rebuilding Index"));
 		IndexingDialog->Show();
 		IndexingDialog->Start();
 	}
@@ -163,7 +163,7 @@ void mvceditor::TagFeatureClass::OnJump(wxCommandEvent& event) {
 				}
 				else {
 					std::vector<mvceditor::TagClass> chosenResources;
-					mvceditor::ResourceSearchDialogClass dialog(GetMainWindow(), *this, term, chosenResources);
+					mvceditor::TagSearchDialogClass dialog(GetMainWindow(), *this, term, chosenResources);
 					dialog.Prepopulate(term, matches);
 					if (dialog.ShowModal() == wxOK) {
 						for (size_t i = 0; i < chosenResources.size(); ++i) {
@@ -179,7 +179,7 @@ void mvceditor::TagFeatureClass::OnJump(wxCommandEvent& event) {
 void mvceditor::TagFeatureClass::OnSearchForResource(wxCommandEvent& event) {
 	std::vector<mvceditor::TagClass> chosenResources;
 	wxString term;
-	mvceditor::ResourceSearchDialogClass dialog(GetMainWindow(), *this, term, chosenResources);
+	mvceditor::TagSearchDialogClass dialog(GetMainWindow(), *this, term, chosenResources);
 	if (dialog.ShowModal() == wxOK) {
 		for (size_t i = 0; i < chosenResources.size(); ++i) {
 			LoadPageFromResource(term, chosenResources[i]);
@@ -371,11 +371,11 @@ void mvceditor::TagFeatureClass::OnAppFileOpened(wxCommandEvent& event) {
 	event.Skip();
 }
 
-mvceditor::ResourceSearchDialogClass::ResourceSearchDialogClass(wxWindow* parent, 
+mvceditor::TagSearchDialogClass::TagSearchDialogClass(wxWindow* parent, 
 																TagFeatureClass& tag,
 																wxString& term,
 																std::vector<mvceditor::TagClass>& chosenResources)
-	: ResourceSearchDialogGeneratedClass(parent)
+	: TagSearchDialogGeneratedClass(parent)
 	, ResourceFeature(tag)
 	, ChosenResources(chosenResources) 
 	, MatchedResources() {
@@ -396,7 +396,7 @@ mvceditor::ResourceSearchDialogClass::ResourceSearchDialogClass(wxWindow* parent
 	ProjectChoice->Select(0);
 }
 
-void mvceditor::ResourceSearchDialogClass::OnSearchText(wxCommandEvent& event) {
+void mvceditor::TagSearchDialogClass::OnSearchText(wxCommandEvent& event) {
 	wxString text = SearchText->GetValue();
 	std::vector<mvceditor::ProjectClass*> projects;
 	bool showAllProjects = ProjectChoice->GetSelection() == 0;
@@ -425,7 +425,7 @@ void mvceditor::ResourceSearchDialogClass::OnSearchText(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::ResourceSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
+void mvceditor::TagSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
 	if (MatchedResources.size() == 1) {
 
 		// if there is only match, just take the user to it
@@ -465,7 +465,7 @@ void mvceditor::ResourceSearchDialogClass::OnSearchEnter(wxCommandEvent& event) 
 	}
 }
 
-void mvceditor::ResourceSearchDialogClass::ShowJumpToResults(const wxString& finderQuery, const std::vector<mvceditor::TagClass>& allMatches) {
+void mvceditor::TagSearchDialogClass::ShowJumpToResults(const wxString& finderQuery, const std::vector<mvceditor::TagClass>& allMatches) {
 	wxArrayString files;
 	for (size_t i = 0; i < allMatches.size(); ++i) {
 		files.Add(allMatches[i].GetFullPath());
@@ -514,7 +514,7 @@ void mvceditor::ResourceSearchDialogClass::ShowJumpToResults(const wxString& fin
 	MatchesLabel->SetLabel(wxString::Format(_("Found %d files. Please choose file(s) to open."), allMatches.size()));
 }
 
-void mvceditor::ResourceSearchDialogClass::OnOkButton(wxCommandEvent& event) {
+void mvceditor::TagSearchDialogClass::OnOkButton(wxCommandEvent& event) {
 	TransferDataFromWindow();
 	ChosenResources.clear();
 	for (size_t i = 0; i < MatchesList->GetCount(); ++i) {
@@ -528,17 +528,17 @@ void mvceditor::ResourceSearchDialogClass::OnOkButton(wxCommandEvent& event) {
 	EndModal(wxOK);
 }
 
-void mvceditor::ResourceSearchDialogClass::OnCancelButton(wxCommandEvent& event) {
+void mvceditor::TagSearchDialogClass::OnCancelButton(wxCommandEvent& event) {
 	EndModal(wxCANCEL);
 }
 
-void mvceditor::ResourceSearchDialogClass::Prepopulate(const wxString& term, const std::vector<mvceditor::TagClass> &matches) {
+void mvceditor::TagSearchDialogClass::Prepopulate(const wxString& term, const std::vector<mvceditor::TagClass> &matches) {
 	MatchedResources = matches;
 	SearchText->SetValue(term);
 	ShowJumpToResults(term, MatchedResources);
 }
 	
-void mvceditor::ResourceSearchDialogClass::OnHelpButton(wxCommandEvent& event) {
+void mvceditor::TagSearchDialogClass::OnHelpButton(wxCommandEvent& event) {
 	
   wxString help = wxString::FromAscii("Type in a file name, file name:page number, "
 		"class name,  or class name::method name. The resulting page will then be opened.\n\nExamples:\n\n"
@@ -562,7 +562,7 @@ void mvceditor::ResourceSearchDialogClass::OnHelpButton(wxCommandEvent& event) {
 	wxMessageBox(help, _("Resource Search Help"), wxOK, this);	
 }
 
-void mvceditor::ResourceSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
+void mvceditor::TagSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 	int keyCode = event.GetKeyCode();
 	size_t selection = MatchesList->GetSelection();
 	if (keyCode == WXK_DOWN) {		
@@ -592,7 +592,7 @@ void mvceditor::ResourceSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 	}
 }
 
-void mvceditor::ResourceSearchDialogClass::OnMatchesListDoubleClick(wxCommandEvent& event) {
+void mvceditor::TagSearchDialogClass::OnMatchesListDoubleClick(wxCommandEvent& event) {
 	TransferDataFromWindow();
 	ChosenResources.clear();
 	size_t selection = event.GetSelection();
@@ -605,7 +605,7 @@ void mvceditor::ResourceSearchDialogClass::OnMatchesListDoubleClick(wxCommandEve
 	EndModal(wxOK);
 }
 
-void mvceditor::ResourceSearchDialogClass::OnMatchesListKeyDown(wxKeyEvent& event) {
+void mvceditor::TagSearchDialogClass::OnMatchesListKeyDown(wxKeyEvent& event) {
 	if (event.GetKeyCode() == WXK_RETURN) {
 		wxCommandEvent cmdEvt;
 		OnSearchEnter(cmdEvt);
@@ -615,7 +615,7 @@ void mvceditor::ResourceSearchDialogClass::OnMatchesListKeyDown(wxKeyEvent& even
 	}
 }
 
-void mvceditor::ResourceSearchDialogClass::OnProjectChoice(wxCommandEvent& event) {
+void mvceditor::TagSearchDialogClass::OnProjectChoice(wxCommandEvent& event) {
 	OnSearchText(event);
 }
 
