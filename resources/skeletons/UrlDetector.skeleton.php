@@ -92,7 +92,7 @@ EOF;
 		// now send the detected URLs to either STDOUT or store in the 
 		// sqlite DB	
 		$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $outputDbFileName));
-		$urlResourceTable = new MvcEditor_UrlResourceTable($pdo);
+		$urlResourceTable = new MvcEditor_UrlTagTable($pdo);
 		$urlResourceTable->saveUrls($arrUrls, $sourceDir);
 		echo "Url dectection complete, written to {$outputDbFileName}\n";
 	}
@@ -124,7 +124,7 @@ EOF;
  * @param  boolean $doSkip               out parameter; if TRUE then this detector does not know how
  *                                       to detect URLs for the given source directory; this situation
  *                                       is different than zero URLs being detected.
- * @return MvcEditor_Url[]              array of MvcEditor_Url instances the detected URLs
+ * @return MvcEditor_UrlTag[]           array of MvcEditor_UrlTag instances the detected URLs
  */
 function detectUrls($sourceDir, $resourceDbFileName, $host, &$doSkip) {
 	$allUrls = array();
