@@ -5,8 +5,8 @@
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef __RunBrowserFeatureForms__
-#define __RunBrowserFeatureForms__
+#ifndef __ChooseUrlDialogWidget__
+#define __ChooseUrlDialogWidget__
 
 #include <wx/intl.h>
 
@@ -57,6 +57,7 @@ class ChooseUrlDialogGeneratedClass : public wxDialog
 		virtual void OnFilterTextEnter( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnProjectChoice( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnListItemSelected( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnListItemDoubleClicked( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnExtraChar( wxKeyEvent& event ) { event.Skip(); }
 		virtual void OnExtraText( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
@@ -69,4 +70,4 @@ class ChooseUrlDialogGeneratedClass : public wxDialog
 	
 };
 
-#endif //__RunBrowserFeatureForms__
+#endif //__ChooseUrlDialogWidget__

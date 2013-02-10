@@ -25,7 +25,7 @@
 #ifndef __MVCEDITOR_CHOOSEURLDIALOGCLASS_H__
 #define __MVCEDITOR_CHOOSEURLDIALOGCLASS_H__
 
-#include <features/wxformbuilder/RunBrowserFeatureForms.h>
+#include <widgets/wxformbuilder/ChooseUrlDialogWidget.h>
 #include <globals/UrlResourceClass.h>
 #include <globals/ProjectClass.h>
 #include <wx/wx.h>
@@ -61,6 +61,11 @@ protected:
 	 * be opened in the browser
 	 */
 	void OnListItemSelected(wxCommandEvent& event);
+	
+	/**
+	 * double click == ok button
+	 */
+	void OnListItemDoubleClicked(wxCommandEvent& event);
 
 	/**
 	 * events on the extra textbox, so that the list gets updates

@@ -26,7 +26,6 @@
 #define __RUNBROWSERFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
-#include <features/wxformbuilder/RunBrowserFeatureForms.h>
 #include <globals/UrlResourceClass.h>
 #include <widgets/GaugeDialogClass.h>
 #include <wx/string.h>

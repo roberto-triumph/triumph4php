@@ -5,7 +5,7 @@
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#include "RunBrowserFeatureForms.h"
+#include "ChooseUrlDialogWidget.h"
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -118,6 +118,7 @@ ChooseUrlDialogGeneratedClass::ChooseUrlDialogGeneratedClass( wxWindow* parent, 
 	Filter->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnFilterTextEnter ), NULL, this );
 	ProjectChoice->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnProjectChoice ), NULL, this );
 	UrlList->Connect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnListItemSelected ), NULL, this );
+	UrlList->Connect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnListItemDoubleClicked ), NULL, this );
 	ExtraText->Connect( wxEVT_CHAR, wxKeyEventHandler( ChooseUrlDialogGeneratedClass::OnExtraChar ), NULL, this );
 	ExtraText->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnExtraText ), NULL, this );
 	ButtonSizerOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnOkButton ), NULL, this );
@@ -131,6 +132,7 @@ ChooseUrlDialogGeneratedClass::~ChooseUrlDialogGeneratedClass()
 	Filter->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnFilterTextEnter ), NULL, this );
 	ProjectChoice->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnProjectChoice ), NULL, this );
 	UrlList->Disconnect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnListItemSelected ), NULL, this );
+	UrlList->Disconnect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnListItemDoubleClicked ), NULL, this );
 	ExtraText->Disconnect( wxEVT_CHAR, wxKeyEventHandler( ChooseUrlDialogGeneratedClass::OnExtraChar ), NULL, this );
 	ExtraText->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnExtraText ), NULL, this );
 	ButtonSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ChooseUrlDialogGeneratedClass::OnOkButton ), NULL, this );

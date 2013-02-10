@@ -73,6 +73,10 @@ void mvceditor::ChooseUrlDialogClass::OnOkButton(wxCommandEvent& event) {
 	}
 }
 
+void mvceditor::ChooseUrlDialogClass::OnListItemDoubleClicked(wxCommandEvent& event) {
+	OnOkButton(event);	
+}
+
 void mvceditor::ChooseUrlDialogClass::OnListItemSelected(wxCommandEvent& event) {
 	wxString finalUrl = UrlList->GetStringSelection() + ExtraText->GetValue();
 	FinalUrlLabel->SetLabel(finalUrl);
