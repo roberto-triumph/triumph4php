@@ -44,7 +44,7 @@ void mvceditor::TemplateFilesFeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
 }
 
 void mvceditor::TemplateFilesFeatureClass::OnTemplateFilesMenu(wxCommandEvent& event) {
-	if (App.Globals.UrlResourceFinder.Count() > 0) {
+	if (App.Globals.UrlTagFinder.Count() > 0) {
 		ShowPanel();
 	}
 	else {
@@ -87,18 +87,18 @@ void mvceditor::TemplateFilesFeatureClass::StartDetection() {
 
 	// the sequence class will own this pointer
 	mvceditor::CallStackActionClass* callStackAction =  new mvceditor::CallStackActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_CALL_STACK);
-	mvceditor::UrlResourceClass urlResource = App.Globals.CurrentUrl;
+	mvceditor::UrlTagClass urlTag = App.Globals.CurrentUrl;
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	wxFileName detectorDbFileName;
 	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
-		if (project->IsAPhpSourceFile(urlResource.FileName.GetFullPath())) {
+		if (project->IsAPhpSourceFile(urlTag.FileName.GetFullPath())) {
 			detectorDbFileName = project->DetectorDbFileName;
 			break;
 		}
 	}
-	callStackAction->SetCallStackStart(urlResource.FileName,
-		mvceditor::WxToIcu(urlResource.ClassName),
-		mvceditor::WxToIcu(urlResource.MethodName),
+	callStackAction->SetCallStackStart(urlTag.FileName,
+		mvceditor::WxToIcu(urlTag.ClassName),
+		mvceditor::WxToIcu(urlTag.MethodName),
 		detectorDbFileName);
 	actions.push_back(callStackAction);
 	actions.push_back(
@@ -107,8 +107,8 @@ void mvceditor::TemplateFilesFeatureClass::StartDetection() {
 	App.Sequences.Build(actions);
 }
 
-mvceditor::UrlResourceFinderClass& mvceditor::TemplateFilesFeatureClass::Urls() {
-	return App.Globals.UrlResourceFinder;
+mvceditor::UrlTagFinderClass& mvceditor::TemplateFilesFeatureClass::Urls() {
+	return App.Globals.UrlTagFinder;
 }
 
 void mvceditor::TemplateFilesFeatureClass::OpenFile(wxString file) {
@@ -120,7 +120,7 @@ void mvceditor::TemplateFilesFeatureClass::OpenFile(wxString file) {
 	}
 }
 
-void mvceditor::TemplateFilesFeatureClass::SetCurrentUrl(mvceditor::UrlResourceClass url) {
+void mvceditor::TemplateFilesFeatureClass::SetCurrentUrl(mvceditor::UrlTagClass url) {
 	App.Globals.CurrentUrl = url;
 }
 
@@ -147,7 +147,7 @@ mvceditor::TemplateFilesPanelClass::TemplateFilesPanelClass(wxWindow* parent, in
 
 void mvceditor::TemplateFilesPanelClass::UpdateControllers() {
 	wxArrayString wxControllers;
-	std::vector<wxString> controllers = Feature.App.Globals.UrlResourceFinder.AllControllerNames();
+	std::vector<wxString> controllers = Feature.App.Globals.UrlTagFinder.AllControllerNames();
 	for (size_t i = 0; i < controllers.size(); ++i) {
 		wxControllers.Add(controllers[i]);
 	}
@@ -210,9 +210,9 @@ void mvceditor::TemplateFilesPanelClass::OnActionChoice(wxCommandEvent& event) {
 	wxString controller = Controller->GetStringSelection();
 	wxString action = Action->GetStringSelection();
 
-	mvceditor::UrlResourceClass url;
-	std::vector<mvceditor::UrlResourceClass>::iterator it;
-	bool found = Feature.App.Globals.UrlResourceFinder.FindByClassMethod(controller, action, url);
+	mvceditor::UrlTagClass url;
+	std::vector<mvceditor::UrlTagClass>::iterator it;
+	bool found = Feature.App.Globals.UrlTagFinder.FindByClassMethod(controller, action, url);
 	if (found) {
 		StatusLabel->SetLabel(_("Detecting"));
 		Feature.SetCurrentUrl(url);
@@ -223,7 +223,7 @@ void mvceditor::TemplateFilesPanelClass::OnActionChoice(wxCommandEvent& event) {
 void mvceditor::TemplateFilesPanelClass::OnControllerChoice(wxCommandEvent &event) {
 	ClearResults();
 	wxString controller = event.GetString();
-	std::vector<wxString> methodNames = Feature.App.Globals.UrlResourceFinder.AllMethodNames(controller);
+	std::vector<wxString> methodNames = Feature.App.Globals.UrlTagFinder.AllMethodNames(controller);
 	for (size_t i = 0; i < methodNames.size(); ++i) {
 		Action->AppendString(methodNames[i]);
 	}
@@ -247,9 +247,9 @@ void mvceditor::TemplateFilesPanelClass::OnCurrentButton(wxCommandEvent &event) 
 
 	wxString current = Feature.CurrentFile();
 	wxFileName currentFileName(current);
-	std::vector<mvceditor::UrlResourceClass> urls;
-	Feature.App.Globals.UrlResourceFinder.FilterByFullPath(current, urls);
-	std::vector<mvceditor::UrlResourceClass>::iterator it;
+	std::vector<mvceditor::UrlTagClass> urls;
+	Feature.App.Globals.UrlTagFinder.FilterByFullPath(current, urls);
+	std::vector<mvceditor::UrlTagClass>::iterator it;
 	wxArrayString controllers;
 	wxArrayString methods;
 	for (it = urls.begin(); it != urls.end(); ++it) {

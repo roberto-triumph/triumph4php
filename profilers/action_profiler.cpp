@@ -25,7 +25,7 @@
 #include <wx/wx.h>
 #include <actions/SequenceClass.h>
 #include <actions/ProjectTagActionClass.h>
-#include <actions/UrlDetectorActionClass.h>
+#include <actions/UrlTagDetectorActionClass.h>
 #include <unicode/uclean.h>
 #include <soci/mysql/soci-mysql.h>
 #include <soci/sqlite3/soci-sqlite3.h>
@@ -136,7 +136,7 @@ void MyApp::BuildSequence() {
 		new mvceditor::ProjectTagActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE)
 	);
 	actions.push_back(
-		new mvceditor::UrlDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_DETECTOR)
+		new mvceditor::UrlTagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR)
 	);
 	Sequence.Build(actions);
 }

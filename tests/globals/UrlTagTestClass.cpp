@@ -24,7 +24,7 @@
  */
 #include <UnitTest++.h>
 #include <FileTestFixtureClass.h>
-#include <globals/UrlResourceClass.h>
+#include <globals/UrlTagClass.h>
 #include <globals/String.h>
 #include <globals/Assets.h>
 #include <soci/soci.h>
@@ -32,17 +32,17 @@
 #include <MvcEditorChecks.h>
 #include <string>
 
-class UrlResourceFixtureClass : public FileTestFixtureClass {
+class UrlTagFixtureClass : public FileTestFixtureClass {
 
 public:
 
-	mvceditor::UrlResourceFinderClass Finder;
+	mvceditor::UrlTagFinderClass Finder;
 	soci::session Session1,
 		Session2;
 	wxFileName DetectorDbFileName1,
 		DetectorDbFileName2;
 	
-	UrlResourceFixtureClass()
+	UrlTagFixtureClass()
 		: FileTestFixtureClass(wxT("url_resource_finder"))
 		, Finder()
 		, Session1()
@@ -70,7 +70,7 @@ public:
 		DetectorDbFileName2.Assign(TestProjectDir, wxT("detectors_2.sqlite"));
 	}
 
-	~UrlResourceFixtureClass() {
+	~UrlTagFixtureClass() {
 		Session1.close();
 		Session2.close();
 	}
@@ -118,43 +118,43 @@ public:
 
 };
 
-SUITE(UrlResourceTestClass) {
+SUITE(UrlTagTestClass) {
 
-TEST_FIXTURE(UrlResourceFixtureClass, FindByUrlMatch) {
+TEST_FIXTURE(UrlTagFixtureClass, FindByUrlMatch) {
 	CHECK_EQUAL(2, DatabaseRecordsNumDb1());
 
 	wxURI toFind(wxT("http://localhost/frontend.php"));
-	mvceditor::UrlResourceClass urlResource;
-	CHECK(Finder.FindByUrl(toFind, urlResource));
-	CHECK(toFind == urlResource.Url);
-	CHECK_EQUAL(wxT("http://localhost/frontend.php"), urlResource.Url.BuildURI());
+	mvceditor::UrlTagClass urlTag;
+	CHECK(Finder.FindByUrl(toFind, urlTag));
+	CHECK(toFind == urlTag.Url);
+	CHECK_EQUAL(wxT("http://localhost/frontend.php"), urlTag.Url.BuildURI());
 	
 	// use filename to compare because we want this test to run on windows and on
 	// linux without needing modifications
-	CHECK(wxFileName(wxT("/home/user/frontend.php")) == urlResource.FileName);
-	CHECK_EQUAL(wxT("FrontendController"), urlResource.ClassName);
-	CHECK_EQUAL(wxT("action"), urlResource.MethodName);
+	CHECK(wxFileName(wxT("/home/user/frontend.php")) == urlTag.FileName);
+	CHECK_EQUAL(wxT("FrontendController"), urlTag.ClassName);
+	CHECK_EQUAL(wxT("action"), urlTag.MethodName);
 
 	toFind.Create(wxT("http://localhost/index.php"));
-	CHECK(Finder.FindByUrl(toFind, urlResource));
-	CHECK(toFind == urlResource.Url);
-	CHECK_EQUAL(wxT("http://localhost/index.php"), urlResource.Url.BuildURI());
+	CHECK(Finder.FindByUrl(toFind, urlTag));
+	CHECK(toFind == urlTag.Url);
+	CHECK_EQUAL(wxT("http://localhost/index.php"), urlTag.Url.BuildURI());
 
 	// use filename to compare because we want this test to run on windows and on
 	// linux without needing modifications
-	CHECK(wxFileName(wxT("/home/user/welcome.php")) == urlResource.FileName);
-	CHECK_EQUAL(wxT("WelcomeController"), urlResource.ClassName);
-	CHECK_EQUAL(wxT("index"), urlResource.MethodName);
+	CHECK(wxFileName(wxT("/home/user/welcome.php")) == urlTag.FileName);
+	CHECK_EQUAL(wxT("WelcomeController"), urlTag.ClassName);
+	CHECK_EQUAL(wxT("index"), urlTag.MethodName);
 }
 
-TEST_FIXTURE(UrlResourceFixtureClass, FindByUrlNoMatch) {
+TEST_FIXTURE(UrlTagFixtureClass, FindByUrlNoMatch) {
 	wxURI toFind(wxT("http://localhost/backend.php"));
-	mvceditor::UrlResourceClass urlResource;
-	CHECK_EQUAL(false, Finder.FindByUrl(toFind, urlResource));
-	CHECK(urlResource.Url.BuildURI().IsEmpty());
+	mvceditor::UrlTagClass urlTag;
+	CHECK_EQUAL(false, Finder.FindByUrl(toFind, urlTag));
+	CHECK(urlTag.Url.BuildURI().IsEmpty());
 }
 
-TEST_FIXTURE(UrlResourceFixtureClass, FindUrlWithMultipleDbs) {
+TEST_FIXTURE(UrlTagFixtureClass, FindUrlWithMultipleDbs) {
 	InitDb2();
 	AddToDb2("http://localhost/frontend_dev.php",
 			"/home/user/project2/frontend.php", "FrontendController", "action");
@@ -162,58 +162,58 @@ TEST_FIXTURE(UrlResourceFixtureClass, FindUrlWithMultipleDbs) {
 	// test the find across multiple dbs
 	wxURI toFind;
 	toFind.Create(wxT("http://localhost/frontend_dev.php"));
-	mvceditor::UrlResourceClass urlResource;
+	mvceditor::UrlTagClass urlTag;
 
-	CHECK(Finder.FindByUrl(toFind, urlResource));
+	CHECK(Finder.FindByUrl(toFind, urlTag));
 	
-	CHECK(toFind == urlResource.Url);
+	CHECK(toFind == urlTag.Url);
 
 	// use filename to compare because we want this test to run on windows and on
 	// linux without needing modifications
-	CHECK(wxFileName(wxT("/home/user/project2/frontend.php")) == urlResource.FileName);
-	CHECK_EQUAL(wxT("FrontendController"), urlResource.ClassName);
-	CHECK_EQUAL(wxT("action"), urlResource.MethodName);
+	CHECK(wxFileName(wxT("/home/user/project2/frontend.php")) == urlTag.FileName);
+	CHECK_EQUAL(wxT("FrontendController"), urlTag.ClassName);
+	CHECK_EQUAL(wxT("action"), urlTag.MethodName);
 }
 
-TEST_FIXTURE(UrlResourceFixtureClass, FilterUrl) {
-	std::vector<mvceditor::UrlResourceClass> urls;
+TEST_FIXTURE(UrlTagFixtureClass, FilterUrl) {
+	std::vector<mvceditor::UrlTagClass> urls;
 	Finder.FilterUrls(wxT("front"), urls);
 	CHECK_VECTOR_SIZE(1, urls);
 	CHECK_EQUAL(wxT("http://localhost/frontend.php"), urls[0].Url.BuildURI());
 }
 
-TEST_FIXTURE(UrlResourceFixtureClass, FilterUrlWithMultipleDbs) {
+TEST_FIXTURE(UrlTagFixtureClass, FilterUrlWithMultipleDbs) {
 	InitDb2();
 	AddToDb2("http://localhost/frontend_dev.php",
 			"/home/user/project2/frontend.php", "FrontendController", "action");
 
 	// test the filter across multiple dbs
-	std::vector<mvceditor::UrlResourceClass> urls;
+	std::vector<mvceditor::UrlTagClass> urls;
 	Finder.FilterUrls(wxT("front"), urls);
 	CHECK_VECTOR_SIZE(2, urls);
 	CHECK_EQUAL(wxT("http://localhost/frontend.php"), urls[0].Url.BuildURI());
 	CHECK_EQUAL(wxT("http://localhost/frontend_dev.php"), urls[1].Url.BuildURI());
 }
 
-TEST_FIXTURE(UrlResourceFixtureClass, FilterUrlNoMatches) {
-	std::vector<mvceditor::UrlResourceClass> urls;
+TEST_FIXTURE(UrlTagFixtureClass, FilterUrlNoMatches) {
+	std::vector<mvceditor::UrlTagClass> urls;
 	Finder.FilterUrls(wxT("back"), urls);
 	CHECK_VECTOR_SIZE(0, urls);
 }
 
-TEST_FIXTURE(UrlResourceFixtureClass, DeleteUrlMatch) {
+TEST_FIXTURE(UrlTagFixtureClass, DeleteUrlMatch) {
 	wxURI toDelete(wxT("http://localhost/frontend.php"));
 	Finder.DeleteUrl(toDelete);
 	CHECK_EQUAL(1, DatabaseRecordsNumDb1());
 }
 
-TEST_FIXTURE(UrlResourceFixtureClass, DeleteUrlNoMatch) {
+TEST_FIXTURE(UrlTagFixtureClass, DeleteUrlNoMatch) {
 	wxURI toDelete(wxT("http://localhost/backend.php"));
 	Finder.DeleteUrl(toDelete);
 	CHECK_EQUAL(2, DatabaseRecordsNumDb1());
 }
 
-TEST_FIXTURE(UrlResourceFixtureClass, WipeAcrossMultipleDbs) {
+TEST_FIXTURE(UrlTagFixtureClass, WipeAcrossMultipleDbs) {
 	InitDb2();
 	AddToDb2("http://localhost/frontend_dev.php",
 			"/home/user/project2/frontend.php", "FrontendController", "action");

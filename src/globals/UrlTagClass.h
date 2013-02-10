@@ -35,7 +35,7 @@ namespace mvceditor {
  * A small class to hold an application URL. We tie together a URL and its PHP source
  * code entry point so that we can easily jump to it.
  */
-class UrlResourceClass {
+class UrlTagClass {
 	
 public:
 
@@ -68,26 +68,26 @@ public:
 	 */
 	wxString MethodName;
 	
-	UrlResourceClass();
+	UrlTagClass();
 
-	UrlResourceClass(wxString uri);
+	UrlTagClass(wxString uri);
 
 	/**
 	 * @param src this item will be a deep copy of src
 	 */
-	UrlResourceClass(const mvceditor::UrlResourceClass& src);
+	UrlTagClass(const mvceditor::UrlTagClass& src);
 
 	/**
 	 * @param src item to copy from. after a call to this method, this item will have the
 	 * same properties as src. This is a deep copy
 	 */
-	void Copy(const mvceditor::UrlResourceClass& src);
+	void Copy(const mvceditor::UrlTagClass& src);
 
 	/**
 	 * @param src item to copy from. after a call to this method, this item will have the
 	 * same properties as src. This is a deep copy
 	 */
-	mvceditor::UrlResourceClass& operator=(const mvceditor::UrlResourceClass& src);
+	mvceditor::UrlTagClass& operator=(const mvceditor::UrlTagClass& src);
 
 	void Reset();
 };
@@ -95,45 +95,45 @@ public:
 /**
  * Class that holds all of the URLs that MVC Editor has encountered.
  * We remember them because they are a relatively expensive to determine (have to
- * use the UrlDetectorActionClass).
+ * use the UrlTagDetectorActionClass).
  * The URLs here are a combination of detected URLs and URLs manually entered in by the user.
  * For a big application, there may be hundreds or thousands of these.
  */
-class UrlResourceFinderClass : public mvceditor::SqliteFinderClass {
+class UrlTagFinderClass : public mvceditor::SqliteFinderClass {
 
 public:
 		
-	UrlResourceFinderClass();
+	UrlTagFinderClass();
 
 	/**
 	 * check to see if the given URL exists in the Urls list; if the URL
-	 * exists then urlResource is filled with the contents of the URL.
+	 * exists then urlTag is filled with the contents of the URL.
 	 * This way, the caller can "resolve" a URL into a file name
 	 * Comparison is done in a case-insensitive manner
 	 *
 	 * @return TRUE if there is a URL resource that has the given URL member
 	 */
-	bool FindByUrl(const wxURI& url, UrlResourceClass& urlResource);
+	bool FindByUrl(const wxURI& url, UrlTagClass& urlTag);
 
 	/**
 	 * check to see if the given class / method is a URL entry point. If the class/method combination
-	 * exists then urlResource is filled with the contents of the URL.
+	 * exists then urlTag is filled with the contents of the URL.
 	 * This way, the caller can "resolve" a class/method name into a URL
 	 * Comparison is done in a case-insensitive manner
 	 *
 	 * @return TRUE if there is a URL resource that has the given controller class name AND method name
 	 */
-	bool FindByClassMethod(const wxString& className, const wxString& methodName, UrlResourceClass& urlResource);
+	bool FindByClassMethod(const wxString& className, const wxString& methodName, UrlTagClass& urlTag);
 
 	/**
-	 * Get all UrlResources that have their FullPath equal to fullPath. if the URL
-	 * exists then urlResource it is appended to urlResources;
+	 * Get all Url tags that have their FullPath equal to fullPath. if the URL
+	 * exists then urlTag it is appended to urlTags;
 	 * This way, the caller can "resolve" a file name into all of the URLs for that file.
 	 * Comparison is done in a case-insensitive manner
 	 *
 	 * @return TRUE if there is a URL resource that has the given full path
 	 */
-	bool FilterByFullPath(const wxString& fullPath, std::vector<UrlResourceClass>& urlResources);
+	bool FilterByFullPath(const wxString& fullPath, std::vector<UrlTagClass>& urlTags);
 
 	/**
 	 * Searches all URLs for the URLs that match the given filter; and will copy matching
@@ -142,7 +142,7 @@ public:
 	 *        No wildcards are accepted.
 	 * @param matchedUrls matching URLs will be pushed into the given vector.
 	 */
-	void FilterUrls(const wxString& filter, std::vector<UrlResourceClass>& matchedUrls);
+	void FilterUrls(const wxString& filter, std::vector<UrlTagClass>& matchedUrls);
 
 	/**
 	 * @param url the URL to delete from this list.

@@ -205,7 +205,7 @@ public:
 	 * (ResourceDbFileName or DetectorDbFileName are empty [the strings themselves
 	 * are empty]).  If the files already exist, this method does nothing.
 	 * This method does not initialize the dbs or create the schema. that is
-	 * done by either ParsedTagFinderClass or UrlResourceFinderClass
+	 * done by either ParsedTagFinderClass or UrlTagFinderClass
 	 */
 	bool TouchCacheDbs();
 

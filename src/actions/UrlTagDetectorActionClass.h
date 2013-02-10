@@ -32,15 +32,15 @@
 namespace mvceditor {
 
 /**
- * This class will load the detected url resources from a sqlite database.
- * This class is used so that the url resource cache is available as soon as the 
+ * This class will load the detected url tags from a sqlite database.
+ * This class is used so that the url tag cache is available as soon as the 
  * program starts.
  */
-class UrlResourceFinderInitActionClass : public mvceditor::InitializerActionClass {
+class UrlTagFinderInitActionClass : public mvceditor::InitializerActionClass {
 
 public:
 
-	UrlResourceFinderInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	UrlTagFinderInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 	void Work(mvceditor::GlobalsClass& globals);
 
@@ -53,7 +53,7 @@ public:
  * these params are required with the exception of
  * OutputDbFileName.
  */
-class UrlDetectorParamsClass {
+class UrlTagDetectorParamsClass {
 
 public:
 
@@ -106,7 +106,7 @@ public:
 	 */
 	wxString OutputDbFileName;
 
-	UrlDetectorParamsClass();
+	UrlTagDetectorParamsClass();
 
 	/**
 	 * build the command line to be executed for each url detector
@@ -118,11 +118,11 @@ public:
  * This class will run all url detectors across all enabled projects. This means that there is
  * one external process execution for each project source directory / url detector combination
  */
-class UrlDetectorActionClass : public mvceditor::ActionClass {
+class UrlTagDetectorActionClass : public mvceditor::ActionClass {
 
 public:
 
-	UrlDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	UrlTagDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 	bool Init(mvceditor::GlobalsClass& globals);
 
@@ -143,7 +143,7 @@ private:
 	 * we will perform one external call for each item in this
 	 * queue
 	 */
-	std::queue<mvceditor::UrlDetectorParamsClass> ParamsQueue;
+	std::queue<mvceditor::UrlTagDetectorParamsClass> ParamsQueue;
 
 	/**
 	 * pop the next set of params from the queue and call the php url 

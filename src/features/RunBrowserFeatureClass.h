@@ -26,7 +26,7 @@
 #define __RUNBROWSERFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
-#include <globals/UrlResourceClass.h>
+#include <globals/UrlTagClass.h>
 #include <widgets/GaugeDialogClass.h>
 #include <wx/string.h>
 #include <vector>
@@ -45,7 +45,7 @@ public:
 	 * These urls have a Project scope; when a project is opened any previous
 	 * URLs are cleared.
 	 */
-	std::vector<UrlResourceClass> RecentUrls;
+	std::vector<UrlTagClass> RecentUrls;
 
 	RunBrowserFeatureClass(mvceditor::AppClass& app);
 	

@@ -299,7 +299,7 @@ private:
 	/**
 	 * The URL to use for testing the detector
 	 */
-	mvceditor::UrlResourceClass TestUrl;
+	mvceditor::UrlTagClass TestUrl;
 
 	/**
 	 * to access the url resource list

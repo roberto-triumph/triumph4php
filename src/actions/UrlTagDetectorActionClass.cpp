@@ -22,34 +22,34 @@
  * @copyright  2012 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <actions/UrlDetectorActionClass.h>
+#include <actions/UrlTagDetectorActionClass.h>
 #include <search/RecursiveDirTraverserClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 
-static int ID_URL_DETECTOR_PROCESS = wxNewId();
+static int ID_URL_TAG_DETECTOR_PROCESS = wxNewId();
 
-mvceditor::UrlResourceFinderInitActionClass::UrlResourceFinderInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+mvceditor::UrlTagFinderInitActionClass::UrlTagFinderInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: InitializerActionClass(runningThreads, eventId) {
 
 }
 
-void mvceditor::UrlResourceFinderInitActionClass::Work(mvceditor::GlobalsClass& globals) {
-	SetStatus(_("Url Detect Init"));
-	globals.UrlResourceFinder.Close();
+void mvceditor::UrlTagFinderInitActionClass::Work(mvceditor::GlobalsClass& globals) {
+	SetStatus(_("Url Tag Finder Init"));
+	globals.UrlTagFinder.Close();
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
 		if (project->IsEnabled) {
-			globals.UrlResourceFinder.AttachExistingFile(project->DetectorDbFileName);
+			globals.UrlTagFinder.AttachExistingFile(project->DetectorDbFileName);
 		}
 	}
 }
 
-wxString mvceditor::UrlResourceFinderInitActionClass::GetLabel() const {
-	return wxT("URL Detection Init");
+wxString mvceditor::UrlTagFinderInitActionClass::GetLabel() const {
+	return wxT("URL Tag Finder Init");
 }
 
-mvceditor::UrlDetectorParamsClass::UrlDetectorParamsClass() 
+mvceditor::UrlTagDetectorParamsClass::UrlTagDetectorParamsClass() 
 	: PhpExecutablePath()
 	, PhpIncludePath()
 	, ScriptName()
@@ -60,7 +60,7 @@ mvceditor::UrlDetectorParamsClass::UrlDetectorParamsClass()
 
 }
 
-wxString mvceditor::UrlDetectorParamsClass::BuildCmdLine() const {
+wxString mvceditor::UrlTagDetectorParamsClass::BuildCmdLine() const {
 	wxString cmdLine;
 	cmdLine = wxT("\"") + PhpExecutablePath + wxT("\"") + 
 		wxT(" -d include_path=") + wxT("\"") + PhpIncludePath.GetPath() + wxT("\"") + 
@@ -72,15 +72,15 @@ wxString mvceditor::UrlDetectorParamsClass::BuildCmdLine() const {
 	return cmdLine;
 }
 
-mvceditor::UrlDetectorActionClass::UrlDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+mvceditor::UrlTagDetectorActionClass::UrlTagDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: ActionClass(runningThreads, eventId)
 	, Process(*this)
 	, ParamsQueue() {
 
 }
 
-bool mvceditor::UrlDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
-	SetStatus(_("Url Detect"));
+bool mvceditor::UrlTagDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
+	SetStatus(_("Url Tag Detect"));
 	while (!ParamsQueue.empty()) {
 		ParamsQueue.pop();
 	}
@@ -97,7 +97,7 @@ bool mvceditor::UrlDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
 			for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
 				if (source->Exists()) {
 					for (scriptName = detectorScripts.begin(); scriptName != detectorScripts.end(); ++scriptName) {
-						mvceditor::UrlDetectorParamsClass params;
+						mvceditor::UrlTagDetectorParamsClass params;
 						params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
 						params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset();
 						params.ScriptName = *scriptName;
@@ -123,35 +123,35 @@ bool mvceditor::UrlDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
 	return started;
 }
 
-bool mvceditor::UrlDetectorActionClass::DoAsync() {
+bool mvceditor::UrlTagDetectorActionClass::DoAsync() {
 	return false;
 }
 
-wxString mvceditor::UrlDetectorActionClass::GetLabel() const {
+wxString mvceditor::UrlTagDetectorActionClass::GetLabel() const {
 	return wxT("URL Detectors");
 }
 
-void mvceditor::UrlDetectorActionClass::BackgroundWork() {
+void mvceditor::UrlTagDetectorActionClass::BackgroundWork() {
 	// nothing is done in the background, we use ProcessWithHeartbeatClass
 	// here
 }
 
-void mvceditor::UrlDetectorActionClass::NextDetection() {
+void mvceditor::UrlTagDetectorActionClass::NextDetection() {
 	if (ParamsQueue.empty()) {
 		return;
 	}
-	mvceditor::UrlDetectorParamsClass params = ParamsQueue.front();
+	mvceditor::UrlTagDetectorParamsClass params = ParamsQueue.front();
 	ParamsQueue.pop();
 	wxArrayString dirs = params.SourceDir.GetDirs();
 	if (!dirs.IsEmpty()) {
-		SetStatus(_("Url Detect / ") +  dirs.back());
+		SetStatus(_("Url Tag Detect / ") +  dirs.back());
 	}
 	wxString cmdLine = params.BuildCmdLine();
 	long pid;
-	Process.Init(cmdLine, ID_URL_DETECTOR_PROCESS, pid);
+	Process.Init(cmdLine, ID_URL_TAG_DETECTOR_PROCESS, pid);
 }
 
-std::vector<wxString> mvceditor::UrlDetectorActionClass::DetectorScripts() {
+std::vector<wxString> mvceditor::UrlTagDetectorActionClass::DetectorScripts() {
 	std::vector<wxString> scripts;
 	mvceditor::RecursiveDirTraverserClass traverser(scripts);
 	wxDir globalDir;
@@ -165,7 +165,7 @@ std::vector<wxString> mvceditor::UrlDetectorActionClass::DetectorScripts() {
 	return  scripts;
 }
 
-void mvceditor::UrlDetectorActionClass::OnProcessComplete(wxCommandEvent &event) {
+void mvceditor::UrlTagDetectorActionClass::OnProcessComplete(wxCommandEvent &event) {
 	if (ParamsQueue.empty()) {
 		wxCommandEvent completeEvent(mvceditor::EVENT_WORK_COMPLETE);
 		PostEvent(completeEvent);
@@ -175,7 +175,7 @@ void mvceditor::UrlDetectorActionClass::OnProcessComplete(wxCommandEvent &event)
 	}
 }
 
-void mvceditor::UrlDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
+void mvceditor::UrlTagDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
 	mvceditor::EditorLogError(mvceditor::WARNING_OTHER, event.GetString());
 	if (ParamsQueue.empty()) {
 		wxCommandEvent completeEvent(mvceditor::EVENT_WORK_COMPLETE);
@@ -186,13 +186,13 @@ void mvceditor::UrlDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
 	}
 }
 
-void mvceditor::UrlDetectorActionClass::OnProcessInProgress(wxCommandEvent &event) {
+void mvceditor::UrlTagDetectorActionClass::OnProcessInProgress(wxCommandEvent &event) {
 	wxCommandEvent inProgressEvent(mvceditor::EVENT_WORK_IN_PROGRESS);
 	PostEvent(inProgressEvent);
 }
 
-BEGIN_EVENT_TABLE(mvceditor::UrlDetectorActionClass, mvceditor::ActionClass) 
-	EVT_COMMAND(ID_URL_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::UrlDetectorActionClass::OnProcessInProgress)
-	EVT_COMMAND(ID_URL_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::UrlDetectorActionClass::OnProcessComplete)
-	EVT_COMMAND(ID_URL_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::UrlDetectorActionClass::OnProcessFailed)
+BEGIN_EVENT_TABLE(mvceditor::UrlTagDetectorActionClass, mvceditor::ActionClass) 
+	EVT_COMMAND(ID_URL_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::UrlTagDetectorActionClass::OnProcessInProgress)
+	EVT_COMMAND(ID_URL_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::UrlTagDetectorActionClass::OnProcessComplete)
+	EVT_COMMAND(ID_URL_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::UrlTagDetectorActionClass::OnProcessFailed)
 END_EVENT_TABLE()

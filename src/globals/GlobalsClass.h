@@ -27,7 +27,7 @@
 #define __MVCEDITOR_STRUCTSCLASS_H__
 
 #include <globals/EnvironmentClass.h>
-#include <globals/UrlResourceClass.h>
+#include <globals/UrlTagClass.h>
 #include <globals/ProjectClass.h>
 #include <globals/SqlResourceFinderClass.h>
 #include <globals/TemplateFileClass.h>
@@ -60,7 +60,7 @@ public:
 	 * The URLs (entry points to the current project) that have been detected so far. Also holds the 
 	 * "current" URL.
 	 */
-	UrlResourceFinderClass UrlResourceFinder;
+	UrlTagFinderClass UrlTagFinder;
 	
 	/**
 	 * To grab SQL table meta data
@@ -82,7 +82,7 @@ public:
 	/**
 	 * the URL that the user chose to view files from
 	 */
-	UrlResourceClass CurrentUrl;
+	UrlTagClass CurrentUrl;
 
 	/**
 	 * The name of the browser that is selected

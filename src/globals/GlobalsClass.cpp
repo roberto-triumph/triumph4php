@@ -28,7 +28,7 @@
 mvceditor::GlobalsClass::GlobalsClass()
 	: Environment()
 	, TagCache()
-	, UrlResourceFinder()
+	, UrlTagFinder()
 	, SqlResourceFinder()
 	, DatabaseTags()
 	, Projects()
@@ -181,11 +181,11 @@ void mvceditor::GlobalsClass::AssignFileExtensions(mvceditor::ProjectClass &proj
 
 std::vector<mvceditor::TemplateFileClass> mvceditor::GlobalsClass::CurrentTemplates() const {
 	std::vector<mvceditor::TemplateFileClass> templates;
-	mvceditor::UrlResourceClass urlResource = CurrentUrl;
+	mvceditor::UrlTagClass urlTag = CurrentUrl;
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	wxFileName detectorDbFileName;
 	for (project = Projects.begin(); project != Projects.end(); ++project) {
-		if (project->IsAPhpSourceFile(urlResource.FileName.GetFullPath())) {
+		if (project->IsAPhpSourceFile(urlTag.FileName.GetFullPath())) {
 			detectorDbFileName = project->DetectorDbFileName;
 			break;
 		}

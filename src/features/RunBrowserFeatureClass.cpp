@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <features/RunBrowserFeatureClass.h>
-#include <actions/UrlDetectorActionClass.h>
+#include <actions/UrlTagDetectorActionClass.h>
 #include <globals/Errors.h>
 #include <widgets/ChooseUrlDialogClass.h>
 #include <MvcEditor.h>
@@ -214,7 +214,7 @@ void mvceditor::RunBrowserFeatureClass::OnUrlSearchTool(wxCommandEvent& event) {
 	if (IsUrlCacheStale) {
 		IsWaitingForUrlDetection = true;
 
-		mvceditor::UrlDetectorActionClass* action = new mvceditor::UrlDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_URL_DETECTOR);
+		mvceditor::UrlTagDetectorActionClass* action = new mvceditor::UrlTagDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR);
 		std::vector<mvceditor::ActionClass*> actions;
 		actions.push_back(action);
 		App.Sequences.Build(actions);
@@ -225,7 +225,7 @@ void mvceditor::RunBrowserFeatureClass::OnUrlSearchTool(wxCommandEvent& event) {
 		}
 		GaugeDialog = new mvceditor::GaugeDialogClass(GetMainWindow(), _("URL Detection"), _("Running URL Detection"));
 	}
-	else if (App.Globals.UrlResourceFinder.Count() > 0) {
+	else if (App.Globals.UrlTagFinder.Count() > 0) {
 		ShowUrlDialog();
 	}
 	else {
@@ -235,7 +235,7 @@ void mvceditor::RunBrowserFeatureClass::OnUrlSearchTool(wxCommandEvent& event) {
 }
 
 void mvceditor::RunBrowserFeatureClass::ShowUrlDialog() {
-	mvceditor::ChooseUrlDialogClass dialog(GetMainWindow(), App.Globals.UrlResourceFinder, App.Globals.Projects, App.Globals.CurrentUrl);
+	mvceditor::ChooseUrlDialogClass dialog(GetMainWindow(), App.Globals.UrlTagFinder, App.Globals.Projects, App.Globals.CurrentUrl);
 	if (wxOK == dialog.ShowModal() && !App.Globals.CurrentUrl.Url.BuildURI().IsEmpty()) {
 				
 		// 'select' the URL (make it the current in the toolbar)
@@ -245,7 +245,7 @@ void mvceditor::RunBrowserFeatureClass::ShowUrlDialog() {
 
 		// add it to the Recent list, or push up to the top of the Recent list if its already there
 		bool found = false;
-		for (std::vector<mvceditor::UrlResourceClass>::iterator it = RecentUrls.begin(); it  != RecentUrls.end(); ++it) {
+		for (std::vector<mvceditor::UrlTagClass>::iterator it = RecentUrls.begin(); it  != RecentUrls.end(); ++it) {
 			if (it->Url == App.Globals.CurrentUrl.Url) {
 				found = true;
 				RecentUrls.erase(it);
@@ -289,17 +289,17 @@ void mvceditor::RunBrowserFeatureClass::OnUrlToolMenuItem(wxCommandEvent& event)
 	// change both the data structure and the toolbar 
 	if (UrlMenu.get()) {
 		wxString name = UrlMenu->GetLabelText(event.GetId());
-		mvceditor::UrlResourceClass urlResource;
+		mvceditor::UrlTagClass urlTag;
 		bool found = false;
 		for (size_t i = 0; i < RecentUrls.size(); i++) {
 			if (RecentUrls[i].Url.BuildURI() == name) {
-				urlResource = RecentUrls[i]; 
+				urlTag = RecentUrls[i]; 
 				found = true;
 				break;
 			}
 		}
 		if (found) {
-			App.Globals.CurrentUrl = urlResource;
+			App.Globals.CurrentUrl = urlTag;
 			BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, name);
 			BrowserToolbar->Realize();
 			AuiManager->Update();
@@ -357,6 +357,6 @@ BEGIN_EVENT_TABLE(mvceditor::RunBrowserFeatureClass, wxEvtHandler)
 	// application events
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::RunBrowserFeatureClass::OnPreferencesSaved)
 	EVT_FEATURE_FILE_SAVED(mvceditor::RunBrowserFeatureClass::OnFileSaved)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_URL_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::RunBrowserFeatureClass::OnUrlDetectionComplete)
+	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::RunBrowserFeatureClass::OnUrlDetectionComplete)
 END_EVENT_TABLE()
 

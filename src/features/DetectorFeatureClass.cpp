@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <features/DetectorFeatureClass.h>
-#include <actions/UrlDetectorActionClass.h>
+#include <actions/UrlTagDetectorActionClass.h>
 #include <actions/TagDetectorActionClass.h>
 #include <actions/CallStackActionClass.h>
 #include <actions/TemplateFilesDetectorActionClass.h>
@@ -78,7 +78,7 @@ wxString mvceditor::UrlDetectorClass::TestCommandLine(const mvceditor::GlobalsCl
 	mvceditor::SourceClass source = project.Sources[0];
 	wxString rootUrl = globals.Environment.Apache.GetUrl(source.RootDirectory.GetPath());
 
-	mvceditor::UrlDetectorParamsClass params;
+	mvceditor::UrlTagDetectorParamsClass params;
 	params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
 	params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset();
 	params.ScriptName = detectorScriptFullPath;
@@ -714,7 +714,7 @@ void mvceditor::TemplateFilesDetectorPanelClass::UpdateProjects() {
 
 void mvceditor::TemplateFilesDetectorPanelClass::OnChooseUrlButton(wxCommandEvent& event) {
 	TestUrl.Reset();
-	mvceditor::ChooseUrlDialogClass dialog(this, Globals.UrlResourceFinder, Globals.Projects, TestUrl);
+	mvceditor::ChooseUrlDialogClass dialog(this, Globals.UrlTagFinder, Globals.Projects, TestUrl);
 	if (dialog.ShowModal() == wxOK) {
 		UrlToTest->SetValue(TestUrl.Url.BuildURI());
 		mvceditor::CallStackActionClass* action = new mvceditor::CallStackActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_CALL_STACK);
@@ -943,7 +943,7 @@ void mvceditor::DetectorFeatureClass::OnRunUrlDetectors(wxCommandEvent& event) {
 
 	// the sequence class will own this pointer
 	actions.push_back(
-		new mvceditor::UrlDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_URL_DETECTOR)	
+		new mvceditor::UrlTagDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR)	
 	);
 	App.Sequences.Build(actions);
 }
@@ -957,22 +957,22 @@ void mvceditor::DetectorFeatureClass::OnRunTemplateFileDetectors(wxCommandEvent&
 
 	// the sequence class will own this pointer
 	mvceditor::CallStackActionClass* callStackAction =  new mvceditor::CallStackActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_CALL_STACK);
-	mvceditor::UrlResourceClass urlResource = App.Globals.CurrentUrl;
+	mvceditor::UrlTagClass urlTag = App.Globals.CurrentUrl;
 	
-	if (!urlResource.Url.GetServer().IsEmpty() && urlResource.FileName.IsOk()
-		&& !urlResource.ClassName.IsEmpty() && !urlResource.MethodName.IsEmpty()) {
+	if (!urlTag.Url.GetServer().IsEmpty() && urlTag.FileName.IsOk()
+		&& !urlTag.ClassName.IsEmpty() && !urlTag.MethodName.IsEmpty()) {
 
 		std::vector<mvceditor::ProjectClass>::const_iterator project;
 		wxFileName detectorDbFileName;
 		for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
-			if (project->IsAPhpSourceFile(urlResource.FileName.GetFullPath())) {
+			if (project->IsAPhpSourceFile(urlTag.FileName.GetFullPath())) {
 				detectorDbFileName = project->DetectorDbFileName;
 				break;
 			}
 		}
-		callStackAction->SetCallStackStart(urlResource.FileName,
-			mvceditor::WxToIcu(urlResource.ClassName),
-			mvceditor::WxToIcu(urlResource.MethodName),
+		callStackAction->SetCallStackStart(urlTag.FileName,
+			mvceditor::WxToIcu(urlTag.ClassName),
+			mvceditor::WxToIcu(urlTag.MethodName),
 			detectorDbFileName);
 		actions.push_back(callStackAction);
 		actions.push_back(

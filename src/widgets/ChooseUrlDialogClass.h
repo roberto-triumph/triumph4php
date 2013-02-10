@@ -26,7 +26,7 @@
 #define __MVCEDITOR_CHOOSEURLDIALOGCLASS_H__
 
 #include <widgets/wxformbuilder/ChooseUrlDialogWidget.h>
-#include <globals/UrlResourceClass.h>
+#include <globals/UrlTagClass.h>
 #include <globals/ProjectClass.h>
 #include <wx/wx.h>
 
@@ -34,15 +34,15 @@ namespace mvceditor {
 
 /**
  * Small dialog that allows the user to choose a URL to run. Url list
- * is populated from the URL detector cache (UrlResourceFinder).
+ * is populated from the URL detector cache (UrlTagFinder).
  */
 class ChooseUrlDialogClass : public ChooseUrlDialogGeneratedClass {
 	
 public:
 
-	ChooseUrlDialogClass(wxWindow* parent, UrlResourceFinderClass& urls, 
+	ChooseUrlDialogClass(wxWindow* parent, UrlTagFinderClass& urls, 
 		const std::vector<mvceditor::ProjectClass>& projects,
-		UrlResourceClass& chosenUrl);
+		UrlTagClass& chosenUrl);
 	
 protected:
 
@@ -88,7 +88,7 @@ private:
 	 *
 	 * @return the urls that match filter. 
 	 */
-	std::vector<mvceditor::UrlResourceClass> GetFilteredUrls(const wxString& filter);
+	std::vector<mvceditor::UrlTagClass> GetFilteredUrls(const wxString& filter);
 
 	/**
 	 * Get the matching urls. a matching url is one that starts with the 
@@ -98,25 +98,25 @@ private:
 	 *
 	 * @return the urls that match filter and the project. 
 	 */
-	std::vector<mvceditor::UrlResourceClass> GetFilteredUrlsByProject(const wxString& filter, const mvceditor::ProjectClass& project);
+	std::vector<mvceditor::UrlTagClass> GetFilteredUrlsByProject(const wxString& filter, const mvceditor::ProjectClass& project);
 
 	/**
 	 * fills the url list box with the given urls. any previously existing urls in the 
 	 * list box are removed.
 	 */
-	void FillUrlList(const std::vector<mvceditor::UrlResourceClass>& urls);
+	void FillUrlList(const std::vector<mvceditor::UrlTagClass>& urls);
 
 	/**
 	 * The list of URLs, it will contain URLs that were detected and URLs that were input
 	 * by the user.
 	 * This pointer will not be owned by thie class
 	 */
-	UrlResourceFinderClass& UrlResourceFinder;
+	UrlTagFinderClass& UrlTagFinder;
 
 	/**
 	 * The URL that the user selected.
 	 */
-	UrlResourceClass& ChosenUrl;
+	UrlTagClass& ChosenUrl;
 
 	/**
 	 * The defined projects. Will use them to allow the user to filter URLs

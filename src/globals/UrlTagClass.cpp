@@ -22,14 +22,14 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <globals/UrlResourceClass.h>
+#include <globals/UrlTagClass.h>
 #include <globals/String.h>
 #include <globals/Assets.h>
 #include <globals/Sqlite.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <wx/ffile.h>
 
-mvceditor::UrlResourceClass::UrlResourceClass()
+mvceditor::UrlTagClass::UrlTagClass()
  : Url()
  , FileName()
  , ClassName()
@@ -37,14 +37,14 @@ mvceditor::UrlResourceClass::UrlResourceClass()
 
  }
 
-mvceditor::UrlResourceClass::UrlResourceClass(wxString uri) 
+mvceditor::UrlTagClass::UrlTagClass(wxString uri) 
 	: Url(uri)
 	, FileName()
 	, ClassName()
 	, MethodName() {
 }
 
-mvceditor::UrlResourceClass::UrlResourceClass(const mvceditor::UrlResourceClass& src)
+mvceditor::UrlTagClass::UrlTagClass(const mvceditor::UrlTagClass& src)
 	: Url()	
 	, FileName()
 	, ClassName()
@@ -52,31 +52,31 @@ mvceditor::UrlResourceClass::UrlResourceClass(const mvceditor::UrlResourceClass&
 	Copy(src);
  }
 
-void mvceditor::UrlResourceClass::Reset() {
+void mvceditor::UrlTagClass::Reset() {
 	Url.Create(wxT(""));
 	FileName.Clear();
 	ClassName.Clear();
 	MethodName.Clear();
 }
 
-mvceditor::UrlResourceClass& mvceditor::UrlResourceClass::operator=(const mvceditor::UrlResourceClass& src) {
+mvceditor::UrlTagClass& mvceditor::UrlTagClass::operator=(const mvceditor::UrlTagClass& src) {
 	Copy(src);
 	return *this;
 }
 
-void mvceditor::UrlResourceClass::Copy(const mvceditor::UrlResourceClass& src) {
+void mvceditor::UrlTagClass::Copy(const mvceditor::UrlTagClass& src) {
 	Url = src.Url;
 	FileName = src.FileName;
 	ClassName = src.ClassName.c_str();
 	MethodName = src.MethodName.c_str();
 }
 
-mvceditor::UrlResourceFinderClass::UrlResourceFinderClass()
+mvceditor::UrlTagFinderClass::UrlTagFinderClass()
 	: SqliteFinderClass() {
 		
 }
 
-bool mvceditor::UrlResourceFinderClass::FindByUrl(const wxURI& url, mvceditor::UrlResourceClass& urlResource) {
+bool mvceditor::UrlTagFinderClass::FindByUrl(const wxURI& url, mvceditor::UrlTagClass& urlTag) {
 	bool ret = false;
 	if (Sessions.empty()) {
 		return ret;
@@ -96,10 +96,10 @@ bool mvceditor::UrlResourceFinderClass::FindByUrl(const wxURI& url, mvceditor::U
 				soci::into(stdClassName), soci::into(stdMethodName) 
 			);
 			if (stmt.execute(true)) {
-				urlResource.Url.Create(mvceditor::CharToWx(stdUrl.c_str()));
-				urlResource.FileName.Assign(mvceditor::CharToWx(stdFullPath.c_str()));
-				urlResource.ClassName = mvceditor::CharToWx(stdClassName.c_str());
-				urlResource.MethodName = mvceditor::CharToWx(stdMethodName.c_str());
+				urlTag.Url.Create(mvceditor::CharToWx(stdUrl.c_str()));
+				urlTag.FileName.Assign(mvceditor::CharToWx(stdFullPath.c_str()));
+				urlTag.ClassName = mvceditor::CharToWx(stdClassName.c_str());
+				urlTag.MethodName = mvceditor::CharToWx(stdMethodName.c_str());
 				ret = true;
 			}
 		} catch (std::exception& e) {
@@ -111,7 +111,7 @@ bool mvceditor::UrlResourceFinderClass::FindByUrl(const wxURI& url, mvceditor::U
 	return ret;
 }
 
-bool mvceditor::UrlResourceFinderClass::FindByClassMethod(const wxString& className, const wxString& methodName, mvceditor::UrlResourceClass& urlResource) {
+bool mvceditor::UrlTagFinderClass::FindByClassMethod(const wxString& className, const wxString& methodName, mvceditor::UrlTagClass& urlTag) {
 	bool ret = false;
 	if (Sessions.empty()) {
 		return ret;
@@ -132,10 +132,10 @@ bool mvceditor::UrlResourceFinderClass::FindByClassMethod(const wxString& classN
 				soci::into(stdClassName), soci::into(stdMethodName) 
 			);
 			if (stmt.execute(true)) {
-				urlResource.Url.Create(mvceditor::CharToWx(stdUrl.c_str()));
-				urlResource.FileName.Assign(mvceditor::CharToWx(stdFullPath.c_str()));
-				urlResource.ClassName = mvceditor::CharToWx(stdClassName.c_str());
-				urlResource.MethodName = mvceditor::CharToWx(stdMethodName.c_str());
+				urlTag.Url.Create(mvceditor::CharToWx(stdUrl.c_str()));
+				urlTag.FileName.Assign(mvceditor::CharToWx(stdFullPath.c_str()));
+				urlTag.ClassName = mvceditor::CharToWx(stdClassName.c_str());
+				urlTag.MethodName = mvceditor::CharToWx(stdMethodName.c_str());
 				ret = true;
 			}
 		} catch (std::exception& e) {
@@ -147,7 +147,7 @@ bool mvceditor::UrlResourceFinderClass::FindByClassMethod(const wxString& classN
 	return ret;
 }
 
-bool mvceditor::UrlResourceFinderClass::FilterByFullPath(const wxString& fullPath, std::vector<UrlResourceClass>& urlResources) {
+bool mvceditor::UrlTagFinderClass::FilterByFullPath(const wxString& fullPath, std::vector<UrlTagClass>& urlTags) {
 	bool ret = false;
 	if (Sessions.empty()) {
 		return ret;
@@ -167,13 +167,13 @@ bool mvceditor::UrlResourceFinderClass::FilterByFullPath(const wxString& fullPat
 				soci::into(stdClassName), soci::into(stdMethodName) 
 			);
 			if (stmt.execute(true)) {
-				mvceditor::UrlResourceClass urlResource;
-				urlResource.Url.Create(mvceditor::CharToWx(stdUrl.c_str()));
-				urlResource.FileName.Assign(mvceditor::CharToWx(stdFullPath.c_str()));
-				urlResource.ClassName = mvceditor::CharToWx(stdClassName.c_str());
-				urlResource.MethodName = mvceditor::CharToWx(stdMethodName.c_str());
+				mvceditor::UrlTagClass urlTag;
+				urlTag.Url.Create(mvceditor::CharToWx(stdUrl.c_str()));
+				urlTag.FileName.Assign(mvceditor::CharToWx(stdFullPath.c_str()));
+				urlTag.ClassName = mvceditor::CharToWx(stdClassName.c_str());
+				urlTag.MethodName = mvceditor::CharToWx(stdMethodName.c_str());
 
-				urlResources.push_back(urlResource);
+				urlTags.push_back(urlTag);
 				ret = true;
 			}
 		} catch (std::exception& e) {
@@ -185,7 +185,7 @@ bool mvceditor::UrlResourceFinderClass::FilterByFullPath(const wxString& fullPat
 	return ret;
 }
 
-void mvceditor::UrlResourceFinderClass::DeleteUrl(const wxURI& url) {
+void mvceditor::UrlTagFinderClass::DeleteUrl(const wxURI& url) {
 	if (Sessions.empty()) {
 		return;
 	}
@@ -206,7 +206,7 @@ void mvceditor::UrlResourceFinderClass::DeleteUrl(const wxURI& url) {
 	}
 }
 
-void mvceditor::UrlResourceFinderClass::FilterUrls(const wxString& filter, std::vector<UrlResourceClass>& matchedUrls) {
+void mvceditor::UrlTagFinderClass::FilterUrls(const wxString& filter, std::vector<UrlTagClass>& matchedUrls) {
 	if (Sessions.empty()) {
 		return;
 	}
@@ -231,13 +231,13 @@ void mvceditor::UrlResourceFinderClass::FilterUrls(const wxString& filter, std::
 			);
 			if (stmt.execute(true)) {
 				do {
-					mvceditor::UrlResourceClass urlResource;
-					urlResource.Url.Create(mvceditor::CharToWx(stdUrl.c_str()));
-					urlResource.FileName.Assign(mvceditor::CharToWx(stdFullPath.c_str()));
-					urlResource.ClassName = mvceditor::CharToWx(stdClassName.c_str());
-					urlResource.MethodName = mvceditor::CharToWx(stdMethodName.c_str());
+					mvceditor::UrlTagClass urlTag;
+					urlTag.Url.Create(mvceditor::CharToWx(stdUrl.c_str()));
+					urlTag.FileName.Assign(mvceditor::CharToWx(stdFullPath.c_str()));
+					urlTag.ClassName = mvceditor::CharToWx(stdClassName.c_str());
+					urlTag.MethodName = mvceditor::CharToWx(stdMethodName.c_str());
 
-					matchedUrls.push_back(urlResource);
+					matchedUrls.push_back(urlTag);
 				} while (stmt.fetch());
 			}
 		}
@@ -249,7 +249,7 @@ void mvceditor::UrlResourceFinderClass::FilterUrls(const wxString& filter, std::
 	}
 }
 
-void mvceditor::UrlResourceFinderClass::Wipe() {
+void mvceditor::UrlTagFinderClass::Wipe() {
 	if (Sessions.empty()) {
 		return;
 	}
@@ -265,7 +265,7 @@ void mvceditor::UrlResourceFinderClass::Wipe() {
 	}
 }
 
-int mvceditor::UrlResourceFinderClass::Count() {
+int mvceditor::UrlTagFinderClass::Count() {
 	int totalCount = 0;
 	if (Sessions.empty()) {
 		return totalCount;
@@ -290,7 +290,7 @@ int mvceditor::UrlResourceFinderClass::Count() {
 	return totalCount;
 }
 
-std::vector<wxString> mvceditor::UrlResourceFinderClass::AllControllerNames() {
+std::vector<wxString> mvceditor::UrlTagFinderClass::AllControllerNames() {
 	std::vector<wxString> controllerNames;
 	std::vector<soci::session*>::iterator session;
 	std::string controller;
@@ -314,7 +314,7 @@ std::vector<wxString> mvceditor::UrlResourceFinderClass::AllControllerNames() {
 	return controllerNames;
 }
 
-std::vector<wxString> mvceditor::UrlResourceFinderClass::AllMethodNames(const wxString& controllerClassName) {
+std::vector<wxString> mvceditor::UrlTagFinderClass::AllMethodNames(const wxString& controllerClassName) {
 	std::vector<wxString> methodNames;
 	std::vector<soci::session*>::iterator session;
 	std::string methodName;

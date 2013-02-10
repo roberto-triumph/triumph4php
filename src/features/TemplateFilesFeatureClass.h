@@ -49,11 +49,11 @@ public:
 	
 	TemplateFilesFeatureClass(mvceditor::AppClass& app);
 
-	void SetCurrentUrl(mvceditor::UrlResourceClass url);
+	void SetCurrentUrl(mvceditor::UrlTagClass url);
 	
 	void AddViewMenuItems(wxMenu* viewMenu);
 
-	UrlResourceFinderClass& Urls();
+	UrlTagFinderClass& Urls();
 
 	/**
 	 * starts the view file detection process. This is an asynchronous operation.
