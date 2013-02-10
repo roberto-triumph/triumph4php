@@ -26,7 +26,7 @@
 #include <actions/UrlTagDetectorActionClass.h>
 #include <actions/TagDetectorActionClass.h>
 #include <actions/CallStackActionClass.h>
-#include <actions/TemplateFilesDetectorActionClass.h>
+#include <actions/TemplateFileTagsDetectorActionClass.h>
 #include <actions/DatabaseDetectorActionClass.h>
 #include <actions/ConfigDetectorActionClass.h>
 #include <widgets/TreeItemDataStringClass.h>
@@ -127,7 +127,7 @@ bool  mvceditor::TemplateFilesDetectorClass::CanTest(const mvceditor::GlobalsCla
 
 wxString mvceditor::TemplateFilesDetectorClass::TestCommandLine(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project,
 																const wxString& detectorScriptFullPath) {
-	mvceditor::TemplateFilesDetectorParamsClass params;
+	mvceditor::TemplateFileTagsDetectorParamsClass params;
 	mvceditor::SourceClass source = project.Sources[0];
 
 	params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
@@ -976,7 +976,7 @@ void mvceditor::DetectorFeatureClass::OnRunTemplateFileDetectors(wxCommandEvent&
 			detectorDbFileName);
 		actions.push_back(callStackAction);
 		actions.push_back(
-			new mvceditor::TemplateFilesDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_DETECTOR)
+			new mvceditor::TemplateFileTagsDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR)
 		);
 		App.Sequences.Build(actions);
 	}

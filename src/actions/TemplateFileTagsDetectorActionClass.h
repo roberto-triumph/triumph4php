@@ -37,7 +37,7 @@ namespace mvceditor {
  * these params are required with the exception of
  * OutputDbFileName.
  */
-class TemplateFilesDetectorParamsClass {
+class TemplateFileTagsDetectorParamsClass {
 
 public:
 
@@ -83,7 +83,7 @@ public:
 	 */
 	wxString OutputDbFileName;
 
-	TemplateFilesDetectorParamsClass();
+	TemplateFileTagsDetectorParamsClass();
 
 	/**
 	 * build the command line to be executed for each url detector
@@ -101,11 +101,11 @@ public:
  * can be used to build the call stack. This means that the CallStackActionClass should be run immediately before
  * this action.
  */
-class TemplateFilesDetectorActionClass : public mvceditor::ActionClass {
+class TemplateFileTagsDetectorActionClass : public mvceditor::ActionClass {
 
 public:
 
-	TemplateFilesDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	TemplateFileTagsDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 	bool Init(mvceditor::GlobalsClass& globals);
 
@@ -126,7 +126,7 @@ private:
 	 * we will perform one external call for each item in this
 	 * queue
 	 */
-	std::queue<mvceditor::TemplateFilesDetectorParamsClass> ParamsQueue;
+	std::queue<mvceditor::TemplateFileTagsDetectorParamsClass> ParamsQueue;
 
 	/**
 	 * pop the next set of params from the queue and call the php url 

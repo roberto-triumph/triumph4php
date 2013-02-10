@@ -22,8 +22,8 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_TEMPLATEFILECLASS_H__
-#define __MVCEDITOR_TEMPLATEFILECLASS_H__
+#ifndef __MVCEDITOR_TemplateFileTagClass_H__
+#define __MVCEDITOR_TemplateFileTagClass_H__
 
 #include <wx/string.h>
 #include <wx/filename.h>
@@ -37,7 +37,7 @@ namespace mvceditor {
  * template files detectors. It holds the full path of the template file as well
  * as the names of the variables that the controller assigned to this template file.
  */
-class TemplateFileClass {
+class TemplateFileTagClass {
 
 public:
 
@@ -51,13 +51,13 @@ public:
 	 */
 	std::vector<wxString> Variables;
 
-	TemplateFileClass();
+	TemplateFileTagClass();
 
-	TemplateFileClass(const mvceditor::TemplateFileClass& src);
+	TemplateFileTagClass(const mvceditor::TemplateFileTagClass& src);
 
-	void Copy(const mvceditor::TemplateFileClass& src);
+	void Copy(const mvceditor::TemplateFileTagClass& src);
 
-	mvceditor::TemplateFileClass& operator=(const mvceditor::TemplateFileClass& src);
+	mvceditor::TemplateFileTagClass& operator=(const mvceditor::TemplateFileTagClass& src);
 
 	void Init(const wxString& fullPath, const std::vector<wxString>& variables);
 
@@ -66,11 +66,11 @@ public:
 /**
  * This class will load template file rows from the detector DB into memeory
  */
-class TemplateFileTagClass {
+class TemplateFileTagFinderClass {
 
 public:
 
-	TemplateFileTagClass();
+	TemplateFileTagFinderClass();
 
 	/**
 	 * Connect to the given db; will disconnect from the previous db
@@ -83,7 +83,7 @@ public:
 	 * @return all of the templates that are in the detectors db file that was last
 	 *  initialized.
 	 */
-	std::vector<mvceditor::TemplateFileClass> All();
+	std::vector<mvceditor::TemplateFileTagClass> All();
 
 private:
 

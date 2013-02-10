@@ -22,26 +22,26 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <globals/TemplateFileClass.h>
+#include <globals/TemplateFileTagClass.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <globals/String.h>
 #include <globals/Assets.h>
 #include <globals/Sqlite.h>
 #include <wx/tokenzr.h>
 
-mvceditor::TemplateFileClass::TemplateFileClass()
+mvceditor::TemplateFileTagClass::TemplateFileTagClass()
 	:  FullPath()
 	, Variables() {
 
 }
 
-mvceditor::TemplateFileClass::TemplateFileClass(const mvceditor::TemplateFileClass& src)
+mvceditor::TemplateFileTagClass::TemplateFileTagClass(const mvceditor::TemplateFileTagClass& src)
 	: FullPath()
 	, Variables() {
 	Copy(src);
 }
 
-void mvceditor::TemplateFileClass::Copy(const mvceditor::TemplateFileClass& src) {
+void mvceditor::TemplateFileTagClass::Copy(const mvceditor::TemplateFileTagClass& src) {
 	
 	// copy is thread-safe, wxString needs to be cloned
 	FullPath = src.FullPath.c_str();
@@ -51,23 +51,23 @@ void mvceditor::TemplateFileClass::Copy(const mvceditor::TemplateFileClass& src)
 	}
 }
 
-mvceditor::TemplateFileClass& mvceditor::TemplateFileClass::operator=(const mvceditor::TemplateFileClass& src) {
+mvceditor::TemplateFileTagClass& mvceditor::TemplateFileTagClass::operator=(const mvceditor::TemplateFileTagClass& src) {
 	Copy(src);
 	return *this;
 }
 
-void mvceditor::TemplateFileClass::Init(const wxString& fullPath, const std::vector<wxString>& variables) {
+void mvceditor::TemplateFileTagClass::Init(const wxString& fullPath, const std::vector<wxString>& variables) {
 	FullPath = fullPath;
 	Variables = variables;
 }
 
-mvceditor::TemplateFileTagClass::TemplateFileTagClass()
+mvceditor::TemplateFileTagFinderClass::TemplateFileTagFinderClass()
 	: Session() 
 	, IsInitialized(false) {
 
 }
 
-void mvceditor::TemplateFileTagClass::Init(const wxFileName& detectorDbFileName) {
+void mvceditor::TemplateFileTagFinderClass::Init(const wxFileName& detectorDbFileName) {
 	IsInitialized = false;
 	try {
 		Session.close();
@@ -84,8 +84,8 @@ void mvceditor::TemplateFileTagClass::Init(const wxFileName& detectorDbFileName)
 	}
 }
 
-std::vector<mvceditor::TemplateFileClass> mvceditor::TemplateFileTagClass::All() {
-	std::vector<mvceditor::TemplateFileClass> templates;
+std::vector<mvceditor::TemplateFileTagClass> mvceditor::TemplateFileTagFinderClass::All() {
+	std::vector<mvceditor::TemplateFileTagClass> templates;
 	if (!IsInitialized) {
 		return templates;
 	}
@@ -98,7 +98,7 @@ std::vector<mvceditor::TemplateFileClass> mvceditor::TemplateFileTagClass::All()
 	);
 	if (stmt.execute(true)) {
 		do {
-			mvceditor::TemplateFileClass templateFile;
+			mvceditor::TemplateFileTagClass templateFile;
 			templateFile.FullPath = mvceditor::CharToWx(fullPath.c_str());
 			wxString wxVariables = mvceditor::CharToWx(variables.c_str());
 			wxStringTokenizer tok(wxVariables, wxT(","));

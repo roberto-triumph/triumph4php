@@ -30,7 +30,7 @@
 #include <globals/UrlTagClass.h>
 #include <globals/ProjectClass.h>
 #include <globals/SqlResourceFinderClass.h>
-#include <globals/TemplateFileClass.h>
+#include <globals/TemplateFileTagClass.h>
 #include <language/TagCacheClass.h>
 #include <vector>
 
@@ -220,7 +220,7 @@ public:
 	// since this method just reads from the detector db, the templates
 	// are for the url as picked in the template files panel and NOT
 	// the URL dialog.
-	std::vector<mvceditor::TemplateFileClass> CurrentTemplates() const;
+	std::vector<mvceditor::TemplateFileTagClass> CurrentTemplates() const;
 
 };
 

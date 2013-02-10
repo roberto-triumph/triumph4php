@@ -179,8 +179,8 @@ void mvceditor::GlobalsClass::AssignFileExtensions(mvceditor::ProjectClass &proj
 	project.MiscFileExtensions = GetMiscFileExtensions();
 }
 
-std::vector<mvceditor::TemplateFileClass> mvceditor::GlobalsClass::CurrentTemplates() const {
-	std::vector<mvceditor::TemplateFileClass> templates;
+std::vector<mvceditor::TemplateFileTagClass> mvceditor::GlobalsClass::CurrentTemplates() const {
+	std::vector<mvceditor::TemplateFileTagClass> templates;
 	mvceditor::UrlTagClass urlTag = CurrentUrl;
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	wxFileName detectorDbFileName;
@@ -191,7 +191,7 @@ std::vector<mvceditor::TemplateFileClass> mvceditor::GlobalsClass::CurrentTempla
 		}
 	}
 	if (detectorDbFileName.IsOk()) {
-		mvceditor::TemplateFileTagClass fileTags;
+		mvceditor::TemplateFileTagFinderClass fileTags;
 		fileTags.Init(detectorDbFileName);
 		templates = fileTags.All();
 	}

@@ -22,14 +22,14 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <actions/TemplateFilesDetectorActionClass.h>
+#include <actions/TemplateFileTagsDetectorActionClass.h>
 #include <globals/Assets.h>
 #include <globals/Errors.h>
 #include <search/RecursiveDirTraverserClass.h>
 
-static int ID_TEMPLATE_FILES_DETECTOR_PROCESS = wxNewId();
+static int ID_TEMPLATE_FILE_TAGS_DETECTOR_PROCESS = wxNewId();
 
-mvceditor::TemplateFilesDetectorParamsClass::TemplateFilesDetectorParamsClass() 
+mvceditor::TemplateFileTagsDetectorParamsClass::TemplateFileTagsDetectorParamsClass() 
 	: PhpExecutablePath()
 	, PhpIncludePath()
 	, ScriptName()
@@ -39,7 +39,7 @@ mvceditor::TemplateFilesDetectorParamsClass::TemplateFilesDetectorParamsClass()
 
 }
 
-wxString mvceditor::TemplateFilesDetectorParamsClass::BuildCmdLine() const {
+wxString mvceditor::TemplateFileTagsDetectorParamsClass::BuildCmdLine() const {
 	wxString cmdLine;
 	cmdLine = wxT("\"") + PhpExecutablePath + wxT("\"") + 
 		wxT(" -d include_path=") + wxT("\"") + PhpIncludePath.GetPath() + wxT("\"") + 
@@ -50,15 +50,15 @@ wxString mvceditor::TemplateFilesDetectorParamsClass::BuildCmdLine() const {
 	return cmdLine;
 }
 
-mvceditor::TemplateFilesDetectorActionClass::TemplateFilesDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+mvceditor::TemplateFileTagsDetectorActionClass::TemplateFileTagsDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: ActionClass(runningThreads, eventId)
 	, Process(*this)
 	, ParamsQueue() {
 
 }
 
-bool mvceditor::TemplateFilesDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
-	SetStatus(_("Template Detect"));
+bool mvceditor::TemplateFileTagsDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
+	SetStatus(_("Template File Tags Detect"));
 	while (!ParamsQueue.empty()) {
 		ParamsQueue.pop();
 	}
@@ -74,7 +74,7 @@ bool mvceditor::TemplateFilesDetectorActionClass::Init(mvceditor::GlobalsClass& 
 		for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
 			if (source->Exists()) {
 				for (scriptName = detectorScripts.begin(); scriptName != detectorScripts.end(); ++scriptName) {
-					mvceditor::TemplateFilesDetectorParamsClass params;
+					mvceditor::TemplateFileTagsDetectorParamsClass params;
 					params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
 					params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset();
 					params.ScriptName = *scriptName;
@@ -98,36 +98,36 @@ bool mvceditor::TemplateFilesDetectorActionClass::Init(mvceditor::GlobalsClass& 
 	return started;
 }
 
-bool mvceditor::TemplateFilesDetectorActionClass::DoAsync() {
+bool mvceditor::TemplateFileTagsDetectorActionClass::DoAsync() {
 	return false;
 }
 
-wxString mvceditor::TemplateFilesDetectorActionClass::GetLabel() const {
-	return wxT("Template File Detectors");
+wxString mvceditor::TemplateFileTagsDetectorActionClass::GetLabel() const {
+	return wxT("Template File Tags Detector");
 }
 
-void mvceditor::TemplateFilesDetectorActionClass::BackgroundWork() {
+void mvceditor::TemplateFileTagsDetectorActionClass::BackgroundWork() {
 	// nothing is done in the background, we use ProcessWithHeartbeatClass
 	// here
 }
 
-void mvceditor::TemplateFilesDetectorActionClass::NextDetection() {
+void mvceditor::TemplateFileTagsDetectorActionClass::NextDetection() {
 	if (ParamsQueue.empty()) {
 		return;
 	}
-	mvceditor::TemplateFilesDetectorParamsClass params = ParamsQueue.front();
+	mvceditor::TemplateFileTagsDetectorParamsClass params = ParamsQueue.front();
 	ParamsQueue.pop();
 
 	wxArrayString dirs = params.SourceDir.GetDirs();
 	if (!dirs.IsEmpty()) {
-		SetStatus(_("Template Detect / ") + dirs.back());
+		SetStatus(_("Template File Tag Detect / ") + dirs.back());
 	}
 	wxString cmdLine = params.BuildCmdLine();
 	long pid;
-	Process.Init(cmdLine, ID_TEMPLATE_FILES_DETECTOR_PROCESS, pid);
+	Process.Init(cmdLine, ID_TEMPLATE_FILE_TAGS_DETECTOR_PROCESS, pid);
 }
 
-std::vector<wxString> mvceditor::TemplateFilesDetectorActionClass::DetectorScripts() {
+std::vector<wxString> mvceditor::TemplateFileTagsDetectorActionClass::DetectorScripts() {
 	std::vector<wxString> scripts;
 	mvceditor::RecursiveDirTraverserClass traverser(scripts);
 	wxDir globalDir;
@@ -141,7 +141,7 @@ std::vector<wxString> mvceditor::TemplateFilesDetectorActionClass::DetectorScrip
 	return  scripts;
 }
 
-void mvceditor::TemplateFilesDetectorActionClass::OnProcessComplete(wxCommandEvent &event) {
+void mvceditor::TemplateFileTagsDetectorActionClass::OnProcessComplete(wxCommandEvent &event) {
 	if (ParamsQueue.empty()) {
 		wxCommandEvent completeEvent(mvceditor::EVENT_WORK_COMPLETE);
 		PostEvent(completeEvent);
@@ -151,7 +151,7 @@ void mvceditor::TemplateFilesDetectorActionClass::OnProcessComplete(wxCommandEve
 	}
 }
 
-void mvceditor::TemplateFilesDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
+void mvceditor::TemplateFileTagsDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
 	mvceditor::EditorLogError(mvceditor::WARNING_OTHER, event.GetString());
 	if (ParamsQueue.empty()) {
 		wxCommandEvent completeEvent(mvceditor::EVENT_WORK_COMPLETE);
@@ -162,13 +162,13 @@ void mvceditor::TemplateFilesDetectorActionClass::OnProcessFailed(wxCommandEvent
 	}
 }
 
-void mvceditor::TemplateFilesDetectorActionClass::OnProcessInProgress(wxCommandEvent &event) {
+void mvceditor::TemplateFileTagsDetectorActionClass::OnProcessInProgress(wxCommandEvent &event) {
 	wxCommandEvent inProgressEvent(mvceditor::EVENT_WORK_IN_PROGRESS);
 	PostEvent(inProgressEvent);
 }
 
-BEGIN_EVENT_TABLE(mvceditor::TemplateFilesDetectorActionClass, mvceditor::ActionClass) 
-	EVT_COMMAND(ID_TEMPLATE_FILES_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::TemplateFilesDetectorActionClass::OnProcessInProgress)
-	EVT_COMMAND(ID_TEMPLATE_FILES_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::TemplateFilesDetectorActionClass::OnProcessComplete)
-	EVT_COMMAND(ID_TEMPLATE_FILES_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::TemplateFilesDetectorActionClass::OnProcessFailed)
+BEGIN_EVENT_TABLE(mvceditor::TemplateFileTagsDetectorActionClass, mvceditor::ActionClass) 
+	EVT_COMMAND(ID_TEMPLATE_FILE_TAGS_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::TemplateFileTagsDetectorActionClass::OnProcessInProgress)
+	EVT_COMMAND(ID_TEMPLATE_FILE_TAGS_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::TemplateFileTagsDetectorActionClass::OnProcessComplete)
+	EVT_COMMAND(ID_TEMPLATE_FILE_TAGS_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::TemplateFileTagsDetectorActionClass::OnProcessFailed)
 END_EVENT_TABLE()

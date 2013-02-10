@@ -26,7 +26,7 @@
 #include <code_control/CodeControlClass.h>
 #include <globals/String.h>
 #include <globals/Assets.h>
-#include <globals/TemplateFileClass.h>
+#include <globals/TemplateFileTagClass.h>
 #include <wx/tokenzr.h>
 #include <wx/filename.h>
 #include <algorithm>
@@ -525,8 +525,8 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 			}
 		}
 		// auto complete any template variables
-		std::vector<mvceditor::TemplateFileClass> templateFiles = Globals->CurrentTemplates();
-		std::vector<mvceditor::TemplateFileClass>::const_iterator templateFile;
+		std::vector<mvceditor::TemplateFileTagClass> templateFiles = Globals->CurrentTemplates();
+		std::vector<mvceditor::TemplateFileTagClass>::const_iterator templateFile;
 		std::vector<wxString>::const_iterator variable;
 
 		for (templateFile =  templateFiles.begin(); templateFile != templateFiles.end(); ++templateFile) {

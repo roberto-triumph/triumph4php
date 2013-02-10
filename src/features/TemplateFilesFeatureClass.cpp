@@ -25,9 +25,9 @@
 #include <features/TemplateFilesFeatureClass.h>
 #include <widgets/TreeItemDataStringClass.h>
 #include <globals/Errors.h>
-#include <globals/TemplateFileClass.h>
+#include <globals/TemplateFileTagClass.h>
 #include <actions/CallStackActionClass.h>
-#include <actions/TemplateFilesDetectorActionClass.h>
+#include <actions/TemplateFileTagsDetectorActionClass.h>
 #include <actions/SequenceClass.h>
 #include <MvcEditor.h>
 #include <wx/artprov.h>
@@ -102,7 +102,7 @@ void mvceditor::TemplateFilesFeatureClass::StartDetection() {
 		detectorDbFileName);
 	actions.push_back(callStackAction);
 	actions.push_back(
-		new mvceditor::TemplateFilesDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_DETECTOR)
+		new mvceditor::TemplateFileTagsDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR)
 	);
 	App.Sequences.Build(actions);
 }
@@ -157,7 +157,7 @@ void mvceditor::TemplateFilesPanelClass::UpdateControllers() {
 }
 
 void mvceditor::TemplateFilesPanelClass::UpdateResults() {		
-	std::vector<mvceditor::TemplateFileClass> currentTemplates = Feature.App.Globals.CurrentTemplates();
+	std::vector<mvceditor::TemplateFileTagClass> currentTemplates = Feature.App.Globals.CurrentTemplates();
 	StatusLabel->SetLabel(wxString::Format(_("Found %d view files"), currentTemplates.size()));
 	FileTree->DeleteAllItems();
 
@@ -186,7 +186,7 @@ void mvceditor::TemplateFilesPanelClass::UpdateResults() {
 	TemplateVariablesTree->DeleteAllItems();
 	parent = TemplateVariablesTree->AddRoot(_("Template Variables"));
 	for (size_t i = 0; i < currentTemplates.size(); ++i) {
-		mvceditor::TemplateFileClass templateFile = currentTemplates[i];
+		mvceditor::TemplateFileTagClass templateFile = currentTemplates[i];
 		wxString text = templateFile.FullPath;
 		wxString projectLabel;
 		
@@ -276,5 +276,5 @@ void mvceditor::TemplateFilesPanelClass::OnTreeItemActivated(wxTreeEvent& event)
 
 BEGIN_EVENT_TABLE(mvceditor::TemplateFilesFeatureClass, wxEvtHandler) 
 	EVT_MENU(mvceditor::MENU_TEMPLATE_FILES + 0, mvceditor::TemplateFilesFeatureClass::OnTemplateFilesMenu)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::TemplateFilesFeatureClass::OnTemplateDetectionComplete)
+	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::TemplateFilesFeatureClass::OnTemplateDetectionComplete)
 END_EVENT_TABLE()

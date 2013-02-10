@@ -27,7 +27,7 @@
 
 #include <features/FeatureClass.h>
 #include <features/wxformbuilder/TemplateFilesFeatureForms.h>
-#include <globals/TemplateFileClass.h>
+#include <globals/TemplateFileTagClass.h>
 
 namespace mvceditor {
 
