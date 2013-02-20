@@ -292,6 +292,9 @@ void mvceditor::SequenceClass::RunNextStep() {
 			if (!isInit) {
 
 				// if the step is not initialized, move on to the next step.
+				// we need to delete the step since OnActionComplete will not
+				// get called for this action
+				delete Steps.front();
 				Steps.pop();
 				if (Steps.empty()) {
 					isSequenceDone = true;
