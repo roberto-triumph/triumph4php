@@ -236,7 +236,19 @@ void mvceditor::OutlineViewFeatureClass::BuildOutlineCurrentCodeControl() {
 					outlineViewPanel->SetStatus(_("Parsing ..."));
 				}				
 			}
+			else if (code->IsNew()) {
+
+				// don't show this error when the outline tab is working on a completely new file
+				// ATTN: completely new files are not currently being outlined; we should probably
+				// do so 
+				if (outlineViewPanel) {	
+					outlineViewPanel->SetStatus(_(""));
+					std::vector<mvceditor::TagClass> tags;
+					outlineViewPanel->RefreshOutlines(tags);
+				}
+			} 
 			else {
+
 				// show the error on the outline tab and the regular error mechanism
 				if (outlineViewPanel) {	
 					outlineViewPanel->SetStatus(_("Invalid File"));
