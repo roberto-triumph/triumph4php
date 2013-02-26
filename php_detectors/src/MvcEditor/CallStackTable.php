@@ -43,4 +43,77 @@ class MvcEditor_CallStackTable extends Zend_Db_Table_Abstract {
 		}
 		return $callStacks;
 	}
+	
+	function getMethodCalls($callStacks) {
+		$methodCalls = array();
+		foreach ($callStacks as $call) {
+			if (MvcEditor_CallStack::METHOD_CALL == $call->type) {
+				$methodCalls[$call->destinationVariable] = $call;
+			}
+		}
+		return $methodCalls;
+	}
+	
+	function getPropertyCalls($callStacks) {
+		$propertyCalls = array();
+		foreach ($callStacks as $call) {
+			if (MvcEditor_CallStack::PROPERTY == $call->type) {
+				$propertyCalls[$call->destinationVariable] = $call;
+			}
+		}
+		return $propertyCalls;
+	}
+	
+	function getVariables($callStacks) {
+		$variableCalls = array();
+		$arrayKeys = array();
+		foreach ($callStacks as $call) {
+			if (MvcEditor_CallStack::T_ARRAY == $call->type 
+				|| MvcEditor_CallStack::SCALAR == $call->type
+				|| MvcEditor_CallStack::NEW_OBJECT == $call->type
+				|| MvcEditor_CallStack::ASSIGN == $call->type) {
+				$variableCalls[$call->destinationVariable] = $call;
+			}
+		}
+		return $variableCalls;
+	}
+	
+	function getArrayKeys($callStacks, $variableName) {
+		$keys = array();
+		foreach ($callStacks as $call) {
+			if (MvcEditor_CallStack::ARRAY_KEY == $call->type && \opstring\compare($variableName, $call->destinationVariable) == 0) {
+				$keys[$call->arrayKey] = 1;
+			}
+		}
+		return array_keys($keys);
+	}
+	
+	function printScope($callStacks) {
+		foreach ($callStacks as $call) {
+			if (MvcEditor_Callstack::T_ARRAY == $call->type) {
+				echo $call->type, "\t\t\t\t", $call->destinationVariable, "\n";
+			}
+			if (MvcEditor_Callstack::METHOD_CALL == $call->type) {
+				echo $call->type, "\t\t\t\t", $call->destinationVariable, "=", $call->objectName . "->" . $call->methodName . "(" . join(',', $call->functionArguments). ")" , "\n";
+			}
+			else if (MvcEditor_Callstack::PROPERTY == $call->type) {
+				echo $call->type, "\t\t\t\t", $call->destinationVariable, "=", $call->objectName . "->" . $call->propertyName, "\n";
+			}
+			else if (MvcEditor_Callstack::FUNCTION_CALL == $call->type) {
+				echo $call->type, "\t\t\t\t", $call->destinationVariable, "=", $call->functioName . "(" . join(',', $call->functionArguments). ")" , "\n";
+			}
+			else if (MvcEditor_Callstack::SCALAR == $call->type) {
+				echo $call->type, "\t\t\t\t", $call->destinationVariable, ",", $call->scalarValue , "\n";
+			}
+			else if (MvcEditor_Callstack::ASSIGN == $call->type) {
+				echo $call->type, "\t\t\t\t", $call->destinationVariable . "=" . $call->sourceVariable, "\n";
+			}
+			else if (MvcEditor_Callstack::ARRAY_KEY == $call->type) {
+				echo $call->type, "\t\t\t\t", $call->destinationVariable . "[" . $call->arrayKey . "]", "\n";
+			}
+			else if (MvcEditor_Callstack::NEW_OBJECT == $call->type) {
+				echo $call->type, "\t\t\t\t", $call->destinationVariable . "=new " . $call->className . "()", "\n";
+			}
+		}
+	}
 }

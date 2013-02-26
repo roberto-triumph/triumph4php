@@ -31,32 +31,189 @@
 #include <globals/Sqlite.h>
 #include <wx/ffile.h>
 
+mvceditor::VariableSymbolClass::VariableSymbolClass() 
+	: Type(mvceditor::VariableSymbolClass::SCALAR)
+	, DestinationVariable()
+	, ScalarValue()
+	, ArrayKey()
+	, SourceVariable()
+	, ObjectName()
+	, PropertyName()
+	, FunctionName() 
+	, ClassName()
+	, FunctionArguments() {
+		
+}
 
-static UnicodeString EscapeScalar(const UnicodeString& expr) {
-	UnicodeString content = expr;
-	content = content.findAndReplace(UNICODE_STRING_SIMPLE("\""), UNICODE_STRING_SIMPLE("\\\""));
-	content = content.findAndReplace(UNICODE_STRING_SIMPLE("\r\n"), UNICODE_STRING_SIMPLE(" "));
-	content = content.findAndReplace(UNICODE_STRING_SIMPLE("\n"), UNICODE_STRING_SIMPLE(" "));
-	content = content.findAndReplace(UNICODE_STRING_SIMPLE("\r"), UNICODE_STRING_SIMPLE(" "));
-	content = content.findAndReplace(UNICODE_STRING_SIMPLE("\t"), UNICODE_STRING_SIMPLE(" "));
-	
+void mvceditor::VariableSymbolClass::ToScalar(const UnicodeString& variableName, const UnicodeString& scalar) {
+	Type = mvceditor::VariableSymbolClass::SCALAR;
+	DestinationVariable = variableName;
+	ScalarValue = scalar;
+}
+
+void mvceditor::VariableSymbolClass::ToArray(const UnicodeString& variableName) {
+	Type = mvceditor::VariableSymbolClass::ARRAY;
+	DestinationVariable = variableName;
+}
+
+void mvceditor::VariableSymbolClass::ToArrayKey(const UnicodeString& variableName, const UnicodeString& keyName) {
+	Type = mvceditor::VariableSymbolClass::ARRAY_KEY;
+	DestinationVariable = variableName;
+	ArrayKey = keyName;
+}
+
+void mvceditor::VariableSymbolClass::ToNewObject(const UnicodeString& variableName, const UnicodeString& className) {
+	Type = mvceditor::VariableSymbolClass::NEW_OBJECT;
+	DestinationVariable = variableName;
+	ClassName = className;
+}
+
+void mvceditor::VariableSymbolClass::ToAssignment(const UnicodeString& variableName, const UnicodeString& sourceVariableName) {
+	Type = mvceditor::VariableSymbolClass::ASSIGN;
+	DestinationVariable = variableName;
+	SourceVariable = sourceVariableName;
+}
+
+void mvceditor::VariableSymbolClass::ToProperty(const UnicodeString& variableName, const UnicodeString& objectName, const UnicodeString& propertyName) {
+	Type = mvceditor::VariableSymbolClass::PROPERTY;
+	DestinationVariable = variableName;
+	ObjectName = objectName;
+	PropertyName = propertyName;
+}
+
+void mvceditor::VariableSymbolClass::ToMethodCall(const UnicodeString& variableName, const UnicodeString& objectName, const UnicodeString& methodName, const std::vector<UnicodeString> arguments) {
+	Type = mvceditor::VariableSymbolClass::METHOD_CALL;
+	DestinationVariable = variableName;
+	ObjectName = objectName;
+	MethodName = methodName;
+	FunctionArguments = arguments;
+}
+
+void mvceditor::VariableSymbolClass::ToFunctionCall(const UnicodeString& variableName, const UnicodeString& functionName, const std::vector<UnicodeString> arguments) {
+	Type = mvceditor::VariableSymbolClass::FUNCTION_CALL;
+	DestinationVariable = variableName;
+	FunctionName = functionName;
+	FunctionArguments = arguments;
+}
+
+void mvceditor::VariableSymbolClass::ToBeginMethod(const UnicodeString& className, const UnicodeString& methodName) {
+	Type = mvceditor::VariableSymbolClass::BEGIN_METHOD;
+	ClassName = className;
+	MethodName = methodName;
+}
+
+void mvceditor::VariableSymbolClass::ToBeginFunction(const UnicodeString& functionName) {
+	Type = mvceditor::VariableSymbolClass::FUNCTION_CALL;
+	FunctionName = functionName;
+}
+
+std::string mvceditor::VariableSymbolClass::ToString() const {
 	UnicodeString line;
-	line += UNICODE_STRING_SIMPLE("\"");
-	line += content;
-	line += UNICODE_STRING_SIMPLE("\"");
+	switch (Type) {
+	case ARRAY:
+		line = DestinationVariable;
+		break;
+	case ARRAY_KEY:
+		line = DestinationVariable;
+		line += UNICODE_STRING_SIMPLE(",");
+		line += ArrayKey;
+		break;
+	case ASSIGN:
+		line = DestinationVariable;
+		line += UNICODE_STRING_SIMPLE(",");
+		line += SourceVariable;
+		break;
+	case SCALAR:
+		line = DestinationVariable;
+		line += UNICODE_STRING_SIMPLE(",");
+		line += ScalarValue;
+		break;
+	case NEW_OBJECT:
+		line = DestinationVariable;
+		line += UNICODE_STRING_SIMPLE(",");
+		line += ClassName;
+		break;
+	case PROPERTY:
+		line = DestinationVariable;
+		line += UNICODE_STRING_SIMPLE(",");
+		line += ObjectName;
+		line += UNICODE_STRING_SIMPLE(",");
+		line += PropertyName;
+		break;
+	case METHOD_CALL:
+		line = DestinationVariable;
+		line += UNICODE_STRING_SIMPLE(",");
+		line += ObjectName;
+		line += UNICODE_STRING_SIMPLE(",");
+		line += MethodName;
+		for (std::vector<UnicodeString>::const_iterator it = FunctionArguments.begin(); it != FunctionArguments.end(); ++it) {
+			line += UNICODE_STRING_SIMPLE(",");
+			line += *it;
+		}
+		break;
+	case FUNCTION_CALL:
+		line = DestinationVariable;
+		line += UNICODE_STRING_SIMPLE(",");
+		line += ObjectName;
+		line += UNICODE_STRING_SIMPLE(",");
+		line += MethodName;
+		for (std::vector<UnicodeString>::const_iterator it = FunctionArguments.begin(); it != FunctionArguments.end(); ++it) {
+			line += UNICODE_STRING_SIMPLE(",");
+			line += *it;
+		}
+		break;
+	case BEGIN_METHOD:
+		line += ClassName;
+		line += UNICODE_STRING_SIMPLE(",");
+		line += MethodName;
+		break;
+	case BEGIN_FUNCTION:
+		line += FunctionName;
+		break;
+	}	
+	std::string stdLine = mvceditor::IcuToChar(line);
+	return stdLine;
+}
+
+std::string mvceditor::VariableSymbolClass::TypeString() const {
+	std::string line;
+	switch (Type) {
+	case ARRAY:
+		line = "ARRAY";
+		break;
+	case ARRAY_KEY:
+		line = "ARRAY_KEY";
+		break;
+	case ASSIGN:
+		line = "ASSIGN";
+		break;
+	case SCALAR:
+		line = "SCALAR";
+		break;
+	case NEW_OBJECT:
+		line = "NEW_OBJECT";
+		break;
+	case PROPERTY:
+		line = "PROPERTY";
+		break;
+	case METHOD_CALL:
+		line = "METHOD_CALL";
+		break;
+	case FUNCTION_CALL:
+		line = "FUNCTION_CALL";
+		break;
+	case BEGIN_METHOD:
+		line = "BEGIN_METHOD";
+		break;
+	case BEGIN_FUNCTION:
+		line = "BEGIN_FUNCTION";
+		break;
+	}	
 	return line;
 }
 
-mvceditor::CallClass::CallClass()
-	: Resource()
-	, Symbol(UNICODE_STRING_SIMPLE(""), mvceditor::SymbolClass::UNKNOWN)
-	, Scope()
-	, Expression(Scope)
-	, Type(NONE) {
-}
-
 mvceditor::CallStackClass::CallStackClass(mvceditor::TagCacheClass& tagCache)
-	: List()
+	: Variables()
 	, LintResults()
 	, MatchError()
 	, Parser()
@@ -65,30 +222,29 @@ mvceditor::CallStackClass::CallStackClass(mvceditor::TagCacheClass& tagCache)
 	, CurrentFunction()
 	, ResourcesRemaining()
 	, TagCache(tagCache)
-	, ScopeVariables()
 	, ScopeFunctionCalls()
 	, ParsedMethods()
+	, TempVarIndex(1)
 	, FoundScope(false) {
 	Parser.SetClassObserver(this);
 	Parser.SetClassMemberObserver(this);
 	Parser.SetFunctionObserver(this);
-	Parser.SetVariableObserver(this);
 	Parser.SetExpressionObserver(this);
 }
 
 void mvceditor::CallStackClass::Clear() {
-	List.clear();
+	Variables.clear();
 	LintResults.Clear();
 	MatchError.Clear();
 	CurrentClass.remove();
 	CurrentMethod.remove();
 	CurrentFunction.remove();
-	ScopeVariables.clear();
 	ScopeFunctionCalls.clear();
 	ParsedMethods.clear();
 	while (!ResourcesRemaining.empty()) {
 		ResourcesRemaining.pop();
 	}
+	TempVarIndex = 1;
 	FoundScope = false;
 }
 
@@ -115,7 +271,7 @@ bool mvceditor::CallStackClass::Recurse(pelet::Versions version, mvceditor::Call
 	}
 
 	// at a certain point, just stop the recursion.
-	if (List.size() >= (size_t)100) {
+	if (Variables.size() >= (size_t)3000) {
 		error = STACK_LIMIT;
 		return false;
 	}
@@ -147,15 +303,7 @@ bool mvceditor::CallStackClass::Recurse(pelet::Versions version, mvceditor::Call
 	UnicodeString key = item.Resource.ClassName + UNICODE_STRING_SIMPLE("::")  + item.Resource.Identifier;
 	ParsedMethods[key] = true;
 	if (ret && FoundScope) {
-		CreateCalls();
 		
-		// CreateCalls() method can fill in another error too
-		if (MatchError.HasError()) {
-			
-			// leave ret as true; we want may want an incomplete call stack
-			error = RESOLUTION_ERROR;
-		}
-
 		// check to see if we have any new functions to parse
 		ResourcesRemaining.pop();
 		if (!ResourcesRemaining.empty()) {
@@ -176,14 +324,13 @@ bool mvceditor::CallStackClass::Recurse(pelet::Versions version, mvceditor::Call
 					// this is because we want to write a function call if the same function is called
 					// twice but we don't want to parse it twice
 					ScopeFunctionCalls.clear();
-					ScopeVariables.clear();
-					CreateCalls();					
+					TempVarIndex = 1;
 					ResourcesRemaining.pop();
 				}
 			}
 			if (hasNext) {
 				ScopeFunctionCalls.clear();
-				ScopeVariables.clear();
+				TempVarIndex = 1;
 				return Recurse(version, error);
 			}
 		}
@@ -230,9 +377,9 @@ bool mvceditor::CallStackClass::Persist(wxFileName& fileName) {
 			"INSERT INTO call_stacks(step_number, step_type, expression) VALUES (?, ?, ?)",
 			soci::use(stepNumber), soci::use(stepType), soci::use(expression)
 		);
-		for (std::vector<mvceditor::CallClass>::const_iterator it = List.begin(); it != List.end(); ++it) {
-			stepType = it->StepTypeString();
-			expression = it->ExpressionString();
+		for (std::vector<mvceditor::VariableSymbolClass>::const_iterator it = Variables.begin(); it != Variables.end(); ++it) {
+			stepType = it->TypeString();
+			expression = it->ToString();
 			stmt.execute(true);
 			stepNumber++;
 		}
@@ -258,6 +405,24 @@ void mvceditor::CallStackClass::ExpressionFound(const pelet::ExpressionClass& ex
 
 	if (item.Resource.Identifier == CurrentFunction || (item.Resource.ClassName == CurrentClass && item.Resource.Identifier == CurrentMethod)) {
 		FoundScope = true;
+		
+		if (expression.Type == pelet::StatementClass::ASSIGNMENT) {
+			pelet::AssignmentExpressionClass* assignmentExpression = (pelet::AssignmentExpressionClass*)&expression;
+				VariableFound(assignmentExpression->Destination.Scope.NamespaceName, 
+					assignmentExpression->Destination.Scope.ClassName, assignmentExpression->Destination.Scope.MethodName, 
+					assignmentExpression->Destination, *assignmentExpression, assignmentExpression->Comment);
+		}
+		else if (expression.Type == pelet::StatementClass::ASSIGNMENT_LIST) {
+			pelet::AssignmentListExpressionClass* assignmentListExpression = (pelet::AssignmentListExpressionClass*)&expression;
+				for (size_t i = 0; i < assignmentListExpression->Destinations.size(); ++i) {
+					VariableFound(assignmentListExpression->Scope.NamespaceName, 
+						assignmentListExpression->Scope.ClassName, assignmentListExpression->Scope.MethodName, 
+						assignmentListExpression->Destinations[i], *assignmentListExpression, assignmentListExpression->Comment);
+				}
+		}
+		else {
+			SymbolFromExpression(expression, Variables);
+		}
 
 		// this is the scope we are interested in. if the expression is a function call
 		// note that variable may contain function calls too
@@ -278,66 +443,192 @@ void mvceditor::CallStackClass::VariableFound(const UnicodeString& namespaceName
 	ResourceWithFile item = ResourcesRemaining.front();
 	if (item.Resource.Identifier == CurrentFunction || (item.Resource.ClassName == CurrentClass && item.Resource.Identifier == CurrentMethod)) {
 		FoundScope = true;
+		SymbolsFromVariable(variable, expression);
+	}
+}
 
-		// ATTN: a single variable may have many assignments
-		// for now just take the first one
+void mvceditor::CallStackClass::SymbolsFromVariable(const pelet::VariableClass& variable, const pelet::ExpressionClass& expression) {
+	mvceditor::VariableSymbolClass expressionResultSymbol;
+	
+	// follow associativity, do the right hand side first
+	size_t oldSize = Variables.size();
+	SymbolFromExpression(expression, Variables);
+	if (Variables.size() > oldSize) {
+		expressionResultSymbol = Variables.back();
+	}
+	
+	if (!variable.ArrayKey.isEmpty()) {
+		
+		// dont need to insert the same array key multiple times
+		// add the variable to the list only if we have not added it yet
+		// an array key may be assigned if the variable is not yet
+		// seen; need to look for this case also
+		// ie.  $arr[] = 'name';  
+		// as the array initialization for $arr
+		std::vector<mvceditor::VariableSymbolClass>::iterator var;
+		bool foundIndex = false;
+		bool foundVariable = false;
+		for (var = Variables.begin(); var != Variables.end(); ++var) {
+			if (var->DestinationVariable == variable.ChainList[0].Name) {
+				foundVariable = true;
+			}
+			if (var->DestinationVariable == variable.ChainList[0].Name && var->ArrayKey == variable.ArrayKey) {
+				foundIndex = true;
+			}
+		}
+		if (!foundVariable) {
+			mvceditor::VariableSymbolClass arrayVariableSymbol;
+			arrayVariableSymbol.ToArray(variable.ChainList[0].Name);
+			Variables.push_back(arrayVariableSymbol);
+		}
+		if (!foundIndex) {
+			mvceditor::VariableSymbolClass arrayVariableKeySymbol;
+			arrayVariableKeySymbol.ToArrayKey(variable.ChainList[0].Name, variable.ArrayKey);
+			Variables.push_back(arrayVariableKeySymbol);
+		}
+		
+	}
+	else if (!variable.ChainList.empty()) {
+		UnicodeString destinationVariable = variable.ChainList[0].Name;
+		if (variable.ChainList.size() > 1) {
+			std::vector<pelet::VariablePropertyClass>::const_iterator prop = variable.ChainList.begin();
+			prop++;
+			size_t oldSize = Variables.size();
+			for (; prop != variable.ChainList.end(); ++prop) {
+				SymbolFromVariableProperty(variable.ChainList[0].Name, *prop, Variables);
+			}
+			if (Variables.size() > oldSize) {
+				destinationVariable = Variables.back().DestinationVariable;
+			}
+		}
+		
+		// now assign the right side of the expression to the left side of the
+		// expression
+		mvceditor::VariableSymbolClass assignSymbol;
+		assignSymbol.ToAssignment(destinationVariable, expressionResultSymbol.DestinationVariable);
+		Variables.push_back(assignSymbol);
+	}
+}
+
+void mvceditor::CallStackClass::SymbolFromVariableProperty(const UnicodeString& objectName, const pelet::VariablePropertyClass& property, std::vector<mvceditor::VariableSymbolClass>& symbols) {
+	
+	// recurse down the arguments first
+	std::vector<UnicodeString> argumentVariables;
+	if (property.IsFunction && !property.CallArguments.empty()) {
+		std::vector<pelet::ExpressionClass>::const_iterator expr;
+		for (expr = property.CallArguments.begin(); expr != property.CallArguments.end(); ++expr) {
+			size_t oldSize = symbols.size();
+			SymbolFromExpression(*expr, symbols);
+			if (symbols.size() > oldSize) {
+				argumentVariables.push_back(symbols.back().DestinationVariable);
+			}
+			else {
+				// a new variable symbol was not created because the argument already exists in the symbols list
+				argumentVariables.push_back(expr->FirstValue());
+			}
+		}
+	}
+	
+	// now the symbol for this property
+	UnicodeString tempVarName = NewTempVariable();
+	mvceditor::VariableSymbolClass symbol;
+	if (property.IsFunction) {
+		symbol.ToMethodCall(tempVarName, objectName, property.Name, argumentVariables);
+	}
+	else {
+		symbol.ToProperty(tempVarName, objectName, property.Name);
+	}
+	symbols.push_back(symbol);
+}
+
+void mvceditor::CallStackClass::SymbolFromExpression(const pelet::ExpressionClass& expression, std::vector<mvceditor::VariableSymbolClass>& symbols) {	
+	if (pelet::ExpressionClass::SCALAR == expression.ExpressionType) {
+		UnicodeString tempVarName = NewTempVariable();
+		mvceditor::VariableSymbolClass scalarSymbol;
+		scalarSymbol.ToScalar(tempVarName, expression.FirstValue());
+		symbols.push_back(scalarSymbol);
+	}
+	else if (pelet::ExpressionClass::ARRAY == expression.ExpressionType) {
+		UnicodeString tempVarName = NewTempVariable();
+		mvceditor::VariableSymbolClass arraySymbol;
+		arraySymbol.ToArray(tempVarName);
+		symbols.push_back(arraySymbol);
+		for (std::vector<UnicodeString>::const_iterator key = expression.ArrayKeys.begin(); key != expression.ArrayKeys.end(); ++key) {
+			mvceditor::VariableSymbolClass keySymbol;
+			keySymbol.ToArrayKey(tempVarName, *key);
+			symbols.push_back(keySymbol);
+		}
+	}
+	else if (pelet::ExpressionClass::NEW_CALL == expression.ExpressionType) {
+		UnicodeString tempVarName = NewTempVariable();
+		mvceditor::VariableSymbolClass newSymbol;
+		newSymbol.ToNewObject(tempVarName, expression.FirstValue());
+		symbols.push_back(newSymbol);
+	}
+	else if (pelet::ExpressionClass::FUNCTION_CALL == expression.ExpressionType && !expression.ChainList.empty()) {
+		
+		// do the function calls first
+		// a function will never have more than 1 item in the chain list because the following code
+		// is not possible
+		// func1() funct2();
+		std::vector<pelet::ExpressionClass>::const_iterator arg;
+		std::vector<UnicodeString> argumentVariables;
+		for (arg = expression.ChainList[0].CallArguments.begin(); arg != expression.ChainList[0].CallArguments.end(); ++arg) {
+			SymbolFromExpression(*arg, symbols);
+			if (!symbols.empty()) {
+				argumentVariables.push_back(symbols.back().DestinationVariable);
+			}
+		}
+		
+		// variable for the function result
+		UnicodeString tempVarName = NewTempVariable();
+		mvceditor::VariableSymbolClass functionSymbol;
+		functionSymbol.ToFunctionCall(tempVarName, expression.FirstValue(), argumentVariables);
+	}
+	else if (pelet::ExpressionClass::VARIABLE == expression.ExpressionType && !expression.ChainList.empty()) {
+		
+		// add the variable to the list only if we have not added it yet
+		std::vector<mvceditor::VariableSymbolClass>::iterator var;
 		bool found = false;
-		for (size_t i = 0; i < ScopeVariables.size(); ++i) {
-			if (!variable.ChainList.empty() && ScopeVariables[i].Variable == variable.ChainList[0].Name) {
+		for (var = symbols.begin(); var != symbols.end(); ++var) {
+			if (var->DestinationVariable == expression.ChainList[0].Name) {
 				found = true;
-
-				if (!variable.ArrayKey.isEmpty()) {
-
-					// update any new Array keys used in the variable assignment
-					// make sure not to have duplicates in case the same key is assigned
-					// multiple times
-					std::vector<UnicodeString>::iterator it = std::find(
-					            ScopeVariables[i].ArrayKeys.begin(), ScopeVariables[i].ArrayKeys.end(), variable.ArrayKey);
-					if (it == ScopeVariables[i].ArrayKeys.end()) {
-						ScopeVariables[i].ArrayKeys.push_back(variable.ArrayKey);
-					}
-				}
 				break;
 			}
 		}
-		if (!found && !variable.ChainList.empty()) {
-			UnicodeString name = variable.ChainList[0].Name;
-			mvceditor::SymbolClass::Types type;
-			std::vector<UnicodeString> arrayKeys;
-			if (variable.ArrayKey.isEmpty()) {
-				switch (expression.ExpressionType) {
-					case pelet::ExpressionClass::SCALAR:
-						type = mvceditor::SymbolClass::SCALAR;
-						break;
-					case pelet::ExpressionClass::ARRAY:
-						type = mvceditor::SymbolClass::ARRAY;
-						arrayKeys = expression.ArrayKeys;
-						break;
-					case pelet::ExpressionClass::VARIABLE:
-					case pelet::ExpressionClass::FUNCTION_CALL:
-					case pelet::ExpressionClass::NEW_CALL:
-						type = mvceditor::SymbolClass::OBJECT;
-						break;
-					case pelet::ExpressionClass::UNKNOWN:
-						type = mvceditor::SymbolClass::UNKNOWN;
-						break;
+		if (!found) {
+			mvceditor::VariableSymbolClass varSymbol;
+			varSymbol.ToAssignment(expression.ChainList[0].Name, UNICODE_STRING_SIMPLE(""));
+			symbols.push_back(varSymbol);
+		}
+		
+		if (expression.ChainList.size() > 1) {
+			
+			// now add any property / method accesses
+			std::vector<pelet::VariablePropertyClass>::const_iterator prop = expression.ChainList.begin();
+			prop++;
+			UnicodeString nextObjectName = expression.ChainList[0].Name;
+			for (; prop != expression.ChainList.end(); ++prop) {
+				size_t oldSize = symbols.size();
+				SymbolFromVariableProperty(nextObjectName, *prop, symbols);
+				if (symbols.size() > oldSize) {
+					nextObjectName = symbols.back().DestinationVariable;
 				}
-			}
-			else {
-				type = mvceditor::SymbolClass::ARRAY;
-				
-				// in  PHP an array may be created by assiging
-				// an array key-value to a non-existant variable
-				arrayKeys.push_back(variable.ArrayKey);
-			}
-
-			mvceditor::SymbolClass newSymbol(name, type);
-			newSymbol.ChainList = expression.ChainList;
-			newSymbol.PhpDocType = variable.PhpDocType;
-			newSymbol.ArrayKeys = arrayKeys;
-			ScopeVariables.push_back(newSymbol);
+			}			
 		}
 	}
+}
+
+UnicodeString mvceditor::CallStackClass::NewTempVariable() {
+	UnicodeString newName;
+	
+	// 11 == length of "$@tmp" + a 5 digit number + NUL should be big enough
+	// using $@tmp so that a temp variable will never collide with a variable found in
+	// the source
+	int32_t len = u_sprintf(newName.getBuffer(11), "$@tmp%d", TempVarIndex);
+	newName.releaseBuffer(len);
+	TempVarIndex++;
+	return newName;
 }
 
 void mvceditor::CallStackClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, const UnicodeString& signature,
@@ -358,6 +649,10 @@ void mvceditor::CallStackClass::MethodFound(const UnicodeString& namespaceName, 
 	// and we dont want to flag this as an error
 	if (item.Resource.ClassName == CurrentClass && item.Resource.Identifier == CurrentMethod) {
 		FoundScope = true;
+		
+		mvceditor::VariableSymbolClass beginScope;
+		beginScope.ToBeginMethod(className, methodName);
+		Variables.push_back(beginScope);
 	}
 }
 
@@ -378,282 +673,8 @@ void mvceditor::CallStackClass::FunctionFound(const UnicodeString& namespaceName
 	// and we dont want to flag this as an error
 	if (item.Resource.Identifier == CurrentFunction) {
 		FoundScope = true;
+		mvceditor::VariableSymbolClass beginScope;
+		beginScope.ToBeginFunction(functionName);
+		Variables.push_back(beginScope);
 	}
-}
-
-void mvceditor::CallStackClass::CreateCalls() {
-	if (ResourcesRemaining.empty()) {
-		return;
-	}
-	
-	ResourceWithFile item = ResourcesRemaining.front();
-
-	// add it to the code to signal the start of a function call
-	mvceditor::CallClass cBegin;
-	if (mvceditor::TagClass::FUNCTION == item.Resource.Type) {
-		cBegin.ToBeginFunction(item.Resource);
-	}
-	else if (mvceditor::TagClass::METHOD == item.Resource.Type) {
-		cBegin.ToBeginMethod(item.Resource);
-	}
-	if (mvceditor::CallClass::NONE != cBegin.Type) {
-		List.push_back(cBegin);
-	}
-	
-	// add it to the code to signal function call parameters
-	for (size_t k = 0; k < item.CallArguments.size(); ++k) {
-		
-		// look for the parameter in the scopeVariables list
-		mvceditor::CallClass c;
-		c.ToParam(item.CallArguments[k]);
-		for (size_t m = 0; m < item.ScopeVariables.size(); ++m) {
-			if (item.ScopeVariables[m].Variable == item.CallArguments[k].FirstValue()) {
-				c.Symbol = item.ScopeVariables[m];
-				break;
-			}
-		}
-		List.push_back(c);
-	}
-
-	// go through the symbols and create the CallClass instances
-	for (size_t i = 0; i < ScopeVariables.size(); ++i) {
-		mvceditor::CallClass c;
-		switch (ScopeVariables[i].Type) {
-			case mvceditor::SymbolClass::ARRAY:
-				c.ToArray(ScopeVariables[i]);
-				break;
-			case mvceditor::SymbolClass::OBJECT:
-				c.ToObject(ScopeVariables[i]);
-				break;
-			case mvceditor::SymbolClass::SCALAR:
-				c.ToScalar(ScopeVariables[i]);
-				break;
-			case mvceditor::SymbolClass::UNKNOWN:
-				break;
-		}
-		if (mvceditor::CallClass::NONE != c.Type) {
-			List.push_back(c);
-		}
-	}
-
-	// go through the function calls and add them to the recursion list
-	for (size_t i = 0; i < ScopeFunctionCalls.size(); ++i) {
-
-		// here expr is a FULL line like this
-		// $this->load->view('welcome/index', $data);
-		// $this->template()->set('user', $this->getUser());
-		pelet::ExpressionClass expr = ScopeFunctionCalls[i];
-		pelet::ExpressionClass subExpr(expr.Scope);
-		for (size_t j = 0; j < expr.ChainList.size(); ++j) {
-
-			// go through each expression property and look for function calls
-			// we keep adding the property to the subExpr so that we can properly resolve
-			// the class of the method being called
-			// for example; subExpr will first be "$this", then "$this->template()", then
-			// "$this->template()->set()"
-			// Since expr was parsed properly by pelet::ParserClass, we will handle function
-			// call arguments properly
-			subExpr.ChainList.push_back(expr.ChainList[j]);
-			if (expr.ChainList[j].IsFunction) {
-				std::vector<mvceditor::TagClass> matches;
-				mvceditor::SymbolTableMatchErrorClass singleMatchError;
-				pelet::ScopeClass scopeResult;
-				scopeResult.ClassName = expr.Scope.ClassName;
-				scopeResult.MethodName = expr.Scope.MethodName;
-
-				TagCache.ResourceMatches(item.FileName.GetFullPath(), subExpr, scopeResult, matches, false, true, singleMatchError);
-				for (std::vector<mvceditor::TagClass>::iterator it = matches.begin(); it != matches.end(); ++it) {
-
-					// if we get here; we are able to know which class and method are being called
-					// lets add it to the queue so that this class/method will get recursed into next
-					if (mvceditor::TagClass::FUNCTION == it->Type || mvceditor::TagClass::METHOD == it->Type) {
-						if (it->FileName().IsOk()) {
-							
-							// dynamic resources may not have a file path to go to
-							ResourceWithFile newItem;
-							newItem.FileName = it->FileName();
-							newItem.Resource = *it;
-							newItem.CallArguments = expr.ChainList[j].CallArguments;
-							newItem.ScopeVariables = ScopeVariables;
-							ResourcesRemaining.push(newItem);
-						}
-					}
-				}
-				if (!MatchError.HasError() && (singleMatchError.HasError() || matches.empty())) {
-
-					// using 2 variables so that previous errors do not affect the ResourceMatches() call
-					MatchError = singleMatchError;
-				}
-			}
-		}
-	}
-	
-	// signal the end of this function
-	mvceditor::CallClass cReturn;
-	cReturn.ToReturn();
-	List.push_back(cReturn);
-}
-
-void mvceditor::CallClass::ToArray(const mvceditor::SymbolClass& symbol) {
-	Type = mvceditor::CallClass::ARRAY;
-	Symbol = symbol;
-}
-
-void mvceditor::CallClass::ToBeginFunction(const mvceditor::TagClass& tag) {
-	Type = mvceditor::CallClass::BEGIN_FUNCTION;
-	Resource = tag;
-}
-
-void mvceditor::CallClass::ToBeginMethod(const mvceditor::TagClass& tag) {
-	Type = mvceditor::CallClass::BEGIN_METHOD;
-	Resource = tag;
-}
-
-void mvceditor::CallClass::ToObject(const mvceditor::SymbolClass& symbol) {
-	Type = mvceditor::CallClass::OBJECT;
-	Symbol = symbol;
-}
-
-void mvceditor::CallClass::ToParam(const pelet::ExpressionClass& expr) {
-	Type = mvceditor::CallClass::PARAM;
-	Expression = expr;
-}
-
-void mvceditor::CallClass::ToReturn() {
-	Type = mvceditor::CallClass::RETURN;
-}
-
-void mvceditor::CallClass::ToScalar(const mvceditor::SymbolClass& symbol) {
-	Type = mvceditor::CallClass::SCALAR;
-	Symbol = symbol;
-}
-
-std::string mvceditor::CallClass::StepTypeString() const {
-	switch (Type) {
-		case mvceditor::CallClass::ARRAY:
-			return "ARRAY";
-			break;
-		case mvceditor::CallClass::BEGIN_FUNCTION:
-			return "BEGIN_FUNCTION";
-			break;
-		case mvceditor::CallClass::BEGIN_METHOD:
-			return "BEGIN_METHOD";
-			break;
-		case mvceditor::CallClass::OBJECT:
-			return "OBJECT";
-			break;
-		case mvceditor::CallClass::NONE:
-
-			// none will be skipped always
-			break;
-		case mvceditor::CallClass::PARAM:
-			return "PARAM";
-			break;
-		case mvceditor::CallClass::RETURN:
-			return "RETURN";
-			break;
-		case mvceditor::CallClass::SCALAR:
-			return "SCALAR";
-			break;
-	}
-	return "";
-}
-
-std::string mvceditor::CallClass::ExpressionString() const {
-	UnicodeString line;
-	switch (Type) {
-		case mvceditor::CallClass::ARRAY:
-			line += Symbol.Variable;
-			for (size_t j = 0; j < Symbol.ArrayKeys.size(); ++j) {
-				line += UNICODE_STRING_SIMPLE(",");
-				line += Symbol.ArrayKeys[j];
-			}
-			break;
-
-		case mvceditor::CallClass::BEGIN_FUNCTION:
-			line += Resource.Identifier;
-			break;
-
-		case mvceditor::CallClass::BEGIN_METHOD:
-			line += Resource.ClassName;
-			line += UNICODE_STRING_SIMPLE(",");
-			line += Resource.Identifier;
-			break;
-
-		case mvceditor::CallClass::OBJECT:
-			line += Symbol.Variable;
-			break;
-
-		case mvceditor::CallClass::NONE:
-
-			// none will be skipped always
-			break;
-		case mvceditor::CallClass::PARAM:
-			if (mvceditor::SymbolClass::ARRAY == Symbol.Type) {
-				line += UNICODE_STRING_SIMPLE("ARRAY,");
-				line += Symbol.Variable;
-				for (size_t j = 0; j < Symbol.ArrayKeys.size(); ++j) {
-					line += UNICODE_STRING_SIMPLE(",");
-					line += Symbol.ArrayKeys[j];
-				}
-			}
-			else if (mvceditor::SymbolClass::OBJECT == Symbol.Type) {
-				line += UNICODE_STRING_SIMPLE("OBJECT,");
-				for (size_t j = 0; j < Symbol.ChainList.size(); ++j) {
-					if (j > 0 && Symbol.ChainList[j].IsStatic) {
-						line += UNICODE_STRING_SIMPLE("::");
-					}
-					else if (j > 0) {
-						line += UNICODE_STRING_SIMPLE("->");
-					}
-					line += Symbol.ChainList[j].Name;
-					if (Symbol.ChainList[j].IsFunction) {
-						line += UNICODE_STRING_SIMPLE("()");
-					}
-				}
-			}
-			else if (mvceditor::SymbolClass::SCALAR == Symbol.Type) {
-				line += UNICODE_STRING_SIMPLE("SCALAR,");
-				
-				// escape any double quotes in case of string constants
-				line += EscapeScalar(Symbol.ChainList[0].Name);
-			}
-			else if (pelet::ExpressionClass::SCALAR == Expression.ExpressionType) {
-				line += UNICODE_STRING_SIMPLE("SCALAR,");
-				
-				// escape any double quotes in case of string constants
-				line += EscapeScalar(Expression.ChainList[0].Name);
-			}
-			else {
-				line += UNICODE_STRING_SIMPLE("VARIABLE,");
-				for (size_t j = 0; j < Expression.ChainList.size(); ++j) {
-					if (j > 0 && Expression.ChainList[j].IsStatic) {
-						line += UNICODE_STRING_SIMPLE("::");
-					}
-					else if (j > 0) {
-						line += UNICODE_STRING_SIMPLE("->");
-					}
-					line += Expression.ChainList[j].Name;
-					if (Expression.ChainList[j].IsFunction) {
-						line += UNICODE_STRING_SIMPLE("()");
-					}
-				}
-			}
-			break;
-
-		case mvceditor::CallClass::RETURN:
-			break;
-
-		case mvceditor::CallClass::SCALAR:
-			line += Symbol.Variable;
-			line += UNICODE_STRING_SIMPLE(",");
-			if (!Symbol.ChainList.empty()) {
-
-				// escape any double quotes in case of string constants
-				line += EscapeScalar(Symbol.ChainList[0].Name);
-			}
-			break;
-	}
-	std::string stdLine = mvceditor::IcuToChar(line);
-	return stdLine;
 }
