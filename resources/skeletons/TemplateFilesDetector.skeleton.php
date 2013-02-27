@@ -84,7 +84,7 @@ EOF;
 		// now send the detected URLs to either STDOUT or store in the 
 		// sqlite DB	
 		$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $outputDbFileName));
-		$templateFileTable = new MvcEditor_TemplateFileTable($pdo);
+		$templateFileTable = new MvcEditor_TemplateFileTagTable($pdo);
 		$templateFileTable->saveTemplates($arrTemplates);
 		echo "Template file dectection complete, written to {$outputDbFileName}\n";
 	}
@@ -105,7 +105,7 @@ EOF;
 
 /**
  * This function will use the resource cache to lookup all controllers and their methods.  Then it
- * will create a MvcEditor_Url instance for each method; note that the routes file is 
+ * will create a MvcEditor_TemplateFileTag instance for each method; note that the routes file is 
  * also consulted and we will generate URLs for the default controller.
  *
  * @param  string $sourceDir            the root directory of the project in question
@@ -114,7 +114,7 @@ EOF;
  * @param  boolean $doSkip              out parameter; if TRUE then this detector does not know how
  *                                      to detect URLs for the given source directory; this situation
  *                                      is different than zero URLs being detected.
- * @return MvcEditor_TemplateFile[]     array of MvcEditor_TemplateFile instances the detected template files and their variables
+ * @return MvcEditor_TemplateFileTag[]  array of MvcEditor_TemplateFileTag instances the detected template files and their variables
  */
 function detectTemplates($sourceDir, $detectorDbFileName, &$doSkip) {
 	$allTemplates = array();
