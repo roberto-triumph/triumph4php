@@ -141,59 +141,78 @@ function detectTemplates($sourceDir, $detectorDbFileName, &$doSkip) {
 	$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $detectorDbFileName));
 	$callStackTable = new MvcEditor_CallStackTable($pdo);
 	$callStacks = $callStackTable->load();
-	$i = 0;
-	$inViewMethod = FALSE;
-	$paramIndex = 0;
-	foreach ($callStacks as $call) {
-		if (MvcEditor_CallStack::BEGIN_METHOD == $call->type && strcasecmp('CI_Loader::view', $call->resource) == 0) {
-			$inViewMethod = TRUE;
-			$paramIndex = 0;
-		}
-		else if (MvcEditor_CallStack::PARAM == $call->type && $inViewMethod) {
-			if (0 == $paramIndex) {
-				$currentTemplate = new MvcEditor_TemplateFileTag();
-				$currentTemplate->variables = array();
-				$currentTemplate->fullPath = $call->scalar;
-				
-				// most of the time views are given as relative relatives; starting from the application/views/ directory
-				// for now ignore variable arguments
-				if ($currentTemplate->fullPath[0] != '$' && !empty($currentTemplate->fullPath)) {
-					
-					// view file may have an extesion; if it has an extension use that; otherwise use the default (.php)
-					if (stripos($currentTemplate->fullPath, '.') === FALSE) {
-						$currentTemplate->fullPath .= '.php';
-					}
-					
-					// not using realpath() so that MVCEditor can know that a template file has not yet been created
-					// or the programmer has a bug in the project.
-					$currentTemplate->fullPath = \opstring\replace($currentTemplate->fullPath, '/', DIRECTORY_SEPARATOR);
-					$currentTemplate->fullPath = \opstring\replace($currentTemplate->fullPath, '\\', DIRECTORY_SEPARATOR);
-					$currentTemplate->fullPath = $sourceDir . 'application' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $currentTemplate->fullPath;
-					
-					// push it now just in case the template does not get any variables
-					$allTemplates[] = $currentTemplate;
-				}
-			}
-			else if (1 == $paramIndex) {
-				if (MvcEditor_CallStack::T_ARRAY == $call->paramType) {
-					foreach ($call->arrayKeys as $key) {
-					
-						// add the siguil here; editor expects us to return variables
-						$currentTemplate->variables[] = '$' . $key;
-					}
-				}
-				$allTemplates[count($allTemplates) - 1] = $currentTemplate;
-			}
-			$paramIndex++;
-		}
-		else {
-			$inViewMethod = FALSE;
-			$paramIndex = 0;
-			$currentTemplate = NULL;
-		}
-		$i++;
-	}
 	
+	// figure out the variables
+	$scopes = $callStackTable->splitScopes($callStacks);
+	
+	// now go through each scope, looking for calls to $this->load->view
+	foreach ($scopes as $scope) {
+	
+		// list of all method calls used to find calls to view method
+		$methodCalls = $callStackTable->getMethodCalls($scope);
+		
+		// list of all property accesses, make sure that calls to view method
+		// are used on the loader member variables
+		$propertyCalls = $callStackTable->getPropertyCalls($scope);
+		$variableCalls = $callStackTable->getVariables($scope);
+
+		foreach ($methodCalls as $destinationVariable => $call) {
+			if (\opstring\compare_case($call->methodName, 'view') == 0 && isset($propertyCalls[$call->objectName])) {
+			
+				// is this view call of a loader object ?
+				$propertyCall = $propertyCalls[$call->objectName];
+				if (\opstring\compare('$this', $propertyCall->objectName) == 0 &&
+					(\opstring\compare('load', $propertyCall->propertyName) == 0 || 
+					\opstring\compare('loader', $propertyCall->propertyName) == 0)) {
+					
+					$currentTemplate = new MvcEditor_TemplateFileTag();
+					$currentTemplate->variables = array();
+					$currentTemplate->fullPath = '';
+					
+					if (count($call->functionArguments) >= 1) {
+						
+						// argument 1 of the view method call is the template file
+						// most of the time views are given as relative relatives; starting from the application/views/ directory
+						// for now ignore variable arguments
+						if (isset($variableCalls[$call->functionArguments[0]])) {
+							$variableCall = $variableCalls[$call->functionArguments[0]];
+							if ($variableCall->type == MvcEditor_CallStack::SCALAR) {
+								$currentTemplate->fullPath = $variableCall->scalarValue;
+										
+								// view file may have an extesion; if it has an extension use that; otherwise use the default (.php)
+								if (stripos($currentTemplate->fullPath, '.') === FALSE) {
+									$currentTemplate->fullPath .= '.php';
+								}
+						
+								// not using realpath() so that MVCEditor can know that a template file has not yet been created
+								// or the programmer has a bug in the project.
+								$currentTemplate->fullPath = \opstring\replace($currentTemplate->fullPath, '/', DIRECTORY_SEPARATOR);
+								$currentTemplate->fullPath = \opstring\replace($currentTemplate->fullPath, '\\', DIRECTORY_SEPARATOR);
+								$currentTemplate->fullPath = $sourceDir . 'application' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $currentTemplate->fullPath;
+								
+								// push it now just in case the template does not get any variables
+								$allTemplates[] = $currentTemplate;
+							}
+						}
+					}
+					if (count($call->functionArguments) >= 2 && !empty($currentTemplate->fullPath)) {
+						
+						// argument 2 is an array of template variables
+						if (isset($variableCalls[$call->functionArguments[1]])) {
+							$variableCall = $variableCalls[$call->functionArguments[1]];
+							$arrayKeys = $callStackTable->getArrayKeys($scope, $variableCall->destinationVariable);
+							foreach ($arrayKeys as $key) {
+					
+								// add the siguil here; editor expects us to return variables
+								$currentTemplate->variables[] = '$' . $key;
+							}
+							$allTemplates[count($allTemplates) - 1] = $currentTemplate;
+						}
+					}
+				}
+			}
+		}
+	}	
 	return $allTemplates;
 }
 

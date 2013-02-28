@@ -100,10 +100,56 @@ public:
 	}
 };
 
-#define CHECK_CALL_STACK(i, type, expression) \
-	CHECK_EQUAL(type, CallStack.List[i].Type);\
-	CHECK_EQUAL(expression, CallStack.List[i].ExpressionString());
+#define CHECK_SYMBOL_IS_ASSIGN(i, destinationVariable, sourceVariable) \
+		CHECK_EQUAL(mvceditor::VariableSymbolClass::ASSIGN, CallStack.Variables[i].Type);\
+		CHECK_UNISTR_EQUALS(destinationVariable, CallStack.Variables[i].DestinationVariable);\
+		CHECK_UNISTR_EQUALS(sourceVariable, CallStack.Variables[i].SourceVariable);
+			
+#define CHECK_SYMBOL_IS_ARRAY(i, destinationVariable) \
+	CHECK_EQUAL(mvceditor::VariableSymbolClass::ARRAY, CallStack.Variables[i].Type);\
+	CHECK_UNISTR_EQUALS(destinationVariable, CallStack.Variables[i].DestinationVariable);
+	
+#define CHECK_SYMBOL_IS_ARRAY_KEY(i, destinationVariable, keyName) \
+	CHECK_EQUAL(mvceditor::VariableSymbolClass::ARRAY_KEY, CallStack.Variables[i].Type);\
+	CHECK_UNISTR_EQUALS(destinationVariable, CallStack.Variables[i].DestinationVariable);\
+	CHECK_UNISTR_EQUALS(keyName, CallStack.Variables[i].ArrayKey);
 
+#define CHECK_SYMBOL_IS_FUNCTION_CALL(i, destinationVariable, functionName) \
+	CHECK_EQUAL(mvceditor::VariableSymbolClass::FUNCTION_CALL, CallStack.Variables[i].Type);\
+	CHECK_UNISTR_EQUALS(destinationVariable, CallStack.Variables[i].DestinationVariable);\
+	CHECK_UNISTR_EQUALS(functionName, CallStack.Variables[i].FunctionName);
+	
+#define CHECK_SYMBOL_IS_METHOD_CALL(i, destinationVariable, objectName, methodName) \
+	CHECK_EQUAL(mvceditor::VariableSymbolClass::METHOD_CALL, CallStack.Variables[i].Type);\
+	CHECK_UNISTR_EQUALS(destinationVariable, CallStack.Variables[i].DestinationVariable);\
+	CHECK_UNISTR_EQUALS(objectName, CallStack.Variables[i].ObjectName);\
+	CHECK_UNISTR_EQUALS(methodName, CallStack.Variables[i].MethodName);
+		
+#define CHECK_SYMBOL_IS_METHOD_CALL_ARG(i, argIndex, argName) \
+	CHECK((size_t)argIndex < CallStack.Variables[i].FunctionArguments.size());\
+	CHECK_UNISTR_EQUALS(argName, CallStack.Variables[i].FunctionArguments[argIndex]);
+	
+#define CHECK_SYMBOL_IS_NEW_OBJECT(i, destinationVariable, className) \
+	CHECK_EQUAL(mvceditor::VariableSymbolClass::NEW_OBJECT, CallStack.Variables[i].Type);\
+	CHECK_UNISTR_EQUALS(destinationVariable, CallStack.Variables[i].DestinationVariable);\
+	CHECK_UNISTR_EQUALS(className, CallStack.Variables[i].ClassName);
+
+#define CHECK_SYMBOL_IS_PROPERTY(i, destinationVariable, objectName, propertyName) \
+	CHECK_EQUAL(mvceditor::VariableSymbolClass::PROPERTY, CallStack.Variables[i].Type);\
+	CHECK_UNISTR_EQUALS(destinationVariable, CallStack.Variables[i].DestinationVariable);\
+	CHECK_UNISTR_EQUALS(objectName, CallStack.Variables[i].ObjectName);\
+	CHECK_UNISTR_EQUALS(propertyName, CallStack.Variables[i].PropertyName);
+
+#define CHECK_SYMBOL_IS_SCALAR(i, destinationVariable, scalar) \
+	CHECK_EQUAL(mvceditor::VariableSymbolClass::SCALAR, CallStack.Variables[i].Type);\
+	CHECK_UNISTR_EQUALS(destinationVariable, CallStack.Variables[i].DestinationVariable);\
+	CHECK_UNISTR_EQUALS(scalar, CallStack.Variables[i].ScalarValue);
+
+#define CHECK_SYMBOL_IS_BEGIN_METHOD(i, className, methodName) \
+	CHECK_EQUAL(mvceditor::VariableSymbolClass::BEGIN_METHOD, CallStack.Variables[i].Type);\
+	CHECK_UNISTR_EQUALS(className, CallStack.Variables[i].ClassName);\
+	CHECK_UNISTR_EQUALS(methodName, CallStack.Variables[i].MethodName);
+	
 SUITE(CallStackTestClass) {
 
 TEST_FIXTURE(CallStackFixtureTestClass, FailOnUnknownResource) {
@@ -179,18 +225,23 @@ TEST_FIXTURE(CallStackFixtureTestClass, ResolutionError) {
 	
 	// we still want to return true because an incomplete call stack may be helpful in some cases
 	CHECK_EQUAL(true, CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
-	CHECK_EQUAL(mvceditor::CallStackClass::RESOLUTION_ERROR, error);
-	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::UNKNOWN_RESOURCE, CallStack.MatchError.Type);
+	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
+	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
 	
-	// since load can be resolved the call stack should have it	
-	CHECK_VECTOR_SIZE(7, CallStack.List);
-	CHECK_CALL_STACK(0, mvceditor::CallClass::BEGIN_METHOD, "News,index");
-	CHECK_CALL_STACK(1, mvceditor::CallClass::ARRAY, "$data,title");
-	CHECK_CALL_STACK(2, mvceditor::CallClass::RETURN, "");
-	CHECK_CALL_STACK(3, mvceditor::CallClass::BEGIN_METHOD, "CI_Loader,view");
-	CHECK_CALL_STACK(4, mvceditor::CallClass::PARAM, "SCALAR,\"index\"");
-	CHECK_CALL_STACK(5, mvceditor::CallClass::PARAM, "ARRAY,$data,title");
-	CHECK_CALL_STACK(6, mvceditor::CallClass::RETURN, "");
+	CHECK_VECTOR_SIZE(9, CallStack.Variables);
+	
+	CHECK_SYMBOL_IS_BEGIN_METHOD(0, "News", "index");
+	CHECK_SYMBOL_IS_ARRAY(1, "$@tmp1");
+	CHECK_SYMBOL_IS_ARRAY_KEY(2, "$@tmp1", "title");
+	CHECK_SYMBOL_IS_ASSIGN(3, "$data", "$@tmp1");
+	CHECK_SYMBOL_IS_ASSIGN(4, "$this", "");
+	CHECK_SYMBOL_IS_METHOD_CALL(5, "$@tmp2", "$this", "work");
+	CHECK_SYMBOL_IS_PROPERTY(6, "$@tmp3", "$this", "load");
+	CHECK_SYMBOL_IS_SCALAR(7, "$@tmp4", "index");
+	
+	CHECK_SYMBOL_IS_METHOD_CALL(8, "$@tmp5", "$@tmp3", "view");
+	CHECK_SYMBOL_IS_METHOD_CALL_ARG(8, 0, "$@tmp4");
+	CHECK_SYMBOL_IS_METHOD_CALL_ARG(8, 1, "$data");
 }	
 
 TEST_FIXTURE(CallStackFixtureTestClass, FailOnStackLimit) {
@@ -220,14 +271,19 @@ TEST_FIXTURE(CallStackFixtureTestClass, SimpleMethodCall) {
 	
 	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
-	CHECK_VECTOR_SIZE(7, CallStack.List);
-	CHECK_CALL_STACK(0, mvceditor::CallClass::BEGIN_METHOD, "News,index");
-	CHECK_CALL_STACK(1, mvceditor::CallClass::ARRAY, "$data,title");
-	CHECK_CALL_STACK(2, mvceditor::CallClass::RETURN, "");
-	CHECK_CALL_STACK(3, mvceditor::CallClass::BEGIN_METHOD, "CI_Loader,view");
-	CHECK_CALL_STACK(4, mvceditor::CallClass::PARAM, "SCALAR,\"index\"");
-	CHECK_CALL_STACK(5, mvceditor::CallClass::PARAM, "ARRAY,$data,title");
-	CHECK_CALL_STACK(6, mvceditor::CallClass::RETURN, "");
+	
+	CHECK_VECTOR_SIZE(8, CallStack.Variables);
+	CHECK_SYMBOL_IS_BEGIN_METHOD(0, "News", "index");	
+	CHECK_SYMBOL_IS_ARRAY(1, "$@tmp1");
+	CHECK_SYMBOL_IS_ARRAY_KEY(2, "$@tmp1", "title");
+	CHECK_SYMBOL_IS_ASSIGN(3, "$data", "$@tmp1");
+	CHECK_SYMBOL_IS_ASSIGN(4, "$this", "");
+	CHECK_SYMBOL_IS_PROPERTY(5, "$@tmp2", "$this", "load");
+	CHECK_SYMBOL_IS_SCALAR(6, "$@tmp3", "index");
+	
+	CHECK_SYMBOL_IS_METHOD_CALL(7, "$@tmp4", "$@tmp2", "view");
+	CHECK_SYMBOL_IS_METHOD_CALL_ARG(7, 0, "$@tmp3");
+	CHECK_SYMBOL_IS_METHOD_CALL_ARG(7, 1, "$data");
 }
 
 TEST_FIXTURE(CallStackFixtureTestClass, MultipleMethodCalls) {
@@ -258,20 +314,27 @@ TEST_FIXTURE(CallStackFixtureTestClass, MultipleMethodCalls) {
 	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
 	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
-	CHECK_VECTOR_SIZE(13, CallStack.List);
-	CHECK_CALL_STACK(0, mvceditor::CallClass::BEGIN_METHOD, "News,index");
-	CHECK_CALL_STACK(1, mvceditor::CallClass::ARRAY, "$data,title");
-	CHECK_CALL_STACK(2, mvceditor::CallClass::RETURN, "");
-	CHECK_CALL_STACK(3, mvceditor::CallClass::BEGIN_METHOD, "CI_Loader,view");
-	CHECK_CALL_STACK(4, mvceditor::CallClass::PARAM, "SCALAR,\"header\"");
-	CHECK_CALL_STACK(5, mvceditor::CallClass::RETURN, "");
-	CHECK_CALL_STACK(6, mvceditor::CallClass::BEGIN_METHOD, "CI_Loader,view");
-	CHECK_CALL_STACK(7, mvceditor::CallClass::PARAM, "SCALAR,\"index\"");
-	CHECK_CALL_STACK(8, mvceditor::CallClass::PARAM, "ARRAY,$data,title");
-	CHECK_CALL_STACK(9, mvceditor::CallClass::RETURN, "");
-	CHECK_CALL_STACK(10, mvceditor::CallClass::BEGIN_METHOD, "CI_Loader,view");
-	CHECK_CALL_STACK(11, mvceditor::CallClass::PARAM, "SCALAR,\"footer\"");
-	CHECK_CALL_STACK(12, mvceditor::CallClass::RETURN, "");
+	
+	CHECK_VECTOR_SIZE(14, CallStack.Variables);
+	CHECK_SYMBOL_IS_BEGIN_METHOD(0, "News", "index");
+	CHECK_SYMBOL_IS_ARRAY(1, "$@tmp1");
+	CHECK_SYMBOL_IS_ARRAY_KEY(2, "$@tmp1", "title");
+	CHECK_SYMBOL_IS_ASSIGN(3, "$data", "$@tmp1");
+	CHECK_SYMBOL_IS_ASSIGN(4, "$this", "");
+	CHECK_SYMBOL_IS_PROPERTY(5, "$@tmp2", "$this", "load");
+	CHECK_SYMBOL_IS_SCALAR(6, "$@tmp3", "header");
+	CHECK_SYMBOL_IS_METHOD_CALL(7, "$@tmp4", "$@tmp2", "view");
+	CHECK_SYMBOL_IS_METHOD_CALL_ARG(7, 0, "$@tmp3");
+	
+	CHECK_SYMBOL_IS_PROPERTY(8, "$@tmp5", "$this", "load");
+	CHECK_SYMBOL_IS_SCALAR(9, "$@tmp6", "index");
+	CHECK_SYMBOL_IS_METHOD_CALL(10, "$@tmp7", "$@tmp5", "view");
+	CHECK_SYMBOL_IS_METHOD_CALL_ARG(10, 0, "$@tmp6");
+	
+	CHECK_SYMBOL_IS_PROPERTY(11, "$@tmp8", "$this", "load");
+	CHECK_SYMBOL_IS_SCALAR(12, "$@tmp9", "footer");	
+	CHECK_SYMBOL_IS_METHOD_CALL(13, "$@tmp10", "$@tmp8", "view");
+	CHECK_SYMBOL_IS_METHOD_CALL_ARG(13, 0, "$@tmp9");
 }
 
 TEST_FIXTURE(CallStackFixtureTestClass, WithArrayKeyAssignment) {
@@ -299,14 +362,20 @@ TEST_FIXTURE(CallStackFixtureTestClass, WithArrayKeyAssignment) {
 	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
 	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
-	CHECK_VECTOR_SIZE(7, CallStack.List);
-	CHECK_CALL_STACK(0, mvceditor::CallClass::BEGIN_METHOD, "News,index");
-	CHECK_CALL_STACK(1, mvceditor::CallClass::ARRAY, "$data,title,name");
-	CHECK_CALL_STACK(2, mvceditor::CallClass::RETURN, "");
-	CHECK_CALL_STACK(3, mvceditor::CallClass::BEGIN_METHOD, "CI_Loader,view");
-	CHECK_CALL_STACK(4, mvceditor::CallClass::PARAM, "SCALAR,\"index\"");
-	CHECK_CALL_STACK(5, mvceditor::CallClass::PARAM, "ARRAY,$data,title,name");
-	CHECK_CALL_STACK(6, mvceditor::CallClass::RETURN, "");
+	
+	CHECK_VECTOR_SIZE(10, CallStack.Variables);
+	CHECK_SYMBOL_IS_BEGIN_METHOD(0, "News", "index");
+	CHECK_SYMBOL_IS_SCALAR(1, "$@tmp1", "Welcome to the News Page");
+	CHECK_SYMBOL_IS_ARRAY(2, "$data");
+	CHECK_SYMBOL_IS_ARRAY_KEY(3, "$data", "title");
+	CHECK_SYMBOL_IS_SCALAR(4, "$@tmp2", "Hello");
+	CHECK_SYMBOL_IS_ARRAY_KEY(5, "$data", "name");
+	CHECK_SYMBOL_IS_ASSIGN(6, "$this", "");
+	CHECK_SYMBOL_IS_PROPERTY(7, "$@tmp3", "$this", "load");
+	CHECK_SYMBOL_IS_SCALAR(8, "$@tmp4", "index");
+	CHECK_SYMBOL_IS_METHOD_CALL(9, "$@tmp5", "$@tmp3", "view");
+	CHECK_SYMBOL_IS_METHOD_CALL_ARG(9, 0, "$@tmp4");
+	CHECK_SYMBOL_IS_METHOD_CALL_ARG(9, 1, "$data");
 }
 
 
@@ -319,6 +388,7 @@ TEST_FIXTURE(CallStackFixtureTestClass, WithMethodCall) {
 		"\tfunction view() {} \n"
 		"}\n"
 		"\n"
+
 		"class News extends CI_Controller {\n"
 		"\t/** @var CI_Loader */\n"
 		"\tprivate $load;\n"
@@ -337,16 +407,21 @@ TEST_FIXTURE(CallStackFixtureTestClass, WithMethodCall) {
 	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
 	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
-	CHECK_VECTOR_SIZE(9, CallStack.List);
-	CHECK_CALL_STACK(0, mvceditor::CallClass::BEGIN_METHOD, "News,index");
-	CHECK_CALL_STACK(1, mvceditor::CallClass::ARRAY, "$data,title,name");
-	CHECK_CALL_STACK(2, mvceditor::CallClass::RETURN, "");
-	CHECK_CALL_STACK(3, mvceditor::CallClass::BEGIN_METHOD, "CI_Loader,defaultVars");
-	CHECK_CALL_STACK(4, mvceditor::CallClass::RETURN, "");
-	CHECK_CALL_STACK(5, mvceditor::CallClass::BEGIN_METHOD, "CI_Loader,view");
-	CHECK_CALL_STACK(6, mvceditor::CallClass::PARAM, "SCALAR,\"index\"");
-	CHECK_CALL_STACK(7, mvceditor::CallClass::PARAM, "ARRAY,$data,title,name");
-	CHECK_CALL_STACK(8, mvceditor::CallClass::RETURN, "");
+	
+	CHECK_VECTOR_SIZE(11, CallStack.Variables);
+	CHECK_SYMBOL_IS_BEGIN_METHOD(0, "News", "index");
+	CHECK_SYMBOL_IS_ASSIGN(1, "$this", "");
+	CHECK_SYMBOL_IS_PROPERTY(2, "$@tmp1", "$this", "load");
+	CHECK_SYMBOL_IS_METHOD_CALL(3, "$@tmp2", "$@tmp1", "defaultVars");
+	CHECK_SYMBOL_IS_ARRAY(4, "$data");
+	CHECK_SYMBOL_IS_ARRAY_KEY(5, "$data", "title");
+	CHECK_SYMBOL_IS_SCALAR(6, "$@tmp3", "Hello");
+	CHECK_SYMBOL_IS_ARRAY_KEY(7, "$data", "name");
+	CHECK_SYMBOL_IS_PROPERTY(8, "$@tmp4", "$this", "load");
+	CHECK_SYMBOL_IS_SCALAR(9, "$@tmp5", "index");
+	CHECK_SYMBOL_IS_METHOD_CALL(10, "$@tmp6", "$@tmp4", "view");
+	CHECK_SYMBOL_IS_METHOD_CALL_ARG(10, 0, "$@tmp5");
+	CHECK_SYMBOL_IS_METHOD_CALL_ARG(10, 1, "$data");
 }
 
 TEST_FIXTURE(CallStackFixtureTestClass, Persist) {
@@ -365,7 +440,8 @@ TEST_FIXTURE(CallStackFixtureTestClass, Persist) {
 
 	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
-	CHECK_EQUAL((size_t)7, CallStack.List.size());
+	
+	CHECK_VECTOR_SIZE(8, CallStack.Variables);
 
 	// now check the sqlite db contents
 	session.close();
@@ -376,46 +452,53 @@ TEST_FIXTURE(CallStackFixtureTestClass, Persist) {
 	int rowCount;
 
 	session.once << "SELECT COUNT(*) FROM call_stacks", soci::into(rowCount);
-	CHECK_EQUAL(7, rowCount);
+	CHECK_EQUAL(8, rowCount);
 
 	soci::statement stmt = (session.prepare <<
 		"SELECT step_number, step_type, expression FROM call_stacks",
 		soci::into(stepNumber), soci::into(type), soci::into(expression)
 	);
 	CHECK(stmt.execute(true));
+	
 	CHECK_EQUAL(0, stepNumber);
 	CHECK_EQUAL("BEGIN_METHOD", type);
 	CHECK_EQUAL("News,index", expression);
-
+	
+	
 	CHECK(stmt.fetch());
 	CHECK_EQUAL(1, stepNumber);
 	CHECK_EQUAL("ARRAY", type);
-	CHECK_EQUAL("$data,title", expression);
+	CHECK_EQUAL("$@tmp1", expression);
 
 	CHECK(stmt.fetch());
 	CHECK_EQUAL(2, stepNumber);
-	CHECK_EQUAL("RETURN", type);
-	CHECK_EQUAL("", expression);
+	CHECK_EQUAL("ARRAY_KEY", type);
+	CHECK_EQUAL("$@tmp1,title", expression);
 
 	CHECK(stmt.fetch());
 	CHECK_EQUAL(3, stepNumber);
-	CHECK_EQUAL("BEGIN_METHOD", type);
-	CHECK_EQUAL("CI_Loader,view", expression);
+	CHECK_EQUAL("ASSIGN", type);
+	CHECK_EQUAL("$data,$@tmp1", expression);
 
 	CHECK(stmt.fetch());
 	CHECK_EQUAL(4, stepNumber);
-	CHECK_EQUAL("PARAM", type);
-	CHECK_EQUAL("SCALAR,\"index\"", expression);
+	CHECK_EQUAL("ASSIGN", type);
+	CHECK_EQUAL("$this,", expression);
 
 	CHECK(stmt.fetch());
 	CHECK_EQUAL(5, stepNumber);
-	CHECK_EQUAL("PARAM", type);
-	CHECK_EQUAL("ARRAY,$data,title", expression);
+	CHECK_EQUAL("PROPERTY", type);
+	CHECK_EQUAL("$@tmp2,$this,load", expression);
 
 	CHECK(stmt.fetch());
 	CHECK_EQUAL(6, stepNumber);
-	CHECK_EQUAL("RETURN", type);
-	CHECK_EQUAL("", expression);
+	CHECK_EQUAL("SCALAR", type);
+	CHECK_EQUAL("$@tmp3,index", expression);
+	
+	CHECK(stmt.fetch());
+	CHECK_EQUAL(7, stepNumber);
+	CHECK_EQUAL("METHOD_CALL", type);
+	CHECK_EQUAL("$@tmp4,$@tmp2,view,$@tmp3,$data", expression);
 
 }
 

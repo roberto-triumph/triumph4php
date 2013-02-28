@@ -116,7 +116,7 @@ int main() {
 			CallStack.MatchError.ErrorClass.getTerminatedBuffer());
 	}
 	u_fclose(ufout);
-	printf("The call stack is %d items long\n", (int)CallStack.List.size());
+	printf("The call stack is %d items long\n", (int)CallStack.Variables.size());
 	wxFileName detectorDbFileName(DetectorDbFullPath);
 	CallStack.Persist(detectorDbFileName);
 	printf("Call stack written to:%s\n", (const char*)DetectorDbFullPath.ToAscii());

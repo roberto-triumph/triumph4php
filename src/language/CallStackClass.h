@@ -35,76 +35,212 @@
 
 namespace mvceditor
 {
-
+	
 /**
- * A small class to keep track of the function / method call along with the arguments
- * to the function / method call. This class groups together the function name, file 
- * location, class name (if a method) and the list of arguments.
+ * This is a representation of a single variable assignment.  A variable
+ * may be assigned with different values (scalar, object, return
+ * values from methods, properties).
+ * Note that this represents "simple" assignments. For example,
+ * this class is no suitable to hold assignments such as 
+ * 
+ * $name = Person::getInstance()->name;
+ * 
+ * Statements like above are broken up into multiple temporary
+ * variables.  
  */
-class CallClass {
+class VariableSymbolClass {
 
-	public:
-
-	/**
-	 * All of the different types of 
-	 * NONE a sentinel value
-	 * BEGIN_METHOD a method (cass + function) was called
-	 * BEGIN_FUNCTION a function was called
-	 * ARRAY an array variable was created using the array() or [] syntax
-	 * SCALAR a scalar variable was created
-	 * OBJECT an object variable was created
-	 * PARAM this is a variable that is a function argument
-	 * RETURN the function ended
-	 */
-	enum Types {
-		NONE,
-		BEGIN_METHOD,
-		BEGIN_FUNCTION,
-		ARRAY,
-		SCALAR,
-		OBJECT,
-		PARAM,
-		RETURN
-	};
-
-	/**
-	 * the function / method being called
-	 */
-	TagClass Resource;
-	
-	/**
-	 * If a variable, then this is the variable name
-	 */
-	mvceditor::SymbolClass Symbol;
-	
-private:
-
-	pelet::ScopeClass Scope;	
-	
 public:
 
+	enum Types {
+		
+		/** 
+		 * variable is assigned a scalar (string or number) 
+		 */
+		SCALAR,
+		
+		/** 
+		 * variable is assigned an array. Note that there will be one ARRAY_KEY 
+		 *  assignment for each array key
+		 */
+		ARRAY,
+		
+		/** 
+		 * a new key being assigned to an array.
+		 */
+		ARRAY_KEY,
+		
+		/** 
+		 * variable is created using the new operator
+		 */
+		NEW_OBJECT,
+		
+		/** 
+		 * variable is assigned another variable
+		 */
+		ASSIGN,
+		
+		/** 
+		 * variable is assigned an object property
+		 */
+		PROPERTY,
+		
+		/** 
+		 * variable is assigned the return value of an object method
+		 */
+		METHOD_CALL,
+		
+		/** 
+		 * variable is assigned the return value of a function
+		 */
+		FUNCTION_CALL,
+		
+		/** 
+		 * not a variable; this symbol declares that a new scope
+		 * has started.  All of the symbols that follow this symbol belong
+		 * in the scope of this function.
+		 * FunctionName will contain the function name 
+		 * of the scope
+		 */
+		BEGIN_FUNCTION,
+		
+		/** 
+		 * not a variable; this symbol declares that a new scope
+		 * has started.  All of the symbols that follow this symbol belong
+		 * in the scope of this method.
+		 * ClassName and MethodName will contain the  class and method
+		 * of the scope
+		 */
+		BEGIN_METHOD
+	};
+	
+	Types Type; 
+	
 	/**
-	 * If this is a parameter, then the expression is here
+	 *  the variable being assigned (the left side of 
+	 *  $a = $b). Will contain the siguil ('$')
 	 */
-	pelet::ExpressionClass Expression;
+	UnicodeString DestinationVariable;
 	
-	Types Type;
+	/**
+	 *  if type = SCALAR, then this will be the scalar's lexeme (the contents)
+	 *  for the code:
+	 *    $s = 'hello';
+	 *  ScalarValue will be 'hello' (no quotes)
+	 */
+	UnicodeString ScalarValue;
 	
-	CallClass();
+	/**
+	 * if type = ARRAY_KEY this is the key that was assigned to the array
+	 *  for the code:
+	 *    $s['greeting'] = 'hello';
+	 * ArrayKey will be 'greeting' (no quotes)
+	 */
+	UnicodeString ArrayKey;
 	
-	// various methods to set the appropriate properties
-	void ToArray(const mvceditor::SymbolClass& symbol);
-	void ToScalar(const mvceditor::SymbolClass& symbol);
-	void ToObject(const mvceditor::SymbolClass& symbol);
-	void ToParam(const pelet::ExpressionClass& expr);
-	void ToBeginFunction(const mvceditor::TagClass& tag);
-	void ToBeginMethod(const mvceditor::TagClass& tag);
-	void ToReturn();
+	/**
+	 *  the name of the variable to assign (the right side of 
+	 *  $a = $b)
+	 */
+	UnicodeString SourceVariable;
 	
-	std::string StepTypeString() const;
-
-	std::string ExpressionString() const;
-
+	/**
+	 * if type = METHOD or type = PROPERTY, this is the name of the
+	 * variable used
+	 *  for the code:
+	 *    $name =  $person->firstName
+	 * ObjectName will be $person
+	 */
+	UnicodeString ObjectName;
+	
+	/**
+	 * if type = PROPERTY, this is the name of the property
+	 * .  this never contains a siguil
+	 * for the code:
+	 *    $name = $person->firstName
+	 * PropertyName will be firstName
+	 */
+	UnicodeString PropertyName;
+	
+	/**
+	 * if type = METHOD, this is the name of the method being 
+	 * called.
+	 *  for the code:
+	 *    $name = $person->getName()
+	 * MethodName will be getName
+	 * 
+	 * if type = BEGIN_METHOD, this is the name of the 
+	 * method where all of the subsquent variables are located in
+	 */
+	UnicodeString MethodName;
+	
+	/**
+	 * if type = FUNCTION, this is the name of the function being 
+	 * called.
+	 *  for the code:
+	 *    $name = getName()
+	 * FunctionName will be getName
+	 * 
+	 * if type = BEGIN_FUNCTION, this is the name of the 
+	 * function where all of the subsquent variables are located in
+	 */
+	UnicodeString FunctionName;
+	
+	/**
+	 * if type = NEW_OBJECT, this is the name of the class being 
+	 * instatiated.
+	 *  for the code:
+	 *    $user = new UserClass;
+	 * ClassName will be UserClass
+	 
+	 * if type = BEGIN_METHOD, this is the name of the 
+	 * class where all of the subsquent variables are located in
+	 */
+	UnicodeString ClassName;
+	
+	/**
+	 * if type = METHOD or type = FUNCTION this is the list of
+	 * variables that were passed into the function / method. These are the
+	 * "simple" variables; ie the temporary variables that are
+	 * assigned for example the code:
+	 * 
+	 * $name = buildName(getFirstName($a), getLastName($a));
+	 * 
+	 * then FunctionArguments are [ $@tmp1, $@tmp2 ]
+	 * because the resul of getFirstName and getLastName get assigned to
+	 * a temp variable.
+	 * 
+	 */
+	std::vector<UnicodeString> FunctionArguments;
+	
+	VariableSymbolClass();
+	
+	void ToScalar(const UnicodeString& variableName, const UnicodeString& scalar);
+	
+	void ToArray(const UnicodeString& variableName);
+	
+	void ToArrayKey(const UnicodeString& variableName, const UnicodeString& keyName);
+	
+	void ToNewObject(const UnicodeString& variableName, const UnicodeString& className);
+	
+	void ToAssignment(const UnicodeString& variableName, const UnicodeString& sourceVariableName);
+	
+	void ToProperty(const UnicodeString& variableName, const UnicodeString& objectName, const UnicodeString& propertyName);
+	
+	void ToMethodCall(const UnicodeString& variableName, const UnicodeString& objectName, const UnicodeString& methodName, const std::vector<UnicodeString> arguments);
+	
+	void ToFunctionCall(const UnicodeString& variableName, const UnicodeString& functionName, const std::vector<UnicodeString> arguments);
+	
+	void ToBeginMethod(const UnicodeString& className, const UnicodeString& methodName);
+	
+	void ToBeginFunction(const UnicodeString& functionName);
+	
+	/**
+	 *  @return std::string serialization
+	 */
+	std::string ToString() const;
+	
+	std::string TypeString() const;
 };
 
 /**
@@ -117,8 +253,7 @@ class CallStackClass :
 	public pelet::ClassMemberObserverClass, 
 	public pelet::FunctionObserverClass, 
 	public pelet::ExpressionObserverClass,
-	public pelet::ClassObserverClass, 
-	public pelet::VariableObserverClass {
+	public pelet::ClassObserverClass {
 
 public:
 
@@ -161,8 +296,8 @@ public:
 	 * All of the resolved function calls that took place; this vector is overwritten each time
 	 * Build() method is called.
 	 */
-	std::vector<CallClass> List;
-
+	std::vector<VariableSymbolClass> Variables;
+	
 	/**
 	 * If given code has a parser error (PARSE_ERR0R), the error will be stored here
 	 */
@@ -277,18 +412,21 @@ private:
 	TagCacheClass& TagCache;
 	
 	/**
-	 * Holds all variables for the current scope
-	 * The value of each item in the vector is the parsed Symbol.
-	 * @var std::vector<mvceditor::SymbolClass>>
-	 */
-	std::vector<mvceditor::SymbolClass> ScopeVariables;
-	
-	/**
 	 * Holds all of the function calls that were performed in the current scope
 	 */
 	std::vector<pelet::ExpressionClass> ScopeFunctionCalls;
 	
+	/**
+	 * flag each method after we parse it, that way recursice functions
+	 * don't cause infinte loops
+	 */
 	std::map<UnicodeString, bool, UnicodeStringComparatorClass> ParsedMethods;
+
+
+	/**
+	 * index appended to the temporary variables. will be reset every scope.
+	 */
+	int TempVarIndex;
 	
 	/**
 	 * this flag will be set when the parser hits the scope (tag) we are looking for.  If we dont
@@ -301,8 +439,40 @@ private:
 	
 	bool Recurse(pelet::Versions version, Errors& error);
 	
-	void CreateCalls();
+	/**
+	 *  breaks up an assignment expression into multiple VariableSymbolClass instances
+	 *  We break up a potentially huge statements into simple assignments so that
+	 *  we can tell exactly what methods are being called.
+	 * 
+	 *  For example, take this assignment expression:
+	 * 
+	 *    $this->view->name = $this->getFullNameFromRequest($this->getRequest());
+	 * 
+	 * the assignment will be broken up into these variable symbols:
+	 * 
+	 *   variable      |     type       |     lexemes (class + method + args or class + property or variable)
+	 *   -----------------------------------------------------------------------------------------------
+	 *   $this         |   ASSIGN       |     
+	 *   $@tmp1        |   METHOD       |     $this, getRequest
+	 *   $@tmp2        |   METHOD       |     $this, getFullNameFromRequest, $@tmp1
+	 *   $@tmp3        |   PROPERTY     |     $this, view
+	 *   $@tmp4        |   PROPERTY     |     $@tmp3, name
+	 *   $@tmp4        |   ASSIGN       |     $@tmp2
+	 * 
+	 * note that this method creates "temporary" variables that are not present in the actual
+	 * source code (as denoted by "$@", which can never happen in valid php).
+	 */
+	void SymbolsFromVariable(const pelet::VariableClass& variable, const pelet::ExpressionClass& expression);
 	
+	
+	void SymbolFromVariableProperty(const UnicodeString& objectName, const pelet::VariablePropertyClass& property, std::vector<mvceditor::VariableSymbolClass>& symbols);
+	
+	void SymbolFromExpression(const pelet::ExpressionClass& expression, std::vector<mvceditor::VariableSymbolClass>& symbols);
+	
+	/**
+	 * @return the name for a new template variable; the variable name will be unique for the current scope
+	 */
+	UnicodeString NewTempVariable();
 };
 
 }

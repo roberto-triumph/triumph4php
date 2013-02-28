@@ -26,63 +26,184 @@
 
 /**
  * This is a class that will take care of deserializing a single CallClass from the call stack file.
- * Usage:
- * The user of this class will open the file using the PHP file functions, the call the fromFile method
- * giving it the opened file resource.  The fromFile method will then reset and fill in the public members
- * according to the contents of the file.
  */
 class MvcEditor_CallStack {
 
-	const BEGIN_METHOD = 'BEGIN_METHOD';
-	
-	const BEGIN_FUNCTION = 'BEGIN_FUNCTION';
-	
-	const PARAM = 'PARAM';
-	
-	const T_ARRAY = 'ARRAY';
-	
+	/** 
+	 * variable is assigned a scalar (string or number) 
+	 */
 	const SCALAR = 'SCALAR';
 	
-	const OBJECT = 'OBJECT';
-	
-	const T_RETURN = 'RETURN';
-
 	/** 
-	 * @var string the type of call, one of the class constants
+	 * variable is assigned an array. Note that there will be one ARRAY_KEY 
+	 *  assignment for each array key
 	 */
-	public $type;
+	const T_ARRAY = 'ARRAY';
+	
+	/** 
+	 * a new key being assigned to an array.
+	 */
+	const ARRAY_KEY = 'ARRAY_KEY';
+	
+	/** 
+	 * variable is created using the new operator
+	 */
+	const NEW_OBJECT = 'NEW_OBJECT';
+	
+	/** 
+	 * variable is assigned another variable
+	 */
+	const ASSIGN = 'ASSIGN';
+	
+	/** 
+	 * variable is assigned an object property
+	 */
+	const PROPERTY = 'PROPERTY';
+	
+	/** 
+	 * variable is assigned the return value of an object method
+	 */
+	const METHOD_CALL = 'METHOD_CALL';
+	
+	/** 
+	 * variable is assigned the return value of a function
+	 */
+	const FUNCTION_CALL = 'FUNCTION_CALL';
+	
+	/** 
+	 * not a variable; this symbol declares that a new scope
+	 * has started.  All of the symbols that follow this symbol belong
+	 * in the scope of this function.
+	 * FunctionName will contain the function name 
+	 * of the scope
+	 */
+	const BEGIN_FUNCTION = 'BEGIN_FUNCTION';
+	
+	/** 
+	 * not a variable; this symbol declares that a new scope
+	 * has started.  All of the symbols that follow this symbol belong
+	 * in the scope of this method.
+	 * ClassName and MethodName will contain the  class and method
+	 * of the scope
+	 */
+	const BEGIN_METHOD = 'BEGIN_METHOD';
 
 	/**
-	 * @var string the fully qualified name of the resource being called; in the form ClassName::MethodName if this is a method
-	 * or functionName if this is a function.
+	 * the symbol type. one of the constants.
 	 */
-	public $resource;
+	public $type; 
 	
 	/**
-	 * @var string, this is the argument to the function / method call that has begun in the
-	 * previous line. The argument may be a string (ie. "news/view" without the quotes), a variable (ie. $data, or $this->data). In the
-	 * case that one of the arguments is the result of another function / method call; then the argument will
-	 * be the function name with a parenthesis pair; like this "myFunct()". The parentheses wil always be
-	 * empty, even if that call had arguments.
+	 *  the variable being assigned (the left side of 
+	 *  $a = $b). Will contain the siguil ('$')
 	 */
-	public $paramType;
+	public $destinationVariable;
 	
-	public $variableName;
+	/**
+	 *  if type = SCALAR, then this will be the scalar's lexeme (the contents)
+	 *  for the code:
+	 *    $s = 'hello';
+	 *  ScalarValue will be 'hello' (no quotes)
+	 */
+	public $scalarValue;
 	
-	public $arrayKeys;
+	/**
+	 * if type = ARRAY_KEY this is the key that was assigned to the array
+	 *  for the code:
+	 *    $s['greeting'] = 'hello';
+	 * ArrayKey will be 'greeting' (no quotes)
+	 */
+	public $arrayKey;
 	
-	public $scalar;
+	/**
+	 *  the name of the variable to assign (the right side of 
+	 *  $a = $b)
+	 */
+	public $sourceVariable;
+	
+	/**
+	 * if type = METHOD or type = PROPERTY, this is the name of the
+	 * variable used
+	 *  for the code:
+	 *    $name =  $person->firstName
+	 * ObjectName will be $person
+	 */
+	public $objectName;
+	
+	/**
+	 * if type = PROPERTY, this is the name of the property
+	 * .  this never contains a siguil
+	 * for the code:
+	 *    $name = $person->firstName
+	 * PropertyName will be firstName
+	 */
+	public $propertyName;
+	
+	/**
+	 * if type = METHOD, this is the name of the method being 
+	 * called.
+	 *  for the code:
+	 *    $name = $person->getName()
+	 * MethodName will be getName
+	 * 
+	 * if type = BEGIN_METHOD, this is the name of the 
+	 * method where all of the subsquent variables are located in
+	 */
+	public $methodName;
+	
+	/**
+	 * if type = FUNCTION, this is the name of the function being 
+	 * called.
+	 *  for the code:
+	 *    $name = getName()
+	 * FunctionName will be getName
+	 * 
+	 * if type = BEGIN_FUNCTION, this is the name of the 
+	 * function where all of the subsquent variables are located in
+	 */
+	public $functionName;
+	
+	/**
+	 * if type = NEW_OBJECT, this is the name of the class being 
+	 * instatiated.
+	 *  for the code:
+	 *    $user = new UserClass;
+	 * ClassName will be UserClass
+	 
+	 * if type = BEGIN_METHOD, this is the name of the 
+	 * class where all of the subsquent variables are located in
+	 */
+	public $className;
+	
+	/**
+	 * if type = METHOD or type = FUNCTION this is the list of
+	 * variables that were passed into the function / method. These are the
+	 * "simple" variables; ie the temporary variables that are
+	 * assigned for example the code:
+	 * 
+	 * $name = buildName(getFirstName($a), getLastName($a));
+	 * 
+	 * then FunctionArguments are [ $@tmp1, $@tmp2 ]
+	 * because the resul of getFirstName and getLastName get assigned to
+	 * a temp variable.
+	 * 
+	 */
+	public $functionArguments;
 	
 	/**
 	 * sets all public members to the empty string / array.
 	 */
 	public function clear() {
-		$this->type = '';
-		$this->resource = '';
-		$this->variableName = '';
-		$this->arrayKeys = '';
-		$this->scalar = '';
-		$this->paramType = '';
+		$this->type = self::T_ARRAY;
+		$this->arrayKey = '';
+		$this->className = '';
+		$this->destinationVariable = '';
+		$this->functionArguments = array();
+		$this->functionName = '';
+		$this->methodName = '';
+		$this->objectName = '';
+		$this->scalarValue = '';
+		$this->sourceVariable = '';
 	}
 
 	/**
@@ -97,80 +218,89 @@ class MvcEditor_CallStack {
 		$this->clear();
 		$ret = false;
 		$line = trim($line);
-		if (empty($line) && \opstring\compare($stepType, 'RETURN') != 0) {
+		if (empty($line)) {
 			return $ret;
 		}
 			
 		// line format: a CSV line with variable columns. Each row may have a different
 		// column count depending on the type. Format is as follows:
 		//
-		// BEGIN_FUNCTION, function name,
-		// BEGIN_METHOD, class name, method name
-		// PARAM, SCALAR, expression
-		// PARAM, OBJECT, variable name
-		// PARAM, ARRAY, variable name, list of array keys
-		// ARRAY, variable name, list of array keys
-		// SCALAR, variable name,lexeme
-		// OBJECT, variable name
-		// RETURN
-		//  
-		// where
-		// expression is the lexeme (string) of a constant (when argument is a string / number)
-		// or it can be a variable name.
+		// BEGIN_FUNCTION: function name,
+		// BEGIN_METHOD: class name, method name
+		// SCALAR: destination variable name, scalar value
+		// NEW_OBJECT: destination variable name, class name
+		// ARRAY: destination variable name
+		// ARRAY_KEY: destination variable name, array key
+		// ASSIGN: destination variable name, source variable
+		// PROPERTY: destination variable name, object name, property name
+		// METHOD_CALL: destination variable name, object name, method name, argument1, argument2,...
+		// FUNCTION_CALL: destination variable name, function name, argument1, argument2,...
+		//
 		$columns  = explode(',', $line);
 		if (count($columns) >= 1 && $stepType == self::BEGIN_FUNCTION) {
 			$this->type = $stepType;
-			$this->resource = $columns[0];
+			$this->functionName = $columns[0];
 			$ret = true;
 		}
 		else if (count($columns) >= 2 && ($stepType == self::BEGIN_METHOD)) {
 			$this->type = $stepType;
-			$this->resource = $columns[0] . '::' . $columns[1];
+			$this->className = $columns[0];
+			$this->methodName = $columns[1];
 			$ret = true;
 		}
-		else if (count($columns) >= 2 && $stepType == self::PARAM) {
+		else if (count($columns) >= 2 && $stepType == self::SCALAR) {
 			$this->type = $stepType;
-			$this->paramType = $columns[0];
-			if (self::T_ARRAY == $this->paramType) {
-				$this->variableName = $columns[1];
-				for ($i = 2; $i < count($columns); $i++) {
-					$this->arrayKeys[] = $columns[$i];
-				}
+			$this->destinationVariable = $columns[0];
+			$this->scalarValue = $columns[1];
+			$ret = true;
+		}
+		else if (count($columns) >= 2 &&  $stepType == self::NEW_OBJECT) {
+			$this->type = $stepType;
+			$this->destinationVariable = $columns[0];
+			$this->className = $columns[1];
+			$ret = true;
+		}
+		else if (count($columns) >= 1 && $stepType == self::T_ARRAY) {
+			$this->type = $stepType;
+			$this->destinationVariable = $columns[0];
+			$ret = true;
+		}
+		else if (count($columns) >= 2 && $stepType == self::ARRAY_KEY) {
+			$this->type = $stepType;
+			$this->destinationVariable = $columns[0];
+			$this->arrayKey = $columns[1];
+			$ret = true;
+		}
+		else if (count($columns) >= 2 && $stepType == self::ASSIGN) {
+			$this->type = $stepType;
+			$this->destinationVariable = $columns[0];
+			$this->sourceVariable = $columns[1];
+			$ret = true;
+		}
+		else if (count($columns) >= 3 && $stepType == self::PROPERTY) {
+			$this->type = $stepType;
+			$this->destinationVariable = $columns[0];
+			$this->objectName = $columns[1];
+			$this->propertyName = $columns[2];
+			$ret = true;
+		}
+		else if (count($columns) >= 3 && $stepType == self::METHOD_CALL) {
+			$this->type = $stepType;
+			$this->destinationVariable = $columns[0];
+			$this->objectName = $columns[1];
+			$this->methodName = $columns[2];
+			for ($i = 3; $i < count($columns); $i++) {
+				$this->functionArguments[] = $columns[$i];
 			}
-			else if (self::SCALAR == $this->paramType) {
-			
-				// trim the ending newline that ends the line too
-				// item may be sorrounded by quotes when it is a constant (ALWAYS DOUBLE QUOTES only)
-				$this->scalar = trim($columns[1], "\"\n");
+			$ret = true;
+		}
+		else if (count($columns) >= 2 && $stepType == self::FUNCTION_CALL) {
+			$this->type = $stepType;
+			$this->destinationVariable = $columns[0];
+			$this->functionName = $columns[1];
+			for ($i = 2; $i < count($columns); $i++) {
+				$this->functionArguments[] = $columns[$i];
 			}
-			else if (self::OBJECT == $this->paramType) {
-				$this->variableName = $columns[1];
-			}
-			$ret = true;
-		}
-		else if (count($columns) >= 1 && ($stepType == self::T_ARRAY)) {
-			$this->type = $stepType;
-			$this->variableName = $columns[0];
-			for ($i = 1; $i < count($columns); $i++) {
-				$this->arrayKeys[] = $columns[$i];
-			}
-			$ret = true;
-		}
-		else if (count($columns) >= 1 && ($stepType == self::OBJECT)) {
-			$this->type = $stepType;
-			$this->variableName = $columns[0];
-			$ret = true;
-		}
-		else if (count($columns) >= 1 && ($stepType == self::SCALAR)) {
-			$this->type = $stepType;
-			$this->scalar = $columns[0];
-			// trim the ending newline that ends the line too
-			// item may be sorrounded by quotes when it is a constant (ALWAYS DOUBLE QUOTES only)
-			$this->scalar = trim($this->scalar , "\"\n");
-			$ret = true;
-		}
-		else if (count($columns) >= 1 && ($stepType == self::T_RETURN)) {
-			$this->type = $stepType;
 			$ret = true;
 		}
 		return $ret;
