@@ -158,7 +158,6 @@ function detectTemplates($sourceDir, $detectorDbFileName, &$doSkip) {
 			$scopes[$scopeIndex][] = $call;
 		}
 	}
-	echo "scope count=" . count($scopes) . "\n";
 	
 	// now go through each scope, looking for calls to $this->load->view
 	foreach ($scopes as $scope) {
