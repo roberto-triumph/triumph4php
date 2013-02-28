@@ -337,6 +337,35 @@ TEST_FIXTURE(CallStackFixtureTestClass, MultipleMethodCalls) {
 	CHECK_SYMBOL_IS_METHOD_CALL_ARG(13, 0, "$@tmp9");
 }
 
+TEST_FIXTURE(CallStackFixtureTestClass, MultiplePropertyCalls) {
+	
+	// a property assignment on a long variable
+	 wxString code = wxString::FromAscii(
+			"<?php\n"
+			"class News extends CI_Controller {\n"
+			"\tfunction index() {\n"
+			"\t\t$this->load->title = $this->title;\n"
+			"\t}\n"
+			"}\n"
+		);
+	SetupFile(wxT("news.php"), code);
+	BuildCache();
+
+	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
+	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
+	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
+	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
+	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
+	
+	CHECK_VECTOR_SIZE(6, CallStack.Variables);
+	CHECK_SYMBOL_IS_BEGIN_METHOD(0, "News", "index");
+	CHECK_SYMBOL_IS_ASSIGN(1, "$this", "");
+	CHECK_SYMBOL_IS_PROPERTY(2, "$@tmp1", "$this", "title");
+	CHECK_SYMBOL_IS_PROPERTY(3, "$@tmp2", "$this", "load");
+	CHECK_SYMBOL_IS_PROPERTY(4, "$@tmp3", "$@tmp2", "title");
+	CHECK_SYMBOL_IS_ASSIGN(5, "$@tmp3", "$@tmp1");
+}
+
 TEST_FIXTURE(CallStackFixtureTestClass, WithArrayKeyAssignment) {
 	wxString code = wxString::FromAscii(
 		"<?php\n"

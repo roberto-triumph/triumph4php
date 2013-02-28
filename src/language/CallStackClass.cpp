@@ -494,8 +494,10 @@ void mvceditor::CallStackClass::SymbolsFromVariable(const pelet::VariableClass& 
 			std::vector<pelet::VariablePropertyClass>::const_iterator prop = variable.ChainList.begin();
 			prop++;
 			size_t oldSize = Variables.size();
+			UnicodeString nextObjectName = variable.ChainList[0].Name;
 			for (; prop != variable.ChainList.end(); ++prop) {
-				SymbolFromVariableProperty(variable.ChainList[0].Name, *prop, Variables);
+				SymbolFromVariableProperty(nextObjectName, *prop, Variables);
+				nextObjectName = Variables.back().DestinationVariable;
 			}
 			if (Variables.size() > oldSize) {
 				destinationVariable = Variables.back().DestinationVariable;
