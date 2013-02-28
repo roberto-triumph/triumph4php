@@ -26,10 +26,6 @@
 
 /**
  * This is a class that will take care of deserializing a single CallClass from the call stack file.
- * Usage:
- * The user of this class will open the file using the PHP file functions, the call the fromFile method
- * giving it the opened file resource.  The fromFile method will then reset and fill in the public members
- * according to the contents of the file.
  */
 class MvcEditor_CallStack {
 

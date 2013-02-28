@@ -143,21 +143,7 @@ function detectTemplates($sourceDir, $detectorDbFileName, &$doSkip) {
 	$callStacks = $callStackTable->load();
 	
 	// figure out the variables
-	$scopeIndex = -1;
-	$scopes = array();
-	foreach ($callStacks as $call) {		
-		if ((MvcEditor_CallStack::BEGIN_METHOD == $call->type || MvcEditor_CallStack::BEGIN_FUNCTION == $call->type)) {
-		
-			// these items signal a new scope
-			$scopeIndex++;
-		}
-		else if (!isset($scopes[$scopeIndex])) {
-			$scopes[$scopeIndex] = array();
-		}
-		else {
-			$scopes[$scopeIndex][] = $call;
-		}
-	}
+	$scopes = $callStackTable->splitScopes($callStacks);
 	
 	// now go through each scope, looking for calls to $this->load->view
 	foreach ($scopes as $scope) {

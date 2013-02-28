@@ -66,6 +66,7 @@ class MvcEditor_CallStackTable extends Zend_Db_Table_Abstract {
 	 */
 	public function splitScopes($callStacks) {
 		$scopes = array();
+		$scopeIndex = -1;
 		foreach ($callStacks as $call) {		
 			if ((MvcEditor_CallStack::BEGIN_METHOD == $call->type || MvcEditor_CallStack::BEGIN_FUNCTION == $call->type)) {
 			
