@@ -57,23 +57,16 @@ static int ID_SEQUENCE_GAUGE = wxNewId();
 class AboutDialogWithCreditsClass : public wxGenericAboutDialog {
 
 public:
-	AboutDialogWithCreditsClass(const wxAboutDialogInfo& info, const std::vector<wxString> credits) 
+	AboutDialogWithCreditsClass(const wxAboutDialogInfo& info, const std::vector<wxString>& credits) 
 		: Credits(credits) {
 		Create(info);
     }
 
-    // add some custom controls
     virtual void DoAddCustomControls() {
-		
-		/*
-		AddControl(new wxStaticLine(this), wxSizerFlags().Expand());
-		AddText(_("Credits"));
-		AddText(_("MVC Editor uses the following open source projects. MVC Editor would like to thank the projects for their contributions to the open source community"));
-		*/
 		wxString text;
 		for (size_t i = 0; i < Credits.size(); i++) {
 			text += Credits[i];
-			text += wxT("\r\n");
+			text += wxT("\n");
 		}
 		AddCollapsiblePane(_("Credits"), text);
     }
