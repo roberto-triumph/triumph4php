@@ -458,6 +458,8 @@ void mvceditor::MainFrameClass::OnHelpAbout(wxCommandEvent& event) {
 	info.SetWebSite(wxT("http://www.mvceditor.com"), wxT("http://www.mvceditor.com"));
 
 	std::vector<wxString> credits;
+	credits.push_back(wxT("MVC Editor makes uses of the following open source projects. None of these projects are affiliated with MVC Editor in any way."));
+	credits.push_back(wxT("\n\n"));
 	credits.push_back(wxT("wxWidgets: a C++ crossplatform framework    http://www.wxwidgets.org/"));
 	credits.push_back(wxT("ICU: a library that provides unicode support          http://site.icu-project.org/"));
 	credits.push_back(wxT("wxFormBuilder: a RAD tool for wxWidgets GUI design  http://sourceforge.net/projects/wxformbuilder/"));
