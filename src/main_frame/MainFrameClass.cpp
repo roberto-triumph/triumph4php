@@ -34,6 +34,8 @@
 #include <wx/filename.h>
 #include <wx/wfstream.h>
 #include <wx/aboutdlg.h>
+#include <wx/generic/aboutdlgg.h>
+#include <wx/statline.h>
 #include <vector>
 
 int ID_TOOLBAR_SAVE = wxNewId();
@@ -47,6 +49,39 @@ int ID_UPPERCASE = wxNewId();
 int ID_MENU_MORE = wxNewId();
 int ID_TOOLBAR = wxNewId();
 static int ID_SEQUENCE_GAUGE = wxNewId();
+
+
+/**
+ * enhance the about box with a list of credits
+ */
+class AboutDialogWithCreditsClass : public wxGenericAboutDialog {
+
+public:
+	AboutDialogWithCreditsClass(const wxAboutDialogInfo& info, const std::vector<wxString> credits) 
+		: Credits(credits) {
+		Create(info);
+    }
+
+    // add some custom controls
+    virtual void DoAddCustomControls() {
+		
+		/*
+		AddControl(new wxStaticLine(this), wxSizerFlags().Expand());
+		AddText(_("Credits"));
+		AddText(_("MVC Editor uses the following open source projects. MVC Editor would like to thank the projects for their contributions to the open source community"));
+		*/
+		wxString text;
+		for (size_t i = 0; i < Credits.size(); i++) {
+			text += Credits[i];
+			text += wxT("\r\n");
+		}
+		AddCollapsiblePane(_("Credits"), text);
+    }
+
+private:
+
+	std::vector<wxString> Credits;
+};
 
 mvceditor::MainFrameClass::MainFrameClass(const std::vector<mvceditor::FeatureClass*>& features,
 										mvceditor::AppClass& app,
@@ -422,11 +457,29 @@ void mvceditor::MainFrameClass::OnContentNotebookPageChanged(wxAuiNotebookEvent&
 void mvceditor::MainFrameClass::OnHelpAbout(wxCommandEvent& event) {
 	wxAboutDialogInfo info;
 	info.AddDeveloper(wxT("Roberto Perpuly"));
-	info.SetCopyright(wxT("(c)2009-2011 Roberto Perpuly"));
+	info.SetCopyright(wxT("(c)2009-2013 Roberto Perpuly"));
 	info.SetDescription(wxT("MVC Editor is an Integrated Development Environment for PHP Web Applications"));
 	info.SetName(wxT("MVC Editor"));
 	info.SetVersion(wxString::Format(wxT("%s.%s.%s"), wxT(APP_MAJOR_VERSION), wxT(APP_MINOR_VERSION), wxT(APP_BUILD_NUMBER)));
-	wxAboutBox(info);
+	info.SetLicence(wxT("MIT License"));
+	info.SetWebSite(wxT("http://www.mvceditor.com"), wxT("http://www.mvceditor.com"));
+
+	std::vector<wxString> credits;
+	credits.push_back(wxT("wxWidgets: a C++ crossplatform framework    http://www.wxwidgets.org/"));
+	credits.push_back(wxT("ICU: a library that provides unicode support          http://site.icu-project.org/"));
+	credits.push_back(wxT("wxFormBuilder: a RAD tool for wxWidgets GUI design  http://sourceforge.net/projects/wxformbuilder/"));
+	credits.push_back(wxT("re2c:  a tool for writing very fast and very flexible scanners.  http://re2c.org/"));
+	credits.push_back(wxT("bison: Bison is a general-purpose parser generator.      http://www.gnu.org/software/bison/"));
+	credits.push_back(wxT("SQLite: a library that implements a self-contained SQL database engine      h ttp://www.sqlite.org/"));
+	credits.push_back(wxT("SOCI:  a database access library for C++        http://soci.sourceforge.net/"));
+	credits.push_back(wxT("Premake: Powerfully simple build configuration   http://industriousone.com/premake"));
+	credits.push_back(wxT(""));
+	credits.push_back(wxT("Thanks to Google for providing project hosting: https://code.google.com/"));
+	credits.push_back(wxT(""));
+	credits.push_back(wxT("Fugue icons \xa9 2013 Yusuke Kamiyamane http://p.yusukekamiyamane.com/"));
+	credits.push_back(wxT("Fugue icons used under a Creative Commons Attribution-ShareAlike license: http://creativecommons.org/licenses/by/3.0/"));
+	AboutDialogWithCreditsClass dialog(info, credits);
+	dialog.ShowModal();
 }
 
 void mvceditor::MainFrameClass::SaveCurrentFile(wxCommandEvent& event) {

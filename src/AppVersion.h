@@ -31,9 +31,9 @@
 /*
  * This define is for the Minor version of this program
  */
-#define APP_MINOR_VERSION "2"
+#define APP_MINOR_VERSION "3"
 
 /*
  * This is the lastest build number
  */
-#define APP_BUILD_NUMBER "1"
+#define APP_BUILD_NUMBER "0"
