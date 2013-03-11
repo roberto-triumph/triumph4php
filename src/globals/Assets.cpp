@@ -60,6 +60,7 @@ wxFileName mvceditor::AutoCompleteImageAsset(wxString imageName) {
 	wxString nativeFileName = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
 	                          wxT("..") + wxFileName::GetPathSeparator() +
 	                          wxT("resources") + wxFileName::GetPathSeparator() +
+							  wxT("auto_complete") + wxFileName::GetPathSeparator() +
 							  imageName +
 	                          wxT(".xpm");
 	wxFileName fileName(nativeFileName);
@@ -67,6 +68,25 @@ wxFileName mvceditor::AutoCompleteImageAsset(wxString imageName) {
 	wxASSERT(fileName.IsOk());
 	return fileName;
 }
+
+wxFileName mvceditor::IconImageAsset(wxString imageName) {
+	if (!wxImage::FindHandler(wxBITMAP_TYPE_PNG)) {
+		wxImage::AddHandler(new wxPNGHandler());	
+	}
+	wxStandardPaths paths;
+	wxFileName pathExecutableFileName(paths.GetExecutablePath());
+	wxString nativeFileName = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
+	                          wxT("..") + wxFileName::GetPathSeparator() +
+	                          wxT("resources") + wxFileName::GetPathSeparator() +
+							  wxT("icons") + wxFileName::GetPathSeparator() +
+							  imageName +
+	                          wxT(".png");
+	wxFileName fileName(nativeFileName);
+	fileName.Normalize();
+	wxASSERT(fileName.IsOk());
+	return fileName;
+}
+
 
 wxFileName mvceditor::PhpDetectorsBaseAsset() {
 	wxStandardPaths paths;

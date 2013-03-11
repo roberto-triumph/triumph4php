@@ -164,7 +164,9 @@ enum AutoCompletionImages {
 	AUTOCOMP_IMAGE_PUBLIC_METHOD,
 	AUTOCOMP_IMAGE_PRIVATE_MEMBER,
 	AUTOCOMP_IMAGE_PROTECTED_MEMBER,
-	AUTOCOMP_IMAGE_PUBLIC_MEMBER
+	AUTOCOMP_IMAGE_PUBLIC_MEMBER,
+	AUTOCOMP_IMAGE_CLASS_CONSTANT,
+	AUTOCOMP_IMAGE_DEFINE
 };
 
 /**
@@ -478,7 +480,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 				mvceditor::TagClass res = AutoCompletionResourceMatches[i];
 				wxString postFix;
 				if (mvceditor::TagClass::DEFINE == res.Type) {
-					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_VARIABLE);
+					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_DEFINE);
 				}
 				else if (mvceditor::TagClass::FUNCTION == res.Type) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_FUNCTION);
@@ -520,6 +522,9 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 				}
 				else if (mvceditor::TagClass::METHOD == res.Type) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PUBLIC_METHOD);
+				}
+				else if (mvceditor::TagClass::CLASS_CONSTANT == res.Type) {
+					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_CLASS_CONSTANT);
 				}
 				autoCompleteList.push_back(comp + postFix);
 			}
@@ -935,16 +940,18 @@ void mvceditor::PhpDocumentClass::OnCallTipClick(wxStyledTextEvent& evt) {
 void mvceditor::PhpDocumentClass::RegisterAutoCompletionImages() {
 	AreImagesRegistered = true;
 	std::map<int, wxString> autoCompleteImages;
-	autoCompleteImages[AUTOCOMP_IMAGE_CLASS] = wxT("round-blue");
-	autoCompleteImages[AUTOCOMP_IMAGE_FUNCTION] = wxT("F-unction");
-	autoCompleteImages[AUTOCOMP_IMAGE_KEYWORD] = wxT("inner-square-blue");
-	autoCompleteImages[AUTOCOMP_IMAGE_PRIVATE_MEMBER] = wxT("dot-red");
-	autoCompleteImages[AUTOCOMP_IMAGE_PRIVATE_METHOD] = wxT("F-unction-blue");
-	autoCompleteImages[AUTOCOMP_IMAGE_PROTECTED_MEMBER] = wxT("dot-orange");
-	autoCompleteImages[AUTOCOMP_IMAGE_PROTECTED_METHOD] = wxT("F-unction-blue");
-	autoCompleteImages[AUTOCOMP_IMAGE_PUBLIC_MEMBER] = wxT("dot-blue");
-	autoCompleteImages[AUTOCOMP_IMAGE_PUBLIC_METHOD] = wxT("F-unction");
-	autoCompleteImages[AUTOCOMP_IMAGE_VARIABLE] = wxT("inner-square-black");
+	autoCompleteImages[AUTOCOMP_IMAGE_CLASS] = wxT("class_black");
+	autoCompleteImages[AUTOCOMP_IMAGE_FUNCTION] = wxT("function_black");
+	autoCompleteImages[AUTOCOMP_IMAGE_KEYWORD] = wxT("keyword_black");
+	autoCompleteImages[AUTOCOMP_IMAGE_PRIVATE_MEMBER] = wxT("property_black");
+	autoCompleteImages[AUTOCOMP_IMAGE_PRIVATE_METHOD] = wxT("function_black");
+	autoCompleteImages[AUTOCOMP_IMAGE_PROTECTED_MEMBER] = wxT("property_black");
+	autoCompleteImages[AUTOCOMP_IMAGE_PROTECTED_METHOD] = wxT("property_black");
+	autoCompleteImages[AUTOCOMP_IMAGE_PUBLIC_MEMBER] = wxT("property_black");
+	autoCompleteImages[AUTOCOMP_IMAGE_PUBLIC_METHOD] = wxT("function_blue");
+	autoCompleteImages[AUTOCOMP_IMAGE_VARIABLE] = wxT("inner_square_black");
+	autoCompleteImages[AUTOCOMP_IMAGE_CLASS_CONSTANT] = wxT("class_constant_black");
+	autoCompleteImages[AUTOCOMP_IMAGE_DEFINE] = wxT("define_black");
 	for (std::map<int, wxString>::iterator it = autoCompleteImages.begin(); it != autoCompleteImages.end(); ++it) {
 		wxFileName imgFileName = mvceditor::AutoCompleteImageAsset(it->second);
 		wxBitmap bitmap(imgFileName.GetFullPath(), wxBITMAP_TYPE_XPM);

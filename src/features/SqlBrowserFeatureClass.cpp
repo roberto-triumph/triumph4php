@@ -28,6 +28,7 @@
 #include <globals/String.h>
 #include <widgets/UnicodeStringValidatorClass.h>
 #include <globals/Errors.h>
+#include <globals/Assets.h>
 #include <MvcEditor.h>
 #include <wx/artprov.h>
 
@@ -717,8 +718,9 @@ void mvceditor::SqlBrowserFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 }
 
 void mvceditor::SqlBrowserFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
-	toolBar->AddTool(mvceditor::MENU_SQL + 0, _("SQL Browser"), wxArtProvider::GetBitmap(
-		wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), wxT("Open the SQL Browser"), wxITEM_NORMAL);
+	wxBitmap bmp;
+	bmp.LoadFile(mvceditor::IconImageAsset(wxT("sql")).GetFullPath(), wxBITMAP_TYPE_PNG);
+	toolBar->AddTool(mvceditor::MENU_SQL + 0, _("SQL Browser"), bmp, wxT("Open the SQL Browser"), wxITEM_NORMAL);
 }
 
 void  mvceditor::SqlBrowserFeatureClass::OnSqlBrowserToolsMenu(wxCommandEvent& event) {

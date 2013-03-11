@@ -58,8 +58,9 @@ void mvceditor::TagFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClas
 }
 
 void mvceditor::TagFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
-	toolBar->AddTool(mvceditor::MENU_RESOURCE + 0, wxT("Index"), wxArtProvider::GetBitmap(
-		wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), wxT("Index"), wxITEM_NORMAL);
+	wxBitmap bmp;
+	bmp.LoadFile(mvceditor::IconImageAsset(wxT("tag-projects")).GetFullPath(), wxBITMAP_TYPE_PNG);
+	toolBar->AddTool(mvceditor::MENU_RESOURCE + 0, wxT("Tag Projects"), bmp, _("Create tags for the enabled projects"), wxITEM_NORMAL);
 }
 
 void mvceditor::TagFeatureClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {

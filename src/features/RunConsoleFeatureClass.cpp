@@ -25,6 +25,7 @@
 #include <features/RunConsoleFeatureClass.h>
 #include <globals/String.h>
 #include <globals/Errors.h>
+#include <globals/Assets.h>
 #include <MvcEditor.h>
 #include <wx/artprov.h>
 #include <wx/filename.h>
@@ -692,8 +693,9 @@ void mvceditor::RunConsoleFeatureClass::OnUpdateUi(wxUpdateUIEvent& event) {
 }
 
 void mvceditor::RunConsoleFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
-	toolBar->AddTool(mvceditor::MENU_RUN_PHP + 0, _("Run"), wxArtProvider::GetBitmap(
-		wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), _("Run"));
+	wxBitmap bmp;
+	bmp.LoadFile(mvceditor::IconImageAsset(wxT("run")).GetFullPath(), wxBITMAP_TYPE_PNG);
+	toolBar->AddTool(mvceditor::MENU_RUN_PHP + 0, _("Run"), bmp, _("Run"));
 }
 
 void mvceditor::RunConsoleFeatureClass::OnRunSavedCommands(wxCommandEvent& event) {

@@ -49,6 +49,13 @@ wxFileName ResourceSqlSchemaAsset();
 wxFileName AutoCompleteImageAsset(wxString imageName);
 
 /**
+ * @param the name of an image, minus the .png extension
+ * @return the file location of the given icon image.  The image name must exist; if it
+ * does not an assertion is triggered.
+ */
+wxFileName IconImageAsset(wxString imageName);
+
+/**
  * @return the base directory location of the PHP URL scripts.  The editor will use this as the
  * include path when calling all PHP detectors
  */

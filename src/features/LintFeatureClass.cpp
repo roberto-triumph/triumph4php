@@ -25,6 +25,8 @@
 #include <features/LintFeatureClass.h>
 #include <globals/String.h>
 #include <globals/Errors.h>
+#include <globals/Assets.h>
+
 #include <MvcEditor.h>
 #include <globals/Events.h>
 #include <unicode/unistr.h>
@@ -315,8 +317,9 @@ void mvceditor::LintFeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
 }
 
 void mvceditor::LintFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
-	wxBitmap bitmap = wxArtProvider::GetBitmap(wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16));
-	toolBar->AddTool(mvceditor::MENU_LINT_PHP + 0, _("Lint Check"), bitmap, _("Performs syntax check on the current project"));
+	wxBitmap bmp;
+	bmp.LoadFile(mvceditor::IconImageAsset(wxT("lint-check")).GetFullPath(), wxBITMAP_TYPE_PNG);
+	toolBar->AddTool(mvceditor::MENU_LINT_PHP + 0, _("Lint Check"), bmp, _("Performs syntax check on the current project"));
 }
 
 void mvceditor::LintFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {

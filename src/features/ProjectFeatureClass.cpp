@@ -25,6 +25,7 @@
 #include <features/ProjectFeatureClass.h>
 #include <widgets/NonEmptyTextValidatorClass.h>
 #include <globals/Errors.h>
+#include <globals/Assets.h>
 #include <MvcEditor.h>
 #include <wx/artprov.h>
 #include <wx/platinfo.h>
@@ -69,10 +70,13 @@ void mvceditor::ProjectFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmd
 }
 
 void mvceditor::ProjectFeatureClass::AddToolBarItems(wxAuiToolBar* toolbar) {
-	wxBitmap bitmap = wxArtProvider::GetBitmap(wxART_FOLDER_OPEN, wxART_TOOLBAR, wxSize(16, 16));
-	toolbar->AddTool(mvceditor::MENU_PROJECT + 1, _("Explore"), bitmap, _("Open An explorer window in the Project Root"));
-	bitmap = wxArtProvider::GetBitmap(wxART_FOLDER_OPEN, wxART_TOOLBAR, wxSize(16, 16));
-	toolbar->AddTool(mvceditor::MENU_PROJECT + 2, _("Explore Open File"), bitmap, _("Open An explorer window in the currently opened file"));
+	wxBitmap bmp;
+	bmp.LoadFile(mvceditor::IconImageAsset(wxT("explore")).GetFullPath(), wxBITMAP_TYPE_PNG);
+	wxBitmap bmpOpen;
+	bmpOpen.LoadFile(mvceditor::IconImageAsset(wxT("explore-open-document")).GetFullPath(), wxBITMAP_TYPE_PNG);
+
+	toolbar->AddTool(mvceditor::MENU_PROJECT + 1, _("Explore"), bmp, _("Open An explorer window in the Project Root"));
+	toolbar->AddTool(mvceditor::MENU_PROJECT + 2, _("Explore Open File"), bmpOpen, _("Open An explorer window in the currently opened file"));
 }
 
 void mvceditor::ProjectFeatureClass::LoadPreferences(wxConfigBase* config) {
