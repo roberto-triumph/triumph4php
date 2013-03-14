@@ -27,7 +27,7 @@ newaction {
 	trigger = "soci",
 	description = "Build the SOCI (database access) library",
 	execute = function()
-		batchexecute(os.getcwd(), { string.format("%s --version", CMAKE) }, "cmake not found. Compiling SOCI requires CMake. SOCI cannot be built.")
+		batchexecute(normalizepath("lib/soci"), { string.format("%s --version", CMAKE) }, "cmake not found. Compiling SOCI requires CMake. SOCI cannot be built.")
 		SOCI_BUILD_DIR =  normalizepath("lib/soci/mvc-editor");
 		SOCI_ROOT = normalizepath("lib/soci")
 		SOCI_SRC = normalizepath("lib/soci/src")

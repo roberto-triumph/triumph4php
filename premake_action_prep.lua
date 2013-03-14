@@ -112,12 +112,14 @@ function checkIcu()
 			print(cmd)
 			os.execute(cmd)
 		else 
-			error ("ICU DLLs not found in " .. icuDllPath .. ".  You need to build the ICU library. " ..
-					"Extract the ICU library into " .. normalizepath(ICU_LIB_DIR .. "../") ..
-					"open the following solution file in Visual Studio: " .. normalizepath(ICU_LIB_DIR .. "../source/allinone/allinone.sln") ..
-					"Choose Debug|Win32 Build. Go to Build .. Rebuild Solution" ..
-					"Choose Release|Win32 Build. Go to Build .. Rebuild Solution" ..
-					"(Note: Batch Build \"Select All\" won't work on Visual Studio 2008 Express Edition because it does not support 64 bit compilation)")
+			error ("ICU DLLs not found in " .. icuDllPath .. ".  Either build the ICU library " ..
+				"\nor set the MVCEDITOR_ICU_DIR environment variable to the location of ICU." ..
+				"To build the ICU library:" ..
+				"\nExtract the ICU library into " .. normalizepath(ICU_LIB_DIR .. "../") ..
+				"open the following solution file in Visual Studio: " .. normalizepath(ICU_LIB_DIR .. "../source/allinone/allinone.sln") ..
+				"\nChoose Debug|Win32 Build. Go to Build .. Rebuild Solution" ..
+				"\nChoose Release|Win32 Build. Go to Build .. Rebuild Solution" ..
+				"\n(Note: Batch Build \"Select All\" won't work on Visual Studio 2008 Express Edition because it does not support 64 bit compilation)")
 		end
 	elseif os.is "linux" then
 		print(ICU_CONFIG .. " --exists")
@@ -209,7 +211,9 @@ function checkMysql()
 		else 
 			error ("MySQL libraries not found in " ..  MYSQL_LIB_DIR ..
 				"\nPlease download the MySQL Connector/C from http://dev.mysql.com/downloads/connector/c/\n" ..
-				"and extract to " .. MYSQL_LIB_DIR)
+				"and extract to " .. MYSQL_LIB_DIR .. 
+				"\nOR" ..
+				"set the environment variable MVCEDITOR_MYSQL_CONNECTOR_DIR to location of MySQL connector.")
 		end
 	elseif os.is "linux" then
 		mysqlLib = MYSQL_LIB_DIR .. MYSQL_LIB_NAME
@@ -243,7 +247,9 @@ function checkSqlite()
 		else 
 			error ("SQLite libraries not found in " ..  SQLITE_LIB_DIR ..
 				"\nPlease download the SQLite3 DLLs from http://sqlite.org/download.html\n" ..
-				"and extract to " .. SQLITE_LIB_DIR)
+				"and extract to " .. SQLITE_LIB_DIR ..
+				"\nOR set the environment variable MVCEDITOR_SQLITE_DIR to the location" .. 
+				"of the SQLITE files.  See lib/sqlite/README for more info.")
 		end
 	elseif os.is "linux" then
 		sqliteLib = SQLITE_LIB_DIR .. SQLITE_LIB_NAME

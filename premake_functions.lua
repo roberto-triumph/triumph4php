@@ -27,15 +27,18 @@
 -- this function will also enclose the path in quotes; allowing file paths with spaces to be used.
 -- main purpose of this function is to generate paths that can be embedded into strings that consist
 -- of system commands.
-function normalizepath(path) 
+function normalizepath(filepath) 
+	if not path.isabsolute(filepath) then
+		filepath = os.getcwd() .. "/" .. filepath
+	end
 	if os.is "windows" then
 	
 		-- Windows XP doesn't like forward slashes
-		path = "\"" .. string.gsub(os.getcwd(), "/", "\\") .. "\\" .. string.gsub(path, "/", "\\") .. "\"";
+		filepath = "\"" .. string.gsub(filepath, "/", "\\") .. "\"";
 	else 
-		path = "\"" .. os.getcwd() .. "/" .. path .. "\"";
+		filepath = "\"" .. filepath .. "\"";
 	end
-	return path
+	return filepath
 end
 
 -- takes a path relative to the project root and checks that it exists in the file system. if

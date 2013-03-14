@@ -47,11 +47,17 @@ ICU_LIBS_DEBUG = {
        "iculxd", "icutud", "icuucd"
 }
 
+icuDir = os.getenv("MVCEDITOR_ICU_DIR")
+if (not icuDir) then
+	icuDir = "lib/icu"
+	print "Using default location of lib/icu for ICU dir"
+end
+
 -- location where the ICU lib files are located
-ICU_LIB_DIR = "lib/icu/lib/"
+ICU_LIB_DIR = icuDir .. "/lib/"
 
 -- location where the ICU header files are located
-ICU_INCLUDE_DIR = "lib/icu/include/"
+ICU_INCLUDE_DIR = icuDir .. "/include/"
 
 -- location to the wxWidgets libraries. Make sure to copy the
 -- wxWidgets DLLs to the Debug directory, otherwise the wxWidgets library
@@ -98,25 +104,37 @@ WX_STC_INCLUDE_DIRS = "$(WXWIN)/contrib/include/"
 
 -- location of the cmake executable. cmake is used to build the SOCI
 -- library (Database Access wrapper)
-CMAKE = 'cmake';
+CMAKE = 'cmake.exe';
 
 -- will look for MySQL files in these directories
 -- not easy to get MySQL Connector C libs in windows
 -- doing a manual, binary install
-MYSQL_INCLUDE_DIR = 'lib/mysql-connector-c-noinstall-6.0.2-win32/include'
-MYSQL_LIB = 'lib/mysql-connector-c-noinstall-6.0.2-win32/lib/libmysql.lib'
-MYSQL_LIB_DIR = 'lib/mysql-connector-c-noinstall-6.0.2-win32/lib/'
+
+mysqlDir = os.getenv("MVCEDITOR_MYSQL_CONNECTOR_DIR")
+if (not mysqlDir) then
+
+	mysqlDir = "lib/mysql-connector-c-noinstall-6.0.2-win32"
+	print("Using default dir for MySQL Connector: " .. mysqlDir)
+end
+MYSQL_INCLUDE_DIR = mysqlDir .. '/include'
+MYSQL_LIB = mysqlDir .. '/lib/libmysql.lib'
+MYSQL_LIB_DIR = mysqlDir .. '/lib/'
 MYSQL_LIB_NAME = 'libmysql.lib'
 
 -- On some unit tests, MVC Editor attempt to connect to a database
 -- Set the username and password to use here.
 -- MVC Editor will create (and drop) the schema that it uses
-MVCEDITOR_DB_USER = 'mvc-editor';
-MVCEDITOR_DB_PASSWORD = '';
+MVCEDITOR_DB_USER = 'mvc-editor'
+MVCEDITOR_DB_PASSWORD = ''
 
 -- will look for SQLite in these directories
 -- read lib/sqlite/README  for more info
-SQLITE_INCLUDE_DIR = 'lib/sqlite/include'
-SQLITE_LIB = 'lib/sqlite/lib/sqlite3.lib'
-SQLITE_LIB_DIR = 'lib/sqlite/lib'
+sqliteDir = os.getenv("MVCEDITOR_SQLITE_DIR")
+if (not sqliteDir) then
+	sqliteDir = "lib/sqlite";
+	print("Using default dir for SQLITE driver: " .. sqliteDir)
+end
+SQLITE_INCLUDE_DIR = sqliteDir .. '/include'
+SQLITE_LIB = sqliteDir .. '/lib/sqlite3.lib'
+SQLITE_LIB_DIR = sqliteDir .. '/lib'
 SQLITE_LIB_NAME = 'sqlite3.lib'
