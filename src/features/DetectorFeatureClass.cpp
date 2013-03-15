@@ -692,7 +692,7 @@ mvceditor::TemplateFileTagsDetectorPanelClass::TemplateFileTagsDetectorPanelClas
 														mvceditor::RunningThreadsClass& runningThreads)
 	: TemplateFilesDetectorPanelGeneratedClass(parent, id) 
 	, Detector() 
-	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, mvceditor::IconImageAsset(wxT("template-files-detectors")))
+	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, mvceditor::IconImageAsset(wxT("template-file-detectors")))
 	, TestUrl()
 	, Globals(globals) 
 	, RunningThreads(runningThreads) {
