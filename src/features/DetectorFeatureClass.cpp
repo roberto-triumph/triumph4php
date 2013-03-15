@@ -867,7 +867,8 @@ void mvceditor::DetectorFeatureClass::OnViewUrlDetectors(wxCommandEvent& event) 
 	else {
 		mvceditor::UrlTagDetectorPanelClass* panel = new mvceditor::UrlTagDetectorPanelClass(GetOutlineNotebook(), ID_URL_DETECTOR_PANEL, 
 			App.Globals, App.EventSink);
-		if (AddOutlineWindow(panel, _("URL Detectors"))) {
+		wxBitmap urlBitmap = mvceditor::IconImageAsset(wxT("url-detectors"));
+		if (AddOutlineWindow(panel, _("URL Detectors"), urlBitmap)) {
 			panel->Init();
 			panel->UpdateProjects();
 		}
@@ -882,7 +883,8 @@ void mvceditor::DetectorFeatureClass::OnViewTemplateFileDetectors(wxCommandEvent
 	else {
 		mvceditor::TemplateFileTagsDetectorPanelClass* panel = new mvceditor::TemplateFileTagsDetectorPanelClass(GetOutlineNotebook(), ID_TEMPLATE_FILES_DETECTOR_PANEL, 
 			App.Globals, App.EventSink, App.RunningThreads);
-		if (AddOutlineWindow(panel, _("Template Files Detectors"))) {
+		wxBitmap templateFilesBitmap = mvceditor::IconImageAsset(wxT("template-file-detectors"));
+		if (AddOutlineWindow(panel, _("Template Files Detectors"), templateFilesBitmap)) {
 			panel->Init();
 			panel->UpdateProjects();
 		}
@@ -897,7 +899,8 @@ void mvceditor::DetectorFeatureClass::OnViewTagDetectors(wxCommandEvent& event) 
 	else {
 		mvceditor::TagDetectorPanelClass* panel = new mvceditor::TagDetectorPanelClass(GetOutlineNotebook(), ID_TAG_DETECTOR_PANEL, 
 			App.Globals, App.EventSink);
-		if (AddOutlineWindow(panel, _("Tag Detectors"))) {
+		wxBitmap tagBitmap = mvceditor::IconImageAsset(wxT("tag-detectors"));
+		if (AddOutlineWindow(panel, _("Tag Detectors"), tagBitmap)) {
 			panel->Init();
 			panel->UpdateProjects();
 		}
@@ -912,7 +915,8 @@ void mvceditor::DetectorFeatureClass::OnViewDatabaseDetectors(wxCommandEvent& ev
 	else {
 		mvceditor::DatabaseTagDetectorPanelClass* panel = new mvceditor::DatabaseTagDetectorPanelClass(GetOutlineNotebook(), ID_DATABASE_DETECTOR_PANEL, 
 			App.Globals, App.EventSink);
-		if (AddOutlineWindow(panel, _("Database Detectors"))) {
+		wxBitmap databaseBitmap = mvceditor::IconImageAsset(wxT("database-detectors"));
+		if (AddOutlineWindow(panel, _("Database Detectors"), databaseBitmap)) {
 			panel->Init();
 			panel->UpdateProjects();
 		}
@@ -927,7 +931,8 @@ void mvceditor::DetectorFeatureClass::OnViewConfigDetectors(wxCommandEvent& even
 	else {
 		mvceditor::ConfigTagDetectorPanelClass* panel = new mvceditor::ConfigTagDetectorPanelClass(GetOutlineNotebook(), ID_CONFIG_DETECTOR_PANEL, 
 			App.Globals, App.EventSink);
-		if (AddOutlineWindow(panel, _("Config Detectors"))) {
+		wxBitmap configBitmap = mvceditor::IconImageAsset(wxT("config-detectors"));
+		if (AddOutlineWindow(panel, _("Config Detectors"), configBitmap)) {
 			panel->Init();
 			panel->UpdateProjects();
 		}

@@ -26,6 +26,7 @@
 #define __MVCEDITOR_ASSETS_H__
 
 #include <wx/filename.h>
+#include <wx/bitmap.h>
 
 namespace mvceditor {
 
@@ -43,17 +44,17 @@ wxFileName ResourceSqlSchemaAsset();
 
 /**
  * @param the name of an image, minus the .xpm extension
- * @return the file location of the given auto complete image.  The image name must exist; if it
+ * @return the loaded bitmap of the given auto complete image.  The image name must exist; if it
  * does not an assertion is triggered.
  */
-wxFileName AutoCompleteImageAsset(wxString imageName);
+wxBitmap AutoCompleteImageAsset(wxString imageName);
 
 /**
  * @param the name of an image, minus the .png extension
- * @return the file location of the given icon image.  The image name must exist; if it
+ * @return the loaded bitmap of the given icon image.  The image name must exist; if it
  * does not an assertion is triggered.
  */
-wxFileName IconImageAsset(wxString imageName);
+wxBitmap IconImageAsset(wxString imageName);
 
 /**
  * @return the base directory location of the PHP URL scripts.  The editor will use this as the

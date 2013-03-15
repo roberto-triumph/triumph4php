@@ -24,6 +24,7 @@
  */
 #include <features/FindInFilesFeatureClass.h>
 #include <globals/String.h>
+#include <globals/Assets.h>
 #include <widgets/UnicodeStringValidatorClass.h>
 #include <widgets/RegularExpressionValidatorClass.h>
 #include <globals/Errors.h>
@@ -789,7 +790,15 @@ void mvceditor::FindInFilesFeatureClass::OnEditFindInFiles(wxCommandEvent& event
 	if (dialog.ShowModal() == wxID_OK) {
 		mvceditor::FindInFilesResultsPanelClass* panel = new mvceditor::FindInFilesResultsPanelClass(GetToolsNotebook(), 
 			GetNotebook(), GetStatusBarWithGauge(), App.RunningThreads);		
-		if(AddToolsWindow(panel, _("Find In Files Results"))) {
+		wxBitmap findBitmap = wxNullBitmap;
+		if (PreviousFindInFiles.ReplaceExpression.isEmpty()) {
+			findBitmap = mvceditor::IconImageAsset(wxT("find-in-files"));
+		}
+		else {
+			findBitmap = mvceditor::IconImageAsset(wxT("replace-in-files"));
+		}
+		
+		if(AddToolsWindow(panel, _("Find In Files Results"), wxEmptyString, findBitmap)) {
 			panel->Find(PreviousFindInFiles, DoHiddenFiles);
 			ResultsPanels.push_back(panel);
 		}

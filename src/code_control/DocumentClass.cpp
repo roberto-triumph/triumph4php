@@ -953,8 +953,7 @@ void mvceditor::PhpDocumentClass::RegisterAutoCompletionImages() {
 	autoCompleteImages[AUTOCOMP_IMAGE_CLASS_CONSTANT] = wxT("class_constant_black");
 	autoCompleteImages[AUTOCOMP_IMAGE_DEFINE] = wxT("define_black");
 	for (std::map<int, wxString>::iterator it = autoCompleteImages.begin(); it != autoCompleteImages.end(); ++it) {
-		wxFileName imgFileName = mvceditor::AutoCompleteImageAsset(it->second);
-		wxBitmap bitmap(imgFileName.GetFullPath(), wxBITMAP_TYPE_XPM);
+		wxBitmap bitmap = mvceditor::AutoCompleteImageAsset(it->second);
 		Ctrl->RegisterImage(it->first, bitmap);
 	}
 }

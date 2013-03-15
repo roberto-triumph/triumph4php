@@ -70,10 +70,8 @@ void mvceditor::ProjectFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmd
 }
 
 void mvceditor::ProjectFeatureClass::AddToolBarItems(wxAuiToolBar* toolbar) {
-	wxBitmap bmp;
-	bmp.LoadFile(mvceditor::IconImageAsset(wxT("explore")).GetFullPath(), wxBITMAP_TYPE_PNG);
-	wxBitmap bmpOpen;
-	bmpOpen.LoadFile(mvceditor::IconImageAsset(wxT("explore-open-document")).GetFullPath(), wxBITMAP_TYPE_PNG);
+	wxBitmap bmp = mvceditor::IconImageAsset(wxT("explore"));
+	wxBitmap bmpOpen = mvceditor::IconImageAsset(wxT("explore-open-document"));
 
 	toolbar->AddTool(mvceditor::MENU_PROJECT + 1, _("Explore"), bmp, _("Open An explorer window in the Project Root"));
 	toolbar->AddTool(mvceditor::MENU_PROJECT + 2, _("Explore Open File"), bmpOpen, _("Open An explorer window in the currently opened file"));

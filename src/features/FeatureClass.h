@@ -261,18 +261,20 @@ protected:
 	 * @param wxWindow* window the window to add
 	 * @param wxString tabName the name that will show up in the window's tab
 	 * @param wxString windowName the name that will be given to the window (wxWindow::SetName)
+	 * @param bitmap the image that gets place in the notebook tab for this window
 	 * @return bool true if window was added.
 	 */
-	bool AddToolsWindow(wxWindow* window, wxString tabName, wxString windowName = wxEmptyString);
+	bool AddToolsWindow(wxWindow* window, wxString tabName, wxString windowName = wxEmptyString, const wxBitmap& bitmap = wxNullBitmap);
 
 	/**
 	 * Add a window to the outline notebook. Once added, this class will take care of memory management for the window pointer.
 	 * 
 	 * @param wxWindow* window the window to add
 	 * @param wxString name the name that will show up in the window's tab
+	 * @param bitmap the image that gets place in the notebook tab for this window
 	 * @return bool true if window was added.
 	 */
-	bool AddOutlineWindow(wxWindow* window, wxString name);
+	bool AddOutlineWindow(wxWindow* window, wxString name, const wxBitmap& bitmap = wxNullBitmap);
 	
 	/**
 	 * Finds the tools window with the given window ID and returns it.

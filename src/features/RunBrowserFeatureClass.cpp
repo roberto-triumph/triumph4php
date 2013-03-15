@@ -57,8 +57,7 @@ static void ExternalBrowser(const wxString& browserName, const wxURI& url, mvced
 
 /**
  * get all of the browser icons and load them into memory.
- * @return vector the returned bitmaps must be cleaned up. Use BrowserIconsDelete() to clean up
- *         the returned bitmaps.
+ * @return vector the returned bitmaps 
  *         the returned bitmaps will alaways have a guaranteed order
  *         0 = chrome icon
  *         1 = firefox icon
@@ -68,21 +67,15 @@ static void ExternalBrowser(const wxString& browserName, const wxURI& url, mvced
  *         5 = unknown 'generic' web browser icon
  *         
  */
-static std::vector<wxBitmap*> BrowserIconsLoad() {
-	wxBitmap* browserOperaBitmap = new wxBitmap;
-	browserOperaBitmap->LoadFile(mvceditor::IconImageAsset(wxT("browser-opera")).GetFullPath(), wxBITMAP_TYPE_PNG);
-	wxBitmap* browserChromeBitmap = new wxBitmap();
-	browserChromeBitmap->LoadFile(mvceditor::IconImageAsset(wxT("browser-chrome")).GetFullPath(), wxBITMAP_TYPE_PNG);
-	wxBitmap* browserInternetExplorerBitmap = new wxBitmap();
-	browserInternetExplorerBitmap->LoadFile(mvceditor::IconImageAsset(wxT("browser-internet-explorer")).GetFullPath(), wxBITMAP_TYPE_PNG);
-	wxBitmap* browserFirefoxBitmap = new wxBitmap();
-	browserFirefoxBitmap->LoadFile(mvceditor::IconImageAsset(wxT("browser-firefox")).GetFullPath(), wxBITMAP_TYPE_PNG);
-	wxBitmap* browserSafariBitmap = new wxBitmap();
-	browserSafariBitmap->LoadFile(mvceditor::IconImageAsset(wxT("browser-safari")).GetFullPath(), wxBITMAP_TYPE_PNG);
-	wxBitmap* browserGenericBitmap = new wxBitmap();
-	browserGenericBitmap->LoadFile(mvceditor::IconImageAsset(wxT("browser-generic")).GetFullPath(), wxBITMAP_TYPE_PNG);
+static std::vector<wxBitmap> BrowserIconsLoad() {
+	wxBitmap browserOperaBitmap = mvceditor::IconImageAsset(wxT("browser-opera"));
+	wxBitmap browserChromeBitmap = mvceditor::IconImageAsset(wxT("browser-chrome"));
+	wxBitmap browserInternetExplorerBitmap = mvceditor::IconImageAsset(wxT("browser-internet-explorer"));
+	wxBitmap browserFirefoxBitmap = mvceditor::IconImageAsset(wxT("browser-firefox"));
+	wxBitmap browserSafariBitmap = mvceditor::IconImageAsset(wxT("browser-safari"));
+	wxBitmap browserGenericBitmap = mvceditor::IconImageAsset(wxT("browser-generic"));
 
-	std::vector<wxBitmap*>  icons;
+	std::vector<wxBitmap> icons;
 	icons.push_back(browserChromeBitmap);
 	icons.push_back(browserFirefoxBitmap);
 	icons.push_back(browserInternetExplorerBitmap);
@@ -97,7 +90,7 @@ static std::vector<wxBitmap*> BrowserIconsLoad() {
  * @param name string to compare
  * @return int index into browserIcons of the icon that should be displayed with the given name
  */
-static int BrowserIconsIndex(std::vector<wxBitmap*>&  browserIcons, const wxString& name) {
+static int BrowserIconsIndex(std::vector<wxBitmap>&  browserIcons, const wxString& name) {
 	wxString lowerCaseBrowserName(name);
 	lowerCaseBrowserName.LowerCase();
 	if (lowerCaseBrowserName.Contains(wxT("chrome"))) {
@@ -122,21 +115,11 @@ static int BrowserIconsIndex(std::vector<wxBitmap*>&  browserIcons, const wxStri
  * set the menu item icon to the corresponding web browser icon.  the menu item name
  * will determine what browser icon we use
  */
-static void BrowserIconsMenuSet(std::vector<wxBitmap*>&  browserIcons, wxMenuItem* menuItem) {
+static void BrowserIconsMenuSet(std::vector<wxBitmap>&  browserIcons, wxMenuItem* menuItem) {
 	int index = BrowserIconsIndex(browserIcons, menuItem->GetLabel());
 	if (index >= 0 && index < (int)browserIcons.size()) {
-		menuItem->SetBitmap(*(browserIcons[index]));
+		menuItem->SetBitmap(browserIcons[index]);
 	}
-}
-
-/**
- * cleans up all browser icons (the reverse of BrowserIconsLoad)
- */
-void BrowserIconsDelete(std::vector<wxBitmap*>&  browserIcons) {
-	for (size_t i = 0; i < browserIcons.size(); i++) {
-		delete browserIcons[i];
-	}
-	browserIcons.clear();
 }
 
 mvceditor::RunBrowserFeatureClass::RunBrowserFeatureClass(mvceditor::AppClass& app)
@@ -157,15 +140,10 @@ void mvceditor::RunBrowserFeatureClass::AddWindows() {
                                          wxAUI_TB_TEXT |
                                          wxAUI_TB_HORZ_TEXT);
     BrowserToolbar->SetToolBitmapSize(wxSize(16,16));
-    wxBitmap browserBitmap;
-	browserBitmap.LoadFile(mvceditor::IconImageAsset(wxT("browser-generic")).GetFullPath(), wxBITMAP_TYPE_PNG);
-	wxBitmap runBitmap;
-	runBitmap.LoadFile(mvceditor::IconImageAsset(wxT("run-browser")).GetFullPath(), wxBITMAP_TYPE_PNG);
-	wxBitmap searchUrlBitmap;
-	searchUrlBitmap.LoadFile(mvceditor::IconImageAsset(wxT("search-url-tags")).GetFullPath(), wxBITMAP_TYPE_PNG);
-
-	wxBitmap recentUrlBitmap;
-	recentUrlBitmap.LoadFile(mvceditor::IconImageAsset(wxT("recent-urls")).GetFullPath(), wxBITMAP_TYPE_PNG);
+    wxBitmap browserBitmap = mvceditor::IconImageAsset(wxT("browser-generic"));
+	wxBitmap runBitmap = mvceditor::IconImageAsset(wxT("run-browser"));
+	wxBitmap searchUrlBitmap = mvceditor::IconImageAsset(wxT("search-url-tags"));
+	wxBitmap recentUrlBitmap = mvceditor::IconImageAsset(wxT("recent-urls"));
 
 	BrowserToolbar->AddTool(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, _("No Browsers Configured"), browserBitmap);
     BrowserToolbar->SetToolDropDown(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, true);
@@ -202,12 +180,11 @@ void mvceditor::RunBrowserFeatureClass::LoadPreferences(wxConfigBase* config) {
 	}
 	if (BrowserToolbar) {
 		BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, App.Globals.ChosenBrowser);
-		std::vector<wxBitmap*> browserIcons = BrowserIconsLoad();
+		std::vector<wxBitmap> browserIcons = BrowserIconsLoad();
 		int index = BrowserIconsIndex(browserIcons, App.Globals.ChosenBrowser);
 		if (index >= 0 && index < (int)browserIcons.size()) {		
-			BrowserToolbar->SetToolBitmap(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, *(browserIcons[index]));
+			BrowserToolbar->SetToolBitmap(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, browserIcons[index]);
 		}
-		BrowserIconsDelete(browserIcons);
 		BrowserToolbar->Realize();
 	}
 }
@@ -224,12 +201,11 @@ void mvceditor::RunBrowserFeatureClass::OnPreferencesSaved(wxCommandEvent& event
 	}
 	if (BrowserToolbar) {
 		BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, App.Globals.ChosenBrowser);
-		std::vector<wxBitmap*> browserIcons = BrowserIconsLoad();
+		std::vector<wxBitmap> browserIcons = BrowserIconsLoad();
 		int index = BrowserIconsIndex(browserIcons, App.Globals.ChosenBrowser);
 		if (index >= 0 && index < (int)browserIcons.size()) {		
-			BrowserToolbar->SetToolBitmap(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, *(browserIcons[index]));
+			BrowserToolbar->SetToolBitmap(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, browserIcons[index]);
 		}
-		BrowserIconsDelete(browserIcons);
 		BrowserToolbar->Realize();
 		AuiManager->Update();
 	}
@@ -249,7 +225,7 @@ void mvceditor::RunBrowserFeatureClass::OnBrowserToolDropDown(wxAuiToolBarEvent&
 		event.Skip();
 		return;
 	}
-	std::vector<wxBitmap*> browserIcons = BrowserIconsLoad();
+	std::vector<wxBitmap> browserIcons = BrowserIconsLoad();
 	BrowserToolbar->SetToolSticky(event.GetId(), true);
 
 	// create the popup menu that contains all the available browser names
@@ -266,7 +242,6 @@ void mvceditor::RunBrowserFeatureClass::OnBrowserToolDropDown(wxAuiToolBarEvent&
 		BrowserIconsMenuSet(browserIcons, menuItem);
 		BrowserMenu->Append(menuItem);
 	}
-	BrowserIconsDelete(browserIcons);
 	
 	// line up our menu with the button
 	wxRect rect = BrowserToolbar->GetToolRect(event.GetId());
@@ -283,8 +258,7 @@ void mvceditor::RunBrowserFeatureClass::OnUrlToolDropDown(wxAuiToolBarEvent& eve
 		if (RecentUrls.empty()) {
 			return;
 		}
-		wxBitmap recentUrlBitmap;
-		recentUrlBitmap.LoadFile(mvceditor::IconImageAsset(wxT("recent-urls")).GetFullPath(), wxBITMAP_TYPE_PNG);
+		wxBitmap recentUrlBitmap = mvceditor::IconImageAsset(wxT("recent-urls"));
 
 		BrowserToolbar->SetToolSticky(event.GetId(), true);
 		
@@ -386,13 +360,12 @@ void mvceditor::RunBrowserFeatureClass::OnBrowserToolMenuItem(wxCommandEvent& ev
 		if (found != browserNames.end()) {
 			App.Globals.ChosenBrowser = name;
 
-			std::vector<wxBitmap*> browserIcons = BrowserIconsLoad();
+			std::vector<wxBitmap> browserIcons = BrowserIconsLoad();
 			int browserIndex = BrowserIconsIndex(browserIcons, name);
 			BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, name);
 			if (browserIndex >= 0 && browserIndex < (int)browserIcons.size()) {
-				BrowserToolbar->SetToolBitmap(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, *browserIcons[browserIndex]);
+				BrowserToolbar->SetToolBitmap(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, browserIcons[browserIndex]);
 			}
-			BrowserIconsDelete(browserIcons);
 			BrowserToolbar->Realize();
 			AuiManager->Update();
 		}

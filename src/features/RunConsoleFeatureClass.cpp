@@ -653,7 +653,8 @@ void mvceditor::RunConsoleFeatureClass::RunCommand(const wxString& cmdLine, bool
 			GetStatusBarWithGauge(), *this);
 
 		// set the name so that we can know which window pointer can be safely cast this panel back to the RunConsolePanelClass
-		if (AddToolsWindow(window, _("Run"), wxT("mvceditor::RunConsolePanelClass"))) {
+		wxBitmap runBitmap = mvceditor::IconImageAsset(wxT("run"));
+		if (AddToolsWindow(window, _("Run"), wxT("mvceditor::RunConsolePanelClass"), runBitmap)) {
 			window->SetToRunCommand(cmdLine, waitForArguments);
 		}
 	}
@@ -673,7 +674,8 @@ void mvceditor::RunConsoleFeatureClass::RunCommand(const wxString& cmdLine, bool
 				GetStatusBarWithGauge(), *this);
 			
 			// set the name so that we can know which window pointer can be safely cast this panel back to the RunConsolePanelClass
-			AddToolsWindow(runConsolePanel, _("Run"), wxT("mvceditor::RunConsolePanelClass"));
+			wxBitmap runBitmap = mvceditor::IconImageAsset(wxT("run"));
+			AddToolsWindow(runConsolePanel, _("Run"), wxT("mvceditor::RunConsolePanelClass"), runBitmap);
 		}
 		if (runConsolePanel) {
 			
@@ -693,8 +695,7 @@ void mvceditor::RunConsoleFeatureClass::OnUpdateUi(wxUpdateUIEvent& event) {
 }
 
 void mvceditor::RunConsoleFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
-	wxBitmap bmp;
-	bmp.LoadFile(mvceditor::IconImageAsset(wxT("run")).GetFullPath(), wxBITMAP_TYPE_PNG);
+	wxBitmap bmp = mvceditor::IconImageAsset(wxT("run"));
 	toolBar->AddTool(mvceditor::MENU_RUN_PHP + 0, _("Run"), bmp, _("Run"));
 }
 

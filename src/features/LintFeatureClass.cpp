@@ -317,8 +317,7 @@ void mvceditor::LintFeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
 }
 
 void mvceditor::LintFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
-	wxBitmap bmp;
-	bmp.LoadFile(mvceditor::IconImageAsset(wxT("lint-check")).GetFullPath(), wxBITMAP_TYPE_PNG);
+	wxBitmap bmp = mvceditor::IconImageAsset(wxT("lint-check"));
 	toolBar->AddTool(mvceditor::MENU_LINT_PHP + 0, _("Lint Check"), bmp, _("Performs syntax check on the current project"));
 }
 
@@ -376,7 +375,8 @@ void mvceditor::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
 			}
 			else {
 				mvceditor::LintResultsPanelClass* resultsPanel = new LintResultsPanelClass(GetToolsNotebook(), ID_LINT_RESULTS_PANEL, GetNotebook(), LintErrors);
-				AddToolsWindow(resultsPanel, _("Lint Check"));
+				wxBitmap lintBitmap = mvceditor::IconImageAsset(wxT("lint-check"));
+				AddToolsWindow(resultsPanel, _("Lint Check"), wxEmptyString, lintBitmap);
 				SetFocusToToolsWindow(resultsPanel);
 			}
 		}

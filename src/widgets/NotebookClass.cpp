@@ -24,6 +24,7 @@
  */
 #include <widgets/NotebookClass.h>
 #include <globals/String.h>
+#include <globals/Assets.h>
 #include <search/FindInFilesClass.h>
 #include <MvcEditor.h>
 #include <globals/Errors.h>
@@ -172,9 +173,18 @@ void mvceditor::NotebookClass::AddMvcEditorPage(mvceditor::CodeControlClass::Mod
 	// make sure to use a unique ID, other source code depends on this
 	CodeControlClass* page = new CodeControlClass(this, *CodeControlOptions, Globals, wxNewId());
 	page->SetDocumentMode(mode);
-	AddPage(page, wxString::Format(format, NewPageNumber++), true, 
-		wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_TOOLBAR, 
-		wxSize(16, 16)));
+	wxBitmap docBitmap = mvceditor::IconImageAsset(wxT("document-text"));
+	if (mvceditor::CodeControlClass::PHP == mode) {
+		docBitmap = mvceditor::IconImageAsset(wxT("document-php"));
+	}
+	else if (mvceditor::CodeControlClass::CSS == mode) {
+		docBitmap = mvceditor::IconImageAsset(wxT("document-css"));
+	}
+	else if (mvceditor::CodeControlClass::SQL == mode) {
+		docBitmap = mvceditor::IconImageAsset(wxT("document-sql"));
+	}
+
+	AddPage(page, wxString::Format(format, NewPageNumber++), true, docBitmap);
 
 	// make the gui response ASAP thaw it before notifying the rest of the app
 	this->Thaw();
@@ -232,12 +242,22 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename) {
 			CodeControlClass* newCode = new CodeControlClass(this, *CodeControlOptions, Globals, wxNewId());
 			newCode->TrackFile(filename, fileContents);
 
+			int mode = newCode->GetDocumentMode();
+			wxBitmap docBitmap = mvceditor::IconImageAsset(wxT("document-text"));
+			if (mvceditor::CodeControlClass::PHP == mode) {
+				docBitmap = mvceditor::IconImageAsset(wxT("document-php"));
+			}
+			else if (mvceditor::CodeControlClass::CSS == mode) {
+				docBitmap = mvceditor::IconImageAsset(wxT("document-css"));
+			}
+			else if (mvceditor::CodeControlClass::SQL == mode) {
+				docBitmap = mvceditor::IconImageAsset(wxT("document-sql"));
+			}
+
 			// if user dragged in a file on an opened file we want still want to accept dragged files
 			newCode->SetDropTarget(new FileDropTargetClass(this));
 			wxFileName fileName(filename);
-			this->AddPage(newCode, fileName.GetFullName(), true, 
-				wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_TOOLBAR, 
-				wxSize(16, 16)));
+			this->AddPage(newCode, fileName.GetFullName(), true, docBitmap);
 
 			// tell the app that a file has been opened
 			wxCommandEvent openEvent(mvceditor::EVENT_APP_FILE_OPENED);

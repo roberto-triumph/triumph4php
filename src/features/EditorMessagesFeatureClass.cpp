@@ -24,6 +24,7 @@
  */
 #include <features/EditorMessagesFeatureClass.h>
 #include <globals/Errors.h>
+#include <globals/Assets.h>
 
 static const int ID_DEBUG_WINDOW = wxNewId();
 
@@ -116,7 +117,8 @@ void mvceditor::EditorMessagesFeatureClass::OnMenu(wxCommandEvent& event) {
 	}
 	else {
 		wxWindow* panel = new mvceditor::EditorMessagesPanelClass(GetToolsNotebook(), ID_DEBUG_WINDOW);
-		AddToolsWindow(panel, _("Editor Messages"));
+		wxBitmap msgBitmap = mvceditor::IconImageAsset(wxT("editor-messages"));
+		AddToolsWindow(panel, _("Editor Messages"), wxEmptyString, msgBitmap);
 	}
 }
 
@@ -150,7 +152,8 @@ void mvceditor::EditorMessagesFeatureClass::AddMessage(wxLogLevel level, const w
 	}
 	else {
 		panel = new mvceditor::EditorMessagesPanelClass(GetToolsNotebook(), ID_DEBUG_WINDOW);
-		AddToolsWindow(panel, _("Editor Messages"));
+		wxBitmap msgBitmap = mvceditor::IconImageAsset(wxT("editor-messages"));
+		AddToolsWindow(panel, _("Editor Messages"), wxEmptyString, msgBitmap);
 	}
 	panel->AddMessage(level, msg, timestamp);
 }

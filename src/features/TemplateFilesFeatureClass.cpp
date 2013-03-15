@@ -25,6 +25,7 @@
 #include <features/TemplateFilesFeatureClass.h>
 #include <widgets/TreeItemDataStringClass.h>
 #include <globals/Errors.h>
+#include <globals/Assets.h>
 #include <globals/TemplateFileTagClass.h>
 #include <actions/CallStackActionClass.h>
 #include <actions/TemplateFileTagsDetectorActionClass.h>
@@ -62,7 +63,8 @@ void mvceditor::TemplateFilesFeatureClass::ShowPanel() {
 	}
 	else {
 		templateFilesPanel = new mvceditor::TemplateFilesPanelClass(GetOutlineNotebook(), ID_TEMPLATE_FILES_PANEL, *this);
-		AddOutlineWindow(templateFilesPanel, _("Templates"));
+		wxBitmap templateFileBitmap = mvceditor::IconImageAsset(wxT("template-files"));
+		AddOutlineWindow(templateFilesPanel, _("Templates"), templateFileBitmap);
 	}
 	templateFilesPanel->UpdateControllers();
 }

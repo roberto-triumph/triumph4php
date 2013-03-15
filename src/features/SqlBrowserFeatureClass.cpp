@@ -718,8 +718,7 @@ void mvceditor::SqlBrowserFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 }
 
 void mvceditor::SqlBrowserFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
-	wxBitmap bmp;
-	bmp.LoadFile(mvceditor::IconImageAsset(wxT("sql")).GetFullPath(), wxBITMAP_TYPE_PNG);
+	wxBitmap bmp = mvceditor::IconImageAsset(wxT("sql"));
 	toolBar->AddTool(mvceditor::MENU_SQL + 0, _("SQL Browser"), bmp, wxT("Open the SQL Browser"), wxITEM_NORMAL);
 }
 
@@ -752,7 +751,8 @@ mvceditor::SqlBrowserPanelClass* mvceditor::SqlBrowserFeatureClass::CreateResult
 
 	// name the windows, since there could be multiple windows from various features; we want to know which opened tools windows
 	// are from this feature
-	AddToolsWindow(sqlPanel, tabText, wxT("mvceditor::SqlBrowserPanelClass"));
+	wxBitmap tableBitmap = mvceditor::IconImageAsset(wxT("table"));
+	AddToolsWindow(sqlPanel, tabText, wxT("mvceditor::SqlBrowserPanelClass"), tableBitmap);
 	sqlPanel->LinkToCodeControl(codeControl);
 	return sqlPanel;
 }

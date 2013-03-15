@@ -51,7 +51,7 @@ wxFileName mvceditor::ResourceSqlSchemaAsset() {
 	return fileName;
 }
 
-wxFileName mvceditor::AutoCompleteImageAsset(wxString imageName) {
+wxBitmap mvceditor::AutoCompleteImageAsset(wxString imageName) {
 	if (!wxImage::FindHandler(wxBITMAP_TYPE_XPM)) {
 		wxImage::AddHandler(new wxXPMHandler);	
 	}
@@ -66,13 +66,16 @@ wxFileName mvceditor::AutoCompleteImageAsset(wxString imageName) {
 	wxFileName fileName(nativeFileName);
 	fileName.Normalize();
 	wxASSERT(fileName.IsOk());
-	return fileName;
+	wxBitmap bitmap;
+	bitmap.LoadFile(fileName.GetFullPath(), wxBITMAP_TYPE_XPM);
+	return bitmap;
 }
 
-wxFileName mvceditor::IconImageAsset(wxString imageName) {
+wxBitmap mvceditor::IconImageAsset(wxString imageName) {
 	if (!wxImage::FindHandler(wxBITMAP_TYPE_PNG)) {
 		wxImage::AddHandler(new wxPNGHandler());	
 	}
+	wxBitmap bitmap;
 	wxStandardPaths paths;
 	wxFileName pathExecutableFileName(paths.GetExecutablePath());
 	wxString nativeFileName = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
@@ -84,7 +87,8 @@ wxFileName mvceditor::IconImageAsset(wxString imageName) {
 	wxFileName fileName(nativeFileName);
 	fileName.Normalize();
 	wxASSERT(fileName.IsOk());
-	return fileName;
+	bitmap.LoadFile(fileName.GetFullPath(), wxBITMAP_TYPE_PNG);
+	return bitmap;
 }
 
 

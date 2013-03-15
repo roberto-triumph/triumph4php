@@ -79,15 +79,11 @@ void mvceditor::FeatureClass::AddKeyboardShortcuts(std::vector<mvceditor::Dynami
 
 }
 
-bool mvceditor::FeatureClass::AddToolsWindow(wxWindow* window, wxString tabName, wxString windowName) {
+bool mvceditor::FeatureClass::AddToolsWindow(wxWindow* window, wxString tabName, wxString windowName, const wxBitmap& bitmap) {
 	if (!windowName.IsEmpty()) {
 		window->SetName(windowName);
 	}
-	if (ToolsNotebook->AddPage(window, tabName)) {
-		int index = ToolsNotebook->GetPageIndex(window);
-		if (index != wxNOT_FOUND) {
-			ToolsNotebook->SetSelection(index);
-		}
+	if (ToolsNotebook->AddPage(window, tabName, true, bitmap)) {
 		if (NULL != AuiManager) {
 			AuiManager->GetPane(ToolsNotebook).Show();
 			AuiManager->Update();
@@ -97,12 +93,8 @@ bool mvceditor::FeatureClass::AddToolsWindow(wxWindow* window, wxString tabName,
 	return false;
 }
 
-bool mvceditor::FeatureClass::AddOutlineWindow(wxWindow* window, wxString name) {
-	if (OutlineNotebook->AddPage(window, name)) {
-		int index = OutlineNotebook->GetPageIndex(window);
-		if (index != wxNOT_FOUND) {
-			OutlineNotebook->SetSelection(index);
-		}
+bool mvceditor::FeatureClass::AddOutlineWindow(wxWindow* window, wxString name, const wxBitmap& bitmap) {
+	if (OutlineNotebook->AddPage(window, name, true, bitmap)) {
 		if (NULL != AuiManager) {
 			AuiManager->GetPane(OutlineNotebook).Show();
 			AuiManager->Update();

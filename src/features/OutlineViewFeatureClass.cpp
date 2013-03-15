@@ -308,7 +308,8 @@ void mvceditor::OutlineViewFeatureClass::OnOutlineMenu(wxCommandEvent& event) {
 		mvceditor::NotebookClass* notebook = GetNotebook();
 		if (notebook != NULL) {
 			outlineViewPanel = new OutlineViewPanelClass(GetOutlineNotebook(), ID_WINDOW_OUTLINE, this, notebook);
-			if (AddOutlineWindow(outlineViewPanel, wxT("Outline"))) {
+			wxBitmap outlineBitmap = mvceditor::IconImageAsset(wxT("outline"));
+			if (AddOutlineWindow(outlineViewPanel, wxT("Outline"), outlineBitmap)) {
 				
 				// the first time, get all of the classes to put in th drop down. note
 				// that this can take a while, do it in the background
