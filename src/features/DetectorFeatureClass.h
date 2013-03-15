@@ -27,6 +27,7 @@
 
 #include <features/FeatureClass.h>
 #include <features/wxformbuilder/DetectorFeatureForms.h>
+#include <wx/imaglist.h>
 
 namespace mvceditor {
 
@@ -171,11 +172,15 @@ public:
 	 * @param addButton pointer will NOT be owned by this class
 	 * @param helpButton pointer will NOT be owned by this class
 	 * @param detector to get the file locations. pointer will NOT be owned by this class
+	 * @param globals to fill the projects choice list 
+	 * @param eventSink to send test button click events to
+	 * @param rootImage the bitmap to be shown in the root of the tree
 	 */
 	DetectorTreeHandlerClass(wxTreeCtrl* detectorTree, wxButton* testButton, wxButton* addButton,
 		wxButton* helpButton, wxChoice* projectChoice,
 		mvceditor::DetectorClass* detector,
-		mvceditor::GlobalsClass& globals, mvceditor::EventSinkClass& eventSink);
+		mvceditor::GlobalsClass& globals, mvceditor::EventSinkClass& eventSink,
+		const wxBitmap& rootImage);
 
 	~DetectorTreeHandlerClass();
 
@@ -203,7 +208,17 @@ private:
 	void OnTestButton(wxCommandEvent& event);
 	void OnAddButton(wxCommandEvent& event);
 
+	// indices into ImageList
+	enum {
+		IMAGE_ROOT_DETECTOR = 0,
+		IMAGE_FOLDER,
+		IMAGE_FOLDER_OPEN,
+		IMAGE_SCRIPT
+	};
 	
+	// put the image list first; since the DetectorTree will have a
+	// pointer to it
+	wxImageList ImageList;
 	wxTreeCtrl* DetectorTree;
 	wxButton* TestButton;
 	wxButton* AddButton;

@@ -323,8 +323,10 @@ mvceditor::DetectorTreeHandlerClass::DetectorTreeHandlerClass(wxTreeCtrl* detect
 															  wxChoice* projectChoice,
 															  mvceditor::DetectorClass* detector,
 															  mvceditor::GlobalsClass& globals, 
-															  mvceditor::EventSinkClass& eventSink)
+															  mvceditor::EventSinkClass& eventSink,
+															  const wxBitmap& rootImage)
 	: wxEvtHandler()
+	, ImageList(16, 16)
 	, DetectorTree(detectorTree)
 	, TestButton(testButton)
 	, AddButton(addButton)
@@ -343,6 +345,14 @@ mvceditor::DetectorTreeHandlerClass::DetectorTreeHandlerClass(wxTreeCtrl* detect
 	DetectorTree->Connect(wxEVT_COMMAND_TREE_END_LABEL_EDIT, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemEndLabelEdit), NULL, this);
 	DetectorTree->Connect(wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemActivated), NULL, this);
 	DetectorTree->Connect(wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemRightClick), NULL, this);
+
+	ImageList.Add(rootImage, wxNullBitmap);
+	ImageList.Add(mvceditor::IconImageAsset(wxT("folder-horizontal")), wxNullBitmap);
+	ImageList.Add(mvceditor::IconImageAsset(wxT("folder-horizontal-open")), wxNullBitmap);
+	ImageList.Add(mvceditor::IconImageAsset(wxT("document-php")), wxNullBitmap);
+
+	// using set not assign; this class owns the list
+	DetectorTree->SetImageList(&ImageList);
 }
 
 mvceditor::DetectorTreeHandlerClass::~DetectorTreeHandlerClass() {
@@ -363,10 +373,12 @@ void mvceditor::DetectorTreeHandlerClass::Init() {
 	
 	DetectorTree->Freeze();
 	DetectorTree->DeleteAllItems();
-	DetectorTree->AddRoot(Detector->Label());
-	wxTreeItemId globalItemId = DetectorTree->AppendItem(DetectorTree->GetRootItem(), _("Global"));
-	wxTreeItemId localItemId = DetectorTree->AppendItem(DetectorTree->GetRootItem(), _("Local"));
-	
+	DetectorTree->AddRoot(Detector->Label(), IMAGE_ROOT_DETECTOR);
+	wxTreeItemId globalItemId = DetectorTree->AppendItem(DetectorTree->GetRootItem(), _("Global"), IMAGE_FOLDER, IMAGE_FOLDER);
+	DetectorTree->SetItemImage(globalItemId, IMAGE_FOLDER_OPEN, wxTreeItemIcon_Expanded);
+	wxTreeItemId localItemId = DetectorTree->AppendItem(DetectorTree->GetRootItem(), _("Local"), IMAGE_FOLDER, IMAGE_FOLDER);
+	DetectorTree->SetItemImage(localItemId, IMAGE_FOLDER_OPEN, wxTreeItemIcon_Expanded);
+
 	FillSubTree(globalRootDir, globalItemId);
 	FillSubTree(localRootDir, localItemId);
 
@@ -394,7 +406,9 @@ void mvceditor::DetectorTreeHandlerClass::FillSubTree(const wxString& detectorRo
 		wxString fileName;
 		if (dir.GetFirst(&fileName, wxEmptyString, wxDIR_DIRS)) {
 			do {
-				wxTreeItemId subRoot = DetectorTree->AppendItem(treeItemDir, fileName);
+				wxTreeItemId subRoot = DetectorTree->AppendItem(treeItemDir, fileName, IMAGE_FOLDER, IMAGE_FOLDER);
+				DetectorTree->SetItemImage(subRoot, IMAGE_FOLDER_OPEN, wxTreeItemIcon_Expanded);
+
 				FillSubTree(detectorRootDir + wxFileName::GetPathSeparator() + fileName, subRoot);
 			} while (dir.GetNext(&fileName));
 		}
@@ -402,7 +416,7 @@ void mvceditor::DetectorTreeHandlerClass::FillSubTree(const wxString& detectorRo
 			do {
 				wxFileName fullPath(detectorRootDir, fileName);
 				TreeItemDataStringClass* treeItemData = new TreeItemDataStringClass(fullPath.GetFullPath());
-				DetectorTree->AppendItem(treeItemDir, fileName, -1, -1, treeItemData);
+				DetectorTree->AppendItem(treeItemDir, fileName, IMAGE_SCRIPT, IMAGE_SCRIPT, treeItemData);
 			} while (dir.GetNext(&fileName));
 
 		}
@@ -465,7 +479,7 @@ void mvceditor::DetectorTreeHandlerClass::OnAddButton(wxCommandEvent& event) {
 		// add the tree node also
 		TreeItemDataStringClass* treeItemData = new TreeItemDataStringClass(localDetectorScript.GetFullPath());
 		wxTreeItemId localLabelTreeItemId = DetectorTree->GetLastChild(DetectorTree->GetRootItem());
-		DetectorTree->AppendItem(localLabelTreeItemId, name, -1,-1, treeItemData);
+		DetectorTree->AppendItem(localLabelTreeItemId, name, IMAGE_SCRIPT, IMAGE_SCRIPT, treeItemData);
 		DetectorTree->SortChildren(localLabelTreeItemId);
 		DetectorTree->ExpandAllChildren(localLabelTreeItemId);
 	}
@@ -642,7 +656,7 @@ mvceditor::UrlTagDetectorPanelClass::UrlTagDetectorPanelClass(wxWindow* parent, 
 														mvceditor::EventSinkClass& eventSink)
 	: UrlDetectorPanelGeneratedClass(parent, id) 
 	, Detector() 
-	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink) {
+	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, mvceditor::IconImageAsset(wxT("url-detectors"))) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
 
@@ -678,7 +692,7 @@ mvceditor::TemplateFileTagsDetectorPanelClass::TemplateFileTagsDetectorPanelClas
 														mvceditor::RunningThreadsClass& runningThreads)
 	: TemplateFilesDetectorPanelGeneratedClass(parent, id) 
 	, Detector() 
-	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink)
+	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, mvceditor::IconImageAsset(wxT("template-files-detectors")))
 	, TestUrl()
 	, Globals(globals) 
 	, RunningThreads(runningThreads) {
@@ -735,7 +749,7 @@ mvceditor::TagDetectorPanelClass::TagDetectorPanelClass(wxWindow* parent, int id
 														mvceditor::EventSinkClass& eventSink)
 	: TagDetectorPanelGeneratedClass(parent, id) 
 	, Detector() 
-	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink) {
+	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, mvceditor::IconImageAsset(wxT("tag-detectors"))) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
 
@@ -770,7 +784,7 @@ mvceditor::DatabaseTagDetectorPanelClass::DatabaseTagDetectorPanelClass(wxWindow
 														mvceditor::EventSinkClass& eventSink)
 	: DatabaseDetectorPanelGeneratedClass(parent, id) 
 	, Detector() 
-	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink) {
+	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, mvceditor::IconImageAsset(wxT("database-detectors"))) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
 
@@ -805,7 +819,7 @@ mvceditor::ConfigTagDetectorPanelClass::ConfigTagDetectorPanelClass(wxWindow* pa
 														mvceditor::EventSinkClass& eventSink)
 	: ConfigDetectorPanelGeneratedClass(parent, id) 
 	, Detector() 
-	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink) {
+	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, mvceditor::IconImageAsset(wxT("config-detectors"))) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
 
