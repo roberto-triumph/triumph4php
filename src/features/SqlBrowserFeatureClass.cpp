@@ -407,14 +407,6 @@ mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id,
 	Feature->App.RunningThreads.AddEventHandler(this);
 }
 
-mvceditor::SqlBrowserPanelClass::~SqlBrowserPanelClass() {
-	if (RunningThreadId > 0) {
-		Stop();
-	}
-	Feature->App.RunningThreads.RemoveEventHandler(this);
-}
-
-
 bool mvceditor::SqlBrowserPanelClass::Check() {
 	bool ret = 	CodeControl && Validate() && TransferDataFromWindow();
 	if (ret) {
@@ -433,7 +425,7 @@ void mvceditor::SqlBrowserPanelClass::Execute() {
 		}
 		else {
 			delete thread;
-			RunningThreadId = 0;			
+			RunningThreadId = 0;
 		}
 	}
 	else if (LastQuery.isEmpty()) {

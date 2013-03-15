@@ -240,8 +240,6 @@ public:
 	 */
 	SqlBrowserPanelClass(wxWindow* parent, int id, mvceditor::StatusBarWithGaugeClass* gauge,
 		const SqlQueryClass& query, SqlBrowserFeatureClass* feature);
-	
-	~SqlBrowserPanelClass();
 
 	/**
 	 * Runs the query that is in the text control (in a separate thread).
