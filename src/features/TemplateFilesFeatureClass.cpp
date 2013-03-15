@@ -141,10 +141,19 @@ void mvceditor::TemplateFilesFeatureClass::OnTemplateDetectionComplete(wxCommand
 
 mvceditor::TemplateFilesPanelClass::TemplateFilesPanelClass(wxWindow* parent, int id, mvceditor::TemplateFilesFeatureClass& feature)
 	: TemplateFilesPanelGeneratedClass(parent, id)
-	, Feature(feature) {
+	, Feature(feature) 
+	, ImageList(16, 16) {
 	StatusLabel->SetLabel(_(""));
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
+	ImageList.Add(mvceditor::IconImageAsset(wxT("folder-horizontal")));
+	ImageList.Add(mvceditor::IconImageAsset(wxT("folder-horizontal-open")));
+	ImageList.Add(mvceditor::IconImageAsset(wxT("template-files")));
+	ImageList.Add(mvceditor::IconImageAsset(wxT("variable")));
+	
+	// this class will own the imagelist
+	FileTree->SetImageList(&ImageList);
+	TemplateVariablesTree->SetImageList(&ImageList);
 }
 
 void mvceditor::TemplateFilesPanelClass::UpdateControllers() {
@@ -163,7 +172,8 @@ void mvceditor::TemplateFilesPanelClass::UpdateResults() {
 	StatusLabel->SetLabel(wxString::Format(_("Found %d view files"), currentTemplates.size()));
 	FileTree->DeleteAllItems();
 
-	wxTreeItemId parent = FileTree->AddRoot(_("Templates"));
+	wxTreeItemId parent = FileTree->AddRoot(_("Templates"), IMAGE_TEMPLATE_FOLDER);
+	FileTree->SetItemImage(parent, IMAGE_TEMPLATE_FOLDER_OPEN, wxTreeItemIcon_Expanded);
 	for (size_t i = 0; i < currentTemplates.size(); ++i) {
 		wxString templateFile = currentTemplates[i].FullPath;
 
@@ -176,7 +186,7 @@ void mvceditor::TemplateFilesPanelClass::UpdateResults() {
 			text = wxT("[X] ") + text;
 		}
 		mvceditor::TreeItemDataStringClass* data = new mvceditor::TreeItemDataStringClass(currentTemplates[i].FullPath);
-		FileTree->AppendItem(parent, text, -1, -1, data);
+		FileTree->AppendItem(parent, text, IMAGE_TEMPLATE_FILE, -1, data);
 	}
 	FileTree->ExpandAll();
 	
@@ -186,7 +196,8 @@ void mvceditor::TemplateFilesPanelClass::UpdateResults() {
 	}
 	TemplateVariablesLabel->SetLabel(wxString::Format(_("Found %d template variables"), variableCount));
 	TemplateVariablesTree->DeleteAllItems();
-	parent = TemplateVariablesTree->AddRoot(_("Template Variables"));
+	parent = TemplateVariablesTree->AddRoot(_("Template Variables"), IMAGE_TEMPLATE_FOLDER);
+	FileTree->SetItemImage(parent, IMAGE_TEMPLATE_FOLDER_OPEN, wxTreeItemIcon_Expanded);
 	for (size_t i = 0; i < currentTemplates.size(); ++i) {
 		mvceditor::TemplateFileTagClass templateFile = currentTemplates[i];
 		wxString text = templateFile.FullPath;
@@ -194,9 +205,9 @@ void mvceditor::TemplateFilesPanelClass::UpdateResults() {
 		
 		// remove the project root so that the dialog is not too 'wordy'
 		text = Feature.App.Globals.RelativeFileName(text, projectLabel);
-		wxTreeItemId sub = TemplateVariablesTree->AppendItem(parent, text);
+		wxTreeItemId sub = TemplateVariablesTree->AppendItem(parent, text, IMAGE_TEMPLATE_FILE);
 		for (size_t j = 0; j < templateFile.Variables.size(); ++j) {
-			TemplateVariablesTree->AppendItem(sub, templateFile.Variables[j]);
+			TemplateVariablesTree->AppendItem(sub, templateFile.Variables[j], IMAGE_TEMPLATE_VARIABLE);
 		}
 	}
 	TemplateVariablesTree->ExpandAll();

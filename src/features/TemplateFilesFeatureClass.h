@@ -28,6 +28,7 @@
 #include <features/FeatureClass.h>
 #include <features/wxformbuilder/TemplateFilesFeatureForms.h>
 #include <globals/TemplateFileTagClass.h>
+#include <wx/imaglist.h>
 
 namespace mvceditor {
 
@@ -115,6 +116,17 @@ protected:
 	void OnActionChoice(wxCommandEvent& event);
 
 	void OnTreeItemActivated(wxTreeEvent& event);
+
+private:
+
+	enum {
+		IMAGE_TEMPLATE_FOLDER = 0,
+		IMAGE_TEMPLATE_FOLDER_OPEN,
+		IMAGE_TEMPLATE_FILE,
+		IMAGE_TEMPLATE_VARIABLE
+	};
+
+	wxImageList ImageList;
 };
 
 }
