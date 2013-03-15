@@ -149,7 +149,7 @@ mvceditor::TemplateFilesPanelClass::TemplateFilesPanelClass(wxWindow* parent, in
 	ImageList.Add(mvceditor::IconImageAsset(wxT("folder-horizontal")));
 	ImageList.Add(mvceditor::IconImageAsset(wxT("folder-horizontal-open")));
 	ImageList.Add(mvceditor::IconImageAsset(wxT("template-files")));
-	ImageList.Add(mvceditor::IconImageAsset(wxT("variable")));
+	ImageList.Add(mvceditor::IconImageAsset(wxT("variable-template")));
 	
 	// this class will own the imagelist
 	FileTree->SetImageList(&ImageList);

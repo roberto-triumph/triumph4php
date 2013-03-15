@@ -366,11 +366,24 @@ void mvceditor::OutlineViewFeatureClass::OnFileSaved(mvceditor::FileSavedEventCl
 mvceditor::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int windowId, OutlineViewFeatureClass* feature, 
 		NotebookClass* notebook)
 	: OutlineViewGeneratedPanelClass(parent, windowId)
+	, ImageList(16, 16)
 	, Feature(feature)
 	, Notebook(notebook) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
-	SetStatus(_(""));	
+	SetStatus(_(""));
+
+	ImageList.Add(mvceditor::IconImageAsset(wxT("outline")));
+	ImageList.Add(mvceditor::IconImageAsset(wxT("class")));
+	ImageList.Add(mvceditor::IconImageAsset(wxT("method")));
+	ImageList.Add(mvceditor::IconImageAsset(wxT("property")));
+	ImageList.Add(mvceditor::IconImageAsset(wxT("define")));
+	ImageList.Add(mvceditor::IconImageAsset(wxT("class-constant")));
+	ImageList.Add(mvceditor::IconImageAsset(wxT("namespace")));
+	ImageList.Add(mvceditor::IconImageAsset(wxT("function")));
+
+	// this class will own the ImageList
+	Tree->SetImageList(&ImageList);
 }
 
 void mvceditor::OutlineViewPanelClass::SetStatus(const wxString& status) {
@@ -394,7 +407,7 @@ void mvceditor::OutlineViewPanelClass::SetClasses(const std::vector<wxString>& c
 void mvceditor::OutlineViewPanelClass::RefreshOutlines(const std::vector<mvceditor::TagClass>& resources) {
 	Tree->Freeze();
 	Tree->DeleteAllItems();
-	wxTreeItemId rootId = Tree->AddRoot(_("Outline"));
+	wxTreeItemId rootId = Tree->AddRoot(_("Outline"), IMAGE_OUTLINE_ROOT);
 	StatusLabel->SetLabel(_(""));
 	std::vector<mvceditor::TagClass>::const_iterator tag;
 	for (tag = resources.begin(); tag != resources.end(); ++tag) {
@@ -404,14 +417,12 @@ void mvceditor::OutlineViewPanelClass::RefreshOutlines(const std::vector<mvcedit
 		if (mvceditor::TagClass::DEFINE == type && !tag->IsDynamic) {
 			UnicodeString res = tag->Identifier;
 			wxString label = mvceditor::IcuToWx(res);
-			label = _("[D] ") + label;
-			Tree->AppendItem(rootId, label);
+			Tree->AppendItem(rootId, label, IMAGE_OUTLINE_DEFINE);
 		}
 		else if (mvceditor::TagClass::CLASS == type && !tag->IsDynamic) {
 			UnicodeString res = tag->Identifier;
 			wxString label = mvceditor::IcuToWx(res);
-			label = _("[C] ") + label;
-			wxTreeItemId classId = Tree->AppendItem(rootId, label);
+			wxTreeItemId classId = Tree->AppendItem(rootId, label, IMAGE_OUTLINE_CLASS);
 
 			// for now just loop again through the resources
 			// for the class we are going to add
@@ -421,31 +432,28 @@ void mvceditor::OutlineViewPanelClass::RefreshOutlines(const std::vector<mvcedit
 					UnicodeString res = j->Identifier;
 					wxString label = mvceditor::IcuToWx(res);
 					if (mvceditor::TagClass::MEMBER == j->Type) {
-						label = _("[P] ") + label;
 						if (!j->ReturnType.isEmpty()) {
 							wxString returnType = mvceditor::IcuToWx(j->ReturnType);
 							label = label + wxT(" [") + returnType + wxT("]");
 						}
-						Tree->AppendItem(classId, label);
+						Tree->AppendItem(classId, label, IMAGE_OUTLINE_PROPERTY);
 					}
 					else if (mvceditor::TagClass::METHOD == j->Type) {
-						label = _("[M] ") + label;
 
 						// add the function signature to the label
 						int32_t sigIndex = j->Signature.indexOf(UNICODE_STRING_SIMPLE(" function ")); 
 						if (sigIndex > 0) {
 							UnicodeString sig(j->Signature, sigIndex + 10);
-							label = _("[M] ") + mvceditor::IcuToWx(sig);
+							label = mvceditor::IcuToWx(sig);
 						}
 						if (!j->ReturnType.isEmpty()) {
 							wxString returnType = mvceditor::IcuToWx(j->ReturnType);
 							label += wxT(" [") + returnType + wxT("]");
 						}
-						Tree->AppendItem(classId, label);
+						Tree->AppendItem(classId, label, IMAGE_OUTLINE_METHOD);
 					}
 					else if (mvceditor::TagClass::CLASS_CONSTANT == j->Type) {
-						label = _("[O] ") + label;
-						Tree->AppendItem(classId, label);
+						Tree->AppendItem(classId, label, IMAGE_OUTLINE_CLASS_CONSTANT);
 					}
 				}
 			}
@@ -453,19 +461,18 @@ void mvceditor::OutlineViewPanelClass::RefreshOutlines(const std::vector<mvcedit
 		else if (mvceditor::TagClass::FUNCTION == type && !tag->IsDynamic) {
 			UnicodeString res = tag->Identifier;
 			wxString label = mvceditor::IcuToWx(res);
-			label = _("[F] ") + label;
 
 			// add the function signature to the label
 			int32_t sigIndex = tag->Signature.indexOf(UNICODE_STRING_SIMPLE("function ")); 
 			if (sigIndex >= 0) {
 				UnicodeString sig(tag->Signature, sigIndex + 9);
-				label = _("[F] ") + mvceditor::IcuToWx(sig);
+				label = mvceditor::IcuToWx(sig);
 			}
 			if (!tag->ReturnType.isEmpty()) {
 				wxString returnType = mvceditor::IcuToWx(tag->ReturnType);
 				label += wxT(" [") + returnType + wxT("]");
 			}
-			Tree->AppendItem(rootId, label);
+			Tree->AppendItem(rootId, label, IMAGE_OUTLINE_FUNCTION);
 		}
 	}
 	Tree->ExpandAll();
@@ -512,12 +519,9 @@ void mvceditor::OutlineViewPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 		return;
 	}
 	wxString tag;
-	if (methodSig.StartsWith(wxT("[P]")) || methodSig.StartsWith(wxT("[M]"))) {
+	if (Tree->GetItemImage(item) == IMAGE_OUTLINE_PROPERTY || Tree->GetItemImage(item) == IMAGE_OUTLINE_METHOD) {
 		wxString classNameSig = Tree->GetItemText(parentItem);
-		classNameSig = classNameSig.Mid(4); // 4 = length of '[C] '
-
 		tag = classNameSig + wxT("::");
-		methodSig = methodSig.Mid(4); // 4= length of '[M] '
 		
 		// extract just the name from the label (function call args or property type)
 		int index = methodSig.Index(wxT('('));
@@ -533,8 +537,7 @@ void mvceditor::OutlineViewPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 			tag += methodSig;
 		}
 	}
-	else if (methodSig.StartsWith(wxT("[D]")) || methodSig.StartsWith(wxT("[F]"))) {
-		methodSig = methodSig.Mid(4); // 4= length of '[D] '
+	else if (Tree->GetItemImage(item) == IMAGE_OUTLINE_DEFINE || Tree->GetItemImage(item) == IMAGE_OUTLINE_FUNCTION) {
 		
 		// extract just the name from the label (omit the return type)
 		int index = methodSig.Index(wxT('('));

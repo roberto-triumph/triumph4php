@@ -29,6 +29,7 @@
 #include <pelet/TokenClass.h>
 #include <features/wxformbuilder/OutlineViewFeatureForms.h>
 #include <widgets/ThreadWithHeartbeatClass.h>
+#include <wx/imaglist.h>
 #include <vector>
 
 namespace mvceditor {
@@ -309,6 +310,19 @@ protected:
 	void OnSyncButton(wxCommandEvent& event);
 
 private:
+
+	enum {
+		IMAGE_OUTLINE_ROOT = 0,
+		IMAGE_OUTLINE_CLASS,
+		IMAGE_OUTLINE_METHOD,
+		IMAGE_OUTLINE_PROPERTY,
+		IMAGE_OUTLINE_DEFINE,
+		IMAGE_OUTLINE_CLASS_CONSTANT,
+		IMAGE_OUTLINE_NAMESPACE,
+		IMAGE_OUTLINE_FUNCTION
+	};
+
+	wxImageList ImageList;
 
 	/**
 	 * The feature class that will execute all logic. 
