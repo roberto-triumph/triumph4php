@@ -291,11 +291,20 @@ wxString mvceditor::DynamicCmdClass::GetIdentifier() const {
 
 mvceditor::PreferencesClass::PreferencesClass()
 	: CodeControlOptions()
-	, KeyProfiles() {
+	, KeyProfiles() 
+	, ApplicationFont() {
 	
 }
 
 void mvceditor::PreferencesClass::Init() {
+	wxPlatformInfo info;
+	
+	ApplicationFont.SetFamily(wxFONTFAMILY_DEFAULT);
+	
+	// ATTN: on linux, default fonts are too big
+	if (info.GetOperatingSystemId() != wxOS_WINDOWS_NT) {
+		ApplicationFont.SetPointSize(8);
+	}
 	mvceditor::CodeControlStylesInit(CodeControlOptions);
 }
 
@@ -314,6 +323,12 @@ void mvceditor::PreferencesClass::Load(wxConfigBase* config, wxFrame* frame) {
 	CodeControlOptions.CommitChanges();
 	KeyProfiles.Cleanup();
 	CodeControlOptions.Load(config);
+	
+	wxString applicationFontInfo = config->Read(wxT("ApplicationFont"));
+	if (!applicationFontInfo.IsEmpty()) {
+		ApplicationFont.SetNativeFontInfo(applicationFontInfo);
+	}
+	
 	int totalCmdCount = 0;
 
 	// call out own key profile load function
@@ -344,6 +359,7 @@ void mvceditor::PreferencesClass::EnableSelectedProfile(wxWindow* window) {
 void mvceditor::PreferencesClass::Save() {
 	wxConfigBase* config = wxConfigBase::Get();
 	CodeControlOptions.Save(config);
+	config->Write(wxT("ApplicationFont"), ApplicationFont.GetNativeFontInfoDesc());
 	SaveKeyProfileArray(DefaultKeyboardShortcutCmds, KeyProfiles, config, wxT(""));
 	
 	// keybinder sets the config path, must reset it back to normal

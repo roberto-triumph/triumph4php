@@ -139,6 +139,7 @@ void mvceditor::RunBrowserFeatureClass::AddWindows() {
                                          wxAUI_TB_DEFAULT_STYLE |
                                          wxAUI_TB_TEXT |
                                          wxAUI_TB_HORZ_TEXT);
+	BrowserToolbar->SetFont(App.Preferences.ApplicationFont);
     BrowserToolbar->SetToolBitmapSize(wxSize(16,16));
     wxBitmap browserBitmap = mvceditor::IconImageAsset(wxT("browser-generic"));
 	wxBitmap runBitmap = mvceditor::IconImageAsset(wxT("run-browser"));

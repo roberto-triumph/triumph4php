@@ -298,6 +298,12 @@ private:
 	 * when a sequence has completed stop the Gauge
 	 */
 	void OnSequenceComplete(wxCommandEvent& event);
+	
+	/**
+	 * set the application-wide font.  this is non-trivial because we 
+	 * want to change the tab fonts on all notebooks also
+	 */
+	void SetApplicationFont();
 
 	/**
 	 * GUI framework object, used to programatically position the different windows

@@ -107,6 +107,8 @@ mvceditor::MainFrameClass::MainFrameClass(const std::vector<mvceditor::FeatureCl
 		wxAUI_NB_TOP | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_CLOSE_ON_ACTIVE_TAB | wxAUI_NB_TAB_MOVE);
 	OutlineNotebook = new wxAuiNotebook(this, mvceditor::ID_OUTLINE_NOTEBOOK, wxDefaultPosition, wxDefaultSize, 
 		wxAUI_NB_TOP | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_CLOSE_ON_ACTIVE_TAB | wxAUI_NB_TAB_MOVE);
+		
+	SetApplicationFont();
 	CreateToolBarButtons();
 	
 	// setup the bottom "tools" pane, the main content pane, and the toolbar on top
@@ -341,6 +343,7 @@ void mvceditor::MainFrameClass::OnEditPreferences(wxCommandEvent& event) {
 	App.StopConfigModifiedCheck();
 
 	PreferencesDialogClass prefDialog(this, Preferences);
+	
 	for (size_t i = 0; i < Features.size(); ++i) {
 		Features[i]->AddPreferenceWindow(prefDialog.GetBookCtrl());
 	}
@@ -372,9 +375,34 @@ void mvceditor::MainFrameClass::PreferencesSaved() {
 	Notebook->RefreshCodeControlOptions();
 }
 
+void Recurse(wxFont& font, wxWindow* window) {
+	
+}
+
+void mvceditor::MainFrameClass::SetApplicationFont() {
+	
+	// ATTN: this method will only work on startup (before the
+	// main frame is drawn. have not found a way to have the font
+	// changes apply to all windows /panels that are already
+	// drawn on the screen
+
+	// so that all dialogs / panels use the same font
+	SetFont(Preferences.ApplicationFont);
+	
+	// so that the tabs use the same font
+	Notebook->SetFont(Preferences.ApplicationFont);
+	Notebook->SetNormalFont(Preferences.ApplicationFont);
+	ToolsNotebook->SetFont(Preferences.ApplicationFont);
+	ToolsNotebook->SetNormalFont(Preferences.ApplicationFont);
+	OutlineNotebook->SetFont(Preferences.ApplicationFont);
+	OutlineNotebook->SetNormalFont(Preferences.ApplicationFont);
+	
+	// so that the toolbar buttons use the same font
+	ToolBar->SetFont(Preferences.ApplicationFont);
+}
+
 void mvceditor::MainFrameClass::PreferencesExternallyUpdated() {
-	Preferences.EnableSelectedProfile(this);
-	Notebook->RefreshCodeControlOptions();
+	PreferencesSaved();
 }
 
 void mvceditor::MainFrameClass::OnEditContentAssist(wxCommandEvent& event) {

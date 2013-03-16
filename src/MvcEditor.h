@@ -102,6 +102,12 @@ public:
 	 * To run multiple steps.
 	 */
 	mvceditor::SequenceClass Sequences;
+	
+	/**
+	 * The user preferences.  
+	 * @var PreferencesClass;
+	 */
+	PreferencesClass Preferences;
 
 	/**
 	 * keep track of the last time the config was modified. will use
@@ -159,12 +165,6 @@ private:
 	 * Additional functionality
 	 */
 	std::vector<FeatureClass*> Features;
-	
-	/**
-	 * The user preferences.  
-	 * @var PreferencesClass;
-	 */
-	PreferencesClass Preferences;
 
 	/**
 	 * With this timer, we will generate an EVENT_APP_INITIALIZED after the

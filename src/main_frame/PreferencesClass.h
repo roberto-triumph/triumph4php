@@ -185,6 +185,18 @@ public:
 	 * @var wxKeyProfileArray
 	 */
 	wxKeyProfileArray KeyProfiles;
+	
+	/**
+	 * this font is used for application windows and dialogs OTHER THAN the source code
+	 * window (source code window font is controlled by CodeControlOptionsClass).
+	 * 
+	 * ATTN: at this time we won't let the user change this; I have not found a way to have the font
+	 * changes apply to all windows /panels that are already
+	 * drawn on the screen
+	 */
+	wxFont ApplicationFont;
+	
+	
 };
 
 }
