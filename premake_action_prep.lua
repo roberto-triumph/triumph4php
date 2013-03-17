@@ -60,13 +60,12 @@ function checkWxWidgets()
 		if wxLocation then
 			dlls = os.matchfiles(wxLocation .. "/lib/vc_dll/*.dll");
 			if #dlls > 0 then
-				cmd = "xcopy /S /Y \"" .. wxLocation .. "\\lib\\vc_dll\\*.dll\" \"Debug\\\""
-				print(cmd)
-				os.execute(cmd)
-		
-				cmd = "xcopy /S /Y \"" .. wxLocation .. "\\lib\\vc_dll\\*.dll\" \"Release\\\""
-				print(cmd)
-				os.execute(cmd)
+				batchexecute(normalizepath(""), {
+					"xcopy /S /Y \"" .. wxLocation .. "\\lib\\vc_dll\\\wxbase28ud_*.dll\" \"Debug\\\"",
+					"xcopy /S /Y \"" .. wxLocation .. "\\lib\\vc_dll\\\wxmsw28ud_*.dll\" \"Debug\\\"",
+					"xcopy /S /Y \"" .. wxLocation .. "\\lib\\vc_dll\\\wxbase28u_*.dll\" \"Release\\\"",
+					"xcopy /S /Y \"" .. wxLocation .. "\\lib\\vc_dll\\\wxmsw28u_*.dll\" \"Release\\\""
+				});
 			else 
 				error("wxWidgets DLLs not found.  You need to build the wxWidgets library (Unicode Debug and Unicode Release configurations). " ..
 						"Use the Visual Studio solution provided by wxWidgets to build the libraries \n" .. 
@@ -103,14 +102,13 @@ function checkIcu()
 		icuDllPath = normalizepath(ICU_LIB_DIR .. "../bin")
 		dlls = os.matchfiles(ICU_LIB_DIR .. "/../bin/*.dll")
 		if #dlls > 0 then
-			
-			cmd = "xcopy /S /Y \"" .. icuDllPath .. "\\*.dll\" \"Debug\\\""
-			print(cmd)
-			os.execute(cmd)
-		
-			cmd = "xcopy /S /Y \"" .. icuDllPath .. "\\*.dll\" \"Release\\\""
-			print(cmd)
-			os.execute(cmd)
+			batchexecute(normalizepath(""), {
+					"xcopy /S /Y " .. normalizepath(ICU_LIB_DIR .. "../bin/*42d.dll") .. " \"Debug\\\"",
+					"xcopy /S /Y " .. normalizepath(ICU_LIB_DIR .. "../bin/*41d.dll") .. " \"Debug\\\"",
+					"xcopy /S /Y " .. normalizepath(ICU_LIB_DIR .. "../bin/icudt42.dll") .. " \"Debug\\\"",
+					"xcopy /S /Y " .. normalizepath(ICU_LIB_DIR .. "../bin/*42.dll") .. " \"Release\\\"",
+					"xcopy /S /Y " .. normalizepath(ICU_LIB_DIR .. "../bin/*41d.dll") .. " \"Release\\\""
+				});
 		else 
 			error ("ICU DLLs not found in " .. icuDllPath .. ".  Either build the ICU library " ..
 				"\nor set the MVCEDITOR_ICU_DIR environment variable to the location of ICU." ..
@@ -147,9 +145,9 @@ function checkSoci()
 		dlls = os.matchfiles("lib/soci/src/bin/Debug/*.dll")
 		if #dlls > 0 then
 			sociLibPath = normalizepath("lib/soci/src/bin/Debug/*.dll")
-			cmd = "xcopy /S /Y " .. sociLibPath  .. " \"Debug\\\""
-			print(cmd)
-			os.execute(cmd)
+			batchexecute(normalizepath(""), {
+				"xcopy /S /Y " .. sociLibPath .. " \"Debug\\\""
+			});
 		else 
 			print "SOCI Debug libraries have not been built. You need to build the SOCI library in Debug configuration. "
 			print ("Open the solution found at " .. SOCI_SRC .. "\\SOCI.sln")
@@ -160,7 +158,9 @@ function checkSoci()
 		dlls = os.matchfiles("lib/soci/src/bin/Release/*.dll")
 		if #dlls > 0 then
 			sociLibPath = normalizepath("lib/soci/src/bin/Release/*.dll")
-			cmd = "xcopy /S /Y " .. sociLibPath  .. " \"Release\\\""
+			batchexecute(normalizepath(""), {
+				"xcopy /S /Y " .. sociLibPath .. " \"Release\\\""
+			});
 			print(cmd)
 			os.execute(cmd)
 		else 
