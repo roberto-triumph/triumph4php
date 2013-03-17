@@ -160,6 +160,8 @@ protected:
 	void OnEditContentAssist(wxCommandEvent& event);
 	void OnEditCallTip(wxCommandEvent& event);
 	void OnHelpAbout(wxCommandEvent& event);
+	void OnHelpCredits(wxCommandEvent& event);
+	void OnHelpLicense(wxCommandEvent& event);
 	
 	/**
 	 * Context menu handler

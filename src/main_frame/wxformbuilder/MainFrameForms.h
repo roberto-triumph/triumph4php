@@ -35,6 +35,9 @@ namespace mvceditor{ class NotebookClass; }
 #include <wx/panel.h>
 #include <wx/spinctrl.h>
 #include <wx/radiobox.h>
+#include <wx/hyperlink.h>
+#include <wx/button.h>
+#include <wx/dialog.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -71,6 +74,8 @@ class MainFrameGeneratedClass : public wxFrame
 		void _wxFB_OnEditCallTip( wxCommandEvent& event ){ OnEditCallTip( event ); }
 		void _wxFB_OnEditPreferences( wxCommandEvent& event ){ OnEditPreferences( event ); }
 		void _wxFB_OnHelpAbout( wxCommandEvent& event ){ OnHelpAbout( event ); }
+		void _wxFB_OnHelpCredits( wxCommandEvent& event ){ OnHelpCredits( event ); }
+		void _wxFB_OnHelpLicense( wxCommandEvent& event ){ OnHelpLicense( event ); }
 		
 	
 	protected:
@@ -89,6 +94,8 @@ class MainFrameGeneratedClass : public wxFrame
 			ID_EDIT_CALL_TIP,
 			ID_EDIT_PREFERENCES,
 			ID_ABOUT,
+			ID_MENUITEMCREDITS,
+			ID_MENUITEMLICENSE,
 		};
 		
 		mvceditor::NotebookClass* Notebook;
@@ -123,6 +130,8 @@ class MainFrameGeneratedClass : public wxFrame
 		virtual void OnEditCallTip( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditPreferences( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpAbout( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnHelpCredits( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnHelpLicense( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
@@ -239,6 +248,78 @@ class EditorBehaviorPanelGeneratedClass : public wxPanel
 		
 		EditorBehaviorPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 603,339 ), long style = wxTAB_TRAVERSAL );
 		~EditorBehaviorPanelGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class CreditsDialogClass
+///////////////////////////////////////////////////////////////////////////////
+class CreditsDialogClass : public wxDialog 
+{
+	private:
+	
+	protected:
+		enum
+		{
+			ID_CREDITSDIALOGGENERATEDCLASS = 1000,
+		};
+		
+		wxStaticText* m_staticText8;
+		wxStaticText* m_staticText12;
+		wxHyperlinkCtrl* m_hyperlink3;
+		wxStaticText* m_staticText13;
+		wxHyperlinkCtrl* m_hyperlink4;
+		wxStaticText* m_staticText15;
+		wxHyperlinkCtrl* m_hyperlink6;
+		wxStaticText* m_staticText18;
+		wxHyperlinkCtrl* m_hyperlink9;
+		wxStaticText* m_staticText17;
+		wxHyperlinkCtrl* m_hyperlink8;
+		wxStaticText* m_staticText16;
+		wxHyperlinkCtrl* m_hyperlink7;
+		wxStaticText* m_staticText14;
+		wxHyperlinkCtrl* m_hyperlink5;
+		wxStaticText* m_staticText11;
+		wxHyperlinkCtrl* m_hyperlink2;
+		wxStaticText* m_staticText10;
+		wxHyperlinkCtrl* m_hyperlink1;
+		wxStaticText* m_staticText19;
+		wxHyperlinkCtrl* m_hyperlink10;
+		wxHyperlinkCtrl* m_hyperlink11;
+		wxStdDialogButtonSizer* m_sdbSizer2;
+		wxButton* m_sdbSizer2OK;
+	
+	public:
+		
+		CreditsDialogClass( wxWindow* parent, wxWindowID id = ID_CREDITSDIALOGGENERATEDCLASS, const wxString& title = _("Credits"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 668,392 ), long style = wxDEFAULT_DIALOG_STYLE );
+		~CreditsDialogClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class LicenseDialogClass
+///////////////////////////////////////////////////////////////////////////////
+class LicenseDialogClass : public wxDialog 
+{
+	private:
+	
+	protected:
+		enum
+		{
+			ID_LICENSEDIAOGCLASS = 1000,
+			ID_TEXT,
+			ID_LICENSELINK,
+		};
+		
+		wxStaticText* Text;
+		wxHyperlinkCtrl* LicenseLink;
+		wxStdDialogButtonSizer* ButtonSizer;
+		wxButton* ButtonSizerOK;
+	
+	public:
+		
+		LicenseDialogClass( wxWindow* parent, wxWindowID id = ID_LICENSEDIAOGCLASS, const wxString& title = _("License"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 431,410 ), long style = wxDEFAULT_DIALOG_STYLE );
+		~LicenseDialogClass();
 	
 };
 
