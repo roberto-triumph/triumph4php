@@ -22,6 +22,10 @@
 #include <wx/radiobox.h>
 #include <wx/checkbox.h>
 #include <wx/dialog.h>
+#include <wx/bitmap.h>
+#include <wx/image.h>
+#include <wx/icon.h>
+#include <wx/bmpbuttn.h>
 #include <wx/listbox.h>
 #include <wx/panel.h>
 
@@ -37,8 +41,11 @@ class FindInFilesDialogGeneratedClass : public wxDialog
 	protected:
 		enum
 		{
-			ID_FINDTEXT = 1000,
+			ID_REGEXFINDHELP = 1000,
+			ID_FINDTEXT,
+			ID_REGEXREPLACEHELP,
 			ID_REPLACEWITHTEXT,
+			ID_FILESFILTER,
 		};
 		
 		wxStaticText* FindLabel;
@@ -58,8 +65,11 @@ class FindInFilesDialogGeneratedClass : public wxDialog
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnRegExFindHelpButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnKeyDown( wxKeyEvent& event ) { event.Skip(); }
+		virtual void OnKillFocusFindText( wxFocusEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRegExReplaceHelpButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnKillFocusReplaceText( wxFocusEvent& event ) { event.Skip(); }
 		virtual void OnDirChanged( wxFileDirPickerEvent& event ) { event.Skip(); }
 		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
 		
@@ -81,21 +91,29 @@ class FindInFilesResultsPanelGeneratedClass : public wxPanel
 	protected:
 		enum
 		{
-			ID_REPLACE_BUTTON = 1000,
-			ID_REPLACE_ALL_IN_FILE_BUTTON,
-			ID_REPLACE_ALL_BUTTON,
-			ID_STOP_BUTTON,
-			ID_COPY_SELECTED_BUTTON,
-			ID_COPY_ALL_BUTTON,
+			ID_REPLACEBUTTON = 1000,
+			ID_REPLACEALLINFILEBUTTON,
+			ID_REPLACEINALLFILESBUTTON,
+			ID_COPYSELETEDBUTTON,
+			ID_COPYALLBUTTON,
+			ID_STOPBUTTON,
+			ID_REPLACEREGEXHELPBUTTON,
+			ID_REPLACETEXT,
 			ID_FIND_IN_FILES_RESULTS,
 		};
 		
-		wxButton* ReplaceButton;
-		wxButton* ReplaceAllInFileButton;
-		wxButton* ReplaceInAllFilesButton;
-		wxButton* StopButton;
-		wxButton* CopySelectedButton;
-		wxButton* CopyAllButton;
+		wxBitmapButton* ReplaceButton;
+		wxBitmapButton* ReplaceAllInFileButton;
+		wxBitmapButton* ReplaceInAllFilesButton;
+		wxBitmapButton* PreviousHitButton;
+		wxBitmapButton* NextHitButton;
+		wxBitmapButton* CopySelectedButton;
+		wxBitmapButton* CopyAllButton;
+		wxBitmapButton* StopButton;
+		wxStaticText* ReplaceLabel;
+		wxButton* RegexReplaceWithHelpButton;
+		wxComboBox* ReplaceWithText;
+		wxStaticText* FindLabel;
 		wxStaticText* ResultText;
 		wxListBox* ResultsList;
 		
@@ -103,9 +121,13 @@ class FindInFilesResultsPanelGeneratedClass : public wxPanel
 		virtual void OnReplaceButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnReplaceAllInFileButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnReplaceInAllFilesButton( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnStopButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnPreviousHitButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnNextHitButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCopySelectedButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCopyAllButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnStopButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRegExReplaceHelpButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnKillFocusReplaceText( wxFocusEvent& event ) { event.Skip(); }
 		virtual void OnDoubleClick( wxCommandEvent& event ) { event.Skip(); }
 		
 	

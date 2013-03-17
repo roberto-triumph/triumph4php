@@ -124,7 +124,7 @@ public:
 	 * the caller MUST call Prepare on this new  variable.  
 	 */
 	FindInFilesClass(const FindInFilesClass& source);
-	
+
 	~FindInFilesClass();
 	
 	/**
@@ -209,6 +209,12 @@ public:
 	 * the called MUST call Prepare on the assigned variable.  
 	 */
 	FindInFilesClass& operator=(const FindInFilesClass& source);
+
+	/**
+	 * Will copy source into this instance. However, this variable is not prepared, and
+	 * the caller MUST call Prepare on this new variable.  
+	 */
+	void Copy(const FindInFilesClass& source);
 	
 	/**
 	 * Copy this expression into the given finder.

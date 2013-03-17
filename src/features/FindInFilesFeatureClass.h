@@ -228,6 +228,11 @@ protected:
 	void OnCopySelectedButton(wxCommandEvent& event);
 	void OnCopyAllButton(wxCommandEvent& event);
 	void OnFindInFilesComplete(wxCommandEvent& event);
+	void OnNextHitButton(wxCommandEvent& event);
+	void OnPreviousHitButton(wxCommandEvent& event);
+	void OnRegExReplaceHelpButton(wxCommandEvent& event);
+	void OnReplaceTextEnter(wxCommandEvent& event);
+
 		
 public:
 
@@ -238,7 +243,7 @@ public:
 	 * @param NotebookClass* notebook the object that holds the text. The pointer will NOT be managed (deleted) by this class. 
 	 * @param StatusBarWithGaugeClass* gauge the object used to create gauge for showing progress. The pointer will NOT be managed 
 	 *        (deleted) by this class. 
-	 * to search in
+	 * @param runningThreads manages the background search thread
 	 */
 	FindInFilesResultsPanelClass(wxWindow* parent, NotebookClass* notebook, StatusBarWithGaugeClass* gauge,
 		mvceditor::RunningThreadsClass& runningThreads);
@@ -322,6 +327,14 @@ private:
 	 * to stop the thread if this panel is closed.
 	 */
 	wxThreadIdType RunningThreadId;
+
+	/**
+	 * Need to save the insertion point of the replace combo boxes; in Win32
+	 * GetInsertionPoint() of combobox fails when it does not have focus.
+	 * The insertion is needed to have the cursor show up properly when
+	 * the user clicks on the regex help buttons
+	 */
+	int CurrentInsertionPointReplace;
 	
 	/**
 	 * Enable the controls that allow the user to replace hits or stop searches.
@@ -359,15 +372,28 @@ private:
 	  */
 	 void FindInOpenedFiles();
 
-	 /**
-	  * Shows the i'th match. Will set the cursor to the position of the match, opening the file
-	  * it if it's not already open.
-	  *
-	  * @param i index of hit to show. i is 0-based
-	  */
-	 void ShowMatch(int i);
+	/**
+ 	 * Shows the i'th match. Will set the cursor to the position of the match, opening the file
+	 * it if it's not already open.
+	 *
+	 * @param i index of hit to show. i is 0-based
+	 */
+	void ShowMatch(int i);
 
-	 void OnWorkComplete(wxCommandEvent& event);
+	void OnWorkComplete(wxCommandEvent& event);
+
+	/**
+	 * handling of the replace regex help menu
+	 */
+	void InsertReplaceRegExSymbol(wxCommandEvent& event);
+	
+	/**
+	 * Need to save the insertion point of the Find and replace combo boxes; in Win32
+	 * GetInsertionPoint() of combobox fails when it does not have focus.
+	 * The insertion is needed to have the cursor show up properly when
+	 * the user clicks on the regex help buttons
+	 */
+	void OnKillFocusReplaceText(wxFocusEvent& event);
 	
 	DECLARE_EVENT_TABLE()
 };
@@ -461,8 +487,6 @@ class FindInFilesDialogClass: public FindInFilesDialogGeneratedClass {
 public:
 
 	FindInFilesDialogClass(wxWindow* parent, FindInFilesFeatureClass& feature);
-	
-	~FindInFilesDialogClass();
 
 protected:
 

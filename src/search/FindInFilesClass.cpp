@@ -44,15 +44,17 @@ mvceditor::FindInFilesClass::FindInFilesClass(const UnicodeString& expression, m
 	, LineNumber(0) {
 }
 
-mvceditor::FindInFilesClass::FindInFilesClass(const FindInFilesClass& findInFiles) {
-	Expression = findInFiles.Expression;
-	ReplaceExpression = findInFiles.ReplaceExpression;
-	Source = findInFiles.Source;
-	Mode = findInFiles.Mode;
-	Finder.Expression = findInFiles.Finder.Expression;
-	Finder.Mode = findInFiles.Finder.Mode;
-	File = NULL;
-	LineNumber = 0;
+mvceditor::FindInFilesClass::FindInFilesClass(const FindInFilesClass& findInFiles)
+	: Expression()
+	, ReplaceExpression()
+	, Source()
+	, Mode()
+	, Finder() 
+	, FFile()
+	, File(NULL)
+	, CurrentLine()
+	, LineNumber(0) {
+	Copy(findInFiles);
 }
 
 mvceditor::FindInFilesClass::~FindInFilesClass() {
@@ -208,14 +210,22 @@ mvceditor::FindInFilesClass::OpenErrors mvceditor::FindInFilesClass::FileContent
 	return error;
 }
 
-mvceditor::FindInFilesClass& mvceditor::FindInFilesClass::operator=(const FindInFilesClass& findInFiles) {
-	Expression = findInFiles.Expression;
-	ReplaceExpression = findInFiles.ReplaceExpression;
-	Source = findInFiles.Source;
-	Mode = findInFiles.Mode;
-	Finder.Expression = findInFiles.Finder.Expression;
-	Finder.Mode = findInFiles.Finder.Mode;
+mvceditor::FindInFilesClass& mvceditor::FindInFilesClass::operator=(const FindInFilesClass& src) {
+	Copy(src);
 	return *this;
+}
+
+void mvceditor::FindInFilesClass::Copy(const FindInFilesClass& src) {
+	CleanupStreams();
+
+	Expression = src.Expression;
+	ReplaceExpression = src.ReplaceExpression;
+	Source = src.Source;
+	Mode = src.Mode;
+	Finder.Expression = src.Finder.Expression;
+	Finder.Mode = src.Finder.Mode;
+
+	LineNumber = 0;
 }
 
 void mvceditor::FindInFilesClass::CleanupStreams() {

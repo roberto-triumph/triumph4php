@@ -194,9 +194,18 @@ mvceditor::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* 
 	, Notebook(notebook)
 	, Gauge(gauge)
 	, MatchedFiles(0) 
-	, RunningThreadId(0){
+	, RunningThreadId(0) {
 	FindInFilesGaugeId = wxNewId();
 	RunningThreads.AddEventHandler(this);
+
+	ReplaceButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("replace")));
+	ReplaceAllInFileButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("replace-file")));
+	ReplaceInAllFilesButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("replace-all")));
+	PreviousHitButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("previous")));
+	NextHitButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("next")));
+	StopButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("stop")));
+	CopySelectedButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("copy")));
+	CopyAllButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("copy-all")));
 }
 
 mvceditor::FindInFilesResultsPanelClass::~FindInFilesResultsPanelClass() {
@@ -212,8 +221,10 @@ mvceditor::FindInFilesResultsPanelClass::~FindInFilesResultsPanelClass() {
 }
 
 void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findInFiles, bool doHiddenFiles) {
-	FindInFiles = findInFiles;
+	FindInFiles.Copy(findInFiles);
 	MatchedFiles = 0;
+	ReplaceWithText->SetValue(mvceditor::IcuToWx(FindInFiles.ReplaceExpression));
+	RegexReplaceWithHelpButton->Enable(mvceditor::FinderClass::REGULAR_EXPRESSION == FindInFiles.Mode);
 
 	// for now disallow another find when one is already active
 	if (RunningThreadId > 0) {
@@ -324,6 +335,11 @@ void mvceditor::FindInFilesResultsPanelClass::ShowPreviousMatch() {
 }
 
 void mvceditor::FindInFilesResultsPanelClass::OnReplaceButton(wxCommandEvent& event) {
+	if (ReplaceWithText->FindString(ReplaceWithText->GetValue()) == wxNOT_FOUND) {
+		ReplaceWithText->AppendString(ReplaceWithText->GetValue());	
+	}
+	FindInFiles.ReplaceExpression = mvceditor::WxToIcu(ReplaceWithText->GetValue());
+	FindInFiles.Prepare();
 	CodeControlClass* codeControl = 
 			Notebook->GetCodeControl(Notebook->GetSelection());	
 			
@@ -332,8 +348,9 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceButton(wxCommandEvent& ev
 	if (codeControl) {		
 		int32_t position = codeControl->GetCurrentPos(),
 			length = 0;
-		UnicodeString replaceText;
 		FinderClass finder;
+		UnicodeString matchedText;
+		wxString replaceWithText = mvceditor::IcuToWx(FindInFiles.ReplaceExpression);
 		FindInFiles.CopyFinder(finder);
 		if (finder.Prepare()) {
 			
@@ -341,16 +358,23 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceButton(wxCommandEvent& ev
 			// double clicked on the result list (and focused on the hit).
 			if (finder.FindNext(text, position) && finder.GetLastMatch(position, length) && 
 				position == codeControl->GetCurrentPos() &&
-				finder.GetLastReplacementText(text, replaceText)) {
+				finder.GetLastReplacementText(text, matchedText)) {
 				codeControl->SetSelectionAndEnsureVisible(position, position + length);
-				codeControl->ReplaceSelection(mvceditor::IcuToWx(replaceText));
-				codeControl->SetSelectionByCharacterPosition(position, position + replaceText.length());
+				codeControl->ReplaceSelection(replaceWithText);
+				codeControl->SetSelectionByCharacterPosition(position, position + replaceWithText.length());
+
+				ShowNextMatch();
 			}
 		}
 	}
 }
 
 void mvceditor::FindInFilesResultsPanelClass::OnReplaceAllInFileButton(wxCommandEvent& event) {
+	if (ReplaceWithText->FindString(ReplaceWithText->GetValue()) == wxNOT_FOUND) {
+		ReplaceWithText->AppendString(ReplaceWithText->GetValue());	
+	}
+	FindInFiles.ReplaceExpression = mvceditor::WxToIcu(ReplaceWithText->GetValue());
+	FindInFiles.Prepare();
 	CodeControlClass* codeControl = 
 			Notebook->GetCodeControl(Notebook->GetSelection());	
 			
@@ -374,7 +398,10 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxComman
 		wxMessageBox(_("Find in files is already running. Please wait for it to finish."), _("Find In Files"));
 		return;
 	}
-
+	if (ReplaceWithText->FindString(ReplaceWithText->GetValue()) == wxNOT_FOUND) {
+		ReplaceWithText->AppendString(ReplaceWithText->GetValue());	
+	}
+	FindInFiles.ReplaceExpression = mvceditor::WxToIcu(ReplaceWithText->GetValue());
 	if (FindInFiles.Prepare()) {
 		FinderClass finder;
 		FindInFiles.CopyFinder(finder);
@@ -420,7 +447,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxComman
 
 void mvceditor::FindInFilesResultsPanelClass::OnFindInFilesComplete(wxCommandEvent& event) {
 	int matchedFilesSize = GetNumberOfMatchedFiles();
-	bool enableReplace = matchedFilesSize > 0 && !FindInFiles.ReplaceExpression.isEmpty();
+	bool enableReplace = matchedFilesSize > 0;
 	bool enableCopy = matchedFilesSize > 0;
 	EnableButtons(false, enableReplace, enableCopy);
 	Gauge->StopGauge(FindInFilesGaugeId);
@@ -574,6 +601,36 @@ void mvceditor::FindInFilesResultsPanelClass::OnCopyAllButton(wxCommandEvent& ev
 	}
 }
 
+void mvceditor::FindInFilesResultsPanelClass::OnPreviousHitButton(wxCommandEvent& event) {
+	ShowPreviousMatch();
+}
+
+void mvceditor::FindInFilesResultsPanelClass::OnNextHitButton(wxCommandEvent& event) {
+	ShowNextMatch();
+}
+
+void mvceditor::FindInFilesResultsPanelClass::OnRegExReplaceHelpButton(wxCommandEvent& event) {
+	wxMenu regExMenu;
+	mvceditor::PopulateRegExReplaceMenu(regExMenu, ID_REGEX_REPLACE_MENU_START);
+	PopupMenu(&regExMenu);	
+}
+
+void mvceditor::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol(wxCommandEvent& event) {
+	int id = event.GetId() - ID_REGEX_REPLACE_MENU_START;
+	mvceditor::AddSymbolToReplaceRegularExpression(ReplaceWithText, id, CurrentInsertionPointReplace);
+}
+
+void mvceditor::FindInFilesResultsPanelClass::OnKillFocusReplaceText(wxFocusEvent& event) {
+	CurrentInsertionPointReplace = ReplaceWithText->GetInsertionPoint();
+	event.Skip();
+}
+
+void mvceditor::FindInFilesResultsPanelClass::OnReplaceTextEnter(wxCommandEvent& event) {
+	if (ReplaceWithText->FindString(ReplaceWithText->GetValue()) == wxNOT_FOUND) {
+		ReplaceWithText->AppendString(ReplaceWithText->GetValue());	
+	}
+}
+
 void mvceditor::FindInFilesResultsPanelClass::EnableButtons(bool enableStopButton, bool enableReplaceButtons, bool enableCopyButtons) {
 	StopButton->Enable(enableStopButton);
 	ReplaceButton->Enable(enableReplaceButtons);
@@ -589,8 +646,24 @@ void mvceditor::FindInFilesResultsPanelClass::SetStatus(const wxString& text) {
 	// tell the sizer to re-position the label correctly
 	// we need this for the label to be right-aligned after
 	// the text change
+	wxString msg;
+	msg += _("Searched For: ");
+	msg += mvceditor::IcuToWx(FindInFiles.Expression);
+	if (mvceditor::FinderClass::REGULAR_EXPRESSION == FindInFiles.Mode) {
+		msg += _(" (regex)");
+	}
+	else if (mvceditor::FinderClass::CASE_INSENSITIVE == FindInFiles.Mode) {
+		msg += _(" (case)");
+	}
+	else if (mvceditor::FinderClass::EXACT == FindInFiles.Mode) {
+		msg += _(" (exact)");
+	}
+
+	FindLabel->SetLabel(msg);
 	ResultText->SetLabel(text);
+	FindLabel->GetContainingSizer()->Layout();
 	ResultText->GetContainingSizer()->Layout();
+	this->Layout();
 }
 
 int mvceditor::FindInFilesResultsPanelClass::GetNumberOfMatchedFiles() {
@@ -657,29 +730,7 @@ mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvce
 	DoHiddenFiles->SetValidator(doHiddenFilesValidator);
 
 	FilesFilter->SetValue(Feature.PreviousFindInFiles.Source.IncludeWildcardsString());
-
 	FindText->SetFocus();
-
-	// since this panel handles EVT_TEXT_ENTER, we need to handle the
-	// tab traversal ourselves otherwise tab travesal wont work
-	FindText->GetEventHandler()->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown));
-	ReplaceWithText->GetEventHandler()->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown));
-	FilesFilter->GetEventHandler()->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown));
-	
-	// connect to the KILL_FOCUS events so that we can capture the insertion point
-	// on Win32 GetInsertionPoint() returns 0 when the combo box is no
-	// in focus; we must receive the position via an outside mechanism
-	FindText->GetEventHandler()->Connect(wxID_ANY, wxID_ANY, wxEVT_KILL_FOCUS, wxFocusEventHandler(FindInFilesDialogClass::OnKillFocusFindText), NULL, this);
-	ReplaceWithText->GetEventHandler()->Connect(wxID_ANY, wxID_ANY, wxEVT_KILL_FOCUS, wxFocusEventHandler(FindInFilesDialogClass::OnKillFocusReplaceText), NULL, this);
-}
-
-mvceditor::FindInFilesDialogClass::~FindInFilesDialogClass() {
-	FindText->GetEventHandler()->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown));
-	ReplaceWithText->GetEventHandler()->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown));
-	FilesFilter->GetEventHandler()->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(mvceditor::FindInFilesDialogClass::OnKeyDown));
-
-	FindText->GetEventHandler()->Disconnect(wxID_ANY, wxID_ANY, wxEVT_KILL_FOCUS, wxFocusEventHandler(FindInFilesDialogClass::OnKillFocusFindText), NULL, this);
-	ReplaceWithText->GetEventHandler()->Disconnect(wxID_ANY, wxID_ANY, wxEVT_KILL_FOCUS, wxFocusEventHandler(FindInFilesDialogClass::OnKillFocusReplaceText), NULL, this);
 }
 
 void mvceditor::FindInFilesDialogClass::OnOkButton(wxCommandEvent& event) {
@@ -733,12 +784,12 @@ void mvceditor::FindInFilesDialogClass::OnDirChanged(wxFileDirPickerEvent& event
 
 void mvceditor::FindInFilesDialogClass::OnKeyDown(wxKeyEvent& event) {
 
-	// warning: don't use "this"; look at the way this event has been connected 
+	// the event object is the control that has focus
 	if (event.GetKeyCode() == WXK_TAB && event.ShiftDown()) {
-		Navigate(wxNavigationKeyEvent::IsBackward);
+		((wxWindow*)event.GetEventObject())->Navigate(wxNavigationKeyEvent::IsBackward);
 	}
-	else if (event.GetKeyCode() == WXK_TAB ) {
-		Navigate(wxNavigationKeyEvent::IsForward);
+	else if (event.GetKeyCode() == WXK_TAB) {
+		((wxWindow*)event.GetEventObject())->Navigate(wxNavigationKeyEvent::IsForward);
 	}
 	else {
 		event.Skip();
@@ -757,6 +808,10 @@ void mvceditor::FindInFilesDialogClass::OnKillFocusReplaceText(wxFocusEvent& eve
 
 mvceditor::FindInFilesFeatureClass::FindInFilesFeatureClass(mvceditor::AppClass& app)
 	: FeatureClass(app)
+	, FindHistory()
+	, ReplaceHistory()
+	, DirectoriesHistory()
+	, FilesHistory()
 	, PreviousFindInFiles()
 	, DoHiddenFiles(false)
 	, ResultsPanels() {
@@ -887,6 +942,12 @@ BEGIN_EVENT_TABLE(mvceditor::FindInFilesResultsPanelClass, FindInFilesResultsPan
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FILE_READ_COMPLETE, mvceditor::FindInFilesResultsPanelClass::OnFindInFilesComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::FindInFilesResultsPanelClass::OnTimer)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::FindInFilesResultsPanelClass::OnWorkComplete)
+
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_ONE, mvceditor::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_TWO, mvceditor::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_THREE, mvceditor::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_FOUR, mvceditor::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_FIVE, mvceditor::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::FindInFilesFeatureClass, wxEvtHandler)
