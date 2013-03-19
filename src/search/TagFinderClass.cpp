@@ -254,7 +254,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchReso
 			matches = CollectNearMatchFiles(tagSearch.GetFileName(), tagSearch.GetLineNumber());
 			break;
 		case mvceditor::TagSearchClass::CLASS_NAME:
-			matches = CollectNearMatchNonMembers(tagSearch);
+			matches = CollectNearMatchNonMembers(tagSearch, true, true, true);
 			if (matches.empty() && doCollectFileNames) {
 				matches = CollectNearMatchFiles(tagSearch.GetClassName(), tagSearch.GetLineNumber());
 			}
@@ -270,12 +270,42 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchReso
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchNonMembers(const mvceditor::TagSearchClass& tagSearch) {
+std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchClassesOrFiles(
+	const mvceditor::TagSearchClass& tagSearch) {
+
+	// at one point there was a check here to see if the  tag files existed
+	// it was removed because it caused performance issues, since this method
+	// is called while the user is typing text.
+	// take care when coding; make sure that any code called by this method does not touch the file system
+	std::vector<mvceditor::TagClass> matches;
+	switch (tagSearch.GetResourceType()) {
+		case mvceditor::TagSearchClass::FILE_NAME:
+		case mvceditor::TagSearchClass::FILE_NAME_LINE_NUMBER:
+			matches = CollectNearMatchFiles(tagSearch.GetFileName(), tagSearch.GetLineNumber());
+			break;
+		case mvceditor::TagSearchClass::CLASS_NAME:
+			matches = CollectNearMatchNonMembers(tagSearch, true, false, false);
+			if (matches.empty()) {
+				matches = CollectNearMatchFiles(tagSearch.GetClassName(), tagSearch.GetLineNumber());
+			}
+			break;
+	}
+	sort(matches.begin(), matches.end());
+	return matches;
+}
+
+std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchNonMembers(const mvceditor::TagSearchClass& tagSearch, bool doClasses, bool doDefines, bool doFunctions) {
 	std::string key = mvceditor::IcuToChar(tagSearch.GetClassName());
 	std::vector<int> types;
-	types.push_back(mvceditor::TagClass::CLASS);
-	types.push_back(mvceditor::TagClass::DEFINE);
-	types.push_back(mvceditor::TagClass::FUNCTION);
+	if (doClasses) {
+		types.push_back(mvceditor::TagClass::CLASS);
+	}
+	if (doDefines) {
+		types.push_back(mvceditor::TagClass::DEFINE);
+	}
+	if (doFunctions) {
+		types.push_back(mvceditor::TagClass::FUNCTION);
+	}
 	std::vector<mvceditor::TagClass> matches = FindByKeyExactAndTypes(key, types, true);
 	if (matches.empty()) {
 	
@@ -513,6 +543,27 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectFullyQualifie
 		types.push_back(mvceditor::TagClass::CLASS);
 		types.push_back(mvceditor::TagClass::FUNCTION);
 
+		allMatches = FindByKeyExactAndTypes(stdKey, types, true);
+	}
+	return allMatches;
+}
+
+std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectFullyQualifiedClassOrFile(const mvceditor::TagSearchClass& tagSearch) {
+
+	// at one point there was a check here to see if the  tag files existed
+	// it was removed because it caused performance issues, since this method
+	// is called while the user is typing text.
+	// take care when coding; make sure that any code called by this method does not touch the file system
+	std::vector<mvceditor::TagClass> allMatches;
+	std::vector<int> types;
+	if (mvceditor::TagSearchClass::FILE_NAME == tagSearch.GetResourceType() || 
+		mvceditor::TagSearchClass::FILE_NAME_LINE_NUMBER == tagSearch.GetResourceType()) {
+		allMatches = CollectExactFiles(tagSearch.GetFileName(), tagSearch.GetLineNumber());
+	}
+	else {
+		UnicodeString key = tagSearch.GetClassName();
+		std::string stdKey = mvceditor::IcuToChar(key);
+		types.push_back(mvceditor::TagClass::CLASS);
 		allMatches = FindByKeyExactAndTypes(stdKey, types, true);
 	}
 	return allMatches;
@@ -826,6 +877,48 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::CollectNearMat
 	return matches;
 }
 
+std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::CollectExactFiles(const UnicodeString& search, int lineNumber) {
+	wxString path,
+		currentFileName,
+		extension;
+	std::vector<mvceditor::TagClass> matches;
+	std::string query = mvceditor::IcuToChar(search);
+	std::string escaped = mvceditor::SqliteSqlEscape(query, '^');
+	query = "'" + escaped + "'";
+	std::string match;
+	int fileTagId;
+	int isNew;
+	try {
+		soci::statement stmt = (Session->prepare << 
+			"SELECT full_path, file_item_id, is_new FROM file_items WHERE full_path = " + query + " ESCAPE '^'",
+			soci::into(match), soci::into(fileTagId), soci::into(isNew));
+		if (stmt.execute(true)) {
+			do {
+				wxString fullPath = mvceditor::CharToWx(match.c_str());
+				wxFileName::SplitPath(fullPath, &path, &currentFileName, &extension);
+				currentFileName += wxT(".") + extension;
+				wxString fileName = mvceditor::IcuToWx(search);
+				fileName = fileName.Lower();
+				if (wxNOT_FOUND != currentFileName.Lower().Find(fileName)) {
+					if (0 == lineNumber || GetLineCountFromFile(fullPath) >= lineNumber) {
+						TagClass newTag;
+						newTag.FileTagId = fileTagId;
+						newTag.Identifier = mvceditor::WxToIcu(currentFileName);
+						newTag.SetFullPath(fullPath);
+						newTag.FileIsNew = isNew > 0;
+						matches.push_back(newTag);
+					}
+				}
+			} while (stmt.fetch());
+		}
+	} catch (std::exception& e) {
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxUnusedVar(msg);
+		wxASSERT_MSG(false, msg);
+	}
+	return matches;
+}
+
 std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::CollectAllTraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName) {
 	std::vector<mvceditor::TagClass> matches;
 
@@ -1025,6 +1118,13 @@ std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::ResourceStat
 }
 
 std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::CollectNearMatchFiles(const UnicodeString& search, int lineNumber) {
+	
+	// detector db does not have  a file_items table
+	std::vector<mvceditor::TagClass> matches;
+	return matches;
+}
+
+std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::CollectExactFiles(const UnicodeString& search, int lineNumber) {
 	
 	// detector db does not have  a file_items table
 	std::vector<mvceditor::TagClass> matches;

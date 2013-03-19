@@ -265,16 +265,6 @@ void mvceditor::TagCacheClass::RemoveGlobal(const wxFileName& resourceDbFileName
 	}
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllNonNativeClassesGlobal() const {
-	std::vector<mvceditor::TagClass> res; 
-	std::vector<mvceditor::GlobalCacheClass*>::const_iterator it;
-	for (it = GlobalCaches.begin(); it != GlobalCaches.end(); ++it) {
-		std::vector<mvceditor::TagClass> finderResources = (*it)->TagFinder->AllNonNativeClasses();
-		res.insert(res.end(), finderResources.begin(), finderResources.end());
-	}
-	return res;
-}
-
 std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectFullyQualifiedResourceFromAll(const UnicodeString& search) {
 	std::vector<mvceditor::TagClass> matches;
 	mvceditor::TagSearchClass tagSearch(search);
@@ -330,6 +320,74 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectNearMatchResou
 	for (size_t i = 0; i < finders.size(); ++i) {
 		mvceditor::TagFinderClass* tagFinder = finders[i];
 		std::vector<mvceditor::TagClass> finderMatches = tagFinder->CollectNearMatchResources(tagSearch, true);
+		size_t count = finderMatches.size();
+		for (size_t j = 0; j < count; ++j) {
+			mvceditor::TagClass tag = finderMatches[j];
+			if (!mvceditor::IsResourceDirty(openedFinders, tag, tagFinder)) {
+				matches.push_back(tag);
+			}
+		}
+	}
+	std::sort(matches.begin(), matches.end());
+	return matches;
+}
+
+
+std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectFullyQualifiedClassOrFileFromAll(const UnicodeString& search) {
+	std::vector<mvceditor::TagClass> matches;
+	mvceditor::TagSearchClass tagSearch(search);
+
+	// return all of the matches from all finders that were found by the Collect* call.
+	// This is a bit tricky because we want to prioritize matches in opened files 
+	// instead of the global finder, since the global finder will be outdated.
+	std::vector<mvceditor::TagFinderClass*> finders = AllFinders();
+	std::map<wxString, mvceditor::TagFinderClass*> openedFinders;
+	std::map<wxString, mvceditor::WorkingCacheClass*>::const_iterator it;
+	for (it = WorkingCaches.begin(); it != WorkingCaches.end(); ++it) {
+		openedFinders[it->first] = &it->second->TagFinder;
+	}
+	for (size_t i = 0; i < finders.size(); ++i) {
+		mvceditor::TagFinderClass* tagFinder = finders[i];
+		std::vector<mvceditor::TagClass> finderMatches = tagFinder->CollectFullyQualifiedClassOrFile(tagSearch);
+		size_t count = finderMatches.size();
+		for (size_t j = 0; j < count; ++j) {
+			mvceditor::TagClass tag = finderMatches[j];
+			if (!mvceditor::IsResourceDirty(openedFinders, tag, tagFinder)) {
+				matches.push_back(tag);
+			}
+		}
+	}
+	std::sort(matches.begin(), matches.end());
+	return matches;
+}
+
+std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectNearMatchClassesOrFilesFromAll(const UnicodeString& search) {
+	std::vector<mvceditor::TagClass> matches;
+	mvceditor::TagSearchClass tagSearch(search);
+
+	// return all of the matches from all finders that were found by the Collect* call.
+	// This is a bit tricky because we want to prioritize matches in opened files 
+	// instead of the global finder, since the global finder will be outdated.
+	std::vector<mvceditor::TagFinderClass*> finders = AllFinders();
+	std::map<wxString, mvceditor::TagFinderClass*> openedFinders;
+	std::map<wxString, mvceditor::WorkingCacheClass*>::const_iterator it;
+	for (it = WorkingCaches.begin(); it != WorkingCaches.end(); ++it) {
+		if (it->second->IsNew) {
+
+			// use the file identifier as a key to the map
+			openedFinders[it->first] = &it->second->TagFinder;
+		}
+		else {
+
+			// use the filename being edited as a key to the map
+			// this is needed so that we can know to remove matches
+			// that come from dirty files
+			openedFinders[it->second->FileName] = &it->second->TagFinder;
+		}
+	}
+	for (size_t i = 0; i < finders.size(); ++i) {
+		mvceditor::TagFinderClass* tagFinder = finders[i];
+		std::vector<mvceditor::TagClass> finderMatches = tagFinder->CollectNearMatchClassesOrFiles(tagSearch);
 		size_t count = finderMatches.size();
 		for (size_t j = 0; j < count; ++j) {
 			mvceditor::TagClass tag = finderMatches[j];

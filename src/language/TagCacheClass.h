@@ -324,16 +324,10 @@ public:
 	 * @return bool TRUE if db file is already loaded.
 	 */
 	bool IsInitGlobal(const wxFileName& resourceDbFileName) const;
-
-	/**
-	 * calls AllNonNativeClasses() method on the GLOBAL tag. This is usually done after all files have been indexed.
-	 * @see mvceditor::ParsedTagFinderClass::AllNonNativeClasses
-	 */
-	std::vector<TagClass> AllNonNativeClassesGlobal() const;
 	
 	/**
 	 * Searches all the registered caches (working AND global caches)
-	 * Will returm only for full exact matches (it will call CollectFullyQualifiedResource
+	 * Will return only for full exact matches (it will call CollectFullyQualifiedResource
 	 * on each tag finder).
 	 * @see mvceditor::TagFinderClass::CollectFullyQualifiedResource
 	 * @param search string to search for
@@ -351,6 +345,27 @@ public:
 	 * @return std::vector<mvceditor::TagClass> matched resources
 	 */
 	std::vector<mvceditor::TagClass> CollectNearMatchResourcesFromAll(const UnicodeString& search);
+
+	/**
+	 * Searches all the registered caches (working AND global caches)
+	 * Will return only for full exact matches (it will call CollectFullyQualifiedClassOrFile
+	 * on each tag finder).
+	 * @see mvceditor::TagFinderClass::CollectFullyQualifiedClassOrFile
+	 * @param search string to search for
+	 * @return std::vector<mvceditor::TagClass> matched resources. will be either files or classes 
+	 */
+	std::vector<mvceditor::TagClass> CollectFullyQualifiedClassOrFileFromAll(const UnicodeString& search);
+	
+	/**
+	 * Searches all the registered caches (working AND global caches)
+	 * Will return near matches (it will call CollectNearMatchClassesOrFiles
+	 * on each tag finder).
+	 *
+	 * @see mvceditor::TagFinderClass::CollectNearMatchClassesOrFiles
+	 * @param string to search for
+	 * @return std::vector<mvceditor::TagClass> matched resources. will be either files or classes
+	 */
+	std::vector<mvceditor::TagClass> CollectNearMatchClassesOrFilesFromAll(const UnicodeString& search);
 	
 	/**
 	 * Collects all near matches that are possible candidates for completion of the parsed expression.

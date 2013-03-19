@@ -122,6 +122,11 @@ public:
 		Matches = ParsedTagFinder.CollectNearMatchResources(tagSearch, doCollectFileNames);
 	}
 
+	void CollectNearMatchClassesOrFiles(const UnicodeString& search) {
+		mvceditor::TagSearchClass tagSearch(search);
+		Matches = ParsedTagFinder.CollectNearMatchClassesOrFiles(tagSearch);
+	}
+
 	soci::session Session;
 	mvceditor::TagParserClass TagParser;
 	mvceditor::ParsedTagFinderClass ParsedTagFinder;
@@ -899,6 +904,38 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldNotC
 	CHECK_UNISTR_EQUALS("AdminClass", Matches[0].Identifier);
 }
 
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchClassesOrFilesShouldCollectBoth) {
+	Prep(mvceditor::CharToIcu(
+		"<?php\n"
+		"class UserClass {\n"
+		"\tprivate $name;\n"
+		"\tprivate $address;\n"
+		"\tfunction getName() {\n"
+		"\t\treturn $this->name;\n"
+		"\t}\n"
+		"\tprivate function clearName() {\n"
+		"\t}\n"
+		"}\n"
+		"class SuperUserClass extends UserClass {\n"
+		"\tfunction disableUser(User $user) {\n"
+		"\t}\n"
+		"}\n"
+		"class UserAdminClass extends SuperUserClass {\n"
+		"\tfunction deleteUser(User $user) {\n"
+		"\t}\n"
+		"}\n"
+		"?>\n"
+	));
+	CollectNearMatchClassesOrFiles(UNICODE_STRING_SIMPLE("user"));
+	CHECK_VECTOR_SIZE(2, Matches);
+	CHECK_UNISTR_EQUALS("UserAdminClass", Matches[0].Identifier);
+	CHECK_UNISTR_EQUALS("UserClass", Matches[1].Identifier);
+
+	CollectNearMatchClassesOrFiles(UNICODE_STRING_SIMPLE("test.php"));
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(wxT("test.php"), Matches[0].GetFullPath());
+}
+
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectFullyQualifiedResourcesShouldFindFileWhenClassNameMatches) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
@@ -1115,6 +1152,26 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectFullyQualifiedResourceShould
 	mvceditor::TagClass tag = Matches[0];
 	CHECK_UNISTR_EQUALS("UserClass", tag.ClassName);
 	CHECK_UNISTR_EQUALS("name", tag.Identifier);
+}
+
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectFullyQualifiedClassOrFile) {
+	Prep(mvceditor::CharToIcu(
+		"<?php\n"
+		"class UserClass {\n"
+		"\tprivate $name;"
+		"\tfunction getName() {\n"
+		"\t\treturn $this->name;\n"
+		"\t}\n"
+		"}\n"
+	));	
+	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("UserClass"));
+	Matches = ParsedTagFinder.CollectFullyQualifiedClassOrFile(tagSearch);
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_UNISTR_EQUALS("UserClass", Matches[0].Identifier);
+
+	CollectNearMatchClassesOrFiles(UNICODE_STRING_SIMPLE("test.php"));
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_EQUAL(wxT("test.php"), Matches[0].GetFullPath());
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceParentClassShouldReturnParentClass) {
