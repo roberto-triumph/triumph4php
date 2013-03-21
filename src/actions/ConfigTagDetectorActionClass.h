@@ -118,8 +118,9 @@ private:
 	/**
 	 * pop the next set of params from the queue and call the php database 
 	 * detector.
+	 * @return bool TRUE if the detection was started succesfully
 	 */
-	void NextDetection();
+	bool NextDetection();
 
 	/**
 	 * @return all of the PHP Config detector scripts. These can be either ones

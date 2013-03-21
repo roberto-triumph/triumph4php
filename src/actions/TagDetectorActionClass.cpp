@@ -89,8 +89,7 @@ bool mvceditor::TagDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
 	if (!ParamsQueue.empty()) {
 		
 		// start the first external process
-		NextDetection();
-		started = true;
+		started = NextDetection();
 	}
 	return started;
 }
@@ -108,9 +107,9 @@ void mvceditor::TagDetectorActionClass::BackgroundWork() {
 	// here
 }
 
-void mvceditor::TagDetectorActionClass::NextDetection() {
+bool mvceditor::TagDetectorActionClass::NextDetection() {
 	if (ParamsQueue.empty()) {
-		return;
+		return false;
 	}
 	mvceditor::TagDetectorParamsClass params = ParamsQueue.front();
 	ParamsQueue.pop();
@@ -120,7 +119,7 @@ void mvceditor::TagDetectorActionClass::NextDetection() {
 	}
 	wxString cmdLine = params.BuildCmdLine();
 	long pid;
-	Process.Init(cmdLine, ID_TAG_DETECTOR_PROCESS, pid);
+	return Process.Init(cmdLine, ID_TAG_DETECTOR_PROCESS, pid);
 }
 
 std::vector<wxString> mvceditor::TagDetectorActionClass::DetectorScripts() {

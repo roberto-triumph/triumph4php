@@ -118,8 +118,9 @@ private:
 	/**
 	 * pop the next set of params from the queue and call the php tag 
 	 * detector.
+	 * @return bool TRUE if the detection was started succesfully
 	 */
-	void NextDetection();
+	bool NextDetection();
 
 	/**
 	 * @return all of the PHP tag detector scripts. These can be either ones

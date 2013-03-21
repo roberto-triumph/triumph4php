@@ -89,8 +89,7 @@ bool mvceditor::DatabaseTagDetectorActionClass::Init(mvceditor::GlobalsClass& gl
 	if (!ParamsQueue.empty()) {
 		
 		// start the first external process
-		NextDetection();
-		started = true;
+		started = NextDetection();
 	}
 	return started;
 }
@@ -108,9 +107,9 @@ void mvceditor::DatabaseTagDetectorActionClass::BackgroundWork() {
 	// here
 }
 
-void mvceditor::DatabaseTagDetectorActionClass::NextDetection() {
+bool mvceditor::DatabaseTagDetectorActionClass::NextDetection() {
 	if (ParamsQueue.empty()) {
-		return;
+		return false;
 	}
 	mvceditor::DatabaseTagDetectorParamsClass params = ParamsQueue.front();
 	ParamsQueue.pop();
@@ -122,7 +121,7 @@ void mvceditor::DatabaseTagDetectorActionClass::NextDetection() {
 
 	wxString cmdLine = params.BuildCmdLine();
 	long pid;
-	Process.Init(cmdLine, ID_DATABASE_TAG_DETECTOR_PROCESS, pid);
+	return Process.Init(cmdLine, ID_DATABASE_TAG_DETECTOR_PROCESS, pid);
 }
 
 std::vector<wxString> mvceditor::DatabaseTagDetectorActionClass::DetectorScripts() {

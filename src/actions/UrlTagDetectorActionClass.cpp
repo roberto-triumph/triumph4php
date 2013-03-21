@@ -117,8 +117,7 @@ bool mvceditor::UrlTagDetectorActionClass::Init(mvceditor::GlobalsClass& globals
 	if (!ParamsQueue.empty()) {
 		
 		// start the first external process
-		NextDetection();
-		started = true;
+		started = NextDetection();
 	}
 	return started;
 }
@@ -136,9 +135,9 @@ void mvceditor::UrlTagDetectorActionClass::BackgroundWork() {
 	// here
 }
 
-void mvceditor::UrlTagDetectorActionClass::NextDetection() {
+bool mvceditor::UrlTagDetectorActionClass::NextDetection() {
 	if (ParamsQueue.empty()) {
-		return;
+		return false;
 	}
 	mvceditor::UrlTagDetectorParamsClass params = ParamsQueue.front();
 	ParamsQueue.pop();
@@ -148,7 +147,7 @@ void mvceditor::UrlTagDetectorActionClass::NextDetection() {
 	}
 	wxString cmdLine = params.BuildCmdLine();
 	long pid;
-	Process.Init(cmdLine, ID_URL_TAG_DETECTOR_PROCESS, pid);
+	return Process.Init(cmdLine, ID_URL_TAG_DETECTOR_PROCESS, pid);
 }
 
 std::vector<wxString> mvceditor::UrlTagDetectorActionClass::DetectorScripts() {

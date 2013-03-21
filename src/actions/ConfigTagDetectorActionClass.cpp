@@ -89,8 +89,7 @@ bool mvceditor::ConfigTagDetectorActionClass::Init(mvceditor::GlobalsClass& glob
 	if (!ParamsQueue.empty()) {
 		
 		// start the first external process
-		NextDetection();
-		started = true;
+		started = NextDetection();
 	}
 	return started;
 }
@@ -108,9 +107,9 @@ void mvceditor::ConfigTagDetectorActionClass::BackgroundWork() {
 	// here
 }
 
-void mvceditor::ConfigTagDetectorActionClass::NextDetection() {
+bool mvceditor::ConfigTagDetectorActionClass::NextDetection() {
 	if (ParamsQueue.empty()) {
-		return;
+		return false;
 	}
 	mvceditor::ConfigTagDetectorParamsClass params = ParamsQueue.front();
 	ParamsQueue.pop();
@@ -120,7 +119,7 @@ void mvceditor::ConfigTagDetectorActionClass::NextDetection() {
 	}
 	wxString cmdLine = params.BuildCmdLine();
 	long pid;
-	Process.Init(cmdLine, ID_CONFIG_TAG_DETECTOR_PROCESS, pid);
+	return Process.Init(cmdLine, ID_CONFIG_TAG_DETECTOR_PROCESS, pid);
 }
 
 std::vector<wxString> mvceditor::ConfigTagDetectorActionClass::DetectorScripts() {

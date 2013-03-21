@@ -94,8 +94,7 @@ bool mvceditor::TemplateFileTagsDetectorActionClass::Init(mvceditor::GlobalsClas
 	if (!ParamsQueue.empty()) {
 		
 		// start the first external process
-		NextDetection();
-		started = true;
+		started = NextDetection();
 	}
 	return started;
 }
@@ -113,9 +112,9 @@ void mvceditor::TemplateFileTagsDetectorActionClass::BackgroundWork() {
 	// here
 }
 
-void mvceditor::TemplateFileTagsDetectorActionClass::NextDetection() {
+bool mvceditor::TemplateFileTagsDetectorActionClass::NextDetection() {
 	if (ParamsQueue.empty()) {
-		return;
+		return false;
 	}
 	mvceditor::TemplateFileTagsDetectorParamsClass params = ParamsQueue.front();
 	ParamsQueue.pop();
@@ -126,7 +125,7 @@ void mvceditor::TemplateFileTagsDetectorActionClass::NextDetection() {
 	}
 	wxString cmdLine = params.BuildCmdLine();
 	long pid;
-	Process.Init(cmdLine, ID_TEMPLATE_FILE_TAGS_DETECTOR_PROCESS, pid);
+	return Process.Init(cmdLine, ID_TEMPLATE_FILE_TAGS_DETECTOR_PROCESS, pid);
 }
 
 std::vector<wxString> mvceditor::TemplateFileTagsDetectorActionClass::DetectorScripts() {
