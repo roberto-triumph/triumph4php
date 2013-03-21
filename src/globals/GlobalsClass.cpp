@@ -148,6 +148,18 @@ bool mvceditor::GlobalsClass::IsAPhpSourceFile(const wxString& fullPath) const {
 	return isPhp;
 }
 
+bool mvceditor::GlobalsClass::HasAPhpExtension(const wxString& fullPath) const {
+	std::vector<wxString> wildcards = GetPhpFileExtensions();
+	bool found = false;
+	for (size_t i = 0; i < wildcards.size(); ++i) {
+		if (wxMatchWild(wildcards[i], fullPath)) {
+			found = true;
+			break;
+		}
+	}
+	return found;
+}
+
 wxString mvceditor::GlobalsClass::RelativeFileName(const wxString &fullPath, wxString& projectLabel) const {
 	wxString relativeName;
 	std::vector<mvceditor::ProjectClass>::const_iterator it;

@@ -175,9 +175,17 @@ public:
 	/**
 	 * @return TRUE if given full path is a PHP file, as determined by
 	 * the sources directories and the php file 
-	 * extensions wilcard.
+	 * extensions wilcard. Careful, This method will return FALSE 
+	 * for php files that are NOT in a project. 
 	 */
 	bool IsAPhpSourceFile(const wxString& fullPath) const;
+
+	/**
+	 * @return TRUE if given full path is a PHP file, as determined only by
+	 * the php file extensions wilcard. This method will return TRUE 
+	 * for php files that are NOT in a project.
+	 */
+	bool HasAPhpExtension(const wxString& fullPath) const;
 
 	/**
 	 * removes the source directory from the given full path.
