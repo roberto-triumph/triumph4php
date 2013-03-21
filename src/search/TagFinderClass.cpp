@@ -1052,6 +1052,36 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::FindByIdentifi
 	return ResourceStatementMatches(stream.str(), doLimit);
 }
 
+
+std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::AllTagsInFile(const wxString& fullPath) {
+	std::vector<mvceditor::TagClass> tags;
+	mvceditor::FileTagClass fileTag;
+	if (FindFileTagByFullPathExact(fullPath, fileTag)) {
+		std::ostringstream stream;
+
+		// remove the duplicates from fully qualified namespaces
+		// fully qualified classes / functions will start with backslash; but we want the
+		// tags that don't begin with backslash
+		stream << "r.file_item_id = " << fileTag.FileId << " AND Type IN(" << mvceditor::TagClass::CLASS
+			<< "," << mvceditor::TagClass::DEFINE << "," << mvceditor::TagClass::FUNCTION
+			<< ") AND key NOT LIKE '\\%' ESCAPE '^' ";
+		tags = ResourceStatementMatches(stream.str(), true);
+	}
+	return tags;
+}
+
+void mvceditor::TagFinderClass::Print() {
+	std::vector<mvceditor::TagClass> tags = All();
+	std::vector<mvceditor::TagClass>::iterator tag;
+	for (tag = tags.begin(); tag != tags.end(); ++tag) {
+		printf("key=%s\n", mvceditor::IcuToChar(tag->Key).c_str());
+		printf("type=%d fileItemId=%d\n", tag->Type, tag->FileTagId);
+		printf("identifier=%s\n", mvceditor::IcuToChar(tag->Identifier).c_str());
+		printf("\n\n");
+	}
+}
+
+
 mvceditor::DetectedTagFinderClass::DetectedTagFinderClass()
 	: TagFinderClass() {
 
@@ -1143,6 +1173,14 @@ std::vector<mvceditor::TraitTagClass> mvceditor::DetectedTagFinderClass::FindTra
 	// detector db does not have  a trait_resources table
 	std::vector<mvceditor::TraitTagClass> matches;
 	return matches;
+}
+
+
+std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::AllTagsInFile(const wxString& fullPath) {
+
+	// detector db does not have a file_items table
+	std::vector<mvceditor::TagClass> tags;
+	return tags;
 }
 
 

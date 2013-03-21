@@ -204,6 +204,15 @@ public:
 	 */
 	virtual std::vector<TagClass> AllNonNativeClasses() = 0;
 
+	/**
+	 * Gets all classes, functions, and constants (defines) that were parsed from
+	 * the given file.
+	 *
+	 * @param fullPath the full path of the file to lookup
+	 * @return vector of tags all tags that were parsed from the given file
+	 */
+	virtual std::vector<TagClass> AllTagsInFile(const wxString& fullPath) = 0;
+
 
 protected:
 
@@ -504,6 +513,17 @@ protected:
 	 */
 	int GetLineCountFromFile(const wxString& fullPath) const;
 
+	/**
+	 * Find the FileTag entry that has the given full path (exact, case insensitive search into
+	 * the database).
+	 *
+	 * @param fullPath the full path to search for
+	 * @param fileTag the FileTag itself will be copied here (if found)
+	 * @return bool if TRUE it means that this ResourceFinder has encountered the given
+	 * file before.
+	 */
+	bool FindFileTagByFullPathExact(const wxString& fullPath, mvceditor::FileTagClass& fileTag);
+
 private:
 		
 	/**
@@ -587,17 +607,6 @@ private:
 	std::vector<mvceditor::TagClass> FindByKeyStartMany(const std::vector<std::string>& keyStarts, bool doLimit);
 
 	/**
-	 * Find the FileTag entry that has the given full path (exact, case insensitive search into
-	 * the database).
-	 *
-	 * @param fullPath the full path to search for
-	 * @param fileTag the FileTag itself will be copied here (if found)
-	 * @return bool if TRUE it means that this ResourceFinder has encountered the given
-	 * file before.
-	 */
-	bool FindFileTagByFullPathExact(const wxString& fullPath, mvceditor::FileTagClass& fileTag);
-
-	/**
 	 * check the database AND the current file's parsed cache to see if the namespace has been seen
 	 * before.
 	 * @return bool TRUE if the namespace is NOT in the database and its NOT in the current file
@@ -623,6 +632,15 @@ public:
 	 * This method will NOT return native PHP classes (ie. PDO, DateTime).
 	 */
 	virtual std::vector<TagClass> AllNonNativeClasses();
+
+	/**
+	 * Gets all classes, functions, and constants (defines) that were parsed from
+	 * the given file.
+	 *
+	 * @param fullPath the full path of the file to lookup
+	 * @return vector of tags all tags that were parsed from the given file
+	 */
+	virtual std::vector<TagClass> AllTagsInFile(const wxString& fullPath);
 
 protected:
 
@@ -698,6 +716,15 @@ public:
 	 * This method will NOT return native PHP classes (ie. PDO, DateTime).
 	 */
 	std::vector<TagClass> AllNonNativeClasses();
+
+		/**
+	 * Gets all classes, functions, and constants (defines) that were parsed from
+	 * the given file.
+	 *
+	 * @param fullPath the full path of the file to lookup
+	 * @return vector of tags all tags that were parsed from the given file
+	 */
+	virtual std::vector<TagClass> AllTagsInFile(const wxString& fullPath);
 
 protected:
 

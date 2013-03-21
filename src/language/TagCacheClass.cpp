@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <language/TagCacheClass.h>
+#include <language/TagFinderList.h>
 #include <globals/Assets.h>
 #include <globals/Sqlite.h>
 #include <soci/soci.h>
@@ -533,4 +534,40 @@ void mvceditor::TagCacheClass::Clear() {
 	}
 	GlobalCaches.clear();
 	WorkingCaches.clear();
+}
+
+std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectAllMemberTags(const UnicodeString& className) {
+	std::vector<mvceditor::TagFinderClass*> allTagFinders = AllFinders();
+
+	// add the double colon so that we search for all members
+	mvceditor::TagSearchClass tagSearch(className + UNICODE_STRING_SIMPLE("::"));
+	tagSearch.SetParentClasses(mvceditor::TagFinderListClassParents(tagSearch.GetClassName(), tagSearch.GetMethodName(), allTagFinders));
+	tagSearch.SetTraits(mvceditor::TagFinderListClassUsedTraits(tagSearch.GetClassName(), tagSearch.GetParentClasses(), 
+		tagSearch.GetMethodName(), allTagFinders));
+
+
+	std::vector<mvceditor::TagClass> allMatches;
+	for (size_t j = 0; j < allTagFinders.size(); ++j) {
+		mvceditor::TagFinderClass* finder = allTagFinders[j];
+		std::vector<mvceditor::TagClass> matches = finder->CollectNearMatchResources(tagSearch);
+		allMatches.insert(allMatches.end(), matches.begin(), matches.end());
+	}
+	return allMatches;
+}
+
+std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectAllTagsInFile(const wxString& fullPath) {
+	std::vector<mvceditor::TagClass> allMatches;
+
+	std::vector<mvceditor::TagFinderClass*> allTagFinders = AllFinders();
+	for (size_t j = 0; j < allTagFinders.size(); ++j) {
+		mvceditor::TagFinderClass* finder = allTagFinders[j];
+		allMatches = finder->AllTagsInFile(fullPath);
+		if (!allMatches.empty()) {
+
+			// even if the file tag is is multiple finders, they should both be the 
+			// same. stop when we find anything
+			break;	
+		}
+	}
+	return allMatches;
 }

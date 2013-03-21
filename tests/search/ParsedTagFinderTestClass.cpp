@@ -1504,6 +1504,48 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, IsFileCacheEmptyWithNativeFunctions
 	CHECK(ParsedTagFinder.IsResourceCacheEmpty());
 }
 
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, AllTagsInFileShouldReturnTags) {
+
+	// create 2 files that way we can test that each file will only get its own
+	// tags
+	TestFile = wxT("test.php");
+	Prep(mvceditor::CharToIcu(
+		"<?php\n"
+		"define('USER_MAX', 2000);\n"
+		"class UserClass {\n"
+		"\tprivate $name;"
+		"\tfunction getName() {\n"
+		"\t\treturn $this->name;\n"
+		"\t}\n"
+		"}\n"
+		"function printUsers($user) {}\n"
+		"\n"
+		"?>\n"
+	));	
+	
+	TestFile = wxT("tan.php");
+		Prep(mvceditor::CharToIcu(
+		"<?php\n"
+		"define('TAN_MAX', 2000);\n"
+		"class TanClass {\n"
+		"\tprivate $score;"
+		"\tfunction getScore() {\n"
+		"\t\treturn $this->score;\n"
+		"\t}\n"
+		"}\n"
+		"function printScore($tan) {}\n"
+		"\n"
+		"?>\n"
+	));	
+	Matches = ParsedTagFinder.AllTagsInFile(wxT("test.php"));
+	CHECK_VECTOR_SIZE(3, Matches);
+	CHECK_UNISTR_EQUALS("printUsers", Matches[0].Key);
+	CHECK_UNISTR_EQUALS("USER_MAX", Matches[1].Key);
+	CHECK_UNISTR_EQUALS("UserClass", Matches[2].Key);
+
+
+}
+
 TEST_FIXTURE(ParsedTagFinderFileTestClass, IsFileCacheEmptyWithAnotherFile) {
 	CHECK(ParsedTagFinder.IsFileCacheEmpty());
 	CHECK(ParsedTagFinder.IsResourceCacheEmpty());

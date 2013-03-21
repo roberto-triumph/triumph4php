@@ -251,13 +251,11 @@ private:
  * @endcode
  *
  * Since TagCacheClass is backed by ParsedTagFinderClass, the global tag finders 
- * are stored on disk and are preserved across application restarts. This means that 
- * if the cache file already exists, then WalkGlobal() may return immediately if the file
- * to be parsed has not been modified since the last time we parsed it.
+ * are stored on disk and are preserved across application restarts. 
  *
  * Note that NONE of the methods of this class can be safely accessed by multiple
  * threads. Concurrent access can be achieved by creating separate instances of 
- * ResourceCacheClas with both pointing to the same DB files.
+ * TagCacheClas with both pointing to the same DB files.
  */
 class TagCacheClass {
 	
@@ -366,6 +364,30 @@ public:
 	 * @return std::vector<mvceditor::TagClass> matched resources. will be either files or classes
 	 */
 	std::vector<mvceditor::TagClass> CollectNearMatchClassesOrFilesFromAll(const UnicodeString& search);
+
+	/**
+	 * gets all tags for a single class
+	 * @param className the class to search.  not fully qualified (no namespace)
+	 * @return vector of tags; 
+	 *         all methods and properties that are defined in the class PLUS
+	 *         all methods and properties that are defined in any of its base classes PLUS
+	 *         all methods and properties that are defined in any of the traits used by any of the base classes
+	 */
+	std::vector<mvceditor::TagClass> CollectAllMemberTags(const UnicodeString& className);
+
+	/**
+	 * gets all tags that were found in a single file.
+	 *
+	 * @param fullPath full path to a file to lookup
+	 * @return vector of tags; 
+	 *         all functions or define's in the give file PLUS
+	 *         all classes in the given file PLUS
+	 *         all methods and properties that are defined in any classes PLUS
+	 *         all methods and properties that are defined in any classes' base classes PLUS
+	 *         all methods and properties that are defined in any of the traits used any classes PLUS
+	 *         all methods and properties that are defined in any of the traits used by any of the base classes
+	 */
+	std::vector<mvceditor::TagClass> CollectAllTagsInFile(const wxString& fullPath); 
 	
 	/**
 	 * Collects all near matches that are possible candidates for completion of the parsed expression.
