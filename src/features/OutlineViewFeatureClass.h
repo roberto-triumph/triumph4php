@@ -52,31 +52,6 @@ class ResourceFinderCompleteEventClass : public wxEvent {
 	
 };
 
-class GlobalClassesCompleteEventClass : public wxEvent {
-
-public:
-
-	GlobalClassesCompleteEventClass(int eventId, const std::vector<wxString>& allClasses);
-	
-	wxEvent* Clone() const;
-
-	/**
-	 * @return All of the classes that have been parsed by the
-	 * global cache
-	 */
-	std::vector<wxString> GetAllClasses() const;
-
-private:
-
-	/**
-	 * All of the classes that have been parsed by the
-	 * global cache. Hiding this vector because we want to make sure
-	 * it is deep copied every time since we this event will be handled
-	 * by multiple threads.
-	 */
-	std::vector<wxString> AllClasses;
-};
-
 
 typedef void (wxEvtHandler::*ResourceFinderCompleteEventClassFunction)(ResourceFinderCompleteEventClass&);
 
@@ -84,15 +59,6 @@ typedef void (wxEvtHandler::*ResourceFinderCompleteEventClassFunction)(ResourceF
 	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_RESOURCE_FINDER_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( ResourceFinderCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
-
-
-typedef void (wxEvtHandler::*GlobalClassesCompleteEventClassFunction)(GlobalClassesCompleteEventClass&);
-
-#define EVT_GLOBAL_CLASSES_COMPLETE(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_GLOBAL_CLASSES_COMPLETE, id, -1, \
-    (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( GlobalClassesCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
-
 
 /**
  * A small class that will parse source into resources. We want to do 
@@ -125,7 +91,7 @@ private:
 
 	/**
 	 * Since this thread will be alive as long as the program is running, we guard against access
-	 * for FileName, PhpVersion  variables. We want to start one thread that will handle all code notebook
+	 * for FileName, PhpVersion variables. We want to start one thread that will handle all code notebook
 	 * tab changes instead of creating one thread each time the user changes to a new tab.
 	 */
 	wxMutex Mutex;
@@ -140,40 +106,6 @@ private:
 	 */
 	pelet::Versions PhpVersion;
 
-};
-
-/**
- * class to gather all of the classes from the global cache.
- * Need to do this in the background because the SQLite file
- * does not have an index on the resource_type column
- */
-class GlobalClassesThreadClass : public mvceditor::ThreadWithHeartbeatClass {
-	
-public:
-
-	GlobalClassesThreadClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
-	
-	/**
-	 * @param projects the currently projects, which contain the full paths to tag DB files to read
-	 * @return TRUE if there is at least one enabled project
-	 */
-	bool Init(const std::vector<mvceditor::ProjectClass>& projects);
-	
-protected:
-
-	void BackgroundWork();
-	
-private:
-
-	/**
-	 * location of the tag database files
-	 */
-	std::vector<wxFileName> ResourceDbFileNames;
-	
-	/**
-	 * the resulting class list
-	 */
-	std::vector<wxString> AllClasses;
 };
 
 /**
@@ -223,6 +155,8 @@ public:
 	 * @param wxString teh fully qualified tag
 	 */
 	void JumpToResource(const wxString& tag);
+
+	std::vector<mvceditor::TagClass> SearchForResources(const wxString& text);
 	
 private:		
 		
@@ -235,13 +169,7 @@ private:
 	 * when the parsing is complete update the panel.
 	 */
 	void OnResourceFinderComplete(mvceditor::ResourceFinderCompleteEventClass& event);
-	
-	/**
-	 * When all the classes from the global cache have been gathered
-	 * update the outline panel
-	 */
-	void OnGlobalClassesComplete(mvceditor::GlobalClassesCompleteEventClass& event);
-	
+		
 	/**
 	 * when a file is saved and the outline tab is opened, make sure to refresh the outline
 	 * tab contents with the latest content
@@ -299,14 +227,13 @@ protected:
 	void OnHelpButton(wxCommandEvent& event);
 	
 	/**
-	 * take the selected choice, perform a tag lookup, and get the outline
+	 * make the user pick a tag, then outline the tag
 	 */
-	void OnChoice(wxCommandEvent& event);
+	void OnAddButton(wxCommandEvent& event);
 
 	/**
 	 * sync the outline with the currently opened file
-	 */
-	
+	 */	
 	void OnSyncButton(wxCommandEvent& event);
 
 private:
@@ -339,6 +266,80 @@ private:
 	 * double clicking on a  tag name in the tree will make the editor open up that tag
 	 */
 	void OnTreeItemActivated(wxTreeEvent& event);
+
+	/**
+	 * Show the given tags in the outline tree.
+	 */
+	void AddTagsToOutline(const std::vector<mvceditor::TagClass>& tags);
+
+	/**
+	 * Add a class and all of its members into the tree outline at the given node.
+	 *
+	 */
+	void AddClassToOutline(const UnicodeString& className, wxTreeItemId& classRoot);
+
+	/**
+	 * adds a tag as a child node of the tree control.
+	 */
+	void TagToNode(const mvceditor::TagClass& tag, wxTreeItemId& tagRoot);
+
+};
+
+class FileSearchDialogClass : public FileSearchDialogGeneratedClass {
+
+public:
+
+	/**
+	 * @param parent the parent window
+	 * @param feature to get the project list and to search for files
+	 * @param chosenTags the tags that the user chose will be filled in here
+	 */
+	FileSearchDialogClass(wxWindow* parent, mvceditor::OutlineViewFeatureClass& feature, 
+		std::vector<mvceditor::TagClass>& chosenTags);
+
+protected:
+
+	void OnOkButton(wxCommandEvent& event);
+	void OnSearchText(wxCommandEvent& event);
+	void OnProjectChoice(wxCommandEvent& event);
+	void OnSearchKeyDown(wxKeyEvent& event);
+	void OnSearchEnter(wxCommandEvent& event);
+	void OnMatchesListDoubleClick(wxCommandEvent& event);
+	void OnMatchesListKeyDown(wxKeyEvent& event);
+
+
+private:
+
+	/**
+	 * populate the project choice 
+	 */
+	void Init();
+
+	/**
+	 * perform the file search based on the selected project and 
+	 * the entered text
+	 */
+	void Search();
+
+	/**
+	 * show the tags in the results list
+	 */
+	void ShowTags(const wxString& query, const std::vector<mvceditor::TagClass>& tags);
+
+	/**
+	 * to get the project list and perform tag search
+	 */
+	mvceditor::OutlineViewFeatureClass& Feature;
+
+	/**
+	 * the tags that the were the result of the preivous search
+	 */
+	std::vector<mvceditor::TagClass> MatchingTags;
+	
+	/**
+	 * the tags that the user chose
+	 */
+	std::vector<mvceditor::TagClass>& ChosenTags;
 };
 
 }

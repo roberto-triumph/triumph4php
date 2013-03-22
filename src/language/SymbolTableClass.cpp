@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <language/SymbolTableClass.h>
+#include <language/TagFinderList.h>
 #include <globals/String.h>
 #include <pelet/TokenClass.h>
 #include <wx/ffile.h>
@@ -136,71 +137,6 @@ static bool IsStaticExpression(const pelet::ExpressionClass& parsedExpression) {
 }
 
 /**
- * @return vector of all of the classes that are parent classes of the given
- *         class. this method will search across all tag finders
- */
-static std::vector<UnicodeString> ClassParents(UnicodeString className, UnicodeString methodName, 
-												 const std::vector<mvceditor::TagFinderClass*>& allTagFinders) {
-	std::vector<UnicodeString> parents;
-	bool found = false;
-	UnicodeString classToLookup = className;
-	do {
-
-		// each parent class may be located in any of the finders. in practice this code is not as slow
-		// as it looks; class hierarchies are usually not very deep (1-4 parents)
-		found = false;
-		for (size_t i = 0; i < allTagFinders.size(); ++i) {
-			UnicodeString parentClass = allTagFinders[i]->GetResourceParentClassName(classToLookup);
-			if (!parentClass.isEmpty()) {
-				found = true;
-				parents.push_back(parentClass);
-				classToLookup = parentClass;
-
-				// a class can have at most 1 parent, no need to look at other finders
-				break;
-			}
-		}
-	} while (found);
-	return parents;
-}
-
-/**
- * @return vector of all of the traits that are used by any of the given class or parent classes.
- *         This method will search across all tag finders
- */
-static std::vector<UnicodeString> ClassUsedTraits(const UnicodeString& className, 
-												  const std::vector<UnicodeString>& parentClassNames, 
-												  const UnicodeString& methodName, 
-												  const std::vector<mvceditor::TagFinderClass*>& allTagFinders) {
-
-	// trait support; a class can use multiple traits; hence the different logic 
-	std::vector<UnicodeString> classesToLookup;
-	classesToLookup.push_back(className);
-	classesToLookup.insert(classesToLookup.end(), parentClassNames.begin(), parentClassNames.end());
-	std::vector<UnicodeString> usedTraits;
-	bool found = false;
-	do {
-		found = false;
-		std::vector<UnicodeString> nextTraitsToLookup;
-		for (std::vector<UnicodeString>::iterator it = classesToLookup.begin(); it != classesToLookup.end(); ++it) {
-			for (size_t i = 0; i < allTagFinders.size(); ++i) {
-				std::vector<UnicodeString> traits = allTagFinders[i]->GetResourceTraits(*it, methodName);
-				if (!traits.empty()) {
-					found = true;
-					nextTraitsToLookup.insert(nextTraitsToLookup.end(), traits.begin(), traits.end());
-					usedTraits.insert(usedTraits.end(), traits.begin(), traits.end());
-				}
-			}
-		}
-
-		// next, look for traits used by the traits themselves
-		classesToLookup = nextTraitsToLookup;
-	} while (found);
-
-	return usedTraits;
-}
-
-/**
  * Figure out a tag's type by looking at all of the given finders.
  * @param resourceToLookup MUST BE fully qualified (class name  + method name,  or function name).  string can have the
  *        object operator "::" that separates the class and method name.
@@ -212,8 +148,8 @@ static UnicodeString ResolveResourceType(UnicodeString resourceToLookup,
 										 const std::vector<mvceditor::TagFinderClass*>& allTagFinders) {
 	UnicodeString type;
 	mvceditor::TagSearchClass tagSearch(resourceToLookup);
-	tagSearch.SetParentClasses(ClassParents(tagSearch.GetClassName(), tagSearch.GetMethodName(), allTagFinders));
-	tagSearch.SetTraits(ClassUsedTraits(tagSearch.GetClassName(), tagSearch.GetParentClasses(), tagSearch.GetMethodName(), allTagFinders));
+	tagSearch.SetParentClasses(mvceditor::TagFinderListClassParents(tagSearch.GetClassName(), tagSearch.GetMethodName(), allTagFinders));
+	tagSearch.SetTraits(mvceditor::TagFinderListClassUsedTraits(tagSearch.GetClassName(), tagSearch.GetParentClasses(), tagSearch.GetMethodName(), allTagFinders));
 
 	// need to get the type from the tag finders
 	for (size_t j = 0; j < allTagFinders.size(); ++j) {
@@ -692,8 +628,8 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 
 	if (!error.HasError()) {
 		mvceditor::TagSearchClass tagSearch(resourceToLookup);
-		tagSearch.SetParentClasses(ClassParents(tagSearch.GetClassName(), tagSearch.GetMethodName(), allTagFinders));
-		tagSearch.SetTraits(ClassUsedTraits(tagSearch.GetClassName(), tagSearch.GetParentClasses(), tagSearch.GetMethodName(), allTagFinders));
+		tagSearch.SetParentClasses(mvceditor::TagFinderListClassParents(tagSearch.GetClassName(), tagSearch.GetMethodName(), allTagFinders));
+		tagSearch.SetTraits(mvceditor::TagFinderListClassUsedTraits(tagSearch.GetClassName(), tagSearch.GetParentClasses(), tagSearch.GetMethodName(), allTagFinders));
 		for (size_t j = 0; j < allTagFinders.size(); ++j) {
 			mvceditor::TagFinderClass* finder = allTagFinders[j];
 

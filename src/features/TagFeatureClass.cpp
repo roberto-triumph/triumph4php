@@ -27,6 +27,7 @@
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 #include <globals/Events.h>
+#include <globals/TagList.h>
 #include <actions/TagWipeActionClass.h>
 #include <MvcEditor.h>
 #include <wx/artprov.h>
@@ -94,8 +95,8 @@ std::vector<mvceditor::TagClass> mvceditor::TagFeatureClass::SearchForResources(
 	// no need to show jump to results for native functions
 	// TODO: CollectNearResourceMatches shows resources from files that were recently deleted
 	// need to hide them / remove them
-	RemoveNativeMatches(matches);
-	KeepMatchesFromProjects(matches, projects);
+	mvceditor::TagListRemoveNativeMatches(matches);
+	mvceditor::TagListKeepMatchesFromProjects(matches, projects);
 	return matches;
 }
 
@@ -133,7 +134,7 @@ void mvceditor::TagFeatureClass::OnJump(wxCommandEvent& event) {
 		wxString term = codeControl->GetTextRange(startPos, endPos);
 	
 		std::vector<mvceditor::TagClass> matches = codeControl->GetCurrentSymbolResource();
-		RemoveNativeMatches(matches);
+		mvceditor::TagListRemoveNativeMatches(matches);
 		if (!matches.empty()) {
 			UnicodeString res = matches[0].ClassName + UNICODE_STRING_SIMPLE("::") + matches[0].Identifier;
 			if (matches.size() == 1) {
@@ -260,38 +261,6 @@ void mvceditor::TagFeatureClass::OnAppFileClosed(wxCommandEvent& event) {
 	// this needs to be the same as mvceditor::CodeControlClass::GetIdString
 	wxString idString = wxString::Format(wxT("File_%d"), event.GetId());
 	App.Globals.TagCache.RemoveWorking(idString);
-}
-
-void mvceditor::TagFeatureClass::RemoveNativeMatches(std::vector<mvceditor::TagClass>& matches) const {
-	std::vector<mvceditor::TagClass>::iterator it = matches.begin();
-	while (it != matches.end()) {
-		if (it->IsNative) {
-			it = matches.erase(it);
-		}
-		else {
-			it++;
-		}
-	}
-}
-
-void mvceditor::TagFeatureClass::KeepMatchesFromProjects(std::vector<mvceditor::TagClass>& matches, std::vector<mvceditor::ProjectClass*> projects) const {
-	std::vector<mvceditor::TagClass>::iterator tag = matches.begin();
-	std::vector<mvceditor::ProjectClass*>::const_iterator project;
-	while (tag != matches.end()) {
-		bool isInProjects = false;
-		for (project = projects.begin(); project != projects.end(); ++project) {
-			isInProjects = (*project)->IsASourceFile(tag->GetFullPath());
-			if (isInProjects) {
-				break;
-			}
-		}
-		if (!isInProjects) {
-			tag = matches.erase(tag);
-		}
-		else {
-			tag++;
-		}
-	}
 }
 
 wxString mvceditor::TagFeatureClass::CacheStatus() {

@@ -118,22 +118,6 @@ private:
 	 * @param tag the tag to load
 	 */
 	void LoadPageFromResource(const wxString& finderQuery, const TagClass& tag);
-
-	/**
-	 * remove matches for php built-in functions. as we dont want a source file to
-	 * open.
-	 * @param matches any native matches from this given vector will be removed
-	 */
-	void RemoveNativeMatches(std::vector<mvceditor::TagClass>& matches) const;
-
-	/**
-	 * Further filter matches by only the matches that belong to the given projects.
-	 *
-	 * @param matches the tags list to modify
-	 * @param projects matches from these projects will be kept; all others will be erased.
-	 *        this method will not own the project pointers
-	 */
-	void KeepMatchesFromProjects(std::vector<mvceditor::TagClass>& matches, std::vector<mvceditor::ProjectClass*> projects) const;
 	
 	/**
 	 * prepare to iterate through the given file. The name part of the given file must match the wildcard.
