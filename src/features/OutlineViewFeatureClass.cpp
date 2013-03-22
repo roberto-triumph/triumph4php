@@ -312,73 +312,86 @@ void mvceditor::OutlineViewPanelClass::RefreshOutlines(const std::vector<mvcedit
 	wxTreeItemId rootId = Tree->AddRoot(_("Outline"), IMAGE_OUTLINE_ROOT);
 	StatusLabel->SetLabel(_(""));
 	std::vector<mvceditor::TagClass>::const_iterator tag;
+	std::vector<UnicodeString> classes;
 	for (tag = resources.begin(); tag != resources.end(); ++tag) {
-
-		// for now never show dynamic resources since there is no way we can know where the source for them is.
-		int type = tag->Type;
-		if (mvceditor::TagClass::DEFINE == type && !tag->IsDynamic) {
-			UnicodeString res = tag->Identifier;
-			wxString label = mvceditor::IcuToWx(res);
-			Tree->AppendItem(rootId, label, IMAGE_OUTLINE_DEFINE);
+		
+		// display all of the non-class tags first
+		if (tag->Type != mvceditor::TagClass::CLASS && 
+			tag->Type != mvceditor::TagClass::CLASS_CONSTANT && 
+			tag->Type != mvceditor::TagClass::MEMBER &&
+			tag->Type != mvceditor::TagClass::METHOD) {
+			TagToNode(*tag, rootId);
 		}
-		else if (mvceditor::TagClass::CLASS == type && !tag->IsDynamic) {
-			UnicodeString res = tag->Identifier;
-			wxString label = mvceditor::IcuToWx(res);
-			wxTreeItemId classId = Tree->AppendItem(rootId, label, IMAGE_OUTLINE_CLASS);
-
-			// for now just loop again through the resources
-			// for the class we are going to add
-			std::vector<mvceditor::TagClass>::const_iterator j;
-			for (j = resources.begin(); j != resources.end(); ++j) {
-				if (j->ClassName.caseCompare(tag->Identifier, 0) == 0  && !j->IsDynamic) {
-					UnicodeString res = j->Identifier;
-					wxString label = mvceditor::IcuToWx(res);
-					if (mvceditor::TagClass::MEMBER == j->Type) {
-						if (!j->ReturnType.isEmpty()) {
-							wxString returnType = mvceditor::IcuToWx(j->ReturnType);
-							label = label + wxT(" [") + returnType + wxT("]");
-						}
-						Tree->AppendItem(classId, label, IMAGE_OUTLINE_PROPERTY);
-					}
-					else if (mvceditor::TagClass::METHOD == j->Type) {
-
-						// add the function signature to the label
-						int32_t sigIndex = j->Signature.indexOf(UNICODE_STRING_SIMPLE(" function ")); 
-						if (sigIndex > 0) {
-							UnicodeString sig(j->Signature, sigIndex + 10);
-							label = mvceditor::IcuToWx(sig);
-						}
-						if (!j->ReturnType.isEmpty()) {
-							wxString returnType = mvceditor::IcuToWx(j->ReturnType);
-							label += wxT(" [") + returnType + wxT("]");
-						}
-						Tree->AppendItem(classId, label, IMAGE_OUTLINE_METHOD);
-					}
-					else if (mvceditor::TagClass::CLASS_CONSTANT == j->Type) {
-						Tree->AppendItem(classId, label, IMAGE_OUTLINE_CLASS_CONSTANT);
-					}
-				}
-			}
+		else if (tag->Type == mvceditor::TagClass::CLASS) {
+			classes.push_back(tag->ClassName);
 		}
-		else if (mvceditor::TagClass::FUNCTION == type && !tag->IsDynamic) {
-			UnicodeString res = tag->Identifier;
-			wxString label = mvceditor::IcuToWx(res);
+	}
+	std::vector<UnicodeString>::const_iterator className;
+	for (className = classes.begin(); className != classes.end(); ++className) {
+		wxTreeItemId classId = Tree->AppendItem(rootId, mvceditor::IcuToWx(*className), IMAGE_OUTLINE_CLASS);
 
-			// add the function signature to the label
-			int32_t sigIndex = tag->Signature.indexOf(UNICODE_STRING_SIMPLE("function ")); 
-			if (sigIndex >= 0) {
-				UnicodeString sig(tag->Signature, sigIndex + 9);
-				label = mvceditor::IcuToWx(sig);
+		// display all tags for this class
+		for (tag = resources.begin(); tag != resources.end(); ++tag) {
+			if ((tag->Type == mvceditor::TagClass::MEMBER || 
+				tag->Type == mvceditor::TagClass::CLASS_CONSTANT ||
+				tag->Type == mvceditor::TagClass::METHOD) &&
+				className->caseCompare(tag->ClassName, 0) == 0) {
+				TagToNode(*tag, classId);
 			}
-			if (!tag->ReturnType.isEmpty()) {
-				wxString returnType = mvceditor::IcuToWx(tag->ReturnType);
-				label += wxT(" [") + returnType + wxT("]");
-			}
-			Tree->AppendItem(rootId, label, IMAGE_OUTLINE_FUNCTION);
 		}
 	}
 	Tree->ExpandAll();
 	Tree->Thaw();
+}
+
+void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag, wxTreeItemId& treeId) {
+
+	// for now never show dynamic resources since there is no way we can know where the source for them is.
+	int type = tag.Type;
+	wxString label = mvceditor::IcuToWx(tag.Identifier);
+	if (mvceditor::TagClass::DEFINE == type && !tag.IsDynamic) {
+		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_DEFINE);
+	}
+	else if (mvceditor::TagClass::MEMBER == tag.Type) {
+		if (!tag.ReturnType.isEmpty()) {
+			wxString returnType = mvceditor::IcuToWx(tag.ReturnType);
+			label = label + wxT(" [") + returnType + wxT("]");
+		}
+		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_PROPERTY);
+	}
+	else if (mvceditor::TagClass::METHOD == tag.Type) {
+
+		// add the function signature to the label
+		int32_t sigIndex = tag.Signature.indexOf(UNICODE_STRING_SIMPLE(" function ")); 
+		if (sigIndex > 0) {
+			UnicodeString sig(tag.Signature, sigIndex + 10);
+			label = mvceditor::IcuToWx(sig);
+		}
+		if (!tag.ReturnType.isEmpty()) {
+			wxString returnType = mvceditor::IcuToWx(tag.ReturnType);
+			label += wxT(" [") + returnType + wxT("]");
+		}
+		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_METHOD);
+	}
+	else if (mvceditor::TagClass::CLASS_CONSTANT == tag.Type) {
+		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_CLASS_CONSTANT);
+	}
+	else if (mvceditor::TagClass::FUNCTION == type && !tag.IsDynamic) {
+		UnicodeString res = tag.Identifier;
+		wxString label = mvceditor::IcuToWx(res);
+
+		// add the function signature to the label
+		int32_t sigIndex = tag.Signature.indexOf(UNICODE_STRING_SIMPLE("function ")); 
+		if (sigIndex >= 0) {
+			UnicodeString sig(tag.Signature, sigIndex + 9);
+			label = mvceditor::IcuToWx(sig);
+		}
+		if (!tag.ReturnType.isEmpty()) {
+			wxString returnType = mvceditor::IcuToWx(tag.ReturnType);
+			label += wxT(" [") + returnType + wxT("]");
+		}
+		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_FUNCTION);
+	}
 }
 
 void mvceditor::OutlineViewPanelClass::OnHelpButton(wxCommandEvent& event) {
@@ -462,7 +475,52 @@ void mvceditor::OutlineViewPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 }
 
 void mvceditor::OutlineViewPanelClass::AddTagsToOutline(const std::vector<mvceditor::TagClass>& tags) {
-	wxMessageBox(wxString::Format(wxT("chose %ud tags"), tags.size()));
+	wxTreeItemId root = Tree->GetRootItem();
+	if (!root.IsOk()) {
+		root = Tree->AddRoot(_("Outline"), IMAGE_OUTLINE_ROOT);
+	}
+	Tree->Freeze();
+
+	// each tag could be a file or a class tag. 
+	//if its a class tag, get all of members for the class
+	std::vector<mvceditor::TagClass>::const_iterator chosenTag;
+	for (chosenTag = tags.begin(); chosenTag != tags.end(); ++chosenTag) {
+		std::vector<mvceditor::TagClass> outlineTags;
+		if (chosenTag->Identifier.indexOf(UNICODE_STRING_SIMPLE(".")) >= 0) {
+			
+			// user chose a file: get all classes / functions for that file
+			outlineTags = Feature->App.Globals.TagCache.CollectAllTagsInFile(chosenTag->FullPath);
+			wxFileName fileName(chosenTag->FullPath);
+			wxTreeItemId fileId = Tree->AppendItem(root, fileName.GetFullName(), IMAGE_OUTLINE_CLASS);
+			for (std::vector<mvceditor::TagClass>::const_iterator o = outlineTags.begin(); o != outlineTags.end(); ++o) {
+				if (mvceditor::TagClass::CLASS == o->Type) {
+					wxTreeItemId classRoot = Tree->AppendItem(fileId, mvceditor::IcuToWx(o->Identifier), IMAGE_OUTLINE_CLASS);
+					AddClassToOutline(o->ClassName, classRoot);
+				}
+				else {
+					TagToNode(*o, fileId);
+				}
+			}
+		}
+		else {
+
+			// user chose a class; add the class memeber to the outline
+			wxTreeItemId classRoot = Tree->AppendItem(root, mvceditor::IcuToWx(chosenTag->Identifier), IMAGE_OUTLINE_CLASS);
+			AddClassToOutline(chosenTag->Identifier, classRoot);
+		}
+	}
+	Tree->ExpandAllChildren(Tree->GetRootItem());
+	Tree->Thaw();
+}
+
+void mvceditor::OutlineViewPanelClass::AddClassToOutline(const UnicodeString& className, wxTreeItemId& classRoot) {	
+	std::vector<mvceditor::TagClass> outlineTags;
+	outlineTags = Feature->App.Globals.TagCache.CollectAllMemberTags(className);
+	std::vector<mvceditor::TagClass>::iterator tag;
+	for (tag = outlineTags.begin(); tag != outlineTags.end(); ++tag) {
+		TagToNode(*tag, classRoot);
+	}
+
 }
 
 mvceditor::FileSearchDialogClass::FileSearchDialogClass(wxWindow *parent, mvceditor::OutlineViewFeatureClass& feature, std::vector<mvceditor::TagClass>& chosenTags)

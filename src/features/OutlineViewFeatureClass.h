@@ -272,6 +272,17 @@ private:
 	 */
 	void AddTagsToOutline(const std::vector<mvceditor::TagClass>& tags);
 
+	/**
+	 * Add a class and all of its members into the tree outline at the given node.
+	 *
+	 */
+	void AddClassToOutline(const UnicodeString& className, wxTreeItemId& classRoot);
+
+	/**
+	 * adds a tag as a child node of the tree control.
+	 */
+	void TagToNode(const mvceditor::TagClass& tag, wxTreeItemId& tagRoot);
+
 };
 
 class FileSearchDialogClass : public FileSearchDialogGeneratedClass {
