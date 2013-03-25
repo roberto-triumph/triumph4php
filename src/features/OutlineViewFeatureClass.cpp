@@ -30,6 +30,7 @@
 #include <globals/TagList.h>
 #include <language/TagParserClass.h>
 #include <globals/Sqlite.h>
+#include <widgets/TreeItemDataStringClass.h>
 #include <MvcEditor.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
@@ -41,19 +42,23 @@
 
 static int ID_WINDOW_OUTLINE = wxNewId();
 static int ID_RESOURCE_FINDER_BACKGROUND = wxNewId();
-static int ID_GLOBAL_CLASSES_THREAD = wxNewId();
+static int ID_OUTLINE_MENU_DELETE = wxNewId();
 
 const wxEventType mvceditor::EVENT_RESOURCE_FINDER_COMPLETE = wxNewEventType();
-const wxEventType mvceditor::EVENT_GLOBAL_CLASSES_COMPLETE = wxNewEventType();
 
-mvceditor::ResourceFinderCompleteEventClass::ResourceFinderCompleteEventClass(int eventId, const std::vector<mvceditor::TagClass>& resources)
+mvceditor::ResourceFinderCompleteEventClass::ResourceFinderCompleteEventClass(int eventId, 
+																			  const std::vector<mvceditor::TagClass>& resources,
+																			  const wxString& fullPath)
 	: wxEvent(eventId, mvceditor::EVENT_RESOURCE_FINDER_COMPLETE)
-	, Resources(resources) {
+	, Resources(resources) 
+
+	// fully clone a string, cause we want the event to be thread safe
+	, FullPath(fullPath.c_str()){
 		
 }
 
 wxEvent* mvceditor::ResourceFinderCompleteEventClass::Clone() const {
-	return new mvceditor::ResourceFinderCompleteEventClass(GetId(), Resources);
+	return new mvceditor::ResourceFinderCompleteEventClass(GetId(), Resources, FullPath);
 }
 
 mvceditor::ResourceFinderBackgroundThreadClass::ResourceFinderBackgroundThreadClass(
@@ -108,7 +113,7 @@ void mvceditor::ResourceFinderBackgroundThreadClass::BackgroundWork() {
 				tagFinder.Init(&session);
 				std::vector<mvceditor::TagClass> resources = tagFinder.All();
 				if (!TestDestroy()) {
-					mvceditor::ResourceFinderCompleteEventClass evt(ID_RESOURCE_FINDER_BACKGROUND, resources);
+					mvceditor::ResourceFinderCompleteEventClass evt(ID_RESOURCE_FINDER_BACKGROUND, resources, fileName);
 					PostEvent(evt);
 				}
 			}
@@ -177,7 +182,7 @@ void mvceditor::OutlineViewFeatureClass::BuildOutlineCurrentCodeControl() {
 				if (outlineViewPanel) {	
 					outlineViewPanel->SetStatus(_(""));
 					std::vector<mvceditor::TagClass> tags;
-					outlineViewPanel->RefreshOutlines(tags);
+					outlineViewPanel->AddFileToOutline(tags, fileName);
 				}
 			} 
 			else {
@@ -261,11 +266,24 @@ void mvceditor::OutlineViewFeatureClass::OnContentNotebookPageChanged(wxAuiNoteb
 	event.Skip();
 }
 
+void mvceditor::OutlineViewFeatureClass::OnContentNotebookPageClosed(wxAuiNotebookEvent& event) {
+	wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
+	if (window != NULL) {
+		OutlineViewPanelClass* outlineViewPanel = (OutlineViewPanelClass*)window;
+		int currentPage = event.GetSelection();
+		CodeControlClass* codeCtrl = GetNotebook()->GetCodeControl(currentPage);
+		if (codeCtrl) {
+			outlineViewPanel->RemoveFileFromOutline(codeCtrl->GetFileName());
+		}
+	}
+	event.Skip();
+}
+
 void mvceditor::OutlineViewFeatureClass::OnResourceFinderComplete(mvceditor::ResourceFinderCompleteEventClass& event) {
 	wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 	if (window != NULL) {
 		OutlineViewPanelClass* outlineViewPanel = (OutlineViewPanelClass*)window;
-		outlineViewPanel->RefreshOutlines(event.Resources);
+		outlineViewPanel->AddFileToOutline(event.Resources, event.FullPath);
 	}
 }
 
@@ -290,9 +308,17 @@ mvceditor::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int wi
 	SetStatus(_(""));
 
 	ImageList.Add(mvceditor::IconImageAsset(wxT("outline")));
+	ImageList.Add(mvceditor::IconImageAsset(wxT("document-php")));
 	ImageList.Add(mvceditor::IconImageAsset(wxT("class")));
-	ImageList.Add(mvceditor::IconImageAsset(wxT("method")));
-	ImageList.Add(mvceditor::IconImageAsset(wxT("property")));
+	ImageList.Add(mvceditor::IconImageAsset(wxT("method-public")));
+	ImageList.Add(mvceditor::IconImageAsset(wxT("method-protected")));
+	ImageList.Add(mvceditor::IconImageAsset(wxT("method-private")));
+	ImageList.Add(mvceditor::IconImageAsset(wxT("method-inherited")));
+	ImageList.Add(mvceditor::IconImageAsset(wxT("property-public")));
+	ImageList.Add(mvceditor::IconImageAsset(wxT("property-protected")));
+	ImageList.Add(mvceditor::IconImageAsset(wxT("property-private")));
+	ImageList.Add(mvceditor::IconImageAsset(wxT("property-inherited")));
+
 	ImageList.Add(mvceditor::IconImageAsset(wxT("define")));
 	ImageList.Add(mvceditor::IconImageAsset(wxT("class-constant")));
 	ImageList.Add(mvceditor::IconImageAsset(wxT("namespace")));
@@ -306,11 +332,24 @@ void mvceditor::OutlineViewPanelClass::SetStatus(const wxString& status) {
 	StatusLabel->SetLabel(status);
 }
 
-void mvceditor::OutlineViewPanelClass::RefreshOutlines(const std::vector<mvceditor::TagClass>& resources) {
+void mvceditor::OutlineViewPanelClass::AddFileToOutline(const std::vector<mvceditor::TagClass>& resources, const wxString& fullPath) {
 	Tree->Freeze();
-	Tree->DeleteAllItems();
-	wxTreeItemId rootId = Tree->AddRoot(_("Outline"), IMAGE_OUTLINE_ROOT);
+	wxTreeItemId rootId = Tree->GetRootItem();
+	if (!rootId.IsOk()) {
+		rootId = Tree->AddRoot(_("Outline"), IMAGE_OUTLINE_ROOT);
+	}
 	StatusLabel->SetLabel(_(""));
+
+	// look for the file in the tree
+	// files are in the first level
+	wxTreeItemId fileId = FindFileNode(fullPath);
+	if (fileId.IsOk()) {
+		Tree->DeleteChildren(fileId);
+	}
+	else {
+		fileId = Tree->AppendItem(rootId, wxFileName(fullPath).GetFullName(), IMAGE_OUTLINE_FILE, -1, new mvceditor::TreeItemDataStringClass(fullPath)); 
+	}
+
 	std::vector<mvceditor::TagClass>::const_iterator tag;
 	std::vector<UnicodeString> classes;
 	for (tag = resources.begin(); tag != resources.end(); ++tag) {
@@ -320,7 +359,7 @@ void mvceditor::OutlineViewPanelClass::RefreshOutlines(const std::vector<mvcedit
 			tag->Type != mvceditor::TagClass::CLASS_CONSTANT && 
 			tag->Type != mvceditor::TagClass::MEMBER &&
 			tag->Type != mvceditor::TagClass::METHOD) {
-			TagToNode(*tag, rootId);
+			TagToNode(*tag, fileId);
 		}
 		else if (tag->Type == mvceditor::TagClass::CLASS) {
 			classes.push_back(tag->ClassName);
@@ -328,7 +367,7 @@ void mvceditor::OutlineViewPanelClass::RefreshOutlines(const std::vector<mvcedit
 	}
 	std::vector<UnicodeString>::const_iterator className;
 	for (className = classes.begin(); className != classes.end(); ++className) {
-		wxTreeItemId classId = Tree->AppendItem(rootId, mvceditor::IcuToWx(*className), IMAGE_OUTLINE_CLASS);
+		wxTreeItemId classId = Tree->AppendItem(fileId, mvceditor::IcuToWx(*className), IMAGE_OUTLINE_CLASS);
 
 		// display all tags for this class
 		for (tag = resources.begin(); tag != resources.end(); ++tag) {
@@ -341,6 +380,7 @@ void mvceditor::OutlineViewPanelClass::RefreshOutlines(const std::vector<mvcedit
 		}
 	}
 	Tree->ExpandAll();
+	Tree->SelectItem(fileId);
 	Tree->Thaw();
 }
 
@@ -348,6 +388,7 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 
 	// for now never show dynamic resources since there is no way we can know where the source for them is.
 	int type = tag.Type;
+	UnicodeString className = mvceditor::WxToIcu(Tree->GetItemText(treeId));
 	wxString label = mvceditor::IcuToWx(tag.Identifier);
 	if (mvceditor::TagClass::DEFINE == type && !tag.IsDynamic) {
 		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_DEFINE);
@@ -357,7 +398,17 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 			wxString returnType = mvceditor::IcuToWx(tag.ReturnType);
 			label = label + wxT(" [") + returnType + wxT("]");
 		}
-		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_PROPERTY);
+		int image = IMAGE_OUTLINE_PROPERTY_PUBLIC;
+		if (tag.ClassName != className) {
+			image = IMAGE_OUTLINE_PROPERTY_INHERITED;
+		}
+		else if (tag.IsProtected) {
+			image = IMAGE_OUTLINE_PROPERTY_PROTECTED;
+		}
+		else if (tag.IsPrivate) {
+			image = IMAGE_OUTLINE_PROPERTY_PRIVATE;
+		}
+		Tree->AppendItem(treeId, label, image);
 	}
 	else if (mvceditor::TagClass::METHOD == tag.Type) {
 
@@ -371,7 +422,17 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 			wxString returnType = mvceditor::IcuToWx(tag.ReturnType);
 			label += wxT(" [") + returnType + wxT("]");
 		}
-		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_METHOD);
+		int image = IMAGE_OUTLINE_METHOD_PUBLIC;
+		if (tag.ClassName != className) {
+			image = IMAGE_OUTLINE_METHOD_INHERITED;
+		}
+		else if (tag.IsProtected) {
+			image = IMAGE_OUTLINE_METHOD_PROTECTED;
+		}
+		else if (tag.IsPrivate) {
+			image = IMAGE_OUTLINE_METHOD_PRIVATE;
+		}
+		Tree->AppendItem(treeId, label, image);
 	}
 	else if (mvceditor::TagClass::CLASS_CONSTANT == tag.Type) {
 		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_CLASS_CONSTANT);
@@ -434,7 +495,14 @@ void mvceditor::OutlineViewPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 		return;
 	}
 	wxString tag;
-	if (Tree->GetItemImage(item) == IMAGE_OUTLINE_PROPERTY || Tree->GetItemImage(item) == IMAGE_OUTLINE_METHOD) {
+	if (Tree->GetItemImage(item) == IMAGE_OUTLINE_PROPERTY_PRIVATE || 
+		Tree->GetItemImage(item) == IMAGE_OUTLINE_PROPERTY_PROTECTED ||
+		Tree->GetItemImage(item) == IMAGE_OUTLINE_PROPERTY_PUBLIC ||
+		Tree->GetItemImage(item) == IMAGE_OUTLINE_PROPERTY_INHERITED ||
+		Tree->GetItemImage(item) == IMAGE_OUTLINE_METHOD_PUBLIC ||
+		Tree->GetItemImage(item) == IMAGE_OUTLINE_METHOD_PROTECTED ||
+		Tree->GetItemImage(item) == IMAGE_OUTLINE_METHOD_PRIVATE || 
+		Tree->GetItemImage(item) == IMAGE_OUTLINE_METHOD_INHERITED) {
 		wxString classNameSig = Tree->GetItemText(parentItem);
 		tag = classNameSig + wxT("::");
 		
@@ -485,22 +553,12 @@ void mvceditor::OutlineViewPanelClass::AddTagsToOutline(const std::vector<mvcedi
 	//if its a class tag, get all of members for the class
 	std::vector<mvceditor::TagClass>::const_iterator chosenTag;
 	for (chosenTag = tags.begin(); chosenTag != tags.end(); ++chosenTag) {
-		std::vector<mvceditor::TagClass> outlineTags;
 		if (chosenTag->Identifier.indexOf(UNICODE_STRING_SIMPLE(".")) >= 0) {
 			
 			// user chose a file: get all classes / functions for that file
-			outlineTags = Feature->App.Globals.TagCache.CollectAllTagsInFile(chosenTag->FullPath);
-			wxFileName fileName(chosenTag->FullPath);
-			wxTreeItemId fileId = Tree->AppendItem(root, fileName.GetFullName(), IMAGE_OUTLINE_CLASS);
-			for (std::vector<mvceditor::TagClass>::const_iterator o = outlineTags.begin(); o != outlineTags.end(); ++o) {
-				if (mvceditor::TagClass::CLASS == o->Type) {
-					wxTreeItemId classRoot = Tree->AppendItem(fileId, mvceditor::IcuToWx(o->Identifier), IMAGE_OUTLINE_CLASS);
-					AddClassToOutline(o->ClassName, classRoot);
-				}
-				else {
-					TagToNode(*o, fileId);
-				}
-			}
+			std::vector<mvceditor::TagClass> fileTags = 
+				Feature->App.Globals.TagCache.CollectAllTagsInFile(chosenTag->FullPath);
+			AddFileToOutline(fileTags, chosenTag->FullPath);
 		}
 		else {
 
@@ -520,7 +578,27 @@ void mvceditor::OutlineViewPanelClass::AddClassToOutline(const UnicodeString& cl
 	for (tag = outlineTags.begin(); tag != outlineTags.end(); ++tag) {
 		TagToNode(*tag, classRoot);
 	}
+}
 
+void mvceditor::OutlineViewPanelClass::OnTreeItemRightClick(wxTreeEvent& event) {
+	
+	// show the delete menu only on the first level items
+	wxTreeItemId itemId = event.GetItem();
+	wxTreeItemId rootId = Tree->GetRootItem();
+	if (itemId.IsOk() && rootId == Tree->GetItemParent(itemId)) {
+		wxMenu menu;
+		menu.Append(ID_OUTLINE_MENU_DELETE, _("Delete"), _("Delete the item from the tree"));
+		wxPoint pos = event.GetPoint();
+		Tree->PopupMenu(&menu, pos);
+	}
+	event.Skip();
+}
+
+void mvceditor::OutlineViewPanelClass::OnTreeMenuDelete(wxCommandEvent& event) {
+	wxTreeItemId itemId = Tree->GetSelection();
+	if (itemId.IsOk()) {
+		Tree->Delete(itemId);
+	}
 }
 
 mvceditor::FileSearchDialogClass::FileSearchDialogClass(wxWindow *parent, mvceditor::OutlineViewFeatureClass& feature, std::vector<mvceditor::TagClass>& chosenTags)
@@ -637,6 +715,32 @@ void mvceditor::FileSearchDialogClass::OnMatchesListKeyDown(wxKeyEvent& event) {
 	}
 }
 
+void mvceditor::OutlineViewPanelClass::RemoveFileFromOutline(const wxString& fullPath) {
+	wxTreeItemId fileId = FindFileNode(fullPath);
+	if (fileId.IsOk()) {
+		Tree->Delete(fileId);
+	}
+}
+
+wxTreeItemId mvceditor::OutlineViewPanelClass::FindFileNode(const wxString& fullPath) {
+	wxTreeItemId treeIndex, fileId;
+	wxTreeItemId rootId = Tree->GetRootItem();
+	if (rootId.IsOk()) {
+		wxTreeItemIdValue treeCookie;
+		treeIndex = Tree->GetFirstChild(rootId, treeCookie);
+		bool found = false;
+		while (treeIndex.IsOk()) {
+			mvceditor::TreeItemDataStringClass* data = (mvceditor::TreeItemDataStringClass*)Tree->GetItemData(treeIndex);
+			if (data && data->Str == fullPath) {
+				fileId = treeIndex;
+				break;
+			}
+			treeIndex = Tree->GetNextChild(rootId, treeCookie);
+		}
+	}
+	return fileId;
+}
+
 void mvceditor::FileSearchDialogClass::ShowTags(const wxString& finderQuery, const std::vector<mvceditor::TagClass>& allMatches) {
 	wxArrayString files;
 	for (size_t i = 0; i < allMatches.size(); ++i) {
@@ -736,4 +840,10 @@ BEGIN_EVENT_TABLE(mvceditor::OutlineViewFeatureClass, wxEvtHandler)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::OutlineViewFeatureClass::OnContentNotebookPageChanged)
 	EVT_RESOURCE_FINDER_COMPLETE(ID_RESOURCE_FINDER_BACKGROUND, mvceditor::OutlineViewFeatureClass::OnResourceFinderComplete)
 	EVT_FEATURE_FILE_SAVED(mvceditor::OutlineViewFeatureClass::OnFileSaved)
+	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_CODE_NOTEBOOK, 
+		mvceditor::OutlineViewFeatureClass::OnContentNotebookPageClosed)
+END_EVENT_TABLE()
+
+BEGIN_EVENT_TABLE(mvceditor::OutlineViewPanelClass, OutlineViewGeneratedPanelClass)
+	EVT_MENU(ID_OUTLINE_MENU_DELETE, mvceditor::OutlineViewPanelClass::OnTreeMenuDelete)
 END_EVENT_TABLE()

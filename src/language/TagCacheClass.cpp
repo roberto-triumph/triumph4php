@@ -569,5 +569,22 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectAllTagsInFile(
 			break;	
 		}
 	}
+
+	// now for each class, collect all methods/properties for that class. do it here
+	// since CollectAllTagsInFile only
+	std::vector<mvceditor::TagClass> classTags;
+	std::vector<mvceditor::TagClass>::iterator tag;
+	for (tag = allMatches.begin(); tag != allMatches.end(); ++tag) {
+		if (tag->Type == mvceditor::TagClass::CLASS) {
+			std::vector<mvceditor::TagClass> matches = CollectAllMemberTags(tag->ClassName);
+			classTags.insert(classTags.end(), matches.begin(), matches.end());
+		}
+	}
+	allMatches.insert(allMatches.end(), classTags.begin(), classTags.end());
 	return allMatches;
 }
+/*
+std::vector<UnicodeString> mvceditor::TagCacheClass::ParentClasses(const UnicodeString& className) {
+
+}
+*/

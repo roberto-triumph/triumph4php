@@ -1537,13 +1537,13 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, AllTagsInFileShouldReturnTags) {
 		"\n"
 		"?>\n"
 	));	
+
+	// this method only returns top-level tags for now
 	Matches = ParsedTagFinder.AllTagsInFile(wxT("test.php"));
 	CHECK_VECTOR_SIZE(3, Matches);
 	CHECK_UNISTR_EQUALS("printUsers", Matches[0].Key);
 	CHECK_UNISTR_EQUALS("USER_MAX", Matches[1].Key);
 	CHECK_UNISTR_EQUALS("UserClass", Matches[2].Key);
-
-
 }
 
 TEST_FIXTURE(ParsedTagFinderFileTestClass, IsFileCacheEmptyWithAnotherFile) {

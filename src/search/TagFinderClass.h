@@ -206,7 +206,7 @@ public:
 
 	/**
 	 * Gets all classes, functions, and constants (defines) that were parsed from
-	 * the given file.
+	 * the given file. careful, this method is a bit misnamed.
 	 *
 	 * @param fullPath the full path of the file to lookup
 	 * @return vector of tags all tags that were parsed from the given file

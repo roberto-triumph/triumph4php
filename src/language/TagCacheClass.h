@@ -376,7 +376,8 @@ public:
 	std::vector<mvceditor::TagClass> CollectAllMemberTags(const UnicodeString& className);
 
 	/**
-	 * gets all tags that were found in a single file.
+	 * gets all tags that were found in a single file. for classes, all of the class' members (including
+	 * inherited members) are returned as well.
 	 *
 	 * @param fullPath full path to a file to lookup
 	 * @return vector of tags; 

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Sep  8 2010)
+// C++ code generated with wxFormBuilder (version Feb 17 2010)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -56,6 +56,7 @@ class OutlineViewGeneratedPanelClass : public wxPanel
 		virtual void OnAddButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnTreeItemActivated( wxTreeEvent& event ) { event.Skip(); }
+		virtual void OnTreeItemRightClick( wxTreeEvent& event ) { event.Skip(); }
 		
 	
 	public:

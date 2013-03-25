@@ -45,8 +45,14 @@ class ResourceFinderCompleteEventClass : public wxEvent {
 	 * Will contain all of the parsed resources. 
 	 */
 	std::vector<mvceditor::TagClass> Resources;
+
+	/**
+	 * the full path to the file where the resources are located
+	 */
+	wxString FullPath;
 	
-	ResourceFinderCompleteEventClass(int eventId, const std::vector<mvceditor::TagClass>& resources);
+	ResourceFinderCompleteEventClass(int eventId, const std::vector<mvceditor::TagClass>& resources,
+		const wxString& fullPath);
 	
 	wxEvent* Clone() const;
 	
@@ -177,6 +183,11 @@ private:
 	void OnFileSaved(mvceditor::FileSavedEventClass& event);
 
 	/**
+	 * when a file is closed, remove it from the outline tree
+	 */
+	void OnContentNotebookPageClosed(wxAuiNotebookEvent& event);
+
+	/**
 	 * Since this thread will be alive as long as the program is running, we guard against access
 	 * for FileName, PhpVersion  variables. We want to start one thread that will handle all code notebook
 	 * tab changes instead of creating one thread each time the user changes to a new tab.
@@ -216,8 +227,15 @@ class OutlineViewPanelClass : public OutlineViewGeneratedPanelClass {
 
 	/**
 	 * refresh the code control from the feature source strings
+	 * adds the given tags to the outline tree, under a node that has the name of the file
+	 * as its name
 	 */
-	 void RefreshOutlines(const std::vector<TagClass>& resources);
+	 void AddFileToOutline(const std::vector<TagClass>& resources, const wxString& fullPath);
+
+	 /**
+	  * @param fullPath file to remove from the outline tre
+	  */
+	 void RemoveFileFromOutline(const wxString& fullPath);
 	
 protected:
 
@@ -236,13 +254,31 @@ protected:
 	 */	
 	void OnSyncButton(wxCommandEvent& event);
 
+	/**
+	 * show a context menu
+	 */
+	void OnTreeItemRightClick(wxTreeEvent& event);
+
+	/**
+	 * handle the right click menu item for deletion
+	 */
+	void OnTreeMenuDelete(wxCommandEvent& event);
+
 private:
 
+	// image IDs used by the Tree ImageList
 	enum {
 		IMAGE_OUTLINE_ROOT = 0,
+		IMAGE_OUTLINE_FILE,
 		IMAGE_OUTLINE_CLASS,
-		IMAGE_OUTLINE_METHOD,
-		IMAGE_OUTLINE_PROPERTY,
+		IMAGE_OUTLINE_METHOD_PUBLIC,
+		IMAGE_OUTLINE_METHOD_PROTECTED,
+		IMAGE_OUTLINE_METHOD_PRIVATE,
+		IMAGE_OUTLINE_METHOD_INHERITED,
+		IMAGE_OUTLINE_PROPERTY_PUBLIC,
+		IMAGE_OUTLINE_PROPERTY_PROTECTED,
+		IMAGE_OUTLINE_PROPERTY_PRIVATE,
+		IMAGE_OUTLINE_PROPERTY_INHERITED,
 		IMAGE_OUTLINE_DEFINE,
 		IMAGE_OUTLINE_CLASS_CONSTANT,
 		IMAGE_OUTLINE_NAMESPACE,
@@ -280,8 +316,18 @@ private:
 
 	/**
 	 * adds a tag as a child node of the tree control.
+	 * @param tag the tag to add
+	 * @param tagRoot the tree node to append to
 	 */
 	void TagToNode(const mvceditor::TagClass& tag, wxTreeItemId& tagRoot);
+
+	/**
+	 * @return the tree node for the given full path. search is done 
+	 *         by comparing tree item data and NOT the tree item name
+	 */
+	wxTreeItemId FindFileNode(const wxString& fullPath);
+
+	DECLARE_EVENT_TABLE()
 
 };
 
