@@ -1482,8 +1482,9 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceTraitsShouldReturnAllTra
 		"	 }"
 		"}"
 	));
+	std::vector<wxFileName> emptyVector;
 	std::vector<UnicodeString> traits = ParsedTagFinder.GetResourceTraits(
-		UNICODE_STRING_SIMPLE("ezcReflectionMethod"), UNICODE_STRING_SIMPLE(""));
+		UNICODE_STRING_SIMPLE("ezcReflectionMethod"), UNICODE_STRING_SIMPLE(""), emptyVector);
 	CHECK_VECTOR_SIZE(2, traits);
 
 	// because traits are not guaranteed to be in order
