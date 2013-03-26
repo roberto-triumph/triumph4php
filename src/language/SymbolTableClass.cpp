@@ -154,7 +154,7 @@ static UnicodeString ResolveResourceType(UnicodeString resourceToLookup,
 	// need to get the type from the tag finders
 	for (size_t j = 0; j < allTagFinders.size(); ++j) {
 		mvceditor::TagFinderClass* finder = allTagFinders[j];
-		std::vector<mvceditor::TagClass> matches = finder->CollectFullyQualifiedResource(tagSearch);
+		std::vector<mvceditor::TagClass> matches = finder->ExactTags(tagSearch);
 		if (!matches.empty()) {
 
 			// since we are doing fully qualified matches, all matches are from the inheritance chain; ie. all methods
@@ -307,7 +307,7 @@ static UnicodeString ResolveInitialLexemeType(const pelet::ExpressionClass& pars
 		UnicodeString scopeClass = expressionScope.ClassName;
 		UnicodeString scopeMethod = expressionScope.MethodName;
 		for (size_t i = 0; i < allTagFinders.size(); ++i) {	
-			typeToLookup = allTagFinders[i]->GetResourceParentClassName(scopeClass);
+			typeToLookup = allTagFinders[i]->ParentClassName(scopeClass);
 			if (!typeToLookup.isEmpty()) {
 				break;
 			}
@@ -637,10 +637,10 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 			if ((doDuckTyping || !typeToLookup.isEmpty())) {
 				std::vector<mvceditor::TagClass> matches;
 				if (doFullyQualifiedMatchOnly) {
-					matches = finder->CollectFullyQualifiedResource(tagSearch);
+					matches = finder->ExactTags(tagSearch);
 				}
 				else {
-					matches = finder->CollectNearMatchResources(tagSearch, false);
+					matches = finder->NearMatchTags(tagSearch, false);
 				}
 				
 				// now we loop through the possbile matches and remove stuff that does not 

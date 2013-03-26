@@ -72,8 +72,8 @@ public:
 		mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), session, error);
 	}
 
-	void CollectNearMatchResourcesFromAll(const UnicodeString& search) {
-		Matches = TagCache.CollectNearMatchResourcesFromAll(search);
+	void NearMatchTags(const UnicodeString& search) {
+		Matches = TagCache.NearMatchTags(search);
 	}
 
 	mvceditor::WorkingCacheClass* CreateWorkingCache(const wxString& fileName, const UnicodeString& code) {
@@ -275,7 +275,7 @@ TEST_FIXTURE(RegisterTestFixtureClass, CollectShouldGetFromAllFinders) {
 	
 	// now perform the search. will search for any resource that starts with 'Action'
 	// all 3 caches should hit
-	CollectNearMatchResourcesFromAll(UNICODE_STRING_SIMPLE("Action"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("Action"));
 
 	CHECK_VECTOR_SIZE(3, Matches);
 		
@@ -308,10 +308,10 @@ TEST_FIXTURE(RegisterTestFixtureClass, NearMatchesShouldIgnoreStaleResources) {
 	CHECK(TagCache.RegisterWorking(fileName.GetFullPath(), cache1));
 	CHECK(TagCache.RegisterGlobal(cache2));
 	
-	CollectNearMatchResourcesFromAll(UNICODE_STRING_SIMPLE("ActionMy::methodA"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("ActionMy::methodA"));
 	CHECK_VECTOR_SIZE(0, Matches);
 
-	CollectNearMatchResourcesFromAll(UNICODE_STRING_SIMPLE("ActionMy::methodB"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("ActionMy::methodB"));
 	CHECK_VECTOR_SIZE(1, Matches);
 }
 

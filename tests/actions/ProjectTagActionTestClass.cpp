@@ -108,7 +108,7 @@ TEST_FIXTURE(ProjectTagActionTestClass, InitProject) {
 	CHECK_VECTOR_SIZE(1, GlobalCaches);
 	CHECK(NULL != GlobalCaches[0]);
 	mvceditor::TagSearchClass search(UNICODE_STRING_SIMPLE("User"));
-	CHECK_VECTOR_SIZE(1, GlobalCaches[0]->TagFinder->CollectFullyQualifiedResource(search));
+	CHECK_VECTOR_SIZE(1, GlobalCaches[0]->TagFinder->ExactTags(search));
 }
 
 TEST_FIXTURE(ProjectTagActionTestClass, InitMultipleProjects) {
@@ -142,10 +142,10 @@ TEST_FIXTURE(ProjectTagActionTestClass, InitMultipleProjects) {
 	CHECK(NULL != GlobalCaches[1]);
 
 	mvceditor::TagSearchClass searchFirst(UNICODE_STRING_SIMPLE("User"));
-	CHECK_VECTOR_SIZE(1, GlobalCaches[0]->TagFinder->CollectFullyQualifiedResource(searchFirst));
+	CHECK_VECTOR_SIZE(1, GlobalCaches[0]->TagFinder->ExactTags(searchFirst));
 
 	mvceditor::TagSearchClass searchSecond(UNICODE_STRING_SIMPLE("Role"));
-	CHECK_VECTOR_SIZE(1, GlobalCaches[1]->TagFinder->CollectFullyQualifiedResource(searchSecond));
+	CHECK_VECTOR_SIZE(1, GlobalCaches[1]->TagFinder->ExactTags(searchSecond));
 }
 
 }

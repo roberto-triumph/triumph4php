@@ -86,14 +86,14 @@ std::vector<mvceditor::TagClass> mvceditor::TagFeatureClass::SearchForResources(
 	std::vector<mvceditor::TagClass> matches;
 	bool exactOnly = text.Length() <= 2;
 	if (exactOnly) {
-		matches = App.Globals.TagCache.CollectFullyQualifiedResourceFromAll(mvceditor::WxToIcu(text));
+		matches = App.Globals.TagCache.ExactTags(mvceditor::WxToIcu(text));
 	}
 	else {
-		matches = App.Globals.TagCache.CollectNearMatchResourcesFromAll(mvceditor::WxToIcu(text));
+		matches = App.Globals.TagCache.NearMatchTags(mvceditor::WxToIcu(text));
 	}
 
 	// no need to show jump to results for native functions
-	// TODO: CollectNearResourceMatches shows resources from files that were recently deleted
+	// TODO: NearMatchTags shows resources from files that were recently deleted
 	// need to hide them / remove them
 	mvceditor::TagListRemoveNativeMatches(matches);
 	mvceditor::TagListKeepMatchesFromProjects(matches, projects);

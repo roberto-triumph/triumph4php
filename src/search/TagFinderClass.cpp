@@ -238,7 +238,7 @@ bool mvceditor::TagFinderClass::GetResourceMatchPosition(const mvceditor::TagCla
 	return false;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchResources(
+std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchTags(
 	const mvceditor::TagSearchClass& tagSearch,
 	bool doCollectFileNames) {
 
@@ -251,26 +251,26 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchReso
 	switch (tagSearch.GetResourceType()) {
 		case mvceditor::TagSearchClass::FILE_NAME:
 		case mvceditor::TagSearchClass::FILE_NAME_LINE_NUMBER:
-			matches = CollectNearMatchFiles(tagSearch.GetFileName(), tagSearch.GetLineNumber());
+			matches = NearMatchFiles(tagSearch.GetFileName(), tagSearch.GetLineNumber());
 			break;
 		case mvceditor::TagSearchClass::CLASS_NAME:
-			matches = CollectNearMatchNonMembers(tagSearch, true, true, true);
+			matches = NearMatchNonMembers(tagSearch, true, true, true);
 			if (matches.empty() && doCollectFileNames) {
-				matches = CollectNearMatchFiles(tagSearch.GetClassName(), tagSearch.GetLineNumber());
+				matches = NearMatchFiles(tagSearch.GetClassName(), tagSearch.GetLineNumber());
 			}
 			break;
 		case mvceditor::TagSearchClass::CLASS_NAME_METHOD_NAME:
-			matches = CollectNearMatchMembers(tagSearch);
+			matches = NearMatchMembers(tagSearch);
 			break;
 		case mvceditor::TagSearchClass::NAMESPACE_NAME:
-			matches = CollectNearMatchNamespaces(tagSearch);
+			matches = NearMatchNamespaces(tagSearch);
 			break;
 	}
 	sort(matches.begin(), matches.end());
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchClassesOrFiles(
+std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchClassesOrFiles(
 	const mvceditor::TagSearchClass& tagSearch) {
 
 	// at one point there was a check here to see if the  tag files existed
@@ -281,12 +281,12 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchClas
 	switch (tagSearch.GetResourceType()) {
 		case mvceditor::TagSearchClass::FILE_NAME:
 		case mvceditor::TagSearchClass::FILE_NAME_LINE_NUMBER:
-			matches = CollectNearMatchFiles(tagSearch.GetFileName(), tagSearch.GetLineNumber());
+			matches = NearMatchFiles(tagSearch.GetFileName(), tagSearch.GetLineNumber());
 			break;
 		case mvceditor::TagSearchClass::CLASS_NAME:
-			matches = CollectNearMatchNonMembers(tagSearch, true, false, false);
+			matches = NearMatchNonMembers(tagSearch, true, false, false);
 			if (matches.empty()) {
-				matches = CollectNearMatchFiles(tagSearch.GetClassName(), tagSearch.GetLineNumber());
+				matches = NearMatchFiles(tagSearch.GetClassName(), tagSearch.GetLineNumber());
 			}
 			break;
 	}
@@ -294,7 +294,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchClas
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchNonMembers(const mvceditor::TagSearchClass& tagSearch, bool doClasses, bool doDefines, bool doFunctions) {
+std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchNonMembers(const mvceditor::TagSearchClass& tagSearch, bool doClasses, bool doDefines, bool doFunctions) {
 	std::string key = mvceditor::IcuToChar(tagSearch.GetClassName());
 	std::vector<int> types;
 	if (doClasses) {
@@ -315,7 +315,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchNonM
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchMembers(const mvceditor::TagSearchClass& tagSearch) {
+std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchMembers(const mvceditor::TagSearchClass& tagSearch) {
 	std::vector<mvceditor::TagClass> matches;
 	
 	// when looking for members we need to look
@@ -330,10 +330,10 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchMemb
 	if (tagSearch.GetMethodName().isEmpty()) {
 		
 		// special case; query for all methods for a class (UserClass::)
-		std::vector<mvceditor::TagClass> memberMatches = CollectAllMembers(classesToSearch);
+		std::vector<mvceditor::TagClass> memberMatches = AllMembers(classesToSearch);
 
 		//get the methods that belong to a used trait
-		std::vector<mvceditor::TagClass> traitMatches = CollectAllTraitAliases(classesToSearch, UNICODE_STRING_SIMPLE(""));
+		std::vector<mvceditor::TagClass> traitMatches = TraitAliases(classesToSearch, UNICODE_STRING_SIMPLE(""));
 
 		matches.insert(matches.end(), memberMatches.begin(), memberMatches.end());
 		matches.insert(matches.end(), traitMatches.begin(), traitMatches.end());
@@ -371,14 +371,14 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchMemb
 		matches = FindByKeyStartMany(keyStarts, true);
 
 		// get any aliases
-		std::vector<mvceditor::TagClass> traitMatches = CollectAllTraitAliases(classesToSearch, tagSearch.GetMethodName());
+		std::vector<mvceditor::TagClass> traitMatches = TraitAliases(classesToSearch, tagSearch.GetMethodName());
 		matches.insert(matches.end(), traitMatches.begin(), traitMatches.end());
 			
 	}
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectAllMembers(const std::vector<UnicodeString>& classNames) {
+std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::AllMembers(const std::vector<UnicodeString>& classNames) {
 	std::vector<mvceditor::TagClass> matches;
 	std::vector<std::string> keyStarts;
 	for (size_t i = 0; i < classNames.size(); ++i) {
@@ -390,7 +390,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectAllMembers(co
 	return matches;
 }
 
-std::vector<mvceditor::TagClass>  mvceditor::TagFinderClass::CollectNearMatchNamespaces(const mvceditor::TagSearchClass& tagSearch) {
+std::vector<mvceditor::TagClass>  mvceditor::TagFinderClass::NearMatchNamespaces(const mvceditor::TagSearchClass& tagSearch) {
 	std::vector<mvceditor::TagClass> matches;
 
 	// needle identifier contains a namespace operator; but it may be
@@ -404,7 +404,7 @@ std::vector<mvceditor::TagClass>  mvceditor::TagFinderClass::CollectNearMatchNam
 	return matches;
 }
 
-UnicodeString mvceditor::TagFinderClass::GetResourceParentClassName(const UnicodeString& className) {
+UnicodeString mvceditor::TagFinderClass::ParentClassName(const UnicodeString& className) {
 	UnicodeString parentClassName;
 
 	// first query to get the parent class name
@@ -426,7 +426,7 @@ std::vector<UnicodeString> mvceditor::TagFinderClass::GetResourceTraits(const Un
 	
 	std::vector<std::string> keys;
 	keys.push_back(mvceditor::IcuToChar(className));
-	std::vector<mvceditor::TraitTagClass> matches = FindTraitsByClassName(keys);
+	std::vector<mvceditor::TraitTagClass> matches = UsedTraits(keys);
 	for (size_t i = 0; i < matches.size(); ++i) {
 		UnicodeString fullyQualifiedTrait = QualifyName(matches[i].TraitNamespaceName, matches[i].TraitClassName);
 			
@@ -502,7 +502,7 @@ UnicodeString mvceditor::TagFinderClass::ExtractParentClassFromSignature(const U
 	return parentClassName;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectFullyQualifiedResource(const mvceditor::TagSearchClass& tagSearch) {
+std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::ExactTags(const mvceditor::TagSearchClass& tagSearch) {
 
 	// at one point there was a check here to see if the  tag files existed
 	// it was removed because it caused performance issues, since this method
@@ -548,7 +548,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectFullyQualifie
 	return allMatches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectFullyQualifiedClassOrFile(const mvceditor::TagSearchClass& tagSearch) {
+std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::ExactClassOrFile(const mvceditor::TagSearchClass& tagSearch) {
 
 	// at one point there was a check here to see if the  tag files existed
 	// it was removed because it caused performance issues, since this method
@@ -558,7 +558,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectFullyQualifie
 	std::vector<int> types;
 	if (mvceditor::TagSearchClass::FILE_NAME == tagSearch.GetResourceType() || 
 		mvceditor::TagSearchClass::FILE_NAME_LINE_NUMBER == tagSearch.GetResourceType()) {
-		allMatches = CollectExactFiles(tagSearch.GetFileName(), tagSearch.GetLineNumber());
+		allMatches = ExactFiles(tagSearch.GetFileName(), tagSearch.GetLineNumber());
 	}
 	else {
 		UnicodeString key = tagSearch.GetClassName();
@@ -826,7 +826,7 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ResourceStatem
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::CollectNearMatchFiles(const UnicodeString& search, int lineNumber) {
+std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::NearMatchFiles(const UnicodeString& search, int lineNumber) {
 	wxString path,
 		currentFileName,
 		extension;
@@ -870,7 +870,7 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::CollectNearMat
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::CollectExactFiles(const UnicodeString& search, int lineNumber) {
+std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ExactFiles(const UnicodeString& search, int lineNumber) {
 	wxString path,
 		currentFileName,
 		extension;
@@ -912,7 +912,7 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::CollectExactFi
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::CollectAllTraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName) {
+std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::TraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName) {
 	std::vector<mvceditor::TagClass> matches;
 
 	std::vector<std::string> classNamesToLookFor;
@@ -921,7 +921,7 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::CollectAllTrai
 	}
 
 	// TODO use the correct namespace when querying for traits
-	std::vector<mvceditor::TraitTagClass> traits = FindTraitsByClassName(classNamesToLookFor);
+	std::vector<mvceditor::TraitTagClass> traits = UsedTraits(classNamesToLookFor);
 	
 	// now go through the result and add the method names of any aliased methods
 	UnicodeString lowerMethodName(methodName);
@@ -944,7 +944,7 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::CollectAllTrai
 	return matches;
 }
 
-std::vector<mvceditor::TraitTagClass> mvceditor::ParsedTagFinderClass::FindTraitsByClassName(const std::vector<std::string>& keyStarts) {
+std::vector<mvceditor::TraitTagClass> mvceditor::ParsedTagFinderClass::UsedTraits(const std::vector<std::string>& keyStarts) {
 	std::string join = "";
 	for (size_t i = 0; i < keyStarts.size(); ++i) {
 		join += "'";
@@ -1131,28 +1131,28 @@ std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::ResourceStat
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::CollectNearMatchFiles(const UnicodeString& search, int lineNumber) {
+std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::NearMatchFiles(const UnicodeString& search, int lineNumber) {
 	
 	// detector db does not have  a file_items table
 	std::vector<mvceditor::TagClass> matches;
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::CollectExactFiles(const UnicodeString& search, int lineNumber) {
+std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::ExactFiles(const UnicodeString& search, int lineNumber) {
 	
 	// detector db does not have  a file_items table
 	std::vector<mvceditor::TagClass> matches;
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::CollectAllTraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName) {
+std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::TraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName) {
 	
 	// detector db does not have  a trait_resources table
 	std::vector<mvceditor::TagClass> matches;
 	return matches;
 }
 
-std::vector<mvceditor::TraitTagClass> mvceditor::DetectedTagFinderClass::FindTraitsByClassName(const std::vector<std::string>& keyStarts) {
+std::vector<mvceditor::TraitTagClass> mvceditor::DetectedTagFinderClass::UsedTraits(const std::vector<std::string>& keyStarts) {
 	
 	// detector db does not have  a trait_resources table
 	std::vector<mvceditor::TraitTagClass> matches;

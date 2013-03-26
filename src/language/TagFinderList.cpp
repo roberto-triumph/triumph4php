@@ -36,7 +36,7 @@ std::vector<UnicodeString> mvceditor::TagFinderListClassParents(UnicodeString cl
 		// as it looks; class hierarchies are usually not very deep (1-4 parents)
 		found = false;
 		for (size_t i = 0; i < allTagFinders.size(); ++i) {
-			UnicodeString parentClass = allTagFinders[i]->GetResourceParentClassName(classToLookup);
+			UnicodeString parentClass = allTagFinders[i]->ParentClassName(classToLookup);
 			if (!parentClass.isEmpty()) {
 				found = true;
 				parents.push_back(parentClass);

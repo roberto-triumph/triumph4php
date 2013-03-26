@@ -266,7 +266,7 @@ void mvceditor::TagCacheClass::RemoveGlobal(const wxFileName& resourceDbFileName
 	}
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectFullyQualifiedResourceFromAll(const UnicodeString& search) {
+std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::ExactTags(const UnicodeString& search) {
 	std::vector<mvceditor::TagClass> matches;
 	mvceditor::TagSearchClass tagSearch(search);
 
@@ -281,7 +281,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectFullyQualified
 	}
 	for (size_t i = 0; i < finders.size(); ++i) {
 		mvceditor::TagFinderClass* tagFinder = finders[i];
-		std::vector<mvceditor::TagClass> finderMatches = tagFinder->CollectFullyQualifiedResource(tagSearch);
+		std::vector<mvceditor::TagClass> finderMatches = tagFinder->ExactTags(tagSearch);
 		size_t count = finderMatches.size();
 		for (size_t j = 0; j < count; ++j) {
 			mvceditor::TagClass tag = finderMatches[j];
@@ -294,7 +294,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectFullyQualified
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectNearMatchResourcesFromAll(const UnicodeString& search) {
+std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::NearMatchTags(const UnicodeString& search) {
 	std::vector<mvceditor::TagClass> matches;
 	mvceditor::TagSearchClass tagSearch(search);
 
@@ -320,7 +320,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectNearMatchResou
 	}
 	for (size_t i = 0; i < finders.size(); ++i) {
 		mvceditor::TagFinderClass* tagFinder = finders[i];
-		std::vector<mvceditor::TagClass> finderMatches = tagFinder->CollectNearMatchResources(tagSearch, true);
+		std::vector<mvceditor::TagClass> finderMatches = tagFinder->NearMatchTags(tagSearch, true);
 		size_t count = finderMatches.size();
 		for (size_t j = 0; j < count; ++j) {
 			mvceditor::TagClass tag = finderMatches[j];
@@ -334,7 +334,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectNearMatchResou
 }
 
 
-std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectFullyQualifiedClassOrFileFromAll(const UnicodeString& search) {
+std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::ExactClassOrFile(const UnicodeString& search) {
 	std::vector<mvceditor::TagClass> matches;
 	mvceditor::TagSearchClass tagSearch(search);
 
@@ -349,7 +349,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectFullyQualified
 	}
 	for (size_t i = 0; i < finders.size(); ++i) {
 		mvceditor::TagFinderClass* tagFinder = finders[i];
-		std::vector<mvceditor::TagClass> finderMatches = tagFinder->CollectFullyQualifiedClassOrFile(tagSearch);
+		std::vector<mvceditor::TagClass> finderMatches = tagFinder->ExactClassOrFile(tagSearch);
 		size_t count = finderMatches.size();
 		for (size_t j = 0; j < count; ++j) {
 			mvceditor::TagClass tag = finderMatches[j];
@@ -362,7 +362,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectFullyQualified
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectNearMatchClassesOrFilesFromAll(const UnicodeString& search) {
+std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::NearMatchClassesOrFiles(const UnicodeString& search) {
 	std::vector<mvceditor::TagClass> matches;
 	mvceditor::TagSearchClass tagSearch(search);
 
@@ -388,7 +388,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectNearMatchClass
 	}
 	for (size_t i = 0; i < finders.size(); ++i) {
 		mvceditor::TagFinderClass* tagFinder = finders[i];
-		std::vector<mvceditor::TagClass> finderMatches = tagFinder->CollectNearMatchClassesOrFiles(tagSearch);
+		std::vector<mvceditor::TagClass> finderMatches = tagFinder->NearMatchClassesOrFiles(tagSearch);
 		size_t count = finderMatches.size();
 		for (size_t j = 0; j < count; ++j) {
 			mvceditor::TagClass tag = finderMatches[j];
@@ -536,7 +536,7 @@ void mvceditor::TagCacheClass::Clear() {
 	WorkingCaches.clear();
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectAllMemberTags(const UnicodeString& className) {
+std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllMemberTags(const UnicodeString& className) {
 	std::vector<mvceditor::TagFinderClass*> allTagFinders = AllFinders();
 
 	// add the double colon so that we search for all members
@@ -557,7 +557,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectAllMemberTags(
 	std::vector<mvceditor::TagClass> allMatches;
 	for (size_t j = 0; j < allTagFinders.size(); ++j) {
 		mvceditor::TagFinderClass* tagFinder = allTagFinders[j];
-		std::vector<mvceditor::TagClass> finderMatches = tagFinder->CollectNearMatchResources(tagSearch);
+		std::vector<mvceditor::TagClass> finderMatches = tagFinder->NearMatchTags(tagSearch);
 		size_t count = finderMatches.size();
 		for (size_t k = 0; k < count; ++k) {
 			mvceditor::TagClass tag = finderMatches[k];
@@ -570,7 +570,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectAllMemberTags(
 	return allMatches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectAllTagsInFile(const wxString& fullPath) {
+std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllTagsInFile(const wxString& fullPath) {
 	std::vector<mvceditor::TagClass> allMatches;
 
 	std::vector<mvceditor::TagFinderClass*> allTagFinders = AllFinders();
@@ -591,7 +591,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectAllTagsInFile(
 	std::vector<mvceditor::TagClass>::iterator tag;
 	for (tag = allMatches.begin(); tag != allMatches.end(); ++tag) {
 		if (tag->Type == mvceditor::TagClass::CLASS) {
-			std::vector<mvceditor::TagClass> matches = CollectAllMemberTags(tag->ClassName);
+			std::vector<mvceditor::TagClass> matches = AllMemberTags(tag->ClassName);
 			classTags.insert(classTags.end(), matches.begin(), matches.end());
 		}
 	}

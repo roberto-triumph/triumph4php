@@ -66,20 +66,20 @@ std::vector<mvceditor::TagClass> mvceditor::OutlineViewFeatureClass::BuildOutlin
 	std::vector<mvceditor::TagClass> matches; 
 
 	// get the class tag itself
-	matches = App.Globals.TagCache.CollectFullyQualifiedResourceFromAll(mvceditor::WxToIcu(className));
+	matches = App.Globals.TagCache.ExactTags(mvceditor::WxToIcu(className));
 	allMatches.insert(allMatches.end(), matches.begin(), matches.end());
 
 	// make the tag finder match on all methods / properties
 	UnicodeString lookup;
 	lookup += mvceditor::WxToIcu(className);
 	lookup += UNICODE_STRING_SIMPLE("::");
-	matches = App.Globals.TagCache.CollectNearMatchResourcesFromAll(lookup);
+	matches = App.Globals.TagCache.NearMatchTags(lookup);
 	allMatches.insert(allMatches.end(), matches.begin(), matches.end());
 	return allMatches;
 }
 
 void mvceditor::OutlineViewFeatureClass::JumpToResource(const wxString& tag) {
-	std::vector<mvceditor::TagClass> matches = App.Globals.TagCache.CollectFullyQualifiedResourceFromAll(mvceditor::WxToIcu(tag));
+	std::vector<mvceditor::TagClass> matches = App.Globals.TagCache.ExactTags(mvceditor::WxToIcu(tag));
 	if (!matches.empty()) {
 		mvceditor::TagClass tag = matches[0];
 		GetNotebook()->LoadPage(tag.GetFullPath());
@@ -119,7 +119,7 @@ void mvceditor::OutlineViewFeatureClass::OnOutlineMenu(wxCommandEvent& event) {
 	mvceditor::CodeControlClass* codeCtrl = GetCurrentCodeControl();
 	if (codeCtrl && !codeCtrl->GetFileName().IsEmpty()) {
 		std::vector<mvceditor::TagClass> fileTags = 
-			App.Globals.TagCache.CollectAllTagsInFile(codeCtrl->GetFileName());
+			App.Globals.TagCache.AllTagsInFile(codeCtrl->GetFileName());
 		outlineViewPanel->AddFileToOutline(fileTags, codeCtrl->GetFileName());
 	}
 }
@@ -137,7 +137,7 @@ void mvceditor::OutlineViewFeatureClass::OnContentNotebookPageChanged(wxAuiNoteb
 		mvceditor::CodeControlClass* codeCtrl = GetNotebook()->GetCodeControl(event.GetSelection());
 		if (codeCtrl && !codeCtrl->GetFileName().IsEmpty()) {
 			std::vector<mvceditor::TagClass> fileTags = 
-				App.Globals.TagCache.CollectAllTagsInFile(codeCtrl->GetFileName());
+				App.Globals.TagCache.AllTagsInFile(codeCtrl->GetFileName());
 			outlineViewPanel->AddFileToOutline(fileTags, codeCtrl->GetFileName());
 		}
 	}
@@ -166,7 +166,7 @@ void  mvceditor::OutlineViewFeatureClass::OnWorkingCacheComplete(mvceditor::Work
 		outlineViewPanel = (OutlineViewPanelClass*)window;
 		wxString fileName = event.GetFileName();
 		std::vector<mvceditor::TagClass> fileTags = 
-				App.Globals.TagCache.CollectAllTagsInFile(fileName);
+				App.Globals.TagCache.AllTagsInFile(fileName);
 		outlineViewPanel->AddFileToOutline(fileTags, fileName);
 	}
 }
@@ -377,7 +377,7 @@ void mvceditor::OutlineViewPanelClass::OnSyncButton(wxCommandEvent& event) {
 		mvceditor::CodeControlClass* codeCtrl = Notebook->GetCodeControl(i);
 		if (codeCtrl && !codeCtrl->GetFileName().IsEmpty()) {
 			std::vector<mvceditor::TagClass> fileTags = 
-				Feature->App.Globals.TagCache.CollectAllTagsInFile(codeCtrl->GetFileName());
+				Feature->App.Globals.TagCache.AllTagsInFile(codeCtrl->GetFileName());
 			AddFileToOutline(fileTags, codeCtrl->GetFileName());
 		}
 	}
@@ -421,7 +421,7 @@ void mvceditor::OutlineViewPanelClass::AddTagsToOutline(const std::vector<mvcedi
 			
 			// user chose a file: get all classes / functions for that file
 			std::vector<mvceditor::TagClass> fileTags = 
-				Feature->App.Globals.TagCache.CollectAllTagsInFile(chosenTag->FullPath);
+				Feature->App.Globals.TagCache.AllTagsInFile(chosenTag->FullPath);
 			AddFileToOutline(fileTags, chosenTag->FullPath);
 		}
 		else {
@@ -441,7 +441,7 @@ void mvceditor::OutlineViewPanelClass::AddTagsToOutline(const std::vector<mvcedi
 
 void mvceditor::OutlineViewPanelClass::AddClassToOutline(const UnicodeString& className, wxTreeItemId& classRoot) {	
 	std::vector<mvceditor::TagClass> outlineTags;
-	outlineTags = Feature->App.Globals.TagCache.CollectAllMemberTags(className);
+	outlineTags = Feature->App.Globals.TagCache.AllMemberTags(className);
 	std::vector<mvceditor::TagClass>::iterator tag;
 	for (tag = outlineTags.begin(); tag != outlineTags.end(); ++tag) {
 		TagToNode(*tag, classRoot);
@@ -543,10 +543,10 @@ void mvceditor::FileSearchDialogClass::Search() {
 		}
 	}
 	if (search.Length() == 2) {
-		MatchingTags = Feature.App.Globals.TagCache.CollectFullyQualifiedClassOrFileFromAll(mvceditor::WxToIcu(search));
+		MatchingTags = Feature.App.Globals.TagCache.ExactClassOrFile(mvceditor::WxToIcu(search));
 	}
 	else {
-		MatchingTags = Feature.App.Globals.TagCache.CollectNearMatchClassesOrFilesFromAll(mvceditor::WxToIcu(search));
+		MatchingTags = Feature.App.Globals.TagCache.NearMatchClassesOrFiles(mvceditor::WxToIcu(search));
 	}
 
 	// no need to show jump to results for native functions

@@ -72,9 +72,9 @@ public:
 		CreateFixtureFile(TestFile, source);
 	}
 
-	void CollectNearMatchResources(const UnicodeString& search, bool doCollectFileNames = false) {
+	void NearMatchTags(const UnicodeString& search, bool doCollectFileNames = false) {
 		mvceditor::TagSearchClass tagSearch(search);
-		Matches = ParsedTagFinder.CollectNearMatchResources(tagSearch, doCollectFileNames);
+		Matches = ParsedTagFinder.NearMatchTags(tagSearch, doCollectFileNames);
 	}
 
 	soci::session Session;
@@ -117,14 +117,14 @@ public:
 		TagParser.BuildResourceCacheForFile(TestFile, source, true);
 	}
 
-	void CollectNearMatchResources(const UnicodeString& search, bool doCollectFileNames = false) {
+	void NearMatchTags(const UnicodeString& search, bool doCollectFileNames = false) {
 		mvceditor::TagSearchClass tagSearch(search);
-		Matches = ParsedTagFinder.CollectNearMatchResources(tagSearch, doCollectFileNames);
+		Matches = ParsedTagFinder.NearMatchTags(tagSearch, doCollectFileNames);
 	}
 
-	void CollectNearMatchClassesOrFiles(const UnicodeString& search) {
+	void NearMatchClassesOrFiles(const UnicodeString& search) {
 		mvceditor::TagSearchClass tagSearch(search);
-		Matches = ParsedTagFinder.CollectNearMatchClassesOrFiles(tagSearch);
+		Matches = ParsedTagFinder.NearMatchClassesOrFiles(tagSearch);
 	}
 
 	soci::session Session;
@@ -171,7 +171,7 @@ public:
 
 SUITE(ParsedTagFinderTestClass) {
 
-TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameMatches) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldFindFileWhenFileNameMatches) {
 	Prep(wxString::FromAscii(
 		"<?php\n"
 		"$s = 'hello';\n"
@@ -179,12 +179,12 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldFindFi
 		"?>\n"
 	));
 	TagParser.Walk(TestProjectDir + TestFile);
-	CollectNearMatchResources(mvceditor::WxToIcu(TestFile));
+	NearMatchTags(mvceditor::WxToIcu(TestFile));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 }
 
-TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameMatchesMiscFiles) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldFindFileWhenFileNameMatchesMiscFiles) {
 	Prep(wxString::FromAscii(
 		"<?php\n"
 		"$s = 'hello';\n"
@@ -199,12 +199,12 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldFindFi
 	));
 	TagParser.Walk(TestProjectDir + TestFile);
 	TagParser.Walk(TestProjectDir + miscFile);
-	CollectNearMatchResources(mvceditor::WxToIcu(miscFile));
+	NearMatchTags(mvceditor::WxToIcu(miscFile));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestProjectDir + miscFile, Matches[0].GetFullPath());
 }
 
-TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameIsASubset) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldFindFileWhenFileNameIsASubset) {
 	Prep(wxString::FromAscii(
 		"<?php\n"
 		"$s = 'hello';\n"
@@ -212,12 +212,12 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldFindFi
 		"?>\n"
 	));
 	TagParser.Walk(TestProjectDir + TestFile);
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("est.php"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("est.php"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 }
 
-TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldNotFindFileWhenFileNameMatchesButLineNumberIsTooBig) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldNotFindFileWhenFileNameMatchesButLineNumberIsTooBig) {
 	Prep(wxString::FromAscii(
 		"<?php\n"
 		"$s = 'hello';\n"
@@ -225,13 +225,13 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldNotFin
 		"?>\n"
 	));
 	TagParser.Walk(TestProjectDir + TestFile);
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("test.php:100"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("test.php:100"));
 	CHECK_VECTOR_SIZE(0, Matches);
 	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("test.php:100"));
 	CHECK_EQUAL(100, tagSearch.GetLineNumber());
 }
 
-TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameMatchesAndFileHasDifferentLineEndings) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldFindFileWhenFileNameMatchesAndFileHasDifferentLineEndings) {
 	
 	// should count unix, windows & mac line endings
 	Prep(wxString::FromAscii(
@@ -243,12 +243,12 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldFindFi
 		"?>\n"
 	));
 	TagParser.Walk(TestProjectDir + TestFile);
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("test.php:6"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("test.php:6"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 }
 
-TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameDoesNotMatchCase) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldFindFileWhenFileNameDoesNotMatchCase) {
 	TestFile = wxT("TeST.php");
 	Prep(wxString::FromAscii(
 		"<?php\n"
@@ -259,12 +259,12 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldFindFi
 		"?>\n"
 	));
 	TagParser.Walk(TestProjectDir + TestFile);
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("test.php:6"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("test.php:6"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 }
 
-TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldFindFileWhenFileNameSearchDoesNotMatchCase) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldFindFileWhenFileNameSearchDoesNotMatchCase) {
 	TestFile = wxT("test.php");
 	Prep(wxString::FromAscii(
 		"<?php\n"
@@ -275,12 +275,12 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldFindFi
 		"?>\n"
 	));
 	TagParser.Walk(TestProjectDir + TestFile);
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("TEST.php"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("TEST.php"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhenClassNameMatches) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFileWhenClassNameMatches) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"/** this is my class */\n"
@@ -292,7 +292,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFind
 		"}\n"
 		"?>\n"
 	));	
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 	mvceditor::TagClass tag = Matches[0];
@@ -303,7 +303,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFind
 	CHECK_EQUAL(mvceditor::TagClass::CLASS, tag.Type);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldNotFindFileWhenClassNameDoesNotMatch) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldNotFindFileWhenClassNameDoesNotMatch) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -314,11 +314,11 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldNotF
 		"}\n"
 		"?>\n"
 	));
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("BlogPostClass"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("BlogPostClass"));
 	CHECK_VECTOR_SIZE(0, Matches);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldUseFileSearchWhenResourceIsNotFound) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldUseFileSearchWhenResourceIsNotFound) {
 	TestFile = wxT("UserClass.php");
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
@@ -330,12 +330,12 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldUseF
 		"}\n"
 		"?>\n"
 	));
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("user"), true);
+	NearMatchTags(UNICODE_STRING_SIMPLE("user"), true);
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhenClassNameIsNotTheExactSame) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFileWhenClassNameIsNotTheExactSame) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserAdmin {\n"
@@ -346,12 +346,12 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFind
 		"}\n"
 		"?>\n"
 	));
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("User"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("User"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhenClassNameHasAnExtends) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFileWhenClassNameHasAnExtends) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class User extends Human {\n"
@@ -362,11 +362,11 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFind
 		"}\n"
 		"?>\n"
 	));
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("User"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("User"));
 	CHECK_VECTOR_SIZE(1, Matches);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhenClassNameAndMethodNameMatch) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFileWhenClassNameAndMethodNameMatch) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -378,7 +378,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFind
 		"}\n"
 		"?>\n"
 	));	
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass::getName"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass::getName"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 	mvceditor::TagClass tag = Matches[0];
@@ -390,7 +390,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFind
 	CHECK_EQUAL(mvceditor::TagClass::METHOD, tag.Type);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhenClassNameAndSecondMethodNameMatch) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFileWhenClassNameAndSecondMethodNameMatch) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -404,12 +404,12 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFind
 		"}\n"
 		"?>\n"
 	));	
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass::getName"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass::getName"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldNotFindFileWhenClassNameMatchesButMethodNameDoesNot) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldNotFindFileWhenClassNameMatchesButMethodNameDoesNot) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -420,11 +420,11 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldNotF
 		"}\n"
 		"?>\n"
 	));	
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass::getAddress"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass::getAddress"));
 	CHECK_VECTOR_SIZE(0, Matches);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFileWhendMethodNameMatchesButClassIsNotGiven) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFileWhendMethodNameMatchesButClassIsNotGiven) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -435,13 +435,13 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFind
 		"}\n"
 		"?>\n"
 	));
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("::getName"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("::getName"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 	CHECK_MEMBER_RESOURCE("UserClass", "getName", Matches[0]);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldOnlySaveTheExactMatchWhenAnExactMatchIsFound) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldOnlySaveTheExactMatchWhenAnExactMatchIsFound) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -457,14 +457,14 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldOnly
 		"\t}\n"
 		"}?>\n"
 	));	
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 	CHECK_UNISTR_EQUALS("UserClass", Matches[0].Identifier);
 	CHECK_EQUAL(false, Matches[0].IsNative);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindTwoFilesWhenClassNameMatches) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindTwoFilesWhenClassNameMatches) {
 	wxString testFile = wxT("test.php");
 	wxString testFile2 = wxT("test2.php");
 	TestFile = testFile;
@@ -489,13 +489,13 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFind
 		"}\n"
 		"?>\n"
 	));	
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(2, Matches);
 	CHECK_EQUAL(testFile, Matches[0].GetFullPath());
 	CHECK_EQUAL(testFile2, Matches[1].GetFullPath());
 }
 
-TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldNotFindFileWhenItHasBeenModified) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldNotFindFileWhenItHasBeenModified) {
 	Prep(wxString::FromAscii(
 		"<?php\n"
 		"class UserClass {\n"
@@ -507,7 +507,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldNotFin
 		"?>\n"
 	));	
 	TagParser.Walk(TestProjectDir + TestFile);
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 	wxSleep(1);
@@ -522,11 +522,11 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldNotFin
 		"?>\n"
 	));
 	TagParser.Walk(TestProjectDir + TestFile);
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(0, Matches);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindClassAfterFindingFile) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindClassAfterFindingFile) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -536,21 +536,21 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFind
 		"\t}\n"
 		"}\n"
 	));	
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("test.php"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("test.php"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("test.php"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("test.php"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindFunctionWhenFunctionNameMatches) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFunctionWhenFunctionNameMatches) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -565,7 +565,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFind
 		"}\n"
 		"?>\n"
 	));	
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("printUser"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("printUser"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	mvceditor::TagClass tag = Matches[0];
 	CHECK_UNISTR_EQUALS("printUser", tag.Identifier);
@@ -575,7 +575,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFind
 	CHECK_EQUAL(mvceditor::TagClass::FUNCTION, tag.Type);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForClassesAndFunctions) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForClassesAndFunctions) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -595,13 +595,13 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFind
 		"}\n"		
 		"?>\n"
 	));	
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("userClas"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("userClas"));
 	CHECK_VECTOR_SIZE(2, Matches);
 	CHECK_UNISTR_EQUALS("UserClass", Matches[0].Identifier);
 	CHECK_UNISTR_EQUALS("userClassPrint", Matches[1].Identifier);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForClassMembers) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForClassMembers) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -613,7 +613,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFind
 		"}\n"
 		"?>\n"
 	));	
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass::name"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass::name"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	mvceditor::TagClass tag = Matches[0];
 	CHECK_MEMBER_RESOURCE("UserClass", "name", tag);
@@ -624,7 +624,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFind
 }
 
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForClassConstant) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForClassConstant) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -636,7 +636,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFind
 		"}\n"
 		"?>\n"
 	));	
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass::MAX"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass::MAX"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	mvceditor::TagClass tag = Matches[0];
 	CHECK_MEMBER_RESOURCE("UserClass", "MAX", tag);
@@ -646,14 +646,14 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFind
 	CHECK_EQUAL(mvceditor::TagClass::CLASS_CONSTANT, tag.Type);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForDefines) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForDefines) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"/** the max constant @var int */\n"
 		"define('MAX_ITEMS', 1);\n"
 		"?>\n"
 	));	
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("MAX_ITEMS"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("MAX_ITEMS"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	mvceditor::TagClass tag = Matches[0];
 	CHECK_UNISTR_EQUALS("MAX_ITEMS", tag.Identifier);
@@ -663,7 +663,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFind
 	CHECK_EQUAL(mvceditor::TagClass::DEFINE, tag.Type);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForCorrectClassMethod) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForCorrectClassMethod) {
 	
 	// adding 2 classes to the file because we want to test that the code can differentiate the two classes and
 	// match only on the class given
@@ -683,12 +683,12 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFind
 		"}\n"
 		"?>\n"
 	));	
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass::get"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass::get"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_MEMBER_RESOURCE("UserClass", "get", Matches[0]);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindPartialMatchesForCorrectClassMethod) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindPartialMatchesForCorrectClassMethod) {
 	
 	// adding 2 classes to the file because we want to test that the code can differentiate the two classes and
 	// match only on the class given
@@ -708,12 +708,12 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFind
 		"}\n"
 		"?>\n"
 	));	
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass::get"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass::get"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_MEMBER_RESOURCE("UserClass", "getName", Matches[0]);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindPartialMatchesForClassMethodsWithNoClassName) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindPartialMatchesForClassMethodsWithNoClassName) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -730,16 +730,16 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFind
 		"}\n"
 		"?>\n"
 	));	
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("::getNa"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("::getNa"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_MEMBER_RESOURCE("UserClass", "getName", Matches[0]);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesForNativeFunctions) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForNativeFunctions) {
 	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(mvceditor::NativeFunctionsAsset().GetFullPath()));
 	ParsedTagFinder.Init(&session);
 
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("array_key"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("array_key"));
 	CHECK_VECTOR_SIZE(2, Matches);
 	CHECK_UNISTR_EQUALS("array_key_exists", Matches[0].Identifier);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("bool function array_key_exists($key, $search)"), Matches[0].Signature);
@@ -751,7 +751,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFind
 	CHECK(Matches[1].IsNative);
 
 	// test a built-in object
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("pdo::que"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("pdo::que"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("query", Matches[0].Identifier);
 	CHECK_UNISTR_EQUALS("PDO", Matches[0].ClassName);
@@ -760,17 +760,17 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFind
 	CHECK(Matches[0].IsNative);
 
 	// test a built-in object query for all methods
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("PDO::"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("PDO::"));
 	CHECK_VECTOR_SIZE(91, Matches);
 	
 	// a fully qualified search
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("\\Exception"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("\\Exception"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("\\Exception", Matches[0].Identifier);
 	CHECK_UNISTR_EQUALS("Exception", Matches[0].ClassName);
 }
 
-TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldFindMatchesWhenUsingBuildResourceCacheForFile) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldFindMatchesWhenUsingBuildResourceCacheForFile) {
 	
 	// write a file, "modify" the file in memory by adding a method, we should find the new method
 	wxString code  = wxString::FromAscii(
@@ -806,13 +806,13 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectNearMatchResourcesShouldFindMa
 	);
 	TagParser.Walk(TestProjectDir + TestFile);
 	TagParser.BuildResourceCacheForFile(TestProjectDir + TestFile, uniCode, false);
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("printUse"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("printUse"));
 	CHECK_VECTOR_SIZE(2, Matches);
 	CHECK_UNISTR_EQUALS("printUser", Matches[0].Identifier);
 	CHECK_UNISTR_EQUALS("printUserList", Matches[1].Identifier);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFindMatchesWhenUsingBuildResourceCacheForFileAndUsingNewFile) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesWhenUsingBuildResourceCacheForFileAndUsingNewFile) {
 	Prep(mvceditor::CharToIcu(
 		
 		// this simulates the user writing a completely new file that has yet to be saved.
@@ -843,12 +843,12 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldFind
 	);
 	wxString fileName = wxT("Untitled");
 	TagParser.BuildResourceCacheForFile(fileName, uniCode, true);
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("printUse"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("printUse"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("printUser", Matches[0].Identifier);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldCollectAllMethodsWhenClassIsNotGiven) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldCollectAllMethodsWhenClassIsNotGiven) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -870,14 +870,14 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldColl
 		"}\n"
 		"?>\n"
 	));
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("::user"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("::user"));
 	CHECK_VECTOR_SIZE(3, Matches);
 	CHECK_MEMBER_RESOURCE("AdminClass", "userDelete", Matches[0]);
 	CHECK_MEMBER_RESOURCE("SuperUserClass", "userDisable", Matches[1]);
 	CHECK_MEMBER_RESOURCE("UserClass", "userName", Matches[2]);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldNotCollectParentClassesWhenInheritedClassNameIsGiven) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldNotCollectParentClassesWhenInheritedClassNameIsGiven) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -899,12 +899,12 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchResourcesShouldNotC
 		"}\n"
 		"?>\n"
 	));
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("AdminClass"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("AdminClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("AdminClass", Matches[0].Identifier);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchClassesOrFilesShouldCollectBoth) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchClassesOrFilesShouldCollectBoth) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -926,17 +926,17 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchClassesOrFilesShoul
 		"}\n"
 		"?>\n"
 	));
-	CollectNearMatchClassesOrFiles(UNICODE_STRING_SIMPLE("user"));
+	NearMatchClassesOrFiles(UNICODE_STRING_SIMPLE("user"));
 	CHECK_VECTOR_SIZE(2, Matches);
 	CHECK_UNISTR_EQUALS("UserAdminClass", Matches[0].Identifier);
 	CHECK_UNISTR_EQUALS("UserClass", Matches[1].Identifier);
 
-	CollectNearMatchClassesOrFiles(UNICODE_STRING_SIMPLE("test.php"));
+	NearMatchClassesOrFiles(UNICODE_STRING_SIMPLE("test.php"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(wxT("test.php"), Matches[0].GetFullPath());
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectFullyQualifiedResourcesShouldFindFileWhenClassNameMatches) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldFindFileWhenClassNameMatches) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -947,13 +947,13 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectFullyQualifiedResourcesShoul
 		"}\n"
 	));	
 	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("UserClass"));
-	Matches = ParsedTagFinder.CollectFullyQualifiedResource(tagSearch);
+	Matches = ParsedTagFinder.ExactTags(tagSearch);
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectFullyQualifiedResourcesShouldFindFileWhenClassAndPropertyNameAreTheSame) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldFindFileWhenClassAndPropertyNameAreTheSame) {
 		
 	// the name of the class and the name of the property are the same
 	// the method under test should know the difference and only return the class tag
@@ -975,14 +975,14 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectFullyQualifiedResourcesShoul
 		"?>\n"
 	));	
 	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("SetClass"));
-	Matches = ParsedTagFinder.CollectFullyQualifiedResource(tagSearch);
+	Matches = ParsedTagFinder.ExactTags(tagSearch);
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("SetClass", Matches[0].Identifier);
 	CHECK_UNISTR_EQUALS("SetClass", Matches[0].ClassName);
 	CHECK_EQUAL(mvceditor::TagClass::CLASS, Matches[0].Type);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectFullyQualifiedResourcesShouldFindMatchesForCorrectClassMethod) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldFindMatchesForCorrectClassMethod) {
 	
 	// adding 2 classes to the file because we want to test that the code can differentiate the two classes and
 	// match only on the class given
@@ -1003,12 +1003,12 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectFullyQualifiedResourcesShoul
 		"?>\n"
 	));	
 	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("UserClass::get"));
-	Matches = ParsedTagFinder.CollectFullyQualifiedResource(tagSearch);
+	Matches = ParsedTagFinder.ExactTags(tagSearch);
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_MEMBER_RESOURCE("UserClass", "get", Matches[0]);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectFullyQualifiedResourcesShouldNotFindFileWhenClassNameDoesNotMatch) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldNotFindFileWhenClassNameDoesNotMatch) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -1019,13 +1019,13 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectFullyQualifiedResourcesShoul
 		"}\n"
 	));	
 	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("User"));
-	Matches = ParsedTagFinder.CollectFullyQualifiedResource(tagSearch);
+	Matches = ParsedTagFinder.ExactTags(tagSearch);
 	CHECK_VECTOR_SIZE(0, Matches);
 }
 
-TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectFullyQualifiedResourcesShouldFindClassWhenFileHasBeenModified) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactTagsShouldFindClassWhenFileHasBeenModified) {
 	
-	// this method is testing the scenario where the tag cache is modified and when the CollectFullyQualifiedResource
+	// this method is testing the scenario where the tag cache is modified and when the ExactTags
 	// method is checked that the cache is re-sorted and searched correctly
 	Prep(wxString::FromAscii(
 		"<?php\n"
@@ -1038,7 +1038,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectFullyQualifiedResourcesShouldF
 		"?>\n"
 	));	
 	TagParser.Walk(TestProjectDir + TestFile);
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 	wxSleep(1);
@@ -1060,16 +1060,16 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectFullyQualifiedResourcesShouldF
 	));
 	TagParser.Walk(TestProjectDir + TestFile);
 	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("AdminClass"));
-	Matches = ParsedTagFinder.CollectFullyQualifiedResource(tagSearch);
+	Matches = ParsedTagFinder.ExactTags(tagSearch);
 	CHECK_VECTOR_SIZE(1, Matches);
 
 	// make sure that file lookups work as well
 	mvceditor::TagSearchClass tagFileSearch(UNICODE_STRING_SIMPLE("test.php"));
-	Matches = ParsedTagFinder.CollectNearMatchResources(tagFileSearch);
+	Matches = ParsedTagFinder.NearMatchTags(tagFileSearch);
 	CHECK_VECTOR_SIZE(1, Matches);
 }
 
-TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectFullyQualifiedResourcesShouldFindClassWhenFileHasBeenDeleted) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactTagsShouldFindClassWhenFileHasBeenDeleted) {
 	
 	// this method is testing the scenario where the tag cache invalidates matches when files have been deleted
 	Prep(wxString::FromAscii(
@@ -1084,20 +1084,20 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, CollectFullyQualifiedResourcesShouldF
 	));	
 	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("UserClass"));
 	TagParser.Walk(TestProjectDir + TestFile);
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 	CHECK(wxRemoveFile(TestProjectDir + TestFile));
-	Matches = ParsedTagFinder.CollectFullyQualifiedResource(tagSearch);
+	Matches = ParsedTagFinder.ExactTags(tagSearch);
 
 	// before this was expected to be zero, but the code that ensures matched files
-	// exist is gone from the CollectNearMatchResources method because of performance
+	// exist is gone from the NearMatchTags method because of performance
 	// issues and we want the method to be fast because it is performed during 
 	// user clicks
 	CHECK_VECTOR_SIZE(1, Matches);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectFullyQualifiedResourceShouldReturnSignatureForConstructors) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagshouldReturnSignatureForConstructors) {
 	 Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -1120,12 +1120,12 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectFullyQualifiedResourceShould
 		"?>\n"
 	));
 	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("UserClass::__construct"));
-	Matches = ParsedTagFinder.CollectFullyQualifiedResource(tagSearch);
+	Matches = ParsedTagFinder.ExactTags(tagSearch);
 	mvceditor::TagClass tag = Matches[0];
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("public function __construct($name)"), tag.Signature);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectFullyQualifiedResourceShouldReturnInheritedMember) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagshouldReturnInheritedMember) {
 	 Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -1147,14 +1147,14 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectFullyQualifiedResourceShould
 	std::vector<UnicodeString> parents;
 	parents.push_back(UNICODE_STRING_SIMPLE("UserClass"));
 	tagSearch.SetParentClasses(parents);
-	Matches = ParsedTagFinder.CollectFullyQualifiedResource(tagSearch);
+	Matches = ParsedTagFinder.ExactTags(tagSearch);
 	CHECK_VECTOR_SIZE(1, Matches);
 	mvceditor::TagClass tag = Matches[0];
 	CHECK_UNISTR_EQUALS("UserClass", tag.ClassName);
 	CHECK_UNISTR_EQUALS("name", tag.Identifier);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectFullyQualifiedClassOrFile) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactClassOrFile) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
@@ -1165,11 +1165,11 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectFullyQualifiedClassOrFile) {
 		"}\n"
 	));	
 	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("UserClass"));
-	Matches = ParsedTagFinder.CollectFullyQualifiedClassOrFile(tagSearch);
+	Matches = ParsedTagFinder.ExactClassOrFile(tagSearch);
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("UserClass", Matches[0].Identifier);
 
-	CollectNearMatchClassesOrFiles(UNICODE_STRING_SIMPLE("test.php"));
+	NearMatchClassesOrFiles(UNICODE_STRING_SIMPLE("test.php"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(wxT("test.php"), Matches[0].GetFullPath());
 }
@@ -1191,7 +1191,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceParentClassShouldReturnP
 		"}\n"
 		"?>\n"
 	));
-	CHECK_UNISTR_EQUALS("UserClass", ParsedTagFinder.GetResourceParentClassName(UNICODE_STRING_SIMPLE("AdminClass")));
+	CHECK_UNISTR_EQUALS("UserClass", ParsedTagFinder.ParentClassName(UNICODE_STRING_SIMPLE("AdminClass")));
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceParentClassShouldReturnParentClassForDeepHierarchy) {
@@ -1210,8 +1210,8 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceParentClassShouldReturnP
 		"}\n"
 		"?>\n"
 	));
-	CHECK_UNISTR_EQUALS("AdminClass", ParsedTagFinder.GetResourceParentClassName(UNICODE_STRING_SIMPLE("SuperAdminClass")));
-	CHECK_UNISTR_EQUALS("UserClass", ParsedTagFinder.GetResourceParentClassName(UNICODE_STRING_SIMPLE("AdminClass")));
+	CHECK_UNISTR_EQUALS("AdminClass", ParsedTagFinder.ParentClassName(UNICODE_STRING_SIMPLE("SuperAdminClass")));
+	CHECK_UNISTR_EQUALS("UserClass", ParsedTagFinder.ParentClassName(UNICODE_STRING_SIMPLE("AdminClass")));
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceMatchPositionShouldReturnValidPositionsForClassMethodFunctionAndMember) {
@@ -1230,7 +1230,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceMatchPositionShouldRetur
 	Prep(icuCode);
 	int32_t pos, 
 		length;
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("UserClass", Matches[0].Identifier);
 	CHECK(mvceditor::ParsedTagFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
@@ -1238,7 +1238,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceMatchPositionShouldRetur
 	CHECK_EQUAL(16, length);
 	
 	// checking methods
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("::getName"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("::getName"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_MEMBER_RESOURCE("UserClass", "getName", Matches[0]);
 	CHECK(mvceditor::ParsedTagFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
@@ -1246,7 +1246,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceMatchPositionShouldRetur
 	CHECK_EQUAL(17, length);
 	
 	// checking properties
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("UserClass::name"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass::name"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_MEMBER_RESOURCE("UserClass", "name", Matches[0]);
 	CHECK(mvceditor::ParsedTagFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
@@ -1254,7 +1254,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceMatchPositionShouldRetur
 	CHECK_EQUAL(14, length);
 	
 	// checking functions
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("printUser"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("printUser"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("printUser", Matches[0].Identifier);
 	CHECK(mvceditor::ParsedTagFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
@@ -1274,7 +1274,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectQualifiedResourceNamespaces)
 		"?>\n"
 	));
 	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"));
-	Matches = ParsedTagFinder.CollectFullyQualifiedResource(tagSearch);
+	Matches = ParsedTagFinder.ExactTags(tagSearch);
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), Matches[0].Identifier);
 }
@@ -1301,7 +1301,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectQualifiedResourceNamespacesS
 		"?>\n"
 	));	
 	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"));
-	Matches = ParsedTagFinder.CollectFullyQualifiedResource(tagSearch);
+	Matches = ParsedTagFinder.ExactTags(tagSearch);
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), Matches[0].Identifier);
 
@@ -1328,12 +1328,12 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectResourceInGlobalNamespaces) 
 		"?>\n"
 	));
 	 mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("\\MyClass"));
-	Matches = ParsedTagFinder.CollectFullyQualifiedResource(tagSearch);
+	Matches = ParsedTagFinder.ExactTags(tagSearch);
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("\\MyClass", Matches[0].Identifier);
 	
 	mvceditor::TagSearchClass tagSearchFunction(UNICODE_STRING_SIMPLE("\\singleWork"));
-	Matches = ParsedTagFinder.CollectFullyQualifiedResource(tagSearchFunction);
+	Matches = ParsedTagFinder.ExactTags(tagSearchFunction);
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("\\singleWork", Matches[0].Identifier);
 }
@@ -1349,13 +1349,13 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchNamespaces) {
 		"function singleWork() { } \n"
 		"?>\n"
 	));
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("\\First"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("\\First"));
 	CHECK_VECTOR_SIZE(3, Matches);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child"), Matches[0].Identifier);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), Matches[1].Identifier);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\singleWork"), Matches[2].Identifier);
 	
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("\\First\\Ch"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("\\First\\Ch"));
 	CHECK_VECTOR_SIZE(3, Matches);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child"), Matches[0].Identifier);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), Matches[1].Identifier);
@@ -1373,15 +1373,15 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchNamespaceQualifiedC
 		"function singleWork() { } \n"
 		"?>\n"
 	));
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("\\First\\Child\\si"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("\\First\\Child\\si"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\singleWork"), Matches[0].Identifier);
 	
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("\\First\\Child\\M"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("\\First\\Child\\M"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), Matches[0].Identifier);
 	
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("\\First\\Child\\"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("\\First\\Child\\"));
 	CHECK_VECTOR_SIZE(2, Matches);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), Matches[0].Identifier);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\singleWork"), Matches[1].Identifier);
@@ -1398,7 +1398,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchNamespaceQualifiedC
 		"}\n"
 		"?>\n"
 	));
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("\\Second\\Child\\My"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("\\Second\\Child\\My"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\Second\\Child\\MyClass"), Matches[0].Identifier);
 }
@@ -1423,7 +1423,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchesShouldFindTraitMe
 	traits.push_back(UNICODE_STRING_SIMPLE("ezcReflectionReturnInfo"));
 	tagSearch.SetTraits(traits);
 
-	Matches = ParsedTagFinder.CollectNearMatchResources(tagSearch);
+	Matches = ParsedTagFinder.NearMatchTags(tagSearch);
 
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_MEMBER_RESOURCE("ezcReflectionReturnInfo", "getReturnType", Matches[0]);
@@ -1454,7 +1454,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchesShouldFindTraitsW
 	traits.push_back(UNICODE_STRING_SIMPLE("ezcReflectionFunctionInfo"));
 	tagSearch.SetTraits(traits);
 
-	Matches = ParsedTagFinder.CollectNearMatchResources(tagSearch);
+	Matches = ParsedTagFinder.NearMatchTags(tagSearch);
 	
 	// for now just show both the aliased and original methods
 	CHECK_VECTOR_SIZE(3, Matches);
@@ -1598,8 +1598,8 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, PhpFileExtensionsShouldWorkWithNoWild
 	TagParser.Walk(TestProjectDir + goodFile);
 	TagParser.Walk(TestProjectDir + badFile);
 
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("good.php"));
-	CollectNearMatchResources(UNICODE_STRING_SIMPLE("bad.php"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("good.php"));
+	NearMatchTags(UNICODE_STRING_SIMPLE("bad.php"));
 }
 
 TEST_FIXTURE(TagSearchTestClass, ShouldParseClassAndMethod) {

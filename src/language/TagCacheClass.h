@@ -325,45 +325,45 @@ public:
 	
 	/**
 	 * Searches all the registered caches (working AND global caches)
-	 * Will return only for full exact matches (it will call CollectFullyQualifiedResource
+	 * Will return only for full exact matches (it will call ExactTags
 	 * on each tag finder).
-	 * @see mvceditor::TagFinderClass::CollectFullyQualifiedResource
+	 * @see mvceditor::TagFinderClass::ExactTags
 	 * @param search string to search for
 	 * @return std::vector<mvceditor::TagClass> matched resources 
 	 */
-	std::vector<mvceditor::TagClass> CollectFullyQualifiedResourceFromAll(const UnicodeString& search);
+	std::vector<mvceditor::TagClass> ExactTags(const UnicodeString& search);
 	
 	/**
 	 * Searches all the registered caches (working AND global caches)
-	 * Will return near matches (it will call CollectNearMatchResources
+	 * Will return near matches (it will call NearMatchTags
 	 * on each tag finder).
 	 *
-	 * @see mvceditor::TagFinderClass::CollectNearMatchResources
+	 * @see mvceditor::TagFinderClass::NearMatchTags
 	 * @param string to search for
 	 * @return std::vector<mvceditor::TagClass> matched resources
 	 */
-	std::vector<mvceditor::TagClass> CollectNearMatchResourcesFromAll(const UnicodeString& search);
+	std::vector<mvceditor::TagClass> NearMatchTags(const UnicodeString& search);
 
 	/**
 	 * Searches all the registered caches (working AND global caches)
-	 * Will return only for full exact matches (it will call CollectFullyQualifiedClassOrFile
+	 * Will return only for full exact matches (it will call ExactClassOrFile
 	 * on each tag finder).
-	 * @see mvceditor::TagFinderClass::CollectFullyQualifiedClassOrFile
+	 * @see mvceditor::TagFinderClass::ExactClassOrFile
 	 * @param search string to search for
 	 * @return std::vector<mvceditor::TagClass> matched resources. will be either files or classes 
 	 */
-	std::vector<mvceditor::TagClass> CollectFullyQualifiedClassOrFileFromAll(const UnicodeString& search);
+	std::vector<mvceditor::TagClass> ExactClassOrFile(const UnicodeString& search);
 	
 	/**
 	 * Searches all the registered caches (working AND global caches)
-	 * Will return near matches (it will call CollectNearMatchClassesOrFiles
+	 * Will return near matches (it will call NearMatchClassesOrFiles
 	 * on each tag finder).
 	 *
-	 * @see mvceditor::TagFinderClass::CollectNearMatchClassesOrFiles
+	 * @see mvceditor::TagFinderClass::NearMatchClassesOrFiles
 	 * @param string to search for
 	 * @return std::vector<mvceditor::TagClass> matched resources. will be either files or classes
 	 */
-	std::vector<mvceditor::TagClass> CollectNearMatchClassesOrFilesFromAll(const UnicodeString& search);
+	std::vector<mvceditor::TagClass> NearMatchClassesOrFiles(const UnicodeString& search);
 
 	/**
 	 * gets all tags for a single class
@@ -373,7 +373,7 @@ public:
 	 *         all methods and properties that are defined in any of its base classes PLUS
 	 *         all methods and properties that are defined in any of the traits used by any of the base classes
 	 */
-	std::vector<mvceditor::TagClass> CollectAllMemberTags(const UnicodeString& className);
+	std::vector<mvceditor::TagClass> AllMemberTags(const UnicodeString& className);
 
 	/**
 	 * gets all tags that were found in a single file. for classes, all of the class' members (including
@@ -388,7 +388,7 @@ public:
 	 *         all methods and properties that are defined in any of the traits used any classes PLUS
 	 *         all methods and properties that are defined in any of the traits used by any of the base classes
 	 */
-	std::vector<mvceditor::TagClass> CollectAllTagsInFile(const wxString& fullPath); 
+	std::vector<mvceditor::TagClass> AllTagsInFile(const wxString& fullPath); 
 	
 	/**
 	 * Collects all near matches that are possible candidates for completion of the parsed expression.
@@ -473,7 +473,7 @@ private:
 	std::vector<TagFinderClass*> AllFinders();
 	
 	/**
-	 * These are the tag finders from the ENTIRE projecta; it may include stale resources
+	 * These are the tag finders from the ENTIRE projects; it may include stale resources
 	 * This class will own these pointers and will delete them when appropriate.
 	 */
 	std::vector<mvceditor::GlobalCacheClass*> GlobalCaches;
