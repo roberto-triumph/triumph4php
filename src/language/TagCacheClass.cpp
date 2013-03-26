@@ -545,13 +545,28 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectAllMemberTags(
 	tagSearch.SetTraits(mvceditor::TagFinderListClassUsedTraits(tagSearch.GetClassName(), tagSearch.GetParentClasses(), 
 		tagSearch.GetMethodName(), allTagFinders));
 
+	// return all of the matches from all finders that were found by the Collect* call.
+	// This is a bit tricky because we want to prioritize matches in opened files 
+	// instead of the global finder, since the global finder will be outdated.
+	std::map<wxString, mvceditor::TagFinderClass*> openedFinders;
+	std::map<wxString, mvceditor::WorkingCacheClass*>::const_iterator it;
+	for (it = WorkingCaches.begin(); it != WorkingCaches.end(); ++it) {
+		openedFinders[it->first] = &it->second->TagFinder;
+	}
 
 	std::vector<mvceditor::TagClass> allMatches;
 	for (size_t j = 0; j < allTagFinders.size(); ++j) {
-		mvceditor::TagFinderClass* finder = allTagFinders[j];
-		std::vector<mvceditor::TagClass> matches = finder->CollectNearMatchResources(tagSearch);
-		allMatches.insert(allMatches.end(), matches.begin(), matches.end());
+		mvceditor::TagFinderClass* tagFinder = allTagFinders[j];
+		std::vector<mvceditor::TagClass> finderMatches = tagFinder->CollectNearMatchResources(tagSearch);
+		size_t count = finderMatches.size();
+		for (size_t k = 0; k < count; ++k) {
+			mvceditor::TagClass tag = finderMatches[k];
+			if (!mvceditor::IsResourceDirty(openedFinders, tag, tagFinder)) {
+				allMatches.push_back(tag);
+			}
+		}
 	}
+	//std::sort(allMatches.begin(), allMatches.end());
 	return allMatches;
 }
 
@@ -583,8 +598,17 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::CollectAllTagsInFile(
 	allMatches.insert(allMatches.end(), classTags.begin(), classTags.end());
 	return allMatches;
 }
-/*
-std::vector<UnicodeString> mvceditor::TagCacheClass::ParentClasses(const UnicodeString& className) {
 
+std::vector<UnicodeString> mvceditor::TagCacheClass::ParentClassesAndTraits(const UnicodeString& className) {
+	std::vector<UnicodeString> classParents = mvceditor::TagFinderListClassParents(className, UNICODE_STRING_SIMPLE(""), AllFinders());
+	std::vector<UnicodeString> classTraits = mvceditor::TagFinderListClassUsedTraits(className, classParents, UNICODE_STRING_SIMPLE(""), AllFinders());
+	
+	std::vector<UnicodeString> all;
+	all.insert(all.end(), classParents.begin(), classParents.end());
+	all.insert(all.end(), classTraits.begin(), classTraits.end());
+
+	std::sort(all.begin(), all.end());
+	std::vector<UnicodeString>::iterator it = std::unique(all.begin(), all.end());
+	all.erase(it, all.end());
+	return all;
 }
-*/

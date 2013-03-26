@@ -454,6 +454,13 @@ public:
 	 * Remove all items from all caches and also unregisters any and all files.
 	 */
 	void Clear();
+
+	/**
+	 * @param className the PHP class to check
+	 * @return list of class names that are base classes for the given class; plus traits
+	 *         used by the given class or any of its base classes
+	 */
+	std::vector<UnicodeString> ParentClassesAndTraits(const UnicodeString& className);
 	 
 private:
 		
