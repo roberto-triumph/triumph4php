@@ -193,18 +193,6 @@ public:
 	virtual ~TagFinderClass();
 
 	/**
-	 * this is a virtual method so that each tag finder can use to perform a query to
-	 * get all of its class tags. This is a virtual method so that each specific tag finder
-	 * can define what table names and columns to query.
-	 *
-	 * @return vector of ALL parsed class Resources. Be careful as this method may return
-	 * many items (10000+). Try to use the CollectXXX() methods as much as possible.
-	 * An example use of this method is when wanting to find all classes in a project.
-	 * This method will NOT return native PHP classes (ie. PDO, DateTime).
-	 */
-	virtual std::vector<TagClass> AllNonNativeClasses() = 0;
-
-	/**
 	 * Gets all classes, functions, and constants (defines) that were parsed from
 	 * the given file. careful, this method is a bit misnamed.
 	 *
@@ -626,14 +614,6 @@ public:
 	ParsedTagFinderClass();
 
 	/**
-	 * @return vector of ALL parsed class Resources. Be careful as this method may return
-	 * many items (10000+). Try to use the CollectXXX() methods as much as possible.
-	 * An example use of this method is when wanting to find all classes in a project.
-	 * This method will NOT return native PHP classes (ie. PDO, DateTime).
-	 */
-	virtual std::vector<TagClass> AllNonNativeClasses();
-
-	/**
 	 * Gets all classes, functions, and constants (defines) that were parsed from
 	 * the given file.
 	 *
@@ -710,14 +690,6 @@ public:
 	DetectedTagFinderClass();
 
 	/**
-	 * @return vector of ALL parsed class Resources. Be careful as this method may return
-	 * many items (10000+). Try to use the CollectXXX() methods as much as possible.
-	 * An example use of this method is when wanting to find all classes in a project.
-	 * This method will NOT return native PHP classes (ie. PDO, DateTime).
-	 */
-	std::vector<TagClass> AllNonNativeClasses();
-
-		/**
 	 * Gets all classes, functions, and constants (defines) that were parsed from
 	 * the given file.
 	 *

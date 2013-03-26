@@ -745,13 +745,6 @@ mvceditor::ParsedTagFinderClass::ParsedTagFinderClass()
 
 }
 
-std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::AllNonNativeClasses() {
-	std::ostringstream stream;
-	stream << " is_native = 0 AND type =" << mvceditor::TagClass::CLASS;
-	std::vector<mvceditor::TagClass> all = ResourceStatementMatches(stream.str(), false);
-	return all;
-}
-
 std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ResourceStatementMatches(std::string whereCond, bool doLimit) {
 	std::string sql;
 	sql += "SELECT r.file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, full_path, ";
@@ -1086,15 +1079,6 @@ mvceditor::DetectedTagFinderClass::DetectedTagFinderClass()
 	: TagFinderClass() {
 
 }
-
-std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::AllNonNativeClasses() {
-	std::ostringstream stream;
-	stream << "type =" << mvceditor::TagClass::CLASS;
-	std::vector<mvceditor::TagClass> all = ResourceStatementMatches(stream.str(), false);
-	return all;
-}
-
-
 
 std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::ResourceStatementMatches(std::string whereCond, bool doLimit) {
 	std::string sql;
