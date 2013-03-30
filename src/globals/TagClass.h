@@ -258,6 +258,11 @@ public:
 	 * 'insteadof' operator
 	 */
 	std::vector<UnicodeString> InsteadOfs;
+
+	/**
+	 * The index to the file where this tag was found. 
+	 */
+	int FileTagId;
 	
 	TraitTagClass();
 };

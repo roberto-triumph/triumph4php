@@ -153,7 +153,8 @@ bool mvceditor::TagClass::HasParameters() const {
 mvceditor::TraitTagClass::TraitTagClass() 
 	: TraitClassName()
 	, Aliased()
-	, InsteadOfs() {
+	, InsteadOfs() 
+	, FileTagId(0) {
 		
 }
 

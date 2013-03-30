@@ -302,14 +302,16 @@ private:
 	 * @param resources the list of resources that were parsed out
 	 * @param int the file that the resources are located in
 	 */
-	void PersistResources(const std::vector<mvceditor::TagClass>& resources, int fileitemId);
+	void PersistResources(const std::vector<mvceditor::TagClass>& resources, int fileTagId);
 
 	/**
 	 * add all of the given trait resources into the database.
 	 * @param traits the map of resources that were parsed out
+	 * @param int the file that the resources are located in
 	 */
 	void PersistTraits(
-		const std::map<UnicodeString, std::vector<mvceditor::TraitTagClass>, UnicodeStringComparatorClass>& traitMap);
+		const std::map<UnicodeString, std::vector<mvceditor::TraitTagClass>, UnicodeStringComparatorClass>& traitMap,
+		int fileTagId);
 
 	/**
 	 * @return all of the traits that any of the given classes use.

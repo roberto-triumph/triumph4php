@@ -877,6 +877,46 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldCollectAllMethod
 	CHECK_MEMBER_RESOURCE("UserClass", "userName", Matches[2]);
 }
 
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldCollectTagsFromSpecifiedFiles) {
+
+	// create 2 files with the same class; files in separate directories
+	wxFileName userDir(wxFileName::GetTempDir());
+	userDir.AppendDir(wxT("user"));
+	wxFileName modelDir(wxFileName::GetTempDir());
+	modelDir.AppendDir(wxT("model"));
+
+	TestFile = wxFileName(userDir.GetPath(), wxT("user.php")).GetFullPath();
+	Prep(mvceditor::CharToIcu(
+		"<?php\n"
+		"class UserClass {\n"
+		"\tprivate $name;\n"
+		"\tfunction getName() {\n"
+		"\t\treturn $this->name;\n"
+		"\t}\n"
+		"}\n"
+		"?>\n"
+	));
+	TestFile = wxFileName(modelDir.GetPath(), wxT("user.php")).GetFullPath();
+	Prep(mvceditor::CharToIcu(
+		"<?php\n"
+		"class UserClass {\n"
+		"\tprivate $name;\n"
+		"\tfunction userName() {\n"
+		"\t\treturn $this->name;\n"
+		"\t}\n"
+		"}\n"
+		"?>\n"
+	));
+	mvceditor::TagSearchClass search(UNICODE_STRING_SIMPLE("UserClass"));
+	std::vector<wxFileName> dirs;
+	dirs.push_back(modelDir);
+	search.SetDirs(dirs);
+	Matches = ParsedTagFinder.NearMatchTags(search, true);
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_UNISTR_EQUALS("UserClass", Matches[0].Identifier);
+	CHECK_EQUAL(TestFile, Matches[0].FullPath);
+}
+
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldNotCollectParentClassesWhenInheritedClassNameIsGiven) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
@@ -935,6 +975,49 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchClassesOrFilesShouldCollec
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(wxT("test.php"), Matches[0].GetFullPath());
 }
+
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchClassesOrFilesFromSpecifiedFiles) {
+
+	// create 2 files with the same class; files in separate directories
+	wxFileName userDir(wxFileName::GetTempDir());
+	userDir.AppendDir(wxT("user"));
+	wxFileName adminDir(wxFileName::GetTempDir());
+	adminDir.AppendDir(wxT("admin"));
+
+	TestFile = wxFileName(userDir.GetPath(), wxT("user.php")).GetFullPath();
+	Prep(mvceditor::CharToIcu(
+		"<?php\n"
+		"class UserClass {\n"
+		"\tprivate $name;\n"
+		"\tprivate $address;\n"
+		"\tfunction getName() {\n"
+		"\t\treturn $this->name;\n"
+		"\t}\n"
+		"\tprivate function clearName() {\n"
+		"\t}\n"
+		"}\n"
+	));
+
+	TestFile = wxFileName(adminDir.GetPath(), wxT("user.php")).GetFullPath();
+	Prep(mvceditor::CharToIcu(
+		"class UserAdminClass extends SuperUserClass {\n"
+		"\tfunction deleteUser(User $user) {\n"
+		"\t}\n"
+		"}\n"
+		"?>\n"
+	));
+
+	mvceditor::TagSearchClass search(UNICODE_STRING_SIMPLE("user"));
+	std::vector<wxFileName> dirs;
+	dirs.push_back(adminDir);
+	search.SetDirs(dirs);
+
+	Matches = ParsedTagFinder.NearMatchClassesOrFiles(search);
+
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_UNISTR_EQUALS("UserAdminClass", Matches[0].Identifier);
+}
+
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldFindFileWhenClassNameMatches) {
 	Prep(mvceditor::CharToIcu(
@@ -1154,6 +1237,46 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagshouldReturnInheritedMember
 	CHECK_UNISTR_EQUALS("name", tag.Identifier);
 }
 
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldCollectTagsFromSpecifiedFiles) {
+
+	// create 2 files with the same class; files in separate directories
+	wxFileName userDir(wxFileName::GetTempDir());
+	userDir.AppendDir(wxT("user"));
+	wxFileName modelDir(wxFileName::GetTempDir());
+	modelDir.AppendDir(wxT("model"));
+
+	TestFile = wxFileName(userDir.GetPath(), wxT("user.php")).GetFullPath();
+	Prep(mvceditor::CharToIcu(
+		"<?php\n"
+		"class UserClass {\n"
+		"\tprivate $name;\n"
+		"\tfunction getName() {\n"
+		"\t\treturn $this->name;\n"
+		"\t}\n"
+		"}\n"
+		"?>\n"
+	));
+	TestFile = wxFileName(modelDir.GetPath(), wxT("user.php")).GetFullPath();
+	Prep(mvceditor::CharToIcu(
+		"<?php\n"
+		"class UserClass {\n"
+		"\tprivate $name;\n"
+		"\tfunction userName() {\n"
+		"\t\treturn $this->name;\n"
+		"\t}\n"
+		"}\n"
+		"?>\n"
+	));
+	mvceditor::TagSearchClass search(UNICODE_STRING_SIMPLE("UserClass"));
+	std::vector<wxFileName> dirs;
+	dirs.push_back(modelDir);
+	search.SetDirs(dirs);
+	Matches = ParsedTagFinder.ExactTags(search);
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_UNISTR_EQUALS("UserClass", Matches[0].Identifier);
+	CHECK_EQUAL(TestFile, Matches[0].FullPath);
+}
+
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactClassOrFile) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
@@ -1172,6 +1295,44 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactClassOrFile) {
 	NearMatchClassesOrFiles(UNICODE_STRING_SIMPLE("test.php"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(wxT("test.php"), Matches[0].GetFullPath());
+}
+	
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactClassOrFileWithSpecifiedFiles) {
+	
+	// create 2 files with the same class; files in separate directories
+	wxFileName userDir(wxFileName::GetTempDir());
+	userDir.AppendDir(wxT("user"));
+	wxFileName adminDir(wxFileName::GetTempDir());
+	adminDir.AppendDir(wxT("admin"));
+
+	TestFile = wxFileName(userDir.GetPath(), wxT("user.php")).GetFullPath();
+	Prep(mvceditor::CharToIcu(
+		"<?php\n"
+		"class UserClass {\n"
+		"\tprivate $name;"
+		"\tfunction getName() {\n"
+		"\t\treturn $this->name;\n"
+		"\t}\n"
+		"}\n"
+	));	
+	TestFile = wxFileName(adminDir.GetPath(), wxT("user.php")).GetFullPath();
+	Prep(mvceditor::CharToIcu(
+		"<?php\n"
+		"class UserClass {\n"
+		"\tprivate $name;"
+		"\tfunction getName() {\n"
+		"\t\treturn $this->name;\n"
+		"\t}\n"
+		"}\n"
+	));	
+	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("UserClass"));
+	std::vector<wxFileName> dirs;
+	dirs.push_back(adminDir);
+	tagSearch.SetDirs(dirs);
+	Matches = ParsedTagFinder.ExactClassOrFile(tagSearch);
+	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_UNISTR_EQUALS("UserClass", Matches[0].Identifier);
+	CHECK_EQUAL(adminDir.GetPathWithSep() + wxT("user.php"), Matches[0].GetFullPath());	
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceParentClassShouldReturnParentClass) {

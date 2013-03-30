@@ -287,7 +287,7 @@ void mvceditor::TagParserClass::BuildResourceCacheForFile(const wxString& fullPa
 	Parser.ScanString(code, results);
 
 	PersistResources(FileParsingCache, fileTag.FileId);
-	PersistTraits(TraitCache);
+	PersistTraits(TraitCache, fileTag.FileId);
 	EndSearch();
 }
 
@@ -329,7 +329,7 @@ void mvceditor::TagParserClass::BuildResourceCache(const wxString& fullPath, boo
 			wxFFile file(fullPath, wxT("rb"));
 			Parser.ScanFile(file.fp(), mvceditor::WxToIcu(fullPath), lintResults);
 			PersistResources(FileParsingCache, fileTag.FileId);
-			PersistTraits(TraitCache);
+			PersistTraits(TraitCache, fileTag.FileId);
 			FileParsingCache.clear();
 		}
 	}
@@ -607,6 +607,7 @@ void mvceditor::TagParserClass::RemovePersistedResources(const std::vector<int>&
 	}
 	stream << ")";
 	try {
+		// TODO remove trait_resources
 		Session->once << "DELETE FROM resources " << stream.str();
 		Session->once << "DELETE FROM file_items " << stream.str();
 	} catch (std::exception& e) {
@@ -752,6 +753,8 @@ void mvceditor::TagParserClass::Wipe() {
 
 	if (IsCacheInitialized) {
 		try {
+
+			// TODO remove trait_resources
 			Session->once << "DELETE FROM file_items;";
 			Session->once << "DELETE FROM resources;";
 		} catch (std::exception& e) {
@@ -827,15 +830,16 @@ void mvceditor::TagParserClass::PersistResources(const std::vector<mvceditor::Ta
 }
 
 void mvceditor::TagParserClass::PersistTraits(
-	const std::map<UnicodeString, std::vector<mvceditor::TraitTagClass>, UnicodeStringComparatorClass>& traitMap) {
+	const std::map<UnicodeString, std::vector<mvceditor::TraitTagClass>, UnicodeStringComparatorClass>& traitMap,
+	int fileTagId) {
 	if (!IsCacheInitialized) {
 		return;
 	}
 	std::string sql;
 	sql += "INSERT OR IGNORE INTO trait_resources(";
-	sql += "key, class_name, namespace_name, trait_name, ";
+	sql += "key, file_item_id, class_name, namespace_name, trait_name, ";
 	sql += "trait_namespace_name, aliases, instead_ofs) VALUES ("; 
-	sql += "?, ?, ?, ?, ";
+	sql += "?, ?, ?, ?, ?, ";
 	sql += "?, ?, ?)";
 	std::string key;
 	std::string className;
@@ -847,7 +851,7 @@ void mvceditor::TagParserClass::PersistTraits(
 
 	try {
 		soci::statement stmt = (Session->prepare << sql,
-			soci::use(key), soci::use(className), soci::use(namespaceName), soci::use(traitClassName),
+			soci::use(key), soci::use(fileTagId), soci::use(className), soci::use(namespaceName), soci::use(traitClassName),
 			soci::use(traitNamespaceName), soci::use(aliases), soci::use(insteadOfs)
 		);
 		std::map<UnicodeString, std::vector<mvceditor::TraitTagClass>, UnicodeStringComparatorClass>::const_iterator it;
@@ -882,7 +886,9 @@ void mvceditor::TagParserClass::PersistTraits(
 			
 		// ATTN: at some point bubble these exceptions up?
 		// to avoid unreferenced local variable warnings in MSVC
-		e.what();
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxUnusedVar(msg);
+		wxASSERT_MSG(false, msg);
 	}
 }
 
