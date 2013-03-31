@@ -49,6 +49,12 @@ public:
 	ActionTestFixtureClass();
 
 	virtual ~ActionTestFixtureClass();
+
+	/**
+	 * Set the directory location for the tag db files
+	 * @param cacheDir the directory to place the cache db files
+	 */
+	void InitTagCache(const wxString& cacheDir);
 	
 	/**
 	 * Creates a project and adds it to the end of Globals.Projects
@@ -56,9 +62,8 @@ public:
 	 * at all. Any source dir or db cache files are NOT created.
 	 *
 	 * @param sourceDir the directory that contains source files (php)
-	 * @param cacheDir the directory to place the cache db files
 	 */
-	void CreateProject(const wxFileName& sourceDir, const wxString& cacheDir);
+	void CreateProject(const wxFileName& sourceDir);
 };
 
 #endif

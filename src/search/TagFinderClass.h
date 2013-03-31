@@ -647,12 +647,6 @@ private:
 	std::vector<mvceditor::TagClass> FindByKeyStartMany(const std::vector<std::string>& keyStarts, const std::vector<int>& fileTagIds, bool doLimit);
 
 	/**
-	 * @param dirs the directories to look for
-	 * @return file_item_id for each file in each of the given dirs. sub directories are looked for.
-	 */
-	std::vector<int> fileTagIdsForDirs(const std::vector<wxFileName>& dirs);
-
-	/**
 	 * check the database AND the current file's parsed cache to see if the namespace has been seen
 	 * before.
 	 * @return bool TRUE if the namespace is NOT in the database and its NOT in the current file

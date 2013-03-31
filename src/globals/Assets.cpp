@@ -266,3 +266,21 @@ wxFileName mvceditor::SkeletonsBaseAsset() {
 	scriptsFileName.Normalize();
 	return scriptsFileName;
 }
+
+wxFileName mvceditor::TagCacheAsset() {
+	wxFileName configDir = mvceditor::ConfigDirAsset();
+	wxFileName tagCacheFileName(configDir.GetFullPath(), wxT("tags.db"));
+	return tagCacheFileName;
+}
+
+wxFileName mvceditor::TagCacheWorkingAsset() {
+	wxFileName configDir = mvceditor::ConfigDirAsset();
+	wxFileName tagCacheFileName(configDir.GetFullPath(), wxT("working_tags.db"));
+	return tagCacheFileName;
+}
+
+wxFileName mvceditor::DetectorCacheAsset() {
+	wxFileName configDir = mvceditor::ConfigDirAsset();
+	wxFileName tagCacheFileName(configDir.GetFullPath(), wxT("detectors.db"));
+	return tagCacheFileName;
+}

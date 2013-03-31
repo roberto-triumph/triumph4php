@@ -78,7 +78,7 @@ bool mvceditor::DatabaseTagDetectorActionClass::Init(mvceditor::GlobalsClass& gl
 						params.PhpIncludePath.Assign(mvceditor::PhpDetectorsBaseAsset());
 						params.ScriptName = scriptName->c_str();
 						params.SourceDir.AssignDir(source->RootDirectory.GetPath());
-						params.OutputDbFileName = project->DetectorDbFileName.GetFullPath().c_str();
+						params.OutputDbFileName = globals.DetectorCacheDbFileName.GetFullPath().c_str();
 						ParamsQueue.push(params);
 					}
 				}
@@ -190,7 +190,7 @@ void mvceditor::DatabaseTagDetectorInitActionClass::Work(mvceditor::GlobalsClass
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
 		if (project->IsEnabled) {
-			finder.AttachExistingFile(project->DetectorDbFileName);
+			finder.AttachExistingFile(globals.DetectorCacheDbFileName);
 		}
 	}
 	std::vector<mvceditor::DatabaseTagClass> detected = finder.All();

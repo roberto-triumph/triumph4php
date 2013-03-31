@@ -64,8 +64,9 @@ public:
 		, ProjectTagAction(RunningThreads, ID_EVENT) 
 		, GlobalCaches() {
 		TouchTestDir();
-		CreateProject(AbsoluteDir(wxT("src_project_1")), TestProjectDir);
-		soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.Projects[0].ResourceDbFileName.GetFullPath()));
+		InitTagCache(TestProjectDir);
+		CreateProject(AbsoluteDir(wxT("src_project_1")));
+		soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
 		wxString error;
 		mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), session, error);
 	}
@@ -121,14 +122,14 @@ TEST_FIXTURE(ProjectTagActionTestClass, InitMultipleProjects) {
 	wxString contents = wxT("<?php class User {}");
 	CreateFixtureFile(srcFileProject1, contents);
 
-	CreateProject(AbsoluteDir(wxT("src_project_2")), TestProjectDir);
+	CreateProject(AbsoluteDir(wxT("src_project_2")));
 	CreateSubDirectory(wxT("src_project_2"));
 	wxString srcFileProject2;
 	MAKE_FILENAME(srcFileProject2, wxT("src_project_2"), wxT("Role.php"));
 	contents = wxT("<?php class Role {}");
 	CreateFixtureFile(srcFileProject2, contents);
 	soci::session session;
-	session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.Projects[1].ResourceDbFileName.GetFullPath()));
+	session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
 	wxString error;
 	mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), session, error);
 

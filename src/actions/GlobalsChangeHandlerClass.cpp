@@ -66,9 +66,7 @@ void mvceditor::GlobalsChangeHandlerClass::OnDatabaseTagsComplete(wxCommandEvent
 	mvceditor::DatabaseTagFinderClass finder;
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	std::vector<mvceditor::ProjectClass> projects = Globals.AllEnabledProjects();
-	for (project = projects.begin(); project != projects.end(); ++project) {
-		finder.AttachExistingFile(project->DetectorDbFileName);
-	}
+	finder.AttachExistingFile(Globals.DetectorCacheDbFileName);
 	std::vector<mvceditor::DatabaseTagClass> detected = finder.All();
 	Globals.DatabaseTags.insert(Globals.DatabaseTags.end(), detected.begin(), detected.end());
 }

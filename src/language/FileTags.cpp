@@ -19,41 +19,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2012 Roberto Perpulybn
+ * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
+#include <language/FileTags.h>
+#include <globals/String.h>
+#include <algorithm>
 
-#include <ActionTestFixtureClass.h>
-
-ActionTestFixtureClass::ActionTestFixtureClass()
-	: wxEvtHandler() 
-	, RunningThreads(false)
-	, Globals() {
-	RunningThreads.AddEventHandler(this);
-}
-
-ActionTestFixtureClass::~ActionTestFixtureClass() {
-	RunningThreads.RemoveEventHandler(this);
-}
-
-void ActionTestFixtureClass::InitTagCache(const wxString& cacheDir) {
-	Globals.TagCacheDbFileName.Assign(cacheDir, wxT("tag_cache.db"));
-	Globals.WorkingTagCacheDbFileName.Assign(cacheDir, wxT("tag_cache_working.db"));
-	Globals.DetectorCacheDbFileName.Assign(cacheDir, wxT("detector_cache.db"));
-}
-
-void ActionTestFixtureClass::CreateProject(const wxFileName& sourceDir) {
-	mvceditor::ProjectClass project;
-	
-	int projectNum = Globals.Projects.size() + 1;
-	project.Label = wxString::Format(wxT("project %d"), projectNum);
-	project.IsEnabled = true;
-	
-
-	mvceditor::SourceClass srcProject;
-	srcProject.RootDirectory.Assign(sourceDir);
-	project.AddSource(srcProject);
-	project.PhpFileExtensions.push_back(wxT("*.php"));
-	
-	Globals.Projects.push_back(project);
+std::vector<int> mvceditor::FileTagIdsForDirs(soci::session& session, const std::vector<wxFileName>& dirs, bool& error, wxString& errorMsg) {
+	std::vector<int> fileTagIds;
+	if (dirs.empty()) {
+		return fileTagIds;
+	}
+	std::string sql = "";
+	for (size_t i = 0; i < dirs.size(); i++) {
+		sql += "SELECT file_item_id FROM file_items WHERE full_path LIKE '" + 
+			mvceditor::WxToChar(dirs[i].GetPathWithSep()) + "%' ESCAPE '^'";
+		if (i < (dirs.size() - 1)) {
+			sql += " UNION ";
+		}
+	}
+	int fileItemId = 0;
+	try {
+		soci::statement stmt = (session.prepare << sql, 
+			soci::into(fileItemId)
+		);
+		bool foundFile = stmt.execute(true);
+		if (foundFile) {
+			fileTagIds.push_back(fileItemId);
+			while (stmt.fetch()) {
+				fileTagIds.push_back(fileItemId);
+			}
+		}
+	} catch (std::exception& e) {
+		error = true;
+		errorMsg = mvceditor::CharToWx(e.what());
+		wxASSERT_MSG(false, errorMsg);
+	}
+	std::sort(fileTagIds.begin(), fileTagIds.end());
+	std::vector<int>::iterator it = std::unique(fileTagIds.begin(), fileTagIds.end());
+	fileTagIds.erase(it, fileTagIds.end());
+	return fileTagIds;
 }

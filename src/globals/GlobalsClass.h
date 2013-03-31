@@ -111,6 +111,48 @@ public:
 	 */
 	wxString MiscFileExtensionsString;
 
+	/**
+	 * The location of the tag cache db. The tag DB file contains all of
+	 * the parsed resources for all of defined projects' resources.
+	 *
+	 * The SQL schema for this cache can be found in resources/sql/resource.sql
+	 * Schema management will be done by TagCacheDbVersionClass. We will check the version
+	 * of the schema in the db against the schema the code expects and will re-create the schema
+	 * if the versions differ.  This check will be done at app start, so that in most of the code
+	 * we can assume that the schema is up-to-date.
+	 *
+	 * @see mvceditor::ParsedTagFinderClass
+	 * @see mvceditor::TagCacheDbVersionActionClass
+	 *
+	 * the full path to the tag database that stores tags for all defined projects
+	 */
+	wxFileName TagCacheDbFileName;
+
+	/**
+	 * A separate db file that contains the same schema as TagCache, but this DB is 
+	 * used to store tags for opened files only.  The samve version checking mechanism
+	 * that applies to TagCache also applies to WorkingCache
+	 *
+	 * the full path to the tag database that stores tags for all opened files
+	 * in a session
+	 */
+	wxFileName WorkingTagCacheDbFileName;
+
+	/**
+	 * The location of the detectors cache for all defined projects. 
+	 *
+	 * The SQL schema for this cache can be found in resources/sql/detectors.sql
+	 * Schema management will be done by DetectorCacheDbVersionClass. We will check the version
+	 * of the schema in the db against the schema the code expects and will re-create the schema
+	 * if the versions differ.  This check will be done at app start, so that in most of the code
+	 * we can assume that the schema is up-to-date.
+	 *
+	 * @see mvceditor::DetectorCacheDbVersionClass
+	 *
+	 * @return the full path to the tag database that stores detected tags for all defined projects
+	 */
+	wxFileName DetectorCacheDbFileName;
+
 	GlobalsClass();
 
 	/**

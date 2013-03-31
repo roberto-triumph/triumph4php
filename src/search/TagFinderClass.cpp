@@ -27,6 +27,7 @@
 #include <globals/String.h>
 #include <globals/Sqlite.h>
 #include <globals/Errors.h>
+#include <language/FileTags.h>
 #include <wx/filename.h>
 #include <algorithm>
 #include <fstream>
@@ -267,7 +268,10 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchTags(
 	// is called while the user is typing text.
 	// take care when coding; make sure that any code called by this method does not touch the file system
 	std::vector<mvceditor::TagClass> matches;
-	std::vector<int> fileTagIds = fileTagIdsForDirs(tagSearch.GetDirs());
+	bool error = false;
+	wxString errorMsg;
+	std::vector<int> fileTagIds = mvceditor::FileTagIdsForDirs(*Session, tagSearch.GetDirs(), error, errorMsg);
+	wxASSERT_MSG(!error, errorMsg);
 	switch (tagSearch.GetResourceType()) {
 		case mvceditor::TagSearchClass::FILE_NAME:
 		case mvceditor::TagSearchClass::FILE_NAME_LINE_NUMBER:
@@ -298,7 +302,10 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchClassesOrFi
 	// is called while the user is typing text.
 	// take care when coding; make sure that any code called by this method does not touch the file system
 	std::vector<mvceditor::TagClass> matches;
-	std::vector<int> fileTagIds = fileTagIdsForDirs(tagSearch.GetDirs());
+	bool error = false;
+	wxString errorMsg;
+	std::vector<int> fileTagIds = mvceditor::FileTagIdsForDirs(*Session, tagSearch.GetDirs(), error, errorMsg);
+	wxASSERT_MSG(!error, errorMsg);
 	switch (tagSearch.GetResourceType()) {
 		case mvceditor::TagSearchClass::FILE_NAME:
 		case mvceditor::TagSearchClass::FILE_NAME_LINE_NUMBER:
@@ -327,7 +334,10 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchNonMembers(
 	if (doFunctions) {
 		types.push_back(mvceditor::TagClass::FUNCTION);
 	}
-	std::vector<int> fileTagIds = fileTagIdsForDirs(tagSearch.GetDirs());
+	bool error = false;
+	wxString errorMsg;
+	std::vector<int> fileTagIds = mvceditor::FileTagIdsForDirs(*Session, tagSearch.GetDirs(), error, errorMsg);
+	wxASSERT_MSG(!error, errorMsg);
 	std::vector<mvceditor::TagClass> matches = FindByKeyExactAndTypes(key, types, fileTagIds, true);
 	if (matches.empty()) {
 	
@@ -348,7 +358,10 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchMembers(con
 	classesToSearch.push_back(tagSearch.GetClassName());
 	std::vector<UnicodeString> traits = tagSearch.GetTraits();
 	classesToSearch.insert(classesToSearch.end(), traits.begin(), traits.end());
-	std::vector<int> fileTagIds = fileTagIdsForDirs(tagSearch.GetDirs());
+	bool error = false;
+	wxString errorMsg;
+	std::vector<int> fileTagIds = mvceditor::FileTagIdsForDirs(*Session, tagSearch.GetDirs(), error, errorMsg);
+	wxASSERT_MSG(!error, errorMsg);
 	if (tagSearch.GetMethodName().isEmpty()) {
 		
 		// special case; query for all methods for a class (UserClass::)
@@ -419,7 +432,10 @@ std::vector<mvceditor::TagClass>  mvceditor::TagFinderClass::NearMatchNamespaces
 	// a namespace or a fully qualified name
 	UnicodeString key = tagSearch.GetClassName();
 	std::string stdKey = mvceditor::IcuToChar(key);
-	std::vector<int> fileTagIds = fileTagIdsForDirs(tagSearch.GetDirs());
+	bool error = false;
+	wxString errorMsg;
+	std::vector<int> fileTagIds = mvceditor::FileTagIdsForDirs(*Session, tagSearch.GetDirs(), error, errorMsg);
+	wxASSERT_MSG(!error, errorMsg);
 	matches = FindByKeyExact(stdKey, fileTagIds);
 	if (matches.empty()) {
 		matches = FindByKeyStart(stdKey, fileTagIds, true);
@@ -448,7 +464,10 @@ UnicodeString mvceditor::TagFinderClass::ParentClassName(const UnicodeString& cl
 std::vector<UnicodeString> mvceditor::TagFinderClass::GetResourceTraits(const UnicodeString& className, 
 																		const UnicodeString& methodName,
 																		const std::vector<wxFileName>& dirs) {
-	std::vector<int> fileTagIds = fileTagIdsForDirs(dirs);
+	bool error = false;
+	wxString errorMsg;
+	std::vector<int> fileTagIds = mvceditor::FileTagIdsForDirs(*Session, dirs, error, errorMsg);
+	wxASSERT_MSG(!error, errorMsg);
 	std::vector<UnicodeString> inheritedTraits;
 	bool match = false;
 	
@@ -538,7 +557,10 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::ExactTags(const mvce
 	// take care when coding; make sure that any code called by this method does not touch the file system
 	std::vector<mvceditor::TagClass> allMatches;
 	std::vector<int> types;
-	std::vector<int> fileTagIds = fileTagIdsForDirs(tagSearch.GetDirs());
+	bool error = false;
+	wxString errorMsg;
+	std::vector<int> fileTagIds = mvceditor::FileTagIdsForDirs(*Session, tagSearch.GetDirs(), error, errorMsg);
+	wxASSERT_MSG(!error, errorMsg);
 	if (tagSearch.GetResourceType() == mvceditor::TagSearchClass::CLASS_NAME_METHOD_NAME) {
 
 		// check the entire class hierachy; stop as soon as we found it
@@ -585,7 +607,10 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::ExactClassOrFile(con
 	// take care when coding; make sure that any code called by this method does not touch the file system
 	std::vector<mvceditor::TagClass> allMatches;
 	std::vector<int> types;
-	std::vector<int> fileTagIds = fileTagIdsForDirs(tagSearch.GetDirs());
+	bool error = false;
+	wxString errorMsg;
+	std::vector<int> fileTagIds = mvceditor::FileTagIdsForDirs(*Session, tagSearch.GetDirs(), error, errorMsg);
+	wxASSERT_MSG(!error, errorMsg);
 	if (mvceditor::TagSearchClass::FILE_NAME == tagSearch.GetResourceType() || 
 		mvceditor::TagSearchClass::FILE_NAME_LINE_NUMBER == tagSearch.GetResourceType()) {
 		allMatches = ExactFiles(tagSearch.GetFileName(), tagSearch.GetLineNumber());
@@ -1143,39 +1168,6 @@ void mvceditor::TagFinderClass::Print() {
 		printf("identifier=%s\n", mvceditor::IcuToChar(tag->Identifier).c_str());
 		printf("\n\n");
 	}
-}
-
-std::vector<int> mvceditor::TagFinderClass::fileTagIdsForDirs(const std::vector<wxFileName>& dirs) {
-	std::vector<int> fileTagIds;
-	if (dirs.empty()) {
-		return fileTagIds;
-	}
-	std::string sql = "";
-	for (size_t i = 0; i < dirs.size(); i++) {
-		sql += "SELECT file_item_id FROM file_items WHERE full_path LIKE '" + 
-			mvceditor::WxToChar(dirs[i].GetPathWithSep()) + "%' ESCAPE '^'";
-		if (i < (dirs.size() - 1)) {
-			sql += " UNION ";
-		}
-	}
-	int fileItemId = 0;
-	try {
-		soci::statement stmt = (Session->prepare << sql, 
-			soci::into(fileItemId)
-		);
-		bool foundFile = stmt.execute(true);
-		if (foundFile) {
-			fileTagIds.push_back(fileItemId);
-		}
-	} catch (std::exception& e) {
-		wxString msg = mvceditor::CharToWx(e.what());
-		wxUnusedVar(msg);
-		wxASSERT_MSG(false, msg);
-	}
-	std::sort(fileTagIds.begin(), fileTagIds.end());
-	std::vector<int>::iterator it = std::unique(fileTagIds.begin(), fileTagIds.end());
-	fileTagIds.erase(it, fileTagIds.end());
-	return fileTagIds;
 }
 
 mvceditor::DetectedTagFinderClass::DetectedTagFinderClass()

@@ -130,6 +130,12 @@ int mvceditor::SqliteSchemaVersion(soci::session& session) {
 	return versionNumber;
 }
 
+void mvceditor::SqliteSetBusyTimeout(soci::session& session, int timeoutMs) {
+
+	// get the 'raw' sqlite connection
+	soci::sqlite3_session_backend* backend = static_cast<soci::sqlite3_session_backend*>(session.get_backend());
+	sqlite_api::sqlite3_busy_timeout(backend->conn_, timeoutMs);
+}
 
 
 mvceditor::SqliteFinderClass::SqliteFinderClass()

@@ -114,12 +114,10 @@ void mvceditor::GlobalCacheClass::OpenAndCreateTables(const wxString& dbName, co
 		// we should be able to open this since it has been created by
 		// the TagCacheDbVersionActionClass
 		Session.open(*soci::factory_sqlite3(), stdDbName);
-		/// TODO: remove since we are created 
-		/*wxString error;
-		if (!mvceditor::SqlScript(schemaFileName, Session, error)) {
-			wxASSERT_MSG(false, error);
-		}
-		*/
+
+		// set a busy handler so that if we attempt to query while the file is locked, we 
+		// sleep for a bit then try again
+		mvceditor::SqliteSetBusyTimeout(Session, 1000);
 	} catch(std::exception const& e) {
 		Session.close();
 		wxString msg = mvceditor::CharToWx(e.what());

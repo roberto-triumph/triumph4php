@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <globals/GlobalsClass.h>
+#include <globals/Assets.h>
 #include <wx/tokenzr.h>
 
 mvceditor::GlobalsClass::GlobalsClass()
@@ -37,7 +38,10 @@ mvceditor::GlobalsClass::GlobalsClass()
 	, PhpFileExtensionsString(wxT("*.php"))	
 	, CssFileExtensionsString(wxT("*.css"))
 	, SqlFileExtensionsString(wxT("*.sql"))
-	, MiscFileExtensionsString(wxT("*.js;*.html;*.yml;*.xml;*.txt")) {
+	, MiscFileExtensionsString(wxT("*.js;*.html;*.yml;*.xml;*.txt"))
+	, TagCacheDbFileName(mvceditor::TagCacheAsset())
+	, WorkingTagCacheDbFileName(mvceditor::TagCacheWorkingAsset()) 
+	, DetectorCacheDbFileName(mvceditor::DetectorCacheAsset()) {
 }
 
 std::vector<mvceditor::SourceClass> mvceditor::GlobalsClass::AllEnabledSources() const {
@@ -181,15 +185,7 @@ void mvceditor::GlobalsClass::AssignFileExtensions(mvceditor::ProjectClass &proj
 
 std::vector<mvceditor::TemplateFileTagClass> mvceditor::GlobalsClass::CurrentTemplates() const {
 	std::vector<mvceditor::TemplateFileTagClass> templates;
-	mvceditor::UrlTagClass urlTag = CurrentUrl;
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	wxFileName detectorDbFileName;
-	for (project = Projects.begin(); project != Projects.end(); ++project) {
-		if (project->IsAPhpSourceFile(urlTag.FileName.GetFullPath())) {
-			detectorDbFileName = project->DetectorDbFileName;
-			break;
-		}
-	}
+	wxFileName detectorDbFileName = mvceditor::DetectorCacheAsset();
 	if (detectorDbFileName.IsOk()) {
 		mvceditor::TemplateFileTagFinderClass fileTags;
 		fileTags.Init(detectorDbFileName);

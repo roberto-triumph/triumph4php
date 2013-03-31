@@ -96,13 +96,9 @@ void mvceditor::ProjectFeatureClass::LoadPreferences(wxConfigBase* config) {
 
 			wxString keyLabel = wxString::Format(wxT("/Project_%d/Label"), projectIndex);
 			wxString keyEnabled = wxString::Format(wxT("/Project_%d/IsEnabled"), projectIndex);
-			wxString keyResourceDbFileName = wxString::Format(wxT("/Project_%d/ResourceDbFileName"), projectIndex);
-			wxString keyDetectorDbFileName = wxString::Format(wxT("/Project_%d/DetectorDbFileName"), projectIndex);
 			wxString keySourceCount = wxString::Format(wxT("/Project_%d/SourceCount"), projectIndex);
 			config->Read(keyLabel, &newProject.Label);
 			config->Read(keyEnabled, &newProject.IsEnabled);
-			newProject.ResourceDbFileName.Assign(config->Read(keyResourceDbFileName));
-			newProject.DetectorDbFileName.Assign(config->Read(keyDetectorDbFileName));
 			config->Read(keySourceCount, &sourcesCount);
 			for (int j = 0; j < sourcesCount; ++j) {
 				wxString keyRootPath = wxString::Format(wxT("/Project_%d/Source_%d_RootDirectory"), projectIndex, j);
@@ -158,13 +154,9 @@ void mvceditor::ProjectFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 		mvceditor::ProjectClass project = App.Globals.Projects[i];
 		wxString keyLabel = wxString::Format(wxT("/Project_%d/Label"), i);
 		wxString keyEnabled = wxString::Format(wxT("/Project_%d/IsEnabled"), i);
-		wxString keyResourceDbFileName = wxString::Format(wxT("/Project_%d/ResourceDbFileName"), i);
-		wxString keyDetectorDbFileName = wxString::Format(wxT("/Project_%d/DetectorDbFileName"), i);
 		wxString keySourceCount = wxString::Format(wxT("/Project_%d/SourceCount"), i);
 		config->Write(keyLabel, project.Label);
 		config->Write(keyEnabled, project.IsEnabled);
-		config->Write(keyResourceDbFileName, project.ResourceDbFileName.GetFullPath());
-		config->Write(keyDetectorDbFileName, project.DetectorDbFileName.GetFullPath());
 		config->Write(keySourceCount, (int)project.Sources.size());
 		for (size_t j = 0; j < project.Sources.size(); ++j) {
 			mvceditor::SourceClass source = project.Sources[j];			
@@ -252,8 +244,8 @@ void mvceditor::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
 		// delete the cache files for the projects the user has removed
 		// before deleting the file, must disconnect from the SQLite database
 		for (project = removedProjects.begin(); project != removedProjects.end(); ++project) {
-			App.Globals.TagCache.RemoveGlobal(project->ResourceDbFileName);
-			project->RemoveCacheDbs();
+
+			// TODO: remove tags from deleted projects
 		}
 
 		// for new projects we need to fill in the file extensions
@@ -637,12 +629,6 @@ void mvceditor::ProjectListDialogClass::OnOkButton(wxCommandEvent& event) {
 			}
 		}
 		if (touched) {
-
-			// create the cache files for this project since it may be a
-			// completely new project
-			if (editedProject->IsEnabled) {
-				editedProject->TouchCacheDbs();
-			}
 			TouchedProjects.push_back(*editedProject);
 		}
 	}

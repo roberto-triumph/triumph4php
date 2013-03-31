@@ -58,23 +58,35 @@ void mvceditor::ConfigFilesFeatureClass::RebuildMenu() {
 
 	// get the menus; need to keep them in memory
 	// because we use the index to know which menu was selected
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
-		if (project->IsEnabled) {
-			ConfigPair pair;
-			pair.ProjectLabel = project->Label;
-			mvceditor::ConfigTagFinderClass finder;
-			if (project->DetectorDbFileName.IsOk()) {
-				finder.AttachExistingFile(project->DetectorDbFileName);
-				pair.ConfigTags = finder.All();
+	std::vector<mvceditor::ConfigTagClass> allConfigTags;
+	mvceditor::ConfigTagFinderClass finder;
+	if (App.Globals.DetectorCacheDbFileName.IsOk()) {
+		finder.AttachExistingFile(App.Globals.DetectorCacheDbFileName);
+		allConfigTags = finder.All();
+	}
+	if (!allConfigTags.empty()) {
+
+		// doing 2 for-loops because we need the index into ConfigTags to line up
+		// with the way we create the menu items
+		std::vector<mvceditor::ProjectClass>::const_iterator project;
+		for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
+			if (project->IsEnabled) {
+				ConfigPair pair;
+				pair.ProjectLabel = project->Label;
+				std::vector<mvceditor::ConfigTagClass>::const_iterator configTag;
+				for (configTag = allConfigTags.begin(); configTag != allConfigTags.end(); ++configTag) {
+					wxString fullPath = configTag->ConfigFileName.GetFullPath();
+					if (project->IsASourceFile(fullPath)) {
+						ConfigTags.push_back(*configTag);
+						pair.ConfigTags.push_back(*configTag);
+					}
+				}
 				if (!pair.ConfigTags.empty()) {
-					ConfigTags.insert(ConfigTags.end(), pair.ConfigTags.begin(), pair.ConfigTags.end());
 					ConfigPairs.push_back(pair);
 				}
 			}
 		}
 	}
-
 	while (ConfigMenu->GetMenuItemCount() > 0) {
 
 		// use destroy because these are all submenus

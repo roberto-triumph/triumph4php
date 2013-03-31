@@ -24,6 +24,7 @@
  */
 #include <wx/wx.h>
 #include <actions/SequenceClass.h>
+#include <actions/CacheDbVersionActionClass.h>
 #include <actions/ProjectTagActionClass.h>
 #include <actions/UrlTagDetectorActionClass.h>
 #include <unicode/uclean.h>
@@ -133,6 +134,12 @@ void MyApp::Stop() {
 void MyApp::BuildSequence() {
 	std::vector<mvceditor::ActionClass*> actions;
 	actions.push_back(
+		new mvceditor::TagCacheDbVersionActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK)
+	);
+	actions.push_back(
+		new mvceditor::DetectorCacheDbVersionActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK)
+	);
+	actions.push_back(
 		new mvceditor::ProjectTagActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE)
 	);
 	actions.push_back(
@@ -142,6 +149,7 @@ void MyApp::BuildSequence() {
 }
 
 void MyApp::BuildGlobals() {
+	Globals.Environment.Init();
 
 	// needed so that we can know what files need to be parsed
 	Globals.PhpFileExtensionsString = wxT("*.php");
@@ -151,6 +159,10 @@ void MyApp::BuildGlobals() {
 
 	Globals.Environment.Apache.ManualConfiguration = true;
 	Globals.Environment.Apache.SetVirtualHostMapping(wxT("C:\\Users\\roberto\\software\\wamp\\www\\ember"), wxT("http://localhost/"));
+
+	Globals.TagCacheDbFileName.Assign(wxT("C:\\Users\\roberto\\Desktop\\caches\\tags.sqlite"));
+	Globals.WorkingTagCacheDbFileName.Assign(wxT("C:\\Users\\roberto\\Desktop\\caches\\working_tags.sqlite"));
+	Globals.DetectorCacheDbFileName.Assign(wxT("C:\\Users\\roberto\\Desktop\\caches\\detectors.sqlite"));
 	
 	// create a project
 	CreateProject(wxT("ember"), wxT("C:\\Users\\roberto\\software\\wamp\\www\\ember"));
@@ -164,9 +176,6 @@ void MyApp::CreateProject(wxString projectName, wxString rootDir) {
         src1.RootDirectory.AssignDir(rootDir);
         src1.SetIncludeWildcards(wxT("*.php"));
         project1.AddSource(src1);
-        
-        project1.ResourceDbFileName.Assign(wxT("C:\\Users\\roberto\\Desktop\\caches"), projectName + wxT(".sqlite"));
-		project1.DetectorDbFileName.Assign(wxT("C:\\Users\\roberto\\Desktop\\caches"), projectName + wxT("Detectors.sqlite"));
         Globals.AssignFileExtensions(project1);
         Globals.Projects.push_back(project1);
 }

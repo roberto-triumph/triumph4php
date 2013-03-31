@@ -19,75 +19,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2012 Roberto Perpuly
+ * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITORRESOUCEWIPEACTIONCLASS_H__
-#define __MVCEDITORRESOUCEWIPEACTIONCLASS_H__
-
-#include <actions/ActionClass.h>
+#ifndef __MVCEDITOR_FILETAGS_H__
+#define __MVCEDITOR_FILETAGS_H__
+ 
 #include <wx/filename.h>
+#include <soci/soci.h>
+#include <vector>
 
 namespace mvceditor {
 
-/**
- * Class to 'wipe' tag databases (empty all of their contents)
- */
-class TagWipeActionClass : public mvceditor::ActionClass {
-	
-public:
-
-	TagWipeActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
-	
-	bool Init(mvceditor::GlobalsClass& globals);
-
-	wxString GetLabel() const;
-	
-protected:
-	
-	void BackgroundWork();
-	
-private:
-		
 	/**
-	 * The db files that need to be wiped.
+	 * Get the file_item_id for all files that are in any of the given directories. Files
+	 * that are inside of sub-directories of any of the directories are also returned.
+	 *
+	 * @param session the db connection to the tags cache db
+	 * @param dirs the directories to look up.
+	 * @param error if there was a db error, this will be set to TRUE
+	 * @param errorMsg if there was a db error, this string will be set with the error message
+	 * @return list of file_item_id the file IDs for all files that are in the given directories
 	 */
-	std::vector<wxFileName> ResourceDbFileNames;
-	
-};
-
-/**
- * action to remove only tags from certain directories from the tag
- * databases
- */
-class TagDeleteActionClass : public mvceditor::ActionClass {
-	
-public:
-
-	TagDeleteActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId, const std::vector<wxFileName>& dirsToDelete);
-	
-	bool Init(mvceditor::GlobalsClass& globals);
-
-	wxString GetLabel() const;
-	
-protected:
-	
-	void BackgroundWork();
-	
-private:
-		
-	/**
-	 * The db files that need to be wiped.
-	 */
-	std::vector<wxFileName> ResourceDbFileNames;
-
-	/**
-	 * the directories to be removed from the cache.
-	 */
-	std::vector<wxFileName> DirsToDelete;
-	
-};
+	std::vector<int> FileTagIdsForDirs(soci::session& session, const std::vector<wxFileName>& dirs, bool& error, wxString& errorMsg);
 
 }
-
 #endif

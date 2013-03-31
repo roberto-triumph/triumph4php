@@ -37,12 +37,7 @@ mvceditor::UrlTagFinderInitActionClass::UrlTagFinderInitActionClass(mvceditor::R
 void mvceditor::UrlTagFinderInitActionClass::Work(mvceditor::GlobalsClass& globals) {
 	SetStatus(_("Url Tag Finder Init"));
 	globals.UrlTagFinder.Close();
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
-		if (project->IsEnabled) {
-			globals.UrlTagFinder.AttachExistingFile(project->DetectorDbFileName);
-		}
-	}
+	globals.UrlTagFinder.AttachExistingFile(globals.DetectorCacheDbFileName);
 }
 
 wxString mvceditor::UrlTagFinderInitActionClass::GetLabel() const {
@@ -102,9 +97,9 @@ bool mvceditor::UrlTagDetectorActionClass::Init(mvceditor::GlobalsClass& globals
 						params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset();
 						params.ScriptName = *scriptName;
 						params.SourceDir = source->RootDirectory;
-						params.ResourceDbFileName = project->ResourceDbFileName.GetFullPath();
+						params.ResourceDbFileName = globals.TagCacheDbFileName.GetFullPath();
 						params.RootUrl = globals.Environment.Apache.GetUrl(source->RootDirectory.GetPath());
-						params.OutputDbFileName = project->DetectorDbFileName.GetFullPath();
+						params.OutputDbFileName = globals.DetectorCacheDbFileName.GetFullPath();
 						if (!params.RootUrl.IsEmpty()) {
 							ParamsQueue.push(params);
 						}
