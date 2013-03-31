@@ -339,6 +339,10 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 		}
 		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_FUNCTION, -1, keyData);
 	}
+	else {
+		// not something we want to display, make sure to cleanup the keyData
+		delete keyData;
+	}
 }
 
 void mvceditor::OutlineViewPanelClass::OnHelpButton(wxCommandEvent& event) {
