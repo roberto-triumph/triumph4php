@@ -117,7 +117,7 @@ void mvceditor::GlobalCacheClass::OpenAndCreateTables(const wxString& dbName, co
 
 		// set a busy handler so that if we attempt to query while the file is locked, we 
 		// sleep for a bit then try again
-		mvceditor::SqliteSetBusyTimeout(Session, 1000);
+		mvceditor::SqliteSetBusyTimeout(Session, 100);
 	} catch(std::exception const& e) {
 		Session.close();
 		wxString msg = mvceditor::CharToWx(e.what());
