@@ -138,6 +138,7 @@ mvceditor::TagParserClass::TagParserClass()
 	, Session(NULL)
 	, Transaction(NULL)
 	, FileParsingBufferSize(32)
+	, FilesParsed(0)
 	, IsCacheInitialized(false) {
 	Parser.SetClassObserver(this);
 	Parser.SetClassMemberObserver(this);
@@ -168,12 +169,38 @@ void mvceditor::TagParserClass::BeginSearch() {
 	NamespaceCache.clear();
 	TraitCache.clear();
 
+	// start a transaction here
+	FilesParsed = 0;
+	try {
+		Transaction = new soci::transaction(*Session);
+	} catch (std::exception& e) {
+		
+		// ATTN: at some point bubble these exceptions up?
+		// to avoid unreferenced local variable warnings in MSVC
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxUnusedVar(msg);
+		wxASSERT_MSG(false, msg);
+	}
+
 	FileParsingCache.clear();
 	FileParsingCache.resize(0);
 	FileParsingCache.reserve(FileParsingBufferSize);
 }
 
 void mvceditor::TagParserClass::EndSearch() {
+	try {
+		Transaction->commit();
+	} catch (std::exception& e) {
+		
+		// ATTN: at some point bubble these exceptions up?
+		// to avoid unreferenced local variable warnings in MSVC
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxUnusedVar(msg);
+		wxASSERT_MSG(false, msg);
+	}
+	delete Transaction;
+	Transaction = NULL;
+
 	FileParsingCache.clear();
 	NamespaceCache.clear();
 	TraitCache.clear();
@@ -255,24 +282,8 @@ void mvceditor::TagParserClass::BuildResourceCacheForFile(const wxString& fullPa
 	pelet::LintResultsClass results;
 	Parser.ScanString(code, results);
 
-	try {
-
-		// start a transaction here, after parsing has taken place
-		// we dont want to lock the DB while parsing
-		Transaction = new soci::transaction(*Session);
-		PersistResources(FileParsingCache, fileTag.FileId);
-		PersistTraits(TraitCache, fileTag.FileId);
-		Transaction->commit();
-	} catch (std::exception& e) {
-			
-		// ATTN: at some point bubble these exceptions up?
-		// to avoid unreferenced local variable warnings in MSVC
-		wxString msg = mvceditor::CharToWx(e.what());
-		wxUnusedVar(msg);
-		wxASSERT_MSG(false, msg);
-	}
-	delete Transaction;
-	Transaction = NULL;
+	PersistResources(FileParsingCache, fileTag.FileId);
+	PersistTraits(TraitCache, fileTag.FileId);
 	EndSearch();
 }
 
@@ -298,22 +309,36 @@ void mvceditor::TagParserClass::BuildResourceCache(const wxString& fullPath, boo
 			// no need to look for resources if the file had not yet existed, this will save much time
 			// this optimization was found by using the profiler
 			if (foundFile) {
+				std::vector<int> fileTagIdsToRemove;
+				fileTagIdsToRemove.push_back(fileTag.FileId);
+				RemovePersistedResources(fileTagIdsToRemove);
 
-				// wrap this in a transaction and commit 
-				// we want to commit before we start parsing so that 
-				// the db is not locked.
+				// the previous line deleted the file from file_items
+				// we need to re-add it
+				fileTag.MakeNew(fileName, parseClasses);
+				PersistFileTag(fileTag);
+			}			
+			FileParsingCache.clear();
+			
+			// for now silently ignore files with parser errors
+			pelet::LintResultsClass lintResults;
+			wxFFile file(fullPath, wxT("rb"));
+			Parser.ScanFile(file.fp(), mvceditor::WxToIcu(fullPath), lintResults);
+	
+			PersistResources(FileParsingCache, fileTag.FileId);
+			PersistTraits(TraitCache, fileTag.FileId);
+			FileParsingCache.clear();
+
+			FilesParsed++;
+			if (FilesParsed % 200 == 0) {
 				try {
-					Transaction = new soci::transaction(*Session);
-					std::vector<int> fileTagIdsToRemove;
-					fileTagIdsToRemove.push_back(fileTag.FileId);
-					RemovePersistedResources(fileTagIdsToRemove);
 
-					// the previous line deleted the file from file_items
-					// we need to re-add it
-					fileTag.MakeNew(fileName, parseClasses);
-					PersistFileTag(fileTag);
+					// commit at regular intervals.  we dont want to wait until
+					// the end to commit because we dont want to lock the db until
+					// the end of parsing of all files in all projects
 					Transaction->commit();
-
+					delete Transaction;
+					Transaction = new soci::transaction(*Session);
 				} catch (std::exception& e) {
 					
 					// ATTN: at some point bubble these exceptions up?
@@ -322,35 +347,7 @@ void mvceditor::TagParserClass::BuildResourceCache(const wxString& fullPath, boo
 					wxUnusedVar(msg);
 					wxASSERT_MSG(false, msg);
 				}
-				delete Transaction;
-				Transaction = NULL;
-			}			
-			FileParsingCache.clear();
-			
-			// for now silently ignore files with parser errors
-			pelet::LintResultsClass lintResults;
-			wxFFile file(fullPath, wxT("rb"));
-			Parser.ScanFile(file.fp(), mvceditor::WxToIcu(fullPath), lintResults);
-
-			try {
-
-				// start a transaction here, after parsing has taken place
-				// we dont want to lock the DB while parsing
-				Transaction = new soci::transaction(*Session);
-				PersistResources(FileParsingCache, fileTag.FileId);
-				PersistTraits(TraitCache, fileTag.FileId);
-				Transaction->commit();
-			} catch (std::exception& e) {
-					
-				// ATTN: at some point bubble these exceptions up?
-				// to avoid unreferenced local variable warnings in MSVC
-				wxString msg = mvceditor::CharToWx(e.what());
-				wxUnusedVar(msg);
-				wxASSERT_MSG(false, msg);
 			}
-			delete Transaction;
-			Transaction = NULL;
-			FileParsingCache.clear();
 		}
 	}
 }

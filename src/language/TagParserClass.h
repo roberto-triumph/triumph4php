@@ -269,6 +269,12 @@ private:
 	int FileParsingBufferSize;
 
 	/**
+	 * count the number of files that have been parsed so that we commit to sqlite at regular
+	 * intervals. 
+	 */
+	int FilesParsed;
+
+	/**
 	 * Flag to make sure we initialize the tag database.
 	 */
 	bool IsCacheInitialized;
