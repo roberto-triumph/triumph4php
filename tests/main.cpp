@@ -22,8 +22,6 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <stdio.h>
-#include <stdarg.h>
 #include <UnitTest++.h>
 #include <TestReporterStdout.h>
 #include <TestRunner.h>
@@ -32,6 +30,11 @@
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <string.h>
 #include <wx/wx.h>
+
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <iostream>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -92,9 +95,9 @@ class SingleTestsPredicateClass {
 
 public:
 
-	std::vector<const char*> TestCases;
+	std::vector<std::string> TestCases;
 
-	SingleTestsPredicateClass(const std::vector<const char*>& testCases) 
+	SingleTestsPredicateClass(const std::vector<std::string>& testCases) 
 		: TestCases(testCases) {
 	
 	}
@@ -106,8 +109,8 @@ public:
 			return true;
 		}
 		bool ret = false;
-		for (std::vector<const char*>::const_iterator it =  TestCases.begin(); it != TestCases.end(); ++it) {
-			if (strcmp(*it, test->m_details.testName) == 0) {
+		for (std::vector<std::string>::const_iterator it =  TestCases.begin(); it != TestCases.end(); ++it) {
+			if (it->compare(test->m_details.testName) == 0) {
 				ret = true;
 				break;
 			}
@@ -115,6 +118,125 @@ public:
 		return ret;
 	}
 };
+
+std::vector<std::string> listSuites() {
+	UnitTest::TestList& list = UnitTest::Test::GetTestList();
+	UnitTest::Test* test = list.GetHead();
+	std::vector<std::string> suites;
+	while (test) {
+		suites.push_back(test->m_details.suiteName);
+		test = test->next;
+	}
+	std::sort(suites.begin(), suites.end());
+	std::vector<std::string>::iterator end = std::unique(suites.begin(), suites.end());
+	suites.erase(end, suites.end());
+	return suites;
+}
+
+void printSuites(const std::vector<std::string>& suites) {
+	std::cout << "All available test suites\n\n";
+	for (size_t i = 0; i < suites.size(); i++) {
+		std::cout << suites[i] << std::endl;
+	}
+	std::cout << std::endl;
+}
+
+bool matchesSuite(const std::vector<std::string>& suites, const std::string& search) {
+	for (size_t i = 0; i < suites.size(); i++) {
+
+		// lower case suite names so that searches are case insensitive
+		std::string suite(suites[i]);
+		std::transform(suite.begin(), suite.end(), suite.begin(), ::tolower);
+		if (suite.find(search) != std::string::npos) {
+			return true;
+		}
+	}
+	return false;
+}
+
+int runMatchingSuites(const std::string& search) {
+	std::cout << "Running all tests matching \"" << search << "\"\n\n";
+
+	UnitTest::TestReporterStdout reporter;
+	UnitTest::TestResults results(&reporter);
+	UnitTest::CurrentTest::Results() = &results;
+	UnitTest::Timer timer;
+
+	timer.Start();
+	UnitTest::TestList& list = UnitTest::Test::GetTestList();
+	UnitTest::Test* test = list.GetHead();
+	while (test) {
+		std::string suiteName(test->m_details.suiteName);
+
+		// lower case suite names so that searches are case insensitive
+		std::transform(suiteName.begin(), suiteName.end(), suiteName.begin(), ::tolower);
+		if (suiteName.find(search) != std::string::npos) {
+			results.OnTestStart(test->m_details);
+			test->Run();
+			int const testTimeInMs = timer.GetTimeInMs();
+			results.OnTestFinish(test->m_details, testTimeInMs / 1000.0f);
+		}
+		test = test->next;
+	}
+
+	float const secondsElapsed = timer.GetTimeInMs() / 1000.0f;
+	if (results.GetFailureCount() > 0) {
+		std::cout << "FAILURE: " << results.GetFailedTestCount()
+			<< " out of " << results.GetTotalTestCount()
+			<< " failed (" << results.GetFailureCount() << ")." << std::endl;
+	}
+	else {
+		std::cout << "Success: " << results.GetTotalTestCount()
+			<< " tests passed." << std::endl;
+	}
+	std::cout << "Test time: " << secondsElapsed << " seconds.\n";
+	return results.GetFailureCount();
+}
+
+int chooseTests() {
+	int ret = 0;
+	std::string suiteToRun;
+	std::vector<std::string> testCasesToRun;
+	std::vector<std::string> suites = listSuites();
+	std::string prompt = "Choose:\n";
+	prompt += "1. Run all tests\n";
+	prompt += "2. Run suites matching a string\n";
+	prompt += "3. List all suites\n";
+	prompt += "4. Exit the program\n";
+	std::string choice = "";
+
+	std::cout << "MVC Editor test runner." << std::endl;
+	std::cout << prompt;
+	std::cin >> choice;
+	while (choice != "4") {
+		if (choice == "1") {
+			std::cout << "Running all tests\n\n";
+			ret = UnitTest::RunAllTests();
+		}
+		else  if (choice == "2") {
+			std::cout << "Enter suite string:" << std::endl;
+			std::cin >> suiteToRun;
+
+			// lowe case the given name
+			std::transform(suiteToRun.begin(), suiteToRun.end(), suiteToRun.begin(), ::tolower);
+			if (matchesSuite(suites, suiteToRun)) {
+				ret = runMatchingSuites(suiteToRun);
+			}
+			else {
+				std::cout << "No suites matched" << std::endl;
+			}
+		}
+		else if (choice == "3") {
+			printSuites(suites);
+		}
+		else {
+			std::cout << "invalid choice." << std::endl;
+		}
+		std::cout << prompt;
+		std::cin >> choice;
+	}
+	return ret;
+}
 
 // run all tests
 int main(int argc, char **argv) {
@@ -127,20 +249,13 @@ int main(int argc, char **argv) {
 		puts("Could not initialize wxWidgets\n");
 		return -1;
 	}
-
-	// change if you want to run only one test
-	bool runAll = true;
-	const char* suiteToRun = "ApacheTestClass";
-	std::vector<const char*> testCasesToRun;
+	
 	int ret = 0;
-	if (runAll) {
+	if (argc > 0 && strcmp("--all", argv[0]) == 0) {
 		ret = UnitTest::RunAllTests();
 	}
 	else {
-		UnitTest::TestReporterStdout reporter;
-		UnitTest::TestRunner runner(reporter);
-		SingleTestsPredicateClass pred(testCasesToRun);
-		ret = runner.RunTestsIf(UnitTest::Test::GetTestList(), suiteToRun, pred, 0);
+		ret = chooseTests();
 	}
 	
 	// calling cleanup here so that we can run this binary through a memory leak detector 

@@ -37,8 +37,7 @@ class TagWipeActionClass : public mvceditor::ActionClass {
 	
 public:
 
-	TagWipeActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId,
-		const std::vector<mvceditor::ProjectClass>& projects);
+	TagWipeActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 	
 	bool Init(mvceditor::GlobalsClass& globals);
 
@@ -56,6 +55,73 @@ private:
 	std::vector<wxFileName> ResourceDbFileNames;
 	
 };
+
+/**
+ * action to remove only tags from certain directories from the tag
+ * databases
+ */
+class TagDeleteActionClass : public mvceditor::ActionClass {
+	
+public:
+
+	TagDeleteActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId, const std::vector<wxFileName>& dirsToDelete);
+	
+	bool Init(mvceditor::GlobalsClass& globals);
+
+	wxString GetLabel() const;
+	
+protected:
+	
+	void BackgroundWork();
+	
+private:
+		
+	/**
+	 * The db files that need to be wiped.
+	 */
+	std::vector<wxFileName> ResourceDbFileNames;
+
+	/**
+	 * the directories to be removed from the cache.
+	 */
+	std::vector<wxFileName> DirsToDelete;
+	
+};
+
+/**
+ * action to remove only tags from a single file from the tag
+ * databases. This action works on the working cache only. 
+ */
+class TagCleanWorkingCacheActionClass : public mvceditor::ActionClass {
+	
+public:
+
+	TagCleanWorkingCacheActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId, const wxString& fileToDelete);
+	
+	bool Init(mvceditor::GlobalsClass& globals);
+
+	wxString GetLabel() const;
+	
+protected:
+	
+	void BackgroundWork();
+	
+private:
+		
+	/**
+	 * The db file that needs to be cleaned up.
+	 */
+	wxFileName WorkingTagDbFileName;
+
+	/**
+	 * the file to be removed from the cache. this is a string and not
+	 * a wxFileName because we may need to cleanup tags from a new buffer that
+	 * was never saved
+	 */
+	wxString FileToDelete;
+	
+};
+
 }
 
 #endif

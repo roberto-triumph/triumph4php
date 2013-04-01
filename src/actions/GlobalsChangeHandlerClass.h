@@ -51,12 +51,6 @@ private:
 	void OnSqlMetaDataComplete(mvceditor::SqlMetaDataEventClass& event);
 
 	/**
-	 * This method will get called by the WorkingCacheBuilderClass when parsing of the
-	 * code in this control has been completed.
-	 */
-	void OnGlobalCacheComplete(mvceditor::GlobalCacheCompleteEventClass& event);
-
-	/**
 	 * when the php database detectors have completed, put all of the detected database
 	 * tags in the globals list.
 	 */

@@ -46,8 +46,6 @@ mvceditor::ProjectClass::ProjectClass()
 	, CssFileExtensions()
 	, SqlFileExtensions()
 	, MiscFileExtensions()
-	, ResourceDbFileName() 
-	, DetectorDbFileName()
 	, IsEnabled(true) {
 }
 
@@ -58,8 +56,6 @@ mvceditor::ProjectClass::ProjectClass(const mvceditor::ProjectClass& project)
 	, CssFileExtensions(project.CssFileExtensions)
 	, SqlFileExtensions(project.SqlFileExtensions) 
 	, MiscFileExtensions(project.MiscFileExtensions)
-	, ResourceDbFileName(project.ResourceDbFileName)
-	, DetectorDbFileName(project.DetectorDbFileName)
 	, IsEnabled(project.IsEnabled) {
 }
 
@@ -71,8 +67,6 @@ void mvceditor::ProjectClass::operator=(const mvceditor::ProjectClass& project) 
 	CssFileExtensions = project.CssFileExtensions;
 	SqlFileExtensions = project.SqlFileExtensions;
 	MiscFileExtensions = project.MiscFileExtensions;
-	ResourceDbFileName = project.ResourceDbFileName;
-	DetectorDbFileName = project.DetectorDbFileName;
 }
 
 void mvceditor::ProjectClass::AddSource(const mvceditor::SourceClass& src) { 
@@ -172,27 +166,6 @@ wxString mvceditor::ProjectClass::RelativeFileName(const wxString& fullPath) con
 		}
 	}
 	return relativeName;
-}
-
-bool mvceditor::ProjectClass::TouchCacheDbs() {
-	if (!ResourceDbFileName.IsOk() || !ResourceDbFileName.FileExists()) {
-		wxString tempDb = wxFileName::CreateTempFileName(mvceditor::ConfigDirAsset().GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME));
-		ResourceDbFileName.Assign(tempDb);
-	}
-	if (!DetectorDbFileName.IsOk() || !DetectorDbFileName.FileExists()) {
-		wxString tempDb = wxFileName::CreateTempFileName(mvceditor::ConfigDirAsset().GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME));
-		DetectorDbFileName.Assign(tempDb);
-	}
-	return ResourceDbFileName.IsOk() && DetectorDbFileName.IsOk();
-}
-
-void mvceditor::ProjectClass::RemoveCacheDbs() {
-	if (ResourceDbFileName.FileExists()) {
-		wxRemoveFile(ResourceDbFileName.GetFullPath());
-	}
-	if (DetectorDbFileName.FileExists()) {
-		wxRemoveFile(DetectorDbFileName.GetFullPath());
-	}
 }
 
 std::vector<wxString> mvceditor::ProjectClass::AllNonPhpExtensions() const {

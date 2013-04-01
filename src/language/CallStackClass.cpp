@@ -212,7 +212,7 @@ std::string mvceditor::VariableSymbolClass::TypeString() const {
 	return line;
 }
 
-mvceditor::CallStackClass::CallStackClass(mvceditor::TagCacheClass& tagCache)
+mvceditor::CallStackClass::CallStackClass(mvceditor::TagCacheClass& tagCache, const wxFileName& workingTagDbFileName)
 	: Variables()
 	, LintResults()
 	, MatchError()
@@ -224,6 +224,7 @@ mvceditor::CallStackClass::CallStackClass(mvceditor::TagCacheClass& tagCache)
 	, TagCache(tagCache)
 	, ScopeFunctionCalls()
 	, ParsedMethods()
+	, WorkingTagDbFileName(workingTagDbFileName)
 	, TempVarIndex(1)
 	, FoundScope(false) {
 	Parser.SetClassObserver(this);
@@ -292,6 +293,7 @@ bool mvceditor::CallStackClass::Recurse(pelet::Versions version, mvceditor::Call
 	// need to create the symbols for the file if the cache does not have them yet; symbols allow us to know the variable
 	// types
 	mvceditor::WorkingCacheClass* workingCache = new mvceditor::WorkingCacheClass;
+	workingCache->InitWorkingTag(mvceditor::TagCacheWorkingAsset());
 
 	// here file identifier == file name because file name exists and is unique
 	workingCache->Init(fileName.GetFullPath(), fileName.GetFullPath(), false, version, true);

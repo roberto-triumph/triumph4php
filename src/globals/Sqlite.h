@@ -75,7 +75,7 @@ bool SqliteSqlScript(const wxFileName& sqlScriptFileName, soci::session& session
 int SqliteSchemaVersion(soci::session& session);
 
 /**
- * @param sessionn opened connection
+ * @param session opened connection
  * @param [out] vector of table names that exist in the opened connection. will be pushed into.
  * @param error will be filled in case of a db error.
  * @return bool TRUE if there was no db error.
@@ -84,6 +84,17 @@ int SqliteSchemaVersion(soci::session& session);
  * function will return false (an assert will be generated)
  */
 bool SqliteTables(soci::session& session, std::vector<std::string>& tableNames, wxString& error);
+
+/**
+ * set the busy timeout on the opened sqlite connection; the effect is that
+ * when a sqlite db is locked the sqlite client api will sleep for a bit and then
+ * re-attempt the query; this function should be called so that we get 
+ * less soci exceptions due to sqlite complaining that the file is locked.
+ *
+ * @param session opened connection. MUST BE a SQLITE connection otherwise the program will crash!
+ * @param timeoutMs the max number of milliseconds to wait for a locked file
+ */
+void SqliteSetBusyTimeout(soci::session& session, int timeoutMs = 100);
 
 /**
  * Class that holds connections to all attached databases. It will

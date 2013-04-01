@@ -90,18 +90,10 @@ void mvceditor::TemplateFilesFeatureClass::StartDetection() {
 	// the sequence class will own this pointer
 	mvceditor::CallStackActionClass* callStackAction =  new mvceditor::CallStackActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_CALL_STACK);
 	mvceditor::UrlTagClass urlTag = App.Globals.CurrentUrl;
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	wxFileName detectorDbFileName;
-	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
-		if (project->IsAPhpSourceFile(urlTag.FileName.GetFullPath())) {
-			detectorDbFileName = project->DetectorDbFileName;
-			break;
-		}
-	}
 	callStackAction->SetCallStackStart(urlTag.FileName,
 		mvceditor::WxToIcu(urlTag.ClassName),
 		mvceditor::WxToIcu(urlTag.MethodName),
-		detectorDbFileName);
+		App.Globals.DetectorCacheDbFileName);
 	actions.push_back(callStackAction);
 	actions.push_back(
 		new mvceditor::TemplateFileTagsDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR)

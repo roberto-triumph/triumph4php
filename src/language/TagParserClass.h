@@ -185,11 +185,25 @@ public:
 	void Print();
 
 	/**
-	 * Removes all resources from this tag finder entirely. If this
+	 * Removes ALL tags from this tag finder entirely. If this
 	 * finder was initialized with a backing file, the backing database
 	 * file will be truncated also.
 	 */
-	void Wipe();
+	void WipeAll();
+
+
+	/**
+	 * Deletes tags from the given directories only. Tags from subdirectories will
+	 * also be deleted. If this finder was initialized with a backing file, the backing database
+	 * file will be deleted also.
+	 */
+	void DeleteDirectories(const std::vector<wxFileName>& dirs);
+
+	/**
+	 * Deletes tags from a single file. If this finder was initialized with a backing file, the backing database
+	 * file will be deleted also.
+	 */
+	void DeleteFromFile(const wxString& fullPath);
 	
 	/**
 	 * set the PHP version to handle
@@ -261,6 +275,12 @@ private:
 	int FileParsingBufferSize;
 
 	/**
+	 * count the number of files that have been parsed so that we commit to sqlite at regular
+	 * intervals. 
+	 */
+	int FilesParsed;
+
+	/**
 	 * Flag to make sure we initialize the tag database.
 	 */
 	bool IsCacheInitialized;
@@ -302,14 +322,16 @@ private:
 	 * @param resources the list of resources that were parsed out
 	 * @param int the file that the resources are located in
 	 */
-	void PersistResources(const std::vector<mvceditor::TagClass>& resources, int fileitemId);
+	void PersistResources(const std::vector<mvceditor::TagClass>& resources, int fileTagId);
 
 	/**
 	 * add all of the given trait resources into the database.
 	 * @param traits the map of resources that were parsed out
+	 * @param int the file that the resources are located in
 	 */
 	void PersistTraits(
-		const std::map<UnicodeString, std::vector<mvceditor::TraitTagClass>, UnicodeStringComparatorClass>& traitMap);
+		const std::map<UnicodeString, std::vector<mvceditor::TraitTagClass>, UnicodeStringComparatorClass>& traitMap,
+		int fileTagId);
 
 	/**
 	 * @return all of the traits that any of the given classes use.

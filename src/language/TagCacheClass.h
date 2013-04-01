@@ -37,21 +37,26 @@
 namespace mvceditor {
 
 /**
- * A global cache is a cache of an entire project.  All of a project's resources
- * are stored in a SQLite file that is loaded when MVC Editor starts; this way
+ * A global cache contains all 3 tags db files used by MVC Editor.  All projects' tags
+ * are stored in a SQLite file that persisted and then loaded when MVC Editor starts; this way
  * the user can jump to files & classes without needing to re-index the 
- * entire project.
+ * entire project. The global cache also contains tags db files for the 
+ * native functions (str_*, array_*) and any detected tags from the 
+ * TagDetectors database. This class is given to the TagCacheClass.
  */
 class GlobalCacheClass {
 
 private:
 
 	/**
-	 * The connection to the tagcache sqlite db file
-	 * This needs to be declared first because the
-	 * tagparser uses it; and we want it to be cleaned up last
+	 * The connections to all sqlite db files
+	 * These need to be declared first because the
+	 * tagparsers use them; and we want the seesions to be cleaned up last
 	 */
-	soci::session Session;
+	soci::session TagDbSession;
+	soci::session NativeDbSession;
+	soci::session DetectedTagDbSession;
+	soci::session WorkingTagDbSession;
 
 public:
 
@@ -61,16 +66,45 @@ public:
 	mvceditor::TagParserClass TagParser;
 
 	/**
-	 * The object that will be used to lookup tags
+	 * The object that will be used to lookup project tags
 	 * This class will own this pointer
 	 */
-	mvceditor::TagFinderClass* TagFinder;
+	mvceditor::ParsedTagFinderClass TagFinder;
 
 	/**
-	 * The location of the SQLite file where the resources will be
-	 * stored.
+	 * The object that will be used to lookup php native function tags
 	 */
-	wxFileName ResourceDbFileName;
+	mvceditor::ParsedTagFinderClass NativeTagFinder;
+
+	/**
+	 * The object that will be used to lookup tags
+	 */
+	mvceditor::DetectedTagFinderClass DetectedTagFinder;
+
+	/**
+	 * The object that will be used to lookup tags from opened files
+	 */
+	mvceditor::ParsedTagFinderClass WorkingTagFinder;
+
+	/**
+	 * TRUE if NativeTagFinder has an opened and valid connection
+	 */
+	bool IsNativeTagFinderInit;
+
+	/**
+	 * TRUE if TagFinder has an opened and valid connection
+	 */
+	bool IsTagFinderInit;
+
+	/**
+	 * TRUE if DetectedTagFinder has an opened and valid connection
+	 */
+	bool IsDetectedTagFinderInit;
+
+	/**
+	 * TRUE if DetectedTagFinder has an opened and valid connection
+	 */
+	bool IsWorkingTagFinderInit;
 
 	GlobalCacheClass();
 
@@ -101,13 +135,25 @@ public:
 	void InitDetectorTag(const wxFileName& detectorDbFileName);
 
 	/**
+	 * Opens the native functions SQLite file.  
+	 * @param nativeFunctionsDbFileName the full path to the SQLite native functions database.
+	 *        This full path MUST exist; it will never be created.
+	 */
+	void InitNativeTag(const wxFileName& nativeFunctionsDbFileName);
+
+	/**
+	 * Opens the cache SQLite file that holds tags for opened fi\les
+	 * @param workingTagDbFileName the full path to the SQLite workin tags database.
+	 *        This full path MUST exist; it will never be created.
+	 */
+	void InitWorkingTag(const wxFileName& workingTagDbFileName);
+
+	/**
 	 * Will update the tag finder by calling Walk(); meaning that the next file
 	 * given by the directorySearch will be parsed and its resources will be stored
 	 * in the database.
 	 *
-	 * @see mvceditor::TagFinderClass::Walk
-	 * @param resourceDbFileName the location of the SQLite cache for the tag finder. this 
-	 *        is the file where the resources will be persisted to
+	 * @see mvceditor::TagParserClass::Walk
 	 * @param directorySearch keeps track of the file to parse
 	 */
 	void  Walk(DirectorySearchClass& directorySearch);
@@ -118,17 +164,15 @@ public:
 	void SetVersion(pelet::Versions version);
 
 private:
+
 	/**
-	 * create the database connection to the given db, and create tables to store the parsed resources
-	 * If the file does not exist; it will be created and the schema will be initialized as
-	 * well.
+	 * create the database connection to the given db
 	 *
+	 * @param session the db connection to open
 	 * @param wxString dbName, given to SQLite.  db can be a full path to a file  The
-	 *        file does not need to exist; if it does not exist it will be created.
-	 * @param schemaFileName the filename of the SQL script that contains the schema.
-	 *        The schema file will be run if the db has to be created.
+	 *        file does not needs to exist and have been initialized with the schema
 	 */
-	void OpenAndCreateTables(const wxString& dbName, const wxFileName& schemaFileName);
+	bool Open(soci::session& session, const wxString& dbName);
 };
 
 /**
@@ -139,16 +183,6 @@ private:
 class WorkingCacheClass {
 
 public:
-
-	/**
-	 * The object that will parse and persist tags
-	 */
-	mvceditor::TagParserClass TagParser;
-
-	/**
-	 * The object that will be used to lookup tags
-	 */
-	mvceditor::ParsedTagFinderClass TagFinder;
 
 	/**
 	 * The object that keeps track of variable types; we only need
@@ -175,6 +209,13 @@ public:
 	WorkingCacheClass();
 
 	/**
+	 * Opens the cache SQLite file that holds tags for opened fi\les
+	 * @param workingTagDbFileName the full path to the SQLite workin tags database.
+	 *        This full path MUST exist; it will never be created.
+	 */
+	void InitWorkingTag(const wxFileName& workingTagDbFileName);
+
+	/**
 	 * @param fileName the full path to the file being parsed
 	 * @param fileIdentifier  A unique, *non-empty* identifier string. 
 	 * @param isNew TRUE if the user is editing a new file
@@ -196,29 +237,26 @@ public:
 private:
 
 	/**
-	 * will run code through a lint check and choose not to update the cache if 
-	 * the code is not valid.
-	 */
-	pelet::ParserClass Parser;
-
-	/**
-	 * this will hold a memory-based sqlite db for use by this working cache
+	 * this will hold the working tags sqlite db
 	 */
 	soci::session Session;
 
 	/**
-	 * create the database connection to a SQLite memory db will be created and the schema will be initialized as
-	 * well.
-	 *
+	 * The object that will parse and persist tags
 	 */
-	void OpenAndCreateTables();
+	mvceditor::TagParserClass TagParser;
 
+	/**
+	 * will run code through a lint check and choose not to update the cache if 
+	 * the code is not valid.
+	 */
+	pelet::ParserClass Parser;
 };
 
 /**
  * This class represents all the most up-to-date resources of the currently opened project
- * in MVC Editor.  It consists of a series of "global" caches together with a series of 
- * separate caches for each file that is being edited.  The reason for putting opened files
+ * in MVC Editor.  It consists of a series of "global" caches together with a 
+ * separate cache for all files that are being edited.  The reason for putting opened files
  * in their own cache is for speed and accuracy; while a file is being edited (but the new
  * contents have not yet been flushed to disk) we can parse the code control content for resources without 
  * disturbing the global-wide cache; lookups are faster because the cache won't need to re-sort
@@ -226,38 +264,12 @@ private:
  * Lookups are also accurate because we can parse contents that have not yet been parsed, allowing code 
  * completion to be helpful on code not yet saved.
  *
- * Usage:
- * The tag cache can handle multiple global caches; this can be used to separate the
- * tag cache into multiple files; one file per project. Something like this:
- *
- * @code
- 
- * mvceditor::TagCacheClass cache;
- *
- * // setup the parsed resources to be saved into the user's home directory
- * // note that file need not exist
- * wxFileName cache1("/home/user/.mvceditorcache");
- * cache.InitGlobal(cache1);
- *
- * // now parse a project
- * mvceditor::DirectorySearchClass search;
- * search.Init(wxT("/home/user/project1/src"));
- * std::vector<wxString> fileFilters;
- * fileFilters.push_back(wxT("*.php"));
- * while (search.More()) {
- *   cache.WalkGlobal(search, fileFilters);
- * }
- *
- * @endcode
- *
  * Since TagCacheClass is backed by ParsedTagFinderClass, the global tag finders 
- * are stored on disk and are preserved across application restarts. This means that 
- * if the cache file already exists, then WalkGlobal() may return immediately if the file
- * to be parsed has not been modified since the last time we parsed it.
+ * are stored on disk and are preserved across application restarts. 
  *
  * Note that NONE of the methods of this class can be safely accessed by multiple
- * threads. Concurrent access can be achieved by creating separate instances of 
- * ResourceCacheClas with both pointing to the same DB files.
+ * threads. Concurrency is achieved by creating separate instances of 
+ * TagCacheClass with both pointing to the same DB files.
  */
 class TagCacheClass {
 	
@@ -303,54 +315,80 @@ public:
 	void RemoveWorking(const wxString& fileName);
 
 	/**
-	 * Push a new cache into the global cache list. After a call
+	 * Set the global cache. After a call
 	 * to this method, the cache is available for use by 
 	 * the ExpressionCompletionMatches and ResourceMatches methods
-	 *
-	 * @return bool FALSE if the tag file is already initialized
+	 * 
+	 * @param globalCache this class will own the pointer
 	 */
-	bool RegisterGlobal(mvceditor::GlobalCacheClass* globalCache);
-
-	/**
-	 * Removes a db file from the global tag finders.
-	 * @param resourceDbFileName the location of the SQLite cache for the 
-	 *        tag finder.
-	 */
-	void RemoveGlobal(const wxFileName& resourceDbFileName);
-
-	/**
-	 * check to see if a tag DB file is already loaded
-	 *
-	 * @return bool TRUE if db file is already loaded.
-	 */
-	bool IsInitGlobal(const wxFileName& resourceDbFileName) const;
-
-	/**
-	 * calls AllNonNativeClasses() method on the GLOBAL tag. This is usually done after all files have been indexed.
-	 * @see mvceditor::ParsedTagFinderClass::AllNonNativeClasses
-	 */
-	std::vector<TagClass> AllNonNativeClassesGlobal() const;
+	void RegisterGlobal(mvceditor::GlobalCacheClass* globalCache);
 	
 	/**
 	 * Searches all the registered caches (working AND global caches)
-	 * Will returm only for full exact matches (it will call CollectFullyQualifiedResource
+	 * Will return only for full exact matches (it will call ExactTags
 	 * on each tag finder).
-	 * @see mvceditor::TagFinderClass::CollectFullyQualifiedResource
+	 * @see mvceditor::TagFinderClass::ExactTags
 	 * @param search string to search for
 	 * @return std::vector<mvceditor::TagClass> matched resources 
 	 */
-	std::vector<mvceditor::TagClass> CollectFullyQualifiedResourceFromAll(const UnicodeString& search);
+	std::vector<mvceditor::TagClass> ExactTags(const UnicodeString& search);
 	
 	/**
 	 * Searches all the registered caches (working AND global caches)
-	 * Will return near matches (it will call CollectNearMatchResources
+	 * Will return near matches (it will call NearMatchTags
 	 * on each tag finder).
 	 *
-	 * @see mvceditor::TagFinderClass::CollectNearMatchResources
+	 * @see mvceditor::TagFinderClass::NearMatchTags
 	 * @param string to search for
 	 * @return std::vector<mvceditor::TagClass> matched resources
 	 */
-	std::vector<mvceditor::TagClass> CollectNearMatchResourcesFromAll(const UnicodeString& search);
+	std::vector<mvceditor::TagClass> NearMatchTags(const UnicodeString& search);
+
+	/**
+	 * Searches all the registered caches (working AND global caches)
+	 * Will return only for full exact matches (it will call ExactClassOrFile
+	 * on each tag finder).
+	 * @see mvceditor::TagFinderClass::ExactClassOrFile
+	 * @param search string to search for
+	 * @return std::vector<mvceditor::TagClass> matched resources. will be either files or classes 
+	 */
+	std::vector<mvceditor::TagClass> ExactClassOrFile(const UnicodeString& search);
+	
+	/**
+	 * Searches all the registered caches (working AND global caches)
+	 * Will return near matches (it will call NearMatchClassesOrFiles
+	 * on each tag finder).
+	 *
+	 * @see mvceditor::TagFinderClass::NearMatchClassesOrFiles
+	 * @param string to search for
+	 * @return std::vector<mvceditor::TagClass> matched resources. will be either files or classes
+	 */
+	std::vector<mvceditor::TagClass> NearMatchClassesOrFiles(const UnicodeString& search);
+
+	/**
+	 * gets all tags for a single class
+	 * @param className the class to search.  not fully qualified (no namespace)
+	 * @return vector of tags; 
+	 *         all methods and properties that are defined in the class PLUS
+	 *         all methods and properties that are defined in any of its base classes PLUS
+	 *         all methods and properties that are defined in any of the traits used by any of the base classes
+	 */
+	std::vector<mvceditor::TagClass> AllMemberTags(const UnicodeString& className);
+
+	/**
+	 * gets all tags that were found in a single file. for classes, all of the class' members (including
+	 * inherited members) are returned as well.
+	 *
+	 * @param fullPath full path to a file to lookup
+	 * @return vector of tags; 
+	 *         all functions or define's in the give file PLUS
+	 *         all classes in the given file PLUS
+	 *         all methods and properties that are defined in any classes PLUS
+	 *         all methods and properties that are defined in any classes' base classes PLUS
+	 *         all methods and properties that are defined in any of the traits used any classes PLUS
+	 *         all methods and properties that are defined in any of the traits used by any of the base classes
+	 */
+	std::vector<mvceditor::TagClass> AllTagsInFile(const wxString& fullPath); 
 	
 	/**
 	 * Collects all near matches that are possible candidates for completion of the parsed expression.
@@ -416,6 +454,13 @@ public:
 	 * Remove all items from all caches and also unregisters any and all files.
 	 */
 	void Clear();
+
+	/**
+	 * @param className the PHP class to check
+	 * @return list of class names that are base classes for the given class; plus traits
+	 *         used by the given class or any of its base classes
+	 */
+	std::vector<UnicodeString> ParentClassesAndTraits(const UnicodeString& className);
 	 
 private:
 		
@@ -428,10 +473,10 @@ private:
 	std::vector<TagFinderClass*> AllFinders();
 	
 	/**
-	 * These are the tag finders from the ENTIRE projecta; it may include stale resources
-	 * This class will own these pointers and will delete them when appropriate.
+	 * These are the tag finders from the ALL projects and native functions; it may include stale resources
+	 * This class will own the pointer and will delete them when appropriate.
 	 */
-	std::vector<mvceditor::GlobalCacheClass*> GlobalCaches;
+	mvceditor::GlobalCacheClass* GlobalCache;
 	
 	/**
 	 * To calculate variable type information
@@ -495,12 +540,7 @@ private:
 class GlobalCacheCompleteEventClass : public wxEvent {
 public:
 
-	/**
-	 * This will be owned by the event handler
-	 */
-	mvceditor::GlobalCacheClass* GlobalCache;
-
-	GlobalCacheCompleteEventClass(int id, mvceditor::GlobalCacheClass* globalCache);
+	GlobalCacheCompleteEventClass(int id);
 
 	wxEvent* Clone() const;
 };

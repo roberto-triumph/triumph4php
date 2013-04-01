@@ -33,154 +33,11 @@
 #include <vector>
 
 namespace mvceditor {
-	
-extern const wxEventType EVENT_RESOURCE_FINDER_COMPLETE;
-extern const wxEventType EVENT_GLOBAL_CLASSES_COMPLETE;
-	
-class ResourceFinderCompleteEventClass : public wxEvent {
-	
-	public:
-	
-	/**
-	 * Will contain all of the parsed resources. 
-	 */
-	std::vector<mvceditor::TagClass> Resources;
-	
-	ResourceFinderCompleteEventClass(int eventId, const std::vector<mvceditor::TagClass>& resources);
-	
-	wxEvent* Clone() const;
-	
-};
-
-class GlobalClassesCompleteEventClass : public wxEvent {
-
-public:
-
-	GlobalClassesCompleteEventClass(int eventId, const std::vector<wxString>& allClasses);
-	
-	wxEvent* Clone() const;
-
-	/**
-	 * @return All of the classes that have been parsed by the
-	 * global cache
-	 */
-	std::vector<wxString> GetAllClasses() const;
-
-private:
-
-	/**
-	 * All of the classes that have been parsed by the
-	 * global cache. Hiding this vector because we want to make sure
-	 * it is deep copied every time since we this event will be handled
-	 * by multiple threads.
-	 */
-	std::vector<wxString> AllClasses;
-};
-
-
-typedef void (wxEvtHandler::*ResourceFinderCompleteEventClassFunction)(ResourceFinderCompleteEventClass&);
-
-#define EVT_RESOURCE_FINDER_COMPLETE(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_RESOURCE_FINDER_COMPLETE, id, -1, \
-    (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( ResourceFinderCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
-
-
-typedef void (wxEvtHandler::*GlobalClassesCompleteEventClassFunction)(GlobalClassesCompleteEventClass&);
-
-#define EVT_GLOBAL_CLASSES_COMPLETE(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_GLOBAL_CLASSES_COMPLETE, id, -1, \
-    (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( GlobalClassesCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
-
-
-/**
- * A small class that will parse source into resources. We want to do 
- * this in a background thread in case the user is viewing a big file.
- */
-class ResourceFinderBackgroundThreadClass : public ThreadWithHeartbeatClass {
-
-public:
-
-	/**
-	 * @param runningThreads will get notified with EVENT_WORK_COMPLETE and the EVENT_RESOURCE_FINDER_COMPLETE
-	 * events when parsing is complete.
-	 */
-	ResourceFinderBackgroundThreadClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
-
-	/**
-	 * start to parses the given file in  a backgound thread. this will NOT create a thread, rather it
-	 * will signal the already-started thread to parse the given file.
-	 *
-	 * @filename the file to parse
-	 * @param phpVersion the php version to use for parsing the file.
-	 */
-	void Start(const wxString& fileName, pelet::Versions phpVersion);
-
-protected:
-
-	void BackgroundWork();
-
-private:
-
-	/**
-	 * Since this thread will be alive as long as the program is running, we guard against access
-	 * for FileName, PhpVersion  variables. We want to start one thread that will handle all code notebook
-	 * tab changes instead of creating one thread each time the user changes to a new tab.
-	 */
-	wxMutex Mutex;
-
-	/**
-	 * the current file being parsed
-	 */
-	wxString FileName;
-
-	/**
-	 * the version of PHP to check against when parsing
-	 */
-	pelet::Versions PhpVersion;
-
-};
-
-/**
- * class to gather all of the classes from the global cache.
- * Need to do this in the background because the SQLite file
- * does not have an index on the resource_type column
- */
-class GlobalClassesThreadClass : public mvceditor::ThreadWithHeartbeatClass {
-	
-public:
-
-	GlobalClassesThreadClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
-	
-	/**
-	 * @param projects the currently projects, which contain the full paths to tag DB files to read
-	 * @return TRUE if there is at least one enabled project
-	 */
-	bool Init(const std::vector<mvceditor::ProjectClass>& projects);
-	
-protected:
-
-	void BackgroundWork();
-	
-private:
-
-	/**
-	 * location of the tag database files
-	 */
-	std::vector<wxFileName> ResourceDbFileNames;
-	
-	/**
-	 * the resulting class list
-	 */
-	std::vector<wxString> AllClasses;
-};
 
 /**
  * This is a feature that is designed to let the user see the classes / methods of 
  * the opened files and of related files.  The related files / classes / methods that are mentioned
  * in the opened files.
- * 
  */
 class OutlineViewFeatureClass : public FeatureClass {
 public:
@@ -202,13 +59,7 @@ public:
 	 * @param wxCommandEvent& event
 	 */
 	void OnOutlineMenu(wxCommandEvent& event);
-	
-	/**
-	 * Outlines the currently opened code control.  The currently opened file (the meory buffer) is parsed and an outline
-	 * is generated from the parsed tokens.
-	 */
-	void BuildOutlineCurrentCodeControl();
-	
+
 	/**
 	 * Builds an outline based on the given line of text.  Note that this does not parse a file; it searches the
 	 * global TagCache
@@ -223,6 +74,8 @@ public:
 	 * @param wxString teh fully qualified tag
 	 */
 	void JumpToResource(const wxString& tag);
+
+	std::vector<mvceditor::TagClass> SearchForResources(const wxString& text);
 	
 private:		
 		
@@ -234,19 +87,28 @@ private:
 	/**
 	 * when the parsing is complete update the panel.
 	 */
+	/***
 	void OnResourceFinderComplete(mvceditor::ResourceFinderCompleteEventClass& event);
-	
-	/**
-	 * When all the classes from the global cache have been gathered
-	 * update the outline panel
-	 */
-	void OnGlobalClassesComplete(mvceditor::GlobalClassesCompleteEventClass& event);
-	
+	*/
+		
 	/**
 	 * when a file is saved and the outline tab is opened, make sure to refresh the outline
 	 * tab contents with the latest content
 	 */
+	/***
 	void OnFileSaved(mvceditor::FileSavedEventClass& event);
+	*/
+
+	/**
+	 * when a file is closed, remove it from the outline tree
+	 */
+	void OnContentNotebookPageClosed(wxAuiNotebookEvent& event);
+
+	/**
+	 * This method will get called by the EVENT_WORKING_CACHE_COMPLETE event is generated;
+	 * ie when parsing of the code in the active code control buffer has been completed.
+	 */
+	void OnWorkingCacheComplete(mvceditor::WorkingCacheCompleteEventClass& event);
 
 	/**
 	 * Since this thread will be alive as long as the program is running, we guard against access
@@ -255,7 +117,9 @@ private:
 	 * Since ResourceFinderBackgroundThread class inherits from wxThread, it will be deleted
 	 * automaticall and is NOT owned by this object.
 	 */
+	/***
 	mvceditor::ResourceFinderBackgroundThreadClass* ResourceFinderBackgroundThread;
+	*/
 	
 	DECLARE_EVENT_TABLE()
 };
@@ -288,8 +152,15 @@ class OutlineViewPanelClass : public OutlineViewGeneratedPanelClass {
 
 	/**
 	 * refresh the code control from the feature source strings
+	 * adds the given tags to the outline tree, under a node that has the name of the file
+	 * as its name
 	 */
-	 void RefreshOutlines(const std::vector<TagClass>& resources);
+	 void AddFileToOutline(const std::vector<TagClass>& resources, const wxString& fullPath);
+
+	 /**
+	  * @param fullPath file to remove from the outline tre
+	  */
+	 void RemoveFileFromOutline(const wxString& fullPath);
 	
 protected:
 
@@ -299,23 +170,35 @@ protected:
 	void OnHelpButton(wxCommandEvent& event);
 	
 	/**
-	 * take the selected choice, perform a tag lookup, and get the outline
+	 * make the user pick a tag, then outline the tag
 	 */
-	void OnChoice(wxCommandEvent& event);
+	void OnAddButton(wxCommandEvent& event);
 
 	/**
 	 * sync the outline with the currently opened file
-	 */
-	
+	 */	
 	void OnSyncButton(wxCommandEvent& event);
+
+	/**
+	 * show a context menu
+	 */
+	void OnTreeItemRightClick(wxTreeEvent& event);
 
 private:
 
+	// image IDs used by the Tree ImageList
 	enum {
 		IMAGE_OUTLINE_ROOT = 0,
+		IMAGE_OUTLINE_FILE,
 		IMAGE_OUTLINE_CLASS,
-		IMAGE_OUTLINE_METHOD,
-		IMAGE_OUTLINE_PROPERTY,
+		IMAGE_OUTLINE_METHOD_PUBLIC,
+		IMAGE_OUTLINE_METHOD_PROTECTED,
+		IMAGE_OUTLINE_METHOD_PRIVATE,
+		IMAGE_OUTLINE_METHOD_INHERITED,
+		IMAGE_OUTLINE_PROPERTY_PUBLIC,
+		IMAGE_OUTLINE_PROPERTY_PROTECTED,
+		IMAGE_OUTLINE_PROPERTY_PRIVATE,
+		IMAGE_OUTLINE_PROPERTY_INHERITED,
 		IMAGE_OUTLINE_DEFINE,
 		IMAGE_OUTLINE_CLASS_CONSTANT,
 		IMAGE_OUTLINE_NAMESPACE,
@@ -339,6 +222,110 @@ private:
 	 * double clicking on a  tag name in the tree will make the editor open up that tag
 	 */
 	void OnTreeItemActivated(wxTreeEvent& event);
+
+	/**
+	 * Show the given tags in the outline tree.
+	 */
+	void AddTagsToOutline(const std::vector<mvceditor::TagClass>& tags);
+
+	/**
+	 * Add a class and all of its members into the tree outline at the given node.
+	 *
+	 */
+	void AddClassToOutline(const UnicodeString& className, wxTreeItemId& classRoot);
+
+	/**
+	 * adds a tag as a child node of the tree control.
+	 * @param tag the tag to add
+	 * @param tagRoot the tree node to append to
+	 */
+	void TagToNode(const mvceditor::TagClass& tag, wxTreeItemId& tagRoot);
+
+	/**
+	 * @return the tree node for the given full path. search is done 
+	 *         by comparing tree item data and NOT the tree item name
+	 */
+	wxTreeItemId FindFileNode(const wxString& fullPath);
+
+	/**
+	 * handle the right click menu item for deletion
+	 */
+	void OnTreeMenuDelete(wxCommandEvent& event);
+
+	/**
+	 * handle the right click menu item for collapsing
+	 */
+	void OnTreeMenuCollapse(wxCommandEvent& event);
+
+	/**
+	 * handle the right click menu item for collapsing all items
+	 */
+	void OnTreeMenuCollapseAll(wxCommandEvent& event);
+
+	/**
+	 * handle the right click menu item for expanding all items
+	 */
+	void OnTreeMenuExpandAll(wxCommandEvent& event);
+
+	DECLARE_EVENT_TABLE()
+
+};
+
+class FileSearchDialogClass : public FileSearchDialogGeneratedClass {
+
+public:
+
+	/**
+	 * @param parent the parent window
+	 * @param feature to get the project list and to search for files
+	 * @param chosenTags the tags that the user chose will be filled in here
+	 */
+	FileSearchDialogClass(wxWindow* parent, mvceditor::OutlineViewFeatureClass& feature, 
+		std::vector<mvceditor::TagClass>& chosenTags);
+
+protected:
+
+	void OnOkButton(wxCommandEvent& event);
+	void OnSearchText(wxCommandEvent& event);
+	void OnProjectChoice(wxCommandEvent& event);
+	void OnSearchKeyDown(wxKeyEvent& event);
+	void OnSearchEnter(wxCommandEvent& event);
+	void OnMatchesListDoubleClick(wxCommandEvent& event);
+	void OnMatchesListKeyDown(wxKeyEvent& event);
+
+
+private:
+
+	/**
+	 * populate the project choice 
+	 */
+	void Init();
+
+	/**
+	 * perform the file search based on the selected project and 
+	 * the entered text
+	 */
+	void Search();
+
+	/**
+	 * show the tags in the results list
+	 */
+	void ShowTags(const wxString& query, const std::vector<mvceditor::TagClass>& tags);
+
+	/**
+	 * to get the project list and perform tag search
+	 */
+	mvceditor::OutlineViewFeatureClass& Feature;
+
+	/**
+	 * the tags that the were the result of the preivous search
+	 */
+	std::vector<mvceditor::TagClass> MatchingTags;
+	
+	/**
+	 * the tags that the user chose
+	 */
+	std::vector<mvceditor::TagClass>& ChosenTags;
 };
 
 }

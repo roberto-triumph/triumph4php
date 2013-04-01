@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <language/SymbolTableClass.h>
+#include <language/TagFinderList.h>
 #include <globals/String.h>
 #include <pelet/TokenClass.h>
 #include <wx/ffile.h>
@@ -136,71 +137,6 @@ static bool IsStaticExpression(const pelet::ExpressionClass& parsedExpression) {
 }
 
 /**
- * @return vector of all of the classes that are parent classes of the given
- *         class. this method will search across all tag finders
- */
-static std::vector<UnicodeString> ClassParents(UnicodeString className, UnicodeString methodName, 
-												 const std::vector<mvceditor::TagFinderClass*>& allTagFinders) {
-	std::vector<UnicodeString> parents;
-	bool found = false;
-	UnicodeString classToLookup = className;
-	do {
-
-		// each parent class may be located in any of the finders. in practice this code is not as slow
-		// as it looks; class hierarchies are usually not very deep (1-4 parents)
-		found = false;
-		for (size_t i = 0; i < allTagFinders.size(); ++i) {
-			UnicodeString parentClass = allTagFinders[i]->GetResourceParentClassName(classToLookup);
-			if (!parentClass.isEmpty()) {
-				found = true;
-				parents.push_back(parentClass);
-				classToLookup = parentClass;
-
-				// a class can have at most 1 parent, no need to look at other finders
-				break;
-			}
-		}
-	} while (found);
-	return parents;
-}
-
-/**
- * @return vector of all of the traits that are used by any of the given class or parent classes.
- *         This method will search across all tag finders
- */
-static std::vector<UnicodeString> ClassUsedTraits(const UnicodeString& className, 
-												  const std::vector<UnicodeString>& parentClassNames, 
-												  const UnicodeString& methodName, 
-												  const std::vector<mvceditor::TagFinderClass*>& allTagFinders) {
-
-	// trait support; a class can use multiple traits; hence the different logic 
-	std::vector<UnicodeString> classesToLookup;
-	classesToLookup.push_back(className);
-	classesToLookup.insert(classesToLookup.end(), parentClassNames.begin(), parentClassNames.end());
-	std::vector<UnicodeString> usedTraits;
-	bool found = false;
-	do {
-		found = false;
-		std::vector<UnicodeString> nextTraitsToLookup;
-		for (std::vector<UnicodeString>::iterator it = classesToLookup.begin(); it != classesToLookup.end(); ++it) {
-			for (size_t i = 0; i < allTagFinders.size(); ++i) {
-				std::vector<UnicodeString> traits = allTagFinders[i]->GetResourceTraits(*it, methodName);
-				if (!traits.empty()) {
-					found = true;
-					nextTraitsToLookup.insert(nextTraitsToLookup.end(), traits.begin(), traits.end());
-					usedTraits.insert(usedTraits.end(), traits.begin(), traits.end());
-				}
-			}
-		}
-
-		// next, look for traits used by the traits themselves
-		classesToLookup = nextTraitsToLookup;
-	} while (found);
-
-	return usedTraits;
-}
-
-/**
  * Figure out a tag's type by looking at all of the given finders.
  * @param resourceToLookup MUST BE fully qualified (class name  + method name,  or function name).  string can have the
  *        object operator "::" that separates the class and method name.
@@ -212,13 +148,13 @@ static UnicodeString ResolveResourceType(UnicodeString resourceToLookup,
 										 const std::vector<mvceditor::TagFinderClass*>& allTagFinders) {
 	UnicodeString type;
 	mvceditor::TagSearchClass tagSearch(resourceToLookup);
-	tagSearch.SetParentClasses(ClassParents(tagSearch.GetClassName(), tagSearch.GetMethodName(), allTagFinders));
-	tagSearch.SetTraits(ClassUsedTraits(tagSearch.GetClassName(), tagSearch.GetParentClasses(), tagSearch.GetMethodName(), allTagFinders));
+	tagSearch.SetParentClasses(mvceditor::TagFinderListClassParents(tagSearch.GetClassName(), tagSearch.GetMethodName(), allTagFinders));
+	tagSearch.SetTraits(mvceditor::TagFinderListClassUsedTraits(tagSearch.GetClassName(), tagSearch.GetParentClasses(), tagSearch.GetMethodName(), allTagFinders));
 
 	// need to get the type from the tag finders
 	for (size_t j = 0; j < allTagFinders.size(); ++j) {
 		mvceditor::TagFinderClass* finder = allTagFinders[j];
-		std::vector<mvceditor::TagClass> matches = finder->CollectFullyQualifiedResource(tagSearch);
+		std::vector<mvceditor::TagClass> matches = finder->ExactTags(tagSearch);
 		if (!matches.empty()) {
 
 			// since we are doing fully qualified matches, all matches are from the inheritance chain; ie. all methods
@@ -249,7 +185,7 @@ static UnicodeString ResolveResourceType(UnicodeString resourceToLookup,
  * @see VariableObserverClass
  * @param expressionScope needed to use the symbol table
  * @param allTagFinders needed to use the symbol table
- * @param openedTagFinders needed to use the symbol table  
+ * @param openedTagFinder needed to use the symbol table  
  * @param doDuckTyping
  * @param error any symbol table errors will be written here
  * @param variable the variable's name.  This is a single token, ie "$this", "$aglob" no object
@@ -263,7 +199,7 @@ static UnicodeString ResolveResourceType(UnicodeString resourceToLookup,
  */
 static UnicodeString ResolveVariableType(const pelet::ScopeClass& expressionScope, 
 										 const std::vector<mvceditor::TagFinderClass*>& allTagFinders,
-										 const std::map<wxString, mvceditor::TagFinderClass*>& openedTagFinders, 
+										 mvceditor::TagFinderClass* openedTagFinder, 
 										 bool doDuckTyping,
 										 mvceditor::SymbolTableMatchErrorClass& error,
 										 const UnicodeString& variable, 
@@ -307,7 +243,7 @@ static UnicodeString ResolveVariableType(const pelet::ScopeClass& expressionScop
 				parsedExpression.ChainList = symbol.ChainList;
 				std::vector<mvceditor::TagClass> resourceMatches;
 				symbolTable.ResourceMatches(parsedExpression, expressionScope, 
-					allTagFinders, openedTagFinders, resourceMatches, doDuckTyping, false, error);
+					allTagFinders, openedTagFinder, resourceMatches, doDuckTyping, false, error);
 				if (!resourceMatches.empty()) {
 					if (mvceditor::TagClass::CLASS == resourceMatches[0].Type) {
 						type = resourceMatches[0].ClassName;
@@ -331,13 +267,13 @@ static UnicodeString ResolveVariableType(const pelet::ScopeClass& expressionScop
  * @param parsedExpression the expression to resolved.
  * @param scope the scope (to resolve variables)
  * @param allTagFinders all of the finders to look in
- * @param openedResourceFindesr the tag finders from the opened files
+ * @param openedResourceFinder the tag finder for the opened files
  * @return the tag's type; (for methods, it's the return type of the method) could be empty string if type could not be determined 
  */
 static UnicodeString ResolveInitialLexemeType(const pelet::ExpressionClass& parsedExpression, 
 											  const pelet::ScopeClass& expressionScope, 
 											  const std::vector<mvceditor::TagFinderClass*>& allTagFinders,
-											  const std::map<wxString, mvceditor::TagFinderClass*>& openedTagFinders,
+											  mvceditor::TagFinderClass* openedTagFinder,
 											  bool doDuckTyping,
 											  mvceditor::SymbolTableMatchErrorClass& error,
 											  const std::vector<mvceditor::SymbolClass>& scopeSymbols,
@@ -347,7 +283,7 @@ static UnicodeString ResolveInitialLexemeType(const pelet::ExpressionClass& pars
 	if (start.startsWith(UNICODE_STRING_SIMPLE("$"))) {
 		
 		// a variable. look at the type from the symbol table
-		typeToLookup = ResolveVariableType(expressionScope, allTagFinders, openedTagFinders, doDuckTyping, error, 
+		typeToLookup = ResolveVariableType(expressionScope, allTagFinders, openedTagFinder, doDuckTyping, error, 
 				start, scopeSymbols, symbolTable);
 	}
 	else if (start.caseCompare(UNICODE_STRING_SIMPLE("self"), 0) == 0){
@@ -371,7 +307,7 @@ static UnicodeString ResolveInitialLexemeType(const pelet::ExpressionClass& pars
 		UnicodeString scopeClass = expressionScope.ClassName;
 		UnicodeString scopeMethod = expressionScope.MethodName;
 		for (size_t i = 0; i < allTagFinders.size(); ++i) {	
-			typeToLookup = allTagFinders[i]->GetResourceParentClassName(scopeClass);
+			typeToLookup = allTagFinders[i]->ParentClassName(scopeClass);
 			if (!typeToLookup.isEmpty()) {
 				break;
 			}
@@ -589,7 +525,7 @@ void mvceditor::SymbolTableClass::CreateSymbolsFromFile(const wxString& fileName
 
 void mvceditor::SymbolTableClass::ExpressionCompletionMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope,
 															  const std::vector<mvceditor::TagFinderClass*>& allTagFinders,
-															  const std::map<wxString, mvceditor::TagFinderClass*>& openedTagFinders,
+															  mvceditor::TagFinderClass* openedTagFinder,
 															  std::vector<UnicodeString>& autoCompleteVariableList,
 															  std::vector<mvceditor::TagClass>& autoCompleteResourceList,
 															  bool doDuckTyping,
@@ -613,14 +549,14 @@ void mvceditor::SymbolTableClass::ExpressionCompletionMatches(pelet::ExpressionC
 	else {
 
 		// some kind of function call / method chain call
-		ResourceMatches(parsedExpression, expressionScope, allTagFinders, openedTagFinders,
+		ResourceMatches(parsedExpression, expressionScope, allTagFinders, openedTagFinder,
 			autoCompleteResourceList, doDuckTyping, false, error);
 	}	
 }
 
 void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope, 
 												  const std::vector<mvceditor::TagFinderClass*>& allTagFinders,
-												  const std::map<wxString, mvceditor::TagFinderClass*>& openedTagFinders,
+												  mvceditor::TagFinderClass* openedTagFinder,
 												  std::vector<mvceditor::TagClass>& resourceMatches,
 												  bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 												  mvceditor::SymbolTableMatchErrorClass& error) const {
@@ -635,7 +571,7 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 	pelet::ExpressionClass originalExpression = parsedExpression;
 	ResolveNamespaceAlias(parsedExpression, expressionScope);
 	
-	UnicodeString typeToLookup = ResolveInitialLexemeType(parsedExpression, expressionScope, allTagFinders, openedTagFinders, 
+	UnicodeString typeToLookup = ResolveInitialLexemeType(parsedExpression, expressionScope, allTagFinders, openedTagFinder, 
 		doDuckTyping, error, scopeSymbols, *this);
 		
 	// continue to the next item in the chain up until the second to last one
@@ -692,8 +628,8 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 
 	if (!error.HasError()) {
 		mvceditor::TagSearchClass tagSearch(resourceToLookup);
-		tagSearch.SetParentClasses(ClassParents(tagSearch.GetClassName(), tagSearch.GetMethodName(), allTagFinders));
-		tagSearch.SetTraits(ClassUsedTraits(tagSearch.GetClassName(), tagSearch.GetParentClasses(), tagSearch.GetMethodName(), allTagFinders));
+		tagSearch.SetParentClasses(mvceditor::TagFinderListClassParents(tagSearch.GetClassName(), tagSearch.GetMethodName(), allTagFinders));
+		tagSearch.SetTraits(mvceditor::TagFinderListClassUsedTraits(tagSearch.GetClassName(), tagSearch.GetParentClasses(), tagSearch.GetMethodName(), allTagFinders));
 		for (size_t j = 0; j < allTagFinders.size(); ++j) {
 			mvceditor::TagFinderClass* finder = allTagFinders[j];
 
@@ -701,10 +637,10 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 			if ((doDuckTyping || !typeToLookup.isEmpty())) {
 				std::vector<mvceditor::TagClass> matches;
 				if (doFullyQualifiedMatchOnly) {
-					matches = finder->CollectFullyQualifiedResource(tagSearch);
+					matches = finder->ExactTags(tagSearch);
 				}
 				else {
-					matches = finder->CollectNearMatchResources(tagSearch, false);
+					matches = finder->NearMatchTags(tagSearch, false);
 				}
 				
 				// now we loop through the possbile matches and remove stuff that does not 
@@ -713,7 +649,7 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 				for (size_t k = 0; k < matches.size(); ++k) {
 					mvceditor::TagClass tag = matches[k];
 					bool isVisible = IsResourceVisible(tag, originalExpression, expressionScope, isStaticCall, isThisCall, isParentCall);
-					if (!mvceditor::IsResourceDirty(openedTagFinders, tag, finder) && isVisible) {
+					if (!mvceditor::IsResourceDirty(openedTagFinder, tag, finder) && isVisible) {
 						UnresolveNamespaceAlias(originalExpression, expressionScope, tag);
 						resourceMatches.push_back(tag);
 					}
@@ -853,22 +789,28 @@ void mvceditor::SymbolTableClass::SetVersion(pelet::Versions version) {
 	Parser.SetVersion(version);
 }
 
-bool mvceditor::IsResourceDirty(const std::map<wxString, mvceditor::TagFinderClass*>& finders, 
-								const TagClass& tag, mvceditor::TagFinderClass* tagFinder) {
-	bool ret = false;
-	wxString matchFullName = tag.GetFullPath();
-	std::map<wxString, mvceditor::TagFinderClass*>::const_iterator it = finders.begin();
-	while (it != finders.end()) {
+bool mvceditor::IsResourceDirty(mvceditor::TagFinderClass* openedFinder, const mvceditor::TagClass& tag, mvceditor::TagFinderClass* matchTagFinder) {
+	bool isOpened = false;
 
-		// a match from one of the opened tag finders can never be 'dirty' because the tag cache 
-		// has been updated by the Update() method
-		if (it->first.CompareTo(matchFullName) == 0 && it->second != tagFinder) {
-			ret = true;
-			break;
-		}
-		++it;
+	// is the tag from an opened file?
+	// for completely new files, tag.FullPath is the code control's FileIdentifier
+	// so this check should work for new files as well. see
+	// WorkingCacheBuilderClass::BackgroundWork
+
+	// TODO: what should happen when 2 editors are running ? since both now share
+	// the same working cache tags db
+	if (openedFinder) {
+		isOpened = openedFinder->HasFullPath(tag.FullPath);
 	}
-	return ret;
+	if (!isOpened) {
+		
+		// tag is not from an opened file; is not dirty
+		return false;
+	}
+
+	// a match from the opened tag finders can never be 'dirty' because the tag cache 
+	// has been updated by the Update() method
+	return openedFinder != matchTagFinder;
 }
 
 

@@ -44,6 +44,10 @@ public:
 		, FileTestFixtureClass(wxT("cache_db_version")) 
 		, Action(RunningThreads, wxID_ANY) 
 		, DetectorCacheAction(RunningThreads, wxID_ANY) {
+	
+		// need to make sure the directory exists
+		TouchTestDir();
+		InitTagCache(TestProjectDir);
 	}
 
 };
@@ -51,46 +55,37 @@ public:
 SUITE(CacheDbVersionActionTestClass) {
 
 TEST_FIXTURE(CacheDbVersionActionFixtureClass, EmptyCacheDbFiles) {
-	
-	// need to make sure the directory exists
-	TouchTestDir();
-	CreateProject(AbsoluteDir(wxT("project_1")), TestProjectDir);
+	CreateProject(AbsoluteDir(wxT("project_1")));
 
 	CHECK(Action.Init(Globals));
 	Action.BackgroundWork();
-	CHECK(Globals.Projects[0].ResourceDbFileName.FileExists());
+	CHECK(Globals.TagCacheDbFileName.FileExists());
 
-	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.Projects[0].ResourceDbFileName.GetFullPath()));
+	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
 	CHECK(mvceditor::SqliteSchemaVersion(session) > 0);
 }
 
 TEST_FIXTURE(CacheDbVersionActionFixtureClass, ExistingCacheDbFiles) {
-	TouchTestDir();
 	wxString error;
-
-	// need to make sure the directory exists
-	CreateProject(AbsoluteDir(wxT("project_1")), TestProjectDir);
+	CreateProject(AbsoluteDir(wxT("project_1")));
 
 	// create the db files
-	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.Projects[0].ResourceDbFileName.GetFullPath()));
+	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
 	mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), session, error); 
 
 	CHECK(Action.Init(Globals));
 	Action.BackgroundWork();
-	CHECK(Globals.Projects[0].ResourceDbFileName.FileExists());
+	CHECK(Globals.TagCacheDbFileName.FileExists());
 
 	CHECK(mvceditor::SqliteSchemaVersion(session) > 0);
 }
 
 TEST_FIXTURE(CacheDbVersionActionFixtureClass, OldCacheDbFiles) {
-	TouchTestDir();
 	wxString error;
-
-	// need to make sure the directory exists
-	CreateProject(AbsoluteDir(wxT("project_1")), TestProjectDir);
+	CreateProject(AbsoluteDir(wxT("project_1")));
 
 	// create the db files
-	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.Projects[0].ResourceDbFileName.GetFullPath()));
+	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
 	mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), session, error); 
 
 	// set the version to be an old one
@@ -100,55 +95,46 @@ TEST_FIXTURE(CacheDbVersionActionFixtureClass, OldCacheDbFiles) {
 
 	CHECK(Action.Init(Globals));
 	Action.BackgroundWork();
-	CHECK(Globals.Projects[0].ResourceDbFileName.FileExists());
+	CHECK(Globals.TagCacheDbFileName.FileExists());
 
 	// not sure why I have to close the connection in order for the test to work
 	session.close();
-	session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.Projects[0].ResourceDbFileName.GetFullPath()));
+	session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
 	CHECK(mvceditor::SqliteSchemaVersion(session) > 0);
 }
 
 TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorEmptyCacheDbFiles) {
-	
-	// need to make sure the directory exists
-	TouchTestDir();
-	CreateProject(AbsoluteDir(wxT("project_1")), TestProjectDir);
+	CreateProject(AbsoluteDir(wxT("project_1")));
 
 	CHECK(DetectorCacheAction.Init(Globals));
 	DetectorCacheAction.BackgroundWork();
-	CHECK(Globals.Projects[0].DetectorDbFileName.FileExists());
+	CHECK(Globals.DetectorCacheDbFileName.FileExists());
 
-	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.Projects[0].DetectorDbFileName.GetFullPath()));
+	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
 	CHECK(mvceditor::SqliteSchemaVersion(session) > 0);
 }
 
 TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorExistingCacheDbFiles) {
-	TouchTestDir();
 	wxString error;
-
-	// need to make sure the directory exists
-	CreateProject(AbsoluteDir(wxT("project_1")), TestProjectDir);
+	CreateProject(AbsoluteDir(wxT("project_1")));
 
 	// create the db files
-	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.Projects[0].DetectorDbFileName.GetFullPath()));
+	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
 	mvceditor::SqliteSqlScript(mvceditor::DetectorSqlSchemaAsset(), session, error); 
 
 	CHECK(DetectorCacheAction.Init(Globals));
 	DetectorCacheAction.BackgroundWork();
-	CHECK(Globals.Projects[0].DetectorDbFileName.FileExists());
+	CHECK(Globals.DetectorCacheDbFileName.FileExists());
 
 	CHECK(mvceditor::SqliteSchemaVersion(session) > 0);
 }
 
 TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorOldCacheDbFiles) {
-	TouchTestDir();
 	wxString error;
-
-	// need to make sure the directory exists
-	CreateProject(AbsoluteDir(wxT("project_1")), TestProjectDir);
+	CreateProject(AbsoluteDir(wxT("project_1")));
 
 	// create the db files
-	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.Projects[0].DetectorDbFileName.GetFullPath()));
+	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
 	mvceditor::SqliteSqlScript(mvceditor::DetectorSqlSchemaAsset(), session, error); 
 
 	// set the version to be an old one
@@ -158,11 +144,11 @@ TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorOldCacheDbFiles) {
 
 	CHECK(DetectorCacheAction.Init(Globals));
 	DetectorCacheAction.BackgroundWork();
-	CHECK(Globals.Projects[0].DetectorDbFileName.FileExists());
+	CHECK(Globals.DetectorCacheDbFileName.FileExists());
 
 	// not sure why I have to close the connection in order for the test to work
 	session.close();
-	session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.Projects[0].DetectorDbFileName.GetFullPath()));
+	session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
 	CHECK(mvceditor::SqliteSchemaVersion(session) > 0);
 }
 

@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2012 Roberto Perpuly
+ * @copyright  2012 Roberto Perpulybn
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
@@ -28,7 +28,7 @@
 ActionTestFixtureClass::ActionTestFixtureClass()
 	: wxEvtHandler() 
 	, RunningThreads(false)
-	, Globals() {		
+	, Globals() {
 	RunningThreads.AddEventHandler(this);
 }
 
@@ -36,14 +36,19 @@ ActionTestFixtureClass::~ActionTestFixtureClass() {
 	RunningThreads.RemoveEventHandler(this);
 }
 
-void ActionTestFixtureClass::CreateProject(const wxFileName& sourceDir, const wxString& cacheDir) {
+void ActionTestFixtureClass::InitTagCache(const wxString& cacheDir) {
+	Globals.TagCacheDbFileName.Assign(cacheDir, wxT("tag_cache.db"));
+	Globals.WorkingTagCacheDbFileName.Assign(cacheDir, wxT("tag_cache_working.db"));
+	Globals.DetectorCacheDbFileName.Assign(cacheDir, wxT("detector_cache.db"));
+}
+
+void ActionTestFixtureClass::CreateProject(const wxFileName& sourceDir) {
 	mvceditor::ProjectClass project;
 	
 	int projectNum = Globals.Projects.size() + 1;
 	project.Label = wxString::Format(wxT("project %d"), projectNum);
 	project.IsEnabled = true;
-	project.ResourceDbFileName.Assign(cacheDir, wxString::Format(wxT("tag_cache_%d.db"), projectNum));
-	project.DetectorDbFileName.Assign(cacheDir, wxString::Format(wxT("detector_cache_%d.db"), projectNum));
+	
 
 	mvceditor::SourceClass srcProject;
 	srcProject.RootDirectory.Assign(sourceDir);

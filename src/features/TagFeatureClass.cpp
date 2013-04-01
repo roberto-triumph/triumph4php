@@ -27,6 +27,7 @@
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 #include <globals/Events.h>
+#include <globals/TagList.h>
 #include <actions/TagWipeActionClass.h>
 #include <MvcEditor.h>
 #include <wx/artprov.h>
@@ -85,17 +86,17 @@ std::vector<mvceditor::TagClass> mvceditor::TagFeatureClass::SearchForResources(
 	std::vector<mvceditor::TagClass> matches;
 	bool exactOnly = text.Length() <= 2;
 	if (exactOnly) {
-		matches = App.Globals.TagCache.CollectFullyQualifiedResourceFromAll(mvceditor::WxToIcu(text));
+		matches = App.Globals.TagCache.ExactTags(mvceditor::WxToIcu(text));
 	}
 	else {
-		matches = App.Globals.TagCache.CollectNearMatchResourcesFromAll(mvceditor::WxToIcu(text));
+		matches = App.Globals.TagCache.NearMatchTags(mvceditor::WxToIcu(text));
 	}
 
 	// no need to show jump to results for native functions
-	// TODO: CollectNearResourceMatches shows resources from files that were recently deleted
+	// TODO: NearMatchTags shows resources from files that were recently deleted
 	// need to hide them / remove them
-	RemoveNativeMatches(matches);
-	KeepMatchesFromProjects(matches, projects);
+	mvceditor::TagListRemoveNativeMatches(matches);
+	mvceditor::TagListKeepMatchesFromProjects(matches, projects);
 	return matches;
 }
 
@@ -133,7 +134,7 @@ void mvceditor::TagFeatureClass::OnJump(wxCommandEvent& event) {
 		wxString term = codeControl->GetTextRange(startPos, endPos);
 	
 		std::vector<mvceditor::TagClass> matches = codeControl->GetCurrentSymbolResource();
-		RemoveNativeMatches(matches);
+		mvceditor::TagListRemoveNativeMatches(matches);
 		if (!matches.empty()) {
 			UnicodeString res = matches[0].ClassName + UNICODE_STRING_SIMPLE("::") + matches[0].Identifier;
 			if (matches.size() == 1) {
@@ -237,21 +238,25 @@ void mvceditor::TagFeatureClass::OnAppFileClosed(wxCommandEvent& event) {
 	// do we?
 	wxString fileName = event.GetString();
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	pelet::Versions version = GetEnvironment()->Php.Version;
+	bool isFileFromProject = false;
 	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
 
 		if (project->IsEnabled && project->IsAPhpSourceFile(fileName)) {
-			mvceditor::ProjectTagActionClass* thread = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
-			thread->InitForFile(*project, fileName, version);
+			isFileFromProject = true;
+			break;
+		}
+	}
+	if (isFileFromProject) {
+		mvceditor::ProjectTagActionClass* thread = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
+		thread->InitForFile(App.Globals, fileName);
 
-			// show user the error? not for now as they cannot do anything about it
-			// no need to track thread ID as this thread runs for a very short time since
-			// we are only indexing one file
-			wxThreadIdType threadId;
-			wxThreadError err = thread->CreateSingleInstance(threadId);
-			if (wxTHREAD_NO_ERROR != err) {
-				delete thread;
-			}
+		// show user the error? not for now as they cannot do anything about it
+		// no need to track thread ID as this thread runs for a very short time since
+		// we are only indexing one file
+		wxThreadIdType threadId;
+		wxThreadError err = thread->CreateSingleInstance(threadId);
+		if (wxTHREAD_NO_ERROR != err) {
+			delete thread;
 		}
 	}
 
@@ -260,37 +265,17 @@ void mvceditor::TagFeatureClass::OnAppFileClosed(wxCommandEvent& event) {
 	// this needs to be the same as mvceditor::CodeControlClass::GetIdString
 	wxString idString = wxString::Format(wxT("File_%d"), event.GetId());
 	App.Globals.TagCache.RemoveWorking(idString);
-}
-
-void mvceditor::TagFeatureClass::RemoveNativeMatches(std::vector<mvceditor::TagClass>& matches) const {
-	std::vector<mvceditor::TagClass>::iterator it = matches.begin();
-	while (it != matches.end()) {
-		if (it->IsNative) {
-			it = matches.erase(it);
-		}
-		else {
-			it++;
-		}
+	
+	wxString fileToDelete = fileName;
+	if (fileToDelete.IsEmpty()) {
+		fileToDelete = idString;
 	}
-}
-
-void mvceditor::TagFeatureClass::KeepMatchesFromProjects(std::vector<mvceditor::TagClass>& matches, std::vector<mvceditor::ProjectClass*> projects) const {
-	std::vector<mvceditor::TagClass>::iterator tag = matches.begin();
-	std::vector<mvceditor::ProjectClass*>::const_iterator project;
-	while (tag != matches.end()) {
-		bool isInProjects = false;
-		for (project = projects.begin(); project != projects.end(); ++project) {
-			isInProjects = (*project)->IsASourceFile(tag->GetFullPath());
-			if (isInProjects) {
-				break;
-			}
-		}
-		if (!isInProjects) {
-			tag = matches.erase(tag);
-		}
-		else {
-			tag++;
-		}
+	mvceditor::TagCleanWorkingCacheActionClass* action = new mvceditor::TagCleanWorkingCacheActionClass(App.RunningThreads, wxID_ANY, fileToDelete);
+	action->Init(App.Globals);
+	wxThreadIdType threadId;
+	wxThreadError err = action->CreateSingleInstance(threadId);
+	if (wxTHREAD_NO_ERROR != err) {
+		delete action;
 	}
 }
 
@@ -333,21 +318,25 @@ void mvceditor::TagFeatureClass::OnAppFileSaved(mvceditor::FileSavedEventClass& 
 	// a file is opened the url detector gets the latest resources
 	wxString fileName = event.GetCodeControl()->GetFileName();
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	pelet::Versions version = GetEnvironment()->Php.Version;
+	bool isFileFromProject = false;
 	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
 
 		if (project->IsEnabled && project->IsAPhpSourceFile(fileName)) {
-			mvceditor::ProjectTagActionClass* thread = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
-			thread->InitForFile(*project, fileName, version);
+			isFileFromProject = true;
+			break;
+		}
+	}
+	if (isFileFromProject) {
+		mvceditor::ProjectTagActionClass* thread = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
+		thread->InitForFile(App.Globals, fileName);
 
-			// show user the error? not for now as they cannot do anything about it
-			// no need to track thread ID as this thread runs for a very short time since
-			// we are only indexing one file
-			wxThreadIdType threadId;
-			wxThreadError err = thread->CreateSingleInstance(threadId);
-			if (wxTHREAD_NO_ERROR != err) {
-				delete thread;
-			}
+		// show user the error? not for now as they cannot do anything about it
+		// no need to track thread ID as this thread runs for a very short time since
+		// we are only indexing one file
+		wxThreadIdType threadId;
+		wxThreadError err = thread->CreateSingleInstance(threadId);
+		if (wxTHREAD_NO_ERROR != err) {
+			delete thread;
 		}
 	}
 	event.Skip();

@@ -78,7 +78,7 @@ bool mvceditor::ConfigTagDetectorActionClass::Init(mvceditor::GlobalsClass& glob
 						params.PhpIncludePath.Assign(mvceditor::PhpDetectorsBaseAsset());
 						params.ScriptName = scriptName->c_str();
 						params.SourceDir.AssignDir(source->RootDirectory.GetPath());
-						params.OutputDbFileName = project->DetectorDbFileName.GetFullPath().c_str();
+						params.OutputDbFileName = globals.DetectorCacheDbFileName.GetFullPath().c_str();
 						ParamsQueue.push(params);
 					}
 				}
