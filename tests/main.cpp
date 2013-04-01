@@ -251,7 +251,7 @@ int main(int argc, char **argv) {
 	}
 	
 	int ret = 0;
-	if (argc > 0 && strcmp("--all", argv[0]) == 0) {
+	if (argc > 1 && strcmp("--all", argv[1]) == 0) {
 		ret = UnitTest::RunAllTests();
 	}
 	else {
