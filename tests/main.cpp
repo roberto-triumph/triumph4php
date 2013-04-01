@@ -22,6 +22,7 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
+#include <cstdarg>
 #include <UnitTest++.h>
 #include <TestReporterStdout.h>
 #include <TestRunner.h>
@@ -35,7 +36,6 @@
 #include <string>
 #include <algorithm>
 #include <iostream>
-#include <cstdarg>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
