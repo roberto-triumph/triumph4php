@@ -312,6 +312,8 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchClassesOrFi
 			matches = NearMatchFiles(tagSearch.GetFileName(), tagSearch.GetLineNumber(), fileTagIds);
 			break;
 		case mvceditor::TagSearchClass::CLASS_NAME:
+		case mvceditor::TagSearchClass::CLASS_NAME_METHOD_NAME:
+		case mvceditor::TagSearchClass::NAMESPACE_NAME:
 			matches = NearMatchNonMembers(tagSearch, true, false, false);
 			if (matches.empty()) {
 				matches = NearMatchFiles(tagSearch.GetClassName(), tagSearch.GetLineNumber(), fileTagIds);
