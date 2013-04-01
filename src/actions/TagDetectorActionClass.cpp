@@ -78,7 +78,7 @@ bool mvceditor::TagDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
 						params.PhpIncludePath.Assign(mvceditor::PhpDetectorsBaseAsset());
 						params.ScriptName = scriptName->c_str();
 						params.SourceDir.AssignDir(source->RootDirectory.GetPath());
-						params.OutputDbFileName = project->DetectorDbFileName.GetFullPath().c_str();
+						params.OutputDbFileName = globals.DetectorCacheDbFileName.GetFullPath().c_str();
 						ParamsQueue.push(params);
 					}
 				}
@@ -160,34 +160,6 @@ void mvceditor::TagDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
 void mvceditor::TagDetectorActionClass::OnProcessInProgress(wxCommandEvent &event) {
 	wxCommandEvent inProgressEvent(mvceditor::EVENT_WORK_IN_PROGRESS);
 	PostEvent(inProgressEvent);
-}
-
-mvceditor::TagDetectorInitActionClass::TagDetectorInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: InitializerActionClass(runningThreads, eventId) {
-
-}
-
-void mvceditor::TagDetectorInitActionClass::Work(mvceditor::GlobalsClass &globals) {
-	SetStatus(_("Tag Detection Init"));
-
-	// initialize the detected tag cache only the enabled projects	
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
-		if (project->IsEnabled && !project->AllPhpSources().empty()) {
-
-			// register the detector tag DB file now so that it is available for code completion
-			// even though we know it is stale. The user is notified that the
-			// cache is stale and may not have all of the results
-			// the tag cache will own these pointers
-			mvceditor::GlobalCacheClass* projectCache = new mvceditor::GlobalCacheClass;
-			projectCache->InitDetectorTag(project->DetectorDbFileName);
-			globals.TagCache.RegisterGlobal(projectCache);
-		}
-	}
-}
-
-wxString mvceditor::TagDetectorInitActionClass::GetLabel() const {
-	return _("Tag detector initialization");
 }
 
 

@@ -319,10 +319,9 @@ public:
 	 * @param parsedExpression the expression to resolve. This is usually the result of the ParserClass::ParserExpression
 	 * @param expressionScope the scope where parsed expression is located.  The scope let's us know which variables are
 	 *        available. See ScopeFinderClass for more info.
-	 * @param allResourceFindesr all of the tag finders to look in
-	 * @param openedTagFinders the tag cache will be used to look up class methods and function return
-	 *        values. This map should contain only cache for files that are currently being edited.  The key
-	 *        of the map is the file's full path, the value is the cache itself.
+	 * @param allResourceFinders all of the tag finders to look in
+	 * @param openedTagFinder the tag cache that contains the files being edited. This is used to tell when 
+	 *        a tag is dirty
 	 * @param autoCompleteVariableList the results of the matches; these are the names of the variables that
 	 *        are "near matches" to the parsed expression. This will be filled only when parsedExpression is a variable. 
 	 * @param autoCompleteResourceList the results of the matches; these are the names of the items that
@@ -335,7 +334,7 @@ public:
 	 */
 	void ExpressionCompletionMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope, 
 		const std::vector<mvceditor::TagFinderClass*>& allTagFinders,
-		const std::map<wxString, TagFinderClass*>& openedTagFinders,
+		TagFinderClass* openedTagFinders,
 		std::vector<UnicodeString>& autoCompleteVariableList,
 		std::vector<TagClass>& autoCompleteResourceList,
 		bool doDuckTyping,
@@ -359,9 +358,8 @@ public:
 	 * @param expressionScope the scope where parsed expression is located.  The scope let's us know which variables are
 	 *        available. See ScopeFinderClass for more info.
 	 * @param allTagFinders the tag finders to look in
-	 * @param openedTagFinders the tag cache will be used to look up class methods and function return
-	 *        values. This map should contain only cache for files that are currently being edited.  The key
-	 *        of the map is the file's full path, the value is the cache itself
+ * @param openedTagFinder the tag cache that contains the files being edited. This is used to tell when 
+	 *        a tag is dirty
 	 * @param resourceMatches the tag matches; these are the names of the items that
 	 *        are "near matches" to the parsed expression.
 	 * @param doDuckTyping if an expression chain could not be fully resolved; then we could still
@@ -373,7 +371,7 @@ public:
 	 */
 	void ResourceMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope, 
 		const std::vector<mvceditor::TagFinderClass*>& allTagFinders,
-		const std::map<wxString, TagFinderClass*>& openedTagFinders,
+		TagFinderClass* openedTagFinder,
 		std::vector<TagClass>& resourceMatches,
 		bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 		SymbolTableMatchErrorClass& error) const;
@@ -461,16 +459,12 @@ private:
  * files).  If this returns true, it means that the tag may be stale.
  * None of the given resourc finders pointers will be owned by this class.
  *
- * @param finder a collection of finders that have cached a single file; the key of the map is filename 
- *        and the value is the cache for that file.
+ * @param openedFinder the WorkingTagFinder
  * @param tag the tag to check
- * @param tagFinder the finder that collected the tag; it may be
- *        one of the finders in the map or it may be another stand-alone one.
+ * @param tagFinder the finder that collected the tag
  * @return bool TRUE if tag is stale (should not be shown to the user)
  */
-bool IsResourceDirty(const std::map<wxString, TagFinderClass*>& finders, 
-											 const TagClass& tag, 
-											 mvceditor::TagFinderClass* tagFinder);
+bool IsResourceDirty(mvceditor::TagFinderClass* openedFinder, const mvceditor::TagClass& tag, mvceditor::TagFinderClass* matchTagFinder);
 
 /**
  * This class can be used to determine what function or namespace that a

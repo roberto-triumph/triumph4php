@@ -36,7 +36,7 @@ std::vector<UnicodeString> mvceditor::TagFinderListClassParents(UnicodeString cl
 		// as it looks; class hierarchies are usually not very deep (1-4 parents)
 		found = false;
 		for (size_t i = 0; i < allTagFinders.size(); ++i) {
-			UnicodeString parentClass = allTagFinders[i]->GetResourceParentClassName(classToLookup);
+			UnicodeString parentClass = allTagFinders[i]->ParentClassName(classToLookup);
 			if (!parentClass.isEmpty()) {
 				found = true;
 				parents.push_back(parentClass);
@@ -60,13 +60,16 @@ std::vector<UnicodeString> mvceditor::TagFinderListClassUsedTraits(const Unicode
 	classesToLookup.push_back(className);
 	classesToLookup.insert(classesToLookup.end(), parentClassNames.begin(), parentClassNames.end());
 	std::vector<UnicodeString> usedTraits;
+
+	// TODO propagate from enabled projects
+	std::vector<wxFileName> emptyVector;
 	bool found = false;
 	do {
 		found = false;
 		std::vector<UnicodeString> nextTraitsToLookup;
 		for (std::vector<UnicodeString>::iterator it = classesToLookup.begin(); it != classesToLookup.end(); ++it) {
 			for (size_t i = 0; i < allTagFinders.size(); ++i) {
-				std::vector<UnicodeString> traits = allTagFinders[i]->GetResourceTraits(*it, methodName);
+				std::vector<UnicodeString> traits = allTagFinders[i]->GetResourceTraits(*it, methodName, emptyVector);
 				if (!traits.empty()) {
 					found = true;
 					nextTraitsToLookup.insert(nextTraitsToLookup.end(), traits.begin(), traits.end());

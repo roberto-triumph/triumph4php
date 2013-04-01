@@ -80,8 +80,8 @@ bool mvceditor::TemplateFileTagsDetectorActionClass::Init(mvceditor::GlobalsClas
 						params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset();
 						params.ScriptName = *scriptName;
 						params.SourceDir = source->RootDirectory;
-						params.DetectorDbFileName = project->DetectorDbFileName.GetFullPath();
-						params.OutputDbFileName = project->DetectorDbFileName.GetFullPath();
+						params.DetectorDbFileName = globals.DetectorCacheDbFileName.GetFullPath();
+						params.OutputDbFileName = globals.DetectorCacheDbFileName.GetFullPath();
 						if (params.ScriptName.FileExists()) {
 							ParamsQueue.push(params);
 						}

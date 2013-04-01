@@ -226,13 +226,13 @@ void ProfileNativeFunctionsParsing() {
 	tagFinder.Init(&session);
 	
 	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("stristr"));
-	std::vector<mvceditor::TagClass> matches = tagFinder.CollectNearMatchResources(tagSearch);
+	std::vector<mvceditor::TagClass> matches = tagFinder.NearMatchTags(tagSearch);
 	found = !matches.empty();
 	time = wxGetLocalTimeMillis() - time;
 	printf("time for tagFinder on php.db:%ld ms found:%d\n", time.ToLong(), (int)found);
 	
 	time = wxGetLocalTimeMillis();
-	matches = tagFinder.CollectNearMatchResources(UNICODE_STRING_SIMPLE("mysql_query"));
+	matches = tagFinder.NearMatchTags(UNICODE_STRING_SIMPLE("mysql_query"));
 	time = wxGetLocalTimeMillis() - time;
 	found = !matches.empty();
 	printf("time for tagFinder on php.db after caching:%ld ms found:%d\n", time.ToLong(), (int)found);
@@ -273,7 +273,7 @@ void ProfileResourceFinderOnLargeProject() {
 	while (search.More()) {
 		search.Walk(tagParser);
 	}
-	std::vector<mvceditor::TagClass> matches = tagFinder.CollectNearMatchResources(UNICODE_STRING_SIMPLE("ExtendedRecordSetForUnitTestAddGetLeftJoin"));
+	std::vector<mvceditor::TagClass> matches = tagFinder.NearMatchTags(UNICODE_STRING_SIMPLE("ExtendedRecordSetForUnitTestAddGetLeftJoin"));
 	time = wxGetLocalTimeMillis() - time;
 	size_t found =  matches.size();
 	printf("time for tagFinder on entire project:%ld ms found:%d\n", time.ToLong(), (int)found);
@@ -284,7 +284,7 @@ void ProfileResourceFinderOnLargeProject() {
 		search.Walk(tagParser);
 	}
 	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("Record::get"));
-	matches = tagFinder.CollectNearMatchResources(tagSearch);
+	matches = tagFinder.NearMatchTags(tagSearch);
 	time = wxGetLocalTimeMillis() - time;
 	found = matches.size();
 	printf("time for tagFinder on entire project after caching:%ld ms found:%d\n", time.ToLong(), (int)found);

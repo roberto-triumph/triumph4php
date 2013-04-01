@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <language/TagParserClass.h>
+#include <language/FileTags.h>
 #include <search/FinderClass.h>
 #include <globals/String.h>
 #include <globals/Assets.h>
@@ -55,7 +56,7 @@ std::vector<mvceditor::TagClass> AllResources(soci::session& session) {
 	std::string sql;
 	sql += "SELECT r.file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
-	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) WHERE ";
+	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) ";
 	sql += " ORDER BY key";
 	
 	std::vector<mvceditor::TagClass> matches;
@@ -121,7 +122,8 @@ std::vector<mvceditor::TagClass> AllResources(soci::session& session) {
 			
 		// ATTN: at some point bubble these exceptions up?
 		// to avoid unreferenced local variable warnings in MSVC
-		e.what();
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxASSERT_MSG(false, msg);
 	}
 	return matches;
 }
@@ -136,6 +138,7 @@ mvceditor::TagParserClass::TagParserClass()
 	, Session(NULL)
 	, Transaction(NULL)
 	, FileParsingBufferSize(32)
+	, FilesParsed(0)
 	, IsCacheInitialized(false) {
 	Parser.SetClassObserver(this);
 	Parser.SetClassMemberObserver(this);
@@ -162,26 +165,22 @@ void mvceditor::TagParserClass::Init(soci::session* session, int fileParsingBuff
 }
 
 void mvceditor::TagParserClass::BeginSearch() {
-	if (IsCacheInitialized) {
-
-		// rollback any previous transaction, as commits should be explicit
-		if (Transaction) {
-			delete Transaction;
-		}
-		try {
-			Transaction = new soci::transaction(*Session);
-		} catch (std::exception& e) {
-			delete Transaction;
-			Transaction = NULL;
-
-			// ATTN: at some point bubble these exceptions up?
-			// to avoid unreferenced local variable warnings in MSVC
-			e.what();
-		}
-	}
 	FileParsingCache.clear();
 	NamespaceCache.clear();
 	TraitCache.clear();
+
+	// start a transaction here
+	FilesParsed = 0;
+	try {
+		Transaction = new soci::transaction(*Session);
+	} catch (std::exception& e) {
+		
+		// ATTN: at some point bubble these exceptions up?
+		// to avoid unreferenced local variable warnings in MSVC
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxUnusedVar(msg);
+		wxASSERT_MSG(false, msg);
+	}
 
 	FileParsingCache.clear();
 	FileParsingCache.resize(0);
@@ -189,22 +188,19 @@ void mvceditor::TagParserClass::BeginSearch() {
 }
 
 void mvceditor::TagParserClass::EndSearch() {
-	if (Transaction) {
-
-		// commit until the very end; profiling showed that sqlite3 was
-		// being flushed to disk after every file and that was 
-		// resulting in very slow walks.
-		try {
-			Transaction->commit();
-		} catch (std::exception& e) {
-			
-			// ATTN: at some point bubble these exceptions up?
-			// to avoid unreferenced local variable warnings in MSVC
-			e.what();
-		}
-		delete Transaction;
-		Transaction = NULL;
+	try {
+		Transaction->commit();
+	} catch (std::exception& e) {
+		
+		// ATTN: at some point bubble these exceptions up?
+		// to avoid unreferenced local variable warnings in MSVC
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxUnusedVar(msg);
+		wxASSERT_MSG(false, msg);
 	}
+	delete Transaction;
+	Transaction = NULL;
+
 	FileParsingCache.clear();
 	NamespaceCache.clear();
 	TraitCache.clear();
@@ -287,7 +283,7 @@ void mvceditor::TagParserClass::BuildResourceCacheForFile(const wxString& fullPa
 	Parser.ScanString(code, results);
 
 	PersistResources(FileParsingCache, fileTag.FileId);
-	PersistTraits(TraitCache);
+	PersistTraits(TraitCache, fileTag.FileId);
 	EndSearch();
 }
 
@@ -328,9 +324,30 @@ void mvceditor::TagParserClass::BuildResourceCache(const wxString& fullPath, boo
 			pelet::LintResultsClass lintResults;
 			wxFFile file(fullPath, wxT("rb"));
 			Parser.ScanFile(file.fp(), mvceditor::WxToIcu(fullPath), lintResults);
+	
 			PersistResources(FileParsingCache, fileTag.FileId);
-			PersistTraits(TraitCache);
+			PersistTraits(TraitCache, fileTag.FileId);
 			FileParsingCache.clear();
+
+			FilesParsed++;
+			if (FilesParsed % 200 == 0) {
+				try {
+
+					// commit at regular intervals.  we dont want to wait until
+					// the end to commit because we dont want to lock the db until
+					// the end of parsing of all files in all projects
+					Transaction->commit();
+					delete Transaction;
+					Transaction = new soci::transaction(*Session);
+				} catch (std::exception& e) {
+					
+					// ATTN: at some point bubble these exceptions up?
+					// to avoid unreferenced local variable warnings in MSVC
+					wxString msg = mvceditor::CharToWx(e.what());
+					wxUnusedVar(msg);
+					wxASSERT_MSG(false, msg);
+				}
+			}
 		}
 	}
 }
@@ -607,6 +624,7 @@ void mvceditor::TagParserClass::RemovePersistedResources(const std::vector<int>&
 	}
 	stream << ")";
 	try {
+		// TODO remove trait_resources
 		Session->once << "DELETE FROM resources " << stream.str();
 		Session->once << "DELETE FROM file_items " << stream.str();
 	} catch (std::exception& e) {
@@ -620,36 +638,37 @@ void mvceditor::TagParserClass::RemovePersistedResources(const std::vector<int>&
 void mvceditor::TagParserClass::Print() {
 	UFILE *out = u_finit(stdout, NULL, NULL);
 	std::vector<mvceditor::TagClass> matches = AllResources(*Session);
+	u_fprintf(out, "resource count=%d\n", matches.size());
 	for (std::vector<mvceditor::TagClass>::const_iterator it = matches.begin(); it != matches.end(); ++it) {
 		switch (it->Type) {
 			case mvceditor::TagClass::CLASS :
 			case mvceditor::TagClass::DEFINE :
 			case mvceditor::TagClass::FUNCTION :
 
-				u_fprintf(out, "RESOURCE: Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S Type=%d\n",
+				u_fprintf(out, "RESOURCE: Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S Type=%d FileID=%d\n",
 					it->Key.length(), it->Key.getBuffer(),
 					it->Identifier.length(), it->Identifier.getBuffer(),  
 					it->ClassName.length(), it->ClassName.getBuffer(),
 					it->NamespaceName.length(), it->NamespaceName.getBuffer(),
-					it->Type);
+					it->Type, it->FileTagId);
 				break;
 			case mvceditor::TagClass::CLASS_CONSTANT :
 			case mvceditor::TagClass::MEMBER :
 			case mvceditor::TagClass::METHOD :
-				u_fprintf(out, "MEMBER: Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S ReturnType=%.*S Type=%d\n", 
+				u_fprintf(out, "MEMBER: Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S ReturnType=%.*S Type=%d FileID=%d\n", 
 					it->Key.length(), it->Key.getBuffer(),
 					it->Identifier.length(), it->Identifier.getBuffer(),  
 					it->ClassName.length(), it->ClassName.getBuffer(),
 					it->NamespaceName.length(), it->NamespaceName.getBuffer(),
-					it->ReturnType.length(), it->ReturnType.getBuffer(), it->Type);
+					it->ReturnType.length(), it->ReturnType.getBuffer(), it->Type, it->FileTagId);
 				break;
 			case mvceditor::TagClass::NAMESPACE :
-				u_fprintf(out, "NAMESPACE:Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S  Type=%d\n", 
+				u_fprintf(out, "NAMESPACE:Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S  Type=%d FileID=%d\n", 
 					it->Key.length(), it->Key.getBuffer(),
 					it->Identifier.length(), it->Identifier.getBuffer(),  
 					it->ClassName.length(), it->ClassName.getBuffer(),
 					it->NamespaceName.length(), it->NamespaceName.getBuffer(),
-					it->Type);
+					it->Type, it->FileTagId);
 				break;
 		}
 	}
@@ -745,7 +764,7 @@ bool mvceditor::TagParserClass::FindFileTagByFullPathExact(const wxString& fullP
 	return foundFile;
 }
 
-void mvceditor::TagParserClass::Wipe() {
+void mvceditor::TagParserClass::WipeAll() {
 	FileParsingCache.clear();
 	NamespaceCache.clear();
 	TraitCache.clear();
@@ -754,12 +773,62 @@ void mvceditor::TagParserClass::Wipe() {
 		try {
 			Session->once << "DELETE FROM file_items;";
 			Session->once << "DELETE FROM resources;";
+			Session->once << "DELETE FROM trait_resources;";
 		} catch (std::exception& e) {
 			
 			// ATTN: at some point bubble these exceptions up?
 			// to avoid unreferenced local variable warnings in MSVC
 			e.what();
 		}
+	}
+}
+
+void mvceditor::TagParserClass::DeleteDirectories(const std::vector<wxFileName>& dirs) {
+	FileParsingCache.clear();
+	NamespaceCache.clear();
+	TraitCache.clear();
+
+	if (IsCacheInitialized) {
+		try {
+			bool error = false;
+			wxString errorMsg;
+			std::vector<int> fileTagIds = mvceditor::FileTagIdsForDirs(*Session, dirs, error, errorMsg);
+			wxASSERT_MSG(!error, errorMsg);
+			if (!fileTagIds.empty()) {
+				std::ostringstream stream;
+				stream << "file_item_id IN(";
+				for (size_t i = 0; i < fileTagIds.size(); ++i) {
+					stream << fileTagIds[i];
+					if (i < (fileTagIds.size() - 1)) {
+						stream << ",";
+					}
+				}
+				stream << ")";
+				
+				std::string sql = "DELETE FROM resources WHERE " + stream.str();
+				Session->once << sql;
+
+				sql = "DELETE FROM trait_resources WHERE " + stream.str();
+				Session->once << sql;
+
+				sql = "DELETE FROM file_items WHERE " + stream.str();
+				Session->once << sql;
+			}
+		} catch (std::exception& e) {
+			
+			// ATTN: at some point bubble these exceptions up?
+			// to avoid unreferenced local variable warnings in MSVC
+			e.what();
+		}
+	}
+}
+
+void mvceditor::TagParserClass::DeleteFromFile(const wxString& fullPath) {
+	mvceditor::FileTagClass fileTag;
+	if (FindFileTagByFullPathExact(fullPath, fileTag)) {
+		std::vector<int> fileTagIdsToRemove;
+		fileTagIdsToRemove.push_back(fileTag.FileId);
+		RemovePersistedResources(fileTagIdsToRemove);
 	}
 }
 
@@ -827,15 +896,16 @@ void mvceditor::TagParserClass::PersistResources(const std::vector<mvceditor::Ta
 }
 
 void mvceditor::TagParserClass::PersistTraits(
-	const std::map<UnicodeString, std::vector<mvceditor::TraitTagClass>, UnicodeStringComparatorClass>& traitMap) {
+	const std::map<UnicodeString, std::vector<mvceditor::TraitTagClass>, UnicodeStringComparatorClass>& traitMap,
+	int fileTagId) {
 	if (!IsCacheInitialized) {
 		return;
 	}
 	std::string sql;
 	sql += "INSERT OR IGNORE INTO trait_resources(";
-	sql += "key, class_name, namespace_name, trait_name, ";
+	sql += "key, file_item_id, class_name, namespace_name, trait_name, ";
 	sql += "trait_namespace_name, aliases, instead_ofs) VALUES ("; 
-	sql += "?, ?, ?, ?, ";
+	sql += "?, ?, ?, ?, ?, ";
 	sql += "?, ?, ?)";
 	std::string key;
 	std::string className;
@@ -847,7 +917,7 @@ void mvceditor::TagParserClass::PersistTraits(
 
 	try {
 		soci::statement stmt = (Session->prepare << sql,
-			soci::use(key), soci::use(className), soci::use(namespaceName), soci::use(traitClassName),
+			soci::use(key), soci::use(fileTagId), soci::use(className), soci::use(namespaceName), soci::use(traitClassName),
 			soci::use(traitNamespaceName), soci::use(aliases), soci::use(insteadOfs)
 		);
 		std::map<UnicodeString, std::vector<mvceditor::TraitTagClass>, UnicodeStringComparatorClass>::const_iterator it;
@@ -882,7 +952,9 @@ void mvceditor::TagParserClass::PersistTraits(
 			
 		// ATTN: at some point bubble these exceptions up?
 		// to avoid unreferenced local variable warnings in MSVC
-		e.what();
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxUnusedVar(msg);
+		wxASSERT_MSG(false, msg);
 	}
 }
 

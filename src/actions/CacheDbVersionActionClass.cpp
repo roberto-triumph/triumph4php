@@ -31,13 +31,13 @@
  * This number must match the number on the schema_version table
  * of the tags db; if numbers do not match the db will be recreated.
  */
-static const int SCHEMA_VERSION_TAGS = 1;
+static const int SCHEMA_VERSION_TAGS = 3;
 
 /**
  * This number must match the number on the schema_version table of the
  * detectors db; if numbers do not match the db will be recreated.
  */
-static const int SCHEMA_VERSION_DETECTOR = 2;
+static const int SCHEMA_VERSION_DETECTOR = 3;
 
 mvceditor::TagCacheDbVersionActionClass::TagCacheDbVersionActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: ActionClass(runningThreads, eventId)
@@ -48,19 +48,14 @@ mvceditor::TagCacheDbVersionActionClass::TagCacheDbVersionActionClass(mvceditor:
 
 bool mvceditor::TagCacheDbVersionActionClass::Init(mvceditor::GlobalsClass& globals) {
 	SetStatus(_("Tag Cache Check"));
-	bool ret = false;
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
-		if (project->IsEnabled) {
 
-			// don't think wxFileName copy constructor is a deep clone
-			// we need a deep clone since we access this in the background thread
-			wxFileName file(project->ResourceDbFileName.GetFullPath());
-			TagDbs.push_back(file);
-			ret = true;
-		}
-	}
-	return ret;
+	// don't think wxFileName copy constructor is a deep clone
+	// we need a deep clone since we access this in the background thread
+	wxFileName file(globals.TagCacheDbFileName.GetFullPath());
+	TagDbs.push_back(file);
+	wxFileName workingFile(globals.WorkingTagCacheDbFileName.GetFullPath());
+	TagDbs.push_back(workingFile);
+	return true;
 }
 
 void mvceditor::TagCacheDbVersionActionClass::BackgroundWork() {
@@ -102,19 +97,12 @@ mvceditor::DetectorCacheDbVersionActionClass::DetectorCacheDbVersionActionClass(
 
 bool mvceditor::DetectorCacheDbVersionActionClass::Init(mvceditor::GlobalsClass& globals) {
 	SetStatus(_("Detector Cache Check"));
-	bool ret = false;
-	std::vector<mvceditor::ProjectClass>::iterator project;
-	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
-		if (project->IsEnabled) {
-			
-			// don't think wxFileName copy constructor is a deep clone
-			// we need a deep clone since we access this in the background thread
-			wxFileName file(project->DetectorDbFileName.GetFullPath());
-			DetectorDbs.push_back(file);
-			ret = true;
-		}
-	}
-	return ret;
+
+	// don't think wxFileName copy constructor is a deep clone
+	// we need a deep clone since we access this in the background thread
+	wxFileName file(globals.DetectorCacheDbFileName.GetFullPath());
+	DetectorDbs.push_back(file);
+	return true;
 }
 
 void mvceditor::DetectorCacheDbVersionActionClass::BackgroundWork() {

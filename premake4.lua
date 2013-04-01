@@ -220,17 +220,17 @@ solution "mvc-editor"
 		configuration { "Debug", "vs2008" }
 			includedirs { "$(WXWIN)/contrib/include/" }
 			links { "wxmsw28ud_stc" }
-			postbuildcommands { "cd " .. normalizepath("Debug") .. " && tests.exe" }
+			postbuildcommands { "cd " .. normalizepath("Debug") .. " && tests.exe --all" }
 		configuration { "Debug", "gmake or codelite" }
 			links { "wx_gtk2ud_stc-2.8" }
-			postbuildcommands { "cd " .. normalizepath("Debug") .. " && ./tests" }
+			postbuildcommands { "cd " .. normalizepath("Debug") .. " && ./tests --all" }
 		configuration { "Release", "vs2008" }
 			includedirs { "$(WXWIN)/contrib/include/" }
 			links { "wxmsw28u_stc" }
-			postbuildcommands { "cd " .. normalizepath("Release") .. " && tests.exe"  }
+			postbuildcommands { "cd " .. normalizepath("Release") .. " && tests.exe --all"  }
 		configuration { "Release", "gmake or codelite" }
 			links { "wx_gtk2u_stc-2.8" }
-			postbuildcommands { "cd " .. normalizepath("Release") .. " && ./tests" }
+			postbuildcommands { "cd " .. normalizepath("Release") .. " && ./tests --all" }
 
 	project "tests"
 		language "C++"

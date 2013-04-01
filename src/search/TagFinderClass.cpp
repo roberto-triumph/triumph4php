@@ -27,6 +27,7 @@
 #include <globals/String.h>
 #include <globals/Sqlite.h>
 #include <globals/Errors.h>
+#include <language/FileTags.h>
 #include <wx/filename.h>
 #include <algorithm>
 #include <fstream>
@@ -50,10 +51,21 @@ static UnicodeString QualifyName(const UnicodeString& namespaceName, const Unico
 	return qualifiedName;
 }
 
+static void InClause(const std::vector<int>& values, std::ostringstream& stream) {
+	size_t size = values.size();
+	for (size_t i = 0; i < size; ++i) {
+		stream << values[i];
+		if (i < (size - 1)) {
+			stream << ",";
+		}
+	}
+}
+
 mvceditor::TagSearchClass::TagSearchClass(UnicodeString resourceQuery)
 	: FileName()
 	, ClassName()
 	, MethodName()
+	, Dirs()
 	, ResourceType(FILE_NAME)
 	, LineNumber(0) {
 	ResourceType = CLASS_NAME;
@@ -131,6 +143,14 @@ void mvceditor::TagSearchClass::SetTraits(const std::vector<UnicodeString>& trai
 
 std::vector<UnicodeString> mvceditor::TagSearchClass::GetTraits() const {
 	return Traits;
+}
+
+void mvceditor::TagSearchClass::SetDirs(const std::vector<wxFileName>& dirs) {
+	Dirs = dirs;
+}
+
+std::vector<wxFileName> mvceditor::TagSearchClass::GetDirs() const {
+	return Dirs;
 }
 
 UnicodeString mvceditor::TagSearchClass::GetClassName() const {
@@ -238,7 +258,7 @@ bool mvceditor::TagFinderClass::GetResourceMatchPosition(const mvceditor::TagCla
 	return false;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchResources(
+std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchTags(
 	const mvceditor::TagSearchClass& tagSearch,
 	bool doCollectFileNames) {
 
@@ -248,29 +268,33 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchReso
 	// is called while the user is typing text.
 	// take care when coding; make sure that any code called by this method does not touch the file system
 	std::vector<mvceditor::TagClass> matches;
+	bool error = false;
+	wxString errorMsg;
+	std::vector<int> fileTagIds = mvceditor::FileTagIdsForDirs(*Session, tagSearch.GetDirs(), error, errorMsg);
+	wxASSERT_MSG(!error, errorMsg);
 	switch (tagSearch.GetResourceType()) {
 		case mvceditor::TagSearchClass::FILE_NAME:
 		case mvceditor::TagSearchClass::FILE_NAME_LINE_NUMBER:
-			matches = CollectNearMatchFiles(tagSearch.GetFileName(), tagSearch.GetLineNumber());
+			matches = NearMatchFiles(tagSearch.GetFileName(), tagSearch.GetLineNumber(), fileTagIds);
 			break;
 		case mvceditor::TagSearchClass::CLASS_NAME:
-			matches = CollectNearMatchNonMembers(tagSearch, true, true, true);
+			matches = NearMatchNonMembers(tagSearch, true, true, true);
 			if (matches.empty() && doCollectFileNames) {
-				matches = CollectNearMatchFiles(tagSearch.GetClassName(), tagSearch.GetLineNumber());
+				matches = NearMatchFiles(tagSearch.GetClassName(), tagSearch.GetLineNumber(), fileTagIds);
 			}
 			break;
 		case mvceditor::TagSearchClass::CLASS_NAME_METHOD_NAME:
-			matches = CollectNearMatchMembers(tagSearch);
+			matches = NearMatchMembers(tagSearch);
 			break;
 		case mvceditor::TagSearchClass::NAMESPACE_NAME:
-			matches = CollectNearMatchNamespaces(tagSearch);
+			matches = NearMatchNamespaces(tagSearch);
 			break;
 	}
 	sort(matches.begin(), matches.end());
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchClassesOrFiles(
+std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchClassesOrFiles(
 	const mvceditor::TagSearchClass& tagSearch) {
 
 	// at one point there was a check here to see if the  tag files existed
@@ -278,15 +302,21 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchClas
 	// is called while the user is typing text.
 	// take care when coding; make sure that any code called by this method does not touch the file system
 	std::vector<mvceditor::TagClass> matches;
+	bool error = false;
+	wxString errorMsg;
+	std::vector<int> fileTagIds = mvceditor::FileTagIdsForDirs(*Session, tagSearch.GetDirs(), error, errorMsg);
+	wxASSERT_MSG(!error, errorMsg);
 	switch (tagSearch.GetResourceType()) {
 		case mvceditor::TagSearchClass::FILE_NAME:
 		case mvceditor::TagSearchClass::FILE_NAME_LINE_NUMBER:
-			matches = CollectNearMatchFiles(tagSearch.GetFileName(), tagSearch.GetLineNumber());
+			matches = NearMatchFiles(tagSearch.GetFileName(), tagSearch.GetLineNumber(), fileTagIds);
 			break;
 		case mvceditor::TagSearchClass::CLASS_NAME:
-			matches = CollectNearMatchNonMembers(tagSearch, true, false, false);
+		case mvceditor::TagSearchClass::CLASS_NAME_METHOD_NAME:
+		case mvceditor::TagSearchClass::NAMESPACE_NAME:
+			matches = NearMatchNonMembers(tagSearch, true, false, false);
 			if (matches.empty()) {
-				matches = CollectNearMatchFiles(tagSearch.GetClassName(), tagSearch.GetLineNumber());
+				matches = NearMatchFiles(tagSearch.GetClassName(), tagSearch.GetLineNumber(), fileTagIds);
 			}
 			break;
 	}
@@ -294,7 +324,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchClas
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchNonMembers(const mvceditor::TagSearchClass& tagSearch, bool doClasses, bool doDefines, bool doFunctions) {
+std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchNonMembers(const mvceditor::TagSearchClass& tagSearch, bool doClasses, bool doDefines, bool doFunctions) {
 	std::string key = mvceditor::IcuToChar(tagSearch.GetClassName());
 	std::vector<int> types;
 	if (doClasses) {
@@ -306,16 +336,20 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchNonM
 	if (doFunctions) {
 		types.push_back(mvceditor::TagClass::FUNCTION);
 	}
-	std::vector<mvceditor::TagClass> matches = FindByKeyExactAndTypes(key, types, true);
+	bool error = false;
+	wxString errorMsg;
+	std::vector<int> fileTagIds = mvceditor::FileTagIdsForDirs(*Session, tagSearch.GetDirs(), error, errorMsg);
+	wxASSERT_MSG(!error, errorMsg);
+	std::vector<mvceditor::TagClass> matches = FindByKeyExactAndTypes(key, types, fileTagIds, true);
 	if (matches.empty()) {
 	
 		// if nothing matches exactly then execure the LIKE query
-		matches = FindByKeyStartAndTypes(key, types, true);
+		matches = FindByKeyStartAndTypes(key, types, fileTagIds, true);
 	}
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchMembers(const mvceditor::TagSearchClass& tagSearch) {
+std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchMembers(const mvceditor::TagSearchClass& tagSearch) {
 	std::vector<mvceditor::TagClass> matches;
 	
 	// when looking for members we need to look
@@ -326,14 +360,17 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchMemb
 	classesToSearch.push_back(tagSearch.GetClassName());
 	std::vector<UnicodeString> traits = tagSearch.GetTraits();
 	classesToSearch.insert(classesToSearch.end(), traits.begin(), traits.end());
-
+	bool error = false;
+	wxString errorMsg;
+	std::vector<int> fileTagIds = mvceditor::FileTagIdsForDirs(*Session, tagSearch.GetDirs(), error, errorMsg);
+	wxASSERT_MSG(!error, errorMsg);
 	if (tagSearch.GetMethodName().isEmpty()) {
 		
 		// special case; query for all methods for a class (UserClass::)
-		std::vector<mvceditor::TagClass> memberMatches = CollectAllMembers(classesToSearch);
+		std::vector<mvceditor::TagClass> memberMatches = AllMembers(classesToSearch, fileTagIds);
 
 		//get the methods that belong to a used trait
-		std::vector<mvceditor::TagClass> traitMatches = CollectAllTraitAliases(classesToSearch, UNICODE_STRING_SIMPLE(""));
+		std::vector<mvceditor::TagClass> traitMatches = TraitAliases(classesToSearch, UNICODE_STRING_SIMPLE(""), fileTagIds);
 
 		matches.insert(matches.end(), memberMatches.begin(), memberMatches.end());
 		matches.insert(matches.end(), traitMatches.begin(), traitMatches.end());
@@ -349,11 +386,11 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchMemb
 		types.push_back(mvceditor::TagClass::MEMBER);
 		types.push_back(mvceditor::TagClass::METHOD);
 		types.push_back(mvceditor::TagClass::CLASS_CONSTANT);
-		matches = FindByIdentifierExactAndTypes(identifier, types, true);
+		matches = FindByIdentifierExactAndTypes(identifier, types, fileTagIds, true);
 		if (matches.empty()) {
 		
 			// use LIKE to get near matches
-			matches = FindByIdentifierStartAndTypes(identifier, types, true);
+			matches = FindByIdentifierStartAndTypes(identifier, types, fileTagIds, true);
 		}
 	}
 	else {
@@ -368,17 +405,17 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectNearMatchMemb
 			keyStart += mvceditor::IcuToChar(tagSearch.GetMethodName());
 			keyStarts.push_back(keyStart);
 		}
-		matches = FindByKeyStartMany(keyStarts, true);
+		matches = FindByKeyStartMany(keyStarts, fileTagIds, true);
 
 		// get any aliases
-		std::vector<mvceditor::TagClass> traitMatches = CollectAllTraitAliases(classesToSearch, tagSearch.GetMethodName());
+		std::vector<mvceditor::TagClass> traitMatches = TraitAliases(classesToSearch, tagSearch.GetMethodName(), fileTagIds);
 		matches.insert(matches.end(), traitMatches.begin(), traitMatches.end());
 			
 	}
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectAllMembers(const std::vector<UnicodeString>& classNames) {
+std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::AllMembers(const std::vector<UnicodeString>& classNames, const std::vector<int>& fileTagIds) {
 	std::vector<mvceditor::TagClass> matches;
 	std::vector<std::string> keyStarts;
 	for (size_t i = 0; i < classNames.size(); ++i) {
@@ -386,32 +423,39 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectAllMembers(co
 		keyStart += "::";
 		keyStarts.push_back(keyStart);
 	}
-	matches = FindByKeyStartMany(keyStarts, true);
+	matches = FindByKeyStartMany(keyStarts, fileTagIds, true);
 	return matches;
 }
 
-std::vector<mvceditor::TagClass>  mvceditor::TagFinderClass::CollectNearMatchNamespaces(const mvceditor::TagSearchClass& tagSearch) {
+std::vector<mvceditor::TagClass>  mvceditor::TagFinderClass::NearMatchNamespaces(const mvceditor::TagSearchClass& tagSearch) {
 	std::vector<mvceditor::TagClass> matches;
 
 	// needle identifier contains a namespace operator; but it may be
 	// a namespace or a fully qualified name
 	UnicodeString key = tagSearch.GetClassName();
 	std::string stdKey = mvceditor::IcuToChar(key);
-	matches = FindByKeyExact(stdKey);
+	bool error = false;
+	wxString errorMsg;
+	std::vector<int> fileTagIds = mvceditor::FileTagIdsForDirs(*Session, tagSearch.GetDirs(), error, errorMsg);
+	wxASSERT_MSG(!error, errorMsg);
+	matches = FindByKeyExact(stdKey, fileTagIds);
 	if (matches.empty()) {
-		matches = FindByKeyStart(stdKey, true);
+		matches = FindByKeyStart(stdKey, fileTagIds, true);
 	}
 	return matches;
 }
 
-UnicodeString mvceditor::TagFinderClass::GetResourceParentClassName(const UnicodeString& className) {
+UnicodeString mvceditor::TagFinderClass::ParentClassName(const UnicodeString& className) {
 	UnicodeString parentClassName;
 
 	// first query to get the parent class name
 	std::vector<int> types;
 	types.push_back(mvceditor::TagClass::CLASS);
 	std::string key = mvceditor::IcuToChar(className);
-	std::vector<mvceditor::TagClass> matches = FindByKeyExactAndTypes(key, types, true);
+	
+	// empty file items == search on all files
+	std::vector<int> fileTagIds;
+	std::vector<mvceditor::TagClass> matches = FindByKeyExactAndTypes(key, types, fileTagIds, true);
 	if (!matches.empty()) {
 		mvceditor::TagClass tag = matches[0];
 		parentClassName = ExtractParentClassFromSignature(tag.Signature);
@@ -420,13 +464,18 @@ UnicodeString mvceditor::TagFinderClass::GetResourceParentClassName(const Unicod
 }
 
 std::vector<UnicodeString> mvceditor::TagFinderClass::GetResourceTraits(const UnicodeString& className, 
-																			 const UnicodeString& methodName) {
+																		const UnicodeString& methodName,
+																		const std::vector<wxFileName>& dirs) {
+	bool error = false;
+	wxString errorMsg;
+	std::vector<int> fileTagIds = mvceditor::FileTagIdsForDirs(*Session, dirs, error, errorMsg);
+	wxASSERT_MSG(!error, errorMsg);
 	std::vector<UnicodeString> inheritedTraits;
 	bool match = false;
 	
 	std::vector<std::string> keys;
 	keys.push_back(mvceditor::IcuToChar(className));
-	std::vector<mvceditor::TraitTagClass> matches = FindTraitsByClassName(keys);
+	std::vector<mvceditor::TraitTagClass> matches = UsedTraits(keys, fileTagIds);
 	for (size_t i = 0; i < matches.size(); ++i) {
 		UnicodeString fullyQualifiedTrait = QualifyName(matches[i].TraitNamespaceName, matches[i].TraitClassName);
 			
@@ -502,7 +551,7 @@ UnicodeString mvceditor::TagFinderClass::ExtractParentClassFromSignature(const U
 	return parentClassName;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectFullyQualifiedResource(const mvceditor::TagSearchClass& tagSearch) {
+std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::ExactTags(const mvceditor::TagSearchClass& tagSearch) {
 
 	// at one point there was a check here to see if the  tag files existed
 	// it was removed because it caused performance issues, since this method
@@ -510,6 +559,10 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectFullyQualifie
 	// take care when coding; make sure that any code called by this method does not touch the file system
 	std::vector<mvceditor::TagClass> allMatches;
 	std::vector<int> types;
+	bool error = false;
+	wxString errorMsg;
+	std::vector<int> fileTagIds = mvceditor::FileTagIdsForDirs(*Session, tagSearch.GetDirs(), error, errorMsg);
+	wxASSERT_MSG(!error, errorMsg);
 	if (tagSearch.GetResourceType() == mvceditor::TagSearchClass::CLASS_NAME_METHOD_NAME) {
 
 		// check the entire class hierachy; stop as soon as we found it
@@ -523,7 +576,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectFullyQualifie
 		for (size_t i = 0; i < classHierarchy.size(); ++i) {
 			UnicodeString key = classHierarchy[i] + UNICODE_STRING_SIMPLE("::") + tagSearch.GetMethodName();
 			std::string stdKey = mvceditor::IcuToChar(key);
-			std::vector<mvceditor::TagClass> matches = FindByKeyExactAndTypes(stdKey, types, true);
+			std::vector<mvceditor::TagClass> matches = FindByKeyExactAndTypes(stdKey, types, fileTagIds, true);
 			allMatches.insert(allMatches.end(), matches.begin(), matches.end());
 		}
 	}
@@ -534,7 +587,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectFullyQualifie
 		types.push_back(mvceditor::TagClass::CLASS);
 		types.push_back(mvceditor::TagClass::FUNCTION);
 
-		allMatches = FindByKeyExactAndTypes(stdKey, types, true);
+		allMatches = FindByKeyExactAndTypes(stdKey, types, fileTagIds, true);
 	}
 	else {
 		UnicodeString key = tagSearch.GetClassName();
@@ -543,12 +596,12 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectFullyQualifie
 		types.push_back(mvceditor::TagClass::CLASS);
 		types.push_back(mvceditor::TagClass::FUNCTION);
 
-		allMatches = FindByKeyExactAndTypes(stdKey, types, true);
+		allMatches = FindByKeyExactAndTypes(stdKey, types, fileTagIds, true);
 	}
 	return allMatches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectFullyQualifiedClassOrFile(const mvceditor::TagSearchClass& tagSearch) {
+std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::ExactClassOrFile(const mvceditor::TagSearchClass& tagSearch) {
 
 	// at one point there was a check here to see if the  tag files existed
 	// it was removed because it caused performance issues, since this method
@@ -556,15 +609,19 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::CollectFullyQualifie
 	// take care when coding; make sure that any code called by this method does not touch the file system
 	std::vector<mvceditor::TagClass> allMatches;
 	std::vector<int> types;
+	bool error = false;
+	wxString errorMsg;
+	std::vector<int> fileTagIds = mvceditor::FileTagIdsForDirs(*Session, tagSearch.GetDirs(), error, errorMsg);
+	wxASSERT_MSG(!error, errorMsg);
 	if (mvceditor::TagSearchClass::FILE_NAME == tagSearch.GetResourceType() || 
 		mvceditor::TagSearchClass::FILE_NAME_LINE_NUMBER == tagSearch.GetResourceType()) {
-		allMatches = CollectExactFiles(tagSearch.GetFileName(), tagSearch.GetLineNumber());
+		allMatches = ExactFiles(tagSearch.GetFileName(), tagSearch.GetLineNumber());
 	}
 	else {
 		UnicodeString key = tagSearch.GetClassName();
 		std::string stdKey = mvceditor::IcuToChar(key);
 		types.push_back(mvceditor::TagClass::CLASS);
-		allMatches = FindByKeyExactAndTypes(stdKey, types, true);
+		allMatches = FindByKeyExactAndTypes(stdKey, types, fileTagIds, true);
 	}
 	return allMatches;
 }
@@ -628,6 +685,11 @@ bool mvceditor::TagFinderClass::IsResourceCacheEmpty() {
 	return count <= 0;
 }
 
+bool mvceditor::TagFinderClass::HasFullPath(const wxString& fullPath) {
+	mvceditor::FileTagClass fileTag;
+	return FindFileTagByFullPathExact(fullPath, fileTag);
+}
+
 bool mvceditor::TagFinderClass::FindFileTagByFullPathExact(const wxString& fullPath, mvceditor::FileTagClass& fileTag) {
 	if (!IsCacheInitialized) {
 		return false;
@@ -660,59 +722,83 @@ bool mvceditor::TagFinderClass::FindFileTagByFullPathExact(const wxString& fullP
 	return foundFile;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::FindByKeyExact(const std::string& key) {
+std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::FindByKeyExact(const std::string& key, const std::vector<int>& fileTagIds) {
 	
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
-	std::string whereCond = "key = '" + key + "'";
-	return ResourceStatementMatches(whereCond, false);
+	// TODO escape key
+	std::ostringstream stream;
+	stream << "key = '" + key + "'";
+	if (!fileTagIds.empty()) {
+		stream << " AND f.file_item_id IN(";
+		InClause(fileTagIds, stream);
+		stream << ")";
+	}
+	return ResourceStatementMatches(stream.str(), false);
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::FindByKeyExactAndTypes(const std::string& key, const std::vector<int>& types, bool doLimit) {
+std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::FindByKeyExactAndTypes(const std::string& key, const std::vector<int>& types, 
+																				   const std::vector<int>& fileTagIds, bool doLimit) {
 	std::ostringstream stream;
-
+	
+	// TODO escape key
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	stream << "key = '" << key << "' AND type IN(";
-	for (size_t i = 0; i < types.size(); ++i) {
-		stream << types[i];
-		if (i < (types.size() - 1)) {
-			stream << ",";
-		}
-	}
+	InClause(types, stream);
 	stream << ")";
+	if (!fileTagIds.empty()) {
+		stream << " AND f.file_item_id IN(";
+		InClause(fileTagIds, stream);
+		stream << ")";
+	}
 	return ResourceStatementMatches(stream.str(), doLimit);
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::FindByKeyStart(const std::string& keyStart, bool doLimit) {
+std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::FindByKeyStart(const std::string& keyStart, const std::vector<int>& fileTagIds, bool doLimit) {
 	std::string escaped = mvceditor::SqliteSqlEscape(keyStart, '^');
-	std::string whereCond = "key LIKE '" + escaped + "%' ESCAPE '^' ";
-	return ResourceStatementMatches(whereCond, doLimit);
+	std::ostringstream stream;
+	stream << "key LIKE '" << escaped << "%' ESCAPE '^' ";
+	if (!fileTagIds.empty()) {
+		stream << " AND f.file_item_id IN(";
+		InClause(fileTagIds, stream);
+		stream << ")";
+	}
+	return ResourceStatementMatches(stream.str(), doLimit);
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::FindByKeyStartAndTypes(const std::string& keyStart, const std::vector<int>& types, bool doLimit) {
+std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::FindByKeyStartAndTypes(const std::string& keyStart, 
+																				   const std::vector<int>& types, 
+																				   const std::vector<int>& fileTagIds,
+																				   bool doLimit) {
 	std::ostringstream stream;
 	std::string escaped = mvceditor::SqliteSqlEscape(keyStart, '^');
 	stream << "key LIKE '" << escaped << "%' ESCAPE '^' AND type IN(";
-	for (size_t i = 0; i < types.size(); ++i) {
-		stream << types[i];
-		if (i < (types.size() - 1)) {
-			stream << ",";
-		}
-	}
+	InClause(types, stream);
 	stream << ")";
+	if (!fileTagIds.empty()) {
+		stream << " AND f.file_item_id IN(";
+		InClause(fileTagIds, stream);
+		stream << ")";
+	}
 	return ResourceStatementMatches(stream.str(), doLimit);
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::FindByKeyStartMany(const std::vector<std::string>& keyStarts, bool doLimit) {
+std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::FindByKeyStartMany(const std::vector<std::string>& keyStarts, const std::vector<int>& fileTagIds, bool doLimit) {
 	if (keyStarts.empty()) {
 		std::vector<mvceditor::TagClass> matches;
 		return matches;
 	}
 	std::string escaped = mvceditor::SqliteSqlEscape(keyStarts[0], '^');
 	std::ostringstream stream;
-	stream << "key LIKE '" << escaped << "%' ESCAPE '^' ";
+	stream << "(key LIKE '" << escaped << "%' ESCAPE '^' ";
 	for (size_t i = 1; i < keyStarts.size(); ++i) {
 		escaped = mvceditor::SqliteSqlEscape(keyStarts[i], '^');
 		stream << " OR key LIKE '" << escaped << "%' ESCAPE '^' ";
+	}
+	stream << ")";
+	if (!fileTagIds.empty()) {
+		stream << " AND f.file_item_id IN(";
+		InClause(fileTagIds, stream);
+		stream << ")";
 	}
 	return ResourceStatementMatches(stream.str(), true);
 }
@@ -743,13 +829,6 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::All() {
 mvceditor::ParsedTagFinderClass::ParsedTagFinderClass()
 	: TagFinderClass() {
 
-}
-
-std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::AllNonNativeClasses() {
-	std::ostringstream stream;
-	stream << " is_native = 0 AND type =" << mvceditor::TagClass::CLASS;
-	std::vector<mvceditor::TagClass> all = ResourceStatementMatches(stream.str(), false);
-	return all;
 }
 
 std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ResourceStatementMatches(std::string whereCond, bool doLimit) {
@@ -833,7 +912,8 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ResourceStatem
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::CollectNearMatchFiles(const UnicodeString& search, int lineNumber) {
+std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::NearMatchFiles(const UnicodeString& search, int lineNumber,
+																				 const std::vector<int>& fileTagIds) {
 	wxString path,
 		currentFileName,
 		extension;
@@ -847,8 +927,14 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::CollectNearMat
 	int fileTagId;
 	int isNew;
 	try {
-		soci::statement stmt = (Session->prepare << 
-			"SELECT full_path, file_item_id, is_new FROM file_items WHERE full_path LIKE " + query + " ESCAPE '^'",
+		std::ostringstream stream;
+		stream << "SELECT full_path, file_item_id, is_new FROM file_items WHERE full_path LIKE " + query + " ESCAPE '^'";
+		if (!fileTagIds.empty()) {
+			stream << " AND file_item_id IN(";
+			InClause(fileTagIds, stream);
+			stream << ")";
+		}
+		soci::statement stmt = (Session->prepare << stream.str(), 
 			soci::into(match), soci::into(fileTagId), soci::into(isNew));
 		if (stmt.execute(true)) {
 			do {
@@ -877,7 +963,7 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::CollectNearMat
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::CollectExactFiles(const UnicodeString& search, int lineNumber) {
+std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ExactFiles(const UnicodeString& search, int lineNumber) {
 	wxString path,
 		currentFileName,
 		extension;
@@ -919,7 +1005,8 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::CollectExactFi
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::CollectAllTraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName) {
+std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::TraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName, 
+																			   const std::vector<int>& fileTagIds) {
 	std::vector<mvceditor::TagClass> matches;
 
 	std::vector<std::string> classNamesToLookFor;
@@ -928,7 +1015,7 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::CollectAllTrai
 	}
 
 	// TODO use the correct namespace when querying for traits
-	std::vector<mvceditor::TraitTagClass> traits = FindTraitsByClassName(classNamesToLookFor);
+	std::vector<mvceditor::TraitTagClass> traits = UsedTraits(classNamesToLookFor, fileTagIds);
 	
 	// now go through the result and add the method names of any aliased methods
 	UnicodeString lowerMethodName(methodName);
@@ -951,20 +1038,26 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::CollectAllTrai
 	return matches;
 }
 
-std::vector<mvceditor::TraitTagClass> mvceditor::ParsedTagFinderClass::FindTraitsByClassName(const std::vector<std::string>& keyStarts) {
-	std::string join = "";
+std::vector<mvceditor::TraitTagClass> mvceditor::ParsedTagFinderClass::UsedTraits(const std::vector<std::string>& keyStarts, const std::vector<int>& fileTagIds) {
+	std::ostringstream stream;
+	stream << "SELECT key, file_item_id, class_name, namespace_name, trait_name, trait_namespace_name, aliases, instead_ofs "
+		<< "FROM trait_resources WHERE key IN(";
 	for (size_t i = 0; i < keyStarts.size(); ++i) {
-		join += "'";
-		join += keyStarts[i];
-		join += "'";
+		stream << "'"
+			<< keyStarts[i]
+			<< "'";
 		if (i < (keyStarts.size() - 1)) {
-			join += ",";
+			stream << ",";
 		}
 	}
-	
-	std::string sql = "SELECT key, class_name, namespace_name, trait_name, trait_namespace_name, aliases, instead_ofs ";
-	sql += "FROM trait_resources WHERE key IN(" + join + ")";
+	stream << ")";
+	if (!fileTagIds.empty()) {
+		stream << "AND file_item_id IN(";
+		InClause(fileTagIds, stream);
+		stream << ")";
+	}
 	std::string key;
+	int fileTagId;
 	std::string className;
 	std::string namespaceName;
 	std::string traitClassName;
@@ -972,15 +1065,17 @@ std::vector<mvceditor::TraitTagClass> mvceditor::ParsedTagFinderClass::FindTrait
 	std::string aliases;
 	std::string insteadOfs;
 	std::vector<mvceditor::TraitTagClass> matches;
-	try {
+	std::string sql = stream.str();
+	try {		
 		soci::statement stmt = (Session->prepare << sql,
-			soci::into(key), soci::into(className), soci::into(namespaceName), soci::into(traitClassName),
+			soci::into(key), soci::into(fileTagId), soci::into(className), soci::into(namespaceName), soci::into(traitClassName),
 			soci::into(traitNamespaceName), soci::into(aliases), soci::into(insteadOfs)
 		);
 		if (stmt.execute(true)) {
 			do {
 				mvceditor::TraitTagClass trait;
 				trait.Key = mvceditor::CharToIcu(key.c_str());
+				trait.FileTagId = fileTagId;
 				trait.ClassName = mvceditor::CharToIcu(className.c_str());
 				trait.NamespaceName = mvceditor::CharToIcu(namespaceName.c_str());
 				trait.TraitClassName = mvceditor::CharToIcu(traitClassName.c_str());
@@ -1017,38 +1112,39 @@ std::vector<mvceditor::TraitTagClass> mvceditor::ParsedTagFinderClass::FindTrait
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::FindByIdentifierExactAndTypes(const std::string& identifier, const std::vector<int>& types, bool doLimit) {
+std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::FindByIdentifierExactAndTypes(const std::string& identifier, const std::vector<int>& types, const std::vector<int>& fileTagIds, bool doLimit) {
 	std::ostringstream stream;
 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	// do not get fully qualified resources
 	// make sure to use the key because it is indexed
 	stream << "key = '" << identifier << "' AND identifier = key AND type IN(";
-	for (size_t i = 0; i < types.size(); ++i) {
-		stream << types[i];
-		if (i < (types.size() - 1)) {
-			stream << ",";
-		}
-	}
+	InClause(types, stream);
 	stream << ")";
+	if (!fileTagIds.empty()) {
+		stream << " AND f.file_item_id IN(";
+		InClause(fileTagIds, stream);
+		stream << ")";
+	}
 	return ResourceStatementMatches(stream.str(), doLimit);
 
 }
 
-std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::FindByIdentifierStartAndTypes(const std::string& identifierStart, const std::vector<int>& types, bool doLimit) {
+std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::FindByIdentifierStartAndTypes(const std::string& identifierStart, const std::vector<int>& types, 
+																								const std::vector<int>& fileTagIds, bool doLimit) {
 	std::ostringstream stream;
 
 	// do not get fully qualified resources
 	// make sure to use the key because it is indexed
 	std::string escaped = mvceditor::SqliteSqlEscape(identifierStart, '^');
 	stream << "key LIKE '" << escaped << "%' ESCAPE '^' AND identifier = key AND type IN(";
-	for (size_t i = 0; i < types.size(); ++i) {
-		stream << types[i];
-		if (i < (types.size() - 1)) {
-			stream << ",";
-		}
-	}
+	InClause(types, stream);
 	stream << ")";
+	if (!fileTagIds.empty()) {
+		stream << " AND f.file_item_id IN(";
+		InClause(fileTagIds, stream);
+		stream << ")";
+	}
 	return ResourceStatementMatches(stream.str(), doLimit);
 }
 
@@ -1081,20 +1177,10 @@ void mvceditor::TagFinderClass::Print() {
 	}
 }
 
-
 mvceditor::DetectedTagFinderClass::DetectedTagFinderClass()
 	: TagFinderClass() {
 
 }
-
-std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::AllNonNativeClasses() {
-	std::ostringstream stream;
-	stream << "type =" << mvceditor::TagClass::CLASS;
-	std::vector<mvceditor::TagClass> all = ResourceStatementMatches(stream.str(), false);
-	return all;
-}
-
-
 
 std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::ResourceStatementMatches(std::string whereCond, bool doLimit) {
 	std::string sql;
@@ -1147,28 +1233,28 @@ std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::ResourceStat
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::CollectNearMatchFiles(const UnicodeString& search, int lineNumber) {
+std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::NearMatchFiles(const UnicodeString& search, int lineNumber, const std::vector<int>& fileTagIds) {
 	
 	// detector db does not have  a file_items table
 	std::vector<mvceditor::TagClass> matches;
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::CollectExactFiles(const UnicodeString& search, int lineNumber) {
+std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::ExactFiles(const UnicodeString& search, int lineNumber) {
 	
 	// detector db does not have  a file_items table
 	std::vector<mvceditor::TagClass> matches;
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::CollectAllTraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName) {
+std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::TraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName, const std::vector<int>& fileTagIds) {
 	
 	// detector db does not have  a trait_resources table
 	std::vector<mvceditor::TagClass> matches;
 	return matches;
 }
 
-std::vector<mvceditor::TraitTagClass> mvceditor::DetectedTagFinderClass::FindTraitsByClassName(const std::vector<std::string>& keyStarts) {
+std::vector<mvceditor::TraitTagClass> mvceditor::DetectedTagFinderClass::UsedTraits(const std::vector<std::string>& keyStarts, const std::vector<int>& fileTagIds) {
 	
 	// detector db does not have  a trait_resources table
 	std::vector<mvceditor::TraitTagClass> matches;
@@ -1184,36 +1270,33 @@ std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::AllTagsInFil
 }
 
 
-std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::FindByIdentifierExactAndTypes(const std::string& identifier, const std::vector<int>& types, bool doLimit) {
+std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::FindByIdentifierExactAndTypes(const std::string& identifier, const std::vector<int>& types,
+																								  const std::vector<int>& fileTagIds, bool doLimit) {
 	std::ostringstream stream;
 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	// do not get fully qualified resources
 	// make sure to use the key because it is indexed
 	stream << "key = '" << identifier << "' AND method_name = key AND type IN(";
-	for (size_t i = 0; i < types.size(); ++i) {
-		stream << types[i];
-		if (i < (types.size() - 1)) {
-			stream << ",";
-		}
-	}
+	InClause(types, stream);
 	stream << ")";
+	if (!fileTagIds.empty()) {
+		stream << " AND f.file_item_id IN(";
+		InClause(fileTagIds, stream);
+		stream << ")";
+	}
 	return ResourceStatementMatches(stream.str(), doLimit);
 }
 
-std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::FindByIdentifierStartAndTypes(const std::string& identifierStart, const std::vector<int>& types, bool doLimit) {
+std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::FindByIdentifierStartAndTypes(const std::string& identifierStart, const std::vector<int>& types,
+																								  const std::vector<int>& fileTagIds, bool doLimit) {
 	std::ostringstream stream;
 
 	// do not get fully qualified resources
 	// make sure to use the key because it is indexed
 	std::string escaped = mvceditor::SqliteSqlEscape(identifierStart, '^');
 	stream << "key LIKE '" << escaped << "%' ESCAPE '^' AND method_name = key AND type IN(";
-	for (size_t i = 0; i < types.size(); ++i) {
-		stream << types[i];
-		if (i < (types.size() - 1)) {
-			stream << ",";
-		}
-	}
+	InClause(types, stream);
 	stream << ")";
 	return ResourceStatementMatches(stream.str(), doLimit);
 }

@@ -49,25 +49,22 @@ public:
 	 */
 	ProjectTagActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
-	~ProjectTagActionClass();
-
 	/**
 	 * prepare to iterate through the given file. The name part of the given file must match the wildcard.
 	 * This method can be used to update the resources once a file has been modified on disk.
 	 *
-	 * @param project the project that holds the file
+	 * @param globals to get the tag cache location
 	 * @param fullPath file to be scanned (full path, including name).
-	 * @param version the version of PHP to check against
 	 * @return bool false file does not exist
 	 */
-	bool InitForFile(const mvceditor::ProjectClass& project, const wxString& fullPath, pelet::Versions version);
+	bool InitForFile(mvceditor::GlobalsClass& globals, const wxString& fullPath);
 
 	/**
 	 * prepare to iterate through all files of the given projects
 	 * that match the given wildcard. Only projects that are enabled will
 	 * scanned.
 	 *
-	 * @param projects the directories to be scanned (recursively scan all sources in all projects)
+	 * @param globals to get the projects' directories to be scanned (recursively scan all sources in all projects)
 	 * @param version the version of PHP to check against
 	 * @return bool false if none of the projects are enabled or none of the projects have a PHP source directory
 	 */
@@ -85,8 +82,6 @@ public:
 	 */
 	void BackgroundWork();
 
-	void BackgroundCleanup();
-
 	wxString GetLabel() const;
 
 private:
@@ -102,15 +97,19 @@ private:
 	DirectorySearchClass DirectorySearch;
 
 	/**
+	 * the location of the tag cache; the sqlite file where the tags are stored
+	 */
+	wxFileName TagCacheDbFileName;
+
+	/**
 	 * the version of PHP to parse against
 	 */
 	pelet::Versions Version;
 
 	/**
-	 * This class will not own this pointer. the pointer will be created by this class
-	 * but it will be posted via an event and the event handler will own it.
+	 * This object will perform the parsing and storing of the tags
 	 */
-	mvceditor::GlobalCacheClass* GlobalCache;
+	mvceditor::GlobalCacheClass GlobalCache;
 
 	/**
 	 * TRUE if we should iterate though the touched projects and not all projects.

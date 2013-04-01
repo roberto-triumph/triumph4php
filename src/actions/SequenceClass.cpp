@@ -94,9 +94,6 @@ bool mvceditor::SequenceClass::AppStart() {
 	// this will prime the sql connections from the php detectors
 	AddStep(new mvceditor::DatabaseTagDetectorInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR_INIT));
 
-	// this will prime the detected tags cache
-	AddStep(new mvceditor::TagDetectorInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_DETECTOR_INIT));
-
 	// this will detect all of the config files for projects
 	AddStep(new mvceditor::ConfigTagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR));
 
@@ -137,7 +134,16 @@ bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvced
 	// new exclude wilcards or a source directory has been removed.  the ProjectTagActionClass
 	// will just recurse directories and update the cache, it does not recurse the index
 	// hence it won't remove items that don't need to be there
-	AddStep(new mvceditor::TagWipeActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE, touchedProjects));
+	// don't wipe, just remove tags from touchedProjects
+	std::vector<wxFileName> dirsToDelete;
+	std::vector<mvceditor::ProjectClass>::const_iterator project;
+	std::vector<mvceditor::SourceClass>::const_iterator source;
+	for (project = touchedProjects.begin(); project != touchedProjects.end(); ++project) {
+		for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
+			dirsToDelete.push_back(source->RootDirectory);
+		}
+	}
+	AddStep(new mvceditor::TagDeleteActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE, dirsToDelete));
 
 	// this will load the cache from the hard disk
 	// load the cache from hard disk so that code completion and 
@@ -147,9 +153,6 @@ bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvced
 	// this will load the url entry point cache
 	// do this before the rest so the urls become available asap
 	AddStep(new mvceditor::UrlTagFinderInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR_INIT));
-
-	// this will prime the detected tags cache
-	AddStep(new mvceditor::TagDetectorInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_DETECTOR_INIT));
 
 	// this will prime the sql connections from the php detectors
 	AddStep(new mvceditor::DatabaseTagDetectorInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR_INIT));
@@ -187,7 +190,7 @@ bool mvceditor::SequenceClass::TagCacheWipeAndIndex() {
 	SourceCheck();
 
 	// this step will wipe the global cache from all projects
-	AddStep(new mvceditor::TagWipeActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE, Globals.Projects));
+	AddStep(new mvceditor::TagWipeActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE));
 
 	// this will recurse though all directories and parse the source code
 	AddStep(new mvceditor::ProjectTagActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE));

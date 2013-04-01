@@ -6,7 +6,7 @@
 mvceditor::CallStackActionClass::CallStackActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: ActionClass(runningThreads, eventId) 
 	, TagCache()
-	, CallStack(TagCache)
+	, CallStack(TagCache, mvceditor::TagCacheWorkingAsset())
 	, DetectorDbFileName()
 	, StartFileName() 
 	, StartClassName() 
@@ -24,25 +24,20 @@ bool mvceditor::CallStackActionClass::Init(mvceditor::GlobalsClass& globals) {
 	bool ret = false;
 	Version = globals.Environment.Php.Version;
 	std::vector<wxString> otherFileExtensions = globals.GetNonPhpFileExtensions();
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
-		if (project->IsEnabled && !project->AllPhpSources().empty()) {
 
-			// register the project tag DB file now so that it is available for code completion
-			// the tag cache will own these pointers
-			mvceditor::GlobalCacheClass* projectCache = new mvceditor::GlobalCacheClass;
-			projectCache->InitGlobalTag(project->ResourceDbFileName, project->PhpFileExtensions, otherFileExtensions, Version);
-			TagCache.RegisterGlobal(projectCache);
+	// register the project tag DB file now so that it is available for code completion
+	// the tag cache will own these pointers
+	mvceditor::GlobalCacheClass* projectCache = new mvceditor::GlobalCacheClass;
+	projectCache->InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), otherFileExtensions, Version);
+	TagCache.RegisterGlobal(projectCache);
 
-			// initialize the detected tag cache too so that more methods can be resolved
-			projectCache = new mvceditor::GlobalCacheClass;
-			projectCache->InitDetectorTag(project->DetectorDbFileName);
-			TagCache.RegisterGlobal(projectCache);
-			ret = true;
-			SetStatus(_("Call Stack Gen ") + mvceditor::IcuToWx(StartClassName) + wxT("::") + 
-				mvceditor::IcuToWx(StartMethodName));
-		}
-	}
+	// initialize the detected tag cache too so that more methods can be resolved
+	projectCache = new mvceditor::GlobalCacheClass;
+	projectCache->InitDetectorTag(globals.DetectorCacheDbFileName);
+	TagCache.RegisterGlobal(projectCache);
+	ret = true;
+	SetStatus(_("Call Stack Gen ") + mvceditor::IcuToWx(StartClassName) + wxT("::") + 
+		mvceditor::IcuToWx(StartMethodName));
 	return ret;
 }
 

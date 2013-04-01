@@ -56,7 +56,6 @@ void TagCacheInit(mvceditor::TagCacheClass& tagCache);
 
 mvceditor::TagCacheClass TagCache;
 mvceditor::RunningThreadsClass RunningThreads;
-mvceditor::CallStackClass CallStack(TagCache);
 wxString SourceDir;
 wxString StartingFile;
 wxString PhpExecutableFullPath;
@@ -99,6 +98,8 @@ int main() {
 	}
 	CreateCacheDb(TagCacheDbFullPath, mvceditor::ResourceSqlSchemaAsset());
 	CreateCacheDb(DetectorDbFullPath, mvceditor::DetectorSqlSchemaAsset());
+
+	mvceditor::CallStackClass callStack(TagCache, TagCacheDbFullPath);
 	CacheLargeProject(TagCache, SourceDir);
 	TagCacheInit(TagCache);
 	
@@ -106,19 +107,19 @@ int main() {
 	UnicodeString className = UNICODE_STRING_SIMPLE("News");
 	UnicodeString methodName = UNICODE_STRING_SIMPLE("index");
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
-	CallStack.Build(fileName, className, methodName, pelet::PHP_53, error);
+	callStack.Build(fileName, className, methodName, pelet::PHP_53, error);
 	
 	UFILE* ufout = u_finit(stdout, NULL, NULL);
 	if (mvceditor::CallStackClass::NONE != error) {
 		u_fprintf(ufout, "Call stack error:%d Match Error:%d Error Lexeme:%S Error Class:%S\n", 
-			(int)error, (int)CallStack.MatchError.Type, 
-			CallStack.MatchError.ErrorLexeme.getTerminatedBuffer(),
-			CallStack.MatchError.ErrorClass.getTerminatedBuffer());
+			(int)error, (int)callStack.MatchError.Type, 
+			callStack.MatchError.ErrorLexeme.getTerminatedBuffer(),
+			callStack.MatchError.ErrorClass.getTerminatedBuffer());
 	}
 	u_fclose(ufout);
-	printf("The call stack is %d items long\n", (int)CallStack.Variables.size());
+	printf("The call stack is %d items long\n", (int)callStack.Variables.size());
 	wxFileName detectorDbFileName(DetectorDbFullPath);
-	CallStack.Persist(detectorDbFileName);
+	callStack.Persist(detectorDbFileName);
 	printf("Call stack written to:%s\n", (const char*)DetectorDbFullPath.ToAscii());
 	return 0;
 }
@@ -183,25 +184,16 @@ void TagCacheInit(mvceditor::TagCacheClass& tagCache) {
 	std::vector<wxString> phpFileExtensions,
 		miscFileExtensions;
 	phpFileExtensions.push_back(wxT("*.php"));
-	
-	// load the php native functions into the cache
 	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass;
-	globalCache->InitGlobalTag(mvceditor::NativeFunctionsAsset(), phpFileExtensions, miscFileExtensions, pelet::PHP_53);
-	if (!tagCache.RegisterGlobal(globalCache)) {
-		printf("Could not initialize the native functions cache.\n");
-	}
 	
 	// load the project tags that were just parsed
-	mvceditor::GlobalCacheClass* projectCache = new mvceditor::GlobalCacheClass;
-	projectCache->InitGlobalTag(wxFileName(TagCacheDbFullPath), phpFileExtensions, miscFileExtensions, pelet::PHP_53);
-	if (!tagCache.RegisterGlobal(projectCache)) {
-		printf("Could not initialize the project cache.\n");
-	}
+	globalCache->InitGlobalTag(wxFileName(TagCacheDbFullPath), phpFileExtensions, miscFileExtensions, pelet::PHP_53);
+	
+	// load the php native functions into the cache
+	globalCache->InitNativeTag(mvceditor::NativeFunctionsAsset());
 	
 	// load the detected tags cache
-	mvceditor::GlobalCacheClass* detectorCache = new mvceditor::GlobalCacheClass;
-	detectorCache->InitDetectorTag(wxFileName(DetectorDbFullPath));
-	if (!tagCache.RegisterGlobal(detectorCache)) {
-		printf("Could not initialize the detector cache.\n");
-	}
+	globalCache->InitDetectorTag(wxFileName(DetectorDbFullPath));
+
+	tagCache.RegisterGlobal(globalCache);
 }

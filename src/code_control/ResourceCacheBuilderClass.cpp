@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <code_control/ResourceCacheBuilderClass.h>
+#include <globals/Assets.h>
 
 mvceditor::WorkingCacheBuilderClass::WorkingCacheBuilderClass(
 															mvceditor::RunningThreadsClass& runningThreads, int eventId)
@@ -102,6 +103,12 @@ void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
 			// even if code is empty, lets create a working cache so that the 
 			// file is registered and code completion works
 			mvceditor::WorkingCacheClass* cache = new mvceditor::WorkingCacheClass();
+			if (isNew) {
+
+				// new files will not have a name, use the identifier as the name
+				fileName = fileIdentifier;
+			}
+			cache->InitWorkingTag(mvceditor::TagCacheWorkingAsset());
 			cache->Init(fileName, fileIdentifier, isNew, version, false);
 			bool good = cache->Update(code);
 			if (good && !TestDestroy()) {

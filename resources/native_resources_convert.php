@@ -239,6 +239,8 @@ echo "done\n";
  * creates the MVC editor resource database and creates the tables if necessary.
  */
 function initOutputPdo(PDO $outputPdo) {
+	// TODO: this does not work; PDO cannot execute multiple queries
+	// at once.
 	$outputPdo->query(file_get_contents(__DIR__ . './sql/resources.sql'));
 	
 	// delete any existing resources, since the generated file will only 

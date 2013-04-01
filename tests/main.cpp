@@ -22,6 +22,7 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
+#include <cstdarg>
 #include <UnitTest++.h>
 #include <TestReporterStdout.h>
 #include <TestRunner.h>
@@ -251,7 +252,7 @@ int main(int argc, char **argv) {
 	}
 	
 	int ret = 0;
-	if (argc > 0 && strcmp("--all", argv[0]) == 0) {
+	if (argc > 1 && strcmp("--all", argv[1]) == 0) {
 		ret = UnitTest::RunAllTests();
 	}
 	else {

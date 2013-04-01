@@ -86,14 +86,14 @@ std::vector<mvceditor::TagClass> mvceditor::TagFeatureClass::SearchForResources(
 	std::vector<mvceditor::TagClass> matches;
 	bool exactOnly = text.Length() <= 2;
 	if (exactOnly) {
-		matches = App.Globals.TagCache.CollectFullyQualifiedResourceFromAll(mvceditor::WxToIcu(text));
+		matches = App.Globals.TagCache.ExactTags(mvceditor::WxToIcu(text));
 	}
 	else {
-		matches = App.Globals.TagCache.CollectNearMatchResourcesFromAll(mvceditor::WxToIcu(text));
+		matches = App.Globals.TagCache.NearMatchTags(mvceditor::WxToIcu(text));
 	}
 
 	// no need to show jump to results for native functions
-	// TODO: CollectNearResourceMatches shows resources from files that were recently deleted
+	// TODO: NearMatchTags shows resources from files that were recently deleted
 	// need to hide them / remove them
 	mvceditor::TagListRemoveNativeMatches(matches);
 	mvceditor::TagListKeepMatchesFromProjects(matches, projects);
@@ -238,21 +238,25 @@ void mvceditor::TagFeatureClass::OnAppFileClosed(wxCommandEvent& event) {
 	// do we?
 	wxString fileName = event.GetString();
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	pelet::Versions version = GetEnvironment()->Php.Version;
+	bool isFileFromProject = false;
 	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
 
 		if (project->IsEnabled && project->IsAPhpSourceFile(fileName)) {
-			mvceditor::ProjectTagActionClass* thread = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
-			thread->InitForFile(*project, fileName, version);
+			isFileFromProject = true;
+			break;
+		}
+	}
+	if (isFileFromProject) {
+		mvceditor::ProjectTagActionClass* thread = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
+		thread->InitForFile(App.Globals, fileName);
 
-			// show user the error? not for now as they cannot do anything about it
-			// no need to track thread ID as this thread runs for a very short time since
-			// we are only indexing one file
-			wxThreadIdType threadId;
-			wxThreadError err = thread->CreateSingleInstance(threadId);
-			if (wxTHREAD_NO_ERROR != err) {
-				delete thread;
-			}
+		// show user the error? not for now as they cannot do anything about it
+		// no need to track thread ID as this thread runs for a very short time since
+		// we are only indexing one file
+		wxThreadIdType threadId;
+		wxThreadError err = thread->CreateSingleInstance(threadId);
+		if (wxTHREAD_NO_ERROR != err) {
+			delete thread;
 		}
 	}
 
@@ -261,6 +265,18 @@ void mvceditor::TagFeatureClass::OnAppFileClosed(wxCommandEvent& event) {
 	// this needs to be the same as mvceditor::CodeControlClass::GetIdString
 	wxString idString = wxString::Format(wxT("File_%d"), event.GetId());
 	App.Globals.TagCache.RemoveWorking(idString);
+	
+	wxString fileToDelete = fileName;
+	if (fileToDelete.IsEmpty()) {
+		fileToDelete = idString;
+	}
+	mvceditor::TagCleanWorkingCacheActionClass* action = new mvceditor::TagCleanWorkingCacheActionClass(App.RunningThreads, wxID_ANY, fileToDelete);
+	action->Init(App.Globals);
+	wxThreadIdType threadId;
+	wxThreadError err = action->CreateSingleInstance(threadId);
+	if (wxTHREAD_NO_ERROR != err) {
+		delete action;
+	}
 }
 
 wxString mvceditor::TagFeatureClass::CacheStatus() {
@@ -302,21 +318,25 @@ void mvceditor::TagFeatureClass::OnAppFileSaved(mvceditor::FileSavedEventClass& 
 	// a file is opened the url detector gets the latest resources
 	wxString fileName = event.GetCodeControl()->GetFileName();
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	pelet::Versions version = GetEnvironment()->Php.Version;
+	bool isFileFromProject = false;
 	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
 
 		if (project->IsEnabled && project->IsAPhpSourceFile(fileName)) {
-			mvceditor::ProjectTagActionClass* thread = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
-			thread->InitForFile(*project, fileName, version);
+			isFileFromProject = true;
+			break;
+		}
+	}
+	if (isFileFromProject) {
+		mvceditor::ProjectTagActionClass* thread = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
+		thread->InitForFile(App.Globals, fileName);
 
-			// show user the error? not for now as they cannot do anything about it
-			// no need to track thread ID as this thread runs for a very short time since
-			// we are only indexing one file
-			wxThreadIdType threadId;
-			wxThreadError err = thread->CreateSingleInstance(threadId);
-			if (wxTHREAD_NO_ERROR != err) {
-				delete thread;
-			}
+		// show user the error? not for now as they cannot do anything about it
+		// no need to track thread ID as this thread runs for a very short time since
+		// we are only indexing one file
+		wxThreadIdType threadId;
+		wxThreadError err = thread->CreateSingleInstance(threadId);
+		if (wxTHREAD_NO_ERROR != err) {
+			delete thread;
 		}
 	}
 	event.Skip();

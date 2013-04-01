@@ -59,6 +59,8 @@ CREATE TABLE IF NOT EXISTS file_items (
 -- perform all lookups using a single index (this is the purpose of the key
 -- column).
 CREATE TABLE IF NOT EXISTS resources (
+	
+	-- the file that the resource is located in
 	file_item_id INTEGER, 
 	
 	-- the key is used to perform lookups into this table.  The key will have
@@ -161,6 +163,9 @@ CREATE TABLE IF NOT EXISTS resources (
 -- column).
 CREATE TABLE IF NOT EXISTS trait_resources (
 
+	-- the file that class_name is located in (the class that uses the trait)
+	file_item_id INTEGER, 
+
 	-- the key is used to perform lookups into this table. The key will be either
 	-- 1. The name of the class that uses a trait (same as class_name column)
 	-- 2. The fully qualified name of the class that uses the trait (concatenation of namespace_name and class_name)
@@ -219,4 +224,9 @@ CREATE INDEX IF NOT EXISTS idxTraitKey ON trait_resources(key);
 --
 -- This number must match the version in CacheDbVersionActionClass.cpp
 --
-INSERT INTO schema_version (version_number) VALUES(1);
+INSERT INTO schema_version (version_number) VALUES(3);
+
+--
+-- Write ahead logging to allow for concurrent reads and writes
+--
+PRAGMA journal_mode = WAL;

@@ -84,7 +84,7 @@ wxString mvceditor::UrlTagDetectorClass::TestCommandLine(const mvceditor::Global
 	params.ScriptName = detectorScriptFullPath;
 	params.SourceDir = source.RootDirectory;
 	params.RootUrl = rootUrl;
-	params.ResourceDbFileName = project.ResourceDbFileName;
+	params.ResourceDbFileName = globals.TagCacheDbFileName;
 	return params.BuildCmdLine();
 }
 
@@ -134,7 +134,7 @@ wxString mvceditor::TemplateFileTagsDetectorClass::TestCommandLine(const mvcedit
 	params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset().GetFullPath();
 	params.ScriptName = detectorScriptFullPath;
 	params.SourceDir = source.RootDirectory;
-	params.DetectorDbFileName = project.DetectorDbFileName;
+	params.DetectorDbFileName = globals.DetectorCacheDbFileName;
 	params.OutputDbFileName = wxT("");
 	return params.BuildCmdLine();
 }
@@ -737,7 +737,7 @@ void mvceditor::TemplateFileTagsDetectorPanelClass::OnChooseUrlButton(wxCommandE
 			mvceditor::WxToIcu(TestUrl.MethodName),
 
 			// the selection index is the index of the enabled projects
-			Globals.AllEnabledProjects()[ProjectChoice->GetSelection()].DetectorDbFileName
+			Globals.DetectorCacheDbFileName
 		);
 		wxThreadIdType threadId;
 		action->Init(Globals);
@@ -980,19 +980,10 @@ void mvceditor::DetectorFeatureClass::OnRunTemplateFileDetectors(wxCommandEvent&
 	
 	if (!urlTag.Url.GetServer().IsEmpty() && urlTag.FileName.IsOk()
 		&& !urlTag.ClassName.IsEmpty() && !urlTag.MethodName.IsEmpty()) {
-
-		std::vector<mvceditor::ProjectClass>::const_iterator project;
-		wxFileName detectorDbFileName;
-		for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
-			if (project->IsAPhpSourceFile(urlTag.FileName.GetFullPath())) {
-				detectorDbFileName = project->DetectorDbFileName;
-				break;
-			}
-		}
 		callStackAction->SetCallStackStart(urlTag.FileName,
 			mvceditor::WxToIcu(urlTag.ClassName),
 			mvceditor::WxToIcu(urlTag.MethodName),
-			detectorDbFileName);
+			App.Globals.DetectorCacheDbFileName);
 		actions.push_back(callStackAction);
 		actions.push_back(
 			new mvceditor::TemplateFileTagsDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR)

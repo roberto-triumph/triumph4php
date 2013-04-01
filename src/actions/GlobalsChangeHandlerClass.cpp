@@ -41,14 +41,6 @@ void mvceditor::GlobalsChangeHandlerClass::OnSqlMetaDataComplete(mvceditor::SqlM
 	}
 }
 
-void mvceditor::GlobalsChangeHandlerClass::OnGlobalCacheComplete(mvceditor::GlobalCacheCompleteEventClass& event) {
-	mvceditor::GlobalCacheClass* globalCache = event.GlobalCache;
-	if (Globals.TagCache.IsInitGlobal(globalCache->ResourceDbFileName)) {
-		Globals.TagCache.RemoveGlobal(globalCache->ResourceDbFileName);
-	}
-	Globals.TagCache.RegisterGlobal(globalCache);
-}
-
 void mvceditor::GlobalsChangeHandlerClass::OnDatabaseTagsComplete(wxCommandEvent& event) {
 	
 	// first remove all detected connections that were previously detected
@@ -66,9 +58,7 @@ void mvceditor::GlobalsChangeHandlerClass::OnDatabaseTagsComplete(wxCommandEvent
 	mvceditor::DatabaseTagFinderClass finder;
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	std::vector<mvceditor::ProjectClass> projects = Globals.AllEnabledProjects();
-	for (project = projects.begin(); project != projects.end(); ++project) {
-		finder.AttachExistingFile(project->DetectorDbFileName);
-	}
+	finder.AttachExistingFile(Globals.DetectorCacheDbFileName);
 	std::vector<mvceditor::DatabaseTagClass> detected = finder.All();
 	Globals.DatabaseTags.insert(Globals.DatabaseTags.end(), detected.begin(), detected.end());
 }
@@ -76,7 +66,6 @@ void mvceditor::GlobalsChangeHandlerClass::OnDatabaseTagsComplete(wxCommandEvent
 
 BEGIN_EVENT_TABLE(mvceditor::GlobalsChangeHandlerClass, wxEvtHandler)
 	EVT_SQL_META_DATA_COMPLETE(mvceditor::ID_EVENT_ACTION_SQL_METADATA, mvceditor::GlobalsChangeHandlerClass::OnSqlMetaDataComplete)
-	EVT_GLOBAL_CACHE_COMPLETE(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE, mvceditor::GlobalsChangeHandlerClass::OnGlobalCacheComplete)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::GlobalsChangeHandlerClass::OnDatabaseTagsComplete)
 END_EVENT_TABLE()
 
