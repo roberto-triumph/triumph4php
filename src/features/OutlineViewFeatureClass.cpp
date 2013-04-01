@@ -41,7 +41,6 @@
 
 
 static int ID_WINDOW_OUTLINE = wxNewId();
-static int ID_RESOURCE_FINDER_BACKGROUND = wxNewId();
 static int ID_OUTLINE_MENU_DELETE = wxNewId();
 static int ID_OUTLINE_MENU_COLLAPSE = wxNewId();
 static int ID_OUTLINE_MENU_COLLAPSE_ALL = wxNewId();
@@ -393,7 +392,6 @@ void mvceditor::OutlineViewPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 	// the method name is the leaf node, the class name is the parent of the activated node
 	wxTreeItemId item = event.GetItem();
 	wxString methodSig = Tree->GetItemText(item);
-	wxTreeItemId parentItem = Tree->GetItemParent(item);
 	if (!item.IsOk() || Tree->GetChildrenCount(item) > 0) {
 
 		// dont want to handle a non-leaf (a class)
@@ -635,7 +633,6 @@ wxTreeItemId mvceditor::OutlineViewPanelClass::FindFileNode(const wxString& full
 	if (rootId.IsOk()) {
 		wxTreeItemIdValue treeCookie;
 		treeIndex = Tree->GetFirstChild(rootId, treeCookie);
-		bool found = false;
 		while (treeIndex.IsOk()) {
 			mvceditor::TreeItemDataStringClass* data = (mvceditor::TreeItemDataStringClass*)Tree->GetItemData(treeIndex);
 			if (data && data->Str == fullPath) {
