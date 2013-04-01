@@ -48,7 +48,6 @@ mvceditor::TagCacheDbVersionActionClass::TagCacheDbVersionActionClass(mvceditor:
 
 bool mvceditor::TagCacheDbVersionActionClass::Init(mvceditor::GlobalsClass& globals) {
 	SetStatus(_("Tag Cache Check"));
-	bool ret = false;
 
 	// don't think wxFileName copy constructor is a deep clone
 	// we need a deep clone since we access this in the background thread
