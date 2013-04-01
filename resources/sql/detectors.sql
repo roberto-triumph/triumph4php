@@ -294,4 +294,9 @@ CREATE INDEX IF NOT EXISTS idxDetectedTagKey ON detected_tags(key, type);
 --
 -- This number must match the version in CacheDbVersionActionClass.cpp
 --
-INSERT INTO schema_version (version_number) VALUES(2);
+INSERT INTO schema_version (version_number) VALUES(3);
+
+--
+-- Write ahead logging to allow for concurrent reads and writes
+--
+PRAGMA journal_mode = WAL;

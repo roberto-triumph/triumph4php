@@ -31,13 +31,13 @@
  * This number must match the number on the schema_version table
  * of the tags db; if numbers do not match the db will be recreated.
  */
-static const int SCHEMA_VERSION_TAGS = 2;
+static const int SCHEMA_VERSION_TAGS = 3;
 
 /**
  * This number must match the number on the schema_version table of the
  * detectors db; if numbers do not match the db will be recreated.
  */
-static const int SCHEMA_VERSION_DETECTOR = 2;
+static const int SCHEMA_VERSION_DETECTOR = 3;
 
 mvceditor::TagCacheDbVersionActionClass::TagCacheDbVersionActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: ActionClass(runningThreads, eventId)

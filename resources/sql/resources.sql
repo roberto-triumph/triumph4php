@@ -224,4 +224,9 @@ CREATE INDEX IF NOT EXISTS idxTraitKey ON trait_resources(key);
 --
 -- This number must match the version in CacheDbVersionActionClass.cpp
 --
-INSERT INTO schema_version (version_number) VALUES(2);
+INSERT INTO schema_version (version_number) VALUES(3);
+
+--
+-- Write ahead logging to allow for concurrent reads and writes
+--
+PRAGMA journal_mode = WAL;
