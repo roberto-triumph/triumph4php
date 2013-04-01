@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <actions/TagWipeActionClass.h>
+#include <language/TagParserClass.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 
@@ -111,4 +112,40 @@ void mvceditor::TagDeleteActionClass::BackgroundWork() {
 
 wxString mvceditor::TagDeleteActionClass::GetLabel() const {
 	return wxT("Tag Cache Delete");
+}
+
+mvceditor::TagCleanWorkingCacheActionClass::TagCleanWorkingCacheActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId,
+													  const wxString& fileToDelete)
+	: ActionClass(runningThreads, eventId) 
+	, WorkingTagDbFileName()
+	, FileToDelete(fileToDelete.c_str()) {
+}
+
+bool mvceditor::TagCleanWorkingCacheActionClass::Init(mvceditor::GlobalsClass& globals) {
+	SetStatus(_("Working Cache Clean"));
+
+	// not sure if wxFileName assignment is a complete clone, so use Assign() just in case
+	// since we will access the filenames from multiple threads
+	WorkingTagDbFileName.Assign(globals.WorkingTagCacheDbFileName.GetFullPath());
+	return true;
+}
+
+void mvceditor::TagCleanWorkingCacheActionClass::BackgroundWork() {
+
+	// initialize the sqlite db
+	soci::session session;
+	try {
+		session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(WorkingTagDbFileName.GetFullPath()));
+		mvceditor::TagParserClass tagParser;
+		tagParser.Init(&session);
+		tagParser.DeleteFromFile(FileToDelete);
+	} catch(std::exception const& e) {
+		session.close();
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxASSERT_MSG(false, msg);
+	}
+}
+
+wxString mvceditor::TagCleanWorkingCacheActionClass::GetLabel() const {
+	return wxT("Working Cache Clean");
 }

@@ -683,6 +683,11 @@ bool mvceditor::TagFinderClass::IsResourceCacheEmpty() {
 	return count <= 0;
 }
 
+bool mvceditor::TagFinderClass::HasFullPath(const wxString& fullPath) {
+	mvceditor::FileTagClass fileTag;
+	return FindFileTagByFullPathExact(fullPath, fileTag);
+}
+
 bool mvceditor::TagFinderClass::FindFileTagByFullPathExact(const wxString& fullPath, mvceditor::FileTagClass& fileTag) {
 	if (!IsCacheInitialized) {
 		return false;

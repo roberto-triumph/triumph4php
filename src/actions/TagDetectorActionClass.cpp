@@ -163,27 +163,6 @@ void mvceditor::TagDetectorActionClass::OnProcessInProgress(wxCommandEvent &even
 	PostEvent(inProgressEvent);
 }
 
-mvceditor::TagDetectorInitActionClass::TagDetectorInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: InitializerActionClass(runningThreads, eventId) {
-
-}
-
-void mvceditor::TagDetectorInitActionClass::Work(mvceditor::GlobalsClass &globals) {
-	SetStatus(_("Tag Detection Init"));
-
-	// register the detector tag DB file now so that it is available for code completion
-	// even though we know it is stale. The user is notified that the
-	// cache is stale and may not have all of the results
-	// the tag cache will own these pointers
-	mvceditor::GlobalCacheClass* projectCache = new mvceditor::GlobalCacheClass;
-	projectCache->InitDetectorTag(globals.DetectorCacheDbFileName);
-	globals.TagCache.RegisterGlobal(projectCache);
-}
-
-wxString mvceditor::TagDetectorInitActionClass::GetLabel() const {
-	return _("Tag detector initialization");
-}
-
 
 BEGIN_EVENT_TABLE(mvceditor::TagDetectorActionClass, mvceditor::ActionClass) 
 	EVT_COMMAND(ID_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::TagDetectorActionClass::OnProcessInProgress)

@@ -94,9 +94,6 @@ bool mvceditor::SequenceClass::AppStart() {
 	// this will prime the sql connections from the php detectors
 	AddStep(new mvceditor::DatabaseTagDetectorInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR_INIT));
 
-	// this will prime the detected tags cache
-	AddStep(new mvceditor::TagDetectorInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_DETECTOR_INIT));
-
 	// this will detect all of the config files for projects
 	AddStep(new mvceditor::ConfigTagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR));
 
@@ -156,9 +153,6 @@ bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvced
 	// this will load the url entry point cache
 	// do this before the rest so the urls become available asap
 	AddStep(new mvceditor::UrlTagFinderInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR_INIT));
-
-	// this will prime the detected tags cache
-	AddStep(new mvceditor::TagDetectorInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_DETECTOR_INIT));
 
 	// this will prime the sql connections from the php detectors
 	AddStep(new mvceditor::DatabaseTagDetectorInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR_INIT));

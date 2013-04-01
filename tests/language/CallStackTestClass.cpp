@@ -37,6 +37,7 @@ class CallStackFixtureTestClass : public FileTestFixtureClass {
 public:
 
 	mvceditor::TagCacheClass TagCache;
+	wxFileName WorkingTagDbFileName;
 	mvceditor::CallStackClass CallStack;
 	std::vector<wxString> PhpFileExtensions;
 	std::vector<wxString> MiscFileExtensions;
@@ -45,11 +46,17 @@ public:
 	CallStackFixtureTestClass()
 		: FileTestFixtureClass(wxT("call_stack")) 
 		, TagCache() 
-		, CallStack(TagCache)
+		, WorkingTagDbFileName(TestProjectDir, wxT("working_tags.db"))
+		, CallStack(TagCache, WorkingTagDbFileName)
 		, PhpFileExtensions() 
 		, MiscFileExtensions() {
 		PhpFileExtensions.push_back(wxT("*.php"));
 		CreateSubDirectory(wxT("src"));
+
+		soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(WorkingTagDbFileName.GetFullPath()));
+		wxString error;
+		mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), session, error);
+		session.close();
 	}
 
 	wxString Simple() {
@@ -94,9 +101,7 @@ public:
 		}
 		
 		// need to code it so that gcc does not think that good is an unused variable in release mode
-		bool good = TagCache.RegisterGlobal(globalCache);
-		wxUnusedVar(good);
-		wxASSERT_MSG(good, _("global cache could not be registered"));
+		TagCache.RegisterGlobal(globalCache);
 	}
 };
 
@@ -253,7 +258,7 @@ TEST_FIXTURE(CallStackFixtureTestClass, FailOnEmptyCache) {
 	BuildCache();
 
 	mvceditor::TagCacheClass localCache;
-	mvceditor::CallStackClass localCallStack(localCache);
+	mvceditor::CallStackClass localCallStack(localCache, WorkingTagDbFileName);
 	
 	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;

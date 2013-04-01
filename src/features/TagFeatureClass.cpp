@@ -265,6 +265,18 @@ void mvceditor::TagFeatureClass::OnAppFileClosed(wxCommandEvent& event) {
 	// this needs to be the same as mvceditor::CodeControlClass::GetIdString
 	wxString idString = wxString::Format(wxT("File_%d"), event.GetId());
 	App.Globals.TagCache.RemoveWorking(idString);
+	
+	wxString fileToDelete = fileName;
+	if (fileToDelete.IsEmpty()) {
+		fileToDelete = idString;
+	}
+	mvceditor::TagCleanWorkingCacheActionClass* action = new mvceditor::TagCleanWorkingCacheActionClass(App.RunningThreads, wxID_ANY, fileToDelete);
+	action->Init(App.Globals);
+	wxThreadIdType threadId;
+	wxThreadError err = action->CreateSingleInstance(threadId);
+	if (wxTHREAD_NO_ERROR != err) {
+		delete action;
+	}
 }
 
 wxString mvceditor::TagFeatureClass::CacheStatus() {

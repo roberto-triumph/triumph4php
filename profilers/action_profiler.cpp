@@ -225,8 +225,7 @@ void MyFrame::OnClose(wxCloseEvent& event) {
 }
 
 void MyFrame::OnGlobalCacheComplete(mvceditor::GlobalCacheCompleteEventClass& event) {
-	Log(_("Deleting global cache from event"));
-	delete event.GlobalCache;
+	Log(_("global cache completet"));
 }
 
 void MyFrame::OnSequenceComplete(wxCommandEvent& event) {

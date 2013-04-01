@@ -32,12 +32,8 @@ mvceditor::ProjectTagActionClass::ProjectTagActionClass(mvceditor::RunningThread
 	, DirectorySearch()
 	, TagCacheDbFileName()
 	, Version(pelet::PHP_53) 
-	, GlobalCache(NULL)
+	, GlobalCache()
 	, DoTouchedProjects(false) {
-}
-
-mvceditor::ProjectTagActionClass::~ProjectTagActionClass() {
-	BackgroundCleanup();
 }
 
 bool mvceditor::ProjectTagActionClass::InitForFile(mvceditor::GlobalsClass& globals, const wxString& fullPath) {
@@ -59,9 +55,7 @@ bool mvceditor::ProjectTagActionClass::InitForFile(mvceditor::GlobalsClass& glob
 	std::vector<mvceditor::SourceClass> srcs;
 	srcs.push_back(src);
 	if (DirectorySearch.Init(srcs)) {
-		wxASSERT_MSG(GlobalCache == NULL, _("cache pointer has not been cleaned up"));
-		GlobalCache = new mvceditor::GlobalCacheClass();
-		GlobalCache->InitGlobalTag(globals.TagCacheDbFileName, phpFileExtensions, miscFileExtensions, Version, 1024);
+		GlobalCache.InitGlobalTag(globals.TagCacheDbFileName, phpFileExtensions, miscFileExtensions, Version, 1024);
 		ret = true;
 	}
 	return ret;
@@ -107,53 +101,34 @@ void mvceditor::ProjectTagActionClass::IterateDirectory() {
 	
 	// careful to test for destroy first
 	while (!IsCancelled() && DirectorySearch.More()) {
-		GlobalCache->Walk(DirectorySearch);
+		GlobalCache.Walk(DirectorySearch);
 		if (!DirectorySearch.More()) {
-
-			// the event handler will own the pointer to the global cache
 			if (!IsCancelled()) {
 
 				// eventId will be set by the PostEvent method
-				mvceditor::GlobalCacheCompleteEventClass evt(wxID_ANY, GlobalCache);
+				mvceditor::GlobalCacheCompleteEventClass evt(wxID_ANY);
 				PostEvent(evt);
 			}
-			else {
-				
-				// if the thread is being stopped the the handler will not receive the
-				// event, we shouldn't send the event and clean the pointer ourselves
-				delete GlobalCache;
-			}
-			GlobalCache = NULL;
 		}
 	}
 }
 
 void mvceditor::ProjectTagActionClass::IterateProjects() {
+	std::vector<wxString> miscFileExtensions;
+	std::vector<wxString> phpFileExtensions;
+	
+	// ATTN: assumes that all projects have the same extension
+	if (!Projects.empty()) {
+		phpFileExtensions = Projects[0].PhpFileExtensions;
+		miscFileExtensions = Projects[0].AllNonPhpExtensions();	
+	}
+	GlobalCache.InitGlobalTag(TagCacheDbFileName, phpFileExtensions, miscFileExtensions, Version, 1024);
 	for (size_t i = 0; !IsCancelled() && i < Projects.size(); ++i) {
 		mvceditor::ProjectClass project = Projects[i];
-		std::vector<wxString> miscFileExtensions = project.AllNonPhpExtensions();	
-		std::vector<mvceditor::SourceClass> sources = project.AllSources();
-
-		if (DirectorySearch.Init(sources)) {
-			wxASSERT_MSG(GlobalCache == NULL, _("cache pointer has not been cleaned up"));
-			if (GlobalCache) {
-				delete GlobalCache;
-			}
-			SetStatus(_("Tag Cache / ") + project.Label);
-			GlobalCache = new mvceditor::GlobalCacheClass;
-			GlobalCache->InitGlobalTag(TagCacheDbFileName, project.PhpFileExtensions, miscFileExtensions, Version, 1024);
+		if (DirectorySearch.Init(project.AllSources())) {
+			SetStatus(_("Tag Cache / ") + project.Label);			
 			IterateDirectory();
 		}
-	}
-}
-
-void mvceditor::ProjectTagActionClass::BackgroundCleanup() {
-	if (GlobalCache) {
-
-		// if the thread was stopped by the user (via a program exit), then we still 
-		// own this pointer because we have not generated the event
-		delete GlobalCache;
-		GlobalCache = NULL;
 	}
 }
 
@@ -174,19 +149,16 @@ void mvceditor::ProjectTagInitActionClass::Work(mvceditor::GlobalsClass &globals
 	pelet::Versions version = globals.Environment.Php.Version;
 	std::vector<wxString> otherFileExtensions = globals.GetNonPhpFileExtensions();
 	
-	// the tag cache will own all of the global cache pointers
-	mvceditor::GlobalCacheClass* nativeCache = new mvceditor::GlobalCacheClass;
-	nativeCache->InitGlobalTag(mvceditor::NativeFunctionsAsset(), globals.GetPhpFileExtensions(), otherFileExtensions, version);
-	globals.TagCache.RegisterGlobal(nativeCache);
-	
+	// the tag cache will own the global cache pointers
 	// register the project tag DB file now so that it is available for code completion
 	// even though we know it is stale. The user is notified that the
 	// cache is stale and may not have all of the results
 	// the tag cache will own these pointers
-	mvceditor::GlobalCacheClass* projectCache = new mvceditor::GlobalCacheClass;
-	projectCache->InitGlobalTag(globals.TagCacheDbFileName,globals.GetPhpFileExtensions(), otherFileExtensions, version);
-	globals.TagCache.RegisterGlobal(projectCache);
-
+	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass;
+	globalCache->InitNativeTag(mvceditor::NativeFunctionsAsset());
+	globalCache->InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), otherFileExtensions, version);
+	globalCache->InitDetectorTag(globals.DetectorCacheDbFileName);
+	globals.TagCache.RegisterGlobal(globalCache);
 }
 
 wxString mvceditor::ProjectTagInitActionClass::GetLabel() const {

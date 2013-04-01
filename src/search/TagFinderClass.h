@@ -522,6 +522,14 @@ public:
 	 */
 	std::vector<TagClass> All();
 
+	/**
+	 * check to see if this tag finder has the given file 
+	 *
+	 * @param fullPath the path to check. check is done case-insensitive
+	 * @return bool TRUE if the full path is in this db 
+	 */
+	bool HasFullPath(const wxString& fullPath);
+
 protected:
 
 	/**

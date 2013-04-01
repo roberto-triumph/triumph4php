@@ -198,6 +198,12 @@ public:
 	 * file will be deleted also.
 	 */
 	void DeleteDirectories(const std::vector<wxFileName>& dirs);
+
+	/**
+	 * Deletes tags from a single file. If this finder was initialized with a backing file, the backing database
+	 * file will be deleted also.
+	 */
+	void DeleteFromFile(const wxString& fullPath);
 	
 	/**
 	 * set the PHP version to handle

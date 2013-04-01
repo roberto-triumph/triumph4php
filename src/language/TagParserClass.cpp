@@ -823,6 +823,15 @@ void mvceditor::TagParserClass::DeleteDirectories(const std::vector<wxFileName>&
 	}
 }
 
+void mvceditor::TagParserClass::DeleteFromFile(const wxString& fullPath) {
+	mvceditor::FileTagClass fileTag;
+	if (FindFileTagByFullPathExact(fullPath, fileTag)) {
+		std::vector<int> fileTagIdsToRemove;
+		fileTagIdsToRemove.push_back(fileTag.FileId);
+		RemovePersistedResources(fileTagIdsToRemove);
+	}
+}
+
 void mvceditor::TagParserClass::PersistResources(const std::vector<mvceditor::TagClass>& resources, int fileTagId) {
 	if (!IsCacheInitialized) {
 		return;

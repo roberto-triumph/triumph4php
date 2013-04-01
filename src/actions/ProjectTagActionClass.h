@@ -49,8 +49,6 @@ public:
 	 */
 	ProjectTagActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
-	~ProjectTagActionClass();
-
 	/**
 	 * prepare to iterate through the given file. The name part of the given file must match the wildcard.
 	 * This method can be used to update the resources once a file has been modified on disk.
@@ -84,8 +82,6 @@ public:
 	 */
 	void BackgroundWork();
 
-	void BackgroundCleanup();
-
 	wxString GetLabel() const;
 
 private:
@@ -111,10 +107,9 @@ private:
 	pelet::Versions Version;
 
 	/**
-	 * This class will not own this pointer. the pointer will be created by this class
-	 * but it will be posted via an event and the event handler will own it.
+	 * This object will perform the parsing and storing of the tags
 	 */
-	mvceditor::GlobalCacheClass* GlobalCache;
+	mvceditor::GlobalCacheClass GlobalCache;
 
 	/**
 	 * TRUE if we should iterate though the touched projects and not all projects.

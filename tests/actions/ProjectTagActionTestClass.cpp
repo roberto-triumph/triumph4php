@@ -50,50 +50,39 @@ public:
 	 * events.
 	 */
 	mvceditor::ProjectTagActionClass ProjectTagAction;
-	
+
 	/**
-	 * the results to check; these pointers com from the
-	 * events. This class will owne the pointers.
-	 * Therer should be one pointer per each scanned project.
+	 * connection to the tag db
 	 */
-	std::vector<mvceditor::GlobalCacheClass*> GlobalCaches;
+	soci::session Session;
+
+	/**
+	 * will use this to lookup tags once parsing is complete
+	 */
+	mvceditor::ParsedTagFinderClass Finder;
 
 	ProjectTagActionTestClass() 
 		: ActionTestFixtureClass()
 		, FileTestFixtureClass(wxT("resource_file_reader"))
-		, ProjectTagAction(RunningThreads, ID_EVENT) 
-		, GlobalCaches() {
+		, ProjectTagAction(RunningThreads, ID_EVENT)
+		, Session()
+		, Finder() {
 		TouchTestDir();
 		InitTagCache(TestProjectDir);
 		CreateProject(AbsoluteDir(wxT("src_project_1")));
-		soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
+		Session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
 		wxString error;
-		mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), session, error);
+		bool init = mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), Session, error);
+		wxASSERT_MSG(init, error);
+		Finder.Init(&Session);
 	}
-
-	~ProjectTagActionTestClass() {
-		std::vector<mvceditor::GlobalCacheClass*>::iterator cache;
-		for (cache = GlobalCaches.begin(); cache != GlobalCaches.end(); ++cache) {
-			delete (*cache);
-		}
-	}
-
-	void OnGlobalCacheComplete(mvceditor::GlobalCacheCompleteEventClass& event) {
-		GlobalCaches.push_back(event.GlobalCache);
-	}
-
-	DECLARE_EVENT_TABLE()
 };
 
-BEGIN_EVENT_TABLE(ProjectTagActionTestClass, ActionTestFixtureClass) 
-	EVT_GLOBAL_CACHE_COMPLETE(ID_EVENT, ProjectTagActionTestClass::OnGlobalCacheComplete)
-END_EVENT_TABLE()
 
 SUITE(ProjectTagActionTestClass) {
 
 TEST_FIXTURE(ProjectTagActionTestClass, InitProject) {
-	// test that when we intialize 1 project we get 1
-	// global cache pointer
+	// test that when we intialize 1 project it gets parsed
 
 	wxString srcFile;
 	MAKE_FILENAME(srcFile, wxT("src_project_1"), wxT("User.php"));
@@ -106,15 +95,12 @@ TEST_FIXTURE(ProjectTagActionTestClass, InitProject) {
 
 	ProjectTagAction.BackgroundWork();
 
-	CHECK_VECTOR_SIZE(1, GlobalCaches);
-	CHECK(NULL != GlobalCaches[0]);
 	mvceditor::TagSearchClass search(UNICODE_STRING_SIMPLE("User"));
-	CHECK_VECTOR_SIZE(1, GlobalCaches[0]->TagFinder->ExactTags(search));
+	CHECK_VECTOR_SIZE(1, Finder.ExactTags(search));
 }
 
 TEST_FIXTURE(ProjectTagActionTestClass, InitMultipleProjects) {
-	// test that when we intialize 2 project we get 2
-	// global cache pointers
+	// test that when we intialize 2 projects both projects are parsed
 
 	CreateSubDirectory(wxT("src_project_1"));
 	wxString srcFileProject1;
@@ -128,25 +114,16 @@ TEST_FIXTURE(ProjectTagActionTestClass, InitMultipleProjects) {
 	MAKE_FILENAME(srcFileProject2, wxT("src_project_2"), wxT("Role.php"));
 	contents = wxT("<?php class Role {}");
 	CreateFixtureFile(srcFileProject2, contents);
-	soci::session session;
-	session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
-	wxString error;
-	mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), session, error);
-
-
+	
 	CHECK(ProjectTagAction.Init(Globals));
 
 	ProjectTagAction.BackgroundWork();
 
-	CHECK_VECTOR_SIZE(2, GlobalCaches);
-	CHECK(NULL != GlobalCaches[0]);
-	CHECK(NULL != GlobalCaches[1]);
-
 	mvceditor::TagSearchClass searchFirst(UNICODE_STRING_SIMPLE("User"));
-	CHECK_VECTOR_SIZE(1, GlobalCaches[0]->TagFinder->ExactTags(searchFirst));
+	CHECK_VECTOR_SIZE(1, Finder.ExactTags(searchFirst));
 
 	mvceditor::TagSearchClass searchSecond(UNICODE_STRING_SIMPLE("Role"));
-	CHECK_VECTOR_SIZE(1, GlobalCaches[1]->TagFinder->ExactTags(searchSecond));
+	CHECK_VECTOR_SIZE(1, Finder.ExactTags(searchSecond));
 }
 
 }
