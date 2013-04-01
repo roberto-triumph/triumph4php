@@ -796,6 +796,9 @@ bool mvceditor::IsResourceDirty(mvceditor::TagFinderClass* openedFinder, const m
 	// for completely new files, tag.FullPath is the code control's FileIdentifier
 	// so this check should work for new files as well. see
 	// WorkingCacheBuilderClass::BackgroundWork
+
+	// TODO: what should happen when 2 editors are running ? since both now share
+	// the same working cache tags db
 	if (openedFinder) {
 		isOpened = openedFinder->HasFullPath(tag.FullPath);
 	}
