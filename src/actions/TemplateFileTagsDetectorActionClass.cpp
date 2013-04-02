@@ -51,7 +51,8 @@ wxString mvceditor::TemplateFileTagsDetectorParamsClass::BuildCmdLine() const {
 }
 
 mvceditor::TemplateFileTagsDetectorActionClass::TemplateFileTagsDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: ActionClass(runningThreads, eventId)
+	: wxEvtHandler()
+	, GlobalActionClass(runningThreads, eventId)
 	, Process(*this)
 	, ParamsQueue() {
 
@@ -168,7 +169,7 @@ void mvceditor::TemplateFileTagsDetectorActionClass::OnProcessInProgress(wxComma
 	PostEvent(inProgressEvent);
 }
 
-BEGIN_EVENT_TABLE(mvceditor::TemplateFileTagsDetectorActionClass, mvceditor::ActionClass) 
+BEGIN_EVENT_TABLE(mvceditor::TemplateFileTagsDetectorActionClass, wxEvtHandler) 
 	EVT_COMMAND(ID_TEMPLATE_FILE_TAGS_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::TemplateFileTagsDetectorActionClass::OnProcessInProgress)
 	EVT_COMMAND(ID_TEMPLATE_FILE_TAGS_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::TemplateFileTagsDetectorActionClass::OnProcessComplete)
 	EVT_COMMAND(ID_TEMPLATE_FILE_TAGS_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::TemplateFileTagsDetectorActionClass::OnProcessFailed)

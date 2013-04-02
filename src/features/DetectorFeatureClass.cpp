@@ -739,9 +739,8 @@ void mvceditor::TemplateFileTagsDetectorPanelClass::OnChooseUrlButton(wxCommandE
 			// the selection index is the index of the enabled projects
 			Globals.DetectorCacheDbFileName
 		);
-		wxThreadIdType threadId;
 		action->Init(Globals);
-		action->CreateSingleInstance(threadId);
+		RunningThreads.Add(action);
 	}
 }
 
@@ -958,7 +957,7 @@ void mvceditor::DetectorFeatureClass::OnRunUrlDetectors(wxCommandEvent& event) {
 		wxMessageBox(_("Please wait for the current background task to finish"));
 		return;
 	}
-	std::vector<mvceditor::ActionClass*> actions;
+	std::vector<mvceditor::GlobalActionClass*> actions;
 
 	// the sequence class will own this pointer
 	actions.push_back(
@@ -972,7 +971,7 @@ void mvceditor::DetectorFeatureClass::OnRunTemplateFileDetectors(wxCommandEvent&
 		wxMessageBox(_("Please wait for the current background task to finish"));
 		return;
 	}
-	std::vector<mvceditor::ActionClass*> actions;
+	std::vector<mvceditor::GlobalActionClass*> actions;
 
 	// the sequence class will own this pointer
 	mvceditor::CallStackActionClass* callStackAction =  new mvceditor::CallStackActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_CALL_STACK);
@@ -997,7 +996,7 @@ void mvceditor::DetectorFeatureClass::OnRunTemplateFileDetectors(wxCommandEvent&
 }
 
 void mvceditor::DetectorFeatureClass::OnRunTagDetectors(wxCommandEvent& event) {
-	std::vector<mvceditor::ActionClass*> actions;
+	std::vector<mvceditor::GlobalActionClass*> actions;
 
 	// the sequence class will own this pointer
 	actions.push_back(
@@ -1007,7 +1006,7 @@ void mvceditor::DetectorFeatureClass::OnRunTagDetectors(wxCommandEvent& event) {
 }
 
 void mvceditor::DetectorFeatureClass::OnRunDatabaseDetectors(wxCommandEvent& event) {
-	std::vector<mvceditor::ActionClass*> actions;
+	std::vector<mvceditor::GlobalActionClass*> actions;
 
 	// the sequence class will own this pointer
 	actions.push_back(
@@ -1017,7 +1016,7 @@ void mvceditor::DetectorFeatureClass::OnRunDatabaseDetectors(wxCommandEvent& eve
 }
 
 void mvceditor::DetectorFeatureClass::OnRunConfigDetectors(wxCommandEvent& event) {
-	std::vector<mvceditor::ActionClass*> actions;
+	std::vector<mvceditor::GlobalActionClass*> actions;
 
 	// the sequence class will own this pointer
 	actions.push_back(

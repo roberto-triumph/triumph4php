@@ -25,6 +25,8 @@
 #include <widgets/ThreadWithHeartbeatClass.h>
 #include <algorithm>
 
+#if 0
+
 mvceditor::ThreadWithHeartbeatClass::ThreadWithHeartbeatClass(mvceditor::RunningThreadsClass& runningThreads, 
 		int eventId)
 	: wxEvtHandler()
@@ -254,3 +256,5 @@ const wxEventType mvceditor::EVENT_WORK_IN_PROGRESS = wxNewEventType();
 BEGIN_EVENT_TABLE(mvceditor::ThreadWithHeartbeatClass, wxEvtHandler)
 	EVT_TIMER(wxID_ANY, mvceditor::ThreadWithHeartbeatClass::OnTimer)
 END_EVENT_TABLE()
+
+#endif

@@ -161,21 +161,17 @@ public:
 	LintBackgroundFileReaderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 	
 	/**
-	 * Start the background thread.  Lint errors will be propagated as events.
-
+	 * prepare to lint a list of directories
+	 *
 	 * @param sources the locations and include/exclude wildcards of files that need to be parsed.  Parsing will
 	 *        be recursive (sub directories will be parsed also).
 	 * @param environment to know which PHP version to check against
-	 * @param StartError& error the reason for a failure to start will be set here.
-	 * return bool TRUE if and only if the thread was started.  If false, either thread could
-	 * not be started or directory is not valid. 
+	 * @return bool TRUE if sources is not empty
 	 */
-	bool BeginDirectoryLint(std::vector<mvceditor::SourceClass> sources, const EnvironmentClass& environment, StartError& error, wxThreadIdType& threadId);
+	bool InitDirectoryLint(std::vector<mvceditor::SourceClass> sources, const EnvironmentClass& environment);
 
 	/**
-	 * Lint checks the given file in the current thread.  This is a thread-safe method;
-	 * it is safe to call this even when the thread started by BeginDirectoryLint() has not
-	 * finished.
+	 * Lint checks the given file in the current thread.  
 	 *
 	 * Lint errors will be propagated as events.
 	 * @param wxString fileName the full path of the file to lint
@@ -196,6 +192,8 @@ public:
 	 * @param erroFiles the number of files with lint errors will be set here
 	 */
 	void LintTotals(int& totalFiles, int& errorFiles);
+
+	wxString GetLabel() const;
 	
 protected:
 

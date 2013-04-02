@@ -27,7 +27,7 @@
 
 #include <wx/event.h>
 #include <vector>
-#include <actions/ActionClass.h>
+#include <actions/GlobalActionClass.h>
 
 namespace mvceditor {
 
@@ -64,7 +64,7 @@ public:
  * and columns has been retrieved, a SqlMetaDataEventClass event is generated 
  * with the new resources
  */
-class SqlMetaDataActionClass : public ActionClass {
+class SqlMetaDataActionClass : public GlobalActionClass {
 
 public:
 

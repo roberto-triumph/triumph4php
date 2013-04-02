@@ -27,7 +27,7 @@
 
 #include <globals/GlobalsClass.h>
 #include <widgets/ThreadWithHeartbeatClass.h>
-#include <actions/ActionClass.h>
+#include <actions/GlobalActionClass.h>
 #include <wx/event.h>
 #include <queue>
 
@@ -134,7 +134,7 @@ public:
 	 *        this class.
 	 * @return bool FALSE if there is a sequence already running.
 	 */
-	bool Build(std::vector<mvceditor::ActionClass*> actions);
+	bool Build(std::vector<mvceditor::GlobalActionClass*> actions);
 
 	/**
 	 * @return bool TRUE if there is a sequence currently running.
@@ -155,7 +155,7 @@ protected:
 	 *        This means that the action must have been allocated in the 
 	 *        heap.
 	 */
-	void AddStep(mvceditor::ActionClass* action);
+	void AddStep(mvceditor::GlobalActionClass* action);
 
 	/**
 	 * starts the sequence.
@@ -187,7 +187,7 @@ private:
 	 * These pointers are owned by this class, although that if an action
 	 * is run as a background thread the pointer will delete itself.
 	 */
-	std::queue<mvceditor::ActionClass*> Steps;
+	std::queue<mvceditor::GlobalActionClass*> Steps;
 
 	/**
 	 * Flag that tells whether the sequence has been started but is not yet complete

@@ -25,7 +25,7 @@
 #ifndef __MVCEDITOR_CACHEDBVERSIONACTIONCLASS_H__
 #define __MVCEDITOR_CACHEDBVERSIONACTIONCLASS_H__
 
-#include <actions/ActionClass.h>
+#include <actions/GlobalActionClass.h>
 #include <soci/soci.h>
 
 namespace mvceditor {
@@ -38,7 +38,7 @@ namespace mvceditor {
  * schema file.
  * The action will only check the db files for enabled projects.
  */
-class TagCacheDbVersionActionClass : public mvceditor::ActionClass {
+class TagCacheDbVersionActionClass : public mvceditor::GlobalActionClass {
 
 public:
 
@@ -71,7 +71,7 @@ private:
  * schema file.
  * The action will only check the db files for enabled projects.
  */
-class DetectorCacheDbVersionActionClass : public mvceditor::ActionClass {
+class DetectorCacheDbVersionActionClass : public mvceditor::GlobalActionClass {
 
 public:
 

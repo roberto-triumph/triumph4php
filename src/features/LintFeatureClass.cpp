@@ -100,18 +100,13 @@ mvceditor::LintBackgroundFileReaderClass::LintBackgroundFileReaderClass(mvcedito
 		
 }
 
-bool mvceditor::LintBackgroundFileReaderClass::BeginDirectoryLint(std::vector<mvceditor::SourceClass> sources,
-																  const mvceditor::EnvironmentClass& environment,
-																  mvceditor::BackgroundFileReaderClass::StartError& error,
-																  wxThreadIdType& threadId) {
+bool mvceditor::LintBackgroundFileReaderClass::InitDirectoryLint(std::vector<mvceditor::SourceClass> sources,
+																  const mvceditor::EnvironmentClass& environment) {
 	bool good = false;
-	error = mvceditor::BackgroundFileReaderClass::NONE;
 	if (Init(sources)) {
 		ParserDirectoryWalker.SetVersion(environment.Php.Version);
 		ParserDirectoryWalker.ResetTotals();
-		if (StartReading(error, threadId)) {
-			good = true;
-		}
+		good = true;
 	}
 	return good;
 }
@@ -139,7 +134,7 @@ bool mvceditor::LintBackgroundFileReaderClass::BackgroundFileRead(DirectorySearc
 		mvceditor::LintResultsEventClass lintResultsEvent(ID_LINT_READER, ParserDirectoryWalker.LastResults);
 		PostEvent(lintResultsEvent);
 	}
-	if (!search.More() && !TestDestroy()) {
+	if (!search.More() && !IsCancelled()) {
 		int totalFiles = ParserDirectoryWalker.WithErrors + ParserDirectoryWalker.WithNoErrors;
 		int errorFiles = ParserDirectoryWalker.WithErrors;
 		mvceditor::LintResultsSummaryEventClass summaryEvent(ID_LINT_READER, totalFiles, errorFiles);
@@ -155,6 +150,10 @@ bool mvceditor::LintBackgroundFileReaderClass::BackgroundFileMatch(const wxStrin
 void mvceditor::LintBackgroundFileReaderClass::LintTotals(int& totalFiles, int& errorFiles) {
 	totalFiles = ParserDirectoryWalker.WithErrors + ParserDirectoryWalker.WithNoErrors;
 	errorFiles = ParserDirectoryWalker.WithErrors;
+}
+
+wxString mvceditor::LintBackgroundFileReaderClass::GetLabel() const {
+	return wxT("Lint Files");
 }
 
 mvceditor::LintResultsPanelClass::LintResultsPanelClass(wxWindow *parent, int id, mvceditor::NotebookClass* notebook,
@@ -349,8 +348,7 @@ void mvceditor::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
 		return;
 	}
 	if (App.Globals.HasSources()) {
-		mvceditor::BackgroundFileReaderClass::StartError error;
-		mvceditor::LintBackgroundFileReaderClass* thread = new mvceditor::LintBackgroundFileReaderClass(App.RunningThreads, ID_LINT_READER);
+		mvceditor::LintBackgroundFileReaderClass* reader = new mvceditor::LintBackgroundFileReaderClass(App.RunningThreads, ID_LINT_READER);
 		std::vector<mvceditor::SourceClass> phpSources = App.Globals.AllEnabledPhpSources();
 
 		// output an error if a source directory no longer exists
@@ -362,7 +360,8 @@ void mvceditor::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
 				);
 			}
 		}
-		if (thread->BeginDirectoryLint(phpSources, *GetEnvironment(), error, RunningThreadId)) {
+		if (reader->InitDirectoryLint(phpSources, *GetEnvironment())) {
+			App.RunningThreads.Add(reader);
 			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 			gauge->AddGauge(_("Lint Check"), ID_LINT_RESULTS_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 			
@@ -380,16 +379,8 @@ void mvceditor::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
 				SetFocusToToolsWindow(resultsPanel);
 			}
 		}
-		else if (error == mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING)  {
-			wxMessageBox(_("There is already another lint check that is active. Please wait for it to finish."), _("Lint Check"));
-			delete thread;
-		}
-		else if (error == mvceditor::BackgroundFileReaderClass::NO_RESOURCES)  {
-			mvceditor::EditorLogError(mvceditor::ERR_LOW_RESOURCES);
-			delete thread;
-		}
 		else {
-			delete thread;
+			delete reader;
 		}
 	}
 	else {
@@ -492,7 +483,8 @@ void mvceditor::LintFeatureClass::OnNotebookPageClosed(wxAuiNotebookEvent& event
 	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
 	if (notebook->GetPage(selection) == window) {
 		if (RunningThreadId > 0) {
-			App.RunningThreads.Stop(RunningThreadId);
+			// TODO: stop a single action
+			///App.RunningThreads.Stop(RunningThreadId);
 			RunningThreadId = 0;
 			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 			gauge->StopGauge(ID_LINT_RESULTS_GAUGE);

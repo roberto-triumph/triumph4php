@@ -242,7 +242,6 @@ solution "mvc-editor"
 			"src/actions/*.cpp",
 			"src/language/*.cpp",
 			"src/search/*.cpp",
-			"src/widgets/ThreadWithHeartbeatClass.cpp",
 			"src/widgets/ProcessWithHeartbeatClass.cpp"
 		}
 
@@ -320,7 +319,8 @@ solution "mvc-editor"
 			"src/search/*.cpp",
 			"src/actions/ActionClass.cpp",
 			"src/actions/TagDetectorActionClass.cpp",
-			"src/widgets/ThreadWithHeartbeatClass.cpp",
+			"src/actions/ActionClass.cpp",
+			"src/actions/GlobalActionClass.cpp",
 			"src/widgets/ProcessWithHeartbeatClass.cpp"
 		}
 		includedirs { "src", "lib/pelet/include" }
@@ -345,7 +345,6 @@ solution "mvc-editor"
 			"src/language/*.cpp",
 			"src/search/*.cpp",
 			"src/widgets/ProcessWithHeartbeatClass.cpp",
-			"src/widgets/ThreadWithHeartbeatClass.cpp",
 			"profilers/action_profiler.cpp"
 		}
 		includedirs { "src", "lib/pelet/include" }
@@ -389,12 +388,12 @@ solution "mvc-editor"
 		files {
 			"profilers/code_control_profiler.cpp",
 			"src/code_control/*.cpp",
-			"src/widgets/ThreadWithHeartbeatClass.cpp",
 			"src/widgets/ProcessWithHeartbeatClass.cpp",
 			"src/widgets/StatusBarWithGaugeClass.cpp",
 			"src/globals/*.cpp",
 			"src/language/*.cpp",
-			"src/search/*.cpp"
+			"src/search/*.cpp",
+			"src/actions/ActionClass.cpp"
 		}
 		includedirs { "src/", "lib/pelet/include" }
 		links { "pelet" }
@@ -621,7 +620,7 @@ solution "mvc-editor"
 		kind "WindowedApp"
 		files { 
 			"tutorials/running_threads_tutorial.cpp",
-			"src/widgets/ThreadWithHeartbeatClass.cpp"
+			"src/actions/ActionClass.cpp"
 		}
 		includedirs {
 			"src"

@@ -25,7 +25,7 @@
 #ifndef __MVCEDITOR_CALLSTACKACTIONCLASS_H__
 #define __MVCEDITOR_CALLSTACKACTIONCLASS_H__
 
-#include <actions/ActionClass.h>
+#include <actions/GlobalActionClass.h>
 #include <language/CallStackClass.h>
 
 namespace mvceditor {
@@ -37,7 +37,7 @@ namespace mvceditor {
  * EVENT_CALL_STACK_COMPLETE event as well
  * 
  */
-class CallStackActionClass : public mvceditor::ActionClass {
+class CallStackActionClass : public mvceditor::GlobalActionClass {
 
 public:
 

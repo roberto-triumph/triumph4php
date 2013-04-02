@@ -25,7 +25,7 @@
 #ifndef __RESOURCECACHEBUILDERTHREADCLASS_H__
 #define __RESOURCECACHEBUILDERTHREADCLASS_H__
 
-#include <widgets/ThreadWithHeartbeatClass.h>
+#include <actions/ActionClass.h>
 #include <language/TagCacheClass.h>
 
 namespace mvceditor {
@@ -40,7 +40,8 @@ namespace mvceditor {
  * This class will NEVER update the 'global' tag finder; the caller must take care
  * of updating the global tag finder when the user closes the file.
  */
-class WorkingCacheBuilderClass : public ThreadWithHeartbeatClass {
+// TODO above doc is wrong
+class WorkingCacheBuilderClass : public mvceditor::ActionClass {
 	
 public:
 
@@ -50,21 +51,6 @@ public:
 	 */
 	WorkingCacheBuilderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
-	/**
-	 * Will start the background thread 
-	 * 
-	 */
-	wxThreadError Init(wxThreadIdType& threadId);
-	
-	/**
-	 * this method blocks until the background thread terminates
-	 * we havce to do this when the event handler has the same lifetime as 
-	 * this object; we need the handler to be alive for longer than the 
-	 * thread is alive because the thread will generate the EVENT_WORK_COMPLETE
-	 * event after it has terminated (and the event handler needs to be valid)
-	 */
-	void Wait();
-		
 	/**
 	 * Will parse the resources of the given text in a backgound thread and will
 	 * post an EVENT_WORKING_CACHE_COMPLETE when the parsing is complete.
@@ -77,6 +63,8 @@ public:
 	 */
 	void Update(const wxString& fileName, const wxString& fileIdentifier, const UnicodeString& code, bool isNew, pelet::Versions version);
 
+	wxString GetLabel() const;
+
 protected:
 	
 	/**
@@ -87,43 +75,30 @@ protected:
 private:
 
 	/**
-	 * to prevent simultaneous access to the private members
-	 */
-	wxMutex Mutex;
-	
-	/**
-	 * to implement the blocking wait. the main thread will call wait()
-	 * on the condition right after it has deleted the background thread, once the
-	 * the background thread terminates nicely the background thread will
-	 * call broadcast and the main thread will unblock
-	 */
-	wxSemaphore Semaphore;
-
-	/**
 	 * the code that is being worked on by the background thread.
 	 */
-	UnicodeString CurrentCode;
+	UnicodeString Code;
 	
 	/**
 	 * full path to the file that is being worked on by the background thread.
 	 * this can be empty string if file is a new file.
 	 */
-	wxString CurrentFileName;
+	wxString FileName;
 
 	/**
 	 * string that uniquely identifies the file that is being worked on by the background thread.
 	 */
-	wxString CurrentFileIdentifier;
+	wxString FileIdentifier;
 
 	/**
 	 * if TRUE then tileName is a new file that does not yet exist on disk
 	 */
-	bool CurrentFileIsNew;
+	bool FileIsNew;
 
 	/**
 	 * The version of PHP to check against
 	 */
-	pelet::Versions CurrentVersion;
+	pelet::Versions Version;
 
 };
 

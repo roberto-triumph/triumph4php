@@ -85,7 +85,7 @@ void mvceditor::TemplateFilesFeatureClass::StartDetection() {
 		wxMessageBox(_("Please wait for the current background task to finish"));
 		return;
 	}
-	std::vector<mvceditor::ActionClass*> actions;
+	std::vector<mvceditor::GlobalActionClass*> actions;
 
 	// the sequence class will own this pointer
 	mvceditor::CallStackActionClass* callStackAction =  new mvceditor::CallStackActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_CALL_STACK);

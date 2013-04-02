@@ -186,6 +186,8 @@ public:
 	 */
 	static wxCommandEvent MakeHitEvent(int lineNumber, const wxString& lineText, const wxString& fileName);
 
+	wxString GetLabel() const;
+
 protected:
 
 	/**

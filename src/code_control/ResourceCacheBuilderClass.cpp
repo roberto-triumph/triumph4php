@@ -27,107 +27,58 @@
 
 mvceditor::WorkingCacheBuilderClass::WorkingCacheBuilderClass(
 															mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: ThreadWithHeartbeatClass(runningThreads, eventId)
-	, Mutex()
-	, Semaphore(0 , 1)
-	, CurrentCode() 
-	, CurrentFileName() 
-	, CurrentFileIdentifier()
-	, CurrentFileIsNew(true) 
-	, CurrentVersion(pelet::PHP_53) {
-}
-
-wxThreadError mvceditor::WorkingCacheBuilderClass::Init(wxThreadIdType& threadId) {
-	wxThreadError error = CreateSingleInstance(threadId);
-	return error;
-}
-
-void mvceditor::WorkingCacheBuilderClass::Wait() {
-	Semaphore.Wait();
+	: ActionClass(runningThreads, eventId)
+	, Code() 
+	, FileName() 
+	, FileIdentifier()
+	, FileIsNew(true) 
+	, Version(pelet::PHP_53) {
 }
 	
 void mvceditor::WorkingCacheBuilderClass::Update(const wxString& fileName, 
 												 const wxString& fileIdentifier,
 												 const UnicodeString& code, bool isNew, pelet::Versions version) {
-	
-	// make sure to lock the mutex
-	// in order to prevent Entry from reading them while we write to them
-	wxMutexLocker lock(Mutex);
-	wxASSERT(lock.IsOk());
-
-	CurrentCode = code;
+	Code = code;
 
 	// make sure this is a copy
-	CurrentFileName = fileName.c_str();
-	CurrentFileIdentifier = fileIdentifier.c_str();
-	CurrentFileIsNew = isNew;
-	CurrentVersion = version;	
+	FileName = fileName.c_str();
+	FileIdentifier = fileIdentifier.c_str();
+	FileIsNew = isNew;
+	Version = version;	
 }
 
 void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
-	while (!TestDestroy()) {
-		UnicodeString code;
-		wxString fileName;
-		wxString fileIdentifier;
-		bool isNew;
-		pelet::Versions version;
-		{
+	if (!FileIdentifier.IsEmpty()) {
 
-			// lock while we copy data into the current thread.
-			wxMutexLocker lock(Mutex);
-			wxASSERT(lock.IsOk());
+		// make sure to use the local variables and not the class ones
+		// since this code is outside the mutex
+		// even if code is empty, lets create a working cache so that the 
+		// file is registered and code completion works
+		mvceditor::WorkingCacheClass* cache = new mvceditor::WorkingCacheClass();
+		if (FileIsNew) {
 
-			// use extract to perform a pure copy
-			UErrorCode error = U_ZERO_ERROR;
-			int32_t len = CurrentCode.length();
-			UChar* buf = code.getBuffer(len);
-			CurrentCode.extract(buf, CurrentCode.length(), error);
-			code.releaseBuffer(len);
-
-			fileName = CurrentFileName.c_str();
-			fileIdentifier = CurrentFileIdentifier.c_str();
-			isNew = CurrentFileIsNew;
-			version = CurrentVersion;
-
-			// cleanup.
-			CurrentCode.truncate(0);
-			CurrentFileName.resize(0);
-			CurrentFileIdentifier.resize(0);
-			CurrentFileIsNew = false;
+			// new files will not have a name, use the identifier as the name
+			FileName = FileIdentifier;
 		}
+		cache->InitWorkingTag(mvceditor::TagCacheWorkingAsset());
+		cache->Init(FileName, FileIdentifier, FileIsNew, Version, false);
+		bool good = cache->Update(Code);
+		if (good && !IsCancelled()) {
 
-		if (!fileIdentifier.IsEmpty()) {
-
-			// make sure to use the local variables and not the class ones
-			// since this code is outside the mutex
-			// even if code is empty, lets create a working cache so that the 
-			// file is registered and code completion works
-			mvceditor::WorkingCacheClass* cache = new mvceditor::WorkingCacheClass();
-			if (isNew) {
-
-				// new files will not have a name, use the identifier as the name
-				fileName = fileIdentifier;
-			}
-			cache->InitWorkingTag(mvceditor::TagCacheWorkingAsset());
-			cache->Init(fileName, fileIdentifier, isNew, version, false);
-			bool good = cache->Update(code);
-			if (good && !TestDestroy()) {
-
-				// only send the event if the code passes the lint check
-				// otherwise we will delete a good symbol table, we want auto completion
-				// to work even if the code is broken
-				// PostEvent will set the correct event Id
-				mvceditor::WorkingCacheCompleteEventClass evt(wxID_ANY, fileName, fileIdentifier, cache);
-				PostEvent(evt);
-			}
-			else {
-				// we still own the pointer since we did not send the event
-				delete cache;
-			}
+			// only send the event if the code passes the lint check
+			// otherwise we will delete a good symbol table, we want auto completion
+			// to work even if the code is broken
+			// PostEvent will set the correct event Id
+			mvceditor::WorkingCacheCompleteEventClass evt(wxID_ANY, FileName, FileIdentifier, cache);
+			PostEvent(evt);
 		}
-		if (!TestDestroy()) {
-			wxThread::Sleep(200);
+		else {
+			// we still own the pointer since we did not send the event
+			delete cache;
 		}
 	}
-	Semaphore.Post();
+}
+
+wxString mvceditor::WorkingCacheBuilderClass::GetLabel() const {
+	return wxT("Working Tag Cache");
 }

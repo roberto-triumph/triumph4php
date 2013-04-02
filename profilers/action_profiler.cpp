@@ -132,7 +132,7 @@ void MyApp::Stop() {
 }
 
 void MyApp::BuildSequence() {
-	std::vector<mvceditor::ActionClass*> actions;
+	std::vector<mvceditor::GlobalActionClass*> actions;
 	actions.push_back(
 		new mvceditor::TagCacheDbVersionActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK)
 	);
@@ -153,9 +153,9 @@ void MyApp::BuildGlobals() {
 
 	// needed so that we can know what files need to be parsed
 	Globals.PhpFileExtensionsString = wxT("*.php");
-    Globals.CssFileExtensionsString = wxT("*.css");
-    Globals.SqlFileExtensionsString = wxT("*.php");
-    Globals.MiscFileExtensionsString = wxT("*.txt;*.xml;*.yml");
+	Globals.CssFileExtensionsString = wxT("*.css");
+	Globals.SqlFileExtensionsString = wxT("*.php");
+	Globals.MiscFileExtensionsString = wxT("*.txt;*.xml;*.yml");
 
 	Globals.Environment.Apache.ManualConfiguration = true;
 	Globals.Environment.Apache.SetVirtualHostMapping(wxT("C:\\Users\\roberto\\software\\wamp\\www\\ember"), wxT("http://localhost/"));
@@ -220,6 +220,7 @@ void MyFrame::OnActionInProgress(wxCommandEvent& event) {
 }
 
 void MyFrame::OnClose(wxCloseEvent& event) {
+	App.RunningThreads.RemoveEventHandler(this);
 	App.Stop();
 	event.Skip();
 }

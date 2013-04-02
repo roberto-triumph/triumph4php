@@ -150,7 +150,7 @@ bool mvceditor::FindInFilesBackgroundReaderClass::BackgroundFileRead(DirectorySe
 		std::vector<wxString>::iterator it = find(SkipFiles.begin(), SkipFiles.end(), fileName);
 		std::vector<mvceditor::FindInFilesHitClass> hits;
 		if (it == SkipFiles.end()) {
-			bool destroy = TestDestroy();
+			bool destroy = IsCancelled();
 			do {			
 				if (destroy) {
 					break;
@@ -186,6 +186,10 @@ bool mvceditor::FindInFilesBackgroundReaderClass::BackgroundFileMatch(const wxSt
 	return matches > 0;
 }
 
+wxString mvceditor::FindInFilesBackgroundReaderClass::GetLabel() const {
+	return wxT("Find In Files");
+}
+
 mvceditor::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* parent, NotebookClass* notebook, 
 		StatusBarWithGaugeClass* gauge, mvceditor::RunningThreadsClass& runningThreads)
 	: FindInFilesResultsPanelGeneratedClass(parent)
@@ -212,7 +216,8 @@ mvceditor::FindInFilesResultsPanelClass::~FindInFilesResultsPanelClass() {
 
 	// make sure we kill any running searches
 	if (RunningThreadId > 0) {
-		RunningThreads.Stop(RunningThreadId);
+		// TODO: stop a single action
+		///RunningThreads.Stop(RunningThreadId);
 		
 		// dont try to kill the gauge as the gauge window may not valid anymore
 		// if the program is closed while the find is running
@@ -232,10 +237,10 @@ void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findI
 		return;
 	}
 	std::vector<wxString> skipFiles = Notebook->GetOpenedFiles();
-	mvceditor::FindInFilesBackgroundReaderClass* thread = 
+	mvceditor::FindInFilesBackgroundReaderClass* reader = 
 		new mvceditor::FindInFilesBackgroundReaderClass(RunningThreads, FindInFilesGaugeId);
-	mvceditor::BackgroundFileReaderClass::StartError error;
-	if (thread->InitForFind(FindInFiles, doHiddenFiles, skipFiles) && thread->StartReading(error, RunningThreadId)) {
+	if (reader->InitForFind(FindInFiles, doHiddenFiles, skipFiles)) {
+		RunningThreads.Add(reader);
 		EnableButtons(true, false, false);
 		Gauge->AddGauge(_("Find In Files"), FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE, 
 			wxGA_HORIZONTAL);
@@ -244,17 +249,9 @@ void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findI
 		// lets do the find in the opened files ourselves so that the hits are not stale
 		FindInOpenedFiles();			
 	}
-	else if (error == mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING)  {
-		wxMessageBox(_("Find in files is already running. Please wait for it to finish."), _("Find In Files"));
-		delete thread;
-	}
-	else if (error == mvceditor::BackgroundFileReaderClass::NO_RESOURCES)  {
-		mvceditor::EditorLogError(mvceditor::ERR_LOW_RESOURCES);
-		delete thread;
-	}
 	else {
 		wxMessageBox(_("Please enter a valid expression and path."));
-		delete thread;
+		delete reader;
 	}
 }
 
@@ -420,25 +417,15 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxComman
 		}
 		
 		// we've already searched, when replacing we should iterate through matched files hence we don't call DirectorySearch,.Init().
-		mvceditor::FindInFilesBackgroundReaderClass* thread = 
+		mvceditor::FindInFilesBackgroundReaderClass* reader = 
 			new mvceditor::FindInFilesBackgroundReaderClass(RunningThreads, FindInFilesGaugeId);
-		thread->InitForReplace(FindInFiles, FilesFromHits(AllHits), Notebook->GetOpenedFiles());
-		mvceditor::BackgroundFileReaderClass::StartError error;
-		if (thread->StartReading(error, RunningThreadId)) {
-			SetStatus(_("Find In Files In Progress"));
-			Gauge->AddGauge(_("Find In Files"), FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE, 
-				wxGA_HORIZONTAL);
-			EnableButtons(true, false, false);
-			SetStatus(_("Replacing"));
-		}
-		else if (error == mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING)  {
-			wxMessageBox(_("Find in files is already running. Please wait for it to finish."), _("Find In Files"));
-			delete thread;
-		}
-		else if (error == mvceditor::BackgroundFileReaderClass::NO_RESOURCES)  {
-			mvceditor::EditorLogError(mvceditor::ERR_LOW_RESOURCES);
-			delete thread;
-		}
+		reader->InitForReplace(FindInFiles, FilesFromHits(AllHits), Notebook->GetOpenedFiles());
+		RunningThreads.Add(reader);
+		SetStatus(_("Find In Files In Progress"));
+		Gauge->AddGauge(_("Find In Files"), FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE, 
+			wxGA_HORIZONTAL);
+		EnableButtons(true, false, false);
+		SetStatus(_("Replacing"));
 	}
 	else {
 		wxMessageBox(_("Please enter a valid expression and path."));
@@ -522,7 +509,8 @@ void mvceditor::FindInFilesResultsPanelClass::OnStopButton(wxCommandEvent& event
 }
 
 void mvceditor::FindInFilesResultsPanelClass::Stop() {
-	RunningThreads.Stop(RunningThreadId);
+	// TODO: stop a single action
+	///RunningThreads.Stop(RunningThreadId);
 	Gauge->StopGauge(FindInFilesGaugeId);
 	if (AllHits.size() >= MAX_HITS) {
 		SetStatus(_("Too many hits, Search stopped"));

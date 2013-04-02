@@ -69,6 +69,9 @@ void mvceditor::SequenceClass::Stop() {
 		Steps.pop();
 	}
 	IsRunning = false;
+	wxCommandEvent sequenceEvent(mvceditor::EVENT_SEQUENCE_COMPLETE);
+	sequenceEvent.SetId(wxID_ANY);
+	RunningThreads.PostEvent(sequenceEvent);
 }
 
 bool mvceditor::SequenceClass::AppStart() {
@@ -205,7 +208,7 @@ bool mvceditor::SequenceClass::TagCacheWipeAndIndex() {
 	return true;
 }
 
-bool mvceditor::SequenceClass::Build(std::vector<mvceditor::ActionClass*> actions) {
+bool mvceditor::SequenceClass::Build(std::vector<mvceditor::GlobalActionClass*> actions) {
 	if (Running()) {
 		return false;
 	}
@@ -240,7 +243,7 @@ bool mvceditor::SequenceClass::DatabaseDetection() {
 	return true;
 }
 
-void mvceditor::SequenceClass::AddStep(mvceditor::ActionClass* step) {
+void mvceditor::SequenceClass::AddStep(mvceditor::GlobalActionClass* step) {
 	Steps.push(step);
 }
 
@@ -286,12 +289,11 @@ void mvceditor::SequenceClass::RunNextStep() {
 	while (!Steps.empty()) {
 		bool isInit = false;
 		if (!Steps.front()->DoAsync()) {
+			IsCurrentStepAsync = false;
 
 			// if the step is not asynchronous, it means that it does not
 			// need us to start a new thread
 			isInit = Steps.front()->Init(Globals);
-			IsCurrentStepAsync = false;
-
 			if (!isInit) {
 
 				// if the step is not initialized, move on to the next step.
@@ -308,41 +310,28 @@ void mvceditor::SequenceClass::RunNextStep() {
 				// even though we dont start a background thread, the 
 				// sync actions still generate EVT_WORK_COMPLETE events. let's
 				// wait for it.
+				IsRunning = true;
 				break;
 			}
 		}
 		else {
+			IsCurrentStepAsync = true;
 
 			// if the step is to be performed in a background thread, then check the
 			// return value of the init method, that way we dont start a new thread
 			// if there is no work to be done
-			bool isInit = Steps.front()->Init(Globals);
-			wxThreadError err = wxTHREAD_NO_ERROR;
-			wxThreadIdType runningThreadId;
+			isInit = Steps.front()->Init(Globals);
 			if (isInit) {
-				err = Steps.front()->CreateSingleInstance(runningThreadId);
-			}
-			if (wxTHREAD_NO_RESOURCE == err) {
+				mvceditor::ActionClass* action = Steps.front();
+				RunningThreads.Add(action);
 
-				// if we cannot start a thread due to low resoures, then other steps will
-				// probably fail too. just end the sequence
-				while (!Steps.empty()) {
-					delete Steps.front();
-					Steps.pop();
-				}
-				mvceditor::EditorLogError(mvceditor::WARNING_OTHER, _("The system is low on resources. Close some programs and try again."));
-				isSequenceDone = true;				
-			}
-			else if (isInit && wxTHREAD_NO_ERROR == err) {
-
-				// everything went OK. wait for the background thread to finish
+				// now wait for the background thread to finish
 				IsRunning = true;
-				IsCurrentStepAsync = true;
 				break;
 			}
 			else {
 
-				// no need to start a background thread or a misc error starting up a thread.
+				// no need to start a background thread since Init failed
 				// lets move on to the next step
 				delete Steps.front();
 				Steps.pop();

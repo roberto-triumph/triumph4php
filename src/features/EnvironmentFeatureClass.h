@@ -82,6 +82,8 @@ public:
 	 * @param startDirectory the directory to start looking in
 	 */
 	bool Init(const wxString& startDirectory); 
+
+	wxString GetLabel() const;
 	
 protected:
 

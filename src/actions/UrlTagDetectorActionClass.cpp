@@ -30,7 +30,7 @@
 static int ID_URL_TAG_DETECTOR_PROCESS = wxNewId();
 
 mvceditor::UrlTagFinderInitActionClass::UrlTagFinderInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: InitializerActionClass(runningThreads, eventId) {
+	: InitializerGlobalActionClass(runningThreads, eventId) {
 
 }
 
@@ -68,7 +68,8 @@ wxString mvceditor::UrlTagDetectorParamsClass::BuildCmdLine() const {
 }
 
 mvceditor::UrlTagDetectorActionClass::UrlTagDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: ActionClass(runningThreads, eventId)
+	: wxEvtHandler()
+	, GlobalActionClass(runningThreads, eventId)
 	, Process(*this)
 	, ParamsQueue() {
 
@@ -185,7 +186,7 @@ void mvceditor::UrlTagDetectorActionClass::OnProcessInProgress(wxCommandEvent &e
 	PostEvent(inProgressEvent);
 }
 
-BEGIN_EVENT_TABLE(mvceditor::UrlTagDetectorActionClass, mvceditor::ActionClass) 
+BEGIN_EVENT_TABLE(mvceditor::UrlTagDetectorActionClass, wxEvtHandler) 
 	EVT_COMMAND(ID_URL_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::UrlTagDetectorActionClass::OnProcessInProgress)
 	EVT_COMMAND(ID_URL_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::UrlTagDetectorActionClass::OnProcessComplete)
 	EVT_COMMAND(ID_URL_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::UrlTagDetectorActionClass::OnProcessFailed)

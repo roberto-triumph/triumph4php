@@ -138,7 +138,7 @@ private:
 /**
  * Class that will take a string of SQL statements and will execute them.
  */
-class MultipleSqlExecuteClass : public ThreadWithHeartbeatClass {
+class MultipleSqlExecuteClass : public mvceditor::ActionClass {
 	
 public:
 
@@ -159,25 +159,20 @@ public:
 	 * @return true if sql is not empty
 	 */
 	bool Init(const UnicodeString& sql, const SqlQueryClass& query);
-	
-	/**
-	 * start a new thread and execute the current query.
-	 * @param threadId if thread was started, the thread Id will be set.
-	 * @return bool true if a new thread was started
-	 */
-	bool Execute(wxThreadIdType& threadId);
-	
-	/**
-	 * cleans up the current connection. After a call to this session, stmt, and row are no longer
-	 * valid.
-	 */
-	void Close();
+
+	wxString GetLabel() const;
 	
 protected:
 
 	void BackgroundWork();
 
 private:
+
+	/**
+	 * cleans up the current connection. After a call to this session, stmt, and row are no longer
+	 * valid.
+	 */
+	void Close();
 
 	/**
 	 * we will handle multiple queries here by splitting the contents of the 

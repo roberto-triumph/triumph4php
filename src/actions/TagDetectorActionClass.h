@@ -25,7 +25,7 @@
 #ifndef __MVCEDITOR_TAGDETECTORACTIONCLASS_H__
 #define __MVCEDITOR_TAGDETECTORACTIONCLASS_H__
 
-#include <actions/ActionClass.h>
+#include <actions/GlobalActionClass.h>
 #include <widgets/ProcessWithHeartbeatClass.h>
 #include <queue>
 
@@ -88,7 +88,7 @@ public:
  * This class will run all tag detectors across all enabled projects. This means that there is
  * one external process execution for each project source directory / tag detector combination
  */
-class TagDetectorActionClass : public mvceditor::ActionClass {
+class TagDetectorActionClass : public wxEvtHandler, public mvceditor::GlobalActionClass {
 
 public:
 

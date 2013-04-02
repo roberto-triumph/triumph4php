@@ -118,7 +118,9 @@ void mvceditor::SqlConnectionDialogClass::OnCancelButton(wxCommandEvent& event) 
 	if (TestQuery.Connect(session, error)) {
 		TestQuery.KillConnection(session, ConnectionIdentifier, error);
 	}
-	RunningThreads.Stop(RunningThreadId);
+
+	/// TODO implement stop of a single thing
+	///RunningThreads.Stop(RunningThreadId);
 	RunningThreadId = 0;
 	event.Skip();
 }
@@ -140,26 +142,7 @@ void mvceditor::SqlConnectionDialogClass::OnTestButton(wxCommandEvent& event) {
 			
 			mvceditor::MultipleSqlExecuteClass* thread = new mvceditor::MultipleSqlExecuteClass(RunningThreads, ID_SQL_TEST, ConnectionIdentifier);
 			thread->Init(UNICODE_STRING_SIMPLE("SELECT 1"), TestQuery);
-			wxThreadIdType threadId;
-			error = thread->CreateSingleInstance(threadId);
-			switch (error) {
-			case wxTHREAD_NO_ERROR:
-				RunningThreadId = thread->GetId();
-				wxWindow::FindWindowById(wxID_OK, this)->Disable();
-				wxWindow::FindWindowById(ID_TESTBUTTON, this)->Disable();
-				break;
-			case wxTHREAD_NO_RESOURCE:
-			case wxTHREAD_MISC_ERROR:
-				mvceditor::EditorLogError(mvceditor::ERR_LOW_RESOURCES);
-				break;
-			case wxTHREAD_RUNNING:
-			case wxTHREAD_KILLED:
-			case wxTHREAD_NOT_RUNNING:
-
-				// should not be possible we are controlling this with IsRunning
-				// by disabling the buttons
-				break;
-			}
+			RunningThreads.Add(thread);
 		}
 	}
 }
@@ -309,7 +292,7 @@ void mvceditor::SqlConnectionDialogClass::OnChecklistToggled(wxCommandEvent& eve
 
 mvceditor::MultipleSqlExecuteClass::MultipleSqlExecuteClass(mvceditor::RunningThreadsClass& runningThreads, int queryId,
 															mvceditor::ConnectionIdentifierClass& connectionIdentifier)
-	: ThreadWithHeartbeatClass(runningThreads, queryId)
+	: ActionClass(runningThreads, queryId)
 	, SqlLexer() 
 	, Query()
 	, Session()
@@ -317,26 +300,8 @@ mvceditor::MultipleSqlExecuteClass::MultipleSqlExecuteClass(mvceditor::RunningTh
 	, QueryId(queryId) {
 }
 
-bool mvceditor::MultipleSqlExecuteClass::Execute(wxThreadIdType& threadId) {
-	bool ret = false;
-	
-	wxThreadError error = CreateSingleInstance(threadId);
-	switch (error) {
-	case wxTHREAD_NO_ERROR:
-		ret = true;
-		break;
-	case wxTHREAD_NO_RESOURCE:
-	case wxTHREAD_MISC_ERROR:
-		mvceditor::EditorLogError(mvceditor::ERR_LOW_RESOURCES);
-		break;
-	case wxTHREAD_RUNNING:
-	case wxTHREAD_KILLED:
-	case wxTHREAD_NOT_RUNNING:
-
-		wxMessageBox(_("Please wait while current queries finish executing."));
-		break;
-	}
-	return ret;
+wxString mvceditor::MultipleSqlExecuteClass::GetLabel() const {
+	return wxT("SQL Execute");
 }
 
 void mvceditor::MultipleSqlExecuteClass::BackgroundWork() {
@@ -344,7 +309,7 @@ void mvceditor::MultipleSqlExecuteClass::BackgroundWork() {
 	UnicodeString query;
 	bool connected = Query.Connect(Session, error);
 	if (connected) {
-		while (SqlLexer.NextQuery(query) && !TestDestroy()) {		
+		while (SqlLexer.NextQuery(query) && !IsCancelled()) {		
 			wxLongLong start = wxGetLocalTimeMillis();
 
 			// create a new result on the heap; the event handler must delete it
@@ -420,7 +385,8 @@ void mvceditor::SqlBrowserPanelClass::Execute() {
 	if (Check() && 0 == RunningThreadId) {
 		mvceditor::MultipleSqlExecuteClass* thread = new mvceditor::MultipleSqlExecuteClass(
 			Feature->App.RunningThreads, QueryId, ConnectionIdentifier);
-		if (thread->Init(LastQuery, Query) && thread->Execute(RunningThreadId)) {
+		if (thread->Init(LastQuery, Query)) { 
+			Feature->App.RunningThreads.Add(thread);
 			Gauge->AddGauge(_("Running SQL queries"), ID_SQL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 		}
 		else {
@@ -456,7 +422,8 @@ void mvceditor::SqlBrowserPanelClass::Stop() {
 		else {
 			wxMessageBox(_("could not connect:") + mvceditor::IcuToWx(error));
 		}
-		Feature->App.RunningThreads.Stop(RunningThreadId);
+		// TODO: implement stop on a single action
+		////Feature->App.RunningThreads.Stop(RunningThreadId);
 		RunningThreadId = 0;
 		Gauge->StopGauge(ID_SQL_GAUGE);
 	}
@@ -691,7 +658,7 @@ void mvceditor::SqlBrowserFeatureClass::DetectMetadata() {
 
 	// thread will be owned by SequenceClass
 	mvceditor::SqlMetaDataActionClass* thread = new mvceditor::SqlMetaDataActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA);
-	std::vector<mvceditor::ActionClass*> actions;
+	std::vector<mvceditor::GlobalActionClass*> actions;
 	actions.push_back(thread);
 	App.Sequences.Build(actions);
 }
@@ -814,21 +781,7 @@ void mvceditor::SqlBrowserFeatureClass::OnSqlConnectionMenu(wxCommandEvent& even
 		// redetect the SQL meta data
 		mvceditor::SqlMetaDataActionClass* thread = new mvceditor::SqlMetaDataActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA);
 		if (thread->Init(App.Globals)) {
-			wxThreadIdType threadId;
-			wxThreadError err = thread->CreateSingleInstance(threadId);
-			if (wxTHREAD_NO_ERROR == err) {
-				GetStatusBarWithGauge()->AddGauge(_("Fetching SQL meta data"), ID_SQL_METADATA_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
-			}
-			else if (wxTHREAD_NO_RESOURCE == err) {
-				mvceditor::EditorLogError(mvceditor::ERR_LOW_RESOURCES);
-				delete thread;
-			}
-			else if (wxTHREAD_RUNNING == err) {
-				mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, 
-					_("There is already another SQL MetaData fetch that is active. Please wait for it to finish.")
-				);
-				delete thread;
-			}
+			App.RunningThreads.Add(thread);
 		}
 		else {
 			delete thread;

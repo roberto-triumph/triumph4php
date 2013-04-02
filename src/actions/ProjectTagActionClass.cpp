@@ -27,7 +27,7 @@
 #include <globals/Assets.h>
 
 mvceditor::ProjectTagActionClass::ProjectTagActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId) 
-	: ActionClass(runningThreads, eventId)
+	: GlobalActionClass(runningThreads, eventId)
 	, Projects()
 	, DirectorySearch()
 	, TagCacheDbFileName()
@@ -137,7 +137,7 @@ wxString mvceditor::ProjectTagActionClass::GetLabel() const {
 }
 
 mvceditor::ProjectTagInitActionClass::ProjectTagInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: InitializerActionClass(runningThreads, eventId) {
+	: InitializerGlobalActionClass(runningThreads, eventId) {
 
 }
 
