@@ -100,24 +100,7 @@ protected:
 
 private:
 
-	/**
-	 *  To generate the heartbeats (EVENT_WORK_IN_PROGRESS)
-	 */
-	wxTimer Timer;
-	
-	/**
-	 * Will generate a EVENT_WORK_IN_PROGRESS event
-	 */
-	void OnTimer(wxTimerEvent& event);
-	
-	/**
-	 * Will prepare to send events at regular intervals. After a call to this method, a 
-	 * EVENT_WORK_IN_PROGRESS will be generated at regular intervals until SignalEnd()
-	 * is called.
-	 */
-	void SignalStart();
-	
-	DECLARE_EVENT_TABLE() 
+
 };
 
 #endif

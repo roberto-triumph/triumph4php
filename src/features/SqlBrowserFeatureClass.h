@@ -128,7 +128,7 @@ private:
 	/**
 	 * to kill the test query thread if needed
 	 */
-	int RunningThreadId;
+	int RunningActionId;
 	
 	size_t& ChosenIndex;
 	
@@ -334,9 +334,9 @@ private:
 	UnicodeString LastQuery;
 	
 	/**
-	 * used to process stop a running query if this panel is closed.
+	 * used to stop a running query if this panel is closed.
 	 */
-	wxThreadIdType RunningThreadId;
+	int RunningActionId;
 	
 	/**
 	 * the accumulated results. This class will DELETE the pointers once it has rendered them.

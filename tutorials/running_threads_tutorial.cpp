@@ -55,7 +55,7 @@ private:
 
 	mvceditor::RunningThreadsClass& RunningThreads;
 	wxTextCtrl* Text;
-	wxThreadIdType RunningThreadId;
+	wxThreadIdType RunningActionId;
 
 	DECLARE_EVENT_TABLE()
 };
@@ -91,7 +91,7 @@ MyFrame::MyFrame(mvceditor::RunningThreadsClass& runningThreads) :
 	wxFrame(NULL, wxID_ANY, wxT("running threads tutorial"), wxDefaultPosition, 
 			wxSize(640, 480)) 
 	, RunningThreads(runningThreads) 
-	, RunningThreadId(0) {
+	, RunningActionId(0) {
 	RunningThreads.AddEventHandler(this);
 
 	SetSizeHints( wxDefaultSize, wxDefaultSize );
@@ -118,19 +118,19 @@ void MyFrame::AddMenu() {
 void MyFrame::OnStartNewThread(wxCommandEvent& event) {
 	MyAction* action = new MyAction(RunningThreads, ID_THREAD, wxString::Format(wxT("Action-%d"), ActionCount));
 	ActionCount++;
-	RunningThreads.Add(action);
+	RunningActionId = RunningThreads.Add(action);
 	Text->AppendText(wxString::Format(_("Action started...\n")));
 }
 
 void MyFrame::OnStopThread(wxCommandEvent& event) {
-	RunningThreads.StopCurrent();
-	RunningThreadId = 0;
+	RunningThreads.CancelAction(RunningActionId);
+	RunningActionId = 0;
 }
 
 void MyFrame::OnStopAllThread(wxCommandEvent& event) {
 	RunningThreads.StopAll();
 	Text->AppendText(_("All threads stopped...\n"));
-	RunningThreadId = 0;
+	RunningActionId = 0;
 }
 
 void MyFrame::OnExit(wxCommandEvent &event) {
@@ -171,7 +171,7 @@ void MyFrame::OnThreadRunning(wxCommandEvent& event) {
 void MyFrame::OnThreadComplete(wxCommandEvent& event) {
 	Text->AppendText(event.GetString());
 	Text->AppendText(wxT("Work complete\n"));
-	RunningThreadId = 0;
+	RunningActionId = 0;
 }
 
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)

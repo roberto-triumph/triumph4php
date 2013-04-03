@@ -45,7 +45,7 @@ mvceditor::SqlConnectionDialogClass::SqlConnectionDialogClass(wxWindow* parent, 
 	, TestQuery()
 	, RunningThreads(runningThreads)
 	, ConnectionIdentifier()
-	, RunningThreadId()
+	, RunningActionId()
 	, ChosenIndex(chosenIndex) {
 	RunningThreads.AddEventHandler(this);
 	Label->SetValue(wxT(""));
@@ -118,10 +118,8 @@ void mvceditor::SqlConnectionDialogClass::OnCancelButton(wxCommandEvent& event) 
 	if (TestQuery.Connect(session, error)) {
 		TestQuery.KillConnection(session, ConnectionIdentifier, error);
 	}
-
-	/// TODO implement stop of a single thing
-	///RunningThreads.Stop(RunningThreadId);
-	RunningThreadId = 0;
+	RunningThreads.CancelAction(RunningActionId);
+	RunningActionId = 0;
 	event.Skip();
 }
 
@@ -359,7 +357,7 @@ mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id,
 	, ConnectionIdentifier()
 	, LastError()
 	, LastQuery()
-	, RunningThreadId(0) 
+	, RunningActionId(0) 
 	, Results()
 	, Gauge(gauge)
 	, Feature(feature) {
@@ -382,16 +380,16 @@ bool mvceditor::SqlBrowserPanelClass::Check() {
 }
 
 void mvceditor::SqlBrowserPanelClass::Execute() {
-	if (Check() && 0 == RunningThreadId) {
+	if (Check() && 0 == RunningActionId) {
 		mvceditor::MultipleSqlExecuteClass* thread = new mvceditor::MultipleSqlExecuteClass(
 			Feature->App.RunningThreads, QueryId, ConnectionIdentifier);
 		if (thread->Init(LastQuery, Query)) { 
-			Feature->App.RunningThreads.Add(thread);
+			RunningActionId = Feature->App.RunningThreads.Add(thread);
 			Gauge->AddGauge(_("Running SQL queries"), ID_SQL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 		}
 		else {
 			delete thread;
-			RunningThreadId = 0;
+			RunningActionId = 0;
 		}
 	}
 	else if (LastQuery.isEmpty()) {
@@ -409,7 +407,7 @@ void mvceditor::SqlBrowserPanelClass::Stop() {
 	// query (via a SQL KILL) and stop the thread
 	// so that the rest of the SQL statements are not
 	// sent to the server and the thread terminates
-	if (RunningThreadId > 0) {
+	if (RunningActionId > 0) {
 		soci::session session;
 		UnicodeString error;
 		bool good = Query.Connect(session, error);
@@ -422,9 +420,8 @@ void mvceditor::SqlBrowserPanelClass::Stop() {
 		else {
 			wxMessageBox(_("could not connect:") + mvceditor::IcuToWx(error));
 		}
-		// TODO: implement stop on a single action
-		////Feature->App.RunningThreads.Stop(RunningThreadId);
-		RunningThreadId = 0;
+		Feature->App.RunningThreads.CancelAction(RunningActionId);
+		RunningActionId = 0;
 		Gauge->StopGauge(ID_SQL_GAUGE);
 	}
 }
@@ -617,7 +614,7 @@ void mvceditor::SqlBrowserPanelClass::OnWorkComplete(wxCommandEvent& event) {
 			delete Results[i];
 		}
 		Results.clear();
-		RunningThreadId = 0;
+		RunningActionId = 0;
 		Gauge->StopGauge(ID_SQL_GAUGE);
 		Feature->AuiManagerUpdate();
 	}

@@ -198,7 +198,7 @@ mvceditor::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* 
 	, Notebook(notebook)
 	, Gauge(gauge)
 	, MatchedFiles(0) 
-	, RunningThreadId(0) {
+	, RunningActionId(0) {
 	FindInFilesGaugeId = wxNewId();
 	RunningThreads.AddEventHandler(this);
 
@@ -215,9 +215,8 @@ mvceditor::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* 
 mvceditor::FindInFilesResultsPanelClass::~FindInFilesResultsPanelClass() {
 
 	// make sure we kill any running searches
-	if (RunningThreadId > 0) {
-		// TODO: stop a single action
-		///RunningThreads.Stop(RunningThreadId);
+	if (RunningActionId > 0) {
+		RunningThreads.CancelAction(RunningActionId);
 		
 		// dont try to kill the gauge as the gauge window may not valid anymore
 		// if the program is closed while the find is running
@@ -232,7 +231,7 @@ void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findI
 	RegexReplaceWithHelpButton->Enable(mvceditor::FinderClass::REGULAR_EXPRESSION == FindInFiles.Mode);
 
 	// for now disallow another find when one is already active
-	if (RunningThreadId > 0) {
+	if (RunningActionId > 0) {
 		wxMessageBox(_("Find in files is already running. Please wait for it to finish."), _("Find In Files"));
 		return;
 	}
@@ -240,7 +239,7 @@ void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findI
 	mvceditor::FindInFilesBackgroundReaderClass* reader = 
 		new mvceditor::FindInFilesBackgroundReaderClass(RunningThreads, FindInFilesGaugeId);
 	if (reader->InitForFind(FindInFiles, doHiddenFiles, skipFiles)) {
-		RunningThreads.Add(reader);
+		RunningActionId = RunningThreads.Add(reader);
 		EnableButtons(true, false, false);
 		Gauge->AddGauge(_("Find In Files"), FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE, 
 			wxGA_HORIZONTAL);
@@ -391,7 +390,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceAllInFileButton(wxCommand
 void mvceditor::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxCommandEvent& event) {
 
 	// for now disallow another replace when one is already active
-	if (RunningThreadId > 0) {
+	if (RunningActionId > 0) {
 		wxMessageBox(_("Find in files is already running. Please wait for it to finish."), _("Find In Files"));
 		return;
 	}
@@ -420,7 +419,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxComman
 		mvceditor::FindInFilesBackgroundReaderClass* reader = 
 			new mvceditor::FindInFilesBackgroundReaderClass(RunningThreads, FindInFilesGaugeId);
 		reader->InitForReplace(FindInFiles, FilesFromHits(AllHits), Notebook->GetOpenedFiles());
-		RunningThreads.Add(reader);
+		RunningActionId = RunningThreads.Add(reader);
 		SetStatus(_("Find In Files In Progress"));
 		Gauge->AddGauge(_("Find In Files"), FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE, 
 			wxGA_HORIZONTAL);
@@ -464,7 +463,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnWorkComplete(wxCommandEvent& eve
 		event.Skip();
 		return;
 	}
-	RunningThreadId = 0;
+	RunningActionId = 0;
 }
 
 void mvceditor::FindInFilesResultsPanelClass::OnFileHit(mvceditor::FindInFilesHitEventClass& event) {
@@ -509,8 +508,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnStopButton(wxCommandEvent& event
 }
 
 void mvceditor::FindInFilesResultsPanelClass::Stop() {
-	// TODO: stop a single action
-	///RunningThreads.Stop(RunningThreadId);
+	RunningThreads.CancelAction(RunningActionId);
 	Gauge->StopGauge(FindInFilesGaugeId);
 	if (AllHits.size() >= MAX_HITS) {
 		SetStatus(_("Too many hits, Search stopped"));

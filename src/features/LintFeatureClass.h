@@ -342,9 +342,9 @@ private:
 	void OnNotebookPageClosed(wxAuiNotebookEvent& event);	
 
 	/**
-	 * to stop the lint background thread if the user closes the tab
+	 * to stop the lint action if the user closes the tab
 	 */
-	wxThreadIdType RunningThreadId;
+	int RunningActionId;
 
 	/**
 	 * This will hold all info about parse errors.

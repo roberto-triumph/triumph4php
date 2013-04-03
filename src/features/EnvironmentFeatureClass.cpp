@@ -169,7 +169,7 @@ mvceditor::ApacheEnvironmentPanelClass::ApacheEnvironmentPanelClass(wxWindow* pa
 	, Environment(environment)
 	, RunningThreads(runningThreads)
 	, EditedApache()
-	, RunningThreadId(0) {
+	, RunningActionId(0) {
 	RunningThreads.AddEventHandler(this);
 	EditedApache = environment.Apache;
 	wxGenericValidator manualValidator(&EditedApache.ManualConfiguration);	
@@ -186,9 +186,8 @@ mvceditor::ApacheEnvironmentPanelClass::ApacheEnvironmentPanelClass(wxWindow* pa
 }
 
 mvceditor::ApacheEnvironmentPanelClass::~ApacheEnvironmentPanelClass() {
-	if (RunningThreadId > 0) {
-		// TODO: stop a single action
-		///RunningThreads.Stop(RunningThreadId);
+	if (RunningActionId > 0) {
+		RunningThreads.CancelAction(RunningActionId);
 	}
 	RunningThreads.RemoveEventHandler(this);
 }
@@ -199,21 +198,21 @@ void mvceditor::ApacheEnvironmentPanelClass::OnScanButton(wxCommandEvent& event)
 		wxMessageBox(_("Please enter a configuration directory"));
 		return;
 	}
-	if (0 == RunningThreadId) {
+	if (0 == RunningActionId) {
 		wxChar ch = wxFileName::GetPathSeparator();
 		if (path[path.Length() - 1] != ch) {
 			path.Append(ch);
 		}
 		mvceditor::ApacheFileReaderClass* reader = new mvceditor::ApacheFileReaderClass(RunningThreads, ID_APACHE_FILE_READER);
 		if (reader->Init(path)) {
-			RunningThreads.Add(reader);
+			RunningActionId = RunningThreads.Add(reader);
 			VirtualHostList->DeleteAllItems();
 			ScanButton->SetLabel(_("Stop Scan"));
 			Gauge->Show();
 		}
 		else {
 			delete reader;
-			RunningThreadId = 0;
+			RunningActionId = 0;
 			wxMessageBox(_("Path not valid"), _("Configuration Not Found"), wxOK | wxCENTRE, this);
 		}
 	}
@@ -222,9 +221,9 @@ void mvceditor::ApacheEnvironmentPanelClass::OnScanButton(wxCommandEvent& event)
 		// act like a stop button
 		Gauge->SetValue(0);
 		
-		// TODO: stop a single ction
-		///RunningThreads.Stop(RunningThreadId);
-		RunningThreadId = 0;
+
+		RunningThreads.CancelAction(RunningActionId);
+		RunningActionId = 0;
 		ScanButton->SetLabel(_("Scan For Configuration"));
 	}
 }
@@ -262,7 +261,7 @@ void mvceditor::ApacheEnvironmentPanelClass::OnWorkInProgress(wxCommandEvent& ev
 void mvceditor::ApacheEnvironmentPanelClass::OnWorkComplete(wxCommandEvent& event) {
 	Gauge->SetValue(0);
 	ScanButton->SetLabel(_("Scan For Configuration"));
-	RunningThreadId = 0;
+	RunningActionId = 0;
 }
 
 void mvceditor::ApacheEnvironmentPanelClass::OnResize(wxSizeEvent& event) {
@@ -342,7 +341,7 @@ bool mvceditor::ApacheEnvironmentPanelClass::TransferDataFromWindow() {
 }
 
 void mvceditor::ApacheEnvironmentPanelClass::OnDirChanged(wxFileDirPickerEvent& event) {
-	if (0 == RunningThreadId) {
+	if (0 == RunningActionId) {
 		wxString path = ApacheConfigurationDirectory->GetPath();
 		wxChar ch = wxFileName::GetPathSeparator();
 		if (path[path.Length() - 1] != ch) {
@@ -350,7 +349,7 @@ void mvceditor::ApacheEnvironmentPanelClass::OnDirChanged(wxFileDirPickerEvent& 
 		}
 		mvceditor::ApacheFileReaderClass* reader = new mvceditor::ApacheFileReaderClass(RunningThreads, ID_APACHE_FILE_READER);
 		if (reader->Init(path)) {
-			RunningThreads.Add(reader);
+			RunningActionId = RunningThreads.Add(reader);
 			VirtualHostList->DeleteAllItems();
 			ScanButton->SetLabel(_("Stop Scan"));
 			Gauge->Show();

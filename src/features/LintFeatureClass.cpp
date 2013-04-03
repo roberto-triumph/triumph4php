@@ -305,7 +305,7 @@ void mvceditor::LintResultsPanelClass::SelectPreviousError() {
 mvceditor::LintFeatureClass::LintFeatureClass(mvceditor::AppClass& app) 
 	: FeatureClass(app)
 	, CheckOnSave(true)
-	, RunningThreadId(0)
+	, RunningActionId(0)
 	, LintErrors() {
 }
 
@@ -343,7 +343,7 @@ void mvceditor::LintFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 }
 
 void mvceditor::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
-	if (RunningThreadId > 0) {
+	if (RunningActionId > 0) {
 		wxMessageBox(_("There is already another lint check that is active. Please wait for it to finish."), _("Lint Check"));
 		return;
 	}
@@ -361,7 +361,7 @@ void mvceditor::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
 			}
 		}
 		if (reader->InitDirectoryLint(phpSources, *GetEnvironment())) {
-			App.RunningThreads.Add(reader);
+			RunningActionId = App.RunningThreads.Add(reader);
 			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 			gauge->AddGauge(_("Lint Check"), ID_LINT_RESULTS_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 			
@@ -420,7 +420,7 @@ void mvceditor::LintFeatureClass::OnLintFileComplete(wxCommandEvent& event) {
 void mvceditor::LintFeatureClass::OnLintComplete(wxCommandEvent& event) {
 	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 	gauge->StopGauge(ID_LINT_RESULTS_GAUGE);
-	RunningThreadId = 0;
+	RunningActionId = 0;
 }
 
 void mvceditor::LintFeatureClass::OnTimer(wxCommandEvent& event) {
@@ -482,10 +482,9 @@ void mvceditor::LintFeatureClass::OnNotebookPageClosed(wxAuiNotebookEvent& event
 	int selection = event.GetSelection();
 	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
 	if (notebook->GetPage(selection) == window) {
-		if (RunningThreadId > 0) {
-			// TODO: stop a single action
-			///App.RunningThreads.Stop(RunningThreadId);
-			RunningThreadId = 0;
+		if (RunningActionId > 0) {
+			App.RunningThreads.CancelAction(RunningActionId);
+			RunningActionId = 0;
 			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 			gauge->StopGauge(ID_LINT_RESULTS_GAUGE);
 		}

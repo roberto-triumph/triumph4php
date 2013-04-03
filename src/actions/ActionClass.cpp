@@ -27,6 +27,7 @@
 mvceditor::ActionClass::ActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: RunningThreads(runningThreads)
 	, EventId(eventId)
+	, ActionId(0)
 	, Mutex()
 	, Cancelled(false) {
 }
@@ -54,6 +55,20 @@ void mvceditor::ActionClass::SetStatus(const wxString& status) {
 	PostEvent(evt);
 }
 
+int mvceditor::ActionClass::GetEventId() const {
+	return EventId;
+}
+
+void mvceditor::ActionClass::SetActionId(int actionId) {
+	wxMutexLocker locker(Mutex);
+	ActionId = actionId;
+}
+
+int mvceditor::ActionClass::GetActionId() {
+	wxMutexLocker locker(Mutex);
+	return ActionId;
+}
+
 void mvceditor::ActionClass::PostEvent(wxEvent& event) {
 	event.SetId(EventId);
 	RunningThreads.PostEvent(event);
@@ -62,9 +77,10 @@ void mvceditor::ActionClass::PostEvent(wxEvent& event) {
 void mvceditor::ActionClass::BackgroundCleanup() {
 }
 
+
 void mvceditor::ActionClass::SignalEnd() {
 	wxCommandEvent evt(mvceditor::EVENT_WORK_COMPLETE, EventId);
-	wxString msg = wxString::Format(wxT("Thread %s stopped...\n"), GetLabel());
+	wxString msg = wxString::Format(wxT("Action \"%s\" stopped...\n"), GetLabel());
 	evt.SetString(msg);
 	PostEvent(evt);
 }
@@ -81,6 +97,7 @@ void* mvceditor::ThreadActionClass::Entry() {
 		mvceditor::ActionClass* action = NextAction();
 		if (action && !TestDestroy()) {
 			action->BackgroundWork();
+			action->SignalEnd();
 			ActionComplete();
 		}
 		else if (action) {
@@ -92,7 +109,8 @@ void* mvceditor::ThreadActionClass::Entry() {
 		}
 		else {
 			// no action to work on, wait a bit 
-			wxMicroSleep(300);
+			// 100 milliseconds = 100 microseconds * 1000
+			wxMicroSleep(100 * 1000);
 		}
 	}
 	wxSemaError err = FinishSemaphore.Post();
@@ -121,27 +139,42 @@ void mvceditor::ThreadActionClass::ActionComplete() {
 	wxMutexLocker locker(ActionsMutex);
 	if (!Actions.empty()) {
 		mvceditor::ActionClass* action = Actions.front();
-		action->SignalEnd();
 		delete action;
 		Actions.pop();
 	}
 }
   
 mvceditor::RunningThreadsClass::RunningThreadsClass(bool doPostEvents)
-	: Actions()
+	: wxEvtHandler()
+	, Actions()
 	, ActionMutex()
 	, Handlers()
 	, HandlerMutex()
 	, Semaphore(0, 1)
-	, DoPostEvents(doPostEvents) {
+	, DoPostEvents(doPostEvents) 
+	, NextActionId(0)
+	, Timer() {
 	ThreadAction = NULL;
+	Timer.SetOwner(this);
   }
   
-void mvceditor::RunningThreadsClass::Add(mvceditor::ActionClass* action) {
+int mvceditor::RunningThreadsClass::Add(mvceditor::ActionClass* action) {
+	if (!Timer.IsRunning()) {
+		Timer.Start(200, wxTIMER_CONTINUOUS);
+	}
+	
+	// prevent multiple accesses to Actions queue
 	wxMutexLocker locker(ActionMutex);
-	Actions.push(action);
-	if (NULL == ThreadAction) {
 		
+	Actions.push(action);
+
+	// assign the action a unique ID 
+	int actionId = -1;
+	actionId = NextActionId++;
+	action->SetActionId(actionId);
+
+	// if the actual thread has not started, start it
+	if (NULL == ThreadAction) {		
 		ThreadAction = new mvceditor::ThreadActionClass(Actions, ActionMutex, Semaphore);
 		wxThreadError error = wxTHREAD_NO_ERROR;
 		error = ThreadAction->Create();
@@ -150,29 +183,61 @@ void mvceditor::RunningThreadsClass::Add(mvceditor::ActionClass* action) {
 			ThreadAction->Run();
 		}
 	}
+	return actionId;
 }
-/*
-void mvceditor::RunningThreadsClass::Remove(mvceditor::ThreadWithHeartbeatClass* thread) {
-	{
-		wxMutexLocker locker(Mutex);
-		wxASSERT(locker.IsOk());
-		std::vector<mvceditor::ThreadWithHeartbeatClass*>::iterator it = Workers.begin();
-		while (it != Workers.end()) {
-			if (*it == thread) {
-  				
-				// untrack only 
-				it = Workers.erase(it);
-  			}
-			else {
-				it++;
-			}
+
+void mvceditor::RunningThreadsClass::CancelAction(int actionId) {
+	// this is an important lock because it ensures that
+	// the front action is not deleted while we try to call Cancel on it
+	wxMutexLocker locker(ActionMutex);
+	wxASSERT(locker.IsOk());
+
+	// if there is nothing in the queue nothing to cancel
+	if (Actions.empty()) {
+		return;
+	}
+
+	// check all actions to see which one matches the actionId.
+	// the first action is currently running in the background thread,
+	// we need to cancel it.
+	// note that if the action is being run, ThreadAction will delete the pointer once
+	// the thread dies.  we cannot delete it here because the thread
+	// is still running and delete it will cause crashes (invalid memory
+	// accesses)
+	mvceditor::ActionClass* action = Actions.front();
+	if (action->GetActionId() == actionId) {
+		action->Cancel();
+	}
+
+	// other threads in the queue are not yet running, so we can just
+	// remove them from the queue
+	std::queue<mvceditor::ActionClass*> checked;
+
+	// we just checked the first action above, skip it
+	checked.push(action);
+	Actions.pop();
+	while (!Actions.empty()) {
+		action = Actions.front();
+		if (action->GetActionId() != actionId) {
+
+			// keep this action
+			checked.push(action);
 		}
+		else {
+
+			// this action we need to remove
+			delete action;
+		}		
+		Actions.pop();
 	}
-	if (Semaphore) {
-		Semaphore->Post();
+	
+	// now put back the actions we checked
+	while (!checked.empty()) {
+		action = checked.front();
+		Actions.push(action);
+		checked.pop();
 	}
 }
-*/
 
 void mvceditor::RunningThreadsClass::StopAll() {
 
@@ -208,7 +273,7 @@ void mvceditor::RunningThreadsClass::StopAll() {
 		ThreadAction = NULL;
 	}
 }
-
+/***
 void mvceditor::RunningThreadsClass::StopCurrent() {
 	// this is an important lock because it ensures that
 	// the front action is not deleted while we try to call Cancel on it
@@ -227,8 +292,9 @@ void mvceditor::RunningThreadsClass::StopCurrent() {
 		action->Cancel();
 	}
 }
+*/
 
-/*
+/***
 void mvceditor::RunningThreadsClass::Stop(wxThreadIdType threadId) {
 	mvceditor::ThreadWithHeartbeatClass* thread = NULL;
 	{
@@ -310,6 +376,26 @@ bool mvceditor::RunningThreadsClass::IsRunning(mvceditor::ThreadWithHeartbeatCla
 	return found;
 } */
 
+void mvceditor::RunningThreadsClass::OnTimer(wxTimerEvent& event) {
+	wxMutexLocker locker(ActionMutex);
+	wxASSERT(locker.IsOk());
+
+	// if there is nothing in the queue nothing is running
+	if (!Actions.empty()) {
+
+		// if there is an action that is running then stop it
+		mvceditor::ActionClass* action = Actions.front();
+		wxCommandEvent evt(mvceditor::EVENT_WORK_IN_PROGRESS, action->GetEventId());
+		PostEvent(evt);	
+	}
+}
+
+
 const wxEventType mvceditor::EVENT_ACTION_STATUS = wxNewEventType();
 const wxEventType mvceditor::EVENT_WORK_COMPLETE = wxNewEventType();
 const wxEventType mvceditor::EVENT_WORK_IN_PROGRESS = wxNewEventType();
+
+
+BEGIN_EVENT_TABLE(mvceditor::RunningThreadsClass, wxEvtHandler)
+	EVT_TIMER(wxID_ANY, mvceditor::RunningThreadsClass::OnTimer)
+END_EVENT_TABLE()

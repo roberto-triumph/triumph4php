@@ -326,9 +326,9 @@ private:
 	int FindInFilesGaugeId;
 
 	/**
-	 * to stop the thread if this panel is closed.
+	 * to stop the find in in files action if this panel is closed.
 	 */
-	wxThreadIdType RunningThreadId;
+	int RunningActionId;
 
 	/**
 	 * Need to save the insertion point of the replace combo boxes; in Win32
