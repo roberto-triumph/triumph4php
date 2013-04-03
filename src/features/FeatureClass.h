@@ -29,7 +29,6 @@
 #include <globals/ProjectClass.h>
 #include <widgets/NotebookClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
-#include <widgets/ThreadWithHeartbeatClass.h>
 #include <main_frame/PreferencesClass.h>
 #include <wx/event.h>
 #include <wx/propdlg.h>

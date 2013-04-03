@@ -28,7 +28,6 @@
 #include <features/FeatureClass.h>
 #include <pelet/TokenClass.h>
 #include <features/wxformbuilder/OutlineViewFeatureForms.h>
-#include <widgets/ThreadWithHeartbeatClass.h>
 #include <wx/imaglist.h>
 #include <vector>
 

@@ -49,10 +49,45 @@ extern const wxEventType EVENT_WORK_COMPLETE;
  */
 extern const wxEventType EVENT_WORK_IN_PROGRESS;
 
+
+/**
+ * An action is any short of long-lived logic that needs to be executed asynchronously.
+ * An action is given to RunningThreadsClass to be queued; RunningThreads will then
+ * call the BackgroundWork() method in a background thread and will the delete
+ * the action.  Actions should always be created on the heap because RunningThreadsClass
+ * will take ownership of them.
+ * 
+ * Actions can be cancelled by another process, like for example in response to a
+ * user click button.  Actions should periodically check the IsCancelled() method and
+ * should return as soon as IsCancelled returns TRUE.
+ *
+ * When subclassing an ActionClass, make sure that any data passed from the main thread
+ * and used by the background thread are copied properly. Pay special attention to 
+ * wxString variables, as the default wxString
+ * assignment operator and copy constructors are NOT thread-safe (produce
+ * shallow copies)
+ *
+ * An action will communicate with the rest of the program by posting events
+ * to RunningThreadsClass, the rest of the program will attach themselves as
+ * event handlers of RunningThreadsClass.  For example, an action that 
+ * executes a SQL query in the background would 
+ *
+ * 1.) copy the connection info into member variables via the constructor
+ *     or an Init() method.  the variables would be cloned.
+ * 2.) in the implementation of BackgroundWork() the query would be executed,
+ *     read into object. a wxEvent would be passed to the rest of the 
+ *     program by calling PostEvent()
+ *
+ */
 class ActionClass {
 
 public:
 
+	/**
+	 * @param runningThreads used to post events. This reference must be 
+	 *        alive for as long as this class is alive.
+	 * @param eventId the posted events will have this ID as the EventID
+	 */
 	ActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 	virtual ~ActionClass();
@@ -209,13 +244,19 @@ private:
   };
   
 /**
- * Class to hold all of the threads that are currently running.  wxWidgets
+ * Class to hold all of the actions that are currently running. wxWidgets
  * threads are detached by default, we cannot call the IsRunning or IsAlive
  * methods on them; this makes it necessary for us to track the threads
  * in order to stop them on demand (like say, when the user clicks a stop
  * button or closes a panel).
+ *
+ * Code that needs to run an action in the background will create an action
+ * in the heap, initialize it as need it, then call the Add() method.  Once 
+ * the Add() method is called, the action will be run in the background at
+ * some point in the future.  Add() can be called many times if needed, actions
+ * are queued up and run one after another in the background.
  * 
- * This class will own the given threads, and will delete them if need be.
+ * This class will own all given actions, and will delete them need.
  */
 class RunningThreadsClass : public wxEvtHandler {
   
@@ -224,12 +265,14 @@ class RunningThreadsClass : public wxEvtHandler {
 	RunningThreadsClass(bool doPostEvents = true);
 	
 	/**
-	 * Keeps track of the given worker.  Most of the times we will
-	 * do nothing with this pointer; wxWidgets detached threads delete themselves.
-	 * The only time we will need this pointer is when we want to stop
-	 * the thread while it is running. Remember that it is not safe to
-	 * call IsAlive, IsRunning methods on detached threads.
-	 * 
+	 * Queues the given action to be run at some point in the near future. 
+	 * This method will return an identifier that can be used to stop the 
+	 * action if needed.
+	 *
+	 * It is very important to note that once an action is queued, it may 
+	 * deleted at any time after that so the action pointer should not be accessed
+	 * at all.
+	 *
 	 * @param action this class will own the pointer and delete it
 	 * @return an action ID, which can be used to cancel the action at at 
 	 * later time.

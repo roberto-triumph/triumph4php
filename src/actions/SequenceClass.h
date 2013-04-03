@@ -26,7 +26,6 @@
 #define __MVCEDITORSEQUENCECLASS_H__
 
 #include <globals/GlobalsClass.h>
-#include <widgets/ThreadWithHeartbeatClass.h>
 #include <actions/GlobalActionClass.h>
 #include <wx/event.h>
 #include <queue>

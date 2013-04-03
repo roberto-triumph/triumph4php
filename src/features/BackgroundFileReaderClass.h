@@ -29,8 +29,6 @@
 #include <wx/event.h>
 #include <actions/ActionClass.h>
 #include <search/DirectorySearchClass.h>
-#include <widgets/ThreadWithHeartbeatClass.h>
-
 
 namespace mvceditor {
 

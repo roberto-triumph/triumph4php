@@ -273,63 +273,6 @@ void mvceditor::RunningThreadsClass::StopAll() {
 		ThreadAction = NULL;
 	}
 }
-/***
-void mvceditor::RunningThreadsClass::StopCurrent() {
-	// this is an important lock because it ensures that
-	// the front action is not deleted while we try to call Cancel on it
-	wxMutexLocker locker(ActionMutex);
-	wxASSERT(locker.IsOk());
-
-	// if there is nothing in the queue nothing to cancel
-	if (!Actions.empty()) {
-
-		// if there is an action that is running then stop it
-		// note that ThreadAction will delete the pointer once
-		// the thread dies.  we cannot delete it here because the thread
-		// is still running and delete it will cause crashes (invalid memory
-		// accesses)
-		mvceditor::ActionClass* action = Actions.front();
-		action->Cancel();
-	}
-}
-*/
-
-/***
-void mvceditor::RunningThreadsClass::Stop(wxThreadIdType threadId) {
-	mvceditor::ThreadWithHeartbeatClass* thread = NULL;
-	{
-		wxMutexLocker locker(Mutex);
-		wxASSERT(locker.IsOk());
-		std::vector<mvceditor::ThreadWithHeartbeatClass*>::iterator it;
-		for (it = Workers.begin(); it != Workers.end(); ++it) {
-			if ((*it)->GetId() == threadId) {
-				thread = *it;
-				it = Workers.erase(it);
-				break;
-			}
-		}
-		if (thread) {
-			Semaphore = new wxSemaphore(0, 1);
-		}
-	}
-	if (thread && Semaphore) {
-		// Delete will gracefully delete, which will endup calling
-		// the Remove() method
-		// also, thread pointer will delete itself
-		// we must do this outside of the mutex because in windows
-		// detached threads are really just joinable threads and the wxThread::Delete()
-		// call blocks until the thread terminates; but if we call Delete
-		// inside the mutex we produce a deadlock since Remove() tries to lock
-		// the mutex too
-		thread->Cancel();
-		thread->Delete();
-
-		Semaphore->Wait();
-		delete Semaphore;
-		Semaphore = NULL;
-	}
-}
-*/
 
 void mvceditor::RunningThreadsClass::AddEventHandler(wxEvtHandler *handler) {
 	wxMutexLocker locker(HandlerMutex);
@@ -359,22 +302,6 @@ void mvceditor::RunningThreadsClass::PostEvent(wxEvent& event) {
 		}
 	}
 }
-
-/*
-bool mvceditor::RunningThreadsClass::IsRunning(mvceditor::ThreadWithHeartbeatClass* thread) {
-	bool found = false;
-	wxMutexLocker locker(Mutex);
-	wxASSERT(locker.IsOk());
-	std::vector<mvceditor::ThreadWithHeartbeatClass*>::iterator it = Workers.begin();
-	while (it != Workers.end()) {
-		if (*it == thread) {
-			found = true;
-			break;
-		}
-		++it;
-	}
-	return found;
-} */
 
 void mvceditor::RunningThreadsClass::OnTimer(wxTimerEvent& event) {
 	wxMutexLocker locker(ActionMutex);
