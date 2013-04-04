@@ -316,12 +316,19 @@ void mvceditor::MultipleSqlExecuteClass::BackgroundWork() {
 			results->LineNumber = SqlLexer.GetLineNumber();
 			
 			Query.ConnectionIdentifier(Session, ConnectionIdentifier);
-
-			// always post the results even if the query has an error.
 			Query.Execute(Session, *results, query);
-			wxCommandEvent evt(QUERY_COMPLETE_EVENT, QueryId);
-			evt.SetClientData(results);
-			PostEvent(evt);			
+
+			// post the results even if the query has an error.
+			// but dont post if the query was cancelled
+			// careful: leak will happen when panel is closed since event won't be handled
+			if (!IsCancelled()) {
+				wxCommandEvent evt(QUERY_COMPLETE_EVENT, QueryId);
+				evt.SetClientData(results);
+				PostEvent(evt);
+			}
+			else {
+				delete results;
+			}
 		}
 		SqlLexer.Close();
 	}
@@ -368,6 +375,10 @@ mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id,
 	ResultsGrid->ClearGrid();
 	UpdateLabels(wxT(""));
 	Feature->App.RunningThreads.AddEventHandler(this);
+}
+
+mvceditor::SqlBrowserPanelClass::~SqlBrowserPanelClass() {
+	
 }
 
 bool mvceditor::SqlBrowserPanelClass::Check() {
@@ -843,6 +854,9 @@ void mvceditor::SqlBrowserFeatureClass::OnToolsNotebookPageClose(wxAuiNotebookEv
 	// methods
 	if (toolsWindow->GetName() == wxT("mvceditor::SqlBrowserPanelClass")) {
 		mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)toolsWindow;
+
+		// the constructor added itself as an event handler
+		App.RunningThreads.RemoveEventHandler(panel);
 		panel->Stop();
 	}
 }
@@ -857,6 +871,9 @@ void mvceditor::SqlBrowserFeatureClass::OnAppExit(wxCommandEvent& event) {
 		// methods
 		if (toolsWindow->GetName() == wxT("mvceditor::SqlBrowserPanelClass")) {
 			mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)toolsWindow;
+
+			// the constructor added itself as an event handler
+			App.RunningThreads.RemoveEventHandler(panel);
 			panel->Stop();
 		}
 	}
