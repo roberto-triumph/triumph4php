@@ -193,6 +193,34 @@ private:
 };
 
 /**
+ * A small class that is used to contain code that will be run when a thread 
+ * is end.  The class will be used in the context of the background thread, not
+ * the main thread!
+ *
+ * The main reason for this class is to cleanup MySQL connections; as 
+ * the MySQL driver creates some data in each thread (mysql_thread_init()) 
+ * and we need to clean it up by calling mysql_thread_end() in the 
+ * context of the background thread.
+ */
+class ThreadCleanupClass {
+
+public:
+
+	/**
+	 * override this method to put in logic to be executed just as the thread
+	 * ends.
+	 */
+	virtual void ThreadEnd() = 0;
+
+	/**
+	 * override this method to return a cloned instance of itself.
+	 * since we use more than 1 background thread, we need to
+	 * create new instances of this object for each thread.
+	 */
+	virtual mvceditor::ThreadCleanupClass* Clone() = 0;
+};
+
+/**
  * A small class that will run in a background thread, look at a queue
  * of ActionClass instances and Run each action (call BackgroundWork()) in the 
  * background thread.
@@ -212,11 +240,43 @@ public:
 	 *        BackgroundWork() has finished.
 	 * @param actionsMutex to prevent simultaneous access to Actions
 	 * @param finishSemaphore to signal when all actions have been cleaned up
+	 * @param threadCleanup code to be run once the thread ends. this class will own the pointer
 	 */
 	ThreadActionClass(std::queue<mvceditor::ActionClass*>& actions, wxMutex& actionsMutex,
-		wxSemaphore& finishSemaphore);
+		wxSemaphore& finishSemaphore, mvceditor::ThreadCleanupClass* threadCleanup);
 
 	void* Entry();
+
+	/**
+	 * cancel the current action that is running, but only if the action ID matches
+	 * the given ID.  this method is used when a single action is to be termnated
+	 * early.
+	 *
+	 * Do not confuse this from wxThread::Delete, this is the cancel mechanism for
+	 * the action class; so that actions themselves can terminate early when signaled
+	 * to do so.  When an action is cancelled, this thread will pop the next action
+	 * off the queue and start woking on it.
+	 *
+	 * @param actionId the ID returned by mvceditor::RunningThreadsClass::Add method
+	 */
+	void CancelRunningActionIf(int actionId);
+
+	/**
+	 * cancel the current action that is running.  this method is used when 
+	 * this thread needs to exit; we need the running action to return out of its
+	 * BackgroundWork() method so that the thread can gracefully end.
+	 *
+	 * Do not confuse this from wxThread::Delete, this is the cancel mechanism for
+	 * the action class; so that actions themselves can terminate early when signaled
+	 * to do so.  
+	 */
+	void CancelRunningAction();
+
+	/**
+	 * @return in the EventID of the action that is currently executing.  -1 if no
+	 *         action is running.
+	 */
+	int GetRunningActionEventId();
 
 private:
 
@@ -236,11 +296,37 @@ private:
 	wxSemaphore& FinishSemaphore;
 
 	/**
+	 * prevent simultaneous access to the running action
+	 */
+	wxMutex RunningActionMutex;
+
+	/**
+	 * handle to the action that is actually running; we need to hold
+	 * a pointer to it since we remove the pointer from the queue
+	 * while it is working
+	 */
+	mvceditor::ActionClass* RunningAction;
+
+	/**
+	 * logic to be called when a thread ends
+	 */
+	mvceditor::ThreadCleanupClass* ThreadCleanup;
+
+	/**
 	 * @return action  next action from the queue, or NULL if queue is empty
 	 */
 	mvceditor::ActionClass* NextAction();
 
-	void ActionComplete();
+	/**
+	 * cleanup the action
+	 * @param action to finalize
+	 */
+	void ActionComplete(mvceditor::ActionClass* action);
+
+	/**
+	 * cleanup alls action that are still in the queue
+	 */
+	void CleanupAllActions();
   };
   
 /**
@@ -264,6 +350,8 @@ class RunningThreadsClass : public wxEvtHandler {
   	
 	RunningThreadsClass(bool doPostEvents = true);
 	
+	~RunningThreadsClass();
+
 	/**
 	 * Queues the given action to be run at some point in the near future. 
 	 * This method will return an identifier that can be used to stop the 
@@ -295,6 +383,15 @@ class RunningThreadsClass : public wxEvtHandler {
 	 * been calling Cancel() correctly.
 	 */
 	void StopAll();
+
+	/**
+	 * This method should called before any actions are added. 
+	 * 
+	 * @param threadCleanup object to be called when a thread ends.
+	 *        this class will own the pointer
+	 *        this class will clone the object.
+	 */
+	void SetThreadCleanup(mvceditor::ThreadCleanupClass* threadCleanup);
 
 	/**
 	 * adds an event handler to this instance.  Running threads will
@@ -329,7 +426,10 @@ class RunningThreadsClass : public wxEvtHandler {
   
 	/**
 	 * holds all actions that need to be run. This class will add 
-	 * actions to the queue.
+	 * actions to the queue. An action will be removed as soon as it
+	 * is actually worked on. The background threads will check to
+	 * see if this queue is non-empty and then pop items from it and
+	 * "work" on them (call BackgroundWork() method)
 	 */
 	std::queue<mvceditor::ActionClass*> Actions;
   
@@ -342,7 +442,7 @@ class RunningThreadsClass : public wxEvtHandler {
 	 * this is the background thread that pops items from the action queue
 	 * and actually runs the actions
 	 */
-	mvceditor::ThreadActionClass* ThreadAction;
+	std::vector<mvceditor::ThreadActionClass*> ThreadActions;
 	
 	/**
 	 * holds all event handlers to post events to. This object
@@ -359,8 +459,18 @@ class RunningThreadsClass : public wxEvtHandler {
 	 * to implement blocking wait when stopping the background
 	 * threads
 	 */
-	wxSemaphore Semaphore;
-  
+	wxSemaphore* Semaphore;
+
+	/**
+	 *  To generate the heartbeats (EVENT_WORK_IN_PROGRESS)
+	 */
+	wxTimer Timer;
+ 
+	/**
+	 * logic to be called when a thread ends
+	 */
+	mvceditor::ThreadCleanupClass* ThreadCleanup;
+
 	/**
 	 * wheter to send events in the current event loop or the next event
 	 * loop (wxPostEvent vs. ProcessEvent() ) .  this flag is used for
@@ -375,9 +485,9 @@ class RunningThreadsClass : public wxEvtHandler {
 	int NextActionId;
 
 	/**
-	 *  To generate the heartbeats (EVENT_WORK_IN_PROGRESS)
+	 * the max number of threads to create
 	 */
-	wxTimer Timer;
+	int MaxThreads;
 	
 	/**
 	 * Will generate a EVENT_WORK_IN_PROGRESS event

@@ -25,6 +25,7 @@
 #include <MvcEditor.h>
 #include <wx/cmdline.h>
 #include <unicode/uclean.h>
+#include <soci/mysql/soci-mysql.h>
 
 #include <main_frame/MainFrameClass.h>
 #include <features/EnvironmentFeatureClass.h>
@@ -47,6 +48,33 @@
 
 IMPLEMENT_APP(mvceditor::AppClass)
 
+/**
+ * class that will cleanup mysql thread data.  we will give an instance
+ * of this class to RunningThreads.
+ * The mysql driver allocates data per thread; we need to clean it up
+ * when the thread dies.
+ */
+namespace mvceditor {
+
+class MysqlThreadCleanupClass : public mvceditor::ThreadCleanupClass {
+
+public:
+
+	void ThreadEnd() {
+
+		// clean up the MySQL library. 
+		// mysql has stuff that gets created per each thread
+		mysql_thread_end();
+	
+	}
+
+	mvceditor::ThreadCleanupClass* Clone() {
+		return new MysqlThreadCleanupClass();
+	}
+};
+
+}
+
 mvceditor::AppClass::AppClass()
 	: wxApp()
 	, Globals()
@@ -67,6 +95,7 @@ mvceditor::AppClass::AppClass()
  * when app starts, create the new app frame
  */
 bool mvceditor::AppClass::OnInit() {
+	RunningThreads.SetThreadCleanup(new mvceditor::MysqlThreadCleanupClass);
 	Globals.Environment.Init();
 	Preferences.Init();
 	RunningThreads.AddEventHandler(&GlobalsChangeHandler);
