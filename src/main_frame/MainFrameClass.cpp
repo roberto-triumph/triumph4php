@@ -111,6 +111,10 @@ void mvceditor::MainFrameClass::OnClose(wxCloseEvent& event) {
 		destroy = Notebook->SaveAllModifiedPages();
 	}
 	if (destroy) {
+
+		// delete the DropTarget that was created in the constructor
+		Notebook->SetDropTarget(NULL);
+
 		wxCommandEvent exitEvent(mvceditor::EVENT_APP_EXIT);
 		App.EventSink.Publish(exitEvent);
 		
