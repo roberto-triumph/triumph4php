@@ -49,7 +49,8 @@ wxString mvceditor::DatabaseTagDetectorParamsClass::BuildCmdLine() const {
 }
 
 mvceditor::DatabaseTagDetectorActionClass::DatabaseTagDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: ActionClass(runningThreads, eventId)
+	: wxEvtHandler()
+	, GlobalActionClass(runningThreads, eventId)
 	, Process(*this)
 	, ParamsQueue() {
 
@@ -165,7 +166,7 @@ void mvceditor::DatabaseTagDetectorActionClass::OnProcessInProgress(wxCommandEve
 }
 
 mvceditor::DatabaseTagDetectorInitActionClass::DatabaseTagDetectorInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: InitializerActionClass(runningThreads, eventId) {
+	: InitializerGlobalActionClass(runningThreads, eventId) {
 
 }
 
@@ -200,7 +201,7 @@ wxString mvceditor::DatabaseTagDetectorInitActionClass::GetLabel() const {
 	return _("Database tags detector initialization");
 }
 
-BEGIN_EVENT_TABLE(mvceditor::DatabaseTagDetectorActionClass, mvceditor::ActionClass) 
+BEGIN_EVENT_TABLE(mvceditor::DatabaseTagDetectorActionClass, wxEvtHandler) 
 	EVT_COMMAND(ID_DATABASE_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::DatabaseTagDetectorActionClass::OnProcessInProgress)
 	EVT_COMMAND(ID_DATABASE_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::DatabaseTagDetectorActionClass::OnProcessComplete)
 	EVT_COMMAND(ID_DATABASE_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::DatabaseTagDetectorActionClass::OnProcessFailed)

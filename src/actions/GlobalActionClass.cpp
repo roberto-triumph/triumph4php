@@ -19,51 +19,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2012 Roberto Perpuly
+ * @copyright  2009-20Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
+#include <actions/GlobalActionClass.h>
 
-#ifndef __ACTIONTESTFIXTURECLASS_H__ 
-#define __ACTIONTESTFIXTURECLASS_H__ 
+mvceditor::GlobalActionClass::GlobalActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+	: ActionClass(runningThreads, eventId) {
 
-#include <wx/event.h>
-#include <wx/filename.h>
-#include <globals/GlobalsClass.h>
-#include <actions/ActionClass.h>
+}
 
-/**
- * Note: because this class also derives from wxEvtHandler, this class
- * must be the first class in the inheritance chain.
- */
-class ActionTestFixtureClass : public wxEvtHandler {
+bool mvceditor::GlobalActionClass::DoAsync() {
+	return true;
+}
 
-public:
+mvceditor::InitializerGlobalActionClass::InitializerGlobalActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+	: GlobalActionClass(runningThreads, eventId) {
 
-	mvceditor::RunningThreadsClass RunningThreads;
+}
 
-	/**
-	 * Since ActionClass::Init() needs a GlobalsClass parameter
-	 */
-	mvceditor::GlobalsClass Globals;
-
-	ActionTestFixtureClass();
-
-	virtual ~ActionTestFixtureClass();
-
-	/**
-	 * Set the directory location for the tag db files
-	 * @param cacheDir the directory to place the cache db files
-	 */
-	void InitTagCache(const wxString& cacheDir);
+bool mvceditor::InitializerGlobalActionClass::Init(mvceditor::GlobalsClass& globals) {
+	Work(globals);
 	
-	/**
-	 * Creates a project and adds it to the end of Globals.Projects
-	 * Only the data structure is created. File system is not touched
-	 * at all. Any source dir or db cache files are NOT created.
-	 *
-	 * @param sourceDir the directory that contains source files (php)
-	 */
-	void CreateProject(const wxFileName& sourceDir);
-};
+	wxCommandEvent evt(mvceditor::EVENT_WORK_COMPLETE);
+	PostEvent(evt);
+	return true;
+}
 
-#endif
+
+bool mvceditor::InitializerGlobalActionClass::DoAsync() {
+	return false;
+}
+
+void mvceditor::InitializerGlobalActionClass::BackgroundWork() {
+	
+}

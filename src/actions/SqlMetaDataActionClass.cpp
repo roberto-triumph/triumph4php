@@ -41,7 +41,7 @@ wxEvent* mvceditor::SqlMetaDataEventClass::Clone() const {
 }
 
 mvceditor::SqlMetaDataActionClass::SqlMetaDataActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: ActionClass(runningThreads, eventId)
+	: GlobalActionClass(runningThreads, eventId)
 	, DatabaseTags() {
 		
 }

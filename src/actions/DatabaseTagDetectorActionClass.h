@@ -25,7 +25,7 @@
 #ifndef __MVCEDITOR_DATABASEDETECTORACTIONCLASS_H__
 #define __MVCEDITOR_DATABASEDETECTORACTIONCLASS_H__
 
-#include <actions/ActionClass.h>
+#include <actions/GlobalActionClass.h>
 #include <widgets/ProcessWithHeartbeatClass.h>
 #include <queue>
 
@@ -88,7 +88,7 @@ public:
  * This class will run all database detectors across all enabled projects. This means that there is
  * one external process execution for each project source directory / database detector combination
  */
-class DatabaseTagDetectorActionClass : public mvceditor::ActionClass {
+class DatabaseTagDetectorActionClass : public wxEvtHandler, public mvceditor::GlobalActionClass {
 
 public:
 
@@ -144,7 +144,7 @@ private:
  * it will be primed with the existing cache file which may be
  * stale. 
  */
-class DatabaseTagDetectorInitActionClass : public mvceditor::InitializerActionClass {
+class DatabaseTagDetectorInitActionClass : public mvceditor::InitializerGlobalActionClass {
 
 public:
 

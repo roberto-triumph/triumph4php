@@ -85,13 +85,6 @@ mvceditor::GlobalCacheClass::GlobalCacheClass()
 
 }
 
-mvceditor::GlobalCacheClass::~GlobalCacheClass() {
-	TagDbSession.close();
-	NativeDbSession.close();
-	DetectedTagDbSession.close();
-	WorkingTagDbSession.close();
-}
-
 void mvceditor::GlobalCacheClass::InitGlobalTag(const wxFileName& tagDbFileName, 
 									   const std::vector<wxString>& phpFileExtensions, 
 									   const std::vector<wxString>& miscFileExtensions,

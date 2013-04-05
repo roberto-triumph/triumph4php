@@ -82,6 +82,8 @@ public:
 	 * @param startDirectory the directory to start looking in
 	 */
 	bool Init(const wxString& startDirectory); 
+
+	wxString GetLabel() const;
 	
 protected:
 
@@ -172,9 +174,9 @@ private:
 	ApacheClass EditedApache;
 
 	/**
-	 * the thread identifier, used to stop any running threads
+	 * the action identifier, used to stop any running actions
 	 */
-	wxThreadIdType RunningThreadId;
+	int RunningActionId;
 	
 	/**
 	 * populate the dialog according to the ApacheClass settings

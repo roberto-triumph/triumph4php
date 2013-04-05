@@ -27,9 +27,8 @@
 
 #include <wx/string.h>
 #include <wx/event.h>
+#include <actions/ActionClass.h>
 #include <search/DirectorySearchClass.h>
-#include <widgets/ThreadWithHeartbeatClass.h>
-
 
 namespace mvceditor {
 
@@ -67,7 +66,7 @@ extern const wxEventType EVENT_FILE_READ;
  * to iterate through entire projects twice. It is better to open a file once and hand it to
  * multiple workers than multiple workers attempting to open/close the same file multiple times.
  */
-class BackgroundFileReaderClass : public ThreadWithHeartbeatClass {
+class BackgroundFileReaderClass : public mvceditor::ActionClass {
 
 public:
 
@@ -79,19 +78,6 @@ public:
 	enum Mode {
 		WALK,
 		MATCHED
-	};
-
-	/**
-	 * Possible reasons why Starting a new thread may fail
-	 *  NONE: no error, thread started successfully
-	 *  NO_RESOURCES: not enough system resources to create the new thread
-	 *  ALREADY_RUNNING: there is a previous thread that has not finished it work. This means that 
-	 *                   objects of this class will handle at most 1 concurrently running thread at a time.
-	 */
-	enum StartError {
-		NONE,
-		NO_RESOURCES,
-		ALREADY_RUNNING
 	};
 	
 	/**
@@ -138,18 +124,6 @@ public:
 	 * operation.
 	 */
 	bool InitMatched(const std::vector<wxString>& matchedFiles);
-
-	/**
-	 * Will create a new thread and run it. If an existing thread is already running,
-	 * it will be destroyed. This means that objects of this class will handle at most 
-	 * 1 concurrently running thread at a time.
-	 *
-	 * @param error if thread could not be started
-	 * @param threadId will be set with the new thread Id, thread Id can be used to stop the thread
-	 * @see wxThread::GetId()
-	 * @return bool true if thread was created
-	 */
-	bool StartReading(StartError &error, wxThreadIdType& threadId);
 
 protected: 
 

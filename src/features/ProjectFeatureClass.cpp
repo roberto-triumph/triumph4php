@@ -229,11 +229,18 @@ void mvceditor::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
 			"There is an existing background task running. Since the changes "
 			"made from this dialog may re-trigger a project index sequence, "
 			"you may not make modifications until the existing background task ends.\n"
-			"Please wait until the current background task ends."
+			"Would you like to stop the current background tasks? If you answer no, the "
+			"projects dialog will not be opened."
 		);
 		msg = wxGetTranslation(msg);
-		wxMessageBox(msg, _("Warning"), wxICON_WARNING | wxOK, GetMainWindow());
-		return;
+		int ret = wxMessageBox(msg, _("Warning"), wxICON_WARNING | wxYES_NO, GetMainWindow());
+		if (wxYES != ret) {
+			return;
+		}
+
+		// user said yes, we should stop the running tasks
+		App.Sequences.Stop();
+		App.RunningThreads.StopAll();
 	}
 
 	std::vector<mvceditor::ProjectClass> removedProjects, touchedProjects;

@@ -25,7 +25,7 @@
 #ifndef __MVCEDITOR_TEMPLATEFILESDETECTORACTIONCLASS_H__
 #define __MVCEDITOR_TEMPLATEFILESDETECTORACTIONCLASS_H__
 
-#include <actions/ActionClass.h>
+#include <actions/GlobalActionClass.h>
 #include <widgets/ProcessWithHeartbeatClass.h>
 #include <queue>
 
@@ -101,7 +101,7 @@ public:
  * can be used to build the call stack. This means that the CallStackActionClass should be run immediately before
  * this action.
  */
-class TemplateFileTagsDetectorActionClass : public mvceditor::ActionClass {
+class TemplateFileTagsDetectorActionClass : public wxEvtHandler, public mvceditor::GlobalActionClass {
 
 public:
 

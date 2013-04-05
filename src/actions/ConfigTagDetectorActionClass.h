@@ -25,7 +25,7 @@
 #ifndef __MVCEDITOR_CONFIGDETECTORACTIONCLASS_H__
 #define __MVCEDITOR_CONFIGDETECTORACTIONCLASS_H__
 
-#include <actions/ActionClass.h>
+#include <actions/GlobalActionClass.h>
 #include <widgets/ProcessWithHeartbeatClass.h>
 #include <queue>
 
@@ -88,7 +88,7 @@ public:
  * This class will run all config detectors across all enabled projects. This means that there is
  * one external process execution for each project source directory / config detector combination
  */
-class ConfigTagDetectorActionClass : public mvceditor::ActionClass {
+class ConfigTagDetectorActionClass : public wxEvtHandler, public mvceditor::GlobalActionClass {
 
 public:
 
@@ -144,7 +144,7 @@ private:
  * it will be primed with the existing cache file which may be
  * stale. 
  */
-class ConfigDetectorInitActionClass : public mvceditor::InitializerActionClass {
+class ConfigDetectorInitActionClass : public mvceditor::InitializerGlobalActionClass {
 
 public:
 

@@ -86,8 +86,6 @@ private:
 
 	void OnAppFileClosed(wxCommandEvent& event);
 
-	void OnAppReady(wxCommandEvent& event);
-
 	void OnAppStartSequenceComplete(wxCommandEvent& event);
 	
 	/**
@@ -166,14 +164,6 @@ private:
 	 * this dialog will only be alive while project is being indexed
 	 */
 	mvceditor::GaugeDialogClass* IndexingDialog;
-
-	/**
-	 * The current source code is parsed in the background so that a symbol table can be
-	 * built in the backgroun without slowing the user down. The builder will
-	 * notify us with the new cache via an event when it has completed building the
-	 * symbol table.
-	 */
-	WorkingCacheBuilderClass* WorkingCacheBuilder;
 
 	/**
 	 * cache will be considered stale at app start. once all projects have

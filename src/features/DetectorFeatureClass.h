@@ -26,6 +26,7 @@
 #define __MVCEDITORDETECTORFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
+#include <actions/ActionClass.h>
 #include <features/wxformbuilder/DetectorFeatureForms.h>
 #include <wx/imaglist.h>
 

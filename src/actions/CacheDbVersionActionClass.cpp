@@ -40,7 +40,7 @@ static const int SCHEMA_VERSION_TAGS = 3;
 static const int SCHEMA_VERSION_DETECTOR = 3;
 
 mvceditor::TagCacheDbVersionActionClass::TagCacheDbVersionActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: ActionClass(runningThreads, eventId)
+	: GlobalActionClass(runningThreads, eventId)
 	, TagDbs() 
 	, Session() {
 
@@ -89,7 +89,7 @@ wxString mvceditor::TagCacheDbVersionActionClass::GetLabel() const {
 }
 
 mvceditor::DetectorCacheDbVersionActionClass::DetectorCacheDbVersionActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: ActionClass(runningThreads, eventId) 
+	: GlobalActionClass(runningThreads, eventId) 
 	, DetectorDbs() 
 	, Session() {
 

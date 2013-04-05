@@ -22,7 +22,7 @@
  * @copyright  2012 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <actions/ActionClass.h>
+#include <actions/GlobalActionClass.h>
 #include <search/DirectorySearchClass.h>
 #include <pelet/TokenClass.h>
 #include <vector>
@@ -39,7 +39,7 @@ namespace mvceditor {
  * The ProjectTagActionClass will generate a GlobalCacheCompleteEventClass 
  * event once each project  has been parsed.
  */
-class ProjectTagActionClass : public ActionClass {
+class ProjectTagActionClass : public GlobalActionClass {
 
 public:
 
@@ -134,7 +134,7 @@ private:
  * it will be primed with the existing cache file which may be
  * stale. 
  */
-class ProjectTagInitActionClass : public mvceditor::InitializerActionClass {
+class ProjectTagInitActionClass : public mvceditor::InitializerGlobalActionClass {
 
 public:
 

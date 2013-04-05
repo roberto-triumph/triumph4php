@@ -24,7 +24,7 @@
  */
 #include <actions/GlobalsChangeHandlerClass.h>
 #include <globals/DatabaseTagClass.h>
-#include <actions/ActionClass.h>
+#include <actions/GlobalActionClass.h>
 #include <globals/Errors.h>
 
 mvceditor::GlobalsChangeHandlerClass::GlobalsChangeHandlerClass(mvceditor::GlobalsClass& globals) 

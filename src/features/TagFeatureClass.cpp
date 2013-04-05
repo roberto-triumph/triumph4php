@@ -38,7 +38,6 @@ mvceditor::TagFeatureClass::TagFeatureClass(mvceditor::AppClass& app)
 	: FeatureClass(app)
 	, JumpToText()
 	, ProjectIndexMenu(NULL)
-	, WorkingCacheBuilder(NULL)
 	, CacheState(CACHE_STALE) {
 	IndexingDialog = NULL;
 }
@@ -65,21 +64,6 @@ void mvceditor::TagFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 
 void mvceditor::TagFeatureClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
 	menu->Append(mvceditor::MENU_RESOURCE + 3, _("Jump To Source"));
-}
-
-void mvceditor::TagFeatureClass::OnAppReady(wxCommandEvent& event) {
-
-	// setup the thread that will be used to build the symbol table
-	// in the background for the opened files.
-	WorkingCacheBuilder = new mvceditor::WorkingCacheBuilderClass(App.RunningThreads, wxNewId());
-
-	// no need to keep track of this thread ID it will be
-	// alive until the app terminates
-	wxThreadIdType threadId;
-	if (wxTHREAD_NO_ERROR != WorkingCacheBuilder->Init(threadId)) {
-		delete WorkingCacheBuilder;
-		WorkingCacheBuilder = NULL;
-	}
 }
 
 std::vector<mvceditor::TagClass> mvceditor::TagFeatureClass::SearchForResources(const wxString& text, std::vector<mvceditor::ProjectClass*> projects) {
@@ -247,17 +231,9 @@ void mvceditor::TagFeatureClass::OnAppFileClosed(wxCommandEvent& event) {
 		}
 	}
 	if (isFileFromProject) {
-		mvceditor::ProjectTagActionClass* thread = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
-		thread->InitForFile(App.Globals, fileName);
-
-		// show user the error? not for now as they cannot do anything about it
-		// no need to track thread ID as this thread runs for a very short time since
-		// we are only indexing one file
-		wxThreadIdType threadId;
-		wxThreadError err = thread->CreateSingleInstance(threadId);
-		if (wxTHREAD_NO_ERROR != err) {
-			delete thread;
-		}
+		mvceditor::ProjectTagActionClass* tagAction = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
+		tagAction->InitForFile(App.Globals, fileName);
+		App.RunningThreads.Queue(tagAction);
 	}
 
 	// Notebook class assigns unique IDs to CodeControlClass objects
@@ -270,13 +246,9 @@ void mvceditor::TagFeatureClass::OnAppFileClosed(wxCommandEvent& event) {
 	if (fileToDelete.IsEmpty()) {
 		fileToDelete = idString;
 	}
-	mvceditor::TagCleanWorkingCacheActionClass* action = new mvceditor::TagCleanWorkingCacheActionClass(App.RunningThreads, wxID_ANY, fileToDelete);
-	action->Init(App.Globals);
-	wxThreadIdType threadId;
-	wxThreadError err = action->CreateSingleInstance(threadId);
-	if (wxTHREAD_NO_ERROR != err) {
-		delete action;
-	}
+	mvceditor::TagCleanWorkingCacheActionClass* cleanAction = new mvceditor::TagCleanWorkingCacheActionClass(App.RunningThreads, wxID_ANY, fileToDelete);
+	cleanAction->Init(App.Globals);
+	App.RunningThreads.Queue(cleanAction);
 }
 
 wxString mvceditor::TagFeatureClass::CacheStatus() {
@@ -298,19 +270,19 @@ void mvceditor::TagFeatureClass::OnWorkingCacheComplete(mvceditor::WorkingCacheC
 }
 
 void mvceditor::TagFeatureClass::OnAppFileSaved(mvceditor::FileSavedEventClass& event) {
-	if (WorkingCacheBuilder) {
-		mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
-		if (codeControl && codeControl->GetDocumentMode() == mvceditor::CodeControlClass::PHP) {
-			UnicodeString text = codeControl->GetSafeText();
+	mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
+	if (codeControl && codeControl->GetDocumentMode() == mvceditor::CodeControlClass::PHP) {
+		UnicodeString text = codeControl->GetSafeText();
 
-			// we need to differentiate between new and opened files (the 'true' arg)
-			WorkingCacheBuilder->Update(
-				codeControl->GetFileName(),
-				codeControl->GetIdString(),
-				text, 
-				codeControl->IsNew(),
-				App.Globals.Environment.Php.Version);
-		}
+		// we need to differentiate between new and opened files (the 'true' arg)
+		mvceditor::WorkingCacheBuilderClass* builder = new mvceditor::WorkingCacheBuilderClass(App.RunningThreads, wxID_ANY);
+		builder->Update(
+			codeControl->GetFileName(),
+			codeControl->GetIdString(),
+			text, 
+			codeControl->IsNew(),
+			App.Globals.Environment.Php.Version);
+		App.RunningThreads.Queue(builder);
 	}
 
 	// persist the resources to the "global" cache
@@ -327,35 +299,27 @@ void mvceditor::TagFeatureClass::OnAppFileSaved(mvceditor::FileSavedEventClass& 
 		}
 	}
 	if (isFileFromProject) {
-		mvceditor::ProjectTagActionClass* thread = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
-		thread->InitForFile(App.Globals, fileName);
-
-		// show user the error? not for now as they cannot do anything about it
-		// no need to track thread ID as this thread runs for a very short time since
-		// we are only indexing one file
-		wxThreadIdType threadId;
-		wxThreadError err = thread->CreateSingleInstance(threadId);
-		if (wxTHREAD_NO_ERROR != err) {
-			delete thread;
-		}
+		mvceditor::ProjectTagActionClass* tagAction = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
+		tagAction->InitForFile(App.Globals, fileName);
+		App.RunningThreads.Queue(tagAction);
 	}
 	event.Skip();
 }
 
 void mvceditor::TagFeatureClass::OnAppFileOpened(wxCommandEvent& event) {
-	if (WorkingCacheBuilder) {
-		mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
-		if (codeControl && codeControl->GetDocumentMode() == mvceditor::CodeControlClass::PHP) {
-			UnicodeString text = codeControl->GetSafeText();
+	mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
+	if (codeControl && codeControl->GetDocumentMode() == mvceditor::CodeControlClass::PHP) {
+		UnicodeString text = codeControl->GetSafeText();
 
-			// we need to differentiate between new and opened files (the 'true' arg)
-			WorkingCacheBuilder->Update(
-				codeControl->GetFileName(),
-				codeControl->GetIdString(),
-				text, 
-				codeControl->IsNew(),
-				App.Globals.Environment.Php.Version);
-		}
+		// we need to differentiate between new and opened files (the 'true' arg)
+		mvceditor::WorkingCacheBuilderClass* builder = new mvceditor::WorkingCacheBuilderClass(App.RunningThreads, wxID_ANY);
+		builder->Update(
+			codeControl->GetFileName(),
+			codeControl->GetIdString(),
+			text, 
+			codeControl->IsNew(),
+			App.Globals.Environment.Php.Version);
+		App.RunningThreads.Queue(builder);
 	}
 	event.Skip();
 }
@@ -621,7 +585,6 @@ BEGIN_EVENT_TABLE(mvceditor::TagFeatureClass, wxEvtHandler)
 	// we will treat file new and file opened the same
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_NEW, mvceditor::TagFeatureClass::OnAppFileOpened)
 	EVT_FEATURE_FILE_SAVED(mvceditor::TagFeatureClass::OnAppFileSaved)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::TagFeatureClass::OnAppReady)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_SEQUENCE_COMPLETE, mvceditor::TagFeatureClass::OnAppStartSequenceComplete)
 
 	EVT_WORKING_CACHE_COMPLETE(wxID_ANY, mvceditor::TagFeatureClass::OnWorkingCacheComplete)

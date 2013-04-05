@@ -25,7 +25,7 @@
 #ifndef __MVCEDITOR_URLDETECTORACTIONCLASS_H__
 #define __MVCEDITOR_URLDETECTORACTIONCLASS_H__
 
-#include <actions/ActionClass.h>
+#include <actions/GlobalActionClass.h>
 #include <widgets/ProcessWithHeartbeatClass.h>
 #include <queue>
 
@@ -36,7 +36,7 @@ namespace mvceditor {
  * This class is used so that the url tag cache is available as soon as the 
  * program starts.
  */
-class UrlTagFinderInitActionClass : public mvceditor::InitializerActionClass {
+class UrlTagFinderInitActionClass : public mvceditor::InitializerGlobalActionClass {
 
 public:
 
@@ -118,7 +118,7 @@ public:
  * This class will run all url detectors across all enabled projects. This means that there is
  * one external process execution for each project source directory / url detector combination
  */
-class UrlTagDetectorActionClass : public mvceditor::ActionClass {
+class UrlTagDetectorActionClass : public wxEvtHandler, public mvceditor::GlobalActionClass {
 
 public:
 

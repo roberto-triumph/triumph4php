@@ -4,7 +4,7 @@
 #include <globals/Assets.h>
 
 mvceditor::CallStackActionClass::CallStackActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: ActionClass(runningThreads, eventId) 
+	: GlobalActionClass(runningThreads, eventId) 
 	, TagCache()
 	, CallStack(TagCache, mvceditor::TagCacheWorkingAsset())
 	, DetectorDbFileName()

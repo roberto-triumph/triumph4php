@@ -108,8 +108,6 @@ public:
 
 	GlobalCacheClass();
 
-	~GlobalCacheClass();
-
 	/**
 	 * Opens the SQLite resource db file, or creates it if it does not exist.
 	 *

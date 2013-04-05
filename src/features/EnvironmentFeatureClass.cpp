@@ -127,6 +127,10 @@ bool mvceditor::ApacheFileReaderClass::Init(const wxString& startDirectory) {
 	return BackgroundFileReaderClass::Init(startDirectory);
 }
 
+wxString mvceditor::ApacheFileReaderClass::GetLabel() const {
+	return wxT("Apache File Reader");
+}
+
 bool mvceditor::ApacheFileReaderClass::BackgroundFileMatch(const wxString& file) {
 	return true;
 }
@@ -136,7 +140,7 @@ bool mvceditor::ApacheFileReaderClass::BackgroundFileRead(mvceditor::DirectorySe
 	if (search.Walk(ApacheResults)) {
 		ret = true;
 	}
-	if (!search.More() && !TestDestroy()) {
+	if (!search.More() && !IsCancelled()) {
 		
 		// when we are done recursing, parse the matched files
 		std::vector<wxString> possibleConfigFiles = search.GetMatchedFiles();
@@ -165,7 +169,7 @@ mvceditor::ApacheEnvironmentPanelClass::ApacheEnvironmentPanelClass(wxWindow* pa
 	, Environment(environment)
 	, RunningThreads(runningThreads)
 	, EditedApache()
-	, RunningThreadId(0) {
+	, RunningActionId(0) {
 	RunningThreads.AddEventHandler(this);
 	EditedApache = environment.Apache;
 	wxGenericValidator manualValidator(&EditedApache.ManualConfiguration);	
@@ -182,8 +186,8 @@ mvceditor::ApacheEnvironmentPanelClass::ApacheEnvironmentPanelClass(wxWindow* pa
 }
 
 mvceditor::ApacheEnvironmentPanelClass::~ApacheEnvironmentPanelClass() {
-	if (RunningThreadId > 0) {
-		RunningThreads.Stop(RunningThreadId);
+	if (RunningActionId > 0) {
+		RunningThreads.CancelAction(RunningActionId);
 	}
 	RunningThreads.RemoveEventHandler(this);
 }
@@ -194,40 +198,32 @@ void mvceditor::ApacheEnvironmentPanelClass::OnScanButton(wxCommandEvent& event)
 		wxMessageBox(_("Please enter a configuration directory"));
 		return;
 	}
-	if (0 == RunningThreadId) {
+	if (0 == RunningActionId) {
 		wxChar ch = wxFileName::GetPathSeparator();
 		if (path[path.Length() - 1] != ch) {
 			path.Append(ch);
 		}
-		mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
-		mvceditor::ApacheFileReaderClass* thread = new mvceditor::ApacheFileReaderClass(RunningThreads, ID_APACHE_FILE_READER);
-		if (thread->Init(path) && thread->StartReading(error, RunningThreadId)) {
+		mvceditor::ApacheFileReaderClass* reader = new mvceditor::ApacheFileReaderClass(RunningThreads, ID_APACHE_FILE_READER);
+		if (reader->Init(path)) {
+			RunningActionId = RunningThreads.Queue(reader);
 			VirtualHostList->DeleteAllItems();
 			ScanButton->SetLabel(_("Stop Scan"));
 			Gauge->Show();
 		}
 		else {
-			delete thread;
-			RunningThreadId = 0;
-			switch (error) {
-			case mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING:
-				wxMessageBox(_("Scanner is already running"), _("Configuration Not Found"), wxOK | wxCENTRE, this);
-				break;
-			case mvceditor::BackgroundFileReaderClass::NO_RESOURCES:
-				wxMessageBox(_("System is low on resources.  Try again later."), _("Configuration Not Found"), wxOK | wxCENTRE, this);
-				break;
-			default:
-				wxMessageBox(_("Path not valid"), _("Configuration Not Found"), wxOK | wxCENTRE, this);
-				break;
-			}
+			delete reader;
+			RunningActionId = 0;
+			wxMessageBox(_("Path not valid"), _("Configuration Not Found"), wxOK | wxCENTRE, this);
 		}
 	}
 	else {
 		
 		// act like a stop button
 		Gauge->SetValue(0);
-		RunningThreads.Stop(RunningThreadId);
-		RunningThreadId = 0;
+		
+
+		RunningThreads.CancelAction(RunningActionId);
+		RunningActionId = 0;
 		ScanButton->SetLabel(_("Scan For Configuration"));
 	}
 }
@@ -265,7 +261,7 @@ void mvceditor::ApacheEnvironmentPanelClass::OnWorkInProgress(wxCommandEvent& ev
 void mvceditor::ApacheEnvironmentPanelClass::OnWorkComplete(wxCommandEvent& event) {
 	Gauge->SetValue(0);
 	ScanButton->SetLabel(_("Scan For Configuration"));
-	RunningThreadId = 0;
+	RunningActionId = 0;
 }
 
 void mvceditor::ApacheEnvironmentPanelClass::OnResize(wxSizeEvent& event) {
@@ -345,32 +341,22 @@ bool mvceditor::ApacheEnvironmentPanelClass::TransferDataFromWindow() {
 }
 
 void mvceditor::ApacheEnvironmentPanelClass::OnDirChanged(wxFileDirPickerEvent& event) {
-	if (0 == RunningThreadId) {
+	if (0 == RunningActionId) {
 		wxString path = ApacheConfigurationDirectory->GetPath();
 		wxChar ch = wxFileName::GetPathSeparator();
 		if (path[path.Length() - 1] != ch) {
 			path.Append(ch);
 		}
-		mvceditor::ApacheFileReaderClass* thread = new mvceditor::ApacheFileReaderClass(RunningThreads, ID_APACHE_FILE_READER);
-		mvceditor::BackgroundFileReaderClass::StartError error = mvceditor::BackgroundFileReaderClass::NONE;
-		if (thread->Init(path) && thread->StartReading(error, RunningThreadId)) {
+		mvceditor::ApacheFileReaderClass* reader = new mvceditor::ApacheFileReaderClass(RunningThreads, ID_APACHE_FILE_READER);
+		if (reader->Init(path)) {
+			RunningActionId = RunningThreads.Queue(reader);
 			VirtualHostList->DeleteAllItems();
 			ScanButton->SetLabel(_("Stop Scan"));
 			Gauge->Show();
 		}
 		else {
-			delete thread;
-			switch (error) {
-			case mvceditor::BackgroundFileReaderClass::ALREADY_RUNNING:
-				wxMessageBox(_("Scanner is already running"), _("Configuration Not Found"), wxOK | wxCENTRE, this);
-				break;
-			case mvceditor::BackgroundFileReaderClass::NO_RESOURCES:
-				wxMessageBox(_("System is low on resources.  Try again later."), _("Configuration Not Found"), wxOK | wxCENTRE, this);
-				break;
-			default:
-				wxMessageBox(_("Path not valid"), _("Configuration Not Found"), wxOK | wxCENTRE, this);
-				break;
-			}
+			delete reader;
+			wxMessageBox(_("Path not valid"), _("Configuration Not Found"), wxOK | wxCENTRE, this);
 		}
 	}
 	else {

@@ -49,7 +49,8 @@ wxString mvceditor::ConfigTagDetectorParamsClass::BuildCmdLine() const {
 }
 
 mvceditor::ConfigTagDetectorActionClass::ConfigTagDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: ActionClass(runningThreads, eventId)
+	: wxEvtHandler()
+	, GlobalActionClass(runningThreads, eventId)
 	, Process(*this)
 	, ParamsQueue() {
 
@@ -162,7 +163,7 @@ void mvceditor::ConfigTagDetectorActionClass::OnProcessInProgress(wxCommandEvent
 	PostEvent(inProgressEvent);
 }
 
-BEGIN_EVENT_TABLE(mvceditor::ConfigTagDetectorActionClass, mvceditor::ActionClass) 
+BEGIN_EVENT_TABLE(mvceditor::ConfigTagDetectorActionClass, wxEvtHandler) 
 	EVT_COMMAND(ID_CONFIG_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::ConfigTagDetectorActionClass::OnProcessInProgress)
 	EVT_COMMAND(ID_CONFIG_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::ConfigTagDetectorActionClass::OnProcessComplete)
 	EVT_COMMAND(ID_CONFIG_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::ConfigTagDetectorActionClass::OnProcessFailed)

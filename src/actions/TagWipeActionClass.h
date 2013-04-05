@@ -25,7 +25,7 @@
 #ifndef __MVCEDITORRESOUCEWIPEACTIONCLASS_H__
 #define __MVCEDITORRESOUCEWIPEACTIONCLASS_H__
 
-#include <actions/ActionClass.h>
+#include <actions/GlobalActionClass.h>
 #include <wx/filename.h>
 
 namespace mvceditor {
@@ -33,7 +33,7 @@ namespace mvceditor {
 /**
  * Class to 'wipe' tag databases (empty all of their contents)
  */
-class TagWipeActionClass : public mvceditor::ActionClass {
+class TagWipeActionClass : public mvceditor::GlobalActionClass {
 	
 public:
 
@@ -60,7 +60,7 @@ private:
  * action to remove only tags from certain directories from the tag
  * databases
  */
-class TagDeleteActionClass : public mvceditor::ActionClass {
+class TagDeleteActionClass : public mvceditor::GlobalActionClass {
 	
 public:
 
@@ -92,7 +92,7 @@ private:
  * action to remove only tags from a single file from the tag
  * databases. This action works on the working cache only. 
  */
-class TagCleanWorkingCacheActionClass : public mvceditor::ActionClass {
+class TagCleanWorkingCacheActionClass : public mvceditor::GlobalActionClass {
 	
 public:
 

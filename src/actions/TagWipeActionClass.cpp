@@ -28,7 +28,7 @@
 #include <soci/sqlite3/soci-sqlite3.h>
 
 mvceditor::TagWipeActionClass::TagWipeActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: ActionClass(runningThreads, eventId) {
+	: GlobalActionClass(runningThreads, eventId) {
 }
 
 bool mvceditor::TagWipeActionClass::Init(mvceditor::GlobalsClass& globals) {
@@ -45,7 +45,7 @@ bool mvceditor::TagWipeActionClass::Init(mvceditor::GlobalsClass& globals) {
 
 void mvceditor::TagWipeActionClass::BackgroundWork() {
 	std::vector<wxFileName>::iterator it;
-	for (it = ResourceDbFileNames.begin(); it != ResourceDbFileNames.end() && !TestDestroy(); ++it) {
+	for (it = ResourceDbFileNames.begin(); it != ResourceDbFileNames.end() && !IsCancelled(); ++it) {
 		SetStatus(_("Tag Cache Wipe / ") + it->GetName());
 		// initialize the sqlite db
 		soci::session session;
@@ -69,7 +69,7 @@ wxString mvceditor::TagWipeActionClass::GetLabel() const {
 
 mvceditor::TagDeleteActionClass::TagDeleteActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId,
 													  const std::vector<wxFileName>& dirsToDelete)
-	: ActionClass(runningThreads, eventId) 
+	: GlobalActionClass(runningThreads, eventId) 
 	, DirsToDelete() {
 	for (size_t i = 0; i < dirsToDelete.size(); ++i) {
 
@@ -93,7 +93,7 @@ bool mvceditor::TagDeleteActionClass::Init(mvceditor::GlobalsClass& globals) {
 
 void mvceditor::TagDeleteActionClass::BackgroundWork() {
 	std::vector<wxFileName>::iterator it;
-	for (it = ResourceDbFileNames.begin(); it != ResourceDbFileNames.end() && !TestDestroy(); ++it) {
+	for (it = ResourceDbFileNames.begin(); it != ResourceDbFileNames.end() && !IsCancelled(); ++it) {
 		SetStatus(_("Tag Cache Delete / ") + it->GetName());
 		// initialize the sqlite db
 		soci::session session;
@@ -116,7 +116,7 @@ wxString mvceditor::TagDeleteActionClass::GetLabel() const {
 
 mvceditor::TagCleanWorkingCacheActionClass::TagCleanWorkingCacheActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId,
 													  const wxString& fileToDelete)
-	: ActionClass(runningThreads, eventId) 
+	: GlobalActionClass(runningThreads, eventId) 
 	, WorkingTagDbFileName()
 	, FileToDelete(fileToDelete.c_str()) {
 }
