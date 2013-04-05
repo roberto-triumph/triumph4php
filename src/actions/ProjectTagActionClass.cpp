@@ -69,14 +69,14 @@ void mvceditor::ProjectTagActionClass::SetTouchedProjects(const std::vector<mvce
 bool mvceditor::ProjectTagActionClass::Init(mvceditor::GlobalsClass& globals) {
 	SetStatus(_("Tag Cache"));
 	Version = globals.Environment.Php.Version;
+
+	// not sure if wxFileName assignment is a complete clone, so use Assign() just in case
+	// since we will access the filenames from multiple threads
+	TagCacheDbFileName.Assign(globals.TagCacheDbFileName.GetFullPath());
 	
 	// if we were not given projects, scan all of them
 	if (!DoTouchedProjects) {
 		Projects.clear();
-
-		// not sure if wxFileName assignment is a complete clone, so use Assign() just in case
-		// since we will access the filenames from multiple threads
-		TagCacheDbFileName.Assign(globals.TagCacheDbFileName.GetFullPath());
 		std::vector<mvceditor::ProjectClass>::const_iterator project;
 		for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
 			if (project->IsEnabled && !project->AllPhpSources().empty()) {

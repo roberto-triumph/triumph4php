@@ -148,11 +148,6 @@ bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvced
 	}
 	AddStep(new mvceditor::TagDeleteActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE, dirsToDelete));
 
-	// this will load the cache from the hard disk
-	// load the cache from hard disk so that code completion and 
-	// tag searching is available immediately after the app starts
-	AddStep(new mvceditor::ProjectTagInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_INIT));
-
 	// this will load the url entry point cache
 	// do this before the rest so the urls become available asap
 	AddStep(new mvceditor::UrlTagFinderInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR_INIT));
