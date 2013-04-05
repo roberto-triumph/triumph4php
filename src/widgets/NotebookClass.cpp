@@ -427,6 +427,7 @@ void mvceditor::NotebookClass::CloseAllPages() {
 
 void mvceditor::NotebookClass::CloseCurrentPage() {
 	int currentPage = GetSelection();
+	bool isPageClosed = false;
 	if (IsPageModified(currentPage)) {
 		wxString pageName = GetPageText(currentPage);
 		if (pageName.EndsWith(wxT("*"))) {
@@ -440,10 +441,24 @@ void mvceditor::NotebookClass::CloseCurrentPage() {
 				//something drastic. dont know how to handle it
 			}
 			DeletePage(currentPage);
+			isPageClosed = true;
 		}
 	}
 	else {
 		DeletePage(currentPage);
+		isPageClosed = true;
+	}
+	if (isPageClosed) {
+
+		// notify owner that the tab has been closed
+		// we must do it here; aui notebook's DeletePage does not
+		// generate events
+		wxAuiNotebookEvent evt(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSED, this->GetId());
+
+		// tab index
+		evt.SetSelection(currentPage);
+		evt.SetEventObject(this);
+		EventSink->Publish(evt);
 	}
 }
 
