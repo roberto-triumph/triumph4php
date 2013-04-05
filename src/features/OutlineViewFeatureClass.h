@@ -27,11 +27,97 @@
 
 #include <features/FeatureClass.h>
 #include <pelet/TokenClass.h>
+#include <actions/ActionClass.h>
 #include <features/wxformbuilder/OutlineViewFeatureForms.h>
 #include <wx/imaglist.h>
 #include <vector>
 
 namespace mvceditor {
+
+/**
+ * event that is generated when a tag query is completed.  this event
+ * contains the results of the search.
+ */
+class TagSearchCompleteEventClass : public wxEvent {
+        
+        public:
+        
+        /**
+         * Will contain all of the resulting tags.
+         */
+        std::vector<mvceditor::TagClass> Tags;
+
+		/**
+		 * the string that was searched for
+		 */
+		wxString SearchString;
+
+		/**
+		 * the mode that was used to search, one of
+		 * mvceditor::TagCacheSearchActionClass::Modes
+		 */
+		int Mode;
+        
+        TagSearchCompleteEventClass(int eventId, const std::vector<mvceditor::TagClass>& tags,
+			int mode,
+			const wxString& searchString);
+        
+        wxEvent* Clone() const;
+        
+};
+
+extern const wxEventType EVENT_TAG_SEARCH_COMPLETE;
+
+typedef void (wxEvtHandler::*TagSearchCompleteEventClassFunction)(TagSearchCompleteEventClass&);
+
+#define EVENT_TAG_SEARCH_COMPLETE(id, fn) \
+        DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_TAG_SEARCH_COMPLETE, id, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( TagSearchCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
+
+/**
+ * class that will execute a query against the tag cache in the background.
+ * the results will be posted in an event.
+ */
+class TagCacheSearchActionClass : public mvceditor::ActionClass {
+	
+public:
+
+	/**
+	 * the different searches that can be made. each of these corresponds
+	 * to the method on TagCacheClass that will be called.
+	 */
+	enum Modes {
+		ALL_TAGS_IN_FILE,
+		ALL_MEMBER_TAGS
+	};
+
+	TagCacheSearchActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+
+	/**
+	 * set the search parameters.  this should be called before the action is
+	 * added to the run queue
+	 *
+	 * @param mode the query to execute one of the enum constants
+	 * @param search the search string
+	 * @parm globals to get the locations of the tag dbs
+	 */
+	void SetSearch(Modes mode, const UnicodeString& search, mvceditor::GlobalsClass& globals);
+
+	wxString GetLabel() const;
+
+protected:
+
+	void BackgroundWork();
+
+private:
+
+	mvceditor::TagCacheClass TagCache;
+
+	UnicodeString SearchString;
+
+	Modes Mode;
+};
 
 /**
  * This is a feature that is designed to let the user see the classes / methods of 
@@ -58,14 +144,6 @@ public:
 	 * @param wxCommandEvent& event
 	 */
 	void OnOutlineMenu(wxCommandEvent& event);
-
-	/**
-	 * Builds an outline based on the given line of text.  Note that this does not parse a file; it searches the
-	 * global TagCache
-	 * 
-	 * @param wxString className the name of the class to build the outline for.
-	 */
-	std::vector<mvceditor::TagClass> BuildOutline(const wxString& className);
 	
 	/**
 	 * Opens the file where the given tag is located.
@@ -74,7 +152,14 @@ public:
 	 */
 	void JumpToResource(const wxString& tag);
 
-	std::vector<mvceditor::TagClass> SearchForResources(const wxString& text);
+	/**
+	 * start a tag search; will queue an action that will search the tag cache
+	 * in a background thread and Post the results when complete.
+	 *
+	 * @param mode the search to execute
+	 * @param tag to look for
+	 */
+	void StartTagSearch(mvceditor::TagCacheSearchActionClass::Modes mode, const wxString& text);
 	
 private:		
 		
@@ -83,21 +168,6 @@ private:
 	*/
 	void OnContentNotebookPageChanged(wxAuiNotebookEvent& event);
 	
-	/**
-	 * when the parsing is complete update the panel.
-	 */
-	/***
-	void OnResourceFinderComplete(mvceditor::ResourceFinderCompleteEventClass& event);
-	*/
-		
-	/**
-	 * when a file is saved and the outline tab is opened, make sure to refresh the outline
-	 * tab contents with the latest content
-	 */
-	/***
-	void OnFileSaved(mvceditor::FileSavedEventClass& event);
-	*/
-
 	/**
 	 * when a file is closed, remove it from the outline tree
 	 */
@@ -110,15 +180,9 @@ private:
 	void OnWorkingCacheComplete(mvceditor::WorkingCacheCompleteEventClass& event);
 
 	/**
-	 * Since this thread will be alive as long as the program is running, we guard against access
-	 * for FileName, PhpVersion  variables. We want to start one thread that will handle all code notebook
-	 * tab changes instead of creating one thread each time the user changes to a new tab.
-	 * Since ResourceFinderBackgroundThread class inherits from wxThread, it will be deleted
-	 * automaticall and is NOT owned by this object.
+	 * once tag searching finishes, update the tree control
 	 */
-	/***
-	mvceditor::ResourceFinderBackgroundThreadClass* ResourceFinderBackgroundThread;
-	*/
+	void OnTagSearchComplete(mvceditor::TagSearchCompleteEventClass& event);
 	
 	DECLARE_EVENT_TABLE()
 };
@@ -145,16 +209,17 @@ class OutlineViewPanelClass : public OutlineViewGeneratedPanelClass {
 	void SetStatus(const wxString& status);
 
 	/**
-	 * update the Choice options
-	 */
-	void SetClasses(const std::vector<wxString>& classes);
-
-	/**
 	 * refresh the code control from the feature source strings
 	 * adds the given tags to the outline tree, under a node that has the name of the file
 	 * as its name
 	 */
-	 void AddFileToOutline(const std::vector<TagClass>& resources, const wxString& fullPath);
+	void AddFileToOutline(const wxString& fullPath, const std::vector<TagClass>& tags);
+
+	/**
+	 * Add a class and all of its members into the tree outline at the given node.
+	 *
+	 */
+	void AddClassToOutline(const wxString& className, const std::vector<mvceditor::TagClass>& memberTags);
 
 	 /**
 	  * @param fullPath file to remove from the outline tre
@@ -216,22 +281,19 @@ private:
 	 * The notebook to listen (for page changing) events  to
 	 */
 	NotebookClass* Notebook;
+
+	/**
+	 * takes in class or file tags, perform searches for all tags in each of
+	 * the files / classes given.
+	 *
+	 * @param tags that the user chose
+	 */
+	void SearchTagsToOutline(const std::vector<mvceditor::TagClass>& tags);
 	
 	/**
 	 * double clicking on a  tag name in the tree will make the editor open up that tag
 	 */
 	void OnTreeItemActivated(wxTreeEvent& event);
-
-	/**
-	 * Show the given tags in the outline tree.
-	 */
-	void AddTagsToOutline(const std::vector<mvceditor::TagClass>& tags);
-
-	/**
-	 * Add a class and all of its members into the tree outline at the given node.
-	 *
-	 */
-	void AddClassToOutline(const UnicodeString& className, wxTreeItemId& classRoot);
 
 	/**
 	 * adds a tag as a child node of the tree control.
