@@ -118,7 +118,7 @@ void MyFrame::AddMenu() {
 void MyFrame::OnStartNewThread(wxCommandEvent& event) {
 	MyAction* action = new MyAction(RunningThreads, ID_THREAD, wxString::Format(wxT("Action-%d"), ActionCount));
 	ActionCount++;
-	RunningActionId = RunningThreads.Add(action);
+	RunningActionId = RunningThreads.Queue(action);
 	Text->AppendText(wxString::Format(_("Action started...\n")));
 }
 

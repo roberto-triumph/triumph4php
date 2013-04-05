@@ -239,7 +239,7 @@ void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findI
 	mvceditor::FindInFilesBackgroundReaderClass* reader = 
 		new mvceditor::FindInFilesBackgroundReaderClass(RunningThreads, FindInFilesGaugeId);
 	if (reader->InitForFind(FindInFiles, doHiddenFiles, skipFiles)) {
-		RunningActionId = RunningThreads.Add(reader);
+		RunningActionId = RunningThreads.Queue(reader);
 		EnableButtons(true, false, false);
 		Gauge->AddGauge(_("Find In Files"), FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE, 
 			wxGA_HORIZONTAL);
@@ -419,7 +419,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxComman
 		mvceditor::FindInFilesBackgroundReaderClass* reader = 
 			new mvceditor::FindInFilesBackgroundReaderClass(RunningThreads, FindInFilesGaugeId);
 		reader->InitForReplace(FindInFiles, FilesFromHits(AllHits), Notebook->GetOpenedFiles());
-		RunningActionId = RunningThreads.Add(reader);
+		RunningActionId = RunningThreads.Queue(reader);
 		SetStatus(_("Find In Files In Progress"));
 		Gauge->AddGauge(_("Find In Files"), FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE, 
 			wxGA_HORIZONTAL);

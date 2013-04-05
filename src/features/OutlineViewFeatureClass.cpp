@@ -145,7 +145,7 @@ void mvceditor::OutlineViewFeatureClass::JumpToResource(const wxString& tag) {
 void mvceditor::OutlineViewFeatureClass::StartTagSearch(mvceditor::TagCacheSearchActionClass::Modes mode, const wxString& text) {
 	mvceditor::TagCacheSearchActionClass* action = new mvceditor::TagCacheSearchActionClass(App.RunningThreads, mode);
 	action->SetSearch(mode, mvceditor::WxToIcu(text), App.Globals);
-	App.RunningThreads.Add(action);
+	App.RunningThreads.Queue(action);
 }
 
 void mvceditor::OutlineViewFeatureClass::OnOutlineMenu(wxCommandEvent& event) {

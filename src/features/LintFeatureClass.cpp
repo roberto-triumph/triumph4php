@@ -361,7 +361,7 @@ void mvceditor::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
 			}
 		}
 		if (reader->InitDirectoryLint(phpSources, *GetEnvironment())) {
-			RunningActionId = App.RunningThreads.Add(reader);
+			RunningActionId = App.RunningThreads.Queue(reader);
 			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 			gauge->AddGauge(_("Lint Check"), ID_LINT_RESULTS_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 			

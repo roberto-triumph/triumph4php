@@ -205,7 +205,7 @@ void mvceditor::ApacheEnvironmentPanelClass::OnScanButton(wxCommandEvent& event)
 		}
 		mvceditor::ApacheFileReaderClass* reader = new mvceditor::ApacheFileReaderClass(RunningThreads, ID_APACHE_FILE_READER);
 		if (reader->Init(path)) {
-			RunningActionId = RunningThreads.Add(reader);
+			RunningActionId = RunningThreads.Queue(reader);
 			VirtualHostList->DeleteAllItems();
 			ScanButton->SetLabel(_("Stop Scan"));
 			Gauge->Show();
@@ -349,7 +349,7 @@ void mvceditor::ApacheEnvironmentPanelClass::OnDirChanged(wxFileDirPickerEvent& 
 		}
 		mvceditor::ApacheFileReaderClass* reader = new mvceditor::ApacheFileReaderClass(RunningThreads, ID_APACHE_FILE_READER);
 		if (reader->Init(path)) {
-			RunningActionId = RunningThreads.Add(reader);
+			RunningActionId = RunningThreads.Queue(reader);
 			VirtualHostList->DeleteAllItems();
 			ScanButton->SetLabel(_("Stop Scan"));
 			Gauge->Show();

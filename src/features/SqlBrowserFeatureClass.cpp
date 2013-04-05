@@ -140,7 +140,7 @@ void mvceditor::SqlConnectionDialogClass::OnTestButton(wxCommandEvent& event) {
 			
 			mvceditor::MultipleSqlExecuteClass* thread = new mvceditor::MultipleSqlExecuteClass(RunningThreads, ID_SQL_TEST, ConnectionIdentifier);
 			thread->Init(UNICODE_STRING_SIMPLE("SELECT 1"), TestQuery);
-			RunningThreads.Add(thread);
+			RunningThreads.Queue(thread);
 		}
 	}
 }
@@ -395,7 +395,7 @@ void mvceditor::SqlBrowserPanelClass::Execute() {
 		mvceditor::MultipleSqlExecuteClass* thread = new mvceditor::MultipleSqlExecuteClass(
 			Feature->App.RunningThreads, QueryId, ConnectionIdentifier);
 		if (thread->Init(LastQuery, Query)) { 
-			RunningActionId = Feature->App.RunningThreads.Add(thread);
+			RunningActionId = Feature->App.RunningThreads.Queue(thread);
 			Gauge->AddGauge(_("Running SQL queries"), ID_SQL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 		}
 		else {
@@ -789,7 +789,7 @@ void mvceditor::SqlBrowserFeatureClass::OnSqlConnectionMenu(wxCommandEvent& even
 		// redetect the SQL meta data
 		mvceditor::SqlMetaDataActionClass* thread = new mvceditor::SqlMetaDataActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA);
 		if (thread->Init(App.Globals)) {
-			App.RunningThreads.Add(thread);
+			App.RunningThreads.Queue(thread);
 		}
 		else {
 			delete thread;

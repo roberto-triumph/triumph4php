@@ -740,7 +740,7 @@ void mvceditor::TemplateFileTagsDetectorPanelClass::OnChooseUrlButton(wxCommandE
 			Globals.DetectorCacheDbFileName
 		);
 		action->Init(Globals);
-		RunningThreads.Add(action);
+		RunningThreads.Queue(action);
 	}
 }
 

@@ -318,7 +318,7 @@ void mvceditor::SequenceClass::RunNextStep() {
 			isInit = Steps.front()->Init(Globals);
 			if (isInit) {
 				mvceditor::ActionClass* action = Steps.front();
-				RunningThreads.Add(action);
+				RunningThreads.Queue(action);
 
 				// now wait for the background thread to finish
 				IsRunning = true;

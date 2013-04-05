@@ -233,7 +233,7 @@ void mvceditor::TagFeatureClass::OnAppFileClosed(wxCommandEvent& event) {
 	if (isFileFromProject) {
 		mvceditor::ProjectTagActionClass* tagAction = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
 		tagAction->InitForFile(App.Globals, fileName);
-		App.RunningThreads.Add(tagAction);
+		App.RunningThreads.Queue(tagAction);
 	}
 
 	// Notebook class assigns unique IDs to CodeControlClass objects
@@ -248,7 +248,7 @@ void mvceditor::TagFeatureClass::OnAppFileClosed(wxCommandEvent& event) {
 	}
 	mvceditor::TagCleanWorkingCacheActionClass* cleanAction = new mvceditor::TagCleanWorkingCacheActionClass(App.RunningThreads, wxID_ANY, fileToDelete);
 	cleanAction->Init(App.Globals);
-	App.RunningThreads.Add(cleanAction);
+	App.RunningThreads.Queue(cleanAction);
 }
 
 wxString mvceditor::TagFeatureClass::CacheStatus() {
@@ -282,7 +282,7 @@ void mvceditor::TagFeatureClass::OnAppFileSaved(mvceditor::FileSavedEventClass& 
 			text, 
 			codeControl->IsNew(),
 			App.Globals.Environment.Php.Version);
-		App.RunningThreads.Add(builder);
+		App.RunningThreads.Queue(builder);
 	}
 
 	// persist the resources to the "global" cache
@@ -301,7 +301,7 @@ void mvceditor::TagFeatureClass::OnAppFileSaved(mvceditor::FileSavedEventClass& 
 	if (isFileFromProject) {
 		mvceditor::ProjectTagActionClass* tagAction = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
 		tagAction->InitForFile(App.Globals, fileName);
-		App.RunningThreads.Add(tagAction);
+		App.RunningThreads.Queue(tagAction);
 	}
 	event.Skip();
 }
@@ -319,7 +319,7 @@ void mvceditor::TagFeatureClass::OnAppFileOpened(wxCommandEvent& event) {
 			text, 
 			codeControl->IsNew(),
 			App.Globals.Environment.Php.Version);
-		App.RunningThreads.Add(builder);
+		App.RunningThreads.Queue(builder);
 	}
 	event.Skip();
 }

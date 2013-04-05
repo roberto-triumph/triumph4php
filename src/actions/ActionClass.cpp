@@ -215,7 +215,7 @@ mvceditor::RunningThreadsClass::~RunningThreadsClass() {
 	}
 }
   
-int mvceditor::RunningThreadsClass::Add(mvceditor::ActionClass* action) {
+int mvceditor::RunningThreadsClass::Queue(mvceditor::ActionClass* action) {
 	if (!Timer.IsRunning()) {
 		Timer.Start(200, wxTIMER_CONTINUOUS);
 	}

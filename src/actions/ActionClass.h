@@ -365,7 +365,7 @@ class RunningThreadsClass : public wxEvtHandler {
 	 * @return an action ID, which can be used to cancel the action at at 
 	 * later time.
 	 */
-	int Add(mvceditor::ActionClass* action);
+	int Queue(mvceditor::ActionClass* action);
 
 	/**
 	 * gracefully stops the given action, allowing the other added actions
