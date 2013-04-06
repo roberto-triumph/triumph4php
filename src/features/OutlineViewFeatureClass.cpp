@@ -209,9 +209,7 @@ void mvceditor::OutlineViewFeatureClass::OnWorkingCacheComplete(mvceditor::Worki
 	
 	//if the outline window is open, update the file that was parsed
 	wxWindow* window = FindOutlineWindow(ID_WINDOW_OUTLINE);
-	OutlineViewPanelClass* outlineViewPanel = NULL;
 	if (window != NULL) {
-		outlineViewPanel = (OutlineViewPanelClass*)window;
 		wxString fileName = event.GetFileName();
 		StartTagSearch(mvceditor::TagCacheSearchActionClass::ALL_TAGS_IN_FILE, fileName);
 	}
