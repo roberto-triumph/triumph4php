@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <actions/ActionClass.h>
+#include <algorithm>
 	
 mvceditor::ActionClass::ActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: RunningThreads(runningThreads)
@@ -80,7 +81,7 @@ void mvceditor::ActionClass::BackgroundCleanup() {
 
 void mvceditor::ActionClass::SignalEnd() {
 	wxCommandEvent evt(mvceditor::EVENT_WORK_COMPLETE, EventId);
-	wxString msg = wxString::Format(wxT("Action \"%s\" stopped...\n"), GetLabel());
+	wxString msg = wxString::Format(wxT("Action \"%s\" stopped...\n"), (const char*)GetLabel().c_str());
 	evt.SetString(msg);
 	PostEvent(evt);
 }

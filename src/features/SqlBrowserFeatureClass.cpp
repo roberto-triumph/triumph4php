@@ -33,7 +33,6 @@
 #include <wx/artprov.h>
 
 static const int ID_SQL_GAUGE = wxNewId();
-static const int ID_SQL_METADATA_GAUGE = wxNewId();
 static const int ID_SQL_TEST = wxNewId();
 
 mvceditor::SqlConnectionDialogClass::SqlConnectionDialogClass(wxWindow* parent, std::vector<mvceditor::DatabaseTagClass>& dbTags, 
@@ -136,8 +135,7 @@ void mvceditor::SqlConnectionDialogClass::OnTestButton(wxCommandEvent& event) {
 			EditedDatabaseTags[index].Password = mvceditor::WxToIcu(Password->GetValue());
 			
 			TestQuery.DatabaseTag.Copy(EditedDatabaseTags[index]);
-			wxThreadError error = wxTHREAD_NO_ERROR;
-			
+
 			mvceditor::MultipleSqlExecuteClass* thread = new mvceditor::MultipleSqlExecuteClass(RunningThreads, ID_SQL_TEST, ConnectionIdentifier);
 			thread->Init(UNICODE_STRING_SIMPLE("SELECT 1"), TestQuery);
 			RunningThreads.Queue(thread);

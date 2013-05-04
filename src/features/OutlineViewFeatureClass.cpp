@@ -209,9 +209,7 @@ void mvceditor::OutlineViewFeatureClass::OnWorkingCacheComplete(mvceditor::Worki
 	
 	//if the outline window is open, update the file that was parsed
 	wxWindow* window = FindOutlineWindow(ID_WINDOW_OUTLINE);
-	OutlineViewPanelClass* outlineViewPanel = NULL;
 	if (window != NULL) {
-		outlineViewPanel = (OutlineViewPanelClass*)window;
 		wxString fileName = event.GetFileName();
 		StartTagSearch(mvceditor::TagCacheSearchActionClass::ALL_TAGS_IN_FILE, fileName);
 	}
@@ -224,7 +222,7 @@ void mvceditor::OutlineViewFeatureClass::OnTagSearchComplete(mvceditor::TagSearc
 	OutlineViewPanelClass* outlineViewPanel = NULL;
 	if (window != NULL) {
 		outlineViewPanel = (OutlineViewPanelClass*)window;
-		switch(event.Mode){
+		switch(event.Mode) {
 			case mvceditor::TagCacheSearchActionClass::ALL_MEMBER_TAGS:
 				outlineViewPanel->AddClassToOutline(event.SearchString, event.Tags);
 				break;
@@ -580,6 +578,7 @@ mvceditor::FileSearchDialogClass::FileSearchDialogClass(wxWindow *parent, mvcedi
 	, Feature(feature)
 	, MatchingTags()
 	, ChosenTags(chosenTags) {
+	SearchText->SetFocus();
 	Init();
 }
 

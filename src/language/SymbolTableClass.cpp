@@ -843,7 +843,7 @@ void mvceditor::ScopeFinderClass::NamespaceDeclarationFound(const UnicodeString&
 	
 	// add support for the namespace static operator
 	if (namespaceName != UNICODE_STRING_SIMPLE("\\")) {
-		Scope.AddNamespace(namespaceName, UNICODE_STRING_SIMPLE("namespace"));
+		Scope.AddNamespaceAlias(namespaceName, UNICODE_STRING_SIMPLE("namespace"));
 	}
 }
 
@@ -851,7 +851,7 @@ void mvceditor::ScopeFinderClass::NamespaceUseFound(const UnicodeString& namespa
 	if (startingPos >= PosToCheck) {
 		return;
 	}
-	Scope.AddNamespace(namespaceName, alias);
+	Scope.AddNamespaceAlias(namespaceName, alias);
 }
 
 void mvceditor::ScopeFinderClass::MethodScope(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
