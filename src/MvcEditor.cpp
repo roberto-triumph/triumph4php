@@ -101,6 +101,17 @@ bool mvceditor::AppClass::OnInit() {
 	RunningThreads.AddEventHandler(&GlobalsChangeHandler);
 	CreateFeatures();
 
+	// initialize the  mysql library
+	// do it now for 2 reasons
+	// 1. this function should not be called inside a thread, and our
+	//    threads may use SOCI (which calls the mysql library init function)
+	// 2. there could be a case where the thread cleanup class (above)
+	//    tries to call mysql_thread_end() before mysql_library_init()
+	//    is called. for example when the user opens then closes
+	//    the program real quick.  specifying the init here prevents
+	//    crashes.
+	mysql_library_init(0, NULL, NULL);
+
 	// due to the way keyboard shortcuts are serialized, we need to load the
 	// frame and initialize the feature windows so that all menus are created
 	// and only then can we load the keyboard shortcuts from the INI file
