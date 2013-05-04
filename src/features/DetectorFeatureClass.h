@@ -217,9 +217,11 @@ private:
 		IMAGE_SCRIPT
 	};
 	
-	// put the image list first; since the DetectorTree will have a
-	// pointer to it
-	wxImageList ImageList;
+	/**
+	 * this pointer will be managed by the tree control, since the tree control
+	 * may use the pointer in the destructor.
+	 */
+	wxImageList* ImageList;
 	wxTreeCtrl* DetectorTree;
 	wxButton* TestButton;
 	wxButton* AddButton;

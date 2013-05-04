@@ -326,7 +326,7 @@ mvceditor::DetectorTreeHandlerClass::DetectorTreeHandlerClass(wxTreeCtrl* detect
 															  mvceditor::EventSinkClass& eventSink,
 															  const wxBitmap& rootImage)
 	: wxEvtHandler()
-	, ImageList(16, 16)
+	, ImageList(NULL)
 	, DetectorTree(detectorTree)
 	, TestButton(testButton)
 	, AddButton(addButton)
@@ -346,13 +346,15 @@ mvceditor::DetectorTreeHandlerClass::DetectorTreeHandlerClass(wxTreeCtrl* detect
 	DetectorTree->Connect(wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemActivated), NULL, this);
 	DetectorTree->Connect(wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemRightClick), NULL, this);
 
-	ImageList.Add(rootImage, wxNullBitmap);
-	ImageList.Add(mvceditor::IconImageAsset(wxT("folder-horizontal")), wxNullBitmap);
-	ImageList.Add(mvceditor::IconImageAsset(wxT("folder-horizontal-open")), wxNullBitmap);
-	ImageList.Add(mvceditor::IconImageAsset(wxT("document-php")), wxNullBitmap);
+	ImageList = new wxImageList(16, 16);
+	ImageList->Add(rootImage, wxNullBitmap);
+	ImageList->Add(mvceditor::IconImageAsset(wxT("folder-horizontal")), wxNullBitmap);
+	ImageList->Add(mvceditor::IconImageAsset(wxT("folder-horizontal-open")), wxNullBitmap);
+	ImageList->Add(mvceditor::IconImageAsset(wxT("document-php")), wxNullBitmap);
 
-	// using set not assign; this class owns the list
-	DetectorTree->SetImageList(&ImageList);
+	// this pointer will be managed by the tree control, since the tree control
+	// may use the pointer in the destructor.
+	DetectorTree->SetImageList(ImageList);
 }
 
 mvceditor::DetectorTreeHandlerClass::~DetectorTreeHandlerClass() {

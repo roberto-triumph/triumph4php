@@ -269,7 +269,11 @@ private:
 		IMAGE_OUTLINE_FUNCTION
 	};
 
-	wxImageList ImageList;
+	/**
+	 * this pointer will be managed by the tree control, since the tree control
+	 * may use the pointer in the destructor.
+	 */
+	wxImageList* ImageList;
 
 	/**
 	 * The feature class that will execute all logic. 

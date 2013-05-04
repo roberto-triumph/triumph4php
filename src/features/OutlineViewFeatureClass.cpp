@@ -238,7 +238,7 @@ void mvceditor::OutlineViewFeatureClass::OnTagSearchComplete(mvceditor::TagSearc
 mvceditor::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int windowId, OutlineViewFeatureClass* feature, 
 		NotebookClass* notebook)
 	: OutlineViewGeneratedPanelClass(parent, windowId)
-	, ImageList(16, 16)
+	, ImageList(NULL)
 	, Feature(feature)
 	, Notebook(notebook) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
@@ -246,26 +246,28 @@ mvceditor::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int wi
 	SyncButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("outline-refresh")));
 	AddButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("outline-add")));
 	SetStatus(_(""));
+	
+	ImageList = new wxImageList(16, 16);
+	ImageList->Add(mvceditor::IconImageAsset(wxT("outline")));
+	ImageList->Add(mvceditor::IconImageAsset(wxT("document-php")));
+	ImageList->Add(mvceditor::IconImageAsset(wxT("class")));
+	ImageList->Add(mvceditor::IconImageAsset(wxT("method-public")));
+	ImageList->Add(mvceditor::IconImageAsset(wxT("method-protected")));
+	ImageList->Add(mvceditor::IconImageAsset(wxT("method-private")));
+	ImageList->Add(mvceditor::IconImageAsset(wxT("method-inherited")));
+	ImageList->Add(mvceditor::IconImageAsset(wxT("property-public")));
+	ImageList->Add(mvceditor::IconImageAsset(wxT("property-protected")));
+	ImageList->Add(mvceditor::IconImageAsset(wxT("property-private")));
+	ImageList->Add(mvceditor::IconImageAsset(wxT("property-inherited")));
 
-	ImageList.Add(mvceditor::IconImageAsset(wxT("outline")));
-	ImageList.Add(mvceditor::IconImageAsset(wxT("document-php")));
-	ImageList.Add(mvceditor::IconImageAsset(wxT("class")));
-	ImageList.Add(mvceditor::IconImageAsset(wxT("method-public")));
-	ImageList.Add(mvceditor::IconImageAsset(wxT("method-protected")));
-	ImageList.Add(mvceditor::IconImageAsset(wxT("method-private")));
-	ImageList.Add(mvceditor::IconImageAsset(wxT("method-inherited")));
-	ImageList.Add(mvceditor::IconImageAsset(wxT("property-public")));
-	ImageList.Add(mvceditor::IconImageAsset(wxT("property-protected")));
-	ImageList.Add(mvceditor::IconImageAsset(wxT("property-private")));
-	ImageList.Add(mvceditor::IconImageAsset(wxT("property-inherited")));
+	ImageList->Add(mvceditor::IconImageAsset(wxT("define")));
+	ImageList->Add(mvceditor::IconImageAsset(wxT("class-constant")));
+	ImageList->Add(mvceditor::IconImageAsset(wxT("namespace")));
+	ImageList->Add(mvceditor::IconImageAsset(wxT("function")));
 
-	ImageList.Add(mvceditor::IconImageAsset(wxT("define")));
-	ImageList.Add(mvceditor::IconImageAsset(wxT("class-constant")));
-	ImageList.Add(mvceditor::IconImageAsset(wxT("namespace")));
-	ImageList.Add(mvceditor::IconImageAsset(wxT("function")));
-
-	// this class will own the ImageList
-	Tree->SetImageList(&ImageList);
+	// let the tree control managet the image list
+	// since it may need to use it in the destructor
+	Tree->AssignImageList(ImageList);
 }
 
 void mvceditor::OutlineViewPanelClass::SetStatus(const wxString& status) {
