@@ -234,12 +234,16 @@ int mvceditor::RunningThreadsClass::Queue(mvceditor::ActionClass* action) {
 	// if the actual thread has not started, start it
 	if (ThreadActions.empty()) {		
 		for (int i = 0; i < MaxThreads; ++i) {
+			ThreadCleanupClass* cleanup = NULL;
+			if (ThreadCleanup) {
+				cleanup = ThreadCleanup->Clone();
+			}
 			mvceditor::ThreadActionClass* thread = new mvceditor::ThreadActionClass(
 				Actions, ActionMutex, *Semaphore, 
 				
 				// each thread gets its own instance, so that we dont have to worry about
 				// synchronization 
-				ThreadCleanup->Clone());
+				cleanup);
 			wxThreadError error = wxTHREAD_NO_ERROR;
 			error = thread->Create();
 			wxASSERT_MSG(error == wxTHREAD_NO_ERROR, wxT("Thread could not be started"));
