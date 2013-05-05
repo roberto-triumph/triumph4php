@@ -155,7 +155,7 @@ void MyAction::BackgroundWork() {
 	while (!IsCancelled()) {
 		wxCommandEvent evt(EVENT_RUNNING);
 		evt.SetId(ID_THREAD);
-		evt.SetString(wxString::Format(_("%s is running...\n"), Label));
+		evt.SetString(wxString::Format(_("%s is running...\n"), (const char*)Label.c_str()));
 		PostEvent(evt);
 		wxThread::Sleep(2000);
 	}
