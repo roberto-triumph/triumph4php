@@ -65,25 +65,43 @@ mvceditor::TagSearchClass::TagSearchClass(UnicodeString resourceQuery)
 	: FileName()
 	, ClassName()
 	, MethodName()
+	, NamespaceName()
 	, Dirs()
 	, ResourceType(FILE_NAME)
 	, LineNumber(0) {
 	ResourceType = CLASS_NAME;
 
 	// :: => Class::method
-	// \ => \namespace\namespace
+	// \ => \namespace\subnamespace\class
 	// : => filename : line number
 	int scopePos = resourceQuery.indexOf(UNICODE_STRING_SIMPLE("::"));
-	int namespacePos = resourceQuery.indexOf(UNICODE_STRING_SIMPLE("\\"));
+	int namespacePos = resourceQuery.lastIndexOf(UNICODE_STRING_SIMPLE("\\"));
 	int colonPos = resourceQuery.indexOf(UNICODE_STRING_SIMPLE(":"));
-	if (scopePos >= 0) {
+	if (namespacePos >= 0) {
+		
+		// query has a namespace, parse it out
+		// note that the last identifier after the final backslash is the class name
+		// make sure to account for the root namespace ie '\Exception'
+		if (namespacePos > 0) {
+			NamespaceName.setTo(resourceQuery, 0, namespacePos);
+		}
+		else {
+			NamespaceName.setTo(resourceQuery, 0, 1);
+		}
+
+		// +1 to remove the trailing slash in the namespace name
+		if (scopePos > 0) {
+			ClassName.setTo(resourceQuery, namespacePos + 1, scopePos - namespacePos - 1);
+		}
+		else {
+			ClassName.setTo(resourceQuery, namespacePos + 1);
+		}
+		ResourceType = scopePos > 0 ? CLASS_NAME_METHOD_NAME : NAMESPACE_NAME;
+	}
+	else if (scopePos >= 0) {
 		ClassName.setTo(resourceQuery, 0, scopePos);
 		MethodName.setTo(resourceQuery, scopePos + 2);
 		ResourceType = CLASS_NAME_METHOD_NAME;
-	}
-	else if (namespacePos >= 0) {
-		ClassName = resourceQuery;
-		ResourceType = NAMESPACE_NAME;
 	}
 	else if (colonPos >= 0) {
 		
@@ -173,6 +191,9 @@ mvceditor::TagSearchClass::ResourceTypes mvceditor::TagSearchClass::GetResourceT
 	return ResourceType;
 }
 
+UnicodeString mvceditor::TagSearchClass::GetNamespaceName() const {
+	return NamespaceName;
+}
 
 mvceditor::TagFinderClass::TagFinderClass()
 	: Session(NULL)
@@ -325,7 +346,16 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchClassesOrFi
 }
 
 std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchNonMembers(const mvceditor::TagSearchClass& tagSearch, bool doClasses, bool doDefines, bool doFunctions) {
-	std::string key = mvceditor::IcuToChar(tagSearch.GetClassName());
+	UnicodeString uniKey;
+
+	// if query does not have a namespace then get the non-namespaced tags
+	if (tagSearch.GetNamespaceName().isEmpty()) {
+		uniKey = tagSearch.GetClassName();
+	}
+	else {
+		uniKey = QualifyName(tagSearch.GetNamespaceName(), tagSearch.GetClassName());
+	}
+	std::string key = mvceditor::IcuToChar(uniKey);
 	std::vector<int> types;
 	if (doClasses) {
 		types.push_back(mvceditor::TagClass::CLASS);
@@ -357,7 +387,16 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchMembers(con
 	// 2. in any parent classes
 	// 3. in any used traits
 	std::vector<UnicodeString> classesToSearch = tagSearch.GetParentClasses();
-	classesToSearch.push_back(tagSearch.GetClassName());
+
+	// make sure to fully qualified class name
+	UnicodeString qualifiedClassName;
+	if (!tagSearch.GetNamespaceName().isEmpty()) {
+		qualifiedClassName = QualifyName(tagSearch.GetNamespaceName(), tagSearch.GetClassName());
+	}
+	else {
+		qualifiedClassName = tagSearch.GetClassName();
+	}
+	classesToSearch.push_back(qualifiedClassName);
 	std::vector<UnicodeString> traits = tagSearch.GetTraits();
 	classesToSearch.insert(classesToSearch.end(), traits.begin(), traits.end());
 	bool error = false;
@@ -428,19 +467,26 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::AllMembers(const std
 }
 
 std::vector<mvceditor::TagClass>  mvceditor::TagFinderClass::NearMatchNamespaces(const mvceditor::TagSearchClass& tagSearch) {
+	std::vector<int> types;
+	types.push_back(mvceditor::TagClass::CLASS);
+	types.push_back(mvceditor::TagClass::FUNCTION);
+	types.push_back(mvceditor::TagClass::DEFINE);
+	types.push_back(mvceditor::TagClass::NAMESPACE);
+
 	std::vector<mvceditor::TagClass> matches;
 
 	// needle identifier contains a namespace operator; but it may be
 	// a namespace or a fully qualified name
-	UnicodeString key = tagSearch.GetClassName();
+	UnicodeString key = QualifyName(tagSearch.GetNamespaceName(), tagSearch.GetClassName());
 	std::string stdKey = mvceditor::IcuToChar(key);
 	bool error = false;
 	wxString errorMsg;
 	std::vector<int> fileTagIds = mvceditor::FileTagIdsForDirs(*Session, tagSearch.GetDirs(), error, errorMsg);
 	wxASSERT_MSG(!error, errorMsg);
-	matches = FindByKeyExact(stdKey, fileTagIds);
+	matches = FindByKeyExactAndTypes(stdKey, types, fileTagIds, true);
 	if (matches.empty()) {
-		matches = FindByKeyStart(stdKey, fileTagIds, true);
+		
+		matches = FindByKeyStartAndTypes(stdKey, types, fileTagIds, true);
 	}
 	return matches;
 }
@@ -581,7 +627,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::ExactTags(const mvce
 		}
 	}
 	else if (mvceditor::TagSearchClass::NAMESPACE_NAME == tagSearch.GetResourceType()) {
-		UnicodeString key = tagSearch.GetClassName();
+		UnicodeString key = QualifyName(tagSearch.GetNamespaceName(), tagSearch.GetClassName());
 		std::string stdKey = mvceditor::IcuToChar(key);
 		types.push_back(mvceditor::TagClass::DEFINE);
 		types.push_back(mvceditor::TagClass::CLASS);

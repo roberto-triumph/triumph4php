@@ -522,7 +522,12 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllTagsInFile(const w
 	std::vector<mvceditor::TagClass>::iterator tag;
 	for (tag = allMatches.begin(); tag != allMatches.end(); ++tag) {
 		if (tag->Type == mvceditor::TagClass::CLASS) {
-			std::vector<mvceditor::TagClass> matches = AllMemberTags(tag->ClassName);
+			UnicodeString qualifiedName = tag->NamespaceName;
+			if (!qualifiedName.endsWith(UNICODE_STRING_SIMPLE("\\"))) {
+				qualifiedName.append(UNICODE_STRING_SIMPLE("\\"));
+			}
+			qualifiedName.append(tag->ClassName);
+			std::vector<mvceditor::TagClass> matches = AllMemberTags(qualifiedName);
 			classTags.insert(classTags.end(), matches.begin(), matches.end());
 		}
 	}

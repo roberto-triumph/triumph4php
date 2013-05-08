@@ -518,6 +518,11 @@ void mvceditor::TagParserClass::MethodFound(const UnicodeString& namespaceName, 
 	// insert a complete name so that we can quickly lookup all methods for a single class
 	item.Key = className + UNICODE_STRING_SIMPLE("::") + methodName;
 	FileParsingCache.push_back(item);
+
+	// insert a fully qualified name and method so that we can quickly lookup all methods
+	// for a namespaced class
+	item.Key = QualifyName(namespaceName, className) + UNICODE_STRING_SIMPLE("::") + methodName;
+	FileParsingCache.push_back(item);
 }
 
 void mvceditor::TagParserClass::PropertyFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& propertyName,
@@ -557,6 +562,11 @@ void mvceditor::TagParserClass::PropertyFound(const UnicodeString& namespaceName
 	
 	// insert a complete name so that we can quickly lookup all methods for a single class
 	item.Key = className + UNICODE_STRING_SIMPLE("::") + filteredProperty;
+	FileParsingCache.push_back(item);
+
+	// insert a fully qualified name and method so that we can quickly lookup all methods
+	// for a namespaced class
+	item.Key = QualifyName(namespaceName, className) + UNICODE_STRING_SIMPLE("::") + filteredProperty;
 	FileParsingCache.push_back(item);
 }
 

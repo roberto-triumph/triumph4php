@@ -97,28 +97,34 @@ public:
 	/**
 	 * Returns the parsed class name
 	 * 
-	 * @var UnicodeString
+	 * @return UnicodeString
 	 */
 	UnicodeString GetClassName() const;
 
 	/**
 	 * Returns the parsed file name
 	 * 
-	 * @var UnicodeString
+	 * @return UnicodeString
 	 */
 	UnicodeString GetFileName() const;
 	
 	/**
 	 * Returns the parsed method name
 	 * 
-	 * @var UnicodeString
+	 * @return UnicodeString
 	 */
 	UnicodeString GetMethodName() const;
+
+	/**
+	 * The parsed namespace name.
+	 * @return UnicodeString
+	 */
+	UnicodeString GetNamespaceName() const;
 	
 	/**
 	 * Returns the parsed line number
 	 * 
-	 * @var int
+	 * @return int
 	 */
 	int GetLineNumber() const;
 	
@@ -150,6 +156,12 @@ private:
 	 * @var UnicodeString
 	 */
 	UnicodeString MethodName;
+
+	/**
+	 * The namespace name parsed from the tag string
+	 * @var UnicodeString
+	 */
+	UnicodeString NamespaceName;
 
 	/**
 	 * The list of classes to look in. When this is given, the method name will be searched
