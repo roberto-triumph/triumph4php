@@ -103,7 +103,7 @@ void mvceditor::TagCacheSearchActionClass::BackgroundWork() {
 
 		// PostEvent will set the correct event ID
 		mvceditor::TagSearchCompleteEventClass evt(Mode, tags, Mode, mvceditor::IcuToWx(SearchString));
-		PostEvent(evt);
+		PostEvent(evt);	
 	}
 }
 wxString mvceditor::TagCacheSearchActionClass::GetLabel() const {
