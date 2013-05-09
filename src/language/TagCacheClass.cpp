@@ -481,19 +481,16 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllMemberTags(const U
 	// return all of the matches from all finders that were found by the Collect* call.
 	// This is a bit tricky because we want to prioritize matches in opened files 
 	// instead of the global finder, since the global finder will be outdated.
-	mvceditor::TagFinderClass* openedFinder = NULL;
-	if (GlobalCache && GlobalCache->IsWorkingTagFinderInit) {
-		openedFinder = &GlobalCache->WorkingTagFinder;
-	}
 	std::vector<mvceditor::TagClass> allMatches;
-	for (size_t j = 0; j < allTagFinders.size(); ++j) {
-		mvceditor::TagFinderClass* tagFinder = allTagFinders[j];
-		std::vector<mvceditor::TagClass> finderMatches = tagFinder->NearMatchTags(tagSearch);
-		size_t count = finderMatches.size();
-		for (size_t k = 0; k < count; ++k) {
-			mvceditor::TagClass tag = finderMatches[k];
-			if (!mvceditor::IsResourceDirty(openedFinder, tag, tagFinder)) {
-				allMatches.push_back(tag);
+	if (GlobalCache && GlobalCache->IsWorkingTagFinderInit) {
+		allMatches = GlobalCache->WorkingTagFinder.NearMatchTags(tagSearch);
+	}
+	if (allMatches.empty()) {	
+		for (size_t j = 0; j < allTagFinders.size(); ++j) {
+			mvceditor::TagFinderClass* tagFinder = allTagFinders[j];
+			if (tagFinder != &GlobalCache->WorkingTagFinder) {
+				std::vector<mvceditor::TagClass> finderMatches = tagFinder->NearMatchTags(tagSearch);
+				allMatches.insert(allMatches.end(), finderMatches.begin(), finderMatches.end());
 			}
 		}
 	}
