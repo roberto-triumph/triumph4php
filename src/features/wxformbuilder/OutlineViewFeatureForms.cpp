@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Feb 17 2010)
+// C++ code generated with wxFormBuilder (version Sep  8 2010)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -22,7 +22,7 @@ OutlineViewGeneratedPanelClass::OutlineViewGeneratedPanelClass( wxWindow* parent
 	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	wxFlexGridSizer* NavigationSizer;
-	NavigationSizer = new wxFlexGridSizer( 1, 4, 0, 0 );
+	NavigationSizer = new wxFlexGridSizer( 1, 7, 0, 0 );
 	NavigationSizer->AddGrowableCol( 0 );
 	NavigationSizer->AddGrowableRow( 0 );
 	NavigationSizer->SetFlexibleDirection( wxBOTH );
@@ -31,6 +31,27 @@ OutlineViewGeneratedPanelClass::OutlineViewGeneratedPanelClass( wxWindow* parent
 	StatusLabel = new wxStaticText( this, ID_STATUSLABEL, _("MyLabel"), wxDefaultPosition, wxDefaultSize, 0 );
 	StatusLabel->Wrap( -1 );
 	NavigationSizer->Add( StatusLabel, 1, wxALL|wxALIGN_BOTTOM, 5 );
+	
+	ConstantsButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	ConstantsButton->SetToolTip( _("Toggle Class Constants on and off") );
+	
+	ConstantsButton->SetToolTip( _("Toggle Class Constants on and off") );
+	
+	NavigationSizer->Add( ConstantsButton, 0, wxALL, 5 );
+	
+	PropertiesButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	PropertiesButton->SetToolTip( _("Toggle Class members on and off") );
+	
+	PropertiesButton->SetToolTip( _("Toggle Class members on and off") );
+	
+	NavigationSizer->Add( PropertiesButton, 0, wxALL, 5 );
+	
+	MethodsButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	MethodsButton->SetToolTip( _("Toggle Class methods on and off") );
+	
+	MethodsButton->SetToolTip( _("Toggle Class methods on and off") );
+	
+	NavigationSizer->Add( MethodsButton, 0, wxALL, 5 );
 	
 	AddButton = new wxBitmapButton( this, ID_ADDBUTTON, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	AddButton->SetToolTip( _("Add a class to the outline tree") );
@@ -64,6 +85,9 @@ OutlineViewGeneratedPanelClass::OutlineViewGeneratedPanelClass( wxWindow* parent
 	this->Layout();
 	
 	// Connect Events
+	ConstantsButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnConstantsClick ), NULL, this );
+	PropertiesButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnPropertiesClick ), NULL, this );
+	MethodsButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnMethodsClick ), NULL, this );
 	AddButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnAddButton ), NULL, this );
 	SyncButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnSyncButton ), NULL, this );
 	HelpButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnHelpButton ), NULL, this );
@@ -74,6 +98,9 @@ OutlineViewGeneratedPanelClass::OutlineViewGeneratedPanelClass( wxWindow* parent
 OutlineViewGeneratedPanelClass::~OutlineViewGeneratedPanelClass()
 {
 	// Disconnect Events
+	ConstantsButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnConstantsClick ), NULL, this );
+	PropertiesButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnPropertiesClick ), NULL, this );
+	MethodsButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnMethodsClick ), NULL, this );
 	AddButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnAddButton ), NULL, this );
 	SyncButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnSyncButton ), NULL, this );
 	HelpButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnHelpButton ), NULL, this );

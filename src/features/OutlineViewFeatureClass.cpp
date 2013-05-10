@@ -45,6 +45,9 @@ static int ID_OUTLINE_MENU_DELETE = wxNewId();
 static int ID_OUTLINE_MENU_COLLAPSE = wxNewId();
 static int ID_OUTLINE_MENU_COLLAPSE_ALL = wxNewId();
 static int ID_OUTLINE_MENU_EXPAND_ALL = wxNewId();
+static int ID_OUTLINE_MENU_TOGGLE_METHODS = wxNewId();
+static int ID_OUTLINE_MENU_TOGGLE_PROPERTIES = wxNewId();
+static int ID_OUTLINE_MENU_TOGGLE_CONSTANTS = wxNewId();
 
 const wxEventType mvceditor::EVENT_TAG_SEARCH_COMPLETE = wxNewEventType();
 
@@ -236,13 +239,21 @@ void mvceditor::OutlineViewFeatureClass::OnTagSearchComplete(mvceditor::TagSearc
 mvceditor::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int windowId, OutlineViewFeatureClass* feature, 
 		NotebookClass* notebook)
 	: OutlineViewGeneratedPanelClass(parent, windowId)
+	, OutlinedTags()
 	, ImageList(NULL)
 	, Feature(feature)
-	, Notebook(notebook) {
+	, Notebook(notebook)
+	, ShowMethods(true)
+	, ShowProperties(true)
+	, ShowConstants(true) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
 	SyncButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("outline-refresh")));
 	AddButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("outline-add")));
+	PropertiesButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("property-public")));
+	MethodsButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("method-public")));
+	ConstantsButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("class-constant")));
+
 	SetStatus(_(""));
 	
 	ImageList = new wxImageList(16, 16);
@@ -273,6 +284,7 @@ void mvceditor::OutlineViewPanelClass::SetStatus(const wxString& status) {
 }
 
 void mvceditor::OutlineViewPanelClass::AddFileToOutline(const wxString& fullPath, const std::vector<mvceditor::TagClass>& tags) {
+	OutlinedTags.push_back(fullPath);
 	Tree->Freeze();
 	wxTreeItemId rootId = Tree->GetRootItem();
 	if (!rootId.IsOk()) {
@@ -343,7 +355,7 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_DEFINE, -1, 
 			new mvceditor::TreeItemDataStringClass(mvceditor::IcuToWx(tag.Key)));
 	}
-	else if (mvceditor::TagClass::MEMBER == tag.Type) {
+	else if (mvceditor::TagClass::MEMBER == tag.Type && ShowProperties) {
 		if (!tag.ReturnType.isEmpty()) {
 			wxString returnType = mvceditor::IcuToWx(tag.ReturnType);
 			label = label + wxT(" [") + returnType + wxT("]");
@@ -361,7 +373,7 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 		Tree->AppendItem(treeId, label, image, -1, 
 			new mvceditor::TreeItemDataStringClass(mvceditor::IcuToWx(tag.Key)));
 	}
-	else if (mvceditor::TagClass::METHOD == tag.Type) {
+	else if (mvceditor::TagClass::METHOD == tag.Type && ShowMethods) {
 
 		// add the function signature to the label
 		int32_t sigIndex = tag.Signature.indexOf(UNICODE_STRING_SIMPLE(" function ")); 
@@ -386,7 +398,7 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 		Tree->AppendItem(treeId, label, image, -1, 
 			new mvceditor::TreeItemDataStringClass(mvceditor::IcuToWx(tag.Key)));
 	}
-	else if (mvceditor::TagClass::CLASS_CONSTANT == tag.Type) {
+	else if (mvceditor::TagClass::CLASS_CONSTANT == tag.Type && ShowConstants) {
 		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_CLASS_CONSTANT, -1,
 			new mvceditor::TreeItemDataStringClass(mvceditor::IcuToWx(tag.Key)));
 	}
@@ -438,6 +450,7 @@ void mvceditor::OutlineViewPanelClass::OnAddButton(wxCommandEvent& event) {
 }
 
 void mvceditor::OutlineViewPanelClass::OnSyncButton(wxCommandEvent& event) {
+	OutlinedTags.clear();
 	Tree->DeleteAllItems();
 	for (size_t i = 0; i < Notebook->GetPageCount(); i++) {
 		mvceditor::CodeControlClass* codeCtrl = Notebook->GetCodeControl(i);
@@ -488,6 +501,7 @@ void mvceditor::OutlineViewPanelClass::SearchTagsToOutline(const std::vector<mvc
 
 void mvceditor::OutlineViewPanelClass::AddClassToOutline(const wxString& className, 
 														 const std::vector<mvceditor::TagClass>& memberTags) {	
+	OutlinedTags.push_back(className);
 	Tree->Freeze();
 	wxTreeItemId rootId = Tree->GetRootItem();
 	if (!rootId.IsOk()) {
@@ -536,6 +550,15 @@ void mvceditor::OutlineViewPanelClass::OnTreeItemRightClick(wxTreeEvent& event) 
 	}
 	menu.Append(ID_OUTLINE_MENU_COLLAPSE_ALL, _("Collapse All"), _("Collapse all items in the tree"));
 	menu.Append(ID_OUTLINE_MENU_EXPAND_ALL, _("Expand All"), _("Expand all items in the tree"));
+	wxMenuItem* item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_METHODS, _("Show Methods"), _("Toggle showing methods in the outline"));
+	item->Check(ShowMethods);
+
+	item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_PROPERTIES, _("Show Properties"), _("Toggle showing properties in the outline"));
+	item->Check(ShowProperties);
+	
+	item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_CONSTANTS, _("Show Class Constants"), _("Toggle showing class constants in the outline"));
+	item->Check(ShowConstants);
+
 	wxPoint pos = event.GetPoint();
 	Tree->PopupMenu(&menu, pos);
 	event.Skip();
@@ -547,6 +570,16 @@ void mvceditor::OutlineViewPanelClass::OnTreeMenuDelete(wxCommandEvent& event) {
 	wxTreeItemId rootId = Tree->GetRootItem();
 	wxTreeItemId itemId = Tree->GetSelection();
 	if (itemId.IsOk() && rootId == Tree->GetItemParent(itemId)) {
+		mvceditor::TreeItemDataStringClass* data = (mvceditor::TreeItemDataStringClass*)Tree->GetItemData(itemId);
+		if (data) {
+			wxString fullPath = data->Str;
+
+			// remove the file from the outlined tags list
+			std::vector<wxString>::iterator it = std::find(OutlinedTags.begin(), OutlinedTags.end(), fullPath);
+			if (it != OutlinedTags.end()) {
+				OutlinedTags.erase(it);
+			}
+		}
 		Tree->Delete(itemId);
 	}
 }
@@ -571,6 +604,64 @@ void mvceditor::OutlineViewPanelClass::OnTreeMenuExpandAll(wxCommandEvent& event
 	if (rootId.IsOk()) {
 		Tree->ExpandAllChildren(rootId);
 	}
+}
+
+void mvceditor::OutlineViewPanelClass::OnMethodsClick(wxCommandEvent& event) {
+	ShowMethods = !ShowMethods;
+	std::vector<wxString> tagsToOutline = OutlinedTags;
+	OutlinedTags.clear(); // this will be filled when the tag search is complete
+	std::vector<wxString>::iterator tag;
+	for (tag = tagsToOutline.begin(); tag != tagsToOutline.end(); ++tag) {
+		if (tag->Find(wxT(".")) != wxNOT_FOUND) {
+			
+			// user chose a file: get all classes / functions for that file
+			Feature->StartTagSearch(mvceditor::TagCacheSearchActionClass::ALL_TAGS_IN_FILE, *tag);
+		}
+		else {
+
+			// user chose a class; add the class member to the outline
+			Feature->StartTagSearch(mvceditor::TagCacheSearchActionClass::ALL_MEMBER_TAGS, *tag);
+		}
+	}
+}
+
+void mvceditor::OutlineViewPanelClass::OnPropertiesClick(wxCommandEvent& event) {
+	ShowProperties = !ShowProperties;
+	std::vector<wxString> tagsToOutline = OutlinedTags;
+	OutlinedTags.clear(); // this will be filled when the tag search is complete
+	std::vector<wxString>::iterator tag;
+	for (tag = tagsToOutline.begin(); tag != tagsToOutline.end(); ++tag) {
+		if (tag->Find(wxT(".")) != wxNOT_FOUND) {
+			
+			// user chose a file: get all classes / functions for that file
+			Feature->StartTagSearch(mvceditor::TagCacheSearchActionClass::ALL_TAGS_IN_FILE, *tag);
+		}
+		else {
+
+			// user chose a class; add the class member to the outline
+			Feature->StartTagSearch(mvceditor::TagCacheSearchActionClass::ALL_MEMBER_TAGS, *tag);
+		}
+	}
+}
+
+void mvceditor::OutlineViewPanelClass::OnConstantsClick(wxCommandEvent& event) {
+	ShowConstants = !ShowConstants;
+	std::vector<wxString> tagsToOutline = OutlinedTags;
+	OutlinedTags.clear(); // this will be filled when the tag search is complete
+	std::vector<wxString>::iterator tag;
+	for (tag = tagsToOutline.begin(); tag != tagsToOutline.end(); ++tag) {
+		if (tag->Find(wxT(".")) != wxNOT_FOUND) {
+			
+			// user chose a file: get all classes / functions for that file
+			Feature->StartTagSearch(mvceditor::TagCacheSearchActionClass::ALL_TAGS_IN_FILE, *tag);
+		}
+		else {
+
+			// user chose a class; add the class member to the outline
+			Feature->StartTagSearch(mvceditor::TagCacheSearchActionClass::ALL_MEMBER_TAGS, *tag);
+		}
+	}
+
 }
 
 mvceditor::FileSearchDialogClass::FileSearchDialogClass(wxWindow *parent, mvceditor::OutlineViewFeatureClass& feature, std::vector<mvceditor::TagClass>& chosenTags)
@@ -692,6 +783,12 @@ void mvceditor::OutlineViewPanelClass::RemoveFileFromOutline(const wxString& ful
 	wxTreeItemId fileId = FindFileNode(fullPath);
 	if (fileId.IsOk()) {
 		Tree->Delete(fileId);
+
+		// remove the file from the outlined tags list
+		std::vector<wxString>::iterator it = std::find(OutlinedTags.begin(), OutlinedTags.end(), fullPath);
+		if (it != OutlinedTags.end()) {
+			OutlinedTags.erase(it);
+		}
 	}
 }
 
@@ -821,4 +918,7 @@ BEGIN_EVENT_TABLE(mvceditor::OutlineViewPanelClass, OutlineViewGeneratedPanelCla
 	EVT_MENU(ID_OUTLINE_MENU_COLLAPSE, mvceditor::OutlineViewPanelClass::OnTreeMenuCollapse)
 	EVT_MENU(ID_OUTLINE_MENU_COLLAPSE_ALL, mvceditor::OutlineViewPanelClass::OnTreeMenuCollapseAll)
 	EVT_MENU(ID_OUTLINE_MENU_EXPAND_ALL, mvceditor::OutlineViewPanelClass::OnTreeMenuExpandAll)
+	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_METHODS, mvceditor::OutlineViewPanelClass::OnMethodsClick)
+	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_PROPERTIES, mvceditor::OutlineViewPanelClass::OnPropertiesClick)
+	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_CONSTANTS, mvceditor::OutlineViewPanelClass::OnConstantsClick)
 END_EVENT_TABLE()

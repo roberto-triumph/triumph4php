@@ -270,6 +270,12 @@ private:
 	};
 
 	/**
+	 * these are the things that have been outlined.  these string could be
+	 * either a filename or a class name.
+	 */
+	std::vector<wxString> OutlinedTags;
+
+	/**
 	 * this pointer will be managed by the tree control, since the tree control
 	 * may use the pointer in the destructor.
 	 */
@@ -285,6 +291,21 @@ private:
 	 * The notebook to listen (for page changing) events  to
 	 */
 	NotebookClass* Notebook;
+
+	/**
+	 * if TRUE outline will show class methods
+	 */
+	bool ShowMethods;
+
+	/**
+	 * if TRUE outline will show class properties
+	 */
+	bool ShowProperties;
+
+	/**
+	 * if TRUE outline will show class constants
+	 */
+	bool ShowConstants;
 
 	/**
 	 * takes in class or file tags, perform searches for all tags in each of
@@ -331,6 +352,21 @@ private:
 	 * handle the right click menu item for expanding all items
 	 */
 	void OnTreeMenuExpandAll(wxCommandEvent& event);
+
+	/**
+	 * handle the properties button click; toggle showing class members on and off
+	 */
+	void OnPropertiesClick(wxCommandEvent& event);
+
+	/**
+	 * handle the properties button click; toggle showing class methods on and off
+	 */
+	void OnMethodsClick(wxCommandEvent& event);
+
+	/**
+	 * handle the properties button click; toggle showing class constants on and off
+	 */
+	void OnConstantsClick(wxCommandEvent& event);
 
 	DECLARE_EVENT_TABLE()
 

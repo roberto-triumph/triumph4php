@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Feb 17 2010)
+// C++ code generated with wxFormBuilder (version Sep  8 2010)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -48,12 +48,18 @@ class OutlineViewGeneratedPanelClass : public wxPanel
 		};
 		
 		wxStaticText* StatusLabel;
+		wxBitmapButton* ConstantsButton;
+		wxBitmapButton* PropertiesButton;
+		wxBitmapButton* MethodsButton;
 		wxBitmapButton* AddButton;
 		wxBitmapButton* SyncButton;
 		wxBitmapButton* HelpButton;
 		wxTreeCtrl* Tree;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnConstantsClick( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnPropertiesClick( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMethodsClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSyncButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
