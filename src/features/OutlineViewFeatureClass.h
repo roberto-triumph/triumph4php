@@ -266,7 +266,8 @@ private:
 		IMAGE_OUTLINE_DEFINE,
 		IMAGE_OUTLINE_CLASS_CONSTANT,
 		IMAGE_OUTLINE_NAMESPACE,
-		IMAGE_OUTLINE_FUNCTION
+		IMAGE_OUTLINE_FUNCTION,
+		IMAGE_OUTLINE_ARGUMENT
 	};
 
 	/**
@@ -311,6 +312,11 @@ private:
 	 * if TRUE then only public methods, properties or constants are show
 	 */
 	bool ShowPublicOnly;
+
+	/**
+	 * if TRUE then function arguments are show
+	 */
+	bool ShowFunctionArgs;
 
 	/**
 	 * takes in class or file tags, perform searches for all tags in each of
@@ -359,24 +365,34 @@ private:
 	void OnTreeMenuExpandAll(wxCommandEvent& event);
 
 	/**
-	 * handle the properties button click; toggle showing class members on and off
+	 * handle the properties toggle; toggle showing class members on and off
 	 */
 	void OnPropertiesClick(wxCommandEvent& event);
 
 	/**
-	 * handle the properties button click; toggle showing class methods on and off
+	 * handle the properties toggle; toggle showing class methods on and off
 	 */
 	void OnMethodsClick(wxCommandEvent& event);
 
 	/**
-	 * handle the properties button click; toggle showing class constants on and off
+	 * handle the properties toggle; toggle showing class constants on and off
 	 */
 	void OnConstantsClick(wxCommandEvent& event);
 
 	/**
-	 * handle the "public only" button click; toggle showing private tags on and off
+	 * handle the "public only" toggle; toggle showing private tags on and off
 	 */
-	void OnShowPublicOnlyClick(wxCommandEvent& event);
+	void OnPublicOnlyClick(wxCommandEvent& event);
+
+	/**
+	 * handle the arguments toggle; toggle showing function arguments on and off
+	 */
+	void OnFunctionArgsClick(wxCommandEvent& event);
+
+	/**
+	 * handle the "filter" button click; show the menu to toogle different tags on or off
+	 */
+	void OnFilterLeftDown(wxMouseEvent& event);
 
 	DECLARE_EVENT_TABLE()
 

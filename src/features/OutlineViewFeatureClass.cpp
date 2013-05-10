@@ -36,6 +36,7 @@
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <unicode/regex.h>
 #include <wx/artprov.h>
+#include <wx/tokenzr.h>
 #include <vector>
 #include <algorithm>
 
@@ -49,6 +50,7 @@ static int ID_OUTLINE_MENU_TOGGLE_METHODS = wxNewId();
 static int ID_OUTLINE_MENU_TOGGLE_PROPERTIES = wxNewId();
 static int ID_OUTLINE_MENU_TOGGLE_CONSTANTS = wxNewId();
 static int ID_OUTLINE_MENU_TOGGLE_PUBLIC_ONLY = wxNewId();
+static int ID_OUTLINE_MENU_TOGGLE_FUNCTION_ARGS = wxNewId();
 
 const wxEventType mvceditor::EVENT_TAG_SEARCH_COMPLETE = wxNewEventType();
 
@@ -247,15 +249,13 @@ mvceditor::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int wi
 	, ShowMethods(true)
 	, ShowProperties(true)
 	, ShowConstants(true) 
-	, ShowPublicOnly(false) {
+	, ShowPublicOnly(false) 
+	, ShowFunctionArgs(false) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
 	SyncButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("outline-refresh")));
 	AddButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("outline-add")));
-	PropertiesButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("property-public")));
-	MethodsButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("method-public")));
-	ConstantsButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("class-constant")));
-	ShowPublicOnlyButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("public-only")));
+	FilterButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("filter")));
 
 	SetStatus(_(""));
 	
@@ -276,6 +276,7 @@ mvceditor::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int wi
 	ImageList->Add(mvceditor::IconImageAsset(wxT("class-constant")));
 	ImageList->Add(mvceditor::IconImageAsset(wxT("namespace")));
 	ImageList->Add(mvceditor::IconImageAsset(wxT("function")));
+	ImageList->Add(mvceditor::IconImageAsset(wxT("variable-template")));
 
 	// let the tree control managet the image list
 	// since it may need to use it in the destructor
@@ -381,11 +382,15 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 	}
 	else if (mvceditor::TagClass::METHOD == tag.Type && ShowMethods && passesAccessCheck) {
 
-		// add the function signature to the label
-		int32_t sigIndex = tag.Signature.indexOf(UNICODE_STRING_SIMPLE(" function ")); 
-		if (sigIndex > 0) {
-			UnicodeString sig(tag.Signature, sigIndex + 10);
-			label = mvceditor::IcuToWx(sig);
+		label = mvceditor::IcuToWx(tag.Identifier);
+
+		// check to see if we have args. if so, add an ellipsis to show that there are things hidden
+		// that can be seen
+		if (tag.Signature.indexOf(UNICODE_STRING_SIMPLE("()")) > 0) {
+			label += wxT("()");
+		}
+		else {
+			label += wxT("(...)");
 		}
 		if (!tag.ReturnType.isEmpty()) {
 			wxString returnType = mvceditor::IcuToWx(tag.ReturnType);
@@ -401,8 +406,22 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 		else if (tag.IsPrivate) {
 			image = IMAGE_OUTLINE_METHOD_PRIVATE;
 		}
-		Tree->AppendItem(treeId, label, image, -1, 
+		wxTreeItemId funcId = Tree->AppendItem(treeId, label, image, -1, 
 			new mvceditor::TreeItemDataStringClass(mvceditor::IcuToWx(tag.Key)));
+		if (ShowFunctionArgs) {
+
+			// add the function args under the method name
+			int32_t argsStart = tag.Signature.indexOf(UNICODE_STRING_SIMPLE("(")); 
+			int32_t argsEnd = tag.Signature.indexOf(UNICODE_STRING_SIMPLE(")")); 
+			if (argsStart > 0 && argsEnd > 0) {
+				UnicodeString sig(tag.Signature, argsStart + 1, argsEnd - argsStart - 1);
+				
+				wxStringTokenizer tok(mvceditor::IcuToWx(sig), wxT(","));
+				while (tok.HasMoreTokens()) {
+					Tree->AppendItem(funcId, tok.NextToken(), IMAGE_OUTLINE_ARGUMENT);
+				}
+			}
+		}
 	}
 	else if (mvceditor::TagClass::CLASS_CONSTANT == tag.Type && ShowConstants && passesAccessCheck) {
 		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_CLASS_CONSTANT, -1,
@@ -568,9 +587,42 @@ void mvceditor::OutlineViewPanelClass::OnTreeItemRightClick(wxTreeEvent& event) 
 	item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_PUBLIC_ONLY, _("Show Public Tags Only"), _("Toggle showing public tags in the outline"));
 	item->Check(ShowPublicOnly);
 
+	item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_FUNCTION_ARGS, _("Show Function Arguments"), _("Toggle showing functionn arguments in the outline"));
+	item->Check(ShowFunctionArgs);
+
 	wxPoint pos = event.GetPoint();
 	Tree->PopupMenu(&menu, pos);
 	event.Skip();
+}
+
+
+void mvceditor::OutlineViewPanelClass::OnFilterLeftDown(wxMouseEvent& event) {
+	wxPoint pos = event.GetPosition();
+	wxHitTest test = FilterButton->HitTest(pos);
+	if (test== wxHT_WINDOW_INSIDE) {
+		wxMenu menu;
+		menu.Append(ID_OUTLINE_MENU_COLLAPSE_ALL, _("Collapse All"), _("Collapse all items in the tree"));
+		menu.Append(ID_OUTLINE_MENU_EXPAND_ALL, _("Expand All"), _("Expand all items in the tree"));
+		wxMenuItem* item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_METHODS, _("Show Methods"), _("Toggle showing methods in the outline"));
+		item->Check(ShowMethods);
+
+		item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_PROPERTIES, _("Show Properties"), _("Toggle showing properties in the outline"));
+		item->Check(ShowProperties);
+		
+		item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_CONSTANTS, _("Show Class Constants"), _("Toggle showing class constants in the outline"));
+		item->Check(ShowConstants);
+
+		item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_PUBLIC_ONLY, _("Show Public Tags Only"), _("Toggle showing public tags in the outline"));
+		item->Check(ShowPublicOnly);
+
+		item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_FUNCTION_ARGS, _("Show Function Arguments"), _("Toggle showing functionn arguments in the outline"));
+		item->Check(ShowFunctionArgs);
+
+		FilterButton->PopupMenu(&menu, pos);
+	}
+	else {
+		event.Skip();
+	}
 }
 
 void mvceditor::OutlineViewPanelClass::OnTreeMenuDelete(wxCommandEvent& event) {
@@ -672,8 +724,27 @@ void mvceditor::OutlineViewPanelClass::OnConstantsClick(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::OutlineViewPanelClass::OnShowPublicOnlyClick(wxCommandEvent& event) {
+void mvceditor::OutlineViewPanelClass::OnPublicOnlyClick(wxCommandEvent& event) {
 	ShowPublicOnly = !ShowPublicOnly;
+	std::vector<wxString> tagsToOutline = OutlinedTags;
+	OutlinedTags.clear(); // this will be filled when the tag search is complete
+	std::vector<wxString>::iterator tag;
+	for (tag = tagsToOutline.begin(); tag != tagsToOutline.end(); ++tag) {
+		if (tag->Find(wxT(".")) != wxNOT_FOUND) {
+			
+			// user chose a file: get all classes / functions for that file
+			Feature->StartTagSearch(mvceditor::TagCacheSearchActionClass::ALL_TAGS_IN_FILE, *tag);
+		}
+		else {
+
+			// user chose a class; add the class member to the outline
+			Feature->StartTagSearch(mvceditor::TagCacheSearchActionClass::ALL_MEMBER_TAGS, *tag);
+		}
+	}
+}
+
+void mvceditor::OutlineViewPanelClass::OnFunctionArgsClick(wxCommandEvent& event) {
+	ShowFunctionArgs = !ShowFunctionArgs;
 	std::vector<wxString> tagsToOutline = OutlinedTags;
 	OutlinedTags.clear(); // this will be filled when the tag search is complete
 	std::vector<wxString>::iterator tag;
@@ -948,5 +1019,6 @@ BEGIN_EVENT_TABLE(mvceditor::OutlineViewPanelClass, OutlineViewGeneratedPanelCla
 	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_METHODS, mvceditor::OutlineViewPanelClass::OnMethodsClick)
 	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_PROPERTIES, mvceditor::OutlineViewPanelClass::OnPropertiesClick)
 	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_CONSTANTS, mvceditor::OutlineViewPanelClass::OnConstantsClick)
-	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_PUBLIC_ONLY, mvceditor::OutlineViewPanelClass::OnShowPublicOnlyClick)
+	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_PUBLIC_ONLY, mvceditor::OutlineViewPanelClass::OnPublicOnlyClick)
+	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_FUNCTION_ARGS, mvceditor::OutlineViewPanelClass::OnFunctionArgsClick)
 END_EVENT_TABLE()

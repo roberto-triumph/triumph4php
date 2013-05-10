@@ -22,7 +22,7 @@ OutlineViewGeneratedPanelClass::OutlineViewGeneratedPanelClass( wxWindow* parent
 	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	wxFlexGridSizer* NavigationSizer;
-	NavigationSizer = new wxFlexGridSizer( 1, 8, 0, 0 );
+	NavigationSizer = new wxFlexGridSizer( 1, 9, 0, 0 );
 	NavigationSizer->AddGrowableCol( 0 );
 	NavigationSizer->AddGrowableRow( 0 );
 	NavigationSizer->SetFlexibleDirection( wxBOTH );
@@ -31,30 +31,6 @@ OutlineViewGeneratedPanelClass::OutlineViewGeneratedPanelClass( wxWindow* parent
 	StatusLabel = new wxStaticText( this, ID_STATUSLABEL, _("MyLabel"), wxDefaultPosition, wxDefaultSize, 0 );
 	StatusLabel->Wrap( -1 );
 	NavigationSizer->Add( StatusLabel, 1, wxALL|wxALIGN_BOTTOM, 5 );
-	
-	ShowPublicOnlyButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
-	NavigationSizer->Add( ShowPublicOnlyButton, 0, wxALL, 5 );
-	
-	ConstantsButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
-	ConstantsButton->SetToolTip( _("Toggle Class Constants on and off") );
-	
-	ConstantsButton->SetToolTip( _("Toggle Class Constants on and off") );
-	
-	NavigationSizer->Add( ConstantsButton, 0, wxALL, 5 );
-	
-	PropertiesButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
-	PropertiesButton->SetToolTip( _("Toggle Class members on and off") );
-	
-	PropertiesButton->SetToolTip( _("Toggle Class members on and off") );
-	
-	NavigationSizer->Add( PropertiesButton, 0, wxALL, 5 );
-	
-	MethodsButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
-	MethodsButton->SetToolTip( _("Toggle Class methods on and off") );
-	
-	MethodsButton->SetToolTip( _("Toggle Class methods on and off") );
-	
-	NavigationSizer->Add( MethodsButton, 0, wxALL, 5 );
 	
 	AddButton = new wxBitmapButton( this, ID_ADDBUTTON, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	AddButton->SetToolTip( _("Add a class to the outline tree") );
@@ -69,6 +45,13 @@ OutlineViewGeneratedPanelClass::OutlineViewGeneratedPanelClass( wxWindow* parent
 	SyncButton->SetToolTip( _("Sync Outline With Opened Files") );
 	
 	NavigationSizer->Add( SyncButton, 0, wxALL, 5 );
+	
+	FilterButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	FilterButton->SetToolTip( _("Show filter menu") );
+	
+	FilterButton->SetToolTip( _("Show filter menu") );
+	
+	NavigationSizer->Add( FilterButton, 0, wxALL, 5 );
 	
 	HelpButton = new wxBitmapButton( this, wxID_HELP, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	HelpButton->SetToolTip( _("Help") );
@@ -88,12 +71,9 @@ OutlineViewGeneratedPanelClass::OutlineViewGeneratedPanelClass( wxWindow* parent
 	this->Layout();
 	
 	// Connect Events
-	ShowPublicOnlyButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnShowPublicOnlyClick ), NULL, this );
-	ConstantsButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnConstantsClick ), NULL, this );
-	PropertiesButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnPropertiesClick ), NULL, this );
-	MethodsButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnMethodsClick ), NULL, this );
 	AddButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnAddButton ), NULL, this );
 	SyncButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnSyncButton ), NULL, this );
+	FilterButton->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( OutlineViewGeneratedPanelClass::OnFilterLeftDown ), NULL, this );
 	HelpButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnHelpButton ), NULL, this );
 	Tree->Connect( wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler( OutlineViewGeneratedPanelClass::OnTreeItemActivated ), NULL, this );
 	Tree->Connect( wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK, wxTreeEventHandler( OutlineViewGeneratedPanelClass::OnTreeItemRightClick ), NULL, this );
@@ -102,12 +82,9 @@ OutlineViewGeneratedPanelClass::OutlineViewGeneratedPanelClass( wxWindow* parent
 OutlineViewGeneratedPanelClass::~OutlineViewGeneratedPanelClass()
 {
 	// Disconnect Events
-	ShowPublicOnlyButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnShowPublicOnlyClick ), NULL, this );
-	ConstantsButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnConstantsClick ), NULL, this );
-	PropertiesButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnPropertiesClick ), NULL, this );
-	MethodsButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnMethodsClick ), NULL, this );
 	AddButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnAddButton ), NULL, this );
 	SyncButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnSyncButton ), NULL, this );
+	FilterButton->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( OutlineViewGeneratedPanelClass::OnFilterLeftDown ), NULL, this );
 	HelpButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnHelpButton ), NULL, this );
 	Tree->Disconnect( wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler( OutlineViewGeneratedPanelClass::OnTreeItemActivated ), NULL, this );
 	Tree->Disconnect( wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK, wxTreeEventHandler( OutlineViewGeneratedPanelClass::OnTreeItemRightClick ), NULL, this );
