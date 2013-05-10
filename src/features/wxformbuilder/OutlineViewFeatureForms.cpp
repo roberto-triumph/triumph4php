@@ -22,7 +22,7 @@ OutlineViewGeneratedPanelClass::OutlineViewGeneratedPanelClass( wxWindow* parent
 	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	wxFlexGridSizer* NavigationSizer;
-	NavigationSizer = new wxFlexGridSizer( 1, 7, 0, 0 );
+	NavigationSizer = new wxFlexGridSizer( 1, 8, 0, 0 );
 	NavigationSizer->AddGrowableCol( 0 );
 	NavigationSizer->AddGrowableRow( 0 );
 	NavigationSizer->SetFlexibleDirection( wxBOTH );
@@ -31,6 +31,9 @@ OutlineViewGeneratedPanelClass::OutlineViewGeneratedPanelClass( wxWindow* parent
 	StatusLabel = new wxStaticText( this, ID_STATUSLABEL, _("MyLabel"), wxDefaultPosition, wxDefaultSize, 0 );
 	StatusLabel->Wrap( -1 );
 	NavigationSizer->Add( StatusLabel, 1, wxALL|wxALIGN_BOTTOM, 5 );
+	
+	ShowPublicOnlyButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	NavigationSizer->Add( ShowPublicOnlyButton, 0, wxALL, 5 );
 	
 	ConstantsButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	ConstantsButton->SetToolTip( _("Toggle Class Constants on and off") );
@@ -85,6 +88,7 @@ OutlineViewGeneratedPanelClass::OutlineViewGeneratedPanelClass( wxWindow* parent
 	this->Layout();
 	
 	// Connect Events
+	ShowPublicOnlyButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnShowPublicOnlyClick ), NULL, this );
 	ConstantsButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnConstantsClick ), NULL, this );
 	PropertiesButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnPropertiesClick ), NULL, this );
 	MethodsButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnMethodsClick ), NULL, this );
@@ -98,6 +102,7 @@ OutlineViewGeneratedPanelClass::OutlineViewGeneratedPanelClass( wxWindow* parent
 OutlineViewGeneratedPanelClass::~OutlineViewGeneratedPanelClass()
 {
 	// Disconnect Events
+	ShowPublicOnlyButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnShowPublicOnlyClick ), NULL, this );
 	ConstantsButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnConstantsClick ), NULL, this );
 	PropertiesButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnPropertiesClick ), NULL, this );
 	MethodsButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnMethodsClick ), NULL, this );

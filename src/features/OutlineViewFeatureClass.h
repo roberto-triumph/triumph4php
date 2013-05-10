@@ -308,6 +308,11 @@ private:
 	bool ShowConstants;
 
 	/**
+	 * if TRUE then only public methods, properties or constants are show
+	 */
+	bool ShowPublicOnly;
+
+	/**
 	 * takes in class or file tags, perform searches for all tags in each of
 	 * the files / classes given.
 	 *
@@ -367,6 +372,11 @@ private:
 	 * handle the properties button click; toggle showing class constants on and off
 	 */
 	void OnConstantsClick(wxCommandEvent& event);
+
+	/**
+	 * handle the "public only" button click; toggle showing private tags on and off
+	 */
+	void OnShowPublicOnlyClick(wxCommandEvent& event);
 
 	DECLARE_EVENT_TABLE()
 
