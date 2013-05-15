@@ -265,16 +265,14 @@ void mvceditor::TagParserClass::BuildResourceCacheForFile(const wxString& fullPa
 		fileTagIdsToRemove.push_back(fileTag.FileId);
 		RemovePersistedResources(fileTagIdsToRemove);
 	}
-	if (!foundFile) {
-
-		// if caller just calls this method without calling Walk(); then file cache will be empty
-		// need to add an entry so that GetResourceMatchFullPathFromResource works correctly
-		fileTag.FullPath = fullPath;
-		fileTag.IsNew = isNew;
-		fileTag.DateTime = wxDateTime::Now();
-		fileTag.IsParsed = false;
-		PersistFileTag(fileTag);
-	}
+	
+	// if caller just calls this method without calling Walk(); then file cache will be empty
+	// need to add an entry so that GetResourceMatchFullPathFromResource works correctly
+	fileTag.FullPath = fullPath;
+	fileTag.IsNew = isNew;
+	fileTag.DateTime = wxDateTime::Now();
+	fileTag.IsParsed = false;
+	PersistFileTag(fileTag);
 	
 	FileParsingCache.clear();
 

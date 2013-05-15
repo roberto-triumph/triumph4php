@@ -6,7 +6,7 @@
 mvceditor::CallStackActionClass::CallStackActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: GlobalActionClass(runningThreads, eventId) 
 	, TagCache()
-	, CallStack(TagCache, mvceditor::TagCacheWorkingAsset())
+	, CallStack(TagCache)
 	, DetectorDbFileName()
 	, StartFileName() 
 	, StartClassName() 

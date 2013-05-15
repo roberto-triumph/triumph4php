@@ -37,7 +37,6 @@ bool mvceditor::TagWipeActionClass::Init(mvceditor::GlobalsClass& globals) {
 	// not sure if wxFileName assignment is a complete clone, so use Assign() just in case
 	// since we will access the filenames from multiple threads
 	ResourceDbFileNames.push_back(wxFileName(globals.TagCacheDbFileName.GetFullPath()));
-	ResourceDbFileNames.push_back(wxFileName(globals.WorkingTagCacheDbFileName.GetFullPath()));
 
 	// TODO wipe detector tags db too
 	return !ResourceDbFileNames.empty();
@@ -85,7 +84,6 @@ bool mvceditor::TagDeleteActionClass::Init(mvceditor::GlobalsClass& globals) {
 	// not sure if wxFileName assignment is a complete clone, so use Assign() just in case
 	// since we will access the filenames from multiple threads
 	ResourceDbFileNames.push_back(wxFileName(globals.TagCacheDbFileName.GetFullPath()));
-	ResourceDbFileNames.push_back(wxFileName(globals.WorkingTagCacheDbFileName.GetFullPath()));
 
 	// TODO wipe detector tags db too
 	return !ResourceDbFileNames.empty();
@@ -114,10 +112,10 @@ wxString mvceditor::TagDeleteActionClass::GetLabel() const {
 	return wxT("Tag Cache Delete");
 }
 
+/*
 mvceditor::TagCleanWorkingCacheActionClass::TagCleanWorkingCacheActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId,
 													  const wxString& fileToDelete)
 	: GlobalActionClass(runningThreads, eventId) 
-	, WorkingTagDbFileName()
 	, FileToDelete(fileToDelete.c_str()) {
 }
 
@@ -149,3 +147,4 @@ void mvceditor::TagCleanWorkingCacheActionClass::BackgroundWork() {
 wxString mvceditor::TagCleanWorkingCacheActionClass::GetLabel() const {
 	return wxT("Working Cache Clean");
 }
+*/

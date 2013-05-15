@@ -320,8 +320,6 @@ public:
 	 * @param expressionScope the scope where parsed expression is located.  The scope let's us know which variables are
 	 *        available. See ScopeFinderClass for more info.
 	 * @param allResourceFinders all of the tag finders to look in
-	 * @param openedTagFinder the tag cache that contains the files being edited. This is used to tell when 
-	 *        a tag is dirty
 	 * @param autoCompleteVariableList the results of the matches; these are the names of the variables that
 	 *        are "near matches" to the parsed expression. This will be filled only when parsedExpression is a variable. 
 	 * @param autoCompleteResourceList the results of the matches; these are the names of the items that
@@ -334,7 +332,6 @@ public:
 	 */
 	void ExpressionCompletionMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope, 
 		const std::vector<mvceditor::TagFinderClass*>& allTagFinders,
-		TagFinderClass* openedTagFinders,
 		std::vector<UnicodeString>& autoCompleteVariableList,
 		std::vector<TagClass>& autoCompleteResourceList,
 		bool doDuckTyping,
@@ -358,8 +355,6 @@ public:
 	 * @param expressionScope the scope where parsed expression is located.  The scope let's us know which variables are
 	 *        available. See ScopeFinderClass for more info.
 	 * @param allTagFinders the tag finders to look in
- * @param openedTagFinder the tag cache that contains the files being edited. This is used to tell when 
-	 *        a tag is dirty
 	 * @param resourceMatches the tag matches; these are the names of the items that
 	 *        are "near matches" to the parsed expression.
 	 * @param doDuckTyping if an expression chain could not be fully resolved; then we could still
@@ -371,7 +366,6 @@ public:
 	 */
 	void ResourceMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope, 
 		const std::vector<mvceditor::TagFinderClass*>& allTagFinders,
-		TagFinderClass* openedTagFinder,
 		std::vector<TagClass>& resourceMatches,
 		bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 		SymbolTableMatchErrorClass& error) const;
@@ -453,18 +447,6 @@ private:
 	std::map<UnicodeString, std::vector<mvceditor::SymbolClass>, UnicodeStringComparatorClass> Variables;
 
 };
-
-/**
- * Check to see if the given tag comes from one of the registered (opened
- * files).  If this returns true, it means that the tag may be stale.
- * None of the given resourc finders pointers will be owned by this class.
- *
- * @param openedFinder the WorkingTagFinder
- * @param tag the tag to check
- * @param tagFinder the finder that collected the tag
- * @return bool TRUE if tag is stale (should not be shown to the user)
- */
-bool IsResourceDirty(mvceditor::TagFinderClass* openedFinder, const mvceditor::TagClass& tag, mvceditor::TagFinderClass* matchTagFinder);
 
 /**
  * This class can be used to determine what function or namespace that a

@@ -313,9 +313,8 @@ public:
 	/**
 	 * @param TagCacheClass& need the tag cache so that functions can be resolved
 	 *        into their corresponding file locations
-	 * @param workingTagDbFileName the location of the working cache db file
 	 */
-	CallStackClass(TagCacheClass& tagCache, const wxFileName& workingTagDbFileName);
+	CallStackClass(TagCacheClass& tagCache);
 
 	/**
 	 * Will open up the file, parse it, and collect all function calls. This is recursive (will open up
@@ -422,11 +421,6 @@ private:
 	 * don't cause infinte loops
 	 */
 	std::map<UnicodeString, bool, UnicodeStringComparatorClass> ParsedMethods;
-
-	/**
-	 * location of the tag db file
-	 */
-	wxFileName WorkingTagDbFileName;
 
 	/**
 	 * index appended to the temporary variables. will be reset every scope.

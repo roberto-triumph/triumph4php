@@ -30,6 +30,9 @@
 
 namespace mvceditor {
 
+// forward declaration
+class GlobalsClass;
+
 /**
  * This class will run the tag updates in a background thread.  The caller will use
  * the Register() method when a new file is opened by the user.  Every so often, the 
@@ -55,13 +58,14 @@ public:
 	 * Will parse the resources of the given text in a backgound thread and will
 	 * post an EVENT_WORKING_CACHE_COMPLETE when the parsing is complete.
 	 * 
+	 * @param globals to get the projects' directories to be scanned (recursively scan all sources in all projects)
 	 * @param fileName full path to the file. this can be empty string is contents are new.
 	 * @param fileIdentifier unique identifier for a file
 	 * @param code the file's most up-to-date source code (from the user-edited buffer)
 	 * @param bool if TRUE then tileName is a new file that is not yet written to disk
 	 * @param version The version of PHP to check against
 	 */
-	void Update(const wxString& fileName, const wxString& fileIdentifier, const UnicodeString& code, bool isNew, pelet::Versions version);
+	void Update(mvceditor::GlobalsClass& globals, const wxString& fileName, const wxString& fileIdentifier, const UnicodeString& code, bool isNew, pelet::Versions version);
 
 	wxString GetLabel() const;
 
@@ -73,6 +77,11 @@ protected:
 	void BackgroundWork();
 	
 private:
+	
+	/**
+	 * the location of the tag cache; the sqlite file where the tags are stored
+	 */
+	wxFileName TagCacheDbFileName;
 
 	/**
 	 * the code that is being worked on by the background thread.
@@ -91,14 +100,14 @@ private:
 	wxString FileIdentifier;
 
 	/**
-	 * if TRUE then tileName is a new file that does not yet exist on disk
-	 */
-	bool FileIsNew;
-
-	/**
 	 * The version of PHP to check against
 	 */
 	pelet::Versions Version;
+
+	/**
+	 * if TRUE then tileName is a new file that does not yet exist on disk
+	 */
+	bool FileIsNew;
 
 };
 

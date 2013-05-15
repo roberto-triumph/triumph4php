@@ -38,7 +38,6 @@ ActionTestFixtureClass::~ActionTestFixtureClass() {
 
 void ActionTestFixtureClass::InitTagCache(const wxString& cacheDir) {
 	Globals.TagCacheDbFileName.Assign(cacheDir, wxT("tag_cache.db"));
-	Globals.WorkingTagCacheDbFileName.Assign(cacheDir, wxT("tag_cache_working.db"));
 	Globals.DetectorCacheDbFileName.Assign(cacheDir, wxT("detector_cache.db"));
 }
 

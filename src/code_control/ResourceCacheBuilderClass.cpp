@@ -24,27 +24,31 @@
  */
 #include <code_control/ResourceCacheBuilderClass.h>
 #include <globals/Assets.h>
+#include <globals/GlobalsClass.h>
 
 mvceditor::WorkingCacheBuilderClass::WorkingCacheBuilderClass(
 															mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: ActionClass(runningThreads, eventId)
-	, Code() 
+	, TagCacheDbFileName()
+	, Code()
 	, FileName() 
 	, FileIdentifier()
-	, FileIsNew(true) 
-	, Version(pelet::PHP_53) {
+	, Version(pelet::PHP_53)
+	, FileIsNew(true) {
 }
 	
-void mvceditor::WorkingCacheBuilderClass::Update(const wxString& fileName, 
+void mvceditor::WorkingCacheBuilderClass::Update(mvceditor::GlobalsClass& globals,
+												 const wxString& fileName, 
 												 const wxString& fileIdentifier,
 												 const UnicodeString& code, bool isNew, pelet::Versions version) {
+	
+	// make sure these is are deep copies
+	TagCacheDbFileName.Assign(globals.TagCacheDbFileName);
 	Code = code;
-
-	// make sure this is a copy
 	FileName = fileName.c_str();
 	FileIdentifier = fileIdentifier.c_str();
-	FileIsNew = isNew;
-	Version = version;	
+	Version = version;
+	FileIsNew = isNew;		
 }
 
 void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
@@ -54,28 +58,34 @@ void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
 		// since this code is outside the mutex
 		// even if code is empty, lets create a working cache so that the 
 		// file is registered and code completion works
-		mvceditor::WorkingCacheClass* cache = new mvceditor::WorkingCacheClass();
+		mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass();
+		std::vector<wxString> phpFileExtensions;
+		wxFileName wxf(FileName);
+		phpFileExtensions.push_back(wxf.GetFullName());
+		std::vector<wxString> miscFileExtensions;
+		globalCache->InitGlobalTag(TagCacheDbFileName, phpFileExtensions, miscFileExtensions, Version, 1024);
 		if (FileIsNew) {
 
 			// new files will not have a name, use the identifier as the name
 			FileName = FileIdentifier;
 		}
-		cache->InitWorkingTag(mvceditor::TagCacheWorkingAsset());
-		cache->Init(FileName, FileIdentifier, FileIsNew, Version, false);
-		bool good = cache->Update(Code);
+		mvceditor::WorkingCacheClass* workingCache = new mvceditor::WorkingCacheClass();
+		workingCache->Init(FileName, FileIdentifier, FileIsNew, Version, true);
+		bool good = workingCache->Update(Code);
 		if (good && !IsCancelled()) {
 
 			// only send the event if the code passes the lint check
 			// otherwise we will delete a good symbol table, we want auto completion
 			// to work even if the code is broken
 			// PostEvent will set the correct event Id
-			mvceditor::WorkingCacheCompleteEventClass evt(wxID_ANY, FileName, FileIdentifier, cache);
+			mvceditor::WorkingCacheCompleteEventClass evt(wxID_ANY, FileName, FileIdentifier, workingCache);
 			PostEvent(evt);
 		}
 		else {
 			// we still own the pointer since we did not send the event
-			delete cache;
+			delete workingCache;
 		}
+		delete globalCache;
 	}
 }
 

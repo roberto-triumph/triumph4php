@@ -211,6 +211,11 @@ public:
 	 */
 	bool HasParameters() const;
 
+	/**
+	 * @return UnicodeString the fully qualified class name of this tag
+	 */
+	UnicodeString FullyQualifiedClassName() const;
+
 };
 
 class TraitTagClass {

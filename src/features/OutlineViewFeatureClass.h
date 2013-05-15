@@ -35,6 +35,25 @@
 namespace mvceditor {
 
 /**
+ * grouping of a tag and its member tags.
+ * member tags will be empty for anything other than class tags
+ */
+class TagSearchCompleteClass {
+
+public:
+
+	mvceditor::TagClass Tag;
+
+	std::vector<mvceditor::TagClass> MemberTags;
+
+	TagSearchCompleteClass();
+
+	TagSearchCompleteClass(const TagSearchCompleteClass& src);
+
+	void Copy(const TagSearchCompleteClass& src);
+};
+
+/**
  * event that is generated when a tag query is completed.  this event
  * contains the results of the search.
  */
@@ -45,7 +64,7 @@ class TagSearchCompleteEventClass : public wxEvent {
         /**
          * Will contain all of the resulting tags.
          */
-        std::vector<mvceditor::TagClass> Tags;
+        std::vector<mvceditor::TagSearchCompleteClass> Tags;
 
 		/**
 		 * the string that was searched for
@@ -58,7 +77,7 @@ class TagSearchCompleteEventClass : public wxEvent {
 		 */
 		int Mode;
         
-        TagSearchCompleteEventClass(int eventId, const std::vector<mvceditor::TagClass>& tags,
+        TagSearchCompleteEventClass(int eventId, const std::vector<mvceditor::TagSearchCompleteClass>& tags,
 			int mode,
 			const wxString& searchString);
         
@@ -213,13 +232,13 @@ class OutlineViewPanelClass : public OutlineViewGeneratedPanelClass {
 	 * adds the given tags to the outline tree, under a node that has the name of the file
 	 * as its name
 	 */
-	void AddFileToOutline(const wxString& fullPath, const std::vector<TagClass>& tags);
+	void AddFileToOutline(const wxString& fullPath, const std::vector<mvceditor::TagSearchCompleteClass>& tags);
 
 	/**
 	 * Add a class and all of its members into the tree outline at the given node.
 	 *
 	 */
-	void AddClassToOutline(const wxString& className, const std::vector<mvceditor::TagClass>& memberTags);
+	void AddClassToOutline(const wxString& className, const std::vector<mvceditor::TagSearchCompleteClass>& memberTags);
 
 	 /**
 	  * @param fullPath file to remove from the outline tre
@@ -309,6 +328,11 @@ private:
 	bool ShowConstants;
 
 	/**
+	 * if TRUE then a class' inherited methods and properties are shown
+	 */
+	bool ShowInherited;
+
+	/**
 	 * if TRUE then only public methods, properties or constants are show
 	 */
 	bool ShowPublicOnly;
@@ -335,8 +359,9 @@ private:
 	 * adds a tag as a child node of the tree control.
 	 * @param tag the tag to add
 	 * @param tagRoot the tree node to append to
+	 * @param classNameNode the name of the class the tag belongs to (can be empty)
 	 */
-	void TagToNode(const mvceditor::TagClass& tag, wxTreeItemId& tagRoot);
+	void TagToNode(const mvceditor::TagClass& tag, wxTreeItemId& tagRoot, UnicodeString classNameNode);
 
 	/**
 	 * @return the tree node for the given full path. search is done 
@@ -378,6 +403,11 @@ private:
 	 * handle the properties toggle; toggle showing class constants on and off
 	 */
 	void OnConstantsClick(wxCommandEvent& event);
+
+	/**
+	 * handle the show inherited toggle; toggle showing class inherited members on and off
+	 */
+	void OnInheritedClick(wxCommandEvent& event);
 
 	/**
 	 * handle the "public only" toggle; toggle showing private tags on and off

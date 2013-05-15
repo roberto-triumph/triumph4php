@@ -56,7 +56,6 @@ private:
 	soci::session TagDbSession;
 	soci::session NativeDbSession;
 	soci::session DetectedTagDbSession;
-	soci::session WorkingTagDbSession;
 
 public:
 
@@ -82,11 +81,6 @@ public:
 	mvceditor::DetectedTagFinderClass DetectedTagFinder;
 
 	/**
-	 * The object that will be used to lookup tags from opened files
-	 */
-	mvceditor::ParsedTagFinderClass WorkingTagFinder;
-
-	/**
 	 * TRUE if NativeTagFinder has an opened and valid connection
 	 */
 	bool IsNativeTagFinderInit;
@@ -100,11 +94,6 @@ public:
 	 * TRUE if DetectedTagFinder has an opened and valid connection
 	 */
 	bool IsDetectedTagFinderInit;
-
-	/**
-	 * TRUE if DetectedTagFinder has an opened and valid connection
-	 */
-	bool IsWorkingTagFinderInit;
 
 	GlobalCacheClass();
 
@@ -138,13 +127,6 @@ public:
 	 *        This full path MUST exist; it will never be created.
 	 */
 	void InitNativeTag(const wxFileName& nativeFunctionsDbFileName);
-
-	/**
-	 * Opens the cache SQLite file that holds tags for opened fi\les
-	 * @param workingTagDbFileName the full path to the SQLite workin tags database.
-	 *        This full path MUST exist; it will never be created.
-	 */
-	void InitWorkingTag(const wxFileName& workingTagDbFileName);
 
 	/**
 	 * Will update the tag finder by calling Walk(); meaning that the next file
@@ -205,13 +187,6 @@ public:
 	bool IsNew;
 
 	WorkingCacheClass();
-
-	/**
-	 * Opens the cache SQLite file that holds tags for opened fi\les
-	 * @param workingTagDbFileName the full path to the SQLite workin tags database.
-	 *        This full path MUST exist; it will never be created.
-	 */
-	void InitWorkingTag(const wxFileName& workingTagDbFileName);
 
 	/**
 	 * @param fileName the full path to the file being parsed
@@ -365,13 +340,13 @@ public:
 
 	/**
 	 * gets all tags for a single class
-	 * @param className the class to search.  not fully qualified (no namespace)
+	 * @param fullyQualifiedClassName the class to search.  fully qualified (with namespace)
 	 * @return vector of tags; 
 	 *         all methods and properties that are defined in the class PLUS
 	 *         all methods and properties that are defined in any of its base classes PLUS
 	 *         all methods and properties that are defined in any of the traits used by any of the base classes
 	 */
-	std::vector<mvceditor::TagClass> AllMemberTags(const UnicodeString& className);
+	std::vector<mvceditor::TagClass> AllMemberTags(const UnicodeString& fullyQualifiedClassName);
 
 	/**
 	 * gets all tags that were found in a single file. for classes, all of the class' members (including
@@ -379,14 +354,9 @@ public:
 	 *
 	 * @param fullPath full path to a file to lookup
 	 * @return vector of tags; 
-	 *         all functions or define's in the give file PLUS
-	 *         all classes in the given file PLUS
-	 *         all methods and properties that are defined in any classes PLUS
-	 *         all methods and properties that are defined in any classes' base classes PLUS
-	 *         all methods and properties that are defined in any of the traits used any classes PLUS
-	 *         all methods and properties that are defined in any of the traits used by any of the base classes
+	 *         all classes, functions or define's in the give file
 	 */
-	std::vector<mvceditor::TagClass> AllTagsInFile(const wxString& fullPath); 
+	std::vector<mvceditor::TagClass> AllClassesFunctionsDefines(const wxString& fullPath); 
 	
 	/**
 	 * Collects all near matches that are possible candidates for completion of the parsed expression.

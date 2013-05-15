@@ -51,11 +51,31 @@ static int ID_OUTLINE_MENU_TOGGLE_PROPERTIES = wxNewId();
 static int ID_OUTLINE_MENU_TOGGLE_CONSTANTS = wxNewId();
 static int ID_OUTLINE_MENU_TOGGLE_PUBLIC_ONLY = wxNewId();
 static int ID_OUTLINE_MENU_TOGGLE_FUNCTION_ARGS = wxNewId();
+static int ID_OUTLINE_MENU_TOGGLE_INHERITED = wxNewId();
 
 const wxEventType mvceditor::EVENT_TAG_SEARCH_COMPLETE = wxNewEventType();
 
+mvceditor::TagSearchCompleteClass::TagSearchCompleteClass()
+: Tag()
+, MemberTags() {
+
+}
+
+
+mvceditor::TagSearchCompleteClass::TagSearchCompleteClass(const mvceditor::TagSearchCompleteClass& src)
+: Tag()
+, MemberTags() {
+	Copy(src);
+}
+
+
+void mvceditor::TagSearchCompleteClass::Copy(const mvceditor::TagSearchCompleteClass& src) {
+	Tag = src.Tag;
+	MemberTags = src.MemberTags;
+}
+
 mvceditor::TagSearchCompleteEventClass::TagSearchCompleteEventClass(int eventId, 
-																	const std::vector<mvceditor::TagClass>& tags,
+																	const std::vector<mvceditor::TagSearchCompleteClass>& tags,
 																	int mode,
 																	const wxString& searchString)
 	: wxEvent(eventId, mvceditor::EVENT_TAG_SEARCH_COMPLETE)
@@ -89,26 +109,39 @@ void mvceditor::TagCacheSearchActionClass::SetSearch(mvceditor::TagCacheSearchAc
 		globals.Environment.Php.Version);
 	cache->InitNativeTag(mvceditor::NativeFunctionsAsset());
 	cache->InitDetectorTag(globals.DetectorCacheDbFileName);
-	cache->InitWorkingTag(globals.WorkingTagCacheDbFileName);
 	TagCache.RegisterGlobal(cache);
 }
 
 void mvceditor::TagCacheSearchActionClass::BackgroundWork() {
-	std::vector<TagClass> tags;
+	std::vector<mvceditor::TagSearchCompleteClass> topLevelTags;
 	if (!IsCancelled()) {
+		std::vector<mvceditor::TagClass> tags;
+		std::vector<mvceditor::TagClass>::const_iterator tag;
+		TagSearchCompleteClass tagSearchComplete;
 		switch(Mode) {
 		case ALL_TAGS_IN_FILE:
-			tags = TagCache.AllTagsInFile(mvceditor::IcuToWx(SearchString));
+			tags = TagCache.AllClassesFunctionsDefines(mvceditor::IcuToWx(SearchString));
+			
+			// now for each class, collect all methods/properties for any class.
+			for (tag = tags.begin(); tag != tags.end(); ++tag) {
+				mvceditor::TagSearchCompleteClass tagSearchClassComplete;
+				tagSearchClassComplete.Tag = *tag;
+				if (tag->Type == mvceditor::TagClass::CLASS) {
+					tagSearchClassComplete.MemberTags = TagCache.AllMemberTags(tag->FullyQualifiedClassName());
+				}
+				topLevelTags.push_back(tagSearchClassComplete);
+			}
 			break;
-		case ALL_MEMBER_TAGS:
-			tags = TagCache.AllMemberTags(SearchString);
+		case ALL_MEMBER_TAGS:			
+			tagSearchComplete.MemberTags = TagCache.AllMemberTags(SearchString);
+			topLevelTags.push_back(tagSearchComplete);
 			break;
 		}
 	}
 	if (!IsCancelled()) {
 
 		// PostEvent will set the correct event ID
-		mvceditor::TagSearchCompleteEventClass evt(Mode, tags, Mode, mvceditor::IcuToWx(SearchString));
+		mvceditor::TagSearchCompleteEventClass evt(Mode, topLevelTags, Mode, mvceditor::IcuToWx(SearchString));
 		PostEvent(evt);	
 	}
 }
@@ -249,6 +282,7 @@ mvceditor::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int wi
 	, ShowMethods(true)
 	, ShowProperties(true)
 	, ShowConstants(true) 
+	, ShowInherited(true)
 	, ShowPublicOnly(false) 
 	, ShowFunctionArgs(false) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
@@ -287,7 +321,7 @@ void mvceditor::OutlineViewPanelClass::SetStatus(const wxString& status) {
 	StatusLabel->SetLabel(status);
 }
 
-void mvceditor::OutlineViewPanelClass::AddFileToOutline(const wxString& fullPath, const std::vector<mvceditor::TagClass>& tags) {
+void mvceditor::OutlineViewPanelClass::AddFileToOutline(const wxString& fullPath, const std::vector<mvceditor::TagSearchCompleteClass>& tags) {
 	OutlinedTags.push_back(fullPath);
 	Tree->Freeze();
 	wxTreeItemId rootId = Tree->GetRootItem();
@@ -310,37 +344,22 @@ void mvceditor::OutlineViewPanelClass::AddFileToOutline(const wxString& fullPath
 		fileId = Tree->PrependItem(rootId, wxFileName(fullPath).GetFullName(), IMAGE_OUTLINE_FILE, -1, new mvceditor::TreeItemDataStringClass(fullPath)); 
 	}
 
-	std::vector<mvceditor::TagClass>::const_iterator tag;
+	std::vector<mvceditor::TagSearchCompleteClass>::const_iterator tag;
+	std::vector<mvceditor::TagClass>::const_iterator memberTag;
 	std::vector<UnicodeString> classes;
 	for (tag = tags.begin(); tag != tags.end(); ++tag) {
-		
-		// display all of the non-class tags first
-		if (tag->Type != mvceditor::TagClass::CLASS && 
-			tag->Type != mvceditor::TagClass::CLASS_CONSTANT && 
-			tag->Type != mvceditor::TagClass::MEMBER &&
-			tag->Type != mvceditor::TagClass::METHOD) {
-			TagToNode(*tag, fileId);
+		if (tag->Tag.Type != mvceditor::TagClass::CLASS && 
+			tag->Tag.Type != mvceditor::TagClass::CLASS_CONSTANT && 
+			tag->Tag.Type != mvceditor::TagClass::MEMBER &&
+			tag->Tag.Type != mvceditor::TagClass::METHOD) {
+			TagToNode(tag->Tag, fileId, UNICODE_STRING_SIMPLE(""));
 		}
-		else if (tag->Type == mvceditor::TagClass::CLASS) {
-			classes.push_back(tag->ClassName);
-		}
-	}
-	std::vector<UnicodeString>::const_iterator className;
-	for (className = classes.begin(); className != classes.end(); ++className) {
-		std::vector<UnicodeString> classParents = Feature->App.Globals.TagCache.ParentClassesAndTraits(*className);
-		wxTreeItemId classId = Tree->AppendItem(fileId, mvceditor::IcuToWx(*className), IMAGE_OUTLINE_CLASS);
+		else if (tag->Tag.Type == mvceditor::TagClass::CLASS) {
+			wxTreeItemId classId = Tree->AppendItem(fileId, mvceditor::IcuToWx(tag->Tag.ClassName), IMAGE_OUTLINE_CLASS);
 
-		// display all tags for this class or the class's base classes
-		for (tag = tags.begin(); tag != tags.end(); ++tag) {
-			
-			// check to see if this tag is from one of the base classes
-			bool isInClassParents = std::find(classParents.begin(), classParents.end(), tag->ClassName) != classParents.end();
-
-			if ((tag->Type == mvceditor::TagClass::MEMBER || 
-				tag->Type == mvceditor::TagClass::CLASS_CONSTANT ||
-				tag->Type == mvceditor::TagClass::METHOD) &&
-				(className->caseCompare(tag->ClassName, 0) == 0 || isInClassParents)) {
-				TagToNode(*tag, classId);
+			// display all tags for this class or the class's base classes
+			for (memberTag = tag->MemberTags.begin(); memberTag != tag->MemberTags.end(); ++memberTag) {
+				TagToNode(*memberTag, classId, tag->Tag.ClassName);
 			}
 		}
 	}
@@ -349,7 +368,7 @@ void mvceditor::OutlineViewPanelClass::AddFileToOutline(const wxString& fullPath
 	Tree->SelectItem(fileId);	
 }
 
-void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag, wxTreeItemId& treeId) {
+void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag, wxTreeItemId& treeId, UnicodeString classNameNode) {
 
 	// for now never show dynamic resources since there is no way we can know where the source for them is.
 	int type = tag.Type;
@@ -358,6 +377,11 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 
 	// if the flag to show only public members is on, then do not show private or protected tags
 	bool passesAccessCheck = !ShowPublicOnly || (!tag.IsPrivate && !tag.IsProtected);
+	if (!classNameNode.isEmpty() && !ShowInherited) {
+		
+		// make sure that the inheritance check passes too
+		passesAccessCheck = passesAccessCheck && classNameNode.caseCompare(tag.ClassName, 0) == 0;
+	}
 	if (mvceditor::TagClass::DEFINE == type && !tag.IsDynamic) {
 		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_DEFINE, -1, 
 			new mvceditor::TreeItemDataStringClass(mvceditor::IcuToWx(tag.Key)));
@@ -525,7 +549,7 @@ void mvceditor::OutlineViewPanelClass::SearchTagsToOutline(const std::vector<mvc
 }
 
 void mvceditor::OutlineViewPanelClass::AddClassToOutline(const wxString& className, 
-														 const std::vector<mvceditor::TagClass>& memberTags) {	
+														 const std::vector<mvceditor::TagSearchCompleteClass>& tags) {	
 	OutlinedTags.push_back(className);
 	Tree->Freeze();
 	wxTreeItemId rootId = Tree->GetRootItem();
@@ -545,9 +569,13 @@ void mvceditor::OutlineViewPanelClass::AddClassToOutline(const wxString& classNa
 		classRoot = Tree->PrependItem(rootId, className, IMAGE_OUTLINE_CLASS, -1, new mvceditor::TreeItemDataStringClass(className)); 
 	}
 
+	std::vector<mvceditor::TagSearchCompleteClass>::const_iterator tagComplete;
 	std::vector<mvceditor::TagClass>::const_iterator tag;
-	for (tag = memberTags.begin(); tag != memberTags.end(); ++tag) {
-		TagToNode(*tag, classRoot);
+	UnicodeString icuClassName =  mvceditor::WxToIcu(className);
+	for (tagComplete = tags.begin(); tagComplete != tags.end(); ++tagComplete) {
+		for (tag = tagComplete->MemberTags.begin(); tag != tagComplete->MemberTags.end(); ++tag) {
+			TagToNode(*tag, classRoot, icuClassName);
+		}
 	}
 	Tree->ExpandAllChildren(Tree->GetRootItem());
     Tree->Thaw();
@@ -584,6 +612,9 @@ void mvceditor::OutlineViewPanelClass::OnTreeItemRightClick(wxTreeEvent& event) 
 	item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_CONSTANTS, _("Show Class Constants"), _("Toggle showing class constants in the outline"));
 	item->Check(ShowConstants);
 
+	item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_INHERITED, _("Show Inherited Members"), _("Toggle showing inherited tags in the outline"));
+	item->Check(ShowInherited);
+
 	item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_PUBLIC_ONLY, _("Show Public Tags Only"), _("Toggle showing public tags in the outline"));
 	item->Check(ShowPublicOnly);
 
@@ -611,6 +642,9 @@ void mvceditor::OutlineViewPanelClass::OnFilterLeftDown(wxMouseEvent& event) {
 		
 		item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_CONSTANTS, _("Show Class Constants"), _("Toggle showing class constants in the outline"));
 		item->Check(ShowConstants);
+
+		item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_INHERITED, _("Show Inherited Members"), _("Toggle showing inherited tags in the outline"));
+		item->Check(ShowInherited);
 
 		item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_PUBLIC_ONLY, _("Show Public Tags Only"), _("Toggle showing public tags in the outline"));
 		item->Check(ShowPublicOnly);
@@ -707,6 +741,25 @@ void mvceditor::OutlineViewPanelClass::OnPropertiesClick(wxCommandEvent& event) 
 
 void mvceditor::OutlineViewPanelClass::OnConstantsClick(wxCommandEvent& event) {
 	ShowConstants = !ShowConstants;
+	std::vector<wxString> tagsToOutline = OutlinedTags;
+	OutlinedTags.clear(); // this will be filled when the tag search is complete
+	std::vector<wxString>::iterator tag;
+	for (tag = tagsToOutline.begin(); tag != tagsToOutline.end(); ++tag) {
+		if (tag->Find(wxT(".")) != wxNOT_FOUND) {
+			
+			// user chose a file: get all classes / functions for that file
+			Feature->StartTagSearch(mvceditor::TagCacheSearchActionClass::ALL_TAGS_IN_FILE, *tag);
+		}
+		else {
+
+			// user chose a class; add the class member to the outline
+			Feature->StartTagSearch(mvceditor::TagCacheSearchActionClass::ALL_MEMBER_TAGS, *tag);
+		}
+	}
+}
+
+void mvceditor::OutlineViewPanelClass::OnInheritedClick(wxCommandEvent& event) {
+	ShowInherited = !ShowInherited;
 	std::vector<wxString> tagsToOutline = OutlinedTags;
 	OutlinedTags.clear(); // this will be filled when the tag search is complete
 	std::vector<wxString>::iterator tag;
@@ -1019,6 +1072,7 @@ BEGIN_EVENT_TABLE(mvceditor::OutlineViewPanelClass, OutlineViewGeneratedPanelCla
 	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_METHODS, mvceditor::OutlineViewPanelClass::OnMethodsClick)
 	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_PROPERTIES, mvceditor::OutlineViewPanelClass::OnPropertiesClick)
 	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_CONSTANTS, mvceditor::OutlineViewPanelClass::OnConstantsClick)
+	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_INHERITED, mvceditor::OutlineViewPanelClass::OnInheritedClick)
 	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_PUBLIC_ONLY, mvceditor::OutlineViewPanelClass::OnPublicOnlyClick)
 	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_FUNCTION_ARGS, mvceditor::OutlineViewPanelClass::OnFunctionArgsClick)
 END_EVENT_TABLE()

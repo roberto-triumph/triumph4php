@@ -161,7 +161,6 @@ void MyApp::BuildGlobals() {
 	Globals.Environment.Apache.SetVirtualHostMapping(wxT("C:\\Users\\roberto\\software\\wamp\\www\\ember"), wxT("http://localhost/"));
 
 	Globals.TagCacheDbFileName.Assign(wxT("C:\\Users\\roberto\\Desktop\\caches\\tags.sqlite"));
-	Globals.WorkingTagCacheDbFileName.Assign(wxT("C:\\Users\\roberto\\Desktop\\caches\\working_tags.sqlite"));
 	Globals.DetectorCacheDbFileName.Assign(wxT("C:\\Users\\roberto\\Desktop\\caches\\detectors.sqlite"));
 	
 	// create a project

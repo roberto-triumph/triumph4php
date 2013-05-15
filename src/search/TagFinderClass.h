@@ -231,12 +231,13 @@ public:
 
 	/**
 	 * Gets all classes, functions, and constants (defines) that were parsed from
-	 * the given file. careful, this method is a bit misnamed.
+	 * the given file.
 	 *
 	 * @param fullPath the full path of the file to lookup
-	 * @return vector of tags all tags that were parsed from the given file
+	 * @return vector of tags all tags that were parsed from the given file that 
+	 *         are either a class, function, or define 
 	 */
-	virtual std::vector<TagClass> AllTagsInFile(const wxString& fullPath) = 0;
+	virtual std::vector<TagClass> ClassesFunctionsDefines(const wxString& fullPath) = 0;
 
 protected:
 
@@ -470,10 +471,10 @@ public:
 	 * 
 	 * then this method will return "UserClass"
 	 * 
-	 * @param UnicodeString className the class to search
-	 * @param return UnicodeString the class' most immediate parent
+	 * @param UnicodeString fullyQualifiedClassName the class to search
+	 * @param return UnicodeString fully qualified class name of the class' most immediate parent
 	 */
-	UnicodeString ParentClassName(const UnicodeString& className);
+	UnicodeString ParentClassName(const UnicodeString& fullyQualifiedClassName);
 
 	/**
 	 * Get the traits used by a given tag. For example, let's say source code contained a class and two traits: UserClass,
@@ -692,7 +693,7 @@ public:
 	 * @param fullPath the full path of the file to lookup
 	 * @return vector of tags all tags that were parsed from the given file
 	 */
-	virtual std::vector<TagClass> AllTagsInFile(const wxString& fullPath);
+	virtual std::vector<TagClass> ClassesFunctionsDefines(const wxString& fullPath);
 
 protected:
 
@@ -772,7 +773,7 @@ public:
 	 * @param fullPath the full path of the file to lookup
 	 * @return vector of tags all tags that were parsed from the given file
 	 */
-	virtual std::vector<TagClass> AllTagsInFile(const wxString& fullPath);
+	virtual std::vector<TagClass> ClassesFunctionsDefines(const wxString& fullPath);
 
 protected:
 
