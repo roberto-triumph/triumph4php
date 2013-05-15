@@ -185,7 +185,6 @@ static UnicodeString ResolveResourceType(UnicodeString resourceToLookup,
  * @see VariableObserverClass
  * @param expressionScope needed to use the symbol table
  * @param allTagFinders needed to use the symbol table
- * @param openedTagFinder needed to use the symbol table  
  * @param doDuckTyping
  * @param error any symbol table errors will be written here
  * @param variable the variable's name.  This is a single token, ie "$this", "$aglob" no object
@@ -199,7 +198,6 @@ static UnicodeString ResolveResourceType(UnicodeString resourceToLookup,
  */
 static UnicodeString ResolveVariableType(const pelet::ScopeClass& expressionScope, 
 										 const std::vector<mvceditor::TagFinderClass*>& allTagFinders,
-										 mvceditor::TagFinderClass* openedTagFinder, 
 										 bool doDuckTyping,
 										 mvceditor::SymbolTableMatchErrorClass& error,
 										 const UnicodeString& variable, 
@@ -243,7 +241,7 @@ static UnicodeString ResolveVariableType(const pelet::ScopeClass& expressionScop
 				parsedExpression.ChainList = symbol.ChainList;
 				std::vector<mvceditor::TagClass> resourceMatches;
 				symbolTable.ResourceMatches(parsedExpression, expressionScope, 
-					allTagFinders, openedTagFinder, resourceMatches, doDuckTyping, false, error);
+					allTagFinders, resourceMatches, doDuckTyping, false, error);
 				if (!resourceMatches.empty()) {
 					if (mvceditor::TagClass::CLASS == resourceMatches[0].Type) {
 						type = resourceMatches[0].ClassName;
@@ -273,7 +271,6 @@ static UnicodeString ResolveVariableType(const pelet::ScopeClass& expressionScop
 static UnicodeString ResolveInitialLexemeType(const pelet::ExpressionClass& parsedExpression, 
 											  const pelet::ScopeClass& expressionScope, 
 											  const std::vector<mvceditor::TagFinderClass*>& allTagFinders,
-											  mvceditor::TagFinderClass* openedTagFinder,
 											  bool doDuckTyping,
 											  mvceditor::SymbolTableMatchErrorClass& error,
 											  const std::vector<mvceditor::SymbolClass>& scopeSymbols,
@@ -283,7 +280,7 @@ static UnicodeString ResolveInitialLexemeType(const pelet::ExpressionClass& pars
 	if (start.startsWith(UNICODE_STRING_SIMPLE("$"))) {
 		
 		// a variable. look at the type from the symbol table
-		typeToLookup = ResolveVariableType(expressionScope, allTagFinders, openedTagFinder, doDuckTyping, error, 
+		typeToLookup = ResolveVariableType(expressionScope, allTagFinders, doDuckTyping, error, 
 				start, scopeSymbols, symbolTable);
 	}
 	else if (start.caseCompare(UNICODE_STRING_SIMPLE("self"), 0) == 0){
@@ -525,7 +522,6 @@ void mvceditor::SymbolTableClass::CreateSymbolsFromFile(const wxString& fileName
 
 void mvceditor::SymbolTableClass::ExpressionCompletionMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope,
 															  const std::vector<mvceditor::TagFinderClass*>& allTagFinders,
-															  mvceditor::TagFinderClass* openedTagFinder,
 															  std::vector<UnicodeString>& autoCompleteVariableList,
 															  std::vector<mvceditor::TagClass>& autoCompleteResourceList,
 															  bool doDuckTyping,
@@ -549,14 +545,13 @@ void mvceditor::SymbolTableClass::ExpressionCompletionMatches(pelet::ExpressionC
 	else {
 
 		// some kind of function call / method chain call
-		ResourceMatches(parsedExpression, expressionScope, allTagFinders, openedTagFinder,
+		ResourceMatches(parsedExpression, expressionScope, allTagFinders,
 			autoCompleteResourceList, doDuckTyping, false, error);
 	}	
 }
 
 void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope, 
 												  const std::vector<mvceditor::TagFinderClass*>& allTagFinders,
-												  mvceditor::TagFinderClass* openedTagFinder,
 												  std::vector<mvceditor::TagClass>& resourceMatches,
 												  bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 												  mvceditor::SymbolTableMatchErrorClass& error) const {
@@ -571,7 +566,7 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 	pelet::ExpressionClass originalExpression = parsedExpression;
 	ResolveNamespaceAlias(parsedExpression, expressionScope);
 	
-	UnicodeString typeToLookup = ResolveInitialLexemeType(parsedExpression, expressionScope, allTagFinders, openedTagFinder, 
+	UnicodeString typeToLookup = ResolveInitialLexemeType(parsedExpression, expressionScope, allTagFinders, 
 		doDuckTyping, error, scopeSymbols, *this);
 		
 	// continue to the next item in the chain up until the second to last one
@@ -649,7 +644,7 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 				for (size_t k = 0; k < matches.size(); ++k) {
 					mvceditor::TagClass tag = matches[k];
 					bool isVisible = IsResourceVisible(tag, originalExpression, expressionScope, isStaticCall, isThisCall, isParentCall);
-					if (!mvceditor::IsResourceDirty(openedTagFinder, tag, finder) && isVisible) {
+					if (isVisible) {
 						UnresolveNamespaceAlias(originalExpression, expressionScope, tag);
 						resourceMatches.push_back(tag);
 					}
@@ -788,31 +783,6 @@ void mvceditor::SymbolTableClass::UnresolveNamespaceAlias(const pelet::Expressio
 void mvceditor::SymbolTableClass::SetVersion(pelet::Versions version) {
 	Parser.SetVersion(version);
 }
-
-bool mvceditor::IsResourceDirty(mvceditor::TagFinderClass* openedFinder, const mvceditor::TagClass& tag, mvceditor::TagFinderClass* matchTagFinder) {
-	bool isOpened = false;
-
-	// is the tag from an opened file?
-	// for completely new files, tag.FullPath is the code control's FileIdentifier
-	// so this check should work for new files as well. see
-	// WorkingCacheBuilderClass::BackgroundWork
-
-	// TODO: what should happen when 2 editors are running ? since both now share
-	// the same working cache tags db
-	if (openedFinder) {
-		isOpened = openedFinder->HasFullPath(tag.FullPath);
-	}
-	if (!isOpened) {
-		
-		// tag is not from an opened file; is not dirty
-		return false;
-	}
-
-	// a match from the opened tag finders can never be 'dirty' because the tag cache 
-	// has been updated by the Update() method
-	return openedFinder != matchTagFinder;
-}
-
 
 mvceditor::ScopeFinderClass::ScopeFinderClass() 
 	: Scope()

@@ -77,7 +77,23 @@ mvceditor::TagSearchClass::TagSearchClass(UnicodeString resourceQuery)
 	int scopePos = resourceQuery.indexOf(UNICODE_STRING_SIMPLE("::"));
 	int namespacePos = resourceQuery.lastIndexOf(UNICODE_STRING_SIMPLE("\\"));
 	int colonPos = resourceQuery.indexOf(UNICODE_STRING_SIMPLE(":"));
-	if (namespacePos >= 0) {
+	if (namespacePos >= 0 && scopePos >= 0) {
+		// this query has a namespace AND a method name
+		// note that the last identifier after the final backslash is the class name
+		// make sure to account for the root namespace ie '\Exception'
+		if (namespacePos > 0) {
+			NamespaceName.setTo(resourceQuery, 0, namespacePos);
+		}
+		else {
+			NamespaceName.setTo(resourceQuery, 0, 1);
+		}
+
+		// +1 to remove the trailing slash in the namespace name
+		ClassName.setTo(resourceQuery, namespacePos + 1, scopePos - namespacePos - 1);
+		MethodName.setTo(resourceQuery, scopePos + 2);
+		ResourceType = CLASS_NAME_METHOD_NAME;
+	}
+	else if (namespacePos >= 0) {
 		
 		// query has a namespace, parse it out
 		// note that the last identifier after the final backslash is the class name
@@ -90,12 +106,8 @@ mvceditor::TagSearchClass::TagSearchClass(UnicodeString resourceQuery)
 		}
 
 		// +1 to remove the trailing slash in the namespace name
-		if (scopePos > 0) {
-			ClassName.setTo(resourceQuery, namespacePos + 1, scopePos - namespacePos - 1);
-		}
-		else {
-			ClassName.setTo(resourceQuery, namespacePos + 1);
-		}
+		ClassName.setTo(resourceQuery, namespacePos + 1, scopePos - namespacePos - 1);
+		ClassName.setTo(resourceQuery, namespacePos + 1);
 		ResourceType = scopePos > 0 ? CLASS_NAME_METHOD_NAME : NAMESPACE_NAME;
 	}
 	else if (scopePos >= 0) {
@@ -581,19 +593,28 @@ int mvceditor::TagFinderClass::GetLineCountFromFile(const wxString& fullPath) co
 
 UnicodeString mvceditor::TagFinderClass::ExtractParentClassFromSignature(const UnicodeString& signature) const {
 
-	// look for the parent class. note that the lexer has consumed any extra spaces, so it is safe
-	// to assumes that the signature of the class contains only one space.
+	// look for the parent class. tokenize the signature and get the
+	// class name after the 'extends' keyword note that since the signature is re-constructed by the parser
+	// the parent class is always fully qualified
 	UnicodeString parentClassName;
-	int32_t extendsPos = signature.indexOf(UNICODE_STRING_SIMPLE("extends "));
-	if (0 <= extendsPos) {
-		int extendsEndPos =  signature.indexOf(UNICODE_STRING_SIMPLE(" "), extendsPos + 1);
-		if (0 > extendsEndPos) {
-			extendsEndPos = signature.length();
-		}
-		// 8 = length of 'extends '
-		signature.extract(extendsPos + 8, signature.length() - extendsEndPos, parentClassName);
-		parentClassName = parentClassName.trim();
+	UChar* saveState = NULL;
+	const UChar* delims =  UNICODE_STRING_SIMPLE(" ").getTerminatedBuffer();
+	UChar* sig = new UChar[signature.length() + 1];
+	u_strncpy(sig, signature.getBuffer(), signature.length());
+	sig[signature.length()] = '\0';
+	UChar* next = u_strtok_r(sig, delims, &saveState);
+	if (next) {
+		do {
+			UnicodeString token(next);
+			if (token.caseCompare(UNICODE_STRING_SIMPLE("extends"), 0) == 0) {
+				next = u_strtok_r(NULL, delims, &saveState);
+				if (next) {
+					parentClassName.setTo(next, u_strlen(next));
+				}
+			}
+		} while (next = u_strtok_r(NULL, delims, &saveState));
 	}
+	delete[] sig;
 	return parentClassName;
 }
 
@@ -614,7 +635,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::ExactTags(const mvce
 		// check the entire class hierachy; stop as soon as we found it
 		// combine the parent classes with the class being searched
 		std::vector<UnicodeString> classHierarchy = tagSearch.GetParentClasses();
-		classHierarchy.push_back(tagSearch.GetClassName());
+		classHierarchy.push_back(QualifyName(tagSearch.GetNamespaceName(), tagSearch.GetClassName()));
 		
 		types.push_back(mvceditor::TagClass::MEMBER);
 		types.push_back(mvceditor::TagClass::METHOD);

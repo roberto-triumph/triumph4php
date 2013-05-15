@@ -53,8 +53,6 @@ bool mvceditor::TagCacheDbVersionActionClass::Init(mvceditor::GlobalsClass& glob
 	// we need a deep clone since we access this in the background thread
 	wxFileName file(globals.TagCacheDbFileName.GetFullPath());
 	TagDbs.push_back(file);
-	wxFileName workingFile(globals.WorkingTagCacheDbFileName.GetFullPath());
-	TagDbs.push_back(workingFile);
 	return true;
 }
 

@@ -1375,6 +1375,27 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceParentClassShouldReturnP
 	CHECK_UNISTR_EQUALS("UserClass", ParsedTagFinder.ParentClassName(UNICODE_STRING_SIMPLE("AdminClass")));
 }
 
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceParentClassWithInterfaces) {
+	 Prep(mvceditor::CharToIcu(
+		"<?php\n"
+		"class UserClass {\n"
+		"\tprivate $name;"
+		"\tfunction getName() {\n"
+		"\t\treturn $this->name;\n"
+		"\t}\n"
+		"}\n"
+		"/** The admin class */\n"
+		"class AdminClass extends UserClass implements ArrayAccess {\n"
+		"}\n"
+		"function userClassPrint($user) {\n"
+		"\t echo $user->getName() . \"\\n\";"
+		"}\n"
+		"?>\n"
+	));
+	CHECK_UNISTR_EQUALS("UserClass", ParsedTagFinder.ParentClassName(UNICODE_STRING_SIMPLE("AdminClass")));
+}
+
+
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceMatchPositionShouldReturnValidPositionsForClassMethodFunctionAndMember) {
 	 UnicodeString icuCode = mvceditor::CharToIcu(
 		"<?php\n"
@@ -1779,6 +1800,21 @@ TEST_FIXTURE(TagSearchTestClass, ShouldParseFileNameAndLineNumber) {
 	Make("class.User.php:100");
 	CHECK_UNISTR_EQUALS("class.User.php", TagSearch->GetFileName());
 	CHECK_EQUAL(100, TagSearch->GetLineNumber());
+}
+
+TEST_FIXTURE(TagSearchTestClass, ShouldParseNamespaceAndClass) {
+	Make("\\Guzzle\\Http\\Client");
+	CHECK_UNISTR_EQUALS("\\Guzzle\\Http", TagSearch->GetNamespaceName());
+	CHECK_UNISTR_EQUALS("Client", TagSearch->GetClassName());
+	CHECK_UNISTR_EQUALS("", TagSearch->GetMethodName());
+}
+
+
+TEST_FIXTURE(TagSearchTestClass, ShouldParseNamespaceAndClassAndMethod) {
+	Make("\\Guzzle\\Http\\Client::getResponse");
+	CHECK_UNISTR_EQUALS("\\Guzzle\\Http", TagSearch->GetNamespaceName());
+	CHECK_UNISTR_EQUALS("Client", TagSearch->GetClassName());
+	CHECK_UNISTR_EQUALS("getResponse", TagSearch->GetMethodName());
 }
 
 }

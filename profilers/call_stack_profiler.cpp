@@ -98,7 +98,7 @@ int main() {
 	CreateCacheDb(TagCacheDbFullPath, mvceditor::ResourceSqlSchemaAsset());
 	CreateCacheDb(DetectorDbFullPath, mvceditor::DetectorSqlSchemaAsset());
 
-	mvceditor::CallStackClass callStack(TagCache, TagCacheDbFullPath);
+	mvceditor::CallStackClass callStack(TagCache);
 	CacheLargeProject(TagCache, SourceDir);
 	TagCacheInit(TagCache);
 	

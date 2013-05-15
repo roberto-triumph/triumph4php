@@ -40,7 +40,6 @@ mvceditor::GlobalsClass::GlobalsClass()
 	, SqlFileExtensionsString(wxT("*.sql"))
 	, MiscFileExtensionsString(wxT("*.js;*.html;*.yml;*.xml;*.txt"))
 	, TagCacheDbFileName(mvceditor::TagCacheAsset())
-	, WorkingTagCacheDbFileName(mvceditor::TagCacheWorkingAsset()) 
 	, DetectorCacheDbFileName(mvceditor::DetectorCacheAsset()) {
 }
 

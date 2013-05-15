@@ -129,16 +129,6 @@ public:
 	wxFileName TagCacheDbFileName;
 
 	/**
-	 * A separate db file that contains the same schema as TagCache, but this DB is 
-	 * used to store tags for opened files only.  The samve version checking mechanism
-	 * that applies to TagCache also applies to WorkingCache
-	 *
-	 * the full path to the tag database that stores tags for all opened files
-	 * in a session
-	 */
-	wxFileName WorkingTagCacheDbFileName;
-
-	/**
 	 * The location of the detectors cache for all defined projects. 
 	 *
 	 * The SQL schema for this cache can be found in resources/sql/detectors.sql

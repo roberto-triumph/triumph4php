@@ -89,7 +89,6 @@ void mvceditor::TagCacheSearchActionClass::SetSearch(mvceditor::TagCacheSearchAc
 		globals.Environment.Php.Version);
 	cache->InitNativeTag(mvceditor::NativeFunctionsAsset());
 	cache->InitDetectorTag(globals.DetectorCacheDbFileName);
-	cache->InitWorkingTag(globals.WorkingTagCacheDbFileName);
 	TagCache.RegisterGlobal(cache);
 }
 
@@ -334,7 +333,9 @@ void mvceditor::OutlineViewPanelClass::AddFileToOutline(const wxString& fullPath
 		for (tag = tags.begin(); tag != tags.end(); ++tag) {
 			
 			// check to see if this tag is from one of the base classes
-			bool isInClassParents = std::find(classParents.begin(), classParents.end(), tag->ClassName) != classParents.end();
+			// parents class is fully qualified
+			bool isInClassParents = std::find(classParents.begin(), classParents.end(), 
+					tag->NamespaceName + UNICODE_STRING_SIMPLE("\\") + tag->ClassName) != classParents.end();
 
 			if ((tag->Type == mvceditor::TagClass::MEMBER || 
 				tag->Type == mvceditor::TagClass::CLASS_CONSTANT ||

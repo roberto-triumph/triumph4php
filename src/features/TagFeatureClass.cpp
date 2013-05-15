@@ -246,9 +246,6 @@ void mvceditor::TagFeatureClass::OnAppFileClosed(wxCommandEvent& event) {
 	if (fileToDelete.IsEmpty()) {
 		fileToDelete = idString;
 	}
-	mvceditor::TagCleanWorkingCacheActionClass* cleanAction = new mvceditor::TagCleanWorkingCacheActionClass(App.RunningThreads, wxID_ANY, fileToDelete);
-	cleanAction->Init(App.Globals);
-	App.RunningThreads.Queue(cleanAction);
 }
 
 wxString mvceditor::TagFeatureClass::CacheStatus() {
@@ -277,6 +274,7 @@ void mvceditor::TagFeatureClass::OnAppFileSaved(mvceditor::FileSavedEventClass& 
 		// we need to differentiate between new and opened files (the 'true' arg)
 		mvceditor::WorkingCacheBuilderClass* builder = new mvceditor::WorkingCacheBuilderClass(App.RunningThreads, wxID_ANY);
 		builder->Update(
+			App.Globals,
 			codeControl->GetFileName(),
 			codeControl->GetIdString(),
 			text, 
@@ -314,6 +312,7 @@ void mvceditor::TagFeatureClass::OnAppFileOpened(wxCommandEvent& event) {
 		// we need to differentiate between new and opened files (the 'true' arg)
 		mvceditor::WorkingCacheBuilderClass* builder = new mvceditor::WorkingCacheBuilderClass(App.RunningThreads, wxID_ANY);
 		builder->Update(
+			App.Globals,
 			codeControl->GetFileName(),
 			codeControl->GetIdString(),
 			text, 

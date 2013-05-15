@@ -56,7 +56,6 @@ private:
 	soci::session TagDbSession;
 	soci::session NativeDbSession;
 	soci::session DetectedTagDbSession;
-	soci::session WorkingTagDbSession;
 
 public:
 
@@ -82,11 +81,6 @@ public:
 	mvceditor::DetectedTagFinderClass DetectedTagFinder;
 
 	/**
-	 * The object that will be used to lookup tags from opened files
-	 */
-	mvceditor::ParsedTagFinderClass WorkingTagFinder;
-
-	/**
 	 * TRUE if NativeTagFinder has an opened and valid connection
 	 */
 	bool IsNativeTagFinderInit;
@@ -100,11 +94,6 @@ public:
 	 * TRUE if DetectedTagFinder has an opened and valid connection
 	 */
 	bool IsDetectedTagFinderInit;
-
-	/**
-	 * TRUE if DetectedTagFinder has an opened and valid connection
-	 */
-	bool IsWorkingTagFinderInit;
 
 	GlobalCacheClass();
 
@@ -138,13 +127,6 @@ public:
 	 *        This full path MUST exist; it will never be created.
 	 */
 	void InitNativeTag(const wxFileName& nativeFunctionsDbFileName);
-
-	/**
-	 * Opens the cache SQLite file that holds tags for opened fi\les
-	 * @param workingTagDbFileName the full path to the SQLite workin tags database.
-	 *        This full path MUST exist; it will never be created.
-	 */
-	void InitWorkingTag(const wxFileName& workingTagDbFileName);
 
 	/**
 	 * Will update the tag finder by calling Walk(); meaning that the next file
@@ -205,13 +187,6 @@ public:
 	bool IsNew;
 
 	WorkingCacheClass();
-
-	/**
-	 * Opens the cache SQLite file that holds tags for opened fi\les
-	 * @param workingTagDbFileName the full path to the SQLite workin tags database.
-	 *        This full path MUST exist; it will never be created.
-	 */
-	void InitWorkingTag(const wxFileName& workingTagDbFileName);
 
 	/**
 	 * @param fileName the full path to the file being parsed

@@ -47,7 +47,7 @@ public:
 		: FileTestFixtureClass(wxT("call_stack")) 
 		, TagCache() 
 		, WorkingTagDbFileName(TestProjectDir, wxT("working_tags.db"))
-		, CallStack(TagCache, WorkingTagDbFileName)
+		, CallStack(TagCache)
 		, PhpFileExtensions() 
 		, MiscFileExtensions() {
 		PhpFileExtensions.push_back(wxT("*.php"));
@@ -258,7 +258,7 @@ TEST_FIXTURE(CallStackFixtureTestClass, FailOnEmptyCache) {
 	BuildCache();
 
 	mvceditor::TagCacheClass localCache;
-	mvceditor::CallStackClass localCallStack(localCache, WorkingTagDbFileName);
+	mvceditor::CallStackClass localCallStack(localCache);
 	
 	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
 	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
