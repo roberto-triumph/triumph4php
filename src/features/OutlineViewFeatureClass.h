@@ -309,6 +309,11 @@ private:
 	bool ShowConstants;
 
 	/**
+	 * if TRUE then a class' inherited methods and properties are shown
+	 */
+	bool ShowInherited;
+
+	/**
 	 * if TRUE then only public methods, properties or constants are show
 	 */
 	bool ShowPublicOnly;
@@ -335,8 +340,9 @@ private:
 	 * adds a tag as a child node of the tree control.
 	 * @param tag the tag to add
 	 * @param tagRoot the tree node to append to
+	 * @param classNameNode the name of the class the tag belongs to (can be empty)
 	 */
-	void TagToNode(const mvceditor::TagClass& tag, wxTreeItemId& tagRoot);
+	void TagToNode(const mvceditor::TagClass& tag, wxTreeItemId& tagRoot, UnicodeString classNameNode);
 
 	/**
 	 * @return the tree node for the given full path. search is done 
@@ -378,6 +384,11 @@ private:
 	 * handle the properties toggle; toggle showing class constants on and off
 	 */
 	void OnConstantsClick(wxCommandEvent& event);
+
+	/**
+	 * handle the show inherited toggle; toggle showing class inherited members on and off
+	 */
+	void OnInheritedClick(wxCommandEvent& event);
 
 	/**
 	 * handle the "public only" toggle; toggle showing private tags on and off

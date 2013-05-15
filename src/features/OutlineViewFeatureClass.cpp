@@ -51,6 +51,7 @@ static int ID_OUTLINE_MENU_TOGGLE_PROPERTIES = wxNewId();
 static int ID_OUTLINE_MENU_TOGGLE_CONSTANTS = wxNewId();
 static int ID_OUTLINE_MENU_TOGGLE_PUBLIC_ONLY = wxNewId();
 static int ID_OUTLINE_MENU_TOGGLE_FUNCTION_ARGS = wxNewId();
+static int ID_OUTLINE_MENU_TOGGLE_INHERITED = wxNewId();
 
 const wxEventType mvceditor::EVENT_TAG_SEARCH_COMPLETE = wxNewEventType();
 
@@ -248,6 +249,7 @@ mvceditor::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int wi
 	, ShowMethods(true)
 	, ShowProperties(true)
 	, ShowConstants(true) 
+	, ShowInherited(true)
 	, ShowPublicOnly(false) 
 	, ShowFunctionArgs(false) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
@@ -318,7 +320,7 @@ void mvceditor::OutlineViewPanelClass::AddFileToOutline(const wxString& fullPath
 			tag->Type != mvceditor::TagClass::CLASS_CONSTANT && 
 			tag->Type != mvceditor::TagClass::MEMBER &&
 			tag->Type != mvceditor::TagClass::METHOD) {
-			TagToNode(*tag, fileId);
+			TagToNode(*tag, fileId, UNICODE_STRING_SIMPLE(""));
 		}
 		else if (tag->Type == mvceditor::TagClass::CLASS) {
 			classes.push_back(tag->ClassName);
@@ -341,7 +343,7 @@ void mvceditor::OutlineViewPanelClass::AddFileToOutline(const wxString& fullPath
 				tag->Type == mvceditor::TagClass::CLASS_CONSTANT ||
 				tag->Type == mvceditor::TagClass::METHOD) &&
 				(className->caseCompare(tag->ClassName, 0) == 0 || isInClassParents)) {
-				TagToNode(*tag, classId);
+				TagToNode(*tag, classId, *className);
 			}
 		}
 	}
@@ -350,7 +352,7 @@ void mvceditor::OutlineViewPanelClass::AddFileToOutline(const wxString& fullPath
 	Tree->SelectItem(fileId);	
 }
 
-void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag, wxTreeItemId& treeId) {
+void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag, wxTreeItemId& treeId, UnicodeString classNameNode) {
 
 	// for now never show dynamic resources since there is no way we can know where the source for them is.
 	int type = tag.Type;
@@ -359,6 +361,11 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 
 	// if the flag to show only public members is on, then do not show private or protected tags
 	bool passesAccessCheck = !ShowPublicOnly || (!tag.IsPrivate && !tag.IsProtected);
+	if (!classNameNode.isEmpty() && !ShowInherited) {
+		
+		// make sure that the inheritance check passes too
+		passesAccessCheck = passesAccessCheck && classNameNode.caseCompare(tag.ClassName, 0) == 0;
+	}
 	if (mvceditor::TagClass::DEFINE == type && !tag.IsDynamic) {
 		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_DEFINE, -1, 
 			new mvceditor::TreeItemDataStringClass(mvceditor::IcuToWx(tag.Key)));
@@ -547,8 +554,9 @@ void mvceditor::OutlineViewPanelClass::AddClassToOutline(const wxString& classNa
 	}
 
 	std::vector<mvceditor::TagClass>::const_iterator tag;
+	UnicodeString icuClassName =  mvceditor::WxToIcu(className);
 	for (tag = memberTags.begin(); tag != memberTags.end(); ++tag) {
-		TagToNode(*tag, classRoot);
+		TagToNode(*tag, classRoot, icuClassName);
 	}
 	Tree->ExpandAllChildren(Tree->GetRootItem());
     Tree->Thaw();
@@ -585,6 +593,9 @@ void mvceditor::OutlineViewPanelClass::OnTreeItemRightClick(wxTreeEvent& event) 
 	item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_CONSTANTS, _("Show Class Constants"), _("Toggle showing class constants in the outline"));
 	item->Check(ShowConstants);
 
+	item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_INHERITED, _("Show Inherited Members"), _("Toggle showing inherited tags in the outline"));
+	item->Check(ShowInherited);
+
 	item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_PUBLIC_ONLY, _("Show Public Tags Only"), _("Toggle showing public tags in the outline"));
 	item->Check(ShowPublicOnly);
 
@@ -612,6 +623,9 @@ void mvceditor::OutlineViewPanelClass::OnFilterLeftDown(wxMouseEvent& event) {
 		
 		item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_CONSTANTS, _("Show Class Constants"), _("Toggle showing class constants in the outline"));
 		item->Check(ShowConstants);
+
+		item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_INHERITED, _("Show Inherited Members"), _("Toggle showing inherited tags in the outline"));
+		item->Check(ShowInherited);
 
 		item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_PUBLIC_ONLY, _("Show Public Tags Only"), _("Toggle showing public tags in the outline"));
 		item->Check(ShowPublicOnly);
@@ -708,6 +722,25 @@ void mvceditor::OutlineViewPanelClass::OnPropertiesClick(wxCommandEvent& event) 
 
 void mvceditor::OutlineViewPanelClass::OnConstantsClick(wxCommandEvent& event) {
 	ShowConstants = !ShowConstants;
+	std::vector<wxString> tagsToOutline = OutlinedTags;
+	OutlinedTags.clear(); // this will be filled when the tag search is complete
+	std::vector<wxString>::iterator tag;
+	for (tag = tagsToOutline.begin(); tag != tagsToOutline.end(); ++tag) {
+		if (tag->Find(wxT(".")) != wxNOT_FOUND) {
+			
+			// user chose a file: get all classes / functions for that file
+			Feature->StartTagSearch(mvceditor::TagCacheSearchActionClass::ALL_TAGS_IN_FILE, *tag);
+		}
+		else {
+
+			// user chose a class; add the class member to the outline
+			Feature->StartTagSearch(mvceditor::TagCacheSearchActionClass::ALL_MEMBER_TAGS, *tag);
+		}
+	}
+}
+
+void mvceditor::OutlineViewPanelClass::OnInheritedClick(wxCommandEvent& event) {
+	ShowInherited = !ShowInherited;
 	std::vector<wxString> tagsToOutline = OutlinedTags;
 	OutlinedTags.clear(); // this will be filled when the tag search is complete
 	std::vector<wxString>::iterator tag;
@@ -1020,6 +1053,7 @@ BEGIN_EVENT_TABLE(mvceditor::OutlineViewPanelClass, OutlineViewGeneratedPanelCla
 	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_METHODS, mvceditor::OutlineViewPanelClass::OnMethodsClick)
 	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_PROPERTIES, mvceditor::OutlineViewPanelClass::OnPropertiesClick)
 	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_CONSTANTS, mvceditor::OutlineViewPanelClass::OnConstantsClick)
+	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_INHERITED, mvceditor::OutlineViewPanelClass::OnInheritedClick)
 	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_PUBLIC_ONLY, mvceditor::OutlineViewPanelClass::OnPublicOnlyClick)
 	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_FUNCTION_ARGS, mvceditor::OutlineViewPanelClass::OnFunctionArgsClick)
 END_EVENT_TABLE()
