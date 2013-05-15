@@ -1216,7 +1216,7 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::FindByIdentifi
 }
 
 
-std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::AllTagsInFile(const wxString& fullPath) {
+std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ClassesFunctionsDefines(const wxString& fullPath) {
 	std::vector<mvceditor::TagClass> tags;
 	mvceditor::FileTagClass fileTag;
 	if (FindFileTagByFullPathExact(fullPath, fileTag)) {
@@ -1329,7 +1329,7 @@ std::vector<mvceditor::TraitTagClass> mvceditor::DetectedTagFinderClass::UsedTra
 }
 
 
-std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::AllTagsInFile(const wxString& fullPath) {
+std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::ClassesFunctionsDefines(const wxString& fullPath) {
 
 	// detector db does not have a file_items table
 	std::vector<mvceditor::TagClass> tags;

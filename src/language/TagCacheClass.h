@@ -354,14 +354,9 @@ public:
 	 *
 	 * @param fullPath full path to a file to lookup
 	 * @return vector of tags; 
-	 *         all functions or define's in the give file PLUS
-	 *         all classes in the given file PLUS
-	 *         all methods and properties that are defined in any classes PLUS
-	 *         all methods and properties that are defined in any classes' base classes PLUS
-	 *         all methods and properties that are defined in any of the traits used any classes PLUS
-	 *         all methods and properties that are defined in any of the traits used by any of the base classes
+	 *         all classes, functions or define's in the give file
 	 */
-	std::vector<mvceditor::TagClass> AllTagsInFile(const wxString& fullPath); 
+	std::vector<mvceditor::TagClass> AllClassesFunctionsDefines(const wxString& fullPath); 
 	
 	/**
 	 * Collects all near matches that are possible candidates for completion of the parsed expression.

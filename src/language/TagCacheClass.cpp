@@ -435,13 +435,13 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllMemberTags(const U
 	return allMatches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllTagsInFile(const wxString& fullPath) {
+std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllClassesFunctionsDefines(const wxString& fullPath) {
 	std::vector<mvceditor::TagClass> allMatches;
 
 	std::vector<mvceditor::TagFinderClass*> allTagFinders = AllFinders();
 	for (size_t j = 0; j < allTagFinders.size(); ++j) {
 		mvceditor::TagFinderClass* finder = allTagFinders[j];
-		allMatches = finder->AllTagsInFile(fullPath);
+		allMatches = finder->ClassesFunctionsDefines(fullPath);
 		if (!allMatches.empty()) {
 
 			// even if the file tag is is multiple finders, they should both be the 
@@ -449,23 +449,6 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllTagsInFile(const w
 			break;	
 		}
 	}
-
-	// now for each class, collect all methods/properties for that class. do it here
-	// since CollectAllTagsInFile only
-	std::vector<mvceditor::TagClass> classTags;
-	std::vector<mvceditor::TagClass>::iterator tag;
-	for (tag = allMatches.begin(); tag != allMatches.end(); ++tag) {
-		if (tag->Type == mvceditor::TagClass::CLASS) {
-			UnicodeString qualifiedName = tag->NamespaceName;
-			if (!qualifiedName.endsWith(UNICODE_STRING_SIMPLE("\\"))) {
-				qualifiedName.append(UNICODE_STRING_SIMPLE("\\"));
-			}
-			qualifiedName.append(tag->ClassName);
-			std::vector<mvceditor::TagClass> matches = AllMemberTags(qualifiedName);
-			classTags.insert(classTags.end(), matches.begin(), matches.end());
-		}
-	}
-	allMatches.insert(allMatches.end(), classTags.begin(), classTags.end());
 	return allMatches;
 }
 

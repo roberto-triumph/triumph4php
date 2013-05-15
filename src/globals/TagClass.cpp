@@ -150,6 +150,15 @@ bool mvceditor::TagClass::HasParameters() const {
 	return Signature.indexOf(Identifier + UNICODE_STRING_SIMPLE("()")) < 0;
 }
 
+UnicodeString mvceditor::TagClass::FullyQualifiedClassName() const {
+	UnicodeString qualifiedName = NamespaceName;
+	if (!qualifiedName.endsWith(UNICODE_STRING_SIMPLE("\\"))) {
+		qualifiedName.append(UNICODE_STRING_SIMPLE("\\"));
+	}
+	qualifiedName.append(ClassName);
+	return qualifiedName;
+}
+
 mvceditor::TraitTagClass::TraitTagClass() 
 	: TraitClassName()
 	, Aliased()

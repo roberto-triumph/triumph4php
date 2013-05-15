@@ -1687,7 +1687,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, IsFileCacheEmptyWithNativeFunctions
 	CHECK(ParsedTagFinder.IsResourceCacheEmpty());
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, AllTagsInFileShouldReturnTags) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ClassesFunctionsDefinesShouldReturnTags) {
 
 	// create 2 files that way we can test that each file will only get its own
 	// tags
@@ -1722,7 +1722,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, AllTagsInFileShouldReturnTags) {
 	));	
 
 	// this method only returns top-level tags for now
-	Matches = ParsedTagFinder.AllTagsInFile(wxT("test.php"));
+	Matches = ParsedTagFinder.ClassesFunctionsDefines(wxT("test.php"));
 	CHECK_VECTOR_SIZE(3, Matches);
 	CHECK_UNISTR_EQUALS("printUsers", Matches[0].Key);
 	CHECK_UNISTR_EQUALS("USER_MAX", Matches[1].Key);
