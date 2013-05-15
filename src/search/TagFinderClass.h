@@ -470,10 +470,10 @@ public:
 	 * 
 	 * then this method will return "UserClass"
 	 * 
-	 * @param UnicodeString className the class to search
-	 * @param return UnicodeString the class' most immediate parent
+	 * @param UnicodeString fullyQualifiedClassName the class to search
+	 * @param return UnicodeString fully qualified class name of the class' most immediate parent
 	 */
-	UnicodeString ParentClassName(const UnicodeString& className);
+	UnicodeString ParentClassName(const UnicodeString& fullyQualifiedClassName);
 
 	/**
 	 * Get the traits used by a given tag. For example, let's say source code contained a class and two traits: UserClass,

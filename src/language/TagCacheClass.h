@@ -365,13 +365,13 @@ public:
 
 	/**
 	 * gets all tags for a single class
-	 * @param className the class to search.  not fully qualified (no namespace)
+	 * @param fullyQualifiedClassName the class to search.  fully qualified (with namespace)
 	 * @return vector of tags; 
 	 *         all methods and properties that are defined in the class PLUS
 	 *         all methods and properties that are defined in any of its base classes PLUS
 	 *         all methods and properties that are defined in any of the traits used by any of the base classes
 	 */
-	std::vector<mvceditor::TagClass> AllMemberTags(const UnicodeString& className);
+	std::vector<mvceditor::TagClass> AllMemberTags(const UnicodeString& fullyQualifiedClassName);
 
 	/**
 	 * gets all tags that were found in a single file. for classes, all of the class' members (including

@@ -491,13 +491,13 @@ std::vector<mvceditor::TagClass>  mvceditor::TagFinderClass::NearMatchNamespaces
 	return matches;
 }
 
-UnicodeString mvceditor::TagFinderClass::ParentClassName(const UnicodeString& className) {
+UnicodeString mvceditor::TagFinderClass::ParentClassName(const UnicodeString& fullyQualifiedClassName) {
 	UnicodeString parentClassName;
 
 	// first query to get the parent class name
 	std::vector<int> types;
 	types.push_back(mvceditor::TagClass::CLASS);
-	std::string key = mvceditor::IcuToChar(className);
+	std::string key = mvceditor::IcuToChar(fullyQualifiedClassName);
 	
 	// empty file items == search on all files
 	std::vector<int> fileTagIds;

@@ -469,13 +469,13 @@ void mvceditor::TagCacheClass::Clear() {
 	WorkingCaches.clear();
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllMemberTags(const UnicodeString& className) {
+std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllMemberTags(const UnicodeString& fullyQualifiedClassName) {
 	std::vector<mvceditor::TagFinderClass*> allTagFinders = AllFinders();
 
 	// add the double colon so that we search for all members
-	mvceditor::TagSearchClass tagSearch(className + UNICODE_STRING_SIMPLE("::"));
-	tagSearch.SetParentClasses(mvceditor::TagFinderListClassParents(tagSearch.GetClassName(), tagSearch.GetMethodName(), allTagFinders));
-	tagSearch.SetTraits(mvceditor::TagFinderListClassUsedTraits(tagSearch.GetClassName(), tagSearch.GetParentClasses(), 
+	mvceditor::TagSearchClass tagSearch(fullyQualifiedClassName + UNICODE_STRING_SIMPLE("::"));
+	tagSearch.SetParentClasses(mvceditor::TagFinderListClassParents(fullyQualifiedClassName, tagSearch.GetMethodName(), allTagFinders));
+	tagSearch.SetTraits(mvceditor::TagFinderListClassUsedTraits(fullyQualifiedClassName, tagSearch.GetParentClasses(), 
 		tagSearch.GetMethodName(), allTagFinders));
 
 	// return all of the matches from all finders that were found by the Collect* call.
