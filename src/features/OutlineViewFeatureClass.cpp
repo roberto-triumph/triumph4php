@@ -52,8 +52,25 @@ static int ID_OUTLINE_MENU_TOGGLE_CONSTANTS = wxNewId();
 static int ID_OUTLINE_MENU_TOGGLE_PUBLIC_ONLY = wxNewId();
 static int ID_OUTLINE_MENU_TOGGLE_FUNCTION_ARGS = wxNewId();
 static int ID_OUTLINE_MENU_TOGGLE_INHERITED = wxNewId();
+static int ID_OUTLINE_MENU_SORT_BY_NAME = wxNewId();
+static int ID_OUTLINE_MENU_SORT_BY_TYPE = wxNewId();
 
 const wxEventType mvceditor::EVENT_TAG_SEARCH_COMPLETE = wxNewEventType();
+
+static bool SortTagsByName(const mvceditor::TagClass& a, const mvceditor::TagClass& b) {
+	return a.Identifier.caseCompare(b.Identifier, 0) < 0;
+}
+
+static bool SortTagsByTypeAndName(const mvceditor::TagClass& a, const mvceditor::TagClass& b) {
+	int ret = 0;
+	if (a.Type < b.Type) {
+		return true;
+	}
+	else if (a.Type > b.Type) {
+		return false;
+	}
+	return a.Identifier.caseCompare(b.Identifier, 0) < 0;
+}
 
 mvceditor::TagSearchCompleteClass::TagSearchCompleteClass()
 	: Label()
@@ -143,6 +160,9 @@ void mvceditor::TagCacheSearchActionClass::BackgroundWork() {
 					tag = tags.begin();
 				}
 				wxString classLabel = mvceditor::IcuToWx(tag->Identifier);
+				if (classLabel.Contains(wxT("\\"))) {
+					classLabel = classLabel.AfterLast(wxT('\\'));
+				}
 				if (!tag->NamespaceName.isEmpty()) {
 					classLabel += wxT(": ") + mvceditor::IcuToWx(tag->NamespaceName);
 				}
@@ -297,12 +317,15 @@ mvceditor::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int wi
 	, ShowConstants(true) 
 	, ShowInherited(true)
 	, ShowPublicOnly(false) 
-	, ShowFunctionArgs(false) {
+	, ShowFunctionArgs(false)
+	, SortByName(true)
+	, SortByType(false) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
 	SyncButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("outline-refresh")));
 	AddButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("outline-add")));
 	FilterButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("filter")));
+	SortButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("sort")));
 
 	SetStatus(_(""));
 	
@@ -335,15 +358,16 @@ void mvceditor::OutlineViewPanelClass::SetStatus(const wxString& status) {
 }
 
 void mvceditor::OutlineViewPanelClass::AddTagsToOutline(const std::vector<mvceditor::TagSearchCompleteClass>& tags) {
+	size_t oldSize = OutlinedTags.size();
 	OutlinedTags.insert(OutlinedTags.end(), tags.begin(), tags.end());
-	std::vector<mvceditor::TagSearchCompleteClass>::const_iterator searchTag;
+	std::vector<mvceditor::TagSearchCompleteClass>::iterator searchTag;
 	Tree->Freeze();
 	wxTreeItemId rootId = Tree->GetRootItem();
 	if (!rootId.IsOk()) {
 		rootId = Tree->AddRoot(_("Outline"), IMAGE_OUTLINE_ROOT);
 	}
 	StatusLabel->SetLabel(_(""));
-	for (searchTag = tags.begin(); searchTag != tags.end(); ++searchTag) {
+	for (searchTag = OutlinedTags.begin() + oldSize; searchTag != OutlinedTags.end(); ++searchTag) {
 		wxString label = searchTag->Label;
 
 		// look for the file in the tree
@@ -368,7 +392,7 @@ void mvceditor::OutlineViewPanelClass::AddTagsToOutline(const std::vector<mvcedi
 			fileId = Tree->PrependItem(rootId, label, IMAGE_OUTLINE_CLASS, -1, new mvceditor::TreeItemDataStringClass(label)); 
 		}
 
-		std::map<wxString, std::vector<mvceditor::TagClass> >::const_iterator mapTag; 		
+		std::map<wxString, std::vector<mvceditor::TagClass> >::iterator mapTag; 		
 		std::vector<mvceditor::TagClass>::const_iterator memberTag;
 		for (mapTag = searchTag->Tags.begin(); mapTag != searchTag->Tags.end(); ++mapTag) {
 			wxTreeItemId parent;
@@ -377,6 +401,12 @@ void mvceditor::OutlineViewPanelClass::AddTagsToOutline(const std::vector<mvcedi
 			}
 			else {
 				parent = Tree->AppendItem(fileId, mapTag->first, IMAGE_OUTLINE_CLASS); 
+			}
+			if (SortByName) {
+				std::sort(mapTag->second.begin(), mapTag->second.end(),  SortTagsByName);
+			}
+			else if (SortByType) {
+				std::sort(mapTag->second.begin(), mapTag->second.end(),  SortTagsByTypeAndName);
 			}
 			
 			// display all tags for this class or the class's base classes
@@ -613,6 +643,13 @@ void mvceditor::OutlineViewPanelClass::OnTreeItemRightClick(wxTreeEvent& event) 
 	item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_FUNCTION_ARGS, _("Show Function Arguments"), _("Toggle showing functionn arguments in the outline"));
 	item->Check(ShowFunctionArgs);
 
+	menu.AppendSeparator();
+	item = menu.AppendCheckItem(ID_OUTLINE_MENU_SORT_BY_NAME, _("Sort By Name"), _("Sort tags by name"));
+	item->Check(SortByName);
+
+	item = menu.AppendCheckItem(ID_OUTLINE_MENU_SORT_BY_TYPE, _("Sort By Type"), _("Sort tags by type"));
+	item->Check(SortByType);
+
 	wxPoint pos = event.GetPoint();
 	Tree->PopupMenu(&menu, pos);
 	event.Skip();
@@ -645,6 +682,26 @@ void mvceditor::OutlineViewPanelClass::OnFilterLeftDown(wxMouseEvent& event) {
 		item->Check(ShowFunctionArgs);
 
 		FilterButton->PopupMenu(&menu, pos);
+	}
+	else {
+		event.Skip();
+	}
+}
+
+void mvceditor::OutlineViewPanelClass::OnSortLeftDown(wxMouseEvent& event) {
+	wxPoint pos = event.GetPosition();
+	wxHitTest test = SortButton->HitTest(pos);
+	if (test== wxHT_WINDOW_INSIDE) {
+		wxMenu menu;
+		wxMenuItem* item;
+
+		item = menu.AppendCheckItem(ID_OUTLINE_MENU_SORT_BY_NAME, _("Sort By Name"), _("Sort tags by name"));
+		item->Check(SortByName);
+
+		item = menu.AppendCheckItem(ID_OUTLINE_MENU_SORT_BY_TYPE, _("Sort By Type"), _("Sort tags by type"));
+		item->Check(SortByType);
+
+		SortButton->PopupMenu(&menu, pos);
 	}
 	else {
 		event.Skip();
@@ -732,6 +789,22 @@ void mvceditor::OutlineViewPanelClass::OnPublicOnlyClick(wxCommandEvent& event) 
 
 void mvceditor::OutlineViewPanelClass::OnFunctionArgsClick(wxCommandEvent& event) {
 	ShowFunctionArgs = !ShowFunctionArgs;
+	RedrawOutline();
+}
+
+void mvceditor::OutlineViewPanelClass::OnSortByTypeClick(wxCommandEvent& event) {
+	SortByType = !SortByType;
+	if (SortByType) {
+		SortByName = false;
+	}
+	RedrawOutline();
+}
+
+void mvceditor::OutlineViewPanelClass::OnSortByNameClick(wxCommandEvent& event) {
+	SortByName = !SortByName;
+	if (SortByName) {
+		SortByType = false;
+	}
 	RedrawOutline();
 }
 
@@ -1002,4 +1075,6 @@ BEGIN_EVENT_TABLE(mvceditor::OutlineViewPanelClass, OutlineViewGeneratedPanelCla
 	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_INHERITED, mvceditor::OutlineViewPanelClass::OnInheritedClick)
 	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_PUBLIC_ONLY, mvceditor::OutlineViewPanelClass::OnPublicOnlyClick)
 	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_FUNCTION_ARGS, mvceditor::OutlineViewPanelClass::OnFunctionArgsClick)
+	EVT_MENU(ID_OUTLINE_MENU_SORT_BY_NAME, mvceditor::OutlineViewPanelClass::OnSortByNameClick)
+	EVT_MENU(ID_OUTLINE_MENU_SORT_BY_TYPE, mvceditor::OutlineViewPanelClass::OnSortByTypeClick)
 END_EVENT_TABLE()

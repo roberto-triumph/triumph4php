@@ -312,6 +312,16 @@ private:
 	bool ShowFunctionArgs;
 
 	/**
+	 * if TRUE then tags are sorted by name
+	 */
+	bool SortByName;
+
+	/**
+	 * if TRUE then tags are sorted by type (methods, properties, functions ...) then name
+	 */
+	bool SortByType;
+
+	/**
 	 * takes in class or file tags, perform searches for all tags in each of
 	 * the files / classes given.
 	 *
@@ -392,6 +402,21 @@ private:
 	 * handle the "filter" button click; show the menu to toogle different tags on or off
 	 */
 	void OnFilterLeftDown(wxMouseEvent& event);
+
+	/**
+	 * handle the "sort" button click; show the menu to toogle different sort options on or off
+	 */
+	void OnSortLeftDown(wxMouseEvent& event);
+
+	/**
+	 * handle the 'sort by type' toggle
+	 */
+	void OnSortByTypeClick(wxCommandEvent& event);
+
+	/**
+	 * handle the 'sort by name' toggle
+	 */
+	void OnSortByNameClick(wxCommandEvent& event);
 
 	/**
 	 * redaws the outline nodes based on the state of the various Show* flags.

@@ -49,15 +49,17 @@ class OutlineViewGeneratedPanelClass : public wxPanel
 		
 		wxStaticText* StatusLabel;
 		wxBitmapButton* AddButton;
-		wxBitmapButton* SyncButton;
+		wxBitmapButton* SortButton;
 		wxBitmapButton* FilterButton;
+		wxBitmapButton* SyncButton;
 		wxBitmapButton* HelpButton;
 		wxTreeCtrl* Tree;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnAddButton( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSyncButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSortLeftDown( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnFilterLeftDown( wxMouseEvent& event ) { event.Skip(); }
+		virtual void OnSyncButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnTreeItemActivated( wxTreeEvent& event ) { event.Skip(); }
 		virtual void OnTreeItemRightClick( wxTreeEvent& event ) { event.Skip(); }
