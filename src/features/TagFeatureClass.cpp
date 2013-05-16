@@ -288,19 +288,10 @@ void mvceditor::TagFeatureClass::OnAppFileSaved(mvceditor::FileSavedEventClass& 
 	// a file is opened the url detector gets the latest resources
 	wxString fileName = event.GetCodeControl()->GetFileName();
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	bool isFileFromProject = false;
-	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
-
-		if (project->IsEnabled && project->IsAPhpSourceFile(fileName)) {
-			isFileFromProject = true;
-			break;
-		}
-	}
-	if (isFileFromProject) {
-		mvceditor::ProjectTagActionClass* tagAction = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
-		tagAction->InitForFile(App.Globals, fileName);
-		App.RunningThreads.Queue(tagAction);
-	}
+	
+	mvceditor::ProjectTagActionClass* tagAction = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
+	tagAction->InitForFile(App.Globals, fileName);
+	App.RunningThreads.Queue(tagAction);
 	event.Skip();
 }
 

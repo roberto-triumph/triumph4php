@@ -516,8 +516,10 @@ void mvceditor::SymbolTableClass::CreateSymbolsFromFile(const wxString& fileName
 	
 	// for now ignore parse errors
 	pelet::LintResultsClass results;
-	wxFFile file(fileName, wxT("rb"));
-	Parser.ScanFile(file.fp(), mvceditor::WxToIcu(fileName), results);
+	if (wxFileName::FileExists(fileName)) {
+		wxFFile file(fileName, wxT("rb"));
+		Parser.ScanFile(file.fp(), mvceditor::WxToIcu(fileName), results);
+	}
 }
 
 void mvceditor::SymbolTableClass::ExpressionCompletionMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope,
