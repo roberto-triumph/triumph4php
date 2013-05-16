@@ -139,7 +139,6 @@ void mvceditor::TagCacheSearchActionClass::BackgroundWork() {
 				
 				// now for each class, collect all methods/properties for any class.
 				for (tag = tags.begin(); tag != tags.end(); ++tag) {
-					
 					if (tag->Type == mvceditor::TagClass::CLASS) {
 						wxString classLabel = mvceditor::IcuToWx(tag->Identifier);
 						if (!tag->NamespaceName.isEmpty()) {
@@ -429,22 +428,33 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 
 	// if the flag to show only public members is on, then do not show private or protected tags
 	bool passesAccessCheck = !ShowPublicOnly || (!tag.IsPrivate && !tag.IsProtected);
+
+	// compare clas nodes in the same way that they come from the TagCacheSearchActionClass
+	UnicodeString tagClassName = tag.ClassName;
+	if (!tag.NamespaceName.isEmpty()) {
+		tagClassName += UNICODE_STRING_SIMPLE(": ") + tag.NamespaceName;
+	}
+	bool isInheritedTag = tagClassName.caseCompare(classNameNode, 0) != 0;
 	if (!classNameNode.isEmpty() && !ShowInherited) {
 		
 		// make sure that the inheritance check passes too
-		passesAccessCheck = passesAccessCheck && classNameNode.caseCompare(tag.ClassName, 0) == 0;
+		passesAccessCheck = passesAccessCheck && !isInheritedTag;
 	}
 	if (mvceditor::TagClass::DEFINE == type && !tag.IsDynamic) {
 		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_DEFINE, -1, 
 			new mvceditor::TreeItemDataStringClass(mvceditor::IcuToWx(tag.Key)));
 	}
 	else if (mvceditor::TagClass::MEMBER == tag.Type && ShowProperties && passesAccessCheck) {
+		label = mvceditor::IcuToWx(tag.Identifier);
+		if (isInheritedTag) {
+			label = mvceditor::IcuToWx(tag.ClassName) + wxT("::") + label;
+		}
 		if (!tag.ReturnType.isEmpty()) {
 			wxString returnType = mvceditor::IcuToWx(tag.ReturnType);
 			label = label + wxT(" [") + returnType + wxT("]");
 		}
 		int image = IMAGE_OUTLINE_PROPERTY_PUBLIC;
-		if (tag.ClassName != className) {
+		if (isInheritedTag) {
 			image = IMAGE_OUTLINE_PROPERTY_INHERITED;
 		}
 		else if (tag.IsProtected) {
@@ -457,8 +467,10 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 			new mvceditor::TreeItemDataStringClass(mvceditor::IcuToWx(tag.Key)));
 	}
 	else if (mvceditor::TagClass::METHOD == tag.Type && ShowMethods && passesAccessCheck) {
-
 		label = mvceditor::IcuToWx(tag.Identifier);
+		if (isInheritedTag) {
+			label = mvceditor::IcuToWx(tag.ClassName) + wxT("::") + label;
+		}
 
 		// check to see if we have args. if so, add an ellipsis to show that there are things hidden
 		// that can be seen
@@ -473,7 +485,7 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 			label += wxT(" [") + returnType + wxT("]");
 		}
 		int image = IMAGE_OUTLINE_METHOD_PUBLIC;
-		if (tag.ClassName != className) {
+		if (isInheritedTag) {
 			image = IMAGE_OUTLINE_METHOD_INHERITED;
 		}
 		else if (tag.IsProtected) {
@@ -501,6 +513,9 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 		}
 	}
 	else if (mvceditor::TagClass::CLASS_CONSTANT == tag.Type && ShowConstants && passesAccessCheck) {
+		if (tag.ClassName != className) {
+			label = mvceditor::IcuToWx(tag.ClassName) + wxT("::") + label;
+		}
 		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_CLASS_CONSTANT, -1,
 			new mvceditor::TreeItemDataStringClass(mvceditor::IcuToWx(tag.Key)));
 	}
