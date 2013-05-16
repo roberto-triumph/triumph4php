@@ -36,21 +36,22 @@ namespace mvceditor {
 
 /**
  * grouping of a tag and its member tags.
- * member tags will be empty for anything other than class tags
  */
 class TagSearchCompleteClass {
 
 public:
 
-	mvceditor::TagClass Tag;
+	wxString Label;
 
-	std::vector<mvceditor::TagClass> MemberTags;
+	std::map<wxString, std::vector<mvceditor::TagClass> > Tags;
 
 	TagSearchCompleteClass();
 
-	TagSearchCompleteClass(const TagSearchCompleteClass& src);
+	TagSearchCompleteClass(const mvceditor::TagSearchCompleteClass& src);
 
-	void Copy(const TagSearchCompleteClass& src);
+	void Copy(const mvceditor::TagSearchCompleteClass& src);
+
+	bool IsLabelFileName() const;
 };
 
 /**
@@ -65,21 +66,8 @@ class TagSearchCompleteEventClass : public wxEvent {
          * Will contain all of the resulting tags.
          */
         std::vector<mvceditor::TagSearchCompleteClass> Tags;
-
-		/**
-		 * the string that was searched for
-		 */
-		wxString SearchString;
-
-		/**
-		 * the mode that was used to search, one of
-		 * mvceditor::TagCacheSearchActionClass::Modes
-		 */
-		int Mode;
         
-        TagSearchCompleteEventClass(int eventId, const std::vector<mvceditor::TagSearchCompleteClass>& tags,
-			int mode,
-			const wxString& searchString);
+        TagSearchCompleteEventClass(int eventId, const std::vector<mvceditor::TagSearchCompleteClass>& tags);
         
         wxEvent* Clone() const;
         
@@ -102,26 +90,16 @@ class TagCacheSearchActionClass : public mvceditor::ActionClass {
 	
 public:
 
-	/**
-	 * the different searches that can be made. each of these corresponds
-	 * to the method on TagCacheClass that will be called.
-	 */
-	enum Modes {
-		ALL_TAGS_IN_FILE,
-		ALL_MEMBER_TAGS
-	};
-
 	TagCacheSearchActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
 	 * set the search parameters.  this should be called before the action is
 	 * added to the run queue
 	 *
-	 * @param mode the query to execute one of the enum constants
-	 * @param search the search string
+	 * @param searches the search strings, can be either file names, full paths, or class names
 	 * @parm globals to get the locations of the tag dbs
 	 */
-	void SetSearch(Modes mode, const UnicodeString& search, mvceditor::GlobalsClass& globals);
+	void SetSearch(const std::vector<UnicodeString>& searches, mvceditor::GlobalsClass& globals);
 
 	wxString GetLabel() const;
 
@@ -133,9 +111,7 @@ private:
 
 	mvceditor::TagCacheClass TagCache;
 
-	UnicodeString SearchString;
-
-	Modes Mode;
+	std::vector<UnicodeString> SearchStrings;
 };
 
 /**
@@ -173,12 +149,12 @@ public:
 
 	/**
 	 * start a tag search; will queue an action that will search the tag cache
-	 * in a background thread and Post the results when complete.
+	 * in a background thread and Post the results when complete. If multiple
+	 * search strings are given, a search for each string will be done.
 	 *
-	 * @param mode the search to execute
-	 * @param tag to look for
+	 * @param searchStrings tags to look for
 	 */
-	void StartTagSearch(mvceditor::TagCacheSearchActionClass::Modes mode, const wxString& text);
+	void StartTagSearch(const std::vector<UnicodeString>& searchStrings);
 	
 private:		
 		
@@ -232,13 +208,7 @@ class OutlineViewPanelClass : public OutlineViewGeneratedPanelClass {
 	 * adds the given tags to the outline tree, under a node that has the name of the file
 	 * as its name
 	 */
-	void AddFileToOutline(const wxString& fullPath, const std::vector<mvceditor::TagSearchCompleteClass>& tags);
-
-	/**
-	 * Add a class and all of its members into the tree outline at the given node.
-	 *
-	 */
-	void AddClassToOutline(const wxString& className, const std::vector<mvceditor::TagSearchCompleteClass>& memberTags);
+	void AddTagsToOutline(const std::vector<mvceditor::TagSearchCompleteClass>& tags);
 
 	 /**
 	  * @param fullPath file to remove from the outline tre
@@ -290,10 +260,9 @@ private:
 	};
 
 	/**
-	 * these are the things that have been outlined.  these string could be
-	 * either a filename or a class name.
+	 * these are the things that have been outlined.
 	 */
-	std::vector<wxString> OutlinedTags;
+	std::vector<mvceditor::TagSearchCompleteClass> OutlinedTags;
 
 	/**
 	 * this pointer will be managed by the tree control, since the tree control
@@ -423,6 +392,11 @@ private:
 	 * handle the "filter" button click; show the menu to toogle different tags on or off
 	 */
 	void OnFilterLeftDown(wxMouseEvent& event);
+
+	/**
+	 * redaws the outline nodes based on the state of the various Show* flags.
+	 */
+	void RedrawOutline();
 
 	DECLARE_EVENT_TABLE()
 
