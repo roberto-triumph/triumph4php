@@ -269,6 +269,19 @@ void mvceditor::TagFeatureClass::OnWorkingCacheComplete(mvceditor::WorkingCacheC
 void mvceditor::TagFeatureClass::OnAppFileSaved(mvceditor::FileSavedEventClass& event) {
 	mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
 	if (codeControl && codeControl->GetDocumentMode() == mvceditor::CodeControlClass::PHP) {
+
+		// persist the resources to the "global" cache
+		// this is needed so that if the url detector is triggered while 
+		// a file is opened the url detector gets the latest resources
+		// do this before doing the working cache so that the global cache is up-to-date
+		// when the working cache finis5hes
+		wxString fileName = event.GetCodeControl()->GetFileName();
+		std::vector<mvceditor::ProjectClass>::const_iterator project;
+		
+		mvceditor::ProjectTagActionClass* tagAction = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
+		tagAction->InitForFile(App.Globals, fileName);
+		App.RunningThreads.Queue(tagAction);
+
 		UnicodeString text = codeControl->GetSafeText();
 
 		// we need to differentiate between new and opened files (the 'true' arg)
@@ -281,17 +294,7 @@ void mvceditor::TagFeatureClass::OnAppFileSaved(mvceditor::FileSavedEventClass& 
 			codeControl->IsNew(),
 			App.Globals.Environment.Php.Version);
 		App.RunningThreads.Queue(builder);
-	}
-
-	// persist the resources to the "global" cache
-	// this is needed so that if the url detector is triggered while 
-	// a file is opened the url detector gets the latest resources
-	wxString fileName = event.GetCodeControl()->GetFileName();
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	
-	mvceditor::ProjectTagActionClass* tagAction = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
-	tagAction->InitForFile(App.Globals, fileName);
-	App.RunningThreads.Queue(tagAction);
+	}	
 	event.Skip();
 }
 
