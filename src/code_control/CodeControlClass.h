@@ -45,11 +45,8 @@ namespace mvceditor {
 class TextDocumentClass;
 class TagCacheClass;
 
-
 /**
  * source code control with the following enhancements.
- * - Outside modification of a file: This code control will alert the user when the
- *   loaded file has been modified outside of the editor.
  * - PHP autocompletion of structures found in the current project.
  * - Displaying of PHP call tips
  * - "Word highlight" functionality; when user double clicks on a word then all
@@ -178,9 +175,14 @@ public:
 	/**
 	 * The filename of the file that is opened in this code control.
 	 *
-	 * @retrurn wxString the full path to the file that is shown by this control.
+	 * @return wxString the full path to the file that is shown by this control.
 	 */
 	wxString GetFileName() const;
+
+	/**
+	 * @retrurn wxDateTime the time the file was opened
+	 */
+	wxDateTime GetFileOpenedDateTime() const;
 
 	/**
 	 * Look for a new line character in order to auto indent
@@ -301,6 +303,18 @@ public:
 	wxString GetIdString() const;
 
 	/**
+	 * this method will 'untrack' a file; meaning that the editor will assume the file is not
+	 * yet in the file system and will ask the user to save the file when the file is closed.
+	 */
+	void TreatAsNew();
+
+	/**
+	 * update the control's opened time to the gven time.  this will make the file checking code ignore
+	 * any previous external modifications
+	 */
+	void UpdateOpenedDateTime(wxDateTime openedDateTime);
+
+	/**
 	 * The options to enable/disable various look & feel items
 	 *
 	 * @var CodeControlOptionsClass
@@ -402,7 +416,7 @@ private:
 	void OnContextMenu(wxContextMenuEvent& event);
 
 	/**
-	 * Check to see if file has been modified outside of the editor.
+	 * color the matching braces
 	 */
 	void OnIdle(wxIdleEvent& event);
 
@@ -497,14 +511,6 @@ private:
 	 * The SQL lexer has 5 bits, so the first indicator style will be 32 (2 ^ 5)
 	 */
 	int WordHighlightStyle;
-
-	/**
-	 * Detect when the 'Externally Modified' dialog is opened. In linux, the externally modified
-	 * dialog kept popping up indefinitely.
-	 *
-	 * @var bool
-	 */
-	bool ModifiedDialogOpen;
 
 	/**
 	 * TRUE if the user double clicked a word and that word is not highlighted.

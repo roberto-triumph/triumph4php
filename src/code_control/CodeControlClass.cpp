@@ -161,7 +161,6 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 		, WordHighlightPreviousIndex(-1)
 		, WordHighlightNextIndex(-1)
 		, WordHighlightStyle(0)
-		, ModifiedDialogOpen(false)
 		, WordHighlightIsWordHighlighted(false)
 		, DocumentMode(TEXT) 
 		, IsHidden(false) {
@@ -241,6 +240,15 @@ void mvceditor::CodeControlClass::LoadAndTrackFile(const wxString& fileName) {
 	}
 }
 
+void mvceditor::CodeControlClass::TreatAsNew() {
+	CurrentFilename = wxT("");
+	FileOpenedDateTime = wxDateTime::Now();
+}
+
+void mvceditor::CodeControlClass::UpdateOpenedDateTime(wxDateTime openedDateTime) {
+	FileOpenedDateTime = openedDateTime;
+}
+
 bool mvceditor::CodeControlClass::IsNew() const {
 	return CurrentFilename.empty();
 }
@@ -272,7 +280,7 @@ bool mvceditor::CodeControlClass::SaveAndTrackFile(wxString newFilename) {
 	}
 	if (saved) {
 
-		// when saving, update the internal timestamp so that the OnIdle logic works correctly
+		// when saving, update the internal timestamp so that the external mod check logic works correctly
 		wxFileName file(CurrentFilename);
 		FileOpenedDateTime = file.GetModificationTime();
 	}
@@ -281,6 +289,10 @@ bool mvceditor::CodeControlClass::SaveAndTrackFile(wxString newFilename) {
 
 wxString mvceditor::CodeControlClass::GetFileName() const {
 	return CurrentFilename;
+}
+
+wxDateTime mvceditor::CodeControlClass::GetFileOpenedDateTime() const {
+	return FileOpenedDateTime;
 }
 
 void mvceditor::CodeControlClass::SetSelectionAndEnsureVisible(int start, int end) {
@@ -827,55 +839,7 @@ UnicodeString mvceditor::CodeControlClass::GetSafeText() {
 }
 
 void mvceditor::CodeControlClass::OnIdle(wxIdleEvent& event) {
-	if (!IsNew() && !ModifiedDialogOpen) {
-		
-		// check to see if file has been removed or saved externally.
-		// careful, GetModificationTime requires the file to exist
-		wxFileName file(CurrentFilename);
-		wxDateTime modifiedDateTime;
-		bool exists = file.FileExists();
-		if (exists) {
-			modifiedDateTime = file.GetModificationTime();
-		}
-		if (!exists || modifiedDateTime.IsLaterThan(FileOpenedDateTime)) {
-			
-			ModifiedDialogOpen = true;
-			wxString message = CurrentFilename;
-			int opts = 0;
 
-			// check again, in case file was modified externally at the same time
-			// this code is running
-			exists = file.FileExists();
-			if (exists) {
-				message += _("\n\nFile has been modified externally. Reload file and lose any changes?\n");
-				message += _("Yes will reload file, No will allow you to override the file.");
-				opts = wxYES_NO | wxICON_QUESTION;
-			}
-			else {
-				message += _("\n\nFile has been deleted externally.\n");
-				message += _("You will need to save the file to store the contents.");
-				opts = wxICON_QUESTION;
-			}
-			int res = wxMessageBox(message, _("Warning"), 
-				opts, this);
-			if (wxYES == res && exists) {
-				LoadAndTrackFile(CurrentFilename);
-			}
-			else if (!exists) {
-
-				// so that next idle event user does not get asked the same question again
-				// since file does not exist, make it look like a new file
-				CurrentFilename = wxT("");
-			}
-			else {
-
-				// so that next idle event user does not get asked the same question again
-				FileOpenedDateTime = modifiedDateTime;
-			}
-			ModifiedDialogOpen = false;
-		}
-	}
-	
 	// moving match braces here from UpdateUi because when I put this code in UpdateUi there
 	// is a bad flicker in GTK when the braces are highlighted.
 	// Code folding seems to make the flicker appear all the time.

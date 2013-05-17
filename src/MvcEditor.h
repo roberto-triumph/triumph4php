@@ -29,6 +29,7 @@
 #include <globals/Events.h>
 #include <actions/GlobalsChangeHandlerClass.h>
 #include <actions/SequenceClass.h>
+#include <actions/FileModifiedCheckActionClass.h>
 #include <wx/app.h>
 #include <wx/event.h>
 #include <wx/string.h>
@@ -64,7 +65,13 @@ public:
 	 */
 	void Notify();
 
+private:
+
 	mvceditor::AppClass& App;
+
+	void OnConfigFileModified(mvceditor::FilesModifiedEventClass& event);
+
+	DECLARE_EVENT_TABLE()
 
 };
 
