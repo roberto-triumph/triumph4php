@@ -87,42 +87,6 @@ private:
 	std::vector<wxFileName> DirsToDelete;
 	
 };
-
-/**
- * action to remove only tags from a single file from the tag
- * databases. This action works on the working cache only. 
- */
-/*
-class TagCleanWorkingCacheActionClass : public mvceditor::GlobalActionClass {
-	
-public:
-
-	TagCleanWorkingCacheActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId, const wxString& fileToDelete);
-	
-	bool Init(mvceditor::GlobalsClass& globals);
-
-	wxString GetLabel() const;
-	
-protected:
-	
-	void BackgroundWork();
-	
-private:
-		
-	/**
-	 * The db file that needs to be cleaned up.
-	 * /
-	wxFileName WorkingTagDbFileName;
-
-	/**
-	 * the file to be removed from the cache. this is a string and not
-	 * a wxFileName because we may need to cleanup tags from a new buffer that
-	 * was never saved
-	 * /
-	wxString FileToDelete;
-	
-};
-*/
 }
 
 #endif
