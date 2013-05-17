@@ -19,74 +19,67 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2012 Roberto Perpuly
+ * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITORRESOUCEWIPEACTIONCLASS_H__
-#define __MVCEDITORRESOUCEWIPEACTIONCLASS_H__
+#ifndef __MVCEDITOR_FILEMODIFIEDCHECKFEATURECLASS_H__
+#define __MVCEDITOR_FILEMODIFIEDCHECKFEATURECLASS_H__
 
-#include <actions/GlobalActionClass.h>
-#include <wx/filename.h>
+#include <features/FeatureClass.h>
+#include <actions/FileModifiedCheckActionClass.h>
 
 namespace mvceditor {
 
 /**
- * Class to 'wipe' tag databases (empty all of their contents)
+ * A small feature that checks to see if any files that are currently
+ * opened have been externally modified and / or deleted. If so, we
+ * will prompt the reader to save and or reload them.
  */
-class TagWipeActionClass : public mvceditor::GlobalActionClass {
-	
+class FileModifiedCheckFeatureClass : public mvceditor::FeatureClass {
+
 public:
 
-	TagWipeActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
-	
-	bool Init(mvceditor::GlobalsClass& globals);
+	FileModifiedCheckFeatureClass(mvceditor::AppClass& app);
 
-	wxString GetLabel() const;
-	
-protected:
-	
-	void BackgroundWork();
-	
+
 private:
-		
+
 	/**
-	 * The db files that need to be wiped.
+	 * when the app starts then start the timer
 	 */
-	std::vector<wxFileName> ResourceDbFileNames;
-	
+	void OnAppReady(wxCommandEvent& event);
+
+	/**
+	 * when the app stops then stop the timer
+	 */
+	void OnAppExit(wxCommandEvent& event);
+
+	/**
+	 * when the timer is up then check for file modifications.
+	 */
+	void OnTimer(wxTimerEvent& event);
+
+	/**
+	 * prompt the user to reload modified files or save deleted files
+	 */
+	void OnFilesCheckComplete(mvceditor::FilesModifiedEventClass& event);
+
+	/**
+	 * prompt the user to reload modified files
+	 */
+	void OnFilesModified(mvceditor::FilesModifiedEventClass& event);
+
+	/**
+	 * prompt the user to save the deleted files
+	 */
+	void OnFilesDeleted(mvceditor::FilesModifiedEventClass& event);
+
+	wxTimer Timer;
+
+	DECLARE_EVENT_TABLE()
+
 };
 
-/**
- * action to remove only tags from certain directories from the tag
- * databases
- */
-class TagDeleteActionClass : public mvceditor::GlobalActionClass {
-	
-public:
-
-	TagDeleteActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId, const std::vector<wxFileName>& dirsToDelete);
-	
-	bool Init(mvceditor::GlobalsClass& globals);
-
-	wxString GetLabel() const;
-	
-protected:
-	
-	void BackgroundWork();
-	
-private:
-		
-	/**
-	 * The db files that need to be wiped.
-	 */
-	std::vector<wxFileName> ResourceDbFileNames;
-
-	/**
-	 * the directories to be removed from the cache.
-	 */
-	std::vector<wxFileName> DirsToDelete;
-	
-};
 }
 
 #endif

@@ -43,6 +43,7 @@
 #include <features/DetectorFeatureClass.h>
 #include <features/TemplateFilesFeatureClass.h>
 #include <features/ConfigFilesFeatureClass.h>
+#include <features/FileModifiedCheckFeatureClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 
@@ -75,6 +76,8 @@ public:
 
 }
 
+static int ID_EVENT_CONFIG_FILE_CHECK = wxNewId();
+
 mvceditor::AppClass::AppClass()
 	: wxApp()
 	, Globals()
@@ -99,6 +102,7 @@ bool mvceditor::AppClass::OnInit() {
 	Globals.Environment.Init();
 	Preferences.Init();
 	RunningThreads.AddEventHandler(&GlobalsChangeHandler);
+	RunningThreads.AddEventHandler(&Timer);
 	CreateFeatures();
 
 	// initialize the  mysql library
@@ -143,6 +147,7 @@ bool mvceditor::AppClass::OnInit() {
 mvceditor::AppClass::~AppClass() {
 	Timer.Stop();
 	RunningThreads.RemoveEventHandler(&GlobalsChangeHandler);
+	RunningThreads.RemoveEventHandler(&Timer);
 	DeleteFeatures();
 	
 	// calling cleanup here so that we can run this binary through a memory leak detector 
@@ -224,7 +229,9 @@ void mvceditor::AppClass::CreateFeatures() {
 	Features.push_back(feature);
 	feature = new ConfigFilesFeatureClass(*this);
 	Features.push_back(feature);
-	
+	feature = new FileModifiedCheckFeatureClass(*this);
+	Features.push_back(feature);
+
 	// TODO test feature need to find a quicker way to toggling it ON / OFF
 	//feature = new TestFeatureClass(*this);
 	//Features.push_back(feature);
@@ -288,6 +295,7 @@ void mvceditor::AppClass::UpdateConfigModifiedTime() {
 mvceditor::AppTimerClass::AppTimerClass(mvceditor::AppClass& app)
 	: wxTimer()
 	, App(app) {
+	SetOwner(this, ID_EVENT_CONFIG_FILE_CHECK);
 }
 
 void mvceditor::AppTimerClass::Notify() {
@@ -308,30 +316,53 @@ void mvceditor::AppTimerClass::Notify() {
 	else {
 		wxFileName configFileName(mvceditor::ConfigDirAsset().GetPath(), wxT("mvc-editor.ini"));
 		if (configFileName.FileExists()) {
-			wxDateTime lastModified = configFileName.GetModificationTime();
-			if (lastModified.IsLaterThan(App.ConfigLastModified)) {
+			mvceditor::FileModifiedCheckActionClass* action = 
+				new mvceditor::FileModifiedCheckActionClass(App.RunningThreads, ID_EVENT_CONFIG_FILE_CHECK);
+			std::vector<mvceditor::FileModifiedTimeClass> fileMods;
+			mvceditor::FileModifiedTimeClass fileMod;
+			fileMod.FileName = configFileName;
+			fileMod.ModifiedTime = App.ConfigLastModified;
+			fileMods.push_back(fileMod);
+			action->SetFiles(fileMods);
 
-				// stop the timer so that we dont show this prompt multiple times
-				App.Timer.Stop();
-				wxString msg = wxString::FromAscii(
-					"Preferences have been modified externally.\n"
-					"Reload the preferences?"	
-				);
-				msg = wxGetTranslation(msg);
-				int res = wxMessageBox(msg, _("Reload preferences"), wxCENTRE | wxYES_NO, App.MainFrame);
-				if (wxYES == res) {
-
-					// delete the old config ourselves
-					wxConfigBase* oldConfig = wxConfig::Get();
-					delete oldConfig;
-					wxConfig::Set(NULL);
-					App.Preferences.ClearAllShortcuts();
-					App.LoadPreferences();
-
-					App.ConfigLastModified = configFileName.GetModificationTime();
-				}
-				App.Timer.Start(1000, wxTIMER_CONTINUOUS);
-			}
+			App.RunningThreads.Queue(action);
 		}
 	}
 }
+
+void mvceditor::AppTimerClass::OnConfigFileModified(mvceditor::FilesModifiedEventClass& event) {
+
+	// stop the timer so that we dont show this prompt multiple times
+	App.Timer.Stop();
+	if (event.Modified.empty()) {
+		return;
+	}
+	wxFileName configFileName = event.Modified[0];
+	wxString msg = wxString::FromAscii(
+		"Preferences have been modified externally.\n"
+		"Reload the preferences?"	
+	);
+	msg = wxGetTranslation(msg);
+	int res = wxMessageBox(msg, _("Reload preferences"), wxCENTRE | wxYES_NO, App.MainFrame);
+	if (wxYES == res) {
+
+		// delete the old config ourselves
+		wxConfigBase* oldConfig = wxConfig::Get();
+		delete oldConfig;
+		wxConfig::Set(NULL);
+		App.Preferences.ClearAllShortcuts();
+		App.LoadPreferences();
+
+		App.ConfigLastModified = event.ModifiedTimes[0];
+	}
+	else {
+		
+		// update the time so that we dont continually ask the user the prompt
+		App.ConfigLastModified = event.ModifiedTimes[0];
+	}
+	App.Timer.Start(1000, wxTIMER_CONTINUOUS);
+}
+
+BEGIN_EVENT_TABLE(mvceditor::AppTimerClass, wxTimer)
+	EVT_FILES_EXTERNALLY_MODIFIED_COMPLETE(ID_EVENT_CONFIG_FILE_CHECK, mvceditor::AppTimerClass::OnConfigFileModified)
+END_EVENT_TABLE()
