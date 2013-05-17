@@ -614,7 +614,8 @@ UnicodeString mvceditor::TagFinderClass::ExtractParentClassFromSignature(const U
 					parentClassName.setTo(next, u_strlen(next));
 				}
 			}
-		} while (next = u_strtok_r(NULL, delims, &saveState));
+			next = u_strtok_r(NULL, delims, &saveState);
+		} while (next != NULL);
 	}
 	delete[] sig;
 	return parentClassName;
