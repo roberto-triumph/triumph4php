@@ -474,7 +474,9 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::AllMembers(const std
 		keyStart += "::";
 		keyStarts.push_back(keyStart);
 	}
-	matches = FindByKeyStartMany(keyStarts, fileTagIds, true);
+
+	// don't limit this query, we always want all members
+	matches = FindByKeyStartMany(keyStarts, fileTagIds, false);
 	return matches;
 }
 
@@ -867,7 +869,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::FindByKeyStartMany(c
 		InClause(fileTagIds, stream);
 		stream << ")";
 	}
-	return ResourceStatementMatches(stream.str(), true);
+	return ResourceStatementMatches(stream.str(), doLimit);
 }
 
 std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::All() {
