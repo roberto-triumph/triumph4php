@@ -62,7 +62,6 @@ static bool SortTagsByName(const mvceditor::TagClass& a, const mvceditor::TagCla
 }
 
 static bool SortTagsByTypeAndName(const mvceditor::TagClass& a, const mvceditor::TagClass& b) {
-	int ret = 0;
 	if (a.Type < b.Type) {
 		return true;
 	}
@@ -91,7 +90,7 @@ void mvceditor::TagSearchCompleteClass::Copy(const mvceditor::TagSearchCompleteC
 }
 
 bool mvceditor::TagSearchCompleteClass::IsLabelFileName() const {
-	return Label.find(wxT(".")) != wxNOT_FOUND;
+	return Label.Find(wxT(".")) != wxNOT_FOUND;
 }
 
 mvceditor::TagSearchCompleteEventClass::TagSearchCompleteEventClass(int eventId, 

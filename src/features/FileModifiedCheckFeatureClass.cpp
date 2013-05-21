@@ -25,6 +25,7 @@
 #include <features/FileModifiedCheckFeatureClass.h>
 #include <MvcEditor.h>
 #include <wx/choicdlg.h>
+#include <algorithm>
 
 static int ID_FILE_MODIFIED_CHECK = wxNewId();
 
