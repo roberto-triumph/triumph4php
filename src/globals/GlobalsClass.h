@@ -220,6 +220,27 @@ public:
 	bool HasAPhpExtension(const wxString& fullPath) const;
 
 	/**
+	 * @return TRUE if given full path is a SQL file, as determined only by
+	 * the sql file extensions wilcard. This method will return TRUE 
+	 * for sql files that are NOT in a project.
+	 */
+	bool HasASqlExtension(const wxString& fullPath) const;
+
+	/**
+	 * @return TRUE if given full path is a CSS file, as determined only by
+	 * the css file extensions wilcard. This method will return TRUE 
+	 * for css files that are NOT in a project.
+	 */
+	bool HasACssExtension(const wxString& fullPath) const;
+
+	/**
+	 * @return TRUE if given full path is a misc file, as determined only by
+	 * the misc file extensions wilcard. This method will return TRUE 
+	 * for misc files that are NOT in a project.
+	 */
+	bool HasAMiscExtension(const wxString& fullPath) const;
+
+	/**
 	 * removes the source directory from the given full path.
 	 * Examples
 	 * source RootDirectory = /home/roberto/

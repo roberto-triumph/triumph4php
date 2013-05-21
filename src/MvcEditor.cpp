@@ -44,6 +44,7 @@
 #include <features/TemplateFilesFeatureClass.h>
 #include <features/ConfigFilesFeatureClass.h>
 #include <features/FileModifiedCheckFeatureClass.h>
+#include <features/ExplorerFeatureClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 
@@ -137,7 +138,7 @@ bool mvceditor::AppClass::OnInit() {
 		// this line is needed so that we get all the wxLogXXX messages
 		// pointer will be managed by wxWidgets
 		// need to put this here because the logger needs an initialized window state
-		wxLog::SetActiveTarget(new mvceditor::EditorMessagesLoggerClass(*EditorMessagesFeature));
+		///wxLog::SetActiveTarget(new mvceditor::EditorMessagesLoggerClass(*EditorMessagesFeature));
 		Timer.Start(1000, wxTIMER_CONTINUOUS);
 		return true;
 	}
@@ -230,6 +231,8 @@ void mvceditor::AppClass::CreateFeatures() {
 	feature = new ConfigFilesFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new FileModifiedCheckFeatureClass(*this);
+	Features.push_back(feature);
+	feature = new ExplorerFeatureClass(*this);
 	Features.push_back(feature);
 
 	// TODO test feature need to find a quicker way to toggling it ON / OFF

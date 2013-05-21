@@ -57,11 +57,6 @@ public:
 	void AddFileMenuItems(wxMenu* fileMenu);
 
 	/**
-	 * Add items to the toolbar
-	 */
-	void AddToolBarItems(wxAuiToolBar* toolbar);
-
-	/**
 	 * Add a preference sheet for the user to enter the explorer executable.
 	 */
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
@@ -71,8 +66,6 @@ public:
 	 */
 	void LoadPreferences(wxConfigBase* config);
 
-	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
-
 private:
 
 	/**
@@ -81,18 +74,6 @@ private:
 	void OnPreferencesSaved(wxCommandEvent& event);
 
 	void OnPreferencesExternallyUpdated(wxCommandEvent& event);
-
-	/**
-	 * Handler for the Project .. Explore menu 
-	 * @param wxCommandEvent& event 
-	 */
-	void OnProjectExplore(wxCommandEvent& event);
-
-	/**
-	 * Handler for the Project .. Explore Open File menu 
-	 * @param wxCommandEvent& event 
-	 */
-	void OnProjectExploreOpenFile(wxCommandEvent& event);
 
 	/**
 	 * close all projects and all resources that depend on it

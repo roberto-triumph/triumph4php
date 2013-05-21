@@ -57,24 +57,6 @@ mvceditor::ProjectFeatureClass::~ProjectFeatureClass() {
 
 void mvceditor::ProjectFeatureClass::AddFileMenuItems(wxMenu* fileMenu) {
 	fileMenu->Append(mvceditor::MENU_PROJECT + 3, _("Projects"), _("Add additional source directories to the current project"), wxITEM_NORMAL);
-	fileMenu->Append(mvceditor::MENU_PROJECT + 1, _("Explore"), _("Open An explorer window in the Project Root"), wxITEM_NORMAL);
-	fileMenu->Append(mvceditor::MENU_PROJECT + 2, _("Explore Open File"), _("Open An explorer window in the currently opened file"), wxITEM_NORMAL);
-}
-
-
-void mvceditor::ProjectFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
-	std::map<int, wxString> menuItemIds;
-	menuItemIds[mvceditor::MENU_PROJECT + 1] = wxT("Project-Explore");
-	menuItemIds[mvceditor::MENU_PROJECT + 2] = wxT("Project-Explore File");
-	AddDynamicCmd(menuItemIds, shortcuts);
-}
-
-void mvceditor::ProjectFeatureClass::AddToolBarItems(wxAuiToolBar* toolbar) {
-	wxBitmap bmp = mvceditor::IconImageAsset(wxT("explore"));
-	wxBitmap bmpOpen = mvceditor::IconImageAsset(wxT("explore-open-document"));
-
-	toolbar->AddTool(mvceditor::MENU_PROJECT + 1, _("Explore"), bmp, _("Open An explorer window in the Project Root"));
-	toolbar->AddTool(mvceditor::MENU_PROJECT + 2, _("Explore Open File"), bmpOpen, _("Open An explorer window in the currently opened file"));
 }
 
 void mvceditor::ProjectFeatureClass::LoadPreferences(wxConfigBase* config) {
@@ -179,44 +161,6 @@ void mvceditor::ProjectFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 void mvceditor::ProjectFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 	ProjectPreferencesPanelClass* panel = new ProjectPreferencesPanelClass(parent, *this);
 	parent->AddPage(panel, wxT("Project"));
-}
-
-void mvceditor::ProjectFeatureClass::OnProjectExplore(wxCommandEvent& event) {
-	std::vector<mvceditor::SourceClass> enabledSources = App.Globals.AllEnabledSources();
-	if (!enabledSources.empty()) {
-		wxFileName dir = enabledSources[0].RootDirectory;
-		wxString cmd;
-		cmd += ExplorerExecutable;
-		cmd += wxT(" \"");
-		cmd += dir.GetPath();
-		cmd += wxT("\"");
-		long result = wxExecute(cmd);
-		if (!result) {
-			mvceditor::EditorLogError(mvceditor::ERR_BAD_EXPLORER_EXCUTABLE, cmd);
-		}
-	}
-	else {
-		wxMessageBox(_("Need to define a project first in order for Explore to work."), _("Project Explore"));
-	}
-}
-
-void mvceditor::ProjectFeatureClass::OnProjectExploreOpenFile(wxCommandEvent& event) {
-	CodeControlClass* code = GetCurrentCodeControl();
-	if (code != NULL && !code->GetFileName().IsEmpty()) {
-		wxFileName fileName(code->GetFileName());
-		wxString cmd;
-		cmd += ExplorerExecutable;
-		cmd += wxT(" \"");
-		cmd += fileName.GetPath();
-		cmd += wxT("\"");
-		long result = wxExecute(cmd);
-		if (!result) {
-			mvceditor::EditorLogError(mvceditor::ERR_BAD_EXPLORER_EXCUTABLE, cmd);
-		}
-	}
-	else {
-		wxMessageBox(_("Need to open a file first."), _("Project Explore"));
-	}
 }
 
 void mvceditor::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
@@ -728,8 +672,6 @@ void mvceditor::ProjectListDialogClass::OnHelpButton(wxCommandEvent& event) {
 }
 
 BEGIN_EVENT_TABLE(mvceditor::ProjectFeatureClass, wxEvtHandler)
-	EVT_MENU(mvceditor::MENU_PROJECT + 1, mvceditor::ProjectFeatureClass::OnProjectExplore)
-	EVT_MENU(mvceditor::MENU_PROJECT + 2, mvceditor::ProjectFeatureClass::OnProjectExploreOpenFile)
 	EVT_MENU(mvceditor::MENU_PROJECT + 3, mvceditor::ProjectFeatureClass::OnProjectDefine)
 
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::ProjectFeatureClass::OnPreferencesSaved)

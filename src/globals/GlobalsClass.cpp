@@ -163,6 +163,42 @@ bool mvceditor::GlobalsClass::HasAPhpExtension(const wxString& fullPath) const {
 	return found;
 }
 
+bool mvceditor::GlobalsClass::HasASqlExtension(const wxString& fullPath) const {
+	std::vector<wxString> wildcards = GetSqlFileExtensions();
+	bool found = false;
+	for (size_t i = 0; i < wildcards.size(); ++i) {
+		if (wxMatchWild(wildcards[i], fullPath)) {
+			found = true;
+			break;
+		}
+	}
+	return found;
+}
+
+bool mvceditor::GlobalsClass::HasACssExtension(const wxString& fullPath) const {
+	std::vector<wxString> wildcards = GetCssFileExtensions();
+	bool found = false;
+	for (size_t i = 0; i < wildcards.size(); ++i) {
+		if (wxMatchWild(wildcards[i], fullPath)) {
+			found = true;
+			break;
+		}
+	}
+	return found;
+}
+
+bool mvceditor::GlobalsClass::HasAMiscExtension(const wxString& fullPath) const {
+	std::vector<wxString> wildcards = GetMiscFileExtensions();
+	bool found = false;
+	for (size_t i = 0; i < wildcards.size(); ++i) {
+		if (wxMatchWild(wildcards[i], fullPath)) {
+			found = true;
+			break;
+		}
+	}
+	return found;
+}
+
 wxString mvceditor::GlobalsClass::RelativeFileName(const wxString &fullPath, wxString& projectLabel) const {
 	wxString relativeName;
 	std::vector<mvceditor::ProjectClass>::const_iterator it;
