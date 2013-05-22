@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <actions/FileModifiedCheckActionClass.h>
-
+#include <globals/FileName.h>
 
 mvceditor::FileModifiedTimeClass::FileModifiedTimeClass()
 : FileName()
@@ -37,27 +37,28 @@ mvceditor::FileModifiedTimeClass::FileModifiedTimeClass(const mvceditor::FileMod
 	Copy(src);
 }
 
+void mvceditor::FileModifiedTimeClass::Copy(const mvceditor::FileModifiedTimeClass& src) {	
+	
+	// make these copies thread-safe
+	FileName = mvceditor::FileNameCopy(src.FileName);
+	ModifiedTime = src.ModifiedTime;
+}
+
 mvceditor::FilesModifiedEventClass::FilesModifiedEventClass(int eventId, const std::vector<wxFileName>& modified, 
 															const std::vector<wxDateTime>& modifiedTimes,
 															const std::vector<wxFileName>& deleted)
 : wxEvent(eventId, mvceditor::EVENT_FILES_EXTERNALLY_MODIFIED)
-, Modified(modified)
-, ModifiedTimes(modifiedTimes)
-, Deleted(deleted) {
-	
+, Modified()
+, ModifiedTimes()
+, Deleted() {
+	Modified = mvceditor::DeepCopyFileNames(modified);
+	ModifiedTimes = modifiedTimes;
+	Deleted =  mvceditor::DeepCopyFileNames(deleted);
 }
 
 wxEvent* mvceditor::FilesModifiedEventClass::Clone() const {
 	return new mvceditor::FilesModifiedEventClass(GetId(), Modified, ModifiedTimes, Deleted);
 }
-
-void mvceditor::FileModifiedTimeClass::Copy(const mvceditor::FileModifiedTimeClass& src) {	
-	
-	// make these copies thread-safe
-	FileName.Assign(src.FileName.GetFullPath());
-	ModifiedTime = src.ModifiedTime;
-}
-
 
 mvceditor::FileModifiedCheckActionClass::FileModifiedCheckActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
 : ActionClass(runningThreads, eventId)

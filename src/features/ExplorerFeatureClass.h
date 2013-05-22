@@ -208,7 +208,7 @@ public:
 	wxString Error;
 
 	ExplorerEventClass(int eventId, const wxFileName& dir, const std::vector<wxFileName>& files, 
-		const std::vector<wxFileName>& subDirs);
+		const std::vector<wxFileName>& subDirs, const wxString& error);
 
 	wxEvent* Clone() const;
 };

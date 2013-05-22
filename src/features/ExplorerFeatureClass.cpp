@@ -26,11 +26,39 @@
 #include <features/ExplorerFeatureClass.h>
 #include <globals/Assets.h>
 #include <globals/Events.h>
+#include <globals/FileName.h>
 #include <MvcEditor.h>
+#include <algorithm>
 
 static int ID_EXPLORER_PANEL = wxNewId();
 static int ID_EXPLORER_LIST_ACTION = wxNewId();
 static int ID_EXPLORER_REPORT_ACTION = wxNewId();
+
+/**
+ * comparator function that compares 2 filenames by using the full name
+ * only (wxFileName::GetFullName())
+ */
+static bool FileNameCmp(const wxFileName& a, const wxFileName& b) {
+	wxString aName = a.GetFullName();
+	wxString bName = b.GetFullName();
+	return aName.compare(bName) < 0;
+}
+
+/**
+ * comparator function that compares 2 filenames by using the full name
+ * only (wxFileName::GetDirs().Last())
+ */
+static bool DirNameCmp(const wxFileName& a, const wxFileName& b) {
+	if (a.GetDirCount() == 0) {
+		return true;
+	}
+	if (b.GetDirCount() == 0) {
+		return false;
+	}
+	wxString aName = a.GetDirs().Last();
+	wxString bName = b.GetDirs().Last();
+	return aName.compare(bName) < 0;
+}
 
 mvceditor::ExplorerFeatureClass::ExplorerFeatureClass(mvceditor::AppClass& app) 
 	: FeatureClass(app) {
@@ -66,6 +94,7 @@ void mvceditor::ExplorerFeatureClass::OnProjectExplore(wxCommandEvent& event) {
 	}
 	else {
 		panel = (mvceditor::ModalExplorerPanelClass*)window;
+		SetFocusToToolsWindow(panel);
 	}
 	
 	// TODO show all projects? or a list
@@ -92,6 +121,7 @@ void mvceditor::ExplorerFeatureClass::OnProjectExploreOpenFile(wxCommandEvent& e
 	}
 	else {
 		panel = (mvceditor::ModalExplorerPanelClass*)window;
+		SetFocusToToolsWindow(panel);
 	}
 	wxFileName fileName(openFile);
 	wxFileName dir;
@@ -393,18 +423,22 @@ void mvceditor::ModalExplorerPanelClass::OnReportItemActivated(wxListEvent& even
 }
 
 mvceditor::ExplorerEventClass::ExplorerEventClass(int eventId, const wxFileName& dir, const std::vector<wxFileName>& files, 
-												  const std::vector<wxFileName>& subDirs)
+												  const std::vector<wxFileName>& subDirs, const wxString& error)
 : wxEvent(eventId, mvceditor::EVENT_EXPLORER)
-, Dir(dir)
-, Files(files)
-, SubDirs(subDirs)
+, Dir()
+, Files()
+, SubDirs()
 , Error() {
-
+	
+	// clone filenames they contain wxStrings; no thread-safe
+	Dir = mvceditor::FileNameCopy(dir);
+	Files = mvceditor::DeepCopyFileNames(files);
+	SubDirs = mvceditor::DeepCopyFileNames(subDirs);
+	Error = Error.c_str();
 }
 
 wxEvent* mvceditor::ExplorerEventClass::Clone() const {
-	mvceditor::ExplorerEventClass* event = new mvceditor::ExplorerEventClass(GetId(), Dir, Files, SubDirs);
-	event->Error = Error;
+	mvceditor::ExplorerEventClass* event = new mvceditor::ExplorerEventClass(GetId(), Dir, Files, SubDirs, Error);
 	return event;
 }
 
@@ -420,7 +454,7 @@ wxString mvceditor::ExplorerFileSystemActionClass::GetLabel() const {
 }
 
 void mvceditor::ExplorerFileSystemActionClass::Directory(const wxFileName& dir, bool doHidden) {
-	Dir = dir;
+	Dir = mvceditor::FileNameCopy(dir);
 	DoHidden = doHidden;
 }
 
@@ -466,10 +500,11 @@ void mvceditor::ExplorerFileSystemActionClass::BackgroundWork() {
 		}
 	}
 	if (!IsCancelled()) {
+		std::sort(files.begin(), files.end(), FileNameCmp);
+		std::sort(subDirs.begin(), subDirs.end(), DirNameCmp);
 
 		// PostEvent() will set the correct ID
-		mvceditor::ExplorerEventClass evt(wxID_ANY, Dir, files, subDirs);
-		evt.Error = error;
+		mvceditor::ExplorerEventClass evt(wxID_ANY, Dir, files, subDirs, error);
 		PostEvent(evt);
 	}
 }
