@@ -149,9 +149,11 @@ void mvceditor::ExplorerFeatureClass::OnExplorerReportComplete(mvceditor::Explor
 
 mvceditor::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, mvceditor::AppClass& app)
 : ModalExplorerGeneratedPanel(parent, id) 
-, App(app) 
 , CurrentListDir()
-, CurrentReportDir() {
+, CurrentReportDir() 
+, ListImageList(NULL)
+, ReportImageList(NULL)
+, App(app) {
 	ListImageList = new wxImageList(16, 16);
 	ListImageList->Add(mvceditor::IconImageAsset(wxT("folder-horizontal")));
 	ListImageList->Add(mvceditor::IconImageAsset(wxT("arrow-up")));
@@ -221,7 +223,6 @@ void mvceditor::ModalExplorerPanelClass::OnListItemActivated(wxListEvent& event)
 }
 
 void mvceditor::ModalExplorerPanelClass::OnListItemSelected(wxListEvent& event) {
-	long index = event.GetIndex();
 	wxString text = event.GetText();
 	if (text == wxT("..")) {
 		return;
