@@ -130,23 +130,28 @@ bool mvceditor::ProjectClass::IsAPhpSourceFile(const wxString& fullPath) const {
 bool mvceditor::ProjectClass::IsASourceFile(const wxString& fullPath) const {
 	bool matches = false;
 
-	// first do a directotry check  only. since AllSources() clones the 
+	// first do a directory check  only. since AllSources() clones the 
 	// Sources list; it can be expensive due to regex re-compilation of the
 	// wildcards. for performance, we make sure that the file in question
 	// is definitely in the sources before we copy the sources list
-	for (size_t i = 0; i < Sources.size() && !matches; ++i) {
-		for (size_t i = 0; i < Sources.size() && !matches; ++i) {
-			matches = Sources[i].IsInRootDirectory(fullPath);
-		}
+	std::vector<mvceditor::SourceClass>::const_iterator source;
+	for (source = Sources.begin(); source < Sources.end() && !matches; ++source) {
+		matches = source->IsInRootDirectory(fullPath);
 	}
 	if (matches) {
 		matches = false;
 
 		// a file is considered a file if its in a source directory and it matches
 		// any of the recognized file extensions
-		std::vector<mvceditor::SourceClass> allSources = AllSources();
-		for (size_t i = 0; i < allSources.size() && !matches; ++i) {
-			matches = allSources[i].Contains(fullPath);
+		std::vector<wxString> allExtensions;
+		allExtensions.insert(allExtensions.end(), CssFileExtensions.begin(), CssFileExtensions.end());
+		allExtensions.insert(allExtensions.end(), MiscFileExtensions.begin(), MiscFileExtensions.end());
+		allExtensions.insert(allExtensions.end(), PhpFileExtensions.begin(), PhpFileExtensions.end());
+		allExtensions.insert(allExtensions.end(), SqlFileExtensions.begin(), SqlFileExtensions.end());
+
+		std::vector<wxString>::const_iterator s;
+		for (s = allExtensions.begin(); !matches && s != allExtensions.end(); ++s) {
+			matches = wxMatchWild(*s, fullPath);
 		}
 	}
 	return matches;
