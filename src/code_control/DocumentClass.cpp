@@ -719,7 +719,8 @@ void mvceditor::PhpDocumentClass::HandleCallTip(wxChar ch, bool force) {
 				constructorResourceSearch += wxT("::");
 
 				// TODO: get class hierarchy
-				std::vector<mvceditor::TagClass> matches = Globals->TagCache.NearMatchTags(mvceditor::WxToIcu(constructorResourceSearch));
+				std::vector<wxFileName> dirs;
+				std::vector<mvceditor::TagClass> matches = Globals->TagCache.NearMatchTags(mvceditor::WxToIcu(constructorResourceSearch), dirs);
 				for (size_t i = 0; i < matches.size(); ++i) {
 					mvceditor::TagClass res = matches[i];
 					if (mvceditor::TagClass::METHOD == res.Type && UNICODE_STRING_SIMPLE("__construct") == res.Identifier) {

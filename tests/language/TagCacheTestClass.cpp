@@ -79,7 +79,8 @@ public:
 	}
 
 	void NearMatchTags(const UnicodeString& search) {
-		Matches = TagCache.NearMatchTags(search);
+		std::vector<wxFileName> dirs;
+		Matches = TagCache.NearMatchTags(search, dirs);
 	}
 
 	mvceditor::WorkingCacheClass* CreateWorkingCache(const wxString& fileName, const UnicodeString& code) {

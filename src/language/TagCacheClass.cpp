@@ -214,9 +214,10 @@ void mvceditor::TagCacheClass::RegisterGlobal(mvceditor::GlobalCacheClass* cache
 	GlobalCache = cache;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::ExactTags(const UnicodeString& search) {
+std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::ExactTags(const UnicodeString& search, const std::vector<wxFileName>& searchDirs) {
 	std::vector<mvceditor::TagClass> matches;
 	mvceditor::TagSearchClass tagSearch(search);
+	tagSearch.SetDirs(searchDirs);
 	
 
 	// return all of the matches from all finders that were found by the Collect* call.
@@ -236,9 +237,10 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::ExactTags(const Unico
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::NearMatchTags(const UnicodeString& search) {
+std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::NearMatchTags(const UnicodeString& search, const std::vector<wxFileName>& searchDirs) {
 	std::vector<mvceditor::TagClass> matches;
 	mvceditor::TagSearchClass tagSearch(search);
+	tagSearch.SetDirs(searchDirs);
 
 	// return all of the matches from all finders that were found by the Collect* call.
 	// This is a bit tricky because we want to prioritize matches in opened files 

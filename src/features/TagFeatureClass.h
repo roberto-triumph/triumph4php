@@ -30,6 +30,7 @@
 #include <features/BackgroundFileReaderClass.h>
 #include <search/TagFinderClass.h>
 #include <actions/ProjectTagActionClass.h>
+#include <actions/TagCacheSearchActionClass.h>
 #include <code_control/ResourceCacheBuilderClass.h>
 #include <widgets/GaugeDialogClass.h>
 #include <wx/string.h>
@@ -51,25 +52,7 @@ public:
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 	
 	void AddCodeControlClassContextMenuItems(wxMenu* menu);
-	
-	/**
-	 * Searches for a file that matches the given text. 
-	 * This wont be a straight equals search; it will be a "near match"
-	 * as defined by ParsedTagFinderClass::CollectNearMathResources()
-	 * when the given text is more than 2 characters long, and will
-	 * be an exact search as defined by CollectFullyQualifiedResources when the 
-	 * text is 2 characters long
-	 * This method assumes that index is up-to-date.
-
-	 * @param text search string to query for
-	 * @param projects matches from these projects will be kept; all others will be erased.
-	 *        this method will not own the project pointers
-	 * @return the matching resources
-	 * @see ParsedTagFinderClass::CollectNearMacthResources
-	 * @see ParsedTagFinderClass::CollectFullyQualifiedResources
-	 */
-	std::vector<mvceditor::TagClass> SearchForResources(const wxString& text, std::vector<mvceditor::ProjectClass*> projects);
-	
+		
 	/**
 	 * @param wxString full path to the file that will be opened.
 	 */
@@ -147,6 +130,12 @@ private:
 	void OnAppFileOpened(wxCommandEvent& event);
 
 	/**
+	 * when the tag cache has been searched, display the matching tags in the dialog so that
+	 * the user can choose which to open
+	 */
+	void OnTagCacheSearchComplete(mvceditor::TagCacheSearchCompleteEventClass& event);
+
+	/**
 	 * when a 'jump to tag' is done and we need to index a project, we
 	 * need to keep the search string so that after indexing we can
 	 * search the index.
@@ -178,6 +167,9 @@ private:
 	DECLARE_EVENT_TABLE()
 };
 
+/**
+ * the tag searching will be done in a background thread.
+ */
 class TagSearchDialogClass : public TagSearchDialogGeneratedClass {
 public:
 
@@ -190,7 +182,9 @@ public:
 	TagSearchDialogClass(wxWindow* parent, 
 		TagFeatureClass& tag, wxString& term, 
 		std::vector<mvceditor::TagClass>& chosenResources);
-		
+	
+	~TagSearchDialogClass();
+
 	/**
 	 * @param text to place in the search text
 	 * @param matches to place in the results list
@@ -232,16 +226,45 @@ protected:
 private:
 
 	/**
+	 * Handle the results of the tag lookups.
+	 */
+	void ShowJumpToResults(const wxString& finderQuery, const std::vector<mvceditor::TagClass>& matches);
+
+	/**
+	 * *STARTS* a search for a file that matches the given text. 
+	 * This wont be a straight equals search; it will be a "near match"
+	 * as defined by ParsedTagFinderClass::CollectNearMathResources()
+	 * when the given text is more than 2 characters long, and will
+	 * be an exact search as defined by CollectFullyQualifiedResources when the 
+	 * text is 2 characters long
+	 * This method assumes that index is up-to-date.
+
+	 * @param text search string to query for
+	 * @param projects matches from these projects will be kept; all others will be erased.
+	 *        this method will not own the project pointers
+	 * @return the matching resources
+	 * @see ParsedTagFinderClass::CollectNearMacthResources
+	 * @see ParsedTagFinderClass::CollectFullyQualifiedResources
+	 */
+	void SearchForResources(const wxString& text, std::vector<mvceditor::ProjectClass*> projects);
+
+	/**
+	 * when the timer completes, perform the search
+	 */
+	void OnTimerComplete(wxTimerEvent& event);
+
+	/**
+	 * when the tag cache has been searched, display the matching tags in the dialog so that
+	 * the user can choose which to open
+	 */
+	void OnTagCacheSearchComplete(mvceditor::TagCacheSearchCompleteEventClass& event);
+
+	/**
 	 * The tag feature reference.  The dialog will use this reference to actually perform the search.
 	 * 
 	 * @var TagFeatureClass
 	 */
 	TagFeatureClass& ResourceFeature;
-
-	/**
-	 * Handle the results of the tag lookups.
-	 */
-	void ShowJumpToResults(const wxString& finderQuery, const std::vector<mvceditor::TagClass>& matches);
 
 	/**
 	 * List that will get populated with the files to be opened. These are the
@@ -253,6 +276,26 @@ private:
 	 * results of the most recent search
 	 */
 	std::vector<mvceditor::TagClass> MatchedResources;
+
+	/**
+	 * we use a timer to see when the user has stopped typing. on a keypress,
+	 * we start a timer (if it hasn't already been started).
+	 */
+	wxTimer Timer;
+
+	/**
+	 * the last search input. when the timer is up, if the text contents have
+	 * changed we actually perform the search
+	 */
+	wxString LastInput;
+
+	/**
+	 * we will cancel an action if the user has changed input, that way the always see
+	 * results for the most recent search
+	 */
+	int ActionId;
+
+	DECLARE_EVENT_TABLE()
 };
 
 }

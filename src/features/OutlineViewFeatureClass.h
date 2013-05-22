@@ -37,7 +37,7 @@ namespace mvceditor {
 /**
  * grouping of a tag and its member tags.
  */
-class TagSearchCompleteClass {
+class OutlineSearchCompleteClass {
 
 public:
 
@@ -45,11 +45,11 @@ public:
 
 	std::map<wxString, std::vector<mvceditor::TagClass> > Tags;
 
-	TagSearchCompleteClass();
+	OutlineSearchCompleteClass();
 
-	TagSearchCompleteClass(const mvceditor::TagSearchCompleteClass& src);
+	OutlineSearchCompleteClass(const mvceditor::OutlineSearchCompleteClass& src);
 
-	void Copy(const mvceditor::TagSearchCompleteClass& src);
+	void Copy(const mvceditor::OutlineSearchCompleteClass& src);
 
 	bool IsLabelFileName() const;
 };
@@ -58,39 +58,39 @@ public:
  * event that is generated when a tag query is completed.  this event
  * contains the results of the search.
  */
-class TagSearchCompleteEventClass : public wxEvent {
+class OutlineSearchCompleteEventClass : public wxEvent {
         
         public:
         
         /**
          * Will contain all of the resulting tags.
          */
-        std::vector<mvceditor::TagSearchCompleteClass> Tags;
+        std::vector<mvceditor::OutlineSearchCompleteClass> Tags;
         
-        TagSearchCompleteEventClass(int eventId, const std::vector<mvceditor::TagSearchCompleteClass>& tags);
+        OutlineSearchCompleteEventClass(int eventId, const std::vector<mvceditor::OutlineSearchCompleteClass>& tags);
         
         wxEvent* Clone() const;
         
 };
 
-extern const wxEventType EVENT_TAG_SEARCH_COMPLETE;
+extern const wxEventType EVENT_OUTLINE_SEARCH_COMPLETE;
 
-typedef void (wxEvtHandler::*TagSearchCompleteEventClassFunction)(TagSearchCompleteEventClass&);
+typedef void (wxEvtHandler::*OutlineSearchCompleteEventClassFunction)(OutlineSearchCompleteEventClass&);
 
-#define EVENT_TAG_SEARCH_COMPLETE(id, fn) \
-        DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_TAG_SEARCH_COMPLETE, id, -1, \
+#define EVENT_OUTLINE_SEARCH_COMPLETE(id, fn) \
+        DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_OUTLINE_SEARCH_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( TagSearchCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent( OutlineSearchCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
 
 /**
  * class that will execute a query against the tag cache in the background.
  * the results will be posted in an event.
  */
-class TagCacheSearchActionClass : public mvceditor::ActionClass {
+class OutlineTagCacheSearchActionClass : public mvceditor::ActionClass {
 	
 public:
 
-	TagCacheSearchActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	OutlineTagCacheSearchActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
 	 * set the search parameters.  this should be called before the action is
@@ -177,7 +177,7 @@ private:
 	/**
 	 * once tag searching finishes, update the tree control
 	 */
-	void OnTagSearchComplete(mvceditor::TagSearchCompleteEventClass& event);
+	void OnTagSearchComplete(mvceditor::OutlineSearchCompleteEventClass& event);
 	
 	DECLARE_EVENT_TABLE()
 };
@@ -208,7 +208,7 @@ class OutlineViewPanelClass : public OutlineViewGeneratedPanelClass {
 	 * adds the given tags to the outline tree, under a node that has the name of the file
 	 * as its name
 	 */
-	void AddTagsToOutline(const std::vector<mvceditor::TagSearchCompleteClass>& tags);
+	void AddTagsToOutline(const std::vector<mvceditor::OutlineSearchCompleteClass>& tags);
 
 	 /**
 	  * @param fullPath file to remove from the outline tre
@@ -262,7 +262,7 @@ private:
 	/**
 	 * these are the things that have been outlined.
 	 */
-	std::vector<mvceditor::TagSearchCompleteClass> OutlinedTags;
+	std::vector<mvceditor::OutlineSearchCompleteClass> OutlinedTags;
 
 	/**
 	 * this pointer will be managed by the tree control, since the tree control

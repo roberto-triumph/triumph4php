@@ -302,9 +302,10 @@ public:
 	 * on each tag finder).
 	 * @see mvceditor::TagFinderClass::ExactTags
 	 * @param search string to search for
+	 * @param searchDirs directories to restrict matching tags in. If empty, then the entire cache will be searched.
 	 * @return std::vector<mvceditor::TagClass> matched resources 
 	 */
-	std::vector<mvceditor::TagClass> ExactTags(const UnicodeString& search);
+	std::vector<mvceditor::TagClass> ExactTags(const UnicodeString& search, const std::vector<wxFileName>& searchDirs);
 	
 	/**
 	 * Searches all the registered caches (working AND global caches)
@@ -313,9 +314,10 @@ public:
 	 *
 	 * @see mvceditor::TagFinderClass::NearMatchTags
 	 * @param string to search for
+	 * @param searchDirs directories to restrict matching tags in. If empty, then the entire cache will be searched.
 	 * @return std::vector<mvceditor::TagClass> matched resources
 	 */
-	std::vector<mvceditor::TagClass> NearMatchTags(const UnicodeString& search);
+	std::vector<mvceditor::TagClass> NearMatchTags(const UnicodeString& search, const std::vector<wxFileName>& searchDirs);
 
 	/**
 	 * Searches all the registered caches (working AND global caches)

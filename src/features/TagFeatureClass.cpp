@@ -27,12 +27,15 @@
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 #include <globals/Events.h>
-#include <globals/TagList.h>
 #include <actions/TagWipeActionClass.h>
+#include <globals/TagList.h>
 #include <MvcEditor.h>
 #include <wx/artprov.h>
 #include <wx/filename.h>
 #include <wx/valgen.h>
+
+static int ID_EVENT_TAG_CACHE_SEARCH = wxNewId();
+static int ID_SEARCH_TIMER = wxNewId();
 
 mvceditor::TagFeatureClass::TagFeatureClass(mvceditor::AppClass& app)
 	: FeatureClass(app)
@@ -64,24 +67,6 @@ void mvceditor::TagFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 
 void mvceditor::TagFeatureClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
 	menu->Append(mvceditor::MENU_RESOURCE + 3, _("Jump To Source"));
-}
-
-std::vector<mvceditor::TagClass> mvceditor::TagFeatureClass::SearchForResources(const wxString& text, std::vector<mvceditor::ProjectClass*> projects) {
-	std::vector<mvceditor::TagClass> matches;
-	bool exactOnly = text.Length() <= 2;
-	if (exactOnly) {
-		matches = App.Globals.TagCache.ExactTags(mvceditor::WxToIcu(text));
-	}
-	else {
-		matches = App.Globals.TagCache.NearMatchTags(mvceditor::WxToIcu(text));
-	}
-
-	// no need to show jump to results for native functions
-	// TODO: NearMatchTags shows resources from files that were recently deleted
-	// need to hide them / remove them
-	mvceditor::TagListRemoveNativeMatches(matches);
-	mvceditor::TagListKeepMatchesFromProjects(matches, projects);
-	return matches;
 }
 
 void mvceditor::TagFeatureClass::OnAppStartSequenceComplete(wxCommandEvent& event) {
@@ -324,7 +309,10 @@ mvceditor::TagSearchDialogClass::TagSearchDialogClass(wxWindow* parent,
 	: TagSearchDialogGeneratedClass(parent)
 	, ResourceFeature(tag)
 	, ChosenResources(chosenResources) 
-	, MatchedResources() {
+	, MatchedResources() 
+	, Timer(this, ID_SEARCH_TIMER)
+	, LastInput(term)
+	, ActionId() {
 	wxGenericValidator termValidator(&term);
 	TransferDataToWindow();
 	CacheStatusLabel->SetLabel(wxT("Cache Status: ") + tag.CacheStatus());
@@ -340,9 +328,27 @@ mvceditor::TagSearchDialogClass::TagSearchDialogClass(wxWindow* parent,
 		}
 	}
 	ProjectChoice->Select(0);
+
+	// so that the thread can give the matching tags back to us
+	ResourceFeature.App.RunningThreads.AddEventHandler(this);
+}
+
+mvceditor::TagSearchDialogClass::~TagSearchDialogClass() {
+	ResourceFeature.App.RunningThreads.RemoveEventHandler(this);
 }
 
 void mvceditor::TagSearchDialogClass::OnSearchText(wxCommandEvent& event) {
+	if (Timer.IsRunning()) {
+		if (0 != ActionId) {
+			ResourceFeature.App.RunningThreads.CancelAction(ActionId);
+		}
+		ActionId = 0;
+		return;
+	}
+	Timer.Start(300, wxTIMER_ONE_SHOT);
+}
+
+void mvceditor::TagSearchDialogClass::OnTimerComplete(wxTimerEvent& event) {
 	wxString text = SearchText->GetValue();
 	std::vector<mvceditor::ProjectClass*> projects;
 	bool showAllProjects = ProjectChoice->GetSelection() == 0;
@@ -356,19 +362,8 @@ void mvceditor::TagSearchDialogClass::OnSearchText(wxCommandEvent& event) {
 			projects.push_back((mvceditor::ProjectClass*) ProjectChoice->GetClientData(i));
 		}
 	}
-
-	if (text.Length() >= 2) {
-		MatchedResources = ResourceFeature.SearchForResources(text, projects);
-		if (!MatchedResources.empty()) {
-			MatchesList->Freeze();
-			ShowJumpToResults(text, MatchedResources);
-			MatchesList->Thaw();
-		}
-		else {
-			MatchesList->Clear();
-			MatchesLabel->SetLabel(_("No matches found"));
-		}
-	}
+	LastInput = text;
+	SearchForResources(text, projects);
 }
 
 void mvceditor::TagSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
@@ -457,7 +452,8 @@ void mvceditor::TagSearchDialogClass::ShowJumpToResults(const wxString& finderQu
 	if (!MatchesList->IsEmpty()) {
 		MatchesList->Select(0);
 	}
-	MatchesLabel->SetLabel(wxString::Format(_("Found %d files. Please choose file(s) to open."), allMatches.size()));
+	MatchesLabel->SetLabel(wxString::Format(_("Found %d files for %s. Please choose file(s) to open."), 
+		allMatches.size(), (const char*)finderQuery.c_str()));
 }
 
 void mvceditor::TagSearchDialogClass::OnOkButton(wxCommandEvent& event) {
@@ -565,6 +561,38 @@ void mvceditor::TagSearchDialogClass::OnProjectChoice(wxCommandEvent& event) {
 	OnSearchText(event);
 }
 
+void mvceditor::TagSearchDialogClass::SearchForResources(const wxString& text, std::vector<mvceditor::ProjectClass*> projects) {
+	mvceditor::TagCacheSearchActionClass* action =  new
+		mvceditor::TagCacheSearchActionClass(ResourceFeature.App.RunningThreads, ID_EVENT_TAG_CACHE_SEARCH);
+	std::vector<wxFileName> dirs;
+	for (std::vector<mvceditor::ProjectClass*>::const_iterator p = projects.begin(); p != projects.end(); ++p) {
+		std::vector<mvceditor::SourceClass>::const_iterator src;
+		for (src = (*p)->Sources.begin(); src != (*p)->Sources.end(); ++src) {
+			dirs.push_back(src->RootDirectory);
+		}
+	}
+	action->SetSearch(ResourceFeature.App.Globals, text, dirs);
+	ActionId = ResourceFeature.App.RunningThreads.Queue(action);
+}
+
+void mvceditor::TagSearchDialogClass::OnTagCacheSearchComplete(mvceditor::TagCacheSearchCompleteEventClass &event) {
+	MatchedResources = event.Tags;
+	if (LastInput != mvceditor::IcuToWx(event.SearchString)) {
+
+		// only show results from the last query
+		return;
+	}
+	if (!MatchedResources.empty()) {
+			MatchesList->Freeze();
+			ShowJumpToResults(mvceditor::IcuToWx(event.SearchString), MatchedResources);
+			MatchesList->Thaw();
+		}
+		else {
+			MatchesList->Clear();
+			MatchesLabel->SetLabel(wxString::Format(_("No matches found for %s"), (const char*)LastInput.c_str()));
+		}
+}
+
 BEGIN_EVENT_TABLE(mvceditor::TagFeatureClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_RESOURCE + 0, mvceditor::TagFeatureClass::OnProjectWipeAndIndex)
 	EVT_MENU(mvceditor::MENU_RESOURCE + 1, mvceditor::TagFeatureClass::OnJump)
@@ -581,4 +609,10 @@ BEGIN_EVENT_TABLE(mvceditor::TagFeatureClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_SEQUENCE_COMPLETE, mvceditor::TagFeatureClass::OnAppStartSequenceComplete)
 
 	EVT_WORKING_CACHE_COMPLETE(wxID_ANY, mvceditor::TagFeatureClass::OnWorkingCacheComplete)
+END_EVENT_TABLE()
+
+
+BEGIN_EVENT_TABLE(mvceditor::TagSearchDialogClass, TagSearchDialogGeneratedClass)
+	EVENT_TAG_CACHE_SEARCH_COMPLETE(ID_EVENT_TAG_CACHE_SEARCH, mvceditor::TagSearchDialogClass::OnTagCacheSearchComplete)
+	EVT_TIMER(ID_SEARCH_TIMER, mvceditor::TagSearchDialogClass::OnTimerComplete)
 END_EVENT_TABLE()
