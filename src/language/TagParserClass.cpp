@@ -206,7 +206,11 @@ void mvceditor::TagParserClass::EndSearch() {
 	TraitCache.clear();
 
 	// reclaim mem since we no longer need it
+	// there is no explicit shrink down to size in c++, need to
+	// swapo with an empty vector
 	FileParsingCache.resize(1);
+	std::vector<mvceditor::TagClass>(FileParsingCache).swap(FileParsingCache);
+	
 }
 
 bool mvceditor::TagParserClass::Walk(const wxString& fileName) {
