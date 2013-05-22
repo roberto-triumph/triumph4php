@@ -28,6 +28,7 @@
 #include <features/FeatureClass.h>
 #include <features/wxformbuilder/ExplorerFeatureForms.h>
 #include <actions/ActionClass.h>
+#include <wx/imaglist.h>
 
 namespace mvceditor {
 
