@@ -37,6 +37,7 @@
 #include <wx/timer.h>
 #include <wx/utils.h>
 #include <unicode/uclean.h>
+#include <iostream>
 
 /**
  * Profiles the LexicalAnalyzerClass using the native.php file in resources 
@@ -57,12 +58,10 @@ void ProfileParser();
 void ProfileParserOnLargeProject();
 
 /**
- * Profiles the TagPaserClass and ParsedTagFinderClass using the php.db file 
- * in resources directory.  It profiles two consecutive times in order to
- * compare caching. By using this in combination with the results of 
- * ProfileLexer test, we can find out how much overhead initializing a db file takes.
+ * Profiles the ParsedTagFinderClass.  This function requires that the
+ * tag cache has already been built.
  */
-void ProfileNativeFunctionsParsing();
+void ProfileTagSearch();
 
 /** 
  * This class will help in parsing the large project
@@ -84,10 +83,10 @@ private:
 };
 
 /**
- * Profiles a large project (500k LOC). It profiles two consecutive times in order to
- * compare caching.
+ * Profiles a large project (500k LOC). It profiles the time it takes to build
+ * the tag cache.
  */
-void ProfileResourceFinderOnLargeProject();
+void ProfileTagParserOnLargeProject();
 
 /**
  * Full path to a big php file that will be used to profile the execution time of the lexer & parser.
@@ -104,25 +103,59 @@ wxString DirName;
  */
 wxString DbFileName;
 
-int main() {
+int main(int argc, char** argv) {
 	int major,
 		minor;
 	wxOperatingSystemId os = wxGetOsVersion(&major, &minor);
 	if (os == wxOS_WINDOWS_NT) {
 		FileName = wxT("C:\\Users\\roberto\\Documents\\mvc-editor\\php_detectors\\lib\\Zend\\Config.php");
 		DirName = wxT("C:\\Users\\roberto\\sample_php_project");
-		DbFileName = wxT("C:\\Users\\roberto\\Desktop\\resource.db");
+		DbFileName = wxT("resource.db");
 	}
 	else {
 		FileName = wxT("/home/roberto/workspace/mvc-editor/php_detectors/lib/Zend/Config.php");
 		DirName = wxT("/home/roberto/workspace/sample_php_project/");
-		DbFileName = wxT("/home/roberto/workspace/resource.db");
+		DbFileName = wxT("resource.db");
 	}
-	//ProfileLexer();
-	//ProfileParser();
-	ProfileParserOnLargeProject();
-	//ProfileNativeFunctionsParsing();
-	ProfileResourceFinderOnLargeProject();
+	std::string test;
+	if (argc < 2) {
+		std::cout << "Choose a test:" << std::endl
+			<< "1. Lexer" << std::endl
+			<< "2. Parser" << std::endl
+			<< "3. Lint (On Project)" << std::endl
+			<< "4. TagParser (On Project)" << std::endl
+			<< "5. TagFinder (On Project)" << std::endl;
+		std::string in;
+		std::cin >> test;	
+	}
+	if (test == "lexer") {
+		ProfileLexer();
+	}
+	else if (test == "parser") {
+		ProfileParser();
+	}
+	else if (test == "lint") {
+		ProfileParserOnLargeProject();
+	}
+	else if (test == "tagparser") {
+		ProfileTagParserOnLargeProject();
+	}
+	else if (test == "tagfinder") {
+		ProfileTagSearch();
+	}
+	else if (test == "--help" || test == "-h") {
+		std::cout << "this is a program that is used to profile PHP parsing ang tag cache" << std::endl
+			<< "usage: tag_finder_profiler [test]" << std::endl
+			 << "[test] can be one of:" << std::endl
+			<< "lexer" << std::endl
+			<< "parser" << std::endl
+			<< "lint (On Project)" << std::endl
+			<< "tagparser (On Project)" << std::endl
+			<< "tagfinder (On Project)" << std::endl;
+	}
+	else {
+		std::cout << "unknown test:" << test << std::endl;
+	}
 	
 	// calling cleanup here so that we can run this binary through a memory leak detector 
 	// ICU will cache many things and that will cause the detector to output "possible leaks"
@@ -204,41 +237,7 @@ void ProfileParser() {
 	printf("time for parsing a native.php:%ld ms\n", time.ToLong());
 }
 
-
-void ProfileNativeFunctionsParsing() {
-	printf("*******\n");
-	
-	// initialize the sqlite db
-	soci::session session;
-	try {
-		session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(mvceditor::NativeFunctionsAsset().GetFullPath()));
-	} catch(std::exception const& e) {
-		session.close();
-		wxString msg = mvceditor::CharToWx(e.what());
-		wxASSERT_MSG(false, msg);
-	}
-	mvceditor::ParsedTagFinderClass tagFinder;
-
-	wxLongLong time;
-	size_t found;
-
-	time = wxGetLocalTimeMillis();
-	tagFinder.Init(&session);
-	
-	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("stristr"));
-	std::vector<mvceditor::TagClass> matches = tagFinder.NearMatchTags(tagSearch);
-	found = !matches.empty();
-	time = wxGetLocalTimeMillis() - time;
-	printf("time for tagFinder on php.db:%ld ms found:%d\n", time.ToLong(), (int)found);
-	
-	time = wxGetLocalTimeMillis();
-	matches = tagFinder.NearMatchTags(UNICODE_STRING_SIMPLE("mysql_query"));
-	time = wxGetLocalTimeMillis() - time;
-	found = !matches.empty();
-	printf("time for tagFinder on php.db after caching:%ld ms found:%d\n", time.ToLong(), (int)found);
-}
-
-void ProfileResourceFinderOnLargeProject() {
+void ProfileTagParserOnLargeProject() {
 	printf("*******\n");
 	// initialize the sqlite db
 	soci::session session;
@@ -257,7 +256,6 @@ void ProfileResourceFinderOnLargeProject() {
 	mvceditor::TagParserClass tagParser;
 	mvceditor::ParsedTagFinderClass tagFinder;
 
-	
 	mvceditor::DirectorySearchClass search;
 	wxLongLong time;
 	if (DirName.IsEmpty() || !wxDirExists(DirName)) {
@@ -273,20 +271,22 @@ void ProfileResourceFinderOnLargeProject() {
 	while (search.More()) {
 		search.Walk(tagParser);
 	}
-	std::vector<mvceditor::TagClass> matches = tagFinder.NearMatchTags(UNICODE_STRING_SIMPLE("ExtendedRecordSetForUnitTestAddGetLeftJoin"));
 	time = wxGetLocalTimeMillis() - time;
-	size_t found =  matches.size();
-	printf("time for tagFinder on entire project:%ld ms found:%d\n", time.ToLong(), (int)found);
+printf("time for tagFinder on entire project:%ld ms\n", time.ToLong());
+}
+
+void ProfileTagSearch() {
+	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(DbFileName));
+	mvceditor::ParsedTagFinderClass tagFinder;
+	tagFinder.Init(&session);
+	wxLongLong time;
 
 	time = wxGetLocalTimeMillis();
-	search.Init(DirName);
-	while (search.More()) {
-		search.Walk(tagParser);
-	}
+	std::vector<mvceditor::TagClass> matches;
 	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("Record::get"));
 	matches = tagFinder.NearMatchTags(tagSearch);
 	time = wxGetLocalTimeMillis() - time;
-	found = matches.size();
+	size_t found = matches.size();
 	printf("time for tagFinder on entire project after caching:%ld ms found:%d\n", time.ToLong(), (int)found);
 }
 
