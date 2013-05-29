@@ -185,7 +185,7 @@ void mvceditor::ThreadActionClass::CleanupAllActions() {
 	while (!Actions.empty()) {
 		delete Actions.front();
 		Actions.pop();
-	}	
+	}
 }
   
 mvceditor::RunningThreadsClass::RunningThreadsClass(bool doPostEvents)
@@ -313,6 +313,17 @@ void mvceditor::RunningThreadsClass::StopAll() {
 		return;
 	}
 
+	{
+		// delete all queued actions. we do this first so that when we stop
+		// the running action the thread does not start working on the next action
+		// in the queue
+		wxMutexLocker locker(ActionMutex);
+		while (!Actions.empty()) {
+			delete Actions.front();
+			Actions.pop();
+		}
+	}
+
 	// if there are running actions stop then signal them to stop
 	std::vector<mvceditor::ThreadActionClass*>::iterator thread;
 	for (thread = ThreadActions.begin(); thread != ThreadActions.end(); ++thread) {
@@ -326,7 +337,6 @@ void mvceditor::RunningThreadsClass::StopAll() {
 	// ThreadAction is a wxThread it will get cleaned up automatically
 	for (size_t i = 0; i < ThreadActions.size(); ++i) {
 		ThreadActions[i]->Delete();
-
 		wxSemaError err = Semaphore->WaitTimeout(4000);
 		wxASSERT_MSG(wxSEMA_INVALID != err, wxT("semaphore is invalid"));
 		wxASSERT_MSG(wxSEMA_TIMEOUT != err, wxT("semaphore timed out"));
