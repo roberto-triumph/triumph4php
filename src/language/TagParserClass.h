@@ -104,6 +104,11 @@ public:
 	void Init(soci::session* session, int fileParsingBufferSize = 32);
 	
 	/**
+	 * closes any opened connection / transaction
+	 */
+	void Close();
+
+	/**
 	 * Implement the DirectoryWalkerClass method; will start a transaction
 	 */
 	void BeginSearch();

@@ -24,6 +24,7 @@
  */
 #include <UnitTest++.h>
 #include <FileTestFixtureClass.h>
+#include <SqliteTestFixtureClass.h>
 #include <globals/Sqlite.h>
 #include <globals/String.h>
 #include <globals/Assets.h>
@@ -31,14 +32,9 @@
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 
-class SqliteFixtureClass : public FileTestFixtureClass {
+class SqliteFixtureClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
 
 public:
-
-	/**
-	 * The full path to the sqlite db
-	 */
-	wxFileName DbFileName;
 
 	/**
 	 * The full path to a file that will contain an SQL script
@@ -48,12 +44,12 @@ public:
 	/**
 	 * connection to sqlite db
 	 */
-	soci::session Session;
+	soci::session EmptySession;
 
 	SqliteFixtureClass()
 		: FileTestFixtureClass(wxT("sqlite"))
-		, Session() {
-		DbFileName.Assign(TestProjectDir, wxT("sqlite.db"));
+		, SqliteTestFixtureClass()
+		, EmptySession(*soci::factory_sqlite3(), ":memory:") {
 		ScriptFileName.Assign(TestProjectDir, wxT("script.sql"));
 	}
 };
@@ -65,12 +61,12 @@ TEST_FIXTURE(SqliteFixtureClass, SqlScriptWithNewFile) {
 		"CREATE TABLE my_table ( id INT, name VARCHAR(255));"	
 		"CREATE TABLE your_table ( id INT, your_name VARCHAR(255));"	
 	));
-	Session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(DbFileName.GetFullPath()));
+	
 	wxString error;
-	bool ret = mvceditor::SqliteSqlScript(ScriptFileName, Session, error);
+	bool ret = mvceditor::SqliteSqlScript(ScriptFileName, EmptySession, error);
 	CHECK(ret);
 	std::vector<std::string> tableNames;
-	CHECK(mvceditor::SqliteTables(Session, tableNames, error));
+	CHECK(mvceditor::SqliteTables(EmptySession, tableNames, error));
 	CHECK_VECTOR_SIZE(2, tableNames);
 	CHECK_EQUAL("my_table", tableNames[0]);
 	CHECK_EQUAL("your_table", tableNames[1]);
@@ -81,9 +77,8 @@ TEST_FIXTURE(SqliteFixtureClass, SqlScriptWithExistingFile) {
 		"CREATE TABLE my_table ( id INT, name VARCHAR(255));"	
 		"CREATE TABLE your_table ( id INT, your_name VARCHAR(255));"	
 	));
-	Session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(DbFileName.GetFullPath()));
 	wxString error;
-	bool ret = mvceditor::SqliteSqlScript(ScriptFileName, Session, error);
+	bool ret = mvceditor::SqliteSqlScript(ScriptFileName, EmptySession, error);
 	CHECK(ret);
 
 	CreateFixtureFile(wxT("script.sql"), mvceditor::CharToWx(
@@ -91,12 +86,11 @@ TEST_FIXTURE(SqliteFixtureClass, SqlScriptWithExistingFile) {
 		"CREATE TABLE another_table ( id INT, another_name VARCHAR(255));"	
 		"CREATE TABLE yet_another_table ( id INT, yet_another_name VARCHAR(255));"	
 	));
-	Session.close();
-	Session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(DbFileName.GetFullPath()));
-	ret = mvceditor::SqliteSqlScript(ScriptFileName, Session, error);
+
+	ret = mvceditor::SqliteSqlScript(ScriptFileName, EmptySession, error);
 	CHECK(ret);
 	std::vector<std::string> tableNames;
-	CHECK(mvceditor::SqliteTables(Session, tableNames, error));
+	CHECK(mvceditor::SqliteTables(EmptySession, tableNames, error));
 	CHECK_VECTOR_SIZE(3, tableNames);
 	CHECK_EQUAL("others_table", tableNames[0]);
 	CHECK_EQUAL("another_table", tableNames[1]);
@@ -109,11 +103,10 @@ TEST_FIXTURE(SqliteFixtureClass, SchemaVersion) {
 		"CREATE TABLE schema_version ( version_number INT);"	
 		"INSERT INTO schema_version VALUES(2);"	
 	));
-	Session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(DbFileName.GetFullPath()));
 	wxString error;
-	bool ret = mvceditor::SqliteSqlScript(ScriptFileName, Session, error);
+	bool ret = mvceditor::SqliteSqlScript(ScriptFileName, EmptySession, error);
 	CHECK(ret);
-	int versionNumber = mvceditor::SqliteSchemaVersion(Session);
+	int versionNumber = mvceditor::SqliteSchemaVersion(EmptySession);
 	CHECK_EQUAL(2, versionNumber);
 }
 

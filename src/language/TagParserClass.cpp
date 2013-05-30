@@ -164,6 +164,15 @@ void mvceditor::TagParserClass::Init(soci::session* session, int fileParsingBuff
 	FileParsingCache.reserve(FileParsingBufferSize);
 }
 
+void mvceditor::TagParserClass::Close() {
+	Session = NULL;
+	if (Transaction) {
+		Transaction->rollback();
+		delete Transaction;
+		Transaction = NULL;
+	}
+}
+
 void mvceditor::TagParserClass::BeginSearch() {
 	FileParsingCache.clear();
 	NamespaceCache.clear();

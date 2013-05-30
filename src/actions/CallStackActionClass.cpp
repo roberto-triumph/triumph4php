@@ -2,6 +2,7 @@
 #include <actions/CallStackActionClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 
 mvceditor::CallStackActionClass::CallStackActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: GlobalActionClass(runningThreads, eventId) 
@@ -61,8 +62,15 @@ void mvceditor::CallStackActionClass::BackgroundWork() {
 		if (!DetectorDbFileName.IsOk()) {
 			mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, _("Could not create call stack file in ") + DetectorDbFileName.GetFullPath());
 		}
-		else if (!CallStack.Persist(DetectorDbFileName)) {
-			mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, _("Could not persist call stack file in ") + DetectorDbFileName.GetFullPath());
+		else {
+			std::string stdDbName = mvceditor::WxToChar(DetectorDbFileName.GetFullPath());
+
+			// we should be able to open this since it has been created by
+			// the DetectorCacheDbVersionActionClass
+			soci::session session(*soci::factory_sqlite3(), stdDbName);
+			if (!CallStack.Persist(session)) {
+				mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, _("Could not persist call stack file in ") + DetectorDbFileName.GetFullPath());
+			}
 		}
 	}
 }

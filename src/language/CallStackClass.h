@@ -342,10 +342,10 @@ public:
 	 * or it can be a variable name.
 	 *  TODO: object operator chains are not currently supported
 	 * 
-	 * @param fileName the full path to the file that will be written to
+	 * @param session connection where data will be INSERTed to 
 	 * @return TRUE if file was successfully written to
 	 */
-	bool Persist(wxFileName& fileName);
+	bool Persist(soci::session& session);
 	
 	void MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment, 

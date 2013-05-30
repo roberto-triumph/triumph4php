@@ -46,17 +46,6 @@ namespace mvceditor {
  */
 class GlobalCacheClass {
 
-private:
-
-	/**
-	 * The connections to all sqlite db files
-	 * These need to be declared first because the
-	 * tagparsers use them; and we want the seesions to be cleaned up last
-	 */
-	soci::session TagDbSession;
-	soci::session NativeDbSession;
-	soci::session DetectedTagDbSession;
-
 public:
 
 	/**
@@ -95,7 +84,22 @@ public:
 	 */
 	bool IsDetectedTagFinderInit;
 
+private:
+
+	/**
+	 * The connections to all sqlite db files
+	 * These need to be declared last because the
+	 * tagparsers use them; and we want the sessions to be cleaned up last
+	 */
+	soci::session* TagDbSession;
+	soci::session* NativeDbSession;
+	soci::session* DetectedTagDbSession;
+
+public:
+
 	GlobalCacheClass();
+
+	~GlobalCacheClass();
 
 	/**
 	 * Opens the SQLite resource db file, or creates it if it does not exist.
@@ -114,6 +118,13 @@ public:
 		const std::vector<wxString>& miscFileExtensions, pelet::Versions version, int fileParsingBufferSize = 32);
 
 	/**
+	 * same as InitGlobalTag() but it takes ownership of an existing session
+	 * @param session this object will own the pointer and delete it 
+	 */
+	void AdoptGlobalTag(soci::session* session, const std::vector<wxString>& phpFileExtensions, 
+		const std::vector<wxString>& miscFileExtensions, pelet::Versions version, int fileParsingBufferSize = 32);
+
+	/**
 	 * Opens the detector db SQLite file, or creates it if it does not exist.
 	 *
 	 * @param detectorDbFileName the full path to the SQLite detectors database.
@@ -122,11 +133,24 @@ public:
 	void InitDetectorTag(const wxFileName& detectorDbFileName);
 
 	/**
+	 * same as InitDetectorTag() but it takes ownership of an existing session
+	 * @param session this object will own the pointer and delete it 
+	 */
+	void AdoptDetectorTag(soci::session* session);
+
+	/**
 	 * Opens the native functions SQLite file.  
 	 * @param nativeFunctionsDbFileName the full path to the SQLite native functions database.
 	 *        This full path MUST exist; it will never be created.
 	 */
 	void InitNativeTag(const wxFileName& nativeFunctionsDbFileName);
+
+	/**
+	 * same as InitNativeTag() but it takes ownership of an existing session
+	 * @param session this object will own the pointer and delete it 
+	 */
+	void AdoptNativeTag(soci::session* session);
+
 
 	/**
 	 * Will update the tag finder by calling Walk(); meaning that the next file
@@ -148,11 +172,11 @@ private:
 	/**
 	 * create the database connection to the given db
 	 *
-	 * @param session the db connection to open
+	 * @param session the db connection to open. this class will not own this pointer.
 	 * @param wxString dbName, given to SQLite.  db can be a full path to a file  The
 	 *        file does not needs to exist and have been initialized with the schema
 	 */
-	bool Open(soci::session& session, const wxString& dbName);
+	bool Open(soci::session* session, const wxString& dbName);
 };
 
 /**

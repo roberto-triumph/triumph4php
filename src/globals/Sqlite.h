@@ -120,20 +120,12 @@ public:
 	bool AttachExistingFile(const wxFileName& fileName);
 
 	/**
-	 * opens the sqlite file at the given file location, or create the 
-	 * file if it does not exist. Note that the schema sql script
-	 * is always run to make sure that the schema is up-to-date. The 
-	 * SQL script that contains the table creation statements
-	 * must be "nice" and take care to not error out if the tables already exist
+	 * use an existing connection and adopt it as our own.
 	 *
-	 * @param fileName the location of the detectors sqlite database.
-	 *        if fileName does not exist, it will be created.
-	 * @param schemaFileName SQL file that contains the SQL commands to be
-	 *        run when the file is new (the CREATE TABLE statements)
-	 * @return bool TRUE if cache could be successfully opened / created
+	 * @param session the soci connection to use.  this class WILL own the 
+	 *        pointer and delete it when this object goes out of scope
 	 */
-	/// TODO: remove this method
-	//bool CreateAndAttachFile(const wxFileName& fileName, const wxFileName& schemaFileName);
+	void AdoptSession(soci::session* session);
 
 	/**
 	 * Closes the opened connections; but the backing databases are left intact.

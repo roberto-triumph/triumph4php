@@ -184,41 +184,6 @@ bool mvceditor::SqliteFinderClass::AttachExistingFile(const wxFileName& fileName
 	return isOpened;
 }
 
-/// TODO remove this method
-/**
-bool mvceditor::SqliteFinderClass::CreateAndAttachFile(const wxFileName& fileName, const wxFileName& schemaFileName) {
-	wxASSERT_MSG(fileName.IsOk(), _("File name given to SqliteFinderClass::CreateAndAttachFile is not OK."));
-	if (!fileName.IsOk()) {
-		return false;
-	}
-	wxASSERT_MSG(schemaFileName.IsOk(), _("File name given to SqliteFinderClass::CreateAndAttachFile is not OK."));
-	if (!fileName.IsOk()) {
-		return false;
-	}
-	bool isOpened = false;
-	std::string stdDbName = mvceditor::WxToChar(fileName.GetFullPath());
-	soci::session* session = new soci::session();
-	try {
-		session->open(*soci::factory_sqlite3(), stdDbName);
-	
-		// open the SQL script that contains the table creation statements
-		// the script is "nice" it takes care to not create the tables if
-		// they already exist
-		wxString error;
-		isOpened = mvceditor::SqliteSqlScript(schemaFileName, *session, error);
-		wxASSERT_MSG(isOpened, error);
-		if (isOpened) {
-			Sessions.push_back(session);
-		}
-	} catch(std::exception const& e) {
-		isOpened = false;
-		wxString msg = mvceditor::CharToWx(e.what());
-		wxASSERT_MSG(isOpened, msg);
-	}
-	if (!isOpened) {
-		session->close();
-		delete session;
-	}
-	return isOpened;
+void mvceditor::SqliteFinderClass::AdoptSession(soci::session* session) {
+	Sessions.push_back(session);
 }
-*/

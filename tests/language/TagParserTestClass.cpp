@@ -23,27 +23,22 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <UnitTest++.h>
+#include <SqliteTestFixtureClass.h>
 #include <language/TagParserClass.h>
 #include <globals/Assets.h>
 #include <globals/Sqlite.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 
-class TagParserTestFixtureClass {
+class TagParserTestFixtureClass : public SqliteTestFixtureClass {
 
 public:
 
 	mvceditor::TagParserClass TagParser;
-	soci::session Session;
 
 	TagParserTestFixtureClass() 
-		: TagParser() 
-		, Session() {
-		Session.open(*soci::factory_sqlite3(),":memory:");
-		wxString error;
-		if (!mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), Session, error)) {
-			wxASSERT_MSG(false, error);
-		}
+		: SqliteTestFixtureClass()
+		, TagParser() {
 		TagParser.Init(&Session);
 		TagParser.PhpFileExtensions.push_back(wxT("*.php"));
 	}
@@ -69,7 +64,7 @@ public:
 
 /**
  * ATTN: currently most of the testing for TagParserClass is done in ParsedTagFinderTestClass
- * because the logic of what is now TagParserClass and ParsedTagFinderClass werer originally 
+ * because the logic of what is now TagParserClass and ParsedTagFinderClass were originally 
  * in the same class.
  */
 SUITE(TagParserTestClass) {

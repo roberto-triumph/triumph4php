@@ -26,6 +26,7 @@
 #include <language/TagCacheClass.h>
 #include <globals/String.h>
 #include <FileTestFixtureClass.h>
+#include <SqliteTestFixtureClass.h>
 #include <unicode/ustream.h> //get the << overloaded operator, needed by UnitTest++
 #include <MvcEditorChecks.h>
 #include <globals/Assets.h>
@@ -37,29 +38,26 @@
  * fixture that holds the object under test for 
  * the resource collection tests 
  */
-class RegisterTestFixtureClass : public FileTestFixtureClass {
+class RegisterTestFixtureClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
 
 public:
 
 	mvceditor::TagCacheClass TagCache;
-	mvceditor::ParsedTagFinderClass Finder;
 	mvceditor::DirectorySearchClass Search;
 	std::vector<wxString> PhpFileExtensions;
 	std::vector<wxString> MiscFileExtensions;
 	std::vector<mvceditor::TagClass> Matches;
-	wxFileName TagDbFileName;
-	wxFileName WorkingTagDbFileName;
+	soci::session* Session1;
 
 	RegisterTestFixtureClass()
 		: FileTestFixtureClass(wxT("resource-cache"))
+		, SqliteTestFixtureClass()
 		, TagCache()
-		, Finder()
 		, Search() 
 		, PhpFileExtensions()
 		, MiscFileExtensions()
 		, Matches() 
-		, TagDbFileName()
-		, WorkingTagDbFileName() {
+		, Session1(NULL) {
 		Search.Init(TestProjectDir);
 		PhpFileExtensions.push_back(wxT("*.php"));
 		
@@ -67,15 +65,8 @@ public:
 		if (!wxDirExists(TestProjectDir)) {
 			wxMkdir(TestProjectDir, 0777);
 		}
-		TagDbFileName.Assign(TestProjectDir + wxT("resource_cache.db"));
-		WorkingTagDbFileName.Assign(TestProjectDir + wxT("working_resource_cache.db"));
-
-		soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(TagDbFileName.GetFullPath()));
-		wxString error;
-		mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), session, error);
-
-		soci::session workingSession(*soci::factory_sqlite3(), mvceditor::WxToChar(WorkingTagDbFileName.GetFullPath()));
-		mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), workingSession, error);
+		Session1 = new soci::session(*soci::factory_sqlite3(), ":memory:");
+		CreateDatabase(*Session1, mvceditor::ResourceSqlSchemaAsset());
 	}
 
 	void NearMatchTags(const UnicodeString& search) {
@@ -92,7 +83,7 @@ public:
 
 	mvceditor::GlobalCacheClass* CreateGlobalCache(const wxString& srcDirectory) {
 		mvceditor::GlobalCacheClass* cache = new mvceditor::GlobalCacheClass();
-		cache->InitGlobalTag(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+		cache->AdoptGlobalTag(Session1, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 			
 		// must call init() here since we want to parse files from disk
 		Search.Init(TestProjectDir + srcDirectory);
@@ -111,7 +102,7 @@ public:
  * fixture that holds object under test and dependencies for
  * completion matches tests
  */
-class ExpressionCompletionMatchesFixtureClass : public FileTestFixtureClass  {
+class ExpressionCompletionMatchesFixtureClass : public FileTestFixtureClass, SqliteTestFixtureClass  {
 
 public:
 
@@ -133,11 +124,11 @@ public:
 	mvceditor::DirectorySearchClass Search;
 	std::vector<wxString> PhpFileExtensions;
 	std::vector<wxString> MiscFileExtensions;
-	wxFileName TagDbFileName;
-	wxFileName WorkingTagDbFileName;
+	soci::session* Session1;
 	
 	ExpressionCompletionMatchesFixtureClass() 
 		: FileTestFixtureClass(wxT("resource-cache"))
+		, SqliteTestFixtureClass()
 		, TagCache()
 		, GlobalFile(wxT("src") + wxString(wxFileName::GetPathSeparator()) + wxT("global.php"))
 		, File1(wxT("src") + wxString(wxFileName::GetPathSeparator()) + wxT("file1.php"))
@@ -154,24 +145,14 @@ public:
 		, Error()
 		, Search()
 		, PhpFileExtensions()
-		, MiscFileExtensions()
-		, TagDbFileName() 
-		, WorkingTagDbFileName() {
+		, MiscFileExtensions() {
 		CreateSubDirectory(wxT("src"));
 		Search.Init(TestProjectDir + wxT("src"));
 		PhpFileExtensions.push_back(wxT("*.php"));
 		Scope.ClassName = UNICODE_STRING_SIMPLE("");
 		Scope.MethodName = UNICODE_STRING_SIMPLE("");
-		TagDbFileName.Assign(TestProjectDir + wxT("tags.db"));
-		WorkingTagDbFileName.Assign(TestProjectDir + wxT("working_tags.db"));
-
-		soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(TagDbFileName.GetFullPath()));
-		wxString error;
-		mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), session, error);
-
-		soci::session workingSession(*soci::factory_sqlite3(), mvceditor::WxToChar(WorkingTagDbFileName.GetFullPath()));
-		mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), workingSession, error);
-		session.close();
+		Session1 = new soci::session(*soci::factory_sqlite3(), ":memory:");
+		CreateDatabase(*Session1, mvceditor::ResourceSqlSchemaAsset());
 	}
 	
 	void ToProperty(const UnicodeString& variableName, const UnicodeString& methodName) {
@@ -194,22 +175,7 @@ public:
 
 	mvceditor::GlobalCacheClass* CreateGlobalCache(const wxString& srcDirectory) {
 		mvceditor::GlobalCacheClass* cache = new mvceditor::GlobalCacheClass();
-		cache->InitGlobalTag(TagDbFileName, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
-		
-		// must call init() here since we want to parse files from disk
-		Search.Init(TestProjectDir + srcDirectory);
-		cache->Walk(Search);
-		return cache;
-	}
-
-	mvceditor::GlobalCacheClass* CreateGlobalCache(const wxFileName& resourceDbFile, const wxString& srcDirectory) {
-		soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(resourceDbFile.GetFullPath()));
-		wxString errorString;
-		mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), session, errorString);
-
-		mvceditor::GlobalCacheClass* cache = new mvceditor::GlobalCacheClass();
-		cache->InitGlobalTag(resourceDbFile, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
-
+		cache->AdoptGlobalTag(Session1, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 		
 		// must call init() here since we want to parse files from disk
 		Search.Init(TestProjectDir + srcDirectory);

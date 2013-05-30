@@ -30,6 +30,7 @@
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <FileTestFixtureClass.h>
+#include <SqliteTestFixtureClass.h>
 #include <MvcEditorChecks.h>
 #include <UnitTest++.h>
 
@@ -77,7 +78,7 @@ public:
 	pelet::ExpressionClass ParsedExpression;
 };
 
-class SymbolTableCompletionTestClass {
+class SymbolTableCompletionTestClass : public SqliteTestFixtureClass {
 
 public:
 
@@ -99,7 +100,8 @@ public:
 	mvceditor::SymbolTableMatchErrorClass Error;
 
 	SymbolTableCompletionTestClass()
-		: CompletionSymbolTable()
+		: SqliteTestFixtureClass()
+		, CompletionSymbolTable()
 		, Scope()
 		, ParsedExpression(Scope)
 		, SessionGlobal(*soci::factory_sqlite3(), ":memory:")
@@ -113,19 +115,13 @@ public:
 		, DoDuckTyping(false)
 		, DoFullyQualifiedMatchOnly(false)
 		, Error() {
-		wxString error;
-		if (!mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), SessionGlobal, error)) {
-			wxASSERT_MSG(false, error);
-		}
-		if (!mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), Session1, error)) {
-			wxASSERT_MSG(false, error);
-		}
+		CreateDatabase(SessionGlobal, mvceditor::ResourceSqlSchemaAsset());
+		CreateDatabase(Session1, mvceditor::ResourceSqlSchemaAsset());
 		TagParserGlobal.Init(&SessionGlobal);
 		GlobalFinder.Init(&SessionGlobal);
 
 		TagParser1.Init(&Session1);
-		Finder1.Init(&Session1);
-		
+		Finder1.Init(&Session1);	
 	}
 
 	void Init(const UnicodeString& sourceCode) {

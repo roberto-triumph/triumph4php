@@ -357,13 +357,8 @@ bool mvceditor::CallStackClass::Recurse(pelet::Versions version, mvceditor::Call
 
 }
 
-bool mvceditor::CallStackClass::Persist(wxFileName& fileName) {
+bool mvceditor::CallStackClass::Persist(soci::session& session) {
 	wxString error;
-	std::string stdDbName = mvceditor::WxToChar(fileName.GetFullPath());
-
-	// we should be able to open this since it has been created by
-	// the DetectorCacheDbVersionActionClass
-	soci::session session(*soci::factory_sqlite3(), stdDbName);
 	bool good = false;
 	try {		
 		int stepNumber = 0;

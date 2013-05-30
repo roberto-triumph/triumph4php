@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <UnitTest++.h>
-#include <FileTestFixtureClass.h>
+#include <SqliteTestFixtureClass.h>
 #include <globals/UrlTagClass.h>
 #include <globals/String.h>
 #include <globals/Assets.h>
@@ -32,51 +32,40 @@
 #include <MvcEditorChecks.h>
 #include <string>
 
-class UrlTagFixtureClass : public FileTestFixtureClass {
+class UrlTagFixtureClass : public SqliteTestFixtureClass {
 
 public:
 
-	mvceditor::UrlTagFinderClass Finder;
-	soci::session Session1,
-		Session2;
-	wxFileName DetectorDbFileName1,
-		DetectorDbFileName2;
-	
-	UrlTagFixtureClass()
-		: FileTestFixtureClass(wxT("url_resource_finder"))
-		, Finder()
-		, Session1()
-		, Session2()
-		, DetectorDbFileName1()
-		, DetectorDbFileName2() {
-	
-		DetectorDbFileName1.Assign(TestProjectDir, wxT("detectors.sqlite"));
-		// create the test dir so that the sqlite file can be created
-		TouchTestDir();
-		wxString error;
-		Session1.open(*soci::factory_sqlite3(), mvceditor::WxToChar(DetectorDbFileName1.GetFullPath()));
-		CHECK(mvceditor::SqliteSqlScript(mvceditor::DetectorSqlSchemaAsset(), Session1, error));
-		
-		CHECK(Finder.AttachExistingFile(DetectorDbFileName1));
+	// using these session as opposed to the inherited one because
+	// the UrlTagFinder owns the session pointers
+	soci::session* Session1;
+	soci::session* Session2;
 
-		Session1.close();
-		Session1.open(*soci::factory_sqlite3(), mvceditor::WxToChar(DetectorDbFileName1.GetFullPath()));
+	mvceditor::UrlTagFinderClass Finder;
+
+	UrlTagFixtureClass()
+		: SqliteTestFixtureClass()
+		, Session1(NULL)
+		, Session2(NULL) 
+		, Finder() {
+	
+		Session1 = new soci::session(*soci::factory_sqlite3(), ":memory:");
+		CreateDatabase(*Session1, mvceditor::DetectorSqlSchemaAsset());
+		Finder.AdoptSession(Session1);
+		
 		AddToDb1("http://localhost/index.php", 
 			"/home/user/welcome.php", "WelcomeController", "index");
 		AddToDb1("http://localhost/frontend.php",
 			"/home/user/frontend.php", "FrontendController", "action");
 
-		// setup the name for the second test db but dont create it yet
-		DetectorDbFileName2.Assign(TestProjectDir, wxT("detectors_2.sqlite"));
 	}
 
 	~UrlTagFixtureClass() {
-		Session1.close();
-		Session2.close();
+		// sessions are owned by the UrlFinder
 	}
 
 	void AddToDb1(std::string url, std::string fileName, std::string className, std::string methodName) {
-		soci::statement stmt = (Session1.prepare <<
+		soci::statement stmt = (Session1->prepare <<
 			"INSERT INTO url_tags(url, full_path, class_name, method_name) VALUES (?, ?, ?, ?)",
 			soci::use(url), soci::use(fileName),
 			soci::use(className), soci::use(methodName)
@@ -85,16 +74,13 @@ public:
 	}
 
 	void InitDb2() {
-		wxString error;
-		Session2.open(*soci::factory_sqlite3(), mvceditor::WxToChar(DetectorDbFileName2.GetFullPath()));
-		CHECK(mvceditor::SqliteSqlScript(mvceditor::DetectorSqlSchemaAsset(), Session2, error));
-		CHECK(Finder.AttachExistingFile(DetectorDbFileName2));
-		Session2.close();
-		Session2.open(*soci::factory_sqlite3(), mvceditor::WxToChar(DetectorDbFileName2.GetFullPath()));
+		Session2 = new soci::session(*soci::factory_sqlite3(), ":memory:");
+		CreateDatabase(*Session2, mvceditor::DetectorSqlSchemaAsset());
+		Finder.AdoptSession(Session2);
 	}
 
 	void AddToDb2(std::string url, std::string fileName, std::string className, std::string methodName) {
-		soci::statement stmt = (Session2.prepare <<
+		soci::statement stmt = (Session2->prepare <<
 			"INSERT INTO url_tags(url, full_path, class_name, method_name) VALUES (?, ?, ?, ?)",
 			soci::use(url), soci::use(fileName),
 			soci::use(className), soci::use(methodName)
@@ -104,14 +90,14 @@ public:
 
 	int DatabaseRecordsNumDb1() {
 		int cnt;
-		Session1.once << "SELECT COUNT(*) FROM url_tags; ",
+		Session1->once << "SELECT COUNT(*) FROM url_tags; ",
 			soci::into(cnt);
 		return cnt;
 	}
 
 	int DatabaseRecordsNumDb2() {
 		int cnt;
-		Session2.once << "SELECT COUNT(*) FROM url_tags; ",
+		Session2->once << "SELECT COUNT(*) FROM url_tags; ",
 			soci::into(cnt);
 		return cnt;
 	}

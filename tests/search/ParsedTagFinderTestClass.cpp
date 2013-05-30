@@ -24,6 +24,7 @@
  */
 #include <UnitTest++.h>
 #include <FileTestFixtureClass.h>
+#include <SqliteTestFixtureClass.h>
 #include <MvcEditorChecks.h>
 #include <language/TagParserClass.h>
 #include <search/TagFinderClass.h>
@@ -44,18 +45,14 @@
  * the input.
  * Using the file fixture less often means that tests run faster.
  */
-class ParsedTagFinderFileTestClass : public FileTestFixtureClass {
+class ParsedTagFinderFileTestClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
 public:	
 	ParsedTagFinderFileTestClass() 
 		: FileTestFixtureClass(wxT("tag_finder"))
+		, SqliteTestFixtureClass()
 		, TagParser()
 		, ParsedTagFinder()
 		, TestFile(wxT("test.php")) {
-		Session.open(*soci::factory_sqlite3(), ":memory:");
-		wxString error;
-		if (!mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), Session, error)) {
-			wxASSERT_MSG(false, error);
-		}
 		TagParser.Init(&Session);
 		TagParser.PhpFileExtensions.push_back(wxT("*.php"));
 		if (wxDirExists(TestProjectDir)) {
@@ -77,7 +74,6 @@ public:
 		Matches = ParsedTagFinder.NearMatchTags(tagSearch, doCollectFileNames);
 	}
 
-	soci::session Session;
 	mvceditor::TagParserClass TagParser;
 	mvceditor::ParsedTagFinderClass ParsedTagFinder;
 	wxString TestFile;
@@ -90,19 +86,14 @@ public:
  * lead to the tests running faster since we dont have to repeatedly
  * create and delete actual files.
  */
-class ParsedTagFinderMemoryTestClass {
+class ParsedTagFinderMemoryTestClass : public SqliteTestFixtureClass {
 public:	
 	ParsedTagFinderMemoryTestClass() 
-		: Session()
+		: SqliteTestFixtureClass()
 		, TagParser()
 		, ParsedTagFinder()
 		, TestFile(wxT("test.php"))
 		, Matches() {
-		Session.open(*soci::factory_sqlite3(), ":memory:");
-		wxString error;
-		if (!mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), Session, error)) {
-			wxASSERT_MSG(false, error);
-		}
 		TagParser.PhpFileExtensions.push_back(wxT("*.php"));
 		TagParser.Init(&Session);
 		ParsedTagFinder.Init(&Session);
@@ -127,7 +118,6 @@ public:
 		Matches = ParsedTagFinder.NearMatchClassesOrFiles(tagSearch);
 	}
 
-	soci::session Session;
 	mvceditor::TagParserClass TagParser;
 	mvceditor::ParsedTagFinderClass ParsedTagFinder;
 	wxString TestFile;

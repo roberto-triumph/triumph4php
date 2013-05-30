@@ -117,8 +117,8 @@ int main() {
 	}
 	u_fclose(ufout);
 	printf("The call stack is %d items long\n", (int)callStack.Variables.size());
-	wxFileName detectorDbFileName(DetectorDbFullPath);
-	callStack.Persist(detectorDbFileName);
+	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(DetectorDbFullPath));
+	callStack.Persist(session);
 	printf("Call stack written to:%s\n", (const char*)DetectorDbFullPath.ToAscii());
 	return 0;
 }

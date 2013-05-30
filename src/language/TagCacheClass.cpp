@@ -69,17 +69,30 @@ const wxEventType mvceditor::EVENT_WORKING_CACHE_COMPLETE = wxNewEventType();
 const wxEventType mvceditor::EVENT_GLOBAL_CACHE_COMPLETE = wxNewEventType();
 
 mvceditor::GlobalCacheClass::GlobalCacheClass()
-	: TagDbSession()
-	, NativeDbSession()
-	, DetectedTagDbSession()
-	, TagParser() 
+	: TagParser() 
 	, TagFinder()
 	, NativeTagFinder()
 	, DetectedTagFinder()
 	, IsNativeTagFinderInit(false)
 	, IsTagFinderInit(false)
-	, IsDetectedTagFinderInit(false) {
+	, IsDetectedTagFinderInit(false)
+	, TagDbSession(NULL)
+	, NativeDbSession(NULL)
+	, DetectedTagDbSession(NULL)
+{
 
+}
+mvceditor::GlobalCacheClass::~GlobalCacheClass() {
+	TagParser.Close();
+	if (TagDbSession) {
+		delete TagDbSession;
+	}
+	if (DetectedTagDbSession) {
+		delete DetectedTagDbSession;
+	}
+	if (NativeDbSession) {
+		delete NativeDbSession;
+	}
 }
 
 void mvceditor::GlobalCacheClass::InitGlobalTag(const wxFileName& tagDbFileName, 
@@ -89,45 +102,82 @@ void mvceditor::GlobalCacheClass::InitGlobalTag(const wxFileName& tagDbFileName,
 	wxASSERT_MSG(!IsTagFinderInit, wxT("tag finder can only be initialized once"));
 	TagParser.PhpFileExtensions = phpFileExtensions;
 	TagParser.MiscFileExtensions = miscFileExtensions;
+	TagDbSession = new soci::session;
 	IsTagFinderInit = Open(TagDbSession, tagDbFileName.GetFullPath());
 	if (IsTagFinderInit) {
 		TagParser.SetVersion(version);
-		TagParser.Init(&TagDbSession, fileParsingBufferSize);
-		TagFinder.Init(&TagDbSession);
+		TagParser.Init(TagDbSession, fileParsingBufferSize);
+		TagFinder.Init(TagDbSession);
+	}
+}
+
+void mvceditor::GlobalCacheClass::AdoptGlobalTag(soci::session* globalSession,
+												 const std::vector<wxString>& phpFileExtensions, 
+												 const std::vector<wxString>& miscFileExtensions,
+												 pelet::Versions version, int fileParsingBufferSize) {
+	wxASSERT_MSG(!IsTagFinderInit, wxT("tag finder can only be initialized once"));
+	TagParser.PhpFileExtensions = phpFileExtensions;
+	TagParser.MiscFileExtensions = miscFileExtensions;
+	TagDbSession = globalSession;
+	IsTagFinderInit = NULL != globalSession;
+	if (IsTagFinderInit) {
+		TagParser.SetVersion(version);
+		TagParser.Init(TagDbSession, fileParsingBufferSize);
+		TagFinder.Init(TagDbSession);
 	}
 }
 
 void mvceditor::GlobalCacheClass::InitDetectorTag(const wxFileName& detectorDbFileName) {
 	wxASSERT_MSG(!IsDetectedTagFinderInit, wxT("tag finder can only be initialized once"));
+	DetectedTagDbSession = new soci::session;
 	IsDetectedTagFinderInit = Open(DetectedTagDbSession, detectorDbFileName.GetFullPath());
 	if (IsDetectedTagFinderInit) {
-		DetectedTagFinder.Init(&DetectedTagDbSession);
+		DetectedTagFinder.Init(DetectedTagDbSession);
+	}
+}
+
+void mvceditor::GlobalCacheClass::AdoptDetectorTag(soci::session* session) {
+	wxASSERT_MSG(!IsDetectedTagFinderInit, wxT("tag finder can only be initialized once"));
+	IsDetectedTagFinderInit = NULL != session;
+	DetectedTagDbSession = session;
+	if (IsDetectedTagFinderInit) {
+		DetectedTagFinder.Init(DetectedTagDbSession);
 	}
 }
 
 void mvceditor::GlobalCacheClass::InitNativeTag(const wxFileName& nativeDbFileName) {
 	wxASSERT_MSG(!IsNativeTagFinderInit, wxT("tag finder can only be initialized once"));
+	NativeDbSession = new soci::session;
 	IsNativeTagFinderInit = Open(NativeDbSession, nativeDbFileName.GetFullPath());
 	if (IsNativeTagFinderInit) {
-		NativeTagFinder.Init(&NativeDbSession);
+		NativeTagFinder.Init(NativeDbSession);
 	}
 }
 
-bool mvceditor::GlobalCacheClass::Open(soci::session& session, const wxString& dbName) {
+void mvceditor::GlobalCacheClass::AdoptNativeTag(soci::session* session) {
+	wxASSERT_MSG(!IsNativeTagFinderInit, wxT("tag finder can only be initialized once"));
+	IsNativeTagFinderInit = NULL != session;
+	NativeDbSession = session;
+	if (IsNativeTagFinderInit) {
+		NativeTagFinder.Init(NativeDbSession);
+	}
+}
+
+bool mvceditor::GlobalCacheClass::Open(soci::session* session, const wxString& dbName) {
 	bool ret = false;
 	try {
 		std::string stdDbName = mvceditor::WxToChar(dbName);
 		
 		// we should be able to open this since it has been created by
 		// the TagCacheDbVersionActionClass
-		session.open(*soci::factory_sqlite3(), stdDbName);
+		session->open(*soci::factory_sqlite3(), stdDbName);
 
 		// set a busy handler so that if we attempt to query while the file is locked, we 
 		// sleep for a bit then try again
-		mvceditor::SqliteSetBusyTimeout(session, 100);
+		mvceditor::SqliteSetBusyTimeout(*session, 100);
 		ret = true;
 	} catch(std::exception const& e) {
-		session.close();
+		session->close();
 		wxString msg = mvceditor::CharToWx(e.what());
 		wxASSERT_MSG(false, msg);
 	}
