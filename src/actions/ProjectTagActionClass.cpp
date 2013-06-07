@@ -55,7 +55,7 @@ bool mvceditor::ProjectTagActionClass::InitForFile(mvceditor::GlobalsClass& glob
 	std::vector<mvceditor::SourceClass> srcs;
 	srcs.push_back(src);
 	if (DirectorySearch.Init(srcs)) {
-		GlobalCache.InitGlobalTag(globals.TagCacheDbFileName, phpFileExtensions, miscFileExtensions, Version, 1024);
+		GlobalCache.InitGlobalTag(globals.TagCacheDbFileName, phpFileExtensions, miscFileExtensions, Version);
 		ret = true;
 	}
 	return ret;
@@ -122,7 +122,7 @@ void mvceditor::ProjectTagActionClass::IterateProjects() {
 		phpFileExtensions = Projects[0].PhpFileExtensions;
 		miscFileExtensions = Projects[0].AllNonPhpExtensions();	
 	}
-	GlobalCache.InitGlobalTag(TagCacheDbFileName, phpFileExtensions, miscFileExtensions, Version, 1024);
+	GlobalCache.InitGlobalTag(TagCacheDbFileName, phpFileExtensions, miscFileExtensions, Version);
 	for (size_t i = 0; !IsCancelled() && i < Projects.size(); ++i) {
 		mvceditor::ProjectClass project = Projects[i];
 		if (DirectorySearch.Init(project.AllSources())) {

@@ -63,7 +63,7 @@ void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
 		wxFileName wxf(FileName);
 		phpFileExtensions.push_back(wxf.GetFullName());
 		std::vector<wxString> miscFileExtensions;
-		globalCache->InitGlobalTag(TagCacheDbFileName, phpFileExtensions, miscFileExtensions, Version, 1024);
+		globalCache->InitGlobalTag(TagCacheDbFileName, phpFileExtensions, miscFileExtensions, Version);
 		if (FileIsNew) {
 
 			// new files will not have a name, use the identifier as the name

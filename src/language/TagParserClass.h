@@ -96,12 +96,8 @@ public:
 	 * the InitFile() method)
 	 * 
 	 * @param soci::session* the session. this class will NOT own the pointer
-	 * @param fileParsingBufferSize the size of an internal buffer where parsed resources are initially 
-	 *        stored. This is only a hint, the buffer will grow as necessary
-	 *        Setting this value to a high value (1024) is good for large projects that have a lot
-	 *        resources.
 	 */
-	void Init(soci::session* session, int fileParsingBufferSize = 32);
+	void Init(soci::session* session);
 	
 	/**
 	 * closes any opened connection / transaction
@@ -218,13 +214,6 @@ public:
 private:
 	
 	/**
-	 * All of the resources that have been parsed during the current walk. This is only a temporary cache that is pushed into while the 
-	 * files are being parsed. After all files have been parsed, these resources will be
-	 * added to the database.
-	 */
-	std::vector<TagClass> FileParsingCache;
-
-	/**
 	 * cache of namespaces, used because the same namespace may be declared in multiple 
 	 * files and we don't want to insert multiple rows of the same namespace name. Since
 	 * our transaction is commited once ALL files have been parsed, the DB will
@@ -264,6 +253,26 @@ private:
 	 * This class will own the pointer.
 	 */
 	soci::transaction* Transaction;
+
+	/**
+	 * use a prepared statement for inserts.  below are the variables to bind to the
+	 * statement.
+	 */
+	soci::statement* InsertStmt;
+	int FileTagId;
+	std::string Key;
+	std::string Identifier;
+	std::string ClassName;
+	int Type;
+	std::string NamespaceName;
+	std::string Signature;
+	std::string ReturnType;
+	std::string Comment;
+	int IsProtected;
+	int IsPrivate;
+	int IsStatic;
+	int IsDynamic;
+	int IsNative;
 		
 	/**
 	 * The current file item being indexed.  We keep a class-wide member when parsing through many files.
@@ -327,7 +336,7 @@ private:
 	 * @param resources the list of resources that were parsed out
 	 * @param int the file that the resources are located in
 	 */
-	void PersistResources(const std::vector<mvceditor::TagClass>& resources, int fileTagId);
+	void PersistResources(const mvceditor::TagClass& resource, int fileTagId);
 
 	/**
 	 * add all of the given trait resources into the database.

@@ -63,7 +63,7 @@ public:
 
 	ProjectTagActionTestClass() 
 		: ActionTestFixtureClass()
-		, FileTestFixtureClass(wxT("resource_file_reader"))
+		, FileTestFixtureClass(wxT("project_tag_action"))
 		, ProjectTagAction(RunningThreads, ID_EVENT)
 		, Session()
 		, Finder() {
@@ -75,6 +75,10 @@ public:
 		bool init = mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), Session, error);
 		wxASSERT_MSG(init, error);
 		Finder.Init(&Session);
+	}
+
+	~ProjectTagActionTestClass() {
+		Session.close();
 	}
 };
 

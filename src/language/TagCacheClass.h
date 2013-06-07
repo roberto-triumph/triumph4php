@@ -109,20 +109,16 @@ public:
 	 * @param phpFileExtensions the wildcards that hold which files to parse
 	 * @param miscFileExtensions the wildcards that hold which files to to record but not parse
 	 * @param version the PHP version that the parser will check against
-	 * @param fileParsingBufferSize the size of an internal buffer where parsed resources are initially 
-	 *        stored. This is only a hint, the buffer will grow as necessary
-	 *        Setting this value to a high value (1024) is good for large projects that have a lot
-	 *        resources.
 	*/
 	void InitGlobalTag(const wxFileName& tagDbFileName, const std::vector<wxString>& phpFileExtensions, 
-		const std::vector<wxString>& miscFileExtensions, pelet::Versions version, int fileParsingBufferSize = 32);
+		const std::vector<wxString>& miscFileExtensions, pelet::Versions version);
 
 	/**
 	 * same as InitGlobalTag() but it takes ownership of an existing session
 	 * @param session this object will own the pointer and delete it 
 	 */
 	void AdoptGlobalTag(soci::session* session, const std::vector<wxString>& phpFileExtensions, 
-		const std::vector<wxString>& miscFileExtensions, pelet::Versions version, int fileParsingBufferSize = 32);
+		const std::vector<wxString>& miscFileExtensions, pelet::Versions version);
 
 	/**
 	 * Opens the detector db SQLite file, or creates it if it does not exist.

@@ -131,12 +131,12 @@ std::vector<mvceditor::TagClass> AllResources(soci::session& session) {
 mvceditor::TagParserClass::TagParserClass()
 	: PhpFileExtensions()
 	, MiscFileExtensions()
-	, FileParsingCache()
 	, NamespaceCache()
 	, TraitCache()
 	, Parser()
 	, Session(NULL)
 	, Transaction(NULL)
+	, InsertStmt(NULL)
 	, FileParsingBufferSize(32)
 	, FilesParsed(0)
 	, IsCacheInitialized(false) {
@@ -146,22 +146,16 @@ mvceditor::TagParserClass::TagParserClass()
 }
 
 mvceditor::TagParserClass::~TagParserClass() {
-	if (Transaction) {
-		delete Transaction;
-	}
+	Close();
 }
 
 void mvceditor::TagParserClass::SetVersion(pelet::Versions version) {
 	Parser.SetVersion(version);
 }
 
-void mvceditor::TagParserClass::Init(soci::session* session, int fileParsingBufferSize) {
+void mvceditor::TagParserClass::Init(soci::session* session) {
 	Session = session;
 	IsCacheInitialized = true;
-	FileParsingBufferSize = fileParsingBufferSize;
-	FileParsingCache.clear();
-	FileParsingCache.resize(0);
-	FileParsingCache.reserve(FileParsingBufferSize);
 }
 
 void mvceditor::TagParserClass::Close() {
@@ -171,10 +165,13 @@ void mvceditor::TagParserClass::Close() {
 		delete Transaction;
 		Transaction = NULL;
 	}
+	if (InsertStmt) {
+		delete InsertStmt;
+		InsertStmt = NULL;
+	}
 }
 
 void mvceditor::TagParserClass::BeginSearch() {
-	FileParsingCache.clear();
 	NamespaceCache.clear();
 	TraitCache.clear();
 
@@ -182,6 +179,28 @@ void mvceditor::TagParserClass::BeginSearch() {
 	FilesParsed = 0;
 	try {
 		Transaction = new soci::transaction(*Session);
+
+		std::string sql;
+		sql += "INSERT OR IGNORE INTO resources (";
+		sql += "file_item_id, key, identifier, class_name, ";
+		sql += "type, namespace_name, signature, ";
+		sql += "return_type, comment, is_protected, is_private, ";
+		sql += "is_static, is_dynamic, is_native";
+		sql += ") VALUES(";
+		sql += "?, ?, ?, ?, ";
+		sql += "?, ?, ?, ";
+		sql += "?, ?, ?, ?, ";
+		sql += "?, ?, ?";
+		sql += ");";
+		
+		wxASSERT_MSG(!InsertStmt, wxT("statement should be cleaned up"));
+		InsertStmt = new soci::statement(*Session);
+		*InsertStmt = (Session->prepare << sql,
+			soci::use(FileTagId), soci::use(Key), soci::use(Identifier), soci::use(ClassName), 
+			soci::use(Type), soci::use(NamespaceName), soci::use(Signature), 
+			soci::use(ReturnType), soci::use(Comment), soci::use(IsProtected), soci::use(IsPrivate), 
+			soci::use(IsStatic), soci::use(IsDynamic), soci::use(IsNative)
+		);
 	} catch (std::exception& e) {
 		
 		// ATTN: at some point bubble these exceptions up?
@@ -189,11 +208,11 @@ void mvceditor::TagParserClass::BeginSearch() {
 		wxString msg = mvceditor::CharToWx(e.what());
 		wxUnusedVar(msg);
 		wxASSERT_MSG(false, msg);
+		if (InsertStmt) {
+			delete InsertStmt;
+			InsertStmt = NULL;
+		}
 	}
-
-	FileParsingCache.clear();
-	FileParsingCache.resize(0);
-	FileParsingCache.reserve(FileParsingBufferSize);
 }
 
 void mvceditor::TagParserClass::EndSearch() {
@@ -210,16 +229,11 @@ void mvceditor::TagParserClass::EndSearch() {
 	delete Transaction;
 	Transaction = NULL;
 
-	FileParsingCache.clear();
-	NamespaceCache.clear();
-	TraitCache.clear();
-
-	// reclaim mem since we no longer need it
-	// there is no explicit shrink down to size in c++, need to
-	// swapo with an empty vector
-	FileParsingCache.resize(1);
-	std::vector<mvceditor::TagClass>(FileParsingCache).swap(FileParsingCache);
+	delete InsertStmt;
+	InsertStmt = NULL;
 	
+	NamespaceCache.clear();
+	TraitCache.clear();	
 }
 
 bool mvceditor::TagParserClass::Walk(const wxString& fileName) {
@@ -286,14 +300,12 @@ void mvceditor::TagParserClass::BuildResourceCacheForFile(const wxString& fullPa
 	fileTag.DateTime = wxDateTime::Now();
 	fileTag.IsParsed = false;
 	PersistFileTag(fileTag);
-	
-	FileParsingCache.clear();
+	CurrentFileTagId = fileTag.FileId;
 
 	// for now silently ignore parse errors
 	pelet::LintResultsClass results;
 	Parser.ScanString(code, results);
 
-	PersistResources(FileParsingCache, fileTag.FileId);
 	PersistTraits(TraitCache, fileTag.FileId);
 	EndSearch();
 }
@@ -329,36 +341,17 @@ void mvceditor::TagParserClass::BuildResourceCache(const wxString& fullPath, boo
 				fileTag.MakeNew(fileName, parseClasses);
 				PersistFileTag(fileTag);
 			}			
-			FileParsingCache.clear();
 			
 			// for now silently ignore files with parser errors
 			pelet::LintResultsClass lintResults;
 			wxFFile file(fullPath, wxT("rb"));
+
+			CurrentFileTagId = fileTag.FileId;
 			Parser.ScanFile(file.fp(), mvceditor::WxToIcu(fullPath), lintResults);
 	
-			PersistResources(FileParsingCache, fileTag.FileId);
 			PersistTraits(TraitCache, fileTag.FileId);
-			FileParsingCache.clear();
 
 			FilesParsed++;
-			if (FilesParsed % 200 == 0) {
-				try {
-
-					// commit at regular intervals.  we dont want to wait until
-					// the end to commit because we dont want to lock the db until
-					// the end of parsing of all files in all projects
-					Transaction->commit();
-					delete Transaction;
-					Transaction = new soci::transaction(*Session);
-				} catch (std::exception& e) {
-					
-					// ATTN: at some point bubble these exceptions up?
-					// to avoid unreferenced local variable warnings in MSVC
-					wxString msg = mvceditor::CharToWx(e.what());
-					wxUnusedVar(msg);
-					wxASSERT_MSG(false, msg);
-				}
-			}
 		}
 	}
 }
@@ -375,19 +368,18 @@ void mvceditor::TagParserClass::ClassFound(const UnicodeString& namespaceName, c
 	classItem.ReturnType = UNICODE_STRING_SIMPLE("");
 	classItem.Comment = comment;
 	classItem.IsNative = false;
-	FileParsingCache.push_back(classItem);
+	PersistResources(classItem, CurrentFileTagId);
 
 	if (IsNewNamespace(namespaceName)) {
 
 		// a tag for the namespace itself
 		mvceditor::TagClass namespaceItem = mvceditor::TagClass::MakeNamespace(namespaceName);
-		FileParsingCache.push_back(namespaceItem);
+		PersistResources(namespaceItem, CurrentFileTagId);
 	}
 
 	classItem.Identifier = QualifyName(namespaceName, className);
 	classItem.Key = QualifyName(namespaceName, className);
-	FileParsingCache.push_back(classItem);
-
+	PersistResources(classItem, CurrentFileTagId);
 }
 
 void mvceditor::TagParserClass::TraitAliasFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
@@ -489,11 +481,11 @@ void mvceditor::TagParserClass::DefineDeclarationFound(const UnicodeString& name
 	defineItem.ReturnType = UNICODE_STRING_SIMPLE("");
 	defineItem.Comment = comment;
 	defineItem.IsNative = false;
-	FileParsingCache.push_back(defineItem);
+	PersistResources(defineItem, CurrentFileTagId);
 
 	defineItem.Identifier = QualifyName(namespaceName, variableName);
 	defineItem.Key = QualifyName(namespaceName, variableName);
-	FileParsingCache.push_back(defineItem);
+	PersistResources(defineItem, CurrentFileTagId);
 }
 
 void mvceditor::TagParserClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
@@ -524,16 +516,16 @@ void mvceditor::TagParserClass::MethodFound(const UnicodeString& namespaceName, 
 	}
 	item.IsStatic = isStatic;
 	item.IsNative = false;
-	FileParsingCache.push_back(item);
+	PersistResources(item, CurrentFileTagId);
 	
 	// insert a complete name so that we can quickly lookup all methods for a single class
 	item.Key = className + UNICODE_STRING_SIMPLE("::") + methodName;
-	FileParsingCache.push_back(item);
+	PersistResources(item, CurrentFileTagId);
 
 	// insert a fully qualified name and method so that we can quickly lookup all methods
 	// for a namespaced class
 	item.Key = QualifyName(namespaceName, className) + UNICODE_STRING_SIMPLE("::") + methodName;
-	FileParsingCache.push_back(item);
+	PersistResources(item, CurrentFileTagId);
 }
 
 void mvceditor::TagParserClass::PropertyFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& propertyName,
@@ -569,16 +561,16 @@ void mvceditor::TagParserClass::PropertyFound(const UnicodeString& namespaceName
 	}
 	item.IsStatic = isStatic;
 	item.IsNative = false;
-	FileParsingCache.push_back(item);
+	PersistResources(item, CurrentFileTagId);
 	
 	// insert a complete name so that we can quickly lookup all methods for a single class
 	item.Key = className + UNICODE_STRING_SIMPLE("::") + filteredProperty;
-	FileParsingCache.push_back(item);
+	PersistResources(item, CurrentFileTagId);
 
 	// insert a fully qualified name and method so that we can quickly lookup all methods
 	// for a namespaced class
 	item.Key = QualifyName(namespaceName, className) + UNICODE_STRING_SIMPLE("::") + filteredProperty;
-	FileParsingCache.push_back(item);
+	PersistResources(item, CurrentFileTagId);
 }
 
 void mvceditor::TagParserClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, 
@@ -592,17 +584,17 @@ void mvceditor::TagParserClass::FunctionFound(const UnicodeString& namespaceName
 	item.ReturnType = returnType;
 	item.Comment = comment;
 	item.IsNative = false;
-	FileParsingCache.push_back(item);
+	PersistResources(item, CurrentFileTagId);
 		
 	if (IsNewNamespace(namespaceName)) {
 		mvceditor::TagClass namespaceItem = mvceditor::TagClass::MakeNamespace(namespaceName);
-		FileParsingCache.push_back(namespaceItem);
+		PersistResources(namespaceItem, CurrentFileTagId);
 	}
 		
 	// put in the namespace cache so that qualified name lookups work too
 	item.Identifier = QualifyName(namespaceName, functionName);
 	item.Key = QualifyName(namespaceName, functionName);
-	FileParsingCache.push_back(item);
+	PersistResources(item, CurrentFileTagId);
 }
 
 bool mvceditor::TagParserClass::IsNewNamespace(const UnicodeString& namespaceName) {
@@ -786,7 +778,6 @@ bool mvceditor::TagParserClass::FindFileTagByFullPathExact(const wxString& fullP
 }
 
 void mvceditor::TagParserClass::WipeAll() {
-	FileParsingCache.clear();
 	NamespaceCache.clear();
 	TraitCache.clear();
 
@@ -805,7 +796,6 @@ void mvceditor::TagParserClass::WipeAll() {
 }
 
 void mvceditor::TagParserClass::DeleteDirectories(const std::vector<wxFileName>& dirs) {
-	FileParsingCache.clear();
 	NamespaceCache.clear();
 	TraitCache.clear();
 
@@ -853,61 +843,30 @@ void mvceditor::TagParserClass::DeleteFromFile(const wxString& fullPath) {
 	}
 }
 
-void mvceditor::TagParserClass::PersistResources(const std::vector<mvceditor::TagClass>& resources, int fileTagId) {
+void mvceditor::TagParserClass::PersistResources(const mvceditor::TagClass& resource, int fileTagId) {
 	if (!IsCacheInitialized) {
 		return;
 	}
-	std::string sql;
-	sql += "INSERT OR IGNORE INTO resources (";
-	sql += "file_item_id, key, identifier, class_name, ";
-	sql += "type, namespace_name, signature, ";
-	sql += "return_type, comment, is_protected, is_private, ";
-	sql += "is_static, is_dynamic, is_native";
-	sql += ") VALUES(";
-	sql += "?, ?, ?, ?, ";
-	sql += "?, ?, ?, ";
-	sql += "?, ?, ?, ?, ";
-	sql += "?, ?, ?";
-	sql += ");";
-
-	std::string key;
-	std::string identifier;
-	std::string className;
-	int type;
-	std::string namespaceName;
-	std::string signature;
-	std::string returnType;
-	std::string comment;
-	int isProtected;
-	int isPrivate;
-	int isStatic;
-	int isDynamic;
-	int isNative;
-
+	if (!InsertStmt) {
+		return;
+	}	
 	try {
-		soci::statement stmt = (Session->prepare << sql,
-			soci::use(fileTagId), soci::use(key), soci::use(identifier), soci::use(className), 
-			soci::use(type), soci::use(namespaceName), soci::use(signature), 
-			soci::use(returnType), soci::use(comment), soci::use(isProtected), soci::use(isPrivate), 
-			soci::use(isStatic), soci::use(isDynamic), soci::use(isNative)
-		);
-		std::vector<mvceditor::TagClass>::const_iterator it;
-		for (it = resources.begin(); it != resources.end(); ++it) {
-			key = mvceditor::IcuToChar(it->Key);
-			identifier = mvceditor::IcuToChar(it->Identifier);
-			className = mvceditor::IcuToChar(it->ClassName);
-			type = it->Type;
-			namespaceName = mvceditor::IcuToChar(it->NamespaceName);
-			signature = mvceditor::IcuToChar(it->Signature);
-			returnType = mvceditor::IcuToChar(it->ReturnType);
-			comment = mvceditor::IcuToChar(it->Comment);
-			isProtected = it->IsProtected;
-			isPrivate = it->IsPrivate;
-			isStatic = it->IsStatic;
-			isDynamic = it->IsDynamic;
-			isNative = it->IsNative;
-			stmt.execute(true);
-		}
+		FileTagId = fileTagId;
+		Key = mvceditor::IcuToChar(resource.Key);
+		Identifier = mvceditor::IcuToChar(resource.Identifier);
+		ClassName = mvceditor::IcuToChar(resource.ClassName);
+		Type = resource.Type;
+		NamespaceName = mvceditor::IcuToChar(resource.NamespaceName);
+		Signature = mvceditor::IcuToChar(resource.Signature);
+		ReturnType = mvceditor::IcuToChar(resource.ReturnType);
+		Comment = mvceditor::IcuToChar(resource.Comment);
+		IsProtected = resource.IsProtected;
+		IsPrivate = resource.IsPrivate;
+		IsStatic = resource.IsStatic;
+		IsDynamic = resource.IsDynamic;
+		IsNative = resource.IsNative;
+		InsertStmt->execute(true);
+
 	} catch (std::exception& e) {
 			
 		// ATTN: at some point bubble these exceptions up?

@@ -85,12 +85,15 @@ mvceditor::GlobalCacheClass::GlobalCacheClass()
 mvceditor::GlobalCacheClass::~GlobalCacheClass() {
 	TagParser.Close();
 	if (TagDbSession) {
+		TagDbSession->close();
 		delete TagDbSession;
 	}
 	if (DetectedTagDbSession) {
+		DetectedTagDbSession->close();
 		delete DetectedTagDbSession;
 	}
 	if (NativeDbSession) {
+		NativeDbSession->close();
 		delete NativeDbSession;
 	}
 }
@@ -98,7 +101,7 @@ mvceditor::GlobalCacheClass::~GlobalCacheClass() {
 void mvceditor::GlobalCacheClass::InitGlobalTag(const wxFileName& tagDbFileName, 
 									   const std::vector<wxString>& phpFileExtensions, 
 									   const std::vector<wxString>& miscFileExtensions,
-									   pelet::Versions version, int fileParsingBufferSize) {
+									   pelet::Versions version) {
 	wxASSERT_MSG(!IsTagFinderInit, wxT("tag finder can only be initialized once"));
 	TagParser.PhpFileExtensions = phpFileExtensions;
 	TagParser.MiscFileExtensions = miscFileExtensions;
@@ -106,7 +109,7 @@ void mvceditor::GlobalCacheClass::InitGlobalTag(const wxFileName& tagDbFileName,
 	IsTagFinderInit = Open(TagDbSession, tagDbFileName.GetFullPath());
 	if (IsTagFinderInit) {
 		TagParser.SetVersion(version);
-		TagParser.Init(TagDbSession, fileParsingBufferSize);
+		TagParser.Init(TagDbSession);
 		TagFinder.Init(TagDbSession);
 	}
 }
@@ -114,7 +117,7 @@ void mvceditor::GlobalCacheClass::InitGlobalTag(const wxFileName& tagDbFileName,
 void mvceditor::GlobalCacheClass::AdoptGlobalTag(soci::session* globalSession,
 												 const std::vector<wxString>& phpFileExtensions, 
 												 const std::vector<wxString>& miscFileExtensions,
-												 pelet::Versions version, int fileParsingBufferSize) {
+												 pelet::Versions version) {
 	wxASSERT_MSG(!IsTagFinderInit, wxT("tag finder can only be initialized once"));
 	TagParser.PhpFileExtensions = phpFileExtensions;
 	TagParser.MiscFileExtensions = miscFileExtensions;
@@ -122,7 +125,7 @@ void mvceditor::GlobalCacheClass::AdoptGlobalTag(soci::session* globalSession,
 	IsTagFinderInit = NULL != globalSession;
 	if (IsTagFinderInit) {
 		TagParser.SetVersion(version);
-		TagParser.Init(TagDbSession, fileParsingBufferSize);
+		TagParser.Init(TagDbSession);
 		TagFinder.Init(TagDbSession);
 	}
 }
