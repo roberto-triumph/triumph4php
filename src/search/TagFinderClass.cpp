@@ -207,6 +207,108 @@ UnicodeString mvceditor::TagSearchClass::GetNamespaceName() const {
 	return NamespaceName;
 }
 
+mvceditor::TagResultClass::TagResultClass() 
+	: Tag()
+	, Stmt(NULL)
+	, IsEmpty(true)
+	, FileTagId(0)
+	, Key()
+	, Identifier()
+	, ClassName()
+	, Type(0)
+	, NamespaceName()
+	, Signature()
+	, ReturnType()
+	, Comment()
+	, FullPath()
+	, IsProtected(false)
+	, IsPrivate(false)
+	, IsStatic(false)
+	, IsDynamic(false)
+	, IsNative(false)
+	, FileIsNew(false)
+	, FileTagIdIndicator()
+	, FullPathIndicator()
+	, FileIsNewIndicator()
+{
+}
+
+void mvceditor::TagResultClass::Init(soci::session& session, const std::string& sql) {
+	try {
+		Stmt =  new soci::statement(session);
+		*Stmt = (session.prepare << sql,
+			soci::into(FileTagId, FileTagIdIndicator), soci::into(Key), soci::into(Identifier), soci::into(ClassName), 
+			soci::into(Type), soci::into(NamespaceName), soci::into(Signature), 
+			soci::into(ReturnType), soci::into(Comment), soci::into(FullPath, FullPathIndicator), soci::into(IsProtected), soci::into(IsPrivate), 
+			soci::into(IsStatic), soci::into(IsDynamic), soci::into(IsNative), soci::into(FileIsNew, FileIsNewIndicator)
+		);
+		if (Stmt->execute(true)) {
+			IsEmpty = false;
+		}
+		else {
+			IsEmpty = true;
+			delete Stmt;
+			Stmt = NULL;
+		}
+	} catch (std::exception& e) {
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxUnusedVar(msg);
+		wxASSERT_MSG(false, msg);
+	}
+}
+
+void mvceditor::TagResultClass::Next() {
+	if (soci::i_ok == FileTagIdIndicator) {
+		Tag.FileTagId = FileTagId;
+	}
+	Tag.Key = mvceditor::CharToIcu(Key.c_str());
+	Tag.Identifier = mvceditor::CharToIcu(Identifier.c_str());
+	Tag.ClassName = mvceditor::CharToIcu(ClassName.c_str());
+	Tag.Type = (mvceditor::TagClass::Types)Type;
+	Tag.NamespaceName = mvceditor::CharToIcu(NamespaceName.c_str());
+	Tag.Signature = mvceditor::CharToIcu(Signature.c_str());
+	Tag.ReturnType = mvceditor::CharToIcu(ReturnType.c_str());
+	Tag.Comment = mvceditor::CharToIcu(Comment.c_str());
+	if (soci::i_ok == FullPathIndicator) {
+		Tag.SetFullPath(mvceditor::CharToWx(FullPath.c_str()));
+	}
+	Tag.IsProtected = IsProtected != 0;
+	Tag.IsPrivate = IsPrivate != 0;
+	Tag.IsStatic = IsStatic != 0;
+	Tag.IsDynamic = IsDynamic != 0;
+	Tag.IsNative = IsNative != 0;
+	if (soci::i_ok == FileIsNewIndicator) {
+		Tag.FileIsNew = FileIsNew != 0;
+	}
+	else {
+		Tag.FileIsNew = true;
+	}
+	if (Stmt) {
+		bool next = Stmt->fetch();
+		if (!next) {
+			delete Stmt;
+			Stmt = NULL;
+		}
+	}
+}
+
+std::vector<mvceditor::TagClass> mvceditor::TagResultClass::Matches() {
+	std::vector<mvceditor::TagClass> matches;
+	while (More()) {
+		Next();
+		matches.push_back(Tag);
+	}
+	return matches;
+}
+
+bool mvceditor::TagResultClass::Empty() const {
+	return IsEmpty || NULL == Stmt;
+}
+
+bool mvceditor::TagResultClass::More() const {
+	return NULL != Stmt;
+}
+
 mvceditor::TagFinderClass::TagFinderClass()
 	: Session(NULL)
 	, IsCacheInitialized(false) {
@@ -916,69 +1018,9 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ResourceStatem
 	if (!IsCacheInitialized) {
 		return matches;
 	}
-	int fileTagId;
-	std::string key;
-	std::string identifier;
-	std::string className;
-	int type;
-	std::string namespaceName;
-	std::string signature;
-	std::string returnType;
-	std::string comment;
-	std::string fullPath;
-	int isProtected;
-	int isPrivate;
-	int isStatic;
-	int isDynamic;
-	int isNative;
-	int fileIsNew;
-	soci::indicator fileTagIdIndicator,
-		fullPathIndicator,
-		fileIsNewIndicator;
-	try {
-		soci::statement stmt = (Session->prepare << sql,
-			soci::into(fileTagId, fileTagIdIndicator), soci::into(key), soci::into(identifier), soci::into(className), 
-			soci::into(type), soci::into(namespaceName), soci::into(signature), 
-			soci::into(returnType), soci::into(comment), soci::into(fullPath, fullPathIndicator), soci::into(isProtected), soci::into(isPrivate), 
-			soci::into(isStatic), soci::into(isDynamic), soci::into(isNative), soci::into(fileIsNew, fileIsNewIndicator)
-		);
-		if (stmt.execute(true)) {
-			do {
-				mvceditor::TagClass tag;
-				if (soci::i_ok == fileTagIdIndicator) {
-					tag.FileTagId = fileTagId;
-				}
-				tag.Key = mvceditor::CharToIcu(key.c_str());
-				tag.Identifier = mvceditor::CharToIcu(identifier.c_str());
-				tag.ClassName = mvceditor::CharToIcu(className.c_str());
-				tag.Type = (mvceditor::TagClass::Types)type;
-				tag.NamespaceName = mvceditor::CharToIcu(namespaceName.c_str());
-				tag.Signature = mvceditor::CharToIcu(signature.c_str());
-				tag.ReturnType = mvceditor::CharToIcu(returnType.c_str());
-				tag.Comment = mvceditor::CharToIcu(comment.c_str());
-				if (soci::i_ok == fullPathIndicator) {
-					tag.SetFullPath(mvceditor::CharToWx(fullPath.c_str()));
-				}
-				tag.IsProtected = isProtected != 0;
-				tag.IsPrivate = isPrivate != 0;
-				tag.IsStatic = isStatic != 0;
-				tag.IsDynamic = isDynamic != 0;
-				tag.IsNative = isNative != 0;
-				if (soci::i_ok == fileIsNewIndicator) {
-					tag.FileIsNew = fileIsNew != 0;
-				}
-				else {
-					tag.FileIsNew = true;
-				}
-
-				matches.push_back(tag);
-			} while (stmt.fetch());
-		}
-	} catch (std::exception& e) {
-		wxString msg = mvceditor::CharToWx(e.what());
-		wxUnusedVar(msg);
-		wxASSERT_MSG(false, msg);
-	}
+	mvceditor::TagResultClass result;
+	result.Init(*Session, sql);
+	matches = result.Matches();	
 	return matches;
 }
 

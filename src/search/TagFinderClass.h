@@ -201,6 +201,73 @@ private:
 };
 
 /**
+ * The TagResult is used to loop through database rows of the tag table
+ */
+class TagResultClass {
+
+public:
+
+	mvceditor::TagClass Tag;
+
+	TagResultClass();
+
+	void Init(soci::session& session, const std::string& sql);
+
+	// TODO: remove this method
+	std::vector<mvceditor::TagClass> Matches();
+
+	/**
+	 * @return boolean TRUE if the query returned zero rows.
+	 */
+	bool Empty() const;
+
+	/**
+	 * @return boolean TRUE if there are more results to be iterated through
+	 */
+	bool More() const;
+
+	/**
+	 * advance to the next row. after a call to this method, the Tag member variable will contain the 
+	 * resulting row.
+	 */
+	void Next();
+
+private:
+
+	/**
+	 * the statement to iterate through
+	 */
+	soci::statement* Stmt;
+
+	/**
+	 * TRUE if the query returned zero rows.
+	 * @var boolean
+	 */
+	bool IsEmpty;
+
+	// variables to bind to the statement
+	int FileTagId;
+	std::string Key;
+	std::string Identifier;
+	std::string ClassName;
+	int Type;
+	std::string NamespaceName;
+	std::string Signature;
+	std::string ReturnType;
+	std::string Comment;
+	std::string FullPath;
+	int IsProtected;
+	int IsPrivate;
+	int IsStatic;
+	int IsDynamic;
+	int IsNative;
+	int FileIsNew;
+	soci::indicator FileTagIdIndicator,
+		FullPathIndicator,
+		FileIsNewIndicator;
+};
+
+/**
  * The ParsedTagFinderClass is used to locate source code artifacts (classes, functions, methods, and files). The 
  * general flow of a search is as follows:
  * 
