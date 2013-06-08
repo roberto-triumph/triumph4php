@@ -100,7 +100,11 @@ TEST_FIXTURE(ProjectTagActionTestClass, InitProject) {
 	ProjectTagAction.BackgroundWork();
 
 	mvceditor::TagSearchClass search(UNICODE_STRING_SIMPLE("User"));
-	CHECK_VECTOR_SIZE(1, Finder.ExactTags(search));
+	mvceditor::TagResultClass* results = search.CreateExactResults();
+	CHECK(Finder.ExactTags(results));
+	results->Next();
+	CHECK_UNISTR_EQUALS("User", results->Tag.ClassName);
+	delete results;
 }
 
 TEST_FIXTURE(ProjectTagActionTestClass, InitMultipleProjects) {
@@ -124,10 +128,19 @@ TEST_FIXTURE(ProjectTagActionTestClass, InitMultipleProjects) {
 	ProjectTagAction.BackgroundWork();
 
 	mvceditor::TagSearchClass searchFirst(UNICODE_STRING_SIMPLE("User"));
-	CHECK_VECTOR_SIZE(1, Finder.ExactTags(searchFirst));
+	mvceditor::TagResultClass* results = searchFirst.CreateExactResults();
+	CHECK(Finder.ExactTags(results));
+	results->Next();
+	CHECK_UNISTR_EQUALS("User", results->Tag.ClassName);
+	delete results;
 
 	mvceditor::TagSearchClass searchSecond(UNICODE_STRING_SIMPLE("Role"));
-	CHECK_VECTOR_SIZE(1, Finder.ExactTags(searchSecond));
+	
+	results = searchSecond.CreateExactResults();
+	CHECK(Finder.ExactTags(results));
+	results->Next();
+	CHECK_UNISTR_EQUALS("Role", results->Tag.ClassName);
+	delete results;
 }
 
 }

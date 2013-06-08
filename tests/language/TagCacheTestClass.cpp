@@ -119,7 +119,7 @@ public:
 	pelet::ExpressionClass ParsedExpression;
 
 	std::vector<UnicodeString> VariableMatches;
-	std::vector<mvceditor::TagClass> ResourceMatches;
+	std::vector<mvceditor::TagClass> TagMatches;
 	mvceditor::SymbolTableMatchErrorClass Error;
 	mvceditor::DirectorySearchClass Search;
 	std::vector<wxString> PhpFileExtensions;
@@ -127,7 +127,7 @@ public:
 	soci::session* Session1;
 	
 	ExpressionCompletionMatchesFixtureClass() 
-		: FileTestFixtureClass(wxT("resource-cache"))
+		: FileTestFixtureClass(wxT("tag-cache"))
 		, SqliteTestFixtureClass()
 		, TagCache()
 		, GlobalFile(wxT("src") + wxString(wxFileName::GetPathSeparator()) + wxT("global.php"))
@@ -141,7 +141,7 @@ public:
 		, Scope()
 		, ParsedExpression(Scope)
 		, VariableMatches()
-		, ResourceMatches()
+		, TagMatches()
 		, Error()
 		, Search()
 		, PhpFileExtensions()
@@ -184,7 +184,44 @@ public:
 	}
 };
 
-SUITE(ResourceCacheTestClass) {
+class TagCacheSearchFixtureClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
+
+public:
+
+	mvceditor::TagCacheClass TagCache;
+	mvceditor::DirectorySearchClass Search;
+	std::vector<wxString> PhpFileExtensions;
+	std::vector<wxString> MiscFileExtensions;
+
+	// using a new session instead of sqlitefixture's session
+	// because GlobalTagCache class takes ownership of the session pointer
+	soci::session* Session1;
+
+	TagCacheSearchFixtureClass()
+		: FileTestFixtureClass(wxT("tag-cache"))
+		, SqliteTestFixtureClass() 
+		, TagCache() 
+		, Search() 
+		, PhpFileExtensions() 
+		, MiscFileExtensions() 
+		, Session1(NULL) {
+		PhpFileExtensions.push_back(wxT("*.php"));
+		Session1 = new soci::session(*soci::factory_sqlite3(), ":memory:");
+		CreateDatabase(*Session1, mvceditor::ResourceSqlSchemaAsset());
+	}
+
+	mvceditor::GlobalCacheClass* CreateGlobalCache(const wxString& srcDirectory) {
+		mvceditor::GlobalCacheClass* cache = new mvceditor::GlobalCacheClass();
+		cache->AdoptGlobalTag(Session1, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+			
+		// must call init() here since we want to parse files from disk
+		Search.Init(TestProjectDir + srcDirectory);
+		cache->Walk(Search);
+		return cache;
+	}
+};
+
+SUITE(TagCacheTestClass) {
 
 TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, CompletionMatchesWithGlobalCache) {
 	
@@ -203,12 +240,12 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, CompletionMatchesWithGloba
 	
 	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("w"));
 	TagCache.ExpressionCompletionMatches(File2, ParsedExpression, Scope, 
-		VariableMatches, ResourceMatches, DoDuckTyping, Error);
-	CHECK_VECTOR_SIZE(1, ResourceMatches);
-	CHECK_UNISTR_EQUALS("w", ResourceMatches[0].Identifier);
+		VariableMatches, TagMatches, DoDuckTyping, Error);
+	CHECK_VECTOR_SIZE(1, TagMatches);
+	CHECK_UNISTR_EQUALS("w", TagMatches[0].Identifier);
 }
 
-TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithGlobalCache) {
+TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, TagMatchesWithGlobalCache) {
 	
 	// in this test we will create a class in file2; file1 will use that class
 	// the ResourceUpdate object should be able to detect the variable type of 
@@ -225,13 +262,13 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithGlobalC
 	
 	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("w"));
 	TagCache.ResourceMatches(File1, ParsedExpression, Scope, 
-		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
-	CHECK_VECTOR_SIZE(1, ResourceMatches);
-	CHECK_UNISTR_EQUALS("w", ResourceMatches[0].Identifier);
-	CHECK_UNISTR_EQUALS("ActionYou", ResourceMatches[0].ClassName);
+		TagMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
+	CHECK_VECTOR_SIZE(1, TagMatches);
+	CHECK_UNISTR_EQUALS("w", TagMatches[0].Identifier);
+	CHECK_UNISTR_EQUALS("ActionYou", TagMatches[0].ClassName);
 }
 
-TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithStaleMatches) {
+TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, TagMatchesWithStaleMatches) {
 
 	// create a class in global file with methodA
 	// file2 will use the class from global file; file2 will be registered
@@ -252,20 +289,46 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, ResourceMatchesWithStaleMa
 	
 	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("methodA"));
 	TagCache.ResourceMatches(File1, ParsedExpression, Scope, 
-		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
-	CHECK_VECTOR_SIZE(1, ResourceMatches);
-	CHECK_UNISTR_EQUALS("methodA", ResourceMatches[0].Identifier);
-	CHECK_UNISTR_EQUALS("ActionMy", ResourceMatches[0].ClassName);
+		TagMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
+	CHECK_VECTOR_SIZE(1, TagMatches);
+	CHECK_UNISTR_EQUALS("methodA", TagMatches[0].Identifier);
+	CHECK_UNISTR_EQUALS("ActionMy", TagMatches[0].ClassName);
 
 	// now update the code by creating a working version of the global code.
 	// ie. the user opening a file.
 	mvceditor::WorkingCacheClass* cache3 = CreateWorkingCache(GlobalFile, Code2);
 	CHECK(TagCache.RegisterWorking(GlobalFile, cache3));
 	
-	ResourceMatches.clear();
+	TagMatches.clear();
 	TagCache.ResourceMatches(GlobalFile, ParsedExpression, Scope, 
-		ResourceMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
-	CHECK_VECTOR_SIZE(0, ResourceMatches);
+		TagMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
+	CHECK_VECTOR_SIZE(0, TagMatches);
+}
+
+TEST_FIXTURE(TagCacheSearchFixtureClass, ExactTags) {
+	wxString code = wxT("<?php class ActionYou  { function w() {} }");
+	CreateSubDirectory(wxT("src"));
+	CreateFixtureFile(wxT("src") + wxString(wxFileName::GetPathSeparator()) + wxT("file1.php"), code);
+	
+	mvceditor::GlobalCacheClass* cache = CreateGlobalCache(wxT("src"));
+	TagCache.RegisterGlobal(cache);
+	
+	// empty means search all dirs
+	std::vector<wxFileName> searchDirs;
+	mvceditor::TagResultClass* result = TagCache.ExactTags(UNICODE_STRING_SIMPLE("ActionYou"), searchDirs);
+
+	CHECK(result);
+	if (!result) {
+		return;
+	}
+	CHECK(result->More());
+	result->Next();
+	CHECK_UNISTR_EQUALS("ActionYou", result->Tag.Identifier);
+	CHECK_UNISTR_EQUALS("ActionYou", result->Tag.ClassName);
+	CHECK_EQUAL(false, result->More());
+
+	// do this now so that we dont use the inherited Session
+	delete result;
 }
 
 }

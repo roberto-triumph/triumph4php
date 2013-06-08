@@ -154,12 +154,14 @@ static UnicodeString ResolveResourceType(UnicodeString resourceToLookup,
 	// need to get the type from the tag finders
 	for (size_t j = 0; j < allTagFinders.size(); ++j) {
 		mvceditor::TagFinderClass* finder = allTagFinders[j];
-		std::vector<mvceditor::TagClass> matches = finder->ExactTags(tagSearch);
-		if (!matches.empty()) {
+		mvceditor::TagResultClass* result = tagSearch.CreateExactResults();
+		finder->ExactTags(result);
+		while (result->More()) {
+			result->Next();
 
 			// since we are doing fully qualified matches, all matches are from the inheritance chain; ie. all methods
 			// will have the same signature (return type)
-			mvceditor::TagClass match = matches[0];
+			mvceditor::TagClass match = result->Tag;
 			if (mvceditor::TagClass::CLASS == match.Type) {
 				type = match.ClassName;
 			}
@@ -172,6 +174,8 @@ static UnicodeString ResolveResourceType(UnicodeString resourceToLookup,
 			// since we are doing exact lookups, only one should be found
 			break;
 		}
+		delete result;
+
 	}
 	return type;
 }
@@ -634,7 +638,12 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 			if ((doDuckTyping || !typeToLookup.isEmpty())) {
 				std::vector<mvceditor::TagClass> matches;
 				if (doFullyQualifiedMatchOnly) {
-					matches = finder->ExactTags(tagSearch);
+
+					// TODO: remove vector matches
+					mvceditor::TagResultClass* result = tagSearch.CreateExactResults();
+					finder->ExactTags(result);
+					matches = result->Matches();
+					delete result;
 				}
 				else {
 					matches = finder->NearMatchTags(tagSearch, false);

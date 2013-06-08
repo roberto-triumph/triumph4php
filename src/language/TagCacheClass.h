@@ -323,9 +323,10 @@ public:
 	 * @see mvceditor::TagFinderClass::ExactTags
 	 * @param search string to search for
 	 * @param searchDirs directories to restrict matching tags in. If empty, then the entire cache will be searched.
-	 * @return std::vector<mvceditor::TagClass> matched resources 
+	 * @return TagResultClass to iterate through the results of the query. The
+	 *          returned pointer must be deleted by the caller.
 	 */
-	std::vector<mvceditor::TagClass> ExactTags(const UnicodeString& search, const std::vector<wxFileName>& searchDirs);
+	mvceditor::TagResultClass* ExactTags(const UnicodeString& search, const std::vector<wxFileName>& searchDirs);
 	
 	/**
 	 * Searches all the registered caches (working AND global caches)

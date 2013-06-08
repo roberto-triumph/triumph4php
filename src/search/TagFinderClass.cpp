@@ -38,6 +38,51 @@
 #include <soci/soci.h>
 #include <string>
 
+namespace mvceditor {
+
+class ExactMemberTagResultClass : public mvceditor::TagResultClass {
+
+public:
+
+	ExactMemberTagResultClass();
+
+	void Prepare(soci::session& session, bool doLimit);
+	
+	void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, const std::vector<wxFileName>& dirs);
+
+private:
+
+	std::vector<std::string> Keys;
+
+	std::vector<int> TagTypes;
+
+	std::vector<int> FileTagIds;
+
+	std::vector<wxFileName> Dirs;
+};
+
+class ExactNonMemberTagResultClass : public mvceditor::TagResultClass {
+
+public:
+
+	ExactNonMemberTagResultClass();
+
+	void Prepare(soci::session& session, bool doLimit);
+	
+	void Set(const UnicodeString& key, const std::vector<wxFileName>& dirs);
+
+private:
+
+	std::string Key;
+
+	std::vector<int> TagTypes;
+
+	std::vector<int> FileTagIds;
+
+	std::vector<wxFileName> Dirs;
+};
+
+}
 /**
  * appends name to namespace
  */
@@ -59,6 +104,122 @@ static void InClause(const std::vector<int>& values, std::ostringstream& stream)
 			stream << ",";
 		}
 	}
+}
+
+mvceditor::ExactMemberTagResultClass::ExactMemberTagResultClass()
+	: TagResultClass()
+	, Keys()
+	, TagTypes()
+	, FileTagIds()
+	, Dirs() {
+	TagTypes.push_back(mvceditor::TagClass::CLASS_CONSTANT);
+	TagTypes.push_back(mvceditor::TagClass::MEMBER);
+	TagTypes.push_back(mvceditor::TagClass::METHOD);
+}
+
+void mvceditor::ExactMemberTagResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, 
+											   const std::vector<wxFileName>& dirs) {
+	wxASSERT_MSG(!classNames.empty(), wxT("classNames must not be empty"));
+	for (size_t i = 0; i < classNames.size(); i++) {
+		Keys.push_back(mvceditor::IcuToChar(classNames[i] + UNICODE_STRING_SIMPLE("::") + memberName));
+	}
+	Dirs = dirs;
+}
+
+void mvceditor::ExactMemberTagResultClass::Prepare(soci::session& session,  bool doLimit) {
+	bool error = false;
+	wxString errorMsg;
+	FileTagIds = mvceditor::FileTagIdsForDirs(session, Dirs, error, errorMsg);
+	wxASSERT_MSG(!error, errorMsg);
+
+	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
+	std::string sql;
+	sql += "SELECT r.file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, full_path, ";
+	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
+	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) WHERE ";
+	
+	sql += "key IN (?";
+	for (size_t i = 1; i < Keys.size(); ++i) {
+		sql += ",?";
+	}
+	sql += ")";
+	sql += " AND type IN(?, ?, ?)";
+	if (!FileTagIds.empty()) {
+		sql += " AND f.file_item_id IN(?";
+		for (size_t i = 1; i <  FileTagIds.size(); ++i) {
+			sql += ",?"; 
+		}
+		sql += ")";
+	}
+	sql += " ORDER BY key";
+	if (doLimit) {
+		sql += " LIMIT 100";
+	}
+	soci::statement* stmt = new soci::statement(session);
+	stmt->prepare(sql);
+
+	for (size_t i = 0; i < Keys.size(); i++) {
+		stmt->exchange(soci::use(Keys[i]));
+	}
+	for (size_t i = 0; i < TagTypes.size(); i++) {
+		stmt->exchange(soci::use(TagTypes[i]));
+	}
+	for (size_t i = 0; i < FileTagIds.size(); i++) {
+		stmt->exchange(soci::use(FileTagIds[i]));
+	}
+	Init(session, stmt);
+}
+
+mvceditor::ExactNonMemberTagResultClass::ExactNonMemberTagResultClass()
+	: TagResultClass()
+	, Key() 
+	, TagTypes()
+	, FileTagIds() 
+	, Dirs() {
+	TagTypes.push_back(mvceditor::TagClass::DEFINE);
+	TagTypes.push_back(mvceditor::TagClass::CLASS);
+	TagTypes.push_back(mvceditor::TagClass::FUNCTION);
+}
+
+void mvceditor::ExactNonMemberTagResultClass::Set(const UnicodeString& key, const std::vector<wxFileName>& dirs) {
+	Key = mvceditor::IcuToChar(key);
+	Dirs = dirs;
+}
+
+void mvceditor::ExactNonMemberTagResultClass::Prepare(soci::session& session, bool doLimit) {
+	bool error = false;
+	wxString errorMsg;
+	FileTagIds = mvceditor::FileTagIdsForDirs(session, Dirs, error, errorMsg);
+	wxASSERT_MSG(!error, errorMsg);
+	
+
+	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
+	std::string sql;
+	sql += "SELECT r.file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, full_path, ";
+	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
+	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) WHERE ";
+	sql += "key = ? AND type IN(?, ?, ?)";
+	if (!FileTagIds.empty()) {
+		sql += " AND f.file_item_id IN(?";
+		for (size_t i = 1; i < FileTagIds.size(); ++i) {
+			sql += ",?"; 
+		}
+		sql += ")";
+	}
+	sql += " ORDER BY key";
+	if (doLimit) {
+		sql += " LIMIT 100";
+	}
+	soci::statement* stmt = new soci::statement(session);
+	stmt->prepare(sql);
+	stmt->exchange(soci::use(Key));
+	for (size_t i = 0; i < TagTypes.size(); i++) {
+		stmt->exchange(soci::use(TagTypes[i]));
+	}
+	for (size_t i = 0; i < FileTagIds.size(); i++) {
+		stmt->exchange(soci::use(FileTagIds[i]));
+	}
+	Init(session, stmt);
 }
 
 mvceditor::TagSearchClass::TagSearchClass(UnicodeString resourceQuery)
@@ -207,8 +368,38 @@ UnicodeString mvceditor::TagSearchClass::GetNamespaceName() const {
 	return NamespaceName;
 }
 
+mvceditor::TagResultClass* mvceditor::TagSearchClass::CreateExactResults() const {
+	mvceditor::TagResultClass* results = NULL; 
+	if (GetResourceType() == mvceditor::TagSearchClass::CLASS_NAME_METHOD_NAME) {
+		mvceditor::ExactMemberTagResultClass* memberResults = new mvceditor::ExactMemberTagResultClass();
+
+		// check the entire class hierachy; stop as soon as we found it
+		// combine the parent classes with the class being searched
+		std::vector<UnicodeString> classHierarchy = GetParentClasses();
+		classHierarchy.push_back(QualifyName(GetNamespaceName(), GetClassName()));
+		
+		memberResults->Set(classHierarchy, GetMethodName(), GetDirs());
+		results = memberResults;
+	}
+	else if (mvceditor::TagSearchClass::NAMESPACE_NAME == GetResourceType()) {
+		mvceditor::ExactNonMemberTagResultClass* nonMemberResults = new mvceditor::ExactNonMemberTagResultClass();
+
+		std::vector<UnicodeString> classNames;
+		UnicodeString key = QualifyName(GetNamespaceName(), GetClassName());
+		nonMemberResults->Set(key, GetDirs());
+		results = nonMemberResults;
+	}
+	else {
+		mvceditor::ExactNonMemberTagResultClass* nonMemberResults = new mvceditor::ExactNonMemberTagResultClass();
+		nonMemberResults->Set(GetClassName(), GetDirs());
+		results = nonMemberResults;
+	}
+	return results;
+}
+
 mvceditor::TagResultClass::TagResultClass() 
 	: Tag()
+	, Dirs()
 	, Stmt(NULL)
 	, IsEmpty(true)
 	, FileTagId(0)
@@ -232,6 +423,53 @@ mvceditor::TagResultClass::TagResultClass()
 	, FileIsNewIndicator()
 {
 }
+
+mvceditor::TagResultClass::~TagResultClass() {
+	if (Stmt) {
+		delete Stmt;
+	}
+}
+
+void mvceditor::TagResultClass::Prepare(soci::session& session, bool doLimit) {
+}
+
+
+void mvceditor::TagResultClass::Init(soci::session& session, soci::statement* stmt) {
+	try {
+		Stmt = stmt;
+		Stmt->exchange(soci::into(FileTagId, FileTagIdIndicator));
+		Stmt->exchange(soci::into(Key));
+		Stmt->exchange(soci::into(Identifier));
+		Stmt->exchange(soci::into(ClassName));
+		Stmt->exchange(soci::into(Type));
+		Stmt->exchange(soci::into(NamespaceName));
+		Stmt->exchange(soci::into(Signature));
+		Stmt->exchange(soci::into(ReturnType));
+		Stmt->exchange(soci::into(Comment));
+		Stmt->exchange(soci::into(FullPath, FullPathIndicator));
+		Stmt->exchange(soci::into(IsProtected));
+		Stmt->exchange(soci::into(IsPrivate));
+		Stmt->exchange(soci::into(IsStatic));
+		Stmt->exchange(soci::into(IsDynamic));
+		Stmt->exchange(soci::into(IsNative));
+		Stmt->exchange(soci::into(FileIsNew, FileIsNewIndicator));
+		Stmt->define_and_bind();
+		if (Stmt->execute(true)) {
+			IsEmpty = false;
+		}
+		else {
+			IsEmpty = true;
+			delete Stmt;
+			Stmt = NULL;
+		}
+	} catch (std::exception& e) {
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxUnusedVar(msg);
+		wxASSERT_MSG(false, msg);
+	}
+}
+
+
 
 void mvceditor::TagResultClass::Init(soci::session& session, const std::string& sql) {
 	try {
@@ -723,54 +961,14 @@ UnicodeString mvceditor::TagFinderClass::ExtractParentClassFromSignature(const U
 	return parentClassName;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::ExactTags(const mvceditor::TagSearchClass& tagSearch) {
+bool mvceditor::TagFinderClass::ExactTags(mvceditor::TagResultClass* results) {
 
 	// at one point there was a check here to see if the  tag files existed
 	// it was removed because it caused performance issues, since this method
 	// is called while the user is typing text.
 	// take care when coding; make sure that any code called by this method does not touch the file system
-	std::vector<mvceditor::TagClass> allMatches;
-	std::vector<int> types;
-	bool error = false;
-	wxString errorMsg;
-	std::vector<int> fileTagIds = mvceditor::FileTagIdsForDirs(*Session, tagSearch.GetDirs(), error, errorMsg);
-	wxASSERT_MSG(!error, errorMsg);
-	if (tagSearch.GetResourceType() == mvceditor::TagSearchClass::CLASS_NAME_METHOD_NAME) {
-
-		// check the entire class hierachy; stop as soon as we found it
-		// combine the parent classes with the class being searched
-		std::vector<UnicodeString> classHierarchy = tagSearch.GetParentClasses();
-		classHierarchy.push_back(QualifyName(tagSearch.GetNamespaceName(), tagSearch.GetClassName()));
-		
-		types.push_back(mvceditor::TagClass::MEMBER);
-		types.push_back(mvceditor::TagClass::METHOD);
-		types.push_back(mvceditor::TagClass::CLASS_CONSTANT);
-		for (size_t i = 0; i < classHierarchy.size(); ++i) {
-			UnicodeString key = classHierarchy[i] + UNICODE_STRING_SIMPLE("::") + tagSearch.GetMethodName();
-			std::string stdKey = mvceditor::IcuToChar(key);
-			std::vector<mvceditor::TagClass> matches = FindByKeyExactAndTypes(stdKey, types, fileTagIds, true);
-			allMatches.insert(allMatches.end(), matches.begin(), matches.end());
-		}
-	}
-	else if (mvceditor::TagSearchClass::NAMESPACE_NAME == tagSearch.GetResourceType()) {
-		UnicodeString key = QualifyName(tagSearch.GetNamespaceName(), tagSearch.GetClassName());
-		std::string stdKey = mvceditor::IcuToChar(key);
-		types.push_back(mvceditor::TagClass::DEFINE);
-		types.push_back(mvceditor::TagClass::CLASS);
-		types.push_back(mvceditor::TagClass::FUNCTION);
-
-		allMatches = FindByKeyExactAndTypes(stdKey, types, fileTagIds, true);
-	}
-	else {
-		UnicodeString key = tagSearch.GetClassName();
-		std::string stdKey = mvceditor::IcuToChar(key);
-		types.push_back(mvceditor::TagClass::DEFINE);
-		types.push_back(mvceditor::TagClass::CLASS);
-		types.push_back(mvceditor::TagClass::FUNCTION);
-
-		allMatches = FindByKeyExactAndTypes(stdKey, types, fileTagIds, true);
-	}
-	return allMatches;
+	results->Prepare(*Session, true);
+	return !results->Empty();
 }
 
 std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::ExactClassOrFile(const mvceditor::TagSearchClass& tagSearch) {

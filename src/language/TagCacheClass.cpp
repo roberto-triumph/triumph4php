@@ -267,27 +267,25 @@ void mvceditor::TagCacheClass::RegisterGlobal(mvceditor::GlobalCacheClass* cache
 	GlobalCache = cache;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::ExactTags(const UnicodeString& search, const std::vector<wxFileName>& searchDirs) {
-	std::vector<mvceditor::TagClass> matches;
+mvceditor::TagResultClass* mvceditor::TagCacheClass::ExactTags(const UnicodeString& search, const std::vector<wxFileName>& searchDirs) {
 	mvceditor::TagSearchClass tagSearch(search);
 	tagSearch.SetDirs(searchDirs);
-	
+	mvceditor::TagResultClass* result = NULL;
 
-	// return all of the matches from all finders that were found by the Collect* call.
-	// This is a bit tricky because we want to prioritize matches in opened files 
-	// instead of the global finder, since the global finder will be outdated.
 	std::vector<mvceditor::TagFinderClass*> finders = AllFinders();
 	for (size_t i = 0; i < finders.size(); ++i) {
 		mvceditor::TagFinderClass* tagFinder = finders[i];
-		std::vector<mvceditor::TagClass> finderMatches = tagFinder->ExactTags(tagSearch);
-		size_t count = finderMatches.size();
-		for (size_t j = 0; j < count; ++j) {
-			mvceditor::TagClass tag = finderMatches[j];
-			matches.push_back(tag);
+		result = tagSearch.CreateExactResults();
+		tagFinder->ExactTags(result);
+		
+		// TODO: not correct we need to query all finder
+		if (!result->Empty()) {
+			return result;
 		}
+		delete result;
+		result = NULL;
 	}
-	std::sort(matches.begin(), matches.end());
-	return matches;
+	return result;
 }
 
 std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::NearMatchTags(const UnicodeString& search, const std::vector<wxFileName>& searchDirs) {

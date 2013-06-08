@@ -33,6 +33,9 @@
 
 namespace mvceditor {
 
+// forward declaration, defined below
+class TagResultClass;
+
 /**
  * This represents a single 'query' for a tag; ie. this is how the tell the tag finder
  * what to look for.
@@ -93,6 +96,13 @@ public:
 	 */
 	std::vector<wxFileName> GetDirs() const;
 	void SetDirs(const std::vector<wxFileName>& dirs);
+
+	/**
+	 *
+	 * @return TagResultClass to iterate through the results of the query. The
+	 *          returned pointer must be deleted by the caller.
+	 */
+	mvceditor::TagResultClass* CreateExactResults() const;
 
 	/**
 	 * Returns the parsed class name
@@ -211,6 +221,29 @@ public:
 
 	TagResultClass();
 
+	virtual ~TagResultClass();
+
+	/**
+	 * in this method subclasses will build the SQL and execute it.
+	 *
+	 * @param session the connection
+	 * @param doLimit boolean if TRUE there should be a limit on the query
+	 */
+	virtual void Prepare(soci::session& session, bool doLimit);
+
+	/**
+	 * set the directories to match tags that are only in those directories.
+	 * search is recursive, the given dirs and all subdirs are searched.
+	 */
+	void SetDirs(const std::vector<wxString>& dirs);
+
+	/**
+	 * @param session must be around for as long as this result is alive
+	 * @param stmt this object will own the statement pointer
+	 */
+	void Init(soci::session& session, soci::statement* stmt);
+
+	// TODO: remove this method
 	void Init(soci::session& session, const std::string& sql);
 
 	// TODO: remove this method
@@ -232,7 +265,13 @@ public:
 	 */
 	void Next();
 
-private:
+protected:
+
+	/**
+	 * only tags that were found in files located in the given directories will match.
+	 * search is recursive, dirs and all of their subdirs are searched
+	 */
+	std::vector<wxString> Dirs;
 
 	/**
 	 * the statement to iterate through
@@ -413,27 +452,26 @@ public:
 	 * UserClass::name
 	 * UserClass::getName
 	 *
-	 * This method is NOT tolerant of class hierarchy; meaning that any inherited
-	 * if a property name will NOT match then the parent classes are searched. For example; the following code
+	 * This method can tolerant of class hierarchy; meaning that any inherited
+	 * if a property name will match then the parent classes are searched. For example; the following code
 	 *
 	 *   class AdminClass extends UserClass {
 	 *   }
 	 * 
-	 * then the folowing tag queries will NOT result in a match
+	 * then the folowing tag queries will result in a match
 	 *
 	 * AdminClass
 	 * AdminClass::name
 	 * AdminClass::getName
 	 *
+	 * But this depends on the TagSearch::setParentClassNames() be used.
 	 * To search the hierarchy, the ParentClassName() and GetResourceTraits() methods can be useful
 	 * 
-	 * @param tagSearch the resources to look for
-	 * @return std::vector<TagClass> the matched resources
-	 *         Because this search is done on a database,
-	 *         the returned list may contain matches from files that are no longer in 
-	 *         the file system.
+	 * @param result the result to be prepared and executed.  The caller can then iterate through the result
+	 *        to find the matches.
+	 * @return bool TRUE if there are matches
 	 */
-	std::vector<TagClass> ExactTags(const mvceditor::TagSearchClass& tagSearch);
+	bool ExactTags(mvceditor::TagResultClass* result);
 	
 	/**
 	 * Looks for the tag, using a near-match logic. Logic is as follows:

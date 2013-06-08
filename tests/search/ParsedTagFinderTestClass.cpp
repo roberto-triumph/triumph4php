@@ -80,6 +80,18 @@ public:
 		Matches = ParsedTagFinder.NearMatchTags(tagSearch, doCollectFileNames);
 	}
 
+	void ExactMatchTags(const UnicodeString& search) {
+		mvceditor::TagSearchClass tagSearch(search);
+		mvceditor::TagResultClass* result = tagSearch.CreateExactResults();
+		ParsedTagFinder.ExactTags(result);
+		Matches.clear();
+		while (result->More()) {
+			result->Next();
+			Matches.push_back(result->Tag);
+		}
+		delete result;
+	}
+
 	mvceditor::TagParserClass TagParser;
 	mvceditor::ParsedTagFinderClass ParsedTagFinder;
 	wxString TestFile;
@@ -122,6 +134,22 @@ public:
 	void NearMatchClassesOrFiles(const UnicodeString& search) {
 		mvceditor::TagSearchClass tagSearch(search);
 		Matches = ParsedTagFinder.NearMatchClassesOrFiles(tagSearch);
+	}
+
+	void ExactMatchTags(const mvceditor::TagSearchClass& tagSearch) {
+		mvceditor::TagResultClass* result = tagSearch.CreateExactResults();
+		Matches.clear();
+		ParsedTagFinder.ExactTags(result);
+		while (result->More()) {
+			result->Next();
+			Matches.push_back(result->Tag);
+		}
+		delete result;
+	}
+
+	void ExactMatchTags(const UnicodeString& search) {
+		mvceditor::TagSearchClass tagSearch(search);
+		ExactMatchTags(tagSearch);
 	}
 
 	mvceditor::TagParserClass TagParser;
@@ -1026,8 +1054,8 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldFindFileWhenClassNam
 		"\t}\n"
 		"}\n"
 	));	
-	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("UserClass"));
-	Matches = ParsedTagFinder.ExactTags(tagSearch);
+	ExactMatchTags(UNICODE_STRING_SIMPLE("UserClass"));
+
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
@@ -1054,8 +1082,8 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldFindFileWhenClassAnd
 		"}\n"
 		"?>\n"
 	));	
-	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("SetClass"));
-	Matches = ParsedTagFinder.ExactTags(tagSearch);
+	ExactMatchTags(UNICODE_STRING_SIMPLE("SetClass"));
+	
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("SetClass", Matches[0].Identifier);
 	CHECK_UNISTR_EQUALS("SetClass", Matches[0].ClassName);
@@ -1082,8 +1110,8 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldFindMatchesForCorrec
 		"}\n"
 		"?>\n"
 	));	
-	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("UserClass::get"));
-	Matches = ParsedTagFinder.ExactTags(tagSearch);
+	ExactMatchTags(UNICODE_STRING_SIMPLE("UserClass::get"));
+	
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_MEMBER_RESOURCE("UserClass", "get", Matches[0]);
 }
@@ -1097,9 +1125,8 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldNotFindFileWhenClass
 		"\t\treturn $this->name;\n"
 		"\t}\n"
 		"}\n"
-	));	
-	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("User"));
-	Matches = ParsedTagFinder.ExactTags(tagSearch);
+	));
+	ExactMatchTags(UNICODE_STRING_SIMPLE("User"));
 	CHECK_VECTOR_SIZE(0, Matches);
 }
 
@@ -1139,8 +1166,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactTagsShouldFindClassWhenFileHasBe
 		"?>\n"
 	));
 	Parse(TestProjectDir + TestFile);
-	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("AdminClass"));
-	Matches = ParsedTagFinder.ExactTags(tagSearch);
+	ExactMatchTags(UNICODE_STRING_SIMPLE("AdminClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
 
 	// make sure that file lookups work as well
@@ -1162,13 +1188,14 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactTagsShouldFindClassWhenFileHasBe
 		"}\n"
 		"?>\n"
 	));	
-	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("UserClass"));
 	Parse(TestProjectDir + TestFile);
 	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 	CHECK(wxRemoveFile(TestProjectDir + TestFile));
-	Matches = ParsedTagFinder.ExactTags(tagSearch);
+	
+	ExactMatchTags(UNICODE_STRING_SIMPLE("UserClass"));
+
 
 	// before this was expected to be zero, but the code that ensures matched files
 	// exist is gone from the NearMatchTags method because of performance
@@ -1199,8 +1226,8 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagshouldReturnSignatureForCon
 		"}\n"
 		"?>\n"
 	));
-	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("UserClass::__construct"));
-	Matches = ParsedTagFinder.ExactTags(tagSearch);
+	ExactMatchTags(UNICODE_STRING_SIMPLE("UserClass::__construct"));
+	 
 	mvceditor::TagClass tag = Matches[0];
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("public function __construct($name)"), tag.Signature);
 }
@@ -1227,7 +1254,8 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagshouldReturnInheritedMember
 	std::vector<UnicodeString> parents;
 	parents.push_back(UNICODE_STRING_SIMPLE("UserClass"));
 	tagSearch.SetParentClasses(parents);
-	Matches = ParsedTagFinder.ExactTags(tagSearch);
+	ExactMatchTags(tagSearch);
+	
 	CHECK_VECTOR_SIZE(1, Matches);
 	mvceditor::TagClass tag = Matches[0];
 	CHECK_UNISTR_EQUALS("UserClass", tag.ClassName);
@@ -1268,7 +1296,8 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldCollectTagsFromSpeci
 	std::vector<wxFileName> dirs;
 	dirs.push_back(modelDir);
 	search.SetDirs(dirs);
-	Matches = ParsedTagFinder.ExactTags(search);
+	ExactMatchTags(search);
+
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("UserClass", Matches[0].Identifier);
 	CHECK_EQUAL(TestFile, Matches[0].FullPath);
@@ -1452,8 +1481,8 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectQualifiedResourceNamespaces)
 		"function singleWork() { } \n"
 		"?>\n"
 	));
-	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"));
-	Matches = ParsedTagFinder.ExactTags(tagSearch);
+	ExactMatchTags(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"));
+	
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), Matches[0].Identifier);
 }
@@ -1479,8 +1508,8 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectQualifiedResourceNamespacesS
 		"\n"
 		"?>\n"
 	));	
-	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"));
-	Matches = ParsedTagFinder.ExactTags(tagSearch);
+	ExactMatchTags(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"));
+
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), Matches[0].Identifier);
 
@@ -1506,13 +1535,13 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectResourceInGlobalNamespaces) 
 		"function singleWork() { } \n"
 		"?>\n"
 	));
-	 mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("\\MyClass"));
-	Matches = ParsedTagFinder.ExactTags(tagSearch);
+	ExactMatchTags(UNICODE_STRING_SIMPLE("\\MyClass"));	
+	
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("\\MyClass", Matches[0].Identifier);
 	
-	mvceditor::TagSearchClass tagSearchFunction(UNICODE_STRING_SIMPLE("\\singleWork"));
-	Matches = ParsedTagFinder.ExactTags(tagSearchFunction);
+	ExactMatchTags(UNICODE_STRING_SIMPLE("\\singleWork"));
+
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("\\singleWork", Matches[0].Identifier);
 }

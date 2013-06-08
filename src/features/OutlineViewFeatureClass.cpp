@@ -154,7 +154,10 @@ void mvceditor::OutlineTagCacheSearchActionClass::BackgroundWork() {
 				
 				// searching for all members in a class name
 				std::vector<wxFileName> dirs;
-				tags = TagCache.ExactTags(*search, dirs);
+				mvceditor::TagResultClass* results = TagCache.ExactTags(*search, dirs);
+				tags = results->Matches();
+				delete results;
+
 				if (!tags.empty()) {
 					tag = tags.begin();
 				}
@@ -198,9 +201,11 @@ void mvceditor::OutlineViewFeatureClass::AddKeyboardShortcuts(std::vector<Dynami
 
 void mvceditor::OutlineViewFeatureClass::JumpToResource(const wxString& tag) {
 	std::vector<wxFileName> dirs;
-	std::vector<mvceditor::TagClass> matches = App.Globals.TagCache.ExactTags(mvceditor::WxToIcu(tag), dirs);
-	if (!matches.empty()) {
-		mvceditor::TagClass tag = matches[0];
+	std::vector<mvceditor::TagClass> matches;
+	mvceditor::TagResultClass* result = App.Globals.TagCache.ExactTags(mvceditor::WxToIcu(tag), dirs);
+	if (!result->Empty()) {
+		result->Next();
+		mvceditor::TagClass tag = result->Tag;
 		GetNotebook()->LoadPage(tag.GetFullPath());
 		CodeControlClass* codeControl = GetCurrentCodeControl();
 		if (codeControl) {
@@ -213,6 +218,7 @@ void mvceditor::OutlineViewFeatureClass::JumpToResource(const wxString& tag) {
 			// else the index is out of date....
 		}
 	}	
+	delete result;
 }
 
 void mvceditor::OutlineViewFeatureClass::StartTagSearch(const std::vector<UnicodeString>& searchStrings) {
