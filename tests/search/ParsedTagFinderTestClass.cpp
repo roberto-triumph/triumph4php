@@ -448,7 +448,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldNotFindFileWhenC
 	CHECK_VECTOR_SIZE(0, Matches);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFileWhendMethodNameMatchesButClassIsNotGiven) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFileWhenMethodNameMatchesButClassIsNotGiven) {
 	Prep(mvceditor::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"

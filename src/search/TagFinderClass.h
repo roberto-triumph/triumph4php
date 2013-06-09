@@ -35,6 +35,7 @@ namespace mvceditor {
 
 // forward declaration, defined below
 class TagResultClass;
+class FileTagResultClass;
 
 /**
  * This represents a single 'query' for a tag; ie. this is how the tell the tag finder
@@ -98,11 +99,28 @@ public:
 	void SetDirs(const std::vector<wxFileName>& dirs);
 
 	/**
+	 * Create a query that will match exact matches of the given input.
 	 *
 	 * @return TagResultClass to iterate through the results of the query. The
 	 *          returned pointer must be deleted by the caller.
 	 */
 	mvceditor::TagResultClass* CreateExactResults() const;
+
+	/**
+	 * Create a query that will match near matches of the given input.
+	 *
+	 * @return TagResultClass to iterate through the results of the query. The
+	 *          returned pointer must be deleted by the caller.
+	 */
+	mvceditor::TagResultClass* CreateNearMatchResults() const;
+
+	/**
+	 * Create a query that will match near files of the given input.
+	 *
+	 * @return FileTagResultClass to iterate through the results of the query. The
+	 *          returned pointer must be deleted by the caller.
+	 */
+	mvceditor::FileTagResultClass* CreateNearMatchFileResults() const;
 
 	/**
 	 * Returns the parsed class name
@@ -306,6 +324,104 @@ protected:
 		FileIsNewIndicator;
 };
 
+class FileTagResultClass {
+
+public:
+
+	mvceditor::FileTagClass FileTag;
+
+	FileTagResultClass();
+
+	virtual ~FileTagResultClass();
+
+	/**
+	 * in this method subclasses will build the SQL and execute it.
+	 *
+	 * @param session the connection
+	 * @param doLimit boolean if TRUE there should be a limit on the query
+	 */
+	 void Prepare(soci::session& session, bool doLimit);
+
+	/**
+	 * @param filePart the file name to search for
+	 */
+	void Set(const UnicodeString& filePart, int lineNumber, bool exactMatch, const std::vector<wxFileName>& dirs);
+
+	// TODO: remove this method
+	std::vector<mvceditor::TagClass> Matches();
+
+	/**
+	 * @param session must be around for as long as this result is alive
+	 * @param stmt this object will own the statement pointer
+	 */
+	void Init(soci::session& session, soci::statement* stmt);
+
+	/**
+	 * @return boolean TRUE if the query returned zero rows.
+	 */
+	bool Empty() const;
+
+	/**
+	 * @return boolean TRUE if there are more results to be iterated through
+	 */
+	bool More() const;
+
+	/**
+	 * advance to the next row. after a call to this method, the Tag member variable will contain the 
+	 * resulting row.
+	 */
+	void Next();
+
+private:
+
+	/**
+	 * Get the line count from the given file.
+	 * 
+	 * @param const wxString& fullPath 
+	 * @return int line count
+	 */
+	int GetLineCountFromFile(const wxString& fullPath) const;
+
+	/**
+	 * only tags that were found in files located in the given directories will match.
+	 * search is recursive, dirs and all of their subdirs are searched
+	 */
+	std::vector<wxFileName> Dirs;
+
+	std::vector<int> FileTagIds;
+
+	/**
+	 * the part of the filename to search for
+	 */
+	std::string FilePart;
+
+	/**
+	 * if non-zero, files will be restricted to having at least this many lines
+	 */
+	int LineNumber;
+
+	/**
+	 * if TRUE exact match will be performed
+	 */
+	bool ExactMatch;
+
+	/**
+	 * the statement to iterate through
+	 */
+	soci::statement* Stmt;
+
+	/**
+	 * TRUE if the query returned zero rows.
+	 * @var boolean
+	 */
+	bool IsEmpty;
+
+	// variables to bind to the statement
+	int FileTagId;
+	std::string FullPath;
+	int IsNew;
+};
+
 /**
  * The ParsedTagFinderClass is used to locate source code artifacts (classes, functions, methods, and files). The 
  * general flow of a search is as follows:
@@ -343,7 +459,7 @@ public:
 	 * @return vector of tags all tags that were parsed from the given file that 
 	 *         are either a class, function, or define 
 	 */
-	virtual std::vector<TagClass> ClassesFunctionsDefines(const wxString& fullPath) = 0;
+	virtual std::vector<mvceditor::TagClass> ClassesFunctionsDefines(const wxString& fullPath) = 0;
 
 protected:
 
@@ -376,33 +492,13 @@ protected:
 	virtual std::vector<mvceditor::TagClass> ResourceStatementMatches(std::string whereCond, bool doLimit) = 0;
 
 	/**
-	 * Collects all resources that are files and match the given name. 
-	 * Any hits will be returned
-	 *
-	 * @param search the name of file to look for. 
-	 * @param lineNumber if this is greater than zero, then only files that contain this many lines will be returned
-	 * @param fileTagIds the file IDs to search in. can be empty. if empty, matches from all files will be returned.
-	 */
-	virtual std::vector<TagClass> NearMatchFiles(const UnicodeString& search, int lineNumber, const std::vector<int>& fileTagIds) = 0;
-
-	/**
-	 * Collects all resources that are files and match the given name in full (the filename matches, full path
-	 * will not be searched). 
-	 * Any hits will be returned
-	 *
-	 * @param search the name of file to look for. 
-	 * @param lineNumber if this is greater than zero, then only files that contain this many lines will be returned
-	 */
-	virtual std::vector<TagClass> ExactFiles(const UnicodeString& search, int lineNumber) = 0;
-
-	/**
 	 * collect all of the methods that are aliased from all of the traits used by the given classes
 	 * @param classNames the names of the classes to search  in. these are the classes that use the
 	 *        traits
 	 * @param methodName if non-empty then only aliases that begin with this name will be returned
 	 * @param fileTagIds the file IDs to search in. can be empty. if empty, matches from all files will be returned.
 	 */
-	virtual std::vector<TagClass> TraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName, const std::vector<int>& fileTagIds) = 0;
+	virtual std::vector<mvceditor::TagClass> TraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName, const std::vector<int>& fileTagIds) = 0;
 
 	/**
 	 * @param keyStart the classes to look for ie. the classes we want to see if they use traits
@@ -529,7 +625,7 @@ public:
 	 *         the returned list may contain matches from files that are no longer in 
 	 *         the file system.
 	 */
-	std::vector<TagClass> NearMatchTags(const mvceditor::TagSearchClass& tagSearch,
+	std::vector<mvceditor::TagClass> NearMatchTags(const mvceditor::TagSearchClass& tagSearch,
 		bool doCollectFileNames = false);
 
 	/**
@@ -542,7 +638,7 @@ public:
 	 *         the returned list may contain matches from files that are no longer in 
 	 *         the file system.
 	 */
-	std::vector<TagClass> ExactClassOrFile(const mvceditor::TagSearchClass& tagSearch);
+	std::vector<mvceditor::TagClass> ExactClassOrFile(const mvceditor::TagSearchClass& tagSearch);
 	
 	/**
 	 * Looks for the class or file tag, using a near-match logic. Logic is as follows:
@@ -566,7 +662,7 @@ public:
 	 *         the returned list may contain matches from files that are no longer in 
 	 *         the file system.
 	 */
-	std::vector<TagClass> NearMatchClassesOrFiles(const mvceditor::TagSearchClass& tagSearch);
+	std::vector<mvceditor::TagClass> NearMatchClassesOrFiles(const mvceditor::TagSearchClass& tagSearch);
 	
 	/**
 	 * Get the parent class of a given tag. For example, let's say source code contained two classes: AdminClass and 
@@ -612,7 +708,7 @@ public:
 	 * @param int32_t length the length of the tag [in the text]
 	 * @return bool true if match was found in text
 	 */
-	static bool GetResourceMatchPosition(const TagClass& tag, const UnicodeString& text, int32_t& pos, int32_t& length);
+	static bool GetResourceMatchPosition(const mvceditor::TagClass& tag, const UnicodeString& text, int32_t& pos, int32_t& length);
 	
 	/**
 	 * Print the tag cache to stdout.  Useful for debugging only.
@@ -638,7 +734,7 @@ public:
 	 * many items (10000+). Try to use the CollectXXX() methods as much as possible.
 	 * An example use of this method is when wanting to find all functions in a single file.
 	 */
-	std::vector<TagClass> All();
+	std::vector<mvceditor::TagClass> All();
 
 	/**
 	 * check to see if this tag finder has the given file 
@@ -649,14 +745,6 @@ public:
 	bool HasFullPath(const wxString& fullPath);
 
 protected:
-
-	/**
-	 * Get the line count from the given file.
-	 * 
-	 * @param const wxString& fullPath 
-	 * @return int line count
-	 */
-	int GetLineCountFromFile(const wxString& fullPath) const;
 
 	/**
 	 * Find the FileTag entry that has the given full path (exact, case insensitive search into
@@ -681,7 +769,7 @@ private:
 	 * @param doDefines if TRUE define tags will be collected
 	 * @param doFunctions if TRUE function tags will be collected
 	 */
-	std::vector<TagClass> NearMatchNonMembers(const mvceditor::TagSearchClass& tagSearch, bool doClasses, bool doDefines, bool doFunctions);
+	std::vector<mvceditor::TagClass> NearMatchNonMembers(const mvceditor::TagSearchClass& tagSearch, bool doClasses, bool doDefines, bool doFunctions);
 	
 	/**
 	 * Collects all resources that are class methods / properties and match the given Resource search.
@@ -689,21 +777,8 @@ private:
 	 * 
 	 * @param tagSearch the name of resources to look for
 	 */
-	std::vector<TagClass> NearMatchMembers(const mvceditor::TagSearchClass& tagSearch);
-	
-	/**
-	 * Collects all resources that are namespaces and match the given Resource search.
-	 * Any hits will be returned
-	 */
-	std::vector<TagClass> NearMatchNamespaces(const mvceditor::TagSearchClass& tagSearch);
-	
-	/**
-	 * Collect all of the resources that are methods / properties of the given classes.
-	 * @param fileTagIds tags from the given files will be returned.  this can be empty; if empty then matches from
-	 *        all files will be returned.
-	 */
-	std::vector<TagClass> AllMembers(const std::vector<UnicodeString>& classNames, const std::vector<int>& fileTagIds);
-		
+	std::vector<mvceditor::TagClass> NearMatchMembers(const mvceditor::TagSearchClass& tagSearch);
+			
 	/**
 	 * Extracts the parent class from a class signature.  The class signature, as parsed by the parser contains a string
 	 * "extends ZZZZ ", then this method will return "ZZZZ"
@@ -717,7 +792,7 @@ private:
 	 * Look through all of the matches and verifies that the file still actually exists (file has not been deleted).
 	 * If the file was deleted, then the match is removed from the matches vector.
 	 */
-	void EnsureMatchesExist(std::vector<TagClass>& matches);
+	void EnsureMatchesExist(std::vector<mvceditor::TagClass>& matches);
 	
 	/**
 	 * Get all of the traits that a given class uses. Checking is 
@@ -727,51 +802,7 @@ private:
 	 * @param inheritedTraits the list of traits will be appended to this vector
 	 */
 	void InheritedTraits(const UnicodeString& fullyQualifiedClassName, std::vector<UnicodeString>& inheritedTraits);
-
-	/**
-	 * @param  key the exact key to search for
-	 * @param fileTagIds tags from the given files will be returned.  this can be empty; if empty then matches from
-	 *        all files will be returned.
-	 * @return all resources that match the key exact (case insensitive) AND are in the given files
-	 */
-	std::vector<mvceditor::TagClass> FindByKeyExact(const std::string& key, const std::vector<int>& fileTagIds);
 	
-	/**
-	 * @param key the string tor search for
-	 * @param types the tag types for search for, from mvceditor::TagClass::Types. cannot be empty
-	 * @param fileTagIds tags from the given files will be returned.  this can be empty; if empty then matches from
-	 *        all files will be returned.
-	 * @return all resources that match the key exact (case insensitive) AND are of the given types 
-	 *          AND are in the given files
-	 */
-	std::vector<mvceditor::TagClass> FindByKeyExactAndTypes(const std::string& key, const std::vector<int>& types, const std::vector<int>& fileTagIds, bool doLimit);
-
-	/**
-	* @param  key the exact key to search for
-	 * @param fileTagIds tags from the given files will be returned.  this can be empty; if empty then matches from
-	 *        all files will be returned.
-	 * @return all resources whose key begins with the given keyStart (case insensitive) AND are in the given files
-	 */
-	std::vector<mvceditor::TagClass> FindByKeyStart(const std::string& keyStart, const std::vector<int>& fileTagIds, bool doLimit);
-	
-	/**
-	 * @param keyStart the string tor search for
-	 * @param types the tag types for search for, from mvceditor::TagClass::Types. cannot be empty
-	 * @param fileTagIds tags from the given files will be returned.  this can be empty; if empty then matches from
-	 *        all files will be returned.
-	 * @return all resources whose key begins with the given keyStart (case insensitive) AND are of the given types 
-	 *         AND are in the given files
-	 */
-	std::vector<mvceditor::TagClass> FindByKeyStartAndTypes(const std::string& keyStart, const std::vector<int>& types, const std::vector<int>& fileTagIds, bool doLimit);
-	
-	/**
-	 * @param fileTagIds tags from the given files will be returned.  this can be empty; if empty then matches from
-	 *        all files will be returned.
-	 * @return all resources whose key begins with the given at least one of the given keyStart (case insensitive)
-	 *         AND are in the given files
-	 */
-	std::vector<mvceditor::TagClass> FindByKeyStartMany(const std::vector<std::string>& keyStarts, const std::vector<int>& fileTagIds, bool doLimit);
-
 	/**
 	 * check the database AND the current file's parsed cache to see if the namespace has been seen
 	 * before.
@@ -812,26 +843,6 @@ protected:
 	 * @return the vector of resources pulled from the statement's results
 	 */
 	std::vector<mvceditor::TagClass> ResourceStatementMatches(std::string whereCond, bool doLimit);
-
-	/**
-	 * Collects all resources that are files and match the given name. 
-	 * Any hits will be returned
-	 *
-	 * @param search the name of file to look for. 
-	 * @param lineNumber if this is greater than zero, then only files that contain this many lines will be returned
-	 * @param fileTagIds the file IDs to search in. can be empty. if empty, matches from all files will be returned.
-	 */
-	std::vector<TagClass> NearMatchFiles(const UnicodeString& search, int lineNumber, const std::vector<int>& fileTagIds);
-
-	/**
-	 * Collects all resources that are files and match the given name in full (the filename matches, full path
-	 * will not be searched). 
-	 * Any hits will be returned
-	 *
-	 * @param search the name of file to look for. 
-	 * @param lineNumber if this is greater than zero, then only files that contain this many lines will be returned
-	 */
-	std::vector<TagClass> ExactFiles(const UnicodeString& search, int lineNumber);
 
 	/**
 	 * collect all of the methods that are aliased from all of the traits used by the given classes
@@ -892,26 +903,6 @@ protected:
 	 * @return the vector of resources pulled from the statement's results
 	 */
 	std::vector<mvceditor::TagClass> ResourceStatementMatches(std::string whereCond, bool doLimit);
-
-	/**
-	 * Collects all resources that are files and match the given name. 
-	 * Any hits will be returned
-	 *
-	 * @param search the name of file to look for. 
-	 * @param lineNumber if this is greater than zero, then only files that contain this many lines will be returned
-	 * @param fileTagIds the file IDs to search in. can be empty. if empty, matches from all files will be returned.
-	 */
-	std::vector<TagClass> NearMatchFiles(const UnicodeString& search, int lineNumber, const std::vector<int>& fileTagIds);
-
-	/**
-	 * Collects all resources that are files and match the given name in full (the filename matches, full path
-	 * will not be searched). 
-	 * Any hits will be returned
-	 *
-	 * @param search the name of file to look for. 
-	 * @param lineNumber if this is greater than zero, then only files that contain this many lines will be returned
-	 */
-	virtual std::vector<TagClass> ExactFiles(const UnicodeString& search, int lineNumber);
 
 	/**
 	 * collect all of the methods that are aliased from all of the traits used by the given classes
