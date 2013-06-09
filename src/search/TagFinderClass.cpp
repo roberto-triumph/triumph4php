@@ -146,6 +146,31 @@ public:
 	void Prepare(soci::session& session, bool doLimit);
 };
 
+class TopLevelTagInFileResultClass : public TagResultClass {
+
+public:
+	TopLevelTagInFileResultClass();
+
+	void Set(const wxString& fullPath);
+
+	void Prepare(soci::session& session);
+
+private:
+
+	std::string FullPath;
+
+	std::vector<int> TagTypes;
+};
+
+class AllTagsResultClass : public TagResultClass {
+
+public:
+
+	AllTagsResultClass();
+
+	void Prepare(soci::session& session);
+};
+
 }
 
 /**
@@ -539,6 +564,57 @@ void mvceditor::NearMatchMemberOnlyTagResultClass::Prepare(soci::session& sessio
 	for (size_t i = 0; i < FileTagIds.size(); i++) {
 		stmt->exchange(soci::use(FileTagIds[i]));
 	}
+	Init(session, stmt);
+}
+
+mvceditor::TopLevelTagInFileResultClass::TopLevelTagInFileResultClass()
+	: TagResultClass()
+	, FullPath() 
+	, TagTypes() {
+	TagTypes.push_back(mvceditor::TagClass::CLASS);
+	TagTypes.push_back(mvceditor::TagClass::FUNCTION);
+	TagTypes.push_back(mvceditor::TagClass::DEFINE);
+}
+
+void mvceditor::TopLevelTagInFileResultClass::Set(const wxString& fullPath) {
+	FullPath = mvceditor::WxToChar(fullPath);
+}
+
+void mvceditor::TopLevelTagInFileResultClass::Prepare(soci::session& session) {
+	
+	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
+	// remove the duplicates from fully qualified namespaces
+	// fully qualified classes / functions will start with backslash; but we want the
+	// tags that don't begin with backslash
+	
+	std::string sql;
+	sql += "SELECT r.file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, full_path, ";
+	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
+	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) WHERE ";
+	sql += "f.full_path = ? AND Type IN(?, ?, ?) AND key NOT LIKE '\\%' ESCAPE '^' ORDER BY key ";
+	
+	soci::statement* stmt = new soci::statement(session);
+	stmt->prepare(sql);
+	stmt->exchange(soci::use(FullPath));
+	for (size_t i = 0; i < TagTypes.size(); i++) {
+		stmt->exchange(soci::use(TagTypes[i]));
+	}
+	Init(session, stmt);
+}
+
+mvceditor::AllTagsResultClass::AllTagsResultClass()
+	: TagResultClass() {
+
+}
+
+void mvceditor::AllTagsResultClass::Prepare(soci::session& session) {
+	std::string sql;
+	sql += "SELECT r.file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, full_path, ";
+	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
+	sql += "FROM resources r LEFT JOIN file_items f ON (f.file_item_id = r.file_item_id)";
+	
+	soci::statement* stmt = new soci::statement(session);
+	stmt->prepare(sql);
 	Init(session, stmt);
 }
 
@@ -1555,23 +1631,23 @@ bool mvceditor::TagFinderClass::FindFileTagByFullPathExact(const wxString& fullP
 }
 
 std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::All() {
-	std::vector<mvceditor::TagClass> all = ResourceStatementMatches("1=1", false);
-	
+	mvceditor::AllTagsResultClass result;
+	result.Prepare(*Session);
+
 	// remove the 'duplicates' ie. extra fully qualified entries to make lookups faster
-	std::vector<mvceditor::TagClass>::iterator it = all.begin();
-	while (it != all.end()) {
-		if (it->Key.indexOf(UNICODE_STRING_SIMPLE("::")) > 0) {
+	std::vector<mvceditor::TagClass> all;
+	while (result.More()) {
+		result.Next();
+		if (result.Tag.Key.indexOf(UNICODE_STRING_SIMPLE("::")) > 0) {
 
 			// fully qualified methods
-			it = all.erase(it);
 		}
-		else if (it->Type != mvceditor::TagClass::NAMESPACE && it->Key.indexOf(UNICODE_STRING_SIMPLE("\\")) >= 0) {
+		else if (result.Tag.Type != mvceditor::TagClass::NAMESPACE && result.Tag.Key.indexOf(UNICODE_STRING_SIMPLE("\\")) >= 0) {
 			
 			// fully qualified classes / functions (with namespace)
-			it = all.erase(it);
 		}
 		else {
-			++it;
+			all.push_back(result.Tag);
 		}
 	}
 	return all;
@@ -1580,27 +1656,6 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::All() {
 mvceditor::ParsedTagFinderClass::ParsedTagFinderClass()
 	: TagFinderClass() {
 
-}
-
-std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ResourceStatementMatches(std::string whereCond, bool doLimit) {
-	std::string sql;
-	sql += "SELECT r.file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, full_path, ";
-	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
-	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) WHERE ";
-	sql += whereCond;
-	sql += " ORDER BY key";
-	if (doLimit) {
-		sql += " LIMIT 100";
-	}
-
-	std::vector<mvceditor::TagClass> matches;
-	if (!IsCacheInitialized) {
-		return matches;
-	}
-	mvceditor::TagResultClass result;
-	result.Init(*Session, sql);
-	matches = result.Matches();	
-	return matches;
 }
 
 std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::TraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName, 
@@ -1727,18 +1782,10 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::FindByIdentifi
 
 std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ClassesFunctionsDefines(const wxString& fullPath) {
 	std::vector<mvceditor::TagClass> tags;
-	mvceditor::FileTagClass fileTag;
-	if (FindFileTagByFullPathExact(fullPath, fileTag)) {
-		std::ostringstream stream;
-
-		// remove the duplicates from fully qualified namespaces
-		// fully qualified classes / functions will start with backslash; but we want the
-		// tags that don't begin with backslash
-		stream << "r.file_item_id = " << fileTag.FileId << " AND Type IN(" << mvceditor::TagClass::CLASS
-			<< "," << mvceditor::TagClass::DEFINE << "," << mvceditor::TagClass::FUNCTION
-			<< ") AND key NOT LIKE '\\%' ESCAPE '^' ";
-		tags = ResourceStatementMatches(stream.str(), true);
-	}
+	mvceditor::TopLevelTagInFileResultClass result;
+	result.Set(fullPath);
+	result.Prepare(*Session);
+	tags = result.Matches();
 	return tags;
 }
 
