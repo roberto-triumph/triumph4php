@@ -220,8 +220,11 @@ if ($if) {
 			// insert the 'fully qualified' namespace form
 			$key = $namespaceName . $identifier;
 			$identifier = $key;
+			
+			// for the key, we use "/" as the namespace separator because we want to avoid using
+			// LIKE ? ESCAPE  because sqlite does not an index if it sees an ESCAPE clause
 			$insertStmt->execute(array(
-				$fileItemId, $key, $identifier, $className, $type, $namespaceName,
+				$fileItemId, str_replace("\\", "/", $key), $identifier, $className, $type, $namespaceName,
 				$signature, $comment, $returnType, $isProtected, $isPrivate, $isStatic, 
 				$isDynamic, $isNative
 			));

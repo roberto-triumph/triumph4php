@@ -477,21 +477,6 @@ protected:
 	bool IsCacheInitialized;
 
 	/**
-	 * this is a virtual method so that each tag finder can use to perform a query to
-	 * get a certain portion of its tags. This is a virtual method so that each specific tag finder
-	 * can define what table names and columns to query.
-	 *
-	 * @param whereCond the WHERE clause of the query to execute (query will be into the resources table)
-	 *        this does NOT have the "where" keyword.  examples:  
-	 *        "Key = 'ClassName'"
-	 *        "Key = 'ClassName::Method' AND Type IN(3)"
-	 * @param doLimit if TRUE a max amount of results will be returned, if FALSE then ALL results will be returned
-	 *        most of the time you want to set this to TRUE
-	 * @return the vector of resources pulled from the statement's results
-	 */
-	virtual std::vector<mvceditor::TagClass> ResourceStatementMatches(std::string whereCond, bool doLimit) = 0;
-
-	/**
 	 * collect all of the methods that are aliased from all of the traits used by the given classes
 	 * @param classNames the names of the classes to search  in. these are the classes that use the
 	 *        traits

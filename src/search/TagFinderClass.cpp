@@ -38,6 +38,28 @@
 #include <soci/soci.h>
 #include <string>
 
+
+/**
+ * replace the namespace separator '\'; this is done
+ * because sqlite does not use index when using LIKE 'xxx%' if it has an ESCAPE
+ * clause
+ * the keys store namespaces as '/' so when we use a key in a WHERE clause we must
+ * replace the namespace separator in the key
+ */
+static std::string PrepKey(UnicodeString uniKey) {
+	uniKey = uniKey.findAndReplace(UNICODE_STRING_SIMPLE("\\"), UNICODE_STRING_SIMPLE("/"));
+	return mvceditor::IcuToChar(uniKey);
+}
+
+/**
+ * since the key is stored in the db with namespaces as '/', we want to undo it
+ * when we are reading results into memory
+ */
+static UnicodeString DePrepKey(UnicodeString uniKey) {
+	return uniKey.findAndReplace(UNICODE_STRING_SIMPLE("/"), UNICODE_STRING_SIMPLE("\\"));
+}
+
+
 namespace mvceditor {
 
 class ExactMemberTagResultClass : public mvceditor::TagResultClass {
@@ -211,7 +233,8 @@ void mvceditor::ExactMemberTagResultClass::Set(const std::vector<UnicodeString>&
 											   const std::vector<wxFileName>& dirs) {
 	wxASSERT_MSG(!classNames.empty(), wxT("classNames must not be empty"));
 	for (size_t i = 0; i < classNames.size(); i++) {
-		Keys.push_back(mvceditor::IcuToChar(classNames[i] + UNICODE_STRING_SIMPLE("::") + memberName));
+		UnicodeString key = classNames[i] + UNICODE_STRING_SIMPLE("::") + memberName;
+		Keys.push_back(PrepKey(key));
 	}
 	Dirs = dirs;
 }
@@ -270,20 +293,21 @@ void mvceditor::AllMembersTagResultClass::Prepare(soci::session& session,  bool 
 	FileTagIds = mvceditor::FileTagIdsForDirs(session, Dirs, error, errorMsg);
 	wxASSERT_MSG(!error, errorMsg);
 	wxASSERT_MSG(!Keys.empty(), wxT("keys cannot be empty"));
+	
+	// the scope resolution operator was addded in ::Set method
+	// we need to add the wildcard at the end
+	for (size_t i = 0; i < Keys.size(); i++) {
+		Keys[i] = Keys[i] + "%";
+	}
 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
 	sql += "SELECT r.file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) WHERE ";
-	
-	// the scope resolution operator was addded in ::Set method
-
-	std::string escaped = mvceditor::SqliteSqlEscape(Keys[0], '^');
-	sql += "(key LIKE '" + escaped + "%' ESCAPE '^' ";
+	sql += "(key LIKE ? ";
 	for (size_t i = 1; i < Keys.size(); ++i) {
-		escaped = mvceditor::SqliteSqlEscape(Keys[i], '^');
-		sql += " OR key LIKE '" + escaped + "%' ESCAPE '^' ";
+		sql += " OR key LIKE ? ";
 	}
 	sql += ") ";
 	sql += " AND type IN(?, ?, ?)";
@@ -300,6 +324,9 @@ void mvceditor::AllMembersTagResultClass::Prepare(soci::session& session,  bool 
 	}
 	soci::statement* stmt = new soci::statement(session);
 	stmt->prepare(sql);
+	for (size_t i = 0; i < Keys.size(); i++) {
+		stmt->exchange(soci::use(Keys[i]));
+	}
 	for (size_t i = 0; i < TagTypes.size(); i++) {
 		stmt->exchange(soci::use(TagTypes[i]));
 	}
@@ -320,18 +347,20 @@ void mvceditor::NearMatchMemberTagResultClass::Prepare(soci::session& session,  
 	FileTagIds = mvceditor::FileTagIdsForDirs(session, Dirs, error, errorMsg);
 	wxASSERT_MSG(!error, errorMsg);
 	wxASSERT_MSG(!Keys.empty(), wxT("keys cannot be empty"));
+	
+	// we need to add the wildcard at the end
+	for (size_t i = 0; i < Keys.size(); i++) {
+		Keys[i] = Keys[i] + "%";
+	}
 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
 	sql += "SELECT r.file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) WHERE ";
-	
-	std::string escaped = mvceditor::SqliteSqlEscape(Keys[0], '^');
-	sql += "(key LIKE '" + escaped + "%' ESCAPE '^' ";
+	sql += "(key LIKE ? ";
 	for (size_t i = 1; i < Keys.size(); ++i) {
-		escaped = mvceditor::SqliteSqlEscape(Keys[i], '^');
-		sql += " OR key LIKE '" + escaped + "%' ESCAPE '^' ";
+		sql += " OR key LIKE ? ";
 	}
 	sql += ") ";
 	sql += " AND type IN(?, ?, ?)";
@@ -348,7 +377,9 @@ void mvceditor::NearMatchMemberTagResultClass::Prepare(soci::session& session,  
 	}
 	soci::statement* stmt = new soci::statement(session);
 	stmt->prepare(sql);
-
+	for (size_t i = 0; i < Keys.size(); i++) {
+		stmt->exchange(soci::use(Keys[i]));
+	}
 	for (size_t i = 0; i < TagTypes.size(); i++) {
 		stmt->exchange(soci::use(TagTypes[i]));
 	}
@@ -370,7 +401,7 @@ mvceditor::ExactNonMemberTagResultClass::ExactNonMemberTagResultClass()
 }
 
 void mvceditor::ExactNonMemberTagResultClass::Set(const UnicodeString& key, const std::vector<wxFileName>& dirs) {
-	Key = mvceditor::IcuToChar(key);
+	Key = PrepKey(key);
 	Dirs = dirs;
 }
 
@@ -433,15 +464,17 @@ void mvceditor::NearMatchNonMemberTagResultClass::Prepare(soci::session& session
 	wxString errorMsg;
 	FileTagIds = mvceditor::FileTagIdsForDirs(session, Dirs, error, errorMsg);
 	wxASSERT_MSG(!error, errorMsg);
+
+	// add the wildcard
+	Key = Key + "%";
 	
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
 	sql += "SELECT r.file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
-	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) WHERE ";
-	std::string escaped = mvceditor::SqliteSqlEscape(Key, '^');
-	sql += "key LIKE '" + escaped + "%' ESCAPE '^' ";
-	sql += "AND r.type IN(?";
+	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) WHERE";
+	sql += " key LIKE ?";
+	sql += " AND r.type IN(?";
 	for (size_t i = 1; i < TagTypes.size(); ++i) {
 		sql += ",?"; 
 	}
@@ -460,6 +493,7 @@ void mvceditor::NearMatchNonMemberTagResultClass::Prepare(soci::session& session
 	}
 	soci::statement* stmt = new soci::statement(session);
 	stmt->prepare(sql);
+	stmt->exchange(soci::use(Key));
 	for (size_t i = 0; i < TagTypes.size(); i++) {
 		stmt->exchange(soci::use(TagTypes[i]));
 	}
@@ -482,7 +516,7 @@ mvceditor::ExactMemberOnlyTagResultClass::ExactMemberOnlyTagResultClass()
 
 void mvceditor::ExactMemberOnlyTagResultClass::Set(const UnicodeString& memberName, 
 											   const std::vector<wxFileName>& dirs) {
-	Key = mvceditor::IcuToChar(memberName);
+	Key = PrepKey(memberName);
 	Dirs = dirs;
 }
 
@@ -536,6 +570,9 @@ void mvceditor::NearMatchMemberOnlyTagResultClass::Prepare(soci::session& sessio
 	FileTagIds = mvceditor::FileTagIdsForDirs(session, Dirs, error, errorMsg);
 	wxASSERT_MSG(!error, errorMsg);
 
+	// add wildcard operator
+	Key = Key  + "%";
+
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
 	sql += "SELECT r.file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, full_path, ";
@@ -543,7 +580,7 @@ void mvceditor::NearMatchMemberOnlyTagResultClass::Prepare(soci::session& sessio
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) WHERE ";
 	
 	// make sure to use the key because it is indexed
-	sql += "key LIKE '" + mvceditor::SqliteSqlEscape(Key, '^') + "%' ESCAPE '^' AND identifier = key";
+	sql += "key LIKE ? AND identifier = key";
 	sql += " AND type IN(?, ?, ?)";
 	if (!FileTagIds.empty()) {
 		sql += " AND f.file_item_id IN(?";
@@ -558,6 +595,7 @@ void mvceditor::NearMatchMemberOnlyTagResultClass::Prepare(soci::session& sessio
 	}
 	soci::statement* stmt = new soci::statement(session);
 	stmt->prepare(sql);
+	stmt->exchange(soci::use(Key));
 	for (size_t i = 0; i < TagTypes.size(); i++) {
 		stmt->exchange(soci::use(TagTypes[i]));
 	}
@@ -586,12 +624,13 @@ void mvceditor::TopLevelTagInFileResultClass::Prepare(soci::session& session) {
 	// remove the duplicates from fully qualified namespaces
 	// fully qualified classes / functions will start with backslash; but we want the
 	// tags that don't begin with backslash
-	
+	// note the use of '/' as the namespace operator because we turn all "\" into "/" for performance
+	// reason
 	std::string sql;
 	sql += "SELECT r.file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) WHERE ";
-	sql += "f.full_path = ? AND Type IN(?, ?, ?) AND key NOT LIKE '\\%' ESCAPE '^' ORDER BY key ";
+	sql += "f.full_path = ? AND Type IN(?, ?, ?) AND key NOT LIKE '/%' ORDER BY key ";
 	
 	soci::statement* stmt = new soci::statement(session);
 	stmt->prepare(sql);
@@ -1118,7 +1157,9 @@ void mvceditor::TagResultClass::Next() {
 	if (soci::i_ok == FileTagIdIndicator) {
 		Tag.FileTagId = FileTagId;
 	}
-	Tag.Key = mvceditor::CharToIcu(Key.c_str());
+
+	// transform key back to what's expected.  see PrepKey and DeprepKey for more info
+	Tag.Key = DePrepKey(mvceditor::CharToIcu(Key.c_str()));
 	Tag.Identifier = mvceditor::CharToIcu(Identifier.c_str());
 	Tag.ClassName = mvceditor::CharToIcu(ClassName.c_str());
 	Tag.Type = (mvceditor::TagClass::Types)Type;
