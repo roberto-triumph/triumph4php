@@ -422,6 +422,43 @@ private:
 	int IsNew;
 };
 
+class ExactMemberTagResultClass : public mvceditor::TagResultClass {
+
+public:
+
+	ExactMemberTagResultClass();
+
+	void Prepare(soci::session& session, bool doLimit);
+	
+	virtual void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, const std::vector<wxFileName>& dirs);
+
+protected:
+
+	std::vector<std::string> Keys;
+
+	std::vector<int> TagTypes;
+
+	std::vector<int> FileTagIds;
+
+	std::vector<wxFileName> Dirs;
+};
+
+class NearMatchMemberTagResultClass : public mvceditor::ExactMemberTagResultClass {
+
+public:
+
+	NearMatchMemberTagResultClass();
+
+	void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, const std::vector<wxFileName>& dirs);
+
+	virtual void Prepare(soci::session& session, bool doLimit);
+
+private:
+
+	// number of classes we want to search for
+	int ClassCount;
+};
+
 /**
  * The ParsedTagFinderClass is used to locate source code artifacts (classes, functions, methods, and files). The 
  * general flow of a search is as follows:

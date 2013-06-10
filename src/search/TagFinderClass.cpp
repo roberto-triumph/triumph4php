@@ -38,59 +38,7 @@
 #include <soci/soci.h>
 #include <string>
 
-
-/**
- * replace the namespace separator '\'; this is done
- * because sqlite does not use index when using LIKE 'xxx%' if it has an ESCAPE
- * clause
- * the keys store namespaces as '/' so when we use a key in a WHERE clause we must
- * replace the namespace separator in the key
- */
-static std::string PrepKey(UnicodeString uniKey) {
-	uniKey = uniKey.findAndReplace(UNICODE_STRING_SIMPLE("\\"), UNICODE_STRING_SIMPLE("/"));
-	return mvceditor::IcuToChar(uniKey);
-}
-
-/**
- * since the key is stored in the db with namespaces as '/', we want to undo it
- * when we are reading results into memory
- */
-static UnicodeString DePrepKey(UnicodeString uniKey) {
-	return uniKey.findAndReplace(UNICODE_STRING_SIMPLE("/"), UNICODE_STRING_SIMPLE("\\"));
-}
-
-
 namespace mvceditor {
-
-class ExactMemberTagResultClass : public mvceditor::TagResultClass {
-
-public:
-
-	ExactMemberTagResultClass();
-
-	void Prepare(soci::session& session, bool doLimit);
-	
-	void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, const std::vector<wxFileName>& dirs);
-
-protected:
-
-	std::vector<std::string> Keys;
-
-	std::vector<int> TagTypes;
-
-	std::vector<int> FileTagIds;
-
-	std::vector<wxFileName> Dirs;
-};
-
-class NearMatchMemberTagResultClass : public mvceditor::ExactMemberTagResultClass {
-
-public:
-
-	NearMatchMemberTagResultClass();
-
-	virtual void Prepare(soci::session& session, bool doLimit);
-};
 
 class AllMembersTagResultClass : public mvceditor::ExactMemberTagResultClass {
 
@@ -98,7 +46,13 @@ public:
 
 	AllMembersTagResultClass();
 
+	void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, const std::vector<wxFileName>& dirs);
+
 	virtual void Prepare(soci::session& session, bool doLimit);
+
+private:
+
+	int ClassCount;
 };
 
 class ExactNonMemberTagResultClass : public mvceditor::TagResultClass {
@@ -109,7 +63,7 @@ public:
 
 	void Prepare(soci::session& session, bool doLimit);
 	
-	void Set(const UnicodeString& key, const std::vector<wxFileName>& dirs);
+	virtual void Set(const UnicodeString& key, const std::vector<wxFileName>& dirs);
 
 	void SetTagType(mvceditor::TagClass::Types type);
 
@@ -130,9 +84,15 @@ public:
 
 	NearMatchNonMemberTagResultClass();
 
+	void Set(const UnicodeString& key, const std::vector<wxFileName>& dirs);
+
 	void AddTagType(mvceditor::TagClass::Types type);
 
 	void Prepare(soci::session& session, bool doLimit);
+
+private:
+
+	std::string KeyUpper;
 };
 
 // special case, query across all classes for a method (::getName)
@@ -165,7 +125,13 @@ class NearMatchMemberOnlyTagResultClass : public ExactMemberOnlyTagResultClass {
 public:
 	NearMatchMemberOnlyTagResultClass();
 
+	void Set(const UnicodeString& key, const std::vector<wxFileName>& dirs);
+
 	void Prepare(soci::session& session, bool doLimit);
+
+private:
+
+	std::string KeyUpper;
 };
 
 class TopLevelTagInFileResultClass : public TagResultClass {
@@ -234,7 +200,7 @@ void mvceditor::ExactMemberTagResultClass::Set(const std::vector<UnicodeString>&
 	wxASSERT_MSG(!classNames.empty(), wxT("classNames must not be empty"));
 	for (size_t i = 0; i < classNames.size(); i++) {
 		UnicodeString key = classNames[i] + UNICODE_STRING_SIMPLE("::") + memberName;
-		Keys.push_back(PrepKey(key));
+		Keys.push_back(mvceditor::IcuToChar(key));
 	}
 	Dirs = dirs;
 }
@@ -284,7 +250,22 @@ void mvceditor::ExactMemberTagResultClass::Prepare(soci::session& session,  bool
 }
 
 mvceditor::AllMembersTagResultClass::AllMembersTagResultClass()
-	: ExactMemberTagResultClass() {
+	: ExactMemberTagResultClass()
+	, ClassCount(0) {
+}
+
+void mvceditor::AllMembersTagResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, 
+											   const std::vector<wxFileName>& dirs) {
+	wxASSERT_MSG(!classNames.empty(), wxT("classNames must not be empty"));
+	for (size_t i = 0; i < classNames.size(); i++) {
+		UnicodeString key = classNames[i] + UNICODE_STRING_SIMPLE("::");
+
+		// put the key in two times so that we can buld a BETWEEN expression to emulate a LIKE
+		Keys.push_back(mvceditor::IcuToChar(key));
+		Keys.push_back(mvceditor::IcuToChar(key) + "zzzzzzzzzz");
+	}
+	Dirs = dirs;
+	ClassCount = classNames.size();
 }
 
 void mvceditor::AllMembersTagResultClass::Prepare(soci::session& session,  bool doLimit) {
@@ -294,20 +275,20 @@ void mvceditor::AllMembersTagResultClass::Prepare(soci::session& session,  bool 
 	wxASSERT_MSG(!error, errorMsg);
 	wxASSERT_MSG(!Keys.empty(), wxT("keys cannot be empty"));
 	
-	// the scope resolution operator was addded in ::Set method
-	// we need to add the wildcard at the end
-	for (size_t i = 0; i < Keys.size(); i++) {
-		Keys[i] = Keys[i] + "%";
-	}
-
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
 	sql += "SELECT r.file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) WHERE ";
-	sql += "(key LIKE ? ";
-	for (size_t i = 1; i < Keys.size(); ++i) {
-		sql += " OR key LIKE ? ";
+
+	// not using LIKE operator here, there are way too many situations where it wont use the index
+	// index won't be used when ESCAPE is used or when sqlite3_prepare_v2 is NOT used (which soci does not use)
+	// see http://sqlite.org/optoverview.html (LIKE optimization)
+	// instead we use a trick to mimic LIKE using the BETWEEN
+	// http://stackoverflow.com/questions/13056193/escape-wildcards-in-sqlite-like-without-sacrificing-index-use
+	sql += "((key BETWEEN ? AND ?) ";
+	for (int i = 1; i < ClassCount; ++i) {
+		sql += " OR (key BETWEEN ? AND ?)";
 	}
 	sql += ") ";
 	sql += " AND type IN(?, ?, ?)";
@@ -338,8 +319,24 @@ void mvceditor::AllMembersTagResultClass::Prepare(soci::session& session,  bool 
 
 
 mvceditor::NearMatchMemberTagResultClass::NearMatchMemberTagResultClass()
-	: ExactMemberTagResultClass() {
+	: ExactMemberTagResultClass() 
+	, ClassCount(0) {
 }
+
+void mvceditor::NearMatchMemberTagResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, 
+											   const std::vector<wxFileName>& dirs) {
+	wxASSERT_MSG(!classNames.empty(), wxT("classNames must not be empty"));
+	for (size_t i = 0; i < classNames.size(); i++) {
+		UnicodeString key = classNames[i] + UNICODE_STRING_SIMPLE("::") + memberName;
+
+		// put the key in two times so that we can buld a BETWEEN expression to emulate a LIKE
+		Keys.push_back(mvceditor::IcuToChar(key));
+		Keys.push_back(mvceditor::IcuToChar(key) + "zzzzzzzzzz");
+	}
+	ClassCount = classNames.size();
+	Dirs = dirs;
+}
+
 
 void mvceditor::NearMatchMemberTagResultClass::Prepare(soci::session& session,  bool doLimit) {
 	bool error = false;
@@ -347,20 +344,21 @@ void mvceditor::NearMatchMemberTagResultClass::Prepare(soci::session& session,  
 	FileTagIds = mvceditor::FileTagIdsForDirs(session, Dirs, error, errorMsg);
 	wxASSERT_MSG(!error, errorMsg);
 	wxASSERT_MSG(!Keys.empty(), wxT("keys cannot be empty"));
-	
-	// we need to add the wildcard at the end
-	for (size_t i = 0; i < Keys.size(); i++) {
-		Keys[i] = Keys[i] + "%";
-	}
 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
 	sql += "SELECT r.file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) WHERE ";
-	sql += "(key LIKE ? ";
-	for (size_t i = 1; i < Keys.size(); ++i) {
-		sql += " OR key LIKE ? ";
+
+	// not using LIKE operator here, there are way too many situations where it wont use the index
+	// index won't be used when ESCAPE is used or when sqlite3_prepare_v2 is NOT used (which soci does not use)
+	// see http://sqlite.org/optoverview.html (LIKE optimization)
+	// instead we use a trick to mimic LIKE using the BETWEEN
+	// http://stackoverflow.com/questions/13056193/escape-wildcards-in-sqlite-like-without-sacrificing-index-use
+	sql += "((key BETWEEN ? AND ?) ";
+	for (int i = 1; i < ClassCount; ++i) {
+		sql += " OR (key BETWEEN ? AND ?)";
 	}
 	sql += ") ";
 	sql += " AND type IN(?, ?, ?)";
@@ -401,7 +399,7 @@ mvceditor::ExactNonMemberTagResultClass::ExactNonMemberTagResultClass()
 }
 
 void mvceditor::ExactNonMemberTagResultClass::Set(const UnicodeString& key, const std::vector<wxFileName>& dirs) {
-	Key = PrepKey(key);
+	Key = mvceditor::IcuToChar(key);
 	Dirs = dirs;
 }
 
@@ -451,8 +449,15 @@ void mvceditor::ExactNonMemberTagResultClass::Prepare(soci::session& session, bo
 }
 
 mvceditor::NearMatchNonMemberTagResultClass::NearMatchNonMemberTagResultClass()
-	: ExactNonMemberTagResultClass() {
+	: ExactNonMemberTagResultClass() 
+	, KeyUpper() {
 
+}
+
+void mvceditor::NearMatchNonMemberTagResultClass::Set(const UnicodeString& key, const std::vector<wxFileName>& dirs) {
+	Key = mvceditor::IcuToChar(key);
+	KeyUpper = mvceditor::IcuToChar(key) + "zzzzzzzzzz";
+	Dirs = dirs;
 }
 
 void mvceditor::NearMatchNonMemberTagResultClass::AddTagType(mvceditor::TagClass::Types type) {
@@ -464,16 +469,19 @@ void mvceditor::NearMatchNonMemberTagResultClass::Prepare(soci::session& session
 	wxString errorMsg;
 	FileTagIds = mvceditor::FileTagIdsForDirs(session, Dirs, error, errorMsg);
 	wxASSERT_MSG(!error, errorMsg);
-
-	// add the wildcard
-	Key = Key + "%";
 	
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
 	sql += "SELECT r.file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) WHERE";
-	sql += " key LIKE ?";
+
+	// not using LIKE operator here, there are way too many situations where it wont use the index
+	// index won't be used when ESCAPE is used or when sqlite3_prepare_v2 is NOT used (which soci does not use)
+	// see http://sqlite.org/optoverview.html (LIKE optimization)
+	// instead we use a trick to mimic LIKE using the BETWEEN
+	// http://stackoverflow.com/questions/13056193/escape-wildcards-in-sqlite-like-without-sacrificing-index-use
+	sql += " key BETWEEN ? AND ? ";
 	sql += " AND r.type IN(?";
 	for (size_t i = 1; i < TagTypes.size(); ++i) {
 		sql += ",?"; 
@@ -494,6 +502,7 @@ void mvceditor::NearMatchNonMemberTagResultClass::Prepare(soci::session& session
 	soci::statement* stmt = new soci::statement(session);
 	stmt->prepare(sql);
 	stmt->exchange(soci::use(Key));
+	stmt->exchange(soci::use(KeyUpper));
 	for (size_t i = 0; i < TagTypes.size(); i++) {
 		stmt->exchange(soci::use(TagTypes[i]));
 	}
@@ -516,7 +525,7 @@ mvceditor::ExactMemberOnlyTagResultClass::ExactMemberOnlyTagResultClass()
 
 void mvceditor::ExactMemberOnlyTagResultClass::Set(const UnicodeString& memberName, 
 											   const std::vector<wxFileName>& dirs) {
-	Key = PrepKey(memberName);
+	Key = mvceditor::IcuToChar(memberName);
 	Dirs = dirs;
 }
 
@@ -560,8 +569,15 @@ void mvceditor::ExactMemberOnlyTagResultClass::Prepare(soci::session& session,  
 }
 
 mvceditor::NearMatchMemberOnlyTagResultClass::NearMatchMemberOnlyTagResultClass()
-: ExactMemberOnlyTagResultClass() {
+: ExactMemberOnlyTagResultClass() 
+, KeyUpper() {
 
+}
+
+void mvceditor::NearMatchMemberOnlyTagResultClass::Set(const UnicodeString& key, const std::vector<wxFileName>& dirs) {
+	Key = mvceditor::IcuToChar(key);
+	KeyUpper = mvceditor::IcuToChar(key) + "zzzzzzzzzz";
+	Dirs = dirs;
 }
 
 void mvceditor::NearMatchMemberOnlyTagResultClass::Prepare(soci::session& session, bool doLimit) {
@@ -570,17 +586,18 @@ void mvceditor::NearMatchMemberOnlyTagResultClass::Prepare(soci::session& sessio
 	FileTagIds = mvceditor::FileTagIdsForDirs(session, Dirs, error, errorMsg);
 	wxASSERT_MSG(!error, errorMsg);
 
-	// add wildcard operator
-	Key = Key  + "%";
-
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
 	sql += "SELECT r.file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) WHERE ";
 	
-	// make sure to use the key because it is indexed
-	sql += "key LIKE ? AND identifier = key";
+	// not using LIKE operator here, there are way too many situations where it wont use the index
+	// index won't be used when ESCAPE is used or when sqlite3_prepare_v2 is NOT used (which soci does not use)
+	// see http://sqlite.org/optoverview.html (LIKE optimization)
+	// instead we use a trick to mimic LIKE using the BETWEEN
+	// http://stackoverflow.com/questions/13056193/escape-wildcards-in-sqlite-like-without-sacrificing-index-use
+	sql += "key BETWEEN ? AND ? AND identifier = key";
 	sql += " AND type IN(?, ?, ?)";
 	if (!FileTagIds.empty()) {
 		sql += " AND f.file_item_id IN(?";
@@ -596,6 +613,7 @@ void mvceditor::NearMatchMemberOnlyTagResultClass::Prepare(soci::session& sessio
 	soci::statement* stmt = new soci::statement(session);
 	stmt->prepare(sql);
 	stmt->exchange(soci::use(Key));
+	stmt->exchange(soci::use(KeyUpper));
 	for (size_t i = 0; i < TagTypes.size(); i++) {
 		stmt->exchange(soci::use(TagTypes[i]));
 	}
@@ -624,13 +642,11 @@ void mvceditor::TopLevelTagInFileResultClass::Prepare(soci::session& session) {
 	// remove the duplicates from fully qualified namespaces
 	// fully qualified classes / functions will start with backslash; but we want the
 	// tags that don't begin with backslash
-	// note the use of '/' as the namespace operator because we turn all "\" into "/" for performance
-	// reason
 	std::string sql;
 	sql += "SELECT r.file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) WHERE ";
-	sql += "f.full_path = ? AND Type IN(?, ?, ?) AND key NOT LIKE '/%' ORDER BY key ";
+	sql += "f.full_path = ? AND Type IN(?, ?, ?) AND key NOT LIKE '\\%' ORDER BY key ";
 	
 	soci::statement* stmt = new soci::statement(session);
 	stmt->prepare(sql);
@@ -736,7 +752,7 @@ void mvceditor::FileTagResultClass::Prepare(soci::session& session, bool doLimit
 	wxASSERT_MSG(!Stmt, wxT("statmement must be null"));
 
 	// add the SQL wildcards
-	std::string escaped = mvceditor::SqliteSqlEscape(FilePart, '^');
+	std::string escaped = mvceditor::SqliteSqlLikeEscape(FilePart, '^');
 	std::string query;
 	std::string sql;
 	if (ExactMatch) {
@@ -1157,9 +1173,7 @@ void mvceditor::TagResultClass::Next() {
 	if (soci::i_ok == FileTagIdIndicator) {
 		Tag.FileTagId = FileTagId;
 	}
-
-	// transform key back to what's expected.  see PrepKey and DeprepKey for more info
-	Tag.Key = DePrepKey(mvceditor::CharToIcu(Key.c_str()));
+	Tag.Key = mvceditor::CharToIcu(Key.c_str());
 	Tag.Identifier = mvceditor::CharToIcu(Identifier.c_str());
 	Tag.ClassName = mvceditor::CharToIcu(ClassName.c_str());
 	Tag.Type = (mvceditor::TagClass::Types)Type;
@@ -1944,7 +1958,7 @@ std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::FindByIdenti
 
 	// do not get fully qualified resources
 	// make sure to use the key because it is indexed
-	std::string escaped = mvceditor::SqliteSqlEscape(identifierStart, '^');
+	std::string escaped = mvceditor::SqliteSqlLikeEscape(identifierStart, '^');
 	stream << "key LIKE '" << escaped << "%' ESCAPE '^' AND method_name = key AND type IN(";
 	InClause(types, stream);
 	stream << ")";

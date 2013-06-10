@@ -29,27 +29,15 @@
 #include <sqlite3.h>
 #include <algorithm>
 
-/**
- * escape a value so that it is suitable for using in a LIKE SQL clause
- * ie. so that an underscore is treated literally
- * @param value the value to escape
- * @param c the character to USE for escaping. this should NOT be backslash,
- *        as we have namespaces in the database and they use backslash
- */
-std::string mvceditor::SqliteSqlEscape(const std::string& value, char c) {
-	size_t i = 0;
-	std::string escaped;
-	size_t next = value.find("_", i);
-	while (next != std::string::npos) {
-		escaped += value.substr(i, next - i);
-		escaped += c;
-		escaped += "_";
 
-		i = next + 1;
-		next = value.find("_", i);
-	}
-	if (i < value.length()) {
-		escaped += value.substr(i);
+std::string mvceditor::SqliteSqlLikeEscape(const std::string& value, char e) {
+	std::string escaped;
+	for (size_t i = 0; i < value.size(); i++) {
+		char c = value[i];
+		if ('_' == c || '\'' == c || '%' == c) {
+			escaped += e;
+		}
+		escaped += c;
 	}
 	return escaped;
 }

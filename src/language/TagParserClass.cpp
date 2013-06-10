@@ -52,16 +52,6 @@ static UnicodeString QualifyName(const UnicodeString& namespaceName, const Unico
 	return qualifiedName;
 }
 
-/**
- * replace the namespace separator '\'; this is done
- * because sqlite does not use index when using LIKE 'xxx%' if it has an ESCAPE
- * clause
- */
-static std::string PrepKey(UnicodeString uniKey) {
-	uniKey = uniKey.findAndReplace(UNICODE_STRING_SIMPLE("\\"), UNICODE_STRING_SIMPLE("/"));
-	return mvceditor::IcuToChar(uniKey);
-}
-
 std::vector<mvceditor::TagClass> AllResources(soci::session& session) {
 	std::string sql;
 	sql += "SELECT r.file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, full_path, ";
@@ -609,7 +599,7 @@ void mvceditor::TagParserClass::FunctionFound(const UnicodeString& namespaceName
 
 bool mvceditor::TagParserClass::IsNewNamespace(const UnicodeString& namespaceName) {
 	std::string sql = "SELECT COUNT(*) FROM resources WHERE key = ? AND type = ?";
-	std::string nm = PrepKey(namespaceName);
+	std::string nm = mvceditor::IcuToChar(namespaceName);
 	int type = mvceditor::TagClass::NAMESPACE;
 	int count = 0;
 	bool isNew = false;
@@ -863,10 +853,7 @@ void mvceditor::TagParserClass::PersistResources(const mvceditor::TagClass& reso
 	try {
 		FileTagId = fileTagId;
 
-		// special handling of key, namespace separator '\' is replaced; this is done
-		// because sqlite does not use index when using LIKE 'xxx%' if it has an ESCAPE
-		// clause
-		Key = PrepKey(resource.Key);
+		Key = mvceditor::IcuToChar(resource.Key);
 		Identifier = mvceditor::IcuToChar(resource.Identifier);
 		ClassName = mvceditor::IcuToChar(resource.ClassName);
 		Type = resource.Type;

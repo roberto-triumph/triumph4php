@@ -217,7 +217,7 @@ void mvceditor::UrlTagFinderClass::FilterUrls(const wxString& filter, std::vecto
 		std::string stdClassName;
 		std::string stdMethodName;
 		std::string stdFilter = mvceditor::WxToChar(filter);
-		std::string escaped = mvceditor::SqliteSqlEscape(stdFilter, '^');
+		std::string escaped = mvceditor::SqliteSqlLikeEscape(stdFilter, '^');
 
 		// hmmm... query might not be optimal for 1000s of urls
 		// not sure if the number of urls will go into the 1000s

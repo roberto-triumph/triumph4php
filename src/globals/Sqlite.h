@@ -34,13 +34,17 @@ namespace mvceditor {
 
 /**
  * escape a value so that it is suitable for using in a LIKE SQL clause
- * ie. so that an underscore is treated literally and not as a wildcard
+ * ie. so that underscores, percents are treated literally
+ * We escape ourselves because SOCI uses sqlite3_prepare instead of sqlite3_prepare_v2, and 
+ * sqlite3_prepare will make LIKE queries not use the index. But this means we have to escape ourselves
+ * see http://sqlite.org/optoverview.html (LIKE optimization)
+ *
  * @param value the value to escape
  * @param c the character to USE for escaping. this should NOT be backslash,
  *        as this projet stores string that are likely to have backslashes
  *        (ie. PHP namespace names, file names) in the database.
  */
-std::string SqliteSqlEscape(const std::string& value, char c);
+std::string SqliteSqlLikeEscape(const std::string& value, char c);
 
 /**
  * Run multiple SQL statements that are located in fileName
