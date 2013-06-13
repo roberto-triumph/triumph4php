@@ -250,7 +250,7 @@
                                         <property name="validator_style">wxFILTER_NONE</property>
                                         <property name="validator_type">wxDefaultValidator</property>
                                         <property name="validator_variable"></property>
-                                        <property name="value">Combo!</property>
+                                        <property name="value"></property>
                                         <property name="window_extra_style"></property>
                                         <property name="window_name"></property>
                                         <property name="window_style"></property>
@@ -464,13 +464,13 @@
                                                             <event name="OnListColRightClick"></event>
                                                             <event name="OnListDeleteAllItems"></event>
                                                             <event name="OnListDeleteItem"></event>
-                                                            <event name="OnListEndLabelEdit"></event>
+                                                            <event name="OnListEndLabelEdit">OnListEndLabelEdit</event>
                                                             <event name="OnListInsertItem"></event>
                                                             <event name="OnListItemActivated">OnListItemActivated</event>
                                                             <event name="OnListItemDeselected"></event>
                                                             <event name="OnListItemFocused"></event>
                                                             <event name="OnListItemMiddleClick"></event>
-                                                            <event name="OnListItemRightClick"></event>
+                                                            <event name="OnListItemRightClick">OnListItemRightClick</event>
                                                             <event name="OnListItemSelected">OnListItemSelected</event>
                                                             <event name="OnListKeyDown"></event>
                                                             <event name="OnMiddleDClick"></event>

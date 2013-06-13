@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Sep  8 2010)
+// C++ code generated with wxFormBuilder (version Feb 17 2010)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -34,7 +34,7 @@ ModalExplorerGeneratedPanel::ModalExplorerGeneratedPanel( wxWindow* parent, wxWi
 	
 	TopSizer->Add( ParentButton, 0, wxALL, 5 );
 	
-	Directory = new wxComboBox( this, wxID_ANY, wxT("Combo!"), wxDefaultPosition, wxDefaultSize, 0, NULL, wxTE_PROCESS_ENTER ); 
+	Directory = new wxComboBox( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxTE_PROCESS_ENTER ); 
 	TopSizer->Add( Directory, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	GridSizer->Add( TopSizer, 1, wxEXPAND, 5 );
@@ -83,7 +83,9 @@ ModalExplorerGeneratedPanel::ModalExplorerGeneratedPanel( wxWindow* parent, wxWi
 	ParentButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModalExplorerGeneratedPanel::OnParentButtonClick ), NULL, this );
 	Directory->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ModalExplorerGeneratedPanel::OnDirectoryEnter ), NULL, this );
 	Splitter->Connect( wxEVT_COMMAND_SPLITTER_SASH_POS_CHANGED, wxSplitterEventHandler( ModalExplorerGeneratedPanel::OnSashChanged ), NULL, this );
+	List->Connect( wxEVT_COMMAND_LIST_END_LABEL_EDIT, wxListEventHandler( ModalExplorerGeneratedPanel::OnListEndLabelEdit ), NULL, this );
 	List->Connect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( ModalExplorerGeneratedPanel::OnListItemActivated ), NULL, this );
+	List->Connect( wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, wxListEventHandler( ModalExplorerGeneratedPanel::OnListItemRightClick ), NULL, this );
 	List->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( ModalExplorerGeneratedPanel::OnListItemSelected ), NULL, this );
 	Report->Connect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( ModalExplorerGeneratedPanel::OnReportItemActivated ), NULL, this );
 }
@@ -94,7 +96,9 @@ ModalExplorerGeneratedPanel::~ModalExplorerGeneratedPanel()
 	ParentButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModalExplorerGeneratedPanel::OnParentButtonClick ), NULL, this );
 	Directory->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ModalExplorerGeneratedPanel::OnDirectoryEnter ), NULL, this );
 	Splitter->Disconnect( wxEVT_COMMAND_SPLITTER_SASH_POS_CHANGED, wxSplitterEventHandler( ModalExplorerGeneratedPanel::OnSashChanged ), NULL, this );
+	List->Disconnect( wxEVT_COMMAND_LIST_END_LABEL_EDIT, wxListEventHandler( ModalExplorerGeneratedPanel::OnListEndLabelEdit ), NULL, this );
 	List->Disconnect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( ModalExplorerGeneratedPanel::OnListItemActivated ), NULL, this );
+	List->Disconnect( wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, wxListEventHandler( ModalExplorerGeneratedPanel::OnListItemRightClick ), NULL, this );
 	List->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( ModalExplorerGeneratedPanel::OnListItemSelected ), NULL, this );
 	Report->Disconnect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( ModalExplorerGeneratedPanel::OnReportItemActivated ), NULL, this );
 	

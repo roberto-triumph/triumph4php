@@ -34,7 +34,7 @@ namespace mvceditor {
 
 // forward declaration, defined below
 class ExplorerEventClass;
-
+class ExplorerModifyEventClass;
 /**
  * The explorer feature shows the user the files and directories
  * for all defined projects.  Additionally, it can display folders
@@ -93,6 +93,7 @@ private:
 class ModalExplorerPanelClass : public ModalExplorerGeneratedPanel {
 public:
 	ModalExplorerPanelClass(wxWindow* parent, int id, mvceditor::AppClass& app);
+	~ModalExplorerPanelClass();
 
 	void RefreshDir(const wxFileName& dir);
 	
@@ -149,6 +150,14 @@ private:
 	// events handlers for the left lsit
 	void OnListItemSelected(wxListEvent& event);
 	void OnListItemActivated(wxListEvent& event);
+	void OnListItemRightClick(wxListEvent& event);
+	void OnListEndLabelEdit(wxListEvent& event);
+
+	// event handlers for the context menu on the left files list
+	void OnListMenuOpen(wxCommandEvent& event);
+	void OnListMenuRename(wxCommandEvent& event);
+	void OnListMenuDelete(wxCommandEvent& event);
+	void OnExplorerModifyComplete(mvceditor::ExplorerModifyEventClass& event);
 
 	// event handler for the right list
 	void OnReportItemActivated(wxListEvent& event);
@@ -169,6 +178,7 @@ private:
 	int ListImageId(const wxFileName& fileName);
 	int ReportImageId(const wxFileName& fileName);
 
+	DECLARE_EVENT_TABLE()
 };
 
 extern const wxEventType EVENT_EXPLORER;
@@ -217,7 +227,7 @@ public:
 
 /**
  * this action list files by reading the file system. the main point of this
- * action is to get files that we have not indexes yet for whatever reason.
+ * action is to get files that we have not indexed yet for whatever reason.
  */
 class ExplorerFileSystemActionClass : public mvceditor::ActionClass {
 
@@ -244,22 +254,114 @@ private:
 };
 
 /**
- * this action list files by reading the project cache. the main point of
- * this action is to show the files quickly.
+ * This action is used to modify the file system: remove files, remove
+ * directories, and rename files / folders.
+ *
+ * The action will post EVENT_EXPLORER_MODIFY events
  */
-class ExplorerCacheActionClass : public mvceditor::ActionClass {
+class ExplorerModifyActionClass : public mvceditor::ActionClass {
 
 public:
 
-	ExplorerCacheActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	enum Actions {
+		NONE,
+		DELETE_FILE,
+		DELETE_DIRECTORY,
+		RENAME
+	};
+
+	ExplorerModifyActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
-	 * starts an action to read the files from the given directory.
-	 * @param dir the directory to list
-	 * @param doHidden if TRUE hidden files/dirs are shown
+	 * @param dir the directory to be deleted (recursively)
 	 */
-	void Directory(const wxFileName& dir, bool doHidden);
+	void SetDirToRemove(const wxFileName& dir);
 
+	/**
+	 * @param file the directory to be deleted
+	 */
+	void SetFileToRemove(const wxFileName& file);
+
+	/**
+	 * @param file the file to be renamed.  thie can also be a
+	  *       directory
+	 */
+	void SetFileToRename(const wxFileName& file, const wxString& newName);
+
+protected:
+
+	void BackgroundWork();
+
+	wxString GetLabel() const;
+
+	/**
+	 * what type of modification to perform
+	 */
+	Actions Action;
+
+	/**
+	 * set when Action == DELETE_DIRECTORY
+	 */
+	wxFileName Dir;
+
+	/**
+	 * set when Action == DELETE_FILE or RENAME
+	 */
+	wxFileName File;
+
+	/**
+	 * set when Action == RENAME
+	 */
+	wxString NewName;
+};
+
+extern const wxEventType EVENT_EXPLORER_MODIFY;
+
+typedef void (wxEvtHandler::*ExplorerModifyEventClassFunction)(mvceditor::ExplorerModifyEventClass&);
+
+#define EVT_EXPLORER_MODIFY_COMPLETE(id, fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_EXPLORER_MODIFY, id, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( ExplorerModifyEventClassFunction, & fn ), (wxObject *) NULL ),
+
+
+/**
+ * results of a file system modification (delete / rename)
+ */
+class ExplorerModifyEventClass : public wxEvent {
+
+public:
+
+	/**
+	 * the dir that where the modification took place
+	 * ie the parent dir
+	 */
+	wxFileName ParentDir;
+
+	/**
+	 * name of the item renamed or removed
+	 */
+	wxString Name;
+
+	/**
+	 * the new name, if the modification was a rename
+	 */
+	wxString NewName;
+
+	/**
+	 * the type of modification to perform
+	 */
+	mvceditor::ExplorerModifyActionClass::Actions Action;
+
+	/**
+	 * TRUE if the delete/rename was successful.
+	 */
+	bool Success;
+
+	ExplorerModifyEventClass(int eventId, const wxFileName& dir, const wxString& name, 
+		const wxString& newName, mvceditor::ExplorerModifyActionClass::Actions action, bool success);
+
+	wxEvent* Clone() const;
 };
 
 }

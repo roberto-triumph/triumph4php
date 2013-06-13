@@ -109,7 +109,7 @@ int main(int argc, char** argv) {
 	wxOperatingSystemId os = wxGetOsVersion(&major, &minor);
 	if (os == wxOS_WINDOWS_NT) {
 		FileName = wxT("C:\\Users\\roberto\\Documents\\mvc-editor\\php_detectors\\lib\\Zend\\Config.php");
-		DirName = wxT("C:\\Users\\roberto\\sample_php_project");
+		DirName = wxT("C:\\Users\\roberto\\software\\wamp\\www\\tci_umbrellaservices");
 		DbFileName = wxT("resource.db");
 	}
 	else {
@@ -280,13 +280,25 @@ void ProfileTagSearch() {
 	mvceditor::ParsedTagFinderClass tagFinder;
 	tagFinder.Init(&session);
 	wxLongLong time;
+	size_t found = 0;
 
 	time = wxGetLocalTimeMillis();
+	std::string key;
+	soci::statement stmt = (session.prepare << "SELECT key from resources WHERE key like 'Request::get%' escape '^'", soci::into(key));
+	bool data = stmt.execute(true);
+	if (data) {
+		do {
+			found++;
+		} while (stmt.fetch());
+	}
+	/*
 	std::vector<mvceditor::TagClass> matches;
-	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("Record::get"));
+	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("Request::get"));
 	matches = tagFinder.NearMatchTags(tagSearch);
+	found = matches.size();
+	*/
 	time = wxGetLocalTimeMillis() - time;
-	size_t found = matches.size();
+	
 	printf("time for tagFinder on entire project after caching:%ld ms found:%d\n", time.ToLong(), (int)found);
 }
 

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Sep  8 2010)
+// C++ code generated with wxFormBuilder (version Feb 17 2010)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -48,7 +48,9 @@ class ModalExplorerGeneratedPanel : public wxPanel
 		virtual void OnParentButtonClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDirectoryEnter( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSashChanged( wxSplitterEvent& event ) { event.Skip(); }
+		virtual void OnListEndLabelEdit( wxListEvent& event ) { event.Skip(); }
 		virtual void OnListItemActivated( wxListEvent& event ) { event.Skip(); }
+		virtual void OnListItemRightClick( wxListEvent& event ) { event.Skip(); }
 		virtual void OnListItemSelected( wxListEvent& event ) { event.Skip(); }
 		virtual void OnReportItemActivated( wxListEvent& event ) { event.Skip(); }
 		

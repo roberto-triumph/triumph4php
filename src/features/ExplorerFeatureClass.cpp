@@ -27,12 +27,17 @@
 #include <globals/Assets.h>
 #include <globals/Events.h>
 #include <globals/FileName.h>
+#include <search/Directory.h>
 #include <MvcEditor.h>
 #include <algorithm>
 
 static int ID_EXPLORER_PANEL = wxNewId();
 static int ID_EXPLORER_LIST_ACTION = wxNewId();
 static int ID_EXPLORER_REPORT_ACTION = wxNewId();
+static int ID_EXPLORER_LIST_OPEN = wxNewId();
+static int ID_EXPLORER_LIST_RENAME = wxNewId();
+static int ID_EXPLORER_LIST_DELETE = wxNewId();
+static int ID_EXPLORER_MODIFY = wxNewId();
 
 /**
  * comparator function that compares 2 filenames by using the full name
@@ -179,6 +184,12 @@ mvceditor::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, in
 
 	FilterButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("filter")));
 	ParentButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("arrow-up")));
+
+	App.RunningThreads.AddEventHandler(this);
+}
+
+mvceditor::ModalExplorerPanelClass::~ModalExplorerPanelClass() {
+	App.RunningThreads.RemoveEventHandler(this);
 }
 
 void mvceditor::ModalExplorerPanelClass::RefreshDir(const wxFileName& dir) {
@@ -197,9 +208,13 @@ void mvceditor::ModalExplorerPanelClass::OnParentButtonClick(wxCommandEvent& eve
 	if (!curDir.IsOk()) {
 		return;
 	}
-	curDir.RemoveLastDir();
-	if (curDir.IsOk()) {	
-		RefreshDir(curDir);
+
+	// root directories don't have parents
+	if (curDir.GetDirCount() > 0) {
+		curDir.RemoveLastDir();
+		if (curDir.IsOk()) {	
+			RefreshDir(curDir);
+		}
 	}
 }
 
@@ -233,6 +248,18 @@ void mvceditor::ModalExplorerPanelClass::OnListItemSelected(wxListEvent& event) 
 		mvceditor::ExplorerFileSystemActionClass* action = new mvceditor::ExplorerFileSystemActionClass(App.RunningThreads, ID_EXPLORER_REPORT_ACTION);
 		action->Directory(nextDir, false);
 		App.RunningThreads.Queue(action);
+	}
+}
+
+void mvceditor::ModalExplorerPanelClass::OnListItemRightClick(wxListEvent& event) {
+	long index = event.GetIndex();
+	if (index != wxNOT_FOUND) {
+		wxMenu menu;
+		menu.Append(ID_EXPLORER_LIST_OPEN, _("Open"), _("Open the file in the editor"), wxITEM_NORMAL);
+		menu.Append(ID_EXPLORER_LIST_RENAME, _("Rename"), _("Rename the file"), wxITEM_NORMAL);
+		menu.Append(ID_EXPLORER_LIST_DELETE, _("Delete"), _("Delete the file"), wxITEM_NORMAL);
+
+		this->PopupMenu(&menu, wxDefaultPosition);
 	}
 }
 
@@ -423,6 +450,134 @@ void mvceditor::ModalExplorerPanelClass::OnReportItemActivated(wxListEvent& even
 	}
 }
 
+void mvceditor::ModalExplorerPanelClass::OnListMenuOpen(wxCommandEvent& event) {
+	long index = -1;
+	index = List->GetNextItem(index, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (index != -1) {
+		wxString name = List->GetItemText(index);
+
+		// ideally we dont need to query the file system, but cant seem to get the 
+		// item image to tell if selected item is a dir or not
+		wxString fullPath = CurrentListDir.GetPathWithSep() + name;
+		if (wxFileName::FileExists(fullPath)) {
+			wxCommandEvent evt(mvceditor::EVENT_CMD_FILE_OPEN);
+			evt.SetString(fullPath);
+			App.EventSink.Publish(evt);
+		}
+		else if (wxFileName::DirExists(fullPath)) {
+			mvceditor::ExplorerFileSystemActionClass* action = new mvceditor::ExplorerFileSystemActionClass(App.RunningThreads, ID_EXPLORER_REPORT_ACTION);
+			action->Directory(fullPath, false);
+			App.RunningThreads.Queue(action);
+		}
+	}
+}
+
+void mvceditor::ModalExplorerPanelClass::OnListMenuRename(wxCommandEvent& event) {
+	long index = -1;
+	index = List->GetNextItem(index, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (index != -1) {
+		List->EditLabel(index);
+	}
+}
+
+void mvceditor::ModalExplorerPanelClass::OnListMenuDelete(wxCommandEvent& event) {
+	long index = -1;
+	index = List->GetNextItem(index, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (index != -1) {
+		wxString name = List->GetItemText(index);
+		wxString fullPath = CurrentListDir.GetPathWithSep() + name;
+
+		// perform the deletion in the background
+		mvceditor::ExplorerModifyActionClass* action = new mvceditor::ExplorerModifyActionClass(App.RunningThreads, ID_EXPLORER_MODIFY);
+		if (wxFileName::FileExists(fullPath)) {
+			action->SetFileToRemove(wxFileName(fullPath));
+		}
+		else if (wxFileName::DirExists(fullPath)) {
+
+			// need to recursively delete a directory
+			wxFileName dirToDelete;
+			dirToDelete.AssignDir(fullPath);
+			action->SetDirToRemove(dirToDelete);
+		}
+		App.RunningThreads.Queue(action);
+	}
+}
+
+void mvceditor::ModalExplorerPanelClass::OnListEndLabelEdit(wxListEvent& event) {
+	
+	// ideally we dont need to query the file system, but cant seem to get the 
+	// item image to tell if selected item is a dir or not
+	wxString newName = event.GetLabel();
+	long index = event.GetIndex();
+	wxString name = List->GetItemText(index);
+
+	// dont attempt rename if they are new and old name are the same
+	if (newName != name) {	
+		
+		wxFileName sourceFile(CurrentListDir.GetPath(), name);
+		wxFileName destFile(CurrentListDir.GetPath(), newName);
+
+		mvceditor::ExplorerModifyActionClass* action = new mvceditor::ExplorerModifyActionClass(App.RunningThreads, ID_EXPLORER_MODIFY);
+		action->SetFileToRename(sourceFile, newName);
+		App.RunningThreads.Queue(action);		
+	}
+}
+
+void mvceditor::ModalExplorerPanelClass::OnExplorerModifyComplete(mvceditor::ExplorerModifyEventClass &event) {
+	if (CurrentListDir.GetPath() != event.ParentDir.GetPath()) {
+		wxString a = CurrentListDir.GetPath();
+		wxString b = event.ParentDir.GetPath();
+
+		// user is looking at another dir. no need to update the list items
+		return;
+	}
+
+	// TODO FindItem is case insensitive but the file system may be case sensitive
+	long index = List->FindItem(-1, event.Name);
+	if (wxNOT_FOUND == index) {
+		return;
+	}
+
+	if (mvceditor::ExplorerModifyActionClass::DELETE_FILE == event.Action) {
+		wxFileName fileName(event.ParentDir.GetPath(), event.Name);
+		wxString fullPath = fileName.GetFullPath();
+		if (event.Success) {
+				List->DeleteItem(index);
+			}
+			else {
+				wxMessageBox(_("File could not be deleted:\n") + fullPath, _("Delete File"));
+			}
+	}
+	else if (mvceditor::ExplorerModifyActionClass::DELETE_DIRECTORY == event.Action) {
+		wxFileName fileName;
+		fileName.AssignDir(event.ParentDir.GetPath());
+		fileName.AppendDir(event.Name);
+		wxString fullPath = fileName.GetPath();
+		if (event.Success) {
+			List->DeleteItem(index);
+		}
+		else {
+			wxMessageBox(_("Directory could not be deleted:\n") + fullPath, _("Delete Directory"));
+		}
+	}
+	else if (mvceditor::ExplorerModifyActionClass::RENAME == event.Action) {
+		wxFileName destFile(event.ParentDir.GetPath(), event.NewName);
+
+		if (!event.Success && wxFileName::DirExists(destFile.GetFullPath())) {
+			// revert the item back to the original name
+			List->SetItemText(index, event.Name);
+
+			wxMessageBox(_("A directory with that name already exists"), _("Rename"));			
+		}
+		else if (!event.Success) {
+			// revert the item back to the original name
+			List->SetItemText(index, event.Name);
+
+			wxMessageBox(_("A file with that name already exists"), _("Rename"));			
+		}
+	}
+}
+
 mvceditor::ExplorerEventClass::ExplorerEventClass(int eventId, const wxFileName& dir, const std::vector<wxFileName>& files, 
 												  const std::vector<wxFileName>& subDirs, const wxString& error)
 : wxEvent(eventId, mvceditor::EVENT_EXPLORER)
@@ -510,11 +665,100 @@ void mvceditor::ExplorerFileSystemActionClass::BackgroundWork() {
 	}
 }
 
+mvceditor::ExplorerModifyActionClass::ExplorerModifyActionClass(mvceditor::RunningThreadsClass& runningThreads,
+																int eventId)
+: ActionClass(runningThreads, eventId) 
+, Action(NONE)
+, Dir()
+, File()
+, NewName() {
+}
+
+void mvceditor::ExplorerModifyActionClass::SetDirToRemove(const wxFileName &dir) {
+	Action = DELETE_DIRECTORY;
+
+	// make sure to clone
+	Dir.AssignDir(dir.GetPath());
+}
+
+void mvceditor::ExplorerModifyActionClass::SetFileToRemove(const wxFileName& file) {
+	Action = DELETE_FILE;
+
+	// make sure to clone
+	File.Assign(file.GetFullPath());
+}
+
+void mvceditor::ExplorerModifyActionClass::SetFileToRename(const wxFileName& file, const wxString& newName) {
+	Action = RENAME;
+
+	// make sure to clone
+	File.Assign(file.GetFullPath());
+	NewName = newName.c_str();
+}
+
+void mvceditor::ExplorerModifyActionClass::BackgroundWork() {
+	wxFileName parentDir;
+	wxString name;
+	bool success = false;
+	if (mvceditor::ExplorerModifyActionClass::DELETE_DIRECTORY == Action) {
+		parentDir.AssignDir(Dir.GetPath());
+		name = parentDir.GetDirs().Last();
+		parentDir.RemoveLastDir();
+	}
+	else {
+		parentDir.Assign(File.GetFullPath());
+		name = parentDir.GetFullName();
+	}
+
+	// perform the action
+	if (mvceditor::ExplorerModifyActionClass::DELETE_DIRECTORY == Action) {
+		success = mvceditor::RecursiveRmDir(Dir.GetPath());
+	}
+	else if (mvceditor::ExplorerModifyActionClass::DELETE_FILE == Action) {
+		success = wxRemoveFile(File.GetFullPath());
+	}
+	else if (mvceditor::ExplorerModifyActionClass::RENAME == Action) {
+		wxFileName destFile(parentDir.GetPath(), NewName);
+		success = wxRenameFile(File.GetFullPath(), destFile.GetFullPath(), false);
+	}
+	mvceditor::ExplorerModifyEventClass modEvent(GetEventId(), 
+		parentDir, name, NewName, Action, success);
+	PostEvent(modEvent);
+}
+wxString mvceditor::ExplorerModifyActionClass::GetLabel() const {
+	return wxT("File System Modification");
+}
+
+mvceditor::ExplorerModifyEventClass::ExplorerModifyEventClass(int eventId, const wxFileName &dir, const wxString &name, const wxString &newName, mvceditor::ExplorerModifyActionClass::Actions action, bool success) 
+: wxEvent(eventId, mvceditor::EVENT_EXPLORER_MODIFY)
+, ParentDir(dir)
+, Name(name)
+, NewName(newName)
+, Action(action)
+, Success(success)
+{
+
+}
+
+wxEvent* mvceditor::ExplorerModifyEventClass::Clone() const {
+	return  new mvceditor::ExplorerModifyEventClass(
+		GetId(), ParentDir, Name, NewName, Action, Success
+	);
+}
+
 const wxEventType mvceditor::EVENT_EXPLORER = wxNewEventType();
+const wxEventType mvceditor::EVENT_EXPLORER_MODIFY = wxNewEventType();
 
 BEGIN_EVENT_TABLE(mvceditor::ExplorerFeatureClass, mvceditor::FeatureClass)
 	EVT_MENU(mvceditor::MENU_EXPLORER + 1, mvceditor::ExplorerFeatureClass::OnProjectExplore)
 	EVT_MENU(mvceditor::MENU_EXPLORER + 2, mvceditor::ExplorerFeatureClass::OnProjectExploreOpenFile)
 	EVT_EXPLORER_COMPLETE(ID_EXPLORER_LIST_ACTION, mvceditor::ExplorerFeatureClass::OnExplorerListComplete)
 	EVT_EXPLORER_COMPLETE(ID_EXPLORER_REPORT_ACTION, mvceditor::ExplorerFeatureClass::OnExplorerReportComplete)
+END_EVENT_TABLE()
+
+BEGIN_EVENT_TABLE(mvceditor::ModalExplorerPanelClass, ModalExplorerGeneratedPanel)
+	EVT_MENU(ID_EXPLORER_LIST_OPEN, mvceditor::ModalExplorerPanelClass::OnListMenuOpen)
+	EVT_MENU(ID_EXPLORER_LIST_RENAME, mvceditor::ModalExplorerPanelClass::OnListMenuRename)
+	EVT_MENU(ID_EXPLORER_LIST_DELETE, mvceditor::ModalExplorerPanelClass::OnListMenuDelete)
+	EVT_EXPLORER_MODIFY_COMPLETE(ID_EXPLORER_MODIFY, mvceditor::ModalExplorerPanelClass::OnExplorerModifyComplete)
 END_EVENT_TABLE()
