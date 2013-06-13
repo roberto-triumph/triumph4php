@@ -41,7 +41,8 @@ mvceditor::TagClass::TagClass()
 	, IsNative(false)
 	, Key()
 	, FullPath()
-	, FileTagId(-1) {
+	, FileTagId(-1) 
+	, SourceId(-1) {
 		
 }
 
@@ -61,7 +62,8 @@ mvceditor::TagClass::TagClass(const mvceditor::TagClass& src)
 	, IsNative(false)
 	, Key()
 	, FullPath()
-	, FileTagId(-1) {
+	, FileTagId(-1) 
+	, SourceId(-1) {
 	Copy(src);
 }
 
@@ -82,6 +84,7 @@ void mvceditor::TagClass::Copy(const mvceditor::TagClass& src) {
 	FullPath = src.FullPath.c_str();
 	Key = src.Key;
 	FileTagId = src.FileTagId;
+	SourceId = src.SourceId;
 	IsProtected = src.IsProtected;
 	IsPrivate = src.IsPrivate;
 	IsStatic = src.IsStatic;
@@ -111,6 +114,7 @@ void mvceditor::TagClass::Clear() {
 	Comment.remove();
 	Type = CLASS;
 	FileTagId = -1;
+	SourceId = -1;
 	FullPath = wxT("");
 	Key.remove();
 	IsProtected = false;

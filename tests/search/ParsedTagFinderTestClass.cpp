@@ -70,7 +70,8 @@ public:
 	}
 
 	void Parse(const wxString& fullPath) {
-		TagParser.BeginSearch();
+		wxFileName fileName(fullPath);
+		TagParser.BeginSearch(fileName.GetPathWithSep());
 		TagParser.Walk(fullPath);
 		TagParser.EndSearch();
 	}
@@ -902,16 +903,15 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldCollectAllMethod
 	CHECK_MEMBER_RESOURCE("UserClass", "userName", Matches[2]);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldCollectTagsFromSpecifiedFiles) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldCollectTagsFromSpecifiedFiles) {
 
 	// create 2 files with the same class; files in separate directories
-	wxFileName userDir(wxFileName::GetTempDir());
-	userDir.AppendDir(wxT("user"));
-	wxFileName modelDir(wxFileName::GetTempDir());
-	modelDir.AppendDir(wxT("model"));
+	CreateSubDirectory(wxT("user"));
+	CreateSubDirectory(wxT("model"));
 
-	TestFile = wxFileName(userDir.GetPath(), wxT("user.php")).GetFullPath();
-	Prep(mvceditor::CharToIcu(
+	TestFile = wxT("user") + wxString(wxFileName::GetPathSeparator()) + wxT("user.php");
+	
+	Prep(mvceditor::CharToWx(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;\n"
@@ -921,8 +921,9 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldCollectTagsFromS
 		"}\n"
 		"?>\n"
 	));
-	TestFile = wxFileName(modelDir.GetPath(), wxT("user.php")).GetFullPath();
-	Prep(mvceditor::CharToIcu(
+	Parse(TestProjectDir + TestFile);
+	TestFile = wxT("model") + wxString(wxFileName::GetPathSeparator()) + wxT("user.php");
+	Prep(mvceditor::CharToWx(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;\n"
@@ -932,14 +933,18 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldCollectTagsFromS
 		"}\n"
 		"?>\n"
 	));
+	Parse(TestProjectDir + TestFile);
 	mvceditor::TagSearchClass search(UNICODE_STRING_SIMPLE("UserClass"));
 	std::vector<wxFileName> dirs;
+	wxFileName modelDir;
+	modelDir.AssignDir(TestProjectDir);
+	modelDir.AppendDir(wxT("model"));
 	dirs.push_back(modelDir);
-	search.SetDirs(dirs);
+	search.SetSourceDirs(dirs);
 	Matches = ParsedTagFinder.NearMatchTags(search, true);
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("UserClass", Matches[0].Identifier);
-	CHECK_EQUAL(TestFile, Matches[0].FullPath);
+	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].FullPath);
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldNotCollectParentClassesWhenInheritedClassNameIsGiven) {
@@ -1001,16 +1006,14 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchClassesOrFilesShouldCollec
 	CHECK_EQUAL(wxT("test.php"), Matches[0].GetFullPath());
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchClassesOrFilesFromSpecifiedFiles) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchClassesOrFilesFromSpecifiedFiles) {
 
 	// create 2 files with the same class; files in separate directories
-	wxFileName userDir(wxFileName::GetTempDir());
-	userDir.AppendDir(wxT("user"));
-	wxFileName adminDir(wxFileName::GetTempDir());
-	adminDir.AppendDir(wxT("admin"));
+	CreateSubDirectory(wxT("user"));
+	CreateSubDirectory(wxT("admin"));
 
-	TestFile = wxFileName(userDir.GetPath(), wxT("user.php")).GetFullPath();
-	Prep(mvceditor::CharToIcu(
+	TestFile = wxT("user") + wxString(wxFileName::GetPathSeparator()) + wxT("user.php");
+	Prep(mvceditor::CharToWx(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;\n"
@@ -1022,20 +1025,26 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchClassesOrFilesFromSpecifie
 		"\t}\n"
 		"}\n"
 	));
+	Parse(TestProjectDir + TestFile);
 
-	TestFile = wxFileName(adminDir.GetPath(), wxT("user.php")).GetFullPath();
-	Prep(mvceditor::CharToIcu(
+	TestFile = wxT("admin") + wxString(wxFileName::GetPathSeparator()) + wxT("user.php");
+	Prep(mvceditor::CharToWx(
+		"<?php\n"
 		"class UserAdminClass extends SuperUserClass {\n"
 		"\tfunction deleteUser(User $user) {\n"
 		"\t}\n"
 		"}\n"
 		"?>\n"
 	));
-
+	Parse(TestProjectDir + TestFile);
 	mvceditor::TagSearchClass search(UNICODE_STRING_SIMPLE("user"));
+	
 	std::vector<wxFileName> dirs;
+	wxFileName adminDir;
+	adminDir.AssignDir(TestProjectDir);
+	adminDir.AppendDir(wxT("admin"));
 	dirs.push_back(adminDir);
-	search.SetDirs(dirs);
+	search.SetSourceDirs(dirs);
 
 	Matches = ParsedTagFinder.NearMatchClassesOrFiles(search);
 
@@ -1262,16 +1271,14 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagshouldReturnInheritedMember
 	CHECK_UNISTR_EQUALS("name", tag.Identifier);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldCollectTagsFromSpecifiedFiles) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactTagsShouldCollectTagsFromSpecifiedFiles) {
 
 	// create 2 files with the same class; files in separate directories
-	wxFileName userDir(wxFileName::GetTempDir());
-	userDir.AppendDir(wxT("user"));
-	wxFileName modelDir(wxFileName::GetTempDir());
-	modelDir.AppendDir(wxT("model"));
-
-	TestFile = wxFileName(userDir.GetPath(), wxT("user.php")).GetFullPath();
-	Prep(mvceditor::CharToIcu(
+	CreateSubDirectory(wxT("user"));
+	CreateSubDirectory(wxT("model"));
+	
+	TestFile = wxT("user") + wxString(wxFileName::GetPathSeparator()) + wxT("user.php");
+	Prep(mvceditor::CharToWx(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;\n"
@@ -1281,8 +1288,10 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldCollectTagsFromSpeci
 		"}\n"
 		"?>\n"
 	));
-	TestFile = wxFileName(modelDir.GetPath(), wxT("user.php")).GetFullPath();
-	Prep(mvceditor::CharToIcu(
+	Parse(TestProjectDir + TestFile);
+
+	TestFile = wxT("model") + wxString(wxFileName::GetPathSeparator()) + wxT("user.php");
+	Prep(mvceditor::CharToWx(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;\n"
@@ -1292,15 +1301,25 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldCollectTagsFromSpeci
 		"}\n"
 		"?>\n"
 	));
+	Parse(TestProjectDir + TestFile);
+
 	mvceditor::TagSearchClass search(UNICODE_STRING_SIMPLE("UserClass"));
 	std::vector<wxFileName> dirs;
+	wxFileName modelDir;
+	modelDir.AssignDir(TestProjectDir);
+	modelDir.AppendDir(wxT("model"));
 	dirs.push_back(modelDir);
-	search.SetDirs(dirs);
-	ExactMatchTags(search);
+	search.SetSourceDirs(dirs);
+
+	mvceditor::TagResultClass* tagResult = search.CreateExactResults();
+	ParsedTagFinder.ExactTags(tagResult);
+	Matches = tagResult->Matches();
 
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("UserClass", Matches[0].Identifier);
-	CHECK_EQUAL(TestFile, Matches[0].FullPath);
+	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].FullPath);
+
+	delete tagResult;
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactClassOrFile) {
@@ -1323,16 +1342,26 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactClassOrFile) {
 	CHECK_EQUAL(wxT("test.php"), Matches[0].GetFullPath());
 }
 	
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactClassOrFileWithSpecifiedFiles) {
+TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactClassOrFileWithSpecifiedFiles) {
 	
 	// create 2 files with the same class; files in separate directories
-	wxFileName userDir(wxFileName::GetTempDir());
-	userDir.AppendDir(wxT("user"));
-	wxFileName adminDir(wxFileName::GetTempDir());
-	adminDir.AppendDir(wxT("admin"));
+	CreateSubDirectory(wxT("user"));
+	CreateSubDirectory(wxT("admin"));
+	
+	TestFile = wxT("user") + wxString(wxFileName::GetPathSeparator()) + wxT("user.php");
+	Prep(mvceditor::CharToWx(
+		"<?php\n"
+		"class UserClass {\n"
+		"\tprivate $name;"
+		"\tfunction getName() {\n"
+		"\t\treturn $this->name;\n"
+		"\t}\n"
+		"}\n"
+	));	
+	Parse(TestProjectDir + TestFile);
 
-	TestFile = wxFileName(userDir.GetPath(), wxT("user.php")).GetFullPath();
-	Prep(mvceditor::CharToIcu(
+	TestFile = wxT("admin") + wxString(wxFileName::GetPathSeparator()) + wxT("user.php");
+	Prep(mvceditor::CharToWx(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -1341,20 +1370,15 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactClassOrFileWithSpecifiedFiles)
 		"\t}\n"
 		"}\n"
 	));	
-	TestFile = wxFileName(adminDir.GetPath(), wxT("user.php")).GetFullPath();
-	Prep(mvceditor::CharToIcu(
-		"<?php\n"
-		"class UserClass {\n"
-		"\tprivate $name;"
-		"\tfunction getName() {\n"
-		"\t\treturn $this->name;\n"
-		"\t}\n"
-		"}\n"
-	));	
+	Parse(TestProjectDir + TestFile);
+
 	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("UserClass"));
 	std::vector<wxFileName> dirs;
+	wxFileName adminDir;
+	adminDir.AssignDir(TestProjectDir);
+	adminDir.AppendDir(wxT("admin"));
 	dirs.push_back(adminDir);
-	tagSearch.SetDirs(dirs);
+	tagSearch.SetSourceDirs(dirs);
 	Matches = ParsedTagFinder.ExactClassOrFile(tagSearch);
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("UserClass", Matches[0].Identifier);

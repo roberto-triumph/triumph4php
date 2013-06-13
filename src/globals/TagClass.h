@@ -153,6 +153,11 @@ public:
 	 * The index to the file where this tag was found. 
 	 */
 	int FileTagId;
+
+	/**
+	 * The index to the source directory where this tag was found. 
+	 */
+	int SourceId;
 	
 	TagClass();
 	TagClass(const mvceditor::TagClass& src);

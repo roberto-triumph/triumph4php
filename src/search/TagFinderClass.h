@@ -92,11 +92,11 @@ public:
 
 	/**
 	 * get the directories to search in. this list is used to restrict the
-	 * matching to tags to tags from certain directories. this is the list of dirs given to
-	 * SetDirs() method.  this is usually the directories for the enabled projects.
+	 * matching to tags to tags from certain directories. this is the list of sourceDirs given to
+	 * SetSourceDirs() method.  this is usually the directories for the enabled projects.
 	 */
-	std::vector<wxFileName> GetDirs() const;
-	void SetDirs(const std::vector<wxFileName>& dirs);
+	std::vector<wxFileName> GetSourceDirs() const;
+	void SetSourceDirs(const std::vector<wxFileName>& sourceDirs);
 
 	/**
 	 * Create a query that will match exact matches of the given input.
@@ -209,10 +209,10 @@ private:
 
 	/**
 	 * get the directories to search in. this list is used to restrict the
-	 * matching to tags to tags from certain directories. this is the list of dirs given to
-	 * SetDirs() method.  this is usually the directories for the enabled projects.
+	 * matching to tags to tags from certain directories. this is the list of sourceDirs given to
+	 * SetSourceDirs() method.  this is usually the directories for the enabled projects.
 	 */
-	std::vector<wxFileName> Dirs;
+	std::vector<wxFileName> SourceDirs;
 	
 	/**
 	 * The tag type that was parsed
@@ -250,12 +250,6 @@ public:
 	virtual void Prepare(soci::session& session, bool doLimit);
 
 	/**
-	 * set the directories to match tags that are only in those directories.
-	 * search is recursive, the given dirs and all subdirs are searched.
-	 */
-	void SetDirs(const std::vector<wxString>& dirs);
-
-	/**
 	 * @param session must be around for as long as this result is alive
 	 * @param stmt this object will own the statement pointer
 	 */
@@ -286,12 +280,6 @@ public:
 protected:
 
 	/**
-	 * only tags that were found in files located in the given directories will match.
-	 * search is recursive, dirs and all of their subdirs are searched
-	 */
-	std::vector<wxString> Dirs;
-
-	/**
 	 * the statement to iterate through
 	 */
 	soci::statement* Stmt;
@@ -304,6 +292,7 @@ protected:
 
 	// variables to bind to the statement
 	int FileTagId;
+	int SourceId;
 	std::string Key;
 	std::string Identifier;
 	std::string ClassName;
@@ -345,7 +334,7 @@ public:
 	/**
 	 * @param filePart the file name to search for
 	 */
-	void Set(const UnicodeString& filePart, int lineNumber, bool exactMatch, const std::vector<wxFileName>& dirs);
+	void Set(const UnicodeString& filePart, int lineNumber, bool exactMatch, const std::vector<wxFileName>& sourceDirs);
 
 	// TODO: remove this method
 	std::vector<mvceditor::TagClass> Matches();
@@ -384,11 +373,9 @@ private:
 
 	/**
 	 * only tags that were found in files located in the given directories will match.
-	 * search is recursive, dirs and all of their subdirs are searched
+	 * search is recursive, sourceDirs and all of their subdirs are searched
 	 */
-	std::vector<wxFileName> Dirs;
-
-	std::vector<int> FileTagIds;
+	std::vector<std::string> SourceDirs;
 
 	/**
 	 * the part of the filename to search for
@@ -430,7 +417,7 @@ public:
 
 	void Prepare(soci::session& session, bool doLimit);
 	
-	virtual void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, const std::vector<wxFileName>& dirs);
+	virtual void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, const std::vector<wxFileName>& sourceDirs);
 
 protected:
 
@@ -438,9 +425,7 @@ protected:
 
 	std::vector<int> TagTypes;
 
-	std::vector<int> FileTagIds;
-
-	std::vector<wxFileName> Dirs;
+	std::vector<std::string> SourceDirs;
 };
 
 class NearMatchMemberTagResultClass : public mvceditor::ExactMemberTagResultClass {
@@ -449,7 +434,7 @@ public:
 
 	NearMatchMemberTagResultClass();
 
-	void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, const std::vector<wxFileName>& dirs);
+	void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, const std::vector<wxFileName>& sourceDirs);
 
 	virtual void Prepare(soci::session& session, bool doLimit);
 
@@ -711,13 +696,13 @@ public:
 	 * @param UnicodeString methodName the method to search.  IF and only IF given, then returned traits will be further constraint by 
 	 *        looking at the trait conflict resolution (insteadof). In this case, returned traits will have been checked and
 	 *        passed the insteadof operator.
-	 * @param dirs the directories to search in. this list is used to restrict the
+	 * @param sourceDirs the directories to search in. this list is used to restrict the
 	          matching to tags to tags from certain directories. this is usually the directories for the enabled projects.
 	 * @param return vector UnicodeString the class' most immediate used traits (ie won't return the traits' traits). 
 	 *        returned vector is not guaranteed to be in any order
 	 */
 	std::vector<UnicodeString> GetResourceTraits(const UnicodeString& className, const UnicodeString& methodName,
-		const std::vector<wxFileName>& dirs);
+		const std::vector<wxFileName>& sourceDirs);
 	
 	/**
 	 * Searches the given text for the position of the given tag.  For example, if the tag matched 3 items

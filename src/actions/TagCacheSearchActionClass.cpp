@@ -71,8 +71,10 @@ void mvceditor::TagCacheSearchActionClass::BackgroundWork() {
 	}
 	if (exactOnly) {
 		mvceditor::TagResultClass* results = TagCache.ExactTags(SearchString, SearchDirs);
-		matches = results->Matches();
-		delete results;
+		if (results) {
+			matches = results->Matches();
+			delete results;
+		}
 	}
 	else {
 		matches = TagCache.NearMatchTags(SearchString, SearchDirs);

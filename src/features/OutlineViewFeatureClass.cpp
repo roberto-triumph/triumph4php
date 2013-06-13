@@ -155,8 +155,10 @@ void mvceditor::OutlineTagCacheSearchActionClass::BackgroundWork() {
 				// searching for all members in a class name
 				std::vector<wxFileName> dirs;
 				mvceditor::TagResultClass* results = TagCache.ExactTags(*search, dirs);
-				tags = results->Matches();
-				delete results;
+				if (results) {
+					tags = results->Matches();
+					delete results;
+				}
 
 				if (!tags.empty()) {
 					tag = tags.begin();
@@ -203,7 +205,7 @@ void mvceditor::OutlineViewFeatureClass::JumpToResource(const wxString& tag) {
 	std::vector<wxFileName> dirs;
 	std::vector<mvceditor::TagClass> matches;
 	mvceditor::TagResultClass* result = App.Globals.TagCache.ExactTags(mvceditor::WxToIcu(tag), dirs);
-	if (!result->Empty()) {
+	if (result && !result->Empty()) {
 		result->Next();
 		mvceditor::TagClass tag = result->Tag;
 		GetNotebook()->LoadPage(tag.GetFullPath());
@@ -218,7 +220,9 @@ void mvceditor::OutlineViewFeatureClass::JumpToResource(const wxString& tag) {
 			// else the index is out of date....
 		}
 	}	
-	delete result;
+	if (result) {
+		delete result;
+	}
 }
 
 void mvceditor::OutlineViewFeatureClass::StartTagSearch(const std::vector<UnicodeString>& searchStrings) {
