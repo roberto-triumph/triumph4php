@@ -137,6 +137,11 @@ void mvceditor::SqliteFinderClass::InitSession(soci::session* session) {
 	Session = session;
 }
 
+bool mvceditor::SqliteFinderClass::Exec(mvceditor::SqliteResultClass* result) {
+	bool ret = result->Prepare(*Session, true);
+	return ret;
+}
+
 bool mvceditor::SqliteFinderClass::IsInit() const {
 	return NULL != Session;
 }
@@ -174,12 +179,12 @@ bool mvceditor::SqliteResultClass::Fetch() {
 
 bool mvceditor::SqliteResultClass::AdoptStatement(soci::statement* stmt, wxString& error)  {
 	Stmt = stmt;
-	bool good = true;
+	IsEmpty = true;
 	try {
 		Stmt->define_and_bind();
 		bool hasData = Stmt->execute(true);
 		if (hasData) {
-			IsEmpty =  false;
+			IsEmpty = false;
 		}
 		else {
 			IsEmpty = true;
@@ -191,7 +196,6 @@ bool mvceditor::SqliteResultClass::AdoptStatement(soci::statement* stmt, wxStrin
 		wxASSERT_MSG(false, error);
 		delete Stmt;
 		Stmt = NULL;
-		good = false;
 	}
-	return good;
+	return !IsEmpty;
 }

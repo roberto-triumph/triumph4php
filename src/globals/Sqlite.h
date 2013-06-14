@@ -117,8 +117,9 @@ public:
 	 *
 	 * @param session the connection.  must be around for as long as this result is alive.
 	 * @param doLimit boolean if TRUE there should be a limit on the query
+	 * @return bool subclasses should return TRUE if there is at least one result
 	 */
-	virtual void Prepare(soci::session& session, bool doLimit) = 0;
+	virtual bool Prepare(soci::session& session, bool doLimit) = 0;
 
 	/**
 	 * advance to the next row. in this method subclasses will construct their

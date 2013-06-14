@@ -47,7 +47,7 @@ public:
 
 	void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, const std::vector<wxFileName>& sourceDirs);
 
-	virtual void Prepare(soci::session& session, bool doLimit);
+	bool Prepare(soci::session& session, bool doLimit);
 
 private:
 
@@ -60,7 +60,7 @@ public:
 
 	ExactNonMemberTagResultClass();
 
-	void Prepare(soci::session& session, bool doLimit);
+	bool Prepare(soci::session& session, bool doLimit);
 	
 	virtual void Set(const UnicodeString& key, const std::vector<wxFileName>& sourceDirs);
 
@@ -85,7 +85,7 @@ public:
 
 	void AddTagType(mvceditor::TagClass::Types type);
 
-	void Prepare(soci::session& session, bool doLimit);
+	bool Prepare(soci::session& session, bool doLimit);
 
 private:
 
@@ -102,7 +102,7 @@ public:
 
 	ExactMemberOnlyTagResultClass();
 
-	void Prepare(soci::session& session, bool doLimit);
+	bool Prepare(soci::session& session, bool doLimit);
 	
 	void Set(const UnicodeString& key, const std::vector<wxFileName>& sourceDirs);
 
@@ -122,7 +122,7 @@ public:
 
 	void Set(const UnicodeString& key, const std::vector<wxFileName>& sourceDirs);
 
-	void Prepare(soci::session& session, bool doLimit);
+	bool Prepare(soci::session& session, bool doLimit);
 
 private:
 
@@ -136,7 +136,7 @@ public:
 
 	void Set(const wxString& fullPath);
 
-	void Prepare(soci::session& session, bool doLimit);
+	bool Prepare(soci::session& session, bool doLimit);
 
 private:
 
@@ -151,7 +151,7 @@ public:
 
 	AllTagsResultClass();
 
-	void Prepare(soci::session& session, bool doLimit);
+	bool Prepare(soci::session& session, bool doLimit);
 };
 
 }
@@ -204,7 +204,7 @@ void mvceditor::ExactMemberTagResultClass::Set(const std::vector<UnicodeString>&
 	}
 }
 
-void mvceditor::ExactMemberTagResultClass::Prepare(soci::session& session,  bool doLimit) {
+bool mvceditor::ExactMemberTagResultClass::Prepare(soci::session& session,  bool doLimit) {
 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
@@ -241,7 +241,7 @@ void mvceditor::ExactMemberTagResultClass::Prepare(soci::session& session,  bool
 	for (size_t i = 0; i < SourceDirs.size(); i++) {
 		stmt->exchange(soci::use(SourceDirs[i]));
 	}
-	Init(stmt);
+	return Init(stmt);
 }
 
 mvceditor::AllMembersTagResultClass::AllMembersTagResultClass()
@@ -267,7 +267,7 @@ void mvceditor::AllMembersTagResultClass::Set(const std::vector<UnicodeString>& 
 	ClassCount = classNames.size();
 }
 
-void mvceditor::AllMembersTagResultClass::Prepare(soci::session& session,  bool doLimit) {
+bool mvceditor::AllMembersTagResultClass::Prepare(soci::session& session,  bool doLimit) {
 	
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
@@ -308,7 +308,7 @@ void mvceditor::AllMembersTagResultClass::Prepare(soci::session& session,  bool 
 	for (size_t i = 0; i < SourceDirs.size(); i++) {
 		stmt->exchange(soci::use(SourceDirs[i]));
 	}
-	Init(stmt);
+	return Init(stmt);
 }
 
 
@@ -337,7 +337,7 @@ void mvceditor::NearMatchMemberTagResultClass::Set(const std::vector<UnicodeStri
 }
 
 
-void mvceditor::NearMatchMemberTagResultClass::Prepare(soci::session& session,  bool doLimit) {
+bool mvceditor::NearMatchMemberTagResultClass::Prepare(soci::session& session,  bool doLimit) {
 	wxASSERT_MSG(!Keys.empty(), wxT("keys cannot be empty"));
 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
@@ -379,7 +379,7 @@ void mvceditor::NearMatchMemberTagResultClass::Prepare(soci::session& session,  
 	for (size_t i = 0; i < SourceDirs.size(); i++) {
 		stmt->exchange(soci::use(SourceDirs[i]));
 	}
-	Init(stmt);
+	return Init(stmt);
 }
 
 mvceditor::ExactNonMemberTagResultClass::ExactNonMemberTagResultClass()
@@ -407,7 +407,7 @@ void mvceditor::ExactNonMemberTagResultClass::SetTagType(mvceditor::TagClass::Ty
 	TagTypes.push_back(type);
 }
 
-void mvceditor::ExactNonMemberTagResultClass::Prepare(soci::session& session, bool doLimit) {
+bool mvceditor::ExactNonMemberTagResultClass::Prepare(soci::session& session, bool doLimit) {
 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
@@ -439,7 +439,7 @@ void mvceditor::ExactNonMemberTagResultClass::Prepare(soci::session& session, bo
 	for (size_t i = 0; i < SourceDirs.size(); i++) {
 		stmt->exchange(soci::use(SourceDirs[i]));
 	}
-	Init(stmt);
+	return Init(stmt);
 }
 
 mvceditor::NearMatchNonMemberTagResultClass::NearMatchNonMemberTagResultClass()
@@ -463,7 +463,7 @@ void mvceditor::NearMatchNonMemberTagResultClass::AddTagType(mvceditor::TagClass
 	TagTypes.push_back(type);
 }
 
-void mvceditor::NearMatchNonMemberTagResultClass::Prepare(soci::session& session, bool doLimit) {
+bool mvceditor::NearMatchNonMemberTagResultClass::Prepare(soci::session& session, bool doLimit) {
 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
@@ -504,7 +504,7 @@ void mvceditor::NearMatchNonMemberTagResultClass::Prepare(soci::session& session
 	for (size_t i = 0; i < SourceDirs.size(); i++) {
 		stmt->exchange(soci::use(SourceDirs[i]));
 	}
-	Init(stmt);
+	return Init(stmt);
 }
 
 mvceditor::ExactMemberOnlyTagResultClass::ExactMemberOnlyTagResultClass()
@@ -528,7 +528,7 @@ void mvceditor::ExactMemberOnlyTagResultClass::Set(const UnicodeString& memberNa
 	}
 }
 
-void mvceditor::ExactMemberOnlyTagResultClass::Prepare(soci::session& session,  bool doLimit) {
+bool mvceditor::ExactMemberOnlyTagResultClass::Prepare(soci::session& session,  bool doLimit) {
 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
@@ -560,7 +560,7 @@ void mvceditor::ExactMemberOnlyTagResultClass::Prepare(soci::session& session,  
 	for (size_t i = 0; i < SourceDirs.size(); i++) {
 		stmt->exchange(soci::use(SourceDirs[i]));
 	}
-	Init(stmt);
+	return Init(stmt);
 }
 
 mvceditor::NearMatchMemberOnlyTagResultClass::NearMatchMemberOnlyTagResultClass()
@@ -580,7 +580,7 @@ void mvceditor::NearMatchMemberOnlyTagResultClass::Set(const UnicodeString& key,
 	}
 }
 
-void mvceditor::NearMatchMemberOnlyTagResultClass::Prepare(soci::session& session, bool doLimit) {
+bool mvceditor::NearMatchMemberOnlyTagResultClass::Prepare(soci::session& session, bool doLimit) {
 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
@@ -616,7 +616,7 @@ void mvceditor::NearMatchMemberOnlyTagResultClass::Prepare(soci::session& sessio
 	for (size_t i = 0; i < SourceDirs.size(); i++) {
 		stmt->exchange(soci::use(SourceDirs[i]));
 	}
-	Init(stmt);
+	return Init(stmt);
 }
 
 mvceditor::TopLevelTagInFileResultClass::TopLevelTagInFileResultClass()
@@ -632,7 +632,7 @@ void mvceditor::TopLevelTagInFileResultClass::Set(const wxString& fullPath) {
 	FullPath = mvceditor::WxToChar(fullPath);
 }
 
-void mvceditor::TopLevelTagInFileResultClass::Prepare(soci::session& session, bool doLimit) {
+bool mvceditor::TopLevelTagInFileResultClass::Prepare(soci::session& session, bool doLimit) {
 	
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	// remove the duplicates from fully qualified namespaces
@@ -650,7 +650,7 @@ void mvceditor::TopLevelTagInFileResultClass::Prepare(soci::session& session, bo
 	for (size_t i = 0; i < TagTypes.size(); i++) {
 		stmt->exchange(soci::use(TagTypes[i]));
 	}
-	Init(stmt);
+	return Init(stmt);
 }
 
 mvceditor::AllTagsResultClass::AllTagsResultClass()
@@ -658,7 +658,7 @@ mvceditor::AllTagsResultClass::AllTagsResultClass()
 
 }
 
-void mvceditor::AllTagsResultClass::Prepare(soci::session& session, bool doLimit) {
+bool mvceditor::AllTagsResultClass::Prepare(soci::session& session, bool doLimit) {
 	std::string sql;
 	sql += "SELECT r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
@@ -666,7 +666,7 @@ void mvceditor::AllTagsResultClass::Prepare(soci::session& session, bool doLimit
 	
 	soci::statement* stmt = new soci::statement(session);
 	stmt->prepare(sql);
-	Init(stmt);
+	return Init(stmt);
 }
 
 mvceditor::FileTagResultClass::FileTagResultClass()
@@ -700,7 +700,7 @@ void mvceditor::FileTagResultClass::Set(const UnicodeString& filePart, int lineN
 	ExactMatch = exactMatch;
 }
 
-void mvceditor::FileTagResultClass::Prepare(soci::session& session, bool doLimit) {
+bool mvceditor::FileTagResultClass::Prepare(soci::session& session, bool doLimit) {
 
 	// add the SQL wildcards
 	std::string escaped = mvceditor::SqliteSqlLikeEscape(FilePart, '^');
@@ -722,6 +722,7 @@ void mvceditor::FileTagResultClass::Prepare(soci::session& session, bool doLimit
 		sql += ")";
 	}
 	wxString error;
+	bool ret = false;
 	try {
 		soci::statement* stmt = new soci::statement(session);
 		stmt->prepare(sql);
@@ -733,12 +734,12 @@ void mvceditor::FileTagResultClass::Prepare(soci::session& session, bool doLimit
 		stmt->exchange(soci::into(FileTagId));
 		stmt->exchange(soci::into(IsNew));
 	
-		AdoptStatement(stmt, error);
+		ret = AdoptStatement(stmt, error);
 	} catch (std::exception& e) {
 		error = mvceditor::CharToWx(e.what());
 		wxASSERT_MSG(false, error);
 	}
-
+	return ret;
 }
 
 std::vector<mvceditor::TagClass> mvceditor::FileTagResultClass::Matches() {
@@ -1058,8 +1059,9 @@ mvceditor::TagResultClass::TagResultClass()
 {
 }
 
-void mvceditor::TagResultClass::Init(soci::statement* stmt) {
+bool mvceditor::TagResultClass::Init(soci::statement* stmt) {
 	wxString error;
+	bool ret = false;
 	try {
 		stmt->exchange(soci::into(FileTagId, FileTagIdIndicator));
 		stmt->exchange(soci::into(SourceId));
@@ -1079,11 +1081,12 @@ void mvceditor::TagResultClass::Init(soci::statement* stmt) {
 		stmt->exchange(soci::into(IsNative));
 		stmt->exchange(soci::into(FileIsNew, FileIsNewIndicator));
 		
-		AdoptStatement(stmt, error);
+		ret = AdoptStatement(stmt, error);
 	} catch (std::exception& e) {
 		error = mvceditor::CharToWx(e.what());
 		wxASSERT_MSG(false, error);
 	}
+	return ret;
 }
 
 void mvceditor::TagResultClass::Next() {
@@ -1747,109 +1750,4 @@ void mvceditor::TagFinderClass::Print() {
 		printf("identifier=%s\n", mvceditor::IcuToChar(tag->Identifier).c_str());
 		printf("\n\n");
 	}
-}
-
-mvceditor::DetectedTagFinderClass::DetectedTagFinderClass()
-	: TagFinderClass() {
-
-}
-
-std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::ResourceStatementMatches(std::string whereCond, bool doLimit) {
-	std::string sql;
-	sql += "SELECT key, type, class_name, method_name, return_type, namespace_name, comment ";
-	sql += "FROM detected_tags WHERE ";
-	sql += whereCond;
-	sql += " ORDER BY key";
-	if (doLimit) {
-		sql += " LIMIT 100";
-	}
-
-	std::vector<mvceditor::TagClass> matches;
-	if (!IsInit()) {
-		return matches;
-	}
-	std::string key;
-	int type;
-	std::string className;
-	std::string identifier;
-	std::string returnType;
-	std::string namespaceName;
-	std::string comment;
-	int isDynamic = true;
-	try {
-		soci::statement stmt = (Session->prepare << sql,
-			soci::into(key), soci::into(type), soci::into(className), 
-			soci::into(identifier), soci::into(returnType), soci::into(namespaceName), 
-			soci::into(comment)
-		);
-		if (stmt.execute(true)) {
-			do {
-				mvceditor::TagClass tag;
-				tag.Key = mvceditor::CharToIcu(key.c_str());
-				tag.Type = (mvceditor::TagClass::Types)type;
-				tag.ClassName = mvceditor::CharToIcu(className.c_str());
-				tag.Identifier = mvceditor::CharToIcu(identifier.c_str());
-				tag.ReturnType = mvceditor::CharToIcu(returnType.c_str());
-				tag.NamespaceName = mvceditor::CharToIcu(namespaceName.c_str());		
-				tag.Comment = mvceditor::CharToIcu(comment.c_str());
-				tag.IsDynamic = isDynamic != 0;
-
-				matches.push_back(tag);
-			} while (stmt.fetch());
-		}
-	} catch (std::exception& e) {
-		wxString msg = mvceditor::CharToWx(e.what());
-		wxUnusedVar(msg);
-		wxASSERT_MSG(false, msg);
-	}
-	return matches;
-}
-
-std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::TraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName, const std::vector<int>& fileTagIds) {
-	
-	// detector db does not have  a trait_resources table
-	std::vector<mvceditor::TagClass> matches;
-	return matches;
-}
-
-std::vector<mvceditor::TraitTagClass> mvceditor::DetectedTagFinderClass::UsedTraits(const std::vector<std::string>& keyStarts, const std::vector<int>& fileTagIds) {
-	
-	// detector db does not have  a trait_resources table
-	std::vector<mvceditor::TraitTagClass> matches;
-	return matches;
-}
-
-
-std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::ClassesFunctionsDefines(const wxString& fullPath) {
-
-	// detector db does not have a file_items table
-	std::vector<mvceditor::TagClass> tags;
-	return tags;
-}
-
-
-std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::FindByIdentifierExactAndTypes(const std::string& identifier, const std::vector<int>& types,
-																								  const std::vector<int>& fileTagIds, bool doLimit) {
-	std::ostringstream stream;
-
-	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
-	// do not get fully qualified resources
-	// make sure to use the key because it is indexed
-	stream << "key = '" << identifier << "' AND method_name = key AND type IN(";
-	InClause(types, stream);
-	stream << ")";
-	return ResourceStatementMatches(stream.str(), doLimit);
-}
-
-std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::FindByIdentifierStartAndTypes(const std::string& identifierStart, const std::vector<int>& types,
-																								  const std::vector<int>& fileTagIds, bool doLimit) {
-	std::ostringstream stream;
-
-	// do not get fully qualified resources
-	// make sure to use the key because it is indexed
-	std::string escaped = mvceditor::SqliteSqlLikeEscape(identifierStart, '^');
-	stream << "key LIKE '" << escaped << "%' ESCAPE '^' AND method_name = key AND type IN(";
-	InClause(types, stream);
-	stream << ")";
-	return ResourceStatementMatches(stream.str(), doLimit);
 }

@@ -29,6 +29,7 @@
 #include <search/DirectorySearchClass.h>
 #include <language/TagParserClass.h>
 #include <language/SymbolTableClass.h>
+#include <globals/Sqlite.h>
 #include <unicode/unistr.h>
 #include <map>
 #include <wx/thread.h>
@@ -67,7 +68,7 @@ public:
 	/**
 	 * The object that will be used to lookup tags
 	 */
-	mvceditor::DetectedTagFinderClass DetectedTagFinder;
+	mvceditor::SqliteFinderClass DetectedTagFinder;
 
 	/**
 	 * TRUE if NativeTagFinder has an opened and valid connection

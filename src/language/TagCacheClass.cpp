@@ -24,6 +24,7 @@
  */
 #include <language/TagCacheClass.h>
 #include <language/TagFinderList.h>
+#include <language/DetectedTagFinderResultClass.h>
 #include <globals/Assets.h>
 #include <globals/Sqlite.h>
 #include <soci/soci.h>
@@ -362,9 +363,6 @@ std::vector<mvceditor::TagFinderClass*> mvceditor::TagCacheClass::AllFinders() {
 		if (GlobalCache->IsTagFinderInit) {
 			allTagFinders.push_back(&GlobalCache->TagFinder);
 		}
-		if (GlobalCache->IsDetectedTagFinderInit) {
-			allTagFinders.push_back(&GlobalCache->DetectedTagFinder);
-		}
 	}
 	return allTagFinders;
 }
@@ -428,9 +426,6 @@ bool mvceditor::TagCacheClass::IsFileCacheEmpty() {
 	if (GlobalCache && GlobalCache->IsTagFinderInit && !GlobalCache->TagFinder.IsFileCacheEmpty()) {
 		return false;
 	}
-	if (GlobalCache && GlobalCache->IsDetectedTagFinderInit && !GlobalCache->DetectedTagFinder.IsFileCacheEmpty()) {
-		return false;
-	}
 	return true;
 }
 
@@ -443,8 +438,12 @@ bool mvceditor::TagCacheClass::IsResourceCacheEmpty() {
 	if (GlobalCache && GlobalCache->IsTagFinderInit && !GlobalCache->TagFinder.IsResourceCacheEmpty()) {
 		return false;
 	}
-	if (GlobalCache && GlobalCache->IsDetectedTagFinderInit && !GlobalCache->DetectedTagFinder.IsResourceCacheEmpty()) {
-		return false;
+	if (GlobalCache && GlobalCache->IsDetectedTagFinderInit) {
+		mvceditor::DetectedTagTotalCountResultClass result;
+		GlobalCache->DetectedTagFinder.Exec(&result);
+		if (result.GetTotalCount() <= 0) {
+			return false;
+		}
 	}
 	return true;
 }

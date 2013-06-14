@@ -242,8 +242,9 @@ public:
 
 	/**
 	 * @param stmt this object will own the statement pointer
+	 * @return bool TRUE if there is at least one result
 	 */
-	void Init(soci::statement* stmt);
+	bool Init(soci::statement* stmt);
 
 	// TODO: remove this method
 	std::vector<mvceditor::TagClass> Matches();
@@ -293,7 +294,7 @@ public:
 	 * @param session the connection
 	 * @param doLimit boolean if TRUE there should be a limit on the query
 	 */
-	void Prepare(soci::session& session, bool doLimit);
+	bool Prepare(soci::session& session, bool doLimit);
 
 	/**
 	 * @param filePart the file name to search for
@@ -352,7 +353,7 @@ public:
 
 	ExactMemberTagResultClass();
 
-	void Prepare(soci::session& session, bool doLimit);
+	bool Prepare(soci::session& session, bool doLimit);
 	
 	virtual void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, const std::vector<wxFileName>& sourceDirs);
 
@@ -373,7 +374,7 @@ public:
 
 	void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, const std::vector<wxFileName>& sourceDirs);
 
-	virtual void Prepare(soci::session& session, bool doLimit);
+	bool Prepare(soci::session& session, bool doLimit);
 
 private:
 
@@ -769,66 +770,6 @@ protected:
 	 */
 	std::vector<mvceditor::TraitTagClass> UsedTraits(const std::vector<std::string>& keyStarts, const std::vector<int>& fileTagIds);
 
-	/**
-	 * @return all resources whose identifier begins with the given identifier(case insensitive)
-	 */
-	std::vector<mvceditor::TagClass> FindByIdentifierExactAndTypes(const std::string& identifier, const std::vector<int>& types, const std::vector<int>& fileTagIds, bool doLimit);
-	
-	/**
-	 * @return all resources whose identifier begins with the given identifierStart (case insensitive) AND are of the given type 
-	 */
-	std::vector<mvceditor::TagClass> FindByIdentifierStartAndTypes(const std::string& identifierStart, const std::vector<int>& types, const std::vector<int>& fileTagIds, bool doLimit);
-};
-
-
-/**
- * the DetectedTagFinderClass will query from the detectors db. The detectors db
- * has different columns than the resources db.
- */
-class DetectedTagFinderClass : public mvceditor::TagFinderClass {
-
-public:
-	
-	DetectedTagFinderClass();
-
-	/**
-	 * Gets all classes, functions, and constants (defines) that were parsed from
-	 * the given file.
-	 *
-	 * @param fullPath the full path of the file to lookup
-	 * @return vector of tags all tags that were parsed from the given file
-	 */
-	virtual std::vector<TagClass> ClassesFunctionsDefines(const wxString& fullPath);
-
-protected:
-
-	/**
-	 * @param whereCond the WHERE clause of the query to execute (query will be into the resources table)
-	 *        this does NOT have the "where" keyword.  examples:  
-	 *        "Key = 'ClassName'"
-	 *        "Key = 'ClassName::Method' AND Type IN(3)"
-	 * @param doLimit if TRUE a max amount of results will be returned, if FALSE then ALL results will be returned
-	 *        most of the time you want to set this to TRUE
-	 * @return the vector of resources pulled from the statement's results
-	 */
-	std::vector<mvceditor::TagClass> ResourceStatementMatches(std::string whereCond, bool doLimit);
-
-	/**
-	 * collect all of the methods that are aliased from all of the traits used by the given classes
-	 * @param classNames the names of the classes to search  in. these are the classes that use the
-	 *        traits
-	 * @param methodName if non-empty then only aliases that begin with this name will be returned
-	 * @param fileTagIds the file IDs to search in. can be empty. if empty, matches from all files will be returned.
-	 */
-	std::vector<TagClass> TraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName, const std::vector<int>& fileTagIds);
-
-	/**
-	 * @param keyStart the classes to look for ie. the classes we want to see if they use traits
-	 * @param fileTagIds the file IDs to search in. can be empty. if empty, matches from all files will be returned.
-	 * @return all of the traits that any of the given classes use.
-	 */
-	std::vector<mvceditor::TraitTagClass> UsedTraits(const std::vector<std::string>& keyStarts, const std::vector<int>& fileTagIds);
-	
 	/**
 	 * @return all resources whose identifier begins with the given identifier(case insensitive)
 	 */
