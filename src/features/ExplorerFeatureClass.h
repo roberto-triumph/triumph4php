@@ -97,9 +97,9 @@ public:
 
 	void RefreshDir(const wxFileName& dir);
 	
-	void ShowDir(const wxFileName& dir, const std::vector<wxFileName>& files, const std::vector<wxFileName>& dirs);
+	void ShowDir(const wxFileName& dir, const std::vector<wxFileName>& files, const std::vector<wxFileName>& dirs, int totalFiles, int totalSubDirs);
 
-	void ShowReport(const wxFileName& dir, const std::vector<wxFileName>& files, const std::vector<wxFileName>& dirs);
+	void ShowReport(const wxFileName& dir, const std::vector<wxFileName>& files, const std::vector<wxFileName>& dirs, int totalFiles, int totalSubDirs);
 
 private:
 
@@ -127,6 +127,11 @@ private:
 	 * to get projects list and tag cache
 	 */
 	mvceditor::AppClass& App;
+
+	/**
+	 * the currently selected filter menu item
+	 */
+	int FilterChoice;
 
 	enum ListImages {
 		LIST_FOLDER,
@@ -158,6 +163,7 @@ private:
 	void OnListMenuRename(wxCommandEvent& event);
 	void OnListMenuDelete(wxCommandEvent& event);
 	void OnExplorerModifyComplete(mvceditor::ExplorerModifyEventClass& event);
+	void OnListKeyDown(wxKeyEvent& event);
 
 	// event handler for the right list
 	void OnReportItemActivated(wxListEvent& event);
@@ -166,6 +172,12 @@ private:
 	void OnDirectoryEnter(wxCommandEvent& event);
 
 	void OnParentButtonClick(wxCommandEvent& event);
+
+	void OnFilterButtonLeftDown(wxMouseEvent& event);
+
+	void OnFilterMenuCheck(wxCommandEvent& event);
+
+	std::vector<wxString> FilterFileExtensions();
 
 	void ListFiles(const std::vector<wxFileName>& files);
 
@@ -218,8 +230,19 @@ public:
 	 */
 	wxString Error;
 
+	/**
+	 * total number of files in the directory, includes files not
+	 * shown due to extension filters
+	 */
+	int TotalFiles;
+
+	/**
+	 * total number of sub directories in the directory
+	 */
+	int TotalSubDirs;
+
 	ExplorerEventClass(int eventId, const wxFileName& dir, const std::vector<wxFileName>& files, 
-		const std::vector<wxFileName>& subDirs, const wxString& error);
+		const std::vector<wxFileName>& subDirs, const wxString& error, int totalFiles, int totalSubDirs);
 
 	wxEvent* Clone() const;
 };
@@ -237,9 +260,10 @@ public:
 	/**
 	 * starts an action to read the files from the given directory.
 	 * @param dir the directory to list
+	 * @param extension list of extensions to show.  If empty all files are shown
 	 * @param doHidden if TRUE hidden files/dirs are shown
 	 */
-	void Directory(const wxFileName& dir, bool doHidden);
+	void Directory(const wxFileName& dir, const std::vector<wxString>& extensions, bool doHidden);
 
 	wxString GetLabel() const;
 
@@ -250,7 +274,17 @@ private:
 
 	wxFileName Dir;
 
+	/** 
+	 * extensions to show.  if empty, we show all files
+	 */
+	std::vector<wxString> Extensions;
+
 	bool DoHidden;
+
+	/**
+	 * @return bool TRUE if the given name matches any of the wildcards
+	 */
+	bool MatchesWildcards(const wxString& fileName);
 };
 
 /**

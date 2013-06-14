@@ -56,6 +56,10 @@ ModalExplorerGeneratedPanel::ModalExplorerGeneratedPanel( wxWindow* parent, wxWi
 	List = new wxListCtrl( LeftPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_EDIT_LABELS|wxLC_LIST );
 	LeftPanelSizer->Add( List, 1, wxEXPAND|wxTOP|wxBOTTOM|wxLEFT, 5 );
 	
+	ListLabel = new wxStaticText( LeftPanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	ListLabel->Wrap( -1 );
+	LeftPanelSizer->Add( ListLabel, 0, wxALL|wxEXPAND, 5 );
+	
 	LeftPanel->SetSizer( LeftPanelSizer );
 	LeftPanel->Layout();
 	LeftPanelSizer->Fit( LeftPanel );
@@ -65,6 +69,10 @@ ModalExplorerGeneratedPanel::ModalExplorerGeneratedPanel( wxWindow* parent, wxWi
 	
 	Report = new wxListCtrl( RightPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT );
 	RightPanelSizer->Add( Report, 1, wxEXPAND|wxTOP|wxBOTTOM|wxRIGHT, 5 );
+	
+	ReportLabel = new wxStaticText( RightPanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	ReportLabel->Wrap( -1 );
+	RightPanelSizer->Add( ReportLabel, 0, wxALL|wxEXPAND, 5 );
 	
 	RightPanel->SetSizer( RightPanelSizer );
 	RightPanel->Layout();
@@ -80,9 +88,11 @@ ModalExplorerGeneratedPanel::ModalExplorerGeneratedPanel( wxWindow* parent, wxWi
 	this->Layout();
 	
 	// Connect Events
+	FilterButton->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( ModalExplorerGeneratedPanel::OnFilterButtonLeftDown ), NULL, this );
 	ParentButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModalExplorerGeneratedPanel::OnParentButtonClick ), NULL, this );
 	Directory->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ModalExplorerGeneratedPanel::OnDirectoryEnter ), NULL, this );
 	Splitter->Connect( wxEVT_COMMAND_SPLITTER_SASH_POS_CHANGED, wxSplitterEventHandler( ModalExplorerGeneratedPanel::OnSashChanged ), NULL, this );
+	List->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( ModalExplorerGeneratedPanel::OnListKeyDown ), NULL, this );
 	List->Connect( wxEVT_COMMAND_LIST_END_LABEL_EDIT, wxListEventHandler( ModalExplorerGeneratedPanel::OnListEndLabelEdit ), NULL, this );
 	List->Connect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( ModalExplorerGeneratedPanel::OnListItemActivated ), NULL, this );
 	List->Connect( wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, wxListEventHandler( ModalExplorerGeneratedPanel::OnListItemRightClick ), NULL, this );
@@ -93,9 +103,11 @@ ModalExplorerGeneratedPanel::ModalExplorerGeneratedPanel( wxWindow* parent, wxWi
 ModalExplorerGeneratedPanel::~ModalExplorerGeneratedPanel()
 {
 	// Disconnect Events
+	FilterButton->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( ModalExplorerGeneratedPanel::OnFilterButtonLeftDown ), NULL, this );
 	ParentButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModalExplorerGeneratedPanel::OnParentButtonClick ), NULL, this );
 	Directory->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ModalExplorerGeneratedPanel::OnDirectoryEnter ), NULL, this );
 	Splitter->Disconnect( wxEVT_COMMAND_SPLITTER_SASH_POS_CHANGED, wxSplitterEventHandler( ModalExplorerGeneratedPanel::OnSashChanged ), NULL, this );
+	List->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( ModalExplorerGeneratedPanel::OnListKeyDown ), NULL, this );
 	List->Disconnect( wxEVT_COMMAND_LIST_END_LABEL_EDIT, wxListEventHandler( ModalExplorerGeneratedPanel::OnListEndLabelEdit ), NULL, this );
 	List->Disconnect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( ModalExplorerGeneratedPanel::OnListItemActivated ), NULL, this );
 	List->Disconnect( wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, wxListEventHandler( ModalExplorerGeneratedPanel::OnListItemRightClick ), NULL, this );

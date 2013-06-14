@@ -21,6 +21,7 @@
 #include <wx/combobox.h>
 #include <wx/sizer.h>
 #include <wx/listctrl.h>
+#include <wx/stattext.h>
 #include <wx/panel.h>
 #include <wx/splitter.h>
 
@@ -41,13 +42,17 @@ class ModalExplorerGeneratedPanel : public wxPanel
 		wxSplitterWindow* Splitter;
 		wxPanel* LeftPanel;
 		wxListCtrl* List;
+		wxStaticText* ListLabel;
 		wxPanel* RightPanel;
 		wxListCtrl* Report;
+		wxStaticText* ReportLabel;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnFilterButtonLeftDown( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnParentButtonClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDirectoryEnter( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSashChanged( wxSplitterEvent& event ) { event.Skip(); }
+		virtual void OnListKeyDown( wxKeyEvent& event ) { event.Skip(); }
 		virtual void OnListEndLabelEdit( wxListEvent& event ) { event.Skip(); }
 		virtual void OnListItemActivated( wxListEvent& event ) { event.Skip(); }
 		virtual void OnListItemRightClick( wxListEvent& event ) { event.Skip(); }

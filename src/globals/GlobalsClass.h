@@ -205,6 +205,13 @@ public:
 	std::vector<wxString> GetNonPhpFileExtensions() const;
 
 	/**
+	 * Returns the all file extensions that we want the editor to open
+	 *   php, css, sql, and misc
+	 * @return std::vector<wxString> a copy of the file extensions
+	 */
+	std::vector<wxString> GetAllSourceFileExtensions() const;
+
+	/**
 	 * @return TRUE if given full path is a PHP file, as determined by
 	 * the sources directories and the php file 
 	 * extensions wilcard. Careful, This method will return FALSE 

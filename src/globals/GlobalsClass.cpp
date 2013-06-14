@@ -142,6 +142,20 @@ std::vector<wxString> mvceditor::GlobalsClass::GetNonPhpFileExtensions() const {
 	return wildcards;
 }
 
+std::vector<wxString> mvceditor::GlobalsClass::GetAllSourceFileExtensions() const {
+	std::vector<wxString> wildcards;
+	std::vector<wxString> php = GetPhpFileExtensions();
+	std::vector<wxString> css = GetCssFileExtensions();
+	std::vector<wxString> sql = GetSqlFileExtensions();
+	std::vector<wxString> misc = GetMiscFileExtensions();
+
+	wildcards.insert(wildcards.end(), php.begin(), php.end());
+	wildcards.insert(wildcards.end(), css.begin(), css.end());
+	wildcards.insert(wildcards.end(), sql.begin(), sql.end());
+	wildcards.insert(wildcards.end(), misc.begin(), misc.end());
+	return wildcards;
+}
+
 bool mvceditor::GlobalsClass::IsAPhpSourceFile(const wxString& fullPath) const {
 	bool isPhp = false;
 	std::vector<mvceditor::ProjectClass>::const_iterator it;
