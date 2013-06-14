@@ -270,7 +270,7 @@ void ProfileTagParserOnLargeProject() {
 	time = wxGetLocalTimeMillis();
 	tagParser.PhpFileExtensions.push_back(wxT("*.php"));
 	tagParser.Init(&session);
-	tagFinder.Init(&session);
+	tagFinder.InitSession(&session);
 	search.Init(DirName);
 	while (search.More()) {
 		search.Walk(tagParser);
@@ -282,7 +282,7 @@ printf("time for tagFinder on entire project:%ld ms\n", time.ToLong());
 void ProfileTagSearch() {
 	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(DbFileName));
 	mvceditor::ParsedTagFinderClass tagFinder;
-	tagFinder.Init(&session);
+	tagFinder.InitSession(&session);
 	wxLongLong time;
 	size_t found = 0;
 
