@@ -26,6 +26,7 @@
 #include <globals/Assets.h>
 #include <globals/Errors.h>
 #include <search/RecursiveDirTraverserClass.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 
 static const int ID_DATABASE_TAG_DETECTOR_PROCESS = wxNewId();
 
@@ -187,12 +188,10 @@ void mvceditor::DatabaseTagDetectorInitActionClass::Work(mvceditor::GlobalsClass
 
 	// initialize the detected tag cache only the enabled projects	
 	mvceditor::DatabaseTagFinderClass finder;
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
-		if (project->IsEnabled) {
-			finder.AttachExistingFile(globals.DetectorCacheDbFileName);
-		}
-	}
+
+	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(globals.DetectorCacheDbFileName.GetFullPath()));
+	finder.InitSession(&session);
+	
 	std::vector<mvceditor::DatabaseTagClass> detected = finder.All();
 	globals.DatabaseTags.insert(globals.DatabaseTags.end(), detected.begin(), detected.end());
 }

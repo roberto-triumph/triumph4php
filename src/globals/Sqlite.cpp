@@ -126,52 +126,72 @@ void mvceditor::SqliteSetBusyTimeout(soci::session& session, int timeoutMs) {
 }
 
 
-mvceditor::SqliteFinderClass::SqliteFinderClass()
-	: Sessions() {
+mvceditor::SqliteFinderClass::SqliteFinderClass() {
+	Session = NULL;
 }
 
 mvceditor::SqliteFinderClass::~SqliteFinderClass() {
-	Close();
 }
 
-void mvceditor::SqliteFinderClass::Close() {
-	std::vector<soci::session*>::iterator session;
-	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
-		try {
-			(*session)->close();
-		} catch (std::exception& e) {
-			wxUnusedVar(e);
-			// ignore close exceptions since we want to clean up
-		}
-		delete (*session);
+void mvceditor::SqliteFinderClass::InitSession(soci::session* session) {
+	Session = session;
+}
+
+bool mvceditor::SqliteFinderClass::IsInit() const {
+	return NULL != Session;
+}
+
+mvceditor::SqliteResultClass::SqliteResultClass() 
+: IsEmpty(true) {
+	Stmt = NULL;
+}
+
+mvceditor::SqliteResultClass::~SqliteResultClass() {
+	if (Stmt) {
+		delete Stmt;
 	}
-	Sessions.clear();
+}	
+
+bool mvceditor::SqliteResultClass::Empty() const {
+	return IsEmpty;
 }
 
-bool mvceditor::SqliteFinderClass::AttachExistingFile(const wxFileName& fileName) {
-	wxASSERT_MSG(fileName.IsOk(), _("File name given to SqliteFinderClass::AttachExistingFile is not OK."));
-	if (!fileName.IsOk()) {
+bool mvceditor::SqliteResultClass::More() const {
+	return !IsEmpty && NULL != Stmt;
+}
+
+bool mvceditor::SqliteResultClass::Fetch() {
+	if (!Stmt) {
 		return false;
 	}
-	bool isOpened = false;
-	std::string stdDbName = mvceditor::WxToChar(fileName.GetFullPath());
-	soci::session* session = new soci::session();
-	try {
-		session->open(*soci::factory_sqlite3(), stdDbName);
-		isOpened = true;
-		Sessions.push_back(session);
-	} catch(std::exception const& e) {
-		isOpened = false;
-		wxString msg = mvceditor::CharToWx(e.what());
-		wxASSERT_MSG(isOpened, msg);
+	bool more = Stmt->fetch();
+	if (!more) {
+		delete Stmt;
+		Stmt = NULL;
 	}
-	if (!isOpened) {
-		session->close();
-		delete session;
-	}
-	return isOpened;
+	return more;
 }
 
-void mvceditor::SqliteFinderClass::AdoptSession(soci::session* session) {
-	Sessions.push_back(session);
+bool mvceditor::SqliteResultClass::AdoptStatement(soci::statement* stmt, wxString& error)  {
+	Stmt = stmt;
+	bool good = true;
+	try {
+		Stmt->define_and_bind();
+		bool hasData = Stmt->execute(true);
+		if (hasData) {
+			IsEmpty =  false;
+		}
+		else {
+			IsEmpty = true;
+			delete Stmt;
+			Stmt = NULL;
+		}
+	} catch (std::exception& e) {
+		error = mvceditor::CharToWx(e.what()); 
+		wxASSERT_MSG(false, error);
+		delete Stmt;
+		Stmt = NULL;
+		good = false;
+	}
+	return good;
 }

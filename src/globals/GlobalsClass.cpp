@@ -40,7 +40,8 @@ mvceditor::GlobalsClass::GlobalsClass()
 	, SqlFileExtensionsString(wxT("*.sql"))
 	, MiscFileExtensionsString(wxT("*.js;*.html;*.yml;*.xml;*.txt"))
 	, TagCacheDbFileName(mvceditor::TagCacheAsset())
-	, DetectorCacheDbFileName(mvceditor::DetectorCacheAsset()) {
+	, DetectorCacheDbFileName(mvceditor::DetectorCacheAsset()) 
+	, DetectorCacheSession(){
 }
 
 std::vector<mvceditor::SourceClass> mvceditor::GlobalsClass::AllEnabledSources() const {

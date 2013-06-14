@@ -58,7 +58,7 @@ public:
 		if (wxDirExists(TestProjectDir)) {
 			RecursiveRmDir(TestProjectDir);
 		}
-		ParsedTagFinder.Init(&Session);
+		ParsedTagFinder.InitSession(&Session);
 	}
 	
 	/**
@@ -115,7 +115,7 @@ public:
 		, Matches() {
 		TagParser.PhpFileExtensions.push_back(wxT("*.php"));
 		TagParser.Init(&Session);
-		ParsedTagFinder.Init(&Session);
+		ParsedTagFinder.InitSession(&Session);
 	}
 	
 	/**
@@ -763,7 +763,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindPartialMatch
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForNativeFunctions) {
 	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(mvceditor::NativeFunctionsAsset().GetFullPath()));
-	ParsedTagFinder.Init(&session);
+	ParsedTagFinder.InitSession(&session);
 
 	NearMatchTags(UNICODE_STRING_SIMPLE("array_key"));
 	CHECK_VECTOR_SIZE(2, Matches);
@@ -1730,7 +1730,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, IsFileCacheEmptyWithNativeFunctions
 	CHECK(ParsedTagFinder.IsResourceCacheEmpty());
 
 	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(mvceditor::NativeFunctionsAsset().GetFullPath()));;
-	ParsedTagFinder.Init(&session);
+	ParsedTagFinder.InitSession(&session);
 	
 	// still empty
 	CHECK(ParsedTagFinder.IsFileCacheEmpty());

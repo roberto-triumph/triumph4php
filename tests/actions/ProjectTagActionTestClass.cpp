@@ -52,7 +52,7 @@ public:
 	mvceditor::ProjectTagActionClass ProjectTagAction;
 
 	/**
-	 * connection to the tag db
+	 * connection to the tag db.
 	 */
 	soci::session Session;
 
@@ -65,7 +65,6 @@ public:
 		: ActionTestFixtureClass()
 		, FileTestFixtureClass(wxT("project_tag_action"))
 		, ProjectTagAction(RunningThreads, ID_EVENT)
-		, Session()
 		, Finder() {
 		TouchTestDir();
 		InitTagCache(TestProjectDir);
@@ -74,11 +73,7 @@ public:
 		wxString error;
 		bool init = mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), Session, error);
 		wxASSERT_MSG(init, error);
-		Finder.Init(&Session);
-	}
-
-	~ProjectTagActionTestClass() {
-		Session.close();
+		Finder.InitSession(&Session);
 	}
 };
 

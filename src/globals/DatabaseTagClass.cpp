@@ -397,38 +397,36 @@ std::vector<mvceditor::DatabaseTagClass> mvceditor::DatabaseTagFinderClass::All(
 		user,
 		password;
 	int port;
-	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
-		try {
-			soci::statement stmt = ((*session)->prepare <<
-				"SELECT label, \"schema\", driver, host, port, \"user\", password FROM database_tags",
-				soci::into(label), soci::into(schema), soci::into(driver), 
-				soci::into(host), soci::into(port), soci::into(user), 
-				soci::into(password)
-			);
-			if (stmt.execute(true)) {
-				do {
-					mvceditor::DatabaseTagClass dbTag;
-					dbTag.Schema = mvceditor::CharToIcu(schema.c_str());
-					if (driver == "MYSQL") {
-						dbTag.Driver = mvceditor::DatabaseTagClass::MYSQL;
-					}
-					dbTag.Host = mvceditor::CharToIcu(host.c_str());
-					dbTag.IsDetected = true;
-					dbTag.IsEnabled = true;
-					dbTag.Label = mvceditor::CharToIcu(label.c_str());
-					dbTag.Password = mvceditor::CharToIcu(password.c_str());
-					dbTag.Port = port;
-					dbTag.User = mvceditor::CharToIcu(user.c_str());
+	try {
+		soci::statement stmt = (Session->prepare <<
+			"SELECT label, \"schema\", driver, host, port, \"user\", password FROM database_tags",
+			soci::into(label), soci::into(schema), soci::into(driver), 
+			soci::into(host), soci::into(port), soci::into(user), 
+			soci::into(password)
+		);
+		if (stmt.execute(true)) {
+			do {
+				mvceditor::DatabaseTagClass dbTag;
+				dbTag.Schema = mvceditor::CharToIcu(schema.c_str());
+				if (driver == "MYSQL") {
+					dbTag.Driver = mvceditor::DatabaseTagClass::MYSQL;
+				}
+				dbTag.Host = mvceditor::CharToIcu(host.c_str());
+				dbTag.IsDetected = true;
+				dbTag.IsEnabled = true;
+				dbTag.Label = mvceditor::CharToIcu(label.c_str());
+				dbTag.Password = mvceditor::CharToIcu(password.c_str());
+				dbTag.Port = port;
+				dbTag.User = mvceditor::CharToIcu(user.c_str());
 
-					allDbTags.push_back(dbTag);
+				allDbTags.push_back(dbTag);
 
-				} while (stmt.fetch());
-			}
-		} catch (std::exception& e) {
-			wxString msg = mvceditor::CharToWx(e.what());
-			wxUnusedVar(msg);
-			mvceditor::EditorLogError(mvceditor::WARNING_OTHER, msg);
+			} while (stmt.fetch());
 		}
+	} catch (std::exception& e) {
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxUnusedVar(msg);
+		mvceditor::EditorLogError(mvceditor::WARNING_OTHER, msg);
 	}
 	return allDbTags;
 }

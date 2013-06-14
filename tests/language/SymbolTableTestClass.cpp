@@ -118,10 +118,10 @@ public:
 		CreateDatabase(SessionGlobal, mvceditor::ResourceSqlSchemaAsset());
 		CreateDatabase(Session1, mvceditor::ResourceSqlSchemaAsset());
 		TagParserGlobal.Init(&SessionGlobal);
-		GlobalFinder.Init(&SessionGlobal);
+		GlobalFinder.InitSession(&SessionGlobal);
 
 		TagParser1.Init(&Session1);
-		Finder1.Init(&Session1);	
+		Finder1.InitSession(&Session1);	
 	}
 
 	void Init(const UnicodeString& sourceCode) {

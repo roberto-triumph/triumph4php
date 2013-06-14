@@ -110,7 +110,7 @@ void mvceditor::GlobalCacheClass::InitGlobalTag(const wxFileName& tagDbFileName,
 	if (IsTagFinderInit) {
 		TagParser.SetVersion(version);
 		TagParser.Init(TagDbSession);
-		TagFinder.Init(TagDbSession);
+		TagFinder.InitSession(TagDbSession);
 	}
 }
 
@@ -126,7 +126,7 @@ void mvceditor::GlobalCacheClass::AdoptGlobalTag(soci::session* globalSession,
 	if (IsTagFinderInit) {
 		TagParser.SetVersion(version);
 		TagParser.Init(TagDbSession);
-		TagFinder.Init(TagDbSession);
+		TagFinder.InitSession(TagDbSession);
 	}
 }
 
@@ -135,7 +135,7 @@ void mvceditor::GlobalCacheClass::InitDetectorTag(const wxFileName& detectorDbFi
 	DetectedTagDbSession = new soci::session;
 	IsDetectedTagFinderInit = Open(DetectedTagDbSession, detectorDbFileName.GetFullPath());
 	if (IsDetectedTagFinderInit) {
-		DetectedTagFinder.Init(DetectedTagDbSession);
+		DetectedTagFinder.InitSession(DetectedTagDbSession);
 	}
 }
 
@@ -144,7 +144,7 @@ void mvceditor::GlobalCacheClass::AdoptDetectorTag(soci::session* session) {
 	IsDetectedTagFinderInit = NULL != session;
 	DetectedTagDbSession = session;
 	if (IsDetectedTagFinderInit) {
-		DetectedTagFinder.Init(DetectedTagDbSession);
+		DetectedTagFinder.InitSession(DetectedTagDbSession);
 	}
 }
 
@@ -153,7 +153,7 @@ void mvceditor::GlobalCacheClass::InitNativeTag(const wxFileName& nativeDbFileNa
 	NativeDbSession = new soci::session;
 	IsNativeTagFinderInit = Open(NativeDbSession, nativeDbFileName.GetFullPath());
 	if (IsNativeTagFinderInit) {
-		NativeTagFinder.Init(NativeDbSession);
+		NativeTagFinder.InitSession(NativeDbSession);
 	}
 }
 
@@ -162,7 +162,7 @@ void mvceditor::GlobalCacheClass::AdoptNativeTag(soci::session* session) {
 	IsNativeTagFinderInit = NULL != session;
 	NativeDbSession = session;
 	if (IsNativeTagFinderInit) {
-		NativeTagFinder.Init(NativeDbSession);
+		NativeTagFinder.InitSession(NativeDbSession);
 	}
 }
 

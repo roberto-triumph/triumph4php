@@ -66,27 +66,25 @@ std::vector<mvceditor::ConfigTagClass> mvceditor::ConfigTagFinderClass::All() {
 	std::vector<soci::session*>::iterator session;
 	std::string label,
 		fullPath;
-	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
-		try {
-			soci::statement stmt = ((*session)->prepare <<
-				"SELECT label, full_path FROM config_tags",
-				soci::into(label), soci::into(fullPath)
-			);
-			if (stmt.execute(true)) {
-				do {
-					mvceditor::ConfigTagClass configTag;
-					configTag.Label = mvceditor::CharToWx(label.c_str());
-					configTag.ConfigFileName.Assign(mvceditor::CharToWx(fullPath.c_str()));
+	try {
+		soci::statement stmt = (Session->prepare <<
+			"SELECT label, full_path FROM config_tags",
+			soci::into(label), soci::into(fullPath)
+		);
+		if (stmt.execute(true)) {
+			do {
+				mvceditor::ConfigTagClass configTag;
+				configTag.Label = mvceditor::CharToWx(label.c_str());
+				configTag.ConfigFileName.Assign(mvceditor::CharToWx(fullPath.c_str()));
 
-					allConfigTags.push_back(configTag);
+				allConfigTags.push_back(configTag);
 
-				} while (stmt.fetch());
-			}
-		} catch (std::exception& e) {
-			wxString msg = mvceditor::CharToWx(e.what());
-			wxUnusedVar(msg);
-			mvceditor::EditorLogError(mvceditor::WARNING_OTHER, msg);
+			} while (stmt.fetch());
 		}
+	} catch (std::exception& e) {
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxUnusedVar(msg);
+		mvceditor::EditorLogError(mvceditor::WARNING_OTHER, msg);
 	}
 	return allConfigTags;
 }

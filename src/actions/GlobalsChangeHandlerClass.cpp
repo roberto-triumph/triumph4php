@@ -26,6 +26,7 @@
 #include <globals/DatabaseTagClass.h>
 #include <actions/GlobalActionClass.h>
 #include <globals/Errors.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 
 mvceditor::GlobalsChangeHandlerClass::GlobalsChangeHandlerClass(mvceditor::GlobalsClass& globals) 
 	: wxEvtHandler()
@@ -56,9 +57,9 @@ void mvceditor::GlobalsChangeHandlerClass::OnDatabaseTagsComplete(wxCommandEvent
 	}
 
 	mvceditor::DatabaseTagFinderClass finder;
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	std::vector<mvceditor::ProjectClass> projects = Globals.AllEnabledProjects();
-	finder.AttachExistingFile(Globals.DetectorCacheDbFileName);
+	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
+	finder.InitSession(&session);
+
 	std::vector<mvceditor::DatabaseTagClass> detected = finder.All();
 	Globals.DatabaseTags.insert(Globals.DatabaseTags.end(), detected.begin(), detected.end());
 }

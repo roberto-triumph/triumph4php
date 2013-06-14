@@ -26,6 +26,7 @@
 #define __MVCEDITORPARSEDTAGFINDERCLASS_H__
 
 #include <globals/TagClass.h>
+#include <globals/Sqlite.h>
 #include <wx/string.h>
 #include <soci/soci.h>
 #include <unicode/unistr.h>
@@ -231,7 +232,7 @@ private:
 /**
  * The TagResult is used to loop through database rows of the tag table
  */
-class TagResultClass {
+ class TagResultClass : public mvceditor::SqliteResultClass {
 
 public:
 
@@ -239,37 +240,13 @@ public:
 
 	TagResultClass();
 
-	virtual ~TagResultClass();
-
 	/**
-	 * in this method subclasses will build the SQL and execute it.
-	 *
-	 * @param session the connection
-	 * @param doLimit boolean if TRUE there should be a limit on the query
-	 */
-	virtual void Prepare(soci::session& session, bool doLimit);
-
-	/**
-	 * @param session must be around for as long as this result is alive
 	 * @param stmt this object will own the statement pointer
 	 */
-	void Init(soci::session& session, soci::statement* stmt);
-
-	// TODO: remove this method
-	void Init(soci::session& session, const std::string& sql);
+	void Init(soci::statement* stmt);
 
 	// TODO: remove this method
 	std::vector<mvceditor::TagClass> Matches();
-
-	/**
-	 * @return boolean TRUE if the query returned zero rows.
-	 */
-	bool Empty() const;
-
-	/**
-	 * @return boolean TRUE if there are more results to be iterated through
-	 */
-	bool More() const;
 
 	/**
 	 * advance to the next row. after a call to this method, the Tag member variable will contain the 
@@ -278,17 +255,6 @@ public:
 	void Next();
 
 protected:
-
-	/**
-	 * the statement to iterate through
-	 */
-	soci::statement* Stmt;
-
-	/**
-	 * TRUE if the query returned zero rows.
-	 * @var boolean
-	 */
-	bool IsEmpty;
 
 	// variables to bind to the statement
 	int FileTagId;
@@ -313,7 +279,7 @@ protected:
 		FileIsNewIndicator;
 };
 
-class FileTagResultClass {
+ class FileTagResultClass : public mvceditor::SqliteResultClass {
 
 public:
 
@@ -321,15 +287,13 @@ public:
 
 	FileTagResultClass();
 
-	virtual ~FileTagResultClass();
-
 	/**
 	 * in this method subclasses will build the SQL and execute it.
 	 *
 	 * @param session the connection
 	 * @param doLimit boolean if TRUE there should be a limit on the query
 	 */
-	 void Prepare(soci::session& session, bool doLimit);
+	void Prepare(soci::session& session, bool doLimit);
 
 	/**
 	 * @param filePart the file name to search for
@@ -338,22 +302,6 @@ public:
 
 	// TODO: remove this method
 	std::vector<mvceditor::TagClass> Matches();
-
-	/**
-	 * @param session must be around for as long as this result is alive
-	 * @param stmt this object will own the statement pointer
-	 */
-	void Init(soci::session& session, soci::statement* stmt);
-
-	/**
-	 * @return boolean TRUE if the query returned zero rows.
-	 */
-	bool Empty() const;
-
-	/**
-	 * @return boolean TRUE if there are more results to be iterated through
-	 */
-	bool More() const;
 
 	/**
 	 * advance to the next row. after a call to this method, the Tag member variable will contain the 
@@ -391,17 +339,6 @@ private:
 	 * if TRUE exact match will be performed
 	 */
 	bool ExactMatch;
-
-	/**
-	 * the statement to iterate through
-	 */
-	soci::statement* Stmt;
-
-	/**
-	 * TRUE if the query returned zero rows.
-	 * @var boolean
-	 */
-	bool IsEmpty;
 
 	// variables to bind to the statement
 	int FileTagId;
@@ -466,12 +403,11 @@ private:
  * the return values for methods of this class will be false, empty, or zero. Currently this class does not expose 
  * the specific error code from SQLite.
  */
-class TagFinderClass {
+class TagFinderClass : public mvceditor::SqliteFinderClass {
 
 public:
 	
 	TagFinderClass();
-	virtual ~TagFinderClass();
 
 	/**
 	 * Gets all classes, functions, and constants (defines) that were parsed from
@@ -484,19 +420,6 @@ public:
 	virtual std::vector<mvceditor::TagClass> ClassesFunctionsDefines(const wxString& fullPath) = 0;
 
 protected:
-
-	/**
-	 * The connection to the database that backs the tag cache
-	 * The database will hold all of the files that have been looked at, as well
-	 * as all of the resources that were parsed.
-	 * This class will NOT own the pointer.
-	 */
-	soci::session* Session;
-
-	/**
-	 * Flag to make sure we initialize the tag database.
-	 */
-	bool IsCacheInitialized;
 
 	/**
 	 * collect all of the methods that are aliased from all of the traits used by the given classes
@@ -525,16 +448,6 @@ protected:
 	virtual std::vector<mvceditor::TagClass> FindByIdentifierStartAndTypes(const std::string& identifierStart, const std::vector<int>& types, const std::vector<int>& fileTagIds, bool doLimit) = 0;
 
 public:
-
-	/**
-	 * Create the tag database that is backed by the given session. 
-	 * This method can used to have the tag parser write to either  a file-backed db or a memory db.
-	 * By using an in-memory database, lookups are faster.
-	 * Note that this method assumes that the schema has already been created.
-	 * 
-	 * @param soci::session* the session. this class will NOT own the pointer
-	 */
-	void Init(soci::session* session);
 		
 	/**
 	 * Looks for the tag, using exact, case insensitive matching. Will collect the fully qualified tag name 

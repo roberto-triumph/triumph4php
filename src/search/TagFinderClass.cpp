@@ -25,7 +25,6 @@
 #include <search/TagFinderClass.h>
 #include <search/FinderClass.h>
 #include <globals/String.h>
-#include <globals/Sqlite.h>
 #include <globals/Errors.h>
 #include <language/FileTags.h>
 #include <wx/filename.h>
@@ -137,7 +136,7 @@ public:
 
 	void Set(const wxString& fullPath);
 
-	void Prepare(soci::session& session);
+	void Prepare(soci::session& session, bool doLimit);
 
 private:
 
@@ -152,7 +151,7 @@ public:
 
 	AllTagsResultClass();
 
-	void Prepare(soci::session& session);
+	void Prepare(soci::session& session, bool doLimit);
 };
 
 }
@@ -242,7 +241,7 @@ void mvceditor::ExactMemberTagResultClass::Prepare(soci::session& session,  bool
 	for (size_t i = 0; i < SourceDirs.size(); i++) {
 		stmt->exchange(soci::use(SourceDirs[i]));
 	}
-	Init(session, stmt);
+	Init(stmt);
 }
 
 mvceditor::AllMembersTagResultClass::AllMembersTagResultClass()
@@ -309,7 +308,7 @@ void mvceditor::AllMembersTagResultClass::Prepare(soci::session& session,  bool 
 	for (size_t i = 0; i < SourceDirs.size(); i++) {
 		stmt->exchange(soci::use(SourceDirs[i]));
 	}
-	Init(session, stmt);
+	Init(stmt);
 }
 
 
@@ -380,7 +379,7 @@ void mvceditor::NearMatchMemberTagResultClass::Prepare(soci::session& session,  
 	for (size_t i = 0; i < SourceDirs.size(); i++) {
 		stmt->exchange(soci::use(SourceDirs[i]));
 	}
-	Init(session, stmt);
+	Init(stmt);
 }
 
 mvceditor::ExactNonMemberTagResultClass::ExactNonMemberTagResultClass()
@@ -440,7 +439,7 @@ void mvceditor::ExactNonMemberTagResultClass::Prepare(soci::session& session, bo
 	for (size_t i = 0; i < SourceDirs.size(); i++) {
 		stmt->exchange(soci::use(SourceDirs[i]));
 	}
-	Init(session, stmt);
+	Init(stmt);
 }
 
 mvceditor::NearMatchNonMemberTagResultClass::NearMatchNonMemberTagResultClass()
@@ -505,7 +504,7 @@ void mvceditor::NearMatchNonMemberTagResultClass::Prepare(soci::session& session
 	for (size_t i = 0; i < SourceDirs.size(); i++) {
 		stmt->exchange(soci::use(SourceDirs[i]));
 	}
-	Init(session, stmt);
+	Init(stmt);
 }
 
 mvceditor::ExactMemberOnlyTagResultClass::ExactMemberOnlyTagResultClass()
@@ -561,7 +560,7 @@ void mvceditor::ExactMemberOnlyTagResultClass::Prepare(soci::session& session,  
 	for (size_t i = 0; i < SourceDirs.size(); i++) {
 		stmt->exchange(soci::use(SourceDirs[i]));
 	}
-	Init(session, stmt);
+	Init(stmt);
 }
 
 mvceditor::NearMatchMemberOnlyTagResultClass::NearMatchMemberOnlyTagResultClass()
@@ -617,7 +616,7 @@ void mvceditor::NearMatchMemberOnlyTagResultClass::Prepare(soci::session& sessio
 	for (size_t i = 0; i < SourceDirs.size(); i++) {
 		stmt->exchange(soci::use(SourceDirs[i]));
 	}
-	Init(session, stmt);
+	Init(stmt);
 }
 
 mvceditor::TopLevelTagInFileResultClass::TopLevelTagInFileResultClass()
@@ -633,7 +632,7 @@ void mvceditor::TopLevelTagInFileResultClass::Set(const wxString& fullPath) {
 	FullPath = mvceditor::WxToChar(fullPath);
 }
 
-void mvceditor::TopLevelTagInFileResultClass::Prepare(soci::session& session) {
+void mvceditor::TopLevelTagInFileResultClass::Prepare(soci::session& session, bool doLimit) {
 	
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	// remove the duplicates from fully qualified namespaces
@@ -651,7 +650,7 @@ void mvceditor::TopLevelTagInFileResultClass::Prepare(soci::session& session) {
 	for (size_t i = 0; i < TagTypes.size(); i++) {
 		stmt->exchange(soci::use(TagTypes[i]));
 	}
-	Init(session, stmt);
+	Init(stmt);
 }
 
 mvceditor::AllTagsResultClass::AllTagsResultClass()
@@ -659,7 +658,7 @@ mvceditor::AllTagsResultClass::AllTagsResultClass()
 
 }
 
-void mvceditor::AllTagsResultClass::Prepare(soci::session& session) {
+void mvceditor::AllTagsResultClass::Prepare(soci::session& session, bool doLimit) {
 	std::string sql;
 	sql += "SELECT r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
@@ -667,70 +666,26 @@ void mvceditor::AllTagsResultClass::Prepare(soci::session& session) {
 	
 	soci::statement* stmt = new soci::statement(session);
 	stmt->prepare(sql);
-	Init(session, stmt);
+	Init(stmt);
 }
 
 mvceditor::FileTagResultClass::FileTagResultClass()
-	: FileTag()
+	: SqliteResultClass()
+	, FileTag()
 	, SourceDirs()
 	, FilePart() 
 	, LineNumber(0)
 	, ExactMatch(false)
-	, Stmt(NULL)
-	, IsEmpty(false) 
 	, FileTagId(0)
 	, FullPath()
 	, IsNew(0) {
-}
-
-mvceditor::FileTagResultClass::~FileTagResultClass() {
-	if (Stmt) {
-		delete Stmt;
-	}
-}
-
-void mvceditor::FileTagResultClass::Init(soci::session& session, soci::statement* stmt) {
-	Stmt = stmt;
-	try {
-		Stmt->exchange(soci::into(FullPath));
-		Stmt->exchange(soci::into(FileTagId));
-		Stmt->exchange(soci::into(IsNew));
-		Stmt->define_and_bind();
-		bool hasData = Stmt->execute(true);
-		if (hasData) {
-			IsEmpty =  false;
-		}
-		else {
-			IsEmpty = true;
-			delete Stmt;
-			Stmt = NULL;
-		}
-	} catch (std::exception& e) {
-		wxString msg = mvceditor::CharToWx(e.what());
-		wxUnusedVar(msg);
-		wxASSERT_MSG(false, msg);
-		delete Stmt;
-		Stmt = NULL;
-	}
-}
-
-bool mvceditor::FileTagResultClass::Empty() const {
-	return IsEmpty;
-}
-
-bool mvceditor::FileTagResultClass::More() const {
-	return !IsEmpty && NULL != Stmt;
 }
 
 void mvceditor::FileTagResultClass::Next() {
 	FileTag.FileId = FileTagId;
 	FileTag.FullPath = mvceditor::CharToWx(FullPath.c_str());
 	FileTag.IsNew = IsNew > 0;
-	bool more = Stmt->fetch();
-	if (!more) {
-		delete Stmt;
-		Stmt = NULL;
-	}
+	Fetch();
 }
 
 void mvceditor::FileTagResultClass::Set(const UnicodeString& filePart, int lineNumber, bool exactMatch, const std::vector<wxFileName>& sourceDirs) {
@@ -746,7 +701,6 @@ void mvceditor::FileTagResultClass::Set(const UnicodeString& filePart, int lineN
 }
 
 void mvceditor::FileTagResultClass::Prepare(soci::session& session, bool doLimit) {
-	wxASSERT_MSG(!Stmt, wxT("statmement must be null"));
 
 	// add the SQL wildcards
 	std::string escaped = mvceditor::SqliteSqlLikeEscape(FilePart, '^');
@@ -767,12 +721,24 @@ void mvceditor::FileTagResultClass::Prepare(soci::session& session, bool doLimit
 		}
 		sql += ")";
 	}
-	soci::statement* stmt = new soci::statement(session);
-	stmt->prepare(sql);
-	for (size_t i = 0; i < SourceDirs.size(); i++) {
-		stmt->exchange(soci::use(SourceDirs[i]));
+	wxString error;
+	try {
+		soci::statement* stmt = new soci::statement(session);
+		stmt->prepare(sql);
+		for (size_t i = 0; i < SourceDirs.size(); i++) {
+			stmt->exchange(soci::use(SourceDirs[i]));
+		}
+	
+		stmt->exchange(soci::into(FullPath));
+		stmt->exchange(soci::into(FileTagId));
+		stmt->exchange(soci::into(IsNew));
+	
+		AdoptStatement(stmt, error);
+	} catch (std::exception& e) {
+		error = mvceditor::CharToWx(e.what());
+		wxASSERT_MSG(false, error);
 	}
-	Init(session, stmt);
+
 }
 
 std::vector<mvceditor::TagClass> mvceditor::FileTagResultClass::Matches() {
@@ -1067,9 +1033,8 @@ mvceditor::FileTagResultClass* mvceditor::TagSearchClass::CreateNearMatchFileRes
 }
 
 mvceditor::TagResultClass::TagResultClass() 
-	: Tag()
-	, Stmt(NULL)
-	, IsEmpty(true)
+	: SqliteResultClass()
+	, Tag()
 	, FileTagId(0)
 	, SourceId(0)
 	, Key()
@@ -1093,77 +1058,31 @@ mvceditor::TagResultClass::TagResultClass()
 {
 }
 
-mvceditor::TagResultClass::~TagResultClass() {
-	if (Stmt) {
-		delete Stmt;
-	}
-}
-
-void mvceditor::TagResultClass::Prepare(soci::session& session, bool doLimit) {
-}
-
-
-void mvceditor::TagResultClass::Init(soci::session& session, soci::statement* stmt) {
+void mvceditor::TagResultClass::Init(soci::statement* stmt) {
+	wxString error;
 	try {
-		Stmt = stmt;
-		Stmt->exchange(soci::into(FileTagId, FileTagIdIndicator));
-		Stmt->exchange(soci::into(SourceId));
-		Stmt->exchange(soci::into(Key));
-		Stmt->exchange(soci::into(Identifier));
-		Stmt->exchange(soci::into(ClassName));
-		Stmt->exchange(soci::into(Type));
-		Stmt->exchange(soci::into(NamespaceName));
-		Stmt->exchange(soci::into(Signature));
-		Stmt->exchange(soci::into(ReturnType));
-		Stmt->exchange(soci::into(Comment));
-		Stmt->exchange(soci::into(FullPath, FullPathIndicator));
-		Stmt->exchange(soci::into(IsProtected));
-		Stmt->exchange(soci::into(IsPrivate));
-		Stmt->exchange(soci::into(IsStatic));
-		Stmt->exchange(soci::into(IsDynamic));
-		Stmt->exchange(soci::into(IsNative));
-		Stmt->exchange(soci::into(FileIsNew, FileIsNewIndicator));
-		Stmt->define_and_bind();
-		if (Stmt->execute(true)) {
-			IsEmpty = false;
-		}
-		else {
-			IsEmpty = true;
-			delete Stmt;
-			Stmt = NULL;
-		}
+		stmt->exchange(soci::into(FileTagId, FileTagIdIndicator));
+		stmt->exchange(soci::into(SourceId));
+		stmt->exchange(soci::into(Key));
+		stmt->exchange(soci::into(Identifier));
+		stmt->exchange(soci::into(ClassName));
+		stmt->exchange(soci::into(Type));
+		stmt->exchange(soci::into(NamespaceName));
+		stmt->exchange(soci::into(Signature));
+		stmt->exchange(soci::into(ReturnType));
+		stmt->exchange(soci::into(Comment));
+		stmt->exchange(soci::into(FullPath, FullPathIndicator));
+		stmt->exchange(soci::into(IsProtected));
+		stmt->exchange(soci::into(IsPrivate));
+		stmt->exchange(soci::into(IsStatic));
+		stmt->exchange(soci::into(IsDynamic));
+		stmt->exchange(soci::into(IsNative));
+		stmt->exchange(soci::into(FileIsNew, FileIsNewIndicator));
+		
+		AdoptStatement(stmt, error);
 	} catch (std::exception& e) {
-		wxString msg = mvceditor::CharToWx(e.what());
-		wxUnusedVar(msg);
-		wxASSERT_MSG(false, msg);
-	}
-}
-
-
-
-void mvceditor::TagResultClass::Init(soci::session& session, const std::string& sql) {
-	try {
-		Stmt =  new soci::statement(session);
-		*Stmt = (session.prepare << sql,
-			soci::into(FileTagId, FileTagIdIndicator), soci::into(SourceId), soci::into(Key), soci::into(Identifier), soci::into(ClassName), 
-			soci::into(Type), soci::into(NamespaceName), soci::into(Signature), 
-			soci::into(ReturnType), soci::into(Comment), soci::into(FullPath, FullPathIndicator), soci::into(IsProtected), soci::into(IsPrivate), 
-			soci::into(IsStatic), soci::into(IsDynamic), soci::into(IsNative), soci::into(FileIsNew, FileIsNewIndicator)
-		);
-		if (Stmt->execute(true)) {
-			IsEmpty = false;
-		}
-		else {
-			IsEmpty = true;
-			delete Stmt;
-			Stmt = NULL;
-		}
-	} catch (std::exception& e) {
-		wxString msg = mvceditor::CharToWx(e.what());
-		wxUnusedVar(msg);
-		wxASSERT_MSG(false, msg);
-		delete Stmt;
-		Stmt = NULL;
+		error = mvceditor::CharToWx(e.what());
+		wxASSERT_MSG(false, error);
 	}
 }
 
@@ -1194,13 +1113,7 @@ void mvceditor::TagResultClass::Next() {
 	else {
 		Tag.FileIsNew = true;
 	}
-	if (Stmt) {
-		bool next = Stmt->fetch();
-		if (!next) {
-			delete Stmt;
-			Stmt = NULL;
-		}
-	}
+	Fetch();
 }
 
 std::vector<mvceditor::TagClass> mvceditor::TagResultClass::Matches() {
@@ -1212,26 +1125,8 @@ std::vector<mvceditor::TagClass> mvceditor::TagResultClass::Matches() {
 	return matches;
 }
 
-bool mvceditor::TagResultClass::Empty() const {
-	return IsEmpty || NULL == Stmt;
-}
-
-bool mvceditor::TagResultClass::More() const {
-	return NULL != Stmt;
-}
-
 mvceditor::TagFinderClass::TagFinderClass()
-	: Session(NULL)
-	, IsCacheInitialized(false) {
-}
-
-mvceditor::TagFinderClass::~TagFinderClass() {
-
-}
-
-void mvceditor::TagFinderClass::Init(soci::session* session) {
-	Session = session;
-	IsCacheInitialized = true;
+: SqliteFinderClass() { 
 }
 
 bool mvceditor::TagFinderClass::GetResourceMatchPosition(const mvceditor::TagClass& tag, const UnicodeString& text, int32_t& pos, 
@@ -1616,7 +1511,7 @@ void mvceditor::TagFinderClass::EnsureMatchesExist(std::vector<TagClass>& matche
 }
 
 bool mvceditor::TagFinderClass::IsFileCacheEmpty() {
-	if (!IsCacheInitialized) {
+	if (!IsInit()) {
 		return true;
 	}
 	int count = 0;
@@ -1631,7 +1526,7 @@ bool mvceditor::TagFinderClass::IsFileCacheEmpty() {
 }
 
 bool mvceditor::TagFinderClass::IsResourceCacheEmpty() {
-	if (!IsCacheInitialized) {
+	if (!IsInit()) {
 		return true;
 	}
 
@@ -1653,7 +1548,7 @@ bool mvceditor::TagFinderClass::HasFullPath(const wxString& fullPath) {
 }
 
 bool mvceditor::TagFinderClass::FindFileTagByFullPathExact(const wxString& fullPath, mvceditor::FileTagClass& fileTag) {
-	if (!IsCacheInitialized) {
+	if (!IsInit()) {
 		return false;
 	}
 	int fileTagId;
@@ -1686,7 +1581,7 @@ bool mvceditor::TagFinderClass::FindFileTagByFullPathExact(const wxString& fullP
 
 std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::All() {
 	mvceditor::AllTagsResultClass result;
-	result.Prepare(*Session);
+	result.Prepare(*Session, false);
 
 	// remove the 'duplicates' ie. extra fully qualified entries to make lookups faster
 	std::vector<mvceditor::TagClass> all;
@@ -1838,7 +1733,7 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ClassesFunctio
 	std::vector<mvceditor::TagClass> tags;
 	mvceditor::TopLevelTagInFileResultClass result;
 	result.Set(fullPath);
-	result.Prepare(*Session);
+	result.Prepare(*Session, false);
 	tags = result.Matches();
 	return tags;
 }
@@ -1870,7 +1765,7 @@ std::vector<mvceditor::TagClass> mvceditor::DetectedTagFinderClass::ResourceStat
 	}
 
 	std::vector<mvceditor::TagClass> matches;
-	if (!IsCacheInitialized) {
+	if (!IsInit()) {
 		return matches;
 	}
 	std::string key;

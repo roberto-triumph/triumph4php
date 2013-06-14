@@ -36,22 +36,15 @@ class UrlTagFixtureClass : public SqliteTestFixtureClass {
 
 public:
 
-	// using these session as opposed to the inherited one because
-	// the UrlTagFinder owns the session pointers
-	soci::session* Session1;
-	soci::session* Session2;
-
 	mvceditor::UrlTagFinderClass Finder;
+	soci::session DetectorTagSession;
 
 	UrlTagFixtureClass()
 		: SqliteTestFixtureClass()
-		, Session1(NULL)
-		, Session2(NULL) 
 		, Finder() {
-	
-		Session1 = new soci::session(*soci::factory_sqlite3(), ":memory:");
-		CreateDatabase(*Session1, mvceditor::DetectorSqlSchemaAsset());
-		Finder.AdoptSession(Session1);
+		DetectorTagSession.open(*soci::factory_sqlite3(), ":memory:");
+		CreateDatabase(DetectorTagSession, mvceditor::DetectorSqlSchemaAsset());
+		Finder.InitSession(&DetectorTagSession);
 		
 		AddToDb1("http://localhost/index.php", 
 			"/home/user/welcome.php", "WelcomeController", "index");
@@ -65,22 +58,7 @@ public:
 	}
 
 	void AddToDb1(std::string url, std::string fileName, std::string className, std::string methodName) {
-		soci::statement stmt = (Session1->prepare <<
-			"INSERT INTO url_tags(url, full_path, class_name, method_name) VALUES (?, ?, ?, ?)",
-			soci::use(url), soci::use(fileName),
-			soci::use(className), soci::use(methodName)
-		);
-		stmt.execute(true);
-	}
-
-	void InitDb2() {
-		Session2 = new soci::session(*soci::factory_sqlite3(), ":memory:");
-		CreateDatabase(*Session2, mvceditor::DetectorSqlSchemaAsset());
-		Finder.AdoptSession(Session2);
-	}
-
-	void AddToDb2(std::string url, std::string fileName, std::string className, std::string methodName) {
-		soci::statement stmt = (Session2->prepare <<
+		soci::statement stmt = (DetectorTagSession.prepare <<
 			"INSERT INTO url_tags(url, full_path, class_name, method_name) VALUES (?, ?, ?, ?)",
 			soci::use(url), soci::use(fileName),
 			soci::use(className), soci::use(methodName)
@@ -90,18 +68,10 @@ public:
 
 	int DatabaseRecordsNumDb1() {
 		int cnt;
-		Session1->once << "SELECT COUNT(*) FROM url_tags; ",
+		DetectorTagSession.once << "SELECT COUNT(*) FROM url_tags; ",
 			soci::into(cnt);
 		return cnt;
 	}
-
-	int DatabaseRecordsNumDb2() {
-		int cnt;
-		Session2->once << "SELECT COUNT(*) FROM url_tags; ",
-			soci::into(cnt);
-		return cnt;
-	}
-
 };
 
 SUITE(UrlTagTestClass) {
@@ -140,45 +110,11 @@ TEST_FIXTURE(UrlTagFixtureClass, FindByUrlNoMatch) {
 	CHECK(urlTag.Url.BuildURI().IsEmpty());
 }
 
-TEST_FIXTURE(UrlTagFixtureClass, FindUrlWithMultipleDbs) {
-	InitDb2();
-	AddToDb2("http://localhost/frontend_dev.php",
-			"/home/user/project2/frontend.php", "FrontendController", "action");
-
-	// test the find across multiple dbs
-	wxURI toFind;
-	toFind.Create(wxT("http://localhost/frontend_dev.php"));
-	mvceditor::UrlTagClass urlTag;
-
-	CHECK(Finder.FindByUrl(toFind, urlTag));
-	
-	CHECK(toFind == urlTag.Url);
-
-	// use filename to compare because we want this test to run on windows and on
-	// linux without needing modifications
-	CHECK(wxFileName(wxT("/home/user/project2/frontend.php")) == urlTag.FileName);
-	CHECK_EQUAL(wxT("FrontendController"), urlTag.ClassName);
-	CHECK_EQUAL(wxT("action"), urlTag.MethodName);
-}
-
 TEST_FIXTURE(UrlTagFixtureClass, FilterUrl) {
 	std::vector<mvceditor::UrlTagClass> urls;
 	Finder.FilterUrls(wxT("front"), urls);
 	CHECK_VECTOR_SIZE(1, urls);
 	CHECK_EQUAL(wxT("http://localhost/frontend.php"), urls[0].Url.BuildURI());
-}
-
-TEST_FIXTURE(UrlTagFixtureClass, FilterUrlWithMultipleDbs) {
-	InitDb2();
-	AddToDb2("http://localhost/frontend_dev.php",
-			"/home/user/project2/frontend.php", "FrontendController", "action");
-
-	// test the filter across multiple dbs
-	std::vector<mvceditor::UrlTagClass> urls;
-	Finder.FilterUrls(wxT("front"), urls);
-	CHECK_VECTOR_SIZE(2, urls);
-	CHECK_EQUAL(wxT("http://localhost/frontend.php"), urls[0].Url.BuildURI());
-	CHECK_EQUAL(wxT("http://localhost/frontend_dev.php"), urls[1].Url.BuildURI());
 }
 
 TEST_FIXTURE(UrlTagFixtureClass, FilterUrlNoMatches) {
@@ -199,14 +135,9 @@ TEST_FIXTURE(UrlTagFixtureClass, DeleteUrlNoMatch) {
 	CHECK_EQUAL(2, DatabaseRecordsNumDb1());
 }
 
-TEST_FIXTURE(UrlTagFixtureClass, WipeAcrossMultipleDbs) {
-	InitDb2();
-	AddToDb2("http://localhost/frontend_dev.php",
-			"/home/user/project2/frontend.php", "FrontendController", "action");
-
+TEST_FIXTURE(UrlTagFixtureClass, Wipe) {
 	Finder.Wipe();
 	CHECK_EQUAL(0, DatabaseRecordsNumDb1());
-	CHECK_EQUAL(0, DatabaseRecordsNumDb2());
 }
 
 }
