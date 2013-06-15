@@ -343,7 +343,7 @@ protected:
 		FileIsNewIndicator;
 };
 
- class FileTagResultClass : public mvceditor::SqliteResultClass {
+class FileTagResultClass : public mvceditor::SqliteResultClass {
 
 public:
 
@@ -409,6 +409,72 @@ private:
 	int FileTagId;
 	std::string FullPath;
 	int IsNew;
+};
+
+class TraitTagResultClass : public mvceditor::SqliteResultClass {
+
+public:
+
+	mvceditor::TraitTagClass TraitTag;
+
+	TraitTagResultClass();
+
+	/**
+	 * in this method subclasses will build the SQL and execute it.
+	 *
+	 * @param session the connection
+	 * @param doLimit boolean if TRUE there should be a limit on the query
+	 */
+	bool Prepare(soci::session& session, bool doLimit);
+
+	/**
+	 * @param classNames the class names that we want to search for, can be either class names
+	 *                   or fully qualified class names
+	 * @param memberName part of the member name to restrict
+	 */
+	void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, bool exactMatch, const std::vector<wxFileName>& sourceDirs);
+
+	// TODO: remove this method
+	std::vector<mvceditor::TagClass> MatchesAsTags();
+
+	/**
+	 * advance to the next row. after a call to this method, the Tag member variable will contain the 
+	 * resulting row.
+	 */
+	void Next();
+
+private:
+
+	/**
+	 * only tags that were found in files located in the given directories will match.
+	 * search is recursive, sourceDirs and all of their subdirs are searched
+	 */
+	std::vector<std::string> SourceDirs;
+
+	/**
+	 * the class names to search for
+	 */
+	std::vector<std::string> Keys;
+
+	/**
+	 * the part of the member name to search for
+	 */
+	UnicodeString MemberName;
+
+	/**
+	 * if TRUE exact match will be performed
+	 */
+	bool ExactMatch;
+
+	// variables to bind to the statement
+	std::string Key;
+	int FileTagId;
+	std::string ClassName;
+	std::string NamespaceName;
+	std::string TraitClassName;
+	std::string TraitNamespaceName;
+	std::string Aliases;
+	std::string InsteadOfs;
 };
 
 class ExactMemberTagResultClass : public mvceditor::TagResultClass {
@@ -483,35 +549,7 @@ public:
 	 *         are either a class, function, or define 
 	 */
 	virtual std::vector<mvceditor::TagClass> ClassesFunctionsDefines(const wxString& fullPath) = 0;
-
-protected:
-
-	/**
-	 * collect all of the methods that are aliased from all of the traits used by the given classes
-	 * @param classNames the names of the classes to search  in. these are the classes that use the
-	 *        traits
-	 * @param methodName if non-empty then only aliases that begin with this name will be returned
-	 * @param fileTagIds the file IDs to search in. can be empty. if empty, matches from all files will be returned.
-	 */
-	virtual std::vector<mvceditor::TagClass> TraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName, const std::vector<int>& fileTagIds) = 0;
-
-	/**
-	 * @param keyStart the classes to look for ie. the classes we want to see if they use traits
-	 * @param fileTagIds the file IDs to search in. can be empty. if empty, matches from all files will be returned.
-	 * @return all of the traits that any of the given classes use.
-	 */
-	virtual std::vector<mvceditor::TraitTagClass> UsedTraits(const std::vector<std::string>& keyStarts, const std::vector<int>& fileTagIds) = 0;
-
-	/**
-	 * @return all resources whose identifier begins with the given identifier(case insensitive)
-	 */
-	virtual std::vector<mvceditor::TagClass> FindByIdentifierExactAndTypes(const std::string& identifier, const std::vector<int>& types, const std::vector<int>& fileTagIds, bool doLimit) = 0;
 	
-	/**
-	 * @return all resources whose identifier begins with the given identifierStart (case insensitive) AND are of the given type 
-	 */
-	virtual std::vector<mvceditor::TagClass> FindByIdentifierStartAndTypes(const std::string& identifierStart, const std::vector<int>& types, const std::vector<int>& fileTagIds, bool doLimit) = 0;
-
 public:
 	
 	/**
@@ -794,15 +832,6 @@ protected:
 	 */
 	std::vector<mvceditor::TraitTagClass> UsedTraits(const std::vector<std::string>& keyStarts, const std::vector<int>& fileTagIds);
 
-	/**
-	 * @return all resources whose identifier begins with the given identifier(case insensitive)
-	 */
-	std::vector<mvceditor::TagClass> FindByIdentifierExactAndTypes(const std::string& identifier, const std::vector<int>& types, const std::vector<int>& fileTagIds, bool doLimit);
-	
-	/**
-	 * @return all resources whose identifier begins with the given identifierStart (case insensitive) AND are of the given type 
-	 */
-	std::vector<mvceditor::TagClass> FindByIdentifierStartAndTypes(const std::string& identifierStart, const std::vector<int>& types, const std::vector<int>& fileTagIds, bool doLimit);
 };
 
 }

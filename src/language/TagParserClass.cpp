@@ -923,9 +923,9 @@ void mvceditor::TagParserClass::PersistTraits(
 	}
 	std::string sql;
 	sql += "INSERT OR IGNORE INTO trait_resources(";
-	sql += "key, file_item_id, class_name, namespace_name, trait_name, ";
+	sql += "key, file_item_id, source_id, class_name, namespace_name, trait_name, ";
 	sql += "trait_namespace_name, aliases, instead_ofs) VALUES ("; 
-	sql += "?, ?, ?, ?, ?, ";
+	sql += "?, ?, ?, ?, ?, ?, ";
 	sql += "?, ?, ?)";
 	std::string key;
 	std::string className;
@@ -937,7 +937,7 @@ void mvceditor::TagParserClass::PersistTraits(
 
 	try {
 		soci::statement stmt = (Session->prepare << sql,
-			soci::use(key), soci::use(fileTagId), soci::use(className), soci::use(namespaceName), soci::use(traitClassName),
+			soci::use(key), soci::use(fileTagId), soci::use(CurrentSourceId), soci::use(className), soci::use(namespaceName), soci::use(traitClassName),
 			soci::use(traitNamespaceName), soci::use(aliases), soci::use(insteadOfs)
 		);
 		std::map<UnicodeString, std::vector<mvceditor::TraitTagClass>, UnicodeStringComparatorClass>::const_iterator it;

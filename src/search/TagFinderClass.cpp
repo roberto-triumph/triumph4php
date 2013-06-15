@@ -827,6 +827,149 @@ int mvceditor::FileTagResultClass::GetLineCountFromFile(const wxString& fullPath
 	return lineCount;
 }
 
+mvceditor::TraitTagResultClass::TraitTagResultClass()
+: SqliteResultClass()
+, TraitTag()
+, SourceDirs()
+, Keys()
+, MemberName()
+, ExactMatch(false)
+, Key()
+, FileTagId()
+, ClassName()
+, NamespaceName()
+, TraitClassName()
+, TraitNamespaceName()
+, Aliases()
+, InsteadOfs() {
+
+}
+
+void mvceditor::TraitTagResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, bool exactMatch, const std::vector<wxFileName>& sourceDirs) {
+	for (size_t i = 0; i < classNames.size(); ++i) {
+		Keys.push_back(mvceditor::IcuToChar(classNames[i]));
+	}
+
+	// add trailing separator to lookup exact matches that include the last directory 
+	// we dont want to get directories that start with a prefix
+	for (size_t i = 0; i < sourceDirs.size(); i++) {
+		SourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+	}
+	MemberName = memberName;
+	ExactMatch = exactMatch;
+}
+
+bool mvceditor::TraitTagResultClass::Prepare(soci::session& session, bool doLimit) {
+	wxASSERT_MSG(!Keys.empty(), wxT("keys must not be empty"));
+	std::string sql;
+
+	sql =  "SELECT key, file_item_id, class_name, namespace_name, trait_name, trait_namespace_name, aliases, instead_ofs ";
+	sql += "FROM trait_resources t LEFT JOIN sources s ON(t.source_id = s.source_id) ";
+	sql += "WHERE key IN(?";
+	for (size_t i = 1; i < Keys.size(); ++i) {
+		sql += ",?";
+	}
+	sql += ") ";
+	if (!SourceDirs.empty()) {
+		sql += "AND s.directory IN(?";
+		for (size_t i = 1; i < SourceDirs.size(); ++i) {
+			sql += ",?";
+		}
+		sql += ") ";
+	}
+	sql += "ORDER BY key ";
+	if (doLimit) {
+		sql += "LIMIT 100";
+	}
+
+	bool good = false;
+	wxString error;
+	try {
+		soci::statement* stmt = new soci::statement(session);
+		stmt->prepare(sql);
+		for (size_t i = 0; i < Keys.size(); ++i) {
+			stmt->exchange(soci::use(Keys[i]));
+		}
+		for (size_t i = 0; i < SourceDirs.size(); ++i) {
+			stmt->exchange(soci::use(SourceDirs[i]));
+		}
+		stmt->exchange(soci::into(Key));
+		stmt->exchange(soci::into(FileTagId));
+		stmt->exchange(soci::into(ClassName));
+		stmt->exchange(soci::into(NamespaceName));
+		stmt->exchange(soci::into(TraitClassName));
+		stmt->exchange(soci::into(TraitNamespaceName));
+		stmt->exchange(soci::into(Aliases));
+		stmt->exchange(soci::into(InsteadOfs));
+
+		good = AdoptStatement(stmt, error);
+	} catch (std::exception& e) {
+		error = mvceditor::CharToWx(e.what());
+		wxASSERT_MSG(false, error);
+	}
+	return good;
+}
+
+void mvceditor::TraitTagResultClass::Next() {
+	TraitTag.Key = mvceditor::CharToIcu(Key.c_str());
+	TraitTag.FileTagId = FileTagId;
+	TraitTag.ClassName = mvceditor::CharToIcu(ClassName.c_str());
+	TraitTag.NamespaceName = mvceditor::CharToIcu(NamespaceName.c_str());
+	TraitTag.TraitClassName = mvceditor::CharToIcu(TraitClassName.c_str());
+	TraitTag.TraitNamespaceName = mvceditor::CharToIcu(TraitNamespaceName.c_str());
+	
+	size_t start = 0;
+	size_t found = Aliases.find_first_of(",");
+	while (found != std::string::npos) {
+		TraitTag.Aliased.push_back(mvceditor::CharToIcu(Aliases.substr(start, found).c_str()));	
+		start = found++;
+	}
+	if (!Aliases.empty()) {
+		TraitTag.Aliased.push_back(mvceditor::CharToIcu(Aliases.substr(start, found).c_str()));
+	}
+
+	start = 0;
+	found = InsteadOfs.find_first_of(",");
+	while (found != std::string::npos) {
+		TraitTag.InsteadOfs.push_back(mvceditor::CharToIcu(InsteadOfs.substr(start, found).c_str()));	
+		start = found++;
+	}
+	if (!InsteadOfs.empty()) {
+		TraitTag.InsteadOfs.push_back(mvceditor::CharToIcu(InsteadOfs.substr(start, found).c_str()));
+	}
+	Fetch();
+}
+
+std::vector<mvceditor::TagClass> mvceditor::TraitTagResultClass::MatchesAsTags() {
+	std::vector<mvceditor::TagClass> tags;
+	while (More()) {
+		Next();
+
+		// now go through the result and add the method names of any aliased methods
+		UnicodeString lowerMethodName(MemberName);
+		lowerMethodName.toLower();
+		for (size_t a = 0; a < TraitTag.Aliased.size(); a++) {
+			UnicodeString alias(TraitTag.Aliased[a]);
+			UnicodeString lowerAlias(alias);
+			lowerAlias.toLower();
+			bool useAlias = false;
+			if (ExactMatch) {
+				useAlias = lowerMethodName.caseCompare(lowerAlias, 0) == 0;
+			}
+			else {
+				useAlias = MemberName.isEmpty() || lowerMethodName.indexOf(lowerAlias) == 0;
+			}
+			if (useAlias) {
+				mvceditor::TagClass res;
+				res.ClassName = TraitTag.TraitClassName;
+				res.Identifier = alias;
+				tags.push_back(res);
+			}
+		}
+	}
+	return tags;
+}
+
 mvceditor::TagSearchClass::TagSearchClass(UnicodeString resourceQuery)
 	: FileName()
 	, ClassName()
@@ -978,9 +1121,10 @@ mvceditor::TagResultClass* mvceditor::TagSearchClass::CreateExactResults() const
 	if (GetResourceType() == mvceditor::TagSearchClass::CLASS_NAME_METHOD_NAME) {
 		mvceditor::ExactMemberTagResultClass* memberResults = new mvceditor::ExactMemberTagResultClass();
 
-		// check the entire class hierachy; stop as soon as we found it
+		// check the entire class hierachy
 		// combine the parent classes with the class being searched
 		std::vector<UnicodeString> classHierarchy = GetParentClasses();
+		classHierarchy.insert(classHierarchy.end(), Traits.begin(), Traits.end());
 		classHierarchy.push_back(QualifyName(GetNamespaceName(), GetClassName()));
 		
 		memberResults->Set(classHierarchy, GetMethodName(), GetSourceDirs());
@@ -1004,16 +1148,23 @@ mvceditor::TagResultClass* mvceditor::TagSearchClass::CreateExactResults() const
 
 mvceditor::TagResultClass* mvceditor::TagSearchClass::CreateNearMatchResults() const {
 	mvceditor::TagResultClass* results = NULL; 
-	if (mvceditor::TagSearchClass::CLASS_NAME_METHOD_NAME == GetResourceType()) {
+	if (mvceditor::TagSearchClass::CLASS_NAME_METHOD_NAME == GetResourceType() && !GetClassName().isEmpty()) {
 		mvceditor::NearMatchMemberTagResultClass* nearMatchMembersResult = new mvceditor::NearMatchMemberTagResultClass();
 
-		// check the entire class hierachy; stop as soon as we found it
+		// check the entire class hierachy
 		// combine the parent classes with the class being searched
 		std::vector<UnicodeString> classHierarchy = GetParentClasses();
 		classHierarchy.push_back(QualifyName(GetNamespaceName(), GetClassName()));
+		classHierarchy.insert(classHierarchy.end(), Traits.begin(), Traits.end());
 
 		nearMatchMembersResult->Set(classHierarchy, GetMethodName(), GetSourceDirs());
 		results = nearMatchMembersResult;
+	}
+	else if ((mvceditor::TagSearchClass::CLASS_NAME_METHOD_NAME == GetResourceType())
+			&& GetClassName().isEmpty()) {
+		mvceditor::NearMatchMemberOnlyTagResultClass* nearMatchMemberOnlyResult = new mvceditor::NearMatchMemberOnlyTagResultClass();
+		nearMatchMemberOnlyResult->Set(GetMethodName(), GetSourceDirs());
+		results = nearMatchMemberOnlyResult;
 	}
 	else if (mvceditor::TagSearchClass::NAMESPACE_NAME == GetResourceType()) {
 
@@ -1354,11 +1505,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchMembers(con
 		allMembersResult.Prepare(*Session, false);
 		std::vector<mvceditor::TagClass> memberMatches = allMembersResult.Matches();
 
-		//get the methods that belong to a used trait
-		std::vector<mvceditor::TagClass> traitMatches = TraitAliases(classesToSearch, UNICODE_STRING_SIMPLE(""), fileTagIds);
-
 		matches.insert(matches.end(), memberMatches.begin(), memberMatches.end());
-		matches.insert(matches.end(), traitMatches.begin(), traitMatches.end());
 	}
 	else if (tagSearch.GetClassName().isEmpty()) {
 		
@@ -1388,12 +1535,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchMembers(con
 		mvceditor::NearMatchMemberTagResultClass nearMatchMemberResult;
 		nearMatchMemberResult.Set(classesToSearch, tagSearch.GetMethodName(), tagSearch.GetSourceDirs());
 		nearMatchMemberResult.Prepare(*Session, true);
-		matches = nearMatchMemberResult.Matches();
-
-		// get any aliases
-		std::vector<mvceditor::TagClass> traitMatches = TraitAliases(classesToSearch, tagSearch.GetMethodName(), fileTagIds);
-		matches.insert(matches.end(), traitMatches.begin(), traitMatches.end());
-			
+		matches = nearMatchMemberResult.Matches();			
 	}
 	return matches;
 }
@@ -1418,29 +1560,30 @@ UnicodeString mvceditor::TagFinderClass::ParentClassName(const UnicodeString& fu
 std::vector<UnicodeString> mvceditor::TagFinderClass::GetResourceTraits(const UnicodeString& className, 
 																		const UnicodeString& methodName,
 																		const std::vector<wxFileName>& sourceDirs) {
-	bool error = false;
-	wxString errorMsg;
-	std::vector<int> fileTagIds = mvceditor::FileTagIdsForDirs(*Session, sourceDirs, error, errorMsg);
-	wxASSERT_MSG(!error, errorMsg);
 	std::vector<UnicodeString> inheritedTraits;
-	bool match = false;
 	
-	std::vector<std::string> keys;
-	keys.push_back(mvceditor::IcuToChar(className));
-	std::vector<mvceditor::TraitTagClass> matches = UsedTraits(keys, fileTagIds);
-	for (size_t i = 0; i < matches.size(); ++i) {
-		UnicodeString fullyQualifiedTrait = QualifyName(matches[i].TraitNamespaceName, matches[i].TraitClassName);
+	std::vector<UnicodeString> classNames;
+	classNames.push_back(className);
+
+	mvceditor::TraitTagResultClass traitResult;
+	traitResult.Set(classNames, UNICODE_STRING_SIMPLE(""), false, sourceDirs);
+	if (traitResult.Prepare(*Session, false)) {
+		while (traitResult.More()) {
+			traitResult.Next();
+			mvceditor::TraitTagClass trait = traitResult.TraitTag;
+			UnicodeString fullyQualifiedTrait = QualifyName(trait.TraitNamespaceName, trait.TraitClassName);
 			
-		// trait is used unless there is an explicit insteadof 
-		match = true;
-		for (size_t j = 0; j < matches[i].InsteadOfs.size(); ++j) {
-			if (matches[i].InsteadOfs[j].caseCompare(fullyQualifiedTrait, 0) == 0) {
-				match = false;
-				break;
+			// trait is used unless there is an explicit insteadof 
+			bool match = true;
+			for (size_t j = 0; j < trait.InsteadOfs.size(); ++j) {
+				if (trait.InsteadOfs[j].caseCompare(fullyQualifiedTrait, 0) == 0) {
+					match = false;
+					break;
+				}
 			}
-		}
-		if (match) {
-			inheritedTraits.push_back(matches[i].TraitClassName);
+			if (match) {
+				inheritedTraits.push_back(trait.TraitClassName);
+			}
 		}
 	}
 	return inheritedTraits;
@@ -1626,128 +1769,6 @@ mvceditor::ParsedTagFinderClass::ParsedTagFinderClass()
 	: TagFinderClass() {
 
 }
-
-std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::TraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName, 
-																			   const std::vector<int>& fileTagIds) {
-	std::vector<mvceditor::TagClass> matches;
-
-	std::vector<std::string> classNamesToLookFor;
-	for (std::vector<UnicodeString>::const_iterator it = classNames.begin(); it != classNames.end(); ++it) {
-		classNamesToLookFor.push_back(mvceditor::IcuToChar(*it));
-	}
-
-	// TODO use the correct namespace when querying for traits
-	std::vector<mvceditor::TraitTagClass> traits = UsedTraits(classNamesToLookFor, fileTagIds);
-	
-	// now go through the result and add the method names of any aliased methods
-	UnicodeString lowerMethodName(methodName);
-	lowerMethodName.toLower();
-	for (size_t i = 0; i < traits.size(); i++) {
-		std::vector<UnicodeString> aliases = traits[i].Aliased;
-		for (size_t a = 0; a < aliases.size(); a++) {
-			UnicodeString alias(aliases[a]);
-			UnicodeString lowerAlias(alias);
-			lowerAlias.toLower();
-			bool useAlias = methodName.isEmpty() || lowerMethodName.indexOf(lowerAlias) == 0;
-			if (useAlias) {
-				mvceditor::TagClass res;
-				res.ClassName = traits[i].TraitClassName;
-				res.Identifier = alias;
-				matches.push_back(res);
-			}
-		}
-	}
-	return matches;
-}
-
-std::vector<mvceditor::TraitTagClass> mvceditor::ParsedTagFinderClass::UsedTraits(const std::vector<std::string>& keyStarts, const std::vector<int>& fileTagIds) {
-	std::ostringstream stream;
-	stream << "SELECT key, file_item_id, class_name, namespace_name, trait_name, trait_namespace_name, aliases, instead_ofs "
-		<< "FROM trait_resources WHERE key IN(";
-	for (size_t i = 0; i < keyStarts.size(); ++i) {
-		stream << "'"
-			<< keyStarts[i]
-			<< "'";
-		if (i < (keyStarts.size() - 1)) {
-			stream << ",";
-		}
-	}
-	stream << ")";
-	if (!fileTagIds.empty()) {
-		stream << "AND file_item_id IN(";
-		InClause(fileTagIds, stream);
-		stream << ")";
-	}
-	std::string key;
-	int fileTagId;
-	std::string className;
-	std::string namespaceName;
-	std::string traitClassName;
-	std::string traitNamespaceName;
-	std::string aliases;
-	std::string insteadOfs;
-	std::vector<mvceditor::TraitTagClass> matches;
-	std::string sql = stream.str();
-	try {		
-		soci::statement stmt = (Session->prepare << sql,
-			soci::into(key), soci::into(fileTagId), soci::into(className), soci::into(namespaceName), soci::into(traitClassName),
-			soci::into(traitNamespaceName), soci::into(aliases), soci::into(insteadOfs)
-		);
-		if (stmt.execute(true)) {
-			do {
-				mvceditor::TraitTagClass trait;
-				trait.Key = mvceditor::CharToIcu(key.c_str());
-				trait.FileTagId = fileTagId;
-				trait.ClassName = mvceditor::CharToIcu(className.c_str());
-				trait.NamespaceName = mvceditor::CharToIcu(namespaceName.c_str());
-				trait.TraitClassName = mvceditor::CharToIcu(traitClassName.c_str());
-				trait.TraitNamespaceName = mvceditor::CharToIcu(traitNamespaceName.c_str());
-				
-				size_t start = 0;
-				size_t found = aliases.find_first_of(",");
-				while (found != std::string::npos) {
-					trait.Aliased.push_back(mvceditor::CharToIcu(aliases.substr(start, found).c_str()));	
-					start = found++;
-				}
-				if (!aliases.empty()) {
-					trait.Aliased.push_back(mvceditor::CharToIcu(aliases.substr(start, found).c_str()));
-				}
-
-				start = 0;
-				found = insteadOfs.find_first_of(",");
-				while (found != std::string::npos) {
-					trait.InsteadOfs.push_back(mvceditor::CharToIcu(insteadOfs.substr(start, found).c_str()));	
-					start = found++;
-				}
-				if (!insteadOfs.empty()) {
-					trait.InsteadOfs.push_back(mvceditor::CharToIcu(insteadOfs.substr(start, found).c_str()));
-				}
-
-				matches.push_back(trait);
-			} while (stmt.fetch());
-		}
-	} catch (std::exception& e) {
-		wxString msg = mvceditor::CharToWx(e.what());
-		wxUnusedVar(msg);
-		wxASSERT_MSG(false, msg);
-	}
-	return matches;
-}
-
-std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::FindByIdentifierExactAndTypes(const std::string& identifier, const std::vector<int>& types, const std::vector<int>& fileTagIds, bool doLimit) {
-	// TODO remove
-	std::vector<mvceditor::TagClass> tags;
-	return tags;
-
-}
-
-std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::FindByIdentifierStartAndTypes(const std::string& identifierStart, const std::vector<int>& types, 
-																								const std::vector<int>& fileTagIds, bool doLimit) {
-	// TODO remove
-	std::vector<mvceditor::TagClass> tags;																					
-	return tags;
-}
-
 
 std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ClassesFunctionsDefines(const wxString& fullPath) {
 	std::vector<mvceditor::TagClass> tags;

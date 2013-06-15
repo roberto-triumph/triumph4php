@@ -719,10 +719,11 @@ void mvceditor::PhpDocumentClass::HandleCallTip(wxChar ch, bool force) {
 				constructorResourceSearch += wxT("::");
 
 				// TODO: get class hierarchy
-				std::vector<wxFileName> dirs;
-				std::vector<mvceditor::TagClass> matches = Globals->TagCache.NearMatchTags(mvceditor::WxToIcu(constructorResourceSearch), dirs);
-				for (size_t i = 0; i < matches.size(); ++i) {
-					mvceditor::TagClass res = matches[i];
+				mvceditor::TagSearchClass search(mvceditor::WxToIcu(constructorResourceSearch));
+				mvceditor::TagResultClass* result = search.CreateExactResults();
+				while (result->More()) {
+					result->Next();
+					mvceditor::TagClass res = result->Tag;
 					if (mvceditor::TagClass::METHOD == res.Type && UNICODE_STRING_SIMPLE("__construct") == res.Identifier) {
 						CurrentCallTipResources.push_back(res);
 					}
@@ -730,6 +731,7 @@ void mvceditor::PhpDocumentClass::HandleCallTip(wxChar ch, bool force) {
 						CurrentCallTipResources.push_back(res);
 					}
 				}
+				delete result;
 			}
 			size_t matchCount = CurrentCallTipResources.size();
 			if (matchCount > 0) {				

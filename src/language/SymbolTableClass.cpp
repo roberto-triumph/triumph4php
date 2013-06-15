@@ -635,25 +635,21 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 			mvceditor::TagFinderClass* finder = allTagFinders[j];
 
 			// only do duck typing if needed. otherwise, make sure that we have a type match first.
-			if ((doDuckTyping || !typeToLookup.isEmpty())) {
-				std::vector<mvceditor::TagClass> matches;
-				if (doFullyQualifiedMatchOnly) {
-
-					// TODO: remove vector matches
-					mvceditor::TagResultClass* result = tagSearch.CreateExactResults();
-					finder->Exec(result);
-					matches = result->Matches();
+			if (doDuckTyping || !typeToLookup.isEmpty()) {
+				mvceditor::TagResultClass* result = tagSearch.CreateExactResults();
+				bool found = finder->Exec(result);
+				
+				if (!found && !doFullyQualifiedMatchOnly) {
 					delete result;
-				}
-				else {
-					matches = finder->NearMatchTags(tagSearch, false);
+					result = tagSearch.CreateNearMatchResults();
+					finder->Exec(result);
 				}
 				
 				// now we loop through the possbile matches and remove stuff that does not 
-				// make sense because of visibility rules or resources that are 
-				// duplicated in two separate caches
-				for (size_t k = 0; k < matches.size(); ++k) {
-					mvceditor::TagClass tag = matches[k];
+				// make sense because of visibility rules
+				while (result->More()) {
+					result->Next();
+					mvceditor::TagClass tag = result->Tag;
 					bool isVisible = IsResourceVisible(tag, originalExpression, expressionScope, isStaticCall, isThisCall, isParentCall);
 					if (isVisible) {
 						UnresolveNamespaceAlias(originalExpression, expressionScope, tag);
@@ -661,6 +657,34 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 					}
 					else if (!isVisible) {
 						visibilityError = true;
+					}
+				}
+				delete result;
+
+				// now look for any trait aliases
+				// TODO clean this up remove dup code
+				if (!tagSearch.GetClassName().isEmpty()) {
+					mvceditor::TraitTagResultClass traitResult;
+					std::vector<UnicodeString> classNames;
+					std::vector<UnicodeString> parentClasses = tagSearch.GetParentClasses();
+					std::vector<UnicodeString> traits = tagSearch.GetTraits();
+					classNames.push_back(tagSearch.GetClassName());
+					classNames.insert(classNames.end(), parentClasses.begin(), parentClasses.end());
+					classNames.insert(classNames.end(), traits.begin(), traits.end());
+					traitResult.Set(classNames, tagSearch.GetMethodName(), false, tagSearch.GetSourceDirs());
+					if (finder->Exec(&traitResult)) {
+						std::vector<mvceditor::TagClass> matches = traitResult.MatchesAsTags();
+						for (size_t i = 0; i < matches.size(); ++i) {
+							mvceditor::TagClass tag = matches[i];
+							bool isVisible = IsResourceVisible(tag, originalExpression, expressionScope, isStaticCall, isThisCall, isParentCall);
+							if (isVisible) {
+								UnresolveNamespaceAlias(originalExpression, expressionScope, tag);
+								resourceMatches.push_back(tag);
+							}
+							else if (!isVisible) {
+								visibilityError = true;
+							}
+						}
 					}
 				}
 			}

@@ -1608,14 +1608,17 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchesShouldFindTraitMe
 	traits.push_back(UNICODE_STRING_SIMPLE("ezcReflectionReturnInfo"));
 	tagSearch.SetTraits(traits);
 
-	Matches = ParsedTagFinder.NearMatchTags(tagSearch);
+	mvceditor::TagResultClass* result = tagSearch.CreateNearMatchResults();
+	ParsedTagFinder.Exec(result);
+	Matches = result->Matches();
+	delete result;
 
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_MEMBER_RESOURCE("ezcReflectionReturnInfo", "getReturnType", Matches[0]);
 	CHECK_UNISTR_EQUALS("getReturnType", Matches[0].Identifier);
 }
 
-TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchesShouldFindTraitsWhenLookingForAllMethods) {
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, TraitTagResultShouldFindAliases) {
 	TagParser.SetVersion(pelet::PHP_54); 
 	Prep(mvceditor::CharToIcu(
 		"trait ezcReflectionReturnInfo { "
@@ -1631,24 +1634,20 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchesShouldFindTraitsW
 		"	 }"
 		"}"
 	));
-	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("ezcReflectionMethod::"));
-	
 	// tell the tag finder to look for traits
-	std::vector<UnicodeString> traits;
-	traits.push_back(UNICODE_STRING_SIMPLE("ezcReflectionReturnInfo"));
-	traits.push_back(UNICODE_STRING_SIMPLE("ezcReflectionFunctionInfo"));
-	tagSearch.SetTraits(traits);
+	std::vector<UnicodeString> classNames;
+	std::vector<wxFileName> sourceDirs;
+	classNames.push_back(UNICODE_STRING_SIMPLE("ezcReflectionMethod"));
 
-	Matches = ParsedTagFinder.NearMatchTags(tagSearch);
+	mvceditor::TraitTagResultClass result;
+	result.Set(classNames, UNICODE_STRING_SIMPLE(""), false, sourceDirs);
+	ParsedTagFinder.Exec(&result);
+	Matches = result.MatchesAsTags();
 	
-	// for now just show both the aliased and original methods
-	CHECK_VECTOR_SIZE(3, Matches);
+	// for now just show only the aliased methods
+	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_MEMBER_RESOURCE("ezcReflectionReturnInfo", "getFunctionReturnType", Matches[0]);
 	CHECK_UNISTR_EQUALS("getFunctionReturnType", Matches[0].Identifier);
-	CHECK_MEMBER_RESOURCE("ezcReflectionFunctionInfo", "getReturnType", Matches[1]);
-	CHECK_UNISTR_EQUALS("getReturnType", Matches[1].Identifier);
-	CHECK_MEMBER_RESOURCE("ezcReflectionReturnInfo", "getReturnType", Matches[2]);
-	CHECK_UNISTR_EQUALS("getReturnType", Matches[2].Identifier);
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceTraitsShouldReturnAllTraits) {
