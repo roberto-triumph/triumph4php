@@ -742,7 +742,27 @@ bool mvceditor::FileTagResultClass::Prepare(soci::session& session, bool doLimit
 	return ret;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::FileTagResultClass::Matches() {
+std::vector<mvceditor::FileTagClass> mvceditor::FileTagResultClass::Matches() {
+	std::vector<mvceditor::FileTagClass> matches;
+	while (More()) {
+		Next();
+		wxString path,
+			currentFileName,
+			extension;
+		wxFileName::SplitPath(FileTag.FullPath, &path, &currentFileName, &extension);
+		currentFileName += wxT(".") + extension;
+		wxString fileName = mvceditor::CharToWx(FilePart.c_str());
+		fileName = fileName.Lower();
+		if (wxNOT_FOUND != currentFileName.Lower().Find(fileName)) {
+			if (0 == LineNumber || GetLineCountFromFile(FileTag.FullPath) >= LineNumber) {
+				matches.push_back(FileTag);
+			}
+		}
+	}
+	return matches;
+}
+
+std::vector<mvceditor::TagClass> mvceditor::FileTagResultClass::MatchesAsTags() {
 	std::vector<mvceditor::TagClass> matches;
 	while (More()) {
 		Next();
@@ -1025,10 +1045,17 @@ mvceditor::TagResultClass* mvceditor::TagSearchClass::CreateNearMatchResults() c
 mvceditor::FileTagResultClass* mvceditor::TagSearchClass::CreateNearMatchFileResults() const {
 	mvceditor::FileTagResultClass* result = new mvceditor::FileTagResultClass();
 	if (mvceditor::TagSearchClass::FILE_NAME_LINE_NUMBER == GetResourceType()) {
-		result->Set(GetFileName(), GetLineNumber(), false, GetSourceDirs());
+		UnicodeString query = GetFileName();
+		result->Set(query, GetLineNumber(), false, GetSourceDirs());
 	}
 	else {
-		result->Set(GetClassName(), 0, false, GetSourceDirs());
+		UnicodeString query = GetFileName();
+
+		// empty file name = no period, get the query from the class name variable
+		if (query.isEmpty()) {
+			query = GetClassName();
+		}
+		result->Set(query, 0, false, GetSourceDirs());
 	}
 	return result;
 }
@@ -1220,7 +1247,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchTags(
 		case mvceditor::TagSearchClass::FILE_NAME:
 		case mvceditor::TagSearchClass::FILE_NAME_LINE_NUMBER:
 			fileTagResult.Prepare(*Session, true);
-			matches = fileTagResult.Matches();
+			matches = fileTagResult.MatchesAsTags();
 			break;
 		case mvceditor::TagSearchClass::CLASS_NAME:
 			exactNonMembers.Set(tagSearch.GetClassName(), tagSearch.GetSourceDirs());
@@ -1232,7 +1259,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchTags(
 				matches = nonMembers.Matches();
 				if (matches.empty() && doCollectFileNames) {
 					fileTagResult.Prepare(*Session, true);
-					matches = fileTagResult.Matches();
+					matches = fileTagResult.MatchesAsTags();
 				}
 			}
 			break;
@@ -1265,7 +1292,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchClassesOrFi
 		case mvceditor::TagSearchClass::FILE_NAME:
 		case mvceditor::TagSearchClass::FILE_NAME_LINE_NUMBER:
 			fileTagResult.Prepare(*Session, true);
-			matches = fileTagResult.Matches();
+			matches = fileTagResult.MatchesAsTags();
 			break;
 		case mvceditor::TagSearchClass::NAMESPACE_NAME:
 			nonMembers.Set(QualifyName(tagSearch.GetNamespaceName(), tagSearch.GetClassName()), tagSearch.GetSourceDirs());
@@ -1274,7 +1301,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchClassesOrFi
 			matches = nonMembers.Matches();
 			if (matches.empty()) {
 				fileTagResult.Prepare(*Session, true);
-				matches = fileTagResult.Matches();
+				matches = fileTagResult.MatchesAsTags();
 			}
 			break;
 		case mvceditor::TagSearchClass::CLASS_NAME:
@@ -1285,7 +1312,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchClassesOrFi
 			matches = nonMembers.Matches();
 			if (matches.empty()) {
 				fileTagResult.Prepare(*Session, true);
-				matches = fileTagResult.Matches();
+				matches = fileTagResult.MatchesAsTags();
 			}
 			break;
 	}
@@ -1464,7 +1491,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::ExactClassOrFile(con
 		mvceditor::FileTagResultClass fileTagResult;
 		fileTagResult.Set(tagSearch.GetFileName(), tagSearch.GetLineNumber(), true, tagSearch.GetSourceDirs());
 		fileTagResult.Prepare(*Session, true);
-		allMatches = fileTagResult.Matches();
+		allMatches = fileTagResult.MatchesAsTags();
 	}
 	else {
 		mvceditor::ExactNonMemberTagResultClass exactResult;

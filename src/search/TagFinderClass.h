@@ -140,8 +140,39 @@ public:
 	mvceditor::TagResultClass* CreateExactResults() const;
 
 	/**
-	 * Create a query that will match near matches of the given input.
-	 *
+	 * Looks for the tag, using a near-match logic. Logic is as follows:
+	 * 
+	 *  1) A class name or function is given:
+	 *    a class name or function will match if the class/function starts with the query.  If the query is 'User', 
+	 *    the  classes like 'UserAdmin', 'UserGuest' will match, Functions like 'userPrint', 'userIsLoggedIn' 
+	 *    will match as well. Note that if a class name or function is not found, then file name search (item 3 below)
+	 *    is performed.  This logic makes it easier for the user to search for something without having to type
+	 *    in entire file names.
+	 * 
+	 *  2) A method name is given:
+	 *     When looking for a method / property, only match methods or properties.  For example, if the query is
+	 *     'User::getN' then methods like 'UserClass::getName', 'UserClass::getNumber' will match. Also, any inherited
+	 *     methods are searched; if UserClass inherits a method called 'getNumericId' (but the code itself is in a
+	 *     base class) it will match as well. Note that queries need not include a class name; a query can be made
+	 *     for '::load' which will match all methods that start with 'load'.
+	 * 
+	 * For example the following class:
+	 * 
+	 * class UserClass {
+	 *   private $name;
+	 *  
+	 *  function getName() {
+	 *   // ...
+	 *  } 
+	 * }
+	 * 
+	 * the following tag queries will result in a match:
+	 * 
+	 * UserClass
+	 * name
+	 * getName
+	 * UserC
+	 * 
 	 * @return TagResultClass to iterate through the results of the query. The
 	 *          returned pointer must be deleted by the caller.
 	 */
@@ -334,7 +365,8 @@ public:
 	void Set(const UnicodeString& filePart, int lineNumber, bool exactMatch, const std::vector<wxFileName>& sourceDirs);
 
 	// TODO: remove this method
-	std::vector<mvceditor::TagClass> Matches();
+	std::vector<mvceditor::FileTagClass> Matches();
+	std::vector<mvceditor::TagClass> MatchesAsTags();
 
 	/**
 	 * advance to the next row. after a call to this method, the Tag member variable will contain the 
