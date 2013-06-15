@@ -25,6 +25,7 @@
 #include <actions/TagCacheSearchActionClass.h>
 #include <globals/FileName.h>
 #include <globals/Assets.h>
+#include <language/TagFinderList.h>
 #include <globals/TagList.h>
 
 mvceditor::TagCacheSearchCompleteEventClass::TagCacheSearchCompleteEventClass(int eventId,
@@ -55,7 +56,7 @@ void mvceditor::TagCacheSearchActionClass::SetSearch(mvceditor::GlobalsClass& gl
 	SearchString = mvceditor::WxToIcu(search);
 	SearchDirs = mvceditor::DeepCopyFileNames(dirs);
 
-	mvceditor::GlobalCacheClass* cache = new mvceditor::GlobalCacheClass;
+	mvceditor::TagFinderListClass* cache = new mvceditor::TagFinderListClass;
 	cache->InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), globals.GetMiscFileExtensions(),
 		globals.Environment.Php.Version);
 	///cache->InitNativeTag(mvceditor::NativeFunctionsAsset());

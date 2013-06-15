@@ -216,7 +216,7 @@ void mvceditor::TagFeatureClass::OnAppFileClosed(wxCommandEvent& event) {
 		}
 	}
 	if (isFileFromProject) {
-		mvceditor::ProjectTagActionClass* tagAction = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
+		mvceditor::ProjectTagActionClass* tagAction = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST);
 		tagAction->InitForFile(App.Globals, fileName);
 		App.RunningThreads.Queue(tagAction);
 	}
@@ -263,7 +263,7 @@ void mvceditor::TagFeatureClass::OnAppFileSaved(mvceditor::FileSavedEventClass& 
 		wxString fileName = event.GetCodeControl()->GetFileName();
 		std::vector<mvceditor::ProjectClass>::const_iterator project;
 		
-		mvceditor::ProjectTagActionClass* tagAction = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
+		mvceditor::ProjectTagActionClass* tagAction = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST);
 		tagAction->InitForFile(App.Globals, fileName);
 		App.RunningThreads.Queue(tagAction);
 

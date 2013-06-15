@@ -23,6 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <globals/TagList.h>
+#include <globals/ProjectClass.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 
 void mvceditor::TagListRemoveNativeMatches(std::vector<mvceditor::TagClass>& matches) {
 	std::vector<mvceditor::TagClass>::iterator it = matches.begin();

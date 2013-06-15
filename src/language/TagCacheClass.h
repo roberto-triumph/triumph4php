@@ -25,7 +25,6 @@
 #ifndef __MVCEDITORRESOURCECACHECLASS_H__
 #define __MVCEDITORRESOURCECACHECLASS_H__
 
-#include <search/TagFinderClass.h>
 #include <search/DirectorySearchClass.h>
 #include <language/TagParserClass.h>
 #include <language/SymbolTableClass.h>
@@ -37,148 +36,11 @@
  
 namespace mvceditor {
 
-// forward declaration
+// forward declarations
 class DetectedTagNearMatchMemberResultClass;
 class DetectedTagExactMemberResultClass;
-
-/**
- * A global cache contains all 3 tags db files used by MVC Editor.  All projects' tags
- * are stored in a SQLite file that persisted and then loaded when MVC Editor starts; this way
- * the user can jump to files & classes without needing to re-index the 
- * entire project. The global cache also contains tags db files for the 
- * native functions (str_*, array_*) and any detected tags from the 
- * TagDetectors database. This class is given to the TagCacheClass.
- */
-class GlobalCacheClass {
-
-public:
-
-	/**
-	 * The object that will parse and persist tags
-	 */
-	mvceditor::TagParserClass TagParser;
-
-	/**
-	 * The object that will be used to lookup project tags
-	 * This class will own this pointer
-	 */
-	mvceditor::ParsedTagFinderClass TagFinder;
-
-	/**
-	 * The object that will be used to lookup php native function tags
-	 */
-	mvceditor::ParsedTagFinderClass NativeTagFinder;
-
-	/**
-	 * The object that will be used to lookup tags
-	 */
-	mvceditor::SqliteFinderClass DetectedTagFinder;
-
-	/**
-	 * TRUE if NativeTagFinder has an opened and valid connection
-	 */
-	bool IsNativeTagFinderInit;
-
-	/**
-	 * TRUE if TagFinder has an opened and valid connection
-	 */
-	bool IsTagFinderInit;
-
-	/**
-	 * TRUE if DetectedTagFinder has an opened and valid connection
-	 */
-	bool IsDetectedTagFinderInit;
-
-private:
-
-	/**
-	 * The connections to all sqlite db files
-	 * These need to be declared last because the
-	 * tagparsers use them; and we want the sessions to be cleaned up last
-	 */
-	soci::session* TagDbSession;
-	soci::session* NativeDbSession;
-	soci::session* DetectedTagDbSession;
-
-public:
-
-	GlobalCacheClass();
-
-	~GlobalCacheClass();
-
-	/**
-	 * Opens the SQLite resource db file, or creates it if it does not exist.
-	 *
-	 * @param resourceDbFileName the full path to the SQLite resources database.
-	 *        If this full path does not exist it will be created.
-	 * @param phpFileExtensions the wildcards that hold which files to parse
-	 * @param miscFileExtensions the wildcards that hold which files to to record but not parse
-	 * @param version the PHP version that the parser will check against
-	*/
-	void InitGlobalTag(const wxFileName& tagDbFileName, const std::vector<wxString>& phpFileExtensions, 
-		const std::vector<wxString>& miscFileExtensions, pelet::Versions version);
-
-	/**
-	 * same as InitGlobalTag() but it takes ownership of an existing session
-	 * @param session this object will own the pointer and delete it 
-	 */
-	void AdoptGlobalTag(soci::session* session, const std::vector<wxString>& phpFileExtensions, 
-		const std::vector<wxString>& miscFileExtensions, pelet::Versions version);
-
-	/**
-	 * Opens the detector db SQLite file, or creates it if it does not exist.
-	 *
-	 * @param detectorDbFileName the full path to the SQLite detectors database.
-	 *        If this full path does not exist it will be created.
-	*/
-	void InitDetectorTag(const wxFileName& detectorDbFileName);
-
-	/**
-	 * same as InitDetectorTag() but it takes ownership of an existing session
-	 * @param session this object will own the pointer and delete it 
-	 */
-	void AdoptDetectorTag(soci::session* session);
-
-	/**
-	 * Opens the native functions SQLite file.  
-	 * @param nativeFunctionsDbFileName the full path to the SQLite native functions database.
-	 *        This full path MUST exist; it will never be created.
-	 */
-	void InitNativeTag(const wxFileName& nativeFunctionsDbFileName);
-
-	/**
-	 * same as InitNativeTag() but it takes ownership of an existing session
-	 * @param session this object will own the pointer and delete it 
-	 */
-	void AdoptNativeTag(soci::session* session);
-
-
-	/**
-	 * Will update the tag finder by calling Walk(); meaning that the next file
-	 * given by the directorySearch will be parsed and its resources will be stored
-	 * in the database.
-	 *
-	 * @see mvceditor::TagParserClass::Walk
-	 * @param directorySearch keeps track of the file to parse
-	 */
-	void  Walk(DirectorySearchClass& directorySearch);
-
-	/**
-	 * @param version the PHP version that the parser will check against
-	 */
-	void SetVersion(pelet::Versions version);
-
-private:
-
-	/**
-	 * create the database connection to the given db
-	 *
-	 * @param session the db connection to open. this class will not own this pointer.
-	 * @param wxString dbName, given to SQLite.  db can be a full path to a file  The
-	 *        file does not needs to exist and have been initialized with the schema
-	 */
-	bool Open(soci::session* session, const wxString& dbName);
-};
+class TagFinderListClass;
+class TagFinderClass;
 
 /**
  * The working cache is an in-memory cache of source code that is being edited
@@ -317,9 +179,9 @@ public:
 	 * to this method, the cache is available for use by 
 	 * the ExpressionCompletionMatches and ResourceMatches methods
 	 * 
-	 * @param globalCache this class will own the pointer
+	 * @param tagFinderList this class will own the pointer
 	 */
-	void RegisterGlobal(mvceditor::GlobalCacheClass* globalCache);
+	void RegisterGlobal(mvceditor::TagFinderListClass* tagFinderList);
 	
 	/**
 	 * Searches the parsed tag finder
@@ -504,7 +366,7 @@ private:
 	 * These are the tag finders from the ALL projects and native functions; it may include stale resources
 	 * This class will own the pointer and will delete them when appropriate.
 	 */
-	mvceditor::GlobalCacheClass* GlobalCache;
+	mvceditor::TagFinderListClass* TagFinderList;
 	
 	/**
 	 * To calculate variable type information
@@ -523,7 +385,7 @@ extern const wxEventType EVENT_WORKING_CACHE_COMPLETE;
  * Event that will hold the results of tag finder & symbol table
  * on a single file.
  */
-extern const wxEventType EVENT_GLOBAL_CACHE_COMPLETE;
+extern const wxEventType EVENT_TAG_FINDER_LIST_COMPLETE;
 
 
 class WorkingCacheCompleteEventClass : public wxEvent {
@@ -565,10 +427,10 @@ private:
 	wxString FileIdentifier;
 };
 
-class GlobalCacheCompleteEventClass : public wxEvent {
+class TagFinderListCompleteEventClass : public wxEvent {
 public:
 
-	GlobalCacheCompleteEventClass(int id);
+	TagFinderListCompleteEventClass(int id);
 
 	wxEvent* Clone() const;
 };
@@ -582,18 +444,18 @@ typedef void (wxEvtHandler::*WorkingCacheCompleteEventClassFunction)(mvceditor::
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( WorkingCacheCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
 
-typedef void (wxEvtHandler::*GlobalCacheCompleteEventClassFunction)(mvceditor::GlobalCacheCompleteEventClass&);
+typedef void (wxEvtHandler::*TagFinderListCompleteEventClassFunction)(mvceditor::TagFinderListCompleteEventClass&);
 
-#define EVT_GLOBAL_CACHE_COMPLETE(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_GLOBAL_CACHE_COMPLETE, id, -1, \
+#define EVT_TAG_FINDER_LIST_COMPLETE(id, fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_TAG_FINDER_LIST_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( GlobalCacheCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent( TagFinderListCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
 
-typedef void (wxEvtHandler::*GlobalCacheCompleteEventClassFunction)(mvceditor::GlobalCacheCompleteEventClass&);
+typedef void (wxEvtHandler::*TagFinderListCompleteEventClassFunction)(mvceditor::TagFinderListCompleteEventClass&);
 
-#define EVT_GLOBAL_CACHE_COMPLETE(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_GLOBAL_CACHE_COMPLETE, id, -1, \
+#define EVT_TAG_FINDER_LIST_COMPLETE(id, fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_TAG_FINDER_LIST_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( GlobalCacheCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent( TagFinderListCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
 
 #endif

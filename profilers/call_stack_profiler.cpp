@@ -24,6 +24,7 @@
  */
 
 #include <language/TagCacheClass.h>
+#include <language/TagFinderList.h>
 #include <language/CallStackClass.h>
 #include <actions/TagDetectorActionClass.h>
 #include <actions/CallStackActionClass.h>
@@ -135,7 +136,7 @@ void CacheLargeProject(mvceditor::TagCacheClass& tagCache, wxString sourceDir) {
 		printf("Directory does not exist: %s\n", (const char*)sourceDir.ToAscii());
 	}
 	
-	mvceditor::GlobalCacheClass projectCache;
+	mvceditor::TagFinderListClass projectCache;
 	projectCache.InitGlobalTag(wxFileName(TagCacheDbFullPath), phpFileExtensions, miscFileExtensions, pelet::PHP_53);
 	while (directorySearch.More()) {
 		projectCache.Walk(directorySearch);
@@ -183,16 +184,16 @@ void TagCacheInit(mvceditor::TagCacheClass& tagCache) {
 	std::vector<wxString> phpFileExtensions,
 		miscFileExtensions;
 	phpFileExtensions.push_back(wxT("*.php"));
-	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass;
+	mvceditor::TagFinderListClass* tagFinderlist = new mvceditor::TagFinderListClass;
 	
 	// load the project tags that were just parsed
-	globalCache->InitGlobalTag(wxFileName(TagCacheDbFullPath), phpFileExtensions, miscFileExtensions, pelet::PHP_53);
+	tagFinderlist->InitGlobalTag(wxFileName(TagCacheDbFullPath), phpFileExtensions, miscFileExtensions, pelet::PHP_53);
 	
 	// load the php native functions into the cache
-	globalCache->InitNativeTag(mvceditor::NativeFunctionsAsset());
+	tagFinderlist->InitNativeTag(mvceditor::NativeFunctionsAsset());
 	
 	// load the detected tags cache
-	globalCache->InitDetectorTag(wxFileName(DetectorDbFullPath));
+	tagFinderlist->InitDetectorTag(wxFileName(DetectorDbFullPath));
 
-	tagCache.RegisterGlobal(globalCache);
+	tagCache.RegisterGlobal(tagFinderlist);
 }

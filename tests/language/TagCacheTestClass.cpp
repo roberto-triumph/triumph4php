@@ -24,6 +24,7 @@
  */
 #include <UnitTest++.h>
 #include <language/TagCacheClass.h>
+#include <language/TagFinderList.h>
 #include <globals/String.h>
 #include <FileTestFixtureClass.h>
 #include <SqliteTestFixtureClass.h>
@@ -83,8 +84,8 @@ public:
 		return cache;
 	}
 
-	mvceditor::GlobalCacheClass* CreateGlobalCache(const wxString& srcDirectory) {
-		mvceditor::GlobalCacheClass* cache = new mvceditor::GlobalCacheClass();
+	mvceditor::TagFinderListClass* CreateTagFinderList(const wxString& srcDirectory) {
+		mvceditor::TagFinderListClass* cache = new mvceditor::TagFinderListClass();
 		cache->AdoptGlobalTag(Session1, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 			
 		// must call init() here since we want to parse files from disk
@@ -175,8 +176,8 @@ public:
 		return cache;
 	}
 
-	mvceditor::GlobalCacheClass* CreateGlobalCache(const wxString& srcDirectory) {
-		mvceditor::GlobalCacheClass* cache = new mvceditor::GlobalCacheClass();
+	mvceditor::TagFinderListClass* CreateTagFinderList(const wxString& srcDirectory) {
+		mvceditor::TagFinderListClass* cache = new mvceditor::TagFinderListClass();
 		cache->AdoptGlobalTag(Session1, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 		
 		// must call init() here since we want to parse files from disk
@@ -212,8 +213,8 @@ public:
 		CreateDatabase(*Session1, mvceditor::ResourceSqlSchemaAsset());
 	}
 
-	mvceditor::GlobalCacheClass* CreateGlobalCache(const wxString& srcDirectory) {
-		mvceditor::GlobalCacheClass* cache = new mvceditor::GlobalCacheClass();
+	mvceditor::TagFinderListClass* CreateTagFinderList(const wxString& srcDirectory) {
+		mvceditor::TagFinderListClass* cache = new mvceditor::TagFinderListClass();
 		cache->AdoptGlobalTag(Session1, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 			
 		// must call init() here since we want to parse files from disk
@@ -225,7 +226,7 @@ public:
 
 SUITE(TagCacheTestClass) {
 
-TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, CompletionMatchesWithGlobalCache) {
+TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, CompletionMatchesWithTagFinderList) {
 	
 	// in this test we will create a class in file1; file2 will use that class
 	// the TagCache object should be able to detect the variable type of 
@@ -235,7 +236,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, CompletionMatchesWithGloba
 	CreateFixtureFile(File1, code1);
 
 	mvceditor::WorkingCacheClass* cache1 = CreateWorkingCache(File2, Code2);
-	mvceditor::GlobalCacheClass* cache2 = CreateGlobalCache(wxT("src"));
+	mvceditor::TagFinderListClass* cache2 = CreateTagFinderList(wxT("src"));
 	
 	CHECK(TagCache.RegisterWorking(File2, cache1));
 	TagCache.RegisterGlobal(cache2);
@@ -247,7 +248,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, CompletionMatchesWithGloba
 	CHECK_UNISTR_EQUALS("w", TagMatches[0].Identifier);
 }
 
-TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, TagMatchesWithGlobalCache) {
+TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, TagMatchesWithTagFinderList) {
 	
 	// in this test we will create a class in file2; file1 will use that class
 	// the ResourceUpdate object should be able to detect the variable type of 
@@ -257,7 +258,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, TagMatchesWithGlobalCache)
 	CreateFixtureFile(GlobalFile, GlobalCode);
 	
 	mvceditor::WorkingCacheClass* cache1 = CreateWorkingCache(File1, Code1);
-	mvceditor::GlobalCacheClass* cache2 = CreateGlobalCache(wxT("src"));
+	mvceditor::TagFinderListClass* cache2 = CreateTagFinderList(wxT("src"));
 	
 	CHECK(TagCache.RegisterWorking(File1, cache1));
 	TagCache.RegisterGlobal(cache2);
@@ -284,7 +285,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, TagMatchesWithStaleMatches
 	CreateFixtureFile(GlobalFile, GlobalCode);
 
 	mvceditor::WorkingCacheClass* cache1 = CreateWorkingCache(File1, Code1);
-	mvceditor::GlobalCacheClass* cache2 = CreateGlobalCache(wxT("src"));
+	mvceditor::TagFinderListClass* cache2 = CreateTagFinderList(wxT("src"));
 
 	CHECK(TagCache.RegisterWorking(File1, cache1));
 	TagCache.RegisterGlobal(cache2);
@@ -312,7 +313,7 @@ TEST_FIXTURE(TagCacheSearchFixtureClass, ExactTags) {
 	CreateSubDirectory(wxT("src"));
 	CreateFixtureFile(wxT("src") + wxString(wxFileName::GetPathSeparator()) + wxT("file1.php"), code);
 	
-	mvceditor::GlobalCacheClass* cache = CreateGlobalCache(wxT("src"));
+	mvceditor::TagFinderListClass* cache = CreateTagFinderList(wxT("src"));
 	TagCache.RegisterGlobal(cache);
 	
 	// empty means search all dirs

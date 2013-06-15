@@ -1,5 +1,6 @@
 
 #include <actions/CallStackActionClass.h>
+#include <language/TagFinderList.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 #include <soci/sqlite3/soci-sqlite3.h>
@@ -28,12 +29,12 @@ bool mvceditor::CallStackActionClass::Init(mvceditor::GlobalsClass& globals) {
 
 	// register the project tag DB file now so that it is available for code completion
 	// the tag cache will own these pointers
-	mvceditor::GlobalCacheClass* projectCache = new mvceditor::GlobalCacheClass;
+	mvceditor::TagFinderListClass* projectCache = new mvceditor::TagFinderListClass;
 	projectCache->InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), otherFileExtensions, Version);
 	TagCache.RegisterGlobal(projectCache);
 
 	// initialize the detected tag cache too so that more methods can be resolved
-	projectCache = new mvceditor::GlobalCacheClass;
+	projectCache = new mvceditor::TagFinderListClass;
 	projectCache->InitDetectorTag(globals.DetectorCacheDbFileName);
 	TagCache.RegisterGlobal(projectCache);
 	ret = true;

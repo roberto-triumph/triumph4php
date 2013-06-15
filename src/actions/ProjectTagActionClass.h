@@ -24,6 +24,7 @@
  */
 #include <actions/GlobalActionClass.h>
 #include <search/DirectorySearchClass.h>
+#include <language/TagFinderList.h>
 #include <pelet/TokenClass.h>
 #include <vector>
 
@@ -36,7 +37,7 @@ namespace mvceditor {
  * This class will take care of iterating through all files in a project
  * and parsing the resources so that queries to ParsedTagFinderClass
  * will work.
- * The ProjectTagActionClass will generate a GlobalCacheCompleteEventClass 
+ * The ProjectTagActionClass will generate a TagFinderListCompleteEventClass 
  * event once each project  has been parsed.
  */
 class ProjectTagActionClass : public GlobalActionClass {
@@ -109,7 +110,7 @@ private:
 	/**
 	 * This object will perform the parsing and storing of the tags
 	 */
-	mvceditor::GlobalCacheClass GlobalCache;
+	mvceditor::TagFinderListClass TagFinderList;
 
 	/**
 	 * TRUE if we should iterate though the touched projects and not all projects.

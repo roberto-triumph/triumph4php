@@ -276,7 +276,7 @@ void ProfileTagParserOnLargeProject() {
 		search.Walk(tagParser);
 	}
 	time = wxGetLocalTimeMillis() - time;
-printf("time for tagFinder on entire project:%ld ms\n", time.ToLong());
+	printf("time for tagFinder on entire project:%ld ms\n", time.ToLong());
 }
 
 void ProfileTagSearch() {
@@ -290,8 +290,14 @@ void ProfileTagSearch() {
 	
 	std::vector<mvceditor::TagClass> matches;
 	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("Request::get"));
-	matches = tagFinder.NearMatchTags(tagSearch);
-	found = matches.size();
+	mvceditor::TagResultClass* result = tagSearch.CreateNearMatchResults();
+	tagFinder.Exec(result);
+	found = 0;
+	while (result->More()) {
+		result->Next();
+		found++;
+	}
+	delete result;
 	
 	time = wxGetLocalTimeMillis() - time;
 	printf("time for tagFinder on entire project after caching:%ld ms found:%d\n", time.ToLong(), (int)found);
