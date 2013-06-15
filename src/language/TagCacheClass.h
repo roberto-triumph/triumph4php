@@ -37,6 +37,10 @@
  
 namespace mvceditor {
 
+// forward declaration
+class DetectedTagNearMatchMemberResultClass;
+class DetectedTagExactMemberResultClass;
+
 /**
  * A global cache contains all 3 tags db files used by MVC Editor.  All projects' tags
  * are stored in a SQLite file that persisted and then loaded when MVC Editor starts; this way
@@ -318,34 +322,67 @@ public:
 	void RegisterGlobal(mvceditor::GlobalCacheClass* globalCache);
 	
 	/**
-	 * Searches all the registered caches (working AND global caches)
-	 * Will return only for full exact matches (it will call ExactTags
-	 * on each tag finder).
-	 * @see mvceditor::TagFinderClass::ExactTags
+	 * Searches the parsed tag finder
+	 * Will return only for full exact matches (it will call ExactTags).
 	 * @param search string to search for
-	 * @param searchDirs directories to restrict matching tags in. If empty, then the entire cache will be searched.
+	 * @param sourceDirs directories to restrict matching tags in. If empty, then the entire cache will be searched.
 	 * @return TagResultClass to iterate through the results of the query. The
 	 *          returned pointer must be deleted by the caller.
 	 */
 	mvceditor::TagResultClass* ExactTags(const UnicodeString& search, const std::vector<wxFileName>& searchDirs);
+
+	/**
+	 * Searches the native tag finder
+	 * Will return only for full exact matches (it will call ExactTags).
+	 * @param search string to search for
+	 * @return TagResultClass to iterate through the results of the query. The
+	 *          returned pointer must be deleted by the caller.
+	 */
+	mvceditor::TagResultClass* ExactNativeTags(const UnicodeString& search);
+
+	/**
+	 * Searches the detected tag finder
+	 * Will return only for full exact matches (it will call ExactTags).
+	 * @param search string to search for
+	 * @param sourceDirs directories to restrict matching tags in. If empty, then the entire cache will be searched.
+	 * @return TagResultClass to iterate through the results of the query. The
+	 *          returned pointer must be deleted by the caller.
+	 */
+	mvceditor::DetectedTagExactMemberResultClass* ExactDetectedTags(const UnicodeString& search, const std::vector<wxFileName>& searchDirs);
 	
 	/**
-	 * Searches all the registered caches (working AND global caches)
-	 * Will return near matches (it will call NearMatchTags
-	 * on each tag finder).
+	 * Searches the tag cache using near-match logic
 	 *
-	 * @see mvceditor::TagFinderClass::NearMatchTags
 	 * @param string to search for
-	 * @param searchDirs directories to restrict matching tags in. If empty, then the entire cache will be searched.
-	 * @return std::vector<mvceditor::TagClass> matched resources
+	 * @param sourceDirs source directories to restrict matching tags in. If empty, then the entire cache will be searched.
+	 * @return TagResultClass to iterate through the results of the query. The
+	 *          returned pointer must be deleted by the caller.
 	 */
-	std::vector<mvceditor::TagClass> NearMatchTags(const UnicodeString& search, const std::vector<wxFileName>& searchDirs);
+	mvceditor::TagResultClass* NearMatchTags(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs);
+
+	/**
+	 * Searches the detected tag cache using near-match logic
+	 *
+	 * @param string to search for
+	 * @param sourceDirs source directories to restrict matching tags in. If empty, then the entire cache will be searched.
+	 * @return TagResultClass to iterate through the results of the query. The
+	 *          returned pointer must be deleted by the caller.
+	 */
+	mvceditor::DetectedTagNearMatchMemberResultClass* NearMatchDetectedTags(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs);
+
+	/**
+	 * Searches the native tag cache using near-match logic
+	 *
+	 * @param string to search for
+	 * @return TagResultClass to iterate through the results of the query. The
+	 *          returned pointer must be deleted by the caller.
+	 */
+	mvceditor::TagResultClass* NearMatchNativeTags(const UnicodeString& search);
 
 	/**
 	 * Searches all the registered caches (working AND global caches)
 	 * Will return only for full exact matches (it will call ExactClassOrFile
 	 * on each tag finder).
-	 * @see mvceditor::TagFinderClass::ExactClassOrFile
 	 * @param search string to search for
 	 * @return std::vector<mvceditor::TagClass> matched resources. will be either files or classes 
 	 */
@@ -356,7 +393,6 @@ public:
 	 * Will return near matches (it will call NearMatchClassesOrFiles
 	 * on each tag finder).
 	 *
-	 * @see mvceditor::TagFinderClass::NearMatchClassesOrFiles
 	 * @param string to search for
 	 * @return std::vector<mvceditor::TagClass> matched resources. will be either files or classes
 	 */
@@ -397,7 +433,7 @@ public:
 	 *        a function / static class call.
 	 * @param doDuckTyping if an expression chain could not be fully resolved; then we could still
 	 *        perform a search for the expression member in ALL classes. The lookups will not be
-	 *        slower because TagFinderClass still handles them
+	 *        slower because ParsedTagFinderClass still handles them
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
 	void ExpressionCompletionMatches(const wxString& fileName, const pelet::ExpressionClass& parsedExpression, const pelet::ScopeClass& expressionScope, 
@@ -417,7 +453,7 @@ public:
 	 * @param matches all of the tag matches will be put here
 	 * @param doDuckTyping if an expression chain could not be fully resolved; then we could still
 	 *        perform a search for the expression member in ALL classes. The lookups will not be
-	 *        slower because TagFinderClass still handles them
+	 *        slower because ParsedTagFinderClass still handles them
 	 * @param doFullyQualifiedMatchOnly if TRUE the only resources that match fully qualified resources will be
 	 *        returned
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
@@ -462,7 +498,7 @@ private:
 	 * 
 	 * This clas owns the tag finder pointers, do NOT delete them
 	 */
-	std::vector<TagFinderClass*> AllFinders();
+	std::vector<ParsedTagFinderClass*> AllFinders();
 	
 	/**
 	 * These are the tag finders from the ALL projects and native functions; it may include stale resources

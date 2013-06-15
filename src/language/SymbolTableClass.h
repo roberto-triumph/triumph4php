@@ -331,7 +331,7 @@ public:
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear() )
 	 */
 	void ExpressionCompletionMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope, 
-		const std::vector<mvceditor::TagFinderClass*>& allTagFinders,
+		const std::vector<mvceditor::ParsedTagFinderClass*>& allTagFinders,
 		std::vector<UnicodeString>& autoCompleteVariableList,
 		std::vector<TagClass>& autoCompleteResourceList,
 		bool doDuckTyping,
@@ -365,7 +365,7 @@ public:
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
 	void ResourceMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope, 
-		const std::vector<mvceditor::TagFinderClass*>& allTagFinders,
+		const std::vector<mvceditor::ParsedTagFinderClass*>& allTagFinders,
 		std::vector<TagClass>& resourceMatches,
 		bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 		SymbolTableMatchErrorClass& error) const;

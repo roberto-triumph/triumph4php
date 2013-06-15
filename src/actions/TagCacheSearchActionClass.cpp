@@ -71,13 +71,13 @@ void mvceditor::TagCacheSearchActionClass::BackgroundWork() {
 	}
 	if (exactOnly) {
 		mvceditor::TagResultClass* results = TagCache.ExactTags(SearchString, SearchDirs);
-		if (results) {
-			matches = results->Matches();
-			delete results;
-		}
+		matches = results->Matches();
+		delete results;
 	}
 	else {
-		matches = TagCache.NearMatchTags(SearchString, SearchDirs);
+		mvceditor::TagResultClass* results = TagCache.NearMatchTags(SearchString, SearchDirs);
+		matches = results->Matches();
+		delete results;
 	}
 
 	// no need to show jump to results for native functions

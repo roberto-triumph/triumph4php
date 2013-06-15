@@ -25,14 +25,13 @@
 #ifndef __MVCEDITOR_TAGFINDERLIST_H__
 #define __MVCEDITOR_TAGFINDERLIST_H__
 
-#include <language/TagFinderList.h>
 #include <unicode/unistr.h>
 #include <vector>
 
 namespace mvceditor {
 
 // forward declaration
-class TagFinderClass;
+class ParsedTagFinderClass;
 
 
 /**
@@ -49,7 +48,7 @@ class TagFinderClass;
  *         class. this method will search across all tag finders
  */
 std::vector<UnicodeString> TagFinderListClassParents(UnicodeString className, UnicodeString methodName, 
-												 const std::vector<mvceditor::TagFinderClass*>& allTagFinders);
+												 const std::vector<mvceditor::ParsedTagFinderClass*>& allTagFinders);
 
 
 /**
@@ -59,7 +58,7 @@ std::vector<UnicodeString> TagFinderListClassParents(UnicodeString className, Un
 std::vector<UnicodeString> TagFinderListClassUsedTraits(const UnicodeString& className, 
 												  const std::vector<UnicodeString>& parentClassNames, 
 												  const UnicodeString& methodName, 
-												  const std::vector<mvceditor::TagFinderClass*>& allTagFinders);
+												  const std::vector<mvceditor::ParsedTagFinderClass*>& allTagFinders);
 
 }
 

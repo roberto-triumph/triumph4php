@@ -1154,7 +1154,12 @@ mvceditor::TagResultClass* mvceditor::TagSearchClass::CreateNearMatchResults() c
 		// check the entire class hierachy
 		// combine the parent classes with the class being searched
 		std::vector<UnicodeString> classHierarchy = GetParentClasses();
-		classHierarchy.push_back(QualifyName(GetNamespaceName(), GetClassName()));
+		if (GetNamespaceName().isEmpty()) {
+			classHierarchy.push_back(GetClassName());
+		}
+		else {
+			classHierarchy.push_back(QualifyName(GetNamespaceName(), GetClassName()));
+		}
 		classHierarchy.insert(classHierarchy.end(), Traits.begin(), Traits.end());
 
 		nearMatchMembersResult->Set(classHierarchy, GetMethodName(), GetSourceDirs());
@@ -1306,11 +1311,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagResultClass::Matches() {
 	return matches;
 }
 
-mvceditor::TagFinderClass::TagFinderClass()
-: SqliteFinderClass() { 
-}
-
-bool mvceditor::TagFinderClass::GetResourceMatchPosition(const mvceditor::TagClass& tag, const UnicodeString& text, int32_t& pos, 
+bool mvceditor::ParsedTagFinderClass::GetResourceMatchPosition(const mvceditor::TagClass& tag, const UnicodeString& text, int32_t& pos, 
 		int32_t& length) {
 	size_t start = 0;
 	mvceditor::FinderClass finder;
@@ -1380,7 +1381,7 @@ bool mvceditor::TagFinderClass::GetResourceMatchPosition(const mvceditor::TagCla
 	return false;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchTags(
+/*std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::NearMatchTags(
 	const mvceditor::TagSearchClass& tagSearch,
 	bool doCollectFileNames) {
 
@@ -1427,8 +1428,9 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchTags(
 	sort(matches.begin(), matches.end());
 	return matches;
 }
+*/
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchClassesOrFiles(
+std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::NearMatchClassesOrFiles(
 	const mvceditor::TagSearchClass& tagSearch) {
 	std::vector<mvceditor::TagClass> matches;
 
@@ -1471,7 +1473,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchClassesOrFi
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchMembers(const mvceditor::TagSearchClass& tagSearch) {
+std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::NearMatchMembers(const mvceditor::TagSearchClass& tagSearch) {
 	std::vector<mvceditor::TagClass> matches;
 	
 	// when looking for members we need to look
@@ -1540,7 +1542,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::NearMatchMembers(con
 	return matches;
 }
 
-UnicodeString mvceditor::TagFinderClass::ParentClassName(const UnicodeString& fullyQualifiedClassName) {
+UnicodeString mvceditor::ParsedTagFinderClass::ParentClassName(const UnicodeString& fullyQualifiedClassName) {
 	UnicodeString parentClassName;
 	
 	// empty file items == search on all files
@@ -1557,7 +1559,7 @@ UnicodeString mvceditor::TagFinderClass::ParentClassName(const UnicodeString& fu
 	return parentClassName;
 }
 
-std::vector<UnicodeString> mvceditor::TagFinderClass::GetResourceTraits(const UnicodeString& className, 
+std::vector<UnicodeString> mvceditor::ParsedTagFinderClass::GetResourceTraits(const UnicodeString& className, 
 																		const UnicodeString& methodName,
 																		const std::vector<wxFileName>& sourceDirs) {
 	std::vector<UnicodeString> inheritedTraits;
@@ -1589,7 +1591,7 @@ std::vector<UnicodeString> mvceditor::TagFinderClass::GetResourceTraits(const Un
 	return inheritedTraits;
 }
 
-UnicodeString mvceditor::TagFinderClass::ExtractParentClassFromSignature(const UnicodeString& signature) const {
+UnicodeString mvceditor::ParsedTagFinderClass::ExtractParentClassFromSignature(const UnicodeString& signature) const {
 
 	// look for the parent class. tokenize the signature and get the
 	// class name after the 'extends' keyword note that since the signature is re-constructed by the parser
@@ -1617,7 +1619,7 @@ UnicodeString mvceditor::TagFinderClass::ExtractParentClassFromSignature(const U
 	return parentClassName;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::ExactClassOrFile(const mvceditor::TagSearchClass& tagSearch) {
+std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ExactClassOrFile(const mvceditor::TagSearchClass& tagSearch) {
 
 	// at one point there was a check here to see if the  tag files existed
 	// it was removed because it caused performance issues, since this method
@@ -1646,7 +1648,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::ExactClassOrFile(con
 	return allMatches;
 }
 
-void mvceditor::TagFinderClass::EnsureMatchesExist(std::vector<TagClass>& matches) {
+void mvceditor::ParsedTagFinderClass::EnsureMatchesExist(std::vector<TagClass>& matches) {
 
 	// remove from matches that have a file that is no longer in the file system
 	std::vector<mvceditor::TagClass>::iterator it = matches.begin();
@@ -1673,7 +1675,7 @@ void mvceditor::TagFinderClass::EnsureMatchesExist(std::vector<TagClass>& matche
 	}
 }
 
-bool mvceditor::TagFinderClass::IsFileCacheEmpty() {
+bool mvceditor::ParsedTagFinderClass::IsFileCacheEmpty() {
 	if (!IsInit()) {
 		return true;
 	}
@@ -1688,7 +1690,7 @@ bool mvceditor::TagFinderClass::IsFileCacheEmpty() {
 	return count <= 0;
 }
 
-bool mvceditor::TagFinderClass::IsResourceCacheEmpty() {
+bool mvceditor::ParsedTagFinderClass::IsResourceCacheEmpty() {
 	if (!IsInit()) {
 		return true;
 	}
@@ -1705,12 +1707,12 @@ bool mvceditor::TagFinderClass::IsResourceCacheEmpty() {
 	return count <= 0;
 }
 
-bool mvceditor::TagFinderClass::HasFullPath(const wxString& fullPath) {
+bool mvceditor::ParsedTagFinderClass::HasFullPath(const wxString& fullPath) {
 	mvceditor::FileTagClass fileTag;
 	return FindFileTagByFullPathExact(fullPath, fileTag);
 }
 
-bool mvceditor::TagFinderClass::FindFileTagByFullPathExact(const wxString& fullPath, mvceditor::FileTagClass& fileTag) {
+bool mvceditor::ParsedTagFinderClass::FindFileTagByFullPathExact(const wxString& fullPath, mvceditor::FileTagClass& fileTag) {
 	if (!IsInit()) {
 		return false;
 	}
@@ -1742,7 +1744,7 @@ bool mvceditor::TagFinderClass::FindFileTagByFullPathExact(const wxString& fullP
 	return foundFile;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::All() {
+std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::All() {
 	mvceditor::AllTagsResultClass result;
 	result.Prepare(*Session, false);
 
@@ -1766,7 +1768,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::All() {
 }
 
 mvceditor::ParsedTagFinderClass::ParsedTagFinderClass()
-	: TagFinderClass() {
+	: SqliteFinderClass() {
 
 }
 
@@ -1779,7 +1781,7 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ClassesFunctio
 	return tags;
 }
 
-void mvceditor::TagFinderClass::Print() {
+void mvceditor::ParsedTagFinderClass::Print() {
 	std::vector<mvceditor::TagClass> tags = All();
 	std::vector<mvceditor::TagClass>::iterator tag;
 	for (tag = tags.begin(); tag != tags.end(); ++tag) {

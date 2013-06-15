@@ -295,7 +295,7 @@ private:
 /**
  * The TagResult is used to loop through database rows of the tag table
  */
- class TagResultClass : public mvceditor::SqliteResultClass {
+class TagResultClass : public mvceditor::SqliteResultClass {
 
 public:
 
@@ -534,11 +534,11 @@ private:
  * the return values for methods of this class will be false, empty, or zero. Currently this class does not expose 
  * the specific error code from SQLite.
  */
-class TagFinderClass : public mvceditor::SqliteFinderClass {
+class ParsedTagFinderClass : public mvceditor::SqliteFinderClass {
 
 public:
 	
-	TagFinderClass();
+	ParsedTagFinderClass();
 
 	/**
 	 * Gets all classes, functions, and constants (defines) that were parsed from
@@ -548,68 +548,7 @@ public:
 	 * @return vector of tags all tags that were parsed from the given file that 
 	 *         are either a class, function, or define 
 	 */
-	virtual std::vector<mvceditor::TagClass> ClassesFunctionsDefines(const wxString& fullPath) = 0;
-	
-public:
-	
-	/**
-	 * Looks for the tag, using a near-match logic. Logic is as follows:
-	 * 
-	 *  1) A class name or function is given:
-	 *    a class name or function will match if the class/function starts with the query.  If the query is 'User', 
-	 *    the  classes like 'UserAdmin', 'UserGuest' will match, Functions like 'userPrint', 'userIsLoggedIn' 
-	 *    will match as well. Note that if a class name or function is not found, then file name search (item 3 below)
-	 *    is performed.  This logic makes it easier for the user to search for something without having to type
-	 *    in entire file names.
-	 * 
-	 *  2) A method name is given:
-	 *     When looking for a method / property, only match methods or properties.  For example, if the query is
-	 *     'User::getN' then methods like 'UserClass::getName', 'UserClass::getNumber' will match. Also, any inherited
-	 *     methods are searched; if UserClass inherits a method called 'getNumericId' (but the code itself is in a
-	 *     base class) it will match as well. Note that queries need not include a class name; a query can be made
-	 *     for '::load' which will match all methods that start with 'load'.
-	 * 
-	 * 3) A file name is given:
-	 *    A file name  matches will be done based on the file name only, not the full path. A file name will match if
-	 *    it contains the query.  For example, if the query is 'user.php', then file names like 'guest_user.php',
-	 *   'admin_user.php' will match.
-	 * 
-	 * 4) A file name and line number is given:
-	 *    A file name  matches will be done based on the file name only, not the full path. A file name will match if
-	 *    it contains the query.  For example, if the query is 'user.php:900', then file names like 'guest_user.php',
-	 *   'admin_user.php' will match. Additionally, the file will only match if it has at least as many lines as the
-	 *    query.  For example, if the query is 'user.php:900' then all files that would match 'user.php' AND are 
-	 *    at least 900 lines long will match.
-	 * 
-	 * For example the following class:
-	 * 
-	 * class UserClass {
-	 *   private $name;
-	 *  
-	 *  function getName() {
-	 *   // ...
-	 *  } 
-	 * }
-	 * 
-	 * the following tag queries will result in a match:
-	 * 
-	 * UserClass
-	 * name
-	 * getName
-	 * UserC
-	 * 
-	 * Note that if any exact matches are found, then no near-matches will be collected.
-	 * 
-	 * @param tagSearch the partial name of resources to look for
-	 * @param doCollectFileNames if TRUE, then file name matches will be returned if no
-	 *        class / function names are found
-	 * @return matches the list of matched resources (max of 50)
-	 *         Because this search is done on a database,
-	 *         the returned list may contain matches from files that are no longer in 
-	 *         the file system.
-	 */
-	std::vector<mvceditor::TagClass> NearMatchTags(const mvceditor::TagSearchClass& tagSearch,
-		bool doCollectFileNames = false);
+	std::vector<mvceditor::TagClass> ClassesFunctionsDefines(const wxString& fullPath);
 
 	/**
 	 * Looks for the a class or file tag, using exact, case insensitive matching. Will collect the fully qualified tag name 
@@ -793,45 +732,6 @@ private:
 	 *  parsed cache
 	 */
 	bool IsNewNamespace(const UnicodeString& namespaceName);
-};
-
-/**
- * the ParsedTagFinderClass will query from the resources db. The resources db
- * has different columns than the detectors db.
- */
-class ParsedTagFinderClass : public mvceditor::TagFinderClass {
-
-public:
-	
-	ParsedTagFinderClass();
-
-	/**
-	 * Gets all classes, functions, and constants (defines) that were parsed from
-	 * the given file.
-	 *
-	 * @param fullPath the full path of the file to lookup
-	 * @return vector of tags all tags that were parsed from the given file
-	 */
-	virtual std::vector<TagClass> ClassesFunctionsDefines(const wxString& fullPath);
-
-protected:
-
-	/**
-	 * collect all of the methods that are aliased from all of the traits used by the given classes
-	 * @param classNames the names of the classes to search  in. these are the classes that use the
-	 *        traits
-	 * @param methodName if non-empty then only aliases that begin with this name will be returned
-	 * @param fileTagIds the file IDs to search in. can be empty. if empty, matches from all files will be returned.
-	 */
-	std::vector<TagClass> TraitAliases(const std::vector<UnicodeString>& classNames, const UnicodeString& methodName, const std::vector<int>& fileTagIds);
-
-	/**
-	 * @param keyStart the classes to look for ie. the classes we want to see if they use traits
-	 * @param fileTagIds the file IDs to search in. can be empty. if empty, matches from all files will be returned.
-	 * @return all of the traits that any of the given classes use.
-	 */
-	std::vector<mvceditor::TraitTagClass> UsedTraits(const std::vector<std::string>& keyStarts, const std::vector<int>& fileTagIds);
-
 };
 
 }

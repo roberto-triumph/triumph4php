@@ -26,7 +26,7 @@
 #include <search/TagFinderClass.h>
 
 std::vector<UnicodeString> mvceditor::TagFinderListClassParents(UnicodeString className, UnicodeString methodName, 
-												 const std::vector<mvceditor::TagFinderClass*>& allTagFinders) {
+												 const std::vector<mvceditor::ParsedTagFinderClass*>& allTagFinders) {
 	std::vector<UnicodeString> parents;
 	bool found = false;
 	UnicodeString classToLookup = className;
@@ -53,7 +53,7 @@ std::vector<UnicodeString> mvceditor::TagFinderListClassParents(UnicodeString cl
 std::vector<UnicodeString> mvceditor::TagFinderListClassUsedTraits(const UnicodeString& className, 
 												  const std::vector<UnicodeString>& parentClassNames, 
 												  const UnicodeString& methodName, 
-												  const std::vector<mvceditor::TagFinderClass*>& allTagFinders) {
+												  const std::vector<mvceditor::ParsedTagFinderClass*>& allTagFinders) {
 
 	// trait support; a class can use multiple traits; hence the different logic 
 	std::vector<UnicodeString> classesToLookup;

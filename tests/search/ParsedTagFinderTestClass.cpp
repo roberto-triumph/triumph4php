@@ -143,9 +143,12 @@ public:
 		TagParser.BuildResourceCacheForFile(TestFile, source, true);
 	}
 
-	void NearMatchTags(const UnicodeString& search, bool doCollectFileNames = false) {
+	void NearMatchTags(const UnicodeString& search) {
 		mvceditor::TagSearchClass tagSearch(search);
-		Matches = ParsedTagFinder.NearMatchTags(tagSearch, doCollectFileNames);
+		mvceditor::TagResultClass* result = tagSearch.CreateNearMatchResults();
+		ParsedTagFinder.Exec(result);
+		Matches = result->Matches();
+		delete result;
 	}
 
 	void NearMatchClassesOrFiles(const UnicodeString& search) {
@@ -894,7 +897,11 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldCollectTagsFromSpe
 	modelDir.AppendDir(wxT("model"));
 	dirs.push_back(modelDir);
 	search.SetSourceDirs(dirs);
-	Matches = ParsedTagFinder.NearMatchTags(search, true);
+
+	mvceditor::TagResultClass* result = search.CreateNearMatchResults();
+	ParsedTagFinder.Exec(result);
+	Matches = result->Matches();
+	delete result;
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("UserClass", Matches[0].Identifier);
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].FullPath);
@@ -1133,8 +1140,11 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactTagsShouldFindClassWhenFileHasBe
 
 	// make sure that file lookups work as well
 	mvceditor::TagSearchClass tagFileSearch(UNICODE_STRING_SIMPLE("test.php"));
-	Matches = ParsedTagFinder.NearMatchTags(tagFileSearch);
-	CHECK_VECTOR_SIZE(1, Matches);
+	mvceditor::FileTagResultClass* fileResult = tagFileSearch.CreateNearMatchFileResults();
+	ParsedTagFinder.Exec(fileResult);
+	FileMatches = fileResult->Matches();
+	CHECK_VECTOR_SIZE(1, FileMatches);
+	delete fileResult;
 }
 
 TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactTagsShouldFindClassWhenFileHasBeenDeleted) {
