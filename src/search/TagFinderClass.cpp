@@ -1447,16 +1447,6 @@ UnicodeString mvceditor::TagFinderClass::ExtractParentClassFromSignature(const U
 	return parentClassName;
 }
 
-bool mvceditor::TagFinderClass::ExactTags(mvceditor::TagResultClass* results) {
-
-	// at one point there was a check here to see if the  tag files existed
-	// it was removed because it caused performance issues, since this method
-	// is called while the user is typing text.
-	// take care when coding; make sure that any code called by this method does not touch the file system
-	results->Prepare(*Session, true);
-	return !results->Empty();
-}
-
 std::vector<mvceditor::TagClass> mvceditor::TagFinderClass::ExactClassOrFile(const mvceditor::TagSearchClass& tagSearch) {
 
 	// at one point there was a check here to see if the  tag files existed

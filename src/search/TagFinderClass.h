@@ -100,7 +100,39 @@ public:
 	void SetSourceDirs(const std::vector<wxFileName>& sourceDirs);
 
 	/**
-	 * Create a query that will match exact matches of the given input.
+	 * Looks for the tag, using exact, case insensitive matching. Will collect the fully qualified tag name 
+	 * itself.
+	 * For example for the following class:
+	 * 
+	 *  class UserClass {
+	 *   private $name;
+	 *  
+	 *  function getName() {
+	 *   // ...
+	 *  } 
+	 * }
+	 * 
+	 * ONLY the following tag queries will result in a match:
+	 * 
+	 * UserClass
+	 * UserClass::name
+	 * UserClass::getName
+	 *
+	 * This method can tolerant of class hierarchy; meaning that any inherited
+	 * if a property name will match then the parent classes are searched. For example; the following code
+	 *
+	 *   class AdminClass extends UserClass {
+	 *   }
+	 * 
+	 * then the folowing tag queries will result in a match
+	 *
+	 * AdminClass
+	 * AdminClass::name
+	 * AdminClass::getName
+	 *
+	 * But this depends on the TagSearch::setParentClassNames() be used.
+	 * To search the hierarchy, the ParentClassName() and GetResourceTraits() methods can be useful
+	 * 
 	 *
 	 * @return TagResultClass to iterate through the results of the query. The
 	 *          returned pointer must be deleted by the caller.
@@ -449,46 +481,6 @@ protected:
 	virtual std::vector<mvceditor::TagClass> FindByIdentifierStartAndTypes(const std::string& identifierStart, const std::vector<int>& types, const std::vector<int>& fileTagIds, bool doLimit) = 0;
 
 public:
-		
-	/**
-	 * Looks for the tag, using exact, case insensitive matching. Will collect the fully qualified tag name 
-	 * itself.
-	 * For example for the following class:
-	 * 
-	 *  class UserClass {
-	 *   private $name;
-	 *  
-	 *  function getName() {
-	 *   // ...
-	 *  } 
-	 * }
-	 * 
-	 * ONLY the following tag queries will result in a match:
-	 * 
-	 * UserClass
-	 * UserClass::name
-	 * UserClass::getName
-	 *
-	 * This method can tolerant of class hierarchy; meaning that any inherited
-	 * if a property name will match then the parent classes are searched. For example; the following code
-	 *
-	 *   class AdminClass extends UserClass {
-	 *   }
-	 * 
-	 * then the folowing tag queries will result in a match
-	 *
-	 * AdminClass
-	 * AdminClass::name
-	 * AdminClass::getName
-	 *
-	 * But this depends on the TagSearch::setParentClassNames() be used.
-	 * To search the hierarchy, the ParentClassName() and GetResourceTraits() methods can be useful
-	 * 
-	 * @param result the result to be prepared and executed.  The caller can then iterate through the result
-	 *        to find the matches.
-	 * @return bool TRUE if there are matches
-	 */
-	bool ExactTags(mvceditor::TagResultClass* result);
 	
 	/**
 	 * Looks for the tag, using a near-match logic. Logic is as follows:

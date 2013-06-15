@@ -277,7 +277,7 @@ mvceditor::TagResultClass* mvceditor::TagCacheClass::ExactTags(const UnicodeStri
 	for (size_t i = 0; i < finders.size(); ++i) {
 		mvceditor::TagFinderClass* tagFinder = finders[i];
 		result = tagSearch.CreateExactResults();
-		tagFinder->ExactTags(result);
+		tagFinder->Exec(result);
 		
 		// TODO: not correct we need to query all finder
 		if (!result->Empty()) {

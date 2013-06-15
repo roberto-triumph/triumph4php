@@ -84,7 +84,7 @@ public:
 	void ExactMatchTags(const UnicodeString& search) {
 		mvceditor::TagSearchClass tagSearch(search);
 		mvceditor::TagResultClass* result = tagSearch.CreateExactResults();
-		ParsedTagFinder.ExactTags(result);
+		ParsedTagFinder.Exec(result);
 		Matches.clear();
 		while (result->More()) {
 			result->Next();
@@ -140,7 +140,7 @@ public:
 	void ExactMatchTags(const mvceditor::TagSearchClass& tagSearch) {
 		mvceditor::TagResultClass* result = tagSearch.CreateExactResults();
 		Matches.clear();
-		ParsedTagFinder.ExactTags(result);
+		ParsedTagFinder.Exec(result);
 		while (result->More()) {
 			result->Next();
 			Matches.push_back(result->Tag);
@@ -1312,7 +1312,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactTagsShouldCollectTagsFromSpecifi
 	search.SetSourceDirs(dirs);
 
 	mvceditor::TagResultClass* tagResult = search.CreateExactResults();
-	ParsedTagFinder.ExactTags(tagResult);
+	ParsedTagFinder.Exec(tagResult);
 	Matches = tagResult->Matches();
 
 	CHECK_VECTOR_SIZE(1, Matches);

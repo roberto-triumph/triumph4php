@@ -96,7 +96,7 @@ TEST_FIXTURE(ProjectTagActionTestClass, InitProject) {
 
 	mvceditor::TagSearchClass search(UNICODE_STRING_SIMPLE("User"));
 	mvceditor::TagResultClass* results = search.CreateExactResults();
-	CHECK(Finder.ExactTags(results));
+	CHECK(Finder.Exec(results));
 	results->Next();
 	CHECK_UNISTR_EQUALS("User", results->Tag.ClassName);
 	delete results;
@@ -124,7 +124,7 @@ TEST_FIXTURE(ProjectTagActionTestClass, InitMultipleProjects) {
 
 	mvceditor::TagSearchClass searchFirst(UNICODE_STRING_SIMPLE("User"));
 	mvceditor::TagResultClass* results = searchFirst.CreateExactResults();
-	CHECK(Finder.ExactTags(results));
+	CHECK(Finder.Exec(results));
 	results->Next();
 	CHECK_UNISTR_EQUALS("User", results->Tag.ClassName);
 	delete results;
@@ -132,7 +132,7 @@ TEST_FIXTURE(ProjectTagActionTestClass, InitMultipleProjects) {
 	mvceditor::TagSearchClass searchSecond(UNICODE_STRING_SIMPLE("Role"));
 	
 	results = searchSecond.CreateExactResults();
-	CHECK(Finder.ExactTags(results));
+	CHECK(Finder.Exec(results));
 	results->Next();
 	CHECK_UNISTR_EQUALS("Role", results->Tag.ClassName);
 	delete results;

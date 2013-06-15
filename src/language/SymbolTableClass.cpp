@@ -155,7 +155,7 @@ static UnicodeString ResolveResourceType(UnicodeString resourceToLookup,
 	for (size_t j = 0; j < allTagFinders.size(); ++j) {
 		mvceditor::TagFinderClass* finder = allTagFinders[j];
 		mvceditor::TagResultClass* result = tagSearch.CreateExactResults();
-		finder->ExactTags(result);
+		finder->Exec(result);
 		while (result->More()) {
 			result->Next();
 
@@ -641,7 +641,7 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 
 					// TODO: remove vector matches
 					mvceditor::TagResultClass* result = tagSearch.CreateExactResults();
-					finder->ExactTags(result);
+					finder->Exec(result);
 					matches = result->Matches();
 					delete result;
 				}
