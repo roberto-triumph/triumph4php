@@ -27,13 +27,16 @@
 
 #include <pelet/ParserClass.h>
 #include <pelet/ParserTypeClass.h>
-#include <search/TagFinderClass.h>
+#include <globals/TagClass.h>
 #include <globals/String.h>
 #include <unicode/unistr.h>
 #include <map>
 #include <vector>
 
 namespace mvceditor {
+
+// forward declaration
+class TagFinderListClass;
 
 /**
  * A small class that will tell the outside world why the symbol table failed
@@ -319,7 +322,7 @@ public:
 	 * @param parsedExpression the expression to resolve. This is usually the result of the ParserClass::ParserExpression
 	 * @param expressionScope the scope where parsed expression is located.  The scope let's us know which variables are
 	 *        available. See ScopeFinderClass for more info.
-	 * @param allResourceFinders all of the tag finders to look in
+	 * @param tagFinderList all of the tag finders to look in
 	 * @param autoCompleteVariableList the results of the matches; these are the names of the variables that
 	 *        are "near matches" to the parsed expression. This will be filled only when parsedExpression is a variable. 
 	 * @param autoCompleteResourceList the results of the matches; these are the names of the items that
@@ -331,7 +334,7 @@ public:
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear() )
 	 */
 	void ExpressionCompletionMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope, 
-		const std::vector<mvceditor::ParsedTagFinderClass*>& allTagFinders,
+		mvceditor::TagFinderListClass& tagFinderList,
 		std::vector<UnicodeString>& autoCompleteVariableList,
 		std::vector<TagClass>& autoCompleteResourceList,
 		bool doDuckTyping,
@@ -354,7 +357,7 @@ public:
 	 * @param parsedExpression the expression to resolve. This is usually the result of the ParserClass::ParserExpression
 	 * @param expressionScope the scope where parsed expression is located.  The scope let's us know which variables are
 	 *        available. See ScopeFinderClass for more info.
-	 * @param allTagFinders the tag finders to look in
+	 * @param tagFinderList the tag finders to look in
 	 * @param resourceMatches the tag matches; these are the names of the items that
 	 *        are "near matches" to the parsed expression.
 	 * @param doDuckTyping if an expression chain could not be fully resolved; then we could still
@@ -365,7 +368,7 @@ public:
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
 	void ResourceMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope, 
-		const std::vector<mvceditor::ParsedTagFinderClass*>& allTagFinders,
+		mvceditor::TagFinderListClass& tagFinderList,
 		std::vector<TagClass>& resourceMatches,
 		bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 		SymbolTableMatchErrorClass& error) const;

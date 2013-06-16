@@ -266,9 +266,8 @@ void mvceditor::TagCacheClass::ExpressionCompletionMatches(const wxString& fileN
 	bool foundSymbolTable = false;
 	if (itWorkingCache != WorkingCaches.end()) {
 		foundSymbolTable = true;
-		std::vector<mvceditor::ParsedTagFinderClass*> allFinders = AllFinders();
 		mvceditor::WorkingCacheClass* cache = itWorkingCache->second;
-		cache->SymbolTable.ExpressionCompletionMatches(parsedExpression, expressionScope, allFinders, 
+		cache->SymbolTable.ExpressionCompletionMatches(parsedExpression, expressionScope, *TagFinderList, 
 			autoCompleteList, resourceMatches, doDuckTyping, error);
 	
 	}
@@ -286,9 +285,8 @@ void mvceditor::TagCacheClass::ResourceMatches(const wxString& fileName, const p
 	bool foundSymbolTable = false;
 	if (itWorkingCache != WorkingCaches.end()) {
 		foundSymbolTable = true;
-		std::vector<mvceditor::ParsedTagFinderClass*> allFinders = AllFinders();
 		mvceditor::WorkingCacheClass* cache = itWorkingCache->second;
-		cache->SymbolTable.ResourceMatches(parsedExpression, expressionScope, allFinders, 
+		cache->SymbolTable.ResourceMatches(parsedExpression, expressionScope, *TagFinderList, 
 			matches, doDuckTyping, doFullyQualifiedMatchOnly, error);	
 	}
 	if (!foundSymbolTable) {
@@ -354,27 +352,16 @@ void mvceditor::TagCacheClass::Clear() {
 }
 
 std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllMemberTags(const UnicodeString& fullyQualifiedClassName) {
-	std::vector<mvceditor::ParsedTagFinderClass*> allTagFinders = AllFinders();
 
 	// add the double colon so that we search for all members
 	mvceditor::TagSearchClass tagSearch(fullyQualifiedClassName + UNICODE_STRING_SIMPLE("::"));
-	tagSearch.SetParentClasses(mvceditor::TagFinderListClassParents(fullyQualifiedClassName, tagSearch.GetMethodName(), allTagFinders));
-	tagSearch.SetTraits(mvceditor::TagFinderListClassUsedTraits(fullyQualifiedClassName, tagSearch.GetParentClasses(), 
-		tagSearch.GetMethodName(), allTagFinders));
+	tagSearch.SetParentClasses(TagFinderList->ClassParents(fullyQualifiedClassName, tagSearch.GetMethodName()));
+	tagSearch.SetTraits(TagFinderList->ClassUsedTraits(fullyQualifiedClassName, tagSearch.GetParentClasses(), 
+		tagSearch.GetMethodName()));
 
 	std::vector<mvceditor::TagClass> allMatches;
-	if (allMatches.empty()) {	
-		for (size_t j = 0; j < allTagFinders.size(); ++j) {
-			mvceditor::ParsedTagFinderClass* tagFinder = allTagFinders[j];
-			mvceditor::TagResultClass* result = tagSearch.CreateNearMatchResults();
-			
-			tagFinder->Exec(result);
-			std::vector<mvceditor::TagClass> finderMatches = result->Matches();
-			allMatches.insert(allMatches.end(), finderMatches.begin(), finderMatches.end());
-
-			delete result;
-		}
-	}
+	TagFinderList->NearMatchesFromAll(tagSearch, allMatches);
+	TagFinderList->NearMatchTraitAliasesFromAll(tagSearch, allMatches);
 	return allMatches;
 }
 
@@ -396,8 +383,8 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllClassesFunctionsDe
 }
 
 std::vector<UnicodeString> mvceditor::TagCacheClass::ParentClassesAndTraits(const UnicodeString& className) {
-	std::vector<UnicodeString> classParents = mvceditor::TagFinderListClassParents(className, UNICODE_STRING_SIMPLE(""), AllFinders());
-	std::vector<UnicodeString> classTraits = mvceditor::TagFinderListClassUsedTraits(className, classParents, UNICODE_STRING_SIMPLE(""), AllFinders());
+	std::vector<UnicodeString> classParents = TagFinderList->ClassParents(className, UNICODE_STRING_SIMPLE(""));
+	std::vector<UnicodeString> classTraits = TagFinderList->ClassUsedTraits(className, classParents, UNICODE_STRING_SIMPLE(""));
 	
 	std::vector<UnicodeString> all;
 	all.insert(all.end(), classParents.begin(), classParents.end());

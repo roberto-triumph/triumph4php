@@ -35,33 +35,6 @@
 namespace mvceditor {
 
 /**
- * These are functions that work with multiple instances of TagFinderClass instances
- * at the same time. We want to query many tag finders at once because classes in one
- * source directory may use classes in another source directory; for example the 
- * base class for a particular class is located in a totally separate directory.
- */
-
-/**
- *
- * 
- * @return vector of all of the classes that are parent classes of the given
- *         class. this method will search across all tag finders
- */
-std::vector<UnicodeString> TagFinderListClassParents(UnicodeString className, UnicodeString methodName, 
-												 const std::vector<mvceditor::ParsedTagFinderClass*>& allTagFinders);
-
-
-/**
- * @return vector of all of the traits that are used by any of the given class or parent classes.
- *         This method will search across all tag finders
- */
-std::vector<UnicodeString> TagFinderListClassUsedTraits(const UnicodeString& className, 
-												  const std::vector<UnicodeString>& parentClassNames, 
-												  const UnicodeString& methodName, 
-												  const std::vector<mvceditor::ParsedTagFinderClass*>& allTagFinders);
-
-
-/**
  * A tag list contains all 3 tags db files used by MVC Editor.  All projects' tags
  * are stored in a SQLite file that persisted and then loaded when MVC Editor starts; this way
  * the user can jump to files & classes without needing to re-index the 
@@ -186,6 +159,61 @@ public:
 	 * @param version the PHP version that the parser will check against
 	 */
 	void SetVersion(pelet::Versions version);
+
+	/**
+	 *
+	 * 
+	 * @return vector of all of the classes that are parent classes of the given
+	 *         class. this method will search across all tag finders
+	 */
+	std::vector<UnicodeString> ClassParents(UnicodeString className, UnicodeString methodName);
+
+
+	/**
+	 * @return vector of all of the traits that are used by any of the given class or parent classes.
+	 *         This method will search across all tag finders
+	 */
+	std::vector<UnicodeString> ClassUsedTraits(const UnicodeString& className, 
+		const std::vector<UnicodeString>& parentClassNames, 
+		const UnicodeString& methodName);
+
+	/**
+	 * Figure out a tag's type by looking at all of the initalized finders.
+	 * @param resourceToLookup MUST BE fully qualified (class name  + method name,  or function name).  string can have the
+	 *        object operator "::" that separates the class and method name.
+	 * @return the tag's type; (for methods / functions, it's the return type of the method) could be empty string if type could 
+	 *         not be determined 
+	 */
+	UnicodeString ResolveResourceType(UnicodeString resourceToLookup);
+
+	/**
+	 * searches all tag finders for the parent class of the given class
+	 */
+	UnicodeString ParentClassName(UnicodeString className);
+
+	/**
+	 * queries all tag finders for resources that match tagSearch exactly. Any matched tags are
+	 * appended to the matches vector.
+	 */
+	void ExactMatchesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches);
+	
+	/**
+	 * queries all tag finders for resources that nearly match tagSearch (begin with). Any matched tags are
+	 * appended to the matches vector.
+	 */
+	void NearMatchesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches);
+
+	/**
+	 * queries all tag finders for trait aliases of that match the given tagSearch extactly. Any matched tag are
+	 * appended to the matches vector.
+	 */
+	void ExactTraitAliasesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches);
+
+	/**
+	 * queries all tag finders for trait aliases of that match the given tagSearch extactly. Any matched tag are
+	 * appended to the matches vector.
+	 */
+	void NearMatchTraitAliasesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches);
 
 private:
 

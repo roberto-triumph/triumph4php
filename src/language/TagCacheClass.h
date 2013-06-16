@@ -41,6 +41,8 @@ class DetectedTagNearMatchMemberResultClass;
 class DetectedTagExactMemberResultClass;
 class TagFinderListClass;
 class TagFinderClass;
+class TagResultClass;
+class ParsedTagFinderClass;
 
 /**
  * The working cache is an in-memory cache of source code that is being edited
@@ -360,7 +362,7 @@ private:
 	 * 
 	 * This clas owns the tag finder pointers, do NOT delete them
 	 */
-	std::vector<ParsedTagFinderClass*> AllFinders();
+	std::vector<mvceditor::ParsedTagFinderClass*> AllFinders();
 	
 	/**
 	 * These are the tag finders from the ALL projects and native functions; it may include stale resources

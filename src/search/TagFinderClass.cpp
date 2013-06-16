@@ -1084,6 +1084,17 @@ std::vector<UnicodeString> mvceditor::TagSearchClass::GetTraits() const {
 	return Traits;
 }
 
+std::vector<UnicodeString> mvceditor::TagSearchClass::GetClassHierarchy() const {
+	std::vector<UnicodeString> allClassNames;
+	if (!ClassName.isEmpty()) { 
+		allClassNames.push_back(ClassName);
+	}
+	allClassNames.insert(allClassNames.end(), ParentClasses.begin(), ParentClasses.end());
+	allClassNames.insert(allClassNames.end(), Traits.begin(), Traits.end());
+	return allClassNames;
+
+}
+
 void mvceditor::TagSearchClass::SetSourceDirs(const std::vector<wxFileName>& sourceDirs) {
 	SourceDirs = sourceDirs;
 }

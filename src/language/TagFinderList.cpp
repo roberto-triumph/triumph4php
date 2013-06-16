@@ -24,67 +24,8 @@
  */
 #include <language/TagFinderList.h>
 #include <search/TagFinderClass.h>
+#include <language/DetectedTagFinderResultClass.h>
 #include <soci/sqlite3/soci-sqlite3.h>
-
-std::vector<UnicodeString> mvceditor::TagFinderListClassParents(UnicodeString className, UnicodeString methodName, 
-												 const std::vector<mvceditor::ParsedTagFinderClass*>& allTagFinders) {
-	std::vector<UnicodeString> parents;
-	bool found = false;
-	UnicodeString classToLookup = className;
-	do {
-
-		// each parent class may be located in any of the finders. in practice this code is not as slow
-		// as it looks; class hierarchies are usually not very deep (1-4 parents)
-		found = false;
-		for (size_t i = 0; i < allTagFinders.size(); ++i) {
-			UnicodeString parentClass = allTagFinders[i]->ParentClassName(classToLookup);
-			if (!parentClass.isEmpty()) {
-				found = true;
-				parents.push_back(parentClass);
-				classToLookup = parentClass;
-
-				// a class can have at most 1 parent, no need to look at other finders
-				break;
-			}
-		}
-	} while (found);
-	return parents;
-}
-
-std::vector<UnicodeString> mvceditor::TagFinderListClassUsedTraits(const UnicodeString& className, 
-												  const std::vector<UnicodeString>& parentClassNames, 
-												  const UnicodeString& methodName, 
-												  const std::vector<mvceditor::ParsedTagFinderClass*>& allTagFinders) {
-
-	// trait support; a class can use multiple traits; hence the different logic 
-	std::vector<UnicodeString> classesToLookup;
-	classesToLookup.push_back(className);
-	classesToLookup.insert(classesToLookup.end(), parentClassNames.begin(), parentClassNames.end());
-	std::vector<UnicodeString> usedTraits;
-
-	// TODO propagate from enabled projects
-	std::vector<wxFileName> emptyVector;
-	bool found = false;
-	do {
-		found = false;
-		std::vector<UnicodeString> nextTraitsToLookup;
-		for (std::vector<UnicodeString>::iterator it = classesToLookup.begin(); it != classesToLookup.end(); ++it) {
-			for (size_t i = 0; i < allTagFinders.size(); ++i) {
-				std::vector<UnicodeString> traits = allTagFinders[i]->GetResourceTraits(*it, methodName, emptyVector);
-				if (!traits.empty()) {
-					found = true;
-					nextTraitsToLookup.insert(nextTraitsToLookup.end(), traits.begin(), traits.end());
-					usedTraits.insert(usedTraits.end(), traits.begin(), traits.end());
-				}
-			}
-		}
-
-		// next, look for traits used by the traits themselves
-		classesToLookup = nextTraitsToLookup;
-	} while (found);
-
-	return usedTraits;
-}
 
 mvceditor::TagFinderListClass::TagFinderListClass()
 	: TagParser() 
@@ -207,4 +148,236 @@ bool mvceditor::TagFinderListClass::Open(soci::session* session, const wxString&
 
 void mvceditor::TagFinderListClass::Walk(mvceditor::DirectorySearchClass& search) {
 	search.Walk(TagParser);
+}
+
+
+std::vector<UnicodeString> mvceditor::TagFinderListClass::ClassParents(UnicodeString className, UnicodeString methodName) {
+	std::vector<UnicodeString> parents;
+	bool found = false;
+	UnicodeString classToLookup = className;
+	do {
+
+		// each parent class may be located in any of the finders. in practice this code is not as slow
+		// as it looks; class hierarchies are usually not very deep (1-4 parents)
+		found = false;		
+		UnicodeString parentClass;
+		if (IsTagFinderInit) {
+			parentClass = TagFinder.ParentClassName(classToLookup);
+			if (!parentClass.isEmpty()) {
+				found = true;
+				parents.push_back(parentClass);
+				classToLookup = parentClass;
+			}
+		}
+		if (IsNativeTagFinderInit) {
+			parentClass = NativeTagFinder.ParentClassName(classToLookup);
+			if (!parentClass.isEmpty()) {
+				found = true;
+				parents.push_back(parentClass);
+				classToLookup = parentClass;
+			}
+		}
+	} while (found);
+	return parents;
+}
+
+std::vector<UnicodeString> mvceditor::TagFinderListClass::ClassUsedTraits(const UnicodeString& className, 
+												  const std::vector<UnicodeString>& parentClassNames, 
+												  const UnicodeString& methodName) {
+
+	// trait support; a class can use multiple traits; hence the different logic 
+	std::vector<UnicodeString> classesToLookup;
+	classesToLookup.push_back(className);
+	classesToLookup.insert(classesToLookup.end(), parentClassNames.begin(), parentClassNames.end());
+	std::vector<UnicodeString> usedTraits;
+
+	// TODO propagate from enabled projects
+	std::vector<wxFileName> emptyVector;
+	bool found = false;
+	do {
+		found = false;
+		std::vector<UnicodeString> nextTraitsToLookup;
+		for (std::vector<UnicodeString>::iterator it = classesToLookup.begin(); it != classesToLookup.end(); ++it) {
+			UnicodeString parentClass;
+			if (IsTagFinderInit) {
+				std::vector<UnicodeString> traits = TagFinder.GetResourceTraits(*it, methodName, emptyVector);
+				if (!traits.empty()) {
+					found = true;
+					nextTraitsToLookup.insert(nextTraitsToLookup.end(), traits.begin(), traits.end());
+					usedTraits.insert(usedTraits.end(), traits.begin(), traits.end());
+				}
+			}
+			if (IsNativeTagFinderInit) {
+				std::vector<UnicodeString> traits = NativeTagFinder.GetResourceTraits(*it, methodName, emptyVector);
+				if (!traits.empty()) {
+					found = true;
+					nextTraitsToLookup.insert(nextTraitsToLookup.end(), traits.begin(), traits.end());
+					usedTraits.insert(usedTraits.end(), traits.begin(), traits.end());
+				}
+			}
+		}
+
+		// next, look for traits used by the traits themselves
+		classesToLookup = nextTraitsToLookup;
+	} while (found);
+
+	return usedTraits;
+}
+
+
+UnicodeString mvceditor::TagFinderListClass::ResolveResourceType(UnicodeString resourceToLookup) {
+	UnicodeString type;
+	mvceditor::TagSearchClass tagSearch(resourceToLookup);
+	tagSearch.SetParentClasses(ClassParents(tagSearch.GetClassName(), tagSearch.GetMethodName()));
+	tagSearch.SetTraits(ClassUsedTraits(tagSearch.GetClassName(), tagSearch.GetParentClasses(), tagSearch.GetMethodName()));
+	
+	if (IsDetectedTagFinderInit && !tagSearch.GetClassName().isEmpty()) {
+		mvceditor::DetectedTagExactMemberResultClass detectedResult;
+		std::vector<UnicodeString> classNames = tagSearch.GetClassHierarchy();
+		detectedResult.Set(classNames, tagSearch.GetMethodName());
+		if (DetectedTagFinder.Exec(&detectedResult)) {
+			detectedResult.Next();
+			type = detectedResult.Tag.ReturnType;
+		}
+	}
+	if (type.isEmpty() && IsTagFinderInit) {
+		mvceditor::TagResultClass* tagResults = tagSearch.CreateExactResults();
+		if (TagFinder.Exec(tagResults)) {
+
+			// since we are doing fully qualified matches, all matches are from the inheritance chain; ie. all methods
+			// should have the same signature (return type)
+			tagResults->Next();
+
+			// if the given string was a class name, return the class name
+			// if the given string was a method, return the method's return type
+			type =  mvceditor::TagClass::CLASS == tagResults->Tag.Type ? tagResults->Tag.ClassName : tagResults->Tag.ReturnType;
+		}
+		delete tagResults;
+
+	}
+	if (type.isEmpty() && IsNativeTagFinderInit) {
+		mvceditor::TagResultClass* tagResults = tagSearch.CreateExactResults();
+		if (NativeTagFinder.Exec(tagResults)) {
+			tagResults->Next();
+			type =  mvceditor::TagClass::CLASS == tagResults->Tag.Type ? tagResults->Tag.ClassName : tagResults->Tag.ReturnType;
+		}
+		delete tagResults;
+
+	}
+	return type;
+}
+
+UnicodeString mvceditor::TagFinderListClass::ParentClassName(UnicodeString className) {
+	UnicodeString parent;
+	if (IsTagFinderInit) {
+		parent = TagFinder.ParentClassName(className);
+	}
+	if (parent.isEmpty() && IsNativeTagFinderInit) {
+		parent = NativeTagFinder.ParentClassName(className);
+	}
+	return parent;
+}
+
+void mvceditor::TagFinderListClass::ExactMatchesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches) {
+	mvceditor::TagResultClass* result = tagSearch.CreateExactResults();
+	if (IsTagFinderInit && TagFinder.Exec(result)) {
+		while (result->More()) {
+			result->Next();
+			matches.push_back(result->Tag);
+		}
+	}
+	delete result;
+	result = tagSearch.CreateExactResults();
+	if (IsNativeTagFinderInit && NativeTagFinder.Exec(result)) {
+		while (result->More()) {
+			result->Next();
+			matches.push_back(result->Tag);
+		}
+	}
+	delete result;
+
+	if (IsDetectedTagFinderInit && !tagSearch.GetClassName().isEmpty()) {
+		mvceditor::DetectedTagExactMemberResultClass detectedResult;
+		detectedResult.Set(tagSearch.GetClassHierarchy(), tagSearch.GetMethodName());
+		if (DetectedTagFinder.Exec(&detectedResult)) {
+			while (detectedResult.More()) {
+				detectedResult.Next();
+				matches.push_back(detectedResult.Tag);
+			}
+		}
+	}
+}
+
+void mvceditor::TagFinderListClass::NearMatchesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches) {
+	mvceditor::TagResultClass* result = tagSearch.CreateNearMatchResults();
+	if (IsTagFinderInit && TagFinder.Exec(result)) {
+		while (result->More()) {
+			result->Next();
+			matches.push_back(result->Tag);
+		}
+	}
+	delete result;
+	result = tagSearch.CreateNearMatchResults();
+	if (IsNativeTagFinderInit && NativeTagFinder.Exec(result)) {
+		while (result->More()) {
+			result->Next();
+			matches.push_back(result->Tag);
+		}
+	}
+	delete result;
+
+	if (IsDetectedTagFinderInit && !tagSearch.GetClassName().isEmpty()) {
+		mvceditor::DetectedTagNearMatchMemberResultClass detectedResult;
+		detectedResult.Set(tagSearch.GetClassHierarchy(), tagSearch.GetMethodName());
+		if (DetectedTagFinder.Exec(&detectedResult)) {
+			while (detectedResult.More()) {
+				detectedResult.Next();
+				matches.push_back(detectedResult.Tag);
+			}
+		}
+	}
+}
+
+void mvceditor::TagFinderListClass::ExactTraitAliasesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches) {
+	if (tagSearch.GetClassName().isEmpty()) {
+
+		// no class = impossible to have traits
+		return;
+	}
+	mvceditor::TraitTagResultClass traitResult;
+	traitResult.Set(tagSearch.GetClassHierarchy(), tagSearch.GetMethodName(), true, tagSearch.GetSourceDirs());
+	if (IsTagFinderInit && TagFinder.Exec(&traitResult)) {
+		std::vector<mvceditor::TagClass> traitAliases = traitResult.MatchesAsTags();
+		for (size_t i = 0; i < traitAliases.size(); ++i) {
+			matches.push_back(traitAliases[i]);
+		}
+	}
+	if (IsNativeTagFinderInit && NativeTagFinder.Exec(&traitResult)) {
+		std::vector<mvceditor::TagClass> traitAliases = traitResult.MatchesAsTags();
+		for (size_t i = 0; i < traitAliases.size(); ++i) {
+			matches.push_back(traitAliases[i]);
+		}
+	}
+}
+
+void mvceditor::TagFinderListClass::NearMatchTraitAliasesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches) {
+	if (tagSearch.GetClassName().isEmpty()) {
+
+		// no class = impossible to have traits
+		return;
+	}
+	mvceditor::TraitTagResultClass traitResult;
+	traitResult.Set(tagSearch.GetClassHierarchy(), tagSearch.GetMethodName(), false, tagSearch.GetSourceDirs());
+	if (IsTagFinderInit && TagFinder.Exec(&traitResult)) {
+		std::vector<mvceditor::TagClass> traitAliases = traitResult.MatchesAsTags();
+		for (size_t i = 0; i < traitAliases.size(); ++i) {
+			matches.push_back(traitAliases[i]);
+		}
+	}
+	if (IsNativeTagFinderInit && NativeTagFinder.Exec(&traitResult)) {
+		std::vector<mvceditor::TagClass> traitAliases = traitResult.MatchesAsTags();
+		for (size_t i = 0; i < traitAliases.size(); ++i) {
+			matches.push_back(traitAliases[i]);
+		}
+	}
 }

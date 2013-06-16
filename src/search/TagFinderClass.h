@@ -92,6 +92,11 @@ public:
 	void SetTraits(const std::vector<UnicodeString>& traits);
 
 	/**
+	 * @return the class name plus all ParentClasses that were set plus all Traits that were set
+	 */
+	std::vector<UnicodeString> GetClassHierarchy() const;
+
+	/**
 	 * get the directories to search in. this list is used to restrict the
 	 * matching to tags to tags from certain directories. this is the list of sourceDirs given to
 	 * SetSourceDirs() method.  this is usually the directories for the enabled projects.
