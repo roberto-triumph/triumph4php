@@ -24,6 +24,7 @@
  */
 #include <code_control/DocumentClass.h>
 #include <code_control/CodeControlClass.h>
+#include <search/TagFinderClass.h>
 #include <globals/String.h>
 #include <globals/Assets.h>
 #include <globals/TemplateFileTagClass.h>
