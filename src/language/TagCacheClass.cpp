@@ -200,6 +200,14 @@ mvceditor::TagResultClass* mvceditor::TagCacheClass::NearMatchNativeTags(const U
 	return result;
 }
 
+mvceditor::FileTagResultClass* mvceditor::TagCacheClass::NearMatchFileTags(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs) {
+	mvceditor::TagSearchClass tagSearch(search);
+	tagSearch.SetSourceDirs(sourceDirs);
+
+	mvceditor::FileTagResultClass* result = tagSearch.CreateNearMatchFileResults();
+	TagFinderList->TagFinder.Exec(result);
+	return result;
+}
 
 std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::ExactClassOrFile(const UnicodeString& search) {
 	std::vector<mvceditor::TagClass> matches;

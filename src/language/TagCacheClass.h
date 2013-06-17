@@ -42,6 +42,7 @@ class DetectedTagExactMemberResultClass;
 class TagFinderListClass;
 class TagFinderClass;
 class TagResultClass;
+class FileTagResultClass;
 class ParsedTagFinderClass;
 
 /**
@@ -242,6 +243,16 @@ public:
 	 *          returned pointer must be deleted by the caller.
 	 */
 	mvceditor::TagResultClass* NearMatchNativeTags(const UnicodeString& search);
+
+	/**
+	 * Searches the tag cache for filenames using near-match logic
+	 *
+	 * @param string part of filename to search for
+	 * @param sourceDirs source directories to restrict matching tags in. If empty, then the entire cache will be searched.
+	 * @return FiileTagResultClass to iterate through the results of the query. The
+	 *          returned pointer must be deleted by the caller.
+	 */
+	mvceditor::FileTagResultClass* NearMatchFileTags(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs);
 
 	/**
 	 * Searches all the registered caches (working AND global caches)

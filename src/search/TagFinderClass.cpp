@@ -1149,9 +1149,14 @@ mvceditor::TagResultClass* mvceditor::TagSearchClass::CreateExactResults() const
 		nonMemberResults->Set(key, GetSourceDirs());
 		results = nonMemberResults;
 	}
-	else {
+	else if (!ClassName.isEmpty()) {
 		mvceditor::ExactNonMemberTagResultClass* nonMemberResults = new mvceditor::ExactNonMemberTagResultClass();
 		nonMemberResults->Set(GetClassName(), GetSourceDirs());
+		results = nonMemberResults;
+	}
+	else {
+		mvceditor::ExactNonMemberTagResultClass* nonMemberResults = new mvceditor::ExactNonMemberTagResultClass();
+		nonMemberResults->Set(GetFileName(), GetSourceDirs());
 		results = nonMemberResults;
 	}
 	return results;
@@ -1193,7 +1198,7 @@ mvceditor::TagResultClass* mvceditor::TagSearchClass::CreateNearMatchResults() c
 		nearMatchNonMemberNamespaced->AddTagType(mvceditor::TagClass::NAMESPACE);
 		results = nearMatchNonMemberNamespaced;
 	} 
-	else {
+	else if (!ClassName.isEmpty()) {
 		UnicodeString key;
 		// if query does not have a namespace then get the non-namespaced tags
 		if (GetNamespaceName().isEmpty()) {
@@ -1202,6 +1207,12 @@ mvceditor::TagResultClass* mvceditor::TagSearchClass::CreateNearMatchResults() c
 		else {
 			key = QualifyName(GetNamespaceName(), GetClassName());
 		}
+		mvceditor::NearMatchNonMemberTagResultClass* nearMatchNonMembers = new mvceditor::NearMatchNonMemberTagResultClass();
+		nearMatchNonMembers->Set(key, GetSourceDirs());
+		results = nearMatchNonMembers;
+	}
+	else {
+		UnicodeString key = GetFileName();
 		mvceditor::NearMatchNonMemberTagResultClass* nearMatchNonMembers = new mvceditor::NearMatchNonMemberTagResultClass();
 		nearMatchNonMembers->Set(key, GetSourceDirs());
 		results = nearMatchNonMembers;

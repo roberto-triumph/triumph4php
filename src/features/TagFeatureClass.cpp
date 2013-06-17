@@ -133,7 +133,7 @@ void mvceditor::TagFeatureClass::OnJump(wxCommandEvent& event) {
 				}
 				else {
 					std::vector<mvceditor::TagClass> chosenResources;
-					mvceditor::TagSearchDialogClass dialog(GetMainWindow(), *this, term, chosenResources);
+					mvceditor::TagSearchDialogClass dialog(GetMainWindow(), App.Globals, CacheStatus(), term, chosenResources);
 					dialog.Prepopulate(term, matches);
 					if (dialog.ShowModal() == wxOK) {
 						for (size_t i = 0; i < chosenResources.size(); ++i) {
@@ -149,7 +149,7 @@ void mvceditor::TagFeatureClass::OnJump(wxCommandEvent& event) {
 void mvceditor::TagFeatureClass::OnSearchForResource(wxCommandEvent& event) {
 	std::vector<mvceditor::TagClass> chosenResources;
 	wxString term;
-	mvceditor::TagSearchDialogClass dialog(GetMainWindow(), *this, term, chosenResources);
+	mvceditor::TagSearchDialogClass dialog(GetMainWindow(), App.Globals, CacheStatus(), term, chosenResources);
 	if (dialog.ShowModal() == wxOK) {
 		for (size_t i = 0; i < chosenResources.size(); ++i) {
 			LoadPageFromResource(term, chosenResources[i]);
@@ -303,53 +303,54 @@ void mvceditor::TagFeatureClass::OnAppFileOpened(wxCommandEvent& event) {
 }
 
 mvceditor::TagSearchDialogClass::TagSearchDialogClass(wxWindow* parent, 
-																TagFeatureClass& tag,
-																wxString& term,
-																std::vector<mvceditor::TagClass>& chosenResources)
+													  mvceditor::GlobalsClass& globals,
+													  wxString cacheStatus,
+													  wxString& term,
+													  std::vector<mvceditor::TagClass>& chosenResources)
 	: TagSearchDialogGeneratedClass(parent)
-	, ResourceFeature(tag)
+	, RunningThreads()
+	, Globals(globals)
 	, ChosenResources(chosenResources) 
 	, MatchedResources() 
 	, Timer(this, ID_SEARCH_TIMER)
-	, LastInput(term)
-	, ActionId() {
+	, LastInput(term) {
 	wxGenericValidator termValidator(&term);
 	TransferDataToWindow();
-	CacheStatusLabel->SetLabel(wxT("Cache Status: ") + tag.CacheStatus());
+	CacheStatusLabel->SetLabel(wxT("Cache Status: ") + cacheStatus);
 	SearchText->SetFocus();
 
 	ProjectChoice->Append(_("All Enabled Projects"), (void*)NULL);
-	for (size_t i = 0; i < tag.App.Globals.Projects.size(); ++i) {
-		if (tag.App.Globals.Projects[i].IsEnabled) {
+	for (size_t i = 0; i < Globals.Projects.size(); ++i) {
+		if (Globals.Projects[i].IsEnabled) {
 
 			// should be ok to reference this vector since it wont change because this is a 
 			// modal dialog
-			ProjectChoice->Append(tag.App.Globals.Projects[i].Label, &tag.App.Globals.Projects[i]);
+			ProjectChoice->Append(Globals.Projects[i].Label, &Globals.Projects[i]);
 		}
 	}
 	ProjectChoice->Select(0);
 
 	// so that the thread can give the matching tags back to us
-	ResourceFeature.App.RunningThreads.AddEventHandler(this);
+	RunningThreads.AddEventHandler(this);
+	Timer.Start(150, wxTIMER_CONTINUOUS);
 }
 
 mvceditor::TagSearchDialogClass::~TagSearchDialogClass() {
-	ResourceFeature.App.RunningThreads.RemoveEventHandler(this);
+	RunningThreads.RemoveEventHandler(this);
+	RunningThreads.StopAll();
 }
 
 void mvceditor::TagSearchDialogClass::OnSearchText(wxCommandEvent& event) {
-	if (Timer.IsRunning()) {
-		if (0 != ActionId) {
-			ResourceFeature.App.RunningThreads.CancelAction(ActionId);
-		}
-		ActionId = 0;
-		return;
-	}
-	Timer.Start(300, wxTIMER_ONE_SHOT);
+	// nothing will be done while the user is entering text
 }
 
 void mvceditor::TagSearchDialogClass::OnTimerComplete(wxTimerEvent& event) {
 	wxString text = SearchText->GetValue();
+	if (text == LastInput) {
+
+		// nothing to do, results are already being shown
+		return;
+	}
 	std::vector<mvceditor::ProjectClass*> projects;
 	bool showAllProjects = ProjectChoice->GetSelection() == 0;
 	if (!showAllProjects) {
@@ -423,7 +424,7 @@ void mvceditor::TagSearchDialogClass::ShowJumpToResults(const wxString& finderQu
 		wxString projectLabel;
 		wxString relativeName;
 		if (showAllProjects) {
-			relativeName = ResourceFeature.App.Globals.RelativeFileName(files[i], projectLabel);
+			relativeName = Globals.RelativeFileName(files[i], projectLabel);
 		}
 		else {
 			relativeName = selectedProject->RelativeFileName(files[i]);
@@ -457,6 +458,7 @@ void mvceditor::TagSearchDialogClass::ShowJumpToResults(const wxString& finderQu
 }
 
 void mvceditor::TagSearchDialogClass::OnOkButton(wxCommandEvent& event) {
+	RunningThreads.StopAll();
 	TransferDataFromWindow();
 	ChosenResources.clear();
 	for (size_t i = 0; i < MatchesList->GetCount(); ++i) {
@@ -471,6 +473,7 @@ void mvceditor::TagSearchDialogClass::OnOkButton(wxCommandEvent& event) {
 }
 
 void mvceditor::TagSearchDialogClass::OnCancelButton(wxCommandEvent& event) {
+	RunningThreads.StopAll();
 	EndModal(wxCANCEL);
 }
 
@@ -558,12 +561,24 @@ void mvceditor::TagSearchDialogClass::OnMatchesListKeyDown(wxKeyEvent& event) {
 }
 
 void mvceditor::TagSearchDialogClass::OnProjectChoice(wxCommandEvent& event) {
-	OnSearchText(event);
+	bool showAllProjects = event.GetSelection() == 0;
+	std::vector<mvceditor::ProjectClass*> projects;
+	if (!showAllProjects) {
+		projects.push_back((mvceditor::ProjectClass*)ProjectChoice->GetClientData(event.GetSelection()));
+	}
+	else {
+
+		// the first item in the wxChoice will not have client data; the "all" option
+		for (size_t i = 1; i < ProjectChoice->GetCount(); ++i) {
+			projects.push_back((mvceditor::ProjectClass*) ProjectChoice->GetClientData(i));
+		}
+	}
+	SearchForResources(LastInput, projects);
 }
 
 void mvceditor::TagSearchDialogClass::SearchForResources(const wxString& text, std::vector<mvceditor::ProjectClass*> projects) {
 	mvceditor::TagCacheSearchActionClass* action =  new
-		mvceditor::TagCacheSearchActionClass(ResourceFeature.App.RunningThreads, ID_EVENT_TAG_CACHE_SEARCH);
+		mvceditor::TagCacheSearchActionClass(RunningThreads, ID_EVENT_TAG_CACHE_SEARCH);
 	std::vector<wxFileName> dirs;
 	for (std::vector<mvceditor::ProjectClass*>::const_iterator p = projects.begin(); p != projects.end(); ++p) {
 		std::vector<mvceditor::SourceClass>::const_iterator src;
@@ -571,26 +586,21 @@ void mvceditor::TagSearchDialogClass::SearchForResources(const wxString& text, s
 			dirs.push_back(src->RootDirectory);
 		}
 	}
-	action->SetSearch(ResourceFeature.App.Globals, text, dirs);
-	ActionId = ResourceFeature.App.RunningThreads.Queue(action);
+	action->SetSearch(Globals, text, dirs);
+	RunningThreads.Queue(action);
 }
 
 void mvceditor::TagSearchDialogClass::OnTagCacheSearchComplete(mvceditor::TagCacheSearchCompleteEventClass &event) {
 	MatchedResources = event.Tags;
-	if (LastInput != mvceditor::IcuToWx(event.SearchString)) {
-
-		// only show results from the last query
-		return;
-	}
 	if (!MatchedResources.empty()) {
-			MatchesList->Freeze();
-			ShowJumpToResults(mvceditor::IcuToWx(event.SearchString), MatchedResources);
-			MatchesList->Thaw();
-		}
-		else {
-			MatchesList->Clear();
-			MatchesLabel->SetLabel(wxString::Format(_("No matches found for %s"), (const char*)LastInput.c_str()));
-		}
+		MatchesList->Freeze();
+		ShowJumpToResults(mvceditor::IcuToWx(event.SearchString), MatchedResources);
+		MatchesList->Thaw();
+	}
+	else {
+		MatchesList->Clear();
+		MatchesLabel->SetLabel(wxString::Format(_("No matches found for %s"), (const char*)LastInput.c_str()));
+	}
 }
 
 BEGIN_EVENT_TABLE(mvceditor::TagFeatureClass, wxEvtHandler)
