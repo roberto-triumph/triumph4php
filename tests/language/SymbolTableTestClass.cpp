@@ -114,14 +114,8 @@ public:
 		, MiscExtensions() {
 
 		GlobalSession = new soci::session(*soci::factory_sqlite3(), ":memory:");
-		/// NativeSession(*soci::factory_sqlite3(), mvceditor::WxToChar(mvceditor::NativeFunctionsAsset().GetFullPath()));
-		/// DetectedTagSession(*soci::factory_sqlite3(), ":memory:");
 		CreateDatabase(*GlobalSession, mvceditor::ResourceSqlSchemaAsset());
-		///CreateDatabase(DetectedTagSession, mvceditor::DetectorSqlSchemaAsset());
-		
 		TagFinderList.AdoptGlobalTag(GlobalSession, PhpExtensions, MiscExtensions, pelet::PHP_53);
-		///TagFinderList.AdoptNativeTag(&NativeSession);
-		///TagFinderList.AdoptDetectorTag(&DetectedTagSession);
 	}
 
 	void Init(const UnicodeString& sourceCode) {
@@ -990,7 +984,6 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, WithDuckTyping) {
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), ResourceMatches[1].Identifier);
 }
 
-
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithClassHierarchyInMultipleResourceFinders) {
 
 	/*
@@ -1017,10 +1010,59 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithClassHierarchyInMultiple
 	CHECK_VECTOR_SIZE(3, ResourceMatches);
 
 	// sorted by key (class name + method name)
-
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workBase"), ResourceMatches[0].Identifier);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workA"), ResourceMatches[1].Identifier);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), ResourceMatches[2].Identifier);
+}
+
+TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithNativeTags) {
+	NativeSession = new soci::session(*soci::factory_sqlite3(), mvceditor::WxToChar(mvceditor::NativeFunctionsAsset().GetFullPath()));
+	TagFinderList.AdoptNativeTag(NativeSession);
+	UnicodeString sourceCode = mvceditor::CharToIcu(
+		"<?php\n"
+		"$pdo = new PDO;\n"
+	);
+	TagFinderList.TagParser.BuildResourceCacheForFile(wxT("untitled 2"), sourceCode, true);
+	Init(sourceCode);
+	ToProperty(UNICODE_STRING_SIMPLE("$pdo"), UNICODE_STRING_SIMPLE("que"), false, false);
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, Scope, TagFinderList, 
+		VariableMatches, ResourceMatches, DoDuckTyping, Error);
+	CHECK_VECTOR_SIZE(1, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("query"), ResourceMatches[0].Identifier);
+}
+
+TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithDetectedTags) {
+	DetectedTagSession = new soci::session(*soci::factory_sqlite3(), ":memory:");
+	CreateDatabase(*DetectedTagSession, mvceditor::DetectorSqlSchemaAsset());
+	TagFinderList.AdoptDetectorTag(DetectedTagSession);
+	std::string key = "CI_Controller::email", 
+		className = "CI_Controller", 
+		methodName = "email", 
+		returnType = "CI_Email", 
+		namespaceName = "\\", 
+		comment = "";
+	int type = mvceditor::TagClass::METHOD;
+	std::string sql = "INSERT INTO detected_tags";
+	sql += "(key, type, class_name, method_name, return_type, namespace_name, comment) ";
+	sql += "VALUES(?, ?, ?, ?,?, ?, ?)";
+	soci::statement stmt = (DetectedTagSession->prepare << sql, soci::use(key), soci::use(type),
+		soci::use(className), soci::use(methodName), soci::use(returnType),
+		soci::use(namespaceName), soci::use(comment)
+	);
+	stmt.execute(true);
+
+	UnicodeString sourceCode = mvceditor::CharToIcu(
+		"<?php\n"
+		"class CI_Controller {}\n"
+		"$ci = new CI_Controller();\n"
+	);
+	TagFinderList.TagParser.BuildResourceCacheForFile(wxT("untitled 2"), sourceCode, true);
+	Init(sourceCode);
+	ToProperty(UNICODE_STRING_SIMPLE("$ci"), UNICODE_STRING_SIMPLE(""), false, false);
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, Scope, TagFinderList, 
+		VariableMatches, ResourceMatches, DoDuckTyping, Error);
+	CHECK_VECTOR_SIZE(1, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("email"), ResourceMatches[0].Identifier);
 }
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldFindMethodScope) {
