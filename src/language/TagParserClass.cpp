@@ -750,6 +750,7 @@ void mvceditor::TagParserClass::PersistFileTag(mvceditor::FileTagClass& fileTag)
 		return;
 	}
 	std::string fullPath = mvceditor::WxToChar(fileTag.FullPath);
+	std::string name = mvceditor::WxToChar(fileTag.Name());
 	std::tm tm;
 	int isParsed = fileTag.IsParsed ? 1 : 0;
 	int isNew = fileTag.IsNew ? 1 : 0;
@@ -769,8 +770,8 @@ void mvceditor::TagParserClass::PersistFileTag(mvceditor::FileTagClass& fileTag)
 	}
 	try {
 		soci::statement stmt = (Session->prepare <<
-			"INSERT INTO file_items (file_item_id, source_id, full_path, last_modified, is_parsed, is_new) VALUES(NULL, ?, ?, ?, ?, ?)",
-			soci::use(CurrentSourceId), soci::use(fullPath), soci::use(tm), soci::use(isParsed), soci::use(isNew)
+			"INSERT INTO file_items (file_item_id, source_id, full_path, name, last_modified, is_parsed, is_new) VALUES(NULL, ?, ?, ?, ?, ?, ?)",
+			soci::use(CurrentSourceId), soci::use(fullPath), soci::use(name), soci::use(tm), soci::use(isParsed), soci::use(isNew)
 		);
 		stmt.execute(true);
 		soci::sqlite3_statement_backend* backend = static_cast<soci::sqlite3_statement_backend*>(stmt.get_backend());
@@ -779,7 +780,8 @@ void mvceditor::TagParserClass::PersistFileTag(mvceditor::FileTagClass& fileTag)
 		
 		// ATTN: at some point bubble these exceptions up?
 		// to avoid unreferenced local variable warnings in MSVC
-		e.what();
+		wxString msg = wxString::FromAscii(e.what());
+		wxASSERT_MSG(false, msg);
 	}
 }
 

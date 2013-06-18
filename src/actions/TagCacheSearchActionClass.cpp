@@ -79,8 +79,13 @@ void mvceditor::TagCacheSearchActionClass::BackgroundWork() {
 		results = TagCache.NearMatchTags(SearchString, SearchDirs);
 		matches = results->Matches();
 		if (matches.empty()) {
-			mvceditor::FileTagResultClass* fileTagResults = TagCache.NearMatchFileTags(SearchString, SearchDirs);
+			mvceditor::FileTagResultClass* fileTagResults = TagCache.ExactFileTags(SearchString, SearchDirs);
 			matches = fileTagResults->MatchesAsTags();
+			if (matches.empty()) {
+				delete fileTagResults;
+				fileTagResults = TagCache.NearMatchFileTags(SearchString, SearchDirs);
+				matches = fileTagResults->MatchesAsTags();
+			}
 			delete fileTagResults;
 		}
 	}

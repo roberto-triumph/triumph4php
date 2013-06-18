@@ -209,3 +209,8 @@ void mvceditor::FileTagClass::MakeNew(const wxFileName& fileName, bool isParsed)
 	IsParsed = isParsed;
 	IsNew = false;
 }
+
+wxString mvceditor::FileTagClass::Name() const {
+	wxFileName fileName(FullPath);
+	return fileName.GetFullName();
+}

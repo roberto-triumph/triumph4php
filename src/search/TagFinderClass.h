@@ -184,6 +184,14 @@ public:
 	mvceditor::TagResultClass* CreateNearMatchResults() const;
 
 	/**
+	 * Create a query that will exact match on file names (name or full path)
+	 *
+	 * @return FileTagResultClass to iterate through the results of the query. The
+	 *          returned pointer must be deleted by the caller.
+	 */
+	mvceditor::FileTagResultClass* CreateExactFileResults() const;
+
+	/**
 	 * Create a query that will match near files of the given input.
 	 *
 	 * @return FileTagResultClass to iterate through the results of the query. The

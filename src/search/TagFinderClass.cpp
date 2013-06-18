@@ -707,12 +707,15 @@ bool mvceditor::FileTagResultClass::Prepare(soci::session& session, bool doLimit
 	std::string query;
 	std::string sql;
 	if (ExactMatch) {
-		escaped = "'" + escaped + "'";
-		sql += "SELECT f.full_path, file_item_id, is_new FROM file_items f LEFT JOIN sources s ON (f.source_id = s.source_id) WHERE f.full_path = " + query + " ESCAPE '^'";
+		sql += "SELECT f.full_path, file_item_id, is_new ";
+		sql += "FROM file_items f LEFT JOIN sources s ON (f.source_id = s.source_id) ";
+		sql += "WHERE f.full_path = ? OR f.name = ?";
 	}
 	else {
 		query = "'%" + escaped + "%'";
-		sql += "SELECT f.full_path, file_item_id, is_new FROM file_items f LEFT JOIN sources s ON (f.source_id = s.source_id) WHERE f.full_path LIKE " + query + " ESCAPE '^' ";
+		sql += "SELECT f.full_path, file_item_id, is_new ";
+		sql += "FROM file_items f LEFT JOIN sources s ON (f.source_id = s.source_id) ";
+		sql += "WHERE f.full_path LIKE " + query + " ESCAPE '^' ";
 	}
 	if (!SourceDirs.empty()) {
 		sql += " AND s.directory IN(?";
@@ -721,11 +724,18 @@ bool mvceditor::FileTagResultClass::Prepare(soci::session& session, bool doLimit
 		}
 		sql += ")";
 	}
+	if (doLimit) {
+		sql += "LIMIT 100";
+	}
 	wxString error;
 	bool ret = false;
 	try {
 		soci::statement* stmt = new soci::statement(session);
 		stmt->prepare(sql);
+		if (ExactMatch) {
+			stmt->exchange(soci::use(FilePart));
+			stmt->exchange(soci::use(FilePart));
+		}
 		for (size_t i = 0; i < SourceDirs.size(); i++) {
 			stmt->exchange(soci::use(SourceDirs[i]));
 		}
@@ -746,17 +756,8 @@ std::vector<mvceditor::FileTagClass> mvceditor::FileTagResultClass::Matches() {
 	std::vector<mvceditor::FileTagClass> matches;
 	while (More()) {
 		Next();
-		wxString path,
-			currentFileName,
-			extension;
-		wxFileName::SplitPath(FileTag.FullPath, &path, &currentFileName, &extension);
-		currentFileName += wxT(".") + extension;
-		wxString fileName = mvceditor::CharToWx(FilePart.c_str());
-		fileName = fileName.Lower();
-		if (wxNOT_FOUND != currentFileName.Lower().Find(fileName)) {
-			if (0 == LineNumber || GetLineCountFromFile(FileTag.FullPath) >= LineNumber) {
-				matches.push_back(FileTag);
-			}
+		if (0 == LineNumber || GetLineCountFromFile(FileTag.FullPath) >= LineNumber) {
+			matches.push_back(FileTag);
 		}
 	}
 	return matches;
@@ -766,23 +767,15 @@ std::vector<mvceditor::TagClass> mvceditor::FileTagResultClass::MatchesAsTags() 
 	std::vector<mvceditor::TagClass> matches;
 	while (More()) {
 		Next();
-		wxString path,
-			currentFileName,
-			extension;
-		wxFileName::SplitPath(FileTag.FullPath, &path, &currentFileName, &extension);
-		currentFileName += wxT(".") + extension;
-		wxString fileName = mvceditor::CharToWx(FilePart.c_str());
-		fileName = fileName.Lower();
-		if (wxNOT_FOUND != currentFileName.Lower().Find(fileName)) {
-			if (0 == LineNumber || GetLineCountFromFile(FileTag.FullPath) >= LineNumber) {
-				mvceditor::TagClass newTag;
-				wxFileName fileName(FileTag.FullPath);
-				newTag.FileTagId = FileTag.FileId;
-				newTag.Identifier = mvceditor::WxToIcu(fileName.GetFullName());
-				newTag.FileIsNew = FileTag.IsNew;
-				newTag.SetFullPath(FileTag.FullPath);
-				matches.push_back(newTag);
-			}
+		wxString path;
+		if (0 == LineNumber || GetLineCountFromFile(FileTag.FullPath) >= LineNumber) {
+			mvceditor::TagClass newTag;
+			wxFileName fileName(FileTag.FullPath);
+			newTag.FileTagId = FileTag.FileId;
+			newTag.Identifier = mvceditor::WxToIcu(fileName.GetFullName());
+			newTag.FileIsNew = FileTag.IsNew;
+			newTag.SetFullPath(FileTag.FullPath);
+			matches.push_back(newTag);
 		}
 	}
 	return matches;
@@ -1220,19 +1213,51 @@ mvceditor::TagResultClass* mvceditor::TagSearchClass::CreateNearMatchResults() c
 	return results;
 }
 
-mvceditor::FileTagResultClass* mvceditor::TagSearchClass::CreateNearMatchFileResults() const {
+mvceditor::FileTagResultClass* mvceditor::TagSearchClass::CreateExactFileResults() const {
 	mvceditor::FileTagResultClass* result = new mvceditor::FileTagResultClass();
 	if (mvceditor::TagSearchClass::FILE_NAME_LINE_NUMBER == GetResourceType()) {
 		UnicodeString query = GetFileName();
-		result->Set(query, GetLineNumber(), false, GetSourceDirs());
+		result->Set(query, GetLineNumber(), true, GetSourceDirs());
 	}
-	else {
+	else if (mvceditor::TagSearchClass::FILE_NAME == GetResourceType()) {
 		UnicodeString query = GetFileName();
 
 		// empty file name = no period, get the query from the class name variable
 		if (query.isEmpty()) {
 			query = GetClassName();
 		}
+		result->Set(query, 0, true, GetSourceDirs());
+	}
+	else {
+
+		// backslash (dir separator) ==  PHP namespace separator
+		// if query contains a backslash then the type will be namespace name
+		UnicodeString query = GetNamespaceName() + UNICODE_STRING_SIMPLE("\\") + GetClassName();
+		result->Set(query, 0, true, GetSourceDirs());
+	}
+	return result;
+}
+
+mvceditor::FileTagResultClass* mvceditor::TagSearchClass::CreateNearMatchFileResults() const {
+	mvceditor::FileTagResultClass* result = new mvceditor::FileTagResultClass();
+	if (mvceditor::TagSearchClass::FILE_NAME_LINE_NUMBER == GetResourceType()) {
+		UnicodeString query = GetFileName();
+		result->Set(query, GetLineNumber(), false, GetSourceDirs());
+	}
+	else if (mvceditor::TagSearchClass::FILE_NAME == GetResourceType()) {
+		UnicodeString query = GetFileName();
+
+		// empty file name = no period, get the query from the class name variable
+		if (query.isEmpty()) {
+			query = GetClassName();
+		}
+		result->Set(query, 0, false, GetSourceDirs());
+	}
+	else {
+
+		// backslash (dir separator) ==  PHP namespace separator
+		// if query contains a backslash then the type will be namespace name
+		UnicodeString query = GetNamespaceName() + UNICODE_STRING_SIMPLE("\\") + GetClassName();
 		result->Set(query, 0, false, GetSourceDirs());
 	}
 	return result;
@@ -1405,55 +1430,6 @@ bool mvceditor::ParsedTagFinderClass::GetResourceMatchPosition(const mvceditor::
 	}
 	return false;
 }
-
-/*std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::NearMatchTags(
-	const mvceditor::TagSearchClass& tagSearch,
-	bool doCollectFileNames) {
-
-	
-	// at one point there was a check here to see if the  tag files existed
-	// it was removed because it caused performance issues, since this method
-	// is called while the user is typing text.
-	// take care when coding; make sure that any code called by this method does not touch the file system
-	std::vector<mvceditor::TagClass> matches;
-	mvceditor::FileTagResultClass fileTagResult;
-	fileTagResult.Set(tagSearch.GetFileName(), tagSearch.GetLineNumber(), false, tagSearch.GetSourceDirs());
-	mvceditor::NearMatchNonMemberTagResultClass nonMembers;
-	mvceditor::ExactNonMemberTagResultClass exactNonMembers;
-	switch (tagSearch.GetResourceType()) {
-		case mvceditor::TagSearchClass::FILE_NAME:
-		case mvceditor::TagSearchClass::FILE_NAME_LINE_NUMBER:
-			fileTagResult.Prepare(*Session, true);
-			matches = fileTagResult.MatchesAsTags();
-			break;
-		case mvceditor::TagSearchClass::CLASS_NAME:
-			exactNonMembers.Set(tagSearch.GetClassName(), tagSearch.GetSourceDirs());
-			exactNonMembers.Prepare(*Session, true);
-			matches = exactNonMembers.Matches();
-			if (matches.empty()) {
-				nonMembers.Set(tagSearch.GetClassName(), tagSearch.GetSourceDirs());
-				nonMembers.Prepare(*Session, true);
-				matches = nonMembers.Matches();
-				if (matches.empty() && doCollectFileNames) {
-					fileTagResult.Prepare(*Session, true);
-					matches = fileTagResult.MatchesAsTags();
-				}
-			}
-			break;
-		case mvceditor::TagSearchClass::CLASS_NAME_METHOD_NAME:
-			matches = NearMatchMembers(tagSearch);
-			break;
-		case mvceditor::TagSearchClass::NAMESPACE_NAME:
-			nonMembers.Set(QualifyName(tagSearch.GetNamespaceName(), tagSearch.GetClassName()), tagSearch.GetSourceDirs());
-			nonMembers.AddTagType(mvceditor::TagClass::NAMESPACE);
-			nonMembers.Prepare(*Session, true);
-			matches = nonMembers.Matches();
-			break;
-	}
-	sort(matches.begin(), matches.end());
-	return matches;
-}
-*/
 
 std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::NearMatchClassesOrFiles(
 	const mvceditor::TagSearchClass& tagSearch) {
