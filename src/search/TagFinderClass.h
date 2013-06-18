@@ -326,6 +326,7 @@ public:
 protected:
 
 	// variables to bind to the statement
+	int Id;
 	int FileTagId;
 	int SourceId;
 	std::string Key;

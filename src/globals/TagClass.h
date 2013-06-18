@@ -92,6 +92,12 @@ public:
 	UnicodeString Comment;
 
 	/**
+	 * primary key, unique identifier for this tag.
+	 * @var int
+	 */
+	int Id;
+
+	/**
 	 * Same as FileTagClass::IsNew ie TRUE if this tag was parsed from contents
 	 * not yet written to disk
 	 * @see FileTagClass::IsNew

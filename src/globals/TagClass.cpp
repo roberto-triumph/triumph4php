@@ -32,6 +32,7 @@ mvceditor::TagClass::TagClass()
 	, Signature()
 	, ReturnType()
 	, Comment()
+	, Id(0)
 	, FileIsNew(false)
 	, Type(CLASS) 
 	, IsProtected(false)
@@ -53,6 +54,7 @@ mvceditor::TagClass::TagClass(const mvceditor::TagClass& src)
 	, Signature()
 	, ReturnType()
 	, Comment()
+	, Id(0)
 	, FileIsNew(false)
 	, Type(CLASS)	
 	, IsProtected(false)
@@ -83,6 +85,7 @@ void mvceditor::TagClass::Copy(const mvceditor::TagClass& src) {
 	// deep copy the wxString, as this object may be passed between threads
 	FullPath = src.FullPath.c_str();
 	Key = src.Key;
+	Id = src.Id;
 	FileTagId = src.FileTagId;
 	SourceId = src.SourceId;
 	IsProtected = src.IsProtected;
@@ -112,6 +115,7 @@ void mvceditor::TagClass::Clear() {
 	Signature.remove();
 	ReturnType.remove();
 	Comment.remove();
+	Id = 0;
 	Type = CLASS;
 	FileTagId = -1;
 	SourceId = -1;

@@ -208,7 +208,7 @@ bool mvceditor::ExactMemberTagResultClass::Prepare(soci::session& session,  bool
 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
-	sql += "SELECT r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
+	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) LEFT JOIN sources s ON (s.source_id = r.source_id) WHERE ";
 	
@@ -271,7 +271,7 @@ bool mvceditor::AllMembersTagResultClass::Prepare(soci::session& session,  bool 
 	
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
-	sql += "SELECT r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
+	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) LEFT JOIN sources s ON(s.source_id = r.source_id) WHERE ";
 
@@ -342,7 +342,7 @@ bool mvceditor::NearMatchMemberTagResultClass::Prepare(soci::session& session,  
 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
-	sql += "SELECT r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
+	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) LEFT JOIN sources s  ON(s.source_id = r.source_id) WHERE ";
 
@@ -411,7 +411,7 @@ bool mvceditor::ExactNonMemberTagResultClass::Prepare(soci::session& session, bo
 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
-	sql += "SELECT r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
+	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) LEFT JOIN sources s ON(s.source_id = r.source_id) WHERE ";
 	sql += "key = ? AND type IN(?";
@@ -467,7 +467,7 @@ bool mvceditor::NearMatchNonMemberTagResultClass::Prepare(soci::session& session
 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
-	sql += "SELECT r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
+	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) LEFT JOIN sources s ON(s.source_id = r.source_id) WHERE";
 
@@ -532,7 +532,7 @@ bool mvceditor::ExactMemberOnlyTagResultClass::Prepare(soci::session& session,  
 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
-	sql += "SELECT r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
+	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) LEFT JOIN sources s ON(s.source_id = r.source_id) WHERE ";
 	
@@ -584,7 +584,7 @@ bool mvceditor::NearMatchMemberOnlyTagResultClass::Prepare(soci::session& sessio
 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
-	sql += "SELECT r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
+	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) LEFT JOIN sources s ON(s.source_id = r.source_id) WHERE ";
 	
@@ -639,7 +639,7 @@ bool mvceditor::TopLevelTagInFileResultClass::Prepare(soci::session& session, bo
 	// fully qualified classes / functions will start with backslash; but we want the
 	// tags that don't begin with backslash
 	std::string sql;
-	sql += "SELECT r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
+	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) WHERE ";
 	sql += "f.full_path = ? AND Type IN(?, ?, ?) AND key NOT LIKE '\\%' ORDER BY key ";
@@ -660,7 +660,7 @@ mvceditor::AllTagsResultClass::AllTagsResultClass()
 
 bool mvceditor::AllTagsResultClass::Prepare(soci::session& session, bool doLimit) {
 	std::string sql;
-	sql += "SELECT r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
+	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON (f.file_item_id = r.file_item_id)";
 	
@@ -1241,6 +1241,7 @@ mvceditor::FileTagResultClass* mvceditor::TagSearchClass::CreateNearMatchFileRes
 mvceditor::TagResultClass::TagResultClass() 
 	: SqliteResultClass()
 	, Tag()
+	, Id(0)
 	, FileTagId(0)
 	, SourceId(0)
 	, Key()
@@ -1268,6 +1269,7 @@ bool mvceditor::TagResultClass::Init(soci::statement* stmt) {
 	wxString error;
 	bool ret = false;
 	try {
+		stmt->exchange(soci::into(Id));
 		stmt->exchange(soci::into(FileTagId, FileTagIdIndicator));
 		stmt->exchange(soci::into(SourceId));
 		stmt->exchange(soci::into(Key));
@@ -1295,6 +1297,7 @@ bool mvceditor::TagResultClass::Init(soci::statement* stmt) {
 }
 
 void mvceditor::TagResultClass::Next() {
+	Tag.Id = Id;
 	if (soci::i_ok == FileTagIdIndicator) {
 		Tag.FileTagId = FileTagId;
 	}
