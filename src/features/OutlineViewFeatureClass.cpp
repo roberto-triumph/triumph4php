@@ -163,7 +163,7 @@ void mvceditor::OutlineTagCacheSearchActionClass::BackgroundWork() {
 						if (!tag->NamespaceName.isEmpty()) {
 							classLabel += wxT(": ") + mvceditor::IcuToWx(tag->NamespaceName);
 						}
-						tagSearchComplete.Tags[classLabel] = TagCache.AllMemberTags(tag->FullyQualifiedClassName());
+						tagSearchComplete.Tags[classLabel] = TagCache.AllMemberTags(tag->FullyQualifiedClassName(), tag->FileTagId);
 					}
 					else {
 						tagSearchComplete.Tags[wxT("")].push_back(*tag);
@@ -191,7 +191,7 @@ void mvceditor::OutlineTagCacheSearchActionClass::BackgroundWork() {
 					classLabel += wxT(": ") + mvceditor::IcuToWx(tag->NamespaceName);
 				}
 				tagSearchComplete.Label = classLabel;
-				tagSearchComplete.Tags[wxT("")] = TagCache.AllMemberTags(tag->FullyQualifiedClassName());
+				tagSearchComplete.Tags[wxT("")] = TagCache.AllMemberTags(tag->FullyQualifiedClassName(), tag->FileTagId);
 			}
 			topLevelTags.push_back(tagSearchComplete);
 		}

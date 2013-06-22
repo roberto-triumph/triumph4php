@@ -286,12 +286,14 @@ public:
 	/**
 	 * gets all tags for a single class
 	 * @param fullyQualifiedClassName the class to search.  fully qualified (with namespace)
+	 * @param fileTagId the file in which the class is found in. this is to filter out 
+	 *        classes if the same class name is found in multiple files
 	 * @return vector of tags; 
 	 *         all methods and properties that are defined in the class PLUS
 	 *         all methods and properties that are defined in any of its base classes PLUS
 	 *         all methods and properties that are defined in any of the traits used by any of the base classes
 	 */
-	std::vector<mvceditor::TagClass> AllMemberTags(const UnicodeString& fullyQualifiedClassName);
+	std::vector<mvceditor::TagClass> AllMemberTags(const UnicodeString& fullyQualifiedClassName, int fileTagId);
 
 	/**
 	 * gets all tags that were found in a single file. for classes, all of the class' members (including

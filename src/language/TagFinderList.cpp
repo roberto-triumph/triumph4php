@@ -162,7 +162,7 @@ std::vector<UnicodeString> mvceditor::TagFinderListClass::ClassParents(UnicodeSt
 		found = false;		
 		UnicodeString parentClass;
 		if (IsTagFinderInit) {
-			parentClass = TagFinder.ParentClassName(classToLookup);
+			parentClass = TagFinder.ParentClassName(classToLookup, 0);
 			if (!parentClass.isEmpty()) {
 				found = true;
 				parents.push_back(parentClass);
@@ -170,7 +170,7 @@ std::vector<UnicodeString> mvceditor::TagFinderListClass::ClassParents(UnicodeSt
 			}
 		}
 		if (IsNativeTagFinderInit) {
-			parentClass = NativeTagFinder.ParentClassName(classToLookup);
+			parentClass = NativeTagFinder.ParentClassName(classToLookup, 0);
 			if (!parentClass.isEmpty()) {
 				found = true;
 				parents.push_back(parentClass);
@@ -267,13 +267,13 @@ UnicodeString mvceditor::TagFinderListClass::ResolveResourceType(UnicodeString r
 	return type;
 }
 
-UnicodeString mvceditor::TagFinderListClass::ParentClassName(UnicodeString className) {
+UnicodeString mvceditor::TagFinderListClass::ParentClassName(UnicodeString className, int fileTagId) {
 	UnicodeString parent;
 	if (IsTagFinderInit) {
-		parent = TagFinder.ParentClassName(className);
+		parent = TagFinder.ParentClassName(className, 0);
 	}
 	if (parent.isEmpty() && IsNativeTagFinderInit) {
-		parent = NativeTagFinder.ParentClassName(className);
+		parent = NativeTagFinder.ParentClassName(className, 0);
 	}
 	return parent;
 }

@@ -263,7 +263,7 @@ static UnicodeString ResolveInitialLexemeType(const pelet::ExpressionClass& pars
 		UnicodeString scopeClass = expressionScope.ClassName;
 		UnicodeString scopeMethod = expressionScope.MethodName;
 
-		typeToLookup = tagFinderList.ParentClassName(scopeClass);
+		typeToLookup = tagFinderList.ParentClassName(scopeClass, 0);
 		if (typeToLookup.isEmpty()) {
 			error.Type = mvceditor::SymbolTableMatchErrorClass::PARENT_ERROR;
 			error.ErrorLexeme = scopeClass;

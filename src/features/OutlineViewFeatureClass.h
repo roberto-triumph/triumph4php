@@ -97,7 +97,7 @@ public:
 	 * added to the run queue
 	 *
 	 * @param searches the search strings, can be either file names, full paths, or class names
-	 * @parm globals to get the locations of the tag dbs
+	 * @param globals to get the locations of the tag dbs
 	 */
 	void SetSearch(const std::vector<UnicodeString>& searches, mvceditor::GlobalsClass& globals);
 

@@ -368,17 +368,30 @@ void mvceditor::TagCacheClass::Clear() {
 	WorkingCaches.clear();
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllMemberTags(const UnicodeString& fullyQualifiedClassName) {
+std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllMemberTags(const UnicodeString& fullyQualifiedClassName, int fileTagId) {
+	std::vector<mvceditor::TagClass> allMatches;
 
 	// add the double colon so that we search for all members
+	// first search for all members of the given class that is also in the given file
 	mvceditor::TagSearchClass tagSearch(fullyQualifiedClassName + UNICODE_STRING_SIMPLE("::"));
-	tagSearch.SetParentClasses(TagFinderList->ClassParents(fullyQualifiedClassName, tagSearch.GetMethodName()));
+	tagSearch.SetFileItemId(fileTagId);
 	tagSearch.SetTraits(TagFinderList->ClassUsedTraits(fullyQualifiedClassName, tagSearch.GetParentClasses(), 
-		tagSearch.GetMethodName()));
-
-	std::vector<mvceditor::TagClass> allMatches;
+			tagSearch.GetMethodName()));
+	
 	TagFinderList->NearMatchesFromAll(tagSearch, allMatches);
-	TagFinderList->NearMatchTraitAliasesFromAll(tagSearch, allMatches);
+	
+	// now get all parent class  (look in all files) also look for inherited members and traits
+	UnicodeString parentClassName  = TagFinderList->ParentClassName(fullyQualifiedClassName, fileTagId);
+	if (!parentClassName.isEmpty()) {
+		mvceditor::TagSearchClass hierarchySearch(parentClassName + UNICODE_STRING_SIMPLE("::"));
+		
+		hierarchySearch.SetParentClasses(TagFinderList->ClassParents(parentClassName, hierarchySearch.GetMethodName()));
+		hierarchySearch.SetTraits(TagFinderList->ClassUsedTraits(parentClassName, hierarchySearch.GetParentClasses(), 
+			hierarchySearch.GetMethodName()));
+		
+		TagFinderList->NearMatchesFromAll(hierarchySearch, allMatches);
+		TagFinderList->NearMatchTraitAliasesFromAll(hierarchySearch, allMatches);
+	}
 	return allMatches;
 }
 

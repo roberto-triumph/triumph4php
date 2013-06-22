@@ -189,7 +189,7 @@ public:
 	/**
 	 * searches all tag finders for the parent class of the given class
 	 */
-	UnicodeString ParentClassName(UnicodeString className);
+	UnicodeString ParentClassName(UnicodeString className, int fileTagId);
 
 	/**
 	 * queries all tag finders for resources that match tagSearch exactly. Any matched tags are

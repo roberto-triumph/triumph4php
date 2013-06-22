@@ -103,6 +103,12 @@ public:
 	 */
 	std::vector<wxFileName> GetSourceDirs() const;
 	void SetSourceDirs(const std::vector<wxFileName>& sourceDirs);
+	
+	/**
+	 * if a file id is set then matches will be restricted to the file only
+	 */
+	int GetFileItemId() const;
+	void SetFileItemId(int fileItemId);
 
 	/**
 	 * Looks for the tag, using exact, case insensitive matching. Will collect the fully qualified tag name 
@@ -290,6 +296,11 @@ private:
 	 * SetSourceDirs() method.  this is usually the directories for the enabled projects.
 	 */
 	std::vector<wxFileName> SourceDirs;
+	
+	/**
+	 * If given, searches will be restricted to this file
+	 */
+	int FileItemId;
 	
 	/**
 	 * The tag type that was parsed
@@ -516,7 +527,7 @@ public:
 
 	NearMatchMemberTagResultClass();
 
-	void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, const std::vector<wxFileName>& sourceDirs);
+	void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, int fileItemId, const std::vector<wxFileName>& sourceDirs);
 
 	bool Prepare(soci::session& session, bool doLimit);
 
@@ -524,6 +535,9 @@ private:
 
 	// number of classes we want to search for
 	int ClassCount;
+	
+	// if set, matches will be restricted to this file
+	int FileItemId;
 };
 
 /**
@@ -609,9 +623,10 @@ public:
 	 * then this method will return "UserClass"
 	 * 
 	 * @param UnicodeString fullyQualifiedClassName the class to search
+	 * @param int the file to restrict matches to. can be zero, in which case all files are searched
 	 * @param return UnicodeString fully qualified class name of the class' most immediate parent
 	 */
-	UnicodeString ParentClassName(const UnicodeString& fullyQualifiedClassName);
+	UnicodeString ParentClassName(const UnicodeString& fullyQualifiedClassName, int fileTagId);
 
 	/**
 	 * Get the traits used by a given tag. For example, let's say source code contained a class and two traits: UserClass,

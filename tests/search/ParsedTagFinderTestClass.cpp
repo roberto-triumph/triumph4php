@@ -1365,7 +1365,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceParentClassShouldReturnP
 		"}\n"
 		"?>\n"
 	));
-	CHECK_UNISTR_EQUALS("UserClass", ParsedTagFinder.ParentClassName(UNICODE_STRING_SIMPLE("AdminClass")));
+	CHECK_UNISTR_EQUALS("UserClass", ParsedTagFinder.ParentClassName(UNICODE_STRING_SIMPLE("AdminClass"), 0));
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceParentClassShouldReturnParentClassForDeepHierarchy) {
@@ -1384,8 +1384,8 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceParentClassShouldReturnP
 		"}\n"
 		"?>\n"
 	));
-	CHECK_UNISTR_EQUALS("AdminClass", ParsedTagFinder.ParentClassName(UNICODE_STRING_SIMPLE("SuperAdminClass")));
-	CHECK_UNISTR_EQUALS("UserClass", ParsedTagFinder.ParentClassName(UNICODE_STRING_SIMPLE("AdminClass")));
+	CHECK_UNISTR_EQUALS("AdminClass", ParsedTagFinder.ParentClassName(UNICODE_STRING_SIMPLE("SuperAdminClass"), 0));
+	CHECK_UNISTR_EQUALS("UserClass", ParsedTagFinder.ParentClassName(UNICODE_STRING_SIMPLE("AdminClass"), 0));
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceParentClassWithInterfaces) {
@@ -1405,7 +1405,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceParentClassWithInterface
 		"}\n"
 		"?>\n"
 	));
-	CHECK_UNISTR_EQUALS("UserClass", ParsedTagFinder.ParentClassName(UNICODE_STRING_SIMPLE("AdminClass")));
+	CHECK_UNISTR_EQUALS("UserClass", ParsedTagFinder.ParentClassName(UNICODE_STRING_SIMPLE("AdminClass"), 0));
 }
 
 
