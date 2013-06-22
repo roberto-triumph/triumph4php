@@ -533,11 +533,11 @@ private:
  * 1) The tag cache must be built using TagParserClass. 
  * 2) An object of type ParsedTagFinderClass is instantiated and initialized using the same connection
  *    as the TagParserClass; that way the ParsedTagFinderClass reads whatever tags the TagParserClass found.
- * 3) The search is performed by calling the ExactTags or NearMatchTags() methods.
+ * 3) The search is performed by calling the Exec method.
  *    Fully qualified search does exact matching while the near match search performs special logic (see method for
  *    details on search logic).
- * 4) Iteration of the search results is done through the results vector that each of the Collect methods
- *    returns. Note that because this search is done on a database, the returned matches may contain matches from 
+ * 4) Iteration of the search results is done by using TagResultClass::Next() and TagResultClass::More() methods. Note 
+ *    that because this search is done on a database, the returned matches may contain matches from 
  *    files that are no longer in the file system.
  * 
  * The parsed resources are persisted in a SQLite database; the database may be a file backed database or
@@ -645,6 +645,15 @@ public:
 	 * @return bool true if match was found in text
 	 */
 	static bool GetResourceMatchPosition(const mvceditor::TagClass& tag, const UnicodeString& text, int32_t& pos, int32_t& length);
+
+	/**
+	 * retrieves a tag by its ID
+	 * 
+	 * @param id the ID to query for
+	 * @param tag out parameter, will be filled in with the tag data
+	 * @return bool TRUE if the ID was found
+	 */
+	bool FindById(int id, mvceditor::TagClass& tag);
 	
 	/**
 	 * Print the tag cache to stdout.  Useful for debugging only.

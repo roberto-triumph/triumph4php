@@ -374,6 +374,15 @@ public:
 	 *         used by the given class or any of its base classes
 	 */
 	std::vector<UnicodeString> ParentClassesAndTraits(const UnicodeString& className);
+
+	/**
+	 * retrieves a tag by its ID
+	 * 
+	 * @param id the ID to query for
+	 * @param tag out parameter, will be filled in with the tag data
+	 * @return bool TRUE if the ID was found
+	 */
+	bool FindById(int id, mvceditor::TagClass& tag);
 	 
 private:
 		

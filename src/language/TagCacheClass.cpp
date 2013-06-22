@@ -412,3 +412,12 @@ std::vector<UnicodeString> mvceditor::TagCacheClass::ParentClassesAndTraits(cons
 	all.erase(it, all.end());
 	return all;
 }
+
+
+bool mvceditor::TagCacheClass::FindById(int id, mvceditor::TagClass& tag) {
+	bool found = false;
+	if (TagFinderList->IsTagFinderInit) {
+		found = TagFinderList->TagFinder.FindById(id, tag);
+	}
+	return found;
+}

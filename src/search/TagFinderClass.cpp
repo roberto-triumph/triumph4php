@@ -154,6 +154,25 @@ public:
 	bool Prepare(soci::session& session, bool doLimit);
 };
 
+/**
+ * queries for tags by their primary key
+ */
+class TagByIdResultClass : public TagResultClass {
+
+public:
+
+	TagByIdResultClass();
+
+	void Set(int id);
+
+	bool Prepare(soci::session& session, bool doLimit);
+
+private:
+
+	int Id;
+};
+
+
 }
 
 /**
@@ -668,6 +687,30 @@ bool mvceditor::AllTagsResultClass::Prepare(soci::session& session, bool doLimit
 	stmt->prepare(sql);
 	return Init(stmt);
 }
+
+mvceditor::TagByIdResultClass::TagByIdResultClass()
+	: TagResultClass()
+	, Id(0) {
+
+}
+
+void mvceditor::TagByIdResultClass::Set(int id) {
+	Id = id;
+}
+
+bool mvceditor::TagByIdResultClass::Prepare(soci::session& session, bool doLimit) {
+	std::string sql;
+	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
+	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
+	sql += "FROM resources r LEFT JOIN file_items f ON (f.file_item_id = r.file_item_id) ";
+	sql += "WHERE r.id = ?";
+	
+	soci::statement* stmt = new soci::statement(session);
+	stmt->prepare(sql);
+	stmt->exchange(soci::use(Id));
+	return Init(stmt);
+}
+
 
 mvceditor::FileTagResultClass::FileTagResultClass()
 	: SqliteResultClass()
@@ -1791,4 +1834,15 @@ void mvceditor::ParsedTagFinderClass::Print() {
 		printf("identifier=%s\n", mvceditor::IcuToChar(tag->Identifier).c_str());
 		printf("\n\n");
 	}
+}
+
+bool mvceditor::ParsedTagFinderClass::FindById(int id, mvceditor::TagClass& tag) {
+	mvceditor::TagByIdResultClass result;
+	result.Set(id);
+	bool found = Exec(&result);
+	if (found) {
+		result.Next();
+		tag = result.Tag;
+	}
+	return found;
 }
