@@ -26,7 +26,7 @@
 #define __MVCEDITOR_TAGFINDERLIST_H__
 
 #include <language/TagParserClass.h>
-#include <search/TagFinderClass.h>
+#include <language/ParsedTagFinderClass.h>
 #include <wx/filename.h>
 #include <unicode/unistr.h>
 #include <vector>

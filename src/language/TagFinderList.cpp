@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <language/TagFinderList.h>
-#include <search/TagFinderClass.h>
+#include <language/ParsedTagFinderClass.h>
 #include <language/DetectedTagFinderResultClass.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 

@@ -26,7 +26,7 @@
 #define __MVCEDITOR_TAGLIST_H__
 
 #include <globals/TagClass.h>
-#include <search/TagFinderClass.h>
+#include <language/ParsedTagFinderClass.h>
 #include <vector>
 
 namespace mvceditor {

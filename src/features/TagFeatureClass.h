@@ -28,7 +28,7 @@
 #include <features/FeatureClass.h>
 #include <features/wxformbuilder/TagFeatureForms.h>
 #include <features/BackgroundFileReaderClass.h>
-#include <search/TagFinderClass.h>
+#include <language/ParsedTagFinderClass.h>
 #include <actions/ProjectTagActionClass.h>
 #include <actions/TagCacheSearchActionClass.h>
 #include <code_control/ResourceCacheBuilderClass.h>

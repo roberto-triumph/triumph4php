@@ -28,7 +28,7 @@
 #include <language/SymbolTableClass.h>
 #include <language/TagCacheClass.h>
 #include <search/DirectorySearchClass.h>
-#include <search/TagFinderClass.h>
+#include <language/ParsedTagFinderClass.h>
 #include <globals/Assets.h>
 #include <globals/Sqlite.h>
 #include <soci/soci.h>

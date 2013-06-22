@@ -27,7 +27,7 @@
 #include <SqliteTestFixtureClass.h>
 #include <MvcEditorChecks.h>
 #include <language/TagParserClass.h>
-#include <search/TagFinderClass.h>
+#include <language/ParsedTagFinderClass.h>
 #include <globals/String.h>
 #include <globals/Assets.h>
 #include <globals/Sqlite.h>
