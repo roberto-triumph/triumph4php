@@ -356,7 +356,7 @@ void mvceditor::ModalExplorerPanelClass::ShowDir(const wxFileName& currentDir, c
 		Report->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_MASK_STATE | wxLIST_MASK_TEXT);
 	}
 	wxString label;
-	if (files.size() == totalFiles) {
+	if (files.size() == (size_t)totalFiles) {
 		label = wxString::Format(wxT("%d Files, %d Directories"), files.size(), dirs.size());
 	}
 	else {
@@ -374,7 +374,7 @@ void mvceditor::ModalExplorerPanelClass::ShowReport(const wxFileName& dir, const
 	ListFiles(files);
 
 	wxString label;
-	if (files.size() == totalFiles) {
+	if (files.size() == (size_t)totalFiles) {
 		label = wxString::Format(wxT("%d Files, %d Directories"), files.size(), dirs.size());
 	}
 	else {
