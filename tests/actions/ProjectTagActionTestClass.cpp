@@ -72,6 +72,7 @@ public:
 		Session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
 		wxString error;
 		bool init = mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), Session, error);
+		wxUnusedVar(init);
 		wxASSERT_MSG(init, error);
 		Finder.InitSession(&Session);
 	}

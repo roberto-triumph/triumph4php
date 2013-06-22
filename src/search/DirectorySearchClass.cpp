@@ -254,7 +254,6 @@ bool mvceditor::DirectorySearchClass::Init(const std::vector<mvceditor::SourceCl
 	}
 	InitSources.clear();
 	MatchedFiles.clear();
-	wxChar separator = wxFileName::GetPathSeparator();
 
 	size_t total = 0;
 	for (size_t i = 0; i < sources.size(); ++i) {

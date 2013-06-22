@@ -188,16 +188,6 @@ static UnicodeString QualifyName(const UnicodeString& namespaceName, const Unico
 	return qualifiedName;
 }
 
-static void InClause(const std::vector<int>& values, std::ostringstream& stream) {
-	size_t size = values.size();
-	for (size_t i = 0; i < size; ++i) {
-		stream << values[i];
-		if (i < (size - 1)) {
-			stream << ",";
-		}
-	}
-}
-
 mvceditor::ExactMemberTagResultClass::ExactMemberTagResultClass()
 	: TagResultClass()
 	, Keys()

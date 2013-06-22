@@ -159,6 +159,7 @@ void* mvceditor::ThreadActionClass::Entry() {
 	}
 
 	wxSemaError err = FinishSemaphore.Post();
+	wxUnusedVar(err);
 	wxASSERT_MSG(wxSEMA_NO_ERROR == err, wxT("error posting to finish semaphore"));
 	return 0;
 }
@@ -343,6 +344,7 @@ void mvceditor::RunningThreadsClass::StopAll() {
 	for (size_t i = 0; i < ThreadActions.size(); ++i) {
 		ThreadActions[i]->Delete();
 		wxSemaError err = Semaphore->WaitTimeout(4000);
+		wxUnusedVar(err);
 		wxASSERT_MSG(wxSEMA_INVALID != err, wxT("semaphore is invalid"));
 		wxASSERT_MSG(wxSEMA_TIMEOUT != err, wxT("semaphore timed out"));
 		wxASSERT_MSG(wxSEMA_MISC_ERROR != err, wxT("semaphore misc error"));
