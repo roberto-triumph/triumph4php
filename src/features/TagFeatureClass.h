@@ -28,7 +28,7 @@
 #include <features/FeatureClass.h>
 #include <features/wxformbuilder/TagFeatureForms.h>
 #include <features/BackgroundFileReaderClass.h>
-#include <search/TagFinderClass.h>
+#include <language/ParsedTagFinderClass.h>
 #include <actions/ProjectTagActionClass.h>
 #include <actions/TagCacheSearchActionClass.h>
 #include <code_control/ResourceCacheBuilderClass.h>
@@ -175,12 +175,13 @@ public:
 
 	/**
 	 * @param parent the parent window
-	 * @param tag the feature, used to perform the search logic
+	 * @param globals to get the project list
+	 * @param cacheStatus the string that describes the cache state (shown to the user)
 	 * @param term string to prepopulate the input box
 	 * @param chosenResources out parameter, the list of resources that the user chose
 	 */
 	TagSearchDialogClass(wxWindow* parent, 
-		TagFeatureClass& tag, wxString& term, 
+		mvceditor::GlobalsClass& globals, wxString cacheStatus, wxString& term, 
 		std::vector<mvceditor::TagClass>& chosenResources);
 	
 	~TagSearchDialogClass();
@@ -260,11 +261,16 @@ private:
 	void OnTagCacheSearchComplete(mvceditor::TagCacheSearchCompleteEventClass& event);
 
 	/**
+	 * use our own thread to handle search for tag results in the backgroudn
+	 */
+	mvceditor::RunningThreadsClass RunningThreads;
+
+	/**
 	 * The tag feature reference.  The dialog will use this reference to actually perform the search.
 	 * 
 	 * @var TagFeatureClass
 	 */
-	TagFeatureClass& ResourceFeature;
+	mvceditor::GlobalsClass& Globals;
 
 	/**
 	 * List that will get populated with the files to be opened. These are the
@@ -288,12 +294,6 @@ private:
 	 * changed we actually perform the search
 	 */
 	wxString LastInput;
-
-	/**
-	 * we will cancel an action if the user has changed input, that way the always see
-	 * results for the most recent search
-	 */
-	int ActionId;
 
 	DECLARE_EVENT_TABLE()
 };

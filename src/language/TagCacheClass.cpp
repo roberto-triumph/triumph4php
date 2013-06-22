@@ -24,6 +24,7 @@
  */
 #include <language/TagCacheClass.h>
 #include <language/TagFinderList.h>
+#include <language/DetectedTagFinderResultClass.h>
 #include <globals/Assets.h>
 #include <globals/Sqlite.h>
 #include <soci/soci.h>
@@ -55,141 +56,18 @@ wxString mvceditor::WorkingCacheCompleteEventClass::GetFileName() const {
 	return FileName;
 }
 
-mvceditor::GlobalCacheCompleteEventClass::GlobalCacheCompleteEventClass(int eventId)
-	: wxEvent(eventId, mvceditor::EVENT_GLOBAL_CACHE_COMPLETE) {
+mvceditor::TagFinderListCompleteEventClass::TagFinderListCompleteEventClass(int eventId)
+	: wxEvent(eventId, mvceditor::EVENT_TAG_FINDER_LIST_COMPLETE) {
 
 }
 
-wxEvent* mvceditor::GlobalCacheCompleteEventClass::Clone() const {
-	mvceditor::GlobalCacheCompleteEventClass* evt = new mvceditor::GlobalCacheCompleteEventClass(GetId());
+wxEvent* mvceditor::TagFinderListCompleteEventClass::Clone() const {
+	mvceditor::TagFinderListCompleteEventClass* evt = new mvceditor::TagFinderListCompleteEventClass(GetId());
 	return evt;
 }
 
 const wxEventType mvceditor::EVENT_WORKING_CACHE_COMPLETE = wxNewEventType();
-const wxEventType mvceditor::EVENT_GLOBAL_CACHE_COMPLETE = wxNewEventType();
-
-mvceditor::GlobalCacheClass::GlobalCacheClass()
-	: TagParser() 
-	, TagFinder()
-	, NativeTagFinder()
-	, DetectedTagFinder()
-	, IsNativeTagFinderInit(false)
-	, IsTagFinderInit(false)
-	, IsDetectedTagFinderInit(false)
-	, TagDbSession(NULL)
-	, NativeDbSession(NULL)
-	, DetectedTagDbSession(NULL)
-{
-
-}
-mvceditor::GlobalCacheClass::~GlobalCacheClass() {
-	TagParser.Close();
-	if (TagDbSession) {
-		TagDbSession->close();
-		delete TagDbSession;
-	}
-	if (DetectedTagDbSession) {
-		DetectedTagDbSession->close();
-		delete DetectedTagDbSession;
-	}
-	if (NativeDbSession) {
-		NativeDbSession->close();
-		delete NativeDbSession;
-	}
-}
-
-void mvceditor::GlobalCacheClass::InitGlobalTag(const wxFileName& tagDbFileName, 
-									   const std::vector<wxString>& phpFileExtensions, 
-									   const std::vector<wxString>& miscFileExtensions,
-									   pelet::Versions version) {
-	wxASSERT_MSG(!IsTagFinderInit, wxT("tag finder can only be initialized once"));
-	TagParser.PhpFileExtensions = phpFileExtensions;
-	TagParser.MiscFileExtensions = miscFileExtensions;
-	TagDbSession = new soci::session;
-	IsTagFinderInit = Open(TagDbSession, tagDbFileName.GetFullPath());
-	if (IsTagFinderInit) {
-		TagParser.SetVersion(version);
-		TagParser.Init(TagDbSession);
-		TagFinder.Init(TagDbSession);
-	}
-}
-
-void mvceditor::GlobalCacheClass::AdoptGlobalTag(soci::session* globalSession,
-												 const std::vector<wxString>& phpFileExtensions, 
-												 const std::vector<wxString>& miscFileExtensions,
-												 pelet::Versions version) {
-	wxASSERT_MSG(!IsTagFinderInit, wxT("tag finder can only be initialized once"));
-	TagParser.PhpFileExtensions = phpFileExtensions;
-	TagParser.MiscFileExtensions = miscFileExtensions;
-	TagDbSession = globalSession;
-	IsTagFinderInit = NULL != globalSession;
-	if (IsTagFinderInit) {
-		TagParser.SetVersion(version);
-		TagParser.Init(TagDbSession);
-		TagFinder.Init(TagDbSession);
-	}
-}
-
-void mvceditor::GlobalCacheClass::InitDetectorTag(const wxFileName& detectorDbFileName) {
-	wxASSERT_MSG(!IsDetectedTagFinderInit, wxT("tag finder can only be initialized once"));
-	DetectedTagDbSession = new soci::session;
-	IsDetectedTagFinderInit = Open(DetectedTagDbSession, detectorDbFileName.GetFullPath());
-	if (IsDetectedTagFinderInit) {
-		DetectedTagFinder.Init(DetectedTagDbSession);
-	}
-}
-
-void mvceditor::GlobalCacheClass::AdoptDetectorTag(soci::session* session) {
-	wxASSERT_MSG(!IsDetectedTagFinderInit, wxT("tag finder can only be initialized once"));
-	IsDetectedTagFinderInit = NULL != session;
-	DetectedTagDbSession = session;
-	if (IsDetectedTagFinderInit) {
-		DetectedTagFinder.Init(DetectedTagDbSession);
-	}
-}
-
-void mvceditor::GlobalCacheClass::InitNativeTag(const wxFileName& nativeDbFileName) {
-	wxASSERT_MSG(!IsNativeTagFinderInit, wxT("tag finder can only be initialized once"));
-	NativeDbSession = new soci::session;
-	IsNativeTagFinderInit = Open(NativeDbSession, nativeDbFileName.GetFullPath());
-	if (IsNativeTagFinderInit) {
-		NativeTagFinder.Init(NativeDbSession);
-	}
-}
-
-void mvceditor::GlobalCacheClass::AdoptNativeTag(soci::session* session) {
-	wxASSERT_MSG(!IsNativeTagFinderInit, wxT("tag finder can only be initialized once"));
-	IsNativeTagFinderInit = NULL != session;
-	NativeDbSession = session;
-	if (IsNativeTagFinderInit) {
-		NativeTagFinder.Init(NativeDbSession);
-	}
-}
-
-bool mvceditor::GlobalCacheClass::Open(soci::session* session, const wxString& dbName) {
-	bool ret = false;
-	try {
-		std::string stdDbName = mvceditor::WxToChar(dbName);
-		
-		// we should be able to open this since it has been created by
-		// the TagCacheDbVersionActionClass
-		session->open(*soci::factory_sqlite3(), stdDbName);
-
-		// set a busy handler so that if we attempt to query while the file is locked, we 
-		// sleep for a bit then try again
-		mvceditor::SqliteSetBusyTimeout(*session, 100);
-		ret = true;
-	} catch(std::exception const& e) {
-		session->close();
-		wxString msg = mvceditor::CharToWx(e.what());
-		wxASSERT_MSG(false, msg);
-	}
-	return ret;
-}
-
-void mvceditor::GlobalCacheClass::Walk(mvceditor::DirectorySearchClass& search) {
-	search.Walk(TagParser);
-}
+const wxEventType mvceditor::EVENT_TAG_FINDER_LIST_COMPLETE = wxNewEventType();
 
 mvceditor::WorkingCacheClass::WorkingCacheClass()
 	: SymbolTable()
@@ -229,7 +107,7 @@ void mvceditor::WorkingCacheClass::Init(const wxString& fileName,
 }
 
 mvceditor::TagCacheClass::TagCacheClass()
-	: GlobalCache(NULL)
+	: TagFinderList(NULL)
 	, WorkingCaches() {
 	
 }
@@ -263,55 +141,82 @@ void mvceditor::TagCacheClass::RemoveWorking(const wxString& fileName) {
 	}
 }
 
-void mvceditor::TagCacheClass::RegisterGlobal(mvceditor::GlobalCacheClass* cache) {
-	GlobalCache = cache;
+void mvceditor::TagCacheClass::RegisterGlobal(mvceditor::TagFinderListClass* cache) {
+	TagFinderList = cache;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::ExactTags(const UnicodeString& search, const std::vector<wxFileName>& searchDirs) {
-	std::vector<mvceditor::TagClass> matches;
+mvceditor::TagResultClass* mvceditor::TagCacheClass::ExactTags(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs) {
 	mvceditor::TagSearchClass tagSearch(search);
-	tagSearch.SetDirs(searchDirs);
-	
-
-	// return all of the matches from all finders that were found by the Collect* call.
-	// This is a bit tricky because we want to prioritize matches in opened files 
-	// instead of the global finder, since the global finder will be outdated.
-	std::vector<mvceditor::TagFinderClass*> finders = AllFinders();
-	for (size_t i = 0; i < finders.size(); ++i) {
-		mvceditor::TagFinderClass* tagFinder = finders[i];
-		std::vector<mvceditor::TagClass> finderMatches = tagFinder->ExactTags(tagSearch);
-		size_t count = finderMatches.size();
-		for (size_t j = 0; j < count; ++j) {
-			mvceditor::TagClass tag = finderMatches[j];
-			matches.push_back(tag);
-		}
-	}
-	std::sort(matches.begin(), matches.end());
-	return matches;
+	tagSearch.SetSourceDirs(sourceDirs);
+	mvceditor::TagResultClass* result = tagSearch.CreateExactResults();
+	TagFinderList->TagFinder.Exec(result);
+	return result;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::NearMatchTags(const UnicodeString& search, const std::vector<wxFileName>& searchDirs) {
-	std::vector<mvceditor::TagClass> matches;
+mvceditor::TagResultClass* mvceditor::TagCacheClass::ExactNativeTags(const UnicodeString& search) {
 	mvceditor::TagSearchClass tagSearch(search);
-	tagSearch.SetDirs(searchDirs);
-
-	// return all of the matches from all finders that were found by the Collect* call.
-	// This is a bit tricky because we want to prioritize matches in opened files 
-	// instead of the global finder, since the global finder will be outdated.
-	std::vector<mvceditor::TagFinderClass*> finders = AllFinders();
-	for (size_t i = 0; i < finders.size(); ++i) {
-		mvceditor::TagFinderClass* tagFinder = finders[i];
-		std::vector<mvceditor::TagClass> finderMatches = tagFinder->NearMatchTags(tagSearch, true);
-		size_t count = finderMatches.size();
-		for (size_t j = 0; j < count; ++j) {
-			mvceditor::TagClass tag = finderMatches[j];
-			matches.push_back(tag);
-		}
-	}
-	std::sort(matches.begin(), matches.end());
-	return matches;
+	mvceditor::TagResultClass* result = tagSearch.CreateExactResults();
+	TagFinderList->NativeTagFinder.Exec(result);
+	return result;
 }
 
+
+mvceditor::DetectedTagExactMemberResultClass* mvceditor::TagCacheClass::ExactDetectedTags(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs) {
+	mvceditor::TagSearchClass tagSearch(search);
+	mvceditor::DetectedTagExactMemberResultClass* result = new mvceditor::DetectedTagExactMemberResultClass();
+	std::vector<UnicodeString> classNames;
+	classNames.push_back(tagSearch.GetClassName());
+	result->Set(classNames, tagSearch.GetMethodName());
+	TagFinderList->DetectedTagFinder.Exec(result);
+	return result;
+}
+
+mvceditor::TagResultClass* mvceditor::TagCacheClass::NearMatchTags(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs) {
+	mvceditor::TagSearchClass tagSearch(search);
+	tagSearch.SetSourceDirs(sourceDirs);
+
+	mvceditor::TagResultClass* result = tagSearch.CreateNearMatchResults();
+	TagFinderList->TagFinder.Exec(result);
+	return result;
+}
+
+mvceditor::DetectedTagNearMatchMemberResultClass* mvceditor::TagCacheClass::NearMatchDetectedTags(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs) {
+	mvceditor::TagSearchClass tagSearch(search);
+	tagSearch.SetSourceDirs(sourceDirs);
+
+	mvceditor::DetectedTagNearMatchMemberResultClass* result = new mvceditor::DetectedTagNearMatchMemberResultClass();
+	std::vector<UnicodeString> classNames;
+	classNames.push_back(tagSearch.GetClassName());
+	result->Set(classNames, tagSearch.GetMethodName());
+	TagFinderList->DetectedTagFinder.Exec(result);
+	return result;
+}
+
+mvceditor::TagResultClass* mvceditor::TagCacheClass::NearMatchNativeTags(const UnicodeString& search) {
+	mvceditor::TagSearchClass tagSearch(search);
+
+	mvceditor::TagResultClass* result = tagSearch.CreateNearMatchResults();
+	TagFinderList->NativeTagFinder.Exec(result);
+	return result;
+}
+
+mvceditor::FileTagResultClass* mvceditor::TagCacheClass::ExactFileTags(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs) {
+	mvceditor::TagSearchClass tagSearch(search);
+	tagSearch.SetSourceDirs(sourceDirs);
+
+	mvceditor::FileTagResultClass* result = tagSearch.CreateExactFileResults();
+	TagFinderList->TagFinder.Exec(result);
+	return result;
+}
+
+mvceditor::FileTagResultClass* mvceditor::TagCacheClass::NearMatchFileTags(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs) {
+	mvceditor::TagSearchClass tagSearch(search);
+	tagSearch.SetSourceDirs(sourceDirs);
+
+	mvceditor::FileTagResultClass* result = tagSearch.CreateNearMatchFileResults();
+	TagFinderList->TagFinder.Exec(result);
+	return result;
+}
 
 std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::ExactClassOrFile(const UnicodeString& search) {
 	std::vector<mvceditor::TagClass> matches;
@@ -320,9 +225,9 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::ExactClassOrFile(cons
 	// return all of the matches from all finders that were found by the Collect* call.
 	// This is a bit tricky because we want to prioritize matches in opened files 
 	// instead of the global finder, since the global finder will be outdated.
-	std::vector<mvceditor::TagFinderClass*> finders = AllFinders();
+	std::vector<mvceditor::ParsedTagFinderClass*> finders = AllFinders();
 	for (size_t i = 0; i < finders.size(); ++i) {
-		mvceditor::TagFinderClass* tagFinder = finders[i];
+		mvceditor::ParsedTagFinderClass* tagFinder = finders[i];
 		std::vector<mvceditor::TagClass> finderMatches = tagFinder->ExactClassOrFile(tagSearch);
 		size_t count = finderMatches.size();
 		for (size_t j = 0; j < count; ++j) {
@@ -341,9 +246,9 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::NearMatchClassesOrFil
 	// return all of the matches from all finders that were found by the Collect* call.
 	// This is a bit tricky because we want to prioritize matches in opened files 
 	// instead of the global finder, since the global finder will be outdated.
-	std::vector<mvceditor::TagFinderClass*> finders = AllFinders();
+	std::vector<mvceditor::ParsedTagFinderClass*> finders = AllFinders();
 	for (size_t i = 0; i < finders.size(); ++i) {
-		mvceditor::TagFinderClass* tagFinder = finders[i];
+		mvceditor::ParsedTagFinderClass* tagFinder = finders[i];
 		std::vector<mvceditor::TagClass> finderMatches = tagFinder->NearMatchClassesOrFiles(tagSearch);
 		size_t count = finderMatches.size();
 		for (size_t j = 0; j < count; ++j) {
@@ -355,17 +260,14 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::NearMatchClassesOrFil
 	return matches;
 }
 
-std::vector<mvceditor::TagFinderClass*> mvceditor::TagCacheClass::AllFinders() {
-	std::vector<mvceditor::TagFinderClass*> allTagFinders;
-	if (GlobalCache) {
-		if (GlobalCache->IsNativeTagFinderInit) {
-			allTagFinders.push_back(&GlobalCache->NativeTagFinder);
+std::vector<mvceditor::ParsedTagFinderClass*> mvceditor::TagCacheClass::AllFinders() {
+	std::vector<mvceditor::ParsedTagFinderClass*> allTagFinders;
+	if (TagFinderList) {
+		if (TagFinderList->IsNativeTagFinderInit) {
+			allTagFinders.push_back(&TagFinderList->NativeTagFinder);
 		}
-		if (GlobalCache->IsTagFinderInit) {
-			allTagFinders.push_back(&GlobalCache->TagFinder);
-		}
-		if (GlobalCache->IsDetectedTagFinderInit) {
-			allTagFinders.push_back(&GlobalCache->DetectedTagFinder);
+		if (TagFinderList->IsTagFinderInit) {
+			allTagFinders.push_back(&TagFinderList->TagFinder);
 		}
 	}
 	return allTagFinders;
@@ -381,9 +283,8 @@ void mvceditor::TagCacheClass::ExpressionCompletionMatches(const wxString& fileN
 	bool foundSymbolTable = false;
 	if (itWorkingCache != WorkingCaches.end()) {
 		foundSymbolTable = true;
-		std::vector<mvceditor::TagFinderClass*> allFinders = AllFinders();
 		mvceditor::WorkingCacheClass* cache = itWorkingCache->second;
-		cache->SymbolTable.ExpressionCompletionMatches(parsedExpression, expressionScope, allFinders, 
+		cache->SymbolTable.ExpressionCompletionMatches(parsedExpression, expressionScope, *TagFinderList, 
 			autoCompleteList, resourceMatches, doDuckTyping, error);
 	
 	}
@@ -401,9 +302,8 @@ void mvceditor::TagCacheClass::ResourceMatches(const wxString& fileName, const p
 	bool foundSymbolTable = false;
 	if (itWorkingCache != WorkingCaches.end()) {
 		foundSymbolTable = true;
-		std::vector<mvceditor::TagFinderClass*> allFinders = AllFinders();
 		mvceditor::WorkingCacheClass* cache = itWorkingCache->second;
-		cache->SymbolTable.ResourceMatches(parsedExpression, expressionScope, allFinders, 
+		cache->SymbolTable.ResourceMatches(parsedExpression, expressionScope, *TagFinderList, 
 			matches, doDuckTyping, doFullyQualifiedMatchOnly, error);	
 	}
 	if (!foundSymbolTable) {
@@ -424,13 +324,10 @@ void mvceditor::TagCacheClass::Print() {
 bool mvceditor::TagCacheClass::IsFileCacheEmpty() {
 
 	// if at least one tag finder is not empty, return false
-	if (GlobalCache && GlobalCache->IsNativeTagFinderInit && !GlobalCache->NativeTagFinder.IsFileCacheEmpty()) {
+	if (TagFinderList && TagFinderList->IsNativeTagFinderInit && !TagFinderList->NativeTagFinder.IsFileCacheEmpty()) {
 		return false;
 	}
-	if (GlobalCache && GlobalCache->IsTagFinderInit && !GlobalCache->TagFinder.IsFileCacheEmpty()) {
-		return false;
-	}
-	if (GlobalCache && GlobalCache->IsDetectedTagFinderInit && !GlobalCache->DetectedTagFinder.IsFileCacheEmpty()) {
+	if (TagFinderList && TagFinderList->IsTagFinderInit && !TagFinderList->TagFinder.IsFileCacheEmpty()) {
 		return false;
 	}
 	return true;
@@ -439,14 +336,18 @@ bool mvceditor::TagCacheClass::IsFileCacheEmpty() {
 bool mvceditor::TagCacheClass::IsResourceCacheEmpty() {
 
 	// if at least one tag finder is not empty, return false
-	if (GlobalCache && GlobalCache->IsNativeTagFinderInit && !GlobalCache->NativeTagFinder.IsResourceCacheEmpty()) {
+	if (TagFinderList && TagFinderList->IsNativeTagFinderInit && !TagFinderList->NativeTagFinder.IsResourceCacheEmpty()) {
 		return false;
 	}
-	if (GlobalCache && GlobalCache->IsTagFinderInit && !GlobalCache->TagFinder.IsResourceCacheEmpty()) {
+	if (TagFinderList && TagFinderList->IsTagFinderInit && !TagFinderList->TagFinder.IsResourceCacheEmpty()) {
 		return false;
 	}
-	if (GlobalCache && GlobalCache->IsDetectedTagFinderInit && !GlobalCache->DetectedTagFinder.IsResourceCacheEmpty()) {
-		return false;
+	if (TagFinderList && TagFinderList->IsDetectedTagFinderInit) {
+		mvceditor::DetectedTagTotalCountResultClass result;
+		TagFinderList->DetectedTagFinder.Exec(&result);
+		if (result.GetTotalCount() <= 0) {
+			return false;
+		}
 	}
 	return true;
 }
@@ -455,9 +356,9 @@ void mvceditor::TagCacheClass::Clear() {
 
 	// ATTN: do NOT wipe finders, Clear() is meant for memory
 	// cleanup only
-	if (GlobalCache) {
-		delete GlobalCache;
-		GlobalCache	= NULL;
+	if (TagFinderList) {
+		delete TagFinderList;
+		TagFinderList	= NULL;
 	}
 
 	std::map<wxString, mvceditor::WorkingCacheClass*>::iterator itWorking;
@@ -468,34 +369,25 @@ void mvceditor::TagCacheClass::Clear() {
 }
 
 std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllMemberTags(const UnicodeString& fullyQualifiedClassName) {
-	std::vector<mvceditor::TagFinderClass*> allTagFinders = AllFinders();
 
 	// add the double colon so that we search for all members
 	mvceditor::TagSearchClass tagSearch(fullyQualifiedClassName + UNICODE_STRING_SIMPLE("::"));
-	tagSearch.SetParentClasses(mvceditor::TagFinderListClassParents(fullyQualifiedClassName, tagSearch.GetMethodName(), allTagFinders));
-	tagSearch.SetTraits(mvceditor::TagFinderListClassUsedTraits(fullyQualifiedClassName, tagSearch.GetParentClasses(), 
-		tagSearch.GetMethodName(), allTagFinders));
+	tagSearch.SetParentClasses(TagFinderList->ClassParents(fullyQualifiedClassName, tagSearch.GetMethodName()));
+	tagSearch.SetTraits(TagFinderList->ClassUsedTraits(fullyQualifiedClassName, tagSearch.GetParentClasses(), 
+		tagSearch.GetMethodName()));
 
-	// return all of the matches from all finders that were found by the Collect* call.
-	// This is a bit tricky because we want to prioritize matches in opened files 
-	// instead of the global finder, since the global finder will be outdated.
 	std::vector<mvceditor::TagClass> allMatches;
-	if (allMatches.empty()) {	
-		for (size_t j = 0; j < allTagFinders.size(); ++j) {
-			mvceditor::TagFinderClass* tagFinder = allTagFinders[j];
-			std::vector<mvceditor::TagClass> finderMatches = tagFinder->NearMatchTags(tagSearch);
-			allMatches.insert(allMatches.end(), finderMatches.begin(), finderMatches.end());
-		}
-	}
+	TagFinderList->NearMatchesFromAll(tagSearch, allMatches);
+	TagFinderList->NearMatchTraitAliasesFromAll(tagSearch, allMatches);
 	return allMatches;
 }
 
 std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllClassesFunctionsDefines(const wxString& fullPath) {
 	std::vector<mvceditor::TagClass> allMatches;
 
-	std::vector<mvceditor::TagFinderClass*> allTagFinders = AllFinders();
+	std::vector<mvceditor::ParsedTagFinderClass*> allTagFinders = AllFinders();
 	for (size_t j = 0; j < allTagFinders.size(); ++j) {
-		mvceditor::TagFinderClass* finder = allTagFinders[j];
+		mvceditor::ParsedTagFinderClass* finder = allTagFinders[j];
 		allMatches = finder->ClassesFunctionsDefines(fullPath);
 		if (!allMatches.empty()) {
 
@@ -508,8 +400,8 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllClassesFunctionsDe
 }
 
 std::vector<UnicodeString> mvceditor::TagCacheClass::ParentClassesAndTraits(const UnicodeString& className) {
-	std::vector<UnicodeString> classParents = mvceditor::TagFinderListClassParents(className, UNICODE_STRING_SIMPLE(""), AllFinders());
-	std::vector<UnicodeString> classTraits = mvceditor::TagFinderListClassUsedTraits(className, classParents, UNICODE_STRING_SIMPLE(""), AllFinders());
+	std::vector<UnicodeString> classParents = TagFinderList->ClassParents(className, UNICODE_STRING_SIMPLE(""));
+	std::vector<UnicodeString> classTraits = TagFinderList->ClassUsedTraits(className, classParents, UNICODE_STRING_SIMPLE(""));
 	
 	std::vector<UnicodeString> all;
 	all.insert(all.end(), classParents.begin(), classParents.end());
@@ -519,4 +411,13 @@ std::vector<UnicodeString> mvceditor::TagCacheClass::ParentClassesAndTraits(cons
 	std::vector<UnicodeString>::iterator it = std::unique(all.begin(), all.end());
 	all.erase(it, all.end());
 	return all;
+}
+
+
+bool mvceditor::TagCacheClass::FindById(int id, mvceditor::TagClass& tag) {
+	bool found = false;
+	if (TagFinderList->IsTagFinderInit) {
+		found = TagFinderList->TagFinder.FindById(id, tag);
+	}
+	return found;
 }

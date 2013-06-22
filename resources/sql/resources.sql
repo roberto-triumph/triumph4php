@@ -28,15 +28,33 @@
 -- parsing. The database is also given to the various PHP detector scripts.
 --
 
+-- this table store all "source" directories. a source directory is just a 
+-- directory that contains source code files
+CREATE TABLE IF NOT EXISTS sources (
+	source_id INTEGER PRIMARY KEY,
+	
+	-- the full path has OS-dependant file separators
+	-- the full path is the entire path to a source directory
+	-- don't do it case-insensitive because different file systems handle case differently
+	directory TEXT
+);
+
 -- this table stores all of the files that have been seen by MVC Editor
 CREATE TABLE IF NOT EXISTS file_items (
 	file_item_id INTEGER PRIMARY KEY, 
+		
+	-- the foreign key to the source directory
+	source_id INTEGER,
 
 	-- the full path has OS-dependant file separators
 	-- the full path is the entire path to a file
-	-- storing it as case-insensitive because we always want to do case-insensitive lookups
+	-- don't do it case-insensitive because different file systems handle case differently
 	-- this may not be an actual file path when is_new = 1
-	full_path TEXT COLLATE NOCASE, 
+	full_path TEXT, 
+	
+	-- the name (and extension) of the file
+	-- storing it as case-insensitive because we always want to do case-insensitive lookups
+	name TEXT COLLCATE NOCASE,
 	
 	-- this is up to the second precision. this time is used to check to see if
 	-- the file needs to be parsed
@@ -59,9 +77,14 @@ CREATE TABLE IF NOT EXISTS file_items (
 -- perform all lookups using a single index (this is the purpose of the key
 -- column).
 CREATE TABLE IF NOT EXISTS resources (
+
+	id INTEGER PRIMARY KEY,
 	
 	-- the file that the resource is located in
 	file_item_id INTEGER, 
+	
+	-- the foreign key to the source directory
+	source_id INTEGER,
 	
 	-- the key is used to perform lookups into this table.  The key will have
 	-- multiple formats:
@@ -153,6 +176,7 @@ CREATE TABLE IF NOT EXISTS resources (
 	-- 1 if this resource is a "native" function; ie a resource that is in the standard 
 	-- PHP libraries
 	is_native INTEGER
+
 );
 
 -- This table stores all of the trait relationships that have been found by MVC Editor.
@@ -165,6 +189,9 @@ CREATE TABLE IF NOT EXISTS trait_resources (
 
 	-- the file that class_name is located in (the class that uses the trait)
 	file_item_id INTEGER, 
+	
+	-- the foreign key to the source directory
+	source_id INTEGER,
 
 	-- the key is used to perform lookups into this table. The key will be either
 	-- 1. The name of the class that uses a trait (same as class_name column)
@@ -227,7 +254,7 @@ CREATE INDEX IF NOT EXISTS idxTraitKey ON trait_resources(key);
 --
 -- This number must match the version in CacheDbVersionActionClass.cpp
 --
-INSERT INTO schema_version (version_number) VALUES(4);
+INSERT INTO schema_version (version_number) VALUES(5);
 
 --
 -- Write ahead logging to allow for concurrent reads and writes

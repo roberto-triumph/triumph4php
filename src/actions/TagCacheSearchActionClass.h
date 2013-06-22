@@ -49,10 +49,12 @@ class TagCacheSearchCompleteEventClass : public wxEvent {
 
     /**
      * Will contain all of the resulting tags.
+	 * This pointer should be deleted by the event handler
      */
-    std::vector<mvceditor::TagClass> Tags;
-    
-    TagCacheSearchCompleteEventClass(int eventId, const UnicodeString& searchString, const std::vector<mvceditor::TagClass>& tags);
+	std::vector<mvceditor::TagClass> Tags;
+
+    TagCacheSearchCompleteEventClass(int eventId, const UnicodeString& searchString, 
+		const std::vector<mvceditor::TagClass>& tags);
     
     wxEvent* Clone() const;
 

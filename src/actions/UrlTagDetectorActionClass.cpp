@@ -26,6 +26,7 @@
 #include <search/RecursiveDirTraverserClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 
 static int ID_URL_TAG_DETECTOR_PROCESS = wxNewId();
 
@@ -36,8 +37,10 @@ mvceditor::UrlTagFinderInitActionClass::UrlTagFinderInitActionClass(mvceditor::R
 
 void mvceditor::UrlTagFinderInitActionClass::Work(mvceditor::GlobalsClass& globals) {
 	SetStatus(_("Url Tag Finder Init"));
-	globals.UrlTagFinder.Close();
-	globals.UrlTagFinder.AttachExistingFile(globals.DetectorCacheDbFileName);
+	globals.DetectorCacheSession.close();
+	globals.DetectorCacheSession.open(*soci::factory_sqlite3(), 
+		mvceditor::WxToChar(globals.DetectorCacheDbFileName.GetFullPath()));
+	globals.UrlTagFinder.InitSession(&globals.DetectorCacheSession);
 }
 
 wxString mvceditor::UrlTagFinderInitActionClass::GetLabel() const {

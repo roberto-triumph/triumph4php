@@ -71,6 +71,26 @@ static bool SortTagsByTypeAndName(const mvceditor::TagClass& a, const mvceditor:
 	return a.Identifier.caseCompare(b.Identifier, 0) < 0;
 }
 
+namespace mvceditor {
+
+/**
+ * class to hold a tag ID for each item in the outline tree.
+ */
+class IdTreeItemDataClass  : public wxTreeItemData {
+
+public:
+
+	int Id;
+
+	IdTreeItemDataClass(int id) 
+		: wxTreeItemData()
+		, Id(id) {
+		
+	}
+
+};
+}
+
 mvceditor::OutlineSearchCompleteClass::OutlineSearchCompleteClass()
 	: Label()
 	, Tags() {
@@ -114,7 +134,7 @@ mvceditor::OutlineTagCacheSearchActionClass::OutlineTagCacheSearchActionClass(mv
 
 void mvceditor::OutlineTagCacheSearchActionClass::SetSearch(const std::vector<UnicodeString>& searches, mvceditor::GlobalsClass& globals) {
 	SearchStrings = searches;
-	mvceditor::GlobalCacheClass* cache = new mvceditor::GlobalCacheClass;
+	mvceditor::TagFinderListClass* cache = new mvceditor::TagFinderListClass;
 	cache->InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), globals.GetMiscFileExtensions(),
 		globals.Environment.Php.Version);
 	cache->InitNativeTag(mvceditor::NativeFunctionsAsset());
@@ -154,7 +174,12 @@ void mvceditor::OutlineTagCacheSearchActionClass::BackgroundWork() {
 				
 				// searching for all members in a class name
 				std::vector<wxFileName> dirs;
-				tags = TagCache.ExactTags(*search, dirs);
+				mvceditor::TagResultClass* results = TagCache.ExactTags(*search, dirs);
+				if (results) {
+					tags = results->Matches();
+					delete results;
+				}
+
 				if (!tags.empty()) {
 					tag = tags.begin();
 				}
@@ -198,9 +223,11 @@ void mvceditor::OutlineViewFeatureClass::AddKeyboardShortcuts(std::vector<Dynami
 
 void mvceditor::OutlineViewFeatureClass::JumpToResource(const wxString& tag) {
 	std::vector<wxFileName> dirs;
-	std::vector<mvceditor::TagClass> matches = App.Globals.TagCache.ExactTags(mvceditor::WxToIcu(tag), dirs);
-	if (!matches.empty()) {
-		mvceditor::TagClass tag = matches[0];
+	std::vector<mvceditor::TagClass> matches;
+	mvceditor::TagResultClass* result = App.Globals.TagCache.ExactTags(mvceditor::WxToIcu(tag), dirs);
+	if (result && !result->Empty()) {
+		result->Next();
+		mvceditor::TagClass tag = result->Tag;
 		GetNotebook()->LoadPage(tag.GetFullPath());
 		CodeControlClass* codeControl = GetCurrentCodeControl();
 		if (codeControl) {
@@ -213,6 +240,9 @@ void mvceditor::OutlineViewFeatureClass::JumpToResource(const wxString& tag) {
 			// else the index is out of date....
 		}
 	}	
+	if (result) {
+		delete result;
+	}
 }
 
 void mvceditor::OutlineViewFeatureClass::StartTagSearch(const std::vector<UnicodeString>& searchStrings) {
@@ -386,10 +416,10 @@ void mvceditor::OutlineViewPanelClass::AddTagsToOutline(const std::vector<mvcedi
 		}
 		else if (fileId.IsOk() && !searchTag->IsLabelFileName()) {
 			Tree->Delete(fileId);
-			fileId = Tree->PrependItem(rootId, label, IMAGE_OUTLINE_CLASS, -1, new mvceditor::TreeItemDataStringClass(label)); 
+			fileId = Tree->PrependItem(rootId, label, IMAGE_OUTLINE_CLASS, -1, 0); 
 		}
 		else {
-			fileId = Tree->PrependItem(rootId, label, IMAGE_OUTLINE_CLASS, -1, new mvceditor::TreeItemDataStringClass(label)); 
+			fileId = Tree->PrependItem(rootId, label, IMAGE_OUTLINE_CLASS, -1, 0); 
 		}
 
 		std::map<wxString, std::vector<mvceditor::TagClass> >::iterator mapTag; 		
@@ -442,8 +472,7 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 		passesAccessCheck = passesAccessCheck && !isInheritedTag;
 	}
 	if (mvceditor::TagClass::DEFINE == type && !tag.IsDynamic) {
-		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_DEFINE, -1, 
-			new mvceditor::TreeItemDataStringClass(mvceditor::IcuToWx(tag.Key)));
+		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_DEFINE, -1, new mvceditor::IdTreeItemDataClass(tag.Id));
 	}
 	else if (mvceditor::TagClass::MEMBER == tag.Type && ShowProperties && passesAccessCheck) {
 		label = mvceditor::IcuToWx(tag.Identifier);
@@ -464,8 +493,7 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 		else if (tag.IsPrivate) {
 			image = IMAGE_OUTLINE_PROPERTY_PRIVATE;
 		}
-		Tree->AppendItem(treeId, label, image, -1, 
-			new mvceditor::TreeItemDataStringClass(mvceditor::IcuToWx(tag.Key)));
+		Tree->AppendItem(treeId, label, image, -1, new mvceditor::IdTreeItemDataClass(tag.Id));
 	}
 	else if (mvceditor::TagClass::METHOD == tag.Type && ShowMethods && passesAccessCheck) {
 		label = mvceditor::IcuToWx(tag.Identifier);
@@ -495,8 +523,7 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 		else if (tag.IsPrivate) {
 			image = IMAGE_OUTLINE_METHOD_PRIVATE;
 		}
-		wxTreeItemId funcId = Tree->AppendItem(treeId, label, image, -1, 
-			new mvceditor::TreeItemDataStringClass(mvceditor::IcuToWx(tag.Key)));
+		wxTreeItemId funcId = Tree->AppendItem(treeId, label, image, -1, new mvceditor::IdTreeItemDataClass(tag.Id));
 		if (ShowFunctionArgs) {
 
 			// add the function args under the method name
@@ -507,8 +534,7 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 				
 				wxStringTokenizer tok(mvceditor::IcuToWx(sig), wxT(","));
 				while (tok.HasMoreTokens()) {
-					Tree->AppendItem(funcId, tok.NextToken(), IMAGE_OUTLINE_ARGUMENT, -1,
-						new mvceditor::TreeItemDataStringClass(mvceditor::IcuToWx(tag.Key)));
+					Tree->AppendItem(funcId, tok.NextToken(), IMAGE_OUTLINE_ARGUMENT, -1, new mvceditor::IdTreeItemDataClass(tag.Id));
 				}
 			}
 		}
@@ -517,8 +543,7 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 		if (tag.ClassName != className) {
 			label = mvceditor::IcuToWx(tag.ClassName) + wxT("::") + label;
 		}
-		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_CLASS_CONSTANT, -1,
-			new mvceditor::TreeItemDataStringClass(mvceditor::IcuToWx(tag.Key)));
+		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_CLASS_CONSTANT, -1, new mvceditor::IdTreeItemDataClass(tag.Id));
 	}
 	else if (mvceditor::TagClass::FUNCTION == type && !tag.IsDynamic) {
 		UnicodeString res = tag.Identifier;
@@ -534,8 +559,7 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 			wxString returnType = mvceditor::IcuToWx(tag.ReturnType);
 			label += wxT(" [") + returnType + wxT("]");
 		}
-		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_FUNCTION, -1, 
-			new mvceditor::TreeItemDataStringClass(mvceditor::IcuToWx(tag.Key)));
+		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_FUNCTION, -1, new mvceditor::IdTreeItemDataClass(tag.Id));
 	}
 }
 
@@ -591,13 +615,17 @@ void mvceditor::OutlineViewPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 		event.Skip();
 		return;
 	}
-	mvceditor::TreeItemDataStringClass* data = (mvceditor::TreeItemDataStringClass*)Tree->GetItemData(item);
-	if (!data || data->Str.IsEmpty()) {
+	mvceditor::IdTreeItemDataClass* idItemData = (mvceditor::IdTreeItemDataClass*)Tree->GetItemData(item);
+	if (!idItemData) {
 		event.Skip();
 		return;
 	}
-	wxString tag = data->Str;
-	Feature->JumpToResource(tag);
+	mvceditor::TagClass tag;
+	bool found = Feature->App.Globals.TagCache.FindById(idItemData->Id, tag);
+	if (found) {
+		wxString tagKey = mvceditor::IcuToWx(tag.Key);
+		Feature->JumpToResource(tagKey);
+	}
 }
 
 void mvceditor::OutlineViewPanelClass::SearchTagsToOutline(const std::vector<mvceditor::TagClass>& tags) {

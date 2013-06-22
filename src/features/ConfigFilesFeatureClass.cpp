@@ -61,7 +61,7 @@ void mvceditor::ConfigFilesFeatureClass::RebuildMenu() {
 	std::vector<mvceditor::ConfigTagClass> allConfigTags;
 	mvceditor::ConfigTagFinderClass finder;
 	if (App.Globals.DetectorCacheDbFileName.IsOk()) {
-		finder.AttachExistingFile(App.Globals.DetectorCacheDbFileName);
+		finder.InitSession(&App.Globals.DetectorCacheSession);
 		allConfigTags = finder.All();
 	}
 	if (!allConfigTags.empty()) {

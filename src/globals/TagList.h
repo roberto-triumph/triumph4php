@@ -26,10 +26,13 @@
 #define __MVCEDITOR_TAGLIST_H__
 
 #include <globals/TagClass.h>
-#include <globals/ProjectClass.h>
-#include<vector>
+#include <language/ParsedTagFinderClass.h>
+#include <vector>
 
 namespace mvceditor {
+
+// forward declaration
+class ProjectClass;
 
 /**
  * remove matches from the given list that are for php built-in functions. PHP files do not have a source
@@ -48,6 +51,6 @@ void TagListRemoveNativeMatches(std::vector<mvceditor::TagClass>& matches);
  */
 void TagListKeepMatchesFromProjects(std::vector<mvceditor::TagClass>& matches, std::vector<mvceditor::ProjectClass*> projects);
 
-}
 
+}
 #endif

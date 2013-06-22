@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <code_control/ResourceCacheBuilderClass.h>
+#include <language/TagFinderList.h>
 #include <globals/Assets.h>
 #include <globals/GlobalsClass.h>
 
@@ -58,12 +59,12 @@ void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
 		// since this code is outside the mutex
 		// even if code is empty, lets create a working cache so that the 
 		// file is registered and code completion works
-		mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass();
+		mvceditor::TagFinderListClass* tagFinderlist = new mvceditor::TagFinderListClass();
 		std::vector<wxString> phpFileExtensions;
 		wxFileName wxf(FileName);
 		phpFileExtensions.push_back(wxf.GetFullName());
 		std::vector<wxString> miscFileExtensions;
-		globalCache->InitGlobalTag(TagCacheDbFileName, phpFileExtensions, miscFileExtensions, Version);
+		tagFinderlist->InitGlobalTag(TagCacheDbFileName, phpFileExtensions, miscFileExtensions, Version);
 		if (FileIsNew) {
 
 			// new files will not have a name, use the identifier as the name
@@ -85,7 +86,7 @@ void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
 			// we still own the pointer since we did not send the event
 			delete workingCache;
 		}
-		delete globalCache;
+		delete tagFinderlist;
 	}
 }
 

@@ -34,13 +34,17 @@ namespace mvceditor {
 
 /**
  * escape a value so that it is suitable for using in a LIKE SQL clause
- * ie. so that an underscore is treated literally and not as a wildcard
+ * ie. so that underscores, percents are treated literally
+ * We escape ourselves because SOCI uses sqlite3_prepare instead of sqlite3_prepare_v2, and 
+ * sqlite3_prepare will make LIKE queries not use the index. But this means we have to escape ourselves
+ * see http://sqlite.org/optoverview.html (LIKE optimization)
+ *
  * @param value the value to escape
  * @param c the character to USE for escaping. this should NOT be backslash,
  *        as this projet stores string that are likely to have backslashes
  *        (ie. PHP namespace names, file names) in the database.
  */
-std::string SqliteSqlEscape(const std::string& value, char c);
+std::string SqliteSqlLikeEscape(const std::string& value, char c);
 
 /**
  * Run multiple SQL statements that are located in fileName
@@ -97,7 +101,76 @@ bool SqliteTables(soci::session& session, std::vector<std::string>& tableNames, 
 void SqliteSetBusyTimeout(soci::session& session, int timeoutMs = 100);
 
 /**
- * Class that holds connections to all attached databases. It will
+ * Generic class that will encapsulate a single query, the prepared statement,
+ * and the result. Subclassses will override the Prepare() method and 
+ * create a statement for q query.
+ */
+class SqliteResultClass {
+
+public:
+
+	SqliteResultClass();
+	virtual ~SqliteResultClass();
+
+	/**
+	 * in this method subclasses will build the SQL and execute it.
+	 *
+	 * @param session the connection.  must be around for as long as this result is alive.
+	 * @param doLimit boolean if TRUE there should be a limit on the query
+	 * @return bool subclasses should return TRUE if there is at least one result
+	 */
+	virtual bool Prepare(soci::session& session, bool doLimit) = 0;
+
+	/**
+	 * advance to the next row. in this method subclasses will construct their
+	 * next object from the current DB row.
+	 */
+	virtual void Next() = 0;
+
+	/**
+	 * @return boolean TRUE if the query returned zero rows.
+	 */
+	bool Empty() const;
+
+	/**
+	 * @return boolean TRUE if there are more results to be iterated through
+	 */
+	bool More() const;
+
+
+protected:
+
+	/**
+	 * run the statement in an exception-safe manner
+	 *
+	 * @param stmt this object will own the statement pointer
+	 * @param error out parameter, will be set to the error message if one is encountered
+	 * @return bool TRUE if statement was successfully run
+	 */
+	bool AdoptStatement(soci::statement* stmt, wxString& error);
+
+	/**
+	 * fetches the next row of the result.
+	 * @param bool TRUE if there was another row to fetch
+	 */
+	bool Fetch();
+
+private:
+
+	/**
+	 * the statement to iterate through
+	 */
+	soci::statement* Stmt;
+
+	/**
+	 * TRUE if the query returned zero rows.
+	 * @var boolean
+	 */
+	bool IsEmpty;
+};
+
+/**
+ * Class that holds connections to a SQLITE database. It will
  * close them when the class goes out of scope.
  */
 class SqliteFinderClass {
@@ -109,35 +182,36 @@ public:
 	virtual ~SqliteFinderClass();
 
 	/**
-	 * opens the sqlite file at the given file location
-	 * This can be called multiple times safely. If the filename does 
-	 * not exist, this method will return FALSE.
-	 *
-	 * @param fileName the location of the detectors sqlite database.
-	 *        if fileName does not exist, it will be created.
-	 * @return bool TRUE if cache could be successfully opened / created
+	 * use an existing connection for this finder..
+	 * This method can used to have the the finder query either  a file-backed db or a memory db.
+	 * By using an in-memory database, lookups are faster.
+	 * Note that this method assumes that the schema has already been created.
+	 * 
+	 * @param session the soci connection to use.  this class WILL NOT own the 
+	 *        pointer,
 	 */
-	bool AttachExistingFile(const wxFileName& fileName);
+	void InitSession(soci::session* session);
 
 	/**
-	 * use an existing connection and adopt it as our own.
+	 * executes a query against this sqlite db.
 	 *
-	 * @param session the soci connection to use.  this class WILL own the 
-	 *        pointer and delete it when this object goes out of scope
+	 * @param result contains the query to run and the parameters to bind
+	 * @return bool TRUE if the query was successfully run
 	 */
-	void AdoptSession(soci::session* session);
-
-	/**
-	 * Closes the opened connections; but the backing databases are left intact.
-	 */
-	void Close();
+	bool Exec(mvceditor::SqliteResultClass* result);
 
 protected:
 
 	/**
-	 * the opened connection to the detector databases.
+	 * @return TRUE if this finder has an opened connection to a db
 	 */
-	std::vector<soci::session*> Sessions;
+	bool IsInit() const;
+
+	/**
+	 * the opened connection to the detector databases.
+	 * This class will NOT own the pointer.
+	 */
+	soci::session* Session;
 
 };
 

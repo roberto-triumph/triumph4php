@@ -52,7 +52,7 @@ public:
 	mvceditor::ProjectTagActionClass ProjectTagAction;
 
 	/**
-	 * connection to the tag db
+	 * connection to the tag db.
 	 */
 	soci::session Session;
 
@@ -65,7 +65,6 @@ public:
 		: ActionTestFixtureClass()
 		, FileTestFixtureClass(wxT("project_tag_action"))
 		, ProjectTagAction(RunningThreads, ID_EVENT)
-		, Session()
 		, Finder() {
 		TouchTestDir();
 		InitTagCache(TestProjectDir);
@@ -74,11 +73,7 @@ public:
 		wxString error;
 		bool init = mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), Session, error);
 		wxASSERT_MSG(init, error);
-		Finder.Init(&Session);
-	}
-
-	~ProjectTagActionTestClass() {
-		Session.close();
+		Finder.InitSession(&Session);
 	}
 };
 
@@ -100,7 +95,11 @@ TEST_FIXTURE(ProjectTagActionTestClass, InitProject) {
 	ProjectTagAction.BackgroundWork();
 
 	mvceditor::TagSearchClass search(UNICODE_STRING_SIMPLE("User"));
-	CHECK_VECTOR_SIZE(1, Finder.ExactTags(search));
+	mvceditor::TagResultClass* results = search.CreateExactResults();
+	CHECK(Finder.Exec(results));
+	results->Next();
+	CHECK_UNISTR_EQUALS("User", results->Tag.ClassName);
+	delete results;
 }
 
 TEST_FIXTURE(ProjectTagActionTestClass, InitMultipleProjects) {
@@ -124,10 +123,19 @@ TEST_FIXTURE(ProjectTagActionTestClass, InitMultipleProjects) {
 	ProjectTagAction.BackgroundWork();
 
 	mvceditor::TagSearchClass searchFirst(UNICODE_STRING_SIMPLE("User"));
-	CHECK_VECTOR_SIZE(1, Finder.ExactTags(searchFirst));
+	mvceditor::TagResultClass* results = searchFirst.CreateExactResults();
+	CHECK(Finder.Exec(results));
+	results->Next();
+	CHECK_UNISTR_EQUALS("User", results->Tag.ClassName);
+	delete results;
 
 	mvceditor::TagSearchClass searchSecond(UNICODE_STRING_SIMPLE("Role"));
-	CHECK_VECTOR_SIZE(1, Finder.ExactTags(searchSecond));
+	
+	results = searchSecond.CreateExactResults();
+	CHECK(Finder.Exec(results));
+	results->Next();
+	CHECK_UNISTR_EQUALS("Role", results->Tag.ClassName);
+	delete results;
 }
 
 }

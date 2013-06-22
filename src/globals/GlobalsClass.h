@@ -143,6 +143,12 @@ public:
 	 */
 	wxFileName DetectorCacheDbFileName;
 
+	/**
+	 * the opened connection to the detector tags db
+	 * @var session
+	 */
+	soci::session DetectorCacheSession;
+
 	GlobalsClass();
 
 	/**

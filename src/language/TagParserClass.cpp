@@ -54,13 +54,14 @@ static UnicodeString QualifyName(const UnicodeString& namespaceName, const Unico
 
 std::vector<mvceditor::TagClass> AllResources(soci::session& session) {
 	std::string sql;
-	sql += "SELECT r.file_item_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, full_path, ";
+	sql += "SELECT r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) ";
 	sql += " ORDER BY key";
 	
 	std::vector<mvceditor::TagClass> matches;
 	int fileTagId;
+	int sourceId;
 	std::string key;
 	std::string identifier;
 	std::string className;
@@ -81,7 +82,7 @@ std::vector<mvceditor::TagClass> AllResources(soci::session& session) {
 		fileIsNewIndicator;
 	try {
 		soci::statement stmt = (session.prepare << sql,
-			soci::into(fileTagId, fileTagIdIndicator), soci::into(key), soci::into(identifier), soci::into(className), 
+			soci::into(fileTagId, fileTagIdIndicator), soci::into(sourceId), soci::into(key), soci::into(identifier), soci::into(className), 
 			soci::into(type), soci::into(namespaceName), soci::into(signature), 
 			soci::into(returnType), soci::into(comment), soci::into(fullPath, fullPathIndicator), soci::into(isProtected), soci::into(isPrivate), 
 			soci::into(isStatic), soci::into(isDynamic), soci::into(isNative), soci::into(fileIsNew, fileIsNewIndicator)
@@ -114,6 +115,7 @@ std::vector<mvceditor::TagClass> AllResources(soci::session& session) {
 				else {
 					tag.FileIsNew = true;
 				}
+				tag.SourceId = sourceId;
 
 				matches.push_back(tag);
 			} while (stmt.fetch());
@@ -137,7 +139,7 @@ mvceditor::TagParserClass::TagParserClass()
 	, Session(NULL)
 	, Transaction(NULL)
 	, InsertStmt(NULL)
-	, FileParsingBufferSize(32)
+	, CurrentSourceId(0)
 	, FilesParsed(0)
 	, IsCacheInitialized(false) {
 	Parser.SetClassObserver(this);
@@ -171,7 +173,43 @@ void mvceditor::TagParserClass::Close() {
 	}
 }
 
-void mvceditor::TagParserClass::BeginSearch() {
+void mvceditor::TagParserClass::BeginSearch(const wxString& fullPath) {
+
+	// make sure we always insert with the trailing directory separator
+	// to be consistent
+	wxFileName dir;
+	dir.AssignDir(fullPath);
+
+
+	// get (or create) the source ID
+	try {
+		CurrentSourceId = 0;
+		std::string stdFullPath = mvceditor::WxToChar(dir.GetPathWithSep());
+		soci::statement stmt = (Session->prepare << 
+			"SELECT source_id FROM sources WHERE directory = ?", 
+			soci::into(CurrentSourceId), soci::use(stdFullPath)
+		);
+		if (!stmt.execute(true)) {
+
+			// didn't find the source, create a new row
+			soci::statement stmt = (Session->prepare <<
+				"INSERT INTO sources(directory) VALUES(?)",
+				soci::use(stdFullPath)
+			);
+			stmt.execute(true);
+			soci::sqlite3_statement_backend* backend = static_cast<soci::sqlite3_statement_backend*>(stmt.get_backend());
+			CurrentSourceId = sqlite3_last_insert_rowid(backend->session_.conn_);
+		}
+		BeginTransaction();
+	} catch (std::exception& e) {
+		
+		// ATTN: at some point bubble these exceptions up?
+		// to avoid unreferenced local variable warnings in MSVC
+		e.what();
+	}
+}
+
+void mvceditor::TagParserClass::BeginTransaction() {
 	NamespaceCache.clear();
 	TraitCache.clear();
 
@@ -182,12 +220,12 @@ void mvceditor::TagParserClass::BeginSearch() {
 
 		std::string sql;
 		sql += "INSERT OR IGNORE INTO resources (";
-		sql += "file_item_id, key, identifier, class_name, ";
+		sql += "file_item_id, source_id, key, identifier, class_name, ";
 		sql += "type, namespace_name, signature, ";
 		sql += "return_type, comment, is_protected, is_private, ";
 		sql += "is_static, is_dynamic, is_native";
 		sql += ") VALUES(";
-		sql += "?, ?, ?, ?, ";
+		sql += "?, ?, ?, ?, ?, ";
 		sql += "?, ?, ?, ";
 		sql += "?, ?, ?, ?, ";
 		sql += "?, ?, ?";
@@ -196,7 +234,7 @@ void mvceditor::TagParserClass::BeginSearch() {
 		wxASSERT_MSG(!InsertStmt, wxT("statement should be cleaned up"));
 		InsertStmt = new soci::statement(*Session);
 		*InsertStmt = (Session->prepare << sql,
-			soci::use(FileTagId), soci::use(Key), soci::use(Identifier), soci::use(ClassName), 
+			soci::use(FileTagId), soci::use(CurrentSourceId), soci::use(Key), soci::use(Identifier), soci::use(ClassName), 
 			soci::use(Type), soci::use(NamespaceName), soci::use(Signature), 
 			soci::use(ReturnType), soci::use(Comment), soci::use(IsProtected), soci::use(IsPrivate), 
 			soci::use(IsStatic), soci::use(IsDynamic), soci::use(IsNative)
@@ -282,7 +320,8 @@ bool mvceditor::TagParserClass::Walk(const wxString& fileName) {
 }
 
 void mvceditor::TagParserClass::BuildResourceCacheForFile(const wxString& fullPath, const UnicodeString& code, bool isNew) {
-	BeginSearch();
+	CurrentSourceId = 0;
+	BeginTransaction();
 
 	// remove all previous cached resources
 	mvceditor::FileTagClass fileTag;
@@ -658,30 +697,30 @@ void mvceditor::TagParserClass::Print() {
 			case mvceditor::TagClass::DEFINE :
 			case mvceditor::TagClass::FUNCTION :
 
-				u_fprintf(out, "RESOURCE: Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S Type=%d FileID=%d\n",
+				u_fprintf(out, "RESOURCE: Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S Type=%d FileID=%d SourceID=%d\n",
 					it->Key.length(), it->Key.getBuffer(),
 					it->Identifier.length(), it->Identifier.getBuffer(),  
 					it->ClassName.length(), it->ClassName.getBuffer(),
 					it->NamespaceName.length(), it->NamespaceName.getBuffer(),
-					it->Type, it->FileTagId);
+					it->Type, it->FileTagId, it->SourceId);
 				break;
 			case mvceditor::TagClass::CLASS_CONSTANT :
 			case mvceditor::TagClass::MEMBER :
 			case mvceditor::TagClass::METHOD :
-				u_fprintf(out, "MEMBER: Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S ReturnType=%.*S Type=%d FileID=%d\n", 
+				u_fprintf(out, "MEMBER: Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S ReturnType=%.*S Type=%d FileID=%d SourceID=%d\n", 
 					it->Key.length(), it->Key.getBuffer(),
 					it->Identifier.length(), it->Identifier.getBuffer(),  
 					it->ClassName.length(), it->ClassName.getBuffer(),
 					it->NamespaceName.length(), it->NamespaceName.getBuffer(),
-					it->ReturnType.length(), it->ReturnType.getBuffer(), it->Type, it->FileTagId);
+					it->ReturnType.length(), it->ReturnType.getBuffer(), it->Type, it->FileTagId, it->SourceId);
 				break;
 			case mvceditor::TagClass::NAMESPACE :
-				u_fprintf(out, "NAMESPACE:Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S  Type=%d FileID=%d\n", 
+				u_fprintf(out, "NAMESPACE:Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S  Type=%d FileID=%d SourceID=%d\n", 
 					it->Key.length(), it->Key.getBuffer(),
 					it->Identifier.length(), it->Identifier.getBuffer(),  
 					it->ClassName.length(), it->ClassName.getBuffer(),
 					it->NamespaceName.length(), it->NamespaceName.getBuffer(),
-					it->Type, it->FileTagId);
+					it->Type, it->FileTagId, it->SourceId);
 				break;
 		}
 	}
@@ -711,6 +750,7 @@ void mvceditor::TagParserClass::PersistFileTag(mvceditor::FileTagClass& fileTag)
 		return;
 	}
 	std::string fullPath = mvceditor::WxToChar(fileTag.FullPath);
+	std::string name = mvceditor::WxToChar(fileTag.Name());
 	std::tm tm;
 	int isParsed = fileTag.IsParsed ? 1 : 0;
 	int isNew = fileTag.IsNew ? 1 : 0;
@@ -730,8 +770,8 @@ void mvceditor::TagParserClass::PersistFileTag(mvceditor::FileTagClass& fileTag)
 	}
 	try {
 		soci::statement stmt = (Session->prepare <<
-			"INSERT INTO file_items (file_item_id, full_path, last_modified, is_parsed, is_new) VALUES(NULL, ?, ?, ?, ?)",
-			soci::use(fullPath), soci::use(tm), soci::use(isParsed), soci::use(isNew)
+			"INSERT INTO file_items (file_item_id, source_id, full_path, name, last_modified, is_parsed, is_new) VALUES(NULL, ?, ?, ?, ?, ?, ?)",
+			soci::use(CurrentSourceId), soci::use(fullPath), soci::use(name), soci::use(tm), soci::use(isParsed), soci::use(isNew)
 		);
 		stmt.execute(true);
 		soci::sqlite3_statement_backend* backend = static_cast<soci::sqlite3_statement_backend*>(stmt.get_backend());
@@ -740,7 +780,8 @@ void mvceditor::TagParserClass::PersistFileTag(mvceditor::FileTagClass& fileTag)
 		
 		// ATTN: at some point bubble these exceptions up?
 		// to avoid unreferenced local variable warnings in MSVC
-		e.what();
+		wxString msg = wxString::FromAscii(e.what());
+		wxASSERT_MSG(false, msg);
 	}
 }
 
@@ -852,6 +893,7 @@ void mvceditor::TagParserClass::PersistResources(const mvceditor::TagClass& reso
 	}	
 	try {
 		FileTagId = fileTagId;
+
 		Key = mvceditor::IcuToChar(resource.Key);
 		Identifier = mvceditor::IcuToChar(resource.Identifier);
 		ClassName = mvceditor::IcuToChar(resource.ClassName);
@@ -883,9 +925,9 @@ void mvceditor::TagParserClass::PersistTraits(
 	}
 	std::string sql;
 	sql += "INSERT OR IGNORE INTO trait_resources(";
-	sql += "key, file_item_id, class_name, namespace_name, trait_name, ";
+	sql += "key, file_item_id, source_id, class_name, namespace_name, trait_name, ";
 	sql += "trait_namespace_name, aliases, instead_ofs) VALUES ("; 
-	sql += "?, ?, ?, ?, ?, ";
+	sql += "?, ?, ?, ?, ?, ?, ";
 	sql += "?, ?, ?)";
 	std::string key;
 	std::string className;
@@ -897,7 +939,7 @@ void mvceditor::TagParserClass::PersistTraits(
 
 	try {
 		soci::statement stmt = (Session->prepare << sql,
-			soci::use(key), soci::use(fileTagId), soci::use(className), soci::use(namespaceName), soci::use(traitClassName),
+			soci::use(key), soci::use(fileTagId), soci::use(CurrentSourceId), soci::use(className), soci::use(namespaceName), soci::use(traitClassName),
 			soci::use(traitNamespaceName), soci::use(aliases), soci::use(insteadOfs)
 		);
 		std::map<UnicodeString, std::vector<mvceditor::TraitTagClass>, UnicodeStringComparatorClass>::const_iterator it;

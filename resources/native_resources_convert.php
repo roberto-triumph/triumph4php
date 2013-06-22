@@ -109,10 +109,10 @@ $phdPdo = new PDO($phdConnString);
 initOutputPdo($outputPdo);
 $outputPdo->beginTransaction();
 $insertStmt = $outputPdo->prepare('INSERT INTO resources(' .
-	'file_item_id, key, identifier, class_name, type, namespace_name, ' .
+	'file_item_id, source_id, key, identifier, class_name, type, namespace_name, ' .
 	'signature, comment, return_type, is_protected, is_private, is_static, ' .
 	'is_dynamic, is_native) VALUES(' .
-	'?, ?, ?, ?, ?, ?, ' .
+	'?, 0, ?, ?, ?, ?, ?, ' .
 	'?, ?, ?, ?, ?, ?, ' .
 	'?, ?)'
 );

@@ -28,7 +28,7 @@
 #include <language/SymbolTableClass.h>
 #include <language/TagCacheClass.h>
 #include <search/DirectorySearchClass.h>
-#include <search/TagFinderClass.h>
+#include <language/ParsedTagFinderClass.h>
 #include <globals/Assets.h>
 #include <globals/Sqlite.h>
 #include <soci/soci.h>
@@ -109,7 +109,7 @@ int main(int argc, char** argv) {
 	wxOperatingSystemId os = wxGetOsVersion(&major, &minor);
 	if (os == wxOS_WINDOWS_NT) {
 		FileName = wxT("C:\\Users\\roberto\\Documents\\mvc-editor\\php_detectors\\lib\\Zend\\Config.php");
-		DirName = wxT("C:\\Users\\roberto\\software\\wamp\\www\\tci_umbrellaservices");
+		DirName = wxT("C:\\Users\\roberto\\Documents\\sample_php_project");
 		DbFileName = wxT("resource.db");
 	}
 	else {
@@ -128,6 +128,10 @@ int main(int argc, char** argv) {
 		std::string in;
 		std::cin >> test;	
 	}
+	else {
+		test = argv[1];
+	}
+
 	if (test == "lexer") {
 		ProfileLexer();
 	}
@@ -266,39 +270,38 @@ void ProfileTagParserOnLargeProject() {
 	time = wxGetLocalTimeMillis();
 	tagParser.PhpFileExtensions.push_back(wxT("*.php"));
 	tagParser.Init(&session);
-	tagFinder.Init(&session);
+	tagFinder.InitSession(&session);
 	search.Init(DirName);
 	while (search.More()) {
 		search.Walk(tagParser);
 	}
 	time = wxGetLocalTimeMillis() - time;
-printf("time for tagFinder on entire project:%ld ms\n", time.ToLong());
+	printf("time for tagFinder on entire project:%ld ms\n", time.ToLong());
 }
 
 void ProfileTagSearch() {
 	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(DbFileName));
 	mvceditor::ParsedTagFinderClass tagFinder;
-	tagFinder.Init(&session);
+	tagFinder.InitSession(&session);
 	wxLongLong time;
 	size_t found = 0;
 
 	time = wxGetLocalTimeMillis();
-	std::string key;
-	soci::statement stmt = (session.prepare << "SELECT key from resources WHERE key like 'Request::get%' escape '^'", soci::into(key));
-	bool data = stmt.execute(true);
-	if (data) {
-		do {
-			found++;
-		} while (stmt.fetch());
-	}
-	/*
+	
 	std::vector<mvceditor::TagClass> matches;
 	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("Request::get"));
-	matches = tagFinder.NearMatchTags(tagSearch);
+	mvceditor::TagResultClass* result = tagSearch.CreateNearMatchResults();
+	tagFinder.Exec(result);
+	found = 0;
+	while (result->More()) {
+		result->Next();
+		found++;
+	}
+	delete result;
+	
 	found = matches.size();
 	*/
 	time = wxGetLocalTimeMillis() - time;
-	
 	printf("time for tagFinder on entire project after caching:%ld ms found:%d\n", time.ToLong(), (int)found);
 }
 

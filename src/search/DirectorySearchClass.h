@@ -46,8 +46,10 @@ public:
 	 * This method will be called right before the first file is iterated through. Walkers will
 	 * perform any initialization here.
 	 * Note that BeginSearch() will NOT be called if the DirectorySearch was given a non-existent or empty directory.
+	 * 
+	 * @param fullPath the full path to the directory being iterated that was given in the DirectorySearch::Init() method
 	 */
-	virtual void BeginSearch() { };
+	virtual void BeginSearch(const wxString& fullPath) { };
 
 	/**
 	 * The walker should determine whether it thinks the given file is special and wants to mark it as so.
@@ -339,6 +341,13 @@ private:
 	 * @param dir the directory to look in
 	 */
 	void AddFiles(wxDir& dir);
+
+	/**
+	 * pops the next directory off the stack, reads the files in the dir, and 
+	 * populates the files and directories stack.
+	 * @param walker to notify that a new source is being searched
+	 */
+	void EnumerateNextDir(mvceditor::DirectoryWalkerClass& walker);
 	
 	/**
 	 * The files that the DirectoryWalker matched on
@@ -360,6 +369,12 @@ private:
 	 * @var std::vector<wxString>
 	 */
 	std::stack<wxString> Directories;
+
+	/**
+	 * The source directories to iterate through. InitSources are the directories
+	 * where the recursion started.
+	 */
+	std::vector<wxString> InitSources;
 
 	/**
 	 * Stores the wildcards so that we ignore files 

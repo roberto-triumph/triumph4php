@@ -29,27 +29,15 @@
 #include <sqlite3.h>
 #include <algorithm>
 
-/**
- * escape a value so that it is suitable for using in a LIKE SQL clause
- * ie. so that an underscore is treated literally
- * @param value the value to escape
- * @param c the character to USE for escaping. this should NOT be backslash,
- *        as we have namespaces in the database and they use backslash
- */
-std::string mvceditor::SqliteSqlEscape(const std::string& value, char c) {
-	size_t i = 0;
-	std::string escaped;
-	size_t next = value.find("_", i);
-	while (next != std::string::npos) {
-		escaped += value.substr(i, next - i);
-		escaped += c;
-		escaped += "_";
 
-		i = next + 1;
-		next = value.find("_", i);
-	}
-	if (i < value.length()) {
-		escaped += value.substr(i);
+std::string mvceditor::SqliteSqlLikeEscape(const std::string& value, char e) {
+	std::string escaped;
+	for (size_t i = 0; i < value.size(); i++) {
+		char c = value[i];
+		if ('_' == c || '\'' == c || '%' == c) {
+			escaped += e;
+		}
+		escaped += c;
 	}
 	return escaped;
 }
@@ -138,52 +126,76 @@ void mvceditor::SqliteSetBusyTimeout(soci::session& session, int timeoutMs) {
 }
 
 
-mvceditor::SqliteFinderClass::SqliteFinderClass()
-	: Sessions() {
+mvceditor::SqliteFinderClass::SqliteFinderClass() {
+	Session = NULL;
 }
 
 mvceditor::SqliteFinderClass::~SqliteFinderClass() {
-	Close();
 }
 
-void mvceditor::SqliteFinderClass::Close() {
-	std::vector<soci::session*>::iterator session;
-	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
-		try {
-			(*session)->close();
-		} catch (std::exception& e) {
-			wxUnusedVar(e);
-			// ignore close exceptions since we want to clean up
-		}
-		delete (*session);
+void mvceditor::SqliteFinderClass::InitSession(soci::session* session) {
+	Session = session;
+}
+
+bool mvceditor::SqliteFinderClass::Exec(mvceditor::SqliteResultClass* result) {
+	bool ret = result->Prepare(*Session, true);
+	return ret;
+}
+
+bool mvceditor::SqliteFinderClass::IsInit() const {
+	return NULL != Session;
+}
+
+mvceditor::SqliteResultClass::SqliteResultClass() 
+: IsEmpty(true) {
+	Stmt = NULL;
+}
+
+mvceditor::SqliteResultClass::~SqliteResultClass() {
+	if (Stmt) {
+		delete Stmt;
 	}
-	Sessions.clear();
+}	
+
+bool mvceditor::SqliteResultClass::Empty() const {
+	return IsEmpty;
 }
 
-bool mvceditor::SqliteFinderClass::AttachExistingFile(const wxFileName& fileName) {
-	wxASSERT_MSG(fileName.IsOk(), _("File name given to SqliteFinderClass::AttachExistingFile is not OK."));
-	if (!fileName.IsOk()) {
+bool mvceditor::SqliteResultClass::More() const {
+	return !IsEmpty && NULL != Stmt;
+}
+
+bool mvceditor::SqliteResultClass::Fetch() {
+	if (!Stmt) {
 		return false;
 	}
-	bool isOpened = false;
-	std::string stdDbName = mvceditor::WxToChar(fileName.GetFullPath());
-	soci::session* session = new soci::session();
-	try {
-		session->open(*soci::factory_sqlite3(), stdDbName);
-		isOpened = true;
-		Sessions.push_back(session);
-	} catch(std::exception const& e) {
-		isOpened = false;
-		wxString msg = mvceditor::CharToWx(e.what());
-		wxASSERT_MSG(isOpened, msg);
+	bool more = Stmt->fetch();
+	if (!more) {
+		delete Stmt;
+		Stmt = NULL;
 	}
-	if (!isOpened) {
-		session->close();
-		delete session;
-	}
-	return isOpened;
+	return more;
 }
 
-void mvceditor::SqliteFinderClass::AdoptSession(soci::session* session) {
-	Sessions.push_back(session);
+bool mvceditor::SqliteResultClass::AdoptStatement(soci::statement* stmt, wxString& error)  {
+	Stmt = stmt;
+	IsEmpty = true;
+	try {
+		Stmt->define_and_bind();
+		bool hasData = Stmt->execute(true);
+		if (hasData) {
+			IsEmpty = false;
+		}
+		else {
+			IsEmpty = true;
+			delete Stmt;
+			Stmt = NULL;
+		}
+	} catch (std::exception& e) {
+		error = mvceditor::CharToWx(e.what()); 
+		wxASSERT_MSG(false, error);
+		delete Stmt;
+		Stmt = NULL;
+	}
+	return !IsEmpty;
 }

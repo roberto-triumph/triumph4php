@@ -29,6 +29,7 @@
 #include <globals/CodeControlOptionsClass.h>
 #include <globals/Assets.h>
 #include <globals/GlobalsClass.h>
+#include <language/TagFinderList.h>
 #include <code_control/CodeControlStyles.h>
 #include <code_control/CodeControlClass.h>
 #include <search/FindInFilesClass.h>
@@ -152,12 +153,12 @@ bool CodeControlProfilerAppClass::OnInit() {
 	mvceditor::CodeControlStylesSetToLightTheme(Options);
 	Options.EnableAutomaticLineIndentation = true;
 	Options.EnableAutoCompletion = true;
-	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass;
+	mvceditor::TagFinderListClass* tagFinderlist = new mvceditor::TagFinderListClass;
 	std::vector<wxString> phpFileFilters,
 		miscFileFilters;
 	phpFileFilters.push_back(wxT("*.php"));
-	globalCache->InitGlobalTag(mvceditor::NativeFunctionsAsset(), phpFileFilters, miscFileFilters, pelet::PHP_53);
-	Globals.TagCache.RegisterGlobal(globalCache);
+	tagFinderlist->InitGlobalTag(mvceditor::NativeFunctionsAsset(), phpFileFilters, miscFileFilters, pelet::PHP_53);
+	Globals.TagCache.RegisterGlobal(tagFinderlist);
 	
 	CodeControlFrameClass* frame = new CodeControlFrameClass(*this);
 	SetTopWindow(frame);

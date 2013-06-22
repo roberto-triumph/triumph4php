@@ -78,264 +78,246 @@ mvceditor::UrlTagFinderClass::UrlTagFinderClass()
 
 bool mvceditor::UrlTagFinderClass::FindByUrl(const wxURI& url, mvceditor::UrlTagClass& urlTag) {
 	bool ret = false;
-	if (Sessions.empty()) {
+	if (!Session) {
 		return ret;
 	}
-	std::vector<soci::session*>::iterator session;
-	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
-		std::string stdUrlWhere = mvceditor::WxToChar(url.BuildURI());
-		std::string stdUrl;
-		std::string stdFullPath;
-		std::string stdClassName;
-		std::string stdMethodName;
-		try {
-			soci::statement stmt = ((*session)->prepare << 
-				"SELECT url, full_path, class_name, method_name FROM url_tags WHERE url = ? ",
-				soci::use(stdUrlWhere),
-				soci::into(stdUrl), soci::into(stdFullPath), 
-				soci::into(stdClassName), soci::into(stdMethodName) 
-			);
-			if (stmt.execute(true)) {
-				urlTag.Url.Create(mvceditor::CharToWx(stdUrl.c_str()));
-				urlTag.FileName.Assign(mvceditor::CharToWx(stdFullPath.c_str()));
-				urlTag.ClassName = mvceditor::CharToWx(stdClassName.c_str());
-				urlTag.MethodName = mvceditor::CharToWx(stdMethodName.c_str());
-				ret = true;
-			}
-		} catch (std::exception& e) {
-			wxUnusedVar(e);
-			wxString msg = mvceditor::CharToWx(e.what());
-			wxASSERT_MSG(false, msg);
+	std::string stdUrlWhere = mvceditor::WxToChar(url.BuildURI());
+	std::string stdUrl;
+	std::string stdFullPath;
+	std::string stdClassName;
+	std::string stdMethodName;
+	try {
+		soci::statement stmt = (Session->prepare << 
+			"SELECT url, full_path, class_name, method_name FROM url_tags WHERE url = ? ",
+			soci::use(stdUrlWhere),
+			soci::into(stdUrl), soci::into(stdFullPath), 
+			soci::into(stdClassName), soci::into(stdMethodName) 
+		);
+		if (stmt.execute(true)) {
+			urlTag.Url.Create(mvceditor::CharToWx(stdUrl.c_str()));
+			urlTag.FileName.Assign(mvceditor::CharToWx(stdFullPath.c_str()));
+			urlTag.ClassName = mvceditor::CharToWx(stdClassName.c_str());
+			urlTag.MethodName = mvceditor::CharToWx(stdMethodName.c_str());
+			ret = true;
 		}
+	} catch (std::exception& e) {
+		wxUnusedVar(e);
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxASSERT_MSG(false, msg);
 	}
 	return ret;
 }
 
 bool mvceditor::UrlTagFinderClass::FindByClassMethod(const wxString& className, const wxString& methodName, mvceditor::UrlTagClass& urlTag) {
 	bool ret = false;
-	if (Sessions.empty()) {
+	if (!Session) {
 		return ret;
 	}
 	std::string stdClassNameWhere = mvceditor::WxToChar(className);
 	std::string stdMethodNameWhere = mvceditor::WxToChar(methodName);
-	std::vector<soci::session*>::iterator session;
-	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
-		std::string stdUrl;
-		std::string stdFullPath;
-		std::string stdClassName;
-		std::string stdMethodName;
-		try {
-			soci::statement stmt = ((*session)->prepare << 
-				"SELECT url, full_path, class_name, method_name FROM url_tags WHERE class_name = ? AND method_name = ?",
-				soci::use(stdClassNameWhere), soci::use(stdMethodNameWhere),
-				soci::into(stdUrl), soci::into(stdFullPath), 
-				soci::into(stdClassName), soci::into(stdMethodName) 
-			);
-			if (stmt.execute(true)) {
-				urlTag.Url.Create(mvceditor::CharToWx(stdUrl.c_str()));
-				urlTag.FileName.Assign(mvceditor::CharToWx(stdFullPath.c_str()));
-				urlTag.ClassName = mvceditor::CharToWx(stdClassName.c_str());
-				urlTag.MethodName = mvceditor::CharToWx(stdMethodName.c_str());
-				ret = true;
-			}
-		} catch (std::exception& e) {
-			wxUnusedVar(e);
-			wxString msg = mvceditor::CharToWx(e.what());
-			wxASSERT_MSG(false, msg);
+
+	std::string stdUrl;
+	std::string stdFullPath;
+	std::string stdClassName;
+	std::string stdMethodName;
+	try {
+		soci::statement stmt = (Session->prepare << 
+			"SELECT url, full_path, class_name, method_name FROM url_tags WHERE class_name = ? AND method_name = ?",
+			soci::use(stdClassNameWhere), soci::use(stdMethodNameWhere),
+			soci::into(stdUrl), soci::into(stdFullPath), 
+			soci::into(stdClassName), soci::into(stdMethodName) 
+		);
+		if (stmt.execute(true)) {
+			urlTag.Url.Create(mvceditor::CharToWx(stdUrl.c_str()));
+			urlTag.FileName.Assign(mvceditor::CharToWx(stdFullPath.c_str()));
+			urlTag.ClassName = mvceditor::CharToWx(stdClassName.c_str());
+			urlTag.MethodName = mvceditor::CharToWx(stdMethodName.c_str());
+			ret = true;
 		}
+	} catch (std::exception& e) {
+		wxUnusedVar(e);
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxASSERT_MSG(false, msg);
 	}
 	return ret;
 }
 
 bool mvceditor::UrlTagFinderClass::FilterByFullPath(const wxString& fullPath, std::vector<UrlTagClass>& urlTags) {
 	bool ret = false;
-	if (Sessions.empty()) {
+	if (!Session) {
 		return ret;
 	}
 	std::string stdFullPathWhere = mvceditor::WxToChar(fullPath);
-	std::vector<soci::session*>::iterator session;
-	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
-		std::string stdUrl;
-		std::string stdFullPath;
-		std::string stdClassName;
-		std::string stdMethodName;
-		try {
-			soci::statement stmt = ((*session)->prepare << 
-				"SELECT url, full_path, class_name, method_name FROM url_tags WHERE full_path = ?",
-				soci::use(stdFullPathWhere),
-				soci::into(stdUrl), soci::into(stdFullPath), 
-				soci::into(stdClassName), soci::into(stdMethodName) 
-			);
-			if (stmt.execute(true)) {
+	
+	std::string stdUrl;
+	std::string stdFullPath;
+	std::string stdClassName;
+	std::string stdMethodName;
+	try {
+		soci::statement stmt = (Session->prepare << 
+			"SELECT url, full_path, class_name, method_name FROM url_tags WHERE full_path = ?",
+			soci::use(stdFullPathWhere),
+			soci::into(stdUrl), soci::into(stdFullPath), 
+			soci::into(stdClassName), soci::into(stdMethodName) 
+		);
+		if (stmt.execute(true)) {
+			mvceditor::UrlTagClass urlTag;
+			urlTag.Url.Create(mvceditor::CharToWx(stdUrl.c_str()));
+			urlTag.FileName.Assign(mvceditor::CharToWx(stdFullPath.c_str()));
+			urlTag.ClassName = mvceditor::CharToWx(stdClassName.c_str());
+			urlTag.MethodName = mvceditor::CharToWx(stdMethodName.c_str());
+
+			urlTags.push_back(urlTag);
+			ret = true;
+		}
+	} catch (std::exception& e) {
+		wxUnusedVar(e);
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxASSERT_MSG(false, msg);
+	}
+	return ret;
+}
+
+void mvceditor::UrlTagFinderClass::DeleteUrl(const wxURI& url) {
+	if (!Session) {
+		return;
+	}
+	std::string stdUrl = mvceditor::WxToChar(url.BuildURI());
+	try {
+		soci::statement stmt = (Session->prepare << 
+			"DELETE FROM url_tags WHERE url = ? ",
+			soci::use(stdUrl)
+		);
+		stmt.execute(true);
+	} catch (std::exception& e) {
+		wxUnusedVar(e);
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxASSERT_MSG(false, msg);
+	}
+}
+
+void mvceditor::UrlTagFinderClass::FilterUrls(const wxString& filter, std::vector<UrlTagClass>& matchedUrls) {
+	if (!Session) {
+		return;
+	}
+	std::string stdUrl;
+	std::string stdFullPath;
+	std::string stdClassName;
+	std::string stdMethodName;
+	std::string stdFilter = mvceditor::WxToChar(filter);
+	std::string escaped = mvceditor::SqliteSqlLikeEscape(stdFilter, '^');
+
+	// hmmm... query might not be optimal for 1000s of urls
+	// not sure if the number of urls will go into the 1000s
+	std::string sql = "SELECT url, full_path, class_name, method_name ";
+	sql += "FROM url_tags WHERE url LIKE '%" + escaped + "%' ESCAPE '^' LIMIT 100";
+
+	try {
+		soci::statement stmt = (Session->prepare << sql,
+			soci::into(stdUrl), soci::into(stdFullPath),
+			soci::into(stdClassName), soci::into(stdMethodName)
+		);
+		if (stmt.execute(true)) {
+			do {
 				mvceditor::UrlTagClass urlTag;
 				urlTag.Url.Create(mvceditor::CharToWx(stdUrl.c_str()));
 				urlTag.FileName.Assign(mvceditor::CharToWx(stdFullPath.c_str()));
 				urlTag.ClassName = mvceditor::CharToWx(stdClassName.c_str());
 				urlTag.MethodName = mvceditor::CharToWx(stdMethodName.c_str());
 
-				urlTags.push_back(urlTag);
-				ret = true;
-			}
-		} catch (std::exception& e) {
-			wxUnusedVar(e);
-			wxString msg = mvceditor::CharToWx(e.what());
-			wxASSERT_MSG(false, msg);
+				matchedUrls.push_back(urlTag);
+			} while (stmt.fetch());
 		}
 	}
-	return ret;
-}
-
-void mvceditor::UrlTagFinderClass::DeleteUrl(const wxURI& url) {
-	if (Sessions.empty()) {
-		return;
-	}
-	std::string stdUrl = mvceditor::WxToChar(url.BuildURI());
-	std::vector<soci::session*>::iterator session;
-	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
-		try {
-			soci::statement stmt = ((*session)->prepare << 
-				"DELETE FROM url_tags WHERE url = ? ",
-				soci::use(stdUrl)
-			);
-			stmt.execute(true);
-		} catch (std::exception& e) {
-			wxUnusedVar(e);
-			wxString msg = mvceditor::CharToWx(e.what());
-			wxASSERT_MSG(false, msg);
-		}
-	}
-}
-
-void mvceditor::UrlTagFinderClass::FilterUrls(const wxString& filter, std::vector<UrlTagClass>& matchedUrls) {
-	if (Sessions.empty()) {
-		return;
-	}
-	std::vector<soci::session*>::iterator session;
-	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
-		std::string stdUrl;
-		std::string stdFullPath;
-		std::string stdClassName;
-		std::string stdMethodName;
-		std::string stdFilter = mvceditor::WxToChar(filter);
-		std::string escaped = mvceditor::SqliteSqlEscape(stdFilter, '^');
-
-		// hmmm... query might not be optimal for 1000s of urls
-		// not sure if the number of urls will go into the 1000s
-		std::string sql = "SELECT url, full_path, class_name, method_name ";
-		sql += "FROM url_tags WHERE url LIKE '%" + escaped + "%' ESCAPE '^' LIMIT 100";
-
-		try {
-			soci::statement stmt = ((*session)->prepare << sql,
-				soci::into(stdUrl), soci::into(stdFullPath),
-				soci::into(stdClassName), soci::into(stdMethodName)
-			);
-			if (stmt.execute(true)) {
-				do {
-					mvceditor::UrlTagClass urlTag;
-					urlTag.Url.Create(mvceditor::CharToWx(stdUrl.c_str()));
-					urlTag.FileName.Assign(mvceditor::CharToWx(stdFullPath.c_str()));
-					urlTag.ClassName = mvceditor::CharToWx(stdClassName.c_str());
-					urlTag.MethodName = mvceditor::CharToWx(stdMethodName.c_str());
-
-					matchedUrls.push_back(urlTag);
-				} while (stmt.fetch());
-			}
-		}
-		catch (std::exception& e) {
-			wxUnusedVar(e);
-			wxString msg = mvceditor::CharToWx(e.what());
-			wxASSERT_MSG(false, msg);
-		}
+	catch (std::exception& e) {
+		wxUnusedVar(e);
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxASSERT_MSG(false, msg);
 	}
 }
 
 void mvceditor::UrlTagFinderClass::Wipe() {
-	if (Sessions.empty()) {
+	if (!Session) {
 		return;
 	}
-	std::vector<soci::session*>::iterator session;
-	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
-		try {
-			(*session)->once << "DELETE FROM url_tags";
-		} catch (std::exception& e) {
-			wxUnusedVar(e);
-			wxString msg = mvceditor::CharToWx(e.what());
-			wxASSERT_MSG(false, msg);
-		}
+	try {
+		Session->once << "DELETE FROM url_tags";
+	} catch (std::exception& e) {
+		wxUnusedVar(e);
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxASSERT_MSG(false, msg);
 	}
 }
 
 int mvceditor::UrlTagFinderClass::Count() {
 	int totalCount = 0;
-	if (Sessions.empty()) {
+	if (!Session) {
 		return totalCount;
 	}
-	std::vector<soci::session*>::iterator session;
-	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
-		int dbCount;
-		try {
-			soci::statement stmt = (
-				(*session)->prepare << "SELECT COUNT(*) FROM url_tags", 
-				soci::into(dbCount));
-			stmt.execute(true);
+	int dbCount;
+	try {
+		soci::statement stmt = (
+			Session->prepare << "SELECT COUNT(*) FROM url_tags", 
+			soci::into(dbCount));
+		stmt.execute(true);
 
-			// aggregate counts across all dbs
-			totalCount += dbCount;
-		} catch (std::exception& e) {
-			wxUnusedVar(e);
-			wxString msg = mvceditor::CharToWx(e.what());
-			wxASSERT_MSG(false, msg);
-		}
+		// aggregate counts across all dbs
+		totalCount += dbCount;
+	} catch (std::exception& e) {
+		wxUnusedVar(e);
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxASSERT_MSG(false, msg);
 	}
 	return totalCount;
 }
 
 std::vector<wxString> mvceditor::UrlTagFinderClass::AllControllerNames() {
 	std::vector<wxString> controllerNames;
+	if (!Session) {
+		return controllerNames;
+	}
 	std::vector<soci::session*>::iterator session;
 	std::string controller;
-	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
-		try {
-			soci::statement stmt =((*session)->prepare <<
-				"SELECT DISTINCT class_name FROM url_tags", soci::into(controller)
-			);
-			if (stmt.execute(true)) {
-				do {
-					controllerNames.push_back(mvceditor::CharToWx(controller.c_str()));
-				} while (stmt.fetch());
-			}
-		} catch (std::exception& e) {
-			wxString msg = mvceditor::CharToWx(e.what());
-			wxUnusedVar(e);
-			wxUnusedVar(msg);
-			wxASSERT_MSG(false, msg);
+	try {
+		soci::statement stmt = (Session->prepare <<
+			"SELECT DISTINCT class_name FROM url_tags", soci::into(controller)
+		);
+		if (stmt.execute(true)) {
+			do {
+				controllerNames.push_back(mvceditor::CharToWx(controller.c_str()));
+			} while (stmt.fetch());
 		}
+	} catch (std::exception& e) {
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxUnusedVar(e);
+		wxUnusedVar(msg);
+		wxASSERT_MSG(false, msg);
 	}
 	return controllerNames;
 }
 
 std::vector<wxString> mvceditor::UrlTagFinderClass::AllMethodNames(const wxString& controllerClassName) {
 	std::vector<wxString> methodNames;
-	std::vector<soci::session*>::iterator session;
+	if (!Session) {
+		return methodNames;
+	}
 	std::string methodName;
 	std::string controllerWhere = mvceditor::WxToChar(controllerClassName);
-	for (session = Sessions.begin(); session != Sessions.end(); ++session) {
-		try {
-			soci::statement stmt =((*session)->prepare <<
-				"SELECT DISTINCT method_name FROM url_tags WHERE class_name = ?", 
-				soci::use(controllerWhere), soci::into(methodName)
-			);
-			if (stmt.execute(true)) {
-				do {
-					methodNames.push_back(mvceditor::CharToWx(methodName.c_str()));
-				} while (stmt.fetch());
-			}
-		} catch (std::exception& e) {
-			wxString msg = mvceditor::CharToWx(e.what());
-			wxUnusedVar(e);
-			wxUnusedVar(msg);
-			wxASSERT_MSG(false, msg);
+	try {
+		soci::statement stmt = (Session->prepare <<
+			"SELECT DISTINCT method_name FROM url_tags WHERE class_name = ?", 
+			soci::use(controllerWhere), soci::into(methodName)
+		);
+		if (stmt.execute(true)) {
+			do {
+				methodNames.push_back(mvceditor::CharToWx(methodName.c_str()));
+			} while (stmt.fetch());
 		}
+	} catch (std::exception& e) {
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxUnusedVar(e);
+		wxUnusedVar(msg);
+		wxASSERT_MSG(false, msg);
 	}
 	return methodNames;
 }

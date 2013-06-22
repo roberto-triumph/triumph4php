@@ -27,6 +27,7 @@
 #include <FileTestFixtureClass.h>
 #include <SqliteTestFixtureClass.h>
 #include <language/CallStackClass.h>
+#include <language/TagFinderList.h>
 #include <globals/String.h>
 #include <globals/Sqlite.h>
 #include <globals/Assets.h>
@@ -82,17 +83,17 @@ public:
 		soci::session* session = new soci::session(*soci::factory_sqlite3(), ":memory:");
 		CreateDatabase(*session, mvceditor::ResourceSqlSchemaAsset()); 
 
-		mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass;
-		globalCache->AdoptGlobalTag(session, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+		mvceditor::TagFinderListClass* tagFinderList = new mvceditor::TagFinderListClass;
+		tagFinderList->AdoptGlobalTag(session, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 		
 		mvceditor::DirectorySearchClass search;
 		search.Init(TestProjectDir + wxT("src"));
 		while (search.More()) {
-			globalCache->Walk(search);
+			tagFinderList->Walk(search);
 		}
 		
 		// need to code it so that gcc does not think that good is an unused variable in release mode
-		TagCache.RegisterGlobal(globalCache);
+		TagCache.RegisterGlobal(tagFinderList);
 	}
 };
 

@@ -88,7 +88,7 @@ bool mvceditor::SequenceClass::AppStart() {
 	// this will load the cache from the hard disk
 	// load the cache from hard disk so that code completion and 
 	// tag searching is available immediately after the app starts
-	AddStep(new mvceditor::ProjectTagInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_INIT));
+	AddStep(new mvceditor::ProjectTagInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_INIT));
 
 	// this will load the url entry point cache
 	// do this before the rest so the urls become available asap
@@ -105,7 +105,7 @@ bool mvceditor::SequenceClass::AppStart() {
 	AddStep(new mvceditor::DatabaseTagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR));
 
 	// this will update the tag cache by parsing newly modified files
-	AddStep(new mvceditor::ProjectTagActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE));
+	AddStep(new mvceditor::ProjectTagActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST));
 
 	// this will discover the db schema info (tables, columns)
 	AddStep(new mvceditor::SqlMetaDataActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA));
@@ -146,7 +146,7 @@ bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvced
 			dirsToDelete.push_back(source->RootDirectory);
 		}
 	}
-	AddStep(new mvceditor::TagDeleteActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE, dirsToDelete));
+	AddStep(new mvceditor::TagDeleteActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE, dirsToDelete));
 
 	// this will load the url entry point cache
 	// do this before the rest so the urls become available asap
@@ -164,7 +164,7 @@ bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvced
 
 	// this will update the tag cache by parsing newly modified files
 	mvceditor::ProjectTagActionClass* action = 
-		new mvceditor::ProjectTagActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE);
+		new mvceditor::ProjectTagActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST);
 	action->SetTouchedProjects(touchedProjects);
 	AddStep(action);
 	
@@ -188,10 +188,10 @@ bool mvceditor::SequenceClass::TagCacheWipeAndIndex() {
 	SourceCheck();
 
 	// this step will wipe the global cache from all projects
-	AddStep(new mvceditor::TagWipeActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE));
+	AddStep(new mvceditor::TagWipeActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE));
 
 	// this will recurse though all directories and parse the source code
-	AddStep(new mvceditor::ProjectTagActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE));
+	AddStep(new mvceditor::ProjectTagActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST));
 
 	// this will detect the urls (entry points) that a project has
 	AddStep(new mvceditor::UrlTagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR));
@@ -377,15 +377,15 @@ const wxEventType mvceditor::EVENT_SEQUENCE_IN_PROGRESS = wxNewEventType();
 const wxEventType mvceditor::EVENT_SEQUENCE_COMPLETE = wxNewEventType();
 
 BEGIN_EVENT_TABLE(mvceditor::SequenceClass, wxEvtHandler)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_INIT, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
+	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_INIT, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
+	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_SQL_METADATA_INIT, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_SQL_METADATA, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR_INIT, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TAG_DETECTOR_INIT, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TAG_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
+	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_CALL_STACK, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR_INIT, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
@@ -394,15 +394,15 @@ BEGIN_EVENT_TABLE(mvceditor::SequenceClass, wxEvtHandler)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
 
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_INIT, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
+	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_INIT, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
+	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_SQL_METADATA_INIT, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_SQL_METADATA, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR_INIT, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TAG_DETECTOR_INIT, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TAG_DETECTOR, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE_WIPE, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
+	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_CALL_STACK, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
 	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR_INIT, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)

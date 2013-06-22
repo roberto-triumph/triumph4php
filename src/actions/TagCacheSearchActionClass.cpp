@@ -25,15 +25,15 @@
 #include <actions/TagCacheSearchActionClass.h>
 #include <globals/FileName.h>
 #include <globals/Assets.h>
+#include <language/TagFinderList.h>
 #include <globals/TagList.h>
 
 mvceditor::TagCacheSearchCompleteEventClass::TagCacheSearchCompleteEventClass(int eventId,
 																	const UnicodeString& searchString,
 																	const std::vector<mvceditor::TagClass>& tags)
 	: wxEvent(eventId, mvceditor::EVENT_TAG_CACHE_SEARCH_COMPLETE)
-	, SearchString(searchString)
+	, SearchString(searchString) 
 	, Tags(tags) {
-
 }
 
 wxEvent* mvceditor::TagCacheSearchCompleteEventClass::Clone() const {
@@ -55,31 +55,45 @@ void mvceditor::TagCacheSearchActionClass::SetSearch(mvceditor::GlobalsClass& gl
 	SearchString = mvceditor::WxToIcu(search);
 	SearchDirs = mvceditor::DeepCopyFileNames(dirs);
 
-	mvceditor::GlobalCacheClass* cache = new mvceditor::GlobalCacheClass;
+	mvceditor::TagFinderListClass* cache = new mvceditor::TagFinderListClass;
+
+	// only need to initialize the global tag cache, will not show native tags 
+	// because there is no file that needs to be opened
 	cache->InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), globals.GetMiscFileExtensions(),
 		globals.Environment.Php.Version);
-	///cache->InitNativeTag(mvceditor::NativeFunctionsAsset());
-	///cache->InitDetectorTag(globals.DetectorCacheDbFileName);
 	TagCache.RegisterGlobal(cache);
 }
 
 void mvceditor::TagCacheSearchActionClass::BackgroundWork() {
-	std::vector<mvceditor::TagClass> matches;
 	bool exactOnly = SearchString.length() <= 2;
 	if (IsCancelled()) {
 		return;
 	}
-	if (exactOnly) {
-		matches = TagCache.ExactTags(SearchString, SearchDirs);
-	}
-	else {
-		matches = TagCache.NearMatchTags(SearchString, SearchDirs);
-	}
+	std::vector<mvceditor::TagClass> matches;
 
-	// no need to show jump to results for native functions
+	// do exact match first, if that succeeds then don't bother doing near matches
+	mvceditor::TagResultClass* results = TagCache.ExactTags(SearchString, SearchDirs);
+	matches = results->Matches();
+	if (matches.empty() && !exactOnly) {
+		delete results;
+		results = TagCache.NearMatchTags(SearchString, SearchDirs);
+		matches = results->Matches();
+		if (matches.empty()) {
+			mvceditor::FileTagResultClass* fileTagResults = TagCache.ExactFileTags(SearchString, SearchDirs);
+			matches = fileTagResults->MatchesAsTags();
+			if (matches.empty()) {
+				delete fileTagResults;
+				fileTagResults = TagCache.NearMatchFileTags(SearchString, SearchDirs);
+				matches = fileTagResults->MatchesAsTags();
+			}
+			delete fileTagResults;
+		}
+	}
+	delete results;
+
 	// TODO: NearMatchTags shows resources from files that were recently deleted
 	// need to hide them / remove them
-	mvceditor::TagListRemoveNativeMatches(matches);
+
 	if (!IsCancelled()) {
 
 		// PostEvent will set the correct event ID

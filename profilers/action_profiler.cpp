@@ -100,7 +100,7 @@ private:
 	void OnActionInProgress(wxCommandEvent& event);
 	void OnClose(wxCloseEvent& event);
 	void OnSequenceComplete(wxCommandEvent& event);
-	void OnGlobalCacheComplete(mvceditor::GlobalCacheCompleteEventClass& event);
+	void OnTagFinderListComplete(mvceditor::TagFinderListCompleteEventClass& event);
 
 	DECLARE_EVENT_TABLE()
 };
@@ -140,7 +140,7 @@ void MyApp::BuildSequence() {
 		new mvceditor::DetectorCacheDbVersionActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK)
 	);
 	actions.push_back(
-		new mvceditor::ProjectTagActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE)
+		new mvceditor::ProjectTagActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST)
 	);
 	actions.push_back(
 		new mvceditor::UrlTagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR)
@@ -224,7 +224,7 @@ void MyFrame::OnClose(wxCloseEvent& event) {
 	event.Skip();
 }
 
-void MyFrame::OnGlobalCacheComplete(mvceditor::GlobalCacheCompleteEventClass& event) {
+void MyFrame::OnTagFinderListComplete(mvceditor::TagFinderListCompleteEventClass& event) {
 	Log(_("global cache completet"));
 }
 
@@ -235,5 +235,5 @@ void MyFrame::OnSequenceComplete(wxCommandEvent& event) {
 BEGIN_EVENT_TABLE(MyFrame, wxFrame) 
 	EVT_CLOSE(MyFrame::OnClose)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_SEQUENCE_COMPLETE, MyFrame::OnSequenceComplete)
-	EVT_GLOBAL_CACHE_COMPLETE(mvceditor::ID_EVENT_ACTION_GLOBAL_CACHE, MyFrame::OnGlobalCacheComplete)
+	EVT_TAG_FINDER_LIST_COMPLETE(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST, MyFrame::OnTagFinderListComplete)
 END_EVENT_TABLE()

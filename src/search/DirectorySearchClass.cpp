@@ -26,6 +26,7 @@
 #include <wx/dir.h>
 #include <wx/tokenzr.h>
 #include <wx/filename.h>
+#include <algorithm>
 
 mvceditor::SourceClass::SourceClass()  
 	: RootDirectory()
@@ -225,6 +226,7 @@ mvceditor::DirectorySearchClass::DirectorySearchClass()
 	: MatchedFiles() 
 	, CurrentFiles()
 	, Directories()
+	, InitSources()
 	, Sources()
 	, TotalFileCount(0)
 	, DoHiddenFiles(false)
@@ -250,26 +252,26 @@ bool mvceditor::DirectorySearchClass::Init(const std::vector<mvceditor::SourceCl
 	while (!Directories.empty()) {
 		Directories.pop();
 	}
+	InitSources.clear();
 	MatchedFiles.clear();
 	wxChar separator = wxFileName::GetPathSeparator();
 
 	size_t total = 0;
 	for (size_t i = 0; i < sources.size(); ++i) {
 		mvceditor::SourceClass source = sources[i];
-		wxString path = source.RootDirectory.GetFullPath();
-		if (!path.IsEmpty()) {
-			wxString pathWithSeparator = path;
-			if (!pathWithSeparator.IsEmpty() && pathWithSeparator[path.length() - 1] != separator) {
-				pathWithSeparator.Append(separator);
-			}	
-			if (wxDir::Exists(path)) {
-				total++;
-				if (RECURSIVE == mode) {
-					Directories.push(pathWithSeparator);
-				}
-				else {
-					EnumerateAllFiles(pathWithSeparator);
-				}
+		wxString pathWithSeparator = source.RootDirectory.GetPathWithSep();	
+		if (wxDir::Exists(pathWithSeparator)) {
+			total++;
+			InitSources.push_back(pathWithSeparator);
+			if (RECURSIVE == mode) {
+				Directories.push(pathWithSeparator);
+			}
+			else {
+
+				// put the source in the list so that when we are walking through
+				// the files we know when we have started to walk a new source dir
+				CurrentFiles.push(pathWithSeparator);
+				EnumerateAllFiles(pathWithSeparator);
 			}
 		}
 	}
@@ -280,6 +282,7 @@ bool mvceditor::DirectorySearchClass::Init(const std::vector<mvceditor::SourceCl
 		while (!Directories.empty()) {
 			Directories.pop();
 		}
+		InitSources.clear();
 		return false;
 	}
 	Sources.clear();
@@ -297,32 +300,73 @@ bool mvceditor::DirectorySearchClass::More() {
 	return !Directories.empty() || !CurrentFiles.empty();
 }
 
-bool mvceditor::DirectorySearchClass::Walk(mvceditor::DirectoryWalkerClass& walker) {
+void mvceditor::DirectorySearchClass::EnumerateNextDir(mvceditor::DirectoryWalkerClass& walker) {
 	while (CurrentFiles.empty() && !Directories.empty()) {
-		
+		wxString path = Directories.top();
+
+		// if we have come across the new source dir, notify the walker that we are beginning a search
+		// on a new source directory
+		std::vector<wxString>::const_iterator it = std::find(InitSources.begin(), InitSources.end(), path);
+		if (it != InitSources.end()) {
+			if (!HasCalledBegin) {
+				walker.BeginSearch(*it);
+				HasCalledBegin = true;
+				HasCalledEnd = false;
+			}
+			else {
+				walker.EndSearch();
+				walker.BeginSearch(*it);
+				HasCalledBegin = true;
+				HasCalledEnd = false;
+			}
+		}
+
 		// enumerate the next directory, stop when we have a file to search
-		wxString path;
-		path.Append(Directories.top());
 		Directories.pop();
 		wxDir dir(path);
 		if (dir.IsOpened()) {			
-			wxString filename;
 			AddSubDirectories(dir);
 			AddFiles(dir);
-		}
+		}		
 	}
+}
+
+bool mvceditor::DirectorySearchClass::Walk(mvceditor::DirectoryWalkerClass& walker) {
+	EnumerateNextDir(walker);
 	bool hit = false;
 	if (!CurrentFiles.empty()) {
-		wxString filename;
-		filename.Append(CurrentFiles.top());
+		wxString filename = CurrentFiles.top();
 		CurrentFiles.pop();
-		if (!HasCalledBegin) {
-			walker.BeginSearch();
-			HasCalledBegin = true;
+		
+		// if we have come across the new source dir, notify the walker that we are beginning a search
+		// on a new source directory
+		std::vector<wxString>::const_iterator it = std::find(InitSources.begin(), InitSources.end(), filename);
+		if (it != InitSources.end()) {
+			if (!HasCalledBegin) {
+				walker.BeginSearch(*it);
+				HasCalledBegin = true;
+				HasCalledEnd = false;
+			}
+			else {
+				walker.EndSearch();
+				walker.BeginSearch(*it);
+				HasCalledBegin = true;
+				HasCalledEnd = false;
+			}
+			if (!CurrentFiles.empty()) {
+				wxString filename = CurrentFiles.top();
+				CurrentFiles.pop();
+				hit = walker.Walk(filename); 
+				if (hit) {
+					MatchedFiles.push_back(filename);
+				}
+			}
 		}
-		hit = walker.Walk(filename); 
-		if (hit) {
-			MatchedFiles.push_back(filename);
+		else {
+			hit = walker.Walk(filename); 
+			if (hit) {
+				MatchedFiles.push_back(filename);
+			}
 		}
 	}
 	if (HasCalledBegin && !HasCalledEnd && !More()) {

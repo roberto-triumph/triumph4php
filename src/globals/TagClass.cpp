@@ -32,6 +32,7 @@ mvceditor::TagClass::TagClass()
 	, Signature()
 	, ReturnType()
 	, Comment()
+	, Id(0)
 	, FileIsNew(false)
 	, Type(CLASS) 
 	, IsProtected(false)
@@ -41,7 +42,8 @@ mvceditor::TagClass::TagClass()
 	, IsNative(false)
 	, Key()
 	, FullPath()
-	, FileTagId(-1) {
+	, FileTagId(-1) 
+	, SourceId(-1) {
 		
 }
 
@@ -52,6 +54,7 @@ mvceditor::TagClass::TagClass(const mvceditor::TagClass& src)
 	, Signature()
 	, ReturnType()
 	, Comment()
+	, Id(0)
 	, FileIsNew(false)
 	, Type(CLASS)	
 	, IsProtected(false)
@@ -61,7 +64,8 @@ mvceditor::TagClass::TagClass(const mvceditor::TagClass& src)
 	, IsNative(false)
 	, Key()
 	, FullPath()
-	, FileTagId(-1) {
+	, FileTagId(-1) 
+	, SourceId(-1) {
 	Copy(src);
 }
 
@@ -81,7 +85,9 @@ void mvceditor::TagClass::Copy(const mvceditor::TagClass& src) {
 	// deep copy the wxString, as this object may be passed between threads
 	FullPath = src.FullPath.c_str();
 	Key = src.Key;
+	Id = src.Id;
 	FileTagId = src.FileTagId;
+	SourceId = src.SourceId;
 	IsProtected = src.IsProtected;
 	IsPrivate = src.IsPrivate;
 	IsStatic = src.IsStatic;
@@ -109,8 +115,10 @@ void mvceditor::TagClass::Clear() {
 	Signature.remove();
 	ReturnType.remove();
 	Comment.remove();
+	Id = 0;
 	Type = CLASS;
 	FileTagId = -1;
+	SourceId = -1;
 	FullPath = wxT("");
 	Key.remove();
 	IsProtected = false;
@@ -200,4 +208,9 @@ void mvceditor::FileTagClass::MakeNew(const wxFileName& fileName, bool isParsed)
 	FileId = 0;
 	IsParsed = isParsed;
 	IsNew = false;
+}
+
+wxString mvceditor::FileTagClass::Name() const {
+	wxFileName fileName(FullPath);
+	return fileName.GetFullName();
 }

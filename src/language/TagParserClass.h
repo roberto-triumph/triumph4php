@@ -107,7 +107,7 @@ public:
 	/**
 	 * Implement the DirectoryWalkerClass method; will start a transaction
 	 */
-	void BeginSearch();
+	void BeginSearch(const wxString& fullPath);
 		
 	/**
 	 * Parses the given file for resources. Note that one of the Init() method
@@ -282,11 +282,10 @@ private:
 	int CurrentFileTagId;
 
 	/**
-	 * The initial size of FileParsingCache. This is only a hint, the buffer will grow as necessary
-	 * Setting this value to a high value (1024) is good for large projects that have a lot
-	 * resources.
+	 * The source id being indexed. We keep a class-wide member when parsing through all files in a source
+	 * directory.
 	 */
-	int FileParsingBufferSize;
+	int CurrentSourceId;
 
 	/**
 	 * count the number of files that have been parsed so that we commit to sqlite at regular
@@ -359,6 +358,11 @@ private:
 	 *  parsed cache
 	 */
 	bool IsNewNamespace(const UnicodeString& namespaceName);
+
+	/**
+	 * starts a new transaction and creates the INSERT prepared statement
+	 */
+	void BeginTransaction();
 };
 
 }

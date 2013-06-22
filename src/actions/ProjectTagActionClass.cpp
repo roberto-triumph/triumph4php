@@ -32,7 +32,7 @@ mvceditor::ProjectTagActionClass::ProjectTagActionClass(mvceditor::RunningThread
 	, DirectorySearch()
 	, TagCacheDbFileName()
 	, Version(pelet::PHP_53) 
-	, GlobalCache()
+	, TagFinderList()
 	, DoTouchedProjects(false) {
 }
 
@@ -55,7 +55,7 @@ bool mvceditor::ProjectTagActionClass::InitForFile(mvceditor::GlobalsClass& glob
 	std::vector<mvceditor::SourceClass> srcs;
 	srcs.push_back(src);
 	if (DirectorySearch.Init(srcs)) {
-		GlobalCache.InitGlobalTag(globals.TagCacheDbFileName, phpFileExtensions, miscFileExtensions, Version);
+		TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, phpFileExtensions, miscFileExtensions, Version);
 		ret = true;
 	}
 	return ret;
@@ -101,12 +101,12 @@ void mvceditor::ProjectTagActionClass::IterateDirectory() {
 	
 	// careful to test for destroy first
 	while (!IsCancelled() && DirectorySearch.More()) {
-		GlobalCache.Walk(DirectorySearch);
+		TagFinderList.Walk(DirectorySearch);
 		if (!DirectorySearch.More()) {
 			if (!IsCancelled()) {
 
 				// eventId will be set by the PostEvent method
-				mvceditor::GlobalCacheCompleteEventClass evt(wxID_ANY);
+				mvceditor::TagFinderListCompleteEventClass evt(wxID_ANY);
 				PostEvent(evt);
 			}
 		}
@@ -122,7 +122,7 @@ void mvceditor::ProjectTagActionClass::IterateProjects() {
 		phpFileExtensions = Projects[0].PhpFileExtensions;
 		miscFileExtensions = Projects[0].AllNonPhpExtensions();	
 	}
-	GlobalCache.InitGlobalTag(TagCacheDbFileName, phpFileExtensions, miscFileExtensions, Version);
+	TagFinderList.InitGlobalTag(TagCacheDbFileName, phpFileExtensions, miscFileExtensions, Version);
 	for (size_t i = 0; !IsCancelled() && i < Projects.size(); ++i) {
 		mvceditor::ProjectClass project = Projects[i];
 		if (DirectorySearch.Init(project.AllSources())) {
@@ -154,11 +154,11 @@ void mvceditor::ProjectTagInitActionClass::Work(mvceditor::GlobalsClass &globals
 	// even though we know it is stale. The user is notified that the
 	// cache is stale and may not have all of the results
 	// the tag cache will own these pointers
-	mvceditor::GlobalCacheClass* globalCache = new mvceditor::GlobalCacheClass;
-	globalCache->InitNativeTag(mvceditor::NativeFunctionsAsset());
-	globalCache->InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), otherFileExtensions, version);
-	globalCache->InitDetectorTag(globals.DetectorCacheDbFileName);
-	globals.TagCache.RegisterGlobal(globalCache);
+	mvceditor::TagFinderListClass* tagFinderList = new mvceditor::TagFinderListClass;
+	tagFinderList->InitNativeTag(mvceditor::NativeFunctionsAsset());
+	tagFinderList->InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), otherFileExtensions, version);
+	tagFinderList->InitDetectorTag(globals.DetectorCacheDbFileName);
+	globals.TagCache.RegisterGlobal(tagFinderList);
 }
 
 wxString mvceditor::ProjectTagInitActionClass::GetLabel() const {
