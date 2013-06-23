@@ -59,13 +59,13 @@ mvceditor::MainFrameClass::MainFrameClass(const std::vector<mvceditor::FeatureCl
 	, ToolBar(NULL)
 	, ToolsNotebook(NULL)
 	, OutlineNotebook(NULL) {
+	AuiManager.SetManagedWindow(this);
 	StatusBarWithGaugeClass* gauge = new StatusBarWithGaugeClass(this);
 	SetStatusBar(gauge);
 
 	App.EventSink.PushHandler(&Listener);
 	App.RunningThreads.AddEventHandler(this);
 	
-	AuiManager.SetManagedWindow(this);
 	ToolBar = new wxAuiToolBar(this, ID_TOOLBAR, wxDefaultPosition, wxDefaultSize, 
 		  wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_TEXT | wxAUI_TB_HORZ_TEXT);
 	
@@ -84,16 +84,13 @@ mvceditor::MainFrameClass::MainFrameClass(const std::vector<mvceditor::FeatureCl
 	CreateToolBarButtons();
 	
 	// setup the bottom "tools" pane, the main content pane, and the toolbar on top
-	AuiManager.AddPane(Notebook, wxAuiPaneInfo().CentrePane(
+	AuiManager.AddPane(Notebook, wxAuiPaneInfo().Name(wxT("content")).CentrePane(
 		).PaneBorder(true).Gripper(false).Floatable(false).Resizable(true));
-	AuiManager.AddPane(ToolsNotebook, wxAuiPaneInfo().Bottom().Caption(
+	AuiManager.AddPane(ToolsNotebook, wxAuiPaneInfo().Name(wxT("tools")).Bottom().Caption(
 		_("Tools")).Floatable(false).MinSize(-1, 260).Hide().Layer(1));
-	AuiManager.AddPane(OutlineNotebook, wxAuiPaneInfo().Left().Caption(
+	AuiManager.AddPane(OutlineNotebook, wxAuiPaneInfo().Name(wxT("outline")).Left().Caption(
         _("Outlines")).Floatable(false).MinSize(260, -1).Hide());
 	
-	AuiManager.AddPane(ToolBar, wxAuiPaneInfo().Top(
-		).CaptionVisible(false).CloseButton(false).Gripper(
-		false).DockFixed(true).PaneBorder(false).Floatable(false).Row(0).Position(0));
 	DefaultKeyboardShortcuts();
 }
 
@@ -519,11 +516,18 @@ void mvceditor::MainFrameClass::CreateToolBarButtons() {
 	ToolBar->AddTool(ID_TOOLBAR_SAVE, _("Save"), wxArtProvider::GetBitmap(
 		wxART_FILE_SAVE, wxART_TOOLBAR, wxSize(16, 16)), _("Save"));
 	ToolBar->EnableTool(ID_TOOLBAR_SAVE, false);
-	ToolBar->Realize();
 }
 
 void mvceditor::MainFrameClass::AuiManagerUpdate() {
-	ToolBar->Realize();
+	AuiManager.GetPane(wxT("content")).Hide();
+	AuiManager.GetPane(wxT("tools")).Hide();
+	AuiManager.GetPane(wxT("outline")).Hide();
+	
+	AuiManager.GetPane(wxT("tools")).Bottom().Layer(0).Row(0).Position(0);
+	AuiManager.GetPane(wxT("outline")).Left().Layer(0).Row(0).Position(0);
+	AuiManager.GetPane(wxT("content")).Show();
+	Layout();
+	
 	AuiManager.Update();
 }
 
@@ -579,6 +583,17 @@ void mvceditor::MainFrameClass::LoadFeature(mvceditor::FeatureClass* feature) {
 
 	feature->AddToolBarItems(ToolBar);
 	feature->AddWindows();
+}
+
+void mvceditor::MainFrameClass::RealizeToolbar() {
+	ToolBar->Realize();
+	
+	AuiManager.AddPane(ToolBar, wxAuiPaneInfo()
+		.ToolbarPane().Top().Row(1).Position(1)
+		.LeftDockable(false).RightDockable(false)
+		.Gripper(false).CaptionVisible(false).CloseButton(false).DockFixed(true)
+		.PaneBorder(false).Floatable(false)
+	);
 }
 
 void mvceditor::MainFrameClass::OnContextMenu(wxContextMenuEvent& event) {
@@ -816,12 +831,12 @@ void mvceditor::MainFrameClass::OnSequenceActionStatus(wxCommandEvent& event) {
 	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 	wxString title = event.GetString();
 	gauge->IncrementAndRenameGauge(ID_SEQUENCE_GAUGE, title, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
-	
 }
 
 void mvceditor::MainFrameClass::OnSequenceInProgress(wxCommandEvent& event) {
 	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 	gauge->IncrementGauge(ID_SEQUENCE_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
+
 }
 
 void mvceditor::MainFrameClass::OnSequenceComplete(wxCommandEvent& event) {

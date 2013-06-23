@@ -52,19 +52,19 @@ public:
 	void AddFileMenuItems(wxMenu* fileMenu);
 
 	/**
-	 * Add items to the toolbar
+	 * Add a new toolbar for explorer items only
 	 */
-	void AddToolBarItems(wxAuiToolBar* toolbar);
+	void AddWindows();
 
 	/**
 	 * Add keyboard shortcuts
 	 */
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
-
+	
 private:
 
 	/**
-	 * Handler for the Project .. Explore menu 
+	 * Handler for the Project .. Explore Open File menu 
 	 * @param wxCommandEvent& event 
 	 */
 	void OnProjectExplore(wxCommandEvent& event);
@@ -86,6 +86,29 @@ private:
 	 * display them. this handler will only refresh the right panel.
 	 */
 	void OnExplorerReportComplete(mvceditor::ExplorerEventClass& event);
+	
+	/**
+	 * when the explorer tool button is clicked show any open projects
+	 * so that the user can choose which project to explore
+	 */
+	void OnExplorerToolDropDown(wxAuiToolBarEvent& event);
+	
+	/**
+	 * menu handler for all of the project source dir menu items
+	 * when one of these items is clicked the explorer pane will be
+	 * set to the source dir
+	 */
+	void OnExplorerProjectMenu(wxCommandEvent& event);
+	
+	/**
+	 * toolbar to hold the explorer buttons
+	 */
+	wxAuiToolBar* ExplorerToolBar;
+	
+	/**
+	 * the source directories shown in the project menu
+	 */
+	std::vector<mvceditor::SourceClass> SourceDirs;
 
 	DECLARE_EVENT_TABLE()
 };

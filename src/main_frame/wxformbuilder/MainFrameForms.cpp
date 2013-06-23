@@ -51,7 +51,6 @@ MainFrameGeneratedClass::MainFrameGeneratedClass( wxWindow* parent, wxWindowID i
 	
 	this->SetSizer( Sizer );
 	this->Layout();
-	StatusBar = this->CreateStatusBar( 1, wxST_SIZEGRIP, wxID_ANY );
 	MenuBar = new wxMenuBar( 0 );
 	FileMenu = new wxMenu();
 	wxMenuItem* MenuItemFilePhpNew;

@@ -158,11 +158,13 @@ void mvceditor::RunBrowserFeatureClass::AddWindows() {
 	BrowserToolbar->SetOverflowVisible(false);
     BrowserToolbar->Realize();
 
-	// ATTN: not quite sure why wxAuiPaneInfo().ToolbarPane() wont work
-	AuiManager->AddPane(BrowserToolbar, wxAuiPaneInfo().Top(
-		).CaptionVisible(false).CloseButton(false).Gripper(
-		false).DockFixed(true).PaneBorder(false).Floatable(false).Row(1).Position(0));
-}	
+	AuiManager->AddPane(BrowserToolbar, wxAuiPaneInfo()
+		.ToolbarPane().Top().Row(2).Position(1)
+		.LeftDockable(false).RightDockable(false)
+		.Gripper(false).CaptionVisible(false).CloseButton(false).DockFixed(true)
+		.PaneBorder(false).Floatable(false)
+	);
+}
 
 void mvceditor::RunBrowserFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	//std::map<int, wxString> menuItemIds;

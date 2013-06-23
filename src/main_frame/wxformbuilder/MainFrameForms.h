@@ -19,7 +19,6 @@ namespace mvceditor{ class NotebookClass; }
 #include <wx/settings.h>
 #include <wx/string.h>
 #include <wx/sizer.h>
-#include <wx/statusbr.h>
 #include <wx/bitmap.h>
 #include <wx/image.h>
 #include <wx/icon.h>
@@ -99,7 +98,6 @@ class MainFrameGeneratedClass : public wxFrame
 		};
 		
 		mvceditor::NotebookClass* Notebook;
-		wxStatusBar* StatusBar;
 		wxMenuBar* MenuBar;
 		wxMenu* FileMenu;
 		wxMenu* EditMenu;

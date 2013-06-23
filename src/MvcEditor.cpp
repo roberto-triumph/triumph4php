@@ -251,6 +251,7 @@ void mvceditor::AppClass::FeatureWindows() {
 	for (size_t i = 0; i < Features.size(); ++i) {
 		MainFrame->LoadFeature(Features[i]);
 	}
+	MainFrame->RealizeToolbar();
 }
 
 void mvceditor::AppClass::DeleteFeatures() {

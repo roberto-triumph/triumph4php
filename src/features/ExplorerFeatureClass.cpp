@@ -75,27 +75,44 @@ mvceditor::ExplorerFeatureClass::ExplorerFeatureClass(mvceditor::AppClass& app)
 }
 
 void mvceditor::ExplorerFeatureClass::AddFileMenuItems(wxMenu* fileMenu) {
-	fileMenu->Append(mvceditor::MENU_EXPLORER + 1, _("Explore"), _("Open An explorer window in the Project Root"), wxITEM_NORMAL);
-	fileMenu->Append(mvceditor::MENU_EXPLORER + 2, _("Explore Open File"), _("Open An explorer window in the currently opened file"), wxITEM_NORMAL);
+	fileMenu->Append(mvceditor::MENU_EXPLORER + 1, _("Explore Open File"), _("Open An explorer window in the currently opened file"), wxITEM_NORMAL);
 }
 
 
 void mvceditor::ExplorerFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
-	menuItemIds[mvceditor::MENU_EXPLORER + 1] = wxT("Project-Explore");
-	menuItemIds[mvceditor::MENU_EXPLORER + 2] = wxT("Project-Explore File");
+	menuItemIds[mvceditor::MENU_EXPLORER + 1] = wxT("Project-Explore File");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
-void mvceditor::ExplorerFeatureClass::AddToolBarItems(wxAuiToolBar* toolbar) {
+void mvceditor::ExplorerFeatureClass::AddWindows() {
+	
+	ExplorerToolBar = new wxAuiToolBar(GetMainWindow(), wxID_ANY, wxDefaultPosition, wxDefaultSize,
+                                         wxAUI_TB_DEFAULT_STYLE |
+                                         wxAUI_TB_TEXT |
+                                         wxAUI_TB_HORZ_TEXT);
+	ExplorerToolBar->SetFont(App.Preferences.ApplicationFont);
+    ExplorerToolBar->SetToolBitmapSize(wxSize(16,16));
+    
 	wxBitmap bmp = mvceditor::IconImageAsset(wxT("explore"));
 	wxBitmap bmpOpen = mvceditor::IconImageAsset(wxT("explore-open-document"));
+	
+	
+	ExplorerToolBar->AddTool(mvceditor::MENU_EXPLORER + 1, _("Explore Open File"), bmpOpen, _("Open An explorer window in the currently opened file"));
+	ExplorerToolBar->AddTool(mvceditor::MENU_EXPLORER + 2, _("Explore Projects"), bmp, _("Open An explorer window in the Project Root"));
+	ExplorerToolBar->SetToolDropDown(mvceditor::MENU_EXPLORER + 2, true);
+	ExplorerToolBar->SetOverflowVisible(false);
+    ExplorerToolBar->Realize();
 
-	toolbar->AddTool(mvceditor::MENU_EXPLORER + 1, _("Explore"), bmp, _("Open An explorer window in the Project Root"));
-	toolbar->AddTool(mvceditor::MENU_EXPLORER + 2, _("Explore Open File"), bmpOpen, _("Open An explorer window in the currently opened file"));
+	AuiManager->AddPane(ExplorerToolBar, wxAuiPaneInfo()
+		.ToolbarPane().Top().Row(1).Position(2)
+		.LeftDockable(false).RightDockable(false)
+		.Gripper(false).CaptionVisible(false).CloseButton(false).DockFixed(true)
+		.PaneBorder(false).Floatable(false)
+	);
 }
 
-void mvceditor::ExplorerFeatureClass::OnProjectExplore(wxCommandEvent& event) {
+void mvceditor::ExplorerFeatureClass::OnExplorerProjectMenu(wxCommandEvent& event) {
 	wxWindow* window = FindToolsWindow(ID_EXPLORER_PANEL);
 	mvceditor::ModalExplorerPanelClass* panel = NULL;
 	if (!window) {
@@ -107,11 +124,49 @@ void mvceditor::ExplorerFeatureClass::OnProjectExplore(wxCommandEvent& event) {
 		SetFocusToToolsWindow(panel);
 	}
 	
-	// TODO show all projects? or a list
-	std::vector<mvceditor::SourceClass> enabledSources = App.Globals.AllEnabledPhpSources();
-	if (!enabledSources.empty()) {
-		panel->RefreshDir(enabledSources[0].RootDirectory);
+	// show the selected project
+	size_t index = event.GetId() - mvceditor::MENU_EXPLORER - 3;
+	if (index >= 0 && index < SourceDirs.size()) {
+		panel->RefreshDir(SourceDirs[index].RootDirectory);
 	}
+}
+
+void mvceditor::ExplorerFeatureClass::OnProjectExplore(wxCommandEvent& event) {
+	SourceDirs = App.Globals.AllEnabledSources();
+	if (SourceDirs.size() == 1) {
+		
+		// dont show menu, just open it now
+		wxCommandEvent cmdEvt;
+		cmdEvt.SetId(mvceditor::MENU_EXPLORER + 3);
+		OnExplorerProjectMenu(cmdEvt);
+		return;
+	}
+}
+
+void mvceditor::ExplorerFeatureClass::OnExplorerToolDropDown(wxAuiToolBarEvent& event) {
+	if (!event.IsDropDownClicked()) {
+		event.Skip();
+		return;
+	}
+	ExplorerToolBar->SetToolSticky(event.GetId(), true);
+		
+	// gather all enabled source directories
+	SourceDirs = App.Globals.AllEnabledSources();
+	
+	// create the popup menu that contains all the available browser names
+	wxMenu projectMenu;
+	for (size_t index = 0; index < SourceDirs.size(); ++index) {
+		projectMenu.Append(mvceditor::MENU_EXPLORER + 3 + index, SourceDirs[index].RootDirectory.GetDirs().Last());
+	}
+	
+	// line up our menu with the button
+	wxRect rect = ExplorerToolBar->GetToolRect(event.GetId());
+	wxPoint pt = ExplorerToolBar->ClientToScreen(rect.GetBottomLeft());
+	pt = GetMainWindow()->ScreenToClient(pt);
+	GetMainWindow()->PopupMenu(&projectMenu, pt);
+
+	// make sure the button is "un-stuck"
+	ExplorerToolBar->SetToolSticky(event.GetId(), false);
 }
 
 void mvceditor::ExplorerFeatureClass::OnProjectExploreOpenFile(wxCommandEvent& event) {
@@ -764,7 +819,7 @@ void mvceditor::ExplorerFileSystemActionClass::BackgroundWork() {
 			while (fileDir.GetNext(&name) && !IsCancelled()) {
 				totalFiles++;
 				if (MatchesWildcards(name)) {
-					wxFileName nextFile(Dir.GetPath(), name);				
+					wxFileName nextFile(Dir.GetPath(), name);
 					files.push_back(nextFile);
 				}
 			}
@@ -903,8 +958,11 @@ const wxEventType mvceditor::EVENT_EXPLORER = wxNewEventType();
 const wxEventType mvceditor::EVENT_EXPLORER_MODIFY = wxNewEventType();
 
 BEGIN_EVENT_TABLE(mvceditor::ExplorerFeatureClass, mvceditor::FeatureClass)
-	EVT_MENU(mvceditor::MENU_EXPLORER + 1, mvceditor::ExplorerFeatureClass::OnProjectExplore)
-	EVT_MENU(mvceditor::MENU_EXPLORER + 2, mvceditor::ExplorerFeatureClass::OnProjectExploreOpenFile)
+	EVT_MENU(mvceditor::MENU_EXPLORER + 1, mvceditor::ExplorerFeatureClass::OnProjectExploreOpenFile)
+	EVT_MENU(mvceditor::MENU_EXPLORER + 2, mvceditor::ExplorerFeatureClass::OnProjectExplore)
+	EVT_AUITOOLBAR_TOOL_DROPDOWN(mvceditor::MENU_EXPLORER + 2, mvceditor::ExplorerFeatureClass::OnExplorerToolDropDown)
+	EVT_MENU_RANGE(mvceditor::MENU_EXPLORER + 3, mvceditor::MENU_EXPLORER + 50, mvceditor::ExplorerFeatureClass::OnExplorerProjectMenu)
+	
 	EVT_EXPLORER_COMPLETE(ID_EXPLORER_LIST_ACTION, mvceditor::ExplorerFeatureClass::OnExplorerListComplete)
 	EVT_EXPLORER_COMPLETE(ID_EXPLORER_REPORT_ACTION, mvceditor::ExplorerFeatureClass::OnExplorerReportComplete)
 END_EVENT_TABLE()

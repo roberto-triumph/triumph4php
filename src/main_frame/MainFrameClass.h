@@ -131,6 +131,11 @@ public:
 	 * repaint the status bar; cursor line position
 	 */
 	void UpdateStatusBar();
+	
+	/**
+	 * need to call this once all items have been added to the toolbar
+	 */
+	void RealizeToolbar();
 
 protected:
 
