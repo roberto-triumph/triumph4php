@@ -116,12 +116,6 @@ private:
 	 * code in this control has been completed.
 	 */
 	void OnWorkingCacheComplete(mvceditor::WorkingCacheCompleteEventClass& event);
-	
-	/**
-	 * This method will start re-parsing the document in the background. this will allow the 
-	 * code completion to be up-to-date after a file is saved.
-	 */
-	void OnAppFileSaved(mvceditor::FileSavedEventClass& event);
 
 	/**
 	 * This method will start re-parsing the document in the background. this will allow the 
@@ -134,6 +128,18 @@ private:
 	 * the user can choose which to open
 	 */
 	void OnTagCacheSearchComplete(mvceditor::TagCacheSearchCompleteEventClass& event);
+	
+	/**
+	 * when the timer expires, start a re-parsing of the newest content in the current
+	 * code control.  we want to refresh the symbol tables
+	 */
+	void OnTimerComplete(wxTimerEvent& event);
+	
+	/**
+	 * a timer to parse the currently opened file from time to time
+	 * that way we can get the newest variable names
+	 */
+	wxTimer Timer;
 
 	/**
 	 * when a 'jump to tag' is done and we need to index a project, we

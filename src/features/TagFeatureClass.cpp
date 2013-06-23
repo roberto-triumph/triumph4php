@@ -36,9 +36,11 @@
 
 static int ID_EVENT_TAG_CACHE_SEARCH = wxNewId();
 static int ID_SEARCH_TIMER = wxNewId();
+static int ID_REPARSE_TIMER = wxNewId();
 
 mvceditor::TagFeatureClass::TagFeatureClass(mvceditor::AppClass& app)
 	: FeatureClass(app)
+	, Timer(this, ID_REPARSE_TIMER)
 	, JumpToText()
 	, ProjectIndexMenu(NULL)
 	, CacheState(CACHE_STALE) {
@@ -75,6 +77,7 @@ void mvceditor::TagFeatureClass::OnAppStartSequenceComplete(wxCommandEvent& even
 		IndexingDialog->Destroy();
 		IndexingDialog = NULL;
 	}
+	Timer.Start(500, wxTIMER_CONTINUOUS);
 }
 
 void mvceditor::TagFeatureClass::OnProjectWipeAndIndex(wxCommandEvent& event) {
@@ -251,38 +254,6 @@ void mvceditor::TagFeatureClass::OnWorkingCacheComplete(mvceditor::WorkingCacheC
 	event.Skip();
 }
 
-void mvceditor::TagFeatureClass::OnAppFileSaved(mvceditor::FileSavedEventClass& event) {
-	mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
-	if (codeControl && codeControl->GetDocumentMode() == mvceditor::CodeControlClass::PHP) {
-
-		// persist the resources to the "global" cache
-		// this is needed so that if the url detector is triggered while 
-		// a file is opened the url detector gets the latest resources
-		// do this before doing the working cache so that the global cache is up-to-date
-		// when the working cache finis5hes
-		wxString fileName = event.GetCodeControl()->GetFileName();
-		std::vector<mvceditor::ProjectClass>::const_iterator project;
-		
-		mvceditor::ProjectTagActionClass* tagAction = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST);
-		tagAction->InitForFile(App.Globals, fileName);
-		App.RunningThreads.Queue(tagAction);
-
-		UnicodeString text = codeControl->GetSafeText();
-
-		// we need to differentiate between new and opened files (the 'true' arg)
-		mvceditor::WorkingCacheBuilderClass* builder = new mvceditor::WorkingCacheBuilderClass(App.RunningThreads, wxID_ANY);
-		builder->Update(
-			App.Globals,
-			codeControl->GetFileName(),
-			codeControl->GetIdString(),
-			text, 
-			codeControl->IsNew(),
-			App.Globals.Environment.Php.Version);
-		App.RunningThreads.Queue(builder);
-	}	
-	event.Skip();
-}
-
 void mvceditor::TagFeatureClass::OnAppFileOpened(wxCommandEvent& event) {
 	mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
 	if (codeControl && codeControl->GetDocumentMode() == mvceditor::CodeControlClass::PHP) {
@@ -300,6 +271,22 @@ void mvceditor::TagFeatureClass::OnAppFileOpened(wxCommandEvent& event) {
 		App.RunningThreads.Queue(builder);
 	}
 	event.Skip();
+}
+
+void mvceditor::TagFeatureClass::OnTimerComplete(wxTimerEvent& event) {
+	mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
+	if (!codeControl) {
+		return;
+	}
+	mvceditor::WorkingCacheBuilderClass* builder = new mvceditor::WorkingCacheBuilderClass(App.RunningThreads, wxID_ANY);
+	builder->Update(
+		App.Globals,
+		codeControl->GetFileName(),
+		codeControl->GetIdString(),
+		codeControl->GetSafeText(), 
+		codeControl->IsNew(),
+		App.Globals.Environment.Php.Version);
+	App.RunningThreads.Queue(builder);
 }
 
 mvceditor::TagSearchDialogClass::TagSearchDialogClass(wxWindow* parent, 
@@ -615,9 +602,9 @@ BEGIN_EVENT_TABLE(mvceditor::TagFeatureClass, wxEvtHandler)
 
 	// we will treat file new and file opened the same
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_NEW, mvceditor::TagFeatureClass::OnAppFileOpened)
-	EVT_FEATURE_FILE_SAVED(mvceditor::TagFeatureClass::OnAppFileSaved)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_SEQUENCE_COMPLETE, mvceditor::TagFeatureClass::OnAppStartSequenceComplete)
 
+	EVT_TIMER(ID_REPARSE_TIMER, mvceditor::TagFeatureClass::OnTimerComplete)
 	EVT_WORKING_CACHE_COMPLETE(wxID_ANY, mvceditor::TagFeatureClass::OnWorkingCacheComplete)
 END_EVENT_TABLE()
 
