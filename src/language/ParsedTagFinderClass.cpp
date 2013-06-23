@@ -1874,3 +1874,18 @@ bool mvceditor::ParsedTagFinderClass::FindById(int id, mvceditor::TagClass& tag)
 	}
 	return found;
 }
+
+wxString mvceditor::ParsedTagFinderClass::SourceDirFromFile(int fileTagId) {
+	wxString sourcePath;
+	std::string stdSourcePath;
+	if (Session) {
+		soci::statement stmt = (Session->prepare <<
+			"SELECT directory FROM sources s JOIN file_items f ON(s.source_id = f.source_id) WHERE f.file_item_id = ?",
+			soci::use(fileTagId), soci::into(stdSourcePath)
+		);
+		if (stmt.execute(true)) {
+			sourcePath = mvceditor::CharToWx(stdSourcePath.c_str());
+		}
+	}
+	return sourcePath;
+}

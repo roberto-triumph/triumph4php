@@ -128,7 +128,8 @@ mvceditor::OutlineTagCacheSearchActionClass::OutlineTagCacheSearchActionClass(mv
 																int eventId)
 	: ActionClass(runningThreads, eventId)
 	, TagCache()
-	, SearchStrings() {
+	, SearchStrings() 
+	, EnabledSourceDirs() {
 
 }
 
@@ -140,6 +141,18 @@ void mvceditor::OutlineTagCacheSearchActionClass::SetSearch(const std::vector<Un
 	cache->InitNativeTag(mvceditor::NativeFunctionsAsset());
 	cache->InitDetectorTag(globals.DetectorCacheDbFileName);
 	TagCache.RegisterGlobal(cache);
+	
+	EnabledSourceDirs.clear();
+	std::vector<mvceditor::ProjectClass>::const_iterator project;
+	std::vector<mvceditor::SourceClass>::const_iterator source;
+	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
+		if (project->IsEnabled) {
+			for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
+				wxFileName rootDir(source->RootDirectory);
+				EnabledSourceDirs.push_back(rootDir);
+			}
+		}
+	}
 }
 
 void mvceditor::OutlineTagCacheSearchActionClass::BackgroundWork() {
@@ -163,7 +176,7 @@ void mvceditor::OutlineTagCacheSearchActionClass::BackgroundWork() {
 						if (!tag->NamespaceName.isEmpty()) {
 							classLabel += wxT(": ") + mvceditor::IcuToWx(tag->NamespaceName);
 						}
-						tagSearchComplete.Tags[classLabel] = TagCache.AllMemberTags(tag->FullyQualifiedClassName(), tag->FileTagId);
+						tagSearchComplete.Tags[classLabel] = TagCache.AllMemberTags(tag->FullyQualifiedClassName(), tag->FileTagId, EnabledSourceDirs);
 					}
 					else {
 						tagSearchComplete.Tags[wxT("")].push_back(*tag);
@@ -173,8 +186,7 @@ void mvceditor::OutlineTagCacheSearchActionClass::BackgroundWork() {
 			else {
 				
 				// searching for all members in a class name
-				std::vector<wxFileName> dirs;
-				mvceditor::TagResultClass* results = TagCache.ExactTags(*search, dirs);
+				mvceditor::TagResultClass* results = TagCache.ExactTags(*search, EnabledSourceDirs);
 				if (results) {
 					tags = results->Matches();
 					delete results;
@@ -191,7 +203,7 @@ void mvceditor::OutlineTagCacheSearchActionClass::BackgroundWork() {
 					classLabel += wxT(": ") + mvceditor::IcuToWx(tag->NamespaceName);
 				}
 				tagSearchComplete.Label = classLabel;
-				tagSearchComplete.Tags[wxT("")] = TagCache.AllMemberTags(tag->FullyQualifiedClassName(), tag->FileTagId);
+				tagSearchComplete.Tags[wxT("")] = TagCache.AllMemberTags(tag->FullyQualifiedClassName(), tag->FileTagId, EnabledSourceDirs);
 			}
 			topLevelTags.push_back(tagSearchComplete);
 		}
@@ -221,13 +233,10 @@ void mvceditor::OutlineViewFeatureClass::AddKeyboardShortcuts(std::vector<Dynami
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
-void mvceditor::OutlineViewFeatureClass::JumpToResource(const wxString& tag) {
-	std::vector<wxFileName> dirs;
-	std::vector<mvceditor::TagClass> matches;
-	mvceditor::TagResultClass* result = App.Globals.TagCache.ExactTags(mvceditor::WxToIcu(tag), dirs);
-	if (result && !result->Empty()) {
-		result->Next();
-		mvceditor::TagClass tag = result->Tag;
+void mvceditor::OutlineViewFeatureClass::JumpToResource(int tagId) {
+	mvceditor::TagClass tag;
+	bool found = App.Globals.TagCache.FindById(tagId, tag);
+	if (found) {
 		GetNotebook()->LoadPage(tag.GetFullPath());
 		CodeControlClass* codeControl = GetCurrentCodeControl();
 		if (codeControl) {
@@ -239,9 +248,6 @@ void mvceditor::OutlineViewFeatureClass::JumpToResource(const wxString& tag) {
 			}
 			// else the index is out of date....
 		}
-	}	
-	if (result) {
-		delete result;
 	}
 }
 
@@ -381,6 +387,8 @@ mvceditor::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int wi
 	// let the tree control managet the image list
 	// since it may need to use it in the destructor
 	Tree->AssignImageList(ImageList);
+	
+	Tree->SetIndent(10);
 }
 
 void mvceditor::OutlineViewPanelClass::SetStatus(const wxString& status) {
@@ -620,12 +628,7 @@ void mvceditor::OutlineViewPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 		event.Skip();
 		return;
 	}
-	mvceditor::TagClass tag;
-	bool found = Feature->App.Globals.TagCache.FindById(idItemData->Id, tag);
-	if (found) {
-		wxString tagKey = mvceditor::IcuToWx(tag.Key);
-		Feature->JumpToResource(tagKey);
-	}
+	Feature->JumpToResource(idItemData->Id);
 }
 
 void mvceditor::OutlineViewPanelClass::SearchTagsToOutline(const std::vector<mvceditor::TagClass>& tags) {

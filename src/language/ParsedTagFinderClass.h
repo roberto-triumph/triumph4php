@@ -671,6 +671,12 @@ public:
 	bool FindById(int id, mvceditor::TagClass& tag);
 	
 	/**
+	 * @param int fileTagId file to search for
+	 * @return wxString full path to the source directory that the given file tag id is located in
+	 */
+	wxString SourceDirFromFile(int fileTagId);
+	
+	/**
 	 * Print the tag cache to stdout.  Useful for debugging only.
 	 */
 	void Print();

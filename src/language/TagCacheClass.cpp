@@ -368,7 +368,7 @@ void mvceditor::TagCacheClass::Clear() {
 	WorkingCaches.clear();
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllMemberTags(const UnicodeString& fullyQualifiedClassName, int fileTagId) {
+std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllMemberTags(const UnicodeString& fullyQualifiedClassName, int fileTagId, std::vector<wxFileName>& sourceDirs) {
 	std::vector<mvceditor::TagClass> allMatches;
 
 	// add the double colon so that we search for all members
@@ -388,6 +388,9 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllMemberTags(const U
 		hierarchySearch.SetParentClasses(TagFinderList->ClassParents(parentClassName, hierarchySearch.GetMethodName()));
 		hierarchySearch.SetTraits(TagFinderList->ClassUsedTraits(parentClassName, hierarchySearch.GetParentClasses(), 
 			hierarchySearch.GetMethodName()));
+		
+		// search classes from the enabled source directories only
+		hierarchySearch.SetSourceDirs(sourceDirs);
 		
 		TagFinderList->NearMatchesFromAll(hierarchySearch, allMatches);
 		TagFinderList->NearMatchTraitAliasesFromAll(hierarchySearch, allMatches);

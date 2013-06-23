@@ -112,6 +112,11 @@ private:
 	mvceditor::TagCacheClass TagCache;
 
 	std::vector<UnicodeString> SearchStrings;
+	
+	/**
+	 * the directories to look in
+	 */
+	std::vector<wxFileName> EnabledSourceDirs;
 };
 
 /**
@@ -143,9 +148,9 @@ public:
 	/**
 	 * Opens the file where the given tag is located.
 	 * 
-	 * @param wxString teh fully qualified tag
+	 * @param int the tag ID to jump to
 	 */
-	void JumpToResource(const wxString& tag);
+	void JumpToResource(int tagId);
 
 	/**
 	 * start a tag search; will queue an action that will search the tag cache
