@@ -318,12 +318,12 @@ void mvceditor::OutlineViewFeatureClass::OnContentNotebookPageClosed(wxAuiNotebo
 	event.Skip();
 }
 
-void mvceditor::OutlineViewFeatureClass::OnWorkingCacheComplete(mvceditor::WorkingCacheCompleteEventClass& event) {
+void mvceditor::OutlineViewFeatureClass::OnAppFileOpened(wxCommandEvent& event) {
 	
 	//if the outline window is open, update the file that was parsed
 	wxWindow* window = FindOutlineWindow(ID_WINDOW_OUTLINE);
 	if (window != NULL) {
-		wxString fileName = event.GetFileName();
+		wxString fileName = event.GetString();
 		std::vector<UnicodeString> searchStrings;
 		searchStrings.push_back(mvceditor::WxToIcu(fileName));
 		StartTagSearch(searchStrings);
@@ -1107,7 +1107,8 @@ BEGIN_EVENT_TABLE(mvceditor::OutlineViewFeatureClass, wxEvtHandler)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::OutlineViewFeatureClass::OnContentNotebookPageChanged)
 	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_CODE_NOTEBOOK, 
 		mvceditor::OutlineViewFeatureClass::OnContentNotebookPageClosed)
-	EVT_WORKING_CACHE_COMPLETE(wxID_ANY, mvceditor::OutlineViewFeatureClass::OnWorkingCacheComplete)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_OPENED, mvceditor::OutlineViewFeatureClass::OnAppFileOpened)
+	//// EVT_WORKING_CACHE_COMPLETE(wxID_ANY, mvceditor::OutlineViewFeatureClass::OnWorkingCacheComplete)
 	EVENT_OUTLINE_SEARCH_COMPLETE(wxID_ANY, mvceditor::OutlineViewFeatureClass::OnTagSearchComplete)
 END_EVENT_TABLE()
 

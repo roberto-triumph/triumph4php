@@ -174,10 +174,10 @@ private:
 	void OnContentNotebookPageClosed(wxAuiNotebookEvent& event);
 
 	/**
-	 * This method will get called by the EVENT_WORKING_CACHE_COMPLETE event is generated;
+	 * This method will get called by the EVENT_APP_FILE_OPENED event is generated;
 	 * ie when parsing of the code in the active code control buffer has been completed.
 	 */
-	void OnWorkingCacheComplete(mvceditor::WorkingCacheCompleteEventClass& event);
+	void OnAppFileOpened(wxCommandEvent& event);
 
 	/**
 	 * once tag searching finishes, update the tree control
