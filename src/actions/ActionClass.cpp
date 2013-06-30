@@ -126,12 +126,7 @@ void* mvceditor::ThreadActionClass::Entry() {
 	while (!TestDestroy()) {
 		mvceditor::ActionClass* action = NextAction();
 		if (action && !TestDestroy()) {
-			try {
-				action->BackgroundWork();
-			} catch (std::exception& e) {
-				wxString msg = wxString::FromAscii(e.what());
-				wxASSERT_MSG(false, msg);
-			}
+			action->BackgroundWork();
 			ActionComplete(action);
 		}
 		else if (action) {
