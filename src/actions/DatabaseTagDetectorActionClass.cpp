@@ -193,7 +193,12 @@ void mvceditor::DatabaseTagDetectorInitActionClass::Work(mvceditor::GlobalsClass
 	finder.InitSession(&session);
 	
 	std::vector<mvceditor::DatabaseTagClass> detected = finder.All();
-	globals.DatabaseTags.insert(globals.DatabaseTags.end(), detected.begin(), detected.end());
+	std::vector<mvceditor::DatabaseTagClass>::const_iterator tag;
+	for (tag = detected.begin(); tag != detected.end(); ++tag) {
+		if (!tag->Host.isEmpty() && !tag->Schema.isEmpty()) {
+			globals.DatabaseTags.push_back(*tag);
+		}
+	}
 }
 
 wxString mvceditor::DatabaseTagDetectorInitActionClass::GetLabel() const {
