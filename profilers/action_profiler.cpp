@@ -150,6 +150,18 @@ void MyApp::BuildSequence() {
 
 void MyApp::BuildGlobals() {
 	Globals.Environment.Init();
+	Globals.Projects.clear();
+	Globals.TagCache.Clear();
+
+	wxFileName tagDbFileName(wxT("C:\\Users\\roberto\\Desktop\\caches\\tags.sqlite"));
+	wxFileName detectorTagDbFileName(wxT("C:\\Users\\roberto\\Desktop\\caches\\detectors.sqlite"));
+
+	if (tagDbFileName.FileExists()) {
+		wxRemoveFile(tagDbFileName.GetFullPath());
+	}
+	if (detectorTagDbFileName.FileExists()) {
+		wxRemoveFile(detectorTagDbFileName.GetFullPath());
+	}
 
 	// needed so that we can know what files need to be parsed
 	Globals.PhpFileExtensionsString = wxT("*.php");
@@ -160,11 +172,13 @@ void MyApp::BuildGlobals() {
 	Globals.Environment.Apache.ManualConfiguration = true;
 	Globals.Environment.Apache.SetVirtualHostMapping(wxT("C:\\Users\\roberto\\software\\wamp\\www\\ember"), wxT("http://localhost/"));
 
-	Globals.TagCacheDbFileName.Assign(wxT("C:\\Users\\roberto\\Desktop\\caches\\tags.sqlite"));
-	Globals.DetectorCacheDbFileName.Assign(wxT("C:\\Users\\roberto\\Desktop\\caches\\detectors.sqlite"));
+	Globals.TagCacheDbFileName = tagDbFileName;
+	Globals.DetectorCacheDbFileName = detectorTagDbFileName;
 	
 	// create a project
 	CreateProject(wxT("ember"), wxT("C:\\Users\\roberto\\software\\wamp\\www\\ember"));
+	CreateProject(wxT("symfony"), wxT("C:\\Users\\roberto\\Documents\\php_projects\\symfony"));
+
 }
 
 void MyApp::CreateProject(wxString projectName, wxString rootDir) {
@@ -225,11 +239,15 @@ void MyFrame::OnClose(wxCloseEvent& event) {
 }
 
 void MyFrame::OnTagFinderListComplete(mvceditor::TagFinderListCompleteEventClass& event) {
-	Log(_("global cache completet"));
+	Log(_("global cache completed."));
 }
 
 void MyFrame::OnSequenceComplete(wxCommandEvent& event) {
 	Log(_("Sequence completed."));
+
+	App.BuildGlobals();
+	Log(_("Restarting Sequence."));
+	App.BuildSequence();
 }
 
 BEGIN_EVENT_TABLE(MyFrame, wxFrame) 
