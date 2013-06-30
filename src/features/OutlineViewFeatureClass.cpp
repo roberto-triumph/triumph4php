@@ -730,9 +730,12 @@ void mvceditor::OutlineViewPanelClass::OnFilterLeftDown(wxMouseEvent& event) {
 
 		FilterButton->PopupMenu(&menu, pos);
 	}
-	else {
-		event.Skip();
-	}
+	
+	// according to docs, always allow default processing of mouse down events to take place
+	//
+	// The handler of this event should normally call event.Skip() to allow the default processing to take 
+	// place as otherwise the window under mouse wouldn't get the focus.
+	event.Skip();
 }
 
 void mvceditor::OutlineViewPanelClass::OnSortLeftDown(wxMouseEvent& event) {
@@ -750,9 +753,12 @@ void mvceditor::OutlineViewPanelClass::OnSortLeftDown(wxMouseEvent& event) {
 
 		SortButton->PopupMenu(&menu, pos);
 	}
-	else {
-		event.Skip();
-	}
+
+	// according to docs, always allow default processing of mouse down events to take place
+	//
+	// The handler of this event should normally call event.Skip() to allow the default processing to take 
+	// place as otherwise the window under mouse wouldn't get the focus.
+	event.Skip();
 }
 
 void mvceditor::OutlineViewPanelClass::OnTreeMenuDelete(wxCommandEvent& event) {

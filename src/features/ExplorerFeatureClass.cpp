@@ -727,9 +727,12 @@ void mvceditor::ModalExplorerPanelClass::OnFilterButtonLeftDown(wxMouseEvent& ev
 
 		FilterButton->PopupMenu(&menu);
 	}
-	else {
-		event.Skip();
-	}
+
+	// according to docs, always allow default processing of mouse down events to take place
+	//
+	// The handler of this event should normally call event.Skip() to allow the default processing to take 
+	// place as otherwise the window under mouse wouldn't get the focus.
+	event.Skip();
 }
 
 std::vector<wxString> mvceditor::ModalExplorerPanelClass::FilterFileExtensions() {
