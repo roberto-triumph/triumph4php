@@ -165,7 +165,7 @@ std::vector<wxString> mvceditor::UrlTagDetectorActionClass::DetectorScripts() {
 
 void mvceditor::UrlTagDetectorActionClass::OnProcessComplete(wxCommandEvent &event) {
 	if (ParamsQueue.empty()) {
-		wxCommandEvent completeEvent(mvceditor::EVENT_WORK_COMPLETE);
+		mvceditor::ActionEventClass completeEvent(GetEventId(), mvceditor::EVENT_ACTION_COMPLETE, wxT(""));
 		PostEvent(completeEvent);
 	}
 	else {
@@ -176,7 +176,7 @@ void mvceditor::UrlTagDetectorActionClass::OnProcessComplete(wxCommandEvent &eve
 void mvceditor::UrlTagDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
 	mvceditor::EditorLogError(mvceditor::WARNING_OTHER, event.GetString());
 	if (ParamsQueue.empty()) {
-		wxCommandEvent completeEvent(mvceditor::EVENT_WORK_COMPLETE);
+		mvceditor::ActionEventClass completeEvent(GetEventId(), mvceditor::EVENT_ACTION_COMPLETE, wxT(""));
 		PostEvent(completeEvent);
 	}
 	else {
@@ -185,7 +185,7 @@ void mvceditor::UrlTagDetectorActionClass::OnProcessFailed(wxCommandEvent &event
 }
 
 void mvceditor::UrlTagDetectorActionClass::OnProcessInProgress(wxCommandEvent &event) {
-	wxCommandEvent inProgressEvent(mvceditor::EVENT_WORK_IN_PROGRESS);
+	mvceditor::ActionEventClass inProgressEvent(GetEventId(), mvceditor::EVENT_ACTION_IN_PROGRESS, wxT(""));
 	PostEvent(inProgressEvent);
 }
 

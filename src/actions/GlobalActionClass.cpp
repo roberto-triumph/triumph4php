@@ -41,7 +41,7 @@ mvceditor::InitializerGlobalActionClass::InitializerGlobalActionClass(mvceditor:
 bool mvceditor::InitializerGlobalActionClass::Init(mvceditor::GlobalsClass& globals) {
 	Work(globals);
 	
-	wxCommandEvent evt(mvceditor::EVENT_WORK_COMPLETE);
+	mvceditor::ActionEventClass evt(GetEventId(), mvceditor::EVENT_ACTION_COMPLETE, wxT(""));
 	PostEvent(evt);
 	return true;
 }

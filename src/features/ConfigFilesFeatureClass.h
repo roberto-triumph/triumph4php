@@ -27,6 +27,7 @@
 
 #include <features/FeatureClass.h>
 #include <globals/ConfigTagClass.h>
+#include <actions/ActionClass.h>
 #include <vector>
 
 namespace mvceditor {
@@ -77,16 +78,10 @@ private:
 	void RebuildMenu();
 
 	/**
-	 * when the config detector has completed, load all of the
-	 * projects' config files and build the menu.
-	 */
-	void OnConfigDetectorComplete(wxCommandEvent& event);
-
-	/**
 	 * when the config detectors have finished running, load all of the
 	 * projects' config files and build the menu.
 	 */
-	void OnConfigFilesDetected(wxCommandEvent& event);
+	void OnConfigFilesDetected(mvceditor::ActionEventClass& event);
 
 	/**
 	 * When a menu item is selected; open the corresponding config

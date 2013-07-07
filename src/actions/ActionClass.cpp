@@ -48,11 +48,7 @@ bool mvceditor::ActionClass::IsCancelled() {
 }
 
 void mvceditor::ActionClass::SetStatus(const wxString& status) {
-	wxCommandEvent evt(mvceditor::EVENT_ACTION_STATUS);
-	
-	// make sure to copy, since wxString copy is not thread safe
-	wxString cpy(status.c_str());
-	evt.SetString(cpy);
+	mvceditor::ActionEventClass evt(wxID_ANY, mvceditor::EVENT_ACTION_STATUS, status);
 	PostEvent(evt);
 }
 
@@ -80,9 +76,8 @@ void mvceditor::ActionClass::BackgroundCleanup() {
 
 
 void mvceditor::ActionClass::SignalEnd() {
-	wxCommandEvent evt(mvceditor::EVENT_WORK_COMPLETE, EventId);
 	wxString msg = wxString::Format(wxT("Action \"%s\" stopped...\n"), (const char*)GetLabel().c_str());
-	evt.SetString(msg);
+	mvceditor::ActionEventClass evt(GetEventId(), mvceditor::EVENT_ACTION_COMPLETE, msg);
 	PostEvent(evt);
 }
 
@@ -388,7 +383,7 @@ void mvceditor::RunningThreadsClass::OnTimer(wxTimerEvent& event) {
 	for (size_t i = 0; i < ThreadActions.size(); ++i) {
 		int eventId = ThreadActions[i]->GetRunningActionEventId();
 		if (eventId > 0) {
-			wxCommandEvent evt(mvceditor::EVENT_WORK_IN_PROGRESS, eventId);
+			mvceditor::ActionEventClass evt(eventId, mvceditor::EVENT_ACTION_IN_PROGRESS, wxT(""));
 			PostEvent(evt);	
 		}
 	}
@@ -400,7 +395,7 @@ void mvceditor::RunningThreadsClass::OnTimer(wxTimerEvent& event) {
 	mvceditor::ActionClass* action;
 	while (!Actions.empty()) {
 		action = Actions.front();
-		wxCommandEvent evt(mvceditor::EVENT_WORK_IN_PROGRESS, action->GetEventId());
+		mvceditor::ActionEventClass evt(action->GetEventId(), mvceditor::EVENT_ACTION_IN_PROGRESS, wxT(""));
 		PostEvent(evt);
 		copy.push(action);
 
@@ -417,10 +412,20 @@ void mvceditor::RunningThreadsClass::SetThreadCleanup(mvceditor::ThreadCleanupCl
 	ThreadCleanup = threadCleanup;
 }
 
+mvceditor::ActionEventClass::ActionEventClass(int id, wxEventType type, const wxString& msg) 
+: wxEvent(id, type)
+, Message() {
+	Message.append(msg);
+}
+
+wxEvent* mvceditor::ActionEventClass::Clone() const {
+	mvceditor::ActionEventClass* clone = new mvceditor::ActionEventClass(GetId(), GetEventType(), Message);
+	return clone;
+}
 
 const wxEventType mvceditor::EVENT_ACTION_STATUS = wxNewEventType();
-const wxEventType mvceditor::EVENT_WORK_COMPLETE = wxNewEventType();
-const wxEventType mvceditor::EVENT_WORK_IN_PROGRESS = wxNewEventType();
+const wxEventType mvceditor::EVENT_ACTION_COMPLETE = wxNewEventType();
+const wxEventType mvceditor::EVENT_ACTION_IN_PROGRESS = wxNewEventType();
 
 
 BEGIN_EVENT_TABLE(mvceditor::RunningThreadsClass, wxEvtHandler)

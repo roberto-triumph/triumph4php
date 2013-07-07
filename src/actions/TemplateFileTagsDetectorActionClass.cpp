@@ -145,7 +145,7 @@ std::vector<wxString> mvceditor::TemplateFileTagsDetectorActionClass::DetectorSc
 
 void mvceditor::TemplateFileTagsDetectorActionClass::OnProcessComplete(wxCommandEvent &event) {
 	if (ParamsQueue.empty()) {
-		wxCommandEvent completeEvent(mvceditor::EVENT_WORK_COMPLETE);
+		mvceditor::ActionEventClass completeEvent(GetEventId(), mvceditor::EVENT_ACTION_COMPLETE, wxT(""));
 		PostEvent(completeEvent);
 	}
 	else {
@@ -156,7 +156,7 @@ void mvceditor::TemplateFileTagsDetectorActionClass::OnProcessComplete(wxCommand
 void mvceditor::TemplateFileTagsDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
 	mvceditor::EditorLogError(mvceditor::WARNING_OTHER, event.GetString());
 	if (ParamsQueue.empty()) {
-		wxCommandEvent completeEvent(mvceditor::EVENT_WORK_COMPLETE);
+		mvceditor::ActionEventClass completeEvent(GetEventId(), mvceditor::EVENT_ACTION_COMPLETE, wxT(""));
 		PostEvent(completeEvent);
 	}
 	else {
@@ -165,7 +165,7 @@ void mvceditor::TemplateFileTagsDetectorActionClass::OnProcessFailed(wxCommandEv
 }
 
 void mvceditor::TemplateFileTagsDetectorActionClass::OnProcessInProgress(wxCommandEvent &event) {
-	wxCommandEvent inProgressEvent(mvceditor::EVENT_WORK_IN_PROGRESS);
+	mvceditor::ActionEventClass inProgressEvent(GetEventId(), mvceditor::EVENT_ACTION_IN_PROGRESS, wxT(""));
 	PostEvent(inProgressEvent);
 }
 

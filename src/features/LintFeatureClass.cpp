@@ -417,15 +417,15 @@ void mvceditor::LintFeatureClass::OnLintFileComplete(wxCommandEvent& event) {
 
 }
 
-void mvceditor::LintFeatureClass::OnLintComplete(wxCommandEvent& event) {
+void mvceditor::LintFeatureClass::OnLintComplete(mvceditor::ActionEventClass& event) {
 	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 	gauge->StopGauge(ID_LINT_RESULTS_GAUGE);
 	RunningActionId = 0;
 }
 
-void mvceditor::LintFeatureClass::OnTimer(wxCommandEvent& event) {
+void mvceditor::LintFeatureClass::OnLintInProgress(mvceditor::ActionEventClass& event) {
 	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
-	gauge->IncrementGauge(ID_LINT_RESULTS_GAUGE, StatusBarWithGaugeClass::INDETERMINATE_MODE);	
+	gauge->IncrementGauge(ID_LINT_RESULTS_GAUGE, StatusBarWithGaugeClass::INDETERMINATE_MODE);
 }
 
 void mvceditor::LintFeatureClass::OnFileSaved(mvceditor::FileSavedEventClass& event) {
@@ -515,8 +515,8 @@ BEGIN_EVENT_TABLE(mvceditor::LintFeatureClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_LINT_PHP + 1, mvceditor::LintFeatureClass::OnNextLintError)
 	EVT_MENU(mvceditor::MENU_LINT_PHP + 2, mvceditor::LintFeatureClass::OnPreviousLintError)
 	EVT_COMMAND(ID_LINT_READER, EVENT_FILE_READ,  mvceditor::LintFeatureClass::OnLintFileComplete)
-	EVT_COMMAND(ID_LINT_READER, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::LintFeatureClass::OnTimer)
-	EVT_COMMAND(ID_LINT_READER, mvceditor::EVENT_WORK_COMPLETE, mvceditor::LintFeatureClass::OnLintComplete)
+	EVT_ACTION_IN_PROGRESS(ID_LINT_READER, mvceditor::LintFeatureClass::OnLintInProgress)
+	EVT_ACTION_COMPLETE(ID_LINT_READER, mvceditor::LintFeatureClass::OnLintComplete)
 	EVT_FEATURE_FILE_SAVED(mvceditor::LintFeatureClass::OnFileSaved)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::LintFeatureClass::OnPreferencesSaved)
 	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::LintFeatureClass::OnNotebookPageClosed)

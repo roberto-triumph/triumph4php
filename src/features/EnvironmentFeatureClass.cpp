@@ -254,11 +254,11 @@ void mvceditor::ApacheEnvironmentPanelClass::OnApacheFileReadComplete(mvceditor:
 	Populate();
 }
 
-void mvceditor::ApacheEnvironmentPanelClass::OnWorkInProgress(wxCommandEvent& event) {
+void mvceditor::ApacheEnvironmentPanelClass::OnActionInProgress(mvceditor::ActionEventClass& event) {
 	Gauge->Pulse();
 }
 
-void mvceditor::ApacheEnvironmentPanelClass::OnWorkComplete(wxCommandEvent& event) {
+void mvceditor::ApacheEnvironmentPanelClass::OnActionComplete(mvceditor::ActionEventClass& event) {
 	Gauge->SetValue(0);
 	ScanButton->SetLabel(_("Scan For Configuration"));
 	RunningActionId = 0;
@@ -661,9 +661,9 @@ void mvceditor::EnvironmentFeatureClass::AddPreferenceWindow(wxBookCtrlBase* par
 }
 
 BEGIN_EVENT_TABLE(mvceditor::ApacheEnvironmentPanelClass, ApacheEnvironmentPanelGeneratedClass)
-	EVT_COMMAND(ID_APACHE_FILE_READER, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::ApacheEnvironmentPanelClass::OnWorkInProgress)
+	EVT_ACTION_IN_PROGRESS(ID_APACHE_FILE_READER, mvceditor::ApacheEnvironmentPanelClass::OnActionInProgress)
 	EVT_APACHE_FILE_READ_COMPLETE(ID_APACHE_FILE_READER, mvceditor::ApacheEnvironmentPanelClass::OnApacheFileReadComplete)
-	EVT_COMMAND(ID_APACHE_FILE_READER, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ApacheEnvironmentPanelClass::OnWorkComplete)
+	EVT_ACTION_COMPLETE(ID_APACHE_FILE_READER, mvceditor::ApacheEnvironmentPanelClass::OnActionComplete)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::EnvironmentFeatureClass, wxEvtHandler) 

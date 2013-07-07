@@ -42,7 +42,7 @@ void mvceditor::GlobalsChangeHandlerClass::OnSqlMetaDataComplete(mvceditor::SqlM
 	}
 }
 
-void mvceditor::GlobalsChangeHandlerClass::OnDatabaseTagsComplete(wxCommandEvent& event) {
+void mvceditor::GlobalsChangeHandlerClass::OnDatabaseTagsComplete(mvceditor::ActionEventClass& event) {
 	
 	// first remove all detected connections that were previously detected
 	std::vector<mvceditor::DatabaseTagClass>::iterator info;
@@ -72,7 +72,7 @@ void mvceditor::GlobalsChangeHandlerClass::OnDatabaseTagsComplete(wxCommandEvent
 
 BEGIN_EVENT_TABLE(mvceditor::GlobalsChangeHandlerClass, wxEvtHandler)
 	EVT_SQL_META_DATA_COMPLETE(mvceditor::ID_EVENT_ACTION_SQL_METADATA, mvceditor::GlobalsChangeHandlerClass::OnSqlMetaDataComplete)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::GlobalsChangeHandlerClass::OnDatabaseTagsComplete)
+	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR, mvceditor::GlobalsChangeHandlerClass::OnDatabaseTagsComplete)
 END_EVENT_TABLE()
 
 

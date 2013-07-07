@@ -29,6 +29,7 @@
 #include <vector>
 #include <features/FeatureClass.h>
 #include <globals/Events.h>
+#include <actions/ActionClass.h>
 #include <search/DirectorySearchClass.h>
 #include <features/BackgroundFileReaderClass.h>
 #include <features/wxformbuilder/LintFeatureForms.h>
@@ -185,7 +186,7 @@ public:
 
 	/**
 	 * Return a summary of the number of files that were lint'ed.
-	 * Only use this method after the EVENT_WORK_COMPLETE event is dispatched.
+	 * Only use this method after the EVENT_ACTION_COMPLETE event is dispatched.
 	 * (ie dont cll this while the background thread is running).
 	 *
 	 * @param totalFiles the number of files checked will be set here
@@ -331,11 +332,11 @@ private:
 
 	void OnLintFileComplete(wxCommandEvent& event);
 
-	void OnLintComplete(wxCommandEvent& event);
+	void OnLintComplete(mvceditor::ActionEventClass& event);
 
 	void OnLintSummary(mvceditor::LintResultsSummaryEventClass& event);
 	
-	void OnTimer(wxCommandEvent& event);
+	void OnLintInProgress(mvceditor::ActionEventClass& event);
 	
 	void OnFileSaved(mvceditor::FileSavedEventClass& event);
 	

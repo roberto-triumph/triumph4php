@@ -48,10 +48,6 @@ void mvceditor::ConfigFilesFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 	// the detected config files
 }
 
-void mvceditor::ConfigFilesFeatureClass::OnConfigDetectorComplete(wxCommandEvent& event) {
-	RebuildMenu();
-}
-
 void mvceditor::ConfigFilesFeatureClass::RebuildMenu() {
 	ConfigPairs.clear();
 	ConfigTags.clear();
@@ -112,7 +108,7 @@ void mvceditor::ConfigFilesFeatureClass::RebuildMenu() {
 	}
 }
 
-void mvceditor::ConfigFilesFeatureClass::OnConfigFilesDetected(wxCommandEvent& event) {
+void mvceditor::ConfigFilesFeatureClass::OnConfigFilesDetected(mvceditor::ActionEventClass& event) {
 	RebuildMenu();
 }
 
@@ -143,8 +139,7 @@ void mvceditor::ConfigFilesFeatureClass::OnFileSaved(mvceditor::FileSavedEventCl
 
 
 BEGIN_EVENT_TABLE(mvceditor::ConfigFilesFeatureClass, mvceditor::FeatureClass) 
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ConfigFilesFeatureClass::OnConfigFilesDetected)
+	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR, mvceditor::ConfigFilesFeatureClass::OnConfigFilesDetected)
 	EVT_MENU_RANGE(mvceditor::CONFIG_DETECTORS, mvceditor::CONFIG_DETECTORS + MAX_CONFIG_MENU_ITEMS, mvceditor::ConfigFilesFeatureClass::OnConfigMenuItem)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::ConfigFilesFeatureClass::OnConfigDetectorComplete)
 	EVT_FEATURE_FILE_SAVED(mvceditor::ConfigFilesFeatureClass::OnFileSaved)
 END_EVENT_TABLE()

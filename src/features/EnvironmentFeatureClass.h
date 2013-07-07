@@ -191,12 +191,12 @@ private:
 	/**
 	 * tick the gauge here
 	 */
-	void OnWorkInProgress(wxCommandEvent& event);
+	void OnActionInProgress(mvceditor::ActionEventClass& event);
 
 	/**
 	 * stop the gauge here
 	 */
-	void OnWorkComplete(wxCommandEvent& event);
+	void OnActionComplete(mvceditor::ActionEventClass& event);
 	
 	/**
 	 * Fills in the dialogs based on the Apache environment
