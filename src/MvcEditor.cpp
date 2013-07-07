@@ -26,6 +26,7 @@
 #include <wx/cmdline.h>
 #include <unicode/uclean.h>
 #include <soci/mysql/soci-mysql.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 
 #include <main_frame/MainFrameClass.h>
 #include <features/EnvironmentFeatureClass.h>
@@ -116,6 +117,7 @@ bool mvceditor::AppClass::OnInit() {
 	//    the program real quick.  specifying the init here prevents
 	//    crashes.
 	mysql_library_init(0, NULL, NULL);
+	sqlite_api::sqlite3_initialize();
 
 	// due to the way keyboard shortcuts are serialized, we need to load the
 	// frame and initialize the feature windows so that all menus are created
@@ -156,6 +158,7 @@ mvceditor::AppClass::~AppClass() {
 	// TODO: only use this during debug mode
 	u_cleanup();
 	mysql_library_end();
+	sqlite_api::sqlite3_shutdown();
 }
 
 
