@@ -37,6 +37,7 @@
 static int ID_EVENT_TAG_CACHE_SEARCH = wxNewId();
 static int ID_SEARCH_TIMER = wxNewId();
 static int ID_REPARSE_TIMER = wxNewId();
+static int ID_WORKING_CACHE = wxNewId();
 
 mvceditor::TagFeatureClass::TagFeatureClass(mvceditor::AppClass& app)
 	: FeatureClass(app)
@@ -260,7 +261,7 @@ void mvceditor::TagFeatureClass::OnAppFileOpened(wxCommandEvent& event) {
 		UnicodeString text = codeControl->GetSafeText();
 
 		// we need to differentiate between new and opened files (the 'true' arg)
-		mvceditor::WorkingCacheBuilderClass* builder = new mvceditor::WorkingCacheBuilderClass(App.RunningThreads, wxID_ANY);
+		mvceditor::WorkingCacheBuilderClass* builder = new mvceditor::WorkingCacheBuilderClass(App.RunningThreads, ID_WORKING_CACHE);
 		builder->Update(
 			App.Globals,
 			codeControl->GetFileName(),
@@ -278,7 +279,7 @@ void mvceditor::TagFeatureClass::OnTimerComplete(wxTimerEvent& event) {
 	if (!codeControl) {
 		return;
 	}
-	mvceditor::WorkingCacheBuilderClass* builder = new mvceditor::WorkingCacheBuilderClass(App.RunningThreads, wxID_ANY);
+	mvceditor::WorkingCacheBuilderClass* builder = new mvceditor::WorkingCacheBuilderClass(App.RunningThreads, ID_WORKING_CACHE);
 	builder->Update(
 		App.Globals,
 		codeControl->GetFileName(),
@@ -605,7 +606,7 @@ BEGIN_EVENT_TABLE(mvceditor::TagFeatureClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_SEQUENCE_COMPLETE, mvceditor::TagFeatureClass::OnAppStartSequenceComplete)
 
 	EVT_TIMER(ID_REPARSE_TIMER, mvceditor::TagFeatureClass::OnTimerComplete)
-	EVT_WORKING_CACHE_COMPLETE(wxID_ANY, mvceditor::TagFeatureClass::OnWorkingCacheComplete)
+	EVT_WORKING_CACHE_COMPLETE(ID_WORKING_CACHE, mvceditor::TagFeatureClass::OnWorkingCacheComplete)
 END_EVENT_TABLE()
 
 
