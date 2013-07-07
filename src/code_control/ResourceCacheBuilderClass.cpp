@@ -43,13 +43,13 @@ void mvceditor::WorkingCacheBuilderClass::Update(mvceditor::GlobalsClass& global
 												 const wxString& fileIdentifier,
 												 const UnicodeString& code, bool isNew, pelet::Versions version) {
 	
-	// make sure these is are deep copies
-	TagCacheDbFileName.Assign(globals.TagCacheDbFileName);
+	// make sure these is are deep copies since we access the variables in a separate thread
+	TagCacheDbFileName.Assign(globals.TagCacheDbFileName.GetFullPath());
 	Code = code;
 	FileName = fileName.c_str();
 	FileIdentifier = fileIdentifier.c_str();
 	Version = version;
-	FileIsNew = isNew;		
+	FileIsNew = isNew;
 }
 
 void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
