@@ -34,16 +34,16 @@ namespace mvceditor {
 class GlobalsClass;
 
 /**
- * This class will run the tag updates in a background thread.  The caller will use
- * the Register() method when a new file is opened by the user.  Every so often, the 
- * StartBackgroundUpdate() method should be called to trigger re-parsing of the resources
- * on the background task.  The results of the tag parsing will be stored in an 
- * internal cache that's separate from the 'global' cache; that way the entire global cache
- * does not have to be re-sorted every time we want to parse new contents.
- * This class will NEVER update the 'global' tag finder; the caller must take care
- * of updating the global tag finder when the user closes the file.
+ * The working cache builder class will take care of parsing memory buffers to code; the
+ * source code buffers that the user is actively editing.  The working cache bulder produces
+ * 2 things:
+ * - tags: the builder will parse the code and parse out all tags. this means that it may find
+ *         new tags, ie new functions / classes that the user has added to the buffer but before
+ *         the buffer is saved. The new tags are written to the global tag db.
+ * - a symbol table, it is used to determine variable type information. the symbol table is 
+ *   only found in memory, it will be passed in the generated event EVENT_WORKING_CACHE_COMPLETE
+ *
  */
-// TODO above doc is wrong
 class WorkingCacheBuilderClass : public mvceditor::ActionClass {
 	
 public:
