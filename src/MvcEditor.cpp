@@ -155,6 +155,7 @@ mvceditor::AppClass::~AppClass() {
 	// ICU will cache many things and that will cause the detector to output "possible leaks"
 	// TODO: only use this during debug mode
 	u_cleanup();
+	mysql_library_end();
 }
 
 
