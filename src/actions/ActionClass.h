@@ -350,6 +350,12 @@ class RunningThreadsClass : public wxEvtHandler {
 	RunningThreadsClass(bool doPostEvents = true);
 	
 	~RunningThreadsClass();
+	
+	/**
+	 * @param int maxThreads number threads to start. This can be zero, if so
+	 *        then we will start as many threads as there are CPUs in the system
+	 */
+	void SetMaxThreads(int maxThreads);
 
 	/**
 	 * Queues the given action to be run at some point in the near future. 
@@ -382,6 +388,13 @@ class RunningThreadsClass : public wxEvtHandler {
 	 * been calling Cancel() correctly.
 	 */
 	void StopAll();
+	
+	/**
+	 * stops all running threads, and additionally will no longer queue up any
+	 * actions given to be queued.  This method is usually called before this item
+	 * goes out of scope.
+	 */
+	void Shutdown();
 
 	/**
 	 * This method should called before any actions are added. 
@@ -411,15 +424,6 @@ class RunningThreadsClass : public wxEvtHandler {
 	 * this means that the event will be received in the next event loop.
 	 */
 	void PostEvent(wxEvent& event);
-  
-	/**
-	 * Check to see if the given thread is being tracked; if it was previously
-	 * added with the Add() method but not yet removed via the Remove() or Stop()
-	 * methods.  If this returns true, then it means that the thread is definitely alive.
-	 * This is safe to call on detached or joinable threads, as it does not depend
-	 * on wxThread::IsAlive or  wxThread::IsRunning methods.
-	 */
-	//bool IsRunning(mvceditor::ThreadWithHeartbeatClass* thread);
   
 	private:
   
@@ -452,7 +456,7 @@ class RunningThreadsClass : public wxEvtHandler {
 	/**
 	 * prevent concurrent access to the handlers
 	 */
-	wxMutex HandlerMutex;	
+	wxMutex HandlerMutex;
 	
 	/**
 	 * to implement blocking wait when stopping the background
@@ -489,7 +493,12 @@ class RunningThreadsClass : public wxEvtHandler {
 	int MaxThreads;
 	
 	/**
-	 * Will generate a EVENT_WORK_IN_PROGRESS event
+	 * if TRUE no items will be queued.
+	 */
+	bool IsShutdown;
+	
+	/**
+	 * Will generate a EVENT_ACTION_IN_PROGRESS event
 	 */
 	void OnTimer(wxTimerEvent& event);
 	

@@ -71,6 +71,8 @@ private:
 
 	void OnAppStartSequenceComplete(wxCommandEvent& event);
 	
+	void OnAppExit(wxCommandEvent& event);
+	
 	/**
 	 * Toggle various widgets on or off based on the application state. 
 	 */

@@ -81,6 +81,10 @@ void mvceditor::TagFeatureClass::OnAppStartSequenceComplete(wxCommandEvent& even
 	Timer.Start(500, wxTIMER_CONTINUOUS);
 }
 
+void mvceditor::TagFeatureClass::OnAppExit(wxCommandEvent& event) {
+	Timer.Stop();
+}
+
 void mvceditor::TagFeatureClass::OnProjectWipeAndIndex(wxCommandEvent& event) {
 	if (App.Sequences.TagCacheWipeAndIndex()) {
 		IndexingDialog = new mvceditor::GaugeDialogClass(GetMainWindow(), _("Indexing"), _("Wiping and Rebuilding Index"));
@@ -320,12 +324,13 @@ mvceditor::TagSearchDialogClass::TagSearchDialogClass(wxWindow* parent,
 
 	// so that the thread can give the matching tags back to us
 	RunningThreads.AddEventHandler(this);
+	RunningThreads.SetMaxThreads(1);
 	Timer.Start(150, wxTIMER_CONTINUOUS);
 }
 
 mvceditor::TagSearchDialogClass::~TagSearchDialogClass() {
 	RunningThreads.RemoveEventHandler(this);
-	RunningThreads.StopAll();
+	RunningThreads.Shutdown();
 }
 
 void mvceditor::TagSearchDialogClass::OnSearchText(wxCommandEvent& event) {
@@ -356,6 +361,15 @@ void mvceditor::TagSearchDialogClass::OnTimerComplete(wxTimerEvent& event) {
 }
 
 void mvceditor::TagSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
+	size_t selection = MatchesList->GetSelection();
+	if (selection < 0 || MatchedResources.empty()) {
+		
+		// dont dismiss the dialog when no tags are shown
+		return;
+	}
+	Timer.Stop();
+	RunningThreads.Shutdown();
+		
 	if (MatchedResources.size() == 1) {
 
 		// if there is only match, just take the user to it
@@ -363,36 +377,33 @@ void mvceditor::TagSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
 		ChosenResources.clear();
 		ChosenResources.push_back(MatchedResources[0]);
 		EndModal(wxOK);
+		return;
 	}
-	else {
-		wxArrayInt checks;
-		for (size_t i = 0; i < MatchesList->GetCount(); ++i) {
-			if (MatchesList->IsChecked(i)) {
-				checks.Add(i);
+	wxArrayInt checks;
+	for (size_t i = 0; i < MatchesList->GetCount(); ++i) {
+		if (MatchesList->IsChecked(i)) {
+			checks.Add(i);
+		}
+	}
+	if (checks.Count() > 1) {
+	
+		// open the checked items
+		for (size_t i = 0; i < checks.Count(); ++i) {
+			size_t matchIndex = checks.Item(i);
+			if (matchIndex >= 0 && matchIndex < MatchedResources.size()) {
+				ChosenResources.push_back(MatchedResources[matchIndex]);
 			}
 		}
-		if (checks.Count() > 1) {
-		
-			// open the checked items
-			for (size_t i = 0; i < checks.Count(); ++i) {
-				size_t matchIndex = checks.Item(i);
-				if (matchIndex >= 0 && matchIndex < MatchedResources.size()) {
-					ChosenResources.push_back(MatchedResources[matchIndex]);
-				}
-			}
-			EndModal(wxOK);
-		}
-		else {
-			// no checked items, take the user to the
-			// selected item
-			size_t selection = MatchesList->GetSelection();
-			if (selection >= 0 && selection < MatchedResources.size()) {
-				ChosenResources.push_back(MatchedResources[selection]);
-				EndModal(wxOK);
-			}
-		}
+		EndModal(wxOK);
+		return;
+	}
 
+	// no checked items, take the user to the
+	// selected item
+	if (selection >= 0 && selection < MatchedResources.size()) {
+		ChosenResources.push_back(MatchedResources[selection]);
 	}
+	EndModal(wxOK);
 }
 
 void mvceditor::TagSearchDialogClass::ShowJumpToResults(const wxString& finderQuery, const std::vector<mvceditor::TagClass>& allMatches) {
@@ -446,7 +457,8 @@ void mvceditor::TagSearchDialogClass::ShowJumpToResults(const wxString& finderQu
 }
 
 void mvceditor::TagSearchDialogClass::OnOkButton(wxCommandEvent& event) {
-	RunningThreads.StopAll();
+	Timer.Stop();
+	RunningThreads.Shutdown();
 	TransferDataFromWindow();
 	ChosenResources.clear();
 	for (size_t i = 0; i < MatchesList->GetCount(); ++i) {
@@ -461,7 +473,8 @@ void mvceditor::TagSearchDialogClass::OnOkButton(wxCommandEvent& event) {
 }
 
 void mvceditor::TagSearchDialogClass::OnCancelButton(wxCommandEvent& event) {
-	RunningThreads.StopAll();
+	Timer.Stop();
+	RunningThreads.Shutdown();
 	EndModal(wxCANCEL);
 }
 
@@ -604,6 +617,7 @@ BEGIN_EVENT_TABLE(mvceditor::TagFeatureClass, wxEvtHandler)
 	// we will treat file new and file opened the same
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_NEW, mvceditor::TagFeatureClass::OnAppFileOpened)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_SEQUENCE_COMPLETE, mvceditor::TagFeatureClass::OnAppStartSequenceComplete)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_EXIT, mvceditor::TagFeatureClass::OnAppExit)
 
 	EVT_TIMER(ID_REPARSE_TIMER, mvceditor::TagFeatureClass::OnTimerComplete)
 	EVT_WORKING_CACHE_COMPLETE(ID_WORKING_CACHE, mvceditor::TagFeatureClass::OnWorkingCacheComplete)

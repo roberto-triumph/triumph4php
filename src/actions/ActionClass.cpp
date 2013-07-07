@@ -201,12 +201,10 @@ mvceditor::RunningThreadsClass::RunningThreadsClass(bool doPostEvents)
 	, ThreadCleanup(NULL)
 	, DoPostEvents(doPostEvents) 
 	, NextActionId(0) 
-	, MaxThreads(0) {
+	, MaxThreads(0) 
+	, IsShutdown(false) {
 	Timer.SetOwner(this);
-	MaxThreads = wxThread::GetCPUCount();
-	if (MaxThreads <= 0) {
-		MaxThreads = 2;
-	}
+	SetMaxThreads(wxThread::GetCPUCount());
 	Semaphore = new wxSemaphore(0, MaxThreads);
 }
 
@@ -216,8 +214,23 @@ mvceditor::RunningThreadsClass::~RunningThreadsClass() {
 		delete ThreadCleanup;
 	}
 }
+
+void mvceditor::RunningThreadsClass::SetMaxThreads(int maxThreads) {
+	if (maxThreads <= 0) {
+		maxThreads = wxThread::GetCPUCount();
+	}
+	if (maxThreads <= 0) {
+		maxThreads = 2;
+	}
+	MaxThreads = maxThreads;
+}
   
 int mvceditor::RunningThreadsClass::Queue(mvceditor::ActionClass* action) {
+	if (IsShutdown) {
+		delete action;
+		wxASSERT_MSG(IsShutdown, _("Cannot queue items when the running threads has been shutdown"));
+		return -1;
+	}
 	if (!Timer.IsRunning()) {
 		Timer.Start(200, wxTIMER_CONTINUOUS);
 	}
@@ -233,7 +246,7 @@ int mvceditor::RunningThreadsClass::Queue(mvceditor::ActionClass* action) {
 	action->SetActionId(actionId);
 
 	// if the actual thread has not started, start it
-	if (ThreadActions.empty()) {		
+	if (ThreadActions.empty()) {
 		for (int i = 0; i < MaxThreads; ++i) {
 			ThreadCleanupClass* cleanup = NULL;
 			if (ThreadCleanup) {
@@ -345,6 +358,11 @@ void mvceditor::RunningThreadsClass::StopAll() {
 		wxASSERT_MSG(wxSEMA_MISC_ERROR != err, wxT("semaphore misc error"));
 	}
 	ThreadActions.clear();
+}
+
+void mvceditor::RunningThreadsClass::Shutdown() {
+	IsShutdown = true;
+	StopAll();
 }
 
 void mvceditor::RunningThreadsClass::AddEventHandler(wxEvtHandler *handler) {
