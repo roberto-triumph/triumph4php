@@ -115,7 +115,7 @@ private:
 
 class ModalExplorerPanelClass : public ModalExplorerGeneratedPanel {
 public:
-	ModalExplorerPanelClass(wxWindow* parent, int id, mvceditor::AppClass& app);
+	ModalExplorerPanelClass(wxWindow* parent, int id, mvceditor::ExplorerFeatureClass& feature);
 	~ModalExplorerPanelClass();
 
 	void RefreshDir(const wxFileName& dir);
@@ -149,7 +149,13 @@ private:
 	/**
 	 * to get projects list and tag cache
 	 */
-	mvceditor::AppClass& App;
+	mvceditor::ExplorerFeatureClass& Feature;
+	
+	/**
+	 * this object gets its own background thread to
+	 * read directories in the background
+	 */
+	mvceditor::RunningThreadsClass RunningThreads;
 
 	/**
 	 * the currently selected filter menu item

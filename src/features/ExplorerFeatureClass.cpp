@@ -116,7 +116,7 @@ void mvceditor::ExplorerFeatureClass::OnExplorerProjectMenu(wxCommandEvent& even
 	wxWindow* window = FindToolsWindow(ID_EXPLORER_PANEL);
 	mvceditor::ModalExplorerPanelClass* panel = NULL;
 	if (!window) {
-		panel =  new mvceditor::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, App);
+		panel =  new mvceditor::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, *this);
 		AddToolsWindow(panel, _("Explorer"));
 	}
 	else {
@@ -181,7 +181,7 @@ void mvceditor::ExplorerFeatureClass::OnProjectExploreOpenFile(wxCommandEvent& e
 	wxWindow* window = FindToolsWindow(ID_EXPLORER_PANEL);
 	mvceditor::ModalExplorerPanelClass* panel = NULL;
 	if (!window) {
-		panel =  new mvceditor::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, App);
+		panel =  new mvceditor::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, *this);
 		AddToolsWindow(panel, _("Explorer"));
 	}
 	else {
@@ -212,13 +212,14 @@ void mvceditor::ExplorerFeatureClass::OnExplorerReportComplete(mvceditor::Explor
 	}
 }
 
-mvceditor::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, mvceditor::AppClass& app)
+mvceditor::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, mvceditor::ExplorerFeatureClass& feature)
 : ModalExplorerGeneratedPanel(parent, id) 
 , CurrentListDir()
 , CurrentReportDir() 
 , ListImageList(NULL)
 , ReportImageList(NULL)
-, App(app) 
+, Feature(feature) 
+, RunningThreads()
 , FilterChoice(ID_FILTER_ALL) {
 	ListImageList = new wxImageList(16, 16);
 	ListImageList->Add(mvceditor::IconImageAsset(wxT("folder-horizontal")));
@@ -246,21 +247,25 @@ mvceditor::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, in
 	FilterButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("filter")));
 	ParentButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("arrow-up")));
 
-	App.RunningThreads.AddEventHandler(this);
+	RunningThreads.SetMaxThreads(1);
+	RunningThreads.AddEventHandler(this);
+	RunningThreads.AddEventHandler(&Feature);
+	
 }
 
 mvceditor::ModalExplorerPanelClass::~ModalExplorerPanelClass() {
-	App.RunningThreads.RemoveEventHandler(this);
+	RunningThreads.RemoveEventHandler(this);
+	RunningThreads.RemoveEventHandler(&Feature);
 }
 
 void mvceditor::ModalExplorerPanelClass::RefreshDir(const wxFileName& dir) {
 	ListLabel->SetLabel(wxT(""));
 	ReportLabel->SetLabel(wxT(""));
-	mvceditor::ExplorerFileSystemActionClass* action = new mvceditor::ExplorerFileSystemActionClass(App.RunningThreads, ID_EXPLORER_LIST_ACTION);
+	mvceditor::ExplorerFileSystemActionClass* action = new mvceditor::ExplorerFileSystemActionClass(RunningThreads, ID_EXPLORER_LIST_ACTION);
 
 	// when user choose ALL show hidden files too
 	action->Directory(dir, FilterFileExtensions(), ID_FILTER_ALL == FilterChoice);
-	App.RunningThreads.Queue(action);
+	RunningThreads.Queue(action);
 }
 
 void mvceditor::ModalExplorerPanelClass::OnDirectoryEnter(wxCommandEvent& event) {
@@ -310,11 +315,11 @@ void mvceditor::ModalExplorerPanelClass::OnListItemSelected(wxListEvent& event) 
 	wxFileName nextDir;
 	nextDir.AssignDir(CurrentListDir.GetPathWithSep() + text);
 	if (wxFileName::DirExists(CurrentListDir.GetPathWithSep() + text)) {
-		mvceditor::ExplorerFileSystemActionClass* action = new mvceditor::ExplorerFileSystemActionClass(App.RunningThreads, ID_EXPLORER_REPORT_ACTION);
+		mvceditor::ExplorerFileSystemActionClass* action = new mvceditor::ExplorerFileSystemActionClass(RunningThreads, ID_EXPLORER_REPORT_ACTION);
 
 		// when user choose ALL show hidden files too
 		action->Directory(nextDir, FilterFileExtensions(), ID_FILTER_ALL == FilterChoice);
-		App.RunningThreads.Queue(action);
+		RunningThreads.Queue(action);
 	}
 }
 
@@ -491,7 +496,7 @@ bool mvceditor::ModalExplorerPanelClass::OpenIfListFile(const wxString& text) {
 	if (wxFileName::FileExists(fullPath)) {
 		wxCommandEvent evt(mvceditor::EVENT_CMD_FILE_OPEN);
 		evt.SetString(fullPath);
-		App.EventSink.Publish(evt);
+		Feature.App.EventSink.Publish(evt);
 		return true;
 	}
 	return false;
@@ -505,7 +510,7 @@ bool mvceditor::ModalExplorerPanelClass::OpenIfReportFile(const wxString& text) 
 	if (wxFileName::FileExists(fullPath)) {
 		wxCommandEvent evt(mvceditor::EVENT_CMD_FILE_OPEN);
 		evt.SetString(fullPath);
-		App.EventSink.Publish(evt);
+		Feature.App.EventSink.Publish(evt);
 		return true;
 	}
 	return false;
@@ -513,16 +518,16 @@ bool mvceditor::ModalExplorerPanelClass::OpenIfReportFile(const wxString& text) 
 
 int mvceditor::ModalExplorerPanelClass::ListImageId(const wxFileName& fileName) {
 	wxString fullPath = fileName.GetFullPath();
-	if (App.Globals.HasAPhpExtension(fullPath)) {
+	if (Feature.App.Globals.HasAPhpExtension(fullPath)) {
 		return LIST_FILE_PHP;
 	}
-	if (App.Globals.HasASqlExtension(fullPath)) {
+	if (Feature.App.Globals.HasASqlExtension(fullPath)) {
 		return LIST_FILE_SQL;
 	} 
-	if (App.Globals.HasACssExtension(fullPath)) {
+	if (Feature.App.Globals.HasACssExtension(fullPath)) {
 		return LIST_FILE_CSS;
 	}
-	if (App.Globals.HasAMiscExtension(fullPath)) {
+	if (Feature.App.Globals.HasAMiscExtension(fullPath)) {
 		return LIST_FILE_TEXT;
 	}
 	return LIST_FILE_OTHER;
@@ -531,16 +536,16 @@ int mvceditor::ModalExplorerPanelClass::ListImageId(const wxFileName& fileName) 
 
 int mvceditor::ModalExplorerPanelClass::ReportImageId(const wxFileName& fileName) {
 	wxString fullPath = fileName.GetFullPath();
-	if (App.Globals.HasAPhpExtension(fullPath)) {
+	if (Feature.App.Globals.HasAPhpExtension(fullPath)) {
 		return REPORT_FILE_PHP;
 	}
-	if (App.Globals.HasASqlExtension(fullPath)) {
+	if (Feature.App.Globals.HasASqlExtension(fullPath)) {
 		return REPORT_FILE_SQL;
 	} 
-	if (App.Globals.HasACssExtension(fullPath)) {
+	if (Feature.App.Globals.HasACssExtension(fullPath)) {
 		return REPORT_FILE_CSS;
 	}
-	if (App.Globals.HasAMiscExtension(fullPath)) {
+	if (Feature.App.Globals.HasAMiscExtension(fullPath)) {
 		return REPORT_FILE_TEXT;
 	}
 	return REPORT_FILE_OTHER;
@@ -570,14 +575,14 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuOpen(wxCommandEvent& event) {
 		if (wxFileName::FileExists(fullPath)) {
 			wxCommandEvent evt(mvceditor::EVENT_CMD_FILE_OPEN);
 			evt.SetString(fullPath);
-			App.EventSink.Publish(evt);
+			Feature.App.EventSink.Publish(evt);
 		}
 		else if (wxFileName::DirExists(fullPath)) {
-			mvceditor::ExplorerFileSystemActionClass* action = new mvceditor::ExplorerFileSystemActionClass(App.RunningThreads, ID_EXPLORER_REPORT_ACTION);
+			mvceditor::ExplorerFileSystemActionClass* action = new mvceditor::ExplorerFileSystemActionClass(RunningThreads, ID_EXPLORER_REPORT_ACTION);
 
 			// when user choose ALL show hidden files too
 			action->Directory(fullPath, FilterFileExtensions(), ID_FILTER_ALL == FilterChoice);
-			App.RunningThreads.Queue(action);
+			RunningThreads.Queue(action);
 		}
 	}
 }
@@ -602,7 +607,7 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuDelete(wxCommandEvent& event)
 		wxString fullPath = CurrentListDir.GetPathWithSep() + name;
 
 		// perform the deletion in the background
-		mvceditor::ExplorerModifyActionClass* action = new mvceditor::ExplorerModifyActionClass(App.RunningThreads, ID_EXPLORER_MODIFY);
+		mvceditor::ExplorerModifyActionClass* action = new mvceditor::ExplorerModifyActionClass(RunningThreads, ID_EXPLORER_MODIFY);
 		if (wxFileName::FileExists(fullPath)) {
 			action->SetFileToRemove(wxFileName(fullPath));
 		}
@@ -613,7 +618,7 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuDelete(wxCommandEvent& event)
 			dirToDelete.AssignDir(fullPath);
 			action->SetDirToRemove(dirToDelete);
 		}
-		App.RunningThreads.Queue(action);
+		RunningThreads.Queue(action);
 	}
 }
 
@@ -631,9 +636,9 @@ void mvceditor::ModalExplorerPanelClass::OnListEndLabelEdit(wxListEvent& event) 
 		wxFileName sourceFile(CurrentListDir.GetPath(), name);
 		wxFileName destFile(CurrentListDir.GetPath(), newName);
 
-		mvceditor::ExplorerModifyActionClass* action = new mvceditor::ExplorerModifyActionClass(App.RunningThreads, ID_EXPLORER_MODIFY);
+		mvceditor::ExplorerModifyActionClass* action = new mvceditor::ExplorerModifyActionClass(RunningThreads, ID_EXPLORER_MODIFY);
 		action->SetFileToRename(sourceFile, newName);
-		App.RunningThreads.Queue(action);		
+		RunningThreads.Queue(action);		
 	}
 	else {
 		event.Veto();
@@ -698,15 +703,15 @@ void mvceditor::ModalExplorerPanelClass::OnExplorerModifyComplete(mvceditor::Exp
 void mvceditor::ModalExplorerPanelClass::OnFilterButtonLeftDown(wxMouseEvent& event) {
 	wxPoint point = event.GetPosition();
 	if (FilterButton->HitTest(point) == wxHT_WINDOW_INSIDE) {
-		wxString allExtensions = App.Globals.PhpFileExtensionsString + wxT(";") +
-			App.Globals.CssFileExtensionsString + wxT(";") +
-			App.Globals.SqlFileExtensionsString  + wxT(";") + 
-			App.Globals.MiscFileExtensionsString;
+		wxString allExtensions = Feature.App.Globals.PhpFileExtensionsString + wxT(";") +
+			Feature.App.Globals.CssFileExtensionsString + wxT(";") +
+			Feature.App.Globals.SqlFileExtensionsString  + wxT(";") + 
+			Feature.App.Globals.MiscFileExtensionsString;
 
 		wxString allFiles = wxT("*");
-		wxString phpExtensions = App.Globals.PhpFileExtensionsString;
-		wxString cssExtensions = App.Globals.CssFileExtensionsString;
-		wxString sqlExtensions = App.Globals.SqlFileExtensionsString;
+		wxString phpExtensions = Feature.App.Globals.PhpFileExtensionsString;
+		wxString cssExtensions = Feature.App.Globals.CssFileExtensionsString;
+		wxString sqlExtensions = Feature.App.Globals.SqlFileExtensionsString;
 		wxMenu menu;
 	
 		wxMenuItem* item;
@@ -738,16 +743,16 @@ void mvceditor::ModalExplorerPanelClass::OnFilterButtonLeftDown(wxMouseEvent& ev
 std::vector<wxString> mvceditor::ModalExplorerPanelClass::FilterFileExtensions() {
 	std::vector<wxString> extensions;
 	if (ID_FILTER_ALL_SOURCE == FilterChoice) {
-		extensions = App.Globals.GetAllSourceFileExtensions();
+		extensions = Feature.App.Globals.GetAllSourceFileExtensions();
 	}
 	else if (ID_FILTER_PHP == FilterChoice) {
-		extensions = App.Globals.GetPhpFileExtensions();
+		extensions = Feature.App.Globals.GetPhpFileExtensions();
 	}
 	else if (ID_FILTER_CSS == FilterChoice) {
-		extensions = App.Globals.GetCssFileExtensions();
+		extensions = Feature.App.Globals.GetCssFileExtensions();
 	}
 	else if (ID_FILTER_SQL == FilterChoice) {
-		extensions = App.Globals.GetSqlFileExtensions();
+		extensions = Feature.App.Globals.GetSqlFileExtensions();
 	}
 
 	// no extension == ID_FILTER_ALL
