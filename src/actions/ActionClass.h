@@ -352,6 +352,7 @@ class RunningThreadsClass : public wxEvtHandler {
 	~RunningThreadsClass();
 	
 	/**
+	 * Only call this method BEFORE any items are queued up
 	 * @param int maxThreads number threads to start. This can be zero, if so
 	 *        then we will start as many threads as there are CPUs in the system
 	 */

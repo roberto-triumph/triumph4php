@@ -205,7 +205,6 @@ mvceditor::RunningThreadsClass::RunningThreadsClass(bool doPostEvents)
 	, IsShutdown(false) {
 	Timer.SetOwner(this);
 	SetMaxThreads(wxThread::GetCPUCount());
-	Semaphore = new wxSemaphore(0, MaxThreads);
 }
 
 mvceditor::RunningThreadsClass::~RunningThreadsClass() {
@@ -223,6 +222,10 @@ void mvceditor::RunningThreadsClass::SetMaxThreads(int maxThreads) {
 		maxThreads = 2;
 	}
 	MaxThreads = maxThreads;
+	if (Semaphore) {
+		delete Semaphore;
+	}
+	Semaphore = new wxSemaphore(0, MaxThreads);
 }
   
 int mvceditor::RunningThreadsClass::Queue(mvceditor::ActionClass* action) {
