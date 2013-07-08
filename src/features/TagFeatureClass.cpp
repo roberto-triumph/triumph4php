@@ -361,8 +361,7 @@ void mvceditor::TagSearchDialogClass::OnTimerComplete(wxTimerEvent& event) {
 }
 
 void mvceditor::TagSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
-	size_t selection = MatchesList->GetSelection();
-	if (selection < 0 || MatchedResources.empty()) {
+	if (MatchedResources.empty()) {
 		
 		// dont dismiss the dialog when no tags are shown
 		return;
@@ -400,6 +399,7 @@ void mvceditor::TagSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
 
 	// no checked items, take the user to the
 	// selected item
+	size_t selection = MatchesList->GetSelection();
 	if (selection >= 0 && selection < MatchedResources.size()) {
 		ChosenResources.push_back(MatchedResources[selection]);
 	}
@@ -457,6 +457,18 @@ void mvceditor::TagSearchDialogClass::ShowJumpToResults(const wxString& finderQu
 }
 
 void mvceditor::TagSearchDialogClass::OnOkButton(wxCommandEvent& event) {
+	bool isChecked = false;
+	for (size_t i = 0; i < MatchesList->GetCount(); ++i) {
+		if (MatchesList->IsChecked(i)) {
+			isChecked = true;
+			break;
+		}
+	}
+	if (!isChecked) {
+		
+		// nothing chosen
+		return;
+	}
 	Timer.Stop();
 	RunningThreads.Shutdown();
 	TransferDataFromWindow();
@@ -465,9 +477,6 @@ void mvceditor::TagSearchDialogClass::OnOkButton(wxCommandEvent& event) {
 		if (MatchesList->IsChecked(i)) {
 			ChosenResources.push_back(MatchedResources[i]);
 		}
-	}
-	if (ChosenResources.empty()) {
-		return;
 	}
 	EndModal(wxOK);
 }
@@ -539,14 +548,20 @@ void mvceditor::TagSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 }
 
 void mvceditor::TagSearchDialogClass::OnMatchesListDoubleClick(wxCommandEvent& event) {
+	size_t selection = event.GetSelection();
+	if (selection < MatchesList->GetCount()) {
+		
+		// no item chosen
+		return;
+	}
+	Timer.Stop();
+	RunningThreads.Shutdown();
+	
 	TransferDataFromWindow();
 	ChosenResources.clear();
-	size_t selection = event.GetSelection();
+	
 	if (selection >= 0 && selection < MatchesList->GetCount()) {
 		ChosenResources.push_back(MatchedResources[selection]);
-	}
-	if (ChosenResources.empty()) {
-		return;
 	}
 	EndModal(wxOK);
 }
