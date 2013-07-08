@@ -163,9 +163,9 @@ protected:
 
 private:
 
-	void OnActionComplete(wxCommandEvent& event);
+	void OnActionComplete(mvceditor::ActionEventClass& event);
 
-	void OnActionInProgress(wxCommandEvent& event);
+	void OnActionInProgress(mvceditor::ActionEventClass& event);
 
 	/**
 	 * start the next step in the sequence.

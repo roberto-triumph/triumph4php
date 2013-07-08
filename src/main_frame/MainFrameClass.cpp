@@ -129,7 +129,7 @@ void mvceditor::MainFrameClass::OnClose(wxCloseEvent& event) {
 		App.Sequences.Stop();
 
 		App.RunningThreads.RemoveEventHandler(this);
-		App.RunningThreads.StopAll();
+		App.RunningThreads.Shutdown();
 		
 
 		// delete the features first so that we can destroy

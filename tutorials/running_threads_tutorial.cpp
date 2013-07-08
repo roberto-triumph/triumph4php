@@ -50,8 +50,8 @@ private:
 	void OnStartNewThread(wxCommandEvent& event);
 	void OnStopThread(wxCommandEvent& event);
 	void OnStopAllThread(wxCommandEvent& event);
-	void OnThreadRunning(wxCommandEvent& event);
-	void OnThreadComplete(wxCommandEvent& event);
+	void OnThreadRunning(mvceditor::ActionEventClass& event);
+	void OnThreadComplete(mvceditor::ActionEventClass& event);
 
 	mvceditor::RunningThreadsClass& RunningThreads;
 	wxTextCtrl* Text;
@@ -70,7 +70,17 @@ protected:
 	wxString Label;
 };
 
+
 const wxEventType EVENT_RUNNING = wxNewEventType();
+
+typedef void (wxEvtHandler::*ActionEventClassFunction)(mvceditor::ActionEventClass&);
+
+#define EVT_MY_ACTION(id, fn) \
+	DECLARE_EVENT_TABLE_ENTRY(EVENT_RUNNING, id, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( ActionEventClassFunction, & fn ), (wxObject *) NULL ),
+
+
 const int ID_THREAD = wxNewId();
 enum {
 	MENU_START_THREAD = 1,
@@ -153,9 +163,8 @@ MyAction::MyAction(mvceditor::RunningThreadsClass& runningThreads, int eventId, 
 
 void MyAction::BackgroundWork() {
 	while (!IsCancelled()) {
-		wxCommandEvent evt(EVENT_RUNNING);
-		evt.SetId(ID_THREAD);
-		evt.SetString(wxString::Format(_("%s is running...\n"), (const char*)Label.c_str()));
+		wxString msg = wxString::Format(_("%s is running...\n"), (const char*)Label.c_str()); 
+		mvceditor::ActionEventClass evt(ID_THREAD, EVENT_RUNNING, msg);
 		PostEvent(evt);
 		wxThread::Sleep(2000);
 	}
@@ -164,12 +173,12 @@ wxString MyAction::GetLabel() const {
 	return Label;
 }
 
-void MyFrame::OnThreadRunning(wxCommandEvent& event) {
-	Text->AppendText(event.GetString());
+void MyFrame::OnThreadRunning(mvceditor::ActionEventClass& event) {
+	Text->AppendText(event.Message);
 }
 
-void MyFrame::OnThreadComplete(wxCommandEvent& event) {
-	Text->AppendText(event.GetString());
+void MyFrame::OnThreadComplete(mvceditor::ActionEventClass& event) {
+	Text->AppendText(event.Message);
 	Text->AppendText(wxT("Work complete\n"));
 	RunningActionId = 0;
 }
@@ -180,6 +189,6 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 	EVT_MENU(MENU_STOP_ALL_THREAD, MyFrame::OnStopAllThread)
 	EVT_MENU(wxID_EXIT, MyFrame::OnExit)
 	EVT_CLOSE(MyFrame::OnClose)
-	EVT_COMMAND(ID_THREAD, EVENT_RUNNING, MyFrame::OnThreadRunning)
-	EVT_COMMAND(ID_THREAD, mvceditor::EVENT_WORK_COMPLETE, MyFrame::OnThreadComplete)
+	EVT_MY_ACTION(ID_THREAD, MyFrame::OnThreadRunning)
+	EVT_ACTION_COMPLETE(ID_THREAD, MyFrame::OnThreadComplete)
 END_EVENT_TABLE()

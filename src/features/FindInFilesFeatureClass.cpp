@@ -455,7 +455,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnFindInFilesComplete(wxCommandEve
 	}
 }
 
-void mvceditor::FindInFilesResultsPanelClass::OnWorkComplete(wxCommandEvent& event) {
+void mvceditor::FindInFilesResultsPanelClass::OnActionComplete(mvceditor::ActionEventClass& event) {
 	if (event.GetId() != FindInFilesGaugeId) {
 
 		// event from another, concurrent find in files panel. let the other panel
@@ -656,7 +656,7 @@ int mvceditor::FindInFilesResultsPanelClass::GetNumberOfMatchedFiles() {
 	return MatchedFiles;
 }
 
-void mvceditor::FindInFilesResultsPanelClass::OnTimer(wxCommandEvent& event) {
+void mvceditor::FindInFilesResultsPanelClass::OnActionInProgress(mvceditor::ActionEventClass& event) {
 	if (event.GetId() != FindInFilesGaugeId) {
 
 		// event from another, concurrent find in files panel. let the other panel
@@ -926,8 +926,8 @@ BEGIN_EVENT_TABLE(mvceditor::FindInFilesResultsPanelClass, FindInFilesResultsPan
 	//EVT_COMMAND(wxID_ANY, EVENT_FILE_READ, mvceditor::FindInFilesResultsPanelClass::OnFileSearched)
 	EVT_FIND_IN_FILES_HITS(wxID_ANY, mvceditor::FindInFilesResultsPanelClass::OnFileHit)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FILE_READ_COMPLETE, mvceditor::FindInFilesResultsPanelClass::OnFindInFilesComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::FindInFilesResultsPanelClass::OnTimer)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_WORK_COMPLETE, mvceditor::FindInFilesResultsPanelClass::OnWorkComplete)
+	EVT_ACTION_IN_PROGRESS(wxID_ANY, mvceditor::FindInFilesResultsPanelClass::OnActionInProgress)
+	EVT_ACTION_COMPLETE(wxID_ANY, mvceditor::FindInFilesResultsPanelClass::OnActionComplete)
 
 	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_ONE, mvceditor::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol)
 	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_TWO, mvceditor::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol)

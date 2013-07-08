@@ -118,7 +118,7 @@ void mvceditor::TemplateFilesFeatureClass::SetCurrentUrl(mvceditor::UrlTagClass 
 	App.Globals.CurrentUrl = url;
 }
 
-void mvceditor::TemplateFilesFeatureClass::OnTemplateDetectionComplete(wxCommandEvent& event) {
+void mvceditor::TemplateFilesFeatureClass::OnTemplateDetectionComplete(mvceditor::ActionEventClass& event) {
 	wxWindow* window = FindOutlineWindow(ID_TEMPLATE_FILES_PANEL);
 	mvceditor::TemplateFilesPanelClass* templateFilesPanel = NULL;
 	if (window) {
@@ -281,5 +281,5 @@ void mvceditor::TemplateFilesPanelClass::OnTreeItemActivated(wxTreeEvent& event)
 
 BEGIN_EVENT_TABLE(mvceditor::TemplateFilesFeatureClass, wxEvtHandler) 
 	EVT_MENU(mvceditor::MENU_TEMPLATE_FILES + 0, mvceditor::TemplateFilesFeatureClass::OnTemplateFilesMenu)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::TemplateFilesFeatureClass::OnTemplateDetectionComplete)
+	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR, mvceditor::TemplateFilesFeatureClass::OnTemplateDetectionComplete)
 END_EVENT_TABLE()

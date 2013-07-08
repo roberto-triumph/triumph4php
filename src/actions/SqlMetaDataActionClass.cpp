@@ -58,8 +58,8 @@ void mvceditor::SqlMetaDataActionClass::BackgroundWork() {
 	for (std::vector<mvceditor::DatabaseTagClass>::iterator it = DatabaseTags.begin(); it != DatabaseTags.end(); ++it) {
 		if (!IsCancelled()) {
 			if (it->IsEnabled) {
-				wxString wxLabel = mvceditor::IcuToWx(it->Label);
-				SetStatus(_("SQL Meta / ") + wxLabel);
+				wxString wxLabel = _("SQL Meta / ") ; //mvceditor::IcuToWx(it->Label);
+				SetStatus(wxLabel);
 				UnicodeString error;
 				if (!newResources.Fetch(*it, error)) {
 					errors.push_back(it->Label + UNICODE_STRING_SIMPLE(": ") + error);

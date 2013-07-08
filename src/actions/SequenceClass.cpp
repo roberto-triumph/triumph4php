@@ -250,7 +250,7 @@ void mvceditor::SequenceClass::Run() {
 	RunNextStep();
 }
 
-void mvceditor::SequenceClass::OnActionComplete(wxCommandEvent& event) {
+void mvceditor::SequenceClass::OnActionComplete(mvceditor::ActionEventClass& event) {
 	if (!Steps.empty()) {
 
 		// remove the step that just finished
@@ -350,7 +350,7 @@ bool mvceditor::SequenceClass::Running() const {
 	return IsRunning;
 }
 
-void mvceditor::SequenceClass::OnActionInProgress(wxCommandEvent &event) {
+void mvceditor::SequenceClass::OnActionInProgress(mvceditor::ActionEventClass& event) {
 	wxCommandEvent sequenceEvent(mvceditor::EVENT_SEQUENCE_IN_PROGRESS);
 	sequenceEvent.SetId(wxID_ANY);
 	RunningThreads.PostEvent(sequenceEvent);
@@ -377,37 +377,37 @@ const wxEventType mvceditor::EVENT_SEQUENCE_IN_PROGRESS = wxNewEventType();
 const wxEventType mvceditor::EVENT_SEQUENCE_COMPLETE = wxNewEventType();
 
 BEGIN_EVENT_TABLE(mvceditor::SequenceClass, wxEvtHandler)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_INIT, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_SQL_METADATA_INIT, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_SQL_METADATA, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR_INIT, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TAG_DETECTOR_INIT, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TAG_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_CALL_STACK, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR_INIT, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK, mvceditor::EVENT_WORK_COMPLETE, mvceditor::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_INIT, mvceditor::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST, mvceditor::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_SQL_METADATA_INIT, mvceditor::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_SQL_METADATA, mvceditor::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR_INIT, mvceditor::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR, mvceditor::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_TAG_DETECTOR_INIT, mvceditor::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_TAG_DETECTOR, mvceditor::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE, mvceditor::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_CALL_STACK, mvceditor::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR, mvceditor::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR_INIT, mvceditor::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR, mvceditor::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR, mvceditor::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK, mvceditor::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK, mvceditor::SequenceClass::OnActionComplete)
 
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_INIT, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_SQL_METADATA_INIT, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_SQL_METADATA, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR_INIT, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TAG_DETECTOR_INIT, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TAG_DETECTOR, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_CALL_STACK, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR_INIT, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK, mvceditor::EVENT_WORK_IN_PROGRESS, mvceditor::SequenceClass::OnActionInProgress)
+	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_INIT, mvceditor::SequenceClass::OnActionInProgress)
+	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST, mvceditor::SequenceClass::OnActionInProgress)
+	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_SQL_METADATA_INIT, mvceditor::SequenceClass::OnActionInProgress)
+	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_SQL_METADATA, mvceditor::SequenceClass::OnActionInProgress)
+	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR_INIT, mvceditor::SequenceClass::OnActionInProgress)
+	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR, mvceditor::SequenceClass::OnActionInProgress)
+	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_DETECTOR_INIT, mvceditor::SequenceClass::OnActionInProgress)
+	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_DETECTOR, mvceditor::SequenceClass::OnActionInProgress)
+	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE, mvceditor::SequenceClass::OnActionInProgress)
+	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_CALL_STACK, mvceditor::SequenceClass::OnActionInProgress)
+	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR, mvceditor::SequenceClass::OnActionInProgress)
+	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR_INIT, mvceditor::SequenceClass::OnActionInProgress)
+	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR, mvceditor::SequenceClass::OnActionInProgress)
+	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR, mvceditor::SequenceClass::OnActionInProgress)
+	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK, mvceditor::SequenceClass::OnActionInProgress)
+	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK, mvceditor::SequenceClass::OnActionInProgress)
 END_EVENT_TABLE()

@@ -27,6 +27,7 @@
 
 #include <features/FeatureClass.h>
 #include <globals/UrlTagClass.h>
+#include <actions/ActionClass.h>
 #include <widgets/GaugeDialogClass.h>
 #include <wx/string.h>
 #include <vector>
@@ -96,7 +97,7 @@ private:
 	 * click, then when url detection is complete we will show
 	 * the user the ChooseUrlDialog
 	 */
-	void OnUrlDetectionComplete(wxCommandEvent& event);
+	void OnUrlDetectionComplete(mvceditor::ActionEventClass& event);
 		
 	/**
 	 * A popup menu to show the currently configured browsers. The same popup menu will be

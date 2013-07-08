@@ -40,15 +40,14 @@ class RunningThreadsClass;
  * **successfully** A thread that has been stopped via RunningThreads::Stop()
  * or will still generate this event.
  */
-extern const wxEventType EVENT_WORK_COMPLETE;
+extern const wxEventType EVENT_ACTION_COMPLETE;
 
 /**
  * This event will be generated when the thread is in action. Event listeners
  * can do things like update status bars here.
  * event.GetString() may have a message describing the action being taken
  */
-extern const wxEventType EVENT_WORK_IN_PROGRESS;
-
+extern const wxEventType EVENT_ACTION_IN_PROGRESS;
 
 /**
  * An action is any short of long-lived logic that needs to be executed asynchronously.
@@ -119,7 +118,7 @@ public:
 	void Cancel();
 
 	/**
-	 * Will generate a EVENT_WORK_COMPLETE event and stop the EVENT_WORK_IN_PROGRESS events.
+	 * Will generate a EVENT_ACTION_COMPLETE event and stop the EVENT_ACTION_IN_PROGRESS events.
 	 * Does not actually stop the thread.
 	 */
 	void SignalEnd();
@@ -351,6 +350,13 @@ class RunningThreadsClass : public wxEvtHandler {
 	RunningThreadsClass(bool doPostEvents = true);
 	
 	~RunningThreadsClass();
+	
+	/**
+	 * Only call this method BEFORE any items are queued up
+	 * @param int maxThreads number threads to start. This can be zero, if so
+	 *        then we will start as many threads as there are CPUs in the system
+	 */
+	void SetMaxThreads(int maxThreads);
 
 	/**
 	 * Queues the given action to be run at some point in the near future. 
@@ -383,6 +389,13 @@ class RunningThreadsClass : public wxEvtHandler {
 	 * been calling Cancel() correctly.
 	 */
 	void StopAll();
+	
+	/**
+	 * stops all running threads, and additionally will no longer queue up any
+	 * actions given to be queued.  This method is usually called before this item
+	 * goes out of scope.
+	 */
+	void Shutdown();
 
 	/**
 	 * This method should called before any actions are added. 
@@ -412,15 +425,6 @@ class RunningThreadsClass : public wxEvtHandler {
 	 * this means that the event will be received in the next event loop.
 	 */
 	void PostEvent(wxEvent& event);
-  
-	/**
-	 * Check to see if the given thread is being tracked; if it was previously
-	 * added with the Add() method but not yet removed via the Remove() or Stop()
-	 * methods.  If this returns true, then it means that the thread is definitely alive.
-	 * This is safe to call on detached or joinable threads, as it does not depend
-	 * on wxThread::IsAlive or  wxThread::IsRunning methods.
-	 */
-	//bool IsRunning(mvceditor::ThreadWithHeartbeatClass* thread);
   
 	private:
   
@@ -453,7 +457,7 @@ class RunningThreadsClass : public wxEvtHandler {
 	/**
 	 * prevent concurrent access to the handlers
 	 */
-	wxMutex HandlerMutex;	
+	wxMutex HandlerMutex;
 	
 	/**
 	 * to implement blocking wait when stopping the background
@@ -490,7 +494,12 @@ class RunningThreadsClass : public wxEvtHandler {
 	int MaxThreads;
 	
 	/**
-	 * Will generate a EVENT_WORK_IN_PROGRESS event
+	 * if TRUE no items will be queued.
+	 */
+	bool IsShutdown;
+	
+	/**
+	 * Will generate a EVENT_ACTION_IN_PROGRESS event
 	 */
 	void OnTimer(wxTimerEvent& event);
 	
@@ -536,6 +545,45 @@ class RunningThreadsClass : public wxEvtHandler {
  * new status of the sequence can be retrieved via wxCommandEvent.GetString
  */
 extern const wxEventType EVENT_ACTION_STATUS;
+
+/**
+ * An event with a string member that is cloned (deep copied)
+ * so that it can be safely passed between threads.  Since wxString by default
+ * uses "fast" assignments by sharing the same data pointer, we want to deep
+ * copy any strings that we pass from one thread to another.
+ */
+class ActionEventClass : public wxEvent {
+	
+public:
+
+	/**
+	 * a string, copied between threads in a safe way
+	 */
+	wxString Message;
+
+	ActionEventClass(int id, wxEventType type, const wxString& msg);
+		
+	wxEvent* Clone() const;
+	
+};
+
+typedef void (wxEvtHandler::*ActionEventClassFunction)(mvceditor::ActionEventClass&);
+
+#define EVT_ACTION_STATUS(id, fn) \
+        DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_ACTION_STATUS, id, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( ActionEventClassFunction, & fn ), (wxObject *) NULL ),
+
+#define EVT_ACTION_IN_PROGRESS(id, fn) \
+        DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_ACTION_IN_PROGRESS, id, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( ActionEventClassFunction, & fn ), (wxObject *) NULL ),
+
+#define EVT_ACTION_COMPLETE(id, fn) \
+        DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_ACTION_COMPLETE, id, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( ActionEventClassFunction, & fn ), (wxObject *) NULL ),
+
 
 }
 

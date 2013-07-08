@@ -295,12 +295,12 @@ private:
 	 */
 	bool Check();
 	
-	void OnWorkInProgress(wxCommandEvent& event);
+	void OnActionInProgress(mvceditor::ActionEventClass& event);
 	
 	/**
 	 * close the connection here
 	 */
-	void OnWorkComplete(wxCommandEvent& event);
+	void OnActionComplete(mvceditor::ActionEventClass& event);
 	
 	/**
 	 * Fill the grid with the a single SQL result

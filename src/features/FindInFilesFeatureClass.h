@@ -364,9 +364,9 @@ private:
 	/**
 	 * Timer handler.
 	 * 
-	 * @param wxCommandEvent& event
+	 * @param mvceditor::ActionEventClass& event
 	 */
-	 void OnTimer(wxCommandEvent& event);
+	 void OnActionInProgress(mvceditor::ActionEventClass& event);
 
 	 /**
 	  * Search in the files that are opened. We want to do this so that we only show the most up-to-date
@@ -382,7 +382,7 @@ private:
 	 */
 	void ShowMatch(int i);
 
-	void OnWorkComplete(wxCommandEvent& event);
+	void OnActionComplete(mvceditor::ActionEventClass& event);
 
 	/**
 	 * handling of the replace regex help menu

@@ -28,6 +28,7 @@
 #include <features/FeatureClass.h>
 #include <features/wxformbuilder/TemplateFilesFeatureForms.h>
 #include <globals/TemplateFileTagClass.h>
+#include <actions/ActionClass.h>
 #include <wx/imaglist.h>
 
 namespace mvceditor {
@@ -84,7 +85,7 @@ private:
 	/**
 	 * when the template file detection process completes update the variable tree
 	 */
-	void OnTemplateDetectionComplete(wxCommandEvent& event);
+	void OnTemplateDetectionComplete(mvceditor::ActionEventClass& event);
 		
 	void ShowPanel();
 	

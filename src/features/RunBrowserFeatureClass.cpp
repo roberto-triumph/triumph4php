@@ -420,7 +420,7 @@ void mvceditor::RunBrowserFeatureClass::OnFileSaved(mvceditor::FileSavedEventCla
 	}
 }
 
-void mvceditor::RunBrowserFeatureClass::OnUrlDetectionComplete(wxCommandEvent& event) {
+void mvceditor::RunBrowserFeatureClass::OnUrlDetectionComplete(mvceditor::ActionEventClass& event) {
 	IsUrlCacheStale = false;
 	if (!IsWaitingForUrlDetection) {
 
@@ -450,6 +450,6 @@ BEGIN_EVENT_TABLE(mvceditor::RunBrowserFeatureClass, wxEvtHandler)
 	// application events
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::RunBrowserFeatureClass::OnPreferencesSaved)
 	EVT_FEATURE_FILE_SAVED(mvceditor::RunBrowserFeatureClass::OnFileSaved)
-	EVT_COMMAND(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR, mvceditor::EVENT_WORK_COMPLETE, mvceditor::RunBrowserFeatureClass::OnUrlDetectionComplete)
+	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR, mvceditor::RunBrowserFeatureClass::OnUrlDetectionComplete)
 END_EVENT_TABLE()
 

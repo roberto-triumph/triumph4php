@@ -139,7 +139,7 @@ std::vector<wxString> mvceditor::TagDetectorActionClass::DetectorScripts() {
 
 void mvceditor::TagDetectorActionClass::OnProcessComplete(wxCommandEvent &event) {
 	if (ParamsQueue.empty()) {
-		wxCommandEvent completeEvent(mvceditor::EVENT_WORK_COMPLETE);
+		mvceditor::ActionEventClass completeEvent(GetEventId(), mvceditor::EVENT_ACTION_COMPLETE, wxT(""));
 		PostEvent(completeEvent);
 	}
 	else {
@@ -150,7 +150,7 @@ void mvceditor::TagDetectorActionClass::OnProcessComplete(wxCommandEvent &event)
 void mvceditor::TagDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
 	mvceditor::EditorLogError(mvceditor::WARNING_OTHER, event.GetString());
 	if (ParamsQueue.empty()) {
-		wxCommandEvent completeEvent(mvceditor::EVENT_WORK_COMPLETE);
+		mvceditor::ActionEventClass completeEvent(GetEventId(), mvceditor::EVENT_ACTION_COMPLETE, wxT(""));
 		PostEvent(completeEvent);
 	}
 	else {
@@ -159,7 +159,7 @@ void mvceditor::TagDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
 }
 
 void mvceditor::TagDetectorActionClass::OnProcessInProgress(wxCommandEvent &event) {
-	wxCommandEvent inProgressEvent(mvceditor::EVENT_WORK_IN_PROGRESS);
+	mvceditor::ActionEventClass inProgressEvent(GetEventId(), mvceditor::EVENT_ACTION_IN_PROGRESS, wxT(""));
 	PostEvent(inProgressEvent);
 }
 
