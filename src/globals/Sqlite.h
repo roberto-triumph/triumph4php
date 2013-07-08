@@ -193,6 +193,11 @@ public:
 	void InitSession(soci::session* session);
 
 	/**
+	 * removes the session
+	 */
+	void ClearSession();
+
+	/**
 	 * executes a query against this sqlite db.
 	 *
 	 * @param result contains the query to run and the parameters to bind

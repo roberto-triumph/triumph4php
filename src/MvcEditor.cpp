@@ -152,7 +152,10 @@ mvceditor::AppClass::~AppClass() {
 	RunningThreads.RemoveEventHandler(&GlobalsChangeHandler);
 	RunningThreads.RemoveEventHandler(&Timer);
 	DeleteFeatures();
-	
+
+	// must close all soci sessions before shutting down sqlite library
+	Globals.Close();
+
 	// calling cleanup here so that we can run this binary through a memory leak detector 
 	// ICU will cache many things and that will cause the detector to output "possible leaks"
 	// TODO: only use this during debug mode

@@ -44,6 +44,12 @@ mvceditor::GlobalsClass::GlobalsClass()
 	, DetectorCacheSession(){
 }
 
+void mvceditor::GlobalsClass::Close() {
+	TagCache.Clear();
+	UrlTagFinder.ClearSession();
+	DetectorCacheSession.close();
+}
+
 std::vector<mvceditor::SourceClass> mvceditor::GlobalsClass::AllEnabledSources() const {
 	std::vector<mvceditor::SourceClass> allSources;
 	std::vector<mvceditor::ProjectClass>::const_iterator it;

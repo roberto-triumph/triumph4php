@@ -137,6 +137,10 @@ void mvceditor::SqliteFinderClass::InitSession(soci::session* session) {
 	Session = session;
 }
 
+void mvceditor::SqliteFinderClass::ClearSession() {
+	Session = NULL;
+}
+
 bool mvceditor::SqliteFinderClass::Exec(mvceditor::SqliteResultClass* result) {
 	bool ret = result->Prepare(*Session, true);
 	return ret;

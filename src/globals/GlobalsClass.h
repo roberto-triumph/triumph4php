@@ -151,6 +151,8 @@ public:
 
 	GlobalsClass();
 
+	void Close();
+
 	/**
 	 * @return vector of all directories of all source files in all enabled
 	 * projects. For example, if there are 3 enabled projects, each with 2 sources
