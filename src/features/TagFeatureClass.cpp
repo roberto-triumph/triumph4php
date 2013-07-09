@@ -567,7 +567,7 @@ void mvceditor::TagSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 
 void mvceditor::TagSearchDialogClass::OnMatchesListDoubleClick(wxCommandEvent& event) {
 	size_t selection = event.GetSelection();
-	if (selection < MatchesList->GetCount()) {
+	if (selection >= MatchesList->GetCount()) {
 		
 		// no item chosen
 		return;
