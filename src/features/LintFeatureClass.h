@@ -338,7 +338,7 @@ private:
 	
 	void OnLintInProgress(mvceditor::ActionEventClass& event);
 	
-	void OnFileSaved(mvceditor::FileSavedEventClass& event);
+	void OnFileSaved(mvceditor::CodeControlEventClass& event);
 	
 	void OnNotebookPageClosed(wxAuiNotebookEvent& event);	
 

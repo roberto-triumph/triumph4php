@@ -100,16 +100,6 @@ public:
 private:
 
 	/**
-	 * this will hold the working tags sqlite db
-	 */
-	soci::session Session;
-
-	/**
-	 * The object that will parse and persist tags
-	 */
-	mvceditor::TagParserClass TagParser;
-
-	/**
 	 * will run code through a lint check and choose not to update the cache if 
 	 * the code is not valid.
 	 */
@@ -386,6 +376,11 @@ public:
 	 * @return bool TRUE if the ID was found
 	 */
 	bool FindById(int id, mvceditor::TagClass& tag);
+
+	/**
+	 * @param fullPath filename to delete tags that were found in filename.
+	 */
+	void DeleteFromFile(const wxString& fullPath);
 	 
 private:
 		

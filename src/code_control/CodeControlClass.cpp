@@ -1175,7 +1175,10 @@ void mvceditor::CodeControlClass::RemoveTrailingBlankLines() {
 }
 
 wxString mvceditor::CodeControlClass::GetIdString() const {
-	wxString idString = wxString::Format(wxT("File_%d"), GetId());
+
+	// make sure string is unique across program instances
+	long pid = wxGetProcessId();
+	wxString idString = wxString::Format(wxT("File_%ld_%d"), pid, GetId());
 	return idString;
 }
 

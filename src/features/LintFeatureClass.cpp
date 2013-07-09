@@ -428,7 +428,7 @@ void mvceditor::LintFeatureClass::OnLintInProgress(mvceditor::ActionEventClass& 
 	gauge->IncrementGauge(ID_LINT_RESULTS_GAUGE, StatusBarWithGaugeClass::INDETERMINATE_MODE);
 }
 
-void mvceditor::LintFeatureClass::OnFileSaved(mvceditor::FileSavedEventClass& event) {
+void mvceditor::LintFeatureClass::OnFileSaved(mvceditor::CodeControlEventClass& event) {
 	mvceditor::CodeControlClass* codeControl = event.GetCodeControl();
 	wxString fileName = codeControl->GetFileName();
 	codeControl->ClearLintErrors();
@@ -517,7 +517,7 @@ BEGIN_EVENT_TABLE(mvceditor::LintFeatureClass, wxEvtHandler)
 	EVT_COMMAND(ID_LINT_READER, EVENT_FILE_READ,  mvceditor::LintFeatureClass::OnLintFileComplete)
 	EVT_ACTION_IN_PROGRESS(ID_LINT_READER, mvceditor::LintFeatureClass::OnLintInProgress)
 	EVT_ACTION_COMPLETE(ID_LINT_READER, mvceditor::LintFeatureClass::OnLintComplete)
-	EVT_FEATURE_FILE_SAVED(mvceditor::LintFeatureClass::OnFileSaved)
+	EVT_APP_FILE_SAVED(mvceditor::LintFeatureClass::OnFileSaved)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::LintFeatureClass::OnPreferencesSaved)
 	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::LintFeatureClass::OnNotebookPageClosed)
 	EVT_LINT_ERROR(ID_LINT_READER, mvceditor::LintFeatureClass::OnLintError)

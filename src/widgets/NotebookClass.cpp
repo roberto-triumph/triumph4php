@@ -82,11 +82,8 @@ void mvceditor::NotebookClass::SavePageIfModified(wxAuiNotebookEvent& event) {
 	if (!vetoed && codeCtrl) {
 
 		// tell the app that a file has been closed
-		wxString fileName = codeCtrl->GetFileName();
-		wxCommandEvent cmdEvent(mvceditor::EVENT_APP_FILE_CLOSED);
-		cmdEvent.SetId(codeCtrl->GetId());
-		cmdEvent.SetString(fileName);
-		EventSink->Publish(cmdEvent);
+		mvceditor::CodeControlEventClass codeControlEvent(mvceditor::EVENT_APP_FILE_CLOSED, codeCtrl);
+		EventSink->Publish(codeControlEvent);
 	}
 	if (!vetoed) {
 		event.Skip();
@@ -410,6 +407,10 @@ void mvceditor::NotebookClass::OnCloseAllPages(wxCommandEvent& event) {
 void mvceditor::NotebookClass::CloseAllPages() {
 	this->Freeze();
 	while (GetPageCount() > 0) {
+		mvceditor::CodeControlClass* codeCtrl = GetCodeControl(0);
+		mvceditor::CodeControlEventClass codeControlEvent(mvceditor::EVENT_APP_FILE_CLOSED, codeCtrl);
+		EventSink->Publish(codeControlEvent);
+
 		DeletePage(0);
 
 		// notify owner that the tab has been closed

@@ -65,7 +65,7 @@ private:
 	 * we set a dirty flag so that we can re-run url detection
 	 * when the user clicks on the Search For Urls button
 	 */
-	void OnFileSaved(mvceditor::FileSavedEventClass& event);
+	void OnFileSaved(mvceditor::CodeControlEventClass& event);
 
 	/**
 	 * run the chosen URL in (an external) web browser 

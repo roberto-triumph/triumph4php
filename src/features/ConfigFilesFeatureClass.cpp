@@ -122,7 +122,7 @@ void mvceditor::ConfigFilesFeatureClass::OnConfigMenuItem(wxCommandEvent& event)
 	}
 }
 
-void mvceditor::ConfigFilesFeatureClass::OnFileSaved(mvceditor::FileSavedEventClass& event) {
+void mvceditor::ConfigFilesFeatureClass::OnFileSaved(mvceditor::CodeControlEventClass& event) {
 	std::vector<mvceditor::ConfigTagClass>::const_iterator configTag;
 	bool isConfigFileSaved = false;
 	wxString fileSaved = event.GetCodeControl()->GetFileName();
@@ -141,5 +141,5 @@ void mvceditor::ConfigFilesFeatureClass::OnFileSaved(mvceditor::FileSavedEventCl
 BEGIN_EVENT_TABLE(mvceditor::ConfigFilesFeatureClass, mvceditor::FeatureClass) 
 	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR, mvceditor::ConfigFilesFeatureClass::OnConfigFilesDetected)
 	EVT_MENU_RANGE(mvceditor::CONFIG_DETECTORS, mvceditor::CONFIG_DETECTORS + MAX_CONFIG_MENU_ITEMS, mvceditor::ConfigFilesFeatureClass::OnConfigMenuItem)
-	EVT_FEATURE_FILE_SAVED(mvceditor::ConfigFilesFeatureClass::OnFileSaved)
+	EVT_APP_FILE_SAVED(mvceditor::ConfigFilesFeatureClass::OnFileSaved)
 END_EVENT_TABLE()

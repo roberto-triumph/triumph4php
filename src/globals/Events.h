@@ -93,7 +93,15 @@ private:
 class CodeControlClass;
 
 
-extern const wxEventType EVENT_FEATURE_FILE_SAVED;
+/**
+ * event gets generated when a file is saved.
+ */
+extern const wxEventType EVENT_APP_FILE_SAVED;
+
+/**
+ * event gets generated when a file is closed.
+ */
+extern const wxEventType EVENT_APP_FILE_CLOSED;
 
 /**
  * This is an event that will tell a feature that a file has been saved.
@@ -106,14 +114,14 @@ extern const wxEventType EVENT_FEATURE_FILE_SAVED;
  * the main frame's event table; and if the event were to propagate
  * then it would result in an infine loop.
  */
-class FileSavedEventClass : public wxEvent {
+class CodeControlEventClass : public wxEvent {
 
 public:
 
 	/**
 	 * @param codeControl caller will still own the pointer
 	 */
-	FileSavedEventClass(CodeControlClass* codeControl);
+	CodeControlEventClass(wxEventType type, CodeControlClass* codeControl);
 
 	/**
 	 * @return the code control that was saved; do NOT delete the returned
@@ -131,12 +139,17 @@ private:
 	CodeControlClass* CodeControl;
 };
 
-typedef void (wxEvtHandler::*FileSavedEventClassFunction)(FileSavedEventClass&);
+typedef void (wxEvtHandler::*CodeControlEventClassFunction)(CodeControlEventClass&);
 
-#define EVT_FEATURE_FILE_SAVED(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_FEATURE_FILE_SAVED, wxID_ANY, -1, \
+#define EVT_APP_FILE_SAVED(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_APP_FILE_SAVED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( FileSavedEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent( CodeControlEventClassFunction, & fn ), (wxObject *) NULL ),
+
+#define EVT_APP_FILE_CLOSED(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_APP_FILE_CLOSED, wxID_ANY, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( CodeControlEventClassFunction, & fn ), (wxObject *) NULL ),
 
 /**
  * This is a one-time event that gets generated after the application main
@@ -174,13 +187,6 @@ extern const wxEventType EVENT_APP_FILE_CREATED;
  * tab.
  */
 extern const wxEventType EVENT_APP_FILE_NEW;
-
-/**
- * Notification that a file has been closed.  The event will contain
- * the full path of the file that was closed; the path may be the 
- * empty string when a new file is closed.
- */
-extern const wxEventType EVENT_APP_FILE_CLOSED;
 
 /**
  * Notification that the user preferences have been saved by the user. 

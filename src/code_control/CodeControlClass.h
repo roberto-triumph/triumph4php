@@ -296,9 +296,11 @@ public:
 	void SetAsHidden(bool isHidden);
 
 	/**
-	 * @return the ID as a string; this is guranteed to be a unique identifier. This string 
+	 * @return the ID as a string; this is guaranteed to be a unique identifier. This string 
 	 *  can be used to track code control windows; GetFileName() cannot be used in these
 	 *  cases since FileName can be empty string for new files.
+	 *  The string is guaranteed to be unique even across program instances (it includes
+	 *  the programs PID).
 	 */
 	wxString GetIdString() const;
 

@@ -94,7 +94,7 @@ private:
 	 * files that has been changed.  If, so the trigger database
 	 * detection
 	 */
-	void OnFileSaved(mvceditor::FileSavedEventClass& event);
+	void OnFileSaved(mvceditor::CodeControlEventClass& event);
 
 	DECLARE_EVENT_TABLE()
 };

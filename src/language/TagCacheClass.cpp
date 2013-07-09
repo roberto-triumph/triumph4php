@@ -98,9 +98,6 @@ void mvceditor::WorkingCacheClass::Init(const wxString& fileName,
 	IsNew = isNew;
 	
 	SymbolTable.SetVersion(version);
-
-	TagParser.Init(&Session);
-	TagParser.SetVersion(version);
 	if (createSymbols) {
 		SymbolTable.CreateSymbolsFromFile(fileName);
 	}
@@ -429,11 +426,16 @@ std::vector<UnicodeString> mvceditor::TagCacheClass::ParentClassesAndTraits(cons
 	return all;
 }
 
-
 bool mvceditor::TagCacheClass::FindById(int id, mvceditor::TagClass& tag) {
 	bool found = false;
 	if (TagFinderList->IsTagFinderInit) {
 		found = TagFinderList->TagFinder.FindById(id, tag);
 	}
 	return found;
+}
+
+void mvceditor::TagCacheClass::DeleteFromFile(const wxString& fullPath) {
+	if (TagFinderList->IsTagFinderInit) {
+		TagFinderList->TagParser.DeleteFromFile(fullPath);
+	}
 }

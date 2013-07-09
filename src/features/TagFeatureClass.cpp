@@ -206,38 +206,43 @@ void mvceditor::TagFeatureClass::OpenFile(wxString fileName) {
 	GetNotebook()->LoadPage(fileName);
 }
 
-void mvceditor::TagFeatureClass::OnAppFileClosed(wxCommandEvent& event) {
+void mvceditor::TagFeatureClass::OnAppFileClosed(mvceditor::CodeControlEventClass& event) {
 
 	// only index when there is a project open
 	// need to make sure that the file that was closed is in the opened project
 	// as well.
 	// ATTN: don't want single-leaf files to be parsed for resources .. or
 	// do we?
-	wxString fileName = event.GetString();
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	bool isFileFromProject = false;
-	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
-
-		if (project->IsEnabled && project->IsAPhpSourceFile(fileName)) {
-			isFileFromProject = true;
-			break;
-		}
+	mvceditor::CodeControlClass* codeCtrl = event.GetCodeControl();
+	if (!codeCtrl) {
+		return;
 	}
-	if (isFileFromProject) {
-		mvceditor::ProjectTagActionClass* tagAction = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST);
-		tagAction->InitForFile(App.Globals, fileName);
-		App.RunningThreads.Queue(tagAction);
+	if (!codeCtrl->IsNew()) {
+		wxString fileName = codeCtrl->GetFileName();
+		std::vector<mvceditor::ProjectClass>::const_iterator project;
+		bool isFileFromProject = false;
+		for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
+
+			if (project->IsEnabled && project->IsAPhpSourceFile(fileName)) {
+				isFileFromProject = true;
+				break;
+			}
+		}
+		if (isFileFromProject) {
+			mvceditor::ProjectTagActionClass* tagAction = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST);
+			tagAction->InitForFile(App.Globals, fileName);
+			App.RunningThreads.Queue(tagAction);
+		}
 	}
 
 	// Notebook class assigns unique IDs to CodeControlClass objects
 	// the event ID is the ID of the code control that was closed
-	// this needs to be the same as mvceditor::CodeControlClass::GetIdString
-	wxString idString = wxString::Format(wxT("File_%d"), event.GetId());
-	App.Globals.TagCache.RemoveWorking(idString);
+	App.Globals.TagCache.RemoveWorking(codeCtrl->GetIdString());
 	
-	wxString fileToDelete = fileName;
-	if (fileToDelete.IsEmpty()) {
-		fileToDelete = idString;
+	if (codeCtrl->IsNew()) {
+
+		// if a new file was closed but never saved remove it from the tag cache
+		App.Globals.TagCache.DeleteFromFile(codeCtrl->GetIdString());
 	}
 }
 
@@ -257,6 +262,14 @@ void mvceditor::TagFeatureClass::OnWorkingCacheComplete(mvceditor::WorkingCacheC
 		App.Globals.TagCache.ReplaceWorking(fileIdentifier, event.WorkingCache);
 	}
 	event.Skip();
+}
+
+void mvceditor::TagFeatureClass::OnActionComplete(mvceditor::ActionEventClass& event) {
+
+	 // after the file was parsed re-start the timer.  this gets called always, where as
+	 // OnWorkingCacheComplete does not get called when the file contains invalid syntax (no
+	 // symbol table could be created)
+	Timer.Start(500, wxTIMER_CONTINUOUS);
 }
 
 void mvceditor::TagFeatureClass::OnAppFileOpened(wxCommandEvent& event) {
@@ -283,6 +296,11 @@ void mvceditor::TagFeatureClass::OnTimerComplete(wxTimerEvent& event) {
 	if (!codeControl) {
 		return;
 	}
+
+	// builder action could take a while (more than the timer)
+	// stop the timer so that we dont queue up a builder actions before the previous one
+	// finishes
+	Timer.Stop();
 	mvceditor::WorkingCacheBuilderClass* builder = new mvceditor::WorkingCacheBuilderClass(App.RunningThreads, ID_WORKING_CACHE);
 	builder->Update(
 		App.Globals,
@@ -626,7 +644,7 @@ BEGIN_EVENT_TABLE(mvceditor::TagFeatureClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_RESOURCE + 3, mvceditor::TagFeatureClass::OnJump)
 	EVT_UPDATE_UI(wxID_ANY, mvceditor::TagFeatureClass::OnUpdateUi)
 
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_CLOSED, mvceditor::TagFeatureClass::OnAppFileClosed)
+	EVT_APP_FILE_CLOSED(mvceditor::TagFeatureClass::OnAppFileClosed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_OPENED, mvceditor::TagFeatureClass::OnAppFileOpened)
 
 	// we will treat file new and file opened the same
@@ -636,6 +654,7 @@ BEGIN_EVENT_TABLE(mvceditor::TagFeatureClass, wxEvtHandler)
 
 	EVT_TIMER(ID_REPARSE_TIMER, mvceditor::TagFeatureClass::OnTimerComplete)
 	EVT_WORKING_CACHE_COMPLETE(ID_WORKING_CACHE, mvceditor::TagFeatureClass::OnWorkingCacheComplete)
+	EVT_ACTION_COMPLETE(ID_WORKING_CACHE, mvceditor::TagFeatureClass::OnActionComplete)
 END_EVENT_TABLE()
 
 

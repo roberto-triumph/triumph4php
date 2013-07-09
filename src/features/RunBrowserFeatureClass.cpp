@@ -400,7 +400,7 @@ void mvceditor::RunBrowserFeatureClass::OnUrlToolMenuItem(wxCommandEvent& event)
 	}
 }
 
-void mvceditor::RunBrowserFeatureClass::OnFileSaved(mvceditor::FileSavedEventClass& event) {
+void mvceditor::RunBrowserFeatureClass::OnFileSaved(mvceditor::CodeControlEventClass& event) {
 	if (IsUrlCacheStale) {
 
 		// already know that cache is stale, then no need to check for dirty again
@@ -449,7 +449,7 @@ BEGIN_EVENT_TABLE(mvceditor::RunBrowserFeatureClass, wxEvtHandler)
 
 	// application events
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::RunBrowserFeatureClass::OnPreferencesSaved)
-	EVT_FEATURE_FILE_SAVED(mvceditor::RunBrowserFeatureClass::OnFileSaved)
+	EVT_APP_FILE_SAVED(mvceditor::RunBrowserFeatureClass::OnFileSaved)
 	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR, mvceditor::RunBrowserFeatureClass::OnUrlDetectionComplete)
 END_EVENT_TABLE()
 

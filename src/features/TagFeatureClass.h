@@ -67,7 +67,7 @@ private:
 
 	void OnProjectsUpdated(wxCommandEvent& event);
 
-	void OnAppFileClosed(wxCommandEvent& event);
+	void OnAppFileClosed(mvceditor::CodeControlEventClass& event);
 
 	void OnAppStartSequenceComplete(wxCommandEvent& event);
 	
@@ -118,6 +118,13 @@ private:
 	 * code in this control has been completed.
 	 */
 	void OnWorkingCacheComplete(mvceditor::WorkingCacheCompleteEventClass& event);
+
+	/**
+	 * after the file was parsed re-start the timer.  this gets called always, where as
+	 * OnWorkingCacheComplete does not get called when the file contains invalid syntax (no
+	 * symbol table could be created)
+	 */
+	void OnActionComplete(mvceditor::ActionEventClass& event);
 
 	/**
 	 * This method will start re-parsing the document in the background. this will allow the 

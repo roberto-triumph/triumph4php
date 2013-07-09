@@ -131,17 +131,19 @@ void mvceditor::MainFrameClass::OnClose(wxCloseEvent& event) {
 		App.RunningThreads.RemoveEventHandler(this);
 		App.RunningThreads.Shutdown();
 		
-
-		// delete the features first so that we can destroy
-		// the windows without worrying if the features
-		// may access them.
-		App.DeleteFeatures();
-		
-
 		// cleanup all open code controls and tabs. this is because
 		// we want to destroy those items because they may have
 		// threads that are running
 		Notebook->CloseAllPages();
+
+		// delete the features first so that we can destroy
+		// the windows without worrying if the features
+		// may access them.
+		// only delete features until after we close the notebook code pages,
+		// so that the features can get the file closed events and perform
+		// any cleanup
+		App.DeleteFeatures();
+
 		while (ToolsNotebook->GetPageCount() > 0) {
 			ToolsNotebook->DeletePage(0);
 		}
@@ -155,10 +157,10 @@ void mvceditor::MainFrameClass::OnClose(wxCloseEvent& event) {
 void mvceditor::MainFrameClass::OnFileSave(wxCommandEvent& event) {
 	Notebook->SaveCurrentPage();
 	mvceditor::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
-	mvceditor::FileSavedEventClass featureEvent(codeControl);
+	mvceditor::CodeControlEventClass codeControlEvent(mvceditor::EVENT_APP_FILE_SAVED, codeControl);
 
 	for (size_t i = 0; i < Features.size(); i++) {
-		wxPostEvent(Features[i], featureEvent);
+		wxPostEvent(Features[i], codeControlEvent);
 	}
 }
 

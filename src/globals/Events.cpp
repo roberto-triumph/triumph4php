@@ -48,28 +48,27 @@ void mvceditor::EventSinkClass::Publish(wxEvent& event) {
 }
 
 
-mvceditor::FileSavedEventClass::FileSavedEventClass(mvceditor::CodeControlClass* codeControl)
-	: wxEvent(wxID_ANY, mvceditor::EVENT_FEATURE_FILE_SAVED)
+mvceditor::CodeControlEventClass::CodeControlEventClass(wxEventType type, mvceditor::CodeControlClass* codeControl)
+	: wxEvent(wxID_ANY, type)
 	, CodeControl(codeControl) {
 
 }
 
-mvceditor::CodeControlClass* mvceditor::FileSavedEventClass::GetCodeControl() const {
+mvceditor::CodeControlClass* mvceditor::CodeControlEventClass::GetCodeControl() const {
 	return CodeControl;
 }
 
-wxEvent* mvceditor::FileSavedEventClass::Clone() const {
-	mvceditor::FileSavedEventClass* newEvt = new mvceditor::FileSavedEventClass(CodeControl);
+wxEvent* mvceditor::CodeControlEventClass::Clone() const {
+	mvceditor::CodeControlEventClass* newEvt = new mvceditor::CodeControlEventClass(GetEventType(), CodeControl);
 	return newEvt;
 }
 
-
-const wxEventType mvceditor::EVENT_FEATURE_FILE_SAVED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_READY = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_EXIT = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_FILE_OPENED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_FILE_CREATED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_FILE_NEW = wxNewEventType();
+const wxEventType mvceditor::EVENT_APP_FILE_SAVED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_FILE_CLOSED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_PREFERENCES_SAVED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED = wxNewEventType();

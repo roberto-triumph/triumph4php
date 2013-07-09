@@ -54,6 +54,11 @@ void mvceditor::WorkingCacheBuilderClass::Update(mvceditor::GlobalsClass& global
 
 void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
 	if (!FileIdentifier.IsEmpty()) {
+		if (FileIsNew) {
+
+			// new files will not have a name, use the identifier as the name
+			FileName = FileIdentifier;
+		}
 
 		// make sure to use the local variables and not the class ones
 		// since this code is outside the mutex
@@ -65,15 +70,17 @@ void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
 		phpFileExtensions.push_back(wxf.GetFullName());
 		std::vector<wxString> miscFileExtensions;
 		tagFinderlist->InitGlobalTag(TagCacheDbFileName, phpFileExtensions, miscFileExtensions, Version);
-		if (FileIsNew) {
 
-			// new files will not have a name, use the identifier as the name
-			FileName = FileIdentifier;
-		}
 		mvceditor::WorkingCacheClass* workingCache = new mvceditor::WorkingCacheClass();
 		workingCache->Init(FileName, FileIdentifier, FileIsNew, Version, true);
 		bool good = workingCache->Update(Code);
 		if (good && !IsCancelled()) {
+
+			// parse any tags from the source code
+			// note that we only parse the file if it is valid syntax
+			// since BuildResourceCacheForFile kills existing tags in the file
+			// we want to keep previous tags if the code contains a syntax error
+			tagFinderlist->TagParser.BuildResourceCacheForFile(FileName, Code, FileIsNew);
 
 			// only send the event if the code passes the lint check
 			// otherwise we will delete a good symbol table, we want auto completion
