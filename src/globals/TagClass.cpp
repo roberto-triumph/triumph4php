@@ -179,6 +179,7 @@ mvceditor::FileTagClass::FileTagClass()
 	: FullPath()
 	, DateTime()
 	, FileId(0)
+	, SourceId(0)
 	, IsParsed(false)
 	, IsNew(true) {
 

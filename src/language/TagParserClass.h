@@ -311,8 +311,9 @@ private:
 	 * remove all resources for the given file_item_ids.
 	 * 
 	 * @param fileTagids the list of file_item_id that will be deleted from the SQLite database.
+	 * @param removeFileTag if true, file_item tags are removed as well.
 	 */
-	void RemovePersistedResources(const std::vector<int>& fileTagIds);
+	void RemovePersistedResources(const std::vector<int>& fileTagIds, bool removeFileTag);
 	
 	/**
 	 * Write the file item into the database. The item's FileId member will be set as well.

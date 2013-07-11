@@ -306,6 +306,12 @@ public:
 	 * has been saved to the database.
 	 */
 	int FileId;
+
+	/**
+	 * the source directory that this file is located in.  this is the database key
+	 * into the sources table
+	 */ 
+	int SourceId;
 	
 	/**
 	 * whether or not file has been parsed, could be false if we only looked for files

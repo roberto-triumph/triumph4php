@@ -136,7 +136,7 @@ bool mvceditor::TagFinderListClass::Open(soci::session* session, const wxString&
 
 		// set a busy handler so that if we attempt to query while the file is locked, we 
 		// sleep for a bit then try again
-		mvceditor::SqliteSetBusyTimeout(*session, 100);
+		mvceditor::SqliteSetBusyTimeout(*session, 200);
 		ret = true;
 	} catch(std::exception const& e) {
 		session->close();

@@ -329,18 +329,23 @@ void mvceditor::TagParserClass::BuildResourceCacheForFile(const wxString& fullPa
 	if (foundFile) {
 		std::vector<int> fileTagIdsToRemove;
 		fileTagIdsToRemove.push_back(fileTag.FileId);
-		RemovePersistedResources(fileTagIdsToRemove);
-	}
-	
-	// if caller just calls this method without calling Walk(); then file cache will be empty
-	// need to add an entry so that GetResourceMatchFullPathFromResource works correctly
-	fileTag.FullPath = fullPath;
-	fileTag.IsNew = isNew;
-	fileTag.DateTime = wxDateTime::Now();
-	fileTag.IsParsed = false;
-	PersistFileTag(fileTag);
-	CurrentFileTagId = fileTag.FileId;
 
+		// dont remove file tag, since we set source ID for the file
+		// we also want the new tags to have the file's proper source ID
+		CurrentSourceId = fileTag.SourceId;
+		RemovePersistedResources(fileTagIdsToRemove, false);
+	}
+	else {
+		// if caller just calls this method without calling Walk(); then file cache will be empty
+		// need to add an entry so that GetResourceMatchFullPathFromResource works correctly
+		fileTag.FullPath = fullPath;
+		fileTag.IsNew = isNew;
+		fileTag.DateTime = wxDateTime::Now();
+		fileTag.IsParsed = false;
+		PersistFileTag(fileTag);
+	}
+	CurrentFileTagId = fileTag.FileId;
+	
 	// for now silently ignore parse errors
 	pelet::LintResultsClass results;
 	Parser.ScanString(code, results);
@@ -373,7 +378,7 @@ void mvceditor::TagParserClass::BuildResourceCache(const wxString& fullPath, boo
 			if (foundFile) {
 				std::vector<int> fileTagIdsToRemove;
 				fileTagIdsToRemove.push_back(fileTag.FileId);
-				RemovePersistedResources(fileTagIdsToRemove);
+				RemovePersistedResources(fileTagIdsToRemove, true);
 
 				// the previous line deleted the file from file_items
 				// we need to re-add it
@@ -391,6 +396,25 @@ void mvceditor::TagParserClass::BuildResourceCache(const wxString& fullPath, boo
 			PersistTraits(TraitCache, fileTag.FileId);
 
 			FilesParsed++;
+
+			// commit files as we are parsing
+			// this is so that the db is no locked up the entire time
+			// we want tag searches to be able to pass through
+			// even while the projects are being parsed
+			if (FilesParsed % 200 == 0) {
+				try {
+					Transaction->commit();
+				} catch (std::exception& e) {
+					
+					// ATTN: at some point bubble these exceptions up?
+					// to avoid unreferenced local variable warnings in MSVC
+					wxString msg = mvceditor::CharToWx(e.what());
+					wxUnusedVar(msg);
+					wxASSERT_MSG(false, msg);
+				}
+				delete Transaction;
+				Transaction = new soci::transaction(*Session);
+			}
 		}
 	}
 }
@@ -662,7 +686,7 @@ bool mvceditor::TagParserClass::IsNewNamespace(const UnicodeString& namespaceNam
 	return isNew;
 }
 
-void mvceditor::TagParserClass::RemovePersistedResources(const std::vector<int>& fileTagIds) {
+void mvceditor::TagParserClass::RemovePersistedResources(const std::vector<int>& fileTagIds, bool removeFileTag) {
 	if (!IsCacheInitialized || fileTagIds.empty()) {
 		return;
 	}
@@ -676,9 +700,14 @@ void mvceditor::TagParserClass::RemovePersistedResources(const std::vector<int>&
 	}
 	stream << ")";
 	try {
+		std::string deleteResourceSql = "DELETE FROM resources " + stream.str();
+		std::string deleteFileItemSql = "DELETE FROM file_items " + stream.str();
+
 		// TODO remove trait_resources
-		Session->once << "DELETE FROM resources " << stream.str();
-		Session->once << "DELETE FROM file_items " << stream.str();
+		Session->once << deleteResourceSql;
+		if (removeFileTag) {
+			Session->once << deleteFileItemSql;
+		}
 	} catch (std::exception& e) {
 		
 		// ATTN: at some point bubble these exceptions up?
@@ -790,21 +819,23 @@ bool mvceditor::TagParserClass::FindFileTagByFullPathExact(const wxString& fullP
 		return false;
 	}
 	int fileTagId;
+	int sourceId;
 	std::tm lastModified;
 	int isParsed;
 	int isNew;
 	bool foundFile = false;
 
 	std::string query = mvceditor::WxToChar(fullPath);
-	std::string sql = "SELECT file_item_id, last_modified, is_parsed, is_new FROM file_items WHERE full_path = ?";
+	std::string sql = "SELECT file_item_id, source_id, last_modified, is_parsed, is_new FROM file_items WHERE full_path = ?";
 	try {
 		soci::statement stmt = (Session->prepare << sql, soci::use(query), 
-			soci::into(fileTagId), soci::into(lastModified), soci::into(isParsed), soci::into(isNew)
+			soci::into(fileTagId), soci::into(sourceId), soci::into(lastModified), soci::into(isParsed), soci::into(isNew)
 		);
 		foundFile = stmt.execute(true);
 		if (foundFile) {
 			fileTag.DateTime.Set(lastModified);
 			fileTag.FileId = fileTagId;
+			fileTag.SourceId = sourceId;
 			fileTag.FullPath = fullPath;
 			fileTag.IsNew = isNew != 0;
 			fileTag.IsParsed = isParsed != 0;
@@ -880,7 +911,7 @@ void mvceditor::TagParserClass::DeleteFromFile(const wxString& fullPath) {
 	if (FindFileTagByFullPathExact(fullPath, fileTag)) {
 		std::vector<int> fileTagIdsToRemove;
 		fileTagIdsToRemove.push_back(fileTag.FileId);
-		RemovePersistedResources(fileTagIdsToRemove);
+		RemovePersistedResources(fileTagIdsToRemove, true);
 	}
 }
 
