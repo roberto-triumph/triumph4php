@@ -35,13 +35,15 @@ mvceditor::WorkingCacheBuilderClass::WorkingCacheBuilderClass(
 	, FileName() 
 	, FileIdentifier()
 	, Version(pelet::PHP_53)
-	, FileIsNew(true) {
+	, FileIsNew(true) 
+	, DoParseTags(true) {
 }
 	
 void mvceditor::WorkingCacheBuilderClass::Update(mvceditor::GlobalsClass& globals,
 												 const wxString& fileName, 
 												 const wxString& fileIdentifier,
-												 const UnicodeString& code, bool isNew, pelet::Versions version) {
+												 const UnicodeString& code, bool isNew, pelet::Versions version,
+												 bool doParseTags) {
 	
 	// make sure these is are deep copies since we access the variables in a separate thread
 	TagCacheDbFileName.Assign(globals.TagCacheDbFileName.GetFullPath());
@@ -50,6 +52,7 @@ void mvceditor::WorkingCacheBuilderClass::Update(mvceditor::GlobalsClass& global
 	FileIdentifier = fileIdentifier.c_str();
 	Version = version;
 	FileIsNew = isNew;
+	DoParseTags = doParseTags;
 }
 
 void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
@@ -80,7 +83,9 @@ void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
 			// note that we only parse the file if it is valid syntax
 			// since BuildResourceCacheForFile kills existing tags in the file
 			// we want to keep previous tags if the code contains a syntax error
-			tagFinderlist->TagParser.BuildResourceCacheForFile(FileName, Code, FileIsNew);
+			if (DoParseTags) {
+				tagFinderlist->TagParser.BuildResourceCacheForFile(FileName, Code, FileIsNew);
+			}
 
 			// only send the event if the code passes the lint check
 			// otherwise we will delete a good symbol table, we want auto completion

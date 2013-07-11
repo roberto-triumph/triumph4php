@@ -163,7 +163,8 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 		, WordHighlightStyle(0)
 		, WordHighlightIsWordHighlighted(false)
 		, DocumentMode(TEXT) 
-		, IsHidden(false) {
+		, IsHidden(false) 
+		, IsTouched(false) {
 	Document = NULL;
 	
 	// we will handle right-click menu ourselves
@@ -852,6 +853,19 @@ void mvceditor::CodeControlClass::OnKeyDown(wxKeyEvent& event) {
 	if (event.GetKeyCode() == WXK_ESCAPE) {
 		CallTipCancel();
 	}
+
+	// set touched flag if the character was a normal or shifted character, symbol
+	// or number
+	int key = event.GetKeyCode();
+	if (!event.HasModifiers() && key > WXK_SPACE && key < WXK_DELETE) {
+		IsTouched = true;
+	}
+	else if (!event.HasModifiers() && WXK_BACK == key) {
+		IsTouched = true;
+	}
+	if (!event.HasModifiers() && key >= WXK_NUMPAD0 && key < WXK_DIVIDE) {
+		IsTouched = true;
+	}
 	event.Skip();
 }
 
@@ -1180,6 +1194,14 @@ wxString mvceditor::CodeControlClass::GetIdString() const {
 	long pid = wxGetProcessId();
 	wxString idString = wxString::Format(wxT("File_%ld_%d"), pid, GetId());
 	return idString;
+}
+
+void mvceditor::CodeControlClass::SetTouched(bool touched) {
+	IsTouched = touched;
+}
+
+bool mvceditor::CodeControlClass::Touched() const {
+	return IsTouched;
 }
 
 BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)

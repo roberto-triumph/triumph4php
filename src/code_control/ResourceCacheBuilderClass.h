@@ -64,8 +64,12 @@ public:
 	 * @param code the file's most up-to-date source code (from the user-edited buffer)
 	 * @param bool if TRUE then tileName is a new file that is not yet written to disk
 	 * @param version The version of PHP to check against
+	 * @param bool if TRUE then the code will parsed for PHP tags.  This should be true most of time,
+	 *       but it should be false if code is the same as the contents of the file (like for example when
+	 *       the file is opened).
 	 */
-	void Update(mvceditor::GlobalsClass& globals, const wxString& fileName, const wxString& fileIdentifier, const UnicodeString& code, bool isNew, pelet::Versions version);
+	void Update(mvceditor::GlobalsClass& globals, const wxString& fileName, const wxString& fileIdentifier, 
+		const UnicodeString& code, bool isNew, pelet::Versions version, bool doParseTags);
 
 	wxString GetLabel() const;
 
@@ -108,6 +112,11 @@ private:
 	 * if TRUE then tileName is a new file that does not yet exist on disk
 	 */
 	bool FileIsNew;
+
+	/**
+	 * if TRUE then tags will be parsed out of the code
+	 */
+	bool DoParseTags;
 
 };
 

@@ -317,6 +317,14 @@ public:
 	void UpdateOpenedDateTime(wxDateTime openedDateTime);
 
 	/**
+	 * a "touched" code control is one that has been modified at since the last time
+	 * SetTouched(false) was called.  touched is like modified, except that touched
+	 * works on 
+	 */
+	bool Touched() const;
+	void SetTouched(bool touched);
+
+	/**
 	 * The options to enable/disable various look & feel items
 	 *
 	 * @var CodeControlOptionsClass
@@ -540,6 +548,12 @@ private:
 	 * will not show when the Mouse Dwell notification is received.
 	 */
 	bool IsHidden;
+
+	/**
+	 * if true the user has added/removed/modified at least one character since
+	 * this control was last set to touched = false
+	 */
+	bool IsTouched;
 
 	DECLARE_EVENT_TABLE()
 };

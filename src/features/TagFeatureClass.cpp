@@ -86,6 +86,11 @@ void mvceditor::TagFeatureClass::OnAppExit(wxCommandEvent& event) {
 }
 
 void mvceditor::TagFeatureClass::OnProjectWipeAndIndex(wxCommandEvent& event) {
+
+	// stop the working cache timer because we are going to delete the rows from 
+	// the database
+	// we want to avoid locking the database
+	Timer.Stop();
 	if (App.Sequences.TagCacheWipeAndIndex()) {
 		IndexingDialog = new mvceditor::GaugeDialogClass(GetMainWindow(), _("Indexing"), _("Wiping and Rebuilding Index"));
 		IndexingDialog->Show();
@@ -277,6 +282,11 @@ void mvceditor::TagFeatureClass::OnAppFileOpened(wxCommandEvent& event) {
 	if (codeControl && codeControl->GetDocumentMode() == mvceditor::CodeControlClass::PHP) {
 		UnicodeString text = codeControl->GetSafeText();
 
+		// builder action could take a while (more than the timer)
+		// stop the timer so that we dont queue up a builder actions before the previous one
+		// finishes
+		Timer.Stop();
+
 		// we need to differentiate between new and opened files (the 'true' arg)
 		mvceditor::WorkingCacheBuilderClass* builder = new mvceditor::WorkingCacheBuilderClass(App.RunningThreads, ID_WORKING_CACHE);
 		builder->Update(
@@ -285,7 +295,10 @@ void mvceditor::TagFeatureClass::OnAppFileOpened(wxCommandEvent& event) {
 			codeControl->GetIdString(),
 			text, 
 			codeControl->IsNew(),
-			App.Globals.Environment.Php.Version);
+			App.Globals.Environment.Php.Version,
+
+			// false ==  no need to parse tags from the file, because they will be the same as on the db
+			false);
 		App.RunningThreads.Queue(builder);
 	}
 	event.Skip();
@@ -296,6 +309,15 @@ void mvceditor::TagFeatureClass::OnTimerComplete(wxTimerEvent& event) {
 	if (!codeControl) {
 		return;
 	}
+	
+	// if the contents of the code control have not changed since we last parsed
+	// the code then don't do anything.
+	// this will be most of the time, since programmers like to think!
+	// this will also help with lowering the number of times we hit the tags database
+	if (!codeControl->Touched()) {
+		return;
+	}
+	codeControl->SetTouched(false);
 
 	// builder action could take a while (more than the timer)
 	// stop the timer so that we dont queue up a builder actions before the previous one
@@ -308,7 +330,8 @@ void mvceditor::TagFeatureClass::OnTimerComplete(wxTimerEvent& event) {
 		codeControl->GetIdString(),
 		codeControl->GetSafeText(), 
 		codeControl->IsNew(),
-		App.Globals.Environment.Php.Version);
+		App.Globals.Environment.Php.Version,
+		true);
 	App.RunningThreads.Queue(builder);
 }
 
