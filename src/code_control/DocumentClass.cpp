@@ -815,8 +815,18 @@ std::vector<mvceditor::TagClass> mvceditor::PhpDocumentClass::GetCurrentSymbolRe
 	UnicodeString lastExpression = lexer.LastExpression(code);
 	bool doDuckTyping = true;
 	if (Globals && !lastExpression.isEmpty()) {
-		parser.ParseExpression(lastExpression, parsedExpression);
 		scopeFinder.GetScopeString(code, endPos, scopeResult);
+
+		if (lastExpression.indexOf(UNICODE_STRING_SIMPLE("\\")) > 0 && 
+			scopeResult.ClassName.isEmpty() &&
+			scopeResult.MethodName.isEmpty()) {
+			// the expression is a namespace name outside a class or method.  this is 
+			// most likely a namespace in the "use" statement
+			// namespace in a use statement is always fully qualified, even if it does
+			// not begin with a backslash
+			lastExpression = UNICODE_STRING_SIMPLE("\\") + lastExpression;
+		}
+		parser.ParseExpression(lastExpression, parsedExpression);
 
 		// for now do nothing with error
 		mvceditor::SymbolTableMatchErrorClass error;
