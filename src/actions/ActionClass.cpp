@@ -203,6 +203,7 @@ mvceditor::RunningThreadsClass::RunningThreadsClass(bool doPostEvents)
 }
 
 mvceditor::RunningThreadsClass::~RunningThreadsClass() {
+	Shutdown();
 	delete Semaphore;
 	if (ThreadCleanup) {
 		delete ThreadCleanup;

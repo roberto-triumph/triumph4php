@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Feb 17 2010)
+// C++ code generated with wxFormBuilder (version Sep  8 2010)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -97,6 +97,7 @@ ModalExplorerGeneratedPanel::ModalExplorerGeneratedPanel( wxWindow* parent, wxWi
 	List->Connect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( ModalExplorerGeneratedPanel::OnListItemActivated ), NULL, this );
 	List->Connect( wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, wxListEventHandler( ModalExplorerGeneratedPanel::OnListItemRightClick ), NULL, this );
 	List->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( ModalExplorerGeneratedPanel::OnListItemSelected ), NULL, this );
+	List->Connect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( ModalExplorerGeneratedPanel::OnListRightDown ), NULL, this );
 	Report->Connect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( ModalExplorerGeneratedPanel::OnReportItemActivated ), NULL, this );
 }
 
@@ -112,6 +113,7 @@ ModalExplorerGeneratedPanel::~ModalExplorerGeneratedPanel()
 	List->Disconnect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( ModalExplorerGeneratedPanel::OnListItemActivated ), NULL, this );
 	List->Disconnect( wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, wxListEventHandler( ModalExplorerGeneratedPanel::OnListItemRightClick ), NULL, this );
 	List->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( ModalExplorerGeneratedPanel::OnListItemSelected ), NULL, this );
+	List->Disconnect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( ModalExplorerGeneratedPanel::OnListRightDown ), NULL, this );
 	Report->Disconnect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( ModalExplorerGeneratedPanel::OnReportItemActivated ), NULL, this );
 	
 }

@@ -181,16 +181,18 @@ private:
 		REPORT_FILE_OTHER
 	};
 
-	// events handlers for the left lsit
+	// events handlers for the left list
 	void OnListItemSelected(wxListEvent& event);
 	void OnListItemActivated(wxListEvent& event);
 	void OnListItemRightClick(wxListEvent& event);
 	void OnListEndLabelEdit(wxListEvent& event);
+	void OnListRightDown(wxMouseEvent& event);
 
 	// event handlers for the context menu on the left files list
 	void OnListMenuOpen(wxCommandEvent& event);
 	void OnListMenuRename(wxCommandEvent& event);
 	void OnListMenuDelete(wxCommandEvent& event);
+	void OnListMenuCreateNew(wxCommandEvent& event);
 	void OnExplorerModifyComplete(mvceditor::ExplorerModifyEventClass& event);
 	void OnListKeyDown(wxKeyEvent& event);
 

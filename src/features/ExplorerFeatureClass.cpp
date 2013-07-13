@@ -29,6 +29,7 @@
 #include <globals/FileName.h>
 #include <search/Directory.h>
 #include <MvcEditor.h>
+#include <wx/file.h>
 #include <algorithm>
 
 static int ID_EXPLORER_PANEL = wxNewId();
@@ -37,12 +38,17 @@ static int ID_EXPLORER_REPORT_ACTION = wxNewId();
 static int ID_EXPLORER_LIST_OPEN = wxNewId();
 static int ID_EXPLORER_LIST_RENAME = wxNewId();
 static int ID_EXPLORER_LIST_DELETE = wxNewId();
+static int ID_EXPLORER_LIST_CREATE_PHP = wxNewId();
+static int ID_EXPLORER_LIST_CREATE_SQL = wxNewId();
+static int ID_EXPLORER_LIST_CREATE_CSS = wxNewId();
+static int ID_EXPLORER_LIST_CREATE_TEXT = wxNewId();
 static int ID_EXPLORER_MODIFY = wxNewId();
 static int ID_FILTER_ALL_SOURCE = wxNewId();
 static int ID_FILTER_ALL = wxNewId();
 static int ID_FILTER_PHP = wxNewId();
 static int ID_FILTER_CSS = wxNewId();
 static int ID_FILTER_SQL = wxNewId();
+
 
 /**
  * comparator function that compares 2 filenames by using the full name
@@ -256,6 +262,7 @@ mvceditor::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, in
 mvceditor::ModalExplorerPanelClass::~ModalExplorerPanelClass() {
 	RunningThreads.RemoveEventHandler(this);
 	RunningThreads.RemoveEventHandler(&Feature);
+	RunningThreads.Shutdown();
 }
 
 void mvceditor::ModalExplorerPanelClass::RefreshDir(const wxFileName& dir) {
@@ -337,6 +344,29 @@ void mvceditor::ModalExplorerPanelClass::OnListItemRightClick(wxListEvent& event
 
 		this->PopupMenu(&menu, wxDefaultPosition);
 	}
+	event.Skip();
+}
+
+void mvceditor::ModalExplorerPanelClass::OnListRightDown(wxMouseEvent& event) {
+
+	// if the right mouse button was clicked on an item let the context menu handler
+	// handle this event
+	wxPoint point = event.GetPosition();
+	int flags = 0;
+	long index = List->HitTest(point, flags, NULL);
+	if (index != wxNOT_FOUND && (flags & wxLIST_HITTEST_ONITEM)) {
+		event.Skip();
+		return;
+	}
+
+	// if we get here then the user clicked on an empty area of the list control
+	// it means user wants to create a new file
+	wxMenu menu;
+	menu.Append(ID_EXPLORER_LIST_CREATE_PHP, _("New PHP File"), _("Create a new PHP file in this directory"), wxITEM_NORMAL);
+	menu.Append(ID_EXPLORER_LIST_CREATE_SQL, _("New SQL File"), _("Create a new SQL file in this directory"), wxITEM_NORMAL);
+	menu.Append(ID_EXPLORER_LIST_CREATE_CSS, _("New CSS File"), _("Create a new CSS file in this directory"), wxITEM_NORMAL);
+	menu.Append(ID_EXPLORER_LIST_CREATE_TEXT, _("New text File"), _("Create a new text file in this directory"), wxITEM_NORMAL);
+	this->PopupMenu(&menu, event.GetPosition());
 }
 
 void mvceditor::ModalExplorerPanelClass::OnListKeyDown(wxKeyEvent& event) {
@@ -622,6 +652,84 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuDelete(wxCommandEvent& event)
 	}
 }
 
+void mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew(wxCommandEvent& event) {
+	wxString ext;
+	std::vector<wxString> extensions;
+	wxString dialogTitle;
+	if (event.GetId() == ID_EXPLORER_LIST_CREATE_PHP) {
+		extensions = Feature.App.Globals.GetPhpFileExtensions();
+		if (extensions.empty()) {
+			ext = wxT("*.php");
+		}
+		else {
+			ext = extensions[0];
+		}
+		dialogTitle =_("Create a new PHP file");
+	}
+	else if (event.GetId() == ID_EXPLORER_LIST_CREATE_SQL) {
+		extensions = Feature.App.Globals.GetSqlFileExtensions();
+		if (extensions.empty()) {
+			ext = wxT("*.sql");
+		}
+		else {
+			ext = extensions[0];
+		}
+		dialogTitle =_("Create a new SQL file");
+	}
+	else if (event.GetId() == ID_EXPLORER_LIST_CREATE_CSS) {
+		extensions = Feature.App.Globals.GetCssFileExtensions();
+		if (extensions.empty()) {
+			ext = wxT("*.css");
+		}
+		else {
+			ext = extensions[0];
+		}
+		dialogTitle =_("Create a new CSS file");
+	}
+	else if (event.GetId() == ID_EXPLORER_LIST_CREATE_TEXT) {
+		ext = wxT("*.txt");
+		dialogTitle =_("Create a new text file");
+	}
+	ext.Replace(wxT("*"), wxT("New File"));
+
+	wxString newName = ::wxGetTextFromUser(_("Please enter a file name"), dialogTitle, ext);
+	wxString forbidden = wxFileName::GetForbiddenChars();
+	if (newName.find_first_of(forbidden, 0) != std::string::npos) {
+		wxMessageBox(_("Please enter valid a file name"));
+		return;
+	}
+	if (newName.IsEmpty()) {
+		return;
+	}
+	wxFileName newFileName(CurrentListDir.GetPath(), newName);
+	if (newFileName.FileExists()) {
+		wxMessageBox(_("File name already exists. Please enter another name."));
+		return;
+	}
+
+	wxFile file;
+	if (file.Create(newFileName.GetFullPath())) {
+
+		// list ctrl is tricky, for columns we must insertItem() then setItem() for the next columns
+		int newRowNumber = List->GetItemCount();
+		wxListItem column1;
+		column1.SetColumn(0);
+		column1.SetId(newRowNumber);
+		column1.SetImage(ListImageId(newFileName));
+		column1.SetMask(wxLIST_MASK_IMAGE | wxLIST_MASK_TEXT);
+		column1.SetText(newName);
+		List->InsertItem(column1);
+
+		// open the new file
+		wxCommandEvent evt(mvceditor::EVENT_CMD_FILE_OPEN);
+		evt.SetString(newFileName.GetFullPath());
+		Feature.App.EventSink.Publish(evt);
+	}
+	else {
+		wxMessageBox(_("Could not create file: ") + newName);
+	}
+}
+
 void mvceditor::ModalExplorerPanelClass::OnListEndLabelEdit(wxListEvent& event) {
 	
 	// ideally we dont need to query the file system, but cant seem to get the 
@@ -629,9 +737,17 @@ void mvceditor::ModalExplorerPanelClass::OnListEndLabelEdit(wxListEvent& event) 
 	wxString newName = event.GetLabel();
 	long index = event.GetIndex();
 	wxString name = List->GetItemText(index);
+	if (newName.find_first_of(wxFileName::GetForbiddenChars(), 0) != std::string::npos) {
+		event.Veto();
+		return;
+	}
+	else if (newName.IsEmpty()) {
+		event.Veto();
+		return;
+	}
 
 	// dont attempt rename if they are new and old name are the same
-	if (newName != name && !newName.IsEmpty()) {	
+	else if (newName != name && !newName.IsEmpty()) {	
 		
 		wxFileName sourceFile(CurrentListDir.GetPath(), name);
 		wxFileName destFile(CurrentListDir.GetPath(), newName);
@@ -979,6 +1095,10 @@ BEGIN_EVENT_TABLE(mvceditor::ModalExplorerPanelClass, ModalExplorerGeneratedPane
 	EVT_MENU(ID_EXPLORER_LIST_OPEN, mvceditor::ModalExplorerPanelClass::OnListMenuOpen)
 	EVT_MENU(ID_EXPLORER_LIST_RENAME, mvceditor::ModalExplorerPanelClass::OnListMenuRename)
 	EVT_MENU(ID_EXPLORER_LIST_DELETE, mvceditor::ModalExplorerPanelClass::OnListMenuDelete)
+	EVT_MENU(ID_EXPLORER_LIST_CREATE_PHP, mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew)
+	EVT_MENU(ID_EXPLORER_LIST_CREATE_SQL, mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew)
+	EVT_MENU(ID_EXPLORER_LIST_CREATE_CSS, mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew)
+	EVT_MENU(ID_EXPLORER_LIST_CREATE_TEXT, mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew)
 	EVT_EXPLORER_MODIFY_COMPLETE(ID_EXPLORER_MODIFY, mvceditor::ModalExplorerPanelClass::OnExplorerModifyComplete)
 
 	EVT_MENU(ID_FILTER_ALL, mvceditor::ModalExplorerPanelClass::OnFilterMenuCheck)
