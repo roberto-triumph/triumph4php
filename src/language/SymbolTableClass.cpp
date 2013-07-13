@@ -76,19 +76,19 @@ static bool IsResourceVisible(const mvceditor::TagClass& tag, const pelet::Expre
 	// we must perform this logic here
 	bool passesNamespaceCheck = true;			
 	UnicodeString name = originalParsedExpression.FirstValue();
-	if (!name.startsWith(UNICODE_STRING_SIMPLE("$")) && !name.startsWith(UNICODE_STRING_SIMPLE("\\")) && mvceditor::TagClass::CLASS == tag.Type) {
+	if (!name.startsWith(UNICODE_STRING_SIMPLE("$")) && !name.startsWith(UNICODE_STRING_SIMPLE("\\")) 
+		&& mvceditor::TagClass::CLASS == tag.Type) {
 		
-		// if the tag if a global class and the current namespace is NOT the global namespace, 
+		// if the tag is a global class and the current namespace is NOT the global namespace, 
 		// then the class cannot be accessed
 		// this assumes that tag finder was successful
+		// but if the tag is already fully qualified then
 		if (!scope.IsGlobalNamespace()) {
 			passesNamespaceCheck = false;
 			
-			UnicodeString resQualified(tag.NamespaceName);
-			if (!resQualified.endsWith(UNICODE_STRING_SIMPLE("\\"))) {
-				resQualified.append(UNICODE_STRING_SIMPLE("\\"));
-			}
-			resQualified.append(tag.Identifier);
+			// be careful, we could get a fully qualified tag in which case the 
+			// identifier will already be fully qualified
+			UnicodeString resQualified = tag.FullyQualifiedClassName();
 				
 			// but if the tag is aliased then the class can be accessed
 			std::map<UnicodeString, UnicodeString, pelet::UnicodeStringComparatorClass> aliases = scope.GetNamespaceAliases();
@@ -390,7 +390,16 @@ void mvceditor::SymbolTableClass::MethodFound(const UnicodeString& namespaceName
 	// create the $this variable
 	mvceditor::SymbolClass variableSymbol(UNICODE_STRING_SIMPLE("$this"), mvceditor::SymbolClass::OBJECT);
 	pelet::VariablePropertyClass prop;
-	prop.Name = className;
+
+	// qualify class with namespace if needed
+	UnicodeString qualifiedClassName;
+	if (!namespaceName.isEmpty() && namespaceName != UNICODE_STRING_SIMPLE("\\")) {
+		qualifiedClassName = namespaceName + UNICODE_STRING_SIMPLE("\\") + className;
+	}
+	else {
+		qualifiedClassName = className;
+	}
+	prop.Name = qualifiedClassName;
 	variableSymbol.ChainList.push_back(prop);
 	methodScope.push_back(variableSymbol);
 }
@@ -525,7 +534,7 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 	
 	UnicodeString typeToLookup = ResolveInitialLexemeType(parsedExpression, expressionScope, tagFinderList, 
 		doDuckTyping, error, scopeSymbols, *this);
-		
+
 	// continue to the next item in the chain up until the second to last one
 	// if we can't resolve a type then just exit
 	if (typeToLookup.caseCompare(UNICODE_STRING_SIMPLE("primitive"), 0) == 0) {
@@ -683,7 +692,7 @@ void mvceditor::SymbolTableClass::ResolveNamespaceAlias(pelet::ExpressionClass& 
 	// \Class::func()
 	// name variable will be "\Class"
 	// skip over variable expressions since they can't be aliased
-	// leave fully qualified names alon
+	// leave fully qualified names alone
 	UnicodeString name = parsedExpression.FirstValue();
 	if (!name.startsWith(UNICODE_STRING_SIMPLE("$")) && !name.startsWith(UNICODE_STRING_SIMPLE("\\"))) {
 		std::map<UnicodeString, UnicodeString, pelet::UnicodeStringComparatorClass> aliases = scope.GetNamespaceAliases();
@@ -695,10 +704,11 @@ void mvceditor::SymbolTableClass::ResolveNamespaceAlias(pelet::ExpressionClass& 
 			// need to watch out for the namespace operator
 			// the expression may or may not have it
 			UnicodeString alias(it->first);
-			if (!alias.endsWith(UNICODE_STRING_SIMPLE("\\"))) {
-				alias += UNICODE_STRING_SIMPLE("\\");
+			UnicodeString aliasStart(it->first);
+			if (!aliasStart.endsWith(UNICODE_STRING_SIMPLE("\\"))) {
+				aliasStart += UNICODE_STRING_SIMPLE("\\");
 			}
-			if (name.startsWith(alias)) {
+			if (name == alias || name.startsWith(aliasStart)) {
 				UnicodeString afterAlias(name, it->first.length());
 				name = it->second + afterAlias;
 				parsedExpression.ChainList[0].Name = name;

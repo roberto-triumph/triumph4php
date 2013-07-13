@@ -922,7 +922,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillUnknownResourceError) {
 		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_EQUAL((size_t)0, tags.size());
 	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::UNKNOWN_RESOURCE, Error.Type);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass"),  Error.ErrorClass);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\MyClass"),  Error.ErrorClass);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillResolutionError) {
@@ -1009,10 +1009,10 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithClassHierarchyInMultiple
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_VECTOR_SIZE(3, ResourceMatches);
 
-	// sorted by key (class name + method name)
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workBase"), ResourceMatches[0].Identifier);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workA"), ResourceMatches[1].Identifier);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), ResourceMatches[2].Identifier);
+	// sorted by method name
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workA"), ResourceMatches[0].Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), ResourceMatches[1].Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workBase"), ResourceMatches[2].Identifier);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithNativeTags) {

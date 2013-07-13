@@ -248,9 +248,28 @@ UnicodeString mvceditor::TagFinderListClass::ResolveResourceType(UnicodeString r
 			// should have the same signature (return type)
 			tagResults->Next();
 
+			UnicodeString fullyQualifiedClass;
+			if (tagResults->Tag.NamespaceName == UNICODE_STRING_SIMPLE("\\")) {
+				fullyQualifiedClass = tagResults->Tag.NamespaceName + tagResults->Tag.ClassName;
+			}
+			else if (!tagResults->Tag.NamespaceName.isEmpty()) {
+				fullyQualifiedClass = tagResults->Tag.NamespaceName + UNICODE_STRING_SIMPLE("\\") + tagResults->Tag.ClassName;
+			}
+			else {
+				fullyQualifiedClass = tagResults->Tag.ClassName;
+			}
+
 			// if the given string was a class name, return the class name
 			// if the given string was a method, return the method's return type
-			type =  mvceditor::TagClass::CLASS == tagResults->Tag.Type ? tagResults->Tag.ClassName : tagResults->Tag.ReturnType;
+			if (mvceditor::TagClass::CLASS == tagResults->Tag.Type) {
+				type = fullyQualifiedClass;
+			}
+			else {
+
+				// the parser will always return fully qualified class name for return type that is 
+				// based on the namespace aliases
+				type = tagResults->Tag.ReturnType;
+			}
 		}
 		delete tagResults;
 
