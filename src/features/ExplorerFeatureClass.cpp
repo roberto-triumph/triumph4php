@@ -276,7 +276,9 @@ void mvceditor::ModalExplorerPanelClass::RefreshDir(const wxFileName& dir) {
 }
 
 void mvceditor::ModalExplorerPanelClass::OnDirectoryEnter(wxCommandEvent& event) {
-	RefreshDir(Directory->GetValue());
+	wxFileName nextDir;
+	nextDir.AssignDir(Directory->GetValue());
+	RefreshDir(nextDir);
 }
 
 void mvceditor::ModalExplorerPanelClass::OnParentButtonClick(wxCommandEvent& event) {
