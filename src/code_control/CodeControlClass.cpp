@@ -878,37 +878,6 @@ void mvceditor::CodeControlClass::OnKeyDown(wxKeyEvent& event) {
 	event.Skip();
 }
 
-void mvceditor::CodeControlClass::OnMouseMotion(wxMouseEvent& event) {
-	if (!event.CmdDown() || PHP != DocumentMode) {
-		event.Skip();
-		return;
-	}
-
-	// handle the CTRL+Mouse click "jump to resource"
-	int pos = PositionFromPoint(event.GetPosition());
-	if (pos < 0) {
-		event.Skip();
-		return;
-	}
-/*
-	// if the cursor is in the middle of an identifier, find the end of the
-	// current identifier; that way we can know the full name of the tag we want
-	// to get
-	int startPos = WordStartPosition(pos, true);
-	int endPos = WordEndPosition(pos, true);
-	if (endPos < startPos || endPos <= 0 || startPos < 0) {
-		event.Skip();
-		return;
-	}
-	std::vector<mvceditor::TagClass> matches = ((PhpDocumentClass *)Document)->GetSymbolAt(endPos);
-	if (!matches.empty()) {	
-		StartStyling(startPos, wxSTC_STYLE_MAX);
-		SetStyling(endPos - startPos, wxSTC_HPA_START);
-	}
-	*/
-	event.Skip();
-}
-
 void mvceditor::CodeControlClass::OnLeftDown(wxMouseEvent& event) {
 	UndoHighlight();
 	event.Skip();
@@ -1284,6 +1253,5 @@ BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)
 	EVT_KEY_DOWN(mvceditor::CodeControlClass::OnKeyDown)
 	EVT_STC_DWELLSTART(wxID_ANY, mvceditor::CodeControlClass::OnDwellStart)
 	EVT_STC_DWELLEND(wxID_ANY, mvceditor::CodeControlClass::OnDwellEnd)
-	EVT_MOTION(mvceditor::CodeControlClass::OnMouseMotion)
 	EVT_STC_HOTSPOT_CLICK(wxID_ANY, mvceditor::CodeControlClass::OnHotspotClick)
 END_EVENT_TABLE()

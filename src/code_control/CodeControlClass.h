@@ -452,11 +452,6 @@ private:
 	void OnLeftDown(wxMouseEvent& event);
 
 	/**
-	 * On mouse motion, make words clickable if they are tags of an opened project
-	 */
-	void OnMouseMotion(wxMouseEvent& event);
-
-	/**
 	 * show the symbol comment popup to the user
 	 */
 	void OnDwellStart(wxStyledTextEvent& event);
