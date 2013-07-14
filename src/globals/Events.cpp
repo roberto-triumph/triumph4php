@@ -47,6 +47,11 @@ void mvceditor::EventSinkClass::Publish(wxEvent& event) {
 	}
 }
 
+void mvceditor::EventSinkClass::Post(wxEvent& event) {
+	for (size_t i = 0; i < Handlers.size(); ++i) {
+		wxPostEvent(Handlers[i], event);
+	}
+}
 
 mvceditor::CodeControlEventClass::CodeControlEventClass(wxEventType type, mvceditor::CodeControlClass* codeControl)
 	: wxEvent(wxID_ANY, type)

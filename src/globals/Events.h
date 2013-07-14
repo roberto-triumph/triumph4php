@@ -76,13 +76,20 @@ public:
 	void RemoveAllHandlers();
 
 	/**
-	 * Nore that the event is processed IMMEDIATELY ie. within the same 
+	 * Note that the event is processed IMMEDIATELY ie. within the same 
 	 * event loop. This method will not return control until all of the
 	 * handlers have processed the event.
 	 *
 	 * @param event send the event to all registered handlers
 	 */
 	void Publish(wxEvent& event);
+
+	/**
+	 * Note that the event is processed IN THE NEXT EVENT LOOP. 
+	 *
+	 * @param event send the event to all registered handlers
+	 */
+	void Post(wxEvent& event);
 
 private:
 
