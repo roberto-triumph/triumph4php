@@ -168,7 +168,7 @@ void mvceditor::NotebookClass::AddMvcEditorPage(mvceditor::CodeControlClass::Mod
 	this->Freeze();
 	
 	// make sure to use a unique ID, other source code depends on this
-	CodeControlClass* page = new CodeControlClass(this, *CodeControlOptions, Globals, wxNewId());
+	CodeControlClass* page = new CodeControlClass(this, *CodeControlOptions, Globals, *EventSink, wxNewId());
 	page->SetDocumentMode(mode);
 	wxBitmap docBitmap = mvceditor::IconImageAsset(wxT("document-text"));
 	if (mvceditor::CodeControlClass::PHP == mode) {
@@ -236,7 +236,7 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename) {
 		if (error == mvceditor::FindInFilesClass::NONE) {
 
 			// make sure to use a unique ID, other source code depends on this
-			CodeControlClass* newCode = new CodeControlClass(this, *CodeControlOptions, Globals, wxNewId());
+			CodeControlClass* newCode = new CodeControlClass(this, *CodeControlOptions, Globals, *EventSink, wxNewId());
 			newCode->TrackFile(filename, fileContents);
 
 			int mode = newCode->GetDocumentMode();

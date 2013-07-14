@@ -26,8 +26,10 @@
 #define MVCEDITORCODECONTROLCLASS_H_
 
 #include <globals/CodeControlOptionsClass.h>
-#include <globals/GlobalsClass.h>
 #include <search/FinderClass.h>
+#include <globals/TagClass.h>
+#include <globals/DatabaseTagClass.h>
+#include <pelet/ParserClass.h>
 #include <wx/stc/stc.h>
 #include <wx/timer.h>
 #include <unicode/unistr.h>
@@ -44,6 +46,8 @@ namespace mvceditor {
 // files is maded most features have to be re-compiled.
 class TextDocumentClass;
 class TagCacheClass;
+class EventSinkClass;
+class GlobalsClass;
 
 /**
  * source code control with the following enhancements.
@@ -92,9 +96,10 @@ public:
 	 * Constructor. 
 	 * @param GlobalsClass* To get items needed for autocompletion. This object
 	 *        will NOT own the pointer
+	  * @param eventSink to send event to the application
 	 */
 	CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,
-					GlobalsClass* globals,
+		GlobalsClass* globals, mvceditor::EventSinkClass& eventSink,
 	                 wxWindowID id, const wxPoint& position =
 	                     wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0,
 	                 const wxString& name = wxT("code"));
@@ -447,6 +452,11 @@ private:
 	void OnLeftDown(wxMouseEvent& event);
 
 	/**
+	 * On mouse motion, make words clickable if they are tags of an opened project
+	 */
+	void OnMouseMotion(wxMouseEvent& event);
+
+	/**
 	 * show the symbol comment popup to the user
 	 */
 	void OnDwellStart(wxStyledTextEvent& event);
@@ -455,6 +465,12 @@ private:
 	 * Hide the symbool comment popup
 	 */
 	void OnDwellEnd(wxStyledTextEvent& event);
+
+	/**
+	 * when the user clicks on a hotspot (matched method, class) then jump
+	 * to that tag
+	 */
+	void OnHotspotClick(wxStyledTextEvent& event);
 
 	/**
 	 * Removes trailing space from ALL lines in this document.
@@ -493,6 +509,11 @@ private:
 	* This class will NOT own this pointer.
 	*/
 	GlobalsClass* Globals;
+
+	/**
+	 * to send file open commands if the user clicks on a hotspot
+	 */
+	EventSinkClass& EventSink;
 
 	/**
 	 * This is the current specialization (document type) that is being used. This

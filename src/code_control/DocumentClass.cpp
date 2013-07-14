@@ -891,17 +891,26 @@ std::vector<mvceditor::TagClass> mvceditor::PhpDocumentClass::GetSymbolAt(int po
 	std::vector<mvceditor::TagClass> matches;
 	pelet::LexicalAnalyzerClass lexer;
 	pelet::ParserClass parser;
-	pelet::ScopeClass scope;
-	pelet::ExpressionClass parsedExpression(scope);
 	mvceditor::ScopeFinderClass scopeFinder;
 	pelet::ScopeClass expressionScope;
+	pelet::ExpressionClass parsedExpression(expressionScope);
 	
 	UnicodeString lastExpression = lexer.LastExpression(code);
 	UnicodeString resourceName;
 	bool doDuckTyping = true;
 	if (!lastExpression.isEmpty()) {
-		parser.ParseExpression(lastExpression, parsedExpression);
 		scopeFinder.GetScopeString(code, posToCheck, expressionScope);
+		if (lastExpression.indexOf(UNICODE_STRING_SIMPLE("\\")) > 0 && 
+			expressionScope.ClassName.isEmpty() &&
+			expressionScope.MethodName.isEmpty()) {
+
+			// the expression is a namespace name outside a class or method.  this is 
+			// most likely a namespace in the "use" statement
+			// namespace in a use statement is always fully qualified, even if it does
+			// not begin with a backslash
+			lastExpression = UNICODE_STRING_SIMPLE("\\") + lastExpression;
+		}
+		parser.ParseExpression(lastExpression, parsedExpression);
 
 		// for now do nothing with error
 		mvceditor::SymbolTableMatchErrorClass error;

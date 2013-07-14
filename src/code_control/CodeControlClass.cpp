@@ -23,10 +23,12 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <code_control/CodeControlClass.h>
-#include <globals/String.h>
 #include <code_control/DocumentClass.h>
-#include <widgets/StatusBarWithGaugeClass.h>
+#include <globals/String.h>
+#include <globals/GlobalsClass.h>
 #include <globals/Errors.h>
+#include <globals/Events.h>
+#include <widgets/StatusBarWithGaugeClass.h>
 #include <search/FindInFilesClass.h>
 #include <wx/filename.h>
 #include <wx/stc/stc.h>
@@ -148,7 +150,7 @@ static wxString NiceDocText(const UnicodeString& comment) {
 }
 
 mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,
-			mvceditor::GlobalsClass* globals,
+											  mvceditor::GlobalsClass* globals, mvceditor::EventSinkClass& eventSink,
 			wxWindowID id, const wxPoint& position, const wxSize& size, long style,
 			const wxString& name)
 		: wxStyledTextCtrl(parent, id, position, size, style, name)
@@ -158,6 +160,7 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 		, WordHighlightWord()
 		, CurrentDbTag()
 		, Globals(globals)
+		, EventSink(eventSink)
 		, WordHighlightPreviousIndex(-1)
 		, WordHighlightNextIndex(-1)
 		, WordHighlightStyle(0)
@@ -582,6 +585,12 @@ void mvceditor::CodeControlClass::SetPhpOptions() {
 				StyleSetBold(styles[j], pref.IsBold);
 				StyleSetItalic(styles[j], pref.IsItalic);
 			}
+
+			// enable clickable links on identifiers
+			StyleSetHotSpot(style, true);
+			SetHotspotActiveForeground(true, *wxBLUE);
+			SetHotspotActiveUnderline(true);
+
 		}
 		StyleSetFont(style, pref.Font);
 		StyleSetForeground(style, pref.Color);
@@ -866,6 +875,37 @@ void mvceditor::CodeControlClass::OnKeyDown(wxKeyEvent& event) {
 	if (!event.HasModifiers() && key >= WXK_NUMPAD0 && key < WXK_DIVIDE) {
 		IsTouched = true;
 	}
+	event.Skip();
+}
+
+void mvceditor::CodeControlClass::OnMouseMotion(wxMouseEvent& event) {
+	if (!event.CmdDown() || PHP != DocumentMode) {
+		event.Skip();
+		return;
+	}
+
+	// handle the CTRL+Mouse click "jump to resource"
+	int pos = PositionFromPoint(event.GetPosition());
+	if (pos < 0) {
+		event.Skip();
+		return;
+	}
+/*
+	// if the cursor is in the middle of an identifier, find the end of the
+	// current identifier; that way we can know the full name of the tag we want
+	// to get
+	int startPos = WordStartPosition(pos, true);
+	int endPos = WordEndPosition(pos, true);
+	if (endPos < startPos || endPos <= 0 || startPos < 0) {
+		event.Skip();
+		return;
+	}
+	std::vector<mvceditor::TagClass> matches = ((PhpDocumentClass *)Document)->GetSymbolAt(endPos);
+	if (!matches.empty()) {	
+		StartStyling(startPos, wxSTC_STYLE_MAX);
+		SetStyling(endPos - startPos, wxSTC_HPA_START);
+	}
+	*/
 	event.Skip();
 }
 
@@ -1204,6 +1244,33 @@ bool mvceditor::CodeControlClass::Touched() const {
 	return IsTouched;
 }
 
+void mvceditor::CodeControlClass::OnHotspotClick(wxStyledTextEvent& event) {
+	if (event.GetId() != GetId()) {
+		event.Skip();
+		return;
+	}
+	if (PHP != DocumentMode) {
+		event.Skip();
+		return;
+	}
+	int pos = event.GetPosition();
+	if (pos < 0) {
+		event.Skip();
+		return;
+	}
+	if (!Globals) {
+		event.Skip();
+		return;
+	}
+	int endPos = WordEndPosition(pos, true);
+	std::vector<mvceditor::TagClass> matches = ((PhpDocumentClass *)Document)->GetSymbolAt(endPos);
+	if (!matches.empty() && !matches[0].GetFullPath().IsEmpty()) {
+		wxCommandEvent openCmd(mvceditor::EVENT_CMD_FILE_OPEN);
+		openCmd.SetString(matches[0].GetFullPath());
+		EventSink.Publish(openCmd);
+	}
+}
+
 BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)
 	EVT_STC_MARGINCLICK(wxID_ANY, mvceditor::CodeControlClass::OnMarginClick)
 	EVT_STC_DOUBLECLICK(wxID_ANY, mvceditor::CodeControlClass::OnDoubleClick)
@@ -1217,4 +1284,6 @@ BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)
 	EVT_KEY_DOWN(mvceditor::CodeControlClass::OnKeyDown)
 	EVT_STC_DWELLSTART(wxID_ANY, mvceditor::CodeControlClass::OnDwellStart)
 	EVT_STC_DWELLEND(wxID_ANY, mvceditor::CodeControlClass::OnDwellEnd)
+	EVT_MOTION(mvceditor::CodeControlClass::OnMouseMotion)
+	EVT_STC_HOTSPOT_CLICK(wxID_ANY, mvceditor::CodeControlClass::OnHotspotClick)
 END_EVENT_TABLE()
