@@ -159,6 +159,7 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 		, WordHighlightFinder()
 		, WordHighlightWord()
 		, CurrentDbTag()
+		, HotspotTimer(this)
 		, Globals(globals)
 		, EventSink(eventSink)
 		, WordHighlightPreviousIndex(-1)
@@ -315,12 +316,17 @@ void mvceditor::CodeControlClass::SetSelectionByCharacterPosition(int start, int
 	// GET_TEXT  message
 	SendMsg(2182, documentLength, (long)buf);
 	
-	SetSelection(mvceditor::CharToUtf8Pos(buf, documentLength, start), 
-		mvceditor::CharToUtf8Pos(buf, documentLength, end));
+	int byteStart = mvceditor::CharToUtf8Pos(buf, documentLength, start);
+	int byteEnd = mvceditor::CharToUtf8Pos(buf, documentLength, end);
+	SetSelection(byteStart, byteEnd);
 	delete[] buf;
 }
 
 void mvceditor::CodeControlClass::OnCharAdded(wxStyledTextEvent &event) {
+	if (event.GetId() != GetId()) {
+		event.Skip();
+		return;
+	}
 
 	// clear the auto complete message
 	wxWindow* window = GetGrandParent();
@@ -374,8 +380,12 @@ void mvceditor::CodeControlClass::HandleAutomaticIndentation(char chr) {
 	}
 }
 
-std::vector<mvceditor::TagClass> mvceditor::CodeControlClass::GetCurrentSymbolResource() {
-	return Document->GetCurrentSymbolResource();
+std::vector<mvceditor::TagClass> mvceditor::CodeControlClass::GetTagsAtCurrentPosition() {
+	return Document->GetTagsAtCurrentPosition();
+}
+
+std::vector<mvceditor::TagClass> mvceditor::CodeControlClass::GetTagsAtPosition(int pos) {
+	return Document->GetTagsAtPosition(pos);
 }
 
 void mvceditor::CodeControlClass::HandleAutoCompletion() {
@@ -398,11 +408,19 @@ void mvceditor::CodeControlClass::HandleCallTip(wxChar ch, bool force) {
 }
 
 void mvceditor::CodeControlClass::OnUpdateUi(wxStyledTextEvent &event) {
+	if (event.GetId() != GetId()) {
+		event.Skip();
+		return;
+	}
 	HandleCallTip(0, false);
 	event.Skip();
 }
 
 void mvceditor::CodeControlClass::OnMarginClick(wxStyledTextEvent& event) {
+	if (event.GetId() != GetId()) {
+		event.Skip();
+		return;
+	}
 	if (event.GetMargin() == CodeControlOptionsClass::MARGIN_CODE_FOLDING) {
 		int line = LineFromPosition(event.GetPosition());
 		ToggleFold(line);
@@ -792,6 +810,10 @@ void mvceditor::CodeControlClass::SetCodeControlOptions(const std::vector<mvcedi
 }
 
 void  mvceditor::CodeControlClass::OnDoubleClick(wxStyledTextEvent& event) {
+	if (event.GetId() != GetId()) {
+		event.Skip();
+		return;
+	}
 	int pos = WordStartPosition(GetCurrentPos(), true);
 	int endPos = WordEndPosition(GetCurrentPos(), true);
 
@@ -1020,7 +1042,11 @@ mvceditor::CodeControlClass::Mode mvceditor::CodeControlClass::GetDocumentMode()
 }
 
 void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
-	if (event.GetEventObject() != this || IsHidden) {
+	if (event.GetId() != GetId()) {
+		event.Skip();
+		return;
+	}
+	if (IsHidden) {
 		event.Skip();
 		return;
 	}
@@ -1039,7 +1065,7 @@ void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
 		// current identifier; that way we can know the full name of the tag we want
 		// to get
 		int endPos = WordEndPosition(pos, true);
-		std::vector<mvceditor::TagClass> matches = ((PhpDocumentClass *)Document)->GetSymbolAt(endPos);
+		std::vector<mvceditor::TagClass> matches = GetTagsAtPosition(endPos);
 		if (!matches.empty()) {
 			mvceditor::TagClass tag = matches[0];
 			wxString msg;
@@ -1097,6 +1123,10 @@ void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
 }
 
 void mvceditor::CodeControlClass::OnDwellEnd(wxStyledTextEvent& event) {
+	if (event.GetId() != GetId()) {
+		event.Skip();
+		return;
+	}
 	CallTipCancel();
 }
 
@@ -1231,13 +1261,19 @@ void mvceditor::CodeControlClass::OnHotspotClick(wxStyledTextEvent& event) {
 		event.Skip();
 		return;
 	}
-	int endPos = WordEndPosition(pos, true);
-	std::vector<mvceditor::TagClass> matches = ((PhpDocumentClass *)Document)->GetSymbolAt(endPos);
-	if (!matches.empty() && !matches[0].GetFullPath().IsEmpty()) {
-		wxCommandEvent openCmd(mvceditor::EVENT_CMD_FILE_OPEN);
-		openCmd.SetString(matches[0].GetFullPath());
-		EventSink.Publish(openCmd);
-	}
+
+	// process the event at some point later, otherwise scintilla will expand selection
+	// when the tag is in the currently opened file.  
+	// for example, when clicking on "$this->method()"
+	HotspotTimer.Start(100, wxTIMER_ONE_SHOT);
+}
+
+void mvceditor::CodeControlClass::OnTimerComplete(wxTimerEvent& event) {
+	wxStyledTextEvent evt(wxEVT_STC_HOTSPOT_CLICK);
+	evt.SetId(GetId());
+	evt.SetEventObject(this);
+	evt.SetPosition(GetCurrentPos());
+	EventSink.Publish(evt);
 }
 
 BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)
@@ -1254,4 +1290,5 @@ BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)
 	EVT_STC_DWELLSTART(wxID_ANY, mvceditor::CodeControlClass::OnDwellStart)
 	EVT_STC_DWELLEND(wxID_ANY, mvceditor::CodeControlClass::OnDwellEnd)
 	EVT_STC_HOTSPOT_CLICK(wxID_ANY, mvceditor::CodeControlClass::OnHotspotClick)
+	EVT_TIMER(wxID_ANY, mvceditor::CodeControlClass::OnTimerComplete)
 END_EVENT_TABLE()

@@ -244,11 +244,29 @@ public:
 	void HandleCallTip(wxChar ch = 0, bool force = false);
 
 	/**
-	 * Returns the resources that match the the current cursor position.
+	 * Returns the tags that match the identifier located at the current cursor position.
+	 * For example, if the document holds:
+	 *
+	 * <?php pretty_print(array(1, 2, 3)) ?>
+	 *
+	 * and the cursor is in position 8, this method returns the tags for the "pretty_print" function.
 	 *
 	 * @return tag matches
 	 */
-	std::vector<TagClass> GetCurrentSymbolResource();
+	std::vector<TagClass> GetTagsAtCurrentPosition();
+
+	/**
+	 * Returns the tags that match the identifier located at the given cursor position.
+	 * For example, if the document holds:
+	 *
+	 * <?php pretty_print(array(1, 2, 3)) ?>
+	 *
+	 * and the cursor given is 8, this method returns the tags for the "pretty_print" function.
+	 *
+	 * @param pos character position, zero-based
+	 * @return tag matches
+	 */
+	std::vector<TagClass> GetTagsAtPosition(int pos);
 
 	/**
 	 * Applies the current prefernces to this window. This method should be called when the CodeControlOptions class
@@ -452,6 +470,11 @@ private:
 	void OnLeftDown(wxMouseEvent& event);
 
 	/**
+	 * On a left mouse click, we will trigger the hotspot click
+	 */
+	void OnLeftUp(wxMouseEvent& event);
+
+	/**
 	 * show the symbol comment popup to the user
 	 */
 	void OnDwellStart(wxStyledTextEvent& event);
@@ -462,10 +485,16 @@ private:
 	void OnDwellEnd(wxStyledTextEvent& event);
 
 	/**
-	 * when the user clicks on a hotspot (matched method, class) then jump
-	 * to that tag
+	 * when the user clicks on a hotspot (matched method, class)
+	 * just activate the timer, do not process the event in place.
+	 * see the comment on the HotspotTimer
 	 */
 	void OnHotspotClick(wxStyledTextEvent& event);
+
+	/**
+	 * when the timer ends then jump to that tag
+	 */
+	void OnTimerComplete(wxTimerEvent& event);
 
 	/**
 	 * Removes trailing space from ALL lines in this document.
@@ -497,6 +526,23 @@ private:
 	 * The connection to use to fetch the SQL table metadata.
 	 */
 	DatabaseTagClass CurrentDbTag;
+
+	/**
+	 * we will handle hotspot clicks in a timer.  This is because if we handle
+	 * a hotspot that scrolls to a different place in the same file, we want to avoid
+	 * selecting the text that occurs because scintilla processes the left click 
+	 * event as well as the hotspot click; 
+	 * Example: there is a hotspot on $this->myMethod
+	 * - User clicks on myMethod
+	 * - we get the tag, and scroll down to functino definition and select the function
+	 * - scintilla will recognize the mouse click and will perform the default behavio
+	 *   which is to set the anchor and select the text. the text we selected preivously
+	 *   is no longer selectec. this is the behavior we want to avoid
+	 *
+	 * See https://groups.google.com/d/msg/scintilla-interest/XY1sKYBtGj0/ImtO5NRjLcsJ
+	 *
+	 */
+	wxTimer HotspotTimer;
 
 	/**
 	* This object will be used to parse the resources of files that are currently open

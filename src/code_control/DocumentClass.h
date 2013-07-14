@@ -96,11 +96,19 @@ public:
 	virtual void HandleCallTip(wxChar ch = 0, bool force = false);
 
 	/**
-	 * Returns the resources that match the the current cursor position.
+	 * Returns the tags that matched the identifier at the  current position
 	 *
 	 * @return tag matches
 	 */
-	virtual std::vector<TagClass> GetCurrentSymbolResource();
+	virtual std::vector<TagClass> GetTagsAtCurrentPosition();
+
+	/**
+	 * Returns the tags that matched the identifier in the given position
+	 *
+	 * @param int the character position in the document to check
+	 * @return tag matches
+	 */
+	virtual std::vector<TagClass> GetTagsAtPosition(int position);
 
 	/**
 	 * This method will get called when a new file is opened OR when a 
@@ -186,7 +194,9 @@ public:
 
 	void HandleCallTip(wxChar ch = 0, bool force = false);
 
-	std::vector<TagClass> GetCurrentSymbolResource();
+	std::vector<TagClass> GetTagsAtCurrentPosition();
+
+	std::vector<TagClass> GetTagsAtPosition(int position);
 
 	void FileOpened(wxString fileName);
 

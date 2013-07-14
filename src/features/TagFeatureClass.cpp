@@ -115,7 +115,7 @@ void mvceditor::TagFeatureClass::OnJump(wxCommandEvent& event) {
 		int endPos = codeControl->WordEndPosition(currentPos, true);
 		wxString term = codeControl->GetTextRange(startPos, endPos);
 	
-		std::vector<mvceditor::TagClass> matches = codeControl->GetCurrentSymbolResource();
+		std::vector<mvceditor::TagClass> matches = codeControl->GetTagsAtCurrentPosition();
 		mvceditor::TagListRemoveNativeMatches(matches);
 		if (!matches.empty()) {
 			UnicodeString res = matches[0].ClassName + UNICODE_STRING_SIMPLE("::") + matches[0].Identifier;
@@ -333,6 +333,19 @@ void mvceditor::TagFeatureClass::OnTimerComplete(wxTimerEvent& event) {
 		App.Globals.Environment.Php.Version,
 		true);
 	App.RunningThreads.Queue(builder);
+}
+
+void mvceditor::TagFeatureClass::OnCodeControlHotspotClick(wxStyledTextEvent& event) {
+	mvceditor::CodeControlClass* ctrl = GetCurrentCodeControl();
+	if (!ctrl) {
+		return;
+	}
+	int pos = event.GetPosition();
+	int endPos = ctrl->WordEndPosition(pos, true);
+	std::vector<mvceditor::TagClass> matches = ctrl->GetTagsAtPosition(endPos);
+	if (!matches.empty() && !matches[0].GetFullPath().IsEmpty()) {
+		LoadPageFromResource(wxT(""), matches[0]);
+	}
 }
 
 mvceditor::TagSearchDialogClass::TagSearchDialogClass(wxWindow* parent, 
@@ -678,6 +691,7 @@ BEGIN_EVENT_TABLE(mvceditor::TagFeatureClass, wxEvtHandler)
 	EVT_TIMER(ID_REPARSE_TIMER, mvceditor::TagFeatureClass::OnTimerComplete)
 	EVT_WORKING_CACHE_COMPLETE(ID_WORKING_CACHE, mvceditor::TagFeatureClass::OnWorkingCacheComplete)
 	EVT_ACTION_COMPLETE(ID_WORKING_CACHE, mvceditor::TagFeatureClass::OnActionComplete)
+	EVT_STC_HOTSPOT_CLICK(wxID_ANY, mvceditor::TagFeatureClass::OnCodeControlHotspotClick)
 END_EVENT_TABLE()
 
 

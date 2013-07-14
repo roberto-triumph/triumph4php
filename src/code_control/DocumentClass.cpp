@@ -219,7 +219,14 @@ void mvceditor::TextDocumentClass::HandleAutoCompletion(wxString& completeStatus
 void mvceditor::TextDocumentClass::HandleCallTip(wxChar ch, bool force) {
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TextDocumentClass::GetCurrentSymbolResource() {
+std::vector<mvceditor::TagClass> mvceditor::TextDocumentClass::GetTagsAtCurrentPosition() {
+
+	// plain text docs don't have structure
+	std::vector<mvceditor::TagClass> resources;
+	return resources;
+}
+
+std::vector<mvceditor::TagClass> mvceditor::TextDocumentClass::GetTagsAtPosition(int pos) {
 
 	// plain text docs don't have structure
 	std::vector<mvceditor::TagClass> resources;
@@ -702,7 +709,7 @@ void mvceditor::PhpDocumentClass::HandleCallTip(wxChar ch, bool force) {
 		if (currentPos >= 0) {
 			CurrentCallTipResources.clear();
 			CurrentCallTipIndex = 0;
-			std::vector<mvceditor::TagClass> matches = GetSymbolAt(currentPos);
+			std::vector<mvceditor::TagClass> matches = GetTagsAtPosition(currentPos);
 			for (size_t i = 0; i < matches.size(); ++i) {
 				mvceditor::TagClass tag = matches[i];
 				if (mvceditor::TagClass::FUNCTION == tag.Type || mvceditor::TagClass::METHOD == tag.Type) {
@@ -794,46 +801,14 @@ void mvceditor::PhpDocumentClass::HandleCallTip(wxChar ch, bool force) {
 	}
 }
 
-std::vector<mvceditor::TagClass> mvceditor::PhpDocumentClass::GetCurrentSymbolResource() {
+std::vector<mvceditor::TagClass> mvceditor::PhpDocumentClass::GetTagsAtCurrentPosition() {
 	
 	// if the cursor is in the middle of an identifier, find the end of the
 	// current identifier; that way we can know the full name of the tag we want
 	// to get
 	int currentPos = Ctrl->GetCurrentPos();
 	int endPos = Ctrl->WordEndPosition(currentPos, true);
-	
-	UnicodeString code = GetSafeSubstring(0, endPos);
-	
-	std::vector<mvceditor::TagClass> matches;
-	pelet::LexicalAnalyzerClass lexer;
-	pelet::ParserClass parser;
-	pelet::ScopeClass scope;
-	pelet::ExpressionClass parsedExpression(scope);
-	mvceditor::ScopeFinderClass scopeFinder;
-	pelet::ScopeClass scopeResult;
-	
-	UnicodeString lastExpression = lexer.LastExpression(code);
-	bool doDuckTyping = true;
-	if (Globals && !lastExpression.isEmpty()) {
-		scopeFinder.GetScopeString(code, endPos, scopeResult);
-
-		if (lastExpression.indexOf(UNICODE_STRING_SIMPLE("\\")) > 0 && 
-			scopeResult.ClassName.isEmpty() &&
-			scopeResult.MethodName.isEmpty()) {
-			// the expression is a namespace name outside a class or method.  this is 
-			// most likely a namespace in the "use" statement
-			// namespace in a use statement is always fully qualified, even if it does
-			// not begin with a backslash
-			lastExpression = UNICODE_STRING_SIMPLE("\\") + lastExpression;
-		}
-		parser.ParseExpression(lastExpression, parsedExpression);
-
-		// for now do nothing with error
-		mvceditor::SymbolTableMatchErrorClass error;
-		Globals->TagCache.ResourceMatches(Ctrl->GetIdString(), parsedExpression, scopeResult, matches, 
-			doDuckTyping, true, error);
-	}
-	return matches;
+	return GetTagsAtPosition(endPos);
 }
 
 void mvceditor::PhpDocumentClass::FileOpened(wxString fileName) {
@@ -885,7 +860,7 @@ std::vector<wxString> mvceditor::PhpDocumentClass::CollectNearMatchKeywords(wxSt
 	return matchedKeywords;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::PhpDocumentClass::GetSymbolAt(int posToCheck) {
+std::vector<mvceditor::TagClass> mvceditor::PhpDocumentClass::GetTagsAtPosition(int posToCheck) {
 	UnicodeString code = GetSafeSubstring(0, posToCheck);
 	
 	std::vector<mvceditor::TagClass> matches;

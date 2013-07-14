@@ -137,6 +137,11 @@ private:
 	 * the user can choose which to open
 	 */
 	void OnTagCacheSearchComplete(mvceditor::TagCacheSearchCompleteEventClass& event);
+
+	/**
+	 * when the user clicks on a editor hyperlink, take them to the matches php tag.
+	 */
+	void OnCodeControlHotspotClick(wxStyledTextEvent& event);
 	
 	/**
 	 * when the timer expires, start a re-parsing of the newest content in the current
