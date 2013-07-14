@@ -100,7 +100,7 @@ static bool IsResourceVisible(const mvceditor::TagClass& tag, const pelet::Expre
 				// need to watch out for the namespace operator
 				// the expression may or may not have it
 				UnicodeString alias(it->second);				
-				if (alias.caseCompare(resQualified, 0) == 0) {
+				if (resQualified.indexOf(alias) == 0) {
 					passesNamespaceCheck = true;
 					break;
 				}
