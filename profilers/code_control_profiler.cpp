@@ -28,6 +28,7 @@
 #include <unicode/uclean.h>
 #include <globals/CodeControlOptionsClass.h>
 #include <globals/Assets.h>
+#include <globals/Events.h>
 #include <globals/GlobalsClass.h>
 #include <language/TagFinderList.h>
 #include <code_control/CodeControlStyles.h>
@@ -50,6 +51,7 @@ public:
 	
 	mvceditor::CodeControlOptionsClass Options;
 	mvceditor::GlobalsClass Globals;
+	mvceditor::EventSinkClass EventSink;
 };
 
 /**
@@ -144,7 +146,8 @@ IMPLEMENT_APP(CodeControlProfilerAppClass)
 CodeControlProfilerAppClass::CodeControlProfilerAppClass() 
 	: wxApp()
 	, Options()
-	, Globals() {
+	, Globals()
+	, EventSink() {
 		
 }
 
@@ -175,7 +178,7 @@ CodeControlFrameClass::CodeControlFrameClass(CodeControlProfilerAppClass& app)
 	: wxFrame(NULL, wxID_ANY, wxT("CodeControlClass profiler"), wxDefaultPosition, 
 			wxSize(1024, 768)) 
 	, App(app) {
-	Ctrl = new mvceditor::CodeControlClass(this, app.Options, &app.Globals, wxID_ANY);
+	Ctrl = new mvceditor::CodeControlClass(this, app.Options, &app.Globals, app.EventSink, wxID_ANY);
 	Ctrl->SetDropTarget(new FileDropTargetClass(Ctrl));
 	Ctrl->SetDocumentMode(mvceditor::CodeControlClass::PHP);
 	CreateMenu();
