@@ -110,11 +110,11 @@ function wxappconfiguration(config, action)
 	end
 
 	if config == "Debug" and (action == "gmake" or action == "codelite") then
-		linkoptions { string.format("`%s --debug=yes --unicode=yes --libs aui,adv`", WX_CONFIG) }
+		linkoptions { string.format("`%s --debug=yes --unicode=yes --libs aui,adv,stc`", WX_CONFIG) }
 	elseif config == "Debug" and action ==  "vs2008" then
 		links { WX_LIBS_WINDOW_DEBUG }
 	elseif config == "Release" and (action == "gmake" or action == "codelite") then
-		linkoptions { string.format("`%s --debug=no --unicode=yes --libs aui,adv`", WX_CONFIG) }
+		linkoptions { string.format("`%s --debug=no --unicode=yes --libs aui,adv,stc`", WX_CONFIG) }
 	elseif config == "Release" and action ==  "vs2008" then
 		links { WX_LIBS_WINDOW_RELEASE }
 	end
@@ -227,13 +227,11 @@ solution "mvc-editor"
 			links { WX_LIB_STC_DEBUG }
 			postbuildcommands { "cd " .. normalizepath("Debug") .. " && tests.exe --all" }
 		configuration { "Debug", "gmake or codelite" }
-			links { WX_LIB_STC_DEBUG }
 			postbuildcommands { "cd " .. normalizepath("Debug") .. " && ./tests --all" }
 		configuration { "Release", "vs2008" }
 			links { WX_LIB_STC_RELEASE }
 			postbuildcommands { "cd " .. normalizepath("Release") .. " && tests.exe --all"  }
 		configuration { "Release", "gmake or codelite" }
-			links { WX_LIB_STC_RELEASE }
 			postbuildcommands { "cd " .. normalizepath("Release") .. " && ./tests --all" }
 
 	project "tests"
@@ -471,8 +469,8 @@ solution "mvc-editor"
 			-- prevent warning from killing build: warning C4018: '<' : signed/unsigned mismatch
 			buildoptions { "/W1" }
 		configuration { "gmake or codelite" }
-			-- prevent warning: deprecated conversion from string constant to char*
-			buildoptions { "-Wno-write-strings" }
+			-- prevent warning: deprecated stuff from wxWidgets 2.8 -> 2.9
+			buildoptions { "-Wno-deprecated" }
 
 	project "keybinder_test"
 		language "C++"
@@ -566,9 +564,9 @@ solution "mvc-editor"
 			pickywarnings(_ACTION)
 			wxconfiguration("Release", _ACTION)
 			wxappconfiguration("Release", _ACTION)
-		configuration { "Debug" }
+		configuration { "Debug", "vs2008" }
 			links {  WX_LIB_STC_DEBUG }
-		configuration { "Release" }
+		configuration { "Release", "vs2008" }
 			links {  WX_LIB_STC_RELEASE }
 
 	project "wx_window_tutorial"
