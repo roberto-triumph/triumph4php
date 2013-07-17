@@ -271,7 +271,7 @@ EditorBehaviorPanelGeneratedClass::EditorBehaviorPanelGeneratedClass( wxWindow* 
 	StaticBoxSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Editor Behaviors") ), wxVERTICAL );
 	
 	wxFlexGridSizer* FlexGridSizer;
-	FlexGridSizer = new wxFlexGridSizer( 6, 2, 0, 0 );
+	FlexGridSizer = new wxFlexGridSizer( 15, 2, 0, 0 );
 	FlexGridSizer->AddGrowableCol( 0 );
 	FlexGridSizer->AddGrowableCol( 1 );
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );
@@ -546,7 +546,7 @@ LicenseDialogClass::LicenseDialogClass( wxWindow* parent, wxWindowID id, const w
 	Sizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* fgSizer10;
-	fgSizer10 = new wxFlexGridSizer( 2, 1, 0, 0 );
+	fgSizer10 = new wxFlexGridSizer( 3, 1, 0, 0 );
 	fgSizer10->AddGrowableCol( 0 );
 	fgSizer10->AddGrowableRow( 0 );
 	fgSizer10->SetFlexibleDirection( wxBOTH );

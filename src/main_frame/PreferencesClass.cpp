@@ -305,6 +305,9 @@ void mvceditor::PreferencesClass::Init() {
 	if (info.GetOperatingSystemId() != wxOS_WINDOWS_NT) {
 		ApplicationFont.SetPointSize(8);
 	}
+	else {
+		ApplicationFont.SetPointSize(8);
+	}
 	mvceditor::CodeControlStylesInit(CodeControlOptions);
 }
 

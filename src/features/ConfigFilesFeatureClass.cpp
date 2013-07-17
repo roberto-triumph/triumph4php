@@ -40,7 +40,7 @@ mvceditor::ConfigFilesFeatureClass::ConfigFilesFeatureClass(mvceditor::AppClass&
 }
 
 void mvceditor::ConfigFilesFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
-	ConfigMenu = new wxMenu(0);
+	ConfigMenu = new wxMenu();
 	menuBar->Append(ConfigMenu, _("Project Configs"));
 
 	// at this point the projects are not loaded yet must wait
@@ -94,7 +94,7 @@ void mvceditor::ConfigFilesFeatureClass::RebuildMenu() {
 
 	// make sure to not make more menu items than are allowed.
 	for (configPair = ConfigPairs.begin(); configPair != ConfigPairs.end() && i < MAX_CONFIG_MENU_ITEMS; ++configPair) {
-		wxMenu* submenu = new wxMenu(0);
+		wxMenu* submenu = new wxMenu();
 		for (config = configPair->ConfigTags.begin(); config != configPair->ConfigTags.end(); ++config) {
 			submenu->Append(mvceditor::CONFIG_DETECTORS + i, config->MenuLabel() , config->ConfigFileName.GetFullPath(), wxITEM_NORMAL);
 			i++;

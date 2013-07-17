@@ -102,10 +102,9 @@ SqlConnectionDialogGeneratedClass::SqlConnectionDialogGeneratedClass( wxWindow* 
 	FormSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	wxFlexGridSizer* ConnectionsSizer;
-	ConnectionsSizer = new wxFlexGridSizer( 4, 1, 0, 0 );
+	ConnectionsSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
 	ConnectionsSizer->AddGrowableCol( 0 );
 	ConnectionsSizer->AddGrowableRow( 1 );
-	ConnectionsSizer->AddGrowableRow( 3 );
 	ConnectionsSizer->SetFlexibleDirection( wxBOTH );
 	ConnectionsSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -120,7 +119,7 @@ SqlConnectionDialogGeneratedClass::SqlConnectionDialogGeneratedClass( wxWindow* 
 	FormSizer->Add( ConnectionsSizer, 1, wxEXPAND, 5 );
 	
 	wxFlexGridSizer* CredentialsSizer;
-	CredentialsSizer = new wxFlexGridSizer( 6, 2, 0, 0 );
+	CredentialsSizer = new wxFlexGridSizer( 7, 2, 0, 0 );
 	CredentialsSizer->AddGrowableCol( 1 );
 	CredentialsSizer->SetFlexibleDirection( wxBOTH );
 	CredentialsSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );

@@ -616,27 +616,29 @@ void mvceditor::ProjectListDialogClass::OnAddFromDirectoryButton(wxCommandEvent&
 		wxDir dir(rootDir);
 		if (dir.IsOpened()) {
 			wxString fileName;
-			wxArrayString subDirs;
+			std::vector<wxString> subDirs;
 			bool cont = dir.GetFirst(&fileName, wxEmptyString, wxDIR_DIRS);
 			while (cont) {
-				subDirs.Add(fileName);
+				subDirs.push_back(fileName);
 				cont = dir.GetNext(&fileName);
 			}
-			subDirs.Sort();
-			wxArrayInt selections;
+			std::sort(subDirs.begin(), subDirs.end());
+			std::vector<int> selections;
 			cont = !subDirs.empty();
-			if (!subDirs.empty()) {				
-				size_t chosenCount = wxGetMultipleChoices(
-					selections,
-					wxString::Format(_("There are %d projects. Please choose directories to create projects for"), subDirs.GetCount()),
+			if (!subDirs.empty()) {
+				mvceditor::MultipleSelectDialogClass selectDialog(
+					this,
 					_("Add Multiple"),
-					subDirs,
-					this
+					wxString::Format(_("There are %d projects. Please choose directories to create projects for"), subDirs.size()),
+					subDirs,					
+					selections
 				);
-				cont = chosenCount > 0;
+				if (selectDialog.ShowModal() == wxOK) {
+					cont = !selections.empty();
+				}
 			}
 			if (cont) {
-				for (size_t i = 0; i < selections.GetCount(); ++i) {
+				for (size_t i = 0; i < selections.size(); ++i) {
 					wxString chosenSubDir = subDirs[selections[i]];
 
 					mvceditor::ProjectClass project;
@@ -669,6 +671,29 @@ void mvceditor::ProjectListDialogClass::OnHelpButton(wxCommandEvent& event) {
 	);
 	help = wxGetTranslation(help);
 	wxMessageBox(help, _("Defined Projects Help"), wxCENTRE, this);
+}
+
+mvceditor::MultipleSelectDialogClass::MultipleSelectDialogClass(wxWindow* parent, const wxString& title, const wxString& caption,
+																std::vector<wxString>& choices, std::vector<int>& selections)
+: MultipleSelectDialogGeneratedClass(parent, wxID_ANY, title)
+, Selections(selections) {
+	Label->SetLabel(caption);
+	for (size_t i = 0; i < choices.size(); ++i) {
+		Checklist->Append(choices[i]);
+	}
+}
+
+void mvceditor::MultipleSelectDialogClass::OnOkButton(wxCommandEvent& event) {
+	for (size_t i = 0; i < Checklist->GetCount(); ++i) {
+		if (Checklist->IsChecked(i)) {
+			Selections.push_back(i);
+		}
+	}
+	EndModal(wxOK);
+}
+
+void mvceditor::MultipleSelectDialogClass::OnCancelButton(wxCommandEvent& event) {
+	EndModal(wxCANCEL);
 }
 
 BEGIN_EVENT_TABLE(mvceditor::ProjectFeatureClass, wxEvtHandler)

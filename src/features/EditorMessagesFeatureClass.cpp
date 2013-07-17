@@ -170,8 +170,8 @@ mvceditor::EditorMessagesLoggerClass::EditorMessagesLoggerClass(mvceditor::Edito
 	SetLogLevel(wxLOG_Message);
 }
 
-void mvceditor::EditorMessagesLoggerClass::DoLog(wxLogLevel level, const wxChar *msg, time_t timestamp) {
-	Feature.AddMessage(level, msg, timestamp);
+void mvceditor::EditorMessagesLoggerClass::DoLogRecord(wxLogLevel level, const wxString &msg, const wxLogRecordInfo &info) {
+	Feature.AddMessage(level, msg, info.timestamp);
 }
 
 BEGIN_EVENT_TABLE(mvceditor::EditorMessagesFeatureClass, mvceditor::FeatureClass)

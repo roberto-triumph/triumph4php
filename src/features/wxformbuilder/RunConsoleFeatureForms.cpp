@@ -80,7 +80,7 @@ CliCommandEditDialogGeneratedClass::CliCommandEditDialogGeneratedClass( wxWindow
 	ContentSizer = new wxBoxSizer( wxHORIZONTAL );
 	
 	wxFlexGridSizer* RightSizer;
-	RightSizer = new wxFlexGridSizer( 3, 1, 0, 0 );
+	RightSizer = new wxFlexGridSizer( 4, 1, 0, 0 );
 	RightSizer->AddGrowableCol( 0 );
 	RightSizer->AddGrowableRow( 1 );
 	RightSizer->AddGrowableRow( 2 );
@@ -91,7 +91,7 @@ CliCommandEditDialogGeneratedClass::CliCommandEditDialogGeneratedClass( wxWindow
 	FormSizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* FormFlexSizer;
-	FormFlexSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	FormFlexSizer = new wxFlexGridSizer( 3, 1, 0, 0 );
 	FormFlexSizer->AddGrowableCol( 0 );
 	FormFlexSizer->AddGrowableRow( 0 );
 	FormFlexSizer->AddGrowableRow( 1 );
@@ -208,7 +208,7 @@ CliCommandListDialogGeneratedClass::CliCommandListDialogGeneratedClass( wxWindow
 	BoxSizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* ColumnSizer;
-	ColumnSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	ColumnSizer = new wxFlexGridSizer( 4, 1, 0, 0 );
 	ColumnSizer->AddGrowableCol( 0 );
 	ColumnSizer->AddGrowableRow( 1 );
 	ColumnSizer->SetFlexibleDirection( wxBOTH );

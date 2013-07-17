@@ -74,6 +74,12 @@ WX_CONFIG = 'wx-config'
 -- library (Database Access wrapper)
 CMAKE = 'cmake';
 
+-- the styled text control library
+WX_LIB_STC_DEBUG = "wx_gtk2ud_stc-2.8"
+
+-- the styled text control library
+WX_LIB_STC_RELEASE = "wx_gtk2u_stc-2.8"
+
 -- will look for MySQL files in these directories
 -- on linux we will assume it is installed system-wide
 MYSQL_INCLUDE_DIR = '/usr/include/mysql/'

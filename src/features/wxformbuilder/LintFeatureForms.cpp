@@ -52,7 +52,7 @@ LintPreferencesGeneratedPanelClass::LintPreferencesGeneratedPanelClass( wxWindow
 	wxFlexGridSizer* FlexGidSizer;
 	FlexGidSizer = new wxFlexGridSizer( 1, 1, 0, 0 );
 	FlexGidSizer->AddGrowableCol( 0 );
-	FlexGidSizer->AddGrowableRow( 1 );
+	FlexGidSizer->AddGrowableRow( 0 );
 	FlexGidSizer->SetFlexibleDirection( wxBOTH );
 	FlexGidSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	

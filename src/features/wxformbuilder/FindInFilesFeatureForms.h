@@ -76,7 +76,7 @@ class FindInFilesDialogGeneratedClass : public wxDialog
 	
 	public:
 		
-		FindInFilesDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Find In Files"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 599,402 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		FindInFilesDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Find In Files"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 476,388 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~FindInFilesDialogGeneratedClass();
 	
 };

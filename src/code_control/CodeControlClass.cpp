@@ -859,7 +859,7 @@ void mvceditor::CodeControlClass::OnContextMenu(wxContextMenuEvent& event) {
 
 	// Let the frame handle it because we want features to have menu items
 	if (frame) {
-		frame->ProcessEvent(event);
+		frame->GetEventHandler()->ProcessEvent(event);
 	}
 	else {
 		event.Skip();

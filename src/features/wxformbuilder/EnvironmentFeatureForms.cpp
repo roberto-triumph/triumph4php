@@ -75,7 +75,7 @@ WebBrowserEditPanelGeneratedClass::WebBrowserEditPanelGeneratedClass( wxWindow* 
 	FlexSizer->Add( ButtonGridSizer, 1, wxEXPAND, 5 );
 	
 	wxFlexGridSizer* GridSizer;
-	GridSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	GridSizer = new wxFlexGridSizer( 1, 1, 0, 0 );
 	GridSizer->AddGrowableCol( 0 );
 	GridSizer->AddGrowableRow( 0 );
 	GridSizer->SetFlexibleDirection( wxBOTH );
@@ -114,7 +114,7 @@ ApacheEnvironmentPanelGeneratedClass::ApacheEnvironmentPanelGeneratedClass( wxWi
 	MainSizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* FlexGridSizer;
-	FlexGridSizer = new wxFlexGridSizer( 4, 1, 0, 0 );
+	FlexGridSizer = new wxFlexGridSizer( 5, 1, 0, 0 );
 	FlexGridSizer->AddGrowableCol( 0 );
 	FlexGridSizer->AddGrowableRow( 4 );
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );
@@ -161,7 +161,7 @@ ApacheEnvironmentPanelGeneratedClass::ApacheEnvironmentPanelGeneratedClass( wxWi
 	FlexGridSizer->Add( ManualButtonSizer, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxFlexGridSizer* HostsSizer;
-	HostsSizer = new wxFlexGridSizer( 1, 1, 0, 0 );
+	HostsSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
 	HostsSizer->AddGrowableCol( 0 );
 	HostsSizer->AddGrowableRow( 1 );
 	HostsSizer->SetFlexibleDirection( wxBOTH );
@@ -182,7 +182,6 @@ ApacheEnvironmentPanelGeneratedClass::ApacheEnvironmentPanelGeneratedClass( wxWi
 	
 	this->SetSizer( MainSizer );
 	this->Layout();
-	MainSizer->Fit( this );
 }
 
 ApacheEnvironmentPanelGeneratedClass::~ApacheEnvironmentPanelGeneratedClass()
@@ -199,9 +198,9 @@ PhpEnvironmentPanelGeneratedClass::PhpEnvironmentPanelGeneratedClass( wxWindow* 
 	MainSizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* GridSizer;
-	GridSizer = new wxFlexGridSizer( 3, 1, 0, 0 );
+	GridSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
 	GridSizer->AddGrowableCol( 0 );
-	GridSizer->AddGrowableRow( 2 );
+	GridSizer->AddGrowableRow( 1 );
 	GridSizer->SetFlexibleDirection( wxBOTH );
 	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -209,16 +208,16 @@ PhpEnvironmentPanelGeneratedClass::PhpEnvironmentPanelGeneratedClass( wxWindow* 
 	HelpText->Wrap( 450 );
 	GridSizer->Add( HelpText, 1, wxALL|wxEXPAND, 5 );
 	
-	wxFlexGridSizer* fgSizer10;
-	fgSizer10 = new wxFlexGridSizer( 2, 2, 0, 0 );
-	fgSizer10->AddGrowableCol( 0 );
-	fgSizer10->AddGrowableCol( 1 );
-	fgSizer10->SetFlexibleDirection( wxBOTH );
-	fgSizer10->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	wxFlexGridSizer* PhpFormSizer;
+	PhpFormSizer = new wxFlexGridSizer( 2, 2, 0, 0 );
+	PhpFormSizer->AddGrowableCol( 0 );
+	PhpFormSizer->AddGrowableCol( 1 );
+	PhpFormSizer->SetFlexibleDirection( wxBOTH );
+	PhpFormSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	PhpLabel = new wxStaticText( this, wxID_ANY, _("PHP Executable:"), wxDefaultPosition, wxDefaultSize, 0 );
 	PhpLabel->Wrap( -1 );
-	fgSizer10->Add( PhpLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	PhpFormSizer->Add( PhpLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxBoxSizer* PhpSizer;
 	PhpSizer = new wxBoxSizer( wxHORIZONTAL );
@@ -229,11 +228,11 @@ PhpEnvironmentPanelGeneratedClass::PhpEnvironmentPanelGeneratedClass( wxWindow* 
 	PhpExecutableFile = new wxFilePickerCtrl( this, ID_PHP_FILE, wxEmptyString, _("Location of PHP Executable"), wxT("*"), wxDefaultPosition, wxDefaultSize, wxFLP_FILE_MUST_EXIST|wxFLP_OPEN );
 	PhpSizer->Add( PhpExecutableFile, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	fgSizer10->Add( PhpSizer, 1, wxEXPAND, 5 );
+	PhpFormSizer->Add( PhpSizer, 1, wxEXPAND, 5 );
 	
 	VersionLabel = new wxStaticText( this, ID_VERSIONLABEL, _("Version:"), wxDefaultPosition, wxDefaultSize, 0 );
 	VersionLabel->Wrap( -1 );
-	fgSizer10->Add( VersionLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	PhpFormSizer->Add( VersionLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxBoxSizer* bSizer10;
 	bSizer10 = new wxBoxSizer( wxHORIZONTAL );
@@ -244,9 +243,9 @@ PhpEnvironmentPanelGeneratedClass::PhpEnvironmentPanelGeneratedClass( wxWindow* 
 	Version->Append( _("PHP 5.4") );
 	bSizer10->Add( Version, 1, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 	
-	fgSizer10->Add( bSizer10, 1, 0, 5 );
+	PhpFormSizer->Add( bSizer10, 1, 0, 5 );
 	
-	GridSizer->Add( fgSizer10, 1, wxEXPAND, 5 );
+	GridSizer->Add( PhpFormSizer, 1, wxEXPAND, 5 );
 	
 	MainSizer->Add( GridSizer, 1, wxEXPAND, 5 );
 	
@@ -322,7 +321,7 @@ VirtualHostCreateDialogGeneratedClass::VirtualHostCreateDialogGeneratedClass( wx
 	BodySizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* GridSizer;
-	GridSizer = new wxFlexGridSizer( 2, 2, 0, 0 );
+	GridSizer = new wxFlexGridSizer( 3, 2, 0, 0 );
 	GridSizer->AddGrowableCol( 1 );
 	GridSizer->SetFlexibleDirection( wxBOTH );
 	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );

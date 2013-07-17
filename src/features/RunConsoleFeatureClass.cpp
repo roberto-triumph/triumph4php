@@ -368,7 +368,7 @@ void mvceditor::RunConsolePanelClass::OnStoreButton(wxCommandEvent& event) {
 			
 			// prime the description with the base name in case
 			// executable is a full path
-			size_t pos = newCommand.Executable.Length();
+			size_t pos = newCommand.Executable.Length() - 1;
 			for (; pos > 0; pos--) {
 				if (newCommand.Executable[pos] == wxT('/') || newCommand.Executable[pos] == wxT('\\')) {
 
@@ -574,7 +574,7 @@ mvceditor::RunConsoleFeatureClass::RunConsoleFeatureClass(mvceditor::AppClass& a
 }
 
 void mvceditor::RunConsoleFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
-	wxMenu* cliMenu = new wxMenu(0);
+	wxMenu* cliMenu = new wxMenu();
 	RunCliMenuItem = new wxMenuItem(cliMenu, mvceditor::MENU_RUN_PHP + 0, _("Run As CLI\tF7"), 
 		_("Run File As a PHP Command Line Script"), wxITEM_NORMAL);
 	cliMenu->Append(RunCliMenuItem);

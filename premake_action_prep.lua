@@ -61,25 +61,20 @@ function checkWxWidgets()
 			dlls = os.matchfiles(wxLocation .. "/lib/vc_dll/*.dll");
 			if #dlls > 0 then
 				batchexecute(normalizepath(""), {
-					"xcopy /S /Y \"" .. wxLocation .. "\\lib\\vc_dll\\\wxbase28ud_*.dll\" \"Debug\\\"",
-					"xcopy /S /Y \"" .. wxLocation .. "\\lib\\vc_dll\\\wxmsw28ud_*.dll\" \"Debug\\\"",
-					"xcopy /S /Y \"" .. wxLocation .. "\\lib\\vc_dll\\\wxbase28u_*.dll\" \"Release\\\"",
-					"xcopy /S /Y \"" .. wxLocation .. "\\lib\\vc_dll\\\wxmsw28u_*.dll\" \"Release\\\""
+					"xcopy /S /Y \"" .. wxLocation .. "\\lib\\vc_dll\\\wxbase*ud_*.dll\" \"Debug\\\"",
+					"xcopy /S /Y \"" .. wxLocation .. "\\lib\\vc_dll\\\wxmsw*ud_*.dll\" \"Debug\\\"",
+					"xcopy /S /Y \"" .. wxLocation .. "\\lib\\vc_dll\\\wxbase*u_*.dll\" \"Release\\\"",
+					"xcopy /S /Y \"" .. wxLocation .. "\\lib\\vc_dll\\\wxmsw*u_*.dll\" \"Release\\\""
 				});
 			else 
 				error("wxWidgets DLLs not found.  You need to build the wxWidgets library (Unicode Debug and Unicode Release configurations). " ..
 						"Use the Visual Studio solution provided by wxWidgets to build the libraries \n" .. 
-						"1) Download wxPack. Install to a C:\\users\\[user]\\wxWidgets directory \n" ..
-						"2) Open Solution wx.dsw located build\msw directory\n" .. 
-						"3) Select 'DLL Debug Unicode' from Configuration Manager\n" .. 
+						"1) Download wxWidgets >= 2.9.4. Install to a C:\\users\\[user]\\wxWidgets directory \n" ..
+						"2) Open Solution wx_vc9.sln located build\msw directory\n" .. 
+						"3) Select 'DLL Debug' from Configuration Manager\n" .. 
 						"4) Build Entire Solution\n" .. 
-						"5) Select 'DLL Release Unicode' from Configuration Manager\n" .. 
-						"6) Build Entire Solution\n" .. 
-						"7) Open Solution stc.dsw located in contrib\build\msw directory\n" .. 
-						"8) Select 'DLL Debug Unicode' from Configuration Manager\n" .. 
-						"9) Build Entire Solution\n" .. 
-						"10) Select 'DLL Release Unicode' from Configuration Manager\n" .. 
-						"11) Build Entire Solution\n")
+						"5) Select 'DLL Release' from Configuration Manager\n" .. 
+						"6) Build Entire Solution\n")
 			end
 		else 
 			print "WXWIN environment variable not found. Generated Solution file WILL NOT WORK. Please install wxPack."

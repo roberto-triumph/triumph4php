@@ -108,7 +108,7 @@ FileSearchDialogGeneratedClass::FileSearchDialogGeneratedClass( wxWindow* parent
 	BoxSizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* FlexSizer;
-	FlexSizer = new wxFlexGridSizer( 3, 1, 0, 0 );
+	FlexSizer = new wxFlexGridSizer( 4, 1, 0, 0 );
 	FlexSizer->AddGrowableCol( 0 );
 	FlexSizer->AddGrowableRow( 2 );
 	FlexSizer->SetFlexibleDirection( wxBOTH );

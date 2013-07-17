@@ -116,7 +116,7 @@ static int BrowserIconsIndex(std::vector<wxBitmap>&  browserIcons, const wxStrin
  * will determine what browser icon we use
  */
 static void BrowserIconsMenuSet(std::vector<wxBitmap>&  browserIcons, wxMenuItem* menuItem) {
-	int index = BrowserIconsIndex(browserIcons, menuItem->GetLabel());
+	int index = BrowserIconsIndex(browserIcons, menuItem->GetItemLabelText());
 	if (index >= 0 && index < (int)browserIcons.size()) {
 		menuItem->SetBitmap(browserIcons[index]);
 	}
@@ -452,4 +452,3 @@ BEGIN_EVENT_TABLE(mvceditor::RunBrowserFeatureClass, wxEvtHandler)
 	EVT_APP_FILE_SAVED(mvceditor::RunBrowserFeatureClass::OnFileSaved)
 	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR, mvceditor::RunBrowserFeatureClass::OnUrlDetectionComplete)
 END_EVENT_TABLE()
-

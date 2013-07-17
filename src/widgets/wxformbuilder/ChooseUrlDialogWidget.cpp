@@ -17,7 +17,7 @@ ChooseUrlDialogGeneratedClass::ChooseUrlDialogGeneratedClass( wxWindow* parent, 
 	BodySizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* GridSizer;
-	GridSizer = new wxFlexGridSizer( 3, 1, 0, 0 );
+	GridSizer = new wxFlexGridSizer( 6, 1, 0, 0 );
 	GridSizer->AddGrowableCol( 0 );
 	GridSizer->AddGrowableRow( 2 );
 	GridSizer->SetFlexibleDirection( wxBOTH );
@@ -54,7 +54,7 @@ ChooseUrlDialogGeneratedClass::ChooseUrlDialogGeneratedClass( wxWindow* parent, 
 	GridSizer->Add( FilterSizer, 1, wxEXPAND, 5 );
 	
 	wxFlexGridSizer* TopSizer;
-	TopSizer = new wxFlexGridSizer( 1, 4, 0, 0 );
+	TopSizer = new wxFlexGridSizer( 1, 1, 0, 0 );
 	TopSizer->AddGrowableCol( 0 );
 	TopSizer->SetFlexibleDirection( wxBOTH );
 	TopSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );

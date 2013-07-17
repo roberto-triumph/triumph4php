@@ -373,10 +373,6 @@ void mvceditor::MainFrameClass::PreferencesSaved() {
 	Notebook->RefreshCodeControlOptions();
 }
 
-void Recurse(wxFont& font, wxWindow* window) {
-	
-}
-
 void mvceditor::MainFrameClass::SetApplicationFont() {
 	
 	// ATTN: this method will only work on startup (before the
@@ -385,18 +381,23 @@ void mvceditor::MainFrameClass::SetApplicationFont() {
 	// drawn on the screen
 
 	// so that all dialogs / panels use the same font
-	SetFont(Preferences.ApplicationFont);
-	
-	// so that the tabs use the same font
-	Notebook->SetFont(Preferences.ApplicationFont);
-	Notebook->SetNormalFont(Preferences.ApplicationFont);
-	ToolsNotebook->SetFont(Preferences.ApplicationFont);
-	ToolsNotebook->SetNormalFont(Preferences.ApplicationFont);
-	OutlineNotebook->SetFont(Preferences.ApplicationFont);
-	OutlineNotebook->SetNormalFont(Preferences.ApplicationFont);
-	
-	// so that the toolbar buttons use the same font
-	ToolBar->SetFont(Preferences.ApplicationFont);
+	// ATTN: on linux, default fonts are too big
+	//       this code makes them smaller
+	wxPlatformInfo info;
+	if (info.GetOperatingSystemId() != wxOS_WINDOWS_NT) {
+		SetFont(Preferences.ApplicationFont);
+		
+		// so that the tabs use the same font
+		Notebook->SetFont(Preferences.ApplicationFont);
+		Notebook->SetNormalFont(Preferences.ApplicationFont);
+		ToolsNotebook->SetFont(Preferences.ApplicationFont);
+		ToolsNotebook->SetNormalFont(Preferences.ApplicationFont);
+		OutlineNotebook->SetFont(Preferences.ApplicationFont);
+		OutlineNotebook->SetNormalFont(Preferences.ApplicationFont);
+		
+		// so that the toolbar buttons use the same font
+		ToolBar->SetFont(Preferences.ApplicationFont);
+	}
 }
 
 void mvceditor::MainFrameClass::PreferencesExternallyUpdated() {
@@ -801,7 +802,12 @@ void mvceditor::MainFrameClass::OnAnyAuiNotebookEvent(wxAuiNotebookEvent& event)
 
 void mvceditor::MainFrameClass::OnAnyAuiToolbarEvent(wxAuiToolBarEvent& event) {
 	App.EventSink.Publish(event);
-	event.Skip();
+
+	// ATTN: not skipping these event for now, in wxWidgets 2.9 if the tooldropdown event
+	// is skipped then a crash will occur
+	if (!event.IsDropDownClicked()) {
+		event.Skip();
+	}
 }
 
 void mvceditor::MainFrameClass::UpdateTitleBar() {
@@ -925,7 +931,7 @@ BEGIN_EVENT_TABLE(mvceditor::MainFrameClass,  MainFrameGeneratedClass)
 	EVT_AUINOTEBOOK_PAGE_CHANGING(wxID_ANY, mvceditor::MainFrameClass::OnAnyAuiNotebookEvent)
 	EVT_AUINOTEBOOK_PAGE_CLOSE(wxID_ANY, mvceditor::MainFrameClass::OnAnyAuiNotebookEvent)
 	EVT_AUINOTEBOOK_PAGE_CLOSED(wxID_ANY, mvceditor::MainFrameClass::OnAnyAuiNotebookEvent) 
-	
+
 	// make sure the tool bar events are propagated to the app event sink
 	EVT_AUITOOLBAR_BEGIN_DRAG(wxID_ANY, mvceditor::MainFrameClass::OnAnyAuiToolbarEvent)
 	EVT_AUITOOLBAR_MIDDLE_CLICK(wxID_ANY, mvceditor::MainFrameClass::OnAnyAuiToolbarEvent)

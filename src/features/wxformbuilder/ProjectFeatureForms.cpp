@@ -21,27 +21,38 @@ ProjectPreferencesGeneratedPanelClass::ProjectPreferencesGeneratedPanelClass( wx
 	wxStaticBoxSizer* StaticBoxSizerExplorer;
 	StaticBoxSizerExplorer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("label") ), wxVERTICAL );
 	
-	wxGridBagSizer* GridBagSizer;
-	GridBagSizer = new wxGridBagSizer( 0, 0 );
-	GridBagSizer->AddGrowableCol( 1 );
-	GridBagSizer->SetFlexibleDirection( wxBOTH );
-	GridBagSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	wxFlexGridSizer* GridSizer;
+	GridSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	GridSizer->AddGrowableCol( 0 );
+	GridSizer->AddGrowableRow( 0 );
+	GridSizer->SetFlexibleDirection( wxBOTH );
+	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxBoxSizer* LabelSizer;
+	LabelSizer = new wxBoxSizer( wxVERTICAL );
 	
 	HelpText = new wxStaticText( this, wxID_ANY, _("MVC Editor will use this program whenever the \"Explore\" button is clicked."), wxDefaultPosition, wxDefaultSize, 0 );
 	HelpText->Wrap( -1 );
-	GridBagSizer->Add( HelpText, wxGBPosition( 0, 0 ), wxGBSpan( 1, 2 ), wxALL, 5 );
+	LabelSizer->Add( HelpText, 0, wxALL, 5 );
+	
+	GridSizer->Add( LabelSizer, 1, wxEXPAND, 5 );
+	
+	wxBoxSizer* FileSizer;
+	FileSizer = new wxBoxSizer( wxHORIZONTAL );
 	
 	Label = new wxStaticText( this, wxID_ANY, _("Explorer Executable"), wxDefaultPosition, wxDefaultSize, 0 );
 	Label->Wrap( -1 );
-	GridBagSizer->Add( Label, wxGBPosition( 1, 0 ), wxGBSpan( 1, 1 ), wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	FileSizer->Add( Label, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	ExplorerExecutable = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	GridBagSizer->Add( ExplorerExecutable, wxGBPosition( 1, 1 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
+	FileSizer->Add( ExplorerExecutable, 1, wxALL|wxEXPAND, 5 );
 	
 	FilePicker = new wxFilePickerCtrl( this, wxID_ANY, wxEmptyString, _("Select a file"), wxT("*"), wxDefaultPosition, wxDefaultSize, wxFLP_FILE_MUST_EXIST|wxFLP_OPEN );
-	GridBagSizer->Add( FilePicker, wxGBPosition( 1, 2 ), wxGBSpan( 1, 1 ), wxALL, 5 );
+	FileSizer->Add( FilePicker, 0, wxALL, 5 );
 	
-	StaticBoxSizerExplorer->Add( GridBagSizer, 1, wxEXPAND, 5 );
+	GridSizer->Add( FileSizer, 1, wxEXPAND, 5 );
+	
+	StaticBoxSizerExplorer->Add( GridSizer, 1, wxEXPAND, 5 );
 	
 	fgSizer2->Add( StaticBoxSizerExplorer, 1, wxALL|wxEXPAND, 5 );
 	
@@ -207,7 +218,7 @@ ProjectSourceDialogGeneratedClass::ProjectSourceDialogGeneratedClass( wxWindow* 
 	BoxSizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* FlexGridSizer;
-	FlexGridSizer = new wxFlexGridSizer( 6, 1, 0, 0 );
+	FlexGridSizer = new wxFlexGridSizer( 8, 1, 0, 0 );
 	FlexGridSizer->AddGrowableCol( 0 );
 	FlexGridSizer->AddGrowableRow( 0 );
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );
@@ -349,5 +360,55 @@ ProjectListDialogGeneratedClass::~ProjectListDialogGeneratedClass()
 	ButtonsSizerCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnCancelButton ), NULL, this );
 	ButtonsSizerHelp->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnHelpButton ), NULL, this );
 	ButtonsSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ProjectListDialogGeneratedClass::OnOkButton ), NULL, this );
+	
+}
+
+MultipleSelectDialogGeneratedClass::MultipleSelectDialogGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* bSizer7;
+	bSizer7 = new wxBoxSizer( wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizer7;
+	fgSizer7 = new wxFlexGridSizer( 3, 1, 0, 0 );
+	fgSizer7->AddGrowableCol( 0 );
+	fgSizer7->AddGrowableRow( 1 );
+	fgSizer7->SetFlexibleDirection( wxBOTH );
+	fgSizer7->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	Label = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	Label->Wrap( -1 );
+	fgSizer7->Add( Label, 1, wxALL|wxEXPAND, 5 );
+	
+	wxArrayString ChecklistChoices;
+	Checklist = new wxCheckListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, ChecklistChoices, wxLB_NEEDED_SB|wxLB_SINGLE );
+	fgSizer7->Add( Checklist, 1, wxALL|wxEXPAND, 5 );
+	
+	ButtonsSizer = new wxStdDialogButtonSizer();
+	ButtonsSizerOK = new wxButton( this, wxID_OK );
+	ButtonsSizer->AddButton( ButtonsSizerOK );
+	ButtonsSizerCancel = new wxButton( this, wxID_CANCEL );
+	ButtonsSizer->AddButton( ButtonsSizerCancel );
+	ButtonsSizer->Realize();
+	fgSizer7->Add( ButtonsSizer, 1, wxEXPAND, 5 );
+	
+	bSizer7->Add( fgSizer7, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( bSizer7 );
+	this->Layout();
+	
+	this->Centre( wxBOTH );
+	
+	// Connect Events
+	ButtonsSizerCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MultipleSelectDialogGeneratedClass::OnCancelButton ), NULL, this );
+	ButtonsSizerOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MultipleSelectDialogGeneratedClass::OnOkButton ), NULL, this );
+}
+
+MultipleSelectDialogGeneratedClass::~MultipleSelectDialogGeneratedClass()
+{
+	// Disconnect Events
+	ButtonsSizerCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MultipleSelectDialogGeneratedClass::OnCancelButton ), NULL, this );
+	ButtonsSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MultipleSelectDialogGeneratedClass::OnOkButton ), NULL, this );
 	
 }

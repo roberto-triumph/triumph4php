@@ -31,18 +31,6 @@
 #include <iostream>
 
 /**
- * overload the stream operator so that UnitTest++ shows legible error messages when asserts fail. For now, s
- * is assumed to contain only ASCII characters.
- */
-std::ostream& operator<<(std::ostream& out, const wxString& s);
-
-/**
- * overload the stream operator so that UnitTest++ shows legible error messages when asserts fail. For now, s
- * is assumed to contain only ASCII characters.
- */
-std::ostream& operator<<(std::ostream& out, const wxChar* s);
-
-/**
  * This test fixture is useful for testing classes that read from files.
  */
 class FileTestFixtureClass {

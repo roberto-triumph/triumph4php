@@ -670,7 +670,7 @@ void mvceditor::SqlBrowserFeatureClass::DetectMetadata() {
 }
 
 void mvceditor::SqlBrowserFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
-	wxMenu* sqlMenu = new wxMenu(0);
+	wxMenu* sqlMenu = new wxMenu();
 	sqlMenu->Append(mvceditor::MENU_SQL + 0, _("SQL Browser\tSHIFT+F9"), _("Open a window for SQL browsing"),
 		wxITEM_NORMAL);
 	sqlMenu->Append(mvceditor::MENU_SQL + 1, _("SQL Connections\tCTRL+F9"), _("Show & Pick The SQL Connections that this project uses"),
@@ -960,7 +960,6 @@ void mvceditor::SqlBrowserFeatureClass::SavePreferences() {
 	// modification check fails and the user will not be prompted to reload the config
 	App.UpdateConfigModifiedTime();
 }
-
 BEGIN_EVENT_TABLE(mvceditor::SqlBrowserFeatureClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_SQL + 0, mvceditor::SqlBrowserFeatureClass::OnSqlBrowserToolsMenu)	
 	EVT_MENU(mvceditor::MENU_SQL + 1, mvceditor::SqlBrowserFeatureClass::OnSqlConnectionMenu)

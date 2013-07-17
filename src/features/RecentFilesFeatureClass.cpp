@@ -41,7 +41,7 @@ void mvceditor::RecentFilesFeatureClass::AddFileMenuItems(wxMenu* fileMenu) {
 	//     not be registered properly.
 	//
 	// wont worry about that for now since project menu items don't have accelerators automatically
-	RecentFilesMenu = new wxMenu(0);
+	RecentFilesMenu = new wxMenu();
 	FileHistory.UseMenu(RecentFilesMenu);
 	fileMenu->Append(mvceditor::MENU_RECENT_FILES + MAX_RECENT_FILES + 1, _("Recent Files"),  RecentFilesMenu, _("Recent Files"));
 }

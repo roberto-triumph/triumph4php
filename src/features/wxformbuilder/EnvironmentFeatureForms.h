@@ -133,7 +133,7 @@ class ApacheEnvironmentPanelGeneratedClass : public wxPanel
 	
 	public:
 		
-		ApacheEnvironmentPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
+		ApacheEnvironmentPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 564,456 ), long style = wxTAB_TRAVERSAL );
 		~ApacheEnvironmentPanelGeneratedClass();
 	
 };

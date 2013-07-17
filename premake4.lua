@@ -68,7 +68,10 @@ function wxconfiguration(config, action)
 
 		-- wxWidgets framework needs these
 		-- tell wxWidgets to import DLL symbols
-		defines { "WIN32", "_DEBUG", "_WINDOWS", "WXUSINGDLL" }
+		-- wxwidgets uses "unsafe" functions, kill these warnings
+		-- although the flag is technically not needed since wx/defs.h sets the #define, 
+		-- we do it here because not all profiler programs include the entire wxWidgets framework
+		defines { "WIN32", "_DEBUG", "_WINDOWS", "WXUSINGDLL", "NOPCH", "_CRT_SECURE_NO_WARNINGS" }
 
 		-- enable the "Use Unicode Character Set" option under General .. Character Set
 		-- wxWidgets needs this in order to link properly
@@ -83,7 +86,8 @@ function wxconfiguration(config, action)
 
 		-- wxWidgets framework needs these
 		-- tell wxWidgets to import DLL symbols
-		defines { "WIN32", "_WINDOWS", "__WXMSW__", "WXUSINGDLL" }
+		-- wxwidgets uses "unsafe" functions, kill these warnings
+		defines { "WIN32", "_WINDOWS", "__WXMSW__", "WXUSINGDLL", "NDEBUG", "NOPCH", "_CRT_SECURE_NO_WARNINGS" }
 
 		-- enable the "Use Unicode Character Set" option under General .. Character Set
 		-- wxWidgets needs this in order to link properly
@@ -101,6 +105,8 @@ function wxappconfiguration(config, action)
 
 		-- prevent the  "error LNK2019: unresolved external symbol _main referenced in function ___tmainCRTStartup
 		flags { "WinMain" }
+		resdefines { "__WXMSW__", "NDEBUG", "_UNICODE", "WXUSINGDLL", "_WINDOWS", "NOPCH" }
+		resincludedirs { "src/" }
 	end
 
 	if config == "Debug" and (action == "gmake" or action == "codelite") then
@@ -201,7 +207,7 @@ solution "mvc-editor"
 	project "mvc-editor"
 		language "C++"
 		kind "WindowedApp"
-		files { "src/**.cpp", "src/**.h", "*.lua", "src/**.re, src/**.y, src/**.hpp", "README.md" }
+		files { "src/**.cpp", "src/**.h", "*.lua", "src/**.re, src/**.y, src/**.hpp", "README.md", "src/mvceditor.rc" }
 		includedirs { "src/", "lib/keybinder/include/", "lib/pelet/include" }
 		links { "tests", "keybinder", "pelet" }
 
@@ -218,18 +224,16 @@ solution "mvc-editor"
 			wxconfiguration("Release", _ACTION)
 			wxappconfiguration("Release", _ACTION)
 		configuration { "Debug", "vs2008" }
-			includedirs { "$(WXWIN)/contrib/include/" }
-			links { "wxmsw28ud_stc" }
+			links { WX_LIB_STC_DEBUG }
 			postbuildcommands { "cd " .. normalizepath("Debug") .. " && tests.exe --all" }
 		configuration { "Debug", "gmake or codelite" }
-			links { "wx_gtk2ud_stc-2.8" }
+			links { WX_LIB_STC_DEBUG }
 			postbuildcommands { "cd " .. normalizepath("Debug") .. " && ./tests --all" }
 		configuration { "Release", "vs2008" }
-			includedirs { "$(WXWIN)/contrib/include/" }
-			links { "wxmsw28u_stc" }
+			links { WX_LIB_STC_RELEASE }
 			postbuildcommands { "cd " .. normalizepath("Release") .. " && tests.exe --all"  }
 		configuration { "Release", "gmake or codelite" }
-			links { "wx_gtk2u_stc-2.8" }
+			links { WX_LIB_STC_RELEASE }
 			postbuildcommands { "cd " .. normalizepath("Release") .. " && ./tests --all" }
 
 	project "tests"
@@ -408,16 +412,10 @@ solution "mvc-editor"
 			wxconfiguration("Release", _ACTION)
 			wxappconfiguration("Release", _ACTION)
 			icuconfiguration("Release", _ACTION)
-		configuration { "Debug", "vs2008" }
-			includedirs { "$(WXWIN)/contrib/include/" }
-			links {  "wxmsw28ud_stc" }
-		configuration {"Debug", "gmake or codelite"}
-			links { "wx_gtk2ud_stc-2.8" }
-		configuration { "Release", "vs2008" }
-			includedirs { "$(WXWIN)/contrib/include/" }
-			links {  "wxmsw28u_stc" }
-		configuration {"Release", "gmake or codelite"}
-			links { "wx_gtk2u_stc-2.8" }
+		configuration { "Debug" }
+			links {  WX_LIB_STC_DEBUG }
+		configuration { "Release" }
+			links {  WX_LIB_STC_RELEASE }
 
 	project "unit_test++"
 		language "C++"
@@ -568,16 +566,10 @@ solution "mvc-editor"
 			pickywarnings(_ACTION)
 			wxconfiguration("Release", _ACTION)
 			wxappconfiguration("Release", _ACTION)
-		configuration { "Debug", "vs2008" }
-			includedirs { WX_STC_INCLUDE_DIRS }
-			links {  "wxmsw28ud_stc" }
-		configuration {"Debug", "gmake or codelite"}
-			links { "wx_gtk2ud_stc-2.8" }
-		configuration { "Release", "vs2008" }
-			includedirs { WX_STC_INCLUDE_DIRS }
-			links {  "wxmsw28u_stc" }
-		configuration {"Release", "gmake or codelite"}
-			links { "wx_gtk2u_stc-2.8" }
+		configuration { "Debug" }
+			links {  WX_LIB_STC_DEBUG }
+		configuration { "Release" }
+			links {  WX_LIB_STC_RELEASE }
 
 	project "wx_window_tutorial"
 		language "C++"

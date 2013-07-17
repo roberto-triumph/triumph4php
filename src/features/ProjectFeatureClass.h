@@ -241,6 +241,33 @@ private:
 
 };
 
+/**
+ * class to show a checklist of choices and allow to user to select one or more.
+ */
+class MultipleSelectDialogClass : public MultipleSelectDialogGeneratedClass {
+
+public:
+
+	/**
+	 * @param parent the parent window
+	 * @param title the title of the dialog
+	 * @Param caption text shown in the dialog
+	 * @param choices the items to display
+	 * @param selections the indices of the chosen items will be pushed into this vector
+	 */
+	MultipleSelectDialogClass(wxWindow* parent, const wxString& title, const wxString& caption, std::vector<wxString>& choices, std::vector<int>& selections);
+
+protected:
+
+	void OnOkButton(wxCommandEvent& event);
+
+	void OnCancelButton(wxCommandEvent& event);
+
+private:
+
+	std::vector<int>& Selections;
+};
+
 }
 
 #endif

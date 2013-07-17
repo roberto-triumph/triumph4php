@@ -151,7 +151,6 @@ void mvceditor::ExplorerFeatureClass::OnProjectExplore(wxCommandEvent& event) {
 
 void mvceditor::ExplorerFeatureClass::OnExplorerToolDropDown(wxAuiToolBarEvent& event) {
 	if (!event.IsDropDownClicked()) {
-		event.Skip();
 		return;
 	}
 	ExplorerToolBar->SetToolSticky(event.GetId(), true);

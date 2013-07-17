@@ -865,7 +865,7 @@ void mvceditor::DetectorFeatureClass::AddViewMenuItems(wxMenu* menu) {
 }
 
 void mvceditor::DetectorFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
-	wxMenu* menu = new wxMenu(0);
+	wxMenu* menu = new wxMenu();
 	menu->Append(mvceditor::MENU_DETECTORS + 5, _("Run URL Detection"), _("Run the URL Detectors against the current projects"), wxITEM_NORMAL);
 	menu->Append(mvceditor::MENU_DETECTORS + 6, _("Run Template File Detection"), _("Run the Template file Detectors against the current projects"), wxITEM_NORMAL);
 	menu->Append(mvceditor::MENU_DETECTORS + 7, _("Run Tag Detection"), _("Run the Tag Detectors against the current projects"), wxITEM_NORMAL);

@@ -99,7 +99,7 @@ public:
 
 	EditorMessagesLoggerClass(EditorMessagesFeatureClass& feature);
 
-	void DoLog(wxLogLevel level, const wxChar *msg, time_t timestamp);
+	void DoLogRecord(wxLogLevel level, const wxString &msg, const wxLogRecordInfo &info);
 
 private:
 

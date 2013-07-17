@@ -17,7 +17,7 @@ TagSearchDialogGeneratedClass::TagSearchDialogGeneratedClass( wxWindow* parent, 
 	BoxSizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* FlexGridSizer;
-	FlexGridSizer = new wxFlexGridSizer( 5, 1, 0, 0 );
+	FlexGridSizer = new wxFlexGridSizer( 6, 1, 0, 0 );
 	FlexGridSizer->AddGrowableCol( 0 );
 	FlexGridSizer->AddGrowableRow( 4 );
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );

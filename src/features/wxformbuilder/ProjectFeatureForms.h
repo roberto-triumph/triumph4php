@@ -16,10 +16,9 @@
 #include <wx/font.h>
 #include <wx/colour.h>
 #include <wx/settings.h>
+#include <wx/sizer.h>
 #include <wx/textctrl.h>
 #include <wx/filepicker.h>
-#include <wx/gbsizer.h>
-#include <wx/sizer.h>
 #include <wx/statbox.h>
 #include <wx/panel.h>
 #include <wx/listbox.h>
@@ -165,6 +164,32 @@ class ProjectListDialogGeneratedClass : public wxDialog
 		
 		ProjectListDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Defined Projects"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 504,507 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~ProjectListDialogGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class MultipleSelectDialogGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class MultipleSelectDialogGeneratedClass : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* Label;
+		wxCheckListBox* Checklist;
+		wxStdDialogButtonSizer* ButtonsSizer;
+		wxButton* ButtonsSizerOK;
+		wxButton* ButtonsSizerCancel;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		MultipleSelectDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 355,249 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		~MultipleSelectDialogGeneratedClass();
 	
 };
 

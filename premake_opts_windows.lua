@@ -63,30 +63,32 @@ ICU_INCLUDE_DIR = icuDir .. "/include/"
 -- wxWidgets DLLs to the Debug directory, otherwise the wxWidgets library
 -- will not be found at runtime (ie. when you try to execute mvc-editor.exe).
 -- Also, if you build wxWidgets yourself, you will need to build the Unicode
--- DLL versions, AND make sure to compile the wxStyledTextCtrl that is located
--- in the contrib directory of the wxWidgets distribution
+-- DLL versions
 --
 -- Consult the wxWidgets for more info if necessary
 --
 -- these are the core wxWidgets debug libraries and their Win32 dependencies (win dependencies listed first)
 WX_LIBS_DEBUG = {
-	"winmm", "comctl32", "rpcrt4", "wsock32", "odbc32",
-	"wxmsw28ud_core", "wxbase28ud_net", "wxbase28ud", "wxexpatd", "wxjpegd", "wxpngd", "wxregexud",
+	"winmm", "comctl32", "rpcrt4", "wsock32", "wininet",
+	"wxmsw29ud_core", "wxbase29ud_net", "wxbase29ud", "wxexpatd", "wxjpegd", "wxpngd", "wxregexud",
 	"wxtiffd", "wxzlibd"
 }
 
 -- these are the core wxWidgets Release libraries and their Win32 dependencies (win dependencies listed first)
 WX_LIBS_RELEASE = {
-	"winmm", "comctl32", "rpcrt4", "wsock32", "odbc32",
-	"wxmsw28u_core", "wxbase28u_net", "wxbase28u", "wxexpat", "wxjpeg", "wxpng", "wxregexu",
+	"winmm", "comctl32", "rpcrt4", "wsock32", "wininet",
+	"wxmsw29u_core", "wxbase29u_net", "wxbase29u", "wxexpat", "wxjpeg", "wxpng", "wxregexu",
 	"wxtiff", "wxzlib"
 }
 
 -- the wxWidgets GUI debug libraries
-WX_LIBS_WINDOW_DEBUG = { "wxmsw28ud_adv", "wxmsw28ud_aui", "wxmsw28ud_html" }
+WX_LIBS_WINDOW_DEBUG = { "wxmsw29ud_adv", "wxmsw29ud_aui", "wxmsw29ud_html" }
 
 -- the wxWidgets GUI release libraries
-WX_LIBS_WINDOW_RELEASE = { "wxmsw28u_adv", "wxmsw28u_aui", "wxmsw28u_html" }
+WX_LIBS_WINDOW_RELEASE = { "wxmsw29u_adv", "wxmsw29u_aui", "wxmsw29u_html" }
+
+-- the styled text control library
+WX_LIB_STC_DEBUG = "wxmsw29ud_stc"
 
 -- NOTE: for this configuration to work correctly a WXWIN environment variable must be defined and
 -- must point to the location of wxWidgets
@@ -97,10 +99,8 @@ WX_INCLUDE_DIRS_DEBUG = { "$(WXWIN)/include/", "$(WXWIN)/lib/vc_dll/mswud/" }
 -- must point to the location of wxWidgets
 WX_INCLUDE_DIRS_RELEASE =  { "$(WXWIN)/include/", "$(WXWIN)/lib/vc_dll/mswu/" }
 
--- NOTE: for this configuration to work correctly a WXWIN environment variable must be defined and
--- must point to the location of wxWidgets
-WX_STC_INCLUDE_DIRS = "$(WXWIN)/contrib/include/"
-
+-- the styled text control library
+WX_LIB_STC_RELEASE = "wxmsw29u_stc"
 
 -- location of the cmake executable. cmake is used to build the SOCI
 -- library (Database Access wrapper)

@@ -172,16 +172,4 @@ wxFileName FileTestFixtureClass::AbsoluteDir(const wxString& dirName) {
 	fileName.AssignDir(TestProjectDir);
 	fileName.AppendDir(dirName);
 	return fileName;
-
-}
-
-std::ostream& operator<<(std::ostream& out, const wxString& s) {
-	out << s.ToAscii();
-	return out;	
-}
-
-std::ostream& operator<<(std::ostream& out, const wxChar* s) {
-	wxString str(s);
-	out << str.ToAscii();
-	return out;	
 }

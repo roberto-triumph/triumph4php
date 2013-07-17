@@ -168,19 +168,19 @@ mvceditor::AppClass::~AppClass() {
 bool mvceditor::AppClass::CommandLine() {
 	bool ret = true;
 	wxCmdLineEntryDesc description[3];
-	description[0].description = wxT("File name to open on startup");
+	description[0].description = "File name to open on startup";
 	description[0].flags =  wxCMD_LINE_PARAM_OPTIONAL;
 	description[0].kind = wxCMD_LINE_OPTION;
-	description[0].longName = wxT("file");
-	description[0].shortName = wxT("f");
+	description[0].longName = "file";
+	description[0].shortName = "f";
 	description[0].type = wxCMD_LINE_VAL_STRING;
-	description[1].description = wxT("Project to open on startup");
+	description[1].description = "Project to open on startup";
 	description[1].flags =  wxCMD_LINE_PARAM_OPTIONAL;
 	description[1].kind = wxCMD_LINE_OPTION;
-	description[1].longName = wxT("project");
-	description[1].shortName = wxT("p");
+	description[1].longName = "project";
+	description[1].shortName = "p";
 	description[1].type = wxCMD_LINE_VAL_STRING;
-	description[2].description = wxT("");
+	description[2].description = "";
 	description[2].flags =  0;
 	description[2].kind = wxCMD_LINE_NONE;
 	description[2].longName = NULL;
@@ -221,6 +221,7 @@ void mvceditor::AppClass::CreateFeatures() {
 	Features.push_back(feature);
 	feature = new LintFeatureClass(*this);
 	Features.push_back(feature);
+
 	feature = new SqlBrowserFeatureClass(*this);
 	Features.push_back(feature);
 

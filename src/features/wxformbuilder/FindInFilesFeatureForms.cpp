@@ -17,9 +17,8 @@ FindInFilesDialogGeneratedClass::FindInFilesDialogGeneratedClass( wxWindow* pare
 	BoxSizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* FlexGridSizer;
-	FlexGridSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	FlexGridSizer = new wxFlexGridSizer( 5, 1, 0, 0 );
 	FlexGridSizer->AddGrowableCol( 0 );
-	FlexGridSizer->AddGrowableRow( 0 );
 	FlexGridSizer->SetFlexibleDirection( wxVERTICAL );
 	FlexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -183,7 +182,7 @@ FindInFilesResultsPanelGeneratedClass::FindInFilesResultsPanelGeneratedClass( wx
 	BoxSizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* FlexGridSizer;
-	FlexGridSizer = new wxFlexGridSizer( 1, 1, 0, 0 );
+	FlexGridSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
 	FlexGridSizer->AddGrowableCol( 0 );
 	FlexGridSizer->AddGrowableRow( 1 );
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );

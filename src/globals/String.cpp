@@ -60,8 +60,9 @@ UnicodeString mvceditor::WxToIcu(wxString wx) {
 	UnicodeString uni;
 	int actualCount = 0;
 
-	size_t rawLength;
-	wxCharBuffer buf = wxConvUTF8.cWC2MB(wx.c_str(), wx.length() + 1, &rawLength);
+	
+	wxScopedCharBuffer buf = wx.utf8_str();
+	size_t rawLength = buf.length();
 
 	// 5th param is meant to be in bytes not chars
 	// +1 = make room for the NULL terminator
@@ -162,7 +163,7 @@ int32_t mvceditor::FindPrevious(const UnicodeString& text, const UnicodeString& 
  * when source is known to be an ascii string.
  */
 std::string mvceditor::WxToChar(const wxString& source) {
-	std::string s = std::string(source.ToUTF8());
+	std::string s = source.ToStdString();
 	return s;
 }
 
