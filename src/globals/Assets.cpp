@@ -27,7 +27,7 @@
 #include <wx/image.h>
 
 wxFileName mvceditor::NativeFunctionsAsset() {
-	wxStandardPaths paths;
+	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName pathExecutableFileName(paths.GetExecutablePath());
 	wxString nativeFileName = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
 	                          wxT("..") + wxFileName::GetPathSeparator() +
@@ -39,7 +39,7 @@ wxFileName mvceditor::NativeFunctionsAsset() {
 }
 
 wxFileName mvceditor::ResourceSqlSchemaAsset() {
-	wxStandardPaths paths;
+	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName pathExecutableFileName(paths.GetExecutablePath());
 	wxString nativeFileName = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
 	                          wxT("..") + wxFileName::GetPathSeparator() +
@@ -55,7 +55,7 @@ wxBitmap mvceditor::AutoCompleteImageAsset(wxString imageName) {
 	if (!wxImage::FindHandler(wxBITMAP_TYPE_XPM)) {
 		wxImage::AddHandler(new wxXPMHandler);	
 	}
-	wxStandardPaths paths;
+	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName pathExecutableFileName(paths.GetExecutablePath());
 	wxString nativeFileName = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
 	                          wxT("..") + wxFileName::GetPathSeparator() +
@@ -76,7 +76,7 @@ wxBitmap mvceditor::IconImageAsset(wxString imageName) {
 		wxImage::AddHandler(new wxPNGHandler());	
 	}
 	wxBitmap bitmap;
-	wxStandardPaths paths;
+	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName pathExecutableFileName(paths.GetExecutablePath());
 	wxString nativeFileName = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
 	                          wxT("..") + wxFileName::GetPathSeparator() +
@@ -93,7 +93,7 @@ wxBitmap mvceditor::IconImageAsset(wxString imageName) {
 
 
 wxFileName mvceditor::PhpDetectorsBaseAsset() {
-	wxStandardPaths paths;
+	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName pathExecutableFileName(paths.GetExecutablePath());
 	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
 		wxT("..") + wxFileName::GetPathSeparator() +
@@ -105,7 +105,7 @@ wxFileName mvceditor::PhpDetectorsBaseAsset() {
 }
 
 wxFileName mvceditor::UrlTagDetectorsGlobalAsset() {
-	wxStandardPaths paths;
+	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName pathExecutableFileName(paths.GetExecutablePath());
 	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
 		wxT("..") + wxFileName::GetPathSeparator() +
@@ -118,7 +118,7 @@ wxFileName mvceditor::UrlTagDetectorsGlobalAsset() {
 }
 
 wxFileName mvceditor::UrlTagDetectorsLocalAsset() {
-	wxStandardPaths paths;
+	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName configDir = mvceditor::ConfigDirAsset();
 	configDir.AppendDir(wxT("url_detectors"));
 	if (!configDir.DirExists()) {
@@ -128,7 +128,7 @@ wxFileName mvceditor::UrlTagDetectorsLocalAsset() {
 }
 
 wxFileName mvceditor::TemplateFilesDetectorsGlobalAsset() {
-	wxStandardPaths paths;
+	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName pathExecutableFileName(paths.GetExecutablePath());
 	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
 		wxT("..") + wxFileName::GetPathSeparator() +
@@ -141,7 +141,7 @@ wxFileName mvceditor::TemplateFilesDetectorsGlobalAsset() {
 }
 
 wxFileName mvceditor::TemplateFileTagsDetectorsLocalAsset() {
-	wxStandardPaths paths;
+	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName configDir = mvceditor::ConfigDirAsset();
 	configDir.AppendDir(wxT("template_files_detectors"));
 	if (!configDir.DirExists()) {
@@ -151,7 +151,7 @@ wxFileName mvceditor::TemplateFileTagsDetectorsLocalAsset() {
 }
 
 wxFileName mvceditor::TagDetectorsLocalAsset() {
-	wxStandardPaths paths;
+	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName configDir = mvceditor::ConfigDirAsset();
 	configDir.AppendDir(wxT("tag_detectors"));
 	if (!configDir.DirExists()) {
@@ -161,7 +161,7 @@ wxFileName mvceditor::TagDetectorsLocalAsset() {
 }
 
 wxFileName mvceditor::TagDetectorsGlobalAsset() {
-	wxStandardPaths paths;
+	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName pathExecutableFileName(paths.GetExecutablePath());
 	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
 		wxT("..") + wxFileName::GetPathSeparator() +
@@ -174,7 +174,7 @@ wxFileName mvceditor::TagDetectorsGlobalAsset() {
 }
 
 wxFileName mvceditor::DatabaseTagDetectorsLocalAsset() {
-	wxStandardPaths paths;
+	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName configDir = mvceditor::ConfigDirAsset();
 	configDir.AppendDir(wxT("database_detectors"));
 	if (!configDir.DirExists()) {
@@ -184,7 +184,7 @@ wxFileName mvceditor::DatabaseTagDetectorsLocalAsset() {
 }
 
 wxFileName mvceditor::DatabaseTagDetectorsGlobalAsset() {
-	wxStandardPaths paths;
+	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName pathExecutableFileName(paths.GetExecutablePath());
 	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
 		wxT("..") + wxFileName::GetPathSeparator() +
@@ -197,7 +197,7 @@ wxFileName mvceditor::DatabaseTagDetectorsGlobalAsset() {
 }
 
 wxFileName mvceditor::ConfigTagDetectorsLocalAsset() {
-	wxStandardPaths paths;
+	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName configDir = mvceditor::ConfigDirAsset();
 	configDir.AppendDir(wxT("config_detectors"));
 	if (!configDir.DirExists()) {
@@ -207,7 +207,7 @@ wxFileName mvceditor::ConfigTagDetectorsLocalAsset() {
 }
 
 wxFileName mvceditor::ConfigTagDetectorsGlobalAsset() {
-	wxStandardPaths paths;
+	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName pathExecutableFileName(paths.GetExecutablePath());
 	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
 		wxT("..") + wxFileName::GetPathSeparator() +
@@ -220,7 +220,7 @@ wxFileName mvceditor::ConfigTagDetectorsGlobalAsset() {
 }
 
 wxFileName mvceditor::TempDirAsset() {
-	wxStandardPaths paths;
+	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName tempDir;
 	tempDir.AssignDir(paths.GetTempDir());
 	tempDir.AppendDir(wxT("mvc-editor"));
@@ -231,7 +231,7 @@ wxFileName mvceditor::TempDirAsset() {
 }
 
 wxFileName mvceditor::ConfigDirAsset() {
-	wxStandardPaths paths;
+	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName tempDir;
 	tempDir.AssignDir(paths.GetUserConfigDir());
 	tempDir.AppendDir(wxT(".mvc-editor"));
@@ -242,7 +242,7 @@ wxFileName mvceditor::ConfigDirAsset() {
 }
 
 wxFileName mvceditor::DetectorSqlSchemaAsset() {
-	wxStandardPaths paths;
+	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName pathExecutableFileName(paths.GetExecutablePath());
 	wxString nativeFileName = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
 	                          wxT("..") + wxFileName::GetPathSeparator() +
@@ -255,7 +255,7 @@ wxFileName mvceditor::DetectorSqlSchemaAsset() {
 }
 
 wxFileName mvceditor::SkeletonsBaseAsset() {
-	wxStandardPaths paths;
+	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName pathExecutableFileName(paths.GetExecutablePath());
 	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
 		wxT("..") + wxFileName::GetPathSeparator() +

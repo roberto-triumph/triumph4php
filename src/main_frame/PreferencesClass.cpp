@@ -371,7 +371,7 @@ void mvceditor::PreferencesClass::Save() {
 }
 
 void mvceditor::PreferencesClass::InitConfig() {
-	wxStandardPaths paths;
+	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName configFileName(mvceditor::ConfigDirAsset().GetPath(), wxT("mvc-editor.ini"));
 	wxFileConfig* config = new wxFileConfig(wxT("mvc_editor"), wxEmptyString, configFileName.GetFullPath(), wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
 	wxConfigBase::Set(config);
