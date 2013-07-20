@@ -101,6 +101,7 @@ bool mvceditor::FeatureClass::AddOutlineWindow(wxWindow* window, wxString name, 
 		}
 		return true;
 	}
+	wxASSERT_MSG(false, wxT("could not add window to outline notebook"));
 	return false;
 }
 
@@ -152,12 +153,6 @@ bool mvceditor::FeatureClass::IsOutlineWindowSelected(int windowId) const {
 	}
 	int windowIndex = OutlineNotebook->GetPageIndex(window); 
 	return windowIndex != wxNOT_FOUND && windowIndex == OutlineNotebook->GetSelection();
-}
-
-bool mvceditor::FeatureClass::AddContentWindow(wxWindow* window, const wxString& name) {
-	return Notebook->AddPage(window, name, true, 
-		wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_TOOLBAR, 
-		wxSize(16, 16)));
 }
 
 mvceditor::CodeControlClass* mvceditor::FeatureClass::GetCurrentCodeControl() const {

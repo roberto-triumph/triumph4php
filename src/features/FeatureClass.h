@@ -316,15 +316,6 @@ protected:
 	bool IsOutlineWindowSelected(int windowId) const;
 	
 	/**
-	 * Add a window to the 'main' content pane (the center pane). Once added, this class will take care of 
-	 * memory management for the window pointer.
-	 * 
-	 * @param wxWindow any window
-	 * @param wxString name the string that will show up in the tab
-	 */
-	bool AddContentWindow(wxWindow* window, const wxString& name);
-
-	/**
 	 * Returns the top-level window.
 	 * 
 	 * @return wxWindow* the main window
