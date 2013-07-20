@@ -696,7 +696,7 @@ void wxKeyBinder::Attach(wxWindow *p)
     if (p->GetExtraStyle() & wxWS_EX_TRANSIENT)
         return;     // do not attach ourselves to temporary windows !!
 
-    wxKBLogDebug(wxT("wxKeyBinder::Attach - attaching to [%s]"), p->GetName().c_str());
+    wxKBLogDebug(wxT("wxKeyBinder::Attach - attaching to [%s]"), static_cast<const char*>(p->GetName()));
 
     // create a new event handler for this window
     wxEvtHandler *h = new wxBinderEvtHandler(this, p);
@@ -732,7 +732,7 @@ void wxKeyBinder::Detach(wxWindow *p)
     if (!p || !IsAttachedTo(p))
         return;     // this is not attached...
 
-    wxKBLogDebug(wxT("wxKeyBinder::Detach - detaching from [%s]"), p->GetName().c_str());
+    wxKBLogDebug(wxT("wxKeyBinder::Detach - detaching from [%s]"), static_cast<const char*>(p->GetName()));
 
     // remove the event handler
     int idx = FindHandlerIdxFor(p);
@@ -822,7 +822,7 @@ void wxKeyBinder::OnChar(wxKeyEvent &event, wxEvtHandler *next)
 
         wxKBLogDebug(wxT("wxKeyBinder::OnChar - calling the Exec() function of the [%s] ")
                 wxT("wxCmd on the keycode [%d] (event timestamp: %d)"),
-                p->GetName().c_str(), event.GetKeyCode(), event.GetTimestamp());
+                static_cast<const char*>(p->GetName()), event.GetKeyCode(), event.GetTimestamp());
         p->Exec(event.GetEventObject(),     // otherwise, tell wxCmd to send the
                 client);    // associated wxEvent to the next handler in the chain
     }

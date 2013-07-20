@@ -80,7 +80,7 @@ void wxMenuCmd::Update()
 
 	if (m_nShortcuts <= 0) {
 	
-		wxKBLogDebug(wxT("wxMenuCmd::Update - no shortcuts defined for [%s]"), str.c_str());
+		wxKBLogDebug(wxT("wxMenuCmd::Update - no shortcuts defined for [%s]"), static_cast<const char*>(str));
 
 		// no more shortcuts for this menuitem: SetText()
 		// will delete the hotkeys associated...
@@ -89,7 +89,7 @@ void wxMenuCmd::Update()
 	}
 
 	wxString newtext = str+wxT("\t")+GetShortcut(0)->GetStr();
-	wxKBLogDebug(wxT("wxMenuCmd::Update - setting the new text to [%s]"), newtext.c_str());
+	wxKBLogDebug(wxT("wxMenuCmd::Update - setting the new text to [%s]"), static_cast<const char*>(newtext));
 	
 #if defined( __WXMSW__ )
 
@@ -150,14 +150,14 @@ wxCmd *wxMenuCmd::CreateNew(int id)
 void wxMenuWalker::WalkMenuItem(wxMenuBar *p, wxMenuItem *m, void *data)
 {
 	wxKBLogDebug(wxT("wxMenuWalker::WalkMenuItem - walking on [%s] at level [%d]"), 
-				m->GetLabel().c_str(), m_nLevel);
+				static_cast<const char*>(m->GetLabel()), m_nLevel);
 	void *tmp = OnMenuItemWalk(p, m, data);
 
 	if (m->GetSubMenu()) {
 
 		// if this item contains a sub menu, add recursively the menu items
 		// of that sub menu... using the cookie from OnMenuItemWalk.
-		wxKBLogDebug(wxT("wxMenuWalker::WalkMenuItem - recursing on [%s]"), m->GetLabel().c_str());
+		wxKBLogDebug(wxT("wxMenuWalker::WalkMenuItem - recursing on [%s]"), static_cast<const char*>(m->GetLabel()));
 		m_nLevel++;
 		WalkMenu(p, m->GetSubMenu(), tmp);
 		OnMenuExit(p, m->GetSubMenu(), tmp);
@@ -171,7 +171,7 @@ void wxMenuWalker::WalkMenuItem(wxMenuBar *p, wxMenuItem *m, void *data)
 void wxMenuWalker::WalkMenu(wxMenuBar *p, wxMenu *m, void *data)
 {
 	wxKBLogDebug(wxT("wxMenuWalker::WalkMenu - walking on [%s] at level [%d]"), 
-				m->GetTitle().c_str(), m_nLevel);
+				static_cast<const char*>(m->GetTitle()), m_nLevel);
 	for (int i=0; i < (int)m->GetMenuItemCount(); i++) {
 
 		wxMenuItem *pitem = m->GetMenuItems().Item(i)->GetData();
@@ -204,7 +204,7 @@ void wxMenuWalker::Walk(wxMenuBar *p, void *data)
 
 		m_nLevel++;
 		wxKBLogDebug(wxT("wxMenuWalker::Walk - walking on [%s] at level [%d]"), 
-					p->GetLabelTop(i).c_str(), m_nLevel);
+					static_cast<const char*>(p->GetLabelTop(i)), m_nLevel);
 		void *tmp = OnMenuWalk(p, m, data);
 
 		// and fill it...
@@ -316,7 +316,7 @@ void wxMenuComboListWalker::FillComboListCtrl(wxMenuBar *p, wxComboBox *combo)
 
 void *wxMenuComboListWalker::OnMenuWalk(wxMenuBar *p, wxMenu *m, void *)
 {
-	wxKBLogDebug(wxT("wxMenuWalker::OnMenuWalk - walking on [%s]"), m->GetTitle().c_str());
+	wxKBLogDebug(wxT("wxMenuWalker::OnMenuWalk - walking on [%s]"), static_cast<const char*>(m->GetTitle()));
 	wxString toadd;
 
 	// find the index of the given menu
@@ -348,14 +348,14 @@ void *wxMenuComboListWalker::OnMenuWalk(wxMenuBar *p, wxMenu *m, void *)
 	wxClientData *cd = new wxExComboItemData();	
 
 	// and create a new element in our combbox
-	wxKBLogDebug(wxT("wxMenuWalker::OnMenuWalk - appending [%s]"), toadd.c_str());
+	wxKBLogDebug(wxT("wxMenuWalker::OnMenuWalk - appending [%s]"), static_cast<const char*>(toadd));
 	m_pCategories->Append(toadd, cd);
 	return cd;
 }
 
 void *wxMenuComboListWalker::OnMenuItemWalk(wxMenuBar *, wxMenuItem *m, void *data)
 {
-	wxKBLogDebug(wxT("wxMenuWalker::OnMenuItemWalk - walking on [%s]"), m->GetLabel().c_str());
+	wxKBLogDebug(wxT("wxMenuWalker::OnMenuItemWalk - walking on [%s]"), static_cast<const char*>(m->GetLabel()));
 	//int last = m_pCategories->GetCount()-1;
 	wxExComboItemData *p = (wxExComboItemData *)data;//m_pCategories->GetClientObject(last);
 
@@ -371,7 +371,7 @@ void *wxMenuComboListWalker::OnMenuItemWalk(wxMenuBar *, wxMenuItem *m, void *da
 
 void wxMenuComboListWalker::OnMenuExit(wxMenuBar *, wxMenu *m, void *)
 {
-	wxKBLogDebug(wxT("wxMenuWalker::OnMenuExit - walking on [%s]"), m->GetTitle().c_str());
+	wxKBLogDebug(wxT("wxMenuWalker::OnMenuExit - walking on [%s]"), static_cast<const char*>(m->GetTitle()));
 
 	if (!m_strAcc.IsEmpty()){// && m_strAcc.Right() == str) {
 
