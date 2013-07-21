@@ -207,7 +207,12 @@ solution "mvc-editor"
 	project "mvc-editor"
 		language "C++"
 		kind "WindowedApp"
-		files { "src/**.cpp", "src/**.h", "*.lua", "README.md" }
+		
+		if os.is "windows" then
+			files { "src/**.cpp", "src/**.h", "*.lua", "README.md", "src/MvcEditor.rc" }
+		else 
+			files { "src/**.cpp", "src/**.h", "*.lua", "README.md" }
+		end
 		includedirs { "src/", "lib/keybinder/include/", "lib/pelet/include" }
 		links { "tests", "keybinder", "pelet" }
 		
@@ -224,12 +229,10 @@ solution "mvc-editor"
 			wxconfiguration("Release", _ACTION)
 			wxappconfiguration("Release", _ACTION)
 		configuration { "Debug", "vs2008" }
-			files { "src/mvceditor.rc" }
 			postbuildcommands { "cd " .. normalizepath("Debug") .. " && tests.exe --all" }
 		configuration { "Debug", "gmake or codelite" }
 			postbuildcommands { "cd " .. normalizepath("Debug") .. " && ./tests --all" }
 		configuration { "Release", "vs2008" }
-			files { "src/mvceditor.rc" }
 			postbuildcommands { "cd " .. normalizepath("Release") .. " && tests.exe --all"  }
 		configuration { "Release", "gmake or codelite" }
 			postbuildcommands { "cd " .. normalizepath("Release") .. " && ./tests --all" }
