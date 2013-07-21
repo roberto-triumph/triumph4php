@@ -546,6 +546,13 @@ void mvceditor::CodeControlClass::ApplyPreferences() {
 }
 
 void mvceditor::CodeControlClass::SetPhpOptions() {
+	
+	// set the lexer before setting the keywords
+	SetLexer(wxSTC_LEX_PHPSCRIPT);
+	
+	// 7 = as per scintilla docs, HTML lexer uses 7 bits for styles
+	SetStyleBits(7);
+	
 	// Some languages, such as HTML may contain embedded languages, VBScript
 	// and JavaScript are common for HTML. For HTML, key word set 0 is for HTML,
 	// 1 is for JavaScript and 2 is for VBScript, 3 is for Python, 4 is for PHP
@@ -554,10 +561,6 @@ void mvceditor::CodeControlClass::SetPhpOptions() {
 	SetKeyWords(1, ((mvceditor::PhpDocumentClass*)Document)->GetJavascriptKeywords());
 	SetKeyWords(4, ((mvceditor::PhpDocumentClass*)Document)->GetPhpKeywords());
 	
-	SetLexer(wxSTC_LEX_HTML);
-	
-	// 7 = as per scintilla docs, HTML lexer uses 7 bits for styles
-	SetStyleBits(7);
 	AutoCompStops(wxT("!@#$%^&*()_+-=[]{}|;'\",./<?"));
 	AutoCompSetSeparator('\n');
 	AutoCompSetChooseSingle(true);
