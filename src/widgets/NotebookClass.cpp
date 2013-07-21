@@ -31,6 +31,7 @@
 #include <wx/artprov.h>
 #include <wx/filename.h>
 #include <wx/file.h>
+#include <wx/wupdlock.h>
 
 int ID_SAVE_MODIFIED = wxNewId();
 
@@ -165,7 +166,6 @@ void mvceditor::NotebookClass::AddMvcEditorPage(mvceditor::CodeControlClass::Mod
 			format = _("Untitled %d.php");
 			break;
 	}
-	this->Freeze();
 	
 	// make sure to use a unique ID, other source code depends on this
 	CodeControlClass* page = new CodeControlClass(this, *CodeControlOptions, Globals, *EventSink, wxNewId());
@@ -182,9 +182,6 @@ void mvceditor::NotebookClass::AddMvcEditorPage(mvceditor::CodeControlClass::Mod
 	}
 
 	AddPage(page, wxString::Format(format, NewPageNumber++), true, docBitmap);
-
-	// make the gui response ASAP thaw it before notifying the rest of the app
-	this->Thaw();
 
 	wxCommandEvent newEvent(mvceditor::EVENT_APP_FILE_NEW);
 	EventSink->Publish(newEvent);
@@ -204,11 +201,10 @@ void mvceditor::NotebookClass::LoadPage() {
 			fileVector.push_back(filenames[i]);
 		}
 		LoadPages(fileVector);
-	}	
+	}
 }
 
 void mvceditor::NotebookClass::LoadPage(const wxString& filename) {
-	this->Freeze();
 	bool found = false;
 	
 	// if file is already opened just bring it to the forefront
@@ -268,15 +264,18 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename) {
 			mvceditor::EditorLogError(mvceditor::ERR_CHARSET_DETECTION, filename);
 		}
 	}
-	this->Thaw();
 }
 
 void mvceditor::NotebookClass::LoadPages(const std::vector<wxString>& filenames) {
-	this->Freeze();
+	
+	// when we used wxWidgets 2.8 we would freeze the notebook, add all pages,
+	// then thaw the notebook
+	// when upgrading to wxWidgets 2.9, the notebook get frozen/thawed once for
+	// each new page; we can no longer safely  freeze/thaw here because then thaw
+	// would be called n + 1 times and GTK does not like that.
 	for (size_t i = 0; i < filenames.size(); ++i) {
 		LoadPage(filenames[i]);
 	}
-	this->Thaw();
 }
 
 void mvceditor::NotebookClass::RefreshCodeControlOptions() {
@@ -405,7 +404,6 @@ void mvceditor::NotebookClass::OnCloseAllPages(wxCommandEvent& event) {
 }
 
 void mvceditor::NotebookClass::CloseAllPages() {
-	this->Freeze();
 	while (GetPageCount() > 0) {
 		mvceditor::CodeControlClass* codeCtrl = GetCodeControl(0);
 		mvceditor::CodeControlEventClass codeControlEvent(mvceditor::EVENT_APP_FILE_CLOSED, codeCtrl);
@@ -423,7 +421,6 @@ void mvceditor::NotebookClass::CloseAllPages() {
 		evt.SetEventObject(this);
 		EventSink->Publish(evt);
 	}
-	this->Thaw();
 }
 
 void mvceditor::NotebookClass::CloseCurrentPage() {

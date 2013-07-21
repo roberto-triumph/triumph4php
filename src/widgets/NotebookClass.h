@@ -140,7 +140,7 @@ public:
 	 * Loads the given files into this notebook, one page for each file.
 	 * File names must be fully qualified. 
 	 */
-	void LoadPages(const std::vector<wxString>& filenames);	
+	void LoadPages(const std::vector<wxString>& filenames);
 	
 	/**
 	 * Finds out whether the given page has changes that have not been saved.
