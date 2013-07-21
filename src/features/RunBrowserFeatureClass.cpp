@@ -162,7 +162,7 @@ void mvceditor::RunBrowserFeatureClass::AddWindows() {
 		.ToolbarPane().Top().Row(2).Position(1)
 		.LeftDockable(false).RightDockable(false)
 		.Gripper(false).CaptionVisible(false).CloseButton(false).DockFixed(true)
-		.PaneBorder(false).Floatable(false)
+		.PaneBorder(true).Floatable(false)
 	);
 }
 

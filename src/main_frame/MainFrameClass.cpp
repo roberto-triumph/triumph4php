@@ -595,7 +595,7 @@ void mvceditor::MainFrameClass::RealizeToolbar() {
 		.ToolbarPane().Top().Row(1).Position(1)
 		.LeftDockable(false).RightDockable(false)
 		.Gripper(false).CaptionVisible(false).CloseButton(false).DockFixed(true)
-		.PaneBorder(false).Floatable(false)
+		.PaneBorder(true).Floatable(false)
 	);
 }
 
