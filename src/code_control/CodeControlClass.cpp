@@ -622,16 +622,17 @@ void mvceditor::CodeControlClass::SetPhpOptions() {
 }
 
 void mvceditor::CodeControlClass::SetSqlOptions() {	
+	SetLexer(wxSTC_LEX_SQL);
+	
+	// 5 = default as per scintilla docs. set it because it may have been set by SetPhpOptions()
+	SetStyleBits(5);
+	
 	SetKeyWords(0, ((mvceditor::SqlDocumentClass*)Document)->GetMySqlKeywords());
 	SetKeyWords(1, wxT(""));
 	SetKeyWords(2, wxT(""));
 	SetKeyWords(3, wxT(""));
 	SetKeyWords(4, wxT(""));
 	
-	SetLexer(wxSTC_LEX_SQL);
-	
-	// 5 = default as per scintilla docs. set it because it may have been set by SetPhpOptions()
-	SetStyleBits(5);
 	AutoCompStops(wxT("!@#$%^&*()_+-=[]\\{}|;'\",/?`"));
 	AutoCompSetSeparator(' ');
 	AutoCompSetChooseSingle(true);
@@ -663,6 +664,9 @@ void mvceditor::CodeControlClass::SetSqlOptions() {
 void mvceditor::CodeControlClass::SetCssOptions() {
 	SetLexer(wxSTC_LEX_CSS);
 	
+	// 5 = default as per scintilla docs. set it because it may have been set by SetPhpOptions()
+	SetStyleBits(5);
+	
 	// got this by looking at LexCSS.cxx (bottom of the file)
 	// keywords 0 => CSS 1 keywords
 	// keywords 1 => Pseudo classes
@@ -670,9 +674,7 @@ void mvceditor::CodeControlClass::SetCssOptions() {
 	SetKeyWords(0,  ((mvceditor::CssDocumentClass*)Document)->GetCssKeywords());
 	SetKeyWords(1,  ((mvceditor::CssDocumentClass*)Document)->GetCssPseudoClasses());
 	SetKeyWords(2, wxT(""));
-	
-	// 5 = default as per scintilla docs. set it because it may have been set by SetPhpOptions()
-	SetStyleBits(5);
+
 	AutoCompStops(wxT("!@#$%^&*()_+-=[]\\{}|;'\",/?`"));
 	AutoCompSetSeparator(' ');
 	AutoCompSetIgnoreCase(true);
