@@ -112,11 +112,11 @@ function wxappconfiguration(config, action)
 	if config == "Debug" and (action == "gmake" or action == "codelite") then
 		linkoptions { string.format("`%s --debug=yes --unicode=yes --libs aui,adv,stc`", WX_CONFIG) }
 	elseif config == "Debug" and action ==  "vs2008" then
-		links { WX_LIBS_WINDOW_DEBUG }
+		links { WX_LIBS_WINDOW_DEBUG, WX_LIB_STC_DEBUG }
 	elseif config == "Release" and (action == "gmake" or action == "codelite") then
 		linkoptions { string.format("`%s --debug=no --unicode=yes --libs aui,adv,stc`", WX_CONFIG) }
 	elseif config == "Release" and action ==  "vs2008" then
-		links { WX_LIBS_WINDOW_RELEASE }
+		links { WX_LIBS_WINDOW_RELEASE, WX_LIB_STC_RELEASE }
 	end
 end
 
@@ -224,12 +224,10 @@ solution "mvc-editor"
 			wxconfiguration("Release", _ACTION)
 			wxappconfiguration("Release", _ACTION)
 		configuration { "Debug", "vs2008" }
-			links { WX_LIB_STC_DEBUG }
 			postbuildcommands { "cd " .. normalizepath("Debug") .. " && tests.exe --all" }
 		configuration { "Debug", "gmake or codelite" }
 			postbuildcommands { "cd " .. normalizepath("Debug") .. " && ./tests --all" }
 		configuration { "Release", "vs2008" }
-			links { WX_LIB_STC_RELEASE }
 			postbuildcommands { "cd " .. normalizepath("Release") .. " && tests.exe --all"  }
 		configuration { "Release", "gmake or codelite" }
 			postbuildcommands { "cd " .. normalizepath("Release") .. " && ./tests --all" }
@@ -410,10 +408,6 @@ solution "mvc-editor"
 			wxconfiguration("Release", _ACTION)
 			wxappconfiguration("Release", _ACTION)
 			icuconfiguration("Release", _ACTION)
-		configuration { "Debug" }
-			links {  WX_LIB_STC_DEBUG }
-		configuration { "Release" }
-			links {  WX_LIB_STC_RELEASE }
 
 	project "unit_test++"
 		language "C++"
@@ -564,10 +558,6 @@ solution "mvc-editor"
 			pickywarnings(_ACTION)
 			wxconfiguration("Release", _ACTION)
 			wxappconfiguration("Release", _ACTION)
-		configuration { "Debug", "vs2008" }
-			links {  WX_LIB_STC_DEBUG }
-		configuration { "Release", "vs2008" }
-			links {  WX_LIB_STC_RELEASE }
 
 	project "wx_window_tutorial"
 		language "C++"
