@@ -207,7 +207,9 @@ solution "mvc-editor"
 	project "mvc-editor"
 		language "C++"
 		kind "WindowedApp"
-		files { "src/**.cpp", "src/**.h", "*.lua", "src/**.re, src/**.y, src/**.hpp", "README.md", "src/mvceditor.rc" }
+		files { "src/**.cpp", "src/**.h", "*.lua", "README.md" }
+		configuration { "vs2008" }
+			files { "src/mvceditor.rc" }
 		includedirs { "src/", "lib/keybinder/include/", "lib/pelet/include" }
 		links { "tests", "keybinder", "pelet" }
 
