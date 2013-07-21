@@ -74,12 +74,6 @@ WX_CONFIG = 'wx-config'
 -- library (Database Access wrapper)
 CMAKE = 'cmake';
 
--- the styled text control library
-WX_LIB_STC_DEBUG = "wx_gtk2ud_stc-2.8"
-
--- the styled text control library
-WX_LIB_STC_RELEASE = "wx_gtk2u_stc-2.8"
-
 -- will look for MySQL files in these directories
 -- on linux we will assume it is installed system-wide
 MYSQL_INCLUDE_DIR = '/usr/include/mysql/'
@@ -89,7 +83,8 @@ MYSQL_LIB_NAME = 'libmysqlclient.so'
 -- changes to this file
 MYSQL_LIB_DIR = os.pathsearch('libmysqlclient.so', 
 	"/usr/lib/", 
-	"/usr/lib/x86_64-linux-gnu/"
+	"/usr/lib/x86_64-linux-gnu/",
+	"/usr/lib/i386-linux-gnu/"
 );
 
 -- On some unit tests, MVC Editor attempt to connect to a database
