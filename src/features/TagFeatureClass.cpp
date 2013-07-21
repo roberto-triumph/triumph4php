@@ -506,8 +506,8 @@ void mvceditor::TagSearchDialogClass::ShowJumpToResults(const wxString& finderQu
 	if (!MatchesList->IsEmpty()) {
 		MatchesList->Select(0);
 	}
-	MatchesLabel->SetLabel(wxString::Format(_("Found %d files for %s. Please choose file(s) to open."), 
-		allMatches.size(), (const char*)finderQuery.c_str()));
+	MatchesLabel->SetLabel(wxString::Format("Found %d files for %s. Please choose file(s) to open.", 
+		(int)allMatches.size(), finderQuery));
 }
 
 void mvceditor::TagSearchDialogClass::OnOkButton(wxCommandEvent& event) {

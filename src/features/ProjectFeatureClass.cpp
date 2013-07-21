@@ -134,17 +134,17 @@ void mvceditor::ProjectFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	
 	for (size_t i = 0; i < App.Globals.Projects.size(); ++i) {
 		mvceditor::ProjectClass project = App.Globals.Projects[i];
-		wxString keyLabel = wxString::Format(wxT("/Project_%d/Label"), i);
-		wxString keyEnabled = wxString::Format(wxT("/Project_%d/IsEnabled"), i);
-		wxString keySourceCount = wxString::Format(wxT("/Project_%d/SourceCount"), i);
+		wxString keyLabel = wxString::Format(wxT("/Project_%ld/Label"), i);
+		wxString keyEnabled = wxString::Format(wxT("/Project_%ld/IsEnabled"), i);
+		wxString keySourceCount = wxString::Format(wxT("/Project_%ld/SourceCount"), i);
 		config->Write(keyLabel, project.Label);
 		config->Write(keyEnabled, project.IsEnabled);
 		config->Write(keySourceCount, (int)project.Sources.size());
 		for (size_t j = 0; j < project.Sources.size(); ++j) {
 			mvceditor::SourceClass source = project.Sources[j];			
-			wxString keyRootPath = wxString::Format(wxT("/Project_%d/Source_%d_RootDirectory"), i, j);
-			wxString keyInclude = wxString::Format(wxT("/Project_%d/Source_%d_IncludeWildcards"), i, j);
-			wxString keyExclude = wxString::Format(wxT("/Project_%d/Source_%d_ExcludeWildcards"), i, j);			
+			wxString keyRootPath = wxString::Format(wxT("/Project_%ld/Source_%ld_RootDirectory"), i, j);
+			wxString keyInclude = wxString::Format(wxT("/Project_%ld/Source_%ld_IncludeWildcards"), i, j);
+			wxString keyExclude = wxString::Format(wxT("/Project_%ld/Source_%ld_ExcludeWildcards"), i, j);			
 			config->Write(keyRootPath, source.RootDirectory.GetFullPath());
 			config->Write(keyInclude, source.IncludeWildcardsString());
 			config->Write(keyExclude, source.ExcludeWildcardsString());
@@ -629,7 +629,7 @@ void mvceditor::ProjectListDialogClass::OnAddFromDirectoryButton(wxCommandEvent&
 				mvceditor::MultipleSelectDialogClass selectDialog(
 					this,
 					_("Add Multiple"),
-					wxString::Format(_("There are %d projects. Please choose directories to create projects for"), subDirs.size()),
+					wxString::Format(_("There are %ld projects. Please choose directories to create projects for"), subDirs.size()),
 					subDirs,					
 					selections
 				);

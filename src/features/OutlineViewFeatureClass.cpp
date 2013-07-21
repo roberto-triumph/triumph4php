@@ -272,7 +272,7 @@ void mvceditor::OutlineViewFeatureClass::OnOutlineMenu(wxCommandEvent& event) {
 		if (notebook != NULL) {
 			outlineViewPanel = new OutlineViewPanelClass(GetOutlineNotebook(), ID_WINDOW_OUTLINE, this, notebook);
 			wxBitmap outlineBitmap = mvceditor::IconImageAsset(wxT("outline"));
-			AddOutlineWindow(outlineViewPanel, wxT("Outline"), outlineBitmap);
+			AddOutlineWindow(outlineViewPanel, wxT("Outline"), outlineBitmap); 
 		}
 	}
 
@@ -1060,7 +1060,7 @@ void mvceditor::FileSearchDialogClass::ShowTags(const wxString& finderQuery, con
 	if (!MatchesList->IsEmpty()) {
 		MatchesList->Select(0);
 	}
-	MatchesLabel->SetLabel(wxString::Format(_("Found %d files. Please choose file(s) to open."), allMatches.size()));
+	MatchesLabel->SetLabel(wxString::Format(_("Found %ld files. Please choose file(s) to open."), allMatches.size()));
 }
 
 void mvceditor::FileSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {

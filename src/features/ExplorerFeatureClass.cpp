@@ -92,7 +92,6 @@ void mvceditor::ExplorerFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCm
 }
 
 void mvceditor::ExplorerFeatureClass::AddWindows() {
-	
 	ExplorerToolBar = new wxAuiToolBar(GetMainWindow(), wxID_ANY, wxDefaultPosition, wxDefaultSize,
                                          wxAUI_TB_DEFAULT_STYLE |
                                          wxAUI_TB_TEXT |
@@ -448,10 +447,10 @@ void mvceditor::ModalExplorerPanelClass::ShowDir(const wxFileName& currentDir, c
 	}
 	wxString label;
 	if (files.size() == (size_t)totalFiles) {
-		label = wxString::Format(wxT("%d Files, %d Directories"), files.size(), dirs.size());
+		label = wxString::Format(wxT("%ld Files, %ld Directories"), files.size(), dirs.size());
 	}
 	else {
-		label = wxString::Format(wxT("%d Files, %d Directories (%d not shown)"), files.size(), dirs.size(), totalFiles - files.size());
+		label = wxString::Format(wxT("%ld Files, %ld Directories (%ld not shown)"), files.size(), dirs.size(), totalFiles - files.size());
 	}
 	ListLabel->SetLabel(label);
 	ReportLabel->SetLabel(wxT(""));
@@ -466,10 +465,10 @@ void mvceditor::ModalExplorerPanelClass::ShowReport(const wxFileName& dir, const
 
 	wxString label;
 	if (files.size() == (size_t)totalFiles) {
-		label = wxString::Format(wxT("%d Files, %d Directories"), files.size(), dirs.size());
+		label = wxString::Format(wxT("%ld Files, %ld Directories"), files.size(), dirs.size());
 	}
 	else {
-		label = wxString::Format(wxT("%d Files, %d Directories (%d not shown)"), files.size(), dirs.size(), totalFiles - files.size());
+		label = wxString::Format(wxT("%ld Files, %ld Directories (%ld not shown)"), files.size(), dirs.size(), totalFiles - files.size());
 	}
 	ReportLabel->SetLabel(label);
 }
