@@ -204,7 +204,16 @@ void mvceditor::NotebookClass::LoadPage() {
 	}
 }
 
-void mvceditor::NotebookClass::LoadPage(const wxString& filename) {
+void mvceditor::NotebookClass::LoadPage(const wxString& filename, bool doFreeze) {
+	// when we used wxWidgets 2.8 we would freeze the notebook, add all pages,
+	// then thaw the notebook
+	// when upgrading to wxWidgets 2.9, the notebook get frozen/thawed once for
+	// each new page; we can no longer safely  freeze/thaw here because then thaw
+	// would be called n + 1 times and GTK does not like that.
+	wxPlatformInfo info;
+	if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT && doFreeze) {
+		this->Freeze();
+	}
 	bool found = false;
 	
 	// if file is already opened just bring it to the forefront
@@ -264,6 +273,9 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename) {
 			mvceditor::EditorLogError(mvceditor::ERR_CHARSET_DETECTION, filename);
 		}
 	}
+	if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT && doFreeze) {
+		this->Thaw();
+	}
 }
 
 void mvceditor::NotebookClass::LoadPages(const std::vector<wxString>& filenames) {
@@ -273,8 +285,15 @@ void mvceditor::NotebookClass::LoadPages(const std::vector<wxString>& filenames)
 	// when upgrading to wxWidgets 2.9, the notebook get frozen/thawed once for
 	// each new page; we can no longer safely  freeze/thaw here because then thaw
 	// would be called n + 1 times and GTK does not like that.
+	wxPlatformInfo info;
+	if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
+		this->Freeze();
+	}
 	for (size_t i = 0; i < filenames.size(); ++i) {
-		LoadPage(filenames[i]);
+		LoadPage(filenames[i], false);
+	}
+	if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
+		this->Thaw();
 	}
 }
 

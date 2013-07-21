@@ -130,11 +130,13 @@ public:
 	void LoadPage();
 	
 	/**
-	 * Loads the given file into this notebook. If the file is already opened then it is brought
-	 * to the forefront (a file will never be loaded in two controls).
-	 * File name must be fully qualified. 
+	 * @param filename Loads the given file into this notebook. If the file is already opened then it is brought
+	 *        to the forefront (a file will never be loaded in two controls).
+	 *        File name must be fully qualified. 
+	 * @param doFreeze if TRUE the window will be frozen while adding the page (reduces flicker
+	 *        in MSW).  This param should be true if more than 1 page will loaded in quick succession
 	 */
-	void LoadPage(const wxString& filename);
+	void LoadPage(const wxString& filename, bool doFreeze = true);
 	
 	/**
 	 * Loads the given files into this notebook, one page for each file.
