@@ -494,7 +494,6 @@ void mvceditor::CodeControlClass::AutoDetectDocumentMode() {
 }
 
 void mvceditor::CodeControlClass::ApplyPreferences() {
-	SetMargin();
 	if (CodeControlOptions.EnableWordWrap) {
 		SetWrapMode(wxSTC_WRAP_WORD);
 		SetWrapVisualFlags(wxSTC_WRAPVISUALFLAG_START);
@@ -542,13 +541,17 @@ void mvceditor::CodeControlClass::ApplyPreferences() {
 		Document->SetControl(this);
 		SetPlainTextOptions();
 	}
+
+	// in wxWidgets 2.9.5, need to set margin after setting the lexer
+	// otherwise code folding does not work
+	SetMargin();
 	Colourise(0, -1);
 }
 
 void mvceditor::CodeControlClass::SetPhpOptions() {
 	
 	// set the lexer before setting the keywords
-	SetLexer(wxSTC_LEX_PHPSCRIPT);
+	SetLexer(wxSTC_LEX_HTML);
 	
 	// 7 = as per scintilla docs, HTML lexer uses 7 bits for styles
 	SetStyleBits(7);
