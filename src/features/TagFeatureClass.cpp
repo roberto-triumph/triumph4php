@@ -224,19 +224,13 @@ void mvceditor::TagFeatureClass::OnAppFileClosed(mvceditor::CodeControlEventClas
 	}
 	if (!codeCtrl->IsNew()) {
 		wxString fileName = codeCtrl->GetFileName();
-		std::vector<mvceditor::ProjectClass>::const_iterator project;
-		bool isFileFromProject = false;
-		for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
-
-			if (project->IsEnabled && project->IsAPhpSourceFile(fileName)) {
-				isFileFromProject = true;
-				break;
-			}
-		}
-		if (isFileFromProject) {
-			mvceditor::ProjectTagActionClass* tagAction = new mvceditor::ProjectTagActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST);
-			tagAction->InitForFile(App.Globals, fileName);
+		mvceditor::ProjectTagSingleFileActionClass* tagAction = new mvceditor::ProjectTagSingleFileActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST);
+		tagAction->SetFileToParse(fileName);
+		if (tagAction->Init(App.Globals)) {
 			App.RunningThreads.Queue(tagAction);
+		}
+		else {
+			delete tagAction;
 		}
 	}
 
@@ -298,10 +292,70 @@ void mvceditor::TagFeatureClass::OnAppFileOpened(wxCommandEvent& event) {
 			App.Globals.Environment.Php.Version,
 
 			// false ==  no need to parse tags from the file, because they will be the same as on the db
+			// also, do not attempt to parse because we want to avoid sqlite db locking errors in case
+			// that the project tag action is running in the background
 			false);
 		App.RunningThreads.Queue(builder);
 	}
 	event.Skip();
+}
+
+void mvceditor::TagFeatureClass::OnAppFileReverted(wxCommandEvent& event) {
+	mvceditor::CodeControlClass* codeControl = NULL;
+	mvceditor::NotebookClass* notebook = GetNotebook();
+	bool found = false;
+	for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
+		codeControl = notebook->GetCodeControl(i);
+		if (codeControl->GetFileName() == event.GetString()) {
+			found = true;
+			break;
+		}
+	}
+	if (found && codeControl->GetDocumentMode() == mvceditor::CodeControlClass::PHP) {
+		UnicodeString text = codeControl->GetSafeText();
+
+		// builder action could take a while (more than the timer)
+		// stop the timer so that we dont queue up a builder actions before the previous one
+		// finishes
+		Timer.Stop();
+
+		// we need to differentiate between new and opened files (the 'true' arg)
+		mvceditor::WorkingCacheBuilderClass* builder = new mvceditor::WorkingCacheBuilderClass(App.RunningThreads, ID_WORKING_CACHE);
+		builder->Update(
+			App.Globals,
+			codeControl->GetFileName(),
+			codeControl->GetIdString(),
+			text, 
+			codeControl->IsNew(),
+			App.Globals.Environment.Php.Version,
+
+			// The logic is a bit 
+			//  different than OnAppFileOpened, when a file is reverted we will re-tag the file and 
+			// rebuild the symbol table, while when we open a file we dont need to re-tag the file
+			// because it has not changed.
+			true);
+		App.RunningThreads.Queue(builder);
+	}
+	event.Skip();
+}
+
+
+void mvceditor::TagFeatureClass::OnAppFileExternallyModified(wxCommandEvent& event) {
+
+	// the file is assumed not be opened, we don't need to build the symbol table
+	// just retag it
+	// see the comment for EVENT_APP_FILE_EXTERNALLY_MODIFIED in Events.h
+	// if the file is from an active project, then re-tag it
+	// otherwise do nothing
+	wxString fileName = event.GetString();
+	mvceditor::ProjectTagSingleFileActionClass* tagAction = new mvceditor::ProjectTagSingleFileActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST);
+	tagAction->SetFileToParse(fileName);
+	if (tagAction->Init(App.Globals)) {
+		App.RunningThreads.Queue(tagAction);
+	}
+	else {
+		delete tagAction;
+	}
 }
 
 void mvceditor::TagFeatureClass::OnTimerComplete(wxTimerEvent& event) {
@@ -682,9 +736,11 @@ BEGIN_EVENT_TABLE(mvceditor::TagFeatureClass, wxEvtHandler)
 
 	EVT_APP_FILE_CLOSED(mvceditor::TagFeatureClass::OnAppFileClosed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_OPENED, mvceditor::TagFeatureClass::OnAppFileOpened)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_REVERTED, mvceditor::TagFeatureClass::OnAppFileReverted)
 
 	// we will treat file new and file opened the same
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_NEW, mvceditor::TagFeatureClass::OnAppFileOpened)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_EXTERNALLY_MODIFIED, OnAppFileExternallyModified)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_SEQUENCE_COMPLETE, mvceditor::TagFeatureClass::OnAppStartSequenceComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_EXIT, mvceditor::TagFeatureClass::OnAppExit)
 

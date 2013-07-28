@@ -196,6 +196,29 @@ extern const wxEventType EVENT_APP_FILE_CREATED;
 extern const wxEventType EVENT_APP_FILE_NEW;
 
 /**
+ * Notification that a file has been reverted (all changed in memory undone). The event will contain
+ * the full path of the file that was opened in the GetString() method; 
+ */
+extern const wxEventType EVENT_APP_FILE_REVERTED;
+
+/**
+ * Notification that the one of the files in any of the enabled projects has been updated by an 
+ * external process. 
+ * An example is when a user performs a SVN update / GIT pull to get the latest version of their
+ * code; the editor will generated events of this type for each file that was updated by the source control 
+ * program.
+ *
+ * The event generated will be of type wxCommandEvent, the file that was modified will be available via GetString() method
+ * GetString() will return the full path to the file.
+ *
+ * NOTE: This event will only be generated if the file is NOT already opened in MVC editor. In the case that
+ * a file that is opened in MVC editor is modified externally, the user will be prompted to ignore or reload
+ * contents from disk, and if the user chooses to reload contents from disk then a "normal" EVENT_APP_FILE_REVERT
+ * event is generated instead.
+ */
+extern const wxEventType EVENT_APP_FILE_EXTERNALLY_MODIFIED;
+
+/**
  * Notification that the user preferences have been saved by the user. 
  * This event will be genreated after the user changes the settings via Edit ... Preferences.
  * Listeners of this event will  need to repaint any windows that are affected by the changes. Listeners
@@ -207,6 +230,7 @@ extern const wxEventType EVENT_APP_FILE_NEW;
  * is no need for each handler to call wxConfig::Flush()
  */
 extern const wxEventType EVENT_APP_PREFERENCES_SAVED;
+
 /**
  * Notification that the user preferences (the config INI file) has been updated by an 
  * external process. An example of this is the user having 2 instances of MVC Editor open

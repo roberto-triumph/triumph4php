@@ -103,8 +103,8 @@ TEST_FIXTURE(ProjectFixtureClass, IsASourceFileShouldReturnTrueWhenKnownWildcard
 	CHECK(Project.IsASourceFile(fileToCheck));
 }
 
-TEST_FIXTURE(ProjectFixtureClass, AllNonPhpExtesions) {
-	std::vector<wxString> exts = Project.AllNonPhpExtensions();
+TEST_FIXTURE(ProjectFixtureClass, GetNonPhpExtesions) {
+	std::vector<wxString> exts = Project.GetNonPhpExtensions();
 	CHECK_VECTOR_SIZE(3, exts);
 	CHECK_EQUAL(wxT("*.css"), exts[0]);
 	CHECK_EQUAL(wxT("*.txt"), exts[1]);

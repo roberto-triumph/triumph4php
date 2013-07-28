@@ -133,6 +133,20 @@ private:
 	void OnAppFileOpened(wxCommandEvent& event);
 
 	/**
+	 * This method will start re-parsing the document in the background. this will allow the 
+	 * code completion to be up-to-date after a file is *reverted*. The logic is a bit 
+	 * different than OnAppFileOpened, when a file is reverted we will re-tag the file and 
+	 * rebuild the symbiol table, while when we open a file we dont need to re-tag the file
+	 * because it has not changed.
+	 */
+	void OnAppFileReverted(wxCommandEvent& event);
+
+	/**
+	 * if a file is modified externally re-tag it
+	 */
+	void OnAppFileExternallyModified(wxCommandEvent& event);
+
+	/**
 	 * when the tag cache has been searched, display the matching tags in the dialog so that
 	 * the user can choose which to open
 	 */

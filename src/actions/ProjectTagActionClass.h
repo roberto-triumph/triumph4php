@@ -51,16 +51,6 @@ public:
 	ProjectTagActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
-	 * prepare to iterate through the given file. The name part of the given file must match the wildcard.
-	 * This method can be used to update the resources once a file has been modified on disk.
-	 *
-	 * @param globals to get the tag cache location
-	 * @param fullPath file to be scanned (full path, including name).
-	 * @return bool false file does not exist
-	 */
-	bool InitForFile(mvceditor::GlobalsClass& globals, const wxString& fullPath);
-
-	/**
 	 * prepare to iterate through all files of the given projects
 	 * that match the given wildcard. Only projects that are enabled will
 	 * scanned.
@@ -96,16 +86,6 @@ private:
 	 * The object that will be used to traverse the file system.
 	 */
 	DirectorySearchClass DirectorySearch;
-
-	/**
-	 * the location of the tag cache; the sqlite file where the tags are stored
-	 */
-	wxFileName TagCacheDbFileName;
-
-	/**
-	 * the version of PHP to parse against
-	 */
-	pelet::Versions Version;
 
 	/**
 	 * This object will perform the parsing and storing of the tags
@@ -144,6 +124,54 @@ public:
 	void Work(mvceditor::GlobalsClass& globals);
 
 	wxString GetLabel() const;
+};
+
+/**
+ * this action will re-tag a single file only
+ */
+class ProjectTagSingleFileActionClass : public mvceditor::GlobalActionClass {
+
+public:
+
+	ProjectTagSingleFileActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+
+	/**
+	 * Set the file to be parsed
+	 * @param fullPath file to be scanned (full path, including name).
+	 */
+	void SetFileToParse(const wxString& fullPath);
+
+	/**
+	 * prepare to iterate through the file given in SetFileToParse. The name part of the given file must match one
+	 * od the wildcards that has been set in globals.
+	 * This method can be used to update the resources once a file has been modified on disk.
+	 *
+	 * @param globals to get the tag cache location
+	 * @return bool false if file given in FileToParse does not exist
+	 */
+	bool Init(mvceditor::GlobalsClass& globals);
+
+
+protected:
+
+	void BackgroundWork();
+
+	wxString GetLabel() const;
+
+	/**
+	 * the project in which the file is located in
+	 */
+	mvceditor::ProjectClass Project;
+
+	/**
+	 * the file to re-parse
+	 */
+	wxFileName FileName;
+
+	/**
+	 * This object will perform the parsing and storing of the tags
+	 */
+	mvceditor::TagFinderListClass TagFinderList;
 };
 
 }

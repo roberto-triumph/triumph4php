@@ -173,7 +173,7 @@ public:
 	 * return the CssFileExtensions + SqlFileExtensions + MiscFileExtensions for this project.
 	 * @return all extension wilcards except for PHP wildcards
 	 */
-	std::vector<wxString> AllNonPhpExtensions() const;
+	std::vector<wxString> GetNonPhpExtensions() const;
 
 private:
 	

@@ -210,6 +210,10 @@ void mvceditor::MainFrameClass::OnFileRevert(wxCommandEvent& event) {
 		int res = wxMessageBox(_("Reload file and lose all changes?"), _("MVC Editor"), wxICON_QUESTION | wxYES_NO, this);
 		if (wxYES == res) {
 			code->Revert();
+
+			wxCommandEvent reloadEvt(mvceditor::EVENT_APP_FILE_REVERTED);
+			reloadEvt.SetString(code->GetFileName());
+			App.EventSink.Publish(reloadEvt);
 		}
 	}
 }

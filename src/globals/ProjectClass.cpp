@@ -173,7 +173,7 @@ wxString mvceditor::ProjectClass::RelativeFileName(const wxString& fullPath) con
 	return relativeName;
 }
 
-std::vector<wxString> mvceditor::ProjectClass::AllNonPhpExtensions() const {
+std::vector<wxString> mvceditor::ProjectClass::GetNonPhpExtensions() const {
 	std::vector<wxString> allExtensions;
 	allExtensions.insert(allExtensions.end(), CssFileExtensions.begin(), CssFileExtensions.end());
 	allExtensions.insert(allExtensions.end(), MiscFileExtensions.begin(), MiscFileExtensions.end());
