@@ -381,6 +381,14 @@ public:
 	 * @param fullPath filename to delete tags that were found in filename.
 	 */
 	void DeleteFromFile(const wxString& fullPath);
+
+	/**
+	 * check to see if a file was cached
+	 *
+	 * @param fullPath the path to check. check is done case-insensitive
+	 * @return bool TRUE if the file was seen by the tag parser
+	 */
+	bool HasFullPath(const wxString& fullPath);
 	 
 private:
 		

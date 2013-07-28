@@ -26,6 +26,7 @@
 #include <language/TagParserClass.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <globals/FileName.h>
 
 mvceditor::TagWipeActionClass::TagWipeActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: GlobalActionClass(runningThreads, eventId) {
@@ -66,20 +67,15 @@ wxString mvceditor::TagWipeActionClass::GetLabel() const {
 }
 
 
-mvceditor::TagDeleteActionClass::TagDeleteActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId,
+mvceditor::TagDeleteDirectoryActionClass::TagDeleteDirectoryActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId,
 													  const std::vector<wxFileName>& dirsToDelete)
 	: GlobalActionClass(runningThreads, eventId) 
 	, DirsToDelete() {
-	for (size_t i = 0; i < dirsToDelete.size(); ++i) {
-
-		// not sure if wxFileName assignment is a complete clone, so use Assign() just in case
-		// since we will access the filenames from multiple threads
-		DirsToDelete.push_back(wxFileName(dirsToDelete[i].GetFullPath()));
-	}
+	DirsToDelete = mvceditor::DeepCopyFileNames(dirsToDelete);
 }
 
-bool mvceditor::TagDeleteActionClass::Init(mvceditor::GlobalsClass& globals) {
-	SetStatus(_("Tag Cache Delete"));
+bool mvceditor::TagDeleteDirectoryActionClass::Init(mvceditor::GlobalsClass& globals) {
+	SetStatus(_("Tag Cache Delete Directory"));
 
 	// not sure if wxFileName assignment is a complete clone, so use Assign() just in case
 	// since we will access the filenames from multiple threads
@@ -89,7 +85,7 @@ bool mvceditor::TagDeleteActionClass::Init(mvceditor::GlobalsClass& globals) {
 	return !ResourceDbFileNames.empty();
 }
 
-void mvceditor::TagDeleteActionClass::BackgroundWork() {
+void mvceditor::TagDeleteDirectoryActionClass::BackgroundWork() {
 	std::vector<wxFileName>::iterator it;
 	for (it = ResourceDbFileNames.begin(); it != ResourceDbFileNames.end() && !IsCancelled(); ++it) {
 		SetStatus(_("Tag Cache Delete / ") + it->GetName());
@@ -108,6 +104,50 @@ void mvceditor::TagDeleteActionClass::BackgroundWork() {
 	}
 }
 
-wxString mvceditor::TagDeleteActionClass::GetLabel() const {
-	return wxT("Tag Cache Delete");
+wxString mvceditor::TagDeleteDirectoryActionClass::GetLabel() const {
+	return wxT("Tag Cache Delete Directory");
+}
+
+
+mvceditor::TagDeleteFileActionClass::TagDeleteFileActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId,
+													  const std::vector<wxFileName>& filesToDelete)
+	: GlobalActionClass(runningThreads, eventId) 
+	, FilesToDelete() {
+	FilesToDelete = mvceditor::DeepCopyFileNames(filesToDelete);
+}
+
+bool mvceditor::TagDeleteFileActionClass::Init(mvceditor::GlobalsClass& globals) {
+	SetStatus(_("Tag Cache Delete File"));
+
+	// not sure if wxFileName assignment is a complete clone, so use Assign() just in case
+	// since we will access the filenames from multiple threads
+	ResourceDbFileNames.push_back(wxFileName(globals.TagCacheDbFileName.GetFullPath()));
+
+	// TODO wipe detector tags db too
+	return !ResourceDbFileNames.empty();
+}
+
+void mvceditor::TagDeleteFileActionClass::BackgroundWork() {
+	std::vector<wxFileName>::iterator it;
+	for (it = ResourceDbFileNames.begin(); it != ResourceDbFileNames.end() && !IsCancelled(); ++it) {
+		SetStatus(_("Tag Cache Delete File/ ") + it->GetName());
+		// initialize the sqlite db
+		soci::session session;
+		try {
+			session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(it->GetFullPath()));
+			mvceditor::TagParserClass tagParser;
+			tagParser.Init(&session);
+			for (size_t i = 0; i < FilesToDelete.size(); ++i) {
+				tagParser.DeleteFromFile(FilesToDelete[i].GetFullPath());
+			}
+		} catch(std::exception const& e) {
+			session.close();
+			wxString msg = mvceditor::CharToWx(e.what());
+			wxASSERT_MSG(false, msg);
+		}
+	}
+}
+
+wxString mvceditor::TagDeleteFileActionClass::GetLabel() const {
+	return wxT("Tag Cache Delete File");
 }

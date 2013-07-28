@@ -439,3 +439,11 @@ void mvceditor::TagCacheClass::DeleteFromFile(const wxString& fullPath) {
 		TagFinderList->TagParser.DeleteFromFile(fullPath);
 	}
 }
+
+bool mvceditor::TagCacheClass::HasFullPath(const wxString& fullPath) {
+	bool found  = false;
+	if (TagFinderList->IsTagFinderInit) {
+		found = TagFinderList->TagFinder.HasFullPath(fullPath);
+	}	
+	return found;
+}

@@ -76,6 +76,7 @@ const wxEventType mvceditor::EVENT_APP_FILE_NEW = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_FILE_SAVED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_FILE_CLOSED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_FILE_REVERTED = wxNewEventType();
+const wxEventType mvceditor::EVENT_APP_FILE_DELETED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_FILE_EXTERNALLY_MODIFIED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_PREFERENCES_SAVED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED = wxNewEventType();

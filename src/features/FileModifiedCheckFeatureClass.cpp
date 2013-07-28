@@ -35,7 +35,8 @@ mvceditor::FileModifiedCheckFeatureClass::FileModifiedCheckFeatureClass(mvcedito
 : FeatureClass(app)
 , Timer(this, ID_FILE_MODIFIED_CHECK)
 , FsWatcher() 
-, FilesExternallyModified() {
+, FilesExternallyModified()
+, FilesExternallyDeleted() {
 	FsWatcher.SetOwner(this);
 }
 
@@ -103,20 +104,13 @@ void mvceditor::FileModifiedCheckFeatureClass::OnTimer(wxTimerEvent& event) {
 	if (!filesToPrompt.empty()) {
 		FilesModifiedPrompt(filesToPrompt);
 	}
-	FilesExternallyModified.clear();
-	Timer.Start(150, wxTIMER_CONTINUOUS);
-}
-
-void mvceditor::FileModifiedCheckFeatureClass::OnFilesCheckComplete(mvceditor::FilesModifiedEventClass& event) {
-	mvceditor::NotebookClass* notebook = GetNotebook();
-	size_t size = notebook->GetPageCount();
-	if (size > 0 && (event.Modified.size() + event.Deleted.size()) > 0) {
-		Timer.Stop();
-		if (!event.Deleted.empty()) {
-			OnFilesDeleted(event);
-		}
+	if (!FilesExternallyDeleted.empty()) {
+		FilesDeletedPrompt(openedFiles, FilesExternallyDeleted);
 	}
-	Timer.Start(3000, wxTIMER_CONTINUOUS);
+
+	FilesExternallyModified.clear();
+	FilesExternallyDeleted.clear();
+	Timer.Start(150, wxTIMER_CONTINUOUS);
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::FilesModifiedPrompt(std::map<wxString, mvceditor::CodeControlClass*>& filesToPrompt) {
@@ -167,45 +161,61 @@ void mvceditor::FileModifiedCheckFeatureClass::FilesModifiedPrompt(std::map<wxSt
 	}
 }
 
-void mvceditor::FileModifiedCheckFeatureClass::OnFilesDeleted(mvceditor::FilesModifiedEventClass& event) {
-	mvceditor::NotebookClass* notebook = GetNotebook();
-	size_t pageCount = notebook->GetPageCount();
-
-	// get all opened files we need to modify all controls that don't have new files
-	std::vector<wxString> allOpenedFiles;
-	for (size_t i = 0; i < pageCount; ++i) {
-		mvceditor::CodeControlClass* ctrl = notebook->GetCodeControl(i);
-		if (ctrl && !ctrl->IsNew()) {
-			allOpenedFiles.push_back(ctrl->GetFileName());
-		}
-	}
+void mvceditor::FileModifiedCheckFeatureClass::FilesDeletedPrompt(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles, std::vector<wxFileName>& deletedFiles) {
 	std::vector<wxFileName>::const_iterator file;
 	wxString files;
-	for (file = event.Deleted.begin(); file != event.Deleted.end(); ++ file) {
-		files += file->GetFullPath() + wxT("\n");
+	bool deletingOpened = false;
+	for (file = deletedFiles.begin(); file != deletedFiles.end(); ++ file) {
 	
 		// find the control for the file
-		for (size_t i = 0; i < pageCount; ++i) {
-			mvceditor::CodeControlClass* ctrl = notebook->GetCodeControl(i);
-			if (ctrl && ctrl->GetFileName() == file->GetFullPath()) {
-				ctrl->TreatAsNew();
-				break;
-			}
+		if (openedFiles.end() != openedFiles.find(file->GetFullPath())) {
+			mvceditor::CodeControlClass* ctrl = openedFiles[file->GetFullPath()];
+			ctrl->TreatAsNew();
+			files += file->GetFullPath() + wxT("\n");
+			deletingOpened = true;
 		}
+		// send the deleted file event to the app
+		wxCommandEvent deleteEvt(mvceditor::EVENT_APP_FILE_DELETED);
+		deleteEvt.SetString(file->GetFullPath());
+		App.EventSink.Publish(deleteEvt);		
 	}
-	wxString message;
-	message += _("The following files have been deleted externally.\n");
-	message += _("You will need to save the file to store the contents.\n\n");
-	message += files;
-	int opts = wxICON_QUESTION;
-	wxMessageBox(message, _("Warning"), opts, GetMainWindow());
+
+	// only show a message if a file that is being edited was deleted
+	if (deletingOpened) {
+		wxString message;
+		message += _("The following files have been deleted externally.\n");
+		message += _("You will need to save the file to store the contents.\n\n");
+		message += files;
+		int opts = wxICON_QUESTION;
+		wxMessageBox(message, _("Warning"), opts, GetMainWindow());
+	}
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::OnFsWatcher(wxFileSystemWatcherEvent& event) {
+	wxFileName path = event.GetPath();
 	if (wxFSW_EVENT_MODIFY == event.GetChangeType()) {
-		wxFileName path = event.GetPath();
+		
+		// a modify event could be from a file modification or directory modification
+		// skip directoy modifications, as directories are modified when files added/removed from the dir
 		if (path.FileExists() && std::find(FilesExternallyModified.begin(), FilesExternallyModified.end(), path) == FilesExternallyModified.end()) {
+			
+			// this file was modified
 			FilesExternallyModified.push_back(path);
+		}
+	}
+	else if (wxFSW_EVENT_CREATE == event.GetChangeType()) {
+		if (path.FileExists() && std::find(FilesExternallyModified.begin(), FilesExternallyModified.end(), path) == FilesExternallyModified.end()) {
+			
+			// this file was created, same logic as file modification
+			FilesExternallyModified.push_back(path);
+		}
+	}
+	else if (wxFSW_EVENT_DELETE == event.GetChangeType()) {
+		bool isFile = App.Globals.TagCache.HasFullPath(path.GetFullPath());
+		if (isFile && std::find(FilesExternallyDeleted.begin(), FilesExternallyDeleted.end(), path) == FilesExternallyDeleted.end()) {
+			
+			// this file was created, same logic as file modification
+			FilesExternallyDeleted.push_back(path);
 		}
 	}
 }
@@ -215,5 +225,4 @@ BEGIN_EVENT_TABLE(mvceditor::FileModifiedCheckFeatureClass, mvceditor::FeatureCl
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_EXIT, mvceditor::FileModifiedCheckFeatureClass::OnAppExit)
 	EVT_TIMER(ID_FILE_MODIFIED_CHECK, mvceditor::FileModifiedCheckFeatureClass::OnTimer)
 	EVT_FSWATCHER(wxID_ANY, mvceditor::FileModifiedCheckFeatureClass::OnFsWatcher)
-	EVT_FILES_EXTERNALLY_MODIFIED_COMPLETE(ID_FILE_MODIFIED_CHECK, mvceditor::FileModifiedCheckFeatureClass::OnFilesCheckComplete)
 END_EVENT_TABLE()

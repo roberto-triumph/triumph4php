@@ -339,6 +339,17 @@ void mvceditor::TagFeatureClass::OnAppFileReverted(wxCommandEvent& event) {
 	event.Skip();
 }
 
+void mvceditor::TagFeatureClass::OnAppFileDeleted(wxCommandEvent& event) {
+
+	// clean up the cache in a background thread
+	std::vector<wxFileName> filesToDelete;
+	filesToDelete.push_back(wxFileName(event.GetString()));
+	mvceditor::TagDeleteFileActionClass* action =  new mvceditor::TagDeleteFileActionClass(App.RunningThreads, wxID_ANY,
+		filesToDelete);
+	action->Init(App.Globals);
+	App.RunningThreads.Queue(action);
+}
+
 
 void mvceditor::TagFeatureClass::OnAppFileExternallyModified(wxCommandEvent& event) {
 
@@ -737,6 +748,7 @@ BEGIN_EVENT_TABLE(mvceditor::TagFeatureClass, wxEvtHandler)
 	EVT_APP_FILE_CLOSED(mvceditor::TagFeatureClass::OnAppFileClosed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_OPENED, mvceditor::TagFeatureClass::OnAppFileOpened)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_REVERTED, mvceditor::TagFeatureClass::OnAppFileReverted)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_DELETED, mvceditor::TagFeatureClass::OnAppFileDeleted)
 
 	// we will treat file new and file opened the same
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_NEW, mvceditor::TagFeatureClass::OnAppFileOpened)

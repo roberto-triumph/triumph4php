@@ -202,6 +202,14 @@ extern const wxEventType EVENT_APP_FILE_NEW;
 extern const wxEventType EVENT_APP_FILE_REVERTED;
 
 /**
+ * Notification that a single file has been deleted (all changed in memory undone). The event will contain
+ * the full path of the file that was opened in the GetString() method.
+ * This event gets generated if the user deletes a files from the internal explorer or from
+ * an external process (command prompt or OS shell)
+ */
+extern const wxEventType EVENT_APP_FILE_DELETED;
+
+/**
  * Notification that the one of the files in any of the enabled projects has been updated by an 
  * external process. 
  * An example is when a user performs a SVN update / GIT pull to get the latest version of their

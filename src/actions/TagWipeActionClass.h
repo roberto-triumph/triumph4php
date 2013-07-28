@@ -60,11 +60,11 @@ private:
  * action to remove only tags from certain directories from the tag
  * databases
  */
-class TagDeleteActionClass : public mvceditor::GlobalActionClass {
+class TagDeleteDirectoryActionClass : public mvceditor::GlobalActionClass {
 	
 public:
 
-	TagDeleteActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId, const std::vector<wxFileName>& dirsToDelete);
+	TagDeleteDirectoryActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId, const std::vector<wxFileName>& dirsToDelete);
 	
 	bool Init(mvceditor::GlobalsClass& globals);
 
@@ -85,6 +85,39 @@ private:
 	 * the directories to be removed from the cache.
 	 */
 	std::vector<wxFileName> DirsToDelete;
+	
+};
+
+
+/**
+ * action to remove only tags from certain files from the tag
+ * databases
+ */
+class TagDeleteFileActionClass : public mvceditor::GlobalActionClass {
+	
+public:
+
+	TagDeleteFileActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId, const std::vector<wxFileName>& filesToDelete);
+	
+	bool Init(mvceditor::GlobalsClass& globals);
+
+	wxString GetLabel() const;
+	
+protected:
+	
+	void BackgroundWork();
+	
+private:
+		
+	/**
+	 * The db files that need to be wiped.
+	 */
+	std::vector<wxFileName> ResourceDbFileNames;
+
+	/**
+	 * the directories to be removed from the cache.
+	 */
+	std::vector<wxFileName> FilesToDelete;
 	
 };
 }

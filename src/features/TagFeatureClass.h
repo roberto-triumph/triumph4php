@@ -142,6 +142,11 @@ private:
 	void OnAppFileReverted(wxCommandEvent& event);
 
 	/**
+	 * when a file is deleted remove it from the tag cache
+	 */
+	void OnAppFileDeleted(wxCommandEvent& event);
+
+	/**
 	 * if a file is modified externally re-tag it
 	 */
 	void OnAppFileExternallyModified(wxCommandEvent& event);

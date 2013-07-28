@@ -143,7 +143,7 @@ bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvced
 			dirsToDelete.push_back(source->RootDirectory);
 		}
 	}
-	AddStep(new mvceditor::TagDeleteActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE, dirsToDelete));
+	AddStep(new mvceditor::TagDeleteDirectoryActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE, dirsToDelete));
 
 	// this will load the url entry point cache
 	// do this before the rest so the urls become available asap

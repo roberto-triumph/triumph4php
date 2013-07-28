@@ -203,6 +203,7 @@ public:
 	/**
 	 * Deletes tags from a single file. If this finder was initialized with a backing file, the backing database
 	 * file will be deleted also.
+	 * This method deletes all resource tags and the file tag too.
 	 */
 	void DeleteFromFile(const wxString& fullPath);
 	

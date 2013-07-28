@@ -61,11 +61,6 @@ private:
 	void OnTimer(wxTimerEvent& event);
 
 	/**
-	 * prompt the user to reload modified files or save deleted files
-	 */
-	void OnFilesCheckComplete(mvceditor::FilesModifiedEventClass& event);
-
-	/**
 	 * prompt the user to reload modified files
 	 */
 	void FilesModifiedPrompt(std::map<wxString, mvceditor::CodeControlClass*>& filesToPrompt);
@@ -73,7 +68,7 @@ private:
 	/**
 	 * prompt the user to save the deleted files
 	 */
-	void OnFilesDeleted(mvceditor::FilesModifiedEventClass& event);
+	void FilesDeletedPrompt(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles, std::vector<wxFileName>& deletedFiles);
 
 	/**
 	 * when a file has been externally modified / added / deleted we need to
@@ -102,6 +97,7 @@ private:
 	 * the modified list will only contain files (not directories)
 	 */
 	std::vector<wxFileName> FilesExternallyModified;
+	std::vector<wxFileName> FilesExternallyDeleted;
 
 	DECLARE_EVENT_TABLE()
 
