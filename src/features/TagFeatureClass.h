@@ -152,6 +152,11 @@ private:
 	void OnAppFileExternallyModified(wxCommandEvent& event);
 
 	/**
+	 * when a directory has been created tag the directory
+	 */
+	void OnAppDirCreated(wxCommandEvent& event);
+
+	/**
 	 * when the tag cache has been searched, display the matching tags in the dialog so that
 	 * the user can choose which to open
 	 */
@@ -173,6 +178,12 @@ private:
 	 * that way we can get the newest variable names
 	 */
 	wxTimer Timer;
+
+	/**
+	 * To run any updates to the tag cache serially (one at a time)
+	 * doing this in order to prevent locks on the sqlite db
+	 */
+	mvceditor::RunningThreadsClass RunningThreads;
 
 	/**
 	 * when a 'jump to tag' is done and we need to index a project, we

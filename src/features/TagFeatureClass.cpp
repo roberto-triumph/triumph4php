@@ -42,10 +42,15 @@ static int ID_WORKING_CACHE = wxNewId();
 mvceditor::TagFeatureClass::TagFeatureClass(mvceditor::AppClass& app)
 	: FeatureClass(app)
 	, Timer(this, ID_REPARSE_TIMER)
+	, RunningThreads()
 	, JumpToText()
 	, ProjectIndexMenu(NULL)
 	, CacheState(CACHE_STALE) {
 	IndexingDialog = NULL;
+	RunningThreads.AddEventHandler(this);
+
+	// 1 ==> to make sure any queued items are done one at a time
+	RunningThreads.SetMaxThreads(1);
 }
 
 void mvceditor::TagFeatureClass::AddSearchMenuItems(wxMenu* searchMenu) {
@@ -224,10 +229,10 @@ void mvceditor::TagFeatureClass::OnAppFileClosed(mvceditor::CodeControlEventClas
 	}
 	if (!codeCtrl->IsNew()) {
 		wxString fileName = codeCtrl->GetFileName();
-		mvceditor::ProjectTagSingleFileActionClass* tagAction = new mvceditor::ProjectTagSingleFileActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST);
+		mvceditor::ProjectTagSingleFileActionClass* tagAction = new mvceditor::ProjectTagSingleFileActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST);
 		tagAction->SetFileToParse(fileName);
 		if (tagAction->Init(App.Globals)) {
-			App.RunningThreads.Queue(tagAction);
+			RunningThreads.Queue(tagAction);
 		}
 		else {
 			delete tagAction;
@@ -282,7 +287,7 @@ void mvceditor::TagFeatureClass::OnAppFileOpened(wxCommandEvent& event) {
 		Timer.Stop();
 
 		// we need to differentiate between new and opened files (the 'true' arg)
-		mvceditor::WorkingCacheBuilderClass* builder = new mvceditor::WorkingCacheBuilderClass(App.RunningThreads, ID_WORKING_CACHE);
+		mvceditor::WorkingCacheBuilderClass* builder = new mvceditor::WorkingCacheBuilderClass(RunningThreads, ID_WORKING_CACHE);
 		builder->Update(
 			App.Globals,
 			codeControl->GetFileName(),
@@ -295,7 +300,7 @@ void mvceditor::TagFeatureClass::OnAppFileOpened(wxCommandEvent& event) {
 			// also, do not attempt to parse because we want to avoid sqlite db locking errors in case
 			// that the project tag action is running in the background
 			false);
-		App.RunningThreads.Queue(builder);
+		RunningThreads.Queue(builder);
 	}
 	event.Skip();
 }
@@ -320,7 +325,7 @@ void mvceditor::TagFeatureClass::OnAppFileReverted(wxCommandEvent& event) {
 		Timer.Stop();
 
 		// we need to differentiate between new and opened files (the 'true' arg)
-		mvceditor::WorkingCacheBuilderClass* builder = new mvceditor::WorkingCacheBuilderClass(App.RunningThreads, ID_WORKING_CACHE);
+		mvceditor::WorkingCacheBuilderClass* builder = new mvceditor::WorkingCacheBuilderClass(RunningThreads, ID_WORKING_CACHE);
 		builder->Update(
 			App.Globals,
 			codeControl->GetFileName(),
@@ -334,7 +339,7 @@ void mvceditor::TagFeatureClass::OnAppFileReverted(wxCommandEvent& event) {
 			// rebuild the symbol table, while when we open a file we dont need to re-tag the file
 			// because it has not changed.
 			true);
-		App.RunningThreads.Queue(builder);
+		RunningThreads.Queue(builder);
 	}
 	event.Skip();
 }
@@ -344,12 +349,11 @@ void mvceditor::TagFeatureClass::OnAppFileDeleted(wxCommandEvent& event) {
 	// clean up the cache in a background thread
 	std::vector<wxFileName> filesToDelete;
 	filesToDelete.push_back(wxFileName(event.GetString()));
-	mvceditor::TagDeleteFileActionClass* action =  new mvceditor::TagDeleteFileActionClass(App.RunningThreads, wxID_ANY,
+	mvceditor::TagDeleteFileActionClass* action =  new mvceditor::TagDeleteFileActionClass(RunningThreads, wxID_ANY,
 		filesToDelete);
 	action->Init(App.Globals);
-	App.RunningThreads.Queue(action);
+	RunningThreads.Queue(action);
 }
-
 
 void mvceditor::TagFeatureClass::OnAppFileExternallyModified(wxCommandEvent& event) {
 
@@ -359,10 +363,21 @@ void mvceditor::TagFeatureClass::OnAppFileExternallyModified(wxCommandEvent& eve
 	// if the file is from an active project, then re-tag it
 	// otherwise do nothing
 	wxString fileName = event.GetString();
-	mvceditor::ProjectTagSingleFileActionClass* tagAction = new mvceditor::ProjectTagSingleFileActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST);
+	mvceditor::ProjectTagSingleFileActionClass* tagAction = new mvceditor::ProjectTagSingleFileActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST);
 	tagAction->SetFileToParse(fileName);
 	if (tagAction->Init(App.Globals)) {
-		App.RunningThreads.Queue(tagAction);
+		RunningThreads.Queue(tagAction);
+	}
+	else {
+		delete tagAction;
+	}
+}
+
+void mvceditor::TagFeatureClass::OnAppDirCreated(wxCommandEvent& event) {
+	mvceditor::ProjectTagDirectoryActionClass* tagAction =  new mvceditor::ProjectTagDirectoryActionClass(RunningThreads, wxID_ANY);
+	tagAction->SetDirToParse(event.GetString());
+	if (tagAction->Init(App.Globals)) {
+		RunningThreads.Queue(tagAction);
 	}
 	else {
 		delete tagAction;
@@ -388,7 +403,7 @@ void mvceditor::TagFeatureClass::OnTimerComplete(wxTimerEvent& event) {
 	// stop the timer so that we dont queue up a builder actions before the previous one
 	// finishes
 	Timer.Stop();
-	mvceditor::WorkingCacheBuilderClass* builder = new mvceditor::WorkingCacheBuilderClass(App.RunningThreads, ID_WORKING_CACHE);
+	mvceditor::WorkingCacheBuilderClass* builder = new mvceditor::WorkingCacheBuilderClass(RunningThreads, ID_WORKING_CACHE);
 	builder->Update(
 		App.Globals,
 		codeControl->GetFileName(),
@@ -397,7 +412,7 @@ void mvceditor::TagFeatureClass::OnTimerComplete(wxTimerEvent& event) {
 		codeControl->IsNew(),
 		App.Globals.Environment.Php.Version,
 		true);
-	App.RunningThreads.Queue(builder);
+	RunningThreads.Queue(builder);
 }
 
 void mvceditor::TagFeatureClass::OnCodeControlHotspotClick(wxStyledTextEvent& event) {
@@ -749,6 +764,7 @@ BEGIN_EVENT_TABLE(mvceditor::TagFeatureClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_OPENED, mvceditor::TagFeatureClass::OnAppFileOpened)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_REVERTED, mvceditor::TagFeatureClass::OnAppFileReverted)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_DELETED, mvceditor::TagFeatureClass::OnAppFileDeleted)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_DIR_CREATED,  mvceditor::TagFeatureClass::OnAppDirCreated)
 
 	// we will treat file new and file opened the same
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_NEW, mvceditor::TagFeatureClass::OnAppFileOpened)

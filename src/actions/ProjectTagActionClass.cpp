@@ -24,6 +24,7 @@
  */
 #include <actions/ProjectTagActionClass.h>
 #include <code_control/ResourceCacheBuilderClass.h>
+#include <search/RecursiveDirTraverserClass.h>
 #include <globals/Assets.h>
 
 mvceditor::ProjectTagActionClass::ProjectTagActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId) 
@@ -127,6 +128,79 @@ void mvceditor::ProjectTagInitActionClass::Work(mvceditor::GlobalsClass &globals
 	tagFinderList->InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), otherFileExtensions, version);
 	tagFinderList->InitDetectorTag(globals.DetectorCacheDbFileName);
 	globals.TagCache.RegisterGlobal(tagFinderList);
+}
+
+mvceditor::ProjectTagDirectoryActionClass::ProjectTagDirectoryActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+	: GlobalActionClass(runningThreads, eventId) 
+	, Project()
+	, Dir() 
+	, TagFinderList() {
+
+}
+
+void mvceditor::ProjectTagDirectoryActionClass::SetDirToParse(const wxString& path) {
+	Dir.AssignDir(path.c_str());
+}
+
+bool mvceditor::ProjectTagDirectoryActionClass::Init(mvceditor::GlobalsClass& globals) {
+
+	// get the project that the directory is in
+	// TODO: what if the directory is in more than 1 project?
+	std::vector<mvceditor::ProjectClass>::const_iterator project;
+	std::vector<mvceditor::SourceClass>::const_iterator src;
+	bool isDirFromProject = false;
+	Dir.Normalize();
+	wxString dirWithSep = Dir.GetPathWithSep();
+	for (project = globals.Projects.begin(); !isDirFromProject && project != globals.Projects.end(); ++project) {
+		if (project->IsEnabled) {
+			for (src = project->Sources.begin(); src != project->Sources.end(); ++src) {
+				if (src->IsInRootDirectory(dirWithSep)) {
+					isDirFromProject = true;
+					Project = *project;
+					break;
+				}
+			}
+		}
+	}
+	if (isDirFromProject) {
+		TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), globals.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
+
+	}
+	return isDirFromProject; 
+}
+
+void mvceditor::ProjectTagDirectoryActionClass::BackgroundWork() {
+	SetStatus(_("Tag Cache Re-tag"));
+	if (!Dir.DirExists()) {
+		return;
+	}
+	Dir.Normalize();
+	wxString dirWithSep = Dir.GetPathWithSep();
+	std::vector<mvceditor::SourceClass>::iterator src;
+	for (src = Project.Sources.begin(); src != Project.Sources.end(); ++src) {
+		if (src->IsInRootDirectory(dirWithSep)) {
+
+			// this specific sequence is needed so that the source_id
+			// is set properly in the database
+			TagFinderList.TagParser.BeginSearch(src->RootDirectory.GetPath());
+			
+			std::vector<wxString> fullPaths;
+			mvceditor::RecursiveDirTraverserClass traverser(fullPaths);
+			wxDir dir;
+			if (dir.Open(Dir.GetFullPath())) {
+				dir.Traverse(traverser, wxEmptyString, wxDIR_DIRS | wxDIR_FILES);
+				for (size_t i = 0; i < fullPaths.size(); ++i) {
+					TagFinderList.TagParser.Walk(fullPaths[i]);
+				}			
+			}
+			TagFinderList.TagParser.EndSearch();
+			break;
+		}
+	}
+}
+
+wxString mvceditor::ProjectTagDirectoryActionClass::GetLabel() const {
+	return wxT("Tag Cache Directory");
 }
 
 mvceditor::ProjectTagSingleFileActionClass::ProjectTagSingleFileActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)

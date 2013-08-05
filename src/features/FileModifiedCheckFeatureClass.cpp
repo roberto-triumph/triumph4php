@@ -36,18 +36,20 @@ mvceditor::FileModifiedCheckFeatureClass::FileModifiedCheckFeatureClass(mvcedito
 , Timer(this, ID_FILE_MODIFIED_CHECK)
 , FsWatcher() 
 , FilesExternallyModified()
-, FilesExternallyDeleted() {
+, FilesExternallyDeleted() 
+, DirsExternallyCreated() 
+, Ticks(0) {
 	FsWatcher.SetOwner(this);
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::OnAppReady(wxCommandEvent& event) {
-	Timer.Start(150, wxTIMER_CONTINUOUS);
+	Timer.Start(250, wxTIMER_CONTINUOUS);
 	
 	// add the enabled projects to the watch list
 	std::vector<mvceditor::SourceClass> sources = App.Globals.AllEnabledPhpSources();
 	std::vector<mvceditor::SourceClass>::const_iterator source;
 	for (source = sources.begin(); source != sources.end(); ++source) {
-		int flags = wxFSW_EVENT_CREATE  | wxFSW_EVENT_DELETE  | wxFSW_EVENT_RENAME | wxFSW_EVENT_MODIFY;
+		int flags = wxFSW_EVENT_CREATE  | wxFSW_EVENT_DELETE  | wxFSW_EVENT_RENAME | wxFSW_EVENT_MODIFY | wxFSW_EVENT_ERROR | wxFSW_EVENT_WARNING;
 		wxFileName sourceDir = source->RootDirectory;
 		sourceDir.DontFollowLink();
 		FsWatcher.AddTree(sourceDir, flags);
@@ -64,6 +66,7 @@ void mvceditor::FileModifiedCheckFeatureClass::OnAppExit(wxCommandEvent& event) 
 
 void mvceditor::FileModifiedCheckFeatureClass::OnTimer(wxTimerEvent& event) {
 	Timer.Stop();
+	Ticks++;
 
 	mvceditor::NotebookClass* notebook = GetNotebook();
 	size_t size = notebook->GetPageCount();
@@ -83,22 +86,30 @@ void mvceditor::FileModifiedCheckFeatureClass::OnTimer(wxTimerEvent& event) {
 
 	// if the file that was modified is one of the opened files, we need to prompt the user
 	// to see if they want to reload the new version
-	std::vector<wxFileName>::iterator f;
+	std::vector<wxFileName>::iterator f = FilesExternallyModified.begin();
 	std::map<wxString, mvceditor::CodeControlClass*> filesToPrompt;
-	for (f = FilesExternallyModified.begin(); f != FilesExternallyModified.end(); ++f) {
+	while (f != FilesExternallyModified.end()) {
 		bool isOpened = openedFiles.find(f->GetFullPath()) != openedFiles.end();
 		if (!isOpened) {
 			
-			// file is not open. notify the app that a file was externally modified
-			wxCommandEvent modifiedEvt(mvceditor::EVENT_APP_FILE_EXTERNALLY_MODIFIED);
-			modifiedEvt.SetString(f->GetFullPath());
-			App.EventSink.Publish(modifiedEvt);
+			// file is not open. handle it later
+			f++;
+			
 		}
 		else if (f->GetModificationTime() > openedFiles[f->GetFullPath()]->GetFileOpenedDateTime()) {
 			
 			// file is opened, but since file modified time is newer than what the code 
 			// control read in then it means that the file was modified externally
 			filesToPrompt[f->GetFullPath()] = openedFiles[f->GetFullPath()];
+
+			// remove it from the files to handle list
+			f = FilesExternallyModified.erase(f);
+		}
+		else {
+
+			// this file was saved by the user clicking "save" on mvc editor. do nothing
+			// because the cache will be updated via the EVT_APP_FILE_SAVED handler
+			f = FilesExternallyModified.erase(f);
 		}
 	}
 	if (!filesToPrompt.empty()) {
@@ -106,11 +117,36 @@ void mvceditor::FileModifiedCheckFeatureClass::OnTimer(wxTimerEvent& event) {
 	}
 	if (!FilesExternallyDeleted.empty()) {
 		FilesDeletedPrompt(openedFiles, FilesExternallyDeleted);
+		FilesExternallyDeleted.clear();
+	}
+	if (Ticks % 20 == 0 && (!FilesExternallyModified.empty() || !DirsExternallyCreated.empty())) {
+		HandleNonOpenedFiles(openedFiles);
+		Ticks = 1;
+	}
+	Timer.Start(250, wxTIMER_CONTINUOUS);
+}
+
+void mvceditor::FileModifiedCheckFeatureClass::HandleNonOpenedFiles(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles) {
+	std::vector<wxFileName>::iterator f = FilesExternallyModified.begin();
+	while (f != FilesExternallyModified.end()) {
+		bool isOpened = openedFiles.find(f->GetFullPath()) != openedFiles.end();
+		if (!isOpened) {
+			// file is not open. notify the app that a file was externally modified
+			wxCommandEvent modifiedEvt(mvceditor::EVENT_APP_FILE_EXTERNALLY_MODIFIED);
+			modifiedEvt.SetString(f->GetFullPath());
+			App.EventSink.Publish(modifiedEvt);
+			f = FilesExternallyModified.erase(f);
+		}
+	}
+	if (!DirsExternallyCreated.empty()) {
+		for (size_t i = 0; i < DirsExternallyCreated.size(); ++i) {
+			wxCommandEvent modifiedEvt(mvceditor::EVENT_APP_DIR_CREATED);
+			modifiedEvt.SetString(DirsExternallyCreated[i].GetFullPath());
+			App.EventSink.Publish(modifiedEvt);
+		}
+		DirsExternallyCreated.clear();
 	}
 
-	FilesExternallyModified.clear();
-	FilesExternallyDeleted.clear();
-	Timer.Start(150, wxTIMER_CONTINUOUS);
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::FilesModifiedPrompt(std::map<wxString, mvceditor::CodeControlClass*>& filesToPrompt) {
@@ -196,7 +232,7 @@ void mvceditor::FileModifiedCheckFeatureClass::OnFsWatcher(wxFileSystemWatcherEv
 	if (wxFSW_EVENT_MODIFY == event.GetChangeType()) {
 		
 		// a modify event could be from a file modification or directory modification
-		// skip directoy modifications, as directories are modified when files added/removed from the dir
+		// skip directory modifications, as directories are modified when files added/removed from the dir
 		if (path.FileExists() && std::find(FilesExternallyModified.begin(), FilesExternallyModified.end(), path) == FilesExternallyModified.end()) {
 			
 			// this file was modified
@@ -209,6 +245,11 @@ void mvceditor::FileModifiedCheckFeatureClass::OnFsWatcher(wxFileSystemWatcherEv
 			// this file was created, same logic as file modification
 			FilesExternallyModified.push_back(path);
 		}
+		else if (path.DirExists() && std::find(DirsExternallyCreated.begin(), DirsExternallyCreated.end(), path) == DirsExternallyCreated.end()) {
+			
+			// a new directory was created
+			DirsExternallyCreated.push_back(path);
+		}
 	}
 	else if (wxFSW_EVENT_DELETE == event.GetChangeType()) {
 		bool isFile = App.Globals.TagCache.HasFullPath(path.GetFullPath());
@@ -217,6 +258,12 @@ void mvceditor::FileModifiedCheckFeatureClass::OnFsWatcher(wxFileSystemWatcherEv
 			// this file was created, same logic as file modification
 			FilesExternallyDeleted.push_back(path);
 		}
+	}
+	else if (wxFSW_EVENT_WARNING == event.GetChangeType()) {
+		wxASSERT_MSG(false, event.GetErrorDescription());
+	}
+	else if (wxFSW_EVENT_ERROR == event.GetChangeType()) {
+		wxASSERT_MSG(false, event.GetErrorDescription());
 	}
 }
 

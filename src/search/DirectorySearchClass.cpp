@@ -163,8 +163,15 @@ bool mvceditor::SourceClass::Contains(const wxString& fullPath) {
 
 bool mvceditor::SourceClass::IsInRootDirectory(const wxString& fullPath) const {
 
-	// ATTN: should this be case sensitive for different OSes?
-	return fullPath.Find(RootDirectory.GetFullPath()) == 0;
+	// make sure to normalize so that the search can be case sensitive depending on the OS
+	wxFileName af;
+	af.AssignDir(fullPath);
+	af.Normalize();
+
+	wxFileName bf(RootDirectory);
+	bf.Normalize();
+
+	return af.GetPathWithSep().Find(bf.GetPathWithSep()) == 0;
 }
 
 wxString mvceditor::SourceClass::WildcardRegEx(const wxString& wildCardString) {

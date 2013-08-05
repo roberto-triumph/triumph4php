@@ -127,6 +127,54 @@ public:
 };
 
 /**
+ * this action will re-tag a single directory (and its subdirs) 
+ */
+class ProjectTagDirectoryActionClass : public mvceditor::GlobalActionClass {
+
+public:
+
+	ProjectTagDirectoryActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+
+	/**
+	 * Set the directory to be parsed
+	 * @param fullPath directory to be scanned (full path).
+	 */
+	void SetDirToParse(const wxString& path);
+
+	/**
+	 * prepare to iterate through the file given in SetDirToParse. 
+	 * This method can be used to update the resources once a die has been created on disk.
+	 * Note that directory must be inside an enabled project
+	 *
+	 * @param globals to get the tag cache location
+	 * @return bool false if file given in DirToParse does not exist or if the directory is
+	 *        not inside any enabled projects
+	 */
+	bool Init(mvceditor::GlobalsClass& globals);
+
+protected:
+
+	void BackgroundWork();
+
+	wxString GetLabel() const;
+
+	/**
+	 * the project in which the directory is located in
+	 */
+	mvceditor::ProjectClass Project;
+
+	/**
+	 * the directory to re-parse
+	 */
+	wxFileName Dir;
+
+	/**
+	 * This object will perform the parsing and storing of the tags
+	 */
+	mvceditor::TagFinderListClass TagFinderList;
+};
+
+/**
  * this action will re-tag a single file only
  */
 class ProjectTagSingleFileActionClass : public mvceditor::GlobalActionClass {
@@ -136,6 +184,7 @@ public:
 	ProjectTagSingleFileActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
+	 * 
 	 * Set the file to be parsed
 	 * @param fullPath file to be scanned (full path, including name).
 	 */
@@ -145,9 +194,10 @@ public:
 	 * prepare to iterate through the file given in SetFileToParse. The name part of the given file must match one
 	 * od the wildcards that has been set in globals.
 	 * This method can be used to update the resources once a file has been modified on disk.
+	 * Note that the file MUST be part of a project.
 	 *
 	 * @param globals to get the tag cache location
-	 * @return bool false if file given in FileToParse does not exist
+	 * @return bool false if file given in FileToParse does not exist, or if file is not inside any enabled projects
 	 */
 	bool Init(mvceditor::GlobalsClass& globals);
 

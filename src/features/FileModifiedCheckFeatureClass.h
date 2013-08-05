@@ -56,9 +56,15 @@ private:
 	void OnAppExit(wxCommandEvent& event);
 
 	/**
-	 * when the timer is up then check for file modifications.
+	 * when the timer is up then handle the files that the fs watcher notified us 
+	 * that were changed
 	 */
 	void OnTimer(wxTimerEvent& event);
+
+	/**
+	 * special handling for files that are not open.
+	 */
+	void HandleNonOpenedFiles(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles);
 
 	/**
 	 * prompt the user to reload modified files
@@ -98,7 +104,10 @@ private:
 	 */
 	std::vector<wxFileName> FilesExternallyModified;
 	std::vector<wxFileName> FilesExternallyDeleted;
+	std::vector<wxFileName> DirsExternallyCreated;
 
+	int Ticks;
+	
 	DECLARE_EVENT_TABLE()
 
 };

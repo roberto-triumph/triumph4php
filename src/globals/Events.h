@@ -227,6 +227,14 @@ extern const wxEventType EVENT_APP_FILE_DELETED;
 extern const wxEventType EVENT_APP_FILE_EXTERNALLY_MODIFIED;
 
 /**
+ * Notification that a single directory has been created. The event will contain
+ * the full path of the directory that was created in the GetString() method.
+ * This event gets generated if the user creates a directory from 
+ * an external process (command prompt or OS shell)
+ */
+extern const wxEventType EVENT_APP_DIR_CREATED;
+
+/**
  * Notification that the user preferences have been saved by the user. 
  * This event will be genreated after the user changes the settings via Edit ... Preferences.
  * Listeners of this event will  need to repaint any windows that are affected by the changes. Listeners
