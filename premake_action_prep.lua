@@ -56,28 +56,25 @@ newaction {
 -- makes sure wxWidgets DLLs are placed in the same directory as mvc-editor.exe
 function checkWxWidgets() 
 	if os.is "windows" then
-		wxLocation = os.getenv("WXWIN");
-		if wxLocation then
-			dlls = os.matchfiles(wxLocation .. "/lib/vc_dll/*.dll");
-			if #dlls > 0 then
-				batchexecute(normalizepath(""), {
-					"xcopy /S /Y \"" .. wxLocation .. "\\lib\\vc_dll\\\wxbase*ud_*.dll\" \"Debug\\\"",
-					"xcopy /S /Y \"" .. wxLocation .. "\\lib\\vc_dll\\\wxmsw*ud_*.dll\" \"Debug\\\"",
-					"xcopy /S /Y \"" .. wxLocation .. "\\lib\\vc_dll\\\wxbase*u_*.dll\" \"Release\\\"",
-					"xcopy /S /Y \"" .. wxLocation .. "\\lib\\vc_dll\\\wxmsw*u_*.dll\" \"Release\\\""
-				});
-			else 
-				error("wxWidgets DLLs not found.  You need to build the wxWidgets library (Unicode Debug and Unicode Release configurations). " ..
-						"Use the Visual Studio solution provided by wxWidgets to build the libraries \n" .. 
-						"1) Download wxWidgets >= 2.9.4. Install to a C:\\users\\[user]\\wxWidgets directory \n" ..
-						"2) Open Solution wx_vc9.sln located build\msw directory\n" .. 
-						"3) Select 'DLL Debug' from Configuration Manager\n" .. 
-						"4) Build Entire Solution\n" .. 
-						"5) Select 'DLL Release' from Configuration Manager\n" .. 
-						"6) Build Entire Solution\n")
-			end
+		dlls = os.matchfiles(WX_LIB_DIR .. "*.dll")
+		if #dlls > 0 then
+			batchexecute(normalizepath(""), {
+				"xcopy /S /Y " .. normalizepath(WX_LIB_DIR .. "wxbase*ud_*.dll") .. " \"Debug\\\"",
+				"xcopy /S /Y " .. normalizepath(WX_LIB_DIR .. "wxmsw*ud_*.dll") .. " \"Debug\\\"",
+				"xcopy /S /Y " .. normalizepath(WX_LIB_DIR .. "wxbase*u_*.dll") .. " \"Release\\\"",
+				"xcopy /S /Y " .. normalizepath(WX_LIB_DIR .. "wxmsw*u_*.dll") .. " \"Release\\\""
+			});
 		else 
-			print "WXWIN environment variable not found. Generated Solution file WILL NOT WORK. Please install wxPack."
+			error("wxWidgets DLLs not found.  You need to build the wxWidgets library (Unicode Debug and Unicode Release configurations). " ..
+					"Use the Visual Studio solution provided by wxWidgets to build the libraries \n" .. 
+					"1) Intialize the wxWidgets submodule:  git submodule init lib\\wxWidgets \n" ..
+					"2) Checkout the wxWidgets submodule:  git submodule update lib\\wxWidgets \n" ..
+					"3) Open Solution wx_vc9.sln located lib\\wxWidgets\\build\msw directory\n" .. 
+					"4) Select 'DLL Debug' from Configuration Manager\n" .. 
+					"5) Build Entire Solution\n" .. 
+					"6) Select 'DLL Release' from Configuration Manager\n" .. 
+					"7) Build Entire Solution\n" ..
+					"Note that this a fork of wxWidgets 2.9.5.  It has a couple of bug fixes. For more info, see https://github.com/robertop/wxWidgets")
 		end
 	elseif os.is "linux" then
 		print(WX_CONFIG .. " --version")

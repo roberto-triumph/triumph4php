@@ -35,6 +35,7 @@ dofile "premake_action_prep.lua"
 dofile "premake_action_dist.lua"
 dofile "premake_action_generate.lua"
 dofile "premake_action_soci.lua"
+dofile "premake_action_wxWidgets.lua"
 
 
 -- this configuration uses the icu-config binary to get the ICU header & library locations

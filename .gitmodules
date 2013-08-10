@@ -4,3 +4,6 @@
 [submodule "lib/soci"]
 	path = lib/soci
 	url = git://github.com/SOCI/soci.git
+[submodule "lib/wxWidgets"]
+	path = lib/wxWidgets
+	url = https://github.com/robertop/wxWidgets.git

@@ -90,14 +90,15 @@ WX_LIBS_WINDOW_RELEASE = { "wxmsw29u_adv", "wxmsw29u_aui", "wxmsw29u_html" }
 -- the styled text control library
 WX_LIB_STC_DEBUG = "wxmsw29ud_stc"
 
--- NOTE: for this configuration to work correctly a WXWIN environment variable must be defined and
--- must point to the location of wxWidgets
-WX_LIB_DIR = "$(WXWIN)/lib/vc_dll/"
-WX_INCLUDE_DIRS_DEBUG = { "$(WXWIN)/include/", "$(WXWIN)/lib/vc_dll/mswud/" }
+wxWidgetsDir = os.getenv("MVCEDITOR_WXWIDGETS_DIR")
+if (not wxWidgetsDir) then
+	wxWidgetsDir = "lib/wxWidgets"
+	print "Using default location of lib/wxWidgets for wxWidgets dir"
+end
 
--- NOTE: for this configuration to work correctly a WXWIN environment variable must be defined and
--- must point to the location of wxWidgets
-WX_INCLUDE_DIRS_RELEASE =  { "$(WXWIN)/include/", "$(WXWIN)/lib/vc_dll/mswu/" }
+WX_LIB_DIR = wxWidgetsDir .. "/lib/vc_dll/"
+WX_INCLUDE_DIRS_DEBUG = { wxWidgetsDir .. "/include/", wxWidgetsDir .. "/lib/vc_dll/mswud/" }
+WX_INCLUDE_DIRS_RELEASE =  { wxWidgetsDir .. "/include/", wxWidgetsDir .. "/lib/vc_dll/mswu/" }
 
 -- the styled text control library
 WX_LIB_STC_RELEASE = "wxmsw29u_stc"
