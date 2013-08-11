@@ -710,6 +710,15 @@ public:
 	 */
 	bool HasFullPath(const wxString& fullPath);
 
+	/**
+	 * check to see if this tag finder has the given directory
+	 *
+	 * @param dir the path to check. check is done case-insensitive. note that dir is not a source directory,
+	 *        it could be a subdirectory of a source directory
+	 * @return bool TRUE if the dir is in this db 
+	 */
+	bool HasDir(const wxString& dir);
+
 protected:
 
 	/**

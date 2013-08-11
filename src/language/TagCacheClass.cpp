@@ -447,3 +447,11 @@ bool mvceditor::TagCacheClass::HasFullPath(const wxString& fullPath) {
 	}	
 	return found;
 }
+
+bool mvceditor::TagCacheClass::HasDir(const wxString& dir) {
+	bool found  = false;
+	if (TagFinderList->IsTagFinderInit) {
+		found = TagFinderList->TagFinder.HasDir(dir);
+	}	
+	return found;
+}

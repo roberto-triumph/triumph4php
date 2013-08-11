@@ -36,6 +36,7 @@
 #include <wx/filefn.h>
 #include <wx/timer.h>
 #include <wx/tokenzr.h>
+#include <wx/stdpaths.h>
 #include <algorithm>
 
 /**
@@ -1798,6 +1799,40 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, PhpFileExtensionsShouldWorkWithNoWild
 
 	NearMatchFileTags(UNICODE_STRING_SIMPLE("bad.php"));
 	CHECK_VECTOR_SIZE(0, FileMatches);
+}
+
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, HasDir) {
+	wxStandardPaths paths = wxStandardPaths::Get();
+	wxFileName fileName(paths.GetUserDataDir(), wxT("test.php"));
+	TestFile = fileName.GetFullPath();
+
+	Prep(mvceditor::CharToIcu(
+		"<?php\n"
+		"/** this is my class */\n"
+		"class UserClass {\n"
+		"}\n"
+		"?>\n"
+	));	
+
+	bool hasDir = ParsedTagFinder.HasDir(paths.GetUserDataDir());
+	CHECK(hasDir);
+}
+
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, HasDirShouldNotBeFound) {
+	wxStandardPaths paths = wxStandardPaths::Get();
+	wxFileName fileName(paths.GetUserDataDir(), wxT("test.php"));
+	TestFile = fileName.GetFullPath();
+
+	Prep(mvceditor::CharToIcu(
+		"<?php\n"
+		"/** this is my class */\n"
+		"class UserClass {\n"
+		"}\n"
+		"?>\n"
+	));	
+
+	bool hasDir = ParsedTagFinder.HasDir(paths.GetTempDir());
+	CHECK_EQUAL(false, hasDir);
 }
 
 TEST_FIXTURE(TagSearchTestClass, ShouldParseClassAndMethod) {

@@ -384,6 +384,20 @@ void mvceditor::TagFeatureClass::OnAppDirCreated(wxCommandEvent& event) {
 	}
 }
 
+void mvceditor::TagFeatureClass::OnAppDirDeleted(wxCommandEvent& event) {
+	std::vector<wxFileName> dirsToDelete;
+	wxFileName dir;
+	dir.AssignDir(event.GetString());
+	dirsToDelete.push_back(dir);
+	mvceditor::TagDeleteDirectoryActionClass* tagAction =  new mvceditor::TagDeleteDirectoryActionClass(RunningThreads, wxID_ANY, dirsToDelete);
+	if (tagAction->Init(App.Globals)) {
+		RunningThreads.Queue(tagAction);
+	}
+	else {
+		delete tagAction;
+	}
+}
+
 void mvceditor::TagFeatureClass::OnTimerComplete(wxTimerEvent& event) {
 	mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
 	if (!codeControl) {
@@ -765,10 +779,16 @@ BEGIN_EVENT_TABLE(mvceditor::TagFeatureClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_REVERTED, mvceditor::TagFeatureClass::OnAppFileReverted)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_DELETED, mvceditor::TagFeatureClass::OnAppFileDeleted)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_DIR_CREATED,  mvceditor::TagFeatureClass::OnAppDirCreated)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_DIR_DELETED,  mvceditor::TagFeatureClass::OnAppDirDeleted)
 
 	// we will treat file new and file opened the same
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_NEW, mvceditor::TagFeatureClass::OnAppFileOpened)
+	
+	// we will treat new exernal file and file external modified the same
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_EXTERNALLY_CREATED, OnAppFileExternallyModified)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_EXTERNALLY_MODIFIED, OnAppFileExternallyModified)
+	
+
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_SEQUENCE_COMPLETE, mvceditor::TagFeatureClass::OnAppStartSequenceComplete)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_EXIT, mvceditor::TagFeatureClass::OnAppExit)
 

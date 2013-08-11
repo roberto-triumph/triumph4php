@@ -31,15 +31,121 @@
 
 static int ID_FILE_MODIFIED_CHECK = wxNewId();
 
+/**
+ * collapse a list of paths into files and directories.  The collapsing part is that
+ * if list contains a directory and a file in that directory (or a sub-directory) the it is 
+ * ignored.
+ *
+ * For example:
+ * paths = { "/home/user/project1/index.php" => 1, "/home/user/project1/js/index.js" => 1, 
+ *           "/home/user/project1/" => 1, "/home/user/project2/index.php" => 1 }
+ *
+ * Then, the final result will be
+ *
+ * collapsedDirs = { "/home/user/project1/" => 1 }
+ * collapsedFiles = {"/home/user/project2/index.php" => 1 }
+ *
+ * @param tagCache to find out if a path is a file or a directory
+ * @param paths the list of paths to be checked
+ * @param collapsedDis the directories in paths
+ * @param collapsedFiles the files in paths (except files in any of collapsedDirs)
+ */
+static void CollapseDirsFiles(mvceditor::TagCacheClass& tagCache, std::map<wxString, int>& paths, std::map<wxString, int>& collapsedDirs, std::map<wxString, int>& collapsedFiles) {
+	std::map<wxString, int>::iterator mapIt;
+	std::vector<wxString> sortedPaths;
+	for (mapIt = paths.begin(); mapIt != paths.end(); ++mapIt) {
+		sortedPaths.push_back(mapIt->first);
+	}
+	std::sort(sortedPaths.begin(), sortedPaths.end());
+
+	std::vector<wxString>::iterator path;
+	for (path = sortedPaths.begin(); path != sortedPaths.end(); ++path) {
+
+		// we want to know if the path is a file or a directory
+		// in the case of deletes, we can't query the file system as the file/dir no
+		// longer exists
+		// we can look it up in the tag cache instead
+		if (wxFileName::DirExists(*path) || tagCache.HasDir(*path)) {
+			wxFileName dirCreated;
+			dirCreated.AssignDir(*path);
+			
+			// if a parent dir already exists, then it means that this is a subdir and we want to skip it
+			size_t dirCount = dirCreated.GetDirCount();
+			bool foundSubDir = false;
+			for (size_t i = 0; i < dirCount; ++i) {
+				if (collapsedDirs.find(dirCreated.GetPath()) != collapsedDirs.end()) {
+					foundSubDir = true;
+					break;
+				}
+				dirCreated.RemoveLastDir();
+			}
+			if (!foundSubDir) {
+				collapsedDirs[*path] = 1;
+			}
+		}
+		else if (wxFileName::FileExists(*path) || tagCache.HasFullPath(*path)) {
+			
+			// if the file's dir parent dir has been labeled as created, we want to skip it
+			wxFileName fileCreated(*path);
+			wxFileName fileDir;
+			fileDir.AssignDir(fileCreated.GetPath());
+			size_t dirCount = fileDir.GetDirCount();
+			bool foundSubDir = false;
+			for (size_t i = 0; i < dirCount; ++i) {
+				if (collapsedDirs.find(fileDir.GetPath()) != collapsedDirs.end()) {
+					foundSubDir = true;
+					break;
+				}
+				fileDir.RemoveLastDir();
+			}
+			if (!foundSubDir) {
+				collapsedFiles[*path] = 1;
+			}
+		}
+	}
+}
+
+/**
+ * @return map of the code controls that have opened files (as opposed to new files being edited)
+ *         key is the full path of the file being edited, value is the code control itself
+ */
+static std::map<wxString, mvceditor::CodeControlClass*> OpenedFiles(mvceditor::NotebookClass* notebook) {
+	std::map<wxString, mvceditor::CodeControlClass*> openedFiles;
+	if (!notebook) {
+		return openedFiles;
+	}
+	size_t size = notebook->GetPageCount();
+	if (size > 0) {
+
+		// loop through all of the opened files to get the files to
+		// be checked
+		// no need to check new files as they are not yet in the file system
+		for (size_t i = 0; i < size; ++i) {
+			mvceditor::CodeControlClass* ctrl = notebook->GetCodeControl(i);
+			if (ctrl && !ctrl->IsNew()) {
+				openedFiles[ctrl->GetFileName()] = ctrl;
+			}
+		}
+	}
+	return openedFiles;
+}
+
 mvceditor::FileModifiedCheckFeatureClass::FileModifiedCheckFeatureClass(mvceditor::AppClass& app)
 : FeatureClass(app)
 , Timer(this, ID_FILE_MODIFIED_CHECK)
 , FsWatcher() 
+, FilesExternallyCreated()
 , FilesExternallyModified()
 , FilesExternallyDeleted() 
-, DirsExternallyCreated() 
-, Ticks(0) {
+, DirsExternallyCreated()
+, DirsExternallyModified()
+, DirsExternallyDeleted()
+, PathsExternallyModified()
+, PathsExternallyDeleted() 
+, PathsExternallyCreated() 
+, LastWatcherEventTime() {
 	FsWatcher.SetOwner(this);
+	LastWatcherEventTime = wxDateTime::Now();
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::OnAppReady(wxCommandEvent& event) {
@@ -65,86 +171,144 @@ void mvceditor::FileModifiedCheckFeatureClass::OnAppExit(wxCommandEvent& event) 
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::OnTimer(wxTimerEvent& event) {
-	Timer.Stop();
-	Ticks++;
+	wxDateTime now = wxDateTime::Now();
+	wxTimeSpan span = now.Subtract(LastWatcherEventTime);
+	if (span.GetSeconds() <= 1) {
 
-	mvceditor::NotebookClass* notebook = GetNotebook();
-	size_t size = notebook->GetPageCount();
-	std::map<wxString, mvceditor::CodeControlClass*> openedFiles;
-	if (size > 0) {
-
-		// loop through all of the opened files to get the files to
-		// be checked
-		// no need to check new files as they are not yet in the file system
-		for (size_t i = 0; i < size; ++i) {
-			mvceditor::CodeControlClass* ctrl = notebook->GetCodeControl(i);
-			if (ctrl && !ctrl->IsNew()) {
-				openedFiles[ctrl->GetFileName()] = ctrl;
-			}
-		}
+		// we are still getting file change events. let's wait until all
+		// of the changes are done 
+		return;
 	}
+	if (PathsExternallyCreated.empty() && PathsExternallyModified.empty() && PathsExternallyDeleted.empty()) {
+
+		// nothing to do
+		return;
+	}
+	Timer.Stop();
+
+	// when a directory is created/deleted, we will get created/deleted events for
+	// the directory itself plus one event for each new /deleted.
+	// lets collapse the sub files
+	CollapseDirsFiles(App.Globals.TagCache, PathsExternallyCreated, DirsExternallyCreated, FilesExternallyCreated);
+	CollapseDirsFiles(App.Globals.TagCache, PathsExternallyModified, DirsExternallyModified, FilesExternallyModified);
+	CollapseDirsFiles(App.Globals.TagCache, PathsExternallyDeleted, DirsExternallyDeleted, FilesExternallyDeleted);
+
+	std::map<wxString, mvceditor::CodeControlClass*> openedFiles = OpenedFiles(GetNotebook());
+
+	HandleOpenedFiles(openedFiles);
+	HandleNonOpenedFiles(openedFiles);
+
+	// clear out all paths
+	PathsExternallyCreated.clear();
+	PathsExternallyModified.clear();
+	PathsExternallyDeleted.clear();
+	FilesExternallyCreated.clear();
+	FilesExternallyModified.clear();
+	FilesExternallyDeleted.clear();
+	DirsExternallyCreated.clear();
+	DirsExternallyModified.clear();
+	DirsExternallyDeleted.clear();
+	Timer.Start(250, wxTIMER_CONTINUOUS);
+}
+
+void mvceditor::FileModifiedCheckFeatureClass::HandleOpenedFiles(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles) {
 
 	// if the file that was modified is one of the opened files, we need to prompt the user
 	// to see if they want to reload the new version
-	std::vector<wxFileName>::iterator f = FilesExternallyModified.begin();
+	std::map<wxString, int>::const_iterator f;
 	std::map<wxString, mvceditor::CodeControlClass*> filesToPrompt;
-	while (f != FilesExternallyModified.end()) {
-		bool isOpened = openedFiles.find(f->GetFullPath()) != openedFiles.end();
-		if (!isOpened) {
-			
-			// file is not open. handle it later
-			f++;
-			
-		}
-		else if (f->GetModificationTime() > openedFiles[f->GetFullPath()]->GetFileOpenedDateTime()) {
+	for (f = FilesExternallyModified.begin(); f != FilesExternallyModified.end(); ++f) {
+		wxString fullPath = f->first;
+		wxFileName fileName(fullPath);
+		bool isOpened = openedFiles.find(fullPath) != openedFiles.end();
+		if (isOpened && fileName.GetModificationTime() > openedFiles[fullPath]->GetFileOpenedDateTime()) {
 			
 			// file is opened, but since file modified time is newer than what the code 
 			// control read in then it means that the file was modified externally
-			filesToPrompt[f->GetFullPath()] = openedFiles[f->GetFullPath()];
-
-			// remove it from the files to handle list
-			f = FilesExternallyModified.erase(f);
-		}
-		else {
-
-			// this file was saved by the user clicking "save" on mvc editor. do nothing
+			// checking the timestamps also lets us skip  files that are saved inside of the editor 
+			// by the user clicking "save" on mvc editor. do nothing
 			// because the cache will be updated via the EVT_APP_FILE_SAVED handler
-			f = FilesExternallyModified.erase(f);
+			filesToPrompt[fullPath] = openedFiles[fullPath];
 		}
 	}
 	if (!filesToPrompt.empty()) {
 		FilesModifiedPrompt(filesToPrompt);
 	}
-	if (!FilesExternallyDeleted.empty()) {
-		FilesDeletedPrompt(openedFiles, FilesExternallyDeleted);
-		FilesExternallyDeleted.clear();
+
+	// check if an opened file was deleted
+	std::map<wxString, int> openedFilesDeleted;
+	std::map<wxString, int>::iterator deletedFile;
+	for (deletedFile = FilesExternallyDeleted.begin(); deletedFile != FilesExternallyDeleted.end(); ++deletedFile) {
+		if (openedFiles.find(deletedFile->first) != openedFiles.end()) {
+			openedFilesDeleted[deletedFile->first] = 1;
+		}
 	}
-	if (Ticks % 20 == 0 && (!FilesExternallyModified.empty() || !DirsExternallyCreated.empty())) {
-		HandleNonOpenedFiles(openedFiles);
-		Ticks = 1;
+
+	// since we collapse files in the event that a dir is deleted, we need to 
+	// check to see if the opened file exists in a deleted directory
+	std::map<wxString, mvceditor::CodeControlClass*>::iterator openedFile;
+	for (openedFile = openedFiles.begin(); openedFile != openedFiles.end(); ++openedFile) {	
+		wxFileName parentDir;
+		parentDir.AssignDir(wxFileName(openedFile->first).GetPath());
+		
+		// if a parent dir already exists, then it means that this is a subdir and we want to skip it
+		size_t dirCount = parentDir.GetDirCount();
+		bool foundSubDir = false;
+		for (size_t i = 0; i < dirCount; ++i) {
+			if (DirsExternallyDeleted.find(parentDir.GetPath()) != DirsExternallyDeleted.end()) {
+				foundSubDir = true;
+				break;
+			}
+			parentDir.RemoveLastDir();
+		}
+		if (!foundSubDir) {
+			openedFilesDeleted[openedFile->first] = 1;
+		}
+
 	}
-	Timer.Start(250, wxTIMER_CONTINUOUS);
+	if (!openedFilesDeleted.empty()) {
+		FilesDeletedPrompt(openedFiles, openedFilesDeleted);
+	}
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::HandleNonOpenedFiles(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles) {
-	std::vector<wxFileName>::iterator f = FilesExternallyModified.begin();
-	while (f != FilesExternallyModified.end()) {
-		bool isOpened = openedFiles.find(f->GetFullPath()) != openedFiles.end();
+	std::map<wxString, int>::iterator f;
+	for (f = FilesExternallyModified.begin(); f != FilesExternallyModified.end(); ++f) {
+		wxString fullPath = f->first;
+		bool isOpened = openedFiles.find(fullPath) != openedFiles.end();
 		if (!isOpened) {
 			// file is not open. notify the app that a file was externally modified
 			wxCommandEvent modifiedEvt(mvceditor::EVENT_APP_FILE_EXTERNALLY_MODIFIED);
-			modifiedEvt.SetString(f->GetFullPath());
+			modifiedEvt.SetString(fullPath);
 			App.EventSink.Publish(modifiedEvt);
-			f = FilesExternallyModified.erase(f);
 		}
 	}
-	if (!DirsExternallyCreated.empty()) {
-		for (size_t i = 0; i < DirsExternallyCreated.size(); ++i) {
-			wxCommandEvent modifiedEvt(mvceditor::EVENT_APP_DIR_CREATED);
-			modifiedEvt.SetString(DirsExternallyCreated[i].GetFullPath());
+	for (f = FilesExternallyCreated.begin(); f != FilesExternallyCreated.end(); ++f) {
+		wxString fullPath = f->first;
+		wxCommandEvent modifiedEvt(mvceditor::EVENT_APP_FILE_EXTERNALLY_CREATED);
+		modifiedEvt.SetString(fullPath);
+		App.EventSink.Publish(modifiedEvt);
+	}
+	for (f = FilesExternallyDeleted.begin(); f != FilesExternallyDeleted.end(); ++f) {
+		wxString fullPath = f->first;
+		bool isOpened = openedFiles.find(fullPath) != openedFiles.end();
+		if (!isOpened) {
+
+			// file is not open. notify the app that a file was externally deleted
+			wxCommandEvent modifiedEvt(mvceditor::EVENT_APP_FILE_DELETED);
+			modifiedEvt.SetString(fullPath);
 			App.EventSink.Publish(modifiedEvt);
 		}
-		DirsExternallyCreated.clear();
+	}
+	for (f = DirsExternallyCreated.begin(); f != DirsExternallyCreated.end(); ++f) {
+		wxCommandEvent modifiedEvt(mvceditor::EVENT_APP_DIR_CREATED);
+		modifiedEvt.SetString(f->first);
+		App.EventSink.Publish(modifiedEvt);
+	}
+	for (f = DirsExternallyDeleted.begin(); f != DirsExternallyDeleted.end(); ++f) {
+		wxCommandEvent modifiedEvt(mvceditor::EVENT_APP_DIR_DELETED);
+		modifiedEvt.SetString(f->first);
+		App.EventSink.Publish(modifiedEvt);
 	}
 
 }
@@ -197,22 +361,24 @@ void mvceditor::FileModifiedCheckFeatureClass::FilesModifiedPrompt(std::map<wxSt
 	}
 }
 
-void mvceditor::FileModifiedCheckFeatureClass::FilesDeletedPrompt(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles, std::vector<wxFileName>& deletedFiles) {
-	std::vector<wxFileName>::const_iterator file;
+void mvceditor::FileModifiedCheckFeatureClass::FilesDeletedPrompt(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles, 
+																  std::map<wxString, int>& deletedFiles) {
+	std::map<wxString, int>::const_iterator file;
 	wxString files;
 	bool deletingOpened = false;
 	for (file = deletedFiles.begin(); file != deletedFiles.end(); ++ file) {
-	
+		wxString fullPath = file->first;
+
 		// find the control for the file
-		if (openedFiles.end() != openedFiles.find(file->GetFullPath())) {
-			mvceditor::CodeControlClass* ctrl = openedFiles[file->GetFullPath()];
+		if (openedFiles.end() != openedFiles.find(fullPath)) {
+			mvceditor::CodeControlClass* ctrl = openedFiles[fullPath];
 			ctrl->TreatAsNew();
-			files += file->GetFullPath() + wxT("\n");
+			files += fullPath + wxT("\n");
 			deletingOpened = true;
 		}
 		// send the deleted file event to the app
 		wxCommandEvent deleteEvt(mvceditor::EVENT_APP_FILE_DELETED);
-		deleteEvt.SetString(file->GetFullPath());
+		deleteEvt.SetString(fullPath);
 		App.EventSink.Publish(deleteEvt);		
 	}
 
@@ -228,39 +394,23 @@ void mvceditor::FileModifiedCheckFeatureClass::FilesDeletedPrompt(std::map<wxStr
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::OnFsWatcher(wxFileSystemWatcherEvent& event) {
-	wxFileName path = event.GetPath();
+	LastWatcherEventTime = wxDateTime::Now();
+	wxString path = event.GetPath().GetFullPath();
+	wxFileName fileName = event.GetPath();
 	if (wxFSW_EVENT_MODIFY == event.GetChangeType()) {
-		
-		// a modify event could be from a file modification or directory modification
-		// skip directory modifications, as directories are modified when files added/removed from the dir
-		if (path.FileExists() && std::find(FilesExternallyModified.begin(), FilesExternallyModified.end(), path) == FilesExternallyModified.end()) {
-			
-			// this file was modified
-			FilesExternallyModified.push_back(path);
-		}
+		PathsExternallyModified[path] = 1;
 	}
 	else if (wxFSW_EVENT_CREATE == event.GetChangeType()) {
-		if (path.FileExists() && std::find(FilesExternallyModified.begin(), FilesExternallyModified.end(), path) == FilesExternallyModified.end()) {
-			
-			// this file was created, same logic as file modification
-			FilesExternallyModified.push_back(path);
-		}
-		else if (path.DirExists() && std::find(DirsExternallyCreated.begin(), DirsExternallyCreated.end(), path) == DirsExternallyCreated.end()) {
-			
-			// a new directory was created
-			DirsExternallyCreated.push_back(path);
-		}
+		PathsExternallyCreated[path] = 1;
 	}
 	else if (wxFSW_EVENT_DELETE == event.GetChangeType()) {
-		bool isFile = App.Globals.TagCache.HasFullPath(path.GetFullPath());
-		if (isFile && std::find(FilesExternallyDeleted.begin(), FilesExternallyDeleted.end(), path) == FilesExternallyDeleted.end()) {
-			
-			// this file was created, same logic as file modification
-			FilesExternallyDeleted.push_back(path);
-		}
+		PathsExternallyDeleted[path] = 1;
 	}
 	else if (wxFSW_EVENT_WARNING == event.GetChangeType()) {
-		wxASSERT_MSG(false, event.GetErrorDescription());
+	
+		// too many files being added/removed
+		// this is probably a big directory being added / removed
+		// hopefully the root directory is caught
 	}
 	else if (wxFSW_EVENT_ERROR == event.GetChangeType()) {
 		wxASSERT_MSG(false, event.GetErrorDescription());

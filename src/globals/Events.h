@@ -202,12 +202,33 @@ extern const wxEventType EVENT_APP_FILE_NEW;
 extern const wxEventType EVENT_APP_FILE_REVERTED;
 
 /**
- * Notification that a single file has been deleted (all changed in memory undone). The event will contain
+ * Notification that a single file has been deleted. The event will contain
  * the full path of the file that was opened in the GetString() method.
  * This event gets generated if the user deletes a files from the internal explorer or from
  * an external process (command prompt or OS shell)
+ * NOTE: this event will only be generated when single files are deleted. if an entire directory is deleted, 
+ * then only 1 event will be generated: an EVENT_APP_DIR_DELETED, no EVENT_APP_FILE_DELETED events will be
+ * generated.
  */
 extern const wxEventType EVENT_APP_FILE_DELETED;
+
+/**
+ * Notification that the one of the files in any of the enabled projects has been updated by an 
+ * external process. 
+ * An example is when a user performs a SVN update / GIT pull to get the latest version of their
+ * code; the editor will generated events of this type for each file that was updated by the source control 
+ * program.
+ *
+ * The event generated will be of type wxCommandEvent, the file that was modified will be available via GetString() method
+ * GetString() will return the full path to the file.
+ *
+ * NOTE: This event will only be generated if the file is NOT created in MVC editor.
+ * NOTE: This event will only be generated when single files are created. if an entire directory is created, 
+ * then only 1 event will be generated: an EVENT_APP_DIR_CREATED, no EVENT_APP_FILE_EXTERNALLY_CREATED events will be
+ * generated.
+ */
+extern const wxEventType EVENT_APP_FILE_EXTERNALLY_CREATED;
+
 
 /**
  * Notification that the one of the files in any of the enabled projects has been updated by an 
@@ -230,9 +251,21 @@ extern const wxEventType EVENT_APP_FILE_EXTERNALLY_MODIFIED;
  * Notification that a single directory has been created. The event will contain
  * the full path of the directory that was created in the GetString() method.
  * This event gets generated if the user creates a directory from 
- * an external process (command prompt or OS shell)
+ * an external process (command prompt or OS shell). Note: if an entire directory structure
+ * is copied from one place to another, then only one EVENT_APP_DIR_CREATED is created for the
+ * base directory that was created, no events will be generated for the sub directories.
  */
 extern const wxEventType EVENT_APP_DIR_CREATED;
+
+/**
+ * Notification that a single directory has been deleted. The event will contain
+ * the full path of the file that was opened in the GetString() method.
+ * This event gets generated if the user deletes a files from the internal explorer or from
+ * an external process (command prompt or OS shell)
+ * NOTE: If an entire directory structure is deleted, then only 1 event will be generated: 
+ * an EVENT_APP_DIR_DELETED for the base directory. No events will be generated for the sub directories.
+ */
+extern const wxEventType EVENT_APP_DIR_DELETED;
 
 /**
  * Notification that the user preferences have been saved by the user. 

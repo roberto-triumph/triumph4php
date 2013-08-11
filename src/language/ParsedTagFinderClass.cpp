@@ -1784,6 +1784,35 @@ bool mvceditor::ParsedTagFinderClass::HasFullPath(const wxString& fullPath) {
 	return FindFileTagByFullPathExact(fullPath, fileTag);
 }
 
+
+bool mvceditor::ParsedTagFinderClass::HasDir(const wxString& dir) {
+	bool foundDir = false;
+	if (!IsInit()) {
+		return foundDir;
+	}
+
+	// at this point we dont store directories in the db, we look for a file
+	// that contains the dir in question
+	wxFileName dirName;
+	dirName.AssignDir(dir);
+	std::string result;
+	std::string query = mvceditor::WxToChar(dirName.GetPathWithSep() + wxT("%"));
+	std::string sql = "SELECT full_path FROM file_items WHERE full_path LIKE ? LIMIT 1";
+	try {
+		soci::statement stmt = (Session->prepare << sql, soci::use(query), 
+			soci::into(result)
+		);
+		if (stmt.execute(true) && !result.empty()) {
+			foundDir = true;
+		}
+	} catch (std::exception& e) {
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxUnusedVar(msg);
+		wxASSERT_MSG(false, msg);
+	}
+	return foundDir;
+}
+
 bool mvceditor::ParsedTagFinderClass::FindFileTagByFullPathExact(const wxString& fullPath, mvceditor::FileTagClass& fileTag) {
 	if (!IsInit()) {
 		return false;

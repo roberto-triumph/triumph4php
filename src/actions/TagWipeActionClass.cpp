@@ -77,7 +77,7 @@ mvceditor::TagDeleteDirectoryActionClass::TagDeleteDirectoryActionClass(mvcedito
 bool mvceditor::TagDeleteDirectoryActionClass::Init(mvceditor::GlobalsClass& globals) {
 	SetStatus(_("Tag Cache Delete Directory"));
 
-	// not sure if wxFileName assignment is a complete clone, so use Assign() just in case
+	// wxFileName assignment is not a complete clone, so use Assign() just in case
 	// since we will access the filenames from multiple threads
 	ResourceDbFileNames.push_back(wxFileName(globals.TagCacheDbFileName.GetFullPath()));
 

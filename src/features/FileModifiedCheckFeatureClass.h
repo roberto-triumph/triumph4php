@@ -62,6 +62,12 @@ private:
 	void OnTimer(wxTimerEvent& event);
 
 	/**
+	 * special handling for files that are open. For open files that were externally modified
+	 * we will prompt the user to take action
+	 */
+	void HandleOpenedFiles(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles);
+
+	/**
 	 * special handling for files that are not open.
 	 */
 	void HandleNonOpenedFiles(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles);
@@ -74,7 +80,7 @@ private:
 	/**
 	 * prompt the user to save the deleted files
 	 */
-	void FilesDeletedPrompt(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles, std::vector<wxFileName>& deletedFiles);
+	void FilesDeletedPrompt(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles, std::map<wxString, int>& deletedFiles);
 
 	/**
 	 * when a file has been externally modified / added / deleted we need to
@@ -102,11 +108,34 @@ private:
 	 * list.
 	 * the modified list will only contain files (not directories)
 	 */
-	std::vector<wxFileName> FilesExternallyModified;
-	std::vector<wxFileName> FilesExternallyDeleted;
-	std::vector<wxFileName> DirsExternallyCreated;
+	std::map<wxString, int> FilesExternallyModified;
+	std::map<wxString, int> FilesExternallyCreated;
+	std::map<wxString, int> FilesExternallyDeleted;
+	std::map<wxString, int> DirsExternallyCreated;
+	std::map<wxString, int> DirsExternallyModified;
+	std::map<wxString, int> DirsExternallyDeleted;
+	
+	
 
-	int Ticks;
+	/**
+	 * the paths that were recently modified or deleted outside the editor
+	 * these paths could be either files or directories, we don't know
+	 * what they are since that info is not part of wxFileSystemWatcherEvent
+	 * This is a map because we may receive multiple events for a single
+	 * file or dir
+	 */
+	std::map<wxString, int> PathsExternallyModified;
+	std::map<wxString, int> PathsExternallyDeleted;
+	std::map<wxString, int> PathsExternallyCreated;
+
+	/**
+	 * the last time that we got an event from wxFileSystemWatcher.
+	 * we will use this to trigger our app events only after some time
+	 * has passed; if a big directory is being copied we want to wait until
+	 * all of the directory has been copied before we attempt to update our
+	 * PHP tags.
+	 */
+	wxDateTime LastWatcherEventTime;
 	
 	DECLARE_EVENT_TABLE()
 

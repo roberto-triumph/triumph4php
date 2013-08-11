@@ -389,6 +389,15 @@ public:
 	 * @return bool TRUE if the file was seen by the tag parser
 	 */
 	bool HasFullPath(const wxString& fullPath);
+
+	/**
+	 * check to see if a directory was cached
+	 *
+	 * @param dir the path to check. check is done case-insensitive. note that dir is not a source directory,
+	 *        it could be a subdirectory of a source directory
+	 * @return bool TRUE if the directory was seen by the tag parser
+	 */
+	bool HasDir(const wxString& dir);
 	 
 private:
 		

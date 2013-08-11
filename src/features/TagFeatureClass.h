@@ -157,6 +157,11 @@ private:
 	void OnAppDirCreated(wxCommandEvent& event);
 
 	/**
+	 * when a directory has been delete clear the tags from that directory
+	 */
+	void OnAppDirDeleted(wxCommandEvent& event);
+
+	/**
 	 * when the tag cache has been searched, display the matching tags in the dialog so that
 	 * the user can choose which to open
 	 */
