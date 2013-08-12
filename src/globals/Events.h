@@ -26,6 +26,7 @@
 #define __MVCEDITOREVENTS_H__
 
 #include <wx/event.h>
+#include <wx/filename.h>
 #include <vector>
 
 namespace mvceditor {
@@ -146,6 +147,25 @@ private:
 	CodeControlClass* CodeControl;
 };
 
+/**
+ * This event will get generated when a file or directory has been renamed, either inside the editor
+ * or outside the editor (ie in a file shell or command prompt).
+ * The event type determines whether paths are files or directories.
+ */
+class RenameEventClass : public wxEvent {
+
+public:
+
+	wxFileName OldPath;
+
+	wxFileName NewPath;
+
+	RenameEventClass(wxEventType type, const wxString& oldPath, const wxString& newPath);
+
+	wxEvent* Clone() const;
+
+};
+
 typedef void (wxEvtHandler::*CodeControlEventClassFunction)(CodeControlEventClass&);
 
 #define EVT_APP_FILE_SAVED(fn) \
@@ -157,6 +177,18 @@ typedef void (wxEvtHandler::*CodeControlEventClassFunction)(CodeControlEventClas
 	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_APP_FILE_CLOSED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( CodeControlEventClassFunction, & fn ), (wxObject *) NULL ),
+
+typedef void (wxEvtHandler::*RenameEventClassFunction)(RenameEventClass&);
+
+#define EVT_APP_FILE_RENAMED(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_APP_FILE_RENAMED, wxID_ANY, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( RenameEventClassFunction, & fn ), (wxObject *) NULL ),
+
+#define EVT_APP_DIR_RENAMED(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_APP_DIR_RENAMED, wxID_ANY, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( RenameEventClassFunction, & fn ), (wxObject *) NULL ),
 
 /**
  * This is a one-time event that gets generated after the application main
@@ -229,6 +261,12 @@ extern const wxEventType EVENT_APP_FILE_DELETED;
  */
 extern const wxEventType EVENT_APP_FILE_EXTERNALLY_CREATED;
 
+/**
+ * Notification that a file was renamed. The event will contain the old and new
+ * paths. This event gets generated if the user creates a directory from 
+ * an external process (command prompt or OS shell).
+ */
+extern const wxEventType EVENT_APP_FILE_RENAMED;
 
 /**
  * Notification that the one of the files in any of the enabled projects has been updated by an 
@@ -266,6 +304,13 @@ extern const wxEventType EVENT_APP_DIR_CREATED;
  * an EVENT_APP_DIR_DELETED for the base directory. No events will be generated for the sub directories.
  */
 extern const wxEventType EVENT_APP_DIR_DELETED;
+
+/**
+ * Notification that a directory was renamed. The event will contain the old and new
+ * paths. This event gets generated if the user creates a directory from 
+ * an external process (command prompt or OS shell).
+ */
+extern const wxEventType EVENT_APP_DIR_RENAMED;
 
 /**
  * Notification that the user preferences have been saved by the user. 

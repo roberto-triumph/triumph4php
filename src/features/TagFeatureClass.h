@@ -147,6 +147,11 @@ private:
 	void OnAppFileDeleted(wxCommandEvent& event);
 
 	/**
+	 * when a file is renamed then update the tag cache
+	 */
+	void OnAppFileRenamed(mvceditor::RenameEventClass& event);
+
+	/**
 	 * if a file is modified externally re-tag it
 	 */
 	void OnAppFileExternallyModified(wxCommandEvent& event);
@@ -160,6 +165,11 @@ private:
 	 * when a directory has been delete clear the tags from that directory
 	 */
 	void OnAppDirDeleted(wxCommandEvent& event);
+
+	/**
+	 * when a dir is renamed then update the tag cache
+	 */
+	void OnAppDirRenamed(mvceditor::RenameEventClass& event);
 
 	/**
 	 * when the tag cache has been searched, display the matching tags in the dialog so that

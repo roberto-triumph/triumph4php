@@ -224,6 +224,89 @@ protected:
 	mvceditor::TagFinderListClass TagFinderList;
 };
 
+/**
+ * this action will rename the file tag for a single file only
+ */
+class ProjectTagSingleFileRenameActionClass : public mvceditor::GlobalActionClass {
+
+public:
+
+	ProjectTagSingleFileRenameActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+
+	/**
+	 * 
+	 * Set the file to be parsed
+	 * @param fullPath file to be scanned (full path, including name).
+	 */
+	void SetPaths(const wxString& oldPath, const wxString& newPath);
+
+	/**
+	 *
+	 * @param globals to get the tag cache location
+	 * @return bool false tag cache file does not exist
+	 */
+	bool Init(mvceditor::GlobalsClass& globals);
+
+
+protected:
+
+	void BackgroundWork();
+
+	wxString GetLabel() const;
+
+	/**
+	 * the files 
+	 */
+	wxFileName OldFileName;
+	wxFileName NewFileName;
+
+	/**
+	 * This object will perform the tag updates
+	 */
+	mvceditor::TagFinderListClass TagFinderList;
+};
+
+/**
+ * this action will rename the file tag for an entire directory
+ */
+class ProjectTagDirectoryRenameActionClass : public mvceditor::GlobalActionClass {
+
+public:
+
+	ProjectTagDirectoryRenameActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+
+	/**
+	 * 
+	 * Set the file to be parsed
+	 * @param fullPath file to be scanned (full path, including name).
+	 */
+	void SetPaths(const wxString& oldPath, const wxString& newPath);
+
+	/**
+	 *
+	 * @param globals to get the tag cache location
+	 * @return bool false tag cache file does not exist
+	 */
+	bool Init(mvceditor::GlobalsClass& globals);
+
+
+protected:
+
+	void BackgroundWork();
+
+	wxString GetLabel() const;
+
+	/**
+	 * the directories
+	 */
+	wxFileName OldDirectory;
+	wxFileName NewDirectory;
+
+	/**
+	 * This object will perform the tag updates
+	 */
+	mvceditor::TagFinderListClass TagFinderList;
+};
 }
 
 #endif

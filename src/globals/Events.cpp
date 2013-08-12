@@ -68,6 +68,27 @@ wxEvent* mvceditor::CodeControlEventClass::Clone() const {
 	return newEvt;
 }
 
+mvceditor::RenameEventClass::RenameEventClass(wxEventType type, const wxString& oldPath, const wxString& newPath)
+: wxEvent(wxID_ANY, type)
+, OldPath()
+, NewPath() {
+	if (mvceditor::EVENT_APP_FILE_RENAMED == type) {
+		OldPath.Assign(oldPath);
+		NewPath.Assign(newPath);
+	}
+	else if (mvceditor::EVENT_APP_DIR_RENAMED == type) {
+		OldPath.AssignDir(oldPath);
+		NewPath.AssignDir(newPath);
+	}
+}
+
+wxEvent* mvceditor::RenameEventClass::Clone() const {
+	if (mvceditor::EVENT_APP_DIR_RENAMED == GetEventType()) {
+		return new mvceditor::RenameEventClass(GetEventType(), OldPath.GetPath(), OldPath.GetPath());
+	}
+	return new mvceditor::RenameEventClass(GetEventType(), OldPath.GetFullPath(), OldPath.GetFullPath());
+}
+
 const wxEventType mvceditor::EVENT_APP_READY = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_EXIT = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_FILE_OPENED = wxNewEventType();
@@ -79,8 +100,10 @@ const wxEventType mvceditor::EVENT_APP_FILE_REVERTED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_FILE_DELETED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_FILE_EXTERNALLY_CREATED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_FILE_EXTERNALLY_MODIFIED = wxNewEventType();
+const wxEventType mvceditor::EVENT_APP_FILE_RENAMED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_DIR_CREATED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_DIR_DELETED = wxNewEventType();
+const wxEventType mvceditor::EVENT_APP_DIR_RENAMED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_PREFERENCES_SAVED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED = wxNewEventType();
 const wxEventType mvceditor::EVENT_CMD_FILE_OPEN = wxNewEventType();

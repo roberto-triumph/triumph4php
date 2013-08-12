@@ -257,3 +257,57 @@ void mvceditor::ProjectTagSingleFileActionClass::BackgroundWork() {
 wxString mvceditor::ProjectTagSingleFileActionClass::GetLabel() const {
 	return wxT("Tag Cache Single File");
 }
+
+mvceditor::ProjectTagSingleFileRenameActionClass::ProjectTagSingleFileRenameActionClass(mvceditor::RunningThreadsClass& runningThreads,
+																						int eventId)
+: GlobalActionClass(runningThreads, eventId)
+, OldFileName()
+, NewFileName()
+, TagFinderList() {
+
+}
+
+void mvceditor::ProjectTagSingleFileRenameActionClass::SetPaths(const wxString& oldPath, const wxString& newPath) {
+	OldFileName.Assign(oldPath);
+	NewFileName.Assign(newPath);
+}
+
+bool mvceditor::ProjectTagSingleFileRenameActionClass::Init(mvceditor::GlobalsClass& globals) {
+	TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), globals.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
+	return TagFinderList.IsTagFinderInit;
+}
+
+void mvceditor::ProjectTagSingleFileRenameActionClass::BackgroundWork() {
+	TagFinderList.TagParser.RenameFile(OldFileName, NewFileName);
+}
+
+wxString mvceditor::ProjectTagSingleFileRenameActionClass::GetLabel() const {
+	return wxT("Project Tag File Rename");
+}
+
+mvceditor::ProjectTagDirectoryRenameActionClass::ProjectTagDirectoryRenameActionClass(mvceditor::RunningThreadsClass& runningThreads,
+																						int eventId)
+: GlobalActionClass(runningThreads, eventId)
+, OldDirectory()
+, NewDirectory()
+, TagFinderList() {
+
+}
+
+void mvceditor::ProjectTagDirectoryRenameActionClass::SetPaths(const wxString& oldPath, const wxString& newPath) {
+	OldDirectory.AssignDir(oldPath);
+	NewDirectory.AssignDir(newPath);
+}
+
+bool mvceditor::ProjectTagDirectoryRenameActionClass::Init(mvceditor::GlobalsClass& globals) {
+	TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), globals.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
+	return TagFinderList.IsTagFinderInit;
+}
+
+void mvceditor::ProjectTagDirectoryRenameActionClass::BackgroundWork() {
+	TagFinderList.TagParser.RenameDir(OldDirectory, NewDirectory);
+}
+
+wxString mvceditor::ProjectTagDirectoryRenameActionClass::GetLabel() const {
+	return wxT("Project Tag Directory Rename");
+}

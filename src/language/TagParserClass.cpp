@@ -1077,3 +1077,39 @@ std::vector<mvceditor::TraitTagClass> mvceditor::TagParserClass::FindTraitsByCla
 	}
 	return matches;
 }
+
+void mvceditor::TagParserClass::RenameFile(const wxFileName& oldFile, const wxFileName& newFile) {
+	try {
+		std::string stdOldPath = mvceditor::WxToChar(oldFile.GetFullPath());
+		std::string stdNewPath = mvceditor::WxToChar(newFile.GetFullPath());
+		std::string stdNewName = mvceditor::WxToChar(newFile.GetFullName());
+		std::string sql = "UPDATE file_items SET full_path = ?, name = ? WHERE full_path = ?";
+		soci::statement stmt = (Session->prepare << sql,
+			soci::use(stdNewPath), soci::use(stdNewName), soci::use(stdOldPath)
+		);
+		stmt.execute(true);
+	} catch (std::exception& e) {
+			
+		// ATTN: at some point bubble these exceptions up?
+		// to avoid unreferenced local variable warnings in MSVC
+		wxASSERT_MSG(false, wxString(e.what()));
+	}
+}
+
+void mvceditor::TagParserClass::RenameDir(const wxFileName& oldDir, const wxFileName& newDir) {
+	try {
+		std::string stdOldPath = mvceditor::WxToChar(oldDir.GetPathWithSep());
+		std::string stdOldPathLike = stdOldPath + "%";
+		std::string stdNewPath = mvceditor::WxToChar(newDir.GetPathWithSep());
+		std::string sql = "UPDATE file_items SET full_path = REPLACE(full_path, ?, ?) WHERE full_path LIKE ?";
+		soci::statement stmt = (Session->prepare << sql,
+			soci::use(stdOldPath), soci::use(stdNewPath), soci::use(stdOldPathLike)
+		);
+		stmt.execute(true);
+	} catch (std::exception& e) {
+			
+		// ATTN: at some point bubble these exceptions up?
+		// to avoid unreferenced local variable warnings in MSVC
+		wxASSERT_MSG(false, wxString(e.what()));
+	}	
+}

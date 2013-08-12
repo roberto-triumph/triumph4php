@@ -355,6 +355,13 @@ void mvceditor::TagFeatureClass::OnAppFileDeleted(wxCommandEvent& event) {
 	RunningThreads.Queue(action);
 }
 
+void mvceditor::TagFeatureClass::OnAppFileRenamed(mvceditor::RenameEventClass& event) {
+	mvceditor::ProjectTagSingleFileRenameActionClass* action = new mvceditor::ProjectTagSingleFileRenameActionClass(RunningThreads, wxID_ANY);
+	action->SetPaths(event.OldPath.GetFullPath(), event.NewPath.GetFullPath());
+	action->Init(App.Globals);
+	RunningThreads.Queue(action);
+}
+
 void mvceditor::TagFeatureClass::OnAppFileExternallyModified(wxCommandEvent& event) {
 
 	// the file is assumed not be opened, we don't need to build the symbol table
@@ -396,6 +403,13 @@ void mvceditor::TagFeatureClass::OnAppDirDeleted(wxCommandEvent& event) {
 	else {
 		delete tagAction;
 	}
+}
+
+void mvceditor::TagFeatureClass::OnAppDirRenamed(mvceditor::RenameEventClass& event) {
+mvceditor::ProjectTagDirectoryRenameActionClass* action = new mvceditor::ProjectTagDirectoryRenameActionClass(RunningThreads, wxID_ANY);
+	action->SetPaths(event.OldPath.GetPath(), event.NewPath.GetPath());
+	action->Init(App.Globals);
+	RunningThreads.Queue(action);
 }
 
 void mvceditor::TagFeatureClass::OnTimerComplete(wxTimerEvent& event) {
@@ -778,8 +792,10 @@ BEGIN_EVENT_TABLE(mvceditor::TagFeatureClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_OPENED, mvceditor::TagFeatureClass::OnAppFileOpened)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_REVERTED, mvceditor::TagFeatureClass::OnAppFileReverted)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_DELETED, mvceditor::TagFeatureClass::OnAppFileDeleted)
+	EVT_APP_FILE_RENAMED(mvceditor::TagFeatureClass::OnAppFileRenamed)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_DIR_CREATED,  mvceditor::TagFeatureClass::OnAppDirCreated)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_DIR_DELETED,  mvceditor::TagFeatureClass::OnAppDirDeleted)
+	EVT_APP_DIR_RENAMED(mvceditor::TagFeatureClass::OnAppDirRenamed)
 
 	// we will treat file new and file opened the same
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_NEW, mvceditor::TagFeatureClass::OnAppFileOpened)

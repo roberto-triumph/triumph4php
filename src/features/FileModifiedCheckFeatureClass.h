@@ -114,8 +114,6 @@ private:
 	std::map<wxString, int> DirsExternallyCreated;
 	std::map<wxString, int> DirsExternallyModified;
 	std::map<wxString, int> DirsExternallyDeleted;
-	
-	
 
 	/**
 	 * the paths that were recently modified or deleted outside the editor
@@ -127,6 +125,9 @@ private:
 	std::map<wxString, int> PathsExternallyModified;
 	std::map<wxString, int> PathsExternallyDeleted;
 	std::map<wxString, int> PathsExternallyCreated;
+
+	// key is from path, value is to path
+	std::map<wxString, wxString> PathsExternallyRenamed;
 
 	/**
 	 * the last time that we got an event from wxFileSystemWatcher.

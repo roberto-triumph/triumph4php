@@ -87,7 +87,6 @@ TEST_FIXTURE(TagParserTestFixtureClass, WipeAll) {
 	CHECK_EQUAL(0, count);
 	count = RowCount("resources");
 	CHECK_EQUAL(0, count);
-	
 }
 
 TEST_FIXTURE(TagParserTestFixtureClass, DeleteDirectories) {
@@ -152,6 +151,58 @@ TEST_FIXTURE(TagParserTestFixtureClass, DeleteDirectoriesWithSubDirectories) {
 	CHECK_EQUAL(0, count);
 	count = RowCount("resources");
 	CHECK_EQUAL(0, count);
+}
+
+TEST_FIXTURE(TagParserTestFixtureClass, RenameFile) {
+	wxFileName file1 = TestFile(wxT("project1"), wxT("user.php"));
+	AddFile(file1, mvceditor::CharToIcu(
+		"class User {}\n"
+		"class Admin {}\n"
+	));
+
+	std::string stdFullPath = mvceditor::WxToChar(file1.GetFullPath());
+	int count = 0;
+	Session << ("SELECT COUNT(*) FROM file_items WHERE full_path= ?"), 
+		soci::use(stdFullPath), soci::into(count);
+	CHECK_EQUAL(1, count);
+
+	wxFileName newFileName(file1.GetPath(), wxT("admin.php"));
+	TagParser.RenameFile(file1, newFileName);
+	
+	stdFullPath = mvceditor::WxToChar(newFileName.GetFullPath());
+	count = 0;
+	std::string newName;
+	Session << ("SELECT name FROM file_items WHERE full_path= ?"), 
+		soci::use(stdFullPath), soci::into(newName);
+	CHECK_EQUAL("admin.php", newName);
+}
+
+TEST_FIXTURE(TagParserTestFixtureClass, RenameDir) {
+	wxFileName file1 = TestFile(wxT("project1"), wxT("user.php"));
+	AddFile(file1, mvceditor::CharToIcu(
+		"class User {}\n"
+		"class Admin {}\n"
+	));
+
+	wxFileName oldDir;
+	oldDir.AssignDir(file1.GetPath());
+
+	// change project_1 to project_2
+	wxFileName newDir;
+	newDir.AssignDir(file1.GetPath());
+	newDir.RemoveLastDir();
+	newDir.AppendDir(wxT("project_2"));
+	
+	
+	TagParser.RenameDir(oldDir, newDir);
+	
+	wxFileName newFileName(newDir.GetPath(), wxT("user.php"));
+	std::string stdFullPath = mvceditor::WxToChar(newFileName.GetFullPath());
+
+	int count = 0;
+	Session << ("SELECT COUNT(*) FROM file_items WHERE full_path= ?"), 
+		soci::use(stdFullPath), soci::into(count);
+	CHECK_EQUAL(1, count);
 }
 
 }

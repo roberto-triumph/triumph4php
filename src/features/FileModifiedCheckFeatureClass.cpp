@@ -142,7 +142,8 @@ mvceditor::FileModifiedCheckFeatureClass::FileModifiedCheckFeatureClass(mvcedito
 , DirsExternallyDeleted()
 , PathsExternallyModified()
 , PathsExternallyDeleted() 
-, PathsExternallyCreated() 
+, PathsExternallyCreated()
+, PathsExternallyRenamed()
 , LastWatcherEventTime() {
 	FsWatcher.SetOwner(this);
 	LastWatcherEventTime = wxDateTime::Now();
@@ -152,10 +153,16 @@ void mvceditor::FileModifiedCheckFeatureClass::OnAppReady(wxCommandEvent& event)
 	Timer.Start(250, wxTIMER_CONTINUOUS);
 	
 	// add the enabled projects to the watch list
+	// watcher things that still need to be done
+	// TODO: handle projects being enabled/disabled
+	// TODO: deletion / renaming of project root
+	// TODO: what is going to happen when a dir is added, then its deleted
+	//       while parsing is taking place?
 	std::vector<mvceditor::SourceClass> sources = App.Globals.AllEnabledPhpSources();
 	std::vector<mvceditor::SourceClass>::const_iterator source;
 	for (source = sources.begin(); source != sources.end(); ++source) {
-		int flags = wxFSW_EVENT_CREATE  | wxFSW_EVENT_DELETE  | wxFSW_EVENT_RENAME | wxFSW_EVENT_MODIFY | wxFSW_EVENT_ERROR | wxFSW_EVENT_WARNING;
+		int flags = wxFSW_EVENT_CREATE  | wxFSW_EVENT_DELETE  | wxFSW_EVENT_RENAME | wxFSW_EVENT_MODIFY | wxFSW_EVENT_RENAME |
+			wxFSW_EVENT_ERROR | wxFSW_EVENT_WARNING;
 		wxFileName sourceDir = source->RootDirectory;
 		sourceDir.DontFollowLink();
 		FsWatcher.AddTree(sourceDir, flags);
@@ -202,6 +209,7 @@ void mvceditor::FileModifiedCheckFeatureClass::OnTimer(wxTimerEvent& event) {
 	PathsExternallyCreated.clear();
 	PathsExternallyModified.clear();
 	PathsExternallyDeleted.clear();
+	PathsExternallyRenamed.clear();
 	FilesExternallyCreated.clear();
 	FilesExternallyModified.clear();
 	FilesExternallyDeleted.clear();
@@ -246,26 +254,37 @@ void mvceditor::FileModifiedCheckFeatureClass::HandleOpenedFiles(std::map<wxStri
 
 	// since we collapse files in the event that a dir is deleted, we need to 
 	// check to see if the opened file exists in a deleted directory
-	std::map<wxString, mvceditor::CodeControlClass*>::iterator openedFile;
-	for (openedFile = openedFiles.begin(); openedFile != openedFiles.end(); ++openedFile) {	
-		wxFileName parentDir;
-		parentDir.AssignDir(wxFileName(openedFile->first).GetPath());
-		
-		// if a parent dir already exists, then it means that this is a subdir and we want to skip it
-		size_t dirCount = parentDir.GetDirCount();
-		bool foundSubDir = false;
-		for (size_t i = 0; i < dirCount; ++i) {
-			if (DirsExternallyDeleted.find(parentDir.GetPath()) != DirsExternallyDeleted.end()) {
-				foundSubDir = true;
-				break;
+	if (!DirsExternallyDeleted.empty()) {
+		std::map<wxString, mvceditor::CodeControlClass*>::iterator openedFile;
+		for (openedFile = openedFiles.begin(); openedFile != openedFiles.end(); ++openedFile) {	
+			wxFileName parentDir;
+			parentDir.AssignDir(wxFileName(openedFile->first).GetPath());
+			
+			// if a parent dir already exists, then it means that this is a subdir and we want to skip it
+			size_t dirCount = parentDir.GetDirCount();
+			bool foundSubDir = false;
+			for (size_t i = 0; i < dirCount; ++i) {
+				if (DirsExternallyDeleted.find(parentDir.GetPath()) != DirsExternallyDeleted.end()) {
+					foundSubDir = true;
+					break;
+				}
+				parentDir.RemoveLastDir();
 			}
-			parentDir.RemoveLastDir();
+			if (!foundSubDir) {
+				openedFilesDeleted[openedFile->first] = 1;
+			}
 		}
-		if (!foundSubDir) {
-			openedFilesDeleted[openedFile->first] = 1;
-		}
-
 	}
+
+	// check for renames; an opened file rename will be handled as a deletion for now
+	std::map<wxString, wxString>::iterator renamed;
+	for (renamed = PathsExternallyRenamed.begin(); renamed != PathsExternallyRenamed.end(); ++renamed) {
+		wxString renamedFrom = renamed->first;
+		if (openedFiles.find(renamedFrom) != openedFiles.end()) {
+			openedFilesDeleted[renamedFrom] = 1;
+		}
+	}
+
 	if (!openedFilesDeleted.empty()) {
 		FilesDeletedPrompt(openedFiles, openedFilesDeleted);
 	}
@@ -310,7 +329,19 @@ void mvceditor::FileModifiedCheckFeatureClass::HandleNonOpenedFiles(std::map<wxS
 		modifiedEvt.SetString(f->first);
 		App.EventSink.Publish(modifiedEvt);
 	}
-
+	std::map<wxString, wxString>::iterator pair;
+	for (pair = PathsExternallyRenamed.begin(); pair != PathsExternallyRenamed.end(); ++pair) {
+		
+		// figure out if we renamed a file or a dir
+		if (wxFileName::DirExists(pair->second)) {
+			mvceditor::RenameEventClass renameEvt(mvceditor::EVENT_APP_DIR_RENAMED, pair->first, pair->second);
+			App.EventSink.Publish(renameEvt);
+		}
+		else {
+			mvceditor::RenameEventClass renameEvt(mvceditor::EVENT_APP_FILE_RENAMED, pair->first, pair->second);
+			App.EventSink.Publish(renameEvt);
+		}
+	}
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::FilesModifiedPrompt(std::map<wxString, mvceditor::CodeControlClass*>& filesToPrompt) {
@@ -405,6 +436,9 @@ void mvceditor::FileModifiedCheckFeatureClass::OnFsWatcher(wxFileSystemWatcherEv
 	}
 	else if (wxFSW_EVENT_DELETE == event.GetChangeType()) {
 		PathsExternallyDeleted[path] = 1;
+	}
+	else if (wxFSW_EVENT_RENAME == event.GetChangeType()) {
+		PathsExternallyRenamed[path] = event.GetNewPath().GetFullPath();
 	}
 	else if (wxFSW_EVENT_WARNING == event.GetChangeType()) {
 	

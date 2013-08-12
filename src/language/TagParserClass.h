@@ -192,7 +192,6 @@ public:
 	 */
 	void WipeAll();
 
-
 	/**
 	 * Deletes tags from the given directories only. Tags from subdirectories will
 	 * also be deleted. If this finder was initialized with a backing file, the backing database
@@ -211,6 +210,24 @@ public:
 	 * set the PHP version to handle
 	 */
 	void SetVersion(pelet::Versions version);
+
+	/**
+	 * renames file records.  This method is useful so that we don't
+	 * have to re-tag a file when a file is renamed.
+	 *
+	 * @param oldFile the old file
+	 * @param newFile the new file
+	 */
+	void RenameFile(const wxFileName& oldFile, const wxFileName& newFile);
+
+	/**
+	 * renames file records.  This method is useful so that we don't
+	 * have to re-tag an entire directory when a directory is renamed.
+	 *
+	 * @param oldDir the old directory
+	 * @param newDir the new directory
+	 */
+	void RenameDir(const wxFileName& oldDir, const wxFileName& newDir);
 	
 private:
 	
