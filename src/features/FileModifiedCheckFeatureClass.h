@@ -94,6 +94,17 @@ private:
 	void OnPreferencesSaved(wxCommandEvent& event);
 
 	/**
+	 * start watching all enabled projects' source directories.
+	 */
+	void StartWatch();
+
+	/**
+	 * when we encounter a watch error, it may be because one of the projects' sources has
+	 * been deleted. Prompt the user on what to do.
+	 */
+	void HandleWatchError();
+
+	/**
 	 * to periodically check the modified time of the opened files
 	 */
 	wxTimer Timer;
@@ -148,6 +159,13 @@ private:
 	 * PHP tags.
 	 */
 	wxDateTime LastWatcherEventTime;
+
+	/**
+	 * will be set to TRUE if the watcher saw an error event.  We may get 
+	 * error events when a project source dir has been deleted. In this case, 
+	 * we want to prompt the user on what action to take
+	 */
+	bool IsWatchError;
 	
 	DECLARE_EVENT_TABLE()
 

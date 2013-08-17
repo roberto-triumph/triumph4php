@@ -143,31 +143,20 @@ mvceditor::FileModifiedCheckFeatureClass::FileModifiedCheckFeatureClass(mvcedito
 , PathsExternallyDeleted() 
 , PathsExternallyCreated()
 , PathsExternallyRenamed()
-, LastWatcherEventTime() {
+, LastWatcherEventTime() 
+, IsWatchError(false) {
 	FsWatcher = NULL;
 	LastWatcherEventTime = wxDateTime::Now();
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::OnAppReady(wxCommandEvent& event) {
-	FsWatcher = new wxFileSystemWatcher();
-	FsWatcher->SetOwner(this);
+	StartWatch();
 	Timer.Start(250, wxTIMER_CONTINUOUS);
-	
 	
 	// add the enabled projects to the watch list
 	// watcher things that still need to be done
-	// TODO: deletion / renaming of project root
 	// TODO: what is going to happen when a dir is added, then its deleted
 	//       while parsing is taking place?
-	std::vector<mvceditor::SourceClass> sources = App.Globals.AllEnabledPhpSources();
-	std::vector<mvceditor::SourceClass>::const_iterator source;
-	for (source = sources.begin(); source != sources.end(); ++source) {
-		int flags = wxFSW_EVENT_CREATE  | wxFSW_EVENT_DELETE  | wxFSW_EVENT_RENAME | wxFSW_EVENT_MODIFY | wxFSW_EVENT_RENAME |
-			wxFSW_EVENT_ERROR | wxFSW_EVENT_WARNING;
-		wxFileName sourceDir = source->RootDirectory;
-		sourceDir.DontFollowLink();
-		FsWatcher->AddTree(sourceDir, flags);
-	}
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::OnAppExit(wxCommandEvent& event) {
@@ -189,17 +178,24 @@ void mvceditor::FileModifiedCheckFeatureClass::OnPreferencesSaved(wxCommandEvent
 	// see http://trac.wxwidgets.org/ticket/12847
 	FsWatcher->SetOwner(NULL);
 	delete FsWatcher;
+	StartWatch();
+}
+
+void mvceditor::FileModifiedCheckFeatureClass::StartWatch() {
+	IsWatchError = false;
 	FsWatcher = new wxFileSystemWatcher();
 	FsWatcher->SetOwner(this);
 
 	std::vector<mvceditor::SourceClass> sources = App.Globals.AllEnabledPhpSources();
 	std::vector<mvceditor::SourceClass>::const_iterator source;
 	for (source = sources.begin(); source != sources.end(); ++source) {
-		int flags = wxFSW_EVENT_CREATE  | wxFSW_EVENT_DELETE  | wxFSW_EVENT_RENAME | wxFSW_EVENT_MODIFY | wxFSW_EVENT_RENAME |
+		int flags = wxFSW_EVENT_CREATE  | wxFSW_EVENT_DELETE  | wxFSW_EVENT_RENAME | wxFSW_EVENT_MODIFY | 
 			wxFSW_EVENT_ERROR | wxFSW_EVENT_WARNING;
 		wxFileName sourceDir = source->RootDirectory;
-		sourceDir.DontFollowLink();
-		FsWatcher->AddTree(sourceDir, flags);
+		if (sourceDir.DirExists()) {
+			sourceDir.DontFollowLink();
+			FsWatcher->AddTree(sourceDir, flags);
+		}
 	}
 }
 
@@ -230,6 +226,9 @@ void mvceditor::FileModifiedCheckFeatureClass::OnTimer(wxTimerEvent& event) {
 
 	HandleOpenedFiles(openedFiles);
 	HandleNonOpenedFiles(openedFiles);
+	if (IsWatchError) {
+		HandleWatchError();
+	}
 
 	// clear out all paths
 	PathsExternallyCreated.clear();
@@ -473,8 +472,43 @@ void mvceditor::FileModifiedCheckFeatureClass::OnFsWatcher(wxFileSystemWatcherEv
 		// hopefully the root directory is caught
 	}
 	else if (wxFSW_EVENT_ERROR == event.GetChangeType()) {
+
+		// in MSW, an error event could be due to the watched directoty being deleted / renamed.
+		// in this case, we need to restart the watch
+		IsWatchError = true;
 		wxASSERT_MSG(false, event.GetErrorDescription());
 	}
+}
+
+void mvceditor::FileModifiedCheckFeatureClass::HandleWatchError() {
+	FsWatcher->SetOwner(NULL);
+	delete FsWatcher;
+
+	wxString dirsDeleted;
+
+	// check to see if the error was due to a watched directory being deleted
+	std::vector<mvceditor::SourceClass> sources = App.Globals.AllEnabledPhpSources();
+	std::vector<mvceditor::SourceClass>::const_iterator source;
+	for (source = sources.begin(); source != sources.end(); ++source) {
+		int flags = wxFSW_EVENT_CREATE  | wxFSW_EVENT_DELETE  | wxFSW_EVENT_RENAME | wxFSW_EVENT_MODIFY |
+			wxFSW_EVENT_ERROR | wxFSW_EVENT_WARNING;
+		if (!source->RootDirectory.DirExists()) {
+			dirsDeleted += source->RootDirectory.GetPath() + wxT("\n");
+		}
+	}
+
+	if (!dirsDeleted.IsEmpty()) {
+		wxString msg = wxString::FromAscii(
+			"The following source directories have been detected as deleted from your system. "
+			"If you intend to delete those permanently, you should go to File ... Projects "
+			"and remove the source directories.\n"
+		);
+		msg += dirsDeleted;
+		msg = wxGetTranslation(msg);
+		wxMessageBox(msg, _("Warning"), wxICON_WARNING | wxOK, GetMainWindow());
+	}
+
+	StartWatch();
 }
 
 BEGIN_EVENT_TABLE(mvceditor::FileModifiedCheckFeatureClass, mvceditor::FeatureClass)
