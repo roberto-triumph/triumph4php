@@ -150,10 +150,12 @@ mvceditor::FileModifiedCheckFeatureClass::FileModifiedCheckFeatureClass(mvcedito
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::OnAppReady(wxCommandEvent& event) {
+	
+	// add the enabled projects to the watch list
 	StartWatch();
 	Timer.Start(250, wxTIMER_CONTINUOUS);
 	
-	// add the enabled projects to the watch list
+	
 	// watcher things that still need to be done
 	// TODO: what is going to happen when a dir is added, then its deleted
 	//       while parsing is taking place?
@@ -208,7 +210,7 @@ void mvceditor::FileModifiedCheckFeatureClass::OnTimer(wxTimerEvent& event) {
 		// of the changes are done 
 		return;
 	}
-	if (PathsExternallyCreated.empty() && PathsExternallyModified.empty() && PathsExternallyDeleted.empty()) {
+	if (PathsExternallyCreated.empty() && PathsExternallyModified.empty() && PathsExternallyDeleted.empty() && PathsExternallyRenamed.empty()) {
 
 		// nothing to do
 		return;

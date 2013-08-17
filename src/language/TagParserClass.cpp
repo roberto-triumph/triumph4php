@@ -357,6 +357,13 @@ void mvceditor::TagParserClass::BuildResourceCacheForFile(const wxString& fullPa
 void mvceditor::TagParserClass::BuildResourceCache(const wxString& fullPath, bool parseClasses) {
 	wxFileName fileName(fullPath);
 	wxDateTime fileLastModifiedDateTime = fileName.GetModificationTime();
+
+	// if the file happens to be just deleted and we get a bad time, then 
+	// assume that it has been modified right now
+	// we dont want to insert junk in the db
+	if (!fileLastModifiedDateTime.IsValid()) {
+		fileLastModifiedDateTime = wxDateTime::Now();
+	}
 	
 	// have we looked at this file yet or is cache out of date? if not, then build the cache.
 	bool cached = false;
@@ -367,7 +374,7 @@ void mvceditor::TagParserClass::BuildResourceCache(const wxString& fullPath, boo
 		cached = !needsToBeParsed;
 	}
 	else {
-		fileTag.MakeNew(fileName, parseClasses);
+		fileTag.MakeNew(fileName, fileLastModifiedDateTime, parseClasses);
 		PersistFileTag(fileTag);
 	}
 	if (parseClasses) {
@@ -382,18 +389,19 @@ void mvceditor::TagParserClass::BuildResourceCache(const wxString& fullPath, boo
 
 				// the previous line deleted the file from file_items
 				// we need to re-add it
-				fileTag.MakeNew(fileName, parseClasses);
+				fileTag.MakeNew(fileName, fileLastModifiedDateTime, parseClasses);
 				PersistFileTag(fileTag);
 			}			
 			
 			// for now silently ignore files with parser errors
 			pelet::LintResultsClass lintResults;
-			wxFFile file(fullPath, wxT("rb"));
-
-			CurrentFileTagId = fileTag.FileId;
-			Parser.ScanFile(file.fp(), mvceditor::WxToIcu(fullPath), lintResults);
-	
-			PersistTraits(TraitCache, fileTag.FileId);
+			wxFFile file;
+			if (file.Open(fullPath, wxT("rb"))) {
+				CurrentFileTagId = fileTag.FileId;
+				Parser.ScanFile(file.fp(), mvceditor::WxToIcu(fullPath), lintResults);
+		
+				PersistTraits(TraitCache, fileTag.FileId);
+			}
 
 			FilesParsed++;
 

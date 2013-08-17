@@ -342,7 +342,7 @@ public:
 	/**
 	 * initialize the members of this file item for insertion into the database.
 	 */
-	void MakeNew(const wxFileName& fileName, bool isParsed);
+	void MakeNew(const wxFileName& fileName, wxDateTime modTime, bool isParsed);
 
 	/**
 	 * @return name the full name of the file (name + extension, no directories)

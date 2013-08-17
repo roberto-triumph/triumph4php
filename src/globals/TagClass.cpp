@@ -201,11 +201,10 @@ bool mvceditor::FileTagClass::NeedsToBeParsed(const wxDateTime& fileLastModified
 	return modified;
 }
 
-void mvceditor::FileTagClass::MakeNew(const wxFileName& fileName, bool isParsed) {
-	wxDateTime fileLastModifiedDateTime = fileName.GetModificationTime();
-
+void mvceditor::FileTagClass::MakeNew(const wxFileName& fileName, wxDateTime modTime, bool isParsed) {
+	wxASSERT_MSG(modTime.IsValid(), _("file modification time is not valid"));
 	FullPath = fileName.GetFullPath();
-	DateTime = fileLastModifiedDateTime;
+	DateTime = modTime;
 	FileId = 0;
 	IsParsed = isParsed;
 	IsNew = false;

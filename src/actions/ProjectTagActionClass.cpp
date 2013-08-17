@@ -263,7 +263,8 @@ mvceditor::ProjectTagSingleFileRenameActionClass::ProjectTagSingleFileRenameActi
 : GlobalActionClass(runningThreads, eventId)
 , OldFileName()
 , NewFileName()
-, TagFinderList() {
+, TagFinderList()
+, Project() {
 
 }
 
@@ -274,11 +275,48 @@ void mvceditor::ProjectTagSingleFileRenameActionClass::SetPaths(const wxString& 
 
 bool mvceditor::ProjectTagSingleFileRenameActionClass::Init(mvceditor::GlobalsClass& globals) {
 	TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), globals.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
+	std::vector<mvceditor::ProjectClass>::const_iterator project;
+	std::vector<mvceditor::SourceClass>::const_iterator src;
+	wxString path = OldFileName.GetFullPath();
+	bool found = false;
+	for (project = globals.Projects.begin(); !found && project != globals.Projects.end(); ++project) {
+		if (project->IsEnabled) {
+			for (src = project->Sources.begin(); src != project->Sources.end(); ++src) {
+				if (src->IsInRootDirectory(path)) {
+					found = true;
+					Project = *project;
+					break;
+				}
+			}
+		}
+	}
 	return TagFinderList.IsTagFinderInit;
 }
 
 void mvceditor::ProjectTagSingleFileRenameActionClass::BackgroundWork() {
-	TagFinderList.TagParser.RenameFile(OldFileName, NewFileName);
+
+	// check to see if the original file exists
+	// if the original file exists, just rename the file (no need to retag the file)
+	if (TagFinderList.TagFinder.HasFullPath(OldFileName.GetFullPath())) {
+		TagFinderList.TagParser.RenameFile(OldFileName, NewFileName);
+	}
+	else {
+		
+		// tag the file since we have never seen it. this could be the same
+		// for example, when file with a non-php extension is renamed to have a 
+		// php extension
+		// this specific sequence is needed so that the source_id
+		// is set properly in the database
+		std::vector<mvceditor::SourceClass>::iterator src;
+		for (src = Project.Sources.begin(); src != Project.Sources.end(); ++src) {
+			wxString newFullPath = NewFileName.GetFullPath();
+			if (src->Contains(newFullPath)) {
+				TagFinderList.TagParser.BeginSearch(src->RootDirectory.GetPath());
+				TagFinderList.TagParser.Walk(newFullPath);
+				TagFinderList.TagParser.EndSearch();
+			}
+		}
+	}
 }
 
 wxString mvceditor::ProjectTagSingleFileRenameActionClass::GetLabel() const {

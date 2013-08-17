@@ -264,6 +264,13 @@ protected:
 	 * This object will perform the tag updates
 	 */
 	mvceditor::TagFinderListClass TagFinderList;
+
+	/**
+	 * the project, needed in case we need to parse the tags in the new file.
+	 * we need to parse the tags when a file is renamed from a non-php extension to
+	 * a php extension
+	 */
+	mvceditor::ProjectClass Project;
 };
 
 /**
