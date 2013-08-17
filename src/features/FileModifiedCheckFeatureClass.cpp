@@ -133,7 +133,6 @@ static std::map<wxString, mvceditor::CodeControlClass*> OpenedFiles(mvceditor::N
 mvceditor::FileModifiedCheckFeatureClass::FileModifiedCheckFeatureClass(mvceditor::AppClass& app)
 : FeatureClass(app)
 , Timer(this, ID_FILE_MODIFIED_CHECK)
-, FsWatcher() 
 , FilesExternallyCreated()
 , FilesExternallyModified()
 , FilesExternallyDeleted() 
@@ -145,16 +144,18 @@ mvceditor::FileModifiedCheckFeatureClass::FileModifiedCheckFeatureClass(mvcedito
 , PathsExternallyCreated()
 , PathsExternallyRenamed()
 , LastWatcherEventTime() {
-	FsWatcher.SetOwner(this);
+	FsWatcher = NULL;
 	LastWatcherEventTime = wxDateTime::Now();
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::OnAppReady(wxCommandEvent& event) {
+	FsWatcher = new wxFileSystemWatcher();
+	FsWatcher->SetOwner(this);
 	Timer.Start(250, wxTIMER_CONTINUOUS);
+	
 	
 	// add the enabled projects to the watch list
 	// watcher things that still need to be done
-	// TODO: handle projects being enabled/disabled
 	// TODO: deletion / renaming of project root
 	// TODO: what is going to happen when a dir is added, then its deleted
 	//       while parsing is taking place?
@@ -165,16 +166,41 @@ void mvceditor::FileModifiedCheckFeatureClass::OnAppReady(wxCommandEvent& event)
 			wxFSW_EVENT_ERROR | wxFSW_EVENT_WARNING;
 		wxFileName sourceDir = source->RootDirectory;
 		sourceDir.DontFollowLink();
-		FsWatcher.AddTree(sourceDir, flags);
+		FsWatcher->AddTree(sourceDir, flags);
 	}
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::OnAppExit(wxCommandEvent& event) {
+	Timer.Stop();
 
 	// unregister ourselves as the event handler from watcher 
-	FsWatcher.SetOwner(NULL);
+	FsWatcher->SetOwner(NULL);
+	delete FsWatcher;
+	FsWatcher = NULL;
+	
+}
 
-	Timer.Stop();
+void mvceditor::FileModifiedCheckFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
+	
+	// on MSW, wxFileSystemWatcher.RemoveAll does not actually remove the old 
+	// watches.
+	// that is why we are using a pointer; deleting the object does remove the
+	// old watches
+	// see http://trac.wxwidgets.org/ticket/12847
+	FsWatcher->SetOwner(NULL);
+	delete FsWatcher;
+	FsWatcher = new wxFileSystemWatcher();
+	FsWatcher->SetOwner(this);
+
+	std::vector<mvceditor::SourceClass> sources = App.Globals.AllEnabledPhpSources();
+	std::vector<mvceditor::SourceClass>::const_iterator source;
+	for (source = sources.begin(); source != sources.end(); ++source) {
+		int flags = wxFSW_EVENT_CREATE  | wxFSW_EVENT_DELETE  | wxFSW_EVENT_RENAME | wxFSW_EVENT_MODIFY | wxFSW_EVENT_RENAME |
+			wxFSW_EVENT_ERROR | wxFSW_EVENT_WARNING;
+		wxFileName sourceDir = source->RootDirectory;
+		sourceDir.DontFollowLink();
+		FsWatcher->AddTree(sourceDir, flags);
+	}
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::OnTimer(wxTimerEvent& event) {
@@ -456,4 +482,5 @@ BEGIN_EVENT_TABLE(mvceditor::FileModifiedCheckFeatureClass, mvceditor::FeatureCl
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_EXIT, mvceditor::FileModifiedCheckFeatureClass::OnAppExit)
 	EVT_TIMER(ID_FILE_MODIFIED_CHECK, mvceditor::FileModifiedCheckFeatureClass::OnTimer)
 	EVT_FSWATCHER(wxID_ANY, mvceditor::FileModifiedCheckFeatureClass::OnFsWatcher)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::FileModifiedCheckFeatureClass::OnPreferencesSaved)
 END_EVENT_TABLE()

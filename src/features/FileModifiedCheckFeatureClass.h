@@ -89,14 +89,25 @@ private:
 	void OnFsWatcher(wxFileSystemWatcherEvent& event);
 
 	/**
+	 * when projects have been enabled/disabled we need to watch the newly enabled projects
+	 */
+	void OnPreferencesSaved(wxCommandEvent& event);
+
+	/**
 	 * to periodically check the modified time of the opened files
 	 */
 	wxTimer Timer;
 
 	/**
-	 * object that will notify us when a file has been modified outside the editor
+	 * object that will notify us when a file has been modified outside the editor.
+	 * This class will own the pointer
+	 * on MSW, wxFileSystemWatcher.RemoveAll does not actually remove the old 
+	 * watches.
+	 * that is why we are using a pointer; deleting the object does remove the
+	 * old watches
+	 * see http://trac.wxwidgets.org/ticket/12847
 	 */ 
-	wxFileSystemWatcher FsWatcher;
+	wxFileSystemWatcher* FsWatcher;
 
 	/**
 	 * files that were recently modified or deleted outside the editor.  We accumulate the
