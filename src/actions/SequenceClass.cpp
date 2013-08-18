@@ -135,15 +135,15 @@ bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvced
 	// will just recurse directories and update the cache, it does not recurse the index
 	// hence it won't remove items that don't need to be there
 	// don't wipe, just remove tags from touchedProjects
-	std::vector<wxFileName> dirsToDelete;
+	std::vector<wxFileName> sourceDirsToDelete;
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	std::vector<mvceditor::SourceClass>::const_iterator source;
 	for (project = touchedProjects.begin(); project != touchedProjects.end(); ++project) {
 		for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
-			dirsToDelete.push_back(source->RootDirectory);
+			sourceDirsToDelete.push_back(source->RootDirectory);
 		}
 	}
-	AddStep(new mvceditor::TagDeleteDirectoryActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE, dirsToDelete));
+	AddStep(new mvceditor::TagDeleteSourceActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE, sourceDirsToDelete));
 
 	// this will load the url entry point cache
 	// do this before the rest so the urls become available asap

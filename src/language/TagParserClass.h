@@ -193,6 +193,13 @@ public:
 	void WipeAll();
 
 	/**
+	 * Deletes all tags from the given source directory. Tags from subdirectories will
+	 * also be deleted. If this finder was initialized with a backing file, the backing database
+	 * file will be deleted also.
+	 */
+	void DeleteSource(const wxFileName& sourceDir);
+
+	/**
 	 * Deletes tags from the given directories only. Tags from subdirectories will
 	 * also be deleted. If this finder was initialized with a backing file, the backing database
 	 * file will be deleted also.

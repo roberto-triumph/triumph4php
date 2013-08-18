@@ -246,6 +246,9 @@ CREATE INDEX IF NOT EXISTS idxResourceKey ON resources(key, type);
 -- to enable fast lookups for resources from a specific file.
 CREATE INDEX IF NOT EXISTS idxResourceFileItem ON resources(file_item_id);
 
+-- to enable fast deletions of entire resources from a specific source directory.
+CREATE INDEX IF NOT EXISTS idxResourceSource ON resources(source_id);
+
 -- to enable fast lookups for traits.
 -- Note that the key is not necessarily unique; 2 different files may declare the same
 -- class / methods / functions.
@@ -254,7 +257,7 @@ CREATE INDEX IF NOT EXISTS idxTraitKey ON trait_resources(key);
 --
 -- This number must match the version in CacheDbVersionActionClass.cpp
 --
-INSERT INTO schema_version (version_number) VALUES(5);
+INSERT INTO schema_version (version_number) VALUES(6);
 
 --
 -- Write ahead logging to allow for concurrent reads and writes

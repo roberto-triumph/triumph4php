@@ -57,6 +57,38 @@ private:
 };
 
 /**
+ * action to remove only tags from entire source directories from the tag
+ * databases
+ */
+class TagDeleteSourceActionClass : public mvceditor::GlobalActionClass {
+	
+public:
+
+	TagDeleteSourceActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId, const std::vector<wxFileName>& sourceDirsToDelete);
+	
+	bool Init(mvceditor::GlobalsClass& globals);
+
+	wxString GetLabel() const;
+	
+protected:
+	
+	void BackgroundWork();
+	
+private:
+		
+	/**
+	 * The db files that need to be wiped.
+	 */
+	std::vector<wxFileName> ResourceDbFileNames;
+
+	/**
+	 * the directories to be removed from the cache.
+	 */
+	std::vector<wxFileName> SourceDirsToDelete;
+	
+};
+
+/**
  * action to remove only tags from certain directories from the tag
  * databases
  */

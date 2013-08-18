@@ -66,6 +66,48 @@ wxString mvceditor::TagWipeActionClass::GetLabel() const {
 	return wxT("Tag Cache Wipe");
 }
 
+mvceditor::TagDeleteSourceActionClass::TagDeleteSourceActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId,
+													  const std::vector<wxFileName>& sourceDirsToDelete)
+	: GlobalActionClass(runningThreads, eventId) 
+	, SourceDirsToDelete() {
+	SourceDirsToDelete = mvceditor::DeepCopyFileNames(sourceDirsToDelete);
+}
+
+bool mvceditor::TagDeleteSourceActionClass::Init(mvceditor::GlobalsClass& globals) {
+	SetStatus(_("Tag Cache Delete Source"));
+
+	// wxFileName assignment is not a complete clone, so use Assign() just in case
+	// since we will access the filenames from multiple threads
+	ResourceDbFileNames.push_back(wxFileName(globals.TagCacheDbFileName.GetFullPath()));
+
+	// TODO wipe detector tags db too
+	return !ResourceDbFileNames.empty();
+}
+
+void mvceditor::TagDeleteSourceActionClass::BackgroundWork() {
+	std::vector<wxFileName>::iterator it;
+	for (it = ResourceDbFileNames.begin(); it != ResourceDbFileNames.end() && !IsCancelled(); ++it) {
+		SetStatus(_("Tag Cache Delete / ") + it->GetName());
+		// initialize the sqlite db
+		soci::session session;
+		try {
+			session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(it->GetFullPath()));
+			mvceditor::TagParserClass tagParser;
+			tagParser.Init(&session);
+			for (size_t i = 0; i < SourceDirsToDelete.size(); ++i) {
+				tagParser.DeleteSource(SourceDirsToDelete[i]);
+			}
+		} catch(std::exception const& e) {
+			session.close();
+			wxString msg = mvceditor::CharToWx(e.what());
+			wxASSERT_MSG(false, msg);
+		}
+	}
+}
+
+wxString mvceditor::TagDeleteSourceActionClass::GetLabel() const {
+	return wxT("Tag Cache Delete Source");
+}
 
 mvceditor::TagDeleteDirectoryActionClass::TagDeleteDirectoryActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId,
 													  const std::vector<wxFileName>& dirsToDelete)
@@ -107,7 +149,6 @@ void mvceditor::TagDeleteDirectoryActionClass::BackgroundWork() {
 wxString mvceditor::TagDeleteDirectoryActionClass::GetLabel() const {
 	return wxT("Tag Cache Delete Directory");
 }
-
 
 mvceditor::TagDeleteFileActionClass::TagDeleteFileActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId,
 													  const std::vector<wxFileName>& filesToDelete)

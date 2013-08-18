@@ -866,6 +866,46 @@ void mvceditor::TagParserClass::WipeAll() {
 			Session->once << "DELETE FROM file_items;";
 			Session->once << "DELETE FROM resources;";
 			Session->once << "DELETE FROM trait_resources;";
+			Session->once << "DELETE FROM sources;";
+		} catch (std::exception& e) {
+			
+			// ATTN: at some point bubble these exceptions up?
+			// to avoid unreferenced local variable warnings in MSVC
+			e.what();
+		}
+	}
+}
+
+void mvceditor::TagParserClass::DeleteSource(const wxFileName& sourceDir) {
+	NamespaceCache.clear();
+	TraitCache.clear();
+
+	if (IsCacheInitialized) {
+		try {
+			bool error = false;
+			wxString errorMsg;
+
+			// get the source ID to be deleted
+			int sourceId = 0;
+			std::string stdSourceDir = mvceditor::WxToChar(sourceDir.GetPathWithSep());
+			
+			std::string sql = "SELECT source_id FROM sources WHERE directory = ?";
+			soci::statement stmt = (Session->prepare << sql, soci::into(sourceId), soci::use(stdSourceDir));
+			
+			if (stmt.execute(true)) {
+				
+				sql = "DELETE FROM resources WHERE source_id = ?";
+				Session->once << sql, soci::use(sourceId);
+
+				sql = "DELETE FROM trait_resources WHERE source_id = ?";
+				Session->once << sql, soci::use(sourceId);
+
+				sql = "DELETE FROM file_items WHERE source_id = ?";
+				Session->once << sql, soci::use(sourceId);
+
+				sql = "DELETE FROM sources WHERE source_id = ?";
+				Session->once << sql, soci::use(sourceId);
+			}
 		} catch (std::exception& e) {
 			
 			// ATTN: at some point bubble these exceptions up?
