@@ -31,7 +31,9 @@ mvceditor::ActionClass::ActionClass(mvceditor::RunningThreadsClass& runningThrea
 	, EventId(eventId)
 	, ActionId(0)
 	, Mutex()
-	, Cancelled(false) {
+	, Cancelled(false) 
+	, Mode(INDETERMINATE)
+	, PercentComplete(0) {
 }
 
 mvceditor::ActionClass::~ActionClass() {
@@ -49,7 +51,7 @@ bool mvceditor::ActionClass::IsCancelled() {
 }
 
 void mvceditor::ActionClass::SetStatus(const wxString& status) {
-	mvceditor::ActionEventClass evt(wxID_ANY, mvceditor::EVENT_ACTION_STATUS, status);
+	mvceditor::ActionProgressEventClass evt(wxID_ANY, GetProgressMode(), GetPercentComplete(), status);
 	PostEvent(evt);
 }
 
@@ -73,6 +75,27 @@ void mvceditor::ActionClass::PostEvent(wxEvent& event) {
 }
 
 void mvceditor::ActionClass::BackgroundCleanup() {
+}
+
+
+void mvceditor::ActionClass::SetProgressMode(mvceditor::ActionClass::ProgressMode mode) {
+	wxMutexLocker locker(Mutex);
+	Mode = mode;
+}
+
+mvceditor::ActionClass::ProgressMode mvceditor::ActionClass::GetProgressMode() {
+	wxMutexLocker locker(Mutex);
+	return Mode;
+}
+
+void mvceditor::ActionClass::SetPercentComplete(int percentComplete) {
+	wxMutexLocker locker(Mutex);
+	PercentComplete = percentComplete;
+}
+
+int mvceditor::ActionClass::GetPercentComplete() {
+	wxMutexLocker locker(Mutex);
+	return PercentComplete;
 }
 
 
@@ -109,19 +132,24 @@ void mvceditor::ThreadActionClass::CancelRunningAction() {
 	}
 }
 
-int mvceditor::ThreadActionClass::GetRunningActionEventId() {
-	int eventId = -1;
+void mvceditor::ThreadActionClass::PostProgressEvent() {
 	wxMutexLocker locker(RunningActionMutex);
 	if (RunningAction) {
-		eventId = RunningAction->GetEventId();
+		int eventId = RunningAction->GetEventId();
+		mvceditor::ActionProgressEventClass evt(eventId, RunningAction->GetProgressMode(), RunningAction->GetPercentComplete(), wxT(""));
+		RunningAction->PostEvent(evt);	
 	}
-	return eventId;
 }
 
 void* mvceditor::ThreadActionClass::Entry() {
 	while (!TestDestroy()) {
 		mvceditor::ActionClass* action = NextAction();
 		if (action && !TestDestroy()) {
+			
+			// signal the start of this action
+			mvceditor::ActionProgressEventClass evt(action->GetEventId(), action->GetProgressMode(), 0, wxT(""));
+			action->PostEvent(evt);
+
 			action->BackgroundWork();
 			ActionComplete(action);
 		}
@@ -399,11 +427,7 @@ void mvceditor::RunningThreadsClass::OnTimer(wxTimerEvent& event) {
 	// if there is an action that is running then send an in-progress event
 	// for it
 	for (size_t i = 0; i < ThreadActions.size(); ++i) {
-		int eventId = ThreadActions[i]->GetRunningActionEventId();
-		if (eventId > 0) {
-			mvceditor::ActionEventClass evt(eventId, mvceditor::EVENT_ACTION_IN_PROGRESS, wxT(""));
-			PostEvent(evt);	
-		}
+		ThreadActions[i]->PostProgressEvent();
 	}
 
 	// if there is an action queued then an in-progress event
@@ -413,7 +437,7 @@ void mvceditor::RunningThreadsClass::OnTimer(wxTimerEvent& event) {
 	mvceditor::ActionClass* action;
 	while (!Actions.empty()) {
 		action = Actions.front();
-		mvceditor::ActionEventClass evt(action->GetEventId(), mvceditor::EVENT_ACTION_IN_PROGRESS, wxT(""));
+		mvceditor::ActionProgressEventClass evt(action->GetEventId(), action->GetProgressMode(), action->GetPercentComplete(), wxT(""));
 		PostEvent(evt);
 		copy.push(action);
 
@@ -441,9 +465,22 @@ wxEvent* mvceditor::ActionEventClass::Clone() const {
 	return clone;
 }
 
-const wxEventType mvceditor::EVENT_ACTION_STATUS = wxNewEventType();
+mvceditor::ActionProgressEventClass::ActionProgressEventClass(int id, mvceditor::ActionClass::ProgressMode mode, int percentComplete, const wxString& msg)
+: wxEvent(id, mvceditor::EVENT_ACTION_PROGRESS)
+, Mode(mode)
+, PercentComplete(percentComplete) 
+
+// thread-safe clone of the string
+, Message(msg.c_str()) {
+
+}
+
+wxEvent* mvceditor::ActionProgressEventClass::Clone() const {
+	return new mvceditor::ActionProgressEventClass(GetId(), Mode, PercentComplete, Message);
+}
+
+const wxEventType mvceditor::EVENT_ACTION_PROGRESS = wxNewEventType();
 const wxEventType mvceditor::EVENT_ACTION_COMPLETE = wxNewEventType();
-const wxEventType mvceditor::EVENT_ACTION_IN_PROGRESS = wxNewEventType();
 
 
 BEGIN_EVENT_TABLE(mvceditor::RunningThreadsClass, wxEvtHandler)

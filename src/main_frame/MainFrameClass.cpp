@@ -840,15 +840,33 @@ void mvceditor::MainFrameClass::OnSequenceStart(wxCommandEvent& event) {
 }
 
 void mvceditor::MainFrameClass::OnSequenceActionStatus(wxCommandEvent& event) {
-	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
-	wxString title = event.GetString();
-	gauge->IncrementAndRenameGauge(ID_SEQUENCE_GAUGE, title, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
 }
 
 void mvceditor::MainFrameClass::OnSequenceInProgress(wxCommandEvent& event) {
-	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
-	gauge->IncrementGauge(ID_SEQUENCE_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
+}
 
+void mvceditor::MainFrameClass::OnDeterminateProgress(mvceditor::ActionProgressEventClass& event) {
+	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
+	if (event.Mode == mvceditor::ActionClass::INDETERMINATE) {
+		gauge->SwitchMode(ID_SEQUENCE_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0, 0);
+		if (!event.Message.IsEmpty()) {
+			gauge->IncrementAndRenameGauge(ID_SEQUENCE_GAUGE, event.Message, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
+		}
+		else {
+			gauge->IncrementGauge(ID_SEQUENCE_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
+		}
+	}
+	else {
+		if (event.PercentComplete == 0) {
+			
+			// the start, turn the gauge into determinate mode
+			gauge->SwitchMode(ID_SEQUENCE_GAUGE, mvceditor::StatusBarWithGaugeClass::DETERMINATE_MODE, 0, 100);
+		}
+		gauge->UpdateGauge(ID_SEQUENCE_GAUGE, event.PercentComplete);
+		if (!event.Message.IsEmpty()) {
+			gauge->RenameGauge(ID_SEQUENCE_GAUGE, event.Message);
+		}
+	}
 }
 
 void mvceditor::MainFrameClass::OnSequenceComplete(wxCommandEvent& event) {
@@ -947,7 +965,7 @@ BEGIN_EVENT_TABLE(mvceditor::MainFrameClass,  MainFrameGeneratedClass)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_SEQUENCE_START, mvceditor::MainFrameClass::OnSequenceStart)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_SEQUENCE_IN_PROGRESS, mvceditor::MainFrameClass::OnSequenceInProgress)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_SEQUENCE_COMPLETE, mvceditor::MainFrameClass::OnSequenceComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_ACTION_STATUS, mvceditor::MainFrameClass::OnSequenceActionStatus)
+	EVT_ACTION_PROGRESS(wxID_ANY, mvceditor::MainFrameClass::OnDeterminateProgress)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::AppEventListenerForFrameClass, wxEvtHandler)

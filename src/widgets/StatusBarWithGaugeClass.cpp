@@ -59,6 +59,19 @@ void mvceditor::StatusBarWithGaugeClass::UpdateGauge(int id, int update) {
 	}
 }
 
+void mvceditor::StatusBarWithGaugeClass::SwitchMode(int id, int mode, int value, int range) {
+	if (Gauges.count(id) > 0) {
+		wxGauge* gauge = Gauges[id];
+		if (INDETERMINATE_MODE == mode) {
+			gauge->Pulse();
+		}
+		else {
+			gauge->SetValue(value);
+			gauge->SetRange(range);
+		}
+	}
+}
+
 void mvceditor::StatusBarWithGaugeClass::IncrementGauge(int id, int increment) {
 	if (Gauges.count(id) > 0) {
 		wxGauge* gauge = Gauges[id];
@@ -83,6 +96,13 @@ void mvceditor::StatusBarWithGaugeClass::IncrementAndRenameGauge(int id, const w
 		else {
 			gauge->Pulse();
 		}
+	}
+}
+
+void mvceditor::StatusBarWithGaugeClass::RenameGauge(int id, const wxString& title) {
+	if (Gauges.count(id) > 0) {
+		GaugeTitles[id] = title;
+		RedrawGauges();
 	}
 }
 

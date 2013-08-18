@@ -423,7 +423,7 @@ void mvceditor::LintFeatureClass::OnLintComplete(mvceditor::ActionEventClass& ev
 	RunningActionId = 0;
 }
 
-void mvceditor::LintFeatureClass::OnLintInProgress(mvceditor::ActionEventClass& event) {
+void mvceditor::LintFeatureClass::OnLintProgress(mvceditor::ActionProgressEventClass& event) {
 	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 	gauge->IncrementGauge(ID_LINT_RESULTS_GAUGE, StatusBarWithGaugeClass::INDETERMINATE_MODE);
 }
@@ -515,7 +515,7 @@ BEGIN_EVENT_TABLE(mvceditor::LintFeatureClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_LINT_PHP + 1, mvceditor::LintFeatureClass::OnNextLintError)
 	EVT_MENU(mvceditor::MENU_LINT_PHP + 2, mvceditor::LintFeatureClass::OnPreviousLintError)
 	EVT_COMMAND(ID_LINT_READER, EVENT_FILE_READ,  mvceditor::LintFeatureClass::OnLintFileComplete)
-	EVT_ACTION_IN_PROGRESS(ID_LINT_READER, mvceditor::LintFeatureClass::OnLintInProgress)
+	EVT_ACTION_PROGRESS(ID_LINT_READER, mvceditor::LintFeatureClass::OnLintProgress)
 	EVT_ACTION_COMPLETE(ID_LINT_READER, mvceditor::LintFeatureClass::OnLintComplete)
 	EVT_APP_FILE_SAVED(mvceditor::LintFeatureClass::OnFileSaved)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::LintFeatureClass::OnPreferencesSaved)

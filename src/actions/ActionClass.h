@@ -36,20 +36,6 @@ namespace mvceditor {
 class RunningThreadsClass;
 
 /**
- * This event will be generated when the thread has completed its job
- * **successfully** A thread that has been stopped via RunningThreads::Stop()
- * or will still generate this event.
- */
-extern const wxEventType EVENT_ACTION_COMPLETE;
-
-/**
- * This event will be generated when the thread is in action. Event listeners
- * can do things like update status bars here.
- * event.GetString() may have a message describing the action being taken
- */
-extern const wxEventType EVENT_ACTION_IN_PROGRESS;
-
-/**
  * An action is any short of long-lived logic that needs to be executed asynchronously.
  * An action is given to RunningThreadsClass to be queued; RunningThreads will then
  * call the BackgroundWork() method in a background thread and will the delete
@@ -81,6 +67,18 @@ extern const wxEventType EVENT_ACTION_IN_PROGRESS;
 class ActionClass {
 
 public:
+
+	/**
+	 * ProgressMode can be one of two modes: determinate or indeterminate.
+	 * Determinate mode means that an action is able to give an accurate estimate of
+	 * how much it has completed at any given time.
+	 * Indeterminate mode is means that an action cannot accurately estimate how
+	 * much it has completed at any given time.
+	 */
+	enum ProgressMode {
+		DETERMINATE,
+		INDETERMINATE
+	};
 
 	/**
 	 * @param runningThreads used to post events. This reference must be 
@@ -140,6 +138,23 @@ public:
 	 */
 	int GetActionId();
 
+	/**
+	 * @return ProgressMode the way that the action tracks its progress
+	 */
+	mvceditor::ActionClass::ProgressMode GetProgressMode();
+
+	/**
+	 * get the percentage complete of this action. only non-zero when the action
+	 * supports determinate mode.
+	 */
+	int GetPercentComplete();
+
+	/**
+	 * send an event to all of the handlers that have registered via RunningThreads::AddHandler
+	 * method.
+	 */
+	void PostEvent(wxEvent& event);
+
 protected:
 
 	/**
@@ -149,16 +164,20 @@ protected:
 	void SetStatus(const wxString& status);
 
 	/**
-	 * send an event to all of the handlers that have registered via RunningThreads::AddHandler
-	 * method.
-	 */
-	void PostEvent(wxEvent& event);
-
-	/**
 	 * subclasses should call this method often in the BackgroundWork() method; subclasses
 	 * should exit the BackgroundWork() method after IsCancelled() returns TRUE
 	 */
 	bool IsCancelled();
+
+	/**
+	 * @paramrProgressMode set the way that the action tracks its progress
+	 */
+	void SetProgressMode(mvceditor::ActionClass::ProgressMode mode);
+
+	/**
+	 * @param int percentComplete a number between 0 and 100
+	 */
+	void SetPercentComplete(int percentComplete);
 
 private:
 
@@ -189,6 +208,16 @@ private:
 	 * not completed its work.
 	 */
 	bool Cancelled;
+
+	/**
+	 * The way that the action tracks its progress
+	 */
+	mvceditor::ActionClass::ProgressMode Mode;
+
+	/** 
+	 * The progress in the current action. This is only valid if the action is in determinate progress mode
+	 */
+	int PercentComplete;
 };
 
 /**
@@ -272,10 +301,9 @@ public:
 	void CancelRunningAction();
 
 	/**
-	 * @return in the EventID of the action that is currently executing.  -1 if no
-	 *         action is running.
+	 * posts the progress event for the action that is currently running
 	 */
-	int GetRunningActionEventId();
+	void PostProgressEvent();
 
 private:
 
@@ -538,13 +566,54 @@ class RunningThreadsClass : public wxEvtHandler {
 	ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK,
 	ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK
  };
+
  
-/*
- * this event will be generated while a sequence is running, it
- * is generated everytime the status of the sequence changes. The
- * new status of the sequence can be retrieved via wxCommandEvent.GetString
+
+/**
+ * This event will be generated when the thread has completed its job
+ * **successfully** A thread that has been stopped via RunningThreads::Stop()
+ * or will still generate this event.
  */
-extern const wxEventType EVENT_ACTION_STATUS;
+extern const wxEventType EVENT_ACTION_COMPLETE;
+
+/**
+ * This event will be generated when the thread is in action. Event listeners
+ * can do things like update status bars here. The event handle receives an event
+ * of type mvceditor::ActionProgressEvent.
+ * event.Message may have a message describing the action being taken.
+ */
+extern const wxEventType EVENT_ACTION_PROGRESS;
+
+/**
+ * This is an event that actions use to announce how much of their task
+ * they have completed.
+ * Progress can be one of two modes: determinate or indeterminate.
+ * Determinate mode means that an action is able to give an accurate estimate of
+ * how much it has completed at any given time.
+ * Indeterminate mode is means that an action cannot accurately estimate how
+ * much it has completed at any given time.
+ * When an action uses determinated mode, it assigns a percentage completed 
+ * that is a number between 0 and 100, with 0 being the start of
+ * the task and 100 being the end of the task.
+ */
+class ActionProgressEventClass : public wxEvent {
+
+public:
+
+	/** on of  either determinate or indeterminate */
+	mvceditor::ActionClass::ProgressMode Mode;
+	
+	/** a number between 0 and 100 */
+	int PercentComplete;
+
+	/** a message to be displayed */
+	wxString Message;
+
+	ActionProgressEventClass(int id, mvceditor::ActionClass::ProgressMode mode, int percentComplete, const wxString& msg);
+
+	wxEvent* Clone() const;
+
+};
 
 /**
  * An event with a string member that is cloned (deep copied)
@@ -568,16 +637,13 @@ public:
 };
 
 typedef void (wxEvtHandler::*ActionEventClassFunction)(mvceditor::ActionEventClass&);
+typedef void (wxEvtHandler::*ActionProgressEventClassFunction)(mvceditor::ActionProgressEventClass&);
 
-#define EVT_ACTION_STATUS(id, fn) \
-        DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_ACTION_STATUS, id, -1, \
-    (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( ActionEventClassFunction, & fn ), (wxObject *) NULL ),
 
-#define EVT_ACTION_IN_PROGRESS(id, fn) \
-        DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_ACTION_IN_PROGRESS, id, -1, \
+#define EVT_ACTION_PROGRESS(id, fn) \
+        DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_ACTION_PROGRESS, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( ActionEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent( ActionProgressEventClassFunction, & fn ), (wxObject *) NULL ),
 
 #define EVT_ACTION_COMPLETE(id, fn) \
         DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_ACTION_COMPLETE, id, -1, \

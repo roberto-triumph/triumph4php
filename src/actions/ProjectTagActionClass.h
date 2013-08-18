@@ -106,7 +106,12 @@ private:
 	 * recurse though all of the queued projects
 	 */
 	void IterateProjects();
+	
+	/** the number of files that have been parsed in the current project */
+	int FilesCompleted;
 
+	/** the number of files to be parsed in the current project */
+	int FilesTotal;
 };
 
 /**

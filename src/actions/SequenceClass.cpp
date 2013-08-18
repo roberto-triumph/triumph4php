@@ -347,7 +347,7 @@ bool mvceditor::SequenceClass::Running() const {
 	return IsRunning;
 }
 
-void mvceditor::SequenceClass::OnActionInProgress(mvceditor::ActionEventClass& event) {
+void mvceditor::SequenceClass::OnActionProgress(mvceditor::ActionProgressEventClass& event) {
 	wxCommandEvent sequenceEvent(mvceditor::EVENT_SEQUENCE_IN_PROGRESS);
 	sequenceEvent.SetId(wxID_ANY);
 	RunningThreads.PostEvent(sequenceEvent);
@@ -391,20 +391,20 @@ BEGIN_EVENT_TABLE(mvceditor::SequenceClass, wxEvtHandler)
 	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK, mvceditor::SequenceClass::OnActionComplete)
 	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK, mvceditor::SequenceClass::OnActionComplete)
 
-	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_INIT, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_SQL_METADATA_INIT, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_SQL_METADATA, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR_INIT, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_DETECTOR_INIT, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_DETECTOR, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_CALL_STACK, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR_INIT, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK, mvceditor::SequenceClass::OnActionInProgress)
-	EVT_ACTION_IN_PROGRESS(mvceditor::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK, mvceditor::SequenceClass::OnActionInProgress)
+	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_INIT, mvceditor::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST, mvceditor::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_SQL_METADATA_INIT, mvceditor::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_SQL_METADATA, mvceditor::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR_INIT, mvceditor::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR, mvceditor::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_DETECTOR_INIT, mvceditor::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_DETECTOR, mvceditor::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE, mvceditor::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_CALL_STACK, mvceditor::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR, mvceditor::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR_INIT, mvceditor::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR, mvceditor::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR, mvceditor::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK, mvceditor::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK, mvceditor::SequenceClass::OnActionProgress)
 END_EVENT_TABLE()

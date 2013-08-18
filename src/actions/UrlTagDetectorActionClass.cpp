@@ -165,8 +165,7 @@ std::vector<wxString> mvceditor::UrlTagDetectorActionClass::DetectorScripts() {
 
 void mvceditor::UrlTagDetectorActionClass::OnProcessComplete(wxCommandEvent &event) {
 	if (ParamsQueue.empty()) {
-		mvceditor::ActionEventClass completeEvent(GetEventId(), mvceditor::EVENT_ACTION_COMPLETE, wxT(""));
-		PostEvent(completeEvent);
+		SignalEnd();
 	}
 	else {
 		NextDetection();
@@ -176,21 +175,14 @@ void mvceditor::UrlTagDetectorActionClass::OnProcessComplete(wxCommandEvent &eve
 void mvceditor::UrlTagDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
 	mvceditor::EditorLogError(mvceditor::WARNING_OTHER, event.GetString());
 	if (ParamsQueue.empty()) {
-		mvceditor::ActionEventClass completeEvent(GetEventId(), mvceditor::EVENT_ACTION_COMPLETE, wxT(""));
-		PostEvent(completeEvent);
+		SignalEnd();
 	}
 	else {
 		NextDetection();
 	}
 }
 
-void mvceditor::UrlTagDetectorActionClass::OnProcessInProgress(wxCommandEvent &event) {
-	mvceditor::ActionEventClass inProgressEvent(GetEventId(), mvceditor::EVENT_ACTION_IN_PROGRESS, wxT(""));
-	PostEvent(inProgressEvent);
-}
-
 BEGIN_EVENT_TABLE(mvceditor::UrlTagDetectorActionClass, wxEvtHandler) 
-	EVT_COMMAND(ID_URL_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::UrlTagDetectorActionClass::OnProcessInProgress)
 	EVT_COMMAND(ID_URL_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::UrlTagDetectorActionClass::OnProcessComplete)
 	EVT_COMMAND(ID_URL_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::UrlTagDetectorActionClass::OnProcessFailed)
 END_EVENT_TABLE()

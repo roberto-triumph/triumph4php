@@ -139,8 +139,7 @@ std::vector<wxString> mvceditor::TagDetectorActionClass::DetectorScripts() {
 
 void mvceditor::TagDetectorActionClass::OnProcessComplete(wxCommandEvent &event) {
 	if (ParamsQueue.empty()) {
-		mvceditor::ActionEventClass completeEvent(GetEventId(), mvceditor::EVENT_ACTION_COMPLETE, wxT(""));
-		PostEvent(completeEvent);
+		SignalEnd();
 	}
 	else {
 		NextDetection();
@@ -150,22 +149,14 @@ void mvceditor::TagDetectorActionClass::OnProcessComplete(wxCommandEvent &event)
 void mvceditor::TagDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
 	mvceditor::EditorLogError(mvceditor::WARNING_OTHER, event.GetString());
 	if (ParamsQueue.empty()) {
-		mvceditor::ActionEventClass completeEvent(GetEventId(), mvceditor::EVENT_ACTION_COMPLETE, wxT(""));
-		PostEvent(completeEvent);
+		SignalEnd();
 	}
 	else {
 		NextDetection();
 	}
 }
 
-void mvceditor::TagDetectorActionClass::OnProcessInProgress(wxCommandEvent &event) {
-	mvceditor::ActionEventClass inProgressEvent(GetEventId(), mvceditor::EVENT_ACTION_IN_PROGRESS, wxT(""));
-	PostEvent(inProgressEvent);
-}
-
-
 BEGIN_EVENT_TABLE(mvceditor::TagDetectorActionClass, wxEvtHandler) 
-	EVT_COMMAND(ID_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::TagDetectorActionClass::OnProcessInProgress)
 	EVT_COMMAND(ID_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::TagDetectorActionClass::OnProcessComplete)
 	EVT_COMMAND(ID_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::TagDetectorActionClass::OnProcessFailed)
 END_EVENT_TABLE()

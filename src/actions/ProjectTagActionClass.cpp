@@ -32,7 +32,9 @@ mvceditor::ProjectTagActionClass::ProjectTagActionClass(mvceditor::RunningThread
 	, Projects()
 	, DirectorySearch()
 	, TagFinderList()
-	, DoTouchedProjects(false) {
+	, DoTouchedProjects(false) 
+	, FilesCompleted(0) 
+	, FilesTotal(0) {
 }
 
 void mvceditor::ProjectTagActionClass::SetTouchedProjects(const std::vector<mvceditor::ProjectClass>& touchedProjects) {
@@ -42,6 +44,7 @@ void mvceditor::ProjectTagActionClass::SetTouchedProjects(const std::vector<mvce
 
 bool mvceditor::ProjectTagActionClass::Init(mvceditor::GlobalsClass& globals) {
 	SetStatus(_("Tag Cache"));
+	SetProgressMode(mvceditor::ActionClass::DETERMINATE);
 	
 	// ATTN: assumes that all projects have the same extension
 	TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), globals.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
@@ -61,11 +64,16 @@ bool mvceditor::ProjectTagActionClass::Init(mvceditor::GlobalsClass& globals) {
 
 
 void mvceditor::ProjectTagActionClass::BackgroundWork() {
-	if (DirectorySearch.More() && Projects.empty()) {
-		IterateDirectory();
-	}
-	else {
-		IterateProjects();
+	for (size_t i = 0; !IsCancelled() && i < Projects.size(); ++i) {
+		FilesCompleted = 0;
+		FilesTotal = 0;
+
+		mvceditor::ProjectClass project = Projects[i];
+		if (DirectorySearch.Init(project.AllSources(), mvceditor::DirectorySearchClass::PRECISE)) {
+			FilesTotal = DirectorySearch.GetTotalFileCount();
+			SetStatus(_("Tag Cache / ") + project.Label);			
+			IterateDirectory();
+		}
 	}
 }
 
@@ -74,6 +82,24 @@ void mvceditor::ProjectTagActionClass::IterateDirectory() {
 	// careful to test for destroy first
 	while (!IsCancelled() && DirectorySearch.More()) {
 		TagFinderList.Walk(DirectorySearch);
+
+		// if we have a total file count it means we want to send progress events
+		if (FilesTotal > 0) {
+
+			// we will try to send at most 100 events, this is in case we have big
+			// projects with 10,000+ files we dont want to flood the system with events
+			// that will barely be noticeable in the gauge.
+			FilesCompleted++;
+			double newProgress = (FilesCompleted * 1.0) / FilesTotal;
+			int newProgressWhole = (int)floor(newProgress * 100);
+
+			// we dont want to send the progress=0 event more than once
+			if (newProgressWhole < 1) {
+				newProgressWhole = 1;
+			}
+			SetPercentComplete(newProgressWhole);
+		}
+
 		if (!DirectorySearch.More()) {
 			if (!IsCancelled()) {
 
@@ -81,16 +107,6 @@ void mvceditor::ProjectTagActionClass::IterateDirectory() {
 				mvceditor::TagFinderListCompleteEventClass evt(wxID_ANY);
 				PostEvent(evt);
 			}
-		}
-	}
-}
-
-void mvceditor::ProjectTagActionClass::IterateProjects() {
-	for (size_t i = 0; !IsCancelled() && i < Projects.size(); ++i) {
-		mvceditor::ProjectClass project = Projects[i];
-		if (DirectorySearch.Init(project.AllSources())) {
-			SetStatus(_("Tag Cache / ") + project.Label);			
-			IterateDirectory();
 		}
 	}
 }

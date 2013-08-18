@@ -295,7 +295,7 @@ private:
 	 */
 	bool Check();
 	
-	void OnActionInProgress(mvceditor::ActionEventClass& event);
+	void OnActionProgress(mvceditor::ActionProgressEventClass& event);
 	
 	/**
 	 * close the connection here

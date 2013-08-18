@@ -364,9 +364,9 @@ private:
 	/**
 	 * Timer handler.
 	 * 
-	 * @param mvceditor::ActionEventClass& event
+	 * @param mvceditor::ActionProgressEventClass& event
 	 */
-	 void OnActionInProgress(mvceditor::ActionEventClass& event);
+	 void OnActionProgress(mvceditor::ActionProgressEventClass& event);
 
 	 /**
 	  * Search in the files that are opened. We want to do this so that we only show the most up-to-date

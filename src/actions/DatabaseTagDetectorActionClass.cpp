@@ -142,8 +142,7 @@ std::vector<wxString> mvceditor::DatabaseTagDetectorActionClass::DetectorScripts
 
 void mvceditor::DatabaseTagDetectorActionClass::OnProcessComplete(wxCommandEvent &event) {
 	if (ParamsQueue.empty()) {
-		mvceditor::ActionEventClass detectionCompleteEvent(GetEventId(), mvceditor::EVENT_ACTION_COMPLETE, wxT(""));
-		PostEvent(detectionCompleteEvent);
+		SignalEnd();
 	}
 	else {
 		NextDetection();
@@ -153,17 +152,11 @@ void mvceditor::DatabaseTagDetectorActionClass::OnProcessComplete(wxCommandEvent
 void mvceditor::DatabaseTagDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
 	mvceditor::EditorLogError(mvceditor::WARNING_OTHER, event.GetString());
 	if (ParamsQueue.empty()) {
-		mvceditor::ActionEventClass detectionCompleteEvent(GetEventId(), mvceditor::EVENT_ACTION_COMPLETE, wxT(""));
-		PostEvent(detectionCompleteEvent);
+		SignalEnd();
 	}
 	else {
 		NextDetection();
 	}
-}
-
-void mvceditor::DatabaseTagDetectorActionClass::OnProcessInProgress(wxCommandEvent &event) {
-	mvceditor::ActionEventClass inProgressEvent(GetEventId(), mvceditor::EVENT_ACTION_COMPLETE, wxT(""));
-	PostEvent(inProgressEvent);
 }
 
 mvceditor::DatabaseTagDetectorInitActionClass::DatabaseTagDetectorInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
@@ -206,7 +199,6 @@ wxString mvceditor::DatabaseTagDetectorInitActionClass::GetLabel() const {
 }
 
 BEGIN_EVENT_TABLE(mvceditor::DatabaseTagDetectorActionClass, wxEvtHandler) 
-	EVT_COMMAND(ID_DATABASE_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::DatabaseTagDetectorActionClass::OnProcessInProgress)
 	EVT_COMMAND(ID_DATABASE_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::DatabaseTagDetectorActionClass::OnProcessComplete)
 	EVT_COMMAND(ID_DATABASE_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::DatabaseTagDetectorActionClass::OnProcessFailed)
 END_EVENT_TABLE()

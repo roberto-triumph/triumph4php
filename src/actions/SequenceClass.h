@@ -165,7 +165,7 @@ private:
 
 	void OnActionComplete(mvceditor::ActionEventClass& event);
 
-	void OnActionInProgress(mvceditor::ActionEventClass& event);
+	void OnActionProgress(mvceditor::ActionProgressEventClass& event);
 
 	/**
 	 * start the next step in the sequence.

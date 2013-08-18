@@ -605,7 +605,7 @@ void mvceditor::SqlBrowserPanelClass::UpdateLabels(const wxString& result) {
 	ResultsLabel->GetContainingSizer()->Layout();
 }
 
-void mvceditor::SqlBrowserPanelClass::OnActionInProgress(mvceditor::ActionEventClass& event) {
+void mvceditor::SqlBrowserPanelClass::OnActionProgress(mvceditor::ActionProgressEventClass& event) {
 	if (event.GetId() == QueryId) {
 		Gauge->IncrementGauge(ID_SQL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
 	}
@@ -973,7 +973,7 @@ END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPanelClass, SqlBrowserPanelGeneratedClass)
 	EVT_COMMAND(wxID_ANY, QUERY_COMPLETE_EVENT, mvceditor::SqlBrowserPanelClass::OnQueryComplete)
-	EVT_ACTION_IN_PROGRESS(wxID_ANY, mvceditor::SqlBrowserPanelClass::OnActionInProgress)
+	EVT_ACTION_PROGRESS(wxID_ANY, mvceditor::SqlBrowserPanelClass::OnActionProgress)
 	EVT_ACTION_COMPLETE(wxID_ANY, mvceditor::SqlBrowserPanelClass::OnActionComplete)
 END_EVENT_TABLE()
 

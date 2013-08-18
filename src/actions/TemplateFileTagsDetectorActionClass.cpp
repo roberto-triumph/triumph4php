@@ -145,8 +145,7 @@ std::vector<wxString> mvceditor::TemplateFileTagsDetectorActionClass::DetectorSc
 
 void mvceditor::TemplateFileTagsDetectorActionClass::OnProcessComplete(wxCommandEvent &event) {
 	if (ParamsQueue.empty()) {
-		mvceditor::ActionEventClass completeEvent(GetEventId(), mvceditor::EVENT_ACTION_COMPLETE, wxT(""));
-		PostEvent(completeEvent);
+		SignalEnd();
 	}
 	else {
 		NextDetection();
@@ -156,21 +155,15 @@ void mvceditor::TemplateFileTagsDetectorActionClass::OnProcessComplete(wxCommand
 void mvceditor::TemplateFileTagsDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
 	mvceditor::EditorLogError(mvceditor::WARNING_OTHER, event.GetString());
 	if (ParamsQueue.empty()) {
-		mvceditor::ActionEventClass completeEvent(GetEventId(), mvceditor::EVENT_ACTION_COMPLETE, wxT(""));
-		PostEvent(completeEvent);
+		SignalEnd();
 	}
 	else {
 		NextDetection();
 	}
 }
 
-void mvceditor::TemplateFileTagsDetectorActionClass::OnProcessInProgress(wxCommandEvent &event) {
-	mvceditor::ActionEventClass inProgressEvent(GetEventId(), mvceditor::EVENT_ACTION_IN_PROGRESS, wxT(""));
-	PostEvent(inProgressEvent);
-}
 
 BEGIN_EVENT_TABLE(mvceditor::TemplateFileTagsDetectorActionClass, wxEvtHandler) 
-	EVT_COMMAND(ID_TEMPLATE_FILE_TAGS_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::TemplateFileTagsDetectorActionClass::OnProcessInProgress)
 	EVT_COMMAND(ID_TEMPLATE_FILE_TAGS_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::TemplateFileTagsDetectorActionClass::OnProcessComplete)
 	EVT_COMMAND(ID_TEMPLATE_FILE_TAGS_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::TemplateFileTagsDetectorActionClass::OnProcessFailed)
 END_EVENT_TABLE()

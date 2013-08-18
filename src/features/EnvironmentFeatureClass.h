@@ -191,7 +191,7 @@ private:
 	/**
 	 * tick the gauge here
 	 */
-	void OnActionInProgress(mvceditor::ActionEventClass& event);
+	void OnActionProgress(mvceditor::ActionProgressEventClass& event);
 
 	/**
 	 * stop the gauge here

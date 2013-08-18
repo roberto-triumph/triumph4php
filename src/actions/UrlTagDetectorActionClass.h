@@ -160,8 +160,6 @@ private:
 
 	void OnProcessComplete(wxCommandEvent& event);
 
-	void OnProcessInProgress(wxCommandEvent& event);
-
 	void OnProcessFailed(wxCommandEvent& event);
 
 	DECLARE_EVENT_TABLE()

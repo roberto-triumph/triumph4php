@@ -336,7 +336,7 @@ private:
 
 	void OnLintSummary(mvceditor::LintResultsSummaryEventClass& event);
 	
-	void OnLintInProgress(mvceditor::ActionEventClass& event);
+	void OnLintProgress(mvceditor::ActionProgressEventClass& event);
 	
 	void OnFileSaved(mvceditor::CodeControlEventClass& event);
 	

@@ -276,8 +276,10 @@ bool mvceditor::DirectorySearchClass::Init(const std::vector<mvceditor::SourceCl
 
 				// put the source in the list so that when we are walking through
 				// the files we know when we have started to walk a new source dir
-				CurrentFiles.push(pathWithSeparator);
+				// do it after we push the files, since CurrentFiles is a stack we want
+				// the source dir to be popped first
 				EnumerateAllFiles(pathWithSeparator);
+				CurrentFiles.push(pathWithSeparator);
 			}
 		}
 	}

@@ -254,7 +254,7 @@ void mvceditor::ApacheEnvironmentPanelClass::OnApacheFileReadComplete(mvceditor:
 	Populate();
 }
 
-void mvceditor::ApacheEnvironmentPanelClass::OnActionInProgress(mvceditor::ActionEventClass& event) {
+void mvceditor::ApacheEnvironmentPanelClass::OnActionProgress(mvceditor::ActionProgressEventClass& event) {
 	Gauge->Pulse();
 }
 
@@ -661,7 +661,7 @@ void mvceditor::EnvironmentFeatureClass::AddPreferenceWindow(wxBookCtrlBase* par
 }
 
 BEGIN_EVENT_TABLE(mvceditor::ApacheEnvironmentPanelClass, ApacheEnvironmentPanelGeneratedClass)
-	EVT_ACTION_IN_PROGRESS(ID_APACHE_FILE_READER, mvceditor::ApacheEnvironmentPanelClass::OnActionInProgress)
+	EVT_ACTION_PROGRESS(ID_APACHE_FILE_READER, mvceditor::ApacheEnvironmentPanelClass::OnActionProgress)
 	EVT_APACHE_FILE_READ_COMPLETE(ID_APACHE_FILE_READER, mvceditor::ApacheEnvironmentPanelClass::OnApacheFileReadComplete)
 	EVT_ACTION_COMPLETE(ID_APACHE_FILE_READER, mvceditor::ApacheEnvironmentPanelClass::OnActionComplete)
 END_EVENT_TABLE()
