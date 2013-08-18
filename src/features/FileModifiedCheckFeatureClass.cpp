@@ -224,19 +224,25 @@ void mvceditor::FileModifiedCheckFeatureClass::OnTimer(wxTimerEvent& event) {
 	CollapseDirsFiles(App.Globals.TagCache, PathsExternallyModified, DirsExternallyModified, FilesExternallyModified);
 	CollapseDirsFiles(App.Globals.TagCache, PathsExternallyDeleted, DirsExternallyDeleted, FilesExternallyDeleted);
 
-	std::map<wxString, mvceditor::CodeControlClass*> openedFiles = OpenedFiles(GetNotebook());
+	std::map<wxString, wxString> pathsRenamed = PathsExternallyRenamed;
 
-	HandleOpenedFiles(openedFiles);
-	HandleNonOpenedFiles(openedFiles);
-	if (IsWatchError) {
-		HandleWatchError();
-	}
-
-	// clear out all paths
+	// clear out the paths. we do this here because when we process a file we may create a prompt dialog
+	// that the user needs to take action and that may take a while. If we cleared the paths after the prompt
+	// we may delete paths we have not processed yet 
 	PathsExternallyCreated.clear();
 	PathsExternallyModified.clear();
 	PathsExternallyDeleted.clear();
 	PathsExternallyRenamed.clear();
+
+	std::map<wxString, mvceditor::CodeControlClass*> openedFiles = OpenedFiles(GetNotebook());
+
+	HandleOpenedFiles(openedFiles, pathsRenamed);
+	HandleNonOpenedFiles(openedFiles, pathsRenamed);
+	if (IsWatchError) {
+		HandleWatchError();
+	}
+
+	// clear out the files we have processed
 	FilesExternallyCreated.clear();
 	FilesExternallyModified.clear();
 	FilesExternallyDeleted.clear();
@@ -246,7 +252,7 @@ void mvceditor::FileModifiedCheckFeatureClass::OnTimer(wxTimerEvent& event) {
 	Timer.Start(250, wxTIMER_CONTINUOUS);
 }
 
-void mvceditor::FileModifiedCheckFeatureClass::HandleOpenedFiles(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles) {
+void mvceditor::FileModifiedCheckFeatureClass::HandleOpenedFiles(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed) {
 
 	// if the file that was modified is one of the opened files, we need to prompt the user
 	// to see if they want to reload the new version
@@ -305,7 +311,7 @@ void mvceditor::FileModifiedCheckFeatureClass::HandleOpenedFiles(std::map<wxStri
 
 	// check for renames; an opened file rename will be handled as a deletion for now
 	std::map<wxString, wxString>::iterator renamed;
-	for (renamed = PathsExternallyRenamed.begin(); renamed != PathsExternallyRenamed.end(); ++renamed) {
+	for (renamed = pathsRenamed.begin(); renamed != pathsRenamed.end(); ++renamed) {
 		wxString renamedFrom = renamed->first;
 		if (openedFiles.find(renamedFrom) != openedFiles.end()) {
 			openedFilesDeleted[renamedFrom] = 1;
@@ -317,7 +323,7 @@ void mvceditor::FileModifiedCheckFeatureClass::HandleOpenedFiles(std::map<wxStri
 	}
 }
 
-void mvceditor::FileModifiedCheckFeatureClass::HandleNonOpenedFiles(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles) {
+void mvceditor::FileModifiedCheckFeatureClass::HandleNonOpenedFiles(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed) {
 	std::map<wxString, int>::iterator f;
 	for (f = FilesExternallyModified.begin(); f != FilesExternallyModified.end(); ++f) {
 		wxString fullPath = f->first;
@@ -357,7 +363,7 @@ void mvceditor::FileModifiedCheckFeatureClass::HandleNonOpenedFiles(std::map<wxS
 		App.EventSink.Publish(modifiedEvt);
 	}
 	std::map<wxString, wxString>::iterator pair;
-	for (pair = PathsExternallyRenamed.begin(); pair != PathsExternallyRenamed.end(); ++pair) {
+	for (pair = pathsRenamed.begin(); pair != pathsRenamed.end(); ++pair) {
 		
 		// figure out if we renamed a file or a dir
 		if (wxFileName::DirExists(pair->second)) {

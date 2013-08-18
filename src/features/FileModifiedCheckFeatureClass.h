@@ -65,12 +65,12 @@ private:
 	 * special handling for files that are open. For open files that were externally modified
 	 * we will prompt the user to take action
 	 */
-	void HandleOpenedFiles(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles);
+	void HandleOpenedFiles(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed);
 
 	/**
 	 * special handling for files that are not open.
 	 */
-	void HandleNonOpenedFiles(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles);
+	void HandleNonOpenedFiles(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed);
 
 	/**
 	 * prompt the user to reload modified files
