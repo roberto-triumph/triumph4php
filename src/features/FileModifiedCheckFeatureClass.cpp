@@ -154,11 +154,6 @@ void mvceditor::FileModifiedCheckFeatureClass::OnAppReady(wxCommandEvent& event)
 	// add the enabled projects to the watch list
 	StartWatch();
 	Timer.Start(250, wxTIMER_CONTINUOUS);
-	
-	
-	// watcher things that still need to be done
-	// TODO: what is going to happen when a dir is added, then its deleted
-	//       while parsing is taking place?
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::OnAppExit(wxCommandEvent& event) {
