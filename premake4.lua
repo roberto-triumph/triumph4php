@@ -35,7 +35,7 @@ dofile "premake_action_prep.lua"
 dofile "premake_action_dist.lua"
 dofile "premake_action_generate.lua"
 dofile "premake_action_soci.lua"
-dofile "premake_action_wxWidgets.lua"
+dofile "premake_action_wxwidgets.lua"
 
 
 -- this configuration uses the icu-config binary to get the ICU header & library locations
@@ -79,8 +79,8 @@ function wxconfiguration(config, action)
 		flags { "Unicode" }
 		links { WX_LIBS_DEBUG }
 	elseif config == "Debug" and (action == "gmake" or action == "codelite") then
-		buildoptions { string.format("`%s --cxxflags --debug=yes --unicode=yes`", WX_CONFIG) }
-		linkoptions { string.format("`%s --debug=yes --unicode=yes --libs core,base,net`", WX_CONFIG) }
+		buildoptions { string.format("`%s --cxxflags --debug=yes --unicode=yes`", normalizepath(WX_CONFIG)) }
+		linkoptions { string.format("`%s --debug=yes --unicode=yes --libs core,base,net`", normalizepath(WX_CONFIG)) }
 	elseif config == "Release" and action ==  "vs2008" then
 		libdirs { WX_LIB_DIR }
 		includedirs { WX_INCLUDE_DIRS_RELEASE }
@@ -95,8 +95,8 @@ function wxconfiguration(config, action)
 		flags { "Unicode", "Optimize" }
 		links { WX_LIBS_RELEASE }
 	elseif config == "Release" and (action == "gmake" or action == "codelite") then
-		buildoptions { string.format("`%s --cxxflags --debug=no --unicode=yes`", WX_CONFIG) }
-		linkoptions { string.format("`%s --debug=no --unicode=yes --libs core,base,net`", WX_CONFIG) }
+		buildoptions { string.format("`%s --cxxflags --debug=no --unicode=yes`", normalizepath(WX_CONFIG)) }
+		linkoptions { string.format("`%s --debug=no --unicode=yes --libs core,base,net`", normalizepath(WX_CONFIG)) }
 	end
 end
 
@@ -111,11 +111,11 @@ function wxappconfiguration(config, action)
 	end
 
 	if config == "Debug" and (action == "gmake" or action == "codelite") then
-		linkoptions { string.format("`%s --debug=yes --unicode=yes --libs aui,adv,stc`", WX_CONFIG) }
+		linkoptions { string.format("`%s --debug=yes --unicode=yes --libs aui,adv,stc`", normalizepath(WX_CONFIG)) }
 	elseif config == "Debug" and action ==  "vs2008" then
 		links { WX_LIBS_WINDOW_DEBUG, WX_LIB_STC_DEBUG }
 	elseif config == "Release" and (action == "gmake" or action == "codelite") then
-		linkoptions { string.format("`%s --debug=no --unicode=yes --libs aui,adv,stc`", WX_CONFIG) }
+		linkoptions { string.format("`%s --debug=no --unicode=yes --libs aui,adv,stc`", normalizepath(WX_CONFIG)) }
 	elseif config == "Release" and action ==  "vs2008" then
 		links { WX_LIBS_WINDOW_RELEASE, WX_LIB_STC_RELEASE }
 	end

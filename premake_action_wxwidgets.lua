@@ -24,7 +24,7 @@
 -------------------------------------------------------------------
 
 newaction {
-	trigger = "wxWidgets",
+	trigger = "wxwidgets",
 	description = "Build the wxWidgets library",
 	execute = function()
 		WXWIDGETS_BUILD_DIR =  normalizepath("lib/wxWidgets/mvc-editor");
@@ -50,8 +50,10 @@ newaction {
 		else 
 
 			-- now build wxWidgets
-			batchexecute(WXWIDGETS_SRC, {
-			"./configure --enable-debug --prefix=" .. WXWIDGETS_BUILD_DIR,
+            WX_BUILD = normalizepath("lib/wxWidgets/mvc-editor/")
+			batchexecute('lib/wxWidgets', {
+            "mkdir -p " .. WX_BUILD,
+			"./configure --enable-debug --with-gtk --enable-unicode --prefix=" .. WX_BUILD,
 			"make",
 			"make install"
 			})

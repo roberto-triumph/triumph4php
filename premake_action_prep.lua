@@ -81,6 +81,10 @@ function checkWxWidgets()
 		if 0 ~= os.execute(WX_CONFIG .. " --version") then
 			error "Could not execute wx-config. Change the location of WX_CONFIG in premake_opts_linux.lua.\n"
 		end
+
+        -- copy wxWidgets libraries to the same dir as our executable
+        os.execute("cp -r " .. os.getcwd() .. "/lib/wxWidgets/mvc-editor/lib/*.so* Debug/");
+        os.execute("cp -r " .. os.getcwd() .. "/lib/wxWidgets/mvc-editor/lib/*.so* Release/");
 	else
 		error "You are running on a non-supported operating system. MVC Editor cannot be built.\n"
 	end
