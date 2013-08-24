@@ -142,9 +142,9 @@ mvceditor::FileModifiedCheckFeatureClass::FileModifiedCheckFeatureClass(mvcedito
 , DirsExternallyCreated()
 , DirsExternallyModified()
 , DirsExternallyDeleted()
+, PathsExternallyCreated()
 , PathsExternallyModified()
 , PathsExternallyDeleted() 
-, PathsExternallyCreated()
 , PathsExternallyRenamed()
 , AllVolumes()
 , NetworkVolumes()
@@ -156,7 +156,7 @@ mvceditor::FileModifiedCheckFeatureClass::FileModifiedCheckFeatureClass(mvcedito
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::OnAppReady(wxCommandEvent& event) {
-#ifdef wxUSE_FSVOLUME
+#ifdef __WXMSW__
 	
 	// on windows, we check for network drives
 	mvceditor::VolumeListActionClass* volumeAction = new mvceditor::VolumeListActionClass(App.RunningThreads, wxID_ANY);
@@ -559,8 +559,6 @@ void mvceditor::FileModifiedCheckFeatureClass::HandleWatchError() {
 	std::vector<mvceditor::SourceClass> sources = App.Globals.AllEnabledPhpSources();
 	std::vector<mvceditor::SourceClass>::const_iterator source;
 	for (source = sources.begin(); source != sources.end(); ++source) {
-		int flags = wxFSW_EVENT_CREATE  | wxFSW_EVENT_DELETE  | wxFSW_EVENT_RENAME | wxFSW_EVENT_MODIFY |
-			wxFSW_EVENT_ERROR | wxFSW_EVENT_WARNING;
 		if (!source->RootDirectory.DirExists()) {
 			dirsDeleted += source->RootDirectory.GetPath() + wxT("\n");
 		}
@@ -655,6 +653,8 @@ mvceditor::VolumeListActionClass::VolumeListActionClass(mvceditor::RunningThread
 }
 
 void mvceditor::VolumeListActionClass::BackgroundWork() {
+#ifdef __WXMSW__
+
 	wxArrayString allVols = wxFSVolume::GetVolumes(wxFS_VOL_MOUNTED, wxFS_VOL_REMOVABLE | wxFS_VOL_READONLY);
 	
 
@@ -669,6 +669,7 @@ void mvceditor::VolumeListActionClass::BackgroundWork() {
 	}
 	mvceditor::VolumeListEventClass evt(GetEventId(), allVolumes, networkVolumes);
 	PostEvent(evt);
+#endif
 }
 
 wxString mvceditor::VolumeListActionClass::GetLabel() const {

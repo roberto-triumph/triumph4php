@@ -882,7 +882,6 @@ void mvceditor::TagParserClass::DeleteSource(const wxFileName& sourceDir) {
 
 	if (IsCacheInitialized) {
 		try {
-			bool error = false;
 			wxString errorMsg;
 
 			// get the source ID to be deleted

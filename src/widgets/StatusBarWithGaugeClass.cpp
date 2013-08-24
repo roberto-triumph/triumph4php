@@ -66,8 +66,11 @@ void mvceditor::StatusBarWithGaugeClass::SwitchMode(int id, int mode, int value,
 			gauge->Pulse();
 		}
 		else {
-			gauge->SetValue(value);
+			
+			// must set range first, otherwise value could be "invalid" (outside the
+			// previous range)
 			gauge->SetRange(range);
+			gauge->SetValue(value);
 		}
 	}
 }

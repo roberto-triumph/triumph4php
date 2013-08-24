@@ -177,8 +177,8 @@ private:
 	 * list.
 	 * the modified list will only contain files (not directories)
 	 */
-	std::map<wxString, int> FilesExternallyModified;
 	std::map<wxString, int> FilesExternallyCreated;
+	std::map<wxString, int> FilesExternallyModified;
 	std::map<wxString, int> FilesExternallyDeleted;
 	std::map<wxString, int> DirsExternallyCreated;
 	std::map<wxString, int> DirsExternallyModified;
@@ -191,9 +191,9 @@ private:
 	 * This is a map because we may receive multiple events for a single
 	 * file or dir
 	 */
+	std::map<wxString, int> PathsExternallyCreated;
 	std::map<wxString, int> PathsExternallyModified;
 	std::map<wxString, int> PathsExternallyDeleted;
-	std::map<wxString, int> PathsExternallyCreated;
 
 	// key is from path, value is to path
 	std::map<wxString, wxString> PathsExternallyRenamed;

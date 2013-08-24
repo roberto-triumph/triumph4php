@@ -801,8 +801,8 @@ BEGIN_EVENT_TABLE(mvceditor::TagFeatureClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_NEW, mvceditor::TagFeatureClass::OnAppFileOpened)
 	
 	// we will treat new exernal file and file external modified the same
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_EXTERNALLY_CREATED, OnAppFileExternallyModified)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_EXTERNALLY_MODIFIED, OnAppFileExternallyModified)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_EXTERNALLY_CREATED, mvceditor::TagFeatureClass::OnAppFileExternallyModified)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_EXTERNALLY_MODIFIED, mvceditor::TagFeatureClass::OnAppFileExternallyModified)
 	
 
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_SEQUENCE_COMPLETE, mvceditor::TagFeatureClass::OnAppStartSequenceComplete)
