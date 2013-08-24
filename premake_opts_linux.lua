@@ -46,29 +46,22 @@ ICU_CONFIG = 'icu-config'
 -- lib directory to your LD_LIBRARY_PATH, otherwise the wxWidgets library 
 -- will not be found at runtime (ie. when you try to execute mvc-editor.exe).
 -- Also, if you build wxWidgets yourself, you will need to build the Unicode
--- version, AND make sure to compile the wxStyledTextCtrl that is located
--- in the contrib directory of the wxWidgets distribution
+-- version
 -- Your command line to build wxWidgets should look like this (for Release mode):
 --
 --    ./configure --prefix="/path/to/wx/dest" --disable-debug --disable-debug_gdb \
---                --with-gtk=2 --enable-unicode --enable-optimize
+--                --with-gtk --enable-unicode --enable-optimize
 --    make
---    make install
---    cd contrib/src/stc/
---    make 
 --    make install
 --
 -- For debug mode:
 --
---    ./configure --prefix="/path/to/wx/dest" --with-gtk=2 --enable-unicode --enable-debug
+--    ./configure --prefix="/path/to/wx/dest" --with-gtk --enable-unicode --enable-debug
 --    make && make install
---    cd contrib/src/stc/
---    make 
---    make install
 --
 -- Consult the wxWidgets for more info if necessary
 --
-WX_CONFIG = 'wx-config'
+WX_CONFIG = 'lib/wxWidgets/mvc-editor/bin/wx-config'
 
 -- location of the cmake executable. cmake is used to build the SOCI
 -- library (Database Access wrapper)
