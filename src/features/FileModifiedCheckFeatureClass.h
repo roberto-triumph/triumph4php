@@ -35,9 +35,16 @@ namespace mvceditor {
 class VolumeListEventClass;
 
 /**
- * A small feature that checks to see if any files that are currently
+ * A feature that checks to see if any files that are currently
  * opened have been externally modified and / or deleted. If so, we
  * will prompt the reader to save and or reload them.
+ * 
+ * Files from any enabled projects will be monitored using wxWigets
+ * wxFileSystemWatcher, which efficiently notifies our application when a 
+ * file inside a project changes.  In some cases, we will use "polling"
+ * ie. checking for file modified times on files. We use polling
+ * when a file that is not part of a project is opened. We also use polling
+ * when a file that is not in a network drive is opened.
  */
 class FileModifiedCheckFeatureClass : public mvceditor::FeatureClass {
 
