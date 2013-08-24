@@ -31,6 +31,9 @@
 
 namespace mvceditor {
 
+// forward declaration, defined below
+class VolumeListEventClass;
+
 /**
  * A small feature that checks to see if any files that are currently
  * opened have been externally modified and / or deleted. If so, we
@@ -56,10 +59,33 @@ private:
 	void OnAppExit(wxCommandEvent& event);
 
 	/**
+	 * In case the file that was opened is not part of a project
+	 * OR it is in a network drive, create a watch for it
+	 */
+	void OnAppFileOpened(wxCommandEvent& event);
+
+	/**
+	 * In case the file that was closed and is not part of a project
+	 * OR it is in a network drive, remove the watch we created for it
+	 */
+	void OnAppFileClosed(wxCommandEvent& event);
+
+	/**
 	 * when the timer is up then handle the files that the fs watcher notified us 
 	 * that were changed
 	 */
 	void OnTimer(wxTimerEvent& event);
+
+	/**
+	 * when the timer is up then handle the files that are not part of the watched directories
+	 * ie we will check the file modified times
+	 */
+	void OnPollTimer(wxTimerEvent& event);
+
+	 /**
+	 * prompt the user to reload modified files or save deleted files
+	 */
+	void OnFilesCheckComplete(mvceditor::FilesModifiedEventClass& event);
 
 	/**
 	 * special handling for files that are open. For open files that were externally modified
@@ -105,9 +131,23 @@ private:
 	void HandleWatchError();
 
 	/**
-	 * to periodically check the modified time of the opened files
+	 * we will look for remote (network drives).  if any source directories
+	 * are in network drives, we will not add them to the watch, as watches on network
+	 * directories fail to notify of file changes inside of sub-directories.
+	 */
+	void OnVolumeListComplete(mvceditor::VolumeListEventClass& event);
+
+	/**
+	 * timer that we will use to see if file system watcher events have been captured. in this timer's
+	 * event handler we will process the file system watcher events.
 	 */
 	wxTimer Timer;
+
+	/**
+	 * to periodically check the modified time of the opened files that we poll (files outside
+	 * watched directories)
+	 */
+	wxTimer PollTimer;
 
 	/**
 	 * object that will notify us when a file has been modified outside the editor.
@@ -152,6 +192,27 @@ private:
 	std::map<wxString, wxString> PathsExternallyRenamed;
 
 	/**
+	 * List of all volumes that are mounted (local + remote).
+	 * if any source directories
+	 * are in network drives, we will not add them to the watch, as watches on network
+	 * directories fail to notify of file changes inside of sub-directories.
+	 */
+	std::vector<wxString> AllVolumes;
+	
+	/**
+	 * List of network (remote) volumes that are mounted
+	 */
+	std::vector<wxString> NetworkVolumes;
+
+	/**
+	 * these are files that are opened but do not belong in a project.
+	 * we poll for external file changes since we do not watch the directories. Also,
+	 * we poll files that are in network drives since we don't create watches for
+	 * sources in network drivers either.
+	 */
+	std::vector<wxFileName> FilesToPoll;
+
+	/**
 	 * the last time that we got an event from wxFileSystemWatcher.
 	 * we will use this to trigger our app events only after some time
 	 * has passed; if a big directory is being copied we want to wait until
@@ -169,6 +230,58 @@ private:
 	
 	DECLARE_EVENT_TABLE()
 
+};
+
+/**
+ * A class that lists all file system volumes. This
+ * is used only on windows in order to find the volumes
+ * on a system; we determine if a source directory is located in a network
+ * share and if so we don't watch it for changes (because we can't, 
+ * file changes in network drives don't work properly when
+ * watching entire directory structures).
+ *
+ * This action generates event of type mvceditor::EVENT_ACTION_VOLUME_LIST
+ */
+class VolumeListActionClass : public mvceditor::ActionClass {
+
+public:
+
+	VolumeListActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+
+protected:
+
+	void BackgroundWork();
+
+	wxString GetLabel() const;
+};
+
+extern const wxEventType EVENT_ACTION_VOLUME_LIST;
+
+typedef void (wxEvtHandler::*VolumeListEventClassFunction)(VolumeListEventClass&);
+
+#define EVT_ACTION_VOLUME_LIST(id, fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_ACTION_VOLUME_LIST, id, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( VolumeListEventClassFunction, & fn ), (wxObject *) NULL ),
+
+class VolumeListEventClass : public wxEvent {
+
+public:
+
+	/**
+	 * List of all volumes that are mounted (local + remote)
+	 */
+	std::vector<wxString> AllVolumes;
+	
+	/**
+	 * List of network (remote) volumes that are mounted
+	 */
+	std::vector<wxString> NetworkVolumes;
+
+	VolumeListEventClass(int id, const std::vector<wxString>& allVolumes, const std::vector<wxString>& networkVolumes);
+
+
+	wxEvent* Clone() const;
 };
 
 }

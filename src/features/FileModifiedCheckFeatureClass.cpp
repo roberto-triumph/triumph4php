@@ -26,10 +26,12 @@
 #include <MvcEditor.h>
 #include <globals/Events.h>
 #include <wx/choicdlg.h>
+#include <wx/volume.h>
 #include <algorithm>
 #include <map>
 
 static int ID_FILE_MODIFIED_CHECK = wxNewId();
+static int ID_FILE_MODIFIED_POLL = wxNewId();
 
 /**
  * collapse a list of paths into files and directories.  The collapsing part is that
@@ -133,6 +135,7 @@ static std::map<wxString, mvceditor::CodeControlClass*> OpenedFiles(mvceditor::N
 mvceditor::FileModifiedCheckFeatureClass::FileModifiedCheckFeatureClass(mvceditor::AppClass& app)
 : FeatureClass(app)
 , Timer(this, ID_FILE_MODIFIED_CHECK)
+, PollTimer(this, ID_FILE_MODIFIED_POLL)
 , FilesExternallyCreated()
 , FilesExternallyModified()
 , FilesExternallyDeleted() 
@@ -143,6 +146,9 @@ mvceditor::FileModifiedCheckFeatureClass::FileModifiedCheckFeatureClass(mvcedito
 , PathsExternallyDeleted() 
 , PathsExternallyCreated()
 , PathsExternallyRenamed()
+, AllVolumes()
+, NetworkVolumes()
+, FilesToPoll()
 , LastWatcherEventTime() 
 , IsWatchError(false) {
 	FsWatcher = NULL;
@@ -150,20 +156,62 @@ mvceditor::FileModifiedCheckFeatureClass::FileModifiedCheckFeatureClass(mvcedito
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::OnAppReady(wxCommandEvent& event) {
+#ifdef wxUSE_FSVOLUME
 	
+	// on windows, we check for network drives
+	mvceditor::VolumeListActionClass* volumeAction = new mvceditor::VolumeListActionClass(App.RunningThreads, wxID_ANY);
+	App.RunningThreads.Queue(volumeAction);
+#else
+
 	// add the enabled projects to the watch list
 	StartWatch();
+#endif
 	Timer.Start(250, wxTIMER_CONTINUOUS);
+	PollTimer.Start(1000, wxTIMER_CONTINUOUS);
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::OnAppExit(wxCommandEvent& event) {
 	Timer.Stop();
+	PollTimer.Stop();
 
 	// unregister ourselves as the event handler from watcher 
 	FsWatcher->SetOwner(NULL);
 	delete FsWatcher;
 	FsWatcher = NULL;
-	
+}
+
+void mvceditor::FileModifiedCheckFeatureClass::OnAppFileOpened(wxCommandEvent& event) {
+	wxString fullPath = event.GetString();
+	bool isInSources = false;
+	bool doAddWatch = false;
+
+	// In case the file that was opened is not part of a project, we want to setup a 
+	// watch for it.
+	std::vector<mvceditor::SourceClass> sources = App.Globals.AllEnabledSources();
+	std::vector<mvceditor::SourceClass>::const_iterator src;
+	for (src = sources.begin(); src != sources.end(); ++src) {
+		if (src->IsInRootDirectory(fullPath)) {
+			isInSources = true;
+		}
+	}
+	if (!isInSources) {
+		doAddWatch = true;
+	}
+	wxFileName fileName(fullPath);
+	if (!doAddWatch) {
+
+		// OR it is in a network drive, create a watch for it
+		// since sources from network drives are not added to the watch
+		if (fileName.HasVolume()) {
+			wxString vol = fileName.GetVolume() + fileName.GetVolumeSeparator();
+			if (std::find(NetworkVolumes.begin(), NetworkVolumes.end(), vol) != NetworkVolumes.end()) {
+				doAddWatch = true;
+			}
+		}
+	}
+	if (doAddWatch && fileName.FileExists()) {
+		FilesToPoll.push_back(fileName);
+	}
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
@@ -186,14 +234,32 @@ void mvceditor::FileModifiedCheckFeatureClass::StartWatch() {
 	std::vector<mvceditor::SourceClass> sources = App.Globals.AllEnabledPhpSources();
 	std::vector<mvceditor::SourceClass>::const_iterator source;
 	for (source = sources.begin(); source != sources.end(); ++source) {
-		int flags = wxFSW_EVENT_CREATE  | wxFSW_EVENT_DELETE  | wxFSW_EVENT_RENAME | wxFSW_EVENT_MODIFY | 
-			wxFSW_EVENT_ERROR | wxFSW_EVENT_WARNING;
 		wxFileName sourceDir = source->RootDirectory;
-		if (sourceDir.DirExists()) {
-			sourceDir.DontFollowLink();
-			FsWatcher->AddTree(sourceDir, flags);
+
+		// check to see if source directory is in a remote volume (network drive)
+		// if any source directories
+		// are in network drives, we will not add them to the watch, as watches on network
+		// directories fail to notify of file changes inside of sub-directories.
+		bool doAdd = true;
+		if (sourceDir.HasVolume()) {
+			doAdd = std::find(NetworkVolumes.begin(), NetworkVolumes.end(), sourceDir.GetVolume()) == NetworkVolumes.end();
+		}
+		if (doAdd) {
+			int flags = wxFSW_EVENT_CREATE  | wxFSW_EVENT_DELETE  | wxFSW_EVENT_RENAME | wxFSW_EVENT_MODIFY | 
+				wxFSW_EVENT_ERROR | wxFSW_EVENT_WARNING;
+			
+			if (sourceDir.DirExists()) {
+				sourceDir.DontFollowLink();
+				FsWatcher->AddTree(sourceDir, flags);
+			}
 		}
 	}
+}
+
+void mvceditor::FileModifiedCheckFeatureClass::OnVolumeListComplete(mvceditor::VolumeListEventClass& event) {
+	AllVolumes = event.AllVolumes;
+	NetworkVolumes = event.NetworkVolumes;
+	StartWatch();
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::OnTimer(wxTimerEvent& event) {
@@ -380,7 +446,7 @@ void mvceditor::FileModifiedCheckFeatureClass::FilesModifiedPrompt(std::map<wxSt
 	}
 	wxString msg;
 	if (filesToPrompt.size() == 1) {
-		msg = _("1 File have been modified externally. Reload file and lose any changes?\n");
+		msg = _("1 File has been modified externally. Reload file and lose any changes?\n");
 		msg += _("If checked, the file will be reloaded. If left unchecked, the file will not be reloaded, allowing you to overwrite the file.");
 	}
 	else {
@@ -514,10 +580,126 @@ void mvceditor::FileModifiedCheckFeatureClass::HandleWatchError() {
 	StartWatch();
 }
 
+void mvceditor::FileModifiedCheckFeatureClass::OnPollTimer(wxTimerEvent& event) {
+	if (FilesToPoll.empty()) {
+		return;
+	}
+	mvceditor::NotebookClass* notebook = GetNotebook();
+	
+	std::vector<mvceditor::FileModifiedTimeClass> fileMods;
+
+	// loop through all of the opened files to get the files to
+	// be checked
+	// no need to check new files as they are not yet in the file system
+	for (size_t i = 0; i < FilesToPoll.size(); ++i) {
+		mvceditor::FileModifiedTimeClass fileMod;
+		fileMod.FileName = FilesToPoll[i];
+		for (size_t j = 0; j < notebook->GetPageCount(); ++j) {
+
+			// get the last modified time from the file at the time we opened the file
+			mvceditor::CodeControlClass* ctrl = notebook->GetCodeControl(j);
+			if (ctrl->GetFileName() == FilesToPoll[i].GetFullPath()) {
+				fileMod.ModifiedTime = ctrl->GetFileOpenedDateTime();
+				break;
+			}
+		}
+		fileMods.push_back(fileMod);
+	}
+	if (!fileMods.empty()) {
+
+		// stop the timer that way we dont check files again until the user answers some questions
+		PollTimer.Stop();
+		mvceditor::FileModifiedCheckActionClass* action = 
+			new mvceditor::FileModifiedCheckActionClass(App.RunningThreads, ID_FILE_MODIFIED_POLL);
+		action->SetFiles(fileMods);
+		App.RunningThreads.Queue(action);
+	}
+}
+
+void mvceditor::FileModifiedCheckFeatureClass::OnFilesCheckComplete(mvceditor::FilesModifiedEventClass& event) {
+    mvceditor::NotebookClass* notebook = GetNotebook();
+    size_t notebookSize = notebook->GetPageCount();
+    if (notebookSize > 0 && (event.Modified.size() + event.Deleted.size()) > 0) {
+			std::map<wxString, mvceditor::CodeControlClass*> openedFilesWithCodeControl;
+			for (size_t i = 0; i < notebookSize; ++i) {
+				mvceditor::CodeControlClass* ctrl = notebook->GetCodeControl(i);
+				openedFilesWithCodeControl[ctrl->GetFileName()] = ctrl;
+			}
+
+            if (!event.Modified.empty()) {
+
+				// group the modified file with its code control. then we will prompt the user
+				// which files they want to keep/revert
+				std::map<wxString, mvceditor::CodeControlClass*> filesToPrompt;
+				for (size_t i = 0; i < event.Modified.size(); ++i) {
+					wxString fullPath = event.Modified[i].GetFullPath();
+					if (openedFilesWithCodeControl.count(fullPath) > 0) {
+						filesToPrompt[fullPath] = openedFilesWithCodeControl[fullPath];
+					}
+				}
+				FilesModifiedPrompt(filesToPrompt);
+            }
+            if (!event.Deleted.empty()) {
+					std::map<wxString, int> deletedFiles;
+					for (size_t i = 0; i < event.Deleted.size(); ++i) {
+						deletedFiles[event.Deleted[i].GetFullPath()] = 1;
+					}
+                    FilesDeletedPrompt(openedFilesWithCodeControl, deletedFiles);
+            }
+    }
+    PollTimer.Start(1000, wxTIMER_CONTINUOUS);
+}
+
+mvceditor::VolumeListActionClass::VolumeListActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+: ActionClass(runningThreads, eventId) {
+}
+
+void mvceditor::VolumeListActionClass::BackgroundWork() {
+	wxArrayString allVols = wxFSVolume::GetVolumes(wxFS_VOL_MOUNTED, wxFS_VOL_REMOVABLE | wxFS_VOL_READONLY);
+	
+
+	std::vector<wxString> allVolumes,
+		networkVolumes;
+	for (size_t i = 0; i < allVols.GetCount(); ++i) {
+		wxFSVolume vol(allVols[i]);
+		allVolumes.push_back(allVols[i]);
+		if (vol.GetFlags() & wxFS_VOL_REMOTE) {
+			networkVolumes.push_back(allVols[i]);
+		}
+	}
+	mvceditor::VolumeListEventClass evt(GetEventId(), allVolumes, networkVolumes);
+	PostEvent(evt);
+}
+
+wxString mvceditor::VolumeListActionClass::GetLabel() const {
+	return wxT("Volume List");
+}
+
+mvceditor::VolumeListEventClass::VolumeListEventClass(int id, 
+													  const std::vector<wxString>& allVolumes, 
+													  const std::vector<wxString>& networkVolumes)
+: wxEvent(id, mvceditor::EVENT_ACTION_VOLUME_LIST)
+, AllVolumes()
+, NetworkVolumes() {
+	mvceditor::DeepCopy(AllVolumes, allVolumes);
+	mvceditor::DeepCopy(NetworkVolumes, networkVolumes);
+}	
+
+
+wxEvent* mvceditor::VolumeListEventClass::Clone() const {
+	return new mvceditor::VolumeListEventClass(GetId(), AllVolumes, NetworkVolumes);
+}
+
+const wxEventType mvceditor::EVENT_ACTION_VOLUME_LIST = wxNewEventType();
+
 BEGIN_EVENT_TABLE(mvceditor::FileModifiedCheckFeatureClass, mvceditor::FeatureClass)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::FileModifiedCheckFeatureClass::OnAppReady)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_EXIT, mvceditor::FileModifiedCheckFeatureClass::OnAppExit)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_OPENED, mvceditor::FileModifiedCheckFeatureClass::OnAppFileOpened)
 	EVT_TIMER(ID_FILE_MODIFIED_CHECK, mvceditor::FileModifiedCheckFeatureClass::OnTimer)
+	EVT_TIMER(ID_FILE_MODIFIED_POLL, mvceditor::FileModifiedCheckFeatureClass::OnPollTimer)
+	EVT_FILES_EXTERNALLY_MODIFIED_COMPLETE(ID_FILE_MODIFIED_POLL, mvceditor::FileModifiedCheckFeatureClass::OnFilesCheckComplete)
 	EVT_FSWATCHER(wxID_ANY, mvceditor::FileModifiedCheckFeatureClass::OnFsWatcher)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::FileModifiedCheckFeatureClass::OnPreferencesSaved)
+	EVT_ACTION_VOLUME_LIST(wxID_ANY, mvceditor::FileModifiedCheckFeatureClass::OnVolumeListComplete)
 END_EVENT_TABLE()
