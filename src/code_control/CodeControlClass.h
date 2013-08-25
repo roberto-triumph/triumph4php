@@ -53,8 +53,6 @@ class GlobalsClass;
  * source code control with the following enhancements.
  * - PHP autocompletion of structures found in the current project.
  * - Displaying of PHP call tips
- * - "Word highlight" functionality; when user double clicks on a word then all
- *   instances of that word are highlighted.
  * - Automatic indentation
  */
 class CodeControlClass : public wxStyledTextCtrl {
@@ -346,6 +344,19 @@ public:
 	 */
 	bool Touched() const;
 	void SetTouched(bool touched);
+	
+	/**
+	 * Highlights the specified portion of the document.
+	 *
+	 * @param int byte position of start of highlighted section
+	 * @param int byte position of end of highlighted section
+	 */
+	void HighlightWord(int utf8Start, int utf8Length);
+	
+	/**
+	 * @return UnicodeString the word that is located at the current position
+	 */
+	UnicodeString WordAtCurrentPos();
 
 	/**
 	 * The options to enable/disable various look & feel items
@@ -422,16 +433,7 @@ private:
 //------------------------------------------------------------------------
 // word highlight feature
 //------------------------------------------------------------------------
-	/**
-	 * Highlight the next matched word.
-	 */
-	void WordHiglightForwardSearch(wxIdleEvent& event);
-
-	/**
-	 * Highlight the previous matched word.
-	 */
-	void WordHiglightPreviousSearch(wxIdleEvent& event);
-
+	
 	/**
 	 * Remove the exact matches style [that was added by the double click event] from all text.
 	 */
@@ -449,8 +451,7 @@ private:
 	void OnContextMenu(wxContextMenuEvent& event);
 
 	/**
-	 * Handle the double clicks.  Highlight any exact matches of the double-clicked word.
-	 * This is the trigger for the "word highlight" feature.
+	 * Handle the double clicks.
 	 */
 	void OnDoubleClick(wxStyledTextEvent& event);
 
@@ -508,16 +509,6 @@ private:
 	wxString CurrentFilename;
 
 	/**
-	  * Used by the word highlight feature to do the actual searching.
-	  */
-	FinderClass WordHighlightFinder;
-
-	/**
-	 * Used by the word highlight feature. The word being searched.
-	 */
-	UnicodeString WordHighlightWord;
-
-	/**
 	 * The connection to use to fetch the SQL table metadata.
 	 */
 	DatabaseTagClass CurrentDbTag;
@@ -558,16 +549,6 @@ private:
 	 * This object owns this pointer and will need to delete it.
 	 */
 	TextDocumentClass* Document;
-
-	/**
-	* Used by the word highlight feature. The location from where to start searching (back)
-	*/
-	int32_t WordHighlightPreviousIndex;
-
-	/**
-	 * Used by the word highlight feature. The location from where to start searching (forward)
-	 */
-	int32_t WordHighlightNextIndex;
 
 	/**
 	 * This is the style bit for the WordHighlight.  Since this code control handles multiple parsers

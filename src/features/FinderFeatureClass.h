@@ -31,6 +31,7 @@
 #include <widgets/StatusBarWithGaugeClass.h>
 #include <search/FinderClass.h>
 #include <features/FeatureClass.h>
+#include <actions/ActionClass.h>
 
 namespace mvceditor {
 
@@ -315,6 +316,86 @@ private:
 	DECLARE_EVENT_TABLE()
 };
 
+/**
+ * An action that will perform a find on an entire set of text
+ * and POST FinderHitEventClas for each found hit. 
+ */
+class FinderActionClass : public mvceditor::ActionClass {
+	
+public:
+
+	/**
+	 * @param utf8buf this class will take ownership of this pointer
+	 */
+	FinderActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId,
+		const UnicodeString& search, char* utf8Buf, int bufLength);
+	
+protected:
+	
+	void BackgroundWork();
+	
+	wxString GetLabel() const;
+	
+	private:
+	
+	/**
+	 * to perform the search
+	 */
+	mvceditor::FinderClass Finder;
+
+	/**
+	 *  unicode representation of ut8buf
+	 */
+	UnicodeString Code;
+	
+	/**
+	 * this class will own the pointer
+	 */
+	char* Utf8Buf;
+	
+	/**
+	 * the number of characters in Utf8Buf
+	 */
+	int BufferLength;
+};
+
+/**
+ * the event that is generated when a FinderActionClass finds an 
+ * instance of the search text in the text being searched.
+ * Note that positions are given as byte offsets and not character
+ * counts so that the character-to-byte offsets are calculated in the
+ * background thread.
+ */
+class FinderHitEventClass : public wxEvent {
+	
+public:
+
+	/**
+	 * this is the index into the utf8 buffer, not character pos
+	 */
+	int Start;
+	
+	/**
+	 * this is the number of utf8 bytes, not number of characters
+	 */
+	int Length;
+	
+	FinderHitEventClass(int id, int start, int length);
+	
+	wxEvent* Clone() const;
+	
+};
+
+extern const wxEventType EVENT_FINDER_ACTION;
+
+typedef void (wxEvtHandler::*FinderHitEventClassFunction)(mvceditor::FinderHitEventClass&);
+
+#define EVT_FINDER(id, fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_FINDER_ACTION, id, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( FinderHitEventClassFunction, & fn ), (wxObject *) NULL ),
+
+
 class FinderFeatureClass : public FeatureClass {
 
 public:
@@ -377,6 +458,17 @@ private:
 	 * @param wxCommandEvent& event
 	 */
 	void OnEditGoToLine(wxCommandEvent& event);
+	
+	/**
+	 * when a background search finds a hit we will highlight it
+	 */
+	void OnFinderHit(mvceditor::FinderHitEventClass& event);
+	
+	/**
+	 *  when the user double clicks on a word we will start a search
+	 * for that word 
+	 */
+	void OnDoubleClick(wxStyledTextEvent& event);
 	
 	DECLARE_EVENT_TABLE()
 };

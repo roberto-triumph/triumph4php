@@ -155,15 +155,11 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 			const wxString& name)
 		: wxStyledTextCtrl(parent, id, position, size, style, name)
 		, CodeControlOptions(options)
-		, CurrentFilename()		
-		, WordHighlightFinder()
-		, WordHighlightWord()
+		, CurrentFilename()
 		, CurrentDbTag()
 		, HotspotTimer(this)
 		, Globals(globals)
 		, EventSink(eventSink)
-		, WordHighlightPreviousIndex(-1)
-		, WordHighlightNextIndex(-1)
 		, WordHighlightStyle(0)
 		, WordHighlightIsWordHighlighted(false)
 		, DocumentMode(TEXT) 
@@ -179,7 +175,7 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 
 mvceditor::CodeControlClass::~CodeControlClass() {
 	Document->DetachFromControl(this);
-	delete Document;	
+	delete Document;
 }
 void mvceditor::CodeControlClass::TrackFile(const wxString& filename, UnicodeString& contents) {
 	SetUnicodeText(contents);
@@ -398,7 +394,7 @@ void mvceditor::CodeControlClass::HandleAutoCompletion() {
 		wxFrame* frame = wxDynamicCast(window, wxFrame);
 		if (frame) {
 			mvceditor::StatusBarWithGaugeClass* gauge = (mvceditor::StatusBarWithGaugeClass*)frame->GetStatusBar();
-			gauge->SetColumn0Text(completeStatus);		
+			gauge->SetColumn0Text(completeStatus);
 		}
 	}
 }
@@ -818,13 +814,19 @@ void mvceditor::CodeControlClass::SetCodeControlOptions(const std::vector<mvcedi
 	}
 }
 
+UnicodeString mvceditor::CodeControlClass::WordAtCurrentPos() {
+	int pos = WordStartPosition(GetCurrentPos(), true);
+	int endPos = WordEndPosition(GetCurrentPos(), true);
+	
+	UnicodeString word = Document->GetSafeSubstring(pos, endPos);
+	return word;
+}
+
 void  mvceditor::CodeControlClass::OnDoubleClick(wxStyledTextEvent& event) {
 	if (event.GetId() != GetId()) {
 		event.Skip();
 		return;
 	}
-	int pos = WordStartPosition(GetCurrentPos(), true);
-	int endPos = WordEndPosition(GetCurrentPos(), true);
 
 	// we must share the indicator between highlight words functionality and
 	// parse errors functionality.  This is because the HTML lexer uses 7 of the
@@ -839,28 +841,7 @@ void  mvceditor::CodeControlClass::OnDoubleClick(wxStyledTextEvent& event) {
 	StartStyling(0, WordHighlightStyle);
 	SetStyling(GetTextLength(), 0);
 	
-	int charStartIndex = 0;
-	
-	// pos, endPos are byte offsets into the UTF-8 string, need to convert to char numbers
-	int documentLength = GetTextLength();
-	char* buf = new char[documentLength];
-		
-	// GET_TEXT  message
-	SendMsg(2182, documentLength, (long)buf);
-	charStartIndex = mvceditor::Utf8PosToChar(buf, documentLength, pos);
-	mvceditor::Utf8PosToChar(buf, documentLength, endPos);
-	
-	UnicodeString word = Document->GetSafeSubstring(pos, endPos);
-	if (!word.isEmpty()) {
-		WordHighlightFinder.Expression = word;
-		WordHighlightFinder.Mode = mvceditor::FinderClass::EXACT;
-		if (WordHighlightFinder.Prepare()) {
-			WordHighlightPreviousIndex = charStartIndex;
-			WordHighlightNextIndex = charStartIndex;
-		}
-	}
-	delete[] buf;
-	event.Skip();
+	EventSink.Publish(event);
 }
 
 void mvceditor::CodeControlClass::OnContextMenu(wxContextMenuEvent& event) {
@@ -907,78 +888,18 @@ void mvceditor::CodeControlClass::OnLeftDown(wxMouseEvent& event) {
 
 void mvceditor::CodeControlClass::UndoHighlight() {
 	if (WordHighlightIsWordHighlighted) {
+	
 		// kill any current highlight searches
-		WordHighlightNextIndex = -1;
-		WordHighlightPreviousIndex = -1;
-		
 		StartStyling(0, WordHighlightStyle);
 		SetStyling(GetTextLength(), 0);
 		WordHighlightIsWordHighlighted = false;
 	}
 }
 
-void mvceditor::CodeControlClass::WordHiglightForwardSearch(wxIdleEvent& event) {
-	if (WordHighlightNextIndex > -1) {
-		UnicodeString codeText = GetSafeText();
-		int documentLength = GetTextLength();
-		char* buf = new char[documentLength];
-		
-		// GET_TEXT  message
-		SendMsg(2182, documentLength, (long)buf);
-		
-		bool found = WordHighlightFinder.FindNext(codeText, WordHighlightNextIndex);
-		int32_t matchStart(0);
-		int32_t	matchLength(0);
-		if (found && WordHighlightFinder.GetLastMatch(matchStart, matchLength)) {
-			WordHighlightIsWordHighlighted = true;
-			
-			// convert match back to UTF-8 ugh
-			int utf8Start = mvceditor::CharToUtf8Pos(buf, documentLength, matchStart);
-			int utf8End = mvceditor::CharToUtf8Pos(buf, documentLength, matchStart + matchLength);
-
-			StartStyling(utf8Start, WordHighlightStyle);
-			SetStyling(utf8End - utf8Start, WordHighlightStyle);
-			WordHighlightNextIndex = matchStart + matchLength + 1; // prevent infinite find next's
-			event.RequestMore();
-		}
-		else {
-			WordHighlightNextIndex = -1;
-		}
-		delete[] buf;
-	}
-	event.Skip();
-}
-
-void mvceditor::CodeControlClass::WordHiglightPreviousSearch(wxIdleEvent& event) {
-	if (WordHighlightPreviousIndex > -1) {
-		UnicodeString codeText = GetSafeText();		
-		int documentLength = GetTextLength();
-		char* buf = new char[documentLength];
-		
-		// GET_TEXT  message
-		SendMsg(2182, documentLength, (long)buf);
-		
-		bool found = WordHighlightFinder.FindPrevious(codeText, WordHighlightPreviousIndex);
-		int32_t matchStart(0);
-		int32_t	matchLength(0);
-		if (found && WordHighlightFinder.GetLastMatch(matchStart, matchLength)) {
-			WordHighlightIsWordHighlighted = true;
-			
-			// convert match back to UTF-8 ugh
-			int utf8Start = mvceditor::CharToUtf8Pos(buf, documentLength, matchStart);
-			int utf8End = mvceditor::CharToUtf8Pos(buf, documentLength, matchStart + matchLength);
-
-			StartStyling(utf8Start, WordHighlightStyle);
-			SetStyling(utf8End - utf8Start, WordHighlightStyle);
-			WordHighlightPreviousIndex = matchStart - 1; // prevent infinite find previous's
-			event.RequestMore();
-		}
-		else {
-			WordHighlightPreviousIndex = -1;
-		}
-		delete[] buf;
-	}
-	event.Skip();
+void mvceditor::CodeControlClass::HighlightWord(int utf8Start, int utf8Length) {
+	WordHighlightIsWordHighlighted = true;
+	StartStyling(utf8Start, WordHighlightStyle);
+	SetStyling(utf8Length, WordHighlightStyle);
 }
 
 void mvceditor::CodeControlClass::MarkLintError(const pelet::LintResultsClass& result) {
@@ -1002,7 +923,7 @@ void mvceditor::CodeControlClass::MarkLintError(const pelet::LintResultsClass& r
 		char* buf = new char[documentLength];
 		
 		// GET_TEXT  message
-		SendMsg(2182, documentLength, (long)buf);	
+		SendMsg(2182, documentLength, (long)buf);
 		byteNumber = mvceditor::CharToUtf8Pos(buf, documentLength, charNumber);
 		StartStyling(byteNumber, WordHighlightStyle);
 		SetStyling(errorLength, WordHighlightStyle);
@@ -1011,7 +932,7 @@ void mvceditor::CodeControlClass::MarkLintError(const pelet::LintResultsClass& r
 
 		delete[] buf;
 	}
-	Colourise(0, -1);	
+	Colourise(0, -1);
 
 	wxString error = mvceditor::IcuToWx(result.Error);
 	CallTipShow(byteNumber, error);
@@ -1280,8 +1201,6 @@ BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)
 	EVT_STC_MARGINCLICK(wxID_ANY, mvceditor::CodeControlClass::OnMarginClick)
 	EVT_STC_DOUBLECLICK(wxID_ANY, mvceditor::CodeControlClass::OnDoubleClick)
 	EVT_CONTEXT_MENU(mvceditor::CodeControlClass::OnContextMenu)
-	EVT_IDLE(mvceditor::CodeControlClass::WordHiglightPreviousSearch)
-	EVT_IDLE(mvceditor::CodeControlClass::WordHiglightForwardSearch)
 	EVT_STC_CHARADDED(wxID_ANY, mvceditor::CodeControlClass::OnCharAdded)
 	EVT_STC_UPDATEUI(wxID_ANY, mvceditor::CodeControlClass::OnUpdateUi) 
 	EVT_LEFT_DOWN(mvceditor::CodeControlClass::OnLeftDown)

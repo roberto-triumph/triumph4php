@@ -30,9 +30,11 @@
 #include <wx/numdlg.h>
 #include <wx/valgen.h>
 #include <wx/valtext.h>
+#include <MvcEditor.h>
 
 static const int ID_FIND_PANEL = wxNewId(); 
 static const int ID_REPLACE_PANEL = wxNewId(); 
+static const int ID_FINDER_ACTION = wxNewId();
 
 // these IDs are needed so that the IDs of the Regular expression help menu
 // do not collide with the menu IDs of the FindInFilesFeature
@@ -420,7 +422,7 @@ void mvceditor::ReplacePanelClass::OnReplaceButton(wxCommandEvent& event) {
 			Find(true);
 			ReplaceHistory.Save();
 		}
-		else {			
+		else {
 			SetStatus(_("Status: Not Found"));
 		}
 	}
@@ -725,6 +727,90 @@ void mvceditor::FinderFeatureClass::OnEditGoToLine(wxCommandEvent& event) {
 	}
 }
 
+void mvceditor::FinderFeatureClass::OnDoubleClick(wxStyledTextEvent& event) {
+	mvceditor::CodeControlClass* ctrl = GetCurrentCodeControl();
+	if (!ctrl) {
+		return;
+	}
+	UnicodeString word = ctrl->WordAtCurrentPos();
+	if (!word.isEmpty()) {
+		
+		int documentLength = ctrl->GetTextLength();
+		
+		// the action will delete it
+		char* buf = new char[documentLength];
+		
+		// GET_TEXT  message
+		ctrl->SendMsg(2182, documentLength, (long)buf);
+		mvceditor::FinderActionClass* action = new mvceditor::FinderActionClass(App.RunningThreads, ID_FINDER_ACTION, word,
+			buf, documentLength);
+		App.RunningThreads.Queue(action);
+	}
+}
+
+void mvceditor::FinderFeatureClass::OnFinderHit(mvceditor::FinderHitEventClass& event) {
+	mvceditor::CodeControlClass* ctrl = GetCurrentCodeControl();
+	if (ctrl) {
+		ctrl->HighlightWord(event.Start, event.Length);
+	}
+}
+
+mvceditor::FinderActionClass::FinderActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId,
+		const UnicodeString& search, char* utf8Buf, int bufLength)
+: ActionClass(runningThreads, eventId)
+, Finder()
+, Code()
+, Utf8Buf(utf8Buf) 
+, BufferLength(bufLength) {
+	Finder.Expression = search;
+	Finder.Mode = mvceditor::FinderClass::EXACT;
+}
+
+void mvceditor::FinderActionClass::BackgroundWork() {
+	if (!Finder.Prepare()) {
+		return;
+	}
+	Code = mvceditor::CharToIcu(Utf8Buf);
+	int32_t nextIndex(0);
+	bool found = Finder.FindNext(Code, nextIndex);
+	int32_t matchStart(0);
+	int32_t matchLength(0);
+	while (found) {
+		if (Finder.GetLastMatch(matchStart, matchLength)) {
+			// convert match back to UTF-8 ugh
+			int utf8Start = mvceditor::CharToUtf8Pos(Utf8Buf, BufferLength, matchStart);
+			int utf8End = mvceditor::CharToUtf8Pos(Utf8Buf, BufferLength, matchStart + matchLength);
+
+			mvceditor::FinderHitEventClass hit(GetEventId(), utf8Start, utf8End - utf8Start);
+			PostEvent(hit);
+			nextIndex = matchStart + matchLength + 1; // prevent infinite find next's
+		}
+		else {
+			break;
+		}
+		found = Finder.FindNext(Code, nextIndex);
+	}
+	delete[] Utf8Buf;
+	
+}
+
+wxString mvceditor::FinderActionClass::GetLabel() const {
+	return wxT("Finder Search");
+}
+
+mvceditor::FinderHitEventClass::FinderHitEventClass(int id, int start, int length)
+: wxEvent(id, mvceditor::EVENT_FINDER_ACTION)
+, Start(start)
+, Length(length) {
+	
+}
+
+wxEvent* mvceditor::FinderHitEventClass::Clone() const {
+	return new mvceditor::FinderHitEventClass(GetId(), Start, Length);
+}
+
+const wxEventType mvceditor::EVENT_FINDER_ACTION = wxNewEventType();
+
 BEGIN_EVENT_TABLE(mvceditor::FinderPanelClass, FinderPanelGeneratedClass)
 	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_ZERO, mvceditor::FinderPanelClass::InsertRegExSymbol)
 	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_ONE, mvceditor::FinderPanelClass::InsertRegExSymbol)
@@ -787,5 +873,7 @@ BEGIN_EVENT_TABLE(mvceditor::FinderFeatureClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_FINDER + 2, mvceditor::FinderFeatureClass::OnEditFindPrevious)
 	EVT_MENU(mvceditor::MENU_FINDER + 3, mvceditor::FinderFeatureClass::OnEditReplace)
 	EVT_MENU(mvceditor::MENU_FINDER + 4, mvceditor::FinderFeatureClass::OnEditGoToLine)
+	EVT_STC_DOUBLECLICK(wxID_ANY, mvceditor::FinderFeatureClass::OnDoubleClick)
+	EVT_FINDER(ID_FINDER_ACTION, mvceditor::FinderFeatureClass::OnFinderHit)
 END_EVENT_TABLE()
 
