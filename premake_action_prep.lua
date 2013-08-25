@@ -83,8 +83,17 @@ function checkWxWidgets()
 		end
 
         -- copy wxWidgets libraries to the same dir as our executable
-        os.execute("cp -r " .. os.getcwd() .. "/lib/wxWidgets/mvc-editor/lib/*.so* Debug/");
-        os.execute("cp -r " .. os.getcwd() .. "/lib/wxWidgets/mvc-editor/lib/*.so* Release/");
+        -- use the wx-config to get the location of the libraries
+        cmd = WX_CONFIG .. ' --prefix'
+        cmdStream = io.popen(cmd)
+        cmdOutput = cmdStream:read("*l")
+        cmdStream:close()
+        
+        libDir = cmdOutput .. '/lib'
+        batchexecute(normalizepath(""), {
+            "cp -r " .. libDir .. "/*.so* Debug/",
+            "cp -r " .. libDir .. "/*.so* Release/"
+        });
 	else
 		error "You are running on a non-supported operating system. MVC Editor cannot be built.\n"
 	end
