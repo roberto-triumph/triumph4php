@@ -214,6 +214,23 @@ void mvceditor::FileModifiedCheckFeatureClass::OnAppFileOpened(wxCommandEvent& e
 	}
 }
 
+void mvceditor::FileModifiedCheckFeatureClass::OnAppFileClosed(mvceditor::CodeControlEventClass& event) {
+	mvceditor::CodeControlClass* ctrl = event.GetCodeControl();
+	if (!ctrl) {
+		return;
+	}
+	wxString fileClosed = ctrl->GetFileName();
+	std::vector<wxFileName>::iterator it = FilesToPoll.begin();
+	while (it != FilesToPoll.end()) {
+		if (it->GetFullPath() == fileClosed) {
+			it = FilesToPoll.erase(it);
+		}
+		else {
+			++it;
+		}
+	}
+}
+
 void mvceditor::FileModifiedCheckFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	
 	// on MSW, wxFileSystemWatcher.RemoveAll does not actually remove the old 
@@ -598,10 +615,10 @@ void mvceditor::FileModifiedCheckFeatureClass::OnPollTimer(wxTimerEvent& event) 
 			mvceditor::CodeControlClass* ctrl = notebook->GetCodeControl(j);
 			if (ctrl->GetFileName() == FilesToPoll[i].GetFullPath()) {
 				fileMod.ModifiedTime = ctrl->GetFileOpenedDateTime();
+				fileMods.push_back(fileMod);
 				break;
 			}
 		}
-		fileMods.push_back(fileMod);
 	}
 	if (!fileMods.empty()) {
 
@@ -697,6 +714,7 @@ BEGIN_EVENT_TABLE(mvceditor::FileModifiedCheckFeatureClass, mvceditor::FeatureCl
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::FileModifiedCheckFeatureClass::OnAppReady)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_EXIT, mvceditor::FileModifiedCheckFeatureClass::OnAppExit)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_OPENED, mvceditor::FileModifiedCheckFeatureClass::OnAppFileOpened)
+	EVT_APP_FILE_CLOSED(mvceditor::FileModifiedCheckFeatureClass::OnAppFileClosed)
 	EVT_TIMER(ID_FILE_MODIFIED_CHECK, mvceditor::FileModifiedCheckFeatureClass::OnTimer)
 	EVT_TIMER(ID_FILE_MODIFIED_POLL, mvceditor::FileModifiedCheckFeatureClass::OnPollTimer)
 	EVT_FILES_EXTERNALLY_MODIFIED_COMPLETE(ID_FILE_MODIFIED_POLL, mvceditor::FileModifiedCheckFeatureClass::OnFilesCheckComplete)

@@ -75,7 +75,7 @@ private:
 	 * In case the file that was closed and is not part of a project
 	 * OR it is in a network drive, remove the watch we created for it
 	 */
-	void OnAppFileClosed(wxCommandEvent& event);
+	void OnAppFileClosed(mvceditor::CodeControlEventClass& event);
 
 	/**
 	 * when the timer is up then handle the files that the fs watcher notified us 
