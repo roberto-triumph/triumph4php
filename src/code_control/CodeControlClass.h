@@ -449,11 +449,6 @@ private:
 	void OnContextMenu(wxContextMenuEvent& event);
 
 	/**
-	 * color the matching braces
-	 */
-	void OnIdle(wxIdleEvent& event);
-
-	/**
 	 * Handle the double clicks.  Highlight any exact matches of the double-clicked word.
 	 * This is the trigger for the "word highlight" feature.
 	 */
