@@ -412,6 +412,7 @@ void mvceditor::CodeControlClass::OnUpdateUi(wxStyledTextEvent &event) {
 		event.Skip();
 		return;
 	}
+	Document->MatchBraces(GetCurrentPos());
 	HandleCallTip(0, false);
 	event.Skip();
 }
@@ -878,15 +879,6 @@ UnicodeString mvceditor::CodeControlClass::GetSafeText() {
 	return Document->GetSafeText();
 }
 
-void mvceditor::CodeControlClass::OnIdle(wxIdleEvent& event) {
-
-	// moving match braces here from UpdateUi because when I put this code in UpdateUi there
-	// is a bad flicker in GTK when the braces are highlighted.
-	// Code folding seems to make the flicker appear all the time.
-	Document->MatchBraces(GetCurrentPos());
-	event.Skip();
-}
-
 void mvceditor::CodeControlClass::OnKeyDown(wxKeyEvent& event) {
 	UndoHighlight();
 	if (event.GetKeyCode() == WXK_ESCAPE) {
@@ -1288,7 +1280,6 @@ BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)
 	EVT_STC_MARGINCLICK(wxID_ANY, mvceditor::CodeControlClass::OnMarginClick)
 	EVT_STC_DOUBLECLICK(wxID_ANY, mvceditor::CodeControlClass::OnDoubleClick)
 	EVT_CONTEXT_MENU(mvceditor::CodeControlClass::OnContextMenu)
-	EVT_IDLE(mvceditor::CodeControlClass::OnIdle)
 	EVT_IDLE(mvceditor::CodeControlClass::WordHiglightPreviousSearch)
 	EVT_IDLE(mvceditor::CodeControlClass::WordHiglightForwardSearch)
 	EVT_STC_CHARADDED(wxID_ANY, mvceditor::CodeControlClass::OnCharAdded)

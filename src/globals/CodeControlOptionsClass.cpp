@@ -41,14 +41,6 @@ mvceditor::CodeControlOptionsClass::CodeControlOptionsClass() {
 	TrimTrailingSpaceBeforeSave = false;
 	RemoveTrailingBlankLinesBeforeSave = true;
 	EnableCallTipsOnMouseHover = true;
-	wxOperatingSystemId os = wxGetOsVersion();
-	if (wxOS_UNIX_LINUX == os) {  
-			
-		// there is a bad flicker that happens when Code Folding and matching braces are enabled ...
-		// turn off code folding in linux by default.
-		// TODO: fixed in new versions of Scintilla?
-		EnableCodeFolding = false;
-	}
 	RightMargin = 0;
 }
 
