@@ -11,7 +11,7 @@
 
 EditorMessagesGeneratedPanelClass::EditorMessagesGeneratedPanelClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
-	GridSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	GridSizer = new wxFlexGridSizer( 3, 1, 0, 0 );
 	GridSizer->AddGrowableCol( 0 );
 	GridSizer->AddGrowableRow( 2 );
 	GridSizer->SetFlexibleDirection( wxBOTH );
