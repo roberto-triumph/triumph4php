@@ -389,6 +389,7 @@ mvceditor::ProjectListDialogClass::ProjectListDialogClass(wxWindow* parent, std:
 	if (!ProjectsList->IsEmpty()) {
 		ProjectsList->SetSelection(0);
 	}
+	this->SetSize(-1, 500);
 	this->Layout();
 	this->Center(wxBOTH);
 }
