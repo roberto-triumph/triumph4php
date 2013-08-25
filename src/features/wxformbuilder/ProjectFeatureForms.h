@@ -162,7 +162,7 @@ class ProjectListDialogGeneratedClass : public wxDialog
 	
 	public:
 		
-		ProjectListDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Defined Projects"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,507 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		ProjectListDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Defined Projects"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~ProjectListDialogGeneratedClass();
 	
 };
@@ -188,7 +188,7 @@ class MultipleSelectDialogGeneratedClass : public wxDialog
 	
 	public:
 		
-		MultipleSelectDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 355,249 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		MultipleSelectDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~MultipleSelectDialogGeneratedClass();
 	
 };

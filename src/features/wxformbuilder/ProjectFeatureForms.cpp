@@ -283,7 +283,7 @@ ProjectListDialogGeneratedClass::ProjectListDialogGeneratedClass( wxWindow* pare
 	BoxSizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* FlexGridSizer;
-	FlexGridSizer = new wxFlexGridSizer( 5, 1, 0, 0 );
+	FlexGridSizer = new wxFlexGridSizer( 4, 1, 0, 0 );
 	FlexGridSizer->AddGrowableCol( 0 );
 	FlexGridSizer->AddGrowableRow( 1 );
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );
@@ -331,6 +331,7 @@ ProjectListDialogGeneratedClass::ProjectListDialogGeneratedClass( wxWindow* pare
 	
 	this->SetSizer( BoxSizer );
 	this->Layout();
+	BoxSizer->Fit( this );
 	
 	this->Centre( wxBOTH );
 	
@@ -397,6 +398,7 @@ MultipleSelectDialogGeneratedClass::MultipleSelectDialogGeneratedClass( wxWindow
 	
 	this->SetSizer( bSizer7 );
 	this->Layout();
+	bSizer7->Fit( this );
 	
 	this->Centre( wxBOTH );
 	

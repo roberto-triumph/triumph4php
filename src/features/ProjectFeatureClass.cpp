@@ -34,6 +34,7 @@
 #include <wx/valgen.h>
 #include <wx/dir.h>
 #include <wx/dirdlg.h>
+#include <wx/choicdlg.h> 
 #include <algorithm>
 
 mvceditor::ProjectFeatureClass::ProjectFeatureClass(mvceditor::AppClass& app) 
@@ -388,6 +389,8 @@ mvceditor::ProjectListDialogClass::ProjectListDialogClass(wxWindow* parent, std:
 	if (!ProjectsList->IsEmpty()) {
 		ProjectsList->SetSelection(0);
 	}
+	this->Layout();
+	this->Center(wxBOTH);
 }
 
 void mvceditor::ProjectListDialogClass::OnSelectAllButton(wxCommandEvent& event) {
@@ -612,25 +615,25 @@ void mvceditor::ProjectListDialogClass::OnAddFromDirectoryButton(wxCommandEvent&
 		wxDir dir(rootDir);
 		if (dir.IsOpened()) {
 			wxString fileName;
-			std::vector<wxString> subDirs;
+			wxArrayString subDirs;
 			bool cont = dir.GetFirst(&fileName, wxEmptyString, wxDIR_DIRS);
 			while (cont) {
-				subDirs.push_back(fileName);
+				subDirs.Add(fileName);
 				cont = dir.GetNext(&fileName);
 			}
 			std::sort(subDirs.begin(), subDirs.end());
-			std::vector<int> selections;
-			cont = !subDirs.empty();
-			if (!subDirs.empty()) {
-				mvceditor::MultipleSelectDialogClass selectDialog(
-					this,
-					_("Add Multiple"),
+			wxArrayInt selections;
+			cont = !subDirs.IsEmpty();
+			if (!subDirs.IsEmpty()) {
+				int choice = wxGetSelectedChoices(
+					selections, 
 					wxString::Format(_("There are %ld projects. Please choose directories to create projects for"), subDirs.size()),
-					subDirs,					
-					selections
+					_("Add Multiple"),
+					subDirs,
+					this
 				);
-				if (selectDialog.ShowModal() == wxOK) {
-					cont = !selections.empty();
+				if (choice > 0) {
+					cont = !selections.IsEmpty();
 				}
 			}
 			if (cont) {
