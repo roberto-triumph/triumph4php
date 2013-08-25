@@ -117,7 +117,8 @@ bool mvceditor::SequenceClass::AppStart() {
 	return true;
 }
 
-bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvceditor::ProjectClass>& touchedProjects) {
+bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvceditor::ProjectClass>& touchedProjects,
+	const std::vector<mvceditor::ProjectClass>& removedProjects) {
 	if (Running()) {
 		return false;
 	}
@@ -139,6 +140,13 @@ bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvced
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	std::vector<mvceditor::SourceClass>::const_iterator source;
 	for (project = touchedProjects.begin(); project != touchedProjects.end(); ++project) {
+		for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
+			sourceDirsToDelete.push_back(source->RootDirectory);
+		}
+	}
+	
+	// remove tags from the deleted projects since we will never use them
+	for (project = removedProjects.begin(); project != removedProjects.end(); ++project) {
 		for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
 			sourceDirsToDelete.push_back(source->RootDirectory);
 		}

@@ -90,7 +90,7 @@ public:
 	 * has added / removed a project, or edited a project's sources list. This sequence
 	 * will do the following, but only on the given projects, as opposed to all projects
 	 * like AppStart sequence.
-	 * - Remove the project cache, urls, SQL table metada for the removed projects
+	 * - Remove the project cache, urls, SQL table metadata for the removed projects
 	 * - Detect the PHP framework that the project is using
 	 * - Load the tag cache if it exists
 	 * - Start the tag cache update for the project
@@ -99,11 +99,14 @@ public:
 	 *
 	 * @param updateProjects the list of projects that were updated ie. new/removed/edited 
 	 *       source directories, wildcards, etc...
+	 * @param removedProjects the list of projects that were deleted we will delete the tags
+	 *        from these projects
 	 * @return bool FALSE if there is a sequence already running. if there is an existing
 	 *         sequence running then we will not start another sequence as sequences deal with 
 	 *         GlobalsClass and running many sequences may cause problems 
 	 */
-	bool ProjectDefinitionsUpdated(const std::vector<mvceditor::ProjectClass>& touchedProjects);
+	bool ProjectDefinitionsUpdated(const std::vector<mvceditor::ProjectClass>& touchedProjects,
+		const std::vector<mvceditor::ProjectClass>& removedProjects);
 
 	/**
 	 * Start the full tag cache rebuild sequence.  This will include

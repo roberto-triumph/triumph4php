@@ -192,13 +192,7 @@ void mvceditor::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
 	if (wxOK == dialog.ShowModal()) {
 		std::vector<mvceditor::ProjectClass>::iterator project;
 
-		// delete the cache files for the projects the user has removed
-		// before deleting the file, must disconnect from the SQLite database
-		for (project = removedProjects.begin(); project != removedProjects.end(); ++project) {
-
-			// TODO: remove tags from deleted projects
-		}
-
+		
 		// for new projects we need to fill in the file extensions
 		// the rest of the app assumes they are already filled in
 		for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
@@ -215,14 +209,16 @@ void mvceditor::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
 		wxCommandEvent evt(mvceditor::EVENT_APP_PREFERENCES_SAVED);
 		App.EventSink.Publish(evt);
 		wxConfigBase* config = wxConfig::Get();
-		config->Flush();		
+		config->Flush();
 
 		// signal that this app has modified the config file, that way the external
 		// modification check fails and the user will not be prompted to reload the config
 		App.UpdateConfigModifiedTime();
 
 		// start the sequence that will update all global data structures
-		App.Sequences.ProjectDefinitionsUpdated(touchedProjects);
+		// delete the cache files for the projects the user has removed
+		// remove tags from deleted projects
+		App.Sequences.ProjectDefinitionsUpdated(touchedProjects, removedProjects);
 	}
 }
 
@@ -233,8 +229,8 @@ void mvceditor::ProjectFeatureClass::OnPreferencesExternallyUpdated(wxCommandEve
 	// since another instance of mvc-editor added them, it is assumed that 
 	// the other instance has parsed them and built the cache.  
 	// this instance will just load the cache into memory
-	std::vector<mvceditor::ProjectClass> touchedProjects;
-	App.Sequences.ProjectDefinitionsUpdated(touchedProjects);
+	std::vector<mvceditor::ProjectClass> touchedProjects, removedProjects;
+	App.Sequences.ProjectDefinitionsUpdated(touchedProjects, removedProjects);
 }
 
 mvceditor::ProjectPreferencesPanelClass::ProjectPreferencesPanelClass(wxWindow *parent, mvceditor::ProjectFeatureClass &projectFeature) 
