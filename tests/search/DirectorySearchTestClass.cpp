@@ -351,6 +351,10 @@ TEST_FIXTURE(SourceFixtureClass, ContainsShouldReturnFalse) {
 	// does not match an include wildcard 
 	test = root + wxFileName::GetPathSeparator() + wxT("file.class");
 	CHECK_EQUAL(false, Source.Contains(test));
+	
+	// does not match an include wildcard 
+	test = root + wxFileName::GetPathSeparator() + wxT("file.php~");
+	CHECK_EQUAL(false, Source.Contains(test));
 }
 
 TEST_FIXTURE(SourceFixtureClass, ContainsShouldReturnFalse2) {

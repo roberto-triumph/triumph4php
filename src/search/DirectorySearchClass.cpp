@@ -178,7 +178,7 @@ wxString mvceditor::SourceClass::WildcardRegEx(const wxString& wildCardString) {
 	wxString escapedExpression(wildCardString);
 	
 	// allow ? and * wildcards, turn ';' into '|'
-	wxString symbols = wxT("!@#$%^&()[]{}\\-+.\"|,");
+	wxString symbols = wxT("!@#$%^&()[]{}\\-+.\"|,~");
 	int pos = escapedExpression.find_first_of(symbols, 0);
 	while (-1 != pos) {
 		wxString symbol = escapedExpression.substr(pos, 1);
