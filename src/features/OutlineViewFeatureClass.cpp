@@ -908,8 +908,6 @@ void mvceditor::FileSearchDialogClass::Search() {
 	}
 
 	// no need to show jump to results for native functions
-	// TODO: CollectNearResourceMatches shows resources from files that were recently deleted
-	// need to hide them / remove them
 	mvceditor::TagListRemoveNativeMatches(MatchingTags);
 	mvceditor::TagListKeepMatchesFromProjects(MatchingTags, projects);
 	ShowTags(search, MatchingTags);
