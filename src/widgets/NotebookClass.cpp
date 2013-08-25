@@ -361,8 +361,9 @@ bool mvceditor::NotebookClass::SaveAllModifiedPages() {
 			"Do you wish to save any files before exiting?"),
 			wxT("Save Files"), modifiedPageNamesArray, 
 			wxDEFAULT_DIALOG_STYLE | wxOK | wxCANCEL);
+		dialog.Center();
 		if (wxID_CANCEL == dialog.ShowModal()) {
-			changed = false;				
+			changed = false;
 		}
 		else {
 			wxArrayInt selections = dialog.GetSelections();
