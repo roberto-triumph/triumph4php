@@ -257,13 +257,14 @@ void mvceditor::ProjectTagSingleFileActionClass::BackgroundWork() {
 		return;
 	}
 	std::vector<mvceditor::SourceClass>::iterator src;
+	wxString fullPath = FileName.GetFullPath();
 	for (src = Project.Sources.begin(); src != Project.Sources.end(); ++src) {
-		if (src->Contains(FileName.GetFullPath())) {
+		if (src->Contains(fullPath)) {
 
 			// this specific sequence is needed so that the source_id
 			// is set properly in the database
 			TagFinderList.TagParser.BeginSearch(src->RootDirectory.GetPath());
-			TagFinderList.TagParser.Walk(FileName.GetFullPath());
+			TagFinderList.TagParser.Walk(fullPath);
 			TagFinderList.TagParser.EndSearch();
 			break;
 		}
@@ -311,12 +312,19 @@ bool mvceditor::ProjectTagSingleFileRenameActionClass::Init(mvceditor::GlobalsCl
 
 void mvceditor::ProjectTagSingleFileRenameActionClass::BackgroundWork() {
 
-	// check to see if the original file exists
-	// if the original file exists, just rename the file (no need to retag the file)
-	if (TagFinderList.TagFinder.HasFullPath(OldFileName.GetFullPath())) {
+	// checking to see if this rename was an actual permanent rename as opposed to
+	// file shuffling by apps.
+	// some apps (notably VIM) will do unexpected things like rename a file when 
+	// they open it, then right away create a new file with the original name. if we captured a file rename
+	// but the old file still exists, assume that the old file was put right back. 
+	bool oldFileExists = OldFileName.FileExists();
+	
+	// check to see if the original file was previosuly parsed
+	// if the original file was previosuly parsed, just rename the file (no need to retag the file)
+	if (!oldFileExists && TagFinderList.TagFinder.HasFullPath(OldFileName.GetFullPath())) {
 		TagFinderList.TagParser.RenameFile(OldFileName, NewFileName);
 	}
-	else {
+	else if (!oldFileExists) {
 		
 		// tag the file since we have never seen it. this could be the same
 		// for example, when file with a non-php extension is renamed to have a 
