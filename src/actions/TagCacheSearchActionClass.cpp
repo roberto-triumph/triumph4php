@@ -90,10 +90,6 @@ void mvceditor::TagCacheSearchActionClass::BackgroundWork() {
 		}
 	}
 	delete results;
-
-	// TODO: NearMatchTags shows resources from files that were recently deleted
-	// need to hide them / remove them
-
 	if (!IsCancelled()) {
 
 		// PostEvent will set the correct event ID
