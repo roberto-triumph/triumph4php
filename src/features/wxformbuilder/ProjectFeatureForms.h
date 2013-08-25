@@ -162,7 +162,7 @@ class ProjectListDialogGeneratedClass : public wxDialog
 	
 	public:
 		
-		ProjectListDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Defined Projects"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 504,507 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		ProjectListDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Defined Projects"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,507 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~ProjectListDialogGeneratedClass();
 	
 };
