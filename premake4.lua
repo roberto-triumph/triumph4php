@@ -229,14 +229,6 @@ solution "mvc-editor"
 			icuconfiguration("Release", _ACTION)
 			wxconfiguration("Release", _ACTION)
 			wxappconfiguration("Release", _ACTION)
-		configuration { "Debug", "vs2008" }
-			postbuildcommands { "cd " .. normalizepath("Debug") .. " && tests.exe --all" }
-		configuration { "Debug", "gmake or codelite" }
-			postbuildcommands { "cd " .. normalizepath("Debug") .. " && ./tests --all" }
-		configuration { "Release", "vs2008" }
-			postbuildcommands { "cd " .. normalizepath("Release") .. " && tests.exe --all"  }
-		configuration { "Release", "gmake or codelite" }
-			postbuildcommands { "cd " .. normalizepath("Release") .. " && ./tests --all" }
 
 	project "tests"
 		language "C++"

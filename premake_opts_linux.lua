@@ -61,7 +61,12 @@ ICU_CONFIG = 'icu-config'
 --
 -- Consult the wxWidgets for more info if necessary
 --
-WX_CONFIG = 'lib/wxWidgets/mvc-editor/bin/wx-config'
+WX_CONFIG = os.getenv("MVCEDITOR_WXCONFIG")
+if (not wxWidgetsDir) then
+    WX_CONFIG = 'lib/wxWidgets/mvc-editor/bin/wx-config'
+    print "Using default location of lib/wxWidgets/mvc-editor/bin/wx-config for wxWidgets dir"
+end
+
 
 -- location of the cmake executable. cmake is used to build the SOCI
 -- library (Database Access wrapper)
