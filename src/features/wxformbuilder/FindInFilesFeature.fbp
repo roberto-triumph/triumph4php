@@ -23,7 +23,7 @@
         <property name="use_microsoft_bom">0</property>
         <object class="Dialog" expanded="1">
             <property name="bg"></property>
-            <property name="center"></property>
+            <property name="center">wxBOTH</property>
             <property name="context_help"></property>
             <property name="context_menu">1</property>
             <property name="enabled">1</property>
@@ -37,7 +37,7 @@
             <property name="minimum_size"></property>
             <property name="name">FindInFilesDialogGeneratedClass</property>
             <property name="pos"></property>
-            <property name="size">476,388</property>
+            <property name="size">500,430</property>
             <property name="style">wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</property>
             <property name="subclass"></property>
             <property name="title">Find In Files</property>

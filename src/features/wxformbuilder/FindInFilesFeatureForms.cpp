@@ -135,6 +135,8 @@ FindInFilesDialogGeneratedClass::FindInFilesDialogGeneratedClass( wxWindow* pare
 	this->SetSizer( BoxSizer );
 	this->Layout();
 	
+	this->Centre( wxBOTH );
+	
 	// Connect Events
 	RegexFindHelpButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FindInFilesDialogGeneratedClass::OnRegExFindHelpButton ), NULL, this );
 	FindText->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( FindInFilesDialogGeneratedClass::OnKeyDown ), NULL, this );

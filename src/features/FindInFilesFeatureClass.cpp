@@ -827,10 +827,10 @@ void mvceditor::FindInFilesFeatureClass::OnEditFindInFiles(wxCommandEvent& event
 	if (!selectedText.empty()) {
 		PreviousFindInFiles.Expression = mvceditor::WxToIcu(selectedText);
 	}
-	FindInFilesDialogClass dialog(NULL, *this);
+	FindInFilesDialogClass dialog(GetMainWindow(), *this);
 	if (dialog.ShowModal() == wxID_OK) {
 		mvceditor::FindInFilesResultsPanelClass* panel = new mvceditor::FindInFilesResultsPanelClass(GetToolsNotebook(), 
-			GetNotebook(), GetStatusBarWithGauge(), App.RunningThreads);		
+			GetNotebook(), GetStatusBarWithGauge(), App.RunningThreads);
 		wxBitmap findBitmap = wxNullBitmap;
 		if (PreviousFindInFiles.ReplaceExpression.isEmpty()) {
 			findBitmap = mvceditor::IconImageAsset(wxT("find-in-files"));
