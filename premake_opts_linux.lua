@@ -62,7 +62,7 @@ ICU_CONFIG = 'icu-config'
 -- Consult the wxWidgets for more info if necessary
 --
 WX_CONFIG = os.getenv("MVCEDITOR_WXCONFIG")
-if (not wxWidgetsDir) then
+if (not WX_CONFIG) then
     WX_CONFIG = 'lib/wxWidgets/mvc-editor/bin/wx-config'
     print "Using default location of lib/wxWidgets/mvc-editor/bin/wx-config for wxWidgets dir"
 end
