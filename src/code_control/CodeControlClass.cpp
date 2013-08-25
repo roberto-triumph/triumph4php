@@ -606,12 +606,6 @@ void mvceditor::CodeControlClass::SetPhpOptions() {
 				StyleSetBold(styles[j], pref.IsBold);
 				StyleSetItalic(styles[j], pref.IsItalic);
 			}
-
-			// enable clickable links on identifiers
-			StyleSetHotSpot(style, true);
-			SetHotspotActiveForeground(true, *wxBLUE);
-			SetHotspotActiveUnderline(true);
-
 		}
 		StyleSetFont(style, pref.Font);
 		StyleSetForeground(style, pref.Color);
@@ -883,6 +877,27 @@ void mvceditor::CodeControlClass::OnKeyDown(wxKeyEvent& event) {
 
 void mvceditor::CodeControlClass::OnLeftDown(wxMouseEvent& event) {
 	UndoHighlight();
+	event.Skip();
+}
+
+void mvceditor::CodeControlClass::OnMotion(wxMouseEvent& event) {
+	UndoHighlight();
+	int pos = CharPositionFromPointClose(event.GetX(), event.GetY());
+	if (pos < 0) {
+		event.Skip();
+		return;
+	}
+	
+	// enable clickable links on identifiers
+	int style = wxSTC_HPHP_DEFAULT;
+	if ((GetStyleAt(pos) & wxSTC_HPHP_DEFAULT) && (event.GetModifiers() & wxMOD_CMD)) {
+		StyleSetHotSpot(style, true);
+		SetHotspotActiveForeground(true, *wxBLUE);
+		SetHotspotActiveUnderline(true);
+	}
+	else {
+		StyleSetHotSpot(style, false);
+	}
 	event.Skip();
 }
 
@@ -1205,6 +1220,7 @@ BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)
 	EVT_STC_UPDATEUI(wxID_ANY, mvceditor::CodeControlClass::OnUpdateUi) 
 	EVT_LEFT_DOWN(mvceditor::CodeControlClass::OnLeftDown)
 	EVT_KEY_DOWN(mvceditor::CodeControlClass::OnKeyDown)
+	EVT_MOTION(mvceditor::CodeControlClass::OnMotion)
 	EVT_STC_DWELLSTART(wxID_ANY, mvceditor::CodeControlClass::OnDwellStart)
 	EVT_STC_DWELLEND(wxID_ANY, mvceditor::CodeControlClass::OnDwellEnd)
 	EVT_STC_HOTSPOT_CLICK(wxID_ANY, mvceditor::CodeControlClass::OnHotspotClick)

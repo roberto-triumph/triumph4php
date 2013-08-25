@@ -454,6 +454,11 @@ private:
 	 * Handle the double clicks.
 	 */
 	void OnDoubleClick(wxStyledTextEvent& event);
+	
+	/**
+	 *  on mouse motion we will turn on hotspots for identifiers 
+	 */
+	void OnMotion(wxMouseEvent& event);
 
 	/**
 	 * On a key press, we will undo the highlighting caused by double clicks
