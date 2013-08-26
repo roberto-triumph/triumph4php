@@ -881,7 +881,6 @@ void mvceditor::CodeControlClass::OnLeftDown(wxMouseEvent& event) {
 }
 
 void mvceditor::CodeControlClass::OnMotion(wxMouseEvent& event) {
-	UndoHighlight();
 	int pos = CharPositionFromPointClose(event.GetX(), event.GetY());
 	if (pos < 0) {
 		event.Skip();
