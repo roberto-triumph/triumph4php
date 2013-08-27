@@ -96,7 +96,7 @@ void mvceditor::WorkingCacheClass::Init(const wxString& fileName,
 	FileName = fileName;
 	FileIdentifier = fileIdentifier;
 	IsNew = isNew;
-	
+	Parser.SetVersion(version);
 	SymbolTable.SetVersion(version);
 	if (createSymbols) {
 		SymbolTable.CreateSymbolsFromFile(fileName);
