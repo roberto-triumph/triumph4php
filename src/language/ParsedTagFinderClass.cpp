@@ -1660,6 +1660,13 @@ std::vector<UnicodeString> mvceditor::ParsedTagFinderClass::GetResourceTraits(co
 			}
 		}
 	}
+	
+	// we will get duplicate traits, since we looped over get the trait methods
+	// not just the traits
+	// lets remove all dups
+	std::sort(inheritedTraits.begin(), inheritedTraits.end());
+	std::vector<UnicodeString>::iterator end = std::unique(inheritedTraits.begin(), inheritedTraits.end());
+	inheritedTraits.erase(end, inheritedTraits.end());
 	return inheritedTraits;
 }
 
