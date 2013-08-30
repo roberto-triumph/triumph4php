@@ -47,11 +47,14 @@ int ID_UPPERCASE = wxNewId();
 int ID_MENU_MORE = wxNewId();
 int ID_TOOLBAR = wxNewId();
 static int ID_SEQUENCE_GAUGE = wxNewId();
+static int ID_STATUS_BAR_TIMER = wxNewId();
 
 mvceditor::MainFrameClass::MainFrameClass(const std::vector<mvceditor::FeatureClass*>& features,
 										mvceditor::AppClass& app,
 										mvceditor::PreferencesClass& preferences)
 	: MainFrameGeneratedClass(NULL)
+	, AuiManager()
+	, StatusBarTimer(this, ID_STATUS_BAR_TIMER)
 	, Features(features)
 	, Listener(this)
 	, App(app)
@@ -718,10 +721,6 @@ void mvceditor::MainFrameClass::OnUppercase(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::MainFrameClass::OnCodeControlUpdate(wxStyledTextEvent& event) {
-	UpdateStatusBar();
-}
-
 void mvceditor::MainFrameClass::UpdateStatusBar() {
 	CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
 	if (codeControl) {
@@ -732,9 +731,10 @@ void mvceditor::MainFrameClass::UpdateStatusBar() {
 		// but offset we want to be 0-based
 		int line = codeControl->LineFromPosition(pos) + 1; 
 		int column = codeControl->GetColumn(pos) + 1;
-		GetStatusBarWithGauge()->SetColumn1Text(
-			wxString::Format(wxT("Line:%d Column:%d Offset:%d"), line, column, pos)
-		);
+		
+		wxString s = wxString::Format(wxT("Line:%d Column:%d Offset:%d"), line, column, pos);
+		GetStatusBarWithGauge()->SetColumn1Text(s);
+		
 	}
 	else {
 		GetStatusBarWithGauge()->SetColumn1Text(wxEmptyString);
@@ -874,6 +874,22 @@ void mvceditor::MainFrameClass::OnSequenceComplete(wxCommandEvent& event) {
 	gauge->StopGauge(ID_SEQUENCE_GAUGE);
 }
 
+void mvceditor::MainFrameClass::StartStatusBarTimer() {
+	StatusBarTimer.Start(250, wxTIMER_CONTINUOUS);
+}
+
+void mvceditor::MainFrameClass::OnStatusBarTimer(wxTimerEvent& event) {
+	
+	/*
+	 * Update the status bar info (line, column)
+	 * at specific intervals instead of in a EVT_STC_UPDATEUI event.
+	 * Updating the status bar text triggers a refresh of the whole
+	 * status bar (and it seems that the entire app is refreshed too)
+	 * and it makes the app feel sluggish.
+	 */
+	UpdateStatusBar();
+}
+
 mvceditor::AppEventListenerForFrameClass::AppEventListenerForFrameClass(mvceditor::MainFrameClass* mainFrame)
 	: wxEvtHandler()
 	, MainFrame(mainFrame) {
@@ -896,6 +912,7 @@ void mvceditor::AppEventListenerForFrameClass::OnPreferencesExternallyUpdated(wx
 
 void mvceditor::AppEventListenerForFrameClass::OnAppReady(wxCommandEvent& event) {
 	MainFrame->PreferencesExternallyUpdated();
+	MainFrame->StartStatusBarTimer();
 }
 
 void mvceditor::AppEventListenerForFrameClass::OnCodeNotebookPageChanged(wxAuiNotebookEvent& event) {
@@ -917,9 +934,9 @@ void mvceditor::AppEventListenerForFrameClass::OnCodeNotebookPageClosed(wxAuiNot
 BEGIN_EVENT_TABLE(mvceditor::MainFrameClass,  MainFrameGeneratedClass)
 	EVT_STC_SAVEPOINTREACHED(wxID_ANY, mvceditor::MainFrameClass::DisableSave)
 	EVT_STC_SAVEPOINTLEFT(wxID_ANY, mvceditor::MainFrameClass::EnableSave)
-	EVT_STC_UPDATEUI(wxID_ANY, mvceditor::MainFrameClass::OnCodeControlUpdate)
 	EVT_UPDATE_UI(wxID_ANY, mvceditor::MainFrameClass::OnUpdateUi)
 	EVT_CONTEXT_MENU(mvceditor::MainFrameClass::OnContextMenu)
+	EVT_TIMER(ID_STATUS_BAR_TIMER, mvceditor::MainFrameClass::OnStatusBarTimer)
 
 	// these are context menu handlers; the menu handlers are already accounted for
 	// in the MainFrameGeneratedClass

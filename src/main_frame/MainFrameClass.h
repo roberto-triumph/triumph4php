@@ -138,6 +138,16 @@ public:
 	 */
 	void RealizeToolbar();
 
+	/**
+	 * after the application starts, start the status bar timer.
+	 * The status bar timer will update the status bar info (line, column)
+	 * at specific intervals instead of in a EVT_STC_UPDATEUI event.
+	 * Updating the status bar text triggers a refresh of the whole
+	 * status bar (and it seems that the entire app is refreshed too)
+	 * and it makes the app feel sluggish.
+	 */
+	void StartStatusBarTimer();
+
 protected:
 
 	// Handlers for MainFrameGeneratedClass events.
@@ -258,11 +268,6 @@ private:
 	 * handle the uppercase selected menu event
 	 */
 	void OnUppercase(wxCommandEvent& event);
-	
-	/*
-	 * Draw the current cursor line and pos
-	 */
-	void OnCodeControlUpdate(wxStyledTextEvent& event);
 
 	/**
 	 * Add the shortcuts for this frame's menu bar into the preference's shortcut list
@@ -320,11 +325,21 @@ private:
 	void SetApplicationFont();
 
 	/**
+	 * at regular intervals, update the status bar text
+	 */
+	void OnStatusBarTimer(wxTimerEvent& event);
+
+	/**
 	 * GUI framework object, used to programatically position the different windows
 	 * 
 	 * @var wxAuiManager
 	 */
 	wxAuiManager AuiManager;
+
+	/**
+	 * timer to update the status bar at a regular intervals
+	 */
+	wxTimer StatusBarTimer;
 
 	/**
 	 * Additional functionality

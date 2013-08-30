@@ -158,13 +158,23 @@ void mvceditor::StatusBarWithGaugeClass::RedrawGauges() {
 }
 
 void mvceditor::StatusBarWithGaugeClass::SetColumn0Text(const wxString &text) {
-	RedrawGauges();
-	SetStatusText(text, 0);
+	
+	// don't redraw unless necessary
+	wxString oldText = GetStatusText(0);
+	if (!oldText.IsEmpty() || !text.IsEmpty()) {
+		RedrawGauges();
+		SetStatusText(text, 0);
+	}
 }
 
 void mvceditor::StatusBarWithGaugeClass::SetColumn1Text(const wxString &text) {
-	RedrawGauges();
-	SetStatusText(text, 1);
+	
+	// don't redraw unless necessary
+	wxString oldText = GetStatusText(1);
+	if (!oldText.IsEmpty() || !text.IsEmpty()) {
+		RedrawGauges();
+		SetStatusText(text, 1);
+	}
 }
 
 BEGIN_EVENT_TABLE(mvceditor::StatusBarWithGaugeClass, wxStatusBar)

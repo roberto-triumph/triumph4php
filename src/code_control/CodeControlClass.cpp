@@ -329,7 +329,7 @@ void mvceditor::CodeControlClass::OnCharAdded(wxStyledTextEvent &event) {
 	wxFrame* frame = wxDynamicCast(window, wxFrame);
 	if (frame) {
 		mvceditor::StatusBarWithGaugeClass* gauge = (mvceditor::StatusBarWithGaugeClass*)frame->GetStatusBar();
-		gauge->SetColumn0Text(wxT(""));		
+		gauge->SetColumn0Text(wxT(""));
 	}
 
 	char ch = (char)event.GetKey();
@@ -1215,8 +1215,10 @@ BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)
 	EVT_STC_MARGINCLICK(wxID_ANY, mvceditor::CodeControlClass::OnMarginClick)
 	EVT_STC_DOUBLECLICK(wxID_ANY, mvceditor::CodeControlClass::OnDoubleClick)
 	EVT_CONTEXT_MENU(mvceditor::CodeControlClass::OnContextMenu)
+
 	EVT_STC_CHARADDED(wxID_ANY, mvceditor::CodeControlClass::OnCharAdded)
 	EVT_STC_UPDATEUI(wxID_ANY, mvceditor::CodeControlClass::OnUpdateUi) 
+
 	EVT_LEFT_DOWN(mvceditor::CodeControlClass::OnLeftDown)
 	EVT_KEY_DOWN(mvceditor::CodeControlClass::OnKeyDown)
 	EVT_MOTION(mvceditor::CodeControlClass::OnMotion)
