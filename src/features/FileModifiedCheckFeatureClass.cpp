@@ -24,6 +24,7 @@
  */
 #include <features/FileModifiedCheckFeatureClass.h>
 #include <MvcEditor.h>
+#include <globals/Errors.h>
 #include <globals/Events.h>
 #include <wx/choicdlg.h>
 #include <wx/volume.h>
@@ -311,7 +312,32 @@ void mvceditor::FileModifiedCheckFeatureClass::OnTimer(wxTimerEvent& event) {
 	PathsExternallyModified.clear();
 	PathsExternallyDeleted.clear();
 	PathsExternallyRenamed.clear();
-
+	
+	// make sure deleted files are actually deleted. sometime editors will swap files 
+	// instead of overwriting them, and this results in DELETE events
+	std::map<wxString, int>::iterator it = FilesExternallyDeleted.begin();
+	while (it != FilesExternallyDeleted.end()) {
+		wxString fullPath = it->first;
+		wxFileName fileName(fullPath);
+		if (fileName.FileExists()) {
+			std::map<wxString, int>::iterator toDelete = it;
+			FilesExternallyDeleted.erase(toDelete);
+		}
+		++it;
+	}
+	
+	// oddity. int linux sometimes we get rename events where the old and new paths
+	// are the same. in this case, lets treat them as modifications
+	std::map<wxString, wxString>::iterator rename = pathsRenamed.begin();
+	while (rename != pathsRenamed.end()) {
+		if (rename->first == rename->second) {
+			std::map<wxString, wxString>::iterator toDeleteRename = rename;
+			PathsExternallyModified[rename->first] = 1;
+			pathsRenamed.erase(toDeleteRename);
+		}
+		rename++;
+	}
+	
 	std::map<wxString, mvceditor::CodeControlClass*> openedFiles = OpenedFiles(GetNotebook());
 
 	HandleOpenedFiles(openedFiles, pathsRenamed);
@@ -340,7 +366,7 @@ void mvceditor::FileModifiedCheckFeatureClass::HandleOpenedFiles(std::map<wxStri
 		wxString fullPath = f->first;
 		wxFileName fileName(fullPath);
 		bool isOpened = openedFiles.find(fullPath) != openedFiles.end();
-		if (isOpened && fileName.GetModificationTime() > openedFiles[fullPath]->GetFileOpenedDateTime()) {
+		if (isOpened && fileName.GetModificationTime() != openedFiles[fullPath]->GetFileOpenedDateTime()) {
 			
 			// file is opened, but since file modified time is newer than what the code 
 			// control read in then it means that the file was modified externally
@@ -389,15 +415,27 @@ void mvceditor::FileModifiedCheckFeatureClass::HandleOpenedFiles(std::map<wxStri
 
 	// check for renames; an opened file rename will be handled as a deletion for now
 	std::map<wxString, wxString>::iterator renamed;
+	std::map<wxString, mvceditor::CodeControlClass*> openedFilesRenamed;
 	for (renamed = pathsRenamed.begin(); renamed != pathsRenamed.end(); ++renamed) {
 		wxString renamedFrom = renamed->first;
 		if (openedFiles.find(renamedFrom) != openedFiles.end()) {
 			openedFilesDeleted[renamedFrom] = 1;
 		}
+		
+		// check for renames, but check the new paths
+		// if a file was renamed and the new name is an opened file, treat it as modified
+		wxString renamedTo = renamed->second;
+		if (openedFiles.find(renamedTo) != openedFiles.end()) {
+			openedFilesRenamed[renamedTo] = openedFiles[renamedTo];
+		}
 	}
 
 	if (!openedFilesDeleted.empty()) {
 		FilesDeletedPrompt(openedFiles, openedFilesDeleted);
+	}
+	
+	if (!openedFilesRenamed.empty()) {
+		FilesModifiedPrompt(openedFilesRenamed);
 	}
 }
 
@@ -456,6 +494,9 @@ void mvceditor::FileModifiedCheckFeatureClass::HandleNonOpenedFiles(std::map<wxS
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::FilesModifiedPrompt(std::map<wxString, mvceditor::CodeControlClass*>& filesToPrompt) {
+	if (filesToPrompt.empty()) {
+		return;
+	}
 	wxArrayString choices;
 	std::map<wxString, mvceditor::CodeControlClass*>::iterator it;
 	for (it = filesToPrompt.begin(); it != filesToPrompt.end(); ++it) {

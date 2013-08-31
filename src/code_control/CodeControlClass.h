@@ -183,7 +183,7 @@ public:
 	wxString GetFileName() const;
 
 	/**
-	 * @retrurn wxDateTime the time the file was opened
+	 * @retrurn wxDateTime the modification time at the file was opened
 	 */
 	wxDateTime GetFileOpenedDateTime() const;
 
