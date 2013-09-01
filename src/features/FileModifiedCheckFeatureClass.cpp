@@ -321,9 +321,12 @@ void mvceditor::FileModifiedCheckFeatureClass::OnTimer(wxTimerEvent& event) {
 		wxFileName fileName(fullPath);
 		if (fileName.FileExists()) {
 			std::map<wxString, int>::iterator toDelete = it;
+			++it;
 			FilesExternallyDeleted.erase(toDelete);
 		}
-		++it;
+		else {
+			++it;
+		}
 	}
 	
 	// oddity. int linux sometimes we get rename events where the old and new paths
@@ -332,10 +335,13 @@ void mvceditor::FileModifiedCheckFeatureClass::OnTimer(wxTimerEvent& event) {
 	while (rename != pathsRenamed.end()) {
 		if (rename->first == rename->second) {
 			std::map<wxString, wxString>::iterator toDeleteRename = rename;
+			++rename;
 			PathsExternallyModified[rename->first] = 1;
 			pathsRenamed.erase(toDeleteRename);
 		}
-		rename++;
+		else {
+			++rename;
+		}
 	}
 	
 	std::map<wxString, mvceditor::CodeControlClass*> openedFiles = OpenedFiles(GetNotebook());
