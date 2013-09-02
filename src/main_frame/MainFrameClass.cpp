@@ -68,7 +68,7 @@ mvceditor::MainFrameClass::MainFrameClass(const std::vector<mvceditor::FeatureCl
 
 	App.EventSink.PushHandler(&Listener);
 	App.RunningThreads.AddEventHandler(this);
-	
+	App.SqliteRunningThreads.AddEventHandler(this);
 	ToolBar = new wxAuiToolBar(this, ID_TOOLBAR, wxDefaultPosition, wxDefaultSize, 
 		  wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_TEXT | wxAUI_TB_HORZ_TEXT);
 	
@@ -132,7 +132,9 @@ void mvceditor::MainFrameClass::OnClose(wxCloseEvent& event) {
 		App.Sequences.Stop();
 
 		App.RunningThreads.RemoveEventHandler(this);
+		App.SqliteRunningThreads.RemoveEventHandler(this);
 		App.RunningThreads.Shutdown();
+		App.SqliteRunningThreads.Shutdown();
 		
 		// cleanup all open code controls and tabs. this is because
 		// we want to destroy those items because they may have
@@ -343,6 +345,7 @@ void mvceditor::MainFrameClass::OnEditPreferences(wxCommandEvent& event) {
 		// user said yes, we should stop the running tasks
 		App.Sequences.Stop();
 		App.RunningThreads.StopAll();
+		App.SqliteRunningThreads.StopAll();
 	}
 
 	App.StopConfigModifiedCheck();

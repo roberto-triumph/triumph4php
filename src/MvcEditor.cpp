@@ -84,9 +84,10 @@ mvceditor::AppClass::AppClass()
 	: wxApp()
 	, Globals()
 	, RunningThreads()
+	, SqliteRunningThreads()
 	, EventSink()
 	, GlobalsChangeHandler(Globals)
-	, Sequences(Globals, RunningThreads)
+	, Sequences(Globals, SqliteRunningThreads)
 	, Preferences()
 	, ConfigLastModified()
 	, Features()
@@ -100,10 +101,18 @@ mvceditor::AppClass::AppClass()
  * when app starts, create the new app frame
  */
 bool mvceditor::AppClass::OnInit() {
+	
+	// 1 ==> to make sure any queued items are done one at a time
+	SqliteRunningThreads.SetMaxThreads(1);
+	
 	RunningThreads.SetThreadCleanup(new mvceditor::MysqlThreadCleanupClass);
+	
+	// not really needed since we will use this running threads for sqlite actions only,
+	// but just in case
+	SqliteRunningThreads.SetThreadCleanup(new mvceditor::MysqlThreadCleanupClass);
 	Globals.Environment.Init();
 	Preferences.Init();
-	RunningThreads.AddEventHandler(&GlobalsChangeHandler);
+	SqliteRunningThreads.AddEventHandler(&GlobalsChangeHandler);
 	RunningThreads.AddEventHandler(&Timer);
 	CreateFeatures();
 
@@ -252,6 +261,7 @@ void mvceditor::AppClass::CreateFeatures() {
 	for (size_t i = 0; i < Features.size(); ++i) {
 		EventSink.PushHandler(Features[i]);
 		RunningThreads.AddEventHandler(Features[i]);
+		SqliteRunningThreads.AddEventHandler(Features[i]);
 	}
 }
 
@@ -265,6 +275,7 @@ void mvceditor::AppClass::FeatureWindows() {
 void mvceditor::AppClass::DeleteFeatures() {
 	for (size_t i = 0; i < Features.size(); ++i) {
 		RunningThreads.RemoveEventHandler(Features[i]);
+		SqliteRunningThreads.RemoveEventHandler(Features[i]);
 	}
 
 	// disconnect from events so that events dont get sent after

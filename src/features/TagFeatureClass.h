@@ -195,12 +195,6 @@ private:
 	wxTimer Timer;
 
 	/**
-	 * To run any updates to the tag cache serially (one at a time)
-	 * doing this in order to prevent locks on the sqlite db
-	 */
-	mvceditor::RunningThreadsClass RunningThreads;
-
-	/**
 	 * when a 'jump to tag' is done and we need to index a project, we
 	 * need to keep the search string so that after indexing we can
 	 * search the index.

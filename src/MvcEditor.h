@@ -90,6 +90,15 @@ public:
 	 */
 	mvceditor::RunningThreadsClass RunningThreads;
 
+
+	/**
+	 * This is a separate instance of running threads  used specifically for
+	 * updating the tag cache. since sqlite locks the DB on inserts, updates,
+	 * or deletes, we must queue actions that modify the tag cache in order
+	 * to prevent locking errors.
+	 */
+	mvceditor::RunningThreadsClass SqliteRunningThreads;
+
 	/**
 	 * Any features should post any useful events to this event handler
 	 * then all other features will get notified.  This is how
