@@ -870,6 +870,10 @@ std::vector<mvceditor::TagClass> mvceditor::PhpDocumentClass::GetTagsAtPosition(
 	mvceditor::ScopeFinderClass scopeFinder;
 	pelet::ScopeClass expressionScope;
 	pelet::ExpressionClass parsedExpression(expressionScope);
+
+	lexer.SetVersion(Globals->Environment.Php.Version);
+	parser.SetVersion(Globals->Environment.Php.Version);
+	scopeFinder.SetVersion(Globals->Environment.Php.Version);
 	
 	UnicodeString lastExpression = lexer.LastExpression(code);
 	UnicodeString resourceName;
