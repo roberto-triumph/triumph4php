@@ -173,6 +173,14 @@ public:
 	std::vector<mvceditor::SourceClass> AllEnabledPhpSources() const;
 
 	/**
+	 * Same as AllEnabledSources() but it returns the root directories of all enabled
+	 * sources.
+	 *
+	 * @return vector of all root directories of all sources.
+	 */
+	std::vector<wxFileName> AllEnabledSourceDirectories() const;
+
+	/**
 	 * @return vector of all enabled projects
 	 */
 	std::vector<mvceditor::ProjectClass> AllEnabledProjects() const;

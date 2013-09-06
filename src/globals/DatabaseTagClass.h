@@ -391,7 +391,7 @@ public:
 	/**
 	 * @return all of the database tags in all of the attached databases
 	 */
-	std::vector<mvceditor::DatabaseTagClass> All();
+	std::vector<mvceditor::DatabaseTagClass> All(const std::vector<wxFileName>& sourceDirectories);
 
 };
 

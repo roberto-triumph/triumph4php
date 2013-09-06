@@ -82,7 +82,7 @@ public:
 	/**
 	 * @return all of the configs tags in all attached sqlite dbs
 	 */
-	std::vector<mvceditor::ConfigTagClass> All();
+	std::vector<mvceditor::ConfigTagClass> All(const std::vector<wxFileName>& sourceDirectories);
 
 };
 

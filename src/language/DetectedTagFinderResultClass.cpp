@@ -62,6 +62,7 @@ mvceditor::DetectedTagExactMemberResultClass::DetectedTagExactMemberResultClass(
 : SqliteResultClass() 
 , Tag()
 , Keys()
+, SourceDirectories()
 , MemberName()
 , TagTypes()
 , Key()
@@ -111,18 +112,22 @@ void mvceditor::DetectedTagExactMemberResultClass::Next() {
 	Fetch();
 }
 
-void mvceditor::DetectedTagExactMemberResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString &memberName) {
+void mvceditor::DetectedTagExactMemberResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString &memberName,
+		const std::vector<wxFileName>& sourceDirectories) {
 	wxASSERT_MSG(!classNames.empty(), wxT("classNames must not be empty"));
 	for (size_t i = 0; i < classNames.size(); i++) {
 		UnicodeString key = classNames[i] + UNICODE_STRING_SIMPLE("::") + memberName;
 		Keys.push_back(mvceditor::IcuToChar(key));
+	}
+	for (size_t i = 0; i < sourceDirectories.size(); i++) {
+		SourceDirectories.push_back(mvceditor::WxToChar(sourceDirectories[i].GetPathWithSep()));
 	}
 }
 
 bool mvceditor::DetectedTagExactMemberResultClass::Prepare(soci::session &session, bool doLimit) {
 	std::string sql;
 	sql += "SELECT key, type, class_name, method_name, return_type, namespace_name, comment ";
-	sql += "FROM detected_tags WHERE ";
+	sql += "FROM detected_tags LEFT JOIN sources ON (sources.source_id = detected_tags.source_id) WHERE ";
 
 	sql += "key IN (?";
 	for (size_t i = 1; i < Keys.size(); ++i) {
@@ -136,6 +141,13 @@ bool mvceditor::DetectedTagExactMemberResultClass::Prepare(soci::session &sessio
 	}
 	sql += ") ";
 
+	if (!SourceDirectories.empty()) {
+		sql += "AND directory IN(?";
+		for (size_t i = 1; i < SourceDirectories.size(); ++i) {
+			sql += ", ?";
+		}
+		sql += ") ";
+	}
 	sql += "ORDER BY key";
 	if (doLimit) {
 		sql += " LIMIT 100";
@@ -150,6 +162,9 @@ bool mvceditor::DetectedTagExactMemberResultClass::Prepare(soci::session &sessio
 	for (size_t i = 0; i < TagTypes.size(); i++) {
 		stmt->exchange(soci::use(TagTypes[i]));
 	}
+	for (size_t i = 0; i < SourceDirectories.size(); i++) {
+		stmt->exchange(soci::use(SourceDirectories[i]));
+	}
 	return Init(stmt);
 }
 
@@ -159,7 +174,8 @@ mvceditor::DetectedTagNearMatchMemberResultClass::DetectedTagNearMatchMemberResu
 
 }
 
-void mvceditor::DetectedTagNearMatchMemberResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName) {
+void mvceditor::DetectedTagNearMatchMemberResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName,
+		const std::vector<wxFileName>& sourceDirectories) {
 	wxASSERT_MSG(!classNames.empty(), wxT("classNames must not be empty"));
 	for (size_t i = 0; i < classNames.size(); i++) {
 		UnicodeString key = classNames[i] + UNICODE_STRING_SIMPLE("::") + memberName;
@@ -169,12 +185,15 @@ void mvceditor::DetectedTagNearMatchMemberResultClass::Set(const std::vector<Uni
 		Keys.push_back(mvceditor::IcuToChar(key) + "zzzzzzzzzz");
 	}
 	ClassCount = classNames.size();
+	for (size_t i = 0; i < sourceDirectories.size(); i++) {
+		SourceDirectories.push_back(mvceditor::WxToChar(sourceDirectories[i].GetPathWithSep()));
+	}
 }
 
 bool mvceditor::DetectedTagNearMatchMemberResultClass::Prepare(soci::session &session, bool doLimit) {
 	std::string sql;
 	sql += "SELECT key, type, class_name, method_name, return_type, namespace_name, comment ";
-	sql += "FROM detected_tags WHERE ";
+	sql += "FROM detected_tags LEFT JOIN sources ON (sources.source_id = detected_tags.source_id) WHERE ";
 
 	// not using LIKE operator here, there are way too many situations where sqlite won't use the index
 	// index won't be used when ESCAPE is used or when sqlite3_prepare_v2 is NOT used (which soci does not use)
@@ -193,6 +212,14 @@ bool mvceditor::DetectedTagNearMatchMemberResultClass::Prepare(soci::session &se
 	}
 	sql += ") ";
 
+	if (!SourceDirectories.empty()) {
+		sql += "AND directory IN(?";
+		for (size_t i = 1; i < SourceDirectories.size(); ++i) {
+			sql += ", ?";
+		}
+		sql += ") ";
+	}
+
 	sql += "ORDER BY key";
 	if (doLimit) {
 		sql += " LIMIT 100";
@@ -206,6 +233,9 @@ bool mvceditor::DetectedTagNearMatchMemberResultClass::Prepare(soci::session &se
 	}
 	for (size_t i = 0; i < TagTypes.size(); i++) {
 		stmt->exchange(soci::use(TagTypes[i]));
+	}
+	for (size_t i = 0; i < SourceDirectories.size(); i++) {
+		stmt->exchange(soci::use(SourceDirectories[i]));
 	}
 	return Init(stmt);
 }

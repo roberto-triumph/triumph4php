@@ -37,11 +37,14 @@ class MvcEditor_DetectedTagTable extends Zend_Db_Table_Abstract {
 	 *
 	 * @param MvcEditor_DetectedTag[] $allTags the tags to save
 	 */
-	public function saveTags($allTags) {
+	public function saveTags($allTags, $sourceDir) {
 		
 		// remove all tags from previous detection. since there is no
 		// easy way to tell of duplicates
-		$this->deleteAll();
+		$sourceDbTable = new MvcEditor_SourceTable($this->getAdapter());
+		$sourceId = $sourceDbTable->getOrSave($sourceDir);
+		$strWhere = $this->getAdapter()->quoteInto("source_id = ?", $sourceId);
+		$this->delete($strWhere);
 		
 		if (empty($allTags)) {
 			return ;
@@ -55,6 +58,7 @@ class MvcEditor_DetectedTagTable extends Zend_Db_Table_Abstract {
 			// just the method name; that way qualified lookups
 			// work 
 			$this->insert(array(
+				'source_id' => $sourceId,
 				'key' => $tag->className . '::' . $tag->identifier,
 				'type' => $tag->type,
 				'class_name' => $tag->className,
@@ -65,6 +69,7 @@ class MvcEditor_DetectedTagTable extends Zend_Db_Table_Abstract {
 			));
 			
 			$this->insert(array(
+				'source_id' => $sourceId,
 				'key' => $tag->identifier,
 				'type' => $tag->type,
 				'class_name' => $tag->className,
@@ -76,12 +81,4 @@ class MvcEditor_DetectedTagTable extends Zend_Db_Table_Abstract {
 		}
 		$this->getAdapter()->commit();
  	}
-	
-	/**
-	 * DELETEs all of the tags from the detected_tags table.
-	 */
-	public function deleteAll() {
-		$this->delete('');
-	}
-	
 }

@@ -113,7 +113,7 @@ public:
 	 *
 	 * @return TRUE if there is a URL resource that has the given URL member
 	 */
-	bool FindByUrl(const wxURI& url, UrlTagClass& urlTag);
+	bool FindByUrl(const wxURI& url, const std::vector<wxFileName>& sourceDirs, UrlTagClass& urlTag);
 
 	/**
 	 * check to see if the given class / method is a URL entry point. If the class/method combination
@@ -123,7 +123,7 @@ public:
 	 *
 	 * @return TRUE if there is a URL resource that has the given controller class name AND method name
 	 */
-	bool FindByClassMethod(const wxString& className, const wxString& methodName, UrlTagClass& urlTag);
+	bool FindByClassMethod(const wxString& className, const wxString& methodName, const std::vector<wxFileName>& sourceDirs, UrlTagClass& urlTag);
 
 	/**
 	 * Get all Url tags that have their FullPath equal to fullPath. if the URL
@@ -133,7 +133,7 @@ public:
 	 *
 	 * @return TRUE if there is a URL resource that has the given full path
 	 */
-	bool FilterByFullPath(const wxString& fullPath, std::vector<UrlTagClass>& urlTags);
+	bool FilterByFullPath(const wxString& fullPath, const std::vector<wxFileName>& sourceDirs, std::vector<UrlTagClass>& urlTags);
 
 	/**
 	 * Searches all URLs for the URLs that match the given filter; and will copy matching
@@ -142,34 +142,34 @@ public:
 	 *        No wildcards are accepted.
 	 * @param matchedUrls matching URLs will be pushed into the given vector.
 	 */
-	void FilterUrls(const wxString& filter, std::vector<UrlTagClass>& matchedUrls);
+	void FilterUrls(const wxString& filter, const std::vector<wxFileName>& sourceDirs, std::vector<UrlTagClass>& matchedUrls);
 
 	/**
 	 * @param url the URL to delete from this list.
 	 */
-	void DeleteUrl(const wxURI& url);
+	void DeleteUrl(const wxURI& url, const std::vector<wxFileName>& sourceDirs);
 
 	/**
 	 * Removes all URLs from the backing databases. This is a destructive operation;
 	 * if you just want to close the opened connections use the Close method
 	 */
-	void Wipe();
+	void Wipe(const std::vector<wxFileName>& sourceDirs);
 
 	/**
 	 * @return int number of urls
 	 */
-	int Count();
+	int Count(const std::vector<wxFileName>& sourceDirs);
 
 	/**
 	 * returns all of the controller names that were detected
 	 */
-	std::vector<wxString> AllControllerNames();
+	std::vector<wxString> AllControllerNames(const std::vector<wxFileName>& sourceDirs);
 
 	/**
 	 * returns all of the method names that were detected. These are just the 
 	 * methods from the detected URLs.
 	 */
-	std::vector<wxString> AllMethodNames(const wxString& controllerClassName);
+	std::vector<wxString> AllMethodNames(const wxString& controllerClassName, const std::vector<wxFileName>& sourceDirs);
 
 };
 	

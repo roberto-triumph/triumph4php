@@ -179,13 +179,15 @@ void mvceditor::DatabaseTagDetectorInitActionClass::Work(mvceditor::GlobalsClass
 		}
 	}
 
+	std::vector<wxFileName> sourceDirectories = globals.AllEnabledSourceDirectories();
+
 	// initialize the detected tag cache only the enabled projects	
 	mvceditor::DatabaseTagFinderClass finder;
 
 	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(globals.DetectorCacheDbFileName.GetFullPath()));
 	finder.InitSession(&session);
 	
-	std::vector<mvceditor::DatabaseTagClass> detected = finder.All();
+	std::vector<mvceditor::DatabaseTagClass> detected = finder.All(sourceDirectories);
 	std::vector<mvceditor::DatabaseTagClass>::const_iterator tag;
 	for (tag = detected.begin(); tag != detected.end(); ++tag) {
 		if (!tag->Host.isEmpty() && !tag->Schema.isEmpty()) {

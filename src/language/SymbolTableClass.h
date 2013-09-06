@@ -322,6 +322,7 @@ public:
 	 * @param parsedExpression the expression to resolve. This is usually the result of the ParserClass::ParserExpression
 	 * @param expressionScope the scope where parsed expression is located.  The scope let's us know which variables are
 	 *        available. See ScopeFinderClass for more info.
+	 * @param sourceDirs the list of enabled source directories, only tags whose source_id matches source directories will be returned
 	 * @param tagFinderList all of the tag finders to look in
 	 * @param autoCompleteVariableList the results of the matches; these are the names of the variables that
 	 *        are "near matches" to the parsed expression. This will be filled only when parsedExpression is a variable. 
@@ -333,7 +334,9 @@ public:
 	 *        slower because TagFinderClass still handles them
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear() )
 	 */
-	void ExpressionCompletionMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope, 
+	void ExpressionCompletionMatches(pelet::ExpressionClass parsedExpression, 
+		const pelet::ScopeClass& expressionScope, 
+		const std::vector<wxFileName>& sourceDirs,
 		mvceditor::TagFinderListClass& tagFinderList,
 		std::vector<UnicodeString>& autoCompleteVariableList,
 		std::vector<TagClass>& autoCompleteResourceList,
@@ -357,6 +360,7 @@ public:
 	 * @param parsedExpression the expression to resolve. This is usually the result of the ParserClass::ParserExpression
 	 * @param expressionScope the scope where parsed expression is located.  The scope let's us know which variables are
 	 *        available. See ScopeFinderClass for more info.
+	 * @param sourceDirs the list of enabled source directories, only tags whose source_id matches source directories will be returned
 	 * @param tagFinderList the tag finders to look in
 	 * @param resourceMatches the tag matches; these are the names of the items that
 	 *        are "near matches" to the parsed expression.
@@ -367,7 +371,9 @@ public:
 	 *        returned
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
-	void ResourceMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope, 
+	void ResourceMatches(pelet::ExpressionClass parsedExpression, 
+		const pelet::ScopeClass& expressionScope, 
+		const std::vector<wxFileName>& sourceDirs,
 		mvceditor::TagFinderListClass& tagFinderList,
 		std::vector<TagClass>& resourceMatches,
 		bool doDuckTyping, bool doFullyQualifiedMatchOnly,

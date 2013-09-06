@@ -61,13 +61,16 @@ public:
 
 	bool Prepare(soci::session& session, bool doLimit);
 
-	virtual void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName);
+	virtual void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, 
+		const std::vector<wxFileName>& sourceDirectories);
 
 	void Next();
 
 protected:
 	
 	std::vector<std::string> Keys;
+
+	std::vector<std::string> SourceDirectories;
 
 	std::string MemberName;
 
@@ -98,7 +101,8 @@ public:
 
 	bool Prepare(soci::session& session, bool doLimit);
 
-	void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName);
+	void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, 
+		const std::vector<wxFileName>& sourceDirectories);
 
 private:
 

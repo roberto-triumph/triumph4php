@@ -38,17 +38,16 @@ class MvcEditor_ConfigTagTable extends Zend_Db_Table_Abstract {
 	public function saveConfigTags($configTags, $sourceDir) {
 		
 		// delete all old config tags
-		/// make sure that sourceDir ends with the separator to make sure
-		// only the correct entries are deleted
-		$sourceDir = \opstring\ensure_ends_with($sourceDir, DIRECTORY_SEPARATOR);
-		$strWhere = $this->getAdapter()->quoteInto("source_dir_full_path = ?", $sourceDir);
+		$sourceDbTable = new MvcEditor_SourceTable($this->getAdapter());
+		$sourceId = $sourceDbTable->getOrSave($sourceDir);
+		$strWhere = $this->getAdapter()->quoteInto("source_id = ?", $sourceId);
 		$this->delete($strWhere);
 		
 		// sqlite optimizes transactions really well; use transaction so that the inserts are faster
 		$this->getAdapter()->beginTransaction();
 		foreach ($configTags as $configTag) {
 			$this->insert(array(
-				'source_dir_full_path' => $sourceDir,
+				'source_id' => $sourceId,
 				'label' => $configTag->label,
 				'full_path' => $configTag->fullPath
 			));

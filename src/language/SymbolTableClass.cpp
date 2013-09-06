@@ -144,6 +144,7 @@ static bool IsStaticExpression(const pelet::ExpressionClass& parsedExpression) {
 
  * @see VariableObserverClass
  * @param expressionScope needed to use the symbol table
+ * @param sourceDirs only tags from matching source directories will be returned
  * @param allTagFinders needed to use the symbol table
  * @param doDuckTyping
  * @param error any symbol table errors will be written here
@@ -157,6 +158,7 @@ static bool IsStaticExpression(const pelet::ExpressionClass& parsedExpression) {
  * @return the variable's type; could be empty string if type could not be determined 
  */
 static UnicodeString ResolveVariableType(const pelet::ScopeClass& expressionScope, 
+										 const std::vector<wxFileName>& sourceDirs,
 										 mvceditor::TagFinderListClass& tagFinderList,
 										 bool doDuckTyping,
 										 mvceditor::SymbolTableMatchErrorClass& error,
@@ -188,7 +190,7 @@ static UnicodeString ResolveVariableType(const pelet::ScopeClass& expressionScop
 				// the  ResolveResourceType will get the function return type
 				// if the variable was created from a function.
 				UnicodeString resourceToLookup = symbol.ChainList[0].Name;
-				type = tagFinderList.ResolveResourceType(resourceToLookup);
+				type = tagFinderList.ResolveResourceType(resourceToLookup, sourceDirs);
 			}
 			else if (!symbol.ChainList.empty()) {
 				
@@ -199,7 +201,7 @@ static UnicodeString ResolveVariableType(const pelet::ScopeClass& expressionScop
 
 				parsedExpression.ChainList = symbol.ChainList;
 				std::vector<mvceditor::TagClass> resourceMatches;
-				symbolTable.ResourceMatches(parsedExpression, expressionScope, 
+				symbolTable.ResourceMatches(parsedExpression, expressionScope, sourceDirs,
 					tagFinderList, resourceMatches, doDuckTyping, false, error);
 				if (!resourceMatches.empty()) {
 					if (mvceditor::TagClass::CLASS == resourceMatches[0].Type) {
@@ -222,6 +224,7 @@ static UnicodeString ResolveVariableType(const pelet::ScopeClass& expressionScop
  * is not trivial; that's why it was separated.
  *
  * @param parsedExpression the expression to resolved.
+ * @param sourceDirs tags from matching source directories will be returned
  * @param scope the scope (to resolve variables)
  * @param allTagFinders all of the finders to look in
  * @param openedResourceFinder the tag finder for the opened files
@@ -229,6 +232,7 @@ static UnicodeString ResolveVariableType(const pelet::ScopeClass& expressionScop
  */
 static UnicodeString ResolveInitialLexemeType(const pelet::ExpressionClass& parsedExpression, 
 											  const pelet::ScopeClass& expressionScope, 
+											  const std::vector<wxFileName>& sourceDirs,
 											  mvceditor::TagFinderListClass& tagFinderList,
 											  bool doDuckTyping,
 											  mvceditor::SymbolTableMatchErrorClass& error,
@@ -239,7 +243,7 @@ static UnicodeString ResolveInitialLexemeType(const pelet::ExpressionClass& pars
 	if (start.startsWith(UNICODE_STRING_SIMPLE("$"))) {
 		
 		// a variable. look at the type from the symbol table
-		typeToLookup = ResolveVariableType(expressionScope, tagFinderList, doDuckTyping, error, 
+		typeToLookup = ResolveVariableType(expressionScope, sourceDirs, tagFinderList, doDuckTyping, error, 
 				start, scopeSymbols, symbolTable);
 	}
 	else if (start.caseCompare(UNICODE_STRING_SIMPLE("self"), 0) == 0){
@@ -278,7 +282,7 @@ static UnicodeString ResolveInitialLexemeType(const pelet::ExpressionClass& pars
 			typeToLookup = start;
 		}
 		else {
-			typeToLookup = tagFinderList.ResolveResourceType(start);
+			typeToLookup = tagFinderList.ResolveResourceType(start, sourceDirs);
 		}
 	}
 	else {
@@ -486,7 +490,9 @@ void mvceditor::SymbolTableClass::CreateSymbolsFromFile(const wxString& fileName
 	}
 }
 
-void mvceditor::SymbolTableClass::ExpressionCompletionMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope,
+void mvceditor::SymbolTableClass::ExpressionCompletionMatches(pelet::ExpressionClass parsedExpression, 
+															  const pelet::ScopeClass& expressionScope,
+															  const std::vector<wxFileName>& sourceDirs,
 															  mvceditor::TagFinderListClass& tagFinderList,
 															  std::vector<UnicodeString>& autoCompleteVariableList,
 															  std::vector<mvceditor::TagClass>& autoCompleteResourceList,
@@ -511,12 +517,14 @@ void mvceditor::SymbolTableClass::ExpressionCompletionMatches(pelet::ExpressionC
 	else {
 
 		// some kind of function call / method chain call
-		ResourceMatches(parsedExpression, expressionScope, tagFinderList,
+		ResourceMatches(parsedExpression, expressionScope, sourceDirs, tagFinderList,
 			autoCompleteResourceList, doDuckTyping, false, error);
 	}	
 }
 
-void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedExpression, const pelet::ScopeClass& expressionScope, 
+void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedExpression, 
+												  const pelet::ScopeClass& expressionScope, 
+												  const std::vector<wxFileName>& sourceDirs,
 												  mvceditor::TagFinderListClass& tagFinderList,
 												  std::vector<mvceditor::TagClass>& resourceMatches,
 												  bool doDuckTyping, bool doFullyQualifiedMatchOnly,
@@ -532,7 +540,7 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 	pelet::ExpressionClass originalExpression = parsedExpression;
 	ResolveNamespaceAlias(parsedExpression, expressionScope);
 	
-	UnicodeString typeToLookup = ResolveInitialLexemeType(parsedExpression, expressionScope, tagFinderList, 
+	UnicodeString typeToLookup = ResolveInitialLexemeType(parsedExpression, expressionScope, sourceDirs, tagFinderList, 
 		doDuckTyping, error, scopeSymbols, *this);
 
 	// continue to the next item in the chain up until the second to last one
@@ -548,7 +556,7 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 		// need the empty check so that we don't overflow when doing 0 - 1 with size_t 
 		for (size_t i = 1;  i < (parsedExpression.ChainList.size() - 1) && !typeToLookup.isEmpty() && !error.HasError(); ++i) {	
 			UnicodeString nextResource = typeToLookup + UNICODE_STRING_SIMPLE("::") + parsedExpression.ChainList[i].Name;
-			UnicodeString resolvedType = tagFinderList.ResolveResourceType(nextResource);
+			UnicodeString resolvedType = tagFinderList.ResolveResourceType(nextResource, sourceDirs);
 
 			if (resolvedType.isEmpty()) {
 				error.ToTypeResolution(typeToLookup, parsedExpression.ChainList[i].Name);
@@ -589,8 +597,9 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 
 	if (!error.HasError()) {
 		mvceditor::TagSearchClass tagSearch(resourceToLookup);
+		tagSearch.SetSourceDirs(sourceDirs);
 		tagSearch.SetParentClasses(tagFinderList.ClassParents(tagSearch.GetClassName(), tagSearch.GetMethodName()));
-		tagSearch.SetTraits(tagFinderList.ClassUsedTraits(tagSearch.GetClassName(), tagSearch.GetParentClasses(), tagSearch.GetMethodName()));
+		tagSearch.SetTraits(tagFinderList.ClassUsedTraits(tagSearch.GetClassName(), tagSearch.GetParentClasses(), tagSearch.GetMethodName(), sourceDirs));
 		
 		// only do duck typing if needed. otherwise, make sure that we have a type match first.
 		std::vector<mvceditor::TagClass> matches;

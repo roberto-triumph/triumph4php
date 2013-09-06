@@ -76,9 +76,9 @@ mvceditor::UrlTagFinderClass::UrlTagFinderClass()
 		
 }
 
-bool mvceditor::UrlTagFinderClass::FindByUrl(const wxURI& url, mvceditor::UrlTagClass& urlTag) {
+bool mvceditor::UrlTagFinderClass::FindByUrl(const wxURI& url, const std::vector<wxFileName>& sourceDirs, mvceditor::UrlTagClass& urlTag) {
 	bool ret = false;
-	if (!Session) {
+	if (!Session || sourceDirs.empty()) {
 		return ret;
 	}
 	std::string stdUrlWhere = mvceditor::WxToChar(url.BuildURI());
@@ -86,13 +86,30 @@ bool mvceditor::UrlTagFinderClass::FindByUrl(const wxURI& url, mvceditor::UrlTag
 	std::string stdFullPath;
 	std::string stdClassName;
 	std::string stdMethodName;
+	std::string sql = "SELECT url, full_path, class_name, method_name ";
+	sql += "FROM url_tags LEFT JOIN sources ON sources.source_id = url_tags.source_id) ";
+	sql += "WHERE  url = ? AND directory IN(";
+	std::vector<std::string> stdSourceDirs;
+	for (size_t i = 0; i < sourceDirs.size(); ++i) {
+		stdSourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+		if (0 == i) {
+			sql += "?";
+		}
+		else {
+			sql += ",?";
+		}
+	}
+	sql += ")";
 	try {
-		soci::statement stmt = (Session->prepare << 
-			"SELECT url, full_path, class_name, method_name FROM url_tags WHERE url = ? ",
-			soci::use(stdUrlWhere),
-			soci::into(stdUrl), soci::into(stdFullPath), 
-			soci::into(stdClassName), soci::into(stdMethodName) 
-		);
+		soci::statement stmt = Session->prepare << sql;
+		stmt.exchange(soci::use(stdUrlWhere));
+		stmt.exchange(soci::into(stdUrl));
+		stmt.exchange(soci::into(stdFullPath));
+		stmt.exchange(soci::into(stdClassName));
+		stmt.exchange(soci::into(stdMethodName));
+		for (size_t i = 0; i < stdSourceDirs.size(); ++i) {
+			stmt.exchange(soci::use(stdSourceDirs[i]));
+		}
 		if (stmt.execute(true)) {
 			urlTag.Url.Create(mvceditor::CharToWx(stdUrl.c_str()));
 			urlTag.FileName.Assign(mvceditor::CharToWx(stdFullPath.c_str()));
@@ -108,9 +125,9 @@ bool mvceditor::UrlTagFinderClass::FindByUrl(const wxURI& url, mvceditor::UrlTag
 	return ret;
 }
 
-bool mvceditor::UrlTagFinderClass::FindByClassMethod(const wxString& className, const wxString& methodName, mvceditor::UrlTagClass& urlTag) {
+bool mvceditor::UrlTagFinderClass::FindByClassMethod(const wxString& className, const wxString& methodName, const std::vector<wxFileName>& sourceDirs, mvceditor::UrlTagClass& urlTag) {
 	bool ret = false;
-	if (!Session) {
+	if (!Session || sourceDirs.empty()) {
 		return ret;
 	}
 	std::string stdClassNameWhere = mvceditor::WxToChar(className);
@@ -120,13 +137,31 @@ bool mvceditor::UrlTagFinderClass::FindByClassMethod(const wxString& className, 
 	std::string stdFullPath;
 	std::string stdClassName;
 	std::string stdMethodName;
+	std::string sql = "SELECT url, full_path, class_name, method_name ";
+	sql += "FROM url_tags LEFT JOIN sources ON sources.source_id = url_tags.source_id";
+	sql += "WHERE class_name = ? AND method_name = ? AND directory IN(";
+	std::vector<std::string> stdSourceDirs;
+	for (size_t i = 0; i < sourceDirs.size(); ++i) {
+		stdSourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+		if (0 == i) {
+			sql += "?";
+		}
+		else {
+			sql += ",?";
+		}
+	}
+	sql += ")";
 	try {
-		soci::statement stmt = (Session->prepare << 
-			"SELECT url, full_path, class_name, method_name FROM url_tags WHERE class_name = ? AND method_name = ?",
-			soci::use(stdClassNameWhere), soci::use(stdMethodNameWhere),
-			soci::into(stdUrl), soci::into(stdFullPath), 
-			soci::into(stdClassName), soci::into(stdMethodName) 
-		);
+		soci::statement stmt = Session->prepare << sql;
+		stmt.exchange(soci::into(stdUrl));
+		stmt.exchange(soci::into(stdFullPath));
+		stmt.exchange(soci::into(stdClassName));
+		stmt.exchange(soci::into(stdMethodName));
+		stmt.exchange(soci::use(stdClassNameWhere));
+		stmt.exchange(soci::use(stdMethodNameWhere));
+		for (size_t i = 0; i < stdSourceDirs.size(); ++i) {
+			stmt.exchange(soci::use(stdSourceDirs[i]));
+		}
 		if (stmt.execute(true)) {
 			urlTag.Url.Create(mvceditor::CharToWx(stdUrl.c_str()));
 			urlTag.FileName.Assign(mvceditor::CharToWx(stdFullPath.c_str()));
@@ -142,7 +177,7 @@ bool mvceditor::UrlTagFinderClass::FindByClassMethod(const wxString& className, 
 	return ret;
 }
 
-bool mvceditor::UrlTagFinderClass::FilterByFullPath(const wxString& fullPath, std::vector<UrlTagClass>& urlTags) {
+bool mvceditor::UrlTagFinderClass::FilterByFullPath(const wxString& fullPath, const std::vector<wxFileName>& sourceDirs, std::vector<UrlTagClass>& urlTags) {
 	bool ret = false;
 	if (!Session) {
 		return ret;
@@ -153,13 +188,30 @@ bool mvceditor::UrlTagFinderClass::FilterByFullPath(const wxString& fullPath, st
 	std::string stdFullPath;
 	std::string stdClassName;
 	std::string stdMethodName;
+	std::string sql = "SELECT url, full_path, class_name, method_name ";
+	sql += "FROM url_tags LEFT JOIN sources ON (sources.source_id = url_tags.source_id)";
+	sql += "WHERE full_path = ? AND directory IN(";
+	std::vector<std::string> stdSourceDirs;
+	for (size_t i = 0; i < sourceDirs.size(); ++i) {
+		stdSourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+		if (0 == i) {
+			sql += "?";
+		}
+		else {
+			sql += ",?";
+		}
+	}
+	sql += ")";
 	try {
-		soci::statement stmt = (Session->prepare << 
-			"SELECT url, full_path, class_name, method_name FROM url_tags WHERE full_path = ?",
-			soci::use(stdFullPathWhere),
-			soci::into(stdUrl), soci::into(stdFullPath), 
-			soci::into(stdClassName), soci::into(stdMethodName) 
-		);
+		soci::statement stmt = Session->prepare << sql;
+		stmt.exchange(soci::into(stdUrl));
+		stmt.exchange(soci::into(stdFullPath));
+		stmt.exchange(soci::into(stdClassName));
+		stmt.exchange(soci::into(stdMethodName));
+		stmt.exchange(soci::use(stdFullPathWhere));
+		for (size_t i = 0; i < stdSourceDirs.size(); ++i) {
+			stmt.exchange(soci::use(stdSourceDirs[i]));
+		}
 		if (stmt.execute(true)) {
 			mvceditor::UrlTagClass urlTag;
 			urlTag.Url.Create(mvceditor::CharToWx(stdUrl.c_str()));
@@ -178,12 +230,14 @@ bool mvceditor::UrlTagFinderClass::FilterByFullPath(const wxString& fullPath, st
 	return ret;
 }
 
-void mvceditor::UrlTagFinderClass::DeleteUrl(const wxURI& url) {
-	if (!Session) {
+void mvceditor::UrlTagFinderClass::DeleteUrl(const wxURI& url, const std::vector<wxFileName>& sourceDirs) {
+	if (!Session || sourceDirs.empty()) {
 		return;
 	}
 	std::string stdUrl = mvceditor::WxToChar(url.BuildURI());
 	try {
+		
+		// TODO query for source ids
 		soci::statement stmt = (Session->prepare << 
 			"DELETE FROM url_tags WHERE url = ? ",
 			soci::use(stdUrl)
@@ -196,7 +250,7 @@ void mvceditor::UrlTagFinderClass::DeleteUrl(const wxURI& url) {
 	}
 }
 
-void mvceditor::UrlTagFinderClass::FilterUrls(const wxString& filter, std::vector<UrlTagClass>& matchedUrls) {
+void mvceditor::UrlTagFinderClass::FilterUrls(const wxString& filter, const std::vector<wxFileName>& sourceDirs, std::vector<UrlTagClass>& matchedUrls) {
 	if (!Session) {
 		return;
 	}
@@ -210,13 +264,28 @@ void mvceditor::UrlTagFinderClass::FilterUrls(const wxString& filter, std::vecto
 	// hmmm... query might not be optimal for 1000s of urls
 	// not sure if the number of urls will go into the 1000s
 	std::string sql = "SELECT url, full_path, class_name, method_name ";
-	sql += "FROM url_tags WHERE url LIKE '%" + escaped + "%' ESCAPE '^' LIMIT 100";
-
+	sql += "FROM url_tags LEFT JOIN sources ON(sources.source_id = url_tags.source_id) ";
+	sql += "WHERE url LIKE '%" + escaped + "%' ESCAPE '^'  AND directory IN(";
+	std::vector<std::string> stdSourceDirs;
+	for (size_t i = 0; i < sourceDirs.size(); ++i) {
+		stdSourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+		if (0 == i) {
+			sql += "?";
+		}
+		else {
+			sql += ",?";
+		}
+	}
+	sql += ") LIMIT 100";
 	try {
-		soci::statement stmt = (Session->prepare << sql,
-			soci::into(stdUrl), soci::into(stdFullPath),
-			soci::into(stdClassName), soci::into(stdMethodName)
-		);
+		soci::statement stmt = Session->prepare << sql;
+		stmt.exchange(soci::into(stdUrl));
+		stmt.exchange(soci::into(stdFullPath));
+		stmt.exchange(soci::into(stdClassName));
+		stmt.exchange(soci::into(stdMethodName));
+		for (size_t i = 0; i < stdSourceDirs.size(); ++i) {
+			stmt.exchange(soci::use(stdSourceDirs[i]));
+		}
 		if (stmt.execute(true)) {
 			do {
 				mvceditor::UrlTagClass urlTag;
@@ -236,12 +305,27 @@ void mvceditor::UrlTagFinderClass::FilterUrls(const wxString& filter, std::vecto
 	}
 }
 
-void mvceditor::UrlTagFinderClass::Wipe() {
-	if (!Session) {
+void mvceditor::UrlTagFinderClass::Wipe(const std::vector<wxFileName>& sourceDirs) {
+	if (!Session || sourceDirs.empty()) {
 		return;
 	}
 	try {
-		Session->once << "DELETE FROM url_tags";
+		std::vector<std::string> stdSourceDirs;
+		std::string sql = "DELETE FROM url_tags WHERE source_id IN(SELECT source_id FROM sources WHERE directory IN("; 
+		for (size_t i = 0; i < sourceDirs.size(); ++ i) {
+			stdSourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+			if (0 == i) {
+				sql += "?";
+			}
+			else {
+				sql += ",?";
+			}
+		}
+		sql += "))"; 
+		soci::statement stmt = Session->prepare << sql;
+		for (size_t i = 0; i < stdSourceDirs.size(); ++i) {
+			stmt.exchange(soci::use(stdSourceDirs[i]));
+		}
 	} catch (std::exception& e) {
 		wxUnusedVar(e);
 		wxString msg = mvceditor::CharToWx(e.what());
@@ -249,19 +333,34 @@ void mvceditor::UrlTagFinderClass::Wipe() {
 	}
 }
 
-int mvceditor::UrlTagFinderClass::Count() {
+int mvceditor::UrlTagFinderClass::Count(const std::vector<wxFileName>& sourceDirs) {
 	int totalCount = 0;
-	if (!Session) {
+	if (!Session || sourceDirs.empty()) {
 		return totalCount;
 	}
 	int dbCount;
+	std::string sql = "SELECT COUNT(*) ";
+	sql += "FROM url_tags LEFT JOIN sources ON(sources.source_id = url_tags.source_id)";
+	sql += "WHERE directory IN(";
+	std::vector<std::string> stdSourceDirs;
+	for (size_t i = 0; i < sourceDirs.size(); ++i) {
+		stdSourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+		if (0 == i) {
+			sql += "?";
+		}
+		else {
+			sql += ",?";
+		}
+	}
+	sql += ")";
+	
 	try {
-		soci::statement stmt = (
-			Session->prepare << "SELECT COUNT(*) FROM url_tags", 
-			soci::into(dbCount));
+		soci::statement stmt = Session->prepare << sql;
+		stmt.exchange(soci::into(dbCount));
+		for (size_t i = 0; i < stdSourceDirs.size(); ++i) {
+			stmt.exchange(soci::use(stdSourceDirs[i]));
+		}
 		stmt.execute(true);
-
-		// aggregate counts across all dbs
 		totalCount += dbCount;
 	} catch (std::exception& e) {
 		wxUnusedVar(e);
@@ -271,17 +370,32 @@ int mvceditor::UrlTagFinderClass::Count() {
 	return totalCount;
 }
 
-std::vector<wxString> mvceditor::UrlTagFinderClass::AllControllerNames() {
+std::vector<wxString> mvceditor::UrlTagFinderClass::AllControllerNames(const std::vector<wxFileName>& sourceDirs) {
 	std::vector<wxString> controllerNames;
-	if (!Session) {
+	if (!Session || sourceDirs.empty()) {
 		return controllerNames;
 	}
-	std::vector<soci::session*>::iterator session;
 	std::string controller;
+	std::string sql = "SELECT DISTINCT class_name ";
+	sql += "FROM url_tags LEFT JOIN sources ON(sources.source_id = url_tags.source_id)";
+	sql += "WHERE directory IN(";
+	std::vector<std::string> stdSourceDirs;
+	for (size_t i = 0; i < sourceDirs.size(); ++i) {
+		stdSourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+		if (0 == i) {
+			sql += "?";
+		}
+		else {
+			sql += ",?";
+		}
+	}
+	sql += ")";
 	try {
-		soci::statement stmt = (Session->prepare <<
-			"SELECT DISTINCT class_name FROM url_tags", soci::into(controller)
-		);
+		soci::statement stmt = Session->prepare << sql;
+		stmt.exchange(soci::into(controller));
+		for (size_t i = 0; i < stdSourceDirs.size(); ++i) {
+			stmt.exchange(soci::use(stdSourceDirs[i]));
+		}
 		if (stmt.execute(true)) {
 			do {
 				controllerNames.push_back(mvceditor::CharToWx(controller.c_str()));
@@ -296,18 +410,35 @@ std::vector<wxString> mvceditor::UrlTagFinderClass::AllControllerNames() {
 	return controllerNames;
 }
 
-std::vector<wxString> mvceditor::UrlTagFinderClass::AllMethodNames(const wxString& controllerClassName) {
+std::vector<wxString> mvceditor::UrlTagFinderClass::AllMethodNames(const wxString& controllerClassName, const std::vector<wxFileName>& sourceDirs) {
 	std::vector<wxString> methodNames;
-	if (!Session) {
+	if (!Session || sourceDirs.empty()) {
 		return methodNames;
 	}
 	std::string methodName;
 	std::string controllerWhere = mvceditor::WxToChar(controllerClassName);
+	std::string sql = "SELECT DISTINCT method_name ";
+	sql += "FROM url_tags LEFT JOIN sources ON(sources.source_id = url_tags.source_id)";
+	sql += "WHERE class_name  = ? directory IN(";
+	std::vector<std::string> stdSourceDirs;
+	for (size_t i = 0; i < sourceDirs.size(); ++i) {
+		stdSourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+		if (0 == i) {
+			sql += "?";
+		}
+		else {
+			sql += ",?";
+		}
+	}
+	sql += ")";
+	
 	try {
-		soci::statement stmt = (Session->prepare <<
-			"SELECT DISTINCT method_name FROM url_tags WHERE class_name = ?", 
-			soci::use(controllerWhere), soci::into(methodName)
-		);
+		soci::statement stmt = Session->prepare << sql;
+		stmt.exchange(soci::into(methodName));
+		stmt.exchange(soci::use(controllerWhere));
+		for (size_t i = 0; i < stdSourceDirs.size(); ++i) {
+			stmt.exchange(soci::use(stdSourceDirs[i]));
+		}
 		if (stmt.execute(true)) {
 			do {
 				methodNames.push_back(mvceditor::CharToWx(methodName.c_str()));

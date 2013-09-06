@@ -107,6 +107,11 @@ private:
 	void FillUrlList(const std::vector<mvceditor::UrlTagClass>& urls);
 
 	/**
+	 * @return list of source directories 
+	 */
+	std::vector<wxFileName> ActiveSourceDirectories();
+
+	/**
 	 * The list of URLs, it will contain URLs that were detected and URLs that were input
 	 * by the user.
 	 * This pointer will not be owned by thie class

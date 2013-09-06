@@ -461,6 +461,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 	Parser.SetVersion(Globals->Environment.Php.Version);
 	ScopeFinder.SetVersion(Globals->Environment.Php.Version);
 	
+	std::vector<wxFileName> sourceDirs = Globals->AllEnabledSourceDirectories();
 	std::vector<wxString> autoCompleteList;
 	std::vector<UnicodeString> variableMatches;
 	int expressionPos = code.length() - 1;
@@ -474,7 +475,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 	if (!lastExpression.isEmpty()) {
 		Parser.ParseExpression(lastExpression, parsedExpression);
 		ScopeFinder.GetScopeString(code, expressionPos, expressionScope);
-		Globals->TagCache.ExpressionCompletionMatches(Ctrl->GetIdString(), parsedExpression, expressionScope,
+		Globals->TagCache.ExpressionCompletionMatches(Ctrl->GetIdString(), parsedExpression, expressionScope, sourceDirs,
 				variableMatches, AutoCompletionResourceMatches, doDuckTyping, error);
 		if (!variableMatches.empty()) {
 			for (size_t i = 0; i < variableMatches.size(); ++i) {
@@ -865,6 +866,7 @@ std::vector<mvceditor::TagClass> mvceditor::PhpDocumentClass::GetTagsAtPosition(
 	UnicodeString code = GetSafeSubstring(0, posToCheck);
 	
 	std::vector<mvceditor::TagClass> matches;
+	std::vector<wxFileName> sourceDirs = Globals->AllEnabledSourceDirectories();
 	pelet::LexicalAnalyzerClass lexer;
 	pelet::ParserClass parser;
 	mvceditor::ScopeFinderClass scopeFinder;
@@ -890,7 +892,7 @@ std::vector<mvceditor::TagClass> mvceditor::PhpDocumentClass::GetTagsAtPosition(
 
 		// for now do nothing with error
 		mvceditor::SymbolTableMatchErrorClass error;
-		Globals->TagCache.ResourceMatches(Ctrl->GetIdString(), parsedExpression, expressionScope, matches, 
+		Globals->TagCache.ResourceMatches(Ctrl->GetIdString(), parsedExpression, expressionScope, sourceDirs, matches, 
 			doDuckTyping, true, error);
 	}
 	return matches;

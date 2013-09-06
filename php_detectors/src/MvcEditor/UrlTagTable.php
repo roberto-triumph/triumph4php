@@ -34,25 +34,22 @@ class MvcEditor_UrlTagTable extends Zend_Db_Table_Abstract {
 	 * @param MvcEditor_Url[] $arrUrls the urls to insert 
 	 */
 	function saveUrls($arrUrls, $sourceDir) {
+	
+		// delete the old rows
+		$sourceDbTable = new MvcEditor_SourceTable($this->getAdapter());
+		$sourceId = $sourceDbTable->getOrSave($sourceDir);
+		$strWhere = $this->getAdapter()->quoteInto("source_id = ?", $sourceId);
+		$this->delete($strWhere);
+		
 		if (!is_array($arrUrls)) {
 			return;
 		}
 		
-		// delete all old urls
-		/// make sure that sourceDir ends with the separator to make sure
-		// only the correct entries are deleted
-		// also  escape a value so that it is suitable for using in a LIKE SQL clause
-		// ie. so that an underscore is treated literally
-		$sourceDir = \opstring\ensure_ends_with($sourceDir, DIRECTORY_SEPARATOR);
-		$sourceDir = \opstring\replace($sourceDir, '_', '^_');
-		$strWhere = $this->getAdapter()->quoteInto("full_path LIKE ? ESCAPE '^'", $sourceDir . '%');
-		$this->delete($strWhere);
-		
 		// sqlite optimizes transactions really well; use transaction so that the inserts are faster
 		$this->getAdapter()->beginTransaction();
 		foreach ($arrUrls as $url) {
-			
 			$this->insert(array(
+				'source_id' => $sourceId,
 				'url' => $url->url,
 				'full_path' => $url->fileName,
 				'class_name' => $url->className,

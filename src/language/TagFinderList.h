@@ -175,16 +175,18 @@ public:
 	 */
 	std::vector<UnicodeString> ClassUsedTraits(const UnicodeString& className, 
 		const std::vector<UnicodeString>& parentClassNames, 
-		const UnicodeString& methodName);
+		const UnicodeString& methodName,
+		const std::vector<wxFileName>& sourceDirs);
 
 	/**
 	 * Figure out a tag's type by looking at all of the initalized finders.
 	 * @param resourceToLookup MUST BE fully qualified (class name  + method name,  or function name).  string can have the
 	 *        object operator "::" that separates the class and method name.
+	 * @param sourceDirs will look only for tags in the given sources
 	 * @return the tag's type; (for methods / functions, it's the return type of the method) could be empty string if type could 
 	 *         not be determined 
 	 */
-	UnicodeString ResolveResourceType(UnicodeString resourceToLookup);
+	UnicodeString ResolveResourceType(UnicodeString resourceToLookup, const std::vector<wxFileName>& sourceDirs);
 
 	/**
 	 * searches all tag finders for the parent class of the given class

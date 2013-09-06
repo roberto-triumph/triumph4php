@@ -429,25 +429,6 @@ void mvceditor::RunningThreadsClass::OnTimer(wxTimerEvent& event) {
 	for (size_t i = 0; i < ThreadActions.size(); ++i) {
 		ThreadActions[i]->PostProgressEvent();
 	}
-
-	// if there is an action queued then an in-progress event
-	// for it
-	wxMutexLocker locker(ActionMutex);
-	std::queue<mvceditor::ActionClass*> copy;
-	mvceditor::ActionClass* action;
-	while (!Actions.empty()) {
-		action = Actions.front();
-		mvceditor::ActionProgressEventClass evt(action->GetEventId(), action->GetProgressMode(), action->GetPercentComplete(), wxT(""));
-		PostEvent(evt);
-		copy.push(action);
-
-		Actions.pop();
-	}
-	// put actions back in the queue
-	while (!copy.empty()) {
-		Actions.push(copy.front());
-		copy.pop();
-	}
 }
 
 void mvceditor::RunningThreadsClass::SetThreadCleanup(mvceditor::ThreadCleanupClass* threadCleanup) {

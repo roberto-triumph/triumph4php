@@ -183,16 +183,14 @@ std::vector<UnicodeString> mvceditor::TagFinderListClass::ClassParents(UnicodeSt
 
 std::vector<UnicodeString> mvceditor::TagFinderListClass::ClassUsedTraits(const UnicodeString& className, 
 												  const std::vector<UnicodeString>& parentClassNames, 
-												  const UnicodeString& methodName) {
+												  const UnicodeString& methodName,
+												  const std::vector<wxFileName>& sourceDirs) {
 
 	// trait support; a class can use multiple traits; hence the different logic 
 	std::vector<UnicodeString> classesToLookup;
 	classesToLookup.push_back(className);
 	classesToLookup.insert(classesToLookup.end(), parentClassNames.begin(), parentClassNames.end());
 	std::vector<UnicodeString> usedTraits;
-
-	// TODO propagate from enabled projects
-	std::vector<wxFileName> emptyVector;
 	bool found = false;
 	do {
 		found = false;
@@ -200,7 +198,7 @@ std::vector<UnicodeString> mvceditor::TagFinderListClass::ClassUsedTraits(const 
 		for (std::vector<UnicodeString>::iterator it = classesToLookup.begin(); it != classesToLookup.end(); ++it) {
 			UnicodeString parentClass;
 			if (IsTagFinderInit) {
-				std::vector<UnicodeString> traits = TagFinder.GetResourceTraits(*it, methodName, emptyVector);
+				std::vector<UnicodeString> traits = TagFinder.GetResourceTraits(*it, methodName, sourceDirs);
 				if (!traits.empty()) {
 					found = true;
 					nextTraitsToLookup.insert(nextTraitsToLookup.end(), traits.begin(), traits.end());
@@ -208,7 +206,7 @@ std::vector<UnicodeString> mvceditor::TagFinderListClass::ClassUsedTraits(const 
 				}
 			}
 			if (IsNativeTagFinderInit) {
-				std::vector<UnicodeString> traits = NativeTagFinder.GetResourceTraits(*it, methodName, emptyVector);
+				std::vector<UnicodeString> traits = NativeTagFinder.GetResourceTraits(*it, methodName, sourceDirs);
 				if (!traits.empty()) {
 					found = true;
 					nextTraitsToLookup.insert(nextTraitsToLookup.end(), traits.begin(), traits.end());
@@ -225,16 +223,17 @@ std::vector<UnicodeString> mvceditor::TagFinderListClass::ClassUsedTraits(const 
 }
 
 
-UnicodeString mvceditor::TagFinderListClass::ResolveResourceType(UnicodeString resourceToLookup) {
+UnicodeString mvceditor::TagFinderListClass::ResolveResourceType(UnicodeString resourceToLookup, const std::vector<wxFileName>& sourceDirs) {
 	UnicodeString type;
 	mvceditor::TagSearchClass tagSearch(resourceToLookup);
 	tagSearch.SetParentClasses(ClassParents(tagSearch.GetClassName(), tagSearch.GetMethodName()));
-	tagSearch.SetTraits(ClassUsedTraits(tagSearch.GetClassName(), tagSearch.GetParentClasses(), tagSearch.GetMethodName()));
+	tagSearch.SetSourceDirs(sourceDirs);
+	tagSearch.SetTraits(ClassUsedTraits(tagSearch.GetClassName(), tagSearch.GetParentClasses(), tagSearch.GetMethodName(), sourceDirs));
 	
 	if (IsDetectedTagFinderInit && !tagSearch.GetClassName().isEmpty()) {
 		mvceditor::DetectedTagExactMemberResultClass detectedResult;
 		std::vector<UnicodeString> classNames = tagSearch.GetClassHierarchy();
-		detectedResult.Set(classNames, tagSearch.GetMethodName());
+		detectedResult.Set(classNames, tagSearch.GetMethodName(), sourceDirs);
 		if (DetectedTagFinder.Exec(&detectedResult)) {
 			detectedResult.Next();
 			type = detectedResult.Tag.ReturnType;
@@ -317,7 +316,7 @@ void mvceditor::TagFinderListClass::ExactMatchesFromAll(mvceditor::TagSearchClas
 
 	if (IsDetectedTagFinderInit && !tagSearch.GetClassName().isEmpty()) {
 		mvceditor::DetectedTagExactMemberResultClass detectedResult;
-		detectedResult.Set(tagSearch.GetClassHierarchy(), tagSearch.GetMethodName());
+		detectedResult.Set(tagSearch.GetClassHierarchy(), tagSearch.GetMethodName(), tagSearch.GetSourceDirs());
 		if (DetectedTagFinder.Exec(&detectedResult)) {
 			while (detectedResult.More()) {
 				detectedResult.Next();
@@ -347,7 +346,7 @@ void mvceditor::TagFinderListClass::NearMatchesFromAll(mvceditor::TagSearchClass
 
 	if (IsDetectedTagFinderInit && !tagSearch.GetClassName().isEmpty()) {
 		mvceditor::DetectedTagNearMatchMemberResultClass detectedResult;
-		detectedResult.Set(tagSearch.GetClassHierarchy(), tagSearch.GetMethodName());
+		detectedResult.Set(tagSearch.GetClassHierarchy(), tagSearch.GetMethodName(), tagSearch.GetSourceDirs());
 		if (DetectedTagFinder.Exec(&detectedResult)) {
 			while (detectedResult.More()) {
 				detectedResult.Next();

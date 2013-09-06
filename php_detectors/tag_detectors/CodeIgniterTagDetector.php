@@ -85,7 +85,7 @@ EOF;
 		// sqlite DB	
 		$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $outputDbFileName));
 		$resourceTable = new MvcEditor_DetectedTagTable($pdo);
-		$resourceTable->saveTags($arrTags);
+		$resourceTable->saveTags($arrTags, $sourceDir);
 		echo "Tag dectection complete, written to {$outputDbFileName}\n";
 	}
 	else {
