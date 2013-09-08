@@ -374,7 +374,8 @@ void mvceditor::MainFrameClass::OnEditPreferences(wxCommandEvent& event) {
 		// for example if the user changed PHP version new classes may become
 		// parseable; new urls may come from a new virtual host that was just
 		// entered
-		App.Sequences.AppStart();
+		std::vector<mvceditor::ProjectClass> emptyProjects;
+		App.Sequences.ProjectDefinitionsUpdated(App.Globals.AllEnabledProjects(), emptyProjects);
 	}
 }
 
