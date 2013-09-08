@@ -89,7 +89,7 @@ void mvceditor::TemplateFilesFeatureClass::StartDetection() {
 	std::vector<mvceditor::GlobalActionClass*> actions;
 
 	// the sequence class will own this pointer
-	mvceditor::CallStackActionClass* callStackAction =  new mvceditor::CallStackActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_CALL_STACK);
+	mvceditor::CallStackActionClass* callStackAction =  new mvceditor::CallStackActionClass(App.SqliteRunningThreads, mvceditor::ID_EVENT_ACTION_CALL_STACK);
 	mvceditor::UrlTagClass urlTag = App.Globals.CurrentUrl;
 	callStackAction->SetCallStackStart(urlTag.FileName,
 		mvceditor::WxToIcu(urlTag.ClassName),
@@ -97,7 +97,7 @@ void mvceditor::TemplateFilesFeatureClass::StartDetection() {
 		App.Globals.DetectorCacheDbFileName);
 	actions.push_back(callStackAction);
 	actions.push_back(
-		new mvceditor::TemplateFileTagsDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR)
+		new mvceditor::TemplateFileTagsDetectorActionClass(App.SqliteRunningThreads, mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR)
 	);
 	App.Sequences.Build(actions);
 }
@@ -163,7 +163,7 @@ void mvceditor::TemplateFilesPanelClass::UpdateControllers() {
 
 void mvceditor::TemplateFilesPanelClass::UpdateResults() {		
 	std::vector<mvceditor::TemplateFileTagClass> currentTemplates = Feature.App.Globals.CurrentTemplates();
-	StatusLabel->SetLabel(wxString::Format(_("Found %d view files"), currentTemplates.size()));
+	StatusLabel->SetLabel(wxString::Format(_("Found %d view files"), (int)currentTemplates.size()));
 	FileTree->DeleteAllItems();
 
 	wxTreeItemId parent = FileTree->AddRoot(_("Templates"), IMAGE_TEMPLATE_FOLDER);

@@ -963,7 +963,7 @@ void mvceditor::DetectorFeatureClass::OnRunUrlDetectors(wxCommandEvent& event) {
 
 	// the sequence class will own this pointer
 	actions.push_back(
-		new mvceditor::UrlTagDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR)	
+		new mvceditor::UrlTagDetectorActionClass(App.SqliteRunningThreads, mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR)	
 	);
 	App.Sequences.Build(actions);
 }
@@ -976,7 +976,7 @@ void mvceditor::DetectorFeatureClass::OnRunTemplateFileDetectors(wxCommandEvent&
 	std::vector<mvceditor::GlobalActionClass*> actions;
 
 	// the sequence class will own this pointer
-	mvceditor::CallStackActionClass* callStackAction =  new mvceditor::CallStackActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_CALL_STACK);
+	mvceditor::CallStackActionClass* callStackAction =  new mvceditor::CallStackActionClass(App.SqliteRunningThreads, mvceditor::ID_EVENT_ACTION_CALL_STACK);
 	mvceditor::UrlTagClass urlTag = App.Globals.CurrentUrl;
 	
 	if (!urlTag.Url.GetServer().IsEmpty() && urlTag.FileName.IsOk()
@@ -987,7 +987,7 @@ void mvceditor::DetectorFeatureClass::OnRunTemplateFileDetectors(wxCommandEvent&
 			App.Globals.DetectorCacheDbFileName);
 		actions.push_back(callStackAction);
 		actions.push_back(
-			new mvceditor::TemplateFileTagsDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR)
+			new mvceditor::TemplateFileTagsDetectorActionClass(App.SqliteRunningThreads, mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR)
 		);
 		App.Sequences.Build(actions);
 	}
@@ -1002,7 +1002,7 @@ void mvceditor::DetectorFeatureClass::OnRunTagDetectors(wxCommandEvent& event) {
 
 	// the sequence class will own this pointer
 	actions.push_back(
-		new mvceditor::TagDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_DETECTOR)
+		new mvceditor::TagDetectorActionClass(App.SqliteRunningThreads, mvceditor::ID_EVENT_ACTION_TAG_DETECTOR)
 	);
 	App.Sequences.Build(actions);
 }
@@ -1012,7 +1012,7 @@ void mvceditor::DetectorFeatureClass::OnRunDatabaseDetectors(wxCommandEvent& eve
 
 	// the sequence class will own this pointer
 	actions.push_back(
-		new mvceditor::DatabaseTagDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR)
+		new mvceditor::DatabaseTagDetectorActionClass(App.SqliteRunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR)
 	);
 	App.Sequences.Build(actions);
 }
@@ -1022,7 +1022,7 @@ void mvceditor::DetectorFeatureClass::OnRunConfigDetectors(wxCommandEvent& event
 
 	// the sequence class will own this pointer
 	actions.push_back(
-		new mvceditor::ConfigTagDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR)
+		new mvceditor::ConfigTagDetectorActionClass(App.SqliteRunningThreads, mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR)
 	);
 	App.Sequences.Build(actions);
 }

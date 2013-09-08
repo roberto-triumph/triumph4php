@@ -302,7 +302,7 @@ void mvceditor::RunBrowserFeatureClass::OnUrlSearchTool(wxCommandEvent& event) {
 	if (IsUrlCacheStale) {
 		IsWaitingForUrlDetection = true;
 
-		mvceditor::UrlTagDetectorActionClass* action = new mvceditor::UrlTagDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR);
+		mvceditor::UrlTagDetectorActionClass* action = new mvceditor::UrlTagDetectorActionClass(App.SqliteRunningThreads, mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR);
 		std::vector<mvceditor::GlobalActionClass*> actions;
 		actions.push_back(action);
 		App.Sequences.Build(actions);
