@@ -365,12 +365,15 @@ bool mvceditor::CallStackClass::Persist(soci::session& session) {
 		std::string stepType;
 		std::string expression;
 		soci::transaction transaction(session);
+		
+		// TODO: prograte?
+		int sourceId = 0;
 
 		// delete any old rows; we only store one call stack for the active URL
 		session.once << "DELETE FROM call_stacks";
 		soci::statement stmt = (session.prepare <<
-			"INSERT INTO call_stacks(step_number, step_type, expression) VALUES (?, ?, ?)",
-			soci::use(stepNumber), soci::use(stepType), soci::use(expression)
+			"INSERT INTO call_stacks(step_number, step_type, expression, source_id) VALUES (?, ?, ?, ?)",
+			soci::use(stepNumber), soci::use(stepType), soci::use(expression), soci::use(sourceId)
 		);
 		for (std::vector<mvceditor::VariableSymbolClass>::const_iterator it = Variables.begin(); it != Variables.end(); ++it) {
 			stepType = it->TypeString();

@@ -42,10 +42,8 @@ class MvcEditor_CallStackTable extends Zend_Db_Table_Abstract {
 	 *         and template variables need to be extracted from these.
 	 *            
 	 */
-	public function load($sourceDir) {
+	public function load() {
 		$select = $this->select()
-			->join('sources', 'sources.source_id = call_stacks.source_id')
-			->where('directory = ?', $sourceDir)
 			->order('step_number');
 		$stmt = $select->query(Zend_Db::FETCH_ASSOC);
 		$callStacks = array();

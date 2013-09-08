@@ -57,12 +57,12 @@ public:
 		std::string stdDir = mvceditor::WxToChar(tmpDir.GetPathWithSep());
 		
 		// create the source
-		soci::statement stmt = DetectorTagSession.prepare << "INSERT INTO sources(directory) VALUES(?)";
-		stmt.exchange(soci::use(stdDir));
+		soci::statement stmt = (DetectorTagSession.prepare << "INSERT INTO sources(directory) VALUES(?)",
+			soci::use(stdDir));
 		stmt.execute(true);
 		soci::sqlite3_statement_backend* backend = static_cast<soci::sqlite3_statement_backend*>(stmt.get_backend());
 		SourceId = sqlite3_last_insert_rowid(backend->session_.conn_);
-		
+	
 		AddToDb1("http://localhost/index.php", 
 			"/home/user/welcome.php", "WelcomeController", "index");
 		AddToDb1("http://localhost/frontend.php",
@@ -76,8 +76,8 @@ public:
 
 	void AddToDb1(std::string url, std::string fileName, std::string className, std::string methodName) {
 		soci::statement stmt = (DetectorTagSession.prepare <<
-			"INSERT INTO url_tags(url, full_path, class_name, method_name) VALUES (?, ?, ?, ?)",
-			soci::use(url), soci::use(fileName),
+			"INSERT INTO url_tags(url, source_id, full_path, class_name, method_name) VALUES (?, ?, ?, ?, ?)",
+			soci::use(url), soci::use(SourceId), soci::use(fileName),
 			soci::use(className), soci::use(methodName)
 		);
 		stmt.execute(true);

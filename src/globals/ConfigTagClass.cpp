@@ -91,6 +91,7 @@ std::vector<mvceditor::ConfigTagClass> mvceditor::ConfigTagFinderClass::All(cons
 		for (size_t i = 0; i < stdSourceDirectories.size(); ++i) {
 			stmt.exchange(soci::use(stdSourceDirectories[i]));
 		}
+		stmt.define_and_bind();
 		if (stmt.execute(true)) {
 			do {
 				mvceditor::ConfigTagClass configTag;

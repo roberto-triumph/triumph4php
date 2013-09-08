@@ -1045,11 +1045,23 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithDetectedTags) {
 		returnType = "CI_Email", 
 		namespaceName = "\\", 
 		comment = "";
+		
+	int sourceId = 0;
+	
+	// create the source row
+	std::string stdDir = mvceditor::WxToChar("");
+	soci::statement sourceStmt = (DetectedTagSession->prepare << "INSERT INTO sources(directory) VALUES(?)",
+		soci::use(stdDir));
+	sourceStmt.execute(true);
+	soci::sqlite3_statement_backend* backend = static_cast<soci::sqlite3_statement_backend*>(sourceStmt.get_backend());
+	sourceId = sqlite3_last_insert_rowid(backend->session_.conn_);
+		
 	int type = mvceditor::TagClass::METHOD;
 	std::string sql = "INSERT INTO detected_tags";
-	sql += "(key, type, class_name, method_name, return_type, namespace_name, comment) ";
-	sql += "VALUES(?, ?, ?, ?,?, ?, ?)";
-	soci::statement stmt = (DetectedTagSession->prepare << sql, soci::use(key), soci::use(type),
+	sql += "(key, source_id, type, class_name, method_name, return_type, namespace_name, comment) ";
+	sql += "VALUES(?, ?, ?, ?, ?,?, ?, ?)";
+	soci::statement stmt = (DetectedTagSession->prepare << sql, 
+		soci::use(key), soci::use(sourceId), soci::use(type),
 		soci::use(className), soci::use(methodName), soci::use(returnType),
 		soci::use(namespaceName), soci::use(comment)
 	);

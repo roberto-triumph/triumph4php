@@ -33,12 +33,12 @@
 -- this table store all "source" directories. a source directory is just a 
 -- directory that contains source code files
 CREATE TABLE IF NOT EXISTS sources (
-	source_id INTEGER PRIMARY KEY,
+	source_id INTEGER PRIMARY KEY AUTOINCREMENT,
 	
 	-- the full path has OS-dependant file separators
 	-- the full path is the entire path to a source directory
 	-- don't do it case-insensitive because different file systems handle case differently
-	directory TEXT
+	directory TEXT NOT NULL COLLATE NOCASE
 );
 
 -- this table will store all of the detected URLs. A URL tag
@@ -122,8 +122,8 @@ CREATE TABLE IF NOT EXISTS template_file_tags (
 	id INTEGER PRIMARY KEY AUTOINCREMENT, 
 	
 	-- the foreign key to the source directory
-	source_id INT INTEGER NOT NULL,
-	
+	source_id INT INTEGER NOT NULL,	
+
 	-- this is the full path to the template file. 
 	-- It contains OS-dependant directory separators
 	full_path TEXT NOT NULL,
@@ -316,11 +316,10 @@ CREATE INDEX IF NOT EXISTS idxTemplateFilesSource ON template_file_tags(source_i
 
 CREATE INDEX IF NOT EXISTS idxUrlSource ON url_tags(source_id);
 
-
 --
 -- This number must match the version in CacheDbVersionActionClass.cpp
 --
-INSERT INTO schema_version (version_number) VALUES(5);
+INSERT INTO schema_version (version_number) VALUES(6);
 
 --
 -- Write ahead logging to allow for concurrent reads and writes
