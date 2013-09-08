@@ -57,15 +57,24 @@ newaction {
 			print "Build the solution in Debug configuration"
 			print "Build the solution in Release configuration"
 		else 
-
+			SOCI_INSTALL_DEBUG_DIR = normalizepath("lib/soci/mvc-editor/Debug")
+			SOCI_INSTALL_RELEASE_DIR = normalizepath("lib/soci/mvc-editor/Release")
+			SOCI_BUILD_DEBUG_DIR = normalizepath("lib/soci/mvc-editor-debug-build")
+			SOCI_BUILD_RELEASE_DIR = normalizepath("lib/soci/mvc-editor-release-build")
+			
+			batchexecute(normalizepath(""), {
+				"mkdir -p " .. SOCI_BUILD_DEBUG_DIR,
+				"mkdir -p " .. SOCI_BUILD_RELEASE_DIR
+			})
+			
 			-- now build SOCI
 			-- exclude SOCI from linking against Boost. we don't use it
-			batchexecute(SOCI_SRC, {
+			batchexecute(SOCI_BUILD_DEBUG_DIR, {
 				CMAKE ..
 					" -G \"Unix Makefiles\"" ..
 					" -DMYSQL_INCLUDE_DIR=" .. MYSQL_INCLUDE_DIR ..
 					" -DMYSQL_LIBRARY=" .. MYSQL_LIB_DIR .. "/" .. MYSQL_LIB_NAME ..
-					" -DCMAKE_INSTALL_PREFIX=" .. SOCI_BUILD_DIR ..
+					" -DCMAKE_INSTALL_PREFIX=" .. SOCI_INSTALL_DEBUG_DIR ..
 					" -DSQLITE3_INCLUDE_DIR=" .. SQLITE_INCLUDE_DIR ..
 					" -DSQLITE3_LIBRARIES=" .. normalizepath(SQLITE_LIB_DIR) ..
 					" -DWITH_MYSQL=YES " ..
@@ -74,7 +83,31 @@ newaction {
 					" -DWITH_POSTGRESQL=NO " ..
 					" -DWITH_SQLITE3=YES " ..
 					" -DWITH_BOOST=NO" ..
-					" -DSOCI_TESTS=YES ",
+					" -DSOCI_TESTS=YES " ..
+					" -DCMAKE_BUILD_TYPE=Debug " .. 
+					" " .. SOCI_SRC,
+				"make",
+				"make install"
+			})
+			
+			-- build release mode
+			batchexecute(SOCI_BUILD_RELEASE_DIR, {
+				CMAKE ..
+					" -G \"Unix Makefiles\"" ..
+					" -DMYSQL_INCLUDE_DIR=" .. MYSQL_INCLUDE_DIR ..
+					" -DMYSQL_LIBRARY=" .. MYSQL_LIB_DIR .. "/" .. MYSQL_LIB_NAME ..
+					" -DCMAKE_INSTALL_PREFIX=" .. SOCI_INSTALL_RELEASE_DIR ..
+					" -DSQLITE3_INCLUDE_DIR=" .. SQLITE_INCLUDE_DIR ..
+					" -DSQLITE3_LIBRARIES=" .. normalizepath(SQLITE_LIB_DIR) ..
+					" -DWITH_MYSQL=YES " ..
+					" -DWITH_MYSQL=ODBC " ..
+					" -DWITH_ORACLE=NO " ..
+					" -DWITH_POSTGRESQL=NO " ..
+					" -DWITH_SQLITE3=YES " ..
+					" -DWITH_BOOST=NO" ..
+					" -DSOCI_TESTS=YES " ..
+					" -DCMAKE_BUILD_TYPE=Debug " .. 
+					" " .. SOCI_SRC,
 				"make",
 				"make install"
 			})

@@ -177,22 +177,29 @@ function checkSoci()
 	elseif os.is "linux" then
 		
 		-- soci lib dirs are named according to architecture
-		if os.isdir "lib/soci/mvc-editor/lib64" then
-			libs = os.matchfiles("lib/soci/mvc-editor/lib64/*.so*");
-			if #libs > 0 then
-				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/lib64/*.so* Debug/");
-				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/lib64/*.so* Release/");
-			else 
-				error "SOCI library has not been built.  Execute the premake soci action: ./premake4 soci"
-			end
-		else
-			libs = os.matchfiles("lib/soci/mvc-editor/lib/*.so*");
-			if #libs > 0 then
-				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/lib/*.so* Debug/");
-				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/lib/*.so* Release/");
-			else
-				error "SOCI library has not been built.  Execute the premake soci action: ./premake4 soci"
-			end
+        foundCount = 0;
+		libs = os.matchfiles("lib/soci/mvc-editor/Debug/lib64/*.so*");
+		if #libs > 0 then
+			os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/Debug/lib64/*.so* Debug/");
+			foundCount = foundCount + 1;
+		end
+		libs = os.matchfiles("lib/soci/mvc-editor/Debug/lib/*.so*");
+		if #libs > 0 then
+			os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/Debug/lib/*.so* Debug/");
+			foundCount = foundCount + 1;
+		end
+		libs = os.matchfiles("lib/soci/mvc-editor/Release/lib64/*.so*");
+		if #libs > 0 then
+			os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/Release/lib64/*.so* Release/");
+			foundCount = foundCount + 1;
+		end
+		libs = os.matchfiles("lib/soci/mvc-editor/Release/lib/*.so*");
+		if #libs > 0 then
+			os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/Release/lib/*.so* Release/");
+			foundCount = foundCount + 1;
+		end
+		if foundCount < 2 then
+			error (string.format("[%d] SOCI library has not been built.  Execute the premake soci action: ./premake4 soci", foundCount))
 		end
 	else 
 		error "You are running on a non-supported operating system. MVC Editor cannot be built.\n"
