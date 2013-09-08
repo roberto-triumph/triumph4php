@@ -85,8 +85,8 @@ EOF;
 		// sqlite DB	
 		$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $outputDbFileName));
 		$templateFileTable = new MvcEditor_TemplateFileTagTable($pdo);
-		$templateFileTable->saveTemplates($arrTemplates);
-		echo "Template file dectection complete, written to {$outputDbFileName}\n";
+		$templateFileTable->saveTemplateFiles($arrTemplates, $sourceDir);
+		echo "Template file detection complete, written to {$outputDbFileName}\n";
 	}
 	else {
 		if (!empty($arrTemplates)) {

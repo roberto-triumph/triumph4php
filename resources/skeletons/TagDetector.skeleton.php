@@ -76,9 +76,9 @@ EOF;
 		// now send the detected URLs to either STDOUT or store in the 
 		// sqlite DB	
 		$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $outputDbFileName));
-		$resourceTable = new MvcEditor_ResourceTable($pdo);
-		$resourceTable->saveTags($arrTags);
-		echo "Tag dectection complete, written to {$outputDbFileName}\n";
+		$resourceTable = new MvcEditor_DetectedTagTable($pdo);
+		$resourceTable->saveTags($arrTags, $sourceDir);
+		echo "Tag detection complete, written to {$outputDbFileName}\n";
 	}
 	else {
 		if (!empty($arrTags)) {

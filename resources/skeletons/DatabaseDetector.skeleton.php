@@ -81,7 +81,7 @@ EOF;
 		$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $outputDbFileName));
 		$databaseTagTable = new MvcEditor_DatabaseTagTable($pdo);
 		$databaseTagTable->saveDatabaseTags($arrDatabases, $sourceDir);
-		echo "Database dectection complete, written to {$outputDbFileName}\n";
+		echo "Database detection complete, written to {$outputDbFileName}\n";
 	}
 	else {
 		if (!empty($arrDatabases)) {
