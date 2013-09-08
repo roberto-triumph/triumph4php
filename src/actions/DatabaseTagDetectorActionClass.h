@@ -136,23 +136,6 @@ private:
 
 };
 
-/**
- * This class will prime the detected tag cache with all of the
- * enabled projects. The tag cache will be primed; although
- * it will be primed with the existing cache file which may be
- * stale. 
- */
-class DatabaseTagDetectorInitActionClass : public mvceditor::InitializerGlobalActionClass {
-
-public:
-
-	DatabaseTagDetectorInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
-
-	void Work(mvceditor::GlobalsClass& globals);
-
-	wxString GetLabel() const;
-};
-
 }
 
 #endif

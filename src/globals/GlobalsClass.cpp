@@ -41,7 +41,7 @@ mvceditor::GlobalsClass::GlobalsClass()
 	, MiscFileExtensionsString(wxT("*.js;*.html;*.yml;*.xml;*.txt"))
 	, TagCacheDbFileName(mvceditor::TagCacheAsset())
 	, DetectorCacheDbFileName(mvceditor::DetectorCacheAsset()) 
-	, DetectorCacheSession(){
+	, DetectorCacheSession() {
 }
 
 void mvceditor::GlobalsClass::Close() {

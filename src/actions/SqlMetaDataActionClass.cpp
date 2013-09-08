@@ -49,6 +49,40 @@ mvceditor::SqlMetaDataActionClass::SqlMetaDataActionClass(mvceditor::RunningThre
 bool mvceditor::SqlMetaDataActionClass::Init(mvceditor::GlobalsClass& globals) {
 	SetStatus(_("SQL Meta"));
 	DatabaseTags = globals.DatabaseTags;
+	
+	// this will prime the sql connections from the php detectors
+	// this is being done here so that we can guarantee that SqlMetaData has the
+	// most up-to-date database tags. The GlobalsChangeHandlerClass also reads
+	// the database tags from the detector db, but since it also works on events
+	// we cannot gurantee that the GlobalsChangeHandlerClass EVENT_WORK_COMPLETE handler will get called
+	// before the SequenceClass EVENT_WORK_COMPLETE handler.
+	
+	// first remove all detected connections that were previously detected
+	std::vector<mvceditor::DatabaseTagClass>::iterator info;
+	info = DatabaseTags.begin();
+	while(info != DatabaseTags.end()) {
+		if (info->IsDetected) {
+			info = DatabaseTags.erase(info);
+		}
+		else {
+			info++;
+		}
+	}
+
+	std::vector<wxFileName> sourceDirectories = globals.AllEnabledSourceDirectories();
+
+	// initialize the detected tag cache only the enabled projects
+	mvceditor::DatabaseTagFinderClass finder;
+	finder.InitSession(&globals.DetectorCacheSession);
+	
+	std::vector<mvceditor::DatabaseTagClass> detected = finder.All(sourceDirectories);
+	std::vector<mvceditor::DatabaseTagClass>::const_iterator tag;
+	for (tag = detected.begin(); tag != detected.end(); ++tag) {
+		if (!tag->Host.isEmpty() && !tag->Schema.isEmpty()) {
+			DatabaseTags.push_back(*tag);
+		}
+	}
+	
 	return !DatabaseTags.empty();
 }
 

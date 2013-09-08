@@ -19,45 +19,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2012 Roberto Perpuly
+ * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_GLOBALSCHANGECLASS_H__
-#define __MVCEDITOR_GLOBALSCHANGECLASS_H__
+#ifndef __MVCEDITOR_DETECTORDBCLASS_H__
+#define __MVCEDITOR_DETECTORDBCLASS_H__
 
-#include <globals/GlobalsClass.h>
-#include <actions/SqlMetaDataActionClass.h>
-#include <actions/ProjectTagActionClass.h>
-#include <wx/event.h>
+#include <soci/soci.h>
+#include <globals/Sqlite.h>
+#include <wx/filename.h>
 
 namespace mvceditor {
-
+	
 /**
- * Class responsible for capturing all events that modify the global
- * structures and performs the updates.
- * This class will not be directly invoked; all actions will Post events
- * to this handler.
+ * This class performs write operations on the detector tags
+ * cache database. 
  */
-class GlobalsChangeHandlerClass : public wxEvtHandler {
-
+class DetectorDbClass {
+	
 public:
 
-	GlobalsChangeHandlerClass(mvceditor::GlobalsClass& globals);
-
-private:
-
-	mvceditor::GlobalsClass& Globals;
-	
-	void OnSqlMetaDataComplete(mvceditor::SqlMetaDataEventClass& event);
+	DetectorDbClass();
 
 	/**
-	 * when the php database detectors have completed, put all of the detected database
-	 * tags in the globals list.
+	 * @param session opened db connection. This class will not own the pointer.
 	 */
-	void OnDatabaseTagsComplete(mvceditor::ActionEventClass& event);
+	void Init(soci::session* session);
 	
-	DECLARE_EVENT_TABLE()
+	/**
+	 * deletes all detected tags (db, config, urls, templates, etc...)
+	 * that were detected from the given source directory.
+	 */
+	void DeleteSource(const wxFileName& sourceDir);
+	
+	/**
+	 * deletes all rows from all tables. 
+	 */
+	void Wipe();
+	
+private:
 
+	/**
+	 * This class will not own the pointer.
+	 */
+	soci::session* Session;
 };
 
 }

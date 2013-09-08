@@ -52,7 +52,8 @@ private:
 	/**
 	 * The db files that need to be wiped.
 	 */
-	std::vector<wxFileName> ResourceDbFileNames;
+	wxFileName ResourceDbFileName;
+	wxFileName DetectorDbFileName;
 	
 };
 
@@ -79,8 +80,9 @@ private:
 	/**
 	 * The db files that need to be wiped.
 	 */
-	std::vector<wxFileName> ResourceDbFileNames;
-
+	wxFileName ResourceDbFileName;
+	wxFileName DetectorDbFileName;
+	
 	/**
 	 * the directories to be removed from the cache.
 	 */

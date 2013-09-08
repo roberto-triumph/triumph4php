@@ -136,23 +136,6 @@ private:
 
 };
 
-/**
- * This class will prime the detected Config cache with all of the
- * enabled projects. The Config cache will be primed; although
- * it will be primed with the existing cache file which may be
- * stale. 
- */
-class ConfigDetectorInitActionClass : public mvceditor::InitializerGlobalActionClass {
-
-public:
-
-	ConfigDetectorInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
-
-	void Work(mvceditor::GlobalsClass& globals);
-
-	wxString GetLabel() const;
-};
-
 }
 
 #endif

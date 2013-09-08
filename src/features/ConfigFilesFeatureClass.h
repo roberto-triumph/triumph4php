@@ -54,7 +54,7 @@ private:
 	 */
 	struct ConfigPair {
 		wxString ProjectLabel;
-		std::vector<mvceditor::ConfigTagClass> ConfigTags;	
+		std::vector<mvceditor::ConfigTagClass> ConfigTags;
 	};
 
 	std::vector<ConfigPair> ConfigPairs;
@@ -95,6 +95,11 @@ private:
 	 * detection
 	 */
 	void OnFileSaved(mvceditor::CodeControlEventClass& event);
+
+	/**
+	 * when the detector cache has been loaded rebuild the menu
+	 */
+	void OnDetectorDbInitComplete(mvceditor::ActionEventClass& event);
 
 	DECLARE_EVENT_TABLE()
 };

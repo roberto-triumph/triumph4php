@@ -32,22 +32,6 @@
 namespace mvceditor {
 
 /**
- * This class will load the detected url tags from a sqlite database.
- * This class is used so that the url tag cache is available as soon as the 
- * program starts.
- */
-class UrlTagFinderInitActionClass : public mvceditor::InitializerGlobalActionClass {
-
-public:
-
-	UrlTagFinderInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
-
-	void Work(mvceditor::GlobalsClass& globals);
-
-	wxString GetLabel() const;
-};
-
-/**
  * the set of parameters that will be used for each 
  * external url detector PHP script call. All of 
  * these params are required with the exception of

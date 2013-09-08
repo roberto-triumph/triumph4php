@@ -159,47 +159,6 @@ void mvceditor::DatabaseTagDetectorActionClass::OnProcessFailed(wxCommandEvent &
 	}
 }
 
-mvceditor::DatabaseTagDetectorInitActionClass::DatabaseTagDetectorInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: InitializerGlobalActionClass(runningThreads, eventId) {
-
-}
-
-void mvceditor::DatabaseTagDetectorInitActionClass::Work(mvceditor::GlobalsClass &globals) {
-	SetStatus(_("DB Detect Init"));
-
-	// first remove all detected connections that were previously detected
-	std::vector<mvceditor::DatabaseTagClass>::iterator info;
-	info = globals.DatabaseTags.begin();
-	while(info != globals.DatabaseTags.end()) {
-		if (info->IsDetected) {
-			info = globals.DatabaseTags.erase(info);
-		}
-		else {
-			info++;
-		}
-	}
-
-	std::vector<wxFileName> sourceDirectories = globals.AllEnabledSourceDirectories();
-
-	// initialize the detected tag cache only the enabled projects	
-	mvceditor::DatabaseTagFinderClass finder;
-
-	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(globals.DetectorCacheDbFileName.GetFullPath()));
-	finder.InitSession(&session);
-	
-	std::vector<mvceditor::DatabaseTagClass> detected = finder.All(sourceDirectories);
-	std::vector<mvceditor::DatabaseTagClass>::const_iterator tag;
-	for (tag = detected.begin(); tag != detected.end(); ++tag) {
-		if (!tag->Host.isEmpty() && !tag->Schema.isEmpty()) {
-			globals.DatabaseTags.push_back(*tag);
-		}
-	}
-}
-
-wxString mvceditor::DatabaseTagDetectorInitActionClass::GetLabel() const {
-	return _("Database tags detector initialization");
-}
-
 BEGIN_EVENT_TABLE(mvceditor::DatabaseTagDetectorActionClass, wxEvtHandler) 
 	EVT_COMMAND(ID_DATABASE_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::DatabaseTagDetectorActionClass::OnProcessComplete)
 	EVT_COMMAND(ID_DATABASE_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::DatabaseTagDetectorActionClass::OnProcessFailed)

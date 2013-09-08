@@ -19,45 +19,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2012 Roberto Perpuly
+ * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_GLOBALSCHANGECLASS_H__
-#define __MVCEDITOR_GLOBALSCHANGECLASS_H__
 
-#include <globals/GlobalsClass.h>
-#include <actions/SqlMetaDataActionClass.h>
-#include <actions/ProjectTagActionClass.h>
-#include <wx/event.h>
+#ifndef __MVCEDITOR_DETECTORDBINITACTIONCLASS_H__
+#define __MVCEDITOR_DETECTORDBINITACTIONCLASS_H__
 
+#include <actions/GlobalActionClass.h>
+ 
 namespace mvceditor {
 
+
 /**
- * Class responsible for capturing all events that modify the global
- * structures and performs the updates.
- * This class will not be directly invoked; all actions will Post events
- * to this handler.
+ * This class will prime the detectors sqlite db file.
+ * enabled projects. The Config cache will be primed; although
+ * it will be primed with the existing cache file which may be
+ * stale. 
  */
-class GlobalsChangeHandlerClass : public wxEvtHandler {
+class DetectorDbInitActionClass : public mvceditor::InitializerGlobalActionClass {
 
 public:
 
-	GlobalsChangeHandlerClass(mvceditor::GlobalsClass& globals);
+	DetectorDbInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
-private:
+	void Work(mvceditor::GlobalsClass& globals);
 
-	mvceditor::GlobalsClass& Globals;
-	
-	void OnSqlMetaDataComplete(mvceditor::SqlMetaDataEventClass& event);
-
-	/**
-	 * when the php database detectors have completed, put all of the detected database
-	 * tags in the globals list.
-	 */
-	void OnDatabaseTagsComplete(mvceditor::ActionEventClass& event);
-	
-	DECLARE_EVENT_TABLE()
-
+	wxString GetLabel() const;
 };
 
 }

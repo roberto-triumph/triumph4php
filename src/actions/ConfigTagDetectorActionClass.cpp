@@ -156,6 +156,7 @@ void mvceditor::ConfigTagDetectorActionClass::OnProcessFailed(wxCommandEvent &ev
 	}
 }
 
+
 BEGIN_EVENT_TABLE(mvceditor::ConfigTagDetectorActionClass, wxEvtHandler) 
 	EVT_COMMAND(ID_CONFIG_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::ConfigTagDetectorActionClass::OnProcessComplete)
 	EVT_COMMAND(ID_CONFIG_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::ConfigTagDetectorActionClass::OnProcessFailed)

@@ -24,12 +24,15 @@
  */
 #include <actions/TagWipeActionClass.h>
 #include <language/TagParserClass.h>
+#include <language/DetectorDbClass.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <globals/FileName.h>
 
 mvceditor::TagWipeActionClass::TagWipeActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: GlobalActionClass(runningThreads, eventId) {
+	: GlobalActionClass(runningThreads, eventId) 
+	, ResourceDbFileName()
+	, DetectorDbFileName() {
 }
 
 bool mvceditor::TagWipeActionClass::Init(mvceditor::GlobalsClass& globals) {
@@ -37,28 +40,32 @@ bool mvceditor::TagWipeActionClass::Init(mvceditor::GlobalsClass& globals) {
 
 	// not sure if wxFileName assignment is a complete clone, so use Assign() just in case
 	// since we will access the filenames from multiple threads
-	ResourceDbFileNames.push_back(wxFileName(globals.TagCacheDbFileName.GetFullPath()));
-
-	// TODO wipe detector tags db too
-	return !ResourceDbFileNames.empty();
+	ResourceDbFileName.Assign(globals.TagCacheDbFileName.GetFullPath());
+	DetectorDbFileName.Assign(globals.DetectorCacheDbFileName.GetFullPath());
+	
+	return ResourceDbFileName.FileExists() && DetectorDbFileName.FileExists();
 }
 
 void mvceditor::TagWipeActionClass::BackgroundWork() {
-	std::vector<wxFileName>::iterator it;
-	for (it = ResourceDbFileNames.begin(); it != ResourceDbFileNames.end() && !IsCancelled(); ++it) {
-		SetStatus(_("Tag Cache Wipe / ") + it->GetName());
-		// initialize the sqlite db
-		soci::session session;
-		try {
-			session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(it->GetFullPath()));
-			mvceditor::TagParserClass tagParser;
-			tagParser.Init(&session);
-			tagParser.WipeAll();
-		} catch(std::exception const& e) {
-			session.close();
-			wxString msg = mvceditor::CharToWx(e.what());
-			wxASSERT_MSG(false, msg);
-		}
+	SetStatus(_("Tag Cache Wipe"));
+
+	// initialize the sqlite db
+	soci::session session;
+	soci::session detectorSession;
+	try {
+		session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(ResourceDbFileName.GetFullPath()));
+		mvceditor::TagParserClass tagParser;
+		tagParser.Init(&session);
+		tagParser.WipeAll();
+		
+		detectorSession.open(*soci::factory_sqlite3(), mvceditor::WxToChar(DetectorDbFileName.GetFullPath()));
+		mvceditor::DetectorDbClass detectorDb;
+		detectorDb.Init(&detectorSession);
+		detectorDb.Wipe();
+	} catch(std::exception const& e) {
+		session.close();
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxASSERT_MSG(false, msg);
 	}
 }
 
@@ -69,6 +76,8 @@ wxString mvceditor::TagWipeActionClass::GetLabel() const {
 mvceditor::TagDeleteSourceActionClass::TagDeleteSourceActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId,
 													  const std::vector<wxFileName>& sourceDirsToDelete)
 	: GlobalActionClass(runningThreads, eventId) 
+	, ResourceDbFileName()
+	, DetectorDbFileName()
 	, SourceDirsToDelete() {
 	SourceDirsToDelete = mvceditor::DeepCopyFileNames(sourceDirsToDelete);
 }
@@ -78,30 +87,37 @@ bool mvceditor::TagDeleteSourceActionClass::Init(mvceditor::GlobalsClass& global
 
 	// wxFileName assignment is not a complete clone, so use Assign() just in case
 	// since we will access the filenames from multiple threads
-	ResourceDbFileNames.push_back(wxFileName(globals.TagCacheDbFileName.GetFullPath()));
-
-	// TODO wipe detector tags db too
-	return !ResourceDbFileNames.empty();
+	// not sure if wxFileName assignment is a complete clone, so use Assign() just in case
+	// since we will access the filenames from multiple threads
+	ResourceDbFileName.Assign(globals.TagCacheDbFileName.GetFullPath());
+	DetectorDbFileName.Assign(globals.DetectorCacheDbFileName.GetFullPath());
+	
+	return ResourceDbFileName.FileExists() && DetectorDbFileName.FileExists();
 }
 
 void mvceditor::TagDeleteSourceActionClass::BackgroundWork() {
-	std::vector<wxFileName>::iterator it;
-	for (it = ResourceDbFileNames.begin(); it != ResourceDbFileNames.end() && !IsCancelled(); ++it) {
-		SetStatus(_("Tag Cache Delete / ") + it->GetName());
-		// initialize the sqlite db
-		soci::session session;
-		try {
-			session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(it->GetFullPath()));
-			mvceditor::TagParserClass tagParser;
-			tagParser.Init(&session);
-			for (size_t i = 0; i < SourceDirsToDelete.size(); ++i) {
-				tagParser.DeleteSource(SourceDirsToDelete[i]);
-			}
-		} catch(std::exception const& e) {
-			session.close();
-			wxString msg = mvceditor::CharToWx(e.what());
-			wxASSERT_MSG(false, msg);
+	SetStatus(_("Tag Cache Delete"));
+
+	// initialize the sqlite db
+	soci::session session;
+	soci::session detectorSession;
+	try {
+		session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(ResourceDbFileName.GetFullPath()));
+		mvceditor::TagParserClass tagParser;
+		tagParser.Init(&session);
+		
+		detectorSession.open(*soci::factory_sqlite3(), mvceditor::WxToChar(DetectorDbFileName.GetFullPath()));
+		mvceditor::DetectorDbClass detectorDb;
+		detectorDb.Init(&detectorSession);
+		
+		for (size_t i = 0; i < SourceDirsToDelete.size(); ++i) {
+			tagParser.DeleteSource(SourceDirsToDelete[i]);
+			detectorDb.DeleteSource(SourceDirsToDelete[i]);
 		}
+	} catch(std::exception const& e) {
+		session.close();
+		wxString msg = mvceditor::CharToWx(e.what());
+		wxASSERT_MSG(false, msg);
 	}
 }
 
@@ -122,8 +138,6 @@ bool mvceditor::TagDeleteDirectoryActionClass::Init(mvceditor::GlobalsClass& glo
 	// wxFileName assignment is not a complete clone, so use Assign() just in case
 	// since we will access the filenames from multiple threads
 	ResourceDbFileNames.push_back(wxFileName(globals.TagCacheDbFileName.GetFullPath()));
-
-	// TODO wipe detector tags db too
 	return !ResourceDbFileNames.empty();
 }
 
@@ -163,8 +177,6 @@ bool mvceditor::TagDeleteFileActionClass::Init(mvceditor::GlobalsClass& globals)
 	// not sure if wxFileName assignment is a complete clone, so use Assign() just in case
 	// since we will access the filenames from multiple threads
 	ResourceDbFileNames.push_back(wxFileName(globals.TagCacheDbFileName.GetFullPath()));
-
-	// TODO wipe detector tags db too
 	return !ResourceDbFileNames.empty();
 }
 
