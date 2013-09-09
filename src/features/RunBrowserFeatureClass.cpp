@@ -298,10 +298,11 @@ void mvceditor::RunBrowserFeatureClass::OnUrlToolDropDown(wxAuiToolBarEvent& eve
 }
 
 void mvceditor::RunBrowserFeatureClass::OnUrlSearchTool(wxCommandEvent& event) {
+	std::vector<wxFileName> sourceDirs = App.Globals.AllEnabledSourceDirectories();
 	if (IsUrlCacheStale) {
 		IsWaitingForUrlDetection = true;
 
-		mvceditor::UrlTagDetectorActionClass* action = new mvceditor::UrlTagDetectorActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR);
+		mvceditor::UrlTagDetectorActionClass* action = new mvceditor::UrlTagDetectorActionClass(App.SqliteRunningThreads, mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR);
 		std::vector<mvceditor::GlobalActionClass*> actions;
 		actions.push_back(action);
 		App.Sequences.Build(actions);
@@ -312,7 +313,7 @@ void mvceditor::RunBrowserFeatureClass::OnUrlSearchTool(wxCommandEvent& event) {
 		}
 		GaugeDialog = new mvceditor::GaugeDialogClass(GetMainWindow(), _("URL Detection"), _("Running URL Detection"));
 	}
-	else if (App.Globals.UrlTagFinder.Count() > 0) {
+	else if (App.Globals.UrlTagFinder.Count(sourceDirs) > 0) {
 		ShowUrlDialog();
 	}
 	else {

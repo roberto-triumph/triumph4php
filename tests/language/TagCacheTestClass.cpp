@@ -48,6 +48,7 @@ public:
 	std::vector<wxString> PhpFileExtensions;
 	std::vector<wxString> MiscFileExtensions;
 	std::vector<mvceditor::TagClass> Matches;
+	std::vector<wxFileName> SourceDirs;
 	soci::session* Session1;
 
 	RegisterTestFixtureClass()
@@ -58,6 +59,7 @@ public:
 		, PhpFileExtensions()
 		, MiscFileExtensions()
 		, Matches() 
+		, SourceDirs()
 		, Session1(NULL) {
 		Search.Init(TestProjectDir);
 		PhpFileExtensions.push_back(wxT("*.php"));
@@ -87,6 +89,10 @@ public:
 	mvceditor::TagFinderListClass* CreateTagFinderList(const wxString& srcDirectory) {
 		mvceditor::TagFinderListClass* cache = new mvceditor::TagFinderListClass();
 		cache->AdoptGlobalTag(Session1, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+			
+		wxFileName srcDir;
+		srcDir.AssignDir(TestProjectDir + srcDirectory);
+		SourceDirs.push_back(srcDir);
 			
 		// must call init() here since we want to parse files from disk
 		Search.Init(TestProjectDir + srcDirectory);
@@ -120,6 +126,7 @@ public:
 	bool DoFullyQualifiedMatchOnly;
 	pelet::ScopeClass Scope;
 	pelet::ExpressionClass ParsedExpression;
+	std::vector<wxFileName> SourceDirs;
 
 	std::vector<UnicodeString> VariableMatches;
 	std::vector<mvceditor::TagClass> TagMatches;
@@ -143,6 +150,7 @@ public:
 		, DoFullyQualifiedMatchOnly(false)
 		, Scope()
 		, ParsedExpression(Scope)
+		, SourceDirs()
 		, VariableMatches()
 		, TagMatches()
 		, Error()
@@ -156,6 +164,10 @@ public:
 		Scope.MethodName = UNICODE_STRING_SIMPLE("");
 		Session1 = new soci::session(*soci::factory_sqlite3(), ":memory:");
 		CreateDatabase(*Session1, mvceditor::ResourceSqlSchemaAsset());
+		
+		wxFileName srcDir;
+		srcDir.AssignDir(TestProjectDir + wxT("src"));
+		SourceDirs.push_back(srcDir);
 	}
 	
 	void ToProperty(const UnicodeString& variableName, const UnicodeString& methodName) {
@@ -242,7 +254,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, CompletionMatchesWithTagFi
 	TagCache.RegisterGlobal(cache2);
 	
 	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("w"));
-	TagCache.ExpressionCompletionMatches(File2, ParsedExpression, Scope, 
+	TagCache.ExpressionCompletionMatches(File2, ParsedExpression, Scope, SourceDirs,
 		VariableMatches, TagMatches, DoDuckTyping, Error);
 	CHECK_VECTOR_SIZE(1, TagMatches);
 	CHECK_UNISTR_EQUALS("w", TagMatches[0].Identifier);
@@ -264,7 +276,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, TagMatchesWithTagFinderLis
 	TagCache.RegisterGlobal(cache2);
 	
 	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("w"));
-	TagCache.ResourceMatches(File1, ParsedExpression, Scope, 
+	TagCache.ResourceMatches(File1, ParsedExpression, Scope, SourceDirs,
 		TagMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_VECTOR_SIZE(1, TagMatches);
 	CHECK_UNISTR_EQUALS("w", TagMatches[0].Identifier);
@@ -291,7 +303,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, TagMatchesWithStaleMatches
 	TagCache.RegisterGlobal(cache2);
 	
 	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("methodA"));
-	TagCache.ResourceMatches(File1, ParsedExpression, Scope, 
+	TagCache.ResourceMatches(File1, ParsedExpression, Scope, SourceDirs,
 		TagMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_VECTOR_SIZE(1, TagMatches);
 	CHECK_UNISTR_EQUALS("methodA", TagMatches[0].Identifier);
@@ -303,7 +315,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, TagMatchesWithStaleMatches
 	CHECK(TagCache.RegisterWorking(GlobalFile, cache3));
 	
 	TagMatches.clear();
-	TagCache.ResourceMatches(GlobalFile, ParsedExpression, Scope, 
+	TagCache.ResourceMatches(GlobalFile, ParsedExpression, Scope, SourceDirs,
 		TagMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_VECTOR_SIZE(0, TagMatches);
 }

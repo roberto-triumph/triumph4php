@@ -39,17 +39,16 @@ class MvcEditor_DatabaseTagTable extends Zend_Db_Table_Abstract {
 	public function saveDatabaseTags($databaseTags, $sourceDir) {
 		
 		// delete all old database tags
-		/// make sure that sourceDir ends with the separator to make sure
-		// only the correct entries are deleted
-		$sourceDir = \opstring\ensure_ends_with($sourceDir, DIRECTORY_SEPARATOR);
-		$strWhere = $this->getAdapter()->quoteInto("source_dir_full_path = ?", $sourceDir);
+		$sourceDbTable = new MvcEditor_SourceTable($this->getAdapter());
+		$sourceId = $sourceDbTable->getOrSave($sourceDir);
+		$strWhere = $this->getAdapter()->quoteInto("source_id = ?", $sourceId);
 		$this->delete($strWhere);
 		
 		// sqlite optimizes transactions really well; use transaction so that the inserts are faster
 		$this->getAdapter()->beginTransaction();
 		foreach ($databaseTags as $databaseTag) {
 			$this->insert(array(
-				'source_dir_full_path' => $sourceDir,
+				'source_id' => $sourceId,
 				'label' => $databaseTag->label,
 				'schema' => $databaseTag->schema,
 				'driver' => $databaseTag->driver,

@@ -43,8 +43,8 @@ class MvcEditor_CallStackTable extends Zend_Db_Table_Abstract {
 	 *            
 	 */
 	public function load() {
-		$select = $this->select();
-		$select->order('step_number');
+		$select = $this->select()
+			->order('step_number');
 		$stmt = $select->query(Zend_Db::FETCH_ASSOC);
 		$callStacks = array();
 		while ($row = $stmt->fetch()) {

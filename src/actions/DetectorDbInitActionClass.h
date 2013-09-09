@@ -1,4 +1,3 @@
-<?php
 /**
  * This software is released under the terms of the MIT License
  * 
@@ -20,42 +19,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2009-2011 Roberto Perpuly
+ * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-class MvcEditor_UrlTagTable extends Zend_Db_Table_Abstract {
+#ifndef __MVCEDITOR_DETECTORDBINITACTIONCLASS_H__
+#define __MVCEDITOR_DETECTORDBINITACTIONCLASS_H__
 
-	protected $_name = 'url_tags';
+#include <actions/GlobalActionClass.h>
+ 
+namespace mvceditor {
 
-	/**
-	 * saves the given MvcEditor_Urls into the database.
-	 * 
-	 * @param MvcEditor_Url[] $arrUrls the urls to insert 
-	 */
-	function saveUrls($arrUrls, $sourceDir) {
-	
-		// delete the old rows
-		$sourceDbTable = new MvcEditor_SourceTable($this->getAdapter());
-		$sourceId = $sourceDbTable->getOrSave($sourceDir);
-		$strWhere = $this->getAdapter()->quoteInto("source_id = ?", $sourceId);
-		$this->delete($strWhere);
-		
-		if (!is_array($arrUrls)) {
-			return;
-		}
-		
-		// sqlite optimizes transactions really well; use transaction so that the inserts are faster
-		$this->getAdapter()->beginTransaction();
-		foreach ($arrUrls as $url) {
-			$this->insert(array(
-				'source_id' => $sourceId,
-				'url' => $url->url,
-				'full_path' => $url->fileName,
-				'class_name' => $url->className,
-				'method_name' => $url->methodName
-			));
-		}
-		$this->getAdapter()->commit();
-	}
+
+/**
+ * This class will prime the detectors sqlite db file.
+ * enabled projects. The Config cache will be primed; although
+ * it will be primed with the existing cache file which may be
+ * stale. 
+ */
+class DetectorDbInitActionClass : public mvceditor::InitializerGlobalActionClass {
+
+public:
+
+	DetectorDbInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+
+	void Work(mvceditor::GlobalsClass& globals);
+
+	wxString GetLabel() const;
+};
+
 }
+
+#endif

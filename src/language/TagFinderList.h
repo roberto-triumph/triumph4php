@@ -175,16 +175,18 @@ public:
 	 */
 	std::vector<UnicodeString> ClassUsedTraits(const UnicodeString& className, 
 		const std::vector<UnicodeString>& parentClassNames, 
-		const UnicodeString& methodName);
+		const UnicodeString& methodName,
+		const std::vector<wxFileName>& sourceDirs);
 
 	/**
 	 * Figure out a tag's type by looking at all of the initalized finders.
 	 * @param resourceToLookup MUST BE fully qualified (class name  + method name,  or function name).  string can have the
 	 *        object operator "::" that separates the class and method name.
+	 * @param sourceDirs will look only for tags in the given sources
 	 * @return the tag's type; (for methods / functions, it's the return type of the method) could be empty string if type could 
 	 *         not be determined 
 	 */
-	UnicodeString ResolveResourceType(UnicodeString resourceToLookup);
+	UnicodeString ResolveResourceType(UnicodeString resourceToLookup, const std::vector<wxFileName>& sourceDirs);
 
 	/**
 	 * searches all tag finders for the parent class of the given class
@@ -195,13 +197,13 @@ public:
 	 * queries all tag finders for resources that match tagSearch exactly. Any matched tags are
 	 * appended to the matches vector.
 	 */
-	void ExactMatchesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches);
+	void ExactMatchesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches, const std::vector<wxFileName>& sourceDirs);
 	
 	/**
 	 * queries all tag finders for resources that nearly match tagSearch (begin with). Any matched tags are
 	 * appended to the matches vector.
 	 */
-	void NearMatchesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches);
+	void NearMatchesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches, const std::vector<wxFileName>& sourceDirs);
 
 	/**
 	 * queries all tag finders for trait aliases of that match the given tagSearch extactly. Any matched tag are

@@ -663,7 +663,7 @@ void mvceditor::SqlBrowserFeatureClass::DetectMetadata() {
 	ChosenIndex = 0;
 
 	// thread will be owned by SequenceClass
-	mvceditor::SqlMetaDataActionClass* thread = new mvceditor::SqlMetaDataActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA);
+	mvceditor::SqlMetaDataActionClass* thread = new mvceditor::SqlMetaDataActionClass(App.SqliteRunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA);
 	std::vector<mvceditor::GlobalActionClass*> actions;
 	actions.push_back(thread);
 	App.Sequences.Build(actions);

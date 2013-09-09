@@ -20,42 +20,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2009-2011 Roberto Perpuly
+ * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-class MvcEditor_UrlTagTable extends Zend_Db_Table_Abstract {
 
-	protected $_name = 'url_tags';
+class MvcEditor_SourceTable extends Zend_Db_Table_Abstract {
+
+	protected $_name = 'sources';
+	
 
 	/**
-	 * saves the given MvcEditor_Urls into the database.
-	 * 
-	 * @param MvcEditor_Url[] $arrUrls the urls to insert 
+	 * @return the primary key of the source directory
 	 */
-	function saveUrls($arrUrls, $sourceDir) {
-	
-		// delete the old rows
-		$sourceDbTable = new MvcEditor_SourceTable($this->getAdapter());
-		$sourceId = $sourceDbTable->getOrSave($sourceDir);
-		$strWhere = $this->getAdapter()->quoteInto("source_id = ?", $sourceId);
-		$this->delete($strWhere);
+	public function getOrSave($sourceDir) {
 		
-		if (!is_array($arrUrls)) {
-			return;
-		}
+		/// make sure that sourceDir ends with the separator to make sure
+		// only the correct entries are selected / saved
+		$sourceDir = \opstring\ensure_ends_with($sourceDir, DIRECTORY_SEPARATOR);
 		
-		// sqlite optimizes transactions really well; use transaction so that the inserts are faster
-		$this->getAdapter()->beginTransaction();
-		foreach ($arrUrls as $url) {
-			$this->insert(array(
-				'source_id' => $sourceId,
-				'url' => $url->url,
-				'full_path' => $url->fileName,
-				'class_name' => $url->className,
-				'method_name' => $url->methodName
-			));
+		$select = $this->select()->where('directory = ?', $sourceDir);
+		$stmt = $select->query(Zend_Db::FETCH_ASSOC);
+		if ($row = $stmt->fetch()) {
+			return $row['source_id'];
 		}
-		$this->getAdapter()->commit();
+		return $this->insert(array(
+			'directory' => $sourceDir
+		));
+		
 	}
+
 }

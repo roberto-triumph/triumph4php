@@ -163,7 +163,7 @@ mvceditor::DetectedTagExactMemberResultClass* mvceditor::TagCacheClass::ExactDet
 	mvceditor::DetectedTagExactMemberResultClass* result = new mvceditor::DetectedTagExactMemberResultClass();
 	std::vector<UnicodeString> classNames;
 	classNames.push_back(tagSearch.GetClassName());
-	result->Set(classNames, tagSearch.GetMethodName());
+	result->Set(classNames, tagSearch.GetMethodName(), sourceDirs);
 	TagFinderList->DetectedTagFinder.Exec(result);
 	return result;
 }
@@ -184,7 +184,7 @@ mvceditor::DetectedTagNearMatchMemberResultClass* mvceditor::TagCacheClass::Near
 	mvceditor::DetectedTagNearMatchMemberResultClass* result = new mvceditor::DetectedTagNearMatchMemberResultClass();
 	std::vector<UnicodeString> classNames;
 	classNames.push_back(tagSearch.GetClassName());
-	result->Set(classNames, tagSearch.GetMethodName());
+	result->Set(classNames, tagSearch.GetMethodName(), sourceDirs);
 	TagFinderList->DetectedTagFinder.Exec(result);
 	return result;
 }
@@ -270,8 +270,10 @@ std::vector<mvceditor::ParsedTagFinderClass*> mvceditor::TagCacheClass::AllFinde
 	return allTagFinders;
 }
 
-void mvceditor::TagCacheClass::ExpressionCompletionMatches(const wxString& fileName, const pelet::ExpressionClass& parsedExpression, 
+void mvceditor::TagCacheClass::ExpressionCompletionMatches(const wxString& fileName, 
+													const pelet::ExpressionClass& parsedExpression, 
 													const pelet::ScopeClass& expressionScope, 
+													const std::vector<wxFileName>& sourceDirs,
 													 std::vector<UnicodeString>& autoCompleteList,
 													 std::vector<mvceditor::TagClass>& resourceMatches,
 													 bool doDuckTyping,
@@ -281,7 +283,7 @@ void mvceditor::TagCacheClass::ExpressionCompletionMatches(const wxString& fileN
 	if (itWorkingCache != WorkingCaches.end()) {
 		foundSymbolTable = true;
 		mvceditor::WorkingCacheClass* cache = itWorkingCache->second;
-		cache->SymbolTable.ExpressionCompletionMatches(parsedExpression, expressionScope, *TagFinderList, 
+		cache->SymbolTable.ExpressionCompletionMatches(parsedExpression, expressionScope, sourceDirs, *TagFinderList, 
 			autoCompleteList, resourceMatches, doDuckTyping, error);
 	
 	}
@@ -290,8 +292,10 @@ void mvceditor::TagCacheClass::ExpressionCompletionMatches(const wxString& fileN
 	}
 }
 
-void mvceditor::TagCacheClass::ResourceMatches(const wxString& fileName, const pelet::ExpressionClass& parsedExpression, 
+void mvceditor::TagCacheClass::ResourceMatches(const wxString& fileName, 
+												const pelet::ExpressionClass& parsedExpression, 
 													const pelet::ScopeClass& expressionScope, 
+												const std::vector<wxFileName>& sourceDirs,
 													std::vector<mvceditor::TagClass>& matches,
 													bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 													mvceditor::SymbolTableMatchErrorClass& error) {
@@ -300,7 +304,7 @@ void mvceditor::TagCacheClass::ResourceMatches(const wxString& fileName, const p
 	if (itWorkingCache != WorkingCaches.end()) {
 		foundSymbolTable = true;
 		mvceditor::WorkingCacheClass* cache = itWorkingCache->second;
-		cache->SymbolTable.ResourceMatches(parsedExpression, expressionScope, *TagFinderList, 
+		cache->SymbolTable.ResourceMatches(parsedExpression, expressionScope, sourceDirs, *TagFinderList, 
 			matches, doDuckTyping, doFullyQualifiedMatchOnly, error);	
 	}
 	if (!foundSymbolTable) {
@@ -373,9 +377,9 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllMemberTags(const U
 	mvceditor::TagSearchClass tagSearch(fullyQualifiedClassName + UNICODE_STRING_SIMPLE("::"));
 	tagSearch.SetFileItemId(fileTagId);
 	tagSearch.SetTraits(TagFinderList->ClassUsedTraits(fullyQualifiedClassName, tagSearch.GetParentClasses(), 
-			tagSearch.GetMethodName()));
+			tagSearch.GetMethodName(), sourceDirs));
 	
-	TagFinderList->NearMatchesFromAll(tagSearch, allMatches);
+	TagFinderList->NearMatchesFromAll(tagSearch, allMatches, sourceDirs);
 	
 	// now get all parent class  (look in all files) also look for inherited members and traits
 	UnicodeString parentClassName  = TagFinderList->ParentClassName(fullyQualifiedClassName, fileTagId);
@@ -384,12 +388,12 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllMemberTags(const U
 		
 		hierarchySearch.SetParentClasses(TagFinderList->ClassParents(parentClassName, hierarchySearch.GetMethodName()));
 		hierarchySearch.SetTraits(TagFinderList->ClassUsedTraits(parentClassName, hierarchySearch.GetParentClasses(), 
-			hierarchySearch.GetMethodName()));
+			hierarchySearch.GetMethodName(), sourceDirs));
 		
 		// search classes from the enabled source directories only
 		hierarchySearch.SetSourceDirs(sourceDirs);
 		
-		TagFinderList->NearMatchesFromAll(hierarchySearch, allMatches);
+		TagFinderList->NearMatchesFromAll(hierarchySearch, allMatches, sourceDirs);
 		TagFinderList->NearMatchTraitAliasesFromAll(hierarchySearch, allMatches);
 	}
 	return allMatches;
@@ -412,9 +416,9 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllClassesFunctionsDe
 	return allMatches;
 }
 
-std::vector<UnicodeString> mvceditor::TagCacheClass::ParentClassesAndTraits(const UnicodeString& className) {
+std::vector<UnicodeString> mvceditor::TagCacheClass::ParentClassesAndTraits(const UnicodeString& className, const std::vector<wxFileName>& sourceDirs) {
 	std::vector<UnicodeString> classParents = TagFinderList->ClassParents(className, UNICODE_STRING_SIMPLE(""));
-	std::vector<UnicodeString> classTraits = TagFinderList->ClassUsedTraits(className, classParents, UNICODE_STRING_SIMPLE(""));
+	std::vector<UnicodeString> classTraits = TagFinderList->ClassUsedTraits(className, classParents, UNICODE_STRING_SIMPLE(""), sourceDirs);
 	
 	std::vector<UnicodeString> all;
 	all.insert(all.end(), classParents.begin(), classParents.end());

@@ -31,6 +31,7 @@
 #include <actions/DatabaseTagDetectorActionClass.h>
 #include <actions/CacheDbVersionActionClass.h>
 #include <actions/ConfigTagDetectorActionClass.h>
+#include <actions/DetectorDbInitActionClass.h>
 #include <globals/Errors.h>
 
 mvceditor::SequenceClass::SequenceClass(mvceditor::GlobalsClass& globals, mvceditor::RunningThreadsClass& runningThreads)
@@ -84,35 +85,18 @@ bool mvceditor::SequenceClass::AppStart() {
 	// code expects them to be
 	AddStep(new mvceditor::TagCacheDbVersionActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK));
 	AddStep(new mvceditor::DetectorCacheDbVersionActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK));
+	
+	// open the detector tags db file
+	AddStep(new mvceditor::DetectorDbInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DETECTOR_DB_INIT));
 
 	// this will load the cache from the hard disk
 	// load the cache from hard disk so that code completion and 
 	// tag searching is available immediately after the app starts
 	AddStep(new mvceditor::ProjectTagInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_INIT));
-
-	// this will load the url entry point cache
-	// do this before the rest so the urls become available asap
-	AddStep(new mvceditor::UrlTagFinderInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR_INIT));
-
-	// this will prime the sql connections from the php detectors
-	AddStep(new mvceditor::DatabaseTagDetectorInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR_INIT));
-
-	// this will detect all of the config files for projects
-	AddStep(new mvceditor::ConfigTagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR));
-
-	// this will attempt to detect new sql connections from the php detectors
-	// this can go here because it does not need the tag cache to be up-to-date
-	AddStep(new mvceditor::DatabaseTagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR));
-
+	
 	// this will discover the db schema info (tables, columns)
 	AddStep(new mvceditor::SqlMetaDataActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA));
 
-	// this will detect the urls (entry points) that a project has
-	AddStep(new mvceditor::UrlTagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR));
-
-	// this will discover any new detected tags 
-	AddStep(new mvceditor::TagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_DETECTOR));
-	
 	Run();
 	return true;
 }
@@ -122,14 +106,9 @@ bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvced
 	if (Running()) {
 		return false;
 	}
+	
+	// in case newly enabled projects are no longer in the file system
 	SourceCheck();
-
-	// before we do anything else, make sure that the cache files are the same version as the
-	// code expects them to be
-	// we need to do this here too because the version checker only checks active projects
-	// and an old project might be enabled
-	AddStep(new mvceditor::TagCacheDbVersionActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK));
-	AddStep(new mvceditor::DetectorCacheDbVersionActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK));
 
 	// this step will wipe the global cache; this is needed in case a project has
 	// new exclude wilcards or a source directory has been removed.  the ProjectTagActionClass
@@ -152,13 +131,6 @@ bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvced
 		}
 	}
 	AddStep(new mvceditor::TagDeleteSourceActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE, sourceDirsToDelete));
-
-	// this will load the url entry point cache
-	// do this before the rest so the urls become available asap
-	AddStep(new mvceditor::UrlTagFinderInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR_INIT));
-
-	// this will prime the sql connections from the php detectors
-	AddStep(new mvceditor::DatabaseTagDetectorInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR_INIT));
 
 	// this will detect all of the config files for projects
 	AddStep(new mvceditor::ConfigTagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR));
@@ -194,6 +166,14 @@ bool mvceditor::SequenceClass::TagCacheWipeAndIndex() {
 
 	// this step will wipe the global cache from all projects
 	AddStep(new mvceditor::TagWipeActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE));
+	
+	// this will detect all of the config files for projects
+	AddStep(new mvceditor::ConfigTagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR));
+
+	// this will attempt to detect new sql connections from the php detectors
+	// this can go here because it does not need the tag cache to be up-to-date
+	AddStep(new mvceditor::DatabaseTagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR));
+
 
 	// this will recurse though all directories and parse the source code
 	AddStep(new mvceditor::ProjectTagActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST));
@@ -227,14 +207,6 @@ bool mvceditor::SequenceClass::DatabaseDetection() {
 
 	// this will attempt to detect new sql connections from the php detectors
 	AddStep(new mvceditor::DatabaseTagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR));
-
-	// this will prime the sql connections from the php detectors
-	// this is being done here so that we can guarantee that SqlMetaData has the
-	// most up-to-date database tags. The GlobalsChangeHandlerClass also reads
-	// the database tags from the detector db, but since it also works on events
-	// we cannot gurantee that the GlobalsChangeHandlerClass EVENT_WORK_COMPLETE handler will get called
-	// before the SequenceClass EVENT_WORK_COMPLETE handler.
-	AddStep(new mvceditor::DatabaseTagDetectorInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR_INIT));
 
 	// this will discover the db schema info (tables, columns)
 	AddStep(new mvceditor::SqlMetaDataActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA));
@@ -386,33 +358,31 @@ BEGIN_EVENT_TABLE(mvceditor::SequenceClass, wxEvtHandler)
 	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST, mvceditor::SequenceClass::OnActionComplete)
 	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_SQL_METADATA_INIT, mvceditor::SequenceClass::OnActionComplete)
 	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_SQL_METADATA, mvceditor::SequenceClass::OnActionComplete)
-	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR_INIT, mvceditor::SequenceClass::OnActionComplete)
 	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR, mvceditor::SequenceClass::OnActionComplete)
 	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_TAG_DETECTOR_INIT, mvceditor::SequenceClass::OnActionComplete)
 	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_TAG_DETECTOR, mvceditor::SequenceClass::OnActionComplete)
 	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE, mvceditor::SequenceClass::OnActionComplete)
 	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_CALL_STACK, mvceditor::SequenceClass::OnActionComplete)
 	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR, mvceditor::SequenceClass::OnActionComplete)
-	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR_INIT, mvceditor::SequenceClass::OnActionComplete)
 	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR, mvceditor::SequenceClass::OnActionComplete)
 	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR, mvceditor::SequenceClass::OnActionComplete)
 	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK, mvceditor::SequenceClass::OnActionComplete)
 	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK, mvceditor::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_DETECTOR_DB_INIT, mvceditor::SequenceClass::OnActionComplete)
 
 	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_INIT, mvceditor::SequenceClass::OnActionProgress)
 	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST, mvceditor::SequenceClass::OnActionProgress)
 	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_SQL_METADATA_INIT, mvceditor::SequenceClass::OnActionProgress)
 	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_SQL_METADATA, mvceditor::SequenceClass::OnActionProgress)
-	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR_INIT, mvceditor::SequenceClass::OnActionProgress)
 	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR, mvceditor::SequenceClass::OnActionProgress)
 	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_DETECTOR_INIT, mvceditor::SequenceClass::OnActionProgress)
 	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_DETECTOR, mvceditor::SequenceClass::OnActionProgress)
 	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE, mvceditor::SequenceClass::OnActionProgress)
 	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_CALL_STACK, mvceditor::SequenceClass::OnActionProgress)
 	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR, mvceditor::SequenceClass::OnActionProgress)
-	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR_INIT, mvceditor::SequenceClass::OnActionProgress)
 	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR, mvceditor::SequenceClass::OnActionProgress)
 	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR, mvceditor::SequenceClass::OnActionProgress)
 	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK, mvceditor::SequenceClass::OnActionProgress)
 	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK, mvceditor::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_DETECTOR_DB_INIT, mvceditor::SequenceClass::OnActionProgress)
 END_EVENT_TABLE()

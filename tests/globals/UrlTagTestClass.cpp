@@ -29,6 +29,7 @@
 #include <globals/Assets.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <wx/stdpaths.h>
 #include <MvcEditorChecks.h>
 #include <string>
 
@@ -38,14 +39,30 @@ public:
 
 	mvceditor::UrlTagFinderClass Finder;
 	soci::session DetectorTagSession;
+	std::vector<wxFileName> SourceDirs;
+	int SourceId;
 
 	UrlTagFixtureClass()
 		: SqliteTestFixtureClass()
-		, Finder() {
+		, Finder() 
+		, SourceDirs() 
+		, SourceId(0) {
 		DetectorTagSession.open(*soci::factory_sqlite3(), ":memory:");
 		CreateDatabase(DetectorTagSession, mvceditor::DetectorSqlSchemaAsset());
 		Finder.InitSession(&DetectorTagSession);
 		
+		wxFileName tmpDir;
+		tmpDir.AssignDir(wxStandardPaths::Get().GetTempDir());
+		SourceDirs.push_back(tmpDir);
+		std::string stdDir = mvceditor::WxToChar(tmpDir.GetPathWithSep());
+		
+		// create the source
+		soci::statement stmt = (DetectorTagSession.prepare << "INSERT INTO sources(directory) VALUES(?)",
+			soci::use(stdDir));
+		stmt.execute(true);
+		soci::sqlite3_statement_backend* backend = static_cast<soci::sqlite3_statement_backend*>(stmt.get_backend());
+		SourceId = sqlite3_last_insert_rowid(backend->session_.conn_);
+	
 		AddToDb1("http://localhost/index.php", 
 			"/home/user/welcome.php", "WelcomeController", "index");
 		AddToDb1("http://localhost/frontend.php",
@@ -59,8 +76,8 @@ public:
 
 	void AddToDb1(std::string url, std::string fileName, std::string className, std::string methodName) {
 		soci::statement stmt = (DetectorTagSession.prepare <<
-			"INSERT INTO url_tags(url, full_path, class_name, method_name) VALUES (?, ?, ?, ?)",
-			soci::use(url), soci::use(fileName),
+			"INSERT INTO url_tags(url, source_id, full_path, class_name, method_name) VALUES (?, ?, ?, ?, ?)",
+			soci::use(url), soci::use(SourceId), soci::use(fileName),
 			soci::use(className), soci::use(methodName)
 		);
 		stmt.execute(true);
@@ -81,7 +98,7 @@ TEST_FIXTURE(UrlTagFixtureClass, FindByUrlMatch) {
 
 	wxURI toFind(wxT("http://localhost/frontend.php"));
 	mvceditor::UrlTagClass urlTag;
-	CHECK(Finder.FindByUrl(toFind, urlTag));
+	CHECK(Finder.FindByUrl(toFind, SourceDirs, urlTag));
 	CHECK(toFind == urlTag.Url);
 	CHECK_EQUAL(wxT("http://localhost/frontend.php"), urlTag.Url.BuildURI());
 	
@@ -92,7 +109,7 @@ TEST_FIXTURE(UrlTagFixtureClass, FindByUrlMatch) {
 	CHECK_EQUAL(wxT("action"), urlTag.MethodName);
 
 	toFind.Create(wxT("http://localhost/index.php"));
-	CHECK(Finder.FindByUrl(toFind, urlTag));
+	CHECK(Finder.FindByUrl(toFind, SourceDirs, urlTag));
 	CHECK(toFind == urlTag.Url);
 	CHECK_EQUAL(wxT("http://localhost/index.php"), urlTag.Url.BuildURI());
 
@@ -106,37 +123,37 @@ TEST_FIXTURE(UrlTagFixtureClass, FindByUrlMatch) {
 TEST_FIXTURE(UrlTagFixtureClass, FindByUrlNoMatch) {
 	wxURI toFind(wxT("http://localhost/backend.php"));
 	mvceditor::UrlTagClass urlTag;
-	CHECK_EQUAL(false, Finder.FindByUrl(toFind, urlTag));
+	CHECK_EQUAL(false, Finder.FindByUrl(toFind, SourceDirs, urlTag));
 	CHECK(urlTag.Url.BuildURI().IsEmpty());
 }
 
 TEST_FIXTURE(UrlTagFixtureClass, FilterUrl) {
 	std::vector<mvceditor::UrlTagClass> urls;
-	Finder.FilterUrls(wxT("front"), urls);
+	Finder.FilterUrls(wxT("front"), SourceDirs, urls);
 	CHECK_VECTOR_SIZE(1, urls);
 	CHECK_EQUAL(wxT("http://localhost/frontend.php"), urls[0].Url.BuildURI());
 }
 
 TEST_FIXTURE(UrlTagFixtureClass, FilterUrlNoMatches) {
 	std::vector<mvceditor::UrlTagClass> urls;
-	Finder.FilterUrls(wxT("back"), urls);
+	Finder.FilterUrls(wxT("back"), SourceDirs, urls);
 	CHECK_VECTOR_SIZE(0, urls);
 }
 
 TEST_FIXTURE(UrlTagFixtureClass, DeleteUrlMatch) {
 	wxURI toDelete(wxT("http://localhost/frontend.php"));
-	Finder.DeleteUrl(toDelete);
+	Finder.DeleteUrl(toDelete, SourceDirs);
 	CHECK_EQUAL(1, DatabaseRecordsNumDb1());
 }
 
 TEST_FIXTURE(UrlTagFixtureClass, DeleteUrlNoMatch) {
 	wxURI toDelete(wxT("http://localhost/backend.php"));
-	Finder.DeleteUrl(toDelete);
+	Finder.DeleteUrl(toDelete, SourceDirs);
 	CHECK_EQUAL(2, DatabaseRecordsNumDb1());
 }
 
 TEST_FIXTURE(UrlTagFixtureClass, Wipe) {
-	Finder.Wipe();
+	Finder.Wipe(SourceDirs);
 	CHECK_EQUAL(0, DatabaseRecordsNumDb1());
 }
 

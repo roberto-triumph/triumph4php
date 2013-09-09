@@ -41,7 +41,7 @@ mvceditor::GlobalsClass::GlobalsClass()
 	, MiscFileExtensionsString(wxT("*.js;*.html;*.yml;*.xml;*.txt"))
 	, TagCacheDbFileName(mvceditor::TagCacheAsset())
 	, DetectorCacheDbFileName(mvceditor::DetectorCacheAsset()) 
-	, DetectorCacheSession(){
+	, DetectorCacheSession() {
 }
 
 void mvceditor::GlobalsClass::Close() {
@@ -74,6 +74,20 @@ std::vector<mvceditor::SourceClass> mvceditor::GlobalsClass::AllEnabledPhpSource
 		}
 	}
 	return allSources;
+}
+
+std::vector<wxFileName> mvceditor::GlobalsClass::AllEnabledSourceDirectories() const {
+	std::vector<wxFileName> allSourceDirectories;
+	std::vector<mvceditor::ProjectClass>::const_iterator it;
+	std::vector<mvceditor::SourceClass>::const_iterator src;
+	for (it = Projects.begin(); it != Projects.end(); ++it) {
+		if (it->IsEnabled) {
+			for (src = it->Sources.begin(); src != it->Sources.end(); ++src) {
+				allSourceDirectories.push_back(src->RootDirectory);
+			}
+		}
+	}
+	return allSourceDirectories;
 }
 
 std::vector<mvceditor::ProjectClass> mvceditor::GlobalsClass::AllEnabledProjects() const {

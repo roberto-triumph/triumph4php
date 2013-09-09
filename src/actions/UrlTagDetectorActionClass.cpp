@@ -30,23 +30,6 @@
 
 static int ID_URL_TAG_DETECTOR_PROCESS = wxNewId();
 
-mvceditor::UrlTagFinderInitActionClass::UrlTagFinderInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
-	: InitializerGlobalActionClass(runningThreads, eventId) {
-
-}
-
-void mvceditor::UrlTagFinderInitActionClass::Work(mvceditor::GlobalsClass& globals) {
-	SetStatus(_("Url Tag Finder Init"));
-	globals.DetectorCacheSession.close();
-	globals.DetectorCacheSession.open(*soci::factory_sqlite3(), 
-		mvceditor::WxToChar(globals.DetectorCacheDbFileName.GetFullPath()));
-	globals.UrlTagFinder.InitSession(&globals.DetectorCacheSession);
-}
-
-wxString mvceditor::UrlTagFinderInitActionClass::GetLabel() const {
-	return wxT("URL Tag Finder Init");
-}
-
 mvceditor::UrlTagDetectorParamsClass::UrlTagDetectorParamsClass() 
 	: PhpExecutablePath()
 	, PhpIncludePath()

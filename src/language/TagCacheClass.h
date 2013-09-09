@@ -301,9 +301,10 @@ public:
 	 * Basically just a calls the ExpressionCompletionResourceMatches() of the given file's SymbolTable. See that method for more info
 	 * 
 	 * @param fileName the symbol table of this registered file will be searched
-	 * @parm parsedExpression the parsed expression; from ParserClass::ParseExpression() 
+	 * @param parsedExpression the parsed expression; from ParserClass::ParseExpression() 
 	 * @param expressionScope the scope where parsed expression is located.  The scope let's us know which variables are
 	 *        available. See ScopeFinderClass for more info.
+	 * @param sourceDirs the list of enabled source directories, only tags whose source_id matches source directories will be returned
 	 * @param autoCompleteVariableList the results of the matches; these are the names of the variables that
 	 *        are "near matches" to the parsed expression. This will be filled only when parsedExpression is a variable. 
 	 * @param autoCompleteResourceList the results of the matches; these are the names of the items that
@@ -314,7 +315,10 @@ public:
 	 *        slower because ParsedTagFinderClass still handles them
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
-	void ExpressionCompletionMatches(const wxString& fileName, const pelet::ExpressionClass& parsedExpression, const pelet::ScopeClass& expressionScope, 
+	void ExpressionCompletionMatches(const wxString& fileName, 
+		const pelet::ExpressionClass& parsedExpression, 
+		const pelet::ScopeClass& expressionScope, 
+		const std::vector<wxFileName>& sourceDirs,
 		std::vector<UnicodeString>& autoCompleteList,
 		std::vector<TagClass>& autoCompleteResourceList,
 		bool doDuckTyping,
@@ -325,9 +329,10 @@ public:
 	 * Basically just a calls the ResourceMatches() of the given file's SymbolTable. See that method for more info
 	 * 
 	 * @param fileName the symbol table of this registered file will be searched
-	 * @parm parsedExpression the parsed expression; from ParserClass::ParseExpression() 
+	 * @param parsedExpression the parsed expression; from ParserClass::ParseExpression() 
 	 * @param expressionScope the scope where parsed expression is located.  The scope let's us know which variables are
 	 *        available. See ScopeFinderClass for more info.
+	 * @param sourceDirs the list of enabled source directories, only tags whose source_id matches source directories will be returned
 	 * @param matches all of the tag matches will be put here
 	 * @param doDuckTyping if an expression chain could not be fully resolved; then we could still
 	 *        perform a search for the expression member in ALL classes. The lookups will not be
@@ -336,7 +341,10 @@ public:
 	 *        returned
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
-	void ResourceMatches(const wxString& fileName, const pelet::ExpressionClass& parsedExpression, const pelet::ScopeClass& expressionScope, 
+	void ResourceMatches(const wxString& fileName, 
+		const pelet::ExpressionClass& parsedExpression, 
+		const pelet::ScopeClass& expressionScope, 
+		const std::vector<wxFileName>& sourceDirs,
 		std::vector<TagClass>& matches,
 		bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 		SymbolTableMatchErrorClass& error);
@@ -366,7 +374,7 @@ public:
 	 * @return list of class names that are base classes for the given class; plus traits
 	 *         used by the given class or any of its base classes
 	 */
-	std::vector<UnicodeString> ParentClassesAndTraits(const UnicodeString& className);
+	std::vector<UnicodeString> ParentClassesAndTraits(const UnicodeString& className, const std::vector<wxFileName>& sourceDirs);
 
 	/**
 	 * retrieves a tag by its ID

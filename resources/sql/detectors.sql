@@ -30,6 +30,17 @@
 --
 
 
+-- this table store all "source" directories. a source directory is just a 
+-- directory that contains source code files
+CREATE TABLE IF NOT EXISTS sources (
+	source_id INTEGER PRIMARY KEY AUTOINCREMENT,
+	
+	-- the full path has OS-dependant file separators
+	-- the full path is the entire path to a source directory
+	-- don't do it case-insensitive because different file systems handle case differently
+	directory TEXT NOT NULL COLLATE NOCASE
+);
+
 -- this table will store all of the detected URLs. A URL tag
 -- stores a URL along with the location of the entry point; ie. what
 -- class / method is invoked when the URL is requested.
@@ -37,6 +48,9 @@
 -- in the case that a single function is invoked, ClassName will be 
 -- empty and MethodName will contain the name of the function being called.
 CREATE TABLE IF NOT EXISTS url_tags (
+
+	-- the foreign key to the source directory
+	source_id INT INTEGER NOT NULL,
 
 	-- full URL; including protocol, host, file, and query args
 	-- http://localhost/file.php?x=1&c=2
@@ -67,6 +81,9 @@ CREATE TABLE IF NOT EXISTS url_tags (
 -- This table is populated by MVC Editor before the template files detectors are called.
 --
 CREATE TABLE IF NOT EXISTS call_stacks (
+	
+	-- the foreign key to the source directory
+	source_id INT INTEGER NOT NULL,
 	
 	-- zero-based index of the 
 	-- where zero (0) is the first step: the entry point. all queries for a
@@ -104,6 +121,9 @@ CREATE TABLE IF NOT EXISTS template_file_tags (
 	--
 	id INTEGER PRIMARY KEY AUTOINCREMENT, 
 	
+	-- the foreign key to the source directory
+	source_id INT INTEGER NOT NULL,	
+
 	-- this is the full path to the template file. 
 	-- It contains OS-dependant directory separators
 	full_path TEXT NOT NULL,
@@ -126,6 +146,9 @@ CREATE TABLE IF NOT EXISTS detected_tags (
 	-- needed for Zend_Db_Table_Abstract 
 	--
 	id INTEGER PRIMARY KEY AUTOINCREMENT, 
+	
+	-- the foreign key to the source directory
+	source_id INT INTEGER NOT NULL,
 	
 	--
 	-- The key is the string that MVC Editor will use to query
@@ -191,13 +214,8 @@ CREATE TABLE IF NOT EXISTS database_tags (
 	--
 	id INTEGER PRIMARY KEY AUTOINCREMENT, 
 	
-	--
-	-- this is the full path to the source directory
-	-- that contains the database settings. Note that this
-	-- is the source as entered by the user in the "Project Sources". 
-	-- It contains OS-dependant directory separators
-	--
-	source_dir_full_path TEXT NOT NULL COLLATE NOCASE,
+	-- the foreign key to the source directory
+	source_id INT INTEGER NOT NULL,
 	
 	--
 	-- a friendly label for this connection. MVC Editor will show
@@ -256,13 +274,8 @@ CREATE TABLE IF NOT EXISTS config_tags (
 	--
 	id INTEGER PRIMARY KEY AUTOINCREMENT, 
 	
-	--
-	-- this is the full path to the source directory
-	-- that contains the database settings. Note that this
-	-- is the source as entered by the user in the "Project Sources". 
-	-- It contains OS-dependant directory separators
-	--
-	source_dir_full_path TEXT NOT NULL COLLATE NOCASE,
+	-- the foreign key to the source directory
+	source_id INT INTEGER NOT NULL,
 	
 	--
 	-- a friendly label for this connection. MVC Editor will show
@@ -291,10 +304,22 @@ CREATE TABLE schema_version (
 -- class / methods / functions.
 CREATE INDEX IF NOT EXISTS idxDetectedTagKey ON detected_tags(key, type);
 
+CREATE INDEX IF NOT EXISTS idxCallStackSource ON call_stacks(source_id);
+
+CREATE INDEX IF NOT EXISTS idxConfigSource ON config_tags(source_id);
+
+CREATE INDEX IF NOT EXISTS idxDatabaseSource ON database_tags(source_id);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idxSourceDirectory ON sources(directory);
+
+CREATE INDEX IF NOT EXISTS idxTemplateFilesSource ON template_file_tags(source_id);
+
+CREATE INDEX IF NOT EXISTS idxUrlSource ON url_tags(source_id);
+
 --
 -- This number must match the version in CacheDbVersionActionClass.cpp
 --
-INSERT INTO schema_version (version_number) VALUES(3);
+INSERT INTO schema_version (version_number) VALUES(6);
 
 --
 -- Write ahead logging to allow for concurrent reads and writes

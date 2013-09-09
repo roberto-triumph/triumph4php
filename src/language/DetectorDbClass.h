@@ -1,4 +1,3 @@
-<?php
 /**
  * This software is released under the terms of the MIT License
  * 
@@ -20,42 +19,52 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2009-2011 Roberto Perpuly
+ * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
+#ifndef __MVCEDITOR_DETECTORDBCLASS_H__
+#define __MVCEDITOR_DETECTORDBCLASS_H__
 
-class MvcEditor_UrlTagTable extends Zend_Db_Table_Abstract {
+#include <soci/soci.h>
+#include <globals/Sqlite.h>
+#include <wx/filename.h>
 
-	protected $_name = 'url_tags';
+namespace mvceditor {
+	
+/**
+ * This class performs write operations on the detector tags
+ * cache database. 
+ */
+class DetectorDbClass {
+	
+public:
+
+	DetectorDbClass();
 
 	/**
-	 * saves the given MvcEditor_Urls into the database.
-	 * 
-	 * @param MvcEditor_Url[] $arrUrls the urls to insert 
+	 * @param session opened db connection. This class will not own the pointer.
 	 */
-	function saveUrls($arrUrls, $sourceDir) {
+	void Init(soci::session* session);
 	
-		// delete the old rows
-		$sourceDbTable = new MvcEditor_SourceTable($this->getAdapter());
-		$sourceId = $sourceDbTable->getOrSave($sourceDir);
-		$strWhere = $this->getAdapter()->quoteInto("source_id = ?", $sourceId);
-		$this->delete($strWhere);
-		
-		if (!is_array($arrUrls)) {
-			return;
-		}
-		
-		// sqlite optimizes transactions really well; use transaction so that the inserts are faster
-		$this->getAdapter()->beginTransaction();
-		foreach ($arrUrls as $url) {
-			$this->insert(array(
-				'source_id' => $sourceId,
-				'url' => $url->url,
-				'full_path' => $url->fileName,
-				'class_name' => $url->className,
-				'method_name' => $url->methodName
-			));
-		}
-		$this->getAdapter()->commit();
-	}
+	/**
+	 * deletes all detected tags (db, config, urls, templates, etc...)
+	 * that were detected from the given source directory.
+	 */
+	void DeleteSource(const wxFileName& sourceDir);
+	
+	/**
+	 * deletes all rows from all tables. 
+	 */
+	void Wipe();
+	
+private:
+
+	/**
+	 * This class will not own the pointer.
+	 */
+	soci::session* Session;
+};
+
 }
+
+#endif

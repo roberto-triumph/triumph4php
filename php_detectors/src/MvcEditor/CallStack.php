@@ -184,7 +184,7 @@ class MvcEditor_CallStack {
 	 * $name = buildName(getFirstName($a), getLastName($a));
 	 * 
 	 * then FunctionArguments are [ $@tmp1, $@tmp2 ]
-	 * because the resul of getFirstName and getLastName get assigned to
+	 * because the result of getFirstName and getLastName get assigned to
 	 * a temp variable.
 	 * 
 	 */

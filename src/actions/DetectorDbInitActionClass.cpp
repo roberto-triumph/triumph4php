@@ -1,5 +1,5 @@
 /**
- * The MIT License
+ * This software is released under the terms of the MIT License
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,60 +19,55 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2012 Roberto Perpuly
+ * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <actions/GlobalsChangeHandlerClass.h>
-#include <globals/DatabaseTagClass.h>
-#include <actions/GlobalActionClass.h>
-#include <globals/Errors.h>
+
+#include <actions/DetectorDbInitActionClass.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 
-mvceditor::GlobalsChangeHandlerClass::GlobalsChangeHandlerClass(mvceditor::GlobalsClass& globals) 
-	: wxEvtHandler()
-	, Globals(globals) {
+mvceditor::DetectorDbInitActionClass::DetectorDbInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+	: InitializerGlobalActionClass(runningThreads, eventId) {
+
 }
 
-void mvceditor::GlobalsChangeHandlerClass::OnSqlMetaDataComplete(mvceditor::SqlMetaDataEventClass& event) {
-	Globals.SqlResourceFinder.Copy(event.NewResources);
-	std::vector<UnicodeString> errors = event.Errors;
-	for (size_t i = 0; i < errors.size(); ++i) {
-		wxString wxError = mvceditor::IcuToWx(errors[i]);
-		mvceditor::EditorLogError(mvceditor::ERR_BAD_SQL_CONNECTION, wxError);
-	}
-}
+void mvceditor::DetectorDbInitActionClass::Work(mvceditor::GlobalsClass &globals) {
+	SetStatus(_("Detector Db Init"));
 
-void mvceditor::GlobalsChangeHandlerClass::OnDatabaseTagsComplete(mvceditor::ActionEventClass& event) {
+	// open the tag db
+	globals.DetectorCacheSession.open(*soci::factory_sqlite3(), 
+		mvceditor::WxToChar(globals.DetectorCacheDbFileName.GetFullPath()));
+	globals.UrlTagFinder.InitSession(&globals.DetectorCacheSession);
+	
+	// reload the detected database tags
 	
 	// first remove all detected connections that were previously detected
 	std::vector<mvceditor::DatabaseTagClass>::iterator info;
-	info = Globals.DatabaseTags.begin();
-	while(info != Globals.DatabaseTags.end()) {
+	info = globals.DatabaseTags.begin();
+	while(info != globals.DatabaseTags.end()) {
 		if (info->IsDetected) {
-			info = Globals.DatabaseTags.erase(info);
+			info = globals.DatabaseTags.erase(info);
 		}
 		else {
 			info++;
 		}
 	}
 
-	mvceditor::DatabaseTagFinderClass finder;
-	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
-	finder.InitSession(&session);
-	std::vector<wxFileName> sourceDirectories = Globals.AllEnabledSourceDirectories();
+	std::vector<wxFileName> sourceDirectories = globals.AllEnabledSourceDirectories();
 
+	// initialize the detected tag cache only the enabled projects
+	mvceditor::DatabaseTagFinderClass finder;
+	finder.InitSession(&globals.DetectorCacheSession);
+	
 	std::vector<mvceditor::DatabaseTagClass> detected = finder.All(sourceDirectories);
 	std::vector<mvceditor::DatabaseTagClass>::const_iterator tag;
 	for (tag = detected.begin(); tag != detected.end(); ++tag) {
 		if (!tag->Host.isEmpty() && !tag->Schema.isEmpty()) {
-			Globals.DatabaseTags.push_back(*tag);
+			globals.DatabaseTags.push_back(*tag);
 		}
 	}
 }
 
-BEGIN_EVENT_TABLE(mvceditor::GlobalsChangeHandlerClass, wxEvtHandler)
-	EVT_SQL_META_DATA_COMPLETE(mvceditor::ID_EVENT_ACTION_SQL_METADATA, mvceditor::GlobalsChangeHandlerClass::OnSqlMetaDataComplete)
-	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR, mvceditor::GlobalsChangeHandlerClass::OnDatabaseTagsComplete)
-END_EVENT_TABLE()
-
-
+wxString mvceditor::DetectorDbInitActionClass::GetLabel() const {
+	return _("Database tags detector initialization");
+}

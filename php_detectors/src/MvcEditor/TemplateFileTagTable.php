@@ -28,7 +28,14 @@ class MvcEditor_TemplateFileTagTable extends Zend_Db_Table_Abstract {
 
 	protected $_name = 'template_file_tags';
 	
-	public function saveTemplateFiles($templateFiles) {
+	public function saveTemplateFiles($templateFiles, $sourceDir) {
+		
+		// delete the old rows
+		$sourceDbTable = new MvcEditor_SourceTable($this->getAdapter());
+		$sourceId = $sourceDbTable->getOrSave($sourceDir);
+		$strWhere = $this->getAdapter()->quoteInto("source_id = ?", $sourceId);
+		$this->delete($strWhere);
+		
 		if (!is_array($templateFiles)) {
 			return;
 		}
@@ -36,11 +43,10 @@ class MvcEditor_TemplateFileTagTable extends Zend_Db_Table_Abstract {
 		// sqlite optimizes transactions really well; use transaction so that the inserts are faster
 		$this->getAdapter()->beginTransaction();
 		
-		// delete any old rows; we only store one set of template files for now
-		$this->delete('');
 		foreach ($templateFiles as $templateFile) {
 			$variables = join(',', $templateFile->variables);
 			$this->insert(array(
+				'source_id' => $sourceId,
 				'full_path' => $templateFile->fullPath,
 				'variables' => $variables
 			));

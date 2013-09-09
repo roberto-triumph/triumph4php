@@ -121,19 +121,18 @@ function wxappconfiguration(config, action)
 	end
 end
 
-function sociconfiguration()
-	includedirs {
-		"lib/soci/mvc-editor/include",
-		"lib/soci/mvc-editor/include/soci",
-		MYSQL_INCLUDE_DIR,
-		SQLITE_INCLUDE_DIR
-	}
+function sociconfiguration(config)
 	libdirs {
 		MYSQL_LIB_DIR,
 		SQLITE_LIB_DIR
 	}
 	if os.is "windows" then 
-	
+		includedirs {
+			"lib/soci/mvc-editor/include",
+			"lib/soci/mvc-editor/include/soci",
+			MYSQL_INCLUDE_DIR,
+			SQLITE_INCLUDE_DIR
+		}
 		links { 
 			"soci_core_3_1", 
 			"soci_mysql_3_1", 
@@ -150,11 +149,32 @@ function sociconfiguration()
 		-- that use them crash)
 		libdirs { "lib/soci/src/lib/Release" }
 	else 
+		if config == "Debug" then
+			includedirs {
+				"lib/soci/mvc-editor/Debug/include",
+				"lib/soci/mvc-editor/Debug/include/soci",
+				MYSQL_INCLUDE_DIR,
+				SQLITE_INCLUDE_DIR
+			}
+		end
+		if config == "Release" then
+			includedirs {
+				"lib/soci/mvc-editor/Release/include",
+				"lib/soci/mvc-editor/Release/include/soci",
+				MYSQL_INCLUDE_DIR,
+				SQLITE_INCLUDE_DIR
+			}
+		end
+
 		-- soci creates lib directory with the architecture name
-		if os.isdir "lib/soci/mvc-editor/lib64" then
-			libdirs { "lib/soci/mvc-editor/lib64" }
-		else
-			libdirs { "lib/soci/mvc-editor/lib" }
+		if (os.isdir("lib/soci/mvc-editor/Debug/lib64") and config == "Debug") then
+			libdirs { "lib/soci/mvc-editor/Debug/lib64" }
+		elseif (os.isdir("lib/soci/mvc-editor/Release/lib64") and config == "Release") then
+			libdirs { "lib/soci/mvc-editor/Release/lib64" }
+		elseif (os.isdir("lib/soci/mvc-editor/Debug/lib") and config == "Debug") then
+			libdirs { "lib/soci/mvc-editor/Debug/lib" }
+		elseif (os.isdir("lib/soci/mvc-editor/Release/lib") and config == "Release") then
+			libdirs { "lib/soci/mvc-editor/Release/lib" }
 		end
 		links { 
 			"soci_core", 
@@ -216,16 +236,17 @@ solution "mvc-editor"
 		end
 		includedirs { "src/", "lib/keybinder/include/", "lib/pelet/include" }
 		links { "tests", "keybinder", "pelet" }
-		
-		sociconfiguration()
+
 		configuration "Debug"
 			pickywarnings(_ACTION)
+			sociconfiguration("Debug")
 			icuconfiguration("Debug", _ACTION)
 			wxconfiguration("Debug", _ACTION)
 			wxappconfiguration("Debug", _ACTION)
 
 		configuration "Release"
 			pickywarnings(_ACTION)
+			sociconfiguration("Release")
 			icuconfiguration("Release", _ACTION)
 			wxconfiguration("Release", _ACTION)
 			wxappconfiguration("Release", _ACTION)
@@ -270,13 +291,14 @@ solution "mvc-editor"
 			"pelet"
 		}
 
-		sociconfiguration()
 		configuration "Debug"
 			pickywarnings(_ACTION)
+			sociconfiguration("Debug")
 			icuconfiguration("Debug", _ACTION)
 			wxconfiguration("Debug", _ACTION)
 		configuration "Release"
 			pickywarnings(_ACTION)
+			sociconfiguration("Release")
 			icuconfiguration("Release", _ACTION)
 			wxconfiguration("Release", _ACTION)
 
@@ -296,13 +318,14 @@ solution "mvc-editor"
 		includedirs { "src", "lib/pelet/include" }
 		links { "pelet" }
 
-		sociconfiguration()
 		configuration "Debug"
 			pickywarnings(_ACTION)
+			sociconfiguration("Debug")
 			icuconfiguration("Debug", _ACTION)
 			wxconfiguration("Debug", _ACTION)
 		configuration { "Release"}
 			pickywarnings(_ACTION)
+			sociconfiguration("Release")
 			icuconfiguration("Release", _ACTION)
 			wxconfiguration("Release", _ACTION)
 
@@ -324,13 +347,14 @@ solution "mvc-editor"
 		includedirs { "src", "lib/pelet/include" }
 		links { "pelet" }
 
-		sociconfiguration()
 		configuration "Debug"
 			pickywarnings(_ACTION)
+			sociconfiguration("Debug")
 			icuconfiguration("Debug", _ACTION)
 			wxconfiguration("Debug", _ACTION)
 		configuration { "Release"}
 			pickywarnings(_ACTION)
+			sociconfiguration("Release")
 			icuconfiguration("Release", _ACTION)
 			wxconfiguration("Release", _ACTION)
                         
@@ -347,14 +371,16 @@ solution "mvc-editor"
 		}
 		includedirs { "src", "lib/pelet/include" }
 		links { "pelet" }
-		sociconfiguration()
+		
 		configuration "Debug"
 			pickywarnings(_ACTION)
+			sociconfiguration("Debug")
 			icuconfiguration("Debug", _ACTION)
 			wxconfiguration("Debug", _ACTION)
 			wxappconfiguration("Debug", _ACTION)
 		configuration { "Release" }
 			pickywarnings(_ACTION)
+			sociconfiguration("Release")
 			icuconfiguration("Release", _ACTION)
 			wxconfiguration("Release", _ACTION)
 			wxappconfiguration("Release", _ACTION)
@@ -395,14 +421,16 @@ solution "mvc-editor"
 		}
 		includedirs { "src/", "lib/pelet/include" }
 		links { "pelet" }
-		sociconfiguration()
+		
 		configuration "Debug"
 			pickywarnings(_ACTION)
+			sociconfiguration("Debug")
 			wxconfiguration("Debug", _ACTION)
 			wxappconfiguration("Debug", _ACTION)
 			icuconfiguration("Debug", _ACTION)
 		configuration "Release"
 			pickywarnings(_ACTION)
+			sociconfiguration("Release")
 			wxconfiguration("Release", _ACTION)
 			wxappconfiguration("Release", _ACTION)
 			icuconfiguration("Release", _ACTION)
@@ -587,11 +615,13 @@ solution "mvc-editor"
 		language "C++"
 		kind "ConsoleApp"
 		files { "tutorials/soci_tutorial.cpp" }
-		sociconfiguration()
+		
 		configuration "Debug"
 			pickywarnings(_ACTION)
+			sociconfiguration("Debug")
 		configuration "Release"
 			pickywarnings(_ACTION)
+			sociconfiguration("Release")
 
 	project "running_threads_tutorial"
 		language "C++"

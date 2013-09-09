@@ -47,7 +47,7 @@ public:
 private:
 
 	mvceditor::GlobalsClass& Globals;
-
+	
 	void OnSqlMetaDataComplete(mvceditor::SqlMetaDataEventClass& event);
 
 	/**

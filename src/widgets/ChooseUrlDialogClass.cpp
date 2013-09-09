@@ -63,7 +63,8 @@ void mvceditor::ChooseUrlDialogClass::OnOkButton(wxCommandEvent& event) {
 		int index = UrlList->GetSelection();
 		if (index >= 0) {
 			wxURI selection(UrlList->GetString(index));
-			UrlTagFinder.FindByUrl(selection, ChosenUrl);
+			std::vector<wxFileName> sourceDirs = ActiveSourceDirectories();
+			UrlTagFinder.FindByUrl(selection, sourceDirs, ChosenUrl);
 
 			// add the extra string also
 			wxURI entireUri(ChosenUrl.Url.BuildURI() + ExtraText->GetValue());
@@ -167,14 +168,21 @@ void mvceditor::ChooseUrlDialogClass::OnProjectChoice(wxCommandEvent& event) {
 
 std::vector<mvceditor::UrlTagClass> mvceditor::ChooseUrlDialogClass::GetFilteredUrls(const wxString& filter) {
 	std::vector<mvceditor::UrlTagClass> filteredUrls;
-	UrlTagFinder.FilterUrls(filter, filteredUrls);
+	std::vector<wxFileName> sourceDirs = ActiveSourceDirectories();
+	UrlTagFinder.FilterUrls(filter, sourceDirs, filteredUrls);
 	return filteredUrls;
 }
 
 
 std::vector<mvceditor::UrlTagClass> mvceditor::ChooseUrlDialogClass::GetFilteredUrlsByProject(const wxString& filter, const mvceditor::ProjectClass& project) {
+	std::vector<wxFileName> dirs;
+	std::vector<mvceditor::SourceClass>::const_iterator src;
+	for (src = project.Sources.begin(); src != project.Sources.end(); ++src) {
+		dirs.push_back(src->RootDirectory);
+	}
+	
 	std::vector<mvceditor::UrlTagClass> filteredUrls;
-	UrlTagFinder.FilterUrls(filter, filteredUrls);
+	UrlTagFinder.FilterUrls(filter, dirs, filteredUrls);
 
 	// check that the controller is part of the project's sources
 	std::vector<mvceditor::UrlTagClass>::iterator url = filteredUrls.begin();
@@ -201,4 +209,27 @@ void mvceditor::ChooseUrlDialogClass::FillUrlList(const std::vector<mvceditor::U
 		UrlList->Select(0);
 	}
 	UrlList->Thaw();
+}
+
+std::vector<wxFileName> mvceditor::ChooseUrlDialogClass::ActiveSourceDirectories() {
+	std::vector<wxFileName> dirs;
+	std::vector<mvceditor::ProjectClass>::const_iterator project;
+	std::vector<mvceditor::SourceClass>::const_iterator src;
+	
+	// project 0 is the "all enabled projects"
+	int sel = ProjectChoice->GetSelection();
+	if (sel >= 1 && sel < (int)ProjectChoice->GetCount()) {
+		mvceditor::ProjectClass* project = (mvceditor::ProjectClass*)ProjectChoice->GetClientData(sel);
+		for (src = project->Sources.begin(); src != project->Sources.end(); ++src) {
+			dirs.push_back(src->RootDirectory);
+		}
+	}
+	else {
+		for (project = Projects.begin(); project != Projects.end(); ++project) {
+			for (src = project->Sources.begin(); src != project->Sources.end(); ++src) {
+				dirs.push_back(src->RootDirectory);
+			}
+		}
+	}
+	return dirs;
 }

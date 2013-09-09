@@ -61,16 +61,37 @@ mvceditor::ConfigTagFinderClass::ConfigTagFinderClass()
 
 }
 
-std::vector<mvceditor::ConfigTagClass> mvceditor::ConfigTagFinderClass::All() {
+std::vector<mvceditor::ConfigTagClass> mvceditor::ConfigTagFinderClass::All(const std::vector<wxFileName>& sourceDirectories) {
 	std::vector<mvceditor::ConfigTagClass> allConfigTags;
-	std::vector<soci::session*>::iterator session;
+	if (sourceDirectories.empty()) {
+		return allConfigTags;
+	}
+	
+	std::vector<std::string> stdSourceDirectories;
+	
 	std::string label,
 		fullPath;
+	std::string sql = "SELECT label, full_path FROM config_tags JOIN sources ON(sources.source_id = config_tags.source_id) ";
+	sql += "WHERE directory IN(";
+	for (size_t i = 0; i < sourceDirectories.size(); ++i) {
+		stdSourceDirectories.push_back(mvceditor::WxToChar(sourceDirectories[i].GetPathWithSep()));
+		if (0 == i) {
+			sql += "?";
+		}
+		else {
+			sql += ",?";
+		}
+	}
+	sql += ")";
+	
 	try {
-		soci::statement stmt = (Session->prepare <<
-			"SELECT label, full_path FROM config_tags",
-			soci::into(label), soci::into(fullPath)
-		);
+		soci::statement stmt = Session->prepare << sql;
+		stmt.exchange(soci::into(label));
+		stmt.exchange(soci::into(fullPath)); 
+		for (size_t i = 0; i < stdSourceDirectories.size(); ++i) {
+			stmt.exchange(soci::use(stdSourceDirectories[i]));
+		}
+		stmt.define_and_bind();
 		if (stmt.execute(true)) {
 			do {
 				mvceditor::ConfigTagClass configTag;

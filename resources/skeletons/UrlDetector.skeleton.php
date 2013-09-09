@@ -94,7 +94,7 @@ EOF;
 		$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $outputDbFileName));
 		$urlResourceTable = new MvcEditor_UrlTagTable($pdo);
 		$urlResourceTable->saveUrls($arrUrls, $sourceDir);
-		echo "Url dectection complete, written to {$outputDbFileName}\n";
+		echo "Url detection complete, written to {$outputDbFileName}\n";
 	}
 	else {
 		if (!empty($arrUrls)) {
