@@ -597,7 +597,6 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 
 	if (!error.HasError()) {
 		mvceditor::TagSearchClass tagSearch(resourceToLookup);
-		tagSearch.SetSourceDirs(sourceDirs);
 		tagSearch.SetParentClasses(tagFinderList.ClassParents(tagSearch.GetClassName(), tagSearch.GetMethodName()));
 		tagSearch.SetTraits(tagFinderList.ClassUsedTraits(tagSearch.GetClassName(), tagSearch.GetParentClasses(), tagSearch.GetMethodName(), sourceDirs));
 		
@@ -605,11 +604,11 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 		std::vector<mvceditor::TagClass> matches;
 		if (doDuckTyping || !typeToLookup.isEmpty()) {
 			if (doFullyQualifiedMatchOnly) {
-				tagFinderList.ExactMatchesFromAll(tagSearch, matches);
+				tagFinderList.ExactMatchesFromAll(tagSearch, matches, sourceDirs);
 				tagFinderList.ExactTraitAliasesFromAll(tagSearch, matches);
 			}
 			else  {
-				tagFinderList.NearMatchesFromAll(tagSearch, matches);
+				tagFinderList.NearMatchesFromAll(tagSearch, matches, sourceDirs);
 				tagFinderList.NearMatchTraitAliasesFromAll(tagSearch, matches);
 			}
 			std::sort(matches.begin(), matches.end());

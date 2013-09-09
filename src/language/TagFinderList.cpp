@@ -296,7 +296,9 @@ UnicodeString mvceditor::TagFinderListClass::ParentClassName(UnicodeString class
 	return parent;
 }
 
-void mvceditor::TagFinderListClass::ExactMatchesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches) {
+void mvceditor::TagFinderListClass::ExactMatchesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches,
+		const std::vector<wxFileName>& sourceDirs) {
+	tagSearch.SetSourceDirs(sourceDirs);
 	mvceditor::TagResultClass* result = tagSearch.CreateExactResults();
 	if (IsTagFinderInit && TagFinder.Exec(result)) {
 		while (result->More()) {
@@ -305,6 +307,11 @@ void mvceditor::TagFinderListClass::ExactMatchesFromAll(mvceditor::TagSearchClas
 		}
 	}
 	delete result;
+	
+	// tags in the native db file do not have a source_id
+	// when we query do not use source_id
+	std::vector<wxFileName> emptyVector;
+	tagSearch.SetSourceDirs(emptyVector);
 	result = tagSearch.CreateExactResults();
 	if (IsNativeTagFinderInit && NativeTagFinder.Exec(result)) {
 		while (result->More()) {
@@ -314,6 +321,7 @@ void mvceditor::TagFinderListClass::ExactMatchesFromAll(mvceditor::TagSearchClas
 	}
 	delete result;
 
+	tagSearch.SetSourceDirs(sourceDirs);
 	if (IsDetectedTagFinderInit && !tagSearch.GetClassName().isEmpty()) {
 		mvceditor::DetectedTagExactMemberResultClass detectedResult;
 		detectedResult.Set(tagSearch.GetClassHierarchy(), tagSearch.GetMethodName(), tagSearch.GetSourceDirs());
@@ -326,7 +334,9 @@ void mvceditor::TagFinderListClass::ExactMatchesFromAll(mvceditor::TagSearchClas
 	}
 }
 
-void mvceditor::TagFinderListClass::NearMatchesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches) {
+void mvceditor::TagFinderListClass::NearMatchesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches,
+		const std::vector<wxFileName>& sourceDirs) {
+	tagSearch.SetSourceDirs(sourceDirs);
 	mvceditor::TagResultClass* result = tagSearch.CreateNearMatchResults();
 	if (IsTagFinderInit && TagFinder.Exec(result)) {
 		while (result->More()) {
@@ -335,6 +345,11 @@ void mvceditor::TagFinderListClass::NearMatchesFromAll(mvceditor::TagSearchClass
 		}
 	}
 	delete result;
+	
+	// tags in the native db file do not have a source_id
+	// when we query do not use source_id
+	std::vector<wxFileName> emptyVector;
+	tagSearch.SetSourceDirs(emptyVector);
 	result = tagSearch.CreateNearMatchResults();
 	if (IsNativeTagFinderInit && NativeTagFinder.Exec(result)) {
 		while (result->More()) {
@@ -344,6 +359,7 @@ void mvceditor::TagFinderListClass::NearMatchesFromAll(mvceditor::TagSearchClass
 	}
 	delete result;
 
+	tagSearch.SetSourceDirs(sourceDirs);
 	if (IsDetectedTagFinderInit && !tagSearch.GetClassName().isEmpty()) {
 		mvceditor::DetectedTagNearMatchMemberResultClass detectedResult;
 		detectedResult.Set(tagSearch.GetClassHierarchy(), tagSearch.GetMethodName(), tagSearch.GetSourceDirs());

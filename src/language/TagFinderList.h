@@ -197,13 +197,13 @@ public:
 	 * queries all tag finders for resources that match tagSearch exactly. Any matched tags are
 	 * appended to the matches vector.
 	 */
-	void ExactMatchesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches);
+	void ExactMatchesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches, const std::vector<wxFileName>& sourceDirs);
 	
 	/**
 	 * queries all tag finders for resources that nearly match tagSearch (begin with). Any matched tags are
 	 * appended to the matches vector.
 	 */
-	void NearMatchesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches);
+	void NearMatchesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches, const std::vector<wxFileName>& sourceDirs);
 
 	/**
 	 * queries all tag finders for trait aliases of that match the given tagSearch extactly. Any matched tag are

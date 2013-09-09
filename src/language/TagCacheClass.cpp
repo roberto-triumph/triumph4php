@@ -379,7 +379,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllMemberTags(const U
 	tagSearch.SetTraits(TagFinderList->ClassUsedTraits(fullyQualifiedClassName, tagSearch.GetParentClasses(), 
 			tagSearch.GetMethodName(), sourceDirs));
 	
-	TagFinderList->NearMatchesFromAll(tagSearch, allMatches);
+	TagFinderList->NearMatchesFromAll(tagSearch, allMatches, sourceDirs);
 	
 	// now get all parent class  (look in all files) also look for inherited members and traits
 	UnicodeString parentClassName  = TagFinderList->ParentClassName(fullyQualifiedClassName, fileTagId);
@@ -393,7 +393,7 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::AllMemberTags(const U
 		// search classes from the enabled source directories only
 		hierarchySearch.SetSourceDirs(sourceDirs);
 		
-		TagFinderList->NearMatchesFromAll(hierarchySearch, allMatches);
+		TagFinderList->NearMatchesFromAll(hierarchySearch, allMatches, sourceDirs);
 		TagFinderList->NearMatchTraitAliasesFromAll(hierarchySearch, allMatches);
 	}
 	return allMatches;
