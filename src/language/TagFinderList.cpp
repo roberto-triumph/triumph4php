@@ -336,6 +336,11 @@ void mvceditor::TagFinderListClass::ExactMatchesFromAll(mvceditor::TagSearchClas
 
 void mvceditor::TagFinderListClass::NearMatchesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches,
 		const std::vector<wxFileName>& sourceDirs) {
+	if (tagSearch.GetClassName().isEmpty() && tagSearch.GetMethodName().isEmpty() && tagSearch.GetNamespaceName().length() <= 1) {
+		
+		// empty query, do not attempt as we dont want to query for all tagsd
+		return;
+	}
 	tagSearch.SetSourceDirs(sourceDirs);
 	mvceditor::TagResultClass* result = tagSearch.CreateNearMatchResults();
 	if (IsTagFinderInit && TagFinder.Exec(result)) {
