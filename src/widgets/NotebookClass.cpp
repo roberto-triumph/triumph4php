@@ -501,8 +501,13 @@ wxString mvceditor::NotebookClass::CreateWildcardString() const {
 	wxString php = Globals->PhpFileExtensionsString,
 		css = Globals->CssFileExtensionsString,
 		sql = Globals->SqlFileExtensionsString;
+	wxString allSourceCode = 
+			Globals->PhpFileExtensionsString + wxT(";") + 
+			Globals->CssFileExtensionsString + wxT(";") + 
+			Globals->SqlFileExtensionsString;
 
 	wxString fileFilter = 
+		wxString::Format(wxT("All Source Code Files (%s)|%s|"), allSourceCode.c_str(), allSourceCode.c_str()) +
 		wxString::Format(wxT("PHP Files (%s)|%s|"), phpLabel.c_str(), php.c_str()) +
 		wxString::Format(wxT("CSS Files (%s)|%s|"), cssLabel.c_str(), css.c_str()) +
 		wxString::Format(wxT("SQL Files (%s)|%s|"), sqlLabel.c_str(), sql.c_str()) +
