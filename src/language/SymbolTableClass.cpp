@@ -48,10 +48,14 @@ static bool IsResourceVisible(const mvceditor::TagClass& tag, const pelet::Expre
 		bool isStaticCall, bool isThisCall, bool isParentCall) {
 	bool passesStaticCheck = true;
 	if (isStaticCall) {
+
+		// only static methods can be accessed with the '::' operator
 		passesStaticCheck = mvceditor::TagClass::CLASS_CONSTANT == tag.Type || tag.IsStatic;
 	}
 	else {
-		passesStaticCheck = mvceditor::TagClass::CLASS_CONSTANT != tag.Type && !tag.IsStatic;
+
+		// static methods can be accessed via the -> operator 
+		passesStaticCheck = mvceditor::TagClass::CLASS_CONSTANT != tag.Type;
 	}
 
 	// $this => can access this tag's private, parent's protected/public, other public
