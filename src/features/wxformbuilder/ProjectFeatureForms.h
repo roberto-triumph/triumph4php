@@ -18,12 +18,12 @@
 #include <wx/settings.h>
 #include <wx/sizer.h>
 #include <wx/textctrl.h>
-#include <wx/filepicker.h>
 #include <wx/statbox.h>
 #include <wx/panel.h>
 #include <wx/listbox.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
+#include <wx/filepicker.h>
 #include <wx/checklst.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -37,10 +37,6 @@ class ProjectPreferencesGeneratedPanelClass : public wxPanel
 	private:
 	
 	protected:
-		wxStaticText* HelpText;
-		wxStaticText* Label;
-		wxTextCtrl* ExplorerExecutable;
-		wxFilePickerCtrl* FilePicker;
 		wxStaticText* WildcardHelpText;
 		wxStaticText* PhpLabel;
 		wxTextCtrl* PhpFileExtensions;
@@ -50,10 +46,6 @@ class ProjectPreferencesGeneratedPanelClass : public wxPanel
 		wxTextCtrl* SqlFileExtensions;
 		wxStaticText* MiscLabel;
 		wxTextCtrl* MiscFileExtensions;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void OnFileChanged( wxFileDirPickerEvent& event ) { event.Skip(); }
-		
 	
 	public:
 		

@@ -14,47 +14,9 @@ ProjectPreferencesGeneratedPanelClass::ProjectPreferencesGeneratedPanelClass( wx
 	wxFlexGridSizer* fgSizer2;
 	fgSizer2 = new wxFlexGridSizer( 2, 1, 0, 0 );
 	fgSizer2->AddGrowableCol( 0 );
-	fgSizer2->AddGrowableRow( 1 );
+	fgSizer2->AddGrowableRow( 0 );
 	fgSizer2->SetFlexibleDirection( wxBOTH );
 	fgSizer2->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	wxStaticBoxSizer* StaticBoxSizerExplorer;
-	StaticBoxSizerExplorer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("label") ), wxVERTICAL );
-	
-	wxFlexGridSizer* GridSizer;
-	GridSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
-	GridSizer->AddGrowableCol( 0 );
-	GridSizer->AddGrowableRow( 0 );
-	GridSizer->SetFlexibleDirection( wxBOTH );
-	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	wxBoxSizer* LabelSizer;
-	LabelSizer = new wxBoxSizer( wxVERTICAL );
-	
-	HelpText = new wxStaticText( this, wxID_ANY, _("MVC Editor will use this program whenever the \"Explore\" button is clicked."), wxDefaultPosition, wxDefaultSize, 0 );
-	HelpText->Wrap( -1 );
-	LabelSizer->Add( HelpText, 0, wxALL, 5 );
-	
-	GridSizer->Add( LabelSizer, 1, wxEXPAND, 5 );
-	
-	wxBoxSizer* FileSizer;
-	FileSizer = new wxBoxSizer( wxHORIZONTAL );
-	
-	Label = new wxStaticText( this, wxID_ANY, _("Explorer Executable"), wxDefaultPosition, wxDefaultSize, 0 );
-	Label->Wrap( -1 );
-	FileSizer->Add( Label, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	ExplorerExecutable = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	FileSizer->Add( ExplorerExecutable, 1, wxALL|wxEXPAND, 5 );
-	
-	FilePicker = new wxFilePickerCtrl( this, wxID_ANY, wxEmptyString, _("Select a file"), wxT("*"), wxDefaultPosition, wxDefaultSize, wxFLP_FILE_MUST_EXIST|wxFLP_OPEN );
-	FileSizer->Add( FilePicker, 0, wxALL, 5 );
-	
-	GridSizer->Add( FileSizer, 1, wxEXPAND, 5 );
-	
-	StaticBoxSizerExplorer->Add( GridSizer, 1, wxEXPAND, 5 );
-	
-	fgSizer2->Add( StaticBoxSizerExplorer, 1, wxALL|wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* StaticBoxSizerFileTypes;
 	StaticBoxSizerFileTypes = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Editor Associations") ), wxVERTICAL );
@@ -62,7 +24,6 @@ ProjectPreferencesGeneratedPanelClass::ProjectPreferencesGeneratedPanelClass( wx
 	wxFlexGridSizer* AssociationsGridSizer;
 	AssociationsGridSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
 	AssociationsGridSizer->AddGrowableCol( 0 );
-	AssociationsGridSizer->AddGrowableRow( 0 );
 	AssociationsGridSizer->AddGrowableRow( 1 );
 	AssociationsGridSizer->SetFlexibleDirection( wxBOTH );
 	AssociationsGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
@@ -118,16 +79,10 @@ ProjectPreferencesGeneratedPanelClass::ProjectPreferencesGeneratedPanelClass( wx
 	
 	this->SetSizer( fgSizer2 );
 	this->Layout();
-	
-	// Connect Events
-	FilePicker->Connect( wxEVT_COMMAND_FILEPICKER_CHANGED, wxFileDirPickerEventHandler( ProjectPreferencesGeneratedPanelClass::OnFileChanged ), NULL, this );
 }
 
 ProjectPreferencesGeneratedPanelClass::~ProjectPreferencesGeneratedPanelClass()
 {
-	// Disconnect Events
-	FilePicker->Disconnect( wxEVT_COMMAND_FILEPICKER_CHANGED, wxFileDirPickerEventHandler( ProjectPreferencesGeneratedPanelClass::OnFileChanged ), NULL, this );
-	
 }
 
 ProjectDefinitionDialogGeneratedClass::ProjectDefinitionDialogGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )

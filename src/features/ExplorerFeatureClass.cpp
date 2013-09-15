@@ -28,13 +28,13 @@
 #include <globals/Events.h>
 #include <globals/FileName.h>
 #include <search/Directory.h>
+#include <widgets/FilePickerValidatorClass.h>
 #include <MvcEditor.h>
 #include <wx/file.h>
 #include <algorithm>
 
 static int ID_EXPLORER_PANEL = wxNewId();
 static int ID_EXPLORER_LIST_ACTION = wxNewId();
-static int ID_EXPLORER_REPORT_ACTION = wxNewId();
 static int ID_EXPLORER_LIST_OPEN = wxNewId();
 static int ID_EXPLORER_LIST_RENAME = wxNewId();
 static int ID_EXPLORER_LIST_DELETE = wxNewId();
@@ -42,6 +42,9 @@ static int ID_EXPLORER_LIST_CREATE_PHP = wxNewId();
 static int ID_EXPLORER_LIST_CREATE_SQL = wxNewId();
 static int ID_EXPLORER_LIST_CREATE_CSS = wxNewId();
 static int ID_EXPLORER_LIST_CREATE_TEXT = wxNewId();
+static int ID_EXPLORER_LIST_CREATE_DIRECTORY = wxNewId();
+static int ID_EXPLORER_LIST_SHELL = wxNewId();
+static int ID_EXPLORER_LIST_FILE_MANAGER = wxNewId();
 static int ID_EXPLORER_MODIFY = wxNewId();
 static int ID_FILTER_ALL_SOURCE = wxNewId();
 static int ID_FILTER_ALL = wxNewId();
@@ -78,6 +81,21 @@ static bool DirNameCmp(const wxFileName& a, const wxFileName& b) {
 
 mvceditor::ExplorerFeatureClass::ExplorerFeatureClass(mvceditor::AppClass& app) 
 	: FeatureClass(app) {
+	wxPlatformInfo info;
+	switch (info.GetOperatingSystemId()) {
+		case wxOS_WINDOWS_NT:
+			FileManagerExecutable = wxT("explorer.exe");
+			ShellExecutable = wxT("cmd.exe");
+			break;
+		case wxOS_UNIX:
+		case wxOS_UNIX_LINUX:
+			FileManagerExecutable = wxT("nautilus");
+			ShellExecutable = wxT("sh");
+			break;
+		default:
+			FileManagerExecutable = wxT("explorer");
+			ShellExecutable = wxT("sh");
+	}
 }
 
 void mvceditor::ExplorerFeatureClass::AddFileMenuItems(wxMenu* fileMenu) {
@@ -115,6 +133,22 @@ void mvceditor::ExplorerFeatureClass::AddWindows() {
 		.Gripper(false).CaptionVisible(false).CloseButton(false).DockFixed(true)
 		.PaneBorder(true).Floatable(false)
 	);
+}
+
+void mvceditor::ExplorerFeatureClass::LoadPreferences(wxConfigBase *config) {
+	config->Read(wxT("/Explorer/FileManagerExecutable"), &FileManagerExecutable);
+	config->Read(wxT("/Explorer/ShellExecutable"), &ShellExecutable);
+}
+
+void mvceditor::ExplorerFeatureClass::SavePreferences() {
+	wxConfigBase *config = wxConfig::Get();
+	config->Write(wxT("/Explorer/FileManagerExecutable"), FileManagerExecutable);
+	config->Write(wxT("/Explorer/ShellExecutable"), ShellExecutable);
+}
+
+void mvceditor::ExplorerFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
+	ExplorerOptionsPanelClass* panel = new ExplorerOptionsPanelClass(parent, wxID_ANY, *this);
+	parent->AddPage(panel, wxT("Explorer"));
 }
 
 void mvceditor::ExplorerFeatureClass::OnExplorerProjectMenu(wxCommandEvent& event) {
@@ -207,21 +241,10 @@ void mvceditor::ExplorerFeatureClass::OnExplorerListComplete(mvceditor::Explorer
 	}
 }
 
-void mvceditor::ExplorerFeatureClass::OnExplorerReportComplete(mvceditor::ExplorerEventClass& event) {
-	mvceditor::ModalExplorerPanelClass* panel = NULL;
-	wxWindow* window = FindToolsWindow(ID_EXPLORER_PANEL);
-	if (window) {
-		panel = (mvceditor::ModalExplorerPanelClass*)window;
-		panel->ShowReport(event.Dir, event.Files, event.SubDirs, event.TotalFiles, event.TotalSubDirs);
-	}
-}
-
 mvceditor::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, mvceditor::ExplorerFeatureClass& feature)
-: ModalExplorerGeneratedPanel(parent, id) 
+: ModalExplorerGeneratedPanelClass(parent, id) 
 , CurrentListDir()
-, CurrentReportDir() 
 , ListImageList(NULL)
-, ReportImageList(NULL)
 , Feature(feature) 
 , RunningThreads()
 , FilterChoice(ID_FILTER_ALL) {
@@ -234,22 +257,11 @@ mvceditor::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, in
 	ListImageList->Add(mvceditor::IconImageAsset(wxT("document-text")));
 	ListImageList->Add(mvceditor::IconImageAsset(wxT("document-blank")));
 
-	ReportImageList = new wxImageList(16, 16);
-	ReportImageList->Add(mvceditor::IconImageAsset(wxT("document-php")));
-	ReportImageList->Add(mvceditor::IconImageAsset(wxT("folder-horizontal")));
-	ReportImageList->Add(mvceditor::IconImageAsset(wxT("document-sql")));
-	ReportImageList->Add(mvceditor::IconImageAsset(wxT("document-css")));
-	ReportImageList->Add(mvceditor::IconImageAsset(wxT("document-text")));
-	ReportImageList->Add(mvceditor::IconImageAsset(wxT("document-blank")));
-
-
 	List->AssignImageList(ListImageList, wxIMAGE_LIST_SMALL);
-
-	Report->AssignImageList(ReportImageList, wxIMAGE_LIST_SMALL);
-	Report->InsertColumn(0, _("Name"), wxLIST_FORMAT_LEFT, 300);
 
 	FilterButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("filter")));
 	ParentButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("arrow-up")));
+	RefreshButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("outline-refresh")));
 
 	RunningThreads.SetMaxThreads(1);
 	RunningThreads.AddEventHandler(this);
@@ -265,12 +277,15 @@ mvceditor::ModalExplorerPanelClass::~ModalExplorerPanelClass() {
 
 void mvceditor::ModalExplorerPanelClass::RefreshDir(const wxFileName& dir) {
 	ListLabel->SetLabel(wxT(""));
-	ReportLabel->SetLabel(wxT(""));
 	mvceditor::ExplorerFileSystemActionClass* action = new mvceditor::ExplorerFileSystemActionClass(RunningThreads, ID_EXPLORER_LIST_ACTION);
 
 	// when user choose ALL show hidden files too
 	action->Directory(dir, FilterFileExtensions(), ID_FILTER_ALL == FilterChoice);
 	RunningThreads.Queue(action);
+}
+
+void mvceditor::ModalExplorerPanelClass::OnRefreshClick(wxCommandEvent& event) {
+	RefreshDir(CurrentListDir);
 }
 
 void mvceditor::ModalExplorerPanelClass::OnDirectoryEnter(wxCommandEvent& event) {
@@ -307,27 +322,17 @@ void mvceditor::ModalExplorerPanelClass::OnListItemActivated(wxListEvent& event)
 		return;
 	}
 	else {
-		nextDir.AssignDir(CurrentListDir.GetPathWithSep() + text);
+		
 	}
 	if (!OpenIfListFile(text)) {
+		nextDir.AssignDir(CurrentListDir.GetPath());
+		nextDir.AppendDir(text);
 		RefreshDir(nextDir);
 	}	
 }
 
 void mvceditor::ModalExplorerPanelClass::OnListItemSelected(wxListEvent& event) {
-	wxString text = event.GetText();
-	if (text == wxT("..")) {
-		return;
-	}
-	wxFileName nextDir;
-	nextDir.AssignDir(CurrentListDir.GetPathWithSep() + text);
-	if (wxFileName::DirExists(CurrentListDir.GetPathWithSep() + text)) {
-		mvceditor::ExplorerFileSystemActionClass* action = new mvceditor::ExplorerFileSystemActionClass(RunningThreads, ID_EXPLORER_REPORT_ACTION);
-
-		// when user choose ALL show hidden files too
-		action->Directory(nextDir, FilterFileExtensions(), ID_FILTER_ALL == FilterChoice);
-		RunningThreads.Queue(action);
-	}
+	// TODO activate
 }
 
 void mvceditor::ModalExplorerPanelClass::OnListItemRightClick(wxListEvent& event) {
@@ -340,8 +345,9 @@ void mvceditor::ModalExplorerPanelClass::OnListItemRightClick(wxListEvent& event
 		if (index > 0) {
 			menu.Append(ID_EXPLORER_LIST_RENAME, _("Rename\tF2"), _("Rename the file"), wxITEM_NORMAL);
 			menu.Append(ID_EXPLORER_LIST_DELETE, _("Delete\tDEL"), _("Delete the file"), wxITEM_NORMAL);
+			menu.Append(ID_EXPLORER_LIST_SHELL, _("Open Shell Here"), _("Open an external shell to this directory"), wxITEM_NORMAL);
+			menu.Append(ID_EXPLORER_LIST_FILE_MANAGER, _("Open File Manager Here"), _("Opens the Operating System's file manager to this directory"), wxITEM_NORMAL);
 		}
-
 		this->PopupMenu(&menu, wxDefaultPosition);
 	}
 	event.Skip();
@@ -366,6 +372,9 @@ void mvceditor::ModalExplorerPanelClass::OnListRightDown(wxMouseEvent& event) {
 	menu.Append(ID_EXPLORER_LIST_CREATE_SQL, _("New SQL File"), _("Create a new SQL file in this directory"), wxITEM_NORMAL);
 	menu.Append(ID_EXPLORER_LIST_CREATE_CSS, _("New CSS File"), _("Create a new CSS file in this directory"), wxITEM_NORMAL);
 	menu.Append(ID_EXPLORER_LIST_CREATE_TEXT, _("New text File"), _("Create a new text file in this directory"), wxITEM_NORMAL);
+	menu.Append(ID_EXPLORER_LIST_CREATE_DIRECTORY, _("New Directory"), _("Create a new directory in this directory"), wxITEM_NORMAL);
+	menu.Append(ID_EXPLORER_LIST_SHELL, _("Open Shell Here"), _("Open an external shell to this directory"), wxITEM_NORMAL);
+	menu.Append(ID_EXPLORER_LIST_FILE_MANAGER, _("Open File Manager Here"), _("Opens the Operating System's file manager to this directory"), wxITEM_NORMAL);
 	this->PopupMenu(&menu, event.GetPosition());
 }
 
@@ -388,8 +397,6 @@ void mvceditor::ModalExplorerPanelClass::OnListKeyDown(wxKeyEvent& event) {
 
 void mvceditor::ModalExplorerPanelClass::ShowDir(const wxFileName& currentDir, const std::vector<wxFileName>& files, const std::vector<wxFileName>& dirs,
 												 int totalFiles, int totalSubDirs) {
-	Report->DeleteAllItems();
-	CurrentReportDir.Clear();
 	CurrentListDir = currentDir;
 
 	Directory->SetValue(currentDir.GetPath());
@@ -438,13 +445,6 @@ void mvceditor::ModalExplorerPanelClass::ShowDir(const wxFileName& currentDir, c
 
 		newRowNumber++;
 	}
-	newRowNumber = Report->GetItemCount();
-	if (newRowNumber > 1) {
-		Report->SetItemState(1, wxLIST_STATE_SELECTED, wxLIST_MASK_STATE | wxLIST_MASK_TEXT);
-	}
-	else if (newRowNumber > 0) {
-		Report->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_MASK_STATE | wxLIST_MASK_TEXT);
-	}
 	wxString label;
 	if (files.size() == (size_t)totalFiles) {
 		label = wxString::Format(wxT("%ld Files, %ld Directories"), files.size(), dirs.size());
@@ -453,68 +453,6 @@ void mvceditor::ModalExplorerPanelClass::ShowDir(const wxFileName& currentDir, c
 		label = wxString::Format(wxT("%ld Files, %ld Directories (%ld not shown)"), files.size(), dirs.size(), totalFiles - files.size());
 	}
 	ListLabel->SetLabel(label);
-	ReportLabel->SetLabel(wxT(""));
-}
-
-void mvceditor::ModalExplorerPanelClass::ShowReport(const wxFileName& dir, const std::vector<wxFileName>& files, const std::vector<wxFileName>& dirs,
-													int totalFiles, int totalSubDirs) {
-	Report->DeleteAllItems();
-	CurrentReportDir = dir;
-	ListDirectories(dirs);
-	ListFiles(files);
-
-	wxString label;
-	if (files.size() == (size_t)totalFiles) {
-		label = wxString::Format(wxT("%ld Files, %ld Directories"), files.size(), dirs.size());
-	}
-	else {
-		label = wxString::Format(wxT("%ld Files, %ld Directories (%ld not shown)"), files.size(), dirs.size(), totalFiles - files.size());
-	}
-	ReportLabel->SetLabel(label);
-}
-
-void mvceditor::ModalExplorerPanelClass::ListFiles(const std::vector<wxFileName>& files) {
-	long newRowNumber = Report->GetItemCount();
-	std::vector<wxFileName>::const_iterator file;
-	for (file = files.begin(); file != files.end(); ++file) {
-		
-		// list ctrl is tricky, for columns we must insertItem() then setItem() for the next columns
-		wxListItem column1;
-		column1.SetColumn(0);
-		column1.SetId(newRowNumber);
-		column1.SetImage(ReportImageId(*file));
-		column1.SetMask(wxLIST_MASK_IMAGE | wxLIST_MASK_TEXT);
-		column1.SetText(file->GetFullName());
-		Report->InsertItem(column1);
-
-		newRowNumber++;
-	}
-	newRowNumber = Report->GetItemCount();
-	if (newRowNumber > 0) {
-		Report->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_MASK_STATE | wxLIST_MASK_TEXT);
-	}
-}
-
-void mvceditor::ModalExplorerPanelClass::ListDirectories(const std::vector<wxFileName>& dirs) {
-	long newRowNumber = Report->GetItemCount();
-	std::vector<wxFileName>::const_iterator dir;
-	for (dir = dirs.begin(); dir != dirs.end(); ++dir) {
-		
-		// list ctrl is tricky, for columns we must insertItem() then setItem() for the next columns
-		wxListItem column1;
-		column1.SetColumn(0);
-		column1.SetId(newRowNumber);
-		column1.SetImage(REPORT_DIR);
-		column1.SetMask(wxLIST_MASK_IMAGE | wxLIST_MASK_TEXT);
-		column1.SetText(dir->GetDirs().Last());
-		Report->InsertItem(column1);
-
-		newRowNumber++;
-	}
-	newRowNumber = Report->GetItemCount();
-	if (newRowNumber > 0) {
-		Report->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_MASK_STATE | wxLIST_MASK_TEXT);
-	}
 }
 
 bool mvceditor::ModalExplorerPanelClass::OpenIfListFile(const wxString& text) {
@@ -523,20 +461,6 @@ bool mvceditor::ModalExplorerPanelClass::OpenIfListFile(const wxString& text) {
 	// ideally we dont need to query the file system, but cant seem to get the 
 	// item image to tell if selected item is a dir or not
 	wxString fullPath = CurrentListDir.GetPathWithSep() + text;
-	if (wxFileName::FileExists(fullPath)) {
-		wxCommandEvent evt(mvceditor::EVENT_CMD_FILE_OPEN);
-		evt.SetString(fullPath);
-		Feature.App.EventSink.Publish(evt);
-		return true;
-	}
-	return false;
-}
-
-bool mvceditor::ModalExplorerPanelClass::OpenIfReportFile(const wxString& text) {
-	
-	// ideally we dont need to query the file system, but cant seem to get the 
-	// item image to tell if selected item is a dir or not
-	wxString fullPath = CurrentReportDir.GetPathWithSep() + text;
 	if (wxFileName::FileExists(fullPath)) {
 		wxCommandEvent evt(mvceditor::EVENT_CMD_FILE_OPEN);
 		evt.SetString(fullPath);
@@ -564,35 +488,6 @@ int mvceditor::ModalExplorerPanelClass::ListImageId(const wxFileName& fileName) 
 
 }
 
-int mvceditor::ModalExplorerPanelClass::ReportImageId(const wxFileName& fileName) {
-	wxString fullPath = fileName.GetFullPath();
-	if (Feature.App.Globals.HasAPhpExtension(fullPath)) {
-		return REPORT_FILE_PHP;
-	}
-	if (Feature.App.Globals.HasASqlExtension(fullPath)) {
-		return REPORT_FILE_SQL;
-	} 
-	if (Feature.App.Globals.HasACssExtension(fullPath)) {
-		return REPORT_FILE_CSS;
-	}
-	if (Feature.App.Globals.HasAMiscExtension(fullPath)) {
-		return REPORT_FILE_TEXT;
-	}
-	return REPORT_FILE_OTHER;
-}
-
-void mvceditor::ModalExplorerPanelClass::OnReportItemActivated(wxListEvent& event) {
-	wxString text = event.GetText();
-	if (text.empty()) {
-		return;
-	}
-	if (!OpenIfReportFile(text)) {
-		wxFileName nextDir;
-		nextDir.AssignDir(CurrentReportDir.GetPathWithSep() + text);
-		RefreshDir(nextDir);
-	}
-}
-
 void mvceditor::ModalExplorerPanelClass::OnListMenuOpen(wxCommandEvent& event) {
 	long index = -1;
 	index = List->GetNextItem(index, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
@@ -608,11 +503,15 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuOpen(wxCommandEvent& event) {
 			Feature.App.EventSink.Publish(evt);
 		}
 		else if (wxFileName::DirExists(fullPath)) {
-			mvceditor::ExplorerFileSystemActionClass* action = new mvceditor::ExplorerFileSystemActionClass(RunningThreads, ID_EXPLORER_REPORT_ACTION);
-
-			// when user choose ALL show hidden files too
-			action->Directory(fullPath, FilterFileExtensions(), ID_FILTER_ALL == FilterChoice);
-			RunningThreads.Queue(action);
+			wxFileName nextDir;
+			nextDir.AssignDir(CurrentListDir.GetPath());
+			if (name == wxT("..")) {
+				nextDir.RemoveLastDir();
+			}
+			else {
+				nextDir.AppendDir(name);
+			}
+			RefreshDir(nextDir);
 		}
 	}
 }
@@ -690,6 +589,10 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew(wxCommandEvent& eve
 		ext = wxT("*.txt");
 		dialogTitle =_("Create a new text file");
 	}
+	else if (event.GetId() == ID_EXPLORER_LIST_CREATE_DIRECTORY) {
+		ext = wxT("");
+		dialogTitle =_("Create a directory");
+	}
 	ext.Replace(wxT("*"), wxT("New File"));
 
 	wxString newName = ::wxGetTextFromUser(_("Please enter a file name"), dialogTitle, ext);
@@ -706,7 +609,6 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew(wxCommandEvent& eve
 		wxMessageBox(_("File name already exists. Please enter another name."));
 		return;
 	}
-
 	wxFile file;
 	if (file.Create(newFileName.GetFullPath())) {
 
@@ -728,6 +630,57 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew(wxCommandEvent& eve
 	else {
 		wxMessageBox(_("Could not create file: ") + newName);
 	}
+}
+
+void mvceditor::ModalExplorerPanelClass::OnListMenuCreateDirectory(wxCommandEvent& event) {
+	wxString newName = ::wxGetTextFromUser(_("Please enter a directory name"), _("Create New Directory"), wxT(""));
+	wxString forbidden = wxFileName::GetForbiddenChars();
+	if (newName.find_first_of(forbidden, 0) != std::string::npos) {
+		wxMessageBox(_("Please enter valid a directory name"));
+		return;
+	}
+	if (newName.IsEmpty()) {
+		return;
+	}
+	wxFileName newDir(CurrentListDir.GetPath());
+	newDir.AppendDir(newName);
+	if (newDir.DirExists()) {
+		wxMessageBox(_("Directory already exists with that name. Please enter another name."));
+		return;
+	}
+	if (wxMkdir(newDir.GetPath())) {
+
+		// list ctrl is tricky, for columns we must insertItem() then setItem() for the next columns
+		int newRowNumber = List->GetItemCount();
+		wxListItem column1;
+		column1.SetColumn(0);
+		column1.SetId(newRowNumber);
+		column1.SetImage(LIST_FOLDER);
+		column1.SetMask(wxLIST_MASK_IMAGE | wxLIST_MASK_TEXT);
+		column1.SetText(newName);
+		List->InsertItem(column1);
+	}
+	else {
+		wxMessageBox(_("Could not create directory: ") + newName);
+	}
+}
+
+void mvceditor::ModalExplorerPanelClass::OnListMenuShell(wxCommandEvent& event) {
+	wxString cmd = Feature.ShellExecutable;
+	wxPlatformInfo info;
+	if (info.GetOperatingSystemId() & wxOS_WINDOWS_NT) {
+		cmd += wxT(" /k cd \"") + CurrentListDir.GetPath() + wxT("\"");
+	}
+	wxExecute(cmd, wxEXEC_ASYNC);
+}
+
+void mvceditor::ModalExplorerPanelClass::OnListMenuFileManager(wxCommandEvent& event) {
+	wxString cmd = Feature.FileManagerExecutable;
+	wxPlatformInfo info;
+	if (info.GetOperatingSystemId() & wxOS_WINDOWS_NT) {
+		cmd += wxT(" ") + CurrentListDir.GetPath();
+	}
+	wxExecute(cmd, wxEXEC_ASYNC);	
 }
 
 void mvceditor::ModalExplorerPanelClass::OnListEndLabelEdit(wxListEvent& event) {
@@ -1078,6 +1031,15 @@ wxEvent* mvceditor::ExplorerModifyEventClass::Clone() const {
 	);
 }
 
+mvceditor::ExplorerOptionsPanelClass::ExplorerOptionsPanelClass(wxWindow* parent, int id, mvceditor::ExplorerFeatureClass& feature)
+	: ExplorerOptionsGeneratedPanelClass(parent, id)
+	, Feature(feature) {
+	mvceditor::FilePickerValidatorClass fileManagerValidator(&feature.FileManagerExecutable);
+	FileManager->SetValidator(fileManagerValidator);
+	mvceditor::FilePickerValidatorClass shellValidator(&feature.ShellExecutable);
+	Shell->SetValidator(shellValidator);
+}
+
 const wxEventType mvceditor::EVENT_EXPLORER = wxNewEventType();
 const wxEventType mvceditor::EVENT_EXPLORER_MODIFY = wxNewEventType();
 
@@ -1088,10 +1050,9 @@ BEGIN_EVENT_TABLE(mvceditor::ExplorerFeatureClass, mvceditor::FeatureClass)
 	EVT_MENU_RANGE(mvceditor::MENU_EXPLORER + 3, mvceditor::MENU_EXPLORER + 50, mvceditor::ExplorerFeatureClass::OnExplorerProjectMenu)
 	
 	EVT_EXPLORER_COMPLETE(ID_EXPLORER_LIST_ACTION, mvceditor::ExplorerFeatureClass::OnExplorerListComplete)
-	EVT_EXPLORER_COMPLETE(ID_EXPLORER_REPORT_ACTION, mvceditor::ExplorerFeatureClass::OnExplorerReportComplete)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(mvceditor::ModalExplorerPanelClass, ModalExplorerGeneratedPanel)
+BEGIN_EVENT_TABLE(mvceditor::ModalExplorerPanelClass, ModalExplorerGeneratedPanelClass)
 	EVT_MENU(ID_EXPLORER_LIST_OPEN, mvceditor::ModalExplorerPanelClass::OnListMenuOpen)
 	EVT_MENU(ID_EXPLORER_LIST_RENAME, mvceditor::ModalExplorerPanelClass::OnListMenuRename)
 	EVT_MENU(ID_EXPLORER_LIST_DELETE, mvceditor::ModalExplorerPanelClass::OnListMenuDelete)
@@ -1099,6 +1060,9 @@ BEGIN_EVENT_TABLE(mvceditor::ModalExplorerPanelClass, ModalExplorerGeneratedPane
 	EVT_MENU(ID_EXPLORER_LIST_CREATE_SQL, mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew)
 	EVT_MENU(ID_EXPLORER_LIST_CREATE_CSS, mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew)
 	EVT_MENU(ID_EXPLORER_LIST_CREATE_TEXT, mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew)
+	EVT_MENU(ID_EXPLORER_LIST_CREATE_DIRECTORY, mvceditor::ModalExplorerPanelClass::OnListMenuCreateDirectory)
+	EVT_MENU(ID_EXPLORER_LIST_SHELL, mvceditor::ModalExplorerPanelClass::OnListMenuShell)
+	EVT_MENU(ID_EXPLORER_LIST_FILE_MANAGER, mvceditor::ModalExplorerPanelClass::OnListMenuFileManager)
 	EVT_EXPLORER_MODIFY_COMPLETE(ID_EXPLORER_MODIFY, mvceditor::ModalExplorerPanelClass::OnExplorerModifyComplete)
 
 	EVT_MENU(ID_FILTER_ALL, mvceditor::ModalExplorerPanelClass::OnFilterMenuCheck)

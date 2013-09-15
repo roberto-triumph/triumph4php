@@ -23,54 +23,66 @@
 #include <wx/listctrl.h>
 #include <wx/stattext.h>
 #include <wx/panel.h>
-#include <wx/splitter.h>
+#include <wx/filepicker.h>
+#include <wx/statbox.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class ModalExplorerGeneratedPanel
+/// Class ModalExplorerGeneratedPanelClass
 ///////////////////////////////////////////////////////////////////////////////
-class ModalExplorerGeneratedPanel : public wxPanel 
+class ModalExplorerGeneratedPanelClass : public wxPanel 
 {
 	private:
 	
 	protected:
 		wxBitmapButton* FilterButton;
 		wxBitmapButton* ParentButton;
+		wxBitmapButton* RefreshButton;
 		wxComboBox* Directory;
-		wxSplitterWindow* Splitter;
 		wxPanel* LeftPanel;
 		wxListCtrl* List;
 		wxStaticText* ListLabel;
-		wxPanel* RightPanel;
-		wxListCtrl* Report;
-		wxStaticText* ReportLabel;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnFilterButtonLeftDown( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnParentButtonClick( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRefreshClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDirectoryEnter( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSashChanged( wxSplitterEvent& event ) { event.Skip(); }
 		virtual void OnListKeyDown( wxKeyEvent& event ) { event.Skip(); }
 		virtual void OnListEndLabelEdit( wxListEvent& event ) { event.Skip(); }
 		virtual void OnListItemActivated( wxListEvent& event ) { event.Skip(); }
 		virtual void OnListItemRightClick( wxListEvent& event ) { event.Skip(); }
 		virtual void OnListItemSelected( wxListEvent& event ) { event.Skip(); }
 		virtual void OnListRightDown( wxMouseEvent& event ) { event.Skip(); }
-		virtual void OnReportItemActivated( wxListEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		ModalExplorerGeneratedPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 722,332 ), long style = wxTAB_TRAVERSAL );
-		~ModalExplorerGeneratedPanel();
+		ModalExplorerGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 722,332 ), long style = wxTAB_TRAVERSAL );
+		~ModalExplorerGeneratedPanelClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class ExplorerOptionsGeneratedPanelClass
+///////////////////////////////////////////////////////////////////////////////
+class ExplorerOptionsGeneratedPanelClass : public wxPanel 
+{
+	private:
+	
+	protected:
+		wxStaticText* HelpLabel;
+		wxStaticText* FileManagerLabel;
+		wxFilePickerCtrl* FileManager;
+		wxStaticText* ShellLabel;
+		wxFilePickerCtrl* Shell;
+	
+	public:
 		
-		void SplitterOnIdle( wxIdleEvent& )
-		{
-			Splitter->SetSashPosition( 323 );
-			Splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( ModalExplorerGeneratedPanel::SplitterOnIdle ), NULL, this );
-		}
+		ExplorerOptionsGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
+		~ExplorerOptionsGeneratedPanelClass();
 	
 };
 

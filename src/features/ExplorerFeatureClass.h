@@ -43,6 +43,16 @@ class ExplorerModifyEventClass;
 class ExplorerFeatureClass : public mvceditor::FeatureClass {
 
 public:
+	
+	/**
+	 * executable of the operating system file manager
+	 */
+	wxString FileManagerExecutable;
+
+	/**
+	 * executable of the operating system shell
+	 */
+	wxString ShellExecutable;
 
 	ExplorerFeatureClass(mvceditor::AppClass& app);
 
@@ -60,6 +70,12 @@ public:
 	 * Add keyboard shortcuts
 	 */
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
+
+	void LoadPreferences(wxConfigBase* config);
+
+	void SavePreferences();
+
+	void AddPreferenceWindow(wxBookCtrlBase* parent);
 	
 private:
 
@@ -80,12 +96,6 @@ private:
 	 * display them. this handler will refresh both the left and right panels.
 	 */
 	void OnExplorerListComplete(mvceditor::ExplorerEventClass& event);
-
-	/**
-	 * when the explorer action has finished fetching the files,
-	 * display them. this handler will only refresh the right panel.
-	 */
-	void OnExplorerReportComplete(mvceditor::ExplorerEventClass& event);
 	
 	/**
 	 * when the explorer tool button is clicked show any open projects
@@ -113,7 +123,7 @@ private:
 	DECLARE_EVENT_TABLE()
 };
 
-class ModalExplorerPanelClass : public ModalExplorerGeneratedPanel {
+class ModalExplorerPanelClass : public ModalExplorerGeneratedPanelClass {
 public:
 	ModalExplorerPanelClass(wxWindow* parent, int id, mvceditor::ExplorerFeatureClass& feature);
 	~ModalExplorerPanelClass();
@@ -122,29 +132,17 @@ public:
 	
 	void ShowDir(const wxFileName& dir, const std::vector<wxFileName>& files, const std::vector<wxFileName>& dirs, int totalFiles, int totalSubDirs);
 
-	void ShowReport(const wxFileName& dir, const std::vector<wxFileName>& files, const std::vector<wxFileName>& dirs, int totalFiles, int totalSubDirs);
-
 private:
 
 	/**
 	 * the directory being shown on the left hand side
 	 */
 	wxFileName CurrentListDir;
-
-	/**
-	 * the directory being shown on the right hand side
-	 */
-	wxFileName CurrentReportDir;
 	
 	/**
 	 * will be owned by the list control
 	 */
 	wxImageList* ListImageList;
-
-	/**
-	 * will be owned by the list control
-	 */
-	wxImageList* ReportImageList;
 
 	/**
 	 * to get projects list and tag cache
@@ -172,15 +170,6 @@ private:
 		LIST_FILE_OTHER
 	};
 
-	enum ReportImages {
-		REPORT_FILE_PHP,
-		REPORT_DIR,
-		REPORT_FILE_SQL,
-		REPORT_FILE_CSS,
-		REPORT_FILE_TEXT,
-		REPORT_FILE_OTHER
-	};
-
 	// events handlers for the left list
 	void OnListItemSelected(wxListEvent& event);
 	void OnListItemActivated(wxListEvent& event);
@@ -193,20 +182,21 @@ private:
 	void OnListMenuRename(wxCommandEvent& event);
 	void OnListMenuDelete(wxCommandEvent& event);
 	void OnListMenuCreateNew(wxCommandEvent& event);
+	void OnListMenuCreateDirectory(wxCommandEvent& event);
+	void OnListMenuShell(wxCommandEvent& event);
+	void OnListMenuFileManager(wxCommandEvent& event);
 	void OnExplorerModifyComplete(mvceditor::ExplorerModifyEventClass& event);
 	void OnListKeyDown(wxKeyEvent& event);
-
-	// event handler for the right list
-	void OnReportItemActivated(wxListEvent& event);
 
 	// event handler for the combo box
 	void OnDirectoryEnter(wxCommandEvent& event);
 
+
+	// handlers for the buttons
 	void OnParentButtonClick(wxCommandEvent& event);
-
 	void OnFilterButtonLeftDown(wxMouseEvent& event);
-
 	void OnFilterMenuCheck(wxCommandEvent& event);
+	void OnRefreshClick(wxCommandEvent& event);
 
 	std::vector<wxString> FilterFileExtensions();
 
@@ -216,10 +206,7 @@ private:
 
 	bool OpenIfListFile(const wxString& text);
 
-	bool OpenIfReportFile(const wxString& text);
-
 	int ListImageId(const wxFileName& fileName);
-	int ReportImageId(const wxFileName& fileName);
 
 	DECLARE_EVENT_TABLE()
 };
@@ -427,6 +414,17 @@ public:
 		const wxString& newName, mvceditor::ExplorerModifyActionClass::Actions action, bool success);
 
 	wxEvent* Clone() const;
+};
+
+class ExplorerOptionsPanelClass : public ExplorerOptionsGeneratedPanelClass {
+
+public:
+
+	ExplorerOptionsPanelClass(wxWindow* parent, int id, mvceditor::ExplorerFeatureClass& feature);
+
+private:
+
+	mvceditor::ExplorerFeatureClass& Feature;
 };
 
 }

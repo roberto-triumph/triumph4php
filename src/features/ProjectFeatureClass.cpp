@@ -39,18 +39,6 @@
 
 mvceditor::ProjectFeatureClass::ProjectFeatureClass(mvceditor::AppClass& app) 
 	: FeatureClass(app) {
-	wxPlatformInfo info;
-	switch (info.GetOperatingSystemId()) {
-		case wxOS_WINDOWS_NT:
-			ExplorerExecutable = wxT("explorer.exe");
-			break;
-		case wxOS_UNIX:
-		case wxOS_UNIX_LINUX:
-			ExplorerExecutable = wxT("nautilus");
-			break;
-		default:
-			ExplorerExecutable = wxT("explorer");
-	}
 }
 
 mvceditor::ProjectFeatureClass::~ProjectFeatureClass() {
@@ -61,7 +49,6 @@ void mvceditor::ProjectFeatureClass::AddFileMenuItems(wxMenu* fileMenu) {
 }
 
 void mvceditor::ProjectFeatureClass::LoadPreferences(wxConfigBase* config) {
-	config->Read(wxT("/Project/ExplorerExecutable"), &ExplorerExecutable);
 	App.Globals.PhpFileExtensionsString = config->Read(wxT("/Project/PhpFileExtensions"));
 	App.Globals.CssFileExtensionsString = config->Read(wxT("/Project/CssFileExtensions"));
 	App.Globals.SqlFileExtensionsString = config->Read(wxT("/Project/SqlFileExtensions"));
@@ -112,7 +99,6 @@ void mvceditor::ProjectFeatureClass::LoadPreferences(wxConfigBase* config) {
 
 void mvceditor::ProjectFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfig::Get();
-	config->Write(wxT("/Project/ExplorerExecutable"), ExplorerExecutable);
 	config->Write(wxT("/Project/PhpFileExtensions"), App.Globals.PhpFileExtensionsString);
 	config->Write(wxT("/Project/CssFileExtensions"), App.Globals.CssFileExtensionsString);
 	config->Write(wxT("/Project/SqlFileExtensions"), App.Globals.SqlFileExtensionsString);
@@ -236,9 +222,6 @@ void mvceditor::ProjectFeatureClass::OnPreferencesExternallyUpdated(wxCommandEve
 
 mvceditor::ProjectPreferencesPanelClass::ProjectPreferencesPanelClass(wxWindow *parent, mvceditor::ProjectFeatureClass &projectFeature) 
 : ProjectPreferencesGeneratedPanelClass(parent) {
-	NonEmptyTextValidatorClass explorerValidator(&projectFeature.ExplorerExecutable, Label);
-	ExplorerExecutable->SetValidator(explorerValidator);
-
 	NonEmptyTextValidatorClass phpFileExtensionsValidator(&projectFeature.App.Globals.PhpFileExtensionsString, PhpLabel);
 	PhpFileExtensions->SetValidator(phpFileExtensionsValidator);
 
@@ -251,11 +234,12 @@ mvceditor::ProjectPreferencesPanelClass::ProjectPreferencesPanelClass(wxWindow *
 	NonEmptyTextValidatorClass miscFileExtensionsValidator(&projectFeature.App.Globals.MiscFileExtensionsString, MiscLabel);
 	MiscFileExtensions->SetValidator(miscFileExtensionsValidator);
 }
-
+/***
 void mvceditor::ProjectPreferencesPanelClass::OnFileChanged(wxFileDirPickerEvent& event) {
 	ExplorerExecutable->SetValue(event.GetPath());
 	event.Skip();
 }
+*/
 
 mvceditor::ProjectDefinitionDialogClass::ProjectDefinitionDialogClass(wxWindow* parent, mvceditor::ProjectClass& project)
 	: ProjectDefinitionDialogGeneratedClass(parent)
