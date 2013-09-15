@@ -175,6 +175,8 @@ protected:
 	void OnEditPreferences(wxCommandEvent& event);
 	void OnEditContentAssist(wxCommandEvent& event);
 	void OnEditCallTip(wxCommandEvent& event);
+	void OnViewToggleTools(wxCommandEvent& event);
+	void OnViewToggleOutline(wxCommandEvent& event);
 	void OnHelpAbout(wxCommandEvent& event);
 	void OnHelpCredits(wxCommandEvent& event);
 	void OnHelpLicense(wxCommandEvent& event);

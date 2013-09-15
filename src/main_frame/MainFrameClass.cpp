@@ -379,6 +379,20 @@ void mvceditor::MainFrameClass::OnEditPreferences(wxCommandEvent& event) {
 	}
 }
 
+void mvceditor::MainFrameClass::OnViewToggleOutline(wxCommandEvent& event) {
+	wxAuiPaneInfo& info = AuiManager.GetPane(OutlineNotebook);
+	info.Show(!info.IsShown());
+	AuiManager.Update();
+	OutlineNotebook->SetFocus();
+}
+
+void mvceditor::MainFrameClass::OnViewToggleTools(wxCommandEvent& event) {
+	wxAuiPaneInfo& info = AuiManager.GetPane(ToolsNotebook);
+	info.Show(!info.IsShown());
+	AuiManager.Update();
+	ToolsNotebook->SetFocus();
+}
+
 void mvceditor::MainFrameClass::PreferencesSaved() {
 	Preferences.EnableSelectedProfile(this);
 	Notebook->RefreshCodeControlOptions();
@@ -766,6 +780,9 @@ void mvceditor::MainFrameClass::DefaultKeyboardShortcuts() {
 	defaultMenus[ID_EDIT_CONTENT_ASSIST] = wxT("Edit-Content Assist");
 	defaultMenus[ID_EDIT_CALL_TIP] = wxT("Edit-Call Tip");
 	defaultMenus[ID_EDIT_PREFERENCES] = wxT("Edit-Preferences");
+	defaultMenus[ID_VIEW_TOGGLE_TOOLS] = wxT("View-Tools");
+	defaultMenus[ID_VIEW_TOGGLE_OUTLINE] = wxT("View-Outline");
+
 	defaultMenus[ID_ABOUT] = wxT("Help-About");
 	wxMenuBar* menuBar = GetMenuBar();
 	for (std::map<int, wxString>::iterator it = defaultMenus.begin(); it != defaultMenus.end(); ++it) {

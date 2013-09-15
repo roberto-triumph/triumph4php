@@ -33,6 +33,8 @@ BEGIN_EVENT_TABLE( MainFrameGeneratedClass, wxFrame )
 	EVT_MENU( ID_EDIT_CONTENT_ASSIST, MainFrameGeneratedClass::_wxFB_OnEditContentAssist )
 	EVT_MENU( ID_EDIT_CALL_TIP, MainFrameGeneratedClass::_wxFB_OnEditCallTip )
 	EVT_MENU( ID_EDIT_PREFERENCES, MainFrameGeneratedClass::_wxFB_OnEditPreferences )
+	EVT_MENU( ID_VIEW_TOGGLE_TOOLS, MainFrameGeneratedClass::_wxFB_OnViewToggleTools )
+	EVT_MENU( ID_VIEW_TOGGLE_OUTLINE, MainFrameGeneratedClass::_wxFB_OnViewToggleOutline )
 	EVT_MENU( ID_ABOUT, MainFrameGeneratedClass::_wxFB_OnHelpAbout )
 	EVT_MENU( ID_MENUITEMCREDITS, MainFrameGeneratedClass::_wxFB_OnHelpCredits )
 	EVT_MENU( ID_MENUITEMLICENSE, MainFrameGeneratedClass::_wxFB_OnHelpLicense )
@@ -142,6 +144,14 @@ MainFrameGeneratedClass::MainFrameGeneratedClass( wxWindow* parent, wxWindowID i
 	MenuBar->Append( EditMenu, _("&Edit") ); 
 	
 	ViewMenu = new wxMenu();
+	wxMenuItem* ToggleTools;
+	ToggleTools = new wxMenuItem( ViewMenu, ID_VIEW_TOGGLE_TOOLS, wxString( _("Toggle Tools Pane") ) + wxT('\t') + wxT("CTRL+ALT+T"), wxEmptyString, wxITEM_NORMAL );
+	ViewMenu->Append( ToggleTools );
+	
+	wxMenuItem* ToggleOutline;
+	ToggleOutline = new wxMenuItem( ViewMenu, ID_VIEW_TOGGLE_OUTLINE, wxString( _("Toogle Outline Pane") ) + wxT('\t') + wxT("CTRL+ALT+O"), wxEmptyString, wxITEM_NORMAL );
+	ViewMenu->Append( ToggleOutline );
+	
 	MenuBar->Append( ViewMenu, _("&View") ); 
 	
 	SearchMenu = new wxMenu();
