@@ -49,21 +49,39 @@ ModalExplorerGeneratedPanelClass::ModalExplorerGeneratedPanelClass( wxWindow* pa
 	BodyGridSizer->SetFlexibleDirection( wxBOTH );
 	BodyGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	LeftPanel = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	wxBoxSizer* LeftPanelSizer;
-	LeftPanelSizer = new wxBoxSizer( wxVERTICAL );
+	Splitter = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D );
+	Splitter->Connect( wxEVT_IDLE, wxIdleEventHandler( ModalExplorerGeneratedPanelClass::SplitterOnIdle ), NULL, this );
 	
-	List = new wxListCtrl( LeftPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_EDIT_LABELS|wxLC_LIST );
-	LeftPanelSizer->Add( List, 1, wxEXPAND|wxTOP|wxBOTTOM|wxLEFT, 5 );
+	SourcesPanel = new wxPanel( Splitter, wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), wxTAB_TRAVERSAL );
+	wxBoxSizer* SourcesSizer;
+	SourcesSizer = new wxBoxSizer( wxVERTICAL );
 	
-	ListLabel = new wxStaticText( LeftPanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	SourcesList = new wxListCtrl( SourcesPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_SINGLE_SEL|wxLC_SMALL_ICON|wxLC_SORT_ASCENDING );
+	SourcesSizer->Add( SourcesList, 1, wxALL|wxEXPAND, 5 );
+	
+	SourcesLabel = new wxStaticText( SourcesPanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT );
+	SourcesLabel->Wrap( -1 );
+	SourcesSizer->Add( SourcesLabel, 0, wxALL|wxEXPAND, 5 );
+	
+	SourcesPanel->SetSizer( SourcesSizer );
+	SourcesPanel->Layout();
+	SourcesSizer->Fit( SourcesPanel );
+	FilesPanel = new wxPanel( Splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	wxBoxSizer* FilesPanelSizer;
+	FilesPanelSizer = new wxBoxSizer( wxVERTICAL );
+	
+	List = new wxListCtrl( FilesPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_EDIT_LABELS|wxLC_LIST );
+	FilesPanelSizer->Add( List, 1, wxEXPAND|wxTOP|wxBOTTOM|wxLEFT, 5 );
+	
+	ListLabel = new wxStaticText( FilesPanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	ListLabel->Wrap( -1 );
-	LeftPanelSizer->Add( ListLabel, 0, wxALL|wxEXPAND, 5 );
+	FilesPanelSizer->Add( ListLabel, 0, wxALL|wxEXPAND, 5 );
 	
-	LeftPanel->SetSizer( LeftPanelSizer );
-	LeftPanel->Layout();
-	LeftPanelSizer->Fit( LeftPanel );
-	BodyGridSizer->Add( LeftPanel, 1, wxEXPAND | wxALL, 5 );
+	FilesPanel->SetSizer( FilesPanelSizer );
+	FilesPanel->Layout();
+	FilesPanelSizer->Fit( FilesPanel );
+	Splitter->SplitVertically( SourcesPanel, FilesPanel, 164 );
+	BodyGridSizer->Add( Splitter, 1, wxEXPAND, 5 );
 	
 	GridSizer->Add( BodyGridSizer, 1, wxEXPAND, 5 );
 	
@@ -77,6 +95,7 @@ ModalExplorerGeneratedPanelClass::ModalExplorerGeneratedPanelClass( wxWindow* pa
 	ParentButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModalExplorerGeneratedPanelClass::OnParentButtonClick ), NULL, this );
 	RefreshButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModalExplorerGeneratedPanelClass::OnRefreshClick ), NULL, this );
 	Directory->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ModalExplorerGeneratedPanelClass::OnDirectoryEnter ), NULL, this );
+	SourcesList->Connect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( ModalExplorerGeneratedPanelClass::OnSourceActivated ), NULL, this );
 	List->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( ModalExplorerGeneratedPanelClass::OnListKeyDown ), NULL, this );
 	List->Connect( wxEVT_COMMAND_LIST_END_LABEL_EDIT, wxListEventHandler( ModalExplorerGeneratedPanelClass::OnListEndLabelEdit ), NULL, this );
 	List->Connect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( ModalExplorerGeneratedPanelClass::OnListItemActivated ), NULL, this );
@@ -92,6 +111,7 @@ ModalExplorerGeneratedPanelClass::~ModalExplorerGeneratedPanelClass()
 	ParentButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModalExplorerGeneratedPanelClass::OnParentButtonClick ), NULL, this );
 	RefreshButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModalExplorerGeneratedPanelClass::OnRefreshClick ), NULL, this );
 	Directory->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ModalExplorerGeneratedPanelClass::OnDirectoryEnter ), NULL, this );
+	SourcesList->Disconnect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( ModalExplorerGeneratedPanelClass::OnSourceActivated ), NULL, this );
 	List->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( ModalExplorerGeneratedPanelClass::OnListKeyDown ), NULL, this );
 	List->Disconnect( wxEVT_COMMAND_LIST_END_LABEL_EDIT, wxListEventHandler( ModalExplorerGeneratedPanelClass::OnListEndLabelEdit ), NULL, this );
 	List->Disconnect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( ModalExplorerGeneratedPanelClass::OnListItemActivated ), NULL, this );

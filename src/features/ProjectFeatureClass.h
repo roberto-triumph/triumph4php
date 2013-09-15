@@ -98,12 +98,6 @@ public:
 	 */
 	ProjectPreferencesPanelClass(wxWindow* parent, ProjectFeatureClass& projectFeature);
 
-protected:
-
-	/**
-	 * When a new file is chosen, update the textbox.
-	 */
-	void OnFileChanged(wxFileDirPickerEvent& event);
 };
 
 /**

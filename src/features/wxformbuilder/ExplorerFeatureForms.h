@@ -23,6 +23,7 @@
 #include <wx/listctrl.h>
 #include <wx/stattext.h>
 #include <wx/panel.h>
+#include <wx/splitter.h>
 #include <wx/filepicker.h>
 #include <wx/statbox.h>
 
@@ -41,7 +42,11 @@ class ModalExplorerGeneratedPanelClass : public wxPanel
 		wxBitmapButton* ParentButton;
 		wxBitmapButton* RefreshButton;
 		wxComboBox* Directory;
-		wxPanel* LeftPanel;
+		wxSplitterWindow* Splitter;
+		wxPanel* SourcesPanel;
+		wxListCtrl* SourcesList;
+		wxStaticText* SourcesLabel;
+		wxPanel* FilesPanel;
 		wxListCtrl* List;
 		wxStaticText* ListLabel;
 		
@@ -50,6 +55,7 @@ class ModalExplorerGeneratedPanelClass : public wxPanel
 		virtual void OnParentButtonClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRefreshClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDirectoryEnter( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSourceActivated( wxListEvent& event ) { event.Skip(); }
 		virtual void OnListKeyDown( wxKeyEvent& event ) { event.Skip(); }
 		virtual void OnListEndLabelEdit( wxListEvent& event ) { event.Skip(); }
 		virtual void OnListItemActivated( wxListEvent& event ) { event.Skip(); }
@@ -62,6 +68,12 @@ class ModalExplorerGeneratedPanelClass : public wxPanel
 		
 		ModalExplorerGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 722,332 ), long style = wxTAB_TRAVERSAL );
 		~ModalExplorerGeneratedPanelClass();
+		
+		void SplitterOnIdle( wxIdleEvent& )
+		{
+			Splitter->SetSashPosition( 164 );
+			Splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( ModalExplorerGeneratedPanelClass::SplitterOnIdle ), NULL, this );
+		}
 	
 };
 

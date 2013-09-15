@@ -57,9 +57,9 @@ public:
 	ExplorerFeatureClass(mvceditor::AppClass& app);
 
 	/**
-	 * Add menu items to the file menu
+	 * Add menu items to the view menu
 	 */
-	void AddFileMenuItems(wxMenu* fileMenu);
+	void AddViewMenuItems(wxMenu* viewMenu);
 
 	/**
 	 * Add a new toolbar for explorer items only
@@ -109,6 +109,11 @@ private:
 	 * set to the source dir
 	 */
 	void OnExplorerProjectMenu(wxCommandEvent& event);
+
+	/**
+	 * when projects list is updated, we need to update our sources list
+	 */
+	void OnAppPreferencesSaved(wxCommandEvent& event);
 	
 	/**
 	 * toolbar to hold the explorer buttons
@@ -132,6 +137,10 @@ public:
 	
 	void ShowDir(const wxFileName& dir, const std::vector<wxFileName>& files, const std::vector<wxFileName>& dirs, int totalFiles, int totalSubDirs);
 
+	void FillSourcesList(const std::vector<wxFileName>& sourceDirs);
+
+	void FocusOnSourcesList();
+
 private:
 
 	/**
@@ -142,7 +151,12 @@ private:
 	/**
 	 * will be owned by the list control
 	 */
-	wxImageList* ListImageList;
+	wxImageList* FilesImageList;
+
+	/**
+	 * will be owned by the list control
+	 */
+	wxImageList* SourcesImageList;
 
 	/**
 	 * to get projects list and tag cache
@@ -170,14 +184,17 @@ private:
 		LIST_FILE_OTHER
 	};
 
-	// events handlers for the left list
-	void OnListItemSelected(wxListEvent& event);
+	enum SourceImages {
+		SOURCE_FOLDER
+	};
+
+	// events handlers for the files list
 	void OnListItemActivated(wxListEvent& event);
 	void OnListItemRightClick(wxListEvent& event);
 	void OnListEndLabelEdit(wxListEvent& event);
 	void OnListRightDown(wxMouseEvent& event);
 
-	// event handlers for the context menu on the left files list
+	// event handlers for the context menu on the files list
 	void OnListMenuOpen(wxCommandEvent& event);
 	void OnListMenuRename(wxCommandEvent& event);
 	void OnListMenuDelete(wxCommandEvent& event);
@@ -191,6 +208,8 @@ private:
 	// event handler for the combo box
 	void OnDirectoryEnter(wxCommandEvent& event);
 
+	// event handlers for the sources list
+	void OnSourceActivated(wxListEvent& event);
 
 	// handlers for the buttons
 	void OnParentButtonClick(wxCommandEvent& event);
@@ -420,7 +439,7 @@ class ExplorerOptionsPanelClass : public ExplorerOptionsGeneratedPanelClass {
 
 public:
 
-	ExplorerOptionsPanelClass(wxWindow* parent, int id, mvceditor::ExplorerFeatureClass& feature);
+	ExplorerOptionsPanelClass(wxWindow* parent, int id, mvceditor::ExplorerFeatureClass& feature);	
 
 private:
 

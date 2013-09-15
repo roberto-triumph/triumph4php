@@ -234,12 +234,6 @@ mvceditor::ProjectPreferencesPanelClass::ProjectPreferencesPanelClass(wxWindow *
 	NonEmptyTextValidatorClass miscFileExtensionsValidator(&projectFeature.App.Globals.MiscFileExtensionsString, MiscLabel);
 	MiscFileExtensions->SetValidator(miscFileExtensionsValidator);
 }
-/***
-void mvceditor::ProjectPreferencesPanelClass::OnFileChanged(wxFileDirPickerEvent& event) {
-	ExplorerExecutable->SetValue(event.GetPath());
-	event.Skip();
-}
-*/
 
 mvceditor::ProjectDefinitionDialogClass::ProjectDefinitionDialogClass(wxWindow* parent, mvceditor::ProjectClass& project)
 	: ProjectDefinitionDialogGeneratedClass(parent)

@@ -98,14 +98,16 @@ mvceditor::ExplorerFeatureClass::ExplorerFeatureClass(mvceditor::AppClass& app)
 	}
 }
 
-void mvceditor::ExplorerFeatureClass::AddFileMenuItems(wxMenu* fileMenu) {
-	fileMenu->Append(mvceditor::MENU_EXPLORER + 1, _("Explore Open File"), _("Open An explorer window in the currently opened file"), wxITEM_NORMAL);
+void mvceditor::ExplorerFeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
+	viewMenu->Append(mvceditor::MENU_EXPLORER + 1, _("Explore Open File\tCTRL+ALT+E"), _("Open An explorer window in the currently opened file"), wxITEM_NORMAL);
+	viewMenu->Append(mvceditor::MENU_EXPLORER + 2, _("Explore Sources\tCTRL+SHIFT+E"), _("Open An explorer window"), wxITEM_NORMAL);
 }
 
 
 void mvceditor::ExplorerFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
 	menuItemIds[mvceditor::MENU_EXPLORER + 1] = wxT("Project-Explore File");
+	menuItemIds[mvceditor::MENU_EXPLORER + 2] = wxT("Project-Explore Sources");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
@@ -168,18 +170,20 @@ void mvceditor::ExplorerFeatureClass::OnExplorerProjectMenu(wxCommandEvent& even
 	if (index >= 0 && index < SourceDirs.size()) {
 		panel->RefreshDir(SourceDirs[index].RootDirectory);
 	}
+	else {
+		panel->FocusOnSourcesList();
+	}
 }
 
 void mvceditor::ExplorerFeatureClass::OnProjectExplore(wxCommandEvent& event) {
 	SourceDirs = App.Globals.AllEnabledSources();
+	wxCommandEvent cmdEvt;
 	if (SourceDirs.size() == 1) {
-		
-		// dont show menu, just open it now
-		wxCommandEvent cmdEvt;
+	
+		// only 1 source dir, just open it now
 		cmdEvt.SetId(mvceditor::MENU_EXPLORER + 3);
-		OnExplorerProjectMenu(cmdEvt);
-		return;
 	}
+	OnExplorerProjectMenu(cmdEvt);
 }
 
 void mvceditor::ExplorerFeatureClass::OnExplorerToolDropDown(wxAuiToolBarEvent& event) {
@@ -241,23 +245,37 @@ void mvceditor::ExplorerFeatureClass::OnExplorerListComplete(mvceditor::Explorer
 	}
 }
 
+void mvceditor::ExplorerFeatureClass::OnAppPreferencesSaved(wxCommandEvent& event) {
+	mvceditor::ModalExplorerPanelClass* panel = NULL;
+	wxWindow* window = FindToolsWindow(ID_EXPLORER_PANEL);
+	if (window) {
+		std::vector<wxFileName> sourceDirs = App.Globals.AllEnabledSourceDirectories();	
+	
+		panel = (mvceditor::ModalExplorerPanelClass*)window;
+		panel->FillSourcesList(sourceDirs);
+	}
+}
+
 mvceditor::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, mvceditor::ExplorerFeatureClass& feature)
 : ModalExplorerGeneratedPanelClass(parent, id) 
 , CurrentListDir()
-, ListImageList(NULL)
+, FilesImageList(NULL)
 , Feature(feature) 
 , RunningThreads()
 , FilterChoice(ID_FILTER_ALL) {
-	ListImageList = new wxImageList(16, 16);
-	ListImageList->Add(mvceditor::IconImageAsset(wxT("folder-horizontal")));
-	ListImageList->Add(mvceditor::IconImageAsset(wxT("arrow-up")));
-	ListImageList->Add(mvceditor::IconImageAsset(wxT("document-php")));
-	ListImageList->Add(mvceditor::IconImageAsset(wxT("document-sql")));
-	ListImageList->Add(mvceditor::IconImageAsset(wxT("document-css")));
-	ListImageList->Add(mvceditor::IconImageAsset(wxT("document-text")));
-	ListImageList->Add(mvceditor::IconImageAsset(wxT("document-blank")));
+	FilesImageList = new wxImageList(16, 16);
+	FilesImageList->Add(mvceditor::IconImageAsset(wxT("folder-horizontal")));
+	FilesImageList->Add(mvceditor::IconImageAsset(wxT("arrow-up")));
+	FilesImageList->Add(mvceditor::IconImageAsset(wxT("document-php")));
+	FilesImageList->Add(mvceditor::IconImageAsset(wxT("document-sql")));
+	FilesImageList->Add(mvceditor::IconImageAsset(wxT("document-css")));
+	FilesImageList->Add(mvceditor::IconImageAsset(wxT("document-text")));
+	FilesImageList->Add(mvceditor::IconImageAsset(wxT("document-blank")));
+	List->AssignImageList(FilesImageList, wxIMAGE_LIST_SMALL);
 
-	List->AssignImageList(ListImageList, wxIMAGE_LIST_SMALL);
+	SourcesImageList = new wxImageList(16, 16);
+	SourcesImageList->Add(mvceditor::IconImageAsset(wxT("folder-horizontal")));
+	SourcesList->AssignImageList(SourcesImageList, wxIMAGE_LIST_SMALL);
 
 	FilterButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("filter")));
 	ParentButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("arrow-up")));
@@ -266,7 +284,9 @@ mvceditor::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, in
 	RunningThreads.SetMaxThreads(1);
 	RunningThreads.AddEventHandler(this);
 	RunningThreads.AddEventHandler(&Feature);
-	
+
+	std::vector<wxFileName> sourceDirs = feature.App.Globals.AllEnabledSourceDirectories();	
+	FillSourcesList(sourceDirs);
 }
 
 mvceditor::ModalExplorerPanelClass::~ModalExplorerPanelClass() {
@@ -329,10 +349,6 @@ void mvceditor::ModalExplorerPanelClass::OnListItemActivated(wxListEvent& event)
 		nextDir.AppendDir(text);
 		RefreshDir(nextDir);
 	}	
-}
-
-void mvceditor::ModalExplorerPanelClass::OnListItemSelected(wxListEvent& event) {
-	// TODO activate
 }
 
 void mvceditor::ModalExplorerPanelClass::OnListItemRightClick(wxListEvent& event) {
@@ -404,6 +420,7 @@ void mvceditor::ModalExplorerPanelClass::ShowDir(const wxFileName& currentDir, c
 	List->DeleteAllItems();
 	int newRowNumber = 0;
 
+	// add the parent dir item
 	wxFileName parentDir;
 	parentDir.AssignDir(currentDir.GetPath());
 	if (parentDir.GetDirCount() > 1) {
@@ -419,6 +436,8 @@ void mvceditor::ModalExplorerPanelClass::ShowDir(const wxFileName& currentDir, c
 			newRowNumber++;
 		}
 	}
+
+	// add all sub-directories
 	std::vector<mvceditor::ProjectClass>::const_iterator p;
 	std::vector<wxFileName>::const_iterator dir;
 	for (dir = dirs.begin(); dir != dirs.end(); ++dir) {
@@ -432,6 +451,8 @@ void mvceditor::ModalExplorerPanelClass::ShowDir(const wxFileName& currentDir, c
 
 		newRowNumber++;
 	}
+
+	// add all files
 	std::vector<wxFileName>::const_iterator file;
 	for (file = files.begin(); file != files.end(); ++file) {
 		wxListItem column1;
@@ -453,6 +474,16 @@ void mvceditor::ModalExplorerPanelClass::ShowDir(const wxFileName& currentDir, c
 		label = wxString::Format(wxT("%ld Files, %ld Directories (%ld not shown)"), files.size(), dirs.size(), totalFiles - files.size());
 	}
 	ListLabel->SetLabel(label);
+
+	// set the second item to be selected (first other than parent)
+	// except if the dir is empty
+	if (List->GetItemCount() >= 2) {
+		List->SetItemState(1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+	}
+	else if (List->GetItemCount() >= 1) {
+		List->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+	}
+	List->SetFocus();
 }
 
 bool mvceditor::ModalExplorerPanelClass::OpenIfListFile(const wxString& text) {
@@ -835,6 +866,45 @@ void mvceditor::ModalExplorerPanelClass::OnFilterMenuCheck(wxCommandEvent& event
 	RefreshDir(dir);
 }
 
+void mvceditor::ModalExplorerPanelClass::OnSourceActivated(wxListEvent& event) {
+	long selection = event.GetIndex();
+	std::vector<wxFileName> sourceDirs = Feature.App.Globals.AllEnabledSourceDirectories();
+	if (selection >= 0 && selection < (long)sourceDirs.size()) {
+		RefreshDir(sourceDirs[selection]);
+	}
+}
+
+void mvceditor::ModalExplorerPanelClass::FillSourcesList(const std::vector<wxFileName> &sourceDirs) {
+	SourcesList->DeleteAllItems();
+	std::vector<wxFileName>::const_iterator dir;
+	for (dir = sourceDirs.begin(); dir != sourceDirs.end(); ++dir) {
+		
+		// list ctrl is tricky, for columns we must insertItem() then setItem() for the next columns
+		int newRowNumber = SourcesList->GetItemCount();
+		wxString newName = dir->GetDirs().Last();
+		wxListItem column1;
+		column1.SetColumn(0);
+		column1.SetId(newRowNumber);
+		column1.SetImage(LIST_FOLDER);
+		column1.SetMask(wxLIST_MASK_IMAGE | wxLIST_MASK_TEXT);
+		column1.SetText(newName);
+		SourcesList->InsertItem(column1);
+	}
+	if (sourceDirs.size() == 1) {
+		SourcesLabel->SetLabel(wxString::Format(wxT("%d Source Directory"), (int)sourceDirs.size()));
+	}
+	else {
+		SourcesLabel->SetLabel(wxString::Format(wxT("%d Source Directories"), (int)sourceDirs.size()));
+	}
+}
+
+void mvceditor::ModalExplorerPanelClass::FocusOnSourcesList() {
+	if (SourcesList->GetItemCount()) {
+		SourcesList->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+	}
+	SourcesList->SetFocus();
+}
+
 mvceditor::ExplorerEventClass::ExplorerEventClass(int eventId, const wxFileName& dir, const std::vector<wxFileName>& files, 
 												  const std::vector<wxFileName>& subDirs, const wxString& error, int totalFiles,
 												  int totalSubDirs)
@@ -1037,7 +1107,7 @@ mvceditor::ExplorerOptionsPanelClass::ExplorerOptionsPanelClass(wxWindow* parent
 	mvceditor::FilePickerValidatorClass fileManagerValidator(&feature.FileManagerExecutable);
 	FileManager->SetValidator(fileManagerValidator);
 	mvceditor::FilePickerValidatorClass shellValidator(&feature.ShellExecutable);
-	Shell->SetValidator(shellValidator);
+	Shell->SetValidator(shellValidator);	
 }
 
 const wxEventType mvceditor::EVENT_EXPLORER = wxNewEventType();
@@ -1048,6 +1118,8 @@ BEGIN_EVENT_TABLE(mvceditor::ExplorerFeatureClass, mvceditor::FeatureClass)
 	EVT_MENU(mvceditor::MENU_EXPLORER + 2, mvceditor::ExplorerFeatureClass::OnProjectExplore)
 	EVT_AUITOOLBAR_TOOL_DROPDOWN(mvceditor::MENU_EXPLORER + 2, mvceditor::ExplorerFeatureClass::OnExplorerToolDropDown)
 	EVT_MENU_RANGE(mvceditor::MENU_EXPLORER + 3, mvceditor::MENU_EXPLORER + 50, mvceditor::ExplorerFeatureClass::OnExplorerProjectMenu)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::ExplorerFeatureClass::OnAppPreferencesSaved)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, mvceditor::ExplorerFeatureClass::OnAppPreferencesSaved)
 	
 	EVT_EXPLORER_COMPLETE(ID_EXPLORER_LIST_ACTION, mvceditor::ExplorerFeatureClass::OnExplorerListComplete)
 END_EVENT_TABLE()
