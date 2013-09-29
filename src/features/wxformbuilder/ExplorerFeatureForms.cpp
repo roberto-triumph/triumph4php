@@ -56,7 +56,7 @@ ModalExplorerGeneratedPanelClass::ModalExplorerGeneratedPanelClass( wxWindow* pa
 	wxBoxSizer* SourcesSizer;
 	SourcesSizer = new wxBoxSizer( wxVERTICAL );
 	
-	SourcesList = new wxListCtrl( SourcesPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_SINGLE_SEL|wxLC_SMALL_ICON|wxLC_SORT_ASCENDING );
+	SourcesList = new wxListCtrl( SourcesPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_SINGLE_SEL|wxLC_SMALL_ICON );
 	SourcesSizer->Add( SourcesList, 1, wxALL|wxEXPAND, 5 );
 	
 	SourcesLabel = new wxStaticText( SourcesPanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT );
