@@ -384,21 +384,7 @@ mvceditor::PhpEnvironmentPanelClass::PhpEnvironmentPanelClass(wxWindow* parent, 
 }
 
 bool mvceditor::PhpEnvironmentPanelClass::TransferDataFromWindow() {
-	bool good = wxWindow::TransferDataFromWindow();
-	if (good) {
-		int sel = Version->GetCurrentSelection();
-		Environment.Php.IsAuto = false;
-		if (2 == sel) {
-			Environment.Php.Version = pelet::PHP_54;
-		}
-		else if (1 == sel) {
-			Environment.Php.Version = pelet::PHP_53;
-		}
-		else {
-			Environment.Php.IsAuto = true;
-		}
-		good = true;
-	}
+	bool good = true;
 
 	// php executable can be empty when user does not have php installed
 	if (!NoPhp->GetValue()) {
@@ -413,6 +399,25 @@ bool mvceditor::PhpEnvironmentPanelClass::TransferDataFromWindow() {
 		if (0 == sel) {
 			wxMessageBox(_("If PHP executable is not installed you need to choose a PHP version."), _("Error: PHP Executable"));
 			good = false;
+		}
+	}
+	if (good) {
+		good = wxWindow::TransferDataFromWindow();
+	}
+	if (good) {
+		int sel = Version->GetCurrentSelection();
+		Environment.Php.IsAuto = false;
+		if (2 == sel) {
+			Environment.Php.Version = pelet::PHP_54;
+		}
+		else if (1 == sel) {
+			Environment.Php.Version = pelet::PHP_53;
+		}
+		else {
+			Environment.Php.IsAuto = true;
+		}
+		if (!NoPhp->GetValue()) {
+			Environment.Php.PhpExecutablePath = PhpExecutable->GetValue();
 		}
 	}
 	return good;

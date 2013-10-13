@@ -75,7 +75,8 @@ void mvceditor::PreferencesDialogClass::OnOkButton(wxCommandEvent& event) {
 	wxBookCtrlBase* book = GetBookCtrl();
 	ChangedSettingsDir = false;
 	NeedsRetag = false;
-	pelet::Versions oldVersion = Globals.Environment.Php.Version;
+	pelet::Versions oldPhpVersion = Globals.Environment.Php.Version;
+	wxString oldPhpExecutable = Globals.Environment.Php.PhpExecutablePath;
 	wxString oldExtensions = Globals.PhpFileExtensionsString 
 		+ Globals.SqlFileExtensionsString
 		+ Globals.CssFileExtensionsString
@@ -94,6 +95,15 @@ void mvceditor::PreferencesDialogClass::OnOkButton(wxCommandEvent& event) {
 			+ Globals.CssFileExtensionsString
 			+ Globals.MiscFileExtensionsString;
 		if (oldExtensions != newExtensions) {
+			NeedsRetag = true;
+		}
+
+		// php executable affects populating "detected" tags
+		wxString newPhpExecutable = Globals.Environment.Php.PhpExecutablePath;
+		if (oldPhpExecutable != newPhpExecutable && !Globals.Environment.Php.NotInstalled) {
+			NeedsRetag = true;
+		}
+		if (oldPhpVersion != Globals.Environment.Php.Version) {
 			NeedsRetag = true;
 		}
 		EndModal(wxOK);
