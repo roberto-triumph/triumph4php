@@ -143,6 +143,8 @@ public:
 
 	void LoadPreferences();
 
+	void SavePreferences(const wxFileName& settingsDir);
+
 	/**
 	 * signal that this app has modified the config file, that way the external
 	 * modification check fails and the user will not be prompted to reload the config

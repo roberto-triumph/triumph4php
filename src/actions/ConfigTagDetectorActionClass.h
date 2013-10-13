@@ -94,6 +94,9 @@ public:
 
 	ConfigTagDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
+	/**
+	 * @return boolean false if PHP is not installed in the system
+	 */
 	bool Init(mvceditor::GlobalsClass& globals);
 
 	bool DoAsync();

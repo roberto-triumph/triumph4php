@@ -131,7 +131,7 @@
                                                 <property name="font"></property>
                                                 <property name="hidden">0</property>
                                                 <property name="id">wxID_ANY</property>
-                                                <property name="label">You can associate to open settings control the type of editor that is  invoked when &#x0A;each file is open. The settings are any set of wildcard values. You can use &#x0A;wildcards to match files.  The allowed wildcards are:&#x0A;&#x0A;* : Will match on zero or more characters&#x0A;? : Will match on zero or one character&#x0A;; : Separator among multiple wildcards&#x0A;&#x0A;For example, the value &quot;*.php;*.phtml&quot; will match files withe the extension .php or &#x0A;the extension .phtml</property>
+                                                <property name="label">MVC Editor uses file extensions to determine how to display the source code contained within them. MVC Editor&apos;s syntax highlighting and source code parsing features use these settings to determine which files contain PHP, SQL, and CSS source code. You can change the file extensions if desired.&#x0A;&#x0A;Each input can contain 1 or more wilcard strings. &#x0A;The allowed wildcard characters are:&#x0A;&#x0A;* : Will match on zero or more characters&#x0A;? : Will match on zero or one character&#x0A;; : Separator among multiple wildcards&#x0A;&#x0A;For example, the value &quot;*.php;*.phtml&quot; will match files with the extension .php or the extension .phtml&#x0A;</property>
                                                 <property name="maximum_size"></property>
                                                 <property name="minimum_size"></property>
                                                 <property name="name">WildcardHelpText</property>
@@ -148,7 +148,7 @@
                                                 <property name="window_extra_style"></property>
                                                 <property name="window_name"></property>
                                                 <property name="window_style"></property>
-                                                <property name="wrap">-1</property>
+                                                <property name="wrap">500</property>
                                                 <event name="OnChar"></event>
                                                 <event name="OnEnterWindow"></event>
                                                 <event name="OnEraseBackground"></event>

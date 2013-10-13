@@ -31,8 +31,8 @@ ProjectPreferencesGeneratedPanelClass::ProjectPreferencesGeneratedPanelClass( wx
 	wxBoxSizer* AssociationsBoxSizer;
 	AssociationsBoxSizer = new wxBoxSizer( wxVERTICAL );
 	
-	WildcardHelpText = new wxStaticText( this, wxID_ANY, _("You can associate to open settings control the type of editor that is  invoked when \neach file is open. The settings are any set of wildcard values. You can use \nwildcards to match files.  The allowed wildcards are:\n\n* : Will match on zero or more characters\n? : Will match on zero or one character\n; : Separator among multiple wildcards\n\nFor example, the value \"*.php;*.phtml\" will match files withe the extension .php or \nthe extension .phtml"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
-	WildcardHelpText->Wrap( -1 );
+	WildcardHelpText = new wxStaticText( this, wxID_ANY, _("MVC Editor uses file extensions to determine how to display the source code contained within them. MVC Editor's syntax highlighting and source code parsing features use these settings to determine which files contain PHP, SQL, and CSS source code. You can change the file extensions if desired.\n\nEach input can contain 1 or more wilcard strings. \nThe allowed wildcard characters are:\n\n* : Will match on zero or more characters\n? : Will match on zero or one character\n; : Separator among multiple wildcards\n\nFor example, the value \"*.php;*.phtml\" will match files with the extension .php or the extension .phtml\n"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	WildcardHelpText->Wrap( 500 );
 	AssociationsBoxSizer->Add( WildcardHelpText, 1, wxALL|wxEXPAND, 5 );
 	
 	AssociationsGridSizer->Add( AssociationsBoxSizer, 1, wxEXPAND, 5 );

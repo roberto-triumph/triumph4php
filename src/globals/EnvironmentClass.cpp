@@ -62,13 +62,15 @@ void mvceditor::WebBrowserClass::Copy(const mvceditor::WebBrowserClass& src) {
 mvceditor::PhpEnvironmentClass::PhpEnvironmentClass() 
 	: PhpExecutablePath(wxT(""))
 	, Version(pelet::PHP_53) 
-	, IsAuto(true) {
+	, IsAuto(true)
+	, NotInstalled(true) {
 }
 
 mvceditor::PhpEnvironmentClass::PhpEnvironmentClass(const mvceditor::PhpEnvironmentClass& src) 
 	: PhpExecutablePath()
 	, Version(pelet::PHP_53)
-	, IsAuto(true) {
+	, IsAuto(true) 
+	, NotInstalled(true) {
 	Copy(src);
 }
 
@@ -99,14 +101,19 @@ void mvceditor::PhpEnvironmentClass::Copy(const mvceditor::PhpEnvironmentClass &
 	PhpExecutablePath = src.PhpExecutablePath.c_str();
 	Version = src.Version;
 	IsAuto = src.IsAuto;
+	NotInstalled = src.NotInstalled;
 }
 
 void mvceditor::PhpEnvironmentClass::AutoDetermine() {
-	if (PhpExecutablePath.IsEmpty()) {
-		Version = pelet::PHP_53;
+	if (!IsAuto) {
+
+		// stick with the configured version
 		return;
 	}
-	if (!IsAuto) {
+	if (PhpExecutablePath.IsEmpty() || NotInstalled) {
+
+		// default to the first version
+		Version = pelet::PHP_53;
 		return;
 	}
 	wxString cmd = PhpExecutablePath + wxT(" -v");
@@ -201,6 +208,7 @@ void mvceditor::EnvironmentClass::LoadFromConfig(wxConfigBase* config) {
 	config->Read(wxT("Environment/PhpExecutablePath"), &Php.PhpExecutablePath);
 	config->Read(wxT("Environment/PhpVersionIsAuto"), &Php.IsAuto);
 	config->Read(wxT("Environment/PhpVersion"), &version);
+	config->Read(wxT("Environment/PhpNotInstalled"), &Php.NotInstalled);
 	
 	if (1 == version) {
 		Php.Version = pelet::PHP_53;
@@ -267,7 +275,7 @@ void mvceditor::EnvironmentClass::SaveToConfig(wxConfigBase* config) const {
 	config->Write(wxT("Environment/PhpExecutablePath"), Php.PhpExecutablePath);
 	config->Write(wxT("Environment/PhpVersionIsAuto"), Php.IsAuto);
 	config->Write(wxT("Environment/PhpVersion"), version);
-	
+	config->Write(wxT("Environment/PhpNotInstalled"), Php.NotInstalled);	
 	
 	config->Write(wxT("Environment/ApacheHttpdPath"), Apache.GetHttpdPath());
 	config->Write(wxT("Environment/ManualConfiguration"), Apache.ManualConfiguration);

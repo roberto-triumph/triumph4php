@@ -147,6 +147,7 @@ class PhpEnvironmentPanelGeneratedClass : public wxPanel
 	private:
 		
 		// Private event handlers
+		void _wxFB_OnNoPhpCheck( wxCommandEvent& event ){ OnNoPhpCheck( event ); }
 		void _wxFB_OnPhpFileChanged( wxFileDirPickerEvent& event ){ OnPhpFileChanged( event ); }
 		
 	
@@ -154,6 +155,7 @@ class PhpEnvironmentPanelGeneratedClass : public wxPanel
 		enum
 		{
 			ID_HELPTEXT = 1000,
+			ID_NOPHP,
 			ID_PHP_EXECUTABLE,
 			ID_PHP_FILE,
 			ID_VERSIONLABEL,
@@ -161,6 +163,7 @@ class PhpEnvironmentPanelGeneratedClass : public wxPanel
 		};
 		
 		wxStaticText* HelpText;
+		wxCheckBox* NoPhp;
 		wxStaticText* PhpLabel;
 		wxTextCtrl* PhpExecutable;
 		wxFilePickerCtrl* PhpExecutableFile;
@@ -168,6 +171,7 @@ class PhpEnvironmentPanelGeneratedClass : public wxPanel
 		wxComboBox* Version;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnNoPhpCheck( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnPhpFileChanged( wxFileDirPickerEvent& event ) { event.Skip(); }
 		
 	

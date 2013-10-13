@@ -37,6 +37,8 @@ namespace mvceditor{ class NotebookClass; }
 #include <wx/hyperlink.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
+#include <wx/radiobut.h>
+#include <wx/filepicker.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -324,6 +326,51 @@ class LicenseDialogClass : public wxDialog
 		
 		LicenseDialogClass( wxWindow* parent, wxWindowID id = ID_LICENSEDIAOGCLASS, const wxString& title = _("License"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 431,410 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~LicenseDialogClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class SettingsDirectoryGeneratedPanelClass
+///////////////////////////////////////////////////////////////////////////////
+class SettingsDirectoryGeneratedPanelClass : public wxPanel 
+{
+	DECLARE_EVENT_TABLE()
+	private:
+		
+		// Private event handlers
+		void _wxFB_OnUserDataDir( wxCommandEvent& event ){ OnUserDataDir( event ); }
+		void _wxFB_OnAppDir( wxCommandEvent& event ){ OnAppDir( event ); }
+		void _wxFB_OnCustomDir( wxCommandEvent& event ){ OnCustomDir( event ); }
+		
+	
+	protected:
+		enum
+		{
+			ID_SETTINGSDIRECTORYGENERATEDPANELCLASS = 1000,
+			ID_SETTINGSSIZER,
+			ID_HELPLALBEL,
+			ID_USERDATADIRECTORY,
+			ID_APPLICATIONDIRECTORY,
+			ID_CUSTOMDIRECTORY,
+			ID_SETTINGSDIRECTORY,
+		};
+		
+		wxStaticText* HelpLabel;
+		wxRadioButton* UserDataDirectory;
+		wxRadioButton* ApplicationDirectory;
+		wxRadioButton* CustomDirectory;
+		wxDirPickerCtrl* SettingsDirectory;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnUserDataDir( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAppDir( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCustomDir( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		SettingsDirectoryGeneratedPanelClass( wxWindow* parent, wxWindowID id = ID_SETTINGSDIRECTORYGENERATEDPANELCLASS, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
+		~SettingsDirectoryGeneratedPanelClass();
 	
 };
 

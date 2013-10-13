@@ -586,3 +586,43 @@ LicenseDialogClass::LicenseDialogClass( wxWindow* parent, wxWindowID id, const w
 LicenseDialogClass::~LicenseDialogClass()
 {
 }
+
+BEGIN_EVENT_TABLE( SettingsDirectoryGeneratedPanelClass, wxPanel )
+	EVT_RADIOBUTTON( ID_USERDATADIRECTORY, SettingsDirectoryGeneratedPanelClass::_wxFB_OnUserDataDir )
+	EVT_RADIOBUTTON( ID_APPLICATIONDIRECTORY, SettingsDirectoryGeneratedPanelClass::_wxFB_OnAppDir )
+	EVT_RADIOBUTTON( ID_CUSTOMDIRECTORY, SettingsDirectoryGeneratedPanelClass::_wxFB_OnCustomDir )
+END_EVENT_TABLE()
+
+SettingsDirectoryGeneratedPanelClass::SettingsDirectoryGeneratedPanelClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+{
+	wxBoxSizer* PanelSizer;
+	PanelSizer = new wxBoxSizer( wxVERTICAL );
+	
+	wxStaticBoxSizer* SettingsSizer;
+	SettingsSizer = new wxStaticBoxSizer( new wxStaticBox( this, ID_SETTINGSSIZER, _("Settings Directory") ), wxVERTICAL );
+	
+	HelpLabel = new wxStaticText( this, ID_HELPLALBEL, _("This is the directory where MVC Editor will store its settings (projects list, tag cache, and preferences)."), wxDefaultPosition, wxDefaultSize, 0 );
+	HelpLabel->Wrap( 450 );
+	SettingsSizer->Add( HelpLabel, 0, wxALL, 5 );
+	
+	UserDataDirectory = new wxRadioButton( this, ID_USERDATADIRECTORY, _("User Data Directory"), wxDefaultPosition, wxDefaultSize, 0 );
+	SettingsSizer->Add( UserDataDirectory, 0, wxALL, 5 );
+	
+	ApplicationDirectory = new wxRadioButton( this, ID_APPLICATIONDIRECTORY, _("Application Directory (Good for portable installations)"), wxDefaultPosition, wxDefaultSize, 0 );
+	SettingsSizer->Add( ApplicationDirectory, 0, wxALL, 5 );
+	
+	CustomDirectory = new wxRadioButton( this, ID_CUSTOMDIRECTORY, _("Custom Directory"), wxDefaultPosition, wxDefaultSize, 0 );
+	SettingsSizer->Add( CustomDirectory, 0, wxALL, 5 );
+	
+	SettingsDirectory = new wxDirPickerCtrl( this, ID_SETTINGSDIRECTORY, wxEmptyString, _("Select a folder"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_DIR_MUST_EXIST|wxDIRP_USE_TEXTCTRL );
+	SettingsSizer->Add( SettingsDirectory, 0, wxALL|wxEXPAND, 5 );
+	
+	PanelSizer->Add( SettingsSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( PanelSizer );
+	this->Layout();
+}
+
+SettingsDirectoryGeneratedPanelClass::~SettingsDirectoryGeneratedPanelClass()
+{
+}

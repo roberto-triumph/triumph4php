@@ -49,10 +49,12 @@ void mvceditor::ProjectFeatureClass::AddFileMenuItems(wxMenu* fileMenu) {
 }
 
 void mvceditor::ProjectFeatureClass::LoadPreferences(wxConfigBase* config) {
-	App.Globals.PhpFileExtensionsString = config->Read(wxT("/Project/PhpFileExtensions"));
-	App.Globals.CssFileExtensionsString = config->Read(wxT("/Project/CssFileExtensions"));
-	App.Globals.SqlFileExtensionsString = config->Read(wxT("/Project/SqlFileExtensions"));
-	App.Globals.MiscFileExtensionsString = config->Read(wxT("/Project/MiscFileExtensions"));
+
+	// config will leave the defaults alone if keys are not found in the config
+	config->Read(wxT("/Project/PhpFileExtensions"), &App.Globals.PhpFileExtensionsString);
+	config->Read(wxT("/Project/CssFileExtensions"), &App.Globals.CssFileExtensionsString);
+	config->Read(wxT("/Project/SqlFileExtensions"), &App.Globals.SqlFileExtensionsString);
+	config->Read(wxT("/Project/MiscFileExtensions"), &App.Globals.MiscFileExtensionsString);
 	
 	App.Globals.Projects.clear();
 	wxString key;

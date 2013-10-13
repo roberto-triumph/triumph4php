@@ -282,6 +282,11 @@ protected:
 	 * Handle the file picker changed event.
 	 */
 	void OnPhpFileChanged(wxFileDirPickerEvent& event);
+
+	/*
+	 * disable the file picker when the checkbox is checked
+	 */
+	void OnNoPhpCheck(wxCommandEvent& event);
 	
 	/**
 	 * When this panel is resized automatically re-adjust the wrapping the label 

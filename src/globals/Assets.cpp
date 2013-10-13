@@ -25,6 +25,7 @@
 #include <globals/Assets.h>
 #include <wx/stdpaths.h>
 #include <wx/image.h>
+#include <wx/fileconf.h>
 
 wxFileName mvceditor::NativeFunctionsAsset() {
 	wxStandardPaths paths = wxStandardPaths::Get();
@@ -231,14 +232,30 @@ wxFileName mvceditor::TempDirAsset() {
 }
 
 wxFileName mvceditor::ConfigDirAsset() {
-	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName tempDir;
-	tempDir.AssignDir(paths.GetUserConfigDir());
-	tempDir.AppendDir(wxT(".mvc-editor"));
-	if (!tempDir.DirExists()) {
-		wxMkdir(tempDir.GetPath(), 0777);
+
+	// the config dir is in the bootstrap file
+	// the bootstrap file is located in the same dir as the executable
+	wxFileName bootstrapConfigFile = mvceditor::BootstrapConfigFileAsset();
+	wxFileConfig config(wxT("bootstrap"), wxEmptyString, 
+		bootstrapConfigFile.GetFullPath(), wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
+	wxString configDirString;
+	if (!config.Read("SettingsDirectory", &configDirString)) {
+
+		// the first time the program runs there is no bootstrap config,
+		// use the bootstrap dir as the config dir
+		configDirString = bootstrapConfigFile.GetPath();
 	}
-	return tempDir;
+	wxFileName configDir;
+	configDir.AssignDir(configDirString);
+	return configDir;
+}
+
+wxFileName mvceditor::BootstrapConfigFileAsset() {
+	wxStandardPaths paths = wxStandardPaths::Get();
+	wxFileName bootstrapConfigFile;
+	bootstrapConfigFile.Assign(paths.GetExecutablePath());
+	bootstrapConfigFile.SetFullName(wxT("bootstrap.ini"));
+	return bootstrapConfigFile;
 }
 
 wxFileName mvceditor::DetectorSqlSchemaAsset() {

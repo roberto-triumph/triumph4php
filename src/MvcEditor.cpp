@@ -24,6 +24,7 @@
  */
 #include <MvcEditor.h>
 #include <wx/cmdline.h>
+#include <wx/fileconf.h>
 #include <unicode/uclean.h>
 #include <soci/mysql/soci-mysql.h>
 #include <soci/sqlite3/soci-sqlite3.h>
@@ -46,6 +47,7 @@
 #include <features/ConfigFilesFeatureClass.h>
 #include <features/FileModifiedCheckFeatureClass.h>
 #include <features/ExplorerFeatureClass.h>
+#include <features/NewUserFeatureClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 
@@ -251,6 +253,8 @@ void mvceditor::AppClass::CreateFeatures() {
 	Features.push_back(feature);
 	feature = new ExplorerFeatureClass(*this);
 	Features.push_back(feature);
+	feature = new NewUserFeatureClass(*this);
+	Features.push_back(feature);
 
 	// TODO test feature need to find a quicker way to toggling it ON / OFF
 	//feature = new TestFeatureClass(*this);
@@ -296,11 +300,40 @@ void mvceditor::AppClass::LoadPreferences() {
 	PreferencesClass::InitConfig();
 	wxConfigBase* config = wxConfigBase::Get();
 	Globals.Environment.LoadFromConfig(config);
+
+	// tell each feature to load their settings from the INI file
 	for (size_t i = 0; i < Features.size(); ++i) {
 		Features[i]->LoadPreferences(config);
 		Features[i]->AddKeyboardShortcuts(Preferences.DefaultKeyboardShortcutCmds);
 	}	
 	Preferences.Load(config, MainFrame);
+}
+
+void mvceditor::AppClass::SavePreferences(const wxFileName& settingsDir) {
+	// write the location of the settings dir to the bootstrap file
+	Preferences.SetSettingsDir(settingsDir);
+
+	// close the connections to the tag cache files
+	Globals.TagCache.Clear();
+	Globals.DetectorCacheSession.close();
+
+	// read the config; it now point to the newly chosen dir
+	Globals.TagCacheDbFileName = mvceditor::TagCacheAsset();
+	Globals.DetectorCacheDbFileName = mvceditor::DetectorCacheAsset();
+	
+	// save global preferences; keyboard shortcuts / syntax colors
+	Preferences.Save();
+
+	// tell each feature to save their own config 
+	wxCommandEvent evt(mvceditor::EVENT_APP_PREFERENCES_SAVED);
+	EventSink.Publish(evt);
+
+	// sine the event handlers have updated the config; lets persist the changes
+	wxConfig::Get()->Flush();
+
+	// signal that this app has modified the config file, that way the external
+	// modification check fails and the user will not be prompted to reload the config
+	UpdateConfigModifiedTime();
 }
 
 void mvceditor::AppClass::StopConfigModifiedCheck() {
@@ -328,9 +361,13 @@ void mvceditor::AppTimerClass::Notify() {
 	// work in their event handler
 	if (!App.IsAppReady) {
 		App.IsAppReady = true;
+		wxFileName settingsDir = App.Preferences.SettingsDir();
 		wxCommandEvent evt(mvceditor::EVENT_APP_READY);
 		App.EventSink.Publish(evt);
-		App.Sequences.AppStart();
+
+		if (settingsDir.IsOk()) {
+			App.Sequences.AppStart();
+		}
 		wxFileName configFileName(mvceditor::ConfigDirAsset().GetPath(), wxT("mvc-editor.ini"));
 		if (configFileName.FileExists()) {
 			App.ConfigLastModified = configFileName.GetModificationTime();

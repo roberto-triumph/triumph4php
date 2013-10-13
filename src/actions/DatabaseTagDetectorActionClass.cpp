@@ -58,6 +58,9 @@ mvceditor::DatabaseTagDetectorActionClass::DatabaseTagDetectorActionClass(mvcedi
 }
 
 bool mvceditor::DatabaseTagDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
+	if (globals.Environment.Php.NotInstalled) {
+		return false;
+	}
 	SetStatus(_("DB Detect"));
 	while (!ParamsQueue.empty()) {
 		ParamsQueue.pop();

@@ -189,6 +189,7 @@ ApacheEnvironmentPanelGeneratedClass::~ApacheEnvironmentPanelGeneratedClass()
 }
 
 BEGIN_EVENT_TABLE( PhpEnvironmentPanelGeneratedClass, wxPanel )
+	EVT_CHECKBOX( ID_NOPHP, PhpEnvironmentPanelGeneratedClass::_wxFB_OnNoPhpCheck )
 	EVT_FILEPICKER_CHANGED( ID_PHP_FILE, PhpEnvironmentPanelGeneratedClass::_wxFB_OnPhpFileChanged )
 END_EVENT_TABLE()
 
@@ -198,9 +199,9 @@ PhpEnvironmentPanelGeneratedClass::PhpEnvironmentPanelGeneratedClass( wxWindow* 
 	MainSizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* GridSizer;
-	GridSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	GridSizer = new wxFlexGridSizer( 3, 1, 0, 0 );
 	GridSizer->AddGrowableCol( 0 );
-	GridSizer->AddGrowableRow( 1 );
+	GridSizer->AddGrowableRow( 2 );
 	GridSizer->SetFlexibleDirection( wxBOTH );
 	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -208,9 +209,11 @@ PhpEnvironmentPanelGeneratedClass::PhpEnvironmentPanelGeneratedClass( wxWindow* 
 	HelpText->Wrap( 450 );
 	GridSizer->Add( HelpText, 1, wxALL|wxEXPAND, 5 );
 	
+	NoPhp = new wxCheckBox( this, ID_NOPHP, _("I don't have PHP installed"), wxDefaultPosition, wxDefaultSize, 0 );
+	GridSizer->Add( NoPhp, 0, wxALL, 5 );
+	
 	wxFlexGridSizer* PhpFormSizer;
 	PhpFormSizer = new wxFlexGridSizer( 2, 2, 0, 0 );
-	PhpFormSizer->AddGrowableCol( 0 );
 	PhpFormSizer->AddGrowableCol( 1 );
 	PhpFormSizer->SetFlexibleDirection( wxBOTH );
 	PhpFormSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );

@@ -350,7 +350,8 @@ void mvceditor::MainFrameClass::OnEditPreferences(wxCommandEvent& event) {
 
 	App.StopConfigModifiedCheck();
 
-	PreferencesDialogClass prefDialog(this, Preferences);
+	wxFileName settingsDir = Preferences.SettingsDir();
+	PreferencesDialogClass prefDialog(this, Preferences, settingsDir);
 	
 	for (size_t i = 0; i < Features.size(); ++i) {
 		Features[i]->AddPreferenceWindow(prefDialog.GetBookCtrl());
@@ -358,16 +359,7 @@ void mvceditor::MainFrameClass::OnEditPreferences(wxCommandEvent& event) {
 	prefDialog.Prepare();
 	int exitCode = prefDialog.ShowModal();
 	if (wxOK == exitCode) {
-		wxCommandEvent evt(mvceditor::EVENT_APP_PREFERENCES_SAVED);
-		App.EventSink.Publish(evt);
-
-		// sine the event handlers have updated the config; lets persist the changes
-		wxConfigBase* config = wxConfig::Get();
-		config->Flush();
-
-		// signal that this app has modified the config file, that way the external
-		// modification check fails and the user will not be prompted to reload the config
-		App.UpdateConfigModifiedTime();
+		App.SavePreferences(settingsDir);
 
 		// since preferences setting can affect php and url detection
 		// if the user changed them we must re-detect all tags

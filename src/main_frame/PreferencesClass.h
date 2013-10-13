@@ -27,6 +27,7 @@
 
 #include <wx/keybinder.h>
 #include <wx/menuutils.h>
+#include <wx/filename.h>
 #include <globals/CodeControlOptionsClass.h>
 
 namespace mvceditor {
@@ -158,6 +159,15 @@ public:
 	 * any other source code can get the config object using wxConfigBase::Get
 	 */
 	static void InitConfig();
+
+	/**
+	 * @return the directory where the user preferences are stored. This value 
+	 *         is user-configurable.
+	 */
+	wxFileName SettingsDir();
+
+	void SetSettingsDir(const wxFileName& settingsDir);
+	
 	
 	/**
 	 * The options for the source code editor
@@ -195,8 +205,7 @@ public:
 	 * drawn on the screen
 	 */
 	wxFont ApplicationFont;
-	
-	
+
 };
 
 }

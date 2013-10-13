@@ -159,6 +159,12 @@ wxFileName TempDirAsset();
 wxFileName ConfigDirAsset();
 
 /**
+ * @return the full path to the "bootstap" file that contains the location
+ *         of all user configurable settings
+ */
+wxFileName BootstrapConfigFileAsset();
+
+/**
  * The location of the tag cache db. The tag DB file contains all of
  * the parsed resources for all of defined projects' resources.
  *

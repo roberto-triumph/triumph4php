@@ -108,6 +108,9 @@ public:
 
 	UrlTagDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
+	/**
+	 * @return boolean false if php is not installed in the system
+	 */
 	bool Init(mvceditor::GlobalsClass& globals);
 
 	bool DoAsync();

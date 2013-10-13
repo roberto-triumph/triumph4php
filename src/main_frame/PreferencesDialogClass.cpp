@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <main_frame/PreferencesDialogClass.h>
+#include <main_frame/SettingsDirectoryPanelClass.h>
 #include <wx/bookctrl.h>
 #include <wx/fileconf.h>
 #include <wx/filename.h>
@@ -31,7 +32,8 @@
 #include <map>
 #include <vector>
 
-mvceditor::PreferencesDialogClass::PreferencesDialogClass(wxWindow* parent, mvceditor::PreferencesClass& preferences)
+mvceditor::PreferencesDialogClass::PreferencesDialogClass(wxWindow* parent, mvceditor::PreferencesClass& preferences,
+														  wxFileName& settingsDir)
 		: wxPropertySheetDialog(parent, wxID_ANY, _("Preferences"))
 		, Preferences(preferences) {
 	CreateButtons(wxOK | wxCANCEL);
@@ -48,6 +50,11 @@ mvceditor::PreferencesDialogClass::PreferencesDialogClass(wxWindow* parent, mvce
 	KeyboardShortcutsPanel->AddProfiles(Preferences.KeyProfiles);
 	KeyboardShortcutsPanel->AddDynamicCmds(Preferences.DefaultKeyboardShortcutCmds);
 	notebook->AddPage(KeyboardShortcutsPanel, _("Keyboard Shortcuts"));
+
+	mvceditor::SettingsDirectoryPanelClass* settingsPanel =  new mvceditor::SettingsDirectoryPanelClass(
+		notebook, wxID_ANY, settingsDir
+	);
+	notebook->AddPage(settingsPanel, _("Settings Directory"));
 }
 
 void mvceditor::PreferencesDialogClass::Prepare() {
@@ -61,7 +68,6 @@ void mvceditor::PreferencesDialogClass::OnOkButton(wxCommandEvent& event) {
 		KeyboardShortcutsPanel->ApplyChanges();
 		Preferences.CodeControlOptions.CommitChanges();
 		Preferences.KeyProfiles = KeyboardShortcutsPanel->GetProfiles();
-		Preferences.Save();
 		EndModal(wxOK);
 	}
 }

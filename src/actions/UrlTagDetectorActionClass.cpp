@@ -62,6 +62,9 @@ mvceditor::UrlTagDetectorActionClass::UrlTagDetectorActionClass(mvceditor::Runni
 }
 
 bool mvceditor::UrlTagDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
+	if (globals.Environment.Php.NotInstalled) {
+		return false;
+	}
 	SetStatus(_("Url Tag Detect"));
 	while (!ParamsQueue.empty()) {
 		ParamsQueue.pop();

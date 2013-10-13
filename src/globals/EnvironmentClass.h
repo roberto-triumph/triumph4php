@@ -54,6 +54,13 @@ public:
 	 * itself by reading the output of "php -v"
 	 */
 	bool IsAuto;
+
+	/**
+	 * if TRUE, PHP is not installed in the system. MVC Editor should not
+	 * attempt to run any scripts and should not show the user any "PHP not found"
+	 * errors.
+	 */
+	bool NotInstalled;
 	
 	PhpEnvironmentClass();
 
