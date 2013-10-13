@@ -24,6 +24,7 @@
  */
 #include <main_frame/PreferencesDialogClass.h>
 #include <main_frame/SettingsDirectoryPanelClass.h>
+#include <globals/GlobalsClass.h>
 #include <wx/bookctrl.h>
 #include <wx/fileconf.h>
 #include <wx/filename.h>
@@ -32,10 +33,18 @@
 #include <map>
 #include <vector>
 
-mvceditor::PreferencesDialogClass::PreferencesDialogClass(wxWindow* parent, mvceditor::PreferencesClass& preferences,
-														  wxFileName& settingsDir)
+mvceditor::PreferencesDialogClass::PreferencesDialogClass(wxWindow* parent, 
+														  mvceditor::GlobalsClass& globals,
+														  mvceditor::PreferencesClass& preferences,
+														  wxFileName& settingsDir,
+														  bool& changedSettingsDir, bool& needsRetag)
 		: wxPropertySheetDialog(parent, wxID_ANY, _("Preferences"))
-		, Preferences(preferences) {
+		, Globals(globals)
+		, Preferences(preferences) 
+		, OldSettingsDir(settingsDir)
+		, SettingsDir(settingsDir)
+		, ChangedSettingsDir(changedSettingsDir)
+		, NeedsRetag(needsRetag) {
 	CreateButtons(wxOK | wxCANCEL);
 	wxBookCtrlBase* notebook = GetBookCtrl();
 	
@@ -64,10 +73,29 @@ void mvceditor::PreferencesDialogClass::Prepare() {
 
 void mvceditor::PreferencesDialogClass::OnOkButton(wxCommandEvent& event) {
 	wxBookCtrlBase* book = GetBookCtrl();
+	ChangedSettingsDir = false;
+	NeedsRetag = false;
+	pelet::Versions oldVersion = Globals.Environment.Php.Version;
+	wxString oldExtensions = Globals.PhpFileExtensionsString 
+		+ Globals.SqlFileExtensionsString
+		+ Globals.CssFileExtensionsString
+		+ Globals.MiscFileExtensionsString;
 	if (Validate() && book->Validate() && TransferDataFromWindow() && book->TransferDataFromWindow()) {
 		KeyboardShortcutsPanel->ApplyChanges();
 		Preferences.CodeControlOptions.CommitChanges();
 		Preferences.KeyProfiles = KeyboardShortcutsPanel->GetProfiles();
+
+		// need to figure out if the settings directory wac changed
+		if (OldSettingsDir != SettingsDir) {
+			ChangedSettingsDir = true;
+		}
+		wxString newExtensions = Globals.PhpFileExtensionsString 
+			+ Globals.SqlFileExtensionsString
+			+ Globals.CssFileExtensionsString
+			+ Globals.MiscFileExtensionsString;
+		if (oldExtensions != newExtensions) {
+			NeedsRetag = true;
+		}
 		EndModal(wxOK);
 	}
 }

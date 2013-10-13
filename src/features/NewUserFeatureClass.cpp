@@ -48,7 +48,7 @@ void mvceditor::NewUserFeatureClass::OnTimer(wxTimerEvent& event) {
 	wxFileName settingsDir;
 	NewUserDialogClass dialog(GetMainWindow(), App.Globals, settingsDir);
 	dialog.ShowModal();
-	App.SavePreferences(settingsDir);
+	App.SavePreferences(settingsDir, true);
 
 	// re trigger the app start sequence, that way the tag dbs get created
 	// in the new location

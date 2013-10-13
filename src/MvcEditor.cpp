@@ -309,18 +309,20 @@ void mvceditor::AppClass::LoadPreferences() {
 	Preferences.Load(config, MainFrame);
 }
 
-void mvceditor::AppClass::SavePreferences(const wxFileName& settingsDir) {
-	// write the location of the settings dir to the bootstrap file
-	Preferences.SetSettingsDir(settingsDir);
+void mvceditor::AppClass::SavePreferences(const wxFileName& settingsDir, bool changedDirectory) {
+	if (changedDirectory) {
 
-	// close the connections to the tag cache files
-	Globals.TagCache.Clear();
-	Globals.DetectorCacheSession.close();
+		// write the location of the settings dir to the bootstrap file
+		Preferences.SetSettingsDir(settingsDir);
 
-	// read the config; it now point to the newly chosen dir
-	Globals.TagCacheDbFileName = mvceditor::TagCacheAsset();
-	Globals.DetectorCacheDbFileName = mvceditor::DetectorCacheAsset();
-	
+		// close the connections to the tag cache files
+		Globals.TagCache.Clear();
+		Globals.DetectorCacheSession.close();
+
+		// read the config; it now point to the newly chosen dir
+		Globals.TagCacheDbFileName = mvceditor::TagCacheAsset();
+		Globals.DetectorCacheDbFileName = mvceditor::DetectorCacheAsset();
+	}
 	// save global preferences; keyboard shortcuts / syntax colors
 	Preferences.Save();
 

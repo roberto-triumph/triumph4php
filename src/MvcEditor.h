@@ -143,7 +143,7 @@ public:
 
 	void LoadPreferences();
 
-	void SavePreferences(const wxFileName& settingsDir);
+	void SavePreferences(const wxFileName& settingsDir, bool changedDirectory);
 
 	/**
 	 * signal that this app has modified the config file, that way the external

@@ -351,7 +351,9 @@ void mvceditor::MainFrameClass::OnEditPreferences(wxCommandEvent& event) {
 	App.StopConfigModifiedCheck();
 
 	wxFileName settingsDir = Preferences.SettingsDir();
-	PreferencesDialogClass prefDialog(this, Preferences, settingsDir);
+	bool changedSettingsDir = false;
+	bool needsRetag = false;
+	PreferencesDialogClass prefDialog(this, App.Globals, Preferences, settingsDir, changedSettingsDir, needsRetag);
 	
 	for (size_t i = 0; i < Features.size(); ++i) {
 		Features[i]->AddPreferenceWindow(prefDialog.GetBookCtrl());
@@ -359,15 +361,28 @@ void mvceditor::MainFrameClass::OnEditPreferences(wxCommandEvent& event) {
 	prefDialog.Prepare();
 	int exitCode = prefDialog.ShowModal();
 	if (wxOK == exitCode) {
-		App.SavePreferences(settingsDir);
+		App.SavePreferences(settingsDir, changedSettingsDir);
 
 		// since preferences setting can affect php and url detection
 		// if the user changed them we must re-detect all tags
 		// for example if the user changed PHP version new classes may become
 		// parseable; new urls may come from a new virtual host that was just
 		// entered
-		std::vector<mvceditor::ProjectClass> emptyProjects;
-		App.Sequences.ProjectDefinitionsUpdated(App.Globals.AllEnabledProjects(), emptyProjects);
+		// we guard with a boolean because we dont want to retag when the 
+		// user changes a setting that does not affect tags, like changing the
+		// background color
+		if (needsRetag) {
+			wxString msg = wxString::FromAscii(
+				"You have made a change that affects PHP resource tagging. Would "
+				"you like to re-tag your enabled projects at this time?"
+			);
+			msg = wxGetTranslation(msg);
+			int ret = wxMessageBox(msg, _("Warning"), wxICON_WARNING | wxYES_NO, this);
+			if (wxYES == ret) {
+				std::vector<mvceditor::ProjectClass> emptyProjects;
+				App.Sequences.ProjectDefinitionsUpdated(App.Globals.AllEnabledProjects(), emptyProjects);
+			}
+		}
 	}
 }
 
