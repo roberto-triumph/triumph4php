@@ -110,7 +110,15 @@ bool mvceditor::SqliteTables(soci::session& session, std::vector<std::string>& t
 int mvceditor::SqliteSchemaVersion(soci::session& session) {
 	int versionNumber = 0;
 	try {
-		session.once << "SELECT version_number FROM schema_version", soci::into(versionNumber);
+
+		// check to see if table exists, on first the very first program run 
+		// there won't be any tables
+		std::string table;
+		session.once << "SELECT name FROM sqlite_master WHERE type='table' AND name='schema_version'",
+			soci::into(table);
+		if (!table.empty()) {
+			session.once << "SELECT version_number FROM schema_version", soci::into(versionNumber);
+		}
 	} catch (std::exception& e) {
 		wxUnusedVar(e);
 		versionNumber = -1;	
