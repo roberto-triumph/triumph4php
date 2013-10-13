@@ -36,6 +36,10 @@ wxString MessageFromError(mvceditor::Errors error, const wxString& extra) {
 			msg = mvceditor::MessageWithFix(_("Could not run explorer. ") + extra, 
 				_("Go To Edit ... Preferences, choose the Project tab to change the location of the explorer binary."));
 			break;
+		case mvceditor::ERR_PHP_EXECUTABLE_NONE:
+			msg = mvceditor::MessageWithFix(_("PHP executable location not set. ") + extra, 
+				_("Go To Edit ... Preferences, choose the PHP Executable tab to change the location of the PHP executable binary."));
+			break;
 		case mvceditor::ERR_BAD_PHP_EXECUTABLE:
 			msg = mvceditor::MessageWithFix(_("PHP binary not found. ") + extra,
 				_("Go To Project ... Environment to choose the location of the PHP binary."));

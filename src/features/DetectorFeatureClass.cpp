@@ -491,6 +491,10 @@ void mvceditor::DetectorTreeHandlerClass::OnAddButton(wxCommandEvent& event) {
 }
 
 void mvceditor::DetectorTreeHandlerClass::OnTestButton(wxCommandEvent& event) {
+	if (Globals.Environment.Php.NotInstalled()) {
+		mvceditor::EditorLogError(mvceditor::ERR_PHP_EXECUTABLE_NONE);
+		return;
+	}
 	
 	// create the command to test the selected detector on the selected
 	// project

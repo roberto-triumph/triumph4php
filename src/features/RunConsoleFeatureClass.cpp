@@ -606,6 +606,10 @@ void mvceditor::RunConsoleFeatureClass::AddKeyboardShortcuts(std::vector<Dynamic
 }
 
 void mvceditor::RunConsoleFeatureClass::OnRunFileAsCli(wxCommandEvent& event) {
+	if (App.Globals.Environment.Php.NotInstalled()) {
+		mvceditor::EditorLogError(mvceditor::ERR_PHP_EXECUTABLE_NONE);
+		return;
+	}
 	CodeControlClass* code = GetCurrentCodeControl();
 	if (code) {
 
@@ -635,6 +639,10 @@ void mvceditor::RunConsoleFeatureClass::OnRunFileAsCli(wxCommandEvent& event) {
 }
 
 void mvceditor::RunConsoleFeatureClass::OnRunFileAsCliInNewWindow(wxCommandEvent& event) {
+	if (App.Globals.Environment.Php.NotInstalled()) {
+		mvceditor::EditorLogError(mvceditor::ERR_PHP_EXECUTABLE_NONE);
+		return;
+	}
 	CodeControlClass* code = GetCurrentCodeControl();
 	if (code) {
 
