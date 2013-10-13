@@ -23,12 +23,11 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <main_frame/MainFrameClass.h>
-#include <AppVersion.h>
 #include <features/FeatureClass.h>
 #include <MvcEditor.h>
 #include <main_frame/PreferencesDialogClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
-
+#include <globals/Assets.h>
 #include <wx/artprov.h>
 #include <wx/choicdlg.h>
 #include <wx/filename.h>
@@ -511,7 +510,17 @@ void mvceditor::MainFrameClass::OnHelpAbout(wxCommandEvent& event) {
 	info.SetCopyright(wxT("(c)2009-2013 Roberto Perpuly"));
 	info.SetDescription(wxT("MVC Editor is an Integrated Development Environment for PHP Web Applications"));
 	info.SetName(wxT("MVC Editor"));
-	info.SetVersion(wxString::Format(wxT("%s.%s.%s"), wxT(APP_MAJOR_VERSION), wxT(APP_MINOR_VERSION), wxT(APP_BUILD_NUMBER)));
+	
+	// version info is stored in a file
+	// for releases, the distribution script will properly fill in the
+	// version number using git describe
+	wxString version;
+	wxFileName versionFileName = mvceditor::VersionFileAsset();
+	wxFFile file(versionFileName.GetFullPath());
+	if (file.IsOpened()) {
+		file.ReadAll(&version);
+	}
+	info.SetVersion(version);
 	wxAboutBox(info);
 }
 void mvceditor::MainFrameClass::OnHelpCredits (wxCommandEvent& event) {

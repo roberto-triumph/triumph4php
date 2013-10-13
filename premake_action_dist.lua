@@ -25,7 +25,7 @@
 newaction {
 	trigger = "dist",
 	description = "Build the MVC Editor distributable.",
-	execute = function()
+	execute = function()		
 		if os.is "windows" then
 			if os.isdir("dist") then
 				os.execute("rmdir /s /q dist")
@@ -41,6 +41,14 @@ newaction {
 				"xcopy  /S /Y resources\\* dist\\mvc-editor\\resources && " ..
 				"xcopy  /S /Y php_detectors\\* dist\\mvc-editor\\php_detectors "
 			)
+			
+			-- get the version info from git and populate the version file
+			-- if we have no tags yet, use the -all flag
+			cmd = "git describe --long > dist\\mvc-editor\\version.txt"
+			if 0 ~= os.execute(cmd) then
+				cmd = "git describe --all --long > dist\\mvc-editor\\version.txt"
+				os.execute(cmd) 
+			end
 		else
 			os.execute(
 				"rm -rf dist && " .. 
@@ -50,10 +58,23 @@ newaction {
 				"cp -R Release/*so* dist/mvc-editor/bin && " .. 
 				"cp Release/mvc-editor dist/mvc-editor/bin/mvc-editor && " .. 
 				"cp -R resources/* dist/mvc-editor/resources/ && " .. 
-				"cp -R php_detectors/* dist/mvc-editor/php_detectors && " .. 
+				"cp -R php_detectors/* dist/mvc-editor/php_detectors" 
+			);
+			
+			-- get the version info from git and populate the version file
+			-- if we have no tags yet, use the -all flag
+			cmd = "git describe --long > dist/mvc-editor/version.txt"
+			if 0 ~= os.execute(cmd) then
+				cmd = "git describe --all --long > dist/mvc-editor/version.txt"
+				os.execute(cmd) 
+			end
+			
+			os.execute(
 				"cd dist && " .. 
 				"tar cjf mvc-editor.tar.bz2 mvc-editor"
 			);
 		end
+		
+		
 	end
 }

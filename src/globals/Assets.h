@@ -206,6 +206,12 @@ wxFileName TagCacheWorkingAsset();
  */
 wxFileName DetectorCacheAsset();
 
+/**
+ * @return wxFileName the full path to the file that stores the application's version
+ *         number
+ */
+wxFileName VersionFileAsset();
+
 }
 
 #endif

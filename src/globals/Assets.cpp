@@ -301,3 +301,11 @@ wxFileName mvceditor::DetectorCacheAsset() {
 	wxFileName tagCacheFileName(configDir.GetFullPath(), wxT("detectors.db"));
 	return tagCacheFileName;
 }
+
+wxFileName mvceditor::VersionFileAsset() {
+	wxStandardPaths paths = wxStandardPaths::Get();
+	wxFileName versionFile(paths.GetExecutablePath());
+	versionFile.RemoveLastDir();
+	versionFile.SetFullName(wxT("version.txt"));
+	return versionFile;
+}
