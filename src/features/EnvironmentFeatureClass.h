@@ -286,7 +286,7 @@ protected:
 	/*
 	 * disable the file picker when the checkbox is checked
 	 */
-	void OnNoPhpCheck(wxCommandEvent& event);
+	void OnInstalledCheck(wxCommandEvent& event);
 	
 	/**
 	 * When this panel is resized automatically re-adjust the wrapping the label 

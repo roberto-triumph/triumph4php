@@ -100,7 +100,7 @@ void mvceditor::PreferencesDialogClass::OnOkButton(wxCommandEvent& event) {
 
 		// php executable affects populating "detected" tags
 		wxString newPhpExecutable = Globals.Environment.Php.PhpExecutablePath;
-		if (oldPhpExecutable != newPhpExecutable && !Globals.Environment.Php.NotInstalled) {
+		if (oldPhpExecutable != newPhpExecutable && Globals.Environment.Php.Installed) {
 			NeedsRetag = true;
 		}
 		if (oldPhpVersion != Globals.Environment.Php.Version) {

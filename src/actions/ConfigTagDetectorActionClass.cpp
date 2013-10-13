@@ -57,7 +57,7 @@ mvceditor::ConfigTagDetectorActionClass::ConfigTagDetectorActionClass(mvceditor:
 }
 
 bool mvceditor::ConfigTagDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
-	if (globals.Environment.Php.NotInstalled) {
+	if (globals.Environment.Php.NotInstalled()) {
 		return false;
 	}
 	SetStatus(_("Config Tag Detector"));

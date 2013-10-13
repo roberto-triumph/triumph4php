@@ -368,8 +368,8 @@ mvceditor::PhpEnvironmentPanelClass::PhpEnvironmentPanelClass(wxWindow* parent, 
 	: PhpEnvironmentPanelGeneratedClass(parent)
 	, Environment(environment) {
 	PhpExecutable->SetValue(environment.Php.PhpExecutablePath);
-	wxGenericValidator noPhpValidator(&environment.Php.NotInstalled);
-	NoPhp->SetValidator(noPhpValidator);
+	wxGenericValidator installedValidator(&environment.Php.Installed);
+	Installed->SetValidator(installedValidator);
 	if (environment.Php.IsAuto) {
 		Version->SetSelection(0);
 	}
@@ -379,22 +379,22 @@ mvceditor::PhpEnvironmentPanelClass::PhpEnvironmentPanelClass(wxWindow* parent, 
 	else if (pelet::PHP_54 == environment.Php.Version) {
 		Version->SetSelection(2);
 	}
-	PhpExecutable->Enable(!environment.Php.NotInstalled);
-	PhpExecutableFile->Enable(!environment.Php.NotInstalled);
+	PhpExecutable->Enable(environment.Php.Installed);
+	PhpExecutableFile->Enable(environment.Php.Installed);
 }
 
 bool mvceditor::PhpEnvironmentPanelClass::TransferDataFromWindow() {
 	bool good = true;
 
 	// php executable can be empty when user does not have php installed
-	if (!NoPhp->GetValue()) {
+	if (Installed->GetValue()) {
 		wxString path = PhpExecutable->GetValue();
 		if (!wxFileName::FileExists(path)) {
 			wxMessageBox(_("PHP executable cannot be empty."), _("Error: PHP Executable"));
 			good = false;
 		}
 	}
-	if (NoPhp->GetValue()) {
+	if (!Installed->GetValue()) {
 		int sel = Version->GetCurrentSelection();
 		if (0 == sel) {
 			wxMessageBox(_("If PHP executable is not installed you need to choose a PHP version."), _("Error: PHP Executable"));
@@ -416,7 +416,7 @@ bool mvceditor::PhpEnvironmentPanelClass::TransferDataFromWindow() {
 		else {
 			Environment.Php.IsAuto = true;
 		}
-		if (!NoPhp->GetValue()) {
+		if (Installed->GetValue()) {
 			Environment.Php.PhpExecutablePath = PhpExecutable->GetValue();
 		}
 	}
@@ -428,9 +428,9 @@ void mvceditor::PhpEnvironmentPanelClass::OnPhpFileChanged(wxFileDirPickerEvent&
 	PhpExecutable->SetValue(event.GetPath());
 }
 
-void mvceditor::PhpEnvironmentPanelClass::OnNoPhpCheck(wxCommandEvent& event) {
-	PhpExecutable->Enable(!event.IsChecked());
-	PhpExecutableFile->Enable(!event.IsChecked());
+void mvceditor::PhpEnvironmentPanelClass::OnInstalledCheck(wxCommandEvent& event) {
+	PhpExecutable->Enable(event.IsChecked());
+	PhpExecutableFile->Enable(event.IsChecked());
 }
 
 void mvceditor::PhpEnvironmentPanelClass::OnResize(wxSizeEvent& event) {
@@ -674,7 +674,7 @@ void mvceditor::EnvironmentFeatureClass::OnPreferencesSaved(wxCommandEvent& even
 	wxConfigBase* config = wxConfigBase::Get();
 	mvceditor::EnvironmentClass* environment = GetEnvironment();
 	environment->SaveToConfig(config);
-	if (environment->Php.IsAuto && !environment->Php.NotInstalled) {
+	if (environment->Php.IsAuto && environment->Php.Installed) {
 		environment->Php.AutoDetermine();
 	}
 

@@ -63,14 +63,14 @@ mvceditor::PhpEnvironmentClass::PhpEnvironmentClass()
 	: PhpExecutablePath(wxT(""))
 	, Version(pelet::PHP_53) 
 	, IsAuto(true)
-	, NotInstalled(true) {
+	, Installed(false) {
 }
 
 mvceditor::PhpEnvironmentClass::PhpEnvironmentClass(const mvceditor::PhpEnvironmentClass& src) 
 	: PhpExecutablePath()
 	, Version(pelet::PHP_53)
 	, IsAuto(true) 
-	, NotInstalled(true) {
+	, Installed(false) {
 	Copy(src);
 }
 
@@ -101,7 +101,7 @@ void mvceditor::PhpEnvironmentClass::Copy(const mvceditor::PhpEnvironmentClass &
 	PhpExecutablePath = src.PhpExecutablePath.c_str();
 	Version = src.Version;
 	IsAuto = src.IsAuto;
-	NotInstalled = src.NotInstalled;
+	Installed = src.Installed;
 }
 
 void mvceditor::PhpEnvironmentClass::AutoDetermine() {
@@ -110,7 +110,7 @@ void mvceditor::PhpEnvironmentClass::AutoDetermine() {
 		// stick with the configured version
 		return;
 	}
-	if (PhpExecutablePath.IsEmpty() || NotInstalled) {
+	if (NotInstalled()) {
 
 		// default to the first version
 		Version = pelet::PHP_53;
@@ -142,6 +142,10 @@ void mvceditor::PhpEnvironmentClass::AutoDetermine() {
 		// if version string changes
 		Version = pelet::PHP_53;
 	}
+}
+
+bool mvceditor::PhpEnvironmentClass::NotInstalled() const {
+	return !Installed || PhpExecutablePath.IsEmpty();
 }
 
 mvceditor::EnvironmentClass::EnvironmentClass()
@@ -208,7 +212,7 @@ void mvceditor::EnvironmentClass::LoadFromConfig(wxConfigBase* config) {
 	config->Read(wxT("Environment/PhpExecutablePath"), &Php.PhpExecutablePath);
 	config->Read(wxT("Environment/PhpVersionIsAuto"), &Php.IsAuto);
 	config->Read(wxT("Environment/PhpVersion"), &version);
-	config->Read(wxT("Environment/PhpNotInstalled"), &Php.NotInstalled);
+	config->Read(wxT("Environment/PhpInstalled"), &Php.Installed);
 	
 	if (1 == version) {
 		Php.Version = pelet::PHP_53;
@@ -275,7 +279,7 @@ void mvceditor::EnvironmentClass::SaveToConfig(wxConfigBase* config) const {
 	config->Write(wxT("Environment/PhpExecutablePath"), Php.PhpExecutablePath);
 	config->Write(wxT("Environment/PhpVersionIsAuto"), Php.IsAuto);
 	config->Write(wxT("Environment/PhpVersion"), version);
-	config->Write(wxT("Environment/PhpNotInstalled"), Php.NotInstalled);	
+	config->Write(wxT("Environment/PhpInstalled"), Php.Installed);	
 	
 	config->Write(wxT("Environment/ApacheHttpdPath"), Apache.GetHttpdPath());
 	config->Write(wxT("Environment/ManualConfiguration"), Apache.ManualConfiguration);

@@ -72,8 +72,8 @@ mvceditor::NewUserDialogClass::NewUserDialogClass(wxWindow *parent, mvceditor::G
 	wxTextValidator miscFileExtensionsValidator(wxFILTER_EMPTY, &globals.MiscFileExtensionsString);
 	MiscFileExtensions->SetValidator(miscFileExtensionsValidator);
 
-	wxGenericValidator phpInstalledValidator(&globals.Environment.Php.NotInstalled);
-	NoPhp->SetValidator(phpInstalledValidator);
+	wxGenericValidator phpInstalledValidator(&globals.Environment.Php.Installed);
+	Installed->SetValidator(phpInstalledValidator);
 
 	wxString label = UserDataDirectory->GetLabel();
 	wxStandardPaths paths = wxStandardPaths::Get();
@@ -88,12 +88,12 @@ mvceditor::NewUserDialogClass::NewUserDialogClass(wxWindow *parent, mvceditor::G
 
 void mvceditor::NewUserDialogClass::OnUpdateUi(wxUpdateUIEvent& event) {
 	SettingsDirectory->Enable(CustomDirectory->GetValue());
-	PhpExecutable->Enable(!NoPhp->GetValue());
+	PhpExecutable->Enable(Installed->GetValue());
 }
 
 void mvceditor::NewUserDialogClass::OnOkButton(wxCommandEvent& event) {
 	TransferDataFromWindow();
-	if (!NoPhp->GetValue()) {
+	if (Installed->GetValue()) {
 
 		// only if the user has php installed do we check to see if the 
 		// executable is good
@@ -153,7 +153,7 @@ void mvceditor::NewUserDialogClass::OnOkButton(wxCommandEvent& event) {
 		}
 		ConfigFileDir = tempDir;
 	}
-	if (NoPhp->GetValue()) {
+	if (!Installed->GetValue()) {
 
 		// no PHP then dont try to detect version
 		Globals.Environment.Php.IsAuto = 0;

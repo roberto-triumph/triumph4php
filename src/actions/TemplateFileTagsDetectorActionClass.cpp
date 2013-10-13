@@ -59,7 +59,7 @@ mvceditor::TemplateFileTagsDetectorActionClass::TemplateFileTagsDetectorActionCl
 }
 
 bool mvceditor::TemplateFileTagsDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
-	if (globals.Environment.Php.NotInstalled) {
+	if (globals.Environment.Php.NotInstalled()) {
 		return false;
 	}
 	SetStatus(_("Template File Tags Detect"));

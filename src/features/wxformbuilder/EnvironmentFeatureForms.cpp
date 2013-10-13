@@ -189,7 +189,7 @@ ApacheEnvironmentPanelGeneratedClass::~ApacheEnvironmentPanelGeneratedClass()
 }
 
 BEGIN_EVENT_TABLE( PhpEnvironmentPanelGeneratedClass, wxPanel )
-	EVT_CHECKBOX( ID_NOPHP, PhpEnvironmentPanelGeneratedClass::_wxFB_OnNoPhpCheck )
+	EVT_CHECKBOX( ID_NOPHP, PhpEnvironmentPanelGeneratedClass::_wxFB_OnInstalledCheck )
 	EVT_FILEPICKER_CHANGED( ID_PHP_FILE, PhpEnvironmentPanelGeneratedClass::_wxFB_OnPhpFileChanged )
 END_EVENT_TABLE()
 
@@ -209,8 +209,8 @@ PhpEnvironmentPanelGeneratedClass::PhpEnvironmentPanelGeneratedClass( wxWindow* 
 	HelpText->Wrap( 450 );
 	GridSizer->Add( HelpText, 1, wxALL|wxEXPAND, 5 );
 	
-	NoPhp = new wxCheckBox( this, ID_NOPHP, _("I don't have PHP installed"), wxDefaultPosition, wxDefaultSize, 0 );
-	GridSizer->Add( NoPhp, 0, wxALL, 5 );
+	Installed = new wxCheckBox( this, ID_NOPHP, _("PHP is installed"), wxDefaultPosition, wxDefaultSize, 0 );
+	GridSizer->Add( Installed, 0, wxALL, 5 );
 	
 	wxFlexGridSizer* PhpFormSizer;
 	PhpFormSizer = new wxFlexGridSizer( 2, 2, 0, 0 );

@@ -57,7 +57,7 @@ mvceditor::TagDetectorActionClass::TagDetectorActionClass(mvceditor::RunningThre
 }
 
 bool mvceditor::TagDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
-	if (globals.Environment.Php.NotInstalled) {
+	if (globals.Environment.Php.NotInstalled()) {
 		return false;
 	}
 	SetStatus(_("Tag Detection"));

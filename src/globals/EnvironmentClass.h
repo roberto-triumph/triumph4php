@@ -56,11 +56,11 @@ public:
 	bool IsAuto;
 
 	/**
-	 * if TRUE, PHP is not installed in the system. MVC Editor should not
+	 * if TRUE, PHP is installed in the system. If false, MVC Editor will not
 	 * attempt to run any scripts and should not show the user any "PHP not found"
 	 * errors.
 	 */
-	bool NotInstalled;
+	bool Installed;
 	
 	PhpEnvironmentClass();
 
@@ -93,6 +93,11 @@ public:
 	 */
 	void AutoDetermine();
 	
+	/**
+	 * @return bool TRUE is php is not installed or binary location
+	 *         is invalid
+	 */
+	bool NotInstalled() const;
 };
 
 /**

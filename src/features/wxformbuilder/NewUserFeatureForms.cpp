@@ -49,12 +49,15 @@ NewUserDialogGeneratedClass::NewUserDialogGeneratedClass( wxWindow* parent, wxWi
 	wxStaticBoxSizer* PhpLocationSizer;
 	PhpLocationSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("PHP Location") ), wxVERTICAL );
 	
-	PhpHelpLabel = new wxStaticText( this, wxID_ANY, wxT("The PHP executable is used by MVC Editor when running scripts. It is also used when running framework detection scripts."), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	PhpHelpLabel = new wxStaticText( this, wxID_ANY, wxT("The PHP executable is used by MVC Editor when running scripts. It is also used when running framework detection scripts. \n\nChoose the location of the PHP binary.  If you are running on a Windows PC, choose php-win.exe."), wxDefaultPosition, wxSize( -1,-1 ), 0 );
 	PhpHelpLabel->Wrap( 550 );
-	PhpLocationSizer->Add( PhpHelpLabel, 1, wxALL|wxEXPAND, 5 );
+	PhpLocationSizer->Add( PhpHelpLabel, 1, wxALL, 5 );
 	
-	NoPhp = new wxCheckBox( this, wxID_ANY, wxT("I don't have PHP installed"), wxDefaultPosition, wxDefaultSize, 0 );
-	PhpLocationSizer->Add( NoPhp, 0, wxALL|wxEXPAND, 5 );
+	PhpDetectorsLink = new wxHyperlinkCtrl( this, wxID_ANY, wxT("More about framework detection in MVC Editor"), wxT("https://code.google.com/p/mvc-editor/wiki/FrameworkDetection"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	PhpLocationSizer->Add( PhpDetectorsLink, 0, wxALL, 5 );
+	
+	Installed = new wxCheckBox( this, wxID_ANY, wxT("PHP is installed"), wxDefaultPosition, wxDefaultSize, 0 );
+	PhpLocationSizer->Add( Installed, 0, wxALL|wxEXPAND, 5 );
 	
 	PhpExecutable = new wxFilePickerCtrl( this, wxID_ANY, wxEmptyString, wxT("Select the PHP executable"), wxT("*.*"), wxDefaultPosition, wxDefaultSize, wxFLP_FILE_MUST_EXIST|wxFLP_OPEN|wxFLP_USE_TEXTCTRL );
 	PhpLocationSizer->Add( PhpExecutable, 0, wxALL|wxEXPAND, 5 );
@@ -119,12 +122,14 @@ NewUserDialogGeneratedClass::NewUserDialogGeneratedClass( wxWindow* parent, wxWi
 	this->Centre( wxBOTH );
 	
 	// Connect Events
+	PhpDetectorsLink->Connect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( NewUserDialogGeneratedClass::OnFrameworkHyperlink ), NULL, this );
 	ButtonsSizerOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( NewUserDialogGeneratedClass::OnOkButton ), NULL, this );
 }
 
 NewUserDialogGeneratedClass::~NewUserDialogGeneratedClass()
 {
 	// Disconnect Events
+	PhpDetectorsLink->Disconnect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( NewUserDialogGeneratedClass::OnFrameworkHyperlink ), NULL, this );
 	ButtonsSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( NewUserDialogGeneratedClass::OnOkButton ), NULL, this );
 	
 }
