@@ -161,6 +161,9 @@ void mvceditor::StatusBarWithGaugeClass::SetColumn0Text(const wxString &text) {
 	
 	// don't redraw unless necessary
 	wxString oldText = GetStatusText(0);
+	if (oldText == text) {
+		return;
+	}
 	if (!oldText.IsEmpty() || !text.IsEmpty()) {
 		RedrawGauges();
 		SetStatusText(text, 0);
@@ -171,6 +174,9 @@ void mvceditor::StatusBarWithGaugeClass::SetColumn1Text(const wxString &text) {
 	
 	// don't redraw unless necessary
 	wxString oldText = GetStatusText(1);
+	if (oldText == text) {
+		return;
+	}
 	if (!oldText.IsEmpty() || !text.IsEmpty()) {
 		RedrawGauges();
 		SetStatusText(text, 1);
