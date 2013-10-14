@@ -349,7 +349,7 @@ void mvceditor::MainFrameClass::OnEditPreferences(wxCommandEvent& event) {
 
 	App.StopConfigModifiedCheck();
 
-	wxFileName settingsDir = Preferences.SettingsDir();
+	wxFileName settingsDir = mvceditor::SettingsDirAsset();
 	bool changedSettingsDir = false;
 	bool needsRetag = false;
 	PreferencesDialogClass prefDialog(this, App.Globals, Preferences, settingsDir, changedSettingsDir, needsRetag);

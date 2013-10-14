@@ -234,7 +234,8 @@ wxFileName mvceditor::TempDirAsset() {
 wxFileName mvceditor::ConfigDirAsset() {
 
 	// the config dir is in the bootstrap file
-	// the bootstrap file is located in the same dir as the executable
+	// the bootstrap file could be located in the same dir as the executable
+	// or in the user data directory
 	wxFileName bootstrapConfigFile = mvceditor::BootstrapConfigFileAsset();
 	wxFileConfig config(wxT("bootstrap"), wxEmptyString, 
 		bootstrapConfigFile.GetFullPath(), wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
@@ -253,9 +254,55 @@ wxFileName mvceditor::ConfigDirAsset() {
 wxFileName mvceditor::BootstrapConfigFileAsset() {
 	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName bootstrapConfigFile;
+
+	// look at the local bootstrap config file
 	bootstrapConfigFile.Assign(paths.GetExecutablePath());
-	bootstrapConfigFile.SetFullName(wxT("bootstrap.ini"));
+	bootstrapConfigFile.SetFullName(wxT("mvc-editor-bootstrap.ini"));
+	if (!bootstrapConfigFile.FileExists()) {
+		
+		// look at the global config file
+		bootstrapConfigFile.Assign(paths.GetUserConfigDir());
+		bootstrapConfigFile.SetFullName(wxT("mvc-editor-bootstrap.ini"));
+	}
 	return bootstrapConfigFile;
+}
+
+
+wxFileName mvceditor::SettingsDirAsset() {
+	
+	// get the location of the settings dir from the bootstrap file
+	wxFileName bootstrapConfigFile = mvceditor::BootstrapConfigFileAsset();
+	wxFileConfig bootstrapConfig(wxT("bootstrap"), wxEmptyString, 
+		bootstrapConfigFile.GetFullPath(), wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
+	wxString settingsDirString;
+	bootstrapConfig.Read(wxT("SettingsDirectory"), &settingsDirString);
+	wxFileName settingsDir;
+	settingsDir.AssignDir(settingsDirString);
+	return settingsDir;
+}
+
+void mvceditor::SetSettingsDirLocation(const wxFileName& settingsDir) {
+	wxFileName bootstrapConfigFile;
+	wxStandardPaths paths = wxStandardPaths::Get();
+	wxFileName executableDir(paths.GetExecutablePath());
+
+	// the settings dir is in the same directory as the executable. save
+	// settings dir in the local bootstrap file
+	if (settingsDir.GetPathWithSep().Find(executableDir.GetPathWithSep()) != wxNOT_FOUND) {
+		bootstrapConfigFile.Assign(paths.GetExecutablePath());
+		bootstrapConfigFile.SetFullName(wxT("mvc-editor-bootstrap.ini"));
+	}
+	else {
+
+		// save settings dire in the global bootstrap config file
+		bootstrapConfigFile.Assign(paths.GetUserConfigDir());
+		bootstrapConfigFile.SetFullName(wxT("mvc-editor-bootstrap.ini"));
+	}
+	wxFileConfig bootstrapConfig(wxT("bootstrap"), wxEmptyString, 
+		bootstrapConfigFile.GetFullPath(), wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
+	wxString s = settingsDir.GetPath();
+	bootstrapConfig.Write(wxT("SettingsDirectory"), s);
+	bootstrapConfig.Flush();
 }
 
 wxFileName mvceditor::DetectorSqlSchemaAsset() {

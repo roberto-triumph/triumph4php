@@ -161,14 +161,16 @@ public:
 	static void InitConfig();
 
 	/**
-	 * @return the directory where the user preferences are stored. This value 
-	 *         is user-configurable.
+	 * Set the settings directory.  This will
+	 * - write the settingsDir to the bootstrap config file
+	 * - delete the old wxConfig global pointer (in-memory config)
+	 * - create a new wxFileConfig object 
+	 * - set the global wxConfig  pointer
+	 *
+	 * @param settingsDir the new directory where settings will be stored
 	 */
-	wxFileName SettingsDir();
-
 	void SetSettingsDir(const wxFileName& settingsDir);
-	
-	
+		
 	/**
 	 * The options for the source code editor
 	 * 

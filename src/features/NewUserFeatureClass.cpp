@@ -38,7 +38,7 @@ mvceditor::NewUserFeatureClass::NewUserFeatureClass(mvceditor::AppClass& app)
 }
 
 void mvceditor::NewUserFeatureClass::OnAppReady(wxCommandEvent &event) {
-	wxFileName settingsDir = App.Preferences.SettingsDir();
+	wxFileName settingsDir = mvceditor::SettingsDirAsset();
 	if(!settingsDir.IsOk()) {
 		Timer.Start(1000, wxTIMER_ONE_SHOT);
 	}

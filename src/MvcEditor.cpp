@@ -363,7 +363,7 @@ void mvceditor::AppTimerClass::Notify() {
 	// work in their event handler
 	if (!App.IsAppReady) {
 		App.IsAppReady = true;
-		wxFileName settingsDir = App.Preferences.SettingsDir();
+		wxFileName settingsDir = mvceditor::SettingsDirAsset();
 		wxCommandEvent evt(mvceditor::EVENT_APP_READY);
 		App.EventSink.Publish(evt);
 

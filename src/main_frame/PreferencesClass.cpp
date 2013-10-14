@@ -379,28 +379,10 @@ void mvceditor::PreferencesClass::InitConfig() {
 	// this config will be automatically deleted by wxWidgets at the end
 }
 
-wxFileName mvceditor::PreferencesClass::SettingsDir() {
-	
-	// get the location of the settings dir from the bootstrap file
-	wxFileName bootstrapConfigFile = mvceditor::BootstrapConfigFileAsset();
-	wxFileConfig bootstrapConfig(wxT("bootstrap"), wxEmptyString, 
-		bootstrapConfigFile.GetFullPath(), wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
-	wxString settingsDirString;
-	bootstrapConfig.Read(wxT("SettingsDirectory"), &settingsDirString);
-	wxFileName settingsDir;
-	settingsDir.AssignDir(settingsDirString);
-	return settingsDir;
-}
-
 void mvceditor::PreferencesClass::SetSettingsDir(const wxFileName& settingsDir) {
 	
 	// save the settings dir in the bootstrap file
-	wxFileName bootstrapConfigFile = mvceditor::BootstrapConfigFileAsset();
-	wxFileConfig bootstrapConfig(wxT("bootstrap"), wxEmptyString, 
-		bootstrapConfigFile.GetFullPath(), wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
-	wxString s = settingsDir.GetPath();
-	bootstrapConfig.Write(wxT("SettingsDirectory"), s);
-	bootstrapConfig.Flush();
+	mvceditor::SetSettingsDirLocation(settingsDir);
 	
 	// delete the old config and set the global config object
 	wxConfigBase* config = wxConfig::Get();

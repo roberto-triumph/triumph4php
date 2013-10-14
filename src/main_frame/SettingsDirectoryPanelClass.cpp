@@ -33,8 +33,9 @@
  */
 static wxFileName AppDir() {
 	wxStandardPaths paths = wxStandardPaths::Get();
+	wxFileName execFileName(paths.GetExecutablePath());
 	wxFileName tempDir;
-	tempDir.AssignDir(paths.GetExecutablePath());
+	tempDir.AssignDir(execFileName.GetPath());
 
 	// since we distribute the binary in  a "bin/" dir
 	// lets remove it so that the settings dir is in the top-level
@@ -68,8 +69,8 @@ mvceditor::SettingsDirectoryPanelClass::SettingsDirectoryPanelClass(wxWindow* pa
 
 	if (settingsDir == appDir) {
 		ApplicationDirectory->SetValue(1);
-		UserDataDirectory->SetValue(1);
-		CustomDirectory->SetValue(1);
+		UserDataDirectory->SetValue(0);
+		CustomDirectory->SetValue(0);
 		SettingsDirectory->Enable(false);
 	}
 	else if (settingsDir == userDir) {

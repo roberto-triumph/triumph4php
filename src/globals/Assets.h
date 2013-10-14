@@ -159,10 +159,43 @@ wxFileName TempDirAsset();
 wxFileName ConfigDirAsset();
 
 /**
- * @return the full path to the "bootstap" file that contains the location
- *         of all user configurable settings
+ * The bootstrap file contains the location where all settings are stored
+ * The bootstrap file could be located in either the same directory
+ * as the application executable (in the case of portable installations)
+ * or in the user data directory in all other cases.
+ *
+ * @return the full path to the "bootstrap" file that contains the location
+ *         of all user configurable settings. This file may not exist in the
+ *         file system.
  */
 wxFileName BootstrapConfigFileAsset();
+
+/**
+ * @return the full path to the settings directory. This setting is read from
+ *         the bootstrap config file.  See  BootstrapConfigFileAsset() 
+ *         to see where the bootstrap config file is stored.
+ *         Note that this value is always read from the file system
+ *         care should be taken when calling this function many times
+ *         as it incurs a performance penalty
+ *         Note 2: the returned path may not exist in the file system.
+ *         It will not exist when the application is first run.
+ */
+wxFileName SettingsDirAsset();
+
+/**
+ * @param settingsDir the location of the settings directory (contents of this string 
+ *        will be stored in the config file)
+ *        If the settings directory is located in the same directory as the executable,
+ *        the the settings directory will be stored in the "local" bootstrap config 
+ *        file (located in the same directory
+ *        as the executable). Otherwise, the settings directory will be saved to the
+ *        global bootstrap config file (located in the
+ *        user data directory)
+ * Note that this function always writes to the file system
+ * care should be taken when calling this function many times
+ * as it incurs a performance penalty
+ */
+void SetSettingsDirLocation(const wxFileName& settingsDir);
 
 /**
  * The location of the tag cache db. The tag DB file contains all of
