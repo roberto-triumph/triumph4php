@@ -370,7 +370,7 @@ void mvceditor::MainFrameClass::OnEditPreferences(wxCommandEvent& event) {
 		// we guard with a boolean because we dont want to retag when the 
 		// user changes a setting that does not affect tags, like changing the
 		// background color
-		if (needsRetag) {
+		if (needsRetag || changedSettingsDir) {
 			wxString msg = wxString::FromAscii(
 				"You have made a change that affects PHP resource tagging. Would "
 				"you like to re-tag your enabled projects at this time?"

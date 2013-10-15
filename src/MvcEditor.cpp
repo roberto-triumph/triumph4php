@@ -322,6 +322,9 @@ void mvceditor::AppClass::SavePreferences(const wxFileName& settingsDir, bool ch
 		// read the config; it now point to the newly chosen dir
 		Globals.TagCacheDbFileName = mvceditor::TagCacheAsset();
 		Globals.DetectorCacheDbFileName = mvceditor::DetectorCacheAsset();
+
+		// perform the app start sequence, which will open the tag caches
+		Sequences.AppStart();
 	}
 	// save global preferences; keyboard shortcuts / syntax colors
 	Preferences.Save();
