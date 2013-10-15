@@ -127,21 +127,22 @@ void mvceditor::StatusBarWithGaugeClass::OnSize(wxSizeEvent& event) {
 }
 
 void mvceditor::StatusBarWithGaugeClass::RedrawGauges() {
-	
+
 	// Each gauge takes it 2 columns (one for the gauge title and one for the gauge itself), 
 	// plus the leftmost default status bar columns (for the menu help and other messages)
 	const int DEFAULT_COLUMNS = 2;
-	int numberOfColumns = (Gauges.size() * 2) + DEFAULT_COLUMNS;
-	int* widths = new int[numberOfColumns];
+	int newColumnCount = (Gauges.size() * 2) + DEFAULT_COLUMNS;
+	int* widths = new int[newColumnCount];
 	for (int i = 0; i < DEFAULT_COLUMNS; ++i) {
 		widths[i] = -1;
 	}
-	for (int i = DEFAULT_COLUMNS; i < numberOfColumns; i += 2) {		
+	for (int i = DEFAULT_COLUMNS; i < newColumnCount; i += 2) {		
 		widths[i] = 150;
 		widths[i + 1] = 300;
 	}
-    SetFieldsCount(numberOfColumns);
-    SetStatusWidths(numberOfColumns, widths);
+    SetFieldsCount(newColumnCount);
+    SetStatusWidths(newColumnCount, widths);
+
 	//ATTN: in MSW this line results in a crash why??
 	wxPlatformInfo platform;
 	if (!(wxOS_WINDOWS | platform.GetOperatingSystemId())) {
@@ -165,7 +166,6 @@ void mvceditor::StatusBarWithGaugeClass::SetColumn0Text(const wxString &text) {
 		return;
 	}
 	if (!oldText.IsEmpty() || !text.IsEmpty()) {
-		RedrawGauges();
 		SetStatusText(text, 0);
 	}
 }
@@ -178,7 +178,6 @@ void mvceditor::StatusBarWithGaugeClass::SetColumn1Text(const wxString &text) {
 		return;
 	}
 	if (!oldText.IsEmpty() || !text.IsEmpty()) {
-		RedrawGauges();
 		SetStatusText(text, 1);
 	}
 }
