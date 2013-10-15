@@ -39,8 +39,8 @@ mvceditor::PreferencesDialogClass::PreferencesDialogClass(wxWindow* parent,
 														  wxFileName& settingsDir,
 														  bool& changedSettingsDir, bool& needsRetag)
 		: wxPropertySheetDialog(parent, wxID_ANY, _("Preferences"))
-		, Globals(globals)
 		, Preferences(preferences) 
+		, Globals(globals)
 		, OldSettingsDir(settingsDir)
 		, SettingsDir(settingsDir)
 		, ChangedSettingsDir(changedSettingsDir)
