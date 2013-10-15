@@ -376,7 +376,7 @@ void mvceditor::MainFrameClass::OnEditPreferences(wxCommandEvent& event) {
 				"you like to re-tag your enabled projects at this time?"
 			);
 			msg = wxGetTranslation(msg);
-			int ret = wxMessageBox(msg, _("Warning"), wxICON_WARNING | wxYES_NO, this);
+			int ret = wxMessageBox(msg, _("Tag Projects"), wxICON_QUESTION | wxYES_NO, this);
 			if (wxYES == ret) {
 				std::vector<mvceditor::ProjectClass> emptyProjects;
 				App.Sequences.ProjectDefinitionsUpdated(App.Globals.AllEnabledProjects(), emptyProjects);

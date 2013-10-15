@@ -34,7 +34,7 @@
 #include <wx/valgen.h>
 #include <wx/dir.h>
 #include <wx/dirdlg.h>
-#include <wx/choicdlg.h> 
+#include <wx/choicdlg.h>
 #include <algorithm>
 
 mvceditor::ProjectFeatureClass::ProjectFeatureClass(mvceditor::AppClass& app) 
@@ -207,7 +207,25 @@ void mvceditor::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
 		// start the sequence that will update all global data structures
 		// delete the cache files for the projects the user has removed
 		// remove tags from deleted projects
+		// if at least 1 project was re-enabled, then prompt for re-tagging
+		// note that we always want to start the sequence, because
+		// the sequence disables projects that were removed.
+		// if user only disabled projects, no need to prompt since no projects
+		// will be re-tagged
+		if (!touchedProjects.empty()) {
+			wxString msg = wxString::FromAscii(
+				"Would you like to re-tag your newly enabled projects at this time?"
+			);
+			msg = wxGetTranslation(msg);
+			int ret = wxMessageBox(msg, _("Tag projects"), wxICON_QUESTION | wxYES_NO, GetMainWindow());
+			if (wxNO == ret) {
+
+				// user does not want to re-tag newly enabled projects
+				touchedProjects.clear();
+			}
+		}
 		App.Sequences.ProjectDefinitionsUpdated(touchedProjects, removedProjects);
+				
 	}
 }
 
