@@ -607,6 +607,12 @@ void mvceditor::MainFrameClass::LoadFeature(mvceditor::FeatureClass* feature) {
 		SearchMenu->InsertSeparator(oldSearchMenuCount);
 	}
 
+	size_t oldHelpMenuCount = HelpMenu->GetMenuItemCount();
+	feature->AddHelpMenuItems(HelpMenu);
+	if (oldHelpMenuCount != HelpMenu->GetMenuItemCount() && oldHelpMenuCount > 0) {
+		HelpMenu->InsertSeparator(oldHelpMenuCount);
+	}
+
 	wxMenuBar* menuBar = GetMenuBar();
 	feature->AddNewMenu(menuBar);
 
@@ -616,6 +622,7 @@ void mvceditor::MainFrameClass::LoadFeature(mvceditor::FeatureClass* feature) {
 		menuBar->Remove(helpIndex);
 		menuBar->Insert(menuBar->GetMenuCount(), HelpMenu, _("&Help"));
 	}
+	
 	
 	// move preferences menu to the end, similar to most other programs
 	wxMenuItem* preferencesMenu = EditMenu->Remove(ID_EDIT_PREFERENCES);

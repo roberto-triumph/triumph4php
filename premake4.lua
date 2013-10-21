@@ -72,7 +72,7 @@ function wxconfiguration(config, action)
 		-- wxwidgets uses "unsafe" functions, kill these warnings
 		-- although the flag is technically not needed since wx/defs.h sets the #define, 
 		-- we do it here because not all profiler programs include the entire wxWidgets framework
-		defines { "WIN32", "_DEBUG", "_WINDOWS", "WXUSINGDLL", "NOPCH", "_CRT_SECURE_NO_WARNINGS" }
+		defines { "WIN32", "_DEBUG", "_WINDOWS", "WXUSINGDLL", "_CRT_SECURE_NO_WARNINGS" }
 
 		-- enable the "Use Unicode Character Set" option under General .. Character Set
 		-- wxWidgets needs this in order to link properly
@@ -234,8 +234,14 @@ solution "mvc-editor"
 		else 
 			files { "src/**.cpp", "src/**.h", "*.lua", "README.md" }
 		end
-		includedirs { "src/", "lib/keybinder/include/", "lib/pelet/include" }
-		links { "tests", "keybinder", "pelet" }
+		includedirs { 
+			"src/", 
+			"lib/keybinder/include/", 
+			"lib/pelet/include", 
+			"lib/wxcurl/include",
+			"lib/wxcurl/thirdparty/curl/include"
+		}
+		links { "tests", "keybinder", "pelet", "wxcurl", "curl" }
 
 		configuration "Debug"
 			pickywarnings(_ACTION)
@@ -243,6 +249,11 @@ solution "mvc-editor"
 			icuconfiguration("Debug", _ACTION)
 			wxconfiguration("Debug", _ACTION)
 			wxappconfiguration("Debug", _ACTION)
+			
+			-- use the local update server in debug  
+			defines { 
+				string.format("MVCEDITOR_UPDATE_HOST=%s", 'updates.localhost')
+			}
 
 		configuration "Release"
 			pickywarnings(_ACTION)
@@ -250,6 +261,11 @@ solution "mvc-editor"
 			icuconfiguration("Release", _ACTION)
 			wxconfiguration("Release", _ACTION)
 			wxappconfiguration("Release", _ACTION)
+			
+			-- use the public update server in release
+			defines { 
+				string.format("MVCEDITOR_UPDATE_HOST=%s", 'updates.mvceditor.com')
+			}
 
 	project "tests"
 		language "C++"
@@ -508,6 +524,67 @@ solution "mvc-editor"
 			-- prevent warning: deprecated conversion from string constant to char*
 			buildoptions { "-Wno-write-strings" }
 
+	
+	project "curl"
+		language "C++"
+		kind "SharedLib"
+		includedirs {
+			"lib/wxcurl/thirdparty/curl/include",
+			"lib/wxcurl/thirdparty/curl/lib/"
+		}
+		files {
+			"lib/wxcurl/thirdparty/curl/lib/*"
+		}
+		configuration "vs2008"
+			defines {
+				"WIN32",
+				"_LIB",
+				"CURL_LDAP_WIN",
+				"NDEBUG",
+				"BUILDING_LIBCURL"
+			}
+			links {
+				"ws2_32",
+				"wldap32"
+			}
+	
+	project "wxcurl"
+		language "C++"
+		kind "SharedLib"
+		files { 
+			"lib/wxcurl/include/wx/**/*.h", 
+			"lib/wxcurl/src/*.cpp",
+		}
+		includedirs {
+			"lib/wxcurl/include",
+			"lib/wxcurl/thirdparty/curl/include"
+		}
+		links {
+			"curl"
+		}
+
+		configuration "vs2008"
+			-- this is needed so that symbols are exported
+			defines { 
+				"DLL_EXPORTS",
+				"_USRDLL",
+				"_UNICODE",
+				"__WXDEBUG__",
+				"__WXMSW__",
+				"WXMAKINGDLL_WXCURL"
+			}
+		configuration { "Debug" }
+			wxconfiguration("Debug", _ACTION)
+		configuration { "Release" }
+			wxconfiguration("Release", _ACTION)
+		configuration { "vs2008" }
+			-- prevent warning from killing build: warning C4018: '<' : signed/unsigned mismatch
+			buildoptions { "/W1" }
+		configuration { "gmake or codelite" }
+			-- prevent warning: deprecated stuff from wxWidgets 2.8 -> 2.9
+			buildoptions { "-Wno-deprecated" }
+
+				
 	project "pelet"
 		language "C++"
 		kind "SharedLib"

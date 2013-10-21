@@ -71,14 +71,14 @@ ICU_INCLUDE_DIR = icuDir .. "/include/"
 WX_LIBS_DEBUG = {
 	"winmm", "comctl32", "rpcrt4", "wsock32", "wininet",
 	"wxmsw29ud_core", "wxbase29ud_net", "wxbase29ud", "wxexpatd", "wxjpegd", "wxpngd", "wxregexud",
-	"wxtiffd", "wxzlibd"
+	"wxtiffd", "wxzlibd", "wxbase29ud_xml"
 }
 
 -- these are the core wxWidgets Release libraries and their Win32 dependencies (win dependencies listed first)
 WX_LIBS_RELEASE = {
 	"winmm", "comctl32", "rpcrt4", "wsock32", "wininet",
 	"wxmsw29u_core", "wxbase29u_net", "wxbase29u", "wxexpat", "wxjpeg", "wxpng", "wxregexu",
-	"wxtiff", "wxzlib"
+	"wxtiff", "wxzlib", "wxbase29u_xml"
 }
 
 -- the wxWidgets GUI debug libraries

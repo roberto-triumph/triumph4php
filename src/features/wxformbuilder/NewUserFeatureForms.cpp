@@ -20,6 +20,18 @@ NewUserDialogGeneratedClass::NewUserDialogGeneratedClass( wxWindow* parent, wxWi
 	MoreLabel->Wrap( -1 );
 	DialogSizer->Add( MoreLabel, 0, wxALL|wxEXPAND, 15 );
 	
+	wxStaticBoxSizer* VersionUpdateSizer;
+	VersionUpdateSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Version Updates") ), wxVERTICAL );
+	
+	VersionUpdateHelp = new wxStaticText( this, wxID_ANY, wxT("MVC Editor can check for new versions of the editor.  Version checking requires an active internet connection. If enabled, version update checks will be done once a week."), wxDefaultPosition, wxDefaultSize, 0 );
+	VersionUpdateHelp->Wrap( 550 );
+	VersionUpdateSizer->Add( VersionUpdateHelp, 0, wxALL, 5 );
+	
+	CheckForUpdates = new wxCheckBox( this, wxID_ANY, wxT("Check for new versions automatically "), wxDefaultPosition, wxDefaultSize, 0 );
+	VersionUpdateSizer->Add( CheckForUpdates, 0, wxALL|wxEXPAND, 10 );
+	
+	DialogSizer->Add( VersionUpdateSizer, 1, wxEXPAND, 5 );
+	
 	wxStaticBoxSizer* SettingsSizer;
 	SettingsSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Settings Directory") ), wxVERTICAL );
 	
@@ -54,6 +66,8 @@ NewUserDialogGeneratedClass::NewUserDialogGeneratedClass( wxWindow* parent, wxWi
 	PhpLocationSizer->Add( PhpHelpLabel, 1, wxALL, 5 );
 	
 	PhpDetectorsLink = new wxHyperlinkCtrl( this, wxID_ANY, wxT("More about framework detection in MVC Editor"), wxT("https://code.google.com/p/mvc-editor/wiki/FrameworkDetection"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	PhpDetectorsLink->SetToolTip( wxT("https://code.google.com/p/mvc-editor/wiki/FrameworkDetection") );
+	
 	PhpLocationSizer->Add( PhpDetectorsLink, 0, wxALL, 5 );
 	
 	Installed = new wxCheckBox( this, wxID_ANY, wxT("PHP is installed"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -122,14 +136,12 @@ NewUserDialogGeneratedClass::NewUserDialogGeneratedClass( wxWindow* parent, wxWi
 	this->Centre( wxBOTH );
 	
 	// Connect Events
-	PhpDetectorsLink->Connect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( NewUserDialogGeneratedClass::OnFrameworkHyperlink ), NULL, this );
 	ButtonsSizerOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( NewUserDialogGeneratedClass::OnOkButton ), NULL, this );
 }
 
 NewUserDialogGeneratedClass::~NewUserDialogGeneratedClass()
 {
 	// Disconnect Events
-	PhpDetectorsLink->Disconnect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( NewUserDialogGeneratedClass::OnFrameworkHyperlink ), NULL, this );
 	ButtonsSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( NewUserDialogGeneratedClass::OnOkButton ), NULL, this );
 	
 }

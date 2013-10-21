@@ -14,12 +14,12 @@
 #include <wx/font.h>
 #include <wx/colour.h>
 #include <wx/settings.h>
-#include <wx/radiobut.h>
-#include <wx/sizer.h>
-#include <wx/filepicker.h>
-#include <wx/statbox.h>
-#include <wx/hyperlink.h>
 #include <wx/checkbox.h>
+#include <wx/sizer.h>
+#include <wx/statbox.h>
+#include <wx/radiobut.h>
+#include <wx/filepicker.h>
+#include <wx/hyperlink.h>
 #include <wx/textctrl.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
@@ -35,6 +35,8 @@ class NewUserDialogGeneratedClass : public wxDialog
 	
 	protected:
 		wxStaticText* MoreLabel;
+		wxStaticText* VersionUpdateHelp;
+		wxCheckBox* CheckForUpdates;
 		wxStaticText* SettingsHelpLabel;
 		wxRadioButton* UserDataDirectory;
 		wxRadioButton* ApplicationDirectory;
@@ -57,7 +59,6 @@ class NewUserDialogGeneratedClass : public wxDialog
 		wxButton* ButtonsSizerOK;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnFrameworkHyperlink( wxHyperlinkEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
 		
 	

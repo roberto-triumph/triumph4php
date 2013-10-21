@@ -292,7 +292,8 @@ wxString mvceditor::DynamicCmdClass::GetIdentifier() const {
 mvceditor::PreferencesClass::PreferencesClass()
 	: CodeControlOptions()
 	, KeyProfiles() 
-	, ApplicationFont() {
+	, ApplicationFont()
+	, CheckForUpdates(true) {
 	
 }
 
@@ -331,7 +332,7 @@ void mvceditor::PreferencesClass::Load(wxConfigBase* config, wxFrame* frame) {
 	if (!applicationFontInfo.IsEmpty()) {
 		ApplicationFont.SetNativeFontInfo(applicationFontInfo);
 	}
-	wxString settingsDir;
+	config->Read(wxT("CheckForUpdates"), &CheckForUpdates);
 	
 	int totalCmdCount = 0;
 
@@ -364,6 +365,7 @@ void mvceditor::PreferencesClass::Save() {
 	wxConfigBase* config = wxConfigBase::Get();
 	CodeControlOptions.Save(config);
 	config->Write(wxT("ApplicationFont"), ApplicationFont.GetNativeFontInfoDesc());
+	config->Write(wxT("CheckForUpdates"), CheckForUpdates);
 	SaveKeyProfileArray(DefaultKeyboardShortcutCmds, KeyProfiles, config, wxT(""));
 	
 	// keybinder sets the config path, must reset it back to normal

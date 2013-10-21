@@ -208,6 +208,12 @@ public:
 	 */
 	wxFont ApplicationFont;
 
+	/**
+	 * if TRUE, MVC Editor will check for new versions of the editor
+	 * @var bool
+	 */
+	bool CheckForUpdates;
+
 };
 
 }

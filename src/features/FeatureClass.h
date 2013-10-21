@@ -76,7 +76,8 @@ enum MenuIds {
 	MENU_DETECTORS = wxID_HIGHEST + 11400,
 	CONFIG_DETECTORS = wxID_HIGHEST + 11500,
 	MENU_EXPLORER = wxID_HIGHEST + 11600,
-	MENU_END = wxID_HIGHEST + 11700
+	MENU_VERSION_UPDATE = wxID_HIGHEST + 11700,
+	MENU_END = wxID_HIGHEST + 11800
 };
 
 /**
@@ -200,6 +201,14 @@ public:
 	 * @param wxMenu* menu the tools menu to add items to.
 	 */
 	virtual void AddEditMenuItems(wxMenu* editMenu);
+
+	/**
+	 * Add menu items to the help menu for this feature. Remeber to use the MenuIds enum when building
+	 * menu items.
+	 * 
+	 * @param wxMenu* menu the tools menu to add items to.
+	 */
+	virtual void AddHelpMenuItems(wxMenu* helpMenu);
 	
 	/**
 	 * Feature may create its own menu. The feature should override this method if it desires to create an entirely new menu.

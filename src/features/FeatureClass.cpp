@@ -69,6 +69,9 @@ void mvceditor::FeatureClass::AddFileMenuItems(wxMenu* fileMenu) {
 void mvceditor::FeatureClass::AddEditMenuItems(wxMenu* editMenu) {
 }
 
+void mvceditor::FeatureClass::AddHelpMenuItems(wxMenu* editMenu) {
+}
+
 void mvceditor::FeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 }
 
