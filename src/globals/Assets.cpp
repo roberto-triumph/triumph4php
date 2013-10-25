@@ -257,12 +257,12 @@ wxFileName mvceditor::BootstrapConfigFileAsset() {
 
 	// look at the local bootstrap config file
 	bootstrapConfigFile.Assign(paths.GetExecutablePath());
-	bootstrapConfigFile.SetFullName(wxT("mvc-editor-bootstrap.ini"));
+	bootstrapConfigFile.SetFullName(wxT(".mvc-editor-bootstrap.ini"));
 	if (!bootstrapConfigFile.FileExists()) {
 		
 		// look at the global config file
-		bootstrapConfigFile.Assign(paths.GetUserConfigDir());
-		bootstrapConfigFile.SetFullName(wxT("mvc-editor-bootstrap.ini"));
+		bootstrapConfigFile.AssignDir(paths.GetUserConfigDir());
+		bootstrapConfigFile.SetFullName(wxT(".mvc-editor-bootstrap.ini"));
 	}
 	return bootstrapConfigFile;
 }
@@ -272,8 +272,9 @@ wxFileName mvceditor::SettingsDirAsset() {
 	
 	// get the location of the settings dir from the bootstrap file
 	wxFileName bootstrapConfigFile = mvceditor::BootstrapConfigFileAsset();
+	wxString bootstrapFullPath = bootstrapConfigFile.GetFullPath();
 	wxFileConfig bootstrapConfig(wxT("bootstrap"), wxEmptyString, 
-		bootstrapConfigFile.GetFullPath(), wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
+		bootstrapFullPath, wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
 	wxString settingsDirString;
 	bootstrapConfig.Read(wxT("SettingsDirectory"), &settingsDirString);
 	wxFileName settingsDir;
@@ -290,16 +291,17 @@ void mvceditor::SetSettingsDirLocation(const wxFileName& settingsDir) {
 	// settings dir in the local bootstrap file
 	if (settingsDir.GetPathWithSep().Find(executableDir.GetPathWithSep()) != wxNOT_FOUND) {
 		bootstrapConfigFile.Assign(paths.GetExecutablePath());
-		bootstrapConfigFile.SetFullName(wxT("mvc-editor-bootstrap.ini"));
+		bootstrapConfigFile.SetFullName(wxT(".mvc-editor-bootstrap.ini"));
 	}
 	else {
 
 		// save settings dire in the global bootstrap config file
-		bootstrapConfigFile.Assign(paths.GetUserConfigDir());
-		bootstrapConfigFile.SetFullName(wxT("mvc-editor-bootstrap.ini"));
+		bootstrapConfigFile.AssignDir(paths.GetUserConfigDir());
+		bootstrapConfigFile.SetFullName(wxT(".mvc-editor-bootstrap.ini"));
 	}
+	wxString bootstrapFullPath = bootstrapConfigFile.GetFullPath();
 	wxFileConfig bootstrapConfig(wxT("bootstrap"), wxEmptyString, 
-		bootstrapConfigFile.GetFullPath(), wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
+		bootstrapFullPath, wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
 	wxString s = settingsDir.GetPath();
 	bootstrapConfig.Write(wxT("SettingsDirectory"), s);
 	bootstrapConfig.Flush();
