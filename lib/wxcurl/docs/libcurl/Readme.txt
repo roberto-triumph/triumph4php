@@ -1,1 +1,0 @@
-This folder contains the HTML documentation of libCURL version 7.16.1

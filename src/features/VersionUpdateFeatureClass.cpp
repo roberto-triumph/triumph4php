@@ -25,10 +25,11 @@
 #include <features/VersionUpdateFeatureClass.h>
 #include <globals/Assets.h>
 #include <MvcEditor.h>
-#include <wx/curl/http.h>
+#include <curl/curl.h>
 #include <wx/ffile.h>
 #include <wx/valgen.h>
 #include <wx/tokenzr.h>
+#include <wx/sstream.h>
 
 // these macros will expand a macro into its 
 // these are needed to expand the update host which
@@ -39,17 +40,17 @@
 static int ID_VERSION_FEATURE_TIMER = wxNewId();
 static int ID_VERSION_DIALOG_TIMER = wxNewId();
 static int ID_EVENT_VERSION_UPDATES = wxNewId();
+static int ID_EVENT_VERSION_UPDATES_ON_DIALOG = wxNewId();
 static wxEventType EVENT_VERSION_CHECK = wxNewEventType();
 
-// NOTE: copied from wxCurl, cannot use the one from wxCurl since its
-// not exported
+
  /* writes to a stream */
-static size_t wxcurl_stream_write(void* ptr, size_t size, size_t nmemb, void* stream) {
-    size_t iRealSize = size * nmemb;
-    wxOutputStream* pBuf = (wxOutputStream*)stream;
-    if(pBuf) {
-        pBuf->Write(ptr, iRealSize);
-        return pBuf->LastWrite();
+static size_t curl_ostream_write(void* ptr, size_t size, size_t nmemb, void* stream) {
+    size_t bytes = size * nmemb;
+    wxOutputStream* ostream = (wxOutputStream*)stream;
+    if (ostream) {
+        ostream->Write(ptr, bytes);
+        return ostream->LastWrite();
     }
     return 0;
 }
@@ -85,6 +86,10 @@ void mvceditor::VersionUpdateFeatureClass::OnAppReady(wxCommandEvent& event) {
 	if (App.Preferences.CheckForUpdates) {
 		Timer.Start(1000 * 1, wxTIMER_CONTINUOUS);
 	}
+	CURLcode code = curl_global_init(CURL_GLOBAL_DEFAULT);
+	bool good = 0 == code;
+	wxUnusedVar(good);
+	wxASSERT_MSG(good, _("curl did not initialize"));
 }
 
 void mvceditor::VersionUpdateFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
@@ -125,7 +130,6 @@ void mvceditor::VersionUpdateFeatureClass::OnTimer(wxTimerEvent& event) {
 
 void mvceditor::VersionUpdateFeatureClass::OnUpdateCheckComplete(wxCommandEvent& event) {
 	wxString nextVersion = event.GetString();
-	int statusCode = event.GetInt();
 	
 	wxString currentVersion = GetCurrentVersion();
 	if (!nextVersion.empty()) {
@@ -141,9 +145,22 @@ void mvceditor::VersionUpdateFeatureClass::OnUpdateCheckComplete(wxCommandEvent&
 	NextCheckTime.Add(week);
 
 	// write the check time to the config
-	wxConfigBase* config = wxConfig::Get();
-	config->Write(wxT("VersionUpdates/NextCheckTime"), NextCheckTime.FormatISOCombined(' '));
-	config->Flush();
+	// NOTE: we check if settings dir has been set, if it has not
+	// been set, then we cannot write the config to a file 
+	// because the user has not chosen a settings directory
+	// since the version check is triggered during the app ready
+	// event, during the very first run the user has not yet
+	// chosen a settings dir, and the config is not usable
+	// TODO: we should prevent config from being read
+	// before the user has chosen a settings dir, or
+	// provide a default settings dir
+	wxFileName settingsDir = mvceditor::SettingsDirAsset();
+	if (settingsDir.IsOk()) {
+		wxConfigBase* config = wxConfig::Get();
+	
+		config->Write(wxT("VersionUpdates/NextCheckTime"), NextCheckTime.FormatISOCombined(' '));
+		config->Flush();
+	}
 
 	Timer.Start(1000 * 20, wxTIMER_CONTINUOUS);
 }
@@ -216,8 +233,7 @@ void mvceditor::VersionUpdateDialogClass::OnUpdateCheckComplete(wxCommandEvent& 
 	wxString newVersion = event.GetString();
 	int statusCode = event.GetInt();
 
-	bool foundNew = !newVersion.empty();
-	NewVersion->SetLabel(newVersion);
+	bool foundNew = 200 == statusCode && !newVersion.empty();
 	if (foundNew) {
 		Result->SetLabel(wxT("New version available: ") + newVersion);
 	}
@@ -226,14 +242,14 @@ void mvceditor::VersionUpdateDialogClass::OnUpdateCheckComplete(wxCommandEvent& 
 		NewVersion->SetLabel(CurrentVersion->GetLabel());
 	}
 	else {
-		Result->SetLabel(wxString::Format(wxT("Connection error: (%d)"), statusCode));
+		Result->SetLabel(wxString::Format(wxT("Connection error: (%d) %s"), statusCode, newVersion));
 	}
 	Timer.Stop();
 }
 
 void mvceditor::VersionUpdateDialogClass::ConnectToUpdateServer() {	
 	mvceditor::VersionUpdateActionClass* action = new mvceditor::VersionUpdateActionClass(
-		RunningThreads, ID_EVENT_VERSION_UPDATES, CurrentVersion->GetLabel()
+		RunningThreads, ID_EVENT_VERSION_UPDATES_ON_DIALOG, CurrentVersion->GetLabel()
 	);
 	RunningThreads.Queue(action);
 }
@@ -250,7 +266,7 @@ mvceditor::VersionUpdateActionClass::VersionUpdateActionClass(mvceditor::Running
 }
 
 void mvceditor::VersionUpdateActionClass::BackgroundWork() {
-	int statusCode = 0;
+	long statusCode = 0;
 	wxString newVersion = GetNewVersion(CurrentVersion, statusCode);
 	
 	wxCommandEvent evt(EVENT_VERSION_CHECK);
@@ -259,7 +275,7 @@ void mvceditor::VersionUpdateActionClass::BackgroundWork() {
 	PostEvent(evt);
 }
 
-wxString mvceditor::VersionUpdateActionClass::GetNewVersion(const wxString& currentVersion, int& statusCode) {
+wxString mvceditor::VersionUpdateActionClass::GetNewVersion(const wxString& currentVersion, long& statusCode) {
 
 	// MVCEDITOR_UPDATE_HOST is a define from the premake script
 	// it will be different in debug vs release
@@ -274,36 +290,43 @@ wxString mvceditor::VersionUpdateActionClass::GetNewVersion(const wxString& curr
 	const char* urlBuf = fullUrl.c_str();
 	
 	wxStringOutputStream ostream;
-
-	wxCurlBase curl;
-	curl.SetOpt(CURLOPT_URL, urlBuf);
-	curl.SetOpt(CURLOPT_POST, 1);
-	curl.SetOpt(CURLOPT_POSTFIELDS, buf);
-	curl.SetOpt(CURLOPT_POSTFIELDSIZE, data.length());
-	curl.SetOpt(CURLOPT_WRITEFUNCTION, wxcurl_stream_write);
-	curl.SetOpt(CURLOPT_WRITEDATA, &ostream);
-	curl.Perform();
-
-	statusCode = curl.GetResponseCode();
+	CURL* curl = curl_easy_init();
+	
+	curl_easy_setopt(curl, CURLOPT_URL, urlBuf);
+	curl_easy_setopt(curl, CURLOPT_POST, 1);
+	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, buf);
+	curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data.length());
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_ostream_write);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &ostream);
+	
+	CURLcode ret = curl_easy_perform(curl);
 	wxString newVersion;
-	if (statusCode == 200) {
-		wxString contents = ostream.GetString();
-		if (!contents.empty()) {
+	if (0 == ret) {
+		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &statusCode);
+		if (statusCode == 200) {
+			wxString contents = ostream.GetString();
+			if (!contents.empty()) {
 
-			// the update query can return
-			// 1. A single line: "UP_TO_DATE"
-			// or 
-			// 2. 3 lines seperated by newlines:
-			// "NEW_VERSION"
-			// new version string
-			// new version release date
-			wxStringTokenizer tok(contents);
-			wxString line = tok.NextToken();
-			if (line.CmpNoCase(wxT("NEW_VERSION")) == 0) {
-				newVersion = tok.NextToken();
+				// the update query can return
+				// 1. A single line: "UP_TO_DATE"
+				// or 
+				// 2. 3 lines seperated by newlines:
+				// "NEW_VERSION"
+				// new version string
+				// new version release date
+				wxStringTokenizer tok(contents);
+				wxString line = tok.NextToken();
+				if (line.CmpNoCase(wxT("NEW_VERSION")) == 0) {
+					newVersion = tok.NextToken();
+				}
 			}
 		}
+		else {
+			newVersion = mvceditor::CharToWx(curl_easy_strerror(ret));
+			
+		}
 	}
+	curl_easy_cleanup(curl);
 	return newVersion;
 }
 
@@ -323,5 +346,5 @@ END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::VersionUpdateDialogClass, wxDialog)
 	EVT_TIMER(ID_VERSION_DIALOG_TIMER, mvceditor::VersionUpdateDialogClass::OnTimer)
-	EVT_COMMAND(ID_EVENT_VERSION_UPDATES, EVENT_VERSION_CHECK, mvceditor::VersionUpdateDialogClass::OnUpdateCheckComplete)
+	EVT_COMMAND(ID_EVENT_VERSION_UPDATES_ON_DIALOG, EVENT_VERSION_CHECK, mvceditor::VersionUpdateDialogClass::OnUpdateCheckComplete)
 END_EVENT_TABLE()

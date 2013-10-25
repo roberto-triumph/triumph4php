@@ -103,3 +103,11 @@ SQLITE_LIB_DIR = os.pathsearch('libsqlite3.so',
 	"/usr/lib/i386-linux-gnu/"
 );
 
+-- will look for CURL in these directories
+CURL_INCLUDE_DIR = '/usr/include/'
+CURL_LIB_DIR = os.pathsearch('libcurl.so', 
+	"/usr/lib", 
+	"/usr/lib/x86_64-linux-gnu/",
+	"/usr/lib/i386-linux-gnu/"
+);
+

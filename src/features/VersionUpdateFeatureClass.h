@@ -156,7 +156,7 @@ protected:
 
 	void BackgroundWork();
 
-	wxString GetNewVersion(const wxString& currentVersion, int& statusCode);
+	wxString GetNewVersion(const wxString& currentVersion, long& statusCode);
 
 	wxString GetLabel() const;
 

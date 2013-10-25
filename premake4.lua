@@ -188,6 +188,30 @@ function sociconfiguration(config)
 	end
 end
 
+-- the curl configuration
+-- for MSW, we use the precompiled binaries
+-- for linux, we use the system wide version
+function curlconfiguration(action)
+	if action == "vs2008" then
+		includedirs {
+			"lib/curl/include"
+		}
+		links {
+			"curl"
+		}
+	elseif action == "gmake" or action == "codelite" then
+		includedirs {
+			CURL_INCLUDE_DIR
+		}
+		libdirs {
+			CURL_LIB_DIR
+		}
+		links {
+			"curl"
+		}
+	end
+end
+
 function pickywarnings(action)
 	if action == "vs2008" then
 		flags { "FatalWarnings" }
@@ -237,11 +261,9 @@ solution "mvc-editor"
 		includedirs { 
 			"src/", 
 			"lib/keybinder/include/", 
-			"lib/pelet/include", 
-			"lib/wxcurl/include",
-			"lib/wxcurl/thirdparty/curl/include"
+			"lib/pelet/include"
 		}
-		links { "tests", "keybinder", "pelet", "wxcurl", "curl" }
+		links { "tests", "keybinder", "pelet" }
 
 		configuration "Debug"
 			pickywarnings(_ACTION)
@@ -249,6 +271,7 @@ solution "mvc-editor"
 			icuconfiguration("Debug", _ACTION)
 			wxconfiguration("Debug", _ACTION)
 			wxappconfiguration("Debug", _ACTION)
+			curlconfiguration(_ACTION)
 			
 			-- use the local update server in debug  
 			defines { 
@@ -261,6 +284,7 @@ solution "mvc-editor"
 			icuconfiguration("Release", _ACTION)
 			wxconfiguration("Release", _ACTION)
 			wxappconfiguration("Release", _ACTION)
+			curlconfiguration(_ACTION)
 			
 			-- use the public update server in release
 			defines { 
@@ -525,66 +549,33 @@ solution "mvc-editor"
 			buildoptions { "-Wno-write-strings" }
 
 	
-	project "curl"
-		language "C++"
-		kind "SharedLib"
-		includedirs {
-			"lib/wxcurl/thirdparty/curl/include",
-			"lib/wxcurl/thirdparty/curl/lib/"
-		}
-		files {
-			"lib/wxcurl/thirdparty/curl/lib/*"
-		}
-		configuration "vs2008"
+	if (os.is("windows")) then 
+		project "curl"
+			language "C++"
+			kind "SharedLib"
+			includedirs {
+				"lib/wxcurl/thirdparty/curl/include",
+				"lib/wxcurl/thirdparty/curl/lib/"
+			}
+			files {
+				"lib/wxcurl/thirdparty/curl/lib/*"
+			}
 			defines {
-				"WIN32",
-				"_LIB",
-				"CURL_LDAP_WIN",
 				"NDEBUG",
 				"BUILDING_LIBCURL"
 			}
-			links {
-				"ws2_32",
-				"wldap32"
-			}
+			configuration "vs2008"
+				defines {
+					"WIN32",
+					"_LIB",
+					"CURL_LDAP_WIN"
+				}
+				links {
+					"ws2_32",
+					"wldap32"
+				}
+	end
 	
-	project "wxcurl"
-		language "C++"
-		kind "SharedLib"
-		files { 
-			"lib/wxcurl/include/wx/**/*.h", 
-			"lib/wxcurl/src/*.cpp",
-		}
-		includedirs {
-			"lib/wxcurl/include",
-			"lib/wxcurl/thirdparty/curl/include"
-		}
-		links {
-			"curl"
-		}
-
-		configuration "vs2008"
-			-- this is needed so that symbols are exported
-			defines { 
-				"DLL_EXPORTS",
-				"_USRDLL",
-				"_UNICODE",
-				"__WXDEBUG__",
-				"__WXMSW__",
-				"WXMAKINGDLL_WXCURL"
-			}
-		configuration { "Debug" }
-			wxconfiguration("Debug", _ACTION)
-		configuration { "Release" }
-			wxconfiguration("Release", _ACTION)
-		configuration { "vs2008" }
-			-- prevent warning from killing build: warning C4018: '<' : signed/unsigned mismatch
-			buildoptions { "/W1" }
-		configuration { "gmake or codelite" }
-			-- prevent warning: deprecated stuff from wxWidgets 2.8 -> 2.9
-			buildoptions { "-Wno-deprecated" }
-
-				
 	project "pelet"
 		language "C++"
 		kind "SharedLib"
