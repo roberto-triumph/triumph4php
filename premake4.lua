@@ -240,10 +240,7 @@ solution "mvc-editor"
 
 		-- link against our own version of wxWidgets / ICU instead of any installed in the system
 		linkoptions { "-Wl,-rpath=./" }
-	configuration { "Debug", "vs2008" }
 
-		-- prevent "warning LNK4098: defaultlib 'MSVCRTD' conflicts with use of other libs; use /NODEFAULTLIB:library"
-		buildoptions { "/MDd" }
 
 	project "mvc-editor"
 		language "C++"
