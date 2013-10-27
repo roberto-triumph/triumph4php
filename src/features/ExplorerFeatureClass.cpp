@@ -673,7 +673,8 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuCreateDirectory(wxCommandEven
 	if (newName.IsEmpty()) {
 		return;
 	}
-	wxFileName newDir(CurrentListDir.GetPath());
+	wxFileName newDir;
+	newDir.AssignDir(CurrentListDir.GetPath());
 	newDir.AppendDir(newName);
 	if (newDir.DirExists()) {
 		wxMessageBox(_("Directory already exists with that name. Please enter another name."));
