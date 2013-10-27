@@ -36,6 +36,7 @@ dofile "premake_action_dist.lua"
 dofile "premake_action_generate.lua"
 dofile "premake_action_soci.lua"
 dofile "premake_action_wxwidgets.lua"
+dofile "premake_action_curl.lua"
 
 
 -- this configuration uses the icu-config binary to get the ICU header & library locations
@@ -189,26 +190,21 @@ function sociconfiguration(config)
 end
 
 -- the curl configuration
--- for MSW, we use the precompiled binaries
+-- for MSW, we use the version we compiled with the curl action
 -- for linux, we use the system wide version
-function curlconfiguration(action)
-	if action == "vs2008" then
-		includedirs {
-			"lib/curl/include"
-		}
-		links {
-			"curl"
-		}
+function curlconfiguration(config, action)	
+	if action == "vs2008" and config == "Debug" then	
+		includedirs { CURL_DEBUG_INCLUDE_DIR }
+		libdirs { CURL_DEBUG_LIB_DIR }
+		links { 'libcurl_debug' }
+	elseif action == "vs2008" and config == "Release" then	
+		includedirs { CURL_RELEASE_INCLUDE_DIR }
+		libdirs { CURL_RELEASE_LIB_DIR }
+		links { 'libcurl' }
 	elseif action == "gmake" or action == "codelite" then
-		includedirs {
-			CURL_INCLUDE_DIR
-		}
-		libdirs {
-			CURL_LIB_DIR
-		}
-		links {
-			"curl"
-		}
+		includedirs { CURL_INCLUDE_DIR }
+		libdirs { CURL_LIB_DIR }
+		links { "curl" }
 	end
 end
 
@@ -271,7 +267,7 @@ solution "mvc-editor"
 			icuconfiguration("Debug", _ACTION)
 			wxconfiguration("Debug", _ACTION)
 			wxappconfiguration("Debug", _ACTION)
-			curlconfiguration(_ACTION)
+			curlconfiguration("Debug", _ACTION)
 			
 			-- use the local update server in debug  
 			defines { 
@@ -284,7 +280,7 @@ solution "mvc-editor"
 			icuconfiguration("Release", _ACTION)
 			wxconfiguration("Release", _ACTION)
 			wxappconfiguration("Release", _ACTION)
-			curlconfiguration(_ACTION)
+			curlconfiguration("Release", _ACTION)
 			
 			-- use the public update server in release
 			defines { 
@@ -547,34 +543,6 @@ solution "mvc-editor"
 		configuration { "gmake or codelite" }
 			-- prevent warning: deprecated conversion from string constant to char*
 			buildoptions { "-Wno-write-strings" }
-
-	
-	if (os.is("windows")) then 
-		project "curl"
-			language "C++"
-			kind "SharedLib"
-			includedirs {
-				"lib/wxcurl/thirdparty/curl/include",
-				"lib/wxcurl/thirdparty/curl/lib/"
-			}
-			files {
-				"lib/wxcurl/thirdparty/curl/lib/*"
-			}
-			defines {
-				"NDEBUG",
-				"BUILDING_LIBCURL"
-			}
-			configuration "vs2008"
-				defines {
-					"WIN32",
-					"_LIB",
-					"CURL_LDAP_WIN"
-				}
-				links {
-					"ws2_32",
-					"wldap32"
-				}
-	end
 	
 	project "pelet"
 		language "C++"

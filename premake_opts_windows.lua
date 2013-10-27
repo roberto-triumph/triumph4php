@@ -139,3 +139,26 @@ SQLITE_INCLUDE_DIR = sqliteDir .. '/include'
 SQLITE_LIB = sqliteDir .. '/lib/sqlite3.lib'
 SQLITE_LIB_DIR = sqliteDir .. '/lib'
 SQLITE_LIB_NAME = 'sqlite3.lib'
+
+
+-- will look for CURL in these directories
+-- these are the directories where
+curlDebugDir = os.getenv("MVCEDITOR_CURL_DEBUG_DIR")
+if (not curlDebugDir) then
+	curlDebugDir = "lib/curl/builds/libcurl-debug-dll-ipv6-sspi";
+	print("Using default dir for CURL debug: " .. curlDebugDir)
+end
+CURL_DEBUG_INCLUDE_DIR = curlDebugDir .. '/include'
+CURL_DEBUG_LIB = curlDebugDir .. '/lib/libcurl.lib'
+CURL_DEBUG_LIB_DIR = curlDebugDir .. '/lib'
+CURL_DEBUG_BIN_DIR = curlDebugDir .. '/bin'
+
+curlReleaseDir = os.getenv("MVCEDITOR_CURL_RELEASE_DIR")
+if (not curlReleaseDir) then
+	curlReleaseDir = "lib/curl/builds/libcurl-release-dll-ipv6-sspi";
+	print("Using default dir for CURL Release: " .. curlReleaseDir)
+end
+CURL_RELEASE_INCLUDE_DIR = curlReleaseDir .. '/include'
+CURL_RELEASE_LIB = curlReleaseDir .. '/lib/libcurl.lib'
+CURL_RELEASE_LIB_DIR = curlReleaseDir .. '/lib'
+CURL_RELEASE_BIN_DIR = curlReleaseDir .. '/bin'

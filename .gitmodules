@@ -7,3 +7,6 @@
 [submodule "lib/wxWidgets"]
 	path = lib/wxWidgets
 	url = https://github.com/robertop/wxWidgets.git
+[submodule "lib/curl"]
+	path = lib/curl
+	url = https://github.com/bagder/curl.git

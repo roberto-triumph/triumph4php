@@ -42,6 +42,7 @@ newaction {
 		checkSoci()
 		checkMysql()
 		checkSqlite()
+		checkCurl()
 		print "SUCCESS! All dependencies are met. Next step is to build MVC Editor in your environment.";
 		if os.is "windows" then
 			print "premake4.exe vs2008\n"
@@ -177,7 +178,7 @@ function checkSoci()
 	elseif os.is "linux" then
 		
 		-- soci lib dirs are named according to architecture
-        foundCount = 0;
+	        foundCount = 0;
 		libs = os.matchfiles("lib/soci/mvc-editor/Debug/lib64/*.so*");
 		if #libs > 0 then
 			os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/Debug/lib64/*.so* Debug/");
@@ -272,6 +273,43 @@ function checkSqlite()
 			error ("SQLite libraries not found (" .. sqliteLib .. 
 				"). Please install the SQLite3 client library, or change the location of " ..
 				" SQLITE_LIB_DIR in premake_opts_linux.lua")
+		end
+	else 
+		error "You are running on a non-supported operating system. MVC Editor cannot be built.\n"
+	end
+end
+
+-- makes sure that the CURL DLLs have been built or located
+-- makes sure CURL DLLs are placed in the same directory as mvc-editor.exe
+function checkCurl() 
+	if os.is "windows" then
+		dlls = os.matchfiles(CURL_DEBUG_BIN_DIR .. "/*.dll")
+		if  #dlls > 0 then
+			curlBinPath = normalizepath(CURL_DEBUG_BIN_DIR .. "/*.dll")
+			cmd = "xcopy /S /Y " .. curlBinPath .. " \"Debug\\\""
+			print(cmd)
+			os.execute(cmd)
+		else 
+			error ("CURL Debug DLL was not found in " ..  CURL_DEBUG_BIN_DIR ..
+				"\nPlease build CURL using the premake curl action: premake4.exe curl")
+		end 
+		
+		dlls = os.matchfiles(CURL_RELEASE_BIN_DIR .. "/*.dll")
+		if  #dlls > 0 then
+			curlBinPath = normalizepath(CURL_RELEASE_BIN_DIR .. "/*.dll")
+			cmd = "xcopy /S /Y " .. curlBinPath .. " \"Release\\\""
+			print(cmd)
+			os.execute(cmd)
+		else 
+			error ("CURL Release DLL was not found in " ..  CURL_RELEASE_BIN_DIR ..
+				"\nPlease build CURL using the premake curl action: premake4.exe curl")
+		end
+	elseif os.is "linux" then
+		curlLib = CURL_LIB_DIR
+		if curlLib == nil then
+			error ("CURL libraries not found.  " .. 
+				"Please install the CURL client library, or change the location of " ..
+				"CURL_LIB_DIR in premake_opts_linux.lua")
 		end
 	else 
 		error "You are running on a non-supported operating system. MVC Editor cannot be built.\n"
