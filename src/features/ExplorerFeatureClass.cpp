@@ -478,10 +478,10 @@ void mvceditor::ModalExplorerPanelClass::ShowDir(const wxFileName& currentDir, c
 	// set the second item to be selected (first other than parent)
 	// except if the dir is empty
 	if (List->GetItemCount() >= 2) {
-		List->SetItemState(1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+		List->SetItemState(1, wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED, wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED);
 	}
 	else if (List->GetItemCount() >= 1) {
-		List->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+		List->SetItemState(0, wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED, wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED);
 	}
 	List->SetFocus();
 }
@@ -901,7 +901,7 @@ void mvceditor::ModalExplorerPanelClass::FillSourcesList(const std::vector<wxFil
 
 void mvceditor::ModalExplorerPanelClass::FocusOnSourcesList() {
 	if (SourcesList->GetItemCount()) {
-		SourcesList->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+		SourcesList->SetItemState(0, wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED, wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED);
 	}
 	SourcesList->SetFocus();
 }
