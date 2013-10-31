@@ -41,7 +41,7 @@ extern const wxEventType EVENT_SEQUENCE_START;
  * this event will be generated while a sequence is running; it is 
  * generated consitantly every 200-300 ms.
  */
-extern const wxEventType EVENT_SEQUENCE_IN_PROGRESS;
+extern const wxEventType EVENT_SEQUENCE_PROGRESS;
 
 /**
  * this event will be generated when the AppStart sequence is complete
@@ -205,6 +205,23 @@ private:
 
 	DECLARE_EVENT_TABLE()
 };
+
+class SequenceProgressEventClass : public mvceditor::ActionProgressEventClass {
+
+public:
+
+	SequenceProgressEventClass(int id, mvceditor::ActionClass::ProgressMode mode, int percentComplete, const wxString& msg);
+
+	wxEvent* Clone() const;
+};
+
+typedef void (wxEvtHandler::*SequenceProgressEventClassFunction)(mvceditor::SequenceProgressEventClass&);
+
+#define EVT_SEQUENCE_PROGRESS(fn) \
+        DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_SEQUENCE_PROGRESS, wxID_ANY, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( SequenceProgressEventClassFunction, & fn ), (wxObject *) NULL ),
+
 
 }
 

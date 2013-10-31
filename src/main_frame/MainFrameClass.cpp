@@ -883,13 +883,7 @@ void mvceditor::MainFrameClass::OnSequenceStart(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::MainFrameClass::OnSequenceActionStatus(wxCommandEvent& event) {
-}
-
-void mvceditor::MainFrameClass::OnSequenceInProgress(wxCommandEvent& event) {
-}
-
-void mvceditor::MainFrameClass::OnDeterminateProgress(mvceditor::ActionProgressEventClass& event) {
+void mvceditor::MainFrameClass::OnDeterminateProgress(mvceditor::SequenceProgressEventClass& event) {
 	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 	if (event.Mode == mvceditor::ActionClass::INDETERMINATE) {
 		gauge->SwitchMode(ID_SEQUENCE_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0, 0);
@@ -1024,9 +1018,8 @@ BEGIN_EVENT_TABLE(mvceditor::MainFrameClass,  MainFrameGeneratedClass)
 
 	// make sure to show status of running sequences
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_SEQUENCE_START, mvceditor::MainFrameClass::OnSequenceStart)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_SEQUENCE_IN_PROGRESS, mvceditor::MainFrameClass::OnSequenceInProgress)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_SEQUENCE_COMPLETE, mvceditor::MainFrameClass::OnSequenceComplete)
-	EVT_ACTION_PROGRESS(wxID_ANY, mvceditor::MainFrameClass::OnDeterminateProgress)
+	EVT_SEQUENCE_PROGRESS(mvceditor::MainFrameClass::OnDeterminateProgress)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::AppEventListenerForFrameClass, wxEvtHandler)

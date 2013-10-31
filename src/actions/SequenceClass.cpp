@@ -328,9 +328,11 @@ bool mvceditor::SequenceClass::Running() const {
 }
 
 void mvceditor::SequenceClass::OnActionProgress(mvceditor::ActionProgressEventClass& event) {
-	wxCommandEvent sequenceEvent(mvceditor::EVENT_SEQUENCE_IN_PROGRESS);
-	sequenceEvent.SetId(wxID_ANY);
-	RunningThreads.PostEvent(sequenceEvent);
+	
+	// if there is an action that is running then send an in-progress event
+	// for it
+	mvceditor::SequenceProgressEventClass sequenceEvt(wxID_ANY, event.Mode, event.PercentComplete, event.Message);
+	RunningThreads.PostEvent(sequenceEvt);
 }
 
 void mvceditor::SequenceClass::SourceCheck() {
@@ -349,8 +351,17 @@ void mvceditor::SequenceClass::SourceCheck() {
 	}
 }
 
+mvceditor::SequenceProgressEventClass::SequenceProgressEventClass(int id, mvceditor::ActionClass::ProgressMode mode, int percentComplete, const wxString& msg)
+: ActionProgressEventClass(id, mode, percentComplete, msg) {
+	SetEventType(mvceditor::EVENT_SEQUENCE_PROGRESS);
+}
+
+wxEvent* mvceditor::SequenceProgressEventClass::Clone() const {
+	return new mvceditor::SequenceProgressEventClass(GetId(), Mode, PercentComplete, Message);
+}
+
 const wxEventType mvceditor::EVENT_SEQUENCE_START = wxNewEventType();
-const wxEventType mvceditor::EVENT_SEQUENCE_IN_PROGRESS = wxNewEventType();
+const wxEventType mvceditor::EVENT_SEQUENCE_PROGRESS = wxNewEventType();
 const wxEventType mvceditor::EVENT_SEQUENCE_COMPLETE = wxNewEventType();
 
 BEGIN_EVENT_TABLE(mvceditor::SequenceClass, wxEvtHandler)
