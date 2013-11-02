@@ -274,6 +274,11 @@ UnicodeString mvceditor::TagFinderListClass::ResolveResourceType(UnicodeString r
 
 	}
 	if (type.isEmpty() && IsNativeTagFinderInit) {
+
+		// tags in the native db file do not have a source_id
+		// when we query do not use source_id
+		std::vector<wxFileName> emptySourceDirs;
+		tagSearch.SetSourceDirs(emptySourceDirs);
 		mvceditor::TagResultClass* tagResults = tagSearch.CreateExactResults();
 		if (NativeTagFinder.Exec(tagResults)) {
 			tagResults->Next();

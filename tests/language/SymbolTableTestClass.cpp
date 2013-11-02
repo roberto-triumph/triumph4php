@@ -1035,6 +1035,27 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithNativeTags) {
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("query"), ResourceMatches[0].Identifier);
 }
 
+TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithNativeTagsAndSourceDirs) {
+	
+	// native tags should work even when source directories are defined
+	wxFileName sourceDir;
+	sourceDir.Assign(mvceditor::TagDetectorsGlobalAsset());
+	SourceDirs.push_back(sourceDir);
+	NativeSession = new soci::session(*soci::factory_sqlite3(), mvceditor::WxToChar(mvceditor::NativeFunctionsAsset().GetFullPath()));
+	TagFinderList.AdoptNativeTag(NativeSession);
+	UnicodeString sourceCode = mvceditor::CharToIcu(
+		"<?php\n"
+		"$pdo = new PDO;\n"
+	);
+	TagFinderList.TagParser.BuildResourceCacheForFile(wxT("untitled 2"), sourceCode, true);
+	Init(sourceCode);
+	ToProperty(UNICODE_STRING_SIMPLE("$pdo"), UNICODE_STRING_SIMPLE("que"), false, false);
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedExpression, Scope, SourceDirs, TagFinderList, 
+		VariableMatches, ResourceMatches, DoDuckTyping, Error);
+	CHECK_VECTOR_SIZE(1, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("query"), ResourceMatches[0].Identifier);
+}
+
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithDetectedTags) {
 	DetectedTagSession = new soci::session(*soci::factory_sqlite3(), ":memory:");
 	CreateDatabase(*DetectedTagSession, mvceditor::DetectorSqlSchemaAsset());
