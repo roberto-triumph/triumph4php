@@ -138,14 +138,18 @@ void mvceditor::ExplorerFeatureClass::AddWindows() {
 }
 
 void mvceditor::ExplorerFeatureClass::LoadPreferences(wxConfigBase *config) {
-	config->Read(wxT("/Explorer/FileManagerExecutable"), &FileManagerExecutable);
-	config->Read(wxT("/Explorer/ShellExecutable"), &ShellExecutable);
+	wxString s;
+	config->Read(wxT("/Explorer/FileManagerExecutable"), &s);
+	FileManagerExecutable.Assign(s);
+	s = wxT("");
+	config->Read(wxT("/Explorer/ShellExecutable"), &s);
+	ShellExecutable.Assign(s);
 }
 
 void mvceditor::ExplorerFeatureClass::SavePreferences() {
 	wxConfigBase *config = wxConfig::Get();
-	config->Write(wxT("/Explorer/FileManagerExecutable"), FileManagerExecutable);
-	config->Write(wxT("/Explorer/ShellExecutable"), ShellExecutable);
+	config->Write(wxT("/Explorer/FileManagerExecutable"), FileManagerExecutable.GetFullPath());
+	config->Write(wxT("/Explorer/ShellExecutable"), ShellExecutable.GetFullPath());
 }
 
 void mvceditor::ExplorerFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
@@ -698,7 +702,7 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuCreateDirectory(wxCommandEven
 }
 
 void mvceditor::ModalExplorerPanelClass::OnListMenuShell(wxCommandEvent& event) {
-	wxString cmd = Feature.ShellExecutable;
+	wxString cmd = Feature.ShellExecutable.GetFullPath();
 	wxPlatformInfo info;
 	if (info.GetOperatingSystemId() & wxOS_WINDOWS_NT) {
 		cmd += wxT(" /k cd \"") + CurrentListDir.GetPath() + wxT("\"");
@@ -707,7 +711,7 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuShell(wxCommandEvent& event) 
 }
 
 void mvceditor::ModalExplorerPanelClass::OnListMenuFileManager(wxCommandEvent& event) {
-	wxString cmd = Feature.FileManagerExecutable;
+	wxString cmd = Feature.FileManagerExecutable.GetFullPath();
 	wxPlatformInfo info;
 	if (info.GetOperatingSystemId() & wxOS_WINDOWS_NT) {
 		cmd += wxT(" ") + CurrentListDir.GetPath();

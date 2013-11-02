@@ -26,7 +26,7 @@
 #include <wx/filepicker.h>
 #include <wx/msgdlg.h>
 
-mvceditor::FilePickerValidatorClass::FilePickerValidatorClass(wxString* data)
+mvceditor::FilePickerValidatorClass::FilePickerValidatorClass(wxFileName* data)
 : wxValidator() 
 , Data(data) {
 
@@ -36,7 +36,7 @@ bool mvceditor::FilePickerValidatorClass::TransferToWindow() {
 	bool ret = false;
 	wxFilePickerCtrl* ctrl = wxDynamicCast(GetWindow(), wxFilePickerCtrl);
 	if (ctrl) {
-		ctrl->SetPath(*Data);
+		ctrl->SetPath(Data->GetFullPath());
 		ret = true;
 	}
 	return ret;
@@ -46,7 +46,7 @@ bool mvceditor::FilePickerValidatorClass::TransferFromWindow() {
 	bool ret = false;
 	wxFilePickerCtrl* ctrl = wxDynamicCast(GetWindow(), wxFilePickerCtrl);
 	if (ctrl) {
-		*Data = ctrl->GetPath();
+		Data->Assign(ctrl->GetPath());
 		ret = true;
 	}
 	return ret;

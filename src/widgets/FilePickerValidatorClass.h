@@ -26,6 +26,7 @@
 #define __MVCEDITOR_FILEPICKERVALIDATORCLASS_H__
 
 #include <wx/validate.h>
+#include <wx/filename.h>
 
 namespace mvceditor {
 
@@ -40,7 +41,7 @@ public:
 	/**
 	 * @param The string to validate / transfer. This class will not own this pointer.
 	 */
-	FilePickerValidatorClass(wxString* data);
+	FilePickerValidatorClass(wxFileName* data);
 
 	virtual bool TransferToWindow();
 	
@@ -55,7 +56,7 @@ private:
 	/**
 	 * The object to validate. This class will not own this pointer.
 	 */
-	wxString* Data;
+	wxFileName* Data;
 };
 
 }

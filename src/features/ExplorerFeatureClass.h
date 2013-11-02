@@ -47,12 +47,12 @@ public:
 	/**
 	 * executable of the operating system file manager
 	 */
-	wxString FileManagerExecutable;
+	wxFileName FileManagerExecutable;
 
 	/**
 	 * executable of the operating system shell
 	 */
-	wxString ShellExecutable;
+	wxFileName ShellExecutable;
 
 	ExplorerFeatureClass(mvceditor::AppClass& app);
 
