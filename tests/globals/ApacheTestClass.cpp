@@ -59,7 +59,7 @@ public:
 	 * apache config files in that directory (and recurses sub-directories too).
 	 */
 	void Walk() {
-		Search.Init(TestProjectDir);
+		Search.Init(TestProjectDir, mvceditor::DirectorySearchClass::PRECISE);
 		while (Search.More()) {
 			Search.Walk(Apache);
 		}

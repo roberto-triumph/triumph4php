@@ -339,6 +339,18 @@ void mvceditor::DirectorySearchClass::EnumerateNextDir(mvceditor::DirectoryWalke
 	}
 }
 
+// TODO there is a bug in here when using recursive mode and 
+// there is this structure
+// |
+// ==> apache_config
+//       |
+//       == httpd.conf
+// ==> test.php
+//
+// see the failed test for ApacheTestClass,
+// the test was modified to use PRECISE mode, because the bug
+// is really in this class
+// see commit after 0038fea7e36cbe2e3b4c4795904f6
 bool mvceditor::DirectorySearchClass::Walk(mvceditor::DirectoryWalkerClass& walker) {
 	EnumerateNextDir(walker);
 	bool hit = false;
