@@ -263,7 +263,7 @@ mvceditor::ReplacePanelClass::ReplacePanelClass(wxWindow* parent, int windowId, 
 		wxART_TOOLBAR, wxSize(16, 16))));
 	CloseButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_ERROR, 
 		wxART_FRAME_ICON, wxSize(16, 16))));
-	UnicodeStringValidatorClass replaceValidator(&Finder.ReplaceExpression);
+	UnicodeStringValidatorClass replaceValidator(&Finder.ReplaceExpression, true);
 	ReplaceWithText->SetValidator(replaceValidator);
 	ReplaceButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_FIND_AND_REPLACE, 
 		wxART_TOOLBAR, wxSize(16, 16))));

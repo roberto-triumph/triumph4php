@@ -28,6 +28,8 @@
 #include <wx/validate.h>
 #include <unicode/unistr.h>
 
+namespace mvceditor {
+
 /**
  * Class that can be used to transfer UnicodeString data from wx windows. Currently this validator
  * can handle either wxTextCtrl of wxComboBox only.
@@ -36,7 +38,7 @@ class UnicodeStringValidatorClass : public wxValidator {
 	
 public:
 
-	UnicodeStringValidatorClass(UnicodeString* data);
+	UnicodeStringValidatorClass(UnicodeString* data, bool doAllowEmpty);
 
 	virtual bool TransferToWindow();
 	
@@ -47,13 +49,18 @@ public:
 	virtual wxObject* Clone() const;
 	
 private:
-
-	UnicodeStringValidatorClass();
 	
 	/**
 	 * The data
 	 */
 	UnicodeString* Data;
+	
+	/**
+	 * if FALSE, then empty strings will not be valid
+	 */
+	bool DoAllowEmpty;
 };
+
+}
 
 #endif

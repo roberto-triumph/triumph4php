@@ -26,26 +26,20 @@
 #include <globals/String.h>
 #include <wx/textctrl.h>
 #include <wx/combobox.h>
+#include <wx/msgdlg.h>
 
-UnicodeStringValidatorClass::UnicodeStringValidatorClass(UnicodeString* data)
+mvceditor::UnicodeStringValidatorClass::UnicodeStringValidatorClass(UnicodeString* data, bool doAllowEmpty)
 	: wxValidator()
-	, Data(data) {
-
+	, Data(data) 
+	, DoAllowEmpty(doAllowEmpty) {
 }
 
-UnicodeStringValidatorClass::UnicodeStringValidatorClass()
-	: wxValidator()
-	, Data(NULL) {
-
-}
-
-wxObject* UnicodeStringValidatorClass::Clone() const {
-	UnicodeStringValidatorClass* other = new UnicodeStringValidatorClass();
-	other->Data = Data;
+wxObject* mvceditor::UnicodeStringValidatorClass::Clone() const {
+	mvceditor::UnicodeStringValidatorClass* other = new UnicodeStringValidatorClass(Data, DoAllowEmpty);
 	return other;
 }
 
-bool UnicodeStringValidatorClass::TransferFromWindow() {
+bool mvceditor::UnicodeStringValidatorClass::TransferFromWindow() {
 	bool ret = false;
 	wxTextCtrl* t = wxDynamicCast(GetWindow(), wxTextCtrl);
 	wxComboBox* combo = wxDynamicCast(GetWindow(), wxComboBox);
@@ -62,7 +56,7 @@ bool UnicodeStringValidatorClass::TransferFromWindow() {
 	return ret;
 }
 
-bool UnicodeStringValidatorClass::TransferToWindow() {
+bool mvceditor::UnicodeStringValidatorClass::TransferToWindow() {
 	bool ret = false;
 	wxTextCtrl* t = wxDynamicCast(GetWindow(), wxTextCtrl);
 	wxComboBox* combo = wxDynamicCast(GetWindow(), wxComboBox);
@@ -79,6 +73,22 @@ bool UnicodeStringValidatorClass::TransferToWindow() {
 	return ret;
 }
 
-bool UnicodeStringValidatorClass::Validate(wxWindow* parent) {
+bool mvceditor::UnicodeStringValidatorClass::Validate(wxWindow* parent) {
+	wxTextCtrl* t = wxDynamicCast(GetWindow(), wxTextCtrl);
+	wxComboBox* combo = wxDynamicCast(GetWindow(), wxComboBox);
+	wxString val;
+	if (t) {
+		val = t->GetValue();
+	}
+	else if(combo) {
+		val = combo->GetValue();
+	}
+	
+	if (val.IsEmpty() && !DoAllowEmpty) {
+		wxString msg = GetWindow()->GetName();
+		msg += _(" cannot be empty");
+		wxMessageBox(msg, _("Error"), wxOK | wxCENTRE, parent);
+		return false;
+	}
 	return true;
 }

@@ -708,7 +708,7 @@ mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvce
 	}
 	mvceditor::RegularExpressionValidatorClass regExValidator(&Feature.PreviousFindInFiles.Expression, FinderMode);
 	FindText->SetValidator(regExValidator);
-	UnicodeStringValidatorClass replaceExpressionValidator(&Feature.PreviousFindInFiles.ReplaceExpression);
+	UnicodeStringValidatorClass replaceExpressionValidator(&Feature.PreviousFindInFiles.ReplaceExpression, true);
 	wxGenericValidator modeValidator(&Feature.PreviousFindInFiles.Mode);
 	ReplaceWithText->SetValidator(replaceExpressionValidator);
 	FinderMode->SetValidator(modeValidator);
