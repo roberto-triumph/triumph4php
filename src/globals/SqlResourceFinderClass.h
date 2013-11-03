@@ -63,6 +63,8 @@ class SqlResourceClass {
 	
 	bool operator<(const SqlResourceClass& other) const;
 	
+	bool operator==(const SqlResourceClass& other) const;
+	
 };
 
 class SqlResourceFinderClass {
@@ -112,6 +114,24 @@ public:
 	 * have to keep a pointer to the info around.
 	 */
 	UnicodeString Hash(const DatabaseTagClass& info);
+	
+	/**
+	 * Connects to the given mysql database and queries the table meta data
+	 * for the connection.
+	 * 
+	 * @param info the connection parameters
+	 * @return bool false on error, error gets filled in with error message
+	 */
+	bool FetchMysql(const DatabaseTagClass& info, UnicodeString& error);
+	
+	/**
+	 * Connects to the given sqlite database and queries the table meta data
+	 * for the connection.
+	 * 
+	 * @param info the connection parameters
+	 * @return bool false on error, error gets filled in with error message
+	 */
+	bool FetchSqlite(const DatabaseTagClass& info, UnicodeString& error);
 	
 	/**
 	 * To make the queries

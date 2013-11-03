@@ -92,12 +92,8 @@ SqliteTestFixtureClass::~SqliteTestFixtureClass() {
 }
 
 bool SqliteTestFixtureClass::Exec(const std::string& query) {
-	soci::statement stmt = (Session.prepare << query);
 	try {
-		
-		// execute returns true only when there are results; we want to return
-		// true on success
-		stmt.execute(false);
+		Session.once << query;
 		return true;
 	} catch (std::exception& e) {
 		printf("exception=%s\n", e.what());

@@ -24,6 +24,7 @@
  */
 #include <globals/SqlResourceFinderClass.h>
 #include <globals/String.h>
+#include <globals/Sqlite.h>
 #include <soci.h>
 #include <algorithm>
 
@@ -35,6 +36,10 @@ mvceditor::SqlResourceClass::SqlResourceClass(const UnicodeString& name)
 
 bool mvceditor::SqlResourceClass::operator <(const mvceditor::SqlResourceClass& other) const {
 	return (Key.caseCompare(other.Key, 0) < (int8_t)0) ? true : false;
+}
+
+bool mvceditor::SqlResourceClass::operator ==(const mvceditor::SqlResourceClass& other) const {
+	return (Key.caseCompare(other.Key, 0) == (int8_t)0) ? true : false;
 }
 
 mvceditor::SqlResourceFinderClass::SqlResourceFinderClass() 
@@ -51,6 +56,17 @@ void mvceditor::SqlResourceFinderClass::Copy(const mvceditor::SqlResourceFinderC
 }
 
 bool mvceditor::SqlResourceFinderClass::Fetch(const mvceditor::DatabaseTagClass& info, UnicodeString& error) {
+	switch(info.Driver) {
+	case mvceditor::DatabaseTagClass::MYSQL:
+		return FetchMysql(info, error);
+	case mvceditor::DatabaseTagClass::SQLITE:
+		return FetchSqlite(info, error);
+	}
+	error = UNICODE_STRING_SIMPLE("invalid driver");
+	return false;
+}
+
+bool mvceditor::SqlResourceFinderClass::FetchMysql(const mvceditor::DatabaseTagClass& info, UnicodeString& error) {
 	bool hasError = false;
 	Query.DatabaseTag.Copy(info);
 	soci::session session;
@@ -113,6 +129,84 @@ bool mvceditor::SqlResourceFinderClass::Fetch(const mvceditor::DatabaseTagClass&
 		catch (std::exception const& e) {
 			hasError = true;
 			error = mvceditor::CharToIcu(e.what());
+		}
+	}
+	else {
+		hasError = true;
+	}
+	return !hasError;
+}
+
+bool mvceditor::SqlResourceFinderClass::FetchSqlite(const mvceditor::DatabaseTagClass& info, UnicodeString& error) {
+	bool hasError = false;
+	Query.DatabaseTag.Copy(info);
+	soci::session session;
+	if (Query.Connect(session, error)) {
+		UnicodeString hash = Hash(info);
+		
+		// clear any cache for this info
+		Tables[hash].clear();
+		Columns[hash].clear();
+		try {
+			std::string tableName;
+
+			// populate information_schema tables we want SQL code completion to work for the 
+			// information_schema tables / columns
+			std::vector<std::string> tables;
+			wxString wxError;
+			if (!mvceditor::SqliteTables(session, tables, wxError)) {
+				hasError = true;
+				error = mvceditor::WxToIcu(wxError);
+			}
+			if (!hasError) {
+				for (size_t i = 0; i < tables.size(); ++i) {
+					UnicodeString uni = mvceditor::WxToIcu(tables[i]);
+					mvceditor::SqlResourceClass res(uni);
+					Tables[hash].push_back(res);
+					
+					// get the columns for the table
+					// only getting unique columns names for now
+					// no need to know what tables they came from since we are not yet able to
+					// auto complete properly. proper auto complete would require a proper SQL lexer and parser
+					// and its not worth it for now
+					std::string stdTable = tables[i];
+					std::string query = "pragma table_info('" + stdTable + "')";
+					
+					int cid;
+					std::string name;
+					std::string type;
+					int notNull;
+					std::string defaultValue;
+					int pk;
+					soci::indicator defaultValueNullIndicator;
+					
+					soci::statement stmt = (session.prepare << query, soci::into(cid), soci::into(name),
+						soci::into(type), soci::into(notNull), soci::into(defaultValue, defaultValueNullIndicator),
+						soci::into(pk));
+					stmt.execute();
+					while (Query.More(stmt, hasError, error)) {
+						UnicodeString uniColumn = mvceditor::CharToIcu(name.c_str());
+						UnicodeString hash = Hash(info);
+						mvceditor::SqlResourceClass resColumn(uniColumn);
+						Columns[hash].push_back(resColumn);
+					}
+					Query.Close(stmt);
+				}
+			}
+			std::sort(Tables[hash].begin(), Tables[hash].end());
+			std::sort(Columns[hash].begin(), Columns[hash].end());
+			
+			// want to get only unique cols for now
+			std::vector<mvceditor::SqlResourceClass>::iterator it = std::unique(Columns[hash].begin(), Columns[hash].end());
+			if (it != Columns[hash].end()) {
+				Columns[hash].erase(it, Columns[hash].end());
+			}
+			
+		} 
+		catch (std::exception const& e) {
+			hasError = true;
+			error = mvceditor::CharToIcu(e.what());
+			puts(e.what());
 		}
 	}
 	else {

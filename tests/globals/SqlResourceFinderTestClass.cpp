@@ -24,21 +24,26 @@
  */
 #include <UnitTest++.h>
 #include <DatabaseTestFixtureClass.h>
+#include <FileTestFixtureClass.h>
+#include <SqliteTestFixtureClass.h>
 #include <globals/SqlResourceFinderClass.h>
 #include <globals/String.h>
+#include <globals/Assets.h>
 #include <MvcEditorChecks.h>
 #include <unicode/ustdio.h>
 #include <wx/platinfo.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 #include <string>
 
-class SqlResourceFinderFixtureClass : public DatabaseTestFixtureClass {
+class MysqlResourceFinderFixtureClass : public DatabaseTestFixtureClass {
 
 public:
 
-	SqlResourceFinderFixtureClass() 
+	MysqlResourceFinderFixtureClass() 
 		: DatabaseTestFixtureClass("sql_resource_finder") 
 		, DatabaseTag()
 		, Finder() {
+		DatabaseTag.Driver = mvceditor::DatabaseTagClass::MYSQL;
 		DatabaseTag.Schema = UNICODE_STRING_SIMPLE("sql_resource_finder");
 
 		// user name, pwd are #defines come from the premake script premake_opts.lua
@@ -50,11 +55,42 @@ public:
 	mvceditor::DatabaseTagClass DatabaseTag;
 	
 	mvceditor::SqlResourceFinderClass Finder;
- };
+};
+
+class SqliteResourceFinderFixtureClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
+
+public:
+
+	SqliteResourceFinderFixtureClass() 
+		: FileTestFixtureClass("sql_resource_finder") 
+		, SqliteTestFixtureClass()
+		, DatabaseTag()
+		, Finder() 
+		, SqliteFile() {
+		
+		// create a sqlite db file
+		TouchTestDir();
+		SqliteFile.Assign(TestProjectDir, wxT("sqlite.db"));
+		Session.close();
+		Session.open(*soci::factory_sqlite3(), 
+			mvceditor::WxToChar(SqliteFile.GetFullPath())
+		);
+					
+		DatabaseTag.Driver = mvceditor::DatabaseTagClass::SQLITE;
+		DatabaseTag.FileName = SqliteFile;
+		
+	}
+	
+	mvceditor::DatabaseTagClass DatabaseTag;
+	
+	mvceditor::SqlResourceFinderClass Finder;
+	
+	wxFileName SqliteFile;
+};
  
 SUITE(SqlResourceFinderTestClass) {
 	 
-TEST_FIXTURE(SqlResourceFinderFixtureClass, FindTable) {
+TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindTable) {
 	DatabaseTag.Schema = UNICODE_STRING_SIMPLE("sql_resource_finder");
 	
 	std::string query = "CREATE TABLE web_users(idUser int);";
@@ -73,7 +109,7 @@ TEST_FIXTURE(SqlResourceFinderFixtureClass, FindTable) {
 	CHECK_UNISTR_EQUALS_NO_CASE("service_names", tables[1]);
 }
 
-TEST_FIXTURE(SqlResourceFinderFixtureClass, FindTableCaseInsensitive) {
+TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindTableCaseInsensitive) {
 	std::string query = "SHOW VARIABLES WHERE Variable_name='version_compile_os' AND Value IN('Win64', 'Win32');";
 	if (Exec(query)) {
 		//skip this test on windows, MySQL always creates tables with lowercase names
@@ -99,7 +135,7 @@ TEST_FIXTURE(SqlResourceFinderFixtureClass, FindTableCaseInsensitive) {
 	CHECK_UNISTR_EQUALS("ServiceNames", tables[1]);
 }
 
-TEST_FIXTURE(SqlResourceFinderFixtureClass, FindTableShouldLocateDatabaseTagrmationSchema) {
+TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindTableShouldLocateDatabaseTagrmationSchema) {
 	DatabaseTag.Schema = UNICODE_STRING_SIMPLE("sql_resource_finder");
 	UnicodeString error;
 	CHECK(Finder.Fetch(DatabaseTag, error));
@@ -113,7 +149,7 @@ TEST_FIXTURE(SqlResourceFinderFixtureClass, FindTableShouldLocateDatabaseTagrmat
 	CHECK_UNISTR_EQUALS_NO_CASE("columns", tables[1]);
 }
 
-TEST_FIXTURE(SqlResourceFinderFixtureClass, FindColumns) {	
+TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindColumns) {	
 	DatabaseTag.Schema = UNICODE_STRING_SIMPLE("sql_resource_finder");
 	
 	std::string query = "CREATE TABLE web_users(idIUser int);";
@@ -141,7 +177,7 @@ TEST_FIXTURE(SqlResourceFinderFixtureClass, FindColumns) {
 	CHECK_UNISTR_EQUALS_NO_CASE("idIUser", columns[3]);
 }
 
-TEST_FIXTURE(SqlResourceFinderFixtureClass, FindColumnsCaseInsensitive) {	
+TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindColumnsCaseInsensitive) {
 	DatabaseTag.Schema = UNICODE_STRING_SIMPLE("sql_resource_finder");
 	
 	std::string query = "CREATE TABLE web_users(idIUser int);";
@@ -162,13 +198,55 @@ TEST_FIXTURE(SqlResourceFinderFixtureClass, FindColumnsCaseInsensitive) {
 
 }
 
-TEST_FIXTURE(SqlResourceFinderFixtureClass, FindDatabaseTagrmationSchemaColumns) {
+TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindDatabaseTagrmationSchemaColumns) {
 	DatabaseTag.Schema = UNICODE_STRING_SIMPLE("sql_resource_finder");
 	UnicodeString error;
 	CHECK(Finder.Fetch(DatabaseTag, error));
 	std::vector<UnicodeString> columns = Finder.FindColumns(DatabaseTag, UNICODE_STRING_SIMPLE("table_nam"));
 	CHECK_VECTOR_SIZE(1, columns);
 	CHECK_UNISTR_EQUALS_NO_CASE("table_name", columns[0]);
+}
+
+TEST_FIXTURE(SqliteResourceFinderFixtureClass, FindTable) {
+	std::string query = "CREATE TABLE web_users(idUser int);";
+	CHECK(Exec(query));
+	query = "CREATE TABLE service_names(idServiceName int);";
+	CHECK(Exec(query));
+	query = "CREATE TABLE service_locations(idServiceLocation int);";
+	CHECK(Exec(query));
+	query = "CREATE TABLE deleted_users(idUser int, deletedDate datetime);";
+	CHECK(Exec(query));
+	UnicodeString error;
+	CHECK(Finder.Fetch(DatabaseTag, error));
+	std::vector<UnicodeString> tables = Finder.FindTables(DatabaseTag, UNICODE_STRING_SIMPLE("service"));
+	CHECK_VECTOR_SIZE(2, tables);
+	CHECK_UNISTR_EQUALS_NO_CASE("service_locations", tables[0]);
+	CHECK_UNISTR_EQUALS_NO_CASE("service_names", tables[1]);
+}
+
+TEST_FIXTURE(SqliteResourceFinderFixtureClass, FindColumns) {
+	std::string query = "CREATE TABLE web_users(idIUser int);";
+	CHECK(Exec(query));
+	query = "CREATE TABLE service_names(idIServiceName int);";
+	CHECK(Exec(query));
+	query = "CREATE TABLE service_locations(idIServiceLocation int);";
+	CHECK(Exec(query));
+	query = "CREATE TABLE deleted_users(idIUser int, idIDeletedBy int);";
+	CHECK(Exec(query));
+	UnicodeString error;
+	CHECK(Finder.Fetch(DatabaseTag, error));
+	
+	std::vector<UnicodeString> columns = Finder.FindColumns(DatabaseTag, UNICODE_STRING_SIMPLE("idIServiceL"));
+	CHECK_VECTOR_SIZE(1, columns);
+	CHECK_UNISTR_EQUALS_NO_CASE("idIServiceLocation", columns[0]);
+	
+	columns = Finder.FindColumns(DatabaseTag, UNICODE_STRING_SIMPLE("idI"));
+	
+	CHECK_VECTOR_SIZE(4, columns);
+	CHECK_UNISTR_EQUALS_NO_CASE("idIDeletedBy", columns[0]);
+	CHECK_UNISTR_EQUALS_NO_CASE("idIServiceLocation", columns[1]);
+	CHECK_UNISTR_EQUALS_NO_CASE("idIServiceName", columns[2]);
+	CHECK_UNISTR_EQUALS_NO_CASE("idIUser", columns[3]);
 }
 
 }
