@@ -714,6 +714,13 @@ void mvceditor::SqlBrowserPanelClass::SetCurrentInfo(const mvceditor::DatabaseTa
 
 void mvceditor::SqlBrowserPanelClass::LinkToCodeControl(mvceditor::CodeControlClass* codeControl) {
 	CodeControl = codeControl;
+	
+	// set the current selected db tag, so that code completion works
+	size_t sel = (size_t)Connections->GetSelection();
+	std::vector<mvceditor::DatabaseTagClass> dbTags = Feature->App.Globals.AllEnabledDatabaseTags();
+	if (sel >= 0 && sel < dbTags.size()) {
+		CodeControl->SetCurrentDbTag(dbTags[sel]);
+	}
 }
 
 bool mvceditor::SqlBrowserPanelClass::IsLinkedToCodeControl(mvceditor::CodeControlClass* codeControl) {

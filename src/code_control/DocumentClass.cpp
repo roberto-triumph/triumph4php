@@ -1082,7 +1082,7 @@ std::vector<wxString> mvceditor::SqlDocumentClass::HandleAutoCompletionMySql(con
 	}
 	
 	// look at the meta data
-	if (!CurrentDbTag.Host.isEmpty()) {
+	if (!CurrentDbTag.Label.isEmpty()) {
 		UnicodeString error;
 		std::vector<UnicodeString> results = Globals->SqlResourceFinder.FindTables(CurrentDbTag, word);
 		for (size_t i = 0; i < results.size(); i++) {

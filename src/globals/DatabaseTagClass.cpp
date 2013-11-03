@@ -368,26 +368,31 @@ bool mvceditor::SqlQueryClass::NextRow(soci::row& row, std::vector<UnicodeString
 }
 
 void mvceditor::SqlQueryClass::ConnectionIdentifier(soci::session& session, mvceditor::ConnectionIdentifierClass& connectionIdentifier) {
-	wxASSERT_MSG(mvceditor::DatabaseTagClass::MYSQL == DatabaseTag.Driver, wxT("Only MySQL is supported for now"));
-	soci::mysql_session_backend* backend = static_cast<soci::mysql_session_backend*>(session.get_backend());
-	MYSQL* mysql = backend->conn_;
-	unsigned long id = mysql_thread_id(mysql);
-	connectionIdentifier.Set(id);
+	connectionIdentifier.Set(0);
+	if (mvceditor::DatabaseTagClass::MYSQL == DatabaseTag.Driver) {
+		soci::mysql_session_backend* backend = static_cast<soci::mysql_session_backend*>(session.get_backend());
+		MYSQL* mysql = backend->conn_;
+		unsigned long id = mysql_thread_id(mysql);
+		connectionIdentifier.Set(id);
+	}
 }
 
 bool mvceditor::SqlQueryClass::KillConnection(soci::session& session, 
 											  mvceditor::ConnectionIdentifierClass& connectionIdentifier, 
 											  UnicodeString& error) {
 	bool ret = false;
-	try {
-		std::ostringstream stream;
-		stream << "KILL " << connectionIdentifier.Get();
-		session.once << stream.str();
-		ret = true;
-	} 
-	catch (std::exception const& e) {
-		ret = false;
-		error = mvceditor::CharToIcu(e.what());
+	int id = connectionIdentifier.Get();
+	if (id > 0 && mvceditor::DatabaseTagClass::MYSQL == DatabaseTag.Driver) {
+		try {
+			std::ostringstream stream;
+			stream << "KILL " << connectionIdentifier.Get();
+			session.once << stream.str();
+			ret = true;
+		} 
+		catch (std::exception const& e) {
+			ret = false;
+			error = mvceditor::CharToIcu(e.what());
+		}
 	}
 	return ret;
 }
