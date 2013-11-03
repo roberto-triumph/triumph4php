@@ -24,6 +24,7 @@
  */
 #include <globals/DatabaseTagClass.h>
 #include <soci/mysql/soci-mysql.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 #include <soci/soci.h>
 #include <wx/datetime.h>
 #include <globals/String.h>
@@ -65,7 +66,7 @@ void mvceditor::DatabaseTagClass::Copy(const mvceditor::DatabaseTagClass& src) {
 	User = src.User;
 	Password = src.Password;
 	Schema = src.Schema;
-	FileName = src.FileName;
+	FileName.Assign(src.FileName.GetFullPath());
 	Driver = src.Driver;
 	Port = src.Port;
 	IsDetected = src.IsDetected;
@@ -162,6 +163,31 @@ void mvceditor::SqlQueryClass::Close(soci::session& session, soci::statement& st
 }
 
 bool mvceditor::SqlQueryClass::Connect(soci::session& session, UnicodeString& error) {
+		switch(DatabaseTag.Driver) {
+		case mvceditor::DatabaseTagClass::MYSQL:
+			return ConnectMysql(session, error);
+		case mvceditor::DatabaseTagClass::SQLITE:
+			return ConnectSqlite(session, error);
+		}
+		error = UNICODE_STRING_SIMPLE("bad driver");
+		return false;
+}
+	
+bool mvceditor::SqlQueryClass::ConnectSqlite(soci::session& session, UnicodeString& error) {
+		std::string stdDbName = mvceditor::WxToChar(DatabaseTag.FileName.GetFullPath());
+		bool success = false;
+		try {
+			session.open(*soci::factory_sqlite3(), stdDbName);
+			success = true;
+		} catch (soci::soci_error const& e) {
+			error = mvceditor::CharToIcu(e.what());
+		} catch (std::exception const& e) {
+			error = mvceditor::CharToIcu(e.what());
+		}
+		return success;
+}
+
+bool mvceditor::SqlQueryClass::ConnectMysql(soci::session& session, UnicodeString& error) {
 	bool success = false;
 	UnicodeString host = DatabaseTag.Host;
 	

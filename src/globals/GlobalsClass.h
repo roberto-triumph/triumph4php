@@ -305,6 +305,11 @@ public:
 	// are for the url as picked in the template files panel and NOT
 	// the URL dialog.
 	std::vector<mvceditor::TemplateFileTagClass> CurrentTemplates() const;
+	
+	/**
+	 * @return all of the database tags that are enabled.
+	 */
+	std::vector<mvceditor::DatabaseTagClass> AllEnabledDatabaseTags() const;
 
 };
 

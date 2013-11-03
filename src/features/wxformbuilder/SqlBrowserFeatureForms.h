@@ -14,14 +14,16 @@
 #include <wx/font.h>
 #include <wx/colour.h>
 #include <wx/settings.h>
+#include <wx/choice.h>
 #include <wx/sizer.h>
 #include <wx/grid.h>
 #include <wx/panel.h>
-#include <wx/checklst.h>
 #include <wx/textctrl.h>
 #include <wx/spinctrl.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
+#include <wx/filepicker.h>
+#include <wx/checklst.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -44,8 +46,14 @@ class SqlBrowserPanelGeneratedClass : public wxPanel
 		
 		wxPanel* BottomPanel;
 		wxStaticText* ConnectionLabel;
+		wxChoice* Connections;
+		
 		wxStaticText* ResultsLabel;
 		wxGrid* ResultsGrid;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnConnectionChoice( wxCommandEvent& event ) { event.Skip(); }
+		
 	
 	public:
 		
@@ -55,17 +63,16 @@ class SqlBrowserPanelGeneratedClass : public wxPanel
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class SqlConnectionDialogGeneratedClass
+/// Class MysqlConnectionDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class SqlConnectionDialogGeneratedClass : public wxDialog 
+class MysqlConnectionDialogGeneratedClass : public wxDialog 
 {
 	private:
 	
 	protected:
 		enum
 		{
-			ID_SQLCONNECTIONDIALOGCLASS = 1000,
-			ID_GLOBALCONNECTIONSLABEL,
+			ID_WARNINGLABEL = 1000,
 			ID_NAMELABEL,
 			ID_LABEL,
 			ID_HOSTLABEL,
@@ -78,14 +85,10 @@ class SqlConnectionDialogGeneratedClass : public wxDialog
 			ID_USER,
 			ID_PASSWORDLABEL,
 			ID_PASSWORD,
-			ID_WARNINGLABEL,
 			ID_TESTBUTTON,
-			ID_SQLADDBUTTON,
-			ID_SQLDELETEBUTTON,
 		};
 		
-		wxStaticText* ConnectionsLabel;
-		wxCheckListBox* List;
+		wxStaticText* WarningLabel;
 		wxStaticText* NameLabel;
 		wxTextCtrl* Label;
 		wxStaticText* HostLabel;
@@ -99,30 +102,90 @@ class SqlConnectionDialogGeneratedClass : public wxDialog
 		wxStaticText* PasswordLabel;
 		wxTextCtrl* Password;
 		
-		wxStaticText* WarningLabel;
 		wxButton* TestButton;
-		wxButton* AddButton;
-		wxButton* DeleteButton;
 		wxStdDialogButtonSizer* StdButtonsSizer;
 		wxButton* StdButtonsSizerOK;
 		wxButton* StdButtonsSizerCancel;
 		wxButton* StdButtonsSizerHelp;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnChecklistSelected( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnChecklistToggled( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnLabelText( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnTestButton( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnAddButton( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnDeleteButton( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		MysqlConnectionDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("MySQL Connection"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		~MysqlConnectionDialogGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class SqliteConnectionDialogGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class SqliteConnectionDialogGeneratedClass : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* HelpLabel;
+		wxStaticText* NameLabel;
+		wxTextCtrl* Label;
+		wxStaticText* FileLabel;
+		wxFilePickerCtrl* File;
+		wxStdDialogButtonSizer* ButtonsSizer;
+		wxButton* ButtonsSizerOK;
+		wxButton* ButtonsSizerCancel;
+	
+	public:
+		
+		SqliteConnectionDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("SQLite Connection"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 491,208 ), long style = wxDEFAULT_DIALOG_STYLE );
+		~SqliteConnectionDialogGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class SqlConnectionListDialogGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class SqlConnectionListDialogGeneratedClass : public wxDialog 
+{
+	private:
+	
+	protected:
+		enum
+		{
+			ID_TESTBUTTON = 1000,
+		};
+		
+		wxStaticText* HelpLabel;
+		wxCheckListBox* List;
+		wxButton* AdMysqlButton;
+		wxButton* AddSqliteButton;
+		wxButton* CloneButton;
+		wxButton* TestButton;
+		wxButton* RemoveSelected;
+		wxButton* RemoveAllButton;
+		wxStdDialogButtonSizer* ButtonSizer;
+		wxButton* ButtonSizerOK;
+		wxButton* ButtonSizerCancel;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnListDoubleClick( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCheckToggled( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAddMysqlButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAddSqliteButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCloneButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnTestSelectedButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRemoveSelectedButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRemoveAllButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		SqlConnectionDialogGeneratedClass( wxWindow* parent, wxWindowID id = ID_SQLCONNECTIONDIALOGCLASS, const wxString& title = wxT("SQL Connections"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 667,319 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
-		~SqlConnectionDialogGeneratedClass();
+		SqlConnectionListDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("SQL Connections"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
+		~SqlConnectionListDialogGeneratedClass();
 	
 };
 

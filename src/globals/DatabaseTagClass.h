@@ -30,6 +30,7 @@
  #include <vector>
  #include <wx/longlong.h>
  #include <wx/thread.h>
+ #include <wx/filename.h>
  
  namespace mvceditor {
 
@@ -51,7 +52,8 @@ public:
 	 * The RDBMS systems that both the frameworks and MVC Editor supports.
 	 */
 	enum Drivers {
-		MYSQL
+		MYSQL,
+		SQLITE
 	};
 
 	/**
@@ -82,7 +84,7 @@ public:
 	/**
 	 * The full path to the database (in case of SQLite)
 	 */
-	UnicodeString FileName;
+	wxFileName FileName;
 	
 	/**
 	 * the system that is used.
@@ -346,6 +348,24 @@ class SqlQueryClass {
 	 * Get the number of affected records.
 	 */
 	long long GetAffectedRows(soci::statement& stmt);
+	
+	private:
+
+	/**
+	 * establish a connection to mysql.
+	 * @param session the connection handle
+	 * @param error if connection failed error string will be set here
+	 * @return bool TRUE if connection was successfuly
+	 */
+	bool ConnectMysql(soci::session& session, UnicodeString& error);
+	
+	/**
+	 * establish a connection to sqlite
+	 * @param session the connection handle
+	 * @param error if connection failed error string will be set here
+	 * @return bool TRUE if connection was successfuly
+	 */
+	bool ConnectSqlite(soci::session& session, UnicodeString& error);
 	
 };
 

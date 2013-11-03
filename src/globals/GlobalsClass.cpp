@@ -275,3 +275,14 @@ std::vector<mvceditor::TemplateFileTagClass> mvceditor::GlobalsClass::CurrentTem
 	}
 	return templates;
 }
+
+std::vector<mvceditor::DatabaseTagClass> mvceditor::GlobalsClass::AllEnabledDatabaseTags() const {
+	std::vector<mvceditor::DatabaseTagClass> enabled;
+	std::vector<mvceditor::DatabaseTagClass>::const_iterator tag;
+	for (tag = DatabaseTags.begin(); tag != DatabaseTags.end(); ++tag) {
+		if (tag->IsEnabled) {
+			enabled.push_back(*tag);
+		}
+	}
+	return enabled;
+}

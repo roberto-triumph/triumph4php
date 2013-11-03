@@ -153,6 +153,6 @@ std::vector<UnicodeString> mvceditor::SqlResourceFinderClass::FindColumns(const 
 
 UnicodeString mvceditor::SqlResourceFinderClass::Hash(const mvceditor::DatabaseTagClass& info) {
 	UnicodeString hash = info.Host + UNICODE_STRING_SIMPLE("--") + info.Schema + UNICODE_STRING_SIMPLE("---") +
-		info.FileName;
+		mvceditor::WxToIcu(info.FileName.GetFullPath());
 	return hash;
 }

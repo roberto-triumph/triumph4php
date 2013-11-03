@@ -52,51 +52,110 @@ const wxEventType QUERY_COMPLETE_EVENT = wxNewEventType();
 class SqlBrowserFeatureClass;
 class MultipleSqlExecuteClass;
 
-class SqlConnectionDialogClass : public SqlConnectionDialogGeneratedClass {
+/**
+ * dialog to create / edit an sqlite connection
+ */
+class SqliteConnectionDialogClass : public SqliteConnectionDialogGeneratedClass {
+
+public:
+
+	SqliteConnectionDialogClass(wxWindow* parent, mvceditor::DatabaseTagClass& tag);
+
+};
+
+
+/**
+ * dialog to create / edit / test MySQL connection
+ */
+class MysqlConnectionDialogClass : public MysqlConnectionDialogGeneratedClass {
 
 public:
 
 	/**
 	 * @param wxWindow* the parent window
-	 * @param vector<DatabaseTagClass> will get populated with the values that the user entered. The list can
-	 *        also contain the connections that were detected by the DatabaseDetector 
-	 *        user will NOT be able to edit the detected connections.
+	 * @param DatabaseTagClass& will get populated with the values that the user entered. 
 	 * @param size_t& chosenIndex the info item that the user selected 
 	 */
-	SqlConnectionDialogClass(wxWindow* parent, std::vector<mvceditor::DatabaseTagClass>& dbTags, size_t& chosenIndex,
+	MysqlConnectionDialogClass(wxWindow* parent, mvceditor::DatabaseTagClass& dbTag,
 		mvceditor::RunningThreadsClass& runningThreads);
 	
-	~SqlConnectionDialogClass();
+	~MysqlConnectionDialogClass();
 	
+private:
+	
+	void OnTestButton(wxCommandEvent& event);
+	
+	/**
+	 * cleans up the current query and closes the connection
+	 */
+	void OnCancelButton(wxCommandEvent& event);
+		
+	void ShowTestResults(wxCommandEvent& event);
+	
+	/**
+	 * to execute the test query
+	 */
+	mvceditor::SqlQueryClass TestQuery;
+	
+	/**
+	 * to keep track of the background thread that will
+	 * test the connection
+	 */
+	mvceditor::RunningThreadsClass& RunningThreads;
+	
+	/**
+	 * to kill the test query if needed
+	 */
+	mvceditor::ConnectionIdentifierClass ConnectionIdentifier;
+
+	/**
+	 * to kill the test query thread if needed
+	 */
+	int RunningActionId;
+	
+	DECLARE_EVENT_TABLE()
+};
+
+/**
+ * dialog that shows all connections; user can add / edit / delete them
+ */
+class SqlConnectionListDialogClass : public SqlConnectionListDialogGeneratedClass {
+
+public:
+
+	SqlConnectionListDialogClass(wxWindow* parent, std::vector<mvceditor::DatabaseTagClass>& dbTags, mvceditor::RunningThreadsClass& runningThreads);
+	
+	~SqlConnectionListDialogClass();
+
 private:
 
 	void OnOkButton(wxCommandEvent& event);
 	
 	void OnCancelButton(wxCommandEvent& event);
 	
-	void OnTestButton(wxCommandEvent& event);
-
-	void OnAddButton(wxCommandEvent& event);
-
-	void OnDeleteButton(wxCommandEvent& event);
-
-	void OnLabelText(wxCommandEvent& event);
+	void OnAddMysqlButton(wxCommandEvent& event);
 	
-	void OnChecklistSelected(wxCommandEvent& event);
+	void OnAddSqliteButton(wxCommandEvent& event);
 	
-	void OnChecklistToggled(wxCommandEvent& event);
-
-	void OnHelpButton(wxCommandEvent& event);
-		
+	void OnCloneButton(wxCommandEvent& event);
+	
+	void OnTestSelectedButton(wxCommandEvent& event);
+	
+	void OnRemoveSelectedButton(wxCommandEvent& event);
+	
+	void OnRemoveAllButton(wxCommandEvent& event);
+	
+	void OnCheckToggled(wxCommandEvent& event);
+	
+	void OnListDoubleClick(wxCommandEvent& event);
+	
 	void ShowTestResults(wxCommandEvent& event);
 	
 	/**
-	 * cleans up the current query and closes the connection
+	 * add a tag to the interface and to the backing list
 	 */
-	void Close();
+	void Push(const mvceditor::DatabaseTagClass& tag);
 
-	void UpdateTextInputs();
-	
 	/**
 	 * The info list to modify AFTER the user clicks OK
 	 */
@@ -123,13 +182,11 @@ private:
 	 * to kill the test query if needed
 	 */
 	mvceditor::ConnectionIdentifierClass ConnectionIdentifier;
-
+	
 	/**
 	 * to kill the test query thread if needed
 	 */
 	int RunningActionId;
-	
-	size_t& ChosenIndex;
 	
 	DECLARE_EVENT_TABLE()
 };
@@ -286,6 +343,11 @@ public:
 	 * be used. This method essentially disables the Execute() method.
 	 */
 	void UnlinkFromCodeControl();
+	
+	/**
+	 *  fill the connection list with the configured, enabled connections
+	 */
+	void FillConnectionList();
 
 private:
 	
@@ -306,6 +368,14 @@ private:
 	 * Fill the grid with the a single SQL result
 	 */
 	void Fill(SqlResultClass* results);
+	
+	/**
+	 * when the user makes a change in connection, make sure
+	 * to update the database tag on the code control so that
+	 * auto complete works on the columns/tables of the selected
+	 * connecton
+	 */
+	void OnConnectionChoice(wxCommandEvent& event);
 	
 	/**
 	 * Fill the grid with ALL SQL results
@@ -436,13 +506,6 @@ private:
 	 * Saves the user-created infos using the global config.
 	 */
 	void SavePreferences();
-
-	/**
-	 * index into DatabaseTags vector; the connection that is currently active.
-	 * Any new results panels that are created will use this connection. Any
-	 * existing results panels will keep their original connection.
-	 */
-	size_t ChosenIndex;
 	
 	DECLARE_EVENT_TABLE()
 };

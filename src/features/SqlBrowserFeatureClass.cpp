@@ -27,91 +27,101 @@
 #include <code_control/CodeControlClass.h>
 #include <globals/String.h>
 #include <widgets/UnicodeStringValidatorClass.h>
+#include <widgets/FilePickerValidatorClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 #include <MvcEditor.h>
 #include <wx/artprov.h>
 
 static const int ID_SQL_GAUGE = wxNewId();
-static const int ID_SQL_TEST = wxNewId();
+static const int ID_SQL_EDIT_TEST = wxNewId();
+static const int ID_SQL_LIST_TEST = wxNewId();
 
-mvceditor::SqlConnectionDialogClass::SqlConnectionDialogClass(wxWindow* parent, std::vector<mvceditor::DatabaseTagClass>& dbTags, 
-															  size_t& chosenIndex,
-															  mvceditor::RunningThreadsClass& runningThreads)
-	: SqlConnectionDialogGeneratedClass(parent, wxID_ANY) 
-	, DatabaseTags(dbTags)
-	, EditedDatabaseTags(dbTags)
-	, TestQuery()
-	, RunningThreads(runningThreads)
-	, ConnectionIdentifier()
-	, RunningActionId()
-	, ChosenIndex(chosenIndex) {
-	RunningThreads.AddEventHandler(this);
-	Label->SetValue(wxT(""));
-	Host->SetValue(wxT(""));
-	User->SetValue(wxT(""));
-	Password->SetValue(wxT(""));
-	Database->SetValue(wxT(""));
-	Port->SetValue(0);
-	for (size_t i = 0; i < EditedDatabaseTags.size(); i++) {
-		wxString label = mvceditor::IcuToWx(EditedDatabaseTags[i].Label);
-		if (EditedDatabaseTags[i].IsDetected) {
-			label += _(" <Detected>");
-		}
-		List->Append(label);
-		List->Check(i, EditedDatabaseTags[i].IsEnabled);
-	}
-	UpdateTextInputs();
+mvceditor::SqliteConnectionDialogClass::SqliteConnectionDialogClass(wxWindow* parent, mvceditor::DatabaseTagClass& tag)
+: SqliteConnectionDialogGeneratedClass(parent, wxID_ANY)
+{
+	mvceditor::UnicodeStringValidatorClass labelValidator(&tag.Label, false);
+	Label->SetValidator(labelValidator);
+	Label->SetName(wxT("label"));
+	mvceditor::FilePickerValidatorClass fileValidator(&tag.FileName);
+	File->SetValidator(fileValidator);
+	File->SetName(wxT("file"));
 	TransferDataToWindow();
+	
+	// dont allow editing of detected connections
+	if (tag.IsDetected) {
+		Label->Enable(false);
+		File->Enable(false);
+		wxWindow::FindWindowById(wxID_OK, this)->Enable(false);
+	}
 }
 
-mvceditor::SqlConnectionDialogClass::~SqlConnectionDialogClass() {
+mvceditor::MysqlConnectionDialogClass::MysqlConnectionDialogClass(wxWindow* parent, mvceditor::DatabaseTagClass& tag,
+		mvceditor::RunningThreadsClass& runningThreads)
+: MysqlConnectionDialogGeneratedClass(parent, wxID_ANY)
+, TestQuery()
+, RunningThreads(runningThreads)
+, ConnectionIdentifier()
+, RunningActionId() {
+	RunningThreads.AddEventHandler(this);
+	
+	mvceditor::UnicodeStringValidatorClass labelValidator(&tag.Label, false);
+	Label->SetValidator(labelValidator);
+	Label->SetName(wxT("label"));
+	mvceditor::UnicodeStringValidatorClass hostValidator(&tag.Host, false);
+	Host->SetValidator(hostValidator);
+	Host->SetName(wxT("host"));
+	wxGenericValidator portValidator(&tag.Port);
+	Port->SetValidator(portValidator);
+	mvceditor::UnicodeStringValidatorClass schemaValidator(&tag.Schema, true);
+	Database->SetValidator(schemaValidator);
+	mvceditor::UnicodeStringValidatorClass userValidator(&tag.User, true);
+	User->SetValidator(userValidator);
+	mvceditor::UnicodeStringValidatorClass passwordValidator(&tag.Password, true);
+	Password->SetValidator(passwordValidator);
+	
+	TransferDataToWindow();
+	
+	// dont allow editing of detected connections
+	if (tag.IsDetected) {
+		Label->Enable(false);
+		Host->Enable(false);
+		Port->Enable(false);
+		Database->Enable(false);
+		User->Enable(false);
+		Password->Enable(false);
+		
+		wxWindow::FindWindowById(wxID_OK, this)->Enable(false);
+	}
+}
+
+mvceditor::MysqlConnectionDialogClass::~MysqlConnectionDialogClass() {
 	RunningThreads.RemoveEventHandler(this);
 }
 
-void mvceditor::SqlConnectionDialogClass::UpdateTextInputs() {
-	bool allowEdit = true;
-	if (ChosenIndex < EditedDatabaseTags.size()) {
-		wxString label = mvceditor::IcuToWx(EditedDatabaseTags[ChosenIndex].Label);
-		Label->SetValue(label);
-		Host->SetValue(mvceditor::IcuToWx(EditedDatabaseTags[ChosenIndex].Host));
-		User->SetValue(mvceditor::IcuToWx(EditedDatabaseTags[ChosenIndex].User));
-		Password->SetValue(mvceditor::IcuToWx(EditedDatabaseTags[ChosenIndex].Password));
-		Database->SetValue(mvceditor::IcuToWx(EditedDatabaseTags[ChosenIndex].Schema));
-		Port->SetValue(EditedDatabaseTags[ChosenIndex].Port);
-		List->Select(ChosenIndex);
-		allowEdit = !EditedDatabaseTags[ChosenIndex].IsDetected;
-	}
-	Label->Enable(allowEdit);
-	Host->Enable(allowEdit);
-	User->Enable(allowEdit);
-	Password->Enable(allowEdit);
-	Database->Enable(allowEdit);
-	Port->Enable(allowEdit);
-	DeleteButton->Enable(allowEdit);
-}
+void mvceditor::MysqlConnectionDialogClass::OnTestButton(wxCommandEvent& event) {
+
+	// get the most up-to-date values that the user has input
+
+	TestQuery.DatabaseTag.Driver = mvceditor::DatabaseTagClass::MYSQL;
+	TestQuery.DatabaseTag.Label = mvceditor::WxToIcu(Label->GetValue());
+	TestQuery.DatabaseTag.Host = mvceditor::WxToIcu(Host->GetValue());
+	TestQuery.DatabaseTag.Port = Port->GetValue();
+	TestQuery.DatabaseTag.Schema = mvceditor::WxToIcu(Database->GetValue());
+	TestQuery.DatabaseTag.User = mvceditor::WxToIcu(User->GetValue());
+	TestQuery.DatabaseTag.Password = mvceditor::WxToIcu(Password->GetValue());
 	
-void mvceditor::SqlConnectionDialogClass::OnOkButton(wxCommandEvent& event) {
-	if (Validate() && TransferDataFromWindow()) {
-
-		// save the old values
-		if (ChosenIndex < EditedDatabaseTags.size()) {
-			EditedDatabaseTags[ChosenIndex].Label = mvceditor::WxToIcu(Label->GetValue());
-			EditedDatabaseTags[ChosenIndex].Host = mvceditor::WxToIcu(Host->GetValue());
-			EditedDatabaseTags[ChosenIndex].User = mvceditor::WxToIcu(User->GetValue());
-			EditedDatabaseTags[ChosenIndex].Password = mvceditor::WxToIcu(Password->GetValue());
-			EditedDatabaseTags[ChosenIndex].Schema = mvceditor::WxToIcu(Database->GetValue());
-			EditedDatabaseTags[ChosenIndex].Port = Port->GetValue();
-		}
-
-		ChosenIndex = List->GetSelection();
-		DatabaseTags.resize(EditedDatabaseTags.size());
-		std::copy(EditedDatabaseTags.begin(), EditedDatabaseTags.end(), DatabaseTags.begin());
-		EndModal(wxOK);
-	}
+	wxWindow::FindWindowById(wxID_OK, this)->Enable(false);
+	wxWindow::FindWindowById(ID_TESTBUTTON, this)->Enable(false);
+	
+	mvceditor::MultipleSqlExecuteClass* thread = new mvceditor::MultipleSqlExecuteClass(RunningThreads, ID_SQL_EDIT_TEST, ConnectionIdentifier);
+	thread->Init(UNICODE_STRING_SIMPLE("SELECT 1"), TestQuery);
+	RunningThreads.Queue(thread);
 }
 
-void mvceditor::SqlConnectionDialogClass::OnCancelButton(wxCommandEvent& event) {
+void mvceditor::MysqlConnectionDialogClass::OnCancelButton(wxCommandEvent& event) {
+	
+	// in case the test query is stuck, send a kill command to mysql
 	soci::session session;
 	UnicodeString error;
 	if (TestQuery.Connect(session, error)) {
@@ -122,123 +132,21 @@ void mvceditor::SqlConnectionDialogClass::OnCancelButton(wxCommandEvent& event) 
 	event.Skip();
 }
 
-void mvceditor::SqlConnectionDialogClass::OnTestButton(wxCommandEvent& event) {
-	if (TransferDataFromWindow()) {
-		size_t index = List->GetSelection();
-		if (index < EditedDatabaseTags.size()) {
-
-			// get the most up-to-date values that the user has input
-			EditedDatabaseTags[index].Schema = mvceditor::WxToIcu(Database->GetValue());
-			EditedDatabaseTags[index].Host = mvceditor::WxToIcu(Host->GetValue());
-			EditedDatabaseTags[index].Port = Port->GetValue();
-			EditedDatabaseTags[index].User = mvceditor::WxToIcu(User->GetValue());
-			EditedDatabaseTags[index].Password = mvceditor::WxToIcu(Password->GetValue());
-			
-			TestQuery.DatabaseTag.Copy(EditedDatabaseTags[index]);
-
-			mvceditor::MultipleSqlExecuteClass* thread = new mvceditor::MultipleSqlExecuteClass(RunningThreads, ID_SQL_TEST, ConnectionIdentifier);
-			thread->Init(UNICODE_STRING_SIMPLE("SELECT 1"), TestQuery);
-			RunningThreads.Queue(thread);
-		}
-	}
-}
-
-void mvceditor::SqlConnectionDialogClass::OnAddButton(wxCommandEvent& event) {
-
-	// save the old values
-	if (ChosenIndex < EditedDatabaseTags.size()) {
-		EditedDatabaseTags[ChosenIndex].Label = mvceditor::WxToIcu(Label->GetValue());
-		EditedDatabaseTags[ChosenIndex].Host = mvceditor::WxToIcu(Host->GetValue());
-		EditedDatabaseTags[ChosenIndex].User = mvceditor::WxToIcu(User->GetValue());
-		EditedDatabaseTags[ChosenIndex].Password = mvceditor::WxToIcu(Password->GetValue());
-		EditedDatabaseTags[ChosenIndex].Schema = mvceditor::WxToIcu(Database->GetValue());
-		EditedDatabaseTags[ChosenIndex].Port = Port->GetValue();
-	}
-
-	// add the new item to the info list and the list control
-	mvceditor::DatabaseTagClass newDatabaseTag;
-	newDatabaseTag.Label = UNICODE_STRING_SIMPLE("Untitled");
-	newDatabaseTag.IsDetected = false;
-	EditedDatabaseTags.push_back(newDatabaseTag);
-	List->Append(wxT("Untitled"));
-	ChosenIndex = List->GetCount() - 1;
-	List->SetSelection(List->GetCount() - 1);
-	List->Check(List->GetCount() - 1, newDatabaseTag.IsEnabled);
-
-	// put the newly "blank" values in the textboxes
-	UpdateTextInputs();
-	Label->SetFocus();
-}
-
-void mvceditor::SqlConnectionDialogClass::OnDeleteButton(wxCommandEvent& event) {
-	int selection = List->GetSelection();
-
-	// dont allow the user to delete a detected connection
-	if (selection >= 0 && (size_t)selection < EditedDatabaseTags.size() && !EditedDatabaseTags[selection].IsDetected) {
-		List->Delete(selection);
-		if ((size_t)selection < EditedDatabaseTags.size()) {
-			EditedDatabaseTags.erase(EditedDatabaseTags.begin() + selection);
-		}
-		if ((size_t)selection < List->GetCount()) {
-			List->SetSelection(selection);
-			ChosenIndex = selection;
-		}
-		else {
-			List->SetSelection(List->GetCount() - 1);
-			ChosenIndex = List->GetCount() - 1;
-		}
-		UpdateTextInputs();
-		wxString label = mvceditor::IcuToWx(EditedDatabaseTags[ChosenIndex].Label);
-		if (EditedDatabaseTags[ChosenIndex].IsDetected) {
-			label += _(" <Detected>");
-		}
-		List->SetStringSelection(label);
-	}
-}
-
-void mvceditor::SqlConnectionDialogClass::OnLabelText(wxCommandEvent& event) {
-	
-	// update list box with the label that is being typed in
-	int selection = List->GetSelection();
-	if (selection >= 0 && (size_t)selection < List->GetCount()) {
-		List->SetString(selection, Label->GetValue());
-		
-		// on linux, setting the string causes the checkbox to not
-		// be drawn and it makes it look like the project is
-		// disabled
-		List->Check(selection, EditedDatabaseTags[selection].IsEnabled);	
-	}
-}
-
-void mvceditor::SqlConnectionDialogClass::OnHelpButton(wxCommandEvent& event) {
-	wxString help = wxString::FromAscii(
-		"The SQL Connections dialog shows you the list of database connections that were detected or created. "
-		"Any database connection listed here will be used by MVC Editor; MVC Editor will read the SQL meta data and use it "
-		"for code completion in the SQL query editor and the PHP editor.\n"
-		"MVC Editor can also detect CodeIgniter credentials and automatically populate connection credentials "
-		"from application/config/database.php. If you modify database.php you will need to reopen MVC Editor in order for the new "
-		"connection info to be populated.\n"
-		"If a connection is unchecked, it is considered as disabled and will NOT be used for code completion, but you "
-		"can still make queries to it via the SQL browser.\n"
-	);
-	help = wxGetTranslation(help);
-	wxMessageBox(help, _("SQL Connection Help"), wxOK, this);
-}
-
-void mvceditor::SqlConnectionDialogClass::ShowTestResults(wxCommandEvent& event) {
+void mvceditor::MysqlConnectionDialogClass::ShowTestResults(wxCommandEvent& event) {
 	mvceditor::SqlResultClass* result = (mvceditor::SqlResultClass*)event.GetClientData();
 	wxString error = mvceditor::IcuToWx(result->Error);
 	bool success = result->Success;
 	
-	wxString msg = _("Connection to %s@%s was successful");
-	msg = wxString::Format(msg, 
-		mvceditor::IcuToWx(TestQuery.DatabaseTag.User).c_str(), 
-		mvceditor::IcuToWx(TestQuery.DatabaseTag.Host).c_str());
+	wxString creds = mvceditor::IcuToWx(TestQuery.DatabaseTag.User + 
+			UNICODE_STRING_SIMPLE("@") +
+			TestQuery.DatabaseTag.Host);
+	
+	wxString msg = _("Connection to %s was successful");
+	msg = wxString::Format(msg, creds.c_str());
 	if (!success) {
-		msg = _("Connection to %s@%s failed: %s");
+		msg = _("Connection to %s failed: %s");
 		msg = wxString::Format(msg, 
-		mvceditor::IcuToWx(TestQuery.DatabaseTag.User).c_str(), 
-		mvceditor::IcuToWx(TestQuery.DatabaseTag.Host).c_str(), 
+		creds, 
 		error.c_str());
 	}
 	wxMessageBox(msg);
@@ -247,43 +155,220 @@ void mvceditor::SqlConnectionDialogClass::ShowTestResults(wxCommandEvent& event)
 	delete result;
 }
 
-void mvceditor::SqlConnectionDialogClass::OnChecklistSelected(wxCommandEvent& event) {
-	
-	// save the old values
-	if (ChosenIndex < EditedDatabaseTags.size() && !EditedDatabaseTags[ChosenIndex].IsDetected) {
-		EditedDatabaseTags[ChosenIndex].Label = mvceditor::WxToIcu(Label->GetValue());
-		EditedDatabaseTags[ChosenIndex].Host = mvceditor::WxToIcu(Host->GetValue());
-		EditedDatabaseTags[ChosenIndex].User = mvceditor::WxToIcu(User->GetValue());
-		EditedDatabaseTags[ChosenIndex].Password = mvceditor::WxToIcu(Password->GetValue());
-		EditedDatabaseTags[ChosenIndex].Schema = mvceditor::WxToIcu(Database->GetValue());
-		EditedDatabaseTags[ChosenIndex].Port = Port->GetValue();
-	}
 
-	// put the newly chosen values in the textboxes
-	ChosenIndex = event.GetInt();
-	
-	UpdateTextInputs();
-	
-	if (ChosenIndex >= 0 && ChosenIndex < List->GetCount()) {
-		wxString label = mvceditor::IcuToWx(EditedDatabaseTags[ChosenIndex].Label);
-		if (EditedDatabaseTags[ChosenIndex].IsDetected) {
-			label += _(" <Detected>");
-		}
-		List->SetString(ChosenIndex, label);
-	
-		// on linux, setting the string causes the checkbox to not
-		// be drawn and it makes it look like the project is
-		// disabled
-		List->Check(ChosenIndex, EditedDatabaseTags[ChosenIndex].IsEnabled);
+mvceditor::SqlConnectionListDialogClass::SqlConnectionListDialogClass(wxWindow* parent, std::vector<mvceditor::DatabaseTagClass>& dbTags, 
+															  mvceditor::RunningThreadsClass& runningThreads)
+	: SqlConnectionListDialogGeneratedClass(parent, wxID_ANY) 
+	, DatabaseTags(dbTags)
+	, EditedDatabaseTags()
+	, TestQuery()
+	, RunningThreads(runningThreads)
+	, ConnectionIdentifier()
+	, RunningActionId() {
+	RunningThreads.AddEventHandler(this);
+	for (size_t i = 0; i < dbTags.size(); i++) {
+		Push(dbTags[i]);
+	}
+	TransferDataToWindow();
+}
+
+mvceditor::SqlConnectionListDialogClass::~SqlConnectionListDialogClass() {
+	RunningThreads.RemoveEventHandler(this);
+}
+
+void mvceditor::SqlConnectionListDialogClass::OnAddMysqlButton(wxCommandEvent& event) {
+	mvceditor::DatabaseTagClass newTag;
+	newTag.Driver = mvceditor::DatabaseTagClass::MYSQL;
+	mvceditor::MysqlConnectionDialogClass mysqlDialog(this, newTag, RunningThreads);
+	if (mysqlDialog.ShowModal() == wxID_OK) {
+		Push(newTag);
 	}
 }
 
-void mvceditor::SqlConnectionDialogClass::OnChecklistToggled(wxCommandEvent& event) {
-	size_t sel = event.GetSelection();
-	if (sel >= 0 && sel < EditedDatabaseTags.size()) {
-		EditedDatabaseTags[sel].IsEnabled = List->IsChecked(sel);
+void mvceditor::SqlConnectionListDialogClass::OnAddSqliteButton(wxCommandEvent& event) {
+	mvceditor::DatabaseTagClass newTag;
+	newTag.Driver = mvceditor::DatabaseTagClass::SQLITE;
+	mvceditor::SqliteConnectionDialogClass sqliteDialog(this, newTag);
+	if (sqliteDialog.ShowModal() == wxID_OK) {
+		Push(newTag);
 	}
+}
+
+void mvceditor::SqlConnectionListDialogClass::OnCloneButton(wxCommandEvent& event) {
+	wxArrayInt toCloneIndexes;
+	if (List->GetSelections(toCloneIndexes)) {
+		for (size_t i = 0; i < toCloneIndexes.GetCount(); ++i) {
+			size_t indexToClone = toCloneIndexes[i];
+			
+			mvceditor::DatabaseTagClass clonedTag;
+			clonedTag.Copy(EditedDatabaseTags[indexToClone]);
+			
+			// clone == the user created it
+			clonedTag.IsDetected = false;
+			
+			// add a postfix to the clone label
+			clonedTag.Label = clonedTag.Label + UNICODE_STRING_SIMPLE(" clone");
+			Push(clonedTag);
+		}
+	}
+}
+
+void mvceditor::SqlConnectionListDialogClass::OnRemoveSelectedButton(wxCommandEvent& event) {
+	wxArrayInt toRemoveIndexes;
+	if (List->GetSelections(toRemoveIndexes)) {
+		std::vector<mvceditor::DatabaseTagClass> remaining;
+		for (size_t i = 0; i < EditedDatabaseTags.size(); ++i) {
+			
+			// dont allow the user to delete a detected connection
+			if (toRemoveIndexes.Index(i) == wxNOT_FOUND || EditedDatabaseTags[i].IsDetected) {
+				remaining.push_back(EditedDatabaseTags[i]);
+			}
+		}
+		
+		EditedDatabaseTags.clear();
+		List->Clear();
+		
+		for (size_t i = 0; i < remaining.size(); ++i) {
+			Push(remaining[i]);
+		}
+	}
+}
+
+void mvceditor::SqlConnectionListDialogClass::OnRemoveAllButton(wxCommandEvent& event) {
+	
+	// remove from the backing list
+	// but don't allow the user to delete a detected connection
+	std::vector<mvceditor::DatabaseTagClass> newList;
+	std::vector<mvceditor::DatabaseTagClass>::iterator tag;
+	for (tag = EditedDatabaseTags.begin(); tag != EditedDatabaseTags.end(); ++tag) {
+		if (tag->IsDetected) {
+			newList.push_back(*tag);
+		}
+	}
+	
+	// delete all tags from the list
+	EditedDatabaseTags.clear();
+	List->Clear();
+	
+	// add the tags that we didn't delete
+	for (tag = newList.begin(); tag != newList.end(); ++tag) {
+		Push(*tag);
+	}
+}
+
+void mvceditor::SqlConnectionListDialogClass::OnCheckToggled(wxCommandEvent& event) {
+	size_t sel = event.GetInt();
+	bool b = List->IsChecked(sel);
+	if (sel >= 0 && sel < EditedDatabaseTags.size()) {
+		EditedDatabaseTags[sel].IsEnabled = b;
+	}
+}
+
+void mvceditor::SqlConnectionListDialogClass::OnListDoubleClick(wxCommandEvent& event) {
+	size_t sel = (size_t)event.GetSelection();
+	if (sel >= 0 && sel < EditedDatabaseTags.size()) {
+		mvceditor::DatabaseTagClass editTag = EditedDatabaseTags[sel];
+		int res = 0;
+		if (mvceditor::DatabaseTagClass::MYSQL == editTag.Driver) {
+			mvceditor::MysqlConnectionDialogClass dialog(this, editTag, RunningThreads);
+			res = dialog.ShowModal();
+		}
+		else if (mvceditor::DatabaseTagClass::SQLITE == editTag.Driver) {
+			mvceditor::SqliteConnectionDialogClass dialog(this, editTag);
+			res = dialog.ShowModal();
+		}
+		if (wxID_OK == res) {
+			EditedDatabaseTags[sel] = editTag;
+			
+			// update the list label
+			List->SetString(sel, mvceditor::IcuToWx(editTag.Label));
+		}
+	}
+	
+}
+
+void mvceditor::SqlConnectionListDialogClass::Push(const mvceditor::DatabaseTagClass& newTag) {
+	wxString label = mvceditor::IcuToWx(newTag.Label);
+	if (newTag.IsDetected) {
+		label += _(" <Detected>");
+	}
+	EditedDatabaseTags.push_back(newTag);
+		
+	List->Append(label);
+	List->Check(List->GetCount() - 1, newTag.IsEnabled);
+}
+	
+void mvceditor::SqlConnectionListDialogClass::OnOkButton(wxCommandEvent& event) {
+	if (Validate() && TransferDataFromWindow()) {
+		DatabaseTags.clear();
+		DatabaseTags.resize(EditedDatabaseTags.size());
+		std::copy(EditedDatabaseTags.begin(), EditedDatabaseTags.end(), DatabaseTags.begin());
+		EndModal(wxOK);
+	}
+}
+
+void mvceditor::SqlConnectionListDialogClass::OnCancelButton(wxCommandEvent& event) {
+	soci::session session;
+	UnicodeString error;
+	if (TestQuery.Connect(session, error)) {
+		TestQuery.KillConnection(session, ConnectionIdentifier, error);
+	}
+	RunningThreads.CancelAction(RunningActionId);
+	RunningActionId = 0;
 	event.Skip();
+}
+
+void mvceditor::SqlConnectionListDialogClass::OnTestSelectedButton(wxCommandEvent& event) {
+	wxArrayInt toTestIndexes;
+	if (List->GetSelections(toTestIndexes) > 1) {
+		wxMessageBox(_("Select a single connection to test"), _("Error"), wxOK | wxCENTRE, this);
+		return;
+	}
+	if (toTestIndexes.IsEmpty()) {
+		return;
+	}
+	size_t index = (size_t)toTestIndexes[0];
+	if (index < EditedDatabaseTags.size()) {
+		wxWindow::FindWindowById(wxID_OK, this)->Enable(false);
+		wxWindow::FindWindowById(ID_TESTBUTTON, this)->Enable(false);
+	
+
+		// get the most up-to-date values that the user has input
+		TestQuery.DatabaseTag.Copy(EditedDatabaseTags[index]);
+
+		mvceditor::MultipleSqlExecuteClass* thread = new mvceditor::MultipleSqlExecuteClass(RunningThreads, ID_SQL_LIST_TEST, ConnectionIdentifier);
+		thread->Init(UNICODE_STRING_SIMPLE("SELECT 1"), TestQuery);
+		RunningThreads.Queue(thread);
+	}
+}
+
+void mvceditor::SqlConnectionListDialogClass::ShowTestResults(wxCommandEvent& event) {
+	mvceditor::SqlResultClass* result = (mvceditor::SqlResultClass*)event.GetClientData();
+	wxString error = mvceditor::IcuToWx(result->Error);
+	bool success = result->Success;
+	
+	wxString creds;
+	if (TestQuery.DatabaseTag.FileName.IsOk()) {
+		creds = TestQuery.DatabaseTag.FileName.GetFullPath();
+	}
+	else {
+		creds = mvceditor::IcuToWx(TestQuery.DatabaseTag.User + 
+			UNICODE_STRING_SIMPLE("@") +
+			TestQuery.DatabaseTag.Host);
+	}
+	wxString msg = _("Connection to %s was successful");
+	msg = wxString::Format(msg, 
+		creds.c_str());
+	if (!success) {
+		msg = _("Connection to %s failed: %s");
+		msg = wxString::Format(msg, 
+		creds, 
+		error.c_str());
+	}
+	wxMessageBox(msg, _("Test"), wxOK | wxCENTRE, this);
+	wxWindow::FindWindowById(wxID_OK, this)->Enable();
+	wxWindow::FindWindowById(ID_TESTBUTTON, this)->Enable();
+	delete result;
 }
 
 mvceditor::MultipleSqlExecuteClass::MultipleSqlExecuteClass(mvceditor::RunningThreadsClass& runningThreads, int queryId,
@@ -373,6 +458,7 @@ mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id,
 	ResultsGrid->ClearGrid();
 	UpdateLabels(wxT(""));
 	Feature->App.RunningThreads.AddEventHandler(this);
+	FillConnectionList();
 }
 
 mvceditor::SqlBrowserPanelClass::~SqlBrowserPanelClass() {
@@ -380,10 +466,22 @@ mvceditor::SqlBrowserPanelClass::~SqlBrowserPanelClass() {
 }
 
 bool mvceditor::SqlBrowserPanelClass::Check() {
-	bool ret = 	CodeControl && Validate() && TransferDataFromWindow();
+	bool ret = CodeControl && Validate() && TransferDataFromWindow();
 	if (ret) {
 		LastQuery = CodeControl->GetSafeText();
 		ret = !LastQuery.isEmpty();
+	}
+	if (ret) {
+		
+		// make sure a connection has been chosen
+		size_t sel = (size_t)Connections->GetSelection();
+		std::vector<mvceditor::DatabaseTagClass> dbTags = Feature->App.Globals.AllEnabledDatabaseTags();
+		if (sel >= 0 && sel < dbTags.size()) {
+			Query.DatabaseTag.Copy(dbTags[sel]);
+		}
+		else {
+			ret = false;
+		}
 	}
 	return ret;
 }
@@ -402,10 +500,13 @@ void mvceditor::SqlBrowserPanelClass::Execute() {
 		}
 	}
 	else if (LastQuery.isEmpty()) {
-		wxMessageBox(_("Please enter a query into the code control."));
+		wxMessageBox(_("Please enter a query into the code control."), _("Error"), wxOK | wxCENTRE, this);
+	}
+	else if (Connections->IsEmpty()) {
+		wxMessageBox(_("Please create a database connection."), _("Error"), wxOK | wxCENTRE, this);
 	}
 	else {
-		wxMessageBox(_("Please wait until the current queries completes."));
+		wxMessageBox(_("Please wait until the current queries completes."), _("Error"), wxOK | wxCENTRE, this);
 	}
 }
 
@@ -573,34 +674,6 @@ void mvceditor::SqlBrowserPanelClass::Fill(mvceditor::SqlResultClass* results) {
 }
 
 void mvceditor::SqlBrowserPanelClass::UpdateLabels(const wxString& result) {
-	if (!Query.DatabaseTag.Host.isEmpty()) {
-		wxString driver;
-		if (Query.DatabaseTag.Driver == mvceditor::DatabaseTagClass::MYSQL) {
-			driver = _("mysql");
-		}
-		if (Query.DatabaseTag.Port) {
-			ConnectionLabel->SetLabel(wxString::Format(
-				wxT("%s:host=%s:%d user=%s dbname=%s"),
-				driver.c_str(),
-				mvceditor::IcuToWx(Query.DatabaseTag.Host).c_str(),
-				Query.DatabaseTag.Port,
-				mvceditor::IcuToWx(Query.DatabaseTag.User).c_str(),
-				mvceditor::IcuToWx(Query.DatabaseTag.Schema).c_str()
-			));
-		}
-		else {
-			ConnectionLabel->SetLabel(wxString::Format(
-				wxT("%s:host=%s user=%s dbname=%s"),
-				driver.c_str(),
-				mvceditor::IcuToWx(Query.DatabaseTag.Host).c_str(),
-				mvceditor::IcuToWx(Query.DatabaseTag.User).c_str(),
-				mvceditor::IcuToWx(Query.DatabaseTag.Schema).c_str()
-			));
-		}
-	}
-	else {
-		ConnectionLabel->SetLabel(_("No Connection is not configured."));
-	}
 	ResultsLabel->SetLabel(result);
 	ResultsLabel->GetContainingSizer()->Layout();
 }
@@ -651,16 +724,36 @@ void mvceditor::SqlBrowserPanelClass::UnlinkFromCodeControl() {
 	CodeControl = NULL;
 }
 
+void mvceditor::SqlBrowserPanelClass::FillConnectionList() {
+	std::vector<mvceditor::DatabaseTagClass>::const_iterator tag;
+	Connections->Clear();
+	std::vector<mvceditor::DatabaseTagClass> dbTags = Feature->App.Globals.AllEnabledDatabaseTags();
+	for (tag = dbTags.begin(); tag != dbTags.end(); ++tag) {
+		Connections->Append(mvceditor::IcuToWx(tag->Label));
+	}
+	this->Layout();
+	if (!Connections->IsEmpty()) {
+		Connections->SetSelection(0);
+		SetCurrentInfo(dbTags[0]);
+	}
+}
+
+void mvceditor::SqlBrowserPanelClass::OnConnectionChoice(wxCommandEvent& event) {
+	size_t sel = (size_t)event.GetSelection();
+	std::vector<mvceditor::DatabaseTagClass> dbTags = Feature->App.Globals.AllEnabledDatabaseTags();
+	if (sel >= 0 && sel < dbTags.size()) {
+		SetCurrentInfo(dbTags[sel]);
+	}
+}
+
 mvceditor::SqlBrowserFeatureClass::SqlBrowserFeatureClass(mvceditor::AppClass& app) 
-	: FeatureClass(app)
-	, ChosenIndex(0) {
+	: FeatureClass(app) {
 }
 
 mvceditor::SqlBrowserFeatureClass::~SqlBrowserFeatureClass() {
 }
 
 void mvceditor::SqlBrowserFeatureClass::DetectMetadata() {
-	ChosenIndex = 0;
 
 	// thread will be owned by SequenceClass
 	mvceditor::SqlMetaDataActionClass* thread = new mvceditor::SqlMetaDataActionClass(App.SqliteRunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA);
@@ -704,11 +797,6 @@ void  mvceditor::SqlBrowserFeatureClass::OnSqlBrowserToolsMenu(wxCommandEvent& e
 
 mvceditor::SqlBrowserPanelClass* mvceditor::SqlBrowserFeatureClass::CreateResultsPanel(mvceditor::CodeControlClass* codeControl) {
 	mvceditor::SqlQueryClass query;
-	if (ChosenIndex < App.Globals.DatabaseTags.size()) {
-		query.DatabaseTag.Copy(App.Globals.DatabaseTags[ChosenIndex]);
-		codeControl->SetCurrentDbTag(App.Globals.DatabaseTags[ChosenIndex]);
-	}
-	
 	mvceditor::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxNewId(), GetStatusBarWithGauge(), 
 		query, this);
 	mvceditor::NotebookClass* codeNotebook = GetNotebook();
@@ -761,7 +849,7 @@ void mvceditor::SqlBrowserFeatureClass::OnSqlConnectionMenu(wxCommandEvent& even
 	// first time a new project is created; its database may not exist).
 	// before, a user would not be able to edit the connection info once it was detected
 	// in order to make it less confusing about where the connection info comes from.
-	mvceditor::SqlConnectionDialogClass dialog(GetMainWindow(), App.Globals.DatabaseTags, ChosenIndex, App.RunningThreads);
+	mvceditor::SqlConnectionListDialogClass dialog(GetMainWindow(), App.Globals.DatabaseTags, App.RunningThreads);
 	if (dialog.ShowModal() == wxOK) {
 		
 		// if chosen connection changed need to update the code control so that it knows to use the new
@@ -776,10 +864,7 @@ void mvceditor::SqlBrowserFeatureClass::OnSqlConnectionMenu(wxCommandEvent& even
 			// methods
 			if (window->GetName() == wxT("mvceditor::SqlBrowserPanelClass")) {
 				mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)window;
-				if (ChosenIndex < App.Globals.DatabaseTags.size()) {
-					panel->SetCurrentInfo(App.Globals.DatabaseTags[ChosenIndex]);
-				}
-				panel->UpdateLabels(wxT(""));
+				panel->FillConnectionList();
 			}
 		}
 		SavePreferences();
@@ -900,7 +985,7 @@ void mvceditor::SqlBrowserFeatureClass::LoadPreferences(wxConfigBase* config) {
 				mvceditor::DatabaseTagClass info;
 				info.Schema = mvceditor::WxToIcu(config->Read(groupName + wxT("/DatabaseName")));
 				wxString driverString = config->Read(groupName + wxT("/Driver"));
-				info.FileName = mvceditor::WxToIcu(config->Read(groupName + wxT("/FileName")));
+				info.FileName.Assign(config->Read(groupName + wxT("/FileName")));
 				info.Host = mvceditor::WxToIcu(config->Read(groupName + wxT("/Host")));
 				info.IsDetected = false;
 				info.Label = mvceditor::WxToIcu(config->Read(groupName + wxT("/Label")));
@@ -913,6 +998,10 @@ void mvceditor::SqlBrowserFeatureClass::LoadPreferences(wxConfigBase* config) {
 					info.Driver = mvceditor::DatabaseTagClass::MYSQL;
 					App.Globals.DatabaseTags.push_back(info);
 				}
+				else if (driverString.CmpNoCase(wxT("SQLITE")) == 0) {
+					info.Driver = mvceditor::DatabaseTagClass::SQLITE;
+					App.Globals.DatabaseTags.push_back(info);
+				}
 			}
 		} while (config->GetNextGroup(groupName, index));
 	}
@@ -920,18 +1009,22 @@ void mvceditor::SqlBrowserFeatureClass::LoadPreferences(wxConfigBase* config) {
 
 void mvceditor::SqlBrowserFeatureClass::SavePreferences() {
 	wxConfigBase* config = wxConfig::Get();
-	wxString groupName;
-	long index = 0;
 
 	// delete any previous connections that are in the config
-	if (config->GetFirstGroup(groupName, index)) {
-		do {
-			if (groupName.Find(wxT("DatabaseInfo_")) == 0) {
-				config->DeleteGroup(groupName);
-			}
-		} while (config->GetNextGroup(groupName, index));
+	wxString key;
+	long index = 0;
+	bool next = config->GetFirstGroup(key, index);
+	std::vector<wxString> keysToDelete;
+	while (next) {
+		if (key.Find(wxT("DatabaseInfo_")) == 0) {
+			keysToDelete.push_back(key);
+		}
+		next = config->GetNextGroup(key, index);
 	}
-
+	for (size_t i = 0; i < keysToDelete.size(); ++i) {
+		config->DeleteGroup(keysToDelete[i]);
+	}
+	
 	// now save all of the new ones
 	int saveIndex = 0;
 	for (size_t i = 0; i < App.Globals.DatabaseTags.size(); ++i) {
@@ -942,8 +1035,11 @@ void mvceditor::SqlBrowserFeatureClass::SavePreferences() {
 			if (mvceditor::DatabaseTagClass::MYSQL == App.Globals.DatabaseTags[i].Driver) {
 				driverString = wxT("MYSQL");
 			}
+			else if (mvceditor::DatabaseTagClass::SQLITE == App.Globals.DatabaseTags[i].Driver) {
+				driverString = wxT("SQLITE");
+			}
 			config->Write(wxT("Driver"), driverString);
-			config->Write(wxT("FileName"), mvceditor::IcuToWx(App.Globals.DatabaseTags[i].FileName));
+			config->Write(wxT("FileName"), App.Globals.DatabaseTags[i].FileName.GetFullPath());
 			config->Write(wxT("Host"), mvceditor::IcuToWx(App.Globals.DatabaseTags[i].Host));
 			config->Write(wxT("Label"), mvceditor::IcuToWx(App.Globals.DatabaseTags[i].Label));
 			config->Write(wxT("Password"), mvceditor::IcuToWx(App.Globals.DatabaseTags[i].Password));
@@ -977,6 +1073,10 @@ BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPanelClass, SqlBrowserPanelGeneratedClass
 	EVT_ACTION_COMPLETE(wxID_ANY, mvceditor::SqlBrowserPanelClass::OnActionComplete)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(mvceditor::SqlConnectionDialogClass, SqlConnectionDialogGeneratedClass)
-	EVT_COMMAND(ID_SQL_TEST, QUERY_COMPLETE_EVENT, mvceditor::SqlConnectionDialogClass::ShowTestResults)
+BEGIN_EVENT_TABLE(mvceditor::SqlConnectionListDialogClass, SqlConnectionListDialogGeneratedClass)
+	EVT_COMMAND(ID_SQL_LIST_TEST, QUERY_COMPLETE_EVENT, mvceditor::SqlConnectionListDialogClass::ShowTestResults)
+END_EVENT_TABLE()
+
+BEGIN_EVENT_TABLE(mvceditor::MysqlConnectionDialogClass, MysqlConnectionDialogGeneratedClass)
+	EVT_COMMAND(ID_SQL_EDIT_TEST, QUERY_COMPLETE_EVENT, mvceditor::MysqlConnectionDialogClass::ShowTestResults)
 END_EVENT_TABLE()
