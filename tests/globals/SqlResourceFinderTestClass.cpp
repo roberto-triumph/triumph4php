@@ -35,14 +35,19 @@
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <string>
 
-class MysqlResourceFinderFixtureClass : public DatabaseTestFixtureClass {
+class MysqlResourceFinderFixtureClass : public DatabaseTestFixtureClass,
+	public SqliteTestFixtureClass {
 
 public:
 
 	MysqlResourceFinderFixtureClass() 
 		: DatabaseTestFixtureClass("sql_resource_finder") 
+		, SqliteTestFixtureClass()
 		, DatabaseTag()
+		, Fetcher(SqliteTestFixtureClass::Session)
 		, Finder() {
+		soci::session& s = SqliteTestFixtureClass::Session;
+		Finder.InitSession(&s);
 		DatabaseTag.Driver = mvceditor::DatabaseTagClass::MYSQL;
 		DatabaseTag.Schema = UNICODE_STRING_SIMPLE("sql_resource_finder");
 
@@ -53,6 +58,8 @@ public:
 	}
 	
 	mvceditor::DatabaseTagClass DatabaseTag;
+	
+	mvceditor::SqlResourceFetchClass Fetcher;
 	
 	mvceditor::SqlResourceFinderClass Finder;
 };
@@ -65,44 +72,59 @@ public:
 		: FileTestFixtureClass("sql_resource_finder") 
 		, SqliteTestFixtureClass()
 		, DatabaseTag()
+		, Fetcher(Session)
 		, Finder() 
-		, SqliteFile() {
+		, SqliteFile() 
+		, TestSession() {
+		
+		Finder.InitSession(&Session);
 		
 		// create a sqlite db file
 		TouchTestDir();
 		SqliteFile.Assign(TestProjectDir, wxT("sqlite.db"));
-		Session.close();
-		Session.open(*soci::factory_sqlite3(), 
+		TestSession.open(*soci::factory_sqlite3(), 
 			mvceditor::WxToChar(SqliteFile.GetFullPath())
 		);
 					
 		DatabaseTag.Driver = mvceditor::DatabaseTagClass::SQLITE;
 		DatabaseTag.FileName = SqliteFile;
-		
+	}
+	
+	bool ExecIntoTest(const std::string& sql) {
+		try {
+			TestSession.once << sql;
+			return true;
+		} catch (std::exception& e) {
+			printf("exception=%s\n", e.what());
+		}
+		return false;
 	}
 	
 	mvceditor::DatabaseTagClass DatabaseTag;
 	
+	mvceditor::SqlResourceFetchClass Fetcher;
+	
 	mvceditor::SqlResourceFinderClass Finder;
 	
 	wxFileName SqliteFile;
+	
+	// the db file we will inspect 
+	soci::session TestSession;
 };
  
 SUITE(SqlResourceFinderTestClass) {
 	 
-TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindTable) {
-	DatabaseTag.Schema = UNICODE_STRING_SIMPLE("sql_resource_finder");
-	
+TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindTable) {	
 	std::string query = "CREATE TABLE web_users(idUser int);";
-	CHECK(Exec(query));
+	CHECK(DatabaseTestFixtureClass::Exec(query));
 	query = "CREATE TABLE service_names(idServiceName int);";
-	CHECK(Exec(query));
+	CHECK(DatabaseTestFixtureClass::Exec(query));
 	query = "CREATE TABLE service_locations(idServiceLocation int);";
-	CHECK(Exec(query));
+	CHECK(DatabaseTestFixtureClass::Exec(query));
 	query = "CREATE TABLE deleted_users(idUser int, deletedDate datetime);";
-	CHECK(Exec(query));
+	CHECK(DatabaseTestFixtureClass::Exec(query));
 	UnicodeString error;
-	CHECK(Finder.Fetch(DatabaseTag, error));
+	CHECK(Fetcher.Fetch(DatabaseTag, error));
 	std::vector<UnicodeString> tables = Finder.FindTables(DatabaseTag, UNICODE_STRING_SIMPLE("service"));
 	CHECK_VECTOR_SIZE(2, tables);
 	CHECK_UNISTR_EQUALS_NO_CASE("service_locations", tables[0]);
@@ -111,23 +133,20 @@ TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindTable) {
 
 TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindTableCaseInsensitive) {
 	std::string query = "SHOW VARIABLES WHERE Variable_name='version_compile_os' AND Value IN('Win64', 'Win32');";
-	if (Exec(query)) {
+	if (DatabaseTestFixtureClass::Exec(query)) {
 		//skip this test on windows, MySQL always creates tables with lowercase names
 		return;
 	}
-
-	DatabaseTag.Schema = UNICODE_STRING_SIMPLE("sql_resource_finder");
-	
 	query = "CREATE TABLE WebUsers(idUser int);";
-	CHECK(Exec(query));
+	CHECK(DatabaseTestFixtureClass::Exec(query));
 	query = "CREATE TABLE ServiceNames(idServiceName int);";
-	CHECK(Exec(query));
+	CHECK(DatabaseTestFixtureClass::Exec(query));
 	query = "CREATE TABLE ServiceLocations(idServiceLocation int);";
-	CHECK(Exec(query));
+	CHECK(DatabaseTestFixtureClass::Exec(query));
 	query = "CREATE TABLE Deleted_Users(idUser int, deletedDate datetime);";
-	CHECK(Exec(query));
+	CHECK(DatabaseTestFixtureClass::Exec(query));
 	UnicodeString error;
-	CHECK(Finder.Fetch(DatabaseTag, error));
+	CHECK(Fetcher.Fetch(DatabaseTag, error));
 	std::vector<UnicodeString> tables = Finder.FindTables(DatabaseTag, UNICODE_STRING_SIMPLE("service"));
 	CHECK_VECTOR_SIZE(2, tables);
 
@@ -135,10 +154,9 @@ TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindTableCaseInsensitive) {
 	CHECK_UNISTR_EQUALS("ServiceNames", tables[1]);
 }
 
-TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindTableShouldLocateDatabaseTagrmationSchema) {
-	DatabaseTag.Schema = UNICODE_STRING_SIMPLE("sql_resource_finder");
+TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindTableShouldLocateInformationSchema) {
 	UnicodeString error;
-	CHECK(Finder.Fetch(DatabaseTag, error));
+	CHECK(Fetcher.Fetch(DatabaseTag, error));
 	std::vector<UnicodeString> tables = Finder.FindTables(DatabaseTag, UNICODE_STRING_SIMPLE("information_sche"));
 	CHECK_VECTOR_SIZE(1, tables);
 	CHECK_UNISTR_EQUALS_NO_CASE("information_schema", tables[0]);
@@ -150,18 +168,16 @@ TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindTableShouldLocateDatabaseTagrm
 }
 
 TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindColumns) {	
-	DatabaseTag.Schema = UNICODE_STRING_SIMPLE("sql_resource_finder");
-	
 	std::string query = "CREATE TABLE web_users(idIUser int);";
-	CHECK(Exec(query));
+	CHECK(DatabaseTestFixtureClass::Exec(query));
 	query = "CREATE TABLE service_names(idIServiceName int);";
-	CHECK(Exec(query));
+	CHECK(DatabaseTestFixtureClass::Exec(query));
 	query = "CREATE TABLE service_locations(idIServiceLocation int);";
-	CHECK(Exec(query));
+	CHECK(DatabaseTestFixtureClass::Exec(query));
 	query = "CREATE TABLE deleted_users(idIUser int, idIDeletedBy int);";
-	CHECK(Exec(query));
+	CHECK(DatabaseTestFixtureClass::Exec(query));
 	UnicodeString error;
-	CHECK(Finder.Fetch(DatabaseTag, error));
+	CHECK(Fetcher.Fetch(DatabaseTag, error));
 	
 	std::vector<UnicodeString> columns = Finder.FindColumns(DatabaseTag, UNICODE_STRING_SIMPLE("idIServiceL"));
 	CHECK_VECTOR_SIZE(1, columns);
@@ -178,18 +194,16 @@ TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindColumns) {
 }
 
 TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindColumnsCaseInsensitive) {
-	DatabaseTag.Schema = UNICODE_STRING_SIMPLE("sql_resource_finder");
-	
 	std::string query = "CREATE TABLE web_users(idIUser int);";
-	CHECK(Exec(query));
+	CHECK(DatabaseTestFixtureClass::Exec(query));
 	query = "CREATE TABLE service_names(idIServiceName int);";
-	CHECK(Exec(query));
+	CHECK(DatabaseTestFixtureClass::Exec(query));
 	query = "CREATE TABLE service_locations(idIServiceLocation int);";
-	CHECK(Exec(query));
+	CHECK(DatabaseTestFixtureClass::Exec(query));
 	query = "CREATE TABLE deleted_users(idIUser int, idIDeletedBy int);";
-	CHECK(Exec(query));
+	CHECK(DatabaseTestFixtureClass::Exec(query));
 	UnicodeString error;
-	CHECK(Finder.Fetch(DatabaseTag, error));
+	CHECK(Fetcher.Fetch(DatabaseTag, error));
 	
 	std::vector<UnicodeString> columns = Finder.FindColumns(DatabaseTag, UNICODE_STRING_SIMPLE("idiservice"));
 	CHECK_VECTOR_SIZE(2, columns);
@@ -199,9 +213,8 @@ TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindColumnsCaseInsensitive) {
 }
 
 TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindDatabaseTagrmationSchemaColumns) {
-	DatabaseTag.Schema = UNICODE_STRING_SIMPLE("sql_resource_finder");
 	UnicodeString error;
-	CHECK(Finder.Fetch(DatabaseTag, error));
+	CHECK(Fetcher.Fetch(DatabaseTag, error));
 	std::vector<UnicodeString> columns = Finder.FindColumns(DatabaseTag, UNICODE_STRING_SIMPLE("table_nam"));
 	CHECK_VECTOR_SIZE(1, columns);
 	CHECK_UNISTR_EQUALS_NO_CASE("table_name", columns[0]);
@@ -209,15 +222,15 @@ TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindDatabaseTagrmationSchemaColumn
 
 TEST_FIXTURE(SqliteResourceFinderFixtureClass, FindTable) {
 	std::string query = "CREATE TABLE web_users(idUser int);";
-	CHECK(Exec(query));
+	CHECK(ExecIntoTest(query));
 	query = "CREATE TABLE service_names(idServiceName int);";
-	CHECK(Exec(query));
+	CHECK(ExecIntoTest(query));
 	query = "CREATE TABLE service_locations(idServiceLocation int);";
-	CHECK(Exec(query));
+	CHECK(ExecIntoTest(query));
 	query = "CREATE TABLE deleted_users(idUser int, deletedDate datetime);";
-	CHECK(Exec(query));
+	CHECK(ExecIntoTest(query));
 	UnicodeString error;
-	CHECK(Finder.Fetch(DatabaseTag, error));
+	CHECK(Fetcher.Fetch(DatabaseTag, error));
 	std::vector<UnicodeString> tables = Finder.FindTables(DatabaseTag, UNICODE_STRING_SIMPLE("service"));
 	CHECK_VECTOR_SIZE(2, tables);
 	CHECK_UNISTR_EQUALS_NO_CASE("service_locations", tables[0]);
@@ -226,15 +239,15 @@ TEST_FIXTURE(SqliteResourceFinderFixtureClass, FindTable) {
 
 TEST_FIXTURE(SqliteResourceFinderFixtureClass, FindColumns) {
 	std::string query = "CREATE TABLE web_users(idIUser int);";
-	CHECK(Exec(query));
+	CHECK(ExecIntoTest(query));
 	query = "CREATE TABLE service_names(idIServiceName int);";
-	CHECK(Exec(query));
+	CHECK(ExecIntoTest(query));
 	query = "CREATE TABLE service_locations(idIServiceLocation int);";
-	CHECK(Exec(query));
+	CHECK(ExecIntoTest(query));
 	query = "CREATE TABLE deleted_users(idIUser int, idIDeletedBy int);";
-	CHECK(Exec(query));
+	CHECK(ExecIntoTest(query));
 	UnicodeString error;
-	CHECK(Finder.Fetch(DatabaseTag, error));
+	CHECK(Fetcher.Fetch(DatabaseTag, error));
 	
 	std::vector<UnicodeString> columns = Finder.FindColumns(DatabaseTag, UNICODE_STRING_SIMPLE("idIServiceL"));
 	CHECK_VECTOR_SIZE(1, columns);

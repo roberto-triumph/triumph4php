@@ -42,17 +42,11 @@ class SqlMetaDataEventClass : public wxEvent {
 public:
 
 	/**
-	 * The new resources that were found
-	 */
-	SqlResourceFinderClass NewResources;
-
-	/**
 	 * Get any connection errors that occurred in the background thread.
 	 */
 	std::vector<UnicodeString> Errors;
 	
-	SqlMetaDataEventClass(int eventId, const mvceditor::SqlResourceFinderClass& resources, 
-		const std::vector<UnicodeString>& errors);
+	SqlMetaDataEventClass(int eventId, const std::vector<UnicodeString>& errors);
 
 	wxEvent* Clone() const;
 
@@ -94,6 +88,24 @@ private:
 	 * The connections to query; where the tables / columns will be fetched from 
 	 */
 	std::vector<DatabaseTagClass> DatabaseTags;
+	
+	/**
+	 * location where sql table names will be stored
+	 */
+	wxFileName CacheDbFileName;
+};
+
+class SqlMetaDataInitActionClass : public mvceditor::InitializerGlobalActionClass {
+	
+public:
+
+	SqlMetaDataInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	
+	void Work(mvceditor::GlobalsClass& globals);
+	
+protected:
+	
+	wxString GetLabel() const;
 };
 
 }

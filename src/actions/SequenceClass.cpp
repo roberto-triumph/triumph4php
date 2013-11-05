@@ -94,8 +94,8 @@ bool mvceditor::SequenceClass::AppStart() {
 	// tag searching is available immediately after the app starts
 	AddStep(new mvceditor::ProjectTagInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_INIT));
 	
-	// this will discover the db schema info (tables, columns)
-	AddStep(new mvceditor::SqlMetaDataActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA));
+	// this will load the discovered the db schema info (tables, columns)
+	AddStep(new mvceditor::SqlMetaDataInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA));
 
 	Run();
 	return true;
@@ -174,7 +174,6 @@ bool mvceditor::SequenceClass::TagCacheWipeAndIndex() {
 	// this can go here because it does not need the tag cache to be up-to-date
 	AddStep(new mvceditor::DatabaseTagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR));
 
-
 	// this will recurse though all directories and parse the source code
 	AddStep(new mvceditor::ProjectTagActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST));
 
@@ -183,6 +182,9 @@ bool mvceditor::SequenceClass::TagCacheWipeAndIndex() {
 
 	// this will discover any new detected tags 
 	AddStep(new mvceditor::TagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_DETECTOR));
+	
+	// this will discover the db schema info (tables, columns)
+	AddStep(new mvceditor::SqlMetaDataActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA));
 
 	Run();
 	return true;
@@ -242,7 +244,7 @@ void mvceditor::SequenceClass::OnActionComplete(mvceditor::ActionEventClass& eve
 	// if there are more steps to run, start the next one
 	IsRunning = !Steps.empty();
 	if (IsRunning) {
-		RunNextStep();	
+		RunNextStep();
 	}
 	else {
 		wxCommandEvent sequenceEvent(mvceditor::EVENT_SEQUENCE_COMPLETE);

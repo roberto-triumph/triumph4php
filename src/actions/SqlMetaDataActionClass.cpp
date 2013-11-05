@@ -24,30 +24,53 @@
  */
 #include <actions/SqlMetaDataActionClass.h>
 #include <globals/Errors.h>
+#include <soci/soci.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 
 const wxEventType mvceditor::EVENT_SQL_META_DATA_COMPLETE = wxNewEventType();
 
-mvceditor::SqlMetaDataEventClass::SqlMetaDataEventClass(int eventId, const mvceditor::SqlResourceFinderClass& newResources,
+mvceditor::SqlMetaDataEventClass::SqlMetaDataEventClass(int eventId,
 														const std::vector<UnicodeString>& errors) 
 	: wxEvent(eventId, mvceditor::EVENT_SQL_META_DATA_COMPLETE)
-	, NewResources(newResources)
 	, Errors(errors) {
 }
 
 wxEvent* mvceditor::SqlMetaDataEventClass::Clone() const {
 	mvceditor::SqlMetaDataEventClass* evt = new 
-		mvceditor::SqlMetaDataEventClass(GetId(), NewResources, Errors);
+		mvceditor::SqlMetaDataEventClass(GetId(), Errors);
 	return evt;
 }
 
+mvceditor::SqlMetaDataInitActionClass::SqlMetaDataInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+: InitializerGlobalActionClass(runningThreads, eventId) {
+		
+}
+
+void mvceditor::SqlMetaDataInitActionClass::Work(mvceditor::GlobalsClass& globals) {
+	
+	// prime the sql resource finder
+	globals.ResourceCacheSession.open(
+		*soci::factory_sqlite3(),
+		mvceditor::WxToChar(globals.TagCacheDbFileName.GetFullPath())
+	);
+	globals.SqlResourceFinder.InitSession(&globals.ResourceCacheSession);
+}
+
+wxString mvceditor::SqlMetaDataInitActionClass::GetLabel() const {
+	return wxT("SQL Metadata Init");
+}
+
+
 mvceditor::SqlMetaDataActionClass::SqlMetaDataActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
 	: GlobalActionClass(runningThreads, eventId)
-	, DatabaseTags() {
+	, DatabaseTags() 
+	, CacheDbFileName() {
 		
 }
 
 bool mvceditor::SqlMetaDataActionClass::Init(mvceditor::GlobalsClass& globals) {
 	SetStatus(_("SQL Meta"));
+	
 	DatabaseTags = globals.DatabaseTags;
 	
 	// this will prime the sql connections from the php detectors
@@ -83,19 +106,26 @@ bool mvceditor::SqlMetaDataActionClass::Init(mvceditor::GlobalsClass& globals) {
 		}
 	}
 	
+	// clone of filename, for thread safety
+	CacheDbFileName.Assign(globals.TagCacheDbFileName.GetFullPath());
+	
 	return !DatabaseTags.empty();
 }
 
 void mvceditor::SqlMetaDataActionClass::BackgroundWork() {
 	std::vector<UnicodeString> errors;
-	mvceditor::SqlResourceFinderClass newResources;
+	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(CacheDbFileName.GetFullPath()));
+	mvceditor::SqlResourceFetchClass fetcher(session);
+	
+	// TODO: don't wipe every time; keep across restarts
+	fetcher.Wipe();
 	for (std::vector<mvceditor::DatabaseTagClass>::iterator it = DatabaseTags.begin(); it != DatabaseTags.end(); ++it) {
 		if (!IsCancelled()) {
 			if (it->IsEnabled) {
 				wxString wxLabel = _("SQL Meta / ") ; //mvceditor::IcuToWx(it->Label);
 				SetStatus(wxLabel);
 				UnicodeString error;
-				if (!newResources.Fetch(*it, error)) {
+				if (!fetcher.Fetch(*it, error)) {
 					errors.push_back(it->Label + UNICODE_STRING_SIMPLE(": ") + error);
 				}
 			}
@@ -107,7 +137,7 @@ void mvceditor::SqlMetaDataActionClass::BackgroundWork() {
 	if (!IsCancelled()) {
 
 		// PostEvent() will set the correct event Id
-		mvceditor::SqlMetaDataEventClass evt(wxID_ANY, newResources, errors);
+		mvceditor::SqlMetaDataEventClass evt(wxID_ANY, errors);
 		PostEvent(evt);
 	}
 }

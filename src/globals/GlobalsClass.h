@@ -142,6 +142,12 @@ public:
 	 * @return the full path to the tag database that stores detected tags for all defined projects
 	 */
 	wxFileName DetectorCacheDbFileName;
+	
+	/**
+	 * the opened connection to the resources tags db
+	 * @var session
+	 */
+	soci::session ResourceCacheSession;
 
 	/**
 	 * the opened connection to the detector tags db

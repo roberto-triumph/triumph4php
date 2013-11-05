@@ -319,8 +319,7 @@ void mvceditor::AppClass::SavePreferences(const wxFileName& settingsDir, bool ch
 		Preferences.SetSettingsDir(settingsDir);
 
 		// close the connections to the tag cache files
-		Globals.TagCache.Clear();
-		Globals.DetectorCacheSession.close();
+		Globals.Close();
 
 		// read the config; it now point to the newly chosen dir
 		Globals.TagCacheDbFileName = mvceditor::TagCacheAsset();

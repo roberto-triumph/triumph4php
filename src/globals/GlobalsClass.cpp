@@ -41,12 +41,15 @@ mvceditor::GlobalsClass::GlobalsClass()
 	, MiscFileExtensionsString(wxT("*.js;*.html;*.yml;*.xml;*.txt"))
 	, TagCacheDbFileName(mvceditor::TagCacheAsset())
 	, DetectorCacheDbFileName(mvceditor::DetectorCacheAsset()) 
+	, ResourceCacheSession()
 	, DetectorCacheSession() {
 }
 
 void mvceditor::GlobalsClass::Close() {
 	TagCache.Clear();
 	UrlTagFinder.ClearSession();
+	SqlResourceFinder.ClearSession();
+	ResourceCacheSession.close();
 	DetectorCacheSession.close();
 }
 

@@ -227,6 +227,38 @@ CREATE TABLE IF NOT EXISTS trait_resources (
 );
 
 --
+-- This table will store any table names that we
+-- detect from the configured database connections
+--
+CREATE TABLE IF NOT EXISTS db_tables (
+
+	table_id INTEGER PRIMARY KEY,
+	
+	-- this is the name of the connection that was used to extract the
+	-- tables from
+	-- storing it as case-insensitive because we always want to do case-insensitive lookups
+	connection_label TEXT NOT NULL COLLATE NOCASE,
+	
+	-- storing it as case-insensitive because we always want to do case-insensitive lookups
+	table_name TEXT NOT NULL COLLATE NOCASE
+);
+
+--
+-- This table will store any column names that we
+-- detect from the configured database connections
+--
+CREATE TABLE IF NOT EXISTS db_columns (
+
+	-- this is the name of the connection that was used to extract the
+	-- tables from
+	-- storing it as case-insensitive because we always want to do case-insensitive lookups
+	connection_label TEXT NOT NULL COLLATE NOCASE,
+
+	-- storing it as case-insensitive because we always want to do case-insensitive lookups
+	column_name TEXT NOT NULL COLLATE NOCASE
+);
+
+--
 -- MVC Editor will check the version number in this table and compare it against the
 -- version the code expects.  MVC Editor will recreate the database if the
 -- versions do not match
@@ -257,7 +289,7 @@ CREATE INDEX IF NOT EXISTS idxTraitKey ON trait_resources(key);
 --
 -- This number must match the version in CacheDbVersionActionClass.cpp
 --
-INSERT INTO schema_version (version_number) VALUES(6);
+INSERT INTO schema_version (version_number) VALUES(7);
 
 --
 -- Write ahead logging to allow for concurrent reads and writes

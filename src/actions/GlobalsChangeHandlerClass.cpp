@@ -34,7 +34,6 @@ mvceditor::GlobalsChangeHandlerClass::GlobalsChangeHandlerClass(mvceditor::Globa
 }
 
 void mvceditor::GlobalsChangeHandlerClass::OnSqlMetaDataComplete(mvceditor::SqlMetaDataEventClass& event) {
-	Globals.SqlResourceFinder.Copy(event.NewResources);
 	std::vector<UnicodeString> errors = event.Errors;
 	for (size_t i = 0; i < errors.size(); ++i) {
 		wxString wxError = mvceditor::IcuToWx(errors[i]);

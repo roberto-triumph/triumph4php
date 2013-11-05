@@ -27,6 +27,8 @@
 #include <MvcEditorChecks.h>
 #include <ActionTestFixtureClass.h>
 #include <DatabaseTestFixtureClass.h>
+#include <SqliteTestFixtureClass.h>
+#include <FileTestFixtureClass.h>
 #include <actions/SqlMetaDataActionClass.h>
 #include <globals/Assets.h>
 #include <soci/soci.h>
@@ -34,7 +36,8 @@
 
 static int ID_SQL_METADATA_FETCH = wxNewId();
 
-class SqlMetaDataActionTestFixtureClass : public ActionTestFixtureClass, public DatabaseTestFixtureClass {
+class SqlMetaDataActionTestFixtureClass : public ActionTestFixtureClass, 
+	public DatabaseTestFixtureClass, public SqliteTestFixtureClass, public FileTestFixtureClass {
 
 public:
 
@@ -44,6 +47,8 @@ public:
 	SqlMetaDataActionTestFixtureClass()
 		: ActionTestFixtureClass()
 		, DatabaseTestFixtureClass("metadata_fetch") 
+		, SqliteTestFixtureClass() 
+		, FileTestFixtureClass(wxT("metadata_fetch"))
 		, SqlMetaDataAction(RunningThreads, ID_SQL_METADATA_FETCH) 
 		, Results() {
 		mvceditor::DatabaseTagClass dbTag;
@@ -53,18 +58,21 @@ public:
 		dbTag.Host = UNICODE_STRING_SIMPLE("127.0.0.1");
 		dbTag.User = mvceditor::CharToIcu(UserName().c_str());
 		dbTag.Password = mvceditor::CharToIcu(Password().c_str());
-
 		Globals.DatabaseTags.push_back(dbTag);
 
+		TouchTestDir();
+		InitTagCache(TestProjectDir);
+		Globals.ResourceCacheSession.open(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
+		SqliteTestFixtureClass::CreateDatabase(Globals.ResourceCacheSession, mvceditor::ResourceSqlSchemaAsset());
+		Results.InitSession(&Globals.ResourceCacheSession);
 		CreateTable();
 	}
 
 	void CreateTable() {
-		CHECK(Exec("CREATE TABLE my_users (id INT, name VARCHAR(255) NOT NULL);"));
+		CHECK(DatabaseTestFixtureClass::Exec("CREATE TABLE my_users (id INT, name VARCHAR(255) NOT NULL);"));
 	}
 
 	void OnSqlMetaDataComplete(mvceditor::SqlMetaDataEventClass& event) {
-		Results.Copy(event.NewResources);
 	}
 
 	DECLARE_EVENT_TABLE()

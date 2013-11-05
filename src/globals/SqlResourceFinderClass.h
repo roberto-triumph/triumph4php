@@ -33,52 +33,18 @@
 namespace mvceditor {
 
 /**
- * Case-sensitive string comparator for use as STL Predicate
- */
-class SqlResourceFinderUnicodeStringComparatorClass {
-public:
-	bool operator()(const UnicodeString& str1, const UnicodeString& str2) const {
-		return (str1.compare(str2) < (int8_t)0) ? true : false;
-	}
-};
-
-class SqlResourceClass {
-
-	public:
-	
-	/**
-	 * a lowercased version useful for sorting and searching. Searches
-	 * will be made against this value.
-	 */
-	UnicodeString Key;
-	
-	/**
-	 * The name of the resource. This is the name that will be returned
-	 * to the callers.
-	 */
-	UnicodeString Name;
-	
-	SqlResourceClass(const UnicodeString& name);
-	
-	
-	bool operator<(const SqlResourceClass& other) const;
-	
-	bool operator==(const SqlResourceClass& other) const;
-	
-};
-
-class SqlResourceFinderClass {
+ * class that will open a connection to a database, get all of the tables
+ * and columns, and store them in the mvc editor resources schema.
+ */	
+class SqlResourceFetchClass {
 	
 public:
 
-	SqlResourceFinderClass();
-
 	/**
-	 * copy the internal resources from src into this object.
-	 *
-	 * @param src the object to copy from.
+	 *  @param soci::session the session that holds the connection
+	 *         to the mvc editor tag cache
 	 */
-	void Copy(const SqlResourceFinderClass& src);
+	SqlResourceFetchClass(soci::session& session);
 	
 	/**
 	 * Connects to the given database and queries the table meta data
@@ -90,30 +56,11 @@ public:
 	bool Fetch(const DatabaseTagClass& info, UnicodeString& error);
 	
 	/**
-	 * @param info the connection to search in. only tables from this connection will be returned
-	 * @param partialTableName table name to search for
-	 * @return vector<UnicodeString> all table names that start with the partial table name
-	 * returned table names will be sorted in ascending order
+	 * delete all stored tables/column info
 	 */
-	std::vector<UnicodeString> FindTables(const DatabaseTagClass& info, const UnicodeString& partialTableName);
+	bool Wipe();
 	
-	/**
-	 * Searches ALL columns of ALL tables.
-	 * @param info the connection to search in. only tables from this connection will be returned
-	 * @param partialColumnName column name to search for
-	 * @return vector<UnicodeString> all table names that start with the partial table name
-	 * will return empty vector when table name is empty
-	 * returned column names will be sorted in ascending order
-	 */
-	std::vector<UnicodeString> FindColumns(const DatabaseTagClass& info, const UnicodeString& partialColumnName);
-	
-	private:
-
-	/**
-	 * turn the info into a string that way we can link tables to a connection and we don't 
-	 * have to keep a pointer to the info around.
-	 */
-	UnicodeString Hash(const DatabaseTagClass& info);
+private:
 	
 	/**
 	 * Connects to the given mysql database and queries the table meta data
@@ -133,24 +80,137 @@ public:
 	 */
 	bool FetchSqlite(const DatabaseTagClass& info, UnicodeString& error);
 	
-	/**
-	 * To make the queries
-	 */
-	SqlQueryClass Query;
+	bool StoreTables(const std::string& hash, const std::vector<std::string>& tables);
+	
+	bool StoreColumns(const std::string& hash, const std::vector<std::string>& columns);
 	
 	/**
-	 * To keep the tables linked to a specific connection
-	 * key will be the info hash, value will be the list of table for that info
+	 * connection where to store the fetched tables/columns
 	 */
-	std::map<UnicodeString, std::vector<SqlResourceClass>, SqlResourceFinderUnicodeStringComparatorClass> Tables;
+	soci::session& Session;
+};
+
+/**
+ * Performs a prefix lookup on table names 
+ */
+class SqlResourceTableResultClass : public mvceditor::SqliteResultClass {
+public:
+
+	/**
+	 * The matched table name
+	 */
+	std::string TableName;
 	
 	/**
-	 * To keep the columns linked to a specific connection AND table
-	 * key will be info hash + table name, value will be the list
-	 * of columns for that table
-	 * comparator is needed for MSW compiler
+	 * The name of the connection that the table was found in
 	 */
-	std::map<UnicodeString, std::vector<SqlResourceClass>, SqlResourceFinderUnicodeStringComparatorClass> Columns;
+	std::string Connection;
+	
+	SqlResourceTableResultClass();
+		
+	/**
+	 * set the (partial) name to lookup
+	 */
+	void SetLookup(const wxString& lookup, const std::string& connectionHash);
+		
+	/**
+	 * prepares and runs the query
+	 */
+	bool Prepare(soci::session& session, bool doLimit);
+
+	/**
+	 * get the next result. the result can be read from the
+	 * TableName, Connection members
+	 */
+	void Next();
+	
+private:
+
+	/**
+	 * adopts the statement and binds the statement result to
+	 * the class members
+	 */
+	bool Init(soci::statement* stmt);
+	
+	std::string Lookup;
+	
+	std::string LookupEnd;
+	
+	std::string ConnectionHash;
+};
+
+/**
+ * Performs a prefix lookup on column names 
+ */
+class SqlResourceColumnResultClass : public mvceditor::SqliteResultClass {
+public:
+	
+	/**
+	 * The matched column name
+	 */
+	std::string ColumnName;
+		
+	SqlResourceColumnResultClass();
+	
+	/**
+	 * set the (partial) name to lookup
+	 */
+	void SetLookup(const wxString& lookup, const std::string& connectionHash);
+		
+	/**
+	 * prepares and runs the query
+	 */
+	bool Prepare(soci::session& session, bool doLimit);
+
+	/**
+	 * get the next result. the result can be read from the
+	 * ColumnName member
+	 */
+	void Next();
+
+private:
+
+	/**
+	 * adopts the statement and binds the statement result to
+	 * the class members
+	 */
+	bool Init(soci::statement* stmt);
+	
+	std::string Lookup;
+	
+	std::string LookupEnd;
+	
+	std::string ConnectionHash;
+};
+
+/**
+ * This class is used to make read-only queries to the 
+ * resources sqlite db to get all of the sql metadata
+ * for the database connections that the user configured
+ */
+class SqlResourceFinderClass : public mvceditor::SqliteFinderClass {
+	
+public:
+
+	SqlResourceFinderClass();
+	
+	/**
+	 * @param info the connection to search in. only tables from this connection will be returned
+	 * @param partialTableName table name to search for
+	 * @return vector<UnicodeString> all table names that start with the partial table name
+	 * returned table names will be sorted in ascending order
+	 */
+	std::vector<UnicodeString> FindTables(const DatabaseTagClass& info, const UnicodeString& partialTableName);
+	
+	/**
+	 * Searches ALL columns of ALL tables.
+	 * @param info the connection to search in. only tables from this connection will be returned
+	 * @param partialColumnName column name to search for
+	 * @return vector<UnicodeString> all table names that start with the partial table name
+	 * will return empty vector when table name is empty
+	 * returned column names will be sorted in ascending order
+	 */
+	std::vector<UnicodeString> FindColumns(const DatabaseTagClass& info, const UnicodeString& partialColumnName);
 	
 };
 	 
