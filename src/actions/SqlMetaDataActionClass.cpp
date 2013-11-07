@@ -117,7 +117,6 @@ void mvceditor::SqlMetaDataActionClass::BackgroundWork() {
 	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(CacheDbFileName.GetFullPath()));
 	mvceditor::SqlResourceFetchClass fetcher(session);
 	
-	// TODO: don't wipe every time; keep across restarts
 	fetcher.Wipe();
 	for (std::vector<mvceditor::DatabaseTagClass>::iterator it = DatabaseTags.begin(); it != DatabaseTags.end(); ++it) {
 		if (!IsCancelled()) {
