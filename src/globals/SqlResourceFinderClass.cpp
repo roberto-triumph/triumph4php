@@ -143,7 +143,6 @@ bool mvceditor::SqlResourceFetchClass::FetchSqlite(const DatabaseTagClass& info,
 		std::vector<std::string> columns;
 		
 		try {
-			std::string tableName;
 
 			// populate information_schema tables we want SQL code completion to work for the 
 			// information_schema tables / columns
