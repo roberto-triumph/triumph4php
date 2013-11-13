@@ -206,6 +206,17 @@ void mvceditor::MainFrameClass::FileOpenPosition(const wxString& fullPath, int s
 		codeControl->SetSelectionAndEnsureVisible(startingPos, startingPos + length);
 	}
 }
+
+void mvceditor::MainFrameClass::FileOpenLine(const wxString& fullPath, int lineNumber) {
+	Notebook->LoadPage(fullPath);
+	CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
+	if (codeControl) {
+		
+		// scintilla line numbers are 1 based, ours are 1 based coz they come
+		// from the user
+		codeControl->GotoLine(lineNumber - 1);
+	}
+}
 	
 void mvceditor::MainFrameClass::OnFileClose(wxCommandEvent& event) {
 	Notebook->CloseCurrentPage();
@@ -942,7 +953,12 @@ mvceditor::AppEventListenerForFrameClass::AppEventListenerForFrameClass(mvcedito
 }
 
 void mvceditor::AppEventListenerForFrameClass::OnCmdFileOpen(mvceditor::OpenFileCommandEventClass& event) {
-	MainFrame->FileOpenPosition(event.FullPath, event.StartingPos, event.Length);
+	if (event.LineNumber > 0) {
+		MainFrame->FileOpenLine(event.FullPath, event.LineNumber);
+	}
+	else {
+		MainFrame->FileOpenPosition(event.FullPath, event.StartingPos, event.Length);
+	}
 }
 
 void mvceditor::AppEventListenerForFrameClass::OnPreferencesSaved(wxCommandEvent& event) {

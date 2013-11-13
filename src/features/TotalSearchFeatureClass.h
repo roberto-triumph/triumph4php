@@ -53,7 +53,7 @@ private:
 
 	void OnTotalSearch(wxCommandEvent& event);
 	
-	void OpenFileTag(const mvceditor::FileTagClass& fileTag);
+	void OpenFileTag(const mvceditor::FileTagClass& fileTag, int lineNumber);
 	
 	void OpenPhpTag(const mvceditor::TagClass& tag);
 	
@@ -75,7 +75,7 @@ class TotalSearchDialogClass : public TotalSearchDialogGeneratedClass {
 public:
 
 	TotalSearchDialogClass(wxWindow* parent, mvceditor::TotalSearchFeatureClass& feature,
-		std::vector<mvceditor::TotalTagResultClass>& selectedTags);
+		std::vector<mvceditor::TotalTagResultClass>& selectedTags, int& lineNumber);
 
 private:
 	
@@ -124,6 +124,11 @@ private:
 	 * The tags that were selected by the user
 	 */
 	std::vector<mvceditor::TotalTagResultClass>& SelectedTags;
+	
+	/**
+	 * the line number to jump to (given by the user)
+	 */
+	int& LineNumber;
 	
 	enum Images {
 		PHP_CLASS,

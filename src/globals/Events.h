@@ -181,6 +181,7 @@ public:
 	
 	/**
 	 * position to focus on and start highlighting, -1 to not highlight anything
+	 * * This number is 0-based
 	 */
 	int StartingPos;
 	
@@ -189,8 +190,14 @@ public:
 	 */
 	int Length;
 	
+	/**
+	 * line number to seek to after the file is opened, -1 to not jump to a file
+	 * This number is 1-based
+	 */
+	int LineNumber;
 	
-	OpenFileCommandEventClass(const wxString& fullPath, int startingPos = -1, int length = -1);
+	
+	OpenFileCommandEventClass(const wxString& fullPath, int startingPos = -1, int length = -1, int lineNumber = -1);
 	
 	wxEvent* Clone() const;
 	

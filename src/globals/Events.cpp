@@ -89,16 +89,18 @@ wxEvent* mvceditor::RenameEventClass::Clone() const {
 	return new mvceditor::RenameEventClass(GetEventType(), OldPath.GetFullPath(), OldPath.GetFullPath());
 }
 
-mvceditor::OpenFileCommandEventClass::OpenFileCommandEventClass(const wxString& fullPath, int startingPos, int length)
+mvceditor::OpenFileCommandEventClass::OpenFileCommandEventClass(const wxString& fullPath, int startingPos, 
+	int length, int lineNumber)
 : wxEvent(wxID_ANY, mvceditor::EVENT_CMD_FILE_OPEN) 
 , FullPath(fullPath.c_str())
 , StartingPos(startingPos)
-, Length(length) {
+, Length(length) 
+, LineNumber(lineNumber) {
 	
 }
 
 wxEvent* mvceditor::OpenFileCommandEventClass::Clone() const {
-	return new mvceditor::OpenFileCommandEventClass(FullPath, StartingPos, Length);
+	return new mvceditor::OpenFileCommandEventClass(FullPath, StartingPos, Length, LineNumber);
 }
 
 

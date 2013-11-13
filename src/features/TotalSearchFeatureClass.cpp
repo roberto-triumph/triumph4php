@@ -50,11 +50,12 @@ void mvceditor::TotalSearchFeatureClass::AddKeyboardShortcuts(std::vector<Dynami
 
 void mvceditor::TotalSearchFeatureClass::OnTotalSearch(wxCommandEvent& event) {
 	std::vector<mvceditor::TotalTagResultClass> selectedTags;
-	mvceditor::TotalSearchDialogClass dialog(GetMainWindow(), *this, selectedTags);
+	int lineNumber = 0;
+	mvceditor::TotalSearchDialogClass dialog(GetMainWindow(), *this, selectedTags, lineNumber);
 	if (wxOK == dialog.ShowModal() && !selectedTags.empty()) {
 		switch (selectedTags[0].Type) {
 		case mvceditor::TotalTagResultClass::FILE_TAG:
-			OpenFileTag(selectedTags[0].FileTag);
+			OpenFileTag(selectedTags[0].FileTag, lineNumber);
 			break;
 		case mvceditor::TotalTagResultClass::TABLE_DATA_TAG:
 			OpenDbData(selectedTags[0].TableTag);
@@ -71,8 +72,8 @@ void mvceditor::TotalSearchFeatureClass::OnTotalSearch(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::TotalSearchFeatureClass::OpenFileTag(const mvceditor::FileTagClass& fileTag) {
-	mvceditor::OpenFileCommandEventClass cmd(fileTag.FullPath);
+void mvceditor::TotalSearchFeatureClass::OpenFileTag(const mvceditor::FileTagClass& fileTag, int lineNumber) {
+	mvceditor::OpenFileCommandEventClass cmd(fileTag.FullPath, -1, -1, lineNumber);
 	App.EventSink.Post(cmd);
 }
 
@@ -108,14 +109,15 @@ void mvceditor::TotalSearchFeatureClass::OpenDbData(const mvceditor::DatabaseTab
 }
 
 mvceditor::TotalSearchDialogClass::TotalSearchDialogClass(wxWindow* parent, mvceditor::TotalSearchFeatureClass& feature,
-	std::vector<mvceditor::TotalTagResultClass>& selectedTags)
+	std::vector<mvceditor::TotalTagResultClass>& selectedTags, int& lineNumber)
 : TotalSearchDialogGeneratedClass(parent, wxID_ANY)
 , Feature(feature)
 , LastSearch()
 , Timer(this, ID_DIALOG_TIMER)
 , RunningThreads() 
 , Results() 
-, SelectedTags(selectedTags) {
+, SelectedTags(selectedTags) 
+, LineNumber(lineNumber) {
 	RunningThreads.SetMaxThreads(1);
 	RunningThreads.AddEventHandler(this);
 	Timer.Start(300, wxTIMER_CONTINUOUS);
@@ -240,6 +242,9 @@ void mvceditor::TotalSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 
 void mvceditor::TotalSearchDialogClass::OnTimer(wxTimerEvent& event) {
 	wxString text = SearchText->GetValue();
+	
+	// trim spaces from the ends
+	text.Trim(false).Trim(true);
 	if (text != LastSearch && text.length() > 2) {
 		Timer.Stop();
 		LastSearch = text;
@@ -254,6 +259,7 @@ void mvceditor::TotalSearchDialogClass::OnTimer(wxTimerEvent& event) {
 void mvceditor::TotalSearchDialogClass::OnSearchComplete(mvceditor::TotalTagSearchCompleteEventClass& event) {
 	MatchesList->DeleteAllItems();
 	Results = event.Tags;
+	LineNumber = event.LineNumber;
 	
 	std::vector<mvceditor::TotalTagResultClass>::const_iterator tag;
 	for (tag = Results.begin(); tag != Results.end(); ++tag) {

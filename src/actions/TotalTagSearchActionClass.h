@@ -88,6 +88,11 @@ class TotalTagSearchCompleteEventClass : public wxEvent {
 	 * The string that was searched for.
 	 */
 	UnicodeString SearchString;
+	
+	/**
+	 * line number parsed from the user query (ie. the end after colon; user.php:299)
+	 */
+	int LineNumber;
 
     /**
      * Will contain all of the resulting tags.
@@ -95,7 +100,7 @@ class TotalTagSearchCompleteEventClass : public wxEvent {
 	std::vector<mvceditor::TotalTagResultClass> Tags;
 
     TotalTagSearchCompleteEventClass(int eventId, const UnicodeString& searchString, 
-		const std::vector<mvceditor::TotalTagResultClass>& tags);
+		int lineNumber, const std::vector<mvceditor::TotalTagResultClass>& tags);
     
     wxEvent* Clone() const;
 

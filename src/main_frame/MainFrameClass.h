@@ -108,6 +108,12 @@ public:
 	 * position. highlights to the given length
 	 */
 	void FileOpenPosition(const wxString& fullPath, int startingPos, int length);
+	
+	/**
+	 * Loads the given file into the application, and goes to the
+	 * given line. line number is 1 based.
+	 */
+	void FileOpenLine(const wxString& fullPath, int lineNumber);
 
 	/**
 	 * get all of the feature's extra windows and menus and attach them to the main frame.

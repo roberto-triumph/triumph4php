@@ -32,16 +32,17 @@
 #include <soci/sqlite3/soci-sqlite3.h>
 
 mvceditor::TotalTagSearchCompleteEventClass::TotalTagSearchCompleteEventClass(int eventId,
-	const UnicodeString& searchString, 
+	const UnicodeString& searchString, int lineNumber,
 	const std::vector<mvceditor::TotalTagResultClass>& tags) 
 : wxEvent(eventId, mvceditor::EVENT_TOTAL_TAG_SEARCH_COMPLETE)
 , SearchString(searchString) 
+, LineNumber(lineNumber)
 , Tags(tags) {
 	
 }
 
 wxEvent* mvceditor::TotalTagSearchCompleteEventClass::Clone() const {
-		return new mvceditor::TotalTagSearchCompleteEventClass(GetId(), SearchString, Tags);
+		return new mvceditor::TotalTagSearchCompleteEventClass(GetId(), SearchString, LineNumber, Tags);
 }
 
 mvceditor::TotalTagResultClass::TotalTagResultClass() 
@@ -144,7 +145,6 @@ void mvceditor::TotalTagSearchActionClass::BackgroundWork() {
 		return;
 	}
 	std::vector<mvceditor::TotalTagResultClass> matches;
-	
 
 	// do exact match first, if that succeeds then don't bother doing near matches
 	mvceditor::TagResultClass* results = TagCache.ExactTags(SearchString, SearchDirs);
@@ -200,9 +200,10 @@ void mvceditor::TotalTagSearchActionClass::BackgroundWork() {
 	}
 	
 	if (!IsCancelled()) {
+		mvceditor::TagSearchClass tagSearch(SearchString);
 
 		// PostEvent will set the correct event ID
-		mvceditor::TotalTagSearchCompleteEventClass evt(wxID_ANY, SearchString, matches);
+		mvceditor::TotalTagSearchCompleteEventClass evt(wxID_ANY, SearchString, tagSearch.GetLineNumber(), matches);
 		PostEvent(evt);
 	}
 }
