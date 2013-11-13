@@ -429,8 +429,7 @@ void mvceditor::DetectorTreeHandlerClass::OnTreeItemActivated(wxTreeEvent& event
 	wxTreeItemId id = event.GetItem();
 	TreeItemDataStringClass* treeItemData = (TreeItemDataStringClass*)DetectorTree->GetItemData(id);
 	if (treeItemData) {
-		wxCommandEvent openEvent(mvceditor::EVENT_CMD_FILE_OPEN);
-		openEvent.SetString(treeItemData->Str);
+		mvceditor::OpenFileCommandEventClass openEvent(treeItemData->Str);
 		EventSink.Publish(openEvent);
 	}
 }
@@ -474,8 +473,7 @@ void mvceditor::DetectorTreeHandlerClass::OnAddButton(wxCommandEvent& event) {
 
 		// close file so that it can be opened later on by the app
 		file.Close();
-		wxCommandEvent openEvent(mvceditor::EVENT_CMD_FILE_OPEN);
-		openEvent.SetString(localDetectorScript.GetFullPath());
+		mvceditor::OpenFileCommandEventClass openEvent(localDetectorScript.GetFullPath());
 		EventSink.Publish(openEvent);
 
 		// add the tree node also
@@ -576,8 +574,7 @@ void mvceditor::DetectorTreeHandlerClass::OnMenuOpenDetector(wxCommandEvent& eve
 	wxTreeItemId id = DetectorTree->GetSelection();
 	TreeItemDataStringClass* treeItemData = (TreeItemDataStringClass*)DetectorTree->GetItemData(id);
 	if (treeItemData) {
-		wxCommandEvent openEvent(mvceditor::EVENT_CMD_FILE_OPEN);
-		openEvent.SetString(treeItemData->Str);
+		mvceditor::OpenFileCommandEventClass openEvent(treeItemData->Str);
 		EventSink.Publish(openEvent);
 	}
 }

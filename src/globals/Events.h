@@ -166,6 +166,55 @@ public:
 
 };
 
+/**
+ * This command can be used by any feature to tell the application to
+ * open a file. A file can be opened to a specific line number.
+ */
+class OpenFileCommandEventClass : public wxEvent {
+	
+public:
+	
+	/**
+	 * the full path of the file to open
+	 */
+	wxString FullPath;
+	
+	/**
+	 * position to focus on and start highlighting, -1 to not highlight anything
+	 */
+	int StartingPos;
+	
+	/**
+	 * number of characters to highlight, -1 to not highlight anything
+	 */
+	int Length;
+	
+	
+	OpenFileCommandEventClass(const wxString& fullPath, int startingPos = -1, int length = -1);
+	
+	wxEvent* Clone() const;
+	
+};
+
+class OpenDbTableCommandEventClass : public wxEvent {
+
+public:
+
+	/**
+	 * The name of the table to open 
+	 */
+	wxString DbTableName;
+	
+	/**
+	 * The hash of the db connection to connect to
+	 */
+	wxString ConnectionHash;
+	
+	OpenDbTableCommandEventClass(wxEventType type, const wxString& dbTable, const wxString& connectionHash);
+	
+	wxEvent* Clone() const;
+};
+
 typedef void (wxEvtHandler::*CodeControlEventClassFunction)(CodeControlEventClass&);
 
 #define EVT_APP_FILE_SAVED(fn) \
@@ -189,7 +238,26 @@ typedef void (wxEvtHandler::*RenameEventClassFunction)(RenameEventClass&);
 	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_APP_DIR_RENAMED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( RenameEventClassFunction, & fn ), (wxObject *) NULL ),
+	
+typedef void (wxEvtHandler::*OpenFileCommandEventClassFunction)(OpenFileCommandEventClass&);
+	
+#define EVT_APP_FILE_OPEN(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_CMD_FILE_OPEN, wxID_ANY, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( OpenFileCommandEventClassFunction, & fn ), (wxObject *) NULL ),
+	
+typedef void (wxEvtHandler::*OpenDbTableCommandEventClassFunction)(OpenDbTableCommandEventClass&);
+	
+#define EVT_APP_DB_TABLE_DATA_OPEN(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_CMD_DB_TABLE_DATA_OPEN, wxID_ANY, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( OpenDbTableCommandEventClassFunction, & fn ), (wxObject *) NULL ),
 
+#define EVT_APP_DB_TABLE_DEFINITION_OPEN(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_CMD_DB_TABLE_DEFINITION_OPEN, wxID_ANY, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( OpenDbTableCommandEventClassFunction, & fn ), (wxObject *) NULL ),
+	
 /**
  * This is a one-time event that gets generated after the application main
  * window is first shown to the user. When this event is generated, all 
@@ -338,7 +406,6 @@ extern const wxEventType EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED;
 
 /**
  * Tell the app to open a new file.
- * The command event should set the file to be opened with event.SetString()
  * Note that the app will do NOTHING if the path is invalid; the feature should
  * make sure the path is valid.
  */
@@ -350,6 +417,16 @@ extern const wxEventType EVENT_CMD_FILE_OPEN;
  * The command line to run should  be set with event.SetString()
  */
 extern const wxEventType EVENT_CMD_RUN_COMMAND;
+
+/**
+ * Tell the app to open a database table and show it's rows
+ */
+extern const wxEventType EVENT_CMD_DB_TABLE_DATA_OPEN;
+
+/**
+ * Tell the app to open a database table and show it's column structure
+ */
+extern const wxEventType EVENT_CMD_DB_TABLE_DEFINITION_OPEN;
 
 /**
  * The window ID of the Tools Notebook. Use this to connect to the notebook

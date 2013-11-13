@@ -497,8 +497,7 @@ bool mvceditor::ModalExplorerPanelClass::OpenIfListFile(const wxString& text) {
 	// item image to tell if selected item is a dir or not
 	wxString fullPath = CurrentListDir.GetPathWithSep() + text;
 	if (wxFileName::FileExists(fullPath)) {
-		wxCommandEvent evt(mvceditor::EVENT_CMD_FILE_OPEN);
-		evt.SetString(fullPath);
+		mvceditor::OpenFileCommandEventClass evt(fullPath);
 		Feature.App.EventSink.Publish(evt);
 		return true;
 	}
@@ -533,8 +532,7 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuOpen(wxCommandEvent& event) {
 		// item image to tell if selected item is a dir or not
 		wxString fullPath = CurrentListDir.GetPathWithSep() + name;
 		if (wxFileName::FileExists(fullPath)) {
-			wxCommandEvent evt(mvceditor::EVENT_CMD_FILE_OPEN);
-			evt.SetString(fullPath);
+			mvceditor::OpenFileCommandEventClass evt(fullPath);
 			Feature.App.EventSink.Publish(evt);
 		}
 		else if (wxFileName::DirExists(fullPath)) {
@@ -658,8 +656,7 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew(wxCommandEvent& eve
 		List->InsertItem(column1);
 
 		// open the new file
-		wxCommandEvent evt(mvceditor::EVENT_CMD_FILE_OPEN);
-		evt.SetString(newFileName.GetFullPath());
+		mvceditor::OpenFileCommandEventClass evt(newFileName.GetFullPath());
 		Feature.App.EventSink.Publish(evt);
 	}
 	else {

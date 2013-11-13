@@ -289,3 +289,16 @@ std::vector<mvceditor::DatabaseTagClass> mvceditor::GlobalsClass::AllEnabledData
 	}
 	return enabled;
 }
+
+bool mvceditor::GlobalsClass::FindDatabaseTagByHash(const wxString& connectionHash, mvceditor::DatabaseTagClass& tag) const {
+	bool found = false;
+	UnicodeString icuHash = mvceditor::WxToIcu(connectionHash);
+	std::vector<mvceditor::DatabaseTagClass>::const_iterator t;
+	for (t = DatabaseTags.begin(); t != DatabaseTags.end(); ++t) {
+		if (t->ConnectionHash() == icuHash) {
+			found = true;
+			tag = *t;
+		}
+	}
+	return found;
+}

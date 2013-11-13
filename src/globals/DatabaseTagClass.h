@@ -115,18 +115,24 @@ public:
 	/**
 	 * copy the attributes from src to this object.
 	 */
-	DatabaseTagClass(const DatabaseTagClass& other);
+	DatabaseTagClass(const mvceditor::DatabaseTagClass& other);
 	
 	/**
 	 * copy the attributes from src to this object.
 	 */
-	void Copy(const DatabaseTagClass& src);
+	void Copy(const mvceditor::DatabaseTagClass& src);
 	
 	/**
 	 * @return true if this info is the "equal to" another; equality is not
 	 * based on pointers it is based on host and database name
 	 */
-	bool SameAs(const DatabaseTagClass& other);
+	bool SameAs(const mvceditor::DatabaseTagClass& other);
+	
+	/**
+	 * @return UnicodeString a connection hash; a string that uniquely
+	 *         identifies this connection
+	 */
+	UnicodeString ConnectionHash() const;
 };
 
 /**

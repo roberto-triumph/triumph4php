@@ -121,8 +121,7 @@ void mvceditor::ConfigFilesFeatureClass::OnConfigMenuItem(wxCommandEvent& event)
 	size_t index = event.GetId() - mvceditor::CONFIG_DETECTORS;
 	if (index >= 0 && index < MAX_CONFIG_MENU_ITEMS && index < ConfigTags.size()) {
 		wxFileName fileName = ConfigTags[index].ConfigFileName;
-		wxCommandEvent cmd(mvceditor::EVENT_CMD_FILE_OPEN);
-		cmd.SetString(fileName.GetFullPath());
+		mvceditor::OpenFileCommandEventClass cmd(fileName.GetFullPath());
 		App.EventSink.Publish(cmd);
 	}
 }

@@ -297,7 +297,12 @@ public:
 	/**
 	 * Runs the query that is in the text control (in a separate thread).
 	 */
-	void Execute();
+	void ExecuteCodeControl();
+	
+	/**
+	 * Runs the given query on the given connection (in a separate thread).
+	 */
+	void ExecuteQuery(const wxString& sql, const mvceditor::DatabaseTagClass& tag);
 
 	/**
 	 * kills a running query in a nice way.
@@ -466,8 +471,6 @@ public:
 	
 private:
 
-	void OnProjectsUpdated(wxCommandEvent& event);
-
 	void OnSqlBrowserToolsMenu(wxCommandEvent& event);
 	
 	void OnSqlConnectionMenu(wxCommandEvent& event);
@@ -477,6 +480,10 @@ private:
 	void OnRun(wxCommandEvent& event);
 	
 	void OnAppExit(wxCommandEvent& event);
+	
+	void OnCmdTableDataOpen(mvceditor::OpenDbTableCommandEventClass& event);
+	
+	void OnCmdTableDefinitionOpen(mvceditor::OpenDbTableCommandEventClass& event);
 	
 	/**
 	 * synchronize the SQL query tab in the code control notebook with

@@ -51,7 +51,6 @@ mvceditor::TagFeatureClass::TagFeatureClass(mvceditor::AppClass& app)
 void mvceditor::TagFeatureClass::AddSearchMenuItems(wxMenu* searchMenu) {
 	ProjectIndexMenu = searchMenu->Append(mvceditor::MENU_RESOURCE + 0, _("Index"), _("Index the project"));
 	searchMenu->Append(mvceditor::MENU_RESOURCE + 1, _("Jump To Resource Under Cursor\tF12"), _("Jump To Resource that is under the cursor"));
-	searchMenu->Append(mvceditor::MENU_RESOURCE + 2, _("Search for Resource...\tCTRL+R"), _("Search for a class, method, or function"));
 	ProjectIndexMenu->Enable(App.Globals.HasSources());
 }
 
@@ -59,7 +58,6 @@ void mvceditor::TagFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClas
 	std::map<int, wxString> menuItemIds;
 	menuItemIds[mvceditor::MENU_RESOURCE + 0] = wxT("Resource-Index Project");
 	menuItemIds[mvceditor::MENU_RESOURCE + 1] = wxT("Resource-Jump To Resource Under Cursor");
-	menuItemIds[mvceditor::MENU_RESOURCE + 2] = wxT("Resource-Search For Resource ...");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
@@ -779,7 +777,6 @@ void mvceditor::TagSearchDialogClass::OnTagCacheSearchComplete(mvceditor::TagCac
 BEGIN_EVENT_TABLE(mvceditor::TagFeatureClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_RESOURCE + 0, mvceditor::TagFeatureClass::OnProjectWipeAndIndex)
 	EVT_MENU(mvceditor::MENU_RESOURCE + 1, mvceditor::TagFeatureClass::OnJump)
-	EVT_MENU(mvceditor::MENU_RESOURCE + 2, mvceditor::TagFeatureClass::OnSearchForResource)
 	EVT_MENU(mvceditor::MENU_RESOURCE + 3, mvceditor::TagFeatureClass::OnJump)
 	EVT_UPDATE_UI(wxID_ANY, mvceditor::TagFeatureClass::OnUpdateUi)
 

@@ -62,7 +62,7 @@ public:
 
 private:
 
-	void OnCmdFileOpen(wxCommandEvent& event);
+	void OnCmdFileOpen(mvceditor::OpenFileCommandEventClass& event);
 
 	void OnPreferencesSaved(wxCommandEvent& event);
 
@@ -102,6 +102,12 @@ public:
 	 * File names must be fully qualified.
 	 */
 	void FileOpen(const std::vector<wxString>& filenames);
+	
+	/**
+	 * Loads the given file into the application, and goes to the
+	 * position. highlights to the given length
+	 */
+	void FileOpenPosition(const wxString& fullPath, int startingPos, int length);
 
 	/**
 	 * get all of the feature's extra windows and menus and attach them to the main frame.

@@ -1,5 +1,5 @@
 /**
- * This software is released under the terms of the MIT License
+ * The MIT License
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,23 +22,65 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_TAGCACHESEARCHACTIONCLASS_H__
-#define __MVCEDITOR_TAGCACHESEARCHACTIONCLASS_H__
 
+#ifndef __MVCEDITOR_TOTALTAGSEARCHACTIONCLASS_H__
+#define __MVCEDITOR_TOTALTAGSEARCHACTIONCLASS_H__
+
+#include <wx/event.h>
 #include <actions/ActionClass.h>
+#include <globals/DatabaseTableTagClass.h>
+#include <globals/TagClass.h>
 #include <globals/GlobalsClass.h>
-#include <language/TagCacheClass.h>
 #include <unicode/unistr.h>
-#include <wx/string.h>
 #include <vector>
 
 namespace mvceditor {
+	
+class TotalTagResultClass {
+	
+public:
 
+	enum Types {
+		FILE_TAG,
+		CLASS_TAG,
+		METHOD_TAG,
+		FUNCTION_TAG,
+		TABLE_DATA_TAG,
+		TABLE_DEFINITION_TAG
+	};
+	
+	/**
+	 * will only be valid when this result is a file
+	 */
+	mvceditor::FileTagClass FileTag;
+	
+	/**
+	 * will only be valid when this result is a class, function, or method
+	 */
+	mvceditor::TagClass PhpTag;
+	
+	/**
+	 * will only be valid when this result is a database table
+	 */
+	mvceditor::DatabaseTableTagClass TableTag;
+	
+	Types Type;
+	
+	TotalTagResultClass();
+	TotalTagResultClass(const mvceditor::FileTagClass& file);
+	TotalTagResultClass(const mvceditor::TagClass& tag);
+	TotalTagResultClass(const mvceditor::DatabaseTableTagClass& table);
+	
+	TotalTagResultClass(const mvceditor::TotalTagResultClass& src);
+		
+	void Copy(const mvceditor::TotalTagResultClass& src);
+};
+	
 /**
  * event that is generated when a tag query is completed.  this event
  * contains the results of the search.
  */
-class TagCacheSearchCompleteEventClass : public wxEvent {
+class TotalTagSearchCompleteEventClass : public wxEvent {
         
     public:
 
@@ -50,35 +92,31 @@ class TagCacheSearchCompleteEventClass : public wxEvent {
     /**
      * Will contain all of the resulting tags.
      */
-	std::vector<mvceditor::TagClass> Tags;
+	std::vector<mvceditor::TotalTagResultClass> Tags;
 
-    TagCacheSearchCompleteEventClass(int eventId, const UnicodeString& searchString, 
-		const std::vector<mvceditor::TagClass>& tags);
+    TotalTagSearchCompleteEventClass(int eventId, const UnicodeString& searchString, 
+		const std::vector<mvceditor::TotalTagResultClass>& tags);
     
     wxEvent* Clone() const;
 
 };
 
-extern const wxEventType EVENT_TAG_CACHE_SEARCH_COMPLETE;
+extern const wxEventType EVENT_TOTAL_TAG_SEARCH_COMPLETE;
 
-typedef void (wxEvtHandler::*TagCacheSearchCompleteEventClassFunction)(TagCacheSearchCompleteEventClass&);
+typedef void (wxEvtHandler::*TotalTagSearchCompleteEventClassFunction)(TotalTagSearchCompleteEventClass&);
 
-#define EVENT_TAG_CACHE_SEARCH_COMPLETE(id, fn) \
-        DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_TAG_CACHE_SEARCH_COMPLETE, id, -1, \
+#define EVENT_TOTAL_TAG_SEARCH_COMPLETE(id, fn) \
+        DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_TOTAL_TAG_SEARCH_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( TagCacheSearchCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent( TotalTagSearchCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
 
 
-/**
- * class that will execute a query against the tag cache in the background.
- * the results will be posted in an event of type EVENT_TAG_CACHE_SEARCH_COMPLETE.
- */
-class TagCacheSearchActionClass : public mvceditor::ActionClass {
-	
+class TotalTagSearchActionClass : public mvceditor::ActionClass {
+
 public:
-
-	TagCacheSearchActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
-
+	
+	TotalTagSearchActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	
 	/**
 	 * set the search parameters.  this should be called before the action is
 	 * added to the run queue
@@ -109,6 +147,11 @@ private:
 	mvceditor::TagCacheClass TagCache;
 
 	/**
+	 * the thing to search for database table tags in
+	 */	
+	mvceditor::SqlResourceFinderClass SqlTagCache;
+
+	/**
 	 * the string to look for. could be a partial class name, file name, function name
 	 */
 	UnicodeString SearchString;
@@ -117,7 +160,14 @@ private:
 	 * directories to search in. If empty, then the entire cache will be searched.
 	 */
 	std::vector<wxFileName> SearchDirs;
+	
+	/**
+	 * connection to tags db
+	 */
+	soci::session Session;
+
 };
+
 }
 
-#endif
+#endif // __MVCEDITOR_TOTALTAGSEARCHACTIONCLASS_H__

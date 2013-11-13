@@ -89,6 +89,33 @@ wxEvent* mvceditor::RenameEventClass::Clone() const {
 	return new mvceditor::RenameEventClass(GetEventType(), OldPath.GetFullPath(), OldPath.GetFullPath());
 }
 
+mvceditor::OpenFileCommandEventClass::OpenFileCommandEventClass(const wxString& fullPath, int startingPos, int length)
+: wxEvent(wxID_ANY, mvceditor::EVENT_CMD_FILE_OPEN) 
+, FullPath(fullPath.c_str())
+, StartingPos(startingPos)
+, Length(length) {
+	
+}
+
+wxEvent* mvceditor::OpenFileCommandEventClass::Clone() const {
+	return new mvceditor::OpenFileCommandEventClass(FullPath, StartingPos, Length);
+}
+
+
+mvceditor::OpenDbTableCommandEventClass::OpenDbTableCommandEventClass(wxEventType type, const wxString& dbTable, 
+	const wxString& connectionHash)
+: wxEvent(wxID_ANY, type)
+, DbTableName(dbTable.c_str())
+, ConnectionHash(connectionHash.c_str()) {
+}
+
+wxEvent* mvceditor::OpenDbTableCommandEventClass::Clone() const {
+	mvceditor::OpenDbTableCommandEventClass* evt = new mvceditor::OpenDbTableCommandEventClass(
+		GetEventType(), DbTableName, ConnectionHash);
+	return evt;
+}
+
+
 const wxEventType mvceditor::EVENT_APP_READY = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_EXIT = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_FILE_OPENED = wxNewEventType();
@@ -108,6 +135,8 @@ const wxEventType mvceditor::EVENT_APP_PREFERENCES_SAVED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED = wxNewEventType();
 const wxEventType mvceditor::EVENT_CMD_FILE_OPEN = wxNewEventType();
 const wxEventType mvceditor::EVENT_CMD_RUN_COMMAND = wxNewEventType();
+const wxEventType mvceditor::EVENT_CMD_DB_TABLE_DATA_OPEN = wxNewEventType();
+const wxEventType mvceditor::EVENT_CMD_DB_TABLE_DEFINITION_OPEN = wxNewEventType();
 
 const long mvceditor::ID_TOOLS_NOTEBOOK = 1003;
 const long mvceditor::ID_OUTLINE_NOTEBOOK = 1002;

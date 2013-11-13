@@ -486,7 +486,7 @@ bool mvceditor::SqlBrowserPanelClass::Check() {
 	return ret;
 }
 
-void mvceditor::SqlBrowserPanelClass::Execute() {
+void mvceditor::SqlBrowserPanelClass::ExecuteCodeControl() {
 	if (Check() && 0 == RunningActionId) {
 		mvceditor::MultipleSqlExecuteClass* thread = new mvceditor::MultipleSqlExecuteClass(
 			Feature->App.RunningThreads, QueryId, ConnectionIdentifier);
@@ -507,6 +507,23 @@ void mvceditor::SqlBrowserPanelClass::Execute() {
 	}
 	else {
 		wxMessageBox(_("Please wait until the current queries completes."), _("Error"), wxOK | wxCENTRE, this);
+	}
+}
+
+
+void mvceditor::SqlBrowserPanelClass::ExecuteQuery(const wxString& sql, const mvceditor::DatabaseTagClass& tag) {
+	LastQuery = mvceditor::WxToIcu(sql);
+	Query.DatabaseTag = tag;
+	RunningActionId = 0;
+	mvceditor::MultipleSqlExecuteClass* thread = new mvceditor::MultipleSqlExecuteClass(
+		Feature->App.RunningThreads, QueryId, ConnectionIdentifier);
+	if (thread->Init(LastQuery, Query)) { 
+		RunningActionId = Feature->App.RunningThreads.Queue(thread);
+		Gauge->AddGauge(_("Running SQL queries"), ID_SQL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
+	}
+	else {
+		delete thread;
+		RunningActionId = 0;
 	}
 }
 
@@ -837,14 +854,14 @@ void mvceditor::SqlBrowserFeatureClass::OnRun(wxCommandEvent& event) {
 					// we found the panel bring it to the forefront and run the query
 					found = true;
 					SetFocusToToolsWindow(window);
-					panel->Execute();
+					panel->ExecuteCodeControl();
 					break;
 				}
 			}
 		}
 		if (!found) {
 			mvceditor::SqlBrowserPanelClass* panel = CreateResultsPanel(ctrl);
-			panel->Execute();
+			panel->ExecuteCodeControl();
 		}
 	}
 }
@@ -1063,6 +1080,55 @@ void mvceditor::SqlBrowserFeatureClass::SavePreferences() {
 	// modification check fails and the user will not be prompted to reload the config
 	App.UpdateConfigModifiedTime();
 }
+
+void mvceditor::SqlBrowserFeatureClass::OnCmdTableDataOpen(mvceditor::OpenDbTableCommandEventClass& event) {
+	
+	// find the connection to use by hash, 
+	mvceditor::DatabaseTagClass tag;
+	bool found = App.Globals.FindDatabaseTagByHash(event.ConnectionHash, tag);
+	if (found) {
+		mvceditor::SqlQueryClass query;
+		mvceditor::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxNewId(), GetStatusBarWithGauge(), 
+			query, this);
+		
+		wxString tabText = event.DbTableName;
+		wxString sql = "SELECT * FROM " + event.DbTableName;
+
+		// name the windows, since there could be multiple windows from various features; we want to know which opened tools windows
+		// are from this feature
+		wxBitmap tableBitmap = mvceditor::IconImageAsset(wxT("table"));
+		AddToolsWindow(sqlPanel, tabText, wxT("mvceditor::SqlBrowserPanelClass"), tableBitmap);
+		sqlPanel->ExecuteQuery(sql, tag);
+	}
+}
+
+void mvceditor::SqlBrowserFeatureClass::OnCmdTableDefinitionOpen(mvceditor::OpenDbTableCommandEventClass& event) {
+	
+	// find the connection to use by hash, 
+	mvceditor::DatabaseTagClass tag;
+	bool found = App.Globals.FindDatabaseTagByHash(event.ConnectionHash, tag);
+	if (found) {
+		mvceditor::SqlQueryClass query;
+		mvceditor::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxNewId(), GetStatusBarWithGauge(), 
+			query, this);
+		
+		wxString tabText = event.DbTableName;
+		wxString sql;
+		if (mvceditor::DatabaseTagClass::MYSQL == tag.Driver) {
+			sql = "DESC " + event.DbTableName;
+		}
+		else if (mvceditor::DatabaseTagClass::SQLITE == tag.Driver) {
+			sql = "PRAGMA table_info('" + event.DbTableName + "')";
+		}
+
+		// name the windows, since there could be multiple windows from various features; we want to know which opened tools windows
+		// are from this feature
+		wxBitmap tableBitmap = mvceditor::IconImageAsset(wxT("database-medium"));
+		AddToolsWindow(sqlPanel, tabText, wxT("mvceditor::SqlBrowserPanelClass"), tableBitmap);
+		sqlPanel->ExecuteQuery(sql, tag);
+	}
+}
+
 BEGIN_EVENT_TABLE(mvceditor::SqlBrowserFeatureClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_SQL + 0, mvceditor::SqlBrowserFeatureClass::OnSqlBrowserToolsMenu)	
 	EVT_MENU(mvceditor::MENU_SQL + 1, mvceditor::SqlBrowserFeatureClass::OnSqlConnectionMenu)
@@ -1072,6 +1138,8 @@ BEGIN_EVENT_TABLE(mvceditor::SqlBrowserFeatureClass, wxEvtHandler)
 	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_CODE_NOTEBOOK, mvceditor::SqlBrowserFeatureClass::OnContentNotebookPageClose)
 	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::SqlBrowserFeatureClass::OnToolsNotebookPageClose)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_EXIT, mvceditor::SqlBrowserFeatureClass::OnAppExit)
+	EVT_APP_DB_TABLE_DATA_OPEN(mvceditor::SqlBrowserFeatureClass::OnCmdTableDataOpen)
+	EVT_APP_DB_TABLE_DEFINITION_OPEN(mvceditor::SqlBrowserFeatureClass::OnCmdTableDefinitionOpen)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPanelClass, SqlBrowserPanelGeneratedClass)
@@ -1087,3 +1155,4 @@ END_EVENT_TABLE()
 BEGIN_EVENT_TABLE(mvceditor::MysqlConnectionDialogClass, MysqlConnectionDialogGeneratedClass)
 	EVT_COMMAND(ID_SQL_EDIT_TEST, QUERY_COMPLETE_EVENT, mvceditor::MysqlConnectionDialogClass::ShowTestResults)
 END_EVENT_TABLE()
+

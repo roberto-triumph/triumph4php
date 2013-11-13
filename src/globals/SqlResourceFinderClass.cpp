@@ -27,15 +27,6 @@
 #include <globals/Sqlite.h>
 #include <soci.h>
 #include <algorithm>
-
-/**
- * turn the info into a string that way we can link tables to a connection and 
- */
-static std::string Hash(const mvceditor::DatabaseTagClass& info) {
-	UnicodeString hash = info.Host + UNICODE_STRING_SIMPLE("--") + info.Schema + UNICODE_STRING_SIMPLE("---") +
-		mvceditor::WxToIcu(info.FileName.GetFullPath());
-	return mvceditor::IcuToChar(hash);
-}
 	
 mvceditor::SqlResourceFetchClass::SqlResourceFetchClass(soci::session& session)
 : Session(session) {
@@ -73,7 +64,7 @@ bool mvceditor::SqlResourceFetchClass::FetchMysql(const DatabaseTagClass& info, 
 	// the local session connects to the db we want to extract the tables / columns from
 	soci::session session;
 	if (query.Connect(session, error)) {
-		std::string hash = Hash(info);
+		std::string hash = mvceditor::IcuToChar(info.ConnectionHash());
 		std::vector<std::string> tables;
 		std::vector<std::string> columns;
 		try {
@@ -138,7 +129,7 @@ bool mvceditor::SqlResourceFetchClass::FetchSqlite(const DatabaseTagClass& info,
 	// this local session connects to the db we want to fetch tables/columns from
 	soci::session session;
 	if (query.Connect(session, error)) {
-		std::string hash = Hash(info);
+		std::string hash = mvceditor::IcuToChar(info.ConnectionHash());
 		std::vector<std::string> tables;
 		std::vector<std::string> columns;
 		
@@ -282,7 +273,12 @@ bool mvceditor::SqlResourceTableResultClass::Prepare(soci::session& session, boo
 	// http://stackoverflow.com/questions/13056193/escape-wildcards-in-sqlite-like-without-sacrificing-index-use
 	std::string sql = "SELECT table_name, connection_label ";
 	sql += "FROM db_tables ";
-	sql += "WHERE table_name BETWEEN ? AND ? AND connection_label = ? ";
+	sql += "WHERE table_name BETWEEN ? AND ? ";
+	if (!ConnectionHash.empty()) {
+		
+		// no connection hash = search for table on all connections
+		sql += "AND connection_label = ? ";
+	}
 	sql += "ORDER BY table_name ";
 	if (doLimit) {
 		sql += "LIMIT 100";
@@ -292,8 +288,9 @@ bool mvceditor::SqlResourceTableResultClass::Prepare(soci::session& session, boo
 	stmt->prepare(sql);
 	stmt->exchange(soci::use(Lookup));
 	stmt->exchange(soci::use(LookupEnd));
-	stmt->exchange(soci::use(ConnectionHash));
-	
+	if (!ConnectionHash.empty()) {
+		stmt->exchange(soci::use(ConnectionHash));
+	}
 	return Init(stmt);
 }
 
@@ -384,7 +381,7 @@ mvceditor::SqlResourceFinderClass::SqlResourceFinderClass()
 
 std::vector<UnicodeString> mvceditor::SqlResourceFinderClass::FindTables(const mvceditor::DatabaseTagClass& info, const UnicodeString& partialTableName) {
 	std::vector<UnicodeString> ret;
-	std::string hash = Hash(info);
+	std::string hash = mvceditor::IcuToChar(info.ConnectionHash());
 	
 	mvceditor::SqlResourceTableResultClass tableLookup;
 	tableLookup.SetLookup(mvceditor::IcuToWx(partialTableName), hash);
@@ -401,7 +398,7 @@ std::vector<UnicodeString> mvceditor::SqlResourceFinderClass::FindTables(const m
 
 std::vector<UnicodeString> mvceditor::SqlResourceFinderClass::FindColumns(const mvceditor::DatabaseTagClass& info, const UnicodeString& partialColumnName) {
 	std::vector<UnicodeString> ret;
-	std::string hash = Hash(info);
+	std::string hash = mvceditor::IcuToChar(info.ConnectionHash());
 	
 	mvceditor::SqlResourceColumnResultClass columnLookup;
 	columnLookup.SetLookup(mvceditor::IcuToWx(partialColumnName), hash);

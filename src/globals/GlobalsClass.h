@@ -316,6 +316,12 @@ public:
 	 * @return all of the database tags that are enabled.
 	 */
 	std::vector<mvceditor::DatabaseTagClass> AllEnabledDatabaseTags() const;
+	
+	/**
+	 * find a db tag by hash
+	 * will find even tags that are not enabled
+	 */
+	bool FindDatabaseTagByHash(const wxString& connectionHash, mvceditor::DatabaseTagClass& tag) const;
 
 };
 

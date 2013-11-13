@@ -77,6 +77,12 @@ bool mvceditor::DatabaseTagClass::SameAs(const mvceditor::DatabaseTagClass& othe
 	return Host.caseCompare(other.Host, 0) == 0 && Schema.caseCompare(other.Schema, 0) == 0;
 }
 
+UnicodeString mvceditor::DatabaseTagClass::ConnectionHash() const {
+	UnicodeString hash = Host + UNICODE_STRING_SIMPLE("--") + Schema + UNICODE_STRING_SIMPLE("---") +
+		mvceditor::WxToIcu(FileName.GetFullPath());
+	return hash;
+}
+
 mvceditor::SqlResultClass::SqlResultClass() 
 	: Error()
 	, Row()
@@ -483,3 +489,4 @@ std::vector<mvceditor::DatabaseTagClass> mvceditor::DatabaseTagFinderClass::All(
 	}
 	return allDbTags;
 }
+

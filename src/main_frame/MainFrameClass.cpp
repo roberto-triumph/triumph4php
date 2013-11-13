@@ -199,7 +199,14 @@ void mvceditor::MainFrameClass::OnFileSaveAll(wxCommandEvent& event) {
 void mvceditor::MainFrameClass::FileOpen(const std::vector<wxString>& filenames) {
 	Notebook->LoadPages(filenames);
 }
-
+void mvceditor::MainFrameClass::FileOpenPosition(const wxString& fullPath, int startingPos, int length) {
+	Notebook->LoadPage(fullPath);
+	CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
+	if (codeControl) {
+		codeControl->SetSelectionAndEnsureVisible(startingPos, startingPos + length);
+	}
+}
+	
 void mvceditor::MainFrameClass::OnFileClose(wxCommandEvent& event) {
 	Notebook->CloseCurrentPage();
 }
@@ -934,10 +941,8 @@ mvceditor::AppEventListenerForFrameClass::AppEventListenerForFrameClass(mvcedito
 
 }
 
-void mvceditor::AppEventListenerForFrameClass::OnCmdFileOpen(wxCommandEvent& event) {
-	std::vector<wxString> filenames;
-	filenames.push_back(event.GetString());
-	MainFrame->FileOpen(filenames);
+void mvceditor::AppEventListenerForFrameClass::OnCmdFileOpen(mvceditor::OpenFileCommandEventClass& event) {
+	MainFrame->FileOpenPosition(event.FullPath, event.StartingPos, event.Length);
 }
 
 void mvceditor::AppEventListenerForFrameClass::OnPreferencesSaved(wxCommandEvent& event) {
@@ -1023,7 +1028,7 @@ BEGIN_EVENT_TABLE(mvceditor::MainFrameClass,  MainFrameGeneratedClass)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::AppEventListenerForFrameClass, wxEvtHandler)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_FILE_OPEN, mvceditor::AppEventListenerForFrameClass::OnCmdFileOpen)
+	EVT_APP_FILE_OPEN(mvceditor::AppEventListenerForFrameClass::OnCmdFileOpen)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_CREATED, mvceditor::AppEventListenerForFrameClass::OnAppFileCreated)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::AppEventListenerForFrameClass::OnPreferencesSaved)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, mvceditor::AppEventListenerForFrameClass::OnPreferencesExternallyUpdated)

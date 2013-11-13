@@ -109,8 +109,7 @@ mvceditor::UrlTagFinderClass& mvceditor::TemplateFilesFeatureClass::Urls() {
 void mvceditor::TemplateFilesFeatureClass::OpenFile(wxString file) {
 	wxFileName fileName(file);
 	if (fileName.IsOk()) {
-		wxCommandEvent openEvent(mvceditor::EVENT_CMD_FILE_OPEN);
-		openEvent.SetString(fileName.GetFullPath());
+		mvceditor::OpenFileCommandEventClass openEvent(fileName.GetFullPath());
 		App.EventSink.Publish(openEvent);
 	}
 }
