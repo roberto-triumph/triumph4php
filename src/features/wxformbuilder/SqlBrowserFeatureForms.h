@@ -24,6 +24,11 @@
 #include <wx/dialog.h>
 #include <wx/filepicker.h>
 #include <wx/checklst.h>
+#include <wx/bitmap.h>
+#include <wx/image.h>
+#include <wx/icon.h>
+#include <wx/bmpbuttn.h>
+#include <wx/scrolwin.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -186,6 +191,39 @@ class SqlConnectionListDialogGeneratedClass : public wxDialog
 		
 		SqlConnectionListDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("SQL Connections"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~SqlConnectionListDialogGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class TableDefinitionPanelGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class TableDefinitionPanelGeneratedClass : public wxPanel 
+{
+	private:
+	
+	protected:
+		wxBitmapButton* RefreshButton;
+		wxButton* ShowSqlButton;
+		wxStaticText* ConnectionLabel;
+		wxChoice* Connections;
+		wxStaticText* TableLabel;
+		wxTextCtrl* TableName;
+		wxScrolledWindow* GridsPanel;
+		wxStaticText* ColumnsLabel;
+		wxGrid* ColumnsGrid;
+		wxStaticText* IndicesLabel;
+		wxGrid* IndicesGrid;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnRefreshButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSqlButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnTableNameEnter( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		TableDefinitionPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
+		~TableDefinitionPanelGeneratedClass();
 	
 };
 

@@ -351,3 +351,152 @@ SqlConnectionListDialogGeneratedClass::~SqlConnectionListDialogGeneratedClass()
 	ButtonSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlConnectionListDialogGeneratedClass::OnOkButton ), NULL, this );
 	
 }
+
+TableDefinitionPanelGeneratedClass::TableDefinitionPanelGeneratedClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+{
+	wxBoxSizer* PanelSizer;
+	PanelSizer = new wxBoxSizer( wxVERTICAL );
+	
+	wxFlexGridSizer* GridSizer;
+	GridSizer = new wxFlexGridSizer( 3, 1, 0, 0 );
+	GridSizer->AddGrowableCol( 0 );
+	GridSizer->AddGrowableRow( 1 );
+	GridSizer->AddGrowableRow( 2 );
+	GridSizer->SetFlexibleDirection( wxBOTH );
+	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxBoxSizer* TopSizer;
+	TopSizer = new wxBoxSizer( wxHORIZONTAL );
+	
+	RefreshButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	TopSizer->Add( RefreshButton, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	ShowSqlButton = new wxButton( this, wxID_ANY, wxT("Show SQL"), wxDefaultPosition, wxDefaultSize, 0 );
+	TopSizer->Add( ShowSqlButton, 0, wxALL|wxEXPAND, 5 );
+	
+	ConnectionLabel = new wxStaticText( this, wxID_ANY, wxT("Connection"), wxDefaultPosition, wxDefaultSize, 0 );
+	ConnectionLabel->Wrap( -1 );
+	TopSizer->Add( ConnectionLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	wxArrayString ConnectionsChoices;
+	Connections = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxSize( 200,-1 ), ConnectionsChoices, 0 );
+	Connections->SetSelection( 0 );
+	TopSizer->Add( Connections, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	TableLabel = new wxStaticText( this, wxID_ANY, wxT("Table"), wxDefaultPosition, wxDefaultSize, 0 );
+	TableLabel->Wrap( -1 );
+	TopSizer->Add( TableLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	TableName = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 300,-1 ), wxTE_PROCESS_ENTER );
+	TopSizer->Add( TableName, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	GridSizer->Add( TopSizer, 1, wxEXPAND, 5 );
+	
+	GridsPanel = new wxScrolledWindow( this, wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), wxHSCROLL|wxVSCROLL );
+	GridsPanel->SetScrollRate( 5, 5 );
+	wxBoxSizer* bSizer17;
+	bSizer17 = new wxBoxSizer( wxVERTICAL );
+	
+	wxFlexGridSizer* ColumnsSizer;
+	ColumnsSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	ColumnsSizer->AddGrowableCol( 0 );
+	ColumnsSizer->AddGrowableRow( 1 );
+	ColumnsSizer->SetFlexibleDirection( wxBOTH );
+	ColumnsSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	ColumnsLabel = new wxStaticText( GridsPanel, wxID_ANY, wxT("Columns"), wxDefaultPosition, wxDefaultSize, 0 );
+	ColumnsLabel->Wrap( -1 );
+	ColumnsSizer->Add( ColumnsLabel, 0, wxALL, 5 );
+	
+	ColumnsGrid = new wxGrid( GridsPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+	
+	// Grid
+	ColumnsGrid->CreateGrid( 5, 5 );
+	ColumnsGrid->EnableEditing( true );
+	ColumnsGrid->EnableGridLines( true );
+	ColumnsGrid->EnableDragGridSize( false );
+	ColumnsGrid->SetMargins( 0, 0 );
+	
+	// Columns
+	ColumnsGrid->EnableDragColMove( false );
+	ColumnsGrid->EnableDragColSize( true );
+	ColumnsGrid->SetColLabelSize( 30 );
+	ColumnsGrid->SetColLabelAlignment( wxALIGN_CENTRE, wxALIGN_CENTRE );
+	
+	// Rows
+	ColumnsGrid->EnableDragRowSize( true );
+	ColumnsGrid->SetRowLabelSize( 80 );
+	ColumnsGrid->SetRowLabelAlignment( wxALIGN_CENTRE, wxALIGN_CENTRE );
+	
+	// Label Appearance
+	
+	// Cell Defaults
+	ColumnsGrid->SetDefaultCellAlignment( wxALIGN_LEFT, wxALIGN_TOP );
+	ColumnsSizer->Add( ColumnsGrid, 1, wxALL|wxEXPAND, 5 );
+	
+	bSizer17->Add( ColumnsSizer, 1, wxEXPAND, 5 );
+	
+	wxFlexGridSizer* IndicesSizer;
+	IndicesSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	IndicesSizer->AddGrowableCol( 0 );
+	IndicesSizer->AddGrowableRow( 1 );
+	IndicesSizer->SetFlexibleDirection( wxBOTH );
+	IndicesSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	IndicesLabel = new wxStaticText( GridsPanel, wxID_ANY, wxT("Indices"), wxDefaultPosition, wxDefaultSize, 0 );
+	IndicesLabel->Wrap( -1 );
+	IndicesSizer->Add( IndicesLabel, 0, wxALL, 5 );
+	
+	IndicesGrid = new wxGrid( GridsPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+	
+	// Grid
+	IndicesGrid->CreateGrid( 5, 5 );
+	IndicesGrid->EnableEditing( true );
+	IndicesGrid->EnableGridLines( true );
+	IndicesGrid->EnableDragGridSize( false );
+	IndicesGrid->SetMargins( 0, 0 );
+	
+	// Columns
+	IndicesGrid->EnableDragColMove( false );
+	IndicesGrid->EnableDragColSize( true );
+	IndicesGrid->SetColLabelSize( 30 );
+	IndicesGrid->SetColLabelAlignment( wxALIGN_CENTRE, wxALIGN_CENTRE );
+	
+	// Rows
+	IndicesGrid->EnableDragRowSize( true );
+	IndicesGrid->SetRowLabelSize( 80 );
+	IndicesGrid->SetRowLabelAlignment( wxALIGN_CENTRE, wxALIGN_CENTRE );
+	
+	// Label Appearance
+	
+	// Cell Defaults
+	IndicesGrid->SetDefaultCellAlignment( wxALIGN_LEFT, wxALIGN_TOP );
+	IndicesSizer->Add( IndicesGrid, 1, wxALL|wxEXPAND, 5 );
+	
+	bSizer17->Add( IndicesSizer, 1, wxEXPAND, 5 );
+	
+	GridsPanel->SetSizer( bSizer17 );
+	GridsPanel->Layout();
+	bSizer17->Fit( GridsPanel );
+	GridSizer->Add( GridsPanel, 1, wxEXPAND | wxALL, 5 );
+	
+	PanelSizer->Add( GridSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( PanelSizer );
+	this->Layout();
+	PanelSizer->Fit( this );
+	
+	// Connect Events
+	RefreshButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( TableDefinitionPanelGeneratedClass::OnRefreshButton ), NULL, this );
+	ShowSqlButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( TableDefinitionPanelGeneratedClass::OnSqlButton ), NULL, this );
+	TableName->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( TableDefinitionPanelGeneratedClass::OnTableNameEnter ), NULL, this );
+}
+
+TableDefinitionPanelGeneratedClass::~TableDefinitionPanelGeneratedClass()
+{
+	// Disconnect Events
+	RefreshButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( TableDefinitionPanelGeneratedClass::OnRefreshButton ), NULL, this );
+	ShowSqlButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( TableDefinitionPanelGeneratedClass::OnSqlButton ), NULL, this );
+	TableName->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( TableDefinitionPanelGeneratedClass::OnTableNameEnter ), NULL, this );
+	
+}

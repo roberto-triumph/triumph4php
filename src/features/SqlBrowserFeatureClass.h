@@ -445,6 +445,52 @@ private:
 	DECLARE_EVENT_TABLE()
 };
 
+class TableDefinitionPanelClass : public TableDefinitionPanelGeneratedClass {
+	
+public:
+	
+	TableDefinitionPanelClass(wxWindow* parent, int id, mvceditor::SqlBrowserFeatureClass& feature);
+	~TableDefinitionPanelClass();
+	
+	/**
+	 * set the table definition to be shown
+	 */
+	void ShowTable(const mvceditor::DatabaseTagClass& tag, const wxString& tableName);
+	
+	void FillConnectionList();
+	
+private:
+
+	void OnColumnSqlComplete(wxCommandEvent& event);
+	
+	void OnIndexSqlComplete(wxCommandEvent& event);
+	
+	void OnTableNameEnter(wxCommandEvent& event);
+	
+	void OnSqlButton(wxCommandEvent& event);
+	
+	void OnCreateSqlComplete(wxCommandEvent& event);
+	
+	void OnRefreshButton(wxCommandEvent& event);
+
+	/**
+	 * needed to get the connection list
+	 */
+	SqlBrowserFeatureClass& Feature;
+	
+	/**
+	 * to kill a running query
+	 */
+	mvceditor::ConnectionIdentifierClass TableConnectionIdentifier;
+	
+	/**
+	 * to kill a running query
+	 */
+	mvceditor::ConnectionIdentifierClass IndexConnectionIdentifier;
+	
+	DECLARE_EVENT_TABLE()
+};
+
 /**
  * This is a feature to manage SQL connections and make queries to the database.
  */
@@ -468,6 +514,8 @@ public:
 	SqlBrowserPanelClass* CreateResultsPanel(CodeControlClass* ctrl);
 	
 	void AuiManagerUpdate();
+	
+	void NewSqlBuffer(const wxString& sql);
 	
 private:
 

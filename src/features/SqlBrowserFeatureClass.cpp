@@ -36,6 +36,70 @@
 static const int ID_SQL_GAUGE = wxNewId();
 static const int ID_SQL_EDIT_TEST = wxNewId();
 static const int ID_SQL_LIST_TEST = wxNewId();
+static const int ID_SQL_TABLE_DEFINITION = wxNewId();
+static const int ID_SQL_TABLE_INDICES = wxNewId();
+static const int ID_SQL_TABLE_CREATE = wxNewId();
+static const int ID_PANEL_TABLE_DEFINITION = wxNewId();
+
+/**
+ * @param grid the grid to put the results in. any previous grid values are cleared. this function will not own the pointer
+ * @param results the results to fill. this function will not own the pointer
+ */
+static void FillGridWithResults(wxGrid* grid, mvceditor::SqlResultClass* results) {
+	std::vector<bool> autoSizeColumns;
+
+	// there may be many results; freeze the drawing until we fill in the grid
+	grid->BeginBatch();
+	int rowNumber = 1;
+	if (grid->GetNumberCols()) {
+		grid->DeleteCols(0, grid->GetNumberCols());
+	}
+	if (grid->GetNumberRows()) {
+		grid->DeleteRows(0, grid->GetNumberRows());
+	}
+	if (!results->Error.isEmpty()) {
+		grid->AppendCols(1);
+		grid->SetColLabelValue(1, _("Error Message"));
+		grid->AppendRows(1);
+		grid->SetCellValue(0, 0, mvceditor::IcuToWx(results->Error));
+		autoSizeColumns.push_back(true);
+	}
+	if (results->HasRows) {
+		grid->AppendCols(results->ColumnNames.size());
+		for (size_t i = 0; i < results->ColumnNames.size(); i++) {
+			grid->SetColLabelValue(i, mvceditor::IcuToWx(results->ColumnNames[i]));
+			autoSizeColumns.push_back(true);
+		}
+		grid->SetDefaultCellOverflow(false);
+		for (size_t i = 0; i < results->StringResults.size(); i++) {
+			grid->AppendRows(1);
+			std::vector<UnicodeString> columnValues =  results->StringResults[i];
+			for (size_t colNumber = 0; colNumber < columnValues.size(); colNumber++) {
+				grid->SetCellValue(rowNumber - 1, colNumber, mvceditor::IcuToWx(columnValues[colNumber]));
+				if (columnValues[colNumber].length() > 50) {
+					autoSizeColumns[colNumber] = false; 
+				}
+			}
+			grid->SetRowLabelValue(rowNumber - 1, wxString::Format(wxT("%d"), rowNumber));
+			rowNumber++;
+		}
+	}
+
+	// resize columns to fit the content, unless the content of the columns is too big (ie blobs)
+	for (size_t i = 0; i < autoSizeColumns.size(); i++) {
+		if (autoSizeColumns[i]) {
+			grid->AutoSizeColumn(i);
+			grid->SetColMinimalWidth(i, grid->GetColumnWidth(i));
+		}
+		else {
+			grid->SetColSize(i, 50);
+			grid->SetColMinimalWidth(i, 50);
+		}
+	}
+
+	// unfreeze the grid
+	grid->EndBatch();
+}
 
 mvceditor::SqliteConnectionDialogClass::SqliteConnectionDialogClass(wxWindow* parent, mvceditor::DatabaseTagClass& tag)
 : SqliteConnectionDialogGeneratedClass(parent, wxID_ANY)
@@ -635,58 +699,14 @@ void mvceditor::SqlBrowserPanelClass::RenderAllResults() {
 }
 
 void mvceditor::SqlBrowserPanelClass::Fill(mvceditor::SqlResultClass* results) {
-	std::vector<bool> autoSizeColumns;
+	FillGridWithResults(ResultsGrid, results);
 
-	// there may be many results; freeze the drawing until we fill in the grid
-	ResultsGrid->BeginBatch();
-	int rowNumber = 1;
-	if (ResultsGrid->GetNumberCols()) {
-		ResultsGrid->DeleteCols(0, ResultsGrid->GetNumberCols());
-	}
-	if (ResultsGrid->GetNumberRows()) {
-		ResultsGrid->DeleteRows(0, ResultsGrid->GetNumberRows());
-	}
-	if (results->HasRows) {
-		ResultsGrid->AppendCols(results->ColumnNames.size());
-		for (size_t i = 0; i < results->ColumnNames.size(); i++) {
-			ResultsGrid->SetColLabelValue(i, mvceditor::IcuToWx(results->ColumnNames[i]));
-			autoSizeColumns.push_back(true);
-		}
-		ResultsGrid->SetDefaultCellOverflow(false);
-		for (size_t i = 0; i < results->StringResults.size(); i++) {
-			ResultsGrid->AppendRows(1);
-			std::vector<UnicodeString> columnValues =  results->StringResults[i];
-			for (size_t colNumber = 0; colNumber < columnValues.size(); colNumber++) {
-				ResultsGrid->SetCellValue(rowNumber - 1, colNumber, mvceditor::IcuToWx(columnValues[colNumber]));
-				if (columnValues[colNumber].length() > 50) {
-					autoSizeColumns[colNumber] = false; 
-				}
-			}
-			ResultsGrid->SetRowLabelValue(rowNumber - 1, wxString::Format(wxT("%d"), rowNumber));
-			rowNumber++;
-		}
-	}
-
-	// resize columns to fit the content, unless the content of the columns is too big (ie blobs)
-	for (size_t i = 0; i < autoSizeColumns.size(); i++) {
-		if (autoSizeColumns[i]) {
-			ResultsGrid->AutoSizeColumn(i);
-			ResultsGrid->SetColMinimalWidth(i, ResultsGrid->GetColumnWidth(i));
-		}
-		else {
-			ResultsGrid->SetColSize(i, 50);
-			ResultsGrid->SetColMinimalWidth(i, 50);
-		}
-	}
-
-	// unfreeze the grid
-	ResultsGrid->EndBatch();
 	if (!results->Success) {
 		UpdateLabels(mvceditor::IcuToWx(results->Error));
 	}
 	else {
 		UpdateLabels(wxString::Format(_("%d rows returned in %.3f sec"), 
-			results->AffectedRows, (results->QueryTime.ToLong() / 1000.00)));		
+			results->AffectedRows, (results->QueryTime.ToLong() / 1000.00)));
 	}
 }
 
@@ -1102,32 +1122,202 @@ void mvceditor::SqlBrowserFeatureClass::OnCmdTableDataOpen(mvceditor::OpenDbTabl
 	}
 }
 
+void mvceditor::SqlBrowserFeatureClass::NewSqlBuffer(const wxString& sql) {
+	GetNotebook()->AddMvcEditorPage(mvceditor::CodeControlClass::SQL);
+	mvceditor::CodeControlClass* ctrl = GetCurrentCodeControl();
+	if (ctrl) {
+		ctrl->SetText(sql);
+	}
+}
+
 void mvceditor::SqlBrowserFeatureClass::OnCmdTableDefinitionOpen(mvceditor::OpenDbTableCommandEventClass& event) {
 	
 	// find the connection to use by hash, 
 	mvceditor::DatabaseTagClass tag;
 	bool found = App.Globals.FindDatabaseTagByHash(event.ConnectionHash, tag);
 	if (found) {
-		mvceditor::SqlQueryClass query;
-		mvceditor::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxNewId(), GetStatusBarWithGauge(), 
-			query, this);
 		
-		wxString tabText = event.DbTableName;
-		wxString sql;
-		if (mvceditor::DatabaseTagClass::MYSQL == tag.Driver) {
-			sql = "DESC " + event.DbTableName;
+		// if there is an existing table definition panel use that
+		wxWindow* win = wxWindow::FindWindowById(ID_PANEL_TABLE_DEFINITION, GetToolsNotebook());
+		mvceditor::TableDefinitionPanelClass* sqlPanel = NULL;
+		if (win) {
+			sqlPanel = (mvceditor::TableDefinitionPanelClass*)win;
+			SetFocusToToolsWindow(win);
 		}
-		else if (mvceditor::DatabaseTagClass::SQLITE == tag.Driver) {
-			sql = "PRAGMA table_info('" + event.DbTableName + "')";
+		else {
+			sqlPanel = new TableDefinitionPanelClass(GetMainWindow(), ID_PANEL_TABLE_DEFINITION, *this);
+			wxString tabText = wxT("Table Definition");
+		
+			// name the windows, since there could be multiple windows from various features; we want to know which opened tools windows
+			// are from this feature
+			wxBitmap tableBitmap = mvceditor::IconImageAsset(wxT("database-medium"));
+			AddToolsWindow(sqlPanel, tabText, wxT("mvceditor::TableDefinitionPanelClass"), tableBitmap);
 		}
-
-		// name the windows, since there could be multiple windows from various features; we want to know which opened tools windows
-		// are from this feature
-		wxBitmap tableBitmap = mvceditor::IconImageAsset(wxT("database-medium"));
-		AddToolsWindow(sqlPanel, tabText, wxT("mvceditor::SqlBrowserPanelClass"), tableBitmap);
-		sqlPanel->ExecuteQuery(sql, tag);
+		sqlPanel->ShowTable(tag, event.DbTableName);
 	}
 }
+
+mvceditor::TableDefinitionPanelClass::TableDefinitionPanelClass(wxWindow* parent, int id, mvceditor::SqlBrowserFeatureClass& feature)
+: TableDefinitionPanelGeneratedClass(parent, id)
+, Feature(feature) 
+, TableConnectionIdentifier() 
+, IndexConnectionIdentifier() {
+	ColumnsGrid->ClearGrid();
+	IndicesGrid->ClearGrid();
+	Connections->Clear();
+	FillConnectionList();
+	Feature.App.RunningThreads.AddEventHandler(this);
+	RefreshButton->SetBitmap(mvceditor::IconImageAsset("outline-refresh"));
+	this->Layout();
+}
+
+mvceditor::TableDefinitionPanelClass::~TableDefinitionPanelClass() {
+	Feature.App.RunningThreads.RemoveEventHandler(this);
+}
+
+void mvceditor::TableDefinitionPanelClass::FillConnectionList() {
+	Connections->Clear();
+	std::vector<mvceditor::DatabaseTagClass> dbTags = Feature.App.Globals.AllEnabledDatabaseTags();
+	for (size_t i = 0; i < dbTags.size(); ++i) {
+		Connections->Append(mvceditor::IcuToWx(dbTags[i].Label));
+	}
+}
+
+
+void mvceditor::TableDefinitionPanelClass::ShowTable(const mvceditor::DatabaseTagClass& tag, const wxString& tableName) {
+	TableName->SetValue(tableName);
+	
+	// select the connection to the one to show
+	std::vector<mvceditor::DatabaseTagClass> dbTags = Feature.App.Globals.AllEnabledDatabaseTags();
+	int indexToSelect = 0;
+	for (size_t i = 0; i < dbTags.size(); ++i) {
+		if (dbTags[i].ConnectionHash() == tag.ConnectionHash()) {
+			indexToSelect = i;
+			break;
+		}
+	}
+	if (indexToSelect) {
+		Connections->Select(indexToSelect);
+	}
+	
+	// trigger the description query
+	mvceditor::SqlQueryClass query;
+	query.DatabaseTag = tag;
+	UnicodeString columnSql;
+	if (mvceditor::DatabaseTagClass::MYSQL == tag.Driver) {
+		columnSql = mvceditor::WxToIcu("DESC " + tableName);
+	}
+	else if (mvceditor::DatabaseTagClass::SQLITE == tag.Driver) {
+		columnSql = mvceditor::WxToIcu("PRAGMA table_info('" + tableName + "')");
+	}
+	mvceditor::MultipleSqlExecuteClass* sqlDefExecute = 
+		new mvceditor::MultipleSqlExecuteClass(Feature.App.RunningThreads, ID_SQL_TABLE_DEFINITION, TableConnectionIdentifier);
+	if (sqlDefExecute->Init(columnSql, query)) {
+		Feature.App.RunningThreads.Queue(sqlDefExecute);
+	}
+	
+	UnicodeString indexSql;
+	if (mvceditor::DatabaseTagClass::MYSQL == tag.Driver) {
+		indexSql = mvceditor::WxToIcu("SHOW INDEX FROM " + tableName);
+	}
+	else if (mvceditor::DatabaseTagClass::SQLITE == tag.Driver) {
+		indexSql = mvceditor::WxToIcu("PRAGMA index_list('" + tableName + "')");
+	}
+	mvceditor::MultipleSqlExecuteClass* sqlIndexExecute = 
+		new mvceditor::MultipleSqlExecuteClass(Feature.App.RunningThreads, ID_SQL_TABLE_INDICES, IndexConnectionIdentifier);
+	if (sqlIndexExecute->Init(indexSql, query)) {
+		Feature.App.RunningThreads.Queue(sqlIndexExecute);
+	}
+}
+
+void mvceditor::TableDefinitionPanelClass::OnColumnSqlComplete(wxCommandEvent& event) {
+	ColumnsGrid->ClearGrid();
+	mvceditor::SqlResultClass* result = (mvceditor::SqlResultClass*)event.GetClientData();
+	if (!result) {
+		return;
+	}
+	FillGridWithResults(ColumnsGrid, result);
+	delete result;
+}
+
+void mvceditor::TableDefinitionPanelClass::OnIndexSqlComplete(wxCommandEvent& event) {
+	IndicesGrid->ClearGrid();
+	mvceditor::SqlResultClass* result = (mvceditor::SqlResultClass*)event.GetClientData();
+	if (!result) {
+		return;
+	}
+	FillGridWithResults(IndicesGrid, result);
+	delete result;
+}
+
+
+void mvceditor::TableDefinitionPanelClass::OnTableNameEnter(wxCommandEvent& event) {
+	
+	// select the connection to the one to show
+	std::vector<mvceditor::DatabaseTagClass> dbTags = Feature.App.Globals.AllEnabledDatabaseTags();
+	size_t selectedIndex = Connections->GetSelection();
+	if (selectedIndex >= 0 && selectedIndex < dbTags.size()) {
+		mvceditor::DatabaseTagClass selectedTag = dbTags[selectedIndex];
+		ShowTable(selectedTag, TableName->GetValue());
+	}
+}
+
+void mvceditor::TableDefinitionPanelClass::OnSqlButton(wxCommandEvent& event) {
+	std::vector<mvceditor::DatabaseTagClass> dbTags = Feature.App.Globals.AllEnabledDatabaseTags();
+	size_t selectedIndex = Connections->GetSelection();
+	if (selectedIndex >= dbTags.size()) {
+		return;
+	}
+	mvceditor::DatabaseTagClass selectedTag = dbTags[selectedIndex];
+	
+	
+	UnicodeString createSql;
+	wxString tableName = TableName->GetValue();
+	if (mvceditor::DatabaseTagClass::MYSQL == selectedTag.Driver) {
+		createSql = mvceditor::WxToIcu("SHOW CREATE TABLE " + tableName);
+	}
+	else if (mvceditor::DatabaseTagClass::SQLITE == selectedTag.Driver) {
+		createSql = mvceditor::WxToIcu("SELECT sql FROM sqlite_master WHERE type='table' AND name= '" + tableName + "'");
+	}
+	mvceditor::SqlQueryClass query;
+	query.DatabaseTag = selectedTag;
+	mvceditor::MultipleSqlExecuteClass* sqlCreateExecute = 
+		new mvceditor::MultipleSqlExecuteClass(Feature.App.RunningThreads, ID_SQL_TABLE_CREATE, IndexConnectionIdentifier);
+	if (sqlCreateExecute->Init(createSql, query)) {
+		Feature.App.RunningThreads.Queue(sqlCreateExecute);
+	}
+}
+
+void mvceditor::TableDefinitionPanelClass::OnCreateSqlComplete(wxCommandEvent& event) {
+	mvceditor::SqlResultClass* result = (mvceditor::SqlResultClass*)event.GetClientData();
+	if (!result) {
+		return;
+	}
+	if (!result->Error.isEmpty()) {
+		FillGridWithResults(ColumnsGrid, result);
+	}
+	else if (!result->StringResults.empty() && result->StringResults[0].size() == 2) {
+		
+		// mysql results
+		UnicodeString table = result->StringResults[0][1];
+		wxString sqlText = mvceditor::IcuToWx(table);
+		Feature.NewSqlBuffer(sqlText);
+	}
+	else if (!result->StringResults.empty() && result->StringResults[0].size() == 1) {
+		
+		// sqlite results
+		UnicodeString table = result->StringResults[0][0];
+		wxString sqlText = mvceditor::IcuToWx(table);
+		Feature.NewSqlBuffer(sqlText);
+	}
+	
+	delete result;
+}
+
+void mvceditor::TableDefinitionPanelClass::OnRefreshButton(wxCommandEvent& event) {
+	OnTableNameEnter(event);
+}
+
 
 BEGIN_EVENT_TABLE(mvceditor::SqlBrowserFeatureClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_SQL + 0, mvceditor::SqlBrowserFeatureClass::OnSqlBrowserToolsMenu)	
@@ -1154,5 +1344,11 @@ END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::MysqlConnectionDialogClass, MysqlConnectionDialogGeneratedClass)
 	EVT_COMMAND(ID_SQL_EDIT_TEST, QUERY_COMPLETE_EVENT, mvceditor::MysqlConnectionDialogClass::ShowTestResults)
+END_EVENT_TABLE()
+
+BEGIN_EVENT_TABLE(mvceditor::TableDefinitionPanelClass, TableDefinitionPanelGeneratedClass)
+	EVT_COMMAND(ID_SQL_TABLE_DEFINITION, QUERY_COMPLETE_EVENT, mvceditor::TableDefinitionPanelClass::OnColumnSqlComplete)
+	EVT_COMMAND(ID_SQL_TABLE_INDICES, QUERY_COMPLETE_EVENT, mvceditor::TableDefinitionPanelClass::OnIndexSqlComplete)
+	EVT_COMMAND(ID_SQL_TABLE_CREATE, QUERY_COMPLETE_EVENT, mvceditor::TableDefinitionPanelClass::OnCreateSqlComplete)
 END_EVENT_TABLE()
 
