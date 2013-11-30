@@ -53,21 +53,24 @@ void mvceditor::TotalSearchFeatureClass::OnTotalSearch(wxCommandEvent& event) {
 	int lineNumber = 0;
 	mvceditor::TotalSearchDialogClass dialog(GetMainWindow(), *this, selectedTags, lineNumber);
 	if (wxOK == dialog.ShowModal() && !selectedTags.empty()) {
-		switch (selectedTags[0].Type) {
-		case mvceditor::TotalTagResultClass::FILE_TAG:
-			OpenFileTag(selectedTags[0].FileTag, lineNumber);
-			break;
-		case mvceditor::TotalTagResultClass::TABLE_DATA_TAG:
-			OpenDbData(selectedTags[0].TableTag);
-			break;
-		case mvceditor::TotalTagResultClass::TABLE_DEFINITION_TAG:
-			OpenDbTable(selectedTags[0].TableTag);
-			break;
-		case mvceditor::TotalTagResultClass::CLASS_TAG:
-		case mvceditor::TotalTagResultClass::FUNCTION_TAG:
-		case mvceditor::TotalTagResultClass::METHOD_TAG:
-			OpenPhpTag(selectedTags[0].PhpTag);
-			break;
+		for (size_t i = 0; i < selectedTags.size(); ++i) {
+			mvceditor::TotalTagResultClass result = selectedTags[i];
+			switch (result.Type) {
+			case mvceditor::TotalTagResultClass::FILE_TAG:
+				OpenFileTag(result.FileTag, lineNumber);
+				break;
+			case mvceditor::TotalTagResultClass::TABLE_DATA_TAG:
+				OpenDbData(result.TableTag);
+				break;
+			case mvceditor::TotalTagResultClass::TABLE_DEFINITION_TAG:
+				OpenDbTable(result.TableTag);
+				break;
+			case mvceditor::TotalTagResultClass::CLASS_TAG:
+			case mvceditor::TotalTagResultClass::FUNCTION_TAG:
+			case mvceditor::TotalTagResultClass::METHOD_TAG:
+				OpenPhpTag(result.PhpTag);
+				break;
+			}
 		}
 	}
 }
@@ -122,26 +125,7 @@ mvceditor::TotalSearchDialogClass::TotalSearchDialogClass(wxWindow* parent, mvce
 	RunningThreads.AddEventHandler(this);
 	Timer.Start(300, wxTIMER_CONTINUOUS);
 	
-	wxImageList* imageList = new wxImageList(16, 16);
-	imageList->Add(mvceditor::IconImageAsset("class"));
-	imageList->Add(mvceditor::IconImageAsset("method-public"));
-	imageList->Add(mvceditor::IconImageAsset("function"));
-	imageList->Add(mvceditor::IconImageAsset("document-php"));
-	imageList->Add(mvceditor::IconImageAsset("document-sql"));
-	imageList->Add(mvceditor::IconImageAsset("document-css"));
-	imageList->Add(mvceditor::IconImageAsset("document-text"));
-	imageList->Add(mvceditor::IconImageAsset("table"));
-	imageList->Add(mvceditor::IconImageAsset("database-medium"));
-	
-	MatchesList->AssignImageList(imageList, wxIMAGE_LIST_SMALL);
-	
-	MatchesList->ClearAll();
-	MatchesList->AppendColumn(_("Name"));
-	MatchesList->AppendColumn(_("Type"));
-	MatchesList->AppendColumn(_("Description"));
-	MatchesList->SetColumnWidth(0, 200);
-	MatchesList->SetColumnWidth(0, 100);
-	MatchesList->SetColumnWidth(1, -1);
+	MatchesList->Clear();
 }
 
 void mvceditor::TotalSearchDialogClass::OnCancelButton(wxCommandEvent& event) {
@@ -177,12 +161,18 @@ void mvceditor::TotalSearchDialogClass::OnHelpButton(wxCommandEvent& event) {
 }
 
 void mvceditor::TotalSearchDialogClass::OnMatchesListKeyDown(wxKeyEvent& event) {
-	long nextIndex = MatchesList->GetNextItem(-1, wxLIST_NEXT_BELOW, wxLIST_STATE_SELECTED);
+	unsigned int nextIndex = MatchesList->GetSelection();
 	bool skip = true;
 	if (event.GetKeyCode() == WXK_RETURN) {
 		skip = false;
 	}
-	if (nextIndex >= 0 && nextIndex < MatchesList->GetItemCount()) {
+	else if (event.GetKeyCode() == WXK_UP) {
+		skip = true;
+	}
+	else if (event.GetKeyCode() == WXK_DOWN) {
+		skip = true;
+	}
+	if (!skip && nextIndex >= 0 && nextIndex < MatchesList->GetCount()) {
 		ChooseSelectedAndEnd(nextIndex);
 	}
 	if (skip) {
@@ -190,37 +180,41 @@ void mvceditor::TotalSearchDialogClass::OnMatchesListKeyDown(wxKeyEvent& event) 
 	}
 }
 
-void mvceditor::TotalSearchDialogClass::OnMatchesListDoubleClick(wxListEvent& event) {
-	long selected = event.GetIndex();
+void mvceditor::TotalSearchDialogClass::OnMatchesListDoubleClick(wxCommandEvent& event) {
+	unsigned int selected = event.GetSelection();
 	if (selected >= 0) {
 		ChooseSelectedAndEnd(selected);
 	}
 }
 
 void mvceditor::TotalSearchDialogClass::OnOkButton(wxCommandEvent& event) {
-	long selected = MatchesList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-	if (selected >= 0) {
-		ChooseSelectedAndEnd(selected);
+	
+	// open all checked tags
+	for (unsigned int i = 0; i < MatchesList->GetCount(); ++i) {
+		if (MatchesList->IsChecked(i)) {
+			mvceditor::TotalTagResultClass tag = Results[i];
+			SelectedTags.push_back(tag);
+		}
 	}
-}
-
-void mvceditor::TotalSearchDialogClass::OnProjectChoice(wxCommandEvent& event) {
-	event.Skip();
+	RunningThreads.Shutdown();
+	RunningThreads.RemoveEventHandler(this);
+	EndModal(wxOK);
 }
 
 void mvceditor::TotalSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
-	long selected = MatchesList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	unsigned int selected = MatchesList->GetSelection();
 	if (selected >= 0) {
 		ChooseSelectedAndEnd(selected);
 	}
 }
 
 void mvceditor::TotalSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
-	long nextIndex = MatchesList->GetNextItem(-1, wxLIST_NEXT_BELOW, wxLIST_STATE_SELECTED);
+	unsigned int currentIndex = MatchesList->GetSelection();
+	unsigned int nextIndex = currentIndex;
 	bool skip = true;
 	if (event.GetKeyCode() == WXK_DOWN) {
 		nextIndex++;
-		if (nextIndex >= MatchesList->GetItemCount()) {
+		if (nextIndex >= MatchesList->GetCount()) {
 			nextIndex = 0;
 		}
 		skip = false;
@@ -228,12 +222,12 @@ void mvceditor::TotalSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 	else if (event.GetKeyCode() == WXK_UP) {
 		nextIndex--;
 		if (nextIndex < 0) {
-			nextIndex = MatchesList->GetItemCount() - 1;
+			nextIndex = MatchesList->GetCount() - 1;
 		}
 		skip = false;
 	}
-	if (nextIndex >= 0 && nextIndex < MatchesList->GetItemCount()) {
-		MatchesList->SetItemState(nextIndex, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+	if (nextIndex >= 0 && nextIndex < MatchesList->GetCount()) {
+		MatchesList->SetSelection(nextIndex);
 	}
 	if (skip) {
 		event.Skip();
@@ -257,94 +251,54 @@ void mvceditor::TotalSearchDialogClass::OnTimer(wxTimerEvent& event) {
 }
 
 void mvceditor::TotalSearchDialogClass::OnSearchComplete(mvceditor::TotalTagSearchCompleteEventClass& event) {
-	MatchesList->DeleteAllItems();
+	MatchesList->Clear();
 	Results = event.Tags;
 	LineNumber = event.LineNumber;
 	
 	std::vector<mvceditor::TotalTagResultClass>::const_iterator tag;
 	for (tag = Results.begin(); tag != Results.end(); ++tag) {
 		wxString value;
-		wxString type;
 		wxString desc;
-		int imageIndex = 0;
 		if (mvceditor::TotalTagResultClass::CLASS_TAG == tag->Type) {
 			value = mvceditor::IcuToWx(tag->PhpTag.ClassName);
-			desc = mvceditor::IcuToWx(tag->PhpTag.Signature);
-			type = _("PHP Class");
-			imageIndex = PHP_CLASS;
+			desc = tag->PhpTag.FullPath;
 		}
 		else if (mvceditor::TotalTagResultClass::FILE_TAG == tag->Type) {
 			value = tag->FileTag.Name();
-			type = _("File");
 			desc = tag->FileTag.FullPath;
-			
-			if (Feature.App.Globals.HasAPhpExtension(tag->FileTag.FullPath)) {
-				imageIndex = FILE_PHP;
-			}
-			else if (Feature.App.Globals.HasASqlExtension(tag->FileTag.FullPath)) {
-				imageIndex = FILE_SQL;
-			}
-			if (Feature.App.Globals.HasACssExtension(tag->FileTag.FullPath)) {
-				imageIndex = FILE_CSS;
-			}
-			if (Feature.App.Globals.HasAMiscExtension(tag->FileTag.FullPath)) {
-				imageIndex = FILE_MISC;
-			}
 		}
 		else if (mvceditor::TotalTagResultClass::FUNCTION_TAG == tag->Type) {
 			value = mvceditor::IcuToWx(tag->PhpTag.Identifier);
-			desc = mvceditor::IcuToWx(tag->PhpTag.Signature);
-			imageIndex = PHP_FUNCTION;
-			type = _("PHP Function");
+			desc = tag->PhpTag.FullPath;
 		}
 		else if (mvceditor::TotalTagResultClass::METHOD_TAG == tag->Type) {
 			value = mvceditor::IcuToWx(tag->PhpTag.ClassName) + 
 				wxT("::") + mvceditor::IcuToWx(tag->PhpTag.Identifier);
-			desc = mvceditor::IcuToWx(tag->PhpTag.Signature);
-			imageIndex = PHP_METHOD;
-			type = _("PHP Member");
+			desc = tag->PhpTag.FullPath;
 		}
 		else if (mvceditor::TotalTagResultClass::TABLE_DATA_TAG == tag->Type) {
 			value = tag->TableTag.TableName;
 			desc = _("Database Table Data for ") + tag->TableTag.TableName;
-			imageIndex = DB_TABLE_DATA;
-			type = _("DB Table");
 		}
 		else if (mvceditor::TotalTagResultClass::TABLE_DEFINITION_TAG == tag->Type) {
 			value = tag->TableTag.TableName;
 			desc = _("Database Table Definition for ") + tag->TableTag.TableName;
-			imageIndex = DB_TABLE_DEFINITION;
-			type = _("DB Table");
 		}
 		
-		int newRowNumber = MatchesList->GetItemCount();
-		wxListItem column1;
-		column1.SetColumn(0);
-		column1.SetId(newRowNumber);
-		column1.SetText(value);
-		MatchesList->InsertItem(column1);
-		
-		MatchesList->SetItemColumnImage(newRowNumber, 0, imageIndex);
-		
-		wxListItem column2;
-		column2.SetId(newRowNumber);
-		column2.SetColumn(1);
-		column2.SetText(type);
-		MatchesList->SetItem(column2);
-		
-		wxListItem column3;
-		column3.SetId(newRowNumber);
-		column3.SetColumn(2);
-		column3.SetText(desc);
-		MatchesList->SetItem(column3);
+		MatchesList->Append(value + wxT(" - ") + desc);
 	}
-	MatchesList->SetColumnWidth(0, wxLIST_AUTOSIZE);
-	MatchesList->SetColumnWidth(1, wxLIST_AUTOSIZE);
-	MatchesList->SetColumnWidth(2, wxLIST_AUTOSIZE);
-	if (MatchesList->GetItemCount() > 0) {
-		MatchesList->SetItemState(0, wxLIST_STATE_FOCUSED | wxLIST_STATE_SELECTED, wxLIST_STATE_FOCUSED | wxLIST_STATE_SELECTED);
+	if (MatchesList->GetCount() > 0) {
+		MatchesList->SetSelection(0);
 	}
-	
+	if (MatchesList->GetCount() == 0) {
+		MatchesLabel->SetLabel(_("No matches found"));
+	}
+	else if (MatchesList->GetCount() == 1) {
+		MatchesLabel->SetLabel(_("1 match found"));
+	}
+	else {
+		MatchesLabel->SetLabel(wxString::Format("%u matches found", event.Tags.size()));
+	}
 	Timer.Start(300, wxTIMER_CONTINUOUS);
 }
 

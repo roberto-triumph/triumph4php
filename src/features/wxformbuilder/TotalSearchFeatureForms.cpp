@@ -33,21 +33,12 @@ TotalSearchDialogGeneratedClass::TotalSearchDialogGeneratedClass( wxWindow* pare
 	wxBoxSizer* bSizer4;
 	bSizer4 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_staticText4 = new wxStaticText( this, wxID_ANY, _("Project"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText4->Wrap( -1 );
-	bSizer4->Add( m_staticText4, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	wxArrayString ProjectChoiceChoices;
-	ProjectChoice = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, ProjectChoiceChoices, 0 );
-	ProjectChoice->SetSelection( 0 );
-	bSizer4->Add( ProjectChoice, 1, wxALL|wxEXPAND, 5 );
-	
 	FlexGridSizer->Add( bSizer4, 1, wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer5;
 	bSizer5 = new wxBoxSizer( wxHORIZONTAL );
 	
-	MatchesLabel = new wxStaticText( this, wxID_ANY, _("Matches: None"), wxDefaultPosition, wxDefaultSize, 0 );
+	MatchesLabel = new wxStaticText( this, wxID_ANY, _("No matches found"), wxDefaultPosition, wxDefaultSize, 0 );
 	MatchesLabel->Wrap( -1 );
 	bSizer5->Add( MatchesLabel, 1, wxALL, 5 );
 	
@@ -60,7 +51,8 @@ TotalSearchDialogGeneratedClass::TotalSearchDialogGeneratedClass( wxWindow* pare
 	wxBoxSizer* ChecklistSizer;
 	ChecklistSizer = new wxBoxSizer( wxHORIZONTAL );
 	
-	MatchesList = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_SINGLE_SEL );
+	wxArrayString MatchesListChoices;
+	MatchesList = new wxCheckListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, MatchesListChoices, wxLB_SINGLE );
 	ChecklistSizer->Add( MatchesList, 1, wxALL|wxEXPAND, 5 );
 	
 	FlexGridSizer->Add( ChecklistSizer, 1, wxEXPAND, 5 );
@@ -85,9 +77,8 @@ TotalSearchDialogGeneratedClass::TotalSearchDialogGeneratedClass( wxWindow* pare
 	// Connect Events
 	SearchText->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( TotalSearchDialogGeneratedClass::OnSearchKeyDown ), NULL, this );
 	SearchText->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( TotalSearchDialogGeneratedClass::OnSearchEnter ), NULL, this );
-	ProjectChoice->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( TotalSearchDialogGeneratedClass::OnProjectChoice ), NULL, this );
+	MatchesList->Connect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( TotalSearchDialogGeneratedClass::OnMatchesListDoubleClick ), NULL, this );
 	MatchesList->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( TotalSearchDialogGeneratedClass::OnMatchesListKeyDown ), NULL, this );
-	MatchesList->Connect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( TotalSearchDialogGeneratedClass::OnMatchesListDoubleClick ), NULL, this );
 	ButtonsSizerCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( TotalSearchDialogGeneratedClass::OnCancelButton ), NULL, this );
 	ButtonsSizerHelp->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( TotalSearchDialogGeneratedClass::OnHelpButton ), NULL, this );
 	ButtonsSizerOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( TotalSearchDialogGeneratedClass::OnOkButton ), NULL, this );
@@ -98,9 +89,8 @@ TotalSearchDialogGeneratedClass::~TotalSearchDialogGeneratedClass()
 	// Disconnect Events
 	SearchText->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( TotalSearchDialogGeneratedClass::OnSearchKeyDown ), NULL, this );
 	SearchText->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( TotalSearchDialogGeneratedClass::OnSearchEnter ), NULL, this );
-	ProjectChoice->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( TotalSearchDialogGeneratedClass::OnProjectChoice ), NULL, this );
+	MatchesList->Disconnect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( TotalSearchDialogGeneratedClass::OnMatchesListDoubleClick ), NULL, this );
 	MatchesList->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( TotalSearchDialogGeneratedClass::OnMatchesListKeyDown ), NULL, this );
-	MatchesList->Disconnect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( TotalSearchDialogGeneratedClass::OnMatchesListDoubleClick ), NULL, this );
 	ButtonsSizerCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( TotalSearchDialogGeneratedClass::OnCancelButton ), NULL, this );
 	ButtonsSizerHelp->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( TotalSearchDialogGeneratedClass::OnHelpButton ), NULL, this );
 	ButtonsSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( TotalSearchDialogGeneratedClass::OnOkButton ), NULL, this );

@@ -82,9 +82,8 @@ private:
 	void OnCancelButton(wxCommandEvent& event);
 	void OnHelpButton(wxCommandEvent& event);
 	void OnMatchesListKeyDown(wxKeyEvent& event);
-	void OnMatchesListDoubleClick(wxListEvent& event);
+	void OnMatchesListDoubleClick(wxCommandEvent& event);
 	void OnOkButton(wxCommandEvent& event);
-	void OnProjectChoice(wxCommandEvent& event);
 	void OnSearchEnter(wxCommandEvent& event);
 	void OnSearchKeyDown(wxKeyEvent& event);
 	void OnSearchComplete(mvceditor::TotalTagSearchCompleteEventClass& event);
@@ -129,18 +128,6 @@ private:
 	 * the line number to jump to (given by the user)
 	 */
 	int& LineNumber;
-	
-	enum Images {
-		PHP_CLASS,
-		PHP_METHOD,
-		PHP_FUNCTION,
-		FILE_PHP,
-		FILE_SQL,
-		FILE_CSS,
-		FILE_MISC,
-		DB_TABLE_DATA,
-		DB_TABLE_DEFINITION
-	};
 	
 	DECLARE_EVENT_TABLE()
 };

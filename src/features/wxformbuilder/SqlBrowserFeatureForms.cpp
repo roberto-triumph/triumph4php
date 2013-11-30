@@ -266,7 +266,7 @@ SqliteConnectionDialogGeneratedClass::~SqliteConnectionDialogGeneratedClass()
 
 SqlConnectionListDialogGeneratedClass::SqlConnectionListDialogGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
-	this->SetSizeHints( wxSize( -1,450 ), wxDefaultSize );
+	this->SetSizeHints( wxSize( -1,-1 ), wxDefaultSize );
 	
 	wxBoxSizer* BoxSizer;
 	BoxSizer = new wxBoxSizer( wxVERTICAL );
@@ -283,7 +283,9 @@ SqlConnectionListDialogGeneratedClass::SqlConnectionListDialogGeneratedClass( wx
 	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	wxArrayString ListChoices;
-	List = new wxCheckListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, ListChoices, wxLB_EXTENDED|wxLB_MULTIPLE|wxLB_NEEDED_SB );
+	List = new wxCheckListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, ListChoices, wxLB_MULTIPLE|wxLB_NEEDED_SB );
+	List->SetMinSize( wxSize( -1,250 ) );
+	
 	GridSizer->Add( List, 1, wxALL|wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer7;

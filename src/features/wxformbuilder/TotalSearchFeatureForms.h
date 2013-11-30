@@ -17,9 +17,8 @@
 #include <wx/colour.h>
 #include <wx/settings.h>
 #include <wx/textctrl.h>
-#include <wx/choice.h>
 #include <wx/sizer.h>
-#include <wx/listctrl.h>
+#include <wx/checklst.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 
@@ -41,11 +40,9 @@ class TotalSearchDialogGeneratedClass : public wxDialog
 		
 		wxStaticText* SearchLabel;
 		wxTextCtrl* SearchText;
-		wxStaticText* m_staticText4;
-		wxChoice* ProjectChoice;
 		wxStaticText* MatchesLabel;
 		wxStaticText* CacheStatusLabel;
-		wxListCtrl* MatchesList;
+		wxCheckListBox* MatchesList;
 		wxStdDialogButtonSizer* ButtonsSizer;
 		wxButton* ButtonsSizerOK;
 		wxButton* ButtonsSizerCancel;
@@ -54,9 +51,8 @@ class TotalSearchDialogGeneratedClass : public wxDialog
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnSearchKeyDown( wxKeyEvent& event ) { event.Skip(); }
 		virtual void OnSearchEnter( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnProjectChoice( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMatchesListDoubleClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnMatchesListKeyDown( wxKeyEvent& event ) { event.Skip(); }
-		virtual void OnMatchesListDoubleClick( wxListEvent& event ) { event.Skip(); }
 		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
