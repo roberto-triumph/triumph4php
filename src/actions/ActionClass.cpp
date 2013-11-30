@@ -41,8 +41,11 @@ mvceditor::ActionClass::~ActionClass() {
 }
 
 void mvceditor::ActionClass::Cancel() {
+	{
 	wxMutexLocker locker(Mutex);
 	Cancelled = true;
+	}
+	DoCancel();
 }
 
 bool mvceditor::ActionClass::IsCancelled() {
@@ -74,7 +77,7 @@ void mvceditor::ActionClass::PostEvent(wxEvent& event) {
 	RunningThreads.PostEvent(event);
 }
 
-void mvceditor::ActionClass::BackgroundCleanup() {
+void mvceditor::ActionClass::DoCancel() {
 }
 
 

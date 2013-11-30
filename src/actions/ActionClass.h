@@ -103,9 +103,9 @@ public:
 	 * if the thread allocates any dynamic memory (using NEW) but this thread is
 	 * Delete()'d before the thread gets a chance to wxPostEvent() to the main
 	 * thread, then it should delete the memory in this method. This method will
-	 * get called in the background thread.
+	 * get called in the main thread.
 	 */
-	virtual void BackgroundCleanup();
+	virtual void DoCancel();
 
 	/**
 	 * ask the action to stop.  the action will then stop as soon as possible but will

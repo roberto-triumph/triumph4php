@@ -222,6 +222,12 @@ protected:
 
 	void BackgroundWork();
 
+	/**
+	 * when the query needs to be cancelled, tell SQlite to stop
+	 * the running query
+	 */
+	void DoCancel();
+
 private:
 
 	/**

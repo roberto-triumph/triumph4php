@@ -31,6 +31,8 @@
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 #include <MvcEditor.h>
+#include <soci/sqlite3/soci-sqlite3.h>
+#include <sqlite3.h>
 #include <wx/artprov.h>
 
 static const int ID_SQL_GAUGE = wxNewId();
@@ -493,6 +495,34 @@ void mvceditor::MultipleSqlExecuteClass::BackgroundWork() {
 	}
 }
 
+void mvceditor::MultipleSqlExecuteClass::DoCancel() {
+	if (mvceditor::DatabaseTagClass::SQLITE == Query.DatabaseTag.Driver) {
+		soci::sqlite3_session_backend* backend = static_cast<soci::sqlite3_session_backend*>(Session.get_backend());
+		sqlite_api::sqlite3_interrupt(backend->conn_);
+	}
+	if (mvceditor::DatabaseTagClass::MYSQL == Query.DatabaseTag.Driver) {
+		// for stopping mysql queries, we
+		// send a KILL sql command instead of killing the
+		// thread; that way the thread can gracefully exit
+		// we need to do both: kill the currently running 
+		// query (via a SQL KILL) and stop the thread
+		// so that the rest of the SQL statements are not
+		// sent to the server and the thread terminates
+		soci::session session;
+		UnicodeString error;
+		bool good = Query.Connect(session, error);
+		if (good) {
+			good = Query.KillConnection(session, ConnectionIdentifier, error);
+			if (!good) {
+				wxMessageBox(_("could not kill connection:") + mvceditor::IcuToWx(error));
+			}
+		}
+		else {
+			wxMessageBox(_("could not connect:") + mvceditor::IcuToWx(error));
+		}
+	}
+}
+
 bool mvceditor::MultipleSqlExecuteClass::Init(const UnicodeString& sql, const SqlQueryClass& query) {
 	Query.DatabaseTag.Copy(query.DatabaseTag);
 	return SqlLexer.OpenString(sql);
@@ -604,25 +634,7 @@ void mvceditor::SqlBrowserPanelClass::OnRefreshButton(wxCommandEvent& event) {
 }
 
 void mvceditor::SqlBrowserPanelClass::Stop() {
-	// send a KILL sql command instead of killing the
-	// thread; that way the thread can gracefully exit
-	// we need to do both: kill the currently running 
-	// query (via a SQL KILL) and stop the thread
-	// so that the rest of the SQL statements are not
-	// sent to the server and the thread terminates
 	if (RunningActionId > 0) {
-		soci::session session;
-		UnicodeString error;
-		bool good = Query.Connect(session, error);
-		if (good) {
-			good = Query.KillConnection(session, ConnectionIdentifier, error);
-			if (!good) {
-				wxMessageBox(_("could not kill connection:") + mvceditor::IcuToWx(error));
-			}
-		}
-		else {
-			wxMessageBox(_("could not connect:") + mvceditor::IcuToWx(error));
-		}
 		Feature->App.RunningThreads.CancelAction(RunningActionId);
 		RunningActionId = 0;
 		Gauge->StopGauge(ID_SQL_GAUGE);
