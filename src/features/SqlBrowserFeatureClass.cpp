@@ -578,6 +578,12 @@ void mvceditor::SqlBrowserPanelClass::ExecuteCodeControl() {
 void mvceditor::SqlBrowserPanelClass::ExecuteQuery(const wxString& sql, const mvceditor::DatabaseTagClass& tag) {
 	LastQuery = mvceditor::WxToIcu(sql);
 	Query.DatabaseTag = tag;
+	for (unsigned int i = 0; i < Connections->GetCount(); ++i) {
+		if (Connections->GetString(i) == mvceditor::IcuToWx(tag.Label)) {
+			Connections->SetSelection(i);
+			break;
+		}
+	}
 	RunningActionId = 0;
 	mvceditor::MultipleSqlExecuteClass* thread = new mvceditor::MultipleSqlExecuteClass(
 		Feature->App.RunningThreads, QueryId, ConnectionIdentifier);
