@@ -8,26 +8,26 @@
 #ifndef __SqlBrowserFeatureForms__
 #define __SqlBrowserFeatureForms__
 
-#include <wx/string.h>
-#include <wx/stattext.h>
+#include <wx/bitmap.h>
+#include <wx/image.h>
+#include <wx/icon.h>
+#include <wx/bmpbuttn.h>
 #include <wx/gdicmn.h>
 #include <wx/font.h>
 #include <wx/colour.h>
 #include <wx/settings.h>
+#include <wx/string.h>
+#include <wx/button.h>
+#include <wx/stattext.h>
 #include <wx/choice.h>
 #include <wx/sizer.h>
 #include <wx/grid.h>
 #include <wx/panel.h>
 #include <wx/textctrl.h>
 #include <wx/spinctrl.h>
-#include <wx/button.h>
 #include <wx/dialog.h>
 #include <wx/filepicker.h>
 #include <wx/checklst.h>
-#include <wx/bitmap.h>
-#include <wx/image.h>
-#include <wx/icon.h>
-#include <wx/bmpbuttn.h>
 #include <wx/scrolwin.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -43,13 +43,12 @@ class SqlBrowserPanelGeneratedClass : public wxPanel
 		enum
 		{
 			ID_PANEL = 1000,
-			ID_BOTTOMPANLE,
 			ID_CONNECTIONLABEL,
 			ID_RESULTSLABEL,
 			ID_DATAGRID,
 		};
 		
-		wxPanel* BottomPanel;
+		wxBitmapButton* RefreshButton;
 		wxStaticText* ConnectionLabel;
 		wxChoice* Connections;
 		
@@ -57,6 +56,7 @@ class SqlBrowserPanelGeneratedClass : public wxPanel
 		wxGrid* ResultsGrid;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnRefreshButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnConnectionChoice( wxCommandEvent& event ) { event.Skip(); }
 		
 	

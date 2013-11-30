@@ -386,7 +386,12 @@ private:
 	 * Fill the grid with ALL SQL results
 	 */
 	void RenderAllResults();
-	
+
+	/**
+	 * Refesh the table results by re-executing the query
+	 */
+	void OnRefreshButton(wxCommandEvent& event);
+
 	/**
 	 * The connection info
 	 */
@@ -405,7 +410,7 @@ private:
 	UnicodeString LastError;
 
 	/**
- 	 * The contents of the code control that are currenltly being executed.
+ 	 * The contents of the code control that are currently being executed.
 	 */
 	UnicodeString LastQuery;
 	

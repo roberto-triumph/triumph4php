@@ -16,10 +16,6 @@ SqlBrowserPanelGeneratedClass::SqlBrowserPanelGeneratedClass( wxWindow* parent, 
 	wxBoxSizer* BoxSizer;
 	BoxSizer = new wxBoxSizer( wxHORIZONTAL );
 	
-	BottomPanel = new wxPanel( this, ID_BOTTOMPANLE, wxDefaultPosition, wxDefaultSize, 0 );
-	wxBoxSizer* BottomGridSizer;
-	BottomGridSizer = new wxBoxSizer( wxVERTICAL );
-	
 	wxFlexGridSizer* FlexGridSizer;
 	FlexGridSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
 	FlexGridSizer->AddGrowableCol( 0 );
@@ -30,25 +26,28 @@ SqlBrowserPanelGeneratedClass::SqlBrowserPanelGeneratedClass( wxWindow* parent, 
 	wxBoxSizer* bSizer13;
 	bSizer13 = new wxBoxSizer( wxHORIZONTAL );
 	
-	ConnectionLabel = new wxStaticText( BottomPanel, ID_CONNECTIONLABEL, wxT("Connection"), wxDefaultPosition, wxDefaultSize, 0 );
+	RefreshButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	bSizer13->Add( RefreshButton, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	ConnectionLabel = new wxStaticText( this, ID_CONNECTIONLABEL, wxT("Connection"), wxDefaultPosition, wxDefaultSize, 0 );
 	ConnectionLabel->Wrap( -1 );
 	bSizer13->Add( ConnectionLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxArrayString ConnectionsChoices;
-	Connections = new wxChoice( BottomPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, ConnectionsChoices, 0 );
+	Connections = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, ConnectionsChoices, 0 );
 	Connections->SetSelection( 0 );
-	bSizer13->Add( Connections, 0, wxALL|wxEXPAND, 5 );
+	bSizer13->Add( Connections, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
 	bSizer13->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	ResultsLabel = new wxStaticText( BottomPanel, ID_RESULTSLABEL, wxT("20 rows returned"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
+	ResultsLabel = new wxStaticText( this, ID_RESULTSLABEL, wxT("20 rows returned"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
 	ResultsLabel->Wrap( -1 );
 	bSizer13->Add( ResultsLabel, 0, wxALL|wxEXPAND, 5 );
 	
 	FlexGridSizer->Add( bSizer13, 1, wxEXPAND, 5 );
 	
-	ResultsGrid = new wxGrid( BottomPanel, ID_DATAGRID, wxDefaultPosition, wxDefaultSize, 0 );
+	ResultsGrid = new wxGrid( this, ID_DATAGRID, wxDefaultPosition, wxDefaultSize, 0 );
 	
 	// Grid
 	ResultsGrid->CreateGrid( 5, 5 );
@@ -79,23 +78,20 @@ SqlBrowserPanelGeneratedClass::SqlBrowserPanelGeneratedClass( wxWindow* parent, 
 	ResultsGrid->SetDefaultCellAlignment( wxALIGN_LEFT, wxALIGN_TOP );
 	FlexGridSizer->Add( ResultsGrid, 1, wxALL|wxEXPAND, 5 );
 	
-	BottomGridSizer->Add( FlexGridSizer, 1, wxEXPAND, 5 );
-	
-	BottomPanel->SetSizer( BottomGridSizer );
-	BottomPanel->Layout();
-	BottomGridSizer->Fit( BottomPanel );
-	BoxSizer->Add( BottomPanel, 1, wxEXPAND | wxALL, 5 );
+	BoxSizer->Add( FlexGridSizer, 1, wxEXPAND, 5 );
 	
 	this->SetSizer( BoxSizer );
 	this->Layout();
 	
 	// Connect Events
+	RefreshButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlBrowserPanelGeneratedClass::OnRefreshButton ), NULL, this );
 	Connections->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( SqlBrowserPanelGeneratedClass::OnConnectionChoice ), NULL, this );
 }
 
 SqlBrowserPanelGeneratedClass::~SqlBrowserPanelGeneratedClass()
 {
 	// Disconnect Events
+	RefreshButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlBrowserPanelGeneratedClass::OnRefreshButton ), NULL, this );
 	Connections->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( SqlBrowserPanelGeneratedClass::OnConnectionChoice ), NULL, this );
 	
 }

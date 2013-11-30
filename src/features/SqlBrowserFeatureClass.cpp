@@ -521,6 +521,8 @@ mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id,
 	ResultsGrid->DeleteRows(0, ResultsGrid->GetNumberRows());
 	ResultsGrid->ClearGrid();
 	UpdateLabels(wxT(""));
+
+	RefreshButton->SetBitmap(mvceditor::IconImageAsset(wxT("outline-refresh")));
 	Feature->App.RunningThreads.AddEventHandler(this);
 	FillConnectionList();
 }
@@ -595,6 +597,10 @@ void mvceditor::SqlBrowserPanelClass::ExecuteQuery(const wxString& sql, const mv
 		delete thread;
 		RunningActionId = 0;
 	}
+}
+
+void mvceditor::SqlBrowserPanelClass::OnRefreshButton(wxCommandEvent& event) {
+	ExecuteQuery(mvceditor::IcuToWx(LastQuery), Query.DatabaseTag);
 }
 
 void mvceditor::SqlBrowserPanelClass::Stop() {
@@ -692,8 +698,9 @@ void mvceditor::SqlBrowserPanelClass::RenderAllResults() {
 		else if (!outputSummary) {
 
 			// put summary in the summary LABEL
-			wxString msg = wxString::Format(_("%d rows affected in %.3f sec"), results->AffectedRows, 
-					(results->QueryTime.ToLong() / 1000.00));
+			wxDateTime now = wxDateTime::Now();
+			wxString msg = wxString::Format(_("%d rows affected in %.3f sec [%s]"), results->AffectedRows, 
+				(results->QueryTime.ToLong() / 1000.00), now.FormatTime().c_str());
 			UpdateLabels(msg);
 		}
 	}
@@ -1118,7 +1125,7 @@ void mvceditor::SqlBrowserFeatureClass::OnCmdTableDataOpen(mvceditor::OpenDbTabl
 			query, this);
 		
 		wxString tabText = event.DbTableName;
-		wxString sql = "SELECT * FROM " + event.DbTableName;
+		wxString sql = "SELECT * FROM " + event.DbTableName + " LIMIT 100";
 
 		// name the windows, since there could be multiple windows from various features; we want to know which opened tools windows
 		// are from this feature
