@@ -79,39 +79,41 @@ LintErrorGeneratedPanelClass::LintErrorGeneratedPanelClass( wxWindow* parent, wx
 	this->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INFOTEXT ) );
 	this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INFOBK ) );
 	
-	wxFlexGridSizer* fgSizer3;
-	fgSizer3 = new wxFlexGridSizer( 2, 1, 0, 0 );
-	fgSizer3->AddGrowableCol( 0 );
-	fgSizer3->AddGrowableRow( 0 );
-	fgSizer3->SetFlexibleDirection( wxBOTH );
-	fgSizer3->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	wxFlexGridSizer* GridSizer;
+	GridSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	GridSizer->AddGrowableCol( 0 );
+	GridSizer->AddGrowableRow( 0 );
+	GridSizer->SetFlexibleDirection( wxBOTH );
+	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	ErrorLabel = new wxStaticText( this, wxID_ANY, wxT("Error on line  57: unexpected '}', expected '{'"), wxDefaultPosition, wxDefaultSize, 0 );
 	ErrorLabel->Wrap( -1 );
-	fgSizer3->Add( ErrorLabel, 1, wxALL|wxEXPAND, 5 );
+	GridSizer->Add( ErrorLabel, 1, wxALL|wxEXPAND, 5 );
 	
-	wxBoxSizer* bSizer3;
-	bSizer3 = new wxBoxSizer( wxHORIZONTAL );
+	wxBoxSizer* BottomSizer;
+	BottomSizer = new wxBoxSizer( wxHORIZONTAL );
 	
 	HelpLabel = new wxStaticText( this, wxID_ANY, wxT("Press <space> to jump to error, ESC to dismiss"), wxDefaultPosition, wxDefaultSize, 0 );
 	HelpLabel->Wrap( -1 );
-	bSizer3->Add( HelpLabel, 1, wxALL|wxEXPAND, 5 );
+	BottomSizer->Add( HelpLabel, 1, wxALL|wxEXPAND, 5 );
 	
 	GoToLink = new wxHyperlinkCtrl( this, wxID_ANY, wxT("Go to error"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
-	bSizer3->Add( GoToLink, 0, wxALL, 5 );
+	BottomSizer->Add( GoToLink, 0, wxALL, 5 );
 	
 	DismissLink = new wxHyperlinkCtrl( this, wxID_ANY, wxT("Dismiss"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
-	bSizer3->Add( DismissLink, 0, wxALL, 5 );
+	BottomSizer->Add( DismissLink, 0, wxALL, 5 );
 	
-	fgSizer3->Add( bSizer3, 1, wxEXPAND, 5 );
+	GridSizer->Add( BottomSizer, 1, wxEXPAND, 5 );
 	
-	this->SetSizer( fgSizer3 );
+	this->SetSizer( GridSizer );
 	this->Layout();
 	
 	// Connect Events
 	this->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( LintErrorGeneratedPanelClass::OnKeyDown ) );
 	GoToLink->Connect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( LintErrorGeneratedPanelClass::OnGoToLink ), NULL, this );
+	GoToLink->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( LintErrorGeneratedPanelClass::OnKeyDown ), NULL, this );
 	DismissLink->Connect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( LintErrorGeneratedPanelClass::OnDismissLink ), NULL, this );
+	DismissLink->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( LintErrorGeneratedPanelClass::OnKeyDown ), NULL, this );
 }
 
 LintErrorGeneratedPanelClass::~LintErrorGeneratedPanelClass()
@@ -119,6 +121,8 @@ LintErrorGeneratedPanelClass::~LintErrorGeneratedPanelClass()
 	// Disconnect Events
 	this->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( LintErrorGeneratedPanelClass::OnKeyDown ) );
 	GoToLink->Disconnect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( LintErrorGeneratedPanelClass::OnGoToLink ), NULL, this );
+	GoToLink->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( LintErrorGeneratedPanelClass::OnKeyDown ), NULL, this );
 	DismissLink->Disconnect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( LintErrorGeneratedPanelClass::OnDismissLink ), NULL, this );
+	DismissLink->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( LintErrorGeneratedPanelClass::OnKeyDown ), NULL, this );
 	
 }

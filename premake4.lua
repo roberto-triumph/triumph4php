@@ -112,11 +112,11 @@ function wxappconfiguration(config, action)
 	end
 
 	if config == "Debug" and (action == "gmake" or action == "codelite") then
-		linkoptions { string.format("`%s --debug=yes --unicode=yes --libs aui,adv,stc`", normalizepath(WX_CONFIG)) }
+		linkoptions { string.format("`%s --debug=yes --unicode=yes --libs aui,adv,stc,richtext,html,xml`", normalizepath(WX_CONFIG)) }
 	elseif config == "Debug" and action ==  "vs2008" then
 		links { WX_LIBS_WINDOW_DEBUG, WX_LIB_STC_DEBUG }
 	elseif config == "Release" and (action == "gmake" or action == "codelite") then
-		linkoptions { string.format("`%s --debug=no --unicode=yes --libs aui,adv,stc`", normalizepath(WX_CONFIG)) }
+		linkoptions { string.format("`%s --debug=no --unicode=yes --libs aui,adv,stc,richtext,html,xml`", normalizepath(WX_CONFIG)) }
 	elseif config == "Release" and action ==  "vs2008" then
 		links { WX_LIBS_WINDOW_RELEASE, WX_LIB_STC_RELEASE }
 	end

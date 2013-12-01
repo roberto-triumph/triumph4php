@@ -406,7 +406,7 @@
                 <property name="growablerows">0</property>
                 <property name="hgap">0</property>
                 <property name="minimum_size"></property>
-                <property name="name">fgSizer3</property>
+                <property name="name">GridSizer</property>
                 <property name="non_flexible_grow_mode">wxFLEX_GROWMODE_SPECIFIED</property>
                 <property name="permission">none</property>
                 <property name="rows">2</property>
@@ -473,7 +473,7 @@
                     <property name="proportion">1</property>
                     <object class="wxBoxSizer" expanded="1">
                         <property name="minimum_size"></property>
-                        <property name="name">bSizer3</property>
+                        <property name="name">BottomSizer</property>
                         <property name="orient">wxHORIZONTAL</property>
                         <property name="permission">none</property>
                         <object class="sizeritem" expanded="0">
@@ -570,7 +570,7 @@
                                 <event name="OnEnterWindow"></event>
                                 <event name="OnEraseBackground"></event>
                                 <event name="OnHyperlink">OnGoToLink</event>
-                                <event name="OnKeyDown"></event>
+                                <event name="OnKeyDown">OnKeyDown</event>
                                 <event name="OnKeyUp"></event>
                                 <event name="OnKillFocus"></event>
                                 <event name="OnLeaveWindow"></event>
@@ -630,7 +630,7 @@
                                 <event name="OnEnterWindow"></event>
                                 <event name="OnEraseBackground"></event>
                                 <event name="OnHyperlink">OnDismissLink</event>
-                                <event name="OnKeyDown"></event>
+                                <event name="OnKeyDown">OnKeyDown</event>
                                 <event name="OnKeyUp"></event>
                                 <event name="OnKillFocus"></event>
                                 <event name="OnLeaveWindow"></event>

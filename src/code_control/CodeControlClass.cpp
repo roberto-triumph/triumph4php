@@ -862,7 +862,6 @@ void mvceditor::CodeControlClass::MarkLintError(const pelet::LintResultsClass& r
 		MarkerAdd(result.LineNumber - 1, LINT_RESULT_MARKER);
 
 		int charNumber = result.CharacterPosition;
-		int errorLength = 5;
 
 		int documentLength = GetTextLength();
 		char* buf = new char[documentLength];
