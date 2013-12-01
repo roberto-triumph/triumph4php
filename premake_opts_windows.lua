@@ -82,10 +82,10 @@ WX_LIBS_RELEASE = {
 }
 
 -- the wxWidgets GUI debug libraries
-WX_LIBS_WINDOW_DEBUG = { "wxmsw29ud_adv", "wxmsw29ud_aui", "wxmsw29ud_html" }
+WX_LIBS_WINDOW_DEBUG = { "wxmsw29ud_adv", "wxmsw29ud_aui", "wxmsw29ud_html", "wxmsw29ud_richtext" }
 
 -- the wxWidgets GUI release libraries
-WX_LIBS_WINDOW_RELEASE = { "wxmsw29u_adv", "wxmsw29u_aui", "wxmsw29u_html" }
+WX_LIBS_WINDOW_RELEASE = { "wxmsw29u_adv", "wxmsw29u_aui", "wxmsw29u_html", "wxmsw29u_richtext" }
 
 -- the styled text control library
 WX_LIB_STC_DEBUG = "wxmsw29ud_stc"

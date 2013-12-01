@@ -50,6 +50,14 @@ class EventSinkClass;
 class GlobalsClass;
 
 /**
+ * this event is generating by a code control when the user hovers over an
+ * identifier while holding the ALT key down
+ * The event will be of class type wxCommandEvent, GetInt() will return
+ * the character posotion where the mouse is positioned at.
+ */
+extern const wxEventType EVT_MOTION_ALT;
+
+/**
  * source code control with the following enhancements.
  * - PHP autocompletion of structures found in the current project.
  * - Displaying of PHP call tips
@@ -474,16 +482,6 @@ private:
 	 * On a left mouse click, we will trigger the hotspot click
 	 */
 	void OnLeftUp(wxMouseEvent& event);
-
-	/**
-	 * show the symbol comment popup to the user
-	 */
-	void OnDwellStart(wxStyledTextEvent& event);
-
-	/**
-	 * Hide the symbool comment popup
-	 */
-	void OnDwellEnd(wxStyledTextEvent& event);
 
 	/**
 	 * when the user clicks on a hotspot (matched method, class)

@@ -331,7 +331,7 @@ EditorBehaviorPanelGeneratedClass::EditorBehaviorPanelGeneratedClass( wxWindow* 
 	RemoveTrailingBlankLines = new wxCheckBox( this, ID_REMOVETRAILINGBLANKLINES, _("Remove Trailing Blank Lines (PHP)"), wxDefaultPosition, wxDefaultSize, 0 );
 	FlexGridSizer->Add( RemoveTrailingBlankLines, 0, wxALL, 5 );
 	
-	EnableCallTipOnMouseHover = new wxCheckBox( this, ID_ENABLECALLTIPONMOUSEHOVER, _("Enable CallTip On Mouse Hover"), wxDefaultPosition, wxDefaultSize, 0 );
+	EnableCallTipOnMouseHover = new wxCheckBox( this, ID_ENABLECALLTIPONMOUSEHOVER, _("Enable CallTip On ALT+ Mouse Hover"), wxDefaultPosition, wxDefaultSize, 0 );
 	FlexGridSizer->Add( EnableCallTipOnMouseHover, 0, wxALL, 5 );
 	
 	
@@ -614,7 +614,7 @@ SettingsDirectoryGeneratedPanelClass::SettingsDirectoryGeneratedPanelClass( wxWi
 	CustomDirectory = new wxRadioButton( this, ID_CUSTOMDIRECTORY, _("Custom Directory"), wxDefaultPosition, wxDefaultSize, 0 );
 	SettingsSizer->Add( CustomDirectory, 0, wxALL, 5 );
 	
-	SettingsDirectory = new wxDirPickerCtrl( this, ID_SETTINGSDIRECTORY, wxEmptyString, _("Select a folder"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_DIR_MUST_EXIST|wxDIRP_USE_TEXTCTRL );
+	SettingsDirectory = new wxDirPickerCtrl( this, ID_SETTINGSDIRECTORY, wxEmptyString, _("Select a folder"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_DIR_MUST_EXIST|wxDIRP_USE_TEXTCTRL, wxDefaultValidator, wxT("Settings directory") );
 	SettingsSizer->Add( SettingsDirectory, 0, wxALL|wxEXPAND, 5 );
 	
 	PanelSizer->Add( SettingsSizer, 1, wxEXPAND, 5 );

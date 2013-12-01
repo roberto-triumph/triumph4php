@@ -57,98 +57,6 @@ static const int INDICATOR_PHP_STYLE = 128;
 // 32 => 5th bit on since first 5 bits of style bits are for all other lexers
 static const int INDICATOR_TEXT_STYLE = 32;
 
-/**
- * Turns a tag PHPDoc comment into a nicer format that is more suitable
- * to display. Any beginning '*'s are removed.
- *
- * Also, any HTML entities are handled (ignored), and any comment that
- * is too big is truncated.
- */
-static wxString NiceDocText(const UnicodeString& comment) {
-	wxString wxComment = mvceditor::IcuToWx(comment);
-	wxComment = wxComment.Trim();
-
-	// remove the beginning and ending '/*' and '*/'
-	wxComment = wxComment.Mid(2, wxComment.Len() - 4);
-
-	wxStringTokenizer tok(wxComment, wxT("\n\r"));
-	wxString prettyComment;
-	int lineCount = 0;
-	while (tok.HasMoreTokens() && lineCount <= 20) {
-		wxString line = tok.NextToken();
-
-		// remove the beginning whitespace and '*'s
-		size_t pos = 0;
-		for (; pos < line.Len(); ++pos) {
-			if (wxT(' ') != line[pos] && wxT('*') != line[pos] && wxT('\t') != line[pos]) {
-				break;
-			}
-		}
-		if (pos < line.Len()) {
-			line = line.Mid(pos);
-		}
-		else {
-
-			// an empty comment line
-			line = wxT("");
-		}
-
-		// tag 'conversions'
-		// taken from http://manual.phpdoc.org/HTMLSmartyConverter/HandS/phpDocumentor/tutorial_phpDocumentor.howto.pkg.html
-		// the DocBlock Description details section
-		// <b> -- emphasize/bold text
-		// <code> -- Use this to surround php code, some converters will highlight it
-		// <br> -- hard line break, may be ignored by some converters
-		// <i> -- italicize/mark as important
-		// <kbd> -- denote keyboard input/screen display
-		// <li> -- list item
-		// <ol> -- ordered list
-		// <p> -- If used to enclose all paragraphs, otherwise it will be considered text
-		// <pre> -- Preserve line breaks and spacing, and assume all tags are text (like XML's CDATA)
-		// <samp> -- denote sample or examples (non-php)
-		// <ul> -- unordered list
-		// <var> -- denote a variable name
-		//
-		// will ignore all of the tags except '<br>', '<code>', <p>', '<pre>' 
-		// since we cannot format the Scintilla call tip window.
-		// For the tags we don handle; just translate them to newlies for now.
-		wxString remove[] = { 
-			wxT("<b>"), wxT("</b>"), wxT("<i>"), wxT("</i>"), 
-			wxT("<kbd>"), wxT("</kbd>"), wxT("<samp>"), wxT("</samp>"), 
-			wxT("<var>"), wxT("</var>"), 
-			wxT("") 
-		};
-		for (int i = 0; !remove[i].IsEmpty(); ++i) {
-			line.Replace(remove[i], wxT(""));	
-		}
-
-		wxString toNewline[] =  { 
-			wxT("<code>"), wxT("</code>"),	wxT("<br>"), wxT("<br />"), 
-			wxT("<li>"), wxT("</li>"), wxT("<ol>"), wxT("</ol>"), 
-			wxT("<p>"), wxT("</p>"), wxT("<ul>"), wxT("</ul>"), 
-			wxT("") 
-		};
-		for (int i = 0; !toNewline[i].IsEmpty(); ++i) {
-			line.Replace(toNewline[i], wxT("\n"));
-		}
-
-
-		line.Replace(wxT("{@*}"), wxT("*/"));
-
-		// replace tabs with spaces
-		// do it here instead of in scintilla; we may want to change this later
-		line.Replace(wxT("\t"), wxT("    "));
-
-		prettyComment += line;
-		prettyComment += wxT("\n");
-		lineCount++;
-	}
-	if (lineCount > 20) {
-		prettyComment += wxT("\n...\n");
-	}
-	return prettyComment;
-}
-
 mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,
 											  mvceditor::GlobalsClass* globals, mvceditor::EventSinkClass& eventSink,
 			wxWindowID id, const wxPoint& position, const wxSize& size, long style,
@@ -497,12 +405,6 @@ void mvceditor::CodeControlClass::ApplyPreferences() {
 	}
 	else {
 		SetWrapMode(wxSTC_WRAP_NONE);
-	}
-	if (CodeControlOptions.EnableCallTipsOnMouseHover) {
-		SetMouseDwellTime(1000);
-	}
-	else {
-		SetMouseDwellTime(wxSTC_TIME_FOREVER);
 	}
 	if (Document) {
 		
@@ -887,9 +789,18 @@ void mvceditor::CodeControlClass::OnMotion(wxMouseEvent& event) {
 		return;
 	}
 	
-	// enable clickable links on identifiers
 	int style = wxSTC_HPHP_DEFAULT;
-	if ((GetStyleAt(pos) & wxSTC_HPHP_DEFAULT) && (event.GetModifiers() & wxMOD_CMD)) {
+	
+	// enable doc text when user holds down ALT+SHIFT
+	if ((GetStyleAt(pos) & wxSTC_HPHP_DEFAULT) && (event.GetModifiers() & wxMOD_ALT)) {
+		wxCommandEvent altEvt(mvceditor::EVT_MOTION_ALT);
+		altEvt.SetInt(pos);
+		altEvt.SetEventObject(this);
+		EventSink.Publish(altEvt);
+	}
+
+	// enable clickable links on identifiers
+	else if ((GetStyleAt(pos) & wxSTC_HPHP_DEFAULT) && (event.GetModifiers() & wxMOD_CMD)) {
 		StyleSetHotSpot(style, true);
 		SetHotspotActiveForeground(true, *wxBLUE);
 		SetHotspotActiveUnderline(true);
@@ -897,6 +808,7 @@ void mvceditor::CodeControlClass::OnMotion(wxMouseEvent& event) {
 	else {
 		StyleSetHotSpot(style, false);
 	}
+	
 	event.Skip();
 }
 
@@ -974,95 +886,6 @@ void mvceditor::CodeControlClass::SetDocumentMode(Mode mode) {
 
 mvceditor::CodeControlClass::Mode mvceditor::CodeControlClass::GetDocumentMode() {
 	return DocumentMode;
-}
-
-void mvceditor::CodeControlClass::OnDwellStart(wxStyledTextEvent& event) {
-	if (event.GetId() != GetId()) {
-		event.Skip();
-		return;
-	}
-	if (IsHidden) {
-		event.Skip();
-		return;
-	}
-	/*
-	 * do not use wxTipWindow 
-	 * there is a crash bug  with wxTipWindow
-	 * 
-	 * http://trac.wxwidgets.org/ticket/11125
-	 *
-	 * use the wxStyledTextCtrl call tip instead 
-	 */
-	if (DocumentMode == PHP) {
-		int pos = event.GetPosition();
-
-		// if the cursor is in the middle of an identifier, find the end of the
-		// current identifier; that way we can know the full name of the tag we want
-		// to get
-		int endPos = WordEndPosition(pos, true);
-		std::vector<mvceditor::TagClass> matches = GetTagsAtPosition(endPos);
-		if (!matches.empty()) {
-			mvceditor::TagClass tag = matches[0];
-			wxString msg;
-			if (tag.Type == mvceditor::TagClass::FUNCTION) {
-				msg = mvceditor::IcuToWx(tag.Identifier);
-				msg += wxT("\n\n");
-				msg += mvceditor::IcuToWx(tag.Signature);
-				msg += wxT(" [ ");
-				msg += mvceditor::IcuToWx(tag.ReturnType);
-				msg += wxT(" ]");
-				
-			}
-			else if (tag.Type == mvceditor::TagClass::METHOD) {
-				msg = mvceditor::IcuToWx(tag.ClassName);
-				msg += wxT("::");
-				msg += mvceditor::IcuToWx(tag.Identifier);
-				msg += wxT("\n\n");
-				msg += mvceditor::IcuToWx(tag.Signature);
-				if (!tag.ReturnType.isEmpty()) {
-					msg += wxT(" [ ");
-					msg += mvceditor::IcuToWx(tag.ReturnType);
-					msg += wxT(" ]");	
-				}
-			}
-			else if (tag.Type == mvceditor::TagClass::MEMBER || tag.Type == mvceditor::TagClass::CLASS_CONSTANT) {
-				msg = mvceditor::IcuToWx(tag.ClassName);
-				msg += wxT("::");
-				msg += mvceditor::IcuToWx(tag.Identifier);
-				msg += wxT("\n\n");
-				msg += mvceditor::IcuToWx(tag.Signature);
-				if (!tag.ReturnType.isEmpty()) {
-					msg += wxT(" [ ");
-					msg += mvceditor::IcuToWx(tag.ReturnType);
-					msg += wxT(" ]");	
-				}
-			}
-			else {
-				msg = mvceditor::IcuToWx(tag.Identifier);
-				msg += wxT("\n\n");
-				msg += mvceditor::IcuToWx(tag.Signature);
-			}
-			if (!tag.Comment.isEmpty()) {
-				msg += wxT("\n\n");
-				msg += NiceDocText(tag.Comment);
-			}
-			if (!msg.IsEmpty()) {
-				if (CallTipActive()) {
-					CallTipCancel();
-				}
-				CallTipShow(event.GetPosition(), msg);
-			}
-		}
-	}
-	event.Skip();
-}
-
-void mvceditor::CodeControlClass::OnDwellEnd(wxStyledTextEvent& event) {
-	if (event.GetId() != GetId()) {
-		event.Skip();
-		return;
-	}
-	CallTipCancel();
 }
 
 int mvceditor::CodeControlClass::LineFromCharacter(int charPos) {
@@ -1211,6 +1034,8 @@ void mvceditor::CodeControlClass::OnTimerComplete(wxTimerEvent& event) {
 	EventSink.Publish(evt);
 }
 
+const wxEventType mvceditor::EVT_MOTION_ALT = wxNewEventType();
+
 BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)
 	EVT_STC_MARGINCLICK(wxID_ANY, mvceditor::CodeControlClass::OnMarginClick)
 	EVT_STC_DOUBLECLICK(wxID_ANY, mvceditor::CodeControlClass::OnDoubleClick)
@@ -1222,8 +1047,6 @@ BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)
 	EVT_LEFT_DOWN(mvceditor::CodeControlClass::OnLeftDown)
 	EVT_KEY_DOWN(mvceditor::CodeControlClass::OnKeyDown)
 	EVT_MOTION(mvceditor::CodeControlClass::OnMotion)
-	EVT_STC_DWELLSTART(wxID_ANY, mvceditor::CodeControlClass::OnDwellStart)
-	EVT_STC_DWELLEND(wxID_ANY, mvceditor::CodeControlClass::OnDwellEnd)
 	EVT_STC_HOTSPOT_CLICK(wxID_ANY, mvceditor::CodeControlClass::OnHotspotClick)
 	EVT_TIMER(wxID_ANY, mvceditor::CodeControlClass::OnTimerComplete)
 END_EVENT_TABLE()
