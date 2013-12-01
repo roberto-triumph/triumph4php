@@ -291,6 +291,36 @@ private:
 };
 
 /**
+ * This is a panel that tells the user that there is a syntax error
+ * somewhere outside the visible part of a file.
+ */
+class LintErrorPanelClass : public LintErrorGeneratedPanelClass {
+
+public:
+
+	LintErrorPanelClass(mvceditor::CodeControlClass* parent, int id, const pelet::LintResultsClass& result);
+
+private:
+
+	void OnKeyDown(wxKeyEvent& event);
+	void OnGoToLink(wxHyperlinkEvent& event);
+	void OnDismissLink(wxHyperlinkEvent& event);
+
+	void DoDestroy();
+
+	/**
+	 * to position the cursor at the spot of the error
+	 * this class will not own the pointer
+	 */
+	mvceditor::CodeControlClass* CodeControl;
+
+	/**
+	 * the lint error to show
+	 */
+	pelet::LintResultsClass LintResult;
+};
+
+/**
  * This is the class that will manage all of the UI buttons and menus
  * for the feature
  */

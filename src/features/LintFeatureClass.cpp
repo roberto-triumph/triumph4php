@@ -38,6 +38,7 @@
 const int ID_LINT_RESULTS_PANEL = wxNewId();
 const int ID_LINT_RESULTS_GAUGE = wxNewId();
 const int ID_LINT_READER = wxNewId();
+const int ID_LINT_ERROR_PANEL = wxNewId();
 
 mvceditor::LintResultsEventClass::LintResultsEventClass(int eventId, const pelet::LintResultsClass& lintResults)
 	: wxEvent(eventId, mvceditor::EVENT_LINT_ERROR) 
@@ -275,7 +276,7 @@ void mvceditor::LintResultsPanelClass::DisplayLintError(int index) {
 
 	wxString file = mvceditor::IcuToWx(results.UnicodeFilename);
 	Notebook->LoadPage(file);
-	Notebook->GetCurrentCodeControl()->MarkLintError(results);
+	Notebook->GetCurrentCodeControl()->MarkLintErrorAndGoto(results);
 }
 
 void mvceditor::LintResultsPanelClass::SelectNextError() {
@@ -457,17 +458,29 @@ void mvceditor::LintFeatureClass::OnFileSaved(mvceditor::CodeControlEventClass& 
 				resultsPanel->AddErrorsFor(fileName, lintResults);
 			}
 			if (codeControl) {
-				int previousPos = codeControl->GetCurrentPos();
 				codeControl->MarkLintError(lintResults);
-			
-				// diplaying the lint causes things to be redrawn; put the cursor 
-				// where the user left it
-				codeControl->GotoPos(previousPos);
-				codeControl->SetFocus();
 
-				wxString error = mvceditor::IcuToWx(lintResults.Error);
-				error += wxString::Format(wxT(" on line %d, offset %d"), lintResults.LineNumber, lintResults.CharacterPosition);
-				codeControl->CallTipShow(previousPos, error);
+				// lines from scintilla are 0 based, but lint results lines are 1-based
+				int firstVisibleLine = codeControl->GetFirstVisibleLine() + 1;
+				int lastVisibleLine = firstVisibleLine + codeControl->LinesOnScreen();
+				if (lintResults.LineNumber < firstVisibleLine || lintResults.LineNumber >= lastVisibleLine) {
+					
+					// the error is out of view show a message, remove any other existing message
+					codeControl->Freeze();
+					wxWindow* old = wxWindow::FindWindowById(ID_LINT_ERROR_PANEL, codeControl);
+					if (old) {
+						old->Destroy();
+					}
+					mvceditor::LintErrorPanelClass* errorPanel = new mvceditor::LintErrorPanelClass(codeControl, ID_LINT_ERROR_PANEL, lintResults);
+					wxPoint point = codeControl->PointFromPosition(codeControl->GetCurrentPos());
+					point.y = point.y - errorPanel->GetSize().GetY();
+					if (point.y < 0) {
+						point.y = 0;
+					}
+					errorPanel->SetPosition(point);
+					errorPanel->SetFocus();
+					codeControl->Thaw();
+				}
 			}
 		}
 		else if (resultsPanel) {
@@ -503,12 +516,52 @@ void mvceditor::LintFeatureClass::OnLintSummary(mvceditor::LintResultsSummaryEve
 }
 
 mvceditor::LintPreferencesPanelClass::LintPreferencesPanelClass(wxWindow* parent,
-																			mvceditor::LintFeatureClass& feature)
+																mvceditor::LintFeatureClass& feature)
 	: LintPreferencesGeneratedPanelClass(parent, wxID_ANY)
 	, Feature(feature) {
 	wxGenericValidator checkValidator(&Feature.CheckOnSave);
 	CheckOnSave->SetValidator(checkValidator);
 }
+
+mvceditor::LintErrorPanelClass::LintErrorPanelClass(mvceditor::CodeControlClass* parent, int id, const pelet::LintResultsClass& result)
+: LintErrorGeneratedPanelClass(parent, id) 
+, CodeControl(parent)
+, LintResult(result) {
+	wxString error = mvceditor::IcuToWx(result.Error);
+	error += wxString::Format(wxT(" on line %d, offset %d"), result.LineNumber, result.CharacterPosition);
+	ErrorLabel->SetLabel(error);
+}
+
+void mvceditor::LintErrorPanelClass::OnKeyDown(wxKeyEvent& event) {
+	if (event.GetKeyCode() == WXK_ESCAPE) {
+		CallAfter(&mvceditor::LintErrorPanelClass::DoDestroy);
+		return;
+	}
+	if (event.GetKeyCode() == WXK_SPACE) {
+
+		// scintilla lines are 0-based, lint error lines are 1 based
+		CodeControl->GotoLine(LintResult.LineNumber - 1);
+		CallAfter(&mvceditor::LintErrorPanelClass::DoDestroy);
+		return;
+	}
+	event.Skip();
+}
+
+void mvceditor::LintErrorPanelClass::OnGoToLink(wxHyperlinkEvent& event) {
+
+	// scintilla lines are 0-based, lint error lines are 1 based
+	CodeControl->GotoLine(LintResult.LineNumber - 1);
+	CallAfter(&mvceditor::LintErrorPanelClass::DoDestroy);
+}
+
+void mvceditor::LintErrorPanelClass::OnDismissLink(wxHyperlinkEvent& event) {
+	CallAfter(&mvceditor::LintErrorPanelClass::DoDestroy);
+}
+
+void mvceditor::LintErrorPanelClass::DoDestroy() {
+	this->Destroy();
+}
+
 
 BEGIN_EVENT_TABLE(mvceditor::LintFeatureClass, wxEvtHandler) 
 	EVT_MENU(mvceditor::MENU_LINT_PHP + 0, mvceditor::LintFeatureClass::OnLintMenu)

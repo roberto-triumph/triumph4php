@@ -291,10 +291,16 @@ public:
 
 	/**
 	 * Put an arrow in the margin of the line where the parse error ocurred.
-	 * The markes will stay forever; to remove the markers
+	 * The markers will stay forever; to remove the markers
 	 * we must explicitly call MarkerDelete to remove the markers.
 	 */
 	void MarkLintError(const pelet::LintResultsClass& result);
+
+	/**
+	 * Marks a lint error AND set the current position to the
+	 * position where the error is located
+	 */
+	void MarkLintErrorAndGoto(const pelet::LintResultsClass& result);
 
 	/**
 	 * Remove any and all markings caused by rendering the parse
@@ -552,16 +558,6 @@ private:
 	 * This object owns this pointer and will need to delete it.
 	 */
 	TextDocumentClass* Document;
-
-	/**
-	 * This is the style bit for the WordHighlight.  Since this code control handles multiple parsers
-	 * and each parser can have more style bits, the indicator offsets will be different for different
-	 * lexers.
-	 *
-	 * For example, the HTML lexer has 7 bits, so the first indicator style will be 128 (2 ^ 7)
-	 * The SQL lexer has 5 bits, so the first indicator style will be 32 (2 ^ 5)
-	 */
-	int WordHighlightStyle;
 
 	/**
 	 * TRUE if the user double clicked a word and that word is not highlighted.

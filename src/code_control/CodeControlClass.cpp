@@ -48,14 +48,15 @@
 static const int LINT_RESULT_MARKER = 2;
 static const int LINT_RESULT_MARGIN = 2;
 
-// we'll use up the first available marker & indicator for showing parse results
-static const int INDICATOR = 0;
+// the indicator to show squiggly lines for lint errors
+static const int INDICATOR_PHP_LINT = 0;
 
-// 128 => 7th bit on since first 7 bits of style bits are for the HTML lexer
-static const int INDICATOR_PHP_STYLE = 128;
+// the indicator to show boxes around found words when user double clicks
+// on a word
+static const int INDICATOR_FIND = 1;
 
-// 32 => 5th bit on since first 5 bits of style bits are for all other lexers
-static const int INDICATOR_TEXT_STYLE = 32;
+// start stealing styles from "asp javascript" we will never use those styles
+static const int STYLE_PHP_LINT_ANNOTATION = wxSTC_HJA_START;
 
 mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,
 											  mvceditor::GlobalsClass* globals, mvceditor::EventSinkClass& eventSink,
@@ -68,7 +69,6 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 		, HotspotTimer(this)
 		, Globals(globals)
 		, EventSink(eventSink)
-		, WordHighlightStyle(0)
 		, WordHighlightIsWordHighlighted(false)
 		, DocumentMode(TEXT) 
 		, IsHidden(false) 
@@ -478,7 +478,6 @@ void mvceditor::CodeControlClass::SetPhpOptions() {
 	SetMarginSensitive(LINT_RESULT_MARGIN, false);
 	SetMarginMask(LINT_RESULT_MARGIN, ~wxSTC_MASK_FOLDERS);
 	MarkerDefine(LINT_RESULT_MARKER, wxSTC_MARK_ARROW, *wxRED, *wxRED);
-	WordHighlightStyle = INDICATOR_PHP_STYLE;
 	
 	// syntax coloring
 	for (size_t i = 0; i < CodeControlOptions.PhpStyles.size(); ++i) {
@@ -515,6 +514,22 @@ void mvceditor::CodeControlClass::SetPhpOptions() {
 		StyleSetBold(style, pref.IsBold);
 		StyleSetItalic(style, pref.IsItalic);
 	}
+
+	// the annotation styles
+	StyleSetForeground(STYLE_PHP_LINT_ANNOTATION, wxSystemSettings::GetColour(wxSYS_COLOUR_INFOTEXT));
+	StyleSetBackground(STYLE_PHP_LINT_ANNOTATION, wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK));
+	StyleSetBold(STYLE_PHP_LINT_ANNOTATION, true);
+	StyleSetItalic(STYLE_PHP_LINT_ANNOTATION, true);
+
+	// the lint error marker styles
+	IndicatorSetStyle(INDICATOR_PHP_LINT, wxSTC_INDIC_SQUIGGLE);
+	IndicatorSetForeground(INDICATOR_PHP_LINT, *wxRED);
+
+	// the found match indicator style
+	mvceditor::StylePreferenceClass pref = CodeControlOptions.FindByStcStyle(CodeControlOptions.PhpStyles, 
+		mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT);
+	IndicatorSetStyle(INDICATOR_FIND,  wxSTC_INDIC_ROUNDBOX);
+	IndicatorSetForeground(INDICATOR_FIND, pref.Color);
 }
 
 void mvceditor::CodeControlClass::SetSqlOptions() {	
@@ -535,7 +550,6 @@ void mvceditor::CodeControlClass::SetSqlOptions() {
 	AutoCompSetIgnoreCase(true);
 	AutoCompSetFillUps(wxT("(["));
 	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
-	WordHighlightStyle = INDICATOR_TEXT_STYLE;
 	
 	for (size_t i = 0; i < CodeControlOptions.SqlStyles.size(); ++i) {
 		mvceditor::StylePreferenceClass pref = CodeControlOptions.SqlStyles[i];
@@ -555,6 +569,12 @@ void mvceditor::CodeControlClass::SetSqlOptions() {
 		StyleSetBold(style, pref.IsBold);
 		StyleSetItalic(style, pref.IsItalic);	
 	}
+
+	// the found match indicator style
+	mvceditor::StylePreferenceClass pref = CodeControlOptions.FindByStcStyle(CodeControlOptions.PhpStyles, 
+		mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT);
+	IndicatorSetStyle(INDICATOR_FIND,  wxSTC_INDIC_ROUNDBOX);
+	IndicatorSetForeground(INDICATOR_FIND, pref.Color);
 }
 
 void mvceditor::CodeControlClass::SetCssOptions() {
@@ -577,7 +597,6 @@ void mvceditor::CodeControlClass::SetCssOptions() {
 	AutoCompSetChooseSingle(true);
 	AutoCompSetFillUps(wxT("([:"));
 	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
-	WordHighlightStyle = INDICATOR_TEXT_STYLE;
 	
 	for (size_t i = 0; i < CodeControlOptions.CssStyles.size(); ++i) {
 		mvceditor::StylePreferenceClass pref = CodeControlOptions.CssStyles[i];
@@ -597,6 +616,12 @@ void mvceditor::CodeControlClass::SetCssOptions() {
 		StyleSetBold(style, pref.IsBold);
 		StyleSetItalic(style, pref.IsItalic);	
 	}
+
+	// the found match indicator style
+	mvceditor::StylePreferenceClass pref = CodeControlOptions.FindByStcStyle(CodeControlOptions.PhpStyles, 
+		mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT);
+	IndicatorSetStyle(INDICATOR_FIND,  wxSTC_INDIC_ROUNDBOX);
+	IndicatorSetForeground(INDICATOR_FIND, pref.Color);
 }
 
 void mvceditor::CodeControlClass::SetPlainTextOptions() {
@@ -612,7 +637,6 @@ void mvceditor::CodeControlClass::SetPlainTextOptions() {
 	SetMarginSensitive(LINT_RESULT_MARGIN, false);
 	SetMarginMask(LINT_RESULT_MARGIN, ~wxSTC_MASK_FOLDERS);
 	MarkerDefine(LINT_RESULT_MARKER, wxSTC_MARK_ARROW, *wxRED, *wxRED);
-	WordHighlightStyle = INDICATOR_TEXT_STYLE;
 	
 	// syntax coloring; use the same font as PHP code for now
 	for (size_t i = 0; i < CodeControlOptions.CssStyles.size(); ++i) {
@@ -640,6 +664,12 @@ void mvceditor::CodeControlClass::SetPlainTextOptions() {
 		StyleSetBold(style, pref.IsBold);
 		StyleSetItalic(style, pref.IsItalic);	
 	}
+
+	// the found match indicator style
+	mvceditor::StylePreferenceClass pref = CodeControlOptions.FindByStcStyle(CodeControlOptions.PhpStyles, 
+		mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT);
+	IndicatorSetStyle(INDICATOR_FIND,  wxSTC_INDIC_ROUNDBOX);
+	IndicatorSetForeground(INDICATOR_FIND, pref.Color);
 }
 
 void mvceditor::CodeControlClass::SetCodeControlOptions(const std::vector<mvceditor::StylePreferenceClass>& styles) {
@@ -724,19 +754,11 @@ void  mvceditor::CodeControlClass::OnDoubleClick(wxStyledTextEvent& event) {
 		return;
 	}
 
-	// we must share the indicator between highlight words functionality and
-	// parse errors functionality.  This is because the HTML lexer uses 7 of the
-	// eight style bits, leaving only one bit for indicators
-	mvceditor::StylePreferenceClass pref = CodeControlOptions.FindByStcStyle(CodeControlOptions.PhpStyles, 
-		mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT);
-	IndicatorSetStyle(INDICATOR,  wxSTC_INDIC_ROUNDBOX);
-	IndicatorSetForeground(INDICATOR, pref.Color);
-
-	// remove any parse error indicators. if we don't do this the 
-	// parse error will get highlighted like a match.
-	StartStyling(0, WordHighlightStyle);
-	SetStyling(GetTextLength(), 0);
-	
+	// remove any previous match indicators
+	SetIndicatorCurrent(INDICATOR_FIND);
+	SetIndicatorValue(INDICATOR_FIND);
+	IndicatorClearRange(0, GetTextLength());
+		
 	EventSink.Publish(event);
 }
 
@@ -816,16 +838,19 @@ void mvceditor::CodeControlClass::UndoHighlight() {
 	if (WordHighlightIsWordHighlighted) {
 	
 		// kill any current highlight searches
-		StartStyling(0, WordHighlightStyle);
-		SetStyling(GetTextLength(), 0);
+		SetIndicatorCurrent(INDICATOR_FIND);
+		SetIndicatorValue(INDICATOR_FIND);
+		IndicatorClearRange(0, GetTextLength());
+
 		WordHighlightIsWordHighlighted = false;
 	}
 }
 
 void mvceditor::CodeControlClass::HighlightWord(int utf8Start, int utf8Length) {
 	WordHighlightIsWordHighlighted = true;
-	StartStyling(utf8Start, WordHighlightStyle);
-	SetStyling(utf8Length, WordHighlightStyle);
+	SetIndicatorCurrent(INDICATOR_FIND);
+	SetIndicatorValue(INDICATOR_FIND);
+	IndicatorFillRange(utf8Start, utf8Length);
 }
 
 void mvceditor::CodeControlClass::MarkLintError(const pelet::LintResultsClass& result) {
@@ -836,12 +861,6 @@ void mvceditor::CodeControlClass::MarkLintError(const pelet::LintResultsClass& r
 	if (result.CharacterPosition >= 0) {
 		MarkerAdd(result.LineNumber - 1, LINT_RESULT_MARKER);
 
-		// we must share the indicator between highlight words functionality and
-		// parse errors functionality.  This is because the HTML lexer uses 7 of the
-		// eight style bits, leaving only one bit for indicators
-		IndicatorSetStyle(INDICATOR, wxSTC_INDIC_SQUIGGLE);
-		IndicatorSetForeground(INDICATOR, *wxRED);
-
 		int charNumber = result.CharacterPosition;
 		int errorLength = 5;
 
@@ -851,23 +870,48 @@ void mvceditor::CodeControlClass::MarkLintError(const pelet::LintResultsClass& r
 		// GET_TEXT  message
 		SendMsg(2182, documentLength, (long)buf);
 		byteNumber = mvceditor::CharToUtf8Pos(buf, documentLength, charNumber);
-		StartStyling(byteNumber, WordHighlightStyle);
-		SetStyling(errorLength, WordHighlightStyle);
-
-		GotoPos(byteNumber);
+		
+		SetIndicatorCurrent(INDICATOR_PHP_LINT);
+		SetIndicatorValue(INDICATOR_PHP_LINT);
+		IndicatorFillRange(byteNumber, 10);
 
 		delete[] buf;
 	}
 	Colourise(0, -1);
 
 	wxString error = mvceditor::IcuToWx(result.Error);
-	CallTipShow(byteNumber, error);
+	error += wxString::Format(wxT(" on line %d, offset %d"), result.LineNumber, result.CharacterPosition);
+	AnnotationSetVisible(wxSTC_ANNOTATION_BOXED);
+	AnnotationSetText(result.LineNumber, error);
+	AnnotationSetStyle(result.LineNumber, STYLE_PHP_LINT_ANNOTATION);
+}
+
+void mvceditor::CodeControlClass::MarkLintErrorAndGoto(const pelet::LintResultsClass& result) {
+	
+	// positions in scintilla are byte offsets. convert chars to bytes so we can jump properly
+	int byteNumber = 0;
+	if (result.CharacterPosition >= 0) {
+		MarkLintError(result);
+		int charNumber = result.CharacterPosition;
+
+		int documentLength = GetTextLength();
+		char* buf = new char[documentLength];
+
+		// GET_TEXT  message
+		SendMsg(2182, documentLength, (long)buf);
+		byteNumber = mvceditor::CharToUtf8Pos(buf, documentLength, charNumber);
+		GotoPos(byteNumber);
+
+		delete[] buf;
+	}
 }
 
 void mvceditor::CodeControlClass::ClearLintErrors() {
 	MarkerDeleteAll(LINT_RESULT_MARKER);
-	StartStyling(0, WordHighlightStyle);
-	SetStyling(GetLength(), 0);
+	SetIndicatorCurrent(INDICATOR_PHP_LINT);
+	SetIndicatorValue(INDICATOR_PHP_LINT);
+	IndicatorClearRange(0, GetTextLength());
+	AnnotationClearAll();
 }
 
 void mvceditor::CodeControlClass::SetCurrentDbTag(const mvceditor::DatabaseTagClass& currentDbTag) {
