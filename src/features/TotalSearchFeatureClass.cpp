@@ -297,7 +297,7 @@ void mvceditor::TotalSearchDialogClass::OnSearchComplete(mvceditor::TotalTagSear
 		MatchesLabel->SetLabel(_("1 match found"));
 	}
 	else {
-		MatchesLabel->SetLabel(wxString::Format("%u matches found", event.Tags.size()));
+		MatchesLabel->SetLabel(wxString::Format("%ld matches found", event.Tags.size()));
 	}
 	Timer.Start(300, wxTIMER_CONTINUOUS);
 }
