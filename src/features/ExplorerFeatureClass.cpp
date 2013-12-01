@@ -146,12 +146,6 @@ void mvceditor::ExplorerFeatureClass::LoadPreferences(wxConfigBase *config) {
 	ShellExecutable.Assign(s);
 }
 
-void mvceditor::ExplorerFeatureClass::SavePreferences() {
-	wxConfigBase *config = wxConfig::Get();
-	config->Write(wxT("/Explorer/FileManagerExecutable"), FileManagerExecutable.GetFullPath());
-	config->Write(wxT("/Explorer/ShellExecutable"), ShellExecutable.GetFullPath());
-}
-
 void mvceditor::ExplorerFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 	ExplorerOptionsPanelClass* panel = new ExplorerOptionsPanelClass(parent, wxID_ANY, *this);
 	parent->AddPage(panel, wxT("Explorer"));
@@ -258,6 +252,10 @@ void mvceditor::ExplorerFeatureClass::OnAppPreferencesSaved(wxCommandEvent& even
 		panel = (mvceditor::ModalExplorerPanelClass*)window;
 		panel->FillSourcesList(sourceDirs);
 	}
+
+	wxConfigBase *config = wxConfig::Get();
+	config->Write(wxT("/Explorer/FileManagerExecutable"), FileManagerExecutable.GetFullPath());
+	config->Write(wxT("/Explorer/ShellExecutable"), ShellExecutable.GetFullPath());
 }
 
 mvceditor::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, mvceditor::ExplorerFeatureClass& feature)
@@ -1110,6 +1108,8 @@ mvceditor::ExplorerOptionsPanelClass::ExplorerOptionsPanelClass(wxWindow* parent
 	FileManager->SetValidator(fileManagerValidator);
 	mvceditor::FilePickerValidatorClass shellValidator(&feature.ShellExecutable);
 	Shell->SetValidator(shellValidator);	
+
+	TransferDataToWindow();
 }
 
 const wxEventType mvceditor::EVENT_EXPLORER = wxNewEventType();

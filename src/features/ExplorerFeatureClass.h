@@ -73,8 +73,6 @@ public:
 
 	void LoadPreferences(wxConfigBase* config);
 
-	void SavePreferences();
-
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
 	
 private:
