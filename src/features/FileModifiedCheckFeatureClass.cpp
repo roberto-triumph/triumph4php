@@ -176,9 +176,11 @@ void mvceditor::FileModifiedCheckFeatureClass::OnAppExit(wxCommandEvent& event) 
 	PollTimer.Stop();
 
 	// unregister ourselves as the event handler from watcher 
-	FsWatcher->SetOwner(NULL);
-	delete FsWatcher;
-	FsWatcher = NULL;
+	if (FsWatcher) {
+		FsWatcher->SetOwner(NULL);
+		delete FsWatcher;
+		FsWatcher = NULL;
+	}
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::OnAppFileOpened(wxCommandEvent& event) {
@@ -239,8 +241,11 @@ void mvceditor::FileModifiedCheckFeatureClass::OnPreferencesSaved(wxCommandEvent
 	// that is why we are using a pointer; deleting the object does remove the
 	// old watches
 	// see http://trac.wxwidgets.org/ticket/12847
-	FsWatcher->SetOwner(NULL);
-	delete FsWatcher;
+	if (FsWatcher) {
+		FsWatcher->SetOwner(NULL);
+		delete FsWatcher;
+		FsWatcher = NULL;
+	}
 	StartWatch();
 }
 
@@ -614,8 +619,11 @@ void mvceditor::FileModifiedCheckFeatureClass::OnFsWatcher(wxFileSystemWatcherEv
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::HandleWatchError() {
-	FsWatcher->SetOwner(NULL);
-	delete FsWatcher;
+	if (FsWatcher) {
+		FsWatcher->SetOwner(NULL);
+		delete FsWatcher;
+		FsWatcher = NULL;
+	}
 
 	wxString dirsDeleted;
 
@@ -734,6 +742,10 @@ void mvceditor::VolumeListActionClass::BackgroundWork() {
 	mvceditor::VolumeListEventClass evt(GetEventId(), allVolumes, networkVolumes);
 	PostEvent(evt);
 #endif
+}
+
+void mvceditor::VolumeListActionClass::DoCancel() {
+	wxFSVolume::CancelSearch();
 }
 
 wxString mvceditor::VolumeListActionClass::GetLabel() const {

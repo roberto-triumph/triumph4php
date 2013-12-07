@@ -259,6 +259,8 @@ protected:
 
 	void BackgroundWork();
 
+	void DoCancel();
+
 	wxString GetLabel() const;
 };
 
