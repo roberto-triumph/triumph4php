@@ -204,7 +204,7 @@ void mvceditor::FileModifiedCheckFeatureClass::OnAppFileOpened(wxCommandEvent& e
 		// OR it is in a network drive, create a watch for it
 		// since sources from network drives are not added to the watch
 		if (fileName.HasVolume()) {
-			wxString vol = fileName.GetVolume() + fileName.GetVolumeSeparator();
+			wxString vol = fileName.GetVolume() + wxT(":\\");
 			if (std::find(NetworkVolumes.begin(), NetworkVolumes.end(), vol) != NetworkVolumes.end()) {
 				doAddWatch = true;
 			}
