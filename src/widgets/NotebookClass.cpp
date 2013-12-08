@@ -33,7 +33,8 @@
 #include <wx/file.h>
 #include <wx/wupdlock.h>
 
-int ID_SAVE_MODIFIED = wxNewId();
+int ID_CLOSE_ALL_TABS = wxNewId();
+int ID_CLOSE_TAB = wxNewId();
 
 mvceditor::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id, 
 	const wxPoint& pos, const wxSize& size, long style)
@@ -42,7 +43,8 @@ mvceditor::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id,
 	, Globals(NULL)
 	, EventSink(NULL)
 	, ContextMenu(NULL)
-	, NewPageNumber(1) {
+	, NewPageNumber(1) 
+	, TabIndexRightClickEvent(-1) {
 }
 
 mvceditor::NotebookClass::~NotebookClass() {
@@ -405,6 +407,7 @@ bool mvceditor::NotebookClass::GetModifiedPageNames(std::vector<wxString>& modif
 }
 
 void mvceditor::NotebookClass::ShowContextMenu(wxAuiNotebookEvent& event) {
+	TabIndexRightClickEvent = event.GetSelection();
 	if (NULL == ContextMenu) {
 		CreateContextMenu();
 	}
@@ -414,7 +417,8 @@ void mvceditor::NotebookClass::ShowContextMenu(wxAuiNotebookEvent& event) {
 
 void mvceditor::NotebookClass::CreateContextMenu() {
 	ContextMenu = new wxMenu;
-	ContextMenu->Append(ID_SAVE_MODIFIED, wxT("Close All Tabs"));
+	ContextMenu->Append(ID_CLOSE_ALL_TABS, wxT("Close All Tabs"));
+	ContextMenu->Append(ID_CLOSE_TAB, wxT("Close This Tab"));
 }
 
 void mvceditor::NotebookClass::OnCloseAllPages(wxCommandEvent& event) {
@@ -445,9 +449,13 @@ void mvceditor::NotebookClass::CloseAllPages() {
 
 void mvceditor::NotebookClass::CloseCurrentPage() {
 	int currentPage = GetSelection();
+	ClosePage(currentPage);
+}
+
+void mvceditor::NotebookClass::ClosePage(int index) {
 	bool isPageClosed = false;
-	if (IsPageModified(currentPage)) {
-		wxString pageName = GetPageText(currentPage);
+	if (IsPageModified(index)) {
+		wxString pageName = GetPageText(index);
 		if (pageName.EndsWith(wxT("*"))) {
 			pageName = pageName.SubString(0, pageName.size() -2);
 		}
@@ -455,15 +463,15 @@ void mvceditor::NotebookClass::CloseCurrentPage() {
 		int response = wxMessageBox(msg, wxT("Save PHP File"), wxYES_NO | 
 			wxCANCEL | wxICON_QUESTION, this);
 		if (wxCANCEL != response) {
-			if (wxYES == response && !SavePage(currentPage)) {
+			if (wxYES == response && !SavePage(index)) {
 				//something drastic. dont know how to handle it
 			}
-			DeletePage(currentPage);
+			DeletePage(index);
 			isPageClosed = true;
 		}
 	}
 	else {
-		DeletePage(currentPage);
+		DeletePage(index);
 		isPageClosed = true;
 	}
 	if (isPageClosed) {
@@ -474,7 +482,7 @@ void mvceditor::NotebookClass::CloseCurrentPage() {
 		wxAuiNotebookEvent evt(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSED, this->GetId());
 
 		// tab index
-		evt.SetSelection(currentPage);
+		evt.SetSelection(index);
 		evt.SetEventObject(this);
 		EventSink->Publish(evt);
 	}
@@ -538,6 +546,16 @@ void mvceditor::NotebookClass::OnPageChanging(wxAuiNotebookEvent& event) {
 	event.Skip();
 }
 
+void mvceditor::NotebookClass::OnMenuClosePage(wxCommandEvent& event) {
+
+	// get the tab that was right clicked; the tab right menu event holds
+	// the index of the tab we want to close
+	if (TabIndexRightClickEvent >= 0 && TabIndexRightClickEvent < (int)GetPageCount()) {
+		ClosePage(TabIndexRightClickEvent);
+		TabIndexRightClickEvent  = -1;
+	}
+}
+
 mvceditor::FileDropTargetClass::FileDropTargetClass(mvceditor::NotebookClass* notebook) :
 	Notebook(notebook) {
 
@@ -557,7 +575,8 @@ BEGIN_EVENT_TABLE(mvceditor::NotebookClass, wxAuiNotebook)
 		mvceditor::NotebookClass::SavePageIfModified)
 	EVT_AUINOTEBOOK_TAB_RIGHT_UP(mvceditor::ID_CODE_NOTEBOOK,
 		mvceditor::NotebookClass::ShowContextMenu)
-	EVT_MENU(ID_SAVE_MODIFIED, mvceditor::NotebookClass::OnCloseAllPages)
+	EVT_MENU(ID_CLOSE_ALL_TABS, mvceditor::NotebookClass::OnCloseAllPages)
+	EVT_MENU(ID_CLOSE_TAB, mvceditor::NotebookClass::OnMenuClosePage)
 
 	// using OnPageChanging instead of OnPageChanged because onPageChanged
 	// generates multiple events (not quite sure why yet)

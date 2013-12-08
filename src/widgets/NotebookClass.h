@@ -269,6 +269,16 @@ private:
 	 * will use the close source code event to re-trigger project indexing.
 	 */
 	void OnNotebookPageClose(wxAuiNotebookEvent& evt);
+
+	/**
+	 * closes the given tab index; prompting to save the file if file is dirty
+	 */
+	void ClosePage(int index);
+
+	/**
+	 * handler for the "close page" context menu
+	 */
+	void OnMenuClosePage(wxCommandEvent& event);
 		
 	/**
 	 * The context menu for handling right-click options
@@ -279,6 +289,11 @@ private:
 	 * To give a friendly number to new files. 
 	 */
 	int NewPageNumber;	
+
+	/**
+	 * the tab index that was last right-clicked on
+	 */
+	int TabIndexRightClickEvent;
 	
 	DECLARE_EVENT_TABLE()
 	
