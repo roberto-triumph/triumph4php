@@ -52,7 +52,6 @@ static int ID_FILTER_PHP = wxNewId();
 static int ID_FILTER_CSS = wxNewId();
 static int ID_FILTER_SQL = wxNewId();
 
-
 /**
  * comparator function that compares 2 filenames by using the full name
  * only (wxFileName::GetFullName())
@@ -262,6 +261,8 @@ mvceditor::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, in
 : ModalExplorerGeneratedPanelClass(parent, id) 
 , CurrentListDir()
 , FilesImageList(NULL)
+, SourcesImageList(NULL)
+, Watcher(NULL)
 , Feature(feature) 
 , RunningThreads()
 , FilterChoice(ID_FILTER_ALL) {
@@ -295,6 +296,9 @@ mvceditor::ModalExplorerPanelClass::~ModalExplorerPanelClass() {
 	RunningThreads.RemoveEventHandler(this);
 	RunningThreads.RemoveEventHandler(&Feature);
 	RunningThreads.Shutdown();
+	if (Watcher) {
+		delete Watcher;
+	}
 }
 
 void mvceditor::ModalExplorerPanelClass::RefreshDir(const wxFileName& dir) {
@@ -416,7 +420,6 @@ void mvceditor::ModalExplorerPanelClass::OnListKeyDown(wxKeyEvent& event) {
 void mvceditor::ModalExplorerPanelClass::ShowDir(const wxFileName& currentDir, const std::vector<wxFileName>& files, const std::vector<wxFileName>& dirs,
 												 int totalFiles, int totalSubDirs) {
 	CurrentListDir = currentDir;
-
 	Directory->SetValue(currentDir.GetPath());
 
 	List->DeleteAllItems();
@@ -486,6 +489,13 @@ void mvceditor::ModalExplorerPanelClass::ShowDir(const wxFileName& currentDir, c
 		List->SetItemState(0, wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED, wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED);
 	}
 	List->SetFocus();
+
+	if (Watcher) {
+		delete Watcher;
+	}
+	Watcher = new wxFileSystemWatcher();
+	Watcher->SetOwner(this);
+	Watcher->Add(currentDir, wxFSW_EVENT_CREATE | wxFSW_EVENT_DELETE | wxFSW_EVENT_RENAME | wxFSW_EVENT_WARNING | wxFSW_EVENT_ERROR);
 }
 
 bool mvceditor::ModalExplorerPanelClass::OpenIfListFile(const wxString& text) {
@@ -905,6 +915,41 @@ void mvceditor::ModalExplorerPanelClass::FocusOnSourcesList() {
 	SourcesList->SetFocus();
 }
 
+void mvceditor::ModalExplorerPanelClass::OnFsWatcher(wxFileSystemWatcherEvent& event) {
+	wxFileName modFile = event.GetNewPath();
+	if (modFile.GetPathWithSep() != CurrentListDir.GetPathWithSep()) {
+
+		// event from directory we are not showing
+		return;
+	}
+	if (event.GetChangeType() == wxFSW_EVENT_WARNING && event.GetWarningType() == wxFSW_WARNING_OVERFLOW) {
+		
+		// restart the watch
+		delete Watcher;
+		Watcher = new wxFileSystemWatcher();
+		Watcher->SetOwner(this);
+		Watcher->Add(CurrentListDir, wxFSW_EVENT_CREATE | wxFSW_EVENT_DELETE | wxFSW_EVENT_RENAME | wxFSW_EVENT_WARNING | wxFSW_EVENT_ERROR);
+	}
+	else if (event.GetChangeType() == wxFSW_EVENT_ERROR) {
+		
+		// restart the watch
+		delete Watcher;
+		Watcher = new wxFileSystemWatcher();
+		Watcher->SetOwner(this);
+		Watcher->Add(CurrentListDir, wxFSW_EVENT_CREATE | wxFSW_EVENT_DELETE | wxFSW_EVENT_RENAME | wxFSW_EVENT_WARNING | wxFSW_EVENT_ERROR);
+	}
+
+	// naive implementation for now, just refresh the entire dir
+	// this is because we have labels to update, and the 
+	// items must be kept sorted (first dirs, then files)
+	// each sorted, AND taking the filters into account
+	else if (event.GetChangeType() == wxFSW_EVENT_CREATE
+		|| event.GetChangeType() == wxFSW_EVENT_DELETE
+		|| event.GetChangeType() == wxFSW_EVENT_RENAME) {
+		RefreshDir(CurrentListDir);
+	}
+}
+
 mvceditor::ExplorerEventClass::ExplorerEventClass(int eventId, const wxFileName& dir, const std::vector<wxFileName>& files, 
 												  const std::vector<wxFileName>& subDirs, const wxString& error, int totalFiles,
 												  int totalSubDirs)
@@ -1144,4 +1189,5 @@ BEGIN_EVENT_TABLE(mvceditor::ModalExplorerPanelClass, ModalExplorerGeneratedPane
 	EVT_MENU(ID_FILTER_PHP, mvceditor::ModalExplorerPanelClass::OnFilterMenuCheck)
 	EVT_MENU(ID_FILTER_CSS, mvceditor::ModalExplorerPanelClass::OnFilterMenuCheck)
 	EVT_MENU(ID_FILTER_SQL, mvceditor::ModalExplorerPanelClass::OnFilterMenuCheck)
+	EVT_FSWATCHER(wxID_ANY, mvceditor::ModalExplorerPanelClass::OnFsWatcher)
 END_EVENT_TABLE()

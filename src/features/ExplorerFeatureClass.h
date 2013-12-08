@@ -29,6 +29,7 @@
 #include <features/wxformbuilder/ExplorerFeatureForms.h>
 #include <actions/ActionClass.h>
 #include <wx/imaglist.h>
+#include <wx/fswatcher.h>
 
 namespace mvceditor {
 
@@ -142,7 +143,7 @@ public:
 private:
 
 	/**
-	 * the directory being shown on the left hand side
+	 * the directory being shown on the right hand side
 	 */
 	wxFileName CurrentListDir;
 	
@@ -155,6 +156,14 @@ private:
 	 * will be owned by the list control
 	 */
 	wxImageList* SourcesImageList;
+
+	/**
+	 * we will watch for new/deleted files and update the panel automatically
+	 * using a pointer because wxFileSystemWatcher::Remove() is buggy on MSW
+	 * we will create a new instance on every directory change
+	 * this class will own the pointer
+	 */
+	wxFileSystemWatcher* Watcher;
 
 	/**
 	 * to get projects list and tag cache
@@ -214,6 +223,9 @@ private:
 	void OnFilterButtonLeftDown(wxMouseEvent& event);
 	void OnFilterMenuCheck(wxCommandEvent& event);
 	void OnRefreshClick(wxCommandEvent& event);
+
+	// when a file is added/remove update the panel
+	void OnFsWatcher(wxFileSystemWatcherEvent& event);
 
 	std::vector<wxString> FilterFileExtensions();
 

@@ -334,10 +334,21 @@ void mvceditor::FileModifiedCheckFeatureClass::OnTimer(wxTimerEvent& event) {
 		}
 	}
 	
-	// oddity. int linux sometimes we get rename events where the old and new paths
-	// are the same. in this case, lets treat them as modifications
 	std::map<wxString, wxString>::iterator rename = pathsRenamed.begin();
 	while (rename != pathsRenamed.end()) {
+		
+		// if a file has been renamed, then remove any modify events for it
+		std::map<wxString, int>::iterator it = FilesExternallyModified.find(rename->first);
+		if (it != FilesExternallyModified.end()) {
+			FilesExternallyModified.erase(it);
+		}
+		it = FilesExternallyModified.find(rename->second);
+		if (it != FilesExternallyModified.end()) {
+			FilesExternallyModified.erase(it);
+		}
+
+		// oddity. int linux sometimes we get rename events where the old and new paths
+		// are the same. in this case, lets treat them as modifications
 		if (rename->first == rename->second) {
 			std::map<wxString, wxString>::iterator toDeleteRename = rename;
 			++rename;
