@@ -32,6 +32,7 @@
 #include <MvcEditor.h>
 #include <wx/file.h>
 #include <wx/wupdlock.h>
+#include <wx/stdpaths.h>
 #include <algorithm>
 
 static int ID_EXPLORER_PANEL = wxNewId();
@@ -168,8 +169,15 @@ void mvceditor::ExplorerFeatureClass::OnExplorerProjectMenu(wxCommandEvent& even
 	if (index >= 0 && index < SourceDirs.size()) {
 		panel->RefreshDir(SourceDirs[index].RootDirectory);
 	}
-	else {
+	else if (!SourceDirs.empty()) {
 		panel->FocusOnSourcesList();
+	}
+	else {
+
+		// as a fallback if the user has not created any projects
+		// just go to the user's home dir
+		wxStandardPaths paths = wxStandardPaths::Get();
+		panel->RefreshDir(paths.GetDocumentsDir());
 	}
 }
 
