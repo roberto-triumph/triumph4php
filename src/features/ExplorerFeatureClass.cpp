@@ -421,6 +421,18 @@ void mvceditor::ModalExplorerPanelClass::OnListKeyDown(wxKeyEvent& event) {
 	else if (WXK_RETURN == code) {
 		OnListMenuOpen(evt);
 	}
+	else if (WXK_LEFT == code && event.GetModifiers() == wxMOD_ALT) {
+		
+		// ALT+left == go to parent dir
+		wxFileName curDir;
+		curDir.AssignDir(Directory->GetValue());
+
+		// root directories don't have parents
+		if (curDir.IsOk() && curDir.GetDirCount() > 0) {
+			curDir.RemoveLastDir();
+			RefreshDir(curDir);
+		}
+	}
 	else {
 		event.Skip();
 	}
