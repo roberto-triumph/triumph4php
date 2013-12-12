@@ -31,6 +31,7 @@
 #include <widgets/FilePickerValidatorClass.h>
 #include <MvcEditor.h>
 #include <wx/file.h>
+#include <wx/wupdlock.h>
 #include <algorithm>
 
 static int ID_EXPLORER_PANEL = wxNewId();
@@ -527,7 +528,6 @@ int mvceditor::ModalExplorerPanelClass::ListImageId(const wxFileName& fileName) 
 		return LIST_FILE_TEXT;
 	}
 	return LIST_FILE_OTHER;
-
 }
 
 void mvceditor::ModalExplorerPanelClass::OnListMenuOpen(wxCommandEvent& event) {
@@ -570,24 +570,51 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuRename(wxCommandEvent& event)
 void mvceditor::ModalExplorerPanelClass::OnListMenuDelete(wxCommandEvent& event) {
 	long index = -1;
 	index = List->GetNextItem(index, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	bool doRun = false;
+	std::vector<wxFileName> dirs;
+	std::vector<wxFileName> files;
+	while (index != wxNOT_FOUND) {
+		
+		// dont allow the parent dir to be deleted
+		if (index > 0) {
+			wxString name = List->GetItemText(index);
+			wxString fullPath = CurrentListDir.GetPathWithSep() + name;
+			if (wxFileName::FileExists(fullPath)) {
+				files.push_back(wxFileName(fullPath));
+			}
+			else if (wxFileName::DirExists(fullPath)) {
 
-	// dont allow the parent dir to be deleted
-	if (index > 0) {
-		wxString name = List->GetItemText(index);
-		wxString fullPath = CurrentListDir.GetPathWithSep() + name;
+				// need to recursively delete a directory
+				wxFileName dirToDelete;
+				dirToDelete.AssignDir(fullPath);
+				dirs.push_back(dirToDelete);
+			}
+		}
+		index = List->GetNextItem(index, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	}
+
+	// 1 file = don;'t ask for confirmation 
+	bool doDelete = false;
+	if ((dirs.size() + files.size()) == 1) {
+		doDelete = true;
+	}
+	else if (!dirs.empty() || !files.empty()) {
+		wxString msg = _("Are you sure you want to delete the following?\n\n");
+		std::vector<wxFileName>::const_iterator f;
+		for (f = dirs.begin(); f != dirs.end(); ++f) {
+			msg += f->GetPath() + wxT("\n");
+		}
+		for (f = files.begin(); f != files.end(); ++f) {
+			msg += f->GetFullPath() + wxT("\n");
+		}
+		int res = wxMessageBox(msg, _("Confirm Delete"), wxCENTRE | wxYES_NO);
+		doDelete = wxYES == res;
+	}
+	if (doDelete) {
 
 		// perform the deletion in the background
 		mvceditor::ExplorerModifyActionClass* action = new mvceditor::ExplorerModifyActionClass(RunningThreads, ID_EXPLORER_MODIFY);
-		if (wxFileName::FileExists(fullPath)) {
-			action->SetFileToRemove(wxFileName(fullPath));
-		}
-		else if (wxFileName::DirExists(fullPath)) {
-
-			// need to recursively delete a directory
-			wxFileName dirToDelete;
-			dirToDelete.AssignDir(fullPath);
-			action->SetDirToRemove(dirToDelete);
-		}
+		action->SetFilesToRemove(dirs, files);
 		RunningThreads.Queue(action);
 	}
 }
@@ -756,55 +783,71 @@ void mvceditor::ModalExplorerPanelClass::OnListEndLabelEdit(wxListEvent& event) 
 }
 
 void mvceditor::ModalExplorerPanelClass::OnExplorerModifyComplete(mvceditor::ExplorerModifyEventClass &event) {
-	if (CurrentListDir.GetPath() != event.ParentDir.GetPath()) {
-		wxString a = CurrentListDir.GetPath();
-		wxString b = event.ParentDir.GetPath();
+	if (CurrentListDir.GetPath() != event.GetParentDir().GetPath()) {
 
 		// user is looking at another dir. no need to update the list items
 		return;
 	}
 
-	// TODO FindItem is case insensitive but the file system may be case sensitive
-	long index = List->FindItem(-1, event.Name);
-	if (wxNOT_FOUND == index) {
-		return;
-	}
+	wxWindowUpdateLocker updateLocker(this);
+	if (mvceditor::ExplorerModifyActionClass::DELETE_FILES_DIRS == event.Action) {
+		std::vector<wxFileName>::iterator f;
 
-	if (mvceditor::ExplorerModifyActionClass::DELETE_FILE == event.Action) {
-		wxFileName fileName(event.ParentDir.GetPath(), event.Name);
-		wxString fullPath = fileName.GetFullPath();
-		if (event.Success) {
+		// find the directories that were deleted and remove them from the list control
+		for (f = event.DirsDeleted.begin(); f != event.DirsDeleted.end(); ++f) {
+			
+			// TODO FindItem is case insensitive but the file system may be case sensitive
+			// not sure how to solve this (removing the item with the 'wrong' case)
+			long index = List->FindItem(-1, f->GetDirs().Last());
+			if (index != wxNOT_FOUND) {
 				List->DeleteItem(index);
 			}
-			else {
-				wxMessageBox(_("File could not be deleted:\n") + fullPath, _("Delete File"));
+		}
+		for (f = event.FilesDeleted.begin(); f != event.FilesDeleted.end(); ++f) {
+			
+			// TODO FindItem is case insensitive but the file system may be case sensitive
+			// not sure how to solve this (removing the item with the 'wrong' case)
+			long index = List->FindItem(-1, f->GetFullName());
+			if (index != wxNOT_FOUND) {
+				List->DeleteItem(index);
 			}
-	}
-	else if (mvceditor::ExplorerModifyActionClass::DELETE_DIRECTORY == event.Action) {
-		wxFileName fileName;
-		fileName.AssignDir(event.ParentDir.GetPath());
-		fileName.AppendDir(event.Name);
-		wxString fullPath = fileName.GetPath();
-		if (event.Success) {
-			List->DeleteItem(index);
 		}
-		else {
-			wxMessageBox(_("Directory could not be deleted:\n") + fullPath, _("Delete Directory"));
+		if (!event.DirsNotDeleted.empty() || !event.FilesNotDeleted.empty()) {
+			wxString msg;
+			if (!event.FilesNotDeleted.empty()) {
+				msg += _("Could not delete the following files");
+				for (f = event.DirsNotDeleted.begin(); f != event.DirsNotDeleted.end(); ++f) {
+					msg += f->GetPath() + wxT("\n");
+				}
+			}
+			if (!event.DirsNotDeleted.empty()) {
+				msg += _("Could not delete the following directories");
+				for (f = event.FilesNotDeleted.begin(); f != event.FilesNotDeleted.end(); ++f) {
+					msg += f->GetFullPath() + wxT("\n");
+				}
+			}
+			wxMessageBox(msg, _("Delete"));
 		}
 	}
-	else if (mvceditor::ExplorerModifyActionClass::RENAME == event.Action) {
-		wxFileName destFile(event.ParentDir.GetPath(), event.NewName);
+	else if (mvceditor::ExplorerModifyActionClass::RENAME_FILE == event.Action) {
+		wxFileName destFile(event.OldFile.GetPath(), event.NewName);
 
 		if (!event.Success && wxFileName::DirExists(destFile.GetFullPath())) {
-			// revert the item back to the original name
-			List->SetItemText(index, event.Name);
 
+			// revert the item back to the original name
+			long index = List->FindItem(-1, event.NewName);
+			if (index != wxNOT_FOUND) {
+				List->SetItemText(index, event.OldFile.GetFullName());
+			}
 			wxMessageBox(_("A directory with that name already exists"), _("Rename"));			
 		}
 		else if (!event.Success) {
+			
 			// revert the item back to the original name
-			List->SetItemText(index, event.Name);
-
+			long index = List->FindItem(-1, event.NewName);
+			if (index != wxNOT_FOUND) {
+				List->SetItemText(index, event.OldFile.GetFullName());
+			}
 			wxMessageBox(_("A file with that name already exists"), _("Rename"));			
 		}
 	}
@@ -1069,80 +1112,152 @@ mvceditor::ExplorerModifyActionClass::ExplorerModifyActionClass(mvceditor::Runni
 																int eventId)
 : ActionClass(runningThreads, eventId) 
 , Action(NONE)
-, Dir()
-, File()
+, Dirs()
+, Files()
+, OldFile()
 , NewName() {
 }
 
-void mvceditor::ExplorerModifyActionClass::SetDirToRemove(const wxFileName &dir) {
-	Action = DELETE_DIRECTORY;
+void mvceditor::ExplorerModifyActionClass::SetFilesToRemove(const std::vector<wxFileName>& dirs, const std::vector<wxFileName>& files) {
+	Action = DELETE_FILES_DIRS;
 
 	// make sure to clone
-	Dir.AssignDir(dir.GetPath());
-}
-
-void mvceditor::ExplorerModifyActionClass::SetFileToRemove(const wxFileName& file) {
-	Action = DELETE_FILE;
-
-	// make sure to clone
-	File.Assign(file.GetFullPath());
+	Dirs = mvceditor::DeepCopyFileNames(dirs);
+	Files = mvceditor::DeepCopyFileNames(files);
 }
 
 void mvceditor::ExplorerModifyActionClass::SetFileToRename(const wxFileName& file, const wxString& newName) {
-	Action = RENAME;
+	Action = RENAME_FILE;
 
 	// make sure to clone
-	File.Assign(file.GetFullPath());
+	OldFile.Assign(file.GetFullPath());
 	NewName = newName.c_str();
 }
 
 void mvceditor::ExplorerModifyActionClass::BackgroundWork() {
 	wxFileName parentDir;
 	wxString name;
-	bool success = false;
-	if (mvceditor::ExplorerModifyActionClass::DELETE_DIRECTORY == Action) {
-		parentDir.AssignDir(Dir.GetPath());
-		name = parentDir.GetDirs().Last();
-		parentDir.RemoveLastDir();
+	bool totalSuccess = true;
+	std::vector<wxFileName> dirsDeleted;
+	std::vector<wxFileName> dirsNotDeleted;
+	std::vector<wxFileName> filesDeleted;
+	std::vector<wxFileName> filesNotDeleted;
+	if (mvceditor::ExplorerModifyActionClass::DELETE_FILES_DIRS == Action) {
+		std::vector<wxFileName>::iterator d;
+		for (d = Dirs.begin(); d != Dirs.end(); ++d) {
+			bool success = mvceditor::RecursiveRmDir(d->GetPath());
+			if (success) {
+				wxFileName wxFileName;
+				wxFileName.AssignDir(d->GetPath());
+				dirsDeleted.push_back(wxFileName);
+			}
+			else {
+				wxFileName wxFileName;
+				wxFileName.AssignDir(d->GetPath());
+				dirsNotDeleted.push_back(wxFileName);
+			}
+			totalSuccess &= success;
+		}
+		std::vector<wxFileName>::iterator f;
+		for (f = Files.begin(); f != Files.end(); ++f) {
+			bool success = wxRemoveFile(f->GetFullPath());
+			if (success) {
+				wxFileName deletedFile(f->GetFullPath());
+				filesDeleted.push_back(deletedFile);
+			}
+			else {
+				wxFileName deletedFile(f->GetFullPath());
+				filesNotDeleted.push_back(deletedFile);
+			}
+			totalSuccess &= success;
+		}
+		mvceditor::ExplorerModifyEventClass modEvent(GetEventId(), 
+			dirsDeleted, filesDeleted, dirsNotDeleted, filesNotDeleted, totalSuccess);
+		PostEvent(modEvent);
 	}
-	else {
-		parentDir.Assign(File.GetFullPath());
-		name = parentDir.GetFullName();
-	}
+	else if (mvceditor::ExplorerModifyActionClass::RENAME_FILE == Action) {
+		wxFileName destFile(OldFile.GetPath(), NewName);
+		bool success = wxRenameFile(OldFile.GetFullPath(), destFile.GetFullPath(), false);
 
-	// perform the action
-	if (mvceditor::ExplorerModifyActionClass::DELETE_DIRECTORY == Action) {
-		success = mvceditor::RecursiveRmDir(Dir.GetPath());
+		mvceditor::ExplorerModifyEventClass modEvent(GetEventId(), 
+			OldFile, NewName, success);
+		PostEvent(modEvent);
 	}
-	else if (mvceditor::ExplorerModifyActionClass::DELETE_FILE == Action) {
-		success = wxRemoveFile(File.GetFullPath());
-	}
-	else if (mvceditor::ExplorerModifyActionClass::RENAME == Action) {
-		wxFileName destFile(parentDir.GetPath(), NewName);
-		success = wxRenameFile(File.GetFullPath(), destFile.GetFullPath(), false);
-	}
-	mvceditor::ExplorerModifyEventClass modEvent(GetEventId(), 
-		parentDir, name, NewName, Action, success);
-	PostEvent(modEvent);
 }
 wxString mvceditor::ExplorerModifyActionClass::GetLabel() const {
 	return wxT("File System Modification");
 }
 
-mvceditor::ExplorerModifyEventClass::ExplorerModifyEventClass(int eventId, const wxFileName &dir, const wxString &name, const wxString &newName, mvceditor::ExplorerModifyActionClass::Actions action, bool success) 
+mvceditor::ExplorerModifyEventClass::ExplorerModifyEventClass(int eventId, const wxFileName &oldFile, 
+															  const wxString &newName, bool success) 
 : wxEvent(eventId, mvceditor::EVENT_EXPLORER_MODIFY)
-, ParentDir(dir)
-, Name(name)
-, NewName(newName)
-, Action(action)
+, OldFile(oldFile.GetFullPath())
+, NewName(newName.c_str())
+, DirsDeleted()
+, DirsNotDeleted()
+, FilesDeleted()
+, FilesNotDeleted()
+, Action(mvceditor::ExplorerModifyActionClass::RENAME_FILE)
 , Success(success)
 {
 
 }
 
+mvceditor::ExplorerModifyEventClass::ExplorerModifyEventClass(int eventId, 
+															  const std::vector<wxFileName>& dirsDeleted, const std::vector<wxFileName>& filesDeleted,
+															  const std::vector<wxFileName>& dirsNotDeleted, const std::vector<wxFileName>& filesNotDeleted,
+															  bool success)
+: wxEvent(eventId, mvceditor::EVENT_EXPLORER_MODIFY)
+, OldFile()
+, NewName()
+, DirsDeleted()
+, DirsNotDeleted()
+, FilesDeleted()
+, FilesNotDeleted()
+, Action(mvceditor::ExplorerModifyActionClass::DELETE_FILES_DIRS)
+, Success(success)
+{
+	DirsDeleted = mvceditor::DeepCopyFileNames(dirsDeleted);
+	DirsNotDeleted = mvceditor::DeepCopyFileNames(dirsNotDeleted);
+	FilesDeleted = mvceditor::DeepCopyFileNames(filesDeleted);
+	FilesNotDeleted = mvceditor::DeepCopyFileNames(filesNotDeleted);
+}
+
+wxFileName mvceditor::ExplorerModifyEventClass::GetParentDir() const {
+	wxFileName parentDir;
+	if (Action == mvceditor::ExplorerModifyActionClass::RENAME_FILE) {
+		parentDir.AssignDir(OldFile.GetPath());
+		return parentDir;
+	}
+	else if (!DirsDeleted.empty()) {
+		parentDir.AssignDir(DirsDeleted[0].GetPath());
+		parentDir.RemoveLastDir();
+		return parentDir;
+	}
+	else if (!DirsNotDeleted.empty()) {
+		parentDir.AssignDir(DirsNotDeleted[0].GetPath());
+		parentDir.RemoveLastDir();
+		return parentDir;
+	}
+	else if (!FilesDeleted.empty()) {
+		parentDir.AssignDir(FilesDeleted[0].GetPath());
+		return parentDir;
+	}
+	else if (!FilesNotDeleted.empty()) {
+		parentDir.AssignDir(FilesNotDeleted[0].GetPath());
+		return parentDir;
+	}
+	return parentDir;
+}
+
 wxEvent* mvceditor::ExplorerModifyEventClass::Clone() const {
-	return  new mvceditor::ExplorerModifyEventClass(
-		GetId(), ParentDir, Name, NewName, Action, Success
+	if (Action == mvceditor::ExplorerModifyActionClass::RENAME_FILE) {
+		return new mvceditor::ExplorerModifyEventClass(
+			GetId(), OldFile, NewName, Success
+		);
+	}
+	return new mvceditor::ExplorerModifyEventClass(
+		GetId(), DirsDeleted, FilesDeleted, DirsNotDeleted, FilesNotDeleted, Success
 	);
 }
 

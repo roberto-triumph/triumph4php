@@ -346,22 +346,17 @@ public:
 
 	enum Actions {
 		NONE,
-		DELETE_FILE,
-		DELETE_DIRECTORY,
-		RENAME
+		DELETE_FILES_DIRS,
+		RENAME_FILE
 	};
 
 	ExplorerModifyActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
-	 * @param dir the directory to be deleted (recursively)
+	 * @param dirs the directories to be deleted (recursively)
+	 * @param files the files to be deleted
 	 */
-	void SetDirToRemove(const wxFileName& dir);
-
-	/**
-	 * @param file the directory to be deleted
-	 */
-	void SetFileToRemove(const wxFileName& file);
+	void SetFilesToRemove(const std::vector<wxFileName>& dirs, const std::vector<wxFileName>& files);
 
 	/**
 	 * @param file the file to be renamed.  thie can also be a
@@ -381,14 +376,19 @@ protected:
 	Actions Action;
 
 	/**
-	 * set when Action == DELETE_DIRECTORY
+	 * set when Action == DELETE
 	 */
-	wxFileName Dir;
+	std::vector<wxFileName> Dirs;
 
 	/**
-	 * set when Action == DELETE_FILE or RENAME
+	 * set when Action == DELETE
 	 */
-	wxFileName File;
+	std::vector<wxFileName> Files;
+
+	/**
+	 * set when Action == RENAME
+	 */
+	wxFileName OldFile;
 
 	/**
 	 * set when Action == RENAME
@@ -414,20 +414,34 @@ class ExplorerModifyEventClass : public wxEvent {
 public:
 
 	/**
-	 * the dir that where the modification took place
-	 * ie the parent dir
+	 * name of the item renamed
 	 */
-	wxFileName ParentDir;
-
-	/**
-	 * name of the item renamed or removed
-	 */
-	wxString Name;
+	wxFileName OldFile;
 
 	/**
 	 * the new name, if the modification was a rename
 	 */
 	wxString NewName;
+
+	/**
+	 * the directories that were successfully deleted
+	 */
+	std::vector<wxFileName> DirsDeleted;
+
+	/**
+	 * the files that were successfully deleted
+	 */
+	std::vector<wxFileName> FilesDeleted;
+
+	/**
+	 * the directories that could not be deleted
+	 */
+	std::vector<wxFileName> DirsNotDeleted;
+
+	/**
+	 * the files that were could not be deleted
+	 */
+	std::vector<wxFileName> FilesNotDeleted;
 
 	/**
 	 * the type of modification to perform
@@ -439,12 +453,31 @@ public:
 	 */
 	bool Success;
 
-	ExplorerModifyEventClass(int eventId, const wxFileName& dir, const wxString& name, 
-		const wxString& newName, mvceditor::ExplorerModifyActionClass::Actions action, bool success);
+	/**
+	 * create a rename event
+	 */
+	ExplorerModifyEventClass(int eventId, const wxFileName& oldFile, 
+		const wxString& newName, bool success);
+
+	/**
+	 * create a delete event
+	 */
+	ExplorerModifyEventClass(int eventId, 
+		const std::vector<wxFileName>& dirsDeleted, const std::vector<wxFileName>& filesDeleted, 
+		const std::vector<wxFileName>& dirsNotDeleted, const std::vector<wxFileName>& filesNotDeleted, 
+		bool success);
+
+	/**
+	 * @return the directory where the changes took place
+	 */
+	wxFileName GetParentDir() const;
 
 	wxEvent* Clone() const;
 };
 
+/**
+ * Panel that shows the explorer options: locations of Operation System shell, file manager
+ */
 class ExplorerOptionsPanelClass : public ExplorerOptionsGeneratedPanelClass {
 
 public:
