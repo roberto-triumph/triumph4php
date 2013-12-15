@@ -153,7 +153,6 @@ CodeControlProfilerAppClass::CodeControlProfilerAppClass()
 
 bool CodeControlProfilerAppClass::OnInit() {
 	mvceditor::CodeControlStylesInit(Options);
-	mvceditor::CodeControlStylesSetToLightTheme(Options);
 	Options.EnableAutomaticLineIndentation = true;
 	Options.EnableAutoCompletion = true;
 	mvceditor::TagFinderListClass* tagFinderlist = new mvceditor::TagFinderListClass;

@@ -36,14 +36,14 @@ namespace mvceditor {
 void CodeControlStylesInit(mvceditor::CodeControlOptionsClass& options);
 
 /**
- * Set the color scheme to the default (dark on light) scheme
+ * Set the color scheme to the default scheme
  */
-void CodeControlStylesSetToLightTheme(mvceditor::CodeControlOptionsClass& options);
+void CodeControlStylesSetTheme(mvceditor::CodeControlOptionsClass& options, const wxString& theme);
 
 /**
- * Set the color scheme to the light on dark scheme
+ * @return all of the theme names
  */
-void CodeControlStylesSetToDarkTheme(mvceditor::CodeControlOptionsClass& options);
+wxArrayString CodeControlStylesGetThemes();
 
 }
 

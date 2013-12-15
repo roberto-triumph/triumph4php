@@ -83,7 +83,6 @@ void mvceditor::PreferencesDialogClass::OnOkButton(wxCommandEvent& event) {
 		+ Globals.MiscFileExtensionsString;
 	if (Validate() && book->Validate() && TransferDataFromWindow() && book->TransferDataFromWindow()) {
 		KeyboardShortcutsPanel->ApplyChanges();
-		Preferences.CodeControlOptions.CommitChanges();
 		Preferences.KeyProfiles = KeyboardShortcutsPanel->GetProfiles();
 
 		// need to figure out if the settings directory wac changed

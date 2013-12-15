@@ -24,10 +24,10 @@ namespace mvceditor{ class NotebookClass; }
 #include <wx/icon.h>
 #include <wx/menu.h>
 #include <wx/frame.h>
+#include <wx/stattext.h>
 #include <wx/choice.h>
 #include <wx/statbox.h>
 #include <wx/listbox.h>
-#include <wx/stattext.h>
 #include <wx/fontpicker.h>
 #include <wx/clrpicker.h>
 #include <wx/checkbox.h>
@@ -166,12 +166,15 @@ class EditColorsPanelGeneratedClass : public wxPanel
 	protected:
 		enum
 		{
-			ID_FOREGROUND_COLOR = 1000,
+			ID_THEMEHELP = 1000,
+			ID_FOREGROUND_COLOR,
 			ID_BACKGROUND_COLOR,
 			ID_BOLD,
 			ID_ITALIC,
+			ID_PREVIEWLABEL,
 		};
 		
+		wxStaticText* ThemeHelp;
 		wxChoice* Theme;
 		wxListBox* Styles;
 		wxStaticText* StyleFontLabel;
@@ -182,6 +185,8 @@ class EditColorsPanelGeneratedClass : public wxPanel
 		wxColourPickerCtrl* BackgroundColor;
 		wxCheckBox* Bold;
 		wxCheckBox* Italic;
+		wxFlexGridSizer* StyleEditSizer;
+		wxStaticText* PreviewLabel;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnThemeChoice( wxCommandEvent& event ) { event.Skip(); }
@@ -193,7 +198,7 @@ class EditColorsPanelGeneratedClass : public wxPanel
 	
 	public:
 		
-		EditColorsPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 526,361 ), long style = wxTAB_TRAVERSAL );
+		EditColorsPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 533,480 ), long style = wxTAB_TRAVERSAL );
 		~EditColorsPanelGeneratedClass();
 	
 };

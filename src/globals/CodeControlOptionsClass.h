@@ -64,13 +64,17 @@ public:
 	bool IsItalic;
 	
 	StylePreferenceClass();
+
+	StylePreferenceClass(const mvceditor::StylePreferenceClass& src);
+
+	mvceditor::StylePreferenceClass& operator=(const mvceditor::StylePreferenceClass& src);
 	
 	/**
 	 * Copy the properties from src to this object.
 	 * After a call to this method; src and this will have the same values
 	 * for each of the properties.
 	 */
-	void Copy(const StylePreferenceClass& src);
+	void Copy(const mvceditor::StylePreferenceClass& src);
 	
 	/**
 	 * Give a name to this style and set the constant that it
@@ -97,14 +101,6 @@ public:
 	std::vector<StylePreferenceClass> PhpStyles;
 	std::vector<StylePreferenceClass> SqlStyles;
 	std::vector<StylePreferenceClass> CssStyles;
-	
-	/**
-	 * Stores the preferences being edited.  They are stored separately so that if the user
-	 * happens to cancel the operation, the original settings are left intact.
-	 */
-	std::vector<StylePreferenceClass> EditedPhpStyles;
-	std::vector<StylePreferenceClass> EditedSqlStyles;
-	std::vector<StylePreferenceClass> EditedCssStyles;
 	
 	/**
 	 *  This is the entire list of styles that can have font/color attached to.
@@ -218,20 +214,12 @@ public:
 	bool EnableCallTipsOnMouseHover;
 
 	CodeControlOptionsClass();
-	
-	/**
-	 * Prepares the edited preferences by copying them FROM the real settings. From this point on, all calls to 
-	 * GetEditedStyle() will return the preferences that are set by the ChangeStyle() method. Note that this
-	 * only affects style preferences and not the public properties.
-	 */
-	void StartEditMode();
-	
-	/**
-	 * Promotes (copies) all edited preferences to the real settings. From this point on, all calls to 
-	 * GetStyle() will return the preferences that were set in ChangeStyle() method. Note that this
-	 * only affects style preferences and not the public properties.
-	 */
-	void CommitChanges();
+
+	CodeControlOptionsClass(const mvceditor::CodeControlOptionsClass& src);
+
+	mvceditor::CodeControlOptionsClass& operator=(const mvceditor::CodeControlOptionsClass& src);
+
+	void Copy(const mvceditor::CodeControlOptionsClass& src);
 	
 	/**
 	 * Load state from persistent storage

@@ -26,52 +26,60 @@
 #include <wx/platinfo.h>
 #include <wx/utils.h>
 
-mvceditor::CodeControlOptionsClass::CodeControlOptionsClass() {
-	SpacesPerIndent = 0;
-	TabWidth = 4;
-	IndentUsingTabs = true;
-	EnableCodeFolding = true;
-	EnableAutomaticLineIndentation = true;
-	EnableLineNumbers = true;
-	EnableIndentationGuides = false;
-	EnableLineEndings = false;
-	EnableAutoCompletion = true;
-	EnableDynamicAutoCompletion = true;
-	EnableWordWrap = false;
-	TrimTrailingSpaceBeforeSave = false;
-	RemoveTrailingBlankLinesBeforeSave = true;
-	EnableCallTipsOnMouseHover = true;
-	RightMargin = 0;
+mvceditor::CodeControlOptionsClass::CodeControlOptionsClass() 
+: PhpStyles() 
+, SqlStyles()
+, CssStyles()
+, CodeStyles() 
+, SpacesPerIndent(0) 
+, TabWidth(4) 
+, RightMargin(0) 
+, LineEndingMode(2)
+, IndentUsingTabs(true) 
+, EnableCodeFolding(true) 
+, EnableAutomaticLineIndentation(true)
+, EnableLineNumbers(true)
+, EnableIndentationGuides(false) 
+, EnableLineEndings(false) 
+, EnableAutoCompletion(true)
+, EnableDynamicAutoCompletion(false) 
+, EnableWordWrap(false) 
+, TrimTrailingSpaceBeforeSave(false) 
+, RemoveTrailingBlankLinesBeforeSave(true) 
+, EnableCallTipsOnMouseHover(true) {
+
 }
 
-void mvceditor::CodeControlOptionsClass::CommitChanges() {
-	for (size_t i = 0; i < PhpStyles.size(); ++i) {
-		PhpStyles[i].Copy(EditedPhpStyles[i]);
-	}
-	for (size_t i = 0; i < SqlStyles.size(); ++i) {
-		SqlStyles[i].Copy(EditedSqlStyles[i]);
-	}
-	for (size_t i = 0; i < CssStyles.size(); ++i) {
-		CssStyles[i].Copy(EditedCssStyles[i]);
-	}
+mvceditor::CodeControlOptionsClass::CodeControlOptionsClass(const mvceditor::CodeControlOptionsClass& src) {
+	Copy(src);
 }
 
-void mvceditor::CodeControlOptionsClass::StartEditMode() {
-	
-	// make sure that the original and edited vectors are the same size
-	EditedPhpStyles.resize(PhpStyles.size());
-	EditedSqlStyles.resize(SqlStyles.size());
-	EditedCssStyles.resize(CssStyles.size());
-	
-	for (size_t i = 0; i < PhpStyles.size(); ++i) {
-		EditedPhpStyles[i].Copy(PhpStyles[i]);
-	}
-	for (size_t i = 0; i < SqlStyles.size(); ++i) {
-		EditedSqlStyles[i].Copy(SqlStyles[i]);
-	}
-	for (size_t i = 0; i < CssStyles.size(); ++i) {
-		EditedCssStyles[i].Copy(CssStyles[i]);
-	}
+mvceditor::CodeControlOptionsClass& mvceditor::CodeControlOptionsClass::operator=(const mvceditor::CodeControlOptionsClass& src) {
+	Copy(src);
+	return *this;
+}
+
+void mvceditor::CodeControlOptionsClass::Copy(const mvceditor::CodeControlOptionsClass& src) {
+	PhpStyles = src.PhpStyles; 
+	SqlStyles = src.SqlStyles;
+	CssStyles = src.CssStyles;
+	CodeStyles = src.CodeStyles; 
+	SpacesPerIndent = src.SpacesPerIndent;
+	TabWidth = src.TabWidth;
+	RightMargin = src.RightMargin;
+	LineEndingMode = src.LineEndingMode;
+	IndentUsingTabs = src.IndentUsingTabs;
+	EnableCodeFolding = src.EnableCodeFolding;
+	EnableAutomaticLineIndentation = src.EnableAutomaticLineIndentation;
+	EnableLineNumbers = src.EnableLineNumbers;
+	EnableIndentationGuides = src.EnableIndentationGuides;
+	EnableLineEndings = src.EnableLineEndings;
+	EnableAutoCompletion = src.EnableAutoCompletion;
+	EnableDynamicAutoCompletion = src.EnableDynamicAutoCompletion;
+	EnableWordWrap = src.EnableWordWrap;
+	TrimTrailingSpaceBeforeSave = src.TrimTrailingSpaceBeforeSave;
+	RemoveTrailingBlankLinesBeforeSave = src.RemoveTrailingBlankLinesBeforeSave; 
+	EnableCallTipsOnMouseHover = src.EnableCallTipsOnMouseHover;
 }
 
 mvceditor::StylePreferenceClass& mvceditor::CodeControlOptionsClass::FindByStcStyle(std::vector<mvceditor::StylePreferenceClass>& styles, int stcStyle) const {
@@ -140,14 +148,30 @@ void mvceditor::CodeControlOptionsClass::Save(wxConfigBase* config) {
 }
 
 mvceditor::StylePreferenceClass::StylePreferenceClass() 
-	: Font()
-	, Color()
-	, BackgroundColor()
-	, Name(0)
-	, StcStyle(0)
-	, IsBold(false)
-	, IsItalic(false) {
+: Font()
+, Color()
+, BackgroundColor()
+, Name(0)
+, StcStyle(0)
+, IsBold(false)
+, IsItalic(false) {
 		
+}
+
+mvceditor::StylePreferenceClass::StylePreferenceClass(const mvceditor::StylePreferenceClass& src)
+: Font()
+, Color()
+, BackgroundColor()
+, Name(0)
+, StcStyle(0)
+, IsBold(false)
+, IsItalic(false) {
+	Copy(src);
+}
+
+mvceditor::StylePreferenceClass& mvceditor::StylePreferenceClass::operator=(const mvceditor::StylePreferenceClass& src) {
+	Copy(src);
+	return *this;
 }
 
 void mvceditor::StylePreferenceClass::Copy(const mvceditor::StylePreferenceClass& src) {

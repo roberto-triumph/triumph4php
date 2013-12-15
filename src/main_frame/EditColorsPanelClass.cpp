@@ -24,33 +24,76 @@
  */
 #include <main_frame/EditColorsPanelClass.h>
 #include <code_control/CodeControlStyles.h>
+#include <code_control/CodeControlClass.h>
 #include <wx/stc/stc.h>
 
 mvceditor::EditColorsPanelClass::EditColorsPanelClass(wxWindow* parent, mvceditor::CodeControlOptionsClass& options)
-		: EditColorsPanelGeneratedClass(parent)
-		, CodeControlOptions(options) {
-	CodeControlOptions.StartEditMode();
-	for (size_t i = 0; i < options.EditedPhpStyles.size(); ++i) {
-		wxString name = wxString::FromAscii(options.EditedPhpStyles[i].Name);
-		Styles->Append(wxGetTranslation(name), &options.EditedPhpStyles[i]);
+: EditColorsPanelGeneratedClass(parent)
+, CodeControlOptions(options)
+, EditedCodeControlOptions(options)
+, CodeCtrl(NULL) 
+, Globals() 
+, EventSink() {
+	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
+		wxString name = wxString::FromAscii(options.PhpStyles[i].Name);
+		Styles->Append(wxGetTranslation(name), &options.PhpStyles[i]);
 	}
-	for (size_t i = 0; i < options.EditedSqlStyles.size(); ++i) {
-		wxString name = wxString::FromAscii(options.EditedSqlStyles[i].Name);
-		Styles->Append(wxGetTranslation(name), &options.EditedSqlStyles[i]);
+	for (size_t i = 0; i < options.SqlStyles.size(); ++i) {
+		wxString name = wxString::FromAscii(options.SqlStyles[i].Name);
+		Styles->Append(wxGetTranslation(name), &options.SqlStyles[i]);
 	}
-	for (size_t i = 0; i < options.EditedCssStyles.size(); ++i) {
-		wxString name = wxString::FromAscii(options.EditedCssStyles[i].Name);
-		Styles->Append(wxGetTranslation(name), &options.EditedCssStyles[i]);
+	for (size_t i = 0; i < options.CssStyles.size(); ++i) {
+		wxString name = wxString::FromAscii(options.CssStyles[i].Name);
+		Styles->Append(wxGetTranslation(name), &options.CssStyles[i]);
 	}
 	Styles->Select(0);
-	mvceditor::StylePreferenceClass firstPref = options.EditedPhpStyles[0];
+	mvceditor::StylePreferenceClass firstPref = EditedCodeControlOptions.PhpStyles[0];
 	Font->SetSelectedFont(firstPref.Font);
 	ForegroundColor->SetColour(firstPref.Color);
 	BackgroundColor->SetColour(firstPref.BackgroundColor);
 	Bold->SetValue(firstPref.IsBold);
 	Italic->SetValue(firstPref.IsItalic);
+
+	Theme->Clear();
+	wxArrayString themes = mvceditor::CodeControlStylesGetThemes();
+	themes.Sort();
+	Theme->Append(themes);
+
+	CodeCtrl = new mvceditor::CodeControlClass(this,
+		EditedCodeControlOptions,
+		&Globals, EventSink, wxID_ANY);
+	StyleEditSizer->Add(CodeCtrl, 1, wxEXPAND|wxLEFT, 5);
+	this->Layout();
+	CodeCtrl->SetDocumentMode(mvceditor::CodeControlClass::PHP);
+
+	wxString txt = mvceditor::CharToWx(
+		"<?php\n"
+		"/**\n"
+		" * this is a class\n"
+		" */\n"
+		"class MyClass {\n"
+		"\n"
+		"	/**\n"
+		"	 * @var string\n"
+		"	 */\n"
+		"	private $name;\n"
+		"\n"
+		"	public function __construct($name) {\n"
+		"		$this->name = $name;\n"
+		"		if (empty($this->name)) {\n"
+		"			throw new Exception(\"Name Cannot be empty\");\n"
+		"		}\n"
+		"	}\n"
+		"}\n"
+		"\n"
+	);
+	CodeCtrl->SetText(txt);
 }
 
+bool mvceditor::EditColorsPanelClass::TransferDataFromWindow() {
+	CodeControlOptions = EditedCodeControlOptions;
+	return true;
+}
 
 void mvceditor::EditColorsPanelClass::OnListBox(wxCommandEvent& event) {
 	int selected = event.GetSelection();
@@ -116,9 +159,11 @@ void mvceditor::EditColorsPanelClass::OnColorChanged(wxColourPickerEvent& event)
 		switch (event.GetId()) {
 			case ID_FOREGROUND_COLOR:
 				pref->Color = event.GetColour();
+				CodeCtrl->ApplyPreferences();
 				break;
 			case ID_BACKGROUND_COLOR:
 				pref->BackgroundColor = event.GetColour();
+				CodeCtrl->ApplyPreferences();
 				break;
 		}
 	}
@@ -130,6 +175,7 @@ void mvceditor::EditColorsPanelClass::OnFontChanged(wxFontPickerEvent& event) {
 	if (pref) {
 		wxFont font = event.GetFont();
 		pref->Font = font;
+		CodeCtrl->ApplyPreferences();
 	}
 }
 
@@ -141,14 +187,9 @@ void mvceditor::EditColorsPanelClass::OnThemeChoice(wxCommandEvent& event) {
 		sel = 0;
 	}
 	listBoxEvent.SetInt(sel);
-	switch (choice) {
-		case 0:
-			mvceditor::CodeControlStylesSetToLightTheme(CodeControlOptions);
-			wxPostEvent(this, listBoxEvent);
-			break;
-		case 1:
-			mvceditor::CodeControlStylesSetToDarkTheme(CodeControlOptions);
-			wxPostEvent(this, listBoxEvent);
-			break;
-	}
+
+	mvceditor::CodeControlStylesSetTheme(EditedCodeControlOptions, Theme->GetStringSelection());
+	wxPostEvent(this, listBoxEvent);
+
+	CodeCtrl->ApplyPreferences();
 }

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<colorTheme id="8208" name="Zenburn High-Contrast" modified="2012-07-03 20:48:49" author="P. J. Reed">
+    <searchResultIndication color="#464467" />
+    <filteredSearchResultIndication color="#3F3F6A" />
+    <occurrenceIndication color="#616161" />
+    <writeOccurrenceIndication color="#948567" />
+    <findScope color="#BCADAD" />
+    <sourceHoverBackground color="#A19879" />
+    <singleLineComment color="#7F9F7F" bold="false" />
+    <multiLineComment color="#7F9F7F" />
+    <commentTaskTag color="#E89393" bold="true" />
+    <javadoc color="#7F9F7F" bold="true" />
+    <javadocLink color="#A893CC" />
+    <javadocTag color="#9393CC" />
+    <javadocKeyword color="#CC9393" />
+    <class color="#FFCFAF" bold="true" />
+    <interface color="#CAE682" />
+    <method color="#EFEF8F" />
+    <methodDeclaration color="#EFEF8F" />
+    <bracket color="#EFEFAF" bold="true" />
+    <number color="#8CD0D3" />
+    <string color="#CC9393" />
+    <operator color="#F0EFD0" />
+    <keyword color="#F0DFAF" />
+    <annotation color="#808080" />
+    <staticMethod color="#C4C4B7" />
+    <localVariable color="#D4C4A9" />
+    <localVariableDeclaration color="#FFCFAF" bold="true" />
+    <field color="#B3B784" bold="false" />
+    <staticField color="#93A2CC" bold="false" />
+    <staticFinalField color="#DCA3A3" bold="true" />
+    <deprecatedMember color="#FFFFFF" bold="false" />
+    <typeArgument color="#DFDFBF" bold="true" />
+    <constant color="#DCA3A3" bold="true" />
+    <background color="#1F1F1F" />
+    <currentLine color="#505050" />
+    <foreground color="#DCDCCC" />
+    <lineNumber color="#9FAFAF" />
+    <selectionBackground color="#71D3B4" />
+    <selectionForeground color="#233323" />
+</colorTheme>

@@ -196,14 +196,18 @@ EditColorsPanelGeneratedClass::EditColorsPanelGeneratedClass( wxWindow* parent, 
 	Sizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* FlexGridSizer;
-	FlexGridSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	FlexGridSizer = new wxFlexGridSizer( 3, 1, 0, 0 );
 	FlexGridSizer->AddGrowableCol( 0 );
-	FlexGridSizer->AddGrowableRow( 1 );
+	FlexGridSizer->AddGrowableRow( 2 );
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );
 	FlexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	wxStaticBoxSizer* ThemeSizer;
 	ThemeSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Theme") ), wxVERTICAL );
+	
+	ThemeHelp = new wxStaticText( this, ID_THEMEHELP, _("Selecting one of the pre-defined themes will change all styles according to the selected theme."), wxDefaultPosition, wxDefaultSize, 0 );
+	ThemeHelp->Wrap( -1 );
+	ThemeSizer->Add( ThemeHelp, 1, wxALL|wxEXPAND, 5 );
 	
 	wxString ThemeChoices[] = { _("Dark On Light"), _("Light On Dark") };
 	int ThemeNChoices = sizeof( ThemeChoices ) / sizeof( wxString );
@@ -256,6 +260,18 @@ EditColorsPanelGeneratedClass::EditColorsPanelGeneratedClass( wxWindow* parent, 
 	StaticBoxSizer->Add( FlexSizer, 1, wxEXPAND|wxLEFT, 5 );
 	
 	FlexGridSizer->Add( StaticBoxSizer, 6, wxEXPAND|wxALL, 10 );
+	
+	StyleEditSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	StyleEditSizer->AddGrowableCol( 0 );
+	StyleEditSizer->AddGrowableRow( 1 );
+	StyleEditSizer->SetFlexibleDirection( wxBOTH );
+	StyleEditSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	PreviewLabel = new wxStaticText( this, ID_PREVIEWLABEL, _("Style Preview"), wxDefaultPosition, wxDefaultSize, 0 );
+	PreviewLabel->Wrap( -1 );
+	StyleEditSizer->Add( PreviewLabel, 1, wxALL|wxEXPAND, 5 );
+	
+	FlexGridSizer->Add( StyleEditSizer, 2, wxEXPAND, 5 );
 	
 	Sizer->Add( FlexGridSizer, 1, wxEXPAND, 5 );
 	

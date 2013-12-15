@@ -322,9 +322,6 @@ void mvceditor::PreferencesClass::ClearAllShortcuts() {
 }
 
 void mvceditor::PreferencesClass::Load(wxConfigBase* config, wxFrame* frame) {
-	CodeControlOptions.StartEditMode();
-	mvceditor::CodeControlStylesSetToLightTheme(CodeControlOptions);
-	CodeControlOptions.CommitChanges();
 	KeyProfiles.Cleanup();
 	CodeControlOptions.Load(config);
 	
