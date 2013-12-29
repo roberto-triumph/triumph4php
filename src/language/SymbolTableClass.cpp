@@ -29,6 +29,14 @@
 #include <wx/ffile.h>
 #include <algorithm>
 
+static UnicodeString VariableName(const pelet::VariableClass& var) {
+	UnicodeString varName;
+	if (!var.ChainList.empty()) {
+		varName = var.ChainList[0].Name;
+	}
+	return varName;
+}
+
 /*
  * Checks that a tag matches visiblity rules.  Visibility rules include
  * 1) public/private/protected
@@ -36,14 +44,14 @@
  * 3) namespace aliases
  * 
  * @param tag the tag to check
- * @param originalParsedExpression the original query being asked for
+ * @param originalParsedVariable the original query being asked for
  * @param scope the scope of the query being parsed
  * @param isStaticCall if TRUE, then tag is visible if the tag is also static
  * @param isThisCall if TRUE, then tag is visible if the tag is private, protected, or public
  * @param isParentCall if TRUE, then tag is visible if the tag is protected, or public
  * @return bool true if tag is visible
  */
-static bool IsResourceVisible(const mvceditor::TagClass& tag, const pelet::ExpressionClass& originalParsedExpression,
+static bool IsResourceVisible(const mvceditor::TagClass& tag, const pelet::VariableClass& originalParsedVariable,
 		const pelet::ScopeClass& scope,
 		bool isStaticCall, bool isThisCall, bool isParentCall) {
 	bool passesStaticCheck = true;
@@ -79,7 +87,7 @@ static bool IsResourceVisible(const mvceditor::TagClass& tag, const pelet::Expre
 	// since tagFinder does not work on a file level it had no knowledge of namespace aliases
 	// we must perform this logic here
 	bool passesNamespaceCheck = true;			
-	UnicodeString name = originalParsedExpression.FirstValue();
+	UnicodeString name = VariableName(originalParsedVariable);
 	if (!name.startsWith(UNICODE_STRING_SIMPLE("$")) && !name.startsWith(UNICODE_STRING_SIMPLE("\\")) 
 		&& mvceditor::TagClass::CLASS == tag.Type) {
 		
@@ -128,16 +136,16 @@ static bool IsResourceVisible(const mvceditor::TagClass& tag, const pelet::Expre
 /**
  * @return bool TRUE if the given parsed expression uses static access ("::")
  */
-static bool IsStaticExpression(const pelet::ExpressionClass& parsedExpression) {
+static bool IsStaticVariable(const pelet::VariableClass& parsedVariable) {
 
 	// "parent" is not static; "parent" could be used to call
 	// methods that are overidden
-	if (parsedExpression.FirstValue().caseCompare(UNICODE_STRING_SIMPLE("parent"), 0) == 0) {
+	if (VariableName(parsedVariable).caseCompare(UNICODE_STRING_SIMPLE("parent"), 0) == 0) {
 		return false;
 	}
 	return
-		parsedExpression.FirstValue().caseCompare(UNICODE_STRING_SIMPLE("self"), 0) == 0
-		|| (parsedExpression.ChainList.size() > 1 && parsedExpression.ChainList[1].IsStatic);
+		VariableName(parsedVariable).caseCompare(UNICODE_STRING_SIMPLE("self"), 0) == 0
+		|| (parsedVariable.ChainList.size() > 1 && parsedVariable.ChainList[1].IsStatic);
 }
 
 /*
@@ -147,7 +155,7 @@ static bool IsStaticExpression(const pelet::ExpressionClass& parsedExpression) {
  * Yes, this will cause a recursive call (symbol table may call this function); but it will never be very deep.
 
  * @see VariableObserverClass
- * @param expressionScope needed to use the symbol table
+ * @param variableScope needed to use the symbol table
  * @param sourceDirs only tags from matching source directories will be returned
  * @param allTagFinders needed to use the symbol table
  * @param doDuckTyping
@@ -161,7 +169,7 @@ static bool IsStaticExpression(const pelet::ExpressionClass& parsedExpression) {
  
  * @return the variable's type; could be empty string if type could not be determined 
  */
-static UnicodeString ResolveVariableType(const pelet::ScopeClass& expressionScope, 
+static UnicodeString ResolveVariableType(const pelet::ScopeClass& variableScope, 
 										 const std::vector<wxFileName>& sourceDirs,
 										 mvceditor::TagFinderListClass& tagFinderList,
 										 bool doDuckTyping,
@@ -201,11 +209,11 @@ static UnicodeString ResolveVariableType(const pelet::ScopeClass& expressionScop
 				
 				// go through the chain list; the first item in the list may be a variable
 				pelet::ScopeClass peletScope;
-				pelet::ExpressionClass parsedExpression(peletScope);
+				pelet::VariableClass parsedVariable(peletScope);
 
-				parsedExpression.ChainList = symbol.ChainList;
+				parsedVariable.ChainList = symbol.ChainList;
 				std::vector<mvceditor::TagClass> resourceMatches;
-				symbolTable.ResourceMatches(parsedExpression, expressionScope, sourceDirs,
+				symbolTable.ResourceMatches(parsedVariable, variableScope, sourceDirs,
 					tagFinderList, resourceMatches, doDuckTyping, false, error);
 				if (!resourceMatches.empty()) {
 					if (mvceditor::TagClass::CLASS == resourceMatches[0].Type) {
@@ -227,27 +235,27 @@ static UnicodeString ResolveVariableType(const pelet::ScopeClass& expressionScop
  * element may be a variable, a function call, or a static class access. This logic
  * is not trivial; that's why it was separated.
  *
- * @param parsedExpression the expression to resolved.
+ * @param parsedVariable the expression to resolved.
  * @param sourceDirs tags from matching source directories will be returned
  * @param scope the scope (to resolve variables)
  * @param allTagFinders all of the finders to look in
  * @param openedResourceFinder the tag finder for the opened files
  * @return the tag's type; (for methods, it's the return type of the method) could be empty string if type could not be determined 
  */
-static UnicodeString ResolveInitialLexemeType(const pelet::ExpressionClass& parsedExpression, 
-											  const pelet::ScopeClass& expressionScope, 
+static UnicodeString ResolveInitialLexemeType(const pelet::VariableClass& parsedVariable, 
+											  const pelet::ScopeClass& variableScope, 
 											  const std::vector<wxFileName>& sourceDirs,
 											  mvceditor::TagFinderListClass& tagFinderList,
 											  bool doDuckTyping,
 											  mvceditor::SymbolTableMatchErrorClass& error,
 											  const std::vector<mvceditor::SymbolClass>& scopeSymbols,
 											  const mvceditor::SymbolTableClass& symbolTable) {
-	UnicodeString start = parsedExpression.FirstValue();
+	UnicodeString start = VariableName(parsedVariable);
 	UnicodeString typeToLookup;
 	if (start.startsWith(UNICODE_STRING_SIMPLE("$"))) {
 		
 		// a variable. look at the type from the symbol table
-		typeToLookup = ResolveVariableType(expressionScope, sourceDirs, tagFinderList, doDuckTyping, error, 
+		typeToLookup = ResolveVariableType(variableScope, sourceDirs, tagFinderList, doDuckTyping, error, 
 				start, scopeSymbols, symbolTable);
 	}
 	else if (start.caseCompare(UNICODE_STRING_SIMPLE("self"), 0) == 0){
@@ -268,8 +276,8 @@ static UnicodeString ResolveInitialLexemeType(const pelet::ExpressionClass& pars
 		// this code assumes that the tag finders have parsed the same exact code as the code that the
 		// symbol table has parsed.
 		// also, determine the type of "parent" by looking at the scope
-		UnicodeString scopeClass = expressionScope.ClassName;
-		UnicodeString scopeMethod = expressionScope.MethodName;
+		UnicodeString scopeClass = variableScope.ClassName;
+		UnicodeString scopeMethod = variableScope.MethodName;
 
 		typeToLookup = tagFinderList.ParentClassName(scopeClass, 0);
 		if (typeToLookup.isEmpty()) {
@@ -277,12 +285,12 @@ static UnicodeString ResolveInitialLexemeType(const pelet::ExpressionClass& pars
 			error.ErrorLexeme = scopeClass;
 		}
 	}
-	else if (parsedExpression.ChainList.size() > 1) {
+	else if (parsedVariable.ChainList.size() > 1) {
 
 		// a function or a class. need to get the type from the tag finders
 		// when ChainList has only one item, the item may be a partial function/class name
 		// so we may not find it. 
-		if (IsStaticExpression(parsedExpression)) {
+		if (IsStaticVariable(parsedVariable)) {
 			typeToLookup = start;
 		}
 		else {
@@ -322,15 +330,15 @@ bool mvceditor::SymbolTableMatchErrorClass::HasError() const {
 	return Type != NONE;
 }
 
-void mvceditor::SymbolTableMatchErrorClass::ToVisibility(const pelet::ExpressionClass& parsedExpression, const UnicodeString& className) {
-	if (IsStaticExpression(parsedExpression)) {
+void mvceditor::SymbolTableMatchErrorClass::ToVisibility(const pelet::VariableClass& parsedVariable, const UnicodeString& className) {
+	if (IsStaticVariable(parsedVariable)) {
 		Type = mvceditor::SymbolTableMatchErrorClass::STATIC_ERROR;
 	}
 	else {
 		Type = mvceditor::SymbolTableMatchErrorClass::VISIBILITY_ERROR;
 	}
-	if (!parsedExpression.ChainList.empty()) {
-		ErrorLexeme = parsedExpression.ChainList.back().Name;
+	if (!parsedVariable.ChainList.empty()) {
+		ErrorLexeme = parsedVariable.ChainList.back().Name;
 	}
 	ErrorClass = className;	
 }
@@ -355,16 +363,16 @@ void mvceditor::SymbolTableMatchErrorClass::ToPrimitiveError(const UnicodeString
 	ErrorClass = className;
 }
 
-void mvceditor::SymbolTableMatchErrorClass::ToUnknownResource(const pelet::ExpressionClass& parsedExpression, const UnicodeString& className) {
-	if (!parsedExpression.ChainList.empty()) {
-		if (IsStaticExpression(parsedExpression)) {
+void mvceditor::SymbolTableMatchErrorClass::ToUnknownResource(const pelet::VariableClass& parsedVariable, const UnicodeString& className) {
+	if (!parsedVariable.ChainList.empty()) {
+		if (IsStaticVariable(parsedVariable)) {
 			Type = mvceditor::SymbolTableMatchErrorClass::UNKNOWN_STATIC_RESOURCE;
 		}
 		else {
 			Type = mvceditor::SymbolTableMatchErrorClass::UNKNOWN_RESOURCE;
 		}
 		ErrorClass = className;
-		ErrorLexeme = parsedExpression.ChainList.back().Name;
+		ErrorLexeme = parsedVariable.ChainList.back().Name;
 	}
 }
 
@@ -413,7 +421,7 @@ void mvceditor::SymbolTableClass::MethodFound(const UnicodeString& namespaceName
 }
 
 void mvceditor::SymbolTableClass::VariableFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
-	const pelet::VariableClass& variable, const pelet::ExpressionClass& expression, const UnicodeString& comment) {
+	const pelet::VariableClass& variable, pelet::ExpressionClass* expression, const UnicodeString& comment) {
 
 	// ATTN: a single variable may have many assignments
 	// for now just take the first one
@@ -437,23 +445,29 @@ void mvceditor::SymbolTableClass::VariableFound(const UnicodeString& namespaceNa
 			break;
 		}
 	}
+	std::vector<pelet::VariablePropertyClass> chainList;
 	if (!found && !variable.ChainList.empty()) {
 		UnicodeString name = variable.ChainList[0].Name;
 		mvceditor::SymbolClass::Types type;
 		std::vector<UnicodeString> arrayKeys;
 		if (variable.ArrayKey.isEmpty()) {
-			switch (expression.ExpressionType) {
+			switch (expression->ExpressionType) {
 			case pelet::ExpressionClass::SCALAR:
 			type = mvceditor::SymbolClass::SCALAR;
 				break;
 			case pelet::ExpressionClass::ARRAY:
 				type = mvceditor::SymbolClass::ARRAY;
-				arrayKeys = expression.ArrayKeys;
+				arrayKeys = ((pelet::ArrayExpressionClass*)expression)->ArrayKeys;
 				break;
 			case pelet::ExpressionClass::VARIABLE:
-			case pelet::ExpressionClass::FUNCTION_CALL:
+				type = mvceditor::SymbolClass::OBJECT;
+				chainList = ((pelet::VariableClass*)expression)->ChainList;
+				break;
 			case pelet::ExpressionClass::NEW_CALL:
 				type = mvceditor::SymbolClass::OBJECT;
+				chainList.push_back(pelet::VariablePropertyClass());
+				chainList.back().Name = 
+					((pelet::NewInstanceExpressionClass*)expression)->ClassName;
 				break;
 			case pelet::ExpressionClass::UNKNOWN:
 				type = mvceditor::SymbolClass::UNKNOWN;
@@ -468,7 +482,7 @@ void mvceditor::SymbolTableClass::VariableFound(const UnicodeString& namespaceNa
 			type = mvceditor::SymbolClass::ARRAY;
 		}
 		mvceditor::SymbolClass newSymbol(name, type);
-		newSymbol.ChainList = expression.ChainList;
+		newSymbol.ChainList = chainList;
 		newSymbol.PhpDocType = variable.PhpDocType;
 		newSymbol.ArrayKeys = arrayKeys;
 		symbols.push_back(newSymbol);
@@ -494,26 +508,26 @@ void mvceditor::SymbolTableClass::CreateSymbolsFromFile(const wxString& fileName
 	}
 }
 
-void mvceditor::SymbolTableClass::ExpressionCompletionMatches(pelet::ExpressionClass parsedExpression, 
-															  const pelet::ScopeClass& expressionScope,
+void mvceditor::SymbolTableClass::ExpressionCompletionMatches(pelet::VariableClass parsedVariable, 
+															  const pelet::ScopeClass& variableScope,
 															  const std::vector<wxFileName>& sourceDirs,
 															  mvceditor::TagFinderListClass& tagFinderList,
 															  std::vector<UnicodeString>& autoCompleteVariableList,
 															  std::vector<mvceditor::TagClass>& autoCompleteResourceList,
 															  bool doDuckTyping,
 															  mvceditor::SymbolTableMatchErrorClass& error) const {
-	if (parsedExpression.ChainList.size() == 1 && parsedExpression.FirstValue().startsWith(UNICODE_STRING_SIMPLE("$"))) {
+	if (parsedVariable.ChainList.size() == 1 && VariableName(parsedVariable).startsWith(UNICODE_STRING_SIMPLE("$"))) {
 
 		// if expression does not have more than one chained called AND it starts with a '$' then we want to match (local)
 		// variables. This is just a SymbolTable search.
 		std::vector<mvceditor::SymbolClass> scopeSymbols;
 		std::map<UnicodeString, std::vector<mvceditor::SymbolClass>, mvceditor::UnicodeStringComparatorClass>::const_iterator it;
-		it = Variables.find(ScopeString(expressionScope.ClassName, expressionScope.MethodName));
+		it = Variables.find(ScopeString(variableScope.ClassName, variableScope.MethodName));
 		if (it != Variables.end()) {
 			scopeSymbols = it->second;
 		}
 		for (size_t i = 0; i < scopeSymbols.size(); ++i) {
-			if (scopeSymbols[i].Variable.startsWith(parsedExpression.FirstValue())) {
+			if (scopeSymbols[i].Variable.startsWith(VariableName(parsedVariable))) {
 				autoCompleteVariableList.push_back(scopeSymbols[i].Variable);
 			}
 		}
@@ -521,13 +535,13 @@ void mvceditor::SymbolTableClass::ExpressionCompletionMatches(pelet::ExpressionC
 	else {
 
 		// some kind of function call / method chain call
-		ResourceMatches(parsedExpression, expressionScope, sourceDirs, tagFinderList,
+		ResourceMatches(parsedVariable, variableScope, sourceDirs, tagFinderList,
 			autoCompleteResourceList, doDuckTyping, false, error);
 	}	
 }
 
-void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedExpression, 
-												  const pelet::ScopeClass& expressionScope, 
+void mvceditor::SymbolTableClass::ResourceMatches(pelet::VariableClass parsedVariable, 
+												  const pelet::ScopeClass& variableScope, 
 												  const std::vector<wxFileName>& sourceDirs,
 												  mvceditor::TagFinderListClass& tagFinderList,
 												  std::vector<mvceditor::TagClass>& resourceMatches,
@@ -535,69 +549,69 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 												  mvceditor::SymbolTableMatchErrorClass& error) const {
 	std::vector<mvceditor::SymbolClass> scopeSymbols;
 	std::map<UnicodeString, std::vector<mvceditor::SymbolClass>, UnicodeStringComparatorClass>::const_iterator it = 
-		Variables.find(ScopeString(expressionScope.ClassName, expressionScope.MethodName));
+		Variables.find(ScopeString(variableScope.ClassName, variableScope.MethodName));
 	if (it != Variables.end()) {
 		scopeSymbols = it->second;
 	}
 	
 	// take care of the 'use' namespace importing
-	pelet::ExpressionClass originalExpression = parsedExpression;
-	ResolveNamespaceAlias(parsedExpression, expressionScope);
+	pelet::VariableClass originalVariable = parsedVariable;
+	ResolveNamespaceAlias(parsedVariable, variableScope);
 	
-	UnicodeString typeToLookup = ResolveInitialLexemeType(parsedExpression, expressionScope, sourceDirs, tagFinderList, 
+	UnicodeString typeToLookup = ResolveInitialLexemeType(parsedVariable, variableScope, sourceDirs, tagFinderList, 
 		doDuckTyping, error, scopeSymbols, *this);
 
 	// continue to the next item in the chain up until the second to last one
 	// if we can't resolve a type then just exit
 	if (typeToLookup.caseCompare(UNICODE_STRING_SIMPLE("primitive"), 0) == 0) {
-		error.ToPrimitiveError(UNICODE_STRING_SIMPLE(""), parsedExpression.FirstValue());
+		error.ToPrimitiveError(UNICODE_STRING_SIMPLE(""), VariableName(parsedVariable));
 	}
 	else if (typeToLookup.caseCompare(UNICODE_STRING_SIMPLE("array"), 0) == 0) {
-		error.ToArrayError(UNICODE_STRING_SIMPLE(""), parsedExpression.FirstValue());
+		error.ToArrayError(UNICODE_STRING_SIMPLE(""), VariableName(parsedVariable));
 	}
-	else if (!parsedExpression.ChainList.empty()) {
+	else if (!parsedVariable.ChainList.empty()) {
 
 		// need the empty check so that we don't overflow when doing 0 - 1 with size_t 
-		for (size_t i = 1;  i < (parsedExpression.ChainList.size() - 1) && !typeToLookup.isEmpty() && !error.HasError(); ++i) {	
-			UnicodeString nextResource = typeToLookup + UNICODE_STRING_SIMPLE("::") + parsedExpression.ChainList[i].Name;
+		for (size_t i = 1;  i < (parsedVariable.ChainList.size() - 1) && !typeToLookup.isEmpty() && !error.HasError(); ++i) {	
+			UnicodeString nextResource = typeToLookup + UNICODE_STRING_SIMPLE("::") + parsedVariable.ChainList[i].Name;
 			UnicodeString resolvedType = tagFinderList.ResolveResourceType(nextResource, sourceDirs);
 
 			if (resolvedType.isEmpty()) {
-				error.ToTypeResolution(typeToLookup, parsedExpression.ChainList[i].Name);
+				error.ToTypeResolution(typeToLookup, parsedVariable.ChainList[i].Name);
 			}
 			else if (typeToLookup.caseCompare(UNICODE_STRING_SIMPLE("primitive"), 0) == 0) {
-				error.ToPrimitiveError(typeToLookup, parsedExpression.ChainList[i].Name);
+				error.ToPrimitiveError(typeToLookup, parsedVariable.ChainList[i].Name);
 			}
 			else if (typeToLookup.caseCompare(UNICODE_STRING_SIMPLE("array"), 0) == 0) {
-				error.ToArrayError(typeToLookup, parsedExpression.ChainList[i].Name);
+				error.ToArrayError(typeToLookup, parsedVariable.ChainList[i].Name);
 			}
 			typeToLookup = resolvedType;
 		}
 	}
 
 	UnicodeString resourceToLookup;
-	if (!typeToLookup.isEmpty() && parsedExpression.ChainList.size() > 1 && !error.HasError()) {
-		resourceToLookup = typeToLookup + UNICODE_STRING_SIMPLE("::") + parsedExpression.ChainList.back().Name;
+	if (!typeToLookup.isEmpty() && parsedVariable.ChainList.size() > 1 && !error.HasError()) {
+		resourceToLookup = typeToLookup + UNICODE_STRING_SIMPLE("::") + parsedVariable.ChainList.back().Name;
 	}
 	else if (!typeToLookup.isEmpty() && !error.HasError()) {
 
 		// in this case; chain list is of size 1 (looking for a function / class name)
 		resourceToLookup = typeToLookup;
 	}
-	else if (!error.HasError() && parsedExpression.ChainList.size() > 1 && typeToLookup.isEmpty() && doDuckTyping) {
+	else if (!error.HasError() && parsedVariable.ChainList.size() > 1 && typeToLookup.isEmpty() && doDuckTyping) {
 		
 		// here, even if the type of previous items in the chain could not be resolved
 		// but were also known NOT to be errors
 		// perform "duck typing" lookups; just look for methods in any class
-		resourceToLookup = UNICODE_STRING_SIMPLE("::") + parsedExpression.ChainList.back().Name;
+		resourceToLookup = UNICODE_STRING_SIMPLE("::") + parsedVariable.ChainList.back().Name;
 	}
 
 	// now do the "final" lookup; here we will also perform access checks
 	// and static access checks
 	bool visibilityError = false;
-	bool isStaticCall = IsStaticExpression(parsedExpression);
-	bool isThisCall = parsedExpression.FirstValue().caseCompare(UNICODE_STRING_SIMPLE("$this"), 0) == 0;
-	bool isParentCall = parsedExpression.FirstValue().caseCompare(UNICODE_STRING_SIMPLE("parent"), 0) == 0;
+	bool isStaticCall = IsStaticVariable(parsedVariable);
+	bool isThisCall = VariableName(parsedVariable).caseCompare(UNICODE_STRING_SIMPLE("$this"), 0) == 0;
+	bool isParentCall = VariableName(parsedVariable).caseCompare(UNICODE_STRING_SIMPLE("parent"), 0) == 0;
 
 	if (!error.HasError()) {
 		mvceditor::TagSearchClass tagSearch(resourceToLookup);
@@ -622,9 +636,9 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 		// make sense because of visibility rules
 		for (size_t i = 0; i < matches.size(); ++i) {
 			mvceditor::TagClass tag = matches[i];
-			bool isVisible = IsResourceVisible(tag, originalExpression, expressionScope, isStaticCall, isThisCall, isParentCall);
+			bool isVisible = IsResourceVisible(tag, originalVariable, variableScope, isStaticCall, isThisCall, isParentCall);
 			if (isVisible) {
-				UnresolveNamespaceAlias(originalExpression, expressionScope, tag);
+				UnresolveNamespaceAlias(originalVariable, variableScope, tag);
 				resourceMatches.push_back(tag);
 			}
 			else if (!isVisible) {
@@ -635,10 +649,10 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::ExpressionClass parsedE
 
 	// don't overwrite a previous error (PRIMITIVE_ERROR, etc...)
 	if (!error.HasError() && visibilityError && resourceMatches.empty()) {
-		error.ToVisibility(parsedExpression, typeToLookup);
+		error.ToVisibility(parsedVariable, typeToLookup);
 	}
 	else if (!error.HasError() && resourceMatches.empty()) {
-		error.ToUnknownResource(parsedExpression, typeToLookup);
+		error.ToUnknownResource(parsedVariable, typeToLookup);
 	}
 }
 
@@ -697,7 +711,7 @@ void mvceditor::SymbolTableClass::CreatePredefinedVariables(std::vector<mvcedito
 	}
 }
 
-void mvceditor::SymbolTableClass::ResolveNamespaceAlias(pelet::ExpressionClass& parsedExpression, const pelet::ScopeClass& scope) const {
+void mvceditor::SymbolTableClass::ResolveNamespaceAlias(pelet::VariableClass& parsedVariable, const pelet::ScopeClass& scope) const {
 	
 	// aliases are only in the beginning of the expression
 	// for example, for the expression 
@@ -705,7 +719,7 @@ void mvceditor::SymbolTableClass::ResolveNamespaceAlias(pelet::ExpressionClass& 
 	// name variable will be "\Class"
 	// skip over variable expressions since they can't be aliased
 	// leave fully qualified names alone
-	UnicodeString name = parsedExpression.FirstValue();
+	UnicodeString name = VariableName(parsedVariable);
 	if (!name.startsWith(UNICODE_STRING_SIMPLE("$")) && !name.startsWith(UNICODE_STRING_SIMPLE("\\"))) {
 		std::map<UnicodeString, UnicodeString, pelet::UnicodeStringComparatorClass> aliases = scope.GetNamespaceAliases();
 		std::map<UnicodeString, UnicodeString, pelet::UnicodeStringComparatorClass>::const_iterator it;
@@ -723,18 +737,19 @@ void mvceditor::SymbolTableClass::ResolveNamespaceAlias(pelet::ExpressionClass& 
 			if (name == alias || name.startsWith(aliasStart)) {
 				UnicodeString afterAlias(name, it->first.length());
 				name = it->second + afterAlias;
-				parsedExpression.ChainList[0].Name = name;
+				parsedVariable.ChainList[0].Name = name;
 				break;
 			}
 		}
 	}
 }
 
-void mvceditor::SymbolTableClass::UnresolveNamespaceAlias(const pelet::ExpressionClass& originalExpression, const pelet::ScopeClass& scope, mvceditor::TagClass& tag) const {
+void mvceditor::SymbolTableClass::UnresolveNamespaceAlias(const pelet::VariableClass& originalVariable, const pelet::ScopeClass& scope, mvceditor::TagClass& tag) const {
 	UnicodeString name = tag.Identifier;
 	
 	// leave variables and fully qualified names alone
-	if (!originalExpression.FirstValue().startsWith(UNICODE_STRING_SIMPLE("$")) && !originalExpression.FirstValue().startsWith(UNICODE_STRING_SIMPLE("\\"))) {
+	UnicodeString originalName = VariableName(originalVariable);
+	if (!originalName.startsWith(UNICODE_STRING_SIMPLE("$")) && !originalName.startsWith(UNICODE_STRING_SIMPLE("\\"))) {
 		
 		std::map<UnicodeString, UnicodeString, pelet::UnicodeStringComparatorClass> aliases = scope.GetNamespaceAliases();
 		std::map<UnicodeString, UnicodeString, pelet::UnicodeStringComparatorClass>::const_iterator it;

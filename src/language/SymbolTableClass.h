@@ -140,10 +140,10 @@ public:
 	void Clear();
 	
 	/**
-	 * @param parsedExpression the expression that was attempted
+	 * @param parsedVariable the variable that was attempted
 	 * @param className the name of the class that was searched
 	 */
-	void ToVisibility(const pelet::ExpressionClass& parsedExpression, const UnicodeString& className);
+	void ToVisibility(const pelet::VariableClass& parsedVariable, const UnicodeString& className);
 
 	/**
 	 * @param className the class name that was attempted
@@ -164,10 +164,10 @@ public:
 	void ToPrimitiveError(const UnicodeString& className, const UnicodeString& methodName);
 
 	/**
-	 * @param parsedExpression the expression that was attempted
+	 * @param parsedVariable the variable that was attempted
 	 * @param className the name of the class that was searched
 	 */
-	void ToUnknownResource(const pelet::ExpressionClass& parsedExpression, const UnicodeString& className);
+	void ToUnknownResource(const pelet::VariableClass& parsedVariable, const UnicodeString& className);
 
 };
 
@@ -319,8 +319,8 @@ public:
 	 * through from the outside will only have access to public members.
 	 * None of the given resourc finders pointers will be owned by this class.
 	 * 
-	 * @param parsedExpression the expression to resolve. This is usually the result of the ParserClass::ParserExpression
-	 * @param expressionScope the scope where parsed expression is located.  The scope let's us know which variables are
+	 * @param parsedVariable the variable to resolve. This is usually the result of the pelet::ParserClass::ParseExpression
+	 * @param variableScope the scope where parsed expression is located.  The scope let's us know which variables are
 	 *        available. See ScopeFinderClass for more info.
 	 * @param sourceDirs the list of enabled source directories, only tags whose source_id matches source directories will be returned
 	 * @param tagFinderList all of the tag finders to look in
@@ -334,8 +334,8 @@ public:
 	 *        slower because TagFinderClass still handles them
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear() )
 	 */
-	void ExpressionCompletionMatches(pelet::ExpressionClass parsedExpression, 
-		const pelet::ScopeClass& expressionScope, 
+	void ExpressionCompletionMatches(pelet::VariableClass parsedVariable, 
+		const pelet::ScopeClass& variableScope, 
 		const std::vector<wxFileName>& sourceDirs,
 		mvceditor::TagFinderListClass& tagFinderList,
 		std::vector<UnicodeString>& autoCompleteVariableList,
@@ -357,8 +357,8 @@ public:
 	 * In this case, the tag object for "ClassA::prop2" will be matched.
 	 * None of the given resourc finders pointers will be owned by this class.
 	 *
-	 * @param parsedExpression the expression to resolve. This is usually the result of the ParserClass::ParserExpression
-	 * @param expressionScope the scope where parsed expression is located.  The scope let's us know which variables are
+	 * @param parsedVariable the varaible to resolve. This is usually the result of the pelet::ParserClass::ParseExpression
+	 * @param variableScope the scope where parsed expression is located.  The scope let's us know which variables are
 	 *        available. See ScopeFinderClass for more info.
 	 * @param sourceDirs the list of enabled source directories, only tags whose source_id matches source directories will be returned
 	 * @param tagFinderList the tag finders to look in
@@ -371,8 +371,8 @@ public:
 	 *        returned
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
-	void ResourceMatches(pelet::ExpressionClass parsedExpression, 
-		const pelet::ScopeClass& expressionScope, 
+	void ResourceMatches(pelet::VariableClass parsedVariable, 
+		const pelet::ScopeClass& variableScope, 
 		const std::vector<wxFileName>& sourceDirs,
 		mvceditor::TagFinderListClass& tagFinderList,
 		std::vector<TagClass>& resourceMatches,
@@ -396,7 +396,7 @@ public:
 		const int lineNumber);
 		
 	void VariableFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
-		const pelet::VariableClass& variable, const pelet::ExpressionClass& expression, const UnicodeString& comment);
+		const pelet::VariableClass& variable, pelet::ExpressionClass* expression, const UnicodeString& comment);
 		
 	/**
 	 * Set the version that the PHP parser should use.
@@ -421,23 +421,23 @@ private:
 	void CreatePredefinedVariables(std::vector<mvceditor::SymbolClass>& scope);
 	
 	/**
-	 * Modifies the expression; resolving namespaces alias to their fully qualified equivalents
+	 * Modifies the variable; resolving namespaces alias to their fully qualified equivalents
 	 * 
-	 * @param the expression to resolve
+	 * @param the variable to resolve
 	 * @param scope the scope that containts the aliases to resolve against
 	 */
-	void ResolveNamespaceAlias(pelet::ExpressionClass& parsedExpression, const pelet::ScopeClass& scope) const;
+	void ResolveNamespaceAlias(pelet::VariableClass& parsedVariable, const pelet::ScopeClass& scope) const;
 	
 	/**
 	 * Modifies the tag; unresolving namespaces alias to their aliased equivalents. We need to 
 	 * do this because the TagFinder class only deals with fully qualified namespaces, it knows nothing
 	 * about the aliases
 	 * 
-	 * @param the original expression to resolve
+	 * @param the original variable to resolve
 	 * @param scope the scope that containts the aliases to resolve against
 	 * @param tag a matched tag; will get modified an any namespace will be 'unresolved'
 	 */
-	void UnresolveNamespaceAlias(const pelet::ExpressionClass& originalExpression, const pelet::ScopeClass& scope, mvceditor::TagClass& tag) const;
+	void UnresolveNamespaceAlias(const pelet::VariableClass& originalVariable, const pelet::ScopeClass& scope, mvceditor::TagClass& tag) const;
 
 	/**
 	 * The parser.

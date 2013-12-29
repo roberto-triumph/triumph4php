@@ -467,15 +467,15 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 	int expressionPos = code.length() - 1;
 	UnicodeString lastExpression = Lexer.LastExpression(code);
 	pelet::ScopeClass scope;
-	pelet::ExpressionClass parsedExpression(scope);
-	pelet::ScopeClass expressionScope;
+	pelet::VariableClass parsedVariable(scope);
+	pelet::ScopeClass variableScope;
 	mvceditor::SymbolTableMatchErrorClass error;
 	
 	bool doDuckTyping = Ctrl->CodeControlOptions.EnableDynamicAutoCompletion;
 	if (!lastExpression.isEmpty()) {
-		Parser.ParseExpression(lastExpression, parsedExpression);
-		ScopeFinder.GetScopeString(code, expressionPos, expressionScope);
-		Globals->TagCache.ExpressionCompletionMatches(Ctrl->GetIdString(), parsedExpression, expressionScope, sourceDirs,
+		Parser.ParseExpression(lastExpression, parsedVariable);
+		ScopeFinder.GetScopeString(code, expressionPos, variableScope);
+		Globals->TagCache.ExpressionCompletionMatches(Ctrl->GetIdString(), parsedVariable, variableScope, sourceDirs,
 				variableMatches, AutoCompletionResourceMatches, doDuckTyping, error);
 		if (!variableMatches.empty()) {
 			for (size_t i = 0; i < variableMatches.size(); ++i) {
@@ -483,7 +483,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 				autoCompleteList.push_back(mvceditor::IcuToWx(variableMatches[i]) + postFix);
 			}
 		}
-		else if (parsedExpression.ChainList.size() == 1) {
+		else if (parsedVariable.ChainList.size() == 1) {
 			
 			// a bunch of function, define, or class names
 			for (size_t i = 0; i < AutoCompletionResourceMatches.size(); ++i) {
@@ -502,7 +502,7 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 			}
 
 			// when completing standalone function names, also include keyword matches
-			std::vector<wxString> keywordMatches = CollectNearMatchKeywords(mvceditor::IcuToWx(parsedExpression.ChainList[0].Name));
+			std::vector<wxString> keywordMatches = CollectNearMatchKeywords(mvceditor::IcuToWx(parsedVariable.ChainList[0].Name));
 			for (size_t i = 0; i < keywordMatches.size(); ++i) {
 				wxString postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_KEYWORD);
 				autoCompleteList.push_back(keywordMatches[i] + postFix);
@@ -582,29 +582,29 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhp(const UnicodeString& c
 		Ctrl->AutoCompShow(wordLength, list);
 	}
 	else {
-		HandleAutoCompletionPhpStatus(error, lastExpression, parsedExpression,
-			expressionScope, completeStatus);
+		HandleAutoCompletionPhpStatus(error, lastExpression, parsedVariable,
+			variableScope, completeStatus);
 	}
 }
 
 void mvceditor::PhpDocumentClass::HandleAutoCompletionPhpStatus(
 		const mvceditor::SymbolTableMatchErrorClass& error, 
 		const UnicodeString& lastExpression,
-		const pelet::ExpressionClass& parsedExpression,
-		const pelet::ScopeClass& expressionScope,
+		const pelet::VariableClass& parsedVariable,
+		const pelet::ScopeClass& variableScope,
 		wxString& completeStatus) {
 	if (lastExpression.isEmpty()) {
 		completeStatus = _("Nothing to complete");
 	}
-	else if (lastExpression.startsWith(UNICODE_STRING_SIMPLE("$")) && parsedExpression.ChainList.size() <= 1) {
+	else if (lastExpression.startsWith(UNICODE_STRING_SIMPLE("$")) && parsedVariable.ChainList.size() <= 1) {
 		completeStatus = _("No matching variables for: ");
 		completeStatus += mvceditor::IcuToWx(lastExpression);
 		completeStatus +=  _(" in scope: ");
-		completeStatus += mvceditor::IcuToWx(expressionScope.ClassName);
+		completeStatus += mvceditor::IcuToWx(variableScope.ClassName);
 		completeStatus += _("::");
-		completeStatus += mvceditor::IcuToWx(expressionScope.MethodName);
+		completeStatus += mvceditor::IcuToWx(variableScope.MethodName);
 	}
-	else if (parsedExpression.ChainList.size() == 1) {
+	else if (parsedVariable.ChainList.size() == 1) {
 		completeStatus = _("No matching class, function, define, or keyword for: \"");
 		completeStatus += mvceditor::IcuToWx(lastExpression);
 		completeStatus += wxT("\"");
@@ -612,9 +612,9 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhpStatus(
 	else if (AutoCompletionResourceMatches.empty()) {
 		if (mvceditor::SymbolTableMatchErrorClass::PARENT_ERROR == error.Type) {
 			completeStatus = _("parent not valid for scope: ");
-			completeStatus += mvceditor::IcuToWx(expressionScope.ClassName);
+			completeStatus += mvceditor::IcuToWx(variableScope.ClassName);
 			completeStatus += _("::");
-			completeStatus += mvceditor::IcuToWx(expressionScope.MethodName);
+			completeStatus += mvceditor::IcuToWx(variableScope.MethodName);
 		}
 		else if (mvceditor::SymbolTableMatchErrorClass::STATIC_ERROR == error.Type) {
 			completeStatus = _("Cannot access protected or private static member \"");
@@ -628,7 +628,8 @@ void mvceditor::PhpDocumentClass::HandleAutoCompletionPhpStatus(
 			completeStatus += wxT("\"");
 		}
 		else if (mvceditor::SymbolTableMatchErrorClass::UNKNOWN_RESOURCE == error.Type) {
-			if (parsedExpression.FirstValue() == UNICODE_STRING_SIMPLE("$this")) {
+			if (!parsedVariable.ChainList.empty() &&
+				parsedVariable.ChainList[0].Name == UNICODE_STRING_SIMPLE("$this")) {
 				completeStatus = _("No public, protected, or private member matches for \"");
 			}
 			else {
@@ -870,8 +871,8 @@ std::vector<mvceditor::TagClass> mvceditor::PhpDocumentClass::GetTagsAtPosition(
 	pelet::LexicalAnalyzerClass lexer;
 	pelet::ParserClass parser;
 	mvceditor::ScopeFinderClass scopeFinder;
-	pelet::ScopeClass expressionScope;
-	pelet::ExpressionClass parsedExpression(expressionScope);
+	pelet::ScopeClass variableScope;
+	pelet::VariableClass parsedVariable(variableScope);
 
 	lexer.SetVersion(Globals->Environment.Php.Version);
 	parser.SetVersion(Globals->Environment.Php.Version);
@@ -881,10 +882,10 @@ std::vector<mvceditor::TagClass> mvceditor::PhpDocumentClass::GetTagsAtPosition(
 	UnicodeString resourceName;
 	bool doDuckTyping = true;
 	if (!lastExpression.isEmpty()) {
-		scopeFinder.GetScopeString(code, posToCheck, expressionScope);
+		scopeFinder.GetScopeString(code, posToCheck, variableScope);
 		if (lastExpression.indexOf(UNICODE_STRING_SIMPLE("\\")) > 0 && 
-			expressionScope.ClassName.isEmpty() &&
-			expressionScope.MethodName.isEmpty()) {
+			variableScope.ClassName.isEmpty() &&
+			variableScope.MethodName.isEmpty()) {
 
 			// the expression is a namespace name outside a class or method.  this is 
 			// most likely a namespace in the "use" statement
@@ -892,11 +893,11 @@ std::vector<mvceditor::TagClass> mvceditor::PhpDocumentClass::GetTagsAtPosition(
 			// not begin with a backslash
 			lastExpression = UNICODE_STRING_SIMPLE("\\") + lastExpression;
 		}
-		parser.ParseExpression(lastExpression, parsedExpression);
+		parser.ParseExpression(lastExpression, parsedVariable);
 
 		// for now do nothing with error
 		mvceditor::SymbolTableMatchErrorClass error;
-		Globals->TagCache.ResourceMatches(Ctrl->GetIdString(), parsedExpression, expressionScope, sourceDirs, matches, 
+		Globals->TagCache.ResourceMatches(Ctrl->GetIdString(), parsedVariable, variableScope, sourceDirs, matches, 
 			doDuckTyping, true, error);
 	}
 	return matches;

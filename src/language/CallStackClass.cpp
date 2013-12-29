@@ -222,7 +222,6 @@ mvceditor::CallStackClass::CallStackClass(mvceditor::TagCacheClass& tagCache)
 	, CurrentFunction()
 	, ResourcesRemaining()
 	, TagCache(tagCache)
-	, ScopeFunctionCalls()
 	, ParsedMethods()
 	, TempVarIndex(1)
 	, FoundScope(false) {
@@ -239,7 +238,6 @@ void mvceditor::CallStackClass::Clear() {
 	CurrentClass.remove();
 	CurrentMethod.remove();
 	CurrentFunction.remove();
-	ScopeFunctionCalls.clear();
 	ParsedMethods.clear();
 	while (!ResourcesRemaining.empty()) {
 		ResourcesRemaining.pop();
@@ -323,13 +321,11 @@ bool mvceditor::CallStackClass::Recurse(pelet::Versions version, mvceditor::Call
 					// already been parsed; write the function arguments for this call and nothing else
 					// this is because we want to write a function call if the same function is called
 					// twice but we don't want to parse it twice
-					ScopeFunctionCalls.clear();
 					TempVarIndex = 1;
 					ResourcesRemaining.pop();
 				}
 			}
 			if (hasNext) {
-				ScopeFunctionCalls.clear();
 				TempVarIndex = 1;
 				return Recurse(version, error);
 			}
@@ -392,60 +388,115 @@ bool mvceditor::CallStackClass::Persist(soci::session& session) {
 	return good;
 }
 
-void mvceditor::CallStackClass::ExpressionFound(const pelet::ExpressionClass& expression) {
-
-	// only collect expressions that are in the scope we want
+bool mvceditor::CallStackClass::InDesiredScope() const {
 	if (ResourcesRemaining.empty()) {
+		return false;
+	}
+	ResourceWithFile item = ResourcesRemaining.front();
+	if (item.Resource.Identifier == CurrentFunction) {
+		return true;
+	}
+	return item.Resource.ClassName == CurrentClass && item.Resource.Identifier == CurrentMethod;
+}
+
+void mvceditor::CallStackClass::ExpressionVariableFound(pelet::VariableClass* expression) {
+	
+	// only collect expressions that are in the scope we want
+	if (!InDesiredScope()) {
 		return;
 	}
+	FoundScope = true;
+	SymbolFromExpression(expression, Variables);
+}
 
-	ResourceWithFile item = ResourcesRemaining.front();
+void mvceditor::CallStackClass::ExpressionAssignmentFound(pelet::AssignmentExpressionClass* expression) {
+	
+	// only collect expressions that are in the scope we want
+	if (!InDesiredScope()) {
+		return;
+	}
+	FoundScope = true;
+	SymbolsFromVariable(expression->Destination, expression->Expression);
 
-	if (item.Resource.Identifier == CurrentFunction || (item.Resource.ClassName == CurrentClass && item.Resource.Identifier == CurrentMethod)) {
-		FoundScope = true;
-		
-		if (expression.Type == pelet::StatementClass::ASSIGNMENT) {
-			pelet::AssignmentExpressionClass* assignmentExpression = (pelet::AssignmentExpressionClass*)&expression;
-				VariableFound(assignmentExpression->Destination.Scope.NamespaceName, 
-					assignmentExpression->Destination.Scope.ClassName, assignmentExpression->Destination.Scope.MethodName, 
-					assignmentExpression->Destination, *assignmentExpression, assignmentExpression->Comment);
-		}
-		else if (expression.Type == pelet::StatementClass::ASSIGNMENT_LIST) {
-			pelet::AssignmentListExpressionClass* assignmentListExpression = (pelet::AssignmentListExpressionClass*)&expression;
-				for (size_t i = 0; i < assignmentListExpression->Destinations.size(); ++i) {
-					VariableFound(assignmentListExpression->Scope.NamespaceName, 
-						assignmentListExpression->Scope.ClassName, assignmentListExpression->Scope.MethodName, 
-						assignmentListExpression->Destinations[i], *assignmentListExpression, assignmentListExpression->Comment);
-				}
-		}
-		else {
-			SymbolFromExpression(expression, Variables);
-		}
+	//SymbolFromExpression(expression->Expression, Variables);
+}
 
-		// this is the scope we are interested in. if the expression is a function call
-		// note that variable may contain function calls too
-		if (pelet::ExpressionClass::FUNCTION_CALL == expression.ExpressionType ||  pelet::ExpressionClass::VARIABLE == expression.ExpressionType) {
-			ScopeFunctionCalls.push_back(expression);
-		}
+void mvceditor::CallStackClass::ExpressionAssignmentCompoundFound(pelet::AssignmentCompoundExpressionClass* expression) {
+	
+	// only collect expressions that are in the scope we want
+	if (!InDesiredScope()) {
+		return;
+	}
+	FoundScope = true;
+	SymbolsFromVariable(expression->Variable, expression->RightOperand);
+}
+
+void mvceditor::CallStackClass::ExpressionBinaryOperationFound(pelet::BinaryOperationClass* expression) {
+
+	// only collect expressions that are in the scope we want
+	if (!InDesiredScope()) {
+		return;
+	}
+	FoundScope = true;
+	SymbolFromExpression(expression->LeftOperand, Variables);
+	SymbolFromExpression(expression->RightOperand, Variables);
+}
+
+void mvceditor::CallStackClass::ExpressionUnaryOperationFound(pelet::UnaryOperationClass* expression) {
+
+	// only collect expressions that are in the scope we want
+	if (!InDesiredScope()) {
+		return;
+	}
+	FoundScope = true;
+	SymbolFromExpression(expression->Operand, Variables);
+}
+
+void mvceditor::CallStackClass::ExpressionUnaryVariableOperationFound(pelet::UnaryVariableOperationClass* expression) {
+
+	// only collect expressions that are in the scope we want
+	if (!InDesiredScope()) {
+		return;
+	}
+	FoundScope = true;
+	SymbolFromExpression(&(expression->Variable), Variables);
+}
+
+void mvceditor::CallStackClass::ExpressionTernaryOperationFound(pelet::TernaryOperationClass* expression) {
+
+	// only collect expressions that are in the scope we want
+	if (!InDesiredScope()) {
+		return;
+	}
+	FoundScope = true;
+	SymbolFromExpression(expression->Expression1, Variables);
+	SymbolFromExpression(expression->Expression2, Variables);
+	if (expression->Expression3) {
+		SymbolFromExpression(expression->Expression3, Variables);
 	}
 }
 
-void mvceditor::CallStackClass::VariableFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
-        const pelet::VariableClass& variable, const pelet::ExpressionClass& expression, const UnicodeString& comment) {
+void mvceditor::CallStackClass::ExpressionScalarFound(pelet::ScalarExpressionClass* expression) {
 
 	// only collect expressions that are in the scope we want
-	if (ResourcesRemaining.empty()) {
+	if (!InDesiredScope()) {
 		return;
 	}
-
-	ResourceWithFile item = ResourcesRemaining.front();
-	if (item.Resource.Identifier == CurrentFunction || (item.Resource.ClassName == CurrentClass && item.Resource.Identifier == CurrentMethod)) {
-		FoundScope = true;
-		SymbolsFromVariable(variable, expression);
-	}
+	FoundScope = true;
+	SymbolFromExpression(expression, Variables);
 }
 
-void mvceditor::CallStackClass::SymbolsFromVariable(const pelet::VariableClass& variable, const pelet::ExpressionClass& expression) {
+void mvceditor::CallStackClass::ExpressionNewInstanceFound(pelet::NewInstanceExpressionClass* expression) {
+
+	// only collect expressions that are in the scope we want
+	if (!InDesiredScope()) {
+		return;
+	}
+	FoundScope = true;
+	SymbolFromExpression(expression, Variables);
+}
+
+void mvceditor::CallStackClass::SymbolsFromVariable(const pelet::VariableClass& variable, pelet::ExpressionClass* expression) {
 	mvceditor::VariableSymbolClass expressionResultSymbol;
 	
 	// follow associativity, do the right hand side first
@@ -515,16 +566,21 @@ void mvceditor::CallStackClass::SymbolFromVariableProperty(const UnicodeString& 
 	// recurse down the arguments first
 	std::vector<UnicodeString> argumentVariables;
 	if (property.IsFunction && !property.CallArguments.empty()) {
-		std::vector<pelet::ExpressionClass>::const_iterator expr;
+		std::vector<pelet::ExpressionClass*>::const_iterator expr;
 		for (expr = property.CallArguments.begin(); expr != property.CallArguments.end(); ++expr) {
 			size_t oldSize = symbols.size();
 			SymbolFromExpression(*expr, symbols);
 			if (symbols.size() > oldSize) {
 				argumentVariables.push_back(symbols.back().DestinationVariable);
 			}
-			else {
-				// a new variable symbol was not created because the argument already exists in the symbols list
-				argumentVariables.push_back(expr->FirstValue());
+			else if (pelet::ExpressionClass::VARIABLE == (*expr)->ExpressionType) {
+
+				pelet::VariableClass* varExpr = (pelet::VariableClass*)(*expr);
+				if (!varExpr->ChainList.empty()) {
+
+					// a new variable symbol was not created because the argument already exists in the symbols list
+					argumentVariables.push_back(varExpr->ChainList[0].Name);
+				}
 			}
 		}
 	}
@@ -541,80 +597,84 @@ void mvceditor::CallStackClass::SymbolFromVariableProperty(const UnicodeString& 
 	symbols.push_back(symbol);
 }
 
-void mvceditor::CallStackClass::SymbolFromExpression(const pelet::ExpressionClass& expression, std::vector<mvceditor::VariableSymbolClass>& symbols) {	
-	if (pelet::ExpressionClass::SCALAR == expression.ExpressionType) {
+void mvceditor::CallStackClass::SymbolFromExpression(pelet::ExpressionClass* expression, std::vector<mvceditor::VariableSymbolClass>& symbols) {	
+	if (pelet::ExpressionClass::SCALAR == expression->ExpressionType) {
 		UnicodeString tempVarName = NewTempVariable();
 		mvceditor::VariableSymbolClass scalarSymbol;
-		scalarSymbol.ToScalar(tempVarName, expression.FirstValue());
+		scalarSymbol.ToScalar(tempVarName, ((pelet::ScalarExpressionClass*)expression)->Value);
 		symbols.push_back(scalarSymbol);
 	}
-	else if (pelet::ExpressionClass::ARRAY == expression.ExpressionType) {
+	else if (pelet::ExpressionClass::ARRAY == expression->ExpressionType) {
 		UnicodeString tempVarName = NewTempVariable();
 		mvceditor::VariableSymbolClass arraySymbol;
 		arraySymbol.ToArray(tempVarName);
 		symbols.push_back(arraySymbol);
-		for (std::vector<UnicodeString>::const_iterator key = expression.ArrayKeys.begin(); key != expression.ArrayKeys.end(); ++key) {
+		std::vector<UnicodeString> arrayKeys = ((pelet::ArrayExpressionClass*)expression)->ArrayKeys;
+		for (std::vector<UnicodeString>::const_iterator key = arrayKeys.begin(); key != arrayKeys.end(); ++key) {
 			mvceditor::VariableSymbolClass keySymbol;
 			keySymbol.ToArrayKey(tempVarName, *key);
 			symbols.push_back(keySymbol);
 		}
 	}
-	else if (pelet::ExpressionClass::NEW_CALL == expression.ExpressionType) {
+	else if (pelet::ExpressionClass::NEW_CALL == expression->ExpressionType) {
 		UnicodeString tempVarName = NewTempVariable();
 		mvceditor::VariableSymbolClass newSymbol;
-		newSymbol.ToNewObject(tempVarName, expression.FirstValue());
+		newSymbol.ToNewObject(tempVarName, ((pelet::NewInstanceExpressionClass*)expression)->ClassName);
 		symbols.push_back(newSymbol);
 	}
-	else if (pelet::ExpressionClass::FUNCTION_CALL == expression.ExpressionType && !expression.ChainList.empty()) {
-		
+	else if (pelet::ExpressionClass::VARIABLE == expression->ExpressionType) {
+		pelet::VariableClass* varExpression = (pelet::VariableClass*) expression;
+
 		// do the function calls first
 		// a function will never have more than 1 item in the chain list because the following code
 		// is not possible
 		// func1() funct2();
-		std::vector<pelet::ExpressionClass>::const_iterator arg;
-		std::vector<UnicodeString> argumentVariables;
-		for (arg = expression.ChainList[0].CallArguments.begin(); arg != expression.ChainList[0].CallArguments.end(); ++arg) {
-			SymbolFromExpression(*arg, symbols);
-			if (!symbols.empty()) {
-				argumentVariables.push_back(symbols.back().DestinationVariable);
-			}
-		}
-		
-		// variable for the function result
-		UnicodeString tempVarName = NewTempVariable();
-		mvceditor::VariableSymbolClass functionSymbol;
-		functionSymbol.ToFunctionCall(tempVarName, expression.FirstValue(), argumentVariables);
-	}
-	else if (pelet::ExpressionClass::VARIABLE == expression.ExpressionType && !expression.ChainList.empty()) {
-		
-		// add the variable to the list only if we have not added it yet
-		std::vector<mvceditor::VariableSymbolClass>::iterator var;
-		bool found = false;
-		for (var = symbols.begin(); var != symbols.end(); ++var) {
-			if (var->DestinationVariable == expression.ChainList[0].Name) {
-				found = true;
-				break;
-			}
-		}
-		if (!found) {
-			mvceditor::VariableSymbolClass varSymbol;
-			varSymbol.ToAssignment(expression.ChainList[0].Name, UNICODE_STRING_SIMPLE(""));
-			symbols.push_back(varSymbol);
-		}
-		
-		if (expression.ChainList.size() > 1) {
-			
-			// now add any property / method accesses
-			std::vector<pelet::VariablePropertyClass>::const_iterator prop = expression.ChainList.begin();
-			prop++;
-			UnicodeString nextObjectName = expression.ChainList[0].Name;
-			for (; prop != expression.ChainList.end(); ++prop) {
-				size_t oldSize = symbols.size();
-				SymbolFromVariableProperty(nextObjectName, *prop, symbols);
-				if (symbols.size() > oldSize) {
-					nextObjectName = symbols.back().DestinationVariable;
+		if (!varExpression->ChainList.empty() && varExpression->ChainList[0].IsFunction) {
+			std::vector<pelet::ExpressionClass*>::const_iterator arg;
+			std::vector<UnicodeString> argumentVariables;
+			for (arg = varExpression->ChainList[0].CallArguments.begin(); arg != varExpression->ChainList[0].CallArguments.end(); ++arg) {
+				SymbolFromExpression(*arg, symbols);
+				if (!symbols.empty()) {
+					argumentVariables.push_back(symbols.back().DestinationVariable);
 				}
-			}			
+			}
+			
+			// variable for the function result
+			UnicodeString tempVarName = NewTempVariable();
+			mvceditor::VariableSymbolClass functionSymbol;
+			functionSymbol.ToFunctionCall(tempVarName, varExpression->ChainList[0].Name, argumentVariables);
+		}
+		else if (!varExpression->ChainList.empty()) {
+		
+			// add the variable to the list only if we have not added it yet
+			std::vector<mvceditor::VariableSymbolClass>::iterator var;
+			bool found = false;
+			for (var = symbols.begin(); var != symbols.end(); ++var) {
+				if (var->DestinationVariable == varExpression->ChainList[0].Name) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				mvceditor::VariableSymbolClass varSymbol;
+				varSymbol.ToAssignment(varExpression->ChainList[0].Name, UNICODE_STRING_SIMPLE(""));
+				symbols.push_back(varSymbol);
+			}
+			
+			if (varExpression->ChainList.size() > 1) {
+				
+				// now add any property / method accesses
+				std::vector<pelet::VariablePropertyClass>::const_iterator prop = varExpression->ChainList.begin();
+				prop++;
+				UnicodeString nextObjectName = varExpression->ChainList[0].Name;
+				for (; prop != varExpression->ChainList.end(); ++prop) {
+					size_t oldSize = symbols.size();
+					SymbolFromVariableProperty(nextObjectName, *prop, symbols);
+					if (symbols.size() > oldSize) {
+						nextObjectName = symbols.back().DestinationVariable;
+					}
+				}
+			}
 		}
 	}
 }

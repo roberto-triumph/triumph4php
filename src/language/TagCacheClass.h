@@ -297,12 +297,12 @@ public:
 	std::vector<mvceditor::TagClass> AllClassesFunctionsDefines(const wxString& fullPath); 
 	
 	/**
-	 * Collects all near matches that are possible candidates for completion of the parsed expression.
+	 * Collects all near matches that are possible candidates for completion of the parsed variable.
 	 * Basically just a calls the ExpressionCompletionResourceMatches() of the given file's SymbolTable. See that method for more info
 	 * 
 	 * @param fileName the symbol table of this registered file will be searched
-	 * @param parsedExpression the parsed expression; from ParserClass::ParseExpression() 
-	 * @param expressionScope the scope where parsed expression is located.  The scope let's us know which variables are
+	 * @param parsedVariable the parsed variable to be completed; from ParserClass::ParseExpression() 
+	 * @param variableScope the scope where parsed variable is located.  The scope let's us know which variables are
 	 *        available. See ScopeFinderClass for more info.
 	 * @param sourceDirs the list of enabled source directories, only tags whose source_id matches source directories will be returned
 	 * @param autoCompleteVariableList the results of the matches; these are the names of the variables that
@@ -316,8 +316,8 @@ public:
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
 	void ExpressionCompletionMatches(const wxString& fileName, 
-		const pelet::ExpressionClass& parsedExpression, 
-		const pelet::ScopeClass& expressionScope, 
+		const pelet::VariableClass& parsedVariable, 
+		const pelet::ScopeClass& variableScope, 
 		const std::vector<wxFileName>& sourceDirs,
 		std::vector<UnicodeString>& autoCompleteList,
 		std::vector<TagClass>& autoCompleteResourceList,
@@ -325,12 +325,12 @@ public:
 		SymbolTableMatchErrorClass& error);
 
 	/**
-	 * This method will resolve the given parsed expression and will figure out the type of a tag.
+	 * This method will resolve the given parsed variable and will figure out the type of a tag.
 	 * Basically just a calls the ResourceMatches() of the given file's SymbolTable. See that method for more info
 	 * 
 	 * @param fileName the symbol table of this registered file will be searched
-	 * @param parsedExpression the parsed expression; from ParserClass::ParseExpression() 
-	 * @param expressionScope the scope where parsed expression is located.  The scope let's us know which variables are
+	 * @param parsedVariable the parsed variable to lookup; from ParserClass::ParseExpression() 
+	 * @param variableScope the scope where parsed variable is located.  The scope let's us know which variables are
 	 *        available. See ScopeFinderClass for more info.
 	 * @param sourceDirs the list of enabled source directories, only tags whose source_id matches source directories will be returned
 	 * @param matches all of the tag matches will be put here
@@ -342,8 +342,8 @@ public:
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
 	void ResourceMatches(const wxString& fileName, 
-		const pelet::ExpressionClass& parsedExpression, 
-		const pelet::ScopeClass& expressionScope, 
+		const pelet::VariableClass& parsedVariable, 
+		const pelet::ScopeClass& variableScope, 
 		const std::vector<wxFileName>& sourceDirs,
 		std::vector<TagClass>& matches,
 		bool doDuckTyping, bool doFullyQualifiedMatchOnly,

@@ -260,8 +260,8 @@ private:
 	 * Fills completeStatus with a human-friendly version of the symbol table error
 	 */
 	void HandleAutoCompletionPhpStatus(const SymbolTableMatchErrorClass& error, 
-		const UnicodeString& lastExpression, const pelet::ExpressionClass& parsedExpression,
-		const pelet::ScopeClass& expressionScope, wxString& completeStatus);
+		const UnicodeString& lastExpression, const pelet::VariableClass& parsedVariable,
+		const pelet::ScopeClass& variableScope, wxString& completeStatus);
 
 	/**
 	 * Return a list of possible keyword matches for the given word. For example, if word="cl"

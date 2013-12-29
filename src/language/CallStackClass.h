@@ -319,7 +319,7 @@ public:
 	/**
 	 * Will open up the file, parse it, and collect all function calls. This is recursive (will open up
 	 * each function call, parse it, and collect all function calls that they first funtion calls).
-	 *
+	 *-
 	 * @param fileName the file to parse
 	 * @param className the class to start collecting
 	 * @param methodName the method to start collecting
@@ -354,10 +354,24 @@ public:
 	void FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, const UnicodeString& returnType, 
 		const UnicodeString& comment, const int lineNumber);
 		
-	void VariableFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
-		const pelet::VariableClass& variable, const pelet::ExpressionClass& expression, const UnicodeString& comment);
-		
-	void ExpressionFound(const pelet::ExpressionClass& expression);
+	void ExpressionVariableFound(pelet::VariableClass* expression);
+
+	void ExpressionAssignmentFound(pelet::AssignmentExpressionClass* expression);
+
+	void ExpressionAssignmentCompoundFound(pelet::AssignmentCompoundExpressionClass* expression);
+
+	void ExpressionBinaryOperationFound(pelet::BinaryOperationClass* expression);
+
+	void ExpressionUnaryOperationFound(pelet::UnaryOperationClass* expression);
+
+	void ExpressionUnaryVariableOperationFound(pelet::UnaryVariableOperationClass* expression);
+
+	void ExpressionTernaryOperationFound(pelet::TernaryOperationClass* expression);
+
+	void ExpressionScalarFound(pelet::ScalarExpressionClass* expression);
+
+	void ExpressionNewInstanceFound(pelet::NewInstanceExpressionClass* expression);
+
 	
 private:
 
@@ -410,12 +424,7 @@ private:
 	 * Used to 'jump' to the calling function
 	 */
 	TagCacheClass& TagCache;
-	
-	/**
-	 * Holds all of the function calls that were performed in the current scope
-	 */
-	std::vector<pelet::ExpressionClass> ScopeFunctionCalls;
-	
+		
 	/**
 	 * flag each method after we parse it, that way recursice functions
 	 * don't cause infinte loops
@@ -461,17 +470,23 @@ private:
 	 * note that this method creates "temporary" variables that are not present in the actual
 	 * source code (as denoted by "$@", which can never happen in valid php).
 	 */
-	void SymbolsFromVariable(const pelet::VariableClass& variable, const pelet::ExpressionClass& expression);
+	void SymbolsFromVariable(const pelet::VariableClass& variable, pelet::ExpressionClass* expression);
 	
 	
 	void SymbolFromVariableProperty(const UnicodeString& objectName, const pelet::VariablePropertyClass& property, std::vector<mvceditor::VariableSymbolClass>& symbols);
 	
-	void SymbolFromExpression(const pelet::ExpressionClass& expression, std::vector<mvceditor::VariableSymbolClass>& symbols);
+	void SymbolFromExpression(pelet::ExpressionClass* expression, std::vector<mvceditor::VariableSymbolClass>& symbols);
 	
 	/**
 	 * @return the name for a new template variable; the variable name will be unique for the current scope
 	 */
 	UnicodeString NewTempVariable();
+
+	/**
+	 * @return bool TRUE if the current function is the method / function that we want to 
+	 *         capture variables from.
+	 */
+	bool InDesiredScope() const;
 };
 
 }

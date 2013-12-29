@@ -271,8 +271,8 @@ std::vector<mvceditor::ParsedTagFinderClass*> mvceditor::TagCacheClass::AllFinde
 }
 
 void mvceditor::TagCacheClass::ExpressionCompletionMatches(const wxString& fileName, 
-													const pelet::ExpressionClass& parsedExpression, 
-													const pelet::ScopeClass& expressionScope, 
+													const pelet::VariableClass& parsedVariable, 
+													const pelet::ScopeClass& variableScope, 
 													const std::vector<wxFileName>& sourceDirs,
 													 std::vector<UnicodeString>& autoCompleteList,
 													 std::vector<mvceditor::TagClass>& resourceMatches,
@@ -283,7 +283,7 @@ void mvceditor::TagCacheClass::ExpressionCompletionMatches(const wxString& fileN
 	if (itWorkingCache != WorkingCaches.end()) {
 		foundSymbolTable = true;
 		mvceditor::WorkingCacheClass* cache = itWorkingCache->second;
-		cache->SymbolTable.ExpressionCompletionMatches(parsedExpression, expressionScope, sourceDirs, *TagFinderList, 
+		cache->SymbolTable.ExpressionCompletionMatches(parsedVariable, variableScope, sourceDirs, *TagFinderList, 
 			autoCompleteList, resourceMatches, doDuckTyping, error);
 	
 	}
@@ -293,18 +293,18 @@ void mvceditor::TagCacheClass::ExpressionCompletionMatches(const wxString& fileN
 }
 
 void mvceditor::TagCacheClass::ResourceMatches(const wxString& fileName, 
-												const pelet::ExpressionClass& parsedExpression, 
-													const pelet::ScopeClass& expressionScope, 
+												const pelet::VariableClass& parsedVariable,
+												const pelet::ScopeClass& variableScope, 
 												const std::vector<wxFileName>& sourceDirs,
-													std::vector<mvceditor::TagClass>& matches,
-													bool doDuckTyping, bool doFullyQualifiedMatchOnly,
-													mvceditor::SymbolTableMatchErrorClass& error) {
+												std::vector<mvceditor::TagClass>& matches,
+												bool doDuckTyping, bool doFullyQualifiedMatchOnly,
+												mvceditor::SymbolTableMatchErrorClass& error) {
 	std::map<wxString, mvceditor::WorkingCacheClass*>::const_iterator itWorkingCache = WorkingCaches.find(fileName);
 	bool foundSymbolTable = false;
 	if (itWorkingCache != WorkingCaches.end()) {
 		foundSymbolTable = true;
 		mvceditor::WorkingCacheClass* cache = itWorkingCache->second;
-		cache->SymbolTable.ResourceMatches(parsedExpression, expressionScope, sourceDirs, *TagFinderList, 
+		cache->SymbolTable.ResourceMatches(parsedVariable, variableScope, sourceDirs, *TagFinderList, 
 			matches, doDuckTyping, doFullyQualifiedMatchOnly, error);	
 	}
 	if (!foundSymbolTable) {

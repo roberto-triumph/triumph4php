@@ -446,6 +446,8 @@ TEST_FIXTURE(CallStackFixtureTestClass, WithMethodCall) {
 	CHECK_SYMBOL_IS_PROPERTY(8, "$@tmp4", "$this", "load");
 	CHECK_SYMBOL_IS_SCALAR(9, "$@tmp5", "index");
 	CHECK_SYMBOL_IS_METHOD_CALL(10, "$@tmp6", "$@tmp4", "view");
+
+	CHECK_VECTOR_SIZE(2, CallStack.Variables[10].FunctionArguments);
 	CHECK_SYMBOL_IS_METHOD_CALL_ARG(10, 0, "$@tmp5");
 	CHECK_SYMBOL_IS_METHOD_CALL_ARG(10, 1, "$data");
 }

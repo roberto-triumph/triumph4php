@@ -125,7 +125,7 @@ public:
 	bool DoDuckTyping;
 	bool DoFullyQualifiedMatchOnly;
 	pelet::ScopeClass Scope;
-	pelet::ExpressionClass ParsedExpression;
+	pelet::VariableClass ParsedVariable;
 	std::vector<wxFileName> SourceDirs;
 
 	std::vector<UnicodeString> VariableMatches;
@@ -149,7 +149,7 @@ public:
 		, DoDuckTyping(false)
 		, DoFullyQualifiedMatchOnly(false)
 		, Scope()
-		, ParsedExpression(Scope)
+		, ParsedVariable(Scope)
 		, SourceDirs()
 		, VariableMatches()
 		, TagMatches()
@@ -171,14 +171,14 @@ public:
 	}
 	
 	void ToProperty(const UnicodeString& variableName, const UnicodeString& methodName) {
-		ParsedExpression.Clear();
+		ParsedVariable.Clear();
 		pelet::VariablePropertyClass classProp;
 		classProp.Name = variableName;
-		ParsedExpression.ChainList.push_back(classProp);
+		ParsedVariable.ChainList.push_back(classProp);
 		
 		pelet::VariablePropertyClass methodProp;
 		methodProp.Name = methodName;
-		ParsedExpression.ChainList.push_back(methodProp);
+		ParsedVariable.ChainList.push_back(methodProp);
 	}
 
 	mvceditor::WorkingCacheClass* CreateWorkingCache(const wxString& fileName, const UnicodeString& code) {
@@ -254,7 +254,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, CompletionMatchesWithTagFi
 	TagCache.RegisterGlobal(cache2);
 	
 	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("w"));
-	TagCache.ExpressionCompletionMatches(File2, ParsedExpression, Scope, SourceDirs,
+	TagCache.ExpressionCompletionMatches(File2, ParsedVariable, Scope, SourceDirs,
 		VariableMatches, TagMatches, DoDuckTyping, Error);
 	CHECK_VECTOR_SIZE(1, TagMatches);
 	CHECK_UNISTR_EQUALS("w", TagMatches[0].Identifier);
@@ -276,7 +276,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, TagMatchesWithTagFinderLis
 	TagCache.RegisterGlobal(cache2);
 	
 	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("w"));
-	TagCache.ResourceMatches(File1, ParsedExpression, Scope, SourceDirs,
+	TagCache.ResourceMatches(File1, ParsedVariable, Scope, SourceDirs,
 		TagMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_VECTOR_SIZE(1, TagMatches);
 	CHECK_UNISTR_EQUALS("w", TagMatches[0].Identifier);
@@ -303,7 +303,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, TagMatchesWithStaleMatches
 	TagCache.RegisterGlobal(cache2);
 	
 	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("methodA"));
-	TagCache.ResourceMatches(File1, ParsedExpression, Scope, SourceDirs,
+	TagCache.ResourceMatches(File1, ParsedVariable, Scope, SourceDirs,
 		TagMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_VECTOR_SIZE(1, TagMatches);
 	CHECK_UNISTR_EQUALS("methodA", TagMatches[0].Identifier);
@@ -315,7 +315,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, TagMatchesWithStaleMatches
 	CHECK(TagCache.RegisterWorking(GlobalFile, cache3));
 	
 	TagMatches.clear();
-	TagCache.ResourceMatches(GlobalFile, ParsedExpression, Scope, SourceDirs,
+	TagCache.ResourceMatches(GlobalFile, ParsedVariable, Scope, SourceDirs,
 		TagMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_VECTOR_SIZE(0, TagMatches);
 }
