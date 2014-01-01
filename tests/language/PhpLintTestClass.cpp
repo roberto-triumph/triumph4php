@@ -222,6 +222,31 @@ TEST_FIXTURE(PhpLintTestFixtureClass, RecurseFunctionArguments) {
 	CHECK_EQUAL(7, Results[0].LineNumber);
 }
 
+TEST_FIXTURE(PhpLintTestFixtureClass, RecurseConstructorArguments) {
+
+	// test that arguments to a constructor are checked
+	// must recurse down constructor call and any method chaining 
+	// in case an argument
+	// is the result of another function call
+	Lint.SetVersion(pelet::PHP_54);
+	UnicodeString code = mvceditor::CharToIcu(
+		"function myFunc($a, $b) {\n"
+		"  $a = $a + 99;\n"
+		"  $b->work();\n"
+		"}\n"
+		"\n"
+		"function myBFunc($a) {\n"
+		"  $b = (new MyClass($a, $c))->myMethod($r);\n"
+		"}"
+	);
+	Parse(code);
+	CHECK_EQUAL(true, HasError);
+	CHECK_VECTOR_SIZE(2, Results);
+	CHECK_UNISTR_EQUALS("$c", Results[0].VariableName);
+	CHECK_UNISTR_EQUALS("$r", Results[1].VariableName);
+	CHECK_EQUAL(7, Results[0].LineNumber);
+	CHECK_EQUAL(7, Results[1].LineNumber);
+}
 
 
 }

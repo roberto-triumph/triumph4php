@@ -188,6 +188,19 @@ void mvceditor::PhpLintClass::ExpressionScalarFound(pelet::ScalarExpressionClass
 }
 
 void mvceditor::PhpLintClass::ExpressionNewInstanceFound(pelet::NewInstanceExpressionClass* expression) {
+	std::vector<pelet::ExpressionClass*>::const_iterator constructorArg = expression->CallArguments.begin();
+	for (; constructorArg != expression->CallArguments.end(); ++constructorArg) {
+		CheckExpression(*constructorArg);
+	}
+
+	// check any function args to any chained method calls.
+	std::vector<pelet::VariablePropertyClass>::const_iterator prop = expression->ChainList.begin();
+	for (; prop != expression->ChainList.end(); ++prop) {
+		std::vector<pelet::ExpressionClass*>::const_iterator chainArg = prop->CallArguments.begin();
+		for (; chainArg != prop->CallArguments.end(); ++chainArg) {
+			CheckExpression(*chainArg);
+		}
+	}
 } 
 
 void mvceditor::PhpLintClass::CheckExpression(pelet::ExpressionClass* expr) {
