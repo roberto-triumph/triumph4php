@@ -248,18 +248,18 @@ void mvceditor::PhpLintClass::CheckVariable(pelet::VariableClass* var) {
 	// TODO:
 	// more checks that would be great to implement
 	//  1. variable inside interporlated strings  "this is your name: {$name}"
-	//  2. functions calls to functions that are not defined in a project
-	//  3. new calls with classes that are not defined in a project
-	//  4. undefined properties of an object
-	//  5. undefined methods of an object
+	   ///  2. functions calls to functions that are not defined in a project
+  	   ///  3. new calls with classes that are not defined in a project
+	   ///  4. undefined properties of an object
+	   ///  5. undefined methods of an object
 	//  6. variable variables  "$obj->{$methodName}"
-	//  7. variables in array expression $users[$iIndex], array(strtolower($name) => $count)
-	//  8. variables inside closures 
-	//  9. attempt to inherit from undefined base classes
-	// 10. attempt to implement undefined interfaces
-	// 11. type hints with classes that are not defined
-	// 12. namespace declarations with namespaces that are not defined
-	// 13. variable in include/require statements
+	  ///  7. variables in array expression $users[$iIndex], array(strtolower($name) => $count)
+	  ///  8. variables inside closures 
+	  ///  9. attempt to inherit from undefined base classes
+	  /// 10. attempt to implement undefined interfaces
+	  /// 11. type hints with classes that are not defined
+	  /// 12. namespace declarations with namespaces that are not defined
+	  /// 13. variable in include/require statements
 	if (!var->ChainList[0].IsFunction) {
 		UnicodeString varName = var->ChainList[0].Name;
 		if (ScopeVariables.end() == std::find(ScopeVariables.begin(), ScopeVariables.end(), varName)

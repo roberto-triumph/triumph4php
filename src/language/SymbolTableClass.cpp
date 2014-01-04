@@ -423,6 +423,11 @@ void mvceditor::SymbolTableClass::MethodFound(const UnicodeString& namespaceName
 void mvceditor::SymbolTableClass::VariableFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
 	const pelet::VariableClass& variable, pelet::ExpressionClass* expression, const UnicodeString& comment) {
 
+	UnicodeString variableArrayAccessKey;
+	if (!variable.ChainList.empty() && variable.ChainList[0].IsArrayAccess && variable.ChainList[0].ArrayAccess) {
+		variableArrayAccessKey = ((pelet::ScalarExpressionClass*)variable.ChainList[0].ArrayAccess)->Value;
+	}
+
 	// ATTN: a single variable may have many assignments
 	// for now just take the first one
 	std::vector<mvceditor::SymbolClass>& symbols = GetScope(className, methodName);
@@ -430,16 +435,15 @@ void mvceditor::SymbolTableClass::VariableFound(const UnicodeString& namespaceNa
 	for (size_t i = 0; i < symbols.size(); ++i) {
 		if (!variable.ChainList.empty() && symbols[i].Variable == variable.ChainList[0].Name) {
 			found = true;
-			
-			if (!variable.ArrayKey.isEmpty()) {
+			if (!variableArrayAccessKey.isEmpty()) {
 				
 				// update any new Array keys used in the variable assignment
 				// make sure not to have duplicates in case the same key is assigned
 				// multiple times
 				std::vector<UnicodeString>::iterator it = std::find(
-					symbols[i].ArrayKeys.begin(), symbols[i].ArrayKeys.end(), variable.ArrayKey);
+					symbols[i].ArrayKeys.begin(), symbols[i].ArrayKeys.end(), variableArrayAccessKey);
 				if (it == symbols[i].ArrayKeys.end()) {
-					symbols[i].ArrayKeys.push_back(variable.ArrayKey);
+					symbols[i].ArrayKeys.push_back(variableArrayAccessKey);
 				}
 			}
 			break;
@@ -449,15 +453,22 @@ void mvceditor::SymbolTableClass::VariableFound(const UnicodeString& namespaceNa
 	if (!found && !variable.ChainList.empty()) {
 		UnicodeString name = variable.ChainList[0].Name;
 		mvceditor::SymbolClass::Types type;
+		std::vector<pelet::ArrayPairExpressionClass*> pairs;
+		std::vector<pelet::ArrayPairExpressionClass*>::const_iterator pair;
 		std::vector<UnicodeString> arrayKeys;
-		if (variable.ArrayKey.isEmpty()) {
+		if (variableArrayAccessKey.isEmpty()) {
 			switch (expression->ExpressionType) {
 			case pelet::ExpressionClass::SCALAR:
 			type = mvceditor::SymbolClass::SCALAR;
 				break;
 			case pelet::ExpressionClass::ARRAY:
 				type = mvceditor::SymbolClass::ARRAY;
-				arrayKeys = ((pelet::ArrayExpressionClass*)expression)->ArrayKeys;
+				pairs = ((pelet::ArrayExpressionClass*)expression)->ArrayPairs;
+				for (pair = pairs.begin(); pair != pairs.end(); ++pair) {
+					if ((*pair)->Key && pelet::ExpressionClass::SCALAR == (*pair)->Key->ExpressionType) {
+						arrayKeys.push_back(((pelet::ScalarExpressionClass*)(*pair)->Key)->Value);
+					}
+				}
 				break;
 			case pelet::ExpressionClass::VARIABLE:
 				type = mvceditor::SymbolClass::OBJECT;
@@ -476,9 +487,9 @@ void mvceditor::SymbolTableClass::VariableFound(const UnicodeString& namespaceNa
 		}
 		else {
 			
-			// in  PHP an array may be created by assiging
+			// in  PHP an array may be created by assigning
 			// an array key-value to a non-existant variable
-			arrayKeys.push_back(variable.ArrayKey);
+			arrayKeys.push_back(variableArrayAccessKey);
 			type = mvceditor::SymbolClass::ARRAY;
 		}
 		mvceditor::SymbolClass newSymbol(name, type);

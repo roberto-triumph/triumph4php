@@ -505,9 +505,16 @@ void mvceditor::CallStackClass::SymbolsFromVariable(const pelet::VariableClass& 
 	if (Variables.size() > oldSize) {
 		expressionResultSymbol = Variables.back();
 	}
-	
-	if (!variable.ArrayKey.isEmpty()) {
+
+	if (variable.ChainList.size() == 2 && variable.ChainList[1].IsArrayAccess) {
 		
+		// check to see if the array access key is a scalar
+		pelet::ExpressionClass* arrayAccessExpr = variable.ChainList[1].ArrayAccess;
+		UnicodeString arrayKey;
+		if (arrayAccessExpr && pelet::ExpressionClass::SCALAR == arrayAccessExpr->ExpressionType) {
+			arrayKey = ((pelet::ScalarExpressionClass*)arrayAccessExpr)->Value;
+		}
+
 		// dont need to insert the same array key multiple times
 		// add the variable to the list only if we have not added it yet
 		// an array key may be assigned if the variable is not yet
@@ -521,7 +528,7 @@ void mvceditor::CallStackClass::SymbolsFromVariable(const pelet::VariableClass& 
 			if (var->DestinationVariable == variable.ChainList[0].Name) {
 				foundVariable = true;
 			}
-			if (var->DestinationVariable == variable.ChainList[0].Name && var->ArrayKey == variable.ArrayKey) {
+			if (var->DestinationVariable == variable.ChainList[0].Name && var->ArrayKey == arrayKey) {
 				foundIndex = true;
 			}
 		}
@@ -532,7 +539,7 @@ void mvceditor::CallStackClass::SymbolsFromVariable(const pelet::VariableClass& 
 		}
 		if (!foundIndex) {
 			mvceditor::VariableSymbolClass arrayVariableKeySymbol;
-			arrayVariableKeySymbol.ToArrayKey(variable.ChainList[0].Name, variable.ArrayKey);
+			arrayVariableKeySymbol.ToArrayKey(variable.ChainList[0].Name, arrayKey);
 			Variables.push_back(arrayVariableKeySymbol);
 		}
 		
@@ -590,11 +597,32 @@ void mvceditor::CallStackClass::SymbolFromVariableProperty(const UnicodeString& 
 	mvceditor::VariableSymbolClass symbol;
 	if (property.IsFunction) {
 		symbol.ToMethodCall(tempVarName, objectName, property.Name, argumentVariables);
+		symbols.push_back(symbol);
 	}
-	else {
+	else if (!property.IsArrayAccess) {
 		symbol.ToProperty(tempVarName, objectName, property.Name);
+		symbols.push_back(symbol);
 	}
-	symbols.push_back(symbol);
+	/*
+	else if (property.IsArrayAccess && property.ArrayAccess) {
+		
+		// check to see if the array access key is a scalar
+		pelet::ExpressionClass* arrayAccessExpr = property.ArrayAccess;
+		UnicodeString arrayKey;
+		if (arrayAccessExpr && pelet::ExpressionClass::SCALAR == arrayAccessExpr->ExpressionType) {
+			arrayKey = ((pelet::ScalarExpressionClass*)arrayAccessExpr)->Value;
+			symbol.ToArrayKey(objectName, arrayKey);
+			symbols.push_back(symbol);
+		}
+
+		// dont need to insert the same array key multiple times
+		// add the variable to the list only if we have not added it yet
+		// an array key may be assigned if the variable is not yet
+		// seen; need to look for this case also
+		// ie.  $arr[] = 'name';  
+		// as the array initialization for $arr	
+	}
+	*/
 }
 
 void mvceditor::CallStackClass::SymbolFromExpression(pelet::ExpressionClass* expression, std::vector<mvceditor::VariableSymbolClass>& symbols) {	
@@ -609,7 +637,17 @@ void mvceditor::CallStackClass::SymbolFromExpression(pelet::ExpressionClass* exp
 		mvceditor::VariableSymbolClass arraySymbol;
 		arraySymbol.ToArray(tempVarName);
 		symbols.push_back(arraySymbol);
-		std::vector<UnicodeString> arrayKeys = ((pelet::ArrayExpressionClass*)expression)->ArrayKeys;
+
+		// array keys are expressions, only want to capture scalar keys
+		std::vector<UnicodeString> arrayKeys;
+		std::vector<pelet::ArrayPairExpressionClass*> pairs = ((pelet::ArrayExpressionClass*)expression)->ArrayPairs;
+		std::vector<pelet::ArrayPairExpressionClass*>::const_iterator pair;
+		for (pair = pairs.begin(); pair != pairs.end(); ++pair) {
+			if ((*pair)->Key && pelet::ExpressionClass::SCALAR == (*pair)->Key->ExpressionType) {
+				arrayKeys.push_back(((pelet::ScalarExpressionClass*)(*pair)->Key)->Value);
+			}
+		}
+
 		for (std::vector<UnicodeString>::const_iterator key = arrayKeys.begin(); key != arrayKeys.end(); ++key) {
 			mvceditor::VariableSymbolClass keySymbol;
 			keySymbol.ToArrayKey(tempVarName, *key);
