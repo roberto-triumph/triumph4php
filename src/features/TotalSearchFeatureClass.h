@@ -88,6 +88,11 @@ private:
 	void OnSearchKeyDown(wxKeyEvent& event);
 	void OnSearchComplete(mvceditor::TotalTagSearchCompleteEventClass& event);
 
+	/**
+	 * update the cache status label and internal flags
+	 */
+	void UpdateCacheStatus();
+
 	void OnTimer(wxTimerEvent& event);
 	
 	void ChooseSelectedAndEnd(size_t selected);
@@ -128,6 +133,20 @@ private:
 	 * the line number to jump to (given by the user)
 	 */
 	int& LineNumber;
+
+	/**
+	 * if TRUE, the cache is being built (background tag cache
+	 * action is running.  We don't want to query the tag
+	 * cache in this case, since ti results in GUI lockups
+	 * since our read query will be locked by the writes
+	 */
+	bool IsCacheBeingBuilt;
+
+	/**
+	 * if TRUE, the cache is empty. informational message is
+	 * shown
+	 */
+	bool IsCacheEmpty;
 	
 	DECLARE_EVENT_TABLE()
 };
