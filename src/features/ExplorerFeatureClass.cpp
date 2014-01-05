@@ -440,6 +440,7 @@ void mvceditor::ModalExplorerPanelClass::OnListKeyDown(wxKeyEvent& event) {
 
 void mvceditor::ModalExplorerPanelClass::ShowDir(const wxFileName& currentDir, const std::vector<wxFileName>& files, const std::vector<wxFileName>& dirs,
 												 int totalFiles, int totalSubDirs) {
+	bool changedDir = CurrentListDir != currentDir;
 	CurrentListDir = currentDir;
 	Directory->SetValue(currentDir.GetPath());
 
@@ -511,12 +512,20 @@ void mvceditor::ModalExplorerPanelClass::ShowDir(const wxFileName& currentDir, c
 	}
 	List->SetFocus();
 
-	if (Watcher) {
-		delete Watcher;
+	// only recreate the watch when the explorer shows a new dir
+	// this method will be called as a result of an external file
+	// watcher event (new/delete file), if there are many events in
+	// quick succession a crash would happen. in reality we 
+	// only need to recreate the watch when the explorer is being 
+	// pointed into a different directory than previous
+	if (changedDir) {
+		if (Watcher) {
+			delete Watcher;
+		}
+		Watcher = new wxFileSystemWatcher();
+		Watcher->SetOwner(this);
+		Watcher->Add(currentDir, wxFSW_EVENT_CREATE | wxFSW_EVENT_DELETE | wxFSW_EVENT_RENAME | wxFSW_EVENT_WARNING | wxFSW_EVENT_ERROR);
 	}
-	Watcher = new wxFileSystemWatcher();
-	Watcher->SetOwner(this);
-	Watcher->Add(currentDir, wxFSW_EVENT_CREATE | wxFSW_EVENT_DELETE | wxFSW_EVENT_RENAME | wxFSW_EVENT_WARNING | wxFSW_EVENT_ERROR);
 }
 
 bool mvceditor::ModalExplorerPanelClass::OpenIfListFile(const wxString& text) {
