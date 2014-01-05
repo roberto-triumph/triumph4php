@@ -412,6 +412,15 @@ extern const wxEventType EVENT_APP_PREFERENCES_SAVED;
 extern const wxEventType EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED;
 
 /**
+ * Notification that a new project was created via the "New Project"
+ * menu (not the "Defined Projects" menu). The generated event will be
+ * a wxCommandEvent, its GetString() will be contain the directory
+ * of the created project.
+ */
+extern const wxEventType EVENT_APP_PROJECT_CREATED;
+
+
+/**
  * Tell the app to open a new file.
  * Note that the app will do NOTHING if the path is invalid; the feature should
  * make sure the path is valid.

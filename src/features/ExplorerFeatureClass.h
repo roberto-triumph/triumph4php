@@ -113,6 +113,11 @@ private:
 	 * when projects list is updated, we need to update our sources list
 	 */
 	void OnAppPreferencesSaved(wxCommandEvent& event);
+
+	/**
+	 * when a new project is created, show it in the explorer panel
+	 */
+	void OnAppProjectCreated(wxCommandEvent& event);
 	
 	/**
 	 * toolbar to hold the explorer buttons

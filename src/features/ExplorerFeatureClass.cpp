@@ -269,6 +269,22 @@ void mvceditor::ExplorerFeatureClass::OnAppPreferencesSaved(wxCommandEvent& even
 	config->Write(wxT("/Explorer/ShellExecutable"), ShellExecutable.GetFullPath());
 }
 
+void mvceditor::ExplorerFeatureClass::OnAppProjectCreated(wxCommandEvent& event) {
+	mvceditor::ModalExplorerPanelClass* panel = NULL;
+	wxWindow* window = FindToolsWindow(ID_EXPLORER_PANEL);
+	if (!window) {	
+		panel =  new mvceditor::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, *this);
+		AddToolsWindow(panel, _("Explorer"));
+	}
+	else {
+		panel = (mvceditor::ModalExplorerPanelClass*)window;
+	}
+	wxString dir = event.GetString();
+	wxFileName projectDir;
+	projectDir.AssignDir(dir);
+	panel->RefreshDir(projectDir);
+}
+
 mvceditor::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, mvceditor::ExplorerFeatureClass& feature)
 : ModalExplorerGeneratedPanelClass(parent, id) 
 , CurrentListDir()
@@ -1314,7 +1330,8 @@ BEGIN_EVENT_TABLE(mvceditor::ExplorerFeatureClass, mvceditor::FeatureClass)
 	EVT_MENU_RANGE(mvceditor::MENU_EXPLORER + 3, mvceditor::MENU_EXPLORER + 50, mvceditor::ExplorerFeatureClass::OnExplorerProjectMenu)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::ExplorerFeatureClass::OnAppPreferencesSaved)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, mvceditor::ExplorerFeatureClass::OnAppPreferencesSaved)
-	
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_CREATED, mvceditor::ExplorerFeatureClass::OnAppProjectCreated)
+
 	EVT_EXPLORER_COMPLETE(ID_EXPLORER_LIST_ACTION, mvceditor::ExplorerFeatureClass::OnExplorerListComplete)
 END_EVENT_TABLE()
 
