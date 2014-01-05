@@ -177,7 +177,10 @@ void mvceditor::ExplorerFeatureClass::OnExplorerProjectMenu(wxCommandEvent& even
 		// as a fallback if the user has not created any projects
 		// just go to the user's home dir
 		wxStandardPaths paths = wxStandardPaths::Get();
-		panel->RefreshDir(paths.GetDocumentsDir());
+		wxString documentsDirString = paths.GetDocumentsDir();
+		wxFileName documentsDir;
+		documentsDir.AssignDir(documentsDirString);
+		panel->RefreshDir(documentsDir);
 	}
 }
 
